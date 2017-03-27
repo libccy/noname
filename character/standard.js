@@ -466,14 +466,14 @@ character.standard={
 			},
 			viewAs:{name:'shan'},
 			viewAsFilter:function(player){
-				if(!player.num('h',{color:'black'})) return false;
+				if(!player.countCards('h',{color:'black'})) return false;
 			},
 			prompt:'将一张黑色手牌当闪打出',
 			check:function(){return 1},
 			ai:{
 				respondShan:true,
 				skillTagFilter:function(player){
-					if(!player.num('h',{color:'black'})) return false;
+					if(!player.countCards('h',{color:'black'})) return false;
 				},
 				effect:{
 					target:function(card,player,target,current){

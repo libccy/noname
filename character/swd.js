@@ -328,7 +328,7 @@ character.swd={
 		tiebi:{
 			trigger:{global:'shaBegin'},
 			filter:function(event,player){
-				return player.num('h',{color:'black'})&&!event.target.hujia&&get.distance(player,event.target)<=1;
+				return player.countCards('h',{color:'black'})&&!event.target.hujia&&get.distance(player,event.target)<=1;
 			},
 			direct:true,
 			content:function(){
@@ -461,7 +461,7 @@ character.swd={
 					prompt:'横置武将牌，视为使用一张无视距离的杀',
 					ai:{
 						order:function(){
-							// if(_status.event.player.num('h',{type:'equip'})) return 9;
+							// if(_status.event.player.countCards('h',{type:'equip'})) return 9;
 							return 3.15;
 						},
 						skillTagFilter:function(player,tag,arg){
@@ -671,7 +671,7 @@ character.swd={
 						if(!player.hasFriend()) return 0;
 						var enemies=player.getEnemies();
 						if(enemies.length+1==game.players.length) return 0;
-						var num=player.num('h',function(card){
+						var num=player.hasCard(function(card){
 							return card.name=='sha'||get.color(card)=='red';
 						});
 						if(num<2) return 0;
@@ -700,7 +700,7 @@ character.swd={
 			enable:'phaseUse',
 			filter:function(event,player){
 				if(!player.countCards('h')) return false;
-				if(player.num('h',{type:'jiqi'})) return false;
+				if(player.countCards('h',{type:'jiqi'})) return false;
 				return true;
 			},
 			discard:false,
@@ -732,7 +732,7 @@ character.swd={
 			trigger:{player:'phaseEnd'},
 			filter:function(event,player){
 				if(!player.num('he',{type:'equip'})) return false;
-				if(player.num('h',{type:'jiqi'})) return false;
+				if(player.countCards('h',{type:'jiqi'})) return false;
 				if(get.cardPile(function(card){return get.type(card)=='jiqi'})) return true;
 				return false;
 			},
@@ -1038,7 +1038,7 @@ character.swd={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				return player.num('h',{suit:['spade','heart']})>0;
+				return player.countCards('h',{suit:['spade','heart']})>0;
 			},
 			filterCard:{suit:['spade','heart']},
 			viewAs:{name:'fengyinzhidan'},
@@ -1295,13 +1295,13 @@ character.swd={
 			selectCard:2,
 			viewAs:{name:'sha'},
 			viewAsFilter:function(player){
-				if(player.num('h',{type:['trick','delay']})<2) return false;
+				if(player.countCards('h',{type:['trick','delay']})<2) return false;
 			},
 			check:function(){return 1},
 			ai:{
 				skillTagFilter:function(player,tag,arg){
 					if(arg!='use') return false;
-					if(player.num('h',{type:['trick','delay']})<2) return false;
+					if(player.countCards('h',{type:['trick','delay']})<2) return false;
 				},
 				respondSha:true,
 				order:function(){
@@ -3396,7 +3396,7 @@ character.swd={
 			enable:'phaseUse',
 			filterCard:{color:'black'},
 			filter:function(event,player){
-				return player.num('h',{color:'black'})>0;
+				return player.countCards('h',{color:'black'})>0;
 			},
 			selectCard:[1,Infinity],
 			prompt:'弃置任意张黑色手牌并摸等量的牌',
@@ -3499,7 +3499,7 @@ character.swd={
 					if(ai.get.attitude(player,trigger.player)>0){
 						return 9-ai.get.value(card);
 					}
-					if(player.num('h',{name:'shan'})) return -1;
+					if(player.countCards('h',{name:'shan'})) return -1;
 					return 7-ai.get.value(card);
 				}
 				"step 1"
@@ -3919,7 +3919,7 @@ character.swd={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				return player.hp<player.maxHp&&player.num('h',{color:'red'})>0;
+				return player.hp<player.maxHp&&player.countCards('h',{color:'red'})>0;
 			},
 			filterTarget:function(card,player,target){
 				return player!=target;//&&get.distance(player,target,'attack')<=1;
@@ -4358,7 +4358,7 @@ character.swd={
 			viewAs:{name:'bingpotong'},
 			position:'he',
 			filter:function(event,player){
-				return player.num('h',{color:'black'})>0;
+				return player.countCards('h',{color:'black'})>0;
 			},
 			viewAsFilter:function(player){
 				if(!player.num('he',{color:'black'})) return false;
@@ -4417,7 +4417,7 @@ character.swd={
 				return player.attitudeTo(event.player)>3;
 			},
 			filter:function(event,player){
-				if(get.is.altered('susheng')&&!player.num('h',{color:'red'})) return false;
+				if(get.is.altered('susheng')&&!player.countCards('h',{color:'red'})) return false;
 				return player.countCards('h')>0&&!player.hasSkill('susheng2');
 			},
 			content:function(){
@@ -5596,8 +5596,8 @@ character.swd={
 			usable:1,
 			filter:function(event,player){
 				if(get.is.altered('xianjiang')&&player.countCards('e')) return false;
-				if(player.num('h',{type:'trick'})) return true;
-				if(player.num('h',{type:'delay'})) return true;
+				if(player.countCards('h',{type:'trick'})) return true;
+				if(player.countCards('h',{type:'delay'})) return true;
 				return false;
 			},
 			selectCard:1,
@@ -6489,7 +6489,7 @@ character.swd={
 				return get.type(card,'trick')=='trick';
 			},
 			filter:function(event,player){
-				return player.num('h',{type:['trick','delay']})>0;
+				return player.countCards('h',{type:['trick','delay']})>0;
 			},
 			filterTarget:function(card,player,target){
 				var names=[];
@@ -6872,7 +6872,7 @@ character.swd={
 				return get.distance(player,target)<=1||player==target;
 			},
 			filter:function(event,player){
-				return player.num('h',{color:'red'})>0;
+				return player.countCards('h',{color:'red'})>0;
 			},
 			selectTarget:-1,
 			content:function(){

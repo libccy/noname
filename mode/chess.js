@@ -5095,7 +5095,7 @@ mode.chess={
 				return get.distance(player,target)<=5&&player!=target;
 			},
 			filter:function(event,player){
-				return player.num('h',{color:'red'})>0;
+				return player.countCards('h',{color:'red'})>0;
 			},
 			selectTarget:-1,
 			content:function(){

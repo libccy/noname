@@ -5940,7 +5940,7 @@ mode.stone={
 			forced:true,
 			unique:true,
 			filter:function(event,player){
-				return player.getLeader().num('h',{type:'stonecharacter'})>0;
+				return player.getLeader().countCards('h',{type:'stonecharacter'})>0;
 			},
 			content:function(){
 				player.addSkill('stone_chongfeng');
@@ -6155,7 +6155,7 @@ mode.stone={
 			forced:true,
 			unique:true,
 			filter:function(event,player){
-				return player.getLeader().num('h',{type:'stonecharacter'})>0;
+				return player.getLeader().countCards('h',{type:'stonecharacter'})>0;
 			},
 			content:function(){
 				player.maxHp++;
@@ -7246,7 +7246,7 @@ mode.stone={
 			forced:true,
 			unique:true,
 			filter:function(event,player){
-				return player.getLeader().num('h',{type:'stonecharacter'})>0;
+				return player.getLeader().countCards('h',{type:'stonecharacter'})>0;
 			},
 			content:function(){
 				player.draw();
@@ -9118,14 +9118,14 @@ mode.stone={
 			nopop:true,
 			check:function(){return 1},
 			filter:function(event,player){
-				return player.num('h',{type:'equip'})>0;
+				return player.countCards('h',{type:'equip'})>0;
 			},
 			viewAsFilter:function(player){
-				return player.num('h',{type:'equip'})>0;
+				return player.countCards('h',{type:'equip'})>0;
 			},
 			ai:{
 				skillTagFilter:function(player){
-					return player.num('h',{type:'equip'})>0;
+					return player.countCards('h',{type:'equip'})>0;
 				},
 				respondSha:true,
 				order:4,
@@ -9149,14 +9149,14 @@ mode.stone={
 			nopop:true,
 			check:function(){return 1},
 			filter:function(event,player){
-				return player.num('h',{type:['stonecharacter','stonecard']})>0;
+				return player.countCards('h',{type:['stonecharacter','stonecard']})>0;
 			},
 			viewAsFilter:function(player){
-				return player.num('h',{type:['stonecharacter','stonecard']})>0;
+				return player.countCards('h',{type:['stonecharacter','stonecard']})>0;
 			},
 			ai:{
 				skillTagFilter:function(player){
-					return player.num('h',{type:['stonecharacter','stonecard']})>0;
+					return player.countCards('h',{type:['stonecharacter','stonecard']})>0;
 				},
 				respondShan:true,
 				order:4,

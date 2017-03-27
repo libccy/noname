@@ -45,7 +45,7 @@ character.diy={
 			usable:1,
 			filterCard:{type:'basic'},
 			filter:function(event,player){
-				return player.num('h',{type:'basic'})>0;
+				return player.countCards('h',{type:'basic'})>0;
 			},
 			check:function(card){
 				return 6-ai.get.value(card);

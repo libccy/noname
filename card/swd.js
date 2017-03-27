@@ -922,7 +922,7 @@ card.swd={
 				},
 				result:{
 					target:function(player,target){
-						if(target==player&&target.num('h',{type:'equip'})) return 2.5;
+						if(target==player&&target.countCards('h',{type:'equip'})) return 2.5;
 						return 1;
 					}
 				}
@@ -1448,7 +1448,7 @@ card.swd={
 			},
 			content:function(){
 				"step 0"
-				if(!target.num('h',{color:'black'})){
+				if(!target.countCards('h',{color:'black'})){
 					target.loseHp();
 					event.finish();
 				}
@@ -2062,7 +2062,7 @@ card.swd={
 				var skills=player.get('s');
 				for(var i=0;i<skills.length;i++){
 					if(skills[i].indexOf('yuchan')==0&&skills[i].indexOf('_equip')!=-1){
-						return player.num('h',{type:'basic'})>0;
+						return player.countCards('h',{type:'basic'})>0;
 					}
 				}
 				return false;
@@ -3868,7 +3868,7 @@ card.swd={
 		jiguanyaoshu_skill_old:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				return player.num('h',{type:['trick','delay']})>0;
+				return player.countCards('h',{type:['trick','delay']})>0;
 			},
 			filterCard:{type:['trick','delay']},
 			check:function(card){
@@ -4081,7 +4081,7 @@ card.swd={
 			selectCard:2,
 			complexCard:true,
 			filter:function(event,player){
-				if(!player.num('h',{type:['hslingjian','jiqi']})) return false;
+				if(!player.countCards('h',{type:['hslingjian','jiqi']})) return false;
 				var es=player.getCards('he',{type:'equip'});
 				for(var i=0;i<es.length;i++){
 					if(lib.inpile.contains(es[i].name)&&

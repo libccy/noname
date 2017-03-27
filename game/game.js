@@ -18593,7 +18593,7 @@
 					if(lib.config.tao_enemy&&event.dying.side!=player.side&&lib.config.mode!='identity'&&lib.config.mode!='guozhan'){
 						event._result={bool:false}
 					}
-					else if(player.isOnline()||(_status.connectMode&&player==game.me)||player.hasSkillTag('save',true)||player.num('h',function(card){
+					else if(player.isOnline()||(_status.connectMode&&player==game.me)||player.hasSkillTag('save',true)||player.hasCard(function(card){
                         var savable=get.info(card).savable;
                         if(typeof savable=='function') savable=savable(card,player,event.dying);
                         return savable;
@@ -18667,7 +18667,7 @@
                 logv:false,
 				prompt:'将要重铸的牌置入弃牌堆并摸一张牌',
 				filter:function(event,player){
-					return (player.num('h',function(card){
+					return (player.hasCard(function(card){
                         var info=get.info(card);
 						if(typeof info.chongzhu=='function'){
 							return info.chongzhu(event,player);
@@ -18686,7 +18686,7 @@
 					player.$throw(cards,1000);
 				},
 				check:function(card){
-					// if(get.type(card)=='stonecharacter'&&_status.event.player.num('h',{type:'stonecharacter'})<=1){
+					// if(get.type(card)=='stonecharacter'&&_status.event.player.countCards('h',{type:'stonecharacter'})<=1){
 					// 	return 0;
 					// }
 					return 1;

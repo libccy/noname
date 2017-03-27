@@ -1156,7 +1156,7 @@ character.refresh={
 				result:{
 					player:function(player){
 						if(player.hp<=2) return player.countCards('h')==0?1:0;
-						if(player.num('h',{name:'sha',color:'red'})) return 1;
+						if(player.countCards('h',{name:'sha',color:'red'})) return 1;
 						return player.countCards('h')<=player.hp?1:0;
 					}
 				},

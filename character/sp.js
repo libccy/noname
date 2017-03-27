@@ -1528,7 +1528,7 @@ character.sp={
 			filterCard:{type:'basic'},
 			viewAs:{name:'tao'},
 			viewAsFilter:function(player){
-				if(!player.num('h',{type:'basic'})) return false;
+				if(!player.countCards('h',{type:'basic'})) return false;
 			},
 			prompt:'将一张基本牌当桃使用',
 			check:function(card){
@@ -1536,7 +1536,7 @@ character.sp={
 			},
 			ai:{
 				skillTagFilter:function(player){
-					if(!player.num('h',{type:'basic'})) return false;
+					if(!player.countCards('h',{type:'basic'})) return false;
 				},
 				save:true,
 			}
@@ -1546,13 +1546,13 @@ character.sp={
 			filterCard:{type:'basic'},
 			viewAs:{name:'sha'},
 			viewAsFilter:function(player){
-				if(!player.num('h',{type:'basic'})) return false;
+				if(!player.countCards('h',{type:'basic'})) return false;
 			},
 			prompt:'将一张基本牌当杀使用',
 			check:function(card){return 4-ai.get.value(card)},
 			ai:{
 				skillTagFilter:function(player){
-					if(!player.num('h',{type:'basic'})) return false;
+					if(!player.countCards('h',{type:'basic'})) return false;
 				},
 				respondSha:true,
 			}
@@ -1562,7 +1562,7 @@ character.sp={
 			filterCard:{type:'basic'},
 			viewAs:{name:'jiu'},
 			viewAsFilter:function(player){
-				if(!player.num('h',{type:'basic'})) return false;
+				if(!player.countCards('h',{type:'basic'})) return false;
 			},
 			prompt:'将一张基本牌当酒使用',
 			check:function(card){
@@ -1571,7 +1571,7 @@ character.sp={
 			},
 			ai:{
 				skillTagFilter:function(player){
-					return player.num('h',{type:'basic'})>0&&player.hp<=0;
+					return player.countCards('h',{type:'basic'})>0&&player.hp<=0;
 				},
 				save:true,
 			}
@@ -2125,7 +2125,7 @@ character.sp={
 			animationColor:'thunder',
 			skillAnimation:'epic',
 			filter:function(event,player){
-				return !player.storage.jianshu&&player.num('h',{color:'black'})>0;
+				return !player.storage.jianshu&&player.countCards('h',{color:'black'})>0;
 			},
 			init:function(player){
 				player.storage.jianshu=false;
@@ -3664,7 +3664,7 @@ character.sp={
 							if(ai.get.attitude(player,trigger.player)>0){
 								return 9-ai.get.value(card);
 							}
-							if(player.num('h',{name:'shan'})) return -1;
+							if(player.countCards('h',{name:'shan'})) return -1;
 							return 7-ai.get.value(card);
 						});
 						next.logSkill='anxian';
@@ -4249,7 +4249,7 @@ character.sp={
 			audio:2,
 			trigger:{player:'phaseDrawBegin'},
 			check:function(event,player){
-				return player.countCards('h')-player.num('h',{type:'equip'})+2<=player.hp;
+				return player.countCards('h')-player.countCards('h',{type:'equip'})+2<=player.hp;
 			},
 			content:function(){
 				trigger.num+=2;
@@ -4337,7 +4337,7 @@ character.sp={
 					trigger:{source:'damageBegin'},
 					direct:true,
 					filter:function(event,player){
-						if(!player.num('h',{color:'black'})) return false;
+						if(!player.countCards('h',{color:'black'})) return false;
 						return event.player.hp>=player.hp&&player!=event.player;
 					},
 					content:function(){
@@ -4362,7 +4362,7 @@ character.sp={
 					audio:true,
 					trigger:{player:'damageBegin'},
 					filter:function(event,player){
-						if(!player.num('h',{color:'red'})) return false;
+						if(!player.countCards('h',{color:'red'})) return false;
 						return event.source&&event.source.hp>=player.hp&&player!=event.source;
 					},
 					direct:true,
@@ -4618,7 +4618,7 @@ character.sp={
 			forced:true,
 			audio:2,
 			filter:function(event,player){
-				return event.parent.name=='phaseDiscard'&&player.num('h',{type:'basic'})<player.countCards('h');
+				return event.parent.name=='phaseDiscard'&&player.countCards('h',{type:'basic'})<player.countCards('h');
 			},
 			content:function(){},
 			mod:{
@@ -4997,7 +4997,7 @@ character.sp={
 				'step 1'
 				if(result.control&&result.control!='cancel2'){
 					player.logSkill('fengpo');
-					var nd=trigger.target.num('h',{suit:'diamond'});
+					var nd=trigger.target.countCards('h',{suit:'diamond'});
 					if(result.control=='draw_card'){
 						player.draw(nd);
 					}
@@ -6665,7 +6665,7 @@ character.sp={
 				return ai.get.damageEffect(event.player,player,player)>0;
 			},
 			filter:function(event,player){
-				return event.player.isAlive()&&event.player!=player&&player.num('h',{type:'basic'});
+				return event.player.isAlive()&&event.player!=player&&player.countCards('h',{type:'basic'});
 			},
 			direct:true,
 			content:function(){

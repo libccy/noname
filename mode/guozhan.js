@@ -947,7 +947,7 @@ mode.guozhan={
 			inherit:'kanpo',
 			zhenfa:'inline',
 			viewAsFilter:function(player){
-				return _status.currentPhase.inline(player)&&!player.hasSkill('kanpo')&&player.num('h',{color:'black'})>0;
+				return _status.currentPhase.inline(player)&&!player.hasSkill('kanpo')&&player.countCards('h',{color:'black'})>0;
 			},
 		},
 		yizhi:{
@@ -1615,7 +1615,7 @@ mode.guozhan={
 			usable:4,
 			filterCard:{color:'red'},
 			viewAsFilter:function(player){
-				return player.num('h',{color:'red'})>0;
+				return player.countCards('h',{color:'red'})>0;
 			},
 			check:function(card){
 				return 5-ai.get.value(card);

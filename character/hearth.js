@@ -483,7 +483,7 @@ character.hearth={
 			trigger:{source:'damageBegin'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('h',{color:'black'})>0;
+				return player.countCards('h',{color:'black'})>0;
 			},
 			content:function(){
 				"step 0"
@@ -523,7 +523,7 @@ character.hearth={
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('h',{suit:'spade'})>0;
+				return player.countCards('h',{suit:'spade'})>0;
 			},
 			content:function(){
 				'step 0'
@@ -556,7 +556,7 @@ character.hearth={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				return player.num('h',{type:['trick','delay']})>0;
+				return player.countCards('h',{type:['trick','delay']})>0;
 			},
 			filterCard:{type:['trick','delay']},
 			check:function(card){
@@ -1636,7 +1636,7 @@ character.hearth={
 			trigger:{player:['phaseBegin','phaseEnd']},
 			frequent:true,
 			filter:function(event,player){
-				return !player.num('h',{type:'hsdusu'});
+				return !player.countCards('h',{type:'hsdusu'});
 			},
 			content:function(){
 				var list=['hsdusu_xueji','hsdusu_huangxuecao','hsdusu_kuyecao','hsdusu_shinancao','hsdusu_huoyanhua'];
@@ -1862,7 +1862,7 @@ character.hearth={
 			usable:1,
 			filter:function(event,player){
 				if(!player.storage.mobao) return false;
-				if(!player.num('h',{color:'black'})) return false;
+				if(!player.countCards('h',{color:'black'})) return false;
 				for(var i=0;i<player.storage.mobao.length;i++){
 					if(player.storage.mobao[i].isAlive()) return true;
 				}
@@ -3875,7 +3875,7 @@ character.hearth={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				return player.num('h',{type:'basic'})<player.countCards('h');
+				return player.countCards('h',{type:'basic'})<player.countCards('h');
 			},
 			filterCard:function(card){
 				return get.type(card)!='basic';
@@ -4398,7 +4398,7 @@ character.hearth={
 		zuzhou:{
 			trigger:{player:'phaseBegin'},
 			filter:function(event,player){
-				if(!player.num('h',{suit:'spade'})) return false;
+				if(!player.countCards('h',{suit:'spade'})) return false;
 				return !game.hasPlayer(function(current){
 					return current.hasJudge('shandian');
 				});
@@ -4429,7 +4429,7 @@ character.hearth={
 			enable:'phaseUse',
 			filterCard:{color:'black'},
 			filter:function(event,player){
-				return player.num('h',{color:'black'})>0;
+				return player.countCards('h',{color:'black'})>0;
 			},
 			filterTarget:function(card,player,target){
 				return player!=target&&!target.hasSkill('mdzhoufu2');
@@ -4651,7 +4651,7 @@ character.hearth={
 				if(_status.currentPhase!=event.player) return false;
 				if(event.player.hasSkill('mengun2')) return false;
 				if(get.itemtype(event.card)!='card') return false;
-				if(!player.num('h',{suit:get.suit(event.card)})) return false;
+				if(!player.countCards('h',{suit:get.suit(event.card)})) return false;
 				return get.type(event.card)=='basic';
 			},
 			direct:true,

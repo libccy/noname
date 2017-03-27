@@ -560,7 +560,7 @@ character.ow={
                 expose:0.2,
                 result:{
                     target:function(player,target){
-                        if(ai.get.damageEffect(target,player,target)<0&&player.num('h',function(card){
+                        if(ai.get.damageEffect(target,player,target)<0&&player.hasCard(function(card){
                             return get.tag(card,'damage')?true:false;
                         })){
                             return -1;
@@ -811,7 +811,7 @@ character.ow={
         maoding2:{
             enable:'phaseUse',
             filter:function(event,player){
-                return player.num('h',{type:'hslingjian'})>1;
+                return player.countCards('h',{type:'hslingjian'})>1;
             },
             filterCard:{type:'hslingjian'},
             filterTarget:function(card,player,target){
@@ -1467,7 +1467,7 @@ character.ow={
                 }
                 var success=false;
                 for(var i=0;i<suits.length;i++){
-                    if(target.num('h',{suit:suits[i]})){
+                    if(target.countCards('h',{suit:suits[i]})){
                         success=true;break;
                     }
                 }
@@ -2413,7 +2413,7 @@ character.ow={
                 return target!=player&&!target.hasSkill('xie2');
             },
             filter:function(event,player){
-                return player.num('h',{suit:'heart'});
+                return player.countCards('h',{suit:'heart'});
             },
             filterCard:{suit:'heart'},
             check:function(card){
@@ -2519,7 +2519,7 @@ character.ow={
                 return target!=player&&!target.hasSkill('luan2');
             },
             filter:function(event,player){
-                return player.num('h',{suit:'spade'});
+                return player.countCards('h',{suit:'spade'});
             },
             filterCard:{suit:'spade'},
             check:function(card){

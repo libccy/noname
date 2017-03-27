@@ -637,7 +637,7 @@ card.gujian={
 			},
 			content:function(){
 				"step 0"
-				if(!target.num('h',{color:'black'})){
+				if(!target.countCards('h',{color:'black'})){
 					target.loseHp();
 					event.finish();
 				}

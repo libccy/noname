@@ -274,7 +274,7 @@ character.yxs={
 			},
 			discard:false,
 			filter:function(event,player){
-				if(player.num('h',{suit:'heart'})){
+				if(player.countCards('h',{suit:'heart'})){
 					return true;
 				}
 				return false;
@@ -684,7 +684,7 @@ character.yxs={
 			enable:'phaseUse',
 			usable:1,
 			viewAsFilter:function(player){
-				return player.num('h',{suit:'heart'})>0;
+				return player.countCards('h',{suit:'heart'})>0;
 			},
 			viewAs:{name:'wuzhong'},
 			filterCard:{suit:'heart'},
@@ -928,7 +928,7 @@ character.yxs={
 				target.popup(result.control);
 				target.showHandcards();
 				"step 2"
-				if(target.num('h',{suit:event.choice})){
+				if(target.countCards('h',{suit:event.choice})){
 					target.damage();
 				}
 			},
@@ -1551,7 +1551,7 @@ character.yxs={
 			trigger:{global:'dying'},
 			priority:11,
 			filter:function(event,player){
-				return event.player.hp<=0&&(player.countCards('h','jiu')>0||player.num('h',{color:'black'})>=2)&&player!=event.player;
+				return event.player.hp<=0&&(player.countCards('h','jiu')>0||player.countCards('h',{color:'black'})>=2)&&player!=event.player;
 			},
 			check:function(event,player){
 				return ai.get.attitude(player,event.player)<0;

@@ -767,7 +767,7 @@ character.gujian={
 				return event.source&&ai.get.attitude(player,event.source)<0;
 			},
 			filter:function(event,player){
-				return event.source&&event.source.isAlive()&&player.num('h',{color:'red'})>1||player.num('h',{color:'black'})>1;
+				return event.source&&event.source.isAlive()&&player.countCards('h',{color:'red'})>1||player.countCards('h',{color:'black'})>1;
 			},
 			direct:true,
 			content:function(){
@@ -776,7 +776,7 @@ character.gujian={
 					if(ui.selected.cards.length){
 						return get.color(card)==get.color(ui.selected.cards[0]);
 					}
-					return player.num('h',{color:get.color(card)})>1;
+					return player.countCards('h',{color:get.color(card)})>1;
 				}).set('complexCard',true);
 				next.ai=function(card){
 					if(ai.get.damageEffect(trigger.source,player,player,'thunder')>0){
@@ -1225,7 +1225,7 @@ character.gujian={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				return player.num('h',{type:'basic'})>0&&player.storage.xuanning!=3;
+				return player.countCards('h',{type:'basic'})>0&&player.storage.xuanning!=3;
 			},
 			filterCard:function(card){
 				return get.type(card)=='basic';
@@ -1336,7 +1336,7 @@ character.gujian={
 			enable:'phaseUse',
 			filter:function(event,player){
 				if(player.storage.yangming2>0) return false;
-				return player.num('h',{color:'red'})>0;
+				return player.countCards('h',{color:'red'})>0;
 			},
 			filterCard:function(card){
 				return get.color(card)=='red';

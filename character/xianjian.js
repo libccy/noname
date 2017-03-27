@@ -760,7 +760,7 @@ character.xianjian={
             trigger:{player:'phaseEnd'},
 			direct:true,
             filter:function(event,player){
-				if(!player.num('h',{color:'black'})) return false;
+				if(!player.countCards('h',{color:'black'})) return false;
 				if(player.storage.leiyu){
 					for(var i=0;i<player.storage.leiyu.length;i++){
 						if(player.storage.leiyu[i].isAlive()) return true;
@@ -925,7 +925,7 @@ character.xianjian={
 			},
 			filterCard:{color:'black'},
 			filter:function(event,player){
-				return player.num('h',{color:'black'});
+				return player.countCards('h',{color:'black'});
 			},
 			check:function(card){
 				return 5-ai.get.value(card);
@@ -1810,7 +1810,7 @@ character.xianjian={
 			trigger:{global:'dying'},
 			priority:6,
 			filter:function(event,player){
-				return event.player.hp<=0&&player.num('h',{color:'red'});
+				return event.player.hp<=0&&player.countCards('h',{color:'red'});
 			},
 			check:function(event,player){
 				if(ai.get.attitude(player,event.player)<=0) return false;
@@ -1952,7 +1952,7 @@ character.xianjian={
 						return get.color(card)=='black'&&get.type(card)!='basic';
 					});
 				}
-				return player.num('h',{type:'basic'})<player.countCards('he');
+				return player.countCards('h',{type:'basic'})<player.countCards('he');
 			},
 			init:function(player){
 				player.storage.zhuyue=[];
@@ -2085,7 +2085,7 @@ character.xianjian={
 			unique:true,
 			enable:'phaseUse',
 			filter:function(event,player){
-				return !player.storage.guanri&&player.num('h',{color:'red'})>=2;
+				return !player.storage.guanri&&player.countCards('h',{color:'red'})>=2;
 			},
 			check:function(card){
 				return 8-ai.get.value(card);
@@ -2305,16 +2305,16 @@ character.xianjian={
 				return get.suit(card)=='club';
 			},
 			filter:function(event,player){
-				return player.num('h',{suit:'club'});
+				return player.countCards('h',{suit:'club'});
 			},
 			viewAs:{name:'shunshou'},
 			viewAsFilter:function(player){
-				if(!player.num('h',{suit:'club'})) return false;
+				if(!player.countCards('h',{suit:'club'})) return false;
 			},
 			prompt:'将一张装备牌当顺手牵羊使用',
 			check:function(card){
 				var player=_status.currentPhase;
-				if(player.num('h',{subtype:get.subtype(card)})>1){
+				if(player.countCards('h',{subtype:get.subtype(card)})>1){
 					return 11-ai.get.equipValue(card);
 				}
 				if(player.countCards('h')<player.hp){

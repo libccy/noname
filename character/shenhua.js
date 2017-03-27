@@ -313,7 +313,7 @@ character.shenhua={
 		lianhuan3:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				return player.num('h',{suit:'club'})>0;
+				return player.countCards('h',{suit:'club'})>0;
 			},
 			filterCard:{suit:'club'},
 			viewAs:{name:'tiesuo'},
@@ -872,7 +872,7 @@ character.shenhua={
 					if(player.countCards('h')>player.hp+1){
 						check=false;
 					}
-					else if(player.num('h',{name:['wuzhong']})){
+					else if(player.countCards('h',{name:['wuzhong']})){
 						check=false;
 					}
 					else{
@@ -1299,7 +1299,7 @@ character.shenhua={
 			audio:2,
 			enable:'phaseUse',
 			filter:function(event,player){
-				return player.num('h',{type:'equip'})>0;
+				return player.countCards('h',{type:'equip'})>0;
 			},
 			filterCard:function(card){
 				return get.type(card)=='equip';
@@ -2368,7 +2368,7 @@ character.shenhua={
 			},
 			viewAs:{name:'jiu'},
 			viewAsFilter:function(player){
-				if(!player.num('h',{suit:'spade'})) return false;
+				if(!player.countCards('h',{suit:'spade'})) return false;
 			},
 			prompt:'将一张黑桃手牌当酒使用',
 			check:function(card){
@@ -2377,7 +2377,7 @@ character.shenhua={
 			},
 			ai:{
 				skillTagFilter:function(player){
-					return player.num('h',{suit:'spade'})>0&&player.hp<=0;
+					return player.countCards('h',{suit:'spade'})>0&&player.hp<=0;
 				},
 				threaten:1.5,
 				save:true,
@@ -2601,7 +2601,7 @@ character.shenhua={
 			},
 			viewAs:{name:'huogong',nature:'fire'},
 			viewAsFilter:function(player){
-				if(!player.num('h',{color:'red'})) return false;
+				if(!player.countCards('h',{color:'red'})) return false;
 			},
 			prompt:'将一张红色牌当火攻使用',
 			check:function(card){
@@ -2639,7 +2639,7 @@ character.shenhua={
 				return get.color(card)=='black';
 			},
 			viewAsFilter:function(player){
-				return player.num('h',{color:'black'})>0;
+				return player.countCards('h',{color:'black'})>0;
 			},
 			viewAs:{name:'wuxie'},
 			prompt:'将一张黑色手牌当无懈可击使用',
@@ -2653,7 +2653,7 @@ character.shenhua={
 			audio:2,
 			enable:'phaseUse',
 			filter:function(event,player){
-				return player.num('h',{suit:'club'})>0;
+				return player.countCards('h',{suit:'club'})>0;
 			},
 			filterCard:function(card){
 				return get.suit(card)=='club';
@@ -2666,7 +2666,7 @@ character.shenhua={
 			audio:2,
 			enable:'phaseUse',
 			filter:function(event,player){
-				return player.num('h',{suit:'club'})>0;
+				return player.countCards('h',{suit:'club'})>0;
 			},
 			filterCard:function(card){
 				return get.suit(card)=='club';
@@ -3479,7 +3479,7 @@ character.shenhua={
 			trigger:{player:'damageBefore'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('h',{suit:'heart'})>0&&event.num>0;
+				return player.countCards('h',{suit:'heart'})>0&&event.num>0;
 			},
 			content:function(){
 				"step 0"

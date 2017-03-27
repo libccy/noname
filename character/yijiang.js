@@ -336,7 +336,7 @@ character.yijiang={
 				check:function(button){
 					var player=_status.event.player;
 					var players=game.filterPlayer();
-					if(player.num('h',button.link)) return 0;
+					if(player.countCards('h',button.link)) return 0;
 					if(button.link=='wuzhong'){
 						if(player.countCards('h')<player.hp){
 							return 3+Math.random();
@@ -1624,7 +1624,7 @@ character.yijiang={
 				return get.color(card)=='black';
 			},
 			viewAsFilter:function(player){
-				return player.num('h',{color:'black'})>0;
+				return player.countCards('h',{color:'black'})>0;
 			},
 			viewAs:{name:'wuxie'},
 			prompt:'将一张黑色手牌当无懈可击使用',
@@ -1639,7 +1639,7 @@ character.yijiang={
 			},
 			viewAs:{name:'shan'},
 			viewAsFilter:function(player){
-				if(!player.num('h',{color:'red'})) return false;
+				if(!player.countCards('h',{color:'red'})) return false;
 			},
 			audio:true,
 			prompt:'将一张红色手牌当闪打出',
@@ -1647,7 +1647,7 @@ character.yijiang={
 			ai:{
 				respondShan:true,
 				skillTagFilter:function(player){
-					if(!player.num('h',{color:'red'})) return false;
+					if(!player.countCards('h',{color:'red'})) return false;
 				},
 				effect:{
 					target:function(card,player,target,current){
@@ -2330,7 +2330,7 @@ character.yijiang={
 			audio:2,
 			trigger:{player:'phaseUseBegin'},
 			check:function(event,player){
-				var nh=player.countCards('h')-player.num('h',{type:'equip'});
+				var nh=player.countCards('h')-player.countCards('h',{type:'equip'});
 				if(nh<=1) return true;
 				if(player.countCards('h','tao')) return false;
 				if(nh<=2) return Math.random()<0.7;
@@ -2439,14 +2439,14 @@ character.yijiang={
 			usable:1,
 			delay:0,
 			filter:function(event,player){
-				return player.num('h',{color:'red'})&&player.num('h',{color:'black'});
+				return player.countCards('h',{color:'red'})&&player.countCards('h',{color:'black'});
 			},
 			content:function(){
 				'step 0'
 				player.chooseControl('红色','黑色').set('ai',function(){
 					var player=_status.event.player;
-					if(player.num('h',{color:'red'})==1&&
-					player.num('h',{color:'black'})>1) return '红色';
+					if(player.countCards('h',{color:'red'})==1&&
+					player.countCards('h',{color:'black'})>1) return '红色';
 					return '黑色';
 				});
 				'step 1'
@@ -2490,8 +2490,8 @@ character.yijiang={
 			},
 			ai:{
 				order:function(item,player){
-					if(player.num('h',{color:'red'})==1) return 10;
-					if(player.num('h',{color:'black'})==1) return 10;
+					if(player.countCards('h',{color:'red'})==1) return 10;
+					if(player.countCards('h',{color:'black'})==1) return 10;
 					return 1;
 				},
 				result:{
@@ -5524,12 +5524,12 @@ character.yijiang={
 					return false;
 				}
 				if(get.tag(event.card,'respondSha')){
-					if(player.num('h',{name:'sha'})==0){
+					if(player.countCards('h',{name:'sha'})==0){
 						return true;
 					}
 				}
 				else if(get.tag(event.card,'respondShan')){
-					if(player.num('h',{name:'shan'})==0){
+					if(player.countCards('h',{name:'shan'})==0){
 						return true;
 					}
 				}
@@ -5928,10 +5928,10 @@ character.yijiang={
 							var e2=target.getEquip(2);
 							if(e2){
 								if(e2.name=='tengjia'){
-									if(!player.num('h',{name:'sha',nature:'fire'})&&!player.num('e','zhuque')) return 0;
+									if(!player.countCards('h',{name:'sha',nature:'fire'})&&!player.num('e','zhuque')) return 0;
 								}
 								if(e2.name=='renwang'){
-									if(!player.num('h',{name:'sha',color:'red'})) return 0;
+									if(!player.countCards('h',{name:'sha',color:'red'})) return 0;
 								}
 								if(e2.name=='baiyin') return 0;
 							}
@@ -6650,7 +6650,7 @@ character.yijiang={
 				"step 0"
 				var check=false;
 				if(trigger.player==player){
-					if(player.num('h',function(card){
+					if(player.hasCard(function(card){
 						return get.type(card)!='basic';
 					})){
 						check=true;
