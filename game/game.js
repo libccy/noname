@@ -19677,11 +19677,15 @@
                 }
             }
         },
-        broadcastAll:function(func){
+        broadcastAll:function(){
             if(game.online) return;
-            game.broadcast.apply(this,arguments);
-            var args=Array.from(arguments);
-            args.shift();
+			var argc=arguments.length;
+			var args=new Array(argc);
+			for(var i=0;i<argc;i++){
+				args[i]=arguments[i];
+			}
+            game.broadcast.apply(this,args);
+            var func=args.shift();
             if(typeof func=='string'){
                 func=lib.message.client[func];
             }
