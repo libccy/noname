@@ -2684,9 +2684,9 @@ character.yxs={
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
-				return player!=target&&target.num('e',function(card){
+				return player!=target&&target.hasCard(function(card){
 					return !get.info(card).unique;
-				});
+				},'e');
 			},
 			check:function(card){
 				return 6-ai.get.value(card);

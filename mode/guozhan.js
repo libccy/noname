@@ -434,7 +434,7 @@ mode.guozhan={
 					if(ui.discardPile.childNodes[i].name=='taipingyaoshu') return true;
 				}
 				return game.hasPlayer(function(current){
-					return current!=player&&current.num('ej','taipingyaoshu');
+					return current!=player&&current.countCards('ej','taipingyaoshu');
 				});
 			},
 			content:function(){

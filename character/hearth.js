@@ -1098,9 +1098,9 @@ character.hearth={
 					frequent:true,
 					usable:1,
 					filter:function(event){
-						return event.target.num('e',function(card){
+						return event.target.hasCard(function(card){
 							return !get.info(card).unique;
-						})>0;
+						},'e');
 					},
 					content:function(){
 						player.gain(game.createCard(trigger.target.getCards('e',function(card){
