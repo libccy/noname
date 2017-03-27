@@ -499,10 +499,12 @@ card.gujian={
 			type:'basic',
 			enable:true,
 			logv:false,
+            markimage:'-12%',
 			filterTarget:function(card,player,target){
 				return !target.hasSkill('yunvyuanshen_skill');
 			},
 			content:function(){
+                target.storage.yunvyuanshen_skill=game.createCard('yunvyuanshen');
 				target.addSkill('yunvyuanshen_skill');
 				if(cards&&cards.length){
 					card=cards[0];
@@ -1326,26 +1328,20 @@ card.gujian={
             }
         },
         yunvyuanshen_skill:{
-			mark:true,
-            marktext:'参',
+			mark:'card',
 			intro:{
-				content:'防止一次死亡，改为弃置所有牌，将体力值变为1并摸一张牌'
+				content:'下一进入濒死状态时回复一点体力'
 			},
-			trigger:{player:'dieBefore'},
+			trigger:{player:'dying'},
 			forced:true,
+            priority:6.1,
+            onremove:true,
             filter:function(event,player){
-                return player.maxHp>0;
+                return player.hp<=0;
             },
 			content:function(){
-				'step 0'
-				trigger.untrigger();
-				trigger.finish();
-				player.discard(player.get('he'));
-				player.removeSkill('yunvyuanshen_skill');
-				'step 1'
-				player.changeHp(1-player.hp);
-				'step 2'
-				player.draw();
+                player.recover();
+                player.removeSkill('yunvyuanshen_skill');
 			}
 		},
         bingpotong:{},
@@ -1605,7 +1601,7 @@ card.gujian={
         // liuxiaxianniang_info:'流霞仙酿',
         yunvyuanshen:'玉女元参',
         yunvyuanshen_skill:'玉女元参',
-        yunvyuanshen_info:'出牌阶段对一名角色使用，在目标即将死亡时防止其死亡，改为令其弃置所有牌，将体力值变为1并摸一张牌',
+        yunvyuanshen_info:'出牌阶段对一名角色使用，目标在下一次进入濒死状态时回复一点体力',
         // ziyangdan:'紫阳丹',
         // ziyangdan_info:'紫阳丹',
         yuheng:'玉衡',
