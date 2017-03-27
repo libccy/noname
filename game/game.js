@@ -17552,7 +17552,7 @@
 				},
                 trigger:function(name){
                     if(_status.video) return;
-                    if(name=='gameStart'){
+                    if(name==='gameStart'){
                         if(_status.brawl&&_status.brawl.gameStart){
                             _status.brawl.gameStart();
                         }
@@ -17589,19 +17589,19 @@
                     var globalskill='global_'+name;
                     var map=_status.connectMode?lib.playerOL:game.playerMap;
                     for(var iwhile=0;iwhile<totalPopulation;iwhile++){
-                        listAdded={};
+						listAdded={};
                         for(var j in player.tempSkills){
 							var expire=player.tempSkills[j];
-							if(expire==name||
+							if(expire===name||
 								(Array.isArray(expire)&&expire.contains(name))||
-								(typeof expire=='function'&&expire(event,player,name))){
+								(typeof expire==='function'&&expire(event,player,name))){
 								delete player.tempSkills[j];
 								player.removeSkill(j);
 							}
-							else if(get.objtype(expire)=='object'){
+							else if(get.objtype(expire)==='object'){
                                 for(var i=0;i<roles.length;i++){
-                                    if(expire[roles[i]]&&player==event[roles[i]]&&
-                                        (expire[roles[i]]==name||(Array.isArray(expire[roles[i]])&&expire[roles[i]].contains(name)))){
+                                    if(expire[roles[i]]&&player===event[roles[i]]&&
+                                        (expire[roles[i]]===name||(Array.isArray(expire[roles[i]])&&expire[roles[i]].contains(name)))){
                                         delete player.tempSkills[j];
     									player.removeSkill(j);
                                     }
@@ -17616,29 +17616,29 @@
 	    							var trigger=get.info(skills[i]).trigger;
 	    							if(trigger){
 	    								var add=false;
-	    								if(player==event.player&&trigger.player){
-	    									if(typeof trigger.player=='string'){
-	    										if(trigger.player==name) add=true;
+	    								if(player===event.player&&trigger.player){
+	    									if(typeof trigger.player==='string'){
+	    										if(trigger.player===name) add=true;
 	    									}
 	    									else if(trigger.player.contains(name)) add=true;
 	    								}
-	    								if((player==event.target||
+	    								if((player===event.target||
 	    									(event.multitarget&&event.targets&&event.targets.contains(player)))&&
 	    									trigger.target){
-	    									if(typeof trigger.target=='string'){
-	    										if(trigger.target==name) add=true;
+	    									if(typeof trigger.target==='string'){
+	    										if(trigger.target===name) add=true;
 	    									}
 	    									else if(trigger.target.contains(name)) add=true;
 	    								}
-	    								if(player==event.source&&trigger.source){
-	    									if(typeof trigger.source=='string'){
-	    										if(trigger.source==name) add=true;
+	    								if(player===event.source&&trigger.source){
+	    									if(typeof trigger.source==='string'){
+	    										if(trigger.source===name) add=true;
 	    									}
 	    									else if(trigger.source.contains(name)) add=true;
 	    								}
 	    								if(trigger.global){
-	    									if(typeof trigger.global=='string'){
-	    										if(trigger.global==name) add=true;
+	    									if(typeof trigger.global==='string'){
+	    										if(trigger.global===name) add=true;
 	    									}
 	    									else if(trigger.global.contains(name)) add=true;
 	    								}
@@ -17651,7 +17651,7 @@
 						}
 						else{
 							for(var i=0;i<roles.length;i++){
-	                            if(event[roles[i]]==player){
+	                            if(event[roles[i]]===player){
 	                                var triggername=player.playerid+'_'+roles[i]+'_'+name;
 	                                if(lib.hook[triggername]){
 	                                    for(var j=0;j<lib.hook[triggername].length;j++){
@@ -17672,7 +17672,7 @@
 	                            }
 	                        }
 	                        for(var i in lib.hook.globaltrigger[name]){
-	                            if(map[i]==player){
+	                            if(map[i]===player){
 	                                for(var j=0;j<lib.hook.globaltrigger[name][i].length;j++){
 	                                    addList(lib.hook.globaltrigger[name][i][j],map[i]);
 	                                }
@@ -17680,7 +17680,7 @@
 	                        }
 						}
 						player=player.next;
-						if(!player||player==start){
+						if(!player||player===start){
 							break;
 						}
 					}
