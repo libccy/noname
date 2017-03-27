@@ -104,6 +104,7 @@ mode.connect={
                 });
                 return uiintro;
             },220);
+            lib.init.onfree();
         }
         if(window.isNonameServer){
             game.connect(window.isNonameServerIp||'localhost');
@@ -135,5 +136,6 @@ mode.connect={
             add:{},
             replace:{}
         };
+        setTimeout(lib.init.onfree,1000);
     }
 };

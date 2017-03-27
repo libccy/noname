@@ -129,8 +129,16 @@ mode.boss={
 		}
 		ui.create.div(bosslist);
 		lib.translate.boss_pangtong='涅槃凤雏';
-		ui.create.cards();
-		game.finishCards();
+		if(lib.onfree){
+			lib.onfree.push(function(){
+				ui.create.cards();
+				game.finishCards();
+			});
+		}
+		else{
+			ui.create.cards();
+			game.finishCards();
+		}
 		game.addGlobalSkill('autoswap');
 		ui.arena.setNumber(8);
 		ui.control.style.transitionProperty='opacity';
@@ -611,7 +619,7 @@ mode.boss={
 				// dialog.add('0/3');
 				dialog.add([list.slice(0,20),'character']);
 				dialog.noopen=true;
-				var next=game.me.chooseButton(dialog,true);
+				var next=game.me.chooseButton(dialog,true).set('onfree',true);
 				next._triggered=null;
 				next.custom.replace.target=event.customreplacetarget;
 				next.selectButton=[3,3];
@@ -644,10 +652,21 @@ mode.boss={
 					ui.cheat=ui.create.control('更换',event.changeDialog);
 					delete _status.createControl;
 				};
-				event.dialogxx=ui.create.characterDialog();
-				event.dialogxx.classList.add('bosscharacter');
-				event.dialogxx.classList.add('withbg');
-				event.dialogxx.classList.add('fixed');
+				var createCharacterDialog=function(){
+					event.dialogxx=ui.create.characterDialog();
+					event.dialogxx.classList.add('bosscharacter');
+					event.dialogxx.classList.add('withbg');
+					event.dialogxx.classList.add('fixed');
+					if(ui.cheat2){
+						ui.cheat2.classList.remove('disabled');
+					}
+				};
+				if(lib.onfree){
+					lib.onfree.push(createCharacterDialog);
+				}
+				else{
+					createCharacterDialog();
+				}
 				ui.create.cheat2=function(){
 					_status.createControl=event.asboss;
 					ui.cheat2=ui.create.control('自由选将',function(){
@@ -662,7 +681,7 @@ mode.boss={
 							game.uncheck();
 							game.check();
 							if(ui.cheat){
-								ui.cheat.style.opacity=1;
+								ui.cheat.classList.remove('disabled');
 							}
 						}
 						else{
@@ -677,10 +696,13 @@ mode.boss={
 							game.uncheck();
 							game.check();
 							if(ui.cheat){
-								ui.cheat.style.opacity=0.6;
+								ui.cheat.classList.add('disabled');
 							}
 						}
 					});
+					if(lib.onfree){
+						ui.cheat2.classList.add('disabled');
+					}
 					delete _status.createControl;
 				}
 				if(!ui.cheat&&get.config('change_choice'))

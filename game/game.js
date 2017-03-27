@@ -18982,7 +18982,7 @@
                         ui.rooms=[];
                         game.ip=get.trimip(_status.ip);
                         for(var i=0;i<list.length;i++){
-                            var player=ui.create.player(ui.window);
+                            var player=ui.create.player(ui.window).animate('start');
                             player.dataset.position='c'+i;
                             player.classList.add('connect');
                             player.roomindex=i;
@@ -19024,6 +19024,7 @@
                         else if(typeof game.roomId=='number'){
                             game.send('server','enter',game.roomId,lib.config.connect_nickname,lib.config.connect_avatar);
                         }
+						lib.init.onfree();
                     }
                     if(_status.event.parent){
                         game.forceOver('noover',proceed);
