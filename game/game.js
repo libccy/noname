@@ -3120,6 +3120,38 @@
 						},
 						clear:true
 					},
+					redownload_game:{
+						name:'重新下载游戏',
+						onclick:function(){
+							var node=this;
+							if(node._clearing){
+								localStorage.removeItem('noname_inited');
+								game.reload();
+								return;
+							}
+							node._clearing=true;
+							node.innerHTML='单击以确认 (3)';
+							setTimeout(function(){
+								node.innerHTML='单击以确认 (2)';
+								setTimeout(function(){
+									node.innerHTML='单击以确认 (1)';
+									setTimeout(function(){
+										node.innerHTML='重新下载游戏';
+										delete node._clearing;
+									},1000);
+								},1000);
+							},1000);
+						},
+						clear:true
+					},
+					update:function(config,map){
+						if(lib.device||lib.node){
+							map.redownload_game.show();
+						}
+						else{
+							map.redownload_game.hide();
+						}
+					}
 					// trim_game:{
 					// 	name:'隐藏非官方扩展包',
 					// 	onclick:function(){
@@ -25318,6 +25350,7 @@
 					if(hidden) ui.auto.show();
 					game.resume();
 				});
+				lib.init.onfree();
 			}
 		},
 		updateSave:function(){
