@@ -7127,7 +7127,7 @@ character.yijiang={
 					var nh2=player.countCards('h');
 					return nh1<=2&&nh2>nh1+1;
 				}
-				if(att>0&&event.player.num('j','lebu')&&event.player.countCards('h')>event.player.hp+1) return true;
+				if(att>0&&event.player.hasJudge('lebu')&&event.player.countCards('h')>event.player.hp+1) return true;
 				return false;
 			},
 			logTarget:'player',

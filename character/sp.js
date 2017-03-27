@@ -3915,7 +3915,7 @@ character.sp={
 					if(target.hp==1&&att>2){
 						att+=2;
 					}
-					if(player.num('j','lebu')){
+					if(player.hasJudge('lebu')){
 						if(target.hp==target.maxHp) return att-2;
 						return att-1;
 					}
@@ -5044,7 +5044,7 @@ character.sp={
 			},
 			check:function(event,player){
 				if(player.countCards('h')>player.hp) return true;
-				if(player.num('j','lebu')) return true;
+				if(player.hasJudge('lebu')) return true;
 				var ng=[];
 				var players=game.filterPlayer();
 				for(var i=0;i<players.length;i++){

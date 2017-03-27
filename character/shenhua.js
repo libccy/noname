@@ -686,7 +686,7 @@ character.shenhua={
 					return target!=player;
 				}).set('ai',function(target){
 					if(!_status.event.fang) return -1;
-					if(target.num('j','lebu')) return -1;
+					if(target.hasJudge('lebu')) return -1;
 					return ai.get.attitude(player,target)-4;
 				}).set('fang',fang);
 				"step 1"

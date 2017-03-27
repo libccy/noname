@@ -1433,7 +1433,7 @@ mode.guozhan={
 					for(var i=0;i<players.length;i++){
 						if(players[i].get('s').contains('haoshi')&&
 							!players[i].isTurnedOver()&&
-							!players[i].num('j','lebu')&&
+							!players[i].hasJudge('lebu')&&
 							ai.get.attitude(player,players[i])>=3&&
 							ai.get.attitude(players[i],player)>=3){
 							return 11-ai.get.value(card);
@@ -1470,7 +1470,7 @@ mode.guozhan={
 						if(ui.selected.cards.length&&ui.selected.cards[0].name=='du'){
 							return -10;
 						}
-						if(target.num('j','lebu')) return 0;
+						if(target.hasJudge('lebu')) return 0;
 						var nh=target.countCards('h');
 						var np=player.countCards('h');
 						if(player.hp==player.maxHp||player.storage.gzrende<0||player.countCards('h')+player.storage.gzrende<=2){

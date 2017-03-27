@@ -1011,7 +1011,7 @@ character.ow={
                     result:{
                     target:function(player,target){
                         if(ai.get.attitude(player,target)<3) return 0;
-                        if(target.num('j','lebu')) return 0;
+                        if(target.hasJudge('lebu')) return 0;
                         if(target.hasSkill('aqianghua2')) return 0.1;
                         return 1;
                     }
@@ -2310,7 +2310,7 @@ character.ow={
 				player.storage.zhanlong=false;
 			},
             check:function(event,player){
-                if(player.num('j','lebu')) return false;
+                if(player.hasJudge('lebu')) return false;
                 return true;
             },
 			filter:function(event,player){

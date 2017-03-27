@@ -5784,7 +5784,7 @@ character.hearth={
 			enable:true,
 			derivation:'hs_ysera',
 			filterTarget:function(card,player,target){
-				return !target.num('j','lebu')||target.countCards('e')>0;
+				return !target.hasJudge('lebu')||target.countCards('e')>0;
 			},
 			content:function(){
 				'step 0'
@@ -5793,7 +5793,7 @@ character.hearth={
 					target.gain(es,'gain2');
 				}
 				'step 1'
-				if(!target.num('j','lebu')){
+				if(!target.hasJudge('lebu')){
 					target.addJudge(game.createCard('lebu'));
 				}
 			},

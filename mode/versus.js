@@ -3646,7 +3646,7 @@ mode.versus={
 					});
                     next.ai=function(target){
                         var att=ai.get.attitude(player,target);
-						if(att>0&&target.num('j','lebu')){
+						if(att>0&&target.hasJudge('lebu')){
 							return 0.1;
 						}
                         if(player.countCards('h')>player.hp){

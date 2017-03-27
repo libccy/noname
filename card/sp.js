@@ -180,7 +180,7 @@ card.sp={
 				},
 				result:{
 					target:function(player,target){
-						if(target.num('j','lebu')) return 0;
+						if(target.hasJudge('lebu')) return 0;
 						return Math.max(1,2-target.countCards('h')/10);
 					}
 				}

@@ -1165,14 +1165,14 @@ card.standard={
 					if(!card.expired){
 						var target=player.next;
 						for(var iwhile=0;iwhile<10;iwhile++){
-							if(target.num('j','shandian')){
+							if(target.hasJudge('shandian')){
 								target=target.next;
 							}
 							else{
 								break;
 							}
 						}
-						if(target.num('j','shandian')||target==player){
+						if(target.hasJudge('shandian')||target==player){
 							ui.discardPile.appendChild(card);
 						}
 						else{
@@ -1193,14 +1193,14 @@ card.standard={
 				if(!card.expired){
 					var target=player.next;
 					for(var iwhile=0;iwhile<10;iwhile++){
-						if(target.num('j','shandian')){
+						if(target.hasJudge('shandian')){
 							target=target.next;
 						}
 						else{
 							break;
 						}
 					}
-					if(target.num('j','shandian')||target==player){
+					if(target.hasJudge('shandian')||target==player){
 						ui.discardPile.appendChild(card);
 					}
 					else{

@@ -736,14 +736,14 @@ card.yunchou={
 					if(!card.expired){
 						var target=player.next;
 						for(var iwhile=0;iwhile<10;iwhile++){
-							if(target.num('j','huoshan')){
+							if(target.hasJudge('huoshan')){
 								target=target.next;
 							}
 							else{
 								break;
 							}
 						}
-						if(target.num('j','huoshan')||target==player){
+						if(target.hasJudge('huoshan')||target==player){
 							ui.discardPile.appendChild(card);
 						}
 						else{
@@ -764,14 +764,14 @@ card.yunchou={
 				if(!card.expired){
 					var target=player.next;
 					for(var iwhile=0;iwhile<10;iwhile++){
-						if(target.num('j','huoshan')){
+						if(target.hasJudge('huoshan')){
 							target=target.next;
 						}
 						else{
 							break;
 						}
 					}
-					if(target.num('j','huoshan')||target==player){
+					if(target.hasJudge('huoshan')||target==player){
 						ui.discardPile.appendChild(card);
 					}
 					else{
@@ -844,14 +844,14 @@ card.yunchou={
 					if(!card.expired){
 						var target=player.next;
 						for(var iwhile=0;iwhile<10;iwhile++){
-							if(target.num('j','hongshui')){
+							if(target.hasJudge('hongshui')){
 								target=target.next;
 							}
 							else{
 								break;
 							}
 						}
-						if(target.num('j','hongshui')||target==player){
+						if(target.hasJudge('hongshui')||target==player){
 							ui.discardPile.appendChild(card);
 						}
 						else{
@@ -872,14 +872,14 @@ card.yunchou={
 				if(!card.expired){
 					var target=player.next;
 					for(var iwhile=0;iwhile<10;iwhile++){
-						if(target.num('j','hongshui')){
+						if(target.hasJudge('hongshui')){
 							target=target.next;
 						}
 						else{
 							break;
 						}
 					}
-					if(target.num('j','hongshui')||target==player){
+					if(target.hasJudge('hongshui')||target==player){
 						ui.discardPile.appendChild(card);
 					}
 					else{

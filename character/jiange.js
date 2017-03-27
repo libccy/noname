@@ -431,7 +431,7 @@ character.jiange={
                     }
                     var next=player.chooseTarget(true,dialog);
                     next.ai=function(target){
-                        if(player.num('j','lebu')){
+                        if(player.hasJudge('lebu')){
                             if(target==player) return 0.1;
                         }
                         var att=ai.get.attitude(player,target);

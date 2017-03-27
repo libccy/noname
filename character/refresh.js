@@ -53,7 +53,7 @@ character.refresh={
 					for(var i=0;i<players.length;i++){
 						if(players[i].get('s').contains('haoshi')&&
 							!players[i].isTurnedOver()&&
-							!players[i].num('j','lebu')&&
+							!players[i].hasJudge('lebu')&&
 							ai.get.attitude(player,players[i])>=3&&
 							ai.get.attitude(players[i],player)>=3){
 							return 11-ai.get.value(card);
@@ -170,7 +170,7 @@ character.refresh={
 							if(target.hasSkillTag('nodu')) return 0;
 							return -10;
 						}
-						if(target.num('j','lebu')) return 0;
+						if(target.hasJudge('lebu')) return 0;
 						var nh=target.countCards('h');
 						var np=player.countCards('h');
 						if(player.hp==player.maxHp||player.storage.rerende<0||player.countCards('h')<=1){
