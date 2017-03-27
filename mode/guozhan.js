@@ -2358,9 +2358,11 @@ mode.guozhan={
 				}
 				if(_status.auto){
 					event.ai(game.me,list);
+					lib.init.onfree();
 				}
 				else if(chosen.length){
 					game.me.init(chosen[0],chosen[1],false);
+					lib.init.onfree();
 				}
 				else{
 					var dialog=ui.create.dialog('选择角色','hidden',[list,'character']);
@@ -2369,7 +2371,7 @@ mode.guozhan={
 							addSetting(dialog);
 						}
 					}
-					var next=game.me.chooseButton(dialog,true,2);
+					var next=game.me.chooseButton(dialog,true,2).set('onfree',true);
 					next.filterButton=function(button){
 						if(ui.dialog.buttons.length<=10){
 							for(var i=0;i<ui.dialog.buttons.length;i++){
@@ -2389,18 +2391,29 @@ mode.guozhan={
 						event.ai(game.me,list);
 						ui.arena.classList.remove('selecting');
 					};
-					event.dialogxx=ui.create.characterDialog(function(i){
-						if(i.indexOf('gz_shibing')==0) return true;
-						if(get.config('onlyguozhan')){
-							if(!lib.characterPack.mode_guozhan[i]) return true;
-							if(get.config('junzhu')){
-								if(lib.junList.contains(i.slice(3))) return true;
+					var createCharacterDialog=function(){
+						event.dialogxx=ui.create.characterDialog(function(i){
+							if(i.indexOf('gz_shibing')==0) return true;
+							if(get.config('onlyguozhan')){
+								if(!lib.characterPack.mode_guozhan[i]) return true;
+								if(get.config('junzhu')){
+									if(lib.junList.contains(i.slice(3))) return true;
+								}
+								else{
+									if(get.is.jun(i)) return true;
+								}
 							}
-							else{
-								if(get.is.jun(i)) return true;
-							}
+						},get.config('onlyguozhanexpand')?'expandall':undefined,get.config('onlyguozhan')?'onlypack:mode_guozhan':undefined);
+						if(ui.cheat2){
+							ui.cheat2.classList.remove('disabled');
 						}
-					},get.config('onlyguozhanexpand')?'expandall':undefined,get.config('onlyguozhan')?'onlypack:mode_guozhan':undefined);
+					};
+					if(lib.onfree){
+						lib.onfree.push(createCharacterDialog);
+					}
+					else{
+						createCharacterDialog();
+					}
 					ui.create.cheat2=function(){
 						ui.cheat2=ui.create.control('自由选将',function(){
 							if(this.dialog==_status.event.dialog){
@@ -2414,7 +2427,7 @@ mode.guozhan={
 								game.uncheck();
 								game.check();
 								if(ui.cheat){
-									ui.cheat.style.opacity=1;
+									ui.cheat.classList.add('disabled');
 								}
 							}
 							else{
@@ -2429,10 +2442,13 @@ mode.guozhan={
 								game.uncheck();
 								game.check();
 								if(ui.cheat){
-									ui.cheat.style.opacity=0.6;
+									ui.cheat.classList.remove('disabled');
 								}
 							}
 						});
+						if(lib.onfree){
+							ui.cheat2.classList.add('disabled');
+						}
 					}
 					ui.create.cheat=function(){
 						_status.createControl=ui.cheat2;

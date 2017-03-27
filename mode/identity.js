@@ -900,6 +900,9 @@ mode.identity={
 						return get.config('double_character')?2:1
 					};
 				}
+				else{
+					lib.init.onfree();
+				}
 				ui.create.cheat=function(){
 					_status.createControl=ui.cheat2;
 					ui.cheat=ui.create.control('更换',function(){

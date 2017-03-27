@@ -7158,8 +7158,8 @@
 					var loop=function(){
 						if(onfree.length){
 							(onfree.shift())();
+							setTimeout(loop,100);
 						}
-						setTimeout(loop,200);
 					};
 					setTimeout(loop,500);
 				}
