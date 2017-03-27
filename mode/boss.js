@@ -132,13 +132,12 @@ mode.boss={
 		if(lib.onfree){
 			lib.onfree.push(function(){
 				ui.create.cards();
-				game.finishCards();
 			});
 		}
 		else{
 			ui.create.cards();
-			game.finishCards();
 		}
+		game.finishCards();
 		game.addGlobalSkill('autoswap');
 		ui.arena.setNumber(8);
 		ui.control.style.transitionProperty='opacity';

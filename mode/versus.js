@@ -86,13 +86,12 @@ mode.versus={
 			if(lib.onfree){
 				lib.onfree.push(function(){
 					ui.create.cards();
-					game.finishCards();
 				});
 			}
 			else{
 				ui.create.cards();
-				game.finishCards();
 			}
+			game.finishCards();
 		}
 		else{
 			if(lib.storage.choice==undefined) game.save('choice',20);
@@ -116,13 +115,12 @@ mode.versus={
 			if(lib.onfree){
 				lib.onfree.push(function(){
 					ui.create.cards();
-					game.finishCards();
 				});
 			}
 			else{
 				ui.create.cards();
-				game.finishCards();
 			}
+			game.finishCards();
 		}
 		// game.delay();
 		"step 2"

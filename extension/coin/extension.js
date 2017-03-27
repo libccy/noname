@@ -1,13 +1,13 @@
 'use strict';
 play.coin={
 	init:function(){
-		if(lib.config.mode!='story'&&(lib.config.mode!='chess'||get.config('chess_mode')!='leader')){
+		if(lib.config.mode!='chess'||get.config('chess_mode')!='leader'){
 			_status.coin=0;
 		}
 	},
 	arenaReady:function(){
         if(_status.video||_status.connectMode) return;
-		if(lib.config.mode!='story'&&(lib.config.mode!='chess'||get.config('chess_mode')!='leader')){
+		if(lib.config.mode!='chess'||get.config('chess_mode')!='leader'){
 			var str;
 			if(lib.config.coin_display_playpackconfig=='text'){
 				str='<span>'+lib.config.coin+'</span><span>金</span>'

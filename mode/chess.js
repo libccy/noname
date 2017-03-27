@@ -3591,7 +3591,7 @@ mode.chess={
 					ui.control.style.top='calc(100% - 70px)';
 				}
 
-				var next=game.me.chooseButton(dialog,true);
+				var next=game.me.chooseButton(dialog,true).set('onfree',true);
 				next._triggered=null;
 				next.selectButton=function(){
 					var bossnum=bosses.querySelectorAll('.glow').length;

@@ -15466,9 +15466,6 @@
                         }
 						return this.side==me.side;
 					}
-                    else if(lib.config.mode=='story'){
-                        return this.side==me.side;
-                    }
 					return false;
 				},
                 isOnline:function(){
