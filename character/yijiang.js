@@ -1980,7 +1980,7 @@ character.yijiang={
 					var trigger=_status.event.getTrigger();
 					if(att>0&&eff>=0) return 1;
 					if(att>=0&&eff>0) return 1;
-					if(att>0&&(trigger.player.hp>=3||trigger.player.num('e','bagua')||trigger.player.countCards('h','shan'))){
+					if(att>0&&(trigger.player.hp>=3||trigger.player.getEquip('bagua')||trigger.player.countCards('h','shan'))){
 						if(name=='lebu'&&nh>trigger.player.hp) return 1;
 						if(name=='bingliang'&&nh<trigger.player.hp) return 1;
 					}
@@ -2079,7 +2079,7 @@ character.yijiang={
 			},
 			check:function(event,player){
 				if(ai.get.attitude(player,event.player)>=0) return false;
-				if(event.player.num('e','zhuge')) return false;
+				if(event.player.getEquip('zhuge')) return false;
 				if(event.player.hasSkill('paoxiao')) return false;
 				var players=game.filterPlayer();
 				for(var i=0;i<players.length;i++){
@@ -2278,7 +2278,7 @@ character.yijiang={
 						!trigger.player.hasSkill('tanlin3')&&
 						!trigger.player.hasSkill('zhaxiang2')&&
 						!trigger.player.hasSkill('fengnu')&&
-						!trigger.player.num('e','zhuge')){
+						!trigger.player.getEquip('zhuge')){
 						var nh=trigger.player.countCards('h');
 						if(player==trigger.player){
 							go=(player.countCards('h','sha')>0);
@@ -5898,7 +5898,7 @@ character.yijiang={
 					player:function(player){
 						if(_status.event.parent.name=='phaseUse'){
 							if(player.countCards('h','jiu')>0) return 0;
-							if(player.num('e','zhuge')&&player.countCards('h','sha')>1) return 0;
+							if(player.getEquip('zhuge')&&player.countCards('h','sha')>1) return 0;
 							if(!player.countCards('h','sha')) return 0;
 							var targets=[];
 							var target;
@@ -5928,14 +5928,14 @@ character.yijiang={
 							var e2=target.getEquip(2);
 							if(e2){
 								if(e2.name=='tengjia'){
-									if(!player.countCards('h',{name:'sha',nature:'fire'})&&!player.num('e','zhuque')) return 0;
+									if(!player.countCards('h',{name:'sha',nature:'fire'})&&!player.getEquip('zhuque')) return 0;
 								}
 								if(e2.name=='renwang'){
 									if(!player.countCards('h',{name:'sha',color:'red'})) return 0;
 								}
 								if(e2.name=='baiyin') return 0;
 							}
-							if(player.num('e','guanshi')&&player.countCards('he')>2) return 1;
+							if(player.getEquip('guanshi')&&player.countCards('he')>2) return 1;
 							return target.countCards('h')>3?0:1;
 						}
 						if(player==_status.event.dying||player.isTurnedOver()) return 3;

@@ -971,7 +971,7 @@ character.yxs={
 			},
 			check:function(event,player){
 				if(ai.get.attitude(player,event.target)>=0) return false;
-				if(event.target.num('e','bagua')) return false;
+				if(event.target.getEquip('bagua')) return false;
 				if(event.target.hasSkillTag('respondShan')&&event.target.countCards('h')>=3) return false;
 				return true;
 			},

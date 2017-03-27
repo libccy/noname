@@ -2443,7 +2443,7 @@ mode.boss={
 			filter:function(event,player){
 				var players=game.filterPlayer();
 				for(var i=0;i<players.length;i++){
-					if(players[i]!=player&&players[i].num('e','qinggang')){
+					if(players[i]!=player&&players[i].getEquip('qinggang')){
 						return true;
 					}
 				}

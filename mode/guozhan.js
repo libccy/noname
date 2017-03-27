@@ -538,7 +538,7 @@ mode.guozhan={
 							}
 						}
 						if(game.hasPlayer(function(current){
-							return current!=player&&current.num('e','feilongduofeng');
+							return current!=player&&current.getEquip('feilongduofeng');
 						})){
 							return true;
 						}
