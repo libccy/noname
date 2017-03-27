@@ -12602,7 +12602,9 @@
                     return null;
                 },
 				getCards:function(arg1,arg2){
-					arg1=arg1||'he';
+					if(typeof arg1!='string'){
+						arg1='he';
+					}
 					var cards=[],cards1=[];
 					var i,j;
 					for(i=0;i<arg1.length;i++){
