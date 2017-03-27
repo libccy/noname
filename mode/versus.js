@@ -125,9 +125,6 @@ mode.versus={
 			}
 		}
 		// game.delay();
-		if(_status.mode=='four'){
-			game.delay(0.5);
-		}
 		"step 2"
 		if(_status.connectMode){
 			if(lib.configOL.versus_mode=='1v1'){
@@ -1077,6 +1074,7 @@ mode.versus={
 					event.xdialog=dialog;
 					dialog.static=true;
 					event.current.classList.add('selectedx');
+					game.delay();
 				}
 				else{
 					event.ai(event.current,event.list.randomGets(3),event.list2);
@@ -1142,6 +1140,7 @@ mode.versus={
 				setTimeout(function(){
 					ui.control.style.transitionDuration='';
 				},500);
+				lib.init.onfree();
 			});
 		},
 		chooseCharacterThree:function(){
