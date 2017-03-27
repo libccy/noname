@@ -836,10 +836,9 @@ mode.versus={
 				}
 				var dialog=ui.create.dialog('选择角色',[characterChoice,'character']);
 				if(get.config('replace_character_two')){
-					game.me.chooseButton(true,dialog,2);
+					game.me.chooseButton(true,dialog,2).set('onfree',true);
 					_status.replacetwo=true;
 					game.additionaldead=[];
-					lib.init.onfree();
 				}
 				else{
 					game.me.chooseButton(true,dialog).set('onfree',true);
