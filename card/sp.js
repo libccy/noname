@@ -154,13 +154,13 @@ card.sp={
 				'step 0'
 				target.draw(3);
 				'step 1'
-				if(target.num('he',{type:'basic'})<target.countCards('he')){
+				if(target.countCards('he',{type:'basic'})<target.countCards('he')){
 					target.chooseToDiscard('弃置一张非基本牌（或取消并弃置两张牌）','he',function(card){
 						return get.type(card)!='basic';
 					}).set('ai',function(card){
 						if(_status.event.goon) return 7-ai.get.value(card);
-						return 8-ai.get.value(card);
-					}).set('goon',target.num('h','basic')>2);
+						return 9-ai.get.value(card);
+					}).set('goon',target.countCards('h',{type:'basic'})>2);
 					event.more=true;
 				}
 				else{

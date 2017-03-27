@@ -251,14 +251,14 @@ character.swd={
 				if(info.nomod) return false;
 				if(info.unique) return false;
 				if(!info.subtype) return false;
-				if(!player.get('e',info.subtype[5])) return false;
+				if(!player.getEquip(parseInt(info.subtype[5]))) return false;
 				return true;
 			},
 			content:function(){
 				'step 0'
 				var list=['equip1','equip2','equip3','equip4','equip5'];
 				for(var i=0;i<list.length;i++){
-					if(player.get('e',list[i][5])){
+					if(player.getEquip(parseInt(list[i][5]))){
 						list.splice(i--,1);
 					}
 				}

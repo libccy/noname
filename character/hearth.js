@@ -1103,7 +1103,7 @@ character.hearth={
 						})>0;
 					},
 					content:function(){
-						player.gain(game.createCard(trigger.target.get('e',function(card){
+						player.gain(game.createCard(trigger.target.getCards('e',function(card){
 							return !get.info(card).unique;
 						}).randomGet()),'draw');
 					}

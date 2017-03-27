@@ -7615,7 +7615,7 @@
                 for(var i=0;i<cards.length;i++){
                     var str=get.subtype(cards[i])[5];
                     if(!str) continue;
-                    var card=target.get('e',str);
+                    var card=target.getEquip(parseInt(str));
                     if(card){
                         console.log(card);
                         ui.discardPile.appendChild(card);
@@ -24840,8 +24840,9 @@
 					if(card.ai.basic.value==undefined)card.ai.basic.value=function(card,player){
 						var value=0;
 						var info=get.info(card);
-						if(player.get('e',info.subtype[5])&&card!=player.get('e',info.subtype[5])){
-							value=ai.get.value(player.get('e',info.subtype[5]),player);
+						var current=player.getEquip(parseInt(info.subtype[5]));
+						if(current&&card!=current){
+							value=ai.get.value(current,player);
 						}
 						var equipValue=info.ai.equipValue||info.ai.basic.equipValue;
 						if(typeof equipValue=='function') return equipValue(card,player)-value;
@@ -40414,7 +40415,7 @@
 				}
 				var value1=ai.get.value(card,target);
 				var value2=0;
-				var current=target.get('e',get.subtype(card)[5]);
+				var current=target.getEquip(parseInt(get.subtype(card)[5]));
 				if(current&&current!=card){
 					value2=ai.get.value(current,target);
 					if(value2>0&&!target.needsToDiscard()){
