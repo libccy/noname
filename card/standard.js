@@ -232,7 +232,7 @@ card.standard={
 						if(nd<=0){
 							keep=true;
 						}
-						else if(nd==1&&target.hp>=2&&target.num('h','tao')<=1){
+						else if(nd==1&&target.hp>=2&&target.countCards('h','tao')<=1){
 							keep=true;
 						}
 						var mode=get.mode();
@@ -257,7 +257,7 @@ card.standard={
 							if(tri&&tri.name=='dying'&&tri.source&&tri.source.identity=='fan'&&tri.source!=target){
 								var num=game.countPlayer(function(current){
 									if(current.identity=='fan'){
-										return current.num('h','tao');
+										return current.countCards('h','tao');
 									}
 								});
 								if(num>1&&player==target) return 2;
@@ -342,7 +342,7 @@ card.standard={
 						})){
 							return 1;
 						}
-						var num=player.num('h','sha');
+						var num=player.countCards('h','sha');
 						if(num>1) return 4+num;
 						return 2+num;
 					}
@@ -382,7 +382,7 @@ card.standard={
 			ai:{
 				basic:{
 					equipValue:function(card,player){
-						return Math.min(2.5+player.num('h','sha'),4);
+						return Math.min(2.5+player.countCards('h','sha'),4);
 					}
 				}
 			},
@@ -659,7 +659,7 @@ card.standard={
 			},
 			ai:{
 				wuxie:function(target,card,player,viewer){
-					if(ai.get.attitude(viewer,target)>0&&target.num('h','sha')){
+					if(ai.get.attitude(viewer,target)>0&&target.countCards('h','sha')){
 						if(!target.countCards('h')||target.hp==1||Math.random()<0.7) return 0;
 					}
 				},
@@ -717,7 +717,7 @@ card.standard={
 			},
 			ai:{
 				wuxie:function(target,card,player,viewer){
-					if(ai.get.attitude(viewer,target)>0&&target.num('h','shan')){
+					if(ai.get.attitude(viewer,target)>0&&target.countCards('h','shan')){
 						if(!target.countCards('h')||target.hp==1||Math.random()<0.7) return 0;
 					}
 				},

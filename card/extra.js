@@ -88,7 +88,7 @@ card.extra={
 							}
 						}
 						else if(player.hasSha()&&player.needsToDiscard()){
-							if(player.num('h','hufu')!=1){
+							if(player.countCards('h','hufu')!=1){
 								card={name:'sha'};
 							}
 						}
@@ -353,7 +353,7 @@ card.extra={
 				basic:{
 					equipValue:function(card,player){
 						if(player.hp==player.maxHp) return 5;
-						if(player.num('h','baiyin')) return 6;
+						if(player.countCards('h','baiyin')) return 6;
 						return 0;
 					}
 				}

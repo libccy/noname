@@ -794,7 +794,7 @@ character.standard={
 					var top=[];
 					var judges=player.node.judges.childNodes;
 					var stopped=false;
-					if(!player.num('h','wuxie')){
+					if(!player.countCards('h','wuxie')){
 						for(var i=0;i<judges.length;i++){
 							var judge=get.judge(judges[i]);
 							cards.sort(function(a,b){
@@ -1016,7 +1016,7 @@ character.standard={
 					filterCard:{name:'shan'},
 					viewAs:{name:'sha'},
 					viewAsFilter:function(player){
-						if(!player.num('h','shan')) return false;
+						if(!player.countCards('h','shan')) return false;
 					},
 					prompt:'将一张闪当杀使用或打出',
 					check:function(){return 1},
@@ -1028,7 +1028,7 @@ character.standard={
 						},
 						respondSha:true,
 						skillTagFilter:function(player){
-							if(!player.num('h','shan')) return false;
+							if(!player.countCards('h','shan')) return false;
 						},
 						order:function(){
 		                    return ai.get.order({name:'sha'})+0.1;
@@ -1045,12 +1045,12 @@ character.standard={
 					prompt:'将一张杀当闪打出',
 					check:function(){return 1},
 					viewAsFilter:function(player){
-						if(!player.num('h','sha')) return false;
+						if(!player.countCards('h','sha')) return false;
 					},
 					ai:{
 						respondShan:true,
 						skillTagFilter:function(player){
-							if(!player.num('h','sha')) return false;
+							if(!player.countCards('h','sha')) return false;
 						},
 						effect:{
 							target:function(card,player,target,current){
@@ -1318,16 +1318,16 @@ character.standard={
 						return ai.get.unuseful(card)+9;
 					},
 					ai2:function(target){
-						if(_status.event.player.num('h','shan')){
+						if(_status.event.player.countCards('h','shan')){
 							return -ai.get.attitude(_status.event.player,target);
 						}
 						if(ai.get.attitude(_status.event.player,target)<5){
 							return 6-ai.get.attitude(_status.event.player,target);
 						}
-						if(_status.event.player.hp==1&&player.num('h','shan')==0){
+						if(_status.event.player.hp==1&&player.countCards('h','shan')==0){
 							return 10-ai.get.attitude(_status.event.player,target);
 						}
-						if(_status.event.player.hp==2&&player.num('h','shan')==0){
+						if(_status.event.player.hp==2&&player.countCards('h','shan')==0){
 							return 8-ai.get.attitude(_status.event.player,target);
 						}
 						return -1;
@@ -1542,7 +1542,7 @@ character.standard={
 				var next=trigger.target.chooseToRespond({name:'shan'});
 				next.autochoose=lib.filter.autoRespondShan;
 				next.set('ai',function(card){
-					if(_status.event.player.num('h','shan')>1){
+					if(_status.event.player.countCards('h','shan')>1){
 						return ai.get.unuseful2(card);
 					}
 					return -1;
@@ -1566,7 +1566,7 @@ character.standard={
 				var next=trigger.turn.chooseToRespond({name:'sha'});
 				next.autochoose=lib.filter.autoRespondSha;
 				next.ai=function(card){
-					if(ai.get.attitude(trigger.turn,player)<0&&trigger.turn.num('h','sha')>1){
+					if(ai.get.attitude(trigger.turn,player)<0&&trigger.turn.countCards('h','sha')>1){
 						return ai.get.unuseful2(card);
 					}
 					return -1;

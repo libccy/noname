@@ -285,7 +285,7 @@ card.hearth={
 			selectTarget:-1,
 			content:function(){
 				player.addTempSkill('shihuawuqi','phaseAfter');
-				if(!player.num('h','sha')){
+				if(!player.countCards('h','sha')){
 					var card=get.cardPile('sha');
 					if(card){
 						player.gain(card,'gain2');
@@ -298,7 +298,7 @@ card.hearth={
 				order:8,
 				result:{
 					target:function(player,target){
-						return target.num('h','sha')?0:1;
+						return target.countCards('h','sha')?0:1;
 					}
 				}
 			}
@@ -486,7 +486,7 @@ card.hearth={
 				order:1,
 				result:{
 					target:function(player,target){
-						if(target.num('h','tao')) return 0;
+						if(target.countCards('h','tao')) return 0;
 						var nh=target.countCards('h');
 						if(nh<=2) return 1;
 						if(target.hp==1&&target.maxHp>2) return 1;

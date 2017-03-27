@@ -15680,7 +15680,7 @@
                     return false;
                 },
                 hasWuxie:function(){
-                    if(this.num('h','wuxie')) return true;
+                    if(this.countCards('h','wuxie')) return true;
 					var skills=this.get('s',true).concat(lib.skill.global);
 					game.expandSkills(skills);
 					for(var i=0;i<skills.length;i++){
@@ -15700,15 +15700,15 @@
                     return false;
                 },
                 hasSha:function(respond){
-                    if(this.num('h','sha')) return true;
-    				if(this.num('h','hufu')) return true;
-    				// if(this.num('h','yuchanqian')) return true;
+                    if(this.countCards('h','sha')) return true;
+    				if(this.countCards('h','hufu')) return true;
+    				// if(this.countCards('h','yuchanqian')) return true;
     				if(this.hasSkillTag('respondSha',true,respond?'respond':'use',true)) return true;
     				return false;
                 },
                 hasShan:function(){
-    				if(this.num('h','shan')) return true;
-    				if(this.num('h','hufu')) return true;
+    				if(this.countCards('h','shan')) return true;
+    				if(this.countCards('h','hufu')) return true;
     				if(this.hasSkillTag('respondShan',true,null,true)) return true;
     				return false;
     			},

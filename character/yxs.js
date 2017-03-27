@@ -203,7 +203,7 @@ character.yxs={
 						if(n1-n2==1){
 							num=1;
 						}
-						if(player.num('h','du')){
+						if(player.countCards('h','du')){
 							if(n1==n2) num=0.5;
 							else num=0.1;
 						}
@@ -1551,7 +1551,7 @@ character.yxs={
 			trigger:{global:'dying'},
 			priority:11,
 			filter:function(event,player){
-				return event.player.hp<=0&&(player.num('h','jiu')>0||player.num('h',{color:'black'})>=2)&&player!=event.player;
+				return event.player.hp<=0&&(player.countCards('h','jiu')>0||player.num('h',{color:'black'})>=2)&&player!=event.player;
 			},
 			check:function(event,player){
 				return ai.get.attitude(player,event.player)<0;
@@ -1736,7 +1736,7 @@ character.yxs={
 				result:{
 					target:function(player,target){
 						if(player==target){
-							if(player.hp<=2&&!player.num('h','shan')){
+							if(player.hp<=2&&!player.countCards('h','shan')){
 								return 2;
 							}
 							return 0;
@@ -2227,7 +2227,7 @@ character.yxs={
 				var next=trigger.target.chooseToRespond({name:'shan'});
 				next.autochoose=lib.filter.autoRespondShan;
 				next.ai=function(card){
-					if(trigger.target.num('h','shan')>1){
+					if(trigger.target.countCards('h','shan')>1){
 						return ai.get.unuseful2(card);
 					}
 					return -1;
@@ -2250,7 +2250,7 @@ character.yxs={
 				var next=trigger.turn.chooseToRespond({name:'sha'});
 				next.autochoose=lib.filter.autoRespondSha;
 				next.ai=function(card){
-					if(ai.get.attitude(trigger.turn,player)<0&&trigger.turn.num('h','sha')>1){
+					if(ai.get.attitude(trigger.turn,player)<0&&trigger.turn.countCards('h','sha')>1){
 						return ai.get.unuseful2(card);
 					}
 					return -1;
@@ -2282,7 +2282,7 @@ character.yxs={
 			priority:15,
 			filter:function(event,player){
 				return event.card.name=='sha'&&event.player!=player&&
-				player.num('h','sha')>0&&event.targets.contains(player)==false;
+				player.countCards('h','sha')>0&&event.targets.contains(player)==false;
 			},
 			direct:true,
 			content:function(){

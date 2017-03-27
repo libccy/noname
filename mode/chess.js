@@ -4751,7 +4751,7 @@ mode.chess={
 		sanjiansheji:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				return player.num('h','sha')>1&&lib.filter.filterCard({name:'sha'},player);
+				return player.countCards('h','sha')>1&&lib.filter.filterCard({name:'sha'},player);
 			},
 			filterCard:{name:'sha'},
 			selectCard:2,
@@ -4791,7 +4791,7 @@ mode.chess={
 				effect:{
 					player:function(card,player){
 						if(_status.currentPhase!=player) return;
-						if(card.name=='sha'&&player.num('h','sha')<2&&player.countCards('h')<=player.hp){
+						if(card.name=='sha'&&player.countCards('h','sha')<2&&player.countCards('h')<=player.hp){
 							var num=0;
 							var player=_status.event.player;
 							for(var i=0;i<game.players.length;i++){
@@ -5019,9 +5019,9 @@ mode.chess={
 							return 1;
 						}
 						var nh=player.countCards('h');
-						if(!player.num('h','sha')&&
-						!player.num('h','shunshou')&&
-						!player.num('h','bingliang')){
+						if(!player.countCards('h','sha')&&
+						!player.countCards('h','shunshou')&&
+						!player.countCards('h','bingliang')){
 							if(nh<=Math.min(3,player.hp)) return Math.random()-0.3;
 							else if(nh<=Math.min(2,player.hp)) return Math.random()-0.4;
 							return Math.random()-0.5;

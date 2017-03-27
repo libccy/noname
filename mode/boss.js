@@ -1586,7 +1586,7 @@ mode.boss={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'respondShan')){
-							var shans=target.num('h','shan');
+							var shans=target.countCards('h','shan');
 							var hs=target.countCards('h');
 							if(shans>1) return [1,1];
 							if(shans&&hs>2) return [1,1];
@@ -1636,7 +1636,7 @@ mode.boss={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'respondShan')){
-							var shans=target.num('h','shan');
+							var shans=target.countCards('h','shan');
 							var hs=target.countCards('h');
 							if(shans>1) return [0,1];
 							if(shans&&hs>2) return [0,1];
@@ -2528,11 +2528,11 @@ mode.boss={
 								}
 							}
 							var be=target.num('e',{color:'black'});
-							if(target.num('h','shan')&&be){
+							if(target.countCards('h','shan')&&be){
 								if(!target.hasSkill('guidao')) return 0;
 								return [0,hastarget?target.countCards('he')/2:0];
 							}
-							if(target.num('h','shan')&&target.countCards('h')>2){
+							if(target.countCards('h','shan')&&target.countCards('h')>2){
 								if(!target.hasSkill('guidao')) return 0;
 								return [0,hastarget?target.countCards('h')/4:0];
 							}
@@ -2704,7 +2704,7 @@ mode.boss={
 				order:1,
 				result:{
 					player:function(player){
-						if(player.num('h','shan')) return 1;
+						if(player.countCards('h','shan')) return 1;
 						var num=0,players=game.filterPlayer();
 						for(var i=0;i<players.length;i++){
 							if(players[i].canUse('sha',player)&&players[i].countCards('h')>1){
@@ -3473,7 +3473,7 @@ mode.boss={
 			trigger:{player:'damageAfter'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('h','tao')>0;
+				return player.countCards('h','tao')>0;
 			},
 			content:function(){
 				player.chooseToUse({name:'tao'},'神躯：是否使用一张桃？').logSkill='shenqu';

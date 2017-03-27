@@ -388,7 +388,7 @@ character.refresh={
 			audio:2,
 			trigger:{player:'phaseDrawBegin'},
 			check:function(event,player){
-				if(player.num('h','sha')) return true;
+				if(player.countCards('h','sha')) return true;
 				return Math.random()<0.5;
 			},
 			content:function(){
@@ -610,7 +610,7 @@ character.refresh={
 				order:9,
 				result:{
 					target:function(player,target){
-						return -target.countCards('he')-(player.num('h','du')?1:0);
+						return -target.countCards('he')-(player.countCards('h','du')?1:0);
 					}
 				},
 				threaten:2,
@@ -1037,7 +1037,7 @@ character.refresh={
 						if(target.countCards('h')>target.hp+1&&ai.get.recoverEffect(target)>0){
 							return 1;
 						}
-						if(player.canUse('sha',target)&&(player.num('h','sha')||player.num('he',{color:'red'}))){
+						if(player.canUse('sha',target)&&(player.countCards('h','sha')||player.num('he',{color:'red'}))){
 							return -2;
 						}
 						return -0.5;
@@ -1082,7 +1082,7 @@ character.refresh={
 				"step 1"
 				var suit=get.suit(result.card);
 				var target=trigger.target;
-				var num=target.num('h','shan');
+				var num=target.countCards('h','shan');
 				target.chooseToDiscard('请弃置一张'+get.translation(suit)+'牌，否则不能使用闪抵消此杀','he',function(card){
 					return get.suit(card)==_status.event.suit;
 				}).set('ai',function(card){

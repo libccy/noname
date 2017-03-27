@@ -93,7 +93,7 @@ card.swd={
 			content:function(){
 				'step 0'
 				var choice;
-				if(target.num('h','shan')==0||target.num('h','sha')==0||target.hp<=1){
+				if(target.countCards('h','shan')==0||target.countCards('h','sha')==0||target.hp<=1){
 					choice='basic';
 				}
 				else{
@@ -1788,7 +1788,7 @@ card.swd={
 			},
 			ai:{
 				wuxie:function(target,card,player,viewer){
-					if(ai.get.attitude(viewer,target)>0&&target.num('h','sha')){
+					if(ai.get.attitude(viewer,target)>0&&target.countCards('h','sha')){
 						if(!target.countCards('h')||target.hp==1||Math.random()<0.7) return 0;
 					}
 				},
@@ -1847,7 +1847,7 @@ card.swd={
 			},
 			ai:{
 				wuxie:function(target,card,player,viewer){
-					if(ai.get.attitude(viewer,target)>0&&target.num('h','shan')){
+					if(ai.get.attitude(viewer,target)>0&&target.countCards('h','shan')){
 						if(!target.countCards('h')||target.hp==1||Math.random()<0.7) return 0;
 					}
 				},
@@ -2257,7 +2257,7 @@ card.swd={
 				return player.canUse('sha',target);
 			},
 			filter:function(event,player){
-				return player.num('h','sha')>0&&lib.filter.cardUsable({name:'sha'},player);
+				return player.countCards('h','sha')>0&&lib.filter.cardUsable({name:'sha'},player);
 			},
 			content:function(){
 				'step 0'
@@ -2403,7 +2403,7 @@ card.swd={
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			filter:function(event,player){
-				return player.num('h','qinglongzhigui')>0;
+				return player.countCards('h','qinglongzhigui')>0;
 			},
 			content:function(){
 				'step 0'
@@ -2417,7 +2417,7 @@ card.swd={
 			trigger:{player:'discardEnd'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('h','baishouzhihu')>0;
+				return player.countCards('h','baishouzhihu')>0;
 			},
 			content:function(){
 				"step 0"
@@ -2442,7 +2442,7 @@ card.swd={
 			trigger:{player:'damageEnd'},
 			forced:true,
 			filter:function(event,player){
-				return event.source&&event.source!=player&&event.source.isAlive()&&player.num('h','zhuquezhizhang')>0;
+				return event.source&&event.source!=player&&event.source.isAlive()&&player.countCards('h','zhuquezhizhang')>0;
 			},
 			logTarget:'source',
 			check:function(event,player){
@@ -2460,7 +2460,7 @@ card.swd={
 			trigger:{source:'damageEnd'},
 			forced:true,
 			filter:function(event,player){
-				return player.num('h','xuanwuzhihuang')>0&&event.num>0&&player.hp<player.maxHp;
+				return player.countCards('h','xuanwuzhihuang')>0&&event.num>0&&player.hp<player.maxHp;
 			},
 			content:function(){
 				player.showCards(get.translation(player)+'发动了【玄武之璜】',player.getCards('h','xuanwuzhihuang'));
@@ -2471,7 +2471,7 @@ card.swd={
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			filter:function(event,player){
-				return !player.hujia&&player.num('h','huanglinzhicong')>0;
+				return !player.hujia&&player.countCards('h','huanglinzhicong')>0;
 			},
 			content:function(){
 				player.showCards(get.translation(player)+'发动了【黄麟之琮】',player.getCards('h','huanglinzhicong'));
@@ -2483,7 +2483,7 @@ card.swd={
 			trigger:{player:'phaseBegin'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('h','cangchizhibi')>0;
+				return player.countCards('h','cangchizhibi')>0;
 			},
 			content:function(){
 				'step 0'

@@ -180,7 +180,7 @@ character.gwent={
 							if(player.hp>=3&&target.hp==1) return -1;
 							return 0;
 						}
-						var num=player.num('h','shan');
+						var num=player.countCards('h','shan');
 						if(num<1){
 							num=1;
 						}

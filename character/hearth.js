@@ -213,7 +213,7 @@ character.hearth={
 				return !target.hasSkill('moxie')&&!target.storage.fuhua_failed;
 			},
 			filter:function(event,player){
-				return player.num('h','du');
+				return player.countCards('h','du');
 			},
 			discard:false,
 			prepare:'give',
@@ -1385,7 +1385,7 @@ character.hearth={
 				}
 				player.gain(event.cards);
 				'step 1'
-				if(player.num('h','sha')){
+				if(player.countCards('h','sha')){
 					player.chooseToUse('战意：使用一张杀').filterCard=function(card){
 						return card.name=='sha'&&get.itemtype(card)=='card';
 					}
@@ -3061,7 +3061,7 @@ character.hearth={
 			filter:function(event,player){
 				return event.card.name=='sha'&&event.player!=player&&
 					get.distance(player,event.targets[0])<=1&&
-					player.num('h','shan')>0&&
+					player.countCards('h','shan')>0&&
 					event.targets.contains(player)==false&&event.targets.length==1;
 			},
 			direct:true,
@@ -3793,10 +3793,10 @@ character.hearth={
 				var nh=player.countCards('h');
 				var nm=1;
 				var check=true;
-				if(player.num('h','tao')){
+				if(player.countCards('h','tao')){
 					check=false;
 				}
-				else if(player.num('h','shan')&&player.num('h','wuxie')){
+				else if(player.countCards('h','shan')&&player.countCards('h','wuxie')){
 					check=false;
 				}
 				player.chooseTarget(get.prompt('kuixin'),function(card,player,target){
@@ -4849,7 +4849,7 @@ character.hearth={
 							var hastarget=game.hasPlayer(function(current){
 								return ai.get.attitude(player,current)<0;
 							});
-							var ns=target.num('h','shan');
+							var ns=target.countCards('h','shan');
 							var nh=target.countCards('h');
 							if(ns>1){
 								return [0,hastarget?1:0];

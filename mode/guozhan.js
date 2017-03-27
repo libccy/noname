@@ -299,7 +299,7 @@ mode.guozhan={
 				player.chooseCardButton(get.prompt('huangjintianbingfu'),zhu.storage.huangjintianbingfu).set('ai',function(){
 					if(_status.event.goon) return 1;
 					return 0;
-				}).set('goon',player.num('h','sha')==0);
+				}).set('goon',player.countCards('h','sha')==0);
 				"step 1"
 				if(result.bool){
 					var card=result.links[0];
@@ -364,7 +364,7 @@ mode.guozhan={
 				},
 				result:{
 					player:function(player){
-						if(player.num('h','sha')) return 0;
+						if(player.countCards('h','sha')) return 0;
 						return 1;
 					}
 				}
@@ -1025,7 +1025,7 @@ mode.guozhan={
 				var next=trigger.target.chooseToRespond({name:'shan'});
 				next.autochoose=lib.filter.autoRespondShan;
 				next.set('ai',function(card){
-					if(_status.event.player.num('h','shan')>1){
+					if(_status.event.player.countCards('h','shan')>1){
 						return ai.get.unuseful2(card);
 					}
 					return -1;

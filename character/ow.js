@@ -235,7 +235,7 @@ character.ow={
 							var bs=player.getCards('h',{type:'basic'});
 							if(bs.length<2) return 0;
 							if(player.hasSkill('jiu')||player.hasSkill('tianxianjiu')) return;
-							if(bs.length<=3&&player.num('h','sha')<=1){
+							if(bs.length<=3&&player.countCards('h','sha')<=1){
 								for(var i=0;i<bs.length;i++){
 									if(bs[i].name!='sha'&&ai.get.value(bs[i])<7){
 										return [1,0,1,-0.5];
@@ -848,7 +848,7 @@ character.ow={
                 player.storage.paotai=0;
             },
             filter:function(event,player){
-                return player.num('h','sha')>0&&player.storage.paotai<3;
+                return player.countCards('h','sha')>0&&player.storage.paotai<3;
             },
             filterCard:{name:'sha'},
             content:function(){
@@ -1216,7 +1216,7 @@ character.ow={
                     target:function(player,target){
                         var nh=target.countCards('h');
                         if(ai.get.attitude(player,target)<0&&nh>=3&&
-                        player.canUse('sha',target)&&player.num('h','sha')&&
+                        player.canUse('sha',target)&&player.countCards('h','sha')&&
                         ai.get.effect(target,{name:'sha'},player,player)>0){
                             return -nh-5;
                         }
@@ -1485,7 +1485,7 @@ character.ow={
                 order:4,
                 result:{
                     target:function(player,target){
-                        if(!player.num('h','sha')) return 0;
+                        if(!player.countCards('h','sha')) return 0;
                         if(target.countCards('h')<=1&&get.distance(player,target,'attack')<=1) return 0;
                         var min=[];
                         var num=0;
@@ -2164,7 +2164,7 @@ character.ow={
 			direct:true,
 			content:function(){
 				"step 0"
-				var dis=trigger.target.num('h','shan')||trigger.target.num('e','bagua')||trigger.target.countCards('h')>2;
+				var dis=trigger.target.countCards('h','shan')||trigger.target.num('e','bagua')||trigger.target.countCards('h')>2;
 				var next=player.chooseToDiscard(get.prompt('xiandan'));
 				next.ai=function(card){
 					if(dis) return 7-ai.get.value(card);
@@ -3071,7 +3071,7 @@ character.ow={
                         switch(get.suit(ui.selected.cards[0])){
                             case 'heart':if(target.hp==1) return 1;return 0.1;
                             case 'diamond':return 1+Math.sqrt(target.countCards('h'));
-                            case 'club':return -target.countCards('h')-Math.sqrt(target.num('h','sha'));
+                            case 'club':return -target.countCards('h')-Math.sqrt(target.countCards('h','sha'));
                             case 'spade':return ai.get.damageEffect(target,player,target,'thunder');
                             default:return 0;
                         }
@@ -3153,7 +3153,7 @@ character.ow={
             },
             enable:'phaseUse',
             filter:function(event,player){
-                return player.num('h','sha')>0;
+                return player.countCards('h','sha')>0;
             },
             filterTarget:function(card,player,target){
                 return target.hp<target.maxHp&&target!=player;
@@ -3179,7 +3179,7 @@ character.ow={
 			},
 			check:function(event,player){
 				return ai.get.attitude(player,event.player)<0&&
-				((player.countCards('h')>player.hp&&player.num('h','lebu')==0)||get.distance(player,event.player)>1);
+				((player.countCards('h')>player.hp&&player.countCards('h','lebu')==0)||get.distance(player,event.player)>1);
 			},
             alter:true,
             intro:{

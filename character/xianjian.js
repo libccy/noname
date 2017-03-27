@@ -265,7 +265,7 @@ character.xianjian={
 			viewAs:{name:'wanjian'},
 			filterCard:{name:'sha'},
 			filter:function(event,player){
-				return player.num('h','sha')>0;
+				return player.countCards('h','sha')>0;
 			},
 			alter:true,
 			usable:1,
@@ -706,7 +706,7 @@ character.xianjian={
 			filter:function(event,player){
 				if(event.responded) return false;
 				if(!event.filterCard({name:'shan'})) return false;
-				return player.num('h','shan')>0;
+				return player.countCards('h','shan')>0;
 			},
 			direct:true,
 			check:function(event,player){
@@ -750,7 +750,7 @@ character.xianjian={
 			popup:false,
 			silent:true,
 			filter:function(event,player){
-				return player.num('h','shan')==0;
+				return player.countCards('h','shan')==0;
 			},
 			content:function(){
 				player.removeSkill('zhangmu_ai');
@@ -1006,7 +1006,7 @@ character.xianjian={
 		diewu:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				return player.num('h','sha')>0;
+				return player.countCards('h','sha')>0;
 			},
 			filterCard:{name:'sha'},
 			filterTarget:function(card,player,target){
@@ -1247,7 +1247,7 @@ character.xianjian={
 				effect:{
 					player:function(card,player){
 						if(_status.currentPhase!=player) return;
-						if(card.name=='sha'&&player.num('h','sha')<2&&!player.needsToDiscard()){
+						if(card.name=='sha'&&player.countCards('h','sha')<2&&!player.needsToDiscard()){
 							var num=0;
 							var player=_status.event.player;
 							var players=game.filterPlayer();
@@ -1278,7 +1278,7 @@ character.xianjian={
 		ctianfu:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				return player.num('h','shan')>0;
+				return player.countCards('h','shan')>0;
 			},
 			usable:1,
 			filterCard:{name:'shan'},

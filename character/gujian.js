@@ -649,7 +649,7 @@ character.gujian={
 			},
 			check:function(event,player){
 				return ai.get.attitude(player,event.player)<0&&
-				((player.countCards('h')>player.hp&&player.num('h','lebu')==0)||get.distance(player,event.player)>1);
+				((player.countCards('h')>player.hp&&player.countCards('h','lebu')==0)||get.distance(player,event.player)>1);
 			},
 			logTarget:'player',
 			content:function(){

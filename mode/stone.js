@@ -8413,7 +8413,7 @@ mode.stone={
 			ai:{
 				order:function(skill,player){
 					if(!player.getEquip(1)&&player.countCards('e')<2){
-						if(player.num('h','sha')&&player.getActCount()+3<=player.actcount){
+						if(player.countCards('h','sha')&&player.getActCount()+3<=player.actcount){
 							return 4;
 						}
 						return 0.1;

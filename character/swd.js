@@ -505,7 +505,7 @@ character.swd={
 							}
 							if(get.tag(card,'respondSha')||get.tag(card,'respondShan')){
 								if(ai.get.attitude(player,target)>0&&card.name=='juedou') return;
-								return [0.5,target.num('h','sha')+target.num('h','shan')];
+								return [0.5,target.countCards('h','sha')+target.countCards('h','shan')];
 							}
 						}
 					}
@@ -827,7 +827,7 @@ character.swd={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'respondShan')){
-							var shans=target.num('h','shan');
+							var shans=target.countCards('h','shan');
 							var hs=target.countCards('h');
 							if(shans>1) return [1,1];
 							if(shans&&hs>2) return [1,1];
@@ -877,7 +877,7 @@ character.swd={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'respondShan')){
-							var shans=target.num('h','shan');
+							var shans=target.countCards('h','shan');
 							var hs=target.countCards('h');
 							if(shans>1) return [0,1];
 							if(shans&&hs>2) return [0,1];
@@ -1572,8 +1572,8 @@ character.swd={
 				order:10,
 				result:{
 					player:function(player){
-						if(player.num('h','juedou')) return 1;
-						if(player.num('h','sha')==0) return 0;
+						if(player.countCards('h','juedou')) return 1;
+						if(player.countCards('h','sha')==0) return 0;
 						var players=game.filterPlayer();
 						for(var i=0;i<players.length;i++){
 							if(player.canUse('sha',players[i])&&
@@ -1848,9 +1848,9 @@ character.swd={
 				"step 0"
 				var save=false;
 				if(ai.get.attitude(player,trigger.target)>2){
-					if(player.num('h','shan')||player.getEquip(2)||
+					if(player.countCards('h','shan')||player.getEquip(2)||
 					trigger.target.hp==1||player.hp>trigger.target.hp+1){
-						if(!trigger.target.num('h','shan')||trigger.target.countCards('h')<player.countCards('h')){
+						if(!trigger.target.countCards('h','shan')||trigger.target.countCards('h')<player.countCards('h')){
 							save=true;
 						}
 					}
@@ -2211,7 +2211,7 @@ character.swd={
 							if(!target.hasFriend()) return;
 							var hs=target.countCards('h');
 							if(get.tag(card,'respondShan')){
-								var shans=target.num('h','shan');
+								var shans=target.countCards('h','shan');
 								if(shans>1) return [0,1];
 								if(shans&&hs>2) return [0,1];
 								if(shans) return [0,0];
@@ -2220,7 +2220,7 @@ character.swd={
 								return [1.5,0];
 							}
 							if(get.tag(card,'respondSha')){
-								var shas=target.num('h','sha');
+								var shas=target.countCards('h','sha');
 								if(shas>1) return [0,1];
 								if(shas&&hs>2) return [0,1];
 								if(shas) return [0,0];
@@ -2342,7 +2342,7 @@ character.swd={
 				var next=trigger.target.chooseToRespond({name:'shan'});
 				next.autochoose=lib.filter.autoRespondShan;
 				next.ai=function(card){
-					if(trigger.target.num('h','shan')>1){
+					if(trigger.target.countCards('h','shan')>1){
 						return ai.get.unuseful2(card);
 					}
 					return -1;
@@ -3294,7 +3294,7 @@ character.swd={
 						if((nme=='juedou')&&(player==trigger.targets[0]||trigger.targets[0].hp==1)) return val;
 						if(nme=='chenhuodajie') return val;
 						if(nme=='lebu'&&trigger.targets[0].countCards('h')>trigger.targets[0].hp) return val;
-						if(nme=='sha'&&trigger.targets[0].hp==1&&!trigger.targets[0].num('h','shan')) return val;
+						if(nme=='sha'&&trigger.targets[0].hp==1&&!trigger.targets[0].countCards('h','shan')) return val;
 						if(nme=='jiedao'&&trigger.targets[0]==player) return val;
 						if(nme=='yihuajiemu'&&trigger.targets[0]==player) return val;
 						if(nme=='shuiyanqijun'&&trigger.targets.contains(player)) return val;
@@ -3332,7 +3332,7 @@ character.swd={
 			priority:15,
 			filter:function(event,player){
 				return event.card.name=='sha'&&event.player!=player&&
-					player.num('h','sha')>0&&event.targets.contains(player)==false;
+					player.countCards('h','sha')>0&&event.targets.contains(player)==false;
 			},
 			direct:true,
 			content:function(){
@@ -7404,7 +7404,7 @@ character.swd={
 			usable:1,
 			alter:true,
 			filter:function(event,player){
-				return player.num('h','sha')>1;
+				return player.countCards('h','sha')>1;
 			},
 			filterCard:{name:'sha'},
 			selectCard:2,
@@ -8589,7 +8589,7 @@ character.swd={
 			direct:true,
 			content:function(){
 				"step 0"
-				var dis=trigger.target.num('h','shan')||trigger.target.num('e','bagua')||trigger.target.countCards('h')>2;
+				var dis=trigger.target.countCards('h','shan')||trigger.target.num('e','bagua')||trigger.target.countCards('h')>2;
 				var next=player.chooseToDiscard(get.prompt('shoulie',trigger.target));
 				next.ai=function(card){
 					if(dis) return 7-ai.get.value(card);

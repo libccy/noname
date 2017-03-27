@@ -584,7 +584,7 @@ character.shenhua={
 						if(target.countCards('h')==0) return 0;
 						if(target.countCards('h')==1) return -0.1;
 						if(player.hp<=2) return -2;
-						if(player.num('h','shan')==0) return -1;
+						if(player.countCards('h','shan')==0) return -1;
 						return -0.5;
 					}
 				},
@@ -658,7 +658,7 @@ character.shenhua={
 							var bs=player.getCards('h',{type:'basic'});
 							if(bs.length<2) return 0;
 							if(player.hasSkill('jiu')||player.hasSkill('tianxianjiu')) return;
-							if(bs.length<=3&&player.num('h','sha')<=1){
+							if(bs.length<=3&&player.countCards('h','sha')<=1){
 								for(var i=0;i<bs.length;i++){
 									if(bs[i].name!='sha'&&ai.get.value(bs[i])<7){
 										return [1,0,1,-0.5];
@@ -1080,8 +1080,8 @@ character.shenhua={
 							return [0.5,Math.max(2,target.countCards('h'))];
 						}
 						if(target.isUnderControl(true,player)){
-							if((get.tag(card,'respondSha')&&target.num('h','sha'))||
-								(get.tag(card,'respondShan')&&target.num('h','shan'))){
+							if((get.tag(card,'respondSha')&&target.countCards('h','sha'))||
+								(get.tag(card,'respondShan')&&target.countCards('h','shan'))){
 								if(target.hasSkill('ziliang')) return 0.7;
 								return [0.5,1];
 							}
@@ -1092,7 +1092,7 @@ character.shenhua={
 							if(target.countCards('h')==0) return 2;
 							if(target.hasSkill('ziliang')) return 0.7;
 							if(get.mode()=='guozhan') return 0.5;
-							return [0.5,Math.max(target.countCards('h')/4,target.num('h','sha')+target.num('h','shan'))];
+							return [0.5,Math.max(target.countCards('h')/4,target.countCards('h','sha')+target.countCards('h','shan'))];
 						}
 					}
 				},
@@ -1275,7 +1275,7 @@ character.shenhua={
 				expose:0.2,
 				result:{
 					target:function(player,target){
-						if(player.num('h','du')&&ai.get.attitude(player,target)<0) return -1;
+						if(player.countCards('h','du')&&ai.get.attitude(player,target)<0) return -1;
 						if(player.countCards('h')<=player.hp) return 0;
 						var maxnum=0;
 						var cards2=target.getCards('h');
@@ -2402,7 +2402,7 @@ character.shenhua={
 				var next=trigger.target.chooseToRespond({name:'shan'});
 				next.autochoose=lib.filter.autoRespondShan;
 				next.ai=function(card){
-					if(trigger.target.num('h','shan')>1){
+					if(trigger.target.countCards('h','shan')>1){
 						return ai.get.unuseful2(card);
 					}
 					return -1;
@@ -3068,7 +3068,7 @@ character.shenhua={
 			ai:{
 				order:function(name,player){
 					var cards=player.getCards('h');
-					if(player.num('h','sha')==0){
+					if(player.countCards('h','sha')==0){
 						return 1;
 					}
 					for(var i=0;i<cards.length;i++){
@@ -3080,7 +3080,7 @@ character.shenhua={
 				},
 				result:{
 					player:function(player){
-						if(player.num('h','sha')>0) return 0.6;
+						if(player.countCards('h','sha')>0) return 0.6;
 						var num=player.countCards('h');
 						if(num>player.hp) return 0;
 						if(num==1) return -2;
@@ -3311,11 +3311,11 @@ character.shenhua={
 								return ai.get.attitude(target,current)<0;
 							});
 							var be=target.num('e',{color:'black'});
-							if(target.num('h','shan')&&be){
+							if(target.countCards('h','shan')&&be){
 								if(!target.hasSkill('guidao')) return 0;
 								return [0,hastarget?target.countCards('he')/2:0];
 							}
-							if(target.num('h','shan')&&target.countCards('h')>2){
+							if(target.countCards('h','shan')&&target.countCards('h')>2){
 								if(!target.hasSkill('guidao')) return 0;
 								return [0,hastarget?target.countCards('h')/4:0];
 							}
@@ -3952,10 +3952,10 @@ character.shenhua={
 							var hastarget=game.hasPlayer(function(current){
 								return ai.get.attitude(target,current)<0;
 							});
-							if(target.num('h','shan')&&target.num('e',{suit:'spade'})){
+							if(target.countCards('h','shan')&&target.num('e',{suit:'spade'})){
 								return [0,hastarget?target.countCards('he')/2:0];
 							}
-							if(target.num('h','shan')){
+							if(target.countCards('h','shan')){
 								return [1,hastarget?target.countCards('he')/2:0];
 							}
 							return [1,target.countCards('h')/4];
@@ -4042,14 +4042,14 @@ character.shenhua={
 				},
 				check:function(button){
 					var player=_status.event.player;
-					if(player.num('h','wuzhong')){
+					if(player.countCards('h','wuzhong')){
 						if(player.hp==1&&player.num('tao')){
 							return button.link=='tao'?1:0;
 						}
 						return button.link=='wuzhong'?1:0;
 					}
 					if(player.hp<player.maxHp){
-						if(player.num('h','tao')){
+						if(player.countCards('h','tao')){
 							return button.link=='tao'?1:0;
 						}
 					}
@@ -4098,7 +4098,7 @@ character.shenhua={
 			prepare:'give',
 			filter:function(event,player){
 				if(player.group!='qun') return false;
-				if(player.num('h','shan')+player.num('h','shandian')==0) return 0;
+				if(player.countCards('h','shan')+player.countCards('h','shandian')==0) return 0;
 				return game.hasPlayer(function(target){
 					return target!=player&&target.hasZhuSkill('huangtian',player);
 				});

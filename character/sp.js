@@ -724,7 +724,7 @@ character.sp={
 						return -ai.get.value(card,_status.event.player,'raw');
 					});
 					if(ai.get.attitude(player,event.target)>1&&
-						player.num('h','shan')>1&&player.countCards('h')>event.target.countCards('h')){
+						player.countCards('h','shan')>1&&player.countCards('h')>event.target.countCards('h')){
 						next.set('shan',true);
 					}
 					if(ai.get.attitude(player,event.target)>0&&player.needsToDiscard()){
@@ -751,7 +751,7 @@ character.sp={
 				return !target.hasSkill('fuman2')&&target!=player;
 			},
 			filter:function(event,player){
-				return player.num('h','sha');
+				return player.countCards('h','sha');
 			},
 			discard:false,
 			prepare:'give',
@@ -894,7 +894,7 @@ character.sp={
 				player.addTempSkill('fenxun2','phaseAfter');
 			},
 			check:function(card){
-				if(card.name=='sha'&&_status.event.player.num('h','sha')<=1) return 0;
+				if(card.name=='sha'&&_status.event.player.countCards('h','sha')<=1) return 0;
 				return 6-ai.get.value(card);
 			},
 			filterCard:true,
@@ -1092,7 +1092,7 @@ character.sp={
 					viewAs:{name:'sha'},
 					viewAsFilter:function(player){
 						if(!player.storage.fanghun) return false;
-						if(!player.num('h','shan')) return false;
+						if(!player.countCards('h','shan')) return false;
 					},
 					prompt:'将一张闪当杀使用或打出',
 					onuse:function(result,player){
@@ -1114,7 +1114,7 @@ character.sp={
 						respondSha:true,
 						skillTagFilter:function(player){
 							if(!player.storage.fanghun) return false;
-							if(!player.num('h','shan')) return false;
+							if(!player.countCards('h','shan')) return false;
 						},
 						order:function(){
 		                    return ai.get.order({name:'sha'})+0.1;
@@ -1130,7 +1130,7 @@ character.sp={
 					prompt:'将一张杀当闪打出',
 					viewAsFilter:function(player){
 						if(!player.storage.fanghun) return false;
-						if(!player.num('h','sha')) return false;
+						if(!player.countCards('h','sha')) return false;
 					},
 					onrespond:function(result,player){
 						player.storage.fanghun--;
@@ -1146,7 +1146,7 @@ character.sp={
 						respondShan:true,
 						skillTagFilter:function(player){
 							if(!player.storage.fanghun) return false;
-							if(!player.num('h','sha')) return false;
+							if(!player.countCards('h','sha')) return false;
 						},
 						effect:{
 							target:function(card,player,target,current){
@@ -2332,7 +2332,7 @@ character.sp={
 		juesi:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				return player.num('h','sha')>0;
+				return player.countCards('h','sha')>0;
 			},
 			filterTarget:function(card,player,target){
 				return target!=player&&target.countCards('he')>0;
@@ -2503,7 +2503,7 @@ character.sp={
 						if(trigger.card.name=='sha'){
 							var target=trigger.targets[0];
 							if(target==player){
-								return !player.num('h','shan');
+								return !player.countCards('h','shan');
 							}
 							else{
 								return target.hp==1||(target.countCards('h')<=2&&target.hp<=2);
@@ -3137,9 +3137,9 @@ character.sp={
 				var save=false;
 				if(ai.get.attitude(player,trigger.target)>2){
 					if(trigger.card.name=='sha'){
-						if(player.num('h','shan')||player.getEquip(2)||
+						if(player.countCards('h','shan')||player.getEquip(2)||
 						trigger.target.hp==1||player.hp>trigger.target.hp+1){
-							if(!trigger.target.num('h','shan')||trigger.target.countCards('h')<player.countCards('h')){
+							if(!trigger.target.countCards('h','shan')||trigger.target.countCards('h')<player.countCards('h')){
 								save=true;
 							}
 						}
@@ -3168,10 +3168,10 @@ character.sp={
 						var trigger=_status.event.getTrigger();
 						var player=_status.event.player;
 						if(trigger.card.name=='sha'){
-							if(player.num('h','shan')) return '转移';
+							if(player.countCards('h','shan')) return '转移';
 						}
 						else if(trigger.card.name=='juedou'){
-							if(player.num('h','sha')) return '转移';
+							if(player.countCards('h','sha')) return '转移';
 						}
 						return '失效';
 					}).set('prompt','将'+get.translation(trigger.card)+'转移给你，或令其失效');
@@ -3289,7 +3289,7 @@ character.sp={
 							}
 						}
 						if(!bool) return 0;
-						if(player.canUse('sha',target)&&(player.num('h','sha'))){
+						if(player.canUse('sha',target)&&(player.countCards('h','sha'))){
 							return -2;
 						}
 						return -0.5;
@@ -3425,7 +3425,7 @@ character.sp={
 					var target=result.targets[0];
 					player.logSkill('junwei',result.targets);
 					event.target=target;
-					var nshan=target.num('h','shan');
+					var nshan=target.countCards('h','shan');
 					if(nshan==0){
 						event.directfalse=true;
 					}
@@ -3452,7 +3452,7 @@ character.sp={
 					player.chooseTarget('将闪交给一名角色',true,function(card,player,target){
 						return target!=_status.event.getParent().target;
 					}).set('ai',function(target){
-						return ai.get.attitude(_status.event.player,target)/(target.num('h','shan')+1);
+						return ai.get.attitude(_status.event.player,target)/(target.countCards('h','shan')+1);
 					});
 				}
 				else{
@@ -3963,7 +3963,7 @@ character.sp={
 					if(e2.name=='tengjia') return true;
 					if(e2.name=='bagua') return	true;
 				}
-				return player.num('h','shan')>0;
+				return player.countCards('h','shan')>0;
 			},
 			content:function(){
 				var target=trigger.player;
@@ -4676,7 +4676,7 @@ character.sp={
 				var target=event.target;
 				var tosave=trigger.player;
 				var att=ai.get.attitude(target,tosave);
-				var hastao=target.num('h','tao');
+				var hastao=target.countCards('h','tao');
 				target.chooseToDiscard(4,true,'he').set('ai',function(card){
 					var hastao=_status.event.hastao;
 					var att=_status.event.att;
@@ -5293,7 +5293,7 @@ character.sp={
 			trigger:{player:'phaseUseBegin'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('h','sha')==0;
+				return player.countCards('h','sha')==0;
 			},
 			content:function(){
 				"step 0"
@@ -5620,7 +5620,7 @@ character.sp={
 				if(get.color(event.card)!='black') return false;
 				if(!event.player) return false;
 				if(event.player==player) return false;
-				return player.num('h','sha')>0;
+				return player.countCards('h','sha')>0;
 			},
 			direct:true,
 			content:function(){
@@ -6318,7 +6318,7 @@ character.sp={
 				else if(trigger.player.hp>1&&player.countCards('h')<3){
 					nono=true;
 				}
-				else if(trigger.player.canUse('sha',player)&&!player.num('h','shan')&&trigger.player.countCards('h')>=3){
+				else if(trigger.player.canUse('sha',player)&&!player.countCards('h','shan')&&trigger.player.countCards('h')>=3){
 					nono=true;
 				}
 				var next=player.chooseToDiscard(get.prompt('zhendu',trigger.player));
@@ -7104,7 +7104,7 @@ character.sp={
 				player.storage.huxiao++;
 			},
 			check:function(event,player){
-				return player.num('h','sha')>0;
+				return player.countCards('h','sha')>0;
 			},
 			mod:{
 				cardUsable:function(card,player,num){
@@ -7987,7 +7987,7 @@ character.sp={
 			forced:true,
 			popup:false,
 			check:function(event,player){
-				return player.num('h','sha')>0;
+				return player.countCards('h','sha')>0;
 			},
 			filter:function(event,player){
 				return _status.currentPhase==player;

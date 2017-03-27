@@ -165,13 +165,13 @@ card.yunchou={
 			},
 			content:function(){
 				'step 0'
-				if(target.num('h','sha')){
+				if(target.countCards('h','sha')){
 					var name=get.translation(player.name);
 					target.chooseControl().set('prompt',get.translation('caochuanjiejian')).set('choiceList',[
 						'将手牌中的所有杀交给'+name+'，并视为对'+name+'使用一张杀','展示手牌并令'+name+'弃置任意一张'
 					],function(){
 						if(ai.get.effect(player,{name:'sha'},target,target)<0) return 1;
-						if(target.num('h','sha')>=3) return 1;
+						if(target.countCards('h','sha')>=3) return 1;
 						return 0;
 					});
 				}
@@ -981,7 +981,7 @@ card.yunchou={
 				order:9.5,
 				basic:{
 					equipValue:function(card,player){
-						if(player.num('h','qiankundai')) return 6;
+						if(player.countCards('h','qiankundai')) return 6;
 						return 1;
 					}
 				}
@@ -1070,7 +1070,7 @@ card.yunchou={
 		_hufu_sha:{
 			enable:['chooseToRespond','chooseToUse'],
 			filter:function(event,player){
-				return player.num('h','hufu')>0;
+				return player.countCards('h','hufu')>0;
 			},
 			filterCard:{name:'hufu'},
 			viewAs:{name:'sha'},
@@ -1085,7 +1085,7 @@ card.yunchou={
 		_hufu_shan:{
 			enable:['chooseToRespond','chooseToUse'],
 			filter:function(event,player){
-				return player.num('h','hufu')>0;
+				return player.countCards('h','hufu')>0;
 			},
 			filterCard:{name:'hufu'},
 			viewAs:{name:'shan'},
@@ -1100,7 +1100,7 @@ card.yunchou={
 		_hufu_jiu:{
 			enable:['chooseToRespond','chooseToUse'],
 			filter:function(event,player){
-				return player.num('h','hufu')>0;
+				return player.countCards('h','hufu')>0;
 			},
 			filterCard:{name:'hufu'},
 			viewAs:{name:'jiu'},
