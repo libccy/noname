@@ -5583,9 +5583,6 @@
 						else if(e.keyCode==74&&(e.ctrlKey||e.metaKey)&&lib.node){
 							lib.node.debug();
 						}
-						// else if(e.keyCode==27){
-						// 	if(!ui.arena.classList.contains('paused')) ui.click.configMenu();
-						// }
                     }
                     else{
                         game.closePopped();
@@ -33758,31 +33755,33 @@
 					},3000);
 				}
                 if(!lib.config.asset_version){
-                    setTimeout(function(){
-                        if(!game.download){
-                            game.saveConfig('asset_version','无');
-                        }
-                        else{
-                            var func=function(){
-                                if(confirm('是否下载图片和字体素材？（约40MB）')){
-                                    if(!ui.arena.classList.contains('menupaused')){
-                                        ui.click.configMenu();
-                                        ui.click.menuTab('其它');
-                                    }
-                                    setTimeout(game.checkForAssetUpdate,500);
-                                }
-                                else{
-                                    game.saveConfig('asset_version','无');
-                                }
-                            }
-                            if(_status.new_tutorial){
-                                _status.new_tutorial=func;
-                            }
-                            else{
-                                func();
-                            }
-                        }
-                    },4000);
+					lib.onfree.push(function(){
+						setTimeout(function(){
+	                        if(!game.download){
+	                            game.saveConfig('asset_version','无');
+	                        }
+	                        else{
+	                            var func=function(){
+	                                if(confirm('是否下载图片和字体素材？（约40MB）')){
+	                                    if(!ui.arena.classList.contains('menupaused')){
+	                                        ui.click.configMenu();
+	                                        ui.click.menuTab('其它');
+	                                    }
+	                                    setTimeout(game.checkForAssetUpdate,500);
+	                                }
+	                                else{
+	                                    game.saveConfig('asset_version','无');
+	                                }
+	                            }
+	                            if(_status.new_tutorial){
+	                                _status.new_tutorial=func;
+	                            }
+	                            else{
+	                                func();
+	                            }
+	                        }
+	                    },3000);
+					});
                 }
 				clearTimeout(window.resetGameTimeout);
 				delete window.resetGameTimeout;
@@ -34637,11 +34636,13 @@
                         ui.click.shortcut();
 						break;
 					case 'menu':
-                        game.closePopped();
-						game.pause2();
-						ui.click.configMenu();
-						ui.system1.classList.remove('shown');
-						ui.system2.classList.remove('shown');
+						if(ui.click.configMenu){
+							game.closePopped();
+							game.pause2();
+							ui.click.configMenu();
+							ui.system1.classList.remove('shown');
+							ui.system2.classList.remove('shown');
+						}
 						break;
 					case 'pause':
 						ui.click.pause();
@@ -35337,11 +35338,13 @@
                                     ui.click.shortcut();
 									break;
 								case 'menu':
-                                    game.closePopped();
-									game.pause2();
-									ui.click.configMenu();
-									ui.system1.classList.remove('shown');
-									ui.system2.classList.remove('shown');
+									if(ui.click.configMenu){
+										game.closePopped();
+										game.pause2();
+										ui.click.configMenu();
+										ui.system1.classList.remove('shown');
+										ui.system2.classList.remove('shown');
+									}
 									break;
 								case 'pause':
 									ui.click.pause();
