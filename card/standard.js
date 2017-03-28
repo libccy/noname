@@ -81,7 +81,7 @@ card.standard={
 					next.set('ai',function(){
 						var target=_status.event.player;
 						var evt=_status.event.getParent();
-						var sks=target.get('s');
+						var sks=target.getSkills();
 						if(sks.contains('leiji')||
 							sks.contains('releiji')||
 							sks.contains('lingbo')){
@@ -1225,7 +1225,7 @@ card.standard={
 				result:{
 					target:function(player,target){
 						var num=game.countPlayer(function(current){
-							var skills=current.get('s');
+							var skills=current.getSkills();
 							for(var j=0;j<current.skills.length;j++){
 								var rejudge=get.tag(current.skills[j],'rejudge',current);
 								if(rejudge!=undefined){
@@ -1590,7 +1590,7 @@ card.standard={
 				event.tempnowuxie=(trigger.targets&&trigger.targets.length>1&&!trigger.multitarget);
 				event.filterCard=function(card,player){
 					if(card.name!='wuxie') return false;
-					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.get('s'));
+					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.getSkills());
 					if(mod!='unchanged') return mod;
 					return true;
 				};
@@ -1625,7 +1625,7 @@ card.standard={
 					var next=player.chooseToUse({
 						filterCard:function(card,player){
 							if(card.name!='wuxie') return false;
-							var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.get('s'));
+							var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.getSkills());
 							if(mod!='unchanged') return mod;
 							return true;
 						},

@@ -51,7 +51,7 @@ character.refresh={
 				if(player.hp==player.maxHp||player.storage.rerende<0||player.countCards('h')<=1){
 					var players=game.filterPlayer();
 					for(var i=0;i<players.length;i++){
-						if(players[i].get('s').contains('haoshi')&&
+						if(players[i].getSkills().contains('haoshi')&&
 							!players[i].isTurnedOver()&&
 							!players[i].hasJudge('lebu')&&
 							ai.get.attitude(player,players[i])>=3&&
@@ -174,7 +174,7 @@ character.refresh={
 						var nh=target.countCards('h');
 						var np=player.countCards('h');
 						if(player.hp==player.maxHp||player.storage.rerende<0||player.countCards('h')<=1){
-							if(nh>=np-1&&np<=player.hp&&!target.get('s').contains('haoshi')) return 0;
+							if(nh>=np-1&&np<=player.hp&&!target.getSkills().contains('haoshi')) return 0;
 						}
 						return Math.max(1,5-nh);
 					}
@@ -1245,7 +1245,7 @@ character.refresh={
 				"step 0"
 				player.chooseControl(['red','black','basic','trick','equip']).set('ai',function(){
 					var player=_status.event.player;
-					if(player.num('shan')==0) return 'basic';
+					if(!player.hasShan()) return 'basic';
 					if(player.countCards('e')<=1) return 'equip';
 					if(player.countCards('h')>2) return 'trick';
 					return 'red';

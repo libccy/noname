@@ -4988,13 +4988,13 @@ mode.chess={
 					return false;
 				}
 				var move=2;
-				move=game.checkMod(player,move,'chessMove',player.get('s'));
+				move=game.checkMod(player,move,'chessMove',player.getSkills());
 				return move>0;
 			},
 			content:function(){
 				"step 0"
 				var move=2;
-				move=game.checkMod(player,move,'chessMove',player.get('s'));
+				move=game.checkMod(player,move,'chessMove',player.getSkills());
 				player.chooseToMove(move).phasing=true;
 				"step 1"
 				if(ui.confirm){

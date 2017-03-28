@@ -895,7 +895,7 @@ mode.boss={
 				var targets=player.getEnemies();
 				var stop=false;
 				for(var i=0;i<targets.length;i++){
-					var skills=targets[i].get('s');
+					var skills=targets[i].getSkills();
 					for(var j=0;j<skills.length;j++){
 						if(get.tag(skills[j],'rejudge',targets[i])){
 							stop=true;break;

@@ -1431,7 +1431,7 @@ mode.guozhan={
 					}
 					var players=game.filterPlayer();
 					for(var i=0;i<players.length;i++){
-						if(players[i].get('s').contains('haoshi')&&
+						if(players[i].getSkills().contains('haoshi')&&
 							!players[i].isTurnedOver()&&
 							!players[i].hasJudge('lebu')&&
 							ai.get.attitude(player,players[i])>=3&&
@@ -1474,7 +1474,7 @@ mode.guozhan={
 						var nh=target.countCards('h');
 						var np=player.countCards('h');
 						if(player.hp==player.maxHp||player.storage.gzrende<0||player.countCards('h')+player.storage.gzrende<=2){
-							if(nh>=np-1&&np<=player.hp&&!target.get('s').contains('haoshi')) return 0;
+							if(nh>=np-1&&np<=player.hp&&!target.getSkills().contains('haoshi')) return 0;
 						}
 						return Math.max(1,5-nh);
 					}
@@ -1848,7 +1848,7 @@ mode.guozhan={
 					}
 				}
 				if(config.inline||config.siege){
-					var skills=player.get('s');
+					var skills=player.getSkills();
 					for(var i=0;i<skills.length;i++){
 						var info=get.info(skills[i]).zhenfa;
 						if(info&&config[info]){
@@ -3129,7 +3129,7 @@ mode.guozhan={
                 if(sourceSkill&&sourceSkill.sourceSkill){
 					skill=sourceSkill.sourceSkill;
                 }
-				if(game.expandSkills(this.get('s')).contains(skill)) return false;
+				if(game.expandSkills(this.getSkills()).contains(skill)) return false;
 				if(lib.skill.global.contains(skill)) return false;
 				if(this.isUnseen(0)){
 					var skills=game.expandSkills(lib.character[this.name1][3].slice(0));

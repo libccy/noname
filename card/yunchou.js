@@ -1054,7 +1054,7 @@ card.yunchou={
 			content:function(){
 				player.chooseToUse(get.prompt('chenhuodajie',trigger.player).replace(/发动/,'使用'),function(card,player){
 					if(card.name!='chenhuodajie') return false;
-					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.get('s'));
+					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.getSkills());
 					if(mod!='unchanged') return mod;
 					return true;
 				},trigger.player,-1).targetRequired=true;

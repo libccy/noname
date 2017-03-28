@@ -532,7 +532,7 @@ character.hearth={
 				}).ai=function(target){
 					var att=ai.get.attitude(player,target);
 					if(att>=0) return 0;
-					var skills=target.get('s');
+					var skills=target.getSkills();
 					for(var i=0;i<skills.length;i++){
 						if(!get.is.locked(skills[i])){
 							if(target.hasSkillTag('maixie')) return 2;
@@ -713,7 +713,7 @@ character.hearth={
 			silent:true,
 			content:function(){
 				var list=['yushou_misha','yushou_huofu','yushou_leiouke'];
-				var skills=player.get('s');
+				var skills=player.getSkills();
 				for(var i=0;i<list.length;i++){
 					if(!skills.contains(list[i])) list.splice(i--,1);
 				}

@@ -463,11 +463,11 @@ character.ow={
                 var position=get.is.altered('pingzhang')?'h':'he';
                 if(event.player==player){
                     if(player.hasSkill('pingzhang2')) return false;
-                    return player.num(position,{suit:'heart'});
+                    return player.countCards(position,{suit:'heart'});
                 }
                 else{
                     if(player.hasSkill('pingzhang3')) return false;
-                    return player.num(position,{suit:'spade'});
+                    return player.countCards(position,{suit:'spade'});
                 }
             },
             direct:true,

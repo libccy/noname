@@ -2975,7 +2975,7 @@ character.swd={
 				order:11,
 				result:{
 					target:function(player,target){
-						var skills=target.get('s');
+						var skills=target.getSkills();
 						for(var i=0;i<skills.length;i++){
 							if(!get.is.locked(skills[i])){
 								if(target.hasSkillTag('maixie')) return -2;
@@ -5659,10 +5659,10 @@ character.swd={
 				}
 				player.chooseButton(dialog,function(button){
 					var player=get.owner(button.link);
-					if(get.subtype(button.link)=='equip2'&&player.num('shan')==0){
+					if(get.subtype(button.link)=='equip2'&&!player.hasShan()){
 						return 11-ai.get.attitude(_status.event.player,player);
 					}
-					if(get.subtype(button.link)=='equip1'&&player.num('sha')==0){
+					if(get.subtype(button.link)=='equip1'&&!player.hasSha()){
 						return 11-ai.get.attitude(_status.event.player,player);
 					}
 					return 5-ai.get.attitude(_status.event.player,player);
@@ -6366,7 +6366,7 @@ character.swd={
                 // if(target.name&&!target.isUnseen(0)) names.add(target.name);
                 // if(target.name1&&!target.isUnseen(0)) names.add(target.name1);
                 // if(target.name2&&!target.isUnseen(1)) names.add(target.name2);
-                // var pss=player.get('s');
+                // var pss=player.getSkills();
                 // for(var i=0;i<names.length;i++){
                 //     var info=lib.character[names[i]];
                 //     if(info){
@@ -6496,7 +6496,7 @@ character.swd={
 				if(target.name&&!target.isUnseen(0)) names.add(target.name);
 				if(target.name1&&!target.isUnseen(0)) names.add(target.name1);
 				if(target.name2&&!target.isUnseen(1)) names.add(target.name2);
-				var pss=player.get('s');
+				var pss=player.getSkills();
 				for(var i=0;i<names.length;i++){
 					var info=lib.character[names[i]];
 					if(info){
@@ -6518,7 +6518,7 @@ character.swd={
 				if(target.name&&!target.isUnseen(0)) names.add(target.name);
 				if(target.name1&&!target.isUnseen(0)) names.add(target.name1);
 				if(target.name2&&!target.isUnseen(1)) names.add(target.name2);
-				var pss=player.get('s');
+				var pss=player.getSkills();
 				for(var i=0;i<names.length;i++){
 					var info=lib.character[names[i]];
 					if(info){
@@ -6642,7 +6642,7 @@ character.swd={
 						if(target.name&&!target.isUnseen(0)) names.add(target.name);
 						if(target.name1&&!target.isUnseen(0)) names.add(target.name1);
 						if(target.name2&&!target.isUnseen(1)) names.add(target.name2);
-						var pss=player.get('s');
+						var pss=player.getSkills();
 						for(var i=0;i<names.length;i++){
 							var info=lib.character[names[i]];
 							if(info){

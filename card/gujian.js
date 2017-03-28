@@ -1544,7 +1544,7 @@ card.gujian={
 			content:function(){
 				player.chooseToUse(get.prompt('shihuifen',trigger.player).replace(/发动/,'使用'),function(card,player){
 					if(card.name!='shihuifen') return false;
-					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.get('s'));
+					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.getSkills());
 					if(mod!='unchanged') return mod;
 					return true;
 				},trigger.player,-1).targetRequired=true;
@@ -1560,7 +1560,7 @@ card.gujian={
 			content:function(){
 				player.chooseToUse(get.prompt('jinlianzhu',trigger.player).replace(/发动/,'使用'),function(card,player){
 					if(card.name!='jinlianzhu') return false;
-					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.get('s'));
+					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.getSkills());
 					if(mod!='unchanged') return mod;
 					return true;
 				},trigger.player,-1).targetRequired=true;

@@ -2579,7 +2579,7 @@ character.shenhua={
 			mod:{
 				cardSavable:function(card,player){
 					if(!_status.currentPhase) return;
-					if(_status.currentPhase.get('s').contains('wansha')&&_status.currentPhase!=player){
+					if(_status.currentPhase.getSkills().contains('wansha')&&_status.currentPhase!=player){
 						if(card.name=='tao'&&_status.event.dying!=player) return false;
 					}
 				}
@@ -4043,7 +4043,7 @@ character.shenhua={
 				check:function(button){
 					var player=_status.event.player;
 					if(player.countCards('h','wuzhong')){
-						if(player.hp==1&&player.num('tao')){
+						if(player.hp==1&&player.countCards('h','tao')){
 							return button.link=='tao'?1:0;
 						}
 						return button.link=='wuzhong'?1:0;

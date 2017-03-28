@@ -8806,7 +8806,7 @@
 				},
 				chooseToUse:function(){
 					"step 0"
-                    var skills=player.get('s',true);
+                    var skills=player.getSkills(true);
                     game.expandSkills(skills);
                     for(var i=0;i<skills.length;i++){
                         var info=lib.skill[skills[i]];
@@ -10791,7 +10791,7 @@
 					}
 					"step 1"
 					if(!event.skill){
-						console.log('error: no skill',get.translation(event.player),event.player.get('s'));
+						console.log('error: no skill',get.translation(event.player),event.player.getSkills());
 						if(event._skill){
 							event.skill=event._skill;
 							console.log(event._skill);
@@ -12574,10 +12574,10 @@
 					}
 					else if(arg1=='s'){
 						if(typeof arg2=='boolean'){
-							return game.expandSkills(this.get('s',arg2).concat(lib.skill.global)).contains(arg3);
+							return game.expandSkills(this.getSkills(arg2).concat(lib.skill.global)).contains(arg3);
 						}
 						else{
-							return game.expandSkills(this.get('s').concat(lib.skill.global)).contains(arg2);
+							return game.expandSkills(this.getSkills().concat(lib.skill.global)).contains(arg2);
 						}
 					}
 				},
@@ -12720,6 +12720,48 @@
 				countCards:function(arg1,arg2){
 					return this.getCards(arg1,arg2).length;
 				},
+				getSkills:function(arg2,arg3,arg4){
+					var skills=this.skills.slice(0);
+					var es=[];
+					var i,j;
+					if(arg3!==false){
+						for(i=0;i<this.node.equips.childElementCount;i++){
+							if(!this.node.equips.childNodes[i].classList.contains('removing')){
+								var equipskills=get.info(this.node.equips.childNodes[i]).skills;
+								if(equipskills){
+									es.addArray(equipskills);
+								}
+							}
+						}
+						if(arg2=='e'){
+							return es;
+						}
+					}
+					for(var i in this.additionalSkills){
+						if(Array.isArray(this.additionalSkills[i])){
+							for(j=0;j<this.additionalSkills[i].length;j++){
+								if(this.additionalSkills[i][j]){
+									skills.add(this.additionalSkills[i][j]);
+								}
+							}
+						}
+						else if(this.additionalSkills[i]&&typeof this.additionalSkills[i]=='string'){
+							skills.add(this.additionalSkills[i]);
+						}
+					}
+					for(var i in this.tempSkills){
+						skills.add(i);
+					}
+					if(arg2) skills.addArray(this.hiddenSkills);
+					if(arg3!==false) skills.addArray(es);
+					for(var i in this.forbiddenSkills){
+						skills.remove(i);
+					}
+					if(arg4!==false){
+						skills=game.filterSkills(skills,this);
+					}
+					return skills;
+				},
 				get:function(arg1,arg2,arg3,arg4){
 					var i,j;
 					if(arg1=='s'){
@@ -12727,10 +12769,11 @@
                         var es=[];
                         if(arg3!==false){
                             for(i=0;i<this.node.equips.childElementCount;i++){
-								if(this.node.equips.childNodes[i].classList.contains('removing')) continue;
-                                var equipskills=get.info(this.node.equips.childNodes[i]).skills;
-								if(equipskills){
-									es.addArray(equipskills);
+								if(!this.node.equips.childNodes[i].classList.contains('removing')){
+									var equipskills=get.info(this.node.equips.childNodes[i]).skills;
+									if(equipskills){
+										es.addArray(equipskills);
+									}
 								}
 							}
                             if(arg2=='e'){
@@ -15048,7 +15091,7 @@
                     return this;
                 },
 				checkMarks:function(){
-					var skills=this.get('s');
+					var skills=this.getSkills();
                     game.expandSkills(skills);
 					for(var i in this.marks){
 						if(!skills.contains(i)&&!this.marks[i].info.fixed){
@@ -15295,7 +15338,7 @@
 							return str.slice(0,str.length-1);
 						}
 						var forbidlist=lib.config.forbid.concat(lib.config.customforbid);
-                        var skills=this.get('s');
+                        var skills=this.getSkills();
 						for(var i=0;i<forbidlist.length;i++){
 							if(lib.config.customforbid.contains(forbidlist[i])||
 								!lib.config.forbidlist.contains(getName(forbidlist[i]))){
@@ -15348,7 +15391,7 @@
 					card=get.autoViewAs(card,null,player);
 					var num=get.info(card).usable;
 					if(typeof num=='function') num=num(card,player);
-					num=game.checkMod(card,player,num,'cardUsable',player.get('s'));
+					num=game.checkMod(card,player,num,'cardUsable',player.getSkills());
 					if(typeof num!='number') return Infinity;
 					if(_status.currentPhase==player){
 						return num-get.cardCount(card,player);
@@ -15358,8 +15401,8 @@
 				getAttackRange:function(){
 					var player=this;
 					var range=0;
-					range=game.checkMod(player,player,range,'globalFrom',player.get('s'));
-					range=game.checkMod(player,player,range,'attackFrom',player.get('s'));
+					range=game.checkMod(player,player,range,'globalFrom',player.getSkills());
+					range=game.checkMod(player,player,range,'attackFrom',player.getSkills());
 					var equips=player.getCards('e');
 					for(var i=0;i<equips.length;i++){
 						var info=get.info(equips[i]).distance;
@@ -15376,7 +15419,7 @@
 				getGlobalFrom:function(){
 					var player=this;
 					var range=0;
-					range=game.checkMod(player,player,range,'globalFrom',player.get('s'));
+					range=game.checkMod(player,player,range,'globalFrom',player.getSkills());
 					var equips=player.getCards('e');
 					for(var i=0;i<equips.length;i++){
 						var info=get.info(equips[i]).distance;
@@ -15390,7 +15433,7 @@
 				getGlobalTo:function(){
 					var player=this;
 					var range=0;
-					range=game.checkMod(player,player,range,'globalTo',player.get('s'));
+					range=game.checkMod(player,player,range,'globalTo',player.getSkills());
 					var equips=player.getCards('e');
 					for(var i=0;i<equips.length;i++){
 						var info=get.info(equips[i]).distance;
@@ -15402,7 +15445,7 @@
 					return (range);
 				},
                 getHandcardLimit:function(){
-                    return Math.max(0,game.checkMod(this,this.hp,'maxHandcard',this.get('s')));
+                    return Math.max(0,game.checkMod(this,this.hp,'maxHandcard',this.getSkills()));
                 },
                 getEnemies:function(func){
                     var player=this;
@@ -15613,7 +15656,7 @@
                     return get.distance(target,this,method);
                 },
 				hasSkill:function(skill){
-					return game.expandSkills(this.get('s')).contains(skill);
+					return game.expandSkills(this.getSkills()).contains(skill);
 				},
                 hasZhuSkill:function(skill,player){
                     if(!this.hasSkill(skill)) return false;
@@ -15648,7 +15691,7 @@
 					return false;
 				},
 				hasSkillTag:function(tag,hidden,arg,globalskill){
-					var skills=this.get('s',hidden);
+					var skills=this.getSkills(hidden);
 					if(globalskill){
 						skills.addArray(lib.skill.global);
 					}
@@ -15714,7 +15757,7 @@
                 },
                 hasWuxie:function(){
                     if(this.countCards('h','wuxie')) return true;
-					var skills=this.get('s',true).concat(lib.skill.global);
+					var skills=this.getSkills(true).concat(lib.skill.global);
 					game.expandSkills(skills);
 					for(var i=0;i<skills.length;i++){
 						var ifo=get.info(skills[i]);
@@ -17657,7 +17700,7 @@
 						}
 						if(lib.config.compatiblemode){
 							(function(){
-								var skills=player.get('s',true).concat(lib.skill.global);
+								var skills=player.getSkills(true).concat(lib.skill.global);
 	    						game.expandSkills(skills);
 	    						for(var i=0;i<skills.length;i++){
 	    							var trigger=get.info(skills[i]).trigger;
@@ -18156,7 +18199,7 @@
 				if(player==undefined) player=_status.event.player;
 				var filter=get.info(card).enable;
 				if(!filter) return;
-				var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.get('s'));
+				var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.getSkills());
 				if(mod!='unchanged') return mod;
 				if(typeof filter=='boolean') return filter;
 				if(typeof filter=='function') return filter(card,player);
@@ -18164,7 +18207,7 @@
 			cardRespondable:function(card,player){
 				if(_status.event.name!='chooseToRespond') return true;
 				if(player==undefined) player=_status.event.player;
-				var mod=game.checkMod(card,player,'unchanged','cardRespondable',player.get('s'));
+				var mod=game.checkMod(card,player,'unchanged','cardRespondable',player.getSkills());
 				if(mod!='unchanged') return mod;
 				return true;
 			},
@@ -18176,13 +18219,13 @@
 				if(event.getParent().player!=player) return true;
 				var num=get.info(card).usable;
 				if(typeof num=='function') num=num(card,player);
-				num=game.checkMod(card,player,num,'cardUsable',player.get('s'));
+				num=game.checkMod(card,player,num,'cardUsable',player.getSkills());
 				if(typeof num!='number') return true;
 				else return(get.cardCount(card,player)<num);
 			},
             cardDiscardable:function(card,player,event){
                 event=event||_status.event;
-                var mod=game.checkMod(card,player,event.getParent().name,'unchanged','cardDiscardable',player.get('s'));
+                var mod=game.checkMod(card,player,event.getParent().name,'unchanged','cardDiscardable',player.getSkills());
                 if(mod!='unchanged') return mod;
                 return true;
             },
@@ -18198,10 +18241,10 @@
 				if(card==undefined) return false;
 				var info=get.info(card);
 				var filter=info.filterTarget;
-				var mod=game.checkMod(card,player,target,'unchanged','playerEnabled',player.get('s'));
+				var mod=game.checkMod(card,player,target,'unchanged','playerEnabled',player.getSkills());
 				if(mod==false) return false;
 				if(!info.singleCard||ui.selected.targets.length==0){
-					var mod=game.checkMod(card,player,target,'unchanged','targetEnabled',target.get('s'));
+					var mod=game.checkMod(card,player,target,'unchanged','targetEnabled',target.getSkills());
 					if(mod!='unchanged') return mod;
 				}
 				if(typeof filter=='boolean') return filter;
@@ -18216,7 +18259,7 @@
                 return false;
             },
 			targetInRange:function(card,player,target){
-				var mod=game.checkMod(card,player,target,'unchanged','targetInRange',player.get('s'));
+				var mod=game.checkMod(card,player,target,'unchanged','targetInRange',player.getSkills());
 				var extra=0;
 				if(mod!='unchanged'){
 					if(typeof mod=='boolean') return mod;
@@ -18260,7 +18303,7 @@
 				else if(typeof select=='number') range=[select,select];
 				else if(get.itemtype(select)=='select') range=select;
 				else if(typeof select=='function') range=select(card,player);
-				game.checkMod(card,player,range,'selectTarget',player.get('s'));
+				game.checkMod(card,player,range,'selectTarget',player.getSkills());
 				return range;
 			},
 			judge:function(card,player,target){
@@ -18403,7 +18446,7 @@
 			},
             fengyin:{
                 init:function(player,skill){
-                    var skills=player.get('s',true,false);
+                    var skills=player.getSkills(true,false);
                     for(var i=0;i<skills.length;i++){
                         if(get.is.locked(skills[i])){
                             skills.splice(i--,1);
@@ -18648,7 +18691,7 @@
 						player.chooseToUse({
 							filterCard:function(card,player,event){
                                 event=event||_status.event;
-								var mod=game.checkMod(card,player,'unchanged','cardSavable',player.get('s'));
+								var mod=game.checkMod(card,player,'unchanged','cardSavable',player.getSkills());
 								if(mod!='unchanged') return mod;
 								var savable=get.info(card).savable;
 								if(typeof savable=='function') savable=savable(card,player,event.dying);
@@ -23612,10 +23655,10 @@
 				else{
 					var skills2;
 					if(get.mode()=='guozhan'&&player.hasSkillTag('nomingzhi',false,null,true)){
-						skills2=player.get('s',false,true,false);
+						skills2=player.getSkills(false,true,false);
 					}
 					else{
-						skills2=player.get('s',true,true,false);
+						skills2=player.getSkills(true,true,false);
 					}
 					skills2=game.filterSkills(skills2.concat(lib.skill.global),player);
 					event._skillChoice=[];
@@ -23652,7 +23695,7 @@
 					}
 				}
 				var equipskills=[];
-				var ownedskills=player.get('s',true,false);
+				var ownedskills=player.getSkills(true,false);
 				game.expandSkills(ownedskills);
 				for(var i=0;i<skills.length;i++){
 					if(!ownedskills.contains(skills[i])){
@@ -34879,7 +34922,7 @@
 				// if(game.players){
 				// 	for(var i=0;i<game.players.length;i++){
 				// 		if(game.players[i]==game.me||game.players[i].isUnderControl()){
-				// 			sks=sks.concat(game.expandSkills(game.players[i].get('s')));
+				// 			sks=sks.concat(game.expandSkills(game.players[i].getSkills()));
 				// 		}
 				// 	}
 				// }
@@ -38263,13 +38306,13 @@
 			}
             var mode=get.mode();
 			if(mode=='identity'){
-				if(skill&&!game.zhu.get('s').contains(skill)) return null;
+				if(skill&&!game.zhu.getSkills().contains(skill)) return null;
 				if(game.zhu.isZhu) return game.zhu;
 			}
 			else if(mode=='versus'&&_status.mode=='four'){
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].isZhu){
-						if(skill&&!(game.players[i].get('s').contains(skill))) continue;
+						if(skill&&!(game.players[i].getSkills().contains(skill))) continue;
 						if(!player) return game.players[i];
 						if(player.side==game.players[i].side){
 							return game.players[i];
@@ -38280,7 +38323,7 @@
 			else if(mode=='guozhan'){
 				for(var i=0;i<game.players.length;i++){
 					if(get.is.jun(game.players[i])&&!game.players[i].isUnseen()){
-						if(skill&&!game.players[i].get('s').contains(skill)) continue;
+						if(skill&&!game.players[i].getSkills().contains(skill)) continue;
 						if(!player) return game.players[i];
 						if(player.identity==game.players[i].identity){
 							return game.players[i];
@@ -38699,7 +38742,7 @@
 			}
 			else{
 				if(get.owner(card)){
-					return game.checkMod(card,card.suit,'suit',get.owner(card).get('s'));
+					return game.checkMod(card,card.suit,'suit',get.owner(card).getSkills());
 				}
 				return card.suit;
 			}
@@ -38814,11 +38857,11 @@
 				if(method=='raw'||method=='pure') return n;
 			}
 
-			n=game.checkMod(from,to,n,'globalFrom',from.get('s'));
-			n=game.checkMod(from,to,n,'globalTo',to.get('s'));
+			n=game.checkMod(from,to,n,'globalFrom',from.getSkills());
+			n=game.checkMod(from,to,n,'globalTo',to.getSkills());
 			m=n;
-			m=game.checkMod(from,to,m,'attackFrom',from.get('s'));
-			m=game.checkMod(from,to,m,'attackTo',to.get('s'));
+			m=game.checkMod(from,to,m,'attackFrom',from.getSkills());
+			m=game.checkMod(from,to,m,'attackTo',to.getSkills());
 			var equips1=from.getCards('e'),equips2=to.getCards('e');
 			for(i=0;i<equips1.length;i++){
 				var info=get.info(equips1[i]).distance;
@@ -39476,7 +39519,7 @@
                     }
                 }
 
-				var skills=node.get('s',false,false);
+				var skills=node.getSkills(false,false);
                 skills=skills.slice(0);
 				var skills2=game.filterSkills(skills,node);
                 if(node==game.me&&node.hiddenSkills.length){
@@ -39529,7 +39572,7 @@
                     for(i in storage){
                         if(get.info(i)&&get.info(i).intro){
                             intro=get.info(i).intro;
-                            if(node.get('s').concat(lib.skill.global).contains(i)==false&&!intro.show) continue;
+                            if(node.getSkills().concat(lib.skill.global).contains(i)==false&&!intro.show) continue;
                             var name=intro.name?intro.name:get.translation(i);
                             if(typeof name=='function'){
                                 name=name(storage[i],node);
@@ -40370,7 +40413,7 @@
 		get:{
             threaten:function(target,player){
                 var threaten=1;
-                var skills=target.get('s');
+                var skills=target.getSkills();
                 for(var i=0;i<skills.length;i++){
                     var info=get.info(skills[i]);
                     if(info&&info.ai&&info.ai.threaten){
@@ -40544,7 +40587,7 @@
 				if(typeof result1!='number') result1=0;
 				if(typeof result2!='number') result2=0;
 				var temp1,temp2,temp3,temp01=0,temp02=0,threaten=1;
-				var skills1=player.get('s').concat(lib.skill.global);
+				var skills1=player.getSkills().concat(lib.skill.global);
 				game.expandSkills(skills1);
 				var zerotarget=false,zeroplayer=false;
 				for(var i=0;i<skills1.length;i++){
@@ -40578,7 +40621,7 @@
 					}
 				}
 				if(target){
-					var skills2=target.get('s').concat(lib.skill.global);
+					var skills2=target.getSkills().concat(lib.skill.global);
 					game.expandSkills(skills2);
 					for(var i=0;i<skills2.length;i++){
 						temp2=get.info(skills2[i]).ai;
