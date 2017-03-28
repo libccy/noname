@@ -20,7 +20,7 @@ window.noname_update={
         // 'mode/identity.js',
         // 'mode/chess.js',
         // 'mode/tafang.js',
-        // 'mode/stone.js',
+        'mode/stone.js',
         // 'theme/music/style.css',
         // 'theme/woodden/style.css',
         // 'layout/default/layout.css',

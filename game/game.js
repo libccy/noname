@@ -17342,6 +17342,7 @@
 					if(_status.event.player!=game.me) return;
 					if(this._transform&&this.parentNode&&this.parentNode.parentNode&&
 						this.parentNode.parentNode.parentNode==ui.me&&
+						(!_status.mousedown||_status.mouseleft)&&
 						(!this.parentNode.parentNode.classList.contains('scrollh')||game.layout=='long2')){
 						if(bool){
 							this.style.transform=this._transform+' translateY(-20px)';
@@ -35799,6 +35800,9 @@
 					if(!_status.mouseleft){
 						_status.mouseleft=true;
 						game.check();
+						for(var i=0;i<ui.selected.cards.length;i++){
+							ui.selected.cards[i].updateTransform(true);
+						}
 					}
 					_status.dragstatuschanged=null;
 				}
@@ -36010,6 +36014,9 @@
 				else{
 					var tmpflag=false;
 					_status.mousedown=false;
+					for(var i=0;i<ui.selected.cards.length;i++){
+						ui.selected.cards[i].updateTransform(true);
+					}
 					if(_status.mousedragging&&_status.mouseleft){
 						if(game.check()){
 							if(ui.confirm){

@@ -362,7 +362,7 @@ mode.stone={
 					deckitem.name=i;
 				}
 				var deckContainer=ui.create.div('.list-container.deck',deckList);
-				ui.deckcontrol.show();
+				if(ui.deckcontrol) ui.deckcontrol.show();
 			};
 
 			ui.deckcontrol=ui.create.system('卡组管理',function(){
