@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.9.18',
+    version:'1.9.18.1',
     // update:'1.9.15',
     changeLog:[
         'bug修复',
@@ -20,6 +20,7 @@ window.noname_update={
         // 'mode/identity.js',
         // 'mode/chess.js',
         // 'mode/tafang.js',
+        'mode/guozhan.js',
         'mode/stone.js',
         // 'theme/music/style.css',
         // 'theme/woodden/style.css',

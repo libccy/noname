@@ -222,6 +222,7 @@ mode.guozhan={
 			gz_lvbu:['male','qun',5,['wushuang']],
 			gz_diaochan:['female','qun',3,['lijian','biyue']],
 			gz_re_yuanshao:['male','qun',4,['luanji']],
+			gz_yanwen:['male','qun',4,['shuangxiong']],
 			gz_jiaxu:['male','qun',3,['wansha','luanwu','gzweimu']],
 			gz_pangde:['male','qun',4,['mashu','mengjin']],
 			gz_zhangjiao:['male','qun',3,['leiji','guidao']],
@@ -242,6 +243,7 @@ mode.guozhan={
 			gz_hetaihou:['female','qun',3,['zhendu','qiluan']],
 
 			gz_re_lidian:['male','wei',3,['xunxun','wangxi']],
+			gz_zangba:['male','wei',4,['hengjiang']],
 			gz_madai:['male','shu',4,['mashu','gzqianxi']],
 			gz_mifuren:['female','shu',3,['gzguixiu','gzcunsi']],
 			gz_sunce:['male','wu',4,['jiang','yingyang','hunshang']],
