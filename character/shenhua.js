@@ -92,7 +92,6 @@ character.shenhua={
 			content:function(){
 				'step 0'
 				player.discardPlayerCard(trigger.target,get.prompt('jianchu',trigger.target)).set('ai',function(button){
-					console.log(_status.event.att);
 					if(!_status.event.att) return 0;
 					if(get.position(button.link)=='e') return ai.get.value(button.link);
 					return 1;

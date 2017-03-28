@@ -3057,9 +3057,10 @@ mode.versus={
 		'jianyong','panzhangmazhong','yufan','xin_liru','fuhuanghou',
 		'caozhen','chenqun','hanhaoshihuan','wuyi','zhoucang','guyong','sunluban','jushou','caifuren',
 		'caoxiu','liuchen','gongsunyuan',
-		'guohuanghou','liyan','cenhun','liuyu',
+		'guohuanghou','liyan','cenhun','liuyu','sundeng',
 		'sp_caiwenji','yuejin','sp_jiangwei','simalang','chengyu','caoang','wangji','wenpin',
-		'zhugedan','mizhu','mayunlu','zhugeke','zumao','dingfeng','sunhao','zhanglu','hetaihou'
+		'zhugedan','mizhu','mayunlu','zhugeke','zumao','dingfeng','sunhao','zhanglu','hetaihou',
+		'litong','dongbai','yanbaihu','zhugejin','daxiaoqiao'
 	],
 	translate:{
 		zhu:'主',
