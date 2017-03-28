@@ -1001,9 +1001,13 @@ mode.versus={
 				}
 				event.list.randomSort();
 				event.list2=list2;
-				event.current=_status.firstAct;
+				event.current=_status.firstAct.next;
 				event.four_assign=get.config('four_assign');
 				event.flipassign=true;
+				for(var i=0;i<game.players.length;i++){
+					game.players[i].node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate['unknown'+get.distance(_status.firstAct,game.players[i],'absolute')]),game.players[i]);
+					game.players[i].node.name_seat.style.opacity=1;
+				}
 				if(get.config('ladder')){
 					var date=new Date();
 					if(!lib.storage.ladder){
@@ -1061,6 +1065,7 @@ mode.versus={
 				}
 				else{
 					event.ai(event.current,event.list.randomGets(3),event.list2);
+					event.current.node.name_seat.remove();
 					if(!event.four_assign){
 						event.current=event.current.next;
 						event.redo();
@@ -1077,6 +1082,7 @@ mode.versus={
 						event.current.maxHp++;
 						event.current.update();
 					}
+					event.current.node.name_seat.remove();
 				}
 				if(event.four_assign){
 					for(var i=0;i<game.players.length;i++){
@@ -1084,7 +1090,7 @@ mode.versus={
 					}
 					if(i<game.players.length){
 						var side=event.current.side;
-						event.current=_status.firstAct;
+						event.current=_status.firstAct.next;
 						if(event.flipassign){
 							for(var iwhile=0;iwhile<8;iwhile++){
 								event.current=event.current.next;
