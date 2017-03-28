@@ -34009,6 +34009,7 @@
 				delete window.resetGameTimeout;
 				delete window.resetExtension;
                 localStorage.removeItem(lib.configprefix+'disable_extension',true);
+				setTimeout(lib.init.onfree,3000);
 
 				if(lib.config.test_game){
 					ui.window.classList.add('testing');
@@ -39892,7 +39893,7 @@
 							banall=true;
                         }
                     }
-					ui.create.div('.menubutton',banall?'全部禁用':'全部启用',uiintro.content,function(){
+					ui.create.div('.menubutton.pointerdiv',banall?'全部禁用':'全部启用',uiintro.content,function(){
 						if(this.innerHTML=='全部禁用'){
 							for(var i=0;i<page.childElementCount;i++){
 								if(page.childNodes[i].bannedname&&page.childNodes[i].classList.contains('on')){
@@ -40027,7 +40028,7 @@
 							banall=true;
                         }
                     }
-					ui.create.div('.menubutton',banall?'全部禁用':'全部启用',uiintro.content,function(){
+					ui.create.div('.menubutton.pointerdiv',banall?'全部禁用':'全部启用',uiintro.content,function(){
 						if(this.innerHTML=='全部禁用'){
 							for(var i=0;i<page.childElementCount;i++){
 								if(page.childNodes[i].bannedname&&page.childNodes[i].classList.contains('on')){
