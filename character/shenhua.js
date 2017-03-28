@@ -86,12 +86,13 @@ character.shenhua={
 				return event.target.countCards('he')>0;
 			},
 			check:function(event,player){
-				return ai.get.attitude(player,event.player)<=0;
+				return ai.get.attitude(player,event.target)<=0;
 			},
 			direct:true,
 			content:function(){
 				'step 0'
 				player.discardPlayerCard(trigger.target,get.prompt('jianchu',trigger.target)).set('ai',function(button){
+					console.log(_status.event.att);
 					if(!_status.event.att) return 0;
 					if(get.position(button.link)=='e') return ai.get.value(button.link);
 					return 1;

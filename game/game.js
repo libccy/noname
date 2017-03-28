@@ -4273,7 +4273,8 @@
                                 map.ladder_monthly.hide();
                                 map.ladder_reset.hide();
                             }
-                            map.enable_all.show();
+							map.enable_all.show();
+                            map.enable_all_cards_four.show();
                             map.four_assign.show();
 							map.expand_dialog.show();
 						}
@@ -4283,6 +4284,7 @@
                             map.ladder_monthly.hide();
                             map.ladder_reset.hide();
 							map.enable_all.hide();
+                            map.enable_all_cards_four.hide();
 							map.four_assign.hide();
                             map.expand_dialog.hide();
 						}
@@ -4348,6 +4350,12 @@
 						frequent:true,
 						restart:true,
 					},
+					enable_all_cards_four:{
+						name:'启用全部卡牌',
+						init:false,
+						frequent:true,
+						restart:true,
+					},
 					enable_all_three:{
 						name:'启用全部武将',
 						init:false,
@@ -4363,7 +4371,7 @@
 					four_assign:{
 						name:'代替队友选将',
 						init:false,
-						frequent:true,
+						// frequent:true,
 						restart:true,
 					},
 					free_choose:{
