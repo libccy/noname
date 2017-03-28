@@ -2579,7 +2579,7 @@ character.shenhua={
 			mod:{
 				cardSavable:function(card,player){
 					if(!_status.currentPhase) return;
-					if(_status.currentPhase.getSkills().contains('wansha')&&_status.currentPhase!=player){
+					if(_status.currentPhase.hasSkill('wansha')&&_status.currentPhase!=player){
 						if(card.name=='tao'&&_status.event.dying!=player) return false;
 					}
 				}

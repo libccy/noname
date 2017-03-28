@@ -1431,7 +1431,7 @@ mode.guozhan={
 					}
 					var players=game.filterPlayer();
 					for(var i=0;i<players.length;i++){
-						if(players[i].getSkills().contains('haoshi')&&
+						if(players[i].hasSkill('haoshi')&&
 							!players[i].isTurnedOver()&&
 							!players[i].hasJudge('lebu')&&
 							ai.get.attitude(player,players[i])>=3&&
@@ -1474,7 +1474,7 @@ mode.guozhan={
 						var nh=target.countCards('h');
 						var np=player.countCards('h');
 						if(player.hp==player.maxHp||player.storage.gzrende<0||player.countCards('h')+player.storage.gzrende<=2){
-							if(nh>=np-1&&np<=player.hp&&!target.getSkills().contains('haoshi')) return 0;
+							if(nh>=np-1&&np<=player.hp&&!target.hasSkill('haoshi')) return 0;
 						}
 						return Math.max(1,5-nh);
 					}

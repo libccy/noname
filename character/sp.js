@@ -4786,7 +4786,7 @@ character.sp={
 			},
 			content:function(){
 				player.storage.mozhi.add(trigger.card);
-				if(player.getSkills().contains('mozhi')) player.markSkill('mozhi');
+				if(player.hasSkill('mozhi')) player.markSkill('mozhi');
 			}
 		},
 		chenqing2:{},
@@ -5760,7 +5760,7 @@ character.sp={
 				game.log(player,'的判定牌改为',player.storage.zhoufu2);
 				game.delay(2);
 				"step 1"
-				if(player.storage.zhoufu3.isAlive()&&player.storage.zhoufu3.getSkills().contains('yingbin')){
+				if(player.storage.zhoufu3.isAlive()&&player.storage.zhoufu3.hasSkill('yingbin')){
 					player.storage.zhoufu3.logSkill('yingbin');
 					player.storage.zhoufu3.draw(2);
 				}
@@ -8034,7 +8034,7 @@ character.sp={
 			mod:{
 				targetEnabled:function(card,player,target){
 					if(card.name!='sha') return;
-					if(player==_status.currentPhase&&player.getSkills().contains('chixin')){
+					if(player==_status.currentPhase&&player.hasSkill('chixin')){
 						var num=game.checkMod(card,player,1,'cardUsable',player.getSkills())-20;
 						var players=game.filterPlayer();
 						for(var i=0;i<players.length;i++){

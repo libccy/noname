@@ -38306,13 +38306,13 @@
 			}
             var mode=get.mode();
 			if(mode=='identity'){
-				if(skill&&!game.zhu.getSkills().contains(skill)) return null;
+				if(skill&&!game.zhu.hasSkill(skill)) return null;
 				if(game.zhu.isZhu) return game.zhu;
 			}
 			else if(mode=='versus'&&_status.mode=='four'){
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].isZhu){
-						if(skill&&!(game.players[i].getSkills().contains(skill))) continue;
+						if(skill&&!(game.players[i].hasSkill(skill))) continue;
 						if(!player) return game.players[i];
 						if(player.side==game.players[i].side){
 							return game.players[i];
@@ -38323,7 +38323,7 @@
 			else if(mode=='guozhan'){
 				for(var i=0;i<game.players.length;i++){
 					if(get.is.jun(game.players[i])&&!game.players[i].isUnseen()){
-						if(skill&&!game.players[i].getSkills().contains(skill)) continue;
+						if(skill&&!game.players[i].hasSkill(skill)) continue;
 						if(!player) return game.players[i];
 						if(player.identity==game.players[i].identity){
 							return game.players[i];
