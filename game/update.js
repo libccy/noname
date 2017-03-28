@@ -14,6 +14,8 @@ window.noname_update={
         'card/sp.js',
         // 'character/*',
         'character/shenhua.js',
+        'character/yijiang.js',
+        'character/sp.js',
         'character/rank.js',
         // 'mode/boss.js',
         'mode/versus.js',

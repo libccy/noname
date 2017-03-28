@@ -149,6 +149,7 @@ window.characterRank={
         'pal_muchanglan',
         'yxs_luzhishen',
         'hs_jaina',
+        're_lidian',
     ],
     am:[
         'ow_orisa',
@@ -265,7 +266,6 @@ window.characterRank={
         'yxs_kaisa',
         'sunluyu',
         'liyan',
-        're_lidian',
         'pal_jiangcheng',
         'zhugeguo',
         'xiaoqiao',

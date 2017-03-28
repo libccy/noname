@@ -2319,7 +2319,7 @@ character.yijiang={
 					if(get.color(trigger.card)=='red'){
 						player.draw();
 					}
-					player.logSkill('longyin',trigger.player);
+					// player.logSkill('longyin',trigger.player);
 				}
 			},
 			ai:{
@@ -2916,12 +2916,13 @@ character.yijiang={
 			group:['zhanjue2','zhanjue3','zhanjue4'],
 			ai:{
 				order:1,
-				result:{
-					target:function(player,target){
-						if(player.countCards('h')>=3||target.countCards('h')>=3) return 0;
-						if(player.countCards('h','tao')) return 0;
-						if(target.countCards('h','sha')>1) return 0;
-						return -1.5;
+				effect:{
+					player:function(card,player,target){
+						if(_status.event.skill=='zhanjue'){
+							if(player.countCards('h')>=3||target.countCards('h')>=3) return 'zeroplayertarget';
+							if(player.countCards('h','tao')) return 'zeroplayertarget';
+							if(target.countCards('h','sha')>1) return 'zeroplayertarget';
+						}
 					}
 				}
 			}

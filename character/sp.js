@@ -3898,38 +3898,44 @@ character.sp={
 			filter:function(event,player){
 				return player.storage.yinbing&&player.storage.yinbing.length>0;
 			},
-			direct:true,
+			forced:true,
 			audio:2,
 			content:function(){
 				'step 0'
-				player.chooseTarget(get.prompt('juedi'),function(card,player,target){
+				player.chooseTarget(get.prompt('juedi'),true,function(card,player,target){
 					return player.hp>=target.hp;
 				}).set('ai',function(target){
 					var player=_status.event.player;
 					var nh=player.countCards('h');
-					if(target==player){
-						if(nh>=player.maxHp) return 0;
-						if(player.maxHp-nh>=3) return 4;
-						return 0.5;
-					}
 					var att=ai.get.attitude(player,target);
-					if(att<2) return 0;
-					if(target.hp==1&&att>2){
-						att+=2;
+					if(att<2) return att-10;
+					if(target==player){
+						if(player.hasJudge('lebu')){
+							player.maxHp-nh-2;
+						}
+						return player.maxHp-nh;
 					}
-					if(player.hasJudge('lebu')){
-						if(target.hp==target.maxHp) return att-2;
-						return att-1;
+					if(target.hp==target.maxHp){
+						return att/10;
 					}
-					if(target.hp==target.maxHp) return 0;
-					if(nh<player.hp-1){
-						return att-3;
+					if(target.hp==1){
+						return 5+att/10;
 					}
-					return att-2;
+					var nh2=target.countCards('h');
+					if(target.hp==2){
+						if(nh2<=1){
+							return 3+att/10;
+						}
+						return 2+att/10;
+					}
+					if(nh2<=2){
+						return 2+att/10;
+					}
+					return 1+att/10;
 				});
 				'step 1'
 				if(result.bool){
-					player.logSkill('juedi',result.targets);
+					player.line(result.targets[0],'green');
 					if(result.targets[0]==player){
 						player.$throw(player.storage.yinbing,1000);
 						var num=player.maxHp-player.countCards('h');
