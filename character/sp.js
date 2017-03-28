@@ -3906,8 +3906,10 @@ character.sp={
 					return player.hp>=target.hp;
 				}).set('ai',function(target){
 					var player=_status.event.player;
+					var nh=player.countCards('h');
 					if(target==player){
-						if(player.countCards('h')>=player.maxHp) return 0;
+						if(nh>=player.maxHp) return 0;
+						if(player.maxHp-nh>=3) return 4;
 						return 0.5;
 					}
 					var att=ai.get.attitude(player,target);
@@ -3920,7 +3922,7 @@ character.sp={
 						return att-1;
 					}
 					if(target.hp==target.maxHp) return 0;
-					if(player.countCards('h')<player.hp-1){
+					if(nh<player.hp-1){
 						return att-3;
 					}
 					return att-2;
