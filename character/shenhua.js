@@ -3555,7 +3555,7 @@ character.shenhua={
 			}
 		},
 		tianxiang2:{
-			trigger:{player:['damageAfter','damageCancelled']},
+			trigger:{player:['damageAfter','damageCancelled','damageZero']},
 			forced:true,
 			popup:false,
 			audio:false,
@@ -3645,7 +3645,7 @@ character.shenhua={
 			}
 		},
 		xintianxiang2:{
-			trigger:{player:['damageAfter','damageCancelled']},
+			trigger:{player:['damageAfter','damageCancelled','damageZero']},
 			forced:true,
 			popup:false,
 			audio:false,
@@ -3656,7 +3656,7 @@ character.shenhua={
 					event.finish();
 					return;
 				}
-				var num=player.maxHp-player.hp;
+				var num=player.maxHp-player.hp||0;
 				var str1='令'+get.translation(player)+'摸'+get.cnNumber(num)+'张牌';
 				var str2='令'+get.translation(player)+'防止造成和受到的所有伤害且天香失效直到你下一回合开始';
 				var att=ai.get.attitude(source,player);
