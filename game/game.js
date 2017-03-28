@@ -9089,7 +9089,7 @@
 					if(event.autochoose()){
 						event.result={
 							bool:true,
-							cards:player.get(event.position||'h')
+							cards:player.getCards(event.position)
 						}
                         for(var i=0;i<event.result.cards.length;i++){
                             if(!lib.filter.cardDiscardable(event.result.cards[i],player,event)){
@@ -9098,7 +9098,7 @@
                         }
 					}
 					else{
-                        event.rangecards=player.get(event.position||'h');
+                        event.rangecards=player.getCards(event.position);
                         for(var i=0;i<event.rangecards.length;i++){
                             if(lib.filter.cardDiscardable(event.rangecards[i],player,event)){
                                 event.rangecards.splice(i--,1);
@@ -10034,7 +10034,7 @@
 						event.finish();
 						return;
 					}
-					var cs=target.get(event.position||'h');
+					var cs=target.getCards(event.position);
                     var select=get.select(event.selectButton);
 					if(event.forced&&select[0]>=cs.length){
 						event.result={
@@ -10128,7 +10128,7 @@
 						event.finish();
 						return;
 					}
-					var cs=target.get(event.position||'h');
+					var cs=target.getCards(event.position);
                     var select=get.select(event.selectButton);
 					if(event.forced&&select[0]>=cs.length){
 						event.result={
@@ -10240,7 +10240,7 @@
 						event.finish();
 						return;
 					}
-					var cs=target.get(event.position||'h');
+					var cs=target.getCards(event.position);
                     var select=get.select(event.selectButton);
 					if(event.forced&&select[0]>=cs.length){
 						event.result={
@@ -11726,6 +11726,7 @@
 					cards[0].fix();
 					cards[0].style.transform='';
 					cards[0].classList.remove('drawinghidden');
+					delete cards[0]._transform;
 					var viewAs=typeof card=='string'?card:card.name;
 					if(!lib.card[viewAs]||!lib.card[viewAs].effect){
 						ui.discardPile.appendChild(cards[0]);
@@ -13165,7 +13166,7 @@
 					next.autochoose=function(){
 						if(!this.forced) return false;
                         if(typeof this.selectCard=='function') return false;
-                        var cards=this.player.get(this.position||'h');
+                        var cards=this.player.getCards(event.position);
                         var num=cards.length;
                         for(var i=0;i<cards.length;i++){
                             if(!lib.filter.cardDiscardable(cards[i],this.player,this)) num--;
@@ -16571,6 +16572,7 @@
                     card.fix();
 					card.style.transform='';
 					card.classList.remove('drawinghidden');
+					delete card._transform;
 					var player=this;
 					var equipNum=get.equipNum(card);
 					var equipped=false;
@@ -36554,7 +36556,7 @@
 				var event=_status.event;
 				event.backup(skill);
                 if(info.filterCard&&info.discard!=false&&info.lose!=false&&!info.viewAs){
-                    var cards=event.player.get(event.position||'h');
+                    var cards=event.player.getCards(event.position);
                     for(var i=0;i<cards.length;i++){
                         if(!lib.filter.cardDiscardable(cards[i],event.player)){
                             cards[i].uncheck('useSkill');
