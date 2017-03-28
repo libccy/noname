@@ -6230,35 +6230,35 @@
 						});
 					}
                 }
-				lib.cardSelectObserver=new MutationObserver(function(mutations){
-					for(var i=0;i<mutations.length;i++){
-						if(mutations[i].attributeName=='class'){
-							var node=mutations[i].target;
-							if(node._transform&&node.parentNode&&node.parentNode.parentNode&&
-								node.parentNode.parentNode.parentNode==ui.me){
-								if(node.classList.contains('selected')){
-									setTimeout((function(node){
-										return function(){
-											if(node._transform&&node.parentNode&&node.parentNode.parentNode&&
-												node.parentNode.parentNode.parentNode==ui.me){
-												if(node.classList.contains('selected')&&
-												!node.parentNode.parentNode.classList.contains('scrollh')){
-													node.style.transform=node._transform+' translateY(-20px)';
-												}
-												else{
-													node.style.transform=node._transform;
-												}
-											}
-										}
-									}(node)),200);
-								}
-								else{
-									node.style.transform=node._transform;
-								}
-							}
-						}
-					}
-				});
+				// lib.cardSelectObserver=new MutationObserver(function(mutations){
+				// 	for(var i=0;i<mutations.length;i++){
+				// 		if(mutations[i].attributeName=='class'){
+				// 			var node=mutations[i].target;
+				// 			if(node._transform&&node.parentNode&&node.parentNode.parentNode&&
+				// 				node.parentNode.parentNode.parentNode==ui.me){
+				// 				if(node.classList.contains('selected')){
+				// 					setTimeout((function(node){
+				// 						return function(){
+				// 							if(node._transform&&node.parentNode&&node.parentNode.parentNode&&
+				// 								node.parentNode.parentNode.parentNode==ui.me){
+				// 								if(node.classList.contains('selected')&&
+				// 								!node.parentNode.parentNode.classList.contains('scrollh')){
+				// 									node.style.transform=node._transform+' translateY(-20px)';
+				// 								}
+				// 								else{
+				// 									node.style.transform=node._transform;
+				// 								}
+				// 							}
+				// 						}
+				// 					}(node)),200);
+				// 				}
+				// 				else{
+				// 					node.style.transform=node._transform;
+				// 				}
+				// 			}
+				// 		}
+				// 	}
+				// });
 
 				if(lib.device){
 					lib.init.cordovaReady=function(){
@@ -17293,6 +17293,19 @@
                     }
 					return this;
 				},
+				updateTransform:function(bool){
+					if(_status.event.player!=game.me) return;
+					if(this._transform&&this.parentNode&&this.parentNode.parentNode&&
+						this.parentNode.parentNode.parentNode==ui.me&&
+						(!this.parentNode.parentNode.classList.contains('scrollh')||game.layout=='long2')){
+						if(bool){
+							this.style.transform=this._transform+' translateY(-20px)';
+						}
+						else{
+							this.style.transform=this._transform||'';
+						}
+					}
+				},
 				aiexclude:function(){
 					_status.event.aiexclude.add(this);
 				},
@@ -23417,7 +23430,7 @@
 					game.uncheck('card');
 				}
 				else{
-					var cards=player.get(event.position||'h');
+					var cards=player.getCards(event.position);
 					var firstCheck=false;
 					range=get.select(event.selectCard);
 					if(!event._cardChoice&&typeof event.selectCard!='function'&&
@@ -23468,6 +23481,7 @@
 							}
 							else if(range[1]==-1){
 								cards[i].classList.add('selected');
+								cards[i].updateTransform(true);
 								ui.selected.cards.add(cards[i]);
 							}
 							else{
@@ -23478,6 +23492,7 @@
 							cards[i].classList.remove('selectable');
 							if(range[1]==-1){
 								cards[i].classList.remove('selected');
+								cards[i].updateTransform();
 								ui.selected.cards.remove(cards[i]);
 							}
 						}
@@ -23760,50 +23775,34 @@
 			for(var i=0;i<argc;i++){
 				args[i]=arguments[i];
 			}
-			if(args.length==0){
-				var selectable=document.getElementsByClassName('selectable');
-				var selected=document.getElementsByClassName('selected');
-				while(selectable.length>0){
-					selectable[0].classList.remove('selectable');
+			if((args.length==0||args.contains('card'))&&_status.event.player){
+				var cards=_status.event.player.getCards('hej');
+				for(j=0;j<cards.length;j++){
+					cards[j].classList.remove('selected');
+					cards[j].classList.remove('selectable');
+					cards[j].updateTransform();
 				}
-				while(selected.length>0){
-					selected[0].classList.remove('selected');
-				}
-				if(_status.event.player){
-					var cards=_status.event.player.getCards('hej');
-					for(j=0;j<cards.length;j++){
-						cards[j].classList.remove('selected');
-						cards[j].classList.remove('selectable');
+				ui.selected.cards.length=0;
+			}
+			if((args.length==0||args.contains('target'))){
+				for(j=0;j<game.players.length;j++){
+					game.players[j].classList.remove('selected');
+					game.players[j].classList.remove('selectable');
+					if(game.players[j].instance){
+						game.players[j].instance.classList.remove('selected');
+						game.players[j].instance.classList.remove('selectable');
 					}
 				}
-				ui.selected.buttons.length=0;
-				ui.selected.cards.length=0;
 				ui.selected.targets.length=0;
 			}
-			else{
-				for(i=0;i<args.length;i++){
-					if(args[i]=='target'){
-						for(j=0;j<game.players.length;j++){
-							game.players[j].classList.remove('selected');
-							game.players[j].classList.remove('selectable');
-							if(game.players[j].instance){
-								game.players[j].instance.classList.remove('selected');
-								game.players[j].instance.classList.remove('selectable');
-							}
-						}
-						ui.selected.targets.length=0;
-					}
-					else if(args[i]=='card'){
-						var cards=_status.event.player.getCards('hej');
-						for(j=0;j<cards.length;j++){
-							cards[j].classList.remove('selected');
-							cards[j].classList.remove('selectable');
-						}
-						ui.selected.cards.length=0;
-					}
+			if((args.length==0||args.contains('button'))&&_status.event.dialog&&_status.event.dialog.buttons){
+				for(var j=0;j<_status.event.dialog.buttons.length;j++){
+					_status.event.dialog.buttons[j].classList.remove('selectable');
+					_status.event.dialog.buttons[j].classList.remove('selected');
 				}
+				ui.selected.buttons.length=0;
 			}
-			if(args[0]!='target'&&args[0]!='card'&&args[0]!='button'){
+			if(args.length==0){
 				ui.arena.classList.remove('selecting');
 				_status.imchoosing=false;
 				_status.lastdragchange.length=0;
@@ -28921,7 +28920,12 @@
                         exportExtLine.style.width='calc(100% - 40px)';
                         exportExtLine.style.textAlign='left';
                         exportExtLine.style.marginBottom='5px';
-                        exportExtLine.innerHTML='重启后生效。<span class="hrefnode">立即重启</span><span class="closenode">×</span>';
+						if(lib.device=='ios'){
+							exportExtLine.innerHTML='已保存。退出游戏并重新打开后生效';
+						}
+                        else{
+							exportExtLine.innerHTML='重启后生效。<span class="hrefnode">立即重启</span><span class="closenode">×</span>';
+						}
                         exportExtLine.querySelectorAll('span')[0].onclick=game.reload;
                         exportExtLine.querySelectorAll('span')[1].onclick=function(){
                             exportExtLine.style.display='none';
@@ -36273,20 +36277,21 @@
 					return;
 				}
 				if(this.classList.contains('selectable')==false) return;
-				var notoggle=false;
 				if(this.classList.contains('selected')){
 					ui.selected.cards.remove(this);
 					if(_status.multitarget||_status.event.complexSelect){
 						game.uncheck();
 						game.check();
-						notoggle=true;
+					}
+					else{
+						this.classList.remove('selected');
+						this.updateTransform();
 					}
 				}
 				else{
 					ui.selected.cards.add(this);
-				}
-				if(!notoggle){
-					this.classList.toggle('selected');
+					this.classList.add('selected');
+					this.updateTransform(true);
 				}
                 if(game.chess&&get.config('show_range')&&!_status.event.skill&&this.classList.contains('selected')&&
                 _status.event.isMine()&&_status.event.name=='chooseToUse'){

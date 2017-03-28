@@ -1,8 +1,8 @@
 window.noname_update={
-    version:'1.9.17',
+    version:'1.9.18',
     // update:'1.9.15',
     changeLog:[
-        '提高载入速度',
+        // '提高载入速度',
     ],
     files:[
         'game/game.js',
@@ -11,7 +11,7 @@ window.noname_update={
         // 'game/source.js',
         // 'game/asset.js',
         // 'card/*',
-        // 'card/guozhan.js',
+        'card/sp.js',
         // 'character/*',
         // 'character/refresh.js',
         // 'mode/boss.js',
@@ -28,7 +28,7 @@ window.noname_update={
         // 'layout/default/menu.css',
         // 'theme/style/cardback/*',
         // 'layout/long/layout.css',
-        // 'layout/long2/layout.css',
+        'layout/long2/layout.css',
         // 'layout/mobile/layout.css',
         // 'layout/newlayout/global.css',
         // 'layout/mode/chess.css',

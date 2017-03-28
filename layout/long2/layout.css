@@ -106,6 +106,14 @@
     padding:0;
     top:calc(100% - 120px);
 }
+#arena:not(.chess) #handcards1.scrollh{
+    top: calc(100% - 180px);
+    height: 180px;
+}
+#arena:not(.chess) #handcards1.scrollh>div{
+    height: 120px;
+    top: 60px;
+}
 #arena:not(.chess):not(.single-handcard) #handcards1{
     width:calc(100% - 240px);
     left:calc(150% / 47 - 300% / 94 + 625% / 47 - 105px + 120px);

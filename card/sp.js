@@ -81,7 +81,7 @@ card.sp={
             type:'trick',
 			selectTarget:2,
 			multitarget:true,
-			targetprompt:['交给其一张牌','得两张牌'],
+			targetprompt:['给一张牌','得两张牌'],
 			filterTarget:function(card,player,target){
 				return target!=player;
 			},
