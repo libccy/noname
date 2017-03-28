@@ -8113,7 +8113,17 @@
 
 			pause:'暂停',
 			config:'选项',
-			auto:'托管'
+			auto:'托管',
+
+			unknown:'无名氏',
+			unknown0:'一号位',
+			unknown1:'二号位',
+			unknown2:'三号位',
+			unknown3:'四号位',
+			unknown4:'五号位',
+			unknown5:'六号位',
+			unknown6:'七号位',
+			unknown7:'八号位',
 		},
 		element:{
 			content:{

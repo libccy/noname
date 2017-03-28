@@ -1769,8 +1769,14 @@ mode.versus={
 				var map={};
 				var num=Math.floor(Math.random()*8);
 				list=list.splice(8-num).concat(list);
-				event.current=game.players[num];
-				_status.firstAct=event.current;
+				_status.firstAct=game.players[num];
+				event.current=_status.firstAct.next;
+				game.broadcastAll(function(current){
+					for(var i=0;i<game.players.length;i++){
+						game.players[i].node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate['unknown'+get.distance(current,game.players[i],'absolute')]),game.players[i]);
+						game.players[i].node.name_seat.style.opacity=1;
+					}
+				},_status.firstAct);
 				for(var i=0;i<8;i++){
 					if(list[i][0]=='e'){
 						game.players[i].side=side;
@@ -1868,6 +1874,9 @@ mode.versus={
 				game.broadcastAll(function(player,name,zhu){
 					player.classList.remove('selectedx');
 					player.init(name);
+					if(player.node.name_seat){
+						player.node.name_seat.remove();
+					}
 				},event.current,result.links[0]);
 				if(event.current.identity=='zhu'){
 					event.current.hp++;
@@ -1880,7 +1889,7 @@ mode.versus={
 				}
 				if(i<game.players.length){
 					var side=event.current.side;
-					event.current=_status.firstAct;
+					event.current=_status.firstAct.next;
 					if(event.flipassign){
 						for(var iwhile=0;iwhile<8;iwhile++){
 							event.current=event.current.next;
