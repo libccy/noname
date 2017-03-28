@@ -19,7 +19,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:21,
+        versionOL:22,
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
         mirrorURL:'https://coding.net/u/libccy/p/noname/git/raw',
 		extensionURL:'https://coding.net/u/libccy/p/noname-extension/git/raw/master/',
@@ -4194,12 +4194,6 @@
                         else{
                             map.connect_replace_handcard.hide();
                         }
-                        if(config.connect_versus_mode=='4v4'){
-                            map.connect_four_cross.show();
-                        }
-                        else{
-                            map.connect_four_cross.hide();
-                        }
                     },
                     connect_versus_mode:{
                         name:'游戏模式',
@@ -4211,12 +4205,6 @@
                             '4v4':'4v4',
                         },
                         frequent:true
-                    },
-                    connect_four_cross:{
-                        name:'交叉座位',
-						init:false,
-						frequent:true,
-						restart:true,
                     },
                     connect_replace_handcard:{
                         name:'末位可换牌',

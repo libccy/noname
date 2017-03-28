@@ -448,9 +448,6 @@ mode.versus={
 			else if(lib.configOL.versus_mode=='2v2'||lib.configOL.versus_mode=='3v3'){
 				uiintro.add('<div class="text chat">四号位换牌：'+(lib.configOL.replace_handcard?'开启':'关闭'));
 			}
-			else if(lib.configOL.versus_mode=='4v4'){
-				uiintro.add('<div class="text chat">交叉座位：'+(lib.configOL.four_cross?'开启':'关闭'));
-			}
 			uiintro.add('<div class="text chat">出牌时限：'+lib.configOL.choose_timeout+'秒');
 			uiintro.add('<div class="text chat">屏蔽弱将：'+(lib.configOL.ban_weak?'开启':'关闭'));
 			var last=uiintro.add('<div class="text chat">屏蔽强将：'+(lib.configOL.ban_strong?'开启':'关闭'));
@@ -1744,13 +1741,36 @@ mode.versus={
 			var next=game.createEvent('chooseCharacter',false);
 			next.setContent(function(){
 				"step 0"
-				var list=['zhong','ezhong','zhong','ezhong','zhong','ezhong','zhong','ezhong'];
-				list[2*Math.floor(Math.random()*4)]='zhu';
-				list[2*Math.floor(Math.random()*4)+1]='ezhu';
-				if(!lib.configOL.four_cross) list.randomSort();
+				var list=[
+					['zhong','ezhong','ezhong','zhong','zhong','ezhong','ezhong','zhong'],
+					['zhong','ezhong','zhong','ezhong','ezhong','zhong','ezhong','zhong'],
+					['zhong','ezhong','ezhong','zhong','ezhong','zhong','zhong','ezhong'],
+					['zhong','ezhong','zhong','ezhong','zhong','ezhong','zhong','ezhong'],
+					['zhong','ezhong','ezhong','zhong','ezhong','zhong','ezhong','zhong'],
+				].randomGet();
+				var rand1=Math.floor(Math.random()*4);
+				var rand2=Math.floor(Math.random()*4);
+				for(var i=0;i<list.length;i++){
+					if(list[i]=='zhong'){
+						if(rand1==0){
+							list[i]='zhu';
+						}
+						rand1--;
+					}
+					else{
+						if(rand2==0){
+							list[i]='ezhu';
+						}
+						rand2--;
+					}
+				}
 
 				var side=Math.random()<0.5;
 				var map={};
+				var num=Math.floor(Math.random()*8);
+				list=list.splice(8-num).concat(list);
+				event.current=game.players[num];
+				_status.firstAct=event.current;
 				for(var i=0;i<8;i++){
 					if(list[i][0]=='e'){
 						game.players[i].side=side;
@@ -1762,6 +1782,7 @@ mode.versus={
 					}
 					map[game.players[i].playerid]=[game.players[i].side,game.players[i].identity];
 				}
+
 				var filterChoice=function(name){
 					if(name=='zuoci') return true;
 					if(!lib.choiceFour.contains(name)){
@@ -1790,8 +1811,6 @@ mode.versus={
 					}
 					return true;
 				}
-				event.current=game.players.randomGet();
-				_status.firstAct=event.current;
 				event.flipassign=true;
 				event.videoId=lib.status.videoId++;
 				var func=function(filter,id,selected,map,choiceFour){
