@@ -13209,7 +13209,7 @@
 					next.autochoose=function(){
 						if(!this.forced) return false;
                         if(typeof this.selectCard=='function') return false;
-                        var cards=this.player.getCards(event.position);
+                        var cards=this.player.getCards(this.position);
                         var num=cards.length;
                         for(var i=0;i<cards.length;i++){
                             if(!lib.filter.cardDiscardable(cards[i],this.player,this)) num--;
@@ -18673,12 +18673,6 @@
                         return;
                     }
                     event.acted.push(player);
-                    // else if(trigger.source&&trigger.source.isDead()){
-                    //     trigger.start=game.findNext(trigger.source);
-                    // }
-					// else{
-                    //     trigger.start=trigger.source||trigger.player;
-                    // }
 					var str=get.translation(trigger.player.name)+'濒死，是否帮助？<br><div class="text center" style="margin-top:10px">当前体力：'+trigger.player.hp+'</div>';
 					if(lib.config.tao_enemy&&event.dying.side!=player.side&&lib.config.mode!='identity'&&lib.config.mode!='guozhan'){
 						event._result={bool:false}
@@ -38390,7 +38384,7 @@
                     return num?Math.round(9*(num-1)/8+1):'sp';
                 }
             }
-			return num?1:'x';
+			return num?Math.round(6*(num-1)/8+1):'x';
 		},
         targetsInfo:function(targets){
             var info=[];
