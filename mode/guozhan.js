@@ -564,8 +564,8 @@ mode.guozhan={
 						game.countPlayer(function(current){
 							if(current!=player){
 								var es=current.getEquip('feilongduofeng');
-								if(es.length){
-									list.addArray(es);
+								if(es){
+									list.add(es);
 								}
 							}
 						});
