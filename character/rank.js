@@ -482,6 +482,7 @@ window.characterRank={
         'xiahouba',
         'yxs_tangbohu',
         'caozhang',
+        'pangde',
     ],
     bm:[
         'zangba',
@@ -516,7 +517,6 @@ window.characterRank={
         're_xiahoudun',
         'zhangliang',
         'xiahouyuan',
-        'pangde',
         'sp_pangde',
         'yanwen',
     ],
