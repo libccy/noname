@@ -23801,12 +23801,10 @@
 		},
 		uncheck:function(){
 			var i,j;
-			if(true){
-				if(game.chess){
-					var shadows=ui.chessContainer.getElementsByClassName('playergrid temp');
-					while(shadows.length){
-						shadows[0].remove();
-					}
+			if(game.chess){
+				var shadows=ui.chessContainer.getElementsByClassName('playergrid temp');
+				while(shadows.length){
+					shadows[0].remove();
 				}
 			}
 			var argc=arguments.length;
