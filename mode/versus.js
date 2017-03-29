@@ -1797,6 +1797,7 @@ mode.versus={
 				if(_status.firstAct.side){
 					for(var i=0;i<game.players.length;i++){
 						game.players[i].side=!game.players[i].side;
+						map[game.players[i].playerid]=[game.players[i].side,game.players[i].identity];
 					}
 				}
 				game.broadcastAll(function(current){
