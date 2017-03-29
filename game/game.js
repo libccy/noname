@@ -8845,7 +8845,7 @@
 							event.fakeforce=false;
 						}
 					}
-					if(event.player.isUnderControl()||(event.player.handcardsVisible&&event.player!=game.me)){
+					if(event.player.isUnderControl()){
 						event.result={
 							bool:false
 						}
@@ -10023,7 +10023,7 @@
 							event.dialog.add('手牌');
 							var hs=target.getCards('h');
 							hs.randomSort();
-							if(event.visible||target.isUnderControl(true)||target.handcardsVisible){
+							if(event.visible||target.isUnderControl(true)){
 								event.dialog.add(hs);
                                 directh=false;
 							}
@@ -10117,7 +10117,7 @@
 							event.dialog.add('手牌');
 							var hs=target.getCards('h');
 							hs.randomSort();
-							if(event.visible||target.isUnderControl(true)||target.handcardsVisible){
+							if(event.visible||target.isUnderControl(true)){
 								event.dialog.add(hs);
                                 directh=false;
 							}
@@ -10228,7 +10228,7 @@
 							event.dialog.add('手牌');
 							var hs=target.getCards('h');
 							hs.randomSort();
-							if(event.visible||target.isUnderControl(true)||target.handcardsVisible){
+							if(event.visible||target.isUnderControl(true)){
 								event.dialog.add(hs);
                                 directh=false;
 							}
@@ -15626,6 +15626,7 @@
 					if(lib.config.mode=='versus'){
 						if(_status.mode=='three') return this.side==me.side;
 						if(_status.mode=='standard') return lib.storage.single_control&&this.side==me.side;
+						if(_status.mode=='four') return get.config('four_phaseswap')&&this.side==me.side;
 						return false;
 					}
 					else if(lib.config.mode=='boss'){
@@ -16504,9 +16505,7 @@
 				$giveAuto:function(card,player){
 					if(Array.isArray(card)&&card.length==0) return;
 					var args=Array.from(arguments);
-					if(_status.connectMode||(
-						!this.isUnderControl(true)&&!player.isUnderControl(true)&&
-						!this.handcardsVisible&&!player.handcardsVisible)){
+					if(_status.connectMode||(!this.isUnderControl(true)&&!player.isUnderControl(true))){
 						if(Array.isArray(card)){
 							card=card.length;
 						}
@@ -18352,7 +18351,7 @@
 					}
 					if(!_status.connectMode&&lib.config.wuxie_self&&event.getParent().state){
 						var tw=event.getTrigger().parent;
-						if((tw.player.isUnderControl(true)||tw.player.handcardsVisible)&&tw.targets&&tw.targets.length==1&&!tw.noai){
+						if(tw.player.isUnderControl(true)&&tw.targets&&tw.targets.length==1&&!tw.noai){
 							return true;
 						}
 					}
@@ -18457,29 +18456,6 @@
 				},
 				content:function(){
 					game.modeSwapPlayer(player);
-				},
-			},
-			autophase:{
-				trigger:{player:['chooseToUseBegin','chooseToRespondBegin','chooseToDiscardBegin','chooseToCompareBegin',
-				'chooseButtonBegin','chooseCardBegin','chooseTargetBegin','chooseCardTargetBegin','chooseControlBegin',
-				'chooseBoolBegin','choosePlayerCardBegin','discardPlayerCardBegin','gainPlayerCardBegin']},
-				forced:true,
-				priority:100,
-				popup:false,
-				filter:function(event,player){
-					if(player==game.me) return false;
-					if(event.autochoose&&event.autochoose()) return false;
-					if(lib.filter.wuxieSwap(event)) return false;
-					if(_status.auto) return false;
-					if(!player.isFriendOf(game.me)) return false;
-					if(_status.autophasefilter&&_status.autophasefilter(event,player)){
-						return true;
-					}
-					if(_status.currentPhase!=player) return false;
-					return true;
-				},
-				content:function(){
-					game.swapPlayer(player);
 				},
 			},
             fengyin:{
@@ -39563,7 +39539,7 @@
 				}
 				uiintro.add(capt);
 
-                if(node.isUnderControl()||(node.handcardsVisible&&node!=game.me)){
+                if(node.isUnderControl()){
                     var hs=node.getCards('h');
                     if(hs.length){
                         uiintro.add('<div class="text center">手牌</div>');

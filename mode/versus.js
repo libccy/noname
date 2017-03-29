@@ -1046,25 +1046,10 @@ mode.versus={
 					_status.ladder_mmr=0;
 				}
 				if(get.config('four_phaseswap')){
-					game.addGlobalSkill('autophase');
+					game.addGlobalSkill('autoswap');
 					if(lib.config.show_handcardbutton){
 						ui.versushs=ui.create.system('手牌',null,true);
 						lib.setPopped(ui.versushs,game.versusHoverHandcards,220);
-					}
-					ui.autophase=ui.create.system('自动切换',function(){
-						this.classList.toggle('glow');
-						game.save('autophase_four',!this.classList.contains('glow'));
-					},true);
-					if(!lib.storage.autophase_four){
-						ui.autophase.classList.add('glow');
-					}
-					_status.autophasefilter=function(){
-						return ui.autophase.classList.contains('glow');
-					}
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].side==game.me.side){
-							game.players[i].handcardsVisible=true;
-						}
 					}
 				}
 				"step 1"
@@ -2731,8 +2716,13 @@ mode.versus={
 			}
 		},
 		modeSwapPlayer:function(player){
-			game.swapControl(player);
-			game.onSwapControl();
+			if(_status.mode=='four'){
+				game.swapPlayer(player);
+			}
+			else{
+				game.swapControl(player);
+				game.onSwapControl();
+			}
 		},
 		updateLineMe:function(opacity,player){
 			if(!player){
