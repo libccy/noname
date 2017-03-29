@@ -28981,15 +28981,18 @@
                         exportExtLine.style.textAlign='left';
                         exportExtLine.style.marginBottom='5px';
 						if(lib.device=='ios'){
-							exportExtLine.innerHTML='已保存。退出游戏并重新打开后生效';
+							exportExtLine.innerHTML='已保存。退出游戏并重新打开后生效<span class="closenode">×</span>';
+	                        exportExtLine.querySelectorAll('span')[0].onclick=function(){
+	                            exportExtLine.style.display='none';
+	                        };
 						}
                         else{
 							exportExtLine.innerHTML='重启后生效。<span class="hrefnode">立即重启</span><span class="closenode">×</span>';
+	                        exportExtLine.querySelectorAll('span')[0].onclick=game.reload;
+	                        exportExtLine.querySelectorAll('span')[1].onclick=function(){
+	                            exportExtLine.style.display='none';
+	                        };
 						}
-                        exportExtLine.querySelectorAll('span')[0].onclick=game.reload;
-                        exportExtLine.querySelectorAll('span')[1].onclick=function(){
-                            exportExtLine.style.display='none';
-                        };
 
 
                         var shareExtLine=ui.create.div(pageboard);
