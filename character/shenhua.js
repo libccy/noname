@@ -1346,7 +1346,7 @@ character.shenhua={
 					return false;
 				}
 			},
-			check:function(event,player){
+			checkx:function(event,player){
 				var du=false;
 				var num=0;
 				for(var i=0;i<event.cards.length;i++){
@@ -1379,7 +1379,7 @@ character.shenhua={
 					event.finish();
 					return;
 				}
-				var check=lib.skill.guzheng.check(trigger,player);
+				var check=lib.skill.guzheng.checkx(trigger,player);
 				player.chooseCardButton(event.cards,'固政：选择令'+get.translation(trigger.player)+'收回的牌').set('ai',function(button){
 					if(_status.event.check){
 						return 20-ai.get.value(button.link);
@@ -1415,16 +1415,21 @@ character.shenhua={
 					event.player.classList.contains('dead')==false&&player.countCards('he'));
 			},
 			direct:true,
-			check:function(event,player){
+			checkx:function(event,player){
 				var att1=ai.get.attitude(player,event.player);
 				var att2=ai.get.attitude(player,event.source);
-				return att1>0&&att2<0;
+				return att1>0&&att2<=0;
 			},
 			content:function(){
 				"step 0"
 				var next=player.chooseToDiscard('he',get.prompt('beige'));
-				next.set('ai',ai.get.unuseful2);
+				var check=lib.skill.beige.checkx(trigger,player);
+				next.set('ai',function(card){
+					if(_status.event.goon) return 8-ai.get.value(card);
+					return 0;
+				});
 				next.set('logSkill','beige');
+				next.set('goon',check);
 				"step 1"
 				if(result.bool){
 					trigger.player.judge();

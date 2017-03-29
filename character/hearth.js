@@ -4927,9 +4927,6 @@ character.hearth={
 			usable:1,
 			unique:true,
 			direct:true,
-			check:function(){
-				return 0;
-			},
 			delay:0,
 			init:function(){
 				for(var i=1;i<=8;i++){

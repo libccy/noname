@@ -3,6 +3,7 @@ window.noname_update={
     // update:'1.9.17',
     changeLog:[
         'bug修复',
+        '4v4单人控制',
     ],
     files:[
         'game/game.js',

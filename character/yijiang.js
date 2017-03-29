@@ -3668,9 +3668,6 @@ character.yijiang={
 				return player.countCards('he')>0&&event.source&&event.source.getEquip(1)!=undefined&&
 					event.card&&event.card.name=='sha';
 			},
-			check:function(event,player){
-				return ai.get.attitude(player,event.source)<=0;
-			},
 			direct:true,
 			priority:5,
 			audio:2,
@@ -3679,7 +3676,7 @@ character.yijiang={
 				var next=player.chooseToDiscard('he',get.prompt('duodao'));
 				next.logSkill=['duodao',trigger.source];
 				next.set('ai',function(card){
-					if(ai.get.attitude(_status.event.player,_status.event.getTrigger().source)<0){
+					if(ai.get.attitude(_status.event.player,_status.event.getTrigger().source)<=0){
 						return 6-ai.get.value(card);
 					}
 					return 0;
@@ -3842,17 +3839,15 @@ character.yijiang={
 			filter:function(event,player){
 				return player.countCards('he')>0;
 			},
-			check:function(event,player){
-				return player.countCards('h','sha')<=player.countCards('h')/3;
-			},
 			content:function(){
 				"step 0"
 				player.chooseTarget(get.prompt('youdi'),function(card,player,target){
 					return player!=target;
 				}).set('ai',function(target){
+					if(!_status.event.goon) return 0;
 					if(target.countCards('he')==0) return 0;
 					return -ai.get.attitude(_status.event.player,target);
-				});
+				}).set('goon',player.countCards('h','sha')<=player.countCards('h')/3);
 				"step 1"
 				if(result.bool){
 					game.delay();
@@ -6638,29 +6633,17 @@ character.yijiang={
 			filter:function(event,player){
 				return event.player.hp<=0&&event.player.countCards('h')>0;
 			},
-			check:function(event,player){
-				if(event.player.isUnderControl(true,player)){
-					return event.player.getCards('h',function(card){
-						return get.type(card)!='basic';
-					}).length>0;
-				}
-				return ai.get.attitude(player,event.player)>0;
-			},
 			direct:true,
 			content:function(){
 				"step 0"
-				var check=false;
-				if(trigger.player==player){
-					if(player.hasCard(function(card){
+				var check;
+				if(trigger.player.isUnderControl(true,player)){
+					check=player.hasCard(function(card){
 						return get.type(card)!='basic';
-					})){
-						check=true;
-					}
+					});
 				}
 				else{
-					if(ai.get.attitude(player,trigger.player)>0){
-						check=true;
-					}
+					check=(ai.get.attitude(player,trigger.player)>0);
 				}
 				player.choosePlayerCard(trigger.player,get.prompt('buyi',trigger.player),'h').set('ai',function(button){
 					if(!_status.event.check) return 0;

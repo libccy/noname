@@ -1714,14 +1714,6 @@ character.sp={
 		},
 		zhaolie:{
 			trigger:{player:'phaseDrawBegin'},
-			check:function(event,player){
-				return game.hasPlayer(function(current){
-					return (current!=player&&
-						get.distance(player,current,'attack')<=1&&
-						ai.get.attitude(player,current)<=0&&
-						ai.get.damageEffect(current,player,player)>0);
-				});
-			},
 			direct:true,
 			content:function(){
 				'step 0'
@@ -6669,9 +6661,6 @@ character.sp={
 		xiaoguo:{
 			audio:2,
 			trigger:{global:'phaseEnd'},
-			check:function(event,player){
-				return ai.get.damageEffect(event.player,player,player)>0;
-			},
 			filter:function(event,player){
 				return event.player.isAlive()&&event.player!=player&&player.countCards('h',{type:'basic'});
 			},
