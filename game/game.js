@@ -39074,7 +39074,13 @@
                 if(lib.translate[str2+'_info']) return lib.translate[str2+'_info'];
                 if(lib.skill[str]&&lib.skill[str].prompt) return lib.skill[str].prompt;
             }
-			return lib.translate[str]||str;
+			if(lib.translate[str]){
+				return lib.translate[str];
+			}
+			if(typeof str=='string'){
+				return str;
+			}
+			return '';
 		},
 		cnNumber:function(num,two){
 			if(num==Infinity) return '∞';
@@ -39546,7 +39552,7 @@
 				}
 				uiintro.add(capt);
 
-                if(node.isUnderControl()){
+                if(node.isUnderControl()||(node.handcardsVisible&&node!=game.me)){
                     var hs=node.getCards('h');
                     if(hs.length){
                         uiintro.add('<div class="text center">手牌</div>');

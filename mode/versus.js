@@ -1053,13 +1053,18 @@ mode.versus={
 					}
 					ui.autophase=ui.create.system('自动切换',function(){
 						this.classList.toggle('glow');
-						game.save('autophase_four',!this.classList.contains('glow'));
+						game.save('autophase_four',this.classList.contains('glow'));
 					},true);
-					if(!lib.storage.autophase_four){
+					if(lib.storage.autophase_four){
 						ui.autophase.classList.add('glow');
 					}
 					_status.autophasefilter=function(){
 						return ui.autophase.classList.contains('glow');
+					}
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].side==game.me.side){
+							game.players[i].handcardsVisible=true;
+						}
 					}
 				}
 				"step 1"
@@ -2590,7 +2595,7 @@ mode.versus={
 			var uiintro=ui.create.dialog('hidden');
 
 			for(var i=0;i<game.players.length;i++){
-				if(game.players[i].side==game.me.side&&game.players[i]!=game.me){
+				if(game.players[i].name&&game.players[i].side==game.me.side&&game.players[i]!=game.me){
 					uiintro.add(get.translation(game.players[i]));
 					var cards=game.players[i].getCards('h');
 					if(cards.length){
