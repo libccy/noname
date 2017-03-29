@@ -4100,6 +4100,7 @@ character.yijiang={
 				if(event.players.length){
 					event.current=event.players.shift();
 					event.current.animate('target');
+					player.line(event.current,'green');
 					if(event.current.countCards('he')&&target.isAlive()){
 						event.current.chooseToDiscard({subtype:'equip1'},'he','弃置一张武器牌或让'+
 						get.translation(target)+'摸一张牌').set('ai',function(card){
@@ -4956,21 +4957,52 @@ character.yijiang={
 			filter:function(event,player){
 				return event.player!=player&&!event.player.tempSkills.qieting3&&event.player.isAlive();
 			},
-			frequent:true,
+			direct:true,
 			content:function(){
 				"step 0"
-				if(trigger.player.countCards('e')){
-					player.choosePlayerCard(trigger.player,'e','选择装备一张装备牌，或取消并摸一张牌');
+				var next;
+				if(trigger.player.hasCard(function(card){
+					return !player.getEquip(parseInt(get.subtype(card)[5]));
+				},'e')){
+					next=player.chooseControl('移动装备','draw_card','cancel2',function(event,player){
+						var source=_status.event.source;
+						var att=ai.get.attitude(player,source);
+						if(source.hasSkillTag('noe')){
+							if(att>0){
+								return '移动装备';
+							}
+						}
+						else{
+							if(att<=0){
+								return '移动装备';
+							}
+						}
+						return 'draw_card';
+					}).set('source',trigger.player);
 				}
+				else{
+					next=player.chooseControl('draw_card','cancel2',function(){
+						return 'draw_card';
+					});
+				}
+				next.set('prompt',get.prompt('qieting',trigger.player));
 				"step 1"
+				if(result.control=='移动装备'){
+					player.logSkill('qieting',trigger.player);
+					player.choosePlayerCard(trigger.player,'e','将一张装备牌移至你的装备区');
+				}
+				else{
+					if(result.control=='draw_card'){
+						player.logSkill('qieting');
+						player.draw();
+					}
+					event.finish();
+				}
+				"step 2"
 				if(result&&result.links&&result.links.length){
 					game.delay(2);
 					trigger.player.$give(result.links[0],player);
 					player.equip(result.links[0]);
-					player.line(trigger.player);
-				}
-				else{
-					player.draw();
 				}
 			},
 			ai:{

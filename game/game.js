@@ -23950,6 +23950,10 @@
 			}
 			else{
 				if(player==game.me) return;
+				var players=game.players.concat(game.dead);
+				for(var i=0;i<players.length;i++){
+					players[i].style.transition='all 0s';
+				}
 				game.addVideo('swapPlayer',player,get.cardsInfo(player.getCards('h')));
 				var pos=parseInt(player.dataset.position);
 				var num=game.players.length+game.dead.length;
@@ -23997,6 +24001,11 @@
 			if(lib.config.mode=='identity'){
 				game.me.setIdentity(game.me.identity);
 			}
+			setTimeout(function(){
+				for(var i=0;i<players.length;i++){
+					players[i].style.transition='';
+				}
+			},100);
 		},
 		swapControl:function(player){
 			if(player==game.me) return;
