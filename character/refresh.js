@@ -643,9 +643,21 @@ character.refresh={
 			ai:{
 				effect:function(card,player,target){
 					if(!target.hasFriend()) return;
-					if(get.type(card,'trick')=='trick'&&ui.selected.targets.length==0) return [1,1];
+					var type=get.type(card);
+					var nh=target.countCards();
+					if(type=='trick'){
+						if(!get.tag(card,'multitarget')||get.info(card).singleCard){
+							if(get.tag(card,'damage')){
+								if(nh<3||target.hp<=2) return 0.8;
+							}
+							return [1,nh];
+						}
+					}
+					else if(type=='delay'){
+						return [0.5,0.5];
+					}
 				},
-			},
+			}
 		},
 		reqianxun2:{
 			trigger:{global:'phaseAfter'},

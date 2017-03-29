@@ -4363,7 +4363,7 @@
 						restart:true,
 					},
 					four_phaseswap:{
-						name:'代替队友回合内行动',
+						name:'代替队友行动',
 						init:false,
 						// frequent:true,
 						restart:true,
@@ -18465,12 +18465,15 @@
 				priority:100,
 				popup:false,
 				filter:function(event,player){
-					if(_status.currentPhase!=player) return false;
 					if(player==game.me) return false;
 					if(event.autochoose&&event.autochoose()) return false;
 					if(lib.filter.wuxieSwap(event)) return false;
 					if(_status.auto) return false;
 					if(!player.isFriendOf(game.me)) return false;
+					if(_status.autophasefilter&&_status.autophasefilter(event,player)){
+						return true;
+					}
+					if(_status.currentPhase!=player) return false;
 					return true;
 				},
 				content:function(){

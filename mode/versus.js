@@ -1002,9 +1002,6 @@ mode.versus={
 				event.list.randomSort();
 				event.list2=list2;
 				event.four_assign=get.config('four_assign');
-				if(get.config('four_phaseswap')){
-					game.addGlobalSkill('autophase');
-				}
 				if(!event.four_assign){
 					event.current=_status.firstAct;
 				}
@@ -1047,6 +1044,23 @@ mode.versus={
 					},180);
 					_status.ladder=true;
 					_status.ladder_mmr=0;
+				}
+				if(get.config('four_phaseswap')){
+					game.addGlobalSkill('autophase');
+					if(lib.config.show_handcardbutton){
+						ui.versushs=ui.create.system('手牌',null,true);
+						lib.setPopped(ui.versushs,game.versusHoverHandcards,220);
+					}
+					ui.autophase=ui.create.system('自动切换',function(){
+						this.classList.toggle('glow');
+						game.save('autophase_four',!this.classList.contains('glow'));
+					},true);
+					if(!lib.storage.autophase_four){
+						ui.autophase.classList.add('glow');
+					}
+					_status.autophasefilter=function(){
+						return ui.autophase.classList.contains('glow');
+					}
 				}
 				"step 1"
 				if(event.current==game.me||(event.four_assign&&event.current.side==game.me.side)){
