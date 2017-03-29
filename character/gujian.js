@@ -763,9 +763,6 @@ character.gujian={
 		},
 		fumo:{
 			trigger:{player:'damageAfter'},
-			check:function(event,player){
-				return event.source&&ai.get.attitude(player,event.source)<0;
-			},
 			filter:function(event,player){
 				return event.source&&event.source.isAlive()&&player.countCards('h',{color:'red'})>1||player.countCards('h',{color:'black'})>1;
 			},
@@ -773,6 +770,7 @@ character.gujian={
 			content:function(){
 				"step 0"
 				var next=player.chooseToDiscard(get.prompt('fumo',trigger.source),2,function(card){
+					if(ai.get.damageEffect(trigger.source,player,player,'thunder')<=0) return 0;
 					if(ui.selected.cards.length){
 						return get.color(card)==get.color(ui.selected.cards[0]);
 					}

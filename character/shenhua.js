@@ -85,9 +85,6 @@ character.shenhua={
 			filter:function(event){
 				return event.target.countCards('he')>0;
 			},
-			check:function(event,player){
-				return ai.get.attitude(player,event.target)<=0;
-			},
 			direct:true,
 			content:function(){
 				'step 0'
@@ -97,7 +94,7 @@ character.shenhua={
 					return 1;
 				}).set('logSkill',['jianchu',trigger.target]).set('att',ai.get.attitude(player,trigger.target)<=0);
 				'step 1'
-				if(result.links.length){
+				if(result.bool&&result.links&&result.links.length){
 					if(get.type(result.links[0])=='equip'){
 						trigger.directHit=true;
 					}

@@ -4362,6 +4362,12 @@
 						// frequent:true,
 						restart:true,
 					},
+					four_phaseswap:{
+						name:'代替队友回合内行动',
+						init:false,
+						// frequent:true,
+						restart:true,
+					},
 					free_choose:{
 						name:'自由选将',
 						init:true,
@@ -8394,7 +8400,7 @@
     					else if(checkFrequent(info)&&!lib.config.autoskilllist.contains(event.skill)){
     						event._result={bool:true};
     					}
-    					else if(info.direct&&player==game.me&&!_status.auto){
+    					else if(info.direct){
     						event._result={bool:true};
     					}
                         else if(info.direct&&player.isOnline()){
@@ -18449,6 +18455,26 @@
 				},
 				content:function(){
 					game.modeSwapPlayer(player);
+				},
+			},
+			autophase:{
+				trigger:{player:['phaseBegin','chooseToUseBegin','chooseToRespondBegin','chooseToDiscardBegin','chooseToCompareBegin',
+				'chooseButtonBegin','chooseCardBegin','chooseTargetBegin','chooseCardTargetBegin','chooseControlBegin',
+				'chooseBoolBegin','choosePlayerCardBegin','discardPlayerCardBegin','gainPlayerCardBegin']},
+				forced:true,
+				priority:100,
+				popup:false,
+				filter:function(event,player){
+					if(_status.currentPhase!=player) return false;
+					if(player==game.me) return false;
+					if(event.autochoose&&event.autochoose()) return false;
+					if(lib.filter.wuxieSwap(event)) return false;
+					if(_status.auto) return false;
+					if(!player.isFriendOf(game.me)) return false;
+					return true;
+				},
+				content:function(){
+					game.swapPlayer(player);
 				},
 			},
             fengyin:{

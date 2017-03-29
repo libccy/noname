@@ -709,10 +709,6 @@ character.xianjian={
 				return player.countCards('h','shan')>0;
 			},
 			direct:true,
-			check:function(event,player){
-				if(ai.get.damageEffect(player,event.player,player)>=0) return false;
-				return true;
-			},
 			usable:1,
 			content:function(){
 				"step 0"
@@ -1905,9 +1901,6 @@ character.xianjian={
 		},
 		poyun:{
 			trigger:{source:'damageEnd'},
-			check:function(event,player){
-				return ai.get.attitude(player,event.player)<0&&event.player.countCards('he')>1;
-			},
 			alter:true,
 			filter:function(event,player){
 				return player.storage.xuanning>0&&event.player.countCards('he')>0;

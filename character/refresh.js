@@ -855,14 +855,14 @@ character.refresh={
 			content:function(){
 				"step 0"
 				if(get.itemtype(trigger.cards)=='cards'&&get.position(trigger.cards[0])=='d'){
-					player.chooseControl('rejianxiong_mopai','rejianxiong_napai','cancel2').ai=function(){
+					player.chooseControl('rejianxiong_mopai','rejianxiong_napai','cancel2').set('prompt',get.prompt('rejianxiong')).ai=function(){
 						var trigger=_status.event.getTrigger();
 						if(trigger.cards.length==1&&trigger.cards[0].name=='sha') return 0;
 						return 1;
 					};
 				}
 				else{
-					player.chooseControl('rejianxiong_mopai','cancel2');
+					player.chooseControl('rejianxiong_mopai','cancel2').set('prompt',get.prompt('rejianxiong'));
 				}
 				"step 1"
 				if(result.control=='rejianxiong_napai'){

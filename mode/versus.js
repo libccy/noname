@@ -1001,8 +1001,16 @@ mode.versus={
 				}
 				event.list.randomSort();
 				event.list2=list2;
-				event.current=_status.firstAct.next;
 				event.four_assign=get.config('four_assign');
+				if(get.config('four_phaseswap')){
+					game.addGlobalSkill('autophase');
+				}
+				if(!event.four_assign){
+					event.current=_status.firstAct;
+				}
+				else{
+					event.current=_status.firstAct.next;
+				}
 				event.flipassign=true;
 				if(_status.firstAct.side){
 					for(var i=0;i<game.players.length;i++){

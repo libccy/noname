@@ -1553,9 +1553,6 @@ character.yxs={
 			filter:function(event,player){
 				return event.player.hp<=0&&(player.countCards('h','jiu')>0||player.countCards('h',{color:'black'})>=2)&&player!=event.player;
 			},
-			check:function(event,player){
-				return ai.get.attitude(player,event.player)<0;
-			},
 			direct:true,
 			content:function(){
 				'step 0'
