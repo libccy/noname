@@ -19841,7 +19841,7 @@
 			game.chooseCharacterOL();
         },
         closeMenu:function(){
-            if(!ui.menuContainer.classList.contains('hidden')){
+            if(ui.menuContainer&&!ui.menuContainer.classList.contains('hidden')){
                 ui.click.configMenu();
             }
         },
@@ -36206,7 +36206,7 @@
                     if(!ui.shortcut.classList.contains('hidden')){
                         ui.click.shortcut(false);
                     }
-					if(get.is.phoneLayout()&&ui.menuContainer.classList.contains('hidden')){
+					if(get.is.phoneLayout()&&ui.menuContainer&&ui.menuContainer.classList.contains('hidden')){
 						if(ui.system2.classList.contains('shown')){
 							_status.removinground=true;
 							setTimeout(function(){
