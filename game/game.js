@@ -8845,7 +8845,7 @@
 							event.fakeforce=false;
 						}
 					}
-					if(event.player.isUnderControl()){
+					if(event.player.isUnderControl()||(event.player.handcardsVisible&&event.player!=game.me)){
 						event.result={
 							bool:false
 						}
@@ -10023,7 +10023,7 @@
 							event.dialog.add('手牌');
 							var hs=target.getCards('h');
 							hs.randomSort();
-							if(event.visible||target.isUnderControl(true)){
+							if(event.visible||target.isUnderControl(true)||target.handcardsVisible){
 								event.dialog.add(hs);
                                 directh=false;
 							}
@@ -10117,7 +10117,7 @@
 							event.dialog.add('手牌');
 							var hs=target.getCards('h');
 							hs.randomSort();
-							if(event.visible||target.isUnderControl(true)){
+							if(event.visible||target.isUnderControl(true)||target.handcardsVisible){
 								event.dialog.add(hs);
                                 directh=false;
 							}
@@ -10228,7 +10228,7 @@
 							event.dialog.add('手牌');
 							var hs=target.getCards('h');
 							hs.randomSort();
-							if(event.visible||target.isUnderControl(true)){
+							if(event.visible||target.isUnderControl(true)||target.handcardsVisible){
 								event.dialog.add(hs);
                                 directh=false;
 							}
@@ -16504,7 +16504,9 @@
 				$giveAuto:function(card,player){
 					if(Array.isArray(card)&&card.length==0) return;
 					var args=Array.from(arguments);
-					if(_status.connectMode||(!this.isUnderControl(true)&&!player.isUnderControl(true))){
+					if(_status.connectMode||(
+						!this.isUnderControl(true)&&!player.isUnderControl(true)&&
+						!this.handcardsVisible&&!player.handcardsVisible)){
 						if(Array.isArray(card)){
 							card=card.length;
 						}
@@ -18350,7 +18352,7 @@
 					}
 					if(!_status.connectMode&&lib.config.wuxie_self&&event.getParent().state){
 						var tw=event.getTrigger().parent;
-						if(tw.player.isUnderControl(true)&&tw.targets&&tw.targets.length==1&&!tw.noai){
+						if((tw.player.isUnderControl(true)||tw.player.handcardsVisible)&&tw.targets&&tw.targets.length==1&&!tw.noai){
 							return true;
 						}
 					}
@@ -18441,7 +18443,7 @@
             zhuSkill:{},
 			unequip:{ai:{unequip:true}},
 			autoswap:{
-				trigger:{player:['phaseBegin','chooseToUseBegin','chooseToRespondBegin','chooseToDiscardBegin','chooseToCompareBegin',
+				trigger:{player:['chooseToUseBegin','chooseToRespondBegin','chooseToDiscardBegin','chooseToCompareBegin',
 				'chooseButtonBegin','chooseCardBegin','chooseTargetBegin','chooseCardTargetBegin','chooseControlBegin',
 				'chooseBoolBegin','choosePlayerCardBegin','discardPlayerCardBegin','gainPlayerCardBegin']},
 				forced:true,
@@ -18458,7 +18460,7 @@
 				},
 			},
 			autophase:{
-				trigger:{player:['phaseBegin','chooseToUseBegin','chooseToRespondBegin','chooseToDiscardBegin','chooseToCompareBegin',
+				trigger:{player:['chooseToUseBegin','chooseToRespondBegin','chooseToDiscardBegin','chooseToCompareBegin',
 				'chooseButtonBegin','chooseCardBegin','chooseTargetBegin','chooseCardTargetBegin','chooseControlBegin',
 				'chooseBoolBegin','choosePlayerCardBegin','discardPlayerCardBegin','gainPlayerCardBegin']},
 				forced:true,
