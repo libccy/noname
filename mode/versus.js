@@ -1004,6 +1004,12 @@ mode.versus={
 				event.current=_status.firstAct.next;
 				event.four_assign=get.config('four_assign');
 				event.flipassign=true;
+				if(_status.firstAct.side){
+					for(var i=0;i<game.players.length;i++){
+						game.players[i].side=!game.players[i].side;
+						game.players[i].node.identity.dataset.color=get.translation(game.players[i].side+'Color');
+					}
+				}
 				for(var i=0;i<game.players.length;i++){
 					game.players[i].node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate['unknown'+get.distance(_status.firstAct,game.players[i],'absolute')]),game.players[i]);
 					game.players[i].node.name_seat.style.opacity=1;
@@ -1777,12 +1783,6 @@ mode.versus={
 				list=list.splice(8-num).concat(list);
 				_status.firstAct=game.players[num];
 				event.current=_status.firstAct.next;
-				game.broadcastAll(function(current){
-					for(var i=0;i<game.players.length;i++){
-						game.players[i].node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate['unknown'+get.distance(current,game.players[i],'absolute')]),game.players[i]);
-						game.players[i].node.name_seat.style.opacity=1;
-					}
-				},_status.firstAct);
 				for(var i=0;i<8;i++){
 					if(list[i][0]=='e'){
 						game.players[i].side=side;
@@ -1794,6 +1794,17 @@ mode.versus={
 					}
 					map[game.players[i].playerid]=[game.players[i].side,game.players[i].identity];
 				}
+				if(_status.firstAct.side){
+					for(var i=0;i<game.players.length;i++){
+						game.players[i].side=!game.players[i].side;
+					}
+				}
+				game.broadcastAll(function(current){
+					for(var i=0;i<game.players.length;i++){
+						game.players[i].node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate['unknown'+get.distance(current,game.players[i],'absolute')]),game.players[i]);
+						game.players[i].node.name_seat.style.opacity=1;
+					}
+				},_status.firstAct);
 
 				var filterChoice=function(name){
 					if(name=='zuoci') return true;
