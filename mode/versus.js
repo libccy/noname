@@ -1121,6 +1121,7 @@ mode.versus={
 					for(var i=0;i<game.players.length;i++){
 						if(!game.players[i].name){
 							event.ai(game.players[i],event.list.splice(0,3),event.list2);
+							game.players[i].node.name_seat.remove();
 						}
 					}
 				}
