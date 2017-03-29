@@ -8047,9 +8047,6 @@ character.sp={
 		suiren:{
 			trigger:{player:'phaseBegin'},
 			skillAnimation:true,
-			check:function(event,player){
-				return player.hp==1||(player.hp==2&&player.countCards('h')<=1);
-			},
 			filter:function(event,player){
 				return !player.storage.suiren;
 			},

@@ -771,7 +771,7 @@ card.swd={
 				tag:{
 					respond:1,
 					respondShan:1,
-					damage:1,
+					// damage:1,
 				}
 			}
 		},

@@ -2628,9 +2628,6 @@ character.swd={
 		},
 		suiyan:{
 			trigger:{source:'damageEnd'},
-			check:function(event,player){
-				return ai.get.attitude(player,event.player)<0;
-			},
 			direct:true,
 			filter:function(event,player){
 				return event.player.countCards('e');
@@ -4149,9 +4146,6 @@ character.swd={
 		},
 		fushen:{
 			trigger:{player:'phaseBefore'},
-			check:function(){
-				return false;
-			},
 			direct:true,
 			filter:function(event,player){
 				return !player.phaseSkipped;
@@ -4413,12 +4407,14 @@ character.swd={
 			trigger:{global:'dieBefore'},
 			direct:true,
 			alter:true,
-			check:function(event,player){
-				return player.attitudeTo(event.player)>3;
-			},
 			filter:function(event,player){
-				if(get.is.altered('susheng')&&!player.countCards('h',{color:'red'})) return false;
-				return player.countCards('h')>0&&!player.hasSkill('susheng2');
+				if(player.hasSkill('susheng2')) return false;
+				if(get.is.altered('susheng')){
+					return player.countCards('h',{color:'red'})>0;
+				}
+				else{
+					return player.countCards('h')>0;
+				}
 			},
 			content:function(){
 				"step 0"
@@ -5186,9 +5182,6 @@ character.swd={
 			filter:function(event){
 				return event.card&&event.card.name=='sha'&&event.player.countCards('he');
 			},
-			check:function(event,player){
-				return ai.get.attitude(player,event.player)<0;
-			},
 			content:function(){
 				var num=1;
 				if(trigger.player.countCards('e')&&trigger.player.countCards('h')){
@@ -5287,9 +5280,6 @@ character.swd={
 			usable:1,
 			filterCard:function(card){
 				return get.suit(card)=='heart';
-			},
-			check:function(card){
-				return 10-ai.get.value(card);
 			},
 			direct:true,
 			content:function(){
@@ -5739,9 +5729,6 @@ character.swd={
 		},
 		polang:{
 			trigger:{source:'damageEnd'},
-			check:function(event,player){
-				return ai.get.attitude(player,event.player)<0;
-			},
 			filter:function(event,player){
 				return event.player.countCards('e');
 			},

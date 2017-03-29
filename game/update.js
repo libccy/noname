@@ -1,6 +1,6 @@
 window.noname_update={
-    version:'1.9.18.2',
-    // update:'1.9.17',
+    version:'1.9.18.3',
+    update:'1.9.18.2',
     changeLog:[
         'bug修复',
         '4v4单人控制',
@@ -12,7 +12,7 @@ window.noname_update={
         // 'game/source.js',
         // 'game/asset.js',
         // 'card/*',
-        // 'card/sp.js',
+        'card/swd.js',
         'character/*',
         // 'character/refresh.js',
         // 'mode/boss.js',
