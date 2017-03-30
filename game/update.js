@@ -1,9 +1,8 @@
 window.noname_update={
-    version:'1.9.19',
-    update:'1.9.18.2',
+    version:'1.9.19.1',
+    update:'1.9.19',
     changeLog:[
         'bug修复',
-        '4v4单人控制',
     ],
     files:[
         'game/game.js',
@@ -12,12 +11,12 @@ window.noname_update={
         // 'game/source.js',
         // 'game/asset.js',
         // 'card/*',
-        'card/swd.js',
-        'character/*',
-        // 'character/refresh.js',
+        // 'card/swd.js',
+        // 'character/*',
+        'character/sp.js',
         // 'mode/boss.js',
         'mode/versus.js',
-        'mode/guozhan.js',
+        // 'mode/guozhan.js',
         // 'mode/identity.js',
         // 'mode/chess.js',
         // 'mode/tafang.js',

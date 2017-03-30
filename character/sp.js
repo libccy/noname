@@ -3034,7 +3034,7 @@ character.sp={
 		fenyong:{
 			trigger:{player:'damageEnd'},
 			content:function(){
-				player.addSkill('fenyong2');
+				player.addTempSkill('fenyong2','phaseAfter');
 			}
 		},
 		fenyong2:{

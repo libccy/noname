@@ -4512,23 +4512,40 @@ mode.versus={
 						if(this.identity=='zhu'){
 							game.over(this.side!=game.me.side);
 						}
-						else if(source){
-							if(source.side==this.side){
-								if(source.identity=='zhu'){
-									source.discard(source.getCards('he'));
+						else{
+							if(source){
+								if(source.side==this.side){
+									if(source.identity=='zhu'){
+										source.discard(source.getCards('he'));
+									}
+								}
+								else{
+									var num1=0,num2=1;
+									for(var i=0;i<game.players.length;i++){
+										if(game.players[i].side==source.side){
+											num1++;
+										}
+										else{
+											num2++;
+										}
+									}
+									source.draw(2+Math.max(0,num2-num1));
 								}
 							}
-							else{
-								var num1=0,num2=1;
-								for(var i=0;i<game.players.length;i++){
-									if(game.players[i].side==source.side){
-										num1++;
-									}
-									else{
-										num2++;
-									}
+							var side1=[],side2=[];
+							for(var i=0;i<game.players.length;i++){
+								if(game.players[i].side){
+									side1.push(game.players[i]);
 								}
-								source.draw(2+Math.max(0,num2-num1));
+								else{
+									side2.push(game.players[i]);
+								}
+							}
+							if(side1.length==1){
+								side1[0].showGiveup();
+							}
+							if(side2.length==1){
+								side2[0].showGiveup();
 							}
 						}
 						return;
@@ -4539,23 +4556,44 @@ mode.versus={
 						if(this.identity=='zhu'){
 							game.over(this.side!=game.me.side);
 						}
-						else if(source){
-							if(source.side==this.side){
-								if(source.identity=='zhu'){
-									source.discard(source.getCards('he'));
+						else{
+							if(source){
+								if(source.side==this.side){
+									if(source.identity=='zhu'){
+										source.discard(source.getCards('he'));
+									}
+								}
+								else{
+									var num1=0,num2=1;
+									for(var i=0;i<game.players.length;i++){
+										if(game.players[i].side==source.side){
+											num1++;
+										}
+										else{
+											num2++;
+										}
+									}
+									source.draw(2+Math.max(0,num2-num1));
+								}
+							}
+							var side1=[],side2=[];
+							for(var i=0;i<game.players.length;i++){
+								if(game.players[i].side){
+									side1.push(game.players[i]);
+								}
+								else{
+									side2.push(game.players[i]);
+								}
+							}
+							if(game.me.side){
+								if(side1.length<=side2.length-2){
+									game.me.showGiveup();
 								}
 							}
 							else{
-								var num1=0,num2=1;
-								for(var i=0;i<game.players.length;i++){
-									if(game.players[i].side==source.side){
-										num1++;
-									}
-									else{
-										num2++;
-									}
+								if(side1.length>=side2.length+2){
+									game.me.showGiveup();
 								}
-								source.draw(2+Math.max(0,num2-num1));
 							}
 						}
 						return;

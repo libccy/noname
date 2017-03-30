@@ -2863,6 +2863,14 @@
 							game.saveConfig('show_handcardbutton',bool);
 						}
 					},
+					show_giveup:{
+						name:'显示投降按钮',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_giveup',bool);
+						}
+					},
 					show_wuxie:{
 						name:'显示无懈按钮',
 						intro:'在右上角显示不询问无懈',
@@ -4263,7 +4271,8 @@
                             }
 							map.enable_all.show();
                             map.enable_all_cards_four.show();
-                            map.four_assign.show();
+							map.four_assign.show();
+                            map.four_phaseswap.show();
 							map.expand_dialog.show();
 						}
 						else{
@@ -4274,6 +4283,7 @@
 							map.enable_all.hide();
                             map.enable_all_cards_four.hide();
 							map.four_assign.hide();
+							map.four_phaseswap.hide();
                             map.expand_dialog.hide();
 						}
 						if(config.versus_mode=='three'||config.versus_mode=='one'){
@@ -7184,6 +7194,11 @@
             },
 			onfree:function(){
 				if(lib.onfree){
+					clearTimeout(window.resetGameTimeout);
+					delete window.resetGameTimeout;
+					delete window.resetExtension;
+	                localStorage.removeItem(lib.configprefix+'disable_extension',true);
+
 					var onfree=lib.onfree;
 					delete lib.onfree;
 					var loop=function(){
@@ -19042,11 +19057,12 @@
                     if(player) lib.element.player.chat.call(player,str);
                 },
                 giveup:function(player){
-                    game.log(player,'投降');
-                    player.popup('投降');
-                    setTimeout(function(){
-                        player.die('nosource');
-                    },1000);
+					_status.event.next.length=0;
+                    game.createEvent('giveup',false).setContent(function(){
+						game.log(player,'投降');
+	                    player.popup('投降');
+						player.die('nosource');
+					}).player=player;
                 },
                 auto:function(){
                     var player=lib.playerOL[this.id];
@@ -32506,6 +32522,7 @@
 			},
             giveup:function(){
                 if(ui.giveup) return;
+				if(!lib.config.show_giveup) return;
                 ui.giveup=ui.create.system('投降',function(){
                     var player=game.me;
                     this.remove();
@@ -32513,11 +32530,12 @@
                         game.send('giveup',player);
                     }
                     else{
-                        game.log(player,'投降');
-                        player.popup('投降');
-                        setTimeout(function(){
-                            player.die('nosource');
-                        },1000);
+						_status.event.next.length=0;
+						game.createEvent('giveup',false).setContent(function(){
+							game.log(player,'投降');
+		                    player.popup('投降');
+							player.die('nosource');
+						}).player=player;
                     }
                     if(_status.paused&&_status.imchoosing&&!_status.auto){
                         ui.click.auto();
@@ -34022,11 +34040,11 @@
 	                    },3000);
 					});
                 }
-				clearTimeout(window.resetGameTimeout);
-				delete window.resetGameTimeout;
-				delete window.resetExtension;
-                localStorage.removeItem(lib.configprefix+'disable_extension',true);
-				setTimeout(lib.init.onfree,3000);
+				// clearTimeout(window.resetGameTimeout);
+				// delete window.resetGameTimeout;
+				// delete window.resetExtension;
+                // localStorage.removeItem(lib.configprefix+'disable_extension',true);
+				// setTimeout(lib.init.onfree,3000);
 
 				if(lib.config.test_game){
 					ui.window.classList.add('testing');
