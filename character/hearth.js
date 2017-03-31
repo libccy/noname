@@ -258,7 +258,6 @@ character.hearth={
 				}
 				player.removeSkill('mad');
 				player.removeSkill('mengye2');
-				player.loseHp();
 			}
 		},
 		mengye3:{},
