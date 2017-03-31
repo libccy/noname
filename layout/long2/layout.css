@@ -379,9 +379,9 @@
 #arena>.player:not(.minskin)>.hp:not(.actcount){
     left: 93px;
 }
-#arena>.player:not(.minskin)>.hp:not(.actcount).text{
+/*#arena>.player:not(.minskin)>.hp:not(.actcount).text{
     left: 89px;
-}
+}*/
 #arena>.player.fullskin2 .avatar2{
     z-index: 2;
 }

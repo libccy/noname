@@ -197,15 +197,18 @@
 	left: 91px;
 }
 .player .hp.text{
-	font-family:'huangcao','xinwei';
-	font-size:22px;
+	font-family:'xinwei';
+	/*font-size:22px;*/
 	transform:none;
 	transition:all 0s;
 	left:114px;
 }
-#arena.slim_player .player .hp.text{
-	left:117px;
+.player .hp.text>div:last-child{
+	top: 4px;
 }
+/*#arena.slim_player .player .hp.text{
+	left:117px;
+}*/
 .player .hp.long{
 	bottom:12px;
 	max-height:160px;

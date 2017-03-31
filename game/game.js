@@ -12471,7 +12471,10 @@
 						(this.maxHp>5&&this.classList.contains('minskin'))||
 						((game.layout=='mobile'||game.layout=='long')&&this.dataset.position==0&&this.maxHp>7)
 					)){
-						hp.innerHTML=this.hp+'<br>/<br>'+this.maxHp;
+						hp.innerHTML=this.hp+'<br>/<br>'+this.maxHp+'<div></div>';
+						if(this.hp==0){
+							hp.lastChild.classList.add('lost');
+						}
 						hp.classList.add('text');
 						hp.classList.remove('long');
 					}
