@@ -1417,7 +1417,7 @@ character.xianjian={
 						if(get.is.altered('shuiyun')) return;
 						if(card.name=='wuzhong'||card.name=='yiyi'||
 							card.name=='yuanjiao'||card.name=='shunshou') return;
-						if(player.countCards('h')<=player.hp){
+						if(!player.needsToDiscard()){
 							var types=[];
 							for(var i=0;i<player.storage.shuiyun.length;i++){
 								types.add(get.type(player.storage.shuiyun[i],'trick'));

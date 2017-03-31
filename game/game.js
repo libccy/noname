@@ -15838,6 +15838,18 @@
 				},
 				getEquip:function(name){
 					var es=this.getCards('e');
+					if(get.itemtype(name)=='card'){
+						name=get.info(name).subtype;
+						if(name){
+							name=parseInt(name[5]);
+						}
+					}
+					else if(typeof name=='string'&&name.indexOf('equip')==0&&name.length==5){
+						name=parseInt(name[5]);
+					}
+					if(!name){
+						return null;
+					}
 					for(var i=0;i<es.length;i++){
 						if(typeof name==='number'){
 							if(get.info(es[i]).subtype==='equip'+name){

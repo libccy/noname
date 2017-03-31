@@ -57,14 +57,13 @@ character.hearth={
 		hs_aedwin:['male','wu',3,['lianzhan']],
 		hs_mijiaojisi:['female','wu',3,['kuixin']],
 		hs_huzhixiannv:['female','wu',3,['jingmeng','qingliu']],
-		// hs_tgolem:['male','wu',4,['xinwuyan','guozai']],
 		hs_totemic:['male','wu',3,['peiyu']],
 		hs_wujiyuansu:['male','wei',3,['hswuji']],
 		hs_xsylvanas:['female','qun',3,['busi','xshixin','xmojian']],
 		hs_siwangzhiyi:['male','qun',12,['mieshi']],
 		hs_bilanyoulong:['male','wei',4,['lingzhou']],
 		hs_jinglinglong:['male','wu',3,['mianyi']],
-		// hs_ruanniguai:['male','wu',3,['nianfu']],
+		hs_ruanniguai:['male','wu',3,['nianfu','xiaorong']],
 		hs_hudunren:['male','shu',2,['hhudun']],
 		hs_nate:['male','wu',4,['chuidiao']],
 		hs_jiaziruila:['male','wu',4,['hannu']],
@@ -164,7 +163,7 @@ character.hearth={
 		hs_laxiao:'什么？身为死亡之翼的儿子，拉西奥居然不是龙牌？你似乎知道的太多了…',
 	},
 	perfectPair:{
-		hs_sthrall:['hs_totemic','hs_alakir','hs_neptulon','hs_yngvar','hs_tgolem'],
+		hs_sthrall:['hs_totemic','hs_alakir','hs_neptulon','hs_yngvar'],
 		hs_anduin:['hs_wvelen','hs_mijiaojisi'],
 		hs_jaina:['hs_antonidas'],
 		hs_malfurion:['hs_malorne'],
@@ -2957,32 +2956,75 @@ character.hearth={
 			}
 		},
 		nianfu:{
-			enable:'phaseUse',
-			usable:1,
-			filterTarget:function(card,player,target){
-				return player!=target&&target.countCards('e')>0;
-			},
+			trigger:{source:'damageEnd',player:'damageEnd'},
+			forced:true,
 			filter:function(event,player){
-				return game.hasPlayer(function(target){
-					return target!=player&&target.countCards('e');
-				});
+				if(player==event.source){
+					return event.player!=player&&event.player.countCards('e');
+				}
+				else{
+					return event.source&&event.source!=player&&event.source.countCards('e');
+				}
 			},
 			content:function(){
-				var es=target.getCards('e');
-				if(es.length>1){
-					es=es.randomGets(Math.ceil(Math.random()*2));
-				}
-				target.discard(es);
-			},
-			ai:{
-				order:9.5,
-				result:{
-					target:function(player,target){
-						var ne=target.countCards('e');
-						if(ne>1) return -1.5;
-						return -1;
+				var target=(player==trigger.player)?trigger.source:trigger.player;
+				if(target){
+					var cards=target.getCards('e');
+					if(cards.length){
+						player.logSkill('nianfu',target);
+						var card=cards.randomGet();
+						player.gain(card,target);
+						target.$give(card,player);
 					}
 				}
+			},
+		},
+		xiaorong:{
+			mod:{
+				maxHandcard:function(player,num){
+					var hs=player.getCards('h');
+					for(var i=0;i<hs.length;i++){
+						if(get.type(hs[i])=='equip'){
+							num++;
+						}
+					}
+					return num;
+				},
+			},
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			filter:function(event,player){
+				return player.countCards('h',{type:'equip'});
+			},
+			content:function(){
+				var cards=player.getCards('h',{type:'equip'});
+				if(cards.length){
+					player.lose(cards)._triggered=null;
+					var list=[];
+					var names=[];
+					for(var i=0;i<lib.inpile.length;i++){
+						if(lib.card[lib.inpile[i]].type=='basic'){
+							names.push(lib.inpile[i]);
+						}
+					}
+					names.remove('du');
+					for(var i=0;i<cards.length*2;i++){
+						list.push(game.createCard(names.randomGet()));
+					}
+					player.directgain(list);
+					player.recover(cards.length);
+				}
+			},
+			ai:{
+				effect:{
+					player:function(card,player){
+						if(_status.currentPhase!=player) return;
+						if(player.needsToDiscard(2)) return;
+						if(get.type(card)=='equip'&&player.getEquip(card)){
+							return [0,0,0,0];
+						}
+					}
+				},
 			}
 		},
 		shixu:{
@@ -6021,7 +6063,6 @@ character.hearth={
 		hs_shanlingjuren:'山岭巨人',
 		hs_mijiaojisi:'秘教祭司',
 		hs_huzhixiannv:'湖之仙女',
-		hs_tgolem:'图腾魔像',
 		hs_totemic:'图腾师',
 		hs_bilanyoulong:'碧蓝幼龙',
 		hs_zhishigushu:'知识古树',
@@ -6031,7 +6072,7 @@ character.hearth={
 		hs_xuanzhuanjijia:'旋转机甲',
 		hs_ruanniguai:'软泥怪',
 		hs_kchromaggus:'克洛玛古斯',
-		hs_hudunren:'护盾人',
+		hs_hudunren:'护盾机甲',
 		hs_nate:'纳特',
 		hs_shifazhe:'嗜法者',
 		hs_yogg:'尤格萨隆',
@@ -6217,7 +6258,9 @@ character.hearth={
 		fenlie:'分裂',
 		fenlie_info:'锁定技，每当你于摸牌阶段外获得非特殊卡牌，你获得一张此牌的复制，每回合最多发动两次',
 		nianfu:'粘附',
-		nianfu_info:'出牌阶段限一次，你可以指定一名其他角色，随机弃置其1~2张装备牌',
+		nianfu_info:'锁定技，每当你造成或受到伤害，你随机获得对方装备区内的一张牌',
+		xiaorong:'消融',
+		xiaorong_info:'锁定技，你的装备牌不占用手牌上限；结束阶段，你将手牌中的每张装备牌转化为两张随机基本牌，每转化一张装备牌便回复一点体力',
 		shixu:'时序',
 		shixu_info:'锁定技，所有角色于出牌阶段每消耗3秒，便须于结束阶段弃置一张牌',
 		qianghua:'绝手',
