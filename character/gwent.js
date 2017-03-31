@@ -23,7 +23,7 @@ character.gwent={
 		gw_jieluote:['male','qun',6,['fayin']],
 		gw_yenaifa:['female','qun',3,['xuezhou']],
 		gw_telisi:['female','wei',3,['huandie']],
-		gw_xili:['female','qun',3,['fengjian']],
+		gw_xili:['female','wu',3,['fengjian']],
 		gw_luoqi:['male','wei',4,['gwzhanjiang']],
 		gw_yioufeisi:['male','wu',4,['gwchuanxin']],
 	},
@@ -173,7 +173,7 @@ character.gwent={
 				result:{
 					target:function(player,target){
 						if(player.getEquip('tengjia')||player.getEquip('bagua')) return -1;
-						if(ai.get.effect(target,{name:'sha'},player,player)>=0) return -1;
+						if(ai.get.effect(player,{name:'sha'},target,player)>=0) return -1;
 						if(!player.hasShan()){
 							if(ui.selected.targets.length) return 0;
 							if(player.hp>=4) return -1;
@@ -372,11 +372,10 @@ character.gwent={
 			direct:true,
 			filter:function(event,player){
 				var type=get.type(event.card,'trick');
-				return (type=='trick'||type=='equip')&&game.hasPlayer(function(current){
+				return type=='trick'&&game.hasPlayer(function(current){
 					return player.canUse('sha',current,false)&&!event.targets.contains(current);
 				});
 			},
-			usable:2,
 			content:function(){
 				"step 0"
 				player.chooseTarget(get.prompt('fengjian'),function(card,player,target){
@@ -388,26 +387,27 @@ character.gwent={
 				if(result.bool){
 					player.logSkill('fengjian');
 					player.useCard({name:'sha',nature:'thunder'},result.targets,false);
+					player.addTempSkill('qianxing',{player:'phaseBegin'});
 				}
 			},
 			ai:{
 				expose:0.2,
 				threaten:1.5
 			},
-			group:'fengjian_hide',
-			subSkill:{
-				hide:{
-					trigger:{source:'damageEnd'},
-					forced:true,
-					popup:false,
-					filter:function(event,player){
-						return event.getParent(3).name=='fengjian';
-					},
-					content:function(){
-						player.addTempSkill('qianxing',{player:'phaseBegin'});
-					}
-				}
-			}
+			// group:'fengjian_hide',
+			// subSkill:{
+			// 	hide:{
+			// 		trigger:{source:'damageEnd'},
+			// 		forced:true,
+			// 		popup:false,
+			// 		filter:function(event,player){
+			// 			return event.getParent(3).name=='fengjian';
+			// 		},
+			// 		content:function(){
+			// 			player.addTempSkill('qianxing',{player:'phaseBegin'});
+			// 		}
+			// 	}
+			// }
 		},
 		huandie:{
 			trigger:{player:'phaseBegin'},
@@ -838,7 +838,7 @@ character.gwent={
 		gwchuanxin:'穿心',
 		gwchuanxin_info:'每当你对一名角色使用杀结算完毕后，你可以进行一判定，若结果为黑色，视为对目标再使用一张杀',
 		fengjian:'风剑',
-		fengjian_info:'每当你使用一张锦囊牌或装备牌，你可以视为对一名不是此牌目标的角色使用一张雷杀；若此杀造成伤害，你获得潜行直到下一回合开始，每回合最多发动两次',
+		fengjian_info:'每当你使用一张锦囊牌，你可以视为对一名不是此牌目标的角色使用一张雷杀，若如此做，你获得潜行直到下一回合开始',
 		huandie:'幻蝶',
 		huandie_info:'准备阶段，你可以摸一张牌，并令任意名其他角色摸两张牌，若如此做，此回合结束时，所有手牌数大于体力值的角色需弃置两张手牌',
 		xuezhou:'血咒',

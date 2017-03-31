@@ -39,7 +39,7 @@ character.hearth={
 		hs_ysera:['female','wu',4,['chenshui']],
 		hs_alextrasza:['female','shu',5,['fushi']],
 		hs_nozdormu:['male','qun',5,['shixu']],
-		// hs_sapphiron:['male','wei',4,['bingdong','stuxi']],
+		hs_sapphiron:['male','wei',4,['bingdong','stuxi']],
 		hs_kchromaggus:['male','wei',4,['fenlie']],
 		hs_lreno:['male','shu',4,['tanmi']],
 		hs_brann:['male','shu',3,['qianghua']],
@@ -59,13 +59,13 @@ character.hearth={
 		hs_huzhixiannv:['female','wu',3,['jingmeng','qingliu']],
 		// hs_tgolem:['male','wu',4,['xinwuyan','guozai']],
 		hs_totemic:['male','wu',3,['peiyu']],
-		// hs_wujiyuansu:['male','wu',3,['s_tuteng']],
+		hs_wujiyuansu:['male','wei',3,['hswuji']],
 		hs_xsylvanas:['female','qun',3,['busi','xshixin','xmojian']],
 		hs_siwangzhiyi:['male','qun',12,['mieshi']],
 		hs_bilanyoulong:['male','wei',4,['lingzhou']],
 		hs_jinglinglong:['male','wu',3,['mianyi']],
 		// hs_ruanniguai:['male','wu',3,['nianfu']],
-		// hs_hudunren:['male','shu',3,['hhudun']],
+		hs_hudunren:['male','shu',2,['hhudun']],
 		hs_nate:['male','wu',4,['chuidiao']],
 		hs_jiaziruila:['male','wu',4,['hannu']],
 		// hs_shifazhe:['male','wei',3,['jizhi','shifa']],
@@ -170,6 +170,20 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		lianzhan:{
+			trigger:{source:'damageEnd'},
+			forced:true,
+			content:function(){
+				if(player.getStat().damage>trigger.num){
+					player.gainMaxHp();
+					player.recover();
+				}
+				else{
+					player.draw(2);
+				}
+			}
+		},
+		lianzhan2:{},
 		kuixin:{
 			trigger:{player:'phaseEnd'},
 			direct:true,
@@ -2878,15 +2892,37 @@ character.hearth={
 			},
 		},
 		hhudun:{
-			trigger:{player:'phaseBegin'},
+			trigger:{global:'phaseBegin'},
 			forced:true,
 			filter:function(event,player){
-				return player.hujia<3;
+				return !player.hujia;
 			},
 			content:function(){
 				player.changeHujia();
-				player.update();
 			},
+			group:'hhudun_hujia',
+			subSkill:{
+				hujia:{
+					trigger:{player:'damageZero'},
+					filter:function(event){
+						return event.hujia;
+					},
+					forced:true,
+					content:function(){
+						player.draw();
+					}
+				}
+			},
+			ai:{
+				threaten:function(player,target){
+					if(target.hujia){
+						return 0.5;
+					}
+					else{
+						return 2;
+					}
+				}
+			}
 		},
 		fenlie:{
 			audio:2,
@@ -3102,20 +3138,61 @@ character.hearth={
 		stuxi:{
 			trigger:{player:'phaseEnd'},
 			forced:true,
-			content:function(){
-				'step 0'
-				event.targets=get.players();
-				'step 1'
-				if(event.targets.length){
-					var target=event.targets.shift();
-					if(!target.isTurnedOver()&&target.countCards('he')){
-						target.chooseToDiscard(true);
-					}
-					event.redo();
+			filter:function(event,player){
+				var enemies=player.getEnemies();
+				for(var i=0;i<enemies.length;i++){
+					if(!enemies[i].hasSkill('stuxi2')) return true;
 				}
+				return false;
+			},
+			content:function(){
+				var enemies=player.getEnemies();
+				for(var i=0;i<enemies.length;i++){
+					if(enemies[i].hasSkill('stuxi2')){
+						enemies.splice(i--,1);
+					}
+				}
+				var target=enemies.randomGet();
+				if(target){
+					player.line(target,'green');
+					target.addExpose(0.2);
+					target.addSkill('stuxi2');
+				}
+			},
+			ai:{
+				expose:0.2
+			}
+		},
+		stuxi2:{
+			trigger:{player:'phaseDrawBegin'},
+			forced:true,
+			mark:true,
+			intro:{
+				content:'下个摸牌阶段摸牌数-1'
+			},
+			filter:function(event){
+				return event.num>0;
+			},
+			content:function(){
+				trigger.num--;
+				player.removeSkill('stuxi2');
 			}
 		},
 		bingdong:{
+			trigger:{source:'damageEnd'},
+			forced:true,
+			usable:1,
+			filter:function(event,player){
+				if(!lib.card.hslingjian_jinjilengdong){
+					return false;
+				}
+				return true;
+			},
+			content:function(){
+				player.gain(game.createCard('hslingjian_jinjilengdong'),'gain2');
+			}
+		},
+		bingdong_old:{
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
@@ -3825,7 +3902,7 @@ character.hearth={
 				threaten:1.5
 			}
 		},
-		lianzhan:{
+		hswuji:{
 			trigger:{player:'phaseUseEnd'},
 			frequent:true,
 			filter:function(event,player){
@@ -4224,7 +4301,6 @@ character.hearth={
 			filter:function(event,player){
 				return !player.storage.anying&&player.countCards('he',{color:'black'})>1;
 			},
-			selectCard:2,
 			filterCard:{color:'black'},
 			position:'he',
 			check:function(card){
@@ -4239,7 +4315,12 @@ character.hearth={
 			ai:{
 				order:1,
 				result:{
-					player:1
+					player:function(player){
+						if(player.hasUnknown()) return 0;
+						return !game.hasPlayer(function(current){
+							return ai.get.attitude(player,current)>0&&current.isDamaged()&&current.hp<=2;
+						});
+					}
 				}
 			}
 		},
@@ -5968,6 +6049,7 @@ character.hearth={
 		hs_khadgar:'卡德加',
 		hs_tyrande:'泰兰德',
 		hs_fenjie:'芬杰',
+		hs_wujiyuansu:'无羁元素',
 
 		fuhua:'腐化',
 		fuhua2:'腐化',
@@ -6108,6 +6190,8 @@ character.hearth={
 		hsyaoshui:'药水',
 		hsqingyu:'青玉',
 
+		lianzhan:'连斩',
+		lianzhan_info:'每当你造成一次伤害，若此伤害是你本回合第一次造成伤害，你摸两张牌；否则你增加一点体力上限并 回复一点体力',
 		shifa:'嗜法',
 		shifa_info:'锁定技，出牌阶段开始时，你令场上所有角色各获得一张随机锦囊牌',
 		yuanzheng:'远征',
@@ -6129,7 +6213,7 @@ character.hearth={
 		fushi:'缚誓',
 		fushi_info:'出牌阶段，你可以令一名已受伤角色失去一点体力上限并回复一点体力',
 		hhudun:'护盾',
-		hhudun_info:'锁定技，准备阶段，若你的护甲值小于3，你获得一点护甲',
+		hhudun_info:'锁定技，在每名角色的准备阶段，若你没有护甲，你获得一点护甲；每当你的护甲抵消一次伤害，你摸一张牌',
 		fenlie:'分裂',
 		fenlie_info:'锁定技，每当你于摸牌阶段外获得非特殊卡牌，你获得一张此牌的复制，每回合最多发动两次',
 		nianfu:'粘附',
@@ -6143,9 +6227,11 @@ character.hearth={
 		biri:'蔽日',
 		biri_info:'每当距离你1以内的一名其他角色成为杀的惟一目标时，若杀的使用者不是你，你可以弃置一张闪取消之',
 		stuxi:'吐息',
-		stuxi_info:'锁定技，结束阶段，你令所有未翻面角色各弃置一张牌',
+		stuxi2:'吐息',
+		stuxi2_bg:'息',
+		stuxi_info:'锁定技，结束阶段，你令一名随机敌人下一个摸牌阶段摸牌数-1',
 		bingdong:'冰冻',
-		bingdong_info:'出牌阶段限一次，若你的武将牌正面朝上，你可以选择一名未翻面的角色与其同时将武将牌翻至背面',
+		bingdong_info:'锁定技，你在一个回合内首次造成伤害后，获得一个冰冻零件',
 		ronghuo:'熔火',
 		ronghuo_info:'锁定技，你的普通杀均视为火杀',
 		luoshi:'落石',
@@ -6219,8 +6305,8 @@ character.hearth={
 		jingmeng_info:'每当你于回合内使用第一张牌时，你可以从牌堆中随机获得一张与之类型相同的牌',
 		kuixin:'窥心',
 		kuixin_info:'结束阶段，你可以获得一名手牌数不少于你的角色的一张手牌',
-		lianzhan:'连斩',
-		lianzhan_info:'出牌阶段结束时，你可以摸X张牌，X为你本回合使用的卡牌数',
+		hswuji:'无羁',
+		hswuji_info:'出牌阶段结束时，你可以摸X张牌，X为你本回合使用的卡牌数',
 		yanshu:'炎舞',
 		yanshu_info:'每回合限一次，当你弃置非基本牌后，你可以获得一张流星火雨',
 		bingshuang:'冰枪',

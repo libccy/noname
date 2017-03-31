@@ -3315,7 +3315,7 @@ character.swd={
 				effect:{
 					player:function(card,player,target){
 						if(player!=target) return;
-						if(get.type(card)=='equip'&&player.countCards('h')<=player.hp){
+						if(get.type(card)=='equip'&&!player.needsToDiscard()){
 							return [0,0,0,0];
 						}
 					}

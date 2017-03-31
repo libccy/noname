@@ -11303,11 +11303,13 @@
 					if(num>0&&player.hujia&&!player.hasSkillTag('nohujia')){
 						if(num>=player.hujia){
 							num-=player.hujia;
+							event.hujia=player.hujia;
 							game.log(player,'的护甲抵挡了'+get.cnNumber(player.hujia)+'点伤害');
 							player.hujia=0;
 						}
 						else{
 							player.hujia-=num;
+							event.hujia=num;
 							game.log(player,'的护甲抵挡了'+get.cnNumber(num)+'点伤害');
 							num=0;
 						}

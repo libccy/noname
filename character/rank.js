@@ -54,6 +54,7 @@ window.characterRank={
         'hs_tyrande',
     ],
     a:[
+        'hs_sapphiron',
         'gw_airuiting',
         'gw_dagong',
         'gw_huoge',
@@ -160,6 +161,7 @@ window.characterRank={
         'gw_kaerweite',
         'yxs_napolun',
         'hs_aedwin',
+        'hs_wujiyuansu',
         'ow_kuangshu',
         'old_wangyi',
         'hs_shaku',
@@ -249,6 +251,7 @@ window.characterRank={
     ],
     bp:[
         'zoushi',
+        'hs_hudunren',
         'diy_lukang',
         'yxs_meixi',
         'yxs_lanlinwang',
