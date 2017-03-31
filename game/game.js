@@ -5185,10 +5185,6 @@
 		},
 		init:{
             init:function(){
-                if(window.cordovaLoadTimeout){
-                    clearTimeout(window.cordovaLoadTimeout);
-                    delete window.cordovaLoadTimeout;
-                }
                 window.resetGameTimeout=setTimeout(function(){
                     if(window.inSplash) return;
                     if(window.resetExtension){
@@ -5234,6 +5230,10 @@
 						}
                     }
                 },5000);
+                if(window.cordovaLoadTimeout){
+                    clearTimeout(window.cordovaLoadTimeout);
+                    delete window.cordovaLoadTimeout;
+                }
                 var links=document.head.querySelectorAll('link');
                 for(var i=0;i<links.length;i++){
                     if(links[i].href.indexOf('app/color.css')!=-1){
@@ -31574,7 +31574,7 @@
 							updatepx.style.display='none';
 							updatepx.style.whiteSpace='nowrap';
 							updatepx.style.marginTop='8px';
-							var buttonx=ui.create.node('button','访问GitHub',function(){
+							var buttonx=ui.create.node('button','访问项目主页',function(){
 								window.open('https://github.com/libccy/noname');
 							});
 							updatepx.appendChild(buttonx);
@@ -34098,11 +34098,9 @@
 	                    },3000);
 					});
                 }
-				// clearTimeout(window.resetGameTimeout);
-				// delete window.resetGameTimeout;
-				// delete window.resetExtension;
-                // localStorage.removeItem(lib.configprefix+'disable_extension',true);
-				// setTimeout(lib.init.onfree,3000);
+				if(localStorage.getItem(lib.configprefix+'playback')){
+					setTimeout(lib.init.onfree);
+				}
 
 				if(lib.config.test_game){
 					ui.window.classList.add('testing');

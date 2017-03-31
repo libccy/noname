@@ -63,7 +63,7 @@ character.swd={
 		// swd_lanmoshen:['female','wei',3,['bingjian','lieren']],
 		swd_huanglei:['male','qun',3,['jilve','gongshen','gaizao']],
 		// swd_libai:['female','qun',3,['miaobi','zhexian']],
-		// swd_kendi:['male','qun',3,['guanxing','jianyan']],
+		swd_kendi:['male','qun',3,['zhanxing','kbolan']],
 		// swd_lijing:['male','qun',4,['tianyi','zhuhai']],
 		swd_lilian:['female','qun',3,['swd_wuxie','lqingcheng']],
 		// swd_linming:['male','qun',3,['shelie','bifa']],
@@ -96,7 +96,6 @@ character.swd={
 		swd_shaowei:['female','shu',3,['jianji','huangyu']],
 
 		swd_youzhao:['male','shu',4,['longdan','yuchen']],
-		// swd_qingming:['male','shu',3,['mingfu','tianlun']],
 		swd_shangzhang:['male','shu',4,['lianwu']],
 		swd_situqiang:['female','shu',3,['fengze','lingyue','jinlin']],
 
@@ -104,11 +103,16 @@ character.swd={
 		swd_hanlong:['male','wei',4,['ciqiu','siji']],
 		swd_yuli:['female','wu',3,['lingxin','tianxiang']],
 		swd_zhanggao:['male','wei',4,['yicong','poxing']],
+		// swd_shuwaner:['female','shu',3,['yicong','poxing']],
+		// swd_xiaohuanglong:['male','wei',3,['yicong','poxing']],
 
 		swd_hupo:['male','wu',3,['dunxing','guiying']],
 		swd_jiangziya:['male','wu',3,['mingfu','tianlun']],
 	},
 	characterIntro:{
+		swd_kendi:'占星大师老肯迪的孙子，老肯迪死后，他也自称肯迪，伪装成老肯迪，以保护老肯迪的藏书。肯迪平常以接受委托抄书与翻译拉丁文书籍为业，除了占星术以外，其余知识也相当广博。为了增长见闻，什么可怕的地方都敢去，所以认识薇达与不少的军官。后来，肯迪的子孙成为伊斯兰地区的大学者，以因果定律的学说著名于世。',
+		swd_shuwaner:'第一代祝犁黄汉卿的妻子，二代祝犁黄采儿的母亲。陷阱机关师，擅长火系陷阱，并能驱使一种可爆裂来杀敌之神秘「火丹」技术。',
+		swd_xiaohuanglong:'龙族之幻兽，后土之神将它送给兰茵避险，以保护她安全。',
 		swd_huzhongxian:'炼妖壶是女娲神所创，是以开天辟地创造生命的工具，开创出万物后即遗留于某一处水底神殿中。由巴蛇及蛟龟守护该神器，过了约莫千年之久，炼妖壶已可幻化成人形，即为壶中仙。此时正因人类对异类的排斥，巴蛇对此愤愤不平，壶中仙与巴蛇讨论人魔共存的方法，但巴蛇觉得壶中仙是另有所图。自不采用，一日趁壶中仙不注意，将炼妖壶的妖怪全数释放，留下蛟龟看守练妖壶，巴蛇率领魔族大军反攻人类，从此人魔之战一直持续着。',
 		swd_anka:'安卡在数千年前，曾经是法老王的宠物。在法老王过世后，本来要当陪葬品，却被一位也要被陪葬的祭司带着逃走，安卡借着长期跟随祭司，学得不少后来传到欧洲的黑魔法，成了一只猫精。但在欧洲黑猫很不受欢迎，之后遇上卡玛，成为共患难的好友。安卡有许多癖好，像是收集漂亮的石头把它藏起来，若是日后又发现会很高兴。',
 		swd_septem:'欧洲梅罗文加王朝高卢出生的东方人与日耳曼混血儿，宇文拓的后人。深受丕平三世的器重，主要担任收集情报等工作，因为屡立大功而被受封为骑士。后因接受丕平三世的任务而秘密离开高卢前往东方寻找所谓的战争不败之术，由此踏上漫漫征途。',
@@ -217,6 +221,128 @@ character.swd={
 		swd_luchengxuan:['swd_xiarou'],
 	},
 	skill:{
+		zhanxing:{
+			enable:'phaseUse',
+			usable:1,
+			position:'he',
+			filterCard:true,
+			selectCard:[1,Infinity],
+			filter:function(event,player){
+				return player.countCards('he')>0;
+			},
+			check:function(card){
+				switch(ui.selected.cards.length){
+					case 0: return 8-ai.get.value(card);
+					case 1: return 6-ai.get.value(card);
+					case 2: return 3-ai.get.value(card);
+				}
+				return 0;
+			},
+			content:function(){
+				'step 0'
+				var list=get.cards(cards.length);
+				event.list=list;
+				player.showCards(list);
+				'step 1'
+				var suits=[];
+				event.suits=suits;
+				for(var i=0;i<event.list.length;i++){
+					suits.add(get.suit(event.list[i]));
+					ui.discardPile.appendChild(event.list[i]);
+				}
+				'step 2'
+				if(event.suits.contains('diamond')){
+					player.draw(2);
+				}
+				'step 3'
+				if(event.suits.contains('heart')){
+					if(player.isDamaged()){
+						player.recover();
+					}
+					else{
+						player.changeHujia();
+					}
+				}
+				'step 4'
+				if(event.suits.contains('club')){
+					var enemies=player.getEnemies();
+					for(var i=0;i<enemies.length;i++){
+						enemies[i].randomDiscard();
+						player.line(enemies[i],'green');
+					}
+				}
+				'step 5'
+				if(event.suits.contains('spade')){
+					player.chooseTarget('令一名角色受到一点无来源的雷属性伤害').ai=function(target){
+						return ai.get.damageEffect(target,target,player,'thunder');
+					}
+				}
+				else{
+					event.finish();
+				}
+				'step 6'
+				if(result.bool){
+					player.line(result.targets[0],'thunder');
+					result.targets[0].damage('thunder','nosource');
+				}
+			},
+			ai:{
+				order:5,
+				result:{
+					player:1
+				},
+				threaten:1.5
+			},
+		},
+		kbolan:{
+			trigger:{player:'drawBegin'},
+			frequent:true,
+			content:function(){
+				trigger.num++;
+				trigger.id=trigger.id||get.id();
+				player.storage.kbolan2=trigger.id;
+				player.addTempSkill('kbolan2','phaseAfter');
+			}
+		},
+		kbolan2:{
+			trigger:{player:'drawEnd'},
+			filter:function(event,player){
+				return player.storage.kbolan2==event.id;
+			},
+			forced:true,
+			popup:false,
+			silent:true,
+			onremove:true,
+			content:function(){
+				'step 0'
+				player.removeSkill('kbolan2');
+				if(player.num('h')){
+					player.chooseCard('h',true,'将一张手牌置于牌堆顶').ai=function(card){
+						return -ai.get.value(card);
+					};
+				}
+				else{
+					event.finish();
+				}
+				'step 1'
+				if(result&&result.cards){
+					event.card=result.cards[0];
+					player.lose(result.cards,ui.special);
+
+					var cardx=ui.create.card();
+					cardx.classList.add('infohidden');
+					cardx.classList.add('infoflip');
+					player.$throw(cardx,1000,'nobroadcast');
+				}
+				'step 2'
+				if(event.player==game.me) game.delay(0.5);
+				'step 3'
+				if(event.card){
+					event.card.fix();
+					ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
+				}
+			}
+		},
 		hujing:{
 			trigger:{player:'phaseBegin'},
 			forced:true,
@@ -8735,8 +8861,12 @@ character.swd={
 		swd_quxian:'屈娴',
 		swd_xiyan:'犀衍',
 
+		sxianjing:'陷阱',
+		sxianjing_info:'出牌阶段限一次，你可以将一张与你武将牌上的牌花色均不同的牌背面朝上置于你的武将牌上。当一名其他角色使用与一张“陷阱”牌花色相同的牌指定你为目标时，你翻开对应的“陷阱”牌，令此牌失效，然后随机获得该角色的一张牌。每当你受到一次伤害，你随机弃置一张“陷阱”牌',
 		zhanxing:'占星',
-		zhanxing_info:'出牌阶段限一次，你可以弃置任意张牌，并亮出牌堆顶的等量的牌，并根据亮出的牌包含的花色执行以下效果：♥获得2点护甲；♦︎摸两张牌；♣弃置一名其他角色两张牌；♠对一名角色造成一点雷属性伤害',
+		zhanxing_info:'出牌阶段限一次，你可以弃置任意张牌，并亮出牌堆顶的等量的牌，并根据亮出的牌包含的花色执行以下效果：♦︎摸两张牌；♥回复一点体力（若未损失体力改为获得一点护甲）；♣令所有敌人随机弃置一张牌；♠令一名角色受到一点无来源的雷属性伤害',
+		kbolan:'博览',
+		kbolan_info:'每当你摸牌时，你可以额外摸一张牌，然后摸牌结束时将一张手牌置于牌堆顶',
 		gaizao:'改造',
 		gaizao_info:'每当你即将装备一张牌（特殊类装备除外），若你的装备区内对应位置已有牌，你可以永久改变此牌的装备类型使其装备在装备区内的空余位置',
 		lingshi:'灵矢',

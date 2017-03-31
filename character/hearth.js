@@ -3091,12 +3091,19 @@ character.hearth={
 					return event.source&&event.source!=player&&event.source.countCards('e');
 				}
 			},
+			logTarget:function(event,player){
+				if(player==event.player){
+					return event.source;
+				}
+				else{
+					return event.player;
+				}
+			},
 			content:function(){
 				var target=(player==trigger.player)?trigger.source:trigger.player;
 				if(target){
 					var cards=target.getCards('e');
 					if(cards.length){
-						player.logSkill('nianfu',target);
 						var card=cards.randomGet();
 						player.gain(card,target);
 						target.$give(card,player);
