@@ -2716,12 +2716,12 @@ mode.versus={
 			}
 		},
 		modeSwapPlayer:function(player){
-			if(_status.mode=='four'){
-				game.swapPlayer(player);
-			}
-			else{
+			if(_status.mode=='three'||(_status.mode=='standard'&&lib.storage.single_control)){
 				game.swapControl(player);
 				game.onSwapControl();
+			}
+			else{
+				game.swapPlayer(player);
 			}
 		},
 		updateLineMe:function(opacity,player){

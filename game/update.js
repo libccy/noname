@@ -1,6 +1,6 @@
 window.noname_update={
     version:'1.9.20',
-    update:'1.9.19',
+    // update:'1.9.19',
     changeLog:[
         '忠胆英杰',
     ],
@@ -16,7 +16,7 @@ window.noname_update={
         'character/*',
         // 'character/sp.js',
         // 'mode/boss.js',
-        'mode/versus.js',
+        // 'mode/versus.js',
         // 'mode/guozhan.js',
         // 'mode/identity.js',
         // 'mode/chess.js',
