@@ -658,7 +658,12 @@ mode.identity={
 								this.classList.add('thundertext');
 							}
 							num=get.config('choice_'+link);
-							if(event.zhongmode) num=3;
+							if(event.zhongmode){
+								num=6;
+								if(link=='zhu'||link=='nei'||link=='mingzhong'){
+									num=8;
+								}
+							}
 							_status.event.parent.swapnodialog=function(dialog,list){
 								var buttons=ui.create.div('.buttons');
 								var node=dialog.buttons[0].parentNode;
@@ -835,7 +840,10 @@ mode.identity={
 				}
 				var num=get.config('choice_'+game.me.identity);
 				if(event.zhongmode){
-					num=3;
+					num=6;
+					if(game.me.identity=='zhu'||game.me.identity=='nei'||game.me.identity=='mingzhong'){
+						num=8;
+					}
 				}
 				if(game.zhu!=game.me){
 					event.ai(game.zhu,event.list,list2)
@@ -868,7 +876,7 @@ mode.identity={
 					}
 					else{
 						if(event.zhongmode){
-							list=list3.slice(0,6);
+							list=list3.slice(0,8);
 						}
 						else{
 							list=list2.concat(list3.slice(0,num));
@@ -1338,6 +1346,14 @@ mode.identity={
 					}
 				}
 				if(this.identity=='fan'&&source) source.draw(3);
+				else if(this.identity=='mingzhong'&&source){
+					if(source.identity=='zhu'){
+						source.discard(source.getCards('he'));
+					}
+					else{
+						source.draw(3);
+					}
+				}
 				else if(this.identity=='zhong'&&source&&source.identity=='zhu'&&source.isZhu){
 					source.discard(source.getCards('he'));
 				}
