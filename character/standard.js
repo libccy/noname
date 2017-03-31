@@ -1114,7 +1114,8 @@ character.standard={
 				player.draw();
 			},
 			ai:{
-				threaten:1.4
+				threaten:1.4,
+				noautowuxie:true,
 			}
 		},
 		qicai:{

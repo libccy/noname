@@ -392,7 +392,8 @@ character.gwent={
 			},
 			ai:{
 				expose:0.2,
-				threaten:1.5
+				threaten:1.5,
+				noautowuxie:true,
 			},
 			// group:'fengjian_hide',
 			// subSkill:{

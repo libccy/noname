@@ -2673,7 +2673,8 @@ character.hearth={
 				}
 			},
 			ai:{
-				threaten:1.5
+				threaten:1.5,
+				noautowuxie:true,
 			}
 		},
 		yuanzheng:{
@@ -3521,7 +3522,8 @@ character.hearth={
 			},
 			ai:{
 				expose:0.2,
-				threaten:1.5
+				threaten:1.5,
+				noautowuxie:true,
 			}
 		},
 		mieshi:{

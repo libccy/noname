@@ -18383,7 +18383,8 @@
 					}
 					if(!_status.connectMode&&lib.config.wuxie_self&&event.getParent().state){
 						var tw=event.getTrigger().parent;
-						if(tw.player.isUnderControl(true)&&tw.targets&&tw.targets.length==1&&!tw.noai){
+						if(tw.player.isUnderControl(true)&&!tw.player.hasSkillTag('noautowuxie')&&
+							tw.targets&&tw.targets.length==1&&!tw.noai){
 							return true;
 						}
 					}

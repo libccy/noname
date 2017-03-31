@@ -3095,7 +3095,8 @@ mode.boss={
 				game.log(player,'获得了',cards);
 			},
 			ai:{
-				threaten:1.4
+				threaten:1.4,
+				noautowuxie:true,
 			}
 		},
 		boss_guiyin:{
