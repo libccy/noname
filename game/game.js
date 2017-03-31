@@ -15410,7 +15410,7 @@
 						}
 					},time)
 				},
-				getCardUsable:function(card){
+				getCardUsable:function(card,pure){
 					var player=this;
 					if(typeof card=='string'){
 						card={name:card};
@@ -15420,7 +15420,7 @@
 					if(typeof num=='function') num=num(card,player);
 					num=game.checkMod(card,player,num,'cardUsable',player.getSkills());
 					if(typeof num!='number') return Infinity;
-					if(_status.currentPhase==player){
+					if(!pure&&_status.currentPhase==player){
 						return num-get.cardCount(card,player);
 					}
 					return num;

@@ -1623,9 +1623,7 @@ card.standard={
 					var next=player.chooseToUse({
 						filterCard:function(card,player){
 							if(card.name!='wuxie') return false;
-							var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.getSkills());
-							if(mod!='unchanged') return mod;
-							return true;
+							return lib.filter.cardEnabled(card,player,'forceEnable');
 						},
 						prompt:str,
 						type:'wuxie',

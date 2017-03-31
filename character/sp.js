@@ -8030,7 +8030,7 @@ character.sp={
 				targetEnabled:function(card,player,target){
 					if(card.name!='sha') return;
 					if(player==_status.currentPhase&&player.hasSkill('chixin')){
-						var num=game.checkMod(card,player,1,'cardUsable',player.getSkills())-20;
+						var num=player.getCardUsable(card,true)-20;
 						var players=game.filterPlayer();
 						for(var i=0;i<players.length;i++){
 							if(players[i].hasSkill('chixin3')){

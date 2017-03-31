@@ -2160,9 +2160,7 @@ card.swd={
 			content:function(){
 				player.chooseToUse(get.prompt('shencaojie',trigger.player).replace(/发动/,'使用'),function(card,player){
 					if(card.name!='shencaojie') return false;
-					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.getSkills());
-					if(mod!='unchanged') return mod;
-					return true;
+					return lib.filter.cardEnabled(card,player,'forceEnable');
 				},trigger.player,-1).targetRequired=true;
 			}
 		},
@@ -2199,9 +2197,7 @@ card.swd={
 				player.storage.shenmiguo=[card,(trigger._targets||trigger.targets).slice(0)];
 				player.chooseToUse('是否使用神秘果？',function(card,player){
 					if(card.name!='shenmiguo'&&card.name!='yuchankan') return false;
-					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.getSkills());
-					if(mod!='unchanged') return mod;
-					return true;
+					return lib.filter.cardEnabled(card,player,'forceEnable');
 				},trigger.player,-1).set('cardname',trigger.card.name).targetRequired=true;
 				'step 1'
 				if(result.bool){
