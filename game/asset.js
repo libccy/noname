@@ -2540,7 +2540,7 @@ window.noname_skin_list={
     huangzhong:1,
     huatuo:4,
     jiangqing:1,
-    jiangwei:4,
+    jiangwei:5,
     jianyong:2,
     jiaxu:3,
     jsp_zhaoyun:1,

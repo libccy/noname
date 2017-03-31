@@ -26,7 +26,7 @@ character.sp={
 		maliang:['male','shu',3,['xiemu','naman']],
 		sp_pangtong:['male','qun',3,['manjuan','zuixiang']],
 		zhugedan:['male','wei',4,['gongao','juyi']],
-		sp_jiangwei:['male','shu',4,['kunfen','fengliang']],
+		sp_jiangwei:['male','wei',4,['kunfen','fengliang']],
 		sp_machao:['male','qun',4,['zhuiji','cihuai']],
 		sunhao:['male','wu',5,['canshi','chouhai','guiming']],
 		shixie:['male','qun',3,['biluan','lixia']],
