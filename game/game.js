@@ -2197,6 +2197,15 @@
                             }
                         }
                     },
+					buttoncharacter_style:{
+						name:'选将样式',
+						init:'default',
+						item:{
+							default:'默认',
+							old:'旧版'
+						},
+						unfrequent:true,
+					},
 					cursor_style:{
 						name:'鼠标指针',
 						init:'auto',
@@ -34217,25 +34226,47 @@
 								}
 							}
 						}
-						if(infoitem[2]>14){
-							node.node.hp.innerHTML=infoitem[2];
-							if(infoitem[2]==Infinity){
-								node.node.hp.innerHTML='∞';
+						node.node.name.innerHTML=get.slimName(item);
+						if(lib.config.buttoncharacter_style=='default'){
+							node.node.hp.dataset.condition='high';
+							node.node.name.dataset.nature=get.groupnature(infoitem[1]);
+							node.classList.add('newstyle');
+							ui.create.div(node.node.hp);
+							var textnode=ui.create.div('.text',get.numStr(infoitem[2]),node.node.hp);
+							if(infoitem[2]<=3){
+								textnode.dataset.nature='watermx';
 							}
-							node.node.hp.classList.add('text');
+							else if(infoitem[2]<=6){
+								textnode.dataset.nature='soilmx';
+							}
+							else{
+								textnode.dataset.nature='firemx';
+							}
+							// if(infoitem[2]>0){
+							// 	node.node.hp.innerHTML=get.numStr(infoitem[2]);
+							// 	node.node.hp.classList.add('text');
+							// }
+							// else{
+							// 	for(var i=0;i<infoitem[2];i++){
+							// 		ui.create.div('',node.node.hp);
+							// 		ui.create.node('br',node.node.hp);
+							// 	}
+							// }
 						}
 						else{
-							for(var i=0;i<infoitem[2];i++){
-								ui.create.div('',node.node.hp);
+							if(infoitem[2]>14){
+								node.node.hp.innerHTML=get.numStr(infoitem[2]);
+								node.node.hp.classList.add('text');
+							}
+							else{
+								for(var i=0;i<infoitem[2];i++){
+									ui.create.div('',node.node.hp);
+								}
 							}
 						}
-						// if(!lib.config.show_name){
-						// 	node.node.name.style.display='none';
-						// }
 						if(node.node.hp.childNodes.length==0){
 							node.node.name.style.top='8px';
 						}
-						node.node.name.innerHTML=get.slimName(item);
                         if(node.node.name.querySelectorAll('br').length>=4){
                             node.node.name.classList.add('long');
                             node.addEventListener('mouseenter',ui.click.buttonnameenter);
@@ -37969,14 +38000,19 @@
 			if(lib.characterIntro[name]) return lib.characterIntro[name];
 			return '暂无武将介绍';
 		},
-		groupnature:function(group){
+		groupnature:function(group,method){
+			var nature;
 			switch(group){
-				case 'wei':return 'watermm';
-				case 'shu':return 'soilmm';
-				case 'wu':return 'woodmm';
-				case 'qun':return 'metalmm';
+				case 'wei':nature='water';break;
+				case 'shu':nature='soil';break;
+				case 'wu':nature='wood';break;
+				case 'qun':nature='metal';break;
 				default:return '';
 			}
+			if(method=='raw'){
+				return nature;
+			}
+			return nature+'mm';
 		},
 		sgn:function(num){
 			if(num>0) return 1;

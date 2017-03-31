@@ -188,7 +188,10 @@ character.hearth={
 					var att=-ai.get.attitude(player,target);
 					if(att<=0) return 0;
 					if(target.needsToDiscard()) att+=3;
-					if(target.needsToDiscard(1)) att++;
+					else if(target.needsToDiscard(1)) att++;
+					else if(target.countCards()<=3){
+						return 0;
+					}
 					return att+target.countCards('h')+ai.get.threaten(target);
 				};
 				'step 1'

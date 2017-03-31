@@ -1587,6 +1587,36 @@ div:not(.handcards)>.card>.info>span,
 	top: -6px;
 	left: 72px;
 }
+.button.character.newstyle>.identity{
+	display: none;
+}
+.button.newstyle>.name{
+	top: 8px;
+}
+.button.newstyle>.hp,
+.button.newstyle>.hp.text{
+	left: auto;
+	top: 5px;
+	text-align: right;
+	right: 6px;
+}
+.button.newstyle>.hp>div{
+	width: 10px;
+	height: 10px;
+	background: rgba(57, 123, 4,1);
+	border: 1px solid rgba(39, 79, 7, 1);
+	box-shadow: rgba(0,0,0,0.2) 1px -1px 2px inset, rgba(255,255,255,0.15) -1px 1px 5px inset;
+}
+.button.newstyle>.hp>div.text{
+	background: none !important;
+	box-shadow: none !important;
+	border: none !important;
+	font-family: 'xinwei';
+	/*margin-left: 2px;*/
+	text-align: right;
+	width: auto;
+	height: auto;
+}
 /*--------确认--------*/
 #control {
 	text-align: center;
@@ -3128,6 +3158,11 @@ span[data-nature='firem'] {
 	text-shadow: black 0 0 1px,rgba(232, 53, 53,1) 0 0 2px,rgba(232, 53, 53,1) 0 0 5px,rgba(232, 53, 53,1) 0 0 5px,
 		rgba(232, 53, 53,1) 0 0 5px,black 0 0 1px;
 }
+div[data-nature='firemx'],
+span[data-nature='firemx'] {
+	text-shadow: black 0 0 1px,rgba(191, 0, 0,0.2) 0 0 2px,rgba(191, 0, 0,1) 0 0 2px,rgba(191, 0, 0,1) 0 0 5px,
+		rgba(191, 0, 0,1) 0 0 5px,black 0 0 1px;
+}
 
 .player .identity[data-color="mingzhong"] {
 	text-shadow: black 0 0 1px,rgba(255, 120, 0,1) 0 0 2px,rgba(255, 120, 0,1) 0 0 5px,rgba(255, 120, 0,1) 0 0 10px,
@@ -3204,6 +3239,11 @@ span[data-nature='watermm'] {
 	text-shadow: rgba(78, 117, 140,1) 0 0 2px,rgba(78, 117, 140,1) 0 0 2px,rgba(78, 117, 140,1) 0 0 2px,
 		rgba(78, 117, 140,1) 0 0 2px,black 0 0 1px;
 }
+div[data-nature='watermx'],
+span[data-nature='watermx'] {
+	text-shadow: rgba(0,0,0,0.4) 0 0 1px,rgba(20, 83, 140,1) 0 0 2px,rgba(20, 83, 140,1) 0 0 2px,rgba(20, 83, 140,1) 0 0 5px,
+		rgba(20, 83, 140,1) 0 0 5px,black 0 0 1px;
+}
 
 .player .identity[data-color="shu"],
 div[data-nature='soil'],
@@ -3220,6 +3260,11 @@ div[data-nature='soilmm'],
 span[data-nature='soilmm'] {
 	text-shadow: rgba(128, 59, 2,1) 0 0 2px,rgba(128, 59, 2,1) 0 0 2px,rgba(128, 59, 2,1) 0 0 2px,
 		rgba(128, 59, 2,1) 0 0 2px,black 0 0 1px;
+}
+div[data-nature='soilmx'],
+span[data-nature='soilmx'] {
+	text-shadow: rgba(0,0,0,0.4) 0 0 1px,rgba(128, 59, 2,1) 0 0 2px,rgba(128, 59, 2,1) 0 0 2px,rgba(128, 59, 2,1) 0 0 5px,
+		rgba(128, 59, 2,1) 0 0 5px,black 0 0 1px;
 }
 
 .player .identity[data-color="unknownx"],

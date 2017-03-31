@@ -25,7 +25,7 @@ window.noname_update={
         // 'mode/stone.js',
         // 'theme/music/style.css',
         // 'theme/woodden/style.css',
-        // 'layout/default/layout.css',
+        'layout/default/layout.css',
         // 'layout/default/phone.css',
         // 'layout/default/menu.css',
         // 'theme/style/cardback/*',
