@@ -169,6 +169,47 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		mengye:{
+			trigger:{global:'phaseBegin'},
+			priority:19,
+			filter:function(event,player){
+				if(get.mode()=='identity'&&_status.mode=='zhong'&&game.zhu&&!game.zhu.isZhu) return false;
+				if(event.player.identity=='zhu'||get.is.jun(event.player)) return false;
+				return !player.isTurnedOver()&&event.player!=player;
+			},
+			check:function(event,player){
+				var att=ai.get.attitude(player,event.player);
+				return att<=-3&&!game.hasPlayer(function(current){
+					return ai.get.attitude(player,current)<att;
+				});
+			},
+			logTarget:'player',
+			content:function(){
+				player.turnOver();
+				trigger.player.storage.mengye=player;
+				trigger.player.addSkill('mengye');
+				trigger.player.ai.modAttitudeFrom=function(from,to){
+					return ai.get.attitude(player,to);
+				}
+				trigger.player.ai.modAttitudeTo=function(){
+					return 0;
+				}
+				// if()
+			}
+		},
+		mengye2:{
+			temp:true,
+			mark:true,
+			intro:{
+				content:'由$控制本回合行动'
+			},
+			onremove:true,
+			trigger:{player:['phaseAfter','dieBegin']},
+			forced:true,
+			content:function(){
+
+			}
+		},
 		lianzhan:{
 			trigger:{source:'damageEnd'},
 			forced:true,
@@ -6117,7 +6158,8 @@ character.hearth={
 		hs_wujiyuansu:'无羁元素',
 
 		mengye:'梦魇',
-		mengye_info:'在一名其他角色的回合开始前，若你的武将牌正面朝上，你可以翻面并代替其进行一回合行动',
+		mengye2:'梦魇',
+		mengye_info:'在一名非主公的其他角色的回合开始前，若你的武将牌正面朝上，你可以翻面并代替其进行一回合行动',
 		fuhua:'腐化',
 		fuhua2:'腐化',
 		fuhua_info:'出牌阶段，你可以将一张毒交给一名没有魔血技能的其他角色，该角色选择一项：1. 获得技能魔血，此后每个出牌阶段开始时需交给你一张牌；2. 视为你对其使用一张决斗，若你因此受到伤害，本局不能再对其发动腐化',

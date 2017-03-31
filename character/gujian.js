@@ -642,40 +642,6 @@ character.gujian={
 				}
 			}
 		},
-		meiying_old:{
-			trigger:{global:'phaseBefore'},
-			filter:function(event,player){
-				return event.player!=player&&!player.isTurnedOver()&&!player.storage.meiying;
-			},
-			check:function(event,player){
-				return ai.get.attitude(player,event.player)<0&&
-				((player.countCards('h')>player.hp&&player.countCards('h','lebu')==0)||get.distance(player,event.player)>1);
-			},
-			logTarget:'player',
-			content:function(){
-				"step 0"
-				player.line(trigger.player,'green');
-				player.phase();
-				player.storage.meiying=trigger.player;
-				"step 1"
-				if(!player.isTurnedOver()){
-					player.turnOver();
-				}
-				delete player.storage.meiying;
-			},
-			mod:{
-				targetInRange:function(card,player,target,now){
-					if(target==player.storage.meiying) return true;
-				},
-			},
-			ai:{
-				effect:{
-					target:function(card){
-						if(card.name=='guiyoujie') return [0,0];
-					}
-				}
-			}
-		},
 		xidie:{
 			trigger:{player:'phaseBegin'},
 			direct:true,
@@ -869,7 +835,7 @@ character.gujian={
 				}
 				if(trigger.source){
 					trigger.source.storage.mingkong=true;
-					trigger.source.addTempSkill('mingkong2','phaseBefore');
+					trigger.source.addTempSkill('mingkong2','phaseAfter');
 				}
 			},
 			ai:{

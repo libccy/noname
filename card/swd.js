@@ -4579,33 +4579,6 @@ card.swd={
 				}
 			}
 		},
-		xujin:{
-			trigger:{player:'phaseBefore'},
-			check:function(){return false;},
-			filter:function(event,player){
-				return player.storage.xujin<player.hp;
-			},
-			content:function(){
-				player.storage.xujin++;
-				trigger.untrigger();
-				trigger.finish();
-			},
-			intro:{
-				content:'已积攒#点力量'
-			},
-			group:['xujin2']
-		},
-		xujin2:{
-			trigger:{source:'damageBegin'},
-			forced:true,
-			filter:function(event,player){
-				return player.storage.xujin>0;
-			},
-			content:function(){
-				trigger.num+=player.storage.xujin;
-				player.storage.xujin--;
-			}
-		},
 		sadengjinhuan:{
 			trigger:{player:'shaMiss'},
 			check:function(event,player){

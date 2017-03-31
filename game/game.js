@@ -23966,14 +23966,16 @@
 					players[i].style.transition='all 0s';
 				}
 				game.addVideo('swapPlayer',player,get.cardsInfo(player.getCards('h')));
-				var pos=parseInt(player.dataset.position);
-				var num=game.players.length+game.dead.length;
-				var players=game.players.concat(game.dead);
-				var temp;
-				for(var i=0;i<players.length;i++){
-					temp=parseInt(players[i].dataset.position)-pos;
-					if(temp<0) temp+=num;
-					players[i].dataset.position=temp;
+				if(!game.chess){
+					var pos=parseInt(player.dataset.position);
+					var num=game.players.length+game.dead.length;
+					var players=game.players.concat(game.dead);
+					var temp;
+					for(var i=0;i<players.length;i++){
+						temp=parseInt(players[i].dataset.position)-pos;
+						if(temp<0) temp+=num;
+						players[i].dataset.position=temp;
+					}
 				}
 				game.me.node.handcards1.remove();
 				game.me.node.handcards2.remove();
