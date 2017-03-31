@@ -1175,7 +1175,7 @@ mode.identity={
 					}
 				}
 				if(event.zhongmode){
-					list=event.list.randomGets(6);
+					list=event.list.randomGets(8);
 				}
 				else{
 					list=list2.concat(list3.randomGets(3));
@@ -1219,7 +1219,7 @@ mode.identity={
 
 				var num,num2=0;
 				if(event.zhongmode){
-					num=3;
+					num=6;
 				}
 				else{
 					num=Math.floor(event.list.length/(game.players.length-1));
@@ -1236,12 +1236,16 @@ mode.identity={
 				}
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=game.zhu){
-						var num3;
-						if(game.players[i].identity=='nei'){
-							num3=num2;
+						var num3=0;
+						if(event.zhongmode){
+							if(game.players[i].identity=='nei'||game.players[i].identity=='zhu'){
+								num3=2;
+							}
 						}
 						else{
-							num3=0;
+							if(game.players[i].identity=='nei'){
+								num3=num2;
+							}
 						}
 						list.push([game.players[i],['选择角色',[event.list.randomRemove(num+num3),'character']],selectButton,true]);
 					}

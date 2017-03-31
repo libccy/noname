@@ -19,7 +19,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:22,
+        versionOL:23,
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
         mirrorURL:'https://coding.net/u/libccy/p/noname/git/raw',
 		extensionURL:'https://coding.net/u/libccy/p/noname-extension/git/raw/master/',
