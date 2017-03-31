@@ -40495,8 +40495,18 @@
             attitude:function(from,to){
 				if(!from||!to) return 0;
 				var att=ai.get.rawAttitude.apply(this,arguments);
-				if(from.isMad()) return -att;
-                if(to.isMad()&&att>0) return 0;
+				if(from.isMad()) att=-att;
+				if(to.isMad()&&att>0) att=0;
+				if(!_status.tempnofake){
+					_status.tempnofake=true;
+					if(from.ai.modAttitudeFrom){
+						att=from.ai.modAttitudeFrom(from,to,att);
+					}
+					if(to.ai.modAttitudeTo){
+						att=to.ai.modAttitudeTo(from,to,att);
+					}
+					delete _status.tempnofake;
+				}
 				return att;
 			},
 			useful:function(card){

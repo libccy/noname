@@ -67,13 +67,13 @@ character.hearth={
 		hs_hudunren:['male','shu',2,['hhudun']],
 		hs_nate:['male','wu',4,['chuidiao']],
 		hs_jiaziruila:['male','wu',4,['hannu']],
-		// hs_shifazhe:['male','wei',3,['jizhi','shifa']],
+		hs_shifazhe:['male','wei',3,['shifa']],
 		hs_lafamu:['male','shu',4,['xieneng']],
 		hs_yelise:['female','wei',3,['xunbao','zhuizong']],
 
 		hs_fandral:['male','shu',4,['nuyan','chouhuo']],
 		hs_hallazeal:['male','wei',4,['shengteng','yuansu']],
-		// hs_nzoth:['male','shu',4,['nuyan']],
+		hs_nzoth:['male','shu',4,['mengye']],
 		hs_walian:['male','shu',4,['wzhanyi']],
 		// hs_pengpeng:['male','qun',4,['zhadan']],
 		// hs_yashaji:['male','wei',3,[]],
@@ -2641,17 +2641,39 @@ character.hearth={
 			forced:true,
 			content:function(){
 				'step 0'
-				var players=game.filterPlayer();
 				var list=[];
-				for(var i in lib.card){
-					if(!lib.translate[i+'_info']) continue;
-					if(lib.card[i].mode&&lib.card[i].mode.contains(lib.config.mode)==false) continue;
-					if(lib.card[i].type=='trick') list.push(i);
+				var target=player.getEnemies().randomGet();
+				for(var i=0;i<lib.inpile.length;i++){
+					if(lib.card[lib.inpile[i]].type=='trick'){
+						list.push(lib.inpile[i]);
+					}
 				}
-				for(var i=0;i<players.length;i++){
-					players[i].gain(game.createCard(list.randomGet()));
-					players[i].$draw();
+				player.gain(game.createCard(list.randomGet()));
+				player.$draw();
+				if(target){
+					target.gain(game.createCard(list.randomGet()));
+					target.$draw();
+					target.addExpose(0.2);
+					player.line(target,'green');
 				}
+				'step 1'
+				game.delay();
+			},
+			group:'shifa_draw',
+			subSkill:{
+				draw:{
+					trigger:{player:'useCard'},
+					frequent:true,
+					filter:function(event){
+						return (get.type(event.card)=='trick'&&event.cards[0]&&event.cards[0]==event.card);
+					},
+					content:function(){
+						player.draw();
+					}
+				}
+			},
+			ai:{
+				threaten:1.5
 			}
 		},
 		yuanzheng:{
@@ -6092,6 +6114,8 @@ character.hearth={
 		hs_fenjie:'芬杰',
 		hs_wujiyuansu:'无羁元素',
 
+		mengye:'梦魇',
+		mengye_info:'在一名其他角色的回合开始前，若你的武将牌正面朝上，你可以翻面并代替其进行一回合行动',
 		fuhua:'腐化',
 		fuhua2:'腐化',
 		fuhua_info:'出牌阶段，你可以将一张毒交给一名没有魔血技能的其他角色，该角色选择一项：1. 获得技能魔血，此后每个出牌阶段开始时需交给你一张牌；2. 视为你对其使用一张决斗，若你因此受到伤害，本局不能再对其发动腐化',
@@ -6233,8 +6257,8 @@ character.hearth={
 
 		lianzhan:'连斩',
 		lianzhan_info:'每当你造成一次伤害，若此伤害是你本回合第一次造成伤害，你摸两张牌；否则你增加一点体力上限并 回复一点体力',
-		shifa:'嗜法',
-		shifa_info:'锁定技，出牌阶段开始时，你令场上所有角色各获得一张随机锦囊牌',
+		shifa:'魔瘾',
+		shifa_info:'锁定技，每当你使用一张非转化的普通锦囊牌，你摸一张牌；出牌阶段开始时，你令你与一名随机敌人各获得一张随机普通锦囊牌',
 		yuanzheng:'远征',
 		yuanzheng_info:'每当你对距离1以外的角色使用一张牌，你可以弃置目标区域内的一张牌',
 		bzhuiji:'追击',

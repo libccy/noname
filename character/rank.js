@@ -402,6 +402,7 @@ window.characterRank={
         'swd_jiting',
         'hs_nozdormu',
         'zhoucang',
+        'hs_shifazhe',
     ],
     b:[
         'sp_daqiao',
