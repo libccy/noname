@@ -34242,16 +34242,6 @@
 							else{
 								textnode.dataset.nature='firemx';
 							}
-							// if(infoitem[2]>0){
-							// 	node.node.hp.innerHTML=get.numStr(infoitem[2]);
-							// 	node.node.hp.classList.add('text');
-							// }
-							// else{
-							// 	for(var i=0;i<infoitem[2];i++){
-							// 		ui.create.div('',node.node.hp);
-							// 		ui.create.node('br',node.node.hp);
-							// 	}
-							// }
 						}
 						else{
 							if(infoitem[2]>14){
