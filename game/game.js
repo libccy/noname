@@ -2991,11 +2991,9 @@
 							if(map[i]._link.config.type=='autoskill'){
 								if(!lib.config.autoskilllist.contains(i)){
 									map[i].classList.add('on');
-									// ui.autoskill[i].lastChild.classList.add('on');
 								}
 								else{
 									map[i].classList.remove('on');
-									// ui.autoskill[i].lastChild.classList.remove('on');
 								}
 							}
 							else if(map[i]._link.config.type=='banskill'){
@@ -15418,7 +15416,7 @@
 					card=get.autoViewAs(card,null,player);
 					var num=get.info(card).usable;
 					if(typeof num=='function') num=num(card,player);
-					num=game.checkMod(card,player,num,'cardUsable',player.getSkills());
+					num=game.checkMod(card,player,num,'cardUsable',player);
 					if(typeof num!='number') return Infinity;
 					if(!pure&&_status.currentPhase==player){
 						return num-get.cardCount(card,player);
@@ -24993,7 +24991,11 @@
 		},
 		checkMod:function(){
 			var name=arguments[arguments.length-2];
-			var skills=arguments[arguments.length-1].concat(lib.skill.global);
+			var skills=arguments[arguments.length-1];
+			if(skills.getSkills){
+				skills=skills.getSkills();
+			}
+			skills=skills.concat(lib.skill.global);
 			game.expandSkills(skills);
 			var arg=[],i,info;
 			for(i=0;i<arguments.length-2;i++){
@@ -33815,23 +33817,6 @@
                 game.documentZoom=game.deviceZoom*zoom;
                 document.documentElement.style.zoom=game.documentZoom;
 
-				// var autoskill={};
-				// ui.autoskill=autoskill;
-				//
-				// if(!lib.config.autoskilllist){
-				// 	lib.config.autoskilllist=[];
-				// }
-				// var nodex;
-				// for(i in lib.skill){
-				// 	if(lib.skill[i].frequent&&lib.translate[i]){
-				// 		lib.translate[i+'_forbid_config']=lib.translate[i+'_noconf']||lib.translate[i];
-				// 		nodex=ui.create.switcher(i+'_forbid',
-				// 			!lib.config.autoskilllist.contains(i),ui.click.autoskill);
-				// 		nodex.link=i;
-				// 		autoskill[i]=nodex;
-				// 	}
-				// }
-
 				ui.system1=ui.create.div('#system1',ui.system);
 				ui.system2=ui.create.div('#system2',ui.system);
 
@@ -34970,36 +34955,6 @@
 					}
 					uiintro.add(node);
 				}
-				// if(_status.video) return uiintro;
-				//
-				// var auto=null;
-				// var ng=null;
-				// var sks=[];
-				// var autoskill=ui.autoskill;
-				// if(game.players){
-				// 	for(var i=0;i<game.players.length;i++){
-				// 		if(game.players[i]==game.me||game.players[i].isUnderControl()){
-				// 			sks=sks.concat(game.expandSkills(game.players[i].getSkills()));
-				// 		}
-				// 	}
-				// }
-				// for(var i=0;i<sks.length;i++){
-				// 	if(autoskill[sks[i]]){
-				// 		if(!auto){
-				// 			ng=ui.create.div('.text');
-				// 			ng.style.marginBottom=0;
-				// 			ng.innerHTML='新游戏';
-				// 			uiintro.content.insertBefore(ng,uiintro.content.firstChild);
-				//
-				// 			auto=ui.create.div('.text');
-				// 			auto.style.marginBottom=0;
-				// 			auto.innerHTML='自动发动';
-				// 			uiintro.add(auto);
-				// 		}
-				// 		autoskill[sks[i]].style.display='';
-				// 		uiintro.add(autoskill[sks[i]]);
-				// 	}
-				// }
 
 				return uiintro;
 			},
@@ -38804,8 +38759,9 @@
 				return get.suit(card.cards);
 			}
 			else{
-				if(get.owner(card)){
-					return game.checkMod(card,card.suit,'suit',get.owner(card).getSkills());
+				var owner=get.owner(card);
+				if(owner){
+					return game.checkMod(card,card.suit,'suit',owner);
 				}
 				return card.suit;
 			}
@@ -38920,11 +38876,11 @@
 				if(method=='raw'||method=='pure') return n;
 			}
 
-			n=game.checkMod(from,to,n,'globalFrom',from.getSkills());
-			n=game.checkMod(from,to,n,'globalTo',to.getSkills());
+			n=game.checkMod(from,to,n,'globalFrom',from);
+			n=game.checkMod(from,to,n,'globalTo',to);
 			m=n;
-			m=game.checkMod(from,to,m,'attackFrom',from.getSkills());
-			m=game.checkMod(from,to,m,'attackTo',to.getSkills());
+			m=game.checkMod(from,to,m,'attackFrom',from);
+			m=game.checkMod(from,to,m,'attackTo',to);
 			var equips1=from.getCards('e'),equips2=to.getCards('e');
 			for(i=0;i<equips1.length;i++){
 				var info=get.info(equips1[i]).distance;
