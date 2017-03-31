@@ -73,7 +73,7 @@ character.hearth={
 
 		hs_fandral:['male','shu',4,['nuyan','chouhuo']],
 		hs_hallazeal:['male','wei',4,['shengteng','yuansu']],
-		hs_nzoth:['male','shu',4,['mengye']],
+		hs_enzoth:['male','qun',4,['mengye']],
 		hs_walian:['male','shu',4,['wzhanyi']],
 		// hs_pengpeng:['male','qun',4,['zhadan']],
 		// hs_yashaji:['male','wei',3,[]],
@@ -170,46 +170,98 @@ character.hearth={
 	},
 	skill:{
 		mengye:{
-			trigger:{global:'phaseBegin'},
-			priority:19,
+			trigger:{player:'phaseAfter'},
+			priority:-50,
+			direct:true,
 			filter:function(event,player){
-				if(get.mode()=='identity'&&_status.mode=='zhong'&&game.zhu&&!game.zhu.isZhu) return false;
-				if(event.player.identity=='zhu'||get.is.jun(event.player)) return false;
-				return !player.isTurnedOver()&&event.player!=player;
+				return !player.isTurnedOver();
 			},
-			check:function(event,player){
-				var att=ai.get.attitude(player,event.player);
-				return att<=-3&&!game.hasPlayer(function(current){
-					return ai.get.attitude(player,current)<att;
-				});
-			},
-			logTarget:'player',
 			content:function(){
-				player.turnOver();
-				trigger.player.storage.mengye=player;
-				trigger.player.addSkill('mengye');
-				trigger.player.ai.modAttitudeFrom=function(from,to){
-					return ai.get.attitude(player,to);
+				'step 0'
+				player.chooseTarget(get.prompt('mengye'),function(card,player,target){
+					if(get.mode()=='identity'&&_status.mode=='zhong'&&game.zhu&&!game.zhu.isZhu){
+						return target==game.zhong;
+					}
+					if(target.identity=='zhu'||get.is.jun(target)) return false;
+					return target!=player;
+				}).ai=function(target){
+					var att=-ai.get.attitude(player,target);
+					if(att<=0) return 0;
+					if(target.needsToDiscard()) att+=3;
+					if(target.needsToDiscard(1)) att++;
+					return att+target.countCards('h')+ai.get.threaten(target);
+				};
+				'step 1'
+				if(result.bool){
+                    var target=result.targets[0];
+                    player.logSkill('mengye',target);
+					target.storage.mengye2=player;
+					target.storage.mengye4=target.ai.shown;
+					target.addSkill('mengye2');
+					event.target=target;
+					player.turnOver();
 				}
-				trigger.player.ai.modAttitudeTo=function(){
-					return 0;
+				else{
+					event.finish();
 				}
-				// if()
+				'step 2'
+				game.delay();
+				'step 3'
+				var target=event.target;
+				if(player==game.me){
+					game.swapPlayerAuto(target);
+					target.storage.mengye3=true;
+				}
+				else{
+					target.addSkill('mad');
+					target.unmarkSkill('mad');
+				}
+				player.out('mengye');
+				target.phase();
+			},
+			ai:{
+				threaten:2
 			}
 		},
 		mengye2:{
 			temp:true,
-			mark:true,
+			mark:'character',
 			intro:{
 				content:'由$控制本回合行动'
 			},
-			onremove:true,
+			init:function(player){
+				player.ai.modAttitudeFrom=function(from,to){
+					return ai.get.attitude(player.storage.mengye2,to);
+				}
+				player.ai.modAttitudeTo=function(from,to,att){
+					if(from!=to) return 0;
+					return att;
+				}
+			},
+			onremove:function(player){
+				delete player.ai.modAttitudeFrom;
+				delete player.ai.modAttitudeTo;
+				delete player.storage.mengye2;
+				delete player.storage.mengye3;
+				delete player.storage.mengye4;
+			},
 			trigger:{player:['phaseAfter','dieBegin']},
 			forced:true,
+			popup:false,
 			content:function(){
-
+				player.storage.mengye2.in('mengye');
+				if(player==game.me&&player.storage.mengye3){
+					game.swapPlayerAuto(player.storage.mengye2);
+				}
+				if(typeof player.ai.shown=='number'){
+					player.ai.shown=player.storage.mengye4;
+				}
+				player.removeSkill('mad');
+				player.removeSkill('mengye2');
+				player.loseHp();
 			}
 		},
+		mengye3:{},
 		lianzhan:{
 			trigger:{source:'damageEnd'},
 			forced:true,
@@ -6119,7 +6171,7 @@ character.hearth={
 		hs_blingtron:'布林顿',
 		hs_fandral:'范达尔',
 		hs_hallazeal:'海纳泽尔',
-		hs_nzoth:'恩佐斯',
+		hs_enzoth:'恩佐斯',
 		hs_walian:'瓦里安',
 		hs_pengpeng:'砰砰博士',
 		hs_aya:'艾雅',
@@ -6159,7 +6211,7 @@ character.hearth={
 
 		mengye:'梦魇',
 		mengye2:'梦魇',
-		mengye_info:'在一名非主公的其他角色的回合开始前，若你的武将牌正面朝上，你可以翻面并代替其进行一回合行动',
+		mengye_info:'回合结束后，你可以翻面并指定一名的非主公角色，由你控制其进行一个额外的回合。在此回合中，你的本体不参与游戏',
 		fuhua:'腐化',
 		fuhua2:'腐化',
 		fuhua_info:'出牌阶段，你可以将一张毒交给一名没有魔血技能的其他角色，该角色选择一项：1. 获得技能魔血，此后每个出牌阶段开始时需交给你一张牌；2. 视为你对其使用一张决斗，若你因此受到伤害，本局不能再对其发动腐化',

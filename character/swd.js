@@ -7721,10 +7721,12 @@ character.swd={
 			forceunique:true,
 			skillAnimation:true,
 			filter:function(event,player){
-				if(get.mode()=='identity'&&_status.mode=='zhong'&&game.zhu&&!game.zhu.isZhu) return false;
 				return !player.storage.duijue;
 			},
 			filterTarget:function(card,player,target){
+				if(get.mode()=='identity'&&_status.mode=='zhong'&&game.zhu&&!game.zhu.isZhu){
+					return target==game.zhong;
+				}
 				if(target.identity=='zhu'||get.is.jun(target)) return false;
 				return player!=target;
 			},

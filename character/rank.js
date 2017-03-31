@@ -54,6 +54,7 @@ window.characterRank={
         'hs_tyrande',
     ],
     a:[
+        'hs_enzoth',
         'hs_sapphiron',
         'gw_airuiting',
         'gw_dagong',

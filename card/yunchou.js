@@ -5,7 +5,9 @@ card.yunchou={
 			type:'trick',
 			enable:true,
 			selectTarget:-1,
-			filterTarget:true,
+			filterTarget:function(card,player,target){
+				return player==target||target.countCards('h');
+			},
 			contentBefore:function(){
 				"step 0"
 				game.delay();
@@ -1039,7 +1041,10 @@ card.yunchou={
 					source:trigger.player,
 					evt:trigger
 				};
-				player.chooseToUse({name:'youdishenru'},'是否使用诱敌深入？').set('source',trigger.player);
+				player.chooseToUse(function(card,player){
+					if(card.name!='youdishenru') return false;
+					return lib.filter.cardEnabled(card,player,'forceEnable');
+				},'是否使用诱敌深入？').set('source',trigger.player);
 			}
 		},
 		_chenhuodajie:{
@@ -1108,7 +1113,7 @@ card.yunchou={
 	},
 	translate:{
 		diaobingqianjiang:'调兵遣将',
-		diaobingqianjiang_info:'出牌阶段，对所有角色使用。你摸一张牌，然后亮出牌堆顶的X张牌（X为存活角色数的一半，向上取整），目标可以用一张手牌替换其中的一张牌。结算后，你可以将剩余的牌中的任意张以任意顺序置于牌堆顶',
+		diaobingqianjiang_info:'出牌阶段，对你及其他有手牌的角色使用。你摸一张牌，然后亮出牌堆顶的X张牌（X为存活角色数的一半，向上取整），目标可以用一张手牌替换其中的一张牌。结算后，你可以将剩余的牌中的任意张以任意顺序置于牌堆顶',
 		caochuanjiejian:'草船借箭',
 		caochuanjiejian_info:'出牌阶段对一名有手牌的其他角色使用，目标选择一项：将手牌中的所有杀（至少1张）交给你，并视为对你使用一张杀；或展示手牌并令你弃置任意张',
 		xiaolicangdao:'笑里藏刀',

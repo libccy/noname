@@ -398,7 +398,7 @@ window.noname_asset_list=[
     'image/character/hs_neptulon.jpg',
     'image/character/hs_nozdormu.jpg',
     'image/character/hs_nuogefu.jpg',
-    'image/character/hs_nzoth.jpg',
+    'image/character/hs_enzoth.jpg',
     'image/character/hs_ronghejuren.jpg',
     'image/character/hs_ruanniguai.jpg',
     'image/character/hs_sainaliusi.jpg',

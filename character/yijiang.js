@@ -6541,6 +6541,9 @@ character.yijiang={
 			usable:1,
 			discard:false,
 			prepare:'give2',
+			filter:function(event,player){
+				return player.countCards('he',{suit:'heart'});
+			},
 			filterCard:function(card){
 				return get.suit(card)=='heart';
 			},

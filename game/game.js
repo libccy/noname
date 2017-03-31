@@ -24057,6 +24057,14 @@
 				}
 			}
 		},
+		swapPlayerAuto:function(player){
+			if(game.modeSwapPlayer){
+				game.modeSwapPlayer(player);
+			}
+			else{
+				game.swapPlayer(player);
+			}
+		},
 		findNext:function(player){
 			var players=get.players(lib.sort.position);
 			var position=parseInt(player.dataset.position);
