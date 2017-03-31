@@ -7662,9 +7662,7 @@
                 }
                 target=target||game.me;
                 for(var i=0;i<cards.length;i++){
-                    var str=get.subtype(cards[i])[5];
-                    if(!str) continue;
-                    var card=target.getEquip(parseInt(str));
+                    var card=target.getEquip(cards[i]);
                     if(card){
                         console.log(card);
                         ui.discardPile.appendChild(card);
@@ -24962,7 +24960,7 @@
 					if(card.ai.basic.value==undefined)card.ai.basic.value=function(card,player){
 						var value=0;
 						var info=get.info(card);
-						var current=player.getEquip(parseInt(info.subtype[5]));
+						var current=player.getEquip(info.subtype);
 						if(current&&card!=current){
 							value=ai.get.value(current,player);
 						}
@@ -40562,7 +40560,7 @@
 				}
 				var value1=ai.get.value(card,target);
 				var value2=0;
-				var current=target.getEquip(parseInt(get.subtype(card)[5]));
+				var current=target.getEquip(card);
 				if(current&&current!=card){
 					value2=ai.get.value(current,target);
 					if(value2>0&&!target.needsToDiscard()){

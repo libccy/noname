@@ -4962,7 +4962,7 @@ character.yijiang={
 				"step 0"
 				var next;
 				if(trigger.player.hasCard(function(card){
-					return !player.getEquip(parseInt(get.subtype(card)[5]));
+					return !player.getEquip(card);
 				},'e')){
 					next=player.chooseControl('移动装备','draw_card','cancel2',function(event,player){
 						var source=_status.event.source;
