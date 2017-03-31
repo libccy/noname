@@ -18238,12 +18238,19 @@
 			cardEnabled:function(card,player,event){
 				card=get.autoViewAs(card,null,player);
 				if(player==undefined) player=_status.event.player;
-				var filter=get.info(card).enable;
-				if(!filter) return;
-				var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.getSkills());
-				if(mod!='unchanged') return mod;
-				if(typeof filter=='boolean') return filter;
-				if(typeof filter=='function') return filter(card,player);
+				if(event==='forceEnable'){
+					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.getSkills());
+					if(mod!='unchanged') return mod;
+					return true;
+				}
+				else{
+					var filter=get.info(card).enable;
+					if(!filter) return;
+					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.getSkills());
+					if(mod!='unchanged') return mod;
+					if(typeof filter=='boolean') return filter;
+					if(typeof filter=='function') return filter(card,player);
+				}
 			},
 			cardRespondable:function(card,player){
 				if(_status.event.name!='chooseToRespond') return true;

@@ -1590,9 +1590,7 @@ card.standard={
 				event.tempnowuxie=(trigger.targets&&trigger.targets.length>1&&!trigger.multitarget);
 				event.filterCard=function(card,player){
 					if(card.name!='wuxie') return false;
-					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.getSkills());
-					if(mod!='unchanged') return mod;
-					return true;
+					return lib.filter.cardEnabled(card,player,'forceEnable');
 				};
 				event.send=function(player,state,isJudge,card,source,target,targets,id,id2,tempnowuxie,skillState){
 					if(skillState){
