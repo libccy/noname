@@ -15428,8 +15428,8 @@
 				getAttackRange:function(){
 					var player=this;
 					var range=0;
-					range=game.checkMod(player,player,range,'globalFrom',player.getSkills());
-					range=game.checkMod(player,player,range,'attackFrom',player.getSkills());
+					range=game.checkMod(player,player,range,'globalFrom',player);
+					range=game.checkMod(player,player,range,'attackFrom',player);
 					var equips=player.getCards('e');
 					for(var i=0;i<equips.length;i++){
 						var info=get.info(equips[i]).distance;
@@ -15446,7 +15446,7 @@
 				getGlobalFrom:function(){
 					var player=this;
 					var range=0;
-					range=game.checkMod(player,player,range,'globalFrom',player.getSkills());
+					range=game.checkMod(player,player,range,'globalFrom',player);
 					var equips=player.getCards('e');
 					for(var i=0;i<equips.length;i++){
 						var info=get.info(equips[i]).distance;
@@ -15460,7 +15460,7 @@
 				getGlobalTo:function(){
 					var player=this;
 					var range=0;
-					range=game.checkMod(player,player,range,'globalTo',player.getSkills());
+					range=game.checkMod(player,player,range,'globalTo',player);
 					var equips=player.getCards('e');
 					for(var i=0;i<equips.length;i++){
 						var info=get.info(equips[i]).distance;
@@ -15472,7 +15472,7 @@
 					return (range);
 				},
                 getHandcardLimit:function(){
-                    return Math.max(0,game.checkMod(this,this.hp,'maxHandcard',this.getSkills()));
+                    return Math.max(0,game.checkMod(this,this.hp,'maxHandcard',this));
                 },
                 getEnemies:function(func){
                     var player=this;
@@ -18239,14 +18239,14 @@
 				card=get.autoViewAs(card,null,player);
 				if(player==undefined) player=_status.event.player;
 				if(event==='forceEnable'){
-					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.getSkills());
+					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player);
 					if(mod!='unchanged') return mod;
 					return true;
 				}
 				else{
 					var filter=get.info(card).enable;
 					if(!filter) return;
-					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.getSkills());
+					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player);
 					if(mod!='unchanged') return mod;
 					if(typeof filter=='boolean') return filter;
 					if(typeof filter=='function') return filter(card,player);
@@ -18255,7 +18255,7 @@
 			cardRespondable:function(card,player){
 				if(_status.event.name!='chooseToRespond') return true;
 				if(player==undefined) player=_status.event.player;
-				var mod=game.checkMod(card,player,'unchanged','cardRespondable',player.getSkills());
+				var mod=game.checkMod(card,player,'unchanged','cardRespondable',player);
 				if(mod!='unchanged') return mod;
 				return true;
 			},
@@ -18267,13 +18267,13 @@
 				if(event.getParent().player!=player) return true;
 				var num=get.info(card).usable;
 				if(typeof num=='function') num=num(card,player);
-				num=game.checkMod(card,player,num,'cardUsable',player.getSkills());
+				num=game.checkMod(card,player,num,'cardUsable',player);
 				if(typeof num!='number') return true;
 				else return(get.cardCount(card,player)<num);
 			},
             cardDiscardable:function(card,player,event){
                 event=event||_status.event;
-                var mod=game.checkMod(card,player,event.getParent().name,'unchanged','cardDiscardable',player.getSkills());
+                var mod=game.checkMod(card,player,event.getParent().name,'unchanged','cardDiscardable',player);
                 if(mod!='unchanged') return mod;
                 return true;
             },
@@ -18289,10 +18289,10 @@
 				if(card==undefined) return false;
 				var info=get.info(card);
 				var filter=info.filterTarget;
-				var mod=game.checkMod(card,player,target,'unchanged','playerEnabled',player.getSkills());
+				var mod=game.checkMod(card,player,target,'unchanged','playerEnabled',player);
 				if(mod==false) return false;
 				if(!info.singleCard||ui.selected.targets.length==0){
-					var mod=game.checkMod(card,player,target,'unchanged','targetEnabled',target.getSkills());
+					var mod=game.checkMod(card,player,target,'unchanged','targetEnabled',target);
 					if(mod!='unchanged') return mod;
 				}
 				if(typeof filter=='boolean') return filter;
@@ -18307,7 +18307,7 @@
                 return false;
             },
 			targetInRange:function(card,player,target){
-				var mod=game.checkMod(card,player,target,'unchanged','targetInRange',player.getSkills());
+				var mod=game.checkMod(card,player,target,'unchanged','targetInRange',player);
 				var extra=0;
 				if(mod!='unchanged'){
 					if(typeof mod=='boolean') return mod;
@@ -18351,7 +18351,7 @@
 				else if(typeof select=='number') range=[select,select];
 				else if(get.itemtype(select)=='select') range=select;
 				else if(typeof select=='function') range=select(card,player);
-				game.checkMod(card,player,range,'selectTarget',player.getSkills());
+				game.checkMod(card,player,range,'selectTarget',player);
 				return range;
 			},
 			judge:function(card,player,target){
@@ -18733,7 +18733,7 @@
 						player.chooseToUse({
 							filterCard:function(card,player,event){
                                 event=event||_status.event;
-								var mod=game.checkMod(card,player,'unchanged','cardSavable',player.getSkills());
+								var mod=game.checkMod(card,player,'unchanged','cardSavable',player);
 								if(mod!='unchanged') return mod;
 								var savable=get.info(card).savable;
 								if(typeof savable=='function') savable=savable(card,player,event.dying);
