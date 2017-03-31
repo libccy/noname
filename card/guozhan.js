@@ -846,7 +846,7 @@ card.guozhan={
 				}
 				"step 1"
 				if(result.bool){
-					player.phase();
+					player.insertPhase();
 				}
 			},
 		},

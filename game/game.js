@@ -13063,31 +13063,50 @@
 					}
 					this.node.identity.dataset.color=identity;
 				},
+				insertPhase:function(){
+					var evt=_status.event.getParent('phase');
+					var next;
+					if(evt&&evt.parent&&evt.parent.next){
+						next=game.createEvent('phase',null,evt.parent);
+						console.log(evt.parent);
+					}
+					else{
+						next=game.createEvent('phase');
+					}
+					next.player=this;
+                    next.setContent('phase');
+					return next;
+				},
 				phase:function(){
 					var next=game.createEvent('phase');
 					next.player=this;
                     next.setContent('phase');
+					return next;
 				},
 				phaseJudge:function(){
 					var next=game.createEvent('phaseJudge');
 					next.player=this;
                     next.setContent('phaseJudge');
+					return next;
 				},
 				phaseDraw:function(){
 					var next=game.createEvent('phaseDraw');
 					next.player=this;
 					next.num=2;
                     next.setContent('phaseDraw');
+					return next;
 				},
 				phaseUse:function(){
 					var next=game.createEvent('phaseUse');
 					next.player=this;
                     next.setContent('phaseUse');
+					return next;
 				},
 				phaseDiscard:function(){
 					var next=game.createEvent('phaseDiscard');
 					next.player=this;
                     next.setContent('phaseDiscard');
+					return next;
 				},
 				chooseToUse:function(use){
 					var next=game.createEvent('chooseToUse');
@@ -38459,7 +38478,7 @@
                     return num?Math.round(9*(num-1)/8+1):'sp';
                 }
             }
-			return num?Math.round(6*(num-1)/8+1):'x';
+			return num?Math.round(9*(num-1)/8+1):'x';
 		},
         targetsInfo:function(targets){
             var info=[];

@@ -174,16 +174,23 @@ character.hearth={
 			priority:-50,
 			direct:true,
 			filter:function(event,player){
+				if(get.mode()=='identity'&&_status.mode=='zhong'&&
+					game.zhu&&!game.zhu.isZhu&&player==game.zhong){
+					return false;
+				}
 				return !player.isTurnedOver();
 			},
 			content:function(){
 				'step 0'
 				player.chooseTarget(get.prompt('mengye'),function(card,player,target){
+					if(target==player){
+						return false;
+					}
 					if(get.mode()=='identity'&&_status.mode=='zhong'&&game.zhu&&!game.zhu.isZhu){
 						return target==game.zhong;
 					}
 					if(target.identity=='zhu'||get.is.jun(target)) return false;
-					return target!=player;
+					return true;
 				}).ai=function(target){
 					var att=-ai.get.attitude(player,target);
 					if(att<=0) return 0;
@@ -220,7 +227,7 @@ character.hearth={
 					target.unmarkSkill('mad');
 				}
 				player.out('mengye');
-				target.phase();
+				target.insertPhase();
 			},
 			ai:{
 				threaten:2
@@ -3197,7 +3204,7 @@ character.hearth={
 			},
 			content:function(){
 				player.draw();
-				player.phase();
+				player.insertPhase();
 			},
 			ai:{
 				threaten:1.8
