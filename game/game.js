@@ -7344,14 +7344,16 @@
 					ui.css.layout.href=lib.assetURL+'layout/'+game.layout+'/layout.css';
 					if(game.layout=='mobile'||game.layout=='long'){
 						ui.arena.classList.add('mobile');
+					}
+					else{
+						ui.arena.classList.remove('mobile');
+					}
+					if(game.layout=='mobile'||game.layout=='long'||game.layout=='long2'){
 						if(game.me&&game.me.node.handcards2.childNodes.length){
 							while(game.me.node.handcards2.childNodes.length){
 								game.me.node.handcards1.appendChild(game.me.node.handcards2.firstChild);
 							}
 						}
-					}
-					else{
-						ui.arena.classList.remove('mobile');
 					}
 					if(game.layout=='default'){
 						ui.arena.classList.add('oldlayout');

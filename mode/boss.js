@@ -230,17 +230,12 @@ mode.boss={
 			boss.dataset.position=7;
 		}
 		ui.create.me();
+		ui.fakeme=ui.create.div('.fakeme.avatar',ui.me);
 		if(game.me!==boss){
 			game.singleHandcard=true;
 			ui.arena.classList.add('single-handcard');
 			ui.window.classList.add('single-handcard');
-			ui.fakeme=ui.create.div('.fakeme.avatar',ui.me);
-			// ui.fakeme.dataset.position=0;
-			// ui.fakeme.line=lib.element.player.line;
-			// ui.fakemebg=ui.create.div('.avatar',ui.fakeme).hide();
-			// ui.refresh(ui.fakemebg);
 			game.onSwapControl();
-			// ui.fakemebg.show();
 
 			if(lib.config.show_handcardbutton){
 				lib.setPopped(ui.create.system('手牌',null,true),function(){
@@ -263,6 +258,9 @@ mode.boss={
 					return uiintro;
 				},220);
 			}
+		}
+		else{
+			ui.fakeme.style.display='none';
 		}
 		lib.setPopped(ui.create.system('重整',null,true),function(){
 			var uiintro=ui.create.dialog('hidden');
@@ -573,8 +571,35 @@ mode.boss={
 			ui.updatehl();
 		},
 		modeSwapPlayer:function(player){
+			var bool=(game.me==game.boss||player==game.boss);
 			game.swapControl(player);
 			game.onSwapControl();
+			if(!bool) return;
+			if(game.me==game.boss){
+				game.singleHandcard=false;
+				ui.arena.classList.remove('single-handcard');
+				ui.window.classList.remove('single-handcard');
+				ui.fakeme.style.display='none';
+				game.me.dataset.position=0;
+				game.me.nextSeat.dataset.position=2;
+				game.me.nextSeat.nextSeat.dataset.position=4;
+				game.me.nextSeat.nextSeat.nextSeat.dataset.position=6;
+			}
+			else{
+				game.singleHandcard=true;
+				ui.arena.classList.add('single-handcard');
+				ui.window.classList.add('single-handcard');
+				ui.fakeme.style.display='';
+				game.boss.dataset.position=7;
+				game.boss.nextSeat.dataset.position=1;
+				game.boss.nextSeat.nextSeat.dataset.position=2;
+				game.boss.nextSeat.nextSeat.nextSeat.dataset.position=3;
+				if(game.me&&game.me.node.handcards2.childNodes.length){
+					while(game.me.node.handcards2.childNodes.length){
+						game.me.node.handcards1.appendChild(game.me.node.handcards2.firstChild);
+					}
+				}
+			}
 		},
 		chooseCharacter:function(func){
 			var next=game.createEvent('chooseCharacter',false);
