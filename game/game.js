@@ -11537,7 +11537,7 @@
 					if(player.hp<=0&&!player.nodying) player.die(event.reason);
 				},
 				die:function(){
-                    game.logv(player,'die',source);
+                    var logvid=game.logv(player,'die',source);
 					if(source&&source!=player){
 						game.log(player,'被',source,'杀害');
 						if(source.stat[source.stat.length-1].kill==undefined){
@@ -11554,7 +11554,7 @@
 					event.playerCards=player.getCards('he');
 					if(event.cards.length){
 						player.$throw(event.cards,1000);
-						game.log(player,'弃置了',event.cards);
+						game.log(player,'弃置了',event.cards,logvid);
 					}
 					if(!game.reserveDead){
 						for(var mark in player.marks){
@@ -25075,8 +25075,8 @@
                 delete ui.rooms;
             }
         },
-		log:function(str){
-			var str='';
+		log:function(){
+			var str='',logvid=null;
 			for(var i=0;i<arguments.length;i++){
 				var itemtype=get.itemtype(arguments[i]);
 				if(itemtype=='player'||itemtype=='players'){
@@ -25096,7 +25096,14 @@
 					}
 				}
 				else if(typeof arguments[i]=='object'){
-					str+=get.translation(arguments[i]);
+					if(arguments[i]){
+						if(arguments[i].parentNode==ui.historybar){
+							logvid=arguments[i].logvid;
+						}
+						else{
+							str+=get.translation(arguments[i]);
+						}
+					}
 				}
 				else if(typeof arguments[i]=='string'){
 					if(lib.config.log_highlight){
@@ -25133,7 +25140,9 @@
                 game.log(str);
             },str);
             if(!_status.video&&!game.online){
-                var logvid=_status.event.getLogv();
+				if(!logvid){
+					logvid=_status.event.getLogv();
+				}
                 if(logvid){
                     game.logv(logvid,'<div class="text center">'+str+'</div>');
                 }
