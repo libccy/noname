@@ -1,8 +1,8 @@
 window.noname_update={
-    version:'1.9.19.1',
+    version:'1.9.20',
     update:'1.9.19',
     changeLog:[
-        'bug修复',
+        '忠胆英杰',
     ],
     files:[
         'game/game.js',
@@ -11,7 +11,8 @@ window.noname_update={
         // 'game/source.js',
         // 'game/asset.js',
         // 'card/*',
-        // 'card/swd.js',
+        'card/sp.js',
+        'card/yunchou.js',
         'character/*',
         // 'character/sp.js',
         // 'mode/boss.js',

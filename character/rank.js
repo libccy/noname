@@ -252,6 +252,7 @@ window.characterRank={
     bp:[
         'zoushi',
         'hs_hudunren',
+        'hs_ruanniguai',
         'diy_lukang',
         'yxs_meixi',
         'yxs_lanlinwang',
@@ -400,6 +401,7 @@ window.characterRank={
         'sunhao',
         'swd_jiting',
         'hs_nozdormu',
+        'zhoucang',
     ],
     b:[
         'sp_daqiao',
@@ -542,7 +544,6 @@ window.characterRank={
         'menghuo',
         'huaxiong',
         'panfeng',
-        'zhoucang',
         'guanyu',
         'xuzhu',
         'lvmeng',

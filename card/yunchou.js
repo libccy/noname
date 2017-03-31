@@ -463,7 +463,7 @@ card.yunchou={
 			},
 			ai:{
 				order:2.5,
-				value:6,
+				value:7,
 				result:{
 					target:function(player,target){
 						var num=0;
