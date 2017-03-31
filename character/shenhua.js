@@ -708,7 +708,7 @@ character.shenhua={
 				"step 1"
 				var target=player.storage.fangquan;
 				target.markSkillCharacter('fangquan',player,'放权','进行一个额外回合');
-				target.phase();
+				target.insertPhase();
 				target.addSkill('fangquan3');
 				player.removeSkill('fangquan2');
 				delete player.storage.fangquan;

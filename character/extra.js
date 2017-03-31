@@ -115,7 +115,7 @@ character.extra={
 			priority:-50,
 			content:function(){
 				player.removeSkill('lianpo2');
-				player.phase();
+				player.insertPhase();
 			}
 		},
 		baonu:{

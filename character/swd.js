@@ -4144,73 +4144,6 @@ character.swd={
 				player.draw();
 			},
 		},
-		fushen:{
-			trigger:{player:'phaseBefore'},
-			direct:true,
-			filter:function(event,player){
-				return !player.phaseSkipped;
-			},
-			content:function(){
-				"step 0"
-				player.chooseTarget(function(card,player,target){
-					if(player==target) return false;
-					return true;
-				},get.prompt('fushen')).ai=function(){
-					return -1;//1+Math.random();
-				}
-				"step 1"
-				if(result.bool){
-					var target=result.targets[0];
-					event.target=target;
-					target.storage.fushen=player;
-					game.swapPlayer(target);
-					// player.out();
-					// player.lockOut=true;
-					// trigger.untrigger();
-					// trigger.finish();
-					// target.phase();
-					// target.addSkill('fushen2');
-					trigger.untrigger();
-					trigger.finish();
-				}
-				else{
-					event.finish();
-				}
-				"step 2"
-				player.out();
-				player.lockOut=true;
-				if(player.ai.shown<0.5){
-					player.ai.shown=0.5;
-				}
-				// trigger.untrigger();
-				// trigger.finish();
-				// target.phase();
-				event.target.addSkill('fushen2');
-				event.target.storage.fushen2=event.target.ai.shown;
-				event.target.phase();
-			},
-			ai:{
-				threaten:1.5,
-			}
-		},
-		fushen2:{
-			trigger:{player:'phaseAfter'},
-			forced:true,
-			popup:false,
-			content:function(){
-				var source=player.storage.fushen;
-				player.ai.shown=player.storage.fushen2;
-				delete player.storage.fushen;
-				delete player.storage.fushen2;
-				if(source){
-				source.lockOut=false;
-				source.out();
-				game.swapPlayer(source);
-				source.loseHp();
-				player.removeSkill('fushen2');}
-				// source.skip('phase');
-			}
-		},
 		anlianying:{
 			trigger:{player:'loseEnd'},
 			frequent:true,
@@ -5508,10 +5441,10 @@ character.swd={
 			trigger:{player:'phaseAfter'},
 			frequent:true,
 			filter:function(event,player){
-				return get.cardCount(true,player)>=player.hp&&event.parent.name!='lingwu';
+				return get.cardCount(true,player)>=player.hp&&event.skill!='lingwu';
 			},
 			content:function(){
-				player.phase();
+				player.insertPhase();
 			},
 			ai:{
 				order:-10,

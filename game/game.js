@@ -13063,17 +13063,17 @@
 					}
 					this.node.identity.dataset.color=identity;
 				},
-				insertPhase:function(){
+				insertPhase:function(skill){
 					var evt=_status.event.getParent('phase');
 					var next;
 					if(evt&&evt.parent&&evt.parent.next){
 						next=game.createEvent('phase',null,evt.parent);
-						console.log(evt.parent);
 					}
 					else{
 						next=game.createEvent('phase');
 					}
 					next.player=this;
+					next.skill=skill||_status.event.name;
                     next.setContent('phase');
 					return next;
 				},

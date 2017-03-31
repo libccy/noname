@@ -4982,7 +4982,7 @@ character.hearth={
 		jihuo:{
 			trigger:{player:'phaseAfter'},
 			filter:function(event,player){
-				return !player.storage.jihuo&&player.countCards('h')>0;
+				return player.countCards('h')>0&&event.skill!='jihuo';
 			},
 			direct:true,
 			priority:-50,
@@ -4993,15 +4993,8 @@ character.hearth={
 				next.logSkill='jihuo';
 				"step 1"
 				if(result.bool){
-					player.storage.jihuo=true;
+					player.insertPhase();
 				}
-				else{
-					event.finish();
-				}
-				"step 2"
-				player.phase();
-				"step 3"
-				player.storage.jihuo=false;
 			},
 			ai:{
 				threaten:1.2

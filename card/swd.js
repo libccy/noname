@@ -3310,7 +3310,7 @@ card.swd={
 				result.links[0].storage.lianyao_hujia=player;
 				game.swapPlayer(result.links[0]);
 				result.links[0].addSkill('lianyao_hujia2');
-				result.links[0].phase();
+				result.links[0].insertPhase();
 				result.links[0].setIdentity();
 				result.links[0].identityShown=true;
 				player.out(true);
