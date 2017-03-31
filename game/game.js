@@ -15844,7 +15844,7 @@
 							name=parseInt(name[5]);
 						}
 					}
-					else if(typeof name=='string'&&name.indexOf('equip')==0&&name.length==5){
+					else if(typeof name=='string'&&name.indexOf('equip')==0&&name.length==6){
 						name=parseInt(name[5]);
 					}
 					if(!name){
@@ -21780,6 +21780,7 @@
 		},
 		reload:function(){
 			if(_status){
+				if(_status.reloading) return;
 				_status.reloading=true;
 			}
 			if(_status.video&&!_status.replayvideo){

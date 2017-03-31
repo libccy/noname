@@ -7750,7 +7750,7 @@ character.sp={
 					},
 					position:'he',
 					filterTarget:function(card,player,target){
-						return !target.getEquip(parseInt(get.subtype(card)[5]));
+						return !target.getEquip(card);
 					},
 					ai1:function(card){
 						return 6-ai.get.value(card);

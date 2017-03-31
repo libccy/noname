@@ -251,14 +251,14 @@ character.swd={
 				if(info.nomod) return false;
 				if(info.unique) return false;
 				if(!info.subtype) return false;
-				if(!player.getEquip(parseInt(info.subtype[5]))) return false;
+				if(!player.getEquip(info.subtype)) return false;
 				return true;
 			},
 			content:function(){
 				'step 0'
 				var list=['equip1','equip2','equip3','equip4','equip5'];
 				for(var i=0;i<list.length;i++){
-					if(player.getEquip(parseInt(list[i][5]))){
+					if(player.getEquip(list[i])){
 						list.splice(i--,1);
 					}
 				}
@@ -8803,7 +8803,7 @@ character.swd={
 		zhanxing:'占星',
 		zhanxing_info:'出牌阶段限一次，你可以弃置任意张牌，并亮出牌堆顶的等量的牌，并根据亮出的牌包含的花色执行以下效果：♥获得2点护甲；♦︎摸两张牌；♣弃置一名其他角色两张牌；♠对一名角色造成一点雷属性伤害',
 		gaizao:'改造',
-		gaizao_info:'每当你即将替换一件装备，你可以永久改变新装备（特殊装备除外）的装备类型使其装备在装备区内的空余位置',
+		gaizao_info:'每当你即将装备一张牌（特殊类装备除外），若你的装备区内对应位置已有牌，你可以永久改变此牌的装备类型使其装备在装备区内的空余位置',
 		lingshi:'灵矢',
 		lingshi_info:'你的装备区内每有一张牌，你的攻击范围+2；当你的装备区内有武器牌或防具牌时，你的杀不可闪避；当你的装备区内有马时，你摸牌阶段额外摸一张牌；当你的装备内的宝物牌时，你回合内可以额外使用一张杀',
 		tiebi:'铁壁',
