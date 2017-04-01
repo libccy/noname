@@ -1612,10 +1612,10 @@ div:not(.handcards)>.card>.info>span,
 	box-shadow: none !important;
 	border: none !important;
 	font-family: 'xinwei';
-	/*margin-left: 2px;*/
 	text-align: right;
 	width: auto;
 	height: auto;
+    transform: none !important;
 }
 /*--------确认--------*/
 #control {
@@ -2838,6 +2838,7 @@ div:not(.handcards)>.card>.info>span,
 #window:not(.nopointer) .pointernode div,
 #window:not(.nopointer) .pointerspan span,
 #window:not(.nopointer) .pointertable td>span,
+#window:not(.nopointer) .config>.toggle.onoff,
 #window:not(.nopointer) .dialog.fullheight .buttons .button:not(.selectedx):not(.glow):not(.forbidden),
 #window:not(.nopointer) #arena.selecting:not(.video) .player .equips>.card.selectable,
 #window:not(.nopointer) #arena.selecting #me .card.selectable,

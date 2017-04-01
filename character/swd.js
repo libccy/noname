@@ -268,6 +268,7 @@ character.swd={
 					var enemies=player.getEnemies();
 					for(var i=0;i<enemies.length;i++){
 						enemies[i].randomDiscard();
+						enemies[i].addExpose(0.1);
 						player.line(enemies[i],'green');
 					}
 				}
@@ -283,7 +284,7 @@ character.swd={
 				'step 6'
 				if(result.bool){
 					player.line(result.targets[0],'thunder');
-					result.targets[0].damage('thunder','nosource');
+					result.targets[0].damage('thunder','nosource','nocard');
 				}
 			},
 			ai:{

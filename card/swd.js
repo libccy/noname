@@ -4922,6 +4922,7 @@ card.swd={
 		ximohu_bg:'魔',
 		// ximohu_info:'锁定技，你将即将受到的雷属性伤害转化为你的体力值',
 		sadengjinhuan:'萨登荆环',
+		sadengjinhuan_ab:'荆环',
 		sadengjinhuan_info:'当你的杀被闪避后，可以进行一次判定，若结果为红色目标需再打出一张闪',
 		sadengjinhuan_bg:'荆',
 		qipoguyu:'奇魄古玉',

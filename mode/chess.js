@@ -1463,6 +1463,7 @@ mode.chess={
 				player.setIdentity();
 				player.node.identity.dataset.color='zhong';
 				player.classList.add('treasure');
+				player.node.hp.classList.add('treasure');
 				player.life=6+Math.floor(Math.random()*6);
 				game.treasures.add(player);
 			}

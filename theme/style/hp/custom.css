@@ -2,7 +2,7 @@
     box-shadow: none;
     border: none;
     background-size: 100% 100%;
-    transform: scale(1.4) rotate(180deg);
+    transform: scale(1.4);
     -webkit-filter:none;
     border-radius: 0px;
 }
@@ -10,7 +10,7 @@
     box-shadow: none;
     border: none;
     background-size: 100% 100%;
-    transform: scale(1.4) rotate(180deg);
+    transform: scale(1.4);
     -webkit-filter:none;
     border-radius: 0px;
 }
@@ -18,7 +18,7 @@
     box-shadow: none;
     border: none;
     background-size: 100% 100%;
-    transform: scale(1.4) rotate(180deg);
+    transform: scale(1.4);
     -webkit-filter:none;
     border-radius: 0px;
 }
@@ -26,7 +26,7 @@
     box-shadow: none;
     border: none;
     background-size: 100% 100%;
-    transform: scale(1.4) rotate(180deg);
+    transform: scale(1.4);
     border-radius: 0px;
 }
 

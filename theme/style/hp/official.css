@@ -3,7 +3,7 @@
     box-shadow: none;
     border: none;
     background-size: cover;
-    transform: scale(1.4) rotate(180deg);
+    transform: scale(1.4);
     border-radius: 0px;
 }
 .hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){
@@ -11,7 +11,7 @@
     box-shadow: none;
     border: none;
     background-size: cover;
-    transform: scale(1.4) rotate(180deg);
+    transform: scale(1.4);
     border-radius: 0px;
 }
 .hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){
@@ -19,7 +19,7 @@
     box-shadow: none;
     border: none;
     background-size: cover;
-    transform: scale(1.4) rotate(180deg);
+    transform: scale(1.4);
     border-radius: 0px;
 }
 .hp:not(.text):not(.actcount)>.lost{
@@ -27,7 +27,7 @@
     box-shadow: none;
     border: none;
     background-size: cover;
-    transform: scale(1.4) rotate(180deg);
+    transform: scale(1.4);
     border-radius: 0px;
 }
 

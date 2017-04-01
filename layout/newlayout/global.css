@@ -186,7 +186,7 @@
 	top: auto;
 	left: 118px;
 	z-index:3;
-	transform:rotate(180deg);
+	/*transform:rotate(180deg);*/
 }
 #arena.slim_player .player .hp,
 #window>.player:not(.minskin) .hp{

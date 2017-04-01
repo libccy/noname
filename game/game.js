@@ -12489,18 +12489,18 @@
 						}
 						for(var i=0;i<this.maxHp;i++){
 							if(i<this.hp){
-								hp.childNodes[i].classList.remove('lost');
+								hp.childNodes[this.maxHp-i-1].classList.remove('lost');
 							}
 							else{
-								hp.childNodes[i].classList.add('lost');
+								hp.childNodes[this.maxHp-i-1].classList.add('lost');
 							}
 						}
-						if(this.maxHp==9){
-							hp.classList.add('long');
-						}
-						else{
-							hp.classList.remove('long');
-						}
+						// if(this.maxHp==9){
+						// 	hp.classList.add('long');
+						// }
+						// else{
+						// 	hp.classList.remove('long');
+						// }
 					}
                     if(hp.classList.contains('room')){
                         hp.dataset.condition='high';

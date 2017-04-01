@@ -237,7 +237,7 @@
     transition: all 0.5s !important;
 }
 .player.treasure{
-    box-shadow: none;
+    /*box-shadow: none;*/
 }
 .player.treasure .count,
 .player.treasure .identity{
