@@ -1365,10 +1365,19 @@ character.yxs={
 				}
 				'step 1'
 				if(result.bool){
-					player.logSkill('xiadao',result.targets);
+					player.logSkill('xiadao');
+					player.line2([trigger.player,result.targets[0]],'green');
+					event.target=result.targets[0];
+					game.delay();
+				}
+				else{
+					event.finish();
+				}
+				'step 0'
+				if(event.target){
 					var card=trigger.player.getCards('h').randomGet();
-					result.targets[0].gain(card,trigger.player);
-					trigger.player.$giveAuto(card,result.targets[0]);
+					event.target.gain(card,trigger.player);
+					trigger.player.$giveAuto(card,event.target);
 				}
 			},
 			ai:{

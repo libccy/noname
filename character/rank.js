@@ -156,6 +156,7 @@ window.characterRank={
         're_lidian',
     ],
     am:[
+        'swd_xiyan',
         'ow_orisa',
         'ow_baolei',
         'ow_wensidun',
@@ -229,7 +230,6 @@ window.characterRank={
         'zhanglu',
         'yxs_luban',
         'yxs_huamulan',
-        'swd_xiyan',
         'hs_jiaziruila',
         'hs_brann',
         're_liubei',
@@ -254,6 +254,7 @@ window.characterRank={
     ],
     bp:[
         'zoushi',
+        'swd_zhiyin',
         'hs_hudunren',
         'hs_ruanniguai',
         'diy_lukang',
@@ -320,7 +321,6 @@ window.characterRank={
         'zhuhuan',
         'yxs_aijiyanhou',
         'yxs_bole',
-        'swd_zhiyin',
         're_machao',
         're_guanyu',
         'yuanshao',

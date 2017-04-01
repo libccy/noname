@@ -3225,8 +3225,8 @@ card.swd={
 					event.bool=true;
 					player.chooseTarget('选择一个目标视为'+get.translation(target)+'对其使用一张杀',function(card,player,target2){
 						return player!=target2&&target.canUse('sha',target2);
-					}).ai=function(target){
-						return ai.get.effect(target,{name:'sha'},target,player);
+					}).ai=function(target2){
+						return ai.get.effect(target2,{name:'sha'},target,player);
 					}
 				}
 				else{

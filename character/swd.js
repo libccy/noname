@@ -22,7 +22,7 @@ character.swd={
 		swd_jiliang:['male','wu',3,['yunchou','gongxin','jqimou']],
 		swd_shuijing:['female','qun',4,['mojian','duanyue','tuzhen']],
 		swd_quxian:['female','qun',3,['mojian','huanxia']],
-		swd_xiyan:['male','qun',3,['zaowu']],
+		swd_xiyan:['male','qun',3,['jiefen','datong']],
 		swd_cheyun:['female','wu',3,['shengong','xianjiang','qiaoxie']],
 		swd_huanyuanzhi:['male','qun',3,['tianshu','lanzhi','mufeng']],
 		swd_murongshi:['female','shu',4,['duanyi','guxing']],
@@ -221,6 +221,89 @@ character.swd={
 		swd_luchengxuan:['swd_xiarou'],
 	},
 	skill:{
+		jiefen:{
+			enable:'phaseUse',
+			usable:1,
+			filterTarget:function(card,player,target){
+				return target.countCards('h')>player.countCards('h');
+			},
+			filter:function(event,player){
+				return !player.isMostHandcard();
+			},
+			content:function(){
+				'step 0'
+				target.chooseCard('h',true,'交给'+get.translation(player)+'一张牌');
+				'step 1'
+				if(result.bool){
+					player.gain(result.cards,target);
+					target.$giveAuto(result.cards,player);
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				var nh=player.countCards('h');
+				if(game.hasPlayer(function(current){
+					return current.countCards('h')<nh;
+				})){
+					player.chooseCardTarget({
+						forced:true,
+						filterTarget:function(card,player,target){
+							return target.countCards('h')<nh;
+						},
+						filterCard:true,
+						ai1:function(card){
+							return 9-ai.get.value(card);
+						},
+						ai2:function(target){
+							return ai.get.attitude(player,target)/Math.sqrt(target.countCards('h')+1);
+						},
+						prompt:'交给一名手牌数少于你的角色一张牌'
+					});
+				}
+				else{
+					event.finish();
+				}
+				'step 3'
+				if(result.bool&&result.targets&&result.targets.length){
+					result.targets[0].gain(result.cards,player);
+					player.$giveAuto(result.cards,result.targets[0]);
+					player.line(result.targets,'green');
+				}
+			},
+			ai:{
+				order:7,
+				result:{
+					target:-1
+				}
+			}
+		},
+		datong:{
+			trigger:{global:'phaseEnd'},
+			frequent:true,
+			filter:function(event,player){
+				var max=player.countCards('h');
+				var min=max;
+				game.countPlayer(function(current){
+					var nh=current.countCards('h');
+					if(nh>max){
+						max=nh;
+					}
+					if(nh<min){
+						min=nh;
+					}
+				});
+				if(game.countPlayer()>=7){
+					return max-min<=2;
+				}
+				else{
+					return max-min<=1;
+				}
+			},
+			content:function(){
+				player.draw(2);
+			}
+		},
 		huodan:{
 			enable:'phaseUse',
 			usable:1,
@@ -494,7 +577,7 @@ character.swd={
 			content:function(){
 				'step 0'
 				player.removeSkill('kbolan2');
-				if(player.num('h')){
+				if(player.countCards('h')){
 					player.chooseCard('h',true,'将一张手牌置于牌堆顶').ai=function(card){
 						return -ai.get.value(card);
 					};
@@ -7088,7 +7171,7 @@ character.swd={
 				player.storage.funiao=false;
 			}
 		},
-		xuehuang:{
+		xuehuang_old:{
 			enable:'phaseUse',
 			usable:1,
 			filterCard:{color:'red'},
@@ -7117,6 +7200,59 @@ character.swd={
 					}
 				}
 			}
+		},
+		xuehuang:{
+			enable:'phaseUse',
+            init:function(player){
+                player.storage.xuehuang=false;
+            },
+            intro:{
+                content:'limited'
+            },
+            mark:true,
+            unique:true,
+            skillAnimation:true,
+            animationColor:'fire',
+            line:'fire',
+            filter:function(event,player){
+                return !player.storage.xuehuang&&
+					player.countCards('he',{color:'red'})>0&&
+					player.countCards('he',{color:'black'})==0;
+            },
+            content:function(){
+				'step 0'
+				player.storage.xuehuang=true;
+                player.awakenSkill('xuehuang');
+                player.showHandcards();
+				var cards=player.getCards('he');
+                player.discard(cards);
+				event.num=cards.length;
+				'step 1'
+				if(event.num){
+					var targets=player.getEnemies().randomGets(2);
+					if(!targets.length){
+						event.finish();
+						return;
+					}
+					player.useCard({name:'sha',nature:'fire'},targets);
+					event.num--;
+					event.redo();
+				}
+            },
+            ai:{
+                order:9,
+                result:{
+                    player:function(player){
+						if(player.countCards('he',{color:'red'})<2) return 0;
+						if(player.hasCard(function(card){
+							return get.color(card)=='red'&&ai.get.value(card)>8;
+						})){
+							return 0;
+						}
+						return 1;
+                    }
+                }
+            }
 		},
 		zhuyu:{
 			trigger:{global:'damageBegin'},
@@ -7175,10 +7311,10 @@ character.swd={
 			direct:true,
 			content:function(){
 				"step 0"
-				var next=player.chooseToDiscard('是否弃置一张黑色牌使其横置或翻面？','he',function(card){
+				var next=player.chooseToDiscard('凝霜：是否弃置一张黑色牌使'+get.translation(trigger.player)+'横置或翻面？','he',function(card){
 					return get.color(card)=='black';
 				});
-				next.logSkill='ningshuang';
+				next.logSkill=['ningshuang',trigger.player];
 				next.ai=function(card){
 					if(ai.get.attitude(player,trigger.player)<0){
 						return 9-ai.get.value(card);
@@ -9059,6 +9195,10 @@ character.swd={
 		swd_shuwaner:'舒莞儿',
 		swd_xiaohuanglong:'小黄龙',
 
+		jiefen:'解纷',
+		jiefen_info:'出牌阶段限一次，你可以令一名手牌数多于你的角色交给你一张牌，然后你交给一名手牌数少于你的角色一张牌',
+		datong:'大同',
+		datong_info:'任意一名角色的结束阶段，若全场手牌数最多和最少的角色手牌数之差不超过1（人数不少于7时改为2），你摸两张牌',
 		huodan:'火丹',
 		huodan_info:'出牌阶段限一次，你可以弃置一张红色牌并失去一点体力，然后将两点火属性伤害分配给1~2名角色',
 		sxianjing:'陷阱',
@@ -9406,6 +9546,7 @@ character.swd={
 		yulin:'玉鳞',
 		funiao:'符鸟',
 		xuehuang:'血凰',
+		xuehuang_bg:'凰',
 		zhuyu:'朱羽',
 		ningshuang:'凝霜',
 		zaowu:'造物',
@@ -9518,8 +9659,8 @@ character.swd={
 		yulin_info:'每当你即将受到伤害，你可以弃置一张装备牌抵消此伤害',
 		funiao_info:'出牌阶段限一次，你可以将一张手牌交给一名其他角色，然后摸一张牌',
 		funiao_old_info:'出牌阶段，你可以交给一名角色一张手牌，然后观看其手牌，每个阶段对一名角色只能发动一次',
-		xuehuang_info:'出牌阶段限一次，你可以弃置一张红色手牌令距离你一以内的所有角色受到一点火焰伤害',
-		zhuyu_info:'每当有横置的角色即将受到伤害时，你可以弃置一张红色牌令此伤害+1并变为火属性',
+		xuehuang_info:'限定技，出牌阶段，若你没有黑色牌，你可以展示并弃置所有牌，每弃置一张牌视为使用一张火杀，随机指定两名敌人为目标',
+		zhuyu_info:'每当一名横置的角色即将受到伤害时，你可以弃置一张红色牌令此伤害+1并变为火属性',
 		ningshuang_info:'每当你成为黑色牌的目标，你可以弃置一张黑色牌将其横置，并摸一张牌，若其已经模置则改为将其翻面',
 		zaowu_old_info:'出牌阶段，你可以弃置三张不同类型的牌，创造任意两张牌并获得之',
 		xielv_info:'弃牌阶段结束后，若你的所有手牌（至少两张）颜色均相同，你可以展示所有手牌，然后回复一点体力并弃置场上的所有判定牌',
