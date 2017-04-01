@@ -12475,12 +12475,13 @@
 						if(this.hp==0){
 							hp.lastChild.classList.add('lost');
 						}
-						hp.classList.add('text');
-						hp.classList.remove('long');
+						hp.classList.add('textstyle');
+						// hp.classList.remove('long');
 					}
 					else{
 						hp.innerHTML='';
 						hp.classList.remove('text');
+						hp.classList.remove('textstyle');
 						while(this.maxHp>hp.childNodes.length){
 							ui.create.div(hp);
 						}
@@ -12488,11 +12489,15 @@
 							hp.removeChild(hp.lastChild);
 						}
 						for(var i=0;i<this.maxHp;i++){
+							var index=i;
+							if(get.is.newLayout()){
+								index=this.maxHp-i-1;
+							}
 							if(i<this.hp){
-								hp.childNodes[this.maxHp-i-1].classList.remove('lost');
+								hp.childNodes[index].classList.remove('lost');
 							}
 							else{
-								hp.childNodes[this.maxHp-i-1].classList.add('lost');
+								hp.childNodes[index].classList.add('lost');
 							}
 						}
 						// if(this.maxHp==9){
@@ -34248,19 +34253,15 @@
 						}
 						node.node.name.innerHTML=get.slimName(item);
 						if(lib.config.buttoncharacter_style=='default'){
-							node.node.hp.dataset.condition='high';
 							node.node.name.dataset.nature=get.groupnature(infoitem[1]);
 							node.classList.add('newstyle');
 							ui.create.div(node.node.hp);
 							var textnode=ui.create.div('.text',get.numStr(infoitem[2]),node.node.hp);
 							if(infoitem[2]<=3){
-								textnode.dataset.nature='watermx';
-							}
-							else if(infoitem[2]<=6){
-								textnode.dataset.nature='soilmx';
+								node.node.hp.dataset.condition='mid';
 							}
 							else{
-								textnode.dataset.nature='firemx';
+								node.node.hp.dataset.condition='high';
 							}
 						}
 						else{

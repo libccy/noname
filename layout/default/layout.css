@@ -1616,6 +1616,7 @@ div:not(.handcards)>.card>.info>span,
 	width: auto;
 	height: auto;
     transform: none !important;
+	text-shadow: black 0 0 2px, black 0 0 3px;
 }
 /*--------确认--------*/
 #control {
@@ -2095,6 +2096,9 @@ div:not(.handcards)>.card>.info>span,
 .hp.text {
 	top: 18px;
 }
+.hp.textstyle{
+	font-family: 'xinwei'
+}
 .hp>div {
 	width: 8px;
 	height: 8px;
@@ -2154,13 +2158,16 @@ div:not(.handcards)>.card>.info>span,
 	filter: grayscale(1);
 	-webkit-filter: grayscale(1);
 }
-.hp.text[data-condition="low"] {
+.hp.text[data-condition="low"],
+.hp.textstyle[data-condition="low"] {
 	text-shadow: black 0 0 1px,rgba(232, 53, 53,1) 0 0 2px,rgba(232, 53, 53,1) 0 0 5px,rgba(232, 53, 53,1) 0 0 10px
 }
-.hp.text[data-condition="mid"] {
+.hp.text[data-condition="mid"],
+.hp.textstyle[data-condition="mid"] {
 	text-shadow: black 0 0 1px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 5px,rgba(255, 203, 0,1) 0 0 10px
 }
-.hp.text[data-condition="high"] {
+.hp.text[data-condition="high"],
+.hp.textstyle[data-condition="high"] {
 	text-shadow: rgba(57, 123, 4,1) 0 0 2px,rgba(57, 123, 4,1) 0 0 5px,rgba(57, 123, 4,1) 0 0 10px
 }
 

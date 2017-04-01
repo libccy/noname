@@ -43,3 +43,7 @@
 #arena.oldlayout .player .hp:not(.text):not(.actcount):not(.treasure)>.lost{
     transform: scale(1.6);
 }
+
+.button.newstyle>.hp>.text{
+    margin-left: 5px;
+}
