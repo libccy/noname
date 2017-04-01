@@ -157,6 +157,7 @@ window.characterRank={
     ],
     am:[
         'swd_xiyan',
+        'swd_xiaohuanglong',
         'ow_orisa',
         'ow_baolei',
         'ow_wensidun',

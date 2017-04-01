@@ -104,7 +104,7 @@ character.swd={
 		swd_yuli:['female','wu',3,['lingxin','tianxiang']],
 		swd_zhanggao:['male','wei',4,['yicong','poxing']],
 		swd_shuwaner:['female','shu',3,['sxianjing','huodan']],
-		// swd_xiaohuanglong:['male','wei',3,['yicong','poxing']],
+		swd_xiaohuanglong:['male','wei',3,['yeying','juxi']],
 
 		swd_hupo:['male','wu',3,['dunxing','guiying']],
 		swd_jiangziya:['male','wu',3,['mingfu','tianlun']],
@@ -221,6 +221,100 @@ character.swd={
 		swd_luchengxuan:['swd_xiarou'],
 	},
 	skill:{
+		yeying:{
+			enable:'phaseUse',
+			usable:1,
+			viewAs:{name:'qiankunbiao'},
+			viewAsFilter:function(player){
+				return player.countCards('he',{color:'black'});
+			},
+			filterCard:{color:'black'},
+			position:'he',
+			check:function(card){
+				return 7-ai.get.value(card);
+			}
+		},
+		juxi:{
+			enable:'phaseUse',
+			usable:2,
+			filter:function(event,player){
+				return player.storage.juxi>=game.countPlayer();
+			},
+			filterTarget:true,
+			init:function(player){
+				player.storage.juxi=0;
+			},
+			init2:function(player){
+				if(get.mode()=='guozhan'){
+					player.logSkill('juxi');
+				}
+			},
+			intro:{
+				content:'mark'
+			},
+			content:function(){
+				'step 0'
+				player.storage.juxi-=game.countPlayer();
+				player.syncStorage('juxi');
+				if(player.storage.juxi<=0){
+					player.unmarkSkill('juxi');
+				}
+				else{
+					player.updateMarks();
+				}
+				if(target.isDamaged()){
+					player.chooseControl(function(){
+						if(ai.get.attitude(player,target)>0) return 1;
+						return 0;
+					}).set('choiceList',[
+						'对'+get.translation(target)+'造成一点伤害',
+						'令'+get.translation(target)+'回复一点体力',
+					])
+				}
+				else{
+					target.damage();
+					event.finish();
+				}
+				'step 1'
+				if(result.control=='选项一'){
+					target.damage();
+				}
+				else{
+					target.recover();
+				}
+			},
+			ai:{
+				order:7,
+				result:{
+					target:function(player,target){
+						if(ai.get.attitude(player,target)>0){
+							if(target.isDamaged()) return ai.get.recoverEffect(target,player,target);
+							return 0;
+						}
+						else{
+							return ai.get.damageEffect(target,player,target);
+						}
+					}
+				}
+			},
+			group:'juxi_count',
+			subSkill:{
+				count:{
+					trigger:{global:'discardAfter'},
+					forced:true,
+					popup:false,
+					filter:function(event,player){
+						return _status.currentPhase!=event.player;
+					},
+					content:function(){
+						player.storage.juxi++;
+						player.syncStorage('juxi');
+						player.markSkill('juxi');
+						player.updateMarks();
+					},
+				}
+			}
+		},
 		jiefen:{
 			enable:'phaseUse',
 			usable:1,
@@ -8480,6 +8574,7 @@ character.swd={
 				if(event.targets.length){
 					event.target=event.targets.shift();
 					event.target.discard(event.target.getCards('j'));
+					player.line(event.target,'green');
 				}
 				else{
 					event.finish();
@@ -9195,6 +9290,10 @@ character.swd={
 		swd_shuwaner:'舒莞儿',
 		swd_xiaohuanglong:'小黄龙',
 
+		juxi:'聚息',
+		juxi_info:'锁定技，每当一名角色于其回合外弃置牌，你获得一枚聚息标记；出牌阶段限两次，你可以移去X枚聚息标记，然后选择一项：对一名角造成一点伤害，或令一名角色回复一点体力，X为存活角色数',
+		yeying:'曳影',
+		yeying_info:'出牌阶段限一次，你可以将一张黑色牌当作乾坤镖使用',
 		jiefen:'解纷',
 		jiefen_info:'出牌阶段限一次，你可以令一名手牌数多于你的角色交给你一张牌，然后你交给一名手牌数少于你的角色一张牌',
 		datong:'大同',
