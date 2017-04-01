@@ -17443,17 +17443,25 @@
                     }
 					return this;
 				},
-				updateTransform:function(bool){
-					if(_status.event.player!=game.me) return;
-					if(this._transform&&this.parentNode&&this.parentNode.parentNode&&
-						this.parentNode.parentNode.parentNode==ui.me&&
-						(!_status.mousedown||_status.mouseleft)&&
-						(!this.parentNode.parentNode.classList.contains('scrollh')||game.layout=='long2')){
-						if(bool){
-							this.style.transform=this._transform+' translateY(-20px)';
-						}
-						else{
-							this.style.transform=this._transform||'';
+				updateTransform:function(bool,delay){
+					if(delay){
+						var that=this;
+						setTimeout(function(){
+							that.updateTransform(that.classList.contains('selected'));
+						},delay);
+					}
+					else{
+						if(_status.event.player!=game.me) return;
+						if(this._transform&&this.parentNode&&this.parentNode.parentNode&&
+							this.parentNode.parentNode.parentNode==ui.me&&
+							(!_status.mousedown||_status.mouseleft)&&
+							(!this.parentNode.parentNode.classList.contains('scrollh')||game.layout=='long2')){
+							if(bool){
+								this.style.transform=this._transform+' translateY(-20px)';
+							}
+							else{
+								this.style.transform=this._transform||'';
+							}
 						}
 					}
 				},
@@ -35496,6 +35504,9 @@
 						var itemtype=get.itemtype(item);
 						if(itemtype=='card'||itemtype=='button'||itemtype=='player'){
 							_status.mouseleft=true;
+							if(ui.selected.cards.length){
+								ui.selected.cards[0].updateTransform(true,100);
+							}
 							var ex=e.touches[0].clientX/game.documentZoom-ui.arena.offsetLeft;
 							var ey=e.touches[0].clientY/game.documentZoom-ui.arena.offsetTop;
 							var exx=ex,eyy=ey;
@@ -35865,6 +35876,9 @@
 						var itemtype=get.itemtype(item);
 						if(itemtype=='card'||itemtype=='button'||itemtype=='player'){
 							_status.mouseleft=true;
+							if(ui.selected.cards.length){
+								ui.selected.cards[0].updateTransform(true,100);
+							}
 							var ex=e.clientX/game.documentZoom-ui.arena.offsetLeft;
 							var ey=e.clientY/game.documentZoom-ui.arena.offsetTop;
 							var exx=ex,eyy=ey;

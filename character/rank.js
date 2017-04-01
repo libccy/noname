@@ -405,6 +405,7 @@ window.characterRank={
         'hs_nozdormu',
         'zhoucang',
         'hs_shifazhe',
+        'guanyinping',
     ],
     b:[
         'sp_daqiao',
@@ -499,7 +500,6 @@ window.characterRank={
         'guohuai',
         'sunluban',
         'zhouyu',
-        'guanyinping',
         'dingfeng',
         'mayunlu',
         'shen_guanyu',
