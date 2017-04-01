@@ -39431,34 +39431,43 @@
 			}
 		},
 		cardPile:function(name,create){
-			var card;
-			for(var i=0;i<ui.cardPile.childNodes.length;i++){
-				card=ui.cardPile.childNodes[i];
+			var filter=function(card){
 				if(typeof name=='string'){
 					if(card.name==name){
-						return card;
+						return true;
 					}
 				}
 				else if(typeof name=='function'){
 					if(name(card)){
-						return card;
+						return true;
 					}
+				}
+				return false;
+			};
+			for(var i=0;i<ui.cardPile.childNodes.length;i++){
+				if(filter(ui.cardPile.childNodes[i])){
+					return ui.cardPile.childNodes[i];
 				}
 			}
 			for(var i=0;i<ui.discardPile.childNodes.length;i++){
-				card=ui.discardPile.childNodes[i];
-				if(typeof name=='string'){
-					if(card.name==name){
-						return card;
-					}
-				}
-				else if(typeof name=='function'){
-					if(name(card)){
-						return card;
-					}
+				if(filter(ui.discardPile.childNodes[i])){
+					return ui.discardPile.childNodes[i];
 				}
 			}
-            if(create){
+			if(create=='field'){
+				var found=null;
+				game.findPlayer(function(current){
+					var ej=current.getCards('ej');
+					for(var i=0;i<ej.length;i++){
+						if(filter(ej[i])){
+							found=ej[i];
+							return true;
+						}
+					}
+				});
+				return found;
+			}
+            else if(create){
                 return game.createCard(name);
             }
 			return null;
