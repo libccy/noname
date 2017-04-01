@@ -18928,6 +18928,7 @@
 				forced:true,
 				popup:false,
                 logv:false,
+				priority:-5,
 				content:function(){
 					"step 0"
 					player.link();
@@ -18957,6 +18958,7 @@
 						event.player.classList.contains('dead')&&player.isLinked());
 				},
 				forced:true,
+				priority:-5,
 				content:function(){
 					"step 0"
 					trigger.player.removeLink();

@@ -7146,30 +7146,78 @@ character.sp={
 			}
 		},
 		huxiao:{
-			audio:2,
-			trigger:{player:'shaMiss'},
-			forced:true,
-			content:function(){
-				player.storage.huxiao++;
-			},
-			check:function(event,player){
-				return player.countCards('h','sha')>0;
-			},
-			mod:{
-				cardUsable:function(card,player,num){
-					if(card.name=='sha') return num+player.storage.huxiao;
-				}
-			},
-			group:'huxiao2'
-		},
-		huxiao2:{
-			trigger:{player:'phaseUseBegin'},
+			trigger:{source:'damageEnd'},
 			forced:true,
 			popup:false,
 			silent:true,
-			content:function(){
-				player.storage.huxiao=0;
+			filter:function(event,player){
+				return event.nature=='fire';
 			},
+			content:function(){
+				if(!player.storage.huxiao){
+					player.storage.huxiao=[];
+				}
+				player.storage.huxiao.add(trigger.player);
+			},
+			group:['huxiao_draw','huxiao_clear'],
+			subSkill:{
+				draw:{
+					trigger:{source:'damageAfter'},
+					priority:-6,
+					filter:function(event,player){
+						if(!player.storage.huxiao||!player.storage.huxiao.length) return false;
+						for(var i=0;i<player.storage.huxiao.length;i++){
+							if(player.storage.huxiao[i].isIn()) return true;
+						}
+						return false;
+					},
+					check:function(){
+						return false;
+					},
+					forced:true,
+					content:function(){
+						for(var i=0;i<player.storage.huxiao.length;i++){
+							if(!player.storage.huxiao[i].isIn()){
+								player.storage.huxiao.splice(i--,1);
+							}
+						}
+						game.asyncDraw(player.storage.huxiao);
+						if(!player.storage.huxiao3){
+							player.storage.huxiao3=[];
+						}
+						player.storage.huxiao3.addArray(player.storage.huxiao);
+						player.addTempSkill('huxiao3','phaseAfter');
+					}
+				},
+				clear:{
+					trigger:{source:'damageAfter'},
+					priority:-7,
+					forced:true,
+					popup:false,
+					silent:true,
+					content:function(){
+						delete player.storage.huxiao;
+					}
+				}
+			}
+		},
+		huxiao3:{
+			onremove:true,
+			mark:true,
+			intro:{
+				content:'players'
+			},
+			mod:{
+				cardUsable:function(card,player,num){
+					if(typeof num=='number') return num+100;
+				},
+				playerEnabled:function(card,player,target){
+					if(!player.storage.huxiao3||!player.storage.huxiao3.contains(target)){
+						var num=player.getCardUsable(card)-100;
+						if(num<=0) return false;
+					}
+				}
+			}
 		},
 		aocai:{
 			audio:2,
@@ -8483,6 +8531,7 @@ character.sp={
 		aocai2_backup:'傲才',
 		aocai3:'傲才',
 		huxiao:'虎啸',
+		huxiao3:'虎啸',
 		xueji:'血祭',
 		wuji:'武继',
 		shushen:'淑慎',
