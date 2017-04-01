@@ -7120,27 +7120,44 @@ character.swd={
 			trigger:{global:'damageBegin'},
 			filter:function(event,player){
 				if(!event.player.isLinked()) return false;
-				if(event.nature=='fire') return false;
+				if(!event.notLink()) return false;
 				if(player.countCards('he',{color:'red'})) return true;
 				return false;
 			},
 			direct:true,
 			content:function(){
 				"step 0"
-				var next=player.chooseToDiscard('朱羽：是否弃置一张红色牌使'+get.translation(trigger.player)+'受到一点火焰伤害？','he',function(card){
+				var next=player.chooseToDiscard('朱羽：是否弃置一张红色牌使'+get.translation(trigger.player)+'受到的伤害+1？','he',function(card){
 					return get.color(card)=='red';
 				});
 				next.logSkill=['zhuyu',trigger.player,'fire'];
+				var num=game.countPlayer(function(current){
+					if(current.isLinked()){
+						if(trigger.nature){
+							return get.sgn(ai.get.damageEffect(current,player,player,'fire'));
+						}
+						else{
+							if(current==trigger.player){
+								return get.sgn(ai.get.damageEffect(current,player,player,'fire'));
+							}
+							else{
+								return 2*get.sgn(ai.get.damageEffect(current,player,player,'fire'));
+							}
+						}
+					}
+				});
+				console.log(num);
 				next.ai=function(card){
 					if(trigger.player.hasSkillTag('nofire')) return 0;
-					if(ai.get.damageEffect(trigger.player,player,player,'fire')>0){
+					if(num>0){
 						return 9-ai.get.value(card);
 					}
 					return 0;
 				};
 				"step 1"
 				if(result.bool){
-					trigger.player.damage('fire');
+					trigger.num++;
+					trigger.nature='fire';
 				}
 			}
 		},
@@ -9501,7 +9518,7 @@ character.swd={
 		funiao_info:'出牌阶段限一次，你可以将一张手牌交给一名其他角色，然后摸一张牌',
 		funiao_old_info:'出牌阶段，你可以交给一名角色一张手牌，然后观看其手牌，每个阶段对一名角色只能发动一次',
 		xuehuang_info:'出牌阶段限一次，你可以弃置一张红色手牌令距离你一以内的所有角色受到一点火焰伤害',
-		zhuyu_info:'每当有横置的角色即将受到非火焰伤害，你可以弃置一张红色牌使其额外受到一点火焰伤害',
+		zhuyu_info:'每当有横置的角色即将受到伤害时，你可以弃置一张红色牌令此伤害+1并变为火属性',
 		ningshuang_info:'每当你成为黑色牌的目标，你可以弃置一张黑色牌将其横置，并摸一张牌，若其已经模置则改为将其翻面',
 		zaowu_old_info:'出牌阶段，你可以弃置三张不同类型的牌，创造任意两张牌并获得之',
 		xielv_info:'弃牌阶段结束后，若你的所有手牌（至少两张）颜色均相同，你可以展示所有手牌，然后回复一点体力并弃置场上的所有判定牌',

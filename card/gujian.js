@@ -885,7 +885,7 @@ card.gujian={
             filterTarget:true,
             content:function(){
                 'step 0'
-                _status.currentPhase.chooseToRespond({name:'shan'});
+                _status.currentPhase.chooseToRespond({name:'shan'},'石灰粉<br><div style="height:10px;display:block"></div><div class="text">打出一张闪，否则本回合无法对其他角色使用卡牌');
                 'step 1'
                 if(!result.bool){
                     _status.currentPhase.addTempSkill('shihuifen','phaseUseAfter');
