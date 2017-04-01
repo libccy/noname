@@ -2,6 +2,36 @@
 card.sp={
 	connect:true,
 	card:{
+		qijiayebing:{
+			fullskin:true,
+			type:'trick',
+			enable:true,
+		},
+		jinchantuoqiao:{
+			fullskin:true,
+			type:'trick',
+			enable:true,
+		},
+		fulei:{
+			fullskin:true,
+			type:'delay',
+			enable:true,
+		},
+		qibaodao:{
+			fullskin:true,
+			type:'equip',
+			subtype:'equip1'
+		},
+		zhungangshuo:{
+			fullskin:true,
+			type:'equip',
+			subtype:'equip1'
+		},
+		lanyinjia:{
+			fullskin:true,
+			type:'equip',
+			subtype:'equip2'
+		},
 		yinyueqiang:{
 			fullskin:true,
 			type:'equip',
@@ -586,6 +616,18 @@ card.sp={
 		}
 	},
 	translate:{
+		qijiayebing:'弃甲曳兵',
+		qijiayebing_info:'出牌阶段，对一名装备区里有牌的其他角色使用。该角色选择一项：1.弃置手牌区和装备区里所有的武器和-1坐骑；2.弃置手牌区和装备区里所有的防具和+1坐骑。',
+		jinchantuoqiao:'金蝉脱壳',
+		jinchantuoqiao_info:'当你成为其他角色使用牌的目标时，若你的手牌里只有【金蝉脱壳】，使目标锦囊牌或基本牌对你无效，你摸两张牌。当你因弃置而失去【金蝉脱壳】时，你摸一张牌。',
+		fulei:'浮雷',
+		fulei_info:'出牌阶段，对你使用。将【浮雷】放置于你的判定区里，若判定结果为黑桃，则目标角色受到X点雷电伤害（X为此锦囊判定结果为黑桃的次数）。判定完成后，将此牌移动到下家的判定区里。',
+		qibaodao:'七宝刀',
+		qibaodao_info:'攻击范围2；锁定技，你使用【杀】无视目标防具，若目标角色未损失体力值，此【杀】伤害+1',
+		zhungangshuo:'衠钢槊',
+		zhungangshuo_info:'攻击范围3；当你使用【杀】指定一名角色为目标后，你可令该角色弃置你的一张手牌，然后你弃置其一张手牌',
+		lanyinjia:'烂银甲',
+		lanyinjia_info:'你可以将一张手牌当做【闪】使用或打出。锁定技，【烂银甲】不会无效化；当你受到【杀】造成的伤害时，弃置【烂银甲】。',
 		yinyueqiang:'银月枪',
 		yinyueqiang_info:'你的回合外，每当你使用或打出了一张黑色手牌（若为使用则在它结算之前），你可以立即对你攻击范围内的任意一名角色使用一张【杀】',
 		muniu:'木牛流马',
