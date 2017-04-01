@@ -103,7 +103,7 @@ character.swd={
 		swd_hanlong:['male','wei',4,['ciqiu','siji']],
 		swd_yuli:['female','wu',3,['lingxin','tianxiang']],
 		swd_zhanggao:['male','wei',4,['yicong','poxing']],
-		// swd_shuwaner:['female','shu',3,['yicong','poxing']],
+		swd_shuwaner:['female','shu',3,['sxianjing','huodan']],
 		// swd_xiaohuanglong:['male','wei',3,['yicong','poxing']],
 
 		swd_hupo:['male','wu',3,['dunxing','guiying']],
@@ -221,6 +221,179 @@ character.swd={
 		swd_luchengxuan:['swd_xiarou'],
 	},
 	skill:{
+		huodan:{
+			enable:'phaseUse',
+			usable:1,
+			filterCard:{color:'red'},
+			filter:function(event,player){
+				return player.countCards('he',{color:'red'})>0;
+			},
+			position:'he',
+			check:function(card){
+				return 7-ai.get.value(card);
+			},
+			content:function(){
+				'step 0'
+				player.loseHp();
+				var enemies=player.getEnemies();
+				event.targets=enemies.randomGets(2);
+				event.targets.sortBySeat();
+				'step 1'
+				if(event.targets.length){
+					var target=event.targets.shift();
+					player.line(target,'fire');
+					target.damage('fire');
+					target.addExpose(0.2);
+					event.redo();
+				}
+			},
+			ai:{
+				order:5,
+				result:{
+					player:function(player){
+						if(player.hp<2) return 0;
+						var enemies=player.getEnemies();
+						if(enemies.length<2) return 0;
+						var hp=0;
+						for(var i=0;i<enemies.length;i++){
+							if(ai.get.damageEffect(enemies[i],player,player,'fire')<=0){
+								return 0;
+							}
+							if(enemies[i].hasSkillTag('maixie')&&enemies[i].hp>1){
+								hp--;
+							}
+							hp+=enemies[i].hp;
+						}
+						hp/=enemies.length;
+						if(player.hp==2){
+							if(hp<2) return 1;
+							return 0;
+						}
+						else{
+							if(hp<=player.hp) return 1;
+							return 0;
+						}
+					}
+				}
+			}
+		},
+		sxianjing:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				var suits=[];
+				for(var i=0;i<player.storage.sxianjing.length;i++){
+					suits.add(get.suit(player.storage.sxianjing[i]));
+				}
+				return player.hasCard(function(card){
+					return !suits.contains(get.suit(card));
+				});
+			},
+			init:function(player){
+				player.storage.sxianjing=[];
+			},
+			filterCard:function(card,player){
+				var suits=[];
+				for(var i=0;i<player.storage.sxianjing.length;i++){
+					suits.add(get.suit(player.storage.sxianjing[i]));
+				}
+				return !suits.contains(get.suit(card));
+			},
+			check:function(card){
+				return 7-ai.get.value(card);
+			},
+			discard:false,
+			prepare:function(cards,player){
+				player.$give(1,player,false);
+			},
+			content:function(){
+				player.storage.sxianjing.add(cards[0]);
+				player.syncStorage('sxianjing');
+				player.markSkill('sxianjing');
+				player.updateMarks();
+			},
+			ai:{
+				order:1,
+				result:{
+					player:1
+				}
+			},
+			intro:{
+				mark:function(dialog,content,player){
+					if(player.isUnderControl(true)){
+						dialog.add(player.storage.sxianjing);
+					}
+					else{
+						return '已有'+get.cnNumber(player.storage.sxianjing.length)+'张“陷阱”牌';
+					}
+				},
+				content:function(content,player){
+					if(player.isUnderControl(true)){
+						return get.translation(player.storage.sxianjing);
+					}
+					return '已有'+get.cnNumber(player.storage.sxianjing.length)+'张“陷阱”牌';
+				}
+			},
+			group:['sxianjing_gain','sxianjing_damage'],
+			subSkill:{
+				gain:{
+					trigger:{target:'useCardToBegin'},
+					forced:true,
+					filter:function(event,player){
+						if(event.player==player||!event.player.countCards('he')) return false;
+						var suit=get.suit(event.card);
+						for(var i=0;i<player.storage.sxianjing.length;i++){
+							if(get.suit(player.storage.sxianjing[i])==suit){
+								return true;
+							}
+						}
+						return false;
+					},
+					content:function(){
+						'step 0'
+						var suit=get.suit(trigger.card);
+						var card=null;
+						for(var i=0;i<player.storage.sxianjing.length;i++){
+							if(get.suit(player.storage.sxianjing[i])==suit){
+								card=player.storage.sxianjing[i];break;
+							}
+						}
+						if(card){
+							player.showCards(card,get.translation(player)+'发动了【陷阱】');
+							player.storage.sxianjing.remove(card);
+							ui.discardPile.appendChild(card);
+							player.syncStorage('sxianjing');
+							if(player.storage.sxianjing.length){
+								player.updateMarks();
+							}
+							else{
+								player.unmarkSkill('sxianjing');
+							}
+						}
+						'step 1'
+						player.randomGain(trigger.player,true);
+					}
+				},
+				damage:{
+					trigger:{player:'damageEnd'},
+					forced:true,
+					filter:function(event,player){
+						return player.storage.sxianjing.length>0;
+					},
+					content:function(){
+						var card=player.storage.sxianjing.randomGet();
+						player.storage.sxianjing.remove(card);
+						player.gain(card,'draw');
+						player.syncStorage('sxianjing');
+						if(player.storage.sxianjing.length){
+							player.updateMarks();
+						}
+						else{
+							player.unmarkSkill('sxianjing');
+						}
+					}
+				}
+			}
+		},
 		zhanxing:{
 			enable:'phaseUse',
 			usable:1,
@@ -8861,9 +9034,14 @@ character.swd={
 		swd_wushi:'巫师',
 		swd_quxian:'屈娴',
 		swd_xiyan:'犀衍',
+		swd_shuwaner:'舒莞儿',
+		swd_xiaohuanglong:'小黄龙',
 
+		huodan:'火丹',
+		huodan_info:'出牌阶段限一次，你可以弃置一张红色牌并失去一点体力，然后对两名随机敌人各造成一点火属性伤害',
 		sxianjing:'陷阱',
-		sxianjing_info:'出牌阶段限一次，你可以将一张手牌背面朝上置于你的武将牌上（不能与已有花色相同）。当一名其他角色使用与一张“陷阱”牌花色相同的牌指定你为目标时，你翻开对应的“陷阱”牌，令此牌失效，然后随机获得该角色的一张牌。每当你受到一次伤害，你随机弃置一张“陷阱”牌',
+		sxianjing_bg:'阱',
+		sxianjing_info:'出牌阶段，你可以将一张手牌背面朝上置于你的武将牌上（不能与已有花色相同）。当一名其他角色使用与一张“陷阱”牌花色相同的牌指定你为目标时，你移去对应的“陷阱”牌，然后随机获得该角色的一张牌。每当你受到一次伤害，你随机将一张“陷阱”牌返回手牌',
 		zhanxing:'占星',
 		zhanxing_info:'出牌阶段限一次，你可以弃置任意张牌，并亮出牌堆顶的等量的牌，并根据亮出的牌包含的花色执行以下效果：♦︎摸两张牌；♥回复一点体力（若未损失体力改为获得一点护甲）；♣令所有敌人随机弃置一张牌；♠令一名角色受到一点无来源的雷属性伤害',
 		kbolan:'博览',

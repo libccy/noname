@@ -7042,7 +7042,7 @@ character.sp={
 				player.storage.wuji=true;
 			}
 		},
-		xueji:{
+		xueji_old:{
 			audio:2,
 			enable:'phaseUse',
 			usable:1,
@@ -7089,6 +7089,60 @@ character.sp={
 						if(get.tag(card,'recover')&&player.hp>=player.maxHp-1) return [0,0];
 					}
 				}
+			}
+		},
+		xueji:{
+			audio:2,
+			enable:'phaseUse',
+			usable:1,
+			filter:function(event,player){
+				return player.countCards('he',{color:'red'})>0;
+			},
+			filterTarget:function(card,player,target){
+				return player!=target;
+			},
+			selectTarget:function(){
+				var player=_status.event.player
+				return [1,Math.max(1,player.maxHp-player.hp)];
+			},
+			position:'he',
+			filterCard:{color:'red'},
+			check:function(card){
+				return 8-ai.get.value(card);
+			},
+			multitarget:true,
+			multiline:true,
+			line:'fire',
+			content:function(){
+				'step 0'
+				event.delay=false;
+				for(var i=0;i<targets.length;i++){
+					if(!targets[i].isLinked()){
+						targets[i].link(true);
+						event.delay=true;
+					}
+				}
+				'step 1'
+				if(event.delay){
+					game.delay();
+				}
+				'step 2'
+				targets[0].damage('fire');
+			},
+			ai:{
+				threaten:1.5,
+				order:7,
+				result:{
+					target:function(player,target){
+						var eff=ai.get.damageEffect(target,player,target,'fire');
+						if(target.isLinked()){
+							return eff/10;
+						}
+						else{
+							return eff;
+						}
+					}
+				},
 			}
 		},
 		huxiao:{

@@ -13957,6 +13957,35 @@
 					}
 					return cards;
 				},
+				randomGain:function(){
+					var position='he',num=1,target=null,line=false;
+					for(var i=0;i<arguments.length;i++){
+						if(typeof arguments[i]=='number'){
+							num=arguments[i];
+						}
+						else if(get.itemtype(arguments[i])=='select'){
+							position=arguments[i];
+						}
+						else if(get.itemtype(arguments[i])=='player'){
+							target=arguments[i];
+						}
+						else if(typeof arguments[i]=='boolean'){
+							line=arguments[i];
+						}
+					}
+					if(target){
+						var cards=target.getCards(position).randomGets(num);
+						if(cards.length){
+							if(line){
+								this.line(target,'green');
+							}
+							this.gain(cards,target,'log');
+							target.$giveAuto(cards,this);
+						}
+						return cards;
+					}
+					return [];
+				},
 				discard:function(){
 					var next=game.createEvent('discard');
 					next.player=this;
