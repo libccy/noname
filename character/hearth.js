@@ -4246,10 +4246,10 @@ character.hearth={
 			selectTarget:function(){
 				return [1,_status.event.player.hujia];
 			},
+			contentBefore:function(){
+				player.changeHujia(-player.hujia);
+			},
 			content:function(){
-				if(target==targets[0]){
-					player.changeHujia(-player.hujia);
-				}
 				target.damage();
 			},
 			ai:{

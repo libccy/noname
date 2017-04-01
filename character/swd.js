@@ -1259,11 +1259,11 @@ character.swd={
 			},
             filterTarget:true,
             selectTarget:[1,Infinity],
+			contentBefore:function(){
+				player.awakenSkill('jinlin');
+				player.storage.jinlin=true;
+			},
 			content:function(){
-                if(target==targets[0]){
-                    player.awakenSkill('jinlin');
-    				player.storage.jinlin=true;
-                }
 				target.changeHujia(3);
 				target.addSkill('jinlin2');
 				target.storage.jinlin2=3;
@@ -4488,21 +4488,23 @@ character.swd={
 				return player!=target;
 			},
 			selectTarget:-1,
-			content:function(){
-				"step 0"
-				if(target==targets[0]){
-					var cards=player.getCards('hej');
-					for(var i=0;i<cards.length;i++){
-						if(get.color(cards[i])!='black'){
-							cards.splice(i,1);i--;
-						}
+			delay:false,
+			contentBefore:function(){
+				'step 0'
+				game.delayx();
+				'step 1'
+				var cards=player.getCards('hej');
+				for(var i=0;i<cards.length;i++){
+					if(get.color(cards[i])!='black'){
+						cards.splice(i,1);i--;
 					}
-					cards.sort(lib.sort.random);
-					player.discard(cards);
-					player.storage.miejing=true;
-					player.unmarkSkill('miejing');
 				}
-				"step 1"
+				cards.sort(lib.sort.random);
+				player.discard(cards);
+				player.storage.miejing=true;
+				player.unmarkSkill('miejing');
+			},
+			content:function(){
 				target.damage('thunder');
 			}
 		},
@@ -7146,7 +7148,6 @@ character.swd={
 						}
 					}
 				});
-				console.log(num);
 				next.ai=function(card){
 					if(trigger.player.hasSkillTag('nofire')) return 0;
 					if(num>0){

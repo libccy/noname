@@ -1273,25 +1273,29 @@ character.ow={
                 return [1,_status.event.player.countCards('he',{color:'black'})];
             },
             alter:true,
+            delay:false,
+            contentBefore:function(){
+                'step 0'
+                game.delayx();
+                'step 1'
+                player.storage.baoxue=true;
+                player.awakenSkill('baoxue');
+                player.showHandcards();
+                player.discard(player.getCards('he',{color:'black'}));
+            },
             content:function(){
                 'step 0'
-                if(target==targets[0]){
-                    player.storage.baoxue=true;
-                    player.awakenSkill('baoxue');
-                    player.showHandcards();
-                    player.discard(player.getCards('he',{color:'black'}));
-                }
-                'step 1'
                 if(!get.is.altered('baoxue')){
                     var he=target.getCards('he');
                     if(he.length){
                         target.discard(he.randomGet());
                     }
                 }
-                'step 2'
+                'step 1'
                 target.turnOver(true);
-                'step 3'
-                if(get.is.altered('baoxue')&&target==targets[targets.length-1]){
+            },
+            contentAfter:function(){
+                if(get.is.altered('baoxue')){
                     player.turnOver(true);
                 }
             },
@@ -2660,13 +2664,13 @@ character.ow={
                 return target.isDamaged();
             },
             selectTarget:[1,Infinity],
+            contentBefore:function(){
+                player.turnOver();
+                player.addSkill('sheng2');
+                player.awakenSkill('sheng');
+                player.storage.sheng=true;
+            },
 			content:function(){
-                if(target==targets[0]){
-                    player.turnOver();
-                    player.addSkill('sheng2');
-                    player.awakenSkill('sheng');
-    				player.storage.sheng=true;
-                }
 				target.recover();
 			},
 			ai:{
