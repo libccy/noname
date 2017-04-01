@@ -97,8 +97,11 @@ character.sp={
 		zangba:['male','wei',4,['hengjiang']],
 		zhangren:['male','qun',4,['chuanxin','zfengshi']],
 		zoushi:['female','qun',3,['zhuoshui','zqingcheng']],
+
+		huangfusong:['male','qun',4,['fenyue']],
 	},
 	characterIntro:{
+		huangfusong:'字义真。安定郡朝那县（今宁夏彭阳）人。于黄巾起义时，以中郎将身份讨伐黄巾，用火攻大破张梁、张宝。[45]  后接替董卓进攻张梁，连胜七阵。掘张角墓，拜左车骑将军、冀州牧，因拒绝贿赂宦官而被免职。[46]  董卓死，王允命其与吕布等共至郿坞抄籍董卓家产、人口，皇甫嵩将坞中所藏良家子女，尽行释放。',
 		zangba:'其父臧戒，有二子臧艾与臧舜。年少时曾召集数人将获罪的父亲救出，此后四处流亡。后来成为陶谦麾下的骑都尉，负责募兵抵抗黄巾军。与孙观、尹礼等人拥兵驻屯于开阳，自成一股独立势力，后跟随吕布。吕布战败后，投降了曹操。后与袁绍、孙权等的战役里战功赫赫，官至镇东将军。',
 		zhangren:'刘璋的属下，以忠勇著称。刘备入蜀时，张任曾劝刘璋提防刘备，但刘璋没有听从。魏延舞剑想趁机除掉刘璋时，张任出面对舞，解救刘璋。后在刘备进攻时于落凤坡射死了庞统。',
 		jiling:'东汉末年袁术帐下将领，勇猛非常，曾奉命率军攻打小沛的刘备，在吕布辕门射戟的调停下撤兵。',
@@ -194,6 +197,88 @@ character.sp={
 		dongbai:['dongzhuo']
 	},
 	skill:{
+		fenyue:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				if(!player.countCards('h')) return false;
+				var num;
+				if(get.mode()=='identity'){
+					num=game.countPlayer(function(current){
+						return current.identity=='zhong'||current.identity=='mingzhong';
+					});
+				}
+				else{
+					num=1;
+				}
+				if(player.getStat().skill.fenyue>=num) return false;
+				return true;
+			},
+			filterTarget:function(card,player,target){
+				return target.countCards('h')&&target!=player;
+			},
+			ai:{
+				order:2.8,
+				result:{
+					target:function(player,target){
+						if(ai.get.attitude(player,target)<0&&player.hasCard(function(card){
+							return (card.number>=9&&ai.get.value(card)<=5)||ai.get.value(card)<=3;
+						})){
+							return ai.get.effect(target,{name:'sha'},player,target);
+						}
+						else{
+							return 0;
+						}
+					}
+				}
+			},
+			content:function(){
+				'step 0'
+				player.chooseToCompare(target);
+				'step 1'
+				if(result.bool){
+					player.chooseControl(function(){
+						return 1;
+					}).set('choiceList',[
+						'令'+get.translation(target)+'不能使用或打出手牌直到回合结束',
+						'视为对'+get.translation(target)+'使用一张杀（不计入次数限制）'
+					]);
+				}
+				else{
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+					event.finish();
+				}
+				'step 2'
+				if(result.control=='选项一'){
+					target.addTempSkill('fenyue2','phaseAfter');
+				}
+				else{
+					player.useCard({name:'sha'},target,false);
+				}
+			}
+		},
+		fenyue2:{
+			mark:true,
+			mod:{
+				cardEnabled:function(){
+					return false;
+				},
+				cardUsable:function(){
+					return false;
+				},
+				cardRespondable:function(){
+					return false;
+				},
+				cardSavable:function(){
+					return false;
+				}
+			},
+			intro:{
+				content:'不能使用或打出卡牌'
+			}
+		},
 		zhuoshui:{
 			audio:'huoshui',
 			trigger:{player:'phaseBegin'},
@@ -385,7 +470,7 @@ character.sp={
 				}
 				else{
 					goon=player.hasCard(function(card){
-						return card.number>=9&&ai.get.value(card)<=5||ai.get.value(card)<=3;
+						return (card.number>=9&&ai.get.value(card)<=5)||ai.get.value(card)<=3;
 					});
 				}
 				player.chooseTarget(get.prompt('shuangren'),function(card,player,target){
@@ -8299,7 +8384,12 @@ character.sp={
 		kanze:'阚泽',
 		dongyun:'董允',
 		mazhong:'马忠',
+		huangfusong:'皇甫嵩',
 
+		fenyue:'奋钺',
+		fenyue2:'奋钺',
+		fenyue2_bg:'钺',
+		fenyue_info:'出牌阶段限X次，你可以与一名角色拼点，若你赢，你选择一项：1.其不能使用或打出手牌直到回合结束；2.视为你对其使用了【杀】（不计入次数限制）。若你没赢，你结束出牌阶段。（X为存活的忠臣数）',
 		zhuoshui:'祸水',
 		zhuoshui_info:'锁定技，准备阶段，你令所有其他角色的非锁定技失效直到回合结束',
 		zqingcheng:'倾城',

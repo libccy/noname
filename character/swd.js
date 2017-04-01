@@ -232,6 +232,9 @@ character.swd={
 			position:'he',
 			check:function(card){
 				return 7-ai.get.value(card);
+			},
+			ai:{
+				threaten:1.5
 			}
 		},
 		juxi:{

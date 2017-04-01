@@ -27,7 +27,7 @@ character.yxs={
 		yxs_direnjie:['male','wei',3,['shentan','kanpo']],
 		yxs_sunwu:['male','wu',3,['bingsheng','taolue']],
 		yxs_chengyaojin:['male','shu',4,['sanbanfu']],
-		yxs_yujix:['female','shu',3,['sheshen','changnian']],
+		yxs_yujix:['female','shu',3,['ysheshen','changnian']],
 		yxs_xiangyu:['male','shu',4,['wushuang','ciqiu']],
 		yxs_yingzheng:['male','qun',4,['jianxiong','batu']],
 		yxs_yuefei:['male','qun',4,['longdan','wumu']],
@@ -960,7 +960,7 @@ character.yxs={
 				}
 			},
 		},
-		sheshen:{
+		ysheshen:{
 			inherit:'yiji'
 		},
 		sanbanfu:{
@@ -2858,8 +2858,8 @@ character.yxs={
 		jiean_info:'每当【演绎】造成伤害时，你可以摸X张牌，并以任意数量分配给任意角色（X为被【演绎】造成伤害角色的已损失体力值）。',
 		wumu:'武穆',
 		wumu_info:'锁定技，你的黑杀无视距离，红色不计入回合内的出杀限制',
-		sheshen:'舍身',
-		sheshen_info:'每当你受到一点伤害，可以观看牌堆顶的两张牌，并将其交给任意1~2名角色',
+		ysheshen:'舍身',
+		ysheshen_info:'每当你受到一点伤害，可以观看牌堆顶的两张牌，并将其交给任意1~2名角色',
 		sanbanfu:'三板斧',
 		sanbanfu_info:'当你对其他角色使用杀时，你可以使此杀有如下效果：若对方没有出闪，其受到2点伤害；若对方打出了一张闪，你与其各受到1点伤害；若对方打出了两张闪，你受到一点伤害',
 		bingsheng:'兵圣',

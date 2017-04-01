@@ -208,6 +208,12 @@ mode.identity={
 				game.zhong=game.zhu;
 				game.zhu=game.zhu2;
 				delete game.zhu2;
+				if(game.zhong.sex=='male'&&game.zhong.maxHp<=4){
+					game.zhong.addSkill('dongcha');
+				}
+				else{
+					game.zhong.addSkill('sheshen');
+				}
 			}
 			var enhance_zhu=false;
 			if(_status.connectMode){
@@ -1307,6 +1313,10 @@ mode.identity={
 		ai_strategy_4:'酱油',
 		ai_strategy_5:'天使',
 		ai_strategy_6:'仇主',
+		dongcha:'洞察',
+		dongcha_info:'游戏开始时，随机一名反贼的身份对你可见；准备阶段，你可以弃置场上的一张牌',
+		sheshen:'舍身',
+		sheshen_info:'锁定技，主公处于濒死状态即将死亡时，令主公+1体力上限，回复体力至X点（X为你的体力值数），获得你的所有牌，然后你死亡',
 	},
 	element:{
 		player:{
@@ -1550,7 +1560,7 @@ mode.identity={
 				}
 				var difficulty=0;
 				if(to==game.me) difficulty=2-get.difficulty();
-				if(from==to||to.identityShown){
+				if(from==to||to.identityShown||(from.storage.dongcha==to)){
 					return ai.get.realAttitude(from,to)+difficulty*1.5;
 				}
 				else{
@@ -1810,6 +1820,75 @@ mode.identity={
 			},
 			population:function(identity){
 				return get.population(identity);
+			}
+		}
+	},
+	skill:{
+		dongcha:{
+			trigger:{player:'phaseBegin'},
+			direct:true,
+			unique:true,
+			forceunique:true,
+			content:function(){
+				'step 0'
+				player.chooseTarget(get.prompt('dongcha'),function(card,player,target){
+					return target.countCards('hej')>0;
+				}).set('ai',function(target){
+					var player=_status.event.player;
+					return ai.get.attitude(player,target)*lib.card.guohe.ai.result.target(player,target);
+				});
+				'step 1'
+				if(result.bool){
+					player.logSkill('dongcha',result.targets);
+					player.discardPlayerCard('hej',true,result.targets[0]);
+				}
+			},
+			group:'dongcha_begin',
+			subSkill:{
+				begin:{
+					trigger:{global:'gameStart'},
+					forced:true,
+					content:function(){
+						var list=[];
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i].identity=='fan'){
+								list.push(game.players[i]);
+							}
+						}
+						var target=list.randomGet();
+						player.storage.dongcha=target;
+						player.chooseControl('ok').set('dialog',[get.translation(target)+'是反贼',[[target.name],'character']]);
+					}
+				}
+			}
+		},
+		sheshen:{
+			trigger:{global:'dieBefore'},
+			forced:true,
+			unique:true,
+			forceunique:true,
+			filter:function(event,player){
+				return event.player==game.zhu&&player.hp>0;
+			},
+			logTarget:'player',
+			content:function(){
+				'step 0'
+				trigger.player.gainMaxHp();
+				'step 1'
+				var dh=player.hp-trigger.player.hp;
+				if(dh>0){
+					trigger.player.recover(dh);
+				}
+				'step 2'
+				var cards=player.getCards('he');
+				if(cards.length){
+					trigger.player.gain(cards,player);
+					player.$giveAuto(cards,trigger.player);
+				}
+				'step 3'
+				trigger.untrigger();
+				trigger.finish();
+				player.die();
 			}
 		}
 	},
