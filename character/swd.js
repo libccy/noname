@@ -228,51 +228,47 @@ character.swd={
 			filter:function(event,player){
 				return player.countCards('he',{color:'red'})>0;
 			},
+			filterTarget:true,
+			selectTarget:[1,2],
 			position:'he',
 			check:function(card){
 				return 7-ai.get.value(card);
 			},
-			content:function(){
-				'step 0'
+			contentBefore:function(){
 				player.loseHp();
-				var enemies=player.getEnemies();
-				event.targets=enemies.randomGets(2);
-				event.targets.sortBySeat();
-				'step 1'
-				if(event.targets.length){
-					var target=event.targets.shift();
-					player.line(target,'fire');
+			},
+			content:function(){
+				if(targets.length==1){
+					target.damage('fire',2);
+				}
+				else{
 					target.damage('fire');
-					target.addExpose(0.2);
-					event.redo();
 				}
 			},
+			line:'fire',
 			ai:{
-				order:5,
+				order:15,
+				expose:0.2,
 				result:{
-					player:function(player){
+					target:function(player,target){
 						if(player.hp<2) return 0;
-						var enemies=player.getEnemies();
-						if(enemies.length<2) return 0;
-						var hp=0;
-						for(var i=0;i<enemies.length;i++){
-							if(ai.get.damageEffect(enemies[i],player,player,'fire')<=0){
-								return 0;
+						if(ai.get.attitude(player,target)>=0) return 0;
+						if(ui.selected.targets.length){
+							if(ui.selected.targets[0].hp>1&&target.hp>1) return 0;
+						}
+						var eff=ai.get.damageEffect(target,player,target,'fire');
+						if(eff<0){
+							var num=game.countPlayer(function(current){
+								return ai.get.attitude(player,current)<0&&
+									ai.get.damageEffect(current,player,player,'fire')>0&&
+									current.hp<=player.hp;
+							});
+							if(num>=2){
+								if(target.nodying) return eff/10;
+								return eff/Math.sqrt(target.hp);
 							}
-							if(enemies[i].hasSkillTag('maixie')&&enemies[i].hp>1){
-								hp--;
-							}
-							hp+=enemies[i].hp;
 						}
-						hp/=enemies.length;
-						if(player.hp==2){
-							if(hp<2) return 1;
-							return 0;
-						}
-						else{
-							if(hp<=player.hp) return 1;
-							return 0;
-						}
+						return 0;
 					}
 				}
 			}
@@ -315,6 +311,14 @@ character.swd={
 				order:1,
 				result:{
 					player:1
+				},
+				threaten:function(player,target){
+					if(target.storage.sxianjing&&target.storage.sxianjing.length){
+						return Math.sqrt(1.6/(target.storage.sxianjing.length+1));
+					}
+					else{
+						return 1.6
+					}
 				}
 			},
 			intro:{
@@ -9038,7 +9042,7 @@ character.swd={
 		swd_xiaohuanglong:'小黄龙',
 
 		huodan:'火丹',
-		huodan_info:'出牌阶段限一次，你可以弃置一张红色牌并失去一点体力，然后对两名随机敌人各造成一点火属性伤害',
+		huodan_info:'出牌阶段限一次，你可以弃置一张红色牌并失去一点体力，然后将两点火属性伤害分配给1~2名角色',
 		sxianjing:'陷阱',
 		sxianjing_bg:'阱',
 		sxianjing_info:'出牌阶段，你可以将一张手牌背面朝上置于你的武将牌上（不能与已有花色相同）。当一名其他角色使用与一张“陷阱”牌花色相同的牌指定你为目标时，你移去对应的“陷阱”牌，然后随机获得该角色的一张牌。每当你受到一次伤害，你随机将一张“陷阱”牌返回手牌',

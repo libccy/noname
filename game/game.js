@@ -10692,7 +10692,7 @@
 					}
 					"step 4"
 					if(get.info(card).contentAfter){
-						var next=game.createEvent(card.name+'contentAfter');
+						var next=game.createEvent(card.name+'ContentAfter');
 						next.setContent(get.info(card).contentAfter);
 						next.targets=targets;
 						next.card=card;
@@ -10824,6 +10824,15 @@
 						}
 					}
 					"step 1"
+					var info=get.info(event.skill);
+					if(info&&info.contentBefore){
+						var next=game.createEvent(event.skill+'ContentBefore');
+						next.setContent(info.contentBefore);
+						next.targets=targets;
+						next.cards=cards;
+						next.player=player;
+					}
+					"step 2"
 					if(!event.skill){
 						console.log('error: no skill',get.translation(event.player),event.player.getSkills());
 						if(event._skill){
@@ -10889,7 +10898,16 @@
 						event.num++;
 						event.redo();
 					}
-					"step 2"
+					"step 3"
+					var info=get.info(event.skill);
+					if(info&&info.contentAfter){
+						var next=game.createEvent(event.skill+'ContentAfter');
+						next.setContent(info.contentAfter);
+						next.targets=targets;
+						next.cards=cards;
+						next.player=player;
+					}
+					"step 4"
 					if(player.getStat().allSkills>200){
 						player._noSkill=true;
 						console.log(player.name,event.skill);
@@ -10900,7 +10918,7 @@
 					else{
 						event.finish();
 					}
-					"step 3"
+					"step 5"
 					ui.clear();
 				},
 				draw:function(){

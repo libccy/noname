@@ -55,6 +55,7 @@ window.characterRank={
     ],
     a:[
         'swd_kendi',
+        'swd_shuwaner',
         'hs_enzoth',
         'hs_sapphiron',
         'gw_airuiting',
