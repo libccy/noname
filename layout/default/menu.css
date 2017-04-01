@@ -1107,7 +1107,7 @@ input.fileinput::-webkit-file-upload-button {
 	max-height: 90px;
 }
 .videonode.menubutton.extension.current{
-	max-height: 200px;
+	max-height: 400px;
 }
 .videonode.menubutton>div{
 	position: absolute;

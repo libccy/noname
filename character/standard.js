@@ -1566,12 +1566,14 @@ character.standard={
 				"step 0"
 				var next=trigger.turn.chooseToRespond({name:'sha'});
 				next.autochoose=lib.filter.autoRespondSha;
-				next.ai=function(card){
+				next.set('ai',function(card){
+					var player=_status.event.player;
+					var trigger=_status.event.getTrigger();
 					if(ai.get.attitude(trigger.turn,player)<0&&trigger.turn.countCards('h','sha')>1){
 						return ai.get.unuseful2(card);
 					}
 					return -1;
-				};
+				});
 				"step 1"
 				if(result.bool==false){
 					trigger.directHit=true;
