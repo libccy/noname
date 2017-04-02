@@ -713,7 +713,7 @@ card.yunchou={
 				return lib.filter.judge(card,player,target);
 			},
 			enable:function(card,player){
-				return (lib.filter.judge(card,player,player));
+				return player.canAddJudge(card);
 			},
 			filterTarget:function(card,player,target){
 				return (lib.filter.judge(card,player,target)&&player==target);
@@ -735,59 +735,11 @@ card.yunchou={
 					}
 				}
 				else{
-					if(!card.expired){
-						var target=player.next;
-						for(var iwhile=0;iwhile<10;iwhile++){
-							if(target.hasJudge('huoshan')){
-								target=target.next;
-							}
-							else{
-								break;
-							}
-						}
-						if(target.hasJudge('huoshan')||target==player){
-							ui.discardPile.appendChild(card);
-						}
-						else{
-							if(card.name!='huoshan'){
-								target.addJudge('huoshan',card);
-							}
-							else{
-								target.addJudge(card);
-							}
-						}
-					}
-					else{
-						card.expired=false;
-					}
+					player.addJudgeNext(card);
 				}
 			},
 			cancel:function(){
-				if(!card.expired){
-					var target=player.next;
-					for(var iwhile=0;iwhile<10;iwhile++){
-						if(target.hasJudge('huoshan')){
-							target=target.next;
-						}
-						else{
-							break;
-						}
-					}
-					if(target.hasJudge('huoshan')||target==player){
-						ui.discardPile.appendChild(card);
-					}
-					else{
-						if(card.name!='huoshan'){
-							target.addJudge('huoshan',card);
-						}
-						else{
-							target.addJudge(card);
-						}
-					}
-				}
-				else{
-					card.expired=false;
-				}
+				player.addJudgeNext(card);
 			},
 			ai:{
 				basic:{
@@ -810,7 +762,7 @@ card.yunchou={
 		hongshui:{
 			type:'delay',
 			enable:function(card,player){
-				return (lib.filter.judge(card,player,player));
+				return player.canAddJudge(card);
 			},
 			modTarget:function(card,player,target){
 				return lib.filter.judge(card,player,target);

@@ -6,7 +6,18 @@ card.sp={
 			fullskin:true,
 			type:'trick',
 			ai:{
-				useful:1,
+				useful:function(){
+					var player=_status.event.player;
+					if(player.countCards('h','jinchan')>1) return 0;
+					var num=player.getHandcardLimit();
+					if(num==1){
+						return 10;
+					}
+					if(num==2){
+						return 6;
+					}
+					return 1;
+				},
 				value:5
 			}
 		},
@@ -99,7 +110,47 @@ card.sp={
 		fulei:{
 			fullskin:true,
 			type:'delay',
-			enable:true,
+			modTarget:function(card,player,target){
+				return lib.filter.judge(card,player,target);
+			},
+			enable:function(card,player){
+				return player.canAddJudge(card);
+			},
+			filterTarget:function(card,player,target){
+				return (lib.filter.judge(card,player,target)&&player==target);
+			},
+			selectTarget:[-1,-1],
+			judge:function(card){
+				if(get.suit(card)=='spade') return -6;
+				return 0;
+			},
+			effect:function(){
+				if(result.judge){
+					if(!card.storage.fulei){
+						card.storage.fulei=1;
+					}
+					else{
+						card.storage.fulei++;
+					}
+					player.damage(card.storage.fulei,'thunder','nosource');
+				}
+				player.addJudgeNext(card);
+			},
+			cancel:function(){
+				player.addJudgeNext(card);
+			},
+			ai:{
+				basic:{
+					order:1,
+					useful:0,
+					value:0,
+				},
+				result:{
+					target:function(player,target){
+						return lib.card.shandian.ai.result.target(player,target);
+					}
+				},
+			}
 		},
 		qibaodao:{
 			fullskin:true,

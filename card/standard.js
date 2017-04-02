@@ -1147,7 +1147,7 @@ card.standard={
 				return lib.filter.judge(card,player,target);
 			},
 			enable:function(card,player){
-				return (lib.filter.judge(card,player,player));
+				return player.canAddJudge(card);
 			},
 			filterTarget:function(card,player,target){
 				return (lib.filter.judge(card,player,target)&&player==target);
@@ -1162,59 +1162,11 @@ card.standard={
 					player.damage(3,'thunder','nosource');
 				}
 				else{
-					if(!card.expired){
-						var target=player.next;
-						for(var iwhile=0;iwhile<10;iwhile++){
-							if(target.hasJudge('shandian')){
-								target=target.next;
-							}
-							else{
-								break;
-							}
-						}
-						if(target.hasJudge('shandian')||target==player){
-							ui.discardPile.appendChild(card);
-						}
-						else{
-							if(card.name!='shandian'){
-								target.addJudge('shandian',card);
-							}
-							else{
-								target.addJudge(card);
-							}
-						}
-					}
-					else{
-						card.expired=false;
-					}
+					player.addJudgeNext(card);
 				}
 			},
 			cancel:function(){
-				if(!card.expired){
-					var target=player.next;
-					for(var iwhile=0;iwhile<10;iwhile++){
-						if(target.hasJudge('shandian')){
-							target=target.next;
-						}
-						else{
-							break;
-						}
-					}
-					if(target.hasJudge('shandian')||target==player){
-						ui.discardPile.appendChild(card);
-					}
-					else{
-						if(card.name!='shandian'){
-							target.addJudge('shandian',card);
-						}
-						else{
-							target.addJudge(card);
-						}
-					}
-				}
-				else{
-					card.expired=false;
-				}
+				player.addJudgeNext(card);
 			},
 			ai:{
 				basic:{

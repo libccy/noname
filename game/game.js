@@ -14444,6 +14444,46 @@
                     next.setContent('addJudge');
 					return next;
 				},
+				canAddJudge:function(card){
+					var name;
+					if(typeof card=='string'){
+						name=card;
+					}
+					else{
+						name=card.viewAs||card.name;
+					}
+					if(!name) return false;
+					if(this.hasJudge(name)) return false;
+					var mod=game.checkMod(card,this,this,'unchanged','targetEnabled',this);
+					if(mod!='unchanged') return mod;
+					return true;
+				},
+				addJudgeNext:function(card){
+					if(!card.expired){
+						var target=this.next;
+						var name=card.viewAs||card.name;
+						for(var iwhile=0;iwhile<20;iwhile++){
+							if(target==this||target.canAddJudge(card)){
+								break;
+							}
+							target=target.next;
+						}
+						if(target==this){
+							ui.discardPile.appendChild(card);
+						}
+						else{
+							if(card.name!=name){
+								target.addJudge(name,card);
+							}
+							else{
+								target.addJudge(card);
+							}
+						}
+					}
+					else{
+						card.expired=false;
+					}
+				},
 				judge:function(){
 					var next=game.createEvent('judge');
 					next.player=this;
