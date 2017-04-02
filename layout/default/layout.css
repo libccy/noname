@@ -1597,9 +1597,10 @@ div:not(.handcards)>.card>.info>span,
 .button.newstyle>.hp,
 .button.newstyle>.hp.text{
 	left: auto;
-	top: 5px;
+	top: auto;
 	text-align: right;
 	right: 6px;
+	bottom: 5px;
 }
 .button.newstyle>.hp>div{
 	width: 10px;
