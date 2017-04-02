@@ -347,10 +347,10 @@ character.gujian={
 			}
 		},
 		xiuhua:{
-			trigger:{global:'loseEnd'},
+			trigger:{global:['loseEnd','discardAfter']},
 			filter:function(event,player){
 				if(event.player==player) return false;
-				if(event.parent.name!='equip'&&event.parent.name!='discard') return false;
+				if(event.name=='lose'&&event.parent.name!='equip') return false;
 				for(var i=0;i<event.cards.length;i++){
 					if(get.type(event.cards[i])=='equip'&&get.position(event.cards[i])=='d'){
 						return true;

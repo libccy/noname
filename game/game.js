@@ -31384,6 +31384,9 @@
 
     							var goupdate=function(files,update){
                                     lib.version=update.version;
+									if(!update.dev){
+										dev=true;
+									}
 									lib.init.req('game/source.js',function(){
 										try{
 											eval(this.responseText);
@@ -31454,7 +31457,9 @@
                                         },function(){
                                             setTimeout(finish,500);
                                         },null,dev);
-									});
+									},function(){
+										alert('更新地址有误');
+									},true);
     							};
 
     							lib.init.req('game/update.js',function(){
@@ -31749,9 +31754,9 @@
     					button3.onclick=function(){
                             game.checkForUpdate(null,true);
                         };
-    					if(lib.config.dev){
-                            li1.lastChild.appendChild(button3);
-                        }
+    					// if(lib.config.dev){
+                        //     li1.lastChild.appendChild(button3);
+                        // }
 
 						(function(){
 							var updatep1=li1.querySelector('p');
