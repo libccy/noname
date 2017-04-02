@@ -2,15 +2,99 @@
 card.sp={
 	connect:true,
 	card:{
+		jinchan:{
+			fullskin:true,
+			type:'trick',
+			ai:{
+				useful:1,
+				value:5
+			}
+		},
 		qijia:{
 			fullskin:true,
 			type:'trick',
 			enable:true,
-		},
-		jinchan:{
-			fullskin:true,
-			type:'trick',
-			enable:true,
+			filterTarget:function(card,player,target){
+				if(target.getEquip(5)){
+					return target.countCards('e')>1;
+				}
+				else{
+					return target.countCards('e')>0;
+				}
+			},
+			content:function(){
+				'step 0'
+				var e1=[],e2=[];
+				var he=target.getCards('he');
+				for(var i=0;i<he.length;i++){
+					if(get.type(he[i])=='equip'){
+						var subtype=get.subtype(he[i]);
+						if(subtype=='equip1'||subtype=='equip4'){
+							e1.push(he[i]);
+						}
+						else if(subtype=='equip2'||subtype=='equip3'){
+							e2.push(he[i]);
+						}
+					}
+				}
+				if(e1.length&&e2.length){
+					var choice=0;
+					if(e1.length>e2.length||(target.hp>=3&&Math.random()<0.3)){
+						choice=1;
+					}
+					event.e1=e1;
+					event.e2=e2;
+					target.chooseControl(choice).set('choiceList',['弃置'+get.translation(e1),'弃置'+get.translation(e2)]);
+				}
+				else{
+					if(e1.length){
+						target.discard(e1);
+					}
+					else if(e2.length){
+						target.discard(e2);
+					}
+					event.finish();
+				}
+				'step 1'
+				if(result.index==0){
+					target.discard(event.e1);
+				}
+				else{
+					target.discard(event.e2);
+				}
+			},
+			ai:{
+				order:9.01,
+				useful:1,
+				value:5,
+				result:{
+					target:function(player,target){
+						var num1=0,num2=0;
+						for(var i=1;i<=4;i++){
+							var card=target.getEquip(i);
+							if(card){
+								if(i==1||i==4){
+									num1+=ai.get.equipValue(card);
+								}
+								else{
+									num2+=ai.get.equipValue(card);
+								}
+							}
+						}
+						var num=Math.min(num1,num2);
+						if(num>0){
+							return -0.8-num/10;
+						}
+						else{
+							return 0;
+						}
+					}
+				},
+				tag:{
+					loseCard:1,
+					discard:1
+				}
+			}
 		},
 		fulei:{
 			fullskin:true,
@@ -264,6 +348,45 @@ card.sp={
         }
 	},
 	skill:{
+		_jinchan:{
+			trigger:{target:'useCardToBefore'},
+			forced:true,
+			popup:false,
+			filter:function(event,player){
+				var cards=player.getCards('h');
+				return cards.length==1&&cards[0].name=='jinchan';
+			},
+			content:function(){
+				'step 0'
+				player.showHandcards(get.translation(player)+'发动了【金蝉脱壳】');
+				'step 1'
+				var type=get.type(trigger.card,'trick');
+				if(type=='basic'||type=='trick'){
+					trigger.untrigger();
+					trigger.finish();
+				}
+				player.draw(2);
+			}
+		},
+		_jinchan2:{
+			trigger:{player:'discardAfter'},
+			forced:true,
+			filter:function(event,player){
+				for(var i=0;i<event.cards.length;i++){
+					if(event.cards[i].name=='jinchan') return true;
+				}
+				return false;
+			},
+			content:function(){
+				var num=0;
+				for(var i=0;i<trigger.cards.length;i++){
+					if(trigger.cards[i].name=='jinchan') num++;
+				}
+				if(num){
+					player.draw(num);
+				}
+			}
+		},
 		yinyueqiang:{
 			trigger:{player:['useCard','respondAfter']},
 			direct:true,
@@ -619,6 +742,8 @@ card.sp={
 		qijia:'弃甲曳兵',
 		qijia_info:'出牌阶段，对一名装备区里有牌的其他角色使用。该角色选择一项：1.弃置手牌区和装备区里所有的武器和-1坐骑；2.弃置手牌区和装备区里所有的防具和+1坐骑。',
 		jinchan:'金蝉脱壳',
+		_jinchan2:'金蝉脱壳',
+		_jinchan2_info:'当你因弃置而失去【金蝉脱壳】时，你摸一张牌',
 		jinchan_info:'当你成为其他角色使用牌的目标时，若你的手牌里只有【金蝉脱壳】，使目标锦囊牌或基本牌对你无效，你摸两张牌。当你因弃置而失去【金蝉脱壳】时，你摸一张牌。',
 		fulei:'浮雷',
 		fulei_info:'出牌阶段，对你使用。将【浮雷】放置于你的判定区里，若判定结果为黑桃，则目标角色受到X点雷电伤害（X为此锦囊判定结果为黑桃的次数）。判定完成后，将此牌移动到下家的判定区里。',
@@ -665,7 +790,17 @@ card.sp={
 		['club',9,'du'],
 		['diamond',5,'du'],
 		['diamond',9,'du'],
-		["diamond",5,'muniu'],
-		["diamond",12,'yinyueqiang'],
+		['diamond',5,'muniu'],
+		['diamond',12,'yinyueqiang'],
+		["spade",11,'jinchan'],
+		["club",12,'jinchan'],
+		["club",13,'jinchan'],
+		["club",12,'qijia'],
+		["club",13,'qijia'],
+		["spade",1,'fulei','thunder'],
+		["spade",6,'qibaodao'],
+		["spade",5,'zhungangshuo'],
+		["spade",2,'lanyinjia'],
+		["club",2,'lanyinjia'],
 	],
 }

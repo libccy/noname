@@ -7691,11 +7691,17 @@
                         cards.push(game.createCard(arguments[i]));
                     }
                 }
+				if(!cards.length){
+					cards.push(game.createCard('qilin'));
+					cards.push(game.createCard('bagua'));
+					cards.push(game.createCard('dilu'));
+					cards.push(game.createCard('chitu'));
+					cards.push(game.createCard('muniu'));
+				}
                 target=target||game.me;
                 for(var i=0;i<cards.length;i++){
                     var card=target.getEquip(cards[i]);
                     if(card){
-                        console.log(card);
                         ui.discardPile.appendChild(card);
                         target.removeEquipTrigger(card);
                     }
