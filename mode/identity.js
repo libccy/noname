@@ -9,6 +9,31 @@ mode.identity={
 		if(_status.brawl&&_status.brawl.submode){
 			_status.mode=_status.brawl.submode;
 		}
+		event.replacePile=function(){
+			var list=['shengdong','qijia','caomu','jinchan','zengbin','fulei','qibaodao','zhungangshuo','lanyinjia'];
+			var map={
+				shunshou:'shengdong',
+				jiedao:'qijia',
+				bingliang:'caomu',
+				wuxie:'jinchan',
+				wuzhong:'zengbin',
+				wugu:'zengbin',
+				shandian:'fulei',
+				qinggang:'qibaodao',
+				qinglong:'zhungangshuo',
+				bagua:'lanyinjia'
+			};
+			for(var i=0;i<lib.card.list.length;i++){
+				var name=lib.card.list[i][2];
+				if(list.contains(name)){
+					lib.card.list.splice(i--,1);
+				}
+				else if(map[name]){
+					lib.card.list[i][2]=map[name];
+					lib.card.list[i]._replaced=true;
+				}
+			}
+		}
 		"step 1"
 		var playback=localStorage.getItem(lib.configprefix+'playback');
 		if(playback){
@@ -31,6 +56,9 @@ mode.identity={
 		}
 		else if(!_status.connectMode){
 			if(_status.mode=='zhong'){
+				if(get.config('zhong_card')){
+					event.replacePile();
+				}
 				game.prepareArena(8);
 			}
 			else{
@@ -161,6 +189,9 @@ mode.identity={
 			_status.mode=lib.configOL.identity_mode;
 			if(_status.mode=='zhong'){
 				lib.configOL.number=8;
+				if(lib.configOL.zhong_card){
+					event.replacePile();
+				}
 			}
 			if(lib.configOL.number<2){
 				lib.configOL.number=2;
@@ -299,6 +330,9 @@ mode.identity={
 			if(lib.configOL.identity_mode!='zhong'){
 				uiintro.add('<div class="text chat">双内奸：'+(lib.configOL.double_nei?'开启':'关闭'));
 				uiintro.add('<div class="text chat">加强主公：'+(lib.configOL.enhance_zhu?'开启':'关闭'));
+			}
+			else{
+				uiintro.add('<div class="text chat">卡牌替换：'+(lib.configOL.zhong_card?'开启':'关闭'));
 			}
 			uiintro.add('<div class="text chat">出牌时限：'+lib.configOL.choose_timeout+'秒');
 			uiintro.add('<div class="text chat">屏蔽弱将：'+(lib.configOL.ban_weak?'开启':'关闭'));

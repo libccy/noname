@@ -2,12 +2,12 @@
 card.sp={
 	connect:true,
 	card:{
-		qijiayebing:{
+		qijia:{
 			fullskin:true,
 			type:'trick',
 			enable:true,
 		},
-		jinchantuoqiao:{
+		jinchan:{
 			fullskin:true,
 			type:'trick',
 			enable:true,
@@ -616,10 +616,10 @@ card.sp={
 		}
 	},
 	translate:{
-		qijiayebing:'弃甲曳兵',
-		qijiayebing_info:'出牌阶段，对一名装备区里有牌的其他角色使用。该角色选择一项：1.弃置手牌区和装备区里所有的武器和-1坐骑；2.弃置手牌区和装备区里所有的防具和+1坐骑。',
-		jinchantuoqiao:'金蝉脱壳',
-		jinchantuoqiao_info:'当你成为其他角色使用牌的目标时，若你的手牌里只有【金蝉脱壳】，使目标锦囊牌或基本牌对你无效，你摸两张牌。当你因弃置而失去【金蝉脱壳】时，你摸一张牌。',
+		qijia:'弃甲曳兵',
+		qijia_info:'出牌阶段，对一名装备区里有牌的其他角色使用。该角色选择一项：1.弃置手牌区和装备区里所有的武器和-1坐骑；2.弃置手牌区和装备区里所有的防具和+1坐骑。',
+		jinchan:'金蝉脱壳',
+		jinchan_info:'当你成为其他角色使用牌的目标时，若你的手牌里只有【金蝉脱壳】，使目标锦囊牌或基本牌对你无效，你摸两张牌。当你因弃置而失去【金蝉脱壳】时，你摸一张牌。',
 		fulei:'浮雷',
 		fulei_info:'出牌阶段，对你使用。将【浮雷】放置于你的判定区里，若判定结果为黑桃，则目标角色受到X点雷电伤害（X为此锦囊判定结果为黑桃的次数）。判定完成后，将此牌移动到下家的判定区里。',
 		qibaodao:'七宝刀',

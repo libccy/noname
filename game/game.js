@@ -3473,6 +3473,7 @@
 							map.connect_player_number.hide();
 							map.connect_enhance_zhu.hide();
 							map.connect_double_nei.hide();
+							map.connect_zhong_card.show();
 						}
 						else{
 							map.connect_player_number.show();
@@ -3483,6 +3484,7 @@
 							else{
 								map.connect_double_nei.hide();
 							}
+							map.connect_zhong_card.hide();
 						}
 					},
                     connect_identity_mode:{
@@ -3511,6 +3513,12 @@
 		                frequent:true,
 						restart:true,
 		            },
+					connect_zhong_card:{
+						name:'明忠卡牌替换',
+						init:true,
+						frequent:true,
+						restart:true
+					},
 					connect_double_nei:{
 						name:'双内奸',
 						init:false,
@@ -3555,6 +3563,7 @@
                             map.ban_identity.hide();
 							map.ban_identity2.hide();
                             map.ban_identity3.hide();
+							map.zhong_card.show();
 						}
 						else{
 							map.player_number.show();
@@ -3583,6 +3592,13 @@
 							else{
 								map.ban_identity3.show();
 							}
+							map.zhong_card.hide();
+						}
+						if(config.double_character){
+							map.double_hp.show();
+						}
+						else{
+							map.double_hp.hide();
 						}
 					},
 					identity_mode:{
@@ -3624,6 +3640,12 @@
 		                frequent:true,
 		                restart:true,
 		            },
+					zhong_card:{
+						name:'明忠卡牌替换',
+						init:true,
+						frequent:true,
+						restart:true
+					},
 		            double_hp:{
 		                name:'双将体力上限',
 		                init:'pingjun',
@@ -12044,7 +12066,14 @@
 						this.node.avatar2.show();
 						this.name2=character2;
 						var hp1=info[2],hp2=info2[2];
-						switch(get.config('double_hp')){
+						var double_hp;
+						if(_status.connectMode){
+							double_hp='pingjun';
+						}
+						else{
+							double_hp=get.config('double_hp');
+						}
+						switch(double_hp){
 							case 'pingjun':{
 								this.maxHp=Math.floor((hp1+hp2)/2);
 								this.singleHp=((hp1+hp2)%2===1);
@@ -34668,13 +34697,15 @@
 				}
 				for(var i=0;i<lib.card.list.length;i++){
 					if(lib.card[lib.card.list[i][2]]){
-                        if(!_status.connectMode){
-                            if(lib.config.bannedcards.contains(lib.card.list[i][2])) continue;
-                        }
-						else{
-                            if(lib.configOL.bannedcards.contains(lib.card.list[i][2])) continue;
-                        }
-						if(game.bannedcards&&game.bannedcards.contains(lib.card.list[i][2])) continue;
+						if(!lib.card.list[i]._replaced){
+							if(!_status.connectMode){
+	                            if(lib.config.bannedcards.contains(lib.card.list[i][2])) continue;
+	                        }
+							else{
+	                            if(lib.configOL.bannedcards.contains(lib.card.list[i][2])) continue;
+	                        }
+							if(game.bannedcards&&game.bannedcards.contains(lib.card.list[i][2])) continue;
+						}
                         lib.inpile.add(lib.card.list[i][2]);
 						ui.create.card(ui.cardPile).init(lib.card.list[i]);
 					}
