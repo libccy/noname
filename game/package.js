@@ -44,7 +44,7 @@ mode.pack={
     brawl:'乱斗',
 };
 background.pack={
-    zhulian_bg:'璧合',
+    ol_bg:'龙纹',
     zhulin_bg:'竹林',
     shengshi_bg:'盛世',
     taoyuan_bg:'桃园',

@@ -1,12 +1,12 @@
 window.noname_asset_list=[
     '1.9.20',
     'image/background/huangtian_bg.jpg',
+    'image/background/ol_bg.jpg',
     'image/background/september_bg.jpg',
     'image/background/shengshi_bg.jpg',
     'image/background/taoyuan_bg.jpg',
     'image/background/yinxiang_bg.jpg',
     'image/background/zhanhuo_bg.jpg',
-    'image/background/zhulian_bg.jpg',
     'image/background/zhulin_bg.jpg',
     'image/card/bagua.png',
     'image/card/baihupifeng.png',

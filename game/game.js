@@ -740,6 +740,7 @@
 									item[link]=name;
 									game.putDB('image',link,file,function(){
 										create(link);
+										node.parentNode.updateBr();
 										lib.config.customBackgroundPack.add(link);
 										game.saveConfig('customBackgroundPack',lib.config.customBackgroundPack);
 									});
