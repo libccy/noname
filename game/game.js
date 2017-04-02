@@ -5219,51 +5219,7 @@
 		},
 		init:{
             init:function(){
-                window.resetGameTimeout=setTimeout(function(){
-                    if(window.inSplash) return;
-                    if(window.resetExtension){
-                        if(confirm('游戏似乎未正常载入，是否禁用扩展并重新打开？')){
-                            window.resetExtension();
-                            window.location.reload();
-                        }
-                    }
-                    else{
-						if(lib.device){
-							if(navigator.notification){
-								navigator.notification.confirm(
-									'游戏似乎未正常载入，是否重置游戏？',
-									 function(index){
-										 if(index==2){
-											 localStorage.removeItem('noname_inited');
-											 window.location.reload();
-										 }
-										 else if(index==3){
-											localStorage.clear();
-											localStorage.setItem('noname_inited',true);
-											if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
-											window.location.reload();
-										 }
-									 },
-									'确认退出',
-									['取消','重新下载','重置设置']
-								);
-							}
-							else{
-								if(confirm('游戏似乎未正常载入，是否重置游戏？')){
-		                            localStorage.removeItem('noname_inited');
-		                            window.location.reload();
-		                        }
-							}
-						}
-						else{
-							if(confirm('游戏似乎未正常载入，是否重置游戏？')){
-	                            localStorage.clear();
-	                            if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
-	                            window.location.reload();
-	                        }
-						}
-                    }
-                },5000);
+                window.resetGameTimeout=setTimeout(lib.init.reset,5000);
                 if(window.cordovaLoadTimeout){
                     clearTimeout(window.cordovaLoadTimeout);
                     delete window.cordovaLoadTimeout;
@@ -6521,6 +6477,51 @@
             		}
                 }
 			},
+			reset:function(){
+				if(window.inSplash) return;
+				if(window.resetExtension){
+					if(confirm('游戏似乎未正常载入，是否禁用扩展并重新打开？')){
+						window.resetExtension();
+						window.location.reload();
+					}
+				}
+				else{
+					if(lib.device){
+						if(navigator.notification){
+							navigator.notification.confirm(
+								'游戏似乎未正常载入，是否重置游戏？',
+								 function(index){
+									 if(index==2){
+										 localStorage.removeItem('noname_inited');
+										 window.location.reload();
+									 }
+									 else if(index==3){
+										localStorage.clear();
+										localStorage.setItem('noname_inited',true);
+										if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
+										window.location.reload();
+									 }
+								 },
+								'确认退出',
+								['取消','重新下载','重置设置']
+							);
+						}
+						else{
+							if(confirm('游戏似乎未正常载入，是否重置游戏？')){
+								localStorage.removeItem('noname_inited');
+								window.location.reload();
+							}
+						}
+					}
+					else{
+						if(confirm('游戏似乎未正常载入，是否重置游戏？')){
+							localStorage.clear();
+							if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
+							window.location.reload();
+						}
+					}
+				}
+			},
 			onload:function(){
                 if(navigator.userAgent.toLowerCase().indexOf('crosswalk')!=-1){
                     lib.crosswalk=true;
@@ -7152,6 +7153,8 @@
 				}
 				if(!mode[lib.config.mode]){
 					window.inSplash=true;
+					clearTimeout(window.resetGameTimeout);
+					delete window.resetGameTimeout;
                     var clickedNode=false;
 					var clickNode=function(){
                         if(clickedNode) return;
@@ -7161,6 +7164,7 @@
 						game.saveConfig('mode',this.link);
 						splash.delete(1000);
 						delete window.inSplash;
+						window.resetGameTimeout=setTimeout(lib.init.reset,5000);
 
                         this.listenTransition(function(){
                             lib.init.js(lib.assetURL+'mode',lib.config.mode,proceed);
@@ -7237,8 +7241,10 @@
 				if(lib.onfree){
 					clearTimeout(window.resetGameTimeout);
 					delete window.resetGameTimeout;
-					delete window.resetExtension;
-	                localStorage.removeItem(lib.configprefix+'disable_extension',true);
+					if(!game.syncMenu){
+						delete window.resetExtension;
+		                localStorage.removeItem(lib.configprefix+'disable_extension',true);
+					}
 
 					var onfree=lib.onfree;
 					delete lib.onfree;
@@ -26282,6 +26288,10 @@
 				return select;
 			},
             menu:function(connectMenu){
+				var menuTimeout=null;
+				if(!connectMenu&&!game.syncMenu){
+					menuTimeout=setTimeout(lib.init.reset,1000);
+				}
 				var menu,menuContainer;
 				var startButton;
 				var popupContainer;
@@ -32714,6 +32724,12 @@
 					}
 					rightPane.appendChild(active.link);
 				}());
+
+				if(menuTimeout){
+					clearTimeout(menuTimeout);
+					delete window.resetExtension;
+	                localStorage.removeItem(lib.configprefix+'disable_extension',true);
+				}
             },
 			table:function(){
 				var str,row,col,position,position2,fixed,style,divposition;

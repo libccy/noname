@@ -52,10 +52,10 @@ window.characterRank={
         'ow_ana',
         'hs_aya',
         'hs_tyrande',
+        'swd_shuwaner',
     ],
     a:[
         'swd_kendi',
-        'swd_shuwaner',
         'hs_enzoth',
         'hs_sapphiron',
         'gw_airuiting',

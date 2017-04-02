@@ -225,6 +225,7 @@ not(.removing):not(.dialog):not(.centermenu):not(.popup-container):not(.forceopa
 	margin-right: 10px;
 	position: relative;
 	transition: all 0.8s;
+	cursor: pointer;
 }
 #splash>div:first-child {
 	margin-left: 20px;

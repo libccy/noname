@@ -417,10 +417,11 @@ character.swd={
 			contentBefore:function(){
 				player.loseHp();
 			},
+			alter:true,
 			content:function(){
 				if(targets.length==1){
 					target.damage('fire',2);
-					target.draw();
+					if(get.is.altered('huodan')) target.draw();
 				}
 				else{
 					target.damage('fire');
@@ -9299,7 +9300,8 @@ character.swd={
 		datong:'大同',
 		datong_info:'任意一名角色的结束阶段，若全场手牌数最多和最少的角色手牌数之差不超过1（人数不少于7时改为2），你摸两张牌',
 		huodan:'火丹',
-		huodan_info:'出牌阶段限一次，你可以弃置一张红色牌并失去一点体力，然后将两点火属性伤害分配给1~2名角色；若你只分配了一名角色，该角色在结算后摸一张牌',
+		huodan_info:'出牌阶段限一次，你可以弃置一张红色牌并失去一点体力，然后将两点火属性伤害分配给1~2名角色',
+		huodan_info_alter:'出牌阶段限一次，你可以弃置一张红色牌并失去一点体力，然后将两点火属性伤害分配给1~2名角色；若你只分配了一名角色，该角色在结算后摸一张牌',
 		sxianjing:'陷阱',
 		sxianjing_bg:'阱',
 		sxianjing_info:'出牌阶段，你可以将一张手牌背面朝上置于你的武将牌上（不能与已有花色相同）。当一名其他角色使用与一张“陷阱”牌花色相同的牌指定你为目标时，你移去对应的“陷阱”牌，然后随机获得该角色的一张牌。每当你受到一次伤害，你随机将一张“陷阱”牌返回手牌',
