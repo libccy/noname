@@ -353,17 +353,19 @@ card.sp={
 					target.chooseToDiscard('弃置一张非基本牌（或取消并弃置两张牌）','he',function(card){
 						return get.type(card)!='basic';
 					}).set('ai',function(card){
-						if(_status.event.goon) return 7-get.value(card);
-						return 9-get.value(card);
-					}).set('goon',target.countCards('h',{type:'basic'})>2);
+						if(_status.event.goon) return 8-get.value(card);
+						return 11-get.value(card);
+					}).set('goon',target.countCards('h',function(card){
+						return get.value(card,target,'raw')<8;
+					})>1);
 					event.more=true;
 				}
 				else{
-					target.chooseToDiscard('he',2,true);
+					target.chooseToDiscard('he',2,true).set('ai',get.disvalue2);
 				}
 				'step 2'
 				if(event.more&&!result.bool){
-					target.chooseToDiscard('he',2,true);
+					target.chooseToDiscard('he',2,true).set('ai',get.disvalue2);
 				}
 			},
 			ai:{

@@ -219,6 +219,7 @@ card.yunchou={
 			filterTarget:function(card,player,target){
 				return target!=player;
 			},
+			multitarget:true,
 			content:function(){
 				'step 0'
 				if(cards&&cards.length){

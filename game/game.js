@@ -40659,6 +40659,9 @@
 		disvalue:function(card,player){
 			return -get.value(card,player);
 		},
+		disvalue2:function(card,player){
+			return -get.value(card,player,'raw');
+		},
 		skillthreaten:function(skill,player,target){
 			if(!lib.skill[skill]) return 1;
 			if(!lib.skill[skill].ai) return 1;
