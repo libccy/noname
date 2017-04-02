@@ -5,7 +5,6 @@ card.gujian={
             fullskin:true,
             type:'food',
             enable:true,
-            markimage:'-14%',
             filterTarget:function(card,player,target){
                 return !target.hasSkill('luyugeng');
             },
@@ -55,7 +54,6 @@ card.gujian={
             fullskin:true,
             type:'food',
             enable:true,
-            markimage:'-13%',
             filterTarget:function(card,player,target){
                 return !target.hasSkill('chunbing');
             },
@@ -87,7 +85,6 @@ card.gujian={
             fullskin:true,
             type:'food',
             enable:true,
-            markimage:'-18%',
             filterTarget:function(card,player,target){
                 return !target.hasSkill('gudonggeng');
             },
@@ -139,7 +136,6 @@ card.gujian={
             fullskin:true,
             type:'food',
             enable:true,
-            markimage:'-16%',
             filterTarget:function(card,player,target){
                 return !target.hasSkill('mizhilianou');
             },
@@ -220,7 +216,6 @@ card.gujian={
             fullskin:true,
             type:'food',
             enable:true,
-            markimage:'-18%',
             filterTarget:function(card,player,target){
                 return !target.hasSkill('mapodoufu');
             },
@@ -245,7 +240,6 @@ card.gujian={
             fullskin:true,
             type:'food',
             enable:true,
-            markimage:'-16%',
             filterTarget:function(card,player,target){
                 return !target.hasSkill('qingtuan');
             },
@@ -279,7 +273,6 @@ card.gujian={
             fullskin:true,
             type:'food',
             enable:true,
-            markimage:'-16%',
             filterTarget:function(card,player,target){
                 return !target.hasSkill('yougeng');
             },
@@ -499,7 +492,6 @@ card.gujian={
 			type:'basic',
 			enable:true,
 			logv:false,
-            markimage:'-12%',
 			filterTarget:function(card,player,target){
 				return !target.hasSkill('yunvyuanshen_skill');
 			},

@@ -666,8 +666,11 @@ mode.identity={
 							setTimeout(function(){
 								_status.tempNoButton=false;
 							},500);
+							var link=this.link;
 							if(game.zhu.name){
-								_status.event.parent.fixedseat=get.distance(game.me,game.zhu,'absolute');
+								if(link!='random'){
+									_status.event.parent.fixedseat=get.distance(game.me,game.zhu,'absolute');
+								}
 								game.zhu.uninit();
 								delete game.zhu.isZhu;
 								delete game.zhu.identityShown;
@@ -680,7 +683,6 @@ mode.identity={
 							if(current){
 								current.classList.remove('thundertext');
 							}
-							var link=this.link;
 							if(link=='random'){
 								if(event.zhongmode){
 									link=['zhu','zhong','nei','fan','mingzhong'].randomGet();

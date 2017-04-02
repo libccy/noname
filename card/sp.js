@@ -523,6 +523,7 @@ card.sp={
 			forced:true,
 			popup:false,
 			filter:function(event,player){
+				if(event.player==player) return false;
 				var cards=player.getCards('h');
 				return cards.length==1&&cards[0].name=='jinchan';
 			},

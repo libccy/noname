@@ -14990,9 +14990,9 @@
 							this.node.marks.insertBefore(node,this.node.marks.childNodes[1]);
 							node.suit=name.suit;
 							node.number=name.number;
-							if(name.name&&lib.card[name.name]&&lib.card[name.name].markimage){
-								node.node.image.style.left=lib.card[name.name].markimage;
-							}
+							// if(name.name&&lib.card[name.name]&&lib.card[name.name].markimage){
+							// 	node.node.image.style.left=lib.card[name.name].markimage;
+							// }
 							name=name.name;
 						}
 						else{

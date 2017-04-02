@@ -4626,11 +4626,12 @@ card.swd={
 			check:function(event,player){
 				var att=ai.get.attitude(player,event.target);
 				if(player.hasSkill('jiu')) return att>0;
-				if(event.target.hasSkillTag('maixie')){
+				if(event.target.hasSkillTag('maixie_hp')){
 					return att<=0;
 				}
-				if(event.target.hp==1) return att>0;
+				if(player.hasSkill('tianxianjiu')) return false;
 				if(event.target.hujia>0) return att<0;
+				if(event.target.hp==1) return att>0;
 				return false;
 			},
 			content:function(){

@@ -2045,10 +2045,13 @@ div:not(.handcards)>.card>.info>span,
 	display: none;
 }
 .equips>div>.image,.judges>div>.image,.marks>div>.image {
-	width: 120%;
+	/*width: 120%;
 	height: 120%;
 	left: -20%;
-	top: -20%;
+	top: -20%;*/
+	background-size: 120%;
+    background-position: -4px -4px;
+    background-repeat: no-repeat;
 }
 /*.equips>div:hover>.info{display: inline-block;
 	animation:equip_hover 1s;
