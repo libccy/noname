@@ -4339,11 +4339,15 @@
                             map.replace_handcard_two.show();
                             map.replace_character_two.show();
                             map.change_identity.show();
+							map.two_assign.show();
+                            map.two_phaseswap.show();
                         }
                         else{
                             map.replace_handcard_two.hide();
                             map.replace_character_two.hide();
                             map.change_identity.remove();
+							map.two_assign.hide();
+                            map.two_phaseswap.hide();
                         }
 					},
 					versus_mode:{
@@ -4398,13 +4402,21 @@
 					four_assign:{
 						name:'代替队友选将',
 						init:false,
-						// frequent:true,
 						restart:true,
 					},
 					four_phaseswap:{
 						name:'代替队友行动',
 						init:false,
-						// frequent:true,
+						restart:true,
+					},
+					two_assign:{
+						name:'代替队友选将',
+						init:false,
+						restart:true,
+					},
+					two_phaseswap:{
+						name:'代替队友行动',
+						init:false,
 						restart:true,
 					},
 					free_choose:{
@@ -15800,6 +15812,7 @@
 						if(_status.mode=='three') return this.side==me.side;
 						if(_status.mode=='standard') return lib.storage.single_control&&this.side==me.side;
 						if(_status.mode=='four') return get.config('four_phaseswap')&&this.side==me.side;
+						if(_status.mode=='two') return get.config('two_phaseswap')&&this.side==me.side;
 						return false;
 					}
 					else if(lib.config.mode=='boss'){

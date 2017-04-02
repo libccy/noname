@@ -818,15 +818,21 @@ mode.versus={
 				else{
 					characterChoice=list.randomGets(7);
 				}
-				var dialog=ui.create.dialog('选择角色',[characterChoice,'character']);
+				var basenum=1;
+				var basestr='选择角色';
+				if(get.config('two_assign')){
+					basenum=2;
+					basestr='选择你和队友的角色';
+					event.two_assign=true;
+				}
 				if(get.config('replace_character_two')){
-					game.me.chooseButton(true,dialog,2).set('onfree',true);
+					basestr+='（含一名替补角色）';
 					_status.replacetwo=true;
 					game.additionaldead=[];
+					basenum*=2;
 				}
-				else{
-					game.me.chooseButton(true,dialog).set('onfree',true);
-				}
+				var dialog=ui.create.dialog(basestr,[characterChoice,'character']);
+				game.me.chooseButton(true,dialog,basenum).set('onfree',true);
 				if(!_status.brawl||!_status.brawl.noAddSetting){
 					if(get.config('change_identity')){
 						addSetting(dialog);
@@ -934,14 +940,35 @@ mode.versus={
 							}
 						}
 						else{
-							game.players[i].init(event.list.randomRemove());
-							game.players[i].replacetwo=event.list.randomRemove();
+							if(event.two_assign&&game.players[i].side==game.me.side){
+								if(_status.replacetwo){
+									game.players[i].init(result.links[2]);
+									game.players[i].replacetwo=result.links[3];
+								}
+								else{
+									game.players[i].init(result.links[1]);
+								}
+							}
+							else{
+								game.players[i].init(event.list.randomRemove());
+								if(_status.replacetwo){
+									game.players[i].replacetwo=event.list.randomRemove();
+								}
+							}
 						}
 					}
 				}
 				setTimeout(function(){
 					ui.arena.classList.remove('choose-character');
-				},500)
+				},500);
+
+				if(get.config('two_phaseswap')){
+					game.addGlobalSkill('autoswap');
+					if(lib.config.show_handcardbutton){
+						ui.versushs=ui.create.system('手牌',null,true);
+						lib.setPopped(ui.versushs,game.versusHoverHandcards,220);
+					}
+				}
 			});
 		},
 		chooseCharacterFour:function(){
@@ -1045,13 +1072,6 @@ mode.versus={
 					_status.ladder=true;
 					_status.ladder_mmr=0;
 				}
-				if(get.config('four_phaseswap')){
-					game.addGlobalSkill('autoswap');
-					if(lib.config.show_handcardbutton){
-						ui.versushs=ui.create.system('手牌',null,true);
-						lib.setPopped(ui.versushs,game.versusHoverHandcards,220);
-					}
-				}
 				"step 1"
 				if(event.current==game.me||(event.four_assign&&event.current.side==game.me.side)){
 					var dialog=event.xdialog;
@@ -1138,6 +1158,13 @@ mode.versus={
 					}
 				}
 				"step 3"
+				if(get.config('four_phaseswap')){
+					game.addGlobalSkill('autoswap');
+					if(lib.config.show_handcardbutton){
+						ui.versushs=ui.create.system('手牌',null,true);
+						lib.setPopped(ui.versushs,game.versusHoverHandcards,220);
+					}
+				}
 				if(event.xdialog){
 					event.xdialog.close();
 				}
@@ -2578,9 +2605,10 @@ mode.versus={
 		},
 		versusHoverHandcards:function(){
 			var uiintro=ui.create.dialog('hidden');
-
+			var added=false;
 			for(var i=0;i<game.players.length;i++){
 				if(game.players[i].name&&game.players[i].side==game.me.side&&game.players[i]!=game.me){
+					added=true;
 					uiintro.add(get.translation(game.players[i]));
 					var cards=game.players[i].getCards('h');
 					if(cards.length){
@@ -2591,8 +2619,7 @@ mode.versus={
 					}
 				}
 			}
-
-			return uiintro;
+			if(added) return uiintro;
 		},
 		versusCheckEnemy:function(){
 			_status.clicked=true;
