@@ -921,11 +921,12 @@ mode.versus={
 					ui.cheat2.close();
 					delete ui.cheat2;
 				}
+				for(var i=0;i<result.links.length;i++){
+					game.addRecentCharacter(result.links[i]);
+				}
 				game.me.init(result.links[0]);
-				game.addRecentCharacter(game.me.name);
 				if(_status.replacetwo){
 					game.me.replacetwo=result.links[1];
-					game.addRecentCharacter(game.me.replacetwo);
 				}
 				event.list.remove(game.me.name);
 				for(var i=0;i<game.players.length;i++){

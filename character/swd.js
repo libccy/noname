@@ -420,6 +420,7 @@ character.swd={
 			content:function(){
 				if(targets.length==1){
 					target.damage('fire',2);
+					target.draw();
 				}
 				else{
 					target.damage('fire');
@@ -429,24 +430,19 @@ character.swd={
 			ai:{
 				order:15,
 				expose:0.2,
+				threaten:1.5,
 				result:{
 					target:function(player,target){
 						if(player.hp<2) return 0;
 						if(ai.get.attitude(player,target)>=0) return 0;
-						if(ui.selected.targets.length){
-							if(ui.selected.targets[0].hp>1&&target.hp>1) return 0;
-						}
+						if(target.hp>player.hp) return 0;
 						var eff=ai.get.damageEffect(target,player,target,'fire');
 						if(eff<0){
-							var num=game.countPlayer(function(current){
-								return ai.get.attitude(player,current)<0&&
-									ai.get.damageEffect(current,player,player,'fire')>0&&
-									current.hp<=player.hp;
-							});
-							if(num>=2){
-								if(target.nodying) return eff/10;
-								return eff/Math.sqrt(target.hp);
+							if(ui.selected.targets.length&&target.hp>1&&ui.selected.targets[0].hp>1){
+								return 0;
 							}
+							if(target.nodying) return eff/10;
+							return eff/Math.sqrt(target.hp);
 						}
 						return 0;
 					}
@@ -9303,7 +9299,7 @@ character.swd={
 		datong:'大同',
 		datong_info:'任意一名角色的结束阶段，若全场手牌数最多和最少的角色手牌数之差不超过1（人数不少于7时改为2），你摸两张牌',
 		huodan:'火丹',
-		huodan_info:'出牌阶段限一次，你可以弃置一张红色牌并失去一点体力，然后将两点火属性伤害分配给1~2名角色',
+		huodan_info:'出牌阶段限一次，你可以弃置一张红色牌并失去一点体力，然后将两点火属性伤害分配给1~2名角色；若你只分配了一名角色，该角色在结算后摸一张牌',
 		sxianjing:'陷阱',
 		sxianjing_bg:'阱',
 		sxianjing_info:'出牌阶段，你可以将一张手牌背面朝上置于你的武将牌上（不能与已有花色相同）。当一名其他角色使用与一张“陷阱”牌花色相同的牌指定你为目标时，你移去对应的“陷阱”牌，然后随机获得该角色的一张牌。每当你受到一次伤害，你随机将一张“陷阱”牌返回手牌',

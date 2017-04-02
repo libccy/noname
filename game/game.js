@@ -16007,7 +16007,7 @@
 				},
 				getEquip:function(name){
 					var es=this.getCards('e');
-					if(get.itemtype(name)=='card'){
+					if(typeof name=='object'&&get.info(name)){
 						name=get.info(name).subtype;
 						if(name){
 							name=parseInt(name[5]);
@@ -40762,12 +40762,12 @@
 				if(!card||card.name!=name){
 					card={name:name};
 				}
-				var value1=ai.get.value(card,target);
+				var value1=ai.get.equipValue(card,target);
 				var value2=0;
 				var current=target.getEquip(card);
 				if(current&&current!=card){
-					value2=ai.get.value(current,target);
-					if(value2>0&&!target.needsToDiscard()){
+					value2=ai.get.equipValue(current,target);
+					if(value2>0&&!target.needsToDiscard()&&!get.tag(card,'valueswap')){
 						return 0;
 					}
 				}

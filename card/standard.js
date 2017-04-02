@@ -339,10 +339,18 @@ card.standard={
 						})){
 							return 1;
 						}
+						if(player.hasSha()&&_status.currentPhase==player){
+							if(player.getEquip('zhuge')||player.getCardUsable('sha')==0){
+								return 10;
+							}
+						}
 						var num=player.countCards('h','sha');
 						if(num>1) return 4+num;
 						return 2+num;
 					}
+				},
+				tag:{
+					valueswap:1
 				}
 			},
 			skills:['zhuge_skill']

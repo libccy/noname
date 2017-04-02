@@ -1206,6 +1206,7 @@ card.swd={
 						if(target.hasSkillTag('noe')) return target.countCards('e')*2;
 						if(target.getEquip('baiyin')&&target.isDamaged()) return 2;
 						if(target.getEquip('xuanyuanjian')||target.getEquip('qiankundai')) return 1;
+						if(target.hasSkill('jiguanyaoshu_skill')) return 0.5;
 						var num=0;
 						var es=target.getCards('e');
 						for(var i=0;i<es.length;i++){
