@@ -78,17 +78,14 @@ card.standard={
 				}
 				else{
 					var next=target.chooseToRespond({name:'shan'});
-					next.set('ai',function(){
+					next.set('ai',function(card){
 						var target=_status.event.player;
 						var evt=_status.event.getParent();
-						var sks=target.getSkills();
-						if(sks.contains('leiji')||
-							sks.contains('releiji')||
-							sks.contains('lingbo')){
-							return 1;
+						if(target.hasSkillTag('useShan')){
+							return 11-ai.get.value(card);
 						}
 						if(ai.get.damageEffect(target,evt.player,target,evt.card.nature)>=0) return -1;
-						return 1;
+						return 11-ai.get.value(card);
 					});
 					next.autochoose=lib.filter.autoRespondShan;
 				}
@@ -649,7 +646,7 @@ card.standard={
 					if(ai.get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
 					if(evt.player.hasSkillTag('notricksource')) return 0;
 					if(evt.target.hasSkillTag('notrick')) return 0;
-					return 1;
+					return 11-ai.get.value(card);
 				});
 				next.autochoose=lib.filter.autoRespondSha;
 				"step 1"
@@ -707,7 +704,7 @@ card.standard={
 					if(ai.get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
 					if(evt.player.hasSkillTag('notricksource')) return 0;
 					if(evt.target.hasSkillTag('notrick')) return 0;
-					return 1;
+					return 11-ai.get.value(card);
 				});
 				next.autochoose=lib.filter.autoRespondShan;
 				"step 1"

@@ -155,17 +155,38 @@ card.sp={
 		qibaodao:{
 			fullskin:true,
 			type:'equip',
-			subtype:'equip1'
+			subtype:'equip1',
+			skills:['qibaodao'],
+			distance:{attackFrom:-1},
+			ai:{
+				equipValue:function(card,player){
+					if(game.hasPlayer(function(current){
+						return player.canUse('sha',current)&&current.isHealthy()&&ai.get.attitude(player,current)<0;
+					})){
+						return 5;
+					}
+					return 3;
+				}
+			},
 		},
 		zhungangshuo:{
 			fullskin:true,
 			type:'equip',
-			subtype:'equip1'
+			subtype:'equip1',
+			skills:['zhungangshuo'],
+			distance:{attackFrom:-2},
+			ai:{
+				equipValue:4
+			},
 		},
 		lanyinjia:{
 			fullskin:true,
 			type:'equip',
-			subtype:'equip2'
+			subtype:'equip2',
+			skills:['lanyinjia','lanyinjia2'],
+			ai:{
+				equipValue:6
+			}
 		},
 		yinyueqiang:{
 			fullskin:true,
@@ -399,6 +420,95 @@ card.sp={
         }
 	},
 	skill:{
+		lanyinjia:{
+			enable:['chooseToRespond'],
+			filterCard:true,
+			viewAs:{name:'shan'},
+			viewAsFilter:function(player){
+				if(!player.countCards('h')) return false;
+			},
+			prompt:'将一张手牌当闪打出',
+			check:function(card){
+				return 6-ai.get.value(card);
+			},
+			ai:{
+				respondShan:true,
+				skillTagFilter:function(player){
+					if(!player.countCards('h')) return false;
+				},
+				effect:{
+					target:function(card,player,target,current){
+						if(get.tag(card,'respondShan')&&current<0&&target.countCards('h')) return 0.59
+					}
+				},
+				order:4,
+				useful:-0.5,
+				value:-0.5
+			}
+		},
+		lanyinjia2:{
+			trigger:{player:'damageEnd'},
+			forced:true,
+			filter:function(event,player){
+				return event.card&&event.card.name=='sha'&&player.getEquip('lanyinjia');
+			},
+			content:function(){
+				var card=player.getEquip('lanyinjia');
+				if(card){
+					player.discard(card);
+				}
+			},
+		},
+		zhungangshuo:{
+			trigger:{player:'shaBegin'},
+			logTarget:'target',
+			filter:function(event,player){
+				return event.player.countCards('h')||player.countCards('h');
+			},
+			check:function(event,player){
+				var target=event.target;
+				if(ai.get.attitude(player,target)>=0) return false;
+				if(player.hasCard(function(card){
+					return ai.get.value(card)>=8;
+				})){
+					return false;
+				}
+				var n1=event.target.countCards('h');
+				return n1>0&&n1<=player.countCards('h');
+			},
+			content:function(){
+				'step 0'
+				game.delayx();
+				'step 1'
+				trigger.target.discardPlayerCard('h',player,true);
+				'step 2'
+				player.discardPlayerCard('h',trigger.target,true);
+			}
+		},
+		qibaodao:{
+			trigger:{source:'damageBegin'},
+			forced:true,
+			filter:function(event){
+				return event.card&&event.card.name=='sha'&&event.player.isHealthy();
+			},
+			content:function(){
+				trigger.num++;
+			},
+			ai:{
+				unequip:true,
+				skillTagFilter:function(player,tag,arg){
+					if(arg&&arg.name=='sha') return true;
+					return false;
+				},
+				effect:{
+					player:function(card,player,target){
+						if(card.name=='sha'&&target.isHealthy()&&ai.get.attitude(player,target)>0){
+							return [1,-2];
+						}
+					}
+				}
+			}
+		},
 		_jinchan:{
 			trigger:{target:'useCardToBefore'},
 			forced:true,

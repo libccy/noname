@@ -1358,6 +1358,7 @@ character.swd={
 			},
 			ai:{
 				mingzhi:false,
+				useShan:true,
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'respondShan')){

@@ -3306,6 +3306,7 @@ character.shenhua={
 				}
 			},
 			ai:{
+				useShan:true,
 				effect:{
 					target:function(card,player,target,current){
 						if(get.tag(card,'respondShan')){
@@ -3948,6 +3949,7 @@ character.shenhua={
 			},
 			ai:{
 				mingzhi:false,
+				useShan:true,
 				effect:{
 					target:function(card,player,target,current){
 						if(get.tag(card,'respondShan')){

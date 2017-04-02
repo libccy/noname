@@ -1778,7 +1778,7 @@ card.swd={
 					if(ai.get.damageEffect(target,player,target,'thunder')>=0) return 0;
 					if(player.hasSkillTag('notricksource')) return 0;
 					if(target.hasSkillTag('notrick')) return 0;
-					return 1;
+					return 11-ai.get.value(card);
 				};
 				next.autochoose=lib.filter.autoRespondSha;
 				"step 1"
@@ -1837,7 +1837,7 @@ card.swd={
 					if(ai.get.damageEffect(target,player,target,'fire')>=0) return 0;
 					if(player.hasSkillTag('notricksource')) return 0;
 					if(target.hasSkillTag('notrick')) return 0;
-					return 1;
+					return 11-ai.get.value(card);
 				};
 				next.autochoose=lib.filter.autoRespondShan;
 				"step 1"
