@@ -25156,15 +25156,19 @@
 					else{
 						if(card.ai.basic.equipValue==undefined) card.ai.basic.equipValue=1;
 					}
-					if(card.ai.basic.value==undefined)card.ai.basic.value=function(card,player){
+					if(card.ai.basic.value==undefined) card.ai.basic.value=function(card,player){
 						var value=0;
 						var info=get.info(card);
 						var current=player.getEquip(info.subtype);
 						if(current&&card!=current){
 							value=ai.get.value(current,player);
 						}
-						var equipValue=info.ai.equipValue||info.ai.basic.equipValue;
+						var equipValue=info.ai.equipValue;
+						if(equipValue==undefined){
+							equipValue=info.ai.basic.equipValue;
+						}
 						if(typeof equipValue=='function') return equipValue(card,player)-value;
+						if(typeof equipValue!='number') equipValue=0;
 						return equipValue-value;
 					}
 					card.ai.result.target=(function(name){
