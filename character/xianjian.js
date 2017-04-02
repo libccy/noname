@@ -99,7 +99,7 @@ character.xianjian={
 			check:function(event,player){
 				if(player.hp==1&&player.hujia==0) return false;
 				var num=game.countPlayer(function(current){
-					var eff=get.sgn(ai.get.damageEffect(current,player,player,'fire'));
+					var eff=get.sgn(get.damageEffect(current,player,player,'fire'));
 					if(current.hp==1&&current.hujia==0) eff*=1.5;
 					return eff;
 				});
@@ -129,8 +129,8 @@ character.xianjian={
 			},
 			filterCard:{color:'red'},
 			check:function(card){
-				if(get.suit(card)=='heart') return 7-ai.get.value(card);
-				return 5-ai.get.value(card);
+				if(get.suit(card)=='heart') return 7-get.value(card);
+				return 5-get.value(card);
 			},
 			onuse:function(result){
 				if(result.targets){
@@ -142,7 +142,7 @@ character.xianjian={
 			group:'yanzhan2',
 			ai:{
 				order:function(){
-                    return ai.get.order({name:'sha'})+0.15;
+                    return get.order({name:'sha'})+0.15;
                 },
 			},
 		},
@@ -197,7 +197,7 @@ character.xianjian={
 				return player.countCards('he',{color:'red'})>0;
 			},
 			check:function(card){
-				return 7-ai.get.value(card);
+				return 7-get.value(card);
 			},
 			content:function(){
 				var targets=player.getEnemies();
@@ -243,7 +243,7 @@ character.xianjian={
 					trigger.target.chooseTarget(function(card,player,target){
 						return target!=player&&target!=_status.event.parent.player&&target.countCards('he')>0;
 					},'选择一名角色并令'+get.translation(player)+'弃置其一张牌').ai=function(target){
-						return -ai.get.attitude(_status.event.player,target);
+						return -get.attitude(_status.event.player,target);
 					};
 				}
 				else{
@@ -367,7 +367,7 @@ character.xianjian={
 				return event.target.countCards('h')>player.countCards('h');
 			},
 			check:function(event,player){
-				return ai.get.attitude(player,event.target)<0;
+				return get.attitude(player,event.target)<0;
 			},
 			logTarget:'target',
 			content:function(){
@@ -407,7 +407,7 @@ character.xianjian={
 				return type=='basic'||type=='equip'||type=='trick';
 			},
 			check:function(card){
-				return 8-ai.get.value(card);
+				return 8-get.value(card);
 			},
 			filter:function(event,player){
 				return player.countCards('h')>0;
@@ -465,7 +465,7 @@ character.xianjian={
 				player.storage.danqing.length=0;
 				player.updateMarks();
 				player.chooseTarget(get.prompt('danqing'),[1,get.is.altered('danqing')?2:4]).ai=function(target){
-					return ai.get.attitude(player,target);
+					return get.attitude(player,target);
 				}
 				'step 1'
 				if(result.bool){
@@ -520,7 +520,7 @@ character.xianjian={
 				player.chooseTarget('令一名角色摸一张牌',function(card,player,target){
 					return !event.targets.contains(target);
 				}).ai=function(target){
-					var att=ai.get.attitude(player,target);
+					var att=get.attitude(player,target);
 					if(att>0){
 						return att+1/Math.sqrt(1+target.countCards('h'));
 					}
@@ -538,7 +538,7 @@ character.xianjian={
 						player.chooseTarget('令一名角色获得一点护甲',function(card,player,target){
 							return !event.targets.contains(target);
 						}).ai=function(target){
-							var att=ai.get.attitude(player,target);
+							var att=get.attitude(player,target);
 							if(att>0){
 								return att+1/Math.sqrt(1+target.hp);
 							}
@@ -562,7 +562,7 @@ character.xianjian={
 						player.chooseTarget('令一名角色装备一件随机装备',function(card,player,target){
 							return !event.targets.contains(target);
 						}).ai=function(target){
-							var att=ai.get.attitude(player,target);
+							var att=get.attitude(player,target);
 							if(att>0&&!target.getEquip(5)){
 								return att;
 							}
@@ -594,7 +594,7 @@ character.xianjian={
 						player.chooseTarget('令一名角色获得潜行',function(card,player,target){
 							return !event.targets.contains(target);
 						}).ai=function(target){
-							var att=ai.get.attitude(player,target);
+							var att=get.attitude(player,target);
 							if(att>0){
 								return att+1/Math.sqrt(1+target.hp);
 							}
@@ -649,11 +649,11 @@ character.xianjian={
 			},
 			check:function(event,player){
 				if(player.isUnseen()) return false;
-				if(ai.get.attitude(player,event.player)>=0) return false;
+				if(get.attitude(player,event.player)>=0) return false;
 				var hs=player.getCards('h');
 				if(hs.length<event.player.countCards('h')) return false;
 				for(var i=0;i<hs.length;i++){
-					var val=ai.get.value(hs[0]);
+					var val=get.value(hs[0]);
 					if(hs[i].number>=10&&val<=6) return true;
 					if(hs[i].number>=8&&val<=3) return true;
 				}
@@ -712,7 +712,7 @@ character.xianjian={
 			usable:1,
 			content:function(){
 				"step 0"
-				var goon=(ai.get.damageEffect(player,trigger.player,player)<=0);
+				var goon=(get.damageEffect(player,trigger.player,player)<=0);
 				player.chooseCard(get.prompt('zhangmu'),{name:'shan'}).ai=function(){
 					return goon?1:0;
 				}
@@ -775,7 +775,7 @@ character.xianjian={
                 var num2=0;
                 for(var i=0;i<player.storage.leiyu.length;i++){
 					if(!player.storage.leiyu[i].isIn()) continue;
-                    var eff=ai.get.effect(player.storage.leiyu[i],{name:'jingleishan',nature:'thunder'},player,player);
+                    var eff=get.effect(player.storage.leiyu[i],{name:'jingleishan',nature:'thunder'},player,player);
                     num+=eff;
                     if(eff>0){
                         num2++;
@@ -787,7 +787,7 @@ character.xianjian={
                 var next=player.chooseToDiscard(get.prompt('leiyu',player.storage.leiyu),{color:'black'});
 				next.ai=function(card){
 					if(num>0&&num2>=2){
-						return 7-ai.get.value(card);
+						return 7-get.value(card);
 					}
 					return 0;
 				};
@@ -873,7 +873,7 @@ character.xianjian={
 				});
 				for(var i=0;i<players.length;i++){
 					if(player!=players[i]&&target!=players[i]&&player.canUse('sha',players[i],false)){
-						num+=ai.get.effect(players[i],{name:'sha'},player,player);
+						num+=get.effect(players[i],{name:'sha'},player,player);
 					}
 				}
                 return num>0;
@@ -924,7 +924,7 @@ character.xianjian={
 				return player.countCards('h',{color:'black'});
 			},
 			check:function(card){
-				return 5-ai.get.value(card);
+				return 5-get.value(card);
 			},
 			content:function(){
 				target.addSkill('guijiang2');
@@ -1042,7 +1042,7 @@ character.xianjian={
 				player.chooseTarget('灵愈：令一名其他角色回复一点体力',function(card,player,target){
 					return target!=player&&target.hp<target.maxHp;
 				}).ai=function(target){
-					return ai.get.recoverEffect(target,player,player);
+					return get.recoverEffect(target,player,player);
 				};
 				'step 1'
 				if(result.bool){
@@ -1065,7 +1065,7 @@ character.xianjian={
 				'step 0'
 				if(player.countCards('h')){
 					player.chooseCardButton('读心',target.getCards('h')).ai=function(button){
-						return ai.get.value(button.link)-5;
+						return get.value(button.link)-5;
 					}
 				}
 				else{
@@ -1076,7 +1076,7 @@ character.xianjian={
 				if(result.bool){
 					event.card=result.links[[0]];
 					player.chooseCard('h',true,'用一张手牌替换'+get.translation(event.card)).ai=function(card){
-						return -ai.get.value(card);
+						return -get.value(card);
 					};
 				}
 				else{
@@ -1108,7 +1108,7 @@ character.xianjian={
 				return event.card&&event.card.name=='shan';
 			},
 			check:function(event,player){
-				return ai.get.attitude(player,event.player)>0;
+				return get.attitude(player,event.player)>0;
 			},
 			logTarget:'player',
 			content:function(){
@@ -1224,9 +1224,9 @@ character.xianjian={
 				var players=game.filterPlayer();
 				for(var i=0;i<players.length;i++){
 					if(lib.filter.targetEnabled({name:'sha'},player,players[i])&&
-					ai.get.effect(players[i],{name:'sha'},player)>0){
+					get.effect(players[i],{name:'sha'},player)>0){
 						num++;
-						if(num>1) return 8-ai.get.value(card);
+						if(num>1) return 8-get.value(card);
 					}
 				}
 				return 0;
@@ -1238,7 +1238,7 @@ character.xianjian={
 			},
 			ai:{
 				order:function(){
-					return ai.get.order({name:'sha'})+0.1;
+					return get.order({name:'sha'})+0.1;
 				},
 				effect:{
 					player:function(card,player){
@@ -1249,7 +1249,7 @@ character.xianjian={
 							var players=game.filterPlayer();
 							for(var i=0;i<players.length;i++){
 								if(lib.filter.targetEnabled({name:'sha'},player,players[i])&&
-								ai.get.attitude(player,players[i])<0){
+								get.attitude(player,players[i])<0){
 									num++;
 									if(num>1) return [0,0,0,0];
 								}
@@ -1284,8 +1284,8 @@ character.xianjian={
 				return target!=player&&!target.hasSkill('ctianfu2');
 			},
 			check:function(card){
-				if(_status.event.player.hp>=3) return 8-ai.get.value(card);
-				return 7-ai.get.value(card);
+				if(_status.event.player.hp>=3) return 8-get.value(card);
+				return 7-get.value(card);
 			},
 			content:function(){
 				target.storage.ctianfu2=cards[0];
@@ -1297,9 +1297,9 @@ character.xianjian={
 				order:2,
 				result:{
 					target:function(player,target){
-						var att=ai.get.attitude(player,target);
+						var att=get.attitude(player,target);
 						if(att>=0) return 0;
-						return ai.get.damageEffect(target,player,target,'thunder');
+						return get.damageEffect(target,player,target,'thunder');
 					}
 				},
 				expose:0.2
@@ -1381,7 +1381,7 @@ character.xianjian={
 				player.chooseCard(get.prompt('shuiyun'),function(card){
 					return !types.contains(get.type(card,'trick'));
 				}).ai=function(card){
-					return 11-ai.get.value(card);
+					return 11-get.value(card);
 				};
 				"step 1"
 				if(result.bool){
@@ -1442,7 +1442,7 @@ character.xianjian={
 			content:function(){
 				"step 0"
 				player.chooseCardButton(player.storage.shuiyun,get.prompt('shuiyun',trigger.player)).ai=function(button){
-					return ai.get.attitude(player,trigger.player)>2?1:0;
+					return get.attitude(player,trigger.player)>2?1:0;
 				}
 				"step 1"
 				if(result.bool){
@@ -1490,7 +1490,7 @@ character.xianjian={
 				var players=game.filterPlayer();
 				for(var i=0;i<players.length;i++){
 					if(players[i].hasSkill('wangyou3')){
-						var att=ai.get.attitude(player,players[i]);
+						var att=get.attitude(player,players[i]);
 						if(att>0) num++;
 						else if(att<0) num--;
 						targets.push(players[i]);
@@ -1502,9 +1502,9 @@ character.xianjian={
 				next.ai=function(card){
 					if(num<=0) return 0;
 					switch(num){
-						case 1:return 5-ai.get.value(card);
-						case 2:return 7-ai.get.value(card);
-						default:return 8-ai.get.value(card);
+						case 1:return 5-get.value(card);
+						case 2:return 7-get.value(card);
+						default:return 8-get.value(card);
 					}
 				}
 				"step 1"
@@ -1546,7 +1546,7 @@ character.xianjian={
 				player.chooseTarget(get.prompt('changnian'),function(card,player,target){
 					return player!=target;
 				}).ai=function(target){
-					return ai.get.attitude(player,target);
+					return get.attitude(player,target);
 				};
 				"step 1"
 				if(result.bool){
@@ -1597,9 +1597,9 @@ character.xianjian={
 			check:function(card){
 				var player=_status.currentPhase;
 				if(player.countCards('h')>player.hp){
-					return 7-ai.get.value(card);
+					return 7-get.value(card);
 				}
-				return 4-ai.get.value(card);
+				return 4-get.value(card);
 			},
 			content:function(){
 				"step 0"
@@ -1616,7 +1616,7 @@ character.xianjian={
 				order:3,
 				result:{
 					target:function(player,target){
-						return ai.get.recoverEffect(target);
+						return get.recoverEffect(target);
 					}
 				},
 				threaten:1.5
@@ -1672,7 +1672,7 @@ character.xianjian={
 				player.chooseTarget(get.prompt('duci'),function(card,player,target){
 					return player!=target&&get.distance(player,target)<=1;
 				}).ai=function(target){
-					return ai.get.damageEffect(target,player,player);
+					return get.damageEffect(target,player,player);
 				};
 				"step 1"
 				if(result.bool){
@@ -1689,7 +1689,7 @@ character.xianjian={
 							var players=game.filterPlayer();
 							for(var i=0;i<players.length;i++){
 								if(player!=players[i]&&get.distance(player,players[i])<=1&&
-								  ai.get.damageEffect(players[i],player,player)>0){
+								  get.damageEffect(players[i],player,player)>0){
 									return [1,3];
 								}
 							}
@@ -1793,7 +1793,7 @@ character.xianjian={
 				player.chooseTarget([1,trigger.cards.length],get.prompt('qijian'),function(card,player,target){
 					return player.canUse({name:'sha'},target,false);
 				}).ai=function(target){
-					return ai.get.effect(target,{name:'sha'},player);
+					return get.effect(target,{name:'sha'},player);
 				};
 				"step 1"
 				if(result.bool){
@@ -1809,11 +1809,11 @@ character.xianjian={
 				return event.player.hp<=0&&player.countCards('h',{color:'red'});
 			},
 			check:function(event,player){
-				if(ai.get.attitude(player,event.player)<=0) return false;
+				if(get.attitude(player,event.player)<=0) return false;
 				var cards=player.getCards('h',{color:'red'});
 				for(var i=0;i<cards.length;i++){
 					if(cards[i].name=='tao') return false;
-					if(ai.get.value(cards[i])>7&&cards.length>2) return false;
+					if(get.value(cards[i])>7&&cards.length>2) return false;
 				}
 			},
 			content:function(){
@@ -1848,7 +1848,7 @@ character.xianjian={
 				for(var i=0;i<players.length;i++){
 					if(players[i]!=player&&!players[i].isOut()&&
 						lib.filter.targetEnabled({name:'wanjian'},player,players[i])){
-						ainum+=ai.get.effect(players[i],{name:'wanjian'});
+						ainum+=get.effect(players[i],{name:'wanjian'});
 						event.targets.push(players[i]);
 					}
 				}
@@ -1857,9 +1857,9 @@ character.xianjian={
 					next.ai=function(card){
 						if(ainum>=0){
 							switch(num){
-								case 1:return 8-ai.get.value(card);
-								case 2:return 6-ai.get.value(card);
-								case 3:return 4-ai.get.value(card);
+								case 1:return 8-get.value(card);
+								case 2:return 6-get.value(card);
+								case 3:return 4-get.value(card);
 							}
 						}
 						return -1;
@@ -1965,7 +1965,7 @@ character.xianjian={
 			usable:1,
 			locked:false,
 			check:function(card){
-				return 7-ai.get.value(card);
+				return 7-get.value(card);
 			},
 			multitarget:true,
 			multiline:true,
@@ -2081,7 +2081,7 @@ character.xianjian={
 				return !player.storage.guanri&&player.countCards('h',{color:'red'})>=2;
 			},
 			check:function(card){
-				return 8-ai.get.value(card);
+				return 8-get.value(card);
 			},
 			filterCard:function(card){
 				return get.color(card)=='red';
@@ -2109,7 +2109,7 @@ character.xianjian={
 				order:1,
 				result:{
 					target:function(player,target){
-						var eff=ai.get.damageEffect(target,player,target,'fire');
+						var eff=get.damageEffect(target,player,target,'fire');
 						if(player.hp>2) return eff;
 						if(player.hp==2&&target.hp==2) return eff;
 						return 0;
@@ -2165,7 +2165,7 @@ character.xianjian={
 				player.chooseTarget(get.prompt('runxin'),function(card,player,target){
 					return target.hp<target.maxHp
 				}).ai=function(target){
-					var num=ai.get.attitude(player,target);
+					var num=get.attitude(player,target);
 					if(num>0){
 						if(noneed&&player==target){
 							num=0.5;
@@ -2203,7 +2203,7 @@ character.xianjian={
 				player.chooseTarget(get.prompt('zhimeng'),function(card,player,target){
 					return player!=target;
 				}).ai=function(target){
-					var num=ai.get.attitude(player,target);
+					var num=get.attitude(player,target);
 					if(num>0){
 						if(player==target){
 							num++;
@@ -2308,12 +2308,12 @@ character.xianjian={
 			check:function(card){
 				var player=_status.currentPhase;
 				if(player.countCards('h',{subtype:get.subtype(card)})>1){
-					return 11-ai.get.equipValue(card);
+					return 11-get.equipValue(card);
 				}
 				if(player.countCards('h')<player.hp){
-					return 6-ai.get.value(card);
+					return 6-get.value(card);
 				}
-				return 2-ai.get.equipValue(card);
+				return 2-get.equipValue(card);
 			},
 			mod:{
 				targetInRange:function(card,player,target,now){
@@ -2345,7 +2345,7 @@ character.xianjian={
 				return game.players.length>3&&(event.player==player.next||event.player==player.previous);
 			},
 			check:function(event,player){
-				return ai.get.effect(player,event.card,event.player,player)<0
+				return get.effect(player,event.card,event.player,player)<0
 			},
 			changeSeat:true,
 			trigger:{target:'useCardToBefore'},
@@ -2380,7 +2380,7 @@ character.xianjian={
 			},
 			filterCard:true,
 			check:function(card){
-				return 4-ai.get.value(card);
+				return 4-get.value(card);
 			},
 			content:function(){
 				while(player.next!=target){
@@ -2391,9 +2391,9 @@ character.xianjian={
 				order:5,
 				result:{
 					player:function(player,target){
-						var att=ai.get.attitude(player,target);
+						var att=get.attitude(player,target);
 						if(target==player.previous&&att>0) return 1;
-						if(target==player.next.next&&ai.get.attitude(player,player.next)<0) return 1;
+						if(target==player.next.next&&get.attitude(player,player.next)<0) return 1;
 						return 0;
 					}
 				}

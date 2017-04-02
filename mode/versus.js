@@ -3272,7 +3272,7 @@ mode.versus={
 				player.chooseTarget(get.prompt('boss_didongjg'),function(card,player,target){
 					return target.isEnemyOf(player);
 				}).ai=function(target){
-					var att=ai.get.attitude(player,target);
+					var att=get.attitude(player,target);
 					if(target.isTurnedOver()){
 						if(att>0){
 							return att+5;
@@ -3345,7 +3345,7 @@ mode.versus={
 				player.chooseTarget(get.prompt('boss_qiwu'),function(card,player,target){
 					return target.hp<target.maxHp&&target.isFriendOf(player);
 				}).ai=function(target){
-					var num=ai.get.attitude(player,target);
+					var num=get.attitude(player,target);
 					if(num>0){
 						if(noneed&&player==target){
 							num=0.5;
@@ -3428,7 +3428,7 @@ mode.versus={
 					return !target.isFriendOf(player);
 				}).ai=function(target){
 					if(target.isTurnedOver()) return 0;
-					return -ai.get.attitude(player,target);
+					return -get.attitude(player,target);
 				};
 				"step 1"
 				if(result.bool){
@@ -3449,7 +3449,7 @@ mode.versus={
 				player.chooseTarget(get.prompt('boss_chuanyun'),function(card,player,target){
 					return player.hp<target.hp;
 				}).ai=function(target){
-					return ai.get.damageEffect(target,player,player);
+					return get.damageEffect(target,player,player);
 				}
 				"step 1"
 				if(result.bool){
@@ -3471,7 +3471,7 @@ mode.versus={
 					if(target==trigger.player) return false;
 					return target.isEnemyOf(player);
 				}).ai=function(target){
-					return ai.get.damageEffect(target,player,player,'thunder');
+					return get.damageEffect(target,player,player,'thunder');
 				}
 				"step 1"
 				if(result.bool){
@@ -3494,7 +3494,7 @@ mode.versus={
 					if(target.isFriendOf(player)) return false;
 					return lib.filter.targetEnabled({name:'sha'},player,target);
 				}).ai=function(target){
-					return ai.get.effect(target,{name:'sha'},player);
+					return get.effect(target,{name:'sha'},player);
 				}
 				"step 1"
 				if(result.bool){
@@ -3617,7 +3617,7 @@ mode.versus={
 				var num=0,players=game.filterPlayer();
 				for(var i=0;i<players.length;i++){
 					if(players[i].hp<players[i].maxHp&&
-						players[i].isFriendOf(player)&&ai.get.recoverEffect(players[i])>0){
+						players[i].isFriendOf(player)&&get.recoverEffect(players[i])>0){
 						if(players[i].hp==1){
 							return true;
 						}
@@ -3861,7 +3861,7 @@ mode.versus={
             },
 			logTarget:'player',
 			check:function(event,player){
-				return ai.get.attitude(player,event.player)<0;
+				return get.attitude(player,event.player)<0;
 			},
             content:function(){
 				player.line(trigger.player,'green');
@@ -3907,7 +3907,7 @@ mode.versus={
 						return target.isFriendOf(player);
 					});
                     next.ai=function(target){
-                        var att=ai.get.attitude(player,target);
+                        var att=get.attitude(player,target);
 						if(att>0&&target.hasJudge('lebu')){
 							return 0.1;
 						}
@@ -4086,7 +4086,7 @@ mode.versus={
                     player.chooseTarget('是否令一名敌方角色失去1点体力？',function(card,player,target){
 						return !target.isFriendOf(player);
                     }).ai=function(target){
-                        return -ai.get.attitude(player,target);
+                        return -get.attitude(player,target);
                     }
                 }
                 "step 2"
@@ -4132,8 +4132,8 @@ mode.versus={
 					return target.isEnemyOf(player);
 				}).ai=function(target){
 					if(player.hp<=1) return 0;
-					if(ai.get.attitude(player,target)>-3) return 0;
-					var eff=ai.get.damageEffect(target,player,player,'fire');
+					if(get.attitude(player,target)>-3) return 0;
+					var eff=get.damageEffect(target,player,player,'fire');
 					if(eff>0){
 						return eff+target.countCards('e')/2;
 					}
@@ -4767,33 +4767,31 @@ mode.versus={
 			}
 		}
 	},
-	ai:{
-		get:{
-			rawAttitude:function(from,to){
-				if(from.side==to.side){
-					if(to.identity=='zhu'){
-						if(_status.connectMode){
-							if(_status.mode=='4v4') return 10;
-						}
-						else{
-							if(lib.storage.main_zhu||_status.mode=='four') return 10;
-						}
+	get:{
+		rawAttitude:function(from,to){
+			if(from.side==to.side){
+				if(to.identity=='zhu'){
+					if(_status.connectMode){
+						if(_status.mode=='4v4') return 10;
 					}
-					return 6;
-				}
-				else{
-					if(to.identity=='zhu'){
-						if(_status.connectMode){
-							if(_status.mode=='4v4') return -10;
-						}
-						else{
-							if(lib.storage.main_zhu||_status.mode=='four') return -10;
-						}
+					else{
+						if(lib.storage.main_zhu||_status.mode=='four') return 10;
 					}
-					return -6;
 				}
-			},
-		}
+				return 6;
+			}
+			else{
+				if(to.identity=='zhu'){
+					if(_status.connectMode){
+						if(_status.mode=='4v4') return -10;
+					}
+					else{
+						if(lib.storage.main_zhu||_status.mode=='four') return -10;
+					}
+				}
+				return -6;
+			}
+		},
 	},
 	help:{
 		'对决模式':

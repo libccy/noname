@@ -58,7 +58,7 @@ character.gwent={
 				}
 				else{
 					game.countPlayer(function(current){
-						var att=ai.get.attitude(player,current);
+						var att=get.attitude(player,current);
 						if(att>0){
 							num1++;
 						}
@@ -121,7 +121,7 @@ character.gwent={
 			filterTarget:function(card,player,target){
 				return target.isHighestHp();
 			},
-			check:function(card){return 7-ai.get.value(card);},
+			check:function(card){return 7-get.value(card);},
 			position:'he',
 			filterCard:true,
 			content:function(){
@@ -130,7 +130,7 @@ character.gwent={
 			ai:{
 				result:{
 					target:function(player,target){
-						return ai.get.damageEffect(target,player);
+						return get.damageEffect(target,player);
 					},
 				},
 				order:7
@@ -173,7 +173,7 @@ character.gwent={
 				result:{
 					target:function(player,target){
 						if(player.getEquip('tengjia')||player.getEquip('bagua')) return -1;
-						if(ai.get.effect(player,{name:'sha'},target,player)>=0) return -1;
+						if(get.effect(player,{name:'sha'},target,player)>=0) return -1;
 						if(!player.hasShan()){
 							if(ui.selected.targets.length) return 0;
 							if(player.hp>=4) return -1;
@@ -198,7 +198,7 @@ character.gwent={
 			position:'he',
 			filterCard:true,
 			check:function(card){
-				return 7-ai.get.value(card)
+				return 7-get.value(card)
 			},
 			content:function(){
 				'step 0'
@@ -232,19 +232,19 @@ character.gwent={
 			selectCard:[1,3],
 			check:function(card){
 				if(!ui.selected.cards.length){
-					return 6-ai.get.value(card)
+					return 6-get.value(card)
 				}
 				var player=_status.event.player;
 				if(player.isDamaged()){
 					var hs=player.getCards('h');
 					var num=0;
 					for(var i=0;i<hs.length;i++){
-						if(ai.get.value(hs[i])<6){
+						if(get.value(hs[i])<6){
 							num++;
 						}
 					}
 					if(num>=3){
-						return 6-ai.get.value(card);
+						return 6-get.value(card);
 					}
 				}
 				return 0;
@@ -283,14 +283,14 @@ character.gwent={
 			},
 			content:function(){
 				'step 0'
-				var bool=(ai.get.effect(trigger.player,{name:'sha'},player,player)>0&&
-					Math.abs(ai.get.attitude(player,trigger.player))>1&&
+				var bool=(get.effect(trigger.player,{name:'sha'},player,player)>0&&
+					Math.abs(get.attitude(player,trigger.player))>1&&
 					game.hasPlayer(function(current){
-					return ai.get.attitude(current,player)>0&&current.hasSha();
+					return get.attitude(current,player)>0&&current.hasSha();
 				}));
 				var next=player.chooseToDiscard(get.prompt('gwzhanjiang',trigger.player),'he');
 				next.ai=function(card){
-					if(bool) return 7-ai.get.value(card);
+					if(bool) return 7-get.value(card);
 					return 0;
 				};
 				next.logSkill=['gwzhanjiang',trigger.player];
@@ -352,7 +352,7 @@ character.gwent={
 				return event.target.isAlive();
 			},
 			check:function(event,player){
-				return ai.get.effect(event.target,{name:'sha'},player,player)>0
+				return get.effect(event.target,{name:'sha'},player,player)>0
 			},
 			logTarget:'target',
 			logLine:false,
@@ -381,7 +381,7 @@ character.gwent={
 				player.chooseTarget(get.prompt('fengjian'),function(card,player,target){
 					return player.canUse('sha',target,false)&&!trigger.targets.contains(target);
 				}).ai=function(target){
-					return ai.get.effect(target,{name:'sha',nature:'thunder'},player,player);
+					return get.effect(target,{name:'sha',nature:'thunder'},player,player);
 				}
 				"step 1"
 				if(result.bool){
@@ -418,7 +418,7 @@ character.gwent={
 				player.chooseTarget(get.prompt('huandie'),[0,game.countPlayer()],function(card,player,target){
 					return target!=player;
 				}).ai=function(target){
-					return ai.get.attitude(player,target);
+					return get.attitude(player,target);
 				}
 				'step 1'
 				if(result.bool){
@@ -546,10 +546,10 @@ character.gwent={
 			content:function(){
 				'step 0'
 				var target=trigger.target;
-				var bool=ai.get.attitude(player,target)<0;
+				var bool=get.attitude(player,target)<0;
 				var next=player.chooseToDiscard('he',get.prompt('fayin',target));
 				next.ai=function(card){
-					if(bool) return 7-ai.get.value(card);
+					if(bool) return 7-get.value(card);
 					return 0;
 				};
 				next.logSkill=['fayin',target];
@@ -583,11 +583,11 @@ character.gwent={
 				target.$giveAuto(hs,player);
 				event.hs=hs;
 				'step 1'
-				var damage=(target.hp>=player.hp&&ai.get.damageEffect(target,player,player)>0);
+				var damage=(target.hp>=player.hp&&get.damageEffect(target,player,player)>0);
 				var hs=event.hs;
 				if(damage&&target.hp>1){
 					for(var i=0;i<hs.length;i++){
-						if(ai.get.value(hs[i],player,'raw')>=8){
+						if(get.value(hs[i],player,'raw')>=8){
 							damage=false;break;
 						}
 					}
@@ -597,7 +597,7 @@ character.gwent={
 						return hs.contains(card)?1:0;
 					}
 					else{
-						return -ai.get.value(card,player,'raw');
+						return -get.value(card,player,'raw');
 					}
 				}
 				if(!event.isMine()) game.delay();
@@ -649,7 +649,7 @@ character.gwent={
 					target:function(player,target){
 						var dh=Math.min(3,player.hp)-target.countCards('h');
 						if(dh<0){
-							dh+=get.sgn(ai.get.effect(target,{name:'sha'},player,target));
+							dh+=get.sgn(get.effect(target,{name:'sha'},player,target));
 						}
 						return dh;
 					}
@@ -664,7 +664,7 @@ character.gwent={
 				player.chooseTarget(get.prompt('hunmo'),[1,game.countPlayer()],function(card,player,target){
 					return target.countCards('h')!=Math.min(3,target.hp);
 				}).ai=function(target){
-					return ai.get.attitude(player,target)*(Math.min(3,target.hp)-target.countCards('h'));
+					return get.attitude(player,target)*(Math.min(3,target.hp)-target.countCards('h'));
 				}
 				'step 1'
 				if(result.bool){
@@ -776,7 +776,7 @@ character.gwent={
 					return false;
 				},
 				check:function(button){
-					return ai.get.value(button.link);
+					return get.value(button.link);
 				},
 				backup:function(links,player){
 					return {

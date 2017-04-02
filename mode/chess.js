@@ -4593,7 +4593,7 @@ mode.chess={
 			complexCard:true,
 			selectCard:4,
 			check:function(card){
-				return 10-ai.get.value(card);
+				return 10-get.value(card);
 			},
 			filterTarget:function(card,player,target){
 				return player!=target;
@@ -4612,7 +4612,7 @@ mode.chess={
 					player:function(card,player){
 						var num=0;
 						for(var i=0;i<game.players.length;i++){
-							if(ai.get.attitude(player,game.players[i])<0){
+							if(get.attitude(player,game.players[i])<0){
 								num++;
 								if(num>1) break;
 							}
@@ -4632,7 +4632,7 @@ mode.chess={
 					target:function(player){
 						var num=0;
 						for(var i=0;i<game.players.length;i++){
-							if(ai.get.attitude(player,game.players[i])<0){
+							if(get.attitude(player,game.players[i])<0){
 								num++;
 								if(num>1) break;
 							}
@@ -4737,7 +4737,7 @@ mode.chess={
 				var targets=lib.skill.guanchuan.getTargets(player,event.targets[0]);
 				var eff=0;
 				for(var i=0;i<targets.length;i++){
-					eff+=ai.get.effect(targets[i],event.card,player,player);
+					eff+=get.effect(targets[i],event.card,player,player);
 				}
 				return eff>0;
 			},
@@ -4761,9 +4761,9 @@ mode.chess={
 				var player=_status.event.player;
 				for(var i=0;i<game.players.length;i++){
 					if(lib.filter.targetEnabled({name:'sha'},player,game.players[i])&&
-					ai.get.effect(game.players[i],{name:'sha'},player)>0){
+					get.effect(game.players[i],{name:'sha'},player)>0){
 						num++;
-						if(num>1) return 8-ai.get.value(card);
+						if(num>1) return 8-get.value(card);
 					}
 				}
 				return 0;
@@ -4782,11 +4782,11 @@ mode.chess={
 			multitarget:true,
 			ai:{
 				order:function(){
-					return ai.get.order({name:'sha'})+0.1;
+					return get.order({name:'sha'})+0.1;
 				},
 				result:{
 					target:function(player,target){
-						return ai.get.effect(target,{name:'sha'},player,target);
+						return get.effect(target,{name:'sha'},player,target);
 					}
 				},
 				effect:{
@@ -4797,7 +4797,7 @@ mode.chess={
 							var player=_status.event.player;
 							for(var i=0;i<game.players.length;i++){
 								if(lib.filter.targetEnabled({name:'sha'},player,game.players[i])&&
-								ai.get.attitude(player,game.players[i])<0){
+								get.attitude(player,game.players[i])<0){
 									num++;
 									if(num>1) return [0,0,0,0];
 								}
@@ -5091,7 +5091,7 @@ mode.chess={
 			usable:1,
 			filterCard:{color:'red'},
 			nodelay:true,
-			check:function(card){return 8-ai.get.value(card);},
+			check:function(card){return 8-get.value(card);},
 			filterTarget:function(card,player,target){
 				return get.distance(player,target)<=5&&player!=target;
 			},
@@ -5107,7 +5107,7 @@ mode.chess={
 				order:1,
 				result:{
 					target:function(player,target){
-						return ai.get.damageEffect(target,player,target,'fire');
+						return get.damageEffect(target,player,target,'fire');
 					}
 				}
 			}
@@ -5123,9 +5123,9 @@ mode.chess={
 			check:function(card){
 				var player=_status.currentPhase;
 				if(player.countCards('he',{subtype:get.subtype(card)})>1){
-					return 12-ai.get.equipValue(card);
+					return 12-get.equipValue(card);
 				}
-				return 8-ai.get.equipValue(card);
+				return 8-get.equipValue(card);
 			},
 			filter:function(event,player){
 				return player.countCards('he',{type:'equip'});
@@ -5140,7 +5140,7 @@ mode.chess={
 				order:9,
 				result:{
 					target:function(player,target){
-						return ai.get.damageEffect(target,player,target,'fire');
+						return get.damageEffect(target,player,target,'fire');
 					}
 				}
 			}
@@ -5432,12 +5432,8 @@ mode.chess={
 			var txy=to.getXY();
 			return Math.abs(fxy[0]-txy[0])+Math.abs(fxy[1]-txy[1]);
 		},
-	},
-	ai:{
-		get:{
-			rawAttitude:function(from,to){
-				return (from.side===to.side?6:-6);
-			}
+		rawAttitude:function(from,to){
+			return (from.side===to.side?6:-6);
 		}
 	},
 	card:{

@@ -55,13 +55,13 @@ card.yunchou={
 				var minValue=20;
 				var hs=target.getCards('h');
 				for(var i=0;i<hs.length;i++){
-					minValue=Math.min(minValue,ai.get.value(hs[i],target));
+					minValue=Math.min(minValue,get.value(hs[i],target));
 				}
 				if(target.isUnderControl(true)){
 					event.dialog.setCaption('选择一张牌并用一张手牌替换之');
 				}
 				var next=target.chooseButton(function(button){
-					return ai.get.value(button.link,_status.event.player)-minValue;
+					return get.value(button.link,_status.event.player)-minValue;
 				});
 				next.set('dialog',event.preResult);
 				next.set('closeDialog',false);
@@ -71,7 +71,7 @@ card.yunchou={
 				if(result.bool){
 					event.button=result.buttons[0];
 					target.chooseCard('用一张牌牌替换'+get.translation(result.links),true).ai=function(card){
-						return -ai.get.value(card);
+						return -get.value(card);
 					}
 				}
 				else{
@@ -101,17 +101,17 @@ card.yunchou={
 					return;
 				}
 				var nextSeat=_status.currentPhase.next;
-				var att=ai.get.attitude(player,nextSeat);
+				var att=get.attitude(player,nextSeat);
 				if(player.isUnderControl(true)&&!_status.auto){
 					event.dialog.setCaption('将任意张牌以任意顺序置于牌堆顶（先选择的在上）');
 				}
 				var next=player.chooseButton([1,event.dialog.buttons.length],event.dialog);
 				next.ai=function(button){
 					if(att>0){
-						return ai.get.value(button.link,nextSeat)-5;
+						return get.value(button.link,nextSeat)-5;
 					}
 					else{
-						return 5-ai.get.value(button.link,nextSeat);
+						return 5-get.value(button.link,nextSeat);
 					}
 				}
 				next.set('closeDialog',false);
@@ -172,7 +172,7 @@ card.yunchou={
 					target.chooseControl().set('prompt',get.translation('caochuanjiejian')).set('choiceList',[
 						'将手牌中的所有杀交给'+name+'，并视为对'+name+'使用一张杀','展示手牌并令'+name+'弃置任意一张'
 					],function(){
-						if(ai.get.effect(player,{name:'sha'},target,target)<0) return 1;
+						if(get.effect(player,{name:'sha'},target,target)<0) return 1;
 						if(target.countCards('h','sha')>=3) return 1;
 						return 0;
 					});
@@ -325,11 +325,11 @@ card.yunchou={
 				if(event.list.length){
 					event.current=event.list.shift();
 					event.current.chooseBool('是否响应'+get.translation(target)+'的舌战群儒？',function(event,player){
-						if(ai.get.attitude(player,_status.event.source)>=0) return false;
+						if(get.attitude(player,_status.event.source)>=0) return false;
 						var hs=player.getCards('h');
 						var dutag=player.hasSkillTag('nodu');
 						for(var i=0;i<hs.length;i++){
-							var value=ai.get.value(hs[i],player);
+							var value=get.value(hs[i],player);
 							if(hs[i].name=='du'&&dutag) continue;
 							if(value<0) return true;
 							if(!_status.event.hasTarget){
@@ -387,7 +387,7 @@ card.yunchou={
 					target:function(player,target){
 						var hs=target.getCards('h');
 						for(var i=0;i<hs.length;i++){
-							var value=ai.get.value(hs[i]);
+							var value=get.value(hs[i]);
 							if(hs[i].number>=7&&value<=6) return 1;
 							if(value<=3) return 1;
 						}
@@ -437,12 +437,12 @@ card.yunchou={
 				useful:[5,1],
 				order:1,
 				wuxie:function(target,card,player,current,state){
-					return -state*ai.get.attitude(player,current);
+					return -state*get.attitude(player,current);
 				},
 				result:{
 					player:function(player){
 						if(_status.event.parent.youdiinfo&&
-							ai.get.attitude(player,_status.event.parent.youdiinfo.source)<=0){
+							get.attitude(player,_status.event.parent.youdiinfo.source)<=0){
 							return 1;
 						}
 						return 0;
@@ -469,7 +469,7 @@ card.yunchou={
 				result:{
 					target:function(player,target){
 						var num=0;
-						if(target.isLowestHp()&&ai.get.recoverEffect(target)>0){
+						if(target.isLowestHp()&&get.recoverEffect(target)>0){
 							if(target.hp==1){
 								num+=3;
 							}
@@ -552,7 +552,7 @@ card.yunchou={
 				result:{
 					target:function(player,target){
 						if(target.getCards('e',{subtype:'equip5'}).length){
-							if(ai.get.attitude(target,player)>0){
+							if(get.attitude(target,player)>0){
 								return -0.5;
 							}
 							return -1;
@@ -661,7 +661,7 @@ card.yunchou={
 					if(_status.auto&&event.addedTarget==game.me){
 						game.delay();
 					}
-					event.addedTarget.chooseCard(true,event.num,'选择'+get.cnNumber(event.num)+'张手牌还给'+get.translation(target)).ai=ai.get.disvalue;
+					event.addedTarget.chooseCard(true,event.num,'选择'+get.cnNumber(event.num)+'张手牌还给'+get.translation(target)).ai=get.disvalue;
 				}
 				else{
 					event.finish();
@@ -875,15 +875,15 @@ card.yunchou={
 				else{
 					target.chooseToDiscard('he',2).ai=function(card){
 						if(target.hasSkillTag('nofire')) return 0;
-						if(ai.get.damageEffect(target,player,target,'fire')>=0) return 0;
+						if(get.damageEffect(target,player,target,'fire')>=0) return 0;
 						if(player.hasSkillTag('notricksource')) return 0;
 						if(target.hasSkillTag('notrick')) return 0;
 						if(card.name=='tao') return 0;
 						if(target.hp==1&&card.name=='jiu') return 0;
 						if(target.hp==1&&get.type(card)!='basic'){
-							return 10-ai.get.value(card);
+							return 10-get.value(card);
 						}
-						return 8-ai.get.value(card);
+						return 8-get.value(card);
 					};
 				}
 				"step 1"
@@ -900,7 +900,7 @@ card.yunchou={
 				result:{
 					target:function(player,target){
 						if(target.hasSkillTag('nofire')) return 0;
-						if(ai.get.damageEffect(target,player,player)<0&&ai.get.attitude(player,target)>0){
+						if(get.damageEffect(target,player,player)<0&&get.attitude(player,target)>0){
 							return -2;
 						}
 						var nh=target.countCards('he');

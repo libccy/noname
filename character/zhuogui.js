@@ -82,7 +82,7 @@ character.zhuogui={
 			enable:'phaseUse',
 			usable:1,
 			filterCard:{color:'red'},
-			check:function(card){return 6-ai.get.value(card)},
+			check:function(card){return 6-get.value(card)},
 			filterTarget:true,
 			selectTarget:-1,
             line:'fire',
@@ -95,7 +95,7 @@ character.zhuogui={
 						var eff=0;
 						for(var i=0;i<game.players.length;i++){
 							if(!game.players[i].isOut()){
-								eff+=ai.get.damageEffect(game.players[i],player,player,'fire');
+								eff+=get.damageEffect(game.players[i],player,player,'fire');
 							}
 						}
 						return eff;
@@ -164,7 +164,7 @@ character.zhuogui={
 				players.sort(function(a,b){
 					return b.hp-a.hp;
 				});
-				return ai.get.damageEffect(players[0],player,player,'fire')>0;
+				return get.damageEffect(players[0],player,player,'fire')>0;
             },
             prompt:function(){
                 var players=game.players.slice(0);
@@ -220,7 +220,7 @@ character.zhuogui={
                 player.chooseTarget('获得一名角色的一张手牌',true,function(card,player,target){
                     return player!=target&&target.countCards('h')>0;
                 }).ai=function(target){
-                    return -ai.get.attitude(player,target);
+                    return -get.attitude(player,target);
                 };
                 "step 1"
                 if(result.targets&&result.targets.length){
@@ -280,9 +280,9 @@ character.zhuogui={
             },
             check:function(card){
                 if(_status.event.player.hp==_status.event.player.maxHp){
-                    return 5-ai.get.value(card);
+                    return 5-get.value(card);
                 }
-                return 10-ai.get.value(card);
+                return 10-get.value(card);
             },
             content:function(){
                 "step 0"
@@ -294,7 +294,7 @@ character.zhuogui={
                 order:9.5,
                 result:{
                     target:function(player,target){
-                        return ai.get.damageEffect(target,player);
+                        return get.damageEffect(target,player);
                     }
                 },
                 expose:0.2

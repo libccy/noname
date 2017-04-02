@@ -7614,8 +7614,8 @@
 				}
 				game.saveConfig('change_skin',false);
 				game.saveConfig('show_favourite',false);
-				game.saveConfig('characters',lib.config.all.characters);
-				game.saveConfig('cards',lib.config.all.cards);
+				// game.saveConfig('characters',lib.config.all.characters);
+				// game.saveConfig('cards',lib.config.all.cards);
 				game.saveConfig('plays',['cardpile']);
 				game.saveConfig('tao_enemy',true);
 				game.saveConfig('layout','long2');
@@ -7625,6 +7625,9 @@
 				game.saveConfig('show_volumn',false);
 				game.saveConfig('debug',true);
 				game.saveConfig('dev',true);
+				if(!lib.device){
+					game.saveConfig('sync_speed',false);
+				}
 				game.reload();
 			},
             o:function(){
@@ -10033,7 +10036,7 @@
 					}
 					else{
 						var choice;
-						if(player.isDamaged()&&ai.get.recoverEffect(player)>0&&(
+						if(player.isDamaged()&&get.recoverEffect(player)>0&&(
 							player.hp==1||player.needsToDiscard()||
 							player.hasSkillTag('maixie_hp')||event.num2>event.num1||
 							(event.num2==event.num1&&player.needsToDiscard(1))
@@ -13223,8 +13226,8 @@
 					if(next.selectTarget==undefined){
 						next.selectTarget=lib.filter.selectTarget;
 					}
-					if(next.ai1==undefined) next.ai1=ai.get.order;
-					if(next.ai2==undefined) next.ai2=ai.get.effect;
+					if(next.ai1==undefined) next.ai1=get.order;
+					if(next.ai2==undefined) next.ai2=get.effect;
                     next.setContent('chooseToUse');
                     next._args=Array.from(arguments);
 					return next;
@@ -13264,7 +13267,7 @@
 					if(next.filterCard==undefined) next.filterCard=lib.filter.all;
 					if(next.selectCard==undefined) next.selectCard=[1,1];
 					if(next.source==undefined&&!next.nosource) next.source=_status.event.player;
-					if(next.ai==undefined) next.ai=ai.get.unuseful2;
+					if(next.ai==undefined) next.ai=get.unuseful2;
 					if(next.prompt!=false){
 						if(typeof next.prompt=='string'){
 							next.dialog=next.prompt;
@@ -13333,7 +13336,7 @@
 					if(next.isMine()==false&&next.dialog) next.dialog.style.display='none';
 					if(next.filterCard==undefined) next.filterCard=lib.filter.all;
 					if(next.selectCard==undefined) next.selectCard=[1,1];
-					if(next.ai==undefined) next.ai=ai.get.unuseful;
+					if(next.ai==undefined) next.ai=get.unuseful;
 					next.autochoose=function(){
 						if(!this.forced) return false;
                         if(typeof this.selectCard=='function') return false;
@@ -13355,14 +13358,14 @@
                         next.targets=target;
                         if(check) next.ai=check;
                         else next.ai=function(card){
-    						var addi=(ai.get.value(card)>=8&&get.type(card)!='equip')?-10:0;
+    						var addi=(get.value(card)>=8&&get.type(card)!='equip')?-10:0;
                             if(card.name=='du') addi+=5;
                             var source=_status.event.source;
                             var player=_status.event.player;
-                            if(source&&source!=player&&ai.get.attitude(player,source)>1){
-                                return -get.number(card)-ai.get.value(card)/2+addi;
+                            if(source&&source!=player&&get.attitude(player,source)>1){
+                                return -get.number(card)-get.value(card)/2+addi;
                             }
-                            return get.number(card)-ai.get.value(card)/2+addi;
+                            return get.number(card)-get.value(card)/2+addi;
                         }
                         next.setContent('chooseToCompareMultiple');
                     }
@@ -13373,19 +13376,19 @@
     						var player=get.owner(card);
     						var event=_status.event.getParent();
     						var to=(player==event.player?event.target:event.player);
-    						var addi=(ai.get.value(card)>=8&&get.type(card)!='equip')?-10:0;
+    						var addi=(get.value(card)>=8&&get.type(card)!='equip')?-10:0;
                             if(card.name=='du') addi+=5;
     						if(player==event.player){
-    							if(ai.get.attitude(player,to)>0&&event.small){
-    								return -get.number(card)-ai.get.value(card)/2+addi;
+    							if(get.attitude(player,to)>0&&event.small){
+    								return -get.number(card)-get.value(card)/2+addi;
     							}
-    							return get.number(card)-ai.get.value(card)/2+addi;
+    							return get.number(card)-get.value(card)/2+addi;
     						}
     						else{
-    							if(ai.get.attitude(player,to)>0&&!event.small){
-    								return -get.number(card)-ai.get.value(card)/2+addi;
+    							if(get.attitude(player,to)>0&&!event.small){
+    								return -get.number(card)-get.value(card)/2+addi;
     							}
-    							return get.number(card)-ai.get.value(card)/2+addi;
+    							return get.number(card)-get.value(card)/2+addi;
     						}
     					}
                         next.setContent('chooseToCompare');
@@ -13494,7 +13497,7 @@
 					}
 					if(next.filterCard==undefined) next.filterCard=lib.filter.all;
 					if(next.selectCard==undefined) next.selectCard=[1,1];
-					if(next.ai==undefined) next.ai=ai.get.unuseful3;
+					if(next.ai==undefined) next.ai=get.unuseful3;
                     next.setContent('chooseCard');
                     next._args=Array.from(arguments);
 					return next;
@@ -13526,7 +13529,7 @@
 					}
 					if(next.filterTarget==undefined) next.filterTarget=lib.filter.all;
 					if(next.selectTarget==undefined) next.selectTarget=[1,1];
-					if(next.ai==undefined) next.ai=ai.get.attitude2;
+					if(next.ai==undefined) next.ai=get.attitude2;
                     next.setContent('chooseTarget');
                     next._args=Array.from(arguments);
 					return next;
@@ -13557,8 +13560,8 @@
 					if(next.selectTarget==undefined){
 						next.selectTarget=1;
 					}
-					if(next.ai1==undefined) next.ai1=ai.get.unuseful2;
-					if(next.ai2==undefined) next.ai2=ai.get.attitude2;
+					if(next.ai1==undefined) next.ai1=get.unuseful2;
+					if(next.ai2==undefined) next.ai2=get.attitude2;
                     next.setContent('chooseCardTarget');
                     next._args=Array.from(arguments);
 					return next;
@@ -13687,8 +13690,8 @@
 					if(next.position==undefined) next.position='he';
 					if(next.selectButton==undefined) next.selectButton=[1,1];
 					if(next.ai==undefined) next.ai=function(button){
-						var val=ai.get.buttonValue(button);
-						if(ai.get.attitude(_status.event.player,get.owner(button.link))>0) return -val;
+						var val=get.buttonValue(button);
+						if(get.attitude(_status.event.player,get.owner(button.link))>0) return -val;
 						return val;
 					};
                     next.setContent('choosePlayerCard');
@@ -13732,8 +13735,8 @@
 					if(next.position==undefined) next.position='he';
 					if(next.selectButton==undefined) next.selectButton=[1,1];
 					if(next.ai==undefined) next.ai=function(button){
-						var val=ai.get.buttonValue(button);
-						if(ai.get.attitude(_status.event.player,get.owner(button.link))>0) return -val;
+						var val=get.buttonValue(button);
+						if(get.attitude(_status.event.player,get.owner(button.link))>0) return -val;
 						return val;
 					};
                     next.setContent('discardPlayerCard');
@@ -13777,8 +13780,8 @@
 					if(next.position==undefined) next.position='he';
 					if(next.selectButton==undefined) next.selectButton=[1,1];
 					if(next.ai==undefined) next.ai=function(button){
-						var val=ai.get.buttonValue(button);
-						if(ai.get.attitude(_status.event.player,get.owner(button.link))>0) return -val;
+						var val=get.buttonValue(button);
+						if(get.attitude(_status.event.player,get.owner(button.link))>0) return -val;
 						return val;
 					};
                     next.setContent('gainPlayerCard');
@@ -13916,7 +13919,7 @@
 						}
 					}
 					for(var i=0;i<next.targets.length;i++){
-						if(ai.get.attitude(this,next.targets[i])>=-1&&ai.get.attitude(this,next.targets[i])<0){
+						if(get.attitude(this,next.targets[i])>=-1&&get.attitude(this,next.targets[i])<0){
 							if(!this.ai.tempIgnore) this.ai.tempIgnore=[];
 							this.ai.tempIgnore.add(next.targets[i]);
 						}
@@ -13962,7 +13965,7 @@
                     }
 					if(next.targets){
 						for(var i=0;i<next.targets.length;i++){
-							if(ai.get.attitude(this,next.targets[i])>=-1&&ai.get.attitude(this,next.targets[i])<0){
+							if(get.attitude(this,next.targets[i])>=-1&&get.attitude(this,next.targets[i])<0){
 								if(!this.ai.tempIgnore) this.ai.tempIgnore=[];
 								this.ai.tempIgnore.add(next.targets[i]);
 							}
@@ -15484,7 +15487,7 @@
 					return skill;
 				},
 				attitudeTo:function(target){
-					if(typeof ai.get.attitude=='function') return ai.get.attitude(this,target);
+					if(typeof get.attitude=='function') return get.attitude(this,target);
 					return 0;
 				},
 				clearSkills:function(all){
@@ -15922,7 +15925,7 @@
 				hasFriend:function(){
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].isOut()) continue;
-						if(game.players[i]!=this&&ai.get.attitude(game.players[i],this)>0){
+						if(game.players[i]!=this&&get.attitude(game.players[i],this)>0){
 							return true;
 						}
 					}
@@ -18935,7 +18938,7 @@
                                 }
                                 return 1;
                             },
-							ai2:ai.get.effect,
+							ai2:get.effect,
 							type:'dying',
 							targetRequired:true,
 							dying:event.dying
@@ -19511,6 +19514,17 @@
         							ai[i]=lib.init.eval(mode.ai[i]);
         						}
         					}
+							for(var i in mode.get){
+								if(typeof mode.get[i]=='object'){
+	                                if(get[i]==undefined) get[i]={};
+	                                for(var j in mode.get[i]){
+	                                    get[i][j]=lib.init.eval(mode.get[i][j]);
+	                                }
+	                            }
+	                            else{
+	                                get[i]=lib.init.eval(mode.get[i]);
+	                            }
+							}
                             for(var i in mode.translate){
                                 lib.translate[i]=mode.translate[i];
                             }
@@ -19588,6 +19602,17 @@
                                 ai[i]=lib.init.eval(mode.ai[i]);
                             }
                         }
+						for(var i in mode.get){
+							if(typeof mode.get[i]=='object'){
+                                if(get[i]==undefined) get[i]={};
+                                for(var j in mode.get[i]){
+                                    get[i][j]=lib.init.eval(mode.get[i][j]);
+                                }
+                            }
+                            else{
+                                get[i]=lib.init.eval(mode.get[i]);
+                            }
+						}
                         for(var i in mode.translate){
                             lib.translate[i]=mode.translate[i];
                         }
@@ -25144,7 +25169,7 @@
 					if(card.ai.basic==undefined) card.ai.basic={};
 					if(card.ai.result==undefined) card.ai.result={target:1.5};
 					if(card.ai.basic.order==undefined) card.ai.basic.order=function(card,player){
-						return 8+ai.get.equipValue(card,player)/20;
+						return 8+get.equipValue(card,player)/20;
 					};
 					if(card.ai.basic.useful==undefined) card.ai.basic.useful=2;
 					if(card.subtype=='equip3'){
@@ -25161,7 +25186,7 @@
 						var info=get.info(card);
 						var current=player.getEquip(info.subtype);
 						if(current&&card!=current){
-							value=ai.get.value(current,player);
+							value=get.value(current,player);
 						}
 						var equipValue=info.ai.equipValue;
 						if(equipValue==undefined){
@@ -25173,7 +25198,7 @@
 					}
 					card.ai.result.target=(function(name){
                         return (function(player,target){
-							return ai.get.equipResult(player,target,name);
+							return get.equipResult(player,target,name);
     					});
                     }(i));
 				}
@@ -40492,7 +40517,370 @@
 				if(buttons[i].link!=undefined) links.push(buttons[i].link);
 			}
 			return links;
-		}
+		},
+		threaten:function(target,player){
+			var threaten=1;
+			var skills=target.getSkills();
+			for(var i=0;i<skills.length;i++){
+				var info=get.info(skills[i]);
+				if(info&&info.ai&&info.ai.threaten){
+					if(typeof info.ai.threaten=='function'&&player){
+						var tmp=info.ai.threaten(player,target);
+						if(typeof tmp=='number'){
+							threaten*=tmp;
+						}
+					}
+					else if(typeof info.ai.threaten=='number'){
+						threaten*=info.ai.threaten;
+					}
+				}
+			}
+			return threaten;
+		},
+		attitude:function(from,to){
+			if(!from||!to) return 0;
+			var att=get.rawAttitude.apply(this,arguments);
+			if(from.isMad()) att=-att;
+			if(to.isMad()&&att>0) att=0;
+			if(!_status.tempnofake){
+				_status.tempnofake=true;
+				if(from.ai.modAttitudeFrom){
+					att=from.ai.modAttitudeFrom(from,to,att);
+				}
+				if(to.ai.modAttitudeTo){
+					att=to.ai.modAttitudeTo(from,to,att);
+				}
+				delete _status.tempnofake;
+			}
+			return att;
+		},
+		useful:function(card){
+			if(get.position(card)=='j') return -1;
+			if(get.position(card)=='e') return get.equipValue(card);
+			if(!lib.temp) lib.temp={};
+			if(lib.temp[card.name]==undefined) lib.temp[card.name]=[card];
+			else lib.temp[card.name].add(card);
+			var i=lib.temp[card.name].find(card);
+			var aii=get.info(card).ai;
+			var useful;
+			if(aii&&aii.useful) useful=aii.useful;
+			else if(aii&&aii.basic) useful=aii.basic.useful;
+			if(useful==undefined) return -1;
+			if(typeof useful=='function'){
+				return useful(card,i);
+			}
+			if(typeof useful=='number') return useful;
+			if(i<useful.length){
+				return useful[i];
+			}
+			return useful[useful.length-1];
+		},
+		unuseful:function(card){
+			return -get.useful(card);
+		},
+		unuseful2:function(card){
+			return 10-get.useful(card);
+		},
+		unuseful3:function(card){
+			if(card.name=='du') return 20;
+			return 10-get.useful(card);
+		},
+		value:function(card,player,method){
+			var aii=get.info(card).ai;
+			var value;
+			if(aii&&aii.value) value=aii.value;
+			else if(aii&&aii.basic) value=aii.basic.value;
+			if(value==undefined) return 0;
+			if(player==undefined||get.itemtype(player)!='player') player=_status.event.player;
+			if(typeof value=='function') return value(card,player);
+			if(typeof value=='number') return value;
+			if(get.objtype(value)=='array'){
+				if(method=='raw') return value[0];
+				var num=0,i;
+				var cards=player.getCards('h');
+				for(i=0;i<cards.length;i++){
+					if(cards[i].name==card.name&&
+						cards[i]!=card&&
+						cards[i].classList.contains('selected')==false) num++;
+				}
+				if(num<value.length) return value[num];
+				return value[value.length-1];
+			}
+			return 0;
+		},
+		equipResult:function(player,target,name){
+			var card=get.card();
+			if(!card||card.name!=name){
+				card={name:name};
+			}
+			var value1=get.equipValue(card,target);
+			var value2=0;
+			var current=target.getEquip(card);
+			if(current&&current!=card){
+				value2=get.equipValue(current,target);
+				if(value2>0&&!target.needsToDiscard()&&!get.tag(card,'valueswap')){
+					return 0;
+				}
+			}
+			return Math.max(0,value1-value2)/5;
+		},
+		equipValue:function(card,player){
+			if(player==undefined||get.itemtype(player)!='player') player=get.owner(card);
+			if(player==undefined||get.itemtype(player)!='player') player=_status.event.player;
+			var info=get.info(card);
+			if(!info.ai) return 0;
+			var value=info.ai.equipValue;
+			if(value==undefined){
+				if(info.ai.basic&&info.ai.basic.equipValue!=undefined){
+					value=info.ai.basic.equipValue;
+				}
+				else return 0;
+			}
+			if(typeof value=='number') return value;
+			if(typeof value=='function') return value(card,player);
+			return 0;
+		},
+		disvalue:function(card,player){
+			return -get.value(card,player);
+		},
+		skillthreaten:function(skill,player,target){
+			if(!lib.skill[skill]) return 1;
+			if(!lib.skill[skill].ai) return 1;
+			var threaten=lib.skill[skill].ai.threaten;
+			if(typeof threaten=='number') return threaten;
+			if(typeof threaten=='function'){
+				player=player||_status.event.player;
+				target=target||player;
+				return threaten(player,target);
+			}
+			return 1;
+		},
+		order:function(item){
+			var aii=get.info(item).ai;
+			var order;
+			if(aii&&aii.order) order=aii.order;
+			else if(aii&&aii.basic) order=aii.basic.order;
+			if(order==undefined) return -1;
+			if(typeof(order)=='function'){
+				return order(item,_status.event.player);
+			}
+			return order;
+		},
+		result:function(item,skill){
+			var result;
+			var info=get.info(item);
+			if(info.ai) result=get.copy(info.ai.result);
+			if(typeof(result)=='function') result=result(item);
+			if(!result) result={};
+			if(skill){
+				var info2=get.info(skill);
+				if(info2.ai){
+					info2=info2.ai.result;
+					for(var i in info2){
+						result[i]=info2[i];
+					}
+				}
+			}
+			return result;
+		},
+		effect:function(target,card,player,player2){
+			var event=_status.event;
+			var eventskill=null;
+			if(player==undefined) player=_status.event.player;
+			if(typeof card!='string'&&(typeof card!='object'||!card.name)){
+				var skillinfo=get.info(event.skill);
+				if(event.skill&&skillinfo.viewAs==undefined) card=_status.event.skill;
+				else{
+					card=get.card();
+					if(skillinfo&&card===skillinfo.viewAs){
+						eventskill=event.skill;
+					}
+				}
+			}
+			var result=get.result(card,eventskill);
+			var result1=result.player,result2=result.target;
+			if(typeof result1=='function') result1=result1(player,target,card);
+			if(typeof result2=='function') result2=result2(player,target,card);
+			if(typeof result1!='number') result1=0;
+			if(typeof result2!='number') result2=0;
+			var temp1,temp2,temp3,temp01=0,temp02=0,threaten=1;
+			var skills1=player.getSkills().concat(lib.skill.global);
+			game.expandSkills(skills1);
+			var zerotarget=false,zeroplayer=false;
+			for(var i=0;i<skills1.length;i++){
+				temp1=get.info(skills1[i]).ai;
+				if(temp1&&typeof temp1.effect=='object'&&typeof temp1.effect.player=='function'){
+					temp1=temp1.effect.player(card,player,target,result1);
+				}
+				else temp1=undefined;
+				if(typeof temp1=='object'){
+					if(temp1.length==2||temp1.length==4){
+						result1*=temp1[0];
+						temp01+=temp1[1];
+					}
+					if(temp1.length==4){
+						result2*=temp1[2];
+						temp02+=temp1[3];
+					}
+				}
+				else if(typeof temp1=='number'){
+					result1*=temp1;
+				}
+				else if(temp1=='zeroplayer'){
+					zeroplayer=true;
+				}
+				else if(temp1=='zerotarget'){
+					zerotarget=true;
+				}
+				else if(temp1=='zeroplayertarget'){
+					zeroplayer=true;
+					zerotarget=true;
+				}
+			}
+			if(target){
+				var skills2=target.getSkills().concat(lib.skill.global);
+				game.expandSkills(skills2);
+				for(var i=0;i<skills2.length;i++){
+					temp2=get.info(skills2[i]).ai;
+					if(temp2&&temp2.threaten) temp3=temp2.threaten;
+					else temp3=undefined;
+					if(temp2&&typeof temp2.effect=='function'){
+						temp2=temp2.effect(card,player,target,result2);
+					}
+					else if(temp2&&typeof temp2.effect=='object'&&typeof temp2.effect.target=='function'){
+						temp2=temp2.effect.target(card,player,target,result2);
+					}
+					else temp2=undefined;
+					if(typeof temp2=='object'){
+						if(temp2.length==2||temp2.length==4){
+							result2*=temp2[0];
+							temp02+=temp2[1];
+						}
+						if(temp2.length==4){
+							result1*=temp2[2];
+							temp01+=temp2[3];
+						}
+					}
+					else if(typeof temp2=='number'){
+						result2*=temp2;
+					}
+					else if(temp2=='zeroplayer'){
+						zeroplayer=true;
+					}
+					else if(temp2=='zerotarget'){
+						zerotarget=true;
+					}
+					else if(temp2=='zeroplayertarget'){
+						zeroplayer=true;
+						zerotarget=true;
+					}
+					if(typeof temp3=='function'&&temp3(player,target)!=undefined){
+						threaten*=temp3(player,target);
+					}
+					else if(typeof temp3=='object'){
+						if(typeof temp3.target=='number'){
+							threaten*=temp3;
+						}
+						else if(typeof temp3.target=='function'&&temp3(player,target)!=undefined){
+							threaten*=temp3(player,target);
+						}
+					}
+					else if(typeof temp3=='number'){
+						threaten*=temp3;
+					}
+				}
+				result2+=temp02;
+				result1+=temp01;
+				if(get.attitude(player,target)<0){
+					result2*=threaten;
+				}
+				else{
+					result2*=Math.sqrt(threaten);
+				}
+				if(target.hp<=1) result2*=2;
+				if(target.hp==2) result2*=1.1;
+				if(target.countCards('h')==0){
+					result2*=1.1;
+					if(get.tag(card,'respondSha')||get.tag(card,'respondShan')) result2*=1.4;
+				}
+				if(target.countCards('h')==1) result2*=1.05;
+				if(target.countCards('h')==2) result2*=1.02;
+				if(target.countCards('h')>3) result2*=0.9;
+				if(target.hp==4) result2*=0.9;
+				if(target.hp==5) result2*=0.8;
+				if(target.hp>5) result2*=0.6;
+			}
+			else{
+				result2+=temp02;
+				result1+=temp01;
+			}
+			if(zeroplayer) result1=0;
+			if(zerotarget) result2=0;
+			if(player2){
+				return (result1*get.attitude(player2,player)+(target?result2*get.attitude(player2,target):0));
+			}
+			return (result1*get.attitude(player,player)+(target?result2*get.attitude(player,target):0));
+		},
+		damageEffect:function(target,player,viewer,nature){
+			if(!player){
+				player=target;
+			}
+			if(!viewer){
+				viewer=target;
+			}
+			var name='damage';
+			if(nature=='fire'){
+				name='firedamage';
+			}
+			else if(nature=='thunder'){
+				name='thunderdamage';
+			}
+			return get.effect(target,{name:name},player,viewer);
+		},
+		recoverEffect:function(target,player,viewer){
+			if(target.hp==target.maxHp) return 0;
+			if(!player){
+				player=target;
+			}
+			if(!viewer){
+				viewer=target;
+			}
+			return get.effect(target,{name:'recover'},player,viewer);
+		},
+		buttonValue:function(button){
+			var card=button.link;
+			var player=get.owner(card);
+			if(!player) player=_status.event.player;
+			if(player.getCards('j').contains(card)){
+				var efff=get.effect(player,card,player,player);
+				if(efff>0) return 0.5;
+				if(efff==0) return 0;
+				return -1.5;
+			}
+			if(player.getCards('e').contains(card)){
+				var evalue=get.equipValue(card);
+				if(player.hasSkillTag('noe')){
+					if(evalue>=7){
+						return evalue/6;
+					}
+					return evalue/10;
+				}
+				return evalue/3;
+			}
+			if(player.hasSkillTag('noh')) return 0.1;
+			var nh=player.countCards('h');
+			switch(nh){
+				case 1:return 2;
+				case 2:return 1.6;
+				case 3:return 1;
+				case 4:return 0.8;
+				case 5:return 0.6;
+				default:return 0.4;
+			}
+		},
+		attitude2:function(to){
+			return get.attitude(_status.event.player,to);
+		},
 	};
 	var ai={
 		basic:{
@@ -40595,7 +40983,7 @@
 						ui.click.skill(cards[ix]);
 						var info=get.info(event.skill);
 						if(info.filterCard){
-							check=info.check||ai.get.unuseful2;
+							check=info.check||get.unuseful2;
 							return (ai.basic.chooseCard(check));
 						}
 						else{
@@ -40670,385 +41058,7 @@
 				}
 			}
 		},
-		get:{
-            threaten:function(target,player){
-                var threaten=1;
-                var skills=target.getSkills();
-                for(var i=0;i<skills.length;i++){
-                    var info=get.info(skills[i]);
-                    if(info&&info.ai&&info.ai.threaten){
-                        if(typeof info.ai.threaten=='function'&&player){
-                            var tmp=info.ai.threaten(player,target);
-                            if(typeof tmp=='number'){
-                                threaten*=tmp;
-                            }
-                        }
-                        else if(typeof info.ai.threaten=='number'){
-                            threaten*=info.ai.threaten;
-                        }
-                    }
-                }
-                return threaten;
-            },
-            attitude:function(from,to){
-				if(!from||!to) return 0;
-				var att=ai.get.rawAttitude.apply(this,arguments);
-				if(from.isMad()) att=-att;
-				if(to.isMad()&&att>0) att=0;
-				if(!_status.tempnofake){
-					_status.tempnofake=true;
-					if(from.ai.modAttitudeFrom){
-						att=from.ai.modAttitudeFrom(from,to,att);
-					}
-					if(to.ai.modAttitudeTo){
-						att=to.ai.modAttitudeTo(from,to,att);
-					}
-					delete _status.tempnofake;
-				}
-				return att;
-			},
-			useful:function(card){
-				if(get.position(card)=='j') return -1;
-				if(get.position(card)=='e') return ai.get.equipValue(card);
-                if(!lib.temp) lib.temp={};
-				if(lib.temp[card.name]==undefined) lib.temp[card.name]=[card];
-				else lib.temp[card.name].add(card);
-				var i=lib.temp[card.name].find(card);
-				var aii=get.info(card).ai;
-				var useful;
-				if(aii&&aii.useful) useful=aii.useful;
-				else if(aii&&aii.basic) useful=aii.basic.useful;
-				if(useful==undefined) return -1;
-				if(typeof useful=='function'){
-					return useful(card,i);
-				}
-				if(typeof useful=='number') return useful;
-				if(i<useful.length){
-					return useful[i];
-				}
-				return useful[useful.length-1];
-			},
-			unuseful:function(card){
-				return -ai.get.useful(card);
-			},
-			unuseful2:function(card){
-				return 10-ai.get.useful(card);
-			},
-			unuseful3:function(card){
-                if(card.name=='du') return 20;
-				return 10-ai.get.useful(card);
-			},
-			value:function(card,player,method){
-				var aii=get.info(card).ai;
-				var value;
-				if(aii&&aii.value) value=aii.value;
-				else if(aii&&aii.basic) value=aii.basic.value;
-				if(value==undefined) return 0;
-				if(player==undefined||get.itemtype(player)!='player') player=_status.event.player;
-				if(typeof value=='function') return value(card,player);
-				if(typeof value=='number') return value;
-				if(get.objtype(value)=='array'){
-					if(method=='raw') return value[0];
-					var num=0,i;
-					var cards=player.getCards('h');
-					for(i=0;i<cards.length;i++){
-						if(cards[i].name==card.name&&
-							cards[i]!=card&&
-							cards[i].classList.contains('selected')==false) num++;
-					}
-					if(num<value.length) return value[num];
-					return value[value.length-1];
-				}
-				return 0;
-			},
-			equipResult:function(player,target,name){
-				var card=get.card();
-				if(!card||card.name!=name){
-					card={name:name};
-				}
-				var value1=ai.get.equipValue(card,target);
-				var value2=0;
-				var current=target.getEquip(card);
-				if(current&&current!=card){
-					value2=ai.get.equipValue(current,target);
-					if(value2>0&&!target.needsToDiscard()&&!get.tag(card,'valueswap')){
-						return 0;
-					}
-				}
-				return Math.max(0,value1-value2)/5;
-			},
-			equipValue:function(card,player){
-				if(player==undefined||get.itemtype(player)!='player') player=get.owner(card);
-				if(player==undefined||get.itemtype(player)!='player') player=_status.event.player;
-				var info=get.info(card);
-				if(!info.ai) return 0;
-				var value=info.ai.equipValue;
-				if(value==undefined){
-					if(info.ai.basic&&info.ai.basic.equipValue!=undefined){
-						value=info.ai.basic.equipValue;
-					}
-					else return 0;
-				}
-				if(typeof value=='number') return value;
-				if(typeof value=='function') return value(card,player);
-				return 0;
-			},
-			disvalue:function(card,player){
-				return -ai.get.value(card,player);
-			},
-			skillthreaten:function(skill,player,target){
-				if(!lib.skill[skill]) return 1;
-				if(!lib.skill[skill].ai) return 1;
-				var threaten=lib.skill[skill].ai.threaten;
-				if(typeof threaten=='number') return threaten;
-				if(typeof threaten=='function'){
-					player=player||_status.event.player;
-					target=target||player;
-					return threaten(player,target);
-				}
-				return 1;
-			},
-			order:function(item){
-				var aii=get.info(item).ai;
-				var order;
-				if(aii&&aii.order) order=aii.order;
-				else if(aii&&aii.basic) order=aii.basic.order;
-				if(order==undefined) return -1;
-				if(typeof(order)=='function'){
-					return order(item,_status.event.player);
-				}
-				return order;
-			},
-			result:function(item,skill){
-				var result;
-                var info=get.info(item);
-				if(info.ai) result=get.copy(info.ai.result);
-				if(typeof(result)=='function') result=result(item);
-				if(!result) result={};
-                if(skill){
-                    var info2=get.info(skill);
-                    if(info2.ai){
-                        info2=info2.ai.result;
-                        for(var i in info2){
-                            result[i]=info2[i];
-                        }
-                    }
-                }
-				return result;
-			},
-			effect:function(target,card,player,player2){
-				var event=_status.event;
-                var eventskill=null;
-				if(player==undefined) player=_status.event.player;
-				if(typeof card!='string'&&(typeof card!='object'||!card.name)){
-                    var skillinfo=get.info(event.skill);
-					if(event.skill&&skillinfo.viewAs==undefined) card=_status.event.skill;
-					else{
-                        card=get.card();
-                        if(skillinfo&&card===skillinfo.viewAs){
-                            eventskill=event.skill;
-                        }
-                    }
-				}
-				var result=ai.get.result(card,eventskill);
-				var result1=result.player,result2=result.target;
-				if(typeof result1=='function') result1=result1(player,target,card);
-				if(typeof result2=='function') result2=result2(player,target,card);
-				if(typeof result1!='number') result1=0;
-				if(typeof result2!='number') result2=0;
-				var temp1,temp2,temp3,temp01=0,temp02=0,threaten=1;
-				var skills1=player.getSkills().concat(lib.skill.global);
-				game.expandSkills(skills1);
-				var zerotarget=false,zeroplayer=false;
-				for(var i=0;i<skills1.length;i++){
-					temp1=get.info(skills1[i]).ai;
-					if(temp1&&typeof temp1.effect=='object'&&typeof temp1.effect.player=='function'){
-						temp1=temp1.effect.player(card,player,target,result1);
-					}
-					else temp1=undefined;
-					if(typeof temp1=='object'){
-						if(temp1.length==2||temp1.length==4){
-							result1*=temp1[0];
-							temp01+=temp1[1];
-						}
-						if(temp1.length==4){
-							result2*=temp1[2];
-							temp02+=temp1[3];
-						}
-					}
-					else if(typeof temp1=='number'){
-						result1*=temp1;
-					}
-					else if(temp1=='zeroplayer'){
-						zeroplayer=true;
-					}
-					else if(temp1=='zerotarget'){
-						zerotarget=true;
-					}
-					else if(temp1=='zeroplayertarget'){
-						zeroplayer=true;
-						zerotarget=true;
-					}
-				}
-				if(target){
-					var skills2=target.getSkills().concat(lib.skill.global);
-					game.expandSkills(skills2);
-					for(var i=0;i<skills2.length;i++){
-						temp2=get.info(skills2[i]).ai;
-						if(temp2&&temp2.threaten) temp3=temp2.threaten;
-						else temp3=undefined;
-						if(temp2&&typeof temp2.effect=='function'){
-							temp2=temp2.effect(card,player,target,result2);
-						}
-						else if(temp2&&typeof temp2.effect=='object'&&typeof temp2.effect.target=='function'){
-							temp2=temp2.effect.target(card,player,target,result2);
-						}
-						else temp2=undefined;
-						if(typeof temp2=='object'){
-							if(temp2.length==2||temp2.length==4){
-								result2*=temp2[0];
-								temp02+=temp2[1];
-							}
-							if(temp2.length==4){
-								result1*=temp2[2];
-								temp01+=temp2[3];
-							}
-						}
-						else if(typeof temp2=='number'){
-							result2*=temp2;
-						}
-						else if(temp2=='zeroplayer'){
-							zeroplayer=true;
-						}
-						else if(temp2=='zerotarget'){
-							zerotarget=true;
-						}
-						else if(temp2=='zeroplayertarget'){
-							zeroplayer=true;
-							zerotarget=true;
-						}
-						if(typeof temp3=='function'&&temp3(player,target)!=undefined){
-							threaten*=temp3(player,target);
-						}
-						else if(typeof temp3=='object'){
-							if(typeof temp3.target=='number'){
-								threaten*=temp3;
-							}
-							else if(typeof temp3.target=='function'&&temp3(player,target)!=undefined){
-								threaten*=temp3(player,target);
-							}
-						}
-						else if(typeof temp3=='number'){
-							threaten*=temp3;
-						}
-					}
-					result2+=temp02;
-					result1+=temp01;
-					if(ai.get.attitude(player,target)<0){
-						result2*=threaten;
-					}
-					else{
-						result2*=Math.sqrt(threaten);
-					}
-					if(target.hp<=1) result2*=2;
-					if(target.hp==2) result2*=1.1;
-					if(target.countCards('h')==0){
-						result2*=1.1;
-						if(get.tag(card,'respondSha')||get.tag(card,'respondShan')) result2*=1.4;
-					}
-					if(target.countCards('h')==1) result2*=1.05;
-					if(target.countCards('h')==2) result2*=1.02;
-					if(target.countCards('h')>3) result2*=0.9;
-					if(target.hp==4) result2*=0.9;
-					if(target.hp==5) result2*=0.8;
-					if(target.hp>5) result2*=0.6;
-				}
-				else{
-					result2+=temp02;
-					result1+=temp01;
-				}
-				if(zeroplayer) result1=0;
-				if(zerotarget) result2=0;
-				if(player2){
-					return (result1*ai.get.attitude(player2,player)+(target?result2*ai.get.attitude(player2,target):0));
-				}
-				return (result1*ai.get.attitude(player,player)+(target?result2*ai.get.attitude(player,target):0));
-			},
-			damageEffect:function(target,player,viewer,nature){
-				if(!player){
-					player=target;
-				}
-				if(!viewer){
-					viewer=target;
-				}
-				var name='damage';
-				if(nature=='fire'){
-					name='firedamage';
-				}
-				else if(nature=='thunder'){
-					name='thunderdamage';
-				}
-				return ai.get.effect(target,{name:name},player,viewer);
-			},
-			recoverEffect:function(target,player,viewer){
-				if(target.hp==target.maxHp) return 0;
-				if(!player){
-					player=target;
-				}
-				if(!viewer){
-					viewer=target;
-				}
-				return ai.get.effect(target,{name:'recover'},player,viewer);
-			},
-			buttonValue:function(button){
-				var card=button.link;
-				var player=get.owner(card);
-				if(!player) player=_status.event.player;
-				if(player.getCards('j').contains(card)){
-					var efff=ai.get.effect(player,card,player,player);
-					if(efff>0) return 0.5;
-					if(efff==0) return 0;
-					return -1.5;
-				}
-				if(player.getCards('e').contains(card)){
-                    var evalue=ai.get.equipValue(card);
-                    if(player.hasSkillTag('noe')){
-                        if(evalue>=7){
-                            return evalue/6;
-                        }
-                        return evalue/10;
-                    }
-					return evalue/3;
-				}
-                if(player.hasSkillTag('noh')) return 0.1;
-				var nh=player.countCards('h');
-				switch(nh){
-					case 1:return 2;
-					case 2:return 1.6;
-					case 3:return 1;
-					case 4:return 0.8;
-					case 5:return 0.6;
-					default:return 0.4;
-				}
-			},
-			attitude2:function(to){
-				return ai.get.attitude(_status.event.player,to);
-			},
-			players:function(range,sort){
-				var players=[];
-				if(range.max==undefined) range.max=Infinity;
-				if(range.min==undefined) range.min=-Infinity;
-				if(range.player==undefined) range.player=_status.event.player;
-				for(var i=0;i<game.players.length;i++){
-					if(ai.get.attitude(range.player,game.players[i])<=range.max&&
-						ai.get.attitude(range.player,game.players[i])>=range.min){
-						players.push(game.players[i]);
-					}
-				}
-				if(sort) players.sort(sort);
-				return players;
-			}
-		},
+		get:get
 	};
     lib.init.init();
 }());

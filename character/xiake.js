@@ -12,8 +12,8 @@ character.xiake={
             trigger:{source:'damageBegin'},
             logTarget:'player',
             check:function(event,player){
-                if(ai.get.damageEffect(event.player,player,player)>0&&
-                    ai.get.attitude(player,event.player)<0){
+                if(get.damageEffect(event.player,player,player)>0&&
+                    get.attitude(player,event.player)<0){
                     return player.hp>event.player.hp&&player.hp>=2;
                 }
                 return false;
@@ -39,11 +39,11 @@ character.xiake={
             discard:false,
             delay:0.5,
             check:function(card,player){
-                var val=ai.get.equipValue(card);
+                var val=get.equipValue(card);
                 var player=_status.event.player;
                 var cards=player.getCards('h',{subtype:get.subtype(card)});
                 for(var i=0;i<cards.length;i++){
-                    if(ai.get.equipValue(cards[i])>=val){
+                    if(get.equipValue(cards[i])>=val){
                         return 1;
                     }
                 }

@@ -90,9 +90,9 @@ character.shenhua={
 				'step 0'
 				player.discardPlayerCard(trigger.target,get.prompt('jianchu',trigger.target)).set('ai',function(button){
 					if(!_status.event.att) return 0;
-					if(get.position(button.link)=='e') return ai.get.value(button.link);
+					if(get.position(button.link)=='e') return get.value(button.link);
 					return 1;
-				}).set('logSkill',['jianchu',trigger.target]).set('att',ai.get.attitude(player,trigger.target)<=0);
+				}).set('logSkill',['jianchu',trigger.target]).set('att',get.attitude(player,trigger.target)<=0);
 				'step 1'
 				if(result.bool&&result.links&&result.links.length){
 					if(get.type(result.links[0])=='equip'){
@@ -159,7 +159,7 @@ character.shenhua={
 				'step 1'
 				if(event.dialog.buttons.length>1){
 					var next=event.current.chooseButton(true,function(button){
-						return ai.get.value(button.link,_status.event.player);
+						return get.value(button.link,_status.event.player);
 					});
 					next.set('dialog',event.dialog.videoId);
 					next.set('closeDialog',false);
@@ -247,11 +247,11 @@ character.shenhua={
 			targetprompt:['先拿牌','后拿牌'],
 			find:function(type){
 				var list=game.filterPlayer(function(current){
-					return current!=player&&ai.get.attitude(player,current)>3;
+					return current!=player&&get.attitude(player,current)>3;
 				});
 				var player=_status.event.player;
 				var num=player.countCards('he',function(card){
-					return ai.get.value(card)<7;
+					return get.value(card)<7;
 				});
 				var count=null;
 				var from,nh;
@@ -264,7 +264,7 @@ character.shenhua={
 				nh=from.countCards('h');
 
 				list=game.filterPlayer(function(current){
-					return current!=player&&ai.get.attitude(player,current)<1;
+					return current!=player&&get.attitude(player,current)<1;
 				});
 				if(list.length==0) return null;
 				list.sort(function(a,b){
@@ -283,7 +283,7 @@ character.shenhua={
 			check:function(card){
 				var count=lib.skill.redimeng.find(3);
 				if(count==null) return -1;
-				if(ui.selected.cards.length<count) return 7-ai.get.value(card);
+				if(ui.selected.cards.length<count) return 7-get.value(card);
 				return -1;
 			},
 			ai:{
@@ -315,7 +315,7 @@ character.shenhua={
 			filterCard:{suit:'club'},
 			viewAs:{name:'tiesuo'},
 			prompt:'将一张梅花牌当铁锁连环使用',
-			check:function(card){return 6-ai.get.value(card)},
+			check:function(card){return 6-get.value(card)},
 			ai:{
 				order:7.5,
 				result:{
@@ -348,7 +348,7 @@ character.shenhua={
 			},
 			selectCard:2,
 			check:function(card){
-				return 6-ai.get.value(card);
+				return 6-get.value(card);
 			},
 			ai:{
 				basic:{
@@ -471,7 +471,7 @@ character.shenhua={
 							return (current.hp<=mindist-1&&
 								get.distance(player,current,'attack')<=mindist&&
 								player.canUse(card,current,false)&&
-								ai.get.effect(current,card,player,player)>0);
+								get.effect(current,card,player,player)>0);
 						})){
 							return 1;
 						}
@@ -528,7 +528,7 @@ character.shenhua={
 			trigger:{player:'shaBegin'},
 			logTarget:'target',
 			check:function(event,player){
-				return ai.get.attitude(player,event.target)<=0;
+				return get.attitude(player,event.target)<=0;
 			},
 			filter:function(event,player){
 				if(event.target.countCards('h')<=player.countCards('h')) return true;
@@ -632,12 +632,12 @@ character.shenhua={
 			},
 			content:function(){
 				"step 0"
-				var eff=ai.get.effect(player,trigger.card,trigger.player,trigger.player);
+				var eff=get.effect(player,trigger.card,trigger.player,trigger.player);
 				trigger.player.chooseToDiscard('享乐：弃置一张基本牌，否则杀对'+get.translation(player)+'无效',function(card){
 					return get.type(card)=='basic';
 				}).set('ai',function(card){
 					if(_status.event.eff>0){
-						return 10-ai.get.value(card);
+						return 10-get.value(card);
 					}
 					return 0;
 				}).set('eff',eff);
@@ -657,7 +657,7 @@ character.shenhua={
 							if(player.hasSkill('jiu')||player.hasSkill('tianxianjiu')) return;
 							if(bs.length<=3&&player.countCards('h','sha')<=1){
 								for(var i=0;i<bs.length;i++){
-									if(bs[i].name!='sha'&&ai.get.value(bs[i])<7){
+									if(bs[i].name!='sha'&&get.value(bs[i])<7){
 										return [1,0,1,-0.5];
 									}
 								}
@@ -684,7 +684,7 @@ character.shenhua={
 				}).set('ai',function(target){
 					if(!_status.event.fang) return -1;
 					if(target.hasJudge('lebu')) return -1;
-					return ai.get.attitude(player,target)-4;
+					return get.attitude(player,target)-4;
 				}).set('fang',fang);
 				"step 1"
 				if(result.bool){
@@ -780,7 +780,7 @@ character.shenhua={
 				}
 				else{
 					var next=player.chooseToDiscard('是否发动巧变跳过判定阶段？');
-					next.set('ai',ai.get.unuseful2);
+					next.set('ai',get.unuseful2);
 					next.set('logSkill','qiaobian');
 				}
 				"step 1"
@@ -802,7 +802,7 @@ character.shenhua={
 				var check,i,num=0,num2=0,players=game.filterPlayer();
 				for(i=0;i<players.length;i++){
 					if(player!=players[i]&&players[i].countCards('h')){
-						var att=ai.get.attitude(player,players[i]);
+						var att=get.attitude(player,players[i]);
 						if(att<=0){
 							num++;
 						}
@@ -817,12 +817,12 @@ character.shenhua={
 					ai1:function(card){
 						var evt=_status.event;
 						if(!evt.check) return 0;
-						return 6-ai.get.useful(card);
+						return 6-get.useful(card);
 					},
 					ai2:function(target){
 						var evt=_status.event;
 						if(!evt.check) return 0;
-						return 1-ai.get.attitude(evt.player,target);
+						return 1-get.attitude(evt.player,target);
 					},
 					filterTarget:function(card,player,target){
 						return target.countCards('h')>0;
@@ -863,7 +863,7 @@ character.shenhua={
 			content:function(){
 				"step 0"
 				var check=game.hasPlayer(function(current){
-					return ai.get.attitude(player,current)>0&&current.countCards('j');
+					return get.attitude(player,current)>0&&current.countCards('j');
 				});
 				if(!check){
 					if(player.countCards('h')>player.hp+1){
@@ -879,28 +879,28 @@ character.shenhua={
 				player.chooseCardTarget({
 					ai1:function(card){
 						if(!_status.event.check) return 0;
-						return 7-ai.get.useful(card);
+						return 7-get.useful(card);
 					},
 					ai2:function(target){
 						if(!_status.event.check) return 0;
 						var player=_status.event.player;
 						if(ui.selected.targets.length==0){
-							if(target.countCards('j')&&ai.get.attitude(player,target)>0) return 10;
-							if(ai.get.attitude(player,target)<0){
+							if(target.countCards('j')&&get.attitude(player,target)>0) return 10;
+							if(get.attitude(player,target)<0){
 								var players=game.filterPlayer();
 								for(var i=0;i<players.length;i++){
-									if(ai.get.attitude(player,players[i])>0){
+									if(get.attitude(player,players[i])>0){
 										if((target.getEquip(1)&&!players[i].getEquip(1))||
 										(target.getEquip(2)&&!players[i].getEquip(2))||
 										(target.getEquip(3)&&!players[i].getEquip(3))||
 										(target.getEquip(4)&&!players[i].getEquip(4))||
-										(target.getEquip(5)&&!players[i].getEquip(5))) return -ai.get.attitude(player,target);
+										(target.getEquip(5)&&!players[i].getEquip(5))) return -get.attitude(player,target);
 									}
 								}
 							}
 							return 0;
 						}
-						return -ai.get.attitude(player,target)*ai.get.attitude(player,ui.selected.targets[0]);
+						return -get.attitude(player,target)*get.attitude(player,ui.selected.targets[0]);
 					},
 					multitarget:true,
 					filterTarget:function(card,player,target){
@@ -948,12 +948,12 @@ character.shenhua={
 						var player=_status.event.player;
 						var targets0=_status.event.targets0;
 						var targets1=_status.event.targets1;
-						if(ai.get.attitude(player,targets0)>ai.get.attitude(player,targets1)){
+						if(get.attitude(player,targets0)>get.attitude(player,targets1)){
 							return get.position(button.link)=='j'?10:0;
 						}
 						else{
 							if(get.position(button.link)=='j') return -10;
-							return ai.get.equipValue(button.link);
+							return get.equipValue(button.link);
 						}
 					},targets[0]).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
 						var targets1=_status.event.targets1;
@@ -1002,7 +1002,7 @@ character.shenhua={
 				next.logSkill='qiaobian';
 				next.ai=function(card){
 					if(discard){
-						return 100-ai.get.useful(card);
+						return 100-get.useful(card);
 					}
 					else{
 						return -1;
@@ -1084,7 +1084,7 @@ character.shenhua={
 							}
 						}
 						else if(get.tag(card,'respondSha')||get.tag(card,'respondShan')){
-							if(ai.get.attitude(player,target)>0&&card.name=='juedou') return;
+							if(get.attitude(player,target)>0&&card.name=='juedou') return;
 							if(get.tag(card,'damage')&&target.hasSkillTag('maixie')) return;
 							if(target.countCards('h')==0) return 2;
 							if(target.hasSkill('ziliang')) return 0.7;
@@ -1238,7 +1238,7 @@ character.shenhua={
 			content:function(){
 				"step 0"
 				if(target.storage.hunzi){
-					target.chooseControl('拒绝','不拒绝').set('prompt','是否拒绝制霸拼点？').set('choice',ai.get.attitude(target,player)<=0);
+					target.chooseControl('拒绝','不拒绝').set('prompt','是否拒绝制霸拼点？').set('choice',get.attitude(target,player)<=0);
 				}
 				else{
 					event.forced=true;
@@ -1254,7 +1254,7 @@ character.shenhua={
 					if(card.name=='du') return 20;
 					var player=get.owner(card);
 					var target=_status.event.getParent().target;
-					if(player!=target&&ai.get.attitude(player,target)>0){
+					if(player!=target&&get.attitude(player,target)>0){
 						return -get.number(card);
 					}
 					return get.number(card);
@@ -1272,7 +1272,7 @@ character.shenhua={
 				expose:0.2,
 				result:{
 					target:function(player,target){
-						if(player.countCards('h','du')&&ai.get.attitude(player,target)<0) return -1;
+						if(player.countCards('h','du')&&get.attitude(player,target)<0) return -1;
 						if(player.countCards('h')<=player.hp) return 0;
 						var maxnum=0;
 						var cards2=target.getCards('h');
@@ -1304,9 +1304,9 @@ character.shenhua={
 			check:function(card){
 				var player=_status.currentPhase;
 				if(player.countCards('he',{subtype:get.subtype(card)})>1){
-					return 11-ai.get.equipValue(card);
+					return 11-get.equipValue(card);
 				}
-				return 6-ai.get.value(card);
+				return 6-get.value(card);
 			},
 			filterTarget:function(card,player,target){
 				if(target.isMin()) return false;
@@ -1357,7 +1357,7 @@ character.shenhua={
 						}
 					}
 				}
-				if(ai.get.attitude(player,event.player)>0){
+				if(get.attitude(player,event.player)>0){
 					if(du&&num<=3){
 						return false;
 					}
@@ -1382,7 +1382,7 @@ character.shenhua={
 				var check=lib.skill.guzheng.checkx(trigger,player);
 				player.chooseCardButton(event.cards,'固政：选择令'+get.translation(trigger.player)+'收回的牌').set('ai',function(button){
 					if(_status.event.check){
-						return 20-ai.get.value(button.link);
+						return 20-get.value(button.link);
 					}
 					return 0;
 				}).set('check',check);
@@ -1416,8 +1416,8 @@ character.shenhua={
 			},
 			direct:true,
 			checkx:function(event,player){
-				var att1=ai.get.attitude(player,event.player);
-				var att2=ai.get.attitude(player,event.source);
+				var att1=get.attitude(player,event.player);
+				var att2=get.attitude(player,event.source);
 				return att1>0&&att2<=0;
 			},
 			content:function(){
@@ -1425,7 +1425,7 @@ character.shenhua={
 				var next=player.chooseToDiscard('he',get.prompt('beige'));
 				var check=lib.skill.beige.checkx(trigger,player);
 				next.set('ai',function(card){
-					if(_status.event.goon) return 8-ai.get.value(card);
+					if(_status.event.goon) return 8-get.value(card);
 					return 0;
 				});
 				next.set('logSkill','beige');
@@ -1876,7 +1876,7 @@ character.shenhua={
 					event.player.countCards('h')&&player.countCards('h'))&&event.player!=player;
 			},
 			check:function(event,player){
-				return ai.get.attitude(player,event.player)<0&&player.countCards('h')>1;
+				return get.attitude(player,event.player)<0&&player.countCards('h')>1;
 			},
 			priority:5,
 			content:function(){
@@ -1925,8 +1925,8 @@ character.shenhua={
 					return player!=target
 				}).ai=function(target){
 					var player=_status.event.player;
-					if(ai.get.attitude(_status.event.player,target)==0) return 0;
-					if(ai.get.attitude(_status.event.player,target)>0){
+					if(get.attitude(_status.event.player,target)==0) return 0;
+					if(get.attitude(_status.event.player,target)>0){
 						if(target.classList.contains('turnedover')) return 1000-target.countCards('h');
 						if(player.maxHp-player.hp<3) return -1;
 						return 100-target.countCards('h');
@@ -1957,15 +1957,15 @@ character.shenhua={
 							var turnfriend=false;
 							var players=game.filterPlayer();
 							for(var i=0;i<players.length;i++){
-								if(ai.get.attitude(target,players[i])<0&&!players[i].isTurnedOver()){
+								if(get.attitude(target,players[i])<0&&!players[i].isTurnedOver()){
 									hastarget=true;
 								}
-								if(ai.get.attitude(target,players[i])>0&&players[i].isTurnedOver()){
+								if(get.attitude(target,players[i])>0&&players[i].isTurnedOver()){
 									hastarget=true;
 									turnfriend=true;
 								}
 							}
-							if(ai.get.attitude(player,target)>0&&!hastarget) return;
+							if(get.attitude(player,target)>0&&!hastarget) return;
 							if(turnfriend||target.hp==target.maxHp) return [0.5,1];
 							if(target.hp>1) return [1,0.5];
 						}
@@ -2000,7 +2000,7 @@ character.shenhua={
 				if(event.list.length){
 					var current=event.list.shift();
 					event.current=current;
-					player.chooseBool(get.prompt('songwei',current)).set('choice',ai.get.attitude(player,current)>0);
+					player.chooseBool(get.prompt('songwei',current)).set('choice',get.attitude(player,current)>0);
 				}
 				else{
 					event.finish();
@@ -2032,7 +2032,7 @@ character.shenhua={
 			position:'he',
 			viewAs:{name:'bingliang'},
 			prompt:'将一黑色的基本牌或装备牌当兵粮寸断使用',
-			check:function(card){return 6-ai.get.value(card)},
+			check:function(card){return 6-get.value(card)},
 			ai:{
 				order:9
 			}
@@ -2066,7 +2066,7 @@ character.shenhua={
 					}
 				}
 				for(var i=0;i<min.length;i++){
-					if(ai.get.attitude(player,min[i])>0) return true;
+					if(get.attitude(player,min[i])>0) return true;
 				}
 				return false;
 			},
@@ -2105,7 +2105,7 @@ character.shenhua={
 					},
 					forced:true,
 					ai2:function(target){
-						return ai.get.attitude(_status.event.player,target);
+						return get.attitude(_status.event.player,target);
 					}
 				});
 				"step 1"
@@ -2144,7 +2144,7 @@ character.shenhua={
 				var count;
 				var players=game.filterPlayer();
 				for(var i=0;i<players.length;i++){
-					if(players[i]!=player&&ai.get.attitude(player,players[i])>3) list.push(players[i]);
+					if(players[i]!=player&&get.attitude(player,players[i])>3) list.push(players[i]);
 				}
 				list.sort(function(a,b){
 					return a.countCards('h')-b.countCards('h');
@@ -2154,7 +2154,7 @@ character.shenhua={
 				list.length=0;
 
 				for(var i=0;i<players.length;i++){
-					if(players[i]!=player&&ai.get.attitude(player,players[i])<1) list.push(players[i]);
+					if(players[i]!=player&&get.attitude(player,players[i])<1) list.push(players[i]);
 				}
 				if(list.length==0) return -1;
 				list.sort(function(a,b){
@@ -2167,7 +2167,7 @@ character.shenhua={
 					}
 				}
 				if(count<2&&from.countCards('h')>=2) return -1;
-				if(ui.selected.cards.length<count) return 11-ai.get.value(card);
+				if(ui.selected.cards.length<count) return 11-get.value(card);
 				return -1;
 			},
 			ai:{
@@ -2181,29 +2181,29 @@ character.shenhua={
 						var players=game.filterPlayer();
 						if(ui.selected.targets.length==0){
 							for(var i=0;i<players.length;i++){
-								if(players[i]!=player&&ai.get.attitude(player,players[i])>3) list.push(players[i]);
+								if(players[i]!=player&&get.attitude(player,players[i])>3) list.push(players[i]);
 							}
 							list.sort(function(a,b){
 								return a.countCards('h')-b.countCards('h');
 							});
-							if(target==list[0]) return ai.get.attitude(player,target);
-							return -ai.get.attitude(player,target);
+							if(target==list[0]) return get.attitude(player,target);
+							return -get.attitude(player,target);
 						}
 						else{
 							var from=ui.selected.targets[0];
 							for(var i=0;i<players.length;i++){
-								if(players[i]!=player&&ai.get.attitude(player,players[i])<1) list.push(players[i]);
+								if(players[i]!=player&&get.attitude(player,players[i])<1) list.push(players[i]);
 							}
 							list.sort(function(a,b){
 								return b.countCards('h')-a.countCards('h');
 							});
-							if(from.countCards('h')>=list[0].countCards('h')) return -ai.get.attitude(player,target);
+							if(from.countCards('h')>=list[0].countCards('h')) return -get.attitude(player,target);
 							for(var i=0;i<list.length&&from.countCards('h')<list[i].countCards('h');i++){
 								if(list[i].countCards('h')-from.countCards('h')<=num){
 									var count=list[i].countCards('h')-from.countCards('h');
-									if(count<2&&from.countCards('h')>=2) return -ai.get.attitude(player,target);
-									if(target==list[i]) return ai.get.attitude(player,target);
-									return -ai.get.attitude(player,target);
+									if(count<2&&from.countCards('h')>=2) return -get.attitude(player,target);
+									if(target==list[i]) return get.attitude(player,target);
+									return -get.attitude(player,target);
 								}
 							}
 						}
@@ -2228,8 +2228,8 @@ character.shenhua={
 					if(player.maxHp-player.hp==1&&target.countCards('he')==0){
 						return 0;
 					}
-					if(ai.get.attitude(_status.event.player,target)>0){
-						return 10+ai.get.attitude(_status.event.player,target);
+					if(get.attitude(_status.event.player,target)>0){
+						return 10+get.attitude(_status.event.player,target);
 					}
 					if(player.maxHp-player.hp==1){
 						return -1;
@@ -2252,7 +2252,7 @@ character.shenhua={
 						var str2='摸一弃'+get.cnNumber(event.num,true);
 						player.chooseControl(str1,str2,function(event,player){
 							return _status.event.choice;
-						}).set('choice',ai.get.attitude(player,event.target)>0?str1:str2);
+						}).set('choice',get.attitude(player,event.target)>0?str1:str2);
 						event.str=str1;
 					}
 				}
@@ -2305,8 +2305,8 @@ character.shenhua={
 					if(player.maxHp-player.hp==1&&target.countCards('he')==0){
 						return 0;
 					}
-					if(ai.get.attitude(_status.event.player,target)>0){
-						return 10+ai.get.attitude(_status.event.player,target);
+					if(get.attitude(_status.event.player,target)>0){
+						return 10+get.attitude(_status.event.player,target);
 					}
 					if(player.maxHp-player.hp==1){
 						return -1;
@@ -2326,7 +2326,7 @@ character.shenhua={
 						var str2='摸一弃'+get.cnNumber(event.num,true);
 						player.chooseControl(str1,str2,function(event,player){
 							return _status.event.choice;
-						}).set('choice',ai.get.attitude(player,event.target)>0?str1:str2);
+						}).set('choice',get.attitude(player,event.target)>0?str1:str2);
 						event.str=str1;
 					}
 				}
@@ -2375,7 +2375,7 @@ character.shenhua={
 			prompt:'将一张黑桃手牌当酒使用',
 			check:function(card){
 				if(_status.event.type=='dying') return 1;
-				return 4-ai.get.value(card);
+				return 4-get.value(card);
 			},
 			ai:{
 				skillTagFilter:function(player){
@@ -2405,7 +2405,7 @@ character.shenhua={
 				next.autochoose=lib.filter.autoRespondShan;
 				next.ai=function(card){
 					if(trigger.target.countCards('h','shan')>1){
-						return ai.get.unuseful2(card);
+						return get.unuseful2(card);
 					}
 					return -1;
 				};
@@ -2471,7 +2471,7 @@ character.shenhua={
 				if(event.list.length){
 					var current=event.list.shift();
 					event.current=current;
-					player.chooseBool(get.prompt('baonue',current)).set('choice',ai.get.attitude(player,current)>0);
+					player.chooseBool(get.prompt('baonue',current)).set('choice',get.attitude(player,current)>0);
 				}
 				else{
 					event.finish();
@@ -2552,7 +2552,7 @@ character.shenhua={
 						var num=0;
 						var players=game.filterPlayer();
 						for(var i=0;i<players.length;i++){
-							var att=ai.get.attitude(player,players[i]);
+							var att=get.attitude(player,players[i]);
 							if(att>0) att=1;
 							if(att<0) att=-1;
 							if(players[i]!=player&&players[i].hp<=3){
@@ -2609,9 +2609,9 @@ character.shenhua={
 			check:function(card){
 				var player=_status.currentPhase;
 				if(player.countCards('h')>player.hp){
-					return 6-ai.get.value(card);
+					return 6-get.value(card);
 				}
-				return 4-ai.get.value(card)
+				return 4-get.value(card)
 			}
 		},
 		bazhen:{
@@ -2626,7 +2626,7 @@ character.shenhua={
 				effect:{
 					target:function(card,player,target){
 						if(player==target&&get.subtype(card)=='equip2'){
-							if(ai.get.equipValue(card)<=7.5) return 0;
+							if(get.equipValue(card)<=7.5) return 0;
 						}
 						if(target.getEquip(2)) return;
 						return lib.skill.bagua_skill.ai.effect.target.apply(this,arguments);
@@ -2645,7 +2645,7 @@ character.shenhua={
 			},
 			viewAs:{name:'wuxie'},
 			prompt:'将一张黑色手牌当无懈可击使用',
-			check:function(card){return 8-ai.get.value(card)},
+			check:function(card){return 8-get.value(card)},
 			threaten:1.2
 		},
 		lianhuan:{
@@ -2662,7 +2662,7 @@ character.shenhua={
 			},
 			viewAs:{name:'tiesuo'},
 			prompt:'将一张梅花牌当铁锁连环使用',
-			check:function(card){return 4-ai.get.value(card)}
+			check:function(card){return 4-get.value(card)}
 		},
 		lianhuan2:{
 			audio:2,
@@ -2674,7 +2674,7 @@ character.shenhua={
 				return get.suit(card)=='club';
 			},
 			check:function(card){
-				return 5-ai.get.useful(card);
+				return 5-get.useful(card);
 			},
 			content:function(){
 				player.draw();
@@ -2828,7 +2828,7 @@ character.shenhua={
 							var source=_status.event.source;
 							return target!=source&&get.distance(source,target,'attack')<=1;
 						},true).set('ai',function(target){
-							return ai.get.damageEffect(target,_status.event.source,player);
+							return get.damageEffect(target,_status.event.source,player);
 						}).set('source',target);
 					}
 					else{
@@ -2849,14 +2849,14 @@ character.shenhua={
 				order:0.5,
 				result:{
 					target:function(player,target){
-						var att=ai.get.attitude(player,target);
+						var att=get.attitude(player,target);
 						var oc=(target.countCards('h')==1);
 						if(att>0&&oc) return 0;
 						var players=game.filterPlayer();
 						for(var i=0;i<players.length;i++){
 							if(players[i]!=target&&players[i]!=player&&
 								get.distance(target,players[i],'attack')<=1){
-								if(ai.get.damageEffect(players[i],target,player)>0){
+								if(get.damageEffect(players[i],target,player)>0){
 									return att>0?att/2:att-(oc?5:0);
 								}
 							}
@@ -2874,7 +2874,7 @@ character.shenhua={
 						var max=player.maxHp-hs.length;
 						var players=game.filterPlayer();
 						for(var i=0;i<players.length;i++){
-							if(ai.get.attitude(player,players[i])>2){
+							if(get.attitude(player,players[i])>2){
 								max=Math.max(Math.min(5,players[i].hp)-players[i].countCards('h'),max);
 							}
 						}
@@ -2899,7 +2899,7 @@ character.shenhua={
 				player.chooseTarget(get.prompt('jieming'),[1,trigger.num],function(card,player,target){
 					return target.countCards('h')<Math.min(target.maxHp,5);
 				}).set('ai',function(target){
-					var att=ai.get.attitude(_status.event.player,target);
+					var att=get.attitude(_status.event.player,target);
 					if(att>2){
 						return Math.min(5,target.maxHp)-target.countCards('h');
 					}
@@ -2923,7 +2923,7 @@ character.shenhua={
 							var max=0;
 							var players=game.filterPlayer();
 							for(var i=0;i<players.length;i++){
-								if(ai.get.attitude(target,players[i])>0){
+								if(get.attitude(target,players[i])>0){
 									max=Math.max(Math.min(5,players[i].hp)-players[i].countCards('h'),max);
 								}
 							}
@@ -2961,7 +2961,7 @@ character.shenhua={
 				target.damage();
 			},
 			check:function(card){
-				return 10-ai.get.value(card);
+				return 10-get.value(card);
 			},
 			position:'he',
 			ai:{
@@ -2979,7 +2979,7 @@ character.shenhua={
 							if(player.hp==2&&target.hp>=2) return 0;
 							if(target.hp>player.hp) return 0;
 						}
-						return ai.get.damageEffect(target,player);
+						return get.damageEffect(target,player);
 					}
 				}
 			},
@@ -3027,7 +3027,7 @@ character.shenhua={
 				target.damage();
 			},
 			check:function(card){
-				return 10-ai.get.value(card);
+				return 10-get.value(card);
 			},
 			position:'he',
 			ai:{
@@ -3038,7 +3038,7 @@ character.shenhua={
 							if(player.hp<2) return 0;
 							if(target.hp>=player.hp) return 0;
 						}
-						return ai.get.damageEffect(target,player);
+						return get.damageEffect(target,player);
 					}
 				}
 			},
@@ -3074,11 +3074,11 @@ character.shenhua={
 						return 1;
 					}
 					for(var i=0;i<cards.length;i++){
-						if(cards[i].name!='sha'&&cards[i].number>11&&ai.get.value(cards[i])<7){
+						if(cards[i].name!='sha'&&cards[i].number>11&&get.value(cards[i])<7){
 							return 9;
 						}
 					}
-					return ai.get.order({name:'sha'})-1;
+					return get.order({name:'sha'})-1;
 				},
 				result:{
 					player:function(player){
@@ -3145,7 +3145,7 @@ character.shenhua={
 				return get.color(card)!=player.storage.shuangxiong;
 			},
 			check:function(card){
-				return 6-ai.get.value(card);
+				return 6-get.value(card);
 			},
 			ai:{
 				basic:{
@@ -3172,7 +3172,7 @@ character.shenhua={
 			selectCard:2,
 			complexCard:true,
 			check:function(card){
-				return 6-ai.get.value(card);
+				return 6-get.value(card);
 			},
 			ai:{
 				basic:{
@@ -3201,7 +3201,7 @@ character.shenhua={
 				return event.target.countCards('he')>0;
 			},
 			check:function(event,player){
-				return ai.get.attitude(player,event.target)<0;
+				return get.attitude(player,event.target)<0;
 			},
 			content:function(){
 				player.discardPlayerCard('he',trigger.target,true);
@@ -3241,10 +3241,10 @@ character.shenhua={
 						});
 						next.set('ai',function(target){
 							if(type=='equip'){
-								return -ai.get.attitude(player,target);
+								return -get.attitude(player,target);
 							}
 							else{
-								return ai.get.attitude(player,target);
+								return get.attitude(player,target);
 							}
 						});
 						next.set('type',type);
@@ -3280,7 +3280,7 @@ character.shenhua={
 				"step 0";
 				player.chooseTarget(get.prompt('releiji')).ai=function(target){
 					if(target.hasSkill('hongyan')) return 0;
-					return ai.get.damageEffect(target,_status.event.player,_status.event.player,'thunder');
+					return get.damageEffect(target,_status.event.player,_status.event.player,'thunder');
 				};
 				"step 1"
 				if(result.bool){
@@ -3311,7 +3311,7 @@ character.shenhua={
 					target:function(card,player,target,current){
 						if(get.tag(card,'respondShan')){
 							var hastarget=game.hasPlayer(function(current){
-								return ai.get.attitude(target,current)<0;
+								return get.attitude(target,current)<0;
 							});
 							var be=target.countCards('e',{color:'black'});
 							if(target.countCards('h','shan')&&be){
@@ -3356,7 +3356,7 @@ character.shenhua={
 					return player.canUse({name:'sha'},target,false);
 				}).set('check',check).set('ai',function(target){
 					if(!_status.event.check) return 0;
-					return ai.get.effect(target,{name:'sha'},_status.event.player);
+					return get.effect(target,{name:'sha'},_status.event.player);
 				});
 				"step 1"
 				if(result.bool){
@@ -3389,11 +3389,11 @@ character.shenhua={
 					},
 					ai1:function(card){
 						if(_status.event.check) return 0;
-						return 6-ai.get.value(card);
+						return 6-get.value(card);
 					},
 					ai2:function(target){
 						if(_status.event.check) return 0;
-						return ai.get.effect(target,{name:'sha'},_status.event.player);
+						return get.effect(target,{name:'sha'},_status.event.player);
 					},
 					check:check
 				});
@@ -3419,7 +3419,7 @@ character.shenhua={
 					return player.canUse({name:'sha'},target,false);
 				}).set('check',check).set('ai',function(target){
 					if(!_status.event.check) return 0;
-					return ai.get.effect(target,{name:'sha'},_status.event.player);
+					return get.effect(target,{name:'sha'},_status.event.player);
 				});
 				"step 1"
 				if(result.bool){
@@ -3450,7 +3450,7 @@ character.shenhua={
 			audio:2,
 			trigger:{player:'shaBegin'},
 			check:function(event,player){
-				return ai.get.attitude(player,event.target)<=0;
+				return get.attitude(player,event.target)<=0;
 			},
 			logTarget:'target',
 			filter:function(event,player){
@@ -3494,10 +3494,10 @@ character.shenhua={
 						return player!=target;
 					},
 					ai1:function(card){
-						return 10-ai.get.value(card);
+						return 10-get.value(card);
 					},
 					ai2:function(target){
-						var att=ai.get.attitude(_status.event.player,target);
+						var att=get.attitude(_status.event.player,target);
 						var trigger=_status.event.getTrigger();
 						var da=0;
 						if(_status.event.player.hp==1){
@@ -3507,7 +3507,7 @@ character.shenhua={
 							if(target.maxHp>5&&target.hp>1) return -att/10+da;
 							return -att+da;
 						}
-						var eff=ai.get.damageEffect(target,trigger.source,target,trigger.nature);
+						var eff=get.damageEffect(target,trigger.source,target,trigger.nature);
 						if(att==0) return 0.1+da;
 						if(eff>=0&&trigger.num==1){
 							return att+da;
@@ -3586,10 +3586,10 @@ character.shenhua={
 					},
 					position:'he',
 					ai1:function(card){
-						return 10-ai.get.value(card);
+						return 10-get.value(card);
 					},
 					ai2:function(target){
-						var att=ai.get.attitude(_status.event.player,target);
+						var att=get.attitude(_status.event.player,target);
 						var trigger=_status.event.getTrigger();
 						var da=0;
 						if(_status.event.player.hp==1){
@@ -3599,7 +3599,7 @@ character.shenhua={
 							if(target.maxHp>5&&target.hp>1) return -att/10+da;
 							return -att+da;
 						}
-						var eff=ai.get.damageEffect(target,trigger.source,target,trigger.nature);
+						var eff=get.damageEffect(target,trigger.source,target,trigger.nature);
 						if(att==0) return 0.1+da;
 						if(eff>=0&&trigger.num==1){
 							return att+da;
@@ -3662,7 +3662,7 @@ character.shenhua={
 				var num=player.maxHp-player.hp||0;
 				var str1='令'+get.translation(player)+'摸'+get.cnNumber(num)+'张牌';
 				var str2='令'+get.translation(player)+'防止造成和受到的所有伤害且天香失效直到你下一回合开始';
-				var att=ai.get.attitude(source,player);
+				var att=get.attitude(source,player);
 				var choice='选项一';
 				if(att<0){
 					if(num>=2){
@@ -3907,7 +3907,7 @@ character.shenhua={
 				return false;
 			},
 			check:function(event,player){
-				return ai.get.attitude(player,event.player)>2;
+				return get.attitude(player,event.player)>2;
 			},
 			content:function(){
 				"step 0"
@@ -3928,7 +3928,7 @@ character.shenhua={
 				"step 0";
 				player.chooseTarget(get.prompt('leiji')).ai=function(target){
 					if(target.hasSkill('hongyan')) return 0;
-					return ai.get.damageEffect(target,_status.event.player,_status.event.player,'thunder');
+					return get.damageEffect(target,_status.event.player,_status.event.player,'thunder');
 				};
 				"step 1"
 				if(result.bool){
@@ -3954,7 +3954,7 @@ character.shenhua={
 					target:function(card,player,target,current){
 						if(get.tag(card,'respondShan')){
 							var hastarget=game.hasPlayer(function(current){
-								return ai.get.attitude(target,current)<0;
+								return get.attitude(target,current)<0;
 							});
 							if(target.countCards('h','shan')&&target.countCards('e',{suit:'spade'})){
 								return [0,hastarget?target.countCards('he')/2:0];
@@ -3985,7 +3985,7 @@ character.shenhua={
 					var player=_status.event.player;
 					var judging=_status.event.judging;
 					var result=trigger.judge(card)-trigger.judge(judging);
-					var attitude=ai.get.attitude(player,trigger.player);
+					var attitude=get.attitude(player,trigger.player);
 					if(attitude==0||result==0) return 0;
 					if(attitude>0){
 						return result;
@@ -4079,7 +4079,7 @@ character.shenhua={
 						var cards=player.getCards('h');
 						if(cards.length>=3&&player.hp>=3) return 0;
 						for(var i=0;i<cards.length;i++){
-							num+=Math.max(0,ai.get.value(cards[i],player,'raw'));
+							num+=Math.max(0,get.value(cards[i],player,'raw'));
 						}
 						num/=cards.length;
 						num*=Math.min(cards.length,player.hp);

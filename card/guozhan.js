@@ -16,7 +16,7 @@ card.guozhan={
 				equipValue:function(card,player){
 					if(player.hasSkill('zhangwu')) return 9;
 					if(game.hasPlayer(function(current){
-						return current.hasSkill('zhangwu')&&ai.get.attitude(player,current)<=0;
+						return current.hasSkill('zhangwu')&&get.attitude(player,current)<=0;
 					})){
 						return 1;
 					}
@@ -37,7 +37,7 @@ card.guozhan={
 				equipValue:function(card,player){
 					if(player.hasSkill('wendao')) return 9;
 					if(game.hasPlayer(function(current){
-						return current.hasSkill('wendao')&&ai.get.attitude(player,current)<=0;
+						return current.hasSkill('wendao')&&get.attitude(player,current)<=0;
 					})){
 						return 1;
 					}
@@ -103,7 +103,7 @@ card.guozhan={
 			content:function(){
 				'step 0'
 				target.chooseControl('discard_card','take_damage',function(event,player){
-					if(ai.get.damageEffect(player,event.player,player,'thunder')>=0){
+					if(get.damageEffect(player,event.player,player,'thunder')>=0){
 						return 'take_damage';
 					}
 					if(player.hp>=3&&player.countCards('e')>=2){
@@ -172,10 +172,10 @@ card.guozhan={
 						return game.countPlayer(function(current){
 							if(target.isMajor()==current.isMajor()){
 								if(current.isLinked()){
-									return ai.get.attitude(player,target);
+									return get.attitude(player,target);
 								}
 								else{
-									return -ai.get.attitude(player,target)*0.8;
+									return -get.attitude(player,target)*0.8;
 								}
 							}
 						});
@@ -299,10 +299,10 @@ card.guozhan={
 				},
 				result:{
 					player:function(player,target){
-						var att=ai.get.attitude(player,target);
+						var att=get.attitude(player,target);
 						if(target.hp==1&&att<0) return 0;
 						if(game.hasPlayer(function(current){
-							return ai.get.attitude(player,current)<att;
+							return get.attitude(player,current)<att;
 						})){
 							var num=1;
 							if(target==player.next||target==player.previous){
@@ -380,11 +380,11 @@ card.guozhan={
 						if(target.hasSkillTag('nofire')||target.hasSkillTag('nodamage')) return 0;
 						if(target.hasSkill('xuying')&&target.countCards('h')==0) return 0;
 						if(!target.isLinked()){
-							return ai.get.damageEffect(target,player,target,'fire');
+							return get.damageEffect(target,player,target,'fire');
 						}
 						return game.countPlayer(function(current){
 							if(current.isLinked()){
-								return get.sgn(ai.get.damageEffect(current,player,target,'fire'));
+								return get.sgn(get.damageEffect(current,player,target,'fire'));
 							}
 						});
 					}
@@ -514,7 +514,7 @@ card.guozhan={
 			},
 			content:function(){
 				target.draw(2);
-				target.chooseToDiscard(2,'he',true).ai=ai.get.disvalue;
+				target.chooseToDiscard(2,'he',true).ai=get.disvalue;
 			},
 			ai:{
 				wuxie:function(){
@@ -588,7 +588,7 @@ card.guozhan={
 					player:function(card,player){
 						if(player.hasSkill('zhangwu')) return;
 						if(card.name=='feilongduofeng'&&game.hasPlayer(function(current){
-							return current.hasSkill('zhangwu')&&ai.get.attitude(player,current)<=0;
+							return current.hasSkill('zhangwu')&&get.attitude(player,current)<=0;
 						})){
 							return [0,0,0,0];
 						}
@@ -602,7 +602,7 @@ card.guozhan={
 					player:function(card,player){
 						if(player.hasSkill('wendao')) return;
 						if(card.name=='taipingyaoshu'&&game.hasPlayer(function(current){
-							return current.hasSkill('wendao')&&ai.get.attitude(player,current)<=0;
+							return current.hasSkill('wendao')&&get.attitude(player,current)<=0;
 						})){
 							return [0,0,0,0];
 						}
@@ -817,7 +817,7 @@ card.guozhan={
 					return player.canUse({name:'zhibi'},target);
 				},true).set('ai',function(target){
 					var player=_status.event.player;
-					return ai.get.effect(target,{name:'zhibi'},player,player);
+					return get.effect(target,{name:'zhibi'},player,player);
 				});
 				'step 1'
 				if(result.bool){
@@ -838,7 +838,7 @@ card.guozhan={
 				player.removeSkill('xietianzi');
 				if(player.countCards('he')>0){
 					player.chooseToDiscard('he','是否弃置一张牌并获得一个额外回合？').set('ai',function(card){
-						return 10-ai.get.value(card);
+						return 10-get.value(card);
 					});
 				}
 				else{
@@ -1086,11 +1086,11 @@ card.guozhan={
 						return get.distance(damaged,target)<=1&&target!=damaged;
 					},
 					ai1:function(card){
-						return 9-ai.get.value(card);
+						return 9-get.value(card);
 					},
 					ai2:function(target){
 						var player=_status.event.player;
-						return ai.get.damageEffect(target,player,player);
+						return get.damageEffect(target,player,player);
 					},
 					prompt:get.prompt('sanjian')
 				}).set('damaged',damaged);

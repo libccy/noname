@@ -35,7 +35,7 @@ character.jiange={
                 player.chooseTarget(get.prompt('konghun'),function(card,player,target){
                     return player!=target;
                 },[1,Math.min(4,Math.floor((game.players.length-1)/2))]).ai=function(target){
-                    return ai.get.damageEffect(target,player,player,'thunder')+1;
+                    return get.damageEffect(target,player,player,'thunder')+1;
                 }
                 "step 1"
                 if(result.bool){
@@ -92,8 +92,8 @@ character.jiange={
                 "step 0"
                 var next=player.chooseToDiscard('he','是否弃置一张牌令'+get.translation(trigger.player)+'的摸牌数-1？');
                 next.ai=function(card){
-                    if(ai.get.attitude(player,trigger.player)<0){
-                        return 6-ai.get.value(card);
+                    if(get.attitude(player,trigger.player)<0){
+                        return 6-get.value(card);
                     }
                     return 0;
                 }
@@ -119,7 +119,7 @@ character.jiange={
                 player.chooseTarget(get.prompt('huodi'),function(card,player,target){
                     return target.countCards('he')&&player!=target;
                 }).ai=function(target){
-                    return -ai.get.attitude(player,target);
+                    return -get.attitude(player,target);
                 }
                 "step 1"
                 if(result.bool){
@@ -162,7 +162,7 @@ character.jiange={
                     player.chooseTarget('选择至多'+get.cnNumber(event.num)+'名角色令其进攻距离+1',[1,event.num],function(card,player,target){
                         return player!=target;
                     }).ai=function(target){
-                        return ai.get.attitude(player,target);
+                        return get.attitude(player,target);
                     }
                 }
                 else{
@@ -203,7 +203,7 @@ character.jiange={
         chiying:{
             trigger:{global:'damageBegin'},
             check:function(event,player){
-                return ai.get.attitude(player,event.player)>0;
+                return get.attitude(player,event.player)>0;
             },
             filter:function(event,player){
                 if(event.num<=1) return false;
@@ -237,7 +237,7 @@ character.jiange={
                 player.chooseTarget(get.prompt('juechen'),function(card,player,target){
                     return player!=target&&!trigger.targets.contains(target)&&target.countCards('he')>0;
                 }).ai=function(target){
-                    return -ai.get.attitude(player,target);
+                    return -get.attitude(player,target);
                 }
                 "step 1"
                 if(result.bool){
@@ -251,7 +251,7 @@ character.jiange={
             check:function(event,player){
                 for(var i=0;i<game.players.length;i++){
                     if(player!=game.players[i]){
-                        if(ai.get.attitude(player,game.players[i])<0) return true;
+                        if(get.attitude(player,game.players[i])<0) return true;
                     }
                 }
                 return false;
@@ -267,7 +267,7 @@ character.jiange={
                     player.chooseTarget('是否弃置一名角色一张牌？',function(card,player,target){
                         return player!=target&&target.countCards('he')>0;
                     }).ai=function(target){
-                        return -ai.get.attitude(player,target);
+                        return -get.attitude(player,target);
                     }
                 }
                 "step 2"
@@ -321,7 +321,7 @@ character.jiange={
                         return player!=target;
                     }).ai=function(target){
                         if(target.hasSkillTag('nofire')) return 0;
-                        return -ai.get.attitude(player,target);
+                        return -get.attitude(player,target);
                     };
                 }
                 else{
@@ -434,7 +434,7 @@ character.jiange={
                         if(player.hasJudge('lebu')){
                             if(target==player) return 0.1;
                         }
-                        var att=ai.get.attitude(player,target);
+                        var att=get.attitude(player,target);
                         if(player.countCards('h')>player.hp){
                             if(target==player) return Math.max(1,att-2);
                         }
@@ -475,7 +475,7 @@ character.jiange={
                 player.chooseTarget(get.prompt('tianyu'),[1,num],function(card,player,target){
                     return !target.isLinked()&&player!=target;
                 }).ai=function(target){
-                    return -ai.get.attitude(player,target);
+                    return -get.attitude(player,target);
                 }
                 "step 1"
                 if(result.bool){
@@ -518,7 +518,7 @@ character.jiange={
                 player.chooseTarget(get.prompt('jizhen'),[1,2],function(card,player,target){
                     return target.hp<target.maxHp&&player!=target;
                 }).ai=function(target){
-                    return ai.get.attitude(player,target);
+                    return get.attitude(player,target);
                 }
                 "step 1"
                 if(result.bool){

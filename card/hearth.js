@@ -100,12 +100,12 @@ card.hearth={
 						var noh=(nh==0||target.hasSkillTag('noh'));
 						if(noh&&noe) return 0;
 						if(noh&&noe2) return 0.01;
-						if(ai.get.attitude(player,target)<=0) return (target.countCards('he'))?-1.5:1.5;
+						if(get.attitude(player,target)<=0) return (target.countCards('he'))?-1.5:1.5;
 						var js=target.getCards('j');
 						if(js.length){
 							var jj=js[0].viewAs?{name:js[0].viewAs}:js[0];
 							if(jj.name=='zhaomingdan') return 3;
-							if(js.length==1&&ai.get.effect(target,jj,target,player)>=0){
+							if(js.length==1&&get.effect(target,jj,target,player)>=0){
 								return 0;
 							}
 							return 3;
@@ -196,7 +196,7 @@ card.hearth={
 				var rand=Math.random()<0.5;
 				target.chooseCard(true).ai=function(card){
 					if(rand) return Math.random();
-					return ai.get.value(card);
+					return get.value(card);
 				};
 				"step 1"
 				event.dialog=ui.create.dialog(get.translation(target.name)+'展示的手牌',result.cards);
@@ -207,8 +207,8 @@ card.hearth={
 				player.chooseToDiscard(function(card){
 					return get.suit(card)==get.suit(_status.event.parent.card2);
 				},function(card){
-					if(ai.get.damageEffect(target,player,player,'thunder')>0){
-						return 6-ai.get.value(card,_status.event.player);
+					if(get.damageEffect(target,player,player,'thunder')>0){
+						return 6-get.value(card,_status.event.player);
 					}
 					return -1;
 				}).prompt=false;
@@ -230,7 +230,7 @@ card.hearth={
 					useful:1,
 				},
 				wuxie:function(target,card,player,current,state){
-					if(ai.get.attitude(current,player)>=0&&state>0) return false;
+					if(get.attitude(current,player)>=0&&state>0) return false;
 				},
 				result:{
 					player:function(player){
@@ -571,7 +571,7 @@ card.hearth={
 				useful:[6,3],
 				result:{
 					target:function(player,target){
-						var eff=ai.get.recoverEffect(target,player,target);
+						var eff=get.recoverEffect(target,player,target);
 						if(eff<=0) return 0;
 						var num=target.maxHp-target.hp;
 						if(num<1) return 0;
@@ -595,7 +595,7 @@ card.hearth={
 			content:function(){
 				"step 0"
 				target.chooseToDiscard([1,2],'he').ai=function(card){
-					if(ai.get.damageEffect(target,player,target,'thunder')>=0){
+					if(get.damageEffect(target,player,target,'thunder')>=0){
 						if(target.hasSkillTag('maixie')){
 							if(ui.selected.cards.length) return 0;
 						}
@@ -608,9 +608,9 @@ card.hearth={
 					if(card.name=='tao') return 0;
 					if(target.hp==1&&card.name=='jiu') return 0;
 					if(get.type(card)!='basic'){
-						return 10-ai.get.value(card);
+						return 10-get.value(card);
 					}
-					return 8-ai.get.value(card);
+					return 8-get.value(card);
 				};
 				"step 1"
 				if(!result.bool||result.cards.length<2){

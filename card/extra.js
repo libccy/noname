@@ -67,7 +67,7 @@ card.extra={
 					},
 				},
 				order:function(){
-					return ai.get.order({name:'sha'})+0.2;
+					return get.order({name:'sha'})+0.2;
 				},
 				result:{
 					target:function(player,target){
@@ -94,10 +94,10 @@ card.extra={
 						}
 						if(card){
 							if(game.hasPlayer(function(current){
-								return (ai.get.attitude(target,current)<0&&
+								return (get.attitude(target,current)<0&&
 									target.canUse(card,current,true,true)&&
 									!current.getEquip('baiyin')&&
-									ai.get.effect(current,card,target)>0);
+									get.effect(current,card,target)>0);
 							})){
 								return 1;
 							}
@@ -128,7 +128,7 @@ card.extra={
 				var rand=Math.random()<0.5;
 				target.chooseCard(true).ai=function(card){
 					if(rand) return Math.random();
-					return ai.get.value(card);
+					return get.value(card);
 				};
 				"step 1"
 				event.dialog=ui.create.dialog(get.translation(target)+'展示的手牌',result.cards);
@@ -140,8 +140,8 @@ card.extra={
 				game.log(target,'展示了',event.card2);
 				player.chooseToDiscard({suit:get.suit(event.card2)},function(card){
 					var evt=_status.event.getParent();
-					if(ai.get.damageEffect(evt.target,evt.player,evt.player,'fire')>0){
-						return 7-ai.get.value(card,evt.player);
+					if(get.damageEffect(evt.target,evt.player,evt.player,'fire')>0){
+						return 7-get.value(card,evt.player);
 					}
 					return -1;
 				}).prompt=false;
@@ -164,7 +164,7 @@ card.extra={
 					useful:1,
 				},
 				wuxie:function(target,card,player,current,state){
-					if(ai.get.attitude(current,player)>=0&&state>0) return false;
+					if(get.attitude(current,player)>=0&&state>0) return false;
 				},
 				result:{
 					player:function(player){
@@ -231,10 +231,10 @@ card.extra={
 				result:{
 					target:function(player,target){
 						if(target.isLinked()) return 1;
-						if(ai.get.attitude(player,target)>=0) return -1;
+						if(get.attitude(player,target)>=0) return -1;
 						if(ui.selected.targets.length) return -1;
 						if(game.hasPlayer(function(current){
-							return ai.get.attitude(player,current)<=-1&&current!=target&&!current.isLinked();
+							return get.attitude(player,current)<=-1&&current!=target&&!current.isLinked();
 						})){
 							return -1;
 						}
@@ -320,9 +320,9 @@ card.extra={
 					equipValue:function(card,player){
 						if(player.hasSkillTag('maixie')&&player.hp>1) return 0;
 						if(player.hasSkillTag('noDirectDamage')) return 10;
-						if(ai.get.damageEffect(player,player,player,'fire')>=0) return 10;
+						if(get.damageEffect(player,player,player,'fire')>=0) return 10;
 						var num=3-game.countPlayer(function(current){
-							return ai.get.attitude(current,player)<0;
+							return get.attitude(current,player)<0;
 						});
 						if(player.hp==1) num+=4;
 						if(player.hp==2) num+=1;
@@ -491,7 +491,7 @@ card.extra={
 			},
 			audio:true,
 			check:function(event,player){
-				var att=ai.get.attitude(player,event.target);
+				var att=get.attitude(player,event.target);
 				if(event.target.hasSkillTag('nofire')){
 					return att>0;
 				}

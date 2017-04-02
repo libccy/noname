@@ -275,8 +275,8 @@ card.zhenfa={
 				player.chooseCard('将一张非基本牌当作杀对'+get.translation(target)+'使用','he',function(card){
 					return get.type(card)!='basic';
 				}).ai=function(card){
-					if(ai.get.effect(target,{name:'sha'},player,player)>0){
-						return 6-ai.get.value(card);
+					if(get.effect(target,{name:'sha'},player,player)>0){
+						return 6-get.value(card);
 					}
 					return 0;
 				};
@@ -290,8 +290,8 @@ card.zhenfa={
 				event.player2.chooseCard('将一张非基本牌当作杀对'+get.translation(target)+'使用','he',function(card){
 					return get.type(card)!='basic';
 				}).ai=function(card){
-					if(ai.get.effect(target,{name:'sha'},event.player2,event.player2)>0){
-						return 6-ai.get.value(card);
+					if(get.effect(target,{name:'sha'},event.player2,event.player2)>0){
+						return 6-get.value(card);
 					}
 					return 0;
 				};
@@ -322,7 +322,7 @@ card.zhenfa={
 				"step 0"
 				var next=target.chooseToRespond({name:'shan'});
 				next.ai=function(card){
-					if(ai.get.damageEffect(target,player,target)>=0) return 0;
+					if(get.damageEffect(target,player,target)>=0) return 0;
 					return 1;
 				};
 				next.autochoose=lib.filter.autoRespondShan;

@@ -85,10 +85,10 @@ card.sp={
 							var card=target.getEquip(i);
 							if(card){
 								if(i==1||i==4){
-									num1+=ai.get.equipValue(card);
+									num1+=get.equipValue(card);
 								}
 								else{
-									num2+=ai.get.equipValue(card);
+									num2+=get.equipValue(card);
 								}
 							}
 						}
@@ -170,7 +170,7 @@ card.sp={
 			ai:{
 				equipValue:function(card,player){
 					if(game.hasPlayer(function(current){
-						return player.canUse('sha',current)&&current.isHealthy()&&ai.get.attitude(player,current)<0;
+						return player.canUse('sha',current)&&current.isHealthy()&&get.attitude(player,current)<0;
 					})){
 						return 5;
 					}
@@ -326,7 +326,7 @@ card.sp={
 						var hs=player.getCards('h');
 						if(hs.length<=1) return 0;
 						for(var i=0;i<hs.length;i++){
-							if(ai.get.value(hs[i])<=5){
+							if(get.value(hs[i])<=5){
 								ok=true;
 								break;
 							}
@@ -353,8 +353,8 @@ card.sp={
 					target.chooseToDiscard('弃置一张非基本牌（或取消并弃置两张牌）','he',function(card){
 						return get.type(card)!='basic';
 					}).set('ai',function(card){
-						if(_status.event.goon) return 7-ai.get.value(card);
-						return 9-ai.get.value(card);
+						if(_status.event.goon) return 7-get.value(card);
+						return 9-get.value(card);
 					}).set('goon',target.countCards('h',{type:'basic'})>2);
 					event.more=true;
 				}
@@ -407,7 +407,7 @@ card.sp={
 					player:function(player,target){
 						return game.countPlayer(function(current){
 							if(get.distance(target,current)<=1&&current!=target){
-								var att=ai.get.attitude(player,current);
+								var att=get.attitude(player,current);
 								if(att>3){
 									return 1.1;
 								}
@@ -438,7 +438,7 @@ card.sp={
 			},
 			prompt:'将一张手牌当闪打出',
 			check:function(card){
-				return 6-ai.get.value(card);
+				return 6-get.value(card);
 			},
 			ai:{
 				respondShan:true,
@@ -476,9 +476,9 @@ card.sp={
 			},
 			check:function(event,player){
 				var target=event.target;
-				if(ai.get.attitude(player,target)>=0) return false;
+				if(get.attitude(player,target)>=0) return false;
 				if(player.hasCard(function(card){
-					return ai.get.value(card)>=8;
+					return get.value(card)>=8;
 				})){
 					return false;
 				}
@@ -511,7 +511,7 @@ card.sp={
 				},
 				effect:{
 					player:function(card,player,target){
-						if(card.name=='sha'&&target.isHealthy()&&ai.get.attitude(player,target)>0){
+						if(card.name=='sha'&&target.isHealthy()&&get.attitude(player,target)>0){
 							return [1,-2];
 						}
 					}
@@ -589,10 +589,10 @@ card.sp={
 				var nh=player.countCards('h');
 				if(!player.needsToDiscard()){
 					if(nh<3) return 0;
-					if(nh==3) return 5-ai.get.value(card);
-					return 7-ai.get.value(card);
+					if(nh==3) return 5-get.value(card);
+					return 7-get.value(card);
 				}
-				return 10-ai.get.useful(card);
+				return 10-get.useful(card);
 			},
 			discard:false,
 			lose:true,
@@ -638,7 +638,7 @@ card.sp={
 				},muniu,muniu.cards);
 				var players=game.filterPlayer(function(current){
 					if(!current.getEquip(5)&&current!=player&&!current.isTurnedOver()&&
-						ai.get.attitude(player,current)>=3&&ai.get.attitude(current,player)>=3){
+						get.attitude(player,current)>=3&&get.attitude(current,player)>=3){
 						return true;
 					}
 				});
@@ -774,14 +774,14 @@ card.sp={
 						if(get.type(button.link)=='delay') return -1;
 						if(get.type(button.link)=='equip'){
 							var current=player.getCards('e',{subtype:get.subtype(button.link)})[0];
-							if(current&&ai.get.equipValue(current)>=ai.get.equipValue(button.link)) return -1;
+							if(current&&get.equipValue(current)>=get.equipValue(button.link)) return -1;
 							return 1;
 						}
 						if(get.tag(button.link,'multitarget')) return -1;
 						if(button.link.name=='huoshaolianying') return -1;
 					}
 					if(button.link.name=='jiu'){
-						if(ai.get.effect(player,{name:'jiu'},player)>0){
+						if(get.effect(player,{name:'jiu'},player)>0){
 							return 1;
 						}
 						return -1;
@@ -811,7 +811,7 @@ card.sp={
 				order:4,
 				result:{
 					player:function(player){
-						if(_status.event.dying) return ai.get.attitude(player,_status.event.dying);
+						if(_status.event.dying) return get.attitude(player,_status.event.dying);
 						return 1;
 					}
 				},

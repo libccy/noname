@@ -38,7 +38,7 @@ character.old={
 				player.chooseTarget(get.prompt('zhenshan'),function(card,player,target){
 					return target.countCards('h')<player.countCards('h');
 				}).set('ai',function(target){
-					return ai.get.attitude(player,target)
+					return get.attitude(player,target)
 				});
 				"step 1"
 				if(result.bool){
@@ -93,7 +93,7 @@ character.old={
 					var card={name:button.link[2],nature:button.link[3]};
                     if(card.name=='jiu') return 0;
 					if(game.hasPlayer(function(current){
-						return player.canUse(card,current)&&ai.get.effect(current,card,player,player)>0;
+						return player.canUse(card,current)&&get.effect(current,card,player,player)>0;
 					})){
                         if(card.name=='sha'){
                             if(card.nature=='fire') return 2.95;
@@ -118,7 +118,7 @@ character.old={
                             player.chooseTarget('选择交换手牌的目标',function(card,player,target){
                                 return target.countCards('h')<player.countCards('h')
                             },true).ai=function(target){
-                                return ai.get.attitude(player,target);
+                                return get.attitude(player,target);
                             }
             				player.addTempSkill('zhenshan2','phaseAfter');
                             'step 1'
@@ -139,7 +139,7 @@ character.old={
 					var event=_status.event;
                     var nh=player.countCards('h');
                     if(game.hasPlayer(function(current){
-                        return ai.get.attitude(player,current)>0&&current.countCards('h')<nh;
+                        return get.attitude(player,current)>0&&current.countCards('h')<nh;
                     })){
                         if(event.type=='dying'){
                             if(event.filterCard({name:'tao'},player,event)){
@@ -209,7 +209,7 @@ character.old={
     				var dialog=ui.create.dialog('选择获得卡牌的目标',cards,'hidden');
     				dialog.classList.add('noselect');
     				player.chooseTarget(true,dialog).ai=function(target){
-                        return ai.get.attitude(player,target)/Math.sqrt(1+target.countCards('h'));
+                        return get.attitude(player,target)/Math.sqrt(1+target.countCards('h'));
                     }
                 }
                 else{
@@ -252,7 +252,7 @@ character.old={
         oldqianxi:{
             trigger:{source:'damageBefore'},
             check:function(event,player){
-                var att=ai.get.attitude(player,event.player);
+                var att=get.attitude(player,event.player);
                 if(event.player.hp==event.player.maxHp) return att<0;
                 if(event.player.hp==event.player.maxHp-1&&
                     (event.player.maxHp<=3||event.player.hasSkillTag('maixie'))) return att<0;
@@ -292,10 +292,10 @@ character.old={
                     return get.distance(player,target)<=1||player.canUse('sha',target,false);
 				}).set('ai',function(target){
                     if(get.distance(player,target)<=1){
-                        return ai.get.damageEffect(target,player,player)*2;
+                        return get.damageEffect(target,player,player)*2;
                     }
                     else{
-                        return ai.get.effect(target,{name:'sha'},player,player);
+                        return get.effect(target,{name:'sha'},player,player);
                     }
 				});
 				"step 1"

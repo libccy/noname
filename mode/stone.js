@@ -1680,6 +1680,16 @@ mode.stone={
 		},
 	},
 	get:{
+		rawAttitude:function(from,to){
+			var num;
+			if(to.isMin()&&!to.hasSkill('chaofeng')){
+				num=5;
+			}
+			else{
+				num=6;
+			}
+			return num*(from.side==to.side?1:-1);
+		},
 		stonecard:function(type,career){
 			var list=[];
 			for(var i in lib.card){
@@ -2422,7 +2432,7 @@ mode.stone={
 						if(player.hasFellowSkill('priest_hunwu')){
 							return -2
 						}
-						return ai.get.recoverEffect(target,player,target);
+						return get.recoverEffect(target,player,target);
 					}
 				}
 			}
@@ -3668,7 +3678,7 @@ mode.stone={
 						if(player.hasFellowSkill('priest_hunwu')){
 							return -2
 						}
-						return ai.get.recoverEffect(target,player,target);
+						return get.recoverEffect(target,player,target);
 					}
 				}
 			}
@@ -3704,7 +3714,7 @@ mode.stone={
 						if(player.hasFellowSkill('priest_hunwu')){
 							return -1;
 						}
-						return ai.get.recoverEffect(target,player,target);
+						return get.recoverEffect(target,player,target);
 					}
 				}
 			}
@@ -4460,7 +4470,7 @@ mode.stone={
 				'step 0'
 				if(player.countCards('e')){
 					player.chooseToDiscard('e','是否弃置一张装备区内的牌令伤害+1？').ai=function(card){
-						return 7-ai.get.value(card);
+						return 7-get.value(card);
 					}
 				}
 				else{
@@ -5966,7 +5976,7 @@ mode.stone={
 				event.chooser.chooseTarget('陪练：令一名随从获得嘲讽',function(card,playerx,target){
 					return player!=target&&target.isMin()&&!target.hasSkill('chaofeng');
 				}).ai=function(target){
-					return ai.get.attitude(event.chooser,target)*target.hp;
+					return get.attitude(event.chooser,target)*target.hp;
 				};
 				player.line(event.chooser);
 				"step 1"
@@ -6032,7 +6042,7 @@ mode.stone={
 				event.chooser.chooseTarget('普照：选择一名己方随从增加两点体力和体力上限',function(card,playerx,target){
 					return player!=target&&player.side==target.side&&target.isMin();
 				}).ai=function(target){
-					return ai.get.attitude(event.chooser,target)*Math.max(1,10-target.hp);
+					return get.attitude(event.chooser,target)*Math.max(1,10-target.hp);
 				};
 				player.line(event.chooser);
 				"step 1"
@@ -6060,7 +6070,7 @@ mode.stone={
 				event.chooser.chooseTarget('缩小：令一名随从减少两点体力上限',function(card,playerx,target){
 					return player!=target&&target.isMin()&&target.maxHp>1;
 				}).ai=function(target){
-					if(ai.get.attitude(player,target)>=0) return 0;
+					if(get.attitude(player,target)>=0) return 0;
 					if(target.hp==1) return 0.01;
 					if(target.maxHp-target.hp>=2) return 0.01;
 					if(target.maxHp-target.hp==1){
@@ -6281,7 +6291,7 @@ mode.stone={
 				'he',function(card){
 					return get.type(card)=='equip';
 				}).ai=function(card){
-					return 7-ai.get.value(card);
+					return 7-get.value(card);
 				};
 				"step 1"
 				if(result.bool){
@@ -6478,9 +6488,9 @@ mode.stone={
 					return player!=target&&target.isMin()&&(target.hp!=2||target.maxHp!=2);
 				}).ai=function(target){
 					if(target.hp==2&&target.maxHp>2){
-						return ai.get.attitude(event.chooser,target)*(2-target.maxHp)/100;
+						return get.attitude(event.chooser,target)*(2-target.maxHp)/100;
 					}
-					return ai.get.attitude(event.chooser,target)*(2-target.hp);
+					return get.attitude(event.chooser,target)*(2-target.hp);
 				};
 				player.line(event.chooser);
 				"step 1"
@@ -6509,7 +6519,7 @@ mode.stone={
 				event.chooser.chooseTarget('保卫：令一名友方随从获得一点护甲',function(card,playerx,target){
 					return player!=target&&player.side==target.side&&target.isMin();
 				}).ai=function(target){
-					return ai.get.attitude(event.chooser,target);
+					return get.attitude(event.chooser,target);
 				};
 				player.line(event.chooser);
 				"step 1"
@@ -7369,10 +7379,10 @@ mode.stone={
 					},
 					filterCard:true,
 					ai1:function(card){
-						return 9-ai.get.value(card);
+						return 9-get.value(card);
 					},
 					ai2:function(target){
-						return ai.get.damageEffect(target,player,player);
+						return get.damageEffect(target,player,player);
 					},
 					prompt:'偷袭：弃置一张装备区内的牌并对一名敌方角色一点伤害'
 				});
@@ -7524,7 +7534,7 @@ mode.stone={
 				event.chooser.chooseTarget('监工：对一名随从造成一点伤害然后令其摸两张牌',function(card,playerx,target){
 					return player!=target&&target.isMin();
 				}).ai=function(target){
-					var att=ai.get.attitude(event.chooser,target);
+					var att=get.attitude(event.chooser,target);
 					if(target.hp==1) return -att;
 					if(target.hp==2) return 0;
 					return att;
@@ -7854,7 +7864,7 @@ mode.stone={
 				event.chooser.chooseTarget('驯兽：选择一名己方随从增加一点体力和体力上限并摸两张牌',function(card,playerx,target){
 					return player!=target&&player.side==target.side&&target.isMin();
 				}).ai=function(target){
-					return ai.get.attitude(event.chooser,target);
+					return get.attitude(event.chooser,target);
 				};
 				player.line(event.chooser);
 				"step 1"
@@ -8198,7 +8208,7 @@ mode.stone={
 						if(player.hasFellowSkill('priest_hunwu')){
 							return -1;
 						}
-						return ai.get.recoverEffect(target,player,target);
+						return get.recoverEffect(target,player,target);
 					}
 				}
 			}
@@ -8230,7 +8240,7 @@ mode.stone={
 				order:2,
 				result:{
 					target:function(player,target){
-						return ai.get.damageEffect(target,player,target);
+						return get.damageEffect(target,player,target);
 					}
 				}
 			}
@@ -8257,7 +8267,7 @@ mode.stone={
 				order:2,
 				result:{
 					target:function(player,target){
-						return ai.get.damageEffect(target,player,target,'fire');
+						return get.damageEffect(target,player,target,'fire');
 					}
 				}
 			}
@@ -8345,7 +8355,7 @@ mode.stone={
 				order:2,
 				result:{
 					target:function(player,target){
-						return ai.get.damageEffect(target,player,target);
+						return get.damageEffect(target,player,target);
 					}
 				}
 			}
@@ -8448,11 +8458,11 @@ mode.stone={
 			},
 			ai:{
 				order:function(){
-					return ai.get.order({name:'sha'})-0.1;
+					return get.order({name:'sha'})-0.1;
 				},
 				result:{
 					target:function(player,target){
-						return ai.get.effect(target,{name:'sha'},player,target);
+						return get.effect(target,{name:'sha'},player,target);
 					}
 				}
 			}
@@ -8763,7 +8773,7 @@ mode.stone={
 				event.chooser.chooseTarget('暗影：选择敌方一名角色视为对其使用一张杀',function(card,player,target){
 					return lib.filter.targetEnabled({name:'sha'},event.chooser,target);
 				}).ai=function(target){
-					return ai.get.effect(target,{name:'sha'},event.chooser);
+					return get.effect(target,{name:'sha'},event.chooser);
 				}
 				player.line(event.chooser);
 				"step 1"
@@ -8790,7 +8800,7 @@ mode.stone={
 				event.chooser.chooseTarget('发明：选择己方一名角色摸一张牌',function(card,playerx,target){
 					return player!=target&&player.side==target.side;
 				}).ai=function(target){
-					return ai.get.attitude(event.chooser,target);
+					return get.attitude(event.chooser,target);
 				};
 				player.line(event.chooser);
 				"step 1"
@@ -10197,20 +10207,6 @@ mode.stone={
 		stonecard:'法术',
 		mode_stone_card_config:'炉石模式',
 		mode_stone_character_config:'炉石模式',
-	},
-	ai:{
-		get:{
-			rawAttitude:function(from,to){
-				var num;
-				if(to.isMin()&&!to.hasSkill('chaofeng')){
-					num=5;
-				}
-				else{
-					num=6;
-				}
-				return num*(from.side==to.side?1:-1);
-			}
-		}
 	},
 	help:{
 		'炉石模式':

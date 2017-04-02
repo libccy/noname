@@ -362,7 +362,7 @@ mode.guozhan={
 					return false;
 				},
 				order:function(){
-					return ai.get.order({name:'sha'})-0.1;
+					return get.order({name:'sha'})-0.1;
 				},
 				result:{
 					player:function(player){
@@ -429,7 +429,7 @@ mode.guozhan={
 			filterCard:{color:'red'},
 			position:'he',
 			check:function(card){
-				return 6-ai.get.value(card);
+				return 6-get.value(card);
 			},
 			filter:function(event,player){
 				for(var i=0;i<ui.discardPile.childElementCount;i++){
@@ -506,7 +506,7 @@ mode.guozhan={
 					num+=player.storage.huangjintianbingfu.length;
 				}
 				player.chooseCardButton(num,true,get.cards(num),'按顺将卡牌置于牌堆顶（先选择的在上）').set('ai',function(button){
-					return ai.get.value(button.link);
+					return get.value(button.link);
 				});
 				'step 1'
 				if(result.bool){
@@ -852,7 +852,7 @@ mode.guozhan={
 			content:function(){
 				'step 0'
 				player.chooseCardButton(get.prompt('ziliang',trigger.player),player.storage.tuntian).set('ai',function(button){
-					return ai.get.value(button.link);
+					return get.value(button.link);
 				});
 				'step 1'
 				if(result.bool){
@@ -894,10 +894,10 @@ mode.guozhan={
 						return !target.getEquip(card);
 					},
 					ai1:function(card){
-						return 6-ai.get.value(card);
+						return 6-get.value(card);
 					},
 					ai2:function(target){
-						return ai.get.attitude(_status.event.player,target)-3;
+						return get.attitude(_status.event.player,target)-3;
 					},
 					prompt:get.prompt('yuanhu')
 				});
@@ -915,7 +915,7 @@ mode.guozhan={
 						var source=_status.event.source;
 						return get.distance(source,target)<=1&&source!=target&&target.countCards('he');
 					}).set('ai',function(target){
-						return -ai.get.attitude(_status.event.player,target);
+						return -get.attitude(_status.event.player,target);
 					}).set('source',target);
 				}
 				else{
@@ -1028,7 +1028,7 @@ mode.guozhan={
 				next.autochoose=lib.filter.autoRespondShan;
 				next.set('ai',function(card){
 					if(_status.event.player.countCards('h','shan')>1){
-						return ai.get.unuseful2(card);
+						return get.unuseful2(card);
 					}
 					return -1;
 				});
@@ -1257,7 +1257,7 @@ mode.guozhan={
 				player.chooseTarget(function(card,player,target){
 					return player!=target&&get.distance(player,target)<=1;
 				},true).set('ai',function(target){
-					return -ai.get.attitude(_status.event.player,target);
+					return -get.attitude(_status.event.player,target);
 				});
 				"step 2"
 				if(result.bool&&result.targets.length){
@@ -1342,7 +1342,7 @@ mode.guozhan={
 			forced:true,
 			priority:15,
 			check:function(event,player){
-				return ai.get.effect(event.target,event.card,event.player,player)<0;
+				return get.effect(event.target,event.card,event.player,player)<0;
 			},
 			filter:function(event,player){
 				return get.type(event.card,'trick')=='trick'&&get.color(event.card)=='black';
@@ -1365,7 +1365,7 @@ mode.guozhan={
 			forced:true,
 			priority:15,
 			check:function(event,player){
-				return ai.get.effect(event.target,event.card,event.player,player)<0;
+				return get.effect(event.target,event.card,event.player,player)<0;
 			},
 			filter:function(event,player){
 				return event.card.name=='shunshou'||event.card.name=='lebu';
@@ -1388,7 +1388,7 @@ mode.guozhan={
 			forced:true,
 			priority:15,
 			check:function(event,player){
-				return ai.get.effect(event.target,event.card,event.player,player)<0;
+				return get.effect(event.target,event.card,event.player,player)<0;
 			},
 			filter:function(event,player){
 				return player.countCards('h')==0&&(event.card.name=='sha'||event.card.name=='juedou');
@@ -1436,16 +1436,16 @@ mode.guozhan={
 						if(players[i].hasSkill('haoshi')&&
 							!players[i].isTurnedOver()&&
 							!players[i].hasJudge('lebu')&&
-							ai.get.attitude(player,players[i])>=3&&
-							ai.get.attitude(players[i],player)>=3){
-							return 11-ai.get.value(card);
+							get.attitude(player,players[i])>=3&&
+							get.attitude(players[i],player)>=3){
+							return 11-get.value(card);
 						}
 					}
-					if(player.countCards('h')>player.hp) return 10-ai.get.value(card);
-					if(player.countCards('h')>2) return 6-ai.get.value(card);
+					if(player.countCards('h')>player.hp) return 10-get.value(card);
+					if(player.countCards('h')>2) return 6-get.value(card);
 					return -1;
 				}
-				return 10-ai.get.value(card);
+				return 10-get.value(card);
 			},
 			content:function(){
 				target.gain(cards,player);
@@ -1487,7 +1487,7 @@ mode.guozhan={
 							if(player.countCards('e',{subtype:get.subtype(card)})){
 								var players=game.filterPlayer();
 								for(var i=0;i<players.length;i++){
-									if(players[i]!=player&&ai.get.attitude(player,players[i])>0){
+									if(players[i]!=player&&get.attitude(player,players[i])>0){
 										return 0;
 									}
 								}
@@ -1548,7 +1548,7 @@ mode.guozhan={
 				return !target.isUnseen(2);
 			},
 			check:function(card){
-				return 6-ai.get.value(card,_status.event.player);
+				return 6-get.value(card,_status.event.player);
 			},
 			content:function(){
 				'step 0'
@@ -1590,7 +1590,7 @@ mode.guozhan={
 						if(target.hp<=0) return -5;
 						if(player.getStat().skill.qingcheng) return 0;
 						if(!target.hasSkillTag('maixie')) return 0;
-						if(ai.get.attitude(player,target)>=0) return 0;
+						if(get.attitude(player,target)>=0) return 0;
 						if(player.hasCard(function(card){
 							return get.tag(card,'damage')&&player.canUse(card,target,true,true);
 						})){
@@ -1620,33 +1620,33 @@ mode.guozhan={
 				return player.countCards('h',{color:'red'})>0;
 			},
 			check:function(card){
-				return 5-ai.get.value(card);
+				return 5-get.value(card);
 			}
 		},
 		gzxiaoguo:{
 			inherit:'xiaoguo',
 			content:function(){
 				"step 0"
-				var nono=(Math.abs(ai.get.attitude(player,trigger.player))<3);
-				if(ai.get.damageEffect(trigger.player,player,player)<=0){
+				var nono=(Math.abs(get.attitude(player,trigger.player))<3);
+				if(get.damageEffect(trigger.player,player,player)<=0){
 					nono=true;
 				}
 				var next=player.chooseToDiscard(get.prompt('gzxiaoguo',trigger.player),{type:'basic'});
 				next.set('ai',function(card){
 					if(_status.event.nono) return 0;
-					return 8-ai.get.useful(card);
+					return 8-get.useful(card);
 				});
 				next.set('logSkill',['gzxiaoguo',trigger.player]);
 				next.set('nono',nono);
 				"step 1"
 				if(result.bool){
-					var nono=(ai.get.damageEffect(trigger.player,player,trigger.player)>=0);
+					var nono=(get.damageEffect(trigger.player,player,trigger.player)>=0);
 					trigger.player.chooseToDiscard('he',{type:'equip'}).set('ai',function(card){
 						if(_status.event.nono){
 							return 0;
 						}
-						if(_status.event.player.hp==1) return 10-ai.get.value(card);
-						return 9-ai.get.value(card);
+						if(_status.event.player.hp==1) return 10-get.value(card);
+						return 9-get.value(card);
 					}).set('nono',nono);
 				}
 				else{
@@ -3514,7 +3514,7 @@ mode.guozhan={
 							else if(shown<0.4) c=0.5;
 							else if(shown<0.6) c=0.8;
 							else c=1;
-							effect+=ai.get.effect(targets[i],card,this)*c;
+							effect+=get.effect(targets[i],card,this)*c;
 						}
 					}
 					if(effect>0){
@@ -3530,91 +3530,89 @@ mode.guozhan={
 			},
 		}
 	},
-	ai:{
-		get:{
-			realAttitude:function(from,toidentity,difficulty){
-				if(from.identity==toidentity&&toidentity!='ye'){
-					return 4+difficulty;
-				}
-				if(from.identity=='unknown'&&lib.character[from.name1][1]==toidentity){
-					if(from.wontYe()) return 4+difficulty;
-				}
-				var groups=[];
-				for(var i=0;i<lib.group.length;i++){
-					groups.push(get.population(lib.group[i]));
-				}
-				var max=Math.max.apply(this,groups);
-				if(max<=1) return -3;
-				var from_p=get.population(from.identity!='unknown'?from.identity:lib.character[from.name1][1]);
-				var to_p=get.population(toidentity);
-				if(from.identity=='ye') from_p=1;
-				if(toidentity=='ye') to_p=1;
+	get:{
+		realAttitude:function(from,toidentity,difficulty){
+			if(from.identity==toidentity&&toidentity!='ye'){
+				return 4+difficulty;
+			}
+			if(from.identity=='unknown'&&lib.character[from.name1][1]==toidentity){
+				if(from.wontYe()) return 4+difficulty;
+			}
+			var groups=[];
+			for(var i=0;i<lib.group.length;i++){
+				groups.push(get.population(lib.group[i]));
+			}
+			var max=Math.max.apply(this,groups);
+			if(max<=1) return -3;
+			var from_p=get.population(from.identity!='unknown'?from.identity:lib.character[from.name1][1]);
+			var to_p=get.population(toidentity);
+			if(from.identity=='ye') from_p=1;
+			if(toidentity=='ye') to_p=1;
 
-				if(to_p==max) return -5;
-				if(from_p==max) return -2-get.population(toidentity);
-				if(max>=game.players.length/2){
-					if(to_p<=from_p){
-						return 0.5;
-					}
+			if(to_p==max) return -5;
+			if(from_p==max) return -2-get.population(toidentity);
+			if(max>=game.players.length/2){
+				if(to_p<=from_p){
+					return 0.5;
+				}
+				return 0;
+			}
+			if(to_p<max-1) return 0;
+			return -0.5;
+		},
+		rawAttitude:function(from,to){
+			if(to.identity=='unknown'&&game.players.length==2) return -5;
+			if(_status.currentPhase==from&&from.ai.tempIgnore&&
+				from.ai.tempIgnore.contains(to)&&to.identity=='unknown'&&
+				(!from.storage.zhibi||!from.storage.zhibi.contains(to))) return 0;
+			var difficulty=0;
+			if(to==game.me) difficulty=(2-get.difficulty())*1.5;
+			if(from==to) return 5+difficulty;
+			if(from.identity==to.identity&&from.identity!='unknown'&&from.identity!='ye') return 5+difficulty;
+			if(from.identity=='unknown'&&lib.character[from.name1][1]==to.identity){
+				if(from.wontYe()) return 4+difficulty;
+			}
+			var toidentity=to.identity;
+			if(toidentity=='unknown'){
+				toidentity=lib.character[to.name1][1];
+				if(get.population(toidentity)>=get.population()-2){
+					toidentity='ye';
+				}
+			}
+			var att=get.realAttitude(from,toidentity,difficulty);
+			if(from.storage.zhibi&&from.storage.zhibi.contains(to)){
+				return att;
+			}
+			if(to.ai.shown>=0.5) return att*to.ai.shown;
+
+			var nshown=0;
+			for(var i=0;i<game.players.length;i++){
+				if(game.players[i]!=from&&game.players[i].identity=='unknown'){
+					nshown++;
+				}
+			}
+			if(to.ai.shown==0){
+				if(nshown>=game.players.length/2&&att>=0){
 					return 0;
 				}
-				if(to_p<max-1) return 0;
-				return -0.5;
-			},
-			rawAttitude:function(from,to){
-				if(to.identity=='unknown'&&game.players.length==2) return -5;
-				if(_status.currentPhase==from&&from.ai.tempIgnore&&
-					from.ai.tempIgnore.contains(to)&&to.identity=='unknown'&&
-					(!from.storage.zhibi||!from.storage.zhibi.contains(to))) return 0;
-				var difficulty=0;
-				if(to==game.me) difficulty=(2-get.difficulty())*1.5;
-				if(from==to) return 5+difficulty;
-				if(from.identity==to.identity&&from.identity!='unknown'&&from.identity!='ye') return 5+difficulty;
-				if(from.identity=='unknown'&&lib.character[from.name1][1]==to.identity){
-					if(from.wontYe()) return 4+difficulty;
-				}
-				var toidentity=to.identity;
-				if(toidentity=='unknown'){
-					toidentity=lib.character[to.name1][1];
-					if(get.population(toidentity)>=get.population()-2){
-						toidentity='ye';
-					}
-				}
-				var att=ai.get.realAttitude(from,toidentity,difficulty);
-				if(from.storage.zhibi&&from.storage.zhibi.contains(to)){
-					return att;
-				}
-				if(to.ai.shown>=0.5) return att*to.ai.shown;
-
-				var nshown=0;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=from&&game.players[i].identity=='unknown'){
-						nshown++;
-					}
-				}
-				if(to.ai.shown==0){
-					if(nshown>=game.players.length/2&&att>=0){
-						return 0;
-					}
-					return Math.min(0,Math.random()-0.5)+difficulty;
-				}
-				if(to.ai.shown>=0.2){
-					if(att>2){
-						return Math.max(0,Math.random()-0.5)+difficulty;
-					}
-					if(att>=0){
-						return 0;
-					}
-					return Math.min(0,Math.random()-0.7)+difficulty;
-				}
+				return Math.min(0,Math.random()-0.5)+difficulty;
+			}
+			if(to.ai.shown>=0.2){
 				if(att>2){
-					return Math.max(0,Math.random()-0.7)+difficulty;
+					return Math.max(0,Math.random()-0.5)+difficulty;
 				}
 				if(att>=0){
-					return Math.min(0,Math.random()-0.3)+difficulty;
+					return 0;
 				}
-				return Math.min(0,Math.random()-0.5)+difficulty;
-			},
-		}
-	},
+				return Math.min(0,Math.random()-0.7)+difficulty;
+			}
+			if(att>2){
+				return Math.max(0,Math.random()-0.7)+difficulty;
+			}
+			if(att>=0){
+				return Math.min(0,Math.random()-0.3)+difficulty;
+			}
+			return Math.min(0,Math.random()-0.5)+difficulty;
+		},
+	}
 }

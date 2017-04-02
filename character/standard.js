@@ -87,7 +87,7 @@ character.standard={
 				});
 			},
 			check:function(event,player){
-				if(ai.get.damageEffect(player,event.player,player)>=0) return false;
+				if(get.damageEffect(player,event.player,player)>=0) return false;
 				return true;
 			},
 			content:function(){
@@ -98,13 +98,13 @@ character.standard={
 				}
 				else if(event.current.group=='wei'){
 					if((event.current==game.me&&!_status.auto)||(
-						ai.get.attitude(event.current,player)>2)||
+						get.attitude(event.current,player)>2)||
 						event.current.isOnline()){
 						player.storage.hujiaing=true;
 						var next=event.current.chooseToRespond('是否替'+get.translation(player)+'打出一张闪？',{name:'shan'});
 						next.set('ai',function(){
 							var event=_status.event;
-							return (ai.get.attitude(event.player,event.source)-2);
+							return (get.attitude(event.player,event.source)-2);
 						});
 						next.autochoose=lib.filter.autoRespondShan;
 						next.set('source',player);
@@ -157,14 +157,14 @@ character.standard={
 				return (event.source&&event.source.countCards('he')&&event.source!=player);
 			},
 			content:function(){
-				player.gainPlayerCard(get.prompt('fankui',trigger.source),trigger.source,ai.get.buttonValue,'he').set('logSkill',['fankui',trigger.source]);
+				player.gainPlayerCard(get.prompt('fankui',trigger.source),trigger.source,get.buttonValue,'he').set('logSkill',['fankui',trigger.source]);
 			},
 			ai:{
 				effect:{
 					target:function(card,player,target){
 						if(player.countCards('he')>1&&get.tag(card,'damage')){
 							if(player.hasSkillTag('jueqing')) return [1,-1.5];
-							if(ai.get.attitude(target,player)<0) return [1,1];
+							if(get.attitude(target,player)<0) return [1,1];
 						}
 					}
 				}
@@ -185,13 +185,13 @@ character.standard={
 					var player=_status.event.player;
 					var judging=_status.event.judging;
 					var result=trigger.judge(card)-trigger.judge(judging);
-					var attitude=ai.get.attitude(player,trigger.player);
+					var attitude=get.attitude(player,trigger.player);
 					if(attitude==0||result==0) return 0;
 					if(attitude>0){
-						return result-ai.get.value(card)/2;
+						return result-get.value(card)/2;
 					}
 					else{
-						return -result-ai.get.value(card)/2;
+						return -result-get.value(card)/2;
 					}
 				}).set('judging',trigger.player.judging[0]);
 				"step 1"
@@ -235,7 +235,7 @@ character.standard={
 				return (event.source!=undefined);
 			},
 			check:function(event,player){
-				return (ai.get.attitude(player,event.source)<=0);
+				return (get.attitude(player,event.source)<=0);
 			},
 			content:function(){
 				"step 0"
@@ -250,7 +250,7 @@ character.standard={
 				trigger.source.chooseToDiscard(2).set('ai',function(card){
 					if(card.name=='tao') return -10;
 					if(card.name=='jiu'&&_status.event.player.hp==1) return -10;
-					return ai.get.unuseful(card)+2.5*(5-get.owner(card).hp);
+					return get.unuseful(card)+2.5*(5-get.owner(card).hp);
 				});
 				"step 2"
 				if(result.bool==false){
@@ -261,7 +261,7 @@ character.standard={
 				result:{
 					target:function(card,player,target){
 						if(player.hasSkillTag('jueqing')) return [1,-1];
-						if(get.tag(card,'damage')&&ai.get.damageEffect(target,player,player)>0) return [1,0,0,-1.5];
+						if(get.tag(card,'damage')&&get.damageEffect(target,player,player)>0) return [1,0,0,-1.5];
 					}
 				}
 			}
@@ -274,14 +274,14 @@ character.standard={
 				"step 0"
 				var check;
 				var i,num=game.countPlayer(function(current){
-					return current!=player&&current.countCards('h')&&ai.get.attitude(player,current)<=0;
+					return current!=player&&current.countCards('h')&&get.attitude(player,current)<=0;
 				});
 				check=(num>=2);
 				player.chooseTarget(get.prompt('tuxi'),[1,2],function(card,player,target){
 					return target.countCards('h')>0&&player!=target;
 				},function(target){
 					if(!_status.event.aicheck) return 0;
-					var att=ai.get.attitude(_status.event.player,target);
+					var att=get.attitude(_status.event.player,target);
 					if(target.hasSkill('tuntian')) return att/10;
 					return 1-att;
 				}).set('aicheck',check);
@@ -310,7 +310,7 @@ character.standard={
 				if(player.countCards('h')<3) return false;
 				if(!player.hasSha()) return false;
 				return game.hasPlayer(function(current){
-					return ai.get.attitude(player,current)<0&&player.canUse('sha',current);
+					return get.attitude(player,current)<0&&player.canUse('sha',current);
 				});
 			},
 			content:function(){
@@ -377,7 +377,7 @@ character.standard={
 						return (_status.event.player.countCards('h')-_status.event.player.hp);
 					},
 					ai2:function(target){
-						var att=ai.get.attitude(_status.event.player,target);
+						var att=get.attitude(_status.event.player,target);
 						if(ui.selected.cards.length&&ui.selected.cards[0].name=='du'){
 							if(target.hasSkillTag('nodu')) return 0;
 							return 1-att;
@@ -507,16 +507,16 @@ character.standard={
 						if(players[i].hasSkill('haoshi')&&
 							!players[i].isTurnedOver()&&
 							!players[i].hasJudge('lebu')&&
-							ai.get.attitude(player,players[i])>=3&&
-							ai.get.attitude(players[i],player)>=3){
-							return 11-ai.get.value(card);
+							get.attitude(player,players[i])>=3&&
+							get.attitude(players[i],player)>=3){
+							return 11-get.value(card);
 						}
 					}
-					if(player.countCards('h')>player.hp) return 10-ai.get.value(card);
-					if(player.countCards('h')>2) return 6-ai.get.value(card);
+					if(player.countCards('h')>player.hp) return 10-get.value(card);
+					if(player.countCards('h')>2) return 6-get.value(card);
 					return -1;
 				}
-				return 10-ai.get.value(card);
+				return 10-get.value(card);
 			},
 			content:function(){
 				target.gain(cards,player);
@@ -559,7 +559,7 @@ character.standard={
 							if(player.countCards('e',{subtype:get.subtype(card)})){
 								var players=game.filterPlayer();
 								for(var i=0;i<players.length;i++){
-									if(players[i]!=player&&ai.get.attitude(player,players[i])>0){
+									if(players[i]!=player&&get.attitude(player,players[i])>0){
 										return 0;
 									}
 								}
@@ -608,7 +608,7 @@ character.standard={
 					var next=event.current.chooseToRespond('是否替'+get.translation(player)+'打出一张杀？',{name:'sha'});
 					next.set('ai',function(){
 						var event=_status.event;
-						return (ai.get.attitude(event.player,event.source)-2);
+						return (get.attitude(event.player,event.source)-2);
 					});
 					next.set('source',player);
 					next.autochoose=lib.filter.autoRespondSha;
@@ -672,7 +672,7 @@ character.standard={
 					});
 					next.set('ai',function(card){
 						var event=_status.event;
-						return ai.get.effect(event.target,card,event.source,event.player);
+						return get.effect(event.target,card,event.source,event.player);
 					});
 					next.set('source',player);
 					next.set('target',target);
@@ -705,11 +705,11 @@ character.standard={
 				result:{
 					target:function(player,target){
 						if(player.hasSkill('jijiang3')) return 0;
-						return ai.get.effect(target,{name:'sha'},player,target);
+						return get.effect(target,{name:'sha'},player,target);
 					}
 				},
 				order:function(){
-					return ai.get.order({name:'sha'})-0.1;
+					return get.order({name:'sha'})-0.1;
 				},
 			}
 		},
@@ -743,7 +743,7 @@ character.standard={
 				}
 			},
 			prompt:'将一张红色牌当杀使用或打出',
-			check:function(card){return 4-ai.get.value(card)},
+			check:function(card){return 4-get.value(card)},
 			ai:{
 				skillTagFilter:function(player){
 					if(get.zhu(player,'shouyue')){
@@ -811,10 +811,10 @@ character.standard={
 					var bottom;
 					if(!stopped){
 						cards.sort(function(a,b){
-							return ai.get.value(b,player)-ai.get.value(a,player);
+							return get.value(b,player)-get.value(a,player);
 						});
 						while(cards.length){
-							if(ai.get.value(cards[0],player)<=5) break;
+							if(get.value(cards[0],player)<=5) break;
 							top.unshift(cards.shift());
 						}
 					}
@@ -1031,7 +1031,7 @@ character.standard={
 							if(!player.countCards('h','shan')) return false;
 						},
 						order:function(){
-		                    return ai.get.order({name:'sha'})+0.1;
+		                    return get.order({name:'sha'})+0.1;
 		                },
 						useful:-1,
 						value:-1
@@ -1082,7 +1082,7 @@ character.standard={
 			audio:2,
 			trigger:{player:'shaBegin'},
 			check:function(event,player){
-				return ai.get.attitude(player,event.target)<=0;
+				return get.attitude(player,event.target)<=0;
 			},
 			logTarget:'target',
 			content:function(){
@@ -1135,7 +1135,7 @@ character.standard={
 			selectCard:[1,Infinity],
 			prompt:'弃置任意张牌并摸等量的牌',
 			check:function(card){
-				return 6-ai.get.value(card)
+				return 6-get.value(card)
 			},
 			content:function(){
 				player.draw(cards.length);
@@ -1177,7 +1177,7 @@ character.standard={
 				if(!player.countCards('he',{color:'black'})) return false;
 			},
 			prompt:'将一张黑色牌当过河拆桥使用',
-			check:function(card){return 4-ai.get.value(card)}
+			check:function(card){return 4-get.value(card)}
 		},
 		keji:{
 			audio:4,
@@ -1259,12 +1259,12 @@ character.standard={
 				order:1,
 				result:{
 					target:function(player,target){
-						var eff=ai.get.damageEffect(target,player);
+						var eff=get.damageEffect(target,player);
 						if(eff>=0) return 1+eff;
 						var value=0,i;
 						var cards=player.getCards('h');
 						for(i=0;i<cards.length;i++){
-							value+=ai.get.value(cards[i]);
+							value+=get.value(cards[i]);
 						}
 						value/=player.countCards('h');
 						if(target.hp==1) return Math.min(0,value-7);
@@ -1285,7 +1285,7 @@ character.standard={
 			position:'he',
 			viewAs:{name:'lebu'},
 			prompt:'将一张方片牌当乐不思蜀使用',
-			check:function(card){return 6-ai.get.value(card)},
+			check:function(card){return 6-get.value(card)},
 			ai:{
 				threaten:1.5
 			}
@@ -1316,20 +1316,20 @@ character.standard={
 						return false;
 					},
 					ai1:function(card){
-						return ai.get.unuseful(card)+9;
+						return get.unuseful(card)+9;
 					},
 					ai2:function(target){
 						if(_status.event.player.countCards('h','shan')){
-							return -ai.get.attitude(_status.event.player,target);
+							return -get.attitude(_status.event.player,target);
 						}
-						if(ai.get.attitude(_status.event.player,target)<5){
-							return 6-ai.get.attitude(_status.event.player,target);
+						if(get.attitude(_status.event.player,target)<5){
+							return 6-get.attitude(_status.event.player,target);
 						}
 						if(_status.event.player.hp==1&&player.countCards('h','shan')==0){
-							return 10-ai.get.attitude(_status.event.player,target);
+							return 10-get.attitude(_status.event.player,target);
 						}
 						if(_status.event.player.hp==2&&player.countCards('h','shan')==0){
-							return 8-ai.get.attitude(_status.event.player,target);
+							return 8-get.attitude(_status.event.player,target);
 						}
 						return -1;
 					},
@@ -1358,15 +1358,15 @@ character.standard={
 						if(target.countCards('he')==0) return;
 						if(card.name!='sha') return;
 						var min=1;
-						var friend=ai.get.attitude(player,target)>0;
+						var friend=get.attitude(player,target)>0;
 						var vcard={name:'shacopy',nature:card.nature,suit:card.suit};
 						var players=game.filterPlayer();
 						for(var i=0;i<players.length;i++){
 							if(player!=players[i]&&
-								ai.get.attitude(target,players[i])<0&&
+								get.attitude(target,players[i])<0&&
 								target.canUse(card,players[i])){
 								if(!friend) return 0;
-								if(ai.get.effect(players[i],vcard,player,player)>0){
+								if(get.effect(players[i],vcard,player,player)>0){
 									if(!player.canUse(card,players[0])){
 										return [0,0.1];
 									}
@@ -1450,10 +1450,10 @@ character.standard={
 			check:function(card){
 				var player=get.owner(card);
 				if(player.countCards('h')>player.hp)
-					return 8-ai.get.value(card)
+					return 8-get.value(card)
 				if(player.hp<player.maxHp)
-					return 6-ai.get.value(card)
-				return 4-ai.get.value(card)
+					return 6-get.value(card)
+				return 4-get.value(card)
 
 			},
 			filterTarget:function(card,player,target){
@@ -1485,7 +1485,7 @@ character.standard={
 			filterCard:true,
 			usable:1,
 			check:function(card){
-				return 9-ai.get.value(card)
+				return 9-get.value(card)
 			},
 			filterTarget:function(card,player,target){
 				if(target.hp>=target.maxHp) return false;
@@ -1518,7 +1518,7 @@ character.standard={
 			position:'he',
 			viewAs:{name:'tao'},
 			prompt:'将一张红色牌当桃使用',
-			check:function(card){return 15-ai.get.value(card)},
+			check:function(card){return 15-get.value(card)},
 			ai:{
 				skillTagFilter:function(player){
 					return player.countCards('he',{color:'red'})>0&&_status.currentPhase!=player;
@@ -1544,7 +1544,7 @@ character.standard={
 				next.autochoose=lib.filter.autoRespondShan;
 				next.set('ai',function(card){
 					if(_status.event.player.countCards('h','shan')>1){
-						return ai.get.unuseful2(card);
+						return get.unuseful2(card);
 					}
 					return -1;
 				});
@@ -1569,8 +1569,8 @@ character.standard={
 				next.set('ai',function(card){
 					var player=_status.event.player;
 					var trigger=_status.event.getTrigger();
-					if(ai.get.attitude(trigger.turn,player)<0&&trigger.turn.countCards('h','sha')>1){
-						return ai.get.unuseful2(card);
+					if(get.attitude(trigger.turn,player)<0&&trigger.turn.countCards('h','sha')>1){
+						return get.unuseful2(card);
 					}
 					return -1;
 				});
@@ -1596,7 +1596,7 @@ character.standard={
 					return current!=player&&current.sex=='male';
 				})>1;
 			},
-			check:function(card){return 10-ai.get.value(card)},
+			check:function(card){return 10-get.value(card)},
 			filterCard:true,
 			position:'he',
 			filterTarget:function(card,player,target){
@@ -1622,7 +1622,7 @@ character.standard={
 							return -3;
 						}
 						else{
-							return ai.get.effect(target,{name:'juedou'},ui.selected.targets[0],target);
+							return get.effect(target,{name:'juedou'},ui.selected.targets[0],target);
 						}
 					}
 				},

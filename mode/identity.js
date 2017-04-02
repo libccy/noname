@@ -1477,7 +1477,7 @@ mode.identity={
 							else if(shown<0.4) c=0.5;
 							else if(shown<0.6) c=0.8;
 							else c=1;
-							var eff=ai.get.effect(targets[i],card,this);
+							var eff=get.effect(targets[i],card,this);
 							effect+=eff*c;
 							if(eff==0&&shown==0&&this.identity=='zhong'&&targets[i]!=this){
 								effect+=0.1;
@@ -1538,7 +1538,7 @@ mode.identity={
 							else if(shown<0.4) c=0.5;
 							else if(shown<0.6) c=0.8;
 							else c=1;
-							effect+=ai.get.effect(targets[i],card,this,zhu)*c;
+							effect+=get.effect(targets[i],card,this,zhu)*c;
 						}
 					}
 					if(this.identity=='nei'){
@@ -1578,286 +1578,281 @@ mode.identity={
 			},
 		}
 	},
-	ai:{
-		get:{
-			rawAttitude:function(from,to){
-				var x=0,num=0,temp,i;
-				if(_status.ai.customAttitude){
-					for(i=0;i<_status.ai.customAttitude.length;i++){
-						temp=_status.ai.customAttitude[i](from,to);
-						if(temp!=undefined){
-							x+=temp;
-							num++;
-						}
+	get:{
+		rawAttitude:function(from,to){
+			var x=0,num=0,temp,i;
+			if(_status.ai.customAttitude){
+				for(i=0;i<_status.ai.customAttitude.length;i++){
+					temp=_status.ai.customAttitude[i](from,to);
+					if(temp!=undefined){
+						x+=temp;
+						num++;
 					}
 				}
-				if(num){
-					return x/num;
-				}
-				var difficulty=0;
-				if(to==game.me) difficulty=2-get.difficulty();
-				if(from==to||to.identityShown||(from.storage.dongcha==to)){
-					return ai.get.realAttitude(from,to)+difficulty*1.5;
-				}
-				else{
-					if(from.identity=='zhong'&&to.ai.shown==0&&from.ai.tempIgnore&&
-						!from.ai.tempIgnore.contains(to)){
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].ai.shown==0&&game.players[i].identity=='fan'){
-								return -0.1+difficulty*1.5;
-							}
-						}
-					}
-					var aishown=to.ai.shown;
-					if(to.identity=='nei'&&to.ai.shown<1&&(to.ai.identity_mark=='fan'||to.ai.identity_mark=='zhong')){
-						aishown=0.5;
-					}
-					else if(aishown==0&&to.identity!='fan'&&to.identity!='zhu'){
-						var fanshown=true;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].identity=='fan'&&game.players[i].ai.shown==0&&game.players[i]!=from){
-								fanshown=false;break;
-							}
-						}
-						if(fanshown) aishown=0.3;
-					}
-					return ai.get.realAttitude(from,to)*aishown+difficulty*1.5;
-				}
-			},
-			realAttitude:function(from,to){
-				if(!game.zhu){
-					if(from.identity=='nei'||to.identity=='nei') return -1;
-					if(from.identity==to.identity) return 6;
-					return -6;
-				}
-				var situation=ai.get.situation();
-				var identity=from.identity;
-				var identity2=to.identity;
-				if(identity2=='zhu'&&!to.isZhu){
-					identity2='zhong';
-					if(from==to) return 10;
-				}
-				if(from!=to&&to.identity=='nei'&&to.ai.shown<1&&(to.ai.identity_mark=='fan'||to.ai.identity_mark=='zhong')){
-					identity2=to.ai.identity_mark;
-				}
-				if(from.identity!='nei'&&from!=to&&get.population('fan')==0&&identity2=='zhong'){
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].identity=='nei'&&
-						game.players[i].ai.identity_mark=='zhong'&&
-						game.players[i].ai.shown<1){
-							identity2='nei';break;
-						}
-					}
-				}
-				var zhongmode=false;
-				if(!game.zhu.isZhu){
-					zhongmode=true;
-				}
-				switch(identity){
-					case 'zhu':
-						switch(identity2){
-							case 'zhu': return 10;
-							case 'zhong':case 'mingzhong': return 6;
-							case 'nei':
-								if(game.players.length==2) return -10;
-								if(to.identity=='zhong') return 0;
-								if(get.population('fan')==0){
-									if(to.ai.identity_mark=='zhong'&&to.ai.shown<1) return 0;
-									return -0.5;
-								}
-								if(zhongmode&&to.ai.sizhong&&to.ai.shown<1) return 6;
-								if(get.population('fan')==1&&get.population('nei')==1&&game.players.length==3){
-									var fan;
-									for(var i=0;i<game.players.length;i++){
-										if(game.players[i].identity=='fan'){
-											fan=game.players[i];break;
-										}
-									}
-									if(fan){
-										if(to.hp>1&&to.hp>fan.hp&&to.countCards('he')>fan.countCards('he')){
-											return -3;
-										}
-									}
-									return 0;
-								}
-								if(situation>1) return 0;
-								return Math.min(3,get.population('fan'));
-							case 'fan':
-								if(get.population('fan')==1&&get.population('nei')==1&&game.players.length==3){
-									var nei;
-									for(var i=0;i<game.players.length;i++){
-										if(game.players[i].identity=='nei'){
-											nei=game.players[i];break;
-										}
-									}
-									if(nei){
-										if(nei.hp>1&&nei.hp>to.hp&&nei.countCards('he')>to.countCards('he')){
-											return 0;
-										}
-									}
-									return -3;
-								}
-								return -4;
-						}
-						break;
-					case 'zhong':case 'mingzhong':
-						switch(identity2){
-							case 'zhu': return 10;
-							case 'zhong':case 'mingzhong': return 4;
-							case 'nei':
-								if(get.population('fan')==0) return -2;
-								if(zhongmode&&to.ai.sizhong&&to.ai.shown<1) return 6;
-								return Math.min(3,-situation);
-							case 'fan': return -8;
-						}
-						break;
-					case 'nei':
-						if(identity2=='zhu'&&game.players.length==2) return -10;
-						var strategy=get.aiStrategy();
-						if(strategy==4){
-							if(from==to) return 10;
-							return 0;
-						}
-						var num;
-						switch(identity2){
-							case 'zhu':
-								if(strategy==6) return -1;
-								if(strategy==5) return 10;
-								if(to.hp<=0) return 10;
-								if(get.population('fan')==1){
-									var fan;
-									for(var i=0;i<game.players.length;i++){
-										if(game.players[i].identity=='fan'){
-											fan=game.players[i];break;
-										}
-									}
-									if(fan){
-										if(to.hp>1&&to.hp>fan.hp&&to.countCards('he')>fan.countCards('he')){
-											return -3;
-										}
-									}
-									return 0;
-								}
-								else{
-									if(situation>1||get.population('fan')==0) num=0;
-									else num=get.population('fan')+Math.max(0,3-game.zhu.hp);
-								}
-								if(strategy==2) num--;
-								if(strategy==3) num++;
-								return num;
-							case 'zhong':
-								if(strategy==5) return Math.min(0,-situation);
-								if(strategy==6) return Math.max(-1,-situation);
-								if(get.population('fan')==0) num=-5;
-								else if(situation<=0) num=0;
-								else if(game.zhu&&game.zhu.hp<2) num=0;
-								else if(game.zhu&&game.zhu.hp==2) num=-1;
-								else if(game.zhu&&game.zhu.hp<=2&&situation>1) num=-1;
-								else num=-2;
-								if(zhongmode&&situation<2){
-									num=4;
-								}
-								if(strategy==2) num--;
-								if(strategy==3) num++;
-								return num;
-							case 'mingzhong':
-								if(zhongmode){
-									if(from.ai.sizhong==undefined){
-										from.ai.sizhong=(Math.random()<0.5);
-									}
-									if(from.ai.sizhong) return 6;
-								}
-								if(strategy==5) return Math.min(0,-situation);
-								if(strategy==6) return Math.max(-1,-situation);
-								if(get.population('fan')==0) num=-5;
-								else if(situation<=0) num=0;
-								else num=-3;
-								if(strategy==2) num--;
-								if(strategy==3) num++;
-								return num;
-							case 'nei':
-								if(from==to) return 10;
-								if(from.ai.friend.contains(to)) return 5;
-								if(get.population('fan')+get.population('zhong')>0) return 0;
-								return -5;
-							case 'fan':
-								if(strategy==5) return Math.max(-1,situation);
-								if(strategy==6) return Math.min(0,situation);
-								if((game.zhu&&game.zhu.hp<=2&&situation<0)||situation<-1) num=-3;
-								else if(situation<0||get.population('zhong')+get.population('mingzhong')==0) num=-2;
-								else if((game.zhu&&game.zhu.hp>=4&&situation>0)||situation>1) num=1;
-								else num=0;
-								if(strategy==2) num++;
-								if(strategy==3) num--;
-								return num;
-						}
-						break;
-					case 'fan':
-						switch(identity2){
-							case 'zhu':
-								if(get.population('nei')>0){
-									if(situation==1) return -6;
-									if(situation>1) return -5;
-								}
-								return -8;
-							case 'zhong':
-								if(!zhongmode&&game.zhu.hp>=3&&to.hp==1){
-									return -10;
-								}
-								return -7;
-							case 'mingzhong':return -5;
-							case 'nei':
-								if(zhongmode&&to.ai.sizhong) return -7;
-								if(get.population('fan')==1) return 0;
-								if(get.population('zhong')+get.population('mingzhong')==0) return -7;
-								if(game.zhu&&game.zhu.hp<=2) return -1;
-								return Math.min(3,situation);
-							case 'fan': return 5;
-						}
-				}
-			},
-			situation:function(absolute){
-				var i,j,player;
-				var zhuzhong=0,total=0,zhu,fan=0;
-				for(i=0;i<game.players.length;i++){
-					player=game.players[i];
-					var php=player.hp;
-					if(player.hasSkill('benghuai')&&php>4){
-						php=4;
-					}
-					else if(php>6){
-						php=6;
-					}
-					j=player.countCards('h')+player.countCards('e')*1.5+php*2;
-					if(player.identity=='zhu'){
-						zhuzhong+=j*1.2+5;
-						total+=j*1.2+5;
-						zhu=j;
-					}
-					else if(player.identity=='zhong'||player.identity=='mingzhong'){
-						zhuzhong+=j*0.8+3;
-						total+=j*0.8+3;
-					}
-					else if(player.identity=='fan'){
-						zhuzhong-=j+4;
-						total+=j+4;
-						fan+=j+4;
-					}
-				}
-				if(absolute) return zhuzhong;
-				var result=parseInt(10*Math.abs(zhuzhong/total));
-				if(zhuzhong<0) result=-result;
-				if(!game.zhong){
-					if(zhu<12&&fan>30) result--;
-					if(zhu<6&&fan>15) result--;
-					if(zhu<4) result--;
-				}
-				return result;
-			},
-			population:function(identity){
-				return get.population(identity);
 			}
-		}
+			if(num){
+				return x/num;
+			}
+			var difficulty=0;
+			if(to==game.me) difficulty=2-get.difficulty();
+			if(from==to||to.identityShown||(from.storage.dongcha==to)){
+				return get.realAttitude(from,to)+difficulty*1.5;
+			}
+			else{
+				if(from.identity=='zhong'&&to.ai.shown==0&&from.ai.tempIgnore&&
+					!from.ai.tempIgnore.contains(to)){
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].ai.shown==0&&game.players[i].identity=='fan'){
+							return -0.1+difficulty*1.5;
+						}
+					}
+				}
+				var aishown=to.ai.shown;
+				if(to.identity=='nei'&&to.ai.shown<1&&(to.ai.identity_mark=='fan'||to.ai.identity_mark=='zhong')){
+					aishown=0.5;
+				}
+				else if(aishown==0&&to.identity!='fan'&&to.identity!='zhu'){
+					var fanshown=true;
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].identity=='fan'&&game.players[i].ai.shown==0&&game.players[i]!=from){
+							fanshown=false;break;
+						}
+					}
+					if(fanshown) aishown=0.3;
+				}
+				return get.realAttitude(from,to)*aishown+difficulty*1.5;
+			}
+		},
+		realAttitude:function(from,to){
+			if(!game.zhu){
+				if(from.identity=='nei'||to.identity=='nei') return -1;
+				if(from.identity==to.identity) return 6;
+				return -6;
+			}
+			var situation=get.situation();
+			var identity=from.identity;
+			var identity2=to.identity;
+			if(identity2=='zhu'&&!to.isZhu){
+				identity2='zhong';
+				if(from==to) return 10;
+			}
+			if(from!=to&&to.identity=='nei'&&to.ai.shown<1&&(to.ai.identity_mark=='fan'||to.ai.identity_mark=='zhong')){
+				identity2=to.ai.identity_mark;
+			}
+			if(from.identity!='nei'&&from!=to&&get.population('fan')==0&&identity2=='zhong'){
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].identity=='nei'&&
+					game.players[i].ai.identity_mark=='zhong'&&
+					game.players[i].ai.shown<1){
+						identity2='nei';break;
+					}
+				}
+			}
+			var zhongmode=false;
+			if(!game.zhu.isZhu){
+				zhongmode=true;
+			}
+			switch(identity){
+				case 'zhu':
+					switch(identity2){
+						case 'zhu': return 10;
+						case 'zhong':case 'mingzhong': return 6;
+						case 'nei':
+							if(game.players.length==2) return -10;
+							if(to.identity=='zhong') return 0;
+							if(get.population('fan')==0){
+								if(to.ai.identity_mark=='zhong'&&to.ai.shown<1) return 0;
+								return -0.5;
+							}
+							if(zhongmode&&to.ai.sizhong&&to.ai.shown<1) return 6;
+							if(get.population('fan')==1&&get.population('nei')==1&&game.players.length==3){
+								var fan;
+								for(var i=0;i<game.players.length;i++){
+									if(game.players[i].identity=='fan'){
+										fan=game.players[i];break;
+									}
+								}
+								if(fan){
+									if(to.hp>1&&to.hp>fan.hp&&to.countCards('he')>fan.countCards('he')){
+										return -3;
+									}
+								}
+								return 0;
+							}
+							if(situation>1) return 0;
+							return Math.min(3,get.population('fan'));
+						case 'fan':
+							if(get.population('fan')==1&&get.population('nei')==1&&game.players.length==3){
+								var nei;
+								for(var i=0;i<game.players.length;i++){
+									if(game.players[i].identity=='nei'){
+										nei=game.players[i];break;
+									}
+								}
+								if(nei){
+									if(nei.hp>1&&nei.hp>to.hp&&nei.countCards('he')>to.countCards('he')){
+										return 0;
+									}
+								}
+								return -3;
+							}
+							return -4;
+					}
+					break;
+				case 'zhong':case 'mingzhong':
+					switch(identity2){
+						case 'zhu': return 10;
+						case 'zhong':case 'mingzhong': return 4;
+						case 'nei':
+							if(get.population('fan')==0) return -2;
+							if(zhongmode&&to.ai.sizhong&&to.ai.shown<1) return 6;
+							return Math.min(3,-situation);
+						case 'fan': return -8;
+					}
+					break;
+				case 'nei':
+					if(identity2=='zhu'&&game.players.length==2) return -10;
+					var strategy=get.aiStrategy();
+					if(strategy==4){
+						if(from==to) return 10;
+						return 0;
+					}
+					var num;
+					switch(identity2){
+						case 'zhu':
+							if(strategy==6) return -1;
+							if(strategy==5) return 10;
+							if(to.hp<=0) return 10;
+							if(get.population('fan')==1){
+								var fan;
+								for(var i=0;i<game.players.length;i++){
+									if(game.players[i].identity=='fan'){
+										fan=game.players[i];break;
+									}
+								}
+								if(fan){
+									if(to.hp>1&&to.hp>fan.hp&&to.countCards('he')>fan.countCards('he')){
+										return -3;
+									}
+								}
+								return 0;
+							}
+							else{
+								if(situation>1||get.population('fan')==0) num=0;
+								else num=get.population('fan')+Math.max(0,3-game.zhu.hp);
+							}
+							if(strategy==2) num--;
+							if(strategy==3) num++;
+							return num;
+						case 'zhong':
+							if(strategy==5) return Math.min(0,-situation);
+							if(strategy==6) return Math.max(-1,-situation);
+							if(get.population('fan')==0) num=-5;
+							else if(situation<=0) num=0;
+							else if(game.zhu&&game.zhu.hp<2) num=0;
+							else if(game.zhu&&game.zhu.hp==2) num=-1;
+							else if(game.zhu&&game.zhu.hp<=2&&situation>1) num=-1;
+							else num=-2;
+							if(zhongmode&&situation<2){
+								num=4;
+							}
+							if(strategy==2) num--;
+							if(strategy==3) num++;
+							return num;
+						case 'mingzhong':
+							if(zhongmode){
+								if(from.ai.sizhong==undefined){
+									from.ai.sizhong=(Math.random()<0.5);
+								}
+								if(from.ai.sizhong) return 6;
+							}
+							if(strategy==5) return Math.min(0,-situation);
+							if(strategy==6) return Math.max(-1,-situation);
+							if(get.population('fan')==0) num=-5;
+							else if(situation<=0) num=0;
+							else num=-3;
+							if(strategy==2) num--;
+							if(strategy==3) num++;
+							return num;
+						case 'nei':
+							if(from==to) return 10;
+							if(from.ai.friend.contains(to)) return 5;
+							if(get.population('fan')+get.population('zhong')>0) return 0;
+							return -5;
+						case 'fan':
+							if(strategy==5) return Math.max(-1,situation);
+							if(strategy==6) return Math.min(0,situation);
+							if((game.zhu&&game.zhu.hp<=2&&situation<0)||situation<-1) num=-3;
+							else if(situation<0||get.population('zhong')+get.population('mingzhong')==0) num=-2;
+							else if((game.zhu&&game.zhu.hp>=4&&situation>0)||situation>1) num=1;
+							else num=0;
+							if(strategy==2) num++;
+							if(strategy==3) num--;
+							return num;
+					}
+					break;
+				case 'fan':
+					switch(identity2){
+						case 'zhu':
+							if(get.population('nei')>0){
+								if(situation==1) return -6;
+								if(situation>1) return -5;
+							}
+							return -8;
+						case 'zhong':
+							if(!zhongmode&&game.zhu.hp>=3&&to.hp==1){
+								return -10;
+							}
+							return -7;
+						case 'mingzhong':return -5;
+						case 'nei':
+							if(zhongmode&&to.ai.sizhong) return -7;
+							if(get.population('fan')==1) return 0;
+							if(get.population('zhong')+get.population('mingzhong')==0) return -7;
+							if(game.zhu&&game.zhu.hp<=2) return -1;
+							return Math.min(3,situation);
+						case 'fan': return 5;
+					}
+			}
+		},
+		situation:function(absolute){
+			var i,j,player;
+			var zhuzhong=0,total=0,zhu,fan=0;
+			for(i=0;i<game.players.length;i++){
+				player=game.players[i];
+				var php=player.hp;
+				if(player.hasSkill('benghuai')&&php>4){
+					php=4;
+				}
+				else if(php>6){
+					php=6;
+				}
+				j=player.countCards('h')+player.countCards('e')*1.5+php*2;
+				if(player.identity=='zhu'){
+					zhuzhong+=j*1.2+5;
+					total+=j*1.2+5;
+					zhu=j;
+				}
+				else if(player.identity=='zhong'||player.identity=='mingzhong'){
+					zhuzhong+=j*0.8+3;
+					total+=j*0.8+3;
+				}
+				else if(player.identity=='fan'){
+					zhuzhong-=j+4;
+					total+=j+4;
+					fan+=j+4;
+				}
+			}
+			if(absolute) return zhuzhong;
+			var result=parseInt(10*Math.abs(zhuzhong/total));
+			if(zhuzhong<0) result=-result;
+			if(!game.zhong){
+				if(zhu<12&&fan>30) result--;
+				if(zhu<6&&fan>15) result--;
+				if(zhu<4) result--;
+			}
+			return result;
+		},
 	},
 	skill:{
 		dongcha:{
@@ -1871,7 +1866,7 @@ mode.identity={
 					return target.countCards('hej')>0;
 				}).set('ai',function(target){
 					var player=_status.event.player;
-					return ai.get.attitude(player,target)*lib.card.guohe.ai.result.target(player,target);
+					return get.attitude(player,target)*lib.card.guohe.ai.result.target(player,target);
 				});
 				'step 1'
 				if(result.bool){

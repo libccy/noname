@@ -42,7 +42,7 @@ card.gujian={
                 result:{
                     target:function(player,target){
                         var evt=_status.event.getTrigger();
-                        var eff=ai.get.damageEffect(target,evt.source,target,evt.nature);
+                        var eff=get.damageEffect(target,evt.source,target,evt.nature);
                         if(eff>0) return -1;
                         if(eff<0) return 2;
                         return 0;
@@ -450,7 +450,7 @@ card.gujian={
             content:function(){
                 'step 0'
                 target.chooseToDiscard('he',[1,target.countCards('he')],'弃置任意张牌并摸等量的牌').ai=function(card){
-                    return 6-ai.get.value(card);
+                    return 6-get.value(card);
                 }
                 'step 1'
                 if(result.bool){
@@ -466,7 +466,7 @@ card.gujian={
                             var cards=player.getCards('he');
                             var num=-1;
                             for(var i=0;i<cards.length;i++){
-                                if(ai.get.value(cards[i])<6) num++;
+                                if(get.value(cards[i])<6) num++;
                             }
                             if(player.needsToDiscard()&&num<1){
                                 num=1;
@@ -549,7 +549,7 @@ card.gujian={
                     else{
                         if(!rand) num-=6;
                     }
-                    var value=ai.get.value(card);
+                    var value=get.value(card);
                     if(value>=8) return -100;
 					return num-value;
 				};
@@ -635,7 +635,7 @@ card.gujian={
 				}
 				else{
 					target.chooseToDiscard({color:'black'},'弃置一张黑色手牌或受流失一点体力').ai=function(card){
-						return 8-ai.get.value(card);
+						return 8-get.value(card);
 					};
 				}
 				"step 1"
@@ -693,7 +693,7 @@ card.gujian={
                     player:function(player,target){
                         return game.countPlayer(function(current){
                             if(current==target||(get.distance(target,current,'pure')==1&&current.countCards('he'))){
-        						var att=ai.get.attitude(player,current);
+        						var att=get.attitude(player,current);
                                 if(att>0){
                                     return -1;
                                 }
@@ -830,7 +830,7 @@ card.gujian={
                 value:5,
                 result:{
                     player:function(player,target){
-                        if(ai.get.attitude(player,target)==0) return 0;
+                        if(get.attitude(player,target)==0) return 0;
                         return 1;
                     }
                 }
@@ -1016,7 +1016,7 @@ card.gujian={
                         return player.countCards('he',{suit:'heart'})>0;
                     },
         			prompt:'将一张红桃牌当桃使用',
-        			check:function(card){return 10-ai.get.value(card)},
+        			check:function(card){return 10-get.value(card)},
         			ai:{
         				skillTagFilter:function(player){
         					return player.countCards('he',{suit:'heart'})>0;
@@ -1092,7 +1092,7 @@ card.gujian={
             ai:{
                 effect:{
                     target:function(card,player,target){
-                        if(card.name=='sha'&&ai.get.attitude(player,target)<0) return 0.5;
+                        if(card.name=='sha'&&get.attitude(player,target)<0) return 0.5;
                     }
                 }
             }
@@ -1357,10 +1357,10 @@ card.gujian={
 				if(!player.countCards('h')) return false;
 			},
 			prompt:'将一张手牌当杀使用',
-			check:function(card){return 5-ai.get.value(card)},
+			check:function(card){return 5-get.value(card)},
 			ai:{
 				order:function(){
-                    return ai.get.order({name:'sha'})+0.1;
+                    return get.order({name:'sha'})+0.1;
                 },
                 skillTagFilter:function(player,tag,arg){
 					if(arg!='use') return false;
@@ -1409,7 +1409,7 @@ card.gujian={
                 order:6,
                 result:{
                     target:function(player,target){
-                        if(ai.get.attitude(player,target)>=0) return 0;
+                        if(get.attitude(player,target)>=0) return 0;
                         var nh=target.countCards('h');
                         var num=-1/Math.sqrt(1+nh);
                         if(player.hp>=4) return num;
@@ -1464,7 +1464,7 @@ card.gujian={
                 order:6,
                 result:{
                     target:function(player,target){
-                        if(ai.get.attitude(player,target)>=0) return 0;
+                        if(get.attitude(player,target)>=0) return 0;
                         var nh=target.countCards('h');
                         var num=-1/Math.sqrt(1+nh);
                         if(player.hp>=4) return num;
@@ -1502,7 +1502,7 @@ card.gujian={
                 order:6,
                 result:{
                     target:function(player,target){
-                        if(ai.get.attitude(player,target)>=0) return 0;
+                        if(get.attitude(player,target)>=0) return 0;
                         var nh=target.countCards('h');
                         var num=-1/Math.sqrt(1+nh);
                         if(player.hp>=4) return num;

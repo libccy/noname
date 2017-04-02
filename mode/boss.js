@@ -915,8 +915,8 @@ mode.boss={
 			direct:true,
 			content:function(){
 				'step 0'
-				var att1=ai.get.attitude(player,trigger.player);
-				var att2=ai.get.attitude(player,trigger.source);
+				var att1=get.attitude(player,trigger.player);
+				var att2=get.attitude(player,trigger.source);
 				var targets=player.getEnemies();
 				var stop=false;
 				for(var i=0;i<targets.length;i++){
@@ -958,8 +958,8 @@ mode.boss={
 					'若判定结果为红色，'+playername+'回复一点体力，否则'+sourcename+'回复一点体力'
 				]);
 				'step 1'
-				var att1=ai.get.attitude(player,trigger.player);
-				var att2=ai.get.attitude(player,trigger.source);
+				var att1=get.attitude(player,trigger.player);
+				var att2=get.attitude(player,trigger.source);
 				if(result.control=='选项一'){
 					event.type=1;
 					player.judge(function(card){
@@ -1101,7 +1101,7 @@ mode.boss={
 			global:'boss_zhangwu_ai',
 			trigger:{player:'damageEnd'},
 			check:function(event,player){
-				return event.source&&ai.get.damageEffect(event.source,player,player)>0;
+				return event.source&&get.damageEffect(event.source,player,player)>0;
 			},
 			filter:function(event){
 				return event.source&&event.source.isAlive();
@@ -1116,7 +1116,7 @@ mode.boss={
 				}
 				else{
 					target.chooseControl('discard_card','get_damage',function(){
-						if(ai.get.damageEffect(target,player,target)>=0) return 'get_damage';
+						if(get.damageEffect(target,player,target)>=0) return 'get_damage';
 						var nh=target.countCards('h');
 						if(nh<=3||target.hp<=3||target.hasSkillTag('noh')) return 'discard_card';
 						return 'get_damage';
@@ -1142,7 +1142,7 @@ mode.boss={
 					target:function(card,player,target){
 						if(get.tag(card,'recover')&&card.name!='recover'){
 							for(var i=0;i<game.players.length;i++){
-								if(game.players[i].hasSkill('xiaoxiong')&&ai.get.attitude(target,game.players[i])<0){
+								if(game.players[i].hasSkill('xiaoxiong')&&get.attitude(target,game.players[i])<0){
 									return 'zeroplayertarget';
 								}
 							}
@@ -1331,7 +1331,7 @@ mode.boss={
 						var next=player.chooseTarget('选择'+get.translation(name)+'的目标');
 						next._get_card=card;
 						next.filterTarget=lib.filter.filterTarget;
-						next.ai=ai.get.effect;
+						next.ai=get.effect;
 						if(typeof info.selectTarget=='function'){
 							next.selectTarget=info.selectTarget;
 						}
@@ -1368,10 +1368,10 @@ mode.boss={
 				"step 0"
 				event.cards=get.cards(7);
 				player.chooseCardButton(true,event.cards,'改命：选择一张牌作为你的'+trigger.judgestr+'判定结果').ai=function(button){
-					if(ai.get.attitude(player,trigger.player)>0){
+					if(get.attitude(player,trigger.player)>0){
 						return 1+trigger.judge(button.link);
 					}
-					if(ai.get.attitude(player,trigger.player)<0){
+					if(get.attitude(player,trigger.player)<0){
 						return 1-trigger.judge(button.link);
 					}
 					return 0;
@@ -1454,7 +1454,7 @@ mode.boss={
 					var trigger=_status.event.parent._trigger;
 					var player=_status.event.player;
 					var result=trigger.judge(card)-trigger.judge(trigger.player.judging[0]);
-					var attitude=ai.get.attitude(player,trigger.player);
+					var attitude=get.attitude(player,trigger.player);
 					if(attitude==0||result==0) return 0;
 					if(attitude>0){
 						return result;
@@ -1507,7 +1507,7 @@ mode.boss={
 			discard:false,
 			filterCard:true,
 			check:function(card){
-				return 6-ai.get.value(card);
+				return 6-get.value(card);
 			},
 			content:function(){
 				"step 0"
@@ -1547,7 +1547,7 @@ mode.boss={
 				return !target.hasSkill('mazui2');
 			},
 			check:function(card){
-				return 6-ai.get.value(card);
+				return 6-get.value(card);
 			},
 			discard:false,
 			prepare:'give',
@@ -1745,7 +1745,7 @@ mode.boss={
 				}
 				next.selectCard=[num,num];
 				next.ai=function(card){
-					return ai.get.value(card);
+					return get.value(card);
 				};
 				'step 1'
 				if(result.bool){
@@ -2063,7 +2063,7 @@ mode.boss={
 					player.chooseTarget(true,'选择一个目标对其造成两点火焰伤害',function(card,player,target){
 						return player!=target;
 					}).ai=function(target){
-						return ai.get.damageEffect(target,player,player,'fire');
+						return get.damageEffect(target,player,player,'fire');
 					}
 				}
 				else{
@@ -2161,7 +2161,7 @@ mode.boss={
 				player.chooseTarget(get.prompt('boss_xixing'),function(card,player,target){
 					return player!=target&&target.isLinked();
 				}).ai=function(target){
-					return ai.get.damageEffect(target,player,player,'thunder');
+					return get.damageEffect(target,player,player,'thunder');
 				}
 				"step 1"
 				if(result.bool){
@@ -2187,7 +2187,7 @@ mode.boss={
                 player.chooseTarget(get.prompt('boss_suoming'),[1,num],function(card,player,target){
                     return !target.isLinked()&&player!=target;
                 }).ai=function(target){
-                    return -ai.get.attitude(player,target);
+                    return -get.attitude(player,target);
                 }
                 "step 1"
                 if(result.bool){
@@ -2228,7 +2228,7 @@ mode.boss={
 				player.chooseTarget(get.prompt('boss_xiaoshou'),function(card,player,target){
 					return player!=target&&target.hp>=player.hp;
 				}).ai=function(target){
-					return ai.get.damageEffect(target,player,player,'fire');
+					return get.damageEffect(target,player,player,'fire');
 				}
 				"step 1"
 				if(result.bool){
@@ -2351,7 +2351,7 @@ mode.boss={
 				player.chooseTarget(get.prompt('boss_guihuo'),function(card,player,target){
 					return player!=target;
 				}).ai=function(target){
-					return ai.get.damageEffect(target,player,player,'fire');
+					return get.damageEffect(target,player,player,'fire');
 				}
 				"step 1"
 				if(result.bool){
@@ -2368,7 +2368,7 @@ mode.boss={
 				player.chooseTarget(get.prompt('boss_luolei'),function(card,player,target){
 					return player!=target;
 				}).ai=function(target){
-					return ai.get.damageEffect(target,player,player,'thunder');
+					return get.damageEffect(target,player,player,'thunder');
 				}
 				"step 1"
 				if(result.bool){
@@ -2423,7 +2423,7 @@ mode.boss={
 				player.chooseTarget(get.prompt('boss_didong'),function(card,player,target){
 					return target.isEnemyOf(player);
 				}).ai=function(target){
-					var att=ai.get.attitude(player,target);
+					var att=get.attitude(player,target);
 					if(target.isTurnedOver()){
 						if(att>0){
 							return att+5;
@@ -2519,7 +2519,7 @@ mode.boss={
 			content:function(){
 				"step 0";
 				player.chooseTarget(get.prompt('boss_leiji')).ai=function(target){
-					return ai.get.damageEffect(target,player,player,'thunder');
+					return get.damageEffect(target,player,player,'thunder');
 				};
 				"step 1"
 				if(result.bool){
@@ -2548,7 +2548,7 @@ mode.boss={
 						if(get.tag(card,'respondShan')){
 							var hastarget=false,players=game.filterPlayer();
 							for(var i=0;i<players.length;i++){
-								if(ai.get.attitude(target,players[i])<0){
+								if(get.attitude(target,players[i])<0){
 									hastarget=true;break;
 								}
 							}
@@ -2819,7 +2819,7 @@ mode.boss={
 				player.chooseTarget(get.prompt('jidian'),function(card,player,target){
 					return get.distance(trigger.player,target)<=1&&trigger.player!=target;
 				}).ai=function(target){
-					return ai.get.damageEffect(target,player,player,'thunder')+0.1;
+					return get.damageEffect(target,player,player,'thunder')+0.1;
 				}
 				"step 1"
 				if(result.bool){
@@ -2864,7 +2864,7 @@ mode.boss={
 					},
 					filterCard:lib.filter.cardDiscardable,
 					ai1:function(card){
-						return ai.get.unuseful(card)+9;
+						return get.unuseful(card)+9;
 					},
 					ai2:function(target){
 						if(target.storage.boss_hujia) return Math.max(1,10-target.maxHp);
@@ -3260,7 +3260,7 @@ mode.boss={
 				next.ai=function(button){
 					var card=button.link;
 					if(get.position(card)=='h'){
-						return 11-ai.get.value(card);
+						return 11-get.value(card);
 					}
 					if(card.name=='lebu') return 5;
 					if(card.name=='bingliang') return 4;
@@ -3471,7 +3471,7 @@ mode.boss={
                 player.chooseTarget(get.prompt('jizhen'),[1,2],function(card,player,target){
                     return target.hp<target.maxHp&&player!=target;
                 }).ai=function(target){
-                    return ai.get.attitude(player,target);
+                    return get.attitude(player,target);
                 }
                 "step 1"
                 if(result.bool){
@@ -3517,7 +3517,7 @@ mode.boss={
 			},
 			filterCard:true,
 			check:function(card){
-				return 7-ai.get.value(card);
+				return 7-get.value(card);
 			},
 			content:function(){
 				'step 0'
@@ -3537,7 +3537,7 @@ mode.boss={
 							if(list.contains('wansha')||list.contains('qiangxi')){
 								var players=game.filterPlayer();
 								for(var i=0;i<players.length;i++){
-									if(players[i].hp==1&&ai.get.attitude(player,players[i])<0){
+									if(players[i].hp==1&&get.attitude(player,players[i])<0){
 										if(list.contains('wansha')) return 'wansha';
 										if(list.contains('qiangxi')) return 'qiangxi';
 									}
@@ -3562,7 +3562,7 @@ mode.boss={
 						if(player.hasSkill('wansha')) return 1;
 						var players=game.filterPlayer();
 						for(var i=0;i<players.length;i++){
-							if(players[i].hp==1&&ai.get.attitude(player,players[i])<0) return 10;
+							if(players[i].hp==1&&get.attitude(player,players[i])<0) return 10;
 						}
 					}
 					return 1;
@@ -3574,7 +3574,7 @@ mode.boss={
 							if(!player.hasSkill('wansha')||!player.hasSkill('qiangxi')){
 								var players=game.filterPlayer();
 								for(var i=0;i<players.length;i++){
-									if(players[i].hp==1&&ai.get.attitude(player,players[i])<0) return 1;
+									if(players[i].hp==1&&get.attitude(player,players[i])<0) return 1;
 								}
 							}
 						}
@@ -3846,11 +3846,9 @@ mode.boss={
 
 		mode_boss_character_config:'挑战武将',
 	},
-	ai:{
-		get:{
-			rawAttitude:function(from,to){
-				return (from.side===to.side?6:-6);
-			}
+	get:{
+		rawAttitude:function(from,to){
+			return (from.side===to.side?6:-6);
 		}
-	},
+	}
 }
