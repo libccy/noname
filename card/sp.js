@@ -92,7 +92,16 @@ card.sp={
 								}
 							}
 						}
-						var num=Math.min(num1,num2);
+						var num;
+						if(num1==0){
+							num=num2;
+						}
+						else if(num2==0){
+							num=num1;
+						}
+						else{
+							num=Math.min(num1,num2);
+						}
 						if(num>0){
 							return -0.8-num/10;
 						}

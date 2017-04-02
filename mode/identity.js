@@ -1873,8 +1873,17 @@ mode.identity={
 				});
 				'step 1'
 				if(result.bool){
-					player.logSkill('dongcha',result.targets);
-					player.discardPlayerCard('hej',true,result.targets[0]);
+					event.target=result.targets[0];
+					event.target.addExpose(0.1);
+					player.logSkill('dongcha',event.target);
+					game.delayx();
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(event.target){
+					player.discardPlayerCard('hej',true,event.target);
 				}
 			},
 			group:'dongcha_begin',
@@ -1882,6 +1891,7 @@ mode.identity={
 				begin:{
 					trigger:{global:'gameStart'},
 					forced:true,
+					popup:false,
 					content:function(){
 						var list=[];
 						for(var i=0;i<game.players.length;i++){
