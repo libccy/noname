@@ -267,6 +267,9 @@
     right: 5px;
     left:auto;
 }
+.button.newstyle .intro.showintro.tafang{
+    top: 6px;
+}
 .dialog .buttons>.button.character.squarebutton{
     height:90px;
 }

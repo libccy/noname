@@ -8,12 +8,12 @@ card.sp={
 			ai:{
 				useful:function(){
 					var player=_status.event.player;
-					if(player.countCards('h','jinchan')>1) return 0;
+					var nj=player.countCards('h','jinchan');
 					var num=player.getHandcardLimit();
-					if(num==1){
+					if(nj>=num){
 						return 10;
 					}
-					if(num==2){
+					if(nj==num-1){
 						return 6;
 					}
 					return 1;
@@ -526,8 +526,8 @@ card.sp={
 			popup:false,
 			filter:function(event,player){
 				if(event.player==player) return false;
-				var cards=player.getCards('h');
-				return cards.length==1&&cards[0].name=='jinchan';
+				var num=player.countCards('h','jinchan');
+				return num&&num==player.countCards('h');
 			},
 			content:function(){
 				'step 0'

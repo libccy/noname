@@ -33579,7 +33579,7 @@
 				var func;
 				var node=ui.create.div('.config');
 				ui.create.div(node).innerHTML=get.translation(name+'_config');
-				var switcher=ui.create.div('.toggle',node);
+				var switcher=ui.create.div('.toggle.pointerdiv',node);
 				switcher.name=name;
 				for(var i=0;i<arguments.length;i++){
 					if(typeof arguments[i]=='function'){
@@ -36499,12 +36499,12 @@
 				this.previousSibling.hide();
 				var node=ui.create.div('.switcher',this.parentNode).animate('start');
 				for(var i=0;i<this.choice.length;i++){
-					var choice=ui.create.div(node);
+					var choice=ui.create.div('.pointerdiv',node);
 					choice.innerHTML=get.translation(this.choice[i]);
 					choice.link=this.choice[i];
 					choice.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.choice);
 				}
-				this.parentNode.style.height=(node.offsetHeight)+'px';
+				// this.parentNode.style.height=(node.offsetHeight)+'px';
 				_status.choosing=this;
 				if(!_status.choosing.expand){
 					_status.choosing.expand=true;
@@ -39309,6 +39309,12 @@
 			}
 			if(typeof str=='string'){
 				return str;
+			}
+			if(typeof str=='number'||typeof str=='boolean'){
+				return str.toString();
+			}
+			if(str&&str.toString){
+				return str.toString();
 			}
 			return '';
 		},

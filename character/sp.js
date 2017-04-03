@@ -1087,7 +1087,7 @@ character.sp={
 			skillAnimation:true,
 			forceunique:true,
 			filter:function(event,player){
-				return player.storage.fanghun2>0;
+				return player.storage.fanghun>0;
 			},
 			prompt:function(event,player){
 				var num=player.storage.fanghun2;
@@ -1098,10 +1098,11 @@ character.sp={
 				return get.prompt('fuhan')+'（体力上限：'+num+'）';
 			},
 			check:function(event,player){
-				if(player.storage.fanghun2==1) return false;
+				var num=player.storage.fanghun2;
+				if(num==1) return false;
 				if(player.hp<=1) return true;
-				if(player.storage.fanghun2==2) return false;
-				if(player.storage.fanghun2==3) return player.hp<3&&player.isLowestHp();
+				if(num==2) return false;
+				if(num==3) return player.hp<3&&player.isLowestHp();
 				return true;
 			},
 			content:function(){
@@ -1155,6 +1156,7 @@ character.sp={
 			},
 			content:function(){
 				player.storage.fanghun++;
+				player.storage.fanghun2++;
 				player.markSkill('fanghun');
 			},
 			group:['fanghun_sha','fanghun_shan','fanghun_draw'],
@@ -1168,7 +1170,6 @@ character.sp={
 					},
 					content:function(){
 						player.draw();
-						player.storage.fanghun2++;
 					}
 				},
 				sha:{
