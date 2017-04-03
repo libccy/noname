@@ -68,4 +68,5 @@ theme.pack={
     woodden:'木纹',
     music:'音乐',
     simple:'简约',
+    ol:'手杀',
 }

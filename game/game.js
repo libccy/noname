@@ -783,13 +783,8 @@
 								node.firstChild.innerHTML=get.verticalStr(name);
 							}
 							if(link=='default'||link.indexOf('custom_')==0){
-								if(lib.config.theme=='simple'){
-									node.style.backgroundImage='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';
-								}
-								else{
-									node.style.backgroundImage='none';
-									node.classList.add('dashedmenubutton');
-								}
+								node.style.backgroundImage='none';
+								node.classList.add('dashedmenubutton');
 								if(link.indexOf('custom_')==0){
 									game.getDB('image',link,function(fileToLoad){
 										if(!fileToLoad) return;
@@ -1146,14 +1141,8 @@
 							node.style.backgroundSize='100% 100%';
 							switch(link){
 								case 'default':case 'custom':{
-									if(lib.config.theme=='simple'){
-										node.style.backgroundImage='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';
-										node.className='button character';
-									}
-									else{
-										node.style.backgroundImage='none';
-										node.className='button character dashedmenubutton';
-									}
+									node.style.backgroundImage='none';
+									node.className='button character dashedmenubutton';
 									break;
 								}
 								case 'new':node.className='button character';node.setBackgroundImage('theme/style/cardback/image/new.png');break;
@@ -1475,14 +1464,8 @@
 							node.style.height='108px';
 							switch(link){
 								case 'default':case 'custom':{
-									if(lib.config.theme=='simple'){
-										node.style.backgroundImage='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';
-										node.className='button character';
-									}
-									else{
-										node.style.backgroundImage='none';
-										node.className='button character dashedmenubutton';
-									}
+									node.style.backgroundImage='none';
+									node.className='button character dashedmenubutton';
 									break;
 								}
 								case 'wood':node.setBackgroundImage('theme/woodden/wood.jpg');break;
@@ -1606,14 +1589,8 @@
 							node.style.height='108px';
 							node.dataset.decoration='';
 							if(link=='default'||link=='custom'||link=='auto'){
-								if(lib.config.theme=='simple'){
-									node.style.backgroundImage='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';
-									node.className='button character';
-								}
-								else{
-									node.style.backgroundImage='none';
-									node.className='button character dashedmenubutton';
-								}
+								node.style.backgroundImage='none';
+								node.className='button character dashedmenubutton';
 							}
 							else{
 								if(link.indexOf('dragon_')==0){
@@ -1782,13 +1759,8 @@
 							node.style.backgroundSize='';
 							switch(link){
 								case 'default':case 'custom':{
-									if(lib.config.theme=='simple'){
-										node.style.backgroundImage='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';
-									}
-									else{
-										node.style.backgroundImage='none';
-										node.classList.add('dashedmenubutton');
-									}
+									node.style.backgroundImage='none';
+									node.classList.add('dashedmenubutton');
 									break;
 								}
 								case 'wood':node.setBackgroundImage('theme/woodden/wood.jpg');break;
@@ -1911,13 +1883,8 @@
 							node.style.backgroundSize='auto';
 							switch(link){
 								case 'default':case 'custom':{
-									if(lib.config.theme=='simple'){
-										node.style.backgroundImage='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';
-									}
-									else{
-										node.style.backgroundImage='none';
-										node.classList.add('dashedmenubutton');
-									}
+									node.style.backgroundImage='none';
+									node.classList.add('dashedmenubutton');
 									break;
 								}
 								case 'wood':node.setBackgroundImage('theme/woodden/wood2.png');break;
