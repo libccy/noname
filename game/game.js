@@ -26773,7 +26773,7 @@
 					var createModeConfig=function(mode,position){
                         var info=lib.mode[mode];
                         var page=ui.create.div('');
-                        var node=ui.create.div('.menubutton.large',info.name,position,clickMode);
+                        var node=ui.create.div('.menubutton.large','<div>'+info.name+'</div>',position,clickMode);
 						node.link=page;
 						node.mode=mode;
                         if(connectMenu){
@@ -27094,7 +27094,7 @@
 					var createModeConfig=function(mode,position){
                         var info=lib.configMenu[mode];
                         var page=ui.create.div('');
-                        var node=ui.create.div('.menubutton.large',info.name,position,clickMode);
+                        var node=ui.create.div('.menubutton.large','<div>'+info.name+'</div>',position,clickMode);
 						node.link=page;
 						node.mode=mode;
                         var map={};
@@ -28100,7 +28100,7 @@
 					var createModeConfig=function(mode,position,position2){
                         var info=lib.characterPack[mode];
                         var page=ui.create.div('');
-                        var node=ui.create.div('.menubutton.large',lib.translate[mode+'_character_config'],position,clickMode);
+                        var node=ui.create.div('.menubutton.large','<div>'+lib.translate[mode+'_character_config']+'</div>',position,clickMode);
                         if(node.innerHTML.length>=5){
                             node.classList.add('smallfont');
                         }
@@ -28442,7 +28442,7 @@
 					var createModeConfig=function(mode,position){
                         var info=lib.cardPack[mode];
                         var page=ui.create.div('');
-                        var node=ui.create.div('.menubutton.large',lib.translate[mode+'_card_config'],position,clickMode);
+                        var node=ui.create.div('.menubutton.large','<div>'+lib.translate[mode+'_card_config']+'</div>',position,clickMode);
                         if(node.innerHTML.length>=5){
                             node.classList.add('smallfont');
                         }
@@ -28750,7 +28750,7 @@
 					(function(){
                         if(connectMenu) return;
 						var page=ui.create.div('.menu-buttons');
-                        var node=ui.create.div('.menubutton.large','牌堆',clickMode);
+                        var node=ui.create.div('.menubutton.large','<div>牌堆</div>',clickMode);
 						start.firstChild.insertBefore(node,start.firstChild.querySelector('.lefttext'));
 						node.link=page;
 						node.mode='cardpile';
@@ -28972,10 +28972,10 @@
                         page.style.paddingBottom='10px';
                         var node;
                         if(mode.indexOf('extension_')==0){
-                            node=ui.create.div('.menubutton.large',mode.slice(10),position,clickMode);
+                            node=ui.create.div('.menubutton.large','<div>'+mode.slice(10)+'</div>',position,clickMode);
                         }
                         else{
-                            node=ui.create.div('.menubutton.large',lib.translate[mode+'_play_config'],position,clickMode);
+                            node=ui.create.div('.menubutton.large','<div>'+lib.translate[mode+'_play_config']+'</div>',position,clickMode);
                         }
                         if(node.innerHTML.length>=5){
                             node.classList.add('smallfont');
@@ -29023,7 +29023,7 @@
                         if(!lib.device&&!lib.db) return;
                         if(lib.config.show_extensionmaker==false) return;
                         var page=ui.create.div('#create-extension');
-                        var node=ui.create.div('.menubutton.large','制作扩展',start.firstChild,clickMode);
+                        var node=ui.create.div('.menubutton.large','<div>制作扩展</div>',start.firstChild,clickMode);
 						node.link=page;
 						node.mode='create';
                         var pageboard=ui.create.div(page);
@@ -31021,7 +31021,7 @@
                     }());
                     (function(){
                         var page=ui.create.div('');
-                        var node=ui.create.div('.menubutton.large','获取扩展',start.firstChild,clickMode);
+                        var node=ui.create.div('.menubutton.large','<div>获取扩展</div>',start.firstChild,clickMode);
 						node.link=page;
 						node.mode='get';
                         var importextensionexpanded=false;
@@ -31281,7 +31281,7 @@
 					};
                     (function(){
                         var page=ui.create.div('');
-                        var node=ui.create.div('.menubutton.large','更新',start.firstChild,clickMode);
+                        var node=ui.create.div('.menubutton.large','<div>更新</div>',start.firstChild,clickMode);
     					node.link=page;
     					page.classList.add('menu-help');
     					var ul=document.createElement('ul');
@@ -31750,14 +31750,14 @@
 									updatep2.style.display='none';
 									updatep3.style.display='none';
 									updatepx.style.display='';
-		                            updatep4.innerHTML='关于';
+		                            updatep4.innerHTML='<div>关于</div>';
 		                        }
 								else{
 									updatep1.style.display='';
 									updatep2.style.display='';
 			                        updatep3.style.display='';
 									updatepx.style.display='none';
-									updatep4.innerHTML='更新';
+									updatep4.innerHTML='<div>更新</div>';
 								}
 							}
 							ui.updateUpdate();
@@ -32071,7 +32071,7 @@
 						});
 
 						var page=ui.create.div('');
-						var node=ui.create.div('.menubutton.large','控制',start.firstChild,clickMode);
+						var node=ui.create.div('.menubutton.large','<div>控制</div>',start.firstChild,clickMode);
 						node.link=page;
 						node.type='cheat';
 						page.classList.add('menu-sym');
@@ -32215,75 +32215,8 @@
 						});
 					}());
 					(function(){
-						if(true) return;
 						var page=ui.create.div('');
-						var node=ui.create.div('.menubutton.large','换人',start.firstChild,clickMode);
-						node.link=page;
-						page.classList.add('menu-sym');
-						var caption=ui.create.div('','选择一个换人目标',page);
-						caption.style.margin='5px';
-						caption.style.marginTop='6px';
-						var row3=ui.create.div('.menu-buttons.leftbutton',page);
-						row3.style.marginTop='3px';
-
-						var currentrow3=null;
-						var clickrow3=function(){
-							if(game.changeCoin){
-								game.changeCoin(-10);
-							}
-							game.swapPlayer(this.link);
-						};
-						menuUpdates.push(function(){
-							if(_status.connectMode||(lib.config.mode!='identity'&&lib.config.mode!='guozhan')){
-								node.classList.add('off');
-								var active=start.firstChild.querySelector('.active');
-								if(active==node){
-									node.classList.remove('active');
-									node.link.remove();
-                                    active=start.firstChild.firstChild;
-                                    if(!_status.connectMode){
-                                        cheatButton.style.display='';
-                                    }
-									active.classList.add('active');
-									rightPane.appendChild(active.link);
-								}
-                                return;
-							}
-							var list=[];
-							for(var i=0;i<game.players.length;i++){
-								if(lib.character[game.players[i].name]&&
-									game.players[i].isAlive()&&game.players[i]!=game.me){
-									list.push(game.players[i]);
-								}
-							}
-							if(_status.video){
-								node.remove();
-							}
-							if(!_status.video&&list.length&&game.phaseNumber&&!_status.event.isMine()){
-								node.classList.remove('off');
-								row3.innerHTML='';
-								var buttons=ui.create.buttons(list,'player',row3,true);
-								for(var i=0;i<buttons.length;i++){
-									buttons[i].listen(clickrow3);
-								}
-							}
-							else{
-								node.classList.add('off');
-								var active=start.firstChild.querySelector('.active');
-								if(active==node){
-									node.classList.remove('active');
-									node.link.remove();
-									active=start.firstChild.firstChild;
-									active.classList.add('active');
-									rightPane.appendChild(active.link);
-									cheatButton.style.display='';
-								}
-							}
-						});
-					}());
-					(function(){
-						var page=ui.create.div('');
-						var node=ui.create.div('.menubutton.large','命令',start.firstChild,clickMode);
+						var node=ui.create.div('.menubutton.large','<div>命令</div>',start.firstChild,clickMode);
                         ui.commandnode=node;
 						node.type='cmd';
 						node.link=page;
@@ -32420,7 +32353,7 @@
 					}());
 					(function(){
 						var page=ui.create.div('');
-						var node=ui.create.div('.menubutton.large','战绩',start.firstChild,clickMode);
+						var node=ui.create.div('.menubutton.large','<div>战绩</div>',start.firstChild,clickMode);
 						node.type='rec';
 						node.link=page;
 						page.style.paddingBottom='10px';
@@ -32454,7 +32387,7 @@
 					(function(){
 						if(!window.indexedDB) return;
 						var page=ui.create.div('');
-						var node=ui.create.div('.menubutton.large','录像',start.firstChild,clickMode);
+						var node=ui.create.div('.menubutton.large','<div>录像</div>',start.firstChild,clickMode);
 						node.type='video';
 						node.link=page;
 
@@ -32634,7 +32567,7 @@
 
 					for(var i in lib.help){
 						var page=ui.create.div('');
-						var node=ui.create.div('.menubutton.large',i,start.firstChild,clickMode);
+						var node=ui.create.div('.menubutton.large','<div>'+i+'</div>',start.firstChild,clickMode);
                         node.type='help';
 						node.link=page;
                         node.style.display='none';
@@ -32643,9 +32576,9 @@
 					}
 
                     if(!connectMenu){
-                        var node=ui.create.div('.menubutton.large','帮助',start.firstChild,function(){
+                        var node=ui.create.div('.menubutton.large','<div>帮助</div>',start.firstChild,function(){
                             var activex=start.firstChild.querySelector('.active');
-                            if(this.innerHTML=='帮助'){
+                            if(this.innerHTML=='<div>帮助</div>'){
 								cheatButton.style.display='none';
 								runButton.style.display='none';
 								clearButton.style.display='none';
@@ -32653,7 +32586,7 @@
 								saveButton.style.display='none';
 								deleteButton.style.display='none';
 
-                                this.innerHTML='返回';
+                                this.innerHTML='<div>返回</div>';
                                 for(var i=0;i<start.firstChild.childElementCount;i++){
                                     var nodex=start.firstChild.childNodes[i];
                                     if(nodex==node) continue;
@@ -32673,7 +32606,7 @@
                                 }
                             }
                             else{
-                                this.innerHTML='帮助';
+                                this.innerHTML='<div>帮助</div>';
                                 for(var i=0;i<start.firstChild.childElementCount;i++){
                                     var nodex=start.firstChild.childNodes[i];
                                     if(nodex==node) continue;

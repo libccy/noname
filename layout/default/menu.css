@@ -639,6 +639,17 @@
 .themebutton.music>div>div{
 	background: linear-gradient(#4b4b4b, #464646);
 }
+.themebutton.ol{
+	background:url('../../image/background/ol_bg.jpg');
+	background-size: cover;
+}
+.themebutton.ol>div:not(*:first-child){
+	background: linear-gradient(#4b4b4b, #464646);
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
+}
+.themebutton.ol>div>div{
+	background: linear-gradient(#4b4b4b, #464646);
+}
 .themebutton.simple{
 	background:url('../../image/background/shengshi_bg.jpg');
 	background-size: cover;
@@ -650,9 +661,7 @@
 .themebutton.simple>div>div{
 	background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));
 }
-/*.themebutton.simple>div>div:not(.avatar):hover,*/
 .themebutton.simple>div>div.active,
-/*.themebutton.music>div>div:not(.avatar):hover,*/
 .themebutton.music>div>div.active{
 	background-image: linear-gradient(rgba(47,101,150,1), rgba(43, 90, 132,1));
 }

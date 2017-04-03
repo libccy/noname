@@ -1,7 +1,9 @@
 html{
 	color: white;
 	text-shadow: black 0 0 2px;
-	background: url('grid.png'),linear-gradient(#333333, #222222) fixed;
+	min-height: 100%;
+	background-image: url('../../image/background/ol_bg.jpg');
+	background-size: cover;
 }
 #system>div>div,#mebg,.control,.player,.card,.avatar,.avatar2,.button,#window>.dialog.popped,
 #arena:not(.long) .player.unseen .equips:not(*:empty),
@@ -18,30 +20,11 @@ html{
 .videonode.menubutton.extension.current{
 	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 133, 255, 0.4) 0 2px 5px, rgba(0, 133, 255, 0.5) 0 0 12px, rgba(0, 133, 255, 0.8) 0 0 15px;
 }
-body[data-background_color_music='blue'] #system>div>div,
-body[data-background_color_music='blue'] #mebg,
-body[data-background_color_music='blue'] .control,
-body[data-background_color_music='blue'] .player,
-body[data-background_color_music='blue'] .card,
-body[data-background_color_music='blue'] .avatar,
-body[data-background_color_music='blue'] .avatar2,
-body[data-background_color_music='blue'] .button,
-body[data-background_color_music='blue'] #window>.dialog.popped,
-body[data-background_color_music='blue'] .player.unseen .equips:not(*:empty),
-body[data-background_color_music='blue'] .menu,
-body[data-background_color_music='blue'] #splash>div,
-body[data-background_color_music='blue'] #arena.mobile:not(.chess) .player[data-position='0'] .equips{
-	background-image: linear-gradient(#6c7989, #434b55);
-}
 
 .marks>.card.fullskin>.markcount.menubutton{
 	background: url('wood3.png');
 }
 
-
-/*.player.current_action{
-	background-image: linear-gradient(rgba(57, 123, 4,1), rgb(48, 103, 3));
-}*/
 #window>.dialog.popped{
 	border-radius: 6px;
 }
@@ -59,9 +42,6 @@ body[data-background_color_music='blue'] #arena.mobile:not(.chess) .player[data-
 	background: none !important;
 }
 
-.player,#mebg{
-	/*background:url('wood.png') left repeat-y,url('wood.png') right repeat-y,linear-gradient(#4b4b4b, #464646);*/
-}
 .card{
 	color:white;
 }
@@ -103,4 +83,67 @@ body[data-background_color_music='blue'] #arena.mobile:not(.chess) .player[data-
 #roundmenu.clock>div:nth-of-type(15){
 	background: linear-gradient(#4b4b4b, #464646);
 	box-shadow: rgba(0,0,0,0.6) 0 0 5px inset;
+}
+
+.menu.main{
+	background: none;
+	box-shadow: none;
+	overflow: visible;
+}
+.menu.main::before{
+	content:'';
+	position: absolute;
+	left:-18px;
+	top: -6px;
+	width: 430px;
+	height: 329px;
+	background-image: url('menu.png');
+	background-size: 100% 100%;
+}
+
+.menu.main>.menu-tab{
+	font-family: xinwei;
+	font-size: 20px;
+	top: 3px;
+}
+.menu-tab-bar{
+	display: none;
+}
+
+.left.pane>.menubutton.large{
+	background: none !important;
+	box-shadow: none !important;
+	overflow: visible;
+}
+.left.pane>.menubutton.large>div{
+	color: transparent;
+	background-color: #dab071;
+	text-shadow: rgba(0, 0, 0, 0.5) 0 5px 6px, rgba(0, 0, 0, 0.2) 1px 3px 3px;
+	-webkit-background-clip: text;
+}
+.menu.main>.menu-tab>div{
+	color: transparent !important;
+	background-color: #dab071;
+	text-shadow: rgba(41, 41, 41, 0.5) 1px 1px 0px, rgba(0, 0, 0, 0.2) 1px 3px 3px;
+	-webkit-background-clip: text;
+}
+.menu.main>.menu-tab>div:not(.active){
+	opacity: 0.5;
+    background-color: #e4caa3;
+	text-shadow: rgba(41, 41, 41, 0.3) 1px 1px 0px, rgba(0, 0, 0, 0.2) 1px 3px 3px;
+}
+.left.pane>.menubutton.large:not(.active)>div{
+    text-shadow: rgba(0, 0, 0, 0.3) 0 5px 6px, rgba(0, 0, 0, 0.2) 1px 3px 3px;
+	opacity: 0.5;
+    background-color: #e4caa3;
+}
+.left.pane>.menubutton.large::before{
+	content: '';
+	position: absolute;
+	left: -4px;
+	top: -4px;
+	width: 123px;
+	height: 40px;
+	background-image: url('button_large.png');
+	background-size: 100% 100%;
 }
