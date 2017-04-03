@@ -336,7 +336,8 @@
 	top:35px;
 	position:absolute;
 	background-color:rgb(0, 133, 255);
-	transition:left 0.3s;
+	transition:transform 0.3s;
+	left: 0;
 }
 .menu.main>.menu-tab>div{
 	display:inline-block;

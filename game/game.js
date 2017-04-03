@@ -26426,6 +26426,9 @@
 	                var menuTab=ui.create.div('.menu-tab',menu);
 	                var menuTabBar=ui.create.div('.menu-tab-bar',menu);
 					menuTabBar.style.left=(config.bar||0)+'px';
+					if(Math.round(2*game.documentZoom)<2){
+						menuTabBar.style.height='3px';
+					}
 	                var menuContent=ui.create.div('.menu-content',menu);
 	                var clickTab=function(){
 						if(this.classList.contains('disabled')) return;
@@ -26435,12 +26438,13 @@
 	                        active._link.remove();
 	                    }
 	                    this.classList.add('active');
-                        if((game.deviceZoom!=1||lib.crosswalk||lib.device=='ios')&&get.is.phoneLayout()){
-                            menuTabBar.style.left=(this.offsetLeft/game.documentZoom)+'px';
-                        }
-	                    else{
-                            menuTabBar.style.left=this.offsetLeft+'px';
-                        }
+						menuTabBar.style.transform='translateX('+(this.getBoundingClientRect().left-this.parentNode.firstChild.getBoundingClientRect().left)+'px)';
+                        // if((game.deviceZoom!=1||lib.crosswalk||lib.device=='ios')&&get.is.phoneLayout()){
+                        //     menuTabBar.style.left=(this.offsetLeft/game.documentZoom)+'px';
+                        // }
+	                    // else{
+                        //     menuTabBar.style.left=this.offsetLeft+'px';
+                        // }
 	                    menuContent.appendChild(this._link);
 	                };
 					ui.click.menuTab=function(tab){
@@ -34077,10 +34081,6 @@
 				ui.replay=ui.create.system('重来',game.reload,true);
                 ui.replay.id='restartbutton';
 				ui.config2=ui.create.system('选项',ui.click.config);
-				if(!game.syncMenu){
-					ui.config2.classList.add('hidden');
-				}
-				ui.config2.style.transition='all 0.5s';
 				ui.pause=ui.create.system('暂停',ui.click.pause);
                 ui.pause.id='pausebutton';
 				if(!_status.video){
@@ -34100,6 +34100,10 @@
 				}
 				ui.auto=ui.create.system('托管',ui.click.auto);
 				if(!game.syncMenu){
+					ui.config2.classList.add('hidden');
+					ui.config2.style.transition='all 0.5s';
+					ui.roundmenu.classList.add('transparent2');
+
 					ui.auto.style.opacity=0.5;
 					ui.auto.style.transition='all 0.5s';
 					lib.onfree.push(function(){
@@ -34249,6 +34253,7 @@
 					lib.onfree.push(function(){
 						ui.create.menu();
 						ui.config2.classList.remove('hidden');
+						ui.roundmenu.classList.remove('transparent2');
 						setTimeout(function(){
 							ui.config2.style.transition='';
 						},500);
@@ -37589,7 +37594,8 @@
 					e.preventDefault();
 				}
 				else{
-					if(this.scrollWidth<=this.offsetWidth+5&&
+					if(lib.device=='ios'&&
+						this.scrollWidth<=this.offsetWidth+5&&
 						this.scrollHeight<=this.offsetHeight+5){
 						e.preventDefault();
 					}

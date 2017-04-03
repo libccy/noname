@@ -363,7 +363,7 @@ mode.brawl={
             game.save('directStage');
             clickStart(directStage);
         }
-            console.log(lib.onfree[0]);
+        lib.init.onfree();
     },
     brawl:{
         duzhansanguo:{
