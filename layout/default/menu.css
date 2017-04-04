@@ -430,7 +430,7 @@
 	transition: all 0s;
 }
 .menu.main>.menu-content>div>.right.pane>div>.config.banskilladd.hidden{
-	margin-top: -50px;
+	margin-top: -50px !important;
 }
 .menu.main>.menu-content>div>.right.pane>div>.config.banskilladd:not(.hidden),
 .menu.main>.menu-content>div>.right.pane>div>.config.cardpileadd:not(.hidden){

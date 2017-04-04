@@ -71,6 +71,7 @@ mode.identity={
 		"step 2"
 		if(!lib.config.new_tutorial){
 			_status.new_tutorial=true;
+			lib.init.onfree();
 			game.saveConfig('version',lib.version);
 			var clear=function(){
 				ui.dialog.close();

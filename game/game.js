@@ -27139,7 +27139,7 @@
                                     banskillexpanded=!banskillexpanded;
                                 });
 
-								var banskilladd=ui.create.div('.config.indent','添加...',page,function(){
+								var banskilladd=ui.create.div('.config.indent','<span class="pointerdiv">添加...</span>',page,function(){
 									this.nextSibling.classList.toggle('hidden');
 								});
 								banskilladd.style.display='none';

@@ -136,6 +136,7 @@ window.config={
 	extensions:[],
 	banned:[],
 	bannedcards:[],
+	forbidlist:[],
 	bannedpile:{},
 	customcardpile:{},
 	addedpile:{},
