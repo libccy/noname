@@ -7189,9 +7189,7 @@ character.sp={
 			filter:function(event,player){
 				return player.countCards('he',{color:'red'})>0;
 			},
-			filterTarget:function(card,player,target){
-				return player!=target;
-			},
+			filterTarget:true,
 			selectTarget:function(){
 				var player=_status.event.player
 				return [1,Math.max(1,player.maxHp-player.hp)];

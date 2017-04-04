@@ -940,10 +940,19 @@ character.hearth={
 				content:function(storage,player){
 					if(!storage) return '未使用过青玉牌';
 					var str='手牌上限+'+storage;
-					if(storage>=6){
+					var num1,num2;
+					if(get.is.altered('qingzun')){
+						num1=3;
+						num2=9;
+					}
+					else{
+						num1=2;
+						num2=6;
+					}
+					if(storage>=num2){
 						str+='；准备阶段和结束阶段，你可以摸一张牌'
 					}
-					else if(storage>=2){
+					else if(storage>=num1){
 						str+='；准备阶段，你可以摸一张牌'
 					}
 					return str;

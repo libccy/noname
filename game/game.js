@@ -24953,6 +24953,9 @@
 				for(var i=0;i<event.avatars.length;i++){
 					event.avatars[i].delete();
 				}
+				for(var i=0;i<event.nodes.length;i++){
+					event.nodes[i].delete();
+				}
 				event.result={friend:[],enemy:[]};
 				for(var i=0;i<event.config.num;i++){
 					event.result.friend[i]=event.friendlist[i].link;
