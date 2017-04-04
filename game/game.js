@@ -2552,12 +2552,13 @@
 						item:{
 							default:'默认',
 							overlay:'嵌入',
+							auto:'自动',
 							off:'关闭'
 						},
 						onclick:function(bool){
 							game.saveConfig('show_statusbar_ios',bool);
 							if(window.StatusBar&&lib.device=='ios'){
-								if(bool!='off'){
+								if(bool!='off'&&bool!='auto'){
 									if(lib.config.show_statusbar_ios=='default'){
 										window.StatusBar.overlaysWebView(false);
 										document.body.classList.remove('statusbar');
@@ -6396,7 +6397,7 @@
 								}
 							}
 							else if(lib.device=='ios'){
-								if(lib.config.show_statusbar_ios!='off'){
+								if(lib.config.show_statusbar_ios!='off'&&lib.config.show_statusbar_ios!='auto'){
 									if(lib.config.show_statusbar_ios=='default'){
 										window.StatusBar.overlaysWebView(false);
 									}
@@ -34927,9 +34928,19 @@
                     ui.shortcut.classList.toggle('hidden');
                 }
                 if(ui.shortcut.classList.contains('hidden')){
+					if(lib.config.show_statusbar_ios=='auto'){
+						document.body.classList.remove('statusbar');
+						window.StatusBar.hide();
+					}
                     ui.window.classList.remove('shortcutpaused');
                 }
                 else{
+					if(lib.config.show_statusbar_ios=='auto'){
+						document.body.classList.add('statusbar');
+						window.StatusBar.overlaysWebView(true);
+						window.StatusBar.backgroundColorByName('black');
+						window.StatusBar.show();
+					}
                     if(_status.auto){
                         ui.shortcut.autobutton.classList.add('active');
                     }
