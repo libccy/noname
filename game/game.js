@@ -160,6 +160,12 @@
 						intro:'开启后可通过按压执行操作',
 						unfrequent:true,
 					},
+					pressure_taptic:{
+						name:'触觉反馈',
+						init:true,
+						intro:'开启后按压操作执行时将产生震动',
+						unfrequent:true,
+					},
 					pressure_click:{
 						name:'按压操作',
 						init:'pause',
@@ -411,9 +417,16 @@
 						}
 						if(config.enable_pressure){
 							map.pressure_click.show();
+							if(lib.device){
+								map.pressure_taptic.show();
+							}
+							else{
+								map.pressure_taptic.hide();
+							}
 						}
 						else{
 							map.pressure_click.hide();
+							map.pressure_taptic.hide();
 						}
 						if(lib.config.touchscreen){
 							map.mousewheel.hide();
@@ -36395,7 +36408,7 @@
 				if(_status.longpressing&&_status.longpressing!=this){
 					ui.click.longpresscancel.call(_status.longpressing);
 				}
-				if(window.ForceTouch&&!_status.paused2&&!_status.forcetouchinterval&&lib.config.enable_pressure){
+				if(window.ForceTouch&&!_status.forcetouchinterval&&lib.config.enable_pressure){
 					_status.forcetouchinterval=setInterval(ui.click.forcetouch,30);
 				}
 				_status.longpressing=this;
@@ -37649,19 +37662,39 @@
 						var force = parseFloat(ForceTouchData.touches[0].force);
 						if(force > 0.2){
 							_status.force=true;
+							var taptic=false;
 							if(_status.longpressing){
+								delete _status.longpressing._waitingfordrag;
 								ui.click.touchpop();
 								ui.click.longpresscallback.call(_status.longpressing);
+								taptic=true;
 							}
 							else if(!_status.forceright){
 								_status.forceright=true;
 								setTimeout(function(){
 									_status.forceright=false;
 								},600);
+								if(_status.mousedragging){
+									_status.mousedragging=null;
+									_status.mouseleft=false;
+									_status.mousedragorigin=null;
+									_status.dragstatuschanged=false;
+									game.uncheck();
+									game.check();
+								}
 								switch(lib.config.pressure_click){
 									case 'pause':ui.click.pause();break;
 									case 'auto':ui.click.auto();break;
 									case 'config':ui.click.config();break;
+								}
+								taptic=true;
+							}
+							if(taptic&&lib.config.pressure_taptic){
+								if(window.TapticEngine){
+									window.TapticEngine.generateTapticFeedback();
+								}
+								else{
+									game.vibrate(50);
 								}
 							}
 						}

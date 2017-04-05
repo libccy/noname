@@ -53,6 +53,8 @@ window.config={
 	auto_skill:true,
 	auto_confirm:true,
 	enable_drag:true,
+	enable_pressure:true,
+	pressure_taptic:true,
 	hover_handcard:true,
 	hover_all:true,
 	right_info:true,
