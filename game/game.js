@@ -273,6 +273,17 @@
 						intro:'回合开始时使手机震动',
 						init:false
 					},
+					pressure_click:{
+						name:'按压功能',
+						init:'auto',
+						intro:'在空白区域点击按压时的操作',
+						unfrequent:true,
+						item:{
+							pause:'暂停',
+							config:'选项',
+							auto:'托管',
+						}
+					},
 					right_click:{
 						name:'右键功能',
 						init:'pause',
@@ -6250,35 +6261,6 @@
 						});
 					}
                 }
-				// lib.cardSelectObserver=new MutationObserver(function(mutations){
-				// 	for(var i=0;i<mutations.length;i++){
-				// 		if(mutations[i].attributeName=='class'){
-				// 			var node=mutations[i].target;
-				// 			if(node._transform&&node.parentNode&&node.parentNode.parentNode&&
-				// 				node.parentNode.parentNode.parentNode==ui.me){
-				// 				if(node.classList.contains('selected')){
-				// 					setTimeout((function(node){
-				// 						return function(){
-				// 							if(node._transform&&node.parentNode&&node.parentNode.parentNode&&
-				// 								node.parentNode.parentNode.parentNode==ui.me){
-				// 								if(node.classList.contains('selected')&&
-				// 								!node.parentNode.parentNode.classList.contains('scrollh')){
-				// 									node.style.transform=node._transform+' translateY(-20px)';
-				// 								}
-				// 								else{
-				// 									node.style.transform=node._transform;
-				// 								}
-				// 							}
-				// 						}
-				// 					}(node)),200);
-				// 				}
-				// 				else{
-				// 					node.style.transform=node._transform;
-				// 				}
-				// 			}
-				// 		}
-				// 	}
-				// });
 
 				if(lib.device){
 					lib.init.cordovaReady=function(){
@@ -33879,6 +33861,10 @@
 					},1000);
 				}
 
+				if(lib.config.threedtouch&&window.Pressure){
+					lib.setPressure(ui.window,ui.click.pressurepause);
+				}
+
 				ui.window.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.window);
 				ui.system=ui.create.div("#system.",ui.window);
 				ui.arena=ui.create.div('#arena.nome',ui.window);
@@ -35760,6 +35746,7 @@
 				}
 			},
 			windowtouchend:function(e){
+				delete _status.force;
 				if(window.inSplash) return;
 				if(e.touches.length==1&&!_status.dragged&&!_status.draggingtouchdialog){
 					ui.click.pause();
@@ -36251,6 +36238,7 @@
 				}
 			},
 			windowmouseup:function(e){
+				delete _status.force;
 				if(window.inSplash) return;
 				if(_status.draggingdialog){
 					var ddialog=_status.draggingdialog;
@@ -37555,17 +37543,6 @@
 				this.startX=e.touches[0].clientX/game.documentZoom;
 				this.startY=e.touches[0].clientY/game.documentZoom;
 				_status.dragged=false;
-				// if(lib.device=='ios'){
-				// 	var startY=e.touches[0].pageY;
-				// 	var startTopScroll=this.scrollTop;
-				//
-				// 	if(startTopScroll<=0){
-				// 		this.scrollTop=1;
-				// 	}
-				// 	else if(startTopScroll&&startTopScroll+this.offsetHeight>=this.scrollHeight){
-				// 		this.scrollTop=this.scrollHeight-this.offsetHeight-1;
-				// 	}
-				// }
 			},
 			dialogtouchStart:function(e){
 				ui.click.touchStart.call(this,e);
@@ -37584,15 +37561,8 @@
 					e.preventDefault();
 				}
 				else{
-					if(lib.device=='ios'&&
-						this.scrollWidth<=this.offsetWidth+5&&
-						this.scrollHeight<=this.offsetHeight+5){
-						e.preventDefault();
-					}
-					else{
-						delete _status._swipeorigin;
-						e.stopPropagation();
-					}
+					delete _status._swipeorigin;
+					e.stopPropagation();
 				}
 			},
             autoskill:function(bool,node){
@@ -37617,7 +37587,20 @@
 				ui.click.touchpop();
 				e.stopPropagation();
 			},
-			rightpressure(force, event){
+			pressurepause:function(force,event){
+				if(!_status.force&&!_status.mousedragging&&force>=0.5){
+					_status.force=true;
+					switch(lib.config.pressure_click){
+						case 'pause':ui.click.pause();break;
+						case 'auto':ui.click.auto();break;
+						case 'config':ui.click.config();break;
+					}
+				}
+			},
+			rightpressure:function(force, event){
+				if(force>0){
+					_status.force=true;
+				}
 				if(force>=0.5){
 					if(_status.mousedragging){
 						_status.mousedragging=null;
