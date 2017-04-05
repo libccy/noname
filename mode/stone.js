@@ -177,17 +177,7 @@ mode.stone={
 						buttonName=lib.character[buttonName];
 						cardDialog.buttons[i].node.info.innerHTML=buttonName[5][1]+'/'+buttonName[2];
 					}
-					if(lib.config.touchscreen){
-						lib.setLongPress(cardDialog.buttons[i],ui.click.intro);
-					}
-					else{
-						if(lib.config.hover_all){
-							lib.setHover(cardDialog.buttons[i],ui.click.hoverplayer);
-						}
-						if(lib.config.right_info){
-							cardDialog.buttons[i].oncontextmenu=ui.click.rightplayer;
-						}
-					}
+					lib.setIntro(cardDialog.buttons[i]);
 				}
 				var updateCardDialog=function(button){
 					if(!deckContainer.classList.contains('shown')){
@@ -457,20 +447,8 @@ mode.stone={
 				_status.friendRage=0;
 				_status.enemyRage=0;
 
-				if(lib.config.touchscreen){
-					lib.setLongPress(ui.friendBar,ui.click.intro);
-					lib.setLongPress(ui.enemyBar,ui.click.intro);
-				}
-				else{
-					if(lib.config.hover_all){
-						lib.setHover(ui.friendBar,ui.click.hoverplayer);
-						lib.setHover(ui.enemyBar,ui.click.hoverplayer);
-					}
-					if(lib.config.right_info){
-						ui.friendBar.oncontextmenu=ui.click.rightplayer;
-						ui.enemyBar.oncontextmenu=ui.click.rightplayer;
-					}
-				}
+				lib.setIntro(ui.friendBar);
+				lib.setIntro(ui.enemyBar);
 			}
 		}
 		_status.friendCount=ui.create.system('',null,true);
@@ -1730,17 +1708,7 @@ mode.stone={
 			if(!player.node.career){
 				player.node.career=ui.create.div('.menubutton.round.identity',player);
 				player.node.career.dataset.career=career;
-				if(lib.config.touchscreen){
-					lib.setLongPress(player.node.career,ui.click.intro);
-				}
-				else{
-					if(lib.config.hover_all){
-						lib.setHover(player.node.career,ui.click.hoverplayer);
-					}
-					if(lib.config.right_info){
-						player.node.career.oncontextmenu=ui.click.rightplayer;
-					}
-				}
+				lib.setIntro(player.node.career);
 			}
 			if(!player.deckCards) player.deckCards=[];
 			for(var i=0;i<deck.length;i++){

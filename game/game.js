@@ -159,13 +159,6 @@
 						unfrequent:true,
 						intro:'开启后可使触屏设备反应更快，但无法使用鼠标操作',
 					},
-					threedtouch:{
-						name:'压感操作',
-						init:true,
-						restart:true,
-						unfrequent:true,
-						intro:'开启后按压可显示菜单或暂停',
-					},
 					swipe:{
 						name:'滑动手势',
 						init:true,
@@ -189,7 +182,7 @@
 					swipe_up:{
 						name:'上划操作',
 						intro:'向上滑动时执行的操作',
-						init:'pause',
+						init:'auto',
 						unfrequent:true,
 						item:{
 							system:'显示按钮',
@@ -275,8 +268,8 @@
 					},
 					pressure_click:{
 						name:'按压功能',
-						init:'auto',
-						intro:'在空白区域点击按压时的操作',
+						init:'pause',
+						intro:'在空白区域按压时的操作',
 						unfrequent:true,
 						item:{
 							pause:'暂停',
@@ -5090,11 +5083,8 @@
 			}
 		},
 		setPressure:function(node,func){
-			if(lib.config.threedtouch&&window.Pressure){
-				window.Pressure.set(node,{change: func}, {
-					only: lib.config.touchscreen?'touch':'mouse',
-					polyfill: false
-				});
+			if(window.Pressure){
+				window.Pressure.set(node,{change: func}, {polyfill: false});
 			}
 		},
 		setPopped:function(node,func,width,height,forceclick,paused2){
@@ -5169,7 +5159,6 @@
 		setLongPress:function(node,func){
 			node.addEventListener('touchstart',ui.click.longpressdown);
 			node.addEventListener('touchend',ui.click.longpresscancel);
-			// node.addEventListener('mouseleave',ui.click.longpresscancel);
 			node._longpresscallback=func;
 			return node;
 		},
@@ -5981,9 +5970,7 @@
     				lib.init.js(lib.assetURL+'card',lib.config.all.cards,packLoaded,packLoaded);
     				lib.init.js(lib.assetURL+'character',lib.config.all.characters,packLoaded,packLoaded);
     				lib.init.js(lib.assetURL+'character','rank',packLoaded,packLoaded);
-					if(lib.config.threedtouch){
-						lib.init.js(lib.assetURL+'game','pressure');
-					}
+					lib.init.js(lib.assetURL+'game','pressure');
                 };
                 if(extensionlist.length){
                     window.game=game;
@@ -22148,6 +22135,12 @@
 				input.focus();
 			}
 		},
+		print:function(){
+			if(!_status.toprint){
+				_status.toprint=[];
+			}
+			_status.toprint.push(Array.from(arguments));
+		},
 		animate:{
 			flame:function(x,y,duration,type){
 				var particles=[];
@@ -32438,6 +32431,12 @@
 							text.innerHTML+=textstr;
                             text.scrollTop=text.scrollHeight;
 						}
+						if(_status.toprint){
+							for(var i=0;i<_status.toprint.length;i++){
+								game.print.apply(this,_status.toprint[i]);
+							}
+							delete _status.toprint;
+						}
 						runButton.listen(runCommand);
 						clearButton.listen(function(){
 							text.innerHTML='';
@@ -33860,8 +33859,7 @@
 						ui.window.show();
 					},1000);
 				}
-
-				if(lib.config.threedtouch&&window.Pressure){
+				if(window.Pressure){
 					lib.setPressure(ui.window,ui.click.pressurepause);
 				}
 
@@ -34898,7 +34896,7 @@
                     clearTimeout(_status.touchpoppingtimeout);
                     _status.touchpoppingtimeout=setTimeout(function(){
                         _status.touchpopping=false;
-                    },500);
+                    },600);
                 }
             },
             exit:function(){
@@ -35552,6 +35550,9 @@
 						time:get.utc()
 					}
 				}
+				if(window.ForceTouch){
+					_status.forcetouchinterval=setInterval(ui.click.forcetouch,30);
+				}
 			},
 			windowtouchmove:function(e){
 				e.preventDefault();
@@ -35747,6 +35748,10 @@
 			},
 			windowtouchend:function(e){
 				delete _status.force;
+				if(window.forcetouchinterval){
+					clearInterval(window.forcetouchinterval);
+					delete window.forcetouchinterval;
+				}
 				if(window.inSplash) return;
 				if(e.touches.length==1&&!_status.dragged&&!_status.draggingtouchdialog){
 					ui.click.pause();
@@ -36218,8 +36223,7 @@
 			},
 			cardtouchmove:function(e){
 				if(this._longpresstimeout){
-					clearTimeout(this._longpresstimeout);
-					delete this._longpresstimeout;
+					ui.click.longpresscancel.call(this);
 				}
 				if(this._waitingfordrag){
 					var drag=this._waitingfordrag;
@@ -36239,6 +36243,10 @@
 			},
 			windowmouseup:function(e){
 				delete _status.force;
+				if(window.forcetouchinterval){
+					clearInterval(window.forcetouchinterval);
+					delete window.forcetouchinterval;
+				}
 				if(window.inSplash) return;
 				if(_status.draggingdialog){
 					var ddialog=_status.draggingdialog;
@@ -36361,32 +36369,49 @@
 				if(this._longpresstimeout){
 					clearTimeout(this._longpresstimeout);
 				}
-				var func=this._longpresscallback;
-				var node=this;
-				this._longpresstimeout=setTimeout(function(){
-					delete node._longpresstimeout;
-					if(_status.mousedragging&&_status.mouseleft) return;
-					if(!_status.longpressed){
-						_status.longpressed=true;
-						setTimeout(function(){
-							_status.longpressed=false;
-						},500);
-						func.call(node,e);
-						if(lib.config.touchscreen&&lib.config.enable_drag&&!node._waitingfordrag){
-							_status.mousedragging=null;
-							_status.mousedragorigin=null;
-							_status.clicked=false;
-							game.uncheck();
-							game.check();
-							_status.clicked=true;
-						}
+				this._longpresstimeout=setTimeout(ui.click.longpresscallback,500);
+				this._longpressevent=e;
+				if(_status.longpressing&&_status.longpressing!=this){
+					ui.click.longpresscancel.call(_status.longpressing);
+				}
+				_status.longpressing=this;
+			},
+			longpresscallback:function(){
+				if(!_status.longpressing) return;
+				var node=_status.longpressing;
+				var func=node._longpresscallback;
+				var e=node._longpressevent;
+				if(!func||!e) return;
+				clearTimeout(node._longpresstimeout);
+				_status.force=true;
+				delete _status.longpressing;
+				delete node._longpresstimeout;
+				delete node._longpressevent;
+				if(_status.mousedragging&&_status.mouseleft) return;
+				if(!_status.longpressed){
+					_status.longpressed=true;
+					setTimeout(function(){
+						_status.longpressed=false;
+					},500);
+					func.call(node,e);
+					if(lib.config.touchscreen&&lib.config.enable_drag&&!node._waitingfordrag){
+						_status.mousedragging=null;
+						_status.mousedragorigin=null;
+						_status.clicked=false;
+						game.uncheck();
+						game.check();
+						_status.clicked=true;
 					}
-				},500);
+				}
 			},
 			longpresscancel:function(){
 				if(this._longpresstimeout){
 					clearTimeout(this._longpresstimeout);
 					delete this._longpresstimeout;
+					delete this._longpressevent;
+					if(_status.longpressing==this){
+						delete _status.longpressing;
+					}
 				}
 			},
 			window:function(){
@@ -37586,6 +37611,32 @@
 				game.saveConfig('autoskilllist',lib.config.autoskilllist);
 				ui.click.touchpop();
 				e.stopPropagation();
+			},
+			forcetouch:function(){
+				if(_status.force){
+					clearInterval(window.forcetouchinterval);
+					delete window.forcetouchinterval;
+					return;
+				}
+				window.ForceTouch.getForceTouchData(function(ForceTouchData){
+					if(ForceTouchData.touches[0]){
+						var force = parseFloat(ForceTouchData.touches[0].force);
+						if(force > 0.2){
+							_status.force=true;
+							if(_status.longpressing){
+								ui.click.touchpop();
+								ui.click.longpresscallback.call(_status.longpressing);
+							}
+							// else{
+							// 	switch(lib.config.pressure_click){
+							// 		case 'pause':ui.click.pause();break;
+							// 		case 'auto':ui.click.auto();break;
+							// 		case 'config':ui.click.config();break;
+							// 	}
+							// }
+						}
+					}
+				});
 			},
 			pressurepause:function(force,event){
 				if(!_status.force&&!_status.mousedragging&&force>=0.5){

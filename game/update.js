@@ -1,6 +1,6 @@
 window.noname_update={
-    version:'1.9.20.2',
-    update:'1.9.20.1',
+    version:'1.9.21',
+    // update:'1.9.20.1',
     changeLog:[
         'bug修复',
         '压感操作'
@@ -25,7 +25,7 @@ window.noname_update={
         // 'mode/chess.js',
         // 'mode/tafang.js',
         // 'mode/guozhan.js',
-        // 'mode/stone.js',
+        'mode/stone.js',
         // 'theme/music/style.css',
         // 'theme/woodden/style.css',
         'theme/simple/style.css',

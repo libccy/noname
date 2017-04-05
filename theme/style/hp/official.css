@@ -2,7 +2,7 @@
     background: url('image/official1.png');
     box-shadow: none;
     border: none;
-    background-size: cover;
+    background-size: 100% 100%;
     transform: scale(1.4);
     border-radius: 0px;
 }
@@ -10,7 +10,7 @@
     background: url('image/official2.png');
     box-shadow: none;
     border: none;
-    background-size: cover;
+    background-size: 100% 100%;
     transform: scale(1.4);
     border-radius: 0px;
 }
@@ -18,7 +18,7 @@
     background: url('image/official3.png');
     box-shadow: none;
     border: none;
-    background-size: cover;
+    background-size: 100% 100%;
     transform: scale(1.4);
     border-radius: 0px;
 }
@@ -26,7 +26,7 @@
     background: url('image/official4.png');
     box-shadow: none;
     border: none;
-    background-size: cover;
+    background-size: 100% 100%;
     transform: scale(1.4);
     border-radius: 0px;
 }

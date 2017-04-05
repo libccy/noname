@@ -2139,6 +2139,7 @@ div:not(.handcards)>.card>.info>span,
 	filter: brightness(1.5);
 	-webkit-filter: brightness(1.5);
 	transition: all 0.5s;
+	background-repeat: no-repeat;
 }
 .button .hp>div {
 	width: 6px;

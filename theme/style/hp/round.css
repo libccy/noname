@@ -2,7 +2,7 @@
     background: url('image/round1.png');
     box-shadow: none;
     border: none;
-    background-size: cover;
+    background-size: 100% 100%;
     transform: scale(1.4);
     -webkit-filter:none;
     border-radius: 0px;
@@ -11,7 +11,7 @@
     background: url('image/round2.png');
     box-shadow: none;
     border: none;
-    background-size: cover;
+    background-size: 100% 100%;
     transform: scale(1.4);
     -webkit-filter:none;
     border-radius: 0px;
@@ -20,7 +20,7 @@
     background: url('image/round3.png');
     box-shadow: none;
     border: none;
-    background-size: cover;
+    background-size: 100% 100%;
     transform: scale(1.4);
     -webkit-filter:none;
     border-radius: 0px;
@@ -29,7 +29,7 @@
     background: url('image/round4.png');
     box-shadow: none;
     border: none;
-    background-size: cover;
+    background-size: 100% 100%;
     transform: scale(1.4);
     border-radius: 0px;
 }
