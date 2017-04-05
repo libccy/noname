@@ -37624,6 +37624,9 @@
 				if((this==ui.handcards1Container||this==ui.handcards2Container)&&!this.classList.contains('scrollh')){
 					e.preventDefault();
 				}
+				else if(lib.device=='ios'&&this.scrollHeight<=this.offsetHeight+5&&this.scrollWidth<=this.offsetWidth+5){
+					e.preventDefault();
+				}
 				else{
 					delete _status._swipeorigin;
 					e.stopPropagation();
