@@ -80,7 +80,6 @@ mode.boss={
 		for(var i in lib.character){
 			var info=lib.character[i];
 			if(info[4].contains('boss')){
-				if(lib.characterPack.mode_boss[i]&&!get.config(i+'_boss_config')) continue;
 				// var cfg=i+'_bossconfig';
 				// if(get.config(cfg)==undefined){
 				// 	game.saveConfig(cfg,true,true);
@@ -92,6 +91,9 @@ mode.boss={
 				// 	init:true,
 				// }
 				var player=ui.create.player(bosslist).init(i);
+				if(lib.characterPack.mode_boss[i]&&get.config(i+'_boss_config')==false){
+					player.style.display='none';
+				}
 				if(player.hp==0){
 					player.node.hp.style.display='none';
 				}
@@ -118,8 +120,9 @@ mode.boss={
 			}
 		}
 		if(!list.length){
-			alert('挑战模式不可隐藏boss武将包，请在选项－其它中选择“重置隐藏扩展包”');
+			alert('没有可挑战的BOSS');
 			event.finish();
+			lib.init.onfree();
 			_status.over=true;
 			return;
 		}
