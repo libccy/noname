@@ -817,6 +817,10 @@
 									menu.parentNode.noclose=true;
 									node.remove();
 									menu.updateBr();
+									if(!lib.config.prompt_hidebg){
+										alert('隐藏的背景可通过选项-其它-重置隐藏扩展包恢复');
+										game.saveConfig('prompt_hidebg',true);
+									}
 									lib.config.hiddenBackgroundPack.add(background);
 									game.saveConfig('hiddenBackgroundPack',lib.config.hiddenBackgroundPack);
 									delete lib.configMenu.appearence.config.image_background.item[background];
@@ -3075,6 +3079,8 @@
 							if(this.innerHTML!='已重置'){
 								this.innerHTML='已重置'
 								game.saveConfig('new_tutorial',false);
+								game.saveConfig('prompt_hidebg');
+								game.saveConfig('prompt_hidemode');
 								var that=this;
 								setTimeout(function(){
 									that.innerHTML='重置新手向导';
@@ -26956,6 +26962,10 @@
     								if(this.innerHTML=='隐藏此模式'){
     									this.innerHTML='此模式将在重启后隐藏';
     									lib.config.hiddenModePack.add(mode);
+										if(!lib.config.prompt_hidepack){
+											alert('隐藏的扩展包可通过选项-其它-重置隐藏扩展包恢复');
+											game.saveConfig('prompt_hidepack',true);
+										}
     								}
     								else{
     									this.innerHTML='隐藏此模式';
@@ -28273,6 +28283,10 @@
     								if(this.innerHTML=='隐藏武将包'){
     									this.innerHTML='武将包将在重启后隐藏';
     									lib.config.hiddenCharacterPack.add(mode);
+										if(!lib.config.prompt_hidepack){
+											alert('隐藏的扩展包可通过选项-其它-重置隐藏扩展包恢复');
+											game.saveConfig('prompt_hidepack',true);
+										}
     								}
     								else{
     									this.innerHTML='隐藏武将包';
@@ -28574,6 +28588,10 @@
 								if(this.innerHTML=='隐藏卡牌包'){
 									this.innerHTML='卡牌包将在重启后隐藏';
 									lib.config.hiddenCardPack.add(mode);
+									if(!lib.config.prompt_hidepack){
+										alert('隐藏的扩展包可通过选项-其它-重置隐藏扩展包恢复');
+										game.saveConfig('prompt_hidepack',true);
+									}
 								}
 								else{
 									this.innerHTML='隐藏卡牌包';
@@ -31380,7 +31398,7 @@
 
     							var goupdate=function(files,update){
                                     lib.version=update.version;
-									if(!update.dev){
+									if(!update.dev||lib.config.debug){
 										dev=true;
 									}
 									lib.init.req('game/source.js',function(){
