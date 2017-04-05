@@ -22018,9 +22018,22 @@
 			window.location.reload();
 		},
         exit:function(){
-            if(navigator.app&&navigator.app.exitApp){
-                navigator.app.exitApp();
-            }
+			if(lib.device=='ios'){
+				game.saveConfig('mode');
+				if(_status){
+					if(_status.reloading) return;
+					_status.reloading=true;
+				}
+				if(_status.video&&!_status.replayvideo){
+					localStorage.removeItem(lib.configprefix+'playbackmode');
+				}
+				window.location.reload();
+			}
+            else{
+				if(navigator.app&&navigator.app.exitApp){
+	                navigator.app.exitApp();
+	            }
+			}
         },
 		open:function(url){
 			if(lib.device){
