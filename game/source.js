@@ -32,6 +32,7 @@ window.noname_source_list=[
     'game/jszip.js',
     'game/package.js',
     'game/phantom.js',
+    'game/pressure.js',
     'game/server.js',
     'game/source.js',
     'game/update.js',

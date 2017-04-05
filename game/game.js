@@ -159,6 +159,13 @@
 						unfrequent:true,
 						intro:'开启后可使触屏设备反应更快，但无法使用鼠标操作',
 					},
+					threedtouch:{
+						name:'压感操作',
+						init:true,
+						restart:true,
+						unfrequent:true,
+						intro:'开启后按压可显示菜单或暂停',
+					},
 					swipe:{
 						name:'滑动手势',
 						init:true,
@@ -5066,7 +5073,18 @@
 					node.oncontextmenu=ui.click.rightplayer;
 				}
 			}
-			node._customintro=func;
+			lib.setPressure(node,ui.click.rightpressure);
+			if(func){
+				node._customintro=func;
+			}
+		},
+		setPressure:function(node,func){
+			if(lib.config.threedtouch&&window.Pressure){
+				window.Pressure.set(node,{change: func}, {
+					only: lib.config.touchscreen?'touch':'mouse',
+					polyfill: false
+				});
+			}
 		},
 		setPopped:function(node,func,width,height,forceclick,paused2){
 			node._poppedfunc=func;
@@ -5952,6 +5970,9 @@
     				lib.init.js(lib.assetURL+'card',lib.config.all.cards,packLoaded,packLoaded);
     				lib.init.js(lib.assetURL+'character',lib.config.all.characters,packLoaded,packLoaded);
     				lib.init.js(lib.assetURL+'character','rank',packLoaded,packLoaded);
+					if(lib.config.threedtouch){
+						lib.init.js(lib.assetURL+'game','pressure');
+					}
                 };
                 if(extensionlist.length){
                     window.game=game;
@@ -12050,17 +12071,7 @@
 					this.hujia=0;
 					this.node.intro.innerHTML=lib.config.intro;
 					this.node.name.dataset.nature=get.groupnature(this.group);
-					if(lib.config.touchscreen){
-						lib.setLongPress(this,ui.click.intro);
-					}
-					else{
-						if(lib.config.hover_all){
-							lib.setHover(this,ui.click.hoverplayer);
-						}
-						if(lib.config.right_info){
-							this.oncontextmenu=ui.click.rightplayer;
-						}
-					}
+					lib.setIntro(this);
 					// var name=get.translation(character);
 					this.node.name.innerHTML=get.slimName(character);
                     if(this.classList.contains('minskin')&&this.node.name.querySelectorAll('br').length>=4){
@@ -24853,17 +24864,7 @@
 						event.avatars[i].animate('start');
 						event.nodes[event.avatars[i].index].style.display='none';
 						event.avatars[i].nodename.dataset.nature=get.groupnature(lib.character[name][1]);
-						if(lib.config.touchscreen){
-							lib.setLongPress(event.avatars[i],ui.click.intro);
-						}
-						else{
-							if(lib.config.hover_all){
-								lib.setHover(event.avatars[i],ui.click.hoverplayer);
-							}
-							if(lib.config.right_info){
-								event.avatars[i].oncontextmenu=ui.click.rightplayer;
-							}
-						}
+						lib.setIntro(event.avatars[i]);
 					}
 					event.resize();
 					for(var i=0;i<event.avatars.length;i++){
@@ -34421,17 +34422,7 @@
 						node.classList.add(item.nature);
 					}
 					if(!noclick){
-						if(lib.config.touchscreen){
-							lib.setLongPress(node,ui.click.intro);
-						}
-						else{
-							if(lib.config.hover_all){
-								lib.setHover(node,ui.click.hoverplayer);
-							}
-							if(lib.config.right_info){
-								node.oncontextmenu=ui.click.rightplayer;
-							}
-						}
+						lib.setIntro(node);
 					}
 					break;
 
@@ -34495,17 +34486,7 @@
                         }
 						node.node.intro.innerHTML=lib.config.intro;
 						if(!noclick){
-							if(lib.config.touchscreen){
-								lib.setLongPress(node,ui.click.intro);
-							}
-							else{
-								if(lib.config.hover_all){
-									lib.setHover(node,ui.click.hoverplayer);
-								}
-								if(lib.config.right_info){
-									node.oncontextmenu=ui.click.rightplayer;
-								}
-							}
+							lib.setIntro(node);
 						}
 						if(infoitem[1]){
 							node.node.group.innerHTML='<div>'+get.translation(infoitem[1])+'</div>';
@@ -34768,17 +34749,7 @@
 				}
 				node.node.intro.innerHTML=lib.config.intro;
 				if(!noclick){
-					if(lib.config.touchscreen){
-						lib.setLongPress(node,ui.click.intro);
-					}
-					else{
-						if(lib.config.hover_all){
-							lib.setHover(node,ui.click.hoverplayer);
-						}
-						if(lib.config.right_info){
-							node.oncontextmenu=ui.click.rightplayer;
-						}
-					}
+					lib.setIntro(node);
 				}
 				node.storage={uncheck:[]};
 				if(info!='noclick'){
@@ -37645,6 +37616,20 @@
 				game.saveConfig('autoskilllist',lib.config.autoskilllist);
 				ui.click.touchpop();
 				e.stopPropagation();
+			},
+			rightpressure(force, event){
+				if(force>=0.5){
+					if(_status.mousedragging){
+						_status.mousedragging=null;
+						_status.mouseleft=false;
+						_status.mousedragorigin=null;
+						_status.dragstatuschanged=false;
+						game.uncheck();
+						game.check();
+					}
+					ui.click.rightplayer.call(this,event);
+					_status.clickedplayer=false;
+				}
 			},
             rightplayer:function(e){
 				if(this._nopup) return false;

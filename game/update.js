@@ -3,12 +3,14 @@ window.noname_update={
     update:'1.9.20.1',
     changeLog:[
         'bug修复',
+        '压感操作'
     ],
     files:[
         'game/game.js',
         // 'game/package.js',
         'game/config.js',
-        // 'game/source.js',
+        'game/source.js',
+        'game/pressure.js',
         // 'game/asset.js',
         // 'card/*',
         // 'card/sp.js',
