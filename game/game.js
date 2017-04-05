@@ -267,7 +267,7 @@
 						init:false
 					},
 					pressure_click:{
-						name:'按压功能',
+						name:'按压操作',
 						init:'pause',
 						intro:'在空白区域按压时的操作',
 						unfrequent:true,
@@ -278,7 +278,7 @@
 						}
 					},
 					right_click:{
-						name:'右键功能',
+						name:'右键操作',
 						init:'pause',
 						intro:'在空白区域点击右键时的操作',
 						unfrequent:true,
@@ -5970,7 +5970,7 @@
     				lib.init.js(lib.assetURL+'card',lib.config.all.cards,packLoaded,packLoaded);
     				lib.init.js(lib.assetURL+'character',lib.config.all.characters,packLoaded,packLoaded);
     				lib.init.js(lib.assetURL+'character','rank',packLoaded,packLoaded);
-					lib.init.js(lib.assetURL+'game','pressure');
+					if(lib.device!='ios') lib.init.js(lib.assetURL+'game','pressure');
                 };
                 if(extensionlist.length){
                     window.game=game;
@@ -33859,9 +33859,7 @@
 						ui.window.show();
 					},1000);
 				}
-				if(window.Pressure){
-					lib.setPressure(ui.window,ui.click.pressurepause);
-				}
+				lib.setPressure(ui.window,ui.click.pressurepause);
 
 				ui.window.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.window);
 				ui.system=ui.create.div("#system.",ui.window);
@@ -37388,8 +37386,8 @@
                 };
 				if(!lib.config.touchscreen){
 					uiintro.addEventListener('mouseleave',clickintro);
+					uiintro.addEventListener('click',clickintro);
 				}
-				uiintro.addEventListener('click',clickintro);
 
 				game.pause2();
 				return uiintro;
@@ -37615,7 +37613,7 @@
 				e.stopPropagation();
 			},
 			forcetouch:function(){
-				if(_status.force){
+				if(_status.force||_status.dragged){
 					clearInterval(window.forcetouchinterval);
 					delete window.forcetouchinterval;
 					return;
