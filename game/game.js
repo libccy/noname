@@ -31228,7 +31228,7 @@
 									ui.create.div('.text.author','作者：'+list[i][1]+'<span>('+list[i][4]+')</span>',node);
                                     ui.create.div('.text',list[i][2],node);
 									if(list[i][5]){
-										ui.create.div('.text','<span class="hrefnode">下载配音素材',node,function(){
+										ui.create.div('.text','<span class="hrefnode">网盘链接',node,function(){
 											game.open(this.link);
 										}).link=list[i][5];
 									}
