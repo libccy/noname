@@ -37386,7 +37386,9 @@
                     delete _status.removePop;
                     return true;
                 };
-				uiintro.addEventListener('mouseleave',clickintro);
+				if(!lib.config.touchscreen){
+					uiintro.addEventListener('mouseleave',clickintro);
+				}
 				uiintro.addEventListener('click',clickintro);
 
 				game.pause2();
@@ -37627,20 +37629,28 @@
 								ui.click.touchpop();
 								ui.click.longpresscallback.call(_status.longpressing);
 							}
-							// else{
-							// 	switch(lib.config.pressure_click){
-							// 		case 'pause':ui.click.pause();break;
-							// 		case 'auto':ui.click.auto();break;
-							// 		case 'config':ui.click.config();break;
-							// 	}
-							// }
+							else if(!_status.forceright){
+								_status.forceright=true;
+								setTimeout(function(){
+									_status.forceright=false;
+								},600);
+								switch(lib.config.pressure_click){
+									case 'pause':ui.click.pause();break;
+									case 'auto':ui.click.auto();break;
+									case 'config':ui.click.config();break;
+								}
+							}
 						}
 					}
 				});
 			},
 			pressurepause:function(force,event){
-				if(!_status.force&&!_status.mousedragging&&force>=0.5){
+				if(!_status.force&&!_status.mousedragging&&force>=0.5&&!_status.forceright){
 					_status.force=true;
+					_status.forceright=true;
+					setTimeout(function(){
+						_status.forceright=false;
+					},600);
 					switch(lib.config.pressure_click){
 						case 'pause':ui.click.pause();break;
 						case 'auto':ui.click.auto();break;
