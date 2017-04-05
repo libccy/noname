@@ -189,10 +189,12 @@ body{
 
 .popup-container>.menu.visual>.button.dashedmenubutton{
 	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px !important;
-	width: 90px;
-	height: 90px;
 	border: none;
 	background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)) !important;
+}
+.popup-container>.menu.visual>.button.dashedmenubutton:not(.hpbutton){
+	width: 90px;
+	height: 90px;
 }
 .popup-container>.menu.visual>.button.dashedmenubutton.controlbutton{
     height: 26px;

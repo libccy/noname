@@ -236,7 +236,12 @@
 					show_splash:{
 						name:'显示开始界面',
 						intro:'游戏开始前进入模式选择画面',
-						init:false,
+						init:'init',
+						item:{
+							off:'关闭',
+							init:'首次启动',
+							always:'保持开启',
+						}
 					},
 					game_speed:{
 						name:'游戏速度',
@@ -5919,11 +5924,21 @@
     						}
     					}
     				};
+					var show_splash=lib.config.show_splash;
+					if(show_splash=='off'){
+						show_splash=false;
+					}
+					else if(show_splash=='init'){
+						if(localStorage.getItem('show_splash_off')){
+							show_splash=false;
+						}
+					}
+					localStorage.removeItem('show_splash_off');
     				if(localStorage.getItem(lib.configprefix+'playback')){
     					toLoad++;
     					lib.init.js(lib.assetURL+'mode',lib.config.mode,packLoaded,packLoaded);
     				}
-    				else if((localStorage.getItem(lib.configprefix+'directstart')||!lib.config.show_splash)&&
+    				else if((localStorage.getItem(lib.configprefix+'directstart')||!show_splash)&&
     					lib.config.all.mode.indexOf(lib.config.mode)!=-1){
     					toLoad++;
     					lib.init.js(lib.assetURL+'mode',lib.config.mode,packLoaded,packLoaded);
@@ -7150,6 +7165,10 @@
                         splash.classList.add('touch');
                         lib.setScroll(splash);
                     }
+					if(lib.config.player_border!='wide'){
+						splash.classList.add('slim');
+					}
+					splash.dataset.radius_size=lib.config.radius_size;
 					for(var i=0;i<lib.config.all.mode.length;i++){
 						var node=ui.create.div('.hidden',splash,clickNode);
 						node.link=lib.config.all.mode[i];
@@ -21973,6 +21992,7 @@
 			if(_status.video&&!_status.replayvideo){
 				localStorage.removeItem(lib.configprefix+'playbackmode');
 			}
+			localStorage.setItem('show_splash_off',true);
 			window.location.reload();
 		},
         exit:function(){

@@ -266,6 +266,30 @@ not(.removing):not(.dialog):not(.centermenu):not(.popup-container):not(.forceopa
 	background-size: cover;
 }
 
+#splash.slim>div>.splashtext{
+	right: 5px;
+	bottom: 5px;
+}
+#splash.slim>div>.avatar{
+	width: 90px;
+	height: calc(100% - 10px);
+	left: 5px;
+	top: 5px;
+}
+
+#splash[data-radius_size='reduce']>div>div,
+#splash[data-radius_size='reduce']>div {
+	border-radius: 4px;
+}
+#splash[data-radius_size='off']>div>div,
+#splash[data-radius_size='off']>div {
+	border-radius: 0px;
+}
+#splash[data-radius_size='increase']>div>div,
+#splash[data-radius_size='increase']>div {
+	border-radius: 12px;
+}
+
 #arena[data-global_font='xiaozhuan'] {
 	font-family: 'xiaozhuan';
 }
@@ -3864,6 +3888,7 @@ div:hover>.wunature {
 #window[data-radius_size='reduce'] #window>.dialog.popped,
 #window[data-radius_size='reduce'] .player.unseen .equips:not(*:empty),
 #window[data-radius_size='reduce'] .menu,
+#window[data-radius_size='reduce'] .left.pane>.menubutton,
 #window[data-radius_size='reduce'] #splash>div,
 #window[data-radius_size='reduce'].mobile:not(.chess) .player[data-position='0'] .equips {
 	border-radius: 4px;
@@ -3884,6 +3909,7 @@ div:hover>.wunature {
 #window[data-radius_size='off'] #window>.dialog.popped,
 #window[data-radius_size='off'] .player.unseen .equips:not(*:empty),
 #window[data-radius_size='off'] .menu,
+#window[data-radius_size='off'] .left.pane>.menubutton,
 #window[data-radius_size='off'] #splash>div,
 #window[data-radius_size='off'].mobile:not(.chess) .player[data-position='0'] .equips {
 	border-radius: 0px;
@@ -3904,6 +3930,7 @@ div:hover>.wunature {
 #window[data-radius_size='increase'] #window>.dialog.popped,
 #window[data-radius_size='increase'] .player.unseen .equips:not(*:empty),
 #window[data-radius_size='increase'] .menu,
+#window[data-radius_size='increase'] .left.pane>.menubutton,
 #window[data-radius_size='increase'] #splash>div,
 #window[data-radius_size='increase'].mobile:not(.chess) .player[data-position='0'] .equips {
 	border-radius: 16px;

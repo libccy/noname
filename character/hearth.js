@@ -2766,6 +2766,7 @@ character.hearth={
 					target.$draw();
 					target.addExpose(0.2);
 					player.line(target,'green');
+					game.log(player,'和',target,'获得了一张锦囊牌');
 				}
 				'step 1'
 				game.delay();
