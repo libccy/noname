@@ -124,6 +124,18 @@
 						unfrequent:true,
 						intro:'当候选目标只有1个时，点击目标后无需再点击确认',
 					},
+					wuxie_self:{
+						name:'不无懈自己',
+						init:true,
+						unfrequent:true,
+						intro:'自己使用的单目标普通锦囊即将生效时，不询问无懈',
+					},
+					tao_enemy:{
+						name:'不对敌方出桃',
+						init:false,
+						intro:'双方阵营明确的模式中（如对决），敌方角色濒死时不询问出桃',
+						unfrequent:true,
+					},
 					enable_drag:{
 						name:'启用拖拽',
 						init:true,
@@ -142,15 +154,22 @@
 						unfrequent:true,
 						intro:'拖拽时显示虚线，可能降低游戏速度',
 					},
-					wuxie_self:{
-						name:'不无懈自己',
+					enable_pressure:{
+						name:'启用压感',
 						init:true,
-						intro:'自己使用的单目标普通锦囊即将生效时，不询问无懈',
+						intro:'开启后可通过按压执行操作',
+						unfrequent:true,
 					},
-					tao_enemy:{
-						name:'不对敌方使用桃',
-						init:false,
-						intro:'双方阵营明确的模式中（如对决），敌方角色濒死时不询问出桃',
+					pressure_click:{
+						name:'按压操作',
+						init:'pause',
+						intro:'在空白区域按压时的操作',
+						unfrequent:true,
+						item:{
+							pause:'暂停',
+							config:'选项',
+							auto:'托管',
+						}
 					},
 					touchscreen:{
 						name:'触屏模式',
@@ -210,7 +229,7 @@
 					swipe_right:{
 						name:'右划操作',
 						intro:'向右滑动时执行的操作',
-						init:'chat',
+						init:'system',
 						unfrequent:true,
 						item:{
 							system:'显示按钮',
@@ -265,17 +284,6 @@
 						name:'开启震动',
 						intro:'回合开始时使手机震动',
 						init:false
-					},
-					pressure_click:{
-						name:'按压操作',
-						init:'pause',
-						intro:'在空白区域按压时的操作',
-						unfrequent:true,
-						item:{
-							pause:'暂停',
-							config:'选项',
-							auto:'托管',
-						}
 					},
 					right_click:{
 						name:'右键操作',
@@ -400,6 +408,12 @@
 						}
 						else{
 							map.enable_vibrate.hide();
+						}
+						if(config.enable_pressure){
+							map.pressure_click.show();
+						}
+						else{
+							map.pressure_click.hide();
 						}
 						if(lib.config.touchscreen){
 							map.mousewheel.hide();
@@ -5979,7 +5993,7 @@
     				lib.init.js(lib.assetURL+'card',lib.config.all.cards,packLoaded,packLoaded);
     				lib.init.js(lib.assetURL+'character',lib.config.all.characters,packLoaded,packLoaded);
     				lib.init.js(lib.assetURL+'character','rank',packLoaded,packLoaded);
-					if(lib.device!='ios') lib.init.js(lib.assetURL+'game','pressure');
+					if(lib.device!='ios'&&lib.config.enable_pressure) lib.init.js(lib.assetURL+'game','pressure');
                 };
                 if(extensionlist.length){
                     window.game=game;
@@ -35557,7 +35571,7 @@
 						time:get.utc()
 					}
 				}
-				if(window.ForceTouch&&!_status.paused2&&!_status.forcetouchinterval){
+				if(window.ForceTouch&&!_status.paused2&&!_status.forcetouchinterval&&lib.config.enable_pressure){
 					_status.forcetouchinterval=setInterval(ui.click.forcetouch,30);
 				}
 			},
@@ -35755,9 +35769,9 @@
 			},
 			windowtouchend:function(e){
 				delete _status.force;
-				if(window.forcetouchinterval){
-					clearInterval(window.forcetouchinterval);
-					delete window.forcetouchinterval;
+				if(_status.forcetouchinterval){
+					clearInterval(_status.forcetouchinterval);
+					delete _status.forcetouchinterval;
 				}
 				if(window.inSplash) return;
 				if(e.touches.length==1&&!_status.dragged&&!_status.draggingtouchdialog){
@@ -36229,9 +36243,7 @@
 				}
 			},
 			cardtouchmove:function(e){
-				if(this._longpresstimeout){
-					ui.click.longpresscancel.call(this);
-				}
+				ui.click.longpresscancel.call(this);
 				if(this._waitingfordrag){
 					var drag=this._waitingfordrag;
 					_status.clicked=false;
@@ -36250,9 +36262,9 @@
 			},
 			windowmouseup:function(e){
 				delete _status.force;
-				if(window.forcetouchinterval){
-					clearInterval(window.forcetouchinterval);
-					delete window.forcetouchinterval;
+				if(_status.forcetouchinterval){
+					clearInterval(_status.forcetouchinterval);
+					delete _status.forcetouchinterval;
 				}
 				if(window.inSplash) return;
 				if(_status.draggingdialog){
@@ -36383,7 +36395,7 @@
 				if(_status.longpressing&&_status.longpressing!=this){
 					ui.click.longpresscancel.call(_status.longpressing);
 				}
-				if(window.ForceTouch&&!_status.paused2&&!_status.forcetouchinterval){
+				if(window.ForceTouch&&!_status.paused2&&!_status.forcetouchinterval&&lib.config.enable_pressure){
 					_status.forcetouchinterval=setInterval(ui.click.forcetouch,30);
 				}
 				_status.longpressing=this;
@@ -36420,10 +36432,10 @@
 				if(this._longpresstimeout){
 					clearTimeout(this._longpresstimeout);
 					delete this._longpresstimeout;
-					delete this._longpressevent;
-					if(_status.longpressing==this){
-						delete _status.longpressing;
-					}
+				}
+				delete this._longpressevent;
+				if(_status.longpressing==this){
+					delete _status.longpressing;
 				}
 			},
 			window:function(){
@@ -37628,8 +37640,8 @@
 			},
 			forcetouch:function(){
 				if(_status.force||_status.dragged){
-					clearInterval(window.forcetouchinterval);
-					delete window.forcetouchinterval;
+					clearInterval(_status.forcetouchinterval);
+					delete _status.forcetouchinterval;
 					return;
 				}
 				window.ForceTouch.getForceTouchData(function(ForceTouchData){
@@ -37692,13 +37704,6 @@
 				if(_status.clickedplayer){
 					return false;
 				}
-				// if(this._mouseentercreated){
-				// 	this._mouseentercreated=false;
-				// 	ui.click.window();
-				// }
-				// else{
-				// 	ui.click.intro.call(this,e);
-				// }
 
 				if(this._mouseenterdialog&&this._mouseenterdialog.parentNode){
 					this._mouseenterdialog.delete();
