@@ -93,6 +93,8 @@ window.config={
 	asset_font:true,
 
 	card_font:'xiaozhuan',
+	show_statusbar_ios:'off',
+	show_statusbar_android:false,
 	show_name:true,
 	show_replay:false,
 	show_pause:true,
