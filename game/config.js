@@ -56,6 +56,7 @@ window.config={
 	hover_handcard:true,
 	hover_all:true,
 	right_info:true,
+	longpress_info:true,
 	long_info:true,
 	background_music:'music_default',
 	background_audio:true,

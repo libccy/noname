@@ -288,6 +288,13 @@
 							auto:'托管',
 						}
 					},
+					longpress_info:{
+						name:'长按显示信息',
+						init:true,
+						unfrequent:true,
+						restart:true,
+						intro:'长按后弹出菜单',
+					},
 					right_info:{
 						name:'右键显示信息',
 						init:true,
@@ -401,6 +408,7 @@
 							map.hoveration.hide();
 							map.right_info.hide();
 							map.right_click.hide();
+							map.longpress_info.show();
 							map.swipe.show();
 							if(lib.config.swipe){
 								map.swipe_up.show();
@@ -420,6 +428,7 @@
 							map.hover_all.show();
 							map.right_info.show();
 							map.right_click.show();
+							map.longpress_info.hide();
 							if(!config.hover_all){
 								map.hover_handcard.hide();
 								map.hoveration.hide();
@@ -35548,7 +35557,7 @@
 						time:get.utc()
 					}
 				}
-				if(window.ForceTouch){
+				if(window.ForceTouch&&!_status.paused2&&!_status.forcetouchinterval){
 					_status.forcetouchinterval=setInterval(ui.click.forcetouch,30);
 				}
 			},
@@ -36367,10 +36376,15 @@
 				if(this._longpresstimeout){
 					clearTimeout(this._longpresstimeout);
 				}
-				this._longpresstimeout=setTimeout(ui.click.longpresscallback,500);
+				if(lib.config.longpress_info){
+					this._longpresstimeout=setTimeout(ui.click.longpresscallback,500);
+				}
 				this._longpressevent=e;
 				if(_status.longpressing&&_status.longpressing!=this){
 					ui.click.longpresscancel.call(_status.longpressing);
+				}
+				if(window.ForceTouch&&!_status.paused2&&!_status.forcetouchinterval){
+					_status.forcetouchinterval=setInterval(ui.click.forcetouch,30);
 				}
 				_status.longpressing=this;
 			},
