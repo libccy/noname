@@ -22,7 +22,7 @@
         versionOL:23,
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
         mirrorURL:'https://coding.net/u/libccy/p/noname/git/raw',
-		extensionURL:'http://websha.cn/web/',
+		extensionURL:'http://extension-1252061710.costj.myqcloud.com/',
         hallURL:'websha.cn',
 		assetURL:'',
 		changeLog:[],
