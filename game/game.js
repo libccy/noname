@@ -20654,9 +20654,9 @@
             }
             else{
                 var zip=new JSZip();
-                zip.load(data);
-                var str=zip.file('extension.js').asText();
                 try{
+	                zip.load(data);
+	                var str=zip.file('extension.js').asText();
                     _status.importingExtension=true;
                     eval(str);
                     _status.importingExtension=false;
@@ -31184,7 +31184,7 @@
                             this.classList.add('button-downloading');
 							var progress=ui.create.div('.button-progress',this);
 							ui.create.div(progress);
-							var url=lib.extensionURL+this.info[0]+'.zip';
+							var url=lib.extensionURL+this.filename+'.zip';
 							var onprogress=function(byte,total){
 								if(total){
 									size=total;
@@ -31234,8 +31234,7 @@
 								var list=window.noname_extension_list;
 								delete window.noname_extension_list;
 								loading.style.display='none';
-								for(var i=0;i<list.length;i++){
-									var info=list[i];
+								for(var i in list){
 									var node=ui.create.div('.videonode.menubutton.extension.large',page,clickExtension);
                                     ui.create.div('.caption',list[i][0],node);
 									ui.create.div('.text.author','作者：'+list[i][1]+'<span>('+list[i][4]+')</span>',node);
@@ -31261,10 +31260,11 @@
 	                                        }
 	                                    }
 	                                    download.info=list[i];
+										download.filename=i;
 									}
 									else{
 										var a=ui.create.node('a',download);
-										a.href=lib.extensionURL+list[i][0]+'.zip';
+										a.href=lib.extensionURL+i+'.zip';
 										a.download=true;
 									}
 								}
