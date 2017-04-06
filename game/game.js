@@ -22,7 +22,7 @@
         versionOL:23,
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
         mirrorURL:'https://coding.net/u/libccy/p/noname/git/raw',
-		extensionURL:'https://coding.net/u/libccy/p/noname-extension/git/raw/master/',
+		extensionURL:'http://websha.cn/web/',
         hallURL:'websha.cn',
 		assetURL:'',
 		changeLog:[],
@@ -35153,7 +35153,7 @@
     						if(get.is.phoneLayout()){
     							transstr+=' scale(1.3)';
     						}
-    						if(get.is.newLayout()&&this.parentNode.isLinked()){
+    						if(get.is.newLayout()&&this.parentNode.classList.contains('linked')){
     							transstr+=' rotate(90deg)';
     						}
     						node.style.transform=transstr;

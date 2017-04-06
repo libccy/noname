@@ -346,6 +346,56 @@ character.gwent={
 				player.draw();
 			}
 		},
+		gwchuanxin_old:{
+			trigger:{player:'shaAfter'},
+			filter:function(event,player){
+				if(player.storage.gwchuanxin&&player.storage.gwchuanxin.length>=4) return false;
+				return event.target.isAlive();
+			},
+			check:function(event,player){
+				return get.effect(event.target,{name:'sha'},player,player)>0
+			},
+			logTarget:'target',
+			logLine:false,
+			content:function(){
+				'step 0'
+				event.card=get.cards()[0];
+				player.showCards(event.card,get.translation(player)+'对'+get.translation(trigger.player)+'发动了【穿心】');
+				'step 1'
+				if(player.storage.gwchuanxin&&!player.storage.gwchuanxin.contains(get.suit(event.card))){
+					player.useCard({name:'sha'},[event.card],trigger.target,false);
+				}
+			},
+			group:['gwchuanxin_count1','gwchuanxin_count2'],
+			subSkill:{
+				count1:{
+					trigger:{global:'phaseBegin'},
+					forced:true,
+					popup:false,
+					silent:true,
+					content:function(){
+						player.storage.gwchuanxin=[];
+					}
+				},
+				count2:{
+					trigger:{player:'useCard'},
+					forced:true,
+					popup:false,
+					silent:true,
+					// filter:function(event){
+					// 	return event.card&&event.card.name=='sha';
+					// },
+					content:function(){
+						for(var i=0;i<trigger.cards.length;i++){
+							player.storage.gwchuanxin.add(get.suit(trigger.cards[i]));
+						}
+					}
+				}
+			},
+			ai:{
+				presha:true,
+			}
+		},
 		gwchuanxin:{
 			trigger:{player:'shaAfter'},
 			filter:function(event,player){
@@ -364,6 +414,11 @@ character.gwent={
 				'step 1'
 				if(result.color=='black'){
 					player.useCard({name:'sha'},trigger.target,false);
+				}
+			},
+			mod:{
+				attackFrom:function(from,to,distance){
+					return distance-from.hp;
 				}
 			}
 		},
@@ -837,7 +892,7 @@ character.gwent={
 		gwzhanjiang:'斩将',
 		gwzhanjiang_info:'每轮限一次，在一名角色的准备阶段，你可以弃置一张牌，然后所有角色可以对该角色使用一张杀，出杀的角色在响应时摸一张牌，当有至少两名角色响应后停止结算',
 		gwchuanxin:'穿心',
-		gwchuanxin_info:'每当你对一名角色使用杀结算完毕后，你可以进行一判定，若结果为黑色，视为对目标再使用一张杀',
+		gwchuanxin_info:'你的攻击范围+X，X为你当前体力值；每当你对一名角色使用杀结算完毕后，你可以进行一判定，若结果为黑色，视为对目标再使用一张杀',
 		fengjian:'风剑',
 		fengjian_info:'每当你使用一张锦囊牌，你可以视为对一名不是此牌目标的角色使用一张雷杀，若如此做，你获得潜行直到下一回合开始',
 		huandie:'幻蝶',
