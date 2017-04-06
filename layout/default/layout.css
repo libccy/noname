@@ -290,23 +290,23 @@ not(.removing):not(.dialog):not(.centermenu):not(.popup-container):not(.forceopa
 	border-radius: 12px;
 }
 
-#arena[data-global_font='xiaozhuan'] {
+#window[data-global_font='xiaozhuan'] {
 	font-family: 'xiaozhuan';
 }
-#arena[data-global_font='lishu'] {
+#window[data-global_font='lishu'] {
 	font-family: 'lishu';
 }
-#arena[data-global_font='xinwei'] {
+#window[data-global_font='xinwei'] {
 	font-family: 'xinwei';
 }
-#arena[data-global_font='huangcao'] {
+#window[data-global_font='huangcao'] {
 	font-family: 'huangcao','xinwei';
 }
 
-#arena[data-global_font='xiaozhuan'] #control,
-#arena[data-global_font='lishu'] #control,
-#arena[data-global_font='xinwei'] #control,
-#arena[data-global_font='huangcao'] #control {
+#window[data-global_font='xiaozhuan'] #control,
+#window[data-global_font='lishu'] #control,
+#window[data-global_font='xinwei'] #control,
+#window[data-global_font='huangcao'] #control {
 	font-family: 'STHeiti','SimHei','Microsoft JhengHei','Microsoft YaHei','WenQuanYi Micro Hei',Helvetica,Arial,sans-serif
 }
 

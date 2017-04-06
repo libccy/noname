@@ -2306,11 +2306,14 @@
 							if(link!='default'){
 								node.style.fontFamily=link;
 							}
+							else{
+								node.style.fontFamily="'STHeiti','SimHei','Microsoft JhengHei','Microsoft YaHei','WenQuanYi Micro Hei',Helvetica,Arial,sans-serif";
+							}
 							node.style.fontSize='20px';
 						},
 						onclick:function(font){
 							game.saveConfig('global_font',font);
-							ui.arena.dataset.global_font=font;
+							ui.window.dataset.global_font=font;
 						}
 					},
 					// font_size:{
@@ -2463,7 +2466,12 @@
 						if(get.is.phoneLayout()){
                             map.show_time2.show();
                             map.show_time.hide();
-                            map.watchface.show();
+							if(lib.config.show_time2){
+								map.watchface.show();
+							}
+                            else{
+								map.watchface.hide();
+							}
                         }
                         else{
                             map.show_time2.hide();
@@ -2680,27 +2688,45 @@
 						intro:'移动对话框后新的对话框也将在移动后的位置显示',
 						init:false,
 						unfrequent:true,
-					},
-					reset_dialog:{
-						name:'重置对话框位置',
-						clear:true,
-						unfrequent:true,
-						onclick:function(){
-							if(ui.dialog){
-								var dialog=ui.dialog;
-								dialog.style.transform='';
-								dialog._dragtransform=[0,0];
-								dialog.style.transition='all 0.3s';
-								dialog._dragtouches;
-								dialog._dragorigin;
-								dialog._dragorigintransform;
-								setTimeout(function(){
-									dialog.style.transition='';
-								},500);
+						onclick:function(bool){
+							game.saveConfig('remember_dialog',bool);
+							if(!bool){
+								if(ui.dialog){
+									var dialog=ui.dialog;
+									dialog.style.transform='';
+									dialog._dragtransform=[0,0];
+									dialog.style.transition='all 0.3s';
+									dialog._dragtouches;
+									dialog._dragorigin;
+									dialog._dragorigintransform;
+									setTimeout(function(){
+										dialog.style.transition='';
+									},500);
+								}
+								game.saveConfig('dialog_transform',[0,0]);
 							}
-							game.saveConfig('dialog_transform',[0,0]);
 						}
 					},
+					// reset_dialog:{
+					// 	name:'重置对话框位置',
+					// 	clear:true,
+					// 	unfrequent:true,
+					// 	onclick:function(){
+					// 		if(ui.dialog){
+					// 			var dialog=ui.dialog;
+					// 			dialog.style.transform='';
+					// 			dialog._dragtransform=[0,0];
+					// 			dialog.style.transition='all 0.3s';
+					// 			dialog._dragtouches;
+					// 			dialog._dragorigin;
+					// 			dialog._dragorigintransform;
+					// 			setTimeout(function(){
+					// 				dialog.style.transition='';
+					// 			},500);
+					// 		}
+					// 		game.saveConfig('dialog_transform',[0,0]);
+					// 	}
+					// },
 					remember_round_button:{
 						name:'记住按钮位置',
 						intro:'重新开始后触屏按钮将保存的上一局的位置',
@@ -20796,7 +20822,6 @@
 		},
         multiDownload2:function(list,onsuccess,onerror,onfinish,process,dev){
             list=list.slice(0);
-            if(lib.config.dev) game.print(get.url());
             var download=function(){
                 if(list.length){
                     var current=list.shift();
@@ -20831,6 +20856,7 @@
             download();
         },
 		multiDownload:function(list,onsuccess,onerror,onfinish,process,dev){
+			if(lib.config.dev) game.print(get.url());
 			var args=Array.from(arguments);
 			if(list.length<=3){
 				game.multiDownload2.apply(this,args);
@@ -33978,7 +34004,7 @@
 				ui.arena.dataset.name_font=lib.config.name_font||'xinwei';
 				ui.arena.dataset.identity_font=lib.config.identity_font||'huangcao';
 				ui.arena.dataset.cardtext_font=lib.config.cardtext_font||'default';
-				ui.arena.dataset.global_font=lib.config.global_font||'default';
+				ui.window.dataset.global_font=lib.config.global_font||'default';
 				// ui.arena.dataset.font_size=lib.config.font_size||'16';
 				ui.arena.dataset.glow_phase=lib.config.glow_phase;
 				ui.backgroundMusic=document.createElement('audio');

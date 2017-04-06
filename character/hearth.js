@@ -6458,7 +6458,7 @@ character.hearth={
 		enze_info_alter:'出牌阶段限一次，你可以指定一名角色令其手牌数与你相等（最多摸或弃两张牌）',
 		chongsheng:'重生',
 		chongsheng_bg:'生',
-		chongsheng_info:'濒死阶段，你可弃置所有牌，将体力回复至2-X，并摸X张牌，X为你本局发动此技能的次数。每局最多发动2次',
+		chongsheng_info:'濒死阶段，你可弃置所有牌，将体力回复至2-X，并摸2-X张牌，X为你本局发动此技能的次数。每局最多发动2次',
 		s_tuteng:'神谕',
 		s_tuteng_info:'锁定技，准备阶段，你随机获得一个图腾，若你已有至少3个图腾，则改为随机替换一个图腾',
 		guozai:'过载',
