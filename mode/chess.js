@@ -1992,6 +1992,12 @@ mode.chess={
 				ui.wuxie.hide();
 				ui.auto.hide();
 				ui.money=ui.create.div(ui.window);
+				lib.setIntro(ui.money,function(uiintro){
+					uiintro.add('<span style="font-family:xinwei">'+game.data.money+'金币');
+					uiintro.addText('通过战斗或竞技场可获得金币。花费100金币可招募3名随机武将；花费150金币可参加一次竞技场');
+					uiintro.add('<span style="font-family:xinwei">'+game.data.dust+'招募令');
+					uiintro.addText('通过遣返武将或竞技场可获得招募令。挑战武将成功后可通过招募令招募该武将，普通/稀有/史诗/传说武将分别花费40/100/400/1600招募令');
+				});
 				ui.money.innerHTML='<span>⚑</span><span>'+game.data.dust+'</span>'+
 					'<span>㉤</span><span>'+game.data.money+'</span>';
 				ui.money.style.top='auto';
@@ -2054,6 +2060,7 @@ mode.chess={
 					node.style.transition='all 0.7s';
 					node.style.opacity=0;
 					node.style.zIndex=4;
+					node.classList.add('pointerdiv');
 
 					var kaibao=false;
 					if(!name||typeof i=='string'){
@@ -2555,6 +2562,19 @@ mode.chess={
 				event.removeCharacter.style.opacity=0.5;
 				event.fight=ui.create.control('开始战斗','nozoom',function(){
 					if(_status.kaibao||_status.qianfan) return;
+					if(selected.challenge.length){
+						var cname=selected.challenge[0].link;
+						var rarity=game.getRarity(cname);
+						switch(rarity){
+							case 'common':rarity=40;break;
+							case 'rare':rarity=100;break;
+							case 'epic':rarity=400;break;
+							case 'legend':rarity=1600;break;
+						}
+						if(!confirm('即将挑战'+get.translation(cname)+'，战斗胜利后可消耗'+rarity+'招募令招募该武将，无论是否招募，挑战列表将被刷新。是否继续？')){
+							return;
+						}
+					}
 					_status.enemylist=[];
 					_status.mylist=[];
 					if(selected.lord.length){
@@ -2989,6 +3009,7 @@ mode.chess={
 						}
 					},200);
 				},200);
+				lib.init.onfree();
 				game.pause();
 				'step 5'
 				if(event.arenachoice.length<9){

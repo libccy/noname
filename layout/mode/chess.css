@@ -234,6 +234,7 @@
 #arena.leaderhide>*:not(canvas){
     opacity:0 !important;
     transition: all 0.5s !important;
+    pointer-events: none;
 }
 #arena.leadercontrol>#control{
     transition: all 0.5s !important;
