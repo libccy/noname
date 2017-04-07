@@ -68,7 +68,9 @@
 #mebg,#me,#autonode{
     height:120px;
 }
-
+#window:not(.nopointer) .dialog.pointerbutton .buttons .button:not(.unselectable){
+    cursor: pointer !important;
+}
 #system{
     z-index:5;
 }

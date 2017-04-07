@@ -5,9 +5,9 @@ mode.chess={
 	start:function(){
 		"step 0"
 		_status.mode=get.config('chess_mode');
-		if(_status.mode=='leader'){
-			_status.mode='combat';
-		}
+		// if(_status.mode=='leader'){
+		// 	_status.mode='combat';
+		// }
 		if(lib.config.test_game){
 			_status.mode='combat';
 		}
@@ -2233,6 +2233,7 @@ mode.chess={
 				dialog1.classList.add('fullheight');
 				dialog1.classList.add('halfleft');
 				dialog1.classList.add('fixed');
+				dialog1.classList.add('pointerbutton');
 				dialog1.add([game.leaderLord,'character']);
 				var i;
 				for(i=0;i<dialog1.buttons.length;i++){
@@ -2317,6 +2318,7 @@ mode.chess={
 				dialog2.classList.add('fullheight');
 				dialog2.classList.add('halfright');
 				dialog2.classList.add('fixed');
+				dialog2.classList.add('pointerbutton');
 				dialog2.add([[
 					['','','leader_easy'],
 					['','','leader_medium'],
@@ -2351,6 +2353,7 @@ mode.chess={
 					fixButton(dialog2.buttons[i])
 				}
 				dialog2.open();
+				dialog1.classList.remove('hidden');
 
 				var selected={
 					lord:[],
@@ -2794,6 +2797,7 @@ mode.chess={
 					}
 					clearSelected();
 				};
+				lib.init.onfree();
 				game.pause();
 				'step 2'
 				if(!game.data.arena){
@@ -5715,8 +5719,19 @@ mode.chess={
 				'hs_malygos',
 				'hs_ysera',
 				'hanba',
+				'hs_aya',
+				'hs_kazhakusi',
+				'gw_jieluote',
+				'gw_yenaifa',
+				'gw_telisi',
+				'gw_xili',
+				'swd_huiyan',
 	        ],
 	        epic:[
+				'hs_tyrande',
+				'yxs_libai',
+				'swd_shuwaner',
+				'swd_kendi',
 				'lingju',
 				'daxiaoqiao',
 				'sunxiu',
@@ -5787,8 +5802,18 @@ mode.chess={
 				'hs_xuefashi',
 				'hs_liadrin',
 				'yxs_libai',
+				'gw_aisinie',
+				'gw_falanxisika',
+				'pal_lixiaoyao',
+				'pal_xingxuan',
+				'gjqt_ouyangshaogong',
+				'gjqt_xunfang',
 	        ],
 	        rare:[
+				'pal_nangonghuang',
+				'pal_wangpengxu',
+				'gw_yioufeisi',
+				'gw_luoqi',
 				'sunluban',
 				'sunluyu',
 				'zhangliang',
@@ -5809,6 +5834,7 @@ mode.chess={
 				'mayunlu',
 				're_liubei',
 				're_lidian',
+				'swd_xiaohuanglong',
 				'hs_alleria',
 				'jsp_huangyueying',
 				'hs_lreno',
