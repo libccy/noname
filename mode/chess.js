@@ -2324,27 +2324,51 @@ mode.chess={
 					['','','leader_medium'],
 					['','','leader_hard']
 				],'vcard']);
-				for(i=0;i<dialog2.buttons.length;i++){
-					dialog2.buttons[i].node.name.style.fontFamily='xinwei';
-					dialog2.buttons[i].node.name.style.fontSize='30px';
-					dialog2.buttons[i].node.name.style.left='4px';
-					dialog2.buttons[i].node.name.dataset.color='unknownm';
-					dialog2.buttons[i]._nopup=true;
-					dialog2.buttons[i].area='difficulty';
-				}
+				// for(i=0;i<dialog2.buttons.length;i++){
+				// 	dialog2.buttons[i].node.name.style.fontFamily='xinwei';
+				// 	dialog2.buttons[i].node.name.style.fontSize='30px';
+				// 	dialog2.buttons[i].node.name.style.left='4px';
+				// 	dialog2.buttons[i].node.name.dataset.color='unknownm';
+				// 	dialog2.buttons[i]._nopup=true;
+				// 	dialog2.buttons[i].area='difficulty';
+				// }
 				dialog2.add('敌方人数');
-				dialog2.addSmall([[
+				dialog2.add([[
 					['','','leader_2'],
 					['','','leader_3'],
 					['','','leader_5'],
 					['','','leader_8'],
 				],'vcard']);
-				for(;i<dialog2.buttons.length;i++){
-					dialog2.buttons[i].style.background='rgba(0,0,0,0.2)';
-					dialog2.buttons[i].style.boxShadow='rgba(0, 0, 0, 0.3) 0 0 0 1px';
-					dialog2.buttons[i].node.background.style.fontFamily='xinwei';
+				for(i=0;i<dialog2.buttons.length;i++){
+					dialog2.buttons[i].className='menubutton large pointerdiv';
+					dialog2.buttons[i].innerHTML=dialog2.buttons[i].node.background.innerHTML;
+					dialog2.buttons[i].style.position='relative';
+					dialog2.buttons[i].style.fontSize='';
+					dialog2.buttons[i].style.color='';
+					dialog2.buttons[i].style.textShadow='';
 					dialog2.buttons[i]._nopup=true;
-					dialog2.buttons[i].area='number';
+					dialog2.buttons[i].style.marginLeft='4px';
+					dialog2.buttons[i].style.marginRight='4px';
+
+					if(i<3){
+						dialog2.buttons[i].area='difficulty';
+					}
+					else{
+						dialog2.buttons[i].area='number';
+					}
+					// if(i<3){
+					// 	dialog2.buttons[i].style.width='160px';
+					// 	dialog2.buttons[i].node.background.classList.remove('tight');
+					// 	dialog2.buttons[i].node.background.style.whiteSpace='nowrap';
+					// }
+					// dialog2.buttons[i].style.background='rgba(0,0,0,0.2)';
+					// dialog2.buttons[i].style.boxShadow='rgba(0, 0, 0, 0.3) 0 0 0 1px';
+					// dialog2.buttons[i].node.background.style.fontFamily='lishu';
+					// dialog2.buttons[i]._nopup=true;
+					// dialog2.buttons[i].area='number';
+					// dialog2.buttons[i].classList.add('menubg');
+					// dialog2.buttons[i].classList.add('large');
+					// dialog2.buttons[i].classList.remove('card');
 				}
 				dialog2.add('挑战武将');
 				dialog2.add([game.data.challenge,'character']);
@@ -5243,9 +5267,12 @@ mode.chess={
 		leader_8:' ',
 		leader_8_bg:'八',
 
-		leader_easy:'简单',
-		leader_medium:'普通',
-		leader_hard:'困难',
+		leader_easy:' ',
+		leader_easy_bg:'简单',
+		leader_medium:' ',
+		leader_medium_bg:'普通',
+		leader_hard:' ',
+		leader_hard_bg:'困难',
 
 		chess_caocao:'曹操',
 		chess_xunyu:'荀彧',
@@ -5610,19 +5637,19 @@ mode.chess={
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
-			image:'mode/chess/difficulty/leader_easy'
+			// image:'mode/chess/difficulty/leader_easy'
 		},
 		leader_medium:{
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
-			image:'mode/chess/difficulty/leader_medium'
+			// image:'mode/chess/difficulty/leader_medium'
 		},
 		leader_hard:{
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
-			image:'mode/chess/difficulty/leader_hard'
+			// image:'mode/chess/difficulty/leader_hard'
 		}
 	},
 	characterPack:{
