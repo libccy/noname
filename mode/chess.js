@@ -2398,10 +2398,11 @@ mode.chess={
 					for(var j in selected){
 						selected[j].length=0;
 					}
+					event.removeCharacter.style.opacity=0.5;
 				}
 				event.enterArena=ui.create.control('竞技场','nozoom',function(){
 					if(game.data.money<150&&!game.data._arena) return;
-					if(_status.zhaomu||_status.qianfan||_status.kaibao) return;
+					if(_status.qianfan||_status.kaibao) return;
 					if(!game.data._arena) game.changeMoney(-150);
 					_status.enterArena=true;
 					game.resume();
@@ -2454,7 +2455,7 @@ mode.chess={
 								event.cardnodes.push(cardNode(2));
 								ui.money.childNodes[1].innerHTML=game.data.dust;
 								game.changeMoney(-100);
-								if(game.data.character.length>3){
+								if(game.data.character.length>3&&selected.character.length){
 									event.removeCharacter.style.opacity=1;
 								}
 								if(game.data.money<150&&!game.data._arena){
@@ -2474,22 +2475,6 @@ mode.chess={
 						},200);
 					},500);
 				};
-				var zhaomu=function(){
-					if(_status.qianfan||_status.kaibao) return;
-					if(game.data.money<100) return;
-					_status.chessclicked=true;
-					_status.zhaomu=true;
-					event.removeCharacter.style.opacity=0.5;
-					event.fight.style.opacity=0.5;
-					clearSelected();
-					for(var i=0;i<dialog1.buttons.length;i++){
-						dialog1.buttons[i].classList.add('unselectable');
-					}
-					for(var i=0;i<dialog2.buttons.length;i++){
-						dialog2.buttons[i].classList.add('unselectable');
-					}
-					this.replace('确认招募',zhaomu2);
-				};
 				event.addCharacter=ui.create.control('招募','nozoom',zhaomu2);
 				if(game.data.money<150&&!game.data._arena){
 					event.enterArena.style.opacity=0.5;
@@ -2498,13 +2483,14 @@ mode.chess={
 					event.addCharacter.style.opacity=0.5;
 				}
 				var qianfan=function(){
-					if(_status.zhaomu||_status.kaibao) return;
+					if(_status.kaibao) return;
 					if(game.data.character.length<=3) return;
-					_status.chessclicked=true;
-					_status.qianfan=true;
-					event.enterArena.style.opacity=0.5;
-					event.addCharacter.style.opacity=0.5;
-					event.fight.style.opacity=0.5;
+					if(!selected.character.length) return;
+					// _status.chessclicked=true;
+					// _status.qianfan=true;
+					// event.enterArena.style.opacity=0.5;
+					// event.addCharacter.style.opacity=0.5;
+					// event.fight.style.opacity=0.5;
 					var current=selected.character.slice(0);
 					clearSelected();
 					var maxq=game.data.character.length-3;
@@ -2522,7 +2508,26 @@ mode.chess={
 					for(var i=0;i<dialog2.buttons.length;i++){
 						dialog2.buttons[i].classList.add('unselectable');
 					}
-					this.replace('确认遣返',function(){
+					if(!selected.character.length){
+						alert('至少需要保留3名武将');
+						return;
+					}
+					var translation=get.translation(selected.character[0].link);
+					for(var i=1;i<selected.character.length;i++){
+						translation+='、'+get.translation(selected.character[i].link);
+					}
+					var dust=0;
+					for(var i=0;i<selected.character.length;i++){
+						var node=selected.character[i];
+						var rarity=game.getRarity(node.link);
+						switch(rarity){
+							case 'common':dust+=5;break;
+							case 'rare':dust+=20;break;
+							case 'epic':dust+=100;break;
+							case 'legend':dust+=400;break;
+						}
+					}
+					if(confirm(translation+'将被遣返，一共将获得'+dust+'个招募令。是否确定遣返？')){
 						for(var i=0;i<selected.character.length;i++){
 							var node=selected.character[i];
 							var rarity=game.getRarity(node.link);
@@ -2534,9 +2539,6 @@ mode.chess={
 							}
 							game.data.character.remove(node.link);
 							game.saveData();
-							if(game.data.character.length<=3){
-								event.removeCharacter.style.opacity=0.5;
-							}
 							if(game.data.money>=100){
 								event.addCharacter.style.opacity=1;
 							}
@@ -2547,14 +2549,12 @@ mode.chess={
 							dialog1.buttons.remove(node);
 						}
 						initcapt();
-					});
+					}
 				};
 				event.removeCharacter=ui.create.control('遣返','nozoom',qianfan);
-				if(game.data.character.length<=3){
-					event.removeCharacter.style.opacity=0.5;
-				}
+				event.removeCharacter.style.opacity=0.5;
 				event.fight=ui.create.control('开始战斗','nozoom',function(){
-					if(_status.kaibao||_status.zhaomu||_status.qianfan) return;
+					if(_status.kaibao||_status.qianfan) return;
 					_status.enemylist=[];
 					_status.mylist=[];
 					if(selected.lord.length){
@@ -2763,6 +2763,12 @@ mode.chess={
 							break;
 						}
 					}
+					if(selected.character.length&&game.data.character.length>3){
+						event.removeCharacter.style.opacity=1;
+					}
+					else{
+						event.removeCharacter.style.opacity=0.5;
+					}
 				};
 				event.custom.add.window=function(){
 					if(!_status.kaibao){
@@ -2805,17 +2811,6 @@ mode.chess={
 						}
 						else{
 							event.enterArena.style.opacity=0.5;
-						}
-						event.fight.style.opacity=1;
-					}
-					else if(_status.zhaomu){
-						_status.zhaomu=false;
-						event.addCharacter.replace('招募',zhaomu);
-						if(game.data.character.length>3){
-							event.removeCharacter.style.opacity=1;
-						}
-						else{
-							event.removeCharacter.style.opacity=0.5;
 						}
 						event.fight.style.opacity=1;
 					}
@@ -3340,17 +3335,24 @@ mode.chess={
 						game.reload();
 					});
 					var giveup=function(){
-						_status.chessclicked=true;
-						_status.chessgiveup=true;
-						event.arenafight.style.opacity=0.5;
-						event.arenaback.style.opacity=0.5;
-						this.replace('确认放弃',function(){
+						if(confirm('放弃后剩余战斗将视为战败并结算奖励，是否确定放弃？')){
 							_status.chessclicked=true;
 							event.arenafight.close();
 							event.arenaback.close();
 							event.arenagiveup.close();
 							event.checkPrize();
-						});
+						}
+						// _status.chessclicked=true;
+						// _status.chessgiveup=true;
+						// event.arenafight.style.opacity=0.5;
+						// event.arenaback.style.opacity=0.5;
+						// this.replace('确认放弃',function(){
+						// 	_status.chessclicked=true;
+						// 	event.arenafight.close();
+						// 	event.arenaback.close();
+						// 	event.arenagiveup.close();
+						// 	event.checkPrize();
+						// });
 					};
 					event.arenagiveup=ui.create.control('放弃','nozoom',giveup);
 				}
@@ -3381,6 +3383,7 @@ mode.chess={
 						nodes[i].classList.remove('unselectable');
 					}
 				};
+				lib.init.onfree();
 				game.pause();
 				'step 7'
 				ui.control.style.display='none';

@@ -16022,7 +16022,7 @@
                 hasSha:function(respond){
                     if(this.countCards('h','sha')) return true;
     				if(this.countCards('h','hufu')) return true;
-    				// if(this.countCards('h','yuchanqian')) return true;
+    				if(this.countCards('h','yuchanqian')) return true;
     				if(this.hasSkillTag('respondSha',true,respond?'respond':'use',true)) return true;
     				return false;
                 },
