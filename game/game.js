@@ -19,7 +19,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:23,
+        versionOL:24,
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
         mirrorURL:'https://coding.net/u/libccy/p/noname/git/raw',
 		extensionURL:'http://extension-1252061710.costj.myqcloud.com/',
@@ -8975,7 +8975,7 @@
                         if(event.type=='wuxie'){
 							if(ui.tempnowuxie){
 								var triggerevent=event.getTrigger();
-								if(triggerevent.targets&&triggerevent.num==triggerevent.targets.length-1){
+								if(triggerevent&&triggerevent.targets&&triggerevent.num==triggerevent.targets.length-1){
 									ui.tempnowuxie.close();
 								}
 							}
