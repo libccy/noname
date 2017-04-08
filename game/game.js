@@ -6202,11 +6202,19 @@
                             catch(e){
                                 onerror();
                             }
+							lib.config.brokenFile.add(folder);
+							game.saveConfigValue('brokenFile');
                             if(!lib.node.http) lib.node.http=require('http');
                             if(!lib.node.https) lib.node.https=require('https');
                             var request = (url.indexOf('https')==0?lib.node.https:lib.node.http).get(url, function(response) {
                                 var stream=response.pipe(file);
-                                stream.on('finish',onsuccess);
+                                stream.on('finish',function(){
+									lib.config.brokenFile.remove(folder);
+									game.saveConfigValue('brokenFile');
+									if(onsuccess){
+										onsuccess();
+									}
+								});
                                 stream.on('error',onerror);
 								if(onprogress){
 									var streamInterval=setInterval(function(){
@@ -6299,16 +6307,6 @@
                     if(ui.updateUpdate){
                         ui.updateUpdate();
                     }
-					if(lib.config.downloadedFile){
-						game.saveConfig('downloadedFile');
-						game.getFileList('',function(folders,files){
-							for(var i=0;i<files.length;i++){
-								if(files[i].indexOf('~tmp')==0){
-									game.removeFile(files[i]);
-								}
-							}
-						});
-					}
                 }
 
 				if(lib.device){
@@ -6366,7 +6364,15 @@
 								    onprogress(progressEvent.loaded,progressEvent.total);
 								};
 							}
-							fileTransfer.download(encodeURI(url),encodeURI(folder),onsuccess,onerror);
+							lib.config.brokenFile.add(folder);
+							game.saveConfigValue('brokenFile');
+							fileTransfer.download(encodeURI(url),encodeURI(folder),function(){
+								lib.config.brokenFile.remove(folder);
+								game.saveConfigValue('brokenFile');
+								if(onsuccess){
+									onsuccess();
+								}
+							},onerror);
 						};
 						game.readFile=function(filename,callback,onerror){
 							window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
@@ -6481,17 +6487,6 @@
 									window.StatusBar.show();
 								}
 							}
-						}
-						if(lib.config.downloadedFile){
-							game.saveConfig('downloadedFile');
-							game.getFileList('',function(folders,files){
-								console.log(files);
-								for(var i=0;i<files.length;i++){
-									if(files[i].indexOf('~tmp')==0){
-										game.removeFile(files[i]);
-									}
-								}
-							});
 						}
 					}
 				}
@@ -7290,6 +7285,14 @@
 					if(!game.syncMenu){
 						delete window.resetExtension;
 		                localStorage.removeItem(lib.configprefix+'disable_extension',true);
+					}
+
+
+					if(game.removeFile&&lib.config.brokenFile.length){
+						while(lib.config.brokenFile.length){
+							game.removeFile(lib.config.brokenFile.shift());
+						}
+						game.saveConfigValue('brokenFile');
 					}
 
 					var onfree=lib.onfree;
@@ -20883,7 +20886,6 @@
 		},
 		fetch:function(url,onload,onerror,onprogress){
 			var tmpName='~tmp'+get.id();
-			game.saveConfig('downloadedFile',true);
 			game.download(encodeURI(url),tmpName,function(){
 				game.readFile(tmpName,function(data){
 					onload(data);
@@ -25785,6 +25787,9 @@
 				config[key]=value;
 			}
 			localStorage.setItem(lib.configprefix+'config',JSON.stringify(config));
+		},
+		saveConfigValue:function(key){
+			game.saveConfig(key,lib.config[key]);
 		},
 		saveExtensionConfig:function(extension,key,value){
 			return game.saveConfig('extension_'+extension+'_'+key,value);

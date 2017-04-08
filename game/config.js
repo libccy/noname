@@ -79,6 +79,7 @@ window.config={
 	favouriteCharacter:[],
 	recentIP:[],
 	alteredSkills:[],
+	brokenFile:[],
 
 	theme:'woodden',
 	layout:'mobile',
