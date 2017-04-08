@@ -31125,6 +31125,14 @@
                         var node=ui.create.div('.menubutton.large','获取扩展',start.firstChild,clickMode);
 						node.link=page;
 						node.mode='get';
+						page.listen(function(){
+							if(!page.currenttimeout){
+								var active=page.querySelector('.videonode.current');
+								if(active){
+									active.classList.remove('current');
+								}
+							}
+						});
                         var importextensionexpanded=false;
                         page.style.paddingBottom='10px';
                         var importExtension;
@@ -31188,12 +31196,14 @@
 
                         var clickExtension=function(){
                             var active=this.parentNode.querySelector('.videonode.current');
-                            if(active){
+                            if(active&&active!=this){
                                 active.classList.remove('current');
                             }
-                            if(active!=this){
-                                this.classList.add('current');
-                            }
+                            this.classList.add('current');
+							clearTimeout(page.currenttimeout);
+							page.currenttimeout=setTimeout(function(){
+								delete page.currenttimeout;
+							},200);
                         };
                         var downloadExtension=function(e){
                             if((this.innerHTML!='下载扩展'&&this.innerHTML!='更新扩展')||!window.JSZip) return;

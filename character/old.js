@@ -243,7 +243,7 @@ character.old={
                 return false;
             },
             filter:function(event,player){
-                return event.card.name=='sha'&&(get.color(event.card)=='red'||event.player.hasSkill('jiu'));
+                return event.card&&event.card.name=='sha'&&(get.color(event.card)=='red'||event.player.hasSkill('jiu'));
             },
             content:function(){
                 player.loseMaxHp();

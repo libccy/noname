@@ -1411,7 +1411,7 @@ card.standard={
 			direct:true,
 			audio:true,
 			filter:function(event,player){
-				return player.countCards('he')>2;
+				return player.countCards('he')>2&&event.target.isAlive();
 			},
 			content:function(){
 				"step 0"
