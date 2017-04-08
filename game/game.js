@@ -31309,20 +31309,20 @@
                                     ui.create.div('.caption',list[i].name,node);
 									ui.create.div('.text.author','作者：'+list[i].author+'<span>('+list[i].size+')</span>',node);
                                     ui.create.div('.text',list[i].intro,node);
-									if(list[i].netdisk){
-										var linknode=ui.create.div('.text',node);
-										ui.create.node('span.hrefnode','网盘链接',function(){
-											game.open(this.link);
-										},linknode).link=list[i].netdisk;
-										if(list[i].forum){
-											ui.create.node('span',linknode).style.marginRight='10px';
-											ui.create.node('span.hrefnode','参与讨论',function(){
-												game.open(this.link);
-											},linknode).link=list[i].forum;
-										}
-									}
                                     var download=ui.create.div('.menubutton.text.active','下载扩展',node.firstChild);
 									if(game.download){
+										if(list[i].netdisk){
+											var linknode=ui.create.div('.text',node);
+											ui.create.node('span.hrefnode','网盘链接',function(){
+												game.open(this.link);
+											},linknode).link=list[i].netdisk;
+											if(list[i].forum){
+												ui.create.node('span',linknode).style.marginRight='10px';
+												ui.create.node('span.hrefnode','参与讨论',function(){
+													game.open(this.link);
+												},linknode).link=list[i].forum;
+											}
+										}
 										download.listen(downloadExtension);
 	                                    if(lib.config.extensions.contains(list[i].name)){
 	                                        download.classList.remove('active');
@@ -31339,9 +31339,20 @@
 	                                    download.info=list[i];
 									}
 									else{
-										var a=ui.create.node('a',download);
-										a.href=lib.extensionURL+'zip/'+list[i].name+'.zip';
-										a.download=true;
+										if(list[i].forum){
+											var linknode=ui.create.div('.text',node);
+											ui.create.node('span',linknode);
+											ui.create.node('span.hrefnode','参与讨论',function(){
+												game.open(this.link);
+											},linknode).link=list[i].forum;
+										}
+										download.listen(function(){
+											game.open(this.link);
+										});
+										download.link=list[i].netdisk;
+										// var a=ui.create.node('a',download);
+										// a.href=lib.extensionURL+'zip/'+list[i].name+'.zip';
+										// a.download=true;
 									}
 								}
 							},function(){
