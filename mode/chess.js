@@ -5362,7 +5362,7 @@ mode.chess={
 		leader_liubei:'刘备',
 		leader_sunquan:'孙权',
 		leader_xiaoxiong:'枭雄',
-		leader_xiaoxiong_info:'你造成伤害后会得到一定数量的金钱奖励',
+		leader_xiaoxiong_info:'每当你造成伤害，获胜后会得到一定数量的额外金币奖励',
 		leader_renyi:'仁义',
 		leader_renyi_info:'你招降敌将的成功率大幅增加',
 		leader_mouduan:'谋断',

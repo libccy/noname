@@ -40152,7 +40152,7 @@
                     }
                 }
 
-				if(lib.config.right_range){
+				if(lib.config.right_range&&_status.gameStarted){
 					uiintro.add(ui.create.div('.placeholder'));
 					var table,tr,td;
 					table=document.createElement('table');
