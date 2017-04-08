@@ -31340,7 +31340,7 @@
 									}
 									else{
 										var a=ui.create.node('a',download);
-										a.href=lib.extensionURL+i+'.zip';
+										a.href=lib.extensionURL+list[i].name+'.zip';
 										a.download=true;
 									}
 								}
