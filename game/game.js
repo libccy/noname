@@ -31510,8 +31510,8 @@
 
     							var goupdate=function(files,update){
                                     lib.version=update.version;
-									if(!update.dev||lib.config.debug){
-										dev=true;
+									if(update.dev&&!lib.config.debug){
+										dev='nodev';
 									}
 									lib.init.req('game/source.js',function(){
 										try{
@@ -38546,7 +38546,7 @@
 			if(url[url.length-1]!='/'){
 				url+='/';
 			}
-            if(lib.config.debug||master){
+            if(master!='nodev'){
                 return url+'master/';
             }
             else{
