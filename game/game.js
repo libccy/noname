@@ -31256,7 +31256,15 @@
 								},function(){
 									onprogress(-1);
 									_status.importingExtension=true;
+									var removegame=false;
+									if(window.game!=game){
+										window.game=game;
+										removegame=true;
+									}
 									lib.init.js(lib.assetURL+'extension/'+that.info.name,'extension',function(){
+										if(removegame){
+											delete window.game;
+										}
 										if(game.importedPack){
 											var extname=game.importedPack.name;
 											if(lib.config.extensions.contains(extname)){
