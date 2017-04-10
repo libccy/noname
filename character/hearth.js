@@ -3217,7 +3217,7 @@ character.hearth={
 			forced:true,
 			priority:-50,
 			filter:function(event,player){
-				return event.parent.name!='jixuan';
+				return event.skill!='jixuan';
 			},
 			content:function(){
 				player.draw();

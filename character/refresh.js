@@ -235,7 +235,7 @@ character.refresh={
 				}
 				'step 2'
 				if(event.target){
-					player.useCard({name:'juedou'},event.target);
+					player.useCard({name:'juedou'},event.target,'noai');
 				}
 			}
 		},
