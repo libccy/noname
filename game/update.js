@@ -1,8 +1,8 @@
 window.noname_update={
-    version:'1.9.22.2',
+    version:'1.9.22.3',
     update:'1.9.21',
     changeLog:[
-        '扩展下载修复',
+        '屏幕常亮选项（需更新客户端）',
     ],
     files:[
         'game/game.js',

@@ -118,6 +118,23 @@
 						unfrequent:true,
 						intro:'离开游戏前弹出确认对话框',
 					},
+					keep_awake:{
+						name:'屏幕常亮',
+						init:true,
+						unfrequent:true,
+						intro:'防止屏幕自动关闭',
+						onclick:function(bool){
+							game.saveConfig('keep_awake',bool);
+							if(window.plugins&&window.plugins.insomnia){
+								if(bool){
+									window.plugins.insomnia.keepAwake();
+								}
+								else{
+									window.plugins.insomnia.allowSleepAgain();
+								}
+							}
+						}
+					},
 					auto_confirm:{
 						name:'自动确认',
 						init:true,
@@ -411,9 +428,11 @@
 						}
 						if(lib.device){
 							map.enable_vibrate.show();
+							map.keep_awake.show();
 						}
 						else{
 							map.enable_vibrate.hide();
+							map.keep_awake.hide();
 						}
 						if(config.enable_pressure){
 							map.pressure_click.show();
@@ -6358,7 +6377,6 @@
                             }
 							var fileTransfer = new FileTransfer();
 							folder=lib.assetURL+folder;
-							game.print(typeof onprogress);
 							if(onprogress){
 								fileTransfer.onprogress=function(progressEvent){
 								    onprogress(progressEvent.loaded,progressEvent.total);
@@ -6561,7 +6579,7 @@
 			},
 			onload:function(){
                 if(navigator.userAgent.toLowerCase().indexOf('crosswalk')!=-1){
-                    lib.crosswalk=true;
+					lib.crosswalk=true;
                 }
                 if(lib.device=='android'&&window.devicePixelRatio>1&&document.documentElement.offsetWidth<900&&!lib.crosswalk){
                     game.documentZoom=document.documentElement.offsetWidth/960;
@@ -7654,6 +7672,60 @@
 				window.ai=ai;
 				window.lib=lib;
 				window._status=_status;
+			},
+			x:function(){
+				var gl=function(dir,callback){
+					var files=[],folders=[];
+					dir='/Users/widget/Documents/extension/'+dir;
+					lib.node.fs.readdir(dir,function(err,filelist){
+						for(var i=0;i<filelist.length;i++){
+							if(filelist[i][0]!='.'&&filelist[i][0]!='_'){
+								if(lib.node.fs.statSync(dir+'/'+filelist[i]).isDirectory()){
+									folders.push(filelist[i]);
+								}
+								else{
+									files.push(filelist[i]);
+								}
+							}
+						}
+						callback(folders,files);
+					});
+				}
+				var args=Array.from(arguments);
+				for(var i=0;i<args.length;i++){
+					args[i]=args[i][0];
+				}
+				gl('',function(list){
+					if(args.length){
+						for(var i=0;i<list.length;i++){
+							if(!args.contains(list[i][0])){
+								list.splice(i--,1);
+							}
+						}
+					}
+					if(list.length){
+						var str=list[0];
+						gl(str,function(folders,files){
+							if(files.length>1){
+								for(var i=0;i<files.length;i++){
+									if(files[i].indexOf('extension.js')!=-1){
+										files.splice(i--,1);
+									}
+									else{
+										if(i%5==0){
+											str+='\n';
+										}
+										str+='"'+files[i]+'",';
+									}
+								}
+								console.log(str);
+							}
+						});
+						for(var i=1;i<list.length;i++){
+							get.extensionPackage(list[i]);
+						}
+					}
+				});
 			},
 			cfg:function(){
 				var mode=lib.config.all.mode.slice(0);
@@ -34069,6 +34141,9 @@
 				if(lib.config.show_statusbar_ios=='overlay'){
 					document.body.classList.add('statusbar');
 				}
+				if(lib.config.keep_awake&&window.plugins&&window.plugis.insomnia){
+					window.plugins.insomnia.keepAwake();
+				}
 				// var themeentry='background_color_'+lib.config.theme;
 				// if(lib.config[themeentry]){
 				// 	document.body.dataset[themeentry]=lib.config[themeentry];
@@ -38365,51 +38440,6 @@
     			return false;
     		},
         },
-		extensionPackage:function(){
-			var gl=function(dir,callback){
-				var files=[],folders=[];
-				dir='/Users/widget/Documents/extension/'+dir;
-				lib.node.fs.readdir(dir,function(err,filelist){
-					for(var i=0;i<filelist.length;i++){
-						if(filelist[i][0]!='.'&&filelist[i][0]!='_'){
-							if(lib.node.fs.statSync(dir+'/'+filelist[i]).isDirectory()){
-								folders.push(filelist[i]);
-							}
-							else{
-								files.push(filelist[i]);
-							}
-						}
-					}
-					callback(folders,files);
-				});
-			}
-			var list=arguments;
-			if(!list.length){
-				list=lib.config.extensions;
-			}
-			if(list.length){
-				var str=list[0];
-				gl(str,function(folders,files){
-					if(files.length>1){
-						for(var i=0;i<files.length;i++){
-							if(files[i].indexOf('extension.js')!=-1){
-								files.splice(i--,1);
-							}
-							else{
-								if(i%5==0){
-									str+='\n';
-								}
-								str+='"'+files[i]+'",';
-							}
-						}
-						console.log(str);
-					}
-				});
-				for(var i=1;i<list.length;i++){
-					get.extensionPackage(list[i]);
-				}
-			}
-		},
 		autoViewAs:function(card,cards){
 			var info=get.info(card);
 			if(info.autoViewAs){
