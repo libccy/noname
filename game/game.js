@@ -957,6 +957,7 @@
 								ui.background.setBackgroundImage('image/background/'+lib.config.image_background+'.jpg');
 							}
 							ui.background.style.backgroundSize='cover';
+							ui.background.style.backgroundPosition='50% 50%';
 						},
 					},
 					image_background_random:{
@@ -6103,6 +6104,7 @@
                 if(lib.config.image_background&&lib.config.image_background!='default'&&lib.config.image_background.indexOf('custom_')!=0){
                     document.documentElement.style.backgroundImage='url("'+lib.assetURL+'image/background/'+lib.config.image_background+'.jpg")';
 					document.documentElement.style.backgroundSize='cover';
+					document.documentElement.style.backgroundPosition='50% 50%';
                 }
 				ui.css.layout=lib.init.css(lib.assetURL+'layout/'+layout,'layout');
                 ui.css.phone=lib.init.css();
@@ -6610,6 +6612,7 @@
                 }
 				ui.background=ui.create.div('.background');
 				ui.background.style.backgroundSize="cover";
+				ui.background.style.backgroundPosition='50% 50%';
 				if(lib.config.image_background&&lib.config.image_background!='default'&&lib.config.image_background.indexOf('custom_')!=0){
 			        ui.background.setBackgroundImage('image/background/'+lib.config.image_background+'.jpg');
                     if(lib.config.image_background_blur){
@@ -6619,6 +6622,7 @@
                     }
 					document.documentElement.style.backgroundImage='';
 					document.documentElement.style.backgroundSize='';
+					document.documentElement.style.backgroundPosition='';
 			    }
 				document.body.insertBefore(ui.background,document.body.firstChild);
 
