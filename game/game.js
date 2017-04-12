@@ -7713,12 +7713,12 @@
 									}
 									else{
 										if(i%5==0){
-											str+='\n';
+											str+='\n\t\t\t';
 										}
 										str+='"'+files[i]+'",';
 									}
 								}
-								console.log(str);
+								console.log(str.slice(0,str.length-1));
 							}
 						});
 						for(var i=1;i<list.length;i++){
@@ -31228,13 +31228,7 @@
                         importExtension.style.textAlign='left';
                         ui.create.div('','<input type="file" accept="application/zip" style="width:153px"><button>确定</button>',importExtension);
 
-
-                        // if(!game.download){
-                        //     extensionnode.classList.add('on');
-                        //     importExtension.style.display='';
-                        //     importextensionexpanded=true;
-                        // }
-
+                        var extensionURL=lib.extensionURL;
                         var reloadnode=ui.create.div('.config.toggle.pointerdiv','重新启动',page,game.reload);
                         reloadnode.style.display='none';
                         var placeholder=ui.create.div('.config.toggle',page);
@@ -31300,7 +31294,7 @@
                             this.classList.add('button-downloading');
 							var progress=ui.create.div('.button-progress',this);
 							ui.create.div(progress);
-							var url=lib.extensionURL+this.info.name+'.zip';
+							var url=extensionURL+this.info.name+'.zip';
 							var onprogress=function(byte,total){
 								if(total){
 									size=total;
@@ -31317,7 +31311,7 @@
 							game.checkFileList(files,function(){
 								files.unshift('extension/'+that.info.name+'/extension.js');
 								for(var i=0;i<files.length;i++){
-									files[i]=lib.extensionURL+that.info.name+'/'+files[i].slice(10+that.info.name.length+1);
+									files[i]=extensionURL+that.info.name+'/'+files[i].slice(10+that.info.name.length+1);
 								}
 								var n1=0,n2=files.length;
 								game.multiDownload(files,function(){
@@ -31369,7 +31363,7 @@
 										_status.importingExtension=false;
 									});
 								},function(current){
-									return 'extension/'+current.slice(lib.extensionURL.length);
+									return 'extension/'+current.slice(extensionURL.length);
 								});
 							});
                         };
@@ -31390,7 +31384,7 @@
                             }
 
                             var loading=ui.create.div('.loading.config.toggle','载入中...',page);
-							lib.init.js(lib.extensionURL+'package.js',null,function(){
+							lib.init.js(extensionURL+'package.js',null,function(){
 								var list=window.noname_extension_list;
 								delete window.noname_extension_list;
 								loading.style.display='none';
@@ -31440,9 +31434,6 @@
 											game.open(this.link);
 										});
 										download.link=list[i].netdisk;
-										// var a=ui.create.node('a',download);
-										// a.href=lib.extensionURL+'zip/'+list[i].name+'.zip';
-										// a.download=true;
 									}
 								}
 							},function(){
