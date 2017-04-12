@@ -120,7 +120,7 @@
 					},
 					keep_awake:{
 						name:'屏幕常亮',
-						init:true,
+						init:false,
 						unfrequent:true,
 						intro:'防止屏幕自动关闭',
 						onclick:function(bool){
