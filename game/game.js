@@ -29,7 +29,6 @@
 		updates:[],
 		canvasUpdates:[],
 		video:[],
-		_onDB:[],
 		skilllist:[],
 		characterIntro:{},
 		characterPack:{},
@@ -57,14 +56,6 @@
                 return list.contains(name)?capt:null;
             }
         },
-		onDB:function(func){
-			if(lib.db){
-				func();
-			}
-			else{
-				lib._onDB.push(func);
-			}
-		},
 		listenEnd:function(node){
 			if(!node._listeningEnd){
 				node._listeningEnd=true;
@@ -685,6 +676,15 @@
 							else{
 								lib.init.layout(layout);
 							}
+							if(lib.config.image_background&&lib.config.image_background!='default'&&lib.config.image_background.indexOf('custom_')!=0){
+								localStorage.setItem(lib.configprefix+'background',lib.config.image_background);
+							}
+							else if(lib.config.image_background=='default'&&lib.config.theme=='simple'){
+								localStorage.setItem(lib.configprefix+'background','shengshi_bg');
+							}
+							else{
+								localStorage.removeItem(lib.configprefix+'background');
+							}
 						}
 					},
                     // fewplayer:{
@@ -921,6 +921,15 @@
 							}
 							var animate=lib.config.image_background=='default';
 							game.saveConfig('image_background',background);
+							if(lib.config.image_background&&lib.config.image_background!='default'&&lib.config.image_background.indexOf('custom_')!=0){
+								localStorage.setItem(lib.configprefix+'background',lib.config.image_background);
+							}
+							else if(lib.config.image_background=='default'&&lib.config.theme=='simple'){
+								localStorage.setItem(lib.configprefix+'background','shengshi_bg');
+							}
+							else{
+								localStorage.removeItem(lib.configprefix+'background');
+							}
 							ui.background.delete();
 							ui.background=ui.create.div('.background');
 
@@ -5787,7 +5796,6 @@
 					lib.changeLog=window.noname_update.changeLog;
 					delete window.noname_update;
 				}
-
 				var noname_inited=localStorage.getItem('noname_inited');
 				if(noname_inited&&noname_inited!=='nodejs'){
                     var ua=navigator.userAgent.toLowerCase();
@@ -5800,535 +5808,12 @@
 					lib.assetURL=noname_inited;
 				}
 
-				lib.config={};
-                lib.configOL={};
-				var config2;
-				var config=window.config;
-				for(var i in config){
-					lib.config[i]=lib.init.eval(config[i]);
-				}
-				try{
-					config2=JSON.parse(localStorage.getItem(lib.configprefix+'config'));
-					if(!config2||typeof config2!='object') throw 'err'
-				}
-				catch(err){
-					config2={};
-					localStorage.setItem(lib.configprefix+'config',JSON.stringify({}));
-				}
-				if(config2.mode) lib.config.mode=config2.mode;
-				if(lib.config.mode_config[lib.config.mode]==undefined) lib.config.mode_config[lib.config.mode]={};
-				for(var i in lib.config.mode_config.global){
-					if(lib.config.mode_config[lib.config.mode][i]==undefined){
-						lib.config.mode_config[lib.config.mode][i]=lib.config.mode_config.global[i];
-					}
-				}
-				if(lib.config.characters){
-					lib.config.defaultcharacters=lib.config.characters.slice(0);
-				}
-				if(lib.config.cards){
-					lib.config.defaultcards=lib.config.cards.slice(0);
-				}
-				for(var i in config2){
-						if(i.indexOf('_mode_config')!=-1){
-							var thismode=i.substr(i.indexOf('_mode_config')+13);
-							if(!lib.config.mode_config[thismode]){
-								lib.config.mode_config[thismode]={};
-							}
-							lib.config.mode_config[thismode][i.substr(0,i.indexOf('_mode_config'))]=config2[i];
-						}
-						else{
-							lib.config[i]=config2[i];
-						}
-				}
-				for(var i in lib.config.translate){
-					lib.translate[i]=lib.config.translate[i];
-				}
-
-				lib.config.all.characters=[];
-				lib.config.all.cards=[];
-				lib.config.all.plays=[];
-				lib.config.all.mode=[];
-
-                if(lib.config.debug){
-                    lib.init.js(lib.assetURL+'game','asset',function(){
-                        lib.skin=window.noname_skin_list;
-                        delete window.noname_skin_list;
-                        delete window.noname_asset_list;
-                    });
-                }
-
-                if(window.isNonameServer){
-                    lib.config.mode='connect';
-                }
-				for(i in character.pack){
-					if(lib.config.hiddenCharacterPack.indexOf(i)==-1){
-						lib.config.all.characters.push(i);
-						lib.translate[i+'_character_config']=character.pack[i];
-					}
-				}
-				for(i in card.pack){
-					if(lib.config.hiddenCardPack.indexOf(i)==-1){
-						lib.config.all.cards.push(i);
-						lib.translate[i+'_card_config']=card.pack[i];
-					}
-				}
-				for(i in play.pack){
-					lib.config.all.plays.push(i);
-					lib.translate[i+'_play_config']=play.pack[i];
-				}
-
-				if(!lib.config.gameRecord){
-					lib.config.gameRecord={};
-				}
-				for(i in mode.pack){
-					if(lib.config.hiddenModePack.indexOf(i)==-1){
-						lib.config.all.mode.push(i);
-						lib.translate[i]=mode.pack[i];
-						if(!lib.config.gameRecord[i]){
-							lib.config.gameRecord[i]={data:{}};
-						}
-					}
-				}
-				if(lib.config.all.mode.length==0){
-					lib.config.all.mode.push('identity');
-					lib.translate.identity='身份';
-					if(!lib.config.gameRecord.identity){
-						lib.config.gameRecord.identity={data:{}};
-					}
-				}
-				if(background&&background.pack){
-					for(i in background.pack){
-						if(lib.config.hiddenBackgroundPack.contains(i)) continue;
-						lib.configMenu.appearence.config.image_background.item[i]=background.pack[i];
-					}
-					for(var i=0;i<lib.config.customBackgroundPack.length;i++){
-						var link=lib.config.customBackgroundPack[i];
-						lib.configMenu.appearence.config.image_background.item[link]=link.slice(7);
-					}
-					lib.configMenu.appearence.config.image_background.item.default='默认';
-				}
-				if(music&&music.pack){
-					if(lib.device||typeof window.require=='function'){
-						lib.configMenu.audio.config.background_music.item.music_custom='自定';
-					}
-					lib.config.all.background_music=['music_default'];
-					for(i in music.pack){
-						lib.config.all.background_music.push(i);
-						lib.configMenu.audio.config.background_music.item[i]=music.pack[i];
-					}
-				    lib.configMenu.audio.config.background_music.item.music_random='随机';
-				    lib.configMenu.audio.config.background_music.item.music_off='关闭';
-				}
-                if(theme&&theme.pack){
-                    for(i in theme.pack){
-						lib.configMenu.appearence.config.theme.item[i]=theme.pack[i];
-					}
-                }
-
-				ui.fontsheet=document.createElement('style');
-				document.head.appendChild(ui.fontsheet);
-				if(font&&font.pack){
-					for(i in font.pack){
-						lib.configMenu.appearence.config.name_font.item[i]=font.pack[i];
-						lib.configMenu.appearence.config.identity_font.item[i]=font.pack[i];
-						lib.configMenu.appearence.config.cardtext_font.item[i]=font.pack[i];
-						lib.configMenu.appearence.config.global_font.item[i]=font.pack[i];
-						ui.fontsheet.sheet.insertRule("@font-face {font-family: '"+i+"';src: url('"+lib.assetURL+"font/"+i+".ttf');}",0);
-					}
-					lib.configMenu.appearence.config.cardtext_font.item.default='默认';
-					lib.configMenu.appearence.config.global_font.item.default='默认';
-				}
-				delete character.pack;
-				delete card.pack;
-				delete play.pack;
-				delete mode.pack;
-				delete window.background;
-				delete window.music;
-				delete window.font;
-
-				var ua=navigator.userAgent.toLowerCase();
-				if('ontouchstart' in document){
-					if(!lib.config.totouched){
-						game.saveConfig('totouched',true);
-						if(lib.device){
-		                    game.saveConfig('low_performance',true);
-		                    game.saveConfig('confirm_exit',true);
-							game.saveConfig('touchscreen',true);
-							game.saveConfig('fold_mode',false);
-							if(ua.indexOf('ipad')==-1){
-								game.saveConfig('phonelayout',true);
-							}
-							else if(lib.device=='ios'){
-								game.saveConfig('show_statusbar_ios','overlay');
-							}
-						}
-						else if(confirm('是否切换到触屏模式？（触屏模式可提高触屏设备的响应速度，但无法使用鼠标）')){
-							game.saveConfig('touchscreen',true);
-							if(ua.indexOf('iphone')!=-1||ua.indexOf('android')!=-1){
-								game.saveConfig('phonelayout',true);
-							}
-							game.reload();
-						}
-	                }
-				}
-                else if(lib.config.touchscreen){
-					game.saveConfig('touchscreen',false);
-				}
-				if(!lib.config.toscrolled&&ua.indexOf('macintosh')!=-1){
-					game.saveConfig('toscrolled',true);
-					game.saveConfig('mousewheel',false);
-				}
-
-                var extensionlist=[];
-                if(!localStorage.getItem(lib.configprefix+'disable_extension')){
-					if(lib.config.extensions.length){
-						window.resetExtension=function(){
-							for(var i=0;i<lib.config.extensions.length;i++){
-								game.saveConfig('extension_'+lib.config.extensions[i]+'_enable',false);
-							}
-	                        localStorage.setItem(lib.configprefix+'disable_extension',true);
-						}
-					}
-                    for(var i=0;i<lib.config.plays.length;i++){
-                        if(lib.config.all.plays.indexOf(lib.config.plays[i])!=-1){
-                            extensionlist.push(lib.config.plays[i]);
-                        }
-                    }
-                    for(var i=0;i<lib.config.extensions.length;i++){
-                        var extcontent=localStorage.getItem(lib.configprefix+'extension_'+lib.config.extensions[i]);
-                        if(extcontent){
-                            _status.evaluatingExtension=true;
-                            try{
-        						eval(extcontent);
-        					}
-        					catch(e){
-        						console.log(e);
-        					}
-                            _status.evaluatingExtension=false;
-                        }
-                        else{
-                            extensionlist.push(lib.config.extensions[i]);
-                        }
-    				}
-                }
-                else{
-                    for(var i=0;i<lib.config.extensions.length;i++){
-                        game.import('extension',{name:lib.config.extensions[i]});
-                    }
-                }
-                var loadPack=function(){
-                    var toLoad=lib.config.all.cards.length+lib.config.all.characters.length+1;
-    				var packLoaded=function(){
-    					toLoad--;
-    					if(toLoad==0){
-    						if(_status.windowLoaded){
-    							delete _status.windowLoaded;
-    							lib.init.onload();
-    						}
-    						else{
-    							_status.packLoaded=true;
-    						}
-    					}
-    				};
-					var show_splash=lib.config.show_splash;
-					if(show_splash=='off'){
-						show_splash=false;
-					}
-					else if(show_splash=='init'){
-						if(localStorage.getItem('show_splash_off')){
-							show_splash=false;
-						}
-					}
-					localStorage.removeItem('show_splash_off');
-    				if(localStorage.getItem(lib.configprefix+'playback')){
-    					toLoad++;
-    					lib.init.js(lib.assetURL+'mode',lib.config.mode,packLoaded,packLoaded);
-    				}
-    				else if((localStorage.getItem(lib.configprefix+'directstart')||!show_splash)&&
-    					lib.config.all.mode.indexOf(lib.config.mode)!=-1){
-    					toLoad++;
-    					lib.init.js(lib.assetURL+'mode',lib.config.mode,packLoaded,packLoaded);
-    				}
-    				lib.init.js(lib.assetURL+'card',lib.config.all.cards,packLoaded,packLoaded);
-    				lib.init.js(lib.assetURL+'character',lib.config.all.characters,packLoaded,packLoaded);
-    				lib.init.js(lib.assetURL+'character','rank',packLoaded,packLoaded);
-					if(lib.device!='ios'&&lib.config.enable_pressure) lib.init.js(lib.assetURL+'game','pressure');
-                };
-                if(extensionlist.length){
-                    window.game=game;
-                    var extToLoad=extensionlist.length;
-                    var extLoaded=function(){
-                        extToLoad--;
-    					if(extToLoad==0){
-                            delete window.game;
-    						loadPack();
-    					}
-                    }
-                    for(var i=0;i<extensionlist.length;i++){
-                        lib.init.js(lib.assetURL+'extension/'+extensionlist[i],'extension',extLoaded,(function(i){
-                            return function(){
-                                game.removeExtension(i);
-                                extToLoad--;
-            					if(extToLoad==0){
-                                    delete window.game;
-            						loadPack();
-            					}
-                            }
-                        }(extensionlist[i])));
-                    }
-                }
-                else{
-                    loadPack();
-                }
-
-				ui.css={};
-				lib.init.css(lib.assetURL+'layout/default','menu');
-				var layout=lib.config.layout;
-                if(lib.layoutfixed.indexOf(lib.config.mode)!==-1){
-					layout='mobile';
-				}
-                if(layout=='phone'){
-                    layout='mobile';
-                    game.saveConfig('layout','mobile');
-                    game.saveConfig('phonelayout',true);
-                }
-                game.layout=layout;
-				if(lib.config.image_background_random){
-					var list=[];
-					for(var i in lib.configMenu.appearence.config.image_background.item){
-						if(i=='default') continue;
-						list.push(i);
-					}
-					game.saveConfig('image_background',list.randomGet(lib.config.image_background));
-				}
-                if(lib.config.image_background&&lib.config.image_background!='default'&&lib.config.image_background.indexOf('custom_')!=0){
-                    document.documentElement.style.backgroundImage='url("'+lib.assetURL+'image/background/'+lib.config.image_background+'.jpg")';
+				ui.css={default:lib.init.css('layout/default','layout')};
+				if(localStorage.getItem(lib.configprefix+'background')){
+					document.documentElement.style.backgroundImage='url("'+lib.assetURL+'image/background/'+localStorage.getItem(lib.configprefix+'background')+'.jpg")';
 					document.documentElement.style.backgroundSize='cover';
 					document.documentElement.style.backgroundPosition='50% 50%';
-                }
-				ui.css.layout=lib.init.css(lib.assetURL+'layout/'+layout,'layout');
-                ui.css.phone=lib.init.css();
-                if(get.is.phoneLayout()){
-                    ui.css.phone.href=lib.assetURL+'layout/default/phone.css';
-                }
-				ui.css.theme=lib.init.css(lib.assetURL+'theme/'+lib.config.theme,'style');
-				ui.css.card_style=lib.init.css(lib.assetURL+'theme/style/card',lib.config.card_style);
-				ui.css.cardback_style=lib.init.css(lib.assetURL+'theme/style/cardback',lib.config.cardback_style);
-				ui.css.hp_style=lib.init.css(lib.assetURL+'theme/style/hp',lib.config.hp_style);
-				if(lib.config.player_style&&lib.config.player_style!='default'&&lib.config.player_style!='custom'){
-					var str='';
-					switch(lib.config.player_style){
-						case 'wood':str='url("'+lib.assetURL+'theme/woodden/wood.jpg")';break;
-						case 'music':str='linear-gradient(#4b4b4b, #464646)';break;
-						case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';break;
-					}
-					ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:'+str+'}');
 				}
-				if(lib.config.border_style&&lib.config.border_style!='default'&&lib.config.border_style!='custom'&&lib.config.border_style!='auto'){
-					ui.css.border_stylesheet=lib.init.sheet();
-					var bstyle=lib.config.border_style;
-					if(bstyle.indexOf('dragon_')==0){
-						bstyle=bstyle.slice(7);
-					}
-					ui.css.border_stylesheet.sheet.insertRule('#window .player>.framebg,#window #arena.long.mobile:not(.fewplayer) .player[data-position="0"]>.framebg{display:block;background-image:url("'+lib.assetURL+'theme/style/player/'+bstyle+'1.png")}',0);
-					ui.css.border_stylesheet.sheet.insertRule('#window #arena.long:not(.fewplayer) .player>.framebg, #arena.oldlayout .player>.framebg{background-image:url("'+lib.assetURL+'theme/style/player/'+bstyle+'3.png")}',0);
-					ui.css.border_stylesheet.sheet.insertRule('.player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}',0);
-				}
-				if(lib.config.control_style&&lib.config.control_style!='default'&&lib.config.control_style!='custom'){
-					var str='';
-					switch(lib.config.control_style){
-						case 'wood':str='url("'+lib.assetURL+'theme/woodden/wood.jpg")';break;
-						case 'music':str='linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px';break;
-						case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));color:white;text-shadow:black 0 0 2px';break;
-					}
-					if(lib.config.control_style=='wood'){
-						ui.css.control_stylesheet=lib.init.sheet('#window .control,#window .menubutton,#window #system>div>div,#window #system>div>.pressdown2{background-image:'+str+'}');
-					}
-					else{
-						ui.css.control_stylesheet=lib.init.sheet('#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:'+str+'}');
-					}
-				}
-				if(lib.config.menu_style&&lib.config.menu_style!='default'&&lib.config.menu_style!='custom'){
-					var str='';
-					switch(lib.config.menu_style){
-						case 'wood':str='url("'+lib.assetURL+'theme/woodden/wood2.png")';break;
-						case 'music':str='linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px';break;
-						case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));color:white;text-shadow:black 0 0 2px';break;
-					}
-					ui.css.menu_stylesheet=lib.init.sheet('html #window>.dialog.popped,html .menu,html .menubg{background-image:'+str+'}');
-				}
-
-				lib.config.duration=500;
-
-				if(window.indexedDB){
-					var request = window.indexedDB.open(lib.configprefix+'data',3);
-					request.onupgradeneeded=function(e){
-						var db=e.target.result;
-						if(!db.objectStoreNames.contains('video')){
-							db.createObjectStore('video',{keyPath:'time'});
-						}
-						if(!db.objectStoreNames.contains('image')){
-							db.createObjectStore('image');
-						}
-						if(!db.objectStoreNames.contains('audio')){
-							db.createObjectStore('audio');
-						}
-						if(!db.objectStoreNames.contains('character')){
-							db.createObjectStore('character');
-						}
-						if(!db.objectStoreNames.contains('card')){
-							db.createObjectStore('card');
-						}
-						if(!db.objectStoreNames.contains('skill')){
-							db.createObjectStore('skill');
-						}
-					};
-					request.onsuccess=function(e){
-						var db=e.target.result;
-						lib.db=db;
-						for(var i=0;i<lib._onDB.length;i++){
-							lib._onDB[i]();
-						}
-                        if(_status.waitingForDB){
-							if(lib.init.startBefore){
-								lib.init.startBefore();
-								delete lib.init.startBefore;
-							}
-                            ui.create.arena();
-    						game.createEvent('game',false).setContent(lib.init.start);
-    						delete lib.init.start;
-    						delete _status.waitingForDB;
-    						game.loop();
-    					}
-                        else{
-                            _status.dbLoaded=true;
-                        }
-					}
-				}
-                if(typeof window.require=='function'&&!lib.device){
-                    lib.node={
-                        fs:require('fs'),
-                        debug:function(){
-                            require('electron').remote.getCurrentWindow().toggleDevTools();
-                        }
-                    };
-                    game.download=function(url,folder,onsuccess,onerror,dev,onprogress){
-                        if(url.indexOf('http')!=0){
-                            url=get.url(dev)+url;
-                        }
-						game.ensureDirectory(folder,function(){
-                            try{
-                                var file = lib.node.fs.createWriteStream(__dirname+'/'+folder);
-                            }
-                            catch(e){
-                                onerror();
-                            }
-							lib.config.brokenFile.add(folder);
-							game.saveConfigValue('brokenFile');
-                            if(!lib.node.http) lib.node.http=require('http');
-                            if(!lib.node.https) lib.node.https=require('https');
-                            var request = (url.indexOf('https')==0?lib.node.https:lib.node.http).get(encodeURI(url), function(response) {
-                                var stream=response.pipe(file);
-                                stream.on('finish',function(){
-									lib.config.brokenFile.remove(folder);
-									game.saveConfigValue('brokenFile');
-									if(onsuccess){
-										onsuccess();
-									}
-								});
-                                stream.on('error',onerror);
-								if(onprogress){
-									var streamInterval=setInterval(function(){
-										if(stream.closed){
-											clearInterval(streamInterval);
-										}
-										else{
-											onprogress(stream.bytesWritten);
-										}
-									},200);
-								}
-                            });
-                        },true);
-                    };
-					game.readFile=function(filename,callback,onerror){
-						lib.node.fs.readFile(__dirname+'/'+filename,function(err,data){
-							if(err){
-								onerror(err);
-							}
-							else{
-								callback(data);
-							}
-						});
-					};
-					game.removeFile=function(filename,callback){
-						lib.node.fs.unlink(__dirname+'/'+filename);
-					};
-					game.getFileList=function(dir,callback){
-						var files=[],folders=[];
-						dir=__dirname+'/'+dir;
-						lib.node.fs.readdir(dir,function(err,filelist){
-							for(var i=0;i<filelist.length;i++){
-								if(filelist[i][0]!='.'&&filelist[i][0]!='_'){
-									if(lib.node.fs.statSync(dir+'/'+filelist[i]).isDirectory()){
-										folders.push(filelist[i]);
-									}
-									else{
-										files.push(filelist[i]);
-									}
-								}
-							}
-							callback(folders,files);
-						});
-					};
-					game.ensureDirectory=function(list,callback,file){
-						var directorylist;
-						var num=0;
-						if(file){
-							num=1;
-						}
-						if(typeof list=='string'){
-							directorylist=[list];
-						}
-						else{
-							var directorylist=list.slice(0);
-						}
-						var access=function(str,dir,callback){
-							if(dir.length<=num){
-								callback();
-							}
-							else{
-								str+='/'+dir.shift();
-								lib.node.fs.access(__dirname+str,function(e){
-									if(e){
-										try{
-											lib.node.fs.mkdir(__dirname+str,function(){
-												access(str,dir,callback);
-											});
-										}
-										catch(e){
-											console.log(e);
-										}
-									}
-									else{
-										access(str,dir,callback);
-									}
-								});
-							}
-						}
-						var createDirectory=function(){
-							if(directorylist.length){
-								access('',directorylist.shift().split('/'),createDirectory);
-							}
-							else{
-								callback();
-							}
-						};
-						createDirectory();
-					};
-                    if(ui.updateUpdate){
-                        ui.updateUpdate();
-                    }
-                }
 
 				if(lib.device){
 					lib.init.cordovaReady=function(){
@@ -6510,20 +5995,131 @@
 						}
 					}
 				}
-                if(!lib.config.touchscreen){
-                    document.addEventListener('mousewheel',ui.click.windowmousewheel,{passive:true});
-        			document.addEventListener('mousemove',ui.click.windowmousemove);
-        			document.addEventListener('mousedown',ui.click.windowmousedown);
-        			document.addEventListener('mouseup',ui.click.windowmouseup);
-        			document.addEventListener('contextmenu',ui.click.right);
-        		}
-        		else{
-					document.addEventListener('touchstart',ui.click.touchconfirm);
-        			document.addEventListener('touchstart',ui.click.windowtouchstart);
-        			document.addEventListener('touchend',ui.click.windowtouchend);
-        			document.addEventListener('touchmove',ui.click.windowtouchmove);
-        		}
-                if(!lib.device&&!lib.node){
+				else if(typeof window.require=='function'){
+					lib.node={
+                        fs:require('fs'),
+                        debug:function(){
+                            require('electron').remote.getCurrentWindow().toggleDevTools();
+                        }
+                    };
+                    game.download=function(url,folder,onsuccess,onerror,dev,onprogress){
+                        if(url.indexOf('http')!=0){
+                            url=get.url(dev)+url;
+                        }
+						game.ensureDirectory(folder,function(){
+                            try{
+                                var file = lib.node.fs.createWriteStream(__dirname+'/'+folder);
+                            }
+                            catch(e){
+                                onerror();
+                            }
+							lib.config.brokenFile.add(folder);
+							game.saveConfigValue('brokenFile');
+                            if(!lib.node.http) lib.node.http=require('http');
+                            if(!lib.node.https) lib.node.https=require('https');
+                            var request = (url.indexOf('https')==0?lib.node.https:lib.node.http).get(encodeURI(url), function(response) {
+                                var stream=response.pipe(file);
+                                stream.on('finish',function(){
+									lib.config.brokenFile.remove(folder);
+									game.saveConfigValue('brokenFile');
+									if(onsuccess){
+										onsuccess();
+									}
+								});
+                                stream.on('error',onerror);
+								if(onprogress){
+									var streamInterval=setInterval(function(){
+										if(stream.closed){
+											clearInterval(streamInterval);
+										}
+										else{
+											onprogress(stream.bytesWritten);
+										}
+									},200);
+								}
+                            });
+                        },true);
+                    };
+					game.readFile=function(filename,callback,onerror){
+						lib.node.fs.readFile(__dirname+'/'+filename,function(err,data){
+							if(err){
+								onerror(err);
+							}
+							else{
+								callback(data);
+							}
+						});
+					};
+					game.removeFile=function(filename,callback){
+						lib.node.fs.unlink(__dirname+'/'+filename);
+					};
+					game.getFileList=function(dir,callback){
+						var files=[],folders=[];
+						dir=__dirname+'/'+dir;
+						lib.node.fs.readdir(dir,function(err,filelist){
+							for(var i=0;i<filelist.length;i++){
+								if(filelist[i][0]!='.'&&filelist[i][0]!='_'){
+									if(lib.node.fs.statSync(dir+'/'+filelist[i]).isDirectory()){
+										folders.push(filelist[i]);
+									}
+									else{
+										files.push(filelist[i]);
+									}
+								}
+							}
+							callback(folders,files);
+						});
+					};
+					game.ensureDirectory=function(list,callback,file){
+						var directorylist;
+						var num=0;
+						if(file){
+							num=1;
+						}
+						if(typeof list=='string'){
+							directorylist=[list];
+						}
+						else{
+							var directorylist=list.slice(0);
+						}
+						var access=function(str,dir,callback){
+							if(dir.length<=num){
+								callback();
+							}
+							else{
+								str+='/'+dir.shift();
+								lib.node.fs.access(__dirname+str,function(e){
+									if(e){
+										try{
+											lib.node.fs.mkdir(__dirname+str,function(){
+												access(str,dir,callback);
+											});
+										}
+										catch(e){
+											console.log(e);
+										}
+									}
+									else{
+										access(str,dir,callback);
+									}
+								});
+							}
+						}
+						var createDirectory=function(){
+							if(directorylist.length){
+								access('',directorylist.shift().split('/'),createDirectory);
+							}
+							else{
+								callback();
+							}
+						};
+						createDirectory();
+					};
+                    if(ui.updateUpdate){
+                        ui.updateUpdate();
+                    }
+				}
+                else{
                     window.onbeforeunload=function(){
             			if(lib.config.confirm_exit&&!_status.reloading){
             				return '是否离开游戏？'
@@ -6533,6 +6129,451 @@
             			}
             		}
                 }
+
+				lib.config=window.config;
+                lib.configOL={};
+				var config2;
+
+				var proceed=function(config2){
+					if(config2.mode) lib.config.mode=config2.mode;
+					if(lib.config.mode_config[lib.config.mode]==undefined) lib.config.mode_config[lib.config.mode]={};
+					for(var i in lib.config.mode_config.global){
+						if(lib.config.mode_config[lib.config.mode][i]==undefined){
+							lib.config.mode_config[lib.config.mode][i]=lib.config.mode_config.global[i];
+						}
+					}
+					if(lib.config.characters){
+						lib.config.defaultcharacters=lib.config.characters.slice(0);
+					}
+					if(lib.config.cards){
+						lib.config.defaultcards=lib.config.cards.slice(0);
+					}
+					for(var i in config2){
+						if(i.indexOf('_mode_config')!=-1){
+							var thismode=i.substr(i.indexOf('_mode_config')+13);
+							if(!lib.config.mode_config[thismode]){
+								lib.config.mode_config[thismode]={};
+							}
+							lib.config.mode_config[thismode][i.substr(0,i.indexOf('_mode_config'))]=config2[i];
+						}
+						else{
+							lib.config[i]=config2[i];
+						}
+					}
+					for(var i in lib.config.translate){
+						lib.translate[i]=lib.config.translate[i];
+					}
+
+					lib.config.all.characters=[];
+					lib.config.all.cards=[];
+					lib.config.all.plays=[];
+					lib.config.all.mode=[];
+
+	                if(lib.config.debug){
+	                    lib.init.js(lib.assetURL+'game','asset',function(){
+	                        lib.skin=window.noname_skin_list;
+	                        delete window.noname_skin_list;
+	                        delete window.noname_asset_list;
+	                    });
+	                }
+
+	                if(window.isNonameServer){
+	                    lib.config.mode='connect';
+	                }
+					for(i in character.pack){
+						if(lib.config.hiddenCharacterPack.indexOf(i)==-1){
+							lib.config.all.characters.push(i);
+							lib.translate[i+'_character_config']=character.pack[i];
+						}
+					}
+					for(i in card.pack){
+						if(lib.config.hiddenCardPack.indexOf(i)==-1){
+							lib.config.all.cards.push(i);
+							lib.translate[i+'_card_config']=card.pack[i];
+						}
+					}
+					for(i in play.pack){
+						lib.config.all.plays.push(i);
+						lib.translate[i+'_play_config']=play.pack[i];
+					}
+
+					if(!lib.config.gameRecord){
+						lib.config.gameRecord={};
+					}
+					for(i in mode.pack){
+						if(lib.config.hiddenModePack.indexOf(i)==-1){
+							lib.config.all.mode.push(i);
+							lib.translate[i]=mode.pack[i];
+							if(!lib.config.gameRecord[i]){
+								lib.config.gameRecord[i]={data:{}};
+							}
+						}
+					}
+					if(lib.config.all.mode.length==0){
+						lib.config.all.mode.push('identity');
+						lib.translate.identity='身份';
+						if(!lib.config.gameRecord.identity){
+							lib.config.gameRecord.identity={data:{}};
+						}
+					}
+					if(background&&background.pack){
+						for(i in background.pack){
+							if(lib.config.hiddenBackgroundPack.contains(i)) continue;
+							lib.configMenu.appearence.config.image_background.item[i]=background.pack[i];
+						}
+						for(var i=0;i<lib.config.customBackgroundPack.length;i++){
+							var link=lib.config.customBackgroundPack[i];
+							lib.configMenu.appearence.config.image_background.item[link]=link.slice(7);
+						}
+						lib.configMenu.appearence.config.image_background.item.default='默认';
+					}
+					if(music&&music.pack){
+						if(lib.device||typeof window.require=='function'){
+							lib.configMenu.audio.config.background_music.item.music_custom='自定';
+						}
+						lib.config.all.background_music=['music_default'];
+						for(i in music.pack){
+							lib.config.all.background_music.push(i);
+							lib.configMenu.audio.config.background_music.item[i]=music.pack[i];
+						}
+					    lib.configMenu.audio.config.background_music.item.music_random='随机';
+					    lib.configMenu.audio.config.background_music.item.music_off='关闭';
+					}
+	                if(theme&&theme.pack){
+	                    for(i in theme.pack){
+							lib.configMenu.appearence.config.theme.item[i]=theme.pack[i];
+						}
+	                }
+
+
+					if(font&&font.pack){
+						ui.css.fontsheet=lib.init.sheet();
+						for(i in font.pack){
+							lib.configMenu.appearence.config.name_font.item[i]=font.pack[i];
+							lib.configMenu.appearence.config.identity_font.item[i]=font.pack[i];
+							lib.configMenu.appearence.config.cardtext_font.item[i]=font.pack[i];
+							lib.configMenu.appearence.config.global_font.item[i]=font.pack[i];
+							ui.css.fontsheet.sheet.insertRule("@font-face {font-family: '"+i+"';src: url('"+lib.assetURL+"font/"+i+".ttf');}",0);
+						}
+						lib.configMenu.appearence.config.cardtext_font.item.default='默认';
+						lib.configMenu.appearence.config.global_font.item.default='默认';
+					}
+					delete character.pack;
+					delete card.pack;
+					delete play.pack;
+					delete mode.pack;
+					delete window.background;
+					delete window.music;
+					delete window.font;
+
+					var ua=navigator.userAgent.toLowerCase();
+					if('ontouchstart' in document){
+						if(!lib.config.totouched){
+							game.saveConfig('totouched',true);
+							if(lib.device){
+			                    game.saveConfig('low_performance',true);
+			                    game.saveConfig('confirm_exit',true);
+								game.saveConfig('touchscreen',true);
+								game.saveConfig('fold_mode',false);
+								if(ua.indexOf('ipad')==-1){
+									game.saveConfig('phonelayout',true);
+								}
+								else if(lib.device=='ios'){
+									game.saveConfig('show_statusbar_ios','overlay');
+								}
+							}
+							else if(confirm('是否切换到触屏模式？（触屏模式可提高触屏设备的响应速度，但无法使用鼠标）')){
+								game.saveConfig('touchscreen',true);
+								if(ua.indexOf('iphone')!=-1||ua.indexOf('android')!=-1){
+									game.saveConfig('phonelayout',true);
+								}
+								game.reload();
+							}
+		                }
+					}
+	                else if(lib.config.touchscreen){
+						game.saveConfig('touchscreen',false);
+					}
+					if(!lib.config.toscrolled&&ua.indexOf('macintosh')!=-1){
+						game.saveConfig('toscrolled',true);
+						game.saveConfig('mousewheel',false);
+					}
+
+	                var extensionlist=[];
+	                if(!localStorage.getItem(lib.configprefix+'disable_extension')){
+						if(lib.config.extensions.length){
+							window.resetExtension=function(){
+								for(var i=0;i<lib.config.extensions.length;i++){
+									game.saveConfig('extension_'+lib.config.extensions[i]+'_enable',false);
+								}
+		                        localStorage.setItem(lib.configprefix+'disable_extension',true);
+							}
+						}
+	                    for(var i=0;i<lib.config.plays.length;i++){
+	                        if(lib.config.all.plays.indexOf(lib.config.plays[i])!=-1){
+	                            extensionlist.push(lib.config.plays[i]);
+	                        }
+	                    }
+	                    for(var i=0;i<lib.config.extensions.length;i++){
+	                        var extcontent=localStorage.getItem(lib.configprefix+'extension_'+lib.config.extensions[i]);
+	                        if(extcontent){
+	                            _status.evaluatingExtension=true;
+	                            try{
+	        						eval(extcontent);
+	        					}
+	        					catch(e){
+	        						console.log(e);
+	        					}
+	                            _status.evaluatingExtension=false;
+	                        }
+	                        else{
+	                            extensionlist.push(lib.config.extensions[i]);
+	                        }
+	    				}
+	                }
+	                else{
+	                    for(var i=0;i<lib.config.extensions.length;i++){
+	                        game.import('extension',{name:lib.config.extensions[i]});
+	                    }
+	                }
+	                var loadPack=function(){
+	                    var toLoad=lib.config.all.cards.length+lib.config.all.characters.length+1;
+	    				var packLoaded=function(){
+	    					toLoad--;
+	    					if(toLoad==0){
+	    						if(_status.windowLoaded){
+	    							delete _status.windowLoaded;
+	    							lib.init.onload();
+	    						}
+	    						else{
+	    							_status.packLoaded=true;
+	    						}
+	    					}
+	    				};
+						var show_splash=lib.config.show_splash;
+						if(show_splash=='off'){
+							show_splash=false;
+						}
+						else if(show_splash=='init'){
+							if(localStorage.getItem('show_splash_off')){
+								show_splash=false;
+							}
+						}
+						localStorage.removeItem('show_splash_off');
+	    				if(localStorage.getItem(lib.configprefix+'playback')){
+	    					toLoad++;
+	    					lib.init.js(lib.assetURL+'mode',lib.config.mode,packLoaded,packLoaded);
+	    				}
+	    				else if((localStorage.getItem(lib.configprefix+'directstart')||!show_splash)&&
+	    					lib.config.all.mode.indexOf(lib.config.mode)!=-1){
+	    					toLoad++;
+	    					lib.init.js(lib.assetURL+'mode',lib.config.mode,packLoaded,packLoaded);
+	    				}
+	    				lib.init.js(lib.assetURL+'card',lib.config.all.cards,packLoaded,packLoaded);
+	    				lib.init.js(lib.assetURL+'character',lib.config.all.characters,packLoaded,packLoaded);
+	    				lib.init.js(lib.assetURL+'character','rank',packLoaded,packLoaded);
+						if(lib.device!='ios'&&lib.config.enable_pressure) lib.init.js(lib.assetURL+'game','pressure');
+	                };
+
+					var layout=lib.config.layout;
+	                if(lib.layoutfixed.indexOf(lib.config.mode)!==-1){
+						layout='mobile';
+					}
+	                if(layout=='phone'){
+	                    layout='mobile';
+	                    game.saveConfig('layout','mobile');
+	                    game.saveConfig('phonelayout',true);
+	                }
+	                game.layout=layout;
+					if(lib.config.image_background_random){
+						var list=[];
+						for(var i in lib.configMenu.appearence.config.image_background.item){
+							if(i=='default') continue;
+							list.push(i);
+						}
+						game.saveConfig('image_background',list.randomGet(lib.config.image_background));
+					}
+
+					var styleToLoad=7;
+					var styleLoaded=function(){
+						styleToLoad--;
+						if(styleToLoad==0){
+							if(extensionlist.length){
+			                    window.game=game;
+			                    var extToLoad=extensionlist.length;
+			                    var extLoaded=function(){
+			                        extToLoad--;
+			    					if(extToLoad==0){
+			                            delete window.game;
+			    						loadPack();
+			    					}
+			                    }
+			                    for(var i=0;i<extensionlist.length;i++){
+			                        lib.init.js(lib.assetURL+'extension/'+extensionlist[i],'extension',extLoaded,(function(i){
+			                            return function(){
+			                                game.removeExtension(i);
+			                                extToLoad--;
+			            					if(extToLoad==0){
+			                                    delete window.game;
+			            						loadPack();
+			            					}
+			                            }
+			                        }(extensionlist[i])));
+			                    }
+			                }
+			                else{
+			                    loadPack();
+			                }
+						}
+					};
+					lib.init.css(lib.assetURL+'layout/default','menu',styleLoaded);
+					if(lib.config.layout!='default'){
+						ui.css.layout=lib.init.css(lib.assetURL+'layout/'+layout,'layout',styleLoaded);
+					}
+					else{
+						ui.css.layout=lib.init.css();
+						styleToLoad--;
+					}
+	                if(get.is.phoneLayout()){
+						ui.css.phone=lib.init.css(lib.assetURL+'layout/default','phone',styleLoaded);
+	                }
+					else{
+						ui.css.phone=lib.init.css();
+						styleToLoad--;
+					}
+					ui.css.theme=lib.init.css(lib.assetURL+'theme/'+lib.config.theme,'style',styleLoaded);
+					ui.css.card_style=lib.init.css(lib.assetURL+'theme/style/card',lib.config.card_style,styleLoaded);
+					ui.css.cardback_style=lib.init.css(lib.assetURL+'theme/style/cardback',lib.config.cardback_style,styleLoaded);
+					ui.css.hp_style=lib.init.css(lib.assetURL+'theme/style/hp',lib.config.hp_style,styleLoaded);
+
+					if(lib.config.player_style&&lib.config.player_style!='default'&&lib.config.player_style!='custom'){
+						var str='';
+						switch(lib.config.player_style){
+							case 'wood':str='url("'+lib.assetURL+'theme/woodden/wood.jpg")';break;
+							case 'music':str='linear-gradient(#4b4b4b, #464646)';break;
+							case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';break;
+						}
+						ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:'+str+'}');
+					}
+					if(lib.config.border_style&&lib.config.border_style!='default'&&lib.config.border_style!='custom'&&lib.config.border_style!='auto'){
+						ui.css.border_stylesheet=lib.init.sheet();
+						var bstyle=lib.config.border_style;
+						if(bstyle.indexOf('dragon_')==0){
+							bstyle=bstyle.slice(7);
+						}
+						ui.css.border_stylesheet.sheet.insertRule('#window .player>.framebg,#window #arena.long.mobile:not(.fewplayer) .player[data-position="0"]>.framebg{display:block;background-image:url("'+lib.assetURL+'theme/style/player/'+bstyle+'1.png")}',0);
+						ui.css.border_stylesheet.sheet.insertRule('#window #arena.long:not(.fewplayer) .player>.framebg, #arena.oldlayout .player>.framebg{background-image:url("'+lib.assetURL+'theme/style/player/'+bstyle+'3.png")}',0);
+						ui.css.border_stylesheet.sheet.insertRule('.player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}',0);
+					}
+					if(lib.config.control_style&&lib.config.control_style!='default'&&lib.config.control_style!='custom'){
+						var str='';
+						switch(lib.config.control_style){
+							case 'wood':str='url("'+lib.assetURL+'theme/woodden/wood.jpg")';break;
+							case 'music':str='linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px';break;
+							case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));color:white;text-shadow:black 0 0 2px';break;
+						}
+						if(lib.config.control_style=='wood'){
+							ui.css.control_stylesheet=lib.init.sheet('#window .control,#window .menubutton,#window #system>div>div,#window #system>div>.pressdown2{background-image:'+str+'}');
+						}
+						else{
+							ui.css.control_stylesheet=lib.init.sheet('#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:'+str+'}');
+						}
+					}
+					if(lib.config.menu_style&&lib.config.menu_style!='default'&&lib.config.menu_style!='custom'){
+						var str='';
+						switch(lib.config.menu_style){
+							case 'wood':str='url("'+lib.assetURL+'theme/woodden/wood2.png")';break;
+							case 'music':str='linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px';break;
+							case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));color:white;text-shadow:black 0 0 2px';break;
+						}
+						ui.css.menu_stylesheet=lib.init.sheet('html #window>.dialog.popped,html .menu,html .menubg{background-image:'+str+'}');
+					}
+
+					lib.config.duration=500;
+
+					if(!lib.config.touchscreen){
+	                    document.addEventListener('mousewheel',ui.click.windowmousewheel,{passive:true});
+	        			document.addEventListener('mousemove',ui.click.windowmousemove);
+	        			document.addEventListener('mousedown',ui.click.windowmousedown);
+	        			document.addEventListener('mouseup',ui.click.windowmouseup);
+	        			document.addEventListener('contextmenu',ui.click.right);
+	        		}
+	        		else{
+						document.addEventListener('touchstart',ui.click.touchconfirm);
+	        			document.addEventListener('touchstart',ui.click.windowtouchstart);
+	        			document.addEventListener('touchend',ui.click.windowtouchend);
+	        			document.addEventListener('touchmove',ui.click.windowtouchmove);
+	        		}
+				};
+
+				if(window.indexedDB){
+					var request = window.indexedDB.open(lib.configprefix+'data',4);
+					request.onupgradeneeded=function(e){
+						var db=e.target.result;
+						if(!db.objectStoreNames.contains('video')){
+							db.createObjectStore('video',{keyPath:'time'});
+						}
+						if(!db.objectStoreNames.contains('image')){
+							db.createObjectStore('image');
+						}
+						if(!db.objectStoreNames.contains('audio')){
+							db.createObjectStore('audio');
+						}
+						if(!db.objectStoreNames.contains('config')){
+							db.createObjectStore('config');
+						}
+						if(!db.objectStoreNames.contains('data')){
+							db.createObjectStore('data');
+						}
+					};
+					request.onsuccess=function(e){
+						lib.db=e.target.result;
+						game.getDB('config',null,function(obj){
+							if(!obj.storageImported){
+								try{
+									config2=JSON.parse(localStorage.getItem(lib.configprefix+'config'));
+									if(!config2||typeof config2!='object') throw 'err'
+								}
+								catch(err){
+									config2={};
+								}
+								for(var i in config2){
+									game.saveConfig(i,config2[i]);
+								}
+								for(var i in lib.mode){
+									try{
+										config2=JSON.parse(localStorage.getItem(lib.configprefix+i));
+										if(!config2||typeof config2!='object'||get.is.empty(config2)) throw 'err'
+									}
+									catch(err){
+										config2=false;
+									}
+									localStorage.removeItem(lib.configprefix+i);
+									if(config2){
+										game.putDB('data',i,config2);
+									}
+								}
+								game.saveConfig('storageImported',true);
+								localStorage.removeItem(lib.configprefix+'config');
+							}
+							else{
+								config2=obj;
+							}
+							proceed(config2);
+						});
+					}
+				}
+				else{
+					try{
+						config2=JSON.parse(localStorage.getItem(lib.configprefix+'config'));
+						if(!config2||typeof config2!='object') throw 'err'
+					}
+					catch(err){
+						config2={};
+						localStorage.setItem(lib.configprefix+'config',JSON.stringify({}));
+					}
+					proceed(config2);
+				}
 			},
 			reset:function(){
 				if(window.inSplash) return;
@@ -6642,164 +6683,162 @@
 					});
 				}
 
-				lib.onDB(function(){
-					if(lib.config.image_background.indexOf('custom_')==0){
-						ui.background.style.backgroundImage="none";
-						game.getDB('image',lib.config.image_background,function(fileToLoad){
-							if(!fileToLoad) return;
-							var fileReader = new FileReader();
-							fileReader.onload = function(fileLoadedEvent)
-							{
-								var data = fileLoadedEvent.target.result;
-								ui.background.style.backgroundImage='url('+data+')';
-                                if(lib.config.image_background_blur){
-                                    ui.background.style.filter='blur(8px)';
-                                    ui.background.style.webkitFilter='blur(8px)';
-                                    ui.background.style.transform='scale(1.05)';
-                                }
-							};
-							fileReader.readAsDataURL(fileToLoad, "UTF-8");
-						});
-					}
-					if(lib.config.card_style=='custom'){
-						game.getDB('image','card_style',function(fileToLoad){
-							if(!fileToLoad) return;
-							var fileReader = new FileReader();
-							fileReader.onload = function(fileLoadedEvent){
-								if(ui.css.card_stylesheet){
-									ui.css.card_stylesheet.remove();
-								}
-								ui.css.card_stylesheet=lib.init.sheet('.card:not(*:empty){background-image:url('+fileLoadedEvent.target.result+')}');
-							};
-							fileReader.readAsDataURL(fileToLoad, "UTF-8");
-						});
-					}
-					if(lib.config.cardback_style=='custom'){
-						game.getDB('image','cardback_style',function(fileToLoad){
-							if(!fileToLoad) return;
-							var fileReader = new FileReader();
-							fileReader.onload = function(fileLoadedEvent){
-								if(ui.css.cardback_stylesheet){
-									ui.css.cardback_stylesheet.remove();
-								}
-								ui.css.cardback_stylesheet=lib.init.sheet('.card:empty,.card.infohidden{background-image:url('+fileLoadedEvent.target.result+')}');
-							};
-							fileReader.readAsDataURL(fileToLoad, "UTF-8");
-						});
-						game.getDB('image','cardback_style2',function(fileToLoad){
-							if(!fileToLoad) return;
-							var fileReader = new FileReader();
-							fileReader.onload = function(fileLoadedEvent){
-								if(ui.css.cardback_stylesheet2){
-									ui.css.cardback_stylesheet2.remove();
-								}
-								ui.css.cardback_stylesheet2=lib.init.sheet('.card.infohidden:not(.infoflip){background-image:url('+fileLoadedEvent.target.result+')}');
-							};
-							fileReader.readAsDataURL(fileToLoad, "UTF-8");
-						});
-					}
-					if(lib.config.hp_style=='custom'){
-						game.getDB('image','hp_style1',function(fileToLoad){
-							if(!fileToLoad) return;
-							var fileReader = new FileReader();
-							fileReader.onload = function(fileLoadedEvent){
-								if(ui.css.hp_stylesheet1){
-									ui.css.hp_stylesheet1.remove();
-								}
-								ui.css.hp_stylesheet1=lib.init.sheet('.hp:not(.text):not(.actcount)[data-condition="high"]>div:not(.lost){background-image:url('+fileLoadedEvent.target.result+')}');
-							};
-							fileReader.readAsDataURL(fileToLoad, "UTF-8");
-						});
-						game.getDB('image','hp_style2',function(fileToLoad){
-							if(!fileToLoad) return;
-							var fileReader = new FileReader();
-							fileReader.onload = function(fileLoadedEvent){
-								if(ui.css.hp_stylesheet2){
-									ui.css.hp_stylesheet2.remove();
-								}
-								ui.css.hp_stylesheet2=lib.init.sheet('.hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){background-image:url('+fileLoadedEvent.target.result+')}');
-							};
-							fileReader.readAsDataURL(fileToLoad, "UTF-8");
-						});
-						game.getDB('image','hp_style3',function(fileToLoad){
-							if(!fileToLoad) return;
-							var fileReader = new FileReader();
-							fileReader.onload = function(fileLoadedEvent){
-								if(ui.css.hp_stylesheet3){
-									ui.css.hp_stylesheet3.remove();
-								}
-								ui.css.hp_stylesheet3=lib.init.sheet('.hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){background-image:url('+fileLoadedEvent.target.result+')}');
-							};
-							fileReader.readAsDataURL(fileToLoad, "UTF-8");
-						});
-						game.getDB('image','hp_style4',function(fileToLoad){
-							if(!fileToLoad) return;
-							var fileReader = new FileReader();
-							fileReader.onload = function(fileLoadedEvent){
-								if(ui.css.hp_stylesheet4){
-									ui.css.hp_stylesheet4.remove();
-								}
-								ui.css.hp_stylesheet4=lib.init.sheet('.hp:not(.text):not(.actcount)>.lost{background-image:url('+fileLoadedEvent.target.result+')}');
-							};
-							fileReader.readAsDataURL(fileToLoad, "UTF-8");
-						});
-					}
-					if(lib.config.player_style=='custom'){
-						ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:none;background-size:100% 100%;}');
-						game.getDB('image','player_style',function(fileToLoad){
-							if(!fileToLoad) return;
-							var fileReader = new FileReader();
-							fileReader.onload = function(fileLoadedEvent){
-								if(ui.css.player_stylesheet){
-									ui.css.player_stylesheet.remove();
-								}
-								ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:url("'+fileLoadedEvent.target.result+'");background-size:100% 100%;}');
-							};
-							fileReader.readAsDataURL(fileToLoad, "UTF-8");
-						});
-					}
-					if(lib.config.border_style=='custom'){
-						game.getDB('image','border_style',function(fileToLoad){
-							if(!fileToLoad) return;
-							var fileReader = new FileReader();
-							fileReader.onload = function(fileLoadedEvent){
-								if(ui.css.border_stylesheet){
-									ui.css.border_stylesheet.remove();
-								}
-								ui.css.border_stylesheet=lib.init.sheet();
-								ui.css.border_stylesheet.sheet.insertRule('#window .player>.framebg{display:block;background-image:url("'+fileLoadedEvent.target.result+'")}',0);
-								ui.css.border_stylesheet.sheet.insertRule('.player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}',0);
-							};
-							fileReader.readAsDataURL(fileToLoad, "UTF-8");
-						});
-					}
-					if(lib.config.control_style=='custom'){
-						game.getDB('image','control_style',function(fileToLoad){
-							if(!fileToLoad) return;
-							var fileReader = new FileReader();
-							fileReader.onload = function(fileLoadedEvent){
-								if(ui.css.control_stylesheet){
-									ui.css.control_stylesheet.remove();
-								}
-								ui.css.control_stylesheet=lib.init.sheet('#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:url("'+fileLoadedEvent.target.result+'")}');
-							};
-							fileReader.readAsDataURL(fileToLoad, "UTF-8");
-						});
-					}
-					if(lib.config.menu_style=='custom'){
-						game.getDB('image','menu_style',function(fileToLoad){
-							if(!fileToLoad) return;
-							var fileReader = new FileReader();
-							fileReader.onload = function(fileLoadedEvent){
-								if(ui.css.menu_stylesheet){
-									ui.css.menu_stylesheet.remove();
-								}
-								ui.css.menu_stylesheet=lib.init.sheet('html #window>.dialog.popped,html .menu,html .menubg{background-image:url("'+fileLoadedEvent.target.result+'");background-size:cover}');
-							};
-							fileReader.readAsDataURL(fileToLoad, "UTF-8");
-						});
-					}
-				});
+				if(lib.config.image_background.indexOf('custom_')==0){
+					ui.background.style.backgroundImage="none";
+					game.getDB('image',lib.config.image_background,function(fileToLoad){
+						if(!fileToLoad) return;
+						var fileReader = new FileReader();
+						fileReader.onload = function(fileLoadedEvent)
+						{
+							var data = fileLoadedEvent.target.result;
+							ui.background.style.backgroundImage='url('+data+')';
+                            if(lib.config.image_background_blur){
+                                ui.background.style.filter='blur(8px)';
+                                ui.background.style.webkitFilter='blur(8px)';
+                                ui.background.style.transform='scale(1.05)';
+                            }
+						};
+						fileReader.readAsDataURL(fileToLoad, "UTF-8");
+					});
+				}
+				if(lib.config.card_style=='custom'){
+					game.getDB('image','card_style',function(fileToLoad){
+						if(!fileToLoad) return;
+						var fileReader = new FileReader();
+						fileReader.onload = function(fileLoadedEvent){
+							if(ui.css.card_stylesheet){
+								ui.css.card_stylesheet.remove();
+							}
+							ui.css.card_stylesheet=lib.init.sheet('.card:not(*:empty){background-image:url('+fileLoadedEvent.target.result+')}');
+						};
+						fileReader.readAsDataURL(fileToLoad, "UTF-8");
+					});
+				}
+				if(lib.config.cardback_style=='custom'){
+					game.getDB('image','cardback_style',function(fileToLoad){
+						if(!fileToLoad) return;
+						var fileReader = new FileReader();
+						fileReader.onload = function(fileLoadedEvent){
+							if(ui.css.cardback_stylesheet){
+								ui.css.cardback_stylesheet.remove();
+							}
+							ui.css.cardback_stylesheet=lib.init.sheet('.card:empty,.card.infohidden{background-image:url('+fileLoadedEvent.target.result+')}');
+						};
+						fileReader.readAsDataURL(fileToLoad, "UTF-8");
+					});
+					game.getDB('image','cardback_style2',function(fileToLoad){
+						if(!fileToLoad) return;
+						var fileReader = new FileReader();
+						fileReader.onload = function(fileLoadedEvent){
+							if(ui.css.cardback_stylesheet2){
+								ui.css.cardback_stylesheet2.remove();
+							}
+							ui.css.cardback_stylesheet2=lib.init.sheet('.card.infohidden:not(.infoflip){background-image:url('+fileLoadedEvent.target.result+')}');
+						};
+						fileReader.readAsDataURL(fileToLoad, "UTF-8");
+					});
+				}
+				if(lib.config.hp_style=='custom'){
+					game.getDB('image','hp_style1',function(fileToLoad){
+						if(!fileToLoad) return;
+						var fileReader = new FileReader();
+						fileReader.onload = function(fileLoadedEvent){
+							if(ui.css.hp_stylesheet1){
+								ui.css.hp_stylesheet1.remove();
+							}
+							ui.css.hp_stylesheet1=lib.init.sheet('.hp:not(.text):not(.actcount)[data-condition="high"]>div:not(.lost){background-image:url('+fileLoadedEvent.target.result+')}');
+						};
+						fileReader.readAsDataURL(fileToLoad, "UTF-8");
+					});
+					game.getDB('image','hp_style2',function(fileToLoad){
+						if(!fileToLoad) return;
+						var fileReader = new FileReader();
+						fileReader.onload = function(fileLoadedEvent){
+							if(ui.css.hp_stylesheet2){
+								ui.css.hp_stylesheet2.remove();
+							}
+							ui.css.hp_stylesheet2=lib.init.sheet('.hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){background-image:url('+fileLoadedEvent.target.result+')}');
+						};
+						fileReader.readAsDataURL(fileToLoad, "UTF-8");
+					});
+					game.getDB('image','hp_style3',function(fileToLoad){
+						if(!fileToLoad) return;
+						var fileReader = new FileReader();
+						fileReader.onload = function(fileLoadedEvent){
+							if(ui.css.hp_stylesheet3){
+								ui.css.hp_stylesheet3.remove();
+							}
+							ui.css.hp_stylesheet3=lib.init.sheet('.hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){background-image:url('+fileLoadedEvent.target.result+')}');
+						};
+						fileReader.readAsDataURL(fileToLoad, "UTF-8");
+					});
+					game.getDB('image','hp_style4',function(fileToLoad){
+						if(!fileToLoad) return;
+						var fileReader = new FileReader();
+						fileReader.onload = function(fileLoadedEvent){
+							if(ui.css.hp_stylesheet4){
+								ui.css.hp_stylesheet4.remove();
+							}
+							ui.css.hp_stylesheet4=lib.init.sheet('.hp:not(.text):not(.actcount)>.lost{background-image:url('+fileLoadedEvent.target.result+')}');
+						};
+						fileReader.readAsDataURL(fileToLoad, "UTF-8");
+					});
+				}
+				if(lib.config.player_style=='custom'){
+					ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:none;background-size:100% 100%;}');
+					game.getDB('image','player_style',function(fileToLoad){
+						if(!fileToLoad) return;
+						var fileReader = new FileReader();
+						fileReader.onload = function(fileLoadedEvent){
+							if(ui.css.player_stylesheet){
+								ui.css.player_stylesheet.remove();
+							}
+							ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:url("'+fileLoadedEvent.target.result+'");background-size:100% 100%;}');
+						};
+						fileReader.readAsDataURL(fileToLoad, "UTF-8");
+					});
+				}
+				if(lib.config.border_style=='custom'){
+					game.getDB('image','border_style',function(fileToLoad){
+						if(!fileToLoad) return;
+						var fileReader = new FileReader();
+						fileReader.onload = function(fileLoadedEvent){
+							if(ui.css.border_stylesheet){
+								ui.css.border_stylesheet.remove();
+							}
+							ui.css.border_stylesheet=lib.init.sheet();
+							ui.css.border_stylesheet.sheet.insertRule('#window .player>.framebg{display:block;background-image:url("'+fileLoadedEvent.target.result+'")}',0);
+							ui.css.border_stylesheet.sheet.insertRule('.player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}',0);
+						};
+						fileReader.readAsDataURL(fileToLoad, "UTF-8");
+					});
+				}
+				if(lib.config.control_style=='custom'){
+					game.getDB('image','control_style',function(fileToLoad){
+						if(!fileToLoad) return;
+						var fileReader = new FileReader();
+						fileReader.onload = function(fileLoadedEvent){
+							if(ui.css.control_stylesheet){
+								ui.css.control_stylesheet.remove();
+							}
+							ui.css.control_stylesheet=lib.init.sheet('#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:url("'+fileLoadedEvent.target.result+'")}');
+						};
+						fileReader.readAsDataURL(fileToLoad, "UTF-8");
+					});
+				}
+				if(lib.config.menu_style=='custom'){
+					game.getDB('image','menu_style',function(fileToLoad){
+						if(!fileToLoad) return;
+						var fileReader = new FileReader();
+						fileReader.onload = function(fileLoadedEvent){
+							if(ui.css.menu_stylesheet){
+								ui.css.menu_stylesheet.remove();
+							}
+							ui.css.menu_stylesheet=lib.init.sheet('html #window>.dialog.popped,html .menu,html .menubg{background-image:url("'+fileLoadedEvent.target.result+'");background-size:cover}');
+						};
+						fileReader.readAsDataURL(fileToLoad, "UTF-8");
+					});
+				}
 
 				var proceed=function(){
 					var i,j,k;
@@ -7129,16 +7168,6 @@
     					}
                     }
 
-					try{
-						lib.storage=JSON.parse(localStorage.getItem(lib.configprefix+lib.config.mode));
-						if(typeof lib.storage!='object') throw('err');
-						if(lib.storage==null) throw('err');
-					}
-					catch(err){
-						lib.storage={};
-						localStorage.setItem(lib.configprefix+lib.config.mode,"{}");
-					}
-
                     if(lib.config.mode=='connect'){
                         _status.connectMode=true;
                     }
@@ -7195,19 +7224,33 @@
                     }
                     delete lib.extensions;
 
-                    if(window.indexedDB&&!_status.dbLoaded){
-						_status.waitingForDB=true;
-					}
-					else{
+					var proceed=function(){
 						if(lib.init.startBefore){
 							lib.init.startBefore();
 							delete lib.init.startBefore;
 						}
-                        ui.create.arena();
+	                    ui.create.arena();
 						game.createEvent('game',false).setContent(lib.init.start);
 						delete lib.init.start;
-                        delete _status.dbLoaded;
 						game.loop();
+					};
+					if(!lib.db){
+						try{
+							lib.storage=JSON.parse(localStorage.getItem(lib.configprefix+lib.config.mode));
+							if(typeof lib.storage!='object') throw('err');
+							if(lib.storage==null) throw('err');
+						}
+						catch(err){
+							lib.storage={};
+							localStorage.setItem(lib.configprefix+lib.config.mode,"{}");
+						}
+						proceed();
+					}
+					else{
+						game.getDB('data',lib.config.mode,function(obj){
+							lib.storage=obj||{};
+							proceed();
+						});
 					}
 				}
 				if(!mode[lib.config.mode]){
@@ -7258,11 +7301,7 @@
                                 avatarnode.setBackgroundImage(avatarbg.replace(/ext:/,'extension/'));
                             }
                             else{
-                                lib.onDB((function(avatarnode,avatarbg){
-                                    return (function(){
-                                        avatarnode.setBackgroundDB(avatarbg);
-                                    });
-                                }(avatarnode,avatarbg)));
+								avatarnode.setBackgroundDB(avatarbg);
                             }
 						}
                         if(!lib.config.touchscreen){
@@ -7378,7 +7417,11 @@
                 if(path){
                     style.href = path+'/'+file+".css";
                 }
-				if(before){
+				if(typeof before=='function'){
+					style.addEventListener('load',before);
+					document.head.appendChild(style);
+				}
+				else if(before){
 					document.head.insertBefore(style,before);
 				}
 				else{
@@ -7461,7 +7504,12 @@
                 game.layout=layout;
 				ui.arena.hide();
 				setTimeout(function(){
-					ui.css.layout.href=lib.assetURL+'layout/'+game.layout+'/layout.css';
+					if(game.layout=='default'){
+						ui.css.layout.href='';
+					}
+					else{
+						ui.css.layout.href=lib.assetURL+'layout/'+game.layout+'/layout.css';
+					}
 					if(game.layout=='mobile'||game.layout=='long'){
 						ui.arena.classList.add('mobile');
 					}
@@ -22959,6 +23007,7 @@
                 }
             }
             localStorage.removeItem(lib.configprefix+prefix);
+			game.deleteDB('data',prefix);
             lib.config.extensions.remove(extname);
             game.saveConfig('extensions',lib.config.extensions);
             var modelist=lib.config.extensionInfo[extname];
@@ -24525,16 +24574,6 @@
                 //     lib.config.addedpile=pilecfg[1]||{};
                 // }
 
-                try{
-                    lib.storage=JSON.parse(localStorage.getItem(lib.configprefix+lib.config.mode));
-                    if(typeof lib.storage!='object') throw('err');
-                    if(lib.storage==null) throw('err');
-                }
-                catch(err){
-                    lib.storage={};
-                    localStorage.setItem(lib.configprefix+lib.config.mode,"{}");
-                }
-
                 _status.event={
                     finished:true,
                     next:[],
@@ -24601,7 +24640,25 @@
                 }
 
                 game.createEvent('game',false).setContent(mode[lib.config.mode].start);
-                game.loop();
+
+				if(!game.db){
+					try{
+	                    lib.storage=JSON.parse(localStorage.getItem(lib.configprefix+lib.config.mode));
+	                    if(typeof lib.storage!='object') throw('err');
+	                    if(lib.storage==null) throw('err');
+	                }
+	                catch(err){
+	                    lib.storage={};
+	                    localStorage.setItem(lib.configprefix+lib.config.mode,"{}");
+	                }
+					game.loop();
+				}
+				else{
+					game.getDB('data',lib.config.mode,function(obj){
+						lib.storage=obj||{};
+						game.loop();
+					});
+				}
             });
         },
 		loadMode:function(mode){
@@ -25769,27 +25826,52 @@
 		},
 		save:function(key,value,mode){
 			if(_status.reloading) return;
-			var config={};
-            mode=mode||lib.config.mode;
-			if(arguments.length>0){
-				try{
-					config=JSON.parse(localStorage.getItem(lib.configprefix+mode));
-					if(typeof config!='object') throw 'err';
-				}
-				catch(err){
-					config={};
-				}
-				if(value==undefined){
-					delete config[key];
-					if(mode==lib.config.mode) delete lib.storage[key];
+			mode=mode||lib.config.mode;
+			if(!lib.db){
+				var config={};
+				if(key){
+					try{
+						config=JSON.parse(localStorage.getItem(lib.configprefix+mode));
+						if(typeof config!='object') throw 'err';
+					}
+					catch(err){
+						config={};
+					}
+					if(value==undefined){
+						delete config[key];
+						if(mode==lib.config.mode) delete lib.storage[key];
+					}
+					else{
+						config[key]=value;
+						if(mode==lib.config.mode) lib.storage[key]=value;
+					}
+					config.version=lib.version;
+					localStorage.setItem(lib.configprefix+mode,JSON.stringify(config));
 				}
 				else{
-					config[key]=value;
-					if(mode==lib.config.mode) lib.storage[key]=value;
+					localStorage.setItem(lib.configprefix+mode,JSON.stringify(lib.storage));
 				}
 			}
-			config.version=lib.version;
-			localStorage.setItem(lib.configprefix+mode,JSON.stringify(config));
+			else{
+				if(key){
+					game.getDB('data',mode,function(config){
+						if(!config) config={};
+						if(value==undefined){
+							delete config[key];
+							if(mode==lib.config.mode) delete lib.storage[key];
+						}
+						else{
+							config[key]=value;
+							if(mode==lib.config.mode) lib.storage[key]=value;
+						}
+						config.version=lib.version;
+						game.putDB('data',mode,config);
+					});
+				}
+				else{
+					game.putDB('data',mode,lib.storage);
+				}
+			}
 		},
 		showChangeLog:function(){
 			if(lib.version!=lib.config.version){
@@ -25819,20 +25901,8 @@
 				lib.init.onfree();
 			}
 		},
-		updateSave:function(){
+		saveConfig:function(key,value,local,callback){
 			if(_status.reloading) return;
-			localStorage.setItem(lib.configprefix+lib.config.mode,JSON.stringify(lib.storage));
-		},
-		saveConfig:function(key,value,local){
-			if(_status.reloading) return;
-			var config;
-			try{
-				config=JSON.parse(localStorage.getItem(lib.configprefix+'config'));
-				if(!config||typeof config!='object') throw 'err'
-			}
-			catch(err){
-				config={};
-			}
 			if(local){
 				var localmode;
 				if(typeof local=='string'){
@@ -25860,13 +25930,31 @@
                     lib.config[key]=value;
                 }
 			}
-			if(value===undefined){
-				delete config[key];
+			if(!lib.db){
+				var config;
+				try{
+					config=JSON.parse(localStorage.getItem(lib.configprefix+'config'));
+					if(!config||typeof config!='object') throw 'err'
+				}
+				catch(err){
+					config={};
+				}
+				if(value===undefined){
+					delete config[key];
+				}
+				else{
+					config[key]=value;
+				}
+				localStorage.setItem(lib.configprefix+'config',JSON.stringify(config));
 			}
 			else{
-				config[key]=value;
+				if(value==undefined){
+					game.deleteDB('config',key,callback);
+				}
+				else{
+					game.putDB('config',key,value,callback);
+				}
 			}
-			localStorage.setItem(lib.configprefix+'config',JSON.stringify(config));
 		},
 		saveConfigValue:function(key){
 			game.saveConfig(key,lib.config[key]);
@@ -25879,21 +25967,32 @@
 		},
 		clearModeConfig:function(mode){
 			if(_status.reloading) return;
-			var config;
-			try{
-				config=JSON.parse(localStorage.getItem(lib.configprefix+'config'));
-				if(!config||typeof config!='object') throw 'err'
-			}
-			catch(err){
-				config={};
-			}
-			for(var i in config){
-				if(i.substr(i.indexOf('_mode_config')+13)==mode){
-					delete config[i];
+			if(!lib.db){
+				var config;
+				try{
+					config=JSON.parse(localStorage.getItem(lib.configprefix+'config'));
+					if(!config||typeof config!='object') throw 'err'
 				}
+				catch(err){
+					config={};
+				}
+				for(var i in config){
+					if(i.substr(i.indexOf('_mode_config')+13)==mode){
+						delete config[i];
+					}
+				}
+				localStorage.setItem(lib.configprefix+'config',JSON.stringify(config));
+				localStorage.removeItem(lib.configprefix+mode);
 			}
-			localStorage.setItem(lib.configprefix+'config',JSON.stringify(config));
-			localStorage.removeItem(lib.configprefix+mode);
+			else{
+				game.getDB('config',null,function(config){
+					for(var i in config){
+						if(i.substr(i.indexOf('_mode_config')+13)==mode){
+							game.saveConfig(i);
+						}
+					}
+				});
+			}
 		},
 		addPlayer:function(position,character,character2){
 			if(position<0||position>game.players.length+game.dead.length||position==undefined){
@@ -32704,177 +32803,175 @@
 						node.type='video';
 						node.link=page;
 
-						lib.onDB(function(){
-							var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
-							lib.videos=[];
-							store.openCursor().onsuccess=function(e){
-							    var cursor=e.target.result;
-							    if(cursor){
-									lib.videos.push(cursor.value);
-									cursor.continue();
-							    }
-								else{
-									lib.videos.sort(function(a,b){
-										return parseInt(b.time)-parseInt(a.time);
-									});
-									var clickcapt=function(){
-										var current=this.parentNode.querySelector('.videonode.active');
-										if(current&&current!=this){
-											current.classList.remove('active');
-										}
-										this.classList.toggle('active');
-									};
-									var staritem=function(){
-										this.parentNode.classList.toggle('starred');
-										var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
-										if(this.parentNode.classList.contains('starred')){
-											this.parentNode.link.starred=true;
-										}
-										else{
-											this.parentNode.link.starred=false;
-										}
-										store.put(this.parentNode.link);
+						var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
+						lib.videos=[];
+						store.openCursor().onsuccess=function(e){
+						    var cursor=e.target.result;
+						    if(cursor){
+								lib.videos.push(cursor.value);
+								cursor.continue();
+						    }
+							else{
+								lib.videos.sort(function(a,b){
+									return parseInt(b.time)-parseInt(a.time);
+								});
+								var clickcapt=function(){
+									var current=this.parentNode.querySelector('.videonode.active');
+									if(current&&current!=this){
+										current.classList.remove('active');
 									}
-									var createNode=function(video,before){
-										var node=ui.create.div('.videonode.menubutton.large',clickcapt);
-										node.link=video;
-										var nodename1=ui.create.div('.menubutton.videoavatar',node);
-										nodename1.setBackground(video.name1,'character');
-										if(video.name2){
-											var nodename2=ui.create.div('.menubutton.videoavatar2',node);
-											nodename2.setBackground(video.name2,'character');
-										}
-										var date=new Date(video.time);
-										var str=date.getFullYear()+'.'+(date.getMonth()+2)+'.'+(date.getDay()+1)+' '+
-											date.getHours()+':';
-										var minutes=date.getMinutes();
-										if(minutes<10){
-											str+='0';
-										}
-										str+=minutes;
-										ui.create.div('.caption',video.name[0],node);
-										ui.create.div('.text',str+'<br>'+video.name[1],node);
-										if(video.win){
-											ui.create.div('.victory','胜',node);
-										}
-
-										if(before){
-											page.insertBefore(node,page.firstChild);
-										}
-										else{
-											page.appendChild(node);
-										}
-										ui.create.div('.video_star','★',node,staritem);
-										if(video.starred){
-											node.classList.add('starred');
-										}
+									this.classList.toggle('active');
+								};
+								var staritem=function(){
+									this.parentNode.classList.toggle('starred');
+									var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
+									if(this.parentNode.classList.contains('starred')){
+										this.parentNode.link.starred=true;
 									}
-									for(var i=0;i<lib.videos.length;i++){
-										createNode(lib.videos[i]);
+									else{
+										this.parentNode.link.starred=false;
 									}
-									ui.create.videoNode=createNode;
-									var importVideoNode=ui.create.div('.config.switcher.pointerspan',
-									'<span class="underlinenode slim ">导入录像...</span>',function(){
-										this.nextSibling.classList.toggle('hidden');
-									},page);
-									importVideoNode.style.marginLeft='12px';
-									importVideoNode.style.marginTop='3px';
-									var importVideo=ui.create.div('.config.hidden',page);
-									importVideo.style.whiteSpace='nowrap';
-									importVideo.style.marginBottom='80px';
-									importVideo.style.marginLeft='13px';
-									importVideo.style.width='calc(100% - 30px)';
-									importVideo.innerHTML='<input type="file" style="width:calc(100% - 40px)">'+
-									'<button style="width:40px">确定</button>';
-									importVideo.lastChild.onclick=function(){
-										var fileToLoad = importVideo.firstChild.files[0];
-										var fileReader = new FileReader();
-										fileReader.onload = function(fileLoadedEvent)
-										{
-											var data = fileLoadedEvent.target.result;
-											if(!data) return;
-											try{
-												data=JSON.parse(lib.init.decode(data));
-											}
-											catch(e){
-												console.log(e);
-												alert('导入失败');
-												return;
-											}
-											var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
-											var videos=lib.videos.slice(0);
-											for(var i=0;i<videos.length;i++){
-												if(videos[i].starred){
-													videos.splice(i--,1);
-												}
-											}
-											for(var deletei=0;deletei<5;deletei++){
-												if(videos.length>=parseInt(lib.config.video)&&videos.length){
-													var toremove=videos.pop();
-													lib.videos.remove(toremove);
-													store.delete(toremove.time);
-													for(var i=0;i<page.childNodes.length;i++){
-														if(page.childNodes[i].link==toremove){
-															page.childNodes[i].remove();
-															break;
-														}
-													}
-												}
-												else{
-													break;
-												}
-											}
-											for(var i=0;i<lib.videos.length;i++){
-												if(lib.videos[i].time==data.time){
-													alert('录像已存在');
-													return;
-												}
-											}
-											lib.videos.unshift(data);
-											store.put(data);
-											createNode(data,true);
-										};
-										fileReader.readAsText(fileToLoad, "UTF-8");
+									store.put(this.parentNode.link);
+								}
+								var createNode=function(video,before){
+									var node=ui.create.div('.videonode.menubutton.large',clickcapt);
+									node.link=video;
+									var nodename1=ui.create.div('.menubutton.videoavatar',node);
+									nodename1.setBackground(video.name1,'character');
+									if(video.name2){
+										var nodename2=ui.create.div('.menubutton.videoavatar2',node);
+										nodename2.setBackground(video.name2,'character');
+									}
+									var date=new Date(video.time);
+									var str=date.getFullYear()+'.'+(date.getMonth()+2)+'.'+(date.getDay()+1)+' '+
+										date.getHours()+':';
+									var minutes=date.getMinutes();
+									if(minutes<10){
+										str+='0';
+									}
+									str+=minutes;
+									ui.create.div('.caption',video.name[0],node);
+									ui.create.div('.text',str+'<br>'+video.name[1],node);
+									if(video.win){
+										ui.create.div('.victory','胜',node);
 									}
 
-									playButton.listen(function(){
-										var current=this.parentNode.querySelector('.videonode.active');
-										if(current){
-											game.playVideo(current.link.time,current.link.mode);
-										}
-									});
-									deleteButton.listen(function(){
-										var current=this.parentNode.querySelector('.videonode.active');
-										if(current){
-											lib.videos.remove(current.link);
-											var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
-											store.delete(current.link.time);
-											current.remove();
-										}
-									});
-									saveButton.listen(function(){
-										var current=this.parentNode.querySelector('.videonode.active');
-										if(current){
-											game.export(lib.init.encode(JSON.stringify(current.link)),
-											'无名杀 - 录像 - '+current.link.name[0]+' - '+current.link.name[1]);
-										}
-									});
-
-									ui.updateVideoMenu=function(){
-                                        var active=start.firstChild.querySelector('.active');
-                                        if(active){
-                                            active.classList.remove('active');
-                                            active.link.remove();
-                                        }
-										node.classList.add('active');
-										rightPane.appendChild(page);
-										playButton.style.display='';
-										deleteButton.style.display='';
-										saveButton.style.display='';
+									if(before){
+										page.insertBefore(node,page.firstChild);
+									}
+									else{
+										page.appendChild(node);
+									}
+									ui.create.div('.video_star','★',node,staritem);
+									if(video.starred){
+										node.classList.add('starred');
 									}
 								}
-					        };
-						});
+								for(var i=0;i<lib.videos.length;i++){
+									createNode(lib.videos[i]);
+								}
+								ui.create.videoNode=createNode;
+								var importVideoNode=ui.create.div('.config.switcher.pointerspan',
+								'<span class="underlinenode slim ">导入录像...</span>',function(){
+									this.nextSibling.classList.toggle('hidden');
+								},page);
+								importVideoNode.style.marginLeft='12px';
+								importVideoNode.style.marginTop='3px';
+								var importVideo=ui.create.div('.config.hidden',page);
+								importVideo.style.whiteSpace='nowrap';
+								importVideo.style.marginBottom='80px';
+								importVideo.style.marginLeft='13px';
+								importVideo.style.width='calc(100% - 30px)';
+								importVideo.innerHTML='<input type="file" style="width:calc(100% - 40px)">'+
+								'<button style="width:40px">确定</button>';
+								importVideo.lastChild.onclick=function(){
+									var fileToLoad = importVideo.firstChild.files[0];
+									var fileReader = new FileReader();
+									fileReader.onload = function(fileLoadedEvent)
+									{
+										var data = fileLoadedEvent.target.result;
+										if(!data) return;
+										try{
+											data=JSON.parse(lib.init.decode(data));
+										}
+										catch(e){
+											console.log(e);
+											alert('导入失败');
+											return;
+										}
+										var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
+										var videos=lib.videos.slice(0);
+										for(var i=0;i<videos.length;i++){
+											if(videos[i].starred){
+												videos.splice(i--,1);
+											}
+										}
+										for(var deletei=0;deletei<5;deletei++){
+											if(videos.length>=parseInt(lib.config.video)&&videos.length){
+												var toremove=videos.pop();
+												lib.videos.remove(toremove);
+												store.delete(toremove.time);
+												for(var i=0;i<page.childNodes.length;i++){
+													if(page.childNodes[i].link==toremove){
+														page.childNodes[i].remove();
+														break;
+													}
+												}
+											}
+											else{
+												break;
+											}
+										}
+										for(var i=0;i<lib.videos.length;i++){
+											if(lib.videos[i].time==data.time){
+												alert('录像已存在');
+												return;
+											}
+										}
+										lib.videos.unshift(data);
+										store.put(data);
+										createNode(data,true);
+									};
+									fileReader.readAsText(fileToLoad, "UTF-8");
+								}
+
+								playButton.listen(function(){
+									var current=this.parentNode.querySelector('.videonode.active');
+									if(current){
+										game.playVideo(current.link.time,current.link.mode);
+									}
+								});
+								deleteButton.listen(function(){
+									var current=this.parentNode.querySelector('.videonode.active');
+									if(current){
+										lib.videos.remove(current.link);
+										var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
+										store.delete(current.link.time);
+										current.remove();
+									}
+								});
+								saveButton.listen(function(){
+									var current=this.parentNode.querySelector('.videonode.active');
+									if(current){
+										game.export(lib.init.encode(JSON.stringify(current.link)),
+										'无名杀 - 录像 - '+current.link.name[0]+' - '+current.link.name[1]);
+									}
+								});
+
+								ui.updateVideoMenu=function(){
+                                    var active=start.firstChild.querySelector('.active');
+                                    if(active){
+                                        active.classList.remove('active');
+                                        active.link.remove();
+                                    }
+									node.classList.add('active');
+									rightPane.appendChild(page);
+									playButton.style.display='';
+									deleteButton.style.display='';
+									saveButton.style.display='';
+								}
+							}
+				        };
 					}());
 
 
