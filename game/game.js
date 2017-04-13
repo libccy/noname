@@ -525,6 +525,7 @@
 						onclick:function(theme){
 							game.saveConfig('theme',theme);
 							ui.arena.hide();
+							lib.init.background();
 							setTimeout(function(){
 								var theme=ui.css.theme;
 								ui.css.theme=lib.init.css(lib.assetURL+'theme/'+lib.config.theme,'style');
@@ -676,7 +677,6 @@
 							else{
 								lib.init.layout(layout);
 							}
-							lib.init.background();
 						}
 					},
                     // fewplayer:{
@@ -5812,7 +5812,7 @@
 					lib.assetURL=noname_inited;
 				}
 
-				ui.css={default:lib.init.css('layout/default','layout')};
+				ui.css={default:lib.init.css(lib.assetURL+'layout/default','layout')};
 				if(localStorage.getItem(lib.configprefix+'background')){
 					document.documentElement.style.backgroundImage='url("'+lib.assetURL+'image/background/'+localStorage.getItem(lib.configprefix+'background')+'.jpg")';
 					document.documentElement.style.backgroundSize='cover';
@@ -6397,7 +6397,6 @@
 						}
 						game.saveConfig('image_background',list.randomGet(lib.config.image_background));
 					}
-
 					var styleToLoad=7;
 					var styleLoaded=function(){
 						styleToLoad--;
@@ -6558,6 +6557,7 @@
 									}
 								}
 								game.saveConfig('storageImported',true);
+								lib.init.background();
 								localStorage.removeItem(lib.configprefix+'config');
 							}
 							else{
@@ -27711,25 +27711,6 @@
 										}
 									}
 								}
-								// else if(j=='import_background'){
-								// 	cfgnode.querySelector('button').onclick=function(){
-								// 		var fileToLoad=this.previousSibling.files[0];
-								// 		if(fileToLoad){
-								// 			game.putDB('image','background',fileToLoad);
-								// 			var fileReader = new FileReader();
-								// 			fileReader.onload = function(fileLoadedEvent)
-								// 			{
-								// 				var data = fileLoadedEvent.target.result;
-								// 				ui.background.style.backgroundImage='url('+data+')';
-								// 			};
-								// 			fileReader.readAsDataURL(fileToLoad, "UTF-8");
-								// 		}
-								// 		else{
-								// 			game.deleteDB('image','background');
-								// 			ui.background.style.backgroundImage='none';
-								// 		}
-								// 	}
-								// }
 								else if(j=='import_music'){
 									cfgnode.querySelector('button').onclick=function(){
 										var fileToLoad=this.previousSibling.files[0];
