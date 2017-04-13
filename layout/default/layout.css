@@ -3523,7 +3523,11 @@ div[data-decoration="bronze"]::after{
 	border-radius: 12px;
 	box-shadow: black 0 0 2px,black 0 0 1px inset;
 	margin: auto;
-	overflow: hidden
+	overflow: hidden;
+	transition-property: none;
+}
+.config>.toggle.onoff>div>div{
+	transition-property: left;
 }
 .config>.toggle.onoff:not(.on)>div,
 .config.disabled {

@@ -33,7 +33,6 @@ mode.versus={
 	},
 	start:function(){
 		"step 0"
-		console.log(lib.storage.versus_reward);
 		_status.mode=get.config('versus_mode');
 		if(_status.brawl&&_status.brawl.submode){
 			_status.mode=_status.brawl.submode;

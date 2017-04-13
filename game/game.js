@@ -884,7 +884,7 @@
 									node.remove();
 									menu.updateBr();
 									if(!lib.config.prompt_hidebg){
-										alert('隐藏的背景可通过选项-其它-重置隐藏扩展包恢复');
+										alert('隐藏的背景可通过选项-其它-重置隐藏扩展恢复');
 										game.saveConfig('prompt_hidebg',true);
 									}
 									lib.config.hiddenBackgroundPack.add(background);
@@ -3100,6 +3100,30 @@
 			others:{
 				name:'其它',
 				config:{
+					// reset_database:{
+					// 	name:'重置游戏',
+					// 	onclick:function(){
+					// 		var node=this;
+					// 		if(node._clearing){
+					// 			if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
+					// 			game.reload();
+					// 			return;
+					// 		}
+					// 		node._clearing=true;
+					// 		node.innerHTML='单击以确认 (3)';
+					// 		setTimeout(function(){
+					// 			node.innerHTML='单击以确认 (2)';
+					// 			setTimeout(function(){
+					// 				node.innerHTML='单击以确认 (1)';
+					// 				setTimeout(function(){
+					// 					node.innerHTML='重置游戏录像';
+					// 					delete node._clearing;
+					// 				},1000);
+					// 			},1000);
+					// 		},1000);
+					// 	},
+					// 	clear:true
+					// },
 					reset_game:{
 						name:'重置游戏设置',
 						onclick:function(){
@@ -3107,6 +3131,8 @@
 							if(node._clearing){
 								var noname_inited=localStorage.getItem('noname_inited');
 				                localStorage.clear();
+								game.deleteDB('config');
+								game.deleteDB('data');
 								if(noname_inited){
 									localStorage.setItem('noname_inited',noname_inited);
 								}
@@ -3128,32 +3154,8 @@
 						},
 						clear:true
 					},
-					reset_database:{
-						name:'重置游戏录像',
-						onclick:function(){
-							var node=this;
-							if(node._clearing){
-								if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
-								game.reload();
-								return;
-							}
-							node._clearing=true;
-							node.innerHTML='单击以确认 (3)';
-							setTimeout(function(){
-								node.innerHTML='单击以确认 (2)';
-								setTimeout(function(){
-									node.innerHTML='单击以确认 (1)';
-									setTimeout(function(){
-										node.innerHTML='重置游戏录像';
-										delete node._clearing;
-									},1000);
-								},1000);
-							},1000);
-						},
-						clear:true
-					},
 					reset_hiddenpack:{
-						name:'重置隐藏扩展包',
+						name:'重置隐藏扩展',
 						onclick:function(){
 							if(this.innerHTML!='已重置'){
 								this.innerHTML='已重置'
@@ -3164,7 +3166,7 @@
 								game.saveConfig('hiddenBackgroundPack',[]);
 								var that=this;
 								setTimeout(function(){
-									that.innerHTML='重置隐藏扩展包';
+									that.innerHTML='重置隐藏扩展';
 									setTimeout(function(){
 										if(confirm('是否重新启动使改变生效？')){
 											game.reload();
@@ -5135,6 +5137,7 @@
 			running:false,
 			canvas:false,
 			time:0,
+			reload:0,
 			delayed:0,
 			frameId:0,
 			videoId:0,
@@ -25821,8 +25824,18 @@
 				callback(false);
 				return;
 			}
-			var store=lib.db.transaction([type],'readwrite').objectStore(type);
-			store.delete(id).onsuccess=callback;
+			if(arguments.length==1){
+				game.getDB(type,null,function(obj){
+					var store=lib.db.transaction([type],'readwrite').objectStore(type);
+					for(var id in obj){
+						store.delete(id);
+					}
+				});
+			}
+			else{
+				var store=lib.db.transaction([type],'readwrite').objectStore(type);
+				store.delete(id).onsuccess=callback;
+			}
 		},
 		save:function(key,value,mode){
 			if(_status.reloading) return;
@@ -25854,22 +25867,26 @@
 			}
 			else{
 				if(key){
+					if(value==undefined){
+						if(mode==lib.config.mode) delete lib.storage[key];
+					}
+					else{
+						if(mode==lib.config.mode) lib.storage[key]=value;
+					}
 					game.getDB('data',mode,function(config){
 						if(!config) config={};
 						if(value==undefined){
 							delete config[key];
-							if(mode==lib.config.mode) delete lib.storage[key];
 						}
 						else{
 							config[key]=value;
-							if(mode==lib.config.mode) lib.storage[key]=value;
 						}
 						config.version=lib.version;
 						game.putDB('data',mode,config);
 					});
 				}
 				else{
-					game.putDB('data',mode,lib.storage);
+					game.putDB('data',mode,get.copy(lib.storage));
 				}
 			}
 		},
@@ -27198,7 +27215,7 @@
     									this.innerHTML='此模式将在重启后隐藏';
     									lib.config.hiddenModePack.add(mode);
 										if(!lib.config.prompt_hidepack){
-											alert('隐藏的扩展包可通过选项-其它-重置隐藏扩展包恢复');
+											alert('隐藏的扩展包可通过选项-其它-重置隐藏扩展恢复');
 											game.saveConfig('prompt_hidepack',true);
 										}
     								}
@@ -28519,7 +28536,7 @@
     									this.innerHTML='武将包将在重启后隐藏';
     									lib.config.hiddenCharacterPack.add(mode);
 										if(!lib.config.prompt_hidepack){
-											alert('隐藏的扩展包可通过选项-其它-重置隐藏扩展包恢复');
+											alert('隐藏的扩展包可通过选项-其它-重置隐藏扩展恢复');
 											game.saveConfig('prompt_hidepack',true);
 										}
     								}
@@ -28824,7 +28841,7 @@
 									this.innerHTML='卡牌包将在重启后隐藏';
 									lib.config.hiddenCardPack.add(mode);
 									if(!lib.config.prompt_hidepack){
-										alert('隐藏的扩展包可通过选项-其它-重置隐藏扩展包恢复');
+										alert('隐藏的扩展包可通过选项-其它-重置隐藏扩展恢复');
 										game.saveConfig('prompt_hidepack',true);
 									}
 								}
