@@ -676,15 +676,7 @@
 							else{
 								lib.init.layout(layout);
 							}
-							if(lib.config.image_background&&lib.config.image_background!='default'&&lib.config.image_background.indexOf('custom_')!=0){
-								localStorage.setItem(lib.configprefix+'background',lib.config.image_background);
-							}
-							else if(lib.config.image_background=='default'&&lib.config.theme=='simple'){
-								localStorage.setItem(lib.configprefix+'background','shengshi_bg');
-							}
-							else{
-								localStorage.removeItem(lib.configprefix+'background');
-							}
+							lib.init.background();
 						}
 					},
                     // fewplayer:{
@@ -884,7 +876,7 @@
 									node.remove();
 									menu.updateBr();
 									if(!lib.config.prompt_hidebg){
-										alert('隐藏的背景可通过选项-其它-重置隐藏扩展恢复');
+										alert('隐藏的背景可通过选项-其它-重置隐藏内容恢复');
 										game.saveConfig('prompt_hidebg',true);
 									}
 									lib.config.hiddenBackgroundPack.add(background);
@@ -921,15 +913,7 @@
 							}
 							var animate=lib.config.image_background=='default';
 							game.saveConfig('image_background',background);
-							if(lib.config.image_background&&lib.config.image_background!='default'&&lib.config.image_background.indexOf('custom_')!=0){
-								localStorage.setItem(lib.configprefix+'background',lib.config.image_background);
-							}
-							else if(lib.config.image_background=='default'&&lib.config.theme=='simple'){
-								localStorage.setItem(lib.configprefix+'background','shengshi_bg');
-							}
-							else{
-								localStorage.removeItem(lib.configprefix+'background');
-							}
+							lib.init.background();
 							ui.background.delete();
 							ui.background=ui.create.div('.background');
 
@@ -3155,7 +3139,7 @@
 						clear:true
 					},
 					reset_hiddenpack:{
-						name:'重置隐藏扩展',
+						name:'重置隐藏内容',
 						onclick:function(){
 							if(this.innerHTML!='已重置'){
 								this.innerHTML='已重置'
@@ -3166,7 +3150,7 @@
 								game.saveConfig('hiddenBackgroundPack',[]);
 								var that=this;
 								setTimeout(function(){
-									that.innerHTML='重置隐藏扩展';
+									that.innerHTML='重置隐藏内容';
 									setTimeout(function(){
 										if(confirm('是否重新启动使改变生效？')){
 											game.reload();
@@ -3209,13 +3193,30 @@
 					export_data:{
 						name:'导出游戏设置',
 						onclick:function(){
-							var data={};
-							for(var i in localStorage){
-								if(i.indexOf(lib.configprefix)==0){
-									data[i]=localStorage[i];
-								}
+							var data;
+							var export_data=function(data){
+								game.export(lib.init.encode(JSON.stringify(data)),'无名杀 - 数据 - '+(new Date()).toLocaleString());
 							}
-							game.export(lib.init.encode(JSON.stringify(data)),'无名杀 - 数据 - '+(new Date()).toLocaleString());
+							if(!lib.db){
+								data={};
+								for(var i in localStorage){
+									if(i.indexOf(lib.configprefix)==0){
+										data[i]=localStorage[i];
+									}
+								}
+								export_data(data);
+							}
+							else{
+								game.getDB('config',null,function(data1){
+									game.getDB('data',null,function(data2){
+										export_data({
+											config:data1,
+											data:data2
+										});
+									});
+								});
+							}
+
 						},
 						clear:true
 					},
@@ -7606,6 +7607,17 @@
 					},100);
 				},500);
 			},
+			background:function(){
+				if(lib.config.image_background&&lib.config.image_background!='default'&&lib.config.image_background.indexOf('custom_')!=0){
+					localStorage.setItem(lib.configprefix+'background',lib.config.image_background);
+				}
+				else if(lib.config.image_background=='default'&&lib.config.theme=='simple'){
+					localStorage.setItem(lib.configprefix+'background','shengshi_bg');
+				}
+				else{
+					localStorage.removeItem(lib.configprefix+'background');
+				}
+			},
 			parsex:function(func){
 				var k;
 				var str='(';
@@ -7795,6 +7807,7 @@
 					game.saveConfig(mode[i]+'_bannedcards',bannedcards);
 				}
 				game.saveConfig('change_skin',false);
+				game.saveConfig('show_splash','off');
 				game.saveConfig('show_favourite',false);
 				// game.saveConfig('characters',lib.config.all.characters);
 				// game.saveConfig('cards',lib.config.all.cards);
@@ -22173,7 +22186,19 @@
 				localStorage.removeItem(lib.configprefix+'playbackmode');
 			}
 			localStorage.setItem('show_splash_off',true);
-			window.location.reload();
+			if(lib.status.reload){
+				_status.waitingToReload=true;
+			}
+			else{
+				window.location.reload();
+			}
+		},
+		reload2:function(){
+			lib.status.reload--;
+			if(_status.waitingToReload&&lib.status.reload==0){
+				window.location.reload();
+				delete _status.waitingToReload;
+			}
 		},
         exit:function(){
 			if(lib.device=='ios'){
@@ -25788,10 +25813,14 @@
         },
 		putDB:function(type,id,item,callback){
 			if(!lib.db) return item;
+			lib.status.reload++;
 			var put=lib.db.transaction([type],'readwrite').objectStore(type).put(item,id);
-			if(callback){
-				put.onsuccess=callback;
-			}
+			put.onsuccess=function(){
+				if(callback){
+					callback.apply(this,arguments);
+				}
+				game.reload2();
+			};
 		},
 		getDB:function(type,id,callback){
 			if(!lib.db){
@@ -25824,17 +25853,27 @@
 				callback(false);
 				return;
 			}
+			lib.status.reload++;
 			if(arguments.length==1){
 				game.getDB(type,null,function(obj){
 					var store=lib.db.transaction([type],'readwrite').objectStore(type);
 					for(var id in obj){
-						store.delete(id);
+						lib.status.reload++;
 					}
+					for(var id in obj){
+						store.delete(id).onsuccess=game.reload2;
+					}
+					game.reload2();
 				});
 			}
 			else{
 				var store=lib.db.transaction([type],'readwrite').objectStore(type);
-				store.delete(id).onsuccess=callback;
+				store.delete(id).onsuccess=function(){
+					if(callback){
+						callback.apply(this,arguments);
+					}
+					game.reload2();
+				};
 			}
 		},
 		save:function(key,value,mode){
@@ -27215,7 +27254,7 @@
     									this.innerHTML='此模式将在重启后隐藏';
     									lib.config.hiddenModePack.add(mode);
 										if(!lib.config.prompt_hidepack){
-											alert('隐藏的扩展包可通过选项-其它-重置隐藏扩展恢复');
+											alert('隐藏的扩展包可通过选项-其它-重置隐藏内容恢复');
 											game.saveConfig('prompt_hidepack',true);
 										}
     								}
@@ -27634,13 +27673,11 @@
 												if(!data) return;
 												try{
 													data=JSON.parse(lib.init.decode(data));
-													var noname_inited=localStorage.getItem('noname_inited');
-									                localStorage.clear();
-													if(noname_inited){
-														localStorage.setItem('noname_inited',noname_inited);
+													if(!data||typeof data!='object'){
+														throw('err');
 													}
-													for(var i in data){
-														localStorage.setItem(i,data[i]);
+													if(lib.db&&(!data.config||!data.data)){
+														throw('err');
 													}
 												}
 												catch(e){
@@ -27649,6 +27686,25 @@
 													return;
 												}
 												alert('导入成功');
+												if(!lib.db){
+													var noname_inited=localStorage.getItem('noname_inited');
+													localStorage.clear();
+													if(noname_inited){
+														localStorage.setItem('noname_inited',noname_inited);
+													}
+													for(var i in data){
+														localStorage.setItem(i,data[i]);
+													}
+												}
+												else{
+													for(var i in data.config){
+														game.putDB('config',i,data.config[i]);
+													}
+													for(var i in data.data){
+														game.putDB('data',i,data.data[i]);
+													}
+												}
+												lib.init.background();
 												game.reload();
 											};
 											fileReader.readAsText(fileToLoad, "UTF-8");
@@ -28536,7 +28592,7 @@
     									this.innerHTML='武将包将在重启后隐藏';
     									lib.config.hiddenCharacterPack.add(mode);
 										if(!lib.config.prompt_hidepack){
-											alert('隐藏的扩展包可通过选项-其它-重置隐藏扩展恢复');
+											alert('隐藏的扩展包可通过选项-其它-重置隐藏内容恢复');
 											game.saveConfig('prompt_hidepack',true);
 										}
     								}
@@ -28841,7 +28897,7 @@
 									this.innerHTML='卡牌包将在重启后隐藏';
 									lib.config.hiddenCardPack.add(mode);
 									if(!lib.config.prompt_hidepack){
-										alert('隐藏的扩展包可通过选项-其它-重置隐藏扩展恢复');
+										alert('隐藏的扩展包可通过选项-其它-重置隐藏内容恢复');
 										game.saveConfig('prompt_hidepack',true);
 									}
 								}
