@@ -24892,6 +24892,7 @@
 								event.dialoglayer.clicked=true;
 							}
 						});
+						event.freechoosedialog.classList.add('pointerdialog');
 						event.dialoglayer=ui.create.div('.popup-container.hidden',function(e){
 							if(this.classList.contains('removing')) return;
 							if(this.clicked){

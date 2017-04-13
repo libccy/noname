@@ -405,7 +405,7 @@ character.gwent={
 				return get.effect(event.target,{name:'sha'},player,player)>0
 			},
 			logTarget:'target',
-			logLine:false,
+			// logLine:false,
 			content:function(){
 				'step 0'
 				var cards=get.cards();
@@ -413,7 +413,7 @@ character.gwent={
 				event.bool=(get.color(cards[0])=='black');
 				'step 1'
 				if(event.bool){
-					player.useCard({name:'sha'},trigger.target,false);
+					player.useCard({name:'sha'},trigger.target,false).animate=false;
 				}
 			},
 			mod:{
