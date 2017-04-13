@@ -955,7 +955,11 @@
 					},
 					image_background_random:{
 						name:'随机背景',
-						init:false
+						init:false,
+						onclick:function(bool){
+							game.saveConfig('image_background_random',bool);
+							lib.init.background();
+						}
 					},
 					image_background_blur:{
 						name:'背景模糊',
@@ -5813,10 +5817,20 @@
 				}
 
 				ui.css={default:lib.init.css(lib.assetURL+'layout/default','layout')};
-				if(localStorage.getItem(lib.configprefix+'background')){
-					document.documentElement.style.backgroundImage='url("'+lib.assetURL+'image/background/'+localStorage.getItem(lib.configprefix+'background')+'.jpg")';
-					document.documentElement.style.backgroundSize='cover';
-					document.documentElement.style.backgroundPosition='50% 50%';
+				var htmlbg=localStorage.getItem(lib.configprefix+'background');
+				if(htmlbg){
+					if(htmlbg[0]=='['){
+						htmlbg=JSON.parse(htmlbg).randomGet();
+						_status.htmlbg=htmlbg;
+						if(htmlbg.indexOf('custom_')==0){
+							htmlbg=null;
+						}
+					}
+					if(htmlbg){
+						document.documentElement.style.backgroundImage='url("'+lib.assetURL+'image/background/'+htmlbg+'.jpg")';
+						document.documentElement.style.backgroundSize='cover';
+						document.documentElement.style.backgroundPosition='50% 50%';
+					}
 				}
 
 				if(lib.device){
@@ -6390,13 +6404,20 @@
 	                }
 	                game.layout=layout;
 					if(lib.config.image_background_random){
-						var list=[];
-						for(var i in lib.configMenu.appearence.config.image_background.item){
-							if(i=='default') continue;
-							list.push(i);
+						if(_status.htmlbg){
+							game.saveConfig('image_background',_status.htmlbg);
 						}
-						game.saveConfig('image_background',list.randomGet(lib.config.image_background));
+						else{
+							var list=[];
+							for(var i in lib.configMenu.appearence.config.image_background.item){
+								if(i=='default') continue;
+								list.push(i);
+							}
+							game.saveConfig('image_background',list.randomGet(lib.config.image_background));
+						}
+						lib.init.background();
 					}
+					delete _status.htmlbg;
 					var styleToLoad=7;
 					var styleLoaded=function(){
 						styleToLoad--;
@@ -7608,7 +7629,16 @@
 				},500);
 			},
 			background:function(){
-				if(lib.config.image_background&&lib.config.image_background!='default'&&lib.config.image_background.indexOf('custom_')!=0){
+				if(lib.config.image_background_random){
+					var list=[];
+					for(var i in lib.configMenu.appearence.config.image_background.item){
+						if(i=='default') continue;
+						list.push(i);
+					}
+					list.remove(lib.config.image_background);
+					localStorage.setItem(lib.configprefix+'background',JSON.stringify(list));
+				}
+				else if(lib.config.image_background&&lib.config.image_background!='default'&&lib.config.image_background.indexOf('custom_')!=0){
 					localStorage.setItem(lib.configprefix+'background',lib.config.image_background);
 				}
 				else if(lib.config.image_background=='default'&&lib.config.theme=='simple'){
