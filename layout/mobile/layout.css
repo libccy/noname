@@ -292,7 +292,7 @@
     top:0;
     left:0;
     background-size:cover;
-    -webkit-clip-path: polygon(-10px 0, 130px 0, 130px 130px, -10px 130px);
+    -webkit-clip-path: polygon(-10px 0, 130px 0, 130px 150px, -10px 150px);
 }
 #window[data-radius_size='increase'] #me>.fakeme.avatar,
 #window[data-radius_size='reduce'] #me>.fakeme.avatar{
@@ -328,7 +328,7 @@
 #arena.mobile.oblongcard:not(.chess)>.card>.image,
 #arena.mobile.oblongcard:not(.chess) .handcards>.card>.image{
     height: 110px;
-    top: 10px;
+    top: 8px;
     background-position-x: -3px;
 }
 
