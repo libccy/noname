@@ -112,7 +112,7 @@ play.boss={
 				boss_yecha:'夜叉',
 
 				boss_nianshou:'年兽',
-				boss_nianshou_heti:'合体年兽',
+				boss_nianshou_heti:'合体',
 				boss_nianshou_jingjue:'警觉年兽',
 				boss_nianshou_renxing:'任性年兽',
 				boss_nianshou_baonu:'暴怒年兽',
