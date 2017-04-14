@@ -463,34 +463,51 @@ mode.boss={
 	},
 	game:{
 		reserveDead:true,
-		changeBoss:function(name){
-			if(game.additionaldead){
-				game.additionaldead.push(game.boss);
+		addBossFellow:function(position,name){
+			var fellow=game.addFellow(position,name,'zoominanim');
+			fellow.directgain(get.cards(4));
+			fellow.side=true;
+			fellow.identity='zhong';
+			fellow.setIdentity('zhong');
+			game.addVideo('setIdentity',fellow,'zhong');
+		},
+		changeBoss:function(name,player){
+			if(!player){
+				if(game.additionaldead){
+					game.additionaldead.push(game.boss);
+				}
+				else{
+					game.additionaldead=[game.boss];
+				}
+				player=game.boss;
+				delete game.boss;
 			}
-			else{
-				game.additionaldead=[game.boss];
-			}
-			game.boss.delete();
-			game.dead.remove(game.boss);
+
+			player.delete();
+			game.players.remove(player);
+			game.dead.remove(player);
 			var boss=ui.create.player();
 			boss.getId();
 			boss.init(name);
 			boss.side=true;
-			game.addVideo('bossSwap',game.boss,boss.name);
-			if(game.me==game.boss){
-				boss.dataset.position=0;
+			game.addVideo('bossSwap',player,(game.boss?'_':'')+boss.name);
+			boss.dataset.position=player.dataset.position;
+			if(game.me==player){
 				game.swapControl(boss);
-			}
-			else{
-				boss.dataset.position=7;
 			}
 			game.players.push(boss.animate('zoominanim'));
 			game.arrangePlayers();
-			game.boss=boss;
+			if(!game.boss){
+				game.boss=boss;
+				boss.setIdentity('zhu');
+				boss.identity='zhu';
+			}
+			else{
+				boss.setIdentity('zhong');
+				boss.identity='zhong';
+			}
 			ui.arena.appendChild(boss);
 			boss.directgain(get.cards(4));
-			boss.setIdentity('zhu');
-			boss.identity='zhu';
 		},
 		checkResult:function(){
 			if(game.boss==game.me){
@@ -960,8 +977,8 @@ mode.boss={
 					game.players[i].hp=game.players[i].maxHp;
 					game.players[i].update();
 				}
-				game.addFellow(game.me==game.boss?1:5,'boss_yanling','zoominanim').directgain(get.cards(4)).side=true;
-				game.addFellow(7,'boss_yanling','zoominanim').directgain(get.cards(4)).side=true;
+				game.addBossFellow(game.me==game.boss?1:5,'boss_yanling');
+				game.addBossFellow(7,'boss_yanling');
 				game.animate.window(2);
 				'step 3'
 				while(_status.event.name!='phaseLoop'){
@@ -3743,6 +3760,7 @@ mode.boss={
 	translate:{
 		zhu:'神',
 		cai:'盟',
+		zhong:'从',
 
 		boss_chi:'魑',
 		boss_mo:'魅',

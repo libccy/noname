@@ -13424,6 +13424,7 @@
 						this.node.identity.firstChild.innerHTML=get.translation(identity);
 					}
 					this.node.identity.dataset.color=identity;
+					return this;
 				},
 				insertPhase:function(skill){
 					var evt=_status.event.getParent('phase');
@@ -21448,19 +21449,32 @@
 				}
 			},
 			bossSwap:function(player,name){
-				player.delete();
-				var boss=ui.create.player().init(name);
-				boss.dataset.position=player.dataset.position;
-				game.playerMap[player.dataset.position]=boss;
-				if(game.me==player){
-					game.me=boss;
+				if(player&&name){
+					player.delete();
+					var noboss=false;
+					if(name[0]=='_'){
+						name=name.slice(1);
+						noboss=true;
+					}
+					var boss=ui.create.player().init(name);
+					boss.dataset.position=player.dataset.position;
+					game.playerMap[player.dataset.position]=boss;
+					if(game.me==player){
+						game.me=boss;
+					}
+					game.players.push(boss);
+					game.arrangePlayers();
+					if(!noboss){
+						game.boss=boss;
+						boss.setIdentity('zhu');
+						boss.identity='zhu';
+					}
+					else{
+						boss.setIdentity('zhong');
+						boss.identity='zhong';
+					}
+					ui.arena.appendChild(boss.animate('zoominanim'));
 				}
-				game.players.push(boss);
-				game.arrangePlayers();
-				game.boss=boss;
-				ui.arena.appendChild(boss.animate('zoominanim'));
-				boss.setIdentity('zhu');
-				boss.identity='zhu';
 			},
 			stoneSwap:function(info){
 				var player=ui.create.player();
@@ -40594,7 +40608,7 @@
 					td.innerHTML='手牌';
 					tr.appendChild(td);
 					td=document.createElement('td');
-					td.innerHTML='轮数';
+					td.innerHTML='行动';
 					tr.appendChild(td);
 
 					tr=document.createElement('tr');

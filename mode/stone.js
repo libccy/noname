@@ -1285,6 +1285,7 @@ mode.stone={
 			next.player=player;
 			next.setContent(function(){
 				"step 0"
+				_status.roundStart=game.me;
 				player.phase();
 				event.num=0;
 				"step 1"
