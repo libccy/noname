@@ -1,13 +1,13 @@
 character.extra={
 	character:{
-		shen_guanyu:['male','shu',6,['wuhun','wushen']],
-		shen_zhaoyun:['male','shu',2,['juejing','longhun']],
-		shen_zhugeliang:['male','shu',3,['qixing','kuangfeng','dawu']],
-		shen_lvmeng:['male','wu',3,['shelie','gongxin']],
-		shen_zhouyu:['male','wu',4,['yeyan','qinyin']],
-		shen_simayi:['male','wei',4,['renjie','sbaiyin','lianpo']],
-		shen_caocao:['male','wei',3,['guixin','feiying']],
-		shen_lvbu:['male','qun',5,['baonu','wuqian','shenfen']],
+		shen_guanyu:['male','shen',6,['wuhun','wushen'],['shu']],
+		shen_zhaoyun:['male','shen',2,['juejing','longhun'],['shu']],
+		shen_zhugeliang:['male','shen',3,['qixing','kuangfeng','dawu'],['shu']],
+		shen_lvmeng:['male','shen',3,['shelie','gongxin'],['wu']],
+		shen_zhouyu:['male','shen',4,['yeyan','qinyin'],['wu']],
+		shen_simayi:['male','shen',4,['renjie','sbaiyin','lianpo'],['wei']],
+		shen_caocao:['male','shen',3,['guixin','feiying'],['wei']],
+		shen_lvbu:['male','shen',5,['baonu','wuqian','shenfen'],['qun']],
 	},
 	characterIntro:{
 		shen_guanyu:'关羽，字云长。曾水淹七军、擒于禁、斩庞德、威震华夏，吓得曹操差点迁都躲避，但是东吴偷袭荆州，关羽兵败被害。后传说吕蒙因关羽之魂索命而死。',

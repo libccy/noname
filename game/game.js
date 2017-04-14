@@ -8420,6 +8420,7 @@
 			shu:'蜀',
 			wu:'吴',
 			qun:'群',
+			shen:'神',
 			male:'男',
 			female:'女',
 			mad:'混乱',
@@ -8435,6 +8436,7 @@
 			shuColor:"#ffddb9",
 			wuColor:"#b2d9a9",
 			qunColor:"#f6f6f6",
+			shenColor:"#ffe14c",
 			basic:'基本',
 			equip:'装备',
 			trick:'锦囊',
@@ -18850,6 +18852,7 @@
             character:function(a,b){
                 var groupSort=function(name){
                     if(!lib.character[name]) return 4;
+					if(lib.character[name][1]=='shen') return -1;
                     if(lib.character[name][1]=='wei') return 0;
                     if(lib.character[name][1]=='shu') return 1;
                     if(lib.character[name][1]=='wu') return 2;
@@ -28532,6 +28535,7 @@
 						}
 						alterableCharacters.sort();
                         var groupSort=function(name){
+							if(info[name][1]=='shen') return -1;
                             if(info[name][1]=='wei') return 0;
                             if(info[name][1]=='shu') return 1;
                             if(info[name][1]=='wu') return 2;
@@ -29963,7 +29967,8 @@
     							['wei','魏'],
     							['shu','蜀'],
     							['wu','吴'],
-    							['qun','群'],
+								['qun','群'],
+    							['shen','神'],
     						],null,ui.create.div('.indent','势力：',newCharacter));
     						var options=ui.create.div('.add_skill.options','<span>主公<input type="checkbox" name="zhu"></span><span>BOSS<input type="checkbox" name="boss"></span><span>AI禁选<input type="checkbox" name="forbidai"></span><br>',newCharacter);
     						var addSkill=ui.create.div('.add_skill','添加技能<br>',newCharacter);
@@ -33680,6 +33685,11 @@
 				}
                 if(!thisiscard){
                     var groups=['wei','shu','wu','qun'];
+					for(var i in lib.character){
+						if(lib.character[i][1]=='shen'){
+							groups.add('shen');break;
+						}
+					}
                     var natures=['water','soil','wood','metal'];
                     var span=document.createElement('span');
                     newlined.appendChild(span);
@@ -33878,6 +33888,7 @@
 				}
 				else{
 					groupSort=function(name){
+						if(lib.character[name][1]=='shen') return -1;
 						if(lib.character[name][1]=='wei') return 0;
 						if(lib.character[name][1]=='shu') return 1;
 						if(lib.character[name][1]=='wu') return 2;
@@ -38742,6 +38753,7 @@
 		groupnature:function(group,method){
 			var nature;
 			switch(group){
+				case 'shen':nature='thunder';break;
 				case 'wei':nature='water';break;
 				case 'shu':nature='soil';break;
 				case 'wu':nature='wood';break;

@@ -3247,6 +3247,11 @@ span[data-nature='thunderm'] {
 	text-shadow: rgba(100, 74, 139,1) 0 0 2px,rgba(100, 74, 139,1) 0 0 5px,rgba(100, 74, 139,1) 0 0 5px,
 		rgba(100, 74, 139,1) 0 0 5px,black 0 0 1px;
 }
+div[data-nature='thundermm'],
+span[data-nature='thundermm'] {
+	text-shadow: rgba(100, 74, 139,1) 0 0 2px,rgba(100, 74, 139,1) 0 0 2px,rgba(100, 74, 139,1) 0 0 2px,
+		rgba(100, 74, 139,1) 0 0 2px,black 0 0 1px;
+}
 
 .player .identity[data-color="fan"],
 .player .identity[data-color="wu"],

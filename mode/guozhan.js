@@ -14,6 +14,16 @@ mode.guozhan={
 				lib.translate[i]=lib.translate[i.slice(3)];
 			}
 		}
+		for(var i in lib.character){
+			if(lib.character[i][1]=='shen'){
+				if(lib.character[i][4]&&lib.group.contains(lib.character[i][4][0])){
+					lib.character[i][1]=lib.character[i][4][0];
+				}
+				else{
+					lib.character[i][1]='qun';
+				}
+			}
+		}
 	},
 	onreinit:function(){
 		var pack=lib.characterPack.mode_guozhan;

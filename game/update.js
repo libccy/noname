@@ -1,8 +1,8 @@
 window.noname_update={
-    version:'1.9.23.1',
-    update:'1.9.23',
+    version:'1.9.24',
+    // update:'1.9.23',
     changeLog:[
-        'bug修复',
+        '神之试炼',
     ],
     files:[
         // 'game/game.js',
@@ -20,7 +20,7 @@ window.noname_update={
         // 'character/old.js',
         // 'mode/boss.js',
         // 'mode/versus.js',
-        'mode/guozhan.js',
+        // 'mode/guozhan.js',
         // 'mode/identity.js',
         // 'mode/chess.js',
         // 'mode/tafang.js',
