@@ -5347,6 +5347,27 @@
                     window.isNonameServer=window.location.href.slice(index+18);
                     window.indexedDB=null;
                 }
+				var htmlbg=localStorage.getItem(lib.configprefix+'background');
+				if(htmlbg){
+					if(htmlbg[0]=='['){
+						try{
+							htmlbg=JSON.parse(htmlbg).randomGet();
+							if(htmlbg.indexOf('custom_')==0){
+								throw('err');
+							}
+							_status.htmlbg=htmlbg;
+						}
+						catch(e){
+							htmlbg=null;
+						}
+					}
+					if(htmlbg){
+						document.documentElement.style.backgroundImage='url("'+lib.assetURL+'image/background/'+htmlbg+'.jpg")';
+						document.documentElement.style.backgroundSize='cover';
+						document.documentElement.style.backgroundPosition='50% 50%';
+					}
+				}
+
 				// index=localStorage.getItem(lib.configprefix+'asserver');
 				// if(index){
 				// 	window.isNonameServer=index;
@@ -5830,22 +5851,10 @@
 					lib.assetURL=noname_inited;
 				}
 
-				ui.css={default:lib.init.css(lib.assetURL+'layout/default','layout')};
-				var htmlbg=localStorage.getItem(lib.configprefix+'background');
-				if(htmlbg){
-					if(htmlbg[0]=='['){
-						htmlbg=JSON.parse(htmlbg).randomGet();
-						_status.htmlbg=htmlbg;
-						if(htmlbg.indexOf('custom_')==0){
-							htmlbg=null;
-						}
-					}
-					if(htmlbg){
-						document.documentElement.style.backgroundImage='url("'+lib.assetURL+'image/background/'+htmlbg+'.jpg")';
-						document.documentElement.style.backgroundSize='cover';
-						document.documentElement.style.backgroundPosition='50% 50%';
-					}
-				}
+				ui.css={
+					menu:lib.init.css(lib.assetURL+'layout/default','menu'),
+					default:lib.init.css(lib.assetURL+'layout/default','layout')
+				};
 
 				if(lib.device){
 					lib.init.cordovaReady=function(){
@@ -6466,7 +6475,7 @@
 						lib.init.background();
 					}
 					delete _status.htmlbg;
-					var styleToLoad=7;
+					var styleToLoad=6;
 					var styleLoaded=function(){
 						styleToLoad--;
 						if(styleToLoad==0){
@@ -6498,7 +6507,6 @@
 			                }
 						}
 					};
-					lib.init.css(lib.assetURL+'layout/default','menu',styleLoaded);
 					if(lib.config.layout!='default'){
 						ui.css.layout=lib.init.css(lib.assetURL+'layout/'+layout,'layout',styleLoaded);
 					}
@@ -6734,10 +6742,10 @@
                         ui.background.style.webkitFilter='blur(8px)';
                         ui.background.style.transform='scale(1.05)';
                     }
-					document.documentElement.style.backgroundImage='';
-					document.documentElement.style.backgroundSize='';
-					document.documentElement.style.backgroundPosition='';
 			    }
+				document.documentElement.style.backgroundImage='';
+				document.documentElement.style.backgroundSize='';
+				document.documentElement.style.backgroundPosition='';
 				document.body.insertBefore(ui.background,document.body.firstChild);
 				document.body.onresize=ui.updatex;
 				if(lib.config.touchscreen){
@@ -27782,6 +27790,7 @@
 												else{
 													for(var i in data.config){
 														game.putDB('config',i,data.config[i]);
+														lib.config[i]=data.config[i];
 													}
 													for(var i in data.data){
 														game.putDB('data',i,data.data[i]);
