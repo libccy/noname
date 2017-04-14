@@ -828,10 +828,10 @@
 											var str;
 											if(this.classList.contains('active')){
 												if(link.indexOf('custom_')==0||link.indexOf('cdv_')==0){
-													str='删除背景';
+													str='删除';
 												}
 												else{
-													str='隐藏背景';
+													str='隐藏';
 												}
 											}
 											else{
@@ -880,7 +880,7 @@
 						onclick:function(background,node){
 							if(node&&node.firstChild){
 								var menu=node.parentNode;
-								if(node.firstChild.innerHTML==get.verticalStr('隐藏背景')){
+								if(node.firstChild.innerHTML==get.verticalStr('隐藏')){
 									menu.parentNode.noclose=true;
 									node.remove();
 									menu.updateBr();
@@ -900,7 +900,7 @@
 										return;
 									}
 								}
-								else if(node.firstChild.innerHTML==get.verticalStr('删除背景')){
+								else if(node.firstChild.innerHTML==get.verticalStr('删除')){
 									menu.parentNode.noclose=true;
 									if(confirm('是否删除此背景？（此操作不可撤销）')){
 										node.remove();
