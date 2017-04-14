@@ -3,6 +3,16 @@ play.boss={
 		if(get.mode()=='tafang') return;
 		if(get.mode()!='boss'){
 			lib.characterPack.mode_extension_boss={
+				boss_zhuque:['female','shen',4,['boss_shenyi','boss_fentian'],['shu','hiddenboss','bossallowed']],
+				boss_huoshenzhurong:['male','shen',5,['boss_shenyi','boss_xingxia'],['shu','hiddenboss','bossallowed']],
+				boss_yanling:['male','shen',4,['boss_huihuo','boss_furan'],['shu','hiddenboss','bossallowed']],
+				boss_yandi:['male','shen',6,['boss_shenyi','boss_shenen','boss_chiyi'],['shu','hiddenboss','bossallowed']],
+
+				boss_qinglong:['male','shen',4,['boss_shenyi','releiji'],['wu','hiddenboss','bossallowed']],
+				boss_mushengoumang:['male','shen',5,['boss_shenyi','boss_buchun'],['wu','hiddenboss','bossallowed']],
+				boss_shujing:['female','shen',2,['boss_cuidu','boss_zhongdu'],['wu','hiddenboss','bossallowed']],
+				boss_taihao:['male','shen',6,['boss_shenyi','boss_shenen','boss_qingyi'],['wu','hiddenboss','bossallowed']],
+
 				boss_nianshou_heti:['male','shen',12,['boss_nianrui','boss_mengtai','boss_nbianshen','boss_nbianshenx'],['shu','boss','bossallowed'],'shu'],
 				boss_nianshou_jingjue:['male','shen',12,['boss_nianrui','boss_mengtai','boss_jingjue','boss_nbianshen'],['shu','hiddenboss','bossallowed'],'shu'],
 				boss_nianshou_renxing:['male','shen',12,['boss_nianrui','boss_mengtai','boss_renxing','boss_nbianshen'],['shu','hiddenboss','bossallowed'],'shu'],

@@ -33873,7 +33873,6 @@
                     }
                 }
 
-
 				var groupSort;
 				if(thisiscard){
 					groupSort=function(name){

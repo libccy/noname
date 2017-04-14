@@ -3271,6 +3271,7 @@ character.shenhua={
 		},
 		releiji:{
 			audio:2,
+			audioname:['boss_qinglong'],
 			trigger:{player:'respond'},
 			filter:function(event,player){
 				return event.card.name=='shan';

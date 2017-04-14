@@ -386,12 +386,25 @@ mode.boss={
 	},
 	characterPack:{
 		mode_boss:{
+			boss_chiyanshilian:['male','',0,['boss_chiyan','boss_chiyan_intro1','boss_chiyan_intro2','boss_chiyan_intro3'],['boss'],'zhu'],
+			boss_zhuque:['female','shen',4,['boss_shenyi','boss_fentian'],['shu','hiddenboss','bossallowed']],
+			boss_huoshenzhurong:['male','shen',5,['boss_shenyi','boss_xingxia'],['shu','hiddenboss','bossallowed']],
+			boss_yanling:['male','shen',4,['boss_huihuo','boss_furan'],['shu','hiddenboss','bossallowed']],
+			boss_yandi:['male','shen',6,['boss_shenyi','boss_shenen','boss_chiyi'],['shu','hiddenboss','bossallowed']],
+
+			boss_qingmushilian:['male','',0,['boss_qingmu','boss_qingmu_intro1','boss_qingmu_intro2','boss_qingmu_intro3'],['boss'],'wu'],
+			boss_qinglong:['male','shen',4,['boss_shenyi','releiji'],['wu','hiddenboss','bossallowed']],
+			boss_mushengoumang:['male','shen',5,['boss_shenyi','boss_buchun'],['wu','hiddenboss','bossallowed']],
+			boss_shujing:['female','shen',2,['boss_cuidu','boss_zhongdu'],['wu','hiddenboss','bossallowed']],
+			boss_taihao:['male','shen',6,['boss_shenyi','boss_shenen','boss_qingyi'],['wu','hiddenboss','bossallowed']],
+
 			boss_zhuoguiquxie:['male','',0,['boss_bianshen','boss_bianshen_intro1','boss_bianshen_intro2','boss_bianshen_intro3','boss_bianshen_intro4'],['boss'],'shu'],
 			boss_nianshou_heti:['male','shen',12,['boss_nianrui','boss_mengtai','boss_nbianshen','boss_nbianshenx'],['shu','boss','bossallowed'],'shu'],
 			boss_nianshou_jingjue:['male','shen',12,['boss_nianrui','boss_mengtai','boss_jingjue','boss_nbianshen'],['shu','hiddenboss','bossallowed'],'shu'],
 			boss_nianshou_renxing:['male','shen',12,['boss_nianrui','boss_mengtai','boss_renxing','boss_nbianshen'],['shu','hiddenboss','bossallowed'],'shu'],
 			boss_nianshou_ruizhi:['male','shen',12,['boss_nianrui','boss_mengtai','boss_ruizhi','boss_nbianshen'],['shu','hiddenboss','bossallowed'],'shu'],
 			boss_nianshou_baonu:['male','shen',12,['boss_nianrui','boss_mengtai','boss_nbaonu','boss_shouyi','boss_nbianshen'],['shu','hiddenboss','bossallowed'],'shu'],
+
 			boss_baiwuchang:['male','shen',9,['boss_baolian','boss_qiangzheng','boss_zuijiu','juece','boss_bianshen4'],['shu','hiddenboss','bossallowed']],
 			boss_heiwuchang:['male','shen',9,['boss_guiji','boss_taiping','boss_suoming','boss_xixing','boss_bianshen4'],['shu','hiddenboss','bossallowed']],
 			boss_luocha:['male','shen',12,['boss_modao','boss_yushou','yizhong','boss_moyany'],['shu','hiddenboss','bossallowed']],
@@ -778,6 +791,32 @@ mode.boss={
 		},
 	},
 	boss:{
+		boss_chiyanshilian:{
+			chongzheng:99,
+			checkResult:function(player){
+				if(player==game.boss&&game.boss.name!='boss_yandi'){
+					return false;
+				}
+			},
+			init:function(){
+				_status.additionalReward=function(){
+					return 500;
+				}
+			}
+		},
+		boss_qingmushilian:{
+			chongzheng:99,
+			checkResult:function(player){
+				if(player==game.boss&&game.boss.name!='boss_taihao'){
+					return false;
+				}
+			},
+			init:function(){
+				_status.additionalReward=function(){
+					return 500;
+				}
+			}
+		},
 		boss_zhuoguiquxie:{
 			chongzheng:99,
 			checkResult:function(player){
@@ -870,6 +909,16 @@ mode.boss={
 		},
 	},
 	skill:{
+		boss_shenyi:{},
+		boss_shenen:{},
+		boss_fentian:{},
+		boss_xingxia:{},
+		boss_huihuo:{},
+		boss_chiyi:{},
+		boss_shenbuchun:{},
+		boss_cuidu:{},
+		boss_zhongdu:{},
+		boss_qingyi:{},
 		boss_qizuo:{
 			trigger:{player:'useCardAfter'},
 			filter:function(event,player){
@@ -2474,6 +2523,14 @@ mode.boss={
 		boss_bianshen_intro2:{nobracket:true},
 		boss_bianshen_intro3:{nobracket:true},
 		boss_bianshen_intro4:{nobracket:true},
+		boss_chiyan_intro1:{nobracket:true},
+		boss_chiyan_intro2:{nobracket:true},
+		boss_chiyan_intro3:{nobracket:true},
+		boss_chiyan_intro4:{nobracket:true},
+		boss_qingmu_intro1:{nobracket:true},
+		boss_qingmu_intro2:{nobracket:true},
+		boss_qingmu_intro3:{nobracket:true},
+		boss_qingmu_intro4:{nobracket:true},
 		zhanjiang:{
 			trigger:{player:'phaseBegin'},
 			filter:function(event,player){
@@ -3643,6 +3700,41 @@ mode.boss={
 		boss_guojia:'世之奇士',
 		boss_caocao:'魏武大帝',
 
+		boss_chiyanshilian:'赤炎试炼',
+		boss_zhuque:'朱雀',
+		boss_huoshenzhurong:'火神祝融',
+		boss_yanling:'焰灵',
+		boss_yandi:'炎帝',
+
+		boss_qingmushilian:'青木试炼',
+		boss_qinglong:'青龙',
+		boss_mushengoumang:'木神勾芒',
+		boss_shujing:'树精',
+		boss_taihao:'太昊',
+
+		boss_shenyi:'神裔',
+		boss_shenyi_info:'锁定技，你的武将牌始终正面向上，你的判定区内的牌效果反转',
+		boss_shenen:'神恩',
+		boss_shenen_info:'锁定技，所有己方角色使用牌无距离限制；所有敌方角色摸牌阶段多摸一张牌且手牌上限+1',
+		boss_fentian:'焚天',
+		boss_fentian_info:'锁定技，你造成的伤害视为火焰伤害；你使用红色牌无距离和次数限制，且不可被其他角色使用【闪】或【无懈可击】响应',
+		boss_xingxia:'行夏',
+		boss_xingxia_info:'每两轮限一次，出牌阶段，你可以对焰灵造成2点火焰伤害，然后令每名敌方角色选择一项：1.弃置一张红色牌；2.你对其造成1点火焰伤害',
+		boss_huihuo:'回火',
+		boss_huihuo_info:'锁定技，当你死亡时，你对所有敌方角色各造成3点火焰伤害；出牌阶段，你可以多使用一张【杀】',
+		boss_furan:'复燃',
+		boss_furan_info:'当你濒死时，所有敌方角色视为可以将红色牌当【桃】对你使用',
+		boss_chiyi:'赤仪',
+		boss_chiyi_info:'锁定技，从第三轮开始，敌方角色受到的伤害+1；第五轮开始时，你对所有角色各造成1点火焰伤害；第七轮开始时，你对焰灵造成5点火焰伤害',
+		boss_buchun:'布春',
+		boss_buchun_info:'每两轮限一次，出牌阶段，若场上有死亡的树精，你可以失去1点体力，复活所有树精，使其回复体力至1点，补充手牌至两张；若场上没有死亡的树精，你可以为一名己方角色回复2点体力',
+		boss_cuidu:'淬毒',
+		boss_cuidu_info:'锁定技，你对敌方角色造成伤害后，若其没有“中毒”，你令其获得“中毒”，然后令木神勾芒摸一张牌',
+		boss_zhongdu:'中毒',
+		boss_zhongdu_info:'锁定技，回合开始时，你进行判定，若结果不为红桃，你受到1点无来源的伤害，若结果不为黑桃，你失去此技能',
+		boss_qingyi:'青仪',
+		boss_qingyi_info:'锁定技，第三轮开始时，己方角色各回复1点体力；第五轮开始时，敌方角色各失去1点体力；第七轮开始时，复活木神勾芒和树精，使其各摸三张牌，各+1体力上限，然后各回复3点体力',
+
 		boss_guimou:'鬼谋',
 		boss_guimou_info:'结束阶段，你可以令一名随机的其他角色进入混乱状态直到其下一回合结束',
 		boss_yuance:'远策',
@@ -3697,7 +3789,6 @@ mode.boss={
 		boss_ruizhi_info:'锁定技，其他角色的准备阶段开始时，其选择一张手牌和一张装备区里的牌，然后弃置其余的牌',
 		boss_jingjue:'警觉',
 		boss_jingjue_info:'每当你于回合外失去牌时，你可以进行一次判定，若结果为红色，你回复1点体力',
-		// boss_jingjue_info:'锁定技，当你因弃置而失去牌后，你回复1点体力',
 		boss_renxing:'任性',
 		boss_renxing_info:'锁定技，你的回合外，一名角色受到1点伤害后或回复1点体力时，你摸一张牌',
 		boss_nbaonu:'暴怒',
@@ -3763,6 +3854,20 @@ mode.boss={
 		boss_shanbeng:'山崩',
 		boss_shanbeng_info:'锁定技，当你死亡时，你令所有其他角色弃置其装备区内的所有牌',
 
+		boss_chiyan_intro1:'第一关：',
+		boss_chiyan_intro1_info:'挑战朱雀',
+		boss_chiyan_intro2:'第二关：',
+		boss_chiyan_intro2_info:'挑战火神祝融、焰灵',
+		boss_chiyan_intro3:'第三关：',
+		boss_chiyan_intro3_info:'挑战炎帝、火神祝融、焰灵',
+
+		boss_qingmu_intro1:'第一关：',
+		boss_qingmu_intro1_info:'挑战青龙',
+		boss_qingmu_intro2:'第二关：',
+		boss_qingmu_intro2_info:'挑战木神勾芒、树精',
+		boss_qingmu_intro3:'第三关：',
+		boss_qingmu_intro3_info:'挑战太昊、木神勾芒、树精',
+
 		boss_bianshen_intro1:'第一关：',
 		boss_bianshen_intro1_info:'挑战魑、魅、魍、魉中的随机一个',
 		boss_bianshen_intro2:'第二关：',
@@ -3771,12 +3876,12 @@ mode.boss={
 		boss_bianshen_intro3_info:'挑战白无常、黑无常中的随机一个',
 		boss_bianshen_intro4:'第四关：',
 		boss_bianshen_intro4_info:'挑战罗刹、夜叉中的随机一个',
-		boss_bianshen2:'后援',
-		boss_bianshen2_info:'你死亡后，随机召唤牛头、马面中的一个',
-		boss_bianshen3:'后援',
-		boss_bianshen3_info:'你死亡后，随机召唤白无常、黑无常中的一个',
-		boss_bianshen4:'后援',
-		boss_bianshen4_info:'你死亡后，随机召唤罗刹、夜叉中的一个',
+		// boss_bianshen2:'后援',
+		// boss_bianshen2_info:'你死亡后，随机召唤牛头、马面中的一个',
+		// boss_bianshen3:'后援',
+		// boss_bianshen3_info:'你死亡后，随机召唤白无常、黑无常中的一个',
+		// boss_bianshen4:'后援',
+		// boss_bianshen4_info:'你死亡后，随机召唤罗刹、夜叉中的一个',
 
 		zhanjiang:'斩将',
 		zhanjiang_info:'准备阶段开始时，如果其他角色的装备区内有【青釭剑】，你可以获得之',
