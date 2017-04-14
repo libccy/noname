@@ -1,4 +1,6 @@
-character.extra={
+'use strict';
+game.import('character',{
+	name:'extra',
 	character:{
 		shen_guanyu:['male','shen',6,['wuhun','wushen'],['shu']],
 		shen_zhaoyun:['male','shen',2,['juejing','longhun'],['shu']],
@@ -1226,4 +1228,4 @@ character.extra={
 		wuqian:'无前',
 		wuqian_info:'出牌阶段，你可以弃置两枚暴怒标记并获得技能【无双】直到回合结束',
 	},
-}
+});

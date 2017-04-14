@@ -46,6 +46,7 @@
         cardType:{},
         hook:{globaltrigger:{},globalskill:{}},
         hookmap:{},
+		imported:{},
         layoutfixed:['chess','tafang','stone'],
         characterDialogGroup:{
             '收藏':function(name,capt){
@@ -6207,6 +6208,7 @@
 
 				lib.config=window.config;
                 lib.configOL={};
+				delete window.config;
 				var config2;
 
 				var proceed=function(config2){
@@ -6255,30 +6257,32 @@
 	                if(window.isNonameServer){
 	                    lib.config.mode='connect';
 	                }
-					for(i in character.pack){
+					var pack=window.noname_package;
+					delete window.noname_package;
+					for(i in pack.character){
 						if(lib.config.hiddenCharacterPack.indexOf(i)==-1){
 							lib.config.all.characters.push(i);
-							lib.translate[i+'_character_config']=character.pack[i];
+							lib.translate[i+'_character_config']=pack.character[i];
 						}
 					}
-					for(i in card.pack){
+					for(i in pack.card){
 						if(lib.config.hiddenCardPack.indexOf(i)==-1){
 							lib.config.all.cards.push(i);
-							lib.translate[i+'_card_config']=card.pack[i];
+							lib.translate[i+'_card_config']=pack.card[i];
 						}
 					}
-					for(i in play.pack){
+					for(i in pack.play){
 						lib.config.all.plays.push(i);
-						lib.translate[i+'_play_config']=play.pack[i];
+						lib.translate[i+'_play_config']=pack.play[i];
 					}
 
 					if(!lib.config.gameRecord){
 						lib.config.gameRecord={};
 					}
-					for(i in mode.pack){
+					for(i in pack.mode){
 						if(lib.config.hiddenModePack.indexOf(i)==-1){
 							lib.config.all.mode.push(i);
-							lib.translate[i]=mode.pack[i];
+							lib.translate[i]=pack.mode[i];
 							if(!lib.config.gameRecord[i]){
 								lib.config.gameRecord[i]={data:{}};
 							}
@@ -6291,10 +6295,10 @@
 							lib.config.gameRecord.identity={data:{}};
 						}
 					}
-					if(background&&background.pack){
-						for(i in background.pack){
+					if(pack.background){
+						for(i in pack.background){
 							if(lib.config.hiddenBackgroundPack.contains(i)) continue;
-							lib.configMenu.appearence.config.image_background.item[i]=background.pack[i];
+							lib.configMenu.appearence.config.image_background.item[i]=pack.background[i];
 						}
 						for(var i=0;i<lib.config.customBackgroundPack.length;i++){
 							var link=lib.config.customBackgroundPack[i];
@@ -6302,44 +6306,36 @@
 						}
 						lib.configMenu.appearence.config.image_background.item.default='默认';
 					}
-					if(music&&music.pack){
+					if(pack.music){
 						if(lib.device||typeof window.require=='function'){
 							lib.configMenu.audio.config.background_music.item.music_custom='自定';
 						}
 						lib.config.all.background_music=['music_default'];
-						for(i in music.pack){
+						for(i in pack.music){
 							lib.config.all.background_music.push(i);
-							lib.configMenu.audio.config.background_music.item[i]=music.pack[i];
+							lib.configMenu.audio.config.background_music.item[i]=pack.music[i];
 						}
 					    lib.configMenu.audio.config.background_music.item.music_random='随机';
 					    lib.configMenu.audio.config.background_music.item.music_off='关闭';
 					}
-	                if(theme&&theme.pack){
-	                    for(i in theme.pack){
-							lib.configMenu.appearence.config.theme.item[i]=theme.pack[i];
+	                if(pack.theme){
+	                    for(i in pack.theme){
+							lib.configMenu.appearence.config.theme.item[i]=pack.theme[i];
 						}
 	                }
 
-
-					if(font&&font.pack){
+					if(pack.font){
 						ui.css.fontsheet=lib.init.sheet();
-						for(i in font.pack){
-							lib.configMenu.appearence.config.name_font.item[i]=font.pack[i];
-							lib.configMenu.appearence.config.identity_font.item[i]=font.pack[i];
-							lib.configMenu.appearence.config.cardtext_font.item[i]=font.pack[i];
-							lib.configMenu.appearence.config.global_font.item[i]=font.pack[i];
+						for(i in pack.font){
+							lib.configMenu.appearence.config.name_font.item[i]=pack.font[i];
+							lib.configMenu.appearence.config.identity_font.item[i]=pack.font[i];
+							lib.configMenu.appearence.config.cardtext_font.item[i]=pack.font[i];
+							lib.configMenu.appearence.config.global_font.item[i]=pack.font[i];
 							ui.css.fontsheet.sheet.insertRule("@font-face {font-family: '"+i+"';src: url('"+lib.assetURL+"font/"+i+".ttf');}",0);
 						}
 						lib.configMenu.appearence.config.cardtext_font.item.default='默认';
 						lib.configMenu.appearence.config.global_font.item.default='默认';
 					}
-					delete character.pack;
-					delete card.pack;
-					delete play.pack;
-					delete mode.pack;
-					delete window.background;
-					delete window.music;
-					delete window.font;
 
 					var ua=navigator.userAgent.toLowerCase();
 					if('ontouchstart' in document){
@@ -6475,17 +6471,18 @@
 						lib.init.background();
 					}
 					delete _status.htmlbg;
+
+
+					window.game=game;
 					var styleToLoad=6;
 					var styleLoaded=function(){
 						styleToLoad--;
 						if(styleToLoad==0){
 							if(extensionlist.length){
-			                    window.game=game;
 			                    var extToLoad=extensionlist.length;
 			                    var extLoaded=function(){
 			                        extToLoad--;
 			    					if(extToLoad==0){
-			                            delete window.game;
 			    						loadPack();
 			    					}
 			                    }
@@ -6495,7 +6492,6 @@
 			                                game.removeExtension(i);
 			                                extToLoad--;
 			            					if(extToLoad==0){
-			                                    delete window.game;
 			            						loadPack();
 			            					}
 			                            }
@@ -6921,6 +6917,11 @@
 				}
 
 				var proceed=function(){
+					var mode=lib.imported.mode;
+					var card=lib.imported.card;
+					var character=lib.imported.character;
+					var play=lib.imported.play;
+					delete window.game;
 					var i,j,k;
 					for(i in mode[lib.config.mode].element){
 						if(!lib.element[i]) lib.element[i]=[];
@@ -6975,8 +6976,8 @@
 					lib.config.banned=lib.config[lib.config.mode+'_banned']||[];
 					lib.config.bannedcards=lib.config[lib.config.mode+'_bannedcards']||[];
 
-					lib.rank=window.characterRank;
-					delete window.characterRank;
+					lib.rank=window.noname_character_rank;
+					delete window.noname_character_rank;
 					for(i in mode[lib.config.mode]){
 						if(i=='element') continue;
 						if(i=='game') continue;
@@ -7258,11 +7259,9 @@
                         lib.cheat.i();
                     }
 					lib.config.sort_card=get.sortCard(lib.config.sort);
-					delete window.config;
-					delete window.mode;
-					delete window.card;
-					delete window.character;
-					delete window.play;
+					delete lib.imported.character;
+					delete lib.imported.card;
+					delete lib.imported.mode;
 					for(var i in lib.init){
 						if(i.indexOf('setMode_')==0){
 							delete lib.init[i];
@@ -7333,7 +7332,7 @@
 						});
 					}
 				}
-				if(!mode[lib.config.mode]){
+				if(!lib.imported.mode[lib.config.mode]){
 					window.inSplash=true;
 					clearTimeout(window.resetGameTimeout);
 					delete window.resetGameTimeout;
@@ -8669,12 +8668,11 @@
     			},
                 loadMode:function(){
     				'step 0'
-    				window.mode={};
     				lib.init.js(lib.assetURL+'mode',event.mode,game.resume);
     				game.pause();
     				'step 1'
-    				event.result=window.mode[event.mode];
-    				delete window.mode;
+    				event.result=lib.imported.mode[event.mode];
+    				delete lib.imported.mode[event.mode];
     			},
                 forceOver:function(){
     				'step 0'
@@ -9475,6 +9473,9 @@
 									ai.basic.chooseCard(event.ai);
 									if(_status.event.custom.add.card){
 										_status.event.custom.add.card();
+									}
+									for(var i=0;i<ui.selected.cards.length;i++){
+										ui.selected.cards[i].updateTransform(true);
 									}
 								});
 							}
@@ -17846,6 +17847,9 @@
                         this.cardid=get.id();
                         lib.cardOL[this.cardid]=this;
                     }
+					if(!_status.connectMode&&!_status.video){
+						this.cardid=get.id();
+					}
 					return this;
 				},
 				updateTransform:function(bool,delay){
@@ -20773,70 +20777,83 @@
 				}
 			}
 		},
-		import:function(type,obj){
+		import:function(type,content){
 			if(type=='extension'){
-                lib.extensionMenu['extension_'+obj.name]={
-                    enable:{
-                        name:'开启',
-    					init:true
-                    }
-                };
-				for(var i in obj.config){
-					lib.extensionMenu['extension_'+obj.name][i]=obj.config[i];
+				game.loadExtension(content);
+			}
+			else{
+				if(!lib.imported[type]){
+					lib.imported[type]={};
 				}
-				for(var i in obj.help){
-					lib.help[i]=obj.help[i];
+				if(content.name){
+					lib.imported[type][content.name]=content;
+					delete content.name;
 				}
-                if(obj.editable!==false){
-                    lib.extensionMenu['extension_'+obj.name].edit={
-    					name:'编辑此扩展',
-    					clear:true,
-    					onclick:function(){
-                            game.editExtension(obj.name);
-    					}
-    				}
+			}
+		},
+		loadExtension:function(obj){
+            lib.extensionMenu['extension_'+obj.name]={
+                enable:{
+                    name:'开启',
+					init:true
                 }
-				lib.extensionMenu['extension_'+obj.name].delete={
-					name:'删除此扩展',
+            };
+			for(var i in obj.config){
+				lib.extensionMenu['extension_'+obj.name][i]=obj.config[i];
+			}
+			for(var i in obj.help){
+				lib.help[i]=obj.help[i];
+			}
+            if(obj.editable!==false){
+                lib.extensionMenu['extension_'+obj.name].edit={
+					name:'编辑此扩展',
 					clear:true,
 					onclick:function(){
-						if(this.innerHTML=='<span>确认删除</span>'){
-							var prefix='extension_'+obj.name;
-							var page=this.parentNode;
-                            var start=page.parentNode.previousSibling;
-                            page.remove();
-                            if(start){
-                                for(var i=0;i<start.childElementCount;i++){
-                                    if(start.childNodes[i].link==page){
-                                        var active=false;
-                                        if(start.childNodes[i].classList.contains('active')){
-                                            active=true;
-                                        }
-                                        start.childNodes[i].remove();
-                                        if(active){
-                                            start.firstChild.classList.add('active');
-                                            start.nextSibling.appendChild(start.firstChild.link);
-                                        }
-                                        break;
+                        game.editExtension(obj.name);
+					}
+				}
+            }
+			lib.extensionMenu['extension_'+obj.name].delete={
+				name:'删除此扩展',
+				clear:true,
+				onclick:function(){
+					if(this.innerHTML=='<span>确认删除</span>'){
+						var prefix='extension_'+obj.name;
+						var page=this.parentNode;
+                        var start=page.parentNode.previousSibling;
+                        page.remove();
+                        if(start){
+                            for(var i=0;i<start.childElementCount;i++){
+                                if(start.childNodes[i].link==page){
+                                    var active=false;
+                                    if(start.childNodes[i].classList.contains('active')){
+                                        active=true;
                                     }
+                                    start.childNodes[i].remove();
+                                    if(active){
+                                        start.firstChild.classList.add('active');
+                                        start.nextSibling.appendChild(start.firstChild.link);
+                                    }
+                                    break;
                                 }
                             }
-                            game.removeExtension(obj.name);
-							if(obj.onremove){
-								obj.onremove();
-							}
+                        }
+                        game.removeExtension(obj.name);
+						if(obj.onremove){
+							obj.onremove();
 						}
-						else{
-							this.innerHTML='<span>确认删除</span>';
-							var that=this;
-							setTimeout(function(){
-								that.innerHTML='<span>删除此扩展</span>';
-							},1000);
-						}
+					}
+					else{
+						this.innerHTML='<span>确认删除</span>';
+						var that=this;
+						setTimeout(function(){
+							that.innerHTML='<span>删除此扩展</span>';
+						},1000);
 					}
 				}
 			}
-            if(type=='extension'&&!_status.importingExtension){
+
+            if(!_status.importingExtension){
                 if(obj&&lib.config['extension_'+obj.name+'_enable']){
                     lib.init.eval(obj);
                     var cfg={};
@@ -24734,12 +24751,11 @@
 			return players[0];
 		},
         loadModeAsync:function(name,callback){
-            window.mode={};
             var script=lib.init.js(lib.assetURL+'mode',name,function(){
                 script.remove();
-                var mode=window.mode;
-                delete window.mode;
-                callback(mode[name]);
+				var content=lib.imported.mode[name];
+				delete lib.imported.mode[name];
+                callback(content);
             });
         },
         switchMode:function(name,configx){
@@ -24753,11 +24769,9 @@
 					}
 				}
 			}
-            window.mode={};
             var script=lib.init.js(lib.assetURL+'mode',name,function(){
                 script.remove();
-                var mode=window.mode;
-                delete window.mode;
+                var mode=lib.imported.mode;
                 _status.sourcemode=lib.config.mode;
                 lib.config.mode=name;
 
@@ -24900,8 +24914,9 @@
                 }
 
                 game.createEvent('game',false).setContent(mode[lib.config.mode].start);
+                delete lib.imported.mode[name];
 
-				if(!game.db){
+				if(!lib.db){
 					try{
 	                    lib.storage=JSON.parse(localStorage.getItem(lib.configprefix+lib.config.mode));
 	                    if(typeof lib.storage!='object') throw('err');
@@ -39921,7 +39936,6 @@
 					else lib.tempSortSeat=sort;
 					players.sort(lib.sort.seat);
 					delete lib.tempSortSeat;
-					lib.temp={};
 				}
 			}
 			if(dead) players=players.concat(game.dead);
@@ -41284,10 +41298,11 @@
 		useful:function(card){
 			if(get.position(card)=='j') return -1;
 			if(get.position(card)=='e') return get.equipValue(card);
-			if(!lib.temp) lib.temp={};
-			if(lib.temp[card.name]==undefined) lib.temp[card.name]=[card];
-			else lib.temp[card.name].add(card);
-			var i=lib.temp[card.name].find(card);
+			var i=0;
+			if(_status.event.player){
+				i=_status.event.player.getCards('h',card.name).indexOf(card);
+				if(i<0) i=0;
+			}
 			var aii=get.info(card).ai;
 			var useful;
 			if(aii&&aii.useful) useful=aii.useful;
@@ -41319,17 +41334,21 @@
 			else if(aii&&aii.basic) value=aii.basic.value;
 			if(value==undefined) return 0;
 			if(player==undefined||get.itemtype(player)!='player') player=_status.event.player;
-			if(typeof value=='function') return value(card,player);
+			var geti=function(){
+				var num=0,i;
+				var cards=player.getCards('h',card.name);
+				if(cards.contains(card)){
+					return cards.indexOf(card);
+				}
+				return cards.length;
+			};
+			if(typeof value=='function'){
+				return value(card,player,geti());
+			}
 			if(typeof value=='number') return value;
 			if(get.objtype(value)=='array'){
 				if(method=='raw') return value[0];
-				var num=0,i;
-				var cards=player.getCards('h');
-				for(i=0;i<cards.length;i++){
-					if(cards[i].name==card.name&&
-						cards[i]!=card&&
-						cards[i].classList.contains('selected')==false) num++;
-				}
+				var num=geti();
 				if(num<value.length) return value[num];
 				return value[value.length-1];
 			}
@@ -41628,7 +41647,6 @@
 						}
 						return (j>0);
 					}
-					lib.temp={};
 					buttons=get.selectableButtons();
 					if(buttons.length==0){
 						return ok;
@@ -41683,7 +41701,6 @@
 						}
 						return (j>0);
 					}
-					lib.temp={};
 					cards=get.selectableCards();
 					if(!_status.event.player._noSkill){
 						cards=cards.concat(get.skills());
@@ -41753,7 +41770,6 @@
 					else if(range[1]==0){
 						return check()>0
 					}
-					lib.temp={};
 					targets=get.selectableTargets();
 					if(targets.length==0){
 						return ok;

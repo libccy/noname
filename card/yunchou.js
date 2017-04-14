@@ -1,4 +1,6 @@
-card.yunchou={
+'use strict';
+game.import('card',{
+	name:'yunchou',
 	card:{
 		diaobingqianjiang:{
 			fullskin:true,
@@ -1154,4 +1156,4 @@ card.yunchou={
 		['club',2,'youdishenru'],
 		['spade',9,'youdishenru'],
 	],
-}
+});

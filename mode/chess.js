@@ -1,5 +1,6 @@
 'use strict';
-mode.chess={
+game.import('mode',{
+	name:'chess',
 	canvasUpdates2:[],
 	hiddenCharacters:[],
 	start:function(){
@@ -2054,7 +2055,6 @@ mode.chess={
 						lib.rank.rarity.common.push(lib.rank.all[i]);
 					}
 				}
-				delete window.characterRank;
 
 				ui.control.style.transition='all 0s';
 				if(get.is.phoneLayout()){
@@ -6020,4 +6020,4 @@ mode.chess={
 		'竞技场：<br>随机选择9名武将，每次派出1~3名武将参战。战斗中阵亡的武将不能再次上场。<br><br>战斗后武将进入疲劳状态，若立即再次出场则初始体力值-1。<br><br>战斗中本方武将行动时可召唤后援，令一名未出场的已方武将加入战斗。后援武将在战斗结束后无论存活与否均不能再次出场<br><br>当取得12场胜利或所有武将全部阵亡后结束，并根据胜场数获得随机奖励<li>'+
 		'修改金钱：<br>game.changeMoney<br>修改招募令：<br>game.changeDust</ul>'
 	},
-}
+});

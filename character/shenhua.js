@@ -1,5 +1,6 @@
 'use strict';
-character.shenhua={
+game.import('character',{
+	name:'shenhua',
 	connect:true,
 	character:{
 		xiahouyuan:['male','wei',4,['xinshensu']],
@@ -4361,4 +4362,4 @@ character.shenhua={
 		fenji_info:'每当一名角色的手牌于回合外被弃置时，你可以失去1点体力，然后该角色摸两张牌。',
 
 	},
-}
+});

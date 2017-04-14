@@ -1,5 +1,6 @@
 'use strict';
-character.hearth={
+game.import('character',{
+	name:'hearth',
 	character:{
 		hs_jaina:['female','wei',3,['huopu','aoshu','bingjia']],
 		hs_lrexxar:['male','shu',4,['yushou']],
@@ -6582,4 +6583,4 @@ character.hearth={
 		wlianji:'连击',
 		wlianji_info:'结束阶段，若你本回合使用的卡牌数大于你当前的体力值，你可以摸两张牌',
 	},
-}
+});

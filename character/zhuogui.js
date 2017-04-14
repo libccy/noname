@@ -1,4 +1,6 @@
-character.zhuogui={
+'use strict';
+game.import('character',{
+	name:'zhuogui',
     character:{
 		nianshou:['male','shu',4,['nianrui','qixiang']],
 		mamian:['male','qun',4,['lianyu','guiji']],
@@ -336,4 +338,4 @@ character.zhuogui={
         xixing:'吸星',
         xixing_info:'出牌阶段限一次，你可以弃置三张不同类别的牌，对一名其他角色造成一点伤害，然后回复一点体力',
     },
-}
+});

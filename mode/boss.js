@@ -1,5 +1,6 @@
 'use strict';
-mode.boss={
+game.import('mode',{
+	name:'boss',
 	start:function(){
 		"step 0"
 		var playback=localStorage.getItem(lib.configprefix+'playback');
@@ -4187,4 +4188,4 @@ mode.boss={
 			return (from.side===to.side?6:-6);
 		}
 	}
-}
+});

@@ -1,5 +1,6 @@
 'use strict';
-card.sp={
+game.import('card',{
+	name:'sp',
 	connect:true,
 	card:{
 		jinchan:{
@@ -977,4 +978,4 @@ card.sp={
 		["spade",2,'lanyinjia'],
 		["club",2,'lanyinjia'],
 	],
-}
+});

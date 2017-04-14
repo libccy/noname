@@ -1,5 +1,6 @@
 'use strict';
-play.coin={
+game.import('play',{
+	name:'coin',
 	init:function(){
 		if(lib.config.mode!='chess'||get.config('chess_mode')!='leader'){
 			_status.coin=0;
@@ -1369,4 +1370,4 @@ play.coin={
 		'<li>修改金币：<br>game.changCoin'+
 		'<li>默认下雪：<br>game.haveFun.alwaysSnow'
 	}
-}
+});

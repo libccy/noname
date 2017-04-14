@@ -1,9 +1,10 @@
 'use strict';
-mode.realtime={
+game.import('mode',{
+	name:'realtime',
     start:function(){
 
     },
     game:{
 
     }
-};
+});

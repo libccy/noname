@@ -1,5 +1,6 @@
 'use strict';
-character.yijiang={
+game.import('character',{
+	name:'yijiang',
 	connect:true,
 	character:{
 		caozhang:['male','wei',4,['jiangchi']],
@@ -7717,4 +7718,4 @@ character.yijiang={
 		zhichi2_info:'智迟已发动',
 		pojun_info:'你每使用【杀】造成一次伤害，可令受到该伤害的角色多摸X张牌，X为该角色当前的体力值(X最多为5)，然后该角色将其武将牌翻面。',
 	},
-}
+});

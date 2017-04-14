@@ -1,5 +1,6 @@
 'use strict';
-character.xianjian={
+game.import('character',{
+	name:'xianjian',
 	character:{
 		pal_lixiaoyao:['male','qun',4,['tianjian','yufeng']],
 		pal_zhaoliner:['female','wei',3,['huimeng','tianshe']],
@@ -2611,4 +2612,4 @@ character.xianjian={
 		tianshe2:'天蛇',
 		tianshe_info:'锁定技，你防止即将受到的属性伤害，每当你造成一次属性伤害，你回复一点体力',
 	},
-}
+});

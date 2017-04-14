@@ -1,4 +1,6 @@
-card.swd={
+'use strict';
+game.import('card',{
+	name:'swd',
 	card:{
 		dujian:{
 			fullskin:true,
@@ -1594,7 +1596,7 @@ card.swd={
 						if(i==0) return 7.3;
 						return 3;
 					},
-					value:function(card,player){
+					value:function(card,player,i){
 						if(player.hp>1){
 							if(i==0) return 5;
 							return 1;
@@ -5177,4 +5179,4 @@ card.swd={
 		// ['club',11,'dujian','poison'],
 		// ['club',12,'dujian','poison'],
 	],
-}
+});

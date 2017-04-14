@@ -232,11 +232,3 @@ window.config={
 		// ['jiushi','kuiwei'],
 	]
 };
-window.mode={};
-window.card={};
-window.character={};
-window.play={};
-window.background={};
-window.music={};
-window.font={};
-window.theme={};

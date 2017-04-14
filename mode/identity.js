@@ -1,5 +1,6 @@
 'use strict';
-mode.identity={
+game.import('mode',{
+	name:'identity',
 	start:function(){
 		"step 0"
 		if(!lib.config.new_tutorial){
@@ -1940,4 +1941,4 @@ mode.identity={
 		'首先由亮出身份的忠臣玩家随机获得六张武将牌，挑选一名角色，并将选好的武将牌展示给其他玩家。之后其余每名玩家随机获得三张武将牌，各自从其中挑选一张同时亮出<li>'+
 		'亮出身份牌的忠臣增加1点体力上限。角色濒死和死亡的结算及胜利条件与普通身份局相同。',
 	}
-}
+});

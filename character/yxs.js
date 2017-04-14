@@ -1,5 +1,6 @@
 'use strict';
-character.yxs={
+game.import('character',{
+	name:'yxs',
 	character:{
 		yxs_wuzetian:['female','wu',4,['nvquan','qiandu','weiyi']],
 		yxs_caocao:['male','wei',4,['zhulu','xieling']],
@@ -2989,4 +2990,4 @@ character.yxs={
 		juma:'拒马',
 		juma_info:'你与其他角色的距离始终视为1。',
 	},
-};
+});

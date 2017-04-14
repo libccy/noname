@@ -1,5 +1,6 @@
 'use strict';
-character.refresh={
+game.import('character',{
+	name:'refresh',
 	connect:true,
 	character:{
 		re_caocao:['male','wei',4,['hujia','rejianxiong'],['zhu']],
@@ -1570,4 +1571,4 @@ character.refresh={
 		reluoyi_info:'你可以跳过摸牌阶段，然后展示牌堆顶的三张牌，获得其中的基本牌、武器牌和【决斗】，若如此做，直到你的下回合开始，你为伤害来源的【杀】或【决斗】造成的伤害+1。',
 		reganglie_info:'每当你受到1点伤害后，可进行一次判定，若结果为红色，你对伤害来源造成1点伤害，若结果为黑色，你弃置其一张牌。'
 	},
-}
+});

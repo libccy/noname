@@ -1,4 +1,6 @@
-play.boss={
+'use strict';
+game.import('play',{
+	name:'boss',
 	init:function(){
 		if(get.mode()=='tafang') return;
 		if(get.mode()!='boss'){
@@ -220,4 +222,4 @@ play.boss={
 	help:{
 		'挑战武将':'<ul><li>在非挑战模式中使用挑战武将'
 	},
-}
+});

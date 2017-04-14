@@ -1,5 +1,6 @@
 'use strict';
-card.gujian={
+game.import('card',{
+	name:'gujian',
     card:{
         luyugeng:{
             fullskin:true,
@@ -1685,4 +1686,4 @@ card.gujian={
         ['club',3,'liufengsan'],
 
     ]
-};
+});

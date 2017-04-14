@@ -1,5 +1,6 @@
 'use strict';
-mode.versus={
+game.import('mode',{
+	name:'versus',
 	init:function(){
 		if(get.config('versus_mode')=='jiange'){
 			lib.characterPack.mode_versus={
@@ -4804,4 +4805,4 @@ mode.versus={
 		'8号位游戏开始时额外摸一张牌，7、8号位可在游戏开始时置换一次手牌<li>'+
 		'杀死对方忠臣摸2+x张牌，x为对方（含刚被杀的忠臣）与己方的存活人数之差；主公杀死己方忠臣须弃置所有牌',
 	}
-}
+});

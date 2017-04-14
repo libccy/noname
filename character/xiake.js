@@ -1,5 +1,6 @@
 'use strict';
-character.xiake={
+game.import('character',{
+	name:'xiake',
     character:{
 		// xk_dongfangweiming:['male','shu',4,[]],
 		xk_guyuexuan:['male','qun',4,['rouquan','gzhenji']],
@@ -118,4 +119,4 @@ character.xiake={
         zitong:'通悟',
         zitong_info:'当你于自己的回合内使用第三张牌时，你可以将一张传送门置于你的手牌',
     },
-}
+});

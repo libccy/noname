@@ -1,4 +1,6 @@
-play.cardpile={
+'use strict';
+game.import('play',{
+	name:'cardpile',
 	arenaReady:function(){
         var data={
             total:160,
@@ -93,4 +95,4 @@ play.cardpile={
 	help:{
 		'牌堆补充':'<ul><li>将杀闪等牌在牌堆中的比例维持在与军争牌堆相同，防止开启扩展包后重要的牌被过多地稀释'
 	},
-}
+});

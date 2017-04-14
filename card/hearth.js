@@ -1,5 +1,6 @@
 'use strict';
-card.hearth={
+game.import('card',{
+	name:'hearth',
 	card:{
 		linghunzhihuo:{
 			fullskin:true,
@@ -714,4 +715,4 @@ card.hearth={
 		['diamond',2,'jihuocard'],
 		['diamond',1,'linghunzhihuo'],
 	],
-}
+});

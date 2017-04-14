@@ -1,5 +1,6 @@
 'use strict';
-mode.connect={
+game.import('mode',{
+	name:'connect',
     start:function(){
         var directstartmode=lib.config.directstartmode;
         ui.create.menu(true);
@@ -138,4 +139,4 @@ mode.connect={
         };
         setTimeout(lib.init.onfree,1000);
     }
-};
+});

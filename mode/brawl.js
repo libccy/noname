@@ -1,5 +1,6 @@
 'use strict';
-mode.brawl={
+game.import('mode',{
+	name:'brawl',
     game:{
         syncMenu:true,
     },
@@ -2235,4 +2236,4 @@ mode.brawl={
             }
         }
     },
-};
+});

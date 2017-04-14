@@ -1,5 +1,6 @@
 'use strict';
-character.jiange={
+game.import('character',{
+	name:'jiange',
     character:{
         jg_pangtong:['male','shu',3,['qiwu','tianyu']],
         jg_huangyueying:['female','shu',3,['zhinang','jingmiao']],
@@ -576,4 +577,4 @@ character.jiange={
         jingfan_info:'回合内，每当你使用一张卡牌，你的进攻距离+1；出牌阶段结束时，你可以将手牌数补至X，并指定至多X名角色令其进攻距离+1直到其下一回合结束，X为你回合内使用的卡牌数',
 
     },
-}
+});

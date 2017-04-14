@@ -1,5 +1,6 @@
 'use strict';
-character.ow={
+game.import('character',{
+	name:'ow',
     character:{
         ow_liekong:['female','shu',3,['shanxian','shanhui']],
         ow_sishen:['male','shu',3,['xiandan','yihun','shouge']],
@@ -3530,4 +3531,4 @@ character.ow={
         ow_heiying:'黑影',
         ow_orisa:'奥丽莎',
     }
-};
+});

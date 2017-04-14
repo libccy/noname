@@ -1,5 +1,6 @@
 'use strict';
-character.standard={
+game.import('character',{
+	name:'standard',
 	connect:true,
 	character:{
 		caocao:['male','wei',4,['hujia','jianxiong'],['zhu']],
@@ -1759,4 +1760,4 @@ character.standard={
 		lijian_info:'出牌阶段，你可以弃一张牌，视为一名男性角色对另一名男性角色使用一张[决斗]，每阶段限一次',
 		biyue_info:'结束阶段，你可以摸一张牌',
 	},
-}
+});

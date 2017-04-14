@@ -1,5 +1,6 @@
 'use strict';
-character.sp={
+game.import('character',{
+	name:'sp',
 	connect:true,
 	character:{
 		yangxiu:['male','wei',3,['jilei','danlao']],
@@ -8783,4 +8784,4 @@ character.sp={
 		yicong_info:'锁定技，只要你的体力值大于2点，你的进攻距离+1；只要你的体力值为2点或更低，你的防御距离+1',
 		baobian_info:'锁定技，若你的体力值为3或更少，你视为拥有技能“挑衅”；若你的体力值为2或更少；你视为拥有技能“咆哮”；若你的体力值为1，你视为拥有技能“神速”。',
 	},
-}
+});

@@ -1,4 +1,6 @@
-play.wuxing={
+'use strict';
+game.import('play',{
+	name:'wuxing',
 	arenaReady:function(){
 		if(_status.connectMode) return;
 		lib.card.list.splice(Math.floor(lib.card.list.length*Math.random()),0,['spade',5,'wuxingpan']);
@@ -71,61 +73,61 @@ play.wuxing={
 						case 'wood':
 							if(player.countCards('he')){
 							game.log(player,'被'+get.translation(trigger.card.wunature)+'属性的卡牌克制');
-							player.chooseToDiscard('你被金属性卡牌克制，需弃置一张牌',true,'he').ai=get.disvalue;player.popup('金克木')};return;
+							player.chooseToDiscard('你被金属性卡牌克制，需弃置一张牌',true,'he').ai=get.disvalue;player.popup('金克木')}return;
 						case 'water':
 							game.log(player,'得到'+get.translation(trigger.card.wunature)+'属性卡牌的加成');
 							player.draw();player.popup('金生水');
 							return;
-						default:return;
 					}
+					return;
 					case 'wood':
 					switch(player.wunature){
 						case 'soil':
 							if(player.countCards('he')){
 							game.log(player,'被'+get.translation(trigger.card.wunature)+'属性的卡牌克制');
-							player.chooseToDiscard('你被木属性卡牌克制，需弃置一张牌',true,'he').ai=get.disvalue;player.popup('木克土')};return;
+							player.chooseToDiscard('你被木属性卡牌克制，需弃置一张牌',true,'he').ai=get.disvalue;player.popup('木克土')}return;
 						case 'fire':
 							game.log(player,'得到'+get.translation(trigger.card.wunature)+'属性卡牌的加成');
 							player.draw();player.popup('木生火');
 							return;
-						default:return;
 					}
+					return;
 					case 'water':
 					switch(player.wunature){
 						case 'fire':
 							if(player.countCards('he')){
 							game.log(player,'被'+get.translation(trigger.card.wunature)+'属性的卡牌克制');
-							player.chooseToDiscard('你被水属性卡牌克制，需弃置一张牌',true,'he').ai=get.disvalue;player.popup('水克火')};return;
+							player.chooseToDiscard('你被水属性卡牌克制，需弃置一张牌',true,'he').ai=get.disvalue;player.popup('水克火')}return;
 						case 'wood':
 							game.log(player,'得到'+get.translation(trigger.card.wunature)+'属性卡牌的加成');
 							player.draw();player.popup('水生木');
 							return;
-						default:return;
 					}
+					return;
 					case 'fire':
 					switch(player.wunature){
 						case 'metal':
 							if(player.countCards('he')){
 							game.log(player,'被'+get.translation(trigger.card.wunature)+'属性的卡牌克制');
-							player.chooseToDiscard('你被火属性卡牌克制，需弃置一张牌',true,'he').ai=get.disvalue;player.popup('火克金')};return;
+							player.chooseToDiscard('你被火属性卡牌克制，需弃置一张牌',true,'he').ai=get.disvalue;player.popup('火克金')}return;
 						case 'soil':
 							game.log(player,'得到'+get.translation(trigger.card.wunature)+'属性卡牌的加成');
 							player.draw();player.popup('火生土');
 							return;
-						default:return;
 					}
+					return;
 					case 'soil':
 					switch(player.wunature){
 						case 'water':
 							if(player.countCards('he')){
 							game.log(player,'被'+get.translation(trigger.card.wunature)+'属性的卡牌克制');
-							player.chooseToDiscard('你被土属性卡牌克制，需弃置一张牌',true,'he').ai=get.disvalue;player.popup('土克水')};return;
+							player.chooseToDiscard('你被土属性卡牌克制，需弃置一张牌',true,'he').ai=get.disvalue;player.popup('土克水')}return;
 						case 'metal':
 							game.log(player,'得到'+get.translation(trigger.card.wunature)+'属性卡牌的加成');
 							player.draw();player.popup('土生金');
 							return;
-						default:return;
 					}
+					return;
 				}
 			},
 			ai:{
@@ -134,34 +136,34 @@ play.wuxing={
 						switch(card.wunature){
 							case 'metal':
 							switch(target.wunature){
-								case 'wood':if(current!=0) return [1,-0.3];
-								case 'water':if(current!=0) return [1,0.3];
-								default:return;
+								case 'wood':if(current!=0) return [1,-0.3];return;
+								case 'water':if(current!=0) return [1,0.3];return;
 							}
+							return;
 							case 'wood':
 							switch(target.wunature){
-								case 'soil':if(current!=0) return [1,-0.3];
-								case 'fire':if(current!=0) return [1,0.3];
-								default:return;
+								case 'soil':if(current!=0) return [1,-0.3];return;
+								case 'fire':if(current!=0) return [1,0.3];return;
 							}
+							return;
 							case 'water':
 							switch(target.wunature){
-								case 'fire':if(current!=0) return [1,-0.3];
-								case 'wood':if(current!=0) return [1,0.3];
-								default:return;
+								case 'fire':if(current!=0) return [1,-0.3];return;
+								case 'wood':if(current!=0) return [1,0.3];return;
 							}
+							return;
 							case 'fire':
 							switch(target.wunature){
-								case 'metal':if(current!=0) return [1,-0.3];
-								case 'soil':if(current!=0) return [1,0.3];
-								default:return;
+								case 'metal':if(current!=0) return [1,-0.3];return;
+								case 'soil':if(current!=0) return [1,0.3];return;
 							}
+							return;
 							case 'soil':
 							switch(target.wunature){
-								case 'water':if(current!=0) return [1,-0.3];
-								case 'metal':if(current!=0) return [1,0.3];
-								default:return;
+								case 'water':if(current!=0) return [1,-0.3];return;
+								case 'metal':if(current!=0) return [1,0.3];return;
 							}
+							return;
 						}
 					}
 				}
@@ -222,4 +224,4 @@ play.wuxing={
 		'须弃置一张牌<li>当一名角色成为相生的卡牌的目标时，须摸一张牌'+
 		'<li>金克木，金生水；<br>木克土，木生火；<br>水克火，水生木；<br>火克金，火生土；<br>土克水，土生金'
 	}
-}
+});

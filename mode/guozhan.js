@@ -1,5 +1,6 @@
 'use strict';
-mode.guozhan={
+game.import('mode',{
+	name:'guozhan',
 	startBefore:function(){
 		var playback=localStorage.getItem(lib.configprefix+'playback');
 		for(var i in lib.characterPack.mode_guozhan){
@@ -3625,4 +3626,4 @@ mode.guozhan={
 			return Math.min(0,Math.random()-0.5)+difficulty;
 		},
 	}
-}
+});

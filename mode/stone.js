@@ -1,5 +1,6 @@
 'use strict';
-mode.stone={
+game.import('mode',{
+	name:'stone',
 	start:function(){
 		"step 0"
 		lib.init.css(lib.assetURL+'layout/mode/','stone');
@@ -10208,4 +10209,4 @@ mode.stone={
 		'<li>嘲讽：若一方阵营中有嘲讽角色，则同阵营的无嘲讽角色不以能成为杀目标'+
 		'<li>行动顺序为先主将后随从。主将或随从死亡后立即移出游戏，主将死亡后替补登场，替补登场时摸3+X张牌，X为对方存活的随从数，无替补时游戏结束'
 	}
-}
+});

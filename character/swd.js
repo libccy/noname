@@ -1,5 +1,6 @@
 'use strict';
-character.swd={
+game.import('character',{
+	name:'swd',
 	character:{
 		swd_huzhongxian:['male','wu',3,['daofa','xielv','hujing']],
 
@@ -9766,4 +9767,4 @@ character.swd={
 		zaowu_old_info:'出牌阶段，你可以弃置三张不同类型的牌，创造任意两张牌并获得之',
 		xielv_info:'弃牌阶段结束后，若你的所有手牌（至少两张）颜色均相同，你可以展示所有手牌，然后回复一点体力并弃置场上的所有判定牌',
 	},
-}
+});

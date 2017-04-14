@@ -1,4 +1,6 @@
-card.extra={
+'use strict';
+game.import('card',{
+	name:'extra',
 	connect:true,
 	card:{
 		jiu:{
@@ -57,7 +59,7 @@ card.extra={
 						if(i==0) return 7.3;
 						return 3;
 					},
-					value:function(card,player){
+					value:function(card,player,i){
 						if(player.hp>1){
 							if(i==0) return 5;
 							return 1;
@@ -600,4 +602,4 @@ card.extra={
 		["spade",10,"bingliang"],
 		["club",4,"bingliang"],
 	],
-}
+});

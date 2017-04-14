@@ -1,4 +1,6 @@
-character.diy={
+'use strict';
+game.import('character',{
+	name:'diy',
 	character:{
 		// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 		// diy_hanlong:['male','wei',4,['siji','ciqiu']],
@@ -927,7 +929,7 @@ character.diy={
 				"step 0"
 				player.draw(2);
 				"step 1"
-				next=player.discardPlayerCard(player,'hej',2,true);
+				var next=player.discardPlayerCard(player,'hej',2,true);
 				next.ai=function(button){
 					if(get.position(button.link)=='j') return 10;
 					return -get.value(button.link);
@@ -1391,4 +1393,4 @@ character.diy={
 		xicai_info:'你可以立即获得对你造成伤害的牌',
 		diyjianxiong_info:'锁定技，在身份局中，在你回合内死亡的角色均视为反贼，国战中，在你回合内死亡的角色若与你势力相同则随机改为另一个势力',
 	},
-}
+});

@@ -1,5 +1,6 @@
 'use strict';
-card.standard={
+game.import('card',{
+	name:'standard',
 	connect:true,
 	card:{
 		damage:{
@@ -218,8 +219,8 @@ card.standard={
 						if(player.hasSkillTag('pretao')) return 5;
 						return 2;
 					},
-					useful:[8,6.5],
-					value:[8,6.5],
+					useful:[8,6.5,5,4],
+					value:[8,6.5,5,4],
 				},
 				result:{
 					target:function(player,target){
@@ -2010,4 +2011,4 @@ card.standard={
 		["heart",12,'shandian','thunder'],
 		["diamond",12,'wuxie'],
 	],
-}
+});

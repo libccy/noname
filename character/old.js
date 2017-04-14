@@ -1,4 +1,6 @@
-character.old={
+'use strict';
+game.import('character',{
+	name:'old',
     character:{
         zhangjiao:['male','qun',3,['leiji','guidao','huangtian'],['zhu']],
 		masu:['male','shu',3,['xinzhan','huilei']],
@@ -370,4 +372,4 @@ character.old={
         oldxuanfeng:'旋风',
         oldxuanfeng_info:'每当你失去一次装备区里的牌时，你可以执行下列两项中的一项：1.视为对任意一名其他角色使用一张【杀】（此【杀】不计入每回合的使用限制）；2.对与你距离1以内的一名其他角色造成一点伤害',
     }
-}
+});

@@ -1,4 +1,6 @@
-character.gujian={
+'use strict';
+game.import('character',{
+	name:'gujian',
 	character:{
 		gjqt_bailitusu:['male','shu',4,['xuelu','fanshi','shahun']],
 		gjqt_fengqingxue:['female','wu',3,['qinglan','yuehua','swd_wuxie']],
@@ -1656,4 +1658,4 @@ character.gujian={
 		yuling_info:'锁定技，你没有摸牌和弃牌阶段，你的手牌数始终为5，你在一个出牌阶段最多使用X+2张牌，X为你的体力上限',
 		yuling_info_alter:'锁定技，你没有摸牌和弃牌阶段，你的手牌数始终为5，你在一个出牌阶段最多使用X+1张牌，X为你的体力上限',
 	},
-}
+});

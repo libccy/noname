@@ -1,5 +1,6 @@
 'use strict';
-card.guozhan={
+game.import('card',{
+	name:'guozhan',
 	connect:true,
 	card:{
 		feilongduofeng:{
@@ -1184,4 +1185,4 @@ card.guozhan={
 		['diamond',4,'xietianzi'],
 		['club',1,'yuxi'],
 	],
-}
+});

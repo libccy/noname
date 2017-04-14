@@ -1,5 +1,6 @@
 'use strict';
-mode.tafang={
+game.import('mode',{
+	name:'tafang',
 	canvasUpdates2:[],
 	start:function(){
 		"step 0"
@@ -1232,4 +1233,4 @@ mode.tafang={
 		'战场上最多出现3个相同的机关，每个机关在置入战场3轮后消失。战场上最多招募5名友方角色。<li>'+
 		'敌方角色到达底部出口时游戏失败，已方角色到达底部出口，将被移出游戏',
 	},
-}
+});

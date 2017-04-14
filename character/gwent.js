@@ -1,4 +1,6 @@
-character.gwent={
+'use strict';
+game.import('character',{
+	name:'gwent',
 	character:{
 		gw_huoge:['male','qun',3,['quanzhang']],
 		gw_aisinie:['female','wu',3,['huihun']],
@@ -911,4 +913,4 @@ character.gwent={
 		quanzhang_backup:'权杖',
 		quanzhang_info:'出牌阶段限一次，你可以观看牌堆顶的6张牌，并选择一张使用',
 	}
-}
+});

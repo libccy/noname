@@ -1,4 +1,4 @@
-window.characterRank={
+window.noname_character_rank={
     s:[
         'swd_muyun',
         'swd_zhaoyun',

@@ -1,4 +1,6 @@
-card.zhenfa={
+'use strict';
+game.import('card',{
+	name:'zhenfa',
 	card:{
 		pozhenjue:{
 			type:'zhenfa',
@@ -214,9 +216,7 @@ card.zhenfa={
 			multitarget:true,
 			selectTarget:-1,
 			content:function(){
-				lib.temp=targets[0];
-				targets.sort(lib.sort.seat);
-				lib.temp={};
+				targets.sortBySeat();
 				for(var i=1;i<targets.length;i++){
 					game.swapSeat(targets[i],targets[i-1].next,false);
 				}
@@ -439,4 +439,4 @@ card.zhenfa={
 		// ["spade",13,'pozhenjue'],
 		//["heart",13,'pozhenjue'],
 	],
-}
+});
