@@ -6698,7 +6698,7 @@
 					lib.crosswalk=true;
                 }
                 if(lib.device=='android'&&window.devicePixelRatio>1&&document.documentElement.offsetWidth<900&&!lib.crosswalk){
-                    game.documentZoom=document.documentElement.offsetWidth/960;
+                    game.documentZoom=Math.round(document.documentElement.offsetWidth/96)/10;
                     game.deviceZoom=game.documentZoom;
                     document.documentElement.style.zoom=game.documentZoom;
                 }
@@ -6739,7 +6739,6 @@
 					document.documentElement.style.backgroundPosition='';
 			    }
 				document.body.insertBefore(ui.background,document.body.firstChild);
-
 				document.body.onresize=ui.updatex;
 				if(lib.config.touchscreen){
 					document.body.addEventListener('touchstart',function(e){
