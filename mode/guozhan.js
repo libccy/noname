@@ -911,7 +911,7 @@ mode.guozhan={
 						player.$give(result.cards,target);
 					}
 					game.delay(2);
-					player.chooseTarget(true,'弃置一名角色的一张牌',function(card,player,target){
+					player.chooseTarget('弃置一名角色的一张牌',function(card,player,target){
 						var source=_status.event.source;
 						return get.distance(source,target)<=1&&source!=target&&target.countCards('he');
 					}).set('ai',function(target){
@@ -1223,13 +1223,13 @@ mode.guozhan={
 		hunshang_yingzi:{
 			inherit:'yingzi',
 			filter:function(event,player){
-				return player.hp==1&&!player.hasSkill('yingzi');
+				return player.hp<=1&&!player.hasSkill('yingzi');
 			}
 		},
 		hunshang_yinghun:{
 			inherit:'gzyinghun',
 			filter:function(event,player){
-				return player.hp==1&&player.isDamaged()&&!player.hasSkill('gzyinghun');
+				return player.hp<=1&&player.isDamaged()&&!player.hasSkill('gzyinghun');
 			}
 		},
 		yingyang:{
@@ -2771,7 +2771,7 @@ mode.guozhan={
 		yingyang:'鹰扬',
 		yingyang_info:'当你拼点的牌亮出后，你可以令此牌的点数+3或-3',
 		hunshang:'魂殇',
-		hunshang_info:'副将技，此武将牌减少半个阴阳鱼；准备阶段，若你的体力值为1，则你本回合获得“英姿”和“英魂”',
+		hunshang_info:'副将技，此武将牌减少半个阴阳鱼；准备阶段，若你的体力值不大于1，则你本回合获得“英姿”和“英魂”',
 		gzguixiu:'闺秀',
 		gzguixiu_info:'当你明置此武将牌时，你摸两张牌；当你失去此技能时，你回复1点体力',
 		gzcunsi:'存嗣',
@@ -2796,7 +2796,7 @@ mode.guozhan={
 		gzjixi:'急袭',
 		gzjixi_info:'主将技，此武将牌减少半个阴阳鱼；你可以将一张“田”当【顺手牵羊】使用',
 		huyuan:'护援',
-		huyuan_info:'结束阶段开始时，你可以将一张装备牌置入一名角色的装备区。若如此做，你弃置该角色距离为1的一名角色的一张牌',
+		huyuan_info:'结束阶段开始时，你可以将一张装备牌置入一名角色的装备区，然后你可以弃置该角色距离为1的一名角色的一张牌',
 		heyi:'鹤翼',
 		heyi_info:'阵法技，与你处于同一队列的其他角色防御距离+1',
 		gz_shibing1wei:'魏兵',

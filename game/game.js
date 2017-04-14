@@ -5351,7 +5351,8 @@
 				if(htmlbg){
 					if(htmlbg[0]=='['){
 						try{
-							htmlbg=JSON.parse(htmlbg).randomGet();
+							htmlbg=JSON.parse(htmlbg);
+							htmlbg=htmlbg[get.rand(htmlbg.length)];
 							if(htmlbg.indexOf('custom_')==0){
 								throw('err');
 							}
