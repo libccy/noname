@@ -387,8 +387,8 @@ mode.boss={
 	characterPack:{
 		mode_boss:{
 			boss_chiyanshilian:['male','',0,['boss_chiyan','boss_chiyan_intro1','boss_chiyan_intro2','boss_chiyan_intro3'],['boss'],'zhu'],
-			boss_zhuque:['female','shen',4,['boss_shenyi','boss_fentian'],['shu','hiddenboss','bossallowed']],
-			boss_huoshenzhurong:['male','shen',5,['boss_shenyi','boss_xingxia'],['shu','hiddenboss','bossallowed']],
+			boss_zhuque:['female','shen',4,['boss_shenyi','boss_fentian','boss_chiyan2'],['shu','hiddenboss','bossallowed']],
+			boss_huoshenzhurong:['male','shen',5,['boss_shenyi','boss_xingxia','boss_chiyan3'],['shu','hiddenboss','bossallowed']],
 			boss_yanling:['male','shen',4,['boss_huihuo','boss_furan'],['shu','hiddenboss','bossallowed']],
 			boss_yandi:['male','shen',6,['boss_shenyi','boss_shenen','boss_chiyi'],['shu','hiddenboss','bossallowed']],
 
@@ -793,6 +793,7 @@ mode.boss={
 	boss:{
 		boss_chiyanshilian:{
 			chongzheng:99,
+			loopType:2,
 			checkResult:function(player){
 				if(player==game.boss&&game.boss.name!='boss_yandi'){
 					return false;
@@ -806,6 +807,7 @@ mode.boss={
 		},
 		boss_qingmushilian:{
 			chongzheng:99,
+			loopType:2,
 			checkResult:function(player){
 				if(player==game.boss&&game.boss.name!='boss_taihao'){
 					return false;
@@ -909,6 +911,55 @@ mode.boss={
 		},
 	},
 	skill:{
+		boss_chiyan:{
+			trigger:{global:'gameStart'},
+			forced:true,
+			popup:false,
+			content:function(){
+				player.init('boss_zhuque');
+				game.addVideo('reinit2',player,player.name);
+			}
+		},
+		boss_chiyan2:{
+			mode:['boss'],
+			global:'boss_chiyan2x'
+		},
+		boss_chiyan2x:{
+			trigger:{global:'dieAfter'},
+			forced:true,
+			priority:-10,
+			globalFixed:true,
+			filter:function(event){
+				if(lib.config.mode!='boss') return false;
+				return event.player==game.boss&&event.player.hasSkill('boss_chiyan2');
+			},
+			content:function(){
+				'step 0'
+				game.delay();
+				'step 1'
+				game.changeBoss('boss_huoshenzhurong');
+			}
+		},
+		boss_chiyan3:{
+			mode:['boss'],
+			global:'boss_chiyan3x'
+		},
+		boss_chiyan3x:{
+			trigger:{global:'dieAfter'},
+			forced:true,
+			priority:-10,
+			globalFixed:true,
+			filter:function(event){
+				if(lib.config.mode!='boss') return false;
+				return event.player==game.boss&&event.player.hasSkill('boss_chiyan3');
+			},
+			content:function(){
+				'step 0'
+				game.delay();
+				'step 1'
+				game.changeBoss('boss_yandi');
+			}
+		},
 		boss_shenyi:{},
 		boss_shenen:{},
 		boss_fentian:{},
