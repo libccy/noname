@@ -2425,6 +2425,7 @@ mode.versus={
 							if(game.players[i].isOut()) continue;
 							game.players[i].classList.remove('acted');
 						}
+						delete _status.roundStart;
 						event.redo();
 						game.delay();
 						return;
@@ -2491,6 +2492,7 @@ mode.versus={
 						for(var i=0;i<game.players.length;i++){
 							game.players[i].classList.remove('acted');
 						}
+						delete _status.roundStart;
 					}
 					var list=(_status.currentSide==game.me.side)?game.friend.slice(0):game.enemy.slice(0);
 					for(var i=0;i<list.length;i++){

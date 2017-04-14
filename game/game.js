@@ -11891,6 +11891,9 @@
 					if(player.hp<=0&&!player.nodying) player.die(event.reason);
 				},
 				die:function(){
+					if(_status.roundStart==player){
+						_status.roundStart=player.next||player.getNext()||game.players[0];
+					}
                     var logvid=game.logv(player,'die',source);
 					if(source&&source!=player){
 						game.log(player,'被',source,'杀害');
@@ -13440,6 +13443,9 @@
 					var next=game.createEvent('phase');
 					next.player=this;
                     next.setContent('phase');
+					if(!_status.roundStart){
+						_status.roundStart=this;
+					}
 					return next;
 				},
 				phaseJudge:function(){
@@ -19099,6 +19105,9 @@
 					}
 					_status.currentPhase=player;
 					game.phaseNumber++;
+					if(player==_status.roundStart){
+						game.roundNumber++;
+					}
                     game.syncState();
 					game.addVideo('phaseChange',player);
 					if(game.phaseNumber==1&&lib.configOL.observe){
@@ -26298,6 +26307,9 @@
 			return player;
 		},
 		removePlayer:function(player){
+			if(_status.roundStart==player){
+				_status.roundStart=player.next||player.getNext()||game.players[0];
+			}
 			var players=game.players.concat(game.dead);
 			player.style.top=player.offsetTop+'px';
 			player.style.left=player.offsetLeft+'px';
@@ -26351,6 +26363,9 @@
 			while(player4.isDead()) player4=player4.previousSeat;
 			player4.next=player2;
 			player2.previous=player4;
+			if(_status.roundStart==player){
+				_status.roundStart=player2;
+			}
 			return player2;
 		},
 		arrangePlayers:function(){
@@ -26536,7 +26551,9 @@
 		dead:[],
 		imported:[],
         playerMap:{},
-		phaseNumber:0
+		phaseNumber:0,
+		roundNumber:0,
+		shuffleNumber:0,
 	};
 	var ui={
 		updates:[],
@@ -35791,6 +35808,7 @@
 				uiintro.add('剩余 <span style="font-family:'+'xinwei'+'">'+num);
 
                 if(_status.connectMode) return uiintro;
+				uiintro.add('<div class="text center">轮数 <span style="font-family:xinwei">'+game.roundNumber+'</span>&nbsp;&nbsp;&nbsp;&nbsp;洗牌 <span style="font-family:xinwei">'+game.shuffleNumber+'</div>');
 				uiintro.add('<div class="text center">弃牌堆</div>');
 				if(ui.discardPile.childNodes.length){
 					var list=[];
@@ -39739,6 +39757,7 @@
 						}
 						_status.maxShuffle--;
 					}
+					game.shuffleNumber++;
 					var cards=[],i;
 					for(var i=0;i<lib.onwash.length;i++){
 						lib.onwash[i]();

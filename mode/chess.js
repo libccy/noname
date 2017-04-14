@@ -625,6 +625,9 @@ mode.chess={
 							game.players.remove(this);
 							_status.friends.remove(this);
 							this.classList.add('dead');
+							if(_status.roundStart==this){
+								_status.roundStart=player.next||player.getNext()||game.players[0];
+							}
 							if(this==game.me){
 								if(ui.confirm){
 									ui.confirm.close();
@@ -1710,6 +1713,7 @@ mode.chess={
 							if(game.players[i].isOut()) continue;
 							game.players[i].classList.remove('acted');
 						}
+						delete _status.roundStart;
 						event.redo();
 						game.delay();
 						return;
@@ -1776,6 +1780,9 @@ mode.chess={
 						else if(!next){
 							next=game.players[i];
 						}
+					}
+					if(_status.roundStart&&_status.roundStart.side==player.side){
+						delete _status.roundStart;
 					}
 					var num2=game.players.length-num1;
 					if(num2>num1){
