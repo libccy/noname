@@ -792,7 +792,7 @@
 									if(name.indexOf('.')!=-1){
 										name=name.slice(0,name.indexOf('.'));
 									}
-									var link='custom_'+name;
+									var link=(game.writeFile?'cdv_':'custom_')+name;
 									if(item[link]){
 										for(var i=1;i<1000;i++){
 											if(!item[link+'_'+i]){
@@ -801,12 +801,18 @@
 										}
 									}
 									item[link]=name;
-									game.putDB('image',link,file,function(){
-										create(link);
+									var callback=function(){
+										create(link,node.parentNode.defaultNode);
 										node.parentNode.updateBr();
 										lib.config.customBackgroundPack.add(link);
 										game.saveConfig('customBackgroundPack',lib.config.customBackgroundPack);
-									});
+									};
+									if(game.writeFile){
+										game.writeFile(file,'image/background',link+'.jpg',callback);
+									}
+									else{
+										game.putDB('image',link,file,callback);
+									}
 									if(node.lastChild.classList.contains('active')){
 										editbg.call(node.lastChild);
 									}
@@ -821,7 +827,7 @@
 										if(link&&link!='default'){
 											var str;
 											if(this.classList.contains('active')){
-												if(link.indexOf('custom_')==0){
+												if(link.indexOf('custom_')==0||link.indexOf('cdv_')==0){
 													str='删除背景';
 												}
 												else{
@@ -862,6 +868,9 @@
 										fileReader.readAsDataURL(fileToLoad, "UTF-8");
 									});
 								}
+								else{
+									node.parentNode.defaultNode=node;
+								}
 							}
 							else{
 								node.setBackgroundImage('image/background/'+link+'.jpg');
@@ -898,7 +907,12 @@
 										menu.updateBr();
 										lib.config.customBackgroundPack.remove(background);
 										game.saveConfig('customBackgroundPack',lib.config.customBackgroundPack);
-										game.deleteDB('image',background);
+										if(background.indexOf('cdv_')==0){
+											game.removeFile('image/background/'+background+'.jpg');
+										}
+										else{
+											game.deleteDB('image',background);
+										}
 										delete lib.configMenu.appearence.config.image_background.item[background];
 										if(lib.config.image_background==background){
 											background='default';
@@ -5910,6 +5924,25 @@
 								},onerror);
 							},onerror);
 						};
+						game.writeFile=function(data,path,name,callback){
+							if(Object.prototype.toString.call(data)=='[object File]'){
+								var fileReader = new FileReader();
+								fileReader.onload = function(e){
+									game.writeFile(e.target.result,path,name,callback);
+								};
+								fileReader.readAsArrayBuffer(data, "UTF-8");
+							}
+							else{
+								window.resolveLocalFileSystemURL(lib.assetURL+path,function(entry){
+									entry.getFile(name,{create:true},function(fileEntry){
+										fileEntry.createWriter(function(fileWriter){
+											fileWriter.onwriteend=callback;
+											fileWriter.write(data);
+										});
+									});
+								});
+							}
+						};
 						game.removeFile=function(dir,callback){
 							window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
 								entry.getFile(dir,{},function(fileEntry){
@@ -6067,6 +6100,21 @@
 								callback(data);
 							}
 						});
+					};
+					game.writeFile=function(data,path,name,callback){
+						if(Object.prototype.toString.call(data)=='[object File]'){
+							var fileReader = new FileReader();
+							fileReader.onload = function(e){
+								game.writeFile(e.target.result,path,name,callback);
+							};
+							fileReader.readAsArrayBuffer(data, "UTF-8");
+						}
+						else{
+							get.zip(function(zip){
+								zip.file('i',data);
+								lib.node.fs.writeFile(__dirname+'/'+path+'/'+name,zip.files.i.asNodeBuffer(),null,callback);
+							});
+						}
 					};
 					game.removeFile=function(filename,callback){
 						lib.node.fs.unlink(__dirname+'/'+filename);
@@ -6241,7 +6289,7 @@
 						}
 						for(var i=0;i<lib.config.customBackgroundPack.length;i++){
 							var link=lib.config.customBackgroundPack[i];
-							lib.configMenu.appearence.config.image_background.item[link]=link.slice(7);
+							lib.configMenu.appearence.config.image_background.item[link]=link.slice(link.indexOf('_')+1);
 						}
 						lib.configMenu.appearence.config.image_background.item.default='默认';
 					}
@@ -26832,10 +26880,15 @@
 								var updateVisual=function(){
 									config.visualMenu(this,this._link,config.item[this._link],config);
 								};
-								var createNode=function(i){
+								var createNode=function(i,before){
 									var visualMenu=ui.create.div();
 									if(config.visualBar){
-										node._link.menu.insertBefore(visualMenu,node._link.menu.lastChild);
+										if(before){
+											node._link.menu.insertBefore(visualMenu,before);
+										}
+										else{
+											node._link.menu.insertBefore(visualMenu,node._link.menu.lastChild);
+										}
 									}
 									else{
 										node._link.menu.appendChild(visualMenu);
@@ -28194,23 +28247,7 @@
 								if(fileToLoad){
 									var fileReader = new FileReader();
 									fileReader.onload = function(e){
-										if(lib.node&&lib.node.fs){
-											get.zip(function(zip){
-												zip.file('i',e.target.result);
-												lib.node.fs.writeFile(__dirname+'/'+path+'/'+fileToLoad.name,zip.files.i.asNodeBuffer(),null,refresh);
-											});
-										}
-										else{
-											game.print(lib.assetURL+path);
-											window.resolveLocalFileSystemURL(lib.assetURL+path,function(entry){
-												entry.getFile(fileToLoad.name,{create:true},function(fileEntry){
-	                                                fileEntry.createWriter(function(fileWriter){
-	                                                    fileWriter.onwriteend=refresh;
-	                                                    fileWriter.write(e.target.result);
-	                                                });
-	                                            });
-				                            });
-										}
+										game.writeFile(e.target.result,path,fileToLoad.name,refresh);
 									};
 									fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
 								}
