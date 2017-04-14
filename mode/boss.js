@@ -386,51 +386,53 @@ mode.boss={
 	},
 	characterPack:{
 		mode_boss:{
-			boss_zhuoguiquxie:['male','shen',0,['boss_bianshen'],['boss'],'shu'],
+			boss_zhuoguiquxie:['male','',0,['boss_bianshen','boss_bianshen_intro1','boss_bianshen_intro2','boss_bianshen_intro3','boss_bianshen_intro4'],['boss'],'shu'],
+			boss_nianshou_heti:['male','shen',12,['boss_nianrui','boss_mengtai','boss_nbianshen','boss_nbianshenx'],['shu','boss','bossallowed'],'shu'],
+			boss_nianshou_jingjue:['male','shen',12,['boss_nianrui','boss_mengtai','boss_jingjue','boss_nbianshen'],['shu','hiddenboss','bossallowed'],'shu'],
+			boss_nianshou_renxing:['male','shen',12,['boss_nianrui','boss_mengtai','boss_renxing','boss_nbianshen'],['shu','hiddenboss','bossallowed'],'shu'],
+			boss_nianshou_ruizhi:['male','shen',12,['boss_nianrui','boss_mengtai','boss_ruizhi','boss_nbianshen'],['shu','hiddenboss','bossallowed'],'shu'],
+			boss_nianshou_baonu:['male','shen',12,['boss_nianrui','boss_mengtai','boss_nbaonu','boss_shouyi','boss_nbianshen'],['shu','hiddenboss','bossallowed'],'shu'],
+			boss_baiwuchang:['male','shen',9,['boss_baolian','boss_qiangzheng','boss_zuijiu','juece','boss_bianshen4'],['shu','hiddenboss','bossallowed']],
+			boss_heiwuchang:['male','shen',9,['boss_guiji','boss_taiping','boss_suoming','boss_xixing','boss_bianshen4'],['shu','hiddenboss','bossallowed']],
+			boss_luocha:['male','shen',12,['boss_modao','boss_yushou','yizhong','boss_moyany'],['shu','hiddenboss','bossallowed']],
+			boss_yecha:['male','shen',11,['boss_modao','boss_mojian','bazhen','boss_danshu'],['shu','hiddenboss','bossallowed']],
+			boss_niutou:['male','shen',7,['boss_baolian','niepan','boss_manjia','boss_xiaoshou','boss_bianshen3'],['shu','hiddenboss','bossallowed']],
+			boss_mamian:['male','shen',6,['boss_guiji','fankui','boss_lianyu','juece','boss_bianshen3'],['shu','hiddenboss','bossallowed']],
+			boss_chi:['male','shen',5,['boss_guimei','boss_didong','boss_shanbeng','boss_bianshen2'],['shu','hiddenboss','bossallowed']],
+			boss_mo:['female','shen',5,['boss_guimei','enyuan','boss_beiming','boss_bianshen2'],['shu','hiddenboss','bossallowed']],
+			boss_wang:['male','shen',5,['boss_guimei','boss_luolei','huilei','boss_bianshen2'],['shu','hiddenboss','bossallowed']],
+			boss_liang:['female','shen',5,['boss_guimei','boss_guihuo','boss_minbao','boss_bianshen2'],['shu','hiddenboss','bossallowed']],
+
+			boss_lvbu1:['male','shen',8,['mashu','wushuang','boss_baonu'],['qun','boss','bossallowed'],'wei'],
+			boss_lvbu2:['male','shen',4,['mashu','wushuang','xiuluo','shenwei','shenji'],['qun','hiddenboss','bossallowed'],'qun'],
+			boss_lvbu3:['male','shen',4,['wushuang','shenqu','jiwu'],['qun','hiddenboss','bossallowed'],'qun'],
+
+			boss_caocao:['male','shen',12,['boss_guixin','xiongcai'],['wei','boss','bossallowed'],'wei'],
+			boss_guojia:['male','shen',4,['tiandu','boss_guimou','boss_yuance','boss_qizuo'],['wei','boss','bossallowed'],'zhu'],
+			boss_zhangchunhua:['female','shen',4,['jueqing','boss_wuxin','shangshix'],['wei','boss','bossallowed'],'wei'],
+			boss_zhenji:['female','shen',4,['tashui','lingbo','jiaoxia','fanghua'],['wei','boss','bossallowed'],'wei'],
+
+			boss_liubei:['male','shen',12,['xiaoxiong','boss_zhangwu'],['shu','boss','bossallowed'],'qun'],
+			boss_zhugeliang:['male','shen',Infinity,['xiangxing','yueyin','fengqi','gaiming'],['shu','boss','bossallowed'],'qun'],
+			boss_huangyueying:['female','shen',4,['boss_gongshen','boss_jizhi','qicai','boss_guiyin'],['shu','boss','bossallowed'],'wei'],
+			boss_pangtong:['male','shen',4,['boss_tianyu','qiwu','niepan','boss_yuhuo'],['shu','boss','bossallowed'],'zhu'],
+			boss_zhaoyun:['male','shen',1,['boss_juejing','longhun','zhanjiang'],['shu','boss','bossallowed'],'qun'],
+
+			boss_zhouyu:['male','shen',6,['huoshen','boss_honglian','boss_xianyin'],['wu','boss','bossallowed'],'zhu'],
+
+			boss_caiwenji:['female','shen',4,['beige','boss_hujia','boss_guihan'],['qun','boss','bossallowed'],'wei'],
+			boss_zhangjiao:['male','shen',8,['boss_leiji','tiandao','jidian'],['qun','boss','bossallowed'],'shu'],
+			boss_zuoci:['male','shen',0,['huanhua'],['qun','boss','bossallowed'],'shu'],
+
+			boss_diaochan:['female','shen',4,['fengwu','yunshen','lianji','boss_wange','yuehun'],['qun','boss','bossallowed'],'qun'],
+			boss_huatuo:['male','shen',6,['chulao','mazui','boss_shengshou','guizhen','wuqin'],['qun','boss','bossallowed'],'wu'],
+			boss_dongzhuo:['male','shen',20,['jiuchi','boss_qiangzheng','boss_baolin'],['qun','boss','bossallowed'],'shu'],
+
+
 			// boss_nianshou:['male','shen',Infinity,['boss_nianrui','boss_qixiang','boss_damagecount'],['boss'],'shu'],
-			boss_nianshou_heti:['male','shen',12,['boss_nianrui','boss_mengtai','boss_nbianshen','boss_nbianshenx'],['boss','bossallowed'],'shu'],
-			boss_nianshou_jingjue:['male','shen',12,['boss_nianrui','boss_mengtai','boss_jingjue','boss_nbianshen'],['hiddenboss','bossallowed'],'shu'],
-			boss_nianshou_renxing:['male','shen',12,['boss_nianrui','boss_mengtai','boss_renxing','boss_nbianshen'],['hiddenboss','bossallowed'],'shu'],
-			boss_nianshou_ruizhi:['male','shen',12,['boss_nianrui','boss_mengtai','boss_ruizhi','boss_nbianshen'],['hiddenboss','bossallowed'],'shu'],
-			boss_nianshou_baonu:['male','shen',12,['boss_nianrui','boss_mengtai','boss_nbaonu','boss_shouyi','boss_nbianshen'],['hiddenboss','bossallowed'],'shu'],
-			boss_baiwuchang:['male','shen',9,['boss_baolian','boss_qiangzheng','boss_zuijiu','juece','boss_bianshen4'],['hiddenboss','bossallowed']],
-			boss_heiwuchang:['male','shen',9,['boss_guiji','boss_taiping','boss_suoming','boss_xixing','boss_bianshen4'],['hiddenboss','bossallowed']],
-			boss_luocha:['male','shen',12,['boss_modao','boss_yushou','yizhong','boss_moyany'],['hiddenboss','bossallowed']],
-			boss_yecha:['male','shen',11,['boss_modao','boss_mojian','bazhen','boss_danshu'],['hiddenboss','bossallowed']],
-			boss_niutou:['male','shen',7,['boss_baolian','niepan','boss_manjia','boss_xiaoshou','boss_bianshen3'],['hiddenboss','bossallowed']],
-			boss_mamian:['male','shen',6,['boss_guiji','fankui','boss_lianyu','juece','boss_bianshen3'],['hiddenboss','bossallowed']],
-			boss_chi:['male','shen',5,['boss_guimei','boss_didong','boss_shanbeng','boss_bianshen2'],['hiddenboss','bossallowed']],
-			boss_mo:['female','shen',5,['boss_guimei','enyuan','boss_beiming','boss_bianshen2'],['hiddenboss','bossallowed']],
-			boss_wang:['male','shen',5,['boss_guimei','boss_luolei','huilei','boss_bianshen2'],['hiddenboss','bossallowed']],
-			boss_liang:['female','shen',5,['boss_guimei','boss_guihuo','boss_minbao','boss_bianshen2'],['hiddenboss','bossallowed']],
-
-			boss_lvbu1:['male','shen',8,['mashu','wushuang','boss_baonu'],['boss','bossallowed'],'wei'],
-			boss_lvbu2:['male','shen',4,['mashu','wushuang','xiuluo','shenwei','shenji'],['hiddenboss','bossallowed'],'qun'],
-			boss_lvbu3:['male','shen',4,['wushuang','shenqu','jiwu'],['hiddenboss','bossallowed'],'qun'],
-
-			boss_zhangchunhua:['female','shen',4,['jueqing','boss_wuxin','shangshix'],['boss','bossallowed'],'wei'],
-			boss_zhenji:['female','shen',4,['tashui','lingbo','jiaoxia','fanghua'],['boss','bossallowed'],'wei'],
-			boss_huangyueying:['female','shen',4,['boss_gongshen','boss_jizhi','qicai','boss_guiyin'],['boss','bossallowed'],'wei'],
-			boss_pangtong:['male','shen',4,['boss_tianyu','qiwu','niepan','boss_yuhuo'],['boss','bossallowed'],'zhu'],
-			boss_zhaoyun:['male','shen',1,['boss_juejing','longhun','zhanjiang'],['boss','bossallowed'],'qun'],
-			boss_zhouyu:['male','shen',6,['huoshen','boss_honglian','boss_xianyin'],['boss','bossallowed'],'zhu'],
-
-
-			boss_caiwenji:['female','shen',4,['beige','boss_hujia','boss_guihan'],['boss','bossallowed'],'wei'],
-			boss_zhangjiao:['male','shen',8,['boss_leiji','tiandao','jidian'],['boss','bossallowed'],'shu'],
-			boss_zuoci:['male','shen',0,['huanhua'],['boss','bossallowed'],'shu'],
-
 			// boss_yuji:['male','qun',8,[],['boss','bossallowed'],'nei'],
-			boss_diaochan:['female','shen',4,['fengwu','yunshen','lianji','boss_wange','yuehun'],['boss','bossallowed'],'qun'],
-			boss_huatuo:['male','shen',6,['chulao','mazui','boss_shengshou','guizhen','wuqin'],['boss','bossallowed'],'wu'],
-			boss_dongzhuo:['male','shen',20,['jiuchi','boss_qiangzheng','boss_baolin'],['boss','bossallowed'],'shu'],
 			// boss_shuijing:['male','qun',8,[],['boss','bossallowed'],'wei'],
 			// boss_sunshangxiang:['male','qun',8,[],['boss','bossallowed'],'wei'],
-
-			boss_liubei:['male','shen',12,['xiaoxiong','boss_zhangwu'],['boss','bossallowed'],'qun'],
-			boss_zhugeliang:['male','shen',Infinity,['xiangxing','yueyin','fengqi','gaiming'],['boss','bossallowed'],'qun'],
-			boss_guojia:['male','shen',4,['tiandu','boss_guimou','boss_yuance','boss_qizuo'],['boss','bossallowed'],'zhu'],
-			boss_caocao:['male','shen',12,['boss_guixin','xiongcai'],['boss','bossallowed'],'wei'],
 		}
 	},
 	init:function(){
@@ -2468,6 +2470,10 @@ mode.boss={
 				game.addVideo('reinit2',player,player.name);
 			}
 		},
+		boss_bianshen_intro1:{nobracket:true},
+		boss_bianshen_intro2:{nobracket:true},
+		boss_bianshen_intro3:{nobracket:true},
+		boss_bianshen_intro4:{nobracket:true},
 		zhanjiang:{
 			trigger:{player:'phaseBegin'},
 			filter:function(event,player){
@@ -3757,8 +3763,14 @@ mode.boss={
 		boss_shanbeng:'山崩',
 		boss_shanbeng_info:'锁定技，当你死亡时，你令所有其他角色弃置其装备区内的所有牌',
 
-		boss_bianshen:'出场',
-		boss_bianshen_info:'游戏开始时，你随机变身为魑、魅、魍、魉中的一个',
+		boss_bianshen_intro1:'第一关：',
+		boss_bianshen_intro1_info:'挑战魑、魅、魍、魉中的随机一个',
+		boss_bianshen_intro2:'第二关：',
+		boss_bianshen_intro2_info:'挑战牛头、马面中的随机一个',
+		boss_bianshen_intro3:'第三关：',
+		boss_bianshen_intro3_info:'挑战白无常、黑无常中的随机一个',
+		boss_bianshen_intro4:'第四关：',
+		boss_bianshen_intro4_info:'挑战罗刹、夜叉中的随机一个',
 		boss_bianshen2:'后援',
 		boss_bianshen2_info:'你死亡后，随机召唤牛头、马面中的一个',
 		boss_bianshen3:'后援',

@@ -33696,6 +33696,12 @@
                     span.style.margin='8px';
                     var clickGroup=function(){
                         if(_status.dragged) return;
+						if(dialog.currentcapt2=='最近'&&dialog.currentcaptnode2!=this&&!dialog.currentcaptnode2.inited){
+	                        dialog.currentcapt2=null;
+	                        dialog.currentcaptnode2.classList.remove('thundertext');
+	                        dialog.currentcaptnode2.inited=true;
+	                        dialog.currentcaptnode2=null;
+	                    }
                         var node=this,link=this.link;
                         if(node.classList.contains('thundertext')){
     						dialog.currentgroup=null;
@@ -40410,6 +40416,9 @@
 							}
 							underlinenode.link=skills[i];
 							underlinenode.listen(ui.click.autoskill2);
+						}
+						else if(lib.skill[skills[i]].nobracket){
+							uiintro.add('<div><div class="skill">'+get.translation(skills[i])+'</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
 						}
 						else{
 							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
