@@ -91,6 +91,7 @@ mode.chess={
 						_status.color=lib.config.continue_name_chess.color;
 						game.saveConfig('continue_name_chess');
 						game.delay(0.5);
+						lib.init.onfree();
 					}
 					else{
 						game.chooseCharacterDouble(function(i){

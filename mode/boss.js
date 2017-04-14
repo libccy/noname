@@ -156,6 +156,7 @@ mode.boss={
 		game.me=ui.create.player();
 		if(lib.config.continue_name_boss){
 			event.noslide=true;
+			lib.init.onfree();
 		}
 		else{
 			game.chooseCharacter(function(target){
@@ -281,7 +282,7 @@ mode.boss={
 				td.innerHTML=get.translation(game.dead[i]);
 				td=ui.create.div(tr);
 				if(game.dead[i].maxHp>0){
-					td.innerHTML='剩余'+get.cnNumber(game.bossinfo.chongzheng-game.dead[i].storage.boss_chongzheng)+'回合';
+					td.innerHTML='剩余'+(game.bossinfo.chongzheng-game.dead[i].storage.boss_chongzheng)+'回合';
 				}
 				else{
 					td.innerHTML='无法重整'
@@ -381,7 +382,9 @@ mode.boss={
 				if(game.bossinfo.checkResult&&game.bossinfo.checkResult(this)===false){
 					return;
 				}
-				if(this==game.boss||game.players.length==1){
+				if(this==game.boss||!game.hasPlayer(function(current){
+					return !current.side;
+				})){
 					game.checkResult();
 				}
 			},
@@ -396,8 +399,8 @@ mode.boss={
 			boss_yandi:['male','shen',6,['boss_shenyi','boss_shenen','boss_chiyi'],['shu','hiddenboss','bossallowed']],
 
 			boss_qingmushilian:['male','',0,['boss_qingmu','boss_qingmu_intro1','boss_qingmu_intro2','boss_qingmu_intro3'],['boss'],'wu'],
-			boss_qinglong:['male','shen',4,['boss_shenyi','releiji'],['wu','hiddenboss','bossallowed']],
-			boss_mushengoumang:['male','shen',5,['boss_shenyi','boss_buchun'],['wu','hiddenboss','bossallowed']],
+			boss_qinglong:['male','shen',4,['boss_shenyi','releiji','boss_qingmu2'],['wu','hiddenboss','bossallowed']],
+			boss_mushengoumang:['male','shen',5,['boss_shenyi','boss_buchun','boss_qingmu3'],['wu','hiddenboss','bossallowed']],
 			boss_shujing:['female','shen',2,['boss_cuidu','boss_zhongdu'],['wu','hiddenboss','bossallowed']],
 			boss_taihao:['male','shen',6,['boss_shenyi','boss_shenen','boss_qingyi'],['wu','hiddenboss','bossallowed']],
 
@@ -963,9 +966,6 @@ mode.boss={
 				'step 0'
 				game.delay();
 				'step 1'
-				game.animate.window(1);
-				'step 2'
-				game.changeBoss('boss_huoshenzhurong');
 				if(game.me!=game.boss){
 					game.changeSeat(game.boss,6);
 				}
@@ -973,13 +973,15 @@ mode.boss={
 					game.changeSeat(game.boss.nextSeat,3);
 					game.changeSeat(game.boss.previousSeat,5);
 				}
+				game.changeBoss('boss_huoshenzhurong');
 				for(var i=0;i<game.players.length;i++){
 					game.players[i].hp=game.players[i].maxHp;
 					game.players[i].update();
 				}
+				game.delay(0.5);
+				'step 2'
 				game.addBossFellow(game.me==game.boss?1:5,'boss_yanling');
 				game.addBossFellow(7,'boss_yanling');
-				game.animate.window(2);
 				'step 3'
 				while(_status.event.name!='phaseLoop'){
 					_status.event=_status.event.parent;
@@ -988,9 +990,9 @@ mode.boss={
 				_status.paused=false;
 				_status.event.player=game.boss;
 				_status.event.step=0;
+				_status.roundStart=game.boss;
 				if(game.bossinfo){
 					game.bossinfo.loopType=1;
-					_status.roundStart=game.boss;
 				}
 			}
 		},
@@ -1012,6 +1014,112 @@ mode.boss={
 				game.delay();
 				'step 1'
 				game.changeBoss('boss_yandi');
+				game.boss.nextSeat.hide();
+				game.boss.previousSeat.hide();
+				game.delay(0.5);
+				'step 2'
+				game.changeBoss('boss_yanling',game.boss.previousSeat);
+				game.changeBoss('boss_huoshenzhurong',game.boss.nextSeat);
+				'step 3'
+				while(_status.event.name!='phaseLoop'){
+					_status.event=_status.event.parent;
+				}
+				game.resetSkills();
+				_status.paused=false;
+				_status.event.player=game.boss;
+				_status.event.step=0;
+			}
+		},
+		boss_qingmu:{
+			trigger:{global:'gameStart'},
+			forced:true,
+			popup:false,
+			content:function(){
+				player.smoothAvatar();
+				player.init('boss_qinglong');
+				_status.noswap=true;
+				game.addVideo('reinit2',player,player.name);
+			}
+		},
+		boss_qingmu2:{
+			mode:['boss'],
+			global:'boss_qingmu2x'
+		},
+		boss_qingmu2x:{
+			trigger:{global:'dieAfter'},
+			forced:true,
+			priority:-10,
+			globalFixed:true,
+			filter:function(event){
+				if(lib.config.mode!='boss') return false;
+				return event.player==game.boss&&event.player.hasSkill('boss_qingmu2');
+			},
+			content:function(){
+				'step 0'
+				game.delay();
+				'step 1'
+				if(game.me!=game.boss){
+					game.changeSeat(game.boss,6);
+				}
+				else{
+					game.changeSeat(game.boss.nextSeat,3);
+					game.changeSeat(game.boss.previousSeat,5);
+				}
+				game.changeBoss('boss_mushengoumang');
+				for(var i=0;i<game.players.length;i++){
+					game.players[i].hp=game.players[i].maxHp;
+					game.players[i].update();
+				}
+				game.delay(0.5);
+				'step 2'
+				game.addBossFellow(game.me==game.boss?1:5,'boss_shujing');
+				game.addBossFellow(7,'boss_shujing');
+				'step 3'
+				while(_status.event.name!='phaseLoop'){
+					_status.event=_status.event.parent;
+				}
+				game.resetSkills();
+				_status.paused=false;
+				_status.event.player=game.boss;
+				_status.event.step=0;
+				_status.roundStart=game.boss;
+				if(game.bossinfo){
+					game.bossinfo.loopType=1;
+				}
+			}
+		},
+		boss_qingmu3:{
+			mode:['boss'],
+			global:'boss_qingmu3x'
+		},
+		boss_qingmu3x:{
+			trigger:{global:'dieAfter'},
+			forced:true,
+			priority:-10,
+			globalFixed:true,
+			filter:function(event){
+				if(lib.config.mode!='boss') return false;
+				return event.player==game.boss&&event.player.hasSkill('boss_qingmu3');
+			},
+			content:function(){
+				'step 0'
+				game.delay();
+				'step 1'
+				game.changeBoss('boss_taihao');
+				game.boss.nextSeat.hide();
+				game.boss.previousSeat.hide();
+				game.delay(0.5);
+				'step 2'
+				game.changeBoss('boss_shujing',game.boss.previousSeat);
+				game.changeBoss('boss_mushengoumang',game.boss.nextSeat);
+				'step 3'
+				while(_status.event.name!='phaseLoop'){
+					_status.event=_status.event.parent;
+				}
+				game.resetSkills();
+				_status.paused=false;
+				_status.event.player=game.boss;
+				_status.event.step=0;
 			}
 		},
 		boss_shenyi:{},
@@ -1020,6 +1128,7 @@ mode.boss={
 		boss_xingxia:{},
 		boss_huihuo:{},
 		boss_chiyi:{},
+		boss_buchun:{},
 		boss_shenbuchun:{},
 		boss_cuidu:{},
 		boss_zhongdu:{},

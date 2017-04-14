@@ -22214,12 +22214,7 @@
 			},
 			changeSeat:function(player,info){
 				if(player){
-					player.style.transition='all 0s';
-					ui.refresh(player);
-					player.dataset.position=info;
-					setTimeout(function(){
-						player.style.transition='';
-					},100);
+					game.changeSeat(player,info);
 					game.playerMap={};
 					var players=game.players.concat(game.dead);
 					for(var i=0;i<players.length;i++){
@@ -23889,7 +23884,9 @@
     						if(pointer==game.boss){
     							break;
     						}
-    						map.links.push(pointer.name);
+							if(!pointer.side){
+								map.links.push(pointer.name);
+							}
     					}
     					game.saveConfig('continue_name_boss',map);
     					game.saveConfig('mode',lib.config.mode);
@@ -24560,8 +24557,18 @@
 			_status.dragline.length=0;
 		},
 		changeSeat:function(player,position){
-			game.addVideo('changeSeat',player,position);
+			var rect1=player.getBoundingClientRect();
+			player.style.transition='all 0s';
+			ui.refresh(player);
 			player.dataset.position=position;
+			var rect2=player.getBoundingClientRect();
+			player.style.transform='translate('+(rect1.left-rect2.left)+'px,'+(rect1.top-rect2.top)+'px)';
+			setTimeout(function(){
+				player.style.transition='';
+				ui.refresh(player);
+				player.style.transform='';
+			},100);
+			game.addVideo('changeSeat',player,position);
 		},
 		swapSeat:function(player1,player2,prompt,behind){
 			if(behind){

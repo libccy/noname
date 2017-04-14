@@ -1299,6 +1299,7 @@ mode.versus={
 					game.additionaldead=[];
 					event.goto(1);
 					game.saveConfig('continue_name_versus');
+					lib.init.onfree();
 					return;
 				}
 				event.check=function(){
