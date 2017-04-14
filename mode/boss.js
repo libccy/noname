@@ -187,20 +187,21 @@ mode.boss={
 		setTimeout(function(){
 			ui.control.classList.remove('bosslist');
 		},500);
-		var rect=event.current.getBoundingClientRect();
 		var boss=ui.create.player();
 		boss.getId();
 		game.boss=boss;
 		boss.init(event.current.name);
 		boss.side=true;
-		boss.node.equips.style.opacity='0';
 		if(!event.noslide){
-			// boss.classList.add('bossplayer');
-			// boss.classList.add('highlight');
+			var rect=event.current.getBoundingClientRect();
 			boss.animate('bossing');
 			boss.node.hp.animate('start');
-			boss.style.left=(rect.left-ui.arena.offsetLeft)+'px';
-			boss.style.top=(rect.top-ui.arena.offsetTop)+'px';
+			boss.bossinginfo=[rect.left+rect.width/2,rect.top+rect.height/2];
+			boss.style.transition='all 0s';
+			boss.node.equips.style.opacity='0';
+		}
+		else{
+			boss.animate('start');
 		}
 		boss.setIdentity('zhu');
 		boss.identity='zhu';
@@ -319,15 +320,17 @@ mode.boss={
 		}
 
 		ui.arena.appendChild(boss);
-		ui.refresh(boss);
-		boss.classList.remove('highlight');
-		boss.classList.remove('bossplayer');
-		boss.style.left='';
-		boss.style.top='';
-		boss.style.position='';
-		setTimeout(function(){
-			boss.node.equips.style.opacity='';
-		},500);
+		if(boss.bossinginfo){
+			var rect=boss.getBoundingClientRect();
+			boss.style.transform='translate('+(boss.bossinginfo[0]-rect.left-rect.width/2)+'px,'+(boss.bossinginfo[1]-rect.top-rect.height/2)+'px) scale(1.1)';
+			ui.refresh(boss);
+			boss.style.transition='';
+			boss.style.transform='';
+			delete boss.bossinginfo;
+			setTimeout(function(){
+				boss.node.equips.style.opacity='';
+			},500);
+		}
 
 		event.bosslist.delete();
 
@@ -916,7 +919,9 @@ mode.boss={
 			forced:true,
 			popup:false,
 			content:function(){
+				player.smoothAvatar();
 				player.init('boss_zhuque');
+				_status.noswap=true;
 				game.addVideo('reinit2',player,player.name);
 			}
 		},
@@ -937,7 +942,34 @@ mode.boss={
 				'step 0'
 				game.delay();
 				'step 1'
+				game.animate.window(1);
+				'step 2'
 				game.changeBoss('boss_huoshenzhurong');
+				if(game.me!=game.boss){
+					game.changeSeat(game.boss,6);
+				}
+				else{
+					game.changeSeat(game.boss.nextSeat,3);
+					game.changeSeat(game.boss.previousSeat,5);
+				}
+				for(var i=0;i<game.players.length;i++){
+					game.players[i].hp=game.players[i].maxHp;
+					game.players[i].update();
+				}
+				game.addFellow(game.me==game.boss?1:5,'boss_yanling','zoominanim').directgain(get.cards(4));
+				game.addFellow(7,'boss_yanling','zoominanim').directgain(get.cards(4));
+				game.animate.window(2);
+				'step 3'
+				while(_status.event.name!='phaseLoop'){
+					_status.event=_status.event.parent;
+				}
+				game.resetSkills();
+				_status.paused=false;
+				_status.event.player=game.boss;
+				_status.event.step=0;
+				if(game.bossinfo){
+					game.bossinfo.loopType=1;
+				}
 			}
 		},
 		boss_chiyan3:{
@@ -2566,6 +2598,7 @@ mode.boss={
 			forced:true,
 			popup:false,
 			content:function(){
+				player.smoothAvatar();
 				player.init(['boss_chi','boss_mo','boss_wang','boss_liang'].randomGet());
 				game.addVideo('reinit2',player,player.name);
 			}
@@ -3519,12 +3552,7 @@ mode.boss={
 				while(_status.event.name!='phaseLoop'){
 					_status.event=_status.event.parent;
 				}
-				for(var i=0;i<game.players.length;i++){
-					for(var j in game.players[i].tempSkills){
-						game.players[i].removeSkill(j);
-					}
-					game.players[i].in(true);
-				}
+				game.resetSkills();
 				_status.paused=false;
 				_status.event.player=player;
 				_status.event.step=0;

@@ -5852,10 +5852,9 @@
 					lib.assetURL=noname_inited;
 				}
 
-				ui.css={
-					menu:lib.init.css(lib.assetURL+'layout/default','menu'),
-					default:lib.init.css(lib.assetURL+'layout/default','layout')
-				};
+				ui.css={menu:lib.init.css(lib.assetURL+'layout/default','menu',function(){
+					ui.css.default=lib.init.css(lib.assetURL+'layout/default','layout');
+				})};
 
 				if(lib.device){
 					lib.init.cordovaReady=function(){
@@ -12621,6 +12620,20 @@
 					this.ai={friend:[],enemy:[],neutral:[]};
 
 					return this;
+				},
+				smoothAvatar:function(){
+					var div=ui.create.div('.fulldiv');
+					div.style.background=getComputedStyle(this.node.avatar).background;
+					this.node.avatar.appendChild(div);
+					ui.refresh(div);
+					div.style.transition='all 1s';
+					setTimeout(function(){
+						div.classList.add('removing');
+						setTimeout(function(){
+							div.remove();
+						},2000);
+					},100);
+					game.addVideo('smoothAvatar',this);
 				},
                 send:function(){
                     if(!this.ws||this.ws.closed) return this;
@@ -21470,6 +21483,11 @@
 					console.log(player);
 				}
 			},
+			smoothAvatar:function(player){
+				if(player&&player.node&&player.node.avatar){
+					player.smoothAvatar();
+				}
+			},
 			reinit:function(source,content){
 				if(source&&content){
 					source.uninit();
@@ -21528,8 +21546,30 @@
 				}
 			},
 			addFellow:function(content){
-				var player=game.addFellow(content[0],content[1]);
+				var player=game.addFellow(content[0],content[1],content[2]);
 				game.playerMap[player.dataset.position]=player;
+			},
+			windowzoom1:function(){
+				ui.window.style.transition='all 0.5s';
+				ui.window.classList.add('zoomout3');
+				ui.window.hide();
+			},
+			windowzoom2:function(){
+				ui.window.style.transition='all 0s';
+				ui.refresh(ui.window);
+			},
+			windowzoom3:function(){
+				ui.window.classList.remove('zoomout3');
+				ui.window.classList.add('zoomin3');
+			},
+			windowzoom4:function(){
+				ui.window.style.transition='all 0.5s';
+				ui.refresh(ui.window);
+				ui.window.show();
+				ui.window.classList.remove('zoomin3');
+			},
+			windowzoom5:function(){
+				ui.window.style.transition='';
 			},
 			updateActCount:function(player,content){
 				if(player&&content){
@@ -22146,6 +22186,21 @@
 					}
 				}
 			},
+			changeSeat:function(player,info){
+				if(player){
+					player.style.transition='all 0s';
+					ui.refresh(player);
+					player.dataset.position=info;
+					setTimeout(function(){
+						player.style.transition='';
+					},100);
+					game.playerMap={};
+					var players=game.players.concat(game.dead);
+					for(var i=0;i<players.length;i++){
+						game.playerMap[players[i].dataset.position]=players[i];
+					}
+				}
+			},
 			dialogCapt:function(content){
 				for(var i=0;i<ui.dialogs.length;i++){
 					if(ui.dialogs[i].videoId==content[0]){
@@ -22463,6 +22518,42 @@
 			_status.toprint.push(Array.from(arguments));
 		},
 		animate:{
+			window:function(num){
+				switch(num){
+					case 1:{
+						ui.window.style.transition='all 0.5s';
+						ui.window.classList.add('zoomout3');
+						ui.window.hide();
+						game.addVideo('windowzoom1');
+						game.delay(0,500);
+						break;
+					}
+					case 2:{
+						ui.window.style.transition='all 0s';
+						ui.refresh(ui.window);
+						game.addVideo('windowzoom2');
+						game.pause();
+						setTimeout(function(){
+							ui.window.classList.remove('zoomout3');
+							ui.window.classList.add('zoomin3');
+							game.addVideo('windowzoom3');
+							setTimeout(function(){
+								ui.window.style.transition='all 0.5s';
+								ui.refresh(ui.window);
+								ui.window.show();
+								ui.window.classList.remove('zoomin3');
+								game.addVideo('windowzoom4');
+								setTimeout(function(){
+									ui.window.style.transition='';
+									game.addVideo('windowzoom5');
+									game.resume();
+								},500);
+							},100);
+						},100);
+						break;
+					}
+				}
+			},
 			flame:function(x,y,duration,type){
 				var particles=[];
 				var particle_count=50;
@@ -23116,6 +23207,21 @@
                 lib.hook.globalskill.remove(skill);
             }
         },
+		resetSkills:function(){
+			for(var i=0;i<game.players.length;i++){
+				for(var j in game.players[i].tempSkills){
+					game.players[i].removeSkill(j);
+				}
+				var skills=game.players[i].getSkills();
+				for(var j=0;j<skills.length;j++){
+					if(lib.skill[skills[j]].temp){
+						game.players[i].removeSkill(skills[j]);
+					}
+				}
+				game.players[i].in(true);
+			}
+			ui.clear();
+		},
         removeExtension:function(extname,keepfile){
             var prefix='extension_'+extname;
             for(var i in lib.config){
@@ -24426,6 +24532,10 @@
 			}
 			ui.arena.classList.remove('dragging');
 			_status.dragline.length=0;
+		},
+		changeSeat:function(player,position){
+			game.addVideo('changeSeat',player,position);
+			player.dataset.position=position;
 		},
 		swapSeat:function(player1,player2,prompt,behind){
 			if(behind){
@@ -26158,7 +26268,7 @@
 			return player;
 		},
 		addFellow:function(position,character,animation){
-			game.addVideo('addFellow',null,[position,character]);
+			game.addVideo('addFellow',null,[position,character,animation]);
 			var player=ui.create.player(ui.arena).animate(animation||'start');
 			player.dataset.position=position||game.players.length+game.dead.length;
             player.getId();
@@ -37951,8 +38061,10 @@
 			pause:function(){
 				if(_status.paused2) return;
 				if(_status.nopause) return;
-				if(ui.pause.classList.contains('hidden')) return;
-                if(!_status.gameStarted&&!_status.video) return;
+				if(!_status.video){
+					if(ui.pause.classList.contains('hidden')) return;
+	                if(!_status.gameStarted) return;
+				}
 				ui.system.hide();
 				game.pause2();
 				var node=ui.create.pause().animate('start');

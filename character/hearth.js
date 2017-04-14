@@ -178,6 +178,9 @@ character.hearth={
 					game.zhu&&!game.zhu.isZhu&&player==game.zhong){
 					return false;
 				}
+				if(_status.noswap){
+					return false;
+				}
 				return !player.isTurnedOver();
 			},
 			content:function(){

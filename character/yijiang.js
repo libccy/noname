@@ -6095,6 +6095,7 @@ character.yijiang={
 				while(_status.event.name!='phase'){
 					_status.event=_status.event.parent;
 				}
+				game.resetSkills();
 				_status.event.finish();
 				_status.event.untrigger(true);
 			}
