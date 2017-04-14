@@ -817,7 +817,7 @@
 										editbg.call(node.lastChild);
 									}
 								}
-							});
+							}).inputNode.accept='image/jpeg';
 							var editbg=function(){
 								this.classList.toggle('active');
 								var page=this.parentNode.parentNode;
@@ -1076,7 +1076,7 @@
 										});
 									});
 								}
-							});
+							}).inputNode.accept='image/jpeg,image/png';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
 									game.deleteDB('image','card_style');
@@ -1200,14 +1200,14 @@
 										});
 									});
 								}
-							});
+							}).inputNode.accept='image/jpeg,image/png';
 							ui.create.filediv('.menubutton.deletebutton.addbutton','添加翻转图片',node,function(file){
 								if(file){
 									game.putDB('image','cardback_style2',file,function(){
 										node.classList.add('hideadd');
 									});
 								}
-							});
+							}).inputNode.accept='image/jpeg,image/png';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
 									game.deleteDB('image','cardback_style');
@@ -1351,7 +1351,7 @@
 										});
 									});
 								}
-							});
+							}).inputNode.accept='image/jpeg,image/png';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
 									game.deleteDB('image','hp_style1');
@@ -1530,7 +1530,7 @@
 										});
 									});
 								}
-							});
+							}).inputNode.accept='image/jpeg,image/png';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
 									game.deleteDB('image','player_style');
@@ -1655,7 +1655,7 @@
 										});
 									});
 								}
-							});
+							}).inputNode.accept='image/jpeg,image/png';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
 									game.deleteDB('image','border_style');
@@ -1826,7 +1826,7 @@
 										});
 									});
 								}
-							});
+							}).inputNode.accept='image/jpeg,image/png';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
 									game.deleteDB('image','control_style');
@@ -1949,7 +1949,7 @@
 										});
 									});
 								}
-							});
+							}).inputNode.accept='image/jpeg,image/png';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
 									game.deleteDB('image','menu_style');
@@ -26497,6 +26497,7 @@
 					func.call(this,this.files[0],e);
 				};
 				div.appendChild(input);
+				div.inputNode=input;
 				return div;
 			},
             node:function(){
