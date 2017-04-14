@@ -13439,12 +13439,15 @@
                     next.setContent('phase');
 					return next;
 				},
-				phase:function(){
+				phase:function(skill){
 					var next=game.createEvent('phase');
 					next.player=this;
                     next.setContent('phase');
 					if(!_status.roundStart){
 						_status.roundStart=this;
+					}
+					if(skill){
+						next.skill=skill;
 					}
 					return next;
 				},
@@ -19105,7 +19108,7 @@
 					}
 					_status.currentPhase=player;
 					game.phaseNumber++;
-					if(player==_status.roundStart){
+					if(player==_status.roundStart&&!event.skill){
 						game.roundNumber++;
 					}
                     game.syncState();

@@ -388,6 +388,7 @@ mode.tafang={
 			var next=game.createEvent('phaseLoop');
 			next.setContent(function(){
 				'step 0'
+				delete _status.roundStart;
 				_status.turnCount++;
 				_status.remainingCount-=_status.friends.length;
 				ui.turnCount.innerHTML='回合'+get.cnNumber(_status.turnCount,true);

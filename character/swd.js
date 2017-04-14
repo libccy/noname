@@ -8234,13 +8234,13 @@ character.swd={
 			},
 			duijueLoop:function(){
 				'step 0'
-				targets[0].phase();
+				targets[0].phase('duijue');
 				'step 1'
 				if(targets[0].isDead()||targets[1].isDead()){
 					event.goto(3);
 				}
 				else{
-					targets[1].phase();
+					targets[1].phase('duijue');
 				}
 				'step 2'
 				if(targets[0].isDead()||targets[1].isDead()){

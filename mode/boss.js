@@ -475,6 +475,7 @@ mode.boss={
 			var boss=ui.create.player();
 			boss.getId();
 			boss.init(name);
+			boss.side=true;
 			game.addVideo('bossSwap',game.boss,boss.name);
 			if(game.me==game.boss){
 				boss.dataset.position=0;
@@ -543,7 +544,6 @@ mode.boss={
 							player.revive(player.hp);
 						}
 					}
-
 					if(game.bossinfo.loopType==2){
 						game.boss.chongzheng=true;
 					}
@@ -556,6 +556,7 @@ mode.boss={
 				}
 				"step 1"
 				if(game.bossinfo.loopType==2){
+					_status.roundStart=true;
 					if(event.player==game.boss){
 						if(!_status.last||_status.last.nextSeat==game.boss){
 							event.player=game.boss.nextSeat;
@@ -567,6 +568,9 @@ mode.boss={
 					else{
 						_status.last=player;
 						event.player=game.boss;
+						if(player.nextSeat==game.boss){
+							delete _status.roundStart;
+						}
 					}
 				}
 				else{
@@ -956,8 +960,8 @@ mode.boss={
 					game.players[i].hp=game.players[i].maxHp;
 					game.players[i].update();
 				}
-				game.addFellow(game.me==game.boss?1:5,'boss_yanling','zoominanim').directgain(get.cards(4));
-				game.addFellow(7,'boss_yanling','zoominanim').directgain(get.cards(4));
+				game.addFellow(game.me==game.boss?1:5,'boss_yanling','zoominanim').directgain(get.cards(4)).side=true;
+				game.addFellow(7,'boss_yanling','zoominanim').directgain(get.cards(4)).side=true;
 				game.animate.window(2);
 				'step 3'
 				while(_status.event.name!='phaseLoop'){
@@ -969,6 +973,7 @@ mode.boss={
 				_status.event.step=0;
 				if(game.bossinfo){
 					game.bossinfo.loopType=1;
+					_status.roundStart=game.boss;
 				}
 			}
 		},
@@ -3071,6 +3076,7 @@ mode.boss={
 				}
 				if(game.bossinfo){
 					game.bossinfo.loopType=1;
+					_status.roundStart=game.boss;
 				}
 				player.removeSkill('beige');
 				player.removeSkill('boss_hujia');
@@ -3227,6 +3233,7 @@ mode.boss={
 				player.addSkill('zhuyu');
 				if(game.bossinfo){
 					game.bossinfo.loopType=1;
+					_status.roundStart=game.boss;
 				}
 			}
 		},
@@ -3558,6 +3565,7 @@ mode.boss={
 				_status.event.step=0;
 				if(game.bossinfo){
 					game.bossinfo.loopType=1;
+					_status.roundStart=game.boss;
 				}
 			},
 			ai:{

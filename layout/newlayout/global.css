@@ -58,10 +58,10 @@
 	top:3px;
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px;
 }
-#arena.uslim_player .player.minskin:not(.fakeme) .avatar:not(.fakeme){
+/*#arena.uslim_player .player.minskin:not(.fakeme) .avatar:not(.fakeme){
 	left:5px;
 	top:5px;
-}
+}*/
 .player.minskin .hp,
 .player.minskin .hp.text{
 	left:88px;

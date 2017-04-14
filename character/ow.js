@@ -3241,7 +3241,7 @@ character.ow={
                 player.storage.shanxian_e=player.getCards('e');
                 player.storage.shanxian_n=1;
                 player.syncStorage('shanxian_e');
-				player.phase();
+				player.phase('shanxian');
 				player.storage.shanxian=trigger.player;
                 player.removeSkill('shanxian2');
                 player.markSkill('shanxian');
