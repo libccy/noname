@@ -597,6 +597,7 @@ game.import('mode',function(){
     								if(lib.character[name][1]!=game.me.identity) return true;
     							});
     							if(ui.cheat2){
+                                    ui.cheat2.animate('controlpressdownx',500);
     								ui.cheat2.classList.remove('disabled');
     							}
     						};
@@ -619,6 +620,7 @@ game.import('mode',function(){
     									game.uncheck();
     									game.check();
     									if(ui.cheat){
+    										ui.cheat.animate('controlpressdownx',500);
     										ui.cheat.classList.remove('disabled');
     									}
     								}
@@ -871,6 +873,7 @@ game.import('mode',function(){
     					lib.onfree.push(function(){
     						event.dialogxx=ui.create.characterDialog();
     						if(ui.cheat2){
+                                ui.cheat2.animate('controlpressdownx',500);
     							ui.cheat2.classList.remove('disabled');
     						}
     					});
@@ -891,7 +894,8 @@ game.import('mode',function(){
     							game.uncheck();
     							game.check();
     							if(ui.cheat){
-    								ui.cheat.classList.remove('hidden');
+                                    ui.cheat.animate('controlpressdownx',500);
+    								ui.cheat.classList.remove('disabled');
     							}
     						}
     						else{
@@ -906,7 +910,7 @@ game.import('mode',function(){
     							game.uncheck();
     							game.check();
     							if(ui.cheat){
-    								ui.cheat.classList.add('hidden');
+    								ui.cheat.classList.add('disabled');
     							}
     						}
     					});

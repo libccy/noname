@@ -1070,8 +1070,11 @@ input.fileinput::-webkit-file-upload-button {
 #system>div>.pressdown{
 	transform: scale(0.97);
 }
-.controlpressdownx{
+.control:not(.disabled) {
 	transition: all 0.1s;
+}
+.control:not(.disabled).controlpressdownx {
+	transition: all 0.5s;
 }
 #system>div>.pressdown2{
 	background-image: linear-gradient(rgba(47,101,150,1), rgba(43, 90, 132,1));

@@ -89,7 +89,7 @@ game.import('play',function(){
 					boss_shihuosuanni:['male','wei',3,['boss_jiguan','boss_lianyujg'],['jiangemech','hiddenboss','bossallowed'],'wei'],
 					boss_lieshiyazi:['male','wei',4,['boss_jiguan','boss_nailuo'],['jiangemech','hiddenboss','bossallowed'],'wei'],
 				}
-				if(get.mode()!='versus'){
+				if(get.mode()!='versus'||get.config('versus_mode')!='jiange'){
 					lib.characterPack.mode_extension_jiange=list2;
 					for(var i in list2){
 						lib.characterPack.mode_extension_jiange[i]=list2[i];

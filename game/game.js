@@ -18461,6 +18461,9 @@
     					ui.refresh(this);
     					this.style.transition='';
     				}
+					else{
+						this.animate('controlpressdownx',500);
+					}
     				ui.updatec();
     				return this;
                 },
@@ -18472,6 +18475,8 @@
 					node.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.control);
 				},
 				close:function(){
+					this.animate('controlpressdownx',500);
+
 					ui.controls.remove(this);
 					this.delete();
 
@@ -18484,6 +18489,8 @@
 					if(ui.skills3==this) delete ui.skills3;
 				},
 				replace:function(){
+					// this.animate('controlpressdownx',500);
+
 					while(this.childNodes.length) this.firstChild.remove();
 					var i,controls;
 					if(get.objtype(arguments[0])=='array') controls=arguments[0];
@@ -34314,6 +34321,7 @@
 				if(control.childNodes.length){
 					// if(nozoom||true){
 					control.style.transition='opacity 0.5s';
+					control.animate('controlpressdownx',500);
 					// }
 					// else{
 					// 	control.style.transition='';
@@ -34334,14 +34342,12 @@
 					control.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',function(){
 						if(this.classList.contains('disabled')) return;
 						this.classList.add('controlpressdown');
-						this.classList.add('controlpressdownx');
 						if(typeof this._offset=='number'){
 							this.style.transform='translateX('+this._offset+'px) scale(0.97)';
 						}
 					});
 					control.addEventListener(lib.config.touchscreen?'touchend':'mouseup',function(){
 						this.classList.remove('controlpressdown');
-						this.classList.remove('controlpressdownx');
 						if(typeof this._offset=='number'){
 							this.style.transform='translateX('+this._offset+'px)';
 						}
@@ -38471,6 +38477,7 @@
 					fullwidth+=154;
 				}
 				if(game.layout!='default'&&game.layout!='newlayout'&&ui.arena.offsetWidth/2>=fullwidth){
+					var current_offset=stayleft._offset;
 					if(fullright){
 						stayleft._offset=Math.ceil(-ui.arena.offsetWidth/2)+135;
 						if(game.layout=='long2'&&ui.arena.dataset.number=='8'&&get.mode()!='boss'){
@@ -38480,7 +38487,10 @@
 					else{
 						stayleft._offset=Math.ceil(-ui.arena.offsetWidth/2)+165;
 					}
-					stayleft.style.transform='translateX('+stayleft._offset+'px)';
+					if(current_offset!=stayleft._offset){
+						stayleft.animate('controlpressdownx',500);
+						stayleft.style.transform='translateX('+stayleft._offset+'px)';
+					}
 				}
 				else{
 					add(stayleft,true);
@@ -38489,8 +38499,11 @@
 			if(!controls.length) return;
 			var offset=-length/2;
 			var control=controls.shift();
-			control.style.transform='translateX('+offset+'px)';
-            control._offset=offset;
+			if(control._offset!=offset){
+				control.animate('controlpressdownx',500);
+				control.style.transform='translateX('+offset+'px)';
+	            control._offset=offset;
+			}
 			while(controls.length){
 				var control=controls.shift();
 				var width=widths.shift();
@@ -38498,8 +38511,11 @@
 				if(get.is.phoneLayout()){
 					offset+=6;
 				}
-				control.style.transform='translateX('+offset+'px)';
-                control._offset=offset;
+				if(control._offset!=offset){
+					control.animate('controlpressdownx',500);
+					control.style.transform='translateX('+offset+'px)';
+	                control._offset=offset;
+				}
 			}
 		},
 		updatex:function(){

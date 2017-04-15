@@ -2425,6 +2425,7 @@ game.import('mode',function(){
 								}
 							},get.config('onlyguozhanexpand')?'expandall':undefined,get.config('onlyguozhan')?'onlypack:mode_guozhan':undefined);
 							if(ui.cheat2){
+								ui.cheat2.animate('controlpressdownx',500);
 								ui.cheat2.classList.remove('disabled');
 							}
 						};
@@ -2447,7 +2448,8 @@ game.import('mode',function(){
 									game.uncheck();
 									game.check();
 									if(ui.cheat){
-										ui.cheat.classList.add('disabled');
+										ui.cheat.animate('controlpressdownx',500);
+										ui.cheat.classList.remove('disabled');
 									}
 								}
 								else{
@@ -2462,7 +2464,7 @@ game.import('mode',function(){
 									game.uncheck();
 									game.check();
 									if(ui.cheat){
-										ui.cheat.classList.remove('disabled');
+										ui.cheat.classList.add('disabled');
 									}
 								}
 							});
