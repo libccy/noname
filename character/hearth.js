@@ -4118,6 +4118,7 @@ game.import('character',function(){
     				event.player.isAlive()&&!event.player.isTurnedOver();
     			},
     			check:function(event,player){
+                    if(event.player.hasSkillTag('noturn')) return;
     				if(event.player.isTurnedOver()){
     					return get.attitude(player,event.player)>0;
     				}

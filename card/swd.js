@@ -1258,7 +1258,10 @@ game.import('card',function(){
 				ai:{
 					order:2,
 					result:{
-						target:-1,
+						target:function(player,target){
+							if(target.hasSkillTag('noturn')) return 0;
+							return -1;
+						},
 					},
 					useful:[2,0.5],
 					value:[2,0.5],
@@ -1715,7 +1718,10 @@ game.import('card',function(){
 						value:6,
 					},
 					result:{
-						target:-3
+						target:function(player,target){
+							if(target.hasSkillTag('noturn')) return 0;
+							return -3;
+						}
 					},
 				}
 			},
@@ -3564,6 +3570,7 @@ game.import('card',function(){
 			hslingjian_jinjilengdong_equip1:{
 				trigger:{source:'damageEnd'},
 				check:function(event,player){
+					if(event.player.hasSkillTag('noturn')) return 0;
 					if(event.player.isTurnedOver()){
 						return get.attitude(player,event.player)>0;
 					}
@@ -3581,6 +3588,7 @@ game.import('card',function(){
 			hslingjian_jinjilengdong_equip2:{
 				trigger:{player:'damageEnd'},
 				check:function(event,player){
+					if(event.player.hasSkillTag('noturn')) return 0;
 					if(event.player.isTurnedOver()){
 						return get.attitude(player,event.source)>0;
 					}
@@ -3621,6 +3629,7 @@ game.import('card',function(){
 					player.chooseTarget(get.prompt('hslingjian_jinjilengdong_duanzao'),function(card,player,target){
 						return player!=target&&!target.isTurnedOver();
 					}).ai=function(target){
+						if(target.hasSkillTag('noturn')) return 0;
 						return Math.max(0,-get.attitude(player,target)-2);
 					};
 					"step 1"

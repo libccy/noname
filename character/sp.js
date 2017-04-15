@@ -329,6 +329,7 @@ game.import('character',function(){
     				order:8,
     				result:{
     					target:function(player,target){
+                            if(target.hasSkillTag('noturn')) return 0;
     						if(target.isTurnedOver()) return 2;
     						return -0.5;
     					}

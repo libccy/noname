@@ -1243,6 +1243,19 @@ game.import('mode',function(){
 							}
 						}
 					}
+				},
+				trigger:{player:'turnOverBefore'},
+				priority:20,
+				forced:true,
+				filter:function(event,player){
+					return !player.isTurnedOver();
+				},
+				content:function(){
+					trigger.untrigger();
+					trigger.finish();
+				},
+				ai:{
+					noturn:true
 				}
 			},
 			honghuangzhili:{
@@ -1269,7 +1282,21 @@ game.import('mode',function(){
 				}
 			},
 			boss_shenen:{},
-			boss_fentian:{},
+			boss_fentian:{
+				trigger:{source:'damageBegin'},
+				forced:true,
+				content:function(){
+					trigger.nature='fire';
+				},
+				mod:{
+					cardUsable:function(card){
+						if(get.color(card)=='red') return Infinity;
+					},
+					targetInRange:function(card){
+						if(get.color(card)=='red') return true;
+					}
+				}
+			},
 			boss_xingxia:{},
 			boss_huihuo:{},
 			boss_chiyi:{},

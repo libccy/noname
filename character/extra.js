@@ -372,6 +372,7 @@ game.import('character',function(){
 					player.chooseTarget('是否弃置一枚“忍”，并发动【放逐】？',function(card,player,target){
 						return player!=target
 					}).ai=function(target){
+						if(target.hasSkillTag('noturn')) return 0;
 						if(target.isTurnedOver()){
 							return get.attitude(player,target)-1;
 						}

@@ -1706,6 +1706,7 @@ game.import('character',function(){
     				order:1,
     				result:{
     					target:function(player,target){
+                            if(target.hasSkillTag('noturn')) return 0;
     						if(game.phaseNumber<game.players.length) return 0;
     						if(game.phaseNumber<game.players.length*2&&player.hp==player.maxHp) return 0;
     						if(player.hasUnknown()) return 0;
@@ -3540,6 +3541,7 @@ game.import('character',function(){
     			ai:{
     				result:{
     					target:function(player,target){
+                            if(target.hasSkillTag('noturn')) return 0;
     						var num=game.countPlayer(function(current){
     							return current.getEquip(1);
     						});
@@ -4524,6 +4526,7 @@ game.import('character',function(){
     					if(get.is.altered('wangchen')){
     						return -get.attitude(player,target)/Math.sqrt(target.hp);
     					}
+                        if(target.hasSkillTag('noturn')) return 0;
     					return get.attitude(player,target)*(target.isTurnedOver()?1:-1);
     				}
     				"step 1"
@@ -7419,6 +7422,7 @@ game.import('character',function(){
     				});
     				next.logSkill=['ningshuang',trigger.player];
     				next.ai=function(card){
+                        if(trigger.player.hasSkillTag('noturn')&&trigger.player.isLinked()) return 0;
     					if(get.attitude(player,trigger.player)<0){
     						return 9-get.value(card);
     					}
@@ -8905,6 +8909,7 @@ game.import('character',function(){
     				player.chooseTarget(get.prompt('huanling'),function(card,player,target){
     					return player!=target;
     				}).ai=function(target){
+                        if(target.hasSkillTag('noturn')) return 0;
     					var att=get.attitude(player,target);
     					if(target.isTurnedOver()){
     						if(att>0){

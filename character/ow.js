@@ -1319,6 +1319,7 @@ game.import('character',function(){
 	                },
 	                result:{
 	                    target:function(player,target){
+							if(target.hasSkillTag('noturn')) return 0;
 	                        if(player.hasUnknown()) return 0;
 	                        return -1;
 	                    }

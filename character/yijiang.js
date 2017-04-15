@@ -4051,6 +4051,7 @@ game.import('character',function(){
     				threaten:1.8,
     				result:{
     					target:function(player,target){
+                            if(target.hasSkillTag('noturn')) return 0;
     						if(target.isTurnedOver()) return 2;
     						return -1/(target.countCards('h')+1);
     					}

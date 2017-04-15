@@ -1932,6 +1932,7 @@ game.import('character',function(){
     				player.chooseTarget(get.prompt('fangzhu'),function(card,player,target){
     					return player!=target
     				}).ai=function(target){
+                        if(target.hasSkillTag('noturn')) return 0;
     					var player=_status.event.player;
     					if(get.attitude(_status.event.player,target)==0) return 0;
     					if(get.attitude(_status.event.player,target)>0){
