@@ -126,7 +126,9 @@
 										window.plugins.insomnia.allowSleepAgain();
 									}
 								}
-								catch(e){}
+								catch(e){
+									game.print(e);
+								}
 							}
 						}
 					},
@@ -34579,7 +34581,9 @@
 					try{
 						window.plugins.insomnia.keepAwake();
 					}
-					catch(e){}
+					catch(e){
+						game.print(e);
+					}
 				}
 				// var themeentry='background_color_'+lib.config.theme;
 				// if(lib.config[themeentry]){
