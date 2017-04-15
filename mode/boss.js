@@ -900,26 +900,29 @@ game.import('mode',function(){
 				chongzheng:0,
 				loopType:2,
 				checkResult:function(player){
-					if(player==game.boss&&game.boss.name!='boss_taihao'){
+					if(player==game.boss&&game.boss.name!='boss_yandi'){
 						return false;
-					}
-					lib.inpile.remove('shandian');
-					lib.inpile.remove('huoshan');
-					lib.inpile.remove('hongshui');
-					lib.inpile.remove('fulei');
-					for(var i=0;i<ui.cardPile.childElementCount;i++){
-						var node=ui.cardPile.childNodes[i];
-						if(node.name=='shandian'){
-							node.init([node.suit,node.number,'honghuangzhili']);
-						}
-						else if(['huoshan','hongshui','fulei'].contains(node)){
-							node.remove();
-						}
 					}
 				},
 				init:function(){
 					_status.additionalReward=function(){
 						return 500;
+					}
+					lib.inpile.remove('shandian');
+					lib.inpile.remove('huoshan');
+					lib.inpile.remove('hongshui');
+					lib.inpile.remove('fulei');
+					lib.inpile.add('honghuangzhili');
+					for(var i=0;i<ui.cardPile.childElementCount;i++){
+						var node=ui.cardPile.childNodes[i];
+						if(node.name=='shandian'){
+							node.classList.remove('fullskin');
+							node.classList.remove('thunder');
+							node.init([node.suit,node.number,'honghuangzhili']);
+						}
+						else if(['huoshan','hongshui','fulei'].contains(node)){
+							node.remove();
+						}
 					}
 				}
 			},
