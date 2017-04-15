@@ -191,8 +191,8 @@ game.import('play',function(){
 			if(get.mode()=='tafang') return;
 			var loadversus=function(){
 				if(get.mode()!='versus'){
-					window.mode={};
 					lib.init.js(lib.assetURL+'mode','versus',function(){
+						var mode=lib.imported.mode;
 						for(var i in mode.versus.translate){
 							lib.translate[i]=lib.translate[i]||mode.versus.translate[i];
 						}
@@ -203,13 +203,13 @@ game.import('play',function(){
 								game.finishSkill(i);
 							}
 						}
-						delete window.mode;
+						delete lib.imported.mode.versus;
 					});
 				}
 			};
 			if(get.mode()!='boss'){
-				window.mode={};
 				lib.init.js(lib.assetURL+'mode','boss',function(){
+					var mode=lib.imported.mode;
 					for(var i in mode.boss.translate){
 						lib.translate[i]=lib.translate[i]||mode.boss.translate[i];
 					}
@@ -218,7 +218,7 @@ game.import('play',function(){
 						lib.skill[i]=lib.init.eval(mode.boss.skill[i]);
 						game.finishSkill(i);
 					}
-					delete window.mode;
+					delete lib.imported.mode.boss;
 					loadversus();
 				});
 			}
