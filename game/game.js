@@ -7351,7 +7351,7 @@
 						});
 					}
 				}
-				if(!lib.imported.mode[lib.config.mode]){
+				if(!lib.imported.mode||!lib.imported.mode[lib.config.mode]){
 					window.inSplash=true;
 					clearTimeout(window.resetGameTimeout);
 					delete window.resetGameTimeout;
