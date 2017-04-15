@@ -9101,7 +9101,7 @@
 					}
 					else event.finish();
 					"step 1"
-					if(!event.cancelled) player.judge(event.card);
+					if(!event.cancelled) player.judge(event.card).set('type','phase');
 					"step 2"
 					var name=event.card.viewAs||event.card.name;
 					if(event.cancelled&&!event.direct){
@@ -9113,7 +9113,6 @@
 						}
 					}
 					else{
-						game.checkMod(player,result,'phaseJudge',player);
 						var next=game.createEvent(name);
 						next.setContent(lib.card[name].effect);
 						next._result=result;
@@ -12220,12 +12219,14 @@
 						node:event.node,
 					};
 					if(event.result.judge>0) event.result.bool=true;
-					if(event.result.judge<0) event.result.bool=false;
+					else if(event.result.judge<0) event.result.bool=false;
+					else event.result.bool=null;
 					player.judging.shift();
-					if(event.result.judge>0){
+					game.checkMod(player,event.result,'judge',player);
+					if(event.result.bool==true){
 						player.popup('洗具');
 					}
-					else if(event.result.judge<0){
+					else if(event.result.bool==false){
 						player.popup('杯具');
 					}
 					if(event.clearArena!=false){

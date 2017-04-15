@@ -36,6 +36,9 @@ game.import('mode',function(){
 					lib.character[i][4]=[];
 				}
 			}
+			for(var i in lib.cardPack.mode_boss){
+				lib.card[i]=lib.cardPack.mode_boss[i];
+			}
 			for(var i in lib.skill){
 				if(lib.skill[i].changeSeat){
 					lib.skill[i]={};
@@ -462,6 +465,42 @@ game.import('mode',function(){
 				// boss_sunshangxiang:['male','qun',8,[],['boss','bossallowed'],'wei'],
 			}
 		},
+		cardPack:{
+			mode_boss:{
+				honghuangzhili:{
+					type:'trick',
+					enable:true,
+					filterTarget:true,
+					content:function(){
+						if(target.group=='shen'){
+							target.addSkill('honghuangzhili');
+							if(target.countCards('he')){
+								player.gainPlayerCard(target,'he',true);
+							}
+						}
+						else{
+							target.turnOver();
+						}
+					},
+					ai:{
+						order:4,
+						value:10,
+						result:{
+							target:function(player,target){
+								if(target.group=='shen'){
+									if(target.countCards('he')) return -2;
+									return 0;
+								}
+								else{
+									if(target.isTurnedOver()) return 4;
+									return -3;
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		init:function(){
 			for(var i in lib.characterPack.mode_boss){
 				if(lib.characterPack.mode_boss[i][4].contains('hiddenboss')) continue;
@@ -838,6 +877,19 @@ game.import('mode',function(){
 					_status.additionalReward=function(){
 						return 500;
 					}
+					lib.inpile.remove('shandian');
+					lib.inpile.remove('huoshan');
+					lib.inpile.remove('hongshui');
+					lib.inpile.remove('fulei');
+					for(var i=0;i<ui.cardPile.childElementCount;i++){
+						var node=ui.cardPile.childNodes[i];
+						if(node.name=='shandian'){
+							node.init([node.suit,node.number,'honghuangzhili']);
+						}
+						else if(['huoshan','hongshui','fulei'].contains(node)){
+							node.remove();
+						}
+					}
 				}
 			},
 			boss_qingmushilian:{
@@ -846,6 +898,19 @@ game.import('mode',function(){
 				checkResult:function(player){
 					if(player==game.boss&&game.boss.name!='boss_taihao'){
 						return false;
+					}
+					lib.inpile.remove('shandian');
+					lib.inpile.remove('huoshan');
+					lib.inpile.remove('hongshui');
+					lib.inpile.remove('fulei');
+					for(var i=0;i<ui.cardPile.childElementCount;i++){
+						var node=ui.cardPile.childNodes[i];
+						if(node.name=='shandian'){
+							node.init([node.suit,node.number,'honghuangzhili']);
+						}
+						else if(['huoshan','hongshui','fulei'].contains(node)){
+							node.remove();
+						}
 					}
 				},
 				init:function(){
@@ -1166,7 +1231,43 @@ game.import('mode',function(){
 					_status.event.step=0;
 				}
 			},
-			boss_shenyi:{},
+			boss_shenyi:{
+				mod:{
+					judge:function(player,result){
+						if(_status.event.type=='phase'){
+							if(result.bool==false){
+								result.bool=null;
+							}
+							else{
+								result.bool=false;
+							}
+						}
+					}
+				}
+			},
+			honghuangzhili:{
+				init:function(player){
+					player.disableSkill('honghuangzhili','boss_shenyi');
+				},
+				mark:true,
+				nopop:true,
+				intro:{
+					content:'【神裔】无效直到下家的回合开始'
+				},
+				marktext:'荒',
+				onremove:function(player){
+					player.enableSkill('honghuangzhili','boss_shenyi');
+				},
+				trigger:{global:'phaseBegin'},
+				forced:true,
+				popup:false,
+				filter:function(event,player){
+					return event.player==player.next;
+				},
+				content:function(){
+					player.removeSkill('honghuangzhili');
+				}
+			},
 			boss_shenen:{},
 			boss_fentian:{},
 			boss_xingxia:{},
@@ -3987,6 +4088,9 @@ game.import('mode',function(){
 			boss_huoshenzhurong:'火神祝融',
 			boss_yanling:'焰灵',
 			boss_yandi:'炎帝',
+
+			honghuangzhili:'洪荒之力',
+			honghuangzhili_info:'若该角色的势力是神，你获得其一张牌，其【神裔】无效直到其下家的回合（这个下家是动态变化的，会随着一个人的死或者复活而变化）开始；若该角色的势力不是神，其翻面。',
 
 			boss_qingmushilian:'青木试炼',
 			boss_qinglong:'青龙',
