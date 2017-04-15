@@ -278,38 +278,40 @@ game.import('mode',function(){
 			else{
 				ui.fakeme.style.display='none';
 			}
-			lib.setPopped(ui.create.system('重整',null,true),function(){
-				var uiintro=ui.create.dialog('hidden');
+			if(game.bossinfo.chongzheng){
+				lib.setPopped(ui.create.system('重整',null,true),function(){
+					var uiintro=ui.create.dialog('hidden');
 
-				uiintro.add('重整');
-				var table=ui.create.div('.bosschongzheng');
+					uiintro.add('重整');
+					var table=ui.create.div('.bosschongzheng');
 
-				var tr,td,added=false;
-				for(var i=0;i<game.dead.length;i++){
-					if(typeof game.dead[i].storage.boss_chongzheng!=='number') continue;
-					added=true;
-					tr=ui.create.div(table);
-					td=ui.create.div(tr);
-					td.innerHTML=get.translation(game.dead[i]);
-					td=ui.create.div(tr);
-					if(game.dead[i].maxHp>0){
-						td.innerHTML='剩余'+(game.bossinfo.chongzheng-game.dead[i].storage.boss_chongzheng)+'回合';
+					var tr,td,added=false;
+					for(var i=0;i<game.dead.length;i++){
+						if(typeof game.dead[i].storage.boss_chongzheng!=='number') continue;
+						added=true;
+						tr=ui.create.div(table);
+						td=ui.create.div(tr);
+						td.innerHTML=get.translation(game.dead[i]);
+						td=ui.create.div(tr);
+						if(game.dead[i].maxHp>0){
+							td.innerHTML='剩余'+(game.bossinfo.chongzheng-game.dead[i].storage.boss_chongzheng)+'回合';
+						}
+						else{
+							td.innerHTML='无法重整'
+						}
+					}
+
+					if(!added){
+						uiintro.add('<div class="text center">（无重整角色）</div>');
+						uiintro.add(ui.create.div('.placeholder.slim'))
 					}
 					else{
-						td.innerHTML='无法重整'
+						uiintro.add(table);
 					}
-				}
 
-				if(!added){
-					uiintro.add('<div class="text center">（无重整角色）</div>');
-					uiintro.add(ui.create.div('.placeholder.slim'))
-				}
-				else{
-					uiintro.add(table);
-				}
-
-				return uiintro;
-			},180);
+					return uiintro;
+				},180);
+			}
 			ui.single_swap=ui.create.system('换人',function(){
 				var players=get.players(game.me);
 				players.remove(game.boss);
@@ -591,10 +593,9 @@ game.import('mode',function(){
 					else if(player.isDead()){
 						if(player.hp<0) player.hp=0;
 						player.storage.boss_chongzheng++;
-						if(player.maxHp>0){
+						if(player.maxHp>0&&game.bossinfo.chongzheng){
 							if(player.hp<player.maxHp){
 								player.hp++;
-								game.log(player,'回复了一点体力');
 							}
 							else if(player.countCards('h')<4){
 								var card=get.cards()[0];
@@ -603,8 +604,6 @@ game.import('mode',function(){
 								card.fix();
 								card.animate('start');
 								position.insertBefore(card,position.firstChild);
-								player.$draw();
-								game.log(player,'摸了一张牌');
 							}
 							player.update();
 							if(player.storage.boss_chongzheng>=game.bossinfo.chongzheng){
@@ -866,7 +865,7 @@ game.import('mode',function(){
 		},
 		boss:{
 			boss_chiyanshilian:{
-				chongzheng:99,
+				chongzheng:0,
 				loopType:2,
 				checkResult:function(player){
 					if(player==game.boss&&game.boss.name!='boss_yandi'){
@@ -893,7 +892,7 @@ game.import('mode',function(){
 				}
 			},
 			boss_qingmushilian:{
-				chongzheng:99,
+				chongzheng:0,
 				loopType:2,
 				checkResult:function(player){
 					if(player==game.boss&&game.boss.name!='boss_taihao'){
@@ -920,7 +919,7 @@ game.import('mode',function(){
 				}
 			},
 			boss_zhuoguiquxie:{
-				chongzheng:99,
+				chongzheng:0,
 				checkResult:function(player){
 					if(player==game.boss&&game.boss.name!='boss_yecha'&&game.boss.name!='boss_luocha'){
 						return false;
@@ -933,7 +932,7 @@ game.import('mode',function(){
 				}
 			},
 			boss_nianshou:{
-				chongzheng:99,
+				chongzheng:0,
 				init:function(){
 					game.boss.node.action.classList.add('freecolor');
 					game.boss.node.action.style.opacity=1;
@@ -975,7 +974,7 @@ game.import('mode',function(){
 				}
 			},
 			boss_nianshou_heti:{
-				chongzheng:99,
+				chongzheng:0,
 			},
 			boss_zhangjiao:{
 				// loopType:2,
@@ -1064,6 +1063,25 @@ game.import('mode',function(){
 					game.addBossFellow(game.me==game.boss?1:5,'boss_yanling');
 					game.addBossFellow(7,'boss_yanling');
 					'step 3'
+					for(var i=0;i<game.players.length;i++){
+						game.players[i].removeEquipTrigger();
+						var hej=game.players[i].get('hej');
+						for(var j=0;j<hej.length;j++){
+							ui.discardPile.appendChild(hej[j]);
+						}
+						game.players[i].hp=game.players[i].maxHp;
+						game.players[i].classList.remove('turnedover');
+						game.players[i].removeLink();
+						game.players[i].directgain(get.cards(4));
+					}
+					var dead=game.dead.slice(0);
+					for(var i=0;i<dead.length;i++){
+						if(!dead[i].side&&dead[i].maxHp>0){
+							dead[i].revive(dead[i].maxHp);
+							dead[i].directgain(get.cards(4));
+						}
+					}
+					'step 4'
 					while(_status.event.name!='phaseLoop'){
 						_status.event=_status.event.parent;
 					}
@@ -1072,6 +1090,8 @@ game.import('mode',function(){
 					_status.event.player=game.boss;
 					_status.event.step=0;
 					_status.roundStart=game.boss;
+					game.phaseNumber=0;
+					game.roundNumber=0;
 					if(game.bossinfo){
 						game.bossinfo.loopType=1;
 					}
@@ -1112,6 +1132,25 @@ game.import('mode',function(){
 					game.changeBoss('boss_yanling',game.boss.previousSeat);
 					game.changeBoss('boss_huoshenzhurong',game.boss.nextSeat);
 					'step 3'
+					for(var i=0;i<game.players.length;i++){
+						game.players[i].removeEquipTrigger();
+						var hej=game.players[i].get('hej');
+						for(var j=0;j<hej.length;j++){
+							ui.discardPile.appendChild(hej[j]);
+						}
+						game.players[i].hp=game.players[i].maxHp;
+						game.players[i].classList.remove('turnedover');
+						game.players[i].removeLink();
+						game.players[i].directgain(get.cards(4));
+					}
+					var dead=game.dead.slice(0);
+					for(var i=0;i<dead.length;i++){
+						if(!dead[i].side&&dead[i].maxHp>0){
+							dead[i].revive(dead[i].maxHp);
+							dead[i].directgain(get.cards(4));
+						}
+					}
+					'step 4'
 					while(_status.event.name!='phaseLoop'){
 						_status.event=_status.event.parent;
 					}
@@ -1119,6 +1158,9 @@ game.import('mode',function(){
 					_status.paused=false;
 					_status.event.player=game.boss;
 					_status.event.step=0;
+					_status.roundStart=game.boss;
+					game.phaseNumber=0;
+					game.roundNumber=0;
 				}
 			},
 			boss_qingmu:{
@@ -1174,6 +1216,25 @@ game.import('mode',function(){
 					game.addBossFellow(game.me==game.boss?1:5,'boss_shujing');
 					game.addBossFellow(7,'boss_shujing');
 					'step 3'
+					for(var i=0;i<game.players.length;i++){
+						game.players[i].removeEquipTrigger();
+						var hej=game.players[i].get('hej');
+						for(var j=0;j<hej.length;j++){
+							ui.discardPile.appendChild(hej[j]);
+						}
+						game.players[i].hp=game.players[i].maxHp;
+						game.players[i].classList.remove('turnedover');
+						game.players[i].removeLink();
+						game.players[i].directgain(get.cards(4));
+					}
+					var dead=game.dead.slice(0);
+					for(var i=0;i<dead.length;i++){
+						if(!dead[i].side&&dead[i].maxHp>0){
+							dead[i].revive(dead[i].maxHp);
+							dead[i].directgain(get.cards(4));
+						}
+					}
+					'step 4'
 					while(_status.event.name!='phaseLoop'){
 						_status.event=_status.event.parent;
 					}
@@ -1182,6 +1243,8 @@ game.import('mode',function(){
 					_status.event.player=game.boss;
 					_status.event.step=0;
 					_status.roundStart=game.boss;
+					game.phaseNumber=0;
+					game.roundNumber=0;
 					if(game.bossinfo){
 						game.bossinfo.loopType=1;
 					}
@@ -1222,6 +1285,25 @@ game.import('mode',function(){
 					game.changeBoss('boss_shujing',game.boss.previousSeat);
 					game.changeBoss('boss_mushengoumang',game.boss.nextSeat);
 					'step 3'
+					for(var i=0;i<game.players.length;i++){
+						game.players[i].removeEquipTrigger();
+						var hej=game.players[i].get('hej');
+						for(var j=0;j<hej.length;j++){
+							ui.discardPile.appendChild(hej[j]);
+						}
+						game.players[i].hp=game.players[i].maxHp;
+						game.players[i].classList.remove('turnedover');
+						game.players[i].removeLink();
+						game.players[i].directgain(get.cards(4));
+					}
+					var dead=game.dead.slice(0);
+					for(var i=0;i<dead.length;i++){
+						if(!dead[i].side&&dead[i].maxHp>0){
+							dead[i].revive(dead[i].maxHp);
+							dead[i].directgain(get.cards(4));
+						}
+					}
+					'step 4'
 					while(_status.event.name!='phaseLoop'){
 						_status.event=_status.event.parent;
 					}
@@ -1229,6 +1311,9 @@ game.import('mode',function(){
 					_status.paused=false;
 					_status.event.player=game.boss;
 					_status.event.step=0;
+					_status.roundStart=game.boss;
+					game.phaseNumber=0;
+					game.roundNumber=0;
 				}
 			},
 			boss_shenyi:{

@@ -19129,7 +19129,7 @@
 					}
 					_status.currentPhase=player;
 					game.phaseNumber++;
-					if(player==_status.roundStart&&!event.skill){
+					if(player==_status.roundStart&&!trigger.skill){
 						game.roundNumber++;
 					}
                     game.syncState();
