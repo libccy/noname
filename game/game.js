@@ -11943,6 +11943,12 @@
 					for(var i in player.tempSkills){
                         player.removeSkill(i);
 					}
+					var skills=player.getSkills();
+					for(var i=0;i<skills.length;i++){
+						if(lib.skill[skills[i]].temp){
+							player.removeSkill(skills[i]);
+						}
+					}
                     player.removeEquipTrigger();
                     // for(var i in lib.skill.globalmap){
                     //     if(lib.skill.globalmap[i].contains(player)){

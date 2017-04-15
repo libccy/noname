@@ -1664,21 +1664,35 @@ game.import('mode',function(){
 						content:function(){
 							'step 0'
 							player.loseHp();
+							player.storage.boss_buchun=game.roundNumber;
 							'step 1'
+							event.targets=[];
 							var dead=game.dead.slice(0);
 							for(var i=0;i<dead.length;i++){
 								if(dead[i].parentNode==player.parentNode&&dead[i].name=='boss_shujing'){
-									dead[i].revive(1);
-									dead[i].draw(2);
-									player.line(dead[i],'green');
+									event.targets.push(dead[i]);
 								}
 							}
-							player.storage.boss_buchun=game.roundNumber;
+							if(event.targets[0]==player.previousSeat){
+								event.targets.push(event.targets.shift());
+							}
+							'step 2'
+							if(event.targets.length){
+								var target=event.targets.shift();
+								player.line(target,'green');
+								target.revive(1);
+								target.draw(2,false);
+								target.$draw(2);
+								event.redo();
+							}
+							'step 3'
+							game.delay();
 						},
 						ai:{
 							order:6,
 							result:{
 								player:function(player,target){
+									if(player.hp<=1) return 0;
 									if(player.hp<=3&&game.hasPlayer(function(current){
 										return current.name=='boss_shujing'&&current.hp==1;
 									})){
@@ -1691,7 +1705,12 @@ game.import('mode',function(){
 									}
 									if(player.hp>=3) return 1;
 									if(player.hp>=2&&player!=game.boss) return 1;
-									return 0;
+									if(game.hasPlayer(function(current){
+										return current.name=='boss_shujing';
+									})){
+										return 0;
+									}
+									return 1;
 								}
 							}
 						}
@@ -1754,6 +1773,7 @@ game.import('mode',function(){
 				forced:true,
 				mark:true,
 				nopop:true,
+				temp:true,
 				intro:{
 					content:'锁定技，回合开始时，你进行判定，若结果不为红桃，你受到1点无来源的伤害，若结果不为黑桃，你失去此技能'
 				},
@@ -1774,7 +1794,85 @@ game.import('mode',function(){
 					}
 				}
 			},
-			boss_qingyi:{},
+			boss_qingyi:{
+				trigger:{player:'phaseBegin'},
+				forced:true,
+				filter:function(event,player){
+					return [3,5,7].contains(game.roundNumber);
+				},
+				content:function(){
+					'step 0'
+					if(game.roundNumber==7){
+						var goumang,shujing;
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i].name=='boss_mushengoumang'){
+								goumang=game.players[i];
+							}
+							if(game.players[i].name=='boss_shujing'){
+								shujing=game.players[i];
+							}
+						}
+						if(!goumang||!shujing){
+							for(var i=0;i<game.dead.length;i++){
+								if(game.dead[i].parentNode!=player.parentNode) continue;
+								if(game.dead[i].name=='boss_mushengoumang'){
+									goumang=game.dead[i];
+								}
+								if(game.dead[i].name=='boss_shujing'){
+									shujing=game.dead[i];
+								}
+							}
+						}
+						event.targets=[];
+						if(goumang){
+							event.targets.push(goumang);
+						}
+						if(shujing){
+							event.targets.push(shujing);
+						}
+						event.command='revive';
+					}
+					else if(game.roundNumber==5){
+						event.targets=game.filterPlayer(function(current){
+							return current.isEnemyOf(player);
+						}).sortBySeat();
+						event.command='loseHp';
+					}
+					else{
+						event.targets=game.filterPlayer(function(current){
+							return current.isFriendOf(player);
+						}).sortBySeat();
+						event.command='recover';
+					}
+					'step 1'
+					if(event.targets.length){
+						var target=event.targets.shift();
+						player.line(target,'green');
+						if(event.command=='revive'){
+							player.line(target,'green');
+							if(target.isDead()){
+								target.maxHp++;
+								target.revive(3);
+							}
+							else{
+								target.gainMaxHp();
+								target.recover(3);
+							}
+							target.draw(3,false);
+							target.$draw(3);
+							event.delay=true;
+						}
+						else{
+							target[event.command]();
+						}
+						event.redo();
+					}
+					'step 2'
+					if(event.delay){
+						game.delay();
+					}
+				}
+			},
 			boss_qizuo:{
 				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
