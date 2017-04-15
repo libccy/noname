@@ -2420,7 +2420,7 @@ game.import('mode',function(){
     					for(var j in selected){
     						selected[j].length=0;
     					}
-    					event.removeCharacter.style.opacity=0.5;
+                        event.removeCharacter.classList.add('disabled');
     				}
     				event.enterArena=ui.create.control('竞技场','nozoom',function(){
     					if(game.data.money<150&&!game.data._arena) return;
@@ -2478,7 +2478,8 @@ game.import('mode',function(){
     								ui.money.childNodes[1].innerHTML=game.data.dust;
     								game.changeMoney(-100);
     								if(game.data.character.length>3&&selected.character.length){
-    									event.removeCharacter.style.opacity=1;
+                                        event.removeCharacter.animate('controlpressdownx',500);
+                                        event.removeCharacter.classList.remove('disabled');
     								}
     								if(game.data.money<150&&!game.data._arena){
                                         event.enterArena.classList.add('disabled');
@@ -2578,7 +2579,7 @@ game.import('mode',function(){
     					}
     				};
     				event.removeCharacter=ui.create.control('遣返','nozoom',qianfan);
-    				event.removeCharacter.style.opacity=0.5;
+                    event.removeCharacter.classList.add('disabled');
     				event.fight=ui.create.control('开始战斗','nozoom',function(){
     					if(_status.kaibao||_status.qianfan) return;
     					if(selected.challenge.length){
@@ -2803,10 +2804,11 @@ game.import('mode',function(){
     						}
     					}
     					if(selected.character.length&&game.data.character.length>3){
-    						event.removeCharacter.style.opacity=1;
+                            event.removeCharacter.animate('controlpressdownx',500);
+                            event.removeCharacter.classList.remove('disabled');
     					}
     					else{
-    						event.removeCharacter.style.opacity=0.5;
+                            event.removeCharacter.classList.add('disabled');
     					}
     				};
     				event.custom.add.window=function(){
