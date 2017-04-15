@@ -3134,11 +3134,11 @@
 							if(node._clearing){
 								var noname_inited=localStorage.getItem('noname_inited');
 				                localStorage.clear();
-								game.deleteDB('config');
-								game.deleteDB('data');
 								if(noname_inited){
 									localStorage.setItem('noname_inited',noname_inited);
 								}
+								game.deleteDB('config');
+								game.deleteDB('data');
 								game.reload();
 								return;
 							}
@@ -6676,8 +6676,11 @@
 										 window.location.reload();
 									 }
 									 else if(index==3){
+										var noname_inited=localStorage.getItem('noname_inited');
 										localStorage.clear();
-										localStorage.setItem('noname_inited',true);
+										if(noname_inited){
+											localStorage.setItem('noname_inited',true);
+										}
 										if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
 										setTimeout(function(){
 											window.location.reload();
