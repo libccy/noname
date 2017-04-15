@@ -142,7 +142,7 @@ game.import('card',function(){
 					return 0;
 				},
 				effect:function(){
-					if(result.judge){
+					if(result.bool==false){
 						if(!card.storage.fulei){
 							card.storage.fulei=1;
 						}

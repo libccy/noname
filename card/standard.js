@@ -1171,7 +1171,7 @@ game.import('card',function(){
 					return 0;
 				},
 				effect:function(){
-					if(result.judge){
+					if(result.bool==false){
 						player.damage(3,'thunder','nosource');
 					}
 					else{

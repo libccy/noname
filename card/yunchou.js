@@ -734,7 +734,7 @@ game.import('card',function(){
 					return 0;
 				},
 				effect:function(){
-					if(result.judge){
+					if(result.bool==false){
 						player.damage(2,'fire','nosource');
 						var players=game.filterPlayer(function(current){
 							return get.distance(player,current)<=1&&player!=current;
@@ -787,7 +787,7 @@ game.import('card',function(){
 				},
 				fullskin:true,
 				effect:function(){
-					if(result.judge){
+					if(result.bool==false){
 						if(player.countCards('he')==0) player.loseHp();
 						else{
 							player.discard(player.getCards('he').randomGets(3));

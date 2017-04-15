@@ -9113,6 +9113,7 @@
 						}
 					}
 					else{
+						game.checkMod(player,result,'phaseJudge',player);
 						var next=game.createEvent(name);
 						next.setContent(lib.card[name].effect);
 						next._result=result;
