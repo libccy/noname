@@ -35359,7 +35359,7 @@
 					ui.handcards2=game.me.node.handcards2;
 					ui.handcards1Container.appendChild(ui.handcards1);
 					ui.handcards2Container.appendChild(ui.handcards2);
-					ui.updatehl();
+					// ui.updatehl();
                 }
 				else if(game.players.length){
 					game.me=game.players[0];
@@ -35367,7 +35367,7 @@
 					ui.handcards2=game.me.node.handcards2;
 					ui.handcards1Container.appendChild(ui.handcards1);
 					ui.handcards2Container.appendChild(ui.handcards2);
-					ui.updatehl();
+					// ui.updatehl();
 				}
 			},
 			card:function(position,info,noclick){
