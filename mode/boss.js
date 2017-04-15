@@ -1141,8 +1141,8 @@ game.import('mode',function(){
 					game.changeBoss('boss_yandi');
 					game.delay(0.5);
 					'step 2'
-					game.changeBoss('boss_yanling',game.boss.previousSeat);
-					game.changeBoss('boss_huoshenzhurong',game.boss.nextSeat);
+					game.changeBoss('boss_huoshenzhurong',game.boss.previousSeat);
+					game.changeBoss('boss_yanling',game.boss.nextSeat);
 					'step 3'
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].side) continue;
@@ -1302,8 +1302,8 @@ game.import('mode',function(){
 					game.changeBoss('boss_taihao');
 					game.delay(0.5);
 					'step 2'
-					game.changeBoss('boss_shujing',game.boss.previousSeat);
-					game.changeBoss('boss_mushengoumang',game.boss.nextSeat);
+					game.changeBoss('boss_mushengoumang',game.boss.previousSeat);
+					game.changeBoss('boss_shujing',game.boss.nextSeat);
 					'step 3'
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].side) continue;
