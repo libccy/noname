@@ -12931,12 +12931,6 @@
 					if(!_status.video){
 						game.addVideo('update',this,[this.countCards('h'),this.hp,this.maxHp,this.hujia]);
 					}
-					if(this.node.jiu&&!this.hasSkill('jiu')){
-						this.node.jiu.delete();
-						this.node.jiu2.delete();
-						delete this.node.jiu;
-						delete this.node.jiu2;
-					}
 					this.updateMarks();
 					return this;
 				},

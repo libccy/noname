@@ -2187,12 +2187,6 @@ game.import('character',function(){
     				if(player.hasSkill('jiu')){
     					game.broadcastAll(function(player){
     						player.removeSkill('jiu');
-    						if(player.node.jiu){
-    							player.node.jiu.delete();
-    							player.node.jiu2.delete();
-    							delete player.node.jiu;
-    							delete player.node.jiu2;
-    						}
     					},player);
     					event.jiu=true;
     				}

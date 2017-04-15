@@ -1064,6 +1064,7 @@ game.import('mode',function(){
 					game.addBossFellow(7,'boss_yanling');
 					'step 3'
 					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].side) continue;
 						game.players[i].removeEquipTrigger();
 						var hej=game.players[i].get('hej');
 						for(var j=0;j<hej.length;j++){
@@ -1133,6 +1134,7 @@ game.import('mode',function(){
 					game.changeBoss('boss_huoshenzhurong',game.boss.nextSeat);
 					'step 3'
 					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].side) continue;
 						game.players[i].removeEquipTrigger();
 						var hej=game.players[i].get('hej');
 						for(var j=0;j<hej.length;j++){
@@ -1217,6 +1219,7 @@ game.import('mode',function(){
 					game.addBossFellow(7,'boss_shujing');
 					'step 3'
 					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].side) continue;
 						game.players[i].removeEquipTrigger();
 						var hej=game.players[i].get('hej');
 						for(var j=0;j<hej.length;j++){
@@ -1286,6 +1289,7 @@ game.import('mode',function(){
 					game.changeBoss('boss_mushengoumang',game.boss.nextSeat);
 					'step 3'
 					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].side) continue;
 						game.players[i].removeEquipTrigger();
 						var hej=game.players[i].get('hej');
 						for(var j=0;j<hej.length;j++){
@@ -1341,7 +1345,12 @@ game.import('mode',function(){
 					game.log(player,'取消了翻面');
 				},
 				ai:{
-					noturn:true
+					noturn:true,
+					effect:{
+						target:function(card,player,target){
+							if(get.type(card)=='delay') return 0.5;
+						}
+					}
 				}
 			},
 			honghuangzhili:{
@@ -1367,7 +1376,28 @@ game.import('mode',function(){
 					player.removeSkill('honghuangzhili');
 				}
 			},
-			boss_shenen:{},
+			boss_shenen:{
+				mode:['boss'],
+				global:'boss_shenen2'
+			},
+			boss_shenen2:{
+				mod:{
+					targetInRange:function(card,player){
+						if(player.side) return true;
+					},
+					maxHandcard:function(player,num){
+						if(!player.side) return num+1;
+					}
+				},
+				trigger:{player:'phaseDrawBegin'},
+				forced:true,
+				filter:function(event,player){
+					return !player.side;
+				},
+				content:function(){
+					trigger.num++;
+				}
+			},
 			boss_fentian:{
 				trigger:{source:'damageBegin'},
 				forced:true,
@@ -1457,7 +1487,10 @@ game.import('mode',function(){
 				ai:{
 					order:6,
 					result:{
-						player:1
+						target:function(player,target){
+							if(target.isLinked()&&player.isLinked()&&ai.get.damageEffect(player,player,player,'fire')<0) return -1;
+							return 1;
+						}
 					}
 				}
 			},
@@ -1473,16 +1506,26 @@ game.import('mode',function(){
 					effect:{
 						target:function(card,player,target){
 							if(!game.boss) return;
+							if(card.name=='tiesuo'){
+								if(_status.event.player==game.boss) return 'zeroplayertarget';
+								return 0.5;
+							}
 							if(get.tag(card,'damage')||get.tag(card,'recover')){
-								if(!game.boss.isLinked()||game.hasPlayer(function(current){
-									return current.isEnemyOf(game.boss)&&current.isLinked();
-								})){
-									if(target.isDying()){
-										if(player.isEnemyOf(target)) return [0,0,0,1];
-										return 'zeroplayertarget';
+								if(game.boss.isLinked()&&ai.get.damageEffect(game.boss,player,game.boss,'fire')<0){
+									if(game.hasPlayer(function(current){
+										return current.isEnemyOf(game.boss)&&current.isLinked();
+									})){
+										return;
 									}
-									return -0.5;
+									if(get.tag(card,'natureDamage')&&target.isLinked()){
+										return;
+									}
 								}
+								if(target.isDying()){
+									if(player.isEnemyOf(target)&&player.hp>=-1) return [0,0,0,1];
+									return 'zeroplayertarget';
+								}
+								return -0.5;
 							}
 						}
 					}
@@ -1538,7 +1581,56 @@ game.import('mode',function(){
 					save:true,
 				}
 			},
-			boss_chiyi:{},
+			boss_chiyi:{
+				trigger:{player:'phaseBegin'},
+				forced:true,
+				filter:function(event,player){
+					return [3,5,7].contains(game.roundNumber);
+				},
+				content:function(){
+					'step 0'
+					if(game.roundNumber==3){
+						var enemies=game.filterPlayer(function(current){
+							return current.isEnemyOf(player);
+						});
+						player.line(enemies,'green');
+						for(var i=0;i<enemies.length;i++){
+							enemies[i].addSkill('boss_chiyi2');
+						}
+						event.finish();
+					}
+					else if(game.roundNumber==5){
+						event.targets=game.filterPlayer().sortBySeat();
+						event.num=1;
+					}
+					else{
+						event.targets=game.filterPlayer(function(current){
+							return current.name=='boss_yanling';
+						}).sortBySeat();
+						event.num=5;
+					}
+					'step 1'
+					if(event.targets.length){
+						var target=event.targets.shift();
+						player.line(target,'fire');
+						target.damage(event.num,'fire');
+						event.redo();
+					}
+				}
+			},
+			boss_chiyi2:{
+				mark:true,
+				marktext:'赤',
+				intro:{
+					content:'受到的伤害+1'
+				},
+				trigger:{player:'damageBegin'},
+				forced:true,
+				popup:false,
+				content:function(){
+					trigger.num++;
+				}
+			},
 			boss_buchun:{},
 			boss_shenbuchun:{},
 			boss_cuidu:{},
@@ -4379,6 +4471,7 @@ game.import('mode',function(){
 			boss_furan2:'复燃',
 			boss_furan_info:'当你濒死时，所有敌方角色视为可以将红色牌当【桃】对你使用',
 			boss_chiyi:'赤仪',
+			boss_chiyi2:'赤仪',
 			boss_chiyi_info:'锁定技，从第三轮开始，敌方角色受到的伤害+1；第五轮开始时，你对所有角色各造成1点火焰伤害；第七轮开始时，你对焰灵造成5点火焰伤害',
 			boss_buchun:'布春',
 			boss_buchun_info:'每两轮限一次，出牌阶段，若场上有死亡的树精，你可以失去1点体力，复活所有树精，使其回复体力至1点，补充手牌至两张；若场上没有死亡的树精，你可以为一名己方角色回复2点体力',

@@ -381,6 +381,14 @@ game.import('card',function(){
 					trigger.num++;
 				},
 				temp:true,
+				onremove:function(player){
+					if(player.node.jiu){
+						player.node.jiu.delete();
+						player.node.jiu2.delete();
+						delete player.node.jiu;
+						delete player.node.jiu2;
+					}
+				},
 				group:'jiu2'
 			},
 			jiu2:{
@@ -396,12 +404,6 @@ game.import('card',function(){
 				content:function(){
 					game.broadcastAll(function(player){
 						player.removeSkill('jiu');
-						if(player.node.jiu){
-							player.node.jiu.delete();
-							player.node.jiu2.delete();
-							delete player.node.jiu;
-							delete player.node.jiu2;
-						}
 					},player);
 				},
 			},
