@@ -6474,6 +6474,11 @@
 
 
 					window.game=game;
+					window.lib=lib;
+					window.ui=ui;
+					window.ai=ai;
+					window.get=get;
+					window._status=_status;
 					var styleToLoad=6;
 					var styleLoaded=function(){
 						styleToLoad--;
@@ -6922,16 +6927,21 @@
 					var character=lib.imported.character;
 					var play=lib.imported.play;
 					delete window.game;
+					delete window.ui;
+					delete window.get;
+					delete window.ai;
+					delete window.lib;
+					delete window._status;
 					var i,j,k;
 					for(i in mode[lib.config.mode].element){
 						if(!lib.element[i]) lib.element[i]=[];
 						for(j in mode[lib.config.mode].element[i]){
 							if(j=='init'){
 								if(!lib.element[i].inits) lib.element[i].inits=[];
-								lib.element[i].inits.push(lib.init.eval(mode[lib.config.mode].element[i][j]));
+								lib.element[i].inits.push(mode[lib.config.mode].element[i][j]);
 							}
 							else{
-								lib.element[i][j]=lib.init.eval(mode[lib.config.mode].element[i][j]);
+								lib.element[i][j]=mode[lib.config.mode].element[i][j];
 							}
 						}
 					}
@@ -6939,32 +6949,32 @@
 						if(typeof mode[lib.config.mode].ai[i]=='object'){
 							if(ai[i]==undefined) ai[i]={};
 							for(j in mode[lib.config.mode].ai[i]){
-								ai[i][j]=lib.init.eval(mode[lib.config.mode].ai[i][j]);
+								ai[i][j]=mode[lib.config.mode].ai[i][j];
 							}
 						}
 						else{
-							ai[i]=lib.init.eval(mode[lib.config.mode].ai[i]);
+							ai[i]=mode[lib.config.mode].ai[i];
 						}
 					}
 					for(i in mode[lib.config.mode].ui){
 						if(typeof mode[lib.config.mode].ui[i]=='object'){
 							if(ui[i]==undefined) ui[i]={};
 							for(j in mode[lib.config.mode].ui[i]){
-								ui[i][j]=lib.init.eval(mode[lib.config.mode].ui[i][j]);
+								ui[i][j]=mode[lib.config.mode].ui[i][j];
 							}
 						}
 						else{
-							ui[i]=lib.init.eval(mode[lib.config.mode].ui[i]);
+							ui[i]=mode[lib.config.mode].ui[i];
 						}
 					}
 					for(i in mode[lib.config.mode].game){
-						game[i]=lib.init.eval(mode[lib.config.mode].game[i]);
+						game[i]=mode[lib.config.mode].game[i];
 					}
 					for(i in mode[lib.config.mode].get){
-						get[i]=lib.init.eval(mode[lib.config.mode].get[i]);
+						get[i]=mode[lib.config.mode].get[i];
 					}
 					lib.init.start=mode[lib.config.mode].start;
-					lib.init.startBefore=lib.init.eval(mode[lib.config.mode].startBefore);
+					lib.init.startBefore=mode[lib.config.mode].startBefore;
 					if(game.onwash){
 						lib.onwash.push(game.onwash);
 						delete game.onwash;
@@ -6990,11 +7000,11 @@
 						if(i=='startBefore') continue;
 						if(lib[i]==undefined) lib[i]=(get.objtype(mode[lib.config.mode][i])=='array')?[]:{};
 						for(j in mode[lib.config.mode][i]){
-							lib[i][j]=lib.init.eval(mode[lib.config.mode][i][j]);
+							lib[i][j]=mode[lib.config.mode][i][j];
 						}
 					}
                     if(typeof mode[lib.config.mode].init=='function'){
-                        (lib.init.eval(mode[lib.config.mode].init))();
+                        mode[lib.config.mode].init();
                     }
 
                     var connectCharacterPack=[];
@@ -7037,7 +7047,7 @@
 								}
 								else{
 									if(lib[j][k]==undefined){
-										lib[j][k]=lib.init.eval(character[i][j][k]);
+										lib[j][k]=character[i][j][k];
 										if(j=='card'&&lib[j][k].derivation){
 											if(!lib.cardPack.mode_derivation){
 												lib.cardPack.mode_derivation=[k];
@@ -7100,7 +7110,7 @@
     								if(lib.config.cards.contains(i)){
     									var pile;
     									if(typeof card[i][j]=='function'){
-    										pile=lib.init.eval(card[i][j])();
+    										pile=card[i][j]();
     									}
     									else{
     										pile=card[i][j];
@@ -7131,7 +7141,7 @@
 										lib[j][k+'_card_config']=card[i][j][k];
 									}
 									else{
-										if(lib[j][k]==undefined) lib[j][k]=lib.init.eval(card[i][j][k]);
+										if(lib[j][k]==undefined) lib[j][k]=card[i][j][k];
 										else console.log('dublicate '+j+' in card '+i+':\n'+k+'\n'+lib[j][k]+'\n'+card[i][j][k]);
                                         if(j=='card'&&lib[j][k].derivation){
 											if(!lib.cardPack.mode_derivation){
@@ -7169,10 +7179,10 @@
     							for(k in play[i].element[j]){
     								if(k=='init'){
     									if(!lib.element[j].inits) lib.element[j].inits=[];
-    									lib.element[j].inits.push(lib.init.eval(play[i].element[j][k]));
+    									lib.element[j].inits.push(play[i].element[j][k]);
     								}
     								else{
-    									lib.element[j][k]=lib.init.eval(play[i].element[j][k]);
+    									lib.element[j][k]=play[i].element[j][k];
     								}
     							}
     						}
@@ -7180,18 +7190,18 @@
     							if(typeof play[i].ui[j]=='object'){
     								if(ui[j]==undefined) ui[j]={};
     								for(k in play[i].ui[j]){
-    									ui[j][k]=lib.init.eval(play[i].ui[j][k]);
+    									ui[j][k]=play[i].ui[j][k];
     								}
     							}
     							else{
-    								ui[j]=lib.init.eval(play[i].ui[j]);
+    								ui[j]=play[i].ui[j];
     							}
     						}
     						for(j in play[i].game){
-    							game[j]=lib.init.eval(play[i].game[j]);
+    							game[j]=play[i].game[j];
     						}
     						for(j in play[i].get){
-    							get[j]=lib.init.eval(play[i].get[j]);
+    							get[j]=play[i].get[j];
     						}
     						for(j in play[i]){
     							if(j=='mode'||j=='forbid'||j=='init'||j=='element'||
@@ -7204,11 +7214,11 @@
     									if(lib[j][k]!=undefined){
     										console.log('dublicate '+j+' in play '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+play[i][j][k]);
     									}
-    									lib[j][k]=lib.init.eval(play[i][j][k]);
+    									lib[j][k]=play[i][j][k];
     								}
     							}
     						}
-    						if(typeof play[i].init=='function') (lib.init.eval(play[i].init))();
+    						if(typeof play[i].init=='function') play[i].init();
     						if(typeof play[i].arenaReady=='function') lib.arenaReady.push(play[i].arenaReady);
     					}
                     }
@@ -8668,9 +8678,12 @@
     			},
                 loadMode:function(){
     				'step 0'
+					event.removegame=window.game!=game;
+					if(event.removegame) window.game=game;
     				lib.init.js(lib.assetURL+'mode',event.mode,game.resume);
     				game.pause();
     				'step 1'
+					if(event.removegame) delete window.game;
     				event.result=lib.imported.mode[event.mode];
     				delete lib.imported.mode[event.mode];
     			},
@@ -20785,9 +20798,10 @@
 				if(!lib.imported[type]){
 					lib.imported[type]={};
 				}
-				if(content.name){
-					lib.imported[type][content.name]=content;
-					delete content.name;
+				var content2=content();
+				if(content2.name){
+					lib.imported[type][content2.name]=content2;
+					delete content2.name;
 				}
 			}
 		},
@@ -24751,7 +24765,10 @@
 			return players[0];
 		},
         loadModeAsync:function(name,callback){
+			var removegame=window.game!=game;
+			if(removegame) window.game=game;
             var script=lib.init.js(lib.assetURL+'mode',name,function(){
+				if(removegame) delete window.game;
                 script.remove();
 				var content=lib.imported.mode[name];
 				delete lib.imported.mode[name];
@@ -24769,7 +24786,10 @@
 					}
 				}
 			}
+			var removegame=window.game!=game;
+			if(removegame) window.game=game;
             var script=lib.init.js(lib.assetURL+'mode',name,function(){
+				if(removegame) delete window.game;
                 script.remove();
                 var mode=lib.imported.mode;
                 _status.sourcemode=lib.config.mode;
