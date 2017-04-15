@@ -768,6 +768,7 @@ game.import('mode',function(){
 						event.dialogxx.classList.add('withbg');
 						event.dialogxx.classList.add('fixed');
 						if(ui.cheat2){
+							ui.cheat2.animate('controlpressdownx',500);
 							ui.cheat2.classList.remove('disabled');
 						}
 					};
@@ -791,6 +792,7 @@ game.import('mode',function(){
 								game.uncheck();
 								game.check();
 								if(ui.cheat){
+                                    ui.cheat.animate('controlpressdownx',500);
 									ui.cheat.classList.remove('disabled');
 								}
 							}
