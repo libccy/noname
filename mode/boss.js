@@ -959,7 +959,15 @@ game.import('mode',function(){
 			},
 			boss_chiyan2:{
 				mode:['boss'],
-				global:'boss_chiyan2x'
+				global:'boss_chiyan2x',
+				trigger:{player:'dieBegin'},
+				forced:true,
+				popup:false,
+				silent:true,
+				content:function(){
+					player.hide();
+					game.addVideo('hidePlayer',player);
+				}
 			},
 			boss_chiyan2x:{
 				trigger:{global:'dieAfter'},
@@ -1006,7 +1014,19 @@ game.import('mode',function(){
 			},
 			boss_chiyan3:{
 				mode:['boss'],
-				global:'boss_chiyan3x'
+				global:'boss_chiyan3x',
+				trigger:{player:'dieBegin'},
+				forced:true,
+				popup:false,
+				silent:true,
+				content:function(){
+					player.hide();
+					player.nextSeat.hide();
+					player.previousSeat.hide();
+					game.addVideo('hidePlayer',player);
+					game.addVideo('hidePlayer',player.nextSeat);
+					game.addVideo('hidePlayer',player.previousSeat);
+				}
 			},
 			boss_chiyan3x:{
 				trigger:{global:'dieAfter'},
@@ -1022,8 +1042,6 @@ game.import('mode',function(){
 					game.delay();
 					'step 1'
 					game.changeBoss('boss_yandi');
-					game.boss.nextSeat.hide();
-					game.boss.previousSeat.hide();
 					game.delay(0.5);
 					'step 2'
 					game.changeBoss('boss_yanling',game.boss.previousSeat);
@@ -1051,7 +1069,15 @@ game.import('mode',function(){
 			},
 			boss_qingmu2:{
 				mode:['boss'],
-				global:'boss_qingmu2x'
+				global:'boss_qingmu2x',
+				trigger:{player:'dieBegin'},
+				forced:true,
+				popup:false,
+				silent:true,
+				content:function(){
+					player.hide();
+					game.addVideo('hidePlayer',player);
+				}
 			},
 			boss_qingmu2x:{
 				trigger:{global:'dieAfter'},
@@ -1098,7 +1124,19 @@ game.import('mode',function(){
 			},
 			boss_qingmu3:{
 				mode:['boss'],
-				global:'boss_qingmu3x'
+				global:'boss_qingmu3x',
+				trigger:{player:'dieBegin'},
+				forced:true,
+				popup:false,
+				silent:true,
+				content:function(){
+					player.hide();
+					player.nextSeat.hide();
+					player.previousSeat.hide();
+					game.addVideo('hidePlayer',player);
+					game.addVideo('hidePlayer',player.nextSeat);
+					game.addVideo('hidePlayer',player.previousSeat);
+				}
 			},
 			boss_qingmu3x:{
 				trigger:{global:'dieAfter'},
@@ -1114,8 +1152,6 @@ game.import('mode',function(){
 					game.delay();
 					'step 1'
 					game.changeBoss('boss_taihao');
-					game.boss.nextSeat.hide();
-					game.boss.previousSeat.hide();
 					game.delay(0.5);
 					'step 2'
 					game.changeBoss('boss_shujing',game.boss.previousSeat);
@@ -2266,7 +2302,15 @@ game.import('mode',function(){
 			},
 			boss_bianshen2:{
 				mode:['boss'],
-				global:'boss_bianshen2x'
+				global:'boss_bianshen2x',
+				trigger:{player:'dieBegin'},
+				forced:true,
+				popup:false,
+				silent:true,
+				content:function(){
+					player.hide();
+					game.addVideo('hidePlayer',player);
+				}
 			},
 			boss_bianshen2x:{
 				trigger:{global:'dieAfter'},
@@ -2286,7 +2330,15 @@ game.import('mode',function(){
 			},
 			boss_bianshen3:{
 				mode:['boss'],
-				global:'boss_bianshen3x'
+				global:'boss_bianshen3x',
+				trigger:{player:'dieBegin'},
+				forced:true,
+				popup:false,
+				silent:true,
+				content:function(){
+					player.hide();
+					game.addVideo('hidePlayer',player);
+				}
 			},
 			boss_bianshen3x:{
 				trigger:{global:'dieAfter'},
@@ -2306,7 +2358,15 @@ game.import('mode',function(){
 			},
 			boss_bianshen4:{
 				mode:['boss'],
-				global:'boss_bianshen4x'
+				global:'boss_bianshen4x',
+				trigger:{player:'dieBegin'},
+				forced:true,
+				popup:false,
+				silent:true,
+				content:function(){
+					player.hide();
+					game.addVideo('hidePlayer',player);
+				}
 			},
 			boss_bianshen4x:{
 				trigger:{global:'dieAfter'},

@@ -21663,6 +21663,11 @@
 					console.log(num);
 				}
 			},
+			hidePlayer:function(player){
+				if(player){
+					player.hide();
+				}
+			},
 			hideCharacter:function(player,num){
 				if(player&&player.classList){
 					switch(num){
@@ -22244,7 +22249,7 @@
 				}
 			},
 			changeSeat:function(player,info){
-				if(player){
+				if(player&&player.getBoundingClientRect){
 					game.changeSeat(player,info);
 					game.playerMap={};
 					var players=game.players.concat(game.dead);
@@ -24588,6 +24593,7 @@
 			_status.dragline.length=0;
 		},
 		changeSeat:function(player,position){
+			game.addVideo('changeSeat',player,position);
 			var rect1=player.getBoundingClientRect();
 			player.style.transition='all 0s';
 			ui.refresh(player);
@@ -24599,7 +24605,6 @@
 				ui.refresh(player);
 				player.style.transform='';
 			},100);
-			game.addVideo('changeSeat',player,position);
 		},
 		swapSeat:function(player1,player2,prompt,behind){
 			if(behind){
