@@ -1530,7 +1530,7 @@ game.import('card',function(){
 							if(info.wuxieable) return true;
 							return false;
 						}
-						if(event.player.hasSkillTag('playernowuxie')) return false;
+						if(event.player.hasSkillTag('playernowuxie',false,event.card)) return false;
 						if(get.type(event.card)!='trick'&&!info.wuxieable) return false;
 					}
 					return true;

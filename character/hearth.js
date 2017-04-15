@@ -3924,6 +3924,7 @@ game.import('character',function(){
     				trigger.player.line(player,'thunder');
     				player.damage('nosource','thunder').animate=false;
     				player.$damage(trigger.player);
+                    player.$damagepop(-1,'thunder');
     				if(lib.config.animation&&!lib.config.low_performance){
     					player.$thunder();
     				}

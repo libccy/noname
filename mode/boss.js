@@ -1253,6 +1253,7 @@ game.import('mode',function(){
 				content:function(){
 					trigger.untrigger();
 					trigger.finish();
+					game.log(player,'取消了翻面');
 				},
 				ai:{
 					noturn:true
@@ -1285,6 +1286,9 @@ game.import('mode',function(){
 			boss_fentian:{
 				trigger:{source:'damageBegin'},
 				forced:true,
+				filter:function(event){
+					return event.nature!='fire';
+				},
 				content:function(){
 					trigger.nature='fire';
 				},
@@ -1295,10 +1299,160 @@ game.import('mode',function(){
 					targetInRange:function(card){
 						if(get.color(card)=='red') return true;
 					}
+				},
+				ai:{
+					playernowuxie:true,
+					skillTagFilter:function(player,tag,arg){
+						if(arg&&get.color(arg)=='red') return true;
+						return false;
+					}
+				},
+				global:'boss_fentian2'
+			},
+			boss_fentian2:{
+				mod:{
+					cardRespondable:function(card,player){
+						var evt=_status.event.parent;
+						if(evt.player&&evt.player.hasSkill('boss_fentian')&&
+							player!=evt.player&&evt.card&&get.color(evt.card)=='red'){
+							return false;
+						}
+					}
 				}
 			},
-			boss_xingxia:{},
-			boss_huihuo:{},
+			boss_xingxia:{
+				enable:'phaseUse',
+				mode:['boss'],
+				filter:function(event,player){
+					if(!game.hasPlayer(function(current){
+						return current.name=='boss_yanling';
+					})){
+						return false;
+					}
+					if(!player.storage.boss_xingxia){
+						return true;
+					}
+					return game.roundNumber-player.storage.boss_xingxia>=2;
+				},
+				filterTarget:function(card,player,target){
+					return target.name=='boss_yanling';
+				},
+				selectTarget:-1,
+				line:'fire',
+				content:function(){
+					target.damage(2,'fire');
+				},
+				contentAfter:function(){
+					'step 0'
+					player.storage.boss_xingxia=game.roundNumber;
+					player.chooseTarget(function(card,player,target){
+						return target.side!=player.side;
+					}).ai=function(target){
+						return ai.get.damageEffect(target,player,player,'fire');
+					}
+					'step 1'
+					if(result.bool){
+						event.target=result.targets[0];
+						player.line(event.target,'fire');
+						event.target.chooseToDiscard('he',{color:'red'},'弃置一张红色牌或受到一点火焰伤害').ai=function(card){
+							var player=_status.event.player;
+							var source=_status.event.parent.player;
+							if(ai.get.damageEffect(player,source,player,'fire')>=0) return 0;
+							return 8-ai.get.value(card);
+						}
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if(!result.bool){
+						event.target.damage('fire');
+					}
+				},
+				ai:{
+					order:6,
+					result:{
+						player:1
+					}
+				}
+			},
+			boss_huihuo:{
+				global:'boss_huihuo2',
+				mod:{
+    				cardUsable:function(card,player,num){
+    					if(card.name=='sha') return num+1;
+    				}
+    			},
+				ai:{
+					revertsave:true,
+					effect:{
+						target:function(card,player,target){
+							if(!game.boss) return;
+							if(get.tag(card,'damage')||get.tag(card,'recover')){
+								if(!game.boss.isLinked()||game.hasPlayer(function(current){
+									return current.isEnemyOf(game.boss)&&current.isLinked();
+								})){
+									if(target.isDying()){
+										if(player.isEnemyOf(target)) return [0,0,0,1];
+										return 'zeroplayertarget';
+									}
+									return -0.5;
+								}
+							}
+						}
+					}
+				}
+			},
+			boss_huihuo2:{
+				trigger:{global:'dieAfter'},
+				forced:true,
+				globalFixed:true,
+				filter:function(event,player){
+					return event.player.hasSkill('boss_huihuo')&&event.player.isDead()&&player.isEnemyOf(event.player);
+				},
+				content:function(){
+					trigger.player.line(player,'fire');
+					player.damage('nosource','fire',3).animate=false;
+					player.$damage(trigger.player);
+					player.$damagepop(-3,'fire');
+					if(lib.config.animation&&!lib.config.low_performance){
+						player.$fire();
+					}
+					if(!event.parent.parent.boss_huihuo_logv){
+						event.parent.parent.boss_huihuo_logv=true;
+						game.logv(trigger.player,'boss_huihuo',game.filterPlayer(),event.parent.parent);
+					}
+				}
+			},
+			boss_furan:{
+				global:'boss_furan2'
+			},
+			boss_furan2:{
+				enable:'chooseToUse',
+				filter:function(event,player){
+					return event.type=='dying'&&event.dying.hasSkill('boss_furan')&&player.isEnemyOf(event.dying);
+				},
+				filterCard:function(card){
+					return get.color(card)=='red';
+				},
+				position:'he',
+				viewAs:{name:'tao'},
+				prompt:'将一张红色牌当桃使用',
+				check:function(card){return 8-get.value(card)},
+				ai:{
+					order:5,
+					skillTagFilter:function(player){
+						var event=_status.event;
+						if(event.dying&&event.dying.hasSkill('boss_furan')&&player.isEnemyOf(event.dying)){
+							return player.countCards('he',{color:'red'})>0&&_status.currentPhase!=player;
+						}
+						else{
+							return false;
+						}
+					},
+					save:true,
+				}
+			},
 			boss_chiyi:{},
 			boss_buchun:{},
 			boss_shenbuchun:{},
@@ -2800,6 +2954,7 @@ game.import('mode',function(){
 					trigger.player.line(player,'fire');
 					player.damage('nosource','fire').animate=false;
 					player.$damage(trigger.player);
+					player.$damagepop(-1,'fire');
 					if(lib.config.animation&&!lib.config.low_performance){
 						player.$fire();
 					}
@@ -4136,6 +4291,7 @@ game.import('mode',function(){
 			boss_huihuo:'回火',
 			boss_huihuo_info:'锁定技，当你死亡时，你对所有敌方角色各造成3点火焰伤害；出牌阶段，你可以多使用一张【杀】',
 			boss_furan:'复燃',
+			boss_furan2:'复燃',
 			boss_furan_info:'当你濒死时，所有敌方角色视为可以将红色牌当【桃】对你使用',
 			boss_chiyi:'赤仪',
 			boss_chiyi_info:'锁定技，从第三轮开始，敌方角色受到的伤害+1；第五轮开始时，你对所有角色各造成1点火焰伤害；第七轮开始时，你对焰灵造成5点火焰伤害',

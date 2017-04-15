@@ -16131,6 +16131,7 @@
 						return false;
 					}
 					else if(lib.config.mode=='boss'){
+						if(me.side) return false;
 						return this.side==me.side&&get.config('single_control');
 					}
 					else if(game.chess){
@@ -19224,10 +19225,10 @@
                     }
                     event.acted.push(player);
 					var str=get.translation(trigger.player.name)+'濒死，是否帮助？<br><div class="text center" style="margin-top:10px">当前体力：'+trigger.player.hp+'</div>';
-					if(lib.config.tao_enemy&&event.dying.side!=player.side&&lib.config.mode!='identity'&&lib.config.mode!='guozhan'){
+					if(lib.config.tao_enemy&&event.dying.side!=player.side&&lib.config.mode!='identity'&&lib.config.mode!='guozhan'&&!event.dying.hasSkillTag('revertsave')){
 						event._result={bool:false}
 					}
-					else if(player.isOnline()||(_status.connectMode&&player==game.me)||player.hasSkillTag('save',true)||player.hasCard(function(card){
+					else if(player.isOnline()||(_status.connectMode&&player==game.me)||player.hasSkillTag('save',true,null,true)||player.hasCard(function(card){
                         var savable=get.info(card).savable;
                         if(typeof savable=='function') savable=savable(card,player,event.dying);
                         return savable;
