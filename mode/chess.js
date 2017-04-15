@@ -2481,10 +2481,11 @@ game.import('mode',function(){
     									event.removeCharacter.style.opacity=1;
     								}
     								if(game.data.money<150&&!game.data._arena){
-    									event.enterArena.style.opacity=0.5;
+                                        event.enterArena.classList.add('disabled');
     								}
     								else{
-    									event.enterArena.style.opacity=1;
+                                        event.enterArena.animate('controlpressdownx',500);
+                                        event.enterArena.classList.remove('disabled');
     								}
     								if(game.data.money<100){
     									event.addCharacter.style.opacity=0.5;
@@ -2499,7 +2500,7 @@ game.import('mode',function(){
     				};
     				event.addCharacter=ui.create.control('招募','nozoom',zhaomu2);
     				if(game.data.money<150&&!game.data._arena){
-    					event.enterArena.style.opacity=0.5;
+                        event.enterArena.classList.add('disabled');
     				}
     				if(game.data.money<100){
     					event.addCharacter.style.opacity=0.5;
@@ -2565,7 +2566,8 @@ game.import('mode',function(){
     								event.addCharacter.style.opacity=1;
     							}
     							if(game.data.money>=150){
-    								event.enterArena.style.opacity=1;
+                                    event.enterArena.animate('controlpressdownx',500);
+                                    event.enterArena.classList.remove('disabled');
     							}
     							node.delete();
     							dialog1.buttons.remove(node);
@@ -2842,10 +2844,11 @@ game.import('mode',function(){
     							event.addCharacter.style.opacity=0.5;
     						}
     						if(game.data.money>=150||game.data._arena){
-    							event.enterArena.style.opacity=1;
+                                event.enterArena.animate('controlpressdownx',500);
+                                event.enterArena.classList.remove('disabled');
     						}
     						else{
-    							event.enterArena.style.opacity=0.5;
+                                event.enterArena.classList.add('disabled');
     						}
     						event.fight.style.opacity=1;
     					}
