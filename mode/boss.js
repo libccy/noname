@@ -1028,6 +1028,9 @@ game.import('mode',function(){
 				forced:true,
 				popup:false,
 				silent:true,
+				filter:function(event,player){
+					return player==game.boss;
+				},
 				content:function(){
 					player.hide();
 					game.addVideo('hidePlayer',player);
@@ -1105,6 +1108,9 @@ game.import('mode',function(){
 				forced:true,
 				popup:false,
 				silent:true,
+				filter:function(event,player){
+					return player==game.boss;
+				},
 				content:function(){
 					player.hide();
 					player.nextSeat.hide();
@@ -1183,6 +1189,9 @@ game.import('mode',function(){
 				forced:true,
 				popup:false,
 				silent:true,
+				filter:function(event,player){
+					return player==game.boss;
+				},
 				content:function(){
 					player.hide();
 					game.addVideo('hidePlayer',player);
@@ -1260,6 +1269,9 @@ game.import('mode',function(){
 				forced:true,
 				popup:false,
 				silent:true,
+				filter:function(event,player){
+					return player==game.boss;
+				},
 				content:function(){
 					player.hide();
 					player.nextSeat.hide();
