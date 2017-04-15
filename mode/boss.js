@@ -414,7 +414,7 @@ game.import('mode',function(){
 				boss_qingmushilian:['male','',0,['boss_qingmu','boss_qingmu_intro1','boss_qingmu_intro2','boss_qingmu_intro3'],['boss'],'wu'],
 				boss_qinglong:['male','shen',4,['boss_shenyi','releiji','boss_qingmu2'],['wu','hiddenboss','bossallowed']],
 				boss_mushengoumang:['male','shen',5,['boss_shenyi','boss_buchun','boss_qingmu3'],['wu','hiddenboss','bossallowed']],
-				boss_shujing:['female','shen',2,['boss_cuidu','boss_zhongdu'],['wu','hiddenboss','bossallowed']],
+				boss_shujing:['female','shen',2,['boss_cuidu'],['wu','hiddenboss','bossallowed']],
 				boss_taihao:['male','shen',6,['boss_shenyi','boss_shenen','boss_qingyi'],['wu','hiddenboss','bossallowed']],
 
 				boss_zhuoguiquxie:['male','',0,['boss_bianshen','boss_bianshen_intro1','boss_bianshen_intro2','boss_bianshen_intro3','boss_bianshen_intro4'],['boss'],'shu'],
@@ -880,9 +880,12 @@ game.import('mode',function(){
 					lib.inpile.remove('huoshan');
 					lib.inpile.remove('hongshui');
 					lib.inpile.remove('fulei');
+					lib.inpile.add('honghuangzhili');
 					for(var i=0;i<ui.cardPile.childElementCount;i++){
 						var node=ui.cardPile.childNodes[i];
 						if(node.name=='shandian'){
+							node.classList.remove('fullskin');
+							node.classList.remove('thunder');
 							node.init([node.suit,node.number,'honghuangzhili']);
 						}
 						else if(['huoshan','hongshui','fulei'].contains(node)){
@@ -1456,10 +1459,7 @@ game.import('mode',function(){
 					})){
 						return false;
 					}
-					if(!player.storage.boss_xingxia){
-						return true;
-					}
-					return game.roundNumber-player.storage.boss_xingxia>=2;
+					return !player.storage.boss_xingxia||game.roundNumber-player.storage.boss_xingxia>=2;
 				},
 				filterTarget:function(card,player,target){
 					return target.name=='boss_yanling';
@@ -1643,10 +1643,135 @@ game.import('mode',function(){
 					trigger.num++;
 				}
 			},
-			boss_buchun:{},
-			boss_shenbuchun:{},
-			boss_cuidu:{},
-			boss_zhongdu:{},
+			boss_buchun:{
+				mode:['boss'],
+				group:['boss_buchun_recover','boss_buchun_revive'],
+				subSkill:{
+					revive:{
+						enable:'phaseUse',
+						filter:function(event,player){
+							if(!player.storage.boss_buchun||game.roundNumber-player.storage.boss_buchun>=2){
+								for(var i=0;i<game.dead.length;i++){
+									if(game.dead[i].parentNode==player.parentNode&&game.dead[i].name=='boss_shujing'){
+										return true;
+									}
+								}
+							}
+							return false;
+						},
+						content:function(){
+							'step 0'
+							player.loseHp();
+							'step 1'
+							var dead=game.dead.slice(0);
+							for(var i=0;i<dead.length;i++){
+								if(dead[i].parentNode==player.parentNode&&dead[i].name=='boss_shujing'){
+									dead[i].revive(1);
+									dead[i].draw(2);
+									player.line(dead[i],'green');
+								}
+							}
+							player.storage.boss_buchun=game.roundNumber;
+						},
+						ai:{
+							order:6,
+							result:{
+								player:function(player,target){
+									if(player.hp<=3&&game.hasPlayer(function(current){
+										return current.name=='boss_shujing'&&current.hp==1;
+									})){
+										if(!_status.event.rand){
+											_status.event.rand=Math.random();
+										}
+										if(_status.event.rand<0.4){
+											return 0;
+										}
+									}
+									if(player.hp>=3) return 1;
+									if(player.hp>=2&&player!=game.boss) return 1;
+									return 0;
+								}
+							}
+						}
+					},
+					recover:{
+						enable:'phaseUse',
+						filter:function(event,player){
+							if(!player.storage.boss_buchun||game.roundNumber-player.storage.boss_buchun>=2){
+								for(var i=0;i<game.dead.length;i++){
+									if(game.dead[i].parentNode==player.parentNode&&game.dead[i].name=='boss_shujing'){
+										return false;
+									}
+								}
+								return true;
+							}
+							return false;
+						},
+						prompt:'令一名己方角色回复2点体力',
+						filterTarget:function(card,player,target){
+							return target.isFriendOf(player)&&target.isDamaged();
+						},
+						content:function(){
+							target.recover(2);
+							player.storage.boss_buchun=game.roundNumber;
+						},
+						ai:{
+							order:6,
+							result:{
+								target:function(player,target){
+									var num=1;
+									if(target.maxHp-target.hp>=2){
+										num=1.5;
+									}
+									return 1.5*ai.get.recoverEffect(target,player,target);
+								}
+							}
+						}
+					}
+				}
+			},
+			boss_cuidu:{
+				trigger:{source:'damageEnd'},
+				forced:true,
+				filter:function(event,player){
+					return event.player.isIn()&&event.player.isEnemyOf(player)&&!event.player.hasSkill('boss_zhongdu');
+				},
+				logTarget:'player',
+				content:function(){
+					trigger.player.addSkill('boss_zhongdu');
+					var boss=game.findPlayer(function(current){
+						return current.name=='boss_mushengoumang';
+					});
+					if(boss){
+						boss.draw();
+					}
+				}
+			},
+			boss_zhongdu:{
+				trigger:{player:'phaseBegin'},
+				forced:true,
+				mark:true,
+				nopop:true,
+				intro:{
+					content:'锁定技，回合开始时，你进行判定，若结果不为红桃，你受到1点无来源的伤害，若结果不为黑桃，你失去此技能'
+				},
+				content:function(){
+					'step 0'
+					player.judge(function(card){
+						var suit=get.suit(card);
+						if(suit=='spade') return -1;
+						if(suit=='heart') return 1;
+						return 0;
+					});
+					'step 1'
+					if(result.suit!='heart'){
+						player.damage('nosource');
+					}
+					if(result.suit!='spade'){
+						player.removeSkill('boss_zhongdu');
+					}
+				}
+			},
 			boss_qingyi:{},
 			boss_qizuo:{
 				trigger:{player:'useCardAfter'},
@@ -4490,6 +4615,7 @@ game.import('mode',function(){
 			boss_cuidu:'淬毒',
 			boss_cuidu_info:'锁定技，你对敌方角色造成伤害后，若其没有“中毒”，你令其获得“中毒”，然后令木神勾芒摸一张牌',
 			boss_zhongdu:'中毒',
+			boss_zhongdu_bg:'毒',
 			boss_zhongdu_info:'锁定技，回合开始时，你进行判定，若结果不为红桃，你受到1点无来源的伤害，若结果不为黑桃，你失去此技能',
 			boss_qingyi:'青仪',
 			boss_qingyi_info:'锁定技，第三轮开始时，己方角色各回复1点体力；第五轮开始时，敌方角色各失去1点体力；第七轮开始时，复活木神勾芒和树精，使其各摸三张牌，各+1体力上限，然后各回复3点体力',

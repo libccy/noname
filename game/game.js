@@ -18470,34 +18470,6 @@
 					node.link=item;
 					node.innerHTML=get.translation(item);
 					node.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.control);
-
-					if(lib.config.button_press){
-						node.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',function(){
-							if(node.parentNode.classList.contains('disabled')) return;
-							// node.classList.add('controlthundertext');
-							node.parentNode.classList.add('controlpressdown');
-							node.parentNode.classList.add('controlpressdownx');
-                            if(typeof node.parentNode._offset=='number'){
-                                node.parentNode.style.transform='translateX('+node.parentNode._offset+'px) scale(0.97)';
-                            }
-						});
-						node.addEventListener(lib.config.touchscreen?'touchend':'mouseup',function(){
-                            if(typeof node.parentNode._offset=='number'){
-                                node.parentNode.style.transform='translateX('+node.parentNode._offset+'px)';
-                            }
-							// node.classList.remove('controlthundertext');
-							node.parentNode.classList.remove('controlpressdown');
-							node.parentNode.classList.remove('controlpressdownx');
-						});
-						node.addEventListener(lib.config.touchscreen?'touchmove':'mousemove',function(){
-                            if(typeof node.parentNode._offset=='number'){
-                                node.parentNode.style.transform='translateX('+node.parentNode._offset+'px)';
-                            }
-							// node.classList.remove('controlthundertext');
-							node.parentNode.classList.remove('controlpressdown');
-							node.parentNode.classList.remove('controlpressdownx');
-						});
-					}
 				},
 				close:function(){
 					ui.controls.remove(this);
@@ -34357,6 +34329,25 @@
 				}
 
 				control.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.control2);
+
+				if(lib.config.button_press){
+					control.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',function(){
+						if(this.classList.contains('disabled')) return;
+						this.classList.add('controlpressdown');
+						this.classList.add('controlpressdownx');
+						if(typeof this._offset=='number'){
+							this.style.transform='translateX('+this._offset+'px) scale(0.97)';
+						}
+					});
+					control.addEventListener(lib.config.touchscreen?'touchend':'mouseup',function(){
+						this.classList.remove('controlpressdown');
+						this.classList.remove('controlpressdownx');
+						if(typeof this._offset=='number'){
+							this.style.transform='translateX('+this._offset+'px)';
+						}
+					});
+				}
+
 				ui.updatec();
 				return control;
 			},
