@@ -118,16 +118,11 @@
 						onclick:function(bool){
 							game.saveConfig('keep_awake',bool);
 							if(window.plugins&&window.plugins.insomnia){
-								try{
-									if(bool){
-										window.plugins.insomnia.keepAwake();
-									}
-									else{
-										window.plugins.insomnia.allowSleepAgain();
-									}
+								if(bool){
+									window.plugins.insomnia.keepAwake();
 								}
-								catch(e){
-									game.print(e);
+								else{
+									window.plugins.insomnia.allowSleepAgain();
 								}
 							}
 						}
@@ -34580,13 +34575,8 @@
 				if(lib.config.show_statusbar_ios=='overlay'){
 					document.body.classList.add('statusbar');
 				}
-				if(lib.config.keep_awake&&window.plugins&&window.plugis.insomnia){
-					try{
-						window.plugins.insomnia.keepAwake();
-					}
-					catch(e){
-						game.print(e);
-					}
+				if(lib.config.keep_awake&&window.plugins&&window.plugins.insomnia){
+					window.plugins.insomnia.keepAwake();
 				}
 				// var themeentry='background_color_'+lib.config.theme;
 				// if(lib.config[themeentry]){
