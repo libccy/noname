@@ -360,7 +360,12 @@ game.import('mode',function(){
     					deckitem.name=i;
     				}
     				var deckContainer=ui.create.div('.list-container.deck',deckList);
-    				if(ui.deckcontrol) ui.deckcontrol.show();
+    				if(ui.deckcontrol){
+                        ui.deckcontrol.show();
+                        setTimeout(function(){
+							ui.deckcontrol.style.transition='';
+						},500);
+                    }
     			};
 
     			ui.deckcontrol=ui.create.system('卡组管理',function(){
@@ -387,6 +392,7 @@ game.import('mode',function(){
     			},true);
 
     			if(lib.onfree){
+                    ui.deckcontrol.style.transition='all 0.5s';
     				ui.deckcontrol.hide();
     				lib.onfree.push(createCardDialog);
     			}
