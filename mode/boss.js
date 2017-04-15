@@ -1082,6 +1082,7 @@ game.import('mode',function(){
 							ui.discardPile.appendChild(hej[j]);
 						}
 						game.players[i].hp=game.players[i].maxHp;
+						game.players[i].hujia=0;
 						game.players[i].classList.remove('turnedover');
 						game.players[i].removeLink();
 						game.players[i].directgain(get.cards(4));
@@ -1155,6 +1156,7 @@ game.import('mode',function(){
 							ui.discardPile.appendChild(hej[j]);
 						}
 						game.players[i].hp=game.players[i].maxHp;
+						game.players[i].hujia=0;
 						game.players[i].classList.remove('turnedover');
 						game.players[i].removeLink();
 						game.players[i].directgain(get.cards(4));
@@ -1243,6 +1245,7 @@ game.import('mode',function(){
 							ui.discardPile.appendChild(hej[j]);
 						}
 						game.players[i].hp=game.players[i].maxHp;
+						game.players[i].hujia=0;
 						game.players[i].classList.remove('turnedover');
 						game.players[i].removeLink();
 						game.players[i].directgain(get.cards(4));
@@ -1316,6 +1319,7 @@ game.import('mode',function(){
 							ui.discardPile.appendChild(hej[j]);
 						}
 						game.players[i].hp=game.players[i].maxHp;
+						game.players[i].hujia=0;
 						game.players[i].classList.remove('turnedover');
 						game.players[i].removeLink();
 						game.players[i].directgain(get.cards(4));
