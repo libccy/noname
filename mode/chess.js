@@ -2488,10 +2488,11 @@ game.import('mode',function(){
                                         event.enterArena.classList.remove('disabled');
     								}
     								if(game.data.money<100){
-    									event.addCharacter.style.opacity=0.5;
+                                        event.addCharacter.classList.add('disabled');
     								}
     								else{
-    									event.addCharacter.style.opacity=1;
+                                        event.addCharacter.animate('controlpressdownx',500);
+                                        event.addCharacter.classList.remove('disabled');
     								}
     								initcapt();
     							},200);
@@ -2503,7 +2504,7 @@ game.import('mode',function(){
                         event.enterArena.classList.add('disabled');
     				}
     				if(game.data.money<100){
-    					event.addCharacter.style.opacity=0.5;
+                        event.addCharacter.classList.add('disabled');
     				}
     				var qianfan=function(){
     					if(_status.kaibao) return;
@@ -2563,7 +2564,8 @@ game.import('mode',function(){
     							game.data.character.remove(node.link);
     							game.saveData();
     							if(game.data.money>=100){
-    								event.addCharacter.style.opacity=1;
+                                    event.addCharacter.animate('controlpressdownx',500);
+                                    event.addCharacter.classList.remove('disabled');
     							}
     							if(game.data.money>=150){
                                     event.enterArena.animate('controlpressdownx',500);
@@ -2838,10 +2840,11 @@ game.import('mode',function(){
     						_status.qianfan=false;
     						event.removeCharacter.replace('遣返',qianfan);
     						if(game.data.money>=100){
-    							event.addCharacter.style.opacity=1;
+                                event.addCharacter.animate('controlpressdownx',500);
+                                event.addCharacter.classList.remove('disabled');
     						}
     						else{
-    							event.addCharacter.style.opacity=0.5;
+                                event.addCharacter.classList.add('disabled');
     						}
     						if(game.data.money>=150||game.data._arena){
                                 event.enterArena.animate('controlpressdownx',500);
