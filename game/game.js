@@ -6684,7 +6684,9 @@
 										localStorage.clear();
 										localStorage.setItem('noname_inited',true);
 										if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
-										window.location.reload();
+										setTimeout(function(){
+											window.location.reload();
+										},200);
 									 }
 								 },
 								'确认退出',
@@ -6702,7 +6704,9 @@
 						if(confirm('游戏似乎未正常载入，是否重置游戏？')){
 							localStorage.clear();
 							if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
-							window.location.reload();
+							setTimeout(function(){
+								window.location.reload();
+							},200);
 						}
 					}
 				}
@@ -7439,9 +7443,8 @@
 					delete window.resetGameTimeout;
 					if(!game.syncMenu){
 						delete window.resetExtension;
-		                localStorage.removeItem(lib.configprefix+'disable_extension',true);
+		                localStorage.removeItem(lib.configprefix+'disable_extension');
 					}
-
 
 					if(game.removeFile&&lib.config.brokenFile.length){
 						while(lib.config.brokenFile.length){
