@@ -16,6 +16,12 @@
 	left:7px;
 	top:7px;
 }
+#window[data-player_border='slim']>.player:not(.minskin):not(.fakeme).connect>.avatar{
+	width: 142px;
+	height: 172px;
+	left:4px;
+	top:4px;
+}
 #arena.uslim_player .player:not(.minskin):not(.fakeme) .avatar{
 	width: 144px;
 	height: 174px;

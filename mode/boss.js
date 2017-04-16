@@ -52,12 +52,6 @@ game.import('mode',function(){
 			game.delay(0.1);
 			"step 1"
 			var bosslist=ui.create.div('#bosslist.hidden');
-			if(lib.config.player_border!='wide'){
-				if(lib.config.player_border=='slim'){
-					bosslist.classList.add('uslim');
-				}
-				bosslist.classList.add('slim');
-			}
 			event.bosslist=bosslist;
 			bosslist.ontouchmove = ui.click.touchScroll;
 			bosslist.style.WebkitOverflowScrolling='touch';

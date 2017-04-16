@@ -8,25 +8,25 @@
     z-index:1;
     overflow-x:scroll;
 }
-#window[data-radius_size='reduce'] #bosslist.slim>.player{
+#window[data-radius_size='reduce'] #bosslist>.player{
 	border-radius:4px;
 }
-#window[data-radius_size='off'] #bosslist.slim>.player{
+#window[data-radius_size='off'] #bosslist>.player{
 	border-radius:0px;
 }
-#window[data-radius_size='increase'] #bosslist.slim>.player{
+#window[data-radius_size='increase'] #bosslist>.player{
 	border-radius:20px;
 }
-#bosslist.slim>.player{
+#window #bosslist>.player{
     border-radius: 10px;
 }
-#bosslist.slim>.player>.avatar{
+#window[data-player_border='normal'] #bosslist>.player>.avatar{
     left: 8px;
     top: 8px;
     width: 164px;
     height: 200px;
 }
-#bosslist.slim.uslim>.player>.avatar{
+#window[data-player_border='slim'] #bosslist>.player>.avatar{
     left: 4px;
     top: 4px;
     width: 172px;

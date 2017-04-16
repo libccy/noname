@@ -1791,6 +1791,7 @@
 							else{
 								ui.arena.classList.remove('lslim_player');
 							}
+							ui.window.dataset.player_border=item;
 						}
 					},
 					control_style:{
@@ -34573,6 +34574,7 @@
 				if(lib.config.player_border=='normal'&&lib.config.mode!='brawl'&&(game.layout=='long'||game.layout=='long2')){
 					ui.arena.classList.add('lslim_player');
 				}
+				ui.window.dataset.player_border=lib.config.player_border;
 				if(lib.config.compatiblemode){
 					ui.window.classList.add('compatiblemode');
 				}
