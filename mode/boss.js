@@ -53,6 +53,9 @@ game.import('mode',function(){
 			"step 1"
 			var bosslist=ui.create.div('#bosslist.hidden');
 			if(lib.config.player_border!='wide'){
+				if(lib.config.player_border=='slim'){
+					bosslist.classList.add('uslim');
+				}
 				bosslist.classList.add('slim');
 			}
 			event.bosslist=bosslist;
@@ -4877,7 +4880,7 @@ game.import('mode',function(){
 			boss_chiyan_intro2_info:'挑战火神祝融、焰灵',
 			boss_chiyan_intro3:'&nbsp;第三关',
 			boss_chiyan_intro3_info:'挑战炎帝、火神祝融、焰灵',
-			boss_chiyan_intro3_append:'每通过一关，游戏轮数清零，所有角色复活、重置武将牌并回复全部体力，移去区域内的的牌并将手牌补至4-X张，X为阵亡角色数',
+			boss_chiyan_intro3_append:'每通过一关，游戏轮数清零，阵亡角色复活，所有角色重置武将和区域内的牌，并获得4-X张起始手牌，X为阵亡角色数',
 
 			boss_qingmu_intro1:'&nbsp;第一关',
 			boss_qingmu_intro1_info:'挑战青龙',
@@ -4885,7 +4888,7 @@ game.import('mode',function(){
 			boss_qingmu_intro2_info:'挑战木神勾芒、树精',
 			boss_qingmu_intro3:'&nbsp;第三关',
 			boss_qingmu_intro3_info:'挑战太昊、木神勾芒、树精',
-			boss_qingmu_intro3_append:'每通过一关，游戏轮数清零，所有角色复活、重置武将牌并回复全部体力，移去区域内的的牌并将手牌补至4-X张，X为阵亡角色数',
+			boss_qingmu_intro3_append:'每通过一关，游戏轮数清零，阵亡角色复活，所有角色重置武将和区域内的牌，并获得4-X张起始手牌，X为阵亡角色数',
 
 			boss_bianshen_intro1:'&nbsp;第一关',
 			boss_bianshen_intro1_info:'挑战魑、魅、魍、魉中的随机一个',

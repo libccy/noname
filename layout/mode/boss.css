@@ -1,6 +1,6 @@
 #bosslist{
     width:100%;
-    /*height:250px;*/
+    height:260px;
     text-align:center;
     top:calc(50% - 200px);
     top:60px;
@@ -25,6 +25,12 @@
     top: 8px;
     width: 164px;
     height: 200px;
+}
+#bosslist.slim.uslim>.player>.avatar{
+    left: 4px;
+    top: 4px;
+    width: 172px;
+    height: 208px;
 }
 .bosspaused>#bosslist,
 .bosspaused>#control,

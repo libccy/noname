@@ -7712,7 +7712,7 @@
 					localStorage.setItem(lib.configprefix+'background',lib.config.image_background);
 				}
 				else if(lib.config.image_background=='default'&&lib.config.theme=='simple'){
-					localStorage.setItem(lib.configprefix+'background','shengshi_bg');
+					localStorage.setItem(lib.configprefix+'background','ol_bg');
 				}
 				else{
 					localStorage.removeItem(lib.configprefix+'background');
