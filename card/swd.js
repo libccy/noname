@@ -147,6 +147,7 @@ game.import('card',function(){
 				fullskin:true,
 				type:'trick',
 				nodelay:true,
+				chongzhu:true,
 				content:function(){
 					event.getParent('_shencaojie')._trigger.num++;
 				},

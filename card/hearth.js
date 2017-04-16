@@ -429,7 +429,7 @@ game.import('card',function(){
 				fullskin:true,
 				type:'trick',
 				enable:true,
-				chongzhu:true,
+				// chongzhu:true,
 				filterTarget:function(card,player,target){
 					return target==player;
 				},
@@ -685,7 +685,7 @@ game.import('card',function(){
 			xingjiegoutong:'星界沟通',
 			xingjiegoutong_info:'增加一点体力上限并回复一点体力，弃置你的所有手牌',
 			tanshezhiren:'弹射之刃',
-			tanshezhiren_info:'出牌阶段对自己使用，第一次结算时随机弃置一名使用者的敌人的一张手牌，从第二次结算开始，每次随机弃置一名上一次被弃牌角色的敌人的一张手牌，共结算X次，X为存活角色数，若X为偶数，改为X-1',
+			tanshezhiren_info:'出牌阶段对自己使用，依次按敌方-友方-敌方-的顺序随机弃置阵营内一名随机角色的一张牌，共结算X次，X为存活角色数，若X为偶数，改为X-1',
 			chuansongmen:'传送门',
 			chuansongmen_info:'摸一张牌并展示，若发生在出牌阶段，你可以立即使用摸到的牌，若如此做，你将传送门收回手牌（每阶段最多收回2张传送门）',
 			dunpaigedang:'盾牌格挡',

@@ -17748,7 +17748,7 @@
 						}
 					}
 					else{
-						this.node.background.innerHTML=lib.translate[bg+'_bg']||get.translation(bg)[0];
+						this.node.background.innerHTML=lib.translate[bg+'_cbg']||lib.translate[bg+'_bg']||get.translation(bg)[0];
 						// this.node.background.style.fontFamily=lib.config.card_font;
 						if(this.node.background.innerHTML.length>1) this.node.background.classList.add('tight');
 						else this.node.background.classList.remove('tight');
@@ -18191,6 +18191,9 @@
                         if(_status.brawl&&_status.brawl.gameStart){
                             _status.brawl.gameStart();
                         }
+						if(lib.config.show_cardpile){
+	                        ui.cardPileButton.style.display='';
+	                    }
                         _status.gameStarted=true;
                         game.showHistory();
                     }
@@ -20094,6 +20097,9 @@
                         game.send('reinited');
                         game.showHistory();
                         _status.gameStarted=true;
+						if(lib.config.show_cardpile){
+	                        ui.cardPileButton.style.display='';
+	                    }
                         if(!observe&&game.me&&game.me.isDead()){
                             ui.exit=ui.create.control('退出联机',ui.click.exit);
                         }
@@ -25308,7 +25314,7 @@
 						return true;
 					}
 				};
-				if(ui.cardPileButton) ui.cardPileButton.style.display='none';
+				// if(ui.cardPileButton) ui.cardPileButton.style.display='none';
 				ui.auto.hide();
 				ui.wuxie.hide();
 				event.resize();
@@ -34751,6 +34757,7 @@
 					ui.pause.style.display='none';
 				}
 				ui.cardPileButton=ui.create.system('牌堆',null,true);
+				ui.cardPileButton.style.display='none';
 				lib.setPopped(ui.cardPileButton,ui.click.cardPileButton,220);
 				ui.wuxie=ui.create.system('不询问无懈',ui.click.wuxie,true);
 				if(!lib.config.touchscreen){
@@ -34798,9 +34805,9 @@
 				if(!lib.config.show_wuxie){
 					ui.wuxie.style.display='none';
 				}
-				if(!lib.config.show_cardpile||_status.connectMode){
-					ui.cardPileButton.style.display='none';
-				}
+				// if(!lib.config.show_cardpile||_status.connectMode){
+				// 	ui.cardPileButton.style.display='none';
+				// }
 				ui.playerids=ui.create.system('显示身份',function(){
 					if(game.showIdentity){
 						game.showIdentity();
@@ -40631,6 +40638,9 @@
 						}
 						else{
 							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
+						}
+						if(lib.translate[skills[i]+'_append']){
+							uiintro._place_text=uiintro.add('<div class="text">'+lib.translate[skills[i]+'_append']+'</div>')
 						}
 					}
 				}

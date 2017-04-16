@@ -900,7 +900,7 @@ game.import('mode',function(){
 				chongzheng:0,
 				loopType:2,
 				checkResult:function(player){
-					if(player==game.boss&&game.boss.name!='boss_yandi'){
+					if(player==game.boss&&game.boss.name!='boss_taihao'){
 						return false;
 					}
 				},
@@ -1022,6 +1022,7 @@ game.import('mode',function(){
 				trigger:{global:'gameStart'},
 				forced:true,
 				popup:false,
+				unique:true,
 				content:function(){
 					player.smoothAvatar();
 					player.init('boss_zhuque');
@@ -1036,6 +1037,7 @@ game.import('mode',function(){
 				forced:true,
 				popup:false,
 				silent:true,
+				unique:true,
 				filter:function(event,player){
 					return player==game.boss;
 				},
@@ -1049,6 +1051,7 @@ game.import('mode',function(){
 				forced:true,
 				priority:-10,
 				globalFixed:true,
+				unique:true,
 				filter:function(event){
 					if(lib.config.mode!='boss') return false;
 					return event.player==game.boss&&event.player.hasSkill('boss_chiyan2');
@@ -1074,6 +1077,14 @@ game.import('mode',function(){
 					game.addBossFellow(game.me==game.boss?1:5,'boss_yanling');
 					game.addBossFellow(7,'boss_yanling');
 					'step 3'
+					var dnum=0;
+					var dead=game.dead.slice(0);
+					for(var i=0;i<dead.length;i++){
+						if(!dead[i].side&&dead[i].maxHp>0&&dead[i].parentNode==player.parentNode){
+							dead[i].revive(dead[i].maxHp);
+							dnum++;
+						}
+					}
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].side) continue;
 						game.players[i].removeEquipTrigger();
@@ -1085,14 +1096,7 @@ game.import('mode',function(){
 						game.players[i].hujia=0;
 						game.players[i].classList.remove('turnedover');
 						game.players[i].removeLink();
-						game.players[i].directgain(get.cards(4));
-					}
-					var dead=game.dead.slice(0);
-					for(var i=0;i<dead.length;i++){
-						if(!dead[i].side&&dead[i].maxHp>0){
-							dead[i].revive(dead[i].maxHp);
-							dead[i].directgain(get.cards(4));
-						}
+						game.players[i].directgain(get.cards(4-dnum));
 					}
 					'step 4'
 					while(_status.event.name!='phaseLoop'){
@@ -1117,6 +1121,7 @@ game.import('mode',function(){
 				forced:true,
 				popup:false,
 				silent:true,
+				unique:true,
 				filter:function(event,player){
 					return player==game.boss;
 				},
@@ -1134,6 +1139,7 @@ game.import('mode',function(){
 				forced:true,
 				priority:-10,
 				globalFixed:true,
+				unique:true,
 				filter:function(event){
 					if(lib.config.mode!='boss') return false;
 					return event.player==game.boss&&event.player.hasSkill('boss_chiyan3');
@@ -1148,6 +1154,14 @@ game.import('mode',function(){
 					game.changeBoss('boss_huoshenzhurong',game.boss.previousSeat);
 					game.changeBoss('boss_yanling',game.boss.nextSeat);
 					'step 3'
+					var dnum=0;
+					var dead=game.dead.slice(0);
+					for(var i=0;i<dead.length;i++){
+						if(!dead[i].side&&dead[i].maxHp>0&&dead[i].parentNode==player.parentNode){
+							dead[i].revive(dead[i].maxHp);
+							dnum++;
+						}
+					}
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].side) continue;
 						game.players[i].removeEquipTrigger();
@@ -1159,14 +1173,7 @@ game.import('mode',function(){
 						game.players[i].hujia=0;
 						game.players[i].classList.remove('turnedover');
 						game.players[i].removeLink();
-						game.players[i].directgain(get.cards(4));
-					}
-					var dead=game.dead.slice(0);
-					for(var i=0;i<dead.length;i++){
-						if(!dead[i].side&&dead[i].maxHp>0){
-							dead[i].revive(dead[i].maxHp);
-							dead[i].directgain(get.cards(4));
-						}
+						game.players[i].directgain(get.cards(4-dnum));
 					}
 					'step 4'
 					while(_status.event.name!='phaseLoop'){
@@ -1185,6 +1192,7 @@ game.import('mode',function(){
 				trigger:{global:'gameStart'},
 				forced:true,
 				popup:false,
+				unique:true,
 				content:function(){
 					player.smoothAvatar();
 					player.init('boss_qinglong');
@@ -1199,6 +1207,7 @@ game.import('mode',function(){
 				forced:true,
 				popup:false,
 				silent:true,
+				unique:true,
 				filter:function(event,player){
 					return player==game.boss;
 				},
@@ -1212,6 +1221,7 @@ game.import('mode',function(){
 				forced:true,
 				priority:-10,
 				globalFixed:true,
+				unique:true,
 				filter:function(event){
 					if(lib.config.mode!='boss') return false;
 					return event.player==game.boss&&event.player.hasSkill('boss_qingmu2');
@@ -1237,6 +1247,14 @@ game.import('mode',function(){
 					game.addBossFellow(game.me==game.boss?1:5,'boss_shujing');
 					game.addBossFellow(7,'boss_shujing');
 					'step 3'
+					var dnum=0;
+					var dead=game.dead.slice(0);
+					for(var i=0;i<dead.length;i++){
+						if(!dead[i].side&&dead[i].maxHp>0&&dead[i].parentNode==player.parentNode){
+							dead[i].revive(dead[i].maxHp);
+							dnum++;
+						}
+					}
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].side) continue;
 						game.players[i].removeEquipTrigger();
@@ -1248,14 +1266,7 @@ game.import('mode',function(){
 						game.players[i].hujia=0;
 						game.players[i].classList.remove('turnedover');
 						game.players[i].removeLink();
-						game.players[i].directgain(get.cards(4));
-					}
-					var dead=game.dead.slice(0);
-					for(var i=0;i<dead.length;i++){
-						if(!dead[i].side&&dead[i].maxHp>0){
-							dead[i].revive(dead[i].maxHp);
-							dead[i].directgain(get.cards(4));
-						}
+						game.players[i].directgain(get.cards(4-dnum));
 					}
 					'step 4'
 					while(_status.event.name!='phaseLoop'){
@@ -1280,6 +1291,7 @@ game.import('mode',function(){
 				forced:true,
 				popup:false,
 				silent:true,
+				unique:true,
 				filter:function(event,player){
 					return player==game.boss;
 				},
@@ -1297,6 +1309,7 @@ game.import('mode',function(){
 				forced:true,
 				priority:-10,
 				globalFixed:true,
+				unique:true,
 				filter:function(event){
 					if(lib.config.mode!='boss') return false;
 					return event.player==game.boss&&event.player.hasSkill('boss_qingmu3');
@@ -1311,6 +1324,14 @@ game.import('mode',function(){
 					game.changeBoss('boss_mushengoumang',game.boss.previousSeat);
 					game.changeBoss('boss_shujing',game.boss.nextSeat);
 					'step 3'
+					var dnum=0;
+					var dead=game.dead.slice(0);
+					for(var i=0;i<dead.length;i++){
+						if(!dead[i].side&&dead[i].maxHp>0&&dead[i].parentNode==player.parentNode){
+							dead[i].revive(dead[i].maxHp);
+							dnum++;
+						}
+					}
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].side) continue;
 						game.players[i].removeEquipTrigger();
@@ -1322,14 +1343,7 @@ game.import('mode',function(){
 						game.players[i].hujia=0;
 						game.players[i].classList.remove('turnedover');
 						game.players[i].removeLink();
-						game.players[i].directgain(get.cards(4));
-					}
-					var dead=game.dead.slice(0);
-					for(var i=0;i<dead.length;i++){
-						if(!dead[i].side&&dead[i].maxHp>0){
-							dead[i].revive(dead[i].maxHp);
-							dead[i].directgain(get.cards(4));
-						}
+						game.players[i].directgain(get.cards(4-dnum));
 					}
 					'step 4'
 					while(_status.event.name!='phaseLoop'){
@@ -1345,6 +1359,7 @@ game.import('mode',function(){
 				}
 			},
 			boss_shenyi:{
+				unique:true,
 				mod:{
 					judge:function(player,result){
 						if(_status.event.type=='phase'){
@@ -1402,6 +1417,7 @@ game.import('mode',function(){
 			},
 			boss_shenen:{
 				mode:['boss'],
+				unique:true,
 				global:'boss_shenen2'
 			},
 			boss_shenen2:{
@@ -1470,6 +1486,7 @@ game.import('mode',function(){
 					}
 					return !player.storage.boss_xingxia||game.roundNumber-player.storage.boss_xingxia>=2;
 				},
+				unique:true,
 				filterTarget:function(card,player,target){
 					return target.name=='boss_yanling';
 				},
@@ -1517,6 +1534,7 @@ game.import('mode',function(){
 			},
 			boss_huihuo:{
 				global:'boss_huihuo2',
+				unique:true,
 				mod:{
     				cardUsable:function(card,player,num){
     					if(card.name=='sha') return num+1;
@@ -1556,6 +1574,7 @@ game.import('mode',function(){
 				trigger:{global:'dieAfter'},
 				forced:true,
 				globalFixed:true,
+				unique:true,
 				filter:function(event,player){
 					return event.player.hasSkill('boss_huihuo')&&event.player.isDead()&&player.isEnemyOf(event.player);
 				},
@@ -1574,6 +1593,7 @@ game.import('mode',function(){
 				}
 			},
 			boss_furan:{
+				unique:true,
 				global:'boss_furan2'
 			},
 			boss_furan2:{
@@ -1605,6 +1625,7 @@ game.import('mode',function(){
 			boss_chiyi:{
 				trigger:{player:'phaseBegin'},
 				forced:true,
+				unique:true,
 				filter:function(event,player){
 					return [3,5,7].contains(game.roundNumber);
 				},
@@ -1654,6 +1675,7 @@ game.import('mode',function(){
 			},
 			boss_buchun:{
 				mode:['boss'],
+				unique:true,
 				group:['boss_buchun_recover','boss_buchun_revive'],
 				subSkill:{
 					revive:{
@@ -1761,6 +1783,7 @@ game.import('mode',function(){
 			boss_cuidu:{
 				trigger:{source:'damageEnd'},
 				forced:true,
+				unique:true,
 				filter:function(event,player){
 					return event.player.isIn()&&event.player.isEnemyOf(player)&&!event.player.hasSkill('boss_zhongdu');
 				},
@@ -1804,6 +1827,7 @@ game.import('mode',function(){
 			boss_qingyi:{
 				trigger:{player:'phaseBegin'},
 				forced:true,
+				unique:true,
 				filter:function(event,player){
 					return [3,5,7].contains(game.roundNumber);
 				},
@@ -4169,7 +4193,7 @@ game.import('mode',function(){
 				unique:true,
 				filter:function(event){
 					var type=get.type(event.card,'trick');
-					return (type=='trick'||type=='equip')&&event.cards[0]&&event.cards[0]==event.card;
+					return type!='basic'&&event.cards[0]&&event.cards[0]==event.card;
 				},
 				content:function(){
 					var cards=get.cards();
@@ -4693,6 +4717,7 @@ game.import('mode',function(){
 			boss_yandi:'炎帝',
 
 			honghuangzhili:'洪荒之力',
+			honghuangzhili_cbg:'洪',
 			honghuangzhili_info:'若该角色的势力是神，你获得其一张牌，其【神裔】无效直到其下家的回合（这个下家是动态变化的，会随着一个人的死或者复活而变化）开始；若该角色的势力不是神，其翻面。',
 
 			boss_qingmushilian:'青木试炼',
@@ -4852,6 +4877,7 @@ game.import('mode',function(){
 			boss_chiyan_intro2_info:'挑战火神祝融、焰灵',
 			boss_chiyan_intro3:'&nbsp;第三关',
 			boss_chiyan_intro3_info:'挑战炎帝、火神祝融、焰灵',
+			boss_chiyan_intro3_append:'每通过一关，游戏轮数清零，所有角色复活、重置武将牌并回复全部体力，移去区域内的的牌并将手牌补至4-X张，X为阵亡角色数',
 
 			boss_qingmu_intro1:'&nbsp;第一关',
 			boss_qingmu_intro1_info:'挑战青龙',
@@ -4859,6 +4885,7 @@ game.import('mode',function(){
 			boss_qingmu_intro2_info:'挑战木神勾芒、树精',
 			boss_qingmu_intro3:'&nbsp;第三关',
 			boss_qingmu_intro3_info:'挑战太昊、木神勾芒、树精',
+			boss_qingmu_intro3_append:'每通过一关，游戏轮数清零，所有角色复活、重置武将牌并回复全部体力，移去区域内的的牌并将手牌补至4-X张，X为阵亡角色数',
 
 			boss_bianshen_intro1:'&nbsp;第一关',
 			boss_bianshen_intro1_info:'挑战魑、魅、魍、魉中的随机一个',
@@ -4928,7 +4955,7 @@ game.import('mode',function(){
 			boss_juejing_info:'锁定技，摸牌阶段开始时，你不摸牌；锁定技，若你的手牌数小于4，你将手牌补至四张',
 
 			boss_jizhi:'集智',
-			boss_jizhi_info:'每当你使用一张锦囊牌或装备牌，你可以摸一张牌并展示之',
+			boss_jizhi_info:'每当你使用一张非转化的非基本牌，你可以摸一张牌并展示之',
 			boss_guiyin:'归隐',
 			boss_guiyin_info:'锁定技，体力值比你多的角色无法在回合内对你使用卡牌',
 			boss_gongshen:'工神',
