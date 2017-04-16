@@ -527,6 +527,14 @@
 							game.saveConfig('theme',theme);
 							ui.arena.hide();
 							lib.init.background();
+							if(lib.config.autostyle){
+								if(theme=='simple'){
+									lib.configMenu.appearence.config.player_border.onclick('slim');
+								}
+								else{
+									lib.configMenu.appearence.config.player_border.onclick('normal');
+								}
+							}
 							setTimeout(function(){
 								var theme=ui.css.theme;
 								ui.css.theme=lib.init.css(lib.assetURL+'theme/'+lib.config.theme,'style');
@@ -7918,6 +7926,7 @@
 				game.saveConfig('background_audio',false);
 				game.saveConfig('background_speak',false);
 				game.saveConfig('show_volumn',false);
+				game.saveConfig('autostyle',true);
 				game.saveConfig('debug',true);
 				game.saveConfig('dev',true);
 				if(!lib.device){
