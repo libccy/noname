@@ -33066,13 +33066,25 @@
 						game.print=function(){
 						    var textstr='';
 							for(var i=0;i<arguments.length;i++){
-								textstr+=arguments[i];
+								if(get.is.object(arguments[i])){
+									var argi=get.stringify(arguments[i]);
+									if(argi&&argi.length<5000){
+										textstr+=argi;
+									}
+									else{
+										textstr+=arguments[i].toString();
+									}
+									console.log(argi);
+								}
+								else{
+									textstr+=arguments[i];
+								}
                                 if(i<arguments.length-1){
                                     textstr+=' ';
                                 }
 							}
 							textstr+='<br>';
-							text.innerHTML+=textstr;
+							text.innerHTML+=textstr.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;');
                             text.scrollTop=text.scrollHeight;
 						}
 						if(_status.toprint){
