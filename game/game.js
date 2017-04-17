@@ -20790,6 +20790,9 @@
 		},
 		import:function(type,content){
 			if(type=='extension'){
+				if(typeof content=='function'){
+					content=content(lib,game,ui,get,ai,_status);
+				}
 				game.loadExtension(content);
 			}
 			else{
@@ -29746,7 +29749,7 @@
                                 }
                                 str+=',files:'+JSON.stringify(files);
                                 str+='}';
-                                var extension={'extension.js':'game.import("extension",'+str+')'};
+                                var extension={'extension.js':'game.import("extension",function(lib,game,ui,get,ai,_status){return '+str+'})'};
                                 for(var i in dash1.content.image){
                                     extension[i]=dash1.content.image[i];
                                 }

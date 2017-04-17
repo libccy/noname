@@ -1120,7 +1120,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 	                            'if(!lib.storage.scene["'+name+'"]){\nlib.storage.scene["'+name+'"]='+get.stringify(scene)+';\n_status.extensionscene=true;}\n'+
 	                            'if(!_status.extensionmade) _status.extensionmade=[];\n'+
 	                            '_status.extensionmade.push("'+name+'");\n}}\n}';
-	                            var extension={'extension.js':'game.import("extension",'+str+')'};
+	                            var extension={'extension.js':'game.import("extension",function(lib,game,ui,get,ai,_status){return '+str+'})'};
 	                            game.importExtension(extension,null,name);
 	                        },{marginLeft:'6px'});
 	                    }
@@ -2079,7 +2079,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 	                            'if(!_status.extensionmade) _status.extensionmade=[];\n'+
 	                            '_status.extensionmade.push("'+name+'");\n}}\n}';
 	                            stage.level=level;
-	                            var extension={'extension.js':'game.import("extension",'+str+')'};
+	                            var extension={'extension.js':'game.import("extension",function(lib,game,ui,get,ai,_status){return '+str+'})'};
 	                            game.importExtension(extension,null,name);
 	                        },{marginLeft:'6px'});
 	                        var noactive=true;
