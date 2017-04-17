@@ -1,11 +1,5 @@
 'use strict';
-game.import('play',function(){
-	var game=window.game;
-	var ui=window.ui;
-	var get=window.get;
-	var ai=window.ai;
-	var lib=window.lib;
-	var _status=window._status;
+game.import('play',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'coin',
 		init:function(){

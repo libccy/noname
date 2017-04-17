@@ -1,11 +1,5 @@
 'use strict';
-game.import('character',function(){
-    var game=window.game;
-    var ui=window.ui;
-    var get=window.get;
-    var ai=window.ai;
-    var lib=window.lib;
-    var _status=window._status;
+game.import('character',function(lib,game,ui,get,ai,_status){
     return {
     	name:'swd',
     	character:{

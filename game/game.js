@@ -418,6 +418,12 @@
 						else{
 							map.touchscreen.hide();
 						}
+						if(lib.device||lib.node){
+							map.auto_check_update.show();
+						}
+						else{
+							map.auto_check_update.hide();
+						}
 						if(lib.device){
 							map.enable_vibrate.show();
 							map.keep_awake.show();
@@ -20796,20 +20802,7 @@
 				if(!lib.imported[type]){
 					lib.imported[type]={};
 				}
-				var bool_ui=!window.ui;
-				var bool_get=!window.get;
-				var bool_ai=!window.ai;
-				var bool_lib=!window.lib;
-				window.ui=ui;
-				window.get=get;
-				window.ai=ai;
-				window.lib=lib;
-				window._status=_status;
-				var content2=content();
-				if(bool_ui) delete window.ui;
-				if(bool_get) delete window.get;
-				if(bool_ai) delete window.ai;
-				if(bool_lib) delete window.lib;
+				var content2=content(lib,game,ui,get,ai,_status);
 				if(content2.name){
 					lib.imported[type][content2.name]=content2;
 					delete content2.name;

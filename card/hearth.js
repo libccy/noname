@@ -1,11 +1,5 @@
 'use strict';
-game.import('card',function(){
-	var game=window.game;
-	var ui=window.ui;
-	var get=window.get;
-	var ai=window.ai;
-	var lib=window.lib;
-	var _status=window._status;
+game.import('card',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'hearth',
 		card:{
