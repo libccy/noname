@@ -5281,7 +5281,7 @@
 		},
 		setScroll:function(node){
 			node.ontouchstart=ui.click.touchStart;
-			node.ontouchmove = ui.click.touchScroll;
+			node.ontouchmove=ui.click.touchScroll;
 			node.style.WebkitOverflowScrolling='touch';
 			return node;
 		},
@@ -32975,7 +32975,11 @@
                         text.style.left='30px';
                         text.style.top='50px';
                         text.style.wordBreak='break-all';
-                        lib.setScroll(text);
+						var pre=ui.create.node('pre.fulldiv',text);
+						pre.style.margin=0;
+						pre.style.padding=0;
+						pre.style.position='relative';
+                        lib.setScroll(pre);
 						page.appendChild(text);
 
 						// var caption=ui.create.div('','输入命令',page);
@@ -33005,7 +33009,7 @@
                                 logs.unshift(text2.value);
                             }
                             if(text2.value=='cls'){
-                                text.innerHTML='';
+                                pre.innerHTML='';
 	                            text2.value='';
                             }
 							else if(text2.value=='up'){
@@ -33074,7 +33078,6 @@
 									else{
 										textstr+=arguments[i].toString();
 									}
-									console.log(argi);
 								}
 								else{
 									textstr+=arguments[i];
@@ -33084,7 +33087,7 @@
                                 }
 							}
 							textstr+='<br>';
-							text.innerHTML+=textstr.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;');
+							pre.innerHTML+=textstr;
                             text.scrollTop=text.scrollHeight;
 						}
 						if(_status.toprint){
@@ -33095,7 +33098,7 @@
 						}
 						runButton.listen(runCommand);
 						clearButton.listen(function(){
-							text.innerHTML='';
+							pre.innerHTML='';
 						});
 					}());
 					(function(){
