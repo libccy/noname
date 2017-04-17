@@ -12,25 +12,25 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			for(var i in result.element){
 				for(var j in result.element[i]){
 					if(j!='dieAfter'){
-						lib.element[i][j]=lib.init.eval(result.element[i][j]);
+						lib.element[i][j]=result.element[i][j];
 					}
 				}
 			}
 			for(var i in result.ui){
 				for(var j in result.ui[i]){
-					ui[i][j]=lib.init.eval(result.ui[i][j]);
+					ui[i][j]=result.ui[i][j];
 				}
 			}
-			get.chessDistance=lib.init.eval(result.get.chessDistance);
-			get.rawAttitude=lib.init.eval(result.get.rawAttitude);
+			get.chessDistance=result.get.chessDistance;
+			get.rawAttitude=result.get.rawAttitude;
 			var toLoad=['addChessPlayer','addObstacle','removeObstacle','isChessNeighbour',
 				'draw2','updateCanvas2','setChessInfo','modeSwapPlayer'];
 			for(var i=0;i<toLoad.length;i++){
-				game[toLoad[i]]=lib.init.eval(result.game[toLoad[i]]);
+				game[toLoad[i]]=result.game[toLoad[i]];
 			}
 			toLoad=['_attackmove','_phasequeue','_chessmove','_chesscenter'];
 			for(var i=0;i<toLoad.length;i++){
-				lib.skill[toLoad[i]]=lib.init.eval(result.skill[toLoad[i]]);
+				lib.skill[toLoad[i]]=result.skill[toLoad[i]];
 			}
 			for(var i in lib.skill){
 				if(lib.skill[i].changeSeat){

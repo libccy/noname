@@ -8614,8 +8614,7 @@
                 loadPackage:function(){
     				'step 0'
     				if(event.packages.length){
-    					window.character={};
-    					window.card={};
+    					window.game=game;
     					var pack=event.packages.shift().split('/');
     					lib.init.js(lib.assetURL+pack[0],pack[1],game.resume);
     					game.pause();
@@ -8624,8 +8623,9 @@
     					event.finish();
     				}
     				'step 1'
-    				var character=window.character;
-    				var card=window.card;
+					if(!lib.config.dev) delete window.game;
+    				var character=lib.imported.character;
+    				var card=lib.imported.card;
     				var i,j,k;
     				for(i in character){
     					if(character[i].character){
@@ -8653,7 +8653,7 @@
     							}
     							else{
     								if(lib[j][k]==undefined){
-    									lib[j][k]=lib.init.eval(character[i][j][k]);
+    									lib[j][k]=character[i][j][k];
     								}
     								else{
     									console.log('dublicate '+j+' in character '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+character[i][j][k]);
@@ -8679,7 +8679,7 @@
     								lib[j][k+'_card_config']=card[i][j][k];
     							}
     							else{
-    								if(lib[j][k]==undefined) lib[j][k]=lib.init.eval(card[i][j][k]);
+    								if(lib[j][k]==undefined) lib[j][k]=card[i][j][k];
     								else console.log('dublicate '+j+' in card '+i+':\n'+k+'\n'+lib[j][k]+'\n'+card[i][j][k]);
     							}
     						}
@@ -19819,40 +19819,40 @@
         						if(typeof mode.ai[i]=='object'){
         							if(ai[i]==undefined) ai[i]={};
         							for(var j in mode.ai[i]){
-        								ai[i][j]=lib.init.eval(mode.ai[i][j]);
+        								ai[i][j]=mode.ai[i][j];
         							}
         						}
         						else{
-        							ai[i]=lib.init.eval(mode.ai[i]);
+        							ai[i]=mode.ai[i];
         						}
         					}
 							for(var i in mode.get){
 								if(typeof mode.get[i]=='object'){
 	                                if(get[i]==undefined) get[i]={};
 	                                for(var j in mode.get[i]){
-	                                    get[i][j]=lib.init.eval(mode.get[i][j]);
+	                                    get[i][j]=mode.get[i][j];
 	                                }
 	                            }
 	                            else{
-	                                get[i]=lib.init.eval(mode.get[i]);
+	                                get[i]=mode.get[i];
 	                            }
 							}
                             for(var i in mode.translate){
                                 lib.translate[i]=mode.translate[i];
                             }
                             if(mode.game){
-                                game.getIdentityList=lib.init.eval(mode.game.getIdentityList);
-                                game.updateState=lib.init.eval(mode.game.updateState);
-								game.getRoomInfo=lib.init.eval(mode.game.getRoomInfo);
+                                game.getIdentityList=mode.game.getIdentityList;
+                                game.updateState=mode.game.updateState;
+								game.getRoomInfo=mode.game.getRoomInfo;
                             }
                             if(mode.element&&mode.element.player){
                                 for(var i in mode.element.player){
-                                    lib.element.player[i]=lib.init.eval(mode.element.player[i]);
+                                    lib.element.player[i]=mode.element.player[i];
                                 }
                             }
                             if(mode.skill){
                                 for(var i in mode.skill){
-                                    lib.skill[i]=lib.init.eval(mode.skill[i]);
+                                    lib.skill[i]=mode.skill[i];
                                 }
                             }
 							game.finishCards();
@@ -19907,39 +19907,39 @@
                             if(typeof mode.ai[i]=='object'){
                                 if(ai[i]==undefined) ai[i]={};
                                 for(var j in mode.ai[i]){
-                                    ai[i][j]=lib.init.eval(mode.ai[i][j]);
+                                    ai[i][j]=mode.ai[i][j];
                                 }
                             }
                             else{
-                                ai[i]=lib.init.eval(mode.ai[i]);
+                                ai[i]=mode.ai[i];
                             }
                         }
 						for(var i in mode.get){
 							if(typeof mode.get[i]=='object'){
                                 if(get[i]==undefined) get[i]={};
                                 for(var j in mode.get[i]){
-                                    get[i][j]=lib.init.eval(mode.get[i][j]);
+                                    get[i][j]=mode.get[i][j];
                                 }
                             }
                             else{
-                                get[i]=lib.init.eval(mode.get[i]);
+                                get[i]=mode.get[i];
                             }
 						}
                         for(var i in mode.translate){
                             lib.translate[i]=mode.translate[i];
                         }
                         if(mode.game){
-                            game.getIdentityList=lib.init.eval(mode.game.getIdentityList);
-                            game.updateState=lib.init.eval(mode.game.updateState);
+                            game.getIdentityList=mode.game.getIdentityList;
+                            game.updateState=mode.game.updateState;
                         }
                         if(mode.element&&mode.element.player){
                             for(var i in mode.element.player){
-                                lib.element.player[i]=lib.init.eval(mode.element.player[i]);
+                                lib.element.player[i]=mode.element.player[i];
                             }
                         }
                         if(mode.skill){
                             for(var i in mode.skill){
-                                lib.skill[i]=lib.init.eval(mode.skill[i]);
+                                lib.skill[i]=mode.skill[i];
                             }
                         }
 						game.finishCards();
@@ -19949,7 +19949,7 @@
 							}
 						}
 						if(mode.onreinit){
-							(lib.init.eval(mode.onreinit))();
+							mode.onreinit();
 						}
                         state=get.parsedResult(state);
                         game.players=[];
@@ -20107,6 +20107,7 @@
                         if(!observe&&game.me&&game.me.isDead()){
                             ui.exit=ui.create.control('退出联机',ui.click.exit);
                         }
+						ui.updatehl();
                     });
                 },
                 exec:function(func){
@@ -20790,9 +20791,6 @@
 		},
 		import:function(type,content){
 			if(type=='extension'){
-				if(typeof content=='function'){
-					content=content(lib,game,ui,get,ai,_status);
-				}
 				game.loadExtension(content);
 			}
 			else{
@@ -20807,6 +20805,11 @@
 			}
 		},
 		loadExtension:function(obj){
+			var noeval=false;
+			if(typeof obj=='function'){
+				obj=obj(lib,game,ui,get,ai,_status);
+				noeval=true;
+			}
             lib.extensionMenu['extension_'+obj.name]={
                 enable:{
                     name:'开启',
@@ -20870,7 +20873,7 @@
 
             if(!_status.importingExtension){
                 if(obj&&lib.config['extension_'+obj.name+'_enable']){
-                    lib.init.eval(obj);
+                    if(!noeval) lib.init.eval(obj);
                     var cfg={};
                     for(var j in lib.config){
                         if(j.indexOf('extension_'+obj.name)==0&&
@@ -23087,7 +23090,7 @@
                         }
                     }
                     if(lib[i][j]==undefined){
-                        lib[i][j]=lib.init.eval(pack[i][j]);
+                        lib[i][j]=pack[i][j];
                     }
                 }
             }
@@ -23180,7 +23183,7 @@
                             pack[i][j].audio='ext:'+extname+':'+pack[i][j].audio;
                         }
                     }
-                    if(lib[i][j]==undefined) lib[i][j]=lib.init.eval(pack[i][j]);
+                    if(lib[i][j]==undefined) lib[i][j]=pack[i][j];
                 }
             }
         },
@@ -24805,10 +24808,10 @@
                     for(j in mode[lib.config.mode].element[i]){
                         if(j=='init'){
                             if(!lib.element[i].inits) lib.element[i].inits=[];
-                            lib.element[i].inits.push(lib.init.eval(mode[lib.config.mode].element[i][j]));
+                            lib.element[i].inits.push(mode[lib.config.mode].element[i][j]);
                         }
                         else{
-                            lib.element[i][j]=lib.init.eval(mode[lib.config.mode].element[i][j]);
+                            lib.element[i][j]=mode[lib.config.mode].element[i][j];
                         }
                     }
                 }
@@ -24816,29 +24819,29 @@
                     if(typeof mode[lib.config.mode].ai[i]=='object'){
                         if(ai[i]==undefined) ai[i]={};
                         for(j in mode[lib.config.mode].ai[i]){
-                            ai[i][j]=lib.init.eval(mode[lib.config.mode].ai[i][j]);
+                            ai[i][j]=mode[lib.config.mode].ai[i][j];
                         }
                     }
                     else{
-                        ai[i]=lib.init.eval(mode[lib.config.mode].ai[i]);
+                        ai[i]=mode[lib.config.mode].ai[i];
                     }
                 }
                 for(i in mode[lib.config.mode].ui){
                     if(typeof mode[lib.config.mode].ui[i]=='object'){
                         if(ui[i]==undefined) ui[i]={};
                         for(j in mode[lib.config.mode].ui[i]){
-                            ui[i][j]=lib.init.eval(mode[lib.config.mode].ui[i][j]);
+                            ui[i][j]=mode[lib.config.mode].ui[i][j];
                         }
                     }
                     else{
-                        ui[i]=lib.init.eval(mode[lib.config.mode].ui[i]);
+                        ui[i]=mode[lib.config.mode].ui[i];
                     }
                 }
                 for(i in mode[lib.config.mode].game){
-                    game[i]=lib.init.eval(mode[lib.config.mode].game[i]);
+                    game[i]=mode[lib.config.mode].game[i];
                 }
                 for(i in mode[lib.config.mode].get){
-                    get[i]=lib.init.eval(mode[lib.config.mode].get[i]);
+                    get[i]=mode[lib.config.mode].get[i];
                 }
                 if(game.onwash){
                     lib.onwash.push(game.onwash);
@@ -24862,7 +24865,7 @@
                     if(i=='startBefore') continue;
                     if(lib[i]==undefined) lib[i]=(get.objtype(mode[lib.config.mode][i])=='array')?[]:{};
                     for(j in mode[lib.config.mode][i]){
-                        lib[i][j]=lib.init.eval(mode[lib.config.mode][i][j]);
+                        lib[i][j]=mode[lib.config.mode][i][j];
                     }
                 }
 
@@ -34932,7 +34935,7 @@
 				lib.status.dateDelayed=0;
 
 				while(lib.arenaReady.length){
-					(lib.init.eval(lib.arenaReady.shift()))();
+					(lib.arenaReady.shift())();
 				}
 				delete lib.arenaReady;
 				if(lib.config.auto_check_update){

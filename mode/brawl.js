@@ -425,7 +425,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 	                if(init){
 	                    player1=ui.create.player(null,true).init('huangyueying');
 	                    player2=ui.create.player(null,true);
-	                    if(lib.character.re_huangyueying){
+						if(lib.character.jsp_huangyueying){
+							player2.init('jsp_huangyueying');
+						}
+						else if(lib.character.re_huangyueying){
 	                        player2.init('re_huangyueying');
 	                    }
 	                    else{
@@ -609,32 +612,36 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 	                                player.show();
 	                            },500);
 	                        },700);
+							for(var i=0;i<5;i++){
+								switch(i){
+			                        case 0:dx=-180;dy=0;break;
+			                        case 1:dx=-140;dy=100;break;
+			                        case 2:dx=0;dy=155;break;
+			                        case 3:dx=140;dy=100;break;
+			                        case 4:dx=180;dy=0;break;
+			                    }
+								var card=game.createCard('sha','noclick');
+			                    card.style.left='calc(50% - 52px)';
+			                    card.style.top='68px';
+			                    card.style.position='absolute';
+			                    card.style.margin=0;
+			                    card.style.zIndex=2;
+			                    card.style.opacity=0;
+			                    node.appendChild(card);
+			                    ui.refresh(card);
+			                    card.style.opacity=1;
+			                    card.style.transform='translate('+dx+'px,'+dy+'px)';
+			                    setTimeout((function(card){
+			                        return function(){
+										card.delete();
+									};
+			                    })(card),700);
+							}
 	                    }
 	                    num2++;
-	                    switch(num++){
-	                        case 0:dx=-180;dy=0;break;
-	                        case 1:dx=-140;dy=100;break;
-	                        case 2:dx=0;dy=155;break;
-	                        case 3:dx=140;dy=100;break;
-	                        case 4:dx=180;dy=0;break;
-	                    }
 	                    if(num>=5){
 	                        num=0;
 	                    }
-	                    var card=game.createCard('sha','noclick');
-	                    card.style.left='calc(50% - 52px)';
-	                    card.style.top='68px';
-	                    card.style.position='absolute';
-	                    card.style.margin=0;
-	                    card.style.zIndex=2;
-	                    card.style.opacity=0;
-	                    node.appendChild(card);
-	                    ui.refresh(card);
-	                    card.style.opacity=1;
-	                    card.style.transform='translate('+dx+'px,'+dy+'px)';
-	                    setTimeout(function(){
-	                        card.delete();
-	                    },700);
 	                },700);
 	            },
 	            init:function(){
@@ -720,7 +727,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 	                    var list=[['guanyu','guanping','guansuo','guanyinping'],
 	                    ['caocao','caopi','caozhi','caorui'],['liubei','liushan','liuchen'],
 	                    ['xiahouyuan','xiahouba','xiahoushi'],['sunjian','sunquan','sunce'],
-	                    ['zhangjiao','zhangliang','zhangbao'],['zhugeliang','zhugeguo','zhugejin','zhugeke'],
+	                    ['sp_zhangjiao','zhangliang','zhangbao'],['zhugeliang','zhugeguo','zhugejin','zhugeke'],
 	                    ['mateng','machao','madai','mayunlu']];
 	                    list.randomSort();
 	                    var list2=[];
@@ -923,8 +930,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 	                        }
 	                    }
 	                }
-	                func3();
-	                node.showcaseinterval=setInterval(func3,5000);
+	                // func3();
+	                // node.showcaseinterval=setInterval(func3,5000);
 	            },
 	            content:{
 	                cardPile:function(list){
