@@ -6487,7 +6487,6 @@
 					}
 					delete _status.htmlbg;
 
-
 					window.game=game;
 					var styleToLoad=6;
 					var styleLoaded=function(){
@@ -6944,11 +6943,6 @@
 					var character=lib.imported.character;
 					var play=lib.imported.play;
 					delete window.game;
-					delete window.ui;
-					delete window.get;
-					delete window.ai;
-					delete window.lib;
-					delete window._status;
 					var i,j,k;
 					for(i in mode[lib.config.mode].element){
 						if(!lib.element[i]) lib.element[i]=[];
