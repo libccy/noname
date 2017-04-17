@@ -2482,7 +2482,7 @@
 						}
 						if(get.is.phoneLayout()){
                             map.remember_round_button.show();
-                            map.reset_round_button.show();
+                            // map.reset_round_button.show();
 							map.filternode_button.show();
                             map.show_pause.hide();
                             map.show_auto.hide();
@@ -2492,7 +2492,7 @@
                             map.show_pause.show();
                             map.show_auto.show();
                             map.show_replay.show();
-                            map.remember_round_button.hide();
+                            // map.remember_round_button.hide();
                             map.reset_round_button.hide();
 							map.filternode_button.hide();
                         }
@@ -2779,15 +2779,21 @@
 						intro:'重新开始后触屏按钮将保存的上一局的位置',
 						init:false,
 						unfrequent:true,
-					},
-					reset_round_button:{
-						name:'重置按钮位置',
-						clear:true,
-						unfrequent:true,
-						onclick:function(){
-							ui.click.resetround();
+						onclick:function(bool){
+							game.saveConfig('remember_round_button',bool);
+							if(!bool){
+								ui.click.resetround();
+							}
 						}
 					},
+					// reset_round_button:{
+					// 	name:'重置按钮位置',
+					// 	clear:true,
+					// 	unfrequent:true,
+					// 	onclick:function(){
+					// 		ui.click.resetround();
+					// 	}
+					// },
 					mark_identity_style:{
                         name:'标记身份操作',
 						intro:'设置单击身份按钮时的操作',
@@ -6048,26 +6054,34 @@
 						if(ui.updateUpdate){
 	                        ui.updateUpdate();
 	                    }
-						if(window.StatusBar){
-							if(lib.device=='android'){
-								if(lib.config.show_statusbar_android){
-									window.StatusBar.overlaysWebView(false);
-									window.StatusBar.backgroundColorByName('black');
-									window.StatusBar.show();
-								}
-							}
-							else if(lib.device=='ios'){
-								if(lib.config.show_statusbar_ios!='off'&&lib.config.show_statusbar_ios!='auto'){
-									if(lib.config.show_statusbar_ios=='default'){
+						var showbar=function(){
+							if(window.StatusBar){
+								if(lib.device=='android'){
+									if(lib.config.show_statusbar_android){
 										window.StatusBar.overlaysWebView(false);
+										window.StatusBar.backgroundColorByName('black');
+										window.StatusBar.show();
 									}
-									else{
-										window.StatusBar.overlaysWebView(true);
+								}
+								else if(lib.device=='ios'){
+									if(lib.config.show_statusbar_ios!='off'&&lib.config.show_statusbar_ios!='auto'){
+										if(lib.config.show_statusbar_ios=='default'){
+											window.StatusBar.overlaysWebView(false);
+										}
+										else{
+											window.StatusBar.overlaysWebView(true);
+										}
+										window.StatusBar.backgroundColorByName('black');
+										window.StatusBar.show();
 									}
-									window.StatusBar.backgroundColorByName('black');
-									window.StatusBar.show();
 								}
 							}
+						}
+						if(lib.arenaReady){
+							lib.arenaReady.push(showbar);
+						}
+						else{
+							showbar();
 						}
 					}
 				}
