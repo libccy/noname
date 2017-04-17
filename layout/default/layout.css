@@ -1305,6 +1305,9 @@ div:not(.handcards)>.card>.info>span,
 	font-family: 'huangcao' !important;
 	padding-top: 4px !important;
 }
+.judges:empty{
+	pointer-events: none;
+}
 
 .button.card>.background {
 	font-size: 68px;
