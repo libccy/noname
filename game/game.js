@@ -3472,7 +3472,7 @@
     			    restart:true,
     			},
     			intro:{
-    			    name:'在其它模式中使用剑阁和挑战模式的武将',
+    			    name:'将使用剑阁和挑战模式的武将添加到其它模式',
                     clear:true,
 					nopointer:true,
     			},
