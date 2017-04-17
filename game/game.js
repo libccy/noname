@@ -2492,8 +2492,8 @@
                             map.show_pause.show();
                             map.show_auto.show();
                             map.show_replay.show();
-                            // map.remember_round_button.hide();
-                            map.reset_round_button.hide();
+                            map.remember_round_button.hide();
+                            // map.reset_round_button.hide();
 							map.filternode_button.hide();
                         }
 						if(lib.config.show_card_prompt){
