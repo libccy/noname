@@ -1,8 +1,8 @@
 window.noname_update={
-    version:'1.9.24',
+    version:'1.9.24.1',
     // update:'1.9.23',
     changeLog:[
-        '神之试炼',
+        'bug修复',
     ],
     files:[
         // 'game/game.js',

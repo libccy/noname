@@ -28,7 +28,7 @@ window.noname_package={
         hearth:'炉石传说',
     },
     play:{
-        boss:'剑阁挑战',
+        boss:'诸神降临',
         cardpile:'牌堆补充',
         wuxing:'五行生克',
         coin:'富甲天下',

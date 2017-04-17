@@ -191,43 +191,36 @@ game.import('play',function(){
 			if(get.mode()=='tafang') return;
 			var loadversus=function(){
 				if(get.mode()!='versus'){
-					lib.init.js(lib.assetURL+'mode','versus',function(){
-						var mode=lib.imported.mode;
-						for(var i in mode.versus.translate){
-							lib.translate[i]=lib.translate[i]||mode.versus.translate[i];
+					game.loadModeAsync('versus',function(mode){
+						for(var i in mode.translate){
+							lib.translate[i]=lib.translate[i]||mode.translate[i];
 						}
-						for(var i in mode.versus.skill){
+						for(var i in mode.skill){
 							if(lib.skill[i]) console.log(i);
 							if(i!='versus_ladder'){
-								lib.skill[i]=lib.init.eval(mode.versus.skill[i]);
+								lib.skill[i]=lib.init.eval(mode.skill[i]);
 								game.finishSkill(i);
 							}
 						}
-						delete lib.imported.mode.versus;
 					});
 				}
 			};
 			if(get.mode()!='boss'){
-				lib.init.js(lib.assetURL+'mode','boss',function(){
-					var mode=lib.imported.mode;
-					for(var i in mode.boss.translate){
-						lib.translate[i]=lib.translate[i]||mode.boss.translate[i];
+				game.loadModeAsync('boss',function(mode){
+					for(var i in mode.translate){
+						lib.translate[i]=lib.translate[i]||mode.translate[i];
 					}
-					for(var i in mode.boss.skill){
+					for(var i in mode.skill){
 						if(lib.skill[i]) console.log(i);
-						lib.skill[i]=lib.init.eval(mode.boss.skill[i]);
+						lib.skill[i]=lib.init.eval(mode.skill[i]);
 						game.finishSkill(i);
 					}
-					delete lib.imported.mode.boss;
 					loadversus();
 				});
 			}
 			else{
 				loadversus();
 			}
-		},
-		help:{
-			'挑战武将':'<ul><li>在非挑战模式中使用挑战武将'
 		},
 	};
 });

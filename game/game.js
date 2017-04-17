@@ -3472,7 +3472,7 @@
     			    restart:true,
     			},
     			intro:{
-    			    name:'在非挑战模式中使用剑阁和挑战模式的武将',
+    			    name:'在其它模式中使用剑阁和挑战模式的武将',
                     clear:true,
 					nopointer:true,
     			},
@@ -6483,11 +6483,6 @@
 
 
 					window.game=game;
-					window.lib=lib;
-					window.ui=ui;
-					window.ai=ai;
-					window.get=get;
-					window._status=_status;
 					var styleToLoad=6;
 					var styleLoaded=function(){
 						styleToLoad--;
@@ -6937,7 +6932,7 @@
 					});
 				}
 
-				var proceed=function(){
+				var proceed2=function(){
 					var mode=lib.imported.mode;
 					var card=lib.imported.card;
 					var character=lib.imported.character;
@@ -7329,16 +7324,16 @@
                     }
                     delete lib.extensions;
 
-					var proceed=function(){
-						if(lib.init.startBefore){
-							lib.init.startBefore();
-							delete lib.init.startBefore;
-						}
-	                    ui.create.arena();
-						game.createEvent('game',false).setContent(lib.init.start);
-						delete lib.init.start;
-						game.loop();
-					};
+					if(lib.init.startBefore){
+						lib.init.startBefore();
+						delete lib.init.startBefore;
+					}
+                    ui.create.arena();
+					game.createEvent('game',false).setContent(lib.init.start);
+					delete lib.init.start;
+					game.loop();
+				}
+				var proceed=function(){
 					if(!lib.db){
 						try{
 							lib.storage=JSON.parse(localStorage.getItem(lib.configprefix+lib.config.mode));
@@ -7349,15 +7344,15 @@
 							lib.storage={};
 							localStorage.setItem(lib.configprefix+lib.config.mode,"{}");
 						}
-						proceed();
+						proceed2();
 					}
 					else{
 						game.getDB('data',lib.config.mode,function(obj){
 							lib.storage=obj||{};
-							proceed();
+							proceed2();
 						});
 					}
-				}
+				};
 				if(!lib.imported.mode||!lib.imported.mode[lib.config.mode]){
 					window.inSplash=true;
 					clearTimeout(window.resetGameTimeout);
@@ -8694,12 +8689,11 @@
     			},
                 loadMode:function(){
     				'step 0'
-					event.removegame=window.game!=game;
-					if(event.removegame) window.game=game;
+					window.game=game;
     				lib.init.js(lib.assetURL+'mode',event.mode,game.resume);
     				game.pause();
     				'step 1'
-					if(event.removegame) delete window.game;
+					if(!lib.config.dev) delete window.game;
     				event.result=lib.imported.mode[event.mode];
     				delete lib.imported.mode[event.mode];
     			},
@@ -20802,7 +20796,20 @@
 				if(!lib.imported[type]){
 					lib.imported[type]={};
 				}
+				var bool_ui=!window.ui;
+				var bool_get=!window.get;
+				var bool_ai=!window.ai;
+				var bool_lib=!window.lib;
+				window.ui=ui;
+				window.get=get;
+				window.ai=ai;
+				window.lib=lib;
+				window._status=_status;
 				var content2=content();
+				if(bool_ui) delete window.ui;
+				if(bool_get) delete window.get;
+				if(bool_ai) delete window.ai;
+				if(bool_lib) delete window.lib;
 				if(content2.name){
 					lib.imported[type][content2.name]=content2;
 					delete content2.name;
@@ -24774,10 +24781,9 @@
 			return players[0];
 		},
         loadModeAsync:function(name,callback){
-			var removegame=window.game!=game;
-			if(removegame) window.game=game;
+			window.game=game;
             var script=lib.init.js(lib.assetURL+'mode',name,function(){
-				if(removegame) delete window.game;
+				if(!lib.config.dev) delete window.game;
                 script.remove();
 				var content=lib.imported.mode[name];
 				delete lib.imported.mode[name];
@@ -24795,10 +24801,9 @@
 					}
 				}
 			}
-			var removegame=window.game!=game;
-			if(removegame) window.game=game;
+			window.game=game;
             var script=lib.init.js(lib.assetURL+'mode',name,function(){
-				if(removegame) delete window.game;
+				if(!lib.config.dev) delete window.game;
                 script.remove();
                 var mode=lib.imported.mode;
                 _status.sourcemode=lib.config.mode;
@@ -31757,15 +31762,9 @@
 								},function(){
 									onprogress(-1);
 									_status.importingExtension=true;
-									var removegame=false;
-									if(window.game!=game){
-										window.game=game;
-										removegame=true;
-									}
+									window.game=game;
 									lib.init.js(lib.assetURL+'extension/'+that.info.name,'extension',function(){
-										if(removegame){
-											delete window.game;
-										}
+										if(!lib.config.dev) delete window.game;
 										if(game.importedPack){
 											var extname=game.importedPack.name;
 											if(lib.config.extensions.contains(extname)){
