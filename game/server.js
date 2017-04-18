@@ -72,12 +72,6 @@
         events:function(cfg,id,type){
             var changed=false;
             var time=(new Date()).getTime();
-            for(var i=0;i<events.length;i++){
-                if(events[i].utc<=time){
-                    events.splice(i--,1);
-                    changed=true;
-                }
-            }
             if(cfg&&id){
                 if(typeof cfg=='string'){
                     for(var i=0;i<events.length;i++){
@@ -231,6 +225,14 @@
             return clientlist;
         },
         updaterooms:function(){
+            if(events.length){
+                var time=(new Date()).getTime();
+                for(var i=0;i<events.length;i++){
+                    if(events[i].utc<=time){
+                        events.splice(i--,1);
+                    }
+                }
+            }
             var roomlist=util.getroomlist();
             for(var i in clients){
                 if(!clients[i].room){
