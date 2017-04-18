@@ -3,6 +3,7 @@
     var wss=new WebSocketServer({port:8080});
 
     var rooms=[{},{},{},{},{},{}];
+    var events=[];
     var clients={};
     var messages={
         enter:function(index,nickname,avatar,config,mode){
@@ -68,6 +69,64 @@
                 util.updaterooms();
             }
         },
+        events:function(cfg,id,type){
+            var changed=false;
+            var time=(new Date()).getTime();
+            for(var i=0;i<events.length;i++){
+                if(events[i].utc<=time){
+                    events.splice(i--,1);
+                    changed=true;
+                }
+            }
+            if(cfg&&id){
+                if(typeof cfg=='string'){
+                    for(var i=0;i<events.length;i++){
+                        if(events[i].id==cfg){
+                            if(type=='join'){
+                                if(events[i].members.indexOf(id)==-1){
+                                    events[i].members.push(id);
+                                }
+                                changed=true;
+                            }
+                            else if(type=='leave'){
+                                var index=events[i].members.indexOf(id);
+                                if(index!=-1){
+                                    events[i].members.splice(index,1);
+                                    if(events[i].members.length==0){
+                                        events.splice(i--,1);
+                                    }
+                                }
+                                changed=true;
+                            }
+                        }
+                    }
+                }
+                else if(cfg.hasOwnProperty('utc')&&
+                        cfg.hasOwnProperty('day')&&
+                        cfg.hasOwnProperty('hour')&&
+                        cfg.hasOwnProperty('content')){
+                    if(events.length>=20){
+                        this.sendl('eventsdenied','total');
+                    }
+                    else if(cfg.utc<=time){
+                        this.sendl('eventsdenied','time');
+                    }
+                    else{
+                        cfg.nickname=cfg.nickname||'无名玩家';
+                        cfg.avatar=cfg.nickname||'caocao';
+                        cfg.creator=id;
+                        cfg.id=(Math.floor(1000000+9000000*Math.random())).toString();
+                        cfg.members=[id];
+                        events.unshift(cfg);
+                        changed=true;
+                        this.sendl('eventsaccepted');
+                    }
+                }
+            }
+            if(changed){
+                util.updaterooms();
+            }
+        },
         config:function(config){
             var room=this.room;
             if(room&&room.owner==this){
@@ -82,6 +141,15 @@
                     }
                 }
                 room.config=config;
+            }
+            util.updaterooms();
+        },
+        status:function(str){
+            if(typeof str=='string'){
+                this.status=str;
+            }
+            else{
+                delete this.status;
             }
             util.updaterooms();
         },
@@ -145,11 +213,28 @@
             }
             return roomlist;
         },
+        getclientlist:function(me){
+            var clientlist=[];
+            for(var i in clients){
+                var num;
+                if(clients[i]==me){
+                    num=0;
+                }
+                else if(clients[i].room){
+                    num=1;
+                }
+                else{
+                    num=2;
+                }
+                clientlist.push([clients[i].nickname,clients[i].avatar,num,clients[i].status]);
+            }
+            return clientlist;
+        },
         updaterooms:function(){
             var roomlist=util.getroomlist();
             for(var i in clients){
                 if(!clients[i].room){
-                    clients[i].sendl('updaterooms',roomlist);
+                    clients[i].sendl('updaterooms',roomlist,events,util.getclientlist(clients[i]));
                 }
             }
         },
@@ -158,7 +243,7 @@
         ws.sendl=util.sendl;
         ws.wsid=util.getid();
         clients[ws.wsid]=ws;
-        ws.sendl('roomlist',util.getroomlist());
+        ws.sendl('roomlist',util.getroomlist(),events,util.getclientlist(ws));
         ws.heartbeat=setInterval(function(){
             if(ws.beat){
                 ws.close();

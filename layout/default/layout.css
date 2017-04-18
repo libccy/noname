@@ -81,12 +81,11 @@ table {
 #window.shortcutpaused.modepaused>.modenopause.popup-container:not(.filter-character) {
 	opacity: 0.3;
 }
-#window.shortcutpaused>div:not(.background):not(#shortcut):not(#system):not(#arena):not(.hidden):
-not(.removing):not(.dialog):not(.centermenu):not(.popup-container):not(.forceopaque) {
-	opacity: 0.3 !important
+#window.shortcutpaused>div:not(.background):not(#shortcut):not(#system):not(#arena):not(.hidden):not(.removing):not(.dialog):not(.centermenu):not(.popup-container):not(.forceopaque) {
+	opacity: 0.3 !important;
 }
 #window.shortcutpaused>#arena>div:not(#timer):not(.removing):not(.hidden):not(#autonode) {
-	opacity: 0.3 !important
+	opacity: 0.3 !important;
 }
 #window.systempaused>#system {
 	opacity: 0.3 !important;
@@ -2741,10 +2740,33 @@ div:not(.handcards)>.card>.info>span,
 #window>.player.connect {
 	width: 120px;
 }
+#window.menupaused>.player.connect{
+	opacity: 0.5;
+}
 .connectbutton {
 	top: calc(400% / 7 - 35px);
 	width: 130px;
 	left: calc(50% - 70px);
+}
+.connectevents {
+	left: auto;
+	top: auto;
+	right: 20px;
+	bottom: 20px;
+}
+.connectevents.left{
+	transform: translateX(-85px);
+}
+.connectevents.icon{
+	width: 20px;
+	height: 20px;
+	border-radius: 100%;
+	padding: 0;
+	font-size: 15px;
+	font-family: 'xinwei';
+	line-height: 22px;
+	bottom: 47px;
+	right: 13px;
 }
 
 /*--------动画--------*/

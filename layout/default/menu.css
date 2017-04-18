@@ -1232,6 +1232,53 @@ input.fileinput::-webkit-file-upload-button {
 .videonode.starred>.video_star{
 	opacity: 1
 }
+
+.onlineclient .videonode{
+	margin: 5px;
+    padding: 0;
+    width: calc(100% - 20px);
+    height: 30px;
+	overflow: visible;
+	border-top-left-radius:10px;
+	border-bottom-left-radius:10px;
+}
+.onlineclient .videonode>.videoavatar{
+	padding: 0;
+	left: -4px;
+	top: -2px;
+	width: 34px;
+	height: 34px;
+	border-radius: 100%;
+}
+.onlineclient .videotext{
+	margin-top: 0px;
+	font-size: 14px;
+	width: calc(100% - 30px);
+}
+.onlineclient .onlineevent.videotext{
+	margin-top: 2px;
+}
+.onlineclient .videonode>.name{
+	left: 35px;
+	white-space: nowrap;
+	text-align: left;
+	height: 30px;
+	line-height: 30px;
+	font-size: 18px;
+	font-family: 'xinwei';
+}
+.onlineevent>div{
+	text-align: left;
+	position: relative;
+	display: block;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+.onlineevent>div.title{
+	font-family: 'xinwei';
+	font-size: 18px;
+}
+
 .button-downloading>.button-progress{
 	width: 100%;
 	border-radius: 4px;

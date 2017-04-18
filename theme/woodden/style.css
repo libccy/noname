@@ -81,7 +81,7 @@ html{
 .dialog.popped .yellowtext{
 	color:#631515;
 }
-.dialog.popped .greentext,.control span.greentext{
+.dialog.popped .greentext,.control span.greentext,.poisontext.poisonauto{
 	color:#00312d;
 }
 .control span.firetext{
@@ -149,6 +149,10 @@ html{
 .menubutton.round.active,
 .menubutton.active{
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 0.4) 0 0 0 2px, rgba(0, 133, 255, 1) 0 0 5px !important;
+}
+.connectevents.icon.highlight{
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 0 5px !important;
+	background: url('wood.jpg');
 }
 .videonode.menubutton.extension>.caption>.menubutton.active{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px !important;
