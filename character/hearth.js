@@ -52,6 +52,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_yogg:['male','wu',3,['kuangluan','qianhou']],
     		hs_xialikeer:['female','shu',3,['duxin']],
             hs_pyros:['female','shu',2,['pyuhuo']],
+            hs_kalimosi:['male','wu',4,['kqizhou']],
 
     		hs_zhishigushu:['male','shu',4,['jiaohui']],
     		hs_zhanzhenggushu:['male','wei',6,['biri']],
@@ -173,6 +174,53 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_malfurion:['hs_malorne'],
     	},
     	skill:{
+            kqizhou:{
+                trigger:{player:'phaseBegin'},
+                direct:true,
+                filter:function(event,player){
+                    return player.storage.kqizhou;
+                },
+                content:function(){
+                    'step 0'
+                    delete player.storage.kqizhou;
+                    var list=[['','','hsqizhou_feng'],
+                        ['','','hsqizhou_shui'],
+    					['','','hsqizhou_huo'],
+    					['','','hsqizhou_tu']];
+    				var dialog=ui.create.dialog(get.prompt('kqizhou'),[list,'vcard'],'hidden');
+                    var shui=(player.hp<=1&&player.maxHp>=3);
+                    var tu=game.hasPlayer(function(current){
+                        return current.hp==1&&ai.get.attitude(player,current)>0;
+                    });
+    				player.chooseButton(dialog).ai=function(button){
+                        if(!player.hasFriend()&&button.link[2]=='hsqizhou_tu') return 0;
+                        if(player.isHealthy()&&button.link[2]=='hsqizhou_shui') return 0;
+                        if(shui&&button.link[2]=='hsqizhou_shui') {console.log('stf');return 3;}
+                        if(tu&&button.link[2]=='hsqizhou_tu') return 2;
+                        return Math.random();
+                    };
+    				'step 1'
+    				if(result.buttons){
+    					player.logSkill('kqizhou');
+    					player.gain(game.createCard(result.buttons[0].link[2]),'draw');
+    				}
+                },
+                group:'kqizhou_add',
+                subSkill:{
+                    add:{
+                        trigger:{player:'useCard'},
+                        forced:true,
+                        popup:false,
+                        silent:true,
+                        filter:function(event,player){
+                            return _status.currentPhase==player&&get.type(event.card,'trick')=='trick';
+                        },
+                        content:function(){
+                            player.storage.kqizhou=true;
+                        }
+                    }
+                }
+            },
             jingcu:{
                 enable:'phaseUse',
                 filter:function(event,player){
@@ -2700,7 +2748,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				var list=[['','','hsshenqi_morijingxiang'],
     					['','','hsshenqi_kongbusangzhong'],
     					['','','hsshenqi_nengliangzhiguang']];
-    				var dialog=ui.create.dialog('邪能：选择一张神器牌并获得之',[list,'vcard'],'hidden');
+    				var dialog=ui.create.dialog(get.prompt('xieneng'),[list,'vcard'],'hidden');
     				player.chooseButton(dialog).ai=function(){return Math.random();};
     				'step 1'
     				if(result.buttons){
@@ -5671,8 +5719,129 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hsshenqi:0.5,
     		hsyaoshui:0.5,
     		hsqingyu:0.5,
+            hsqizhou:0.5,
     	},
     	card:{
+            hsqizhou_feng:{
+    			type:'hsqizhou',
+    			fullimage:true,
+    			vanish:true,
+    			enable:true,
+    			derivation:'hs_kalimosi',
+                filterTarget:function(card,player,target){
+                    return target==player;
+                },
+                selectTarget:-1,
+                content:function(){
+                    'step 0'
+                    event.list=target.getEnemies().sortBySeat();
+                    player.line(event.list,'thunder');
+                    'step 1'
+                    if(event.list.length){
+                        event.current=event.list.shift();
+                        event.current.animate('target');
+                        var next=event.current.chooseToRespond({name:'sha'});
+    					next.ai=function(card){
+    						if(get.damageEffect(event.current,player,event.current,'thunder')>=0) return 0;
+    						if(player.hasSkillTag('notricksource')) return 0;
+    						if(event.current.hasSkillTag('notrick')) return 0;
+    						return 11-get.value(card);
+    					};
+    					next.autochoose=lib.filter.autoRespondSha;
+                    }
+                    else{
+                        event.finish();
+                    }
+                    'step 2'
+                    if(!result.bool){
+                        event.current.damage('thunder');
+                    }
+                    game.delayx(0.5);
+                    'step 3'
+                    event.goto(1);
+                },
+    			ai:{
+    				order:8,
+    				useful:[5,1],
+    				value:8,
+    				result:{
+    					target:1,
+    				},
+    			}
+    		},
+            hsqizhou_shui:{
+    			type:'hsqizhou',
+    			fullimage:true,
+    			vanish:true,
+    			enable:function(event,player){
+                    return player.isDamaged();
+                },
+    			derivation:'hs_kalimosi',
+                filterTarget:function(card,player,target){
+                    return target==player;
+                },
+                selectTarget:-1,
+                content:function(){
+                    target.recover(2);
+                },
+    			ai:{
+    				order:8,
+    				useful:[5,1],
+    				value:8,
+                    tag:{
+                        recover:1
+                    },
+    				result:{
+    					target:2,
+    				},
+    			}
+    		},
+            hsqizhou_huo:{
+    			type:'hsqizhou',
+    			fullimage:true,
+    			vanish:true,
+    			enable:true,
+    			derivation:'hs_kalimosi',
+                filterTarget:true,
+                content:function(){
+                    target.damage('fire');
+                },
+    			ai:{
+                    order:5,
+    				result:{
+    					target:-1,
+    				},
+    				useful:[5,1],
+    				value:8,
+    				tag:{
+    					damage:1,
+    					fireDamage:1,
+    					natureDamage:1,
+    				}
+    			}
+    		},
+            hsqizhou_tu:{
+    			type:'hsqizhou',
+    			fullimage:true,
+    			vanish:true,
+    			enable:true,
+    			derivation:'hs_kalimosi',
+                filterTarget:function(card,player,target){
+                    return target!=player
+                },
+                selectTarget:[1,Infinity],
+                content:function(){
+                    target.changeHujia();
+                },
+    			ai:{
+    				order:8,
+    				useful:[5,1],
+    				value:8,
+    				result:{
+    					target:1,
+    				},
+    			}
+    		},
     		hsqingyu_feibiao:{
     			type:'hsqingyu',
     			fullimage:true,
@@ -6343,7 +6512,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_fenjie:'芬杰',
     		hs_wujiyuansu:'无羁元素',
             hs_mojinbaozi:'魔晶孢子',
+            hs_kalimosi:'卡利莫斯',
 
+            hsqizhou:'祈咒',
+            hsqizhou_feng:'风之祈咒',
+            hsqizhou_feng_info:'出牌阶段对自己使用，令所有目标的敌人打出一张杀或受到一点雷属性伤害',
+            hsqizhou_shui:'水之祈咒',
+            hsqizhou_shui_info:'出牌阶段对自己使用，回复两点体力',
+            hsqizhou_huo:'火之祈咒',
+            hsqizhou_huo_info:'出牌阶段对任意角色使用，令目标受到一点火属性伤害',
+            hsqizhou_tu:'土之祈咒',
+            hsqizhou_tu_info:'出牌阶段对任意其他角色使用，令目标获得一点护甲',
+            kqizhou:'祈咒',
+            kqizhou_info:'准备阶段，若你于上回合使用过锦囊牌，则可以获得一张元素祈咒',
             jingcu:'晶簇',
             jingcu_info:'出牌阶段，你可以减少一点体力上限并摸两张牌',
             shengzhang:'生长',

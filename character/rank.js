@@ -154,6 +154,7 @@ window.noname_character_rank={
         'yxs_luzhishen',
         'hs_jaina',
         're_lidian',
+        'hs_kalimosi',
     ],
     am:[
         'hs_pyros',
