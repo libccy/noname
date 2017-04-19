@@ -12012,7 +12012,7 @@
 						}
                         if(game.online&&player==game.me&&!_status.over&&!game.controlOver&&!ui.exit){
                             if(lib.mode[lib.configOL.mode].config.dierestart){
-                                ui.exit=ui.create.control('退出联机',ui.click.exit);
+                                ui.exit=ui.create.control('退出房间',ui.click.exit);
                             }
                         }
 
@@ -20158,7 +20158,7 @@
 	                        ui.cardPileButton.style.display='';
 	                    }
                         if(!observe&&game.me&&game.me.isDead()){
-                            ui.exit=ui.create.control('退出联机',ui.click.exit);
+                            ui.exit=ui.create.control('退出房间',ui.click.exit);
                         }
 						ui.updatehl();
                     });
@@ -23514,7 +23514,7 @@
     				}
     			}
                 if(!ui.exit){
-                    ui.exit=ui.create.control('退出联机',ui.click.exit);
+                    ui.exit=ui.create.control('退出房间',ui.click.exit);
                 }
 				if(ui.giveup){
 					ui.giveup.remove();
