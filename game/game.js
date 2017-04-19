@@ -37,6 +37,8 @@
         onphase:[],
 		onwash:[],
 		onover:[],
+		ondb:[],
+		ondb2:[],
         chatHistory:[],
 		arenaReady:[],
 		onfree:[],
@@ -22445,9 +22447,19 @@
 		},
 		reload2:function(){
 			lib.status.reload--;
-			if(_status.waitingToReload&&lib.status.reload==0){
-				window.location.reload();
-				delete _status.waitingToReload;
+			if(lib.status.reload==0&&lib.ondb2.length){
+				var command=lib.ondb2.shift();
+				game[command[0]].apply(game,command[1]);
+			}
+			if(lib.status.reload==0&&lib.ondb.length){
+				var command=lib.ondb.shift();
+				game[command[0]].apply(game,command[1]);
+			}
+			if(lib.status.reload==0){
+				if(_status.waitingToReload){
+					window.location.reload();
+					delete _status.waitingToReload;
+				}
 			}
 		},
         exit:function(){
@@ -26142,11 +26154,17 @@
         },
 		putDB:function(type,id,item,callback){
 			if(!lib.db) return item;
+			if(lib.status.reload){
+				lib[_status.dburgent?'ondb2':'ondb'].push(['putDB',Array.from(arguments)]);
+				return;
+			}
 			lib.status.reload++;
 			var put=lib.db.transaction([type],'readwrite').objectStore(type).put(item,id);
 			put.onsuccess=function(){
 				if(callback){
+					_status.dburgent=true;
 					callback.apply(this,arguments);
+					delete _status.dburgent;
 				}
 				game.reload2();
 			};
@@ -26157,10 +26175,18 @@
 				return;
 			}
 			if(!callback) return;
+			if(lib.status.reload){
+				lib[_status.dburgent?'ondb2':'ondb'].push(['getDB',Array.from(arguments)]);
+				return;
+			}
+			lib.status.reload++;
 			var store=lib.db.transaction([type],'readwrite').objectStore(type);
 			if(id){
 				store.get(id).onsuccess=function(e){
+					_status.dburgent=true;
 					callback(e.target.result);
+					delete _status.dburgent;
+					game.reload2();
 				};
 			}
 			else{
@@ -26172,7 +26198,10 @@
 						cursor.continue();
 					}
 					else{
+						_status.dburgent=true;
 						callback(obj);
+						delete _status.dburgent;
+						game.reload2();
 					}
 				}
 			}
@@ -26180,6 +26209,10 @@
 		deleteDB:function(type,id,callback){
 			if(!lib.db){
 				callback(false);
+				return;
+			}
+			if(lib.status.reload){
+				lib[_status.dburgent?'ondb2':'ondb'].push(['deleteDB',Array.from(arguments)]);
 				return;
 			}
 			lib.status.reload++;
@@ -26250,7 +26283,10 @@
 							config[key]=value;
 						}
 						config.version=lib.version;
-						game.putDB('data',mode,config);
+						console.log(key,value);
+						game.putDB('data',mode,config,function(){
+							console.log(key,value,2);
+						});
 					});
 				}
 				else{
