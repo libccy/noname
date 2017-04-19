@@ -35586,6 +35586,9 @@
 					var button=this;
 					var layer=ui.create.div('.poplayer',ui.window);
 					var uiintro=ui.create.dialog('hidden','notouchscroll');
+					if(lib.config.touchscreen){
+						lib.setScroll(uiintro.contentContainer);
+					}
 					layer.listen(function(){
 						if(this.clicked){
 							this.clicked=false;
@@ -35766,6 +35769,9 @@
 					var button=this;
 					var layer=ui.create.div('.poplayer',ui.window);
 					var uiintro=ui.create.dialog('hidden','notouchscroll');
+					if(lib.config.touchscreen){
+						lib.setScroll(uiintro.contentContainer);
+					}
 					layer.listen(function(){
 						if(this.clicked){
 							this.clicked=false;
