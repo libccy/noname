@@ -35706,17 +35706,19 @@
 								num++;
 							}
 							var eventnode=ui.create.div('.menubutton.videotext.onlineevent.pointerdiv',function(){
-								if(this.classList.contains('active')){
-									if(confirm('确定要离开'+this.info.content+'？')){
-										game.send('server','events',this.info.id,game.onlineKey,'leave');
+								var that=this;
+								setTimeout(function(){
+									if(that.classList.contains('active')){
+										if(confirm('确定要离开'+that.info.content+'？')){
+											game.send('server','events',that.info.id,game.onlineKey,'leave');
+										}
 									}
-								}
-								else{
-									if(confirm('确定要加入'+this.info.content+'？')){
-										game.send('server','events',this.info.id,game.onlineKey,'join');
+									else{
+										if(confirm('确定要加入'+that.info.content+'？')){
+											game.send('server','events',that.info.id,game.onlineKey,'join');
+										}
 									}
-								}
-								ui.click.touchpop();
+								});
 							},uiintro.content);
 							eventnode.info=button.info[i];
 							ui.create.div('.title',button.info[i].content,eventnode);
