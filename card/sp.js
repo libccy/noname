@@ -7,6 +7,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			jinchan:{
 				fullskin:true,
 				type:'trick',
+				notarget:true,
+				content:function(){
+					var evt=event.getParent(3)._trigger;
+					if(evt.jinchan){
+						var type=get.type(evt.card,'trick');
+						if(type=='basic'||type=='trick'){
+							evt.untrigger();
+			                evt.finish();
+						}
+					}
+					player.draw(2);
+				},
 				ai:{
 					useful:function(){
 						var player=_status.event.player;
@@ -19,6 +31,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							return 6;
 						}
 						return 1;
+					},
+					result:{
+						player:1
 					},
 					value:5
 				}
@@ -533,14 +548,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.showHandcards(get.translation(player)+'发动了【金蝉脱壳】');
+					player.chooseToUse({name:'jinchan'},'是否对'+get.translation(trigger.card)+'使用【金蝉脱壳】？').set('ai1',function(card){
+						return _status.event.bool;
+					}).set('bool',-ai.get.effect(player,trigger.card,trigger.player,player));
+					trigger.jinchan=true;
 					'step 1'
-					var type=get.type(trigger.card,'trick');
-					if(type=='basic'||type=='trick'){
-						trigger.untrigger();
-						trigger.finish();
-					}
-					player.draw(2);
+					delete trigger.jinchan;
 				}
 			},
 			_jinchan2:{

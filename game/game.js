@@ -23444,7 +23444,7 @@
 			else if(suit=='red'){
 				suit=Math.random()<0.5?'diamond':'heart';
 			}
-			if(typeof number!='number'){
+			if(typeof number!='number'&&typeof number!='string'){
 				number=Math.ceil(Math.random()*13);
 			}
             var card;

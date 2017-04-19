@@ -49,7 +49,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_kcthun:['male','qun',4,['luanji','xianji']],
     		hs_anomalus:['male','wei',4,['mobao']],
     		hs_blingtron:['male','shu',3,['zengli','xiubu']],
-    		hs_yogg:['male','wu',3,['kuangluan','qianhou']],
+    		hs_yogg:['male','wu',4,['qianhou']],
     		hs_xialikeer:['female','shu',3,['duxin']],
             hs_pyros:['female','shu',2,['pyuhuo']],
             hs_kalimosi:['male','wu',4,['kqizhou']],
@@ -77,7 +77,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
     		hs_fandral:['male','shu',4,['nuyan','chouhuo']],
     		hs_hallazeal:['male','wei',4,['shengteng','yuansu']],
-    		hs_enzoth:['male','qun',3,['mengye']],
+    		hs_enzoth:['male','qun',4,['mengye']],
     		hs_walian:['male','shu',4,['wzhanyi']],
     		// hs_pengpeng:['male','qun',4,['zhadan']],
     		// hs_yashaji:['male','wei',3,[]],
@@ -297,33 +297,41 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             },
             mengye:{
                 trigger:{player:'phaseEnd'},
-                forced:true,
+                direct:true,
                 filter:function(event,player){
-                    var enemies=player.getEnemies();
-                    for(var i=0;i<enemies.length;i++){
-                        if(enemies[i].countCards('h')) return true;
-                    }
-                    return false;
+                    return game.hasPlayer(function(current){
+                        return current!=player&&current.countCards('h');
+                    });
                 },
                 content:function(){
-                    var enemies=player.getEnemies();
-                    for(var i=0;i<enemies.length;i++){
-                        if(!enemies[i].countCards('h')){
-                            enemies.splice(i--,1);
+                    'step 0'
+                    player.chooseTarget(get.prompt('mengye'),function(card,player,target){
+                        return target.countCards('h')>0;
+                    }).ai=function(target){
+                        if(target.hasSkillTag('nodu')) return ai.get.attitude(player,target)*1.5;
+                        if(target.hasCard(function(card){
+                            return card.name!='du';
+                        })){
+                            return -ai.get.attitude(player,target);
                         }
+                        return -ai.get.attitude(player,target)/5;
                     }
-                    if(enemies.length){
-                        var target=enemies.randomGet();
-                        player.line(target,'green');
-                        var card=target.getCards('h').randomGet();
+                    'step 1'
+                    if(result.bool){
+                        var target=result.targets[0];
+                        player.logSkill('mengye',target);
+                        var card=target.getCards('h',function(card){
+                            return card.name!='du';
+                        }).randomGet();
                         if(card){
                             card.init([card.suit,card.number,'du']);
-        					game.log(target,'将一张手牌转化为',{name:'du'});
                         }
+                        target.changeHujia();
+                        game.log(target,'将一张手牌转化为',{name:'du'});
                     }
                 },
                 ai:{
-                    threaten:1.1
+                    threaten:1.5
                 }
             },
     		mengye_old:{
@@ -698,6 +706,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{player:'phaseBegin'},
     			forced:true,
     			content:function(){
+                    'step 0'
     				var list=[];
     				for(var i=0;i<lib.inpile.length;i++){
     					if(lib.filter.filterCard({name:lib.inpile[i]},player)){
@@ -722,10 +731,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					});
     					if(targets.length){
     						targets.sort(lib.sort.seat);
-    						if(info.selectTarget==-1){
-    							player.useCard(card,targets,'noai');
-    						}
-    						else{
+    						if(info.selectTarget!=-1){
     							var num=info.selectTarget;
     							if(Array.isArray(num)){
     								if(targets.length<num[0]) continue;
@@ -734,11 +740,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     							else{
     								if(targets.length<num) continue;
     							}
-    							player.useCard(card,targets.randomGets(num),'noai');
+                                targets=targets.randomGets(num);
     						}
+                            player.useCard(card,targets,'noai');
+                            if(targets.length==1&&targets[0]!=player){
+                                event.cardname=card.name;
+                            }
     						break;
     					}
     				}
+                    'step 1'
+                    if(player.countCards('h')&&event.cardname){
+                        player.chooseCard('是否将一张手牌转化为'+get.translation(event.cardname)+'？','h').ai=function(card){
+                            return ai.get.value({name:event.cardname})-ai.get.value(card);
+                        }
+                    }
+                    else{
+                        event.finish();
+                    }
+                    'step 2'
+                    if(result.bool){
+                        var card=result.cards[0];
+                        card.init([card.suit,card.number,event.cardname]);
+                        player.$draw(game.createCard({name:event.cardname,suit:' ',number:' '}));
+                        game.log(player,'将一张手牌转化为',{name:event.cardname});
+                    }
     			}
     		},
     		longyi:{
@@ -6532,7 +6558,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             pyuhuo:'浴火',
             pyuhuo_info:'锁定技，在你首次进入濒死状态时，你弃置所有牌、重置武将牌、将体力和体力上限变为4并摸4张牌；在你第二次进入濒死状态时，你弃置所有牌、重置武将牌、将体力和体力上限变为6并摸6张牌',
             mengye:'梦魇',
-            mengye_info:'锁定技，结束阶段，你将一名随机敌人的一张随机手牌转化为毒',
+            mengye_info:'结束阶段，你可以选择一名有手牌的角色将其一张随机的非毒手牌转化为毒，然后令其获得一点护甲',
     		mengye_old:'梦魇',
     		mengye_old2:'梦魇',
     		mengye_old_info:'回合结束后，你可以翻面并指定一名的非主公角色，由你控制其进行一个额外的回合。在此回合中，你的本体不参与游戏',
@@ -6809,7 +6835,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		aoshu_info:'出牌阶段限一次，你可以将一张黑桃牌当作无中生有使用',
 
     		qianhou:'千喉',
-    		qianhou_info:'锁定技，准备阶段，你视为使用一张随机锦囊（随机指定目标）',
+    		qianhou_info:'锁定技，准备阶段，你视为使用一张随机普通锦囊牌（随机指定目标）；若目标只有1人且不是你，你可以将一张手牌转化为此锦囊',
     		fengxing:'风行',
     		fengxing_info:'每当你于回合外首次失去牌，你可以弃置一张牌并摸两张牌',
     		xinci:'心刺',

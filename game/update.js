@@ -12,7 +12,7 @@ window.noname_update={
         // 'game/pressure.js',
         'game/asset.js',
         // 'card/*',
-        // 'card/sp.js',
+        'card/sp.js',
         // 'card/yunchou.js',
         // 'character/*',
         'character/hearth.js',
