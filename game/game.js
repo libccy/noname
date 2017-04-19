@@ -35706,6 +35706,7 @@
 										game.send('server','events',this.info.id,game.onlineKey,'join');
 									}
 								}
+								ui.click.touchpop();
 							},uiintro.content);
 							eventnode.info=button.info[i];
 							ui.create.div('.title',button.info[i].content,eventnode);
@@ -35858,13 +35859,13 @@
 						var node=ui.create.div('.menubutton.videonode.pointerdiv',uiintro.content);
 						ui.create.div('.menubutton.videoavatar',node).setBackground(this.info[i][1]||'caocao','character');
 						if(this.info[i][4]==game.wsid){
-							ui.create.div('.name','<span class="thundertext thunderauto">'+(this.info[i][0]||'无名玩家'),node);node.isme=true;break;
+							ui.create.div('.name','<span class="thundertext thunderauto">'+(this.info[i][0]||'无名玩家'),node);node.isme=true;
 						}
 						else if(this.info[i][2]){
 							ui.create.div('.name',(this.info[i][0]||'无名玩家'),node);
 						}
 						else{
-							ui.create.div('.name','<span style="opacity:0.6">'+(this.info[i][0]||'无名玩家'),node);break;
+							ui.create.div('.name','<span style="opacity:0.6">'+(this.info[i][0]||'无名玩家'),node);
 						}
 						if(this.info[i][3]){
 							ui.create.div('.menubutton.videotext',uiintro.content,this.info[i][3]);
