@@ -175,9 +175,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     	skill:{
             jingcu:{
                 enable:'phaseUse',
-                usable:2,
                 filter:function(event,player){
-                    return player.maxHp>0;
+                    return player.maxHp>1;
                 },
                 content:function(){
                     'step 0'
@@ -187,6 +186,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 },
                 ai:{
                     order:1.5,
+                    threaten:1.4,
                     result:{
                         player:function(player){
                             if(player.isDamaged()) return 1;
@@ -6345,7 +6345,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_mojinbaozi:'魔晶孢子',
 
             jingcu:'晶簇',
-            jingcu_info:'出牌阶段限两次，你可以减少一点体力上限并摸两张牌',
+            jingcu_info:'出牌阶段，你可以减少一点体力上限并摸两张牌',
             shengzhang:'生长',
             shengzhang_info:'锁定技，若你于弃牌阶段弃置了牌，你增加一点体力上限',
             pyuhuo:'浴火',

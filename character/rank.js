@@ -253,6 +253,7 @@ window.noname_character_rank={
         'wangyi',
         'diy_caiwenji',
         'hs_mijiaojisi',
+        'hs_mojinbaozi',
     ],
     bp:[
         'zoushi',

@@ -20876,12 +20876,14 @@
 			for(var i in obj.help){
 				lib.help[i]=obj.help[i];
 			}
-            if(obj.editable!==false){
+            if(obj.editable!==false&&lib.config.show_extensionmaker){
                 lib.extensionMenu['extension_'+obj.name].edit={
 					name:'编辑此扩展',
 					clear:true,
 					onclick:function(){
-                        game.editExtension(obj.name);
+						if(game.editExtension){
+							game.editExtension(obj.name);
+						}
 					}
 				}
             }
