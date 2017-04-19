@@ -6796,7 +6796,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{global:'dying'},
     			forced:true,
     			popup:false,
-    			priority:6.5,
+    			priority:12,
     			check:function(){
     				return false;
     			},

@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-    '1.9.24',
+    '1.9.26',
     'image/background/huangtian_bg.jpg',
     'image/background/ol_bg.jpg',
     'image/background/september_bg.jpg',
@@ -415,6 +415,9 @@ window.noname_asset_list=[
     'image/character/hs_siwangzhiyi.jpg',
     'image/character/hs_sthrall.jpg',
     'image/character/hs_pengpeng.jpg',
+    'image/character/hs_pyros.jpg',
+    'image/character/hs_pyros1.jpg',
+    'image/character/hs_pyros2.jpg',
     'image/character/hs_tanghangu.jpg',
     'image/character/hs_totemic.jpg',
     'image/character/hs_trueheart.jpg',

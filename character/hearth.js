@@ -51,6 +51,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_blingtron:['male','shu',3,['zengli','xiubu']],
     		hs_yogg:['male','wu',3,['kuangluan','qianhou']],
     		hs_xialikeer:['female','shu',3,['duxin']],
+            hs_pyros:['female','shu',2,['pyuhuo']],
 
     		hs_zhishigushu:['male','shu',4,['jiaohui']],
     		hs_zhanzhenggushu:['male','wei',6,['biri']],
@@ -171,6 +172,47 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_malfurion:['hs_malorne'],
     	},
     	skill:{
+            pyuhuo:{
+                unique:true,
+                skillAnimation:true,
+                animationColor:'fire',
+                trigger:{player:'dying'},
+                priority:10,
+                filter:function(event,player){
+                    return player.storage.pyuhuo!='over';
+                },
+                forced:true,
+                content:function(){
+                    'step 0'
+                    player.discard(player.get('hej'));
+                    'step 1'
+                    player.link(false);
+                    'step 2'
+                    player.turnOver(false);
+                    'step 3'
+                    if(player.storage.pyuhuo){
+                        player.storage.pyuhuo='over';
+                        player.awakenSkill('pyuhuo');
+                        player.hp=6;
+                        player.maxHp=6;
+                        player.draw(6);
+                        player.setAvatar('hs_pyros','hs_pyros2');
+                    }
+                    else{
+                        player.storage.pyuhuo=true;
+                        player.hp=4;
+                        player.maxHp=4;
+                        player.draw(4);
+                        player.setAvatar('hs_pyros','hs_pyros1');
+                    }
+                },
+                ai:{
+                    threaten:function(player,target){
+                        if(target.storage.pyuhuo!='over') return 0.6;
+                        return 1;
+                    }
+                }
+            },
             mengye:{
                 trigger:{player:'phaseEnd'},
                 forced:true,
@@ -6232,6 +6274,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_walian:'瓦里安',
     		hs_pengpeng:'砰砰博士',
     		hs_aya:'艾雅',
+            hs_pyros:'派洛斯',
 
     		hs_ronghejuren:'熔核巨人',
     		hs_shanlingjuren:'山岭巨人',
@@ -6266,6 +6309,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_fenjie:'芬杰',
     		hs_wujiyuansu:'无羁元素',
 
+            pyuhuo:'浴火',
+            pyuhuo_info:'锁定技，在你首次进入濒死状态时，你弃置所有牌、重置武将牌、将体力和体力上限变为4并摸4张牌；在你第二次进入濒死状态时，你弃置所有牌、重置武将牌、将体力和体力上限变为6并摸6张牌',
             mengye:'梦魇',
             mengye_info:'锁定技，结束阶段，你将一名随机敌人的一张随机手牌转化为毒',
     		mengye_old:'梦魇',

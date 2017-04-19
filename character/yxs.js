@@ -553,7 +553,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			shiqin:{
 				trigger:{global:'dying'},
-				priority:11,
+				priority:9,
 				filter:function(event,player){
 					return event.player!=player&&event.player.hp<=0&&event.player.group=='qun';
 				},
@@ -1560,7 +1560,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zhensha:{
 				trigger:{global:'dying'},
-				priority:11,
+				priority:9,
 				filter:function(event,player){
 					return event.player.hp<=0&&(player.countCards('h','jiu')>0||player.countCards('h',{color:'black'})>=2)&&player!=event.player;
 				},

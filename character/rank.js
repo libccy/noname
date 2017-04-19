@@ -156,6 +156,7 @@ window.noname_character_rank={
         're_lidian',
     ],
     am:[
+        'hs_pyros',
         'swd_xiyan',
         'swd_xiaohuanglong',
         'ow_orisa',
