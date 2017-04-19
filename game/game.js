@@ -23493,6 +23493,15 @@
                     dialog.content.firstChild.innerHTML='战斗失败';
                 }
                 ui.update();
+				dialog.add(ui.create.div('.placeholder'));
+	            for(var i=0;i<game.players.length;i++){
+	                var hs=game.players[i].getCards('h');
+	                if(hs.length){
+	                    dialog.add('<div class="text center">'+get.translation(game.players[i])+'</div>');
+	                    dialog.addSmall(hs);
+	                }
+	            }
+				dialog.add(ui.create.div('.placeholder.slim'));
                 if(lib.config.background_audio){
     				if(result2===true){
     					game.playAudio('effect','win');
@@ -23870,6 +23879,14 @@
 				}
 			}
 			dialog.add(ui.create.div('.placeholder'));
+
+            var clients=game.players.concat(game.dead);
+            for(var i=0;i<clients.length;i++){
+                if(clients[i].isOnline2()){
+                    clients[i].send(game.over,dialog.content.innerHTML,game.checkOnlineResult(clients[i]));
+                }
+            }
+
 			dialog.add(ui.create.div('.placeholder'));
 
             for(var i=0;i<game.players.length;i++){
@@ -23881,12 +23898,6 @@
                 }
             }
 			dialog.add(ui.create.div('.placeholder.slim'));
-            var clients=game.players.concat(game.dead);
-            for(var i=0;i<clients.length;i++){
-                if(clients[i].isOnline2()){
-                    clients[i].send(game.over,dialog.content.innerHTML,game.checkOnlineResult(clients[i]));
-                }
-            }
 			game.addVideo('over',null,dialog.content.innerHTML);
 			var vinum=parseInt(lib.config.video);
 			if(!_status.video&&vinum&&game.getVideoName&&window.indexedDB&&_status.videoInited){

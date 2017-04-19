@@ -1,11 +1,12 @@
 window.noname_update={
-    version:'1.9.25',
-    // update:'1.9.23',
+    version:'1.9.25.1',
+    update:'1.9.25',
     changeLog:[
         '联机改进',
+        'bug修复'
     ],
     files:[
-        // 'game/game.js',
+        'game/game.js',
         // 'game/package.js',
         // 'game/config.js',
         // 'game/source.js',
@@ -31,7 +32,7 @@ window.noname_update={
         // 'theme/simple/style.css',
         // 'layout/default/layout.css',
         // 'layout/default/phone.css',
-        // 'layout/default/menu.css',
+        'layout/default/menu.css',
         // 'theme/style/cardback/*',
         // 'layout/long/layout.css',
         // 'layout/long2/layout.css',
