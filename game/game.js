@@ -19701,7 +19701,7 @@
                     alert('请稍后再试');
                     _status.enteringroom=false;
                 },
-                roomlist:function(list,events,clients){
+                roomlist:function(list,events,clients,wsid){
                     game.online=true;
 					game.onlinehall=true;
                     lib.config.recentIP.remove(_status.ip);
@@ -19740,7 +19740,9 @@
 								ui.connectEventsCount.show();
 							}
 						}
-                        lib.message.client.updaterooms(list,events,clients);
+						game.wsid=wsid;
+						lib.message.client.updaterooms(list,clients);
+                        lib.message.client.updateevents(events);
                         ui.exitroom=ui.create.system('退出房间',function(){
                             if(ui.rooms){
                                 game.saveConfig('reconnect_info');
@@ -19784,7 +19786,7 @@
                         proceed();
                     }
                 },
-                updaterooms:function(list,events,clients){
+                updaterooms:function(list,clients){
                     if(ui.rooms){
                         ui.window.classList.add('more_room');
                         var list2=['re_caocao','re_liubei','sunquan','sp_zhangjiao','re_yuanshao','dongzhuo'];
@@ -19792,6 +19794,15 @@
                             ui.rooms[i].initRoom(list[i],list2[i]);
                         }
                     }
+					lib.message.client.updateclients(clients,true);
+                },
+				updateclients:function(clients,bool){
+					if(clients&&ui.connectClients){
+						ui.connectClients.info=clients;
+						ui.connectClientsCount.innerHTML=clients.length;
+					}
+				},
+				updateevents:function(events){
 					if(events&&ui.connectEvents){
 						ui.connectEvents.info=events;
 						if(events.length){
@@ -19805,13 +19816,6 @@
 							_status.connectEventsCallback();
 						}
 					}
-					if(clients&&ui.connectClients){
-						ui.connectClients.info=clients;
-						ui.connectClientsCount.innerHTML=clients.length;
-					}
-                },
-				eventsaccepted:function(){
-
 				},
 				eventsdenied:function(reason){
 					var str='创建约战失败';
@@ -26283,10 +26287,7 @@
 							config[key]=value;
 						}
 						config.version=lib.version;
-						console.log(key,value);
-						game.putDB('data',mode,config,function(){
-							console.log(key,value,2);
-						});
+						game.putDB('data',mode,config);
 					});
 				}
 				else{
@@ -35718,7 +35719,29 @@
 							else{
 								str+=get.cnNumber(button.info[i].day,true);
 							}
-							str+=' '+button.info[i].hour+'点';
+							str+=' ';
+							var hour=button.info[i].hour;
+							if(hour<=12){
+								if(hour<=5){
+									str+='凌晨';
+								}
+								else if(hour<12){
+									str+='上午';
+								}
+								else{
+									str+='中午';
+								}
+								str+=button.info[i].hour+'点';
+							}
+							else{
+								if(hour<=17){
+									str+='下午';
+								}
+								else{
+									str+='晚上';
+								}
+								str+=(button.info[i].hour-12)+'点';
+							}
 							ui.create.div('','已有'+(button.info[i].members.length)+'人加入',eventnode);
 							ui.create.div('','时间：'+str,eventnode);
 							if(button.info[i].members.contains(game.onlineKey)){
@@ -35828,10 +35851,14 @@
 					for(var i=0;i<this.info.length;i++){
 						var node=ui.create.div('.menubutton.videonode.pointerdiv',uiintro.content);
 						ui.create.div('.menubutton.videoavatar',node).setBackground(this.info[i][1]||'caocao','character');
-						switch(this.info[i][2]){
-							case 0:ui.create.div('.name','<span class="thundertext thunderauto">'+(this.info[i][0]||'无名玩家'),node);node.isme=true;break;
-							case 1:ui.create.div('.name','<span style="opacity:0.6">'+(this.info[i][0]||'无名玩家'),node);break;
-							case 2:ui.create.div('.name',(this.info[i][0]||'无名玩家'),node);break;
+						if(this.info[i][4]==game.wsid){
+							ui.create.div('.name','<span class="thundertext thunderauto">'+(this.info[i][0]||'无名玩家'),node);node.isme=true;break;
+						}
+						else if(this.info[i][2]){
+							ui.create.div('.name',(this.info[i][0]||'无名玩家'),node);
+						}
+						else{
+							ui.create.div('.name','<span style="opacity:0.6">'+(this.info[i][0]||'无名玩家'),node);break;
 						}
 						if(this.info[i][3]){
 							ui.create.div('.menubutton.videotext',uiintro.content,this.info[i][3]);

@@ -39,7 +39,7 @@
         changeAvatar:function(nickname,avatar){
             this.nickname=nickname;
             this.avatar=avatar;
-            util.updaterooms();
+            util.updateclients();
         },
         server:function(cfg){
             if(cfg){
@@ -109,16 +109,15 @@
                         cfg.nickname=cfg.nickname||'无名玩家';
                         cfg.avatar=cfg.nickname||'caocao';
                         cfg.creator=id;
-                        cfg.id=(Math.floor(1000000+9000000*Math.random())).toString();
+                        cfg.id=util.getid();
                         cfg.members=[id];
                         events.unshift(cfg);
                         changed=true;
-                        this.sendl('eventsaccepted');
                     }
                 }
             }
             if(changed){
-                util.updaterooms();
+                util.updateevents();
             }
         },
         config:function(config){
@@ -145,7 +144,7 @@
             else{
                 delete this.status;
             }
-            util.updaterooms();
+            util.updateclients();
         },
         send:function(id,message){
             if(clients[id]&&clients[id].owner==this){
@@ -207,24 +206,31 @@
             }
             return roomlist;
         },
-        getclientlist:function(me){
+        getclientlist:function(){
             var clientlist=[];
             for(var i in clients){
-                var num;
-                if(clients[i]==me){
-                    num=0;
-                }
-                else if(clients[i].room){
-                    num=1;
-                }
-                else{
-                    num=2;
-                }
-                clientlist.push([clients[i].nickname,clients[i].avatar,num,clients[i].status]);
+                clientlist.push([clients[i].nickname,clients[i].avatar,!clients[i].room,clients[i].status,clients[i].wsid]);
             }
             return clientlist;
         },
         updaterooms:function(){
+            var roomlist=util.getroomlist();
+            var clientlist=util.getclientlist();
+            for(var i in clients){
+                if(!clients[i].room){
+                    clients[i].sendl('updaterooms',roomlist,clientlist);
+                }
+            }
+        },
+        updateclients:function(){
+            var clientlist=util.getclientlist();
+            for(var i in clients){
+                if(!clients[i].room){
+                    clients[i].sendl('updateclients',clientlist);
+                }
+            }
+        },
+        checkevents:function(){
             if(events.length){
                 var time=(new Date()).getTime();
                 for(var i=0;i<events.length;i++){
@@ -233,19 +239,22 @@
                     }
                 }
             }
-            var roomlist=util.getroomlist();
+            return events;
+        },
+        updateevents:function(){
+            util.checkevents();
             for(var i in clients){
                 if(!clients[i].room){
-                    clients[i].sendl('updaterooms',roomlist,events,util.getclientlist(clients[i]));
+                    clients[i].sendl('updateevents',events);
                 }
             }
-        },
+        }
     };
     wss.on('connection',function(ws){
         ws.sendl=util.sendl;
         ws.wsid=util.getid();
         clients[ws.wsid]=ws;
-        ws.sendl('roomlist',util.getroomlist(),events,util.getclientlist(ws));
+        ws.sendl('roomlist',util.getroomlist(),util.checkevents(),util.getclientlist(ws),ws.wsid);
         ws.heartbeat=setInterval(function(){
             if(ws.beat){
                 ws.close();
@@ -309,7 +318,8 @@
                 }
                 delete clients[this.wsid];
             }
-            util.updaterooms();
+            if(this.room) util.updaterooms();
+            else util.updateclients();
         });
     });
 }());
