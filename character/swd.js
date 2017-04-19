@@ -3686,7 +3686,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				"step 0"
     				player.addAdditionalSkill('jianji','unequip');
     				player.draw();
-    				player.useCard({name:'sha'},cards,targets,'jianji',false).animate=false;
+    				player.useCard({name:'sha'},cards,targets,false).animate=false;
     				player.line(targets,'fire');
     				"step 1"
     				player.removeAdditionalSkill('jianji');

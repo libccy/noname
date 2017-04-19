@@ -399,6 +399,7 @@ window.noname_asset_list=[
     'image/character/hs_malygos.jpg',
     'image/character/hs_medivh.jpg',
     'image/character/hs_mijiaojisi.jpg',
+    'image/character/hs_mojinbaozi.jpg',
     'image/character/hs_morgl.jpg',
     'image/character/hs_nate.jpg',
     'image/character/hs_neptulon.jpg',

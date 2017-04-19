@@ -92,6 +92,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_laxiao:['male','shu',3,['guimou','yingxi','longyi']],
     		// hs_xiangyaqishi:['male','wei',3,[]],
     		// hs_fenjie:['male','shu',3,['guimou','yingxi']],
+            hs_mojinbaozi:['male','wei',3,['jingcu','shengzhang']],
     	},
     	characterIntro:{
     		hs_jaina:'戴林·普罗德摩尔之女。 在吉安娜成年早期，她致力于阻止将引发第三次战争的天灾瘟疫传播，当战况加剧后，吉安娜获得了新部落大酋长萨尔的信任，成为团结艾泽拉斯各族携手对抗燃烧军团的关键人物。当战争结束后，吉安娜管理着塞拉摩岛，致力于促进部落与联盟间的关系。吉安娜的和平立场与性格在接任萨尔成为部落大酋长的加尔鲁什·地狱咆哮以一颗魔法炸弹夷平塞拉摩后改变了。身为肯瑞托的新领袖，她拥有让加尔鲁什为他酿成的惨剧付出血的代价的权力与决心。',
@@ -172,6 +173,39 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_malfurion:['hs_malorne'],
     	},
     	skill:{
+            jingcu:{
+                enable:'phaseUse',
+                usable:2,
+                filter:function(event,player){
+                    return player.maxHp>0;
+                },
+                content:function(){
+                    'step 0'
+                    player.loseMaxHp(true);
+                    'step 1'
+                    player.draw(2);
+                },
+                ai:{
+                    order:1.5,
+                    result:{
+                        player:function(player){
+                            if(player.isDamaged()) return 1;
+                            if(player.hp>=3&&!player.needsToDiscard(2)) return 1;
+                            return 0;
+                        }
+                    }
+                },
+            },
+            shengzhang:{
+                trigger:{player:'phaseDiscardEnd'},
+                forced:true,
+                filter:function(event,player){
+                    return event.cards&&event.cards.length>0;
+                },
+                content:function(){
+                    player.gainMaxHp(true);
+                }
+            },
             pyuhuo:{
                 unique:true,
                 skillAnimation:true,
@@ -6308,7 +6342,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_tyrande:'泰兰德',
     		hs_fenjie:'芬杰',
     		hs_wujiyuansu:'无羁元素',
+            hs_mojinbaozi:'魔晶孢子',
 
+            jingcu:'晶簇',
+            jingcu_info:'出牌阶段限两次，你可以减少一点体力上限并摸两张牌',
+            shengzhang:'生长',
+            shengzhang_info:'锁定技，若你于弃牌阶段弃置了牌，你增加一点体力上限',
             pyuhuo:'浴火',
             pyuhuo_info:'锁定技，在你首次进入濒死状态时，你弃置所有牌、重置武将牌、将体力和体力上限变为4并摸4张牌；在你第二次进入濒死状态时，你弃置所有牌、重置武将牌、将体力和体力上限变为6并摸6张牌',
             mengye:'梦魇',
