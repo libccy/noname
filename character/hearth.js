@@ -75,7 +75,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
     		hs_fandral:['male','shu',4,['nuyan','chouhuo']],
     		hs_hallazeal:['male','wei',4,['shengteng','yuansu']],
-    		hs_enzoth:['male','qun',4,['mengye']],
+    		hs_enzoth:['male','qun',3,['mengye']],
     		hs_walian:['male','shu',4,['wzhanyi']],
     		// hs_pengpeng:['male','qun',4,['zhadan']],
     		// hs_yashaji:['male','wei',3,[]],
@@ -171,7 +171,38 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_malfurion:['hs_malorne'],
     	},
     	skill:{
-    		mengye:{
+            mengye:{
+                trigger:{player:'phaseEnd'},
+                forced:true,
+                filter:function(event,player){
+                    var enemies=player.getEnemies();
+                    for(var i=0;i<enemies.length;i++){
+                        if(enemies[i].countCards('h')) return true;
+                    }
+                    return false;
+                },
+                content:function(){
+                    var enemies=player.getEnemies();
+                    for(var i=0;i<enemies.length;i++){
+                        if(!enemies[i].countCards('h')){
+                            enemies.splice(i--,1);
+                        }
+                    }
+                    if(enemies.length){
+                        var target=enemies.randomGet();
+                        player.line(target,'green');
+                        var card=target.getCards('h').randomGet();
+                        if(card){
+                            card.init([card.suit,card.number,'du']);
+        					game.log(target,'将一张手牌转化为',{name:'du'});
+                        }
+                    }
+                },
+                ai:{
+                    threaten:1.1
+                }
+            },
+    		mengye_old:{
     			trigger:{player:'phaseAfter'},
     			priority:-50,
     			direct:true,
@@ -6235,9 +6266,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_fenjie:'芬杰',
     		hs_wujiyuansu:'无羁元素',
 
-    		mengye:'梦魇',
-    		mengye2:'梦魇',
-    		mengye_info:'回合结束后，你可以翻面并指定一名的非主公角色，由你控制其进行一个额外的回合。在此回合中，你的本体不参与游戏',
+            mengye:'梦魇',
+            mengye_info:'锁定技，结束阶段，你将一名随机敌人的一张随机手牌转化为毒',
+    		mengye_old:'梦魇',
+    		mengye_old2:'梦魇',
+    		mengye_old_info:'回合结束后，你可以翻面并指定一名的非主公角色，由你控制其进行一个额外的回合。在此回合中，你的本体不参与游戏',
     		fuhua:'腐化',
     		fuhua2:'腐化',
     		fuhua_info:'出牌阶段，你可以将一张毒交给一名没有魔血技能的其他角色，该角色选择一项：1. 获得技能魔血，此后每个出牌阶段开始时需交给你一张牌；2. 视为你对其使用一张决斗，若你因此受到伤害，本局不能再对其发动腐化',
