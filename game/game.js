@@ -35835,6 +35835,7 @@
 						button.input.onkeydown=function(e){
 							if(e.keyCode==13&&!this.disabled){
 								game.send('server','status',this.value);
+								this.blur();
 								this.disabled=true;
 								this.style.opacity=0.6;
 								button.textnode.innerHTML='发状态(10)';

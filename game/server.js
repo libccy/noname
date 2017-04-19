@@ -15,6 +15,7 @@
                 room=rooms[0];
             }
             this.room=room;
+            delete this.status;
             if(room.owner){
                 if(room.servermode&&!room.owner._onconfig&&config&&mode){
                     room.owner.sendl('createroom',index,config,mode);
