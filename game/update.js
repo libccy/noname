@@ -1,8 +1,7 @@
 window.noname_update={
-    version:'1.9.25.1',
+    version:'1.9.26',
     update:'1.9.25',
     changeLog:[
-        '联机改进',
         'bug修复'
     ],
     files:[
@@ -11,12 +10,12 @@ window.noname_update={
         // 'game/config.js',
         // 'game/source.js',
         // 'game/pressure.js',
-        // 'game/asset.js',
+        'game/asset.js',
         // 'card/*',
         // 'card/sp.js',
         // 'card/yunchou.js',
         // 'character/*',
-        // 'character/hearth.js',
+        'character/hearth.js',
         // 'character/gwent.js',
         // 'character/old.js',
         // 'mode/boss.js',
@@ -24,7 +23,7 @@ window.noname_update={
         // 'mode/guozhan.js',
         // 'mode/identity.js',
         // 'mode/chess.js',
-        // 'mode/tafang.js',
+        'mode/tafang.js',
         // 'mode/guozhan.js',
         // 'mode/stone.js',
         // 'theme/music/style.css',

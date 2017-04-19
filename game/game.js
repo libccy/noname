@@ -4935,7 +4935,7 @@
 				config:{
 					tafang_turn:{
 						name:'游戏胜利',
-						init:'20',
+						init:'10',
 						frequent:true,
 						item:{
 							'10':'十回合',

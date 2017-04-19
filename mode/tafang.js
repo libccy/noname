@@ -396,9 +396,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					ui.turnCount.innerHTML='回合'+get.cnNumber(_status.turnCount,true);
 					var dialog=ui.create.dialog('剩余行动点：'+(10+_status.remainingCount),'hidden');
 					dialog.style.height='260px';
-					dialog.style.top='calc(50% - 140px)';
+					dialog.style.maxHeight='260px';
+					dialog.style.top='calc(50% - 160px)';
 					dialog.classList.add('center');
 					dialog.classList.add('noupdate');
+					dialog.classList.add('fixed');
 					event.dialog=dialog;
 					var list=_status.characterList.splice(0,6);
 					list.sort(function(a,b){
