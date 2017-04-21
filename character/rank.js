@@ -414,6 +414,7 @@ window.noname_character_rank={
     ],
     b:[
         'sp_daqiao',
+        'hs_jiawodun',
         'yxs_weizhongxian',
         'cenhun',
         'huanghao',

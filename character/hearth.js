@@ -73,7 +73,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_jiaziruila:['male','wu',4,['hannu']],
     		hs_shifazhe:['male','wei',3,['shifa']],
     		hs_lafamu:['male','shu',4,['xieneng']],
-    		hs_yelise:['female','wei',3,['xunbao','zhuizong']],
+            hs_yelise:['female','wei',3,['xunbao','zhuizong']],
+    		hs_jiawodun:['male','wu',4,['jinhua']],
 
     		hs_fandral:['male','shu',4,['nuyan','chouhuo']],
     		hs_hallazeal:['male','wei',4,['shengteng','yuansu']],
@@ -174,6 +175,71 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_malfurion:['hs_malorne'],
     	},
     	skill:{
+            jinhua:{
+    			trigger:{target:'useCardToBegin'},
+                forced:true,
+                filter:function(event,player){
+                    return get.type(event.card,'trick')=='trick'&&event.player==player&&event.cards[0]&&event.cards[0]==event.card;
+                },
+    			content:function(){
+    				'step 0'
+    				var list=get.gainableSkills();
+    				list.remove(player.getSkills());
+    				list=list.randomGets(3);
+    				event.skillai=function(){
+    					return list.randomGet();
+    				};
+    				if(event.isMine()){
+    					var dialog=ui.create.dialog();
+    					dialog.add('选择获得一项技能');
+    					var clickItem=function(){
+    						_status.event._result=this.link;
+    						dialog.close();
+    						game.resume();
+    					};
+    					for(var i=0;i<list.length;i++){
+    						if(lib.translate[list[i]+'_info']){
+    							var translation=get.translation(list[i]);
+    							if(translation[0]=='新'&&translation.length==3){
+    								translation=translation.slice(1,3);
+    							}
+    							else{
+    								translation=translation.slice(0,2);
+    							}
+    							var item=dialog.add('<div class="popup pointerdiv" style="width:50%;display:inline-block"><div class="skill">【'+
+    							translation+'】</div><div>'+lib.translate[list[i]+'_info']+'</div></div>');
+    							item.firstChild.addEventListener('click',clickItem);
+    							item.firstChild.link=list[i];
+    						}
+    					}
+    					dialog.add(ui.create.div('.placeholder'));
+    					event.switchToAuto=function(){
+    						event._result=event.skillai();
+    						dialog.close();
+    						game.resume();
+    					};
+    					_status.imchoosing=true;
+    					game.pause();
+    				}
+    				else{
+    					event._result=event.skillai();
+    				}
+    				'step 1'
+    				_status.imchoosing=false;
+    				var link=result;
+    				player.addSkill(link,true);
+    				player.popup(link);
+    				game.log(player,'获得了技能','【'+get.translation(link)+'】');
+    				game.delay();
+    			},
+    			ai:{
+    				effect:{
+    					target:function(card,player,target){
+                            if(get.type(card,'trick')=='trick'&&player==target) return [1,1];
+                        }
+    				}
+    			}
+    		},
             kqizhou:{
                 trigger:{player:'phaseBegin'},
                 direct:true,
@@ -6504,6 +6570,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_pengpeng:'砰砰博士',
     		hs_aya:'艾雅',
             hs_pyros:'派洛斯',
+            hs_jiawodun:'嘉沃顿',
 
     		hs_ronghejuren:'熔核巨人',
     		hs_shanlingjuren:'山岭巨人',
@@ -6540,6 +6607,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_mojinbaozi:'魔晶孢子',
             hs_kalimosi:'卡利莫斯',
 
+            jinhua:'进化',
+            jinhua_info:'锁定技，每当你以自己为目标使用一张非转化的锦囊牌，你从3个随机亮出的技能中选1个获得之',
             hsqizhou:'祈咒',
             hsqizhou_feng:'风之祈咒',
             hsqizhou_feng_info:'出牌阶段对自己使用，令所有目标的敌人打出一张杀或受到一点雷属性伤害',

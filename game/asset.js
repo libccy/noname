@@ -383,6 +383,7 @@ window.noname_asset_list=[
     'image/character/hs_hallazeal.jpg',
     'image/character/hs_huzhixiannv.jpg',
     'image/character/hs_jgarrosh.jpg',
+    'image/character/hs_jiawodun.jpg',
     'image/character/hs_jiaziruila.jpg',
     'image/character/hs_jinglinglong.jpg',
     'image/character/hs_kalimosi.jpg',
