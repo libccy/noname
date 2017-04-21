@@ -2230,6 +2230,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event){
 					return event.target.sex=='male';
 				},
+				priority:-1,
 				content:function(){
 					"step 0"
 					var next=trigger.target.chooseToRespond({name:'shan'});
@@ -2253,6 +2254,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return event.turn!=player&&event.turn.sex=='male';
 				},
+				priority:-1,
 				content:function(){
 					"step 0"
 					var next=trigger.turn.chooseToRespond({name:'sha'});

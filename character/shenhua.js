@@ -2402,6 +2402,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			check:function(event,player){
     				return player==event.player;
     			},
+				priority:-1,
     			content:function(){
     				"step 0"
     				var next=trigger.target.chooseToRespond({name:'shan'});
