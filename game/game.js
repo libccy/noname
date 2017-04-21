@@ -3183,8 +3183,8 @@
 					reset_hiddenpack:{
 						name:'重置隐藏内容',
 						onclick:function(){
-							if(this.innerHTML!='已重置'){
-								this.innerHTML='已重置'
+							if(this.firstChild.innerHTML!='已重置'){
+								this.firstChild.innerHTML='已重置'
 								game.saveConfig('hiddenModePack',[]);
 								game.saveConfig('hiddenCharacterPack',[]);
 								game.saveConfig('hiddenCardPack',[]);
@@ -3192,7 +3192,7 @@
 								game.saveConfig('hiddenBackgroundPack',[]);
 								var that=this;
 								setTimeout(function(){
-									that.innerHTML='重置隐藏内容';
+									that.firstChild.innerHTML='重置隐藏内容';
 									setTimeout(function(){
 										if(confirm('是否重新启动使改变生效？')){
 											game.reload();
@@ -3206,14 +3206,14 @@
 					reset_tutorial:{
 						name:'重置新手向导',
 						onclick:function(){
-							if(this.innerHTML!='已重置'){
-								this.innerHTML='已重置'
+							if(this.firstChild.innerHTML!='已重置'){
+								this.firstChild.innerHTML='已重置'
 								game.saveConfig('new_tutorial',false);
 								game.saveConfig('prompt_hidebg');
 								game.saveConfig('prompt_hidemode');
 								var that=this;
 								setTimeout(function(){
-									that.innerHTML='重置新手向导';
+									that.firstChild.innerHTML='重置新手向导';
 								},500);
 							}
 						},
@@ -3473,8 +3473,18 @@
     			    name:'隐藏此扩展',
     			    clear:true,
     			    onclick:function(){
-                        this.innerHTML='此扩展将在重启后隐藏';
-    					lib.config.hiddenPlayPack.add('cardpile');
+						if(this.firstChild.innerHTML=='隐藏此扩展'){
+							this.firstChild.innerHTML='此扩展将在重启后隐藏';
+	    					lib.config.hiddenPlayPack.add('cardpile');
+							if(!lib.config.prompt_hidepack){
+								alert('隐藏的扩展包可通过选项-其它-重置隐藏内容恢复');
+								game.saveConfig('prompt_hidepack',true);
+							}
+						}
+						else{
+							this.firstChild.innerHTML='隐藏此扩展';
+							lib.config.hiddenPlayPack.remove('cardpile');
+						}
     					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
     				}
     			},
@@ -3498,8 +3508,18 @@
     			    name:'隐藏此扩展',
     			    clear:true,
     			    onclick:function(){
-                        this.innerHTML='此扩展将在重启后隐藏';
-    					lib.config.hiddenPlayPack.add('boss');
+						if(this.firstChild.innerHTML=='隐藏此扩展'){
+							this.firstChild.innerHTML='此扩展将在重启后隐藏';
+	    					lib.config.hiddenPlayPack.add('boss');
+							if(!lib.config.prompt_hidepack){
+								alert('隐藏的扩展包可通过选项-其它-重置隐藏内容恢复');
+								game.saveConfig('prompt_hidepack',true);
+							}
+						}
+						else{
+							this.firstChild.innerHTML='隐藏此扩展';
+							lib.config.hiddenPlayPack.remove('boss');
+						}
     					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
     				}
     			},
@@ -3529,8 +3549,18 @@
     			    name:'隐藏此扩展',
     			    clear:true,
     			    onclick:function(){
-                        this.innerHTML='此扩展将在重启后隐藏';
-    					lib.config.hiddenPlayPack.add('wuxing');
+						if(this.firstChild.innerHTML=='隐藏此扩展'){
+							this.firstChild.innerHTML='此扩展将在重启后隐藏';
+	    					lib.config.hiddenPlayPack.add('wuxing');
+							if(!lib.config.prompt_hidepack){
+								alert('隐藏的扩展包可通过选项-其它-重置隐藏内容恢复');
+								game.saveConfig('prompt_hidepack',true);
+							}
+						}
+						else{
+							this.firstChild.innerHTML='隐藏此扩展';
+							lib.config.hiddenPlayPack.remove('wuxing');
+						}
     					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
     				}
     			},
@@ -3584,8 +3614,18 @@
     			    name:'隐藏此扩展',
     			    clear:true,
     			    onclick:function(){
-                        this.innerHTML='此扩展将在重启后隐藏';
-    					lib.config.hiddenPlayPack.add('coin');
+						if(this.firstChild.innerHTML=='隐藏此扩展'){
+							this.firstChild.innerHTML='此扩展将在重启后隐藏';
+	    					lib.config.hiddenPlayPack.add('coin');
+							if(!lib.config.prompt_hidepack){
+								alert('隐藏的扩展包可通过选项-其它-重置隐藏内容恢复');
+								game.saveConfig('prompt_hidepack',true);
+							}
+						}
+						else{
+							this.firstChild.innerHTML='隐藏此扩展';
+							lib.config.hiddenPlayPack.remove('coin');
+						}
     					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
     				}
     			},
@@ -4635,17 +4675,17 @@
         						});
 								ui.ladder.innerHTML='卫士五';
                                 clearTimeout(node._clearing);
-                                node.innerHTML='重置天梯数据';
+                                node.firstChild.innerHTML='重置天梯数据';
                                 delete node._clearing;
 								return;
 							}
-							node.innerHTML='单击以确认 (3)';
+							node.firstChild.innerHTML='单击以确认 (3)';
 							node._clearing=setTimeout(function(){
-								node.innerHTML='单击以确认 (2)';
+								node.firstChild.innerHTML='单击以确认 (2)';
 								node._clearing=setTimeout(function(){
-									node.innerHTML='单击以确认 (1)';
+									node.firstChild.innerHTML='单击以确认 (1)';
 									node._clearing=setTimeout(function(){
-										node.innerHTML='重置天梯数据';
+										node.firstChild.innerHTML='重置天梯数据';
 										delete node._clearing;
 									},1000);
 								},1000);
@@ -4825,13 +4865,13 @@
 								return;
 							}
 							node._clearing=true;
-							node.innerHTML='单击以确认 (3)';
+							node.firstChild.innerHTML='单击以确认 (3)';
 							setTimeout(function(){
-								node.innerHTML='单击以确认 (2)';
+								node.firstChild.innerHTML='单击以确认 (2)';
 								setTimeout(function(){
-									node.innerHTML='单击以确认 (1)';
+									node.firstChild.innerHTML='单击以确认 (1)';
 									setTimeout(function(){
-										node.innerHTML='清除进度';
+										node.firstChild.innerHTML='清除进度';
 										delete node._clearing;
 									},1000);
 								},1000);
@@ -27645,9 +27685,9 @@
 								hasexpand=false;
 							}
                             if(!connectMenu){
-                                var hidemode=ui.create.div('.config.more','隐藏此模式',page,function(){
-    								if(this.innerHTML=='隐藏此模式'){
-    									this.innerHTML='此模式将在重启后隐藏';
+                                var hidemode=ui.create.div('.config.pointerspan','<span>隐藏此模式</span>',page,function(){
+    								if(this.firstChild.innerHTML=='隐藏此模式'){
+    									this.firstChild.innerHTML='此模式将在重启后隐藏';
     									lib.config.hiddenModePack.add(mode);
 										if(!lib.config.prompt_hidepack){
 											alert('隐藏的扩展包可通过选项-其它-重置隐藏内容恢复');
@@ -27655,7 +27695,7 @@
 										}
     								}
     								else{
-    									this.innerHTML='隐藏此模式';
+    									this.firstChild.innerHTML='隐藏此模式';
     									lib.config.hiddenModePack.remove(mode);
     								}
     								game.saveConfig('hiddenModePack',lib.config.hiddenModePack);
@@ -28950,9 +28990,9 @@
 						page.classList.add('leftbutton');
                         if(!connectMenu){
                             if(mode.indexOf('mode_')!=0){
-    							ui.create.div('.config.more','隐藏武将包',page,function(){
-    								if(this.innerHTML=='隐藏武将包'){
-    									this.innerHTML='武将包将在重启后隐藏';
+    							ui.create.div('.config.pointerspan','<span>隐藏武将包</span>',page,function(){
+    								if(this.firstChild.innerHTML=='隐藏武将包'){
+    									this.firstChild.innerHTML='武将包将在重启后隐藏';
     									lib.config.hiddenCharacterPack.add(mode);
 										if(!lib.config.prompt_hidepack){
 											alert('隐藏的扩展包可通过选项-其它-重置隐藏内容恢复');
@@ -28960,7 +29000,7 @@
 										}
     								}
     								else{
-    									this.innerHTML='隐藏武将包';
+    									this.firstChild.innerHTML='隐藏武将包';
     									lib.config.hiddenCharacterPack.remove(mode);
     								}
     								game.saveConfig('hiddenCharacterPack',lib.config.hiddenCharacterPack);
@@ -29255,9 +29295,9 @@
 						page.classList.add('menu-buttons');
 						page.classList.add('leftbutton');
 						if(!connectMenu&&mode.indexOf('mode_')!=0){
-							ui.create.div('.config.more','隐藏卡牌包',page,function(){
-								if(this.innerHTML=='隐藏卡牌包'){
-									this.innerHTML='卡牌包将在重启后隐藏';
+							ui.create.div('.config.pointerspan','<span>隐藏卡牌包</span>',page,function(){
+								if(this.firstChild.innerHTML=='隐藏卡牌包'){
+									this.firstChild.innerHTML='卡牌包将在重启后隐藏';
 									lib.config.hiddenCardPack.add(mode);
 									if(!lib.config.prompt_hidepack){
 										alert('隐藏的扩展包可通过选项-其它-重置隐藏内容恢复');
@@ -29265,7 +29305,7 @@
 									}
 								}
 								else{
-									this.innerHTML='隐藏卡牌包';
+									this.firstChild.innerHTML='隐藏卡牌包';
 									lib.config.hiddenCardPack.remove(mode);
 								}
 								game.saveConfig('hiddenCardPack',lib.config.hiddenCardPack);
