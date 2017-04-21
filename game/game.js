@@ -3166,13 +3166,13 @@
 								return;
 							}
 							node._clearing=true;
-							node.innerHTML='单击以确认 (3)';
+							node.firstChild.innerHTML='单击以确认 (3)';
 							setTimeout(function(){
-								node.innerHTML='单击以确认 (2)';
+								node.firstChild.innerHTML='单击以确认 (2)';
 								setTimeout(function(){
-									node.innerHTML='单击以确认 (1)';
+									node.firstChild.innerHTML='单击以确认 (1)';
 									setTimeout(function(){
-										node.innerHTML='重置游戏';
+										node.firstChild.innerHTML='重置游戏设置';
 										delete node._clearing;
 									},1000);
 								},1000);
@@ -3272,13 +3272,13 @@
 								return;
 							}
 							node._clearing=true;
-							node.innerHTML='单击以确认 (3)';
+							node.firstChild.innerHTML='单击以确认 (3)';
 							setTimeout(function(){
-								node.innerHTML='单击以确认 (2)';
+								node.firstChild.innerHTML='单击以确认 (2)';
 								setTimeout(function(){
-									node.innerHTML='单击以确认 (1)';
+									node.firstChild.innerHTML='单击以确认 (1)';
 									setTimeout(function(){
-										node.innerHTML='重新下载游戏';
+										node.firstChild.innerHTML='重新下载游戏';
 										delete node._clearing;
 									},1000);
 								},1000);
@@ -26235,7 +26235,6 @@
 				lib[_status.dburgent?'ondb2':'ondb'].push(['deleteDB',Array.from(arguments)]);
 				return;
 			}
-			lib.status.reload++;
 			if(arguments.length==1){
 				game.getDB(type,null,function(obj){
 					var store=lib.db.transaction([type],'readwrite').objectStore(type);
@@ -26249,6 +26248,7 @@
 				});
 			}
 			else{
+				lib.status.reload++;
 				var store=lib.db.transaction([type],'readwrite').objectStore(type);
 				store.delete(id).onsuccess=function(){
 					if(callback){
