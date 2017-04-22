@@ -9,6 +9,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			lib.init.css(lib.assetURL+'layout/mode','tafang');
 			game.loadMode('chess');
 			"step 1"
+			if(get.is.phoneLayout()&&lib.config.touchscreen&&
+				!lib.config.show_round_menu&&
+				!['system','menu'].contains(lib.config.swipe_left)&&
+				!['system','menu'].contains(lib.config.swipe_right)&&
+				!['system','menu'].contains(lib.config.swipe_up)){
+				ui.roundmenu.style.display='';
+			}
 			for(var i in result.element){
 				for(var j in result.element[i]){
 					if(j!='dieAfter'){

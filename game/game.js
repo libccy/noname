@@ -217,6 +217,10 @@
 							auto:'切换托管',
                             chat:'显示聊天',
 							off:'关闭',
+						},
+						onclick:function(item){
+							if(get.is.nomenu('swipe_down',item)) return false;
+							game.saveConfig('swipe_down',item);
 						}
 					},
 					swipe_up:{
@@ -2764,7 +2768,7 @@
 						onclick:function(bool){
 							if(get.is.nomenu('show_round_menu',bool)) return;
 							game.saveConfig('show_round_menu',bool);
-							if(bool&&get.is.phoneLayout()){
+							if(bool&&ui.roundmenu){
 								ui.roundmenu.style.display='';
 							}
 							else{
@@ -39339,15 +39343,17 @@
 					return false;
 				}
 				if(configs.touchscreen){
-					if(menus.contains(lib.config.swipe_up)) return false;
-					if(menus.contains(lib.config.swipe_down)) return false;
-					if(menus.contains(lib.config.swipe_left)) return false;
-					if(menus.contains(lib.config.swipe_right)) return false;
+					if(menus.contains(configs.swipe_up)) return false;
+					if(menus.contains(configs.swipe_down)) return false;
+					if(menus.contains(configs.swipe_left)) return false;
+					if(menus.contains(configs.swipe_right)) return false;
 				}
 				else{
 					if(configs.right_click=='config') return false;
 				}
-				alert('请将至少一个操作绑定为显示按钮或打开菜单，否则将永远无法打开菜单');
+				setTimeout(function(){
+					alert('请将至少一个操作绑定为显示按钮或打开菜单，否则将永远无法打开菜单');
+				});
 				return true;
 			},
 			altered:function(skill){
