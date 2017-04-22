@@ -3656,7 +3656,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						event.target.draw(trigger.num);
     					}
     				}
-    			}
+    			},
+                ai:{
+                    maixie:true,
+                    maixie_hp:true
+                }
     		},
     		duodao:{
     			trigger:{player:'damageEnd'},

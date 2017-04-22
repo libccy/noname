@@ -99,6 +99,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_shizugui:['male','wu',3,['szbianshen']],
             hs_hemite:['male','wu',6,['zhuilie']],
             hs_laila:['male','wu',3,['lieyang']],
+
+            hs_selajin:['male','shu',3,['qianfu','shimo']],
+            hs_bannabusi:['male','wu',14,['qingtian']],
     	},
     	characterIntro:{
     		hs_jaina:'戴林·普罗德摩尔之女。 在吉安娜成年早期，她致力于阻止将引发第三次战争的天灾瘟疫传播，当战况加剧后，吉安娜获得了新部落大酋长萨尔的信任，成为团结艾泽拉斯各族携手对抗燃烧军团的关键人物。当战争结束后，吉安娜管理着塞拉摩岛，致力于促进部落与联盟间的关系。吉安娜的和平立场与性格在接任萨尔成为部落大酋长的加尔鲁什·地狱咆哮以一颗魔法炸弹夷平塞拉摩后改变了。身为肯瑞托的新领袖，她拥有让加尔鲁什为他酿成的惨剧付出血的代价的权力与决心。',
@@ -179,6 +182,119 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_malfurion:['hs_malorne'],
     	},
     	skill:{
+            qingtian:{
+                trigger:{player:'recoverBefore'},
+                forced:true,
+                filter:function(event,player){
+                    return player.hp>0&&event.num>0;
+                },
+                content:function(){
+                    trigger.untrigger();
+                    trigger.finish();
+                    player.changeHujia(trigger.num);
+                }
+            },
+            qianfu:{
+                trigger:{player:'dieBefore'},
+                forced:true,
+                filter:function(event,player){
+                    return !player.hasSkill('qianfu2')&&player.maxHp>0;
+                },
+                unique:true,
+                content:function(){
+                    trigger.untrigger();
+                    trigger.finish();
+                    player.addSkill('qianfu2');
+                    player.hp=1;
+                    player.update();
+                    player.discard(player.get('he'));
+                    player.setAvatar('hs_selajin','hs_selajin2');
+                },
+                ai:{
+                    threaten:0.8
+                }
+            },
+            qianfu2:{
+                mark:true,
+                intro:{
+                    content:'你防止非火焰伤害，不能使用或打出卡牌，并始终跳过你的回合'
+                },
+                mod:{
+					cardEnabled:function(card,player){
+						return false;
+					},
+					cardUsable:function(card,player){
+						return false;
+					},
+					cardRespondable:function(card,player){
+						return false;
+					},
+					cardSavable:function(card,player){
+						return false;
+					},
+				},
+                group:['qianfu2_damage','qianfu2_phase','qianfu2_revive'],
+                subSkill:{
+                    damage:{
+                        trigger:{player:'damageBefore'},
+        				filter:function(event){
+        					if(event.nature!='fire') return true;
+        					return false;
+        				},
+        				mark:true,
+        				forced:true,
+        				content:function(){
+        					trigger.untrigger();
+        					trigger.finish();
+        				},
+        				ai:{
+        					nothunder:true,
+        					nodamage:true,
+        					effect:{
+        						target:function(card,player,target,current){
+        							if(get.tag(card,'damage')&&!get.tag(card,'fireDamage')) return [0,0];
+        						}
+        					},
+        				},
+                    },
+                    phase:{
+                        trigger:{player:'phaseBefore'},
+                        forced:true,
+                        popup:false,
+                        content:function(){
+                            trigger.untrigger();
+                            trigger.finish();
+                        }
+                    },
+                    revive:{
+                        trigger:{player:'recoverAfter'},
+                        forced:true,
+                        filter:function(event,player){
+                            return player.hp>=3||player.isHealthy();
+                        },
+                        content:function(){
+                            player.removeSkill('qianfu2');
+                            player.draw(3);
+                            player.setAvatar('hs_selajin2','hs_selajin');
+                        }
+                    }
+                }
+            },
+            shimo:{
+                trigger:{global:'damageAfter'},
+                forced:true,
+                filter:function(event,player){
+                    return event.player!=player&&get.distance(player,event.player)<=1;
+                },
+                content:function(){
+                    if(player.isDamaged()){
+                        player.recover();
+                    }
+                    else{
+                        player.draw();
+                    }
+                }
+            },
             lieyang:{
                 trigger:{player:'useCard'},
                 forced:true,
@@ -194,7 +310,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     }
                 },
                 ai:{
-                    threaten:1.7
+                    threaten:1.8
                 }
             },
             lieyang2:{
@@ -6743,7 +6859,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_shizugui:'始祖龟',
             hs_hemite:'赫米特',
             hs_laila:'莱拉',
+            hs_selajin:'瑟拉金',
+            hs_bannabusi:'班纳布斯',
 
+            qingtian:'擎天',
+            qingtian_info:'锁定技，若你的体力值大于0，你防止即将回复的体力，改为获得等量护甲',
+            qianfu:'潜伏',
+            qianfu2:'潜伏',
+            qianfu2_bg:'伏',
+            qianfu_info:'锁定技，在你死亡前，若你没有进入潜伏状态，你弃置所有牌并进入潜伏状态；当你体力值回复到3（或体力上限）时，你解除潜伏状态并摸3张牌',
+            shimo:'尸魔',
+            shimo_info:'锁定技，距离你为1的角色受到伤害时，你回复一点体力，若你没受伤，改为摸一张牌',
             lieyang:'裂阳',
             lieyang_info:'锁定技，每当你于回合内使用一张锦囊牌，你获得一张随机锦囊牌；当你发动三次此技能后，你本回合不能再使用锦囊牌',
             zhuilie:'追猎',

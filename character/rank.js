@@ -261,6 +261,7 @@ window.noname_character_rank={
         'hs_mojinbaozi',
     ],
     bp:[
+        'hs_selajin',
         'hs_hemite',
         'zoushi',
         'swd_zhiyin',

@@ -939,7 +939,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			qibaodao:'七宝刀',
 			qibaodao_info:'攻击范围2；锁定技，你使用【杀】无视目标防具，若目标角色未损失体力值，此【杀】伤害+1',
 			zhungangshuo:'衠钢槊',
-			zhungangshuo_info:'攻击范围3；当你使用【杀】指定一名角色为目标后，你可令该角色弃置你的一张手牌，然后你弃置其一张手牌',
+			zhungangshuo_info:'当你使用【杀】指定一名角色为目标后，你可令该角色弃置你的一张手牌，然后你弃置其一张手牌',
 			lanyinjia:'烂银甲',
 			lanyinjia_info:'你可以将一张手牌当做【闪】使用或打出。锁定技，【烂银甲】不会无效化；当你受到【杀】造成的伤害时，弃置【烂银甲】。',
 			yinyueqiang:'银月枪',
