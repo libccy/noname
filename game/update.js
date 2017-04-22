@@ -7,7 +7,7 @@ window.noname_update={
     files:[
         'game/game.js',
         // 'game/package.js',
-        // 'game/config.js',
+        'game/config.js',
         // 'game/source.js',
         // 'game/pressure.js',
         'game/asset.js',
@@ -15,7 +15,7 @@ window.noname_update={
         'card/sp.js',
         // 'card/yunchou.js',
         'character/*',
-        // 'mode/boss.js',
+        'mode/boss.js',
         // 'mode/versus.js',
         // 'mode/guozhan.js',
         // 'mode/identity.js',

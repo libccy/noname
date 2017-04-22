@@ -98,6 +98,7 @@ window.config={
 	show_statusbar_android:false,
 	show_name:true,
 	show_replay:false,
+	show_round_menu:true,
 	show_pause:true,
 	show_auto:true,
 	show_volumn:true,

@@ -194,6 +194,10 @@
 						restart:true,
 						unfrequent:true,
 						intro:'开启后可使触屏设备反应更快，但无法使用鼠标操作',
+						onclick:function(bool){
+							if(get.is.nomenu('touchscreen',bool)) return;
+							game.saveConfig('touchscreen',bool);
+						}
 					},
 					swipe:{
 						name:'滑动手势',
@@ -227,6 +231,10 @@
 							auto:'切换托管',
                             chat:'显示聊天',
 							off:'关闭',
+						},
+						onclick:function(item){
+							if(get.is.nomenu('swipe_up',item)) return false;
+							game.saveConfig('swipe_up',item);
 						}
 					},
 					swipe_left:{
@@ -241,6 +249,10 @@
 							auto:'切换托管',
                             chat:'显示聊天',
 							off:'关闭',
+						},
+						onclick:function(item){
+							if(get.is.nomenu('swipe_left',item)) return false;
+							game.saveConfig('swipe_left',item);
 						}
 					},
 					swipe_right:{
@@ -255,6 +267,10 @@
 							auto:'切换托管',
                             chat:'显示聊天',
 							off:'关闭',
+						},
+						onclick:function(item){
+							if(get.is.nomenu('swipe_right',item)) return false;
+							game.saveConfig('swipe_right',item);
 						}
 					},
 					round_menu_func:{
@@ -265,9 +281,13 @@
 						item:{
 							system:'显示按钮',
 							menu:'打开菜单',
-							// pause:'切换暂停',
-							// auto:'切换托管'
-						}
+							pause:'切换暂停',
+							auto:'切换托管'
+						},
+						onclick:function(item){
+							if(get.is.nomenu('round_menu_func',item)) return;
+							game.saveConfig('round_menu_func',item);
+						},
 					},
 					show_splash:{
 						name:'显示开始界面',
@@ -311,6 +331,10 @@
 							pause:'暂停',
 							config:'选项',
 							auto:'托管',
+						},
+						onclick:function(item){
+							if(get.is.nomenu('right_click',item)) return false;
+							game.saveConfig('right_click',item);
 						}
 					},
 					longpress_info:{
@@ -1013,6 +1037,7 @@
                         name:'触屏布局',
                         init:false,
                         onclick:function(bool){
+							if(get.is.nomenu('phonelayout',bool)) return false;
                             game.saveConfig('phonelayout',bool);
         					if(get.is.phoneLayout()){
                                 ui.css.phone.href=lib.assetURL+'layout/default/phone.css';
@@ -2484,18 +2509,18 @@
 						}
 						if(get.is.phoneLayout()){
                             map.remember_round_button.show();
-                            // map.reset_round_button.show();
 							map.filternode_button.show();
                             map.show_pause.hide();
                             map.show_auto.hide();
                             map.show_replay.hide();
+							map.show_round_menu.show();
                         }
                         else{
                             map.show_pause.show();
                             map.show_auto.show();
                             map.show_replay.show();
+                            map.show_round_menu.hide();
                             map.remember_round_button.hide();
-                            // map.reset_round_button.hide();
 							map.filternode_button.hide();
                         }
 						if(lib.config.show_card_prompt){
@@ -2732,6 +2757,33 @@
 						init:false,
 						unfrequent:true,
 					},
+					show_round_menu:{
+						name:'显示触屏按钮',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							if(get.is.nomenu('show_round_menu',bool)) return;
+							game.saveConfig('show_round_menu',bool);
+							if(bool&&get.is.phoneLayout()){
+								ui.roundmenu.style.display='';
+							}
+							else{
+								ui.roundmenu.style.display='none';
+							}
+						}
+					},
+					remember_round_button:{
+						name:'记住按钮位置',
+						intro:'重新开始后触屏按钮将保存的上一局的位置',
+						init:false,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('remember_round_button',bool);
+							if(!bool){
+								ui.click.resetround();
+							}
+						}
+					},
 					remember_dialog:{
 						name:'记住对话框位置',
 						intro:'移动对话框后新的对话框也将在移动后的位置显示',
@@ -2756,46 +2808,6 @@
 							}
 						}
 					},
-					// reset_dialog:{
-					// 	name:'重置对话框位置',
-					// 	clear:true,
-					// 	unfrequent:true,
-					// 	onclick:function(){
-					// 		if(ui.dialog){
-					// 			var dialog=ui.dialog;
-					// 			dialog.style.transform='';
-					// 			dialog._dragtransform=[0,0];
-					// 			dialog.style.transition='all 0.3s';
-					// 			dialog._dragtouches;
-					// 			dialog._dragorigin;
-					// 			dialog._dragorigintransform;
-					// 			setTimeout(function(){
-					// 				dialog.style.transition='';
-					// 			},500);
-					// 		}
-					// 		game.saveConfig('dialog_transform',[0,0]);
-					// 	}
-					// },
-					remember_round_button:{
-						name:'记住按钮位置',
-						intro:'重新开始后触屏按钮将保存的上一局的位置',
-						init:false,
-						unfrequent:true,
-						onclick:function(bool){
-							game.saveConfig('remember_round_button',bool);
-							if(!bool){
-								ui.click.resetround();
-							}
-						}
-					},
-					// reset_round_button:{
-					// 	name:'重置按钮位置',
-					// 	clear:true,
-					// 	unfrequent:true,
-					// 	onclick:function(){
-					// 		ui.click.resetround();
-					// 	}
-					// },
 					mark_identity_style:{
                         name:'标记身份操作',
 						intro:'设置单击身份按钮时的操作',
@@ -34830,6 +34842,9 @@
                     ui.roundmenu.classList.add('clock');
                 }
                 ui.roundmenu.dataset.watchface=lib.config.watchface||'none';
+				if(!lib.config.show_round_menu){
+					ui.roundmenu.style.display='none';
+				}
 
 				var resetround=function(e){
 					_status.draggingroundmenu=false;
@@ -35279,7 +35294,10 @@
 							node.classList.add('newstyle');
 							ui.create.div(node.node.hp);
 							var textnode=ui.create.div('.text',get.numStr(infoitem[2]),node.node.hp);
-							if(infoitem[2]<=3){
+							if(infoitem[2]==0){
+								node.node.hp.hide();
+							}
+							else if(infoitem[2]<=3){
 								node.node.hp.dataset.condition='mid';
 							}
 							else{
@@ -38454,12 +38472,18 @@
 						}
 					}
 				}
+				var initskill=false;
 				for(var i=0;i<list.length;i++){
 					if(!get.info(list[i])||get.info(list[i]).nopop) continue;
 					if(!lib.translate[list[i]]||!lib.translate[list[i]+'_info']) continue;
-					var current=ui.create.div('.menubutton.large',skills,clickSkill,get.translation(list[i]));
+					var skilltrans=get.translation(list[i]);
+					if(skilltrans.indexOf('&nbsp;')==0){
+						skilltrans=skilltrans.slice(6);
+					}
+					var current=ui.create.div('.menubutton.large',skills,clickSkill,skilltrans);
 					current.link=list[i];
-					if(i==0){
+					if(!initskill){
+						initskill=true;
 						clickSkill.call(current,'init');
 					}
 				}
@@ -39296,6 +39320,36 @@
 	};
 	var get={
         is:{
+			nomenu:function(name,item){
+				var menus=['system','menu'];
+				var configs={
+					show_round_menu:lib.config.show_round_menu,
+					round_menu_func:lib.config.round_menu_func,
+					touchscreen:lib.config.touchscreen,
+					swipe_up:lib.config.swipe_up,
+					swipe_down:lib.config.swipe_down,
+					swipe_left:lib.config.swipe_left,
+					swipe_right:lib.config.swipe_right,
+					right_click:lib.config.right_click,
+					phonelayout:lib.config.phonelayout
+				};
+				configs[name]=item;
+				if(!configs.phonelayout) return false;
+				if(configs.show_round_menu&&menus.contains(configs.round_menu_func)){
+					return false;
+				}
+				if(configs.touchscreen){
+					if(menus.contains(lib.config.swipe_up)) return false;
+					if(menus.contains(lib.config.swipe_down)) return false;
+					if(menus.contains(lib.config.swipe_left)) return false;
+					if(menus.contains(lib.config.swipe_right)) return false;
+				}
+				else{
+					if(configs.right_click=='config') return false;
+				}
+				alert('请将至少一个操作绑定为显示按钮或打开菜单，否则将永远无法打开菜单');
+				return true;
+			},
 			altered:function(skill){
 				return lib.config.alteredSkills.contains(skill);
 			},
@@ -41519,7 +41573,12 @@
 			}
 			else if(node.classList.contains('character')){
 				var character=node.link;
-				uiintro.add(get.translation(character));
+				if(lib.character[node.link]&&lib.character[node.link][1]){
+					uiintro.add(get.translation(character)+'&nbsp;&nbsp;'+lib.translate[lib.character[node.link][1]]);
+				}
+				else{
+					uiintro.add(get.translation(character));
+				}
                 if(node._banning){
                     var clickBanned=function(){
                         var banned=lib.config[this.bannedname]||[];
@@ -41610,7 +41669,15 @@
     				for(i=0;i<skills.length;i++){
     					if(lib.translate[skills[i]+'_info']){
     						translation=get.translation(skills[i]).slice(0,2);
-    						uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
+							if(lib.skill[skills[i]].nobracket){
+								uiintro.add('<div><div class="skill">'+get.translation(skills[i])+'</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
+							}
+							else{
+								uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
+							}
+							if(lib.translate[skills[i]+'_append']){
+								uiintro._place_text=uiintro.add('<div class="text">'+lib.translate[skills[i]+'_append']+'</div>')
+							}
     					}
     				}
                     var modepack=lib.characterPack['mode_'+get.mode()];
