@@ -157,6 +157,7 @@ window.noname_character_rank={
         'hs_kalimosi',
     ],
     am:[
+        'hs_shuiwenxuejia',
         'hs_pyros',
         'swd_xiyan',
         'swd_xiaohuanglong',

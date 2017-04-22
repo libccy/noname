@@ -95,6 +95,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		// hs_xiangyaqishi:['male','wei',3,[]],
     		// hs_fenjie:['male','shu',3,['guimou','yingxi']],
             hs_mojinbaozi:['male','wei',3,['jingcu','shengzhang']],
+            hs_shuiwenxuejia:['male','wu',3,['kekao']],
+            hs_shizugui:['male','wu',3,['szbianshen']],
     	},
     	characterIntro:{
     		hs_jaina:'戴林·普罗德摩尔之女。 在吉安娜成年早期，她致力于阻止将引发第三次战争的天灾瘟疫传播，当战况加剧后，吉安娜获得了新部落大酋长萨尔的信任，成为团结艾泽拉斯各族携手对抗燃烧军团的关键人物。当战争结束后，吉安娜管理着塞拉摩岛，致力于促进部落与联盟间的关系。吉安娜的和平立场与性格在接任萨尔成为部落大酋长的加尔鲁什·地狱咆哮以一颗魔法炸弹夷平塞拉摩后改变了。身为肯瑞托的新领袖，她拥有让加尔鲁什为他酿成的惨剧付出血的代价的权力与决心。',
@@ -175,6 +177,75 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_malfurion:['hs_malorne'],
     	},
     	skill:{
+            szbianshen:{
+    			trigger:{player:'phaseBefore'},
+    			unique:true,
+    			skillAnimation:true,
+    			forceunique:true,
+    			check:function(event,player){
+                    return player.hp<=2;
+    			},
+    			content:function(){
+    				'step 0'
+                    var list=[];
+					for(var i in lib.character){
+						if(!lib.filter.characterDisabled(i)&&lib.character[i][2]>=5){
+							list.push(i);
+						}
+					}
+    				var players=game.players.concat(game.dead);
+    				for(var i=0;i<players.length;i++){
+    					list.remove(players[i].name);
+    					list.remove(players[i].name1);
+    					list.remove(players[i].name2);
+    				}
+    				var dialog=ui.create.dialog('将武将牌替换为一名角色','hidden');
+    				dialog.add([list.randomGets(5),'character']);
+    				player.chooseButton(dialog,true).ai=function(button){
+    					return get.rank(button.link,true)-lib.character[button.link][2];
+    				};
+    				player.awakenSkill('fuhan');
+    				'step 1'
+    				player.reinit('hs_shizugui',result.links[0]);
+                    player.hp=player.maxHp;
+                    player.update();
+    			}
+    		},
+            kekao:{
+                trigger:{player:'phaseEnd'},
+    			direct:true,
+    			content:function(){
+    				'step 0'
+    				var list=[];
+                    for(var i in lib.card){
+                        if(game.bannedcards&&game.bannedcards.contains(i)) continue;
+                        if(lib.card[i].type=='delay'){
+                            list.push(['锦囊','',i]);
+                        }
+                    }
+                    if(list.length==0){
+                        event.finish();
+                        return;
+                    }
+    				var dialog=ui.create.dialog(get.prompt('kekao'),[list.randomGets(3),'vcard'],'hidden');
+    				player.chooseButton(dialog).ai=function(button){
+                        var name=button.link[2]
+                        var num=Math.random()*ai.get.value({name:name});
+                        if(lib.card[name].selectTarget==-1){
+                            return num/10;
+                        }
+                        return num;
+                    };
+    				'step 1'
+    				if(result.buttons){
+    					player.logSkill('kekao');
+    					player.gain(game.createCard(result.buttons[0].link[2]),'draw');
+    				}
+    			},
+    			ai:{
+    				threaten:1.6
+                }
+            },
             jinhua:{
     			trigger:{target:'useCardToBegin'},
                 forced:true,
@@ -6606,9 +6677,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_wujiyuansu:'无羁元素',
             hs_mojinbaozi:'魔晶孢子',
             hs_kalimosi:'卡利莫斯',
+            hs_shuiwenxuejia:'水文学家',
+            hs_shizugui:'始祖龟',
 
+            szbianshen:'变身',
+            szbianshen_info:'限定技，回合开始时，若游戏轮数不少于3，你可以随机观看5张体力上限不小于5的武将牌，将武将牌替换为其中一张',
+            kekao:'科考',
+            kekao_info:'结束阶段，你可以从三张随机亮出的延时锦囊牌中选择一张加入手牌',
             jinhua:'进化',
-            jinhua_info:'锁定技，每当你以自己为目标使用一张非转化的锦囊牌，你从3个随机亮出的技能中选1个获得之',
+            jinhua_info:'锁定技，每当你以自己为目标使用一张非转化的锦囊牌，你从三个随机亮出的技能中选一个获得之',
             hsqizhou:'祈咒',
             hsqizhou_feng:'风之祈咒',
             hsqizhou_feng_info:'出牌阶段对自己使用，令所有目标的敌人打出一张杀或受到一点雷属性伤害',
@@ -6733,7 +6810,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		xueren_info:'每当你使用杀造成伤害，你可以令受伤害角色与你各流失一点体力，然后你摸两张牌',
     		maoxian:'冒险',
     		maoxian2:'冒险',
-    		maoxian_info:'出牌阶段限两次，你可以从三个随机技能中选择一个作为你的技能',
+    		maoxian_info:'出牌阶段限两次，你可以从三个随机亮出的技能中选择一个作为你的技能',
     		tanmi:'探秘',
     		tanmi_info:'在一名其他角色的结束阶段，若你没有手牌，你可以摸两张牌并可以使用两张牌',
     		yiwen:'轶闻',

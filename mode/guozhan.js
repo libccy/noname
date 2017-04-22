@@ -1543,7 +1543,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				ai:{
 					nomingzhi:true,
 					skillTagFilter:function(player){
-						return _status.currentPhase&&_status.currentPhase!=player&&_status.currentPhase.hasSkill('huoshui');
+						if(_status.currentPhase&&_status.currentPhase!=player&&_status.currentPhase.hasSkill('huoshui')){
+							return true;
+						}
+						return false;
 					}
 				}
 			},

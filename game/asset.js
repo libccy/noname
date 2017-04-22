@@ -419,6 +419,8 @@ window.noname_asset_list=[
     'image/character/hs_shaku.jpg',
     'image/character/hs_shanlingjuren.jpg',
     'image/character/hs_shifazhe.jpg',
+    'image/character/hs_shizugui.jpg',
+    'image/character/hs_shuiwenxuejia.jpg',
     'image/character/hs_siwangzhiyi.jpg',
     'image/character/hs_sthrall.jpg',
     'image/character/hs_pengpeng.jpg',
