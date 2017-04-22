@@ -35664,6 +35664,7 @@
 					var button=this;
 					var layer=ui.create.div('.poplayer',ui.window);
 					var uiintro=ui.create.dialog('hidden','notouchscroll');
+					this.classList.add('active');
 					if(lib.config.touchscreen){
 						lib.setScroll(uiintro.contentContainer);
 					}
@@ -35672,6 +35673,7 @@
 							this.clicked=false;
 							return;
 						}
+						button.classList.remove('active');
 						uiintro.delete();
 						this.delete();
 					});
@@ -35861,6 +35863,7 @@
 					var button=this;
 					var layer=ui.create.div('.poplayer',ui.window);
 					var uiintro=ui.create.dialog('hidden','notouchscroll');
+					this.classList.add('active');
 					if(lib.config.touchscreen){
 						lib.setScroll(uiintro.contentContainer);
 					}
@@ -35869,6 +35872,7 @@
 							this.clicked=false;
 							return;
 						}
+						button.classList.remove('active');
 						uiintro.delete();
 						this.delete();
 					});
