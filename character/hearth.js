@@ -98,6 +98,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_shuiwenxuejia:['male','wu',3,['kekao']],
             hs_shizugui:['male','wu',3,['szbianshen']],
             hs_hemite:['male','wu',6,['zhuilie']],
+            hs_laila:['male','wu',3,['lieyang']],
     	},
     	characterIntro:{
     		hs_jaina:'戴林·普罗德摩尔之女。 在吉安娜成年早期，她致力于阻止将引发第三次战争的天灾瘟疫传播，当战况加剧后，吉安娜获得了新部落大酋长萨尔的信任，成为团结艾泽拉斯各族携手对抗燃烧军团的关键人物。当战争结束后，吉安娜管理着塞拉摩岛，致力于促进部落与联盟间的关系。吉安娜的和平立场与性格在接任萨尔成为部落大酋长的加尔鲁什·地狱咆哮以一颗魔法炸弹夷平塞拉摩后改变了。身为肯瑞托的新领袖，她拥有让加尔鲁什为他酿成的惨剧付出血的代价的权力与决心。',
@@ -178,6 +179,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_malfurion:['hs_malorne'],
     	},
     	skill:{
+            lieyang:{
+                trigger:{player:'useCard'},
+                forced:true,
+                usable:3,
+                filter:function(event,player){
+                    return _status.currentPhase==player&&get.type(event.card,'trick')=='trick';
+                },
+                content:function(){
+                    var list=get.inpile('trick','trick');
+                    player.gain(game.createCard(list.randomGet()),'draw');
+                    if(player.storage.counttrigger&&player.storage.counttrigger.lieyang>=3){
+                        player.addTempSkill('lieyang2','phaseAfter');
+                    }
+                },
+                ai:{
+                    threaten:1.7
+                }
+            },
+            lieyang2:{
+                mod:{
+                    cardEnabled:function(card){if(get.type(card,'trick')=='trick') return false}
+                }
+            },
             zhuilie:{
                 trigger:{player:'phaseBegin'},
                 direct:true,
@@ -6718,7 +6742,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_shuiwenxuejia:'水文学家',
             hs_shizugui:'始祖龟',
             hs_hemite:'赫米特',
+            hs_laila:'莱拉',
 
+            lieyang:'裂阳',
+            lieyang_info:'锁定技，每当你于回合内使用一张锦囊牌，你获得一张随机锦囊牌；当你发动三次此技能后，你本回合不能再使用锦囊牌',
             zhuilie:'追猎',
             zhuilie_info:'准备阶段，你可以弃置一张牌，然后将牌堆顶6张牌中的基本牌移至弃牌堆；若移入弃牌堆的牌超过3张，你摸一张牌',
             szbianshen:'变身',
