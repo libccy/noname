@@ -393,6 +393,7 @@ window.noname_asset_list=[
     'image/character/hs_kcthun.jpg',
     'image/character/hs_khadgar.jpg',
     'image/character/hs_lafamu.jpg',
+    'image/character/hs_laila.jpg',
     'image/character/hs_laxiao.jpg',
     'image/character/hs_lazi.jpg',
     'image/character/hs_liadrin.jpg',
