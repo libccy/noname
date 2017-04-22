@@ -362,6 +362,7 @@ window.noname_asset_list=[
     'image/character/hs_alakir.jpg',
     'image/character/hs_alextrasza.jpg',
     'image/character/hs_alleria.jpg',
+    'image/character/hs_amala.jpg',
     'image/character/hs_aya.jpg',
     'image/character/hs_anduin.jpg',
     'image/character/hs_anomalus.jpg',

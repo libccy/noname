@@ -16,6 +16,7 @@ window.noname_character_rank={
         'hs_medivh',
     ],
     ap:[
+        'hs_amala',
         'ow_zhaliya',
         'pal_liumengli',
         'pal_yuntianhe',
@@ -134,6 +135,7 @@ window.noname_character_rank={
         'liuchen',
         'yxs_guiguzi',
         'hs_shanlingjuren',
+        'hs_bannabusi',
         'zhangrang',
         'hs_lafamu',
         'ow_chanyata',

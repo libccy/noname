@@ -102,6 +102,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
             hs_selajin:['male','shu',3,['qianfu','shimo']],
             hs_bannabusi:['male','wu',14,['qingtian']],
+            hs_amala:['female','wu',3,['azaowu','shouwang']],
     	},
     	characterIntro:{
     		hs_jaina:'戴林·普罗德摩尔之女。 在吉安娜成年早期，她致力于阻止将引发第三次战争的天灾瘟疫传播，当战况加剧后，吉安娜获得了新部落大酋长萨尔的信任，成为团结艾泽拉斯各族携手对抗燃烧军团的关键人物。当战争结束后，吉安娜管理着塞拉摩岛，致力于促进部落与联盟间的关系。吉安娜的和平立场与性格在接任萨尔成为部落大酋长的加尔鲁什·地狱咆哮以一颗魔法炸弹夷平塞拉摩后改变了。身为肯瑞托的新领袖，她拥有让加尔鲁什为他酿成的惨剧付出血的代价的权力与决心。',
@@ -182,6 +183,120 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_malfurion:['hs_malorne'],
     	},
     	skill:{
+            azaowu:{
+    			enable:'phaseUse',
+                usable:1,
+    			filter:function(event,player){
+    				if(event.filterCard({name:'sha'},player,event)||
+    					event.filterCard({name:'jiu'},player,event)||
+    					event.filterCard({name:'tao'},player,event)){
+    					return player.hasCard(function(card){
+    						return get.type(card)=='basic';
+    					});
+    				}
+    				return false;
+    			},
+    			chooseButton:{
+    				dialog:function(event,player){
+    					var list=[];
+    					if(event.filterCard({name:'sha'},player,event)){
+    						list.push(['基本','','sha']);
+    						list.push(['基本','','sha','fire']);
+    						list.push(['基本','','sha','thunder']);
+    					}
+                        for(var i=0;i<lib.inpile.length;i++){
+                            if(lib.inpile[i]!='sha'&&
+                                lib.card[lib.inpile[i]].type=='basic'&&
+                                event.filterCard({name:lib.inpile[i]},player,event)){
+                                list.push(['基本','',lib.inpile[i]]);
+                            }
+                        }
+    					return ui.create.dialog('造物',[list,'vcard'],'hidden');
+    				},
+    				check:function(button){
+    					var player=_status.event.player;
+    					var card={name:button.link[2],nature:button.link[3]};
+                        if(!_status.event.rand) _status.event.rand=Math.random();
+    					if(game.hasPlayer(function(current){
+    						return player.canUse(card,current)&&get.effect(current,card,player,player)>0;
+    					})){
+    						switch(button.link[2]){
+    							case 'tao':return 5;
+                                case 'xuejibingbao': return 4;
+    							case 'jiu':return 3.01;
+    							case 'sha':
+    								if(button.link[3]=='fire') return 2.95;
+    								else if(button.link[3]=='fire') return 2.92;
+    								else return 2.9;
+                                    break;
+                                default:return 2+_status.event.rand*2;
+    						}
+    					}
+    					return 0;
+    				},
+    				backup:function(links,player){
+    					return {
+    						filterCard:function(card){
+    							return get.type(card)=='basic';
+    						},
+    						viewAs:{name:links[0][2],nature:links[0][3]},
+    						popname:true,
+                            ai1:function(card){
+                                return 6-ai.get.value(card);
+                            }
+    					}
+    				},
+    				prompt:function(links,player){
+    					return '将一张基本牌当作'+get.translation(links[0][3]||'')+get.translation(links[0][2])+'使用';
+    				}
+    			},
+    			ai:{
+    				order:function(){
+    					var player=_status.event.player;
+    					var event=_status.event;
+    					if(event.filterCard({name:'jiu'},player,event)&&get.effect(player,{name:'jiu'})>0){
+    						return 3.1;
+    					}
+    					return 2.9;
+    				},
+    				result:{
+    					player:1
+    				}
+    			}
+    		},
+            shouwang:{
+                enable:'chooseToUse',
+    			filter:function(event,player){
+    				return event.type=='dying'&&event.dying&&!event.dying.hasSkill('shouwang2');
+    			},
+    			filterTarget:function(card,player,target){
+    				return target==_status.event.dying;
+    			},
+                alter:true,
+    			selectTarget:-1,
+    			content:function(){
+    				target.recover();
+    				if(!get.is.altered('shouwang')) target.changeHujia();
+                    target.addSkill('shouwang2')
+    			},
+    			ai:{
+    				order:6,
+    				skillTagFilter:function(player){
+    					if(!_status.event.dying||_status.event.dying.hasSkill('shouwang2')) return false;
+    				},
+    				save:true,
+    				result:{
+    					target:3
+    				},
+    				threaten:1.6
+    			},
+            },
+            shouwang2:{
+                mark:true,
+                intro:{
+                    content:'已发动'
+                }
+            },
             qingtian:{
                 trigger:{player:'recoverBefore'},
                 forced:true,
@@ -510,7 +625,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.chooseButton(dialog).ai=function(button){
                         if(!player.hasFriend()&&button.link[2]=='hsqizhou_tu') return 0;
                         if(player.isHealthy()&&button.link[2]=='hsqizhou_shui') return 0;
-                        if(shui&&button.link[2]=='hsqizhou_shui') {console.log('stf');return 3;}
+                        if(shui&&button.link[2]=='hsqizhou_shui') return 3;
                         if(tu&&button.link[2]=='hsqizhou_tu') return 2;
                         return Math.random();
                     };
@@ -6861,7 +6976,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_laila:'莱拉',
             hs_selajin:'瑟拉金',
             hs_bannabusi:'班纳布斯',
+            hs_amala:'阿玛拉',
 
+            azaowu:'造物',
+            azaowu_backup:'造物',
+            azaowu_info:'出牌阶段限一次，你可以将一张基本牌当作任意一张基本牌使用',
+            shouwang:'守望',
+            shouwang2:'守望',
+            shouwang_info:'每名角色每局限一次，当一名角色进入濒死状态时，你可以令其回复一点体力并获得一点护甲',
+            shouwang_info_alter:'每名角色每局限一次，当一名角色进入濒死状态时，你可以令其回复一点体力',
             qingtian:'擎天',
             qingtian_info:'锁定技，若你的体力值大于0，你防止即将回复的体力，改为获得等量护甲',
             qianfu:'潜伏',
