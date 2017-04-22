@@ -157,6 +157,8 @@ window.noname_character_rank={
         'hs_kalimosi',
     ],
     am:[
+        'huangfusong',
+        'hs_shizugui',
         'hs_shuiwenxuejia',
         'hs_pyros',
         'swd_xiyan',
@@ -258,6 +260,7 @@ window.noname_character_rank={
         'hs_mojinbaozi',
     ],
     bp:[
+        'hs_hemite',
         'zoushi',
         'swd_zhiyin',
         'hs_hudunren',

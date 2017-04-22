@@ -97,6 +97,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_mojinbaozi:['male','wei',3,['jingcu','shengzhang']],
             hs_shuiwenxuejia:['male','wu',3,['kekao']],
             hs_shizugui:['male','wu',3,['szbianshen']],
+            hs_hemite:['male','wu',6,['zhuilie']],
     	},
     	characterIntro:{
     		hs_jaina:'戴林·普罗德摩尔之女。 在吉安娜成年早期，她致力于阻止将引发第三次战争的天灾瘟疫传播，当战况加剧后，吉安娜获得了新部落大酋长萨尔的信任，成为团结艾泽拉斯各族携手对抗燃烧军团的关键人物。当战争结束后，吉安娜管理着塞拉摩岛，致力于促进部落与联盟间的关系。吉安娜的和平立场与性格在接任萨尔成为部落大酋长的加尔鲁什·地狱咆哮以一颗魔法炸弹夷平塞拉摩后改变了。身为肯瑞托的新领袖，她拥有让加尔鲁什为他酿成的惨剧付出血的代价的权力与决心。',
@@ -177,6 +178,43 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_malfurion:['hs_malorne'],
     	},
     	skill:{
+            zhuilie:{
+                trigger:{player:'phaseBegin'},
+                direct:true,
+                filter:function(event,player){
+                    return player.countCards('he');
+                },
+                content:function(){
+                    'step 0'
+                    player.chooseToDiscard('he',get.prompt('zhuilie')).set('ai',function(card){
+                        if(player.hp>=4||(player.hasSha()&&player.hasShan())){
+                            return 6-ai.get.value(card);
+                        }
+                        if(player.hasSha()||player.hasShan()){
+                            return 3-ai.get.value(card);
+                        }
+                        return 0;
+                    }).logSkill='zhuilie';
+                    'step 1'
+                    if(result.bool){
+                        var list=[];
+                        var list2=[];
+                        for(var i=0;i<6&&i<ui.cardPile.childElementCount;i++){
+                            list.push(ui.cardPile.childNodes[i]);
+                        }
+                        for(var i=0;i<list.length;i++){
+                            if(get.type(list[i])=='basic'){
+                                ui.discardPile.appendChild(list[i]);
+                                list2.push(list[i]);
+                            }
+                        }
+                        player.showCards(get.translation(player)+'将'+get.cnNumber(list2.length)+'张牌移入弃牌堆',list2);
+                        if(list2.length>3){
+                            player.draw();
+                        }
+                    }
+                }
+            },
             szbianshen:{
     			trigger:{player:'phaseBefore'},
     			unique:true,
@@ -6679,7 +6717,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_kalimosi:'卡利莫斯',
             hs_shuiwenxuejia:'水文学家',
             hs_shizugui:'始祖龟',
+            hs_hemite:'赫米特',
 
+            zhuilie:'追猎',
+            zhuilie_info:'准备阶段，你可以弃置一张牌，然后将牌堆顶6张牌中的基本牌移至弃牌堆；若移入弃牌堆的牌超过3张，你摸一张牌',
             szbianshen:'变身',
             szbianshen_info:'限定技，回合开始时，若游戏轮数不少于3，你可以随机观看5张体力上限不小于5的武将牌，将武将牌替换为其中一张',
             kekao:'科考',

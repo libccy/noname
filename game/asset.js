@@ -379,6 +379,7 @@ window.noname_asset_list=[
     'image/character/hs_jaina.jpg',
     'image/character/hs_fuding.jpg',
     'image/character/hs_guldan.jpg',
+    'image/character/hs_hemite.jpg',
     'image/character/hs_hudunren.jpg',
     'image/character/hs_hallazeal.jpg',
     'image/character/hs_huzhixiannv.jpg',
