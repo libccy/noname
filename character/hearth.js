@@ -5277,12 +5277,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			}
     		},
     		huanjue:{
-    			trigger:{player:'useCard',target:'useCard'},
+    			trigger:{global:'useCard'},
                 usable:1,
     			filter:function(event,player){
                     if(event.targets.length!=1) return false;
                     var target=event.targets[0];
                     if(event.player==target) return false;
+                    if(player!=event.player&&player!=target) return false;
                     for(var i=0;i<lib.inpile.length;i++){
                         var info=lib.card[lib.inpile[i]];
                         if(info.multitarget) continue;
@@ -5336,22 +5337,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             list.push(list1.randomRemove());
                         }
                     }
-                    player.chooseButton('选择一张牌代替'+get.translation(trigger.card),true,[[list,'vcard']]).ai=function(button){
+                    player.chooseButton(true,['幻觉',[list,'vcard']]).ai=function(button){
                         var card={suit:trigger.card.suit,number:trigger.card.number,name:button.link[2]};
                         return ai.get.effect(trigger.targets[0],card,trigger.player,player);
                     };
                     'step 1'
     				if(result.bool){
                         var card=game.createCard({suit:trigger.card.suit,number:trigger.card.number,name:result.links[0][2]});
-                        player.$throw(card);
-                        if(player==trigger.player){
-                            player.line(trigger.targets[0],'green');
-                        }
-                        else{
-                            player.line(trigger.player,'green');
-                        }
+                        event.card=card;
     					game.log(player,'将',trigger.card,'变为',card);
-    					game.delay();
+    					if(!event.isMine()) game.delay();
     					trigger.untrigger();
     					trigger.card=card;
     					trigger.cards=[card];
@@ -5359,12 +5354,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				else{
     					event.finish();
     				}
-    				'step 2'
+                    'step 2'
+                    player.$throw(event.card,null,null,true);
+                    if(player==trigger.player){
+                        player.line(trigger.targets[0],'green');
+                    }
+                    else{
+                        player.line(trigger.player,'green');
+                    }
+                    game.delay(0.5);
+    				'step 3'
     				trigger.trigger('useCard');
     			},
     			ai:{
     				expose:0.2,
-    				threaten:0.7
+    				threaten:function(player,target){
+                        if(target.storage.counttrigger&&target.storage.counttrigger.huanjue) return 1.8;
+                        return 0.6;
+                    },
+                    effect:{
+                        target:function(player,target){
+                            if(player!=target&&_status.currentPhase==target) return 0;
+                        }
+                    }
     			}
     		},
     		bingjia:{
@@ -7578,7 +7590,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hongxi_info:'锁定技，每当有一名角色死亡，你将体力回复至体力上限',
     		jihuo:'激活',
     		jihuo_info:'在你的回合结束后，你可以弃置一张手牌并进行一个额外的回合',
-    		jianren:'剑刃',
+    		jianren:'刃舞',
     		jianren_info:'出牌阶段限一次，你可以弃置装备区内的武器牌，对所有其他角色造成一点伤害',
     		mengun:'闷棍',
     		mengun2:'闷棍',

@@ -14341,6 +14341,7 @@
                             this.logAi(next.targets,next.card);
                         }
 					}
+					next.stocktargets=next.targets.slice(0);
                     next.setContent('useCard');
 					return next;
 				},
@@ -16785,7 +16786,7 @@
 						node2.listenTransition(onEnd02);
 					},200);
 				},
-				$throw:function(card,time,init){
+				$throw:function(card,time,init,nosource){
 					if(typeof card=='number'){
 						var tmp=card;
 						card=[];
@@ -16798,8 +16799,8 @@
 					}
 					if(init!==false){
                         if(init!=='nobroadcast'){
-                            game.broadcast(function(player,card,time,init){
-                                player.$throw(card,time,init);
+                            game.broadcast(function(player,card,time,init,nosource){
+                                player.$throw(card,time,init,nosource);
                             },this,card,time,init);
                         }
 						if(get.itemtype(card)!='cards'){
@@ -16810,7 +16811,7 @@
 								return;
 							}
 						}
-						game.addVideo('throw',this,[get.cardsInfo(card),time]);
+						game.addVideo('throw',this,[get.cardsInfo(card),time,nosource]);
 					}
                     if(game.chess){
                         this.chessFocus();
@@ -16818,14 +16819,14 @@
 					if(get.itemtype(card)=='cards'){
 						var node;
 						for(var i=0;i<card.length;i++){
-							node=this.$throw(card[i],time,false);
+							node=this.$throw(card[i],time,false,nosource);
 						}
 						return node;
 					}
 					else{
 						var node;
 						if(card==undefined||card.length==0) return;
-						node=this.$throwordered(card.copy('thrown'));
+						node=this.$throwordered(card.copy('thrown'),nosource);
 						if(time!=undefined){
 							node.fixed=true;
 							setTimeout(function(){node.delete()},time);
@@ -21839,7 +21840,7 @@
 			},
 			throw:function(player,info){
 				if(player&&info){
-					player.$throw(get.infoCards(info[0]),info[1]);
+					player.$throw(get.infoCards(info[0]),info[1],null,info[2]);
 				}
 				else{
 					console.log(player);

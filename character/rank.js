@@ -160,6 +160,7 @@ window.noname_character_rank={
         'hs_jaina',
         're_lidian',
         'hs_kalimosi',
+        'hs_zhihuanhua',
     ],
     am:[
         'huangfusong',
@@ -423,6 +424,7 @@ window.noname_character_rank={
         'guanyinping',
     ],
     b:[
+        'hs_shirencao',
         'sp_daqiao',
         'hs_jiawodun',
         'yxs_weizhongxian',

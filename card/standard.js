@@ -481,7 +481,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 3"
 					ui.clear();
-					var cards=get.cards(game.countPlayer());
+					var num;
+					if(event.getParent().stocktargets){
+						num=event.getParent().stocktargets.length;
+					}
+					else{
+						num=game.countPlayer();
+					}
+					var cards=get.cards(num);
 					var dialog=ui.create.dialog('五谷丰登',cards,true);
 					_status.dieClose.push(dialog);
 					dialog.videoId=lib.status.videoId++;
@@ -1881,7 +1888,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			fangtian_info:'你使用的【杀】若是你最后的手牌，你可以额外选择至多两个目标。',
 			qilin_skill_info:'每当你使用【杀】对目标角色造成伤害时，你可以弃置其装备区里的一张坐骑牌。',
 			qilin_info:'每当你使用【杀】对目标角色造成伤害时，你可以弃置其装备区里的一张坐骑牌。',
-			wugu_info:'出牌阶段，对所有角色使用。（选择目标后）你从牌堆顶亮出等同于角色数量的牌，每名目标角色获得这些牌中（剩余的）的任意一张。',
+			wugu_info:'出牌阶段，对所有角色使用。（选择目标后）你从牌堆顶亮出等同于目标数量的牌，每名目标角色获得这些牌中（剩余的）的任意一张。',
 			taoyuan_info:'出牌阶段，对所有角色使用。每名目标角色回复1点体力。',
 			nanman_info:'出牌阶段，对所有其他角色使用。每名目标角色需打出一张【杀】，否则受到1点伤害。',
 			wanjian_info:'出牌阶段，对所有其他角色使用。每名目标角色需打出一张【闪】，否则受到1点伤害。',
