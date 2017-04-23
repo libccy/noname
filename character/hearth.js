@@ -104,6 +104,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_bannabusi:['male','wu',14,['qingtian']],
             hs_amala:['female','wu',3,['azaowu','shouwang']],
             hs_yinggencao:['male','wu',3,['lieqi']],
+
+            hs_zhihuanhua:['fmale','wei',3,['huanjue']],
+            hs_shirencao:['ale','wu',3,['srjici']],
+            hs_kaituozhe:['fmale','wei',3,['yinzong','zhanji']],
     	},
     	characterIntro:{
     		hs_jaina:'戴林·普罗德摩尔之女。 在吉安娜成年早期，她致力于阻止将引发第三次战争的天灾瘟疫传播，当战况加剧后，吉安娜获得了新部落大酋长萨尔的信任，成为团结艾泽拉斯各族携手对抗燃烧军团的关键人物。当战争结束后，吉安娜管理着塞拉摩岛，致力于促进部落与联盟间的关系。吉安娜的和平立场与性格在接任萨尔成为部落大酋长的加尔鲁什·地狱咆哮以一颗魔法炸弹夷平塞拉摩后改变了。身为肯瑞托的新领袖，她拥有让加尔鲁什为他酿成的惨剧付出血的代价的权力与决心。',
@@ -184,6 +188,69 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_malfurion:['hs_malorne'],
     	},
     	skill:{
+            srjici:{
+                trigger:{source:'damageEnd'},
+                forced:true,
+                content:function(){
+                    player.draw();
+                    if(trigger.player&&trigger.player.isIn()){
+                        trigger.player.randomDiscard();
+                    }
+                },
+                ai:{
+                    threaten:1.4
+                }
+            },
+            yinzong:{
+    			trigger:{player:'loseEnd'},
+    			forced:true,
+    			filter:function(event,player){
+					for(var i=0;i<event.cards.length;i++){
+						if(event.cards[i].original=='e') return true;
+					}
+    				return false;
+    			},
+    			content:function(){
+    				player.addTempSkill('qianxing',{player:'phaseBegin'});
+    			}
+    		},
+            zhanji:{
+                enable:'phaseUse',
+    			usable:1,
+    			filterCard:true,
+    			position:'he',
+    			check:function(card){
+    				return 8-get.value(card)
+    			},
+    			content:function(){
+                    if(!lib.characterPack.hearth){
+                        player.draw();
+                        return;
+                    }
+                    var list=[];
+                    for(var i=0;i<lib.cardPack.mode_derivation.length;i++){
+                        var name=lib.cardPack.mode_derivation[i];
+                        var info=lib.card[name];
+                        if(info.gainnable==false) continue;
+                        if(lib.characterPack.hearth[info.derivation]){
+                            list.push(name);
+                        }
+                    }
+                    if(!list.length){
+                        player.draw();
+                    }
+                    else{
+                        player.gain(game.createCard(list.randomGet()),'draw');
+                    }
+    			},
+    			ai:{
+                    threaten:1.6,
+    				order:8,
+    				result:{
+    					player:1
+    				},
+    			}
+            },
             lieqi:{
                 trigger:{player:['phaseBegin','phaseEnd']},
                 filter:function(event,player){
@@ -5209,73 +5276,95 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     			}
     		},
-    		bianxing:{
-    			trigger:{global:'useCard'},
+    		huanjue:{
+    			trigger:{player:'useCard',target:'useCard'},
+                usable:1,
     			filter:function(event,player){
-    				if(player.hasSkill('bianxing2')) return false;
-    				if(event.player==player) return false;
-    				if(_status.currentPhase!=event.player) return false;
-    				if(!event.targets) return false;
-    				if(event.targets.length!=1) return false;
-    				if(event.targets[0]==event.player) return false;
-    				var hs=player.getCards('h');
-    				for(var i=0;i<hs.length;i++){
-    					if(hs[i].name!=event.card.name){
-    						var card=hs[i];
-    						if(get.type(card)=='basic'&&get.info(card.enable)){
-    							return true;
-    						}
-    					}
-    				}
-    				return false;
+                    if(event.targets.length!=1) return false;
+                    var target=event.targets[0];
+                    if(event.player==target) return false;
+                    for(var i=0;i<lib.inpile.length;i++){
+                        var info=lib.card[lib.inpile[i]];
+                        if(info.multitarget) continue;
+                        if(lib.filter.targetEnabled2({name:lib.inpile[i]},event.player,target)){
+                            return true;
+                        }
+                    }
+                    return false;
     			},
-    			direct:true,
+    			check:function(event,player){
+                    var eff=get.effect(event.targets[0],event.card,event.player,player);
+                    if(eff<=0) return true;
+                    if(ai.get.value(event.card,event.player,'raw')<5){
+                        return Math.random()<0.5;
+                    }
+    				return false;
+                },
+                prompt2:function(event,player){
+                    var name1,name2;
+                    if(player==event.player){
+                        name1='你';
+                        name2=get.translation(event.targets[0]);
+                    }
+                    else{
+                        name1=get.translation(event.player);
+                        name2='你';
+                    }
+                    return '从三张随机牌中选择一张代替'+name1+'对'+name2+'使用的'+get.translation(event.card);
+                },
     			content:function(){
-    				'step 0'
-    				var eff=get.effect(trigger.targets[0],trigger.card,trigger.player,player);
-    				var att=get.attitude(player,trigger.player);
-    				player.chooseCard(get.prompt('bianxing'),function(card){
-    					if(card.name!=trigger.card.name){
-    						if(get.type(card)=='basic'&&get.info(card).enable){
-    							return true;
-    						}
-    					}
-    					return false;
-    				}).ai=function(card){
-    					if(att>=0) return 0;
-    					if(card.name=='tao'||card.name=='caoyao'){
-    						if(trigger.targets[0].hp==trigger.targets[0].maxHp) return 0;
-    					}
-    					if(eff>=0) return 0;
-    					return get.effect(trigger.targets[0],card,trigger.player,player);
-    				};
-    				'step 1'
+                    'step 0'
+                    var list=[],list1=[],list2=[];
+                    for(var i=0;i<lib.inpile.length;i++){
+                        var info=lib.card[lib.inpile[i]];
+                        if(info.multitarget) continue;
+                        if(lib.filter.targetEnabled2({name:lib.inpile[i]},trigger.player,trigger.targets[0])){
+                            var cardinfo=[trigger.card.suit,trigger.card.number,lib.inpile[i]];
+                            list1.push(cardinfo);
+                            if(info.type!='equip'){
+                                list2.push(cardinfo);
+                            }
+                        }
+                    }
+                    var equipped=false;
+                    for(var i=0;i<3;i++){
+                        if(equipped&&list2.length){
+                            list.push(list2.randomRemove());
+                        }
+                        else{
+                            equipped=true;
+                            list.push(list1.randomRemove());
+                        }
+                    }
+                    player.chooseButton('选择一张牌代替'+get.translation(trigger.card),true,[[list,'vcard']]).ai=function(button){
+                        var card={suit:trigger.card.suit,number:trigger.card.number,name:button.link[2]};
+                        return ai.get.effect(trigger.targets[0],card,trigger.player,player);
+                    };
+                    'step 1'
     				if(result.bool){
-    					var card=result.cards[0];
-    					player.lose(result.cards);
-    					event.cards=result.cards;
-    					player.logSkill('bianxing',trigger.player);
-    					game.log(player,'将',trigger.card,'变为',result.cards);
-    					game.delay(0.5);
+                        var card=game.createCard({suit:trigger.card.suit,number:trigger.card.number,name:result.links[0][2]});
+                        player.$throw(card);
+                        if(player==trigger.player){
+                            player.line(trigger.targets[0],'green');
+                        }
+                        else{
+                            player.line(trigger.player,'green');
+                        }
+    					game.log(player,'将',trigger.card,'变为',card);
+    					game.delay();
     					trigger.untrigger();
     					trigger.card=card;
     					trigger.cards=[card];
-    					player.addTempSkill('bianxing2','phaseAfter');
     				}
     				else{
     					event.finish();
     				}
     				'step 2'
-    				player.$throw(event.cards);
-    				game.delay();
-    				'step 3'
-    				// player.draw();
-    				'step 4'
     				trigger.trigger('useCard');
     			},
     			ai:{
     				expose:0.2,
-    				threaten:1.8
+    				threaten:0.7
     			}
     		},
     		bingjia:{
@@ -6630,6 +6719,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			fullimage:true,
     			vanish:true,
     			enable:true,
+                gainnable:false,
     			derivation:'hs_yelise',
     			filterTarget:function(card,player,target){
     				return target==player;
@@ -6653,23 +6743,42 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			fullimage:true,
     			vanish:true,
     			enable:true,
+                gainnable:false,
     			derivation:'hs_yelise',
     			filterTarget:function(card,player,target){
     				return target==player;
     			},
     			selectTarget:-1,
     			content:function(){
-    				player.recover();
-    				player.draw(3);
-    				// var hs=target.getCards('h');
-    				// target.discard(hs);
-    				// var cs=[];
-    				// for(var i=0;i<hs.length;i++){
-    				// 	cs.push(game.createCard('wuzhong'));
-    				// }
-    				// target.gain(cs,'gain2');
-    				// target.storage.hsbaowu_huangjinyuanhou=cards[0];
-    				// target.addSkill('hsbaowu_huangjinyuanhou');
+                    'step 0'
+					var cards=target.getCards();
+					if(cards.length){
+						target.lose(cards)._triggered=null;
+					}
+					event.num=1+cards.length;
+					'step 1'
+					var cards=[];
+                    var list=[];
+                    if(lib.characterPack.hearth){
+                        for(var i=0;i<lib.cardPack.mode_derivation.length;i++){
+                            var name=lib.cardPack.mode_derivation[i];
+                            var info=lib.card[name];
+                            if(info.gainnable==false) continue;
+                            if(lib.characterPack.hearth[info.derivation]){
+                                list.push(name);
+                            }
+                        }
+                    }
+                    if(!list.length){
+                        list=lib.inpile.slice(0);
+                    }
+					if(list.length){
+						for(var i=0;i<event.num;i++){
+							cards.push(game.createCard(list.randomGet()));
+						}
+						target.directgain(cards);
+					}
+                    target.addTempSkill('qianxing',{player:'phaseBegin'});
     			},
     			ai:{
     				order:10,
@@ -6917,49 +7026,57 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			noname:true,
     			fullimage:true,
     			type:'hstuteng',
-    			derivation:'hs_sthrall'
+    			derivation:'hs_sthrall',
+                gainnable:false
     		},
     		tuteng2:{
     			noname:true,
     			fullimage:true,
     			type:'hstuteng',
-    			derivation:'hs_sthrall'
+    			derivation:'hs_sthrall',
+                gainnable:false
     		},
     		tuteng3:{
     			noname:true,
     			fullimage:true,
     			type:'hstuteng',
-    			derivation:'hs_sthrall'
+    			derivation:'hs_sthrall',
+                gainnable:false
     		},
     		tuteng4:{
     			noname:true,
     			fullimage:true,
     			type:'hstuteng',
-    			derivation:'hs_sthrall'
+    			derivation:'hs_sthrall',
+                gainnable:false
     		},
     		tuteng5:{
     			noname:true,
     			fullimage:true,
     			type:'hstuteng',
-    			derivation:'hs_sthrall'
+    			derivation:'hs_sthrall',
+                gainnable:false
     		},
     		tuteng6:{
     			noname:true,
     			fullimage:true,
     			type:'hstuteng',
-    			derivation:'hs_sthrall'
+    			derivation:'hs_sthrall',
+                gainnable:false
     		},
     		tuteng7:{
     			noname:true,
     			fullimage:true,
     			type:'hstuteng',
-    			derivation:'hs_sthrall'
+    			derivation:'hs_sthrall',
+                gainnable:false
     		},
     		tuteng8:{
     			noname:true,
     			fullimage:true,
     			type:'hstuteng',
-    			derivation:'hs_sthrall'
+    			derivation:'hs_sthrall',
+                gainnable:false
     		},
     	},
     	translate:{
@@ -7037,6 +7154,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_tanghangu:'唐·汉古',
     		hs_barnes:'巴内斯',
     		hs_kchromaggus:'克洛玛古斯',
+            hs_kaituozhe:'开拓者',
 
     		hs_ronghejuren:'熔核巨人',
     		hs_shanlingjuren:'山岭巨人',
@@ -7060,7 +7178,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_shizugui:'始祖龟',
             hs_hemite:'赫米特',
             hs_yinggencao:'萤根草',
+            hs_zhihuanhua:'致幻花',
+            hs_shirencao:'食人草',
 
+            huanjue:'幻觉',
+            huanjue_info:'每名角色的回合限一次，当你使用卡牌指定其他角色为惟一目标，或当其他角色使用卡牌指定你为惟一目标时，你可以从三张随机亮出的牌中选择一张代替此牌',
+            yinzong:'影踪',
+            yinzong_info:'锁定技，每当你失去装备区内牌，你获得潜行直到下一回合开始',
+            zhanji:'斩棘',
+            zhanji_info:'出牌阶段限一次，你可以弃置一张牌，然后随机获得一张炉石衍生牌',
+            srjici:'棘刺',
+            srjici_info:'锁定技，每当你造成一次伤害，你摸一张牌，受伤害角色随机弃置一张牌',
             lieqi:'猎奇',
             lieqi_info:'准备和结束阶段，你可以指定一名角色，从一张该角色手牌与另外两张随机牌中猜测哪张为该角色手牌，若猜中，你获得一张该牌的复制（同一回合不能指定相同角色）',
             azaowu:'造物',
@@ -7243,7 +7371,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hsshenqi_nengliangzhiguang_info:'限武将牌正面朝上时使用，令一名角色增加一点体力上限，回复一点体力，并摸四张牌；使用后将武将牌翻至背面',
     		hsbaowu:'宝物',
     		hsbaowu_huangjinyuanhou:'黄金猿猴',
-    		hsbaowu_huangjinyuanhou_info:'摸三张牌并回复一点体力；直到下个回合开始，不能成为其他角色的卡牌目标',
+    		hsbaowu_huangjinyuanhou_info:'将你的手牌（含此张）替换为随机炉石衍生牌，并获得潜行直到下一回合开始',
     		hsbaowu_cangbaotu:'藏宝图',
     		hsbaowu_cangbaotu_info:'结束阶段，将一张黄金猿猴置入你的手牌；摸一张牌',
     		hsyaoshui:'药水',

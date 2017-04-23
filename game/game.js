@@ -8862,9 +8862,13 @@
                                 }
                             }
     						if(typeof str=='function'){str=str(trigger,player)}
-    						player.chooseBool(str).ai=function(){
+    						var next=player.chooseBool(str);
+							next.ai=function(){
     							return !check||check(trigger,player);
     						};
+							if(typeof info.prompt2=='function'){
+								next.prompt2=info.prompt2(trigger,player);
+							}
     					}
     				}
     				"step 3"
@@ -9599,14 +9603,14 @@
 									if(event.position=='e') str+='装备';
 									str+='牌';
 								}
-								if(event.prompt2){
-									str+='<br><br><div class="text center">'+event.prompt2;
-								}
 								event.dialog=ui.create.dialog(str);
+								if(event.prompt2){
+									event.dialog.addText(event.prompt2);
+								}
                                 if(Array.isArray(event.selectCard)){
-                                    event.dialog.add('0/'+get.numStr(event.selectCard[1]));
+                                    event.promptbar=event.dialog.add('0/'+get.numStr(event.selectCard[1]));
     								event.custom.add.card=function(){
-    									_status.event.dialog.content.childNodes[1].innerHTML=
+    									_status.event.promptbar.innerHTML=
     									ui.selected.cards.length+'/'+get.numStr(_status.event.selectCard[1]);
     								}
                                 }
@@ -10367,6 +10371,9 @@
 						}
 						else if(event.prompt){
 							event.dialog=ui.create.dialog(event.prompt);
+							if(event.prompt2){
+								event.dialog.addText(event.prompt2);
+							}
 						}
 						game.pause();
                         game.countChoose();

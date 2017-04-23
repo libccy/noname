@@ -235,7 +235,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectCard:[1,3],
 				check:function(card){
 					if(!ui.selected.cards.length){
-						return 6-get.value(card)
+						return 8-get.value(card)
 					}
 					var player=_status.event.player;
 					if(player.isDamaged()){
@@ -262,7 +262,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					order:1,
+					order:4,
 					result:{
 						player:1
 					},
