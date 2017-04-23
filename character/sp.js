@@ -4929,33 +4929,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hanyong:{
     			trigger:{player:'useCard'},
     			filter:function(event,player){
-    				return player.storage.hanyong>player.hp&&event.card&&
+    				return game.roundNumber>player.hp&&event.card&&
     					(event.card.name=='nanman'||event.card.name=='wanjian');
     			},
     			content:function(){
     				player.addTempSkill('hanyong3','useCardAfter');
     			},
-    			init:function(player){
-    				player.storage.hanyong=0;
-    			},
-    			group:'hanyong2'
-    		},
-    		hanyong2:{
-    			audio:false,
-    			trigger:{player:'phaseBegin'},
-    			forced:true,
-    			popup:false,
-    			silent:true,
-    			content:function(){
-    				player.storage.hanyong++;
-    			}
     		},
     		hanyong3:{
     			audio:false,
     			trigger:{source:'damageBegin'},
     			forced:true,
     			filter:function(event,player){
-    				return event.card&&(event.card.name=='nanman'||event.card.name=='wanjian');
+    				return event.card&&(event.card.name=='nanman'||event.card.name=='wanjian')&&event.notLink();
     			},
     			content:function(){
     				trigger.num++;

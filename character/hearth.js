@@ -554,6 +554,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			unique:true,
     			skillAnimation:true,
     			forceunique:true,
+                filter:function(){
+                    return game.roundNumber>=3;
+                },
     			check:function(event,player){
                     return player.hp<=2;
     			},
