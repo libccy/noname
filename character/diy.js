@@ -96,7 +96,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					player.chooseTarget(get.prompt('jianbi'),
-						[1,Math.max(1,player.maxHp-player.hp)],function(card,player,target){
+						[1,1],function(card,player,target){
 						return _status.event.getTrigger().targets.contains(target);
 					}).set('ai',function(target){
 						var trigger=_status.event.getTrigger();
@@ -1317,7 +1317,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liangce:'粮策',
 			liangce_info:'①出牌阶段限一次，你可以将一张基本牌当【五谷丰登】使用。②当因执行【五谷丰登】的效果而亮出的牌因效果执行完毕而置入弃牌堆后，你可以选择一名角色，令该角色获取之',
 			jianbi:'坚壁',
-			jianbi_info:'当你成为锦囊牌的目标时，若此牌的目标包括其他角色，你可以令此牌对1至X个目标无效（X为你已损失的体力值且至少为1）',
+			jianbi_info:'当你成为锦囊牌的目标时，若此牌的目标包括其他角色，你可以令此牌对1个目标无效',
 			juntun:'军屯',
 			juntun_info:'出牌阶段，你可以重铸装备牌',
 			choudu:'筹度',

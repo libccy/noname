@@ -103,6 +103,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_selajin:['male','shu',3,['qianfu','shimo']],
             hs_bannabusi:['male','wu',14,['qingtian']],
             hs_amala:['female','wu',3,['azaowu','shouwang']],
+            hs_yinggencao:['male','wu',3,['lieqi']],
     	},
     	characterIntro:{
     		hs_jaina:'戴林·普罗德摩尔之女。 在吉安娜成年早期，她致力于阻止将引发第三次战争的天灾瘟疫传播，当战况加剧后，吉安娜获得了新部落大酋长萨尔的信任，成为团结艾泽拉斯各族携手对抗燃烧军团的关键人物。当战争结束后，吉安娜管理着塞拉摩岛，致力于促进部落与联盟间的关系。吉安娜的和平立场与性格在接任萨尔成为部落大酋长的加尔鲁什·地狱咆哮以一颗魔法炸弹夷平塞拉摩后改变了。身为肯瑞托的新领袖，她拥有让加尔鲁什为他酿成的惨剧付出血的代价的权力与决心。',
@@ -183,6 +184,84 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_malfurion:['hs_malorne'],
     	},
     	skill:{
+            lieqi:{
+                trigger:{player:['phaseBegin','phaseEnd']},
+                filter:function(event,player){
+                    return game.hasPlayer(function(current){
+                        return !current.isUnderControl(true,player)&&current!=player.storage.lieqi&&current.countCards('h');
+                    });
+                },
+                direct:true,
+                content:function(){
+                    'step 0'
+                    player.chooseTarget(get.prompt('lieqi'),function(card,player,target){
+                        return !target.isUnderControl(true,player)&&target!=player.storage.lieqi&&target.countCards('h');
+                    }).ai=function(){
+                        return 1;
+                    }
+                    'step 1'
+                    if(result.bool){
+                        var target=result.targets[0];
+                        player.logSkill('lieqi',target);
+                        if(event.triggername=='phaseBegin'){
+                            player.storage.lieqi=target;
+                        }
+                        var hs=target.get('h').randomSort();
+                        if(hs.length){
+                            var list2=[];
+                            for(var i=0;i<hs.length;i++){
+                                if(list2.contains(hs[i].name)){
+                                    hs.splice(i--,1);
+                                }
+                                else{
+                                    list2.push(hs[i].name);
+                                }
+                            }
+                            var card=hs.randomGet();
+                            var list=[];
+                            for(var i=0;i<lib.inpile.length;i++){
+                                if(!list2.contains(lib.inpile[i])&&
+                                    (get.type(lib.inpile[i])!='equip'||Math.random()<0.5)){
+                                    list.push(lib.inpile[i]);
+                                }
+                            }
+                            event.card=card;
+                            player.chooseCardButton(true,'猜测哪张牌为'+get.translation(target)+'的手牌',
+                            [card,game.createCard(list.randomRemove()),game.createCard(list.randomRemove())].randomSort()).ai=function(button){
+                                if(ai.get.value(button.link)<0) return -10;
+                                if(!_status.event.rand) _status.event.rand=Math.random();
+                                if(_status.event.rand<0.7){
+                                    return button.link==card?1:-1;
+                                }
+                                else{
+                                    return button.link==card?-1:1;
+                                }
+                            };
+                        }
+                        else{
+                            event.finish();
+                        }
+                    }
+                    else{
+                        event.finish();
+                    }
+                    if(event.triggername=='phaseEnd'){
+                        delete player.storage.lieqi;
+                    }
+                    'step 2'
+                    if(result.bool&&result.links){
+                        if(result.links[0]==event.card){
+                            player.gain(game.createCard(event.card),'draw');
+                        }
+                        else{
+                            player.viewCards('正确答案',[event.card]);
+                        }
+                    }
+                },
+                ai:{
+                    threaten:1.5
+                }
+            },
             azaowu:{
     			enable:'phaseUse',
                 usable:1,
@@ -6935,6 +7014,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_aya:'艾雅',
             hs_pyros:'派洛斯',
             hs_jiawodun:'嘉沃顿',
+            hs_laila:'莱拉',
+            hs_selajin:'瑟拉金',
+            hs_bannabusi:'班纳布斯',
+            hs_amala:'阿玛拉',
+    		hs_nuogefu:'诺格弗',
+    		hs_kazhakusi:'卡扎库斯',
+    		hs_lazi:'拉兹',
+    		hs_shaku:'沙库尔',
+    		hs_laxiao:'拉希奥',
+    		hs_yashaji:'亚煞极',
+    		hs_khadgar:'卡德加',
+    		hs_tyrande:'泰兰德',
+    		hs_fenjie:'芬杰',
+            hs_kalimosi:'卡利莫斯',
+    		hs_yogg:'尤格萨隆',
+    		hs_xialikeer:'夏克里尔',
+    		hs_wolazi:'沃拉兹',
+    		hs_tanghangu:'唐·汉古',
+    		hs_barnes:'巴内斯',
+    		hs_kchromaggus:'克洛玛古斯',
 
     		hs_ronghejuren:'熔核巨人',
     		hs_shanlingjuren:'山岭巨人',
@@ -6948,36 +7047,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_sapphiron:'萨菲隆',
     		hs_xuanzhuanjijia:'旋转机甲',
     		hs_ruanniguai:'软泥怪',
-    		hs_kchromaggus:'克洛玛古斯',
     		hs_hudunren:'护盾机甲',
     		hs_nate:'纳特',
     		hs_shifazhe:'嗜法者',
-    		hs_yogg:'尤格萨隆',
-    		hs_xialikeer:'夏克里尔',
-    		hs_wolazi:'沃拉兹',
-    		hs_tanghangu:'唐·汉古',
-    		hs_barnes:'巴内斯',
     		hs_xiangyaqishi:'象牙骑士',
-    		hs_nuogefu:'诺格弗',
-    		hs_kazhakusi:'卡扎库斯',
-    		hs_lazi:'拉兹',
-    		hs_shaku:'沙库尔',
-    		hs_laxiao:'拉希奥',
-    		hs_yashaji:'亚煞极',
-    		hs_khadgar:'卡德加',
-    		hs_tyrande:'泰兰德',
-    		hs_fenjie:'芬杰',
     		hs_wujiyuansu:'无羁元素',
             hs_mojinbaozi:'魔晶孢子',
-            hs_kalimosi:'卡利莫斯',
             hs_shuiwenxuejia:'水文学家',
             hs_shizugui:'始祖龟',
             hs_hemite:'赫米特',
-            hs_laila:'莱拉',
-            hs_selajin:'瑟拉金',
-            hs_bannabusi:'班纳布斯',
-            hs_amala:'阿玛拉',
+            hs_yinggencao:'萤根草',
 
+            lieqi:'猎奇',
+            lieqi_info:'准备和结束阶段，你可以指定一名角色，从一张该角色手牌与另外两张随机牌中猜测哪张为该角色手牌，若猜中，你获得一张该牌的复制（同一回合不能指定相同角色）',
             azaowu:'造物',
             azaowu_backup:'造物',
             azaowu_info:'出牌阶段限一次，你可以将一张基本牌当作任意一张基本牌使用',

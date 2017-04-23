@@ -450,6 +450,7 @@ window.noname_asset_list=[
     'image/character/hs_xuefashi.jpg',
     'image/character/hs_yashaji.jpg',
     'image/character/hs_yelise.jpg',
+    'image/character/hs_yinggencao.jpg',
     'image/character/hs_yngvar.jpg',
     'image/character/hs_ysera.jpg',
     'image/character/hs_yogg.jpg',

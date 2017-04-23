@@ -56,6 +56,7 @@ window.noname_character_rank={
         'swd_shuwaner',
     ],
     a:[
+        'hs_yinggencao',
         'hs_laila',
         'swd_kendi',
         'hs_enzoth',

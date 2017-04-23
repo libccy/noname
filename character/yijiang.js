@@ -6099,7 +6099,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				game.resetSkills();
     				_status.event.finish();
     				_status.event.untrigger(true);
-    			}
+    			},
+                ai:{
+                    jueqing:true
+                }
     		},
     		danshou:{
     			enable:'phaseUse',
