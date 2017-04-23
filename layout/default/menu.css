@@ -101,6 +101,7 @@
 }
 .menu-buttons>.config.more.pile{
 	margin-top: 5px !important;
+	margin-left: 3px !important;
 }
 .menu-buttons>.toggle.cardpilecfgadd:not(.hidden){
 	margin-top: 0 !important;
@@ -424,6 +425,7 @@
 	transition:all 0.3s;
 	width:calc(100% - 20px);
     overflow: visible;
+	position: relative;
 }
 .menu.main>.menu-content>div>.right.pane>div>.config.banskilladd{
 	height: 50px;
