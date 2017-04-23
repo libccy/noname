@@ -437,9 +437,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.num=trigger.num;
 					"step 1"
 					player.judge(function(card){
-						if(get.color(card)=='red') return 2;
-						return 1;
-					})
+						if(get.color(card)=='red') return _status.event.eff;
+						return 0;
+					}).set('eff',ai.get.damageEffect(trigger.source,player,player));
 					"step 2"
 					if(result.judge==1&&trigger.source.countCards('he')){
 						player.discardPlayerCard(trigger.source,'he',true);

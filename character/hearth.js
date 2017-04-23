@@ -107,7 +107,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
             hs_zhihuanhua:['fmale','wei',3,['huanjue']],
             hs_shirencao:['ale','wu',3,['srjici']],
-            hs_kaituozhe:['fmale','wei',3,['yinzong','zhanji']],
+            hs_kaituozhe:['fmale','wei',3,['yinzong','tansuo']],
     	},
     	characterIntro:{
     		hs_jaina:'戴林·普罗德摩尔之女。 在吉安娜成年早期，她致力于阻止将引发第三次战争的天灾瘟疫传播，当战况加剧后，吉安娜获得了新部落大酋长萨尔的信任，成为团结艾泽拉斯各族携手对抗燃烧军团的关键人物。当战争结束后，吉安娜管理着塞拉摩岛，致力于促进部落与联盟间的关系。吉安娜的和平立场与性格在接任萨尔成为部落大酋长的加尔鲁什·地狱咆哮以一颗魔法炸弹夷平塞拉摩后改变了。身为肯瑞托的新领袖，她拥有让加尔鲁什为他酿成的惨剧付出血的代价的权力与决心。',
@@ -214,7 +214,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.addTempSkill('qianxing',{player:'phaseBegin'});
     			}
     		},
-            zhanji:{
+            tansuo:{
                 enable:'phaseUse',
     			usable:1,
     			filterCard:true,
@@ -3089,7 +3089,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			}
     		},
     		yiwen2:{},
-    		tanbao:{
+    		tanbao_old:{
     			enable:'phaseUse',
     			usable:1,
     			filter:function(event,player){
@@ -3121,7 +3121,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     			}
     		},
-    		tanbao_old:{
+    		tanbao_old2:{
     			enable:'phaseUse',
     			usable:10,
     			filterCard:true,
@@ -7197,8 +7197,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             huanjue_info:'每名角色的回合限一次，当你使用卡牌指定其他角色为惟一目标，或当其他角色使用卡牌指定你为惟一目标时，你可以从三张随机亮出的牌中选择一张代替此牌',
             yinzong:'影踪',
             yinzong_info:'锁定技，每当你失去装备区内牌，你获得潜行直到下一回合开始',
-            zhanji:'斩棘',
-            zhanji_info:'出牌阶段限一次，你可以弃置一张牌，然后随机获得一张炉石衍生牌',
+            tansuo:'探索',
+            tansuo_info:'出牌阶段限一次，你可以弃置一张牌，然后随机获得一张炉石衍生牌',
             srjici:'棘刺',
             srjici_info:'锁定技，每当你造成一次伤害，你摸一张牌，受伤害角色随机弃置一张牌',
             lieqi:'猎奇',
