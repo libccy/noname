@@ -20347,6 +20347,7 @@
                 }
             }
         },
+		suit:['club','spade','diamond','heart'],
 		group:['wei','shu','wu','qun'],
 		nature:['fire','thunder','poison'],
 		linked:['fire','thunder'],

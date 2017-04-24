@@ -5320,7 +5320,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         var info=lib.card[lib.inpile[i]];
                         if(info.multitarget) continue;
                         if(lib.filter.targetEnabled2({name:lib.inpile[i]},trigger.player,trigger.targets[0])){
-                            var cardinfo=[trigger.card.suit,trigger.card.number,lib.inpile[i]];
+                            var cardinfo=[trigger.card.suit||'',trigger.card.number||'',lib.inpile[i]];
                             list1.push(cardinfo);
                             if(info.type!='equip'){
                                 list2.push(cardinfo);
@@ -5343,7 +5343,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     };
                     'step 1'
     				if(result.bool){
-                        var card=game.createCard({suit:trigger.card.suit,number:trigger.card.number,name:result.links[0][2]});
+                        var card=game.createCard({
+                            suit:trigger.card.suit||lib.suit.randomGet(),
+                            number:trigger.card.number||Math.ceil(Math.random()*13),
+                            name:result.links[0][2]}
+                        );
                         event.card=card;
     					game.log(player,'将',trigger.card,'变为',card);
     					if(!event.isMine()) game.delay();
