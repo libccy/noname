@@ -195,7 +195,7 @@
 						unfrequent:true,
 						intro:'开启后可使触屏设备反应更快，但无法使用鼠标操作',
 						onclick:function(bool){
-							if(get.is.nomenu('touchscreen',bool)) return;
+							if(get.is.nomenu('touchscreen',bool)) return false;
 							game.saveConfig('touchscreen',bool);
 						}
 					},
@@ -289,7 +289,7 @@
 							auto:'切换托管'
 						},
 						onclick:function(item){
-							if(get.is.nomenu('round_menu_func',item)) return;
+							if(get.is.nomenu('round_menu_func',item)) return false;
 							game.saveConfig('round_menu_func',item);
 						},
 					},
@@ -2766,7 +2766,7 @@
 						init:true,
 						unfrequent:true,
 						onclick:function(bool){
-							if(get.is.nomenu('show_round_menu',bool)) return;
+							if(get.is.nomenu('show_round_menu',bool)) return false;
 							game.saveConfig('show_round_menu',bool);
 							if(bool&&ui.roundmenu){
 								ui.roundmenu.style.display='';
@@ -5631,11 +5631,15 @@
 								func.call(this,e);
 							}
 						});
-						this.addEventListener('click',function(e){
+						var fallback=function(e){
 							if(!_status.touchconfirmed){
 								func.call(this,e);
 							}
-						});
+							else{
+								this.removeEventListener('click',fallback);
+							}
+						}
+						this.addEventListener('click',fallback);
 					}
 					else{
 						this.addEventListener('click',func);
@@ -27082,7 +27086,9 @@
 	                this.classList.toggle('on');
 	                var config=this._link.config;
 	                if(config.onclick){
-	                    config.onclick.call(this,this.classList.contains('on'));
+						if(config.onclick.call(this,this.classList.contains('on'))===false){
+							this.classList.toggle('on');
+						}
 	                }
 	                if(config.update){
 	                    config.update();
@@ -27144,9 +27150,12 @@
 	                var node=this.parentNode._link;
 	                var config=node._link.config;
 	                node._link.current=this.link;
+					var tmpName=node.lastChild.innerHTML;
 	                node.lastChild.innerHTML=config.item[this._link];
 	                if(config.onclick){
-	                    config.onclick.call(node,this._link,this);
+						if(config.onclick.call(node,this._link,this)===false){
+							node.lastChild.innerHTML=tmpName;
+						}
 	                }
 	                if(config.update){
 	                    config.update();
@@ -34854,7 +34863,12 @@
                     ui.roundmenu.classList.add('clock');
                 }
                 ui.roundmenu.dataset.watchface=lib.config.watchface||'none';
-				if(!lib.config.show_round_menu){
+				if(get.is.nomenu()){
+					if(!['menu','system'].contains(lib.config.round_menu_func)){
+						lib.config.round_menu_func='system';
+					}
+				}
+				else if(!lib.config.show_round_menu){
 					ui.roundmenu.style.display='none';
 				}
 
@@ -39363,9 +39377,11 @@
 				else{
 					if(configs.right_click=='config') return false;
 				}
-				setTimeout(function(){
-					alert('请将至少一个操作绑定为显示按钮或打开菜单，否则将永远无法打开菜单');
-				});
+				if(name){
+					setTimeout(function(){
+						alert('请将至少一个操作绑定为显示按钮或打开菜单，否则将永远无法打开菜单');
+					});
+				}
 				return true;
 			},
 			altered:function(skill){
