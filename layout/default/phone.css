@@ -18,6 +18,9 @@
     top:14px;
     height: calc(100% - 150px);
 }
+#window.oblongcard #historybar{
+    height: calc(100% - 170px);
+}
 #time{
     visibility: hidden;
 }

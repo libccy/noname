@@ -27,7 +27,7 @@ window.noname_update={
         // 'theme/woodden/style.css',
         // 'theme/simple/style.css',
         // 'layout/default/layout.css',
-        // 'layout/default/phone.css',
+        'layout/default/phone.css',
         'layout/default/menu.css',
         // 'theme/style/cardback/*',
         // 'layout/long/layout.css',
