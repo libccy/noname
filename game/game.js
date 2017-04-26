@@ -22,7 +22,6 @@
         versionOL:25,
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
         mirrorURL:'https://coding.net/u/libccy/p/noname/git/raw',
-		extensionURL:'http://extension-1252061710.costj.myqcloud.com/',
         hallURL:'websha.cn',
 		assetURL:'',
 		changeLog:[],
@@ -31843,7 +31842,8 @@
                         importExtension.style.textAlign='left';
                         ui.create.div('','<input type="file" accept="application/zip" style="width:153px"><button>确定</button>',importExtension);
 
-                        var extensionURL=lib.extensionURL;
+                        var extensionURL=lib.updateURL.replace(/noname/,'noname-extension')+'/master/';
+
                         var reloadnode=ui.create.div('.config.toggle.pointerdiv','重新启动',page,game.reload);
                         reloadnode.style.display='none';
                         var placeholder=ui.create.div('.config.toggle',page);
@@ -31993,7 +31993,7 @@
                             }
 
                             var loading=ui.create.div('.loading.config.toggle','载入中...',page);
-							lib.init.js(extensionURL+'package.js',null,function(){
+							lib.init.js(extensionURL.replace(/raw\.githubusercontent\.com/,'rawgit.com')+'package.js',null,function(){
 								var list=window.noname_extension_list;
 								delete window.noname_extension_list;
 								loading.style.display='none';
