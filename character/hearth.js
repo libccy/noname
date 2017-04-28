@@ -106,8 +106,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_yinggencao:['male','wu',3,['lieqi']],
 
             hs_zhihuanhua:['fmale','wei',3,['huanjue']],
-            hs_shirencao:['ale','wu',3,['srjici']],
-            hs_kaituozhe:['fmale','wei',3,['yinzong','tansuo']],
+            hs_shirencao:['male','wu',3,['srjici']],
+            hs_kaituozhe:['female','wei',3,['tansuo','yinzong']],
     	},
     	characterIntro:{
     		hs_jaina:'戴林·普罗德摩尔之女。 在吉安娜成年早期，她致力于阻止将引发第三次战争的天灾瘟疫传播，当战况加剧后，吉安娜获得了新部落大酋长萨尔的信任，成为团结艾泽拉斯各族携手对抗燃烧军团的关键人物。当战争结束后，吉安娜管理着塞拉摩岛，致力于促进部落与联盟间的关系。吉安娜的和平立场与性格在接任萨尔成为部落大酋长的加尔鲁什·地狱咆哮以一颗魔法炸弹夷平塞拉摩后改变了。身为肯瑞托的新领袖，她拥有让加尔鲁什为他酿成的惨剧付出血的代价的权力与决心。',

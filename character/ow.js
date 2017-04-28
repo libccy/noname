@@ -214,7 +214,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                else{
 	                    eff=get.effect(player,trigger.card,trigger.player,trigger.player);
 	                }
-					trigger.player.chooseToDiscard('享乐：弃置一张基本牌，否则杀对'+get.translation(player)+'无效',function(card){
+					trigger.player.chooseToDiscard('强固：弃置一张基本牌，否则杀对'+get.translation(player)+'无效',function(card){
 						return get.type(card)=='basic';
 					}).set('ai',function(card){
 						if(_status.event.eff>0){
