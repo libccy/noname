@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.9.26.2',
+    version:'1.9.26.3',
     update:'1.9.26',
     changeLog:[
         'bug修复'
@@ -15,6 +15,8 @@ window.noname_update={
         // 'card/sp.js',
         // 'card/yunchou.js',
         // 'character/*',
+        'character/refresh.js',
+        'character/ow.js',
         // 'mode/boss.js',
         // 'mode/versus.js',
         // 'mode/guozhan.js',

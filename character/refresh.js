@@ -441,13 +441,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 0;
 					}).set('eff',ai.get.damageEffect(trigger.source,player,player));
 					"step 2"
-					if(result.judge==1&&trigger.source.countCards('he')){
-						player.discardPlayerCard(trigger.source,'he',true);
-					}
-					else{
-						if(result.judge==2){
-							trigger.source.damage();
+					if(result.color=='black'){
+						if(trigger.source.countCards('he')){
+							player.discardPlayerCard(trigger.source,'he',true);
 						}
+					}
+					else if(trigger.source.isIn()){
+						trigger.source.damage();
 					}
 					event.num--;
 					if(event.num>0){
