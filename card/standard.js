@@ -190,6 +190,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				audio:true,
 				fullskin:true,
 				type:'basic',
+				cardcolor:'red',
 				ai:{
 					basic:{
 						useful:[7,2],
@@ -200,6 +201,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			tao:{
 				fullskin:true,
 				type:'basic',
+				cardcolor:'red',
 				enable:function(card,player){
 					return player.hp<player.maxHp;
 				},
@@ -767,6 +769,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'trick',
 				enable:true,
 				selectTarget:-1,
+				cardcolor:'red',
 				filterTarget:function(card,player,target){
 					return target==player;
 				},

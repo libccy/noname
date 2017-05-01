@@ -23512,6 +23512,9 @@
                 noclick=true;
                 suit=null;
             }
+			if(!suit&&lib.card[name].cardcolor){
+				suit=lib.card[name].cardcolor;
+			}
 			if(typeof suit!='string'){
 				suit=['heart','diamond','club','spade'].randomGet();
 			}

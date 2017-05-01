@@ -846,7 +846,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            content:function(){
 	                var list=[];
 	                for(var i=0;i<2;i++){
-	                    list.push(game.createCard('shan','red'));
+	                    list.push(game.createCard('shan'));
 	                }
 	                target.gain(list,'gain2');
 	            },

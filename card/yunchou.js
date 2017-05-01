@@ -713,6 +713,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			huoshan:{
 				fullskin:true,
 				type:'delay',
+				cardcolor:'red',
 				modTarget:function(card,player,target){
 					return lib.filter.judge(card,player,target);
 				},
@@ -871,6 +872,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'trick',
 				enable:true,
 				filterTarget:true,
+				cardcolor:'red',
 				content:function(){
 					"step 0"
 					if(target.countCards('he')<2){

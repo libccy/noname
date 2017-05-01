@@ -6366,7 +6366,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     	},
     	card:{
             hsjixie_zhadan:{
-
+                enable:true,
+				fullimage:true,
+				type:'hsjixie',
+    			vanish:true,
+    			derivation:'hs_pengpeng',
+				filterTarget:function(card,player,target){
+					return target==player;
+				},
+				modTarget:true,
+				selectTarget:-1,
+                cardcolor:'black',
+				content:function(){
+					var targets=target.getEnemies();
+					if(targets.length){
+						var target2=targets.randomGet();
+						target2.addExpose(0.2);
+                        target2.damage('fire');
+					}
+				},
+				ai:{
+					value:8,
+					result:{
+						target:1
+					},
+					order:4,
+				}
             },
             hsqizhou_feng:{
     			type:'hsqizhou',
@@ -7199,6 +7224,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_yinggencao:'萤根草',
             hs_zhihuanhua:'致幻花',
             hs_shirencao:'食人草',
+            hs_fachaotuteng:'法潮图腾',
+            hs_huolituteng:'活力图腾',
+            hs_manyututeng:'蛮鱼图腾',
 
             zhaochao:'招潮',
             zhaochao_info:'锁定技，结束阶段，你视为对一名随机敌人使用一张杀；若此杀被闪避，你视为对另一名随机敌人使用一张杀',

@@ -1779,6 +1779,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:true,
 				selectTarget:-1,
 				reverseOrder:true,
+				cardcolor:'black',
 				filterTarget:function(card,player,target){
 					return target!=player;
 				},
@@ -1838,6 +1839,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:true,
 				selectTarget:-1,
 				reverseOrder:true,
+				cardcolor:'red',
 				filterTarget:function(card,player,target){
 					return target!=player;
 				},
