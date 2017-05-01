@@ -11765,21 +11765,17 @@
 					if(num<0) num=0;
 					if(num>0&&player.hujia&&!player.hasSkillTag('nohujia')){
 						if(num>=player.hujia){
-							num-=player.hujia;
 							event.hujia=player.hujia;
-							game.log(player,'的护甲抵挡了'+get.cnNumber(player.hujia)+'点伤害');
-							player.hujia=0;
+							num-=player.hujia;
 						}
 						else{
-							player.hujia-=num;
 							event.hujia=num;
-							game.log(player,'的护甲抵挡了'+get.cnNumber(num)+'点伤害');
 							num=0;
 						}
-						event.hujia=true;
-						player.update();
+						game.log(player,'的护甲抵挡了'+get.cnNumber(event.hujia)+'点伤害');
 					}
 					event.num=num;
+					"step 1"
 					if(lib.config.background_audio){
 						game.playAudio('effect','damage'+(num>1?'2':''));
 					}
@@ -11830,7 +11826,7 @@
 					else{
 						event.trigger('damage');
 					}
-					"step 1"
+					"step 2"
 					if(player.hp<=0&&player.isAlive()){
 						game.delayx();
 						player.dying(event);
@@ -11866,6 +11862,10 @@
 								case 'gold':if(dnum>=12) source.node.framebg.dataset.decoration='gold';break;
 							}
 						}
+					}
+					"step 3"
+					if(event.hujia){
+						player.changeHujia(-event.hujia).type='damage';
 					}
 				},
 				recover:function(){
@@ -11983,6 +11983,19 @@
 						player.$damagepop(num,'water');
 					}
 					event.trigger('changeHp');
+				},
+				changeHujia:function(){
+					if(typeof num!='number'){
+						num=1;
+					}
+					player.hujia+=num;
+					if(num>0){
+						game.log(player,'获得了'+get.cnNumber(num)+'点护甲');
+					}
+					if(player.hujia<0){
+						player.hujia=0;
+					}
+					player.update();
 				},
 				dying:function(){
 					"step 0"
@@ -13517,19 +13530,6 @@
                     },this,time);
 					return this;
 				},
-				changeHujia:function(num){
-					if(typeof num!='number'){
-						num=1;
-					}
-					this.hujia+=num;
-					if(num>0){
-						game.log(this,'获得了'+get.cnNumber(num)+'点护甲值');
-					}
-					if(this.hujia<0){
-						this.hujia=0;
-					}
-					this.update();
-				},
 				setIdentity:function(identity){
 					if(!identity) identity=this.identity;
 					if(get.is.jun(this)){
@@ -14759,6 +14759,15 @@
 					if(popup!=undefined) next.popup=popup;
 					next.player=this;
                     next.setContent('changeHp');
+					return next;
+				},
+
+				changeHujia:function(num,type){
+					var next=game.createEvent('changeHujia');
+					next.num=num;
+					next.player=this;
+					if(type) next.type=type;
+					next.setContent('changeHujia');
 					return next;
 				},
 				dying:function(reason){
