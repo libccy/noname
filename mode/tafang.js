@@ -432,6 +432,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					map.zhaomu=ui.create.buttons(list,'character',dialog.content);
 					for(var i=0;i<map.zhaomu.length;i++){
 						var button=map.zhaomu[i];
+						if(lib.config.buttoncharacter_style=='default'){
+							button.node.group.style.display='none';
+						}
 						button.node.intro.classList.add('showintro');
 						button.node.intro.classList.add('tafang');
 						button.count=difficulty+get.rank(button.link,3.9)+3;

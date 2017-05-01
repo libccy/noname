@@ -1626,7 +1626,15 @@ div:not(.handcards)>.card>.info>span,
 	left: 72px;
 }
 .button.character.newstyle>.identity{
-	display: none;
+	/*display: none;*/
+	border: none;
+	background: none !important;
+	/*box-shadow: none;*/
+	left: auto;
+	right: 2px;
+	top: 2px;
+	font-family: 'huangcao';
+	font-size: 20px;
 }
 .button.newstyle>.name{
 	top: 8px;

@@ -2303,6 +2303,7 @@
 						init:'default',
 						item:{
 							default:'默认',
+							simple:'精简',
 							old:'旧版'
 						},
 						unfrequent:true,
@@ -35333,8 +35334,12 @@
 							}
 						}
 						node.node.name.innerHTML=get.slimName(item);
-						if(lib.config.buttoncharacter_style=='default'){
+						if(lib.config.buttoncharacter_style=='default'||lib.config.buttoncharacter_style=='simple'){
+							if(lib.config.buttoncharacter_style=='simple'){
+								node.node.group.style.display='none';
+							}
 							node.node.name.dataset.nature=get.groupnature(infoitem[1]);
+							node.node.group.dataset.nature=get.groupnature(infoitem[1],'raw');
 							node.classList.add('newstyle');
 							ui.create.div(node.node.hp);
 							var textnode=ui.create.div('.text',get.numStr(infoitem[2]),node.node.hp);
