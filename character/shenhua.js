@@ -3551,6 +3551,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				trigger.trigger('damageBefore');
     			},
     			ai:{
+                    maixie_fake:true,
     				effect:{
     					target:function(card,player,target){
     						if(player.hasSkillTag('jueqing')) return;
@@ -3644,6 +3645,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				trigger.trigger('damageBefore');
     			},
     			ai:{
+                    maixie_fake:true,
     				effect:{
     					target:function(card,player,target){
     						if(player.hasSkillTag('jueqing')) return;

@@ -11985,9 +11985,6 @@
 					event.trigger('changeHp');
 				},
 				changeHujia:function(){
-					if(typeof num!='number'){
-						num=1;
-					}
 					player.hujia+=num;
 					if(num>0){
 						game.log(player,'获得了'+get.cnNumber(num)+'点护甲');
@@ -14764,6 +14761,9 @@
 
 				changeHujia:function(num,type){
 					var next=game.createEvent('changeHujia');
+					if(typeof num!='number'){
+						num=1;
+					}
 					next.num=num;
 					next.player=this;
 					if(type) next.type=type;

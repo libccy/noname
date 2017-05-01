@@ -7200,8 +7200,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_zhihuanhua:'致幻花',
             hs_shirencao:'食人草',
 
+            zhaochao:'招潮',
+            zhaochao_info:'锁定技，结束阶段，你视为对一名随机敌人使用一张杀；若此杀被闪避，你视为对另一名随机敌人使用一张杀',
+            hllingxi:'灵息',
+            hllingxi_info:'出牌阶段，你可以令一名已受伤角色弃置两张牌并回复一点体力（一回合内不能对相同角色发动两次）',
             xiyong:'汐涌',
-            xiyong_info:'锁定技，结束阶段，你摸X张牌，X为你手牌中包含的卡牌类型数且不超过3',
+            xiyong_info:'锁定技，结束阶段，你摸一张牌并可以使用之，若此使用了此牌，你再摸一张牌',
             hsjixie:'机械',
             hsjixie_zhadan:'炸弹机器人',
             hsjixie_zhadan_info:'出牌阶段对自己使用，对一名随机敌人造成一点火属性伤害',

@@ -4640,7 +4640,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				check:function(event,player){
 					var att=get.attitude(player,event.target);
 					if(player.hasSkill('jiu')) return att>0;
-					if(event.target.hasSkillTag('maixie_hp')){
+					if(event.target.hasSkillTag('maixie_hp')||event.target.hasSkillTag('maixie_fake')){
 						return att<=0;
 					}
 					if(player.hasSkill('tianxianjiu')) return false;
