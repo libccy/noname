@@ -439,7 +439,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.judge(function(card){
 						if(get.color(card)=='red') return _status.event.eff;
 						return 0;
-					}).set('eff',ai.get.damageEffect(trigger.source,player,player));
+					}).set('eff',get.damageEffect(trigger.source,player,player));
 					"step 2"
 					if(result.color=='black'){
 						if(trigger.source.countCards('he')){

@@ -440,6 +440,7 @@ window.noname_asset_list=[
     'image/character/hs_pyros1.jpg',
     'image/character/hs_pyros2.jpg',
     'image/character/hs_tanghangu.jpg',
+    'image/character/hs_tgolem.jpg',
     'image/character/hs_totemic.jpg',
     'image/character/hs_trueheart.jpg',
     'image/character/hs_tyrande.jpg',

@@ -550,7 +550,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseToUse({name:'jinchan'},'是否对'+get.translation(trigger.card)+'使用【金蝉脱壳】？').set('ai1',function(card){
 						return _status.event.bool;
-					}).set('bool',-ai.get.effect(player,trigger.card,trigger.player,player));
+					}).set('bool',-get.effect(player,trigger.card,trigger.player,player));
 					trigger.jinchan=true;
 					'step 1'
 					delete trigger.jinchan;

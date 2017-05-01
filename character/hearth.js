@@ -80,7 +80,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_hallazeal:['male','wei',4,['shengteng','yuansu']],
     		hs_enzoth:['male','qun',4,['mengye']],
     		hs_walian:['male','shu',4,['wzhanyi']],
-    		// hs_pengpeng:['male','qun',4,['zhadan']],
+    		hs_pengpeng:['male','qun',4,['yindan']],
     		// hs_yashaji:['male','wei',3,[]],
     		// hs_wolazi:['male','wei',3,[]],
 
@@ -108,6 +108,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_zhihuanhua:['fmale','wei',3,['huanjue']],
             hs_shirencao:['male','wu',3,['srjici']],
             hs_kaituozhe:['female','wei',3,['tansuo','yinzong']],
+
+            hs_fachaotuteng:['male','wei',3,['xiyong']],
+            hs_huolituteng:['male','wei',3,['hllingxi']],
+            hs_manyututeng:['male','wu',3,['zhaochao']],
+            hs_tgolem:['male','wu',4,['xinwuyan','guozaix']],
     	},
     	characterIntro:{
     		hs_jaina:'戴林·普罗德摩尔之女。 在吉安娜成年早期，她致力于阻止将引发第三次战争的天灾瘟疫传播，当战况加剧后，吉安娜获得了新部落大酋长萨尔的信任，成为团结艾泽拉斯各族携手对抗燃烧军团的关键人物。当战争结束后，吉安娜管理着塞拉摩岛，致力于促进部落与联盟间的关系。吉安娜的和平立场与性格在接任萨尔成为部落大酋长的加尔鲁什·地狱咆哮以一颗魔法炸弹夷平塞拉摩后改变了。身为肯瑞托的新领袖，她拥有让加尔鲁什为他酿成的惨剧付出血的代价的权力与决心。',
@@ -188,6 +193,164 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_malfurion:['hs_malorne'],
     	},
     	skill:{
+            yindan:{
+                enable:'phaseUse',
+                filterCard:{suit:'spade'},
+                check:function(card){
+                    return 8-get.value(card);
+                },
+                usable:1,
+                filter:function(event,player){
+                    return player.countCards('he',{suit:'spade'});
+                },
+                position:'he',
+                content:function(){
+                    'step 0'
+                    player.loseHp();
+                    'step 1'
+                    var cards=[];
+                    for(var i=0;i<2;i++){
+                        cards.push(game.createCard('hsjixie_zhadan'));
+                    }
+                    player.gain(cards,'gain2');
+                },
+                ai:{
+                    order:7,
+                    result:{
+                        player:function(player,target){
+                            if(player.hp>=3) return 1;
+                            if(player.hp==2&&game.hasPlayer(function(current){
+                                return get.damageEffect(current,player,player,'fire')>0&&current.hp==1;
+                            })){
+                                return 1;
+                            }
+                            return 0;
+                        }
+                    }
+                }
+            },
+            hllingxi:{
+                enable:'phaseUse',
+                filter:function(event,player){
+                    return game.hasPlayer(function(target){
+                        return lib.skill.hllingxi.filterTarget(null,player,target);
+                    });
+                },
+                filterTarget:function(card,player,target){
+                    return target!=player&&target.isDamaged()&&target.countCards('he')>=2;
+                },
+                content:function(){
+                    'step 0'
+                    target.chooseToDiscard('he',2,true);
+                    'step 1'
+                    target.recover();
+                },
+                group:'hllingxi_end',
+                subSkill:{
+                    end:{
+                        trigger:{player:'phaseEnd'},
+                        frequent:true,
+                        filter:function(event,player){
+                            return player.isDamaged();
+                        },
+                        content:function(){
+                            player.recover();
+                        }
+                    }
+                },
+                ai:{
+                    order:6,
+                    result:{
+                        target:function(player,target){
+                            var nc=target.countCards('he');
+                            if(target.hasSkillTag('maixie_hp')){
+                                if(nc>=3) return 1;
+                                if(target.hp==1) return 1;
+                                return 0;
+                            }
+                            if(nc>=4){
+                                if(target.hp<=2) return 1;
+                                return 0;
+                            }
+                            else if(nc==3){
+                                if(target.hp==1) return 1;
+                                if(target.hp>=4) return -1;
+                                return 0;
+                            }
+                            else{
+                                if(target.hp==1) return 0;
+                                return -1;
+                            }
+                        }
+                    }
+                }
+            },
+            zhaochao:{
+                trigger:{player:'phaseEnd'},
+                forced:true,
+                filter:function(event,player){
+                    return player.getEnemies().length>0;
+                },
+                content:function(){
+                    'step 0'
+                    event.targets=player.getEnemies();
+                    player.addSkill('zhaochao2');
+                    player.useCard({name:'sha'},event.targets.randomRemove());
+                    'step 1'
+                    player.removeSkill('zhaochao2');
+                    if(player.storage.zhaochao2&&event.targets.length){
+                        player.useCard({name:'sha'},event.targets.randomRemove());
+                        delete player.storage.zhaochao2;
+                    }
+                },
+                ai:{
+                    threaten:1.7
+                }
+            },
+            zhaochao2:{
+                trigger:{player:'shaMiss'},
+                forced:true,
+                popup:false,
+                silent:true,
+                filter:function(event){
+                    return event.getParent(2).name=='zhaochao';
+                },
+                content:function(){
+                    player.storage.zhaochao2=true;
+                }
+            },
+            xiyong:{
+                trigger:{player:'phaseEnd'},
+                frequent:true,
+                content:function(){
+                    'step 0'
+                    player.draw();
+                    'step 1'
+                    if(Array.isArray(result)&&result.length){
+                        var gained=result[0];
+    					if(lib.filter.cardEnabled(gained,target)){
+    						var next=player.chooseToUse();
+    						next.filterCard=function(card){
+    							return card==gained;
+    						};
+    						next.prompt='是否使用'+get.translation(gained)+'？';
+    					}
+                        else{
+                            event.finish();
+                        }
+                    }
+					else{
+                        event.finish();
+                    }
+					'step 2'
+					if(result.bool){
+                        player.draw();
+					}
+                },
+                ai:{
+                    threaten:1.6
+                }
+            },
             srjici:{
                 trigger:{source:'damageEnd'},
                 forced:true,
@@ -295,7 +458,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             event.card=card;
                             player.chooseCardButton(true,'猜测哪张牌为'+get.translation(target)+'的手牌',
                             [card,game.createCard(list.randomRemove()),game.createCard(list.randomRemove())].randomSort()).ai=function(button){
-                                if(ai.get.value(button.link)<0) return -10;
+                                if(get.value(button.link)<0) return -10;
                                 if(!_status.event.rand) _status.event.rand=Math.random();
                                 if(_status.event.rand<0.7){
                                     return button.link==card?1:-1;
@@ -388,7 +551,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						viewAs:{name:links[0][2],nature:links[0][3]},
     						popname:true,
                             ai1:function(card){
-                                return 6-ai.get.value(card);
+                                return 6-get.value(card);
                             }
     					}
     				},
@@ -588,10 +751,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     'step 0'
                     player.chooseToDiscard('he',get.prompt('zhuilie')).set('ai',function(card){
                         if(player.hp>=4||(player.hasSha()&&player.hasShan())){
-                            return 6-ai.get.value(card);
+                            return 6-get.value(card);
                         }
                         if(player.hasSha()||player.hasShan()){
-                            return 3-ai.get.value(card);
+                            return 3-get.value(card);
                         }
                         return 0;
                     }).logSkill='zhuilie';
@@ -671,7 +834,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				var dialog=ui.create.dialog(get.prompt('kekao'),[list.randomGets(3),'vcard'],'hidden');
     				player.chooseButton(dialog).ai=function(button){
                         var name=button.link[2]
-                        var num=Math.random()*ai.get.value({name:name});
+                        var num=Math.random()*get.value({name:name});
                         if(lib.card[name].selectTarget==-1){
                             return num/10;
                         }
@@ -768,7 +931,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				var dialog=ui.create.dialog(get.prompt('kqizhou'),[list,'vcard'],'hidden');
                     var shui=(player.hp<=1&&player.maxHp>=3);
                     var tu=game.hasPlayer(function(current){
-                        return current.hp==1&&ai.get.attitude(player,current)>0;
+                        return current.hp==1&&get.attitude(player,current)>0;
                     });
     				player.chooseButton(dialog).ai=function(button){
                         if(!player.hasFriend()&&button.link[2]=='hsqizhou_tu') return 0;
@@ -886,13 +1049,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     player.chooseTarget(get.prompt('mengye'),function(card,player,target){
                         return target.countCards('h')>0;
                     }).ai=function(target){
-                        if(target.hasSkillTag('nodu')) return ai.get.attitude(player,target)*1.5;
+                        if(target.hasSkillTag('nodu')) return get.attitude(player,target)*1.5;
                         if(target.hasCard(function(card){
                             return card.name!='du';
                         })){
-                            return -ai.get.attitude(player,target);
+                            return -get.attitude(player,target);
                         }
-                        return -ai.get.attitude(player,target)/5;
+                        return -get.attitude(player,target)/5;
                     }
                     'step 1'
                     if(result.bool){
@@ -1330,7 +1493,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     'step 1'
                     if(player.countCards('h')&&event.cardname){
                         player.chooseCard('是否将一张手牌转化为'+get.translation(event.cardname)+'？','h').ai=function(card){
-                            return ai.get.value({name:event.cardname})-ai.get.value(card);
+                            return get.value({name:event.cardname})-get.value(card);
                         }
                     }
                     else{
@@ -5295,7 +5458,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			check:function(event,player){
                     var eff=get.effect(event.targets[0],event.card,event.player,player);
                     if(eff<=0) return true;
-                    if(ai.get.value(event.card,event.player,'raw')<5){
+                    if(get.value(event.card,event.player,'raw')<5){
                         return Math.random()<0.5;
                     }
     				return false;
@@ -5338,7 +5501,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     }
                     player.chooseButton(true,['幻觉',[list,'vcard']]).ai=function(button){
                         var card={suit:trigger.card.suit,number:trigger.card.number,name:button.link[2]};
-                        return ai.get.effect(trigger.targets[0],card,trigger.player,player);
+                        return get.effect(trigger.targets[0],card,trigger.player,player);
                     };
                     'step 1'
     				if(result.bool){
@@ -6381,6 +6544,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var targets=target.getEnemies();
 					if(targets.length){
 						var target2=targets.randomGet();
+                        player.line(target2,'fire');
 						target2.addExpose(0.2);
                         target2.damage('fire');
 					}
@@ -7227,15 +7391,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_fachaotuteng:'法潮图腾',
             hs_huolituteng:'活力图腾',
             hs_manyututeng:'蛮鱼图腾',
+            hs_tgolem:'图腾魔像',
+
 
             zhaochao:'招潮',
             zhaochao_info:'锁定技，结束阶段，你视为对一名随机敌人使用一张杀；若此杀被闪避，你视为对另一名随机敌人使用一张杀',
             hllingxi:'灵息',
-            hllingxi_info:'出牌阶段，你可以令一名已受伤角色弃置两张牌并回复一点体力（一回合内不能对相同角色发动两次）',
+            hllingxi_info:'出牌阶段，你可以令一名已受伤的其他角色弃置两张牌并回复一点体力；结束阶段，你可以回复一点体力',
             xiyong:'汐涌',
-            xiyong_info:'锁定技，结束阶段，你摸一张牌并可以使用之，若此使用了此牌，你再摸一张牌',
+            xiyong_info:'结束阶段，你可以摸一张牌并可以使用之，若你使用了此牌，你再摸一张牌',
             hsjixie:'机械',
             hsjixie_zhadan:'炸弹机器人',
+            hsjixie_zhadan_pop:'炸弹',
             hsjixie_zhadan_info:'出牌阶段对自己使用，对一名随机敌人造成一点火属性伤害',
             yindan:'引弹',
             yindan_info:'出牌阶段限一次，你可以弃置一张黑桃牌并流失一点体力，然后获得两张炸弹机器人',
@@ -7531,8 +7698,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		guozai2_bg:'载',
     		guozai_info:'出牌阶段限一次，你可将手牌补至四张，并于此阶段结束时弃置等量的牌',
     		guozai_info_alter:'出牌阶段限一次，你可将手牌补至三张，并于此阶段结束时弃置等量的牌',
-    		guozaix:'重载',
-    		guozaix2:'重载',
+    		guozaix:'过载',
+    		guozaix2:'过载',
     		guozaix2_bg:'载',
     		guozaix_info:'出牌阶段限两次，你可将手牌补至四张，并于此阶段结束时弃置等量的牌',
     		hanshuang:'寒霜',

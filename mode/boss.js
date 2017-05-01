@@ -1492,7 +1492,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(function(card,player,target){
 						return target.side!=player.side;
 					}).ai=function(target){
-						return ai.get.damageEffect(target,player,player,'fire');
+						return get.damageEffect(target,player,player,'fire');
 					}
 					'step 1'
 					if(result.bool){
@@ -1501,8 +1501,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.target.chooseToDiscard('he',{color:'red'},'弃置一张红色牌或受到一点火焰伤害').ai=function(card){
 							var player=_status.event.player;
 							var source=_status.event.parent.player;
-							if(ai.get.damageEffect(player,source,player,'fire')>=0) return 0;
-							return 8-ai.get.value(card);
+							if(get.damageEffect(player,source,player,'fire')>=0) return 0;
+							return 8-get.value(card);
 						}
 					}
 					else{
@@ -1517,7 +1517,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					order:6,
 					result:{
 						target:function(player,target){
-							if(target.isLinked()&&player.isLinked()&&ai.get.damageEffect(player,player,player,'fire')<0) return -1;
+							if(target.isLinked()&&player.isLinked()&&get.damageEffect(player,player,player,'fire')<0) return -1;
 							return 1;
 						}
 					}
@@ -1541,7 +1541,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								return 0.5;
 							}
 							if(get.tag(card,'damage')||get.tag(card,'recover')){
-								if(game.boss.isLinked()&&ai.get.damageEffect(game.boss,player,game.boss,'fire')<0){
+								if(game.boss.isLinked()&&get.damageEffect(game.boss,player,game.boss,'fire')<0){
 									if(game.hasPlayer(function(current){
 										return current.isEnemyOf(game.boss)&&current.isLinked();
 									})){
@@ -1764,7 +1764,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									if(target.maxHp-target.hp>=2){
 										num=1.5;
 									}
-									return 1.5*ai.get.recoverEffect(target,player,target);
+									return 1.5*get.recoverEffect(target,player,target);
 								}
 							}
 						}

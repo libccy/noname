@@ -55,6 +55,8 @@ window.noname_character_rank={
         'swd_shuwaner',
     ],
     a:[
+        'hs_pengpeng',
+        'hs_manyututeng',
         'hs_amala',
         'hs_kaituozhe',
         'hs_yinggencao',
@@ -163,6 +165,7 @@ window.noname_character_rank={
         'hs_zhihuanhua',
     ],
     am:[
+        'hs_fachaotuteng',
         'huangfusong',
         'hs_shizugui',
         'hs_shuiwenxuejia',
@@ -266,6 +269,8 @@ window.noname_character_rank={
         'hs_mojinbaozi',
     ],
     bp:[
+        'hs_tgolem',
+        'hs_huolituteng',
         'hs_selajin',
         'hs_hemite',
         'zoushi',

@@ -10896,7 +10896,12 @@
 						if(get.type(event.card)=='equip'&&lib.config.hide_card_prompt_equip);
 						else if(get.type(event.card)=='basic'&&lib.config.hide_card_prompt_basic);
 						else{
-							player.popup(event.card.name,'metal');
+							if(lib.translate[event.card.name+'_pop']){
+								player.popup(lib.translate[event.card.name+'_pop'],'metal');
+							}
+							else{
+								player.popup(event.card.name,'metal');
+							}
 						}
 					}
 					if(event.audio===false){
