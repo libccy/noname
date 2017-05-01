@@ -418,11 +418,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			filterTarget:function(card,player,target){
     				return target==_status.event.dying;
     			},
-                alter:true,
     			selectTarget:-1,
     			content:function(){
     				target.recover();
-    				if(!get.is.altered('shouwang')) target.changeHujia();
+    				target.changeHujia();
                     target.addSkill('shouwang2')
     			},
     			ai:{
@@ -6363,8 +6362,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hsyaoshui:0.5,
     		hsqingyu:0.5,
             hsqizhou:0.5,
+            hsjixie:0.5
     	},
     	card:{
+            hsjixie_zhadan:{
+
+            },
             hsqizhou_feng:{
     			type:'hsqizhou',
     			fullimage:true,
@@ -7197,6 +7200,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_zhihuanhua:'致幻花',
             hs_shirencao:'食人草',
 
+            xiyong:'汐涌',
+            xiyong_info:'锁定技，结束阶段，你摸X张牌，X为你手牌中包含的卡牌类型数且不超过3',
+            hsjixie:'机械',
+            hsjixie_zhadan:'炸弹机器人',
+            hsjixie_zhadan_info:'出牌阶段对自己使用，对一名随机敌人造成一点火属性伤害',
+            yindan:'引弹',
+            yindan_info:'出牌阶段限一次，你可以弃置一张黑桃牌并流失一点体力，然后获得两张炸弹机器人',
             huanjue:'幻觉',
             huanjue_info:'每名角色的回合限一次，当你使用卡牌指定其他角色为惟一目标，或当其他角色使用卡牌指定你为惟一目标时，你可以从三张随机亮出的牌中选择一张代替此牌',
             yinzong:'影踪',
