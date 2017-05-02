@@ -63,7 +63,12 @@
 .menu-buttons.leftbutton{
 	text-align: left;
 	margin-left: 10px;
-    width: calc(100% - 20px) !important;
+    width: calc(100% - 30px) !important;
+}
+.menu.main>.menu-content>div>.right.pane>.menu-buttons.leftbutton>.config.toggle:first-child,
+.menu.main>.menu-content>div>.right.pane>.menu-buttons.leftbutton>.config.toggle:first-child+.config.toggle{
+    margin-left: 3px !important;
+	width: calc(100% - 15px) !important;
 }
 .menu-buttons div{
 	position: absolute;
@@ -444,6 +449,10 @@
 .menu.main>.menu-content>div>.right.pane>div>.config.toggle{
     left:2px !important;
     text-align: left !important;
+	white-space: nowrap;
+}
+.menu.main>.menu-content>div>.right.pane>div>.config.toggle.pointerspan.cardpilecfg{
+	left:0px !important;
 }
 .menu.main>.menu-content>div>.right.pane>div>.config.indent,
 .menu.main>.menu-content>div>.right.pane>div>.config.toggle.indent{

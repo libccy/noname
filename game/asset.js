@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-    '1.9.26',
+    '1.9.26.3',
     'image/background/huangtian_bg.jpg',
     'image/background/ol_bg.jpg',
     'image/background/september_bg.jpg',
