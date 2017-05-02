@@ -81,7 +81,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_enzoth:['male','qun',4,['mengye']],
     		hs_walian:['male','shu',4,['wzhanyi']],
     		hs_pengpeng:['male','qun',4,['yindan']],
-    		// hs_yashaji:['male','wei',3,[]],
+    		hs_yashaji:['male','qun',4,['ysjqisha']],
     		// hs_wolazi:['male','wei',3,[]],
 
     		hs_tanghangu:['male','shu',5,['zhongji']],
@@ -193,6 +193,146 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_malfurion:['hs_malorne'],
     	},
     	skill:{
+            ysjqisha:{
+                trigger:{source:'damageEnd',player:'damageEnd'},
+                forced:true,
+                filter:function(event,player){
+                    return (event.source!=player&&event.source.isIn())||(event.player!=player&&event.player.isIn());
+                },
+                content:function(){
+                    var target=trigger.source;
+                    if(target==player){
+                        target=trigger.player;
+                    }
+                    var list=['ju','kuang','nu','yi','wang','hen','ao'];
+                    for(var i=0;i<list.length;i++){
+                        list[i]='ysjqisha_'+list[i];
+                        if(target.hasSkillTag(list[i])){
+                            list.splice(i--,1);
+                        }
+                    }
+                    if(list.length){
+                        target.addTempSkill(list.randomGet(),{player:'phaseAfter'});
+                    }
+                },
+                ai:{
+                    threaten:0.8,
+                    maixie_fake:true,
+                },
+                subSkill:{
+                    ju:{
+                        mark:true,
+                        intro:{
+                            content:'锁定技，每当你使用一张牌，需弃置一张牌'
+                        },
+                        trigger:{player:'useCard'},
+            			forced:true,
+            			filter:function(event,player){
+            				return player.countCards('he')>0;
+            			},
+            			content:function(){
+            				game.delay(0.5);
+            				player.chooseToDiscard(true,'he');
+            			}
+                    },
+                    kuang:{
+                        mark:true,
+                        intro:{
+                            content:'锁定技，每当你使用一张牌指定惟一目标，有50%的机率指定错误的目标'
+                        },
+                        trigger:{player:'useCard'},
+            			forced:true,
+            			filter:function(event,player){
+                            return event.getRand()<0.5&&event.targets&&event.targets.length==1&&game.hasPlayer(function(current){
+                                return current!=event.targets[0]&&lib.filter.targetEnabled2(event.card,player,current);
+                            });
+            			},
+            			content:function(){
+                            'step 0'
+            				game.delay();
+                            'step 1'
+                            var list=game.filterPlayer(function(current){
+                                return current!=trigger.targets[0]&&lib.filter.targetEnabled2(trigger.card,player,current);
+                            });
+                            if(list.length){
+                                var target=list.randomGet();
+                                trigger.targets[0]=target;
+                                player.line(target,'green');
+                            }
+            			}
+                    },
+                    nu:{
+                        mark:true,
+                        intro:{
+                            content:'锁定技，你使用的卡牌造成的伤害+1；每当你使用一张牌，有65%的机率失效'
+                        },
+                        forced:true,
+                        trigger:{source:'damageBegin',player:'useCardToBefore'},
+                        filter:function(event,player){
+                            if(event.name=='damage') return event.notLink()&&(event.card?true:false);
+                            var info=get.info(event.card);
+                            if(info.multitarget&&event.targets&&event.targets.contains(player)) return false;
+                            return event.getRand()<0.65;
+                        },
+                        content:function(){
+                            if(trigger.name=='damage'){
+                                trigger.num++;
+                            }
+                            else{
+                                trigger.untrigger();
+                                trigger.finish();
+                            }
+                        }
+                    },
+                    yi:{
+                        mark:true,
+                        intro:{
+                            content:'锁定技，你不能成为非敌方角色的卡牌目标'
+                        },
+                        mod:{
+            				targetEnabled:function(card,player,target){
+            					if(!player.getEnemies().contains(target)) return false;
+            				}
+            			}
+                    },
+                    wang:{
+                        mark:true,
+                        intro:{
+                            content:'锁定技，你的摸牌数始终-1'
+                        },
+                        trigger:{player:'drawBegin'},
+                        forced:true,
+                        content:function(){
+                            trigger.num--;
+                        }
+                    },
+                    hen:{
+                        mark:true,
+                        intro:{
+                            content:'锁定技，每当一名敌方角色回复一点体力，你失去一点体力'
+                        },
+                        trigger:{global:'recoverAfter'},
+                        forced:true,
+                        filter:function(event,player){
+                            return player.getEnemies().contains(event.player);
+                        },
+                        content:function(){
+                            player.loseHp();
+                        }
+                    },
+                    ao:{
+                        mark:true,
+                        intro:{
+                            content:'锁定技，你的手牌上限-2'
+                        },
+                        mod:{
+                            maxHandcard:function(player,num){
+                                return num-2;
+                            }
+                        }
+                    },
+                }
+            },
             yindan:{
                 enable:'phaseUse',
                 filterCard:{suit:'spade'},
@@ -7393,7 +7533,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_manyututeng:'蛮鱼图腾',
             hs_tgolem:'图腾魔像',
 
-
+            ysjqisha:'七煞',
+            ysjqisha_ju:'惧之煞',
+            ysjqisha_kuang:'狂之煞',
+            ysjqisha_nu:'怒之煞',
+            ysjqisha_yi:'疑之煞',
+            ysjqisha_wang:'惘之煞',
+            ysjqisha_hen:'恨之煞',
+            ysjqisha_ao:'傲之煞',
+            ysjqisha_info:'锁定技，每当你造成或受到伤害，你令对方随机获得一种消极状态直到下一回合结束',
             zhaochao:'招潮',
             zhaochao_info:'锁定技，结束阶段，你视为对一名随机敌人使用一张杀；若此杀被闪避，你视为对另一名随机敌人使用一张杀',
             hllingxi:'灵息',

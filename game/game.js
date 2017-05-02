@@ -18201,6 +18201,10 @@
                 getTrigger:function(){
                     return this.getParent()._trigger;
                 },
+				getRand:function(){
+					if(!this.rand) this.rand=Math.random();
+					return this.rand;
+				},
 				backup:function(skill){
 					this._backup={
 						filterButton:this.filterButton,
@@ -25769,7 +25773,7 @@
                         lib.translate[i+'_'+j]=info.subSkill[j].name;
                     }
                     else{
-                        lib.translate[i+'_'+j]=lib.translate[i];
+                        lib.translate[i+'_'+j]=lib.translate[i+'_'+j]||lib.translate[i];
                     }
                     if(info.subSkill[j].description){
                         lib.translate[i+'_'+j+'_info']=info.subSkill[j].description;
@@ -42239,7 +42243,9 @@
 			else if(nature=='thunder'){
 				name='thunderdamage';
 			}
-			return get.effect(target,{name:name},player,viewer);
+			var eff=get.effect(target,{name:name},player,viewer);
+			if(eff>0&&target.hujia>0) return 0;
+			return eff;
 		},
 		recoverEffect:function(target,player,viewer){
 			if(target.hp==target.maxHp) return 0;

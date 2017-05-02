@@ -1631,10 +1631,10 @@ div:not(.handcards)>.card>.info>span,
 	background: none !important;
 	/*box-shadow: none;*/
 	left: auto;
-	right: 2px;
-	top: 2px;
+	right: 3px;
+	top: 3px;
 	font-family: 'huangcao';
-	font-size: 20px;
+	/*font-size: 20px;*/
 }
 .button.newstyle>.name{
 	top: 8px;
