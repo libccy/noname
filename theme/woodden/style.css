@@ -147,7 +147,8 @@ html{
 }
 .menubutton.large.active,
 .menubutton.round.active,
-.menubutton.active{
+.menubutton.active,
+.menubutton.highlight.update{
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 0.4) 0 0 0 2px, rgba(0, 133, 255, 1) 0 0 5px !important;
 }
 .connectevents.icon.highlight{

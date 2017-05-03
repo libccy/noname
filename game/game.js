@@ -31910,6 +31910,7 @@
                         };
                         var downloadExtension=function(e){
                             if((this.innerHTML!='下载扩展'&&this.innerHTML!='更新扩展')||!window.JSZip) return;
+							this.classList.remove('update');
                             if(e){
                                 e.stopPropagation();
                             }
@@ -32044,6 +32045,7 @@
 	                                        if(lib.config['extension_'+list[i].name+'_version']!=list[i].version){
 	                                            download.innerHTML='更新扩展';
 	                                            download.classList.add('highlight');
+												download.classList.add('update');
 	                                        }
 	                                        else{
 	                                            download.classList.add('transparent2');
