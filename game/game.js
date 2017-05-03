@@ -16344,6 +16344,7 @@
 				hasJudge:function(name){
 					var judges=this.node.judges.childNodes;
 					for(var i=0;i<judges.length;i++){
+						if(judges[i].classList.contains('removing')) continue;
 						if((judges[i].viewAs||judges[i].name)==name){
 							return true;
 						}
@@ -16469,6 +16470,7 @@
 				getJudge:function(name){
 					var judges=this.node.judges.childNodes;
 					for(var i=0;i<judges.length;i++){
+						if(judges[i].classList.contains('removing')) continue;
 						if((judges[i].viewAs||judges[i].name)==name){
 							return judges[i];
 						}
@@ -32094,14 +32096,17 @@
 					var clearButton=ui.create.div('.menubutton.round.highlight','清',start);
 					clearButton.style.display='none';
 					clearButton.style.left='275px';
-					var playButton=ui.create.div('.menubutton.round.highlight','播',start);
+					var playButton=ui.create.div('.menubutton.round.highlight.hidden','播',start);
 					playButton.style.display='none';
 					playButton.style.left='215px';
-					var deleteButton=ui.create.div('.menubutton.round.highlight','删',start);
+					playButton.style.transition='opacity 0.3s';
+					var deleteButton=ui.create.div('.menubutton.round.highlight.hidden','删',start);
 					deleteButton.style.display='none';
 					deleteButton.style.left='275px';
-					var saveButton=ui.create.div('.menubutton.round.highlight','存',start);
+					deleteButton.style.transition='opacity 0.3s';
+					var saveButton=ui.create.div('.menubutton.round.highlight.hidden','存',start);
 					saveButton.style.display='none';
+					saveButton.style.transition='opacity 0.3s';
 
 
 					var clickMode=function(){
@@ -33364,7 +33369,16 @@
 									if(current&&current!=this){
 										current.classList.remove('active');
 									}
-									this.classList.toggle('active');
+									if(this.classList.toggle('active')){
+										playButton.show();
+										deleteButton.show();
+										saveButton.show();
+									}
+									else{
+										playButton.hide();
+										deleteButton.hide();
+										saveButton.hide();
+									}
 								};
 								var staritem=function(){
 									this.parentNode.classList.toggle('starred');
