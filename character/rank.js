@@ -55,6 +55,7 @@ window.noname_character_rank={
         'swd_shuwaner',
     ],
     a:[
+        'pal_xia',
         'hs_yashaji',
         'hs_pengpeng',
         'hs_manyututeng',
@@ -270,6 +271,9 @@ window.noname_character_rank={
         'hs_mojinbaozi',
     ],
     bp:[
+        'pal_wangxiaohu',
+        'pal_shenqishuang',
+        'pal_sumei',
         'hs_tgolem',
         'hs_huolituteng',
         'hs_selajin',

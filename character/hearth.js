@@ -105,7 +105,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_amala:['female','wu',3,['azaowu','shouwang']],
             hs_yinggencao:['male','wu',3,['lieqi']],
 
-            hs_zhihuanhua:['fmale','wei',3,['huanjue']],
+            hs_zhihuanhua:['female','wei',3,['huanjue']],
             hs_shirencao:['male','wu',3,['srjici']],
             hs_kaituozhe:['female','wei',3,['tansuo','yinzong']],
 

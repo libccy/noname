@@ -10284,6 +10284,13 @@
 							return;
 						}
 					}
+					else if(event.choiceList&&event.controls.length==1&&event.controls[0]=='cancel2'){
+						event.controls.shift();
+						for(var i=0;i<event.choiceList.length;i++){
+							event.controls.push('选项'+get.cnNumber(i+1,true));
+						}
+						event.controls.push('cancel2');
+					}
 					if(event.isMine()){
                         if(event.dialogcontrol){
                             event.dialog=ui.create.dialog(event.prompt||'选择一项','hidden');

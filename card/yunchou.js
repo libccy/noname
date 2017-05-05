@@ -279,12 +279,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(!result.tie){
 						if(result.bool){
-							target.gainPlayerCard(event.addedTarget,true);
-							target.line(targets[1]);
+							if(event.addedTarget.countCards('he')){
+								target.line(event.addedTarget);
+								target.gainPlayerCard(event.addedTarget,true);
+							}
 						}
 						else{
-							event.addedTarget.gainPlayerCard(target,true);
-							event.addedTarget.line(target);
+							if(target.countCards('he')){
+								event.addedTarget.line(target);
+								event.addedTarget.gainPlayerCard(target,true);
+							}
 						}
 						event.finish();
 					}

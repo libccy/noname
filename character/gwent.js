@@ -321,7 +321,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else{
-						event.goto(4);
+						event.finish();
 					}
 					'step 3'
 					if(result.bool){

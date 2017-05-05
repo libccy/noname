@@ -2194,31 +2194,44 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			}
     		},
     		xinzhongyong:{
-    			trigger:{player:'shaMiss'},
+    			trigger:{player:'shaAfter'},
     			direct:true,
     			filter:function(event,player){
-    				return event.responded&&get.itemtype(event.cards)=='cards'&&get.itemtype(event.responded.cards)=='cards';
+    				return get.itemtype(event.cards)=='cards'||(event.responded&&get.itemtype(event.responded.cards)=='cards');
     			},
     			content:function(){
     				"step 0"
     				event.cards1=trigger.cards.slice(0);
-    				event.cards2=trigger.responded.cards.slice(0);
-    				player.chooseTarget('忠勇：将杀或闪交给一名其他角色',function(card,player,target){
+                    if(trigger.responded&&trigger.responded.cards&&trigger.responded.cards.length){
+                        event.cards2=trigger.responded.cards.slice(0);
+                    }
+    				player.chooseTarget(get.prompt('zhongyong'),function(card,player,target){
     					return target!=_status.event.getTrigger().target&&target!=player;
     				}).set('ai',function(target){
     					return get.attitude(_status.event.player,target);
     				});
     				"step 1"
     				if(result.bool){
-    					var sha=false;
-    					if(event.cards1.length==1&&get.color(event.cards1[0])=='red'){
-    						sha=true;
-    					}
-    					player.chooseControl('杀','闪',function(event,player){
-    						if(_status.event.choosesha) return '杀';
-    						return '闪';
-    					}).set('prompt','选择交给'+get.translation(result.targets)+'的牌').set('choosesha',sha);
-    					event.target=result.targets[0];
+                        event.target=result.targets[0];
+                        if(!event.cards2){
+                            player.logSkill('zhongyong',event.target);
+            				event.sha=false;
+        					event.target.gain(event.cards1,'gain2');
+        					if(get.color(event.cards1)=='red'){
+        						event.sha=true;
+        					}
+                            event.goto(3);
+                        }
+                        else{
+                            var sha=false;
+        					if(event.cards1.length==1&&get.color(event.cards1[0])=='red'){
+        						sha=true;
+        					}
+        					player.chooseControl('杀','闪',function(event,player){
+        						if(_status.event.choosesha) return '杀';
+        						return '闪';
+        					}).set('prompt','选择交给'+get.translation(result.targets)+'的牌').set('choosesha',sha);
+                        }
     				}
     				else{
     					event.finish();
@@ -2228,13 +2241,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				event.sha=false;
     				if(result.control=='杀'){
     					event.target.gain(event.cards1,'gain2');
-    					if(event.cards1.length==1&&get.color(event.cards1[0])=='red'){
+    					if(get.color(event.cards1)=='red'){
     						event.sha=true;
     					}
     				}
     				else{
     					event.target.gain(event.cards2,'gain2');
-    					if(event.cards2.length==1&&get.color(event.cards2[0])=='red'){
+    					if(get.color(event.cards2)=='red'){
     						event.sha=true;
     					}
     				}
