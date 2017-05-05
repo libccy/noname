@@ -38,6 +38,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_muchanglan:['female','wu',3,['feixia','lueying']],
 			pal_xia:['female','shu',3,['zongyu','fanling']],
 			pal_jiangcheng:['male','qun',4,['yanzhan','fenshi']],
+
+			pal_yuejinzhao:['male','qun',4,[]],
+			pal_yueqi:['female','qun',4,[]],
+			pal_mingxiu:['female','qun',4,[]],
+			pal_xianqing:['male','qun',4,[]],
+			pal_luozhaoyan:['female','qun',4,[]],
+			pal_jushifang:['male','qun',4,[]],
 		},
 		characterIntro:{
 			pal_lixiaoyao:'一个天资聪颖的乡下客栈店小二，因一壶酒被酒剑仙传授了蜀山仙剑派剑术，在仙灵岛与赵灵儿相遇，自此经历重重磨难成长为一代旷世奇侠。灵儿牺牲以后他悲痛欲绝。后出任蜀山掌门，取道号一贫，从此御剑行遍天下，行侠仗义、斩妖除魔。多年后因魔教之乱，故引咎卸职，成为蜀山七圣之一。而后虽心力交瘁，但仍竭力保护天下苍生。',
@@ -2864,16 +2871,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			pal_zhaoliner:'赵灵儿',
 			pal_linyueru:'林月如',
+			pal_lixiaoyao:'李逍遥',
+
 			pal_xuejian:'雪见',
 			pal_jingtian:'景天',
 			pal_zixuan:'紫萱',
-			pal_lixiaoyao:'李逍遥',
+
 			pal_yuntianhe:'云天河',
 			pal_hanlingsha:'韩菱纱',
 			pal_liumengli:'柳梦璃',
 			pal_murongziying:'慕容紫英',
 			pal_changqing:'长卿',
 			pal_xuanxiao:'玄霄',
+
+			pal_yuejinzhao:'越今朝',
+			pal_yueqi:'越祈',
+			pal_luozhaoyan:'洛昭言',
+			pal_xianqing:'闲卿',
+			pal_mingxiu:'明绣',
+			pal_jushifang:'居十方',
 
 			zongyu:'纵雨',
 			zongyu_info:'出牌阶段限一次，你可以弃置一张黑色牌，视为使用一张飞镖，随机指定两名敌方角色为目标',
