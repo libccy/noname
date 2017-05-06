@@ -178,6 +178,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				selectTarget:-1,
 				modTarget:true,
+				usable:1,
 				content:function(){
 					'step 0'
 					event.num=3;
@@ -1379,6 +1380,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'equip',
 				subtype:'equip4',
 				fullskin:true,
+				cardnature:'fire',
 				distance:{globalFrom:-2,globalTo:-1},
 				ai:{
 					basic:{
@@ -1780,6 +1782,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				selectTarget:-1,
 				reverseOrder:true,
 				cardcolor:'black',
+				cardnature:'thunder',
 				filterTarget:function(card,player,target){
 					return target!=player;
 				},
@@ -1840,6 +1843,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				selectTarget:-1,
 				reverseOrder:true,
 				cardcolor:'red',
+				cardnature:'fire',
 				filterTarget:function(card,player,target){
 					return target!=player;
 				},
@@ -4757,7 +4761,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			yuruyi_ab:'如意',
 			yuruyi_info:'你有更高的机率摸到好牌',
 			fengyinzhidan:'封印之蛋',
-			fengyinzhidan_info:'随机使用三张普通锦囊牌（随机指定目标）',
+			fengyinzhidan_info:'出牌阶段限用一次，随机使用三张普通锦囊牌（随机指定目标）',
 			shuchui:'鼠槌',
 			shuchui_info:'出牌阶段限一次，你可以指定一名攻击范围内的角色，依次将手牌中的至多3张杀对该角色使用，若杀造成了伤害，你摸一张牌',
 			zhiluxiaohu:'指路小狐',

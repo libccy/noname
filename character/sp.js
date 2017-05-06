@@ -5200,6 +5200,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			prompt:function(event){
     				return get.translation(event.source)+'即将对'+get.translation(event.player)+'造成伤害，'+get.prompt('fuji');
     			},
+                logTarget:'source',
     			content:function(){
     				"step 0"
     				trigger.source.judge(ui.special);

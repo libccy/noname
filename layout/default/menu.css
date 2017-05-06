@@ -63,7 +63,9 @@
 .menu-buttons.leftbutton{
 	text-align: left;
 	margin-left: 10px;
-    width: calc(100% - 30px) !important;
+}
+.menu-buttons.leftbutton:not(.commandbutton){
+	width: calc(100% - 30px) !important;
 }
 .menu.main>.menu-content>div>.right.pane>.menu-buttons.leftbutton>.config.toggle:first-child,
 .menu.main>.menu-content>div>.right.pane>.menu-buttons.leftbutton>.config.toggle:first-child+.config.toggle{

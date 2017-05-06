@@ -169,6 +169,7 @@ window.noname_character_rank={
         'hs_zhihuanhua',
     ],
     am:[
+        'pal_jushifang',
         'hs_fachaotuteng',
         'huangfusong',
         'hs_shizugui',

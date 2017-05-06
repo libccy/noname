@@ -1160,6 +1160,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				audio:true,
 				fullskin:true,
 				type:'delay',
+				cardnature:'thunder',
 				modTarget:function(card,player,target){
 					return lib.filter.judge(card,player,target);
 				},

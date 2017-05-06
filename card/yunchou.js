@@ -718,6 +718,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'delay',
 				cardcolor:'red',
+				cardnature:'fire',
 				modTarget:function(card,player,target){
 					return lib.filter.judge(card,player,target);
 				},
@@ -877,6 +878,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:true,
 				filterTarget:true,
 				cardcolor:'red',
+				cardnature:'fire',
 				content:function(){
 					"step 0"
 					if(target.countCards('he')<2){

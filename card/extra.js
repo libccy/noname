@@ -118,6 +118,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				enable:true,
+				cardnature:'fire',
 				filterTarget:function(card,player,target){
 					if(player!=game.me&&player.countCards('h')<2) return false;
 					return target.countCards('h')>0;
@@ -294,6 +295,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'equip',
 				subtype:'equip1',
+				cardnature:'fire',
 				distance:{attackFrom:-3},
 				ai:{
 					basic:{
@@ -318,6 +320,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'equip',
 				subtype:'equip2',
+				cardnature:'fire',
 				ai:{
 					basic:{
 						equipValue:function(card,player){

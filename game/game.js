@@ -23539,6 +23539,9 @@
 			if(!suit&&lib.card[name].cardcolor){
 				suit=lib.card[name].cardcolor;
 			}
+			if(!nature&&lib.card[name].cardnature){
+				nature=lib.card[name].cardnature;
+			}
 			if(typeof suit!='string'){
 				suit=['heart','diamond','club','spade'].randomGet();
 			}
@@ -25846,7 +25849,12 @@
 					if(card.ai.basic==undefined) card.ai.basic={};
 					if(card.ai.result==undefined) card.ai.result={target:1.5};
 					if(card.ai.basic.order==undefined) card.ai.basic.order=function(card,player){
-						return 8+get.equipValue(card,player)/20;
+						if(player&&player.hasSkillTag('reverseEquip')){
+							return 8.5-get.equipValue(card,player)/20;
+						}
+						else{
+							return 8+get.equipValue(card,player)/20;
+						}
 					};
 					if(card.ai.basic.useful==undefined) card.ai.basic.useful=2;
 					if(card.subtype=='equip3'){
@@ -33018,7 +33026,7 @@
 						var nodex4=ui.create.div('.menubutton','四',row2,clickrow2);
 						var nodex5=ui.create.div('.menubutton','五',row2,clickrow2);
 
-						var row3=ui.create.div('.menu-buttons.leftbutton',page);
+						var row3=ui.create.div('.menu-buttons.leftbutton.commandbutton',page);
 						row3.style.marginTop='3px';
 						var clickrow3=function(){
 							if(this.classList.contains('unselectable')) return;

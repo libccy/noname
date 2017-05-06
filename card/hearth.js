@@ -185,6 +185,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				enable:true,
+				cardnature:'thunder',
 				filterTarget:function(card,player,target){
 					if(player!=game.me&&player.countCards('h')<2) return false;
 					return target.countCards('h')>0;

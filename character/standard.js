@@ -1436,6 +1436,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					noe:true,
+					reverseEquip:true,
 					effect:{
 						target:function(card,player,target,current){
 							if(get.type(card)=='equip') return [1,3];

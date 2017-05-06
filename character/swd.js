@@ -5335,6 +5335,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						if(get.type(card)=='equip') return [1,3];
     					}
     				},
+                    reverseEquip:true,
     				noe:true,
     			}
     		},
