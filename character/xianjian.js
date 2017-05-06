@@ -39,8 +39,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_xia:['female','shu',3,['zongyu','fanling']],
 			pal_jiangcheng:['male','qun',4,['yanzhan','fenshi']],
 
-			pal_yuejinzhao:['male','qun',4,[]],
-			pal_yueqi:['female','qun',4,[]],
+			pal_yuejinzhao:['male','wei',4,['ywuhun','yingfeng']],
+			pal_yueqi:['female','wei',4,[]],
 			pal_mingxiu:['female','qun',4,[]],
 			pal_xianqing:['male','qun',4,[]],
 			pal_luozhaoyan:['female','qun',4,[]],
@@ -84,6 +84,301 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_jiangcheng:'折剑山庄庄主欧阳英的得意门生，但因其蚩尤后人魔族的身份，令他无法被容于人界；再加上人界半魔同族饱受人类迫害，故最终成为净天教教主魔君“姜世离”，毅然肩负起保护同族的重任。',
 		},
 		skill:{
+			yingfeng:{
+				trigger:{player:'useCardAfter'},
+    			filter:function(event,player){
+    				if(event.card.name!='sha') return false;
+					if(event.parent.name=='yingfeng') return false;
+					var enemies=player.getEnemies();
+    				return game.hasPlayer(function(current){
+    					return enemies.contains(current)&&!event.targets.contains(current)&&player.canUse('sha',current,false);
+    				});
+    			},
+    			forced:true,
+    			content:function(){
+    				var enemies=player.getEnemies();
+					enemies.remove(trigger.targets);
+					if(enemies.length){
+						player.useCard({name:'sha'},enemies.randomGet().addExpose(0.2));
+					}
+    			},
+			},
+			ywuhun:{
+				trigger:{player:'phaseBefore'},
+				forced:true,
+				filter:function(event){
+					return event.parent.name!='ywuhun';
+				},
+				intro:{
+					content:'回合结束后，场上及牌堆中的牌将恢复到回合前的状态'
+				},
+				video:function(player,data){
+					for(var i in data){
+						var current=game.playerMap[i];
+						current.node.handcards1.innerHTML='';
+						current.node.handcards2.innerHTML='';
+						current.node.equips.innerHTML='';
+						current.node.judges.innerHTML='';
+						current.directgain(get.infoCards(data[i].h));
+						var es=get.infoCards(data[i].e);
+						for(var j=0;j<es.length;j++){
+							current.$equip(es[j]);
+						}
+						var js=get.infoCards(data[i].j);
+						for(var j=0;j<js.length;j++){
+							current.node.judges.appendChild(js[j]);
+						}
+					}
+    			},
+				content:function(){
+					'step 0'
+					var handcards1,handcards2,judges,equips,viewAs,i,j;
+    				event.data=[];
+					event.cardPile=[];
+
+    				for(i=0;i<game.players.length;i++){
+    					viewAs=[];
+    					handcards1=[];
+    					handcards2=[];
+    					judges=[];
+    					equips=[];
+
+    					for(j=0;j<game.players[i].node.handcards1.childNodes.length;j++)
+    						handcards1.push(game.players[i].node.handcards1.childNodes[j]);
+
+    					for(j=0;j<game.players[i].node.handcards2.childNodes.length;j++)
+    						handcards2.push(game.players[i].node.handcards2.childNodes[j]);
+
+    					for(j=0;j<game.players[i].node.judges.childNodes.length;j++){
+    						viewAs.push(game.players[i].node.judges.childNodes[j].viewAs);
+    						judges.push(game.players[i].node.judges.childNodes[j]);
+    					}
+
+    					for(j=0;j<game.players[i].node.equips.childNodes.length;j++)
+    						equips.push(game.players[i].node.equips.childNodes[j]);
+
+    					event.data.push({
+    						player:game.players[i],
+    						handcards1:handcards1,
+    						handcards2:handcards2,
+    						judges:judges,
+    						equips:equips,
+    						viewAs:viewAs,
+    						value:handcards1.length+handcards2.length+equips.length-judges.length
+    					});
+    				}
+					for(var i=0;i<ui.cardPile.childElementCount;i++){
+						event.cardPile.push(ui.cardPile.childNodes[i]);
+					}
+					'step 1'
+					player.markSkill('ywuhun');
+					player.phase();
+					'step 2'
+    				game.delay(0.5);
+    				'step 3'
+    				game.animate.window(1);
+    				'step 4'
+					player.unmarkSkill('ywuhun');
+    				var storage=event.data;
+    				for(var i=0;i<storage.length;i++){
+    					var current=storage[i].player;
+    					if(current.isAlive()){
+							var cards=current.getCards('hej');
+							for(var j=0;j<cards.length;j++){
+								cards[j].discard();
+							}
+							current.removeEquipTrigger();
+    					}
+    				}
+    				'step 5'
+    				var storage=event.data;
+    				var current;
+    				var i,j;
+    				for(i=0;i<storage.length;i++){
+    					current=storage[i].player;
+    					if(current.isAlive()){
+    						for(j=0;j<storage[i].handcards1.length;j++){
+    							if(storage[i].handcards1[j].parentNode==ui.discardPile||
+    								storage[i].handcards1[j].parentNode==ui.cardPile){
+    								current.node.handcards1.appendChild(storage[i].handcards1[j]);
+    							}
+    							else{
+    								current.node.handcards1.appendChild(game.createCard(storage[i].handcards1[j]));
+    							}
+    						}
+    						for(j=0;j<storage[i].handcards2.length;j++){
+    							if(storage[i].handcards2[j].parentNode==ui.discardPile||
+    								storage[i].handcards2[j].parentNode==ui.cardPile){
+    								current.node.handcards2.appendChild(storage[i].handcards2[j]);
+    							}
+    							else{
+    								current.node.handcards2.appendChild(game.createCard(storage[i].handcards2[j]));
+    							}
+    						}
+    						for(j=0;j<storage[i].equips.length;j++){
+    							if(storage[i].equips[j].parentNode==ui.discardPile||
+    								storage[i].equips[j].parentNode==ui.cardPile){
+    								storage[i].equips[j].style.transform='';
+    								current.$equip(storage[i].equips[j]);
+    							}
+    							else{
+    								current.$equip(game.createCard(storage[i].equips[j]));
+    							}
+    						}
+    						for(j=0;j<storage[i].judges.length;j++){
+    							if(storage[i].judges[j].parentNode==ui.discardPile||
+    								storage[i].judges[j].parentNode==ui.cardPile){
+    								storage[i].judges[j].style.transform='';
+    								storage[i].judges[j].viewAs=storage[i].viewAs[j];
+    								if(storage[i].judges[j].viewAs&&storage[i].judges[j].viewAs!=storage[i].judges[j].name&&storage[i].judges[j].classList.contains('fullskin')){
+    	                                storage[i].judges[j].classList.add('fakejudge');
+    	                                storage[i].judges[j].node.background.innerHTML=lib.translate[storage[i].judges[j].viewAs+'_bg']||get.translation(storage[i].judges[j].viewAs)[0]
+    	                            }
+    								current.node.judges.appendChild(storage[i].judges[j]);
+    							}
+    						}
+    						current.update();
+    					}
+    				}
+    				var data={};
+    				for(var i=0;i<game.players.length;i++){
+    					data[game.players[i].dataset.position]={
+    						h:get.cardsInfo(game.players[i].getCards('h')),
+    						e:get.cardsInfo(game.players[i].getCards('e')),
+    						j:get.cardsInfo(game.players[i].getCards('j'))
+    					}
+    				}
+    				game.addVideo('skill',event.player,['ywuhun',data]);
+    				game.animate.window(2);
+					while(ui.cardPile.childElementCount){
+						ui.discardPile.appendChild(ui.cardPile.firstChild);
+					}
+					for(var i=0;i<event.cardPile.length;i++){
+						if(event.cardPile[i].parentNode==ui.discardPile){
+							ui.cardPile.appendChild(event.cardPile[i]);
+						}
+						else{
+							ui.cardPile.appendChild(game.createCard(event.cardPile[i]));
+						}
+					}
+					ui.updatehl();
+				}
+			},
+			cuikong:{
+				trigger:{player:'phaseUseBefore'},
+				direct:true,
+				filter:function(event,player){
+					var hs=player.getCards('h');
+					return game.hasPlayer(function(current){
+						if(current!=player){
+							for(var i=0;i<hs.length;i++){
+								if(get.info(hs[i]).multitarget) continue;
+								if(lib.filter.targetEnabled2(hs[i],player,current)){
+									return true;
+								}
+							}
+						}
+					});
+				},
+				content:function(){
+					'step 0'
+					var hs=player.getCards('h');
+					player.chooseTarget(get.prompt('cuikong'),function(card,player,target){
+						if(player==target) return false;
+						for(var i=0;i<hs.length;i++){
+							if(get.info(hs[i]).multitarget) continue;
+							if(lib.filter.targetEnabled2(hs[i],player,target)){
+								return true;
+							}
+						}
+						return false;
+					}).ai=function(target){
+						var num=0,eff=0,damaged=false;
+						for(var i=0;i<hs.length;i++){
+							if(get.info(hs[i]).multitarget) continue;
+							var hef;
+							if(get.tag(hs[i],'damage')&&damaged){
+								hef=-1;
+							}
+							else{
+								hef=ai.get.effect(target,hs[i],player,player);
+							}
+							if(lib.filter.targetEnabled2(hs[i],player,target)&&hef>0){
+								num++;
+								if(get.attitude(player,target)>0){
+									hef/=1.5;
+									if(get.tag(hs[i],'damage')){
+										damaged=true;
+									}
+								}
+								eff+=hef;
+							}
+						}
+						if(!player.needsToDiscard(-num)){
+							return eff;
+						}
+						return 0;
+					};
+					'step 1'
+					if(result.bool){
+						event.target=result.targets[0];
+						var num=0;
+						player.chooseCard([1,Infinity],'按顺序选择对'+get.translation(result.targets)+'使用的牌',function(card){
+							return lib.filter.targetEnabled2(card,player,event.target);
+						}).ai=function(card){
+							if(ai.get.effect(event.target,card,player,player)>0){
+								if(get.attitude(player,event.target)>0&&get.tag(card,'damage')){
+									for(var i=0;i<ui.selected.cards.length;i++){
+										if(get.tag(ui.selected.cards[i]),'damage'){
+											return 0;
+										}
+									}
+								}
+								return ai.get.order(card);
+							}
+							return 0;
+						}
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if(result.bool){
+						player.logSkill('cuikong',event.target);
+						player.addTempSkill('cuikong_draw','phaseUseCancelled');
+						player.storage.cuikong_draw=event.target;
+						trigger.untrigger();
+						trigger.finish();
+						event.cards=result.cards.slice(0);
+						player.lose(event.cards,ui.special);
+					}
+					else{
+						event.finish();
+					}
+					'step 3'
+					if(event.cards.length){
+						player.useCard(event.cards.shift(),event.target);
+						event.redo();
+					}
+				},
+				subSkill:{
+					draw:{
+						trigger:{global:'damageEnd'},
+						forced:true,
+						popup:false,
+						filter:function(event,player){
+							return event.player==player.storage.cuikong_draw;
+						},
+						onremove:true,
+						content:function(){
+							player.draw(trigger.num);
+						}
+					}
+				},
+				ai:{
+					threaten:1.3
+				}
+			},
 			zongyu:{
 				enable:'phaseUse',
 				usable:1,
@@ -391,7 +686,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return ai.get.effect(current,{name:'yuansuhuimie'},player,player);
 								}
 							});
-							console.log(num1,num2);
 							if(num1>0&&num2>0) return 3;
 						}
 						if(player.storage.husha>1){
@@ -2891,6 +3185,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_mingxiu:'明绣',
 			pal_jushifang:'居十方',
 
+			ywuhun:'雾魂',
+			ywuhun_info:'锁定技，回合开始前，你获得一个额外的回合，并在此回合结束后将场上及牌堆的所有牌恢复至回合前的状态',
+			feichen:'飞尘',
+			feichen_info:'',
+			yingfeng:'影锋',
+			yingfeng_info:'锁定技，每当你使用一张杀结算完毕后，你随机对一名不是此杀目标的敌方角色使用一张杀',
+			cuikong:'摧空',
+			cuikong_info:'你可以放弃出牌阶段，改为指定一名其他角色并选择任意张手牌，依次对该角色使用，若如此做，此阶段内该角色每受到一点伤害，你摸一张牌',
 			zongyu:'纵雨',
 			zongyu_info:'出牌阶段限一次，你可以弃置一张黑色牌，视为使用一张飞镖，随机指定两名敌方角色为目标',
 			fanling:'返灵',

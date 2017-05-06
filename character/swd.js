@@ -4878,40 +4878,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			alter:true,
     			group:['kunlunjing1','kunlunjing2'],
     			video:function(player,data){
-    				if(data){
-    					for(var i in data){
-    						var current=game.playerMap[i];
-    						current.node.handcards1.innerHTML='';
-    						current.node.handcards2.innerHTML='';
-    						current.node.equips.innerHTML='';
-    						current.node.judges.innerHTML='';
-    						current.directgain(get.infoCards(data[i].h));
-    						var es=get.infoCards(data[i].e);
-    						for(var j=0;j<es.length;j++){
-    							current.$equip(es[j]);
-    						}
-    						var js=get.infoCards(data[i].j);
-    						for(var j=0;j<js.length;j++){
-    							current.node.judges.appendChild(js[j]);
-    						}
-    					}
-    					ui.window.classList.remove('zoomout3');
-    					ui.window.classList.add('zoomin3');
-    					document.body.appendChild(ui.window);
-    					setTimeout(function(){
-    						ui.window.show();
-    						ui.window.classList.remove('zoomin3');
-    						setTimeout(function(){
-    							ui.window.style.transition='';
-    						},500);
-    					},100);
-    				}
-    				else{
-    					ui.window.style.transition='all 0.5s';
-    					ui.window.classList.add('zoomout3');
-    					ui.window.delete();
-    					ui.window.hide();
-    				}
+					for(var i in data){
+						var current=game.playerMap[i];
+						current.node.handcards1.innerHTML='';
+						current.node.handcards2.innerHTML='';
+						current.node.equips.innerHTML='';
+						current.node.judges.innerHTML='';
+						current.directgain(get.infoCards(data[i].h));
+						var es=get.infoCards(data[i].e);
+						for(var j=0;j<es.length;j++){
+							current.$equip(es[j]);
+						}
+						var js=get.infoCards(data[i].j);
+						for(var j=0;j<js.length;j++){
+							current.node.judges.appendChild(js[j]);
+						}
+					}
     			},
     		},
     		kunlunjing1:{
@@ -4944,30 +4926,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				"step 0"
     				game.delay(0.5);
     				"step 1"
-    				ui.window.style.transition='all 0.5s';
-    				ui.window.classList.add('zoomout3');
-    				ui.window.delete();
-    				ui.window.hide();
-    				game.delay(0,500);
-    				game.addVideo('skill',event.player,'kunlunjing');
+    				game.animate.window(1);
     				"step 2"
     				var storage=event.player.storage.kunlunjing;
     				for(var i=0;i<storage.length;i++){
     					var player=storage[i].player;
-    					if(player.isIn()){
-    						player.lose(player.getCards('hej'))._triggered=null;
+    					if(player.isAlive()){
+                            var cards=player.getCards('hej');
+							for(var j=0;j<cards.length;j++){
+								cards[j].discard();
+							}
+							player.removeEquipTrigger();
     					}
     				}
     				"step 3"
     				var storage=event.player.storage.kunlunjing;
-    				var player,frag;
+    				var player;
     				var i,j;
     				for(i=0;i<storage.length;i++){
     					player=storage[i].player;
-    					if(player.isIn()){
+    					if(player.isAlive()){
     						for(j=0;j<storage[i].handcards1.length;j++){
     							if(storage[i].handcards1[j].parentNode==ui.discardPile||
-    							storage[i].handcards1[j].parentNode==ui.cardPile){
+                                    storage[i].handcards1[j].parentNode==ui.cardPile){
     								player.node.handcards1.appendChild(storage[i].handcards1[j]);
     							}
     							else{
@@ -4976,7 +4957,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						}
     						for(j=0;j<storage[i].handcards2.length;j++){
     							if(storage[i].handcards2[j].parentNode==ui.discardPile||
-    							storage[i].handcards2[j].parentNode==ui.cardPile){
+    							                         storage[i].handcards2[j].parentNode==ui.cardPile){
     								player.node.handcards2.appendChild(storage[i].handcards2[j]);
     							}
     							else{
@@ -4985,7 +4966,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						}
     						for(j=0;j<storage[i].equips.length;j++){
     							if(storage[i].equips[j].parentNode==ui.discardPile||
-    							storage[i].equips[j].parentNode==ui.cardPile){
+    							                         storage[i].equips[j].parentNode==ui.cardPile){
     								storage[i].equips[j].style.transform='';
     								player.$equip(storage[i].equips[j]);
     							}
@@ -4995,7 +4976,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						}
     						for(j=0;j<storage[i].judges.length;j++){
     							if(storage[i].judges[j].parentNode==ui.discardPile||
-    							storage[i].judges[j].parentNode==ui.cardPile){
+                                    storage[i].judges[j].parentNode==ui.cardPile){
     								storage[i].judges[j].style.transform='';
     								storage[i].judges[j].viewAs=storage[i].viewAs[j];
     								if(storage[i].judges[j].viewAs&&storage[i].judges[j].viewAs!=storage[i].judges[j].name&&storage[i].judges[j].classList.contains('fullskin')){
@@ -5008,10 +4989,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						player.update();
     					}
     				}
-    				game.delay(0,100);
-    				ui.window.classList.remove('zoomout3');
-    				ui.window.classList.add('zoomin3');
-    				document.body.appendChild(ui.window);
     				var data={};
     				for(var i=0;i<game.players.length;i++){
     					data[game.players[i].dataset.position]={
@@ -5021,16 +4998,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					}
     				}
     				game.addVideo('skill',event.player,['kunlunjing',data]);
-    				"step 4"
-    				ui.window.show();
-    				ui.window.classList.remove('zoomin3');
-    				setTimeout(function(){
-    					ui.window.style.transition='';
-    					game.resume();
-    				},500);
-    				game.pause();
-    				'step 5'
+    				game.animate.window(2);
     				ui.updatehl();
+    				"step 4"
     				if(get.is.altered('kunlunjing')){
     					player.loseHp();
     				}
@@ -7746,7 +7716,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					return !target.hasJudge(button.link[2]);
     				};
     				"step 1"
-    				// console.log(result.links[0][2]);
     				target.addJudge(result.links[0][2],cards);
     			},
     			ai:{

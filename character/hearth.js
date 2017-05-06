@@ -576,7 +576,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         if(event.triggername=='phaseBegin'){
                             player.storage.lieqi=target;
                         }
-                        var hs=target.get('h').randomSort();
+                        var hs=target.getCards('h').randomSort();
                         if(hs.length){
                             var list2=[];
                             for(var i=0;i<hs.length;i++){
@@ -599,8 +599,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             player.chooseCardButton(true,'猜测哪张牌为'+get.translation(target)+'的手牌',
                             [card,game.createCard(list.randomRemove()),game.createCard(list.randomRemove())].randomSort()).ai=function(button){
                                 if(get.value(button.link)<0) return -10;
-                                if(!_status.event.rand) _status.event.rand=Math.random();
-                                if(_status.event.rand<0.7){
+                                if(_status.event.getRand()<0.7){
                                     return button.link==card?1:-1;
                                 }
                                 else{
@@ -665,7 +664,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				check:function(button){
     					var player=_status.event.player;
     					var card={name:button.link[2],nature:button.link[3]};
-                        if(!_status.event.rand) _status.event.rand=Math.random();
     					if(game.hasPlayer(function(current){
     						return player.canUse(card,current)&&get.effect(current,card,player,player)>0;
     					})){
@@ -678,7 +676,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     								else if(button.link[3]=='fire') return 2.92;
     								else return 2.9;
                                     break;
-                                default:return 2+_status.event.rand*2;
+                                default:return 2+_status.event.getRand()*2;
     						}
     					}
     					return 0;
@@ -770,7 +768,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     player.addSkill('qianfu2');
                     player.hp=1;
                     player.update();
-                    player.discard(player.get('he'));
+                    player.discard(player.getCards('he'));
                     player.setAvatar('hs_selajin','hs_selajin2');
                 },
                 ai:{
@@ -1147,7 +1145,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 forced:true,
                 content:function(){
                     'step 0'
-                    player.discard(player.get('hej'));
+                    player.discard(player.getCards('hej'));
                     'step 1'
                     player.link(false);
                     'step 2'

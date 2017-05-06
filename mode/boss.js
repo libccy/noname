@@ -1079,7 +1079,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].side) continue;
 						game.players[i].removeEquipTrigger();
-						var hej=game.players[i].get('hej');
+						var hej=game.players[i].getCards('hej');
 						for(var j=0;j<hej.length;j++){
 							ui.discardPile.appendChild(hej[j]);
 						}
@@ -1156,7 +1156,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].side) continue;
 						game.players[i].removeEquipTrigger();
-						var hej=game.players[i].get('hej');
+						var hej=game.players[i].getCards('hej');
 						for(var j=0;j<hej.length;j++){
 							ui.discardPile.appendChild(hej[j]);
 						}
@@ -1249,7 +1249,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].side) continue;
 						game.players[i].removeEquipTrigger();
-						var hej=game.players[i].get('hej');
+						var hej=game.players[i].getCards('hej');
 						for(var j=0;j<hej.length;j++){
 							ui.discardPile.appendChild(hej[j]);
 						}
@@ -1326,7 +1326,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].side) continue;
 						game.players[i].removeEquipTrigger();
-						var hej=game.players[i].get('hej');
+						var hej=game.players[i].getCards('hej');
 						for(var j=0;j<hej.length;j++){
 							ui.discardPile.appendChild(hej[j]);
 						}
@@ -1716,10 +1716,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									if(player.hp<=3&&game.hasPlayer(function(current){
 										return current.name=='boss_shujing'&&current.hp==1;
 									})){
-										if(!_status.event.rand){
-											_status.event.rand=Math.random();
-										}
-										if(_status.event.rand<0.4){
+										if(_status.event.getRand()<0.4){
 											return 0;
 										}
 									}

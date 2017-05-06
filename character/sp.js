@@ -7571,13 +7571,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				"step 0"
+                    player.addSkill('duwu3');
     				target.damage();
-    				if(target.hp>1){
-    					event.finish();
-    				}
     				"step 1"
-    				player.addSkill('duwu2');
-    				player.loseHp();
+                    if(!player.hasSkill('duwu3')){
+                        player.addSkill('duwu2');
+        				player.loseHp();
+                    }
+                    else{
+                        player.removeSkill('duwu3');
+                    }
     			},
     			ai:{
     				order:2,
@@ -7599,6 +7602,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.removeSkill('duwu2');
     			}
     		},
+            duwu3:{
+                trigger:{global:'dying'},
+                priority:15,
+                forced:true,
+                popup:false,
+                silent:true,
+                filter:function(event,player){
+                    return event.reason&&event.reason.getParent().name=='duwu';
+                },
+                content:function(){
+                    player.removeSkill('duwu3');
+                }
+            },
     		yicong:{
     			mod:{
     				globalFrom:function(from,to,current){
