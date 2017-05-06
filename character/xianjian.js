@@ -40,11 +40,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_jiangcheng:['male','qun',4,['yanzhan','fenshi']],
 
 			pal_yuejinzhao:['male','wei',4,['ywuhun','yingfeng']],
-			pal_yueqi:['female','wei',4,[]],
-			pal_mingxiu:['female','qun',4,[]],
-			pal_xianqing:['male','qun',4,[]],
-			pal_luozhaoyan:['female','qun',4,[]],
-			pal_jushifang:['male','qun',4,[]],
+			// pal_yueqi:['female','wei',4,[]],
+			// pal_mingxiu:['female','qun',4,[]],
+			// pal_xianqing:['male','qun',4,[]],
+			pal_luozhaoyan:['female','shu',4,['fenglue','tanhua']],
+			// pal_jushifang:['male','shu',3,['lingjia','jishou','yanshi']],
 		},
 		characterIntro:{
 			pal_lixiaoyao:'一个天资聪颖的乡下客栈店小二，因一壶酒被酒剑仙传授了蜀山仙剑派剑术，在仙灵岛与赵灵儿相遇，自此经历重重磨难成长为一代旷世奇侠。灵儿牺牲以后他悲痛欲绝。后出任蜀山掌门，取道号一贫，从此御剑行遍天下，行侠仗义、斩妖除魔。多年后因魔教之乱，故引咎卸职，成为蜀山七圣之一。而后虽心力交瘁，但仍竭力保护天下苍生。',
@@ -84,6 +84,200 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_jiangcheng:'折剑山庄庄主欧阳英的得意门生，但因其蚩尤后人魔族的身份，令他无法被容于人界；再加上人界半魔同族饱受人类迫害，故最终成为净天教教主魔君“姜世离”，毅然肩负起保护同族的重任。',
 		},
 		skill:{
+			lingjia:{
+				enable:'phaseUse',
+    			filterCard:function(card){
+    				return get.type(card)!='basic';
+    			},
+    			usable:1,
+    			filter:function(event,player){
+					for(var i in lib.card){
+						if(lib.card[i].type=='jiguan'){
+							return player.hasCard(function(card){
+								return get.type(card)!='basic';
+							},'he');
+						}
+					}
+					return false;
+    			},
+    			selectCard:1,
+    			check:function(card){
+    				return 8-get.value(card);
+    			},
+    			content:function(){
+					var list=get.typeCard('jiguan').randomGets(2);
+					for(var i=0;i<list.length;i++){
+						list[i]=game.createCard(list[i]);
+					}
+					player.gain(list,'draw');
+    			},
+    			ai:{
+    				result:{
+    					player:1
+    				},
+    				order:9
+    			}
+			},
+			lingjia_old:{
+				trigger:{player:'loseEnd'},
+				frequent:true,
+				filter:function(event,player){
+					for(var i=0;i<event.cards.length;i++){
+						if(event.cards[i].original=='e'){
+							for(var i in lib.card){
+								if(lib.card[i].type=='jiguan'){
+									if(!player.storage.lingjia||!player.storage.lingjia.contains(i)){
+										return true;
+									}
+								}
+							}
+							return false;
+						}
+					}
+					return false;
+				},
+				init:function(player){
+					player.storage.lingjia3=0;
+				},
+				content:function(){
+					'step 0'
+					var num=0;
+					for(var i=0;i<trigger.cards.length;i++){
+						if(trigger.cards[i].original=='e') num++;
+					}
+					if(!player.storage.lingjia){
+						player.storage.lingjia=[];
+					}
+					var list=[];
+					for(var i in lib.card){
+						if(lib.card[i].type=='jiguan'){
+							if(!player.storage.lingjia.contains(i)){
+								list.push(i);
+							}
+						}
+					}
+					if(list.length){
+						if(player.storage.lingjia2){
+							for(var i=0;i<list.length;i++){
+								list[i]=['机关','',list[i]];
+							}
+							var num=Math.min(list.length,player.storage.lingjia2);
+							player.chooseButton(true,num,['灵甲：选择'+get.cnNumber(num)+'张机关牌',[list,'vcard']]).ai=function(button){
+								if(button.link[2]=='jiguanyaoshu') return 2;
+								if(button.link[2]=='jiguanren'&&_status.event.getRand()<0.5) return 1.5;
+								return 1;
+							};
+						}
+						else{
+							var name=list.randomGet();
+							player.gain(game.createCard(name),'draw');
+							player.storage.lingjia.push(name);
+							event.finish();
+						}
+					}
+					'step 1'
+					if(result.bool&&result.links&&result.links.length){
+						var list=[];
+						for(var i=0;i<result.links.length;i++){
+							list.push(game.createCard(result.links[i][2]));
+							player.storage.lingjia.push(result.links[i][2]);
+						}
+						player.gain(list,'draw');
+					}
+				},
+				group:['lingjia_count1','lingjia_count2'],
+				subSkill:{
+					count1:{
+						trigger:{global:'phaseAfter'},
+						forced:true,
+						popup:false,
+						silent:true,
+						content:function(){
+							delete player.storage.lingjia;
+						}
+					},
+					count2:{
+						trigger:{player:'useCardAfter'},
+						filter:function(event,player){
+							return get.type(event.card)=='jiguan'&&!player.hasSkill('lingjia2');
+						},
+						forced:true,
+						popup:false,
+						content:function(){
+							player.storage.lingjia3++;
+							player.addTempSkill('lingjia2','phaseAfter');
+						}
+					}
+				},
+				ai:{
+					noe:true,
+					effect:{
+						target:function(card,player,target,current){
+							if(get.type(card)=='equip') return [1,3];
+						}
+					}
+				}
+			},
+			yanshi:{
+				trigger:{player:'phaseAfter'},
+				forced:true,
+				skillAnimation:true,
+				filter:function(event,player){
+					return !player.storage.lingjia2&&player.storage.lingjia3>=3;
+				},
+				content:function(){
+					'step 0'
+					player.awakenSkill('yanshi')
+					player.storage.lingjia2=1;
+					player.gainMaxHp();
+					'step 1'
+					player.recover();
+					'step 2'
+					player.draw(2);
+				}
+			},
+			jishou:{
+				trigger:{player:'phaseAfter'},
+				forced:true,
+				skillAnimation:true,
+				filter:function(event,player){
+					return !player.storage.lingjia2&&player.storage.lingjia3>=3;
+				},
+				content:function(){
+					'step 0'
+					player.awakenSkill('jishou');
+					player.storage.lingjia2=1;
+					player.gainMaxHp();
+					'step 1'
+					player.recover();
+					'step 2'
+					player.draw(2);
+				}
+			},
+			tanhua:{
+				trigger:{player:'recoverBefore'},
+                forced:true,
+                filter:function(event,player){
+                    return player.hp>0&&event.num>0;
+                },
+                content:function(){
+                    trigger.untrigger();
+                    trigger.finish();
+                    player.draw(2*trigger.num);
+                },
+				group:'tanhua_remove',
+				subSkill:{
+					remove:{
+						trigger:{player:'dying'},
+						priority:10,
+						forced:true,
+						content:function(){
+							player.recover();
+							player.removeSkill('tanhua');
+						}
+					}
+				}
+			},
 			yingfeng:{
 				trigger:{player:'useCardAfter'},
     			filter:function(event,player){
@@ -106,11 +300,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ywuhun:{
 				trigger:{player:'phaseBefore'},
 				forced:true,
+				alter:true,
 				filter:function(event){
 					return event.parent.name!='ywuhun';
 				},
 				intro:{
-					content:'回合结束后，场上及牌堆中的牌将恢复到回合前的状态'
+					content:function(storage,player){
+						var str='回合结束后，场上及牌堆中的牌将恢复到回合前的状态';
+						var list=[];
+                        for(var i in player.disabledSkills){
+                            if(player.disabledSkills[i].contains('ywuhun')){
+                                list.push(i)
+                            }
+                        }
+						list.remove('ywuhun');
+    					if(list.length){
+    						str+='<br><br>失效技能：';
+    						for(var i=0;i<list.length;i++){
+    							if(lib.translate[list[i]+'_info']){
+    								str+=get.translation(list[i])+'、';
+    							}
+    						}
+    						str=str.slice(0,str.length-1);
+    					}
+						return str;
+					}
 				},
 				video:function(player,data){
 					for(var i in data){
@@ -172,8 +386,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					player.markSkill('ywuhun');
+					if(get.is.altered('ywuhun')){
+	                    player.disableSkill('ywuhun',player.getSkills(true,false));
+					}
 					player.phase();
 					'step 2'
+					player.enableSkill('ywuhun');
     				game.delay(0.5);
     				'step 3'
     				game.animate.window(1);
@@ -264,7 +482,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					ui.updatehl();
 				}
 			},
-			cuikong:{
+			fenglue:{
 				trigger:{player:'phaseUseBefore'},
 				direct:true,
 				filter:function(event,player){
@@ -283,7 +501,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var hs=player.getCards('h');
-					player.chooseTarget(get.prompt('cuikong'),function(card,player,target){
+					player.chooseTarget(get.prompt('fenglue'),function(card,player,target){
 						if(player==target) return false;
 						for(var i=0;i<hs.length;i++){
 							if(get.info(hs[i]).multitarget) continue;
@@ -344,9 +562,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					if(result.bool){
-						player.logSkill('cuikong',event.target);
-						player.addTempSkill('cuikong_draw','phaseUseCancelled');
-						player.storage.cuikong_draw=event.target;
+						player.logSkill('fenglue',event.target);
+						player.addTempSkill('fenglue_draw','phaseUseCancelled');
+						player.storage.fenglue_draw=event.target;
 						trigger.untrigger();
 						trigger.finish();
 						event.cards=result.cards.slice(0);
@@ -357,7 +575,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 3'
 					if(event.cards.length){
-						player.useCard(event.cards.shift(),event.target);
+						if(event.target.isIn()){
+							player.useCard(event.cards.shift(),event.target);
+						}
+						else{
+							event.cards.shift().discard();
+						}
 						event.redo();
 					}
 				},
@@ -367,7 +590,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						popup:false,
 						filter:function(event,player){
-							return event.player==player.storage.cuikong_draw;
+							return event.player==player.storage.fenglue_draw;
 						},
 						onremove:true,
 						content:function(){
@@ -3185,14 +3408,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_mingxiu:'明绣',
 			pal_jushifang:'居十方',
 
+			lingjia:'灵甲',
+			lingjia_info:'每当你失去一件装备牌，你可以随机获得一张本回合内未以此法获得的机关牌”',
+			yanshi:'偃师',
+			yanshi_info:'觉醒技，结束阶段，若你累计有3个回合使用过机关牌，你增加一点体力和体力上限，并将灵甲的描述中的“随机获得一张”改为“获得任意一张”',
 			ywuhun:'雾魂',
 			ywuhun_info:'锁定技，回合开始前，你获得一个额外的回合，并在此回合结束后将场上及牌堆的所有牌恢复至回合前的状态',
+			ywuhun_info_alter:'锁定技，回合开始前，你获得一个额外的回合（此回合中你的所有技能被禁用），并在此回合结束后将场上及牌堆的所有牌恢复至回合前的状态',
 			feichen:'飞尘',
 			feichen_info:'',
+			tanhua:'昙华',
+			tanhua_info:'锁定技，你回复体力的效果改为摸两张牌；当你进入濒死状态时，你回复一点体力并失去此技能',
 			yingfeng:'影锋',
 			yingfeng_info:'锁定技，每当你使用一张杀结算完毕后，你随机对一名不是此杀目标的敌方角色使用一张杀',
-			cuikong:'摧空',
-			cuikong_info:'你可以放弃出牌阶段，改为指定一名其他角色并选择任意张手牌，依次对该角色使用，若如此做，此阶段内该角色每受到一点伤害，你摸一张牌',
+			fenglue:'风掠',
+			fenglue_info:'你可以放弃出牌阶段，改为指定一名其他角色并选择任意张手牌，依次对该角色使用，若如此做，此阶段内该角色每受到一点伤害，你摸一张牌',
 			zongyu:'纵雨',
 			zongyu_info:'出牌阶段限一次，你可以弃置一张黑色牌，视为使用一张飞镖，随机指定两名敌方角色为目标',
 			fanling:'返灵',

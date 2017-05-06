@@ -521,10 +521,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 				}
 	        },
-	        liuxiaxianniang:{
-	            fullskin:true,
-	            type:'basic',
-	        },
+	        // liuxiaxianniang:{
+	        //     fullskin:true,
+	        //     type:'basic',
+	        // },
 	        bingpotong:{
 	            fullskin:true,
 				type:'jiguan',
@@ -708,21 +708,21 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                }
 	            }
 	        },
-	        wenhuangsan:{
-	            type:'jiguan',
-				enable:true,
-				fullskin:true,
-	        },
-	        tuhunsha:{
-	            type:'jiguan',
-				enable:true,
-				fullskin:true,
-	        },
-	        shenhuofeiya:{
-	            type:'jiguan',
-				enable:true,
-				fullskin:true,
-	        },
+	        // wenhuangsan:{
+	        //     type:'jiguan',
+			// 	enable:true,
+			// 	fullskin:true,
+	        // },
+	        // tuhunsha:{
+	        //     type:'jiguan',
+			// 	enable:true,
+			// 	fullskin:true,
+	        // },
+	        // shenhuofeiya:{
+	        //     type:'jiguan',
+			// 	enable:true,
+			// 	fullskin:true,
+	        // },
 	        mianlijinzhen:{
 	            type:'jiguan',
 				enable:true,
@@ -753,11 +753,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                }
 	            }
 	        },
-	        longxugou:{
-	            type:'jiguan',
-				enable:true,
-				fullskin:true,
-	        },
+	        // longxugou:{
+	        //     type:'jiguan',
+			// 	enable:true,
+			// 	fullskin:true,
+	        // },
 	        liutouge:{
 	            type:'jiguan',
 				enable:true,
