@@ -805,31 +805,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ywuhun:{
 				trigger:{player:'phaseBefore'},
 				forced:true,
-				alter:true,
 				filter:function(event){
 					return event.parent.name!='ywuhun';
 				},
 				intro:{
-					content:function(storage,player){
-						var str='回合结束后，场上及牌堆中的牌将恢复到回合前的状态';
-						var list=[];
-                        for(var i in player.disabledSkills){
-                            if(player.disabledSkills[i].contains('ywuhun')){
-                                list.push(i)
-                            }
-                        }
-						list.remove('ywuhun');
-    					if(list.length){
-    						str+='<br><br>失效技能：';
-    						for(var i=0;i<list.length;i++){
-    							if(lib.translate[list[i]+'_info']){
-    								str+=get.translation(list[i])+'、';
-    							}
-    						}
-    						str=str.slice(0,str.length-1);
-    					}
-						return str;
-					}
+					content:'回合结束后，场上及牌堆中的牌将恢复到回合前的状态'
 				},
 				video:function(player,data){
 					for(var i in data){
@@ -891,12 +871,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					player.markSkill('ywuhun');
-					if(get.is.altered('ywuhun')){
-	                    player.disableSkill('ywuhun',player.getSkills(true,false));
-					}
+					player.addSkill('ywuhun_end');
 					player.phase();
 					'step 2'
-					player.enableSkill('ywuhun');
+					player.removeSkill('ywuhun_end');
     				game.delay(0.5);
     				'step 3'
     				game.animate.window(1);
@@ -985,6 +963,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					ui.updatehl();
+				},
+				subSkill:{
+					end:{
+						trigger:{source:'damageEnd'},
+		    			priority:9,
+						forced:true,
+						popup:false,
+						silent:true,
+						content:function(){
+							var evt=_status.event.getParent('ywuhun');
+							if(evt){
+								_status.event=evt;
+								game.resetSkills();
+							}
+						},
+						ai:{
+							jueqing:true
+						}
+					}
 				}
 			},
 			fenglue:{
@@ -3944,8 +3941,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yanshi:'偃师',
 			yanshi_info:'觉醒技，结束阶段，若你累计有4个回合使用过机关牌，你增加一点体力和体力上限，然后用随机装备填满你的装备区',
 			ywuhun:'雾魂',
-			ywuhun_info:'锁定技，回合开始前，你获得一个额外的回合，并在此回合结束后将场上及牌堆的所有牌恢复至回合前的状态',
-			ywuhun_info_alter:'锁定技，回合开始前，你获得一个额外的回合（此回合中你的所有技能被禁用），并在此回合结束后将场上及牌堆的所有牌恢复至回合前的状态',
+			ywuhun_info:'锁定技，回合开始前，你获得一个额外的回合，并在此回合结束后复原场上及牌堆中的所有牌；当你在此回合中造成伤害后，终止所有结算并结束此回合',
 			feichen:'飞尘',
 			feichen_info:'',
 			tanhua:'昙华',

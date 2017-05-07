@@ -6106,12 +6106,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				"step 0"
     				player.draw();
     				"step 1"
-    				while(_status.event.name!='phase'){
-    					_status.event=_status.event.parent;
-    				}
-    				game.resetSkills();
-    				_status.event.finish();
-    				_status.event.untrigger(true);
+                    var evt=_status.event.getParent('phase');
+                    if(evt){
+                        game.resetSkills();
+                        _status.event=evt;
+        				_status.event.finish();
+        				_status.event.untrigger(true);
+                    }
     			},
                 ai:{
                     jueqing:true
