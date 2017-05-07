@@ -294,7 +294,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             kuangcai:{
                 trigger:{player:'phaseUseBegin'},
                 filter:function(event,player){
-                    return !_status.auto&&event.player==game.me&&!event.player.isMad();
+                    return !_status.auto&&event.player==game.me&&!event.player.isMad()&&!_status.connectMode;
                 },
                 content:function(){
                     player.forceCountChoose={chooseToUse:5,default:5};
