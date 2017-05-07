@@ -1118,7 +1118,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filterCard:{color:'black'},
-				position:'he',
 				filter:function(event,player){
 					return lib.card.feibiao&&player.countCards('he',{color:'black'});
 				},
@@ -1150,7 +1149,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.recover();
 				},
 				ai:{
-					threaten:1.3
+					threaten:1.5
 				}
 			},
 			dujiang:{
@@ -3955,7 +3954,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fenglue:'风掠',
 			fenglue_info:'你可以放弃出牌阶段，改为指定一名其他角色并选择任意张手牌，依次对该角色使用，若如此做，此阶段内该角色每受到一点伤害，你在结算后摸一张牌',
 			zongyu:'纵雨',
-			zongyu_info:'出牌阶段限一次，你可以弃置一张黑色牌，视为使用一张飞镖，随机指定两名敌方角色为目标',
+			zongyu_info:'出牌阶段限一次，你可以弃置一张黑色手牌，视为使用一张飞镖，随机指定两名敌方角色为目标',
 			fanling:'返灵',
 			fanling_info:'锁定技，每当一名角色失去体力，你回复一点体力，每回合只能发动一次',
 			huahu:'化狐',
