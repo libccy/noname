@@ -100,7 +100,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		zhangren:['male','qun',4,['chuanxin','zfengshi']],
     		zoushi:['female','qun',3,['zhuoshui','zqingcheng']],
 
-    		huangfusong:['male','qun',4,['fenyue']],
+            huangfusong:['male','qun',4,['fenyue']],
+            miheng:['male','qun',3,['kuangcai','shejian']],
+    		taoqian:['male','qun',3,['zhaohuo','yixiang','yirang']],
     	},
     	characterIntro:{
     		huangfusong:'字义真。安定郡朝那县（今宁夏彭阳）人。于黄巾起义时，以中郎将身份讨伐黄巾，用火攻大破张梁、张宝。[45]  后接替董卓进攻张梁，连胜七阵。掘张角墓，拜左车骑将军、冀州牧，因拒绝贿赂宦官而被免职。[46]  董卓死，王允命其与吕布等共至郿坞抄籍董卓家产、人口，皇甫嵩将坞中所藏良家子女，尽行释放。',
@@ -8390,7 +8392,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		dongyun:'董允',
     		mazhong:'马忠',
     		huangfusong:'皇甫嵩',
+            miheng:'祢衡',
+            taoqian:'陶谦',
 
+            kuangcai:'狂才',
+            kuangcai_info:'出牌阶段开始时，你可以令你此阶段内的主动出牌时间变为5秒，响应出牌时间也变为5秒。若如此做，你使用牌没距离和次数限制，且每当你于此阶段内使用牌时，你摸一张牌且主动出牌时间-1秒。你一回合通过狂才最多获得5张牌',
+            shejian:'舌剑',
+            shejian_info:'弃牌阶段结束时，若你于此阶段弃置的所有牌花色均不相同，你可以弃置一名其他角色的一张牌',
     		fenyue:'奋钺',
     		fenyue2:'奋钺',
     		fenyue2_bg:'钺',

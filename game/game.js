@@ -39903,7 +39903,7 @@
                 var pack=lib.characterPack[lib.configOL.characterPack[i]];
                 for(var j in pack){
 					if(typeof func=='function'&&func(j)) continue;
-                    if(j=='zuoci') continue;
+					if(j=='zuoci'||j=='miheng') continue;
                     if(lib.character[j]) libCharacter[j]=pack[j];
                 }
             }

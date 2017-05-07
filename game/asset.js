@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-    '1.9.26.3',
+    '1.9.27.1',
     'image/background/huangtian_bg.jpg',
     'image/background/ol_bg.jpg',
     'image/background/september_bg.jpg',
@@ -517,6 +517,7 @@ window.noname_asset_list=[
     'image/character/mazhong.jpg',
     'image/character/menghuo.jpg',
     'image/character/mifuren.jpg',
+    'image/character/miheng.jpg',
     'image/character/mizhu.jpg',
     'image/character/nianshou.jpg',
     'image/character/niutou.jpg',
@@ -750,6 +751,7 @@ window.noname_asset_list=[
     'image/character/swd_ziqiao.jpg',
     'image/character/tadun.jpg',
     'image/character/taishici.jpg',
+    'image/character/taoqian.jpg',
     'image/character/tianfeng.jpg',
     'image/character/wangji.jpg',
     'image/character/wanglang.jpg',

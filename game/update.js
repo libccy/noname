@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.9.27',
+    version:'1.9.27.1',
     update:'1.9.26',
     changeLog:[
         'bug修复'
@@ -7,7 +7,7 @@ window.noname_update={
     files:[
         'game/game.js',
         // 'game/package.js',
-        // 'game/config.js',
+        'game/config.js',
         // 'game/source.js',
         // 'game/pressure.js',
         'game/asset.js',
@@ -16,10 +16,10 @@ window.noname_update={
         // 'card/standard.js',
         'character/*',
         // 'character/rank.js',
-        // 'mode/boss.js',
-        // 'mode/versus.js',
+        'mode/boss.js',
+        'mode/versus.js',
         // 'mode/guozhan.js',
-        // 'mode/identity.js',
+        'mode/identity.js',
         // 'mode/chess.js',
         'mode/tafang.js',
         // 'mode/guozhan.js',
