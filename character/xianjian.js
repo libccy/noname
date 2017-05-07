@@ -3930,7 +3930,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chengxin:'澄心',
 			chengxin2:'澄心',
 			chengxin2_bg:'心',
-			chengxin_info:'每四轮限一次，当一名角色进入濒死状态时，你可以令将体力值回复至1，然后该角色防止一切伤害直到下一回合结束',
+			chengxin_info:'每四轮限一次，当一名角色进入濒死状态时，你可以令其将体力值回复至1，然后该角色防止一切伤害直到下一回合结束',
 			tianwu:'天舞',
 			tianwu_info:'每当你使用卡牌指定一名敌方角色为惟一目标，你可以对其施加一个随机的负面效果',
 			liguang:'离光',
