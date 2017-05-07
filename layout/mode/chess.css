@@ -290,3 +290,11 @@
 br.finish_game{
     display: none;
 }
+
+
+#arena.chess.slim_player.lslim_player .player.minskin:not(.fakeme)>.avatar:not(.fakeme){
+    left: 5px;
+    top: 5px;
+    width: calc(100% - 10px);
+    height: calc(100% - 10px);
+}

@@ -7,6 +7,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     	start:function(){
     		"step 0"
     		_status.mode=get.config('chess_mode');
+            if(lib.config.player_border=='normal'&&(lib.config.layout=='long'||lib.config.layout=='long2')){
+                ui.arena.classList.add('lslim_player');
+            }
     		// if(_status.mode=='leader'){
     		// 	_status.mode='combat';
     		// }

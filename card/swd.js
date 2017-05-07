@@ -1208,7 +1208,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:5,
 					result:{
 						target:function(player,target){
-							if(target.hasSkillTag('noe')) return target.countCards('e')*2;
+							if(target.hasSkillTag('noe')||target.hasSkillTag('reverseEquip')) return target.countCards('e')*2;
 							if(target.getEquip('baiyin')&&target.isDamaged()) return 2;
 							if(target.getEquip('xuanyuanjian')||target.getEquip('qiankundai')) return 1;
 							if(target.hasSkill('jiguanyaoshu_skill')) return 0.5;

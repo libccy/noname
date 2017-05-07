@@ -16,6 +16,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				!['system','menu'].contains(lib.config.swipe_up)){
 				ui.roundmenu.style.display='';
 			}
+			if(lib.config.player_border=='normal'&&(lib.config.layout=='long'||lib.config.layout=='long2')){
+                ui.arena.classList.add('lslim_player');
+            }
 			for(var i in result.element){
 				for(var j in result.element[i]){
 					if(j!='dieAfter'){
