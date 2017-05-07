@@ -596,7 +596,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:function(card,player){
 					return player.hasSkill('xuanyuan')||player.hp>2;
 				},
-				distance:{attackFrom:-3},
+				distance:{attackFrom:-2},
 				onEquip:function(){
 					if(!player.hasSkill('xuanyuan')&&player.hp<=2){
 						player.discard(card);
