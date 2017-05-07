@@ -805,6 +805,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ywuhun:{
 				trigger:{player:'phaseBefore'},
 				forced:true,
+				alter:true,
 				filter:function(event){
 					return event.parent.name!='ywuhun';
 				},
@@ -871,7 +872,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					player.markSkill('ywuhun');
-					player.addSkill('ywuhun_end');
+					if(get.is.altered('ywuhun')){
+						player.addSkill('ywuhun_end');
+					}
 					player.phase();
 					'step 2'
 					player.removeSkill('ywuhun_end');
@@ -3941,7 +3944,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yanshi:'偃师',
 			yanshi_info:'觉醒技，结束阶段，若你累计有4个回合使用过机关牌，你增加一点体力和体力上限，然后用随机装备填满你的装备区',
 			ywuhun:'雾魂',
-			ywuhun_info:'锁定技，回合开始前，你获得一个额外的回合，并在此回合结束后复原场上及牌堆中的所有牌；当你在此回合中造成伤害后，终止所有结算并结束此回合',
+			ywuhun_info:'锁定技，回合开始前，你获得一个额外的回合，并在此回合结束后复原场上及牌堆中的所有牌',
+			ywuhun_info_alter:'锁定技，回合开始前，你获得一个额外的回合，并在此回合结束后复原场上及牌堆中的所有牌；当你在此回合中造成伤害后，终止所有结算并结束此回合',
 			feichen:'飞尘',
 			feichen_info:'',
 			tanhua:'昙华',
