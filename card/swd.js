@@ -1249,14 +1249,22 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					target.changeHujia(2);
 					target.turnOver();
 					'step 1'
-					target.addTempSkill('qianxing',{player:'turnOverAfter'});
+					target.addTempSkill('hslingjian_jinjilengdong',{player:'turnOverAfter'});
 				},
 				ai:{
 					order:2,
 					result:{
 						target:function(player,target){
-							if(target.hasSkillTag('noturn')) return 0;
-							return -1;
+							var num=ai.get.threaten(target,player);
+							if(target.hasSkillTag('noturn')) return 2*num;
+							if(target.hp>4) return -1.2*num;
+							else if(target.hp==4) return -1*num;
+							else if(target.hp==3) return -0.9*num;
+							else if(target.hp==2) return -0.5*num;
+							else{
+								if(target.maxHp>2) return 1*num;
+								return 0;
+							}
 						},
 					},
 					useful:[2,0.5],
@@ -4186,9 +4194,26 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				popup:false,
 				silent:true,
+				temp:true,
 				content:function(){
 					player.removeSkill('hslingjian_xingtigaizao');
 					player.storage.hslingjian_xingtigaizao=0;
+				}
+			},
+			hslingjian_jinjilengdong:{
+				mark:true,
+				nopop:true,
+				temp:true,
+				intro:{
+					content:'不能使用卡牌，也不能成为卡牌的目标'
+				},
+				mod:{
+					targetEnabled:function(card,player,target){
+						return false;
+					},
+					cardEnabled:function(card,player){
+						return false;
+					}
 				}
 			},
 			qinglonglingzhu:{
@@ -4909,7 +4934,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			hslingjian_zhongxinghujia:'重型护甲',
 			hslingjian_zhongxinghujia_info:'可用于煅造装备；令一名角色装备一件随机防具，然后随机弃置其一张手牌',
 			hslingjian_jinjilengdong:'紧急冷冻',
-			hslingjian_jinjilengdong_info:'可用于煅造装备；令一名武将牌正面朝上的其他角色获得两点护甲并翻面，然后获得技能潜行直到武将牌翻回正面',
+			hslingjian_jinjilengdong_bg:'冻',
+			hslingjian_jinjilengdong_info:'可用于煅造装备；令一名武将牌正面朝上的其他角色获得两点护甲并翻面，该角色不能使用卡牌，也不能成为卡牌的目标直到武将牌翻回正面',
 			hslingjian_yinmilichang:'隐秘力场',
 			hslingjian_yinmilichang_info:'可用于煅造装备；令一名其他角色获得技能潜行，直到其下一回合开始',
 			hslingjian_xingtigaizao:'型体改造',

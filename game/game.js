@@ -41769,7 +41769,7 @@
     				for(i=0;i<skills.length;i++){
     					if(lib.translate[skills[i]+'_info']){
     						translation=get.translation(skills[i]).slice(0,2);
-							if(lib.skill[skills[i]].nobracket){
+							if(lib.skill[skills[i]]&&lib.skill[skills[i]].nobracket){
 								uiintro.add('<div><div class="skill">'+get.translation(skills[i])+'</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
 							}
 							else{

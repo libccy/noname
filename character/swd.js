@@ -392,12 +392,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						min=nh;
     					}
     				});
-    				if(game.countPlayer()>=7){
-    					return max-min<=2;
-    				}
-    				else{
-    					return max-min<=1;
-    				}
+    				return max-min<=1;
     			},
     			content:function(){
     				player.draw(2);
@@ -9275,7 +9270,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		jiefen:'解纷',
     		jiefen_info:'出牌阶段限一次，你可以令一名手牌数多于你的角色交给你一张牌，然后你交给一名手牌数少于你的角色一张牌',
     		datong:'大同',
-    		datong_info:'任意一名角色的结束阶段，若全场手牌数最多和最少的角色手牌数之差不超过1（人数不少于7时改为2），你摸两张牌',
+    		datong_info:'任意一名角色的结束阶段，若全场手牌数最多和最少的角色手牌数之差不超过1，你摸两张牌',
     		huodan:'火丹',
     		huodan_info:'出牌阶段限一次，你可以弃置一张红色牌并失去一点体力，然后将两点火属性伤害分配给1~2名角色',
     		huodan_info_alter:'出牌阶段限一次，你可以弃置一张红色牌并失去一点体力，然后将两点火属性伤害分配给1~2名角色；若你只分配了一名角色，该角色在结算后摸一张牌',

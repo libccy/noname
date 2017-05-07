@@ -377,51 +377,57 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			liuying:{
-				trigger:{player:'useCard'},
+				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
-					if(event.card.name!='sha') return false;
-					return game.hasPlayer(function(current){
-						return (event.targets.contains(current)==false&&current!=player&&
-						lib.filter.targetEnabled(event.card,player,current))
+					if(!player.storage.liuying) player.storage.liuying=[];
+					return event.card&&event.card.name=='sha'&&game.hasPlayer(function(current){
+						return !player.storage.liuying.contains(current)&&player.canUse('sha',current,false);
 					});
 				},
 				direct:true,
 				content:function(){
 					'step 0'
-					var list=game.filterPlayer(function(current){
-						return (trigger.targets.contains(current)==false&&current!=player&&
-						lib.filter.targetEnabled(trigger.card,player,current))
-					});
-					event.list=list;
+					player.chooseTarget(get.prompt('liuying'),function(card,player,target){
+						return !player.storage.liuying.contains(target)&&player.canUse('sha',target,false);
+					}).ai=function(target){
+						return ai.get.effect(target,{name:'sha'},player,player);
+					};
 					'step 1'
-					if(event.list.length){
-						player.chooseTarget(get.prompt('liuying'),function(card,player,target){
-							return event.list.contains(target);
-						}).ai=function(target){
-							return get.effect(target,trigger.card,player,player);
-						};
+					if(result.bool){
+						player.logSkill('liuying',result.targets);
+						event.target=result.targets[0];
+						var cards=get.cards();
+						player.showCards(cards,get.translation(player)+'对'+get.translation(result.targets)+'发动了【流影】');
+						event.bool=(get.color(cards[0])=='black');
 					}
 					else{
 						event.finish();
 					}
 					'step 2'
-					if(result.bool){
-						event.current=result.targets[0];
-						event.current.judge(function(card){
-							if(get.color(card)=='black') return -1;
-							return 0;
-						});
-						event.list.remove(event.current);
-						player.logSkill('liuying',event.current);
+					if(event.bool){
+						player.useCard({name:'sha'},event.target,false).animate=false;
 					}
-					else{
-						event.finish();
-					}
-					'step 3'
-					if(result.color=='black'){
-						trigger.targets.push(event.current);
-						game.log(event.current,'被追加为额外目标');
-						event.goto(1);
+				},
+				group:['liuying_count1','liuying_count2'],
+				subSkill:{
+					count1:{
+						trigger:{player:'shaAfter'},
+						forced:true,
+						popup:false,
+						silent:true,
+						content:function(){
+							if(!player.storage.liuying) player.storage.liuying=[];
+							player.storage.liuying.add(trigger.target);
+						}
+					},
+					count2:{
+						trigger:{player:'phaseAfter'},
+						forced:true,
+						popup:false,
+						silent:true,
+						content:function(){
+							delete player.storage.liuying;
+						}
 					}
 				}
 			},
@@ -1629,7 +1635,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiuhua:'袖花',
 			xiuhua_info:'每当一件其他角色的装备因被替换或弃置进入弃牌堆，你可以获得之',
 			liuying:'流影',
-			liuying_info:'每当你使用一张杀，你可以指定一名不是此杀目标的角色并进行一次判定，若结果是黑色，将其追加为杀的额外目标并可以再次判定',
+			liuying_info:'每当你使用一张杀结算完毕后，你可以指定一名本回合未成为过你的杀的目标的角色，并亮出牌堆顶的一张牌，若为黑色，你对该角色使用一张杀',
 			boyun:'拨云',
 			boyun1:'拨云',
 			boyun2:'拨云',
