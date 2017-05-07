@@ -262,13 +262,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         return false;
                     }
                     return game.hasPlayer(function(current){
-                        return current.maxHp>player.hp;
+                        return current.maxHp>player.maxHp;
                     });
                 },
                 content:function(){
                     'step 0'
                     player.chooseTarget(get.prompt('yirang'),function(card,player,target){
-                        return target.maxHp>player.hp;
+                        return target.maxHp>player.maxHp;
                     }).set('ai',function(target){
                         return (get.attitude(_status.event.player,target)-2)*target.maxHp;
                     });
