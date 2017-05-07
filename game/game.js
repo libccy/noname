@@ -23491,7 +23491,7 @@
 				}
 				var skills=game.players[i].getSkills();
 				for(var j=0;j<skills.length;j++){
-					if(lib.skill[skills[j]].temp){
+					if(lib.skill[skills[j]].vanish){
 						game.players[i].removeSkill(skills[j]);
 					}
 				}

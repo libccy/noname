@@ -863,6 +863,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				popup:false,
 				audio:false,
+				vanish:true,
 				filter:function(event,player){
 					return player.storage.mingkong?true:false;
 				},

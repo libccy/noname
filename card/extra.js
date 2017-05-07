@@ -379,6 +379,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					trigger.num++;
 				},
 				temp:true,
+				vanish:true,
 				onremove:function(player){
 					if(player.node.jiu){
 						player.node.jiu.delete();

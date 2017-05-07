@@ -4198,6 +4198,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				silent:true,
 				temp:true,
+				vanish:true,
 				content:function(){
 					player.removeSkill('hslingjian_xingtigaizao');
 					player.storage.hslingjian_xingtigaizao=0;
@@ -4702,6 +4703,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				temp:true,
+				vanish:true,
 				content:function(){
 					player.draw(2);
 					player.removeSkill('tianxianjiu');

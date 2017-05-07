@@ -1283,6 +1283,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		mengye2:{
     			temp:true,
     			mark:'character',
+				vanish:true,
     			intro:{
     				content:'由$控制本回合行动'
     			},

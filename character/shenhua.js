@@ -3568,6 +3568,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			forced:true,
     			popup:false,
     			audio:false,
+				vanish:true,
     			content:function(){
     				if(player.hp<player.maxHp) player.draw(player.maxHp-player.hp);
     				player.removeSkill('tianxiang2');
@@ -3659,6 +3660,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			forced:true,
     			popup:false,
     			audio:false,
+				vanish:true,
     			content:function(){
     				'step 0'
     				var source=player.storage.xintianxiang;
