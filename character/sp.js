@@ -201,6 +201,183 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		dongbai:['dongzhuo']
     	},
     	skill:{
+            zhaohuo:{
+                trigger:{global:'dying'},
+    			forced:true,
+    			popup:false,
+    			priority:12,
+    			filter:function(event,player){
+    				return event.player!=player&&player.maxHp>1;
+    			},
+                content:function(){
+                    'step 0'
+                    event.num=player.maxHp-1;
+                    player.loseMaxHp(event.num,true);
+                    'step 1'
+                    player.draw(event.num);
+                }
+            },
+            yixiang:{
+                trigger:{target:'useCardToBegin'},
+                frequent:true,
+                filter:function(event,player){
+                    if(event.player.hp<=player.hp) return false;
+                    var hs=player.getCards('h');
+                    var names=['sha','shan','tao','jiu'];
+                    for(var i=0;i<hs.length;i++){
+                        names.remove(hs[i].name);
+                    }
+                    for(var i=0;i<ui.cardPile.childElementCount;i++){
+                        if(names.contains(ui.cardPile.childNodes[i].name)){
+                            return true;
+                        }
+                    }
+                    return false;
+                },
+                usable:1,
+                content:function(){
+                    var hs=player.getCards('h');
+                    var list=[];
+                    var names=['sha','shan','tao','jiu'];
+                    for(var i=0;i<hs.length;i++){
+                        names.remove(hs[i].name);
+                    }
+                    for(var i=0;i<ui.cardPile.childElementCount;i++){
+                        if(names.contains(ui.cardPile.childNodes[i].name)){
+                            list.push(ui.cardPile.childNodes[i]);
+                        }
+                    }
+                    if(list.length){
+                        player.gain(list.randomGet(),'draw');
+                    }
+                }
+            },
+            yirang:{
+                trigger:{player:'phaseUseBegin'},
+                direct:true,
+                filter:function(event,player){
+                    if(!player.countCards('h',function(card){
+                        return get.type(card)!='basic';
+                    })){
+                        return false;
+                    }
+                    return game.hasPlayer(function(current){
+                        return current.maxHp>player.hp;
+                    });
+                },
+                content:function(){
+                    'step 0'
+                    player.chooseTarget(get.prompt('yirang'),function(card,player,target){
+                        return target.maxHp>player.hp;
+                    }).set('ai',function(target){
+                        return (get.attitude(_status.event.player,target)-2)*target.maxHp;
+                    });
+                    'step 1'
+                    if(result.bool){
+                        var cards=player.getCards('h',function(card){
+                            return get.type(card)!='basic';
+                        });
+                        var target=result.targets[0];
+                        var types=[];
+                        for(var i=0;i<cards.length;i++){
+                            types.add(get.type(cards[i]));
+                        }
+                        player.logSkill('yirang',target);
+                        player.$give(cards,target);
+                        target.gain(cards,player);
+                        player.gainMaxHp(target.maxHp-player.maxHp,true);
+                        player.recover(types.length);
+                        game.delay();
+                    }
+                }
+            },
+            kuangcai:{
+                trigger:{player:'phaseUseBegin'},
+                filter:function(event,player){
+                    return !_status.auto&&event.player==game.me&&!event.player.isMad();
+                },
+                content:function(){
+                    player.forceCountChoose={chooseToUse:5,default:5};
+                    player.addSkill('kuangcai_use');
+                    player.addSkill('kuangcai_cancel');
+                    ui.auto.hide();
+                },
+                subSkill:{
+                    use:{
+                        mod:{
+            				cardUsable:function(card){
+            					if(get.info(card)&&get.info(card).forceUsable) return;
+            					return Infinity;
+            				},
+            				targetInRange:function(){
+            					return true;
+            				}
+            			},
+            			trigger:{player:'useCard'},
+            			forced:true,
+            			usable:5,
+                        filter:function(event,player){
+                            if(!player.forceCountChoose){
+                                return false;
+                            }
+                            return true;
+                        },
+            			content:function(){
+            				player.draw();
+                            player.forceCountChoose.chooseToUse--;
+            			}
+                    },
+                    cancel:{
+                        trigger:{player:'phaseUseEnd'},
+                        forced:true,
+                        popup:false,
+                        silent:true,
+                        content:function(){
+                            delete player.forceCountChoose;
+                            ui.auto.show();
+                            player.removeSkill('kuangcai_use');
+                            player.removeSkill('kuangcai_cancel');
+                        }
+                    }
+                }
+            },
+            shejian:{
+    			trigger:{player:'phaseDiscardEnd'},
+    			direct:true,
+    			filter:function(event,player){
+    				if(event.cards){
+    					var suits=[];
+    					for(var i=0;i<event.cards.length;i++){
+    						var suit=get.suit(event.cards[i]);
+    						if(suits.contains(suit)){
+    							return false;
+    						}
+    						else{
+    							suits.push(suit);
+    						}
+    					}
+    					return true;
+    				}
+    				return false;
+    			},
+    			content:function(){
+                    'step 0'
+                    player.chooseTarget(get.prompt('shejian'),function(card,player,target){
+    					if(player==target) return false;
+    					return target.countCards('he')>0;
+    				}).ai=function(target){
+    					return -get.attitude(player,target);
+    				};
+    				'step 1'
+    				if(result.bool){
+    					player.logSkill('shejian',result.targets);
+    					player.discardPlayerCard(result.targets[0],'he',true);
+    				}
+    				else{
+    					event.finish();
+    				}
+    			},
+    		},
     		fenyue:{
     			enable:'phaseUse',
     			filter:function(event,player){
@@ -8395,6 +8572,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             miheng:'祢衡',
             taoqian:'陶谦',
 
+            zhaohuo:'招祸',
+            zhaohuo_info:'锁定技，当其他角色进入濒死状态时，你的体力上限变为1点，你每以此法减少1点体力上限，你摸一张牌',
+            yixiang:'义襄',
+            yixiang_info:'每名角色的回合限一次，当你成为一名角色使用牌的目标后，若其的体力值大于你的体力值，你可以随机获得牌堆里一张你没有的基本牌',
+            yirang:'揖让',
+            yirang_info:'出牌阶段开始时，你可以将所有非基本牌交给一名体力上限大于你的其他角色，然后调整体力上限至与该角色相同，你回复X点体力（X为你以此法交给其的牌的类别数）',
             kuangcai:'狂才',
             kuangcai_info:'出牌阶段开始时，你可以令你此阶段内的主动出牌时间变为5秒，响应出牌时间也变为5秒。若如此做，你使用牌没距离和次数限制，且每当你于此阶段内使用牌时，你摸一张牌且主动出牌时间-1秒。你一回合通过狂才最多获得5张牌',
             shejian:'舌剑',

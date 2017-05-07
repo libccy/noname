@@ -624,7 +624,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseToDiscard('h',get.prompt('xiepan')).set('prompt2','弃置一张手牌并获一件随机装备').set('logSkill','xiepan').ai=function(card){
-						return 8-ai.get.value(card);
+						return 8-get.value(card);
 					};
 					'step 1'
 					if(result.bool){

@@ -1255,14 +1255,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:2,
 					result:{
 						target:function(player,target){
-							var num=ai.get.threaten(target,player);
+							var num=get.threaten(target,player);
 							if(target.hasSkillTag('noturn')) return 2*num;
 							if(target.hp>4) return -1.2*num;
 							else if(target.hp==4) return -1*num;
 							else if(target.hp==3) return -0.9*num;
 							else if(target.hp==2) return -0.5*num;
 							else{
-								if(target.maxHp>2) return 1*num;
+								if(target.maxHp>2){
+									if(target.hujia) return 0.5*num;
+									return num;
+								}
 								return 0;
 							}
 						},

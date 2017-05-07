@@ -390,7 +390,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(get.prompt('liuying'),function(card,player,target){
 						return !player.storage.liuying.contains(target)&&player.canUse('sha',target,false);
 					}).ai=function(target){
-						return ai.get.effect(target,{name:'sha'},player,player);
+						return get.effect(target,{name:'sha'},player,player);
 					};
 					'step 1'
 					if(result.bool){

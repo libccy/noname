@@ -20647,10 +20647,11 @@
             var current=time;
             ui.timer.set(current,1);
             _status.countDown=setInterval(function(){
-                if(current){
-                    ui.timer.set(--current,current/time);
+                if(--current){
+                    ui.timer.set(current,current/time);
                 }
                 else{
+					ui.timer.set(0,0);
                     clearInterval(_status.countDown);
                     delete _status.countDown;
                     if(onEnd) onEnd();
@@ -20687,6 +20688,54 @@
                     }
                 }
             }
+			else if(_status.event.player.forceCountChoose&&_status.event.isMine()&&!_status.countDown){
+				var info=_status.event.player.forceCountChoose;
+				var num;
+				if(typeof info[_status.event.name]=='number'){
+					num=info[_status.event.name]
+				}
+				else{
+					num=info.default;
+				}
+				var finish=function(){
+					if(_status.event.endButton){
+						if(_status.event.skill){
+							ui.click.cancel();
+						}
+						ui.click.cancel();
+					}
+					else{
+						if(ui.confirm&&ui.confirm.str){
+							if(ui.confirm.str.indexOf('c')!=-1){
+								ui.click.cancel();
+							}
+							else if(ui.confirm.str.indexOf('o')!=-1){
+								ui.click.ok();
+							}
+						}
+						else if(['chooseControl','chooseBool'].contains(_status.event.name)&&_status.paused){
+							_status.event.result='ai';
+							game.resume();
+						}
+						else{
+							ui.click.auto('forced');
+							setTimeout(function(){
+								ui.click.auto('forced');
+							},200);
+						}
+					}
+                    ui.timer.hide();
+                };
+				if(!num){
+					ui.timer.hide();
+					game.uncheck();
+					setTimeout(finish,200);
+				}
+				else{
+					ui.timer.show();
+					game.countDown(num,finish);
+				}
+			}
         },
         stopCountChoose:function(){
             if(_status.countDown){
@@ -38678,7 +38727,7 @@
 				}
 			},
 			auto:function(){
-				if(ui.auto.classList.contains('hidden')) return;
+				if(ui.auto.classList.contains('hidden')&&arguments[0]!=='forced') return;
 				if(_status.paused2) return;
                 ui.click.shortcut(false);
 				if(!_status.auto){

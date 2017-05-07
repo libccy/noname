@@ -1048,7 +1048,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.dialog) event.dialog.close();
 					var dialog=ui.create.dialog('涉猎',event.cards);
 					player.chooseButton([0,5],dialog,true).set('ai',function(button){
-						return ai.get.value(button.link);
+						return get.value(button.link);
 					}).filterButton=function(button){
 						for(var i=0;i<ui.selected.buttons.length;i++){
 							if(get.suit(button.link)==get.suit(ui.selected.buttons[i].link)) return false;
