@@ -180,17 +180,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.markSkill('guijin');
 					'step 1'
 					if(event.cards.length){
-						var more=false,remain=0,nomore=false;
+						var more=false,remain=false,nomore=false;
 						if(event.cards.length>=3){
 							for(var i=0;i<event.cards.length;i++){
 								var value=get.value(event.cards[i],player,'raw');
 								if(value>=8){
 									more=true;
 								}
-								if(event.cards.length>=4&&value<=4){
-									remain=Math.min(remain,value);
+								if(event.cards.length>=4&&value<6){
+									if(remain===false){
+										remain=value;
+									}
+									else{
+										remain=Math.min(remain,value);
+									}
 								}
 							}
+						}
+						if(remain===false){
+							remain=0;
 						}
 						if(!more&&!game.hasPlayer(function(current){
 							return get.attitude(player,current)<0&&!current.skipList.contains('phaseDraw');
@@ -604,11 +612,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xiepan:{
 				trigger:{player:'loseEnd'},
-				check:function(event,player){
-					return player.countCards('h',function(card){
-						return get.value(card)<8;
-					});
-				},
+				direct:true,
 				filter:function(event,player){
 					if(player.countCards('h',{type:'basic'})) return false;
 					if(!player.countCards('h')) return false;
@@ -619,12 +623,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					if(!player.isUnderControl(true)){
-						player.showHandcards(player,'发动了【械磬】');
-					}
-					player.chooseToDiscard('h',true,'弃置一张手牌并获一件随机装备');
+					player.chooseToDiscard('h',get.prompt('xiepan')).set('prompt2','弃置一张手牌并获一件随机装备').set('logSkill','xiepan').ai=function(card){
+						return 8-ai.get.value(card);
+					};
 					'step 1'
-					player.gain(game.createCard(get.inpile('equip').randomGet()),'draw');
+					if(result.bool){
+						player.gain(game.createCard(get.inpile('equip').randomGet()),'draw');
+					}
 				},
 			},
 			yujia:{
@@ -708,6 +713,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return player.storage.yanshi==4;
 				},
+				intro:{
+					content:'累计#个回合使用过机关牌'
+				},
 				content:function(){
 					'step 0'
 					player.awakenSkill('yanshi');
@@ -741,6 +749,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						silent:true,
 						content:function(){
 							player.storage.yanshi++;
+							if(player.hasSkill('yanshi')){
+								player.markSkill('yanshi');
+								player.updateMarks();
+							}
 							player.addTempSkill('yanshi2','phaseAfter');
 						}
 					}
@@ -3928,7 +3940,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yujia:'御甲',
 			yujia_info:'每当你使用一张未强化的装备牌，你可以随机观看X张机关牌，并选择一张获得之，X为你本局使用过的机关牌数且至少为1',
 			xiepan:'械磐',
-			xiepan_info:'每当你失去最后一张基本牌，你可以展示并弃置一张手牌，然后获得一张随机装备牌',
+			xiepan_info:'每当你失去最后一张基本牌，你可以弃置一张手牌，然后获得一张随机装备牌',
 			yanshi:'偃师',
 			yanshi_info:'觉醒技，结束阶段，若你累计有4个回合使用过机关牌，你增加一点体力和体力上限，然后用随机装备填满你的装备区',
 			ywuhun:'雾魂',

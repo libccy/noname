@@ -836,7 +836,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         content:function(){
                             player.removeSkill('qianfu2');
                             player.draw(3);
-                            player.setAvatar('hs_selajin2','hs_selajin');
+                            player.setAvatar('hs_selajin','hs_selajin');
                         }
                     }
                 }
