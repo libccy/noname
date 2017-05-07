@@ -6,6 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_lixiaoyao:['male','qun',4,['tianjian','yufeng']],
 			pal_zhaoliner:['female','wei',3,['huimeng','tianshe']],
 			pal_linyueru:['female','wei',3,['guiyuan','qijian']],
+			// pal_anu:['female','wu',3,[]],
 
 			pal_wangxiaohu:['male','qun',4,['husha']],
 			pal_sumei:['female','shu',3,['sheying','dujiang','huahu']],
@@ -41,7 +42,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			pal_yuejinzhao:['male','wei',4,['ywuhun','yingfeng']],
 			pal_yueqi:['female','wei',3,['tianwu','liguang','shiying']],
-			// pal_mingxiu:['female','qun',4,[]],
+			pal_mingxiu:['female','shu',3,['linghuo','guijin','chengxin']],
 			// pal_xianqing:['male','qun',4,[]],
 			pal_luozhaoyan:['female','shu',4,['fenglue','tanhua']],
 			pal_jushifang:['male','shu',3,['yujia','xiepan','yanshi']],
@@ -84,6 +85,310 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_jiangcheng:'折剑山庄庄主欧阳英的得意门生，但因其蚩尤后人魔族的身份，令他无法被容于人界；再加上人界半魔同族饱受人类迫害，故最终成为净天教教主魔君“姜世离”，毅然肩负起保护同族的重任。',
 		},
 		skill:{
+			linghuo:{
+				init:function(player){
+					player.storage.linghuo=-1;
+				},
+				intro:{
+					content:function(storage,player){
+						var num=2-(game.roundNumber-storage);
+						if(num>0){
+							return get.cnNumber(num)+'轮后技能重置';
+						}
+						return '技能可发动';
+					},
+					markcount:function(storage,player){
+						var num=2-(game.roundNumber-storage);
+						if(num>0){
+							return num;
+						}
+						return 0;
+					}
+				},
+				trigger:{global:'phaseEnd'},
+				filter:function(event,player){
+					if(2-(game.roundNumber-player.storage.linghuo)>0) return false;
+					return event.player.getStat('damage')&&event.player!=player;
+				},
+				check:function(event,player){
+					return get.damageEffect(event.player,player,player,'fire')>0;
+				},
+				logTarget:'player',
+				line:'fire',
+				ai:{
+					expose:0.2,
+					threaten:1.3,
+				},
+				content:function(){
+					trigger.player.damage('fire');
+					player.storage.linghuo=game.roundNumber;
+					player.syncStorage('linghuo');
+					player.markSkill('linghuo');
+				},
+				group:'linghuo_mark',
+				subSkill:{
+					mark:{
+						trigger:{global:['phaseBegin','phaseCancelled']},
+						forced:true,
+						popup:false,
+						silent:true,
+						filter:function(event,player){
+							return _status.roundStart==event.player;
+						},
+						content:function(){
+							if(2-(game.roundNumber-player.storage.linghuo)>0){
+								player.updateMarks();
+							}
+							else{
+								player.unmarkSkill('linghuo');
+							}
+						}
+					}
+				}
+			},
+			guijin:{
+				init:function(player){
+					player.storage.guijin=-2;
+				},
+				intro:{
+					content:function(storage,player){
+						var num=3-(game.roundNumber-storage);
+						if(num>0){
+							return get.cnNumber(num)+'轮后技能重置';
+						}
+						return '技能可发动';
+					},
+					markcount:function(storage,player){
+						var num=3-(game.roundNumber-storage);
+						if(num>0){
+							return num;
+						}
+						return 0;
+					}
+				},
+				group:'guijin_mark',
+				enable:'phaseUse',
+				delay:0,
+				filter:function(event,player){
+					return 3-(game.roundNumber-player.storage.guijin)<=0;
+				},
+				content:function(){
+					'step 0'
+					event.cards=get.cards(4);
+					player.storage.guijin=game.roundNumber;
+					player.syncStorage('guijin');
+					player.markSkill('guijin');
+					'step 1'
+					if(event.cards.length){
+						var more=false,remain=0,nomore=false;
+						if(event.cards.length>=3){
+							for(var i=0;i<event.cards.length;i++){
+								var value=get.value(event.cards[i],player,'raw');
+								if(value>=8){
+									more=true;
+								}
+								if(event.cards.length>=4&&value<=4){
+									remain=Math.min(remain,value);
+								}
+							}
+						}
+						if(!more&&!game.hasPlayer(function(current){
+							return get.attitude(player,current)<0&&!current.skipList.contains('phaseDraw');
+						})){
+							var num=0;
+							for(var i=0;i<event.cards.length;i++){
+								num+=Math.max(0,get.value(event.cards[i],player,'raw'));
+							}
+							if(num>=12){
+								more=true;
+							}
+							else{
+								nomore=true;
+							}
+						}
+						player.chooseCardButton('归烬',event.cards,[1,event.cards.length]).ai=function(button){
+							if(nomore) return 0;
+							if(more){
+								return get.value(button.link,player,'raw')-remain;
+							}
+							else{
+								if(ui.selected.buttons.length) return 0;
+								return 8-get.value(button.link,player,'raw');
+							}
+						}
+					}
+					else{
+						event.goto(4);
+					}
+					'step 2'
+					if(result.bool){
+						for(var i=0;i<result.links.length;i++){
+							event.cards.remove(result.links[i]);
+						}
+						event.togive=result.links.slice(0);
+						player.chooseTarget('将'+get.translation(result.links)+'交给一名角色',true).ai=function(target){
+							var att=get.attitude(player,target)/Math.sqrt(target.countCards('h')+1);
+							if(result.links.length>1){
+								if(target==player&&target.needsToDiscard(result.links.length)>1){
+									return att/5;
+								}
+								return att;
+							}
+							else{
+								if(target.skipList.contains('phaseDraw')) return att/5;
+								return -att;
+							}
+						}
+					}
+					else{
+						event.goto(4);
+					}
+					'step 3'
+					if(result.targets.length){
+						result.targets[0].gain(event.togive,'draw');
+						result.targets[0].skip('phaseDraw');
+						result.targets[0].addTempSkill('guijin2',{player:'phaseBegin'});
+						player.line(result.targets[0],'green');
+						event.goto(1);
+					}
+					'step 4'
+					while(event.cards.length){
+						ui.cardPile.insertBefore(event.cards.pop(),ui.cardPile.firstChild);
+					}
+				},
+				ai:{
+					order:1,
+					result:{
+						player:function(player){
+							if(game.roundNumber==1&&player.hasUnknown()) return 0;
+							return 1;
+						}
+					}
+				},
+				subSkill:{
+					mark:{
+						trigger:{global:['phaseBegin','phaseCancelled']},
+						forced:true,
+						popup:false,
+						silent:true,
+						filter:function(event,player){
+							return _status.roundStart==event.player;
+						},
+						content:function(){
+							if(3-(game.roundNumber-player.storage.guijin)>0){
+								player.updateMarks();
+							}
+							else{
+								player.unmarkSkill('guijin');
+							}
+						}
+					}
+				}
+			},
+			guijin2:{
+				mark:true,
+				intro:{
+					content:'跳过下一个摸牌阶段'
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(card.name=='bingliang'||card.name=='caomu') return 0;
+						}
+					}
+				}
+			},
+			chengxin:{
+				init:function(player){
+					player.storage.chengxin=-3;
+				},
+				intro:{
+					content:function(storage,player){
+						var num=4-(game.roundNumber-storage);
+						if(num>0){
+							return get.cnNumber(num)+'轮后技能重置';
+						}
+						return '技能可发动';
+					},
+					markcount:function(storage,player){
+						var num=4-(game.roundNumber-storage);
+						if(num>0){
+							return num;
+						}
+						return 0;
+					}
+				},
+				enable:'chooseToUse',
+    			filter:function(event,player){
+					if(4-(game.roundNumber-player.storage.chengxin)>0) return false;
+    				return event.type=='dying';
+    			},
+    			filterTarget:function(card,player,target){
+    				return target==_status.event.dying;
+    			},
+    			selectTarget:-1,
+    			content:function(){
+    				target.recover(1-target.hp);
+					target.addTempSkill('chengxin2',{player:'phaseAfter'});
+					player.storage.chengxin=game.roundNumber;
+					player.syncStorage('chengxin');
+					player.markSkill('chengxin');
+    			},
+    			ai:{
+    				order:6,
+					threaten:1.4,
+    				skillTagFilter:function(player){
+						if(4-(game.roundNumber-player.storage.chengxin)>0) return false;
+    					if(!_status.event.dying) return false;
+    				},
+    				save:true,
+    				result:{
+    					target:3
+    				},
+    			},
+				group:'chengxin_mark',
+				subSkill:{
+					mark:{
+						trigger:{global:['phaseBegin','phaseCancelled']},
+						forced:true,
+						popup:false,
+						silent:true,
+						filter:function(event,player){
+							return _status.roundStart==event.player;
+						},
+						content:function(){
+							if(4-(game.roundNumber-player.storage.chengxin)>0){
+								player.updateMarks();
+							}
+							else{
+								player.unmarkSkill('chengxin');
+							}
+						}
+					}
+				}
+			},
+			chengxin2:{
+				trigger:{player:'damageBefore'},
+    			mark:true,
+    			forced:true,
+    			content:function(){
+    				trigger.untrigger();
+    				trigger.finish();
+    			},
+    			ai:{
+    				nofire:true,
+    				nothunder:true,
+    				nodamage:true,
+    				effect:{
+    					target:function(card,player,target,current){
+    						if(get.tag(card,'damage')) return [0,0];
+    					}
+    				},
+    			},
+    			intro:{
+    				content:'防止一切伤害'
+    			}
+			},
 			tianwu:{
 				trigger:{player:'useCardToBegin'},
 				filter:function(event,player){
@@ -3604,6 +3909,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_mingxiu:'明绣',
 			pal_jushifang:'居十方',
 
+			linghuo:'灵火',
+			linghuo_info:'每两轮限一次，在一名其他角色的结束阶段，若其本回合内造成过伤害，你可以对其造成一点火属性伤害',
+			guijin:'归烬',
+			guijin2:'归烬',
+			guijin2_bg:'烬',
+			guijin_info:'每三轮限一次，出牌阶段，你可以观看牌堆顶的4张牌，然后可以将其中任意张牌分配给任意角色，被分到牌的角色跳过下一摸牌阶段，然后将剩余牌以原顺序放回牌堆顶',
+			chengxin:'澄心',
+			chengxin2:'澄心',
+			chengxin2_bg:'心',
+			chengxin_info:'每四轮限一次，当一名角色进入濒死状态时，你可以令将体力值回复至1，然后该角色防止一切伤害直到下一回合结束',
 			tianwu:'天舞',
 			tianwu_info:'每当你使用卡牌指定一名敌方角色为惟一目标，你可以对其施加一个随机的负面效果',
 			liguang:'离光',

@@ -277,7 +277,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target){
-							return -1-target.countCards('h');
+							if(target.hasJudge('caomu')) return 0;
+							return -1.5/Math.sqrt(target.countCards('h')+1);
 						}
 					},
 					tag:{

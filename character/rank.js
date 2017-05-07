@@ -56,6 +56,7 @@ window.noname_character_rank={
         'swd_shuwaner',
     ],
     a:[
+        'pal_mingxiu',
         'pal_yueqi',
         'pal_luozhaoyan',
         'pal_xia',

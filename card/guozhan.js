@@ -541,7 +541,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					tag:{
 						loseCard:1,
-						discard:1
+						discard:1,
+						norepeat:1
 					}
 				},
 			},

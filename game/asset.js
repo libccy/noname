@@ -555,6 +555,7 @@ window.noname_asset_list=[
     'image/character/ow_wensidun.jpg',
     'image/character/ow_zhaliya.jpg',
     'image/character/ow_ana.jpg',
+    'image/character/pal_anu.jpg',
     'image/character/pal_changqing.jpg',
     'image/character/pal_hanlingsha.jpg',
     'image/character/pal_jiangcheng.jpg',

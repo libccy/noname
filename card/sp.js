@@ -443,7 +443,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								}
 							});
 						},
-						target:-1
+						target:function(player,target){
+							if(target.hasJudge('bingliang')) return 0;
+							return -1.5/Math.sqrt(target.countCards('h')+1);
+						}
 					},
 				}
 	        }

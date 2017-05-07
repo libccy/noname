@@ -5762,7 +5762,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				},
     			},
     			intro:{
-    				content:'防止所有伤害'
+    				content:'防止一切伤害'
     			}
     		},
     		bianxing2:{},
@@ -7907,7 +7907,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		bingjia2:'冰甲',
     		bingjia3:'冰甲',
     		bingjia3_bg:'免',
-    		bingjia_info:'出牌阶段，若你武将牌上没有牌，你可以将一张手牌背面朝上置于你的武将牌上，当你成为其他角色的与此牌花色相同的牌的目标时，你移去此牌，获得一点护甲，并且本回合内防止所有伤害',
+    		bingjia_info:'出牌阶段，若你武将牌上没有牌，你可以将一张手牌背面朝上置于你的武将牌上，当你成为其他角色的与此牌花色相同的牌的目标时，你移去此牌，获得一点护甲，并且本回合内防止一切伤害',
     		bianxing:'变形',
     		bianxing_info:'当一其他角色于回合内使用卡牌指定了惟一的其他目标后，你可以用一张合理的基本牌替代此牌，每名角色的回合限一次',
     		xianzhi:'先知',

@@ -1198,12 +1198,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            nopop:true,
 	            intro:{
 	                content:function(storage,player){
-	                    return '你不能成为延时锦囊牌的目标（剩余'+player.storage.molicha_markcount+'回合）'
+	                    return '你不能成为过河拆桥或延时锦囊牌的目标（剩余'+player.storage.molicha_markcount+'回合）'
 	                }
 	            },
 	            mod:{
 					targetEnabled:function(card){
-						if(get.type(card)=='delay'){
+						if(get.type(card)=='delay'||card.name=='guohe'){
 							return false;
 						}
 					}
@@ -1217,15 +1217,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                }
 	                else{
 	                    player.updateMarks();
-	                }
-	            },
-	            ai:{
-	                effect:{
-	                    target:function(card){
-	                        if(get.type(card)=='delay'){
-	    						return 'zeroplayertarget';
-	    					}
-	                    }
 	                }
 	            }
 	        },
@@ -1637,7 +1628,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	        yuanbaorou:'元宝肉',
 	        yuanbaorou_info:'你在出牌阶段可以额外使用一张杀，持续三回合',
 	        molicha:'茉莉茶',
-	        molicha_info:'弃置判定区内的所有牌；你不能成为延时锦囊牌的目标，持续五回合',
+	        molicha_info:'弃置判定区内的所有牌；你不能成为过河拆桥或延时锦囊牌的目标，持续五回合',
 	        mapodoufu:'麻婆豆腐',
 	        mapodoufu_info:'结束阶段，你有65%的机率弃置一名随机敌人的一张随机牌，持续三回合',
 	    },

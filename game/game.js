@@ -8904,14 +8904,14 @@
     					else{
                             if(info.logTarget&&info.logLine!==false){
                                 if(typeof info.logTarget=='string'){
-                                    player.logSkill(event.skill,trigger[info.logTarget]);
+                                    player.logSkill(event.skill,trigger[info.logTarget],info.line);
                                 }
                                 else if(typeof info.logTarget=='function'){
-                                    player.logSkill(event.skill,info.logTarget(trigger,player));
+                                    player.logSkill(event.skill,info.logTarget(trigger,player),info.line);
                                 }
                             }
     						else{
-                                player.logSkill(event.skill);
+                                player.logSkill(event.skill,false,info.line);
                             }
     					}
     				}
@@ -41364,7 +41364,7 @@
                 var modepack=lib.characterPack['mode_'+get.mode()];
                 if(lib.config.show_favourite&&lib.character[node.name]&&game.players.contains(node)&&
 					(!modepack||!modepack[node.name])&&(!simple||get.is.phoneLayout())){
-                    var addFavourite=ui.create.div('.text.center');
+                    var addFavourite=ui.create.div('.text.center.pointerdiv');
                     addFavourite.link=node.link;
                     if(lib.config.favouriteCharacter.contains(node.name)){
                         addFavourite.innerHTML='移除收藏';
@@ -41783,7 +41783,7 @@
                     var modepack=lib.characterPack['mode_'+get.mode()];
                     if(lib.config.show_favourite&&
                     lib.character[node.link]&&(!modepack||!modepack[node.link])&&(!simple||get.is.phoneLayout())){
-                        var addFavourite=ui.create.div('.text.center');
+                        var addFavourite=ui.create.div('.text.center.pointerdiv');
                         addFavourite.link=node.link;
                         addFavourite.style.marginBottom='15px';
                         if(lib.config.favouriteCharacter.contains(node.link)){
