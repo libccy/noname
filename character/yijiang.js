@@ -1021,6 +1021,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{player:'phaseEnd'},
     			forced:true,
     			popup:false,
+                silent:true,
     			content:function(){
     				delete player.storage.jiaozhao;
     				delete player.storage.jiaozhao_card;
@@ -3901,6 +3902,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			viewAs:{name:'sha'},
     			prompt:'将两张手牌当杀使用或打出',
     			check:function(card){
+                    if(_status.event.name=='chooseToRespond'){
+                        if(card.name=='sha') return 0;
+                        return 6-get.useful(card);
+                    }
     				if(_status.event.player.countCards('h')<4) return 6-get.useful(card);
     				return 7-get.useful(card);
     			},
