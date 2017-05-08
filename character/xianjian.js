@@ -887,11 +887,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				for(var i=0;i<storage.length;i++){
     					var current=storage[i].player;
     					if(current.isAlive()){
+							current.removeEquipTrigger();
 							var cards=current.getCards('hej');
 							for(var j=0;j<cards.length;j++){
 								cards[j].discard();
 							}
-							current.removeEquipTrigger();
     					}
     				}
     				'step 5'
