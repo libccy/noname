@@ -875,7 +875,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(get.is.altered('ywuhun')){
 						player.addSkill('ywuhun_end');
 					}
-					player.phase();
+					player.phase('ywuhun');
 					'step 2'
 					player.removeSkill('ywuhun_end');
     				game.delay(0.5);

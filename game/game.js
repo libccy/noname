@@ -39381,7 +39381,7 @@
 			}
 			if(ui.dialog&&!ui.dialog.classList.contains('noupdate')){
 				if(game.chess){
-					if(ui.dialog.content.scrollHeight<240&&(!ui.dialog.buttons||!ui.dialog.buttons.length)){
+					if(ui.dialog.content.scrollHeight<240&&(!ui.dialog.buttons||!ui.dialog.buttons.length)&&!ui.dialog.forcebutton){
 						ui.dialog.style.height=ui.dialog.content.offsetHeight+'px';
 						ui.dialog.classList.add('slim');
 					}
