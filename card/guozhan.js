@@ -240,24 +240,36 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return Math.random()<0.5?'选项一':'选项三';
 					}
 					else{
-						if(player.hasSkillTag('maixie')||player.hp<=2) return '选项一';
+						if(_status.event.getParent().nomingzhi){
+							if(_status.event.controls.contains('选项二')) return '选项二';
+							return '选项一';
+						}
+						if(player.hasSkillTag('maixie_hp')||player.hp<=2) return '选项一';
 						return Math.random()<0.5?'选项一':'选项二';
 					}
 				},
 				content:function(){
 					'step 0'
 					var choiceList=['明置一张武将牌，然后摸一张牌','失去1点体力'];
+					event.nomingzhi=target.hasSkillTag('nomingzhi',false,null,true);
+					if(event.nomingzhi){
+						choiceList.shift();
+					}
 					if(target.countCards('he',{type:'equip'})){
 						choiceList.push('弃置一张装备牌');
 					}
 					target.chooseControl(lib.card.chiling.chooseai).set('prompt','敕令').set('choiceList',choiceList);
 					'step 1'
-					if(result.control=='选项一'){
+					var index=result.index;
+					if(event.nomingzhi){
+						index++;
+					}
+					if(index==0){
 						target.chooseControl('主将','副将',function(){
 							return Math.floor(Math.random()*2);
 						}).set('prompt','选择要明置的武将牌');
 					}
-					else if(result.control=='选项二'){
+					else if(index==1){
 						target.loseHp();
 						event.finish();
 					}
