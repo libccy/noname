@@ -1797,6 +1797,16 @@
 						},
 						unfrequent:true,
 					},
+					autoborder_start:{
+						name:'基础边框颜色',
+						init:'bronze',
+						item:{
+							bronze:'铜',
+							silver:'银',
+							gold:'金'
+						},
+						unfrequent:true
+					},
 					player_border:{
 						name:'边框宽度',
 						init:'normal',
@@ -11849,6 +11859,14 @@
 						for(var j=0;j<source.stat.length;j++){
 							if(source.stat[j].damage!=undefined) dnum+=source.stat[j].damage;
 						}
+						if(dnum>=2){
+							if(lib.config.autoborder_start=='silver'){
+								dnum+=4;
+							}
+							else if(lib.config.autoborder_start=='gold'){
+								dnum+=8;
+							}
+						}
 						if(lib.config.autoborder_count=='damage'){
 							source.node.framebg.dataset.decoration='';
 							if(dnum>=10){
@@ -12152,7 +12170,7 @@
 						switch(source.node.framebg.dataset.auto){
 							case 'gold':case 'silver':source.node.framebg.dataset.auto='gold';break;
 							case 'bronze':source.node.framebg.dataset.auto='silver';break;
-							default:source.node.framebg.dataset.auto='bronze';
+							default:source.node.framebg.dataset.auto=lib.config.autoborder_start||'bronze';
 						}
 						if(lib.config.autoborder_count=='kill'){
 							source.node.framebg.dataset.decoration=source.node.framebg.dataset.auto;

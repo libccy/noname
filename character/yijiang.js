@@ -880,13 +880,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					event.finish();
     					return;
     				}
-    				var list=['sha','shan','tao','jiu'];
+    				var list=['sha','sha','sha','shan','tao','jiu'];
     				if(player.storage.jiaozhao1){
     					list=list.concat(['taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman']);
     				}
     				for(var i=0;i<list.length;i++){
-    					if(i<=4){
-    						list[i]=['基本','',list[i]];
+    					if(i<=6){
+                            if(i==1){
+                                list[i]=['基本','',list[i],'fire'];
+                            }
+                            else if(i==2){
+                                list[i]=['基本','',list[i],'thunder'];
+                            }
+    						else{
+                                list[i]=['基本','',list[i]];
+                            }
     					}
     					else{
     						list[i]=['锦囊','',list[i]];
@@ -956,13 +964,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					return button.link[2]==_status.event.choice?1:0;
     				}).set('choice',choice);
     				'step 3'
-    				var chosen=result.links[0][2];
-    				event.target.showCards(game.createCard({name:chosen,suit:cards[0].suit,number:cards[0].number}),get.translation(event.target)+'声明了'+get.translation(chosen));
+                    var chosen=result.links[0][2];
+    				var nature=result.links[0][3];
+                    var fakecard={name:chosen,suit:cards[0].suit,number:cards[0].number,nature:nature};
+    				event.target.showCards(game.createCard(fakecard),get.translation(event.target)+'声明了'+get.translation(chosen));
     				player.storage.jiaozhao=cards[0];
-    				player.storage.jiaozhao_card=chosen;
+    				player.storage.jiaozhao_card=fakecard;
     				game.broadcastAll(function(name){
-    					lib.skill.jiaozhao2.viewAs={name:name};
-    				},result.links[0][2]);
+    					lib.skill.jiaozhao2.viewAs=fakecard;
+    				},fakecard);
     			},
     			ai:{
     				order:9,
@@ -987,7 +997,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			audio:'jiaozhao',
     			filter:function(event,player){
     				if(!player.storage.jiaozhao) return false;
-    				var name=player.storage.jiaozhao_card;
+    				var name=player.storage.jiaozhao_card.name;
     				if(name=='tao'||name=='shan'||name=='wuzhong'||name=='jiu') return false;
     				return player.getCards('h').contains(player.storage.jiaozhao);
     			},
@@ -998,7 +1008,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			popname:true,
     			filterTarget:function(card,player,target){
     				if(player==target) return false;
-    				return lib.filter.filterTarget({name:player.storage.jiaozhao_card},player,target);
+    				return lib.filter.filterTarget(player.storage.jiaozhao_card,player,target);
     			},
     			check:function(card){
     				return 8-get.value(card);
