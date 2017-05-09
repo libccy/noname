@@ -1348,7 +1348,7 @@
 					},
 					hp_style:{
 						name:'体力条样式',
-						init:'default',
+						init:'ol',
 						item:{
 							default:'默认',
 							// official:'勾玉',
@@ -2483,9 +2483,11 @@
 						}
 						if(lib.config.border_style=='auto'){
 							map.autoborder_count.show();
+							map.autoborder_start.show();
 						}
 						else{
 							map.autoborder_count.hide();
+							map.autoborder_start.hide();
 						}
 					},
 				}
