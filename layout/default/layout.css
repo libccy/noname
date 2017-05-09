@@ -289,25 +289,6 @@ table {
 	border-radius: 12px;
 }
 
-#window[data-global_font='xiaozhuan'] {
-	font-family: 'xiaozhuan';
-}
-#window[data-global_font='lishu'] {
-	font-family: 'lishu';
-}
-#window[data-global_font='xinwei'] {
-	font-family: 'xinwei';
-}
-#window[data-global_font='huangcao'] {
-	font-family: 'huangcao','xinwei';
-}
-
-#window[data-global_font='xiaozhuan'] #control,
-#window[data-global_font='lishu'] #control,
-#window[data-global_font='xinwei'] #control,
-#window[data-global_font='huangcao'] #control {
-	font-family: 'STHeiti','SimHei','Microsoft JhengHei','Microsoft YaHei','WenQuanYi Micro Hei',Helvetica,Arial,sans-serif
-}
 
 #arena.playerhidden>.player,
 #arena.playerhidden>#mebg,
@@ -1633,7 +1614,6 @@ div:not(.handcards)>.card>.info>span,
 	left: auto;
 	right: 3px;
 	top: 3px;
-	font-family: 'huangcao';
 	/*font-size: 20px;*/
 }
 .button.newstyle>.name{
@@ -1781,26 +1761,6 @@ div:not(.handcards)>.card>.info>span,
 .grayscale{
 	filter: grayscale(1);
 	-webkit-filter: grayscale(1);
-}
-
-#arena[data-name_font='xiaozhuan'] .player>.name,
-#arena[data-name_font='xiaozhuan'] .button.character>.name {
-	font-family: 'xiaozhuan';
-}
-
-#arena[data-name_font='lishu'] .player>.name,
-#arena[data-name_font='lishu'] .button.character>.name {
-	font-family: 'lishu';
-}
-
-#arena[data-name_font='xinwei'] .player>.name,
-#arena[data-name_font='xinwei'] .button.character>.name {
-	font-family: 'xinwei';
-}
-
-#arena[data-name_font='huangcao'] .player>.name,
-#arena[data-name_font='huangcao'] .button.character>.name {
-	font-family: 'huangcao','xinwei';
 }
 
 .player>.nameol {
@@ -3199,30 +3159,6 @@ div:hover>.intro {
 	display: inline-flex;
 	transition: all 0.2s;
 }
-#arena[data-identity_font='xiaozhuan'] .player .identity>div {
-	font-family: 'xiaozhuan';
-}
-#arena[data-identity_font='lishu'] .player .identity>div {
-	font-family: 'lishu';
-}
-#arena[data-identity_font='xinwei'] .player .identity>div {
-	font-family: 'xinwei';
-}
-#arena[data-identity_font='huangcao'] .player .identity>div {
-	font-family: 'huangcao','xinwei';
-}
-#arena[data-cardtext_font='xiaozhuan'] .card div:not(.info):not(.background) {
-	font-family: 'xiaozhuan';
-}
-#arena[data-cardtext_font='lishu'] .card div:not(.info):not(.background) {
-	font-family: 'lishu';
-}
-#arena[data-cardtext_font='xinwei'] .card div:not(.info):not(.background) {
-	font-family: 'xinwei';
-}
-#arena[data-cardtext_font='huangcao'] .card div:not(.info):not(.background) {
-	font-family: 'huangcao','xinwei';
-}
 
 .player .identity>div {
 	margin: auto;
@@ -3886,16 +3822,6 @@ div:hover>.wunature {
 .player:not(.glow_phase)>.avatar.glow2,
 .button.glow2:not(.selected) {
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 5px, rgba(10, 155, 67, 1) 0 0 5px, rgba(10, 155, 67, 1) 0 0 10px, rgba(10, 155, 67, 1) 0 0 10px !important
-}
-
-#arena[data-glow_phase="yellow"] .player:not(.selectable):not(.selected).glow_phase {
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgb(235, 239, 59) 0 0 15px, rgb(199, 64, 64) 0 0 15px !important;
-}
-#arena[data-glow_phase="green"] .player:not(.selectable):not(.selected).glow_phase {
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;
-}
-#arena[data-glow_phase="purple"] .player:not(.selectable):not(.selected).glow_phase {
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgb(178, 59, 239) 0 0 15px, rgb(199, 64, 101) 0 0 15px !important;
 }
 
 .control.blue {

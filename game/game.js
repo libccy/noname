@@ -2110,15 +2110,7 @@
 						},
 						onclick:function(bool){
 							game.saveConfig('glow_phase',bool);
-							if(_status.currentPhase){
-								if(lib.config.glow_phase){
-									_status.currentPhase.classList.add('glow_phase');
-									ui.arena.dataset.glow_phase=lib.config.glow_phase;
-								}
-								else{
-									_status.currentPhase.classList.remove('glow_phase');
-								}
-							}
+							lib.init.cssstyles();
 						}
 					},
 					fold_card:{
@@ -2350,7 +2342,7 @@
 						},
 						onclick:function(font){
 							game.saveConfig('name_font',font);
-							ui.arena.dataset.name_font=font;
+							lib.init.cssstyles();
 						}
 					},
 					identity_font:{
@@ -2366,7 +2358,7 @@
 						},
 						onclick:function(font){
 							game.saveConfig('identity_font',font);
-							ui.arena.dataset.identity_font=font;
+							lib.init.cssstyles();
 						}
 					},
 					cardtext_font:{
@@ -2382,7 +2374,7 @@
 						},
 						onclick:function(font){
 							game.saveConfig('cardtext_font',font);
-							ui.arena.dataset.cardtext_font=font;
+							lib.init.cssstyles();
 						}
 					},
 					global_font:{
@@ -2401,24 +2393,9 @@
 						},
 						onclick:function(font){
 							game.saveConfig('global_font',font);
-							ui.window.dataset.global_font=font;
+							lib.init.cssstyles();
 						}
 					},
-					// font_size:{
-					// 	name:'字体大小',
-					// 	init:'16',
-					// 	unfrequent:true,
-					// 	item:{
-					// 		'14':'14px',
-					// 		'16':'16px',
-					// 		'18':'18px',
-					// 		'20':'20px',
-					// 	},
-					// 	onclick:function(font){
-					// 		game.saveConfig('font_size',font);
-					// 		ui.arena.dataset.font_size=font;
-					// 	}
-					// },
 					update:function(config,map){
 						if(lib.config.change_skin){
 							map.change_skin_auto.show();
@@ -3238,7 +3215,7 @@
 								this.firstChild.innerHTML='已重置'
 								game.saveConfig('new_tutorial',false);
 								game.saveConfig('prompt_hidebg');
-								game.saveConfig('prompt_hidemode');
+								game.saveConfig('prompt_hidepack');
 								var that=this;
 								setTimeout(function(){
 									that.firstChild.innerHTML='重置新手向导';
@@ -7685,6 +7662,27 @@
 				if(onerror) oReq.addEventListener("error",onerror);
 				oReq.open("GET", url);
 				oReq.send();
+			},
+			cssstyles:function(){
+				if(ui.css.styles){
+					ui.css.styles.remove();
+				}
+				ui.css.styles=lib.init.sheet();
+				ui.css.styles.sheet.insertRule('#arena .player>.name,#arena .button.character>.name {font-family: '+(lib.config.name_font||'xinwei')+',xinwei}',0);
+				ui.css.styles.sheet.insertRule('#arena .player .identity>div {font-family: '+(lib.config.identity_font||'huangcao')+',xinwei}',0);
+				ui.css.styles.sheet.insertRule('.button.character.newstyle>.identity {font-family: '+(lib.config.identity_font||'huangcao')+',xinwei}',0);
+				if(lib.config.cardtext_font&&lib.config.cardtext_font!='default'){
+					ui.css.styles.sheet.insertRule('.card div:not(.info):not(.background) {font-family: '+lib.config.cardtext_font+';}',0);
+				}
+				if(lib.config.global_font&&lib.config.global_font!='default'){
+					ui.css.styles.sheet.insertRule('#window {font-family: '+lib.config.global_font+',xinwei}',0);
+					ui.css.styles.sheet.insertRule('#window #control{font-family: STHeiti,SimHei,Microsoft JhengHei,Microsoft YaHei,WenQuanYi Micro Hei,Helvetica,Arial,sans-serif}',0);
+				}
+				switch(lib.config.glow_phase){
+					case 'yellow':ui.css.styles.sheet.insertRule('#arena .player:not(.selectable):not(.selected).glow_phase {box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgb(235, 239, 59) 0 0 15px, rgb(199, 64, 64) 0 0 15px !important;',0);break;
+					case 'green':ui.css.styles.sheet.insertRule('#arena .player:not(.selectable):not(.selected).glow_phase {box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;',0);break;
+					case 'purple':ui.css.styles.sheet.insertRule('#arena .player:not(.selectable):not(.selected).glow_phase {box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgb(178, 59, 239) 0 0 15px, rgb(199, 64, 101) 0 0 15px !important;',0);break;
+				}
 			},
 			layout:function(layout,nosave){
 				if(!nosave) game.saveConfig('layout',layout);
@@ -34914,23 +34912,11 @@
 				if(lib.config.keep_awake&&window.plugins&&window.plugins.insomnia){
 					window.plugins.insomnia.keepAwake();
 				}
-				// var themeentry='background_color_'+lib.config.theme;
-				// if(lib.config[themeentry]){
-				// 	document.body.dataset[themeentry]=lib.config[themeentry];
-				// }
-				// themeentry='theme_color_'+lib.config.theme;
-				// if(lib.config[themeentry]){
-				// 	document.body.dataset[themeentry]=lib.config[themeentry];
-				// }
 
-                ui.arena.dataset.player_height=lib.config.player_height||'default';
+                lib.init.cssstyles();
+
+				ui.arena.dataset.player_height=lib.config.player_height||'default';
 				ui.arena.dataset.target_shake=lib.config.target_shake||'off';
-				ui.arena.dataset.name_font=lib.config.name_font||'xinwei';
-				ui.arena.dataset.identity_font=lib.config.identity_font||'huangcao';
-				ui.arena.dataset.cardtext_font=lib.config.cardtext_font||'default';
-				ui.window.dataset.global_font=lib.config.global_font||'default';
-				// ui.arena.dataset.font_size=lib.config.font_size||'16';
-				ui.arena.dataset.glow_phase=lib.config.glow_phase;
 				ui.backgroundMusic=document.createElement('audio');
 				ui.backgroundMusic.volume=lib.config.volumn_background/8;
 				game.playBackgroundMusic();
