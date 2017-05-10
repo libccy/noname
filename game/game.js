@@ -29347,7 +29347,11 @@
 							list.push(['',get.translation(get.type(info[i],'trick')),info[i]]);
 						}
                         var sortCard=function(card){
-                            var type=lib.card[card[2]].type;
+							var type=lib.card[card[2]].type;
+                            var subtype=lib.card[card[2]].subtype;
+							if(lib.cardType[subtype]){
+                                return lib.cardType[subtype];
+                            }
                             if(lib.cardType[type]){
                                 return lib.cardType[type];
                             }
@@ -40546,7 +40550,8 @@
 						lib.onwash[i]();
 					}
 					for(i=0;i<ui.discardPile.childNodes.length;i++){
-						if(get.info(ui.discardPile.childNodes[i]).vanish) continue;
+						if(get.info(ui.discardPile.childNodes[i]).vanish||
+						ui.discardPile.childNodes[i].storage.vanish) continue;
 						cards.push(ui.discardPile.childNodes[i]);
 					}
 					cards.randomSort();
@@ -41026,7 +41031,11 @@
 			var func;
 			if(sort=='type_sort'){
 				func=function(card){
-                    var type=get.type(card);
+					var type=get.type(card);
+                    var subtype=get.subtype(card);
+					if(lib.cardType[subtype]){
+                        return lib.cardType[subtype];
+                    }
                     if(lib.cardType[type]){
                         return lib.cardType[type];
                     }

@@ -26,6 +26,7 @@ window.noname_package={
         swd:'轩辕剑',
         gujian:'古剑奇谭',
         hearth:'炉石传说',
+        gwent:'昆特牌',
     },
     play:{
         boss:'诸神降临',
