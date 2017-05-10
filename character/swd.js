@@ -7695,19 +7695,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					if(lib.card[i].mode&&lib.card[i].mode.contains(lib.config.mode)==false) continue;
     					if(lib.card[i].type=='delay') list.push([cards[0].suit,cards[0].number,i]);
     				}
-    				var dialog=ui.create.dialog([list,'vcard']);
-    				var bing=target.countCards('h')<=1;
+    				var dialog=ui.create.dialog('玄咒',[list,'vcard']);
+                    var bing=target.countCards('h')<=1;
     				player.chooseButton(dialog,true,function(button){
-    					if(bing&&button.link[2]=='bingliang'){
-    						return 2;
-    					}
-    					if(button.link[2]=='lebu'){
-    						return 1;
-    					}
-    					if(button.link[2]=='guiyoujie'){
-    						return 0.5;
-    					}
-    					return 0.2;
+                        if(ai.get.effect(target,{name:button.link[2]},player,player)>0){
+                            if(button.link[2]=='bingliang'){
+                                if(bing) return 2;
+                                return 0.7;
+        					}
+        					if(button.link[2]=='lebu'){
+        						return 1;
+        					}
+        					if(button.link[2]=='guiyoujie'){
+        						return 0.5;
+        					}
+        					if(button.link[2]=='caomu'){
+        						return 0.3;
+        					}
+        					return 0.2;
+                        }
+                        return 0;
     				}).filterButton=function(button){
     					return !target.hasJudge(button.link[2]);
     				};
@@ -7716,7 +7723,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			ai:{
     				result:{
-    					target:-1
+                        player:function(player,target){
+							var eff=0;
+							for(var i in lib.card){
+								if(lib.card[i].type=='delay'){
+									var current=ai.get.effect(target,{name:i},player,player);
+									if(current>eff){
+										eff=current;
+									}
+								}
+							}
+							return eff;
+						}
     				},
     				order:9.5,
     			}

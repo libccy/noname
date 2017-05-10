@@ -4715,6 +4715,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			jiqi:0.4,
 			jiguan:0.45
 		},
+		help:{
+			'轩辕剑':'<ul><li>零件、祭器牌可用于煅造装备，煅造得到强化装备，并可装备给距离1以内的角色<li>'+
+			'煅造装备时失去牌不触发技能<li>'+
+			'进行洗牌时强化装备将从弃牌堆中消失，不进入牌堆<li>'+
+			'专属、特殊装备无法被强化'
+		},
 		translate:{
 			_yuchan_equip:'玉蝉',
 			yuchanqian_duanzao:'玉蝉',

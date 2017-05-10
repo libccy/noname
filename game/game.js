@@ -17819,6 +17819,10 @@
     						img=null;
     					}
                     }
+					this.classList.remove('fullskin');
+					this.classList.remove('fullimage');
+					this.classList.remove('fullborder');
+					this.node.name.dataset.nature='';
 					if(!lib.config.hide_card_image&&lib.card[bg].fullskin){
 						this.classList.add('fullskin');
 						if(img){
@@ -17843,6 +17847,7 @@
 						else this.node.background.setBackground(bg,'card');
 					}
 					else if(lib.card[bg].fullimage){
+						this.classList.add('fullimage');
 						if(img){
                             if(img.indexOf('ext:')==0){
                                 this.setBackgroundImage(img.replace(/ext:/,'extension/'));
@@ -17862,6 +17867,45 @@
                             }
 							else{
                                 this.setBackground('card/'+bg);
+                            }
+						}
+					}
+					else if(lib.card[bg].fullborder){
+						this.classList.add('fullborder');
+						if(lib.card[bg].fullborder=='gold'){
+							this.node.name.dataset.nature='metalmm';
+						}
+						else if(lib.card[bg].fullborder=='silver'){
+							this.node.name.dataset.nature='watermm';
+						}
+						if(!this.node.avatar){
+							this.node.avatar=ui.create.div('.cardavatar');
+							this.insertBefore(this.node.avatar,this.firstChild);
+						}
+						if(!this.node.framebg){
+							this.node.framebg=ui.create.div('.cardframebg');
+							this.node.framebg.dataset.auto=lib.card[bg].fullborder;
+							this.insertBefore(this.node.framebg,this.firstChild);
+						}
+						if(img){
+                            if(img.indexOf('ext:')==0){
+                                this.node.avatar.setBackgroundImage(img.replace(/ext:/,'extension/'));
+                                this.node.avatar.style.backgroundSize='cover';
+                            }
+                            else{
+                                this.node.avatar.setBackgroundDB(img);
+                            }
+						}
+                        else if(lib.card[bg].image){
+                            this.node.avatar.setBackground(lib.card[bg].image);
+                        }
+						else{
+                            var cardPack=lib.cardPack['mode_'+get.mode()];
+                            if(Array.isArray(cardPack)&&cardPack.contains(bg)){
+                                this.node.avatar.setBackground('mode/'+get.mode()+'/card/'+bg);
+                            }
+							else{
+                                this.node.avatar.setBackground('card/'+bg);
                             }
 						}
 					}
@@ -17895,20 +17939,20 @@
 					if(info.color){
 						this.style.color=info.color;
 					}
-					else if(info.fullimage){
+					else if(info.fullimage||info.fullborder){
 						this.style.color='white';
 					}
 					if(info.textShadow){
 						this.style.textShadow=info.textShadow;
 					}
-					else if(info.fullimage){
+					else if(info.fullimage||info.fullborder){
 						this.style.textShadow='black 0 0 2px';
 					}
 					if(info.opacity){
 						this.node.info.style.opacity=info.opacity;
 						this.node.name.style.opacity=info.opacity;
 					}
-					else if(info.fullimage){
+					else if(info.fullimage||info.fullborder){
 						this.node.info.style.opacity=1;
 						this.node.name.style.opacity=1;
 					}
@@ -19471,6 +19515,33 @@
 						}
 						else{
 							player.draw({drawDeck:1})
+						}
+					}
+					else if(get.subtype(cards[0])=='spell_gold'){
+						var list=get.libCard(function(info){
+							if(player.storage.spell_silver==2){
+								return info.subtype=='spell_bronze';
+							}
+							else{
+								return info.subtype=='spell_silver';
+							}
+						});
+						if(list.length){
+							player.gain(game.createCard(list.randomGet()),'draw');
+						}
+						else{
+							player.draw();
+						}
+					}
+					else if(get.subtype(cards[0])=='spell_silver'){
+						var list=get.libCard(function(info){
+							return info.subtype=='spell_bronze';
+						});
+						if(list.length){
+							player.gain(game.createCard(list.randomGet()),'draw');
+						}
+						else{
+							player.draw();
 						}
 					}
 					else{
@@ -39900,13 +39971,20 @@
             }
             else{
                 for(var i=0;i<lib.inpile.length;i++){
-                    if(typeof filter=='function'&&!filter(lib.inpile[i])) continue;
-                    if(type.indexOf('equip')==0&&type.length==6){
-                        if(get.subtype(lib.inpile[i])==type) list.push(lib.inpile[i]);
-                    }
-                    else{
-                        if(get.type(lib.inpile[i])==type) list.push(lib.inpile[i]);
-                    }
+					if(typeof type=='function'){
+						if(type(lib.inpile[i])){
+							list.push(lib.inpile[i]);
+						}
+					}
+					else{
+						if(typeof filter=='function'&&!filter(lib.inpile[i])) continue;
+	                    if(type.indexOf('equip')==0&&type.length==6){
+	                        if(get.subtype(lib.inpile[i])==type) list.push(lib.inpile[i]);
+	                    }
+	                    else{
+	                        if(get.type(lib.inpile[i])==type) list.push(lib.inpile[i]);
+	                    }
+					}
                 }
             }
             return list;
@@ -39928,6 +40006,15 @@
             }
             return list;
         },
+		libCard:function(filter){
+			var list=[];
+			for(var i in lib.card){
+				if(filter(lib.card[i],i)){
+					list.push(i);
+				}
+			}
+			return list;
+		},
         ip:function(){
             if(!require) return '';
             var interfaces = require('os').networkInterfaces();
@@ -41702,7 +41789,7 @@
     							uiintro.add('<div class="text center">攻击范围：1</div>');
     						}
     					}
-                        else if(get.type(node)=='equip'){
+                        else if(get.subtype(node)){
                             uiintro.add('<div class="text center">'+get.translation(get.subtype(node))+'</div>');
                         }
     					else if(lib.card[name]&&lib.card[name].addinfomenu){
