@@ -32773,9 +32773,9 @@
                         var span1=ui.create.div('.config.more','选项 <div>&gt;</div>');
                         span1.style.fontSize='small';
                         span1.style.display='inline';
-                        span1.listen(function(){
-                            this.classList.toggle('on');
-                            if(!this.classList.contains('on')){
+						span1.toggle=function(){
+                            if(!this.classList.toggle('on')){
+								game.saveConfig('asset_toggle_off',true);
                                 span2.style.display='none';
 								span2_br.style.display='none';
                                 span2_check.style.display='none';
@@ -32793,6 +32793,7 @@
                                 span6_check.style.display='none';
                             }
                             else{
+								game.saveConfig('asset_toggle_off');
 								span2.style.display='';
                                 span2_br.style.display='';
                                 span2_check.style.display='';
@@ -32809,7 +32810,8 @@
                                 span6_br.style.display='';
                                 span6_check.style.display='';
                             }
-                        })
+                        };
+                        span1.listen(span1.toggle);
                         li2.lastChild.appendChild(span1);
 
                         var span6_br=ui.create.node('br');
@@ -32920,6 +32922,11 @@
 						ul.appendChild(li2);
 						ul.appendChild(li3);
     					page.appendChild(ul);
+
+
+						if(!lib.config.asset_toggle_off){
+							span1.toggle();
+						}
                     }());
 					(function(){
 						var norow2=function(){
