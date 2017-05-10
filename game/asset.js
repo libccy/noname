@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-    '1.9.27.1',
+    '1.9.28',
     'image/background/huangtian_bg.jpg',
     'image/background/ol_bg.jpg',
     'image/background/september_bg.jpg',
@@ -55,6 +55,7 @@ window.noname_asset_list=[
     'image/card/hanbing.png',
     'image/card/haotianta.png',
     'image/card/heilonglinpian.png',
+    'image/card/honghuangzhili.png',
     'image/card/hongshui.png',
     'image/card/hsbaowu_cangbaotu.jpg',
     'image/card/hsbaowu_huangjinyuanhou.jpg',

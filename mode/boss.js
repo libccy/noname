@@ -463,6 +463,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				honghuangzhili:{
 					type:'trick',
 					enable:true,
+					fullskin:true,
 					filterTarget:true,
 					content:function(){
 						if(target.group=='shen'){
