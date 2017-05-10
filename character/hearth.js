@@ -2115,7 +2115,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		lianjin:{
     			enable:'phaseUse',
-    			usable:2,
+    			usable:1,
     			filterCard:function(card){
     				return get.type(card)!='hsyaoshui';
     			},
@@ -2269,6 +2269,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				},
     				threaten:1.4
     			},
+                group:'lianjin_discard',
+                subSkill:{
+                    discard:{
+                        trigger:{player:'discardAfter'},
+                        forced:true,
+                        filter:function(event){
+                            for(var i=0;i<event.cards.length;i++){
+                                if(get.type(event.cards[i])=='hsyaoshui') return true;
+                            }
+                            return false;
+                        },
+                        content:function(){
+                            var list=[],cards=[];
+                            for(var i=0;i<trigger.cards.length;i++){
+                                if(get.type(trigger.cards[i])=='hsyaoshui'){
+                                    list.push(trigger.cards[i]);
+                                }
+                            }
+                            for(var i=0;i<list.length;i++){
+                                var names=get.info(list[i]).names;
+                                if(names){
+                                    cards.push(game.createCard(names.randomGet()));
+                                }
+                            }
+                            player.gain(cards,'draw2','log');
+                        }
+                    }
+                }
     		},
     		shouji:{
     			group:['shouji_begin','shouji_miss'],
@@ -7658,7 +7686,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		qingzun_info:'本局对战中，每当你使用一张青玉牌，你的手牌上限+1；当你累计使用两张青玉牌后，你可以于准备阶段摸一张牌；当你累计使用六张青玉牌后，你可以于结束阶段摸一张牌',
     		qingzun_info_alter:'本局对战中，每当你使用一张青玉牌，你的手牌上限+1；当你累计使用三张青玉牌后，你可以于准备阶段摸一张牌；当你累计使用九张青玉牌后，你可以于结束阶段摸一张牌',
     		lianjin:'炼金',
-    		lianjin_info:'出牌阶段限两次，你可以将一张手牌永久转化为一张由三张随机牌组成的药水',
+    		lianjin_info:'出牌阶段限一次，你可以将一张手牌永久转化为一张由三张随机牌组成的药水；当你因弃置而失去药水牌时，你随机获得药水的组成卡牌之一',
     		shouji:'收集',
     		shouji_info:'每当你使用一张杀，你可以获得一张目标随机手牌的复制；每当你的杀被闪避，你可以获得一张目标随机非特殊装备牌的复制；每回合限各限一次',
     		guimou:'鬼谋',

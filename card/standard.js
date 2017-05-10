@@ -1005,23 +1005,29 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target){
-							var es=target.getCards('e');
+							var att=get.attitude(player,target);
 							var nh=target.countCards('h');
-							var noe=(es.length==0||target.hasSkillTag('noe'));
-							var noe2=(es.length==1&&es[0].name=='baiyin'&&target.hp<target.maxHp);
-							var noh=(nh==0||target.hasSkillTag('noh'));
-							if(noh&&noe) return 0;
-							if(noh&&noe2) return 0.01;
-							if(get.attitude(player,target)<=0) return (target.countCards('he'))?-1.5:1.5;
-							var js=target.getCards('j');
-							if(js.length){
-								var jj=js[0].viewAs?{name:js[0].viewAs}:js[0];
-								if(jj.name=='guohe') return 3;
-								if(js.length==1&&get.effect(target,jj,target,player)>=0){
-									return -1.5;
+							if(att>0){
+								var js=target.getCards('j');
+								if(js.length){
+									var jj=js[0].viewAs?{name:js[0].viewAs}:js[0];
+									if(jj.name=='guohe'||js.length>1||get.effect(target,jj,target,player)<0){
+										return 2;
+									}
 								}
-								return 2;
+								if(target.getEquip('baiyin')&&target.isDamaged()&&
+									ai.get.recoverEffect(target,player,player)>0){
+									if(target.hp==1&&!target.hujia) return 1.6;
+									if(target.hp==2) return 0.01;
+									return 0;
+								}
 							}
+							var es=target.getCards('e');
+							var noe=(es.length==0||target.hasSkillTag('noe'));
+							var noe2=(es.length==1&&es[0].name=='baiyin'&&target.isDamaged());
+							var noh=(nh==0||target.hasSkillTag('noh'));
+							if(noh&&(noe||noe2)) return 0;
+							if(att<=0&&!target.countCards('he')) return 1.5;
 							return -1.5;
 						},
 					},
