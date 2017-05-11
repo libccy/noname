@@ -383,7 +383,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					list.push(get.cardPile('sha','cardPile'));
 					list.push(get.cardPile('shan','cardPile'));
 					list.push(get.cardPile('tao','cardPile'));
-					list.push(get.cardPile('jiu','cardPile'));
+					// list.push(get.cardPile('jiu','cardPile'));
 					if(list.length){
 						player.gain(list,'gain2');
 					}
@@ -698,7 +698,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_ansha:'暗杀',
 			gw_ansha_info:'令一名体力为1的随机敌方角立即死亡（不触发技能），然后结束出牌阶段',
 			gw_shizizhaohuan:'十字召唤',
-			gw_shizizhaohuan_info:'从牌堆中获得一张杀、一张闪和一张桃和一张酒',
+			gw_shizizhaohuan_info:'从牌堆中获得一张杀、一张闪和一张桃',
 			gw_zuihouyuanwang:'最后愿望',
 			gw_zuihouyuanwang_info:'摸X张牌并弃置X张牌，X为存活角色数',
 			gw_zirankuizeng:'自然馈赠',
