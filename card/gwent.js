@@ -286,6 +286,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					useful:[6,1],
 					result:{
 						player:function(player,target){
+							if(player.hasUnknown()) return 0;
 							return -game.countPlayer(function(current){
 								return current.countCards('he')*get.sgn(get.attitude(player,current));
 							});
@@ -302,10 +303,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				vanish:true,
 				enable:true,
 				filterTarget:true,
-				contentBefore:function(){
-					player.$skill('卜天术','legend','water');
-					game.delay(2);
-				},
+				// contentBefore:function(){
+				// 	player.$skill('卜天术','legend','water');
+				// 	game.delay(2);
+				// },
 				content:function(){
 					'step 0'
     				var list=[];
@@ -374,10 +375,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target==player;
 				},
 				selectTarget:-1,
-				contentBefore:function(){
-					player.$skill('十字召唤','legend','water');
-					game.delay(2);
-				},
+				// contentBefore:function(){
+				// 	player.$skill('十字召唤','legend','water');
+				// 	game.delay(2);
+				// },
 				content:function(){
     				var list=[];
 					list.push(get.cardPile('sha','cardPile'));
@@ -407,10 +408,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target==player;
 				},
 				selectTarget:-1,
-				contentBefore:function(){
-					player.$skill('最后愿望','legend','water');
-					game.delay(2);
-				},
+				// contentBefore:function(){
+				// 	player.$skill('最后愿望','legend','water');
+				// 	game.delay(2);
+				// },
 				content:function(){
 					'step 0'
 					event.num=game.countPlayer();
@@ -446,10 +447,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				notarget:true,
-				contentBefore:function(){
-					player.$skill('自然馈赠','legend','water');
-					game.delay(2);
-				},
+				// contentBefore:function(){
+				// 	player.$skill('自然馈赠','legend','water');
+				// 	game.delay(2);
+				// },
 				content:function(){
 					'step 0'
 					var info=player.storage.gw_zirankuizeng;
@@ -514,6 +515,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var threaten=ai.get.threaten(target,player,true);
 							if(target.hujia){
 								threaten*=(target.hujia+1);
+							}
+							else if(target.hasSkill('fengyin')){
+								return 0;
 							}
 							return -threaten;
 						}
