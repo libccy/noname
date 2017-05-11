@@ -8339,6 +8339,13 @@
 					}
 				}
 			},
+			ga:function(type){
+				for(var i in lib.card){
+					if(lib.card[i].type==type||lib.card[i].subtype==type){
+						cheat.g(i);
+					}
+				}
+			},
             gg:function(){
                 for(var i=0;i<game.players.length;i++){
                     for(var j=0;j<arguments.length;j++){
@@ -19519,12 +19526,7 @@
 					}
 					else if(get.subtype(cards[0])=='spell_gold'){
 						var list=get.libCard(function(info){
-							if(player.storage.spell_silver==2){
-								return info.subtype=='spell_bronze';
-							}
-							else{
-								return info.subtype=='spell_silver';
-							}
+							return info.subtype=='spell_silver';
 						});
 						if(list.length){
 							player.gain(game.createCard(list.randomGet()),'draw');
@@ -26958,6 +26960,32 @@
 				}
 			}
 			return null;
+		},
+		findMax:function(list,func){
+			list=list.slice(0);
+			var list2=[];
+			list.sort(function(a,b){
+				return func(b)-func(a);
+			});
+			for(var i=0;i<list.length;i++){
+				if(func(list[i])==func(list[0])){
+					list2.push(list[i]);
+				}
+			}
+			return list2;
+		},
+		findMin:function(list,func){
+			list=list.slice(0);
+			var list2=[];
+			list.sort(function(a,b){
+				return func(a)-func(b);
+			});
+			for(var i=0;i<list.length;i++){
+				if(func(list[i])==func(list[0])){
+					list2.push(list[i]);
+				}
+			}
+			return list2;
 		},
 		findCards:function(func,all){
 			var cards=[];

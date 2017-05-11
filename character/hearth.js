@@ -944,9 +944,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				var dialog=ui.create.dialog('将武将牌替换为一名角色','hidden');
     				dialog.add([list.randomGets(5),'character']);
     				player.chooseButton(dialog,true).ai=function(button){
-    					return get.rank(button.link,true)-lib.character[button.link][2];
+    					return get.rank(button.link,true);
     				};
-    				player.awakenSkill('fuhan');
+    				player.awakenSkill('szbianshen');
     				'step 1'
     				player.reinit('hs_shizugui',result.links[0]);
                     player.hp=player.maxHp;
@@ -7916,6 +7916,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		fengxing:'风行',
     		fengxing_info:'每当你于回合外首次失去牌，你可以弃置一张牌并摸两张牌',
     		xinci:'心刺',
+    		xinci_bg:'暗',
     		xinci_info:'出牌阶段限一次，你可以弃置一张黑色牌令一名角色流失一点体力',
     		zhongjia:'战甲',
     		zhongjia_info:'锁定技，每当你受到一次伤害，你获得一点护甲；当你的体力值大于手牌数时，你的护甲不为你抵挡伤害',
@@ -7927,8 +7928,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		fengxian_info:'出牌阶段限一次，你可以令场上所有角色各弃置一张手牌',
     		zhanhou:'战吼',
     		zhanhou_info:'出牌阶段限一次，你可以弃置一张防具牌并获得一点护甲值',
-    		anying:'暗影',
-    		anying_info:'限定技，出牌阶段，你可以弃置两张黑色牌，失去技能圣光，并获得技能心刺',
+            anying:'暗影',
+    		anying_info:'限定技，出牌阶段，你可以弃置一张黑色牌，失去技能圣光，并获得技能心刺',
     		shijie:'视界',
     		shijie_info:'结束阶段，你可以获得一名其他角色的一张手牌，然后该角色摸一张牌',
     		shengguang:'圣光',
