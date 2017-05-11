@@ -913,6 +913,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			quanzhang:'权杖',
 			quanzhang_backup:'权杖',
 			quanzhang_info:'出牌阶段限一次，你可以观看牌堆顶的6张牌，并选择一张使用',
+
+			chaoyong:'潮涌',
+			chaoyong_info:'准备阶段，你可以弃置一张牌，视为对所有敌方角色使用一张南蛮入侵或万箭齐发',
 		}
 	};
 });

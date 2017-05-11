@@ -21,7 +21,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					basic:{
 						order:1.8,
 						value:[6,1],
-						useful:2,
+						useful:[4,1],
 					},
 					result:{
 						player:function(player,target){

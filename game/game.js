@@ -41206,27 +41206,29 @@
 					return ui.cardPile.childNodes[i];
 				}
 			}
-			for(var i=0;i<ui.discardPile.childNodes.length;i++){
-				if(filter(ui.discardPile.childNodes[i])){
-					return ui.discardPile.childNodes[i];
-				}
-			}
-			if(create=='field'){
-				var found=null;
-				game.findPlayer(function(current){
-					var ej=current.getCards('ej');
-					for(var i=0;i<ej.length;i++){
-						if(filter(ej[i])){
-							found=ej[i];
-							return true;
-						}
+			if(create!='cardPile'){
+				for(var i=0;i<ui.discardPile.childNodes.length;i++){
+					if(filter(ui.discardPile.childNodes[i])){
+						return ui.discardPile.childNodes[i];
 					}
-				});
-				return found;
+				}
+				if(create=='field'){
+					var found=null;
+					game.findPlayer(function(current){
+						var ej=current.getCards('ej');
+						for(var i=0;i<ej.length;i++){
+							if(filter(ej[i])){
+								found=ej[i];
+								return true;
+							}
+						}
+					});
+					return found;
+				}
+	            else if(create){
+	                return game.createCard(name);
+	            }
 			}
-            else if(create){
-                return game.createCard(name);
-            }
 			return null;
 		},
 		aiStrategy:function(){
@@ -42143,9 +42145,12 @@
 			}
 			return links;
 		},
-		threaten:function(target,player){
+		threaten:function(target,player,hp){
 			var threaten=1;
 			var skills=target.getSkills();
+			if(!player&&player!==false){
+				player=_status.event.player;
+			}
 			for(var i=0;i<skills.length;i++){
 				var info=get.info(skills[i]);
 				if(info&&info.ai&&info.ai.threaten){
@@ -42158,6 +42163,16 @@
 					else if(typeof info.ai.threaten=='number'){
 						threaten*=info.ai.threaten;
 					}
+				}
+			}
+			if(hp){
+				switch(target.hp){
+					case 0:threaten*=1.5;break;
+					case 1:threaten*=1.2;break;
+				}
+				switch(target.countCards('h')){
+					case 0:threaten*=1.5;break;
+					case 1:threaten*=1.2;break;
 				}
 			}
 			return threaten;
