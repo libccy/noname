@@ -930,6 +930,116 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 
+			gw_qinpendayu:{
+				fullborder:'bronze',
+				type:'spell',
+				subtype:'spell_bronze',
+				enable:true,
+				filterTarget:true,
+				selectTarget:-1,
+				content:function(){
+					target.addTempSkill('gw_qinpendayu',{player:'phaseAfter'});
+				},
+				ai:{
+					value:4,
+					useful:[3,1],
+					result:{
+						target:function(player,target){
+							if(target.needsToDiscard()) return -1;
+							if(target.needsToDiscard(1)) return -0.7;
+							if(target.needsToDiscard(2)) return -0.4;
+							return -0.1;
+						}
+					},
+					order:1.2,
+					tag:{
+						multitarget:1,
+						multineg:1,
+					}
+				}
+			},
+			gw_birinongwu:{
+				fullborder:'bronze',
+				type:'spell',
+				subtype:'spell_bronze',
+				enable:true,
+				filterTarget:function(card,player,target){
+					return !target.isLinked();
+				},
+				selectTarget:-1,
+				content:function(){
+					target.addTempSkill('gw_birinongwu',{player:'phaseAfter'});
+				},
+				ai:{
+					value:4,
+					useful:[3,1],
+					result:{
+						target:-0.5
+					},
+					order:1.2,
+					tag:{
+						multitarget:1,
+						multineg:1,
+					}
+				}
+			},
+			gw_ciguhanshuang:{
+				fullborder:'bronze',
+				type:'spell',
+				subtype:'spell_bronze',
+				enable:true,
+				filterTarget:function(card,player,target){
+					return !target.isLinked();
+				},
+				selectTarget:-1,
+				content:function(){
+					target.addSkill('gw_ciguhanshuang');
+				},
+				ai:{
+					value:4,
+					useful:[3,1],
+					result:{
+						target:-0.5
+					},
+					order:1.2,
+					tag:{
+						multitarget:1,
+						multineg:1,
+					}
+				}
+			},
+			gw_baoxueyaoshui:{
+				fullborder:'bronze',
+				type:'spell',
+				subtype:'spell_bronze',
+				enable:true,
+				filterTarget:true,
+				content:function(){
+					'step 0'
+					target.chooseToDiscard('h',2,true);
+					'step 1'
+					target.draw();
+				},
+				ai:{
+					value:4,
+					useful:[3,1],
+					result:{
+						target:function(player,target){
+							switch(target.countCards('h')){
+								case 0:return 0.5;
+								case 1:return 0;
+								case 2:return -1.5;
+								default:return -1;
+							}
+						}
+					},
+					order:8,
+					tag:{
+						loseCard:1,
+						discard:1,
+					}
+				}
+			},
 			gw_zhihuanjun:{
 				fullborder:'bronze',
 				type:'spell',
@@ -1083,6 +1193,43 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			gw_qinpendayu:{
+    			mark:true,
+    			intro:{
+    				content:'手牌上限-1直到下一回合结束'
+    			},
+    			mod:{
+    				maxHandcard:function(player,num){
+    					return num-1;
+    				}
+    			}
+    		},
+			gw_birinongwu:{
+				mark:true,
+	            intro:{
+	                content:'不能使用杀直到下一回合结束'
+	            },
+	            mod:{
+	                cardEnabled:function(card){
+	                    if(card.name=='sha') return false;
+	                }
+	            }
+			},
+			gw_ciguhanshuang:{
+				trigger:{player:'phaseDrawBegin'},
+    			forced:true,
+    			mark:true,
+    			intro:{
+    				content:'下个摸牌阶段摸牌数-1'
+    			},
+    			filter:function(event){
+    				return event.num>0;
+    			},
+    			content:function(){
+    				trigger.num--;
+    				player.removeSkill('gw_ciguhanshuang');
+    			}
+			},
 			gw_dieyi:{
 				init:function(player){
 					player.storage.gw_dieyi=1;
@@ -1288,11 +1435,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_baoxueyaoshui:'暴雪药水',
 			gw_baoxueyaoshui_info:'令一名角色弃置两张手牌并摸一张牌',
 			gw_birinongwu:'蔽日浓雾',
-			gw_birinongwu_info:'所有角色不能使用杀直到下一回合结束',
+			gw_birinongwu_bg:'雾',
+			gw_birinongwu_info:'出牌阶段对所有角色使用，目标不能使用杀直到下一回合结束',
 			gw_qinpendayu:'倾盆大雨',
-			gw_qinpendayu_info:'所有角色进入横置状态',
-			gw_cigubingshuang:'刺骨寒霜',
-			gw_cigubingshuang_info:'所有角色下个摸牌阶段摸牌数-1',
+			gw_qinpendayu_bg:'雨',
+			gw_qinpendayu_info:'出牌阶段对所有角色使用，目标手牌上限-1直到下一回合结束',
+			gw_ciguhanshuang:'刺骨寒霜',
+			gw_ciguhanshuang_bg:'霜',
+			gw_ciguhanshuang_info:'出牌阶段对所有角色使用，目标下个摸牌阶段摸牌数-1',
 			gw_wenyi:'瘟疫',
 			gw_wenyi_info:'令所有体力值为全场最少的角色随机弃置一张牌',
 			gw_yanziyaoshui:'燕子药水',
@@ -1320,6 +1470,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 
 			['club',1,'gw_zumoshoukao'],
 			['spade',1,'gw_zumoshoukao'],
+
+			['diamond',5,'gw_qinpendayu'],
+			['club',7,'gw_qinpendayu'],
+
+			['spade',9,'gw_birinongwu'],
+			['heart',13,'gw_birinongwu'],
+
+			['diamond',11,'gw_ciguhanshuang'],
+			['club',7,'gw_ciguhanshuang'],
+
+			['heart',4,'gw_baoxueyaoshui'],
+			['spade',8,'gw_baoxueyaoshui'],
 		],
 	};
 });
