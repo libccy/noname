@@ -66,7 +66,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_xsylvanas:['female','qun',3,['busi','xshixin','xmojian']],
     		hs_siwangzhiyi:['male','qun',12,['mieshi']],
     		hs_bilanyoulong:['male','wei',4,['lingzhou']],
-    		hs_jinglinglong:['male','wu',3,['mianyi']],
+    		hs_jinglinglong:['male','wu',3,['moyao']],
     		hs_ruanniguai:['male','wu',3,['nianfu','xiaorong']],
     		hs_hudunren:['male','shu',2,['hhudun']],
     		hs_nate:['male','wu',4,['chuidiao']],
@@ -4580,7 +4580,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     			}
     		},
-    		mianyi:{
+    		moyao:{
     			mod:{
     				targetEnabled:function(card,player,target,now){
     					if(player!=target){
@@ -5754,7 +5754,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				ui.discardPile.appendChild(player.storage.bingjia);
     				delete player.storage.bingjia;
     				player.changeHujia();
-    				player.addTempSkill('bingjia3','phaseAfter');
+    				player.addTempSkill('mianyi','phaseAfter');
     			},
     			intro:{
     				mark:function(dialog,content,player){
@@ -5771,28 +5771,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					}
     					return '已发动冰甲';
     				}
-    			}
-    		},
-    		bingjia3:{
-    			trigger:{player:'damageBefore'},
-    			mark:true,
-    			forced:true,
-    			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
-    			},
-    			ai:{
-    				nofire:true,
-    				nothunder:true,
-    				nodamage:true,
-    				effect:{
-    					target:function(card,player,target,current){
-    						if(get.tag(card,'damage')) return [0,0];
-    					}
-    				},
-    			},
-    			intro:{
-    				content:'防止一切伤害'
     			}
     		},
     		bianxing2:{},
@@ -7826,8 +7804,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		ronghuo_info:'锁定技，你的普通杀均视为火杀',
     		luoshi:'落石',
     		luoshi_info:'锁定技，每当你受到一次伤害，你与伤害来源各随机弃置一张牌',
-    		mianyi:'免疫',
-    		mianyi_info:'锁定技，你不能成为其他角色的普通锦囊牌的目标',
+    		moyao:'魔耀',
+    		moyao_info:'锁定技，你不能成为其他角色的普通锦囊牌的目标',
     		jiaohui:'教诲',
     		jiaohui_info:'结束阶段，若你没有于本回合内造成伤害，你可以令一名角色摸一张牌或回复一点体力',
     		chenshui:'沉睡',
@@ -7936,8 +7914,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		shengguang_info:'出牌阶段限一次，你可以弃置一张红色牌令一名角色回复一点体力',
     		bingjia:'冰甲',
     		bingjia2:'冰甲',
-    		bingjia3:'冰甲',
-    		bingjia3_bg:'免',
     		bingjia_info:'出牌阶段，若你武将牌上没有牌，你可以将一张手牌背面朝上置于你的武将牌上，当你成为其他角色的与此牌花色相同的牌的目标时，你移去此牌，获得一点护甲，并且本回合内防止一切伤害',
     		bianxing:'变形',
     		bianxing_info:'当一其他角色于回合内使用卡牌指定了惟一的其他目标后，你可以用一张合理的基本牌替代此牌，每名角色的回合限一次',

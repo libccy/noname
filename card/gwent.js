@@ -3,6 +3,330 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'gwent',
 		card:{
+			gw_dieyi:{
+				fullskin:true
+			},
+			gw_dieyi_equip1:{
+				fullskin:true,
+				vanish:true,
+				hidden:true,
+				cardimage:'gw_dieyi',
+				type:'equip',
+				subtype:'equip1',
+				onLose:function(){
+					lib.skill.gw_dieyi.process(player);
+				},
+				loseDelay:false,
+				skills:[],
+				ai:{
+					equipValue:0
+				}
+			},
+			gw_dieyi_equip2:{
+				fullskin:true,
+				vanish:true,
+				hidden:true,
+				cardimage:'gw_dieyi',
+				type:'equip',
+				subtype:'equip2',
+				onLose:function(){
+					lib.skill.gw_dieyi.process(player);
+				},
+				loseDelay:false,
+				skills:[],
+				ai:{
+					equipValue:0
+				}
+			},
+			gw_dieyi_equip3:{
+				fullskin:true,
+				vanish:true,
+				hidden:true,
+				cardimage:'gw_dieyi',
+				type:'equip',
+				subtype:'equip3',
+				onLose:function(){
+					lib.skill.gw_dieyi.process(player);
+				},
+				loseDelay:false,
+				skills:[],
+				ai:{
+					equipValue:0
+				}
+			},
+			gw_dieyi_equip4:{
+				fullskin:true,
+				vanish:true,
+				hidden:true,
+				cardimage:'gw_dieyi',
+				type:'equip',
+				subtype:'equip4',
+				onLose:function(){
+					lib.skill.gw_dieyi.process(player);
+				},
+				loseDelay:false,
+				skills:[],
+				ai:{
+					equipValue:0
+				}
+			},
+			gw_dieyi_equip5:{
+				fullskin:true,
+				vanish:true,
+				hidden:true,
+				cardimage:'gw_dieyi',
+				type:'equip',
+				subtype:'equip5',
+				onLose:function(){
+					lib.skill.gw_dieyi.process(player);
+				},
+				loseDelay:false,
+				skills:[],
+				ai:{
+					equipValue:0
+				}
+			},
+			gw_dieyi_judge:{
+				fullskin:true,
+				vanish:true,
+				hidden:true,
+				cardimage:'gw_dieyi',
+				enable:true,
+				type:'delay',
+				filterTarget:true,
+				effect:function(){
+					lib.skill.gw_dieyi.process(player);
+				},
+			},
+			gw_hudiewu:{
+				fullborder:'gold',
+				type:'spell',
+				subtype:'spell_gold',
+				vanish:true,
+				enable:true,
+				notarget:true,
+				contentBefore:function(){
+					player.$skill('蝴蝶舞','legend','metal');
+					game.delay(2);
+				},
+				content:function(){
+					'step 0'
+					event.targets=game.filterPlayer(function(current){
+						return current.countCards('ej');
+					}).sortBySeat();
+					event.targets.remove(player);
+					'step 1'
+					if(event.targets.length){
+						var target=event.targets.shift();
+						var ej=target.getCards('ej');
+						player.line(target);
+						target.removeEquipTrigger();
+						for(var i=0;i<ej.length;i++){
+							ui.discardPile.appendChild(game.createCard(ej[i]));
+							ej[i].init([ej[i].suit,ej[i].number,'gw_dieyi_'+(get.subtype(ej[i])||'judge')]);
+						}
+						event.redo();
+					}
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:6,
+					useful:[6,1],
+					result:{
+						player:function(player){
+							return game.countPlayer(function(current){
+								if(current==player) return;
+								return -(current.countCards('e')-current.countCards('j')/3)*get.sgn(get.attitude(player,current));
+							});
+						}
+					},
+					order:0.7,
+				}
+			},
+			gw_yigeniyin:{
+				fullborder:'gold',
+				type:'spell',
+				subtype:'spell_gold',
+				vanish:true,
+				enable:true,
+				notarget:true,
+				contentBefore:function(){
+					player.$skill('伊格尼印','legend','metal');
+					game.delay(2);
+				},
+				content:function(){
+					'step 0'
+					var enemies=player.getEnemies();
+					var target=get.max(enemies,'hp','list').randomGet();
+					if(target){
+						player.line(target,'fire');
+						target.damage('fire');
+						game.delay();
+					}
+					'step 1'
+					event.targets=game.filterPlayer(function(current){
+						return current.isMaxHp();
+					}).sortBySeat();
+					player.line(event.targets,'fire');
+					'step 2'
+					if(event.targets.length){
+						var target=event.targets.shift();
+						player.line(target,'fire');
+						target.damage('fire');
+						event.redo();
+					}
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:8,
+					useful:[6,1],
+					result:{
+						player:function(player){
+							var enemies=player.getEnemies();
+							var players=game.filterPlayer();
+							var func=function(current){
+								return current.hp;
+							};
+							var max1=get.max(enemies,func);
+							for(var i=0;i<players.length;i++){
+								if(players[i].hp==max1){
+									players.splice(i,1);break;
+								}
+							}
+							var max2=get.max(players,func);
+							if(max1-1>max2){
+								return get.damageEffect(get.max(enemies,func,'item'),player,player,'fire');
+							}
+							else{
+								var num;
+								if(max1>max2){
+									num=get.sgn(get.damageEffect(get.max(enemies,func,'item'),player,player,'fire'));
+								}
+								else if(max1==max2){
+									num=0;
+								}
+								else{
+									num=1;
+								}
+								return num+game.countPlayer(function(current){
+									if(current.hp>=max2){
+										return get.sgn(get.damageEffect(current,player,player,'fire'));
+									}
+								});
+							}
+						}
+					},
+					order:0.7,
+				}
+			},
+			gw_leizhoushu:{
+				fullborder:'gold',
+				type:'spell',
+				subtype:'spell_gold',
+				vanish:true,
+				enable:true,
+				notarget:true,
+				contentBefore:function(){
+					player.$skill('雷咒术','legend','metal');
+					game.delay(2);
+				},
+				content:function(){
+					if(player.hasSkill('gw_leizhoushu')){
+						if(typeof player.storage.gw_leizhoushu!='number'){
+							player.storage.gw_leizhoushu=2;
+						}
+						else{
+							player.storage.gw_leizhoushu++;
+						}
+						player.syncStorage('gw_leizhoushu');
+						player.updateMarks();
+					}
+					else{
+						player.addSkill('gw_leizhoushu');
+					}
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:8,
+					useful:[6,1],
+					result:{
+						player:function(player){
+							return game.countPlayer(function(current){
+								if(current!=player&&current.isMaxHandcard()){
+									return -get.sgn(get.attitude(player,current));
+								}
+							});
+						}
+					},
+					order:0.5,
+				}
+			},
+			gw_aerdeyin:{
+				fullborder:'gold',
+				type:'spell',
+				subtype:'spell_gold',
+				vanish:true,
+				enable:true,
+				notarget:true,
+				contentBefore:function(){
+					player.$skill('阿尔德印','legend','metal');
+					game.delay(2);
+				},
+				content:function(){
+					'step 0'
+					var list=game.filterPlayer(function(current){
+						return get.distance(player,current,'pure')==1;
+					});
+					event.list=list.sortBySeat();
+					'step 1'
+					if(event.list.length){
+						var target=event.list.shift();
+						player.line(target,'green');
+						target.damage();
+						target.draw(false);
+						target.$draw();
+						target.turnOver();
+						event.redo();
+					}
+					'step 2'
+					game.delay();
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:8,
+					useful:[6,1],
+					result:{
+						player:function(player){
+							return game.countPlayer(function(current){
+								if(get.distance(player,current,'pure')==1){
+									return -get.attitude(player,current);
+								}
+							});
+						}
+					},
+					order:0.5,
+				}
+			},
 			gw_ansha:{
 				fullborder:'gold',
 				type:'spell',
@@ -27,7 +351,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(list.length){
 						var target=list.randomGet();
 						player.line(target);
-						target.die()._triggered=null;
+						target.die();
 					}
 				},
 				contentAfter:function(){
@@ -62,9 +386,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					var target=game.findMax(game.filterPlayer(function(current){
+					var target=get.max(game.filterPlayer(function(current){
 						return !current.isUnseen();
-					}).randomSort(),function(current){
+					},'list').randomSort(),function(current){
 						var att=get.attitude(player,current);
 						var rank=get.rank(current,true);
 						if(current.maxHp>=3){
@@ -759,6 +1083,87 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			gw_dieyi:{
+				init:function(player){
+					player.storage.gw_dieyi=1;
+				},
+				onremove:true,
+				trigger:{global:'phaseEnd'},
+				forced:true,
+				mark:true,
+				process:function(player){
+					if(player.hasSkill('gw_dieyi')){
+						player.storage.gw_dieyi++;
+					}
+					else{
+						player.addSkill('gw_dieyi');
+					}
+					player.syncStorage('gw_dieyi');
+					player.updateMarks();
+				},
+				intro:{
+					content:'在下一个结束阶段，你随机弃置#张牌'
+				},
+				content:function(){
+					player.randomDiscard(player.storage.gw_dieyi);
+					player.removeSkill('gw_dieyi');
+				}
+			},
+			gw_leizhoushu:{
+				mark:true,
+				intro:{
+					content:function(storage,player){
+						if(storage>=2){
+							return '在每个准备阶段令牌数为全场最多的所有其他角色各随机弃置一张牌（重复'+storage+'次）';
+						}
+						else{
+							return '在每个准备阶段令牌数为全场最多的所有其他角色各随机弃置一张牌';
+						}
+					}
+				},
+				trigger:{player:'phaseBegin'},
+				forced:true,
+				filter:function(event,player){
+					var list=game.filterPlayer();
+					for(var i=0;i<list.length;i++){
+						if(list[i]!=player&&list[i].countCards('he')) return true;
+					}
+					return false;
+				},
+				content:function(){
+					'step 0'
+					if(typeof player.storage.gw_leizhoushu=='number'){
+						event.num=player.storage.gw_leizhoushu;
+					}
+					else{
+						event.num=1;
+					}
+					'step 1'
+					if(event.num){
+						var max=0;
+						var maxp=null;
+						var list=game.filterPlayer(function(current){
+							return current.isMaxCard();
+						}).sortBySeat();
+						list.remove(player);
+						if(!list.length){
+							event.finish();
+							return;
+						}
+						player.line(list,'green');
+						for(var i=0;i<list.length;i++){
+							list[i].randomDiscard(false);
+						}
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					event.num--;
+					event.goto(1);
+					game.delay();
+				}
+			},
 			_gw_zirankuizeng:{
 				trigger:{player:'useCard'},
 				forced:true,
@@ -819,7 +1224,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			'昆特牌':'<ul><li>法术为分金、银、铜三类，金卡和银卡不出现在牌堆中<li>'+
 			'摸牌阶段有一定概率摸到银卡，在16个摸牌阶段中至少会摸到2张银卡<li>'+
 			'摸牌阶段有一定概率摸到金卡，在16个摸牌阶段中至少会摸到1张金卡<li>'+
-			'金卡造成的任何效果不会触发相关技能，金卡无视调虎离山、潜行等免疫效果<li>'+
+			'金卡无视调虎离山、潜行等免疫目标的效果<li>'+
 			'进行洗牌时金卡、银卡将从弃牌堆中消失，不进入牌堆'
 		},
 		translate:{
@@ -827,8 +1232,29 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			spell_gold:'金卡法术',
 			spell_silver:'银卡法术',
 			spell_bronze:'铜卡法术',
+			gw_dieyi:'蝶翼',
+			gw_dieyi_equip1:'蝶翼·器',
+			gw_dieyi_equip2:'蝶翼·衣',
+			gw_dieyi_equip3:'蝶翼·攻',
+			gw_dieyi_equip4:'蝶翼·防',
+			gw_dieyi_equip5:'蝶翼·宝',
+			gw_dieyi_judge:'蝶翼·判',
+			gw_dieyi_equip1_info:'在你从装备区中失去此牌后，你于下一个结束阶段随机弃置一张牌',
+			gw_dieyi_equip2_info:'在你从装备区中失去此牌后，你于下一个结束阶段随机弃置一张牌',
+			gw_dieyi_equip3_info:'在你从装备区中失去此牌后，你于下一个结束阶段随机弃置一张牌',
+			gw_dieyi_equip4_info:'在你从装备区中失去此牌后，你于下一个结束阶段随机弃置一张牌',
+			gw_dieyi_equip5_info:'在你从装备区中失去此牌后，你于下一个结束阶段随机弃置一张牌',
+			gw_dieyi_judge_info:'判定阶段移去此牌，并于下一个结束阶段随机弃置一张牌',
+			gw_hudiewu:'蝴蝶舞',
+			gw_hudiewu_info:'将其他角色在场上的所有牌替换为蝶翼（在你失去蝶翼后，你于下一个结束阶段随机弃置一张牌），然后结束出牌阶段',
+			gw_yigeniyin:'伊格尼印',
+			gw_yigeniyin_info:'对敌方角色中体力值最大一名随机角色造成一点火焰伤害，然后对场上体力值最大的所有角色各造成一点火焰伤害，然后结束出牌阶段',
+			gw_leizhoushu:'雷咒术',
+			gw_leizhoushu_info:'获得技能雷咒术（在每个准备阶段令全场牌数最多的所有其他角色各随机弃置一张牌，重复获得时效果叠加），然后结束出牌阶段',
+			gw_aerdeyin:'阿尔德印',
+			gw_aerdeyin_info:'对相邻的角色造成一点伤害，目标摸一张牌并翻面，然后结束出牌阶段',
 			gw_xinsheng:'新生',
-			gw_xinsheng_info:'随机观看12张武将牌，选择一张替代一名角色的武将牌（不触发技能），然后结束出牌阶段',
+			gw_xinsheng_info:'随机观看12张武将牌，选择一张替代一名角色的武将牌，然后结束出牌阶段',
 			gw_zhongmozhizhan:'终末之战',
 			gw_zhongmozhizhan_info:'将所有角色区域内的所有牌置入弃牌堆（不触发技能），然后结束出牌阶段',
 			gw_butianshu:'卜天术',
@@ -838,7 +1264,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_niuquzhijing:'纽曲之镜',
 			gw_niuquzhijing_info:'交换全场体力值最大和最小角色的体力值（不触发技能），然后结束出牌阶段',
 			gw_ansha:'暗杀',
-			gw_ansha_info:'令一名体力为1的随机敌方角立即死亡（不触发技能），然后结束出牌阶段',
+			gw_ansha_info:'令一名体力为1的随机敌方角立即死亡，然后结束出牌阶段',
 			gw_shizizhaohuan:'十字召唤',
 			gw_shizizhaohuan_info:'从牌堆中获得两张杀以及决斗、火攻、火烧连营、南蛮入侵中的随机一张',
 			gw_zuihouyuanwang:'最后愿望',

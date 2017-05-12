@@ -170,7 +170,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                    });
 					},
 					result:{
-						player:1
+						player:function(player){
+							if(_status.event.type=='dying'){
+								return get.attitude(player,_status.event.dying);
+							}
+							else{
+								return 1;
+							}
+						}
 					}
 				}
 			},

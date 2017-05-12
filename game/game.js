@@ -7167,7 +7167,7 @@
 						lib.cardPack[i]=[];
 						if(card[i].card){
 							for(var j in card[i].card){
-								if(card[i].translate[j+'_info']){
+								if(!card[i].card[j].hidden&&card[i].translate[j+'_info']){
 									lib.cardPack[i].push(j);
 								}
 							}
@@ -8574,7 +8574,8 @@
     		_chongzhu:'重铸',
     		_lianhuan:'连环',
     		_lianhuan2:'连环',
-            qianxing:'潜行',
+			qianxing:'潜行',
+            mianyi:'免疫',
             fengyin:'封印',
 
 			pause:'暂停',
@@ -8759,7 +8760,7 @@
     					lib.cardPack[i]=[];
     					if(card[i].card){
     						for(var j in card[i].card){
-    							if(card[i].translate[j+'_info']){
+    							if(!card[i].card[j].hidden&&card[i].translate[j+'_info']){
     								lib.cardPack[i].push(j);
     							}
     						}
@@ -9210,12 +9211,21 @@
 							player.$phaseJudge(event.card);
 							event.cancelled=false;
 							event.trigger('phaseJudge');
-							player.popup(event.card.viewAs||event.card.name,'thunder');
+							var name=event.card.viewAs||event.card.name;
+							player.popup(name,'thunder');
+							if(!lib.card[name].effect){
+								game.delay();
+								event.redo();
+							}
+							else if(!lib.card[name].judge){
+								game.delay();
+								event.nojudge=true;
+							}
 						}
 					}
 					else event.finish();
 					"step 1"
-					if(!event.cancelled) player.judge(event.card).set('type','phase');
+					if(!event.cancelled&&!event.nojudge) player.judge(event.card).set('type','phase');
 					"step 2"
 					var name=event.card.viewAs||event.card.name;
 					if(event.cancelled&&!event.direct){
@@ -11834,7 +11844,12 @@
 							source.stat[source.stat.length-1].damage+=num;
 						}
 					}
-					player.changeHp(-num,false);
+					if(event.notrigger){
+						player.changeHp(-num,false)._triggered=null;
+					}
+					else{
+						player.changeHp(-num,false);
+					}
 					if(event.animate!==false){
 						player.$damage(source);
                         game.broadcastAll(function(nature,player){
@@ -11849,12 +11864,14 @@
                         },event.nature,player);
 						player.$damagepop(-num,event.nature);
 					}
-					if(num==0){
-						event.trigger('damageZero');
-						event._triggered=null;
-					}
-					else{
-						event.trigger('damage');
+					if(!event.notrigger){
+						if(num==0){
+							event.trigger('damageZero');
+							event._triggered=null;
+						}
+						else{
+							event.trigger('damage');
+						}
 					}
 					"step 2"
 					if(player.hp<=0&&player.isAlive()){
@@ -14457,7 +14474,7 @@
 					return next;
 				},
 				randomDiscard:function(){
-					var position='he',num=1;
+					var position='he',num=1,delay=null;
 					for(var i=0;i<arguments.length;i++){
 						if(typeof arguments[i]=='number'){
 							num=arguments[i];
@@ -14465,10 +14482,16 @@
 						else if(get.itemtype(arguments[i])=='select'){
 							position=arguments[i];
 						}
+						else if(typeof arguments[i]=='boolean'){
+							delay=arguments[i];
+						}
 					}
 					var cards=this.getCards(position).randomGets(num);
 					if(cards.length){
-						this.discard(cards);
+						var next=this.discard(cards);
+						if(typeof delay=='boolean'){
+							next.delay=delay;
+						}
 					}
 					return cards;
 				},
@@ -14695,6 +14718,10 @@
 						}
 						else if(arguments[i]=='nosource'){
 							nosource=true;
+						}
+						else if(arguments[i]=='notrigger'){
+							next._triggered=null;
+							next.notrigger=true;
 						}
 						else if(get.itemtype(arguments[i])=='nature'){
 							next.nature=arguments[i];
@@ -16204,6 +16231,32 @@
 						}
 						else{
 							if(game.players[i].hp<this.hp) return false;
+						}
+					}
+					return true;
+				},
+				isMaxCard:function(equal){
+					var nh=this.countCards('he');
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].isOut()) continue;
+						if(equal){
+							if(game.players[i].countCards('he')>=nh) return false;
+						}
+						else{
+							if(game.players[i].countCards('he')>nh) return false;
+						}
+					}
+					return true;
+				},
+				isMinCard:function(equal){
+					var nh=this.countCards('he');
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].isOut()) continue;
+						if(equal){
+							if(game.players[i].countCards('he')<=nh) return false;
+						}
+						else{
+							if(game.players[i].countCards('he')<nh) return false;
 						}
 					}
 					return true;
@@ -19226,6 +19279,31 @@
     				}
     			}
             },
+			mianyi:{
+    			trigger:{player:'damageBefore'},
+    			mark:true,
+    			forced:true,
+				init:function(player){
+                    game.log(player,'获得了','【免疫】');
+                },
+    			content:function(){
+    				trigger.untrigger();
+    				trigger.finish();
+    			},
+    			ai:{
+    				nofire:true,
+    				nothunder:true,
+    				nodamage:true,
+    				effect:{
+    					target:function(card,player,target,current){
+    						if(get.tag(card,'damage')) return [0,0];
+    					}
+    				},
+    			},
+    			intro:{
+    				content:'防止一切伤害'
+    			}
+    		},
 			mad:{
 				mark:true,
 				intro:{
@@ -26960,32 +27038,6 @@
 				}
 			}
 			return null;
-		},
-		findMax:function(list,func){
-			list=list.slice(0);
-			var list2=[];
-			list.sort(function(a,b){
-				return func(b)-func(a);
-			});
-			for(var i=0;i<list.length;i++){
-				if(func(list[i])==func(list[0])){
-					list2.push(list[i]);
-				}
-			}
-			return list2;
-		},
-		findMin:function(list,func){
-			list=list.slice(0);
-			var list2=[];
-			list.sort(function(a,b){
-				return func(a)-func(b);
-			});
-			for(var i=0;i<list.length;i++){
-				if(func(list[i])==func(list[0])){
-					list2.push(list[i]);
-				}
-			}
-			return list2;
 		},
 		findCards:function(func,all){
 			var cards=[];
@@ -39728,6 +39780,60 @@
 					card.cards=cards.slice(0);
 				}
 				return card;
+			}
+		},
+		max:function(list,func,type){
+			list=list.slice(0);
+			if(typeof func=='string'){
+				var key=func;
+				func=function(item){
+					return item[key];
+				}
+			}
+			list.sort(function(a,b){
+				return func(b)-func(a);
+			});
+			if(type=='list'){
+				var list2=[];
+				for(var i=0;i<list.length;i++){
+					if(func(list[i])==func(list[0])){
+						list2.push(list[i]);
+					}
+				}
+				return list2;
+			}
+			else if(type=='item'){
+				return list[0];
+			}
+			else{
+				return func(list[0]);
+			}
+		},
+		min:function(list,func,type){
+			list=list.slice(0);
+			if(typeof func=='string'){
+				var key=func;
+				func=function(item){
+					return item[key];
+				}
+			}
+			list.sort(function(a,b){
+				return func(a)-func(b);
+			});
+			if(type=='list'){
+				var list2=[];
+				for(var i=0;i<list.length;i++){
+					if(func(list[i])==func(list[0])){
+						list2.push(list[i]);
+					}
+				}
+				return list2;
+			}
+			else if(type=='item'){
+				return list[0];
+			}
+			else{
+				return func(list[0]);
 			}
 		},
 		character:function(name,num){
