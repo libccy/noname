@@ -29,6 +29,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_xili:['female','wu',3,['fengjian']],
 			gw_luoqi:['male','wei',4,['gwzhanjiang']],
 			gw_yioufeisi:['male','wu',4,['gwchuanxin']],
+
+			// gw_aigeleisi:['male','wu',4,[]],
+			// gw_aokeweisite:['male','wu',4,[]],
+			// gw_kaxier:['male','wu',4,[]],
+			// gw_luobo:['male','wu',4,[]],
+			// gw_mieren:['male','wu',4,[]],
+			// gw_sanhanya:['male','wu',4,[]],
+			// gw_shanhu:['male','wu',4,[]],
+			// gw_zhangyujushou:['male','wu',4,[]],
+			// gw_zhuoertan:['male','wu',4,[]],
 		},
 		characterIntro:{
 			gw_huoge:'那个老年痴呆?不知道他是活着还是已经被制成标本了!',
@@ -879,6 +889,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_xili:'希里',
 			gw_luoqi:'罗契',
 			gw_yioufeisi:'伊欧菲斯',
+
+			gw_aigeleisi:'艾格蕾斯',
+			gw_aokeweisite:'奥克维斯特',
+			gw_kaxier:'卡西尔',
+			gw_luobo:'萝卜',
+			gw_mieren:'米尔恩',
+			gw_sanhanya:'三寒鸦',
+			gw_shanhu:'珊瑚',
+			gw_zhangyujushou:'章鱼巨兽',
+			gw_zhuoertan:'卓尔坦',
 
 			tianbian:'天变',
 			tianbian_info:'出牌阶段开始时，你可以选择一项：随机使用一张对全场有正面效果的牌；或随机使用一张对全场有负面效果的牌',

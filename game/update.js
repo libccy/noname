@@ -2,7 +2,8 @@ window.noname_update={
     version:'1.9.28',
     // update:'1.9.26',
     changeLog:[
-        'bug修复'
+        'bug修复',
+        '新卡'
     ],
     files:[
         // 'game/game.js',

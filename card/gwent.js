@@ -3,6 +3,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'gwent',
 		card:{
+			gw_dudayuanshuai1:{
+				fullimage:true
+			},
+				gw_dudayuanshuai2:{
+					fullimage:true
+				},
 			gw_dieyi:{
 				fullskin:true
 			},
@@ -1273,7 +1279,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					var list=game.filterPlayer();
 					for(var i=0;i<list.length;i++){
-						if(list[i]!=player&&list[i].countCards('he')) return true;
+						if(list[i]!=player&&list[i].isMaxCard()) return true;
 					}
 					return false;
 				},
@@ -1395,7 +1401,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_hudiewu:'蝴蝶舞',
 			gw_hudiewu_info:'将其他角色在场上的所有牌替换为蝶翼（在你失去蝶翼后，你于下一个结束阶段随机弃置一张牌），然后结束出牌阶段',
 			gw_yigeniyin:'伊格尼印',
-			gw_yigeniyin_info:'对敌方角色中体力值最大一名随机角色造成一点火焰伤害，然后对场上体力值最大的所有角色各造成一点火焰伤害，然后结束出牌阶段',
+			gw_yigeniyin_info:'对敌方角色中体力值最大的一名随机角色造成一点火焰伤害，然后对场上体力值最大的所有角色各造成一点火焰伤害，然后结束出牌阶段',
 			gw_leizhoushu:'雷咒术',
 			gw_leizhoushu_info:'获得技能雷咒术（在每个准备阶段令全场牌数最多的所有其他角色各随机弃置一张牌，重复获得时效果叠加），然后结束出牌阶段',
 			gw_aerdeyin:'阿尔德印',
