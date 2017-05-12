@@ -738,7 +738,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			filter:function(event,player){
     				if(!player.hasZhuSkill('ruoyu'))return false;
     				if(player.storage.ruoyu) return false;
-    				return player.isLowestHp();
+    				return player.isMinHp();
     			},
     			content:function(){
     				player.storage.ruoyu=true;
@@ -2104,7 +2104,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.chooseCardTarget({
     					selectCard:Math.floor(player.countCards('h')/2),
     					filterTarget:function(card,player,target){
-    						return target.isFewestHandcard();
+    						return target.isMinHandcard();
     					},
     					forced:true,
     					ai2:function(target){
@@ -2428,7 +2428,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return false;
     			},
     			filter:function(event,player){
-    				return !player.isLowestHp();
+    				return !player.isMinHp();
     			},
     			content:function(){
     				"step 0"

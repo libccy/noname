@@ -1764,7 +1764,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{player:'phaseBegin'},
     			direct:true,
     			filter:function(event,player){
-    				return !player.isMostHandcard();
+    				return !player.isMaxHandcard();
     			},
     			content:function(){
     				'step 0'

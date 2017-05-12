@@ -57,7 +57,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.attitude(player,event.player)>0;
 				},
 				filter:function(event,player){
-					return event.player.isFewestHandcard();
+					return event.player.isMinHandcard();
 				},
 				logTarget:'player',
 				content:function(){
@@ -778,12 +778,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(target.isTurnedOver()) return true;
 						if(target.countCards('j')) return true;
 						if(target.hp==target.maxHp) return false;
-						return target.isLowestHp();
+						return target.isMinHp();
 					}).ai=function(target){
 						var num=0;
 						var att=get.attitude(player,target);
 						if(att>0){
-							if(target.isLowestHp()){
+							if(target.isMinHp()){
 								num+=5;
 							}
 							if(target.isTurnedOver()){
@@ -823,7 +823,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.target.discard(cards);
 					}
 					"step 5"
-					if(event.target.isLowestHp()){
+					if(event.target.isMinHp()){
 						event.target.recover();
 					}
 				},

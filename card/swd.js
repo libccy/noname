@@ -4249,7 +4249,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseEnd'},
 				frequent:true,
 				filter:function(event,player){
-					return player.isLowestHp()&&player.isDamaged();
+					return player.isMinHp()&&player.isDamaged();
 				},
 				content:function(){
 					player.recover();

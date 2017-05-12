@@ -327,7 +327,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return target.countCards('h')>player.countCards('h');
     			},
     			filter:function(event,player){
-    				return !player.isMostHandcard();
+    				return !player.isMaxHandcard();
     			},
     			content:function(){
     				'step 0'
@@ -903,7 +903,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			enable:'phaseUse',
     			usable:1,
     			filter:function(event,player){
-    				return player.isFewestHandcard();
+    				return player.isMinHandcard();
     			},
     			filterTarget:function(card,player,target){
     				return target!=player&&target.countCards('h')>0;
@@ -2287,7 +2287,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return 8-get.value(card);
     			},
     			filterTarget:function(card,player,target){
-    				return target.isDamaged()&&target.isLowestHp();
+    				return target.isDamaged()&&target.isMinHp();
     			},
     			selectTarget:-1,
     			content:function(){

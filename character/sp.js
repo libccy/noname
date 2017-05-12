@@ -1284,7 +1284,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				if(num==1) return false;
     				if(player.hp<=1) return true;
     				if(num==2) return false;
-    				if(num==3) return player.hp<3&&player.isLowestHp();
+    				if(num==3) return player.hp<3&&player.isMinHp();
     				return true;
     			},
     			content:function(){

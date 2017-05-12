@@ -16184,7 +16184,7 @@
                 isHealthy:function(){
                     return this.hp==this.maxHp;
                 },
-				isHighestHp:function(equal){
+				isMaxHp:function(equal){
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].isOut()) continue;
 						if(equal){
@@ -16196,7 +16196,7 @@
 					}
 					return true;
 				},
-				isLowestHp:function(equal){
+				isMinHp:function(equal){
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].isOut()) continue;
 						if(equal){
@@ -16208,7 +16208,7 @@
 					}
 					return true;
 				},
-				isMostHandcard:function(equal){
+				isMaxHandcard:function(equal){
 					var nh=this.countCards('h');
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].isOut()) continue;
@@ -16221,7 +16221,7 @@
 					}
 					return true;
 				},
-				isFewestHandcard:function(equal){
+				isMinHandcard:function(equal){
 					var nh=this.countCards('h');
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].isOut()) continue;

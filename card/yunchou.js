@@ -463,13 +463,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'trick',
 				enable:true,
 				filterTarget:function(card,player,target){
-					return (target.isLowestHp()&&target.isDamaged())||target.isFewestHandcard();
+					return (target.isMinHp()&&target.isDamaged())||target.isMinHandcard();
 				},
 				content:function(){
 					'step 0'
-					if(target.isFewestHandcard()) target.draw(2);
+					if(target.isMinHandcard()) target.draw(2);
 					'step 1'
-					if(target.isLowestHp()) target.recover();
+					if(target.isMinHp()) target.recover();
 				},
 				ai:{
 					order:2.5,
@@ -477,7 +477,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							var num=0;
-							if(target.isLowestHp()&&get.recoverEffect(target)>0){
+							if(target.isMinHp()&&get.recoverEffect(target)>0){
 								if(target.hp==1){
 									num+=3;
 								}
@@ -485,7 +485,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 									num+=2;
 								}
 							}
-							if(target.isFewestHandcard()){
+							if(target.isMinHandcard()){
 								num+=2;
 							}
 							return num;

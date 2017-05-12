@@ -127,8 +127,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                value:4,
 	                result:{
 	                    target:function(player,target){
-	                        if(player==target&&target.isLowestHp()) return 2;
-	                        if(target.isLowestHp()) return 1.5;
+	                        if(player==target&&target.isMinHp()) return 2;
+	                        if(target.isMinHp()) return 1.5;
 	                        return 1/Math.max(1,target.hp);
 	                    }
 	                }
@@ -291,7 +291,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                result:{
 	                    target:function(player,target){
 	                        if(target.isHealthy()) return player.needsToDiscard()?0.1:0;
-	                        if(target.isLowestHp()) return 1.5;
+	                        if(target.isMinHp()) return 1.5;
 	                        return 1/Math.max(1,target.hp);
 	                    }
 	                }
@@ -917,7 +917,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            content:function(){
 	                var list=player.getEnemies();
 	                for(var i=0;i<list.length;i++){
-	                    if(!list[i].isHighestHp()){
+	                    if(!list[i].isMaxHp()){
 	                        list.splice(i--,1);
 	                    }
 	                }
@@ -1148,7 +1148,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                }
 	            },
 	            content:function(){
-	                if(player.isLowestHp()){
+	                if(player.isMinHp()){
 	                    player.logSkill('liyutang');
 	                    player.changeHujia();
 	                }
@@ -1175,7 +1175,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                }
 	            },
 	            content:function(){
-	                if(player.isDamaged()&&player.isLowestHp()){
+	                if(player.isDamaged()&&player.isMinHp()){
 	                    player.logSkill('yougeng');
 	                    player.recover();
 	                }

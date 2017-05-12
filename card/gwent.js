@@ -164,10 +164,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				notarget:true,
 				contentBefore:function(){
 					var list1=game.filterPlayer(function(current){
-						return current.isHighestHp();
+						return current.isMaxHp();
 					});
 					var list2=game.filterPlayer(function(current){
-						return current.isLowestHp();
+						return current.isMinHp();
 					});
 					player.line(list1);
 					for(var i=0;i<list1.length;i++){
@@ -194,12 +194,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var max=null,min=null;
 					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isHighestHp()){
+						if(game.players[i].isMaxHp()){
 							max=game.players[i].hp;break;
 						}
 					}
 					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isLowestHp()){
+						if(game.players[i].isMinHp()){
 							min=game.players[i].hp;break;
 						}
 					}
@@ -233,10 +233,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						player:function(player,target){
 							return game.countPlayer(function(current){
-								if(current.isHighestHp()){
+								if(current.isMaxHp()){
 									return -get.sgn(get.attitude(player,current));
 								}
-								if(current.isLowestHp()){
+								if(current.isMinHp()){
 									return get.sgn(get.attitude(player,current));
 								}
 							});
@@ -296,6 +296,137 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 
+			gw_youer:{
+				fullborder:'silver',
+				type:'spell',
+				subtype:'spell_silver',
+				vanish:true,
+				enable:true,
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countCards('e')>0;
+				},
+				content:function(){
+					var cards=target.getCards('e');
+					target.gain(cards,'draw2');
+					target.draw(cards.length);
+				},
+				ai:{
+					basic:{
+						order:6,
+						value:7,
+						useful:[3,1],
+					},
+					result:{
+						target:function(player,target){
+							var num=target.countCards('e');
+							if(target.hasSkillTag('noe')){
+								num*=1.5;
+							}
+							if(target==_status.currentPhase){
+								num*=1.2;
+							}
+							return num/1.5;
+						},
+					},
+				}
+			},
+			gw_tongdi:{
+				fullborder:'silver',
+				type:'spell',
+				subtype:'spell_silver',
+				vanish:true,
+				enable:true,
+				filterTarget:true,
+				content:function(){
+					'step 0'
+					if(!player.countCards('h')){
+						event.finish();
+					}
+					else{
+						player.chooseCard('h','将一张手牌交给'+get.translation(target),true);
+					}
+					'step 1'
+					player.$giveAuto(result.cards,target);
+					target.gain(result.cards,player);
+					'step 2'
+					player.gainPlayerCard(target,'h',true,2,'visible');
+				},
+				ai:{
+					basic:{
+						order:8,
+						value:9.5,
+						useful:[5,1],
+					},
+					result:{
+						target:function(player,target){
+							if(player.countCards('h','gw_tongdi')==player.countCards('h')) return 0;
+							if(!target.countCards('h')) return 0;
+							return -1;
+						},
+						player:function(player,target){
+							if(player.countCards('h','gw_tongdi')==player.countCards('h')) return 0;
+							if(!target.countCards('h')) return 0;
+							return 0.5;
+						},
+					},
+				}
+			},
+			gw_fuyuan:{
+				fullborder:'silver',
+				type:'spell',
+				subtype:'spell_silver',
+				vanish:true,
+				savable:true,
+				selectTarget:-1,
+				content:function(){
+					target.recover();
+					target.changeHujia();
+				},
+				ai:{
+					basic:{
+						order:6,
+						useful:10,
+						value:[8,6.5,5,4],
+					},
+					result:{
+						target:2
+					},
+					tag:{
+						recover:1,
+						save:1,
+					}
+				}
+			},
+			gw_zhuoshao:{
+				fullborder:'silver',
+				type:'spell',
+				subtype:'spell_silver',
+				vanish:true,
+				enable:true,
+				filterTarget:function(card,player,target){
+					return target.isMaxHp();
+				},
+				cardnature:'fire',
+				selectTarget:[1,Infinity],
+				content:function(){
+					target.damage('fire');
+				},
+				ai:{
+					basic:{
+						order:8.5,
+						value:7.5,
+						useful:[4,1],
+					},
+					result:{
+						target:-1
+					},
+					tag:{
+						damage:1,
+						fireDamage:1,
+						natureDamage:1,
+					}
+				}
+			},
 			gw_butianshu:{
 				fullborder:'silver',
 				type:'spell',
@@ -381,10 +512,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				// },
 				content:function(){
     				var list=[];
-					list.push(get.cardPile('sha','cardPile'));
-					list.push(get.cardPile('shan','cardPile'));
-					list.push(get.cardPile('tao','cardPile'));
-					// list.push(get.cardPile('jiu','cardPile'));
+					list.push(get.cardPile('juedou','cardPile'));
+					list.push(get.cardPile('huogong','cardPile'));
+					list.push(get.cardPile('nanman','cardPile'));
+					list.push(get.cardPile('huoshaolianying','cardPile'));
+					list=[list.randomGet()];
+					var sha=get.cardPile('sha','cardPile');
+					if(sha){
+						sha.remove();
+						list.push(sha);
+						list.push(get.cardPile('sha','cardPile'));
+					}
 					if(list.length){
 						player.gain(list,'gain2');
 					}
@@ -702,19 +840,41 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_ansha:'暗杀',
 			gw_ansha_info:'令一名体力为1的随机敌方角立即死亡（不触发技能），然后结束出牌阶段',
 			gw_shizizhaohuan:'十字召唤',
-			gw_shizizhaohuan_info:'从牌堆中获得一张杀、一张闪和一张桃',
+			gw_shizizhaohuan_info:'从牌堆中获得两张杀以及决斗、火攻、火烧连营、南蛮入侵中的随机一张',
 			gw_zuihouyuanwang:'最后愿望',
 			gw_zuihouyuanwang_info:'摸X张牌并弃置X张牌，X为存活角色数',
 			gw_zirankuizeng:'自然馈赠',
-			gw_zirankuizeng_info:'重新结算一次你上一张使用的非转化普通锦囊牌，然后摸一张牌',
+			gw_zirankuizeng_info:'重新结算一遍你上一张使用的非转化普通锦囊牌，然后摸一张牌',
 			gw_poxiao:'破晓',
 			gw_poxiao_info:'选择一项：弃置一名角色判定区内的所有牌，或随机获得一张铜卡法术（破晓除外）并展示之',
-			gw_baoxueyaoshui:'暴雪药水',
-			gw_baoxueyaoshui_info:'令一名角色摸两张牌并翻面',
 			gw_zumoshoukao:'阻魔手铐',
 			gw_zumoshoukao_info:'令一名角色失去所有护甲且非锁定技失效直到下一回合结束',
 			gw_aozuzhilei:'奥祖之雷',
 			gw_aozuzhilei_info:'对一名体力值不小于你的角色造成一点雷属性伤害，然后该角色摸一张牌',
+			gw_zhuoshao:'灼烧',
+			gw_zhuoshao_info:'对任意名体力值为全场最高的角色使用，造成一点火属性伤害',
+			gw_fuyuan:'复原',
+			gw_fuyuan_info:'对一名濒死状态角色使用，目标回复一点体力并获得一点护甲',
+			gw_youer:'诱饵',
+			gw_youer_info:'令一名装备区内有牌的其他角色将装备区内的牌收回手牌，然后摸等量的牌',
+			gw_tongdi:'通敌',
+			gw_tongdi_info:'交给一名角色一张手牌，然后观看其手牌并获得其中两张',
+			gw_baoxueyaoshui:'暴雪药水',
+			gw_baoxueyaoshui_info:'令一名角色弃置两张手牌并摸一张牌',
+			gw_birinongwu:'蔽日浓雾',
+			gw_birinongwu_info:'所有角色不能使用杀直到下一回合结束',
+			gw_qinpendayu:'倾盆大雨',
+			gw_qinpendayu_info:'所有角色进入横置状态',
+			gw_cigubingshuang:'刺骨寒霜',
+			gw_cigubingshuang_info:'所有角色下个摸牌阶段摸牌数-1',
+			gw_wenyi:'瘟疫',
+			gw_wenyi_info:'令所有体力值为全场最少的角色随机弃置一张牌',
+			gw_yanziyaoshui:'燕子药水',
+			gw_yanziyaoshui_info:'令一名角色摸一张牌，若其手牌数为全场最少，改为摸三张',
+			gw_guaiwuchaoxue:'怪物巢穴',
+			gw_guaiwuchaoxue_info:'选择手牌中的一张杀、闪或酒，获得两张该牌的复制',
+			gw_shanbengshu:'山崩术',
+			gw_shanbengshu_info:'所有角色随机弃置一张牌',
 		},
 		cardType:{
 			spell:0.5,

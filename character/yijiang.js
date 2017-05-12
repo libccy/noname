@@ -4291,7 +4291,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			enable:'phaseUse',
     			usable:1,
     			filterTarget:function(card,player,target){
-    				return target.isHighestHp();
+    				return target.isMaxHp();
     			},
     			check:function(card){return 7-get.value(card);},
     			position:'he',
