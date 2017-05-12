@@ -166,13 +166,13 @@
 					},
 					enable_pressure:{
 						name:'启用压感',
-						init:true,
+						init:false,
 						intro:'开启后可通过按压执行操作',
 						unfrequent:true,
 					},
 					pressure_taptic:{
 						name:'触觉反馈',
-						init:true,
+						init:false,
 						intro:'开启后按压操作执行时将产生震动',
 						unfrequent:true,
 					},
