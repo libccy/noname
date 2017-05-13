@@ -3,7 +3,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'gwent',
 		character:{
-			gw_huoge:['male','qun',3,['quanzhang']],
+			gw_huoge:['male','qun',3,['yinzhang']],
 			gw_aisinie:['female','wu',3,['huihun']],
 			gw_enxier:['male','wei',4,['gwbaquan']],
 
@@ -20,7 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			// gw_kuite:['male','qun',3,[]],
 			// gw_fuertaisite:['male','qun',3,[]],
 			// gw_hengsaite:['male','qun',3,[]],
-			// gw_fulisi:['male','qun',3,[]],
+			gw_fulisi:['male','qun',3,['lanquan']],
 			// gw_gaier:['male','shu',3,['hunmo']],
 
 			gw_jieluote:['male','qun',6,['fayin']],
@@ -31,7 +31,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:['male','wu',4,['gwchuanxin']],
 
 			// gw_aigeleisi:['male','wu',4,[]],
-			// gw_aokeweisite:['male','wu',4,[]],
+			gw_aokeweisite:['male','qun',4,['yunhuo']],
 			// gw_kaxier:['male','wu',4,[]],
 			// gw_luobo:['male','wu',4,[]],
 			// gw_mieren:['male','wu',4,[]],
@@ -54,6 +54,70 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			yunhuo:{
+				trigger:{player:'phaseBegin'},
+				filter:function(event,player){
+					return game.roundNumber%4==0&&event.skill!='yunhuo2';
+				},
+				forced:true,
+				content:function(){
+					'step 0'
+					player.addSkill('yunhuo2');
+					event.list=player.getEnemies().sortBySeat();
+					'step 1'
+					if(event.list.length){
+						var target=event.list.shift();
+						player.line(target,'fire');
+						if(target.countCards('h')){
+							target.randomDiscard('h',false);
+						}
+						else{
+							target.damage('fire');
+						}
+						event.redo();
+					}
+					'step 2'
+					game.delayx();
+				}
+			},
+			yunhuo2:{
+				trigger:{player:'phaseAfter'},
+				forced:true,
+				popup:false,
+				silent:true,
+				priority:-50,
+				content:function(){
+					player.insertPhase();
+					player.removeSkill('yunhuo2');
+				}
+			},
+			yinzhang:{
+    			enable:'phaseUse',
+    			usable:1,
+    			filterCard:true,
+    			position:'he',
+    			check:function(card){
+    				return 8-get.value(card)
+    			},
+    			content:function(){
+    				'step 0'
+					var list=get.typeCard('spell_silver').randomGets(3);
+					if(!list.length){
+						event.finish();
+						return;
+					}
+					var dialog=ui.create.dialog('选择一张加入你的手牌',[list,'vcard'],'hidden');
+    				player.chooseButton(dialog,true);
+    				'step 1'
+    				player.gain(game.createCard(result.links[0][2]),'draw');
+    			},
+    			ai:{
+    				order:8,
+    				result:{
+    					player:1
+    				},
+    			}
+    		},
 			tianbian:{
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
@@ -814,7 +878,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			quanzhang:{
+			lanquan:{
 				enable:'phaseUse',
 				usable:1,
 				onChooseToUse:function(event){
@@ -829,17 +893,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<num;i++){
 						cards.push(ui.cardPile.childNodes[i]);
 					}
-					event.set('quanzhangcards',cards);
+					event.set('lanquancards',cards);
 				},
 				chooseButton:{
 					dialog:function(event,player){
-						return ui.create.dialog('权杖：选择一张牌使用',event.quanzhangcards);
+						return ui.create.dialog('权杖：选择一张牌使用',event.lanquancards);
 					},
 					filter:function(button,player){
 						var evt=_status.event.getParent();
 						if(evt&&evt.filterCard){
 							var type=get.type(button.link,'trick');
-							return type!='equip'&evt.filterCard(button.link,player,evt);
+							return evt.filterCard(button.link,player,evt);
 						}
 						return false;
 					},
@@ -900,6 +964,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_zhangyujushou:'章鱼巨兽',
 			gw_zhuoertan:'卓尔坦',
 
+			yunhuo:'陨火',
+			yunhuo_info:'锁定技，准备阶段，若游戏轮数为4的倍数，你令所有敌方角色随机弃置一张手牌（若没有手牌改为受到一点火焰伤害），然后在此回合结束后获得一个额外回合',
+			yinzhang:'银杖',
+			yinzhang_info:'出牌阶段限一次，你可以弃置一张牌，然后从3张随机亮出的牌中选择一张加入手牌',
 			tianbian:'天变',
 			tianbian_info:'出牌阶段开始时，你可以选择一项：随机使用一张对全场有正面效果的牌；或随机使用一张对全场有负面效果的牌',
 			gwxiaoshou:'枭首',
@@ -930,9 +998,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hunmo_info:'准备阶段和结束阶段，你可以令任意名角色的手牌数等于其当前体力值（最多为3）',
 			huihun:'回魂',
 			huihun_info:'结束阶段，你可以从弃牌堆中获得本回合使用的前两张红色牌',
-			quanzhang:'权杖',
-			quanzhang_backup:'权杖',
-			quanzhang_info:'出牌阶段限一次，你可以观看牌堆顶的6张牌，并选择一张使用',
+			lanquan:'揽权',
+			lanquan_backup:'揽权',
+			lanquan_info:'出牌阶段限一次，你可以观看牌堆顶的6张牌，并选择一张使用',
 
 			chaoyong:'潮涌',
 			chaoyong_info:'准备阶段，你可以弃置一张牌，视为对所有敌方角色使用一张南蛮入侵或万箭齐发',

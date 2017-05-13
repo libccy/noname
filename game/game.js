@@ -35565,6 +35565,9 @@
 					break;
 
 					case 'vcard':
+					if(typeof item=='string'){
+						item=[get.type(item),'',item];
+					}
 					node=ui.create.card(position,'noclick',noclick);
 					node.classList.add('button');
                     node.init(item);
@@ -40128,10 +40131,9 @@
             for(var i in lib.card){
                 if(typeof filter=='function'&&!filter(i)) continue;
                 if(!lib.translate[i+'_info']) continue;
-                if(type.indexOf('equip')==0&&type.length==6){
-                    if(get.subtype(i)==type) list.push(i);
-                }
-                else if(type.indexOf('hslingjian')==0&&type.length==11){
+                if((type.indexOf('equip')==0&&type.length==6)||
+					(type.indexOf('hslingjian')==0&&type.length==11)||
+					(type.indexOf('spell_')==0)){
                     if(get.subtype(i)==type) list.push(i);
                 }
                 else{
