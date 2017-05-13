@@ -109,7 +109,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'spell',
 				subtype:'spell_gold',
 				vanish:true,
-				enable:true,
+				enable:function(card,player){
+					return game.hasPlayer(function(current){
+						return current!=player&&current.countCards('ej');
+					});
+				},
 				notarget:true,
 				contentBefore:function(){
 					player.$skill('蝴蝶舞','legend','metal');
@@ -1255,7 +1259,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.updateMarks();
 				},
 				intro:{
-					content:'在下一个结束阶段，你随机弃置#张牌'
+					content:'在当前回合的结束阶段，你随机弃置#张牌'
 				},
 				content:function(){
 					player.randomDiscard(player.storage.gw_dieyi);
@@ -1274,6 +1278,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
+				nopop:true,
 				trigger:{player:'phaseBegin'},
 				forced:true,
 				filter:function(event,player){
@@ -1392,14 +1397,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_dieyi_equip4:'蝶翼·防',
 			gw_dieyi_equip5:'蝶翼·宝',
 			gw_dieyi_judge:'蝶翼·判',
-			gw_dieyi_equip1_info:'在你从装备区中失去此牌后，你于下一个结束阶段随机弃置一张牌',
-			gw_dieyi_equip2_info:'在你从装备区中失去此牌后，你于下一个结束阶段随机弃置一张牌',
-			gw_dieyi_equip3_info:'在你从装备区中失去此牌后，你于下一个结束阶段随机弃置一张牌',
-			gw_dieyi_equip4_info:'在你从装备区中失去此牌后，你于下一个结束阶段随机弃置一张牌',
-			gw_dieyi_equip5_info:'在你从装备区中失去此牌后，你于下一个结束阶段随机弃置一张牌',
-			gw_dieyi_judge_info:'判定阶段移去此牌，并于下一个结束阶段随机弃置一张牌',
+			gw_dieyi_equip1_info:'在你从装备区中失去此牌后，你于当前回合的结束阶段段随机弃置一张牌',
+			gw_dieyi_equip2_info:'在你从装备区中失去此牌后，你于当前回合的结束阶段段随机弃置一张牌',
+			gw_dieyi_equip3_info:'在你从装备区中失去此牌后，你于当前回合的结束阶段段随机弃置一张牌',
+			gw_dieyi_equip4_info:'在你从装备区中失去此牌后，你于当前回合的结束阶段段随机弃置一张牌',
+			gw_dieyi_equip5_info:'在你从装备区中失去此牌后，你于当前回合的结束阶段段随机弃置一张牌',
+			gw_dieyi_judge_info:'判定阶段移去此牌，并于当前回合的结束阶段随机弃置一张牌',
 			gw_hudiewu:'蝴蝶舞',
-			gw_hudiewu_info:'将其他角色在场上的所有牌替换为蝶翼（在你失去蝶翼后，你于下一个结束阶段随机弃置一张牌），然后结束出牌阶段',
+			gw_hudiewu_info:'将其他角色在场上的所有牌替换为蝶翼（在你失去蝶翼后，你于当前回合的结束阶段随机弃置一张牌），然后结束出牌阶段',
 			gw_yigeniyin:'伊格尼印',
 			gw_yigeniyin_info:'对敌方角色中体力值最大的一名随机角色造成一点火焰伤害，然后对场上体力值最大的所有角色各造成一点火焰伤害，然后结束出牌阶段',
 			gw_leizhoushu:'雷咒术',

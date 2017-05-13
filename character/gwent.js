@@ -36,7 +36,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			// gw_luobo:['male','wu',4,[]],
 			// gw_mieren:['male','wu',4,[]],
 			// gw_sanhanya:['male','wu',4,[]],
-			// gw_shanhu:['male','wu',4,[]],
+			gw_shanhu:['female','qun',3,['shuijian']],
 			// gw_zhangyujushou:['male','wu',4,[]],
 			// gw_zhuoertan:['male','wu',4,[]],
 		},
@@ -54,6 +54,38 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			shuijian:{
+				trigger:{player:'phaseBegin'},
+				direct:true,
+				filter:function(event,player){
+					return player.countCards('h')>0;
+				},
+				content:function(){
+					'step 0'
+					var targets=player.getEnemies();
+					var num=0;
+					for(var i=0;i<targets.length;i++){
+						num+=get.sgn(get.effect(targets[i],{name:'wanjian'},player,player));
+					}
+					event.targets=targets;
+					player.chooseToDiscard(get.prompt('shuijian')).set('ai',function(card){
+						if(num>=3) return 10-get.value(card);
+						if(num>=2) return 9-get.value(card);
+						if(num>=1) return 7-get.value(card);
+						return 0;
+					}).logSkill='shuijian';
+					'step 1'
+					if(result.bool){
+						for(var i=0;i<event.targets.length;i++){
+							event.targets[i].addExpose(0.1);
+						}
+						player.useCard({name:'wanjian'},event.targets);
+					}
+				},
+				ai:{
+					threaten:1.6
+				}
+			},
 			yunhuo:{
 				trigger:{player:'phaseBegin'},
 				filter:function(event,player){
@@ -964,6 +996,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_zhangyujushou:'章鱼巨兽',
 			gw_zhuoertan:'卓尔坦',
 
+			shuijian:'水箭',
+			shuijian_info:'准备阶段，你可以弃置一张手牌视为对所有敌方角色使用一张万箭齐发',
 			yunhuo:'陨火',
 			yunhuo_info:'锁定技，准备阶段，若游戏轮数为4的倍数，你令所有敌方角色随机弃置一张手牌（若没有手牌改为受到一点火焰伤害），然后在此回合结束后获得一个额外回合',
 			yinzhang:'银杖',
