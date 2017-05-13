@@ -8321,7 +8321,7 @@
 		        var list=lib.rank.s.concat(lib.rank.ap).concat(lib.rank.a).concat(lib.rank.am).
 		            concat(lib.rank.bp).concat(lib.rank.b).concat(lib.rank.bm).concat(lib.rank.c).concat(lib.rank.d);
 		        for(var i in lib.character){
-		            if(i!='zuoci'&&i.indexOf('boss_')!=0&&i.indexOf('tafang_')!=0&&!list.contains(i)) console.log(get.translation(i));
+		            if(i!='zuoci'&&i!='miheng'&&i.indexOf('boss_')!=0&&i.indexOf('tafang_')!=0&&!list.contains(i)) console.log(get.translation(i));
 		        }
 		    },
 			h:function(player){

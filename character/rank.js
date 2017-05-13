@@ -72,7 +72,7 @@ window.noname_character_rank={
         'hs_sapphiron',
         'gw_airuiting',
         'gw_dagong',
-        'gw_huoge',
+        'gw_fulisi',
         'gw_xili',
         'gw_yenaifa',
         'gw_yioufeisi',
@@ -277,6 +277,7 @@ window.noname_character_rank={
         'hs_mojinbaozi',
     ],
     bp:[
+        'gw_aokeweisite',
         'pal_wangxiaohu',
         'pal_shenqishuang',
         'pal_sumei',
