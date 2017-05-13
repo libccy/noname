@@ -703,7 +703,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					if(get.is.altered('dili')){
-						trigger.num+=Math.ceil(player.maxHp-player.hp)/2;
+						trigger.num+=Math.ceil((player.maxHp-player.hp)/2);
 					}
 					else{
 						trigger.num+=player.maxHp-player.hp;
