@@ -2035,7 +2035,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	        tuijin2:{
 	            mod:{
 	                globalFrom:function(from,to){
-	                    if(to==from.storage.feitiao2) return -Infinity;
+	                    if(to==from.storage.tuijin2) return -Infinity;
 	                }
 	            },
 	            mark:'character',
