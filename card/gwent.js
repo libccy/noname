@@ -1328,6 +1328,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				silent:true,
 				filter:function(event,player){
+					if(!lib.config.cards.contains('gwent')) return false;
 					if(get.info(event.card).complexTarget) return false;
 					if(!event.targets) return false;
 					return (get.type(event.card)=='trick'&&event.cards[0]&&event.cards[0]==event.card);
@@ -1343,6 +1344,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				priority:-11,
 				filter:function(event,player){
+					if(!lib.config.cards.contains('gwent')) return false;
 					return event.num>0&&event.parent.name=='phaseDraw';
 				},
 				content:function(){

@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.9.28',
+    version:'1.9.28.1',
     // update:'1.9.26',
     changeLog:[
         'bug修复',
@@ -13,7 +13,7 @@ window.noname_update={
         // 'game/pressure.js',
         // 'game/asset.js',
         // 'card/*',
-        // 'card/swd.js',
+        'card/gwent.js',
         // 'card/standard.js',
         // 'character/*',
         // 'character/rank.js',
