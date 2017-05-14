@@ -3,12 +3,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'gwent',
 		card:{
-			gw_dudayuanshuai1:{
-				fullimage:true
-			},
-				gw_dudayuanshuai2:{
-					fullimage:true
-				},
 			gw_dieyi:{
 				fullskin:true
 			},

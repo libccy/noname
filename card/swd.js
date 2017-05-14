@@ -915,8 +915,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<list.length;i++){
 							list[i]=game.createCard(list[i]);
 						}
+						target.gain(list,'gain2');
 					}
-					target.gain(list,'gain2');
 				},
 				ai:{
 					order:10,
@@ -990,15 +990,24 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						event.finish();
 						return;
 					}
+					if(!list.length&&!list2.length){
+						event.finish();
+						return;
+					}
 					var num=get.rand(es.length);
 					var card;
 					target.removeEquipTrigger();
+					var delayed=0;
 					for(var i=0;i<es.length;i++){
 						if(i==num){
 							card=game.createCard(list2.randomGet());
 						}
 						else{
 							card=game.createCard(list.randomGet());
+						}
+						if(!card){
+							delayed++;
+							continue;
 						}
 						cards.push(card);
 						time+=200;
@@ -1014,7 +1023,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 									card.classList.remove('glow');
 								},500);
 							}
-						}(es[i],lib.skill._lingjianduanzao.process([card,es[i]]),i==es.length-1)),i*200);
+						}(es[i],lib.skill._lingjianduanzao.process([card,es[i]]),i==es.length-1)),(i-delayed)*200);
 					}
 					target.$gain2(cards);
 					game.pause();
@@ -3927,8 +3936,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<list.length;i++){
 							list[i]=game.createCard(list[i]);
 						}
+						player.gain(list,'gain2');
 					}
-					player.gain(list,'gain2');
 				}
 			},
 			_lingjianduanzao:{

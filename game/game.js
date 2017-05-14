@@ -40130,6 +40130,7 @@
             var list=[];
             for(var i in lib.card){
                 if(typeof filter=='function'&&!filter(i)) continue;
+				if(lib.config.bannedcards.contains(i)) continue;
                 if(!lib.translate[i+'_info']) continue;
                 if((type.indexOf('equip')==0&&type.length==6)||
 					(type.indexOf('hslingjian')==0&&type.length==11)||
@@ -40145,6 +40146,8 @@
 		libCard:function(filter){
 			var list=[];
 			for(var i in lib.card){
+				if(lib.config.bannedcards.contains(i)) continue;
+				if(!lib.translate[i+'_info']) continue;
 				if(filter(lib.card[i],i)){
 					list.push(i);
 				}

@@ -5420,7 +5420,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return false;
     			},
     			content:function(){
-    				player.gain(game.createCard(get.typeCard('hslingjian').randomGet()),'gain2');
+                    var list=get.typeCard('hslingjian');
+					if(!list.length){
+						return;
+					}
+	                player.gain(game.createCard(list.randomGet()),'gain2');
     			}
     		},
     		meihuo:{

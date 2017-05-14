@@ -3028,6 +3028,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					num=1;
     				}
     				var list=get.typeCard('hslingjian');
+                    if(!list.length){
+                        return;
+                    }
     				var cards=[];
     				while(num--){
     					cards.push(game.createCard(list.randomGet()));
