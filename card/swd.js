@@ -142,8 +142,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'trick',
 				nodelay:true,
 				chongzhu:true,
+				global:'g_shencaojie',
 				content:function(){
-					event.getParent('_shencaojie')._trigger.num++;
+					event.getParent('g_shencaojie')._trigger.num++;
 				},
 				ai:{
 					order:1,
@@ -244,6 +245,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'jiqi',
 				addinfo:'杀',
 				autoViewAs:'sha',
+				global:['g_yuchan_swap','g_yuchan_equip'],
 				ai:{
 					value:6,
 					useful:[5,1]
@@ -254,6 +256,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'jiqi',
 				addinfo:'药',
 				autoViewAs:'caoyao',
+				global:['g_yuchan_swap','g_yuchan_equip'],
 				ai:{
 					value:6,
 					useful:[7,2]
@@ -264,6 +267,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'jiqi',
 				autoViewAs:'jiu',
 				addinfo:'酒',
+				global:['g_yuchan_swap','g_yuchan_equip'],
 				savable:function(card,player,dying){
 					return dying==player;
 				},
@@ -277,6 +281,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'jiqi',
 				autoViewAs:'tao',
 				addinfo:'桃',
+				global:['g_yuchan_swap','g_yuchan_equip'],
 				savable:true,
 				ai:{
 					value:6,
@@ -287,6 +292,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'jiqi',
 				autoViewAs:'shenmiguo',
+				global:['g_yuchan_swap','g_yuchan_equip'],
 				addinfo:'果',
 				ai:{
 					order:1,
@@ -312,6 +318,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'jiqi',
 				autoViewAs:'tianxianjiu',
+				global:['g_yuchan_swap','g_yuchan_equip'],
 				addinfo:'仙',
 				ai:{
 					value:6,
@@ -323,6 +330,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'jiqi',
 				addinfo:'蛋',
 				autoViewAs:'fengyinzhidan',
+				global:['g_yuchan_swap','g_yuchan_equip'],
 				ai:{
 					value:6,
 					useful:1
@@ -333,6 +341,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'jiqi',
 				addinfo:'雪',
 				autoViewAs:'xuejibingbao',
+				global:['g_yuchan_swap','g_yuchan_equip'],
 				ai:{
 					value:6,
 					useful:4
@@ -461,6 +470,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			zhuquezhizhang:{
 				type:'jiqi',
 				fullskin:true,
+				global:'g_zhuquezhizhang`',
 				ai:{
 					value:8,
 					useful:6.5,
@@ -469,6 +479,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			xuanwuzhihuang:{
 				type:'jiqi',
 				fullskin:true,
+				global:'g_xuanwuzhihuang',
 				ai:{
 					value:8,
 					useful:6.5,
@@ -477,6 +488,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			huanglinzhicong:{
 				type:'jiqi',
 				fullskin:true,
+				global:'g_huanglinzhicong',
 				ai:{
 					value:8,
 					useful:6.5,
@@ -485,6 +497,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			cangchizhibi:{
 				type:'jiqi',
 				fullskin:true,
+				global:'g_cangchizhibi',
 				ai:{
 					value:8,
 					useful:6.5,
@@ -493,6 +506,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			qinglongzhigui:{
 				type:'jiqi',
 				fullskin:true,
+				global:'g_qinglongzhigui',
 				ai:{
 					value:8,
 					useful:6.5,
@@ -501,6 +515,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			baishouzhihu:{
 				type:'jiqi',
 				fullskin:true,
+				global:'g_baishouzhihu',
 				ai:{
 					value:8,
 					useful:6.5,
@@ -869,6 +884,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			shenmiguo:{
 				fullskin:true,
 				type:'basic',
+				global:'g_shenmiguo',
 				content:function(){
 					if(Array.isArray(player.storage.shenmiguo)){
 						player.useCard(player.storage.shenmiguo[0],player.storage.shenmiguo[1]);
@@ -1768,6 +1784,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				enable:true,
+				global:'g_zhufangshenshi',
 				filterTarget:function(card,player,target){
 					return target!=player;
 				},
@@ -2045,7 +2062,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				onremove:true,
 			},
-			_zhufangshenshi:{
+			g_zhufangshenshi:{
 				trigger:{player:'useCardAfter'},
 				forced:true,
 				popup:false,
@@ -2076,7 +2093,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			dujian2:{},
-			_yuchan_swap:{
+			g_yuchan_swap:{
 				trigger:{player:'useCardAfter'},
 				forced:true,
 				popup:false,
@@ -2092,7 +2109,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			_yuchan_equip:{
+			g_yuchan_equip:{
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
@@ -2186,7 +2203,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			_shencaojie:{
+			g_shencaojie:{
 				trigger:{source:'damageBegin'},
 				direct:true,
 				filter:function(event,player){
@@ -2201,11 +2218,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},trigger.player,-1).targetRequired=true;
 				}
 			},
-			_shenmiguo:{
+			g_shenmiguo:{
 				trigger:{player:'useCardAfter'},
 				direct:true,
 				filter:function(event,player){
-					if(event.parent.name=='_shenmiguo') return false;
+					if(event.parent.name=='g_shenmiguo') return false;
 					if(_status.currentPhase!=player) return false;
 					if(event.parent.parent.name!='phaseUse') return false;
 					if(!event.targets||!event.card) return false;
@@ -2432,7 +2449,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					delete player.storage.jiguanyuan;
 				}
 			},
-			_qinglongzhigui:{
+			g_qinglongzhigui:{
 				trigger:{player:'phaseBegin'},
 				forced:true,
 				filter:function(event,player){
@@ -2446,7 +2463,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.chooseToDiscard('he',true);
 				}
 			},
-			_baishouzhihu:{
+			g_baishouzhihu:{
 				trigger:{player:'discardEnd'},
 				direct:true,
 				filter:function(event,player){
@@ -2471,7 +2488,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-			_zhuquezhizhang:{
+			g_zhuquezhizhang:{
 				trigger:{player:'damageEnd'},
 				forced:true,
 				filter:function(event,player){
@@ -2489,7 +2506,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					game.delay();
 				}
 			},
-			_xuanwuzhihuang:{
+			g_xuanwuzhihuang:{
 				trigger:{source:'damageEnd'},
 				forced:true,
 				filter:function(event,player){
@@ -2500,7 +2517,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.recover(trigger.num);
 				}
 			},
-			_huanglinzhicong:{
+			g_huanglinzhicong:{
 				trigger:{player:'phaseBegin'},
 				forced:true,
 				filter:function(event,player){
@@ -2512,7 +2529,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.update();
 				},
 			},
-			_cangchizhibi:{
+			g_cangchizhibi:{
 				trigger:{player:'phaseBegin'},
 				direct:true,
 				filter:function(event,player){
@@ -4731,7 +4748,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			'专属、特殊装备无法被强化'
 		},
 		translate:{
-			_yuchan_equip:'玉蝉',
+			g_yuchan_equip:'玉蝉',
 			yuchanqian_duanzao:'玉蝉',
 			yuchanqian_equip1_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
 			yuchanqian_equip2_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
@@ -4818,7 +4835,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			jiguan:'机关',
 			jiqi:'祭器',
 			qinglongzhigui:'青龙之圭',
-			_qinglongzhigui:'青龙之圭',
+			g_qinglongzhigui:'青龙之圭',
 			qinglongzhigui_info:'可用于煅造装备；此牌在你手牌中时，准备阶段，你摸两张牌然后弃置一张牌',
 			qinglongzhigui_duanzao:'云屏',
 			qinglongzhigui_equip1_info:'结束阶段，你摸一张牌',
@@ -4827,7 +4844,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			qinglongzhigui_equip4_info:'结束阶段，你摸一张牌',
 			qinglongzhigui_equip5_info:'结束阶段，你摸一张牌',
 			baishouzhihu:'白兽之琥',
-			_baishouzhihu:'白兽之琥',
+			g_baishouzhihu:'白兽之琥',
 			baishouzhihu_info:'可用于煅造装备；此牌在你手牌中时，每当你弃置卡牌，你可以弃置一名其他角色的一张牌',
 			baishouzhihu_duanzao:'风牙',
 			baishouzhihu_equip1_info:'结束阶段，你可以弃置一名其他角色的一张牌',
@@ -4836,7 +4853,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			baishouzhihu_equip4_info:'结束阶段，你可以弃置一名其他角色的一张牌',
 			baishouzhihu_equip5_info:'结束阶段，你可以弃置一名其他角色的一张牌',
 			zhuquezhizhang:'朱雀之璋',
-			_zhuquezhizhang:'朱雀之璋',
+			g_zhuquezhizhang:'朱雀之璋',
 			zhuquezhizhang_info:'可用于煅造装备；此牌在你手牌中时，每当你受到其他角色造成的伤害，你对伤害来源造成一点火属性伤害',
 			zhuquezhizhang_duanzao:'炽翎',
 			zhuquezhizhang_equip1_info:'结束阶段，你可以弃置一张红色牌并对一名体力值不小于你的角色造成一点火属性伤害',
@@ -4845,7 +4862,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			zhuquezhizhang_equip4_info:'结束阶段，你可以弃置一张红色牌并对一名体力值不小于你的角色造成一点火属性伤害',
 			zhuquezhizhang_equip5_info:'结束阶段，你可以弃置一张红色牌并对一名体力值不小于你的角色造成一点火属性伤害',
 			xuanwuzhihuang:'玄武之璜',
-			_xuanwuzhihuang:'玄武之璜',
+			g_xuanwuzhihuang:'玄武之璜',
 			xuanwuzhihuang_duanzao:'寒晶',
 			xuanwuzhihuang_info:'可用于煅造装备；此牌在你手牌中时，每当你造成伤害，你回复等量的体力',
 			xuanwuzhihuang_equip1_info:'结束阶段，你可以弃置一张红色牌并回复一点体力',
@@ -4854,7 +4871,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			xuanwuzhihuang_equip4_info:'结束阶段，你可以弃置一张红色牌并回复一点体力',
 			xuanwuzhihuang_equip5_info:'结束阶段，你可以弃置一张红色牌并回复一点体力',
 			huanglinzhicong:'黄麟之琮',
-			_huanglinzhicong:'黄麟之琮',
+			g_huanglinzhicong:'黄麟之琮',
 			huanglinzhicong_duanzao:'玄甲',
 			huanglinzhicong_info:'可用于煅造装备；此牌在你手牌中时，准备阶段，若你没有护甲，你获得一点护甲',
 			huanglinzhicong_equip1_info:'结束阶段，若你没有护甲，你可以弃置一张黑色牌并获得一点护甲',
@@ -4863,7 +4880,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			huanglinzhicong_equip4_info:'结束阶段，若你没有护甲，你可以弃置一张黑色牌并获得一点护甲',
 			huanglinzhicong_equip5_info:'结束阶段，若你没有护甲，你可以弃置一张黑色牌并获得一点护甲',
 			cangchizhibi:'苍螭之璧',
-			_cangchizhibi:'苍螭之璧',
+			g_cangchizhibi:'苍螭之璧',
 			cangchizhibi_duanzao:'灵枢',
 			cangchizhibi_info:'可用于煅造装备；此牌在你手牌中时，准备阶段，你可以选择至多3名角色横置或重置之',
 			cangchizhibi_equip1_info:'结束阶段，你可以横置或重置一名角色',

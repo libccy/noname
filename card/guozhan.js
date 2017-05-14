@@ -12,6 +12,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				nomod:true,
 				nopower:true,
 	            unique:true,
+				global:'g_feilongduofeng_ai',
 				distance:{attackFrom:-1},
 				skills:['feilongduofeng','feilongduofeng2'],
 				ai:{
@@ -34,6 +35,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				nomod:true,
 				nopower:true,
 	            unique:true,
+				global:['g_taipingyaoshu','g_taipingyaoshu_ai'],
 				skills:['taipingyaoshu'],
 				ai:{
 					equipValue:function(card,player){
@@ -298,6 +300,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'trick',
 				lianheng:true,
 				enable:true,
+				global:'g_diaohulishan',
 				filterTarget:function(card,player,target){
 					return target!=player;
 				},
@@ -562,6 +565,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'equip',
 				subtype:'equip1',
+				global:'g_wuliu_skill',
 				distance:{attackFrom:-1},
 				ai:{
 					basic:{
@@ -597,7 +601,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
-			_feilongduofeng_ai:{
+			g_feilongduofeng_ai:{
 				ai:{
 					effect:{
 						player:function(card,player){
@@ -611,7 +615,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			_taipingyaoshu_ai:{
+			g_taipingyaoshu_ai:{
 				ai:{
 					effect:{
 						player:function(card,player){
@@ -786,7 +790,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			_taipingyaoshu:{
+			g_taipingyaoshu:{
 				mod:{
 					maxHandcard:function(player,num){
 						var source=game.findPlayer(function(current){
@@ -965,7 +969,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					event.goto(1);
 				}
 			},
-			_diaohulishan:{
+			g_diaohulishan:{
 				trigger:{player:'useCardAfter'},
 				forced:true,
 				popup:false,
@@ -1067,7 +1071,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			wuliu_skill:{},
-			_wuliu_skill2:{
+			g_wuliu_skill:{
 				mod:{
 					attackFrom:function(from,to,distance){
 						return distance-game.countPlayer(function(current){

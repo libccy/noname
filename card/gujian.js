@@ -29,6 +29,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            type:'trick',
 				fullskin:true,
 	            filterTarget:true,
+				global:'g_jinlianzhu',
 	            content:function(){
 	                var evt=event.getParent(3)._trigger;
 	                evt.untrigger();
@@ -877,6 +878,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            type:'trick',
 				fullskin:true,
 	            filterTarget:true,
+				global:'g_shihuifen',
 	            content:function(){
 	                'step 0'
 	                _status.currentPhase.chooseToRespond({name:'shan'},'石灰粉<br><div style="height:10px;display:block"></div><div class="text">打出一张闪，否则本回合无法对其他角色使用卡牌');
@@ -1517,7 +1519,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                }
 	            }
 	        },
-	        _shihuifen:{
+	        g_shihuifen:{
 				trigger:{global:'phaseUseBegin'},
 				direct:true,
 				filter:function(event,player){
@@ -1533,7 +1535,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},trigger.player,-1).targetRequired=true;
 				}
 			},
-	        _jinlianzhu:{
+	        g_jinlianzhu:{
 				trigger:{global:'damageBefore'},
 				direct:true,
 				filter:function(event,player){

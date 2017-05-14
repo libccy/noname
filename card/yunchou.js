@@ -409,6 +409,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'trick',
 				notarget:true,
 				wuxieable:true,
+				global:'g_youdishenru',
 				content:function(){
 					'step 0'
 					var info=event.getParent(2).youdiinfo||event.getParent(3).youdiinfo;
@@ -514,6 +515,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				filterTarget:true,
+				global:'g_chenhuodajie',
 				content:function(){
 					if(target.countCards('he')){
 						player.gainPlayerCard('he',target,true);
@@ -706,6 +708,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			hufu:{
 				fullskin:true,
 				type:'basic',
+				global:['g_hufu_sha','g_hufu_shan','g_hufu_jiu'],
 				savable:function(card,player,dying){
 					return dying==player;
 				},
@@ -994,7 +997,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					delete player.storage.youdishenru;
 				}
 			},
-			_youdishenru:{
+			g_youdishenru:{
 				trigger:{target:'shaBefore'},
 				direct:true,
 				filter:function(event,player){
@@ -1011,7 +1014,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},'是否使用诱敌深入？').set('source',trigger.player);
 				}
 			},
-			_chenhuodajie:{
+			g_chenhuodajie:{
 				trigger:{global:'damageEnd'},
 				direct:true,
 				filter:function(event,player){
@@ -1034,7 +1037,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-			_hufu_sha:{
+			g_hufu_sha:{
 				enable:['chooseToRespond','chooseToUse'],
 				filter:function(event,player){
 					return player.countCards('h','hufu')>0;
@@ -1049,7 +1052,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					value:7.5
 				}
 			},
-			_hufu_shan:{
+			g_hufu_shan:{
 				enable:['chooseToRespond','chooseToUse'],
 				filter:function(event,player){
 					return player.countCards('h','hufu')>0;
@@ -1064,7 +1067,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					value:7.5
 				}
 			},
-			_hufu_jiu:{
+			g_hufu_jiu:{
 				enable:['chooseToRespond','chooseToUse'],
 				filter:function(event,player){
 					return player.countCards('h','hufu')>0;
@@ -1114,9 +1117,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			qiankundai_info:'你的手牌上限+1。当你失去该装备时，你摸一张牌。',
 			hufu:'虎符',
 			hufu_bg:'符',
-			_hufu_sha:'符杀',
-			_hufu_shan:'符闪',
-			_hufu_jiu:'符酒',
+			g_hufu_sha:'符杀',
+			g_hufu_shan:'符闪',
+			g_hufu_jiu:'符酒',
 			hufu_info:'你可以将一张虎符当作杀、闪或酒使用或打出',
 		},
 		list:[

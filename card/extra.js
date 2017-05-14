@@ -552,7 +552,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			baiyin:'白银狮子',
 			baiyin_info:'锁定技，你每次受到伤害时，最多承受1点伤害（防止多余的伤害）；当你失去装备区里的【白银狮子】时，你回复1点体力。',
 			baiyin_skill:'白银狮子',
-			_baiyin:'白银狮子',
 		},
 		list:[
 			["heart",4,"sha","fire"],

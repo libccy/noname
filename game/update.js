@@ -1,21 +1,19 @@
 window.noname_update={
-    version:'1.9.28.1',
+    version:'1.9.28.2',
     update:'1.9.28',
     changeLog:[
         'bug修复',
-        '新卡'
     ],
     files:[
-        // 'game/game.js',
+        'game/game.js',
         // 'game/package.js',
         // 'game/config.js',
         // 'game/source.js',
         // 'game/pressure.js',
         // 'game/asset.js',
-        // 'card/*',
-        'card/gwent.js',
+        'card/*',
         // 'card/standard.js',
-        // 'character/*',
+        'character/*',
         // 'character/rank.js',
         // 'mode/boss.js',
         // 'mode/versus.js',

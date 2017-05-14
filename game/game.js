@@ -7213,6 +7213,9 @@
 							}
 							else{
 								for(k in card[i][j]){
+									if(j=='skill'&&k[0]=='_'&&!lib.config.cards.contains(i)){
+										continue;
+									}
 									if(j=='translate'&&k==i){
 										lib[j][k+'_card_config']=card[i][j][k];
 									}
@@ -8769,6 +8772,9 @@
     						if(j=='mode'||j=='forbid') continue;
     						if(j=='list') continue;
     						for(k in card[i][j]){
+								if(j=='skill'&&k[0]=='_'&&!lib.config.cards.contains(i)){
+									continue;
+								}
     							if(j=='translate'&&k==i){
     								lib[j][k+'_card_config']=card[i][j][k];
     							}
@@ -17848,6 +17854,17 @@
                         lib.card[card[2]]={};
                     }
                     var info=lib.card[card[2]];
+					if(info.global&&!this.classList.contains('button')){
+						if(Array.isArray(info.global)){
+							while(info.global.length){
+								game.addGlobalSkill(info.global.shift());
+							}
+						}
+						else if(typeof info.global=='string'){
+							game.addGlobalSkill(info.global);
+						}
+						delete info.global;
+					}
                     if(this.name){
                         this.classList.remove('epic');
 						this.classList.remove('legend');
@@ -39946,7 +39963,11 @@
         prompt:function(skill,target,player){
             player=player||_status.event.player;
             if(target){
-                return '是否对'+get.translation(target)+'发动【'+get.skillTranslation(skill,player)+'】？';
+				var str=get.translation(target);
+				if(target==player){
+					str+='（你）'
+				}
+                return '是否对'+str+'发动【'+get.skillTranslation(skill,player)+'】？';
             }
             else{
                 return '是否发动【'+get.skillTranslation(skill,player)+'】？';

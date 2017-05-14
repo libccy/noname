@@ -202,26 +202,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					var dialog=ui.create.dialog('云音',[list,'vcard']);
+					var taoyuan=0,nanman=0;
+					var players=game.filterPlayer();
+					for(var i=0;i<players.length;i++){
+						var eff1=get.effect(players[i],{name:'taoyuan'},player,player);
+						var eff2=get.effect(players[i],{name:'nanman'},player,player);
+						if(eff1>0){
+							taoyuan++;
+						}
+						else if(eff1<0){
+							taoyuan--;
+						}
+						if(eff2>0){
+							nanman++;
+						}
+						else if(eff2<0){
+							nanman--;
+						}
+					}
 					player.chooseButton(dialog).ai=function(button){
 						var name=button.link[2];
-						var taoyuan=0,nanman=0;
-						var players=game.filterPlayer();
-						for(var i=0;i<players.length;i++){
-							var eff1=get.effect(players[i],{name:'taoyuan'},player,player);
-							var eff2=get.effect(players[i],{name:'nanman'},player,player);
-							if(eff1>0){
-								taoyuan++;
-							}
-							else if(eff1<0){
-								taoyuan--;
-							}
-							if(eff2>0){
-								nanman++;
-							}
-							else if(eff2<0){
-								nanman--;
-							}
-						}
 						if(Math.max(taoyuan,nanman)>1){
 							if(taoyuan>nanman) return name=='taoyuan'?1:0;
 							return name=='nanman'?1:0;

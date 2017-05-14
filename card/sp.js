@@ -8,6 +8,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				notarget:true,
+				global:['g_jinchan','g_jinchan2'],
 				content:function(){
 					var evt=event.getParent(3)._trigger;
 					if(evt.jinchan){
@@ -277,6 +278,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				enable:true,
 				modTarget:true,
+				global:'g_du',
 				filterTarget:function(card,player,target){
 					return target==player;
 				},
@@ -541,7 +543,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			_jinchan:{
+			g_jinchan:{
 				trigger:{target:'useCardToBefore'},
 				forced:true,
 				popup:false,
@@ -560,7 +562,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					delete trigger.jinchan;
 				}
 			},
-			_jinchan2:{
+			g_jinchan2:{
 				trigger:{player:'discardAfter'},
 				forced:true,
 				filter:function(event,player){
@@ -883,7 +885,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 			},
-			_du:{
+			g_du:{
 				trigger:{player:['useCardAfter','respondAfter','discardAfter']},
 				popup:false,
 				forced:true,
@@ -935,8 +937,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			qijia:'弃甲曳兵',
 			qijia_info:'出牌阶段，对一名装备区里有牌的其他角色使用。该角色选择一项：1.弃置手牌区和装备区里所有的武器和-1坐骑；2.弃置手牌区和装备区里所有的防具和+1坐骑。',
 			jinchan:'金蝉脱壳',
-			_jinchan2:'金蝉脱壳',
-			_jinchan2_info:'当你因弃置而失去【金蝉脱壳】时，你摸一张牌',
+			g_jinchan2:'金蝉脱壳',
+			g_jinchan2_info:'当你因弃置而失去【金蝉脱壳】时，你摸一张牌',
 			jinchan_info:'当你成为其他角色使用牌的目标时，若你的手牌里只有【金蝉脱壳】，使目标锦囊牌或基本牌对你无效，你摸两张牌。当你因弃置而失去【金蝉脱壳】时，你摸一张牌。',
 			fulei:'浮雷',
 			fulei_info:'出牌阶段，对你使用。将【浮雷】放置于你的判定区里，若判定结果为黑桃，则目标角色受到X点雷电伤害（X为此锦囊判定结果为黑桃的次数）。判定完成后，将此牌移动到下家的判定区里。',
