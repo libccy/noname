@@ -300,14 +300,21 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(event.list.length){
 						var target=event.list.shift();
+						event.target=target;
 						player.line(target,'green');
 						target.damage();
 						target.draw(false);
 						target.$draw();
-						target.out();
-						event.redo();
+					}
+					else{
+						delete event.target;
 					}
 					'step 2'
+					if(event.target){
+						event.target.out();
+						event.goto(1);
+					}
+					'step 3'
 					game.delay();
 				},
 				contentAfter:function(){
