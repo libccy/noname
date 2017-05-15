@@ -145,6 +145,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			ai:{
     				order:8,
+					threaten:1.3,
     				result:{
     					player:1
     				},
