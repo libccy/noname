@@ -8819,7 +8819,7 @@
     				if(info.filter&&!info.filter(trigger,player,event.triggername)){
     					event.finish();
     				}
-    				else if(event._trigger.notrigger.contains(player)&&!lib.skill.global.contains(event.skill)){
+    				else if(event._trigger._notrigger.contains(player)&&!lib.skill.global.contains(event.skill)){
     					event.finish();
     				}
                     else if(typeof info.usable=='number'&&player.hasSkill('counttrigger')&&
@@ -9420,17 +9420,17 @@
 						else if(ai.basic.chooseCard(event.ai1)){
 							if(ai.basic.chooseTarget(event.ai2)){
 								ui.click.ok();
-                                event.aiexcludeclear=true;
+                                event._aiexcludeclear=true;
 							}
 							else{
 								if(!event.norestore){
 									if(event.skill){
 										var skill=event.skill;
 										ui.click.cancel();
-										event.aiexclude.add(skill);
+										event._aiexclude.add(skill);
                                         var info=get.info(skill);
                                         if(info.sourceSkill){
-                                            event.aiexclude.add(info.sourceSkill);
+                                            event._aiexclude.add(info.sourceSkill);
                                         }
 									}
 									else{
@@ -9448,10 +9448,10 @@
 						else if(event.skill&&!event.norestore){
 							var skill=event.skill;
 							ui.click.cancel();
-							event.aiexclude.add(skill);
+							event._aiexclude.add(skill);
                             var info=get.info(skill);
                             if(info.sourceSkill){
-                                event.aiexclude.add(info.sourceSkill);
+                                event._aiexclude.add(info.sourceSkill);
                             }
 							event.redo();
 							game.resume();
@@ -9505,15 +9505,15 @@
                         }
                         else{
 							ui.control.animate('nozoom',100);
-                            event.aiexclude.add(event.buttoned);
+                            event._aiexclude.add(event.buttoned);
                         }
                         event.goto(0);
                         delete event.buttoned;
                     }
                     "step 4"
-                    if(event.aiexcludeclear){
-                        delete event.aiexcludeclear;
-                        event.aiexclude.length=0;
+                    if(event._aiexcludeclear){
+                        delete event._aiexcludeclear;
+                        event._aiexclude.length=0;
                     }
                     delete _status.noclearcountdown;
 					if(event.skillDialog&&get.objtype(event.skillDialog)=='div'){
@@ -9565,7 +9565,7 @@
                         else if(event.skill){
                             var skill=event.skill;
                             ui.click.cancel();
-                            event.aiexclude.add(skill);
+                            event._aiexclude.add(skill);
                             event.redo();
                             game.resume();
                         }
@@ -9673,7 +9673,7 @@
                         else if(event.skill){
                             var skill=event.skill;
                             ui.click.cancel();
-                            event.aiexclude.add(skill);
+                            event._aiexclude.add(skill);
                             event.redo();
                             game.resume();
                         }
@@ -10193,7 +10193,7 @@
 						else if(event.skill){
 							var skill=event.skill;
 							ui.click.cancel();
-							event.aiexclude.add(skill);
+							event._aiexclude.add(skill);
 							event.redo();
 							game.resume();
 						}
@@ -10282,7 +10282,7 @@
                         if(ai.basic.chooseCard(event.ai1)){
 							if(ai.basic.chooseTarget(event.ai2)){
 								ui.click.ok();
-								_status.event.aiexclude.length=0;
+								_status.event._aiexclude.length=0;
 							}
 							else{
 								get.card(true).aiexclude();
@@ -15041,10 +15041,16 @@
 				},
 				out:function(skill){
 					if(typeof skill=='number'){
-						this.outCount++;
+						this.outCount+=skill;
 					}
 					else if(typeof skill=='string'){
-						this.outSkill=skill;
+						if(!this.outSkills){
+							this.outSkills=[];
+						}
+						this.outSkills.add(skill);
+					}
+					else{
+						this.outCount++;
 					}
 					if(!this.classList.contains('out')){
 						this.classList.add('out');
@@ -15057,21 +15063,23 @@
 				in:function(skill){
 					if(this.isOut()){
 						if(typeof skill=='string'){
-							if(this.outSkill==skill){
-								delete this.outSkill;
+							if(this.outSkills){
+								this.outSkills.remove(skill);
+								if(!this.outSkills.length){
+									delete this.outSkills;
+								}
 							}
 						}
-						else if(skill===true){
-							delete this.outSkill;
-							this.outCount=0;
-						}
-						else{
-							if(typeof skill!='number'){
-								skill=1;
-							}
+						else if(typeof skill=='number'){
 							this.outCount-=skill;
 						}
-						if(this.outCount<=0&&!this.outSkill){
+						else{
+							if(skill===true){
+								delete this.outSkills;
+							}
+							this.outCount=0;
+						}
+						if(this.outCount<=0&&!this.outSkills){
 							this.outCount=0;
 							this.classList.remove('out');
 							game.log(this,'进入游戏');
@@ -18154,7 +18162,7 @@
 					}
 				},
 				aiexclude:function(){
-					_status.event.aiexclude.add(this);
+					_status.event._aiexclude.add(this);
 				},
                 getSource:function(name){
 					if(this.name==name) return true;
@@ -18369,7 +18377,7 @@
 						position:this.position,
 						forced:this.forced,
 						fakeforce:this.fakeforce,
-						aiexclude:this.aiexclude,
+						_aiexclude:this._aiexclude,
                         complexSelect:this.complexSelect,
 						complexCard:this.complexCard,
 						complexTarget:this.complexTarget,
@@ -18382,7 +18390,7 @@
 					if(skill){
 						var info=get.info(skill);
 						this.skill=skill;
-						this.aiexclude=[];
+						this._aiexclude=[];
 						if(info.viewAs){
 							if(info.filterButton!=undefined) this.filterButton=get.filter(info.filterButton);
 							if(info.selectButton!=undefined) this.selectButton=info.selectButton;
@@ -18430,7 +18438,7 @@
 						this.position=this._backup.position;
 						this.forced=this._backup.forced;
 						this.fakeforce=this._backup.fakeforce;
-                        this.aiexclude=this._backup.aiexclude;
+                        this._aiexclude=this._backup._aiexclude;
 						this.complexSelect=this._backup.complexSelect;
 						this.complexCard=this._backup.complexCard;
                         this.complexTarget=this._backup.complexTarget;
@@ -18603,7 +18611,7 @@
 						this._triggered=5;
 					}
 					else if(player){
-						this.notrigger.add(player);
+						this._notrigger.add(player);
 						for(var i=0;i<this.next.length;i++){
 							if(this.next[i].player==player) this.next.splice(i--,1);
 						}
@@ -19031,7 +19039,7 @@
             },
 			cardAiIncluded:function(card){
 				if(_status.event.isMine()) return true;
-				return (_status.event.aiexclude.contains(card)==false);
+				return (_status.event._aiexclude.contains(card)==false);
 			},
 			filterCard:function(card,player,event){
 				return (lib.filter.cardEnabled(card,player,event)&&
@@ -19368,9 +19376,9 @@
 				priority:20,
 				popup:false,
 				content:function(){
-					for(var i=0;i<game.players.length;i++){
-						game.players[i].in();
-					}
+					// for(var i=0;i<game.players.length;i++){
+					// 	game.players[i].in();
+					// }
 					if(player.isTurnedOver()){
 						trigger.untrigger();
 						trigger.finish();
@@ -19380,8 +19388,18 @@
 					else{
 						player.phaseSkipped=false;
 					}
-					if(player==_status.roundStart&&!trigger.skill){
+					if((player==_status.roundStart||_status.roundSkipped)&&!trigger.skill){
+						delete _status.roundSkipped;
 						game.roundNumber++;
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i].isOut()&&game.players[i].outCount>0){
+								game.players[i].outCount--;
+								if(game.players[i].outCount==0&&!game.players[i].outSkills){
+									game.players[i].in();
+								}
+							}
+						}
+						event.trigger('roundStart');
 					}
 				},
 			},
@@ -23422,12 +23440,12 @@
 				step:0,
 				finished:false,
 				next:[],
-				aiexclude:[],
-				notrigger:[],
 				custom:{
 					add:{},
 					replace:{}
 				},
+				_aiexclude:[],
+				_notrigger:[],
 				_result:{},
                 _set:[],
 			}
@@ -24490,6 +24508,9 @@
 						event.finish();
 					}
 					else if(player&&player.isOut()&&event.name!='phaseLoop'&&!event.includeOut){
+						if(event.name=='phase'&&player==_status.roundStart&&!event.skill){
+							_status.roundSkipped=true;
+						}
 						event.finish();
 					}
 					else{
@@ -24795,7 +24816,7 @@
 				if(event._skillChoice){
 					skills2=event._skillChoice;
 					for(var i=0;i<skills2.length;i++){
-						if(event.isMine()||!event.aiexclude.contains(skills2[i])){
+						if(event.isMine()||!event._aiexclude.contains(skills2[i])){
 							skills.push(skills2[i]);
 						}
 					}
@@ -24826,7 +24847,7 @@
 	                        if(info.chooseButton&&_status.event.noButton) enable=false;
 						}
 						if(enable){
-							if(event.isMine()||!event.aiexclude.contains(skills2[i])){
+							if(event.isMine()||!event._aiexclude.contains(skills2[i])){
 								skills.add(skills2[i]);
 							}
 							event._skillChoice.add(skills2[i]);

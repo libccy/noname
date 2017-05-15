@@ -128,13 +128,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'linghuo_mark',
 				subSkill:{
 					mark:{
-						trigger:{global:['phaseBegin','phaseCancelled']},
+						trigger:{global:'roundStart'},
 						forced:true,
 						popup:false,
 						silent:true,
-						filter:function(event,player){
-							return _status.roundStart==event.player;
-						},
 						content:function(){
 							if(2-(game.roundNumber-player.storage.linghuo)>0){
 								player.updateMarks();
@@ -275,13 +272,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					mark:{
-						trigger:{global:['phaseBegin','phaseCancelled']},
+						trigger:{global:'roundStart'},
 						forced:true,
 						popup:false,
 						silent:true,
-						filter:function(event,player){
-							return _status.roundStart==event.player;
-						},
 						content:function(){
 							if(3-(game.roundNumber-player.storage.guijin)>0){
 								player.updateMarks();
@@ -357,13 +351,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'chengxin_mark',
 				subSkill:{
 					mark:{
-						trigger:{global:['phaseBegin','phaseCancelled']},
+						trigger:{global:'roundStart'},
 						forced:true,
 						popup:false,
 						silent:true,
-						filter:function(event,player){
-							return _status.roundStart==event.player;
-						},
 						content:function(){
 							if(4-(game.roundNumber-player.storage.chengxin)>0){
 								player.updateMarks();

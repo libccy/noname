@@ -304,7 +304,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target.damage();
 						target.draw(false);
 						target.$draw();
-						target.turnOver();
+						target.out();
 						event.redo();
 					}
 					'step 2'
@@ -397,7 +397,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						var rank=get.rank(current,true);
 						if(current.maxHp>=3){
 							if(current.hp<=1){
-								return att*2;
+								return att*3;
 							}
 							else if(current.hp==2){
 								if(att>0){
@@ -412,7 +412,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(att>0){
 								return att/10;
 							}
-							return -att;
+							return -att/5;
 						}
 						else if(rank<=4){
 							if(att<0){
@@ -852,7 +852,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						list.push(get.cardPile('sha','cardPile'));
 					}
 					if(list.length){
-						player.gain(list,'gain2');
+						player.gain(list,'gain2','log');
 					}
 				},
 				ai:{
@@ -1025,7 +1025,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					target.draw();
 				},
 				ai:{
-					value:4,
+					value:6,
 					useful:[3,1],
 					result:{
 						target:function(player,target){
@@ -1406,7 +1406,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_leizhoushu:'雷咒术',
 			gw_leizhoushu_info:'获得技能雷咒术（在每个准备阶段令全场牌数最多的所有其他角色各随机弃置一张牌，重复获得时效果叠加），然后结束出牌阶段',
 			gw_aerdeyin:'阿尔德印',
-			gw_aerdeyin_info:'对相邻的角色造成一点伤害，目标摸一张牌并翻面，然后结束出牌阶段',
+			gw_aerdeyin_info:'对相邻的角色造成一点伤害，目标摸一张牌并移出游戏一轮，然后结束出牌阶段',
 			gw_xinsheng:'新生',
 			gw_xinsheng_info:'随机观看12张武将牌，选择一张替代一名角色的武将牌，然后结束出牌阶段',
 			gw_zhongmozhizhan:'终末之战',

@@ -1098,7 +1098,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				threaten:function(player,target){
     					if(target.countCards('h')==0) return 2;
     					return 0.5;
-    				}
+    				},
+                    nodiscard:true,
+                    nolose:true
     			}
     		},
     		zaoxian:{

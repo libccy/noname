@@ -21,7 +21,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			// gw_fuertaisite:['male','qun',3,[]],
 			// gw_hengsaite:['male','qun',3,[]],
 			gw_fulisi:['male','qun',3,['lanquan']],
-			// gw_gaier:['male','shu',3,['hunmo']],
+			gw_gaier:['male','qun',3,['hunmo']],
 
 			gw_jieluote:['male','qun',6,['fayin']],
 			gw_yenaifa:['female','qun',3,['xuezhou']],
@@ -54,6 +54,71 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			hunmo:{
+				enable:'phaseUse',
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return lib.skill.hunmo.filterTarget(null,player,current);
+					});
+				},
+				filterTarget:function(card,player,target){
+					if(target.countCards('h')==2) return false;
+					if(target!=player){
+						return !target.hasSkill('hunmo2');
+					}
+					else{
+						return player.storage.hunmo2>=player.storage.hunmo1;
+					}
+				},
+				content:function(){
+					var nh=target.countCards('h');
+					if(nh<2){
+						target.draw();
+					}
+					else if(nh>2){
+						target.chooseToDiscard('h',true);
+					}
+					if(target!=player){
+						target.addTempSkill('hunmo2','phaseAfter');
+						player.storage.hunmo2++;
+					}
+					else{
+						player.storage.hunmo1++;
+					}
+				},
+				ai:{
+					order:11,
+					threaten:1.2,
+					result:{
+						target:function(player,target){
+							var nh=target.countCards('h');
+							if(nh<2) return 1;
+							if(nh>2){
+								if(target.hasSkillTag('noh')) return 0;
+								if(target.hasSkillTag('nodiscard')) return 0;
+								return -1;
+							}
+							return 0;
+						}
+					}
+				},
+				group:'hunmo_count',
+				subSkill:{
+					count:{
+						trigger:{player:'phaseUseBegin'},
+						forced:true,
+						popup:false,
+						silent:true,
+						content:function(){
+							player.storage.hunmo1=0;
+							player.storage.hunmo2=0;
+						}
+					}
+				}
+			},
+			hunmo2:{},
+			hunmo3:{},
+			hunmo4:{},
 			shuijian:{
 				trigger:{player:'phaseBegin'},
 				direct:true,
@@ -551,6 +616,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						player.logSkill('fengjian');
+						if(!event.isMine()){
+							game.delay();
+						}
 						player.useCard({name:'sha',nature:'thunder'},result.targets,false);
 						player.addTempSkill('qianxing',{player:'phaseBegin'});
 					}
@@ -1030,7 +1098,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwbaquan:'霸权',
 			gwbaquan_info:'出牌阶段限一次，你可以获得一名其他角色的所有牌，然后还给其等量的牌，若你归还的牌均为你获得的牌且该角色体力值不小于你，你对其造成一点伤害',
 			hunmo:'魂墨',
-			hunmo_info:'准备阶段和结束阶段，你可以令任意名角色的手牌数等于其当前体力值（最多为3）',
+			hunmo_info:'出牌阶段，你可以令一名手牌数少于2的角色摸一张牌，或令一名手牌数大于2的角色弃置一张手牌，每阶段对除你之外的每名角色最多发动一次，对你最多发动X+1次，X为你本回合对其他角色发动魂墨的次数',
 			huihun:'回魂',
 			huihun_info:'结束阶段，你可以从弃牌堆中获得本回合使用的前两张红色牌',
 			lanquan:'揽权',

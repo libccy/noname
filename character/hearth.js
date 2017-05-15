@@ -5351,13 +5351,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return player.hujia?true:false;
     			},
     			filterTarget:function(card,player,target){
-    				return player!=target;
+    				return player!=target&&get.distance(player,target,'attack')<=1;
     			},
     			selectTarget:function(){
     				return [1,_status.event.player.hujia];
     			},
     			contentBefore:function(){
-    				player.changeHujia(-player.hujia);
+    				player.changeHujia(-targets.length);
     			},
     			content:function(){
     				target.damage();
@@ -7902,7 +7902,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		zhongjia:'战甲',
     		zhongjia_info:'锁定技，每当你受到一次伤害，你获得一点护甲；当你的体力值大于手牌数时，你的护甲不为你抵挡伤害',
     		dunji:'盾击',
-    		dunji_info:'出牌阶段限一次，你可以失去你的所有护甲，并对等量的其他角色各造成一点伤害',
+    		dunji_info:'出牌阶段限一次，你可以对攻击范围内的至多X名其他角色各造成一点伤害，并失去等量的护甲，X为你的护甲数',
     		qiaodong:'巧动',
     		qiaodong_info:'你可以将一张装备牌当作闪使用或打出',
     		fengxian:'奉献',

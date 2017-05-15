@@ -104,7 +104,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             miheng:['male','qun',3,['kuangcai','shejian']],
     		taoqian:['male','qun',3,['zhaohuo','yixiang','yirang']],
 
-            wangyun:['male','qun',4,['wylianji','moucheng','jingong']],
+            // wangyun:['male','qun',4,['wylianji','moucheng','jingong']],
             // liuqi:['male','qun',3,['wenji','tunjiang']],
             // tangzi:['male','wu',4,['xingzhao']],
     	},
