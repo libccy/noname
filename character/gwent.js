@@ -38,7 +38,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			// gw_sanhanya:['male','wu',4,[]],
 			gw_shanhu:['female','qun',3,['shuijian']],
 			// gw_zhangyujushou:['male','wu',4,[]],
-			// gw_zhuoertan:['male','wu',4,[]],
+			gw_zhuoertan:['male','wu',3,['hupeng']],
 		},
 		characterIntro:{
 			gw_huoge:'那个老年痴呆?不知道他是活着还是已经被制成标本了!',
@@ -54,6 +54,125 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			hupeng:{
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.countCards('he')>0;
+				},
+				filterCard:true,
+				check:function(card){
+					return 7-ai.get.value(card);
+				},
+				filterTarget:true,
+				content:function(){
+					'step 0'
+					var att=get.attitude(player,target);
+					player.chooseVCardButton('选择令'+get.translation(target)+'获得的牌',['gw_dudayuanshuai1','gw_dudayuanshuai2'],true).ai=function(button){
+						if(att>0){
+							return button.link[2]=='gw_dudayuanshuai1'?1:-1;
+						}
+						else{
+							return button.link[2]=='gw_dudayuanshuai2'?1:-1;
+						}
+					}
+					'step 1'
+					if(result.bool){
+						target.gain(game.createCard(result.links[0][2]),'gain2');
+					}
+				},
+				ai:{
+					threaten:1.5,
+					order:6,
+					result:{
+						target:function(player,target){
+							var nh=target.countCards('h');
+							if(get.attitude(player,target)>0){
+								if(!nh) return 3;
+								if(!target.needsToDiscard(1)){
+									if(nh==1) return 2.5;
+									return 2;
+								}
+								if(!target.needsToDiscard()) return 1;
+								return 0.1;
+							}
+							else{
+								if(!nh) return -0.05;
+								if(target.hp==1) return -1;
+								if(target.hp==2) return -2.5;
+								if(target.hp==3) return -2;
+								return -0.5;
+							}
+						}
+					}
+				},
+				global:['hupeng2','hupeng3','hupeng4']
+			},
+			hupeng2:{
+				mod:{
+					cardDiscardable:function(card,player){
+    					if(card.name=='gw_dudayuanshuai2') return false;
+    				},
+    				cardEnabled:function(card,player){
+    					if(card.name=='gw_dudayuanshuai2') return false;
+    				},
+    				cardUsable:function(card,player){
+    					if(card.name=='gw_dudayuanshuai2') return false;
+    				},
+    				cardRespondable:function(card,player){
+    					if(card.name=='gw_dudayuanshuai2') return false;
+    				},
+    				cardSavable:function(card,player){
+    					if(card.name=='gw_dudayuanshuai2') return false;
+    				},
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(target.countCards('h','gw_dudayuanshuai1')&&get.attitude(player,target)<0){
+								return 0.4;
+							}
+						}
+					}
+				}
+			},
+			hupeng3:{
+				trigger:{player:'phaseEnd'},
+				forced:true,
+				silent:true,
+				popup:false,
+				filter:function(event,player){
+					return player.countCards('h','gw_dudayuanshuai2');
+				},
+				content:function(){
+					var hs=player.getCards('h');
+					var hs2=player.getCards('h','gw_dudayuanshuai2');
+					hs.remove(hs2);
+					if(hs.length){
+						hs2.addArray(hs.randomGets(hs2.length));
+					}
+					player.discard(hs2);
+				}
+			},
+			hupeng4:{
+				trigger:{target:'useCardToBefore'},
+				forced:true,
+				popup:false,
+				filter:function(event,player){
+					if(event.player==player) return false;
+					var num=player.countCards('h','gw_dudayuanshuai1');
+					return num>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseToUse({name:'gw_dudayuanshuai1'},'是否对'+get.translation(trigger.card)+'使用【杜达元帅】？').set('ai1',function(card){
+						return _status.event.bool;
+					}).set('bool',-get.effect(player,trigger.card,trigger.player,player));
+					trigger.gw_dudayuanshuai1=true;
+					'step 1'
+					delete trigger.gw_dudayuanshuai1;
+				}
+			},
 			hunmo:{
 				enable:'phaseUse',
 				filter:function(event,player){
@@ -1031,6 +1150,40 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 		},
+		card:{
+			gw_dudayuanshuai1:{
+				type:'special',
+				fullimage:true,
+				derivation:'gw_zhuoertan',
+				vanish:true,
+				addinfo:'小伙伴',
+				notarget:true,
+				content:function(){
+					var evt=event.getParent(3)._trigger;
+					if(evt.gw_dudayuanshuai1){
+						evt.untrigger();
+		                evt.finish();
+					}
+					if(evt.cards){
+						player.gain(evt.cards,'gain2');
+					}
+				},
+				ai:{
+					value:10,
+					useful:9,
+					result:{
+						player:1
+					},
+				}
+			},
+			gw_dudayuanshuai2:{
+				type:'special',
+				fullimage:true,
+				derivation:'gw_zhuoertan',
+				vanish:true,
+				addinfo:'捣蛋鬼',
+			},
+		},
 		translate:{
 			gw_huoge:'霍格',
 			gw_aisinie:'埃丝涅',
@@ -1065,6 +1218,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_zhangyujushou:'章鱼巨兽',
 			gw_zhuoertan:'卓尔坦',
 
+			gw_dudayuanshuai1:'杜达元帅',
+			gw_dudayuanshuai1_info:'当你成为其他角色使用牌的目标时，你可以使用此牌取消之，然后获得对你使用的牌',
+			gw_dudayuanshuai2:'杜达元帅',
+			gw_dudayuanshuai2_info:'你不能使用、打出或弃置此牌；结束阶段，若此牌在你手牌中，你弃置之并随机弃置一张手牌',
+			hupeng:'呼朋',
+			hupeng_info:'出牌阶段限一次，你可以弃置一张牌并将一张杜达元帅置入一名角色的手牌',
 			shuijian:'水箭',
 			shuijian_info:'准备阶段，你可以弃置一张手牌视为对所有敌方角色使用一张万箭齐发',
 			yunhuo:'陨火',

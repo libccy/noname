@@ -8520,6 +8520,7 @@
 		},
 		translate:{
 			'default':"默认",
+			special:'特殊',
 			zhenfa:'阵法',
             mode_derivation_card_config:'衍生',
 			mode_banned_card_config:'禁卡',
@@ -13896,6 +13897,25 @@
 					}
 					if(prompt==undefined) prompt='请选择卡牌';
 					return this.chooseButton(forced,select,'hidden',[prompt,cards,'hidden']);
+				},
+				chooseVCardButton:function(){
+					var list,prompt,forced,select,notype=false;
+					for(var i=0;i<arguments.length;i++){
+						if(Array.isArray(arguments[i])){
+							list=arguments[i];
+						}
+						else if(arguments[i]=='notype'){
+							notype=true;
+						}
+						else if(typeof arguments[i]=='boolean') forced=arguments[i];
+						else if(typeof arguments[i]=='string') prompt=arguments[i];
+						else if(get.itemtype(arguments[i])=='select'||typeof arguments[i]=='number') select=arguments[i];
+					}
+					for(var i=0;i<list.length;i++){
+						list[i]=[notype?'':(get.subtype(list[i])||get.type(list[i])),'',list[i]];
+					}
+					if(prompt==undefined) prompt='请选择卡牌';
+					return this.chooseButton(forced,select,'hidden',[prompt,[list,'vcard'],'hidden']);
 				},
 				chooseButton:function(){
 					var next=game.createEvent('chooseButton');
