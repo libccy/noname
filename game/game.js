@@ -7118,12 +7118,23 @@
 										lib.skilllist.add(character[i][j][k][3][l]);
 									}
 								}
+								if(j=='skill'&&k[0]=='_'&&(!lib.config.characters.contains(i)||(lib.config.mode=='connect'&&!character[i].connect))){
+									continue;
+								}
 								if(j=='translate'&&k==i){
 									lib[j][k+'_character_config']=character[i][j][k];
 								}
 								else{
 									if(lib[j][k]==undefined){
-										lib[j][k]=character[i][j][k];
+										if(j=='skill'&&lib.config.mode=='connect'&&!character[i].connect){
+											lib[j][k]={
+												nopop:character[i][j][k].nopop,
+												derivation:character[i][j][k].derivation
+											};
+										}
+										else{
+											lib[j][k]=character[i][j][k];
+										}
 										if(j=='card'&&lib[j][k].derivation){
 											if(!lib.cardPack.mode_derivation){
 												lib.cardPack.mode_derivation=[k];
@@ -7213,14 +7224,24 @@
 							}
 							else{
 								for(k in card[i][j]){
-									if(j=='skill'&&k[0]=='_'&&!lib.config.cards.contains(i)){
+									if(j=='skill'&&k[0]=='_'&&(!lib.config.cards.contains(i)||(lib.config.mode=='connect'&&!card[i].connect))){
 										continue;
 									}
 									if(j=='translate'&&k==i){
 										lib[j][k+'_card_config']=card[i][j][k];
 									}
 									else{
-										if(lib[j][k]==undefined) lib[j][k]=card[i][j][k];
+										if(lib[j][k]==undefined){
+											if(j=='skill'&&lib.config.mode=='connect'&&!card[i].connect){
+												lib[j][k]={
+													nopop:card[i][j][k].nopop,
+													derivation:card[i][j][k].derivation
+												};
+											}
+											else{
+												lib[j][k]=card[i][j][k];
+											}
+										}
 										else console.log('dublicate '+j+' in card '+i+':\n'+k+'\n'+lib[j][k]+'\n'+card[i][j][k]);
                                         if(j=='card'&&lib[j][k].derivation){
 											if(!lib.cardPack.mode_derivation){
