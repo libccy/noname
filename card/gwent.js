@@ -852,15 +852,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					list.push(get.cardPile('nanman','cardPile'));
 					list.push(get.cardPile('huoshaolianying','cardPile'));
 					list=[list.randomGet()];
-					// var sha=get.cardPile('sha','cardPile');
-					// if(sha){
-					// 	sha.remove();
-					// 	list.push(sha);
-					// 	list.push(get.cardPile('sha','cardPile'));
-					// }
-					list.push(get.cardPile('sha','cardPile'));
-					if(list.length==1){
+					if(list.length){
 						list.push(get.cardPile('sha','cardPile'));
+					}
+					else{
+						var sha=get.cardPile('sha','cardPile');
+						if(sha){
+							sha.remove();
+							list.push(sha);
+							list.push(get.cardPile('sha','cardPile'));
+						}
 					}
 					if(list.length){
 						player.gain(list,'gain2','log');
