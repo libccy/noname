@@ -149,7 +149,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				filter:function(event,player){
 					return event.player!=player&&event.target!=player&&event.target.isIn()&&player.hasCard(function(card){
-						return player.canUse(card,event.player,false);
+						return player.canUse(card,event.target,false)&&!get.info(card).multitarget;
 					});
 				},
 				content:function(){
