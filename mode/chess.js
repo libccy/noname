@@ -615,7 +615,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				var pos=y*ui.chesswidth+x;
     				if(!lib.posmap[pos]){
     					delete lib.posmap[this.dataset.position];
-    					this.dataset.position=pos;
+                        this.changeSeat(pos,false);
+    					// this.dataset.position=pos;
     					lib.posmap[pos]=this;
     					this.chessFocus();
     				}

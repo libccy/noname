@@ -12830,9 +12830,9 @@
 					},100);
 					game.addVideo('smoothAvatar',this);
 				},
-				changeSeat:function(position){
+				changeSeat:function(position,video){
 					var player=this;
-					game.addVideo('changeSeat',player,position);
+					if(video!==false) game.addVideo('changeSeat',player,position);
 					var rect1=player.getBoundingClientRect();
 					player.style.transition='all 0s';
 					ui.refresh(player);
