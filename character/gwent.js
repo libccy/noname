@@ -109,6 +109,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else{
 							event.target.chooseControl(function(event,player){
 								if(player.hp>=3&&!player.needsToDiscard()) return 1;
+								if(player.hp==2&&player.hasShan()&&player.countCards('h')<=1) return 1;
 								return 0;
 							}).set('choiceList',[
 								'回复一点体力','从弃牌堆中获得一张非金法术'
