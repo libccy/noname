@@ -910,9 +910,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				'step 0'
-    				target.draw();
+    				target.chooseToDiscard(2,'h',true).delay=false;
     				'step 1'
-    				target.chooseToDiscard(2,'h',true);
+    				target.draw();
     			},
     			selectTarget:-1,
     			ai:{
@@ -9546,7 +9546,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		miedao_info:'锁定技，摸牌阶段，你额外摸X张牌；弃牌阶段，你至少须弃X张牌（不足则全弃），X为你已损失的体力值。',
 
     		senluo:'森罗',
-    		senluo_info:'出牌阶段限一次，若你的手牌数为全场最少或之一，你可以令所有有手牌的其他角色摸一张牌并弃置两张手牌',
+    		senluo_info:'出牌阶段限一次，若你的手牌数为全场最少或之一，你可以令所有有手牌的其他角色弃置两张手牌然后摸一张牌',
     		polang:'破浪',
     		polang_info:'每当你造成一次伤害，可以一张对方的装备牌',
     		jikong:'亟空',

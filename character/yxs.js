@@ -332,7 +332,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							if(target.hp==1&&target.maxHp>=3){
-								return get.recoverEffect(target,player,player);
+								return get.recoverEffect(target,player,target);
 							}
 							return 0;
 						}

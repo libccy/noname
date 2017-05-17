@@ -33,7 +33,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			// gw_aigeleisi:['male','wu',4,[]],
 			gw_aokeweisite:['male','qun',4,['yunhuo']],
 			// gw_kaxier:['male','wu',4,[]],
-			// gw_luobo:['male','wu',4,[]],
+			gw_luobo:['male','qun',3,['junchi']],
 			// gw_mieren:['male','wu',4,[]],
 			// gw_sanhanya:['male','wu',4,[]],
 			gw_shanhu:['female','qun',3,['shuijian']],
@@ -54,6 +54,87 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			junchi:{
+				trigger:{global:'shaAfter'},
+				direct:true,
+				filter:function(event,player){
+					return event.player!=player&&event.target!=player&&event.target.isIn()&&player.hasCard(function(card){
+						return player.canUse(card,event.player,false);
+					});
+				},
+				content:function(){
+					var next=player.chooseToUse(get.prompt('junchi'),trigger.target,-1).set('targetRequired',true);
+					next.prompt2='对'+get.translation(trigger.target)+'使用一张牌，并摸一张牌';
+					next.filterCard=function(card){
+						return player.canUse(card,trigger.target,false)&&!get.info(card).multitarget;
+					};
+					next.oncard=function(){
+						player.draw();
+					};
+					next.logSkill='junchi';
+				},
+				subSkill:{
+					gold:{
+						trigger:{global:'useCardAfter'},
+						frequent:true,
+						filter:function(event,player){
+							return event.player!=player&get.subtype(event.card)=='spell_gold';
+						},
+						content:function(){
+							player.insertPhase();
+						}
+					}
+				},
+				group:'junchi_gold'
+			},
+			junchi_old:{
+				trigger:{global:'shaAfter'},
+				forced:true,
+				popup:false,
+				filter:function(event,player){
+					return event.player!=player&&event.target!=player&&event.player.isIn()&&event.player.countCards('he');
+				},
+				content:function(){
+					'step 0'
+					var att=get.attitude(trigger.player,player);
+					trigger.player.chooseCard('he','是否交给'+get.translation(player)+'一张牌？').ai=function(card){
+						if(att>1){
+							if(trigger.target.isIn()){
+								return 9-get.value(card);
+							}
+							return 4-get.value(card);
+						}
+						return 0;
+					}
+					'step 1'
+					if(result.bool){
+						player.logSkill('junchi');
+						player.gain(result.cards,trigger.player);
+						if(get.position(result.cards[0])=='h'){
+							trigger.player.$giveAuto(result.cards,player);
+						}
+						else{
+							trigger.player.$give(result.cards,player);
+						}
+						trigger.player.addExpose(0.2);
+						trigger.player.line(player,'green');
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if(trigger.target.isIn()){
+						var next=player.chooseToUse('是否对'+get.translation(trigger.target)+'使用一张牌？',trigger.target,-1).set('targetRequired',true);
+						next.filterCard=function(card){
+							return player.canUse(card,trigger.target,false)&&!get.info(card).multitarget;
+						};
+						next.oncard=function(){
+							player.recover();
+							trigger.player.draw();
+						}
+					}
+				}
+			},
 			hupeng:{
 				enable:'phaseUse',
 				usable:1,
@@ -278,7 +359,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				content:function(){
 					'step 0'
-					player.addSkill('yunhuo2');
+					player.insertPhase();
 					event.list=player.getEnemies().sortBySeat();
 					'step 1'
 					if(event.list.length){
@@ -294,17 +375,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					game.delayx();
-				}
-			},
-			yunhuo2:{
-				trigger:{player:'phaseAfter'},
-				forced:true,
-				popup:false,
-				silent:true,
-				priority:-50,
-				content:function(){
-					player.insertPhase();
-					player.removeSkill('yunhuo2');
 				}
 			},
 			yinzhang:{
@@ -604,8 +674,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.targets.length){
 						event.current=event.targets.shift();
 						if(event.current.hasSha()){
-							event.current.addTempSkill('gwzhanjiang3','gwzhanjiangAfter');
-							event.current.chooseToUse({name:'sha'},'是否对'+get.translation(trigger.player)+'使用一张杀？',trigger.player,-1);
+							event.current.chooseToUse({name:'sha'},'是否对'+get.translation(trigger.player)+'使用一张杀？',trigger.player,-1).oncard=function(card,player){
+								player.draw();
+							};
 						}
 						else{
 							event.redo();
@@ -1218,6 +1289,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_zhangyujushou:'章鱼巨兽',
 			gw_zhuoertan:'卓尔坦',
 
+			junchi:'骏驰',
+			junchi_info:'每当一名其他角色使用一张杀，若目标不是你，你可以对杀的目标使用一张牌，然后摸一张牌；每当一名其他角色使用一张金卡，你可以在此回合结束后获得一个额外回合',
+			junchi_old_info:'当一名其他角色使用杀对一个目标结算后，该角色可以交给你一张牌，然后你可以对杀的目标使用一张牌，若如此做，你回复一点体力，杀的使用者摸一张牌',
 			gw_dudayuanshuai1:'杜达元帅',
 			gw_dudayuanshuai1_info:'当你成为其他角色使用牌的目标时，你可以使用此牌取消之，然后获得对你使用的牌',
 			gw_dudayuanshuai2:'杜达元帅',

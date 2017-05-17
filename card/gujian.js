@@ -463,6 +463,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            ai:{
 	                order:1.5,
 	                value:[4,1],
+					norepeat:1,
 	                result:{
 	                    target:function(player,target){
 	                        if(target==player){

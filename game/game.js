@@ -11040,6 +11040,9 @@
 						}
 					}
                     event.id=get.id();
+					if(event.oncard){
+						event.oncard(event.card,event.player);
+					}
 					event.trigger('useCard');
                     event._oncancel=function(){
                         game.broadcastAll(function(id){
@@ -11471,6 +11474,9 @@
 					}
 					else{
 						player.gain(cards);
+						if(event.$draw){
+							player.$draw(cards.length);
+						}
 					}
 					event.result=cards;
 				},
@@ -14380,7 +14386,7 @@
                         }
                     }
                     if(result.card||!result.skill){
-                        this.useCard(result.card,result.cards,result.targets,result.skill);
+                        this.useCard(result.card,result.cards,result.targets,result.skill).oncard=event.oncard;
                     }
                     else if(result.skill){
                         this.useSkill(result.skill,result.cards,result.targets);
@@ -14525,6 +14531,10 @@
 						}
 						else if(typeof arguments[i]=='boolean'){
 							next.animate=arguments[i];
+						}
+						else if(arguments[i]=='nodelay'){
+							next.animate=false;
+							next.$draw=true;
 						}
 						else if(arguments[i]=='visible'){
 							next.visible=true;
@@ -35716,8 +35726,10 @@
 						}
                         if(node.node.name.querySelectorAll('br').length>=4){
                             node.node.name.classList.add('long');
-                            node.addEventListener('mouseenter',ui.click.buttonnameenter);
-                            node.addEventListener('mouseleave',ui.click.buttonnameleave);
+							if(lib.config.buttoncharacter_style=='old'){
+								node.addEventListener('mouseenter',ui.click.buttonnameenter);
+	                            node.addEventListener('mouseleave',ui.click.buttonnameleave);
+							}
                         }
 						node.node.intro.innerHTML=lib.config.intro;
 						if(!noclick){

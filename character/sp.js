@@ -1179,7 +1179,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     							return 1;
     						}
     						var geteff=function(current){
-    							return get.effect(current,{name:'sha'},player,player)>0;
+    							return player.canUse('sha',current,false,true)&&get.effect(current,{name:'sha'},player,player)>0;
     						}
     						if(player.hasSha()&&geteff(target)){
     							var num=game.countPlayer(function(current){

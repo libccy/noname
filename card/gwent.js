@@ -1027,7 +1027,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filterTarget:true,
 				content:function(){
 					'step 0'
-					target.chooseToDiscard('h',2,true);
+					target.chooseToDiscard('h',2,true).delay=false;
 					'step 1'
 					target.draw();
 				},

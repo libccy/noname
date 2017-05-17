@@ -3326,69 +3326,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					delete player.storage.kongxin;
 				},
 			},
-			lianyao_hujia:{
-				mode:['identity','guozhan'],
-				enable:'phaseUse',
-				usable:1,
-				filter:function(event,player){
-					if(player!=game.me) return false;
-					var card=player.getEquip('lianyaohu');
-					if(card.storage.shouhua&&card.storage.shouhua.length) return true;
-					return false;
-				},
-				content:function(){
-					"step 0"
-					var list=[];
-					var card=player.getEquip('lianyaohu');
-					for(var i=0;i<card.storage.shouhua.length;i++){
-						list.push(card.storage.shouhua[i].name);
-					}
-					var dialog=ui.create.dialog([list,'character']);
-					for(var i=0;i<dialog.buttons.length;i++){
-						dialog.buttons[i].link=card.storage.shouhua[i];
-						dialog.buttons[i].querySelector('.intro').remove();
-					}
-					player.chooseButton(dialog,true);
-					"step 1"
-					if(result.bool){
-						game.restorePlayer(result.links[0]);
-						game.delay();
-					}
-					else{
-						event.finish();
-					}
-					"step 2"
-					game.swapPlayer(result.links[0]);
-					result.links[0].hp=1;
-					result.links[0].update();
-					result.links[0].storage.lianyao_hujia=player;
-					game.swapPlayer(result.links[0]);
-					result.links[0].addSkill('lianyao_hujia2');
-					result.links[0].insertPhase();
-					result.links[0].setIdentity();
-					result.links[0].identityShown=true;
-					player.out(true);
-				}
-			},
-			lianyao_hujia2:{
-				trigger:{player:['phaseAfter','changeHp']},
-				forced:true,
-				popup:false,
-				content:function(){
-					player.hp=1;
-					player.update();
-					var me=player.storage.lianyao_hujia;
-					delete player.storage.lianyao_hujia;
-					me.lockOut=false;
-					me.out();
-					player.removeSkill('lianyao_hujia2');
-					if(player==game.me){
-						game.swapPlayer(me);
-						game.removePlayer(player);
-						game.delay();
-					}
-				}
-			},
 			qinglianxindeng:{
 				trigger:{player:'damageBefore'},
 				forced:true,

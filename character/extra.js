@@ -109,15 +109,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return !player.hasSkill('lianpo2');
 				},
 				content:function(){
-					player.addSkill('lianpo2');
-				}
-			},
-			lianpo2:{
-				trigger:{global:'phaseAfter'},
-				forced:true,
-				priority:-50,
-				content:function(){
-					player.removeSkill('lianpo2');
 					player.insertPhase();
 				}
 			},
