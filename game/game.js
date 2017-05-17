@@ -7118,12 +7118,23 @@
 										lib.skilllist.add(character[i][j][k][3][l]);
 									}
 								}
+								if(j=='skill'&&k[0]=='_'&&(!lib.config.characters.contains(i)||(lib.config.mode=='connect'&&!character[i].connect))){
+									continue;
+								}
 								if(j=='translate'&&k==i){
 									lib[j][k+'_character_config']=character[i][j][k];
 								}
 								else{
 									if(lib[j][k]==undefined){
-										lib[j][k]=character[i][j][k];
+										if(j=='skill'&&lib.config.mode=='connect'&&!character[i].connect){
+											lib[j][k]={
+												nopop:character[i][j][k].nopop,
+												derivation:character[i][j][k].derivation
+											};
+										}
+										else{
+											lib[j][k]=character[i][j][k];
+										}
 										if(j=='card'&&lib[j][k].derivation){
 											if(!lib.cardPack.mode_derivation){
 												lib.cardPack.mode_derivation=[k];
@@ -7213,14 +7224,24 @@
 							}
 							else{
 								for(k in card[i][j]){
-									if(j=='skill'&&k[0]=='_'&&!lib.config.cards.contains(i)){
+									if(j=='skill'&&k[0]=='_'&&(!lib.config.cards.contains(i)||(lib.config.mode=='connect'&&!card[i].connect))){
 										continue;
 									}
 									if(j=='translate'&&k==i){
 										lib[j][k+'_card_config']=card[i][j][k];
 									}
 									else{
-										if(lib[j][k]==undefined) lib[j][k]=card[i][j][k];
+										if(lib[j][k]==undefined){
+											if(j=='skill'&&lib.config.mode=='connect'&&!card[i].connect){
+												lib[j][k]={
+													nopop:card[i][j][k].nopop,
+													derivation:card[i][j][k].derivation
+												};
+											}
+											else{
+												lib[j][k]=card[i][j][k];
+											}
+										}
 										else console.log('dublicate '+j+' in card '+i+':\n'+k+'\n'+lib[j][k]+'\n'+card[i][j][k]);
                                         if(j=='card'&&lib[j][k].derivation){
 											if(!lib.cardPack.mode_derivation){
@@ -8499,6 +8520,7 @@
 		},
 		translate:{
 			'default':"默认",
+			special:'特殊',
 			zhenfa:'阵法',
             mode_derivation_card_config:'衍生',
 			mode_banned_card_config:'禁卡',
@@ -13897,6 +13919,25 @@
 					}
 					if(prompt==undefined) prompt='请选择卡牌';
 					return this.chooseButton(forced,select,'hidden',[prompt,cards,'hidden']);
+				},
+				chooseVCardButton:function(){
+					var list,prompt,forced,select,notype=false;
+					for(var i=0;i<arguments.length;i++){
+						if(Array.isArray(arguments[i])){
+							list=arguments[i];
+						}
+						else if(arguments[i]=='notype'){
+							notype=true;
+						}
+						else if(typeof arguments[i]=='boolean') forced=arguments[i];
+						else if(typeof arguments[i]=='string') prompt=arguments[i];
+						else if(get.itemtype(arguments[i])=='select'||typeof arguments[i]=='number') select=arguments[i];
+					}
+					for(var i=0;i<list.length;i++){
+						list[i]=[notype?'':(get.subtype(list[i])||get.type(list[i])),'',list[i]];
+					}
+					if(prompt==undefined) prompt='请选择卡牌';
+					return this.chooseButton(forced,select,'hidden',[prompt,[list,'vcard'],'hidden']);
 				},
 				chooseButton:function(){
 					var next=game.createEvent('chooseButton');

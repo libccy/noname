@@ -466,13 +466,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.clearSkills();
 					trigger.player.clearSkills();
 					'step 1'
-					var hs=player.get('hej');
+					var hs=player.getCards('hej');
 					player.$throw(hs);
-					player.lose(player.get('hej'))._triggered=null;
+					player.lose(player.getCards('hej'))._triggered=null;
 					'step 2'
-					var hs=trigger.player.get('hej');
+					var hs=trigger.player.getCards('hej');
 					trigger.player.$throw(hs);
-					trigger.player.lose(trigger.player.get('hej'))._triggered=null;
+					trigger.player.lose(trigger.player.getCards('hej'))._triggered=null;
 					'step 3'
 					game.asyncDraw([player,trigger.player],3);
     			},
