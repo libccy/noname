@@ -108,7 +108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						else{
 							event.target.chooseControl(function(event,player){
-								if(player.hp>=3&&!target.needsToDiscard()) return 1;
+								if(player.hp>=3&&!player.needsToDiscard()) return 1;
 								if(player.hp==2&&player.hasShan()) return 1;
 								return 0;
 							}).set('choiceList',[
