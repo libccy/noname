@@ -852,10 +852,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					list.push(get.cardPile('nanman','cardPile'));
 					list.push(get.cardPile('huoshaolianying','cardPile'));
 					list=[list.randomGet()];
-					var sha=get.cardPile('sha','cardPile');
-					if(sha){
-						sha.remove();
-						list.push(sha);
+					// var sha=get.cardPile('sha','cardPile');
+					// if(sha){
+					// 	sha.remove();
+					// 	list.push(sha);
+					// 	list.push(get.cardPile('sha','cardPile'));
+					// }
+					list.push(get.cardPile('sha','cardPile'));
+					if(list.length==1){
 						list.push(get.cardPile('sha','cardPile'));
 					}
 					if(list.length){
@@ -1427,7 +1431,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_ansha:'暗杀',
 			gw_ansha_info:'令一名体力为1的随机敌方角立即死亡，然后结束出牌阶段',
 			gw_shizizhaohuan:'十字召唤',
-			gw_shizizhaohuan_info:'从牌堆中获得两张杀以及决斗、火攻、火烧连营、南蛮入侵中的随机一张',
+			gw_shizizhaohuan_info:'从牌堆中获得一张杀以及决斗、火攻、火烧连营、南蛮入侵四张牌中的随机一张',
 			gw_zuihouyuanwang:'最后愿望',
 			gw_zuihouyuanwang_info:'摸X张牌并弃置X张牌，X为存活角色数',
 			gw_zirankuizeng:'自然馈赠',

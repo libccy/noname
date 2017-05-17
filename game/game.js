@@ -12341,7 +12341,7 @@
         					card.style.transform='';
         					card.classList.add('drawinghidden');
                             card.viewAs=viewAs;
-                            if(viewAs&&viewAs!=card.name&&card.classList.contains('fullskin')){
+                            if(viewAs&&viewAs!=card.name&&(card.classList.contains('fullskin')||card.classList.contains('fullborder'))){
                                 card.classList.add('fakejudge');
                                 card.node.background.innerHTML=lib.translate[viewAs+'_bg']||get.translation(viewAs)[0]
                             }
@@ -12368,7 +12368,7 @@
 							delete cards[0].viewAs;
 						}
 						if(cards[0].viewAs&&cards[0].viewAs!=cards[0].name){
-                            if(cards[0].classList.contains('fullskin')){
+                            if(cards[0].classList.contains('fullskin')||cards[0].classList.contains('fullborder')){
                                 cards[0].classList.add('fakejudge');
                                 cards[0].node.background.innerHTML=lib.translate[cards[0].viewAs+'_bg']||get.translation(cards[0].viewAs)[0];
                             }
@@ -18097,22 +18097,12 @@
 					if(info.color){
 						this.style.color=info.color;
 					}
-					else if(info.fullimage||info.fullborder){
-						this.style.color='white';
-					}
 					if(info.textShadow){
 						this.style.textShadow=info.textShadow;
-					}
-					else if(info.fullimage||info.fullborder){
-						this.style.textShadow='black 0 0 2px';
 					}
 					if(info.opacity){
 						this.node.info.style.opacity=info.opacity;
 						this.node.name.style.opacity=info.opacity;
-					}
-					else if(info.fullimage||info.fullborder){
-						this.node.info.style.opacity=1;
-						this.node.name.style.opacity=1;
 					}
 					if(info.modinfo){
 						this.node.info.innerHTML=info.modinfo;
@@ -22561,7 +22551,7 @@
 				if(player&&content){
 					var card=get.infoCard(content[0]);
 					card.viewAs=content[1];
-                    if(card.viewAs&&card.viewAs!=card.name&&card.classList.contains('fullskin')){
+                    if(card.viewAs&&card.viewAs!=card.name&&(card.classList.contains('fullskin')||card.classList.contains('fullborder'))){
                         card.classList.add('fakejudge');
                         card.node.background.innerHTML=lib.translate[card.viewAs+'_bg']||get.translation(card.viewAs)[0]
                     }

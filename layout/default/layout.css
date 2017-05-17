@@ -1312,6 +1312,12 @@ div:not(.handcards)>.card>.info>span,
 	text-align: center;
 }
 
+.card.fullimage>div:not(.background),
+.card.fullborder>div:not(.background){
+	color: white;
+	text-shadow: black 0px 0px 2px;
+}
+
 .equips>.card>.background {
 	font-size: 36px;
 	height: 36px;
@@ -1330,7 +1336,8 @@ div:not(.handcards)>.card>.info>span,
 .judges>.card.fakejudge.fullskin>.image {
 	display: none !important
 }
-.judges>.card.fakejudge.fullskin>.background {
+.judges>.card.fakejudge.fullskin>.background,
+.judges>.card.fakejudge.fullborder>.background {
 	display: block !important;
 	font-family: 'huangcao' !important;
 	padding-top: 4px !important;
