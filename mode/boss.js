@@ -1053,11 +1053,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.delay();
 					'step 1'
 					if(game.me!=game.boss){
-						game.changeSeat(game.boss,6);
+						game.boss.changeSeat(6);
 					}
 					else{
-						game.changeSeat(game.boss.nextSeat,3);
-						game.changeSeat(game.boss.previousSeat,5);
+						game.boss.nextSeat.changeSeat(3);
+						game.boss.previousSeat.changeSeat(5);
 					}
 					game.changeBoss('boss_huoshenzhurong');
 					for(var i=0;i<game.players.length;i++){
@@ -1223,11 +1223,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.delay();
 					'step 1'
 					if(game.me!=game.boss){
-						game.changeSeat(game.boss,6);
+						game.boss.changeSeat(6);
 					}
 					else{
-						game.changeSeat(game.boss.nextSeat,3);
-						game.changeSeat(game.boss.previousSeat,5);
+						game.boss.nextSeat.changeSeat(3);
+						game.boss.previousSeat.changeSeat(5);
 					}
 					game.changeBoss('boss_mushengoumang');
 					for(var i=0;i<game.players.length;i++){

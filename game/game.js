@@ -12830,6 +12830,28 @@
 					},100);
 					game.addVideo('smoothAvatar',this);
 				},
+				changeSeat:function(position){
+					var player=this;
+					game.addVideo('changeSeat',player,position);
+					var rect1=player.getBoundingClientRect();
+					player.style.transition='all 0s';
+					ui.refresh(player);
+					player.dataset.position=position;
+					var rect2=player.getBoundingClientRect();
+					var dx=rect1.left-rect2.left;
+					var dy=rect1.top-rect2.top;
+					if((game.chess||(player.dataset.position!=0&&position!=0))&&player.classList.contains('linked')){
+						player.style.transform='rotate(-90deg) translate('+(-dy)+'px,'+(dx)+'px)';
+					}
+					else{
+						player.style.transform='translate('+(dx)+'px,'+(dy)+'px)';
+					}
+					setTimeout(function(){
+						player.style.transition='';
+						ui.refresh(player);
+						player.style.transform='';
+					},100);
+				},
                 send:function(){
                     if(!this.ws||this.ws.closed) return this;
                     this.ws.send.apply(this.ws,arguments);
@@ -22663,8 +22685,8 @@
 				}
 			},
 			changeSeat:function(player,info){
-				if(player&&player.getBoundingClientRect){
-					game.changeSeat(player,info);
+				if(player&&player.getBoundingClientRect&&player.changeSeat){
+					player.changeSeat(info);
 					game.playerMap={};
 					var players=game.players.concat(game.dead);
 					for(var i=0;i<players.length;i++){
@@ -25035,20 +25057,6 @@
 			}
 			ui.arena.classList.remove('dragging');
 			_status.dragline.length=0;
-		},
-		changeSeat:function(player,position){
-			game.addVideo('changeSeat',player,position);
-			var rect1=player.getBoundingClientRect();
-			player.style.transition='all 0s';
-			ui.refresh(player);
-			player.dataset.position=position;
-			var rect2=player.getBoundingClientRect();
-			player.style.transform='translate('+(rect1.left-rect2.left)+'px,'+(rect1.top-rect2.top)+'px)';
-			setTimeout(function(){
-				player.style.transition='';
-				ui.refresh(player);
-				player.style.transform='';
-			},100);
 		},
 		swapSeat:function(player1,player2,prompt,behind){
 			if(behind){
