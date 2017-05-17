@@ -30,7 +30,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_luoqi:['male','wei',4,['gwzhanjiang']],
 			gw_yioufeisi:['male','wu',4,['gwchuanxin']],
 
-			// gw_aigeleisi:['male','wu',4,[]],
+			gw_aigeleisi:['female','wu',3,['gwshenyu']],
 			gw_aokeweisite:['male','qun',4,['yunhuo']],
 			// gw_kaxier:['male','wu',4,[]],
 			gw_luobo:['male','qun',3,['junchi']],
@@ -54,6 +54,75 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			gwshenyu:{
+				trigger:{player:'phaseBegin'},
+				direct:true,
+				filter:function(event,player){
+					return player.countCards('he')&&game.hasPlayer(function(current){
+						return current.isDamaged();
+					});
+				},
+				content:function(){
+					'step 0'
+					player.chooseCardTarget({
+						prompt:get.prompt('gwshenyu'),
+						filterCard:lib.filter.cardDiscardable,
+						position:'he',
+						filterTarget:function(card,player,target){
+							return target.isDamaged();
+						},
+						ai1:function(card){
+							return 9-get.value(card);
+						},
+						ai2:function(target){
+							if(get.recoverEffect(target,player,player)<=0) return 0;
+							var att=get.attitude(player,target);
+							var num=2;
+							if(player==target){
+								num+=2;
+							}
+							if(target.hp==1){
+								num+=4;
+							}
+							return num*att;
+						}
+					});
+					'step 1'
+    				if(result.bool){
+    					player.discard(result.cards);
+    					player.logSkill('shenyu',result.targets);
+						result.targets[0].recover();
+						event.target=result.targets[0];
+    				}
+					else{
+						event.finish();
+					}
+					'step 2'
+					var list=[];
+					for(var i=0;i<ui.discardPile.childElementCount;i++){
+						var card=ui.discardPile.childNodes[i];
+						if(get.type(card)=='spell'&&get.subtype(card)!='spell_gold'){
+							list.push(card);
+						}
+					}
+					if(list.length){
+						event.target.chooseCardButton('选择一张法术牌',list).ai=function(button){
+							return get.value(button.link);
+						};
+					}
+					else{
+						event.finish();
+					}
+					'step 3'
+					if(result.bool){
+						event.target.gain(result.links,'gain2');
+					}
+				},
+				ai:{
+					threaten:2,
+					expose:0.2
+				}
+			},
 			junchi:{
 				trigger:{global:'shaAfter'},
 				direct:true,
@@ -1289,6 +1358,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_zhangyujushou:'章鱼巨兽',
 			gw_zhuoertan:'卓尔坦',
 
+			gwshenyu:'神愈',
+			gwshenyu_info:'准备阶段，你可以弃置一张牌并令一名角色回复一点体力，然后目标可以从弃牌堆中获得一张非金法术牌',
 			junchi:'骏驰',
 			junchi_info:'每当一名其他角色使用一张杀，若目标不是你，你可以对杀的目标使用一张牌，然后摸一张牌；每当一名其他角色使用一张金卡，你可以在此回合结束后获得一个额外回合',
 			junchi_old_info:'当一名其他角色使用杀对一个目标结算后，该角色可以交给你一张牌，然后你可以对杀的目标使用一张牌，若如此做，你回复一点体力，杀的使用者摸一张牌',
