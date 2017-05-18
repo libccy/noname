@@ -1675,7 +1675,7 @@ div:not(.handcards)>.card>.info>span,
 }
 .button.newstyle>.name{
 	top: 8px;
-	max-height: 80px;
+	max-height: 84px;
 }
 .button.newstyle>.name.long{
 	top: 6px;

@@ -16,10 +16,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_laduoweide:['male','wei',4,['gwxiaoshou']],
 			gw_dagong:['male','qun',4,['tianbian']],
 
-			// gw_bulanwang:['male','qun',3,[]],
+			// gw_bulanwang:['male','qun',4,['jielve']],
 			// gw_kuite:['male','qun',3,[]],
 			// gw_fuertaisite:['male','qun',3,[]],
-			// gw_hengsaite:['male','qun',3,[]],
+			// gw_hengsaite:['male','wei',4,['jinsheng']],
 			gw_fulisi:['male','qun',3,['lanquan']],
 			gw_gaier:['male','qun',3,['hunmo']],
 
