@@ -34,8 +34,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_aokeweisite:['male','qun',4,['yunhuo']],
 			// gw_kaxier:['male','wu',4,[]],
 			gw_luobo:['male','qun',3,['junchi']],
-			// gw_mieren:['male','wu',4,[]],
-			// gw_sanhanya:['male','wu',4,[]],
+			// gw_mieren:['male','shu',3,[]],
+			gw_sanhanya:['male','shu',3,['gwjinyan']],
 			gw_shanhu:['female','qun',3,['shuijian']],
 			// gw_zhangyujushou:['male','wu',4,[]],
 			gw_zhuoertan:['male','wu',3,['hupeng']],
@@ -54,6 +54,63 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			gwjinyan:{
+				trigger:{player:['damageBegin','loseHpBegin']},
+    			forced:true,
+    			priority:-55,
+    			mark:true,
+    			filter:function(event,player){
+					if(game.roundNumber%3==0) return false;
+    				return player.hp-event.num<game.roundNumber%3;
+    			},
+    			content:function(){
+    				trigger.num=Math.max(0,player.hp-game.roundNumber%3);
+    			},
+				group:['gwjinyan_gain','gwjinyan_hp'],
+				subSkill:{
+					gain:{
+						trigger:{player:'phaseBegin'},
+						frequent:true,
+						filter:function(){
+							return game.roundNumber%3==0;
+						},
+						content:function(){
+							var list=get.typeCard('spell_gold');
+							if(list.length){
+								player.gain(game.createCard(list.randomGet()),'gain2');
+							}
+						}
+					},
+					hp:{
+						trigger:{global:'roundStart'},
+						forced:true,
+						filter:function(event,player){
+							return player.hp<game.roundNumber%3;
+						},
+						content:function(){
+							player.hp=game.roundNumber%3;
+							if(player.maxHp<player.hp){
+								player.maxHp=player.hp;
+							}
+							player.update();
+						}
+					}
+				},
+    			ai:{
+					threaten:function(){
+						if(game.roundNumber%3==0) return 1.6;
+						return 0.8;
+					},
+    				effect:{
+    					target:function(card,player,target){
+							if(game.roundNumber%3==0) return;
+    						if(get.tag(card,'damage')||get.tag(card,'loseHp')){
+    							if(target.hp<=game.roundNumber%3) return 0;
+    						}
+    					}
+    				}
+    			}
+			},
 			gwshenyu:{
 				trigger:{player:'phaseBegin'},
 				direct:true,
@@ -1379,6 +1436,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_zhangyujushou:'章鱼巨兽',
 			gw_zhuoertan:'卓尔坦',
 
+			gwjinyan:'金焰',
+			gwjinyan_info:'锁定技，准备阶段，若游戏轮数为3的倍数，你获得一张随机金卡；你的体力值不能小于X，X为游戏轮数除3的余数',
 			gwshenyu:'神愈',
 			gwshenyu_info:'准备阶段，你可以令一名角色选择一项：回复一点体力，或从弃牌堆中获得一张非金法术牌',
 			junchi:'骏驰',

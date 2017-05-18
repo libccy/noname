@@ -14741,6 +14741,11 @@
                             next.delay=arguments[i];
                         }
 					}
+					if(next.animate=='gain2'||next.animate=='draw2'){
+						if(!next.hasOwnProperty('log')){
+							next.log=true;
+						}
+					}
                     next.setContent('gain');
 					return next;
 				},
