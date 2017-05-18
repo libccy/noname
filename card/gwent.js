@@ -783,7 +783,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
     				var dialog=ui.create.dialog('卜天术',[list,'vcard']);
 					var bing=target.countCards('h')<=1;
     				player.chooseButton(dialog,true,function(button){
-                        if(ai.get.effect(target,{name:button.link[2]},player,player)>0){
+                        if(get.effect(target,{name:button.link[2]},player,player)>0){
 							if(button.link[2]=='bingliang'){
                                 if(bing) return 2;
                                 return 0.7;
@@ -819,7 +819,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var eff=0;
 							for(var i in lib.card){
 								if(lib.card[i].type=='delay'){
-									var current=ai.get.effect(target,{name:i},player,player);
+									var current=get.effect(target,{name:i},player,player);
 									if(current>eff){
 										eff=current;
 									}
@@ -1100,7 +1100,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					useful:[4,1],
 					result:{
 						target:function(player,target){
-							var threaten=ai.get.threaten(target,player,true);
+							var threaten=get.threaten(target,player,true);
 							if(target.hujia){
 								threaten*=(target.hujia+1);
 							}

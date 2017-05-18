@@ -48,7 +48,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					else{
 						player.$gain2(event.card1);
 						target.$gain2(event.card2);
-						target.addTempSkill('dujian2','phaseBegin');
+						target.addTempSkill('dujian2');
 					}
 					ui.arena.classList.remove('thrownhighlight');
 					game.addVideo('thrownhighlight2');
@@ -1790,7 +1790,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.storage.zhufangshenshi=target;
-					player.addTempSkill('zhufangshenshi','phaseAfter');
+					player.addTempSkill('zhufangshenshi');
 				},
 				ai:{
 					value:4,
@@ -2255,7 +2255,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},trigger.player,-1).set('cardname',trigger.card.name).targetRequired=true;
 					'step 1'
 					if(result.bool){
-						player.addTempSkill('shenmiguo2','phaseAfter');
+						player.addTempSkill('shenmiguo2');
 					}
 					delete player.storage.shenmiguo;
 				}
@@ -2900,7 +2900,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(!hu.storage.shouna){
 							hu.storage.shouna=[];
 						}
-						player.addTempSkill('shouna2','phaseAfter');
+						player.addTempSkill('shouna2');
 						player.$gain2(cards);
 						for(var i=0;i<cards.length;i++){
 							hu.storage.shouna.push(cards[i]);
@@ -3414,7 +3414,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return _status.currentPhase!=player&&!player.hasSkill('hslingjian_xuanfengzhiren_equip3_dist');
 				},
 				content:function(){
-					player.addTempSkill('hslingjian_xuanfengzhiren_equip3_dist','phaseAfter');
+					player.addTempSkill('hslingjian_xuanfengzhiren_equip3_dist');
 				}
 			},
 			hslingjian_xuanfengzhiren_equip3_dist:{
@@ -3431,7 +3431,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return _status.currentPhase==player&&!player.hasSkill('hslingjian_xuanfengzhiren_equip4_dist');
 				},
 				content:function(){
-					player.addTempSkill('hslingjian_xuanfengzhiren_equip4_dist','phaseAfter');
+					player.addTempSkill('hslingjian_xuanfengzhiren_equip4_dist');
 				}
 			},
 			hslingjian_xuanfengzhiren_equip4_dist:{
@@ -3647,7 +3647,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return !player.hasSkill('qianxing');
 				},
 				content:function(){
-					player.addTempSkill('qianxing','phaseAfter');
+					player.addTempSkill('qianxing');
 				}
 			},
 			hslingjian_yinmilichang_equip3:{

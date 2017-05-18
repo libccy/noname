@@ -193,7 +193,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.storage.baonu-=2;
-					player.addTempSkill('wushuang','phaseAfter');
+					player.addTempSkill('wushuang');
 				},
 				ai:{
 					order:5,
@@ -388,7 +388,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.storage.renjie--;
 					player.updateMarks();
-					player.addTempSkill('wansha','phaseAfter');
+					player.addTempSkill('wansha');
 				}
 			},
 			jilue_zhiheng:{

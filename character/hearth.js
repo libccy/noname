@@ -867,7 +867,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     var list=get.inpile('trick','trick');
                     player.gain(game.createCard(list.randomGet()),'draw');
                     if(player.storage.counttrigger&&player.storage.counttrigger.lieyang>=3){
-                        player.addTempSkill('lieyang2','phaseAfter');
+                        player.addTempSkill('lieyang2');
                     }
                 },
                 ai:{
@@ -3415,7 +3415,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			forced:true,
     			content:function(){
     				player.gain(game.createCard(trigger.card),'gain2');
-    				trigger.player.addTempSkill('yiwen2','phaseAfter');
+    				trigger.player.addTempSkill('yiwen2');
     			},
     			ai:{
     				threaten:0.7
@@ -5272,7 +5272,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				trigger.player.recover();
-    				player.addTempSkill('shengyan2','phaseAfter');
+    				player.addTempSkill('shengyan2');
     			},
     			ai:{
     				expose:0.2
@@ -5383,7 +5383,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				'step 0'
     				if(!event.isMine()) game.delay(0.5);
     				'step 1'
-    				player.addTempSkill('fengxing2','phaseAfter');
+    				player.addTempSkill('fengxing2');
     				player.chooseToDiscard('he',get.prompt('fengxing')).set('ai',function(card){
     					return 7-get.value(card);
     				}).logSkill='fengxing';
@@ -5757,7 +5757,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				ui.discardPile.appendChild(player.storage.bingjia);
     				delete player.storage.bingjia;
     				player.changeHujia();
-    				player.addTempSkill('mianyi','phaseAfter');
+    				player.addTempSkill('mianyi');
     			},
     			intro:{
     				mark:function(dialog,content,player){
@@ -6163,7 +6163,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						target.discard(cs.randomGet());
     					}
     					target.damage('thunder');
-    					player.addTempSkill('tzhenji2','phaseAfter');
+    					player.addTempSkill('tzhenji2');
     				}
     			},
     			ai:{

@@ -305,7 +305,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target!=player;
 				},
 				content:function(){
-					target.addTempSkill('diaohulishan','phaseAfter');
+					target.addTempSkill('diaohulishan');
 				},
 				ai:{
 					order:10,

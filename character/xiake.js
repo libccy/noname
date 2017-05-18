@@ -77,7 +77,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	            },
 	            content:function(){
 	                player.draw();
-	                player.addTempSkill('gzhenji3','phaseAfter');
+	                player.addTempSkill('gzhenji3');
 	            }
 	        },
 	        gzhenji3:{

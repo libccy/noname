@@ -1017,9 +1017,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						if(!target.hasSkill('fengyin')){
-							target.addTempSkill('fengyin','phaseAfter');
+							target.addTempSkill('fengyin');
 						}
-						target.addTempSkill('yijue2','phaseAfter');
+						target.addTempSkill('yijue2');
 						event.finish();
 					}
 					else if(target.hp<target.maxHp){
@@ -1091,7 +1091,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.judge(function(){return 0});
 					if(!trigger.target.hasSkill('fengyin')){
-						trigger.target.addTempSkill('fengyin','phaseAfter');
+						trigger.target.addTempSkill('fengyin');
 					}
 					"step 1"
 					var suit=get.suit(result.card);

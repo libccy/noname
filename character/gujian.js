@@ -613,7 +613,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				popup:false,
 				content:function(){
-					player.addTempSkill('meiying3','phaseAfter');
+					player.addTempSkill('meiying3');
 				}
 			},
 			meiying3:{},
@@ -844,7 +844,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					if(trigger.source){
 						trigger.source.storage.mingkong=true;
-						trigger.source.addTempSkill('mingkong2','phaseAfter');
+						trigger.source.addTempSkill('mingkong2');
 					}
 				},
 				ai:{

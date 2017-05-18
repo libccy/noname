@@ -634,7 +634,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkill('jimin');
 					player.addSkill('lzhangyi');
 					player.addSkill('tongyu');
-					player.addTempSkill('tongyu_guiyin','phaseAfter');
+					player.addTempSkill('tongyu_guiyin');
 				},
 				ai:{
 					order:function(){
@@ -669,7 +669,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.removeSkill('jimin');
 					player.removeSkill('lzhangyi');
 					player.removeSkill('tongyu');
-					player.addTempSkill('tongyu_guiyin','phaseAfter');
+					player.addTempSkill('tongyu_guiyin');
 				},
 				ai:{
 					order:9,
@@ -2066,7 +2066,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.dialog.close();
 					}
 					if(result.control!='cancel'){
-						player.addTempSkill('bolehuiyan4','phaseAfter');
+						player.addTempSkill('bolehuiyan4');
 						player.logSkill(['bolehuiyan',result.control],trigger.target);
 						game.log(player,'预言'+result.control);
 						player.storage.bolehuiyan=result.control;
@@ -2465,7 +2465,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						player.gain(trigger.card,'gain2');
-						player.addTempSkill('zhulu2','phaseAfter');
+						player.addTempSkill('zhulu2');
 					}
 				},
 				ai:{

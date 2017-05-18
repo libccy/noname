@@ -311,7 +311,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                    var target=result.targets[0];
 	                    player.logSkill('feitiao',target);
 	                    player.storage.feitiao2=target;
-	                    player.addTempSkill('feitiao2','phaseAfter');
+	                    player.addTempSkill('feitiao2');
 	                    target.randomDiscard();
 	                }
 
@@ -358,7 +358,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                if(player.marks.zhencha){
 	                    player.marks.zhencha.firstChild.innerHTML='侦';
 	                }
-	                player.addTempSkill('zhencha2','phaseAfter');
+	                player.addTempSkill('zhencha2');
 	            },
 	            subSkill:{
 	                sha:{
@@ -394,7 +394,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                if(player.marks.zhencha){
 	                    player.marks.zhencha.firstChild.innerHTML='哨';
 	                }
-	                player.addTempSkill('zhencha2','phaseAfter');
+	                player.addTempSkill('zhencha2');
 	            },
 	            subSkill:{
 	                sha:{
@@ -553,7 +553,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                });
 	                'step 1'
 	                if(result.bool){
-	                    target.addTempSkill('liangou2','phaseAfter');
+	                    target.addTempSkill('liangou2');
 	                    target.storage.liangou2=player;
 	                }
 	            },
@@ -919,6 +919,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.attitude(player,event.target)<=0;
 				},
 				filter:function(event,player){
+					if(player.hasSkill('bfengshi4')) return false;
 	                var num=0.2;
 	                if(get.is.altered('bfengshi')) num=0.15;
 					return Math.random()<num*get.cardCount(true,player);
@@ -931,7 +932,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                    return distance-get.cardCount(true,from);
 	                }
 	            },
-	            group:'bfengshi2'
+	            group:['bfengshi2','bfengshi3']
 	        },
 	        bfengshi2:{
 	            trigger:{source:'damageBegin'},
@@ -940,12 +941,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.attitude(player,event.target)<=0;
 				},
 	            filter:function(event,player){
+					if(player.hasSkill('bfengshi4')) return false;
 	                var num=0.2;
 	                if(get.is.altered('bfengshi')) num=0.15;
 	                return event.card&&event.card.name=='sha'&&Math.random()<num*get.cardCount(true,player);
 	            },
 	            content:function(){
 	                trigger.num++;
+	            }
+	        },
+	        bfengshi3:{
+	            trigger:{player:'useCard'},
+	            forced:true,
+				popup:false,
+				silent:true,
+	            filter:function(event,player){
+					if(player.hasSkill('bfengshi4')) return false;
+	                return event.card.name=='sha';
+	            },
+	            content:function(){
+	                player.addTempSkill('bfengshi4');
 	            }
 	        },
 	        yinbo:{
@@ -1214,7 +1229,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                return 6-get.value(card);
 	            },
 	            content:function(){
-	                target.addTempSkill('shanguang2','phaseAfter');
+	                target.addTempSkill('shanguang2');
 	            },
 	            ai:{
 	                order:7.9,
@@ -2021,7 +2036,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	            },
 	            content:function(){
 	                player.storage.tuijin2=target;
-	                player.addTempSkill('tuijin2','phaseAfter');
+	                player.addTempSkill('tuijin2');
 	            },
 	            ai:{
 	                order:11,
@@ -2334,7 +2349,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                'step 0'
 	                player.discard(player.getCards('he'));
 	                'step 1'
-	                player.addTempSkill('zhanlong2','phaseAfter');
+	                player.addTempSkill('zhanlong2');
 	                player.awakenSkill('zhanlong');
 					player.storage.zhanlong=true;
 	                var cards=[];
@@ -3391,8 +3406,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	        maoding_info_alter:'每当你造成一次伤害，你可以获得一个零件；出牌阶段，你可以弃置两张零件牌令一名没有护甲的角色获得一点护甲',
 	        bfengshi:'风矢',
 	        bfengshi2:'风矢',
-	        bfengshi_info:'锁定技，在一合内每当你使用一张牌，你的攻击范围+1；你的杀增加20%的概率强制命中；你的杀造成伤害后增加20%的概率令伤害+1',
-	        bfengshi_info_alter:'锁定技，在一合内每当你使用一张牌，你的攻击范围+1；你的杀增加15%的概率强制命中；你的杀造成伤害后增加15%的概率令伤害+1',
+	        bfengshi_info:'锁定技，在一合内每当你使用一张牌，你的攻击范围+1；你的首张杀增加20%的概率强制命中；你的首张杀造成伤害后增加20%的概率令伤害+1',
+	        bfengshi_info_alter:'锁定技，在一合内每当你使用一张牌，你的攻击范围+1；你的首张杀增加15%的概率强制命中；你的首张杀造成伤害后增加15%的概率令伤害+1',
 	        yinbo:'音波',
 	        yinbo_info:'出牌阶段限一次，你可以弃置一张黑桃牌，然后随机弃置三名敌人各一张牌',
 	        liudan:'榴弹',

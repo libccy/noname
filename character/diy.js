@@ -440,7 +440,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						else{
 							player.storage.kangyin2=player.maxHp-player.hp;
-							player.addTempSkill('kangyin2','phaseAfter');
+							player.addTempSkill('kangyin2');
 							event.finish();
 						}
 					}

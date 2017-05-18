@@ -654,7 +654,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				targetprompt:['被拿牌','得牌'],
 				content:function(){
 					"step 0"
-					target.addTempSkill('toulianghuanzhu2','phaseAfter');
+					target.addTempSkill('toulianghuanzhu2');
 					var hs=target.getCards('h');
 					event.num=Math.min(2,hs.length);
 					if(event.num){

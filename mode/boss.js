@@ -4593,7 +4593,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(!player.hasSkill('xuanfeng')) list.push('xuanfeng');
 					if(!player.hasSkill('wansha')) list.push('wansha');
 					if(list.length==1){
-						player.addTempSkill(list[0],'phaseAfter');
+						player.addTempSkill(list[0]);
 						event.finish();
 					}
 					else{
@@ -4617,7 +4617,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}).set('prompt','选择获得一项技能直到回合结束');
 					}
 					'step 1'
-					player.addTempSkill(result.control,'phaseAfter');
+					player.addTempSkill(result.control);
 					player.popup(get.translation(result.control));
 				},
 				ai:{

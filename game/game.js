@@ -16030,7 +16030,10 @@
                     this.skills.remove(skill);
 					this.tempSkills[skill]=expire;
 
-                    if(typeof expire=='string'){
+					if(!expire){
+						expire='phaseAfter';
+					}
+                    else if(typeof expire=='string'){
                         lib.hookmap[expire]=true;
                     }
                     else if(Array.isArray(expire)){

@@ -466,7 +466,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					target.$give(result.cards,player);
     				}
     				else{
-    					player.addTempSkill('taoluan3','phaseAfter');
+    					player.addTempSkill('taoluan3');
     					player.loseHp();
     				}
     			}
@@ -1729,10 +1729,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				"step 1"
     				if(result.bool){
     					player.storage.xianzhen=target;
-    					player.addTempSkill('xianzhen2','phaseAfter');
+    					player.addTempSkill('xianzhen2');
     				}
     				else{
-    					player.addTempSkill('xianzhen3','phaseAfter');
+    					player.addTempSkill('xianzhen3');
     				}
     			},
     			ai:{
@@ -1812,7 +1812,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return event.parent.skill=='lihuo';
     			},
     			content:function(){
-    				player.addTempSkill('lihuo3','phaseAfter');
+    				player.addTempSkill('lihuo3');
     			}
     		},
     		lihuo3:{
@@ -2138,7 +2138,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.line(trigger.player,'green');
     					game.log(player,'将',button,'置于弃牌堆');
     					ui.discardPile.appendChild(button);
-    					trigger.player.addTempSkill('sidi3','phaseAfter');
+    					trigger.player.addTempSkill('sidi3');
     					player.storage.sidi.remove(button);
     					player.syncStorage('sidi');
     					if(player.storage.sidi.length==0){
@@ -2359,7 +2359,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				player.draw(2);
-    				player.addTempSkill('jigong2','phaseAfter');
+    				player.addTempSkill('jigong2');
     			}
     		},
     		jigong2:{
@@ -2543,7 +2543,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				'step 1'
     				if(result.bool){
     					player.logSkill('yaoming',result.targets);
-    					player.addTempSkill('yaoming2','phaseAfter');
+    					player.addTempSkill('yaoming2');
     					var target=result.targets[0];
     					if(target.countCards('h')<player.countCards('h')){
     						target.draw();
@@ -3199,7 +3199,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			popup:false,
     			silent:true,
     			content:function(){
-    				player.addTempSkill('zuoding2','phaseAfter');
+    				player.addTempSkill('zuoding2');
     			}
     		},
     		huomo:{
@@ -3239,7 +3239,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.$throw(result.cards);
     					event.card=result.cards[0];
     					player.logSkill('huomo');
-    					player.addTempSkill('huomo2','phaseAfter');
+    					player.addTempSkill('huomo2');
     				}
     				else{
     					event.finish();
@@ -3405,7 +3405,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.storage.taoxi2=trigger.target;
     				player.syncStorage('taoxi');
     				player.markSkill('taoxi');
-    				player.addTempSkill('taoxi4','phaseAfter');
+    				player.addTempSkill('taoxi4');
     			},
     			group:['taoxi2','taoxi3']
     		},
@@ -3930,8 +3930,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return event.getParent().skill=='fuhun';
     			},
     			content:function(){
-    				player.addTempSkill('wusheng','phaseAfter');
-    				player.addTempSkill('paoxiao','phaseAfter');
+    				player.addTempSkill('wusheng');
+    				player.addTempSkill('paoxiao');
     			}
     		},
     		fencheng:{
@@ -4338,10 +4338,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     				"step 2"
     				if(result.bool){
-    					player.addTempSkill('qiaoshui3','phaseAfter');
+    					player.addTempSkill('qiaoshui3');
     				}
     				else{
-    					player.addTempSkill('qiaoshui2','phaseAfter');
+    					player.addTempSkill('qiaoshui2');
     				}
     			},
     			ai:{
@@ -4654,7 +4654,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				"step 1"
     				if(result.bool){
     					target.draw(target.maxHp-target.hp);
-    					target.addTempSkill('dingpin2','phaseAfter');
+    					target.addTempSkill('dingpin2');
     				}
     				else{
     					player.turnOver();
@@ -5046,7 +5046,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			forced:true,
     			popup:false,
     			content:function(){
-    				player.addTempSkill('qieting3','phaseAfter');
+    				player.addTempSkill('qieting3');
     			}
     		},
     		qieting3:{},
@@ -5075,7 +5075,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.chooseToCompare(trigger.player);
     				"step 1"
     				if(result.bool){
-    					trigger.player.addTempSkill('zishou2','phaseAfter');
+    					trigger.player.addTempSkill('zishou2');
     				}
     			},
     		},
@@ -5152,7 +5152,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				"step 0"
-    				player.addTempSkill('gongji2','phaseAfter');
+    				player.addTempSkill('gongji2');
     				"step 1"
     				if(get.type(cards[0])=='equip'){
     					player.chooseTarget('是否弃置一名角色的一张牌？',function(card,player,target){
@@ -6070,7 +6070,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					}
     				});
     				trigger.num+=num;
-    				player.addTempSkill('zishou2','phaseAfter');
+    				player.addTempSkill('zishou2');
 
     			},
     			ai:{
@@ -7100,7 +7100,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.loseHp();
     				}
     				if(!player.hasSkill('shibei2')){
-    					player.addTempSkill('shibei2','phaseAfter');
+    					player.addTempSkill('shibei2');
     				}
     			}
     		},

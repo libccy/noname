@@ -54,7 +54,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                        trigger.result={bool:true,card:{name:'sha'}}
 	                    }
 						player.logSkill('zhenshan',result.targets);
-						player.addTempSkill('zhenshan2','phaseAfter');
+						player.addTempSkill('zhenshan2');
 	                    player.swapHandcards(result.targets[0]);
 					}
 				},
@@ -123,7 +123,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                            },true).ai=function(target){
 	                                return get.attitude(player,target);
 	                            }
-	            				player.addTempSkill('zhenshan2','phaseAfter');
+	            				player.addTempSkill('zhenshan2');
 	                            'step 1'
 	            				if(result.bool){
 	                                player.logSkill('zhenshan',result.targets);

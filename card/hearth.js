@@ -50,7 +50,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				modTarget:true,
 				content:function(){
 					if(_status.currentPhase==target){
-						target.addTempSkill('jihuocard2','phaseAfter');
+						target.addTempSkill('jihuocard2');
 					}
 					target.draw();
 				},
@@ -221,7 +221,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target.damage('thunder');
 					}
 					else{
-						target.addTempSkill('huogong2','phaseBegin');
+						target.addTempSkill('huogong2');
 					}
 					game.addVideo('cardDialog',null,event.videoId);
 					event.dialog.close();
@@ -287,7 +287,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				selectTarget:-1,
 				content:function(){
-					player.addTempSkill('shihuawuqi','phaseAfter');
+					player.addTempSkill('shihuawuqi');
 					if(!player.countCards('h','sha')){
 						var card=get.cardPile('sha');
 						if(card){
@@ -397,10 +397,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool&&!target.hasSkill('chuansongmen3')){
 						if(target.hasSkill('chuansongmen2')){
-							target.addTempSkill('chuansongmen3','phaseAfter');
+							target.addTempSkill('chuansongmen3');
 						}
 						else{
-							target.addTempSkill('chuansongmen2','phaseAfter');
+							target.addTempSkill('chuansongmen2');
 						}
 						target.gain(cards,'gain2');
 					}

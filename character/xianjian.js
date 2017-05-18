@@ -744,7 +744,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.markSkill('yanshi');
 								player.updateMarks();
 							}
-							player.addTempSkill('yanshi2','phaseAfter');
+							player.addTempSkill('yanshi2');
 						}
 					}
 				}
@@ -1332,7 +1332,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					if(result.bool){
-						player.addTempSkill('qixia2','phaseAfter');
+						player.addTempSkill('qixia2');
 						trigger.player.draw(2);
 						if(trigger.player.hp==1&&!trigger.player.hujia){
 							trigger.player.changeHujia();
@@ -1560,7 +1560,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onuse:function(result){
 					if(result.targets){
 						for(var i=0;i<result.targets.length;i++){
-							result.targets[i].addTempSkill('yanzhan3','phaseAfter');
+							result.targets[i].addTempSkill('yanzhan3');
 						}
 					}
 				},
@@ -2439,7 +2439,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.gain(cards,player);
 					if(!player.hasSkill('diewu2')){
 						player.draw();
-						player.addTempSkill('diewu2','phaseAfter');
+						player.addTempSkill('diewu2');
 					}
 				},
 				ai:{
@@ -2956,7 +2956,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.player.isAlive();
 				},
 				content:function(){
-					trigger.player.addTempSkill('wangyou3','phaseAfter');
+					trigger.player.addTempSkill('wangyou3');
 				}
 			},
 			wangyou3:{},
@@ -3075,7 +3075,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var card=cards.randomGet();
 						player.gain(card,'log');
 						player.$gain2(card);
-						player.addTempSkill('jubao2','phaseAfter');
+						player.addTempSkill('jubao2');
 					}
 				},
 				ai:{
@@ -3302,7 +3302,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.storage.xuanning=0;
 						player.unmarkSkill('xuanning');
 						if(!get.is.altered('qianfang')){
-							player.addTempSkill('qianfang2','phaseAfter');
+							player.addTempSkill('qianfang2');
 						}
 						if(!event.logged) player.logSkill('qianfang');
 						player.useCard({name:'wanjian'},event.targets);

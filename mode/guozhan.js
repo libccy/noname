@@ -1596,7 +1596,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						target.hideCharacter(1);
 					}
-					target.addTempSkill('qingcheng_ai','phaseAfter');
+					target.addTempSkill('qingcheng_ai');
 				},
 				ai:{
 					order:8,

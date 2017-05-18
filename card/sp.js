@@ -416,7 +416,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				effect:function(){
 					if(result.bool==false){
-						player.addTempSkill('caomu_skill','phaseAfter');
+						player.addTempSkill('caomu_skill');
 					}
 				},
 				ai:{

@@ -183,7 +183,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                target.storage.xiajiao=card;
 	                target.storage.xiajiao_markcount=3;
 	                target.addSkill('xiajiao');
-	                target.addTempSkill('xiajiao3','phaseAfter');
+	                target.addTempSkill('xiajiao3');
 	            },
 	            ai:{
 	                order:2,
@@ -589,7 +589,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                "step 4"
 	                if(cards&&cards.length){
 	                    player.gain(cards,'gain2');
-	                    target.addTempSkill('bingpotong','phaseAfter');
+	                    target.addTempSkill('bingpotong');
 	                }
 				},
 				ai:{
@@ -964,7 +964,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                else{
 	                    player.updateMarks();
 	                }
-	                player.addTempSkill('xiajiao3','phaseAfter');
+	                player.addTempSkill('xiajiao3');
 	            },
 	            group:'xiajiao_draw',
 	            subSkill:{
@@ -973,7 +973,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                    forced:true,
 	                    content:function(){
 	                        trigger.num++;
-	                        player.addTempSkill('xiajiao2','phaseAfter');
+	                        player.addTempSkill('xiajiao2');
 	                    }
 	                }
 	            }
@@ -1397,7 +1397,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                    }
 	                    if(card.storage.yuheng>=3){
 	                        card.init([card.suit,card.number,'yuheng_plus',card.nature]);
-	                        player.addTempSkill('yuheng_plus_temp','phaseAfter');
+	                        player.addTempSkill('yuheng_plus_temp');
 	                    }
 	                }
 	            },

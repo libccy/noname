@@ -437,7 +437,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     				'step 2'
     				if(result.control=='选项一'){
-    					target.addTempSkill('fenyue2','phaseAfter');
+    					target.addTempSkill('fenyue2');
     				}
     				else{
     					player.useCard({name:'sha'},target,false);
@@ -472,7 +472,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				game.countPlayer(function(current){
     					if(current!=player&&!current.hasSkill('fengyin')){
     						player.line(current,'green');
-    						current.addTempSkill('fengyin','phaseAfter');
+    						current.addTempSkill('fengyin');
     					}
     				});
     			}
@@ -614,7 +614,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				else{
     					source.storage.hengjiang3=player;
     					source.storage.hengjiang2=trigger.num;
-    					source.addTempSkill('hengjiang2','phaseAfter');
+    					source.addTempSkill('hengjiang2');
     				}
     			}
     		},
@@ -1162,7 +1162,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				player.storage.fenxun2=target;
-    				player.addTempSkill('fenxun2','phaseAfter');
+    				player.addTempSkill('fenxun2');
     			},
     			check:function(card){
     				if(card.name=='sha'&&_status.event.player.countCards('h','sha')<=1) return 0;
@@ -1780,9 +1780,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			content:function(){
     				player.loseHp();
     				switch(get.type(cards[0],'trick')){
-    					case 'basic':player.addTempSkill('zhanyi_basic','phaseAfter');break;
-    					case 'equip':player.addTempSkill('zhanyi_equip','phaseAfter');break;
-    					case 'trick':player.addTempSkill('zhanyi_trick','phaseAfter');player.draw(2);break;
+    					case 'basic':player.addTempSkill('zhanyi_basic');break;
+    					case 'equip':player.addTempSkill('zhanyi_equip');break;
+    					case 'trick':player.addTempSkill('zhanyi_trick');player.draw(2);break;
     				}
     			},
     			ai:{
@@ -2332,7 +2332,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				player.draw(2*player.storage.tuifeng.length);
-    				player.addTempSkill('tuifeng3','phaseAfter');
+    				player.addTempSkill('tuifeng3');
     				player.$throw(player.storage.tuifeng.slice(0),1000);
     				player.storage.tuifeng3=player.storage.tuifeng.length;
     				while(player.storage.tuifeng.length){
@@ -2924,7 +2924,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						return true;
     					});
     				}
-    				player.addTempSkill('zhidao2','phaseAfter');
+    				player.addTempSkill('zhidao2');
     			}
     		},
     		zhidao2:{
@@ -3190,7 +3190,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.chooseToCompare(target);
     				'step 1'
     				if(result.bool){
-    					target.addTempSkill('tanhu2','phaseAfter');
+    					target.addTempSkill('tanhu2');
     				}
     			},
     			ai:{
@@ -3306,7 +3306,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		fenyong:{
     			trigger:{player:'damageEnd'},
     			content:function(){
-    				player.addTempSkill('fenyong2','phaseAfter');
+    				player.addTempSkill('fenyong2');
     			}
     		},
     		fenyong2:{
@@ -3523,7 +3523,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						if(_status.event.du) return -att;
     						return att;
     					}).set('du',event.card.name=='du');
-    					target.addTempSkill('dahe2','phaseAfter');
+    					target.addTempSkill('dahe2');
     				}
     				else{
     					event.type=false;
@@ -3631,7 +3631,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.draw(num);
     				}
     				player.storage.yawang=num;
-    				player.addTempSkill('yawang2','phaseAfter');
+    				player.addTempSkill('yawang2');
     			}
     		},
     		yawang2:{
@@ -4237,8 +4237,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				var target=trigger.player;
-    				target.addTempSkill('meibu_viewas','phaseAfter');
-    				target.addTempSkill('meibu_range','phaseAfter');
+    				target.addTempSkill('meibu_viewas');
+    				target.addTempSkill('meibu_range');
     				target.storage.meibu=player;
     				target.markSkillCharacter('meibu',player,'魅步','锦囊牌均视为杀且'+get.translation(player)+'视为在攻击范围内');
     			},
@@ -5248,7 +5248,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			direct:true,
     			content:function(){
     				'step 0'
-    				player.addTempSkill('fengpo3','phaseAfter');
+    				player.addTempSkill('fengpo3');
     				player.chooseControl('draw_card','加伤害','cancel2').set('prompt',get.prompt('fengpo'));
     				'step 1'
     				if(result.control&&result.control!='cancel2'){
@@ -5441,7 +5441,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				if(num>0){
     					player.draw(num);
     				}
-    				player.addTempSkill('canshi2','phaseAfter');
+    				player.addTempSkill('canshi2');
     			}
     		},
     		canshi2:{
@@ -5593,7 +5593,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.logSkill('jilei',trigger.source);
     					player.popup(get.translation(result.control)+'牌');
     					trigger.source.storage.jilei2=result.control;
-    					trigger.source.addTempSkill('jilei2','phaseAfter');
+    					trigger.source.addTempSkill('jilei2');
     				}
     			},
     			ai:{
@@ -6154,7 +6154,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.draw();
     				player.markSkill('wangzun');
     				player.storage.wangzun=trigger.player;
-    				trigger.player.addTempSkill('wangzun3','phaseAfter');
+    				trigger.player.addTempSkill('wangzun3');
     			},
     			ai:{
     				expose:0.2
@@ -6499,7 +6499,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				if(trigger.delay==false) game.delay();
     				"step 1"
     				player.draw();
-    				player.addTempSkill('shenxian2','phaseAfter');
+    				player.addTempSkill('shenxian2');
     			},
     			ai:{
     				threaten:1.5
@@ -7448,7 +7448,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     							player.storage.huxiao3=[];
     						}
     						player.storage.huxiao3.addArray(player.storage.huxiao);
-    						player.addTempSkill('huxiao3','phaseAfter');
+    						player.addTempSkill('huxiao3');
     					}
     				},
     				clear:{

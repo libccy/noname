@@ -1888,7 +1888,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							if(target.getEquip('baiyin')&&target.isDamaged()&&
-								ai.get.recoverEffect(target,player,player)>0){
+								get.recoverEffect(target,player,player)>0){
 								if(target.hp==1&&!target.hujia) return 1.6*att;
 								if(target.hp==2) return 0.01*att;
 								return 0;

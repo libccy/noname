@@ -1016,7 +1016,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 									}
 								}
 								if(target.getEquip('baiyin')&&target.isDamaged()&&
-									ai.get.recoverEffect(target,player,player)>0){
+									get.recoverEffect(target,player,player)>0){
 									if(target.hp==1&&!target.hujia) return 1.6;
 									if(target.hp==2) return 0.01;
 									return 0;

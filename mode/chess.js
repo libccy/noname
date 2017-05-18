@@ -4951,7 +4951,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			forced:true,
     			popup:false,
     			content:function(){
-    				player.addTempSkill('noactpunish','phaseAfter');
+    				player.addTempSkill('noactpunish');
     			}
     		},
     		noactpunish:{},

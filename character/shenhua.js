@@ -447,7 +447,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     				player.storage.qimou2=num;
     				player.loseHp(num);
-    				player.addTempSkill('qimou2','phaseAfter');
+    				player.addTempSkill('qimou2');
     			},
     			ai:{
     				order:2,
@@ -3024,10 +3024,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				"step 0"
     				if(cards.length==0){
     					player.loseHp();
-    					player.addTempSkill('xinqiangxi3','phaseAfter');
+    					player.addTempSkill('xinqiangxi3');
     				}
     				else{
-    					player.addTempSkill('xinqiangxi2','phaseAfter');
+    					player.addTempSkill('xinqiangxi2');
     				}
     				"step 1"
     				target.damage();
@@ -3067,10 +3067,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.chooseToCompare(target);
     				"step 1"
     				if(result.bool){
-    					player.addTempSkill('tianyi2','phaseAfter');
+    					player.addTempSkill('tianyi2');
     				}
     				else{
     					player.addTempSkill('tianyi3','phaseAfter');
+    					player.addTempSkill('tianyi3');
     				}
     			},
     			ai:{
@@ -3137,7 +3138,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				"step 1"
     				player.gain(result.card);
     				player.$gain2(result.card);
-    				player.addTempSkill('shuangxiong2','phaseAfter');
+    				player.addTempSkill('shuangxiong2');
     				player.storage.shuangxiong=get.color(result.card);
     				trigger.untrigger();
     				trigger.finish();

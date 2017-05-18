@@ -144,7 +144,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				popup:false,
 				content:function(){
-					player.addTempSkill('huodi3','phaseAfter');
+					player.addTempSkill('huodi3');
 				}
 	        },
 	        huodi3:{},

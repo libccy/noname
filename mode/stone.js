@@ -2400,7 +2400,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				else{
     					target.recover(num);
     				}
-    				// player.addTempSkill('priest_kuaisuzhiliao','phaseAfter');
+    				// player.addTempSkill('priest_kuaisuzhiliao');
     			},
     			ai:{
     				order:7,
@@ -3441,7 +3441,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			selectTarget:-1,
     			content:function(){
     				player.drawDeck(2);
-    				player.addTempSkill('shaman_xianzuzhishi','phaseAfter');
+    				player.addTempSkill('shaman_xianzuzhishi');
     			},
     			ai:{
     				order:10,
@@ -3982,7 +3982,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			content:function(){
     				var list=['spell_lierenyinji','spell_guanmenfanggou','spell_duochongsheji','spell_kuaisusheji','spell_zhaohuanchongwu'];
     				player.gain(game.createCard(list.randomGet()),'draw');
-    				player.addTempSkill('hunter_zidanshangtang','phaseAfter');
+    				player.addTempSkill('hunter_zidanshangtang');
     			},
     			ai:{
     				order:7.5,
@@ -8873,7 +8873,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			forced:true,
     			unique:true,
     			content:function(){
-    				player.getLeader().addTempSkill('stone_yaosaishouwei2','phaseAfter');
+    				player.getLeader().addTempSkill('stone_yaosaishouwei2');
     			}
     		},
     		stone_yaosaishouwei2:{

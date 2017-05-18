@@ -653,7 +653,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				trigger.num++;
     				trigger.id=trigger.id||get.id();
     				player.storage.kbolan2=trigger.id;
-    				player.addTempSkill('kbolan2','phaseAfter');
+    				player.addTempSkill('kbolan2');
     			}
     		},
     		kbolan2:{
@@ -1920,7 +1920,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				"step 1"
     				if(player.countCards('h')>=8){
     					player.damage(3,'fire');
-    					player.addTempSkill('heihuo2','phaseAfter');
+    					player.addTempSkill('heihuo2');
     				}
     			},
     			ai:{
@@ -2205,7 +2205,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				next.logSkill='lianda';
     				"step 1"
     				if(result.bool){
-    					player.addTempSkill('lianda2','phaseAfter');
+    					player.addTempSkill('lianda2');
     					player.useCard({name:'sha'},trigger.target);
     				}
     			}
@@ -2927,7 +2927,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.lose(result.cards,ui.special);
     					player.storage.hutian=target;
     					player.logSkill('hutian',result.targets);
-    					player.addTempSkill('hutian4','phaseAfter');
+    					player.addTempSkill('hutian4');
     					target.addSkill('hutian2');
     					target.storage.hutian2=result.cards;
     					game.addVideo('storage',target,['hutian2',get.cardsInfo(result.cards),'cards']);
@@ -3915,7 +3915,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				if(result.bool){
     					player.discard(result.cards);
     					player.logSkill('dangping',result.targets);
-    					player.addTempSkill('dangping2','phaseAfter');
+    					player.addTempSkill('dangping2');
     				}
     				"step 2"
     				if(result.bool){
@@ -3945,11 +3945,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
     				"step 1"
     				if(result.bool){
-    					target.addTempSkill('duishi3','phaseAfter');
+    					target.addTempSkill('duishi3');
     				}
     				else{
     					player.gainPlayerCard(target,'he',true);
-    					player.addTempSkill('duishi2','phaseAfter');
+    					player.addTempSkill('duishi2');
     				}
     			},
     			ai:{
@@ -4859,7 +4859,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					trigger.player.hp=1;
     					if(trigger.player.maxHp<1) trigger.player.maxHp=1;
     					trigger.player.update();
-    					player.addTempSkill('susheng2','phaseAfter');
+    					player.addTempSkill('susheng2');
     				}
 
     			},
@@ -7514,7 +7514,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				"step 0"
-    				player.addTempSkill('xiaomoyu2','phaseAfter');
+    				player.addTempSkill('xiaomoyu2');
     				if(player.hp<player.maxHp){
     					player.recover();
     					event.finish();
@@ -7702,7 +7702,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				var dialog=ui.create.dialog('玄咒',[list,'vcard']);
                     var bing=target.countCards('h')<=1;
     				player.chooseButton(dialog,true,function(button){
-                        if(ai.get.effect(target,{name:button.link[2]},player,player)>0){
+                        if(get.effect(target,{name:button.link[2]},player,player)>0){
                             if(button.link[2]=='bingliang'){
                                 if(bing) return 2;
                                 return 0.7;
@@ -7731,7 +7731,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var eff=0;
 							for(var i in lib.card){
 								if(lib.card[i].type=='delay'){
-									var current=ai.get.effect(target,{name:i},player,player);
+									var current=get.effect(target,{name:i},player,player);
 									if(current>eff){
 										eff=current;
 									}
@@ -8333,7 +8333,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.judge(function(){
     					return 0;
     				});
-    				player.addTempSkill('yueren2','phaseAfter');
+    				player.addTempSkill('yueren2');
     				"step 1"
     				if(get.color(result.card)=='black'){
     					if(trigger.target.countCards('he')){

@@ -155,7 +155,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target.damage('fire');
 					}
 					else{
-						target.addTempSkill('huogong2','phaseBegin');
+						target.addTempSkill('huogong2');
 					}
 					event.dialog.close();
 					game.addVideo('cardDialog',null,event.videoId);

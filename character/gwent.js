@@ -34,7 +34,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_aokeweisite:['male','qun',4,['yunhuo']],
 			// gw_kaxier:['male','wu',4,[]],
 			gw_luobo:['male','qun',3,['junchi']],
-			// gw_mieren:['male','shu',3,[]],
+			gw_mieren:['male','shu',3,['lingji']],
 			gw_sanhanya:['male','shu',3,['gwjinyan']],
 			gw_shanhu:['female','qun',3,['shuijian']],
 			// gw_zhangyujushou:['male','wu',4,[]],
@@ -54,6 +54,48 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			lingji:{
+				enable:'phaseUse',
+				usable:1,
+				content:function(){
+					'step 0'
+					player.draw(2);
+					'step 1'
+					player.chooseToDiscard('he',2,true).ai=function(card){
+						var val=get.value(card);
+						if(ui.selected.cards.length){
+							if(get.suit(card)==get.suit(ui.selected.cards[0])) val++;
+							if(get.number(card)==get.number(ui.selected.cards[0])) val+=3;
+						}
+						return val;
+					}
+					'step 2'
+					if(result.cards.length==2){
+						var list=[];
+						if(get.suit(result.cards[0])==get.suit(result.cards[1])){
+							var list1=get.typeCard('spell_bronze');
+							if(list1.length){
+								list.push(game.createCard(list1.randomGet()));
+							}
+						}
+						if(get.number(result.cards[0])==get.number(result.cards[1])){
+							var list2=get.typeCard('spell_silver');
+							if(list2.length){
+								list.push(game.createCard(list2.randomGet()));
+							}
+						}
+						if(list.length){
+							player.gain(list,'gain2');
+						}
+					}
+				},
+				ai:{
+					order:8,
+					result:{
+						player:1
+					}
+				}
+			},
 			gwjinyan:{
 				trigger:{player:['damageBegin','loseHpBegin']},
     			forced:true,
@@ -290,7 +332,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filterCard:true,
 				check:function(card){
-					return 7-ai.get.value(card);
+					return 7-get.value(card);
 				},
 				filterTarget:true,
 				content:function(){
@@ -426,7 +468,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.chooseToDiscard('h',true);
 					}
 					if(target!=player){
-						target.addTempSkill('hunmo2','phaseAfter');
+						target.addTempSkill('hunmo2');
 						player.storage.hunmo2++;
 					}
 					else{
@@ -763,7 +805,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.draw(3);
 					if(cards.length>=2){
-						player.addTempSkill('shewu_dist','phaseAfter');
+						player.addTempSkill('shewu_dist');
 					}
 					if(cards.length==3){
 						player.recover();
@@ -998,7 +1040,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.asyncDrawAuto(result.targets,function(current){
 							return current==player?1:2;
 						});
-						player.addTempSkill('huandie_discard','phaseAfter');
+						player.addTempSkill('huandie_discard');
 					}
 				},
 				ai:{
@@ -1436,6 +1478,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_zhangyujushou:'章鱼巨兽',
 			gw_zhuoertan:'卓尔坦',
 
+			lingji:'灵计',
+			lingji_info:'出牌阶段限一次，你可以摸两张牌并弃置两张牌，若弃置的牌花色相同，你获得一张随机铜卡；若弃置的牌点数相同，你获得一张随机银卡',
 			gwjinyan:'金焰',
 			gwjinyan_info:'锁定技，准备阶段，若游戏轮数为3的倍数，你获得一张随机金卡；你的体力值不能小于X，X为游戏轮数除3的余数',
 			gwshenyu:'神愈',
