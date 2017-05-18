@@ -3070,7 +3070,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.addTempSkill('tianyi2');
     				}
     				else{
-    					player.addTempSkill('tianyi3','phaseAfter');
     					player.addTempSkill('tianyi3');
     				}
     			},
