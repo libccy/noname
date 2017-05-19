@@ -199,8 +199,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			rerende1:{
 				trigger:{player:'phaseUseBegin'},
-				forced:true,
-				popup:false,
 				silent:true,
 				content:function(){
 					player.storage.rerende=0;
@@ -761,8 +759,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			retishen2:{
 				trigger:{player:'phaseEnd'},
 				priority:-10,
-				forced:true,
-				popup:false,
 				silent:true,
 				content:function(){
 					player.storage.retishen2=player.hp;

@@ -361,8 +361,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			subSkill:{
     				reset:{
     					trigger:{player:'phaseAfter'},
-    					forced:true,
-    					popup:false,
     					silent:true,
     					filter:function(event,player){
     						return player.storage.reluanji?true:false;
@@ -373,8 +371,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				},
     				count:{
     					trigger:{player:'useCard'},
-    					forced:true,
-    					popup:false,
     					silent:true,
     					filter:function(event){
     						return event.skill=='reluanji';
@@ -390,8 +386,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				},
     				respond:{
     					trigger:{global:'respond'},
-    					forced:true,
-    					popup:false,
     					silent:true,
     					filter:function(event){
     						return event.getParent(2).skill=='reluanji'&&event.player.isDamaged();
@@ -3706,8 +3700,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		xintianxiang3:{
     			trigger:{player:['phaseBegin','dieBegin']},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				if(player.storage.xintianxiang3){

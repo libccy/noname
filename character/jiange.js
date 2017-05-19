@@ -141,8 +141,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return _status.currentPhase==player&&event.targets&&(event.targets.length>1||event.targets[0]!=player);
 				},
 	            silent:true,
-				forced:true,
-				popup:false,
 				content:function(){
 					player.addTempSkill('huodi3');
 				}

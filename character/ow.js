@@ -142,8 +142,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	            subSkill:{
 	                die:{
 	                    trigger:{player:'dieBegin'},
-	                    forced:true,
-	                    popup:false,
 	                    silent:true,
 	                    content:function(){
 	                        player.removeSkill('woliu2');
@@ -501,8 +499,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	            subSkill:{
 	                count:{
 	                    trigger:{player:'phaseBegin'},
-	                    forced:true,
-	                    popup:false,
 	                    silent:true,
 	                    content:function(){
 	                        player.storage.pingzhang=0;
@@ -952,8 +948,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	        },
 	        bfengshi3:{
 	            trigger:{player:'useCard'},
-	            forced:true,
-				popup:false,
 				silent:true,
 	            filter:function(event,player){
 					if(player.hasSkill('bfengshi4')) return false;
@@ -3049,8 +3043,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	        },
 	        kuoyin2:{
 	            trigger:{player:'phaseBegin'},
-	            forced:true,
-	            popup:false,
 	            silent:true,
 	            content:function(){
 	                player.storage.yuedong_recover=false;

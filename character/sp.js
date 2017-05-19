@@ -333,8 +333,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     },
                     cancel:{
                         trigger:{player:'phaseUseEnd'},
-                        forced:true,
-                        popup:false,
                         silent:true,
                         content:function(){
                             delete player.forceCountChoose;
@@ -1491,8 +1489,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			subSkill:{
     				count1:{
     					trigger:{player:'phaseBegin'},
-    					forced:true,
-    					popup:false,
     					silent:true,
     					content:function(){
     						player.storage.yjixi++;
@@ -1500,8 +1496,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				},
     				count2:{
     					trigger:{player:'loseHpAfter'},
-    					forced:true,
-    					popup:false,
     					silent:true,
     					content:function(){
     						player.storage.yjixi=0;
@@ -1673,8 +1667,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		xiehui4:{
     			trigger:{player:'loseEnd'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				if(player.storage.xiehui2){
@@ -1743,8 +1735,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		shanjia2:{
     			trigger:{player:'useCard'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			filter:function(event,player){
     				return get.type(event.card)=='equip'&&player.storage.shanjia<7;
@@ -2948,8 +2938,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				},
     			},
     			trigger:{source:'damageEnd'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			mark:true,
     			intro:{
@@ -3085,8 +3073,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		qizhi2:{
     			trigger:{player:'phaseBegin'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				player.storage.qizhi=0;
@@ -3967,8 +3953,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			subSkill:{
     				color:{
     					trigger:{player:'phaseBegin'},
-    					forced:true,
-    					popup:false,
     					silent:true,
     					content:function(){
     						player.storage.xingwu_color=['black','red'];
@@ -3976,8 +3960,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				},
     				color2:{
     					trigger:{player:'useCard'},
-    					forced:true,
-    					popup:false,
     					silent:true,
     					filter:function(event,player){
     						return Array.isArray(player.storage.xingwu_color)&&_status.currentPhase==player;
@@ -4835,8 +4817,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		fenyin3:{
     			trigger:{player:'useCard'},
     			priority:-1,
-    			forced:true,
-    			popup:false,
     			silent:true,
     			filter:function(event,player){
     				if(!event.cards||event.cards.length!=1) return false;
@@ -4849,9 +4829,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		fenyin2:{
     			trigger:{player:'phaseBefore'},
-    			forced:true,
     			silent:true,
-    			popup:false,
     			priority:10,
     			content:function(){
     				player.storage.fenyin=null;
@@ -5035,9 +5013,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		mozhi2:{
     			trigger:{player:'phaseAfter'},
-    			forced:true,
     			silent:true,
-    			popup:false,
     			content:function(){
     				player.storage.mozhi.length=0;
     				player.unmarkSkill('mozhi');
@@ -5045,9 +5021,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		mozhi3:{
     			trigger:{player:'useCard'},
-    			forced:true,
     			silent:true,
-    			popup:false,
     			filter:function(event,player){
     				if(_status.currentPhase!=player) return false;
     				if(event.parent.parent.name!='phaseUse') return false;
@@ -6166,8 +6140,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		wangzun2:{
     			trigger:{player:'phaseBegin'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				player.unmarkSkill('wangzun');
@@ -6534,8 +6506,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		qiangwu2:{
     			trigger:{player:'phaseUseBegin'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				delete player.storage.qiangwu;
@@ -6602,10 +6572,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		qiluan:{
     			trigger:{source:'dieAfter'},
-    			forced:true,
     			priority:-10,
     			silent:true,
-    			popup:false,
     			filter:function(event){
     				return _status.currentPhase!=event.player;
     			},
@@ -7409,8 +7377,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		huxiao:{
     			trigger:{source:'damageEnd'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			filter:function(event,player){
     				return event.nature=='fire';
@@ -7454,8 +7420,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				clear:{
     					trigger:{source:'damageAfter'},
     					priority:-7,
-    					forced:true,
-    					popup:false,
     					silent:true,
     					content:function(){
     						delete player.storage.huxiao;
@@ -7789,8 +7753,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             duwu3:{
                 trigger:{global:'dying'},
                 priority:15,
-                forced:true,
-                popup:false,
                 silent:true,
                 filter:function(event,player){
                     return event.reason&&event.reason.getParent().name=='duwu';
