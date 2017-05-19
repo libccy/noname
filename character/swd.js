@@ -661,8 +661,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			filter:function(event,player){
     				return player.storage.kbolan2==event.id;
     			},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			onremove:true,
     			content:function(){
@@ -2505,8 +2503,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		pingshen:{
     			trigger:{source:'damageBegin'},
-    			forced:true,
-    			popup:false,
     			unique:true,
     			silent:true,
     			content:function(){
@@ -5002,8 +4998,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		kunlunjing2:{
     			trigger:{player:'phaseAfter'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				var handcards1,handcards2,judges,equips,viewAs,i,j;
@@ -5279,8 +5273,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		liaoyuan3:{
     			trigger:{player:'shaEnd'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				player.storage.liaoyuan=0;
@@ -5557,8 +5549,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		yishan2:{
     			trigger:{player:'loseEnd'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				for(var i=0;i<trigger.cards.length;i++){
@@ -5797,8 +5787,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		daixing2:{
     			trigger:{player:'phaseBegin'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				if(player.storage.daixing){
@@ -6850,8 +6838,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             },
             tianshu3:{
     			trigger:{global:['useCardAfter','useSkillAfter','phaseAfter']},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			filter:function(event){
     				return event.skill!='tianshu2';
@@ -6982,8 +6968,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		tianshu_remove:{
     			trigger:{global:'dieAfter'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			filter:function(event,player){
     				return event.player==player.storage.tianshu;

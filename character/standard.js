@@ -574,8 +574,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			rende1:{
 				trigger:{player:'phaseUseBegin'},
-				forced:true,
-				popup:false,
 				silent:true,
 				content:function(){
 					player.storage.rende=0;
@@ -717,8 +715,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jijiang3:{
 				trigger:{global:['useCardAfter','useSkillAfter','phaseAfter']},
-				forced:true,
-				popup:false,
 				silent:true,
 				filter:function(event){
 					return event.skill!='jijiang2'&&event.skill!='qinwang2';
