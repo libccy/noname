@@ -108,7 +108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:function(card,player){
 					return !(player.storage.lingdi||[]).contains(get.suit(card));
 				},
-				check:function(){
+				check:function(card){
 					return 8-get.value(card);
 				},
 				content:function(){
@@ -119,6 +119,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.lingdi.add(get.suit(cards[0]));
 				},
 				ai:{
+					threaten:1.2,
 					order:7,
 					result:{
 						target:1

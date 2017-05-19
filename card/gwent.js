@@ -431,11 +431,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							return att;
 						}
 						return Math.abs(att/2);
-					})[0];
+					},'item');
 					event.aitarget=target;
 					var list=[];
 					for(var i in lib.character){
-						if(!lib.filter.characterDisabled(i)&&lib.character[i][2]>=5){
+						if(!lib.filter.characterDisabled(i)){
 							list.push(i);
 						}
 					}
