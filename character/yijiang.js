@@ -551,8 +551,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		jishe2:{
     			trigger:{player:'phaseAfter'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				player.storage.jishe=0;
@@ -828,8 +826,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		jiyu2:{
     			trigger:{player:['phaseUseBegin','phaseAfter']},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				player.storage.jiyu=[];
@@ -1019,8 +1015,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		jiaozhao3:{
     			trigger:{player:'phaseEnd'},
-    			forced:true,
-    			popup:false,
                 silent:true,
     			content:function(){
     				delete player.storage.jiaozhao;
@@ -1218,8 +1212,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		fulin:{
     			trigger:{player:'phaseDiscardBegin'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				player.addTempSkill('fulin2','phaseDiscardAfter');
@@ -1228,8 +1220,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			subSkill:{
     				reset:{
     					trigger:{player:['phaseBegin','phaseEnd']},
-    					forced:true,
-    					popup:false,
     					silent:true,
     					priority:10,
     					content:function(){
@@ -1238,8 +1228,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				},
     				count:{
     					trigger:{player:'gainEnd'},
-    					forced:true,
-    					popup:false,
     					silent:true,
     					filter:function(event,player){
     						return _status.currentPhase==player;
@@ -2950,8 +2938,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		zhanjue2:{
     			audio:false,
     			trigger:{player:'phaseBefore'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				player.storage.zhanjue=0;
@@ -3195,8 +3181,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		zuoding2:{},
     		zuoding3:{
     			trigger:{global:'damageEnd'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				player.addTempSkill('zuoding2');
@@ -3261,8 +3245,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.storage.huomo={};
     			},
     			trigger:{global:'phaseBegin'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				player.storage.huomo={};
@@ -3270,8 +3252,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		huomo_count2:{
     			trigger:{player:'useCard'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				if(!player.storage.huomo) player.storage.huomo={};
@@ -4624,8 +4604,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		qiangzhi3:{
     			trigger:{player:'phaseUseEnd'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				delete player.storage.qiangzhi;
@@ -6014,8 +5992,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		jiushi2:{
     			trigger:{player:'damageBegin'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			filter:function(event,player){
     				return player.classList.contains('turnedover');
@@ -7127,8 +7103,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		jianying3:{
     			trigger:{player:'useCard'},
     			priority:-1,
-    			forced:true,
-    			popup:false,
     			silent:true,
     			filter:function(event,player){
     				if(!event.cards||event.cards.length!=1) return false;
@@ -7141,9 +7115,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		jianying2:{
     			trigger:{player:'phaseAfter'},
-    			forced:true,
     			silent:true,
-    			popup:false,
     			content:function(){
     				player.storage.jianying=null;
     			}
