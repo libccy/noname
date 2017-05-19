@@ -936,7 +936,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:10,
-					value:6,
+					value:7,
 					useful:1,
 					tag:{
 						draw:2

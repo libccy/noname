@@ -4699,7 +4699,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     							if(card.name=='shunshou') return;
     							if(card.name=='yuanjiao') return;
     							if(card.name=='yiyi') return;
-    							if(!player.hasSkill('cangming2')) return [0,0,0,0];
+    							if(!player.hasSkill('cangming2')) return 'zeroplayertarget';
     						}
     					}
     				},
@@ -4874,7 +4874,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     								if(lib.filter.targetEnabled({name:'sha'},player,game.players[i])&&
     								get.attitude(player,game.players[i])<0){
     									num++;
-    									if(num>1) return [0,0,0,0];
+    									if(num>1) return 'zeroplayertarget';
     								}
     							}
     						}

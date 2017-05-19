@@ -1430,7 +1430,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                effect:{
 	                    player:function(card,player,target){
 	                        if(get.tag(card,'damage')&&get.attitude(player,target)>0){
-	                            if(target.hp==target.maxHp) return [0,0,0,0];
+	                            if(target.hp==target.maxHp||get.recoverEffect(target,player,player)<=0) return 'zeroplayertarget';
 	                            return [0,0,0,1];
 	                        }
 	                    }

@@ -853,7 +853,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                target.gain(list,'gain2');
 	            },
 	            ai:{
-	                order:1,
+	                order:4.5,
+					value:[5,1],
+					tag:{
+						gain:1
+					},
 	                result:{
 	                    target:function(player,target){
 	                        if(target==player){

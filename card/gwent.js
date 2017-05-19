@@ -401,6 +401,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return !current.isUnseen();
 					},'list').randomSort(),function(current){
 						var att=get.attitude(player,current);
+						if(att<0&&current.isDamaged()&&current.hp<=3){
+							return -10;
+						}
 						var rank=get.rank(current,true);
 						if(current.maxHp>=3){
 							if(current.hp<=1){
@@ -542,15 +545,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(max!=min&&max!=null&&min!=null){
 						for(var i=0;i<targets.length;i++){
 							if(targets[i].hp==max){
-								targets[i].hp=min;
-								targets[i].$damagepop(min-max);
+								targets[i].hp--;
+								targets[i].maxHp--;
+								targets[i].$damagepop(-1);
 							}
 							else if(targets[i].hp==min){
-								targets[i].hp=max;
-								targets[i].$damagepop(max-min,'wood');
-								if(targets[i].maxHp<targets[i].hp){
-									targets[i].maxHp=targets[i].hp;
-								}
+								targets[i].hp++;
+								targets[i].maxHp++;
+								targets[i].$damagepop(1,'wood');
 							}
 							targets[i].update();
 						}
@@ -1277,10 +1279,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:function(storage,player){
 						if(storage>=2){
-							return '在每个准备阶段令牌数为全场最多的所有其他角色各随机弃置一张牌（重复'+storage+'次）';
+							return '锁定技，准备阶段，你令手牌数为全场最多的所有其他角色各随机弃置一张手牌，若目标不包含敌方角色，将一名随机敌方角色追加为额外目标，结算X次（重复'+storage+'次）';
 						}
 						else{
-							return '在每个准备阶段令牌数为全场最多的所有其他角色各随机弃置一张牌';
+							return '锁定技，准备阶段，你令手牌数为全场最多的所有其他角色各随机弃置一张手牌，若目标不包含敌方角色，将一名随机敌方角色追加为额外目标，结算X次';
 						}
 					}
 				},
@@ -1290,7 +1292,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					var list=game.filterPlayer();
 					for(var i=0;i<list.length;i++){
-						if(list[i]!=player&&list[i].isMaxCard()) return true;
+						if(list[i]!=player&&list[i].isMaxHandcard()) return true;
 					}
 					return false;
 				},
@@ -1307,8 +1309,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						var max=0;
 						var maxp=null;
 						var list=game.filterPlayer(function(current){
-							return current.isMaxCard();
+							return current.isMaxHandcard();
 						}).sortBySeat();
+						var enemies=player.getEnemies();
+						for(var i=0;i<enemies.length;i++){
+							if(list.contains(enemies[i])){
+								break;
+							}
+						}
+						if(i==enemies.length){
+							list.push(enemies.randomGet());
+						}
 						list.remove(player);
 						if(!list.length){
 							event.finish();
@@ -1316,7 +1327,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 						player.line(list,'green');
 						for(var i=0;i<list.length;i++){
-							list[i].randomDiscard(false);
+							list[i].randomDiscard('h',false);
 						}
 					}
 					else{
@@ -1416,7 +1427,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_yigeniyin:'伊格尼印',
 			gw_yigeniyin_info:'对敌方角色中体力值最大的一名随机角色造成一点火焰伤害，然后对场上体力值最大的所有角色各造成一点火焰伤害，然后结束出牌阶段',
 			gw_leizhoushu:'雷咒术',
-			gw_leizhoushu_info:'获得技能雷咒术（在每个准备阶段令全场牌数最多的所有其他角色各随机弃置一张牌，重复获得时效果叠加），然后结束出牌阶段',
+			gw_leizhoushu_info:'获得技能雷咒术（在每个准备阶段令全场牌数最多的所有其他角色各随机弃置一张牌，若目标不包含敌方角色，将一名随机敌方角色追加为额外目标，结算X次，X为本局获得此技能的次数），然后结束出牌阶段',
 			gw_aerdeyin:'阿尔德印',
 			gw_aerdeyin_info:'对相邻的角色造成一点伤害，目标摸一张牌并移出游戏一轮，然后结束出牌阶段',
 			gw_xinsheng:'新生',
@@ -1428,7 +1439,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_zhihuanjun:'致幻菌',
 			gw_zhihuanjun_info:'出牌阶段对一名已受伤角色使用，令其减少一点体力上限',
 			gw_niuquzhijing:'纽曲之镜',
-			gw_niuquzhijing_info:'交换全场体力值最大和最小角色的体力值（不触发技能），然后结束出牌阶段',
+			gw_niuquzhijing_info:'令全场体力最多的角色减少一点体力和体力上限，体力最少的角色增加一点体力和体力上限（不触发技能），然后结束出牌阶段',
 			gw_ansha:'暗杀',
 			gw_ansha_info:'令一名体力为1的随机敌方角立即死亡，然后结束出牌阶段',
 			gw_shizizhaohuan:'十字召唤',

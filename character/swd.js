@@ -9178,7 +9178,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     							for(var i=0;i<players.length;i++){
     								if(get.attitude(player,players[i])<0){
     									num++;
-    									if(num>1) return [0,0,0,0];
+    									if(num>1) return 'zeroplayertarget';
     								}
     							}
     						}

@@ -253,10 +253,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						player:function(card,player){
 							if(_status.currentPhase!=player) return;
-							if(get.type(card)=='basic'||get.type(card,'trick')=='trick') return;
+							if(get.type(card)=='basic') return;
+							if(get.tag(card,'gain')) return;
+							if(get.value(card,player,'raw')>=7) return;
 							if(player.hp<=2) return;
 							if(!player.hasSkill('jilue')||player.storage.renjie==0){
-								return [0,0,0,0];
+								return 'zeroplayertarget';
 							}
 						}
 					}

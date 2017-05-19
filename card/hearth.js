@@ -163,8 +163,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					game.delay(0.5);
 					'step 3'
-					if(target.countCards('h')){
-						target.chooseToDiscard('h',true);
+					if(target.countCards('he')){
+						target.chooseToDiscard('he',true);
 					}
 				},
 				ai:{
@@ -173,7 +173,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					useful:2,
 					result:{
 						target:function(player,target){
-							return Math.max(0,2-target.countCards('e'))+(target.countCards('h')?0:0.5);
+							return Math.max(0,2-target.countCards('e'));
 						},
 					},
 					tag:{
@@ -692,7 +692,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			shandianjian:'闪电箭',
 			shandianjian_info:'目标角色展示一张手牌，然后若你能弃掉一张与所展示牌相同花色的手牌，则对该角色造成1点雷电伤害。',
 			shijieshu:'视界术',
-			shijieshu_info:'目标随机装备两张装备牌，然后弃置一张手牌',
+			shijieshu_info:'目标随机装备两张装备牌，然后弃置一张牌',
 			zhaomingdan:'照明弹',
 			zhaomingdan_info:'观看一名其他角色的手牌，并弃置其区域内的一张牌，然后其与你各摸一张牌',
 			jihuocard:'激活',

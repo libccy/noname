@@ -1861,8 +1861,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				effect:{
     					player:function(card,player){
     						if(_status.currentPhase!=player) return;
-    						if(card.name=='sha'&&player.countCards('h')<=player.hp&&!player.storage.chunlao.length){
-    							return [0,0,0,0];
+    						if(card.name=='sha'&&!player.needsToDiscard()&&!player.storage.chunlao.length){
+    							return 'zeroplayertarget';
     						}
     					}
     				},
@@ -5436,7 +5436,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			ai:{
     				effect:{
     					target:function(card,player,target,current){
-    						if(get.type(card)=='trick'||card.name=='sha') return [0,0,0,0];
+    						if(get.type(card)=='trick'||card.name=='sha') return 'zeroplayertarget';
     					}
     				}
     			}

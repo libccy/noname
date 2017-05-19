@@ -14449,9 +14449,11 @@
                         }
                     }
                     if(result.card||!result.skill){
+						result.used=result.card||result.cards[0];
                         this.useCard(result.card,result.cards,result.targets,result.skill).oncard=event.oncard;
                     }
                     else if(result.skill){
+						result.used=result.skill;
                         this.useSkill(result.skill,result.cards,result.targets);
                     }
                 },
@@ -14770,7 +14772,7 @@
 					next.player=this;
 					next.targets=targets;
 					next.animation=animation;
-					if(get.itemtype(position)=='cards'){
+					if(Array.isArray(position)){
 						next.cards=position;
 					}
 					else{
@@ -16096,12 +16098,13 @@
 					if(this.hasSkill(skill)&&this.tempSkills[skill]==undefined) return;
 					this.addSkill(skill,checkConflict,true);
                     this.skills.remove(skill);
-					this.tempSkills[skill]=expire;
 
 					if(!expire){
 						expire='phaseAfter';
 					}
-                    else if(typeof expire=='string'){
+					this.tempSkills[skill]=expire;
+
+					if(typeof expire=='string'){
                         lib.hookmap[expire]=true;
                     }
                     else if(Array.isArray(expire)){

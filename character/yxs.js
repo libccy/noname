@@ -1260,7 +1260,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target,current){
-							if(get.type(card)=='trick'||card.name=='sha') return [0,0,0,0];
+							if(get.type(card)=='trick'||card.name=='sha') return 'zeroplayertarget';
 						}
 					}
 				}
