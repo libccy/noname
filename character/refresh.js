@@ -281,9 +281,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseDrawBefore'},
 				direct:true,
+				filter:function(event){
+					return event.num>0;
+				},
 				content:function(){
 					"step 0"
-					player.chooseTarget(get.prompt('retuxi'),[1,2],function(card,player,target){
+					player.chooseTarget(get.prompt('retuxi'),[1,trigger.num],function(card,player,target){
 						return target.countCards('h')>0&&player!=target&&target.countCards('h')>=player.countCards('h');
 					},function(target){
 						var att=get.attitude(_status.event.player,target);

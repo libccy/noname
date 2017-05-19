@@ -11625,6 +11625,56 @@
 					player.gain(event.cards2,target);
 					target.gain(event.cards1,player);
 				},
+				gainMultiple:function(){
+					'step 0'
+					event.delayed=false;
+					event.num=0;
+					event.cardlist=[];
+					'step 1'
+					var current=targets[num];
+					var card;
+					if(cards){
+						card=cards[num];
+					}
+					else{
+						card=current.getCards(event.position).randomGet();
+					}
+					if(card){
+						if(typeof event.animation=='string'){
+							current['$'+event.animation](card,player);
+						}
+						else{
+							current.$giveAuto(card,player);
+						}
+						current.lose(card,ui.special).set('type','gain');
+					}
+					event.cardlist[num]=card||null;
+					event.num++;
+					if(event.num<targets.length){
+						event.redo();
+					}
+					else{
+						event.num=0;
+					}
+					'step 2'
+					var current=targets[num];
+					var card=event.cardlist[num];
+					if(card){
+						if(current==game.me||current.isOnline()||(player==game.me&&!event.delayed)){
+							player.gain(card,current);
+							event.delayed=true;
+						}
+						else{
+							player.gain(card,current).set('delay',false);
+						}
+					}
+					event.num++;
+					if(event.num<targets.length){
+						event.redo();
+					}
+					'step 2'
+					if(!event.delayed) game.delay();
+				},
 				gain:function(){
 					"step 0"
 					if(cards){
@@ -11722,6 +11772,19 @@
                             broadcast();
 							game.resume();
 						},get.delayx(gain2t,gain2t));
+					}
+					else if(event.source&&(event.animate=='give'||event.animate=='giveAuto')){
+						event.source['$'+event.animate](cards,player);
+						game.pause();
+						setTimeout(function(){
+							addv();
+							player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
+							player.node.handcards2.insertBefore(frag2,player.node.handcards2.firstChild);
+							player.update();
+							if(player==game.me) ui.updatehl();
+                            broadcast();
+							game.resume();
+						},get.delayx(500,500));
 					}
 					else{
 						addv();
@@ -14701,22 +14764,19 @@
                     },this,cards);
 					return this;
 				},
-				gainMultiple:function(targets,position){
-					var delayed=false;
-					for(var i=0;i<targets.length;i++){
-						var current=targets[i];
-						var card=current.getCards(position).randomGet();
-						if(!card) continue;
-						if(current==game.me||current.isOnline()){
-							this.gain(card,current);
-							delayed=true;
-						}
-						else{
-							this.gain(card,current).set('delay',false);
-						}
-						current.$giveAuto(card,this);
+				gainMultiple:function(targets,position,animation){
+					var next=game.createEvent('gainMultiple',false);
+					next.setContent('gainMultiple');
+					next.player=this;
+					next.targets=targets;
+					next.animation=animation;
+					if(get.itemtype(position)=='cards'){
+						next.cards=position;
 					}
-					if(!delayed) game.delay();
+					else{
+						next.position=position||'h';
+					}
+					return next;
 				},
 				gain:function(){
 					var next=game.createEvent('gain');
@@ -14757,7 +14817,7 @@
 							next.source=arguments[i];
 						}
 						else if(get.itemtype(arguments[i])=='cards'){
-							next.cards=arguments[i];
+							next.cards=arguments[i].slice(0);
 						}
 						else if(get.itemtype(arguments[i])=='card'){
 							next.cards=[arguments[i]];
@@ -14766,7 +14826,15 @@
 							next.position=arguments[i];
 						}
 					}
-					if(next.cards==undefined){
+					if(next.cards){
+						var hej=this.getCards('hej');
+						for(var i=0;i<next.cards.length;i++){
+							if(!hej.contains(next.cards[i])){
+								next.cards.splice(i--,1);
+							}
+						}
+					}
+					if(!next.cards||!next.cards.length){
 						_status.event.next.remove(next);
 					}
 					else{
