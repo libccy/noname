@@ -19490,8 +19490,6 @@
 			},
             counttrigger:{
                 trigger:{global:'phaseAfter'},
-                forced:true,
-                popup:false,
                 silent:true,
                 priority:-25,
                 content:function(){

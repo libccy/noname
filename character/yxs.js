@@ -1004,8 +1004,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			sanbanfu2:{
 				trigger:{player:'shaAfter'},
-				forced:true,
-				popup:false,
 				silent:true,
 				content:function(){
 					if(player.storage.sanbanfu) player.damage(trigger.target);
@@ -1015,8 +1013,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			sanbanfu3:{
 				trigger:{source:'damageBegin'},
-				forced:true,
-				popup:false,
 				silent:true,
 				filter:function(event,player){
 					return event.card&&event.card.name=='sha'&&player.storage.sanbanfu2;

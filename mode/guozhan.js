@@ -653,8 +653,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 					count1:{
 						trigger:{player:'loseAfter'},
-						forced:true,
-						popup:false,
 						silent:true,
 						filter:function(event,player){
 							if(event.type!='gain'&&event.type!='equip') return true;
@@ -744,8 +742,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 					clear:{
 						trigger:{global:'phaseAfter'},
-						forced:true,
-						popup:false,
 						silent:true,
 						content:function(){
 							delete player.storage.zhangwu;
@@ -1157,8 +1153,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return event.card.name=='sha'&&event.cards.length&&
 								event.player.isFriendOf(player)&&get.cardCount(true,event.player)==1;
 						},
-						forced:true,
-						popup:false,
 						silent:true,
 						content:function(){
 							trigger.gzyongjue=player;
@@ -1283,7 +1277,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzduanchang:{
 				audio:'duanchang',
 				trigger:{player:'dieBegin'},
-				forced:true,
+				popup:true,
 				silent:true,
 				filter:function(event,player){
 					return event.source&&event.source.isIn()&&event.source!=player&&
@@ -1333,6 +1327,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					trigger.source.disableSkill('gzduanchang_disable',list);
 					trigger.source.syncSkills();
+					player.line(trigger.source,'green');
 				},
 				logTarget:'source',
 				ai:{
@@ -1512,8 +1507,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			gzrende1:{
 				trigger:{player:'phaseUseBegin'},
-				forced:true,
-				popup:false,
 				silent:true,
 				content:function(){
 					player.storage.gzrende=0;

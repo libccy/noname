@@ -1026,8 +1026,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				mode:['boss'],
 				global:'boss_chiyan2x',
 				trigger:{player:'dieBegin'},
-				forced:true,
-				popup:false,
 				silent:true,
 				unique:true,
 				filter:function(event,player){
@@ -1110,8 +1108,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				mode:['boss'],
 				global:'boss_chiyan3x',
 				trigger:{player:'dieBegin'},
-				forced:true,
-				popup:false,
 				silent:true,
 				unique:true,
 				filter:function(event,player){
@@ -1196,8 +1192,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				mode:['boss'],
 				global:'boss_qingmu2x',
 				trigger:{player:'dieBegin'},
-				forced:true,
-				popup:false,
 				silent:true,
 				unique:true,
 				filter:function(event,player){
@@ -1280,8 +1274,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				mode:['boss'],
 				global:'boss_qingmu3x',
 				trigger:{player:'dieBegin'},
-				forced:true,
-				popup:false,
 				silent:true,
 				unique:true,
 				filter:function(event,player){
@@ -2936,8 +2928,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			boss_damagecount2:{
 				trigger:{source:'damageEnd'},
-				forced:true,
-				popup:false,
 				silent:true,
 				filter:function(event,player){
 					if(!ui.damageCount) return false;
@@ -3020,8 +3010,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				mode:['boss'],
 				global:'boss_bianshen2x',
 				trigger:{player:'dieBegin'},
-				forced:true,
-				popup:false,
 				silent:true,
 				content:function(){
 					player.hide();
@@ -3048,8 +3036,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				mode:['boss'],
 				global:'boss_bianshen3x',
 				trigger:{player:'dieBegin'},
-				forced:true,
-				popup:false,
 				silent:true,
 				content:function(){
 					player.hide();
@@ -3076,8 +3062,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				mode:['boss'],
 				global:'boss_bianshen4x',
 				trigger:{player:'dieBegin'},
-				forced:true,
-				popup:false,
 				silent:true,
 				content:function(){
 					player.hide();

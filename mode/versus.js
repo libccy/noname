@@ -4175,8 +4175,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     		},
     		versus_ladder:{
     			trigger:{global:['damageEnd','recoverEnd','dieEnd','gainEnd','phaseDiscardEnd']},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			filter:function(event,player){
     				if(!_status.ladder) return false;
