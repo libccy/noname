@@ -449,8 +449,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             },
             zhaochao2:{
                 trigger:{player:'shaMiss'},
-                forced:true,
-                popup:false,
                 silent:true,
                 filter:function(event){
                     return event.getParent(2).name=='zhaochao';
@@ -1088,8 +1086,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 subSkill:{
                     add:{
                         trigger:{player:'useCard'},
-                        forced:true,
-                        popup:false,
                         silent:true,
                         filter:function(event,player){
                             return _status.currentPhase==player&&get.type(event.card,'trick')=='trick';
@@ -1890,8 +1886,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		yushou_lose:{
     			trigger:{player:'phaseBegin'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				var list=['yushou_misha','yushou_huofu','yushou_leiouke'];
@@ -1959,8 +1953,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			subSkill:{
     				count:{
     					trigger:{player:'useCard'},
-    					forced:true,
-    					popup:false,
     					silent:true,
     					filter:function(event,player){
     						return event.card.name.indexOf('hsqingyu_')==0;
@@ -2430,8 +2422,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		peiyu2:{
     			trigger:{player:'damageAfter'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				player.removeAdditionalSkill('peiyu');
@@ -2894,8 +2884,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			subSkill:{
     				count1:{
     					trigger:{player:'useCard'},
-    					forced:true,
-    					popup:false,
     					silent:true,
     					filter:function(event,player){
     						return _status.currentPhase==player&&get.type(event.card)=='trick';
@@ -2906,8 +2894,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				},
     				count2:{
     					trigger:{player:'phaseBegin'},
-    					forced:true,
-    					popup:false,
     					silent:true,
     					content:function(){
     						player.storage.kuangluan=0;
@@ -3004,8 +2990,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		kuangluan3:{
     			trigger:{player:'phaseBegin'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				player.storage.kuangluan=[];
@@ -3117,9 +3101,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		mobao2:{
     			trigger:{player:'damageEnd'},
-    			forced:true,
     			silent:true,
-    			popup:false,
     			filter:function(event,player){
     				return event.source&&event.source!=player;
     			},
@@ -3132,9 +3114,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		mobao3:{
     			trigger:{player:'phaseEnd'},
-    			forced:true,
     			silent:true,
-    			popup:false,
     			content:function(){
     				delete player.storage.mobao;
     			}
@@ -3670,8 +3650,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		hsbaowu_huangjinyuanhou2:{
     			trigger:{player:'phaseBegin'},
-    			forced:true,
-    			popup:false,
     			silent:true,
     			content:function(){
     				player.removeSkill('hsbaowu_huangjinyuanhou');
@@ -3746,9 +3724,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		fbeifa3:{
     			trigger:{global:'phaseBegin'},
-    			forced:true,
     			silent:true,
-    			popup:false,
     			content:function(){
     				player.storage.fbeifa=0;
     			}
@@ -3782,8 +3758,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			filter:function(event,player){
     				return event.source==_status.currentPhase&&event.source!=player;
     			},
-    			popup:false,
-    			forced:true,
     			silent:true,
     			content:function(){
     				player.storage.yufa=trigger.source;
@@ -3791,8 +3765,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		yufa3:{
     			trigger:{global:'phaseBegin'},
-    			popup:false,
-    			forced:true,
     			silent:true,
     			content:function(){
     				player.storage.yufa=null;
@@ -4272,8 +4244,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			subSkill:{
     				begin:{
     					trigger:{global:'phaseUseBegin'},
-    					forced:true,
-    					popup:false,
     					silent:true,
     					content:function(){
     						trigger.player.storage.shixu_begin=get.time();
@@ -4281,8 +4251,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				},
     				end:{
     					trigger:{global:'phaseUseEnd'},
-    					forced:true,
-    					popup:false,
     					silent:true,
     					filter:function(event,player){
     						return typeof event.player.storage.shixu_begin=='number';
@@ -4363,9 +4331,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			subSkill:{
     				clear:{
     					trigger:{player:'phaseBefore'},
-    					forced:true,
     					silent:true,
-    					popup:false,
     					content:function(){
     						player.storage.qianghua=0;
     					}
@@ -5088,9 +5054,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		shengdun_old:{
     			trigger:{player:'phaseBegin'},
-    			forced:true,
     			silent:true,
-    			popup:false,
     			priority:10,
     			init2:function(player){
     				player.markSkill('shengdun');

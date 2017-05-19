@@ -493,8 +493,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					count:{
 						trigger:{player:'phaseUseBegin'},
-						forced:true,
-						popup:false,
 						silent:true,
 						content:function(){
 							player.storage.hunmo1=0;
@@ -922,8 +920,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					count1:{
 						trigger:{global:'phaseBegin'},
-						forced:true,
-						popup:false,
 						silent:true,
 						content:function(){
 							player.storage.gwchuanxin=[];
@@ -931,8 +927,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					count2:{
 						trigger:{player:'useCard'},
-						forced:true,
-						popup:false,
 						silent:true,
 						// filter:function(event){
 						// 	return event.card&&event.card.name=='sha';
@@ -1133,8 +1127,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						default:return false;
 					}
 				},
-				forced:true,
-				popup:false,
 				silent:true,
 				content:function(){
 					'step 0'
@@ -1328,8 +1320,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					count:{
 						trigger:{player:'useCard'},
-						forced:true,
-						popup:false,
 						silent:true,
 						filter:function(event,player){
 							return _status.currentPhase==player;
@@ -1347,8 +1337,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					count2:{
 						trigger:{player:'phaseAfter'},
-						forced:true,
-						popup:false,
 						silent:true,
 						content:function(){
 							delete player.storage.huihun;

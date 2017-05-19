@@ -109,7 +109,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return !(player.storage.lingdi||[]).contains(get.suit(card));
 				},
 				check:function(){
-					return 7-get.value(card);
+					return 8-get.value(card);
 				},
 				content:function(){
 					game.asyncDraw([player,target]);
