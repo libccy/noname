@@ -6787,7 +6787,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         player.removeSkill(player.additionalSkills.tianshu);
     				}
     				event.skillai=function(list){
-    					return list.randomGet();
+    					return get.max(list,get.skillRank,'item');
     				};
     				if(event.isMine()){
                         var dialog=ui.create.dialog();
@@ -6943,7 +6943,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				"step 0"
     				// target.gain(cards,player);
     				event.skillai=function(list){
-    					return list.randomGet();
+    					return get.max(list,get.skillRank,'item');
     				};
     				if(event.isMine()){
     					event.dialog=lib.skill.tianshu.createDialog(player,target);

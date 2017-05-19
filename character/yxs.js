@@ -728,6 +728,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			kuangchan:{
+				ai:{
+					neg:true
+				},
 				init:function(player){
 					if(lib.config.mode=='identity'&&player.isZhu){
 						player.maxHp--;

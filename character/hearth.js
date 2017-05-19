@@ -1000,7 +1000,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				list.remove(player.getSkills());
     				list=list.randomGets(3);
     				event.skillai=function(){
-    					return list.randomGet();
+                        return get.max(list,get.skillRank,'item');
     				};
     				if(event.isMine()){
     					var dialog=ui.create.dialog();
@@ -3251,7 +3251,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				list.remove('maoxian');
     				list=list.randomGets(3);
     				event.skillai=function(){
-    					return list.randomGet();
+    					return get.max(list,get.skillRank,'item');
     				};
     				if(event.isMine()){
     					var dialog=ui.create.dialog();

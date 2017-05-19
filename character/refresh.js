@@ -239,6 +239,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.target){
 						player.useCard({name:'juedou'},event.target,'noai');
 					}
+				},
+				ai:{
+					halfneg:true
 				}
 			},
 			reqicai:{

@@ -2448,7 +2448,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     			},
     			ai:{
-    				threaten:0.5
+    				threaten:0.5,
+                    neg:true,
     			}
     		},
     		baonue:{

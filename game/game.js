@@ -40540,6 +40540,15 @@
             }
 			return num?Math.round(9*(num-1)/8+1):'x';
 		},
+		skillRank:function(skill){
+			var info=lib.skill[skill];
+			if(!info) return 0;
+			if(info.ai){
+				if(info.ai.halfneg) return 0;
+				if(info.ai.neg) return -1;
+			}
+			return 1;
+		},
         targetsInfo:function(targets){
             var info=[];
             for(var i=0;i<targets.length;i++){

@@ -303,6 +303,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					halfneg:true,
 					effect:{
 						player:function(card,player,target,current){
 							if(get.color(card)=='red') return [1,0,1,-2];
@@ -1401,6 +1402,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					content:'turn'
 				},
 				ai:{
+					neg:true,
 					mingzhi:false,
 					threaten:0.8
 				},
