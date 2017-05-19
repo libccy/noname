@@ -1812,21 +1812,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return event.parent.skill=='lihuo';
     			},
     			content:function(){
-    				player.addTempSkill('lihuo3');
+    				player.addSkill('lihuo3');
     			}
     		},
     		lihuo3:{
     			trigger:{player:'useCardAfter'},
+                vanish:true,
     			filter:function(event,player){
     				return event.card.name=='sha';
     			},
     			forced:true,
-    			silent:true,
     			audio:false,
     			content:function(){
     				player.loseHp();
     				player.removeSkill('lihuo3');
-    				delete player.tempSkills.lihuo3;
     			}
     		},
     		chunlao:{

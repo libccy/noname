@@ -26188,6 +26188,10 @@
             if(info.marktext){
                 lib.translate[i+'_bg']=info.marktext;
             }
+			if(info.silent){
+				if(!info.hasOwnProperty('forced')) info.forced=true;
+				if(!info.hasOwnProperty('popup')) info.popup=false;
+			}
             if(i[0]=='_'){
                 game.addGlobalSkill(i);
             }

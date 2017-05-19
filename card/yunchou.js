@@ -600,6 +600,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:4,
+					value:[4,1],
 					result:{
 						target:function(player){
 							if(player.countCards('h')<=1) return 0;

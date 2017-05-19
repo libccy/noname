@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_lixiaoyao:['male','qun',4,['tianjian','yufeng']],
 			pal_zhaoliner:['female','wei',3,['huimeng','tianshe']],
 			pal_linyueru:['female','wei',3,['guiyuan','qijian']],
-			// pal_anu:['female','wu',3,[]],
+			pal_anu:['female','wu',3,['lingdi','anwugu']],
 
 			pal_wangxiaohu:['male','qun',4,['husha']],
 			pal_sumei:['female','shu',3,['sheying','dujiang','huahu']],
@@ -85,6 +85,56 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_jiangcheng:'折剑山庄庄主欧阳英的得意门生，但因其蚩尤后人魔族的身份，令他无法被容于人界；再加上人界半魔同族饱受人类迫害，故最终成为净天教教主魔君“姜世离”，毅然肩负起保护同族的重任。',
 		},
 		skill:{
+			lingdi:{
+				enable:'phaseUse',
+				filter:function(event,player){
+					var num=1+(player.getStat().skill.lingdi||0);
+					if(game.hasPlayer(function(current){
+						return current!=player&&Math.max(1,get.distance(player,current))==num;
+					})){
+						var hs=player.getCards('h');
+						var suits=player.storage.lingdi||[];
+						for(var i=0;i<hs.length;i++){
+							if(!suits.contains(get.suit(hs[i]))){
+								return true;
+							}
+						}
+					}
+					return false;
+				},
+				filterTarget:function(card,player,target){
+					return target!=player&&Math.max(1,get.distance(player,target))==1+(player.getStat().skill.lingdi||0);
+				},
+				filterCard:function(card,player){
+					return !(player.storage.lingdi||[]).contains(get.suit(card));
+				},
+				check:function(){
+					return 7-get.value(card);
+				},
+				content:function(){
+					game.asyncDraw([player,target]);
+					if(!player.storage.lingdi){
+						player.storage.lingdi=[];
+					}
+					player.storage.lingdi.add(get.suit(cards[0]));
+				},
+				ai:{
+					order:7,
+					result:{
+						target:1
+					}
+				},
+				group:'lingdi_clear',
+				subSkill:{
+					clear:{
+						trigger:{player:'phaseAfter'},
+						silent:true,
+						content:function(){
+							delete player.storage.lingdi;
+						}
+					}
+				}
+			},
 			xiaoyue:{
 				trigger:{global:'roundStart'},
 				forced:true,
@@ -92,7 +142,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('h','sha');
 				},
 				content:function(){
-					var card=player.get('h','sha').randomGet();
+					var card=player.getCards('h','sha').randomGet();
 					var target=player.getEnemies().randomGet();
 					if(card&&target){
 						target.addExpose(0.1);
@@ -136,35 +186,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.source.draw();
     			}
 			},
-			zisha:{
+			anwugu:{
 				trigger:{source:'damageEnd'},
 				check:function(event,player){
 					return get.attitude(player,event.player)<0;
 				},
 				filter:function(event,player){
-					return event.player!=player&&event.player.isIn()&&!event.player.hasSkill('zisha2');
+					return event.player!=player&&event.player.isIn()&&!event.player.hasSkill('anwugu2');
 				},
 				logTarget:'player',
 				content:function(){
-					trigger.player.addSkill('zisha2');
+					trigger.player.addSkill('anwugu2');
 				}
 			},
-			zisha2:{
+			anwugu2:{
 				mod:{
     				cardEnabled:function(card,player){
     					if(_status.currentPhase!=player) return;
-    					if(get.cardCount(true,player)>=player.storage.zisha2) return false;
+    					if(get.cardCount(true,player)>=player.storage.anwugu2) return false;
     				},
 					maxHandcard:function(player,num){
-    					return num-1;
-    				},
+						return num-1;
+					}
     			},
 				mark:true,
 				intro:{
-					content:'手牌上限-1且每回合最多使用$张牌（剩余$回合）'
+					content:'手牌上限-1，每回合最多使用$张牌（剩余$回合）'
 				},
 				init:function(player){
-					player.storage.zisha2=3;
+					player.storage.anwugu2=3;
 				},
 				trigger:{player:'phaseAfter'},
 				forced:true,
@@ -172,9 +222,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				onremove:true,
 				content:function(){
-					player.storage.zisha2--;
-					if(player.storage.zisha2<=0){
-						player.removeSkill('zisha2');
+					player.storage.anwugu2--;
+					if(player.storage.anwugu2<=0){
+						// player.loseHp();
+						player.removeSkill('anwugu2');
 					}
 					else{
 						player.updateMarks();
@@ -3342,6 +3393,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.recover();
+					player.draw();
 				},
 				ai:{
 					order:5,
@@ -4039,6 +4091,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_xuejian:'雪见',
 			pal_jingtian:'景天',
 			pal_zixuan:'紫萱',
+			pal_anu:'阿奴',
 
 			pal_yuntianhe:'云天河',
 			pal_hanlingsha:'韩菱纱',
@@ -4054,15 +4107,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_mingxiu:'明绣',
 			pal_jushifang:'居十方',
 
+			lingdi:'灵笛',
+			lingdi_info:'出牌阶段，你可以弃置一张本回合与此法弃置的牌花色均不同的手牌，然后选择一名与你距离为X的角色与其各摸一张牌，X为本回合发动灵笛的次数（含此次）',
 			xiaoyue:'啸月',
 			xiaoyue_info:'锁定技，每轮开始时，若你手牌中有杀，你将手牌中的一张随机杀对一名随机敌方角色使用，并摸一张牌',
 			leiyin:'雷印',
 			leiyin_info:'出牌阶段限一次，你可以弃置两张手牌，并对一名体力值不小于你的随机敌方角色造成一点雷属性伤害，然后距离目标1以内的所有其他角色随机弃置一张手牌',
 			xhuanlei:'唤雷',
 			xhuanlei_info:'每当你受到一次伤害，若伤害来源体力值大于你，你可以对其造成一点雷属性伤害，然后其摸一张牌',
-			zisha:'紫煞',
-			zisha2:'紫煞',
-			zisha_info:'每当你对其他角色造成一次伤害，你可以令目标获得三枚紫煞标记；拥有紫煞标记的角色手牌上限-1，每回合最多使用X张牌（X为紫煞标记数），每个结束阶段失去一枚紫煞标记',
+			anwugu:'巫蛊',
+			anwugu2:'蛊',
+			anwugu_info:'每当你对其他角色造成一次伤害，你可以令目标获得三枚蛊标记；拥有蛊标记的角色手牌上限-1，每回合最多使用X张牌（X为蛊标记数），每个结束阶段失去一枚蛊标记',
 			xtanxi:'探息',
 			xtanxi_info:'出牌阶段限一次，你可以弃置一张手牌，然后随机选择一名手牌中有与之同名的牌的敌方角色，观看其手牌并获得任意一张',
 			linghuo:'灵火',
@@ -4204,7 +4259,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jubao:'聚宝',
 			jubao_info:'当其他角色于你的回合外首次弃置非基本牌时，你可以获得其中的随机一张',
 			guiyuan:'归元',
-			guiyuan_info:'出牌阶段限一次，你可以弃置一张杀并回复一点体力',
+			guiyuan_info:'出牌阶段限一次，你可以弃置一张杀，然后回复一点体力并摸一张牌',
 			xshuangren:'双刃',
 			xshuangren_info:'当你的武器牌被替换时，你可以将其置于你的武将牌上，并获得此装备的武器效果（不含距离）',
 			duci:'毒刺',

@@ -747,7 +747,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					basic:{
 						order:5,
 						useful:3,
-						value:6
+						value:[6,2,1]
 					},
 					result:{
 						target:function(player,target){

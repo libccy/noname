@@ -371,7 +371,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                target.addTempSkill('heilonglinpian',{player:'phaseBegin'});
 	            },
 	            ai:{
-	                value:[5.5,1],
+	                value:[6,1],
 	                useful:1,
 	                order:2,
 	                result:{
