@@ -4741,12 +4741,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return lib.filter.targetEnabled({name:'sha'},player,event.player)&&player.hasSha();
     			},
     			content:function(){
-    				"step 0"
-    				player.chooseToUse({name:'sha'},'热血：是否对'+get.translation(trigger.player)+'使用一张杀',trigger.player,-1).logSkill='rexue';
-    				"step 1"
-    				if(result.bool){
-    					player.draw();
-    				}
+    				var next=player.chooseToUse({name:'sha'},'热血：是否对'+get.translation(trigger.player)+'使用一张杀',trigger.player,-1);
+                    next.logSkill='rexue';
+                    next.oncard=function(){
+                        player.draw();
+                    }
     			}
     		},
     		shengshou:{
@@ -9470,7 +9469,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		youyin:'游吟',
     		youyin_info:'每当有其他角色弃置卡牌时，若其中有非基本牌且你的手牌数不超过5，你可以摸一张牌',
     		rexue:'热血',
-    		rexue_info:'任意一名角色的准备阶段，你可以对其使用一张杀，然后摸一张牌',
+    		rexue_info:'任意一名角色的准备阶段，你可以对其使用一张杀，并摸一张牌',
     		huopu:'火瀑',
     		huopu_info:'出牌阶段限一次，你可以将一张红桃牌当作流星火羽使用',
     		benlei:'奔雷',

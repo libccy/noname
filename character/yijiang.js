@@ -1859,9 +1859,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			ai:{
     				effect:{
-    					player:function(card,player){
+    					player:function(card,player,target){
     						if(_status.currentPhase!=player) return;
-    						if(card.name=='sha'&&!player.needsToDiscard()&&!player.storage.chunlao.length){
+    						if(card.name=='sha'&&!player.needsToDiscard()&&
+                                !player.storage.chunlao.length&&target.hp>1){
     							return 'zeroplayertarget';
     						}
     					}

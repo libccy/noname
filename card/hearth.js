@@ -351,7 +351,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:8.5,
-					value:7,
+					value:8,
 					useful:3,
 					result:{
 						target:1

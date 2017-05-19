@@ -92,27 +92,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('h','sha');
 				},
 				content:function(){
-					'step 0'
-					event.num=0;
-					'step 1'
 					var card=player.get('h','sha').randomGet();
 					var target=player.getEnemies().randomGet();
 					if(card&&target){
-						event.num++;
 						target.addExpose(0.1);
-						player.useCard(card,target);
-						event.redo();
-					}
-					'step 2'
-					if(event.num){
-						player.draw(event.num);
+						player.useCard(card,target).oncard=function(){
+							player.draw();
+						};
 					}
 				},
 				ai:{
 					effect:{
-						player:function(card,player){
+						player:function(card,player,target){
 							if(_status.currentPhase!=player) return;
-							if(card.name=='sha'&&get.itemtype(card)=='card'&&!player.needsToDiscard()){
+							if(card.name=='sha'&&get.itemtype(card)=='card'&&
+								!player.needsToDiscard()&&target.hp>1&&player.countCards('h','sha')==1){
 								return 'zeroplayertarget';
 							}
 						}
@@ -4061,7 +4055,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_jushifang:'居十方',
 
 			xiaoyue:'啸月',
-			xiaoyue_info:'锁定技，每轮开始时，若你手牌中有杀，你将手牌中的杀依次对随机敌方角色使用，然后摸等量的牌',
+			xiaoyue_info:'锁定技，每轮开始时，若你手牌中有杀，你将手牌中的一张随机杀对一名随机敌方角色使用，并摸一张牌',
 			leiyin:'雷印',
 			leiyin_info:'出牌阶段限一次，你可以弃置两张手牌，并对一名体力值不小于你的随机敌方角色造成一点雷属性伤害，然后距离目标1以内的所有其他角色随机弃置一张手牌',
 			xhuanlei:'唤雷',
@@ -4094,6 +4088,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yanshi:'偃师',
 			yanshi_info:'觉醒技，结束阶段，若你累计有4个回合使用过机关牌，你增加一点体力和体力上限，然后用随机装备填满你的装备区',
 			ywuhun:'雾魂',
+			ywuhun_bg:'魂',
 			ywuhun_info:'锁定技，回合开始前，你获得一个额外的回合，并在此回合结束后复原场上及牌堆中的所有牌',
 			ywuhun_info_alter:'锁定技，回合开始前，你获得一个额外的回合，并在此回合结束后复原场上及牌堆中的所有牌；当你在此回合中造成伤害后，终止所有结算并结束此回合',
 			feichen:'飞尘',
