@@ -217,8 +217,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.anwugu2=3;
 				},
 				trigger:{player:'phaseAfter'},
-				forced:true,
-				popup:false,
 				silent:true,
 				onremove:true,
 				content:function(){
@@ -323,8 +321,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					mark:{
 						trigger:{global:'roundStart'},
-						forced:true,
-						popup:false,
 						silent:true,
 						content:function(){
 							if(2-(game.roundNumber-player.storage.linghuo)>0){
@@ -467,8 +463,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					mark:{
 						trigger:{global:'roundStart'},
-						forced:true,
-						popup:false,
 						silent:true,
 						content:function(){
 							if(3-(game.roundNumber-player.storage.guijin)>0){
@@ -546,8 +540,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					mark:{
 						trigger:{global:'roundStart'},
-						forced:true,
-						popup:false,
 						silent:true,
 						content:function(){
 							if(4-(game.roundNumber-player.storage.chengxin)>0){
@@ -870,8 +862,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filter:function(event,player){
 							return get.type(event.card)=='jiguan';
 						},
-						forced:true,
-						popup:false,
 						silent:true,
 						content:function(){
 							player.storage.yujia++;
@@ -929,8 +919,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filter:function(event,player){
 							return get.type(event.card)=='jiguan'&&!player.hasSkill('yanshi2');
 						},
-						forced:true,
-						popup:false,
 						silent:true,
 						content:function(){
 							player.storage.yanshi++;
@@ -1156,8 +1144,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					end:{
 						trigger:{source:'damageEnd'},
 		    			priority:9,
-						forced:true,
-						popup:false,
 						silent:true,
 						content:function(){
 							var evt=_status.event.getParent('ywuhun');
@@ -1461,8 +1447,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			qixia:{
 				trigger:{player:['useCardAfter','respondAfter']},
-				forced:true,
-				popup:false,
 				silent:true,
 				init:function(player){
 					player.storage.qixia=[];
@@ -2118,8 +2102,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			danqing_count:{
 				trigger:{player:'useCard'},
-				forced:true,
-				popup:false,
 				silent:true,
 				content:function(){
 					var suit=get.suit(trigger.card);
@@ -2361,8 +2343,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zhangmu_ai:{
 				trigger:{player:'loseAfter'},
-				forced:true,
-				popup:false,
 				silent:true,
 				filter:function(event,player){
 					return player.countCards('h','shan')==0;
@@ -2424,8 +2404,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	        },
 	        leiyu2:{
 	            trigger:{player:'phaseUseBegin'},
-	            forced:true,
-	            popup:false,
 	            silent:true,
 	            content:function(){
 	                player.storage.leiyu=[];
@@ -2445,8 +2423,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	        },
 	        leiyu4:{
 	            trigger:{player:'useCardToBegin'},
-	            forced:true,
-	            popup:false,
 	            silent:true,
 	            filter:function(event,player){
 	                return _status.currentPhase==player&&Array.isArray(player.storage.leiyu)&&event.target&&event.target!=player;
@@ -3143,8 +3119,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			wangyou2:{
 				trigger:{global:'damageEnd'},
-				forced:true,
-				popup:false,
 				silent:true,
 				filter:function(event){
 					return event.player.isAlive();
@@ -3371,8 +3345,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xshuangren2:{
 				trigger:{player:'dieBegin'},
-				forced:true,
-				popup:false,
 				silent:true,
 				filter:function(event,player){
 					return player.storage.xshuangren?true:false;
@@ -3645,8 +3617,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zhuyue2:{
 				trigger:{player:'phaseUseEnd'},
-				forced:true,
-				popup:false,
 				silent:true,
 				content:function(){
 					player.storage.zhuyue.length=0;
@@ -3885,8 +3855,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zhimeng3:{
 				trigger:{player:['phaseBegin','dieBegin']},
-				forced:true,
-				popup:false,
 				silent:true,
 				content:function(){
 					"step 0"
