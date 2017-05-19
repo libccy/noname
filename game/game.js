@@ -12169,7 +12169,15 @@
 					if(_status.roundStart==player){
 						_status.roundStart=player.next||player.getNext()||game.players[0];
 					}
+					var unseen=false;
+					if(player.classList.contains('unseen')){
+						player.classList.remove('unseen');
+						unseen=true;
+					}
                     var logvid=game.logv(player,'die',source);
+					if(unseen){
+						player.classList.add('unseen');
+					}
 					if(source&&source!=player){
 						game.log(player,'被',source,'杀害');
 						if(source.stat[source.stat.length-1].kill==undefined){
