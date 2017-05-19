@@ -752,8 +752,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dawu3:{
 				trigger:{player:['phaseBegin','dieBegin']},
-				forced:true,
-				popup:false,
 				silent:true,
 				content:function(){
 					for(var i=0;i<game.players.length;i++){

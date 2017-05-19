@@ -987,8 +987,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			toulianghuanzhu2:{},
 			youdishenru:{
 				trigger:{source:'damageEnd'},
-				forced:true,
-				popup:false,
 				silent:true,
 				onremove:true,
 				filter:function(event,player){

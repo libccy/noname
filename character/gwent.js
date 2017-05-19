@@ -408,9 +408,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			hupeng3:{
 				trigger:{player:'phaseEnd'},
-				forced:true,
 				silent:true,
-				popup:false,
 				filter:function(event,player){
 					return player.countCards('h','gw_dudayuanshuai2');
 				},

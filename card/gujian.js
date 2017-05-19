@@ -984,8 +984,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	        },
 	        xiajiao2:{
 	            trigger:{player:'phaseDrawAfter'},
-	            forced:true,
-	            popup:false,
 	            silent:true,
 	            content:function(){
 	                player.chooseToDiscard('he',true);

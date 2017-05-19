@@ -2095,8 +2095,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			dujian2:{},
 			g_yuchan_swap:{
 				trigger:{player:'useCardAfter'},
-				forced:true,
-				popup:false,
 				silent:true,
 				priority:-1,
 				content:function(){
@@ -2263,8 +2261,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			shenmiguo2:{},
 			yuruyi:{
 				trigger:{player:'drawBegin'},
-				forced:true,
-				popup:false,
 				silent:true,
 				filter:function(){
 					return ui.cardPile.childElementCount>1;
@@ -4157,8 +4153,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					content:'手牌上限-#'
 				},
 				trigger:{player:'phaseEnd'},
-				forced:true,
-				popup:false,
 				silent:true,
 				temp:true,
 				vanish:true,

@@ -143,8 +143,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					count:{
 						trigger:{player:'useCard'},
-						forced:true,
-						popup:false,
 						silent:true,
 						filter:function(event,player){
 							return _status.currentPhase==player;
@@ -161,8 +159,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					set:{
 						trigger:{player:'phaseAfter'},
-						forced:true,
-						popup:false,
 						silent:true,
 						content:function(){
 							delete player.storage.yunyin;
@@ -413,8 +409,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					count1:{
 						trigger:{player:'shaAfter'},
-						forced:true,
-						popup:false,
 						silent:true,
 						content:function(){
 							if(!player.storage.liuying) player.storage.liuying=[];
@@ -423,8 +417,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					count2:{
 						trigger:{player:'phaseAfter'},
-						forced:true,
-						popup:false,
 						silent:true,
 						content:function(){
 							delete player.storage.liuying;
@@ -1551,8 +1543,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yuling5:{
 				trigger:{player:['useCardAfter','phaseBegin']},
-				forced:true,
-				popup:false,
 				silent:true,
 				content:function(){
 					player.storage.yuling=player.maxHp+2-get.cardCount(true,player);
@@ -1560,8 +1550,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yuling6:{
 				trigger:{player:'phaseAfter'},
-				forced:true,
-				popup:false,
 				silent:true,
 				content:function(){
 					delete player.storage.yuling;

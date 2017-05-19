@@ -1346,8 +1346,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			_gw_zirankuizeng:{
 				trigger:{player:'useCard'},
-				forced:true,
-				popup:false,
 				silent:true,
 				filter:function(event,player){
 					if(!lib.config.cards.contains('gwent')) return false;
@@ -1361,8 +1359,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			_gainspell:{
 				trigger:{player:'drawBegin'},
-				forced:true,
-				popup:false,
 				silent:true,
 				priority:-11,
 				filter:function(event,player){

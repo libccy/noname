@@ -910,8 +910,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			caomu_skill:{
 				unique:true,
 				trigger:{player:'phaseDrawBegin'},
-				forced:true,
-				popup:false,
 				silent:true,
 				content:function(){
 					trigger.num--;
@@ -920,8 +918,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			caomu_skill2:{
 				trigger:{player:'phaseDrawAfter'},
-				forced:true,
-				popup:false,
 				silent:true,
 				content:function(){
 					var targets=game.filterPlayer(function(current){
