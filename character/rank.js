@@ -175,6 +175,10 @@ window.noname_character_rank={
         'hs_zhihuanhua',
     ],
     am:[
+        'pal_anu',
+        'gw_mieren',
+        'gw_sanhanya',
+        'pal_xianqing',
         'gw_shanhu',
         'gw_huoge',
         'taoqian',
@@ -283,6 +287,8 @@ window.noname_character_rank={
         'hs_mojinbaozi',
     ],
     bp:[
+        'pal_jiangyunfan',
+        'pal_longyou',
         'gw_aokeweisite',
         'pal_wangxiaohu',
         'pal_shenqishuang',

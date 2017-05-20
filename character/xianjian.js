@@ -30,9 +30,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_murongziying:['male','wei',4,['xuanning','poyun','qianfang']],
 			pal_xuanxiao:['male','wei',4,['xuanyan','ningbin','xfenxin']],
 
-			// pal_jiangyunfan:['male','wei',4,[]],
+			pal_jiangyunfan:['male','wei',4,['xunying','liefeng']],
 			// pal_tangyurou:['male','wei',4,[]],
-			// pal_longyou:['male','wei',4,[]],
+			pal_longyou:['male','wei',4,['yuexing','minsha']],
 			// pal_xiaoman:['male','wei',4,[]],
 
 			pal_xiahoujinxuan:['male','shu',3,['xuanmo','danqing']],
@@ -85,6 +85,184 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_jiangcheng:'折剑山庄庄主欧阳英的得意门生，但因其蚩尤后人魔族的身份，令他无法被容于人界；再加上人界半魔同族饱受人类迫害，故最终成为净天教教主魔君“姜世离”，毅然肩负起保护同族的重任。',
 		},
 		skill:{
+			xunying:{
+				trigger:{player:'shaAfter'},
+				direct:true,
+				filter:function(event,player){
+					return player.canUse('sha',event.target)&&player.hasSha();
+				},
+				content:function(){
+					"step 0"
+					if(player.hasSkill('jiu')){
+						player.removeSkill('jiu');
+						event.jiu=true;
+					}
+					player.chooseToUse(get.prompt('xunying'),{name:'sha'},trigger.target,-1).logSkill='xunying';
+					"step 1"
+					if(result.bool);
+					else if(event.jiu){
+						player.addSkill('jiu');
+					}
+				}
+			},
+			liefeng:{
+				trigger:{player:'useCard'},
+				forced:true,
+				popup:false,
+				filter:function(event,player){
+					return _status.currentPhase==player&&[2,3,4].contains(get.cardCount(true,player));
+				},
+				content:function(){
+					var skill;
+					switch(get.cardCount(true,player)){
+						case 2:skill='yanzhan';break;
+						case 3:skill='tianjian';break;
+						case 4:skill='yufeng';break;
+					}
+					if(skill&&!player.hasSkill(skill)){
+						player.addTempSkill(skill);
+						player.popup(skill);
+						game.log(player,'获得了','【'+get.translation(skill)+'】');
+						if(skill=='yufeng'){
+							var nh=player.countCards('h');
+							if(nh<2){
+								player.draw(2-nh);
+								player.addSkill('counttrigger');
+		                        if(!player.storage.counttrigger){
+		                            player.storage.counttrigger={};
+		                        }
+								player.storage.counttrigger.yufeng=1;
+							}
+						}
+					}
+				},
+				ai:{
+					effect:{
+						player:function(card,player){
+							if(_status.currentPhase!=player) return;
+							if(get.type(card)=='basic') return;
+							if(get.tag(card,'gain')) return;
+							if(get.value(card,player,'raw')>=7) return;
+							if(player.hp<=2) return;
+							if(player.needsToDiscard()) return;
+							if(get.cardCount(true,player)>=2) return;
+							return 'zeroplayertarget';
+						}
+					}
+				}
+			},
+			yuexing:{
+				enable:'phaseUse',
+				usable:1,
+				filterTarget:function(card,player,target){
+					return target!=player;
+				},
+				content:function(){
+					player.storage.yuexing2=target;
+					player.addTempSkill('yuexing2');
+					target.storage.yuexing2=player;
+					target.addTempSkill('yuexing2');
+				},
+				ai:{
+					order:function(){
+						var player=_status.event.player;
+						if(player.hasSkill('minsha')) return 6.5;
+						return 2;
+					},
+					result:{
+						target:function(player,target){
+							if(player.hasSkill('minsha')&&player.countCards('he')>=3&&
+								target.hp>1&&get.damageEffect(target,player,player,'thunder')>0){
+								var num1=game.countPlayer(function(current){
+									if(get.distance(target,current)<=1&&current!=player&&current!=target){
+										return -get.sgn(get.attitude(player,current));
+									}
+								});
+								var num2=game.countPlayer(function(current){
+									if(get.distance(player,current)<=1&&current!=player&&current!=target){
+										return -get.sgn(get.attitude(player,current));
+									}
+								});
+
+								if(num2>=num1) return 0;
+								return 2*(num2-num1);
+							}
+							return -_status.event.getRand();
+						}
+					}
+				}
+			},
+			yuexing2:{
+				mark:'character',
+				intro:{
+					content:'到其他角色的距离基数与$交换'
+				},
+				onremove:true,
+				mod:{
+					globalFrom:function(from,to,distance){
+						if(from.storage.yuexing2){
+							var dist1=get.distance(from,to,'pure');
+							var dist2=get.distance(from.storage.yuexing2,to,'pure');
+							return distance-dist1+dist2;
+						}
+					}
+				}
+			},
+			minsha:{
+				enable:'phaseUse',
+				usable:1,
+				filterCard:true,
+				selectCard:2,
+				position:'he',
+				filter:function(event,player){
+					return player.countCards('he')>=2;
+				},
+				filterTarget:function(card,player,target){
+					return target!=player&&target.hp>1;
+				},
+				line:'thunder',
+				check:function(card){
+					return 8-get.value(card);
+				},
+				content:function(){
+					'step 0'
+					target.damage('thunder');
+					'step 1'
+					event.targets=game.filterPlayer(function(current){
+						return get.distance(target,current)<=1&&current!=target&&current!=player;
+					}).sortBySeat(target);
+					'step 2'
+					if(event.targets.length){
+						event.targets.shift().randomDiscard(false);
+						event.redo();
+					}
+				},
+				ai:{
+					order:6,
+					result:{
+						player:function(player,target){
+							if(get.damageEffect(target,player,player,'thunder')>0){
+								if(target==player.storage.yuexing2){
+									return 10;
+								}
+								var num=1+game.countPlayer(function(current){
+									if(get.distance(target,current)<=1&&current!=player&&current!=target){
+										return -get.sgn(get.attitude(player,current));
+									}
+								});
+								if(target.hp==1){
+									num+=2;
+								}
+								if(target.hp<player.hp){
+									num+=0.5;
+								}
+								if(player.needsToDiscard()) num+=0.1;
+								return num;
+							}
+						}
+					}
+				}
+			},
 			lingdi:{
 				enable:'phaseUse',
 				filter:function(event,player){
@@ -1758,7 +1936,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.parent.skill=='yanzhan';
 				},
 				content:function(){
-					player.getStat().card.sha--;
+					player.addTempSkill('yanzhan4');
 				}
 			},
 			yanzhan3:{
@@ -1768,6 +1946,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						get.suit(card)!=get.suit(_status.event.parent.cards[0])) return false;
 					}
 				}
+			},
+			yanzhan4:{
+				mod:{
+    				cardUsable:function(card,player,num){
+    					if(card.name=='sha') return num+1;
+    				}
+    			},
 			},
 			yufeng:{
 				trigger:{player:'loseEnd'},
@@ -4076,12 +4261,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_mingxiu:'明绣',
 			pal_jushifang:'居十方',
 
+			xunying:'迅影',
+			xunying_info:'每当你使用杀对一名目标结算完毕后，你可以继续对目标使用杀',
+			liefeng:'冽风',
+			liefeng_info:'锁定技，当你在回合内使用第二张牌时，你本回合获得【炎斩】；当你在回合内使用第三张牌时，你本回合获得【天剑】；当你在回合内使用第四张牌时，你本回合获得【御风】',
+			yuexing:'越行',
+			yuexing_info:'出牌阶段限一次，你可以指定一名角色，本阶段内将你与该角色到其他角色的距离基数互换',
 			lingdi:'灵笛',
 			lingdi_info:'出牌阶段，你可以弃置一张本回合与此法弃置的牌花色均不同的手牌，然后选择一名与你距离为X的角色与其各摸一张牌，X为本回合发动灵笛的次数（含此次）',
 			xiaoyue:'啸月',
 			xiaoyue_info:'锁定技，每轮开始时，若你手牌中有杀，你将手牌中的一张随机杀对一名随机敌方角色使用，并摸一张牌',
-			leiyin:'雷印',
-			leiyin_info:'出牌阶段限一次，你可以弃置两张手牌，并对一名体力值不小于你的随机敌方角色造成一点雷属性伤害，然后距离目标1以内的所有其他角色随机弃置一张手牌',
+			minsha:'冥煞',
+			minsha_info:'出牌阶段限一次，你可以弃置两张牌，对一名体力值大于1的其他角色造成一点雷属性伤害，然后距离目标1以内的所有其他角色随机弃置一张牌',
 			xhuanlei:'唤雷',
 			xhuanlei_info:'每当你受到一次伤害，若伤害来源体力值大于你，你可以对其造成一点雷属性伤害，然后其摸一张牌',
 			anwugu:'巫蛊',
@@ -4148,7 +4339,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fenshi:'焚世',
 			fenshi_info:'觉醒技，当你解除濒死状态时，你获得两点护甲，摸两张牌，然后获得技能龙火',
 			yanzhan:'炎斩',
-			yanzhan_info:'出牌阶段限一次，你可以将一张红色牌当作火杀使用，此杀只能用与之花色相同的闪响应；若此杀造成了伤害，则不计入出杀次数',
+			yanzhan_info:'出牌阶段限一次，你可以将一张红色牌当作火杀使用，此杀只能用与之花色相同的闪响应；若此杀造成了伤害，你本回合可以额外使用一张杀',
 			feixia:'飞霞',
 			feixia_info:'出牌阶段限一次，你可以弃置一张红色牌视为对一名随机敌人使用一张不计入出杀次数的杀',
 			lueying:'掠影',
