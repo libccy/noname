@@ -5459,7 +5459,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			content:function(){
     				"step 0"
     				if(player.storage.kunfen||
-    				(lib.config.mode=='guozhan'&&player.hiddenSkills.contains('kunfen'))){
+    				(get.mode()=='guozhan'&&player.hiddenSkills.contains('kunfen'))){
     					if(!player.storage.kunfen){
     						event.skillHidden=true;
     					}

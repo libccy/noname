@@ -3184,7 +3184,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					if(get.tag(card,'damage')){
     						if(player.hasSkillTag('jueqing',false,target)) return [1,-0.5];
     						if(!target.hasFriend()){
-    							if(lib.config.mode=='guozhan'){
+    							if(get.mode()=='guozhan'){
     								if(!player.hasFriend()) return;
     							}
     							else{

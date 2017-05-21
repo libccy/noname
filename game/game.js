@@ -19230,7 +19230,7 @@
                     if(lib.config.banned.contains(i)) return true;
                     if(lib.config.replacecharacter[i]&&lib.character[lib.config.replacecharacter[i]]) return true;
                     var double_character=false;
-                    if(lib.config.mode=='guozhan'){
+                    if(get.mode()=='guozhan'){
                         double_character=true;
                     }
                     else if(get.config('double_character')&&(lib.config.mode=='identity'||lib.config.mode=='stone')){

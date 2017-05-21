@@ -977,17 +977,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                    event.targets=targets.randomGets(3);
 	                    event.targets.sort(lib.sort.seat);
 	                    player.line(event.targets,'green');
-	                    if(lib.config.mode=='identity'||lib.config.mode=='guozhan'){
-	                        for(var i=0;i<event.targets.length;i++){
-	                            event.targets[i].addExpose(0.3);
-	                        }
-	                    }
 	                }
 	                'step 1'
 	                if(event.targets.length){
 	                    var target=event.targets.shift();
 	                    var he=target.getCards('he');
 	                    if(he.length){
+							target.addExpose(0.1);
 	                        target.discard(he.randomGet());
 	                    }
 	                    event.redo();
