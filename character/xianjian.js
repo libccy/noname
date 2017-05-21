@@ -4292,7 +4292,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_mingxiu:'明绣',
 			pal_jushifang:'居十方',
 
-			txianqu:'仙曲',
+			txianqu:'仙音',
 			txianqu_info:'出牌阶段限一次，当你即将造成伤害时，你可以防止之，然后摸两张牌并回复一点体力',
 			qiongguang:'穹光',
 			qiongguang_info:'弃牌阶段结束时，若你弃置了至少两张牌，你可以对所有敌方角色施加一个随机的负面效果',
