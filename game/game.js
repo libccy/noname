@@ -15443,7 +15443,8 @@
 						this.line(targets,nature);
 					}
                     var info=lib.skill[name];
-					if(info&&info.ai&&info.ai.expose!=undefined&&this.logAi){
+					if(info&&info.ai&&info.ai.expose!=undefined&&
+						this.logAi&&(!targets||targets.length!=1||targets[0]!=this)){
 						this.logAi(lib.skill[name].ai.expose);
 					}
 					if(this.checkShow){
