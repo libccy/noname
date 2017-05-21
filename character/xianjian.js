@@ -102,7 +102,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.delay();
 				},
 				ai:{
-					threaten:1.5,
+					threaten:2,
 					expose:0.2,
 					effect:{
 						player:function(card,player){
@@ -125,6 +125,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{source:'damageBefore'},
     			logTarget:'player',
 				filter:function(event,player){
+					if(player.hasSkill('txianqu2')) return false;
 					var evt=event.getParent('phaseUse');
 					if(evt&&evt.player==player) return true;
 					return false;
@@ -140,13 +141,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				trigger.finish();
     				player.draw(2);
 					player.recover();
+					player.addTempSkill('txianqu2');
     			},
 				ai:{
 					jueqing:true,
 					skillTagFilter:function(player,tag,arg){
 						if(!arg) return false;
+						if(player.hasSkill('txianqu2')) return false;
 						if(get.attitude(player,arg)>0) return false;
-						var evt=event.getParent('phaseUse');
+						var evt=_status.event.getParent('phaseUse');
 						if(evt&&evt.player==player) return true;
 						return false;
 					},
@@ -160,6 +163,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                }
 				}
     		},
+			txianqu2:{},
 			xunying:{
 				trigger:{player:'shaAfter'},
 				direct:true,
@@ -1998,7 +2002,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yufeng:{
 				trigger:{player:'loseEnd'},
-				frequent:true,
+				forced:true,
 				usable:2,
 				filter:function(event,player){
 					for(var i=0;i<event.cards.length;i++){
@@ -4289,7 +4293,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_jushifang:'居十方',
 
 			txianqu:'仙曲',
-			txianqu_info:'每当你于出牌阶段即将造成伤害，你可以防止之，然后摸两张牌并回复一点体力',
+			txianqu_info:'出牌阶段限一次，当你即将造成伤害时，你可以防止之，然后摸两张牌并回复一点体力',
 			qiongguang:'穹光',
 			qiongguang_info:'弃牌阶段结束时，若你弃置了至少两张牌，你可以对所有敌方角色施加一个随机的负面效果',
 			xunying:'迅影',
@@ -4492,7 +4496,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tianjian_info:'出牌阶段限一次，你可以将一张杀当作万箭齐发使用，受到伤害的角色随机弃置一张牌',
 			tianjian_info_alter:'出牌阶段限一次，你可以将一张杀当作万箭齐发使用',
 			yufeng:'御风',
-			yufeng_info:'当你失去手牌后，若手牌数少于2，可将手牌数补至2（每回合最多发动两次）',
+			yufeng_info:'锁定技，当你失去手牌后，若手牌数少于2，你将手牌数补至2（每回合最多发动两次）',
 			huimeng:'回梦',
 			huimeng_info:'每当你回复一点体力，可以摸两张牌',
 			tianshe:'天蛇',

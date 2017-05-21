@@ -2300,25 +2300,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<trigger.targets.length;i++){
 						effect+=get.effect(trigger.targets[i],trigger.card,trigger.player,player);
 					}
-					var str='非攻：是否弃置一张杀令'+get.translation(trigger.player);
+					var str='弃置一张杀令'+get.translation(trigger.player);
 					if(trigger.targets&&trigger.targets.length){
 						str+='对'+get.translation(trigger.targets);
 					}
-					str+='的'+get.translation(trigger.card)+'失效？';
+					str+='的'+get.translation(trigger.card)+'失效';
 					if(event.isMine()||effect<0){
 						game.delay(0.5);
 					}
-					player.chooseToDiscard('h',{name:'sha'},str).ai=function(card){
+					var next=player.chooseToDiscard('h',{name:'sha'},get.prompt('feigong'));
+					next.prompt2=str;
+					next.ai=function(card){
 						if(effect<0){
 							return 9-get.value(card);
 						}
 						return -1;
 					}
+					next.logSkill=['feigong',trigger.player];
 					"step 1"
 					if(result.bool){
 						trigger.untrigger();
 						trigger.finish();
-						player.logSkill('feigong',trigger.targets);
 					}
 				},
 				ai:{
