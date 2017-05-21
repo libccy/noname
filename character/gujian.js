@@ -699,7 +699,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target){
 							if(get.tag(card,'damage')){
-								if(player.hasSkillTag('jueqing')) return [1,-1.5];
+								if(player.hasSkillTag('jueqing',false,target)) return [1,-1.5];
 								return [1,0,0,-0.5];
 							}
 						}
@@ -844,7 +844,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target){
 							if(get.tag(card,'damage')&&target.countCards('h')==0){
-								if(player.hasSkillTag('jueqing')) return;
+								if(player.hasSkillTag('jueqing',false,target)) return;
 								return 0.1;
 							}
 						}

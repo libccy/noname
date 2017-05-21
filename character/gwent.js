@@ -239,8 +239,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					threaten:2,
-					expose:0.2
+					threaten:2
 				}
 			},
 			junchi:{

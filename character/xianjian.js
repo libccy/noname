@@ -31,7 +31,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_xuanxiao:['male','wei',4,['xuanyan','ningbin','xfenxin']],
 
 			pal_jiangyunfan:['male','wei',4,['xunying','liefeng']],
-			// pal_tangyurou:['male','wei',4,[]],
+			pal_tangyurou:['female','shu',3,['txianqu','qiongguang']],
 			pal_longyou:['male','wei',4,['yuexing','minsha']],
 			// pal_xiaoman:['male','wei',4,[]],
 
@@ -85,6 +85,81 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_jiangcheng:'折剑山庄庄主欧阳英的得意门生，但因其蚩尤后人魔族的身份，令他无法被容于人界；再加上人界半魔同族饱受人类迫害，故最终成为净天教教主魔君“姜世离”，毅然肩负起保护同族的重任。',
 		},
 		skill:{
+			qiongguang:{
+				trigger:{player:'phaseDiscardEnd'},
+				filter:function(event,player){
+					return event.cards&&event.cards.length>1
+				},
+				content:function(){
+					'step 0'
+					event.targets=player.getEnemies().sortBySeat();
+					'step 1'
+					if(event.targets.length){
+						player.line(event.targets.shift().getDebuff(false).addExpose(0.1),'green');
+						event.redo();
+					}
+					'step 2'
+					game.delay();
+				},
+				ai:{
+					threaten:1.5,
+					expose:0.2,
+					effect:{
+						player:function(card,player){
+							if(_status.currentPhase!=player) return;
+							if(_status.event.name!='chooseToUse'||_status.event.player!=player) return;
+							var num=player.needsToDiscard();
+							if(num>2||num==1) return;
+							if(get.type(card)=='basic'&&num!=2) return;
+							if(get.tag(card,'gain')) return;
+							if(get.value(card,player,'raw')>=7) return;
+							if(player.hp<=2) return;
+							if(!player.hasSkill('jilue')||player.storage.renjie==0){
+								return 'zeroplayertarget';
+							}
+						}
+					}
+				}
+			},
+			txianqu:{
+    			trigger:{source:'damageBefore'},
+    			logTarget:'player',
+				filter:function(event,player){
+					var evt=event.getParent('phaseUse');
+					if(evt&&evt.player==player) return true;
+					return false;
+				},
+    			check:function(event,player){
+    				var target=event.player;
+					if(get.attitude(player,target)>=0||get.damageEffect(target,player,player)<=0) return true;
+					if(target.hp>player.hp&&player.isDamaged()) return true;
+    				return false;
+    			},
+    			content:function(){
+    				trigger.untrigger();
+    				trigger.finish();
+    				player.draw(2);
+					player.recover();
+    			},
+				ai:{
+					jueqing:true,
+					skillTagFilter:function(player,tag,arg){
+						if(!arg) return false;
+						if(get.attitude(player,arg)>0) return false;
+						var evt=event.getParent('phaseUse');
+						if(evt&&evt.player==player) return true;
+						return false;
+					},
+					effect:{
+	                    player:function(card,player,target){
+	                        if(get.tag(card,'damage')&&get.attitude(player,target)>0){
+	                            if(player.hp==player.maxHp||get.recoverEffect(player,player,player)<=0) return 'zeroplayertarget';
+	                            return [0,0,0,0.5];
+	                        }
+	                    }
+	                }
+				}
+    		},
 			xunying:{
 				trigger:{player:'shaAfter'},
 				direct:true,
@@ -4213,6 +4288,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_mingxiu:'明绣',
 			pal_jushifang:'居十方',
 
+			txianqu:'仙曲',
+			txianqu_info:'每当你于出牌阶段即将造成伤害，你可以防止之，然后摸两张牌并回复一点体力',
+			qiongguang:'穹光',
+			qiongguang_info:'弃牌阶段结束时，若你弃置了至少两张牌，你可以对所有敌方角色施加一个随机的负面效果',
 			xunying:'迅影',
 			xunying_info:'每当你使用杀对一名目标结算完毕后，你可以继续对目标使用杀',
 			liefeng:'冽风',

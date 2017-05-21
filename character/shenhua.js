@@ -1949,7 +1949,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				effect:{
     					target:function(card,player,target){
     						if(get.tag(card,'damage')){
-    							if(player.hasSkillTag('jueqing')) return [1,-2];
+    							if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
     							if(target.hp<=1) return;
     							if(!target.hasFriend()) return;
     							var hastarget=false;
@@ -2865,7 +2865,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						return 0;
     					},
     					player:function(player,target){
-    						if(target.hasSkillTag('jueqing')) return -10;
+    						if(target.hasSkillTag('jueqing',false,target)) return -10;
     						var mn=1;
     						var hs=player.getCards('h');
     						for(var i=0;i<hs.length;i++){
@@ -2920,7 +2920,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				effect:{
     					target:function(card,player,target,current){
     						if(get.tag(card,'damage')&&target.hp>1){
-    							if(player.hasSkillTag('jueqing')) return [1,-2];
+    							if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
     							var max=0;
     							var players=game.filterPlayer();
     							for(var i=0;i<players.length;i++){
@@ -3551,7 +3551,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     maixie_fake:true,
     				effect:{
     					target:function(card,player,target){
-    						if(player.hasSkillTag('jueqing')) return;
+    						if(player.hasSkillTag('jueqing',false,target)) return;
     						if(get.tag(card,'damage')&&target.countCards('h')>1) return 0.7;
     					}
     				},
@@ -3646,7 +3646,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     maixie_fake:true,
     				effect:{
     					target:function(card,player,target){
-    						if(player.hasSkillTag('jueqing')) return;
+    						if(player.hasSkillTag('jueqing',false,target)) return;
     						if(get.tag(card,'damage')&&target.countCards('he')>1) return 0.7;
     					}
     				},

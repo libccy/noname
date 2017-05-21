@@ -963,7 +963,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(card,player,target,current){
 							if(target.hp<=1&&get.tag(card,'damage')){
-								if(player.hasSkillTag('jueqing')) return [1,-5];
+								if(player.hasSkillTag('jueqing',false,target)) return [1,-5];
 								return [1,0,0,-2];
 							}
 						}

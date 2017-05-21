@@ -4808,7 +4808,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				effect:{
     					target:function(card,player,target){
     						if(get.tag(card,'damage')){
-    							if(player.hasSkillTag('jueqing')) return [1,-2];
+    							if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
     							if(!target.hasFriend()) return;
     							if(target.hp>=4) return [0.5,get.tag(card,'damage')*2];
     							if(!target.hasSkill('paiyi')&&target.hp>1) return [0.5,get.tag(card,'damage')*1.5];
@@ -5981,7 +5981,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						if(card.name=='guiyoujie') return [0,0.5];
     						if(target.isTurnedOver()){
     							if(get.tag(card,'damage')){
-    								if(player.hasSkillTag('jueqing')) return [1,-2];
+    								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
     								if(target.hp==1) return;
     								return [1,target.countCards('h')/2];
     							}
@@ -6472,7 +6472,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			ai:{
     				effect:{
     					target:function(card,player,target){
-    						if(player.hasSkillTag('jueqing')) return [1,-1.5];
+    						if(player.hasSkillTag('jueqing',false,target)) return [1,-1.5];
     						if(!target.hasFriend()) return;
     						if(get.tag(card,'damage')) return [1,0,0,-0.7];
     					}
@@ -6499,7 +6499,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			ai:{
     				effect:{
     					target:function(card,player,target){
-    						if(player.hasSkillTag('jueqing')) return [1,-2];
+    						if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
     						if(!target.hasFriend()) return;
     						if(get.tag(card,'damage')) return [1,0,0,-1];
     					}
@@ -6833,7 +6833,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				effect:{
     					target:function(card,player,target){
     						if(get.tag(card,'damage')){
-    							if(player.hasSkillTag('jueqing')) return [1,-2];
+    							if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
     							if(!target.hasFriend()) return;
     							if(target.hp>=4) return [1,2];
     							if(target.hp==3) return [1,1.5];

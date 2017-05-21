@@ -1207,7 +1207,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target){
-							if(player.hasSkillTag('jueqing')) return;
+							if(player.hasSkillTag('jueqing',false,target)) return;
 							if(!player.isUnseen(2)) return;
 							var num=get.tag(card,'damage');
 							if(num){

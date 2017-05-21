@@ -240,7 +240,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					maixie_hp:true,
 					effect:{
 						target:function(card,player,target){
-							if(player.hasSkillTag('jueqing')) return [1,-2];
+							if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
 							if(get.tag(card,'damage')){
 								if(target.hp==target.maxHp){
 									if(!target.hasSkill('jilue')){
@@ -253,6 +253,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						player:function(card,player){
 							if(_status.currentPhase!=player) return;
+							if(_status.event.name!='chooseToUse'||_status.event.player!=player) return;
 							if(get.type(card)=='basic') return;
 							if(get.tag(card,'gain')) return;
 							if(get.value(card,player,'raw')>=7) return;
@@ -496,7 +497,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target,current){
 							if(target.hp<=1&&get.tag(card,'damage')){
-								if(player.hasSkillTag('jueqing')) return [1,-5];
+								if(player.hasSkillTag('jueqing',false,target)) return [1,-5];
 								if(!target.hasFriend()) return;
 								if(player.hp>2&&get.attitude(player,target)<=0) return [0,2];
 								return [1,0,0,-player.hp];
@@ -568,7 +569,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target){
 							if(get.tag(card,'damage')){
-								if(player.hasSkillTag('jueqing')) return [1,-2];
+								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
 								if(target.hp==1) return 0.8;
 								if(target.isTurnedOver()) return [0,3];
 								var num=game.countPlayer(function(current){

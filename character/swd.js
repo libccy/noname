@@ -2476,7 +2476,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				effect:{
     					target:function(card,player){
     						if(get.tag(card,'damage')){
-    							if(player.hasSkillTag('jueqing')) return [1,-2];
+    							if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
     							return 0.7;
     						}
     					}
@@ -3182,7 +3182,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				maixie_hp:true,
     				effect:function(card,player,target){
     					if(get.tag(card,'damage')){
-    						if(player.hasSkillTag('jueqing')) return [1,-0.5];
+    						if(player.hasSkillTag('jueqing',false,target)) return [1,-0.5];
     						if(!target.hasFriend()){
     							if(lib.config.mode=='guozhan'){
     								if(!player.hasFriend()) return;
@@ -3413,7 +3413,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				effect:{
     					target:function(card,player,target){
     						if(get.tag(card,'damage')){
-    							if(player.hasSkillTag('jueqing')) return [1,-1.5];
+    							if(player.hasSkillTag('jueqing',false,target)) return [1,-1.5];
     							if(player.hp>=4) return [1,1.5];
     							if(target.hp==3) return [1,1];
     							if(target.hp==2) return [1,0.5];
@@ -5497,7 +5497,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				effect:{
     					target:function(card,player,target){
     						if(get.tag(card,'damage')){
-    							if(player.hasSkillTag('jueqing')) return [1,-2];
+    							if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
     							if(target.storage.yishan.length==0) return 1.5;
     							if(target.storage.yishan[0]=='tao'||target.storage.yishan[1]=='tao'){
     								return [0,2];
@@ -5773,7 +5773,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				effect:{
     					target:function(card,player,target){
     						if(get.tag(card,'damage')){
-    							if(player.hasSkillTag('jueqing')) return;
+    							if(player.hasSkillTag('jueqing',false,target)) return;
     							if(target.storage.daixing>1) return 0.1;
     							if(target.storage.daixing==1) return 0.5;
     						}
@@ -6391,7 +6391,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				effect:{
     					target:function(card,player,target){
     						if(get.tag(card,'damage')){
-    							if(player.hasSkillTag('jueqing')) return [1,-1];
+    							if(player.hasSkillTag('jueqing',false,target)) return [1,-1];
     							var num=player.countCards('h')-target.countCards('h');
     							if(num>0){
     								return [1,0,0,-num/2];
@@ -6633,7 +6633,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				effect:{
     					target:function(card,player,target){
     						if(get.tag(card,'damage')&&_status.currentPhase!=target){
-    							if(player.hasSkillTag('jueqing')) return [1,-1.5];
+    							if(player.hasSkillTag('jueqing',false,target)) return [1,-1.5];
     							return [1,0.5];
     						}
     					}

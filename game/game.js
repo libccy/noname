@@ -15032,6 +15032,7 @@
 							break;
 						}
 					}
+					return this;
 				},
 				getDebuff:function(){
 					var list=[1,2,3,4,5,6];
@@ -15079,6 +15080,7 @@
 							break;
 						}
 					}
+					return this;
 				},
 				dying:function(reason){
 					if(this.nodying||this.hp>0||this.isDying()) return;
@@ -16650,7 +16652,7 @@
 					for(var i=0;i<skills.length;i++){
 						var info=lib.skill[skills[i]];
 						if(info&&info.ai){
-							if(info.ai.skillTagFilter&&
+							if(info.ai.skillTagFilter&&info.ai[tag]&&
                                 info.ai.skillTagFilter(this,tag,arg)===false) continue;
                             if(typeof info.ai[tag]=='string'){
                                 if(info.ai[tag]==arg) return true;
@@ -16671,7 +16673,7 @@
 					for(var i=0;i<skills.length;i++){
 						var info=lib.skill[skills[i]];
 						if(info&&info.ai){
-							if(info.ai.skillTagFilter&&
+							if(info.ai.skillTagFilter&&info.ai[tag]&&
                                 info.ai.skillTagFilter(this,tag,arg)===false) continue;
                             if(typeof info.ai[tag]=='string'){
                                 if(info.ai[tag]==arg) return true;

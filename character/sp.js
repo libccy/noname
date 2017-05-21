@@ -1931,7 +1931,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				effect:{
     					target:function(card,player,target,current){
     						if(get.tag(card,'damage')){
-    							if(player.hasSkillTag('jueqing')) return [1,-2];
+    							if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
     							if(get.attitude(player,target)>0) return [0,0];
     							var eff=get.damageEffect(target.storage.shichou_target,player,target);
     							if(eff>0){

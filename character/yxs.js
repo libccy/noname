@@ -535,7 +535,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target){
 							if(get.tag(card,'damage')){
-								if(player.hasSkillTag('jueqing')) return [1,-2];
+								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
 								if(!target.hasFriend()) return;
 								var players=game.filterPlayer();
 								for(var i=0;i<players.length;i++){
@@ -899,7 +899,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target){
 							if(get.tag(card,'damage')){
-								if(player.hasSkillTag('jueqing')) return [1,-2];
+								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
 								if(!target.hasFriend()) return;
 								if(target.hp>=4) return [1,get.tag(card,'damage')*2];
 								if(target.hp==3) return [1,get.tag(card,'damage')*1.5];
@@ -2019,7 +2019,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target){
 							if(get.tag(card,'damage')){
-								if(player.hasSkillTag('jueqing')) return [1,-2];
+								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
 								if(!target.hasFriend()) return;
 								if(target.hp>=4) return [1,2];
 								if(target.hp==3) return [1,1.5];
@@ -2185,7 +2185,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(card,player,target){
 							if(player.countCards('he')>1&&get.tag(card,'damage')){
-								if(player.hasSkillTag('jueqing')) return [1,-1];
+								if(player.hasSkillTag('jueqing',false,target)) return [1,-1];
 								if(get.attitude(target,player)<0) return [1,0,0,-1.5];
 							}
 						}
