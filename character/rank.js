@@ -288,6 +288,7 @@ window.noname_character_rank={
         'hs_mojinbaozi',
     ],
     bp:[
+        'pal_xiaoman',
         'pal_jiangyunfan',
         'pal_longyou',
         'gw_aokeweisite',

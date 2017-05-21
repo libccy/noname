@@ -2474,7 +2474,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			ai:{
     				effect:{
-    					target:function(card,player){
+    					target:function(card,player,target){
     						if(get.tag(card,'damage')){
     							if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
     							return 0.7;

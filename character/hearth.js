@@ -5299,7 +5299,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					if(!target.hujia) return 0.8;
     				},
     				effect:{
-    					target:function(card,player){
+    					target:function(card,player,target){
     						if(get.tag(card,'damage')){
     							if(player.hasSkillTag('jueqing',false,target)) return [1,-1];
     							return 0.8;
