@@ -85,19 +85,40 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_jiangcheng:'折剑山庄庄主欧阳英的得意门生，但因其蚩尤后人魔族的身份，令他无法被容于人界；再加上人界半魔同族饱受人类迫害，故最终成为净天教教主魔君“姜世离”，毅然肩负起保护同族的重任。',
 		},
 		skill:{
-			shenwu:{
-    			trigger:{player:'phaseAfter'},
+			lingquan:{
+    			trigger:{player:'phaseEnd'},
     			forced:true,
 				skillAnimation:true,
 				animationColor:'water',
 				unique:true,
     			filter:function(event,player){
-    				return player.countUsed()>player.hp;
+    				return game.roundNumber>=3&&player.countUsed()>player.hp;
     			},
     			content:function(){
-    				player.insertPhase();
+					'step 0'
+    				player.awakenSkill('lingquan');
+					player.draw(3);
+					player.addSkill('shuiyun');
+					'step 1'
+					game.createTrigger('phaseEnd','shuiyun',player,trigger);
     			},
     		},
+			shenwu:{
+    			trigger:{global:'phaseEnd'},
+				forced:true,
+				skillAnimation:true,
+				animationColor:'water',
+				unique:true,
+				filter:function(event,player){
+					return player.storage.shuiyun_count>=3;
+				},
+				content:function(){
+					player.awakenSkill('shenwu');
+					player.gainMaxHp();
+					player.recover();
+					player.addSkill('huimeng');
+				}
+			},
 			qiongguang:{
 				trigger:{player:'phaseDiscardEnd'},
 				filter:function(event,player){
@@ -3179,6 +3200,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				init:function(player){
 					player.storage.shuiyun=[];
+					player.storage.shuiyun_count=0;
 				},
 				alter:true,
 				filter:function(event,player){
@@ -3282,6 +3304,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						// 	trigger.player.draw();
 						// }
 						player.logSkill('shuiyun5',trigger.player,'thunder');
+						if(typeof player.storage.shuiyun_count=='number'){
+							player.storage.shuiyun_count++;
+						}
 						game.addVideo('storage',player,['shuiyun',get.cardsInfo(player.storage.shuiyun),'cards']);
 					}
 					else{
@@ -4307,10 +4332,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			xyufeng:'御蜂',
 			xyufeng_info:'出牌阶段限一次，可以将一张黑桃牌当作机关蜂使用',
-			lingguan:'灵泉',
-			lingquan_info:'觉醒技，结束阶段，若你本回合使用的牌数大于你的体力值，你摸两张牌，然后获得【水蕴】',
+			lingquan:'灵泉',
+			lingquan_info:'觉醒技，结束阶段，若游戏轮数不小于3且你本回合使用的牌数大于你的体力值，你摸三张牌，然后获得技能【水蕴】',
 			shenwu:'神舞',
-			shenwu_info:'觉醒技，在一名角色的结束阶段，若你本局至少发动过3次【水蕴】，你增加一点体力和体力上限，然后获得【回梦】',
+			shenwu_info:'觉醒技，在一名角色的结束阶段，若你本局至少发动过3次【水蕴】，你增加一点体力和体力上限并获得两点护甲，然后获得技能【回梦】',
 			txianqu:'仙音',
 			txianqu_info:'出牌阶段限一次，当你即将造成伤害时，你可以防止之，然后摸两张牌并回复一点体力',
 			qiongguang:'穹光',

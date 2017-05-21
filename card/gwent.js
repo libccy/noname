@@ -1048,6 +1048,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					useful:[3,1],
 					result:{
 						target:function(player,target){
+							if(target.hasSkillTag('noh')) return 0.1;
 							switch(target.countCards('h')){
 								case 0:return 0.5;
 								case 1:return 0;
