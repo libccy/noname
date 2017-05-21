@@ -767,66 +767,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            filterTarget:true,
 	            wuxieable:true,
 	            content:function(){
-	                var list=[1,2,3,4,5,6];
 	                if(player.getEnemies().contains(target)){
-	                    if(target.countCards('he')==0){
-	                        list.remove(1);
-	                    }
-	                    if(target.isLinked()){
-	                        list.remove(4);
-	                    }
-	                    if(target.hasSkill('fengyin')){
-	                        list.remove(5);
-	                    }
-	                    switch(list.randomGet()){
-	                        case 1:target.discard(target.getCards('he').randomGet());break;
-	                        case 2:target.loseHp();break;
-	                        case 3:target.damage();break;
-	                        case 4:if(!target.isLinked()) target.link();break;
-	                        case 5:target.addTempSkill('fengyin',{player:'phaseAfter'});break;
-	                        case 6:{
-	                            var list=[];
-	            				for(var i=0;i<lib.inpile.length;i++){
-	            					var info=lib.card[lib.inpile[i]];
-	            					if(info.type=='delay'&&!info.cancel&&!target.hasJudge(lib.inpile[i])){
-	            						list.push(lib.inpile[i]);
-	            					}
-	            				}
-	            				if(list.length){
-	            					var card=game.createCard(list.randomGet());
-	            					target.addJudge(card);
-	            					target.$draw(card);
-	            					game.delay();
-	            				}
-	                            break;
-	                        }
-	                    }
+	                    target.getDebuff();
 	                }
 	                else{
-	                    if(target.isHealthy()){
-	                        list.remove(2);
-	                    }
-	                    if(!target.countCards('j')){
-	                        list.remove(5);
-	                    }
-	                    if(!target.isLinked()&&!target.isTurnedOver()){
-	                        list.remove(6);
-	                    }
-	                    if(target.hasSkill('qianxing')){
-	                        list.remove(4);
-	                    }
-	                    switch(list.randomGet()){
-	                        case 1:target.draw();break;
-	                        case 2:target.recover();break;
-	                        case 3:target.changeHujia();break;
-	                        case 4:target.addTempSkill('qianxing',{player:'phaseBegin'});break;
-	                        case 5:target.discard(target.getCards('j'));break;
-	                        case 6:{
-	                            if(target.isLinked()) target.link();
-	                            if(target.isTurnedOver()) target.turnOver();
-	                            break;
-	                        }
-	                    }
+	                    target.getBuff();
 	                }
 	            },
 	            ai:{

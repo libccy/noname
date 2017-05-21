@@ -14997,6 +14997,89 @@
 					next.setContent('changeHujia');
 					return next;
 				},
+				getBuff:function(){
+					var list=[1,2,3,4,5,6];
+					var nodelay=false;
+					for(var i=0;i<arguments.length;i++){
+						if(typeof arguments[i]=='number'){
+							list.remove(arguments[i]);
+						}
+						else if(arguments[i]===false){
+							nodelay=true;
+						}
+					}
+					if(this.isHealthy()){
+						list.remove(2);
+					}
+					if(!this.countCards('j')){
+						list.remove(5);
+					}
+					if(!this.isLinked()&&!this.isTurnedOver()){
+						list.remove(6);
+					}
+					if(this.hasSkill('qianxing')){
+						list.remove(4);
+					}
+					switch(list.randomGet()){
+						case 1:this.draw(nodelay?'nodelay':1);break;
+						case 2:this.recover();break;
+						case 3:this.changeHujia();break;
+						case 4:this.addTempSkill('qianxing',{player:'phaseBegin'});break;
+						case 5:this.discard(this.getCards('j')).delay=(!nodelay);break;
+						case 6:{
+							if(this.isLinked()) this.link();
+							if(this.isTurnedOver()) this.turnOver();
+							break;
+						}
+					}
+				},
+				getDebuff:function(){
+					var list=[1,2,3,4,5,6];
+					var nodelay=false;
+					for(var i=0;i<arguments.length;i++){
+						if(typeof arguments[i]=='number'){
+							list.remove(arguments[i]);
+						}
+						else if(arguments[i]===false){
+							nodelay=true;
+						}
+					}
+					if(this.countCards('he')==0){
+						list.remove(1);
+					}
+					if(this.isLinked()){
+						list.remove(4);
+					}
+					if(this.hasSkill('fengyin')){
+						list.remove(5);
+					}
+					switch(list.randomGet()){
+						case 1:this.randomDiscard(nodelay?false:'he');break;
+						case 2:this.loseHp();break;
+						case 3:this.damage();break;
+						case 4:if(!this.isLinked()) this.link();break;
+						case 5:this.addTempSkill('fengyin',{player:'phaseAfter'});break;
+						case 6:{
+							var list=[];
+							for(var i=0;i<lib.inpile.length;i++){
+								var info=lib.card[lib.inpile[i]];
+								if(info.type=='delay'&&!info.cancel&&!this.hasJudge(lib.inpile[i])){
+									list.push(lib.inpile[i]);
+								}
+							}
+							if(list.length){
+								var card=game.createCard(list.randomGet());
+								this.addJudge(card);
+								this.$draw(card);
+								if(!nodelay) game.delay();
+							}
+							else{
+								this.getDebuff(6);
+							}
+							break;
+						}
+					}
+				},
 				dying:function(reason){
 					if(this.nodying||this.hp>0||this.isDying()) return;
 					var next=game.createEvent('dying');

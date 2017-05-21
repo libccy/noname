@@ -760,40 +760,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				frequent:true,
 				content:function(){
-					var list=[1,2,3,4,5,6];
-					var target=trigger.target;
-                    if(target.countCards('he')==0){
-                        list.remove(1);
-                    }
-                    if(target.isLinked()){
-                        list.remove(4);
-                    }
-                    if(target.hasSkill('fengyin')){
-                        list.remove(5);
-                    }
-                    switch(list.randomGet()){
-                        case 1:target.discard(target.getCards('he').randomGet());break;
-                        case 2:target.loseHp();break;
-                        case 3:target.damage();break;
-                        case 4:if(!target.isLinked()) target.link();break;
-                        case 5:target.addTempSkill('fengyin',{player:'phaseAfter'});break;
-                        case 6:{
-                            var list=[];
-            				for(var i=0;i<lib.inpile.length;i++){
-            					var info=lib.card[lib.inpile[i]];
-            					if(info.type=='delay'&&!info.cancel&&!target.hasJudge(lib.inpile[i])){
-            						list.push(lib.inpile[i]);
-            					}
-            				}
-            				if(list.length){
-            					var card=game.createCard(list.randomGet());
-            					target.addJudge(card);
-            					target.$draw(card);
-            					game.delay();
-            				}
-                            break;
-                        }
-                    }
+					target.getDebuff();
 				}
 			},
 			shiying:{
@@ -2259,30 +2226,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						player.logSkill('danqing',result.targets);
-						var effs=['draw','hujia','equip','stealth'];
 						for(var i=0;i<result.targets.length;i++){
-							var eff=effs.randomRemove();
-							var current=result.targets[i];
-							switch(eff){
-								case 'draw':current.draw();break;
-								case 'hujia':current.changeHujia();break;
-								case 'equip':
-									var card=game.createCard(get.inpile('equip').randomGet());
-									current.equip(card);
-									current.$draw(card);
-									break;
-								case 'stealth':
-									current.addTempSkill('qianxing',{player:'phaseBegin'});
-									break;
-							}
-						}
-						if(effs.contains('draw')){
-							game.delay();
+							result.targets[i].getBuff(false);
 						}
 					}
 					else{
 						event.finish();
 					}
+					'step 2'
+					game.delay();
 				},
 				group:'danqing_count'
 			},
@@ -4357,8 +4309,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xuanmo:'玄墨',
 			xuanmo_info:'出牌阶段限一次，你可以将一张手牌置于牌堆顶并随机获得两张与之类别相同的牌',
 			danqing:'丹青',
-			danqing_info:'结束阶段，若你累计使用了4张花色不同的牌，你可以选择至多4名角色分别获得以下4种效果中的随机一个：1、摸一张牌；2、获得一点护甲；3、装备一件随机装备；4、获得潜行直到下一回合开始',
-			danqing_info_alter:'结束阶段，若你累计使用了4张花色不同的牌，你可以选择至多2名角色分别获得以下4种效果中的随机一个：1、摸一张牌；2、获得一点护甲；3、装备一件随机装备；4、获得潜行直到下一回合开始',
+			danqing_info:'结束阶段，若你累计使用了4张花色不同的牌，你可以选择至多4名角色随机获得一个正面效果',
+			danqing_info_alter:'结束阶段，若你累计使用了4张花色不同的牌，你可以选择至多2名角色随机获得一个正面效果',
 			zhangmu:'障目',
 			zhangmu_info:'每回合限一次，当你需要使用或打出一张闪时，你可以展示一张闪，视为使用或打出了此闪',
 			feizhua:'飞爪',
