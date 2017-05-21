@@ -873,7 +873,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				frequent:true,
 				content:function(){
-					target.getDebuff();
+					trigger.target.getDebuff();
 				}
 			},
 			shiying:{

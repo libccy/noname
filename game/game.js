@@ -4495,7 +4495,8 @@
 							map.enable_all_three.hide();
 							map.enable_all_cards.hide();
 						}
-                        if(config.versus_mode=='jiange'||config.versus_mode=='two'||config.versus_mode=='three'||config.versus_mode=='one'){
+                        if(config.versus_mode=='jiange'||config.versus_mode=='two'||
+							config.versus_mode=='three'||config.versus_mode=='one'||config.versus_mode=='siguo'){
                             map.free_choose.show();
                         }
                         else{
@@ -4529,6 +4530,7 @@
 							standard:'自由',
 							three:'统率',
 							jiange:'剑阁',
+							siguo:'四国',
                             // one:'<span style="display:inline-block;width:100%;text-align:center">1v1</span>',
                             two:'<span style="display:inline-block;width:100%;text-align:center">2v2</span>',
 							four:'<span style="display:inline-block;width:100%;text-align:center">4v4</span>'
