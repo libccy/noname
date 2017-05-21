@@ -1151,7 +1151,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'useCard'},
 						filter:function(event,player){
 							return event.card.name=='sha'&&event.cards.length&&
-								event.player.isFriendOf(player)&&get.cardCount(true,event.player)==1;
+								event.player.isFriendOf(player)&&event.player.countUsed()==1;
 						},
 						silent:true,
 						content:function(){

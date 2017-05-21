@@ -1069,7 +1069,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{player:'phaseEnd'},
     			frequent:true,
     			filter:function(event,player){
-    				return get.cardCount(true,player)>=Math.min(3,player.hp);
+    				return player.countUsed()>=Math.min(3,player.hp);
     			},
     			content:function(){
     				'step 0'
@@ -5887,7 +5887,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{player:'phaseAfter'},
     			frequent:true,
     			filter:function(event,player){
-    				return get.cardCount(true,player)>=player.hp&&event.skill!='lingwu';
+    				return player.countUsed()>=player.hp&&event.skill!='lingwu';
     			},
     			content:function(){
     				player.insertPhase();

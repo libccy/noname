@@ -1537,7 +1537,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(_status.currentPhase!=player) return;
 						var num=2;
 						if(get.is.altered('yuling')) num=1;
-						if(get.cardCount(true,player)>=player.maxHp+num) return false;
+						if(player.countUsed()>=player.maxHp+num) return false;
 					}
 				}
 			},
@@ -1545,7 +1545,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['useCardAfter','phaseBegin']},
 				silent:true,
 				content:function(){
-					player.storage.yuling=player.maxHp+2-get.cardCount(true,player);
+					player.storage.yuling=player.maxHp+2-player.countUsed();
 				}
 			},
 			yuling6:{

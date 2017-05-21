@@ -4896,7 +4896,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			mod:{
     				cardUsable:function(card,player,num){
     					if(card.name=='sha'){
-    						return num+get.cardCount(true,player)-get.cardCount('sha',player);
+    						return num+player.countUsed()-player.countUsed('sha');
     					}
     				},
     			},
@@ -4932,11 +4932,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			trigger:{player:'phaseEnd'},
     			direct:true,
     			filter:function(event,player){
-    				return get.cardCount('sha',player)>0;
+    				return player.countUsed('sha')>0;
     			},
     			content:function(){
     				"step 0"
-    				player.chooseToMove(get.cardCount('sha',player),get.prompt('lingdong'));
+    				player.chooseToMove(player.countUsed('sha'),get.prompt('lingdong'));
     				"step 1"
     				if(result.bool){
     					player.logSkill('lingdong');

@@ -152,7 +152,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	            direct:true,
 	            content:function(){
 	                "step 0"
-	                var num=get.cardCount(true,player)-player.countCards('h');
+	                var num=player.countUsed()-player.countCards('h');
 	                event.num=num;
 	                if(num>0){
 	                    player.draw(num);
@@ -180,7 +180,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	            mod:{
 	                globalFrom:function(from,to,distance){
 	                    if(_status.currentPhase==from){
-	                        return distance-get.cardCount(true,from);
+	                        return distance-from.countUsed();
 	                    }
 	                }
 	            },

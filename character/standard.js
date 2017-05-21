@@ -1181,7 +1181,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:4,
 				trigger:{player:'phaseDiscardBefore'},
 				filter:function(event,player){
-					return (get.cardCount({name:'sha'},player)==0);
+					return player.countUsed('sha')==0;
 				},
 				content:function(){
 					trigger.untrigger();

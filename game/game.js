@@ -13342,6 +13342,28 @@
                     }
                     return null;
                 },
+				countUsed:function(card){
+					var num;
+					var stat=this.getStat('card');
+					if(!card){
+						num=0;
+						for(var i in stat){
+							if(typeof stat[i]=='number') num+=stat[i];
+						}
+						return num;
+					}
+					if(typeof card=='object'){
+						card=card.name;
+					}
+					num=stat[card];
+					if(typeof num!='number') return 0;
+					return num;
+				},
+				countSkill:function(skill){
+					var num=this.getStat('skill')[skill];
+					if(num==undefined) return 0;
+					return num;
+				},
 				getCards:function(arg1,arg2){
 					if(typeof arg1!='string'){
 						arg1='h';
@@ -16340,7 +16362,7 @@
 					num=game.checkMod(card,player,num,'cardUsable',player);
 					if(typeof num!='number') return Infinity;
 					if(!pure&&_status.currentPhase==player){
-						return num-get.cardCount(card,player);
+						return num-player.countUsed(card);
 					}
 					return num;
 				},
@@ -19265,7 +19287,7 @@
 				if(typeof num=='function') num=num(card,player);
 				num=game.checkMod(card,player,num,'cardUsable',player);
 				if(typeof num!='number') return true;
-				else return(get.cardCount(card,player)<num);
+				else return(player.countUsed(card)<num);
 			},
             cardDiscardable:function(card,player,event){
                 event=event||_status.event;

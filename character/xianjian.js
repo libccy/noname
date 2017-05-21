@@ -33,7 +33,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_jiangyunfan:['male','wei',4,['xunying','liefeng']],
 			pal_tangyurou:['female','shu',3,['txianqu','qiongguang']],
 			pal_longyou:['male','wei',4,['yuexing','minsha']],
-			// pal_xiaoman:['male','wei',4,[]],
+			pal_xiaoman:['female','shu',3,['anwugu','lingquan','shenwu']],
 
 			pal_xiahoujinxuan:['male','shu',3,['xuanmo','danqing']],
 			pal_muchanglan:['female','wu',3,['feixia','lueying']],
@@ -85,6 +85,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_jiangcheng:'折剑山庄庄主欧阳英的得意门生，但因其蚩尤后人魔族的身份，令他无法被容于人界；再加上人界半魔同族饱受人类迫害，故最终成为净天教教主魔君“姜世离”，毅然肩负起保护同族的重任。',
 		},
 		skill:{
+			shenwu:{
+    			trigger:{player:'phaseAfter'},
+    			forced:true,
+				skillAnimation:true,
+				animationColor:'water',
+				unique:true,
+    			filter:function(event,player){
+    				return player.countUsed()>player.hp;
+    			},
+    			content:function(){
+    				player.insertPhase();
+    			},
+    		},
 			qiongguang:{
 				trigger:{player:'phaseDiscardEnd'},
 				filter:function(event,player){
@@ -189,11 +202,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				popup:false,
 				filter:function(event,player){
-					return _status.currentPhase==player&&[2,3,4].contains(get.cardCount(true,player));
+					return _status.currentPhase==player&&[2,3,4].contains(player.countUsed());
 				},
 				content:function(){
 					var skill;
-					switch(get.cardCount(true,player)){
+					switch(player.countUsed()){
 						case 2:skill='yanzhan';break;
 						case 3:skill='tianjian';break;
 						case 4:skill='yufeng';break;
@@ -224,7 +237,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(get.value(card,player,'raw')>=7) return;
 							if(player.hp<=2) return;
 							if(player.needsToDiscard()) return;
-							if(get.cardCount(true,player)>=2) return;
+							if(player.countUsed()>=2) return;
 							return 'zeroplayertarget';
 						}
 					}
@@ -461,7 +474,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mod:{
     				cardEnabled:function(card,player){
     					if(_status.currentPhase!=player) return;
-    					if(get.cardCount(true,player)>=player.storage.anwugu2) return false;
+    					if(player.countUsed()>=player.storage.anwugu2) return false;
     				},
 					maxHandcard:function(player,num){
 						return num-1;
@@ -4292,6 +4305,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_mingxiu:'明绣',
 			pal_jushifang:'居十方',
 
+			xyufeng:'御蜂',
+			xyufeng_info:'出牌阶段限一次，可以将一张黑桃牌当作机关蜂使用',
+			lingguan:'灵泉',
+			lingquan_info:'觉醒技，结束阶段，若你本回合使用的牌数大于你的体力值，你摸两张牌，然后获得【水蕴】',
+			shenwu:'神舞',
+			shenwu_info:'觉醒技，在一名角色的结束阶段，若你本局至少发动过3次【水蕴】，你增加一点体力和体力上限，然后获得【回梦】',
 			txianqu:'仙音',
 			txianqu_info:'出牌阶段限一次，当你即将造成伤害时，你可以防止之，然后摸两张牌并回复一点体力',
 			qiongguang:'穹光',

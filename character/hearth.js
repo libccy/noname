@@ -5033,7 +5033,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{player:'useCard'},
     			filter:function(event,player){
     				if(_status.currentPhase!=player) return false;
-    				return get.cardCount(event.card,player)>1;
+    				return player.countUsed(event.card)>1;
     			},
     			forced:true,
     			usable:3,
@@ -5086,7 +5086,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{player:'useCard'},
     			frequent:true,
     			filter:function(event,player){
-    				return _status.currentPhase==player&&get.cardCount(true,player)==1;
+    				return _status.currentPhase==player&&player.countUsed()==1;
     			},
     			content:function(){
     				var type=get.type(trigger.card);
@@ -5154,10 +5154,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{player:'phaseUseEnd'},
     			frequent:true,
     			filter:function(event,player){
-    				return get.cardCount(true,player)>0;
+    				return player.countUsed()>0;
     			},
     			content:function(){
-    				player.draw(get.cardCount(true,player));
+    				player.draw(player.countUsed());
     			},
     			ai:{
     				threaten:1.3
@@ -5977,7 +5977,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{player:'phaseEnd'},
     			frequent:true,
     			filter:function(event,player){
-    				return get.cardCount(true,player)>player.hp;
+    				return player.countUsed()>player.hp;
     			},
     			content:function(){
     				player.draw(2);
@@ -5985,7 +5985,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			init:function(player){player.storage.jingce=true},
     			intro:{
     				content:function(storage,player){
-    					if(_status.currentPhase==player) return '已使用'+get.cardCount(true,player)+'张牌';
+    					if(_status.currentPhase==player) return '已使用'+player.countUsed()+'张牌';
     				}
     			}
     		},

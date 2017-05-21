@@ -91,7 +91,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	            trigger:{player:'useCard'},
 	            frequent:true,
 	            filter:function(event,player){
-	                return _status.currentPhase==player&&get.cardCount(true,player)==3;
+	                return _status.currentPhase==player&&player.countUsed()==3;
 	            },
 	            content:function(){
 	                var card=get.cardPile('chuansongmen');

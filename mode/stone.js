@@ -830,7 +830,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				return list;
     			},
     			getActCount:function(){
-    				return get.cardCount(true,this)+(this.actused||0)
+    				return this.countUsed()+(this.actused||0)
     			},
     			getLeader:function(){
     				return this.side==game.me.side?game.me:game.enemy;

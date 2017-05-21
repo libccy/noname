@@ -3624,7 +3624,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			mod:{
     				cardEnabled:function(card,player){
     					if(_status.currentPhase!=player) return;
-    					if(get.cardCount(true,player)>=player.storage.yawang) return false;
+    					if(player.countUsed()>=player.storage.yawang) return false;
     				}
     			}
     		},

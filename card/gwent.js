@@ -1351,7 +1351,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(!lib.config.cards.contains('gwent')) return false;
 					if(get.info(event.card).complexTarget) return false;
 					if(!event.targets) return false;
-					return (get.type(event.card)=='trick'&&event.cards[0]&&event.cards[0]==event.card);
+					if(event.card.name=='gw_zirankuizeng') return false;
+					return ((['spell_bronze','spell_silver'].contains(get.subtype(event.card))||get.type(event.card)=='trick')&&
+						event.cards[0]&&event.cards[0]==event.card);
 				},
 				content:function(){
 					player.storage.gw_zirankuizeng=[trigger.cards[0],trigger.targets.concat(trigger.addedTargets||[])];
@@ -1448,7 +1450,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_zuihouyuanwang:'最后愿望',
 			gw_zuihouyuanwang_info:'摸X张牌并弃置X张牌，X为存活角色数',
 			gw_zirankuizeng:'自然馈赠',
-			gw_zirankuizeng_info:'重新结算一遍你上一张使用的非转化普通锦囊牌，然后摸一张牌',
+			gw_zirankuizeng_info:'重新结算一遍你上一张使用的非金法术（自然馈赠除外）或非转化普通锦囊牌，然后摸一张牌',
 			gw_poxiao:'破晓',
 			gw_poxiao_info:'选择一项：弃置一名角色判定区内的所有牌，或随机获得一张铜卡法术（破晓除外）并展示之',
 			gw_zumoshoukao:'阻魔手铐',

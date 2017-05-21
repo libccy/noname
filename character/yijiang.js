@@ -2021,7 +2021,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			mod:{
                     globalFrom:function(from,to,distance){
                         if(_status.currentPhase==from){
-                            return distance-get.cardCount(true,from);
+                            return distance-from.countUsed();
                         }
                     },
     				selectTarget:function(card,player,range){
@@ -6752,7 +6752,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{player:'phaseUseEnd'},
     			frequent:true,
     			filter:function(event,player){
-    				return get.cardCount(true,player)>=player.hp;
+    				return player.countUsed()>=player.hp;
     			},
     			content:function(){
     				player.draw(2);
@@ -6761,7 +6761,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			init:function(player){player.storage.jingce=true},
     			intro:{
     				content:function(storage,player){
-    					if(_status.currentPhase==player) return '已使用'+get.cardCount(true,player)+'张牌';
+    					if(_status.currentPhase==player) return '已使用'+player.countUsed()+'张牌';
     				}
     			}
     		},

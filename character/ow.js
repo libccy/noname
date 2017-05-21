@@ -918,14 +918,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.hasSkill('bfengshi4')) return false;
 	                var num=0.2;
 	                if(get.is.altered('bfengshi')) num=0.15;
-					return Math.random()<num*get.cardCount(true,player);
+					return Math.random()<num*player.countUsed();
 				},
 				content:function(){
 					trigger.directHit=true;
 				},
 	            mod:{
 	                attackFrom:function(from,to,distance){
-	                    return distance-get.cardCount(true,from);
+	                    return distance-from.countUsed();
 	                }
 	            },
 	            group:['bfengshi2','bfengshi3']
@@ -940,7 +940,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.hasSkill('bfengshi4')) return false;
 	                var num=0.2;
 	                if(get.is.altered('bfengshi')) num=0.15;
-	                return event.card&&event.card.name=='sha'&&Math.random()<num*get.cardCount(true,player);
+	                return event.card&&event.card.name=='sha'&&Math.random()<num*player.countUsed();
 	            },
 	            content:function(){
 	                trigger.num++;
@@ -2224,7 +2224,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	            mod:{
 	                globalFrom:function(from,to,distance){
 	                    if(_status.currentPhase==from){
-	                        return distance-get.cardCount(true,from);
+	                        return distance-from.countUsed();
 	                    }
 	                },
 	            },
