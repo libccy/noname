@@ -957,7 +957,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					value:6,
 					useful:[4,1],
 					result:{
-						player:1
+						player:function(){
+							var info=player.storage.gw_zirankuizeng;
+							if(info&&info[0]&&get.tag(info[0],'norepeat')) return 0;
+							return 1;
+						}
 					},
 					order:7,
 				}
