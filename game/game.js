@@ -8021,8 +8021,8 @@
 				mode.remove('brawl');
 				var banned=['yxs_luzhishen','xuhuang','zhenji','shen_guanyu','zhurong',
 					'daqiao','lingcao','liuzan','lusu','luxun','yanwen','zhouyu','xiahouyuan',
-					'zhuzhi','old_caozhen','guojia','simayi','sp_pangde'];
-				var bannedcards=['zengbin','toulianghuanzhu','huoshan','hongshui','guiyoujie'];
+					'zhuzhi','old_caozhen','guojia','simayi','sp_pangde','swd_kangnalishi'];
+				var bannedcards=['zengbin','toulianghuanzhu','huoshan','hongshui','guiyoujie','fengyinzhidan'];
 				for(var i=0;i<mode.length;i++){
 					game.saveConfig(mode[i]+'_banned',banned);
 					game.saveConfig(mode[i]+'_bannedcards',bannedcards);
