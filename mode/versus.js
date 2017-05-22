@@ -722,6 +722,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			next.setContent(function(){
     				'step 0'
                     _status.firstAct=game.players.randomGet();
+                    for(var i=0;i<game.players.length;i++){
+    					game.players[i].node.name.innerHTML=get.verticalStr(get.cnNumber(get.distance(_status.firstAct,game.players[i],'absolute')+1,true)+'号位');
+    				}
     				ui.arena.classList.add('choose-character');
     				'step 1'
     				var list={
@@ -735,6 +738,70 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                         }
     				}
 					var dialog=ui.create.dialog('选择角色',[list[game.me.identity].randomGets(8),'character']);
+                    var addSetting=function(dialog){
+    					dialog.add('选择座位');
+    					var seats=document.createElement('table');
+    					seats.classList.add('pointertable');
+    					seats.style.margin='0 auto';
+    					seats.style.width='200px';
+    					var tr=document.createElement('tr');
+    					seats.appendChild(tr);
+    					for(var i=1;i<=game.players.length;i++){
+    						var td=document.createElement('td');
+    						tr.appendChild(td);
+    						td.style.width='40px';
+    						td.style.fontSize='25px';
+    						td.style.fontFamily='xinwei';
+    						td.innerHTML='<span>'+get.cnNumber(i,true)+'</span>';
+    						td.link=i-1;
+    						if(get.distance(_status.firstAct,game.me,'absolute')===i-1){
+    							td.classList.add('thundertext');
+    						}
+    						td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+    							if(_status.dragged) return;
+    							if(_status.justdragged) return;
+    							if(get.distance(_status.firstAct,game.me,'absolute')==this.link) return;
+    							var current=this.parentNode.querySelector('.thundertext');
+    							if(current){
+    								current.classList.remove('thundertext');
+    							}
+    							this.classList.add('thundertext');
+    							_status.firstAct=game.me;
+    							for(var i=0;i<this.link;i++){
+    								_status.firstAct=_status.firstAct.previous;
+    							}
+                                for(var i=0;i<game.players.length;i++){
+                					game.players[i].node.name.innerHTML=get.verticalStr(get.cnNumber(get.distance(_status.firstAct,game.players[i],'absolute')+1,true)+'号位');
+                				}
+    						});
+    					}
+    					dialog.content.appendChild(seats);
+    					if(game.me==game.zhu){
+    						seats.previousSibling.style.display='none';
+    						seats.style.display='none';
+    					}
+
+    					dialog.add(ui.create.div('.placeholder'));
+    					dialog.add(ui.create.div('.placeholder'));
+    					dialog.add(ui.create.div('.placeholder'));
+    				};
+    				var removeSetting=function(){
+    					var dialog=_status.event.dialog;
+    					if(dialog.querySelector('table')&&!get.config('change_identity')){
+    						dialog.querySelector('table').previousSibling.remove();
+    						dialog.querySelector('table').nextSibling.remove();
+    						dialog.querySelector('table').nextSibling.remove();
+    						dialog.querySelector('table').nextSibling.remove();
+    						dialog.querySelector('table').remove();
+    					}
+    				};
+    				event.addSetting=addSetting;
+    				event.removeSetting=removeSetting;
+
+                    if(get.config('change_identity')){
+                        addSetting(dialog);
+                    }
+
 					ui.create.cheat=function(){
 						_status.createControl=ui.cheat2;
 						ui.cheat=ui.create.control('更换',function(){
@@ -3465,10 +3532,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                     return event.player.storage.longchuanzhibao>0;
                 },
                 content:function(){
-                    trigger.player.storage.longchuanzhibao--;
-                    trigger.player.updateMark('longchuanzhibao');
-                    player.storage.longchuanzhibao++;
-                    player.updateMark('longchuanzhibao');
+                    if(trigger.player.storage.longchuanzhibao>0){
+                        trigger.player.storage.longchuanzhibao--;
+                        trigger.player.updateMark('longchuanzhibao');
+                        player.storage.longchuanzhibao++;
+                        player.updateMark('longchuanzhibao');
+                    }
                 },
                 group:'longchuanzhibao_over',
                 subSkill:{

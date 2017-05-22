@@ -402,7 +402,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                    if(player.hp>=3) return 4;
 	                    if(player.hp>=2) return 2;
 	                    return 1;
-	                }
+	                },
+					basic:{
+						equipValue:4
+					}
 	            }
 	        },
 	        yuheng_plus:{
@@ -421,7 +424,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                    if(player.hp>=3) return 6;
 	                    if(player.hp>=2) return 2.5;
 	                    return 1;
-	                }
+	                },
+					basic:{
+						equipValue:5
+					}
 	            }
 	        },
 	        yuheng_pro:{
@@ -440,7 +446,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                    if(player.hp>=3) return 6;
 	                    if(player.hp>=2) return 2.5;
 	                    return 1;
-	                }
+	                },
+
+					basic:{
+						equipValue:7
+					}
 	            }
 	        },
 	        shujinsan:{

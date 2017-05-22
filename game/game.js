@@ -4511,7 +4511,6 @@
                         if(config.versus_mode=='two'){
                             map.replace_handcard_two.show();
                             map.replace_character_two.show();
-                            map.change_identity.show();
 							map.two_assign.show();
                             map.two_phaseswap.show();
                         }
@@ -4522,6 +4521,12 @@
 							map.two_assign.hide();
                             map.two_phaseswap.hide();
                         }
+						if(config.versus_mode=='two'||config.versus_mode=='siguo'){
+							map.change_identity.show();
+						}
+						else{
+							map.change_identity.hide();
+						}
 					},
 					versus_mode:{
 						name:'游戏模式',
@@ -42628,7 +42633,7 @@
 			num+=player.countCards('h')/2;
 			var es=player.getCards('e');
 			for(var i=0;i<es.length;i++){
-				var val=get.value(es[i]);
+				var val=get.equipValueNumber(es[i]);
 				if(val>=7) num+=0.8;
 				if(val>=5) num+=0.5;
 				if(val>=3) num+=0.2;
@@ -42741,6 +42746,14 @@
 			}
 			if(typeof value=='number') return value;
 			if(typeof value=='function') return value(card,player);
+			return 0;
+		},
+		equipValueNumber:function(card){
+			var info=get.info(card);
+			if(info.ai){
+				if(typeof info.ai.equipValue=='number') return info.ai.equipValue;
+				if(info.ai.basic&&typeof info.ai.basic.equipValue=='number') return info.ai.basic.equipValue;
+			}
 			return 0;
 		},
 		disvalue:function(card,player){

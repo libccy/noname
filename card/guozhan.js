@@ -24,6 +24,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							return 1;
 						}
 						return 8;
+					},
+					basic:{
+						equipValue:7
 					}
 				}
 			},
@@ -46,6 +49,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							return 1;
 						}
 						return 6;
+					},
+					basic:{
+						equipValue:6
 					}
 				},
 				onLose:function(){
@@ -568,13 +574,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				global:'g_wuliu_skill',
 				distance:{attackFrom:-1},
 				ai:{
+					equipValue:function(card,player){
+						if(player.identity=='unknown'||player.identity=='ye') return 2.5;
+						return 2+game.countPlayer(function(current){
+							return current.identity==player.identity;
+						})/2;
+					},
 					basic:{
-						equipValue:function(card,player){
-							if(player.identity=='unknown'||player.identity=='ye') return 2.5;
-							return 2+game.countPlayer(function(current){
-								return current.identity==player.identity;
-							})/2;
-						}
+						equipValue:3
 					}
 				},
 				skills:['wuliu_skill'],

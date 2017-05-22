@@ -702,12 +702,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				nopower:true,
 	            unique:true,
 				ai:{
+					equipValue:function(card,player){
+						if(player.hp==2) return 7;
+						if(player.hp==1) return 10;
+						return 5;
+					},
 					basic:{
-						equipValue:function(card,player){
-							if(player.hp==2) return 7;
-							if(player.hp==1) return 10;
-							return 5;
-						}
+						equipValue:7
 					}
 				}
 			},
@@ -1380,11 +1381,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:"equip2",
 				skills:['baihupifeng'],
 				ai:{
+					equipValue:function(card,player){
+						if(player.hp<=2) return 8;
+						return 6;
+					},
 					basic:{
-						equipValue:function(card,player){
-							if(player.hp<=2) return 8;
-							return 6;
-						}
+						equipValue:7
 					},
 				},
 			},
@@ -1951,11 +1953,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'equip5',
 				skills:['nigong'],
 				ai:{
+					equipValue:function(card,player){
+						if(!player.storage.nigong) return 5;
+						return 5+player.storage.nigong;
+					},
 					basic:{
-						equipValue:function(card,player){
-							if(!player.storage.nigong) return 5;
-							return 5+player.storage.nigong;
-						}
+						equipValue:5
 					}
 				},
 				equipDelay:false,

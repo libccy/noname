@@ -194,6 +194,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							return 5;
 						}
 						return 3;
+					},
+					basic:{
+						equipValue:5
 					}
 				},
 			},
@@ -254,11 +257,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				loseDelay:false,
 				skills:['muniu_skill','muniu_skill2','muniu_skill6','muniu_skill7'],
 				ai:{
+					equipValue:function(card){
+						if(card.card) return 7+card.card.length;
+						return 7;
+					},
 					basic:{
-						equipValue:function(card){
-							if(card.card) return 8+card.card.length;
-							return 8;
-						}
+						equipValue:7
 					}
 				}
 			},

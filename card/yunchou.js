@@ -949,11 +949,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				skills:['qiankundai'],
 				ai:{
 					order:9.5,
+					equipValue:function(card,player){
+						if(player.countCards('h','qiankundai')) return 6;
+						return 1;
+					},
 					basic:{
-						equipValue:function(card,player){
-							if(player.countCards('h','qiankundai')) return 6;
-							return 1;
-						}
+						equipValue:5,
 					}
 				}
 			},

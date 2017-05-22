@@ -336,22 +336,23 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'equip',
 				subtype:'equip1',
 				ai:{
-					basic:{
-						equipValue:function(card,player){
-							if(!game.hasPlayer(function(current){
-								return player.canUse('sha',current)&&get.effect(current,{name:'sha'},player,player)<0;
-							})){
-								return 1;
-							}
-							if(player.hasSha()&&_status.currentPhase==player){
-								if(player.getEquip('zhuge')||player.getCardUsable('sha')==0){
-									return 10;
-								}
-							}
-							var num=player.countCards('h','sha');
-							if(num>1) return 4+num;
-							return 2+num;
+					equipValue:function(card,player){
+						if(!game.hasPlayer(function(current){
+							return player.canUse('sha',current)&&get.effect(current,{name:'sha'},player,player)<0;
+						})){
+							return 1;
 						}
+						if(player.hasSha()&&_status.currentPhase==player){
+							if(player.getEquip('zhuge')||player.getCardUsable('sha')==0){
+								return 10;
+							}
+						}
+						var num=player.countCards('h','sha');
+						if(num>1) return 4+num;
+						return 2+num;
+					},
+					basic:{
+						equipValue:5
 					},
 					tag:{
 						valueswap:1
@@ -389,10 +390,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'equip1',
 				distance:{attackFrom:-2},
 				ai:{
+					equipValue:function(card,player){
+						return Math.min(2.5+player.countCards('h','sha'),4);
+					},
 					basic:{
-						equipValue:function(card,player){
-							return Math.min(2.5+player.countCards('h','sha'),4);
-						}
+						equipValue:3.5
 					}
 				},
 				skills:['qinglong_skill']
@@ -403,11 +405,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'equip1',
 				distance:{attackFrom:-2},
 				ai:{
+					equipValue:function(card,player){
+						var num=2.5+player.countCards('h')/3;
+						return Math.min(num,4);
+					},
 					basic:{
-						equipValue:function(card,player){
-							var num=2.5+player.countCards('h')/3;
-							return Math.min(num,4);
-						}
+						equipValue:3.5
 					}
 				},
 				skills:['zhangba_skill']
@@ -418,11 +421,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'equip1',
 				distance:{attackFrom:-2},
 				ai:{
+					equipValue:function(card,player){
+						var num=2.5+(player.countCards('h')+player.countCards('e'))/2.5;
+						return Math.min(num,5);
+					},
 					basic:{
-						equipValue:function(card,player){
-							var num=2.5+(player.countCards('h')+player.countCards('e'))/2.5;
-							return Math.min(num,5);
-						}
+						equipValue:4.5,
 					}
 				},
 				skills:['guanshi_skill']

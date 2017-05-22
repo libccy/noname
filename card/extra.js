@@ -322,20 +322,21 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'equip2',
 				cardnature:'fire',
 				ai:{
+					equipValue:function(card,player){
+						if(player.hasSkillTag('maixie')&&player.hp>1) return 0;
+						if(player.hasSkillTag('noDirectDamage')) return 10;
+						if(get.damageEffect(player,player,player,'fire')>=0) return 10;
+						var num=3-game.countPlayer(function(current){
+							return get.attitude(current,player)<0;
+						});
+						if(player.hp==1) num+=4;
+						if(player.hp==2) num+=1;
+						if(player.hp==3) num--;
+						if(player.hp>3) num-=4;
+						return num;
+					},
 					basic:{
-						equipValue:function(card,player){
-							if(player.hasSkillTag('maixie')&&player.hp>1) return 0;
-							if(player.hasSkillTag('noDirectDamage')) return 10;
-							if(get.damageEffect(player,player,player,'fire')>=0) return 10;
-							var num=3-game.countPlayer(function(current){
-								return get.attitude(current,player)<0;
-							});
-							if(player.hp==1) num+=4;
-							if(player.hp==2) num+=1;
-							if(player.hp==3) num--;
-							if(player.hp>3) num-=4;
-							return num;
-						}
+						equipValue:3
 					},
 				},
 				skills:['tengjia1','tengjia2']
@@ -356,12 +357,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:9.5,
+					equipValue:function(card,player){
+						if(player.hp==player.maxHp) return 5;
+						if(player.countCards('h','baiyin')) return 6;
+						return 0;
+					},
 					basic:{
-						equipValue:function(card,player){
-							if(player.hp==player.maxHp) return 5;
-							if(player.countCards('h','baiyin')) return 6;
-							return 0;
-						}
+						equipValue:5
 					}
 				}
 			},
