@@ -194,6 +194,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                     game.players[i].setIdentity(list[i]);
                     game.players[i].node.identity.style.display='none';
     				game.players[i].getId();
+                    game.players[i].node.action.innerHTML='获即<br>胜将';
+                    game.players[i].node.action.style.letterSpacing='0px';
+                    game.players[i].node.action.style.lineHeight='22px';
+                    game.players[i].node.action.style.top='3px';
+                    game.players[i].node.action.style.right='3px';
     			}
     			game.chooseCharacterSiguo();
     		}
@@ -932,6 +937,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				setTimeout(function(){
     					ui.arena.classList.remove('choose-character');
     				},500);
+
+                    ui.longchuanzhibao=ui.create.system('龙船至宝',null,true);
+                    // ui.longchuanzhibao.style.display='none';
+                    lib.setPopped(ui.longchuanzhibao,function(){
+                        var map={wei:0,shu:0,wu:0,qun:0};
+                        for(var i=0;i<game.players.length;i++){
+                            var current=game.players[i];
+                            map[current.side]+=current.storage.longchuanzhibao;
+                        }
+                        var uiintro=ui.create.dialog('hidden');
+                        for(var i in map){
+                            uiintro.addText(get.translation(i)+'势力：'+get.cnNumber(map[i])+'个');
+                        }
+                        uiintro.content.lastChild.style.paddingBottom='8px';
+                        return uiintro;
+                    },150);
     			});
     		},
     		chooseCharacterTwo:function(){
@@ -3564,6 +3585,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                             }
                         },
                         content:function(){
+                            for(var i=0;i<game.players.length;i++){
+                                game.players[i].classList.remove('current_action');
+                            }
                             game.over(_status.winside==game.me.side);
                         }
                     }
@@ -4819,6 +4843,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                         });
                         if(friend){
                             friend.draw(num,'nodelay');
+                        }
+                    }
+
+                    var map={wei:0,shu:0,wu:0,qun:0};
+                    for(var i=0;i<game.players.length;i++){
+                        var current=game.players[i];
+                        map[current.side]+=current.storage.longchuanzhibao;
+                    }
+                    for(var i=0;i<game.players.length;i++){
+                        var current=game.players[i];
+                        if(map[current.side]>=4){
+                            current.classList.add('current_action');
+                        }
+                        else{
+                            current.classList.remove('current_action');
                         }
                     }
                     return this;
