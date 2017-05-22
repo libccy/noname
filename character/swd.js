@@ -241,7 +241,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		juxi:{
     			enable:'phaseUse',
-    			usable:2,
+    			usable:1,
     			filter:function(event,player){
     				return player.storage.juxi>=game.countPlayer();
     			},
@@ -9269,7 +9269,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		swd_xiaohuanglong:'小黄龙',
 
     		juxi:'聚息',
-    		juxi_info:'锁定技，每当一名角色于其回合外弃置牌，你获得一枚聚息标记；出牌阶段限两次，你可以移去X枚聚息标记，然后选择一项：对一名角造成一点伤害，或令一名角色回复一点体力，X为存活角色数',
+    		juxi_info:'锁定技，每当一名角色于其回合外弃置牌，你获得一枚聚息标记；出牌阶段限一次，你可以移去X枚聚息标记，然后选择一项：对一名角造成一点伤害，或令一名角色回复一点体力，X为存活角色数',
     		yeying:'曳影',
     		yeying_info:'出牌阶段限一次，你可以将一张黑色牌当作乾坤镖使用',
     		jiefen:'解纷',

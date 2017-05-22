@@ -40896,8 +40896,8 @@
 		},
         numStr:function(num,method){
             if(num==Infinity){
-				if(method=='card') return get.selectableCards().length.length+ui.selected.cards.length;
-				if(method=='target') return get.selectableTargets().length.length+ui.selected.targets.length;
+				if(method=='card') return get.selectableCards().length+ui.selected.cards.length;
+				if(method=='target') return get.selectableTargets().length+ui.selected.targets.length;
 				return '∞';
 			}
             return num.toString();
