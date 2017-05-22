@@ -210,6 +210,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageEnd'},
 				forced:true,
 				filter:function(event,player){
+                    if(event._notrigger.contains(event.player)) return false;
 					return event.card&&event.card.name=='sha'&&event.player.isAlive()&&event.player.countCards('he')>0;
 				},
 				check:function(){
@@ -1131,6 +1132,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageEnd'},
 				direct:true,
 				filter:function(event){
+                    if(event._notrigger.contains(event.player)) return false;
 					return event.card&&event.card.name=='sha'&&event.cards&&
 					get.color(event.cards)=='black'&&event.player.countCards('e');
 				},
@@ -1456,6 +1458,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'damageEnd',source:'damageEnd'},
 				filter:function(event){
+                    if(event._notrigger.contains(event.player)) return false;
 					return event.num&&event.source&&event.player&&
 					event.player.isAlive()&&event.source.isAlive()&&event.source!=event.player;
 				},

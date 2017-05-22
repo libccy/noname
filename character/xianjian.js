@@ -484,6 +484,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.attitude(player,event.player)<0;
 				},
 				filter:function(event,player){
+                    if(event._notrigger.contains(event.player)) return false;
 					return event.player!=player&&event.player.isIn()&&!event.player.hasSkill('anwugu2');
 				},
 				logTarget:'player',
@@ -2144,6 +2145,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{source:'damageEnd'},
 						forced:true,
 						filter:function(event){
+		                    if(event._notrigger.contains(event.player)) return false;
 							if(get.is.altered('tianjian')) return false;
 							return event.parent.skill=='tianjian'&&event.player.countCards('he');
 						},
@@ -2749,6 +2751,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageEnd'},
 				forced:true,
 				filter:function(event){
+                    if(event._notrigger.contains(event.player)) return false;
 					return event.player.isAlive()&&event.card&&event.card.name=='sha';
 				},
 				content:function(){
@@ -3750,6 +3753,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageEnd'},
 				alter:true,
 				filter:function(event,player){
+                    if(event._notrigger.contains(event.player)) return false;
 					return player.storage.xuanning>0&&event.player.countCards('he')>0;
 				},
 				direct:true,

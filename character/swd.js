@@ -3106,6 +3106,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{source:'damageEnd'},
     			direct:true,
     			filter:function(event,player){
+                    if(event._notrigger.contains(event.player)) return false;
     				return event.player.countCards('e');
     			},
     			content:function(){
@@ -5561,6 +5562,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{source:'damageEnd'},
     			direct:true,
     			filter:function(event){
+                    if(event._notrigger.contains(event.player)) return false;
     				return event.card&&event.card.name=='sha'&&event.player.countCards('he');
     			},
     			content:function(){
@@ -5607,6 +5609,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{source:'damageEnd'},
     			forced:true,
     			filter:function(event,player){
+                    if(event._notrigger.contains(event.player)) return false;
     				return event.player.countCards('hej');
     			},
     			content:function(){
@@ -6109,6 +6112,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		polang:{
     			trigger:{source:'damageEnd'},
     			filter:function(event,player){
+                    if(event._notrigger.contains(event.player)) return false;
     				return event.player.countCards('e');
     			},
     			direct:true,

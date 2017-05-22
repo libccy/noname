@@ -2897,6 +2897,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		zhidao:{
     			trigger:{source:'damageEnd'},
     			filter:function(event,player){
+                    if(event._notrigger.contains(event.player)) return false;
     				return _status.currentPhase==player&&event.player.isAlive()&&
     				event.player.countCards('hej')>0&&event.player!=player&&!player.hasSkill('zhidao2');
     			},
@@ -5129,6 +5130,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		bushi:{
     			trigger:{player:'damageEnd',source:'damageEnd'},
     			filter:function(event,player){
+                    if(event._notrigger.contains(event.player)) return false;
     				return player.storage.yishe&&player.storage.yishe.length&&event.player.isAlive();
     			},
     			direct:true,
@@ -7379,6 +7381,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{source:'damageEnd'},
     			silent:true,
     			filter:function(event,player){
+                    if(event._notrigger.contains(event.player)) return false;
     				return event.nature=='fire';
     			},
     			content:function(){
@@ -8420,6 +8423,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			direct:true,
     			audio:2,
     			filter:function(event){
+                    if(event._notrigger.contains(event.player)) return false;
     				return event.card&&event.card.name=='sha'&&event.player.countCards('e');
     			},
     			content:function(){

@@ -3039,6 +3039,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				priority:55,
 				filter:function(event){
+					if(event._notrigger.contains(event.player)) return false;
 					return event.player.countCards('he')>0;
 				},
 				content:function(){
@@ -3376,6 +3377,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageEnd'},
 				forced:true,
 				filter:function(event){
+					if(event._notrigger.contains(event.player)) return false;
 					return event.card&&event.card.name=='sha'&&event.player.countCards('he');
 				},
 				content:function(){
@@ -3537,6 +3539,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return get.attitude(player,event.player)<=0;
 				},
 				filter:function(event){
+					if(event._notrigger.contains(event.player)) return false;
 					return event.card&&event.card.name=='sha'&&event.player&&event.player.isAlive();
 				},
 				logTarget:'player',
@@ -4170,6 +4173,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageEnd'},
 				direct:true,
 				filter:function(event,player){
+					if(event._notrigger.contains(event.player)) return false;
 					return event.nature&&event.player&&event.player.isAlive();
 				},
 				content:function(){

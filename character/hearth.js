@@ -197,6 +197,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 trigger:{source:'damageEnd',player:'damageEnd'},
                 forced:true,
                 filter:function(event,player){
+                    if(event._notrigger.contains(event.player)) return false;
                     return (event.source!=player&&event.source.isIn())||(event.player!=player&&event.player.isIn());
                 },
                 content:function(){
@@ -494,7 +495,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 forced:true,
                 content:function(){
                     player.draw();
-                    if(trigger.player&&trigger.player.isIn()){
+                    if(trigger.player&&trigger.player.isIn()&&!trigger._notrigger.contains(trigger.player)){
                         trigger.player.randomDiscard();
                     }
                 },
@@ -3202,6 +3203,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		xueren:{
     			trigger:{source:'damageEnd'},
     			filter:function(event){
+                    if(event._notrigger.contains(event.player)) return false;
     				return event.card&&event.card.name=='sha'&&event.player.isAlive();
     			},
     			check:function(event,player){
@@ -4164,6 +4166,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{source:'damageEnd',player:'damageEnd'},
     			forced:true,
     			filter:function(event,player){
+                    if(event._notrigger.contains(event.player)) return false;
     				if(player==event.source){
     					return event.player!=player&&event.player.countCards('e');
     				}
@@ -4755,6 +4758,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			forced:true,
     			alter:true,
     			filter:function(event,player){
+                    if(event._notrigger.contains(event.player)) return false;
     				if(get.is.altered('xshixin')&&event.player.hp<player.hp) return false;
     				return event.player.isAlive()&&event.player!=player;
     			},
@@ -4944,6 +4948,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			forced:true,
     			alter:true,
     			filter:function(event,player){
+                    if(event._notrigger.contains(event.player)) return false;
     				return event.card&&get.color(event.card)=='black'&&
     				!event.player.isTurnedOver()&&event.player.isAlive();
     			},
@@ -5166,6 +5171,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		bingshuang:{
     			trigger:{source:'damageEnd'},
     			filter:function(event,player){
+                    if(event._notrigger.contains(event.player)) return false;
     				return event.card&&get.type(event.card)=='trick'&&
     				event.player.isAlive()&&!event.player.isTurnedOver();
     			},
@@ -7724,7 +7730,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hsqingyu:'青玉',
 
     		lianzhan:'连斩',
-    		lianzhan_info:'每当你造成一次伤害，若此伤害是你本回合第一次造成伤害，你摸两张牌；否则你增加一点体力上限并 回复一点体力',
+    		lianzhan_info:'每当你造成一次伤害，若此伤害是你本回合第一次造成伤害，你摸两张牌；否则你增加一点体力上限并回复一点体力',
     		shifa:'魔瘾',
     		shifa_info:'锁定技，每当你使用一张非转化的普通锦囊牌，你摸一张牌；出牌阶段开始时，你令你与一名随机敌人各获得一张随机普通锦囊牌',
     		yuanzheng:'远征',

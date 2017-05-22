@@ -1869,6 +1869,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			audio:2,
     			trigger:{source:'damageEnd'},
     			filter:function(event,player){
+                    if(event._notrigger.contains(event.player)) return false;
     				return (event.card&&event.card.name=='sha'&&
     					event.player.classList.contains('dead')==false&&
     					event.player.countCards('h')&&player.countCards('h'))&&event.player!=player;

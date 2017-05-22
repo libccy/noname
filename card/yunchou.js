@@ -1021,6 +1021,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(event.player==player) return false;
 					if(!event.player.countCards('he')) return false;
 					if(!lib.filter.targetEnabled({name:'chenhuodajie'},player,event.player)) return false;
+					if(event._notrigger.contains(event.player)) return false;
 					return player.hasCard('chenhuodajie');
 				},
 				content:function(){

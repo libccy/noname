@@ -6738,6 +6738,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return get.attitude(player,event.player)>0;
     			},
     			filter:function(event){
+                    if(event._notrigger.contains(event.player)) return false;
     				return event.card&&event.card.name=='sha'&&event.player.isAlive();
     			},
     			logTarget:'player',

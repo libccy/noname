@@ -73,6 +73,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	            trigger:{source:'damageEnd'},
 	            frequent:true,
 	            filter:function(event,player){
+                    if(event._notrigger.contains(event.player)) return false;
 	                return _status.currentPhase==player&&event.card&&event.card.name=='sha';
 	            },
 	            content:function(){
