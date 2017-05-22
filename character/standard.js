@@ -144,7 +144,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					maixie:true,
 					maixie_hp:true,
 					effect:{
-						target:function(card,player){
+						target:function(card,player,target){
 							if(player.hasSkillTag('jueqing',false,target)) return [1,-1];
 							if(get.tag(card,'damage')) return [1,0.5];
 						}

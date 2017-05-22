@@ -4465,7 +4465,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					effect:{
-						target:function(card,player){
+						target:function(card,player,target){
 							if(get.tag(card,'damage')||get.tag(card,'loseHp')){
 								if(player.hp==5){
 									if(game.players.length<4) return [0,5];
