@@ -901,8 +901,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                         game.players[i].addSkill('longchuanzhibao');
                         if(added[game.players[i].side]==0){
                             if(Math.random()<0.5){
-                                game.players[i].storage.longchuanzhibao=1;
-                                game.players[i].updateMark('longchuanzhibao');
+                                game.players[i].gainZhibao();
                                 added[game.players[i].side]=1;
                             }
                             else{
@@ -910,12 +909,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                             }
                         }
                         else if(added[game.players[i].side]<0){
-                            game.players[i].storage.longchuanzhibao=1;
-                            game.players[i].updateMark('longchuanzhibao');
+                            game.players[i].gainZhibao();
                         }
     				}
-                    _status.firstAct.storage.longchuanzhibao++;
-                    _status.firstAct.updateMark('longchuanzhibao');
+                    _status.firstAct.gainZhibao();
     				game.addRecentCharacter(game.me.name);
     				setTimeout(function(){
     					ui.arena.classList.remove('choose-character');
@@ -3532,12 +3529,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                     return event.player.storage.longchuanzhibao>0;
                 },
                 content:function(){
-                    if(trigger.player.storage.longchuanzhibao>0){
-                        trigger.player.storage.longchuanzhibao--;
-                        trigger.player.updateMark('longchuanzhibao');
-                        player.storage.longchuanzhibao++;
-                        player.updateMark('longchuanzhibao');
-                    }
+                    player.gainZhibao(1,trigger.player);
                 },
                 group:'longchuanzhibao_over',
                 subSkill:{
@@ -4778,6 +4770,43 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			},
     		},
     		player:{
+                gainZhibao:function(num,source){
+                    if(source){
+                        if(num===true||num>source.storage.longchuanzhibao){
+                            num=source.storage.longchuanzhibao;
+                        }
+                    }
+                    else{
+                        if(typeof num!='number'){
+                            num=1;
+                        }
+                    }
+                    if(!num||typeof num!='number') return this;
+
+                    this.storage.longchuanzhibao+=num;
+                    this.updateMark('longchuanzhibao');
+
+                    if(source){
+                        source.storage.longchuanzhibao-=num;
+                        source.updateMark('longchuanzhibao');
+                        game.log(this,'从',source,'处获得了'+get.cnNumber(num)+'个','#y龙船至宝');
+                    }
+                    else{
+                        game.log(this,'获得了'+get.cnNumber(num)+'个','#y龙船至宝');
+                    }
+
+                    if(source&&source.side!=this.side){
+                        this.draw(num,'nodelay');
+                        var that=this;
+                        var friend=game.findPlayer(function(current){
+                            return current.side==that.side&&current!=that;
+                        });
+                        if(friend){
+                            friend.draw(num,'nodelay');
+                        }
+                    }
+                    return this;
+                },
     			dieAfter:function(source){
     				if(_status.connectMode){
     					if(_status.mode=='1v1'||_status.mode=='3v3'){
@@ -4986,12 +5015,59 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                             if(game.players.length==1||(game.players.length==2&&game.players[i].side==game.players[1].side)){
                                 game.over(game.me.side==game.players[0].side);
                             }
-                            if(source){
-                                if(this.storage.longchuanzhibao){
-                                    source.storage.longchuanzhibao+=this.storage.longchuanzhibao;
-                                    this.storage.longchuanzhibao=0;
-                                    source.updateMark('longchuanzhibao');
+                            var assignzhibao=function(){
+                                var list=game.players.slice(0);
+                                var max=0;
+                                var list2=[];
+                                for(var i=0;i<arguments.length;i++){
+                                    list.remove(arguments[i]);
                                 }
+                                for(var i=0;i<list.length;i++){
+                                    if(list[i].storage.longchuanzhibao>max){
+                                        max=list[i].storage.longchuanzhibao;
+                                    }
+                                }
+                                for(var i=0;i<list.length;i++){
+                                    if(list[i].storage.longchuanzhibao==max){
+                                        if(list2.length){
+                                            list2=list;break;
+                                        }
+                                        else{
+                                            list2.push(list[i]);
+                                        }
+                                    }
+                                }
+                                for(var i=0;i<arguments.length;i++){
+                                    for(var j=0;j<arguments[i].storage.longchuanzhibao;j++){
+                                        var current=list2.randomGet();
+                                        if(!current.storage._longchuanzhibao){
+                                            current.storage._longchuanzhibao=1;
+                                        }
+                                        else{
+                                            current.storage._longchuanzhibao++;
+                                        }
+                                    }
+                                    for(var j=0;j<list2.length;j++){
+                                        if(list2[j].storage._longchuanzhibao){
+                                            arguments[i].line(list2[j],'green');
+                                            list2[j].gainZhibao(list2[j].storage._longchuanzhibao,arguments[i]);
+                                            delete list2[j].storage._longchuanzhibao;
+                                        }
+                                    }
+                                }
+                            };
+                            if(source){
+                                if(source.side==this.side){
+                                    assignzhibao(this,source);
+                                }
+                                else{
+                                    if(this.storage.longchuanzhibao){
+                                        source.gainZhibao(true,this);
+                                    }
+                                }
+                            }
+                            else{
+                                assignzhibao(this);
                             }
                             return;
                         }
@@ -5171,6 +5247,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     	},
     	help:{
     		'对决模式':
+    		'<div style="margin:10px">同舟共济（四国）</div><ul style="margin-top:0"><li>游戏开始时，每个势力的随机一名角色得到一个龙船至宝，1号位角色所在的势力额外获得一个龙船至宝，场上共5枚龙船至宝。龙船至宝是一个特殊标记。'+
+            '<li>争夺龙船至宝的方式：当敌人受到了你造成的伤害后，若其有龙船至宝，则你获得其一个龙船至宝。若你杀死了该敌人，则你获得其所有的龙船至宝。'+
+            '<li>获得龙船至宝时的摸牌：除游戏开始时外，若你从非队友处获得了龙船至宝，则你和队友各摸X张牌。（X为该次获得的龙船至宝数；获得队友的龙船至宝不摸牌）'+
+            '<li>无来源死亡时：当一名角色死亡时，若没有伤害来源，则其持有的所有龙船至宝交给场上龙船至宝数唯一最多的角色，若没有则随机分配，获得龙船至宝的角色和其队友各摸X张牌。'+
+            '<li>杀死队友时：当你杀死队友时，则将你和队友持有的所有龙船至宝交给场上龙船至宝数唯一最多的敌人，若没有则随机分配，获得龙船至宝的角色和其队友各摸X张牌。'+
+    		'<li>胜利条件：满足一下任意条件游戏结束：（1）在新的一轮开始时，若你的势力获得的龙船至宝至少为4个，则你和队友获胜；（2）消灭所有敌人。'+
+            '</ul>'+
     		'<div style="margin:10px">2v2 替补模式</div><ul style="margin-top:0"><li>选将时额外选择一名替补武将，阵亡时使用自己的替补武将上场，无替补时改为用队友的替补武将，两人均无替补时游戏结束'+
     		'<li>杀死敌方武将摸3张牌，杀死友方武将弃置所有牌</ul>'+
     		'<div style="margin:10px">4v4</div><ul style="margin-top:0"><li>双方各有一名主公和三名忠臣，杀死对方主公获胜<li>'+

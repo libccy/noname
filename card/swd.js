@@ -1443,20 +1443,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			pusafazhou:{
-				type:'equip',
-				subtype:'equip5',
-				skills:['pusafazhou'],
-				ai:{
-					basic:{
-						equipValue:function(card,player){
-							if(player.hp==2) return 7;
-							if(player.hp==1) return 9;
-							return 5;
-						}
-					}
-				}
-			},
 			xianluhui:{
 				fullskin:true,
 				type:'trick',
@@ -4315,21 +4301,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			pusafazhou:{
-				trigger:{player:'dieBefore'},
-				forced:true,
-				filter:function(event,player){
-					return player.maxHp>0;
-				},
-				content:function(){
-					trigger.untrigger();
-					trigger.finish();
-					player.hp=1;
-					player.draw();
-					player.discard(player.getCards('e',{subtype:'equip5'}));
-					game.delay();
-				}
-			},
 			old_longfan:{
 				enable:'phaseUse',
 				usable:1,
@@ -4977,9 +4948,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			shentoumianju_info:'出牌阶段，你可以指定一名手牌比你多的角色，弃置一张手牌并进行一次判定，若结果不为梅花，你获得其一张手牌',
 			shentou:'神偷',
 			shentou_info:'出牌阶段，你可以进行一次判定，若结果不为梅花，你获得任意一名角色的一张手牌',
-			pusafazhou:'菩萨发咒',
-			pusafazhou_bg:'发',
-			// pusafazhou_info:'令你抵挡一次死亡，将体力回复至1，并摸一张牌',
 			xianluhui:'仙炉灰',
 			xianluhui_info:'令所有已受伤角色获得一点护甲',
 			caoyao:'草药',
