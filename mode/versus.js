@@ -737,7 +737,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                             list[lib.character[i][1]].push(i);
                         }
     				}
-					var dialog=ui.create.dialog('选择角色',[list[game.me.identity].randomGets(8),'character']);
+                    event.friendChoice=list[game.me.identity].randomRemove();
+					var dialog=ui.create.dialog('选择角色',[list[game.me.identity].randomGets(7).concat([event.friendChoice]),'character']);
+                    dialog.buttons[7].node.name.innerHTML=get.verticalStr('队友选择');
+
                     var addSetting=function(dialog){
     					dialog.add('选择座位');
     					var seats=document.createElement('table');
@@ -813,7 +816,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							var buttons=ui.create.div('.buttons');
 							var node=_status.event.dialog.buttons[0].parentNode;
-							_status.event.dialog.buttons=ui.create.buttons(list[game.me.identity].randomGets(8),'character',buttons);
+                            list[game.me.identity].add(event.friendChoice);
+                            event.friendChoice=list[game.me.identity].randomRemove();
+							_status.event.dialog.buttons=ui.create.buttons(list[game.me.identity].randomGets(7).concat([event.friendChoice]),'character',buttons);
+                            _status.event.dialog.buttons[7].node.name.innerHTML=get.verticalStr('队友选择');
 							_status.event.dialog.content.insertBefore(buttons,node);
 							buttons.animate('start');
 							node.remove();
@@ -824,6 +830,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					var createCharacterDialog=function(){
 						event.dialogxx=ui.create.characterDialog(function(name){
+                            if(name==event.friendChoice) return true;
 							if(lib.character[name][1]!=game.me.identity) return true;
 						});
 						if(ui.cheat2){
@@ -874,7 +881,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							ui.cheat2.classList.add('disabled');
 						}
 					}
-    				game.me.chooseButton(dialog,true).set('onfree',true);
+    				game.me.chooseButton(dialog,true).set('onfree',true).set('filterButton',function(button){
+                        if(button==button.parentNode.lastChild) return false;
+                        return true;
+                    });
                     if(!ui.cheat&&get.config('change_choice')){
                         ui.create.cheat();
                     }
@@ -896,7 +906,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				for(var i=0;i<game.players.length;i++){
                         game.players[i].node.identity.style.display='';
     					if(game.players[i]!=game.me){
-                            game.players[i].init(event.list[game.players[i].side].randomRemove());
+                            if(game.players[i].identity==game.me.identity){
+                                game.players[i].init(event.friendChoice);
+                            }
+                            else{
+                                game.players[i].init(event.list[game.players[i].side].randomRemove());
+                            }
                         }
                         game.players[i].addSkill('longchuanzhibao');
                         if(added[game.players[i].side]==0){
@@ -3530,6 +3545,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                 },
                 content:function(){
                     player.gainZhibao(1,trigger.player);
+                    game.delay();
                 },
                 group:'longchuanzhibao_over',
                 subSkill:{
@@ -5174,12 +5190,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                             map[current.side]+=get.condition(current)*get.threaten(current,false,false);
                             map2[current.side]+=current.storage.longchuanzhibao;
                         }
+                        var allin=false;
                         for(var i in map){
                             if(get.population(i)==1){
                                 map[i]/=1.5;
                             }
                             if(map2[i]>=4){
-                                map[i]+=50;
+                                allin=i;
+                                break;
                             }
                             else if(map2[i]==3){
                                 map[i]+=10;
@@ -5188,6 +5206,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                                 map[i]++;
                             }
                         }
+                        if(allin) return to.side==allin?-20:0;
                         list.sort(function(a,b){
                             return map[b]-map[a];
                         });
@@ -5228,6 +5247,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                         }
                         else if(map2[to.side]==2){
                             att-=0.5;
+                        }
+                        if(to.storage.longchuanzhibao){
+                            return att*1.2;
                         }
                         return att;
                     }

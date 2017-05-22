@@ -1176,7 +1176,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return player.countCards('h')<=player.hp?1:0;
 						}
 					},
-					effect:function(card,player){
+					effect:function(card,player,target){
 						if(get.tag(card,'damage')){
 							if(player.hasSkillTag('jueqing',false,target)) return [1,1];
 							return 1.2;

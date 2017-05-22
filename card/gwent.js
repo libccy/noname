@@ -1096,7 +1096,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'spell',
 				subtype:'spell_bronze',
 				enable:true,
-				filterTarget:true,
+				filterTarget:function(card,player,target){
+					return target.hujia||!target.hasSkill('fengyin');
+				},
 				content:function(){
 					target.addTempSkill('fengyin',{player:'phaseAfter'});
 					if(target.hujia){
@@ -1114,6 +1116,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 							else if(target.hasSkill('fengyin')){
 								return 0;
+							}
+							if(target.hasSkillTag('maixie_hp')){
+								threaten*=1.5;
 							}
 							return -threaten;
 						}
