@@ -314,6 +314,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				}
     			}
                 else if(_status.mode=='siguo'){
+                    _status.siguoai=[
+                        [-7.5,-2,0,-4.5,-6,-7.5],
+                        [-7.5,-2,0,-4.5,-6,-7.5],
+                        [-6,-6,-1,-4.5,-6,-7.5],
+                        [-6,-3,0,-3,-3,-6],
+                        [-6,-3,0,-3,-3,-6],
+                        [-6,-6,-6,-6,-6,-6],
+                    ].randomGet();
                     var firstChoose=_status.firstAct;
     				game.gameDraw(firstChoose);
     				game.phaseLoop(firstChoose);
@@ -816,12 +824,31 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     					delete ui.cheat2;
     				}
     				game.me.init(result.links[0]);
-                    event.list[game.me.identity].remove(result.links[0]);
+                    event.list[game.me.side].remove(result.links[0]);
+                    var added={wei:0,shu:0,wu:0,qun:0};
     				for(var i=0;i<game.players.length;i++){
                         game.players[i].node.identity.style.display='';
-    					if(game.players[i]==game.me) continue;
-                        game.players[i].init(event.list[game.players[i].identity].randomRemove());
+    					if(game.players[i]!=game.me){
+                            game.players[i].init(event.list[game.players[i].side].randomRemove());
+                        }
+                        game.players[i].addSkill('longchuanzhibao');
+                        if(added[game.players[i].side]==0){
+                            if(Math.random()<0.5){
+                                game.players[i].storage.longchuanzhibao=1;
+                                game.players[i].updateMark('longchuanzhibao');
+                                added[game.players[i].side]=1;
+                            }
+                            else{
+                                added[game.players[i].side]=-1;
+                            }
+                        }
+                        else if(added[game.players[i].side]<0){
+                            game.players[i].storage.longchuanzhibao=1;
+                            game.players[i].updateMark('longchuanzhibao');
+                        }
     				}
+                    _status.firstAct.storage.longchuanzhibao++;
+                    _status.firstAct.updateMark('longchuanzhibao');
     				game.addRecentCharacter(game.me.name);
     				setTimeout(function(){
     					ui.arena.classList.remove('choose-character');
@@ -3409,8 +3436,30 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     		boss_chiying_info:'锁定技，每当己方角色受到多于1伤害时，你防止其余伤害',
     		boss_jingfan:'惊帆',
     		boss_jingfan_info:'锁定技，己方其他角色的进攻距离+1',
+            longchuanzhibao:'龙船至宝',
+            longchuanzhibao_bg:'船',
     	},
     	skill:{
+            longchuanzhibao:{
+                mark:'auto',
+                nopop:true,
+                init:function(player){
+                    player.storage.longchuanzhibao=0;
+                },
+                intro:{
+                    content:function(storage,player){
+                        var str='已有'+storage+'个龙船至宝，'+get.translation(player.side)+'势力共有';
+                        var num=storage;
+                        for(var i=0;i<game.players.length;i++){
+                            if(game.players[i].side==player.side&&game.players[i]!=player){
+                                num+=game.players[i].storage.longchuanzhibao;break;
+                            }
+                        }
+                        str+=num+'个龙船至宝。新一轮开始时，拥有至少4个龙船至宝的势力获胜';
+                        return str;
+                    }
+                }
+            },
     		boss_didongjg:{
     			trigger:{player:'phaseEnd'},
     			direct:true,
@@ -4836,6 +4885,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                             if(game.players.length==1||(game.players.length==2&&game.players[i].side==game.players[1].side)){
                                 game.over(game.me.side==game.players[0].side);
                             }
+                            if(source){
+                                if(this.storage.longchuanzhibao){
+                                    source.storage.longchuanzhibao+=this.storage.longchuanzhibao;
+                                    this.storage.longchuanzhibao=0;
+                                    source.updateMark('longchuanzhibao');
+                                }
+                            }
+                            return;
                         }
     					else if(_status.mode=='jiange'){
     						if(get.population('wei')==0){
@@ -4931,15 +4988,83 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				return 6;
     			}
     			else{
-    				if(to.identity=='zhu'){
-    					if(_status.connectMode){
-    						if(_status.mode=='4v4') return -10;
-    					}
-    					else{
-    						if(lib.storage.main_zhu||_status.mode=='four') return -10;
-    					}
-    				}
-    				return -6;
+                    if(_status.mode=='siguo'){
+                        var list=['wei','shu','wu','qun'];
+                        var map={wei:0,shu:0,wu:0,qun:0};
+                        var map2={wei:0,shu:0,wu:0,qun:0};
+                        for(var i=0;i<game.players.length;i++){
+                            var current=game.players[i];
+                            map[current.side]+=get.condition(current)*get.threaten(current,false,false);
+                            map2[current.side]+=current.storage.longchuanzhibao;
+                        }
+                        for(var i in map){
+                            if(get.population(i)==1){
+                                map[i]/=1.5;
+                            }
+                            if(map2[i]>=4){
+                                map[i]+=50;
+                            }
+                            else if(map2[i]==3){
+                                map[i]+=10;
+                            }
+                            else if(map2[i]==2){
+                                map[i]++;
+                            }
+                        }
+                        list.sort(function(a,b){
+                            return map[b]-map[a];
+                        });
+                        var id1=list.indexOf(from.side);
+                        var id2=list.indexOf(to.side);
+                        var att=-1;
+                        switch(id1){
+                            case 0:att=_status.siguoai[id2+2];break;
+                            case 1:
+                                switch(id2){
+                                    case 0:att=_status.siguoai[0];break;
+                                    case 2:att=_status.siguoai[1];break;
+                                    case 3:att=_status.siguoai[2];break;
+                                }
+                                break;
+                            case 2:
+                                switch(id2){
+                                    case 0:att=_status.siguoai[0];break;
+                                    case 1:att=_status.siguoai[1];break;
+                                    case 3:att=_status.siguoai[2];break;
+                                }
+                                break;
+                            case 3:{
+                                if(id2==0){
+                                    att=_status.siguoai[1];break;
+                                }
+                                else{
+                                    att=_status.siguoai[2];break;
+                                }
+                                break;
+                            }
+                        }
+                        if(map2[to.side]>=4){
+                            att-=10;
+                        }
+                        else if(map2[to.side]==3){
+                            att-=3;
+                        }
+                        else if(map2[to.side]==2){
+                            att-=0.5;
+                        }
+                        return att;
+                    }
+                    else{
+                        if(to.identity=='zhu'){
+        					if(_status.connectMode){
+        						if(_status.mode=='4v4') return -10;
+        					}
+        					else{
+        						if(lib.storage.main_zhu||_status.mode=='four') return -10;
+        					}
+        				}
+        				return -6;
+                    }
     			}
     		},
     	},

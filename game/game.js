@@ -13236,6 +13236,58 @@
 					this.updateMarks();
 					return this;
 				},
+				updateMark:function(i){
+					if(!this.marks[i]){
+						if(lib.skill[i]&&lib.skill[i].intro&&(this.storage[i]||lib.skill[i].intro.markcount)){
+							this.markSkill(i);
+							if(!this.marks[i]) return this;
+						}
+						else{
+							return this;
+						}
+					}
+					if(i=='ghujia'||((!this.marks[i].querySelector('.image')||this.storage[i+'_markcount'])&&
+						lib.skill[i]&&lib.skill[i].intro&&!lib.skill[i].intro.nocount&&
+						(this.storage[i]||lib.skill[i].intro.markcount))){
+						this.marks[i].classList.add('overflowmark')
+						var num=0;
+						if(typeof lib.skill[i].intro.markcount=='function'){
+							num=lib.skill[i].intro.markcount(this.storage[i],this);
+						}
+						else if(typeof this.storage[i+'_markcount']=='number'){
+							num=this.storage[i+'_markcount'];
+						}
+						else if(i=='ghujia'){
+							num=this.hujia;
+						}
+						else if(typeof this.storage[i]=='number'){
+							num=this.storage[i];
+						}
+						else if(Array.isArray(this.storage[i])){
+							num=this.storage[i].length;
+						}
+						if(num){
+							if(!this.marks[i].markcount){
+								this.marks[i].markcount=ui.create.div('.markcount.menubutton',this.marks[i]);
+							}
+							this.marks[i].markcount.innerHTML=num;
+						}
+						else if(this.marks[i].markcount){
+							this.marks[i].markcount.delete();
+							delete this.marks[i].markcount;
+						}
+					}
+					else{
+						if(this.marks[i].markcount){
+							this.marks[i].markcount.delete();
+							delete this.marks[i].markcount;
+						}
+						if(lib.skill[i].mark=='auto'){
+							this.unmarkSkill(i);
+						}
+					}
+					return this;
+				},
 				updateMarks:function(connect){
 					if(typeof connect=='string'&&_status.connectMode&&!game.online){
 						game.broadcast(function(player,storage,skill){
@@ -13244,41 +13296,7 @@
 						},this,this.storage[connect],connect);
 					}
 					for(var i in this.marks){
-						if(i=='ghujia'||((!this.marks[i].querySelector('.image')||this.storage[i+'_markcount'])&&
-							lib.skill[i]&&lib.skill[i].intro&&!lib.skill[i].intro.nocount&&
-                            (this.storage[i]||lib.skill[i].intro.markcount))){
-							this.marks[i].classList.add('overflowmark')
-							var num=0;
-                            if(typeof lib.skill[i].intro.markcount=='function'){
-                                num=lib.skill[i].intro.markcount(this.storage[i],this);
-                            }
-                            else if(typeof this.storage[i+'_markcount']=='number'){
-                                num=this.storage[i+'_markcount'];
-                            }
-							else if(i=='ghujia'){
-								num=this.hujia;
-							}
-							else if(typeof this.storage[i]=='number'){
-								num=this.storage[i];
-							}
-							else if(Array.isArray(this.storage[i])){
-								num=this.storage[i].length;
-							}
-							if(num){
-								if(!this.marks[i].markcount){
-									this.marks[i].markcount=ui.create.div('.markcount.menubutton',this.marks[i]);
-								}
-								this.marks[i].markcount.innerHTML=num;
-							}
-							else if(this.marks[i].markcount){
-								this.marks[i].markcount.delete();
-								delete this.marks[i].markcount;
-							}
-						}
-						else if(this.marks[i].markcount){
-							this.marks[i].markcount.delete();
-							delete this.marks[i].markcount;
-						}
+						this.updateMark(i);
 					}
 				},
 				num:function(arg1,arg2,arg3){
@@ -42591,6 +42609,31 @@
 				}
 			}
 			return threaten;
+		},
+		condition:function(player){
+			var num=player.hp;
+			if(num>4){
+				num=4+Math.sqrt(num-4);
+			}
+			else{
+				if(player.isHealthy()){
+					if(player.hp==3){
+						num+=0.5;
+					}
+					else if(player.hp<3){
+						num++;
+					}
+				}
+			}
+			num+=player.countCards('h')/2;
+			var es=player.getCards('e');
+			for(var i=0;i<es.length;i++){
+				var val=get.value(es[i]);
+				if(val>=7) num+=0.8;
+				if(val>=5) num+=0.5;
+				if(val>=3) num+=0.2;
+			}
+			return num;
 		},
 		attitude:function(from,to){
 			if(!from||!to) return 0;
