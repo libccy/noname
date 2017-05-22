@@ -32,6 +32,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			lib.characterIntro.boss_duanyuzhongda=lib.characterIntro.simayi;
     			lib.characterIntro.boss_juechenmiaocai=lib.characterIntro.xiahouyuan;
     		}
+            else if(get.config('versus_mode')=='siguo'){
+                lib.cardPack.mode_versus=['zong','xionghuangjiu','tongzhougongji','lizhengshangyou'];
+            }
     	},
     	start:function(){
     		"step 0"
@@ -77,6 +80,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			if(_status.mode=='four'&&!get.config('enable_all_cards_four')){
     				lib.card.list=lib.cardsFour;
     			}
+                else if(_status.mode=='siguo'){
+                    for(var i=0;i<lib.card.list.length;i++){
+                        switch(lib.card.list[i][2]){
+                            case 'tao':lib.card.list[i][2]='zong';break;
+                            case 'jiu':lib.card.list[i][2]='xionghuangjiu';break;
+                            case 'wuzhong':lib.card.list[i][2]='tongzhougongji';break;
+                            case 'wugu':case 'taoyuan':lib.card.list[i][2]='lizhengshangyou';break;
+                        }
+                    }
+                }
     			game.prepareArena(8);
     		}
     		else if(_status.mode=='two'){
@@ -3455,6 +3468,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     		replace_number_config:'替补人数',
     		choice_config:'候选人数',
     		mode_versus_character_config:'剑阁武将',
+            mode_versus_card_config:'同舟共济',
 
     		boss_liedixuande:'烈帝玄德',
     		boss_gongshenyueying:'工神月英',
@@ -3538,8 +3552,64 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     		boss_jingfan_info:'锁定技，己方其他角色的进攻距离+1',
             longchuanzhibao:'龙船至宝',
             longchuanzhibao_bg:'船',
+            zong:'粽',
+            zong_info:'1. 出牌阶段对自己使用，回复1点体力；2. 自己或队友濒死时对其使用，目标角色回复1点体力',
+            xionghuangjiu:'雄黄酒',
+            xionghuangjiu_info:'1. 出牌阶段对自己使用，本回合使用的下一张【杀】伤害+1；若队友已死亡，改为使本回合使用的下一张牌伤害+1；2. 自己濒死时使用，回复1点体力',
+            tongzhougongji:'同舟共济',
+            tongzhougongji_info:'出牌阶段使用，选择一项：1.摸X张牌（X为你所在势力拥有的龙船至宝数）；2.你和队友各摸一张牌',
+            lizhengshangyou:'力争上游',
+            lizhengshangyou_info:'出牌阶段对所有角色使用，若目标角色的势力拥有龙船至宝，其回复1点体力，若目标角色的势力没有龙船至宝，其弃置一张牌',
     	},
     	skill:{
+            xionghuangjiu:{
+				trigger:{source:'damageBegin'},
+				filter:function(event,player){
+					return event.card&&event.card==player.storage.xionghuangjiu&&event.notLink();
+				},
+				forced:true,
+				content:function(){
+					trigger.num++;
+				},
+				temp:true,
+				vanish:true,
+				onremove:function(player){
+					if(player.node.jiu){
+						player.node.jiu.delete();
+						player.node.jiu2.delete();
+						delete player.node.jiu;
+						delete player.node.jiu2;
+					}
+                    delete player.storage.xionghuangjiu;
+				},
+				group:['xionghuangjiu2','xionghuangjiu3']
+			},
+			xionghuangjiu2:{
+				trigger:{player:'useCardAfter',global:'phaseAfter'},
+				priority:2,
+				filter:function(event,player){
+					if(event.name=='useCard') return (event.card&&event.card==player.storage.xionghuangjiu);
+					return true;
+				},
+				forced:true,
+				popup:false,
+				audio:false,
+				content:function(){
+					game.broadcastAll(function(player){
+						player.removeSkill('xionghuangjiu');
+					},player);
+				},
+			},
+            xionghuangjiu3:{
+                trigger:{player:'useCard'},
+                silent:true,
+                filter:function(event,player){
+                    return !player.storage.xionghuangjiu;
+                },
+                content:function(){
+                    player.storage.xionghuangjiu=trigger.card;
+                }
+            },
             longchuanzhibao:{
                 mark:'auto',
                 nopop:true,
@@ -4573,7 +4643,289 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			}
     		}
     	},
-    	element:{
+        card:{
+            zong:{
+                fullskin:true,
+				type:'basic',
+				cardcolor:'red',
+				enable:function(card,player){
+					return player.hp<player.maxHp;
+				},
+                savable:function(card,player,dying){
+					return dying.side==player.side;
+				},
+				selectTarget:-1,
+				filterTarget:function(card,player,target){
+					return target==player&&target.hp<target.maxHp;
+				},
+				modTarget:function(card,player,target){
+					return target.hp<target.maxHp;
+				},
+				content:function(){
+					target.recover();
+				},
+				ai:{
+					basic:{
+						order:function(card,player){
+							if(player.hasSkillTag('pretao')) return 5;
+							return 2;
+						},
+						useful:[8,6.5,5,4],
+						value:[8,6.5,5,4],
+					},
+					result:{
+						target:function(player,target){
+                            if(target.hp<=0) return 2;
+							var nd=player.needsToDiscard();
+							var keep=false;
+							if(nd<=0){
+								keep=true;
+							}
+							else if(nd==1&&target.hp>=2&&target.countCards('h','tao')<=1){
+								keep=true;
+							}
+							var mode=get.mode();
+							if(target.hp>=2&&keep&&target.hasFriend()){
+								if(target.hp>2||nd==0) return 0;
+								if(target.hp==2){
+									if(game.hasPlayer(function(current){
+										if(target!=current&&get.attitude(target,current)>=3){
+											if(current.hp<=1) return true;
+										}
+									})){
+										return 0;
+									}
+								}
+							}
+                            return 2;
+						},
+					},
+					tag:{
+						recover:1,
+						save:1,
+					}
+				}
+            },
+            xionghuangjiu:{
+				fullskin:true,
+				type:"basic",
+				enable:function(event,player){
+					return !player.hasSkill('jiu')&&!player.hasSkill('xionghuangjiu');
+				},
+				lianheng:true,
+				logv:false,
+				savable:function(card,player,dying){
+					return dying==player;
+				},
+				usable:1,
+				selectTarget:-1,
+				modTarget:true,
+				filterTarget:function(card,player,target){
+					return target==player;
+				},
+				content:function(){
+					if(target.isDying()){
+						target.recover();
+						if(_status.currentPhase==target){
+							target.getStat().card.jiu--;
+						}
+					}
+					else{
+						if(cards&&cards.length){
+							card=cards[0];
+						}
+						game.broadcastAll(function(target,card,gain2){
+                            if(get.population(target.side)==1){
+                                target.addSkill('xionghuangjiu');
+                            }
+							else{
+                                target.addSkill('jiu');
+                            }
+							if(!target.node.jiu&&lib.config.jiu_effect){
+								target.node.jiu=ui.create.div('.playerjiu',target.node.avatar);
+								target.node.jiu2=ui.create.div('.playerjiu',target.node.avatar2);
+							}
+							if(gain2&&card.clone&&(card.clone.parentNode==target.parentNode||card.clone.parentNode==ui.arena)){
+								card.clone.moveDelete(target);
+							}
+						},target,card,target==targets[0]);
+						if(target==targets[0]){
+							if(card.clone&&(card.clone.parentNode==target.parentNode||card.clone.parentNode==ui.arena)){
+								game.addVideo('gain2',target,get.cardsInfo([card]));
+							}
+						}
+					}
+				},
+				ai:{
+					basic:{
+						useful:function(card,i){
+							if(_status.event.player.hp>1){
+								if(i==0) return 5;
+								return 1;
+							}
+							if(i==0) return 7.3;
+							return 3;
+						},
+						value:function(card,player,i){
+							if(player.hp>1){
+								if(i==0) return 5;
+								return 1;
+							}
+							if(i==0) return 7.3;
+							return 3;
+						},
+					},
+					order:function(){
+						return get.order({name:'sha'})+0.2;
+					},
+					result:{
+						target:function(player,target){
+							if(target&&target.isDying()) return 2;
+							if(lib.config.mode=='stone'&&!player.isMin()){
+								if(player.getActCount()+1>=player.actcount) return 0;
+							}
+							var shas=player.getCards('h','sha');
+							if(shas.length>1&&player.getCardUsable('sha')>1){
+								return 0;
+							}
+							var card;
+							if(shas.length){
+								for(var i=0;i<shas.length;i++){
+									if(lib.filter.filterCard(shas[i],target)){
+										card=shas[i];break;
+									}
+								}
+							}
+							else if(player.hasSha()&&player.needsToDiscard()){
+								if(player.countCards('h','hufu')!=1){
+									card={name:'sha'};
+								}
+							}
+							if(card){
+								if(game.hasPlayer(function(current){
+									return (get.attitude(target,current)<0&&
+										target.canUse(card,current,true,true)&&
+										!current.getEquip('baiyin')&&
+										get.effect(current,card,target)>0);
+								})){
+									return 1;
+								}
+							}
+							return 0;
+						},
+					},
+					tag:{
+						save:1
+					}
+				}
+            },
+            tongzhougongji:{
+                fullskin:true,
+                cardimage:'lulitongxin',
+                notarget:true,
+                enable:true,
+                type:'trick',
+                content:function(){
+                    'step 0'
+                    var num=0;
+                    for(var i=0;i<game.players.length;i++){
+                        if(game.players[i].side==player.side){
+                            if(game.players[i]!=player){
+                                event.friend=game.players[i];
+                            }
+                            num+=game.players[i].storage.longchuanzhibao;
+                        }
+                    }
+                    player.chooseControl(function(){
+                        if(num>2){
+                            return 0;
+                        }
+                        if(num==2&&get.population(player.side)==1){
+                            return 0;
+                        }
+                        return 1;
+                    }).set('choiceList',[
+                        '摸'+get.cnNumber(num)+'张牌',
+                        '你和队友各摸一张牌'
+                    ]);
+                    event.num=num;
+                    'step 1'
+                    if(result.index==0){
+                        if(event.num){
+                            player.draw(event.num);
+                        }
+                    }
+                    else{
+                        if(event.friend){
+                            player.line(event.friend);
+                            game.asyncDraw([player,event.friend]);
+                        }
+                        else{
+                            player.draw();
+                        }
+                    }
+                },
+                ai:{
+					basic:{
+						order:7.2,
+						useful:4,
+						value:9.2
+					},
+					result:{
+						target:2,
+					},
+					tag:{
+						draw:1
+					}
+				}
+            },
+            lizhengshangyou:{
+                fullskin:true,
+                cardimage:'lianjunshengyan',
+				type:'trick',
+				enable:true,
+				selectTarget:-1,
+				reverseOrder:true,
+				filterTarget:function(card,player,target){
+					for(var i=0;i<game.players.length;i++){
+                        if(game.players[i].side==target.side&&game.players[i].storage.longchuanzhibao){
+                            return target.isDamaged();
+                        }
+                    }
+                    return target.countCards('he');
+				},
+				content:function(){
+                    for(var i=0;i<game.players.length;i++){
+                        if(game.players[i].side==target.side&&game.players[i].storage.longchuanzhibao){
+                            target.recover();return;
+                        }
+                    }
+                    target.chooseToDiscard('he',true);
+				},
+				ai:{
+					basic:{
+						order:9,
+						useful:[3,1],
+						value:0
+					},
+					result:{
+						target:function(player,target){
+                            for(var i=0;i<game.players.length;i++){
+                                if(game.players[i].side==target.side&&game.players[i].storage.longchuanzhibao){
+                                    return 1.5;
+                                }
+                            }
+                            return -1;
+						}
+					},
+					tag:{
+						recover:0.5,
+						multitarget:1
+					}
+				}
+            }
+        },
+        element:{
     		content:{
     			replacePlayer:function(){
     				"step 0"

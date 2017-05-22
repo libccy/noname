@@ -8058,7 +8058,7 @@
 				}
 			},
 			q:function(){
-				if(lib.config.layout!='mobile') lib.init.layout('mobile');
+				// if(lib.config.layout!='mobile') lib.init.layout('mobile');
 				if(arguments.length==0){
 					var style=ui.css.card_style;
 					if(lib.config.card_style!='simple'){
