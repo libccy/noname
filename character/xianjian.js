@@ -202,7 +202,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'shaAfter'},
 				direct:true,
 				filter:function(event,player){
-					return player.canUse('sha',event.target)&&player.hasSha();
+					return player.canUse('sha',event.target)&&player.hasSha()&&event.target.isIn();
 				},
 				content:function(){
 					"step 0"
