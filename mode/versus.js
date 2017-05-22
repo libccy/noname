@@ -3458,6 +3458,38 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                         str+=num+'个龙船至宝。新一轮开始时，拥有至少4个龙船至宝的势力获胜';
                         return str;
                     }
+                },
+                trigger:{source:'damageEnd'},
+                silent:true,
+                function(event,player){
+                    return event.player.storage.longchuanzhibao>0;
+                },
+                content:function(){
+                    trigger.player.storage.longchuanzhibao--;
+                    trigger.player.updateMark('longchuanzhibao');
+                    player.storage.longchuanzhibao++;
+                    player.updateMark('longchuanzhibao');
+                },
+                group:'longchuanzhibao_over',
+                subSkill:{
+                    over:{
+                        trigger:{player:'roundStart'},
+                        silent:true,
+                        filter:function(){
+                            var map={wei:0,shu:0,wu:0,qun:0};
+                            for(var i=0;i<game.players.length;i++){
+                                var current=game.players[i];
+                                map[current.side]+=current.storage.longchuanzhibao;
+                                if(map[current.side]>=4){
+                                    _status.winside=current.side;
+                                    return true;
+                                }
+                            }
+                        },
+                        content:function(){
+                            game.over(_status.winside==game.me.side);
+                        }
+                    }
                 }
             },
     		boss_didongjg:{
