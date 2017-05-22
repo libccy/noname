@@ -593,9 +593,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						bool=true;
 					}
 					var num=player.storage.zhucheng.length;
-					trigger.player.chooseToDiscard('弃置'+get.cnNumber(num)+'张牌，或令杀无效',num).ai=function(card){
+					trigger.player.chooseToDiscard('弃置'+get.cnNumber(num)+'张牌，或令杀无效','he',num).ai=function(card){
 						if(bool){
-							return 7-get.value(card);
+							return 10-get.value(card);
 						}
 						return 0;
 					}
