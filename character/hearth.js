@@ -4234,8 +4234,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				effect:{
     					player:function(card,player){
     						if(_status.currentPhase!=player) return;
-    						if(player.needsToDiscard(2)) return;
-    						if(get.type(card)=='equip'&&player.getEquip(card)){
+    						if(get.type(card)=='equip'&&get.equipValueNumber(card)<7){
+        						if(player.needsToDiscard(2)) return;
     							return [0,0,0,0];
     						}
     					}
