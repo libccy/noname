@@ -533,19 +533,32 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:true,
 	            wuxieable:true,
 				filterTarget:function(card,player,target){
-					return target.countCards('h')>0&&!target.hasSkill('bingpotong');
+					return target.countCards('h')>0;
 				},
+				selectTarget:[1,3],
 				content:function(){
 					"step 0"
 					if(target.countCards('h')==0||player.countCards('h')==0){
 						event.finish();
 						return;
 					}
-					player.chooseCard(true);
+	                var rand=Math.random()<0.5;
+					player.chooseCard('请展示一张手牌',true).set('ai',function(){
+						var num=0;
+	                    if(get.color(card)=='red'){
+	                        if(rand) num-=6;
+	                    }
+	                    else{
+	                        if(!rand) num-=6;
+	                    }
+	                    var value=get.value(card);
+	                    if(value>=8) return -100;
+						return num-value;
+					}).prompt2='若与'+get.translation(target)+'展示的牌相同，你弃置展示的牌，'+get.translation(target)+'失去一点体力';
 					"step 1"
 					event.card1=result.cards[0];
 	                var rand=Math.random()<0.5;
-					target.chooseCard(true).ai=function(card){
+					target.chooseCard('请展示一张手牌',true).set('ai',function(card){
 	                    var num=0;
 	                    if(get.color(card)=='red'){
 	                        if(rand) num-=6;
@@ -556,7 +569,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                    var value=get.value(card);
 	                    if(value>=8) return -100;
 						return num-value;
-					};
+					}).prompt2='若与'+get.translation(player)+'展示的牌相同，'+get.translation(player)+'弃置展示的牌，你失去一点体力';
 					"step 2"
 					event.card2=result.cards[0];
 					ui.arena.classList.add('thrownhighlight');
@@ -578,6 +591,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 						target.loseHp();
 	                    event.finish();
+						event.parent.cancelled=true;
 					}
 					else{
 						player.$gain2(event.card1);
@@ -587,10 +601,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					ui.arena.classList.remove('thrownhighlight');
 					game.addVideo('thrownhighlight2');
 	                "step 4"
-	                if(cards&&cards.length){
-	                    player.gain(cards,'gain2');
-	                    target.addTempSkill('bingpotong');
-	                }
+	                // if(cards&&cards.length){
+	                //     player.gain(cards,'gain2');
+	                //     target.addTempSkill('bingpotong');
+	                // }
 				},
 				ai:{
 					basic:{
@@ -602,13 +616,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						player:function(player,target){
 							if(player.countCards('h')<=Math.min(5,Math.max(2,player.hp))&&_status.event.name=='chooseToUse'){
 								if(typeof _status.event.filterCard=='function'&&
-									_status.event.filterCard({name:'dujian'})){
+									_status.event.filterCard({name:'bingpotong'})){
 									return -10;
 								}
 								if(_status.event.skill){
 									var viewAs=get.info(_status.event.skill).viewAs;
-									if(viewAs=='dujian') return -10;
-									if(viewAs&&viewAs.name=='dujian') return -10;
+									if(viewAs=='bingpotong') return -10;
+									if(viewAs&&viewAs.name=='bingpotong') return -10;
 								}
 							}
 							return 0;
@@ -1523,8 +1537,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	        qiankunbiao:'乾坤镖',
 	        qiankunbiao_info:'随机弃置一名其他角色和其相邻角色的一张牌',
 
-	        bingpotong:'冰魄针',
-	        bingpotong_info:'出牌阶段，对一名有手牌的角色使用，你与其同时展示一张手牌，若颜色相同，你弃置展示的牌，目标流失一点体力；若颜色不同，你收回此牌且本回合内不能再对该目标使用',
+	        bingpotong:'天女散花',
+	        bingpotong_info:'出牌阶段对至多3名角色使用，你与每个目标依次同时展示一张手牌，若颜色相同，你弃置展示的手牌，目标失去一点体力并终止结算',
 	        feibiao:'飞镖',
 	        feibiao_info:'出牌阶段，对一名距离1以外的角色使用，令其弃置一张黑色手牌或流失一点体力',
 

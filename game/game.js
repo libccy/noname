@@ -10195,9 +10195,12 @@
 								str+='牌';
 							}
 							event.dialog=ui.create.dialog(str);
-							event.dialog.add('0/'+get.numStr(event.selectCard[1],'card'));
+							if(event.prompt2){
+								event.dialog.addText(event.prompt2);
+							}
+							event.promptbar=event.dialog.add('0/'+get.numStr(event.selectCard[1],'card'));
 							event.custom.add.card=function(){
-								_status.event.dialog.content.childNodes[1].innerHTML=
+								_status.event.promptbar.innerHTML=
 								ui.selected.cards.length+'/'+get.numStr(_status.event.selectCard[1],'card');
 							}
 						}
@@ -11197,7 +11200,7 @@
                         }
 					}
 					"step 3"
-					if(!get.info(event.card).multitarget&&num<targets.length-1){
+					if(!get.info(event.card).multitarget&&num<targets.length-1&&!event.cancelled){
 						event.num++;
 						event.goto(2);
 					}

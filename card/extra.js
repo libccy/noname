@@ -129,9 +129,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						event.finish();
 						return;
 					}
-					var rand=Math.random()<0.5;
 					target.chooseCard(true).ai=function(card){
-						if(rand) return Math.random();
+						if(_status.event.getRand()<0.5) return Math.random();
 						return get.value(card);
 					};
 					"step 1"
