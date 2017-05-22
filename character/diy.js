@@ -1083,6 +1083,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return event.player!=player&&_status.currentPhase!=player;
 				},
+				logTarget:'player',
 				content:function(){
 					"step 0"
 					var att=get.attitude(trigger.player,player);
