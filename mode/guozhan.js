@@ -930,7 +930,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					"step 2"
-					if(result.targets.length){
+					if(result.bool&&result.targets.length){
 						event.current.line(result.targets,'green');
 						player.discardPlayerCard(true,result.targets[0],'he');
 					}
