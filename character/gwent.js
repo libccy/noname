@@ -226,7 +226,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					var list=event.list;
 					if(list.length){
-						event.target.chooseCardButton('选择一张法术牌',list).ai=function(button){
+						event.target.chooseCardButton('选择一张法术牌',list,true).ai=function(button){
 							return get.value(button.link);
 						};
 					}
