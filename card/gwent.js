@@ -1405,6 +1405,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								list=get.libCard(function(info){
 									return info.subtype=='spell_gold';
 								});
+								if(get.mode()=='stone'){
+									list.remove('gw_aerdeyin');
+								}
 							}
 							else{
 								list=get.libCard(function(info){

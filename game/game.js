@@ -7460,6 +7460,19 @@
                         clickedNode=true;
 						lib.config.mode=this.link;
 						game.saveConfig('mode',this.link);
+						if(game.layout!='mobile'&&lib.layoutfixed.indexOf(lib.config.mode)!==-1){
+							game.layout='mobile';
+							ui.css.layout.href=lib.assetURL+'layout/'+game.layout+'/layout.css';
+						}
+						else if(game.layout=='mobile'&&lib.config.layout!='mobile'&&lib.layoutfixed.indexOf(lib.config.mode)===-1){
+							game.layout=lib.config.layout;
+							if(game.layout=='default'){
+								ui.css.layout.href='';
+							}
+							else{
+								ui.css.layout.href=lib.assetURL+'layout/'+game.layout+'/layout.css';
+							}
+						}
 						splash.delete(1000);
 						delete window.inSplash;
 						window.resetGameTimeout=setTimeout(lib.init.reset,5000);
