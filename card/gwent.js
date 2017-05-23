@@ -974,6 +974,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:true,
 				filterTarget:true,
 				selectTarget:-1,
+				usable:1,
 				content:function(){
 					target.addTempSkill('gw_qinpendayu',{player:'phaseAfter'});
 				},
@@ -1000,9 +1001,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'spell',
 				subtype:'spell_bronze',
 				enable:true,
-				filterTarget:function(card,player,target){
-					return !target.isLinked();
-				},
+				usable:1,
+				filterTarget:true,
 				selectTarget:-1,
 				content:function(){
 					target.addTempSkill('gw_birinongwu',{player:'phaseAfter'});
@@ -1025,6 +1025,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'spell',
 				subtype:'spell_bronze',
 				enable:true,
+				usable:1,
 				filterTarget:function(card,player,target){
 					return !target.isLinked();
 				},
