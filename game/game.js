@@ -11933,6 +11933,7 @@
 							num=0;
 						}
 						game.log(player,'的护甲抵挡了'+get.cnNumber(event.hujia)+'点伤害');
+						player.changeHujia(-event.hujia).type='damage';
 					}
 					event.num=num;
 					"step 1"
@@ -12037,10 +12038,6 @@
 								case 'gold':if(dnum>=12) source.node.framebg.dataset.decoration='gold';break;
 							}
 						}
-					}
-					"step 3"
-					if(event.hujia){
-						player.changeHujia(-event.hujia).type='damage';
 					}
 				},
 				recover:function(){
