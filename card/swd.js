@@ -1040,7 +1040,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 									card.classList.remove('glow');
 								},500);
 							}
-						}(es[i],lib.skill._lingjianduanzao.process([card,es[i]]),i==es.length-1)),(i-delayed)*200);
+						}(es[i],lib.skill.lingjianduanzao.process([card,es[i]]),i==es.length-1)),(i-delayed)*200);
 					}
 					target.$gain2(cards);
 					game.pause();
@@ -3882,77 +3882,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			_lingjianduanzao:{
-				enable:'phaseUse',
-				position:'he',
-				discard:false,
-				losetrigger:false,
-				longprompt:true,
-				prompt:function(event){
-					var lingjians=[],types=[];
-					var hs=event.player.getCards('he');
-					for(var i=0;i<hs.length;i++){
-						switch(get.type(hs[i])){
-							case 'equip':types.add(get.subtype(hs[i]));break;
-							case 'hslingjian':lingjians.add(hs[i].name);break;
-							case 'jiqi':if(!lingjians.contains(hs[i].name)) lingjians.unshift(hs[i].name);break;
-						}
-					}
-					var str='';
-					for(var i=0;i<lingjians.length;i++){
-						var color;
-						var type=get.type(lingjians[i]);
-						if(type=='jiqi'){
-							color='rgba(233, 131, 255,0.2);';
-						}
-						else{
-							color='rgba(117,186,255,0.2);';
-						}
-						str+='<div style="text-align:left;line-height:18px;border-radius:4px;margin-top:7px;margin-bottom:10px;position:relative;width:100%">';
-						str+='<div class="shadowed" style="position:absolute;left0;top:0;padding:5px;border-radius:4px;background:'+color+'">'+lib.translate[lingjians[i]]+'</div>';
-						for(var j=0;j<types.length;j++){
-							str+='<div class="shadowed" style="position:relative;left:85px;width:calc(100% - 95px);height:100%;padding:5px;border-radius: 4px;margin-bottom:10px">'+
-							(type!='jiqi'?(lib.translate[types[j]]+'：'):'')+
-							lib.translate[lingjians[i]+'_'+types[j]+'_info']+'</div>';
-							if(type=='jiqi') break;
-						}
-						str+='</div>';
-					}
-					return str;
-				},
-				check:function(card){
-					if(get.type(card)=='jiqi'){
-						if(_status.event.player.needsToDiscard()){
-							return 0.5;
-						}
-						return 0;
-					}
-					var num=1+get.value(card);
-					if(get.position(card)=='e'){
-						num+=0.1;
-					}
-					return num;
-				},
-				filterCard:function(card){
-					var type=get.type(card);
-					if(type=='equip'){
-						if(!lib.inpile.contains(card.name)) return false;
-						if(lib.card[card.name].nopower) return false;
-						if(lib.card[card.name].unique) return false;
-					}
-					if(ui.selected.cards.length){
-						var type2=get.type(ui.selected.cards[0]);
-						if(type2=='equip'){
-							return type=='hslingjian'||type=='jiqi';
-						}
-						else{
-							return type=='equip';
-						}
-					}
-					else{
-						return type=='equip'||type=='hslingjian'||type=='jiqi';
-					}
-				},
+			lingjianduanzao:{
 				process:function(cards){
 					var equip;
 					for(var i=0;i<cards.length;i++){
@@ -4056,6 +3986,78 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					return name;
 				},
+			},
+			_lingjianduanzao:{
+				enable:'phaseUse',
+				position:'he',
+				discard:false,
+				losetrigger:false,
+				longprompt:true,
+				prompt:function(event){
+					var lingjians=[],types=[];
+					var hs=event.player.getCards('he');
+					for(var i=0;i<hs.length;i++){
+						switch(get.type(hs[i])){
+							case 'equip':types.add(get.subtype(hs[i]));break;
+							case 'hslingjian':lingjians.add(hs[i].name);break;
+							case 'jiqi':if(!lingjians.contains(hs[i].name)) lingjians.unshift(hs[i].name);break;
+						}
+					}
+					var str='';
+					for(var i=0;i<lingjians.length;i++){
+						var color;
+						var type=get.type(lingjians[i]);
+						if(type=='jiqi'){
+							color='rgba(233, 131, 255,0.2);';
+						}
+						else{
+							color='rgba(117,186,255,0.2);';
+						}
+						str+='<div style="text-align:left;line-height:18px;border-radius:4px;margin-top:7px;margin-bottom:10px;position:relative;width:100%">';
+						str+='<div class="shadowed" style="position:absolute;left0;top:0;padding:5px;border-radius:4px;background:'+color+'">'+lib.translate[lingjians[i]]+'</div>';
+						for(var j=0;j<types.length;j++){
+							str+='<div class="shadowed" style="position:relative;left:85px;width:calc(100% - 95px);height:100%;padding:5px;border-radius: 4px;margin-bottom:10px">'+
+							(type!='jiqi'?(lib.translate[types[j]]+'：'):'')+
+							lib.translate[lingjians[i]+'_'+types[j]+'_info']+'</div>';
+							if(type=='jiqi') break;
+						}
+						str+='</div>';
+					}
+					return str;
+				},
+				check:function(card){
+					if(get.type(card)=='jiqi'){
+						if(_status.event.player.needsToDiscard()){
+							return 0.5;
+						}
+						return 0;
+					}
+					var num=1+get.value(card);
+					if(get.position(card)=='e'){
+						num+=0.1;
+					}
+					return num;
+				},
+				filterCard:function(card){
+					var type=get.type(card);
+					if(type=='equip'){
+						if(!lib.inpile.contains(card.name)) return false;
+						if(lib.card[card.name].nopower) return false;
+						if(lib.card[card.name].unique) return false;
+					}
+					if(ui.selected.cards.length){
+						var type2=get.type(ui.selected.cards[0]);
+						if(type2=='equip'){
+							return type=='hslingjian'||type=='jiqi';
+						}
+						else{
+							return type=='equip';
+						}
+					}
+					else{
+						return type=='equip'||type=='hslingjian'||type=='jiqi';
+					}
+				},
 				selectCard:2,
 				complexCard:true,
 				filter:function(event,player){
@@ -4076,7 +4078,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<cards.length;i++){
 						ui.discardPile.appendChild(cards[i]);
 					}
-					var name=lib.skill._lingjianduanzao.process(cards);
+					var name=lib.skill.lingjianduanzao.process(cards);
 					var card=game.createCard(name);
 					player.chooseTarget(function(card,player,target){
 						return !target.isMin()&&get.distance(player,target)<=1;
