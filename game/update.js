@@ -3,7 +3,6 @@ window.noname_update={
     update:'1.9.29',
     changeLog:[
         'bug修复',
-        '同舟共济（对决->四国）'
     ],
     files:[
         'game/game.js',
