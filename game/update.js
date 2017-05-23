@@ -1,12 +1,12 @@
 window.noname_update={
-    version:'1.9.29',
-    // update:'1.9.28',
+    version:'1.9.29beta',
+    update:'1.9.29',
     changeLog:[
         'bug修复',
         '同舟共济（对决->四国）'
     ],
     files:[
-        // 'game/game.js',
+        'game/game.js',
         // 'game/package.js',
         // 'game/config.js',
         // 'game/source.js',

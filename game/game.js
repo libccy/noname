@@ -38215,6 +38215,8 @@
 						game.check();
 						_status.clicked=true;
 					}
+					delete node._waitingfordrag;
+					ui.click.touchpop();
 				}
 			},
 			longpresscancel:function(){
