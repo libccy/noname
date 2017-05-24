@@ -19236,7 +19236,8 @@
 				return true;
 			},
             characterDisabled:function(i,libCharacter){
-                if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) return true;
+				if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) return true;
+                if(lib.character[i][4]&&lib.character[i][4].contains('unseen')) return true;
                 if(lib.config.forbidai.contains(i)) return true;
                 if(_status.connectMode){
                     if(lib.configOL.banned.contains(i)) return true;
