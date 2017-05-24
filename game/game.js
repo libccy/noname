@@ -12859,7 +12859,7 @@
 						num=maxHp-info1[2];
 					}
 					if(typeof this.singleHp=='boolean'){
-						if(num%2==1){
+						if(num%2!=0){
 							if(this.singleHp){
 								this.maxHp+=(num+1)/2;
 								this.singleHp=false;
