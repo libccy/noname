@@ -18,7 +18,7 @@ window.noname_update={
         // 'mode/boss.js',
         // 'mode/versus.js',
         'mode/guozhan.js',
-        // 'mode/identity.js',
+        'mode/versus.js',
         // 'mode/chess.js',
         // 'mode/tafang.js',
         // 'mode/guozhan.js',

@@ -5419,7 +5419,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     						return;
     					}
                         else if(_status.mode=='siguo'){
-                            if(game.players.length==1||(game.players.length==2&&game.players[i].side==game.players[1].side)){
+                            if(game.players.length==1||(game.players.length==2&&game.players[0].side==game.players[1].side)){
                                 game.over(game.me.side==game.players[0].side);
                             }
                             var assignzhibao=function(){
