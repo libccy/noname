@@ -33,6 +33,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			lib.characterIntro.boss_juechenmiaocai=lib.characterIntro.xiahouyuan;
     		}
             else if(get.config('versus_mode')=='siguo'){
+                lib.characterPack.mode_versus={
+                    tangzi:['male',['wei','wu'].randomGet(),4,['xingzhao'],[]],
+                    liuqi:['male',['shu','qun'].randomGet(),3,['wenji','tunjiang'],[]],
+                };
+                for(var i in lib.characterPack.mode_versus){
+                    lib.character[i]=lib.characterPack.mode_versus[i];
+                }
                 lib.cardPack.mode_versus=['zong','xionghuangjiu','tongzhougongji','lizhengshangyou'];
             }
     	},
@@ -751,12 +758,35 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				event.list=list;
     				for(var i in lib.character){
     					if(lib.filter.characterDisabled(i)) continue;
+                        if(get.config('siguo_character')=='off'&&lib.characterPack.mode_versus[i]) continue;
                         if(list[lib.character[i][1]]){
                             list[lib.character[i][1]].push(i);
                         }
     				}
-                    event.friendChoice=list[game.me.identity].randomRemove();
-					var dialog=ui.create.dialog('选择角色',[list[game.me.identity].randomGets(7).concat([event.friendChoice]),'character']);
+                    var duallist=[];
+                    if(get.config('siguo_character')=='increase'){
+                        for(var i in lib.characterPack.mode_versus){
+                            if(lib.characterPack.mode_versus[i][1]==game.me.identity){
+                                duallist.push(i);
+                            }
+                        }
+                    }
+                    if(duallist.length&&Math.random()<0.5){
+                        event.friendChoice=duallist.randomGet();
+                        duallist.length=0;
+                    }
+                    else{
+                        event.friendChoice=list[game.me.identity].randomRemove();
+                    }
+                    var myChoice=list[game.me.identity].randomGets(7);
+                    if(duallist.length){
+                        var myChoiceName=duallist.randomGet();
+                        if(list[game.me.identity].contains(myChoiceName)){
+                            myChoice.randomRemove();
+                            myChoice.push(myChoiceName);
+                        }
+                    }
+					var dialog=ui.create.dialog('选择角色',[myChoice.concat([event.friendChoice]),'character']);
                     dialog.buttons[7].node.name.innerHTML=get.verticalStr('队友选择');
 
                     var addSetting=function(dialog){
@@ -921,6 +951,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				game.me.init(result.links[0]);
                     event.list[game.me.side].remove(result.links[0]);
                     var added={wei:0,shu:0,wu:0,qun:0};
+                    var dualside={wei:[],shu:[],wu:[],qun:[]};
+                    if(get.config('siguo_character')=='increase'){
+                        for(var i in lib.characterPack.mode_versus){
+                            if(Math.random()<0.5){
+                                dualside[lib.characterPack.mode_versus[i][1]].push(i);
+                            }
+                        }
+                    }
     				for(var i=0;i<game.players.length;i++){
                         game.players[i].node.identity.style.display='';
     					if(game.players[i]!=game.me){
@@ -928,7 +966,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                                 game.players[i].init(event.friendChoice);
                             }
                             else{
-                                game.players[i].init(event.list[game.players[i].side].randomRemove());
+                                if(dualside[game.players[i].side]&&dualside[game.players[i].side].length){
+                                    var enemyChoice=dualside[game.players[i].side];
+                                    if(enemyChoice._skipped||Math.random()<0.5){
+                                        var enemyChoiceName=enemyChoice.randomRemove();
+                                        if(event.list[game.players[i].side].contains(enemyChoiceName)){
+                                            game.players[i].init(enemyChoiceName);
+                                            event.list[game.players[i].side].remove(enemyChoiceName);
+                                        }
+                                    }
+                                    else{
+                                        enemyChoice._skipped=true;
+                                    }
+                                }
+                                if(!game.players[i].name) game.players[i].init(event.list[game.players[i].side].randomRemove());
                             }
                         }
                         game.players[i].addSkill('longchuanzhibao');
@@ -3470,6 +3521,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     		mode_versus_character_config:'剑阁武将',
             mode_versus_card_config:'同舟共济',
 
+            tangzi:'唐咨',
+            liuqi:'刘琦',
+
+            wenji:'问计',
+            wenji2:'问计',
+            wenji_info:'队友的出牌阶段开始时，你可令其交给你一张手牌，若此牌为锦囊牌，则非队友角色计算与你的距离+1直到你的下个回合开始',
+            qunjiang:'屯江',
+            qunjiang_info:'结束阶段开始时，若你于本回合的出牌阶段使用过至少两张牌且未造成过伤害，你可以选择一项：1.你摸两张牌；2.队友摸两张牌',
+            xingzhao:'兴棹',
+            xingzhao2:'兴棹',
+            xingzhao3:'兴棹',
+            xingzhao_bg:'棹',
+            xingzhao_info:'锁定技，若你和队友持有的龙船至宝数合计为：1个以上，你具有技能“恂恂”；2个以上，当你或队友使用装备牌时，其摸一张牌；3个以上，你和队友跳过判定阶段',
+
     		boss_liedixuande:'烈帝玄德',
     		boss_gongshenyueying:'工神月英',
     		boss_tianhoukongming:'天侯孔明',
@@ -3562,6 +3627,166 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
             lizhengshangyou_info:'出牌阶段对所有角色使用，若目标角色的势力拥有龙船至宝，其回复1点体力，若目标角色的势力没有龙船至宝，其弃置一张牌',
     	},
     	skill:{
+            wenji:{
+                trigger:{global:'phaseUseBegin'},
+                filter:function(event,player){
+                    return event.player.side==player.side&&event.player!=player&&event.player.countCards('h');
+                },
+                logTarget:'player',
+                check:function(event,player){
+                    return event.player.needsToDiscard(1)||event.player.countCards('h')>player.countCards('h')+1||player.hp==1;
+                },
+                content:function(){
+                    'step 0'
+                    trigger.player.chooseCard('将一张手牌交给'+get.translation(player),true).ai=function(card){
+                        if(get.type(card)=='trick') return 8-get.value(card);
+                        return 6-get.value(card);
+                    }
+                    'step 1'
+                    if(result.bool&&result.cards.length){
+                        player.gain(result.cards,trigger.player,'give');
+                        if(get.type(result.cards[0])=='trick'){
+                            player.addTempSkill('wenji2',{player:'phaseBegin'});
+                        }
+                    }
+                }
+            },
+            wenji2:{
+                mark:true,
+                intro:{
+                    content:'非队友角色计算与你的距离+1'
+                },
+                mod:{
+                    globalTo:function(from,to,distance){
+                        if(from.side!=to.side){
+                            return distance+1;
+                        }
+                    }
+                }
+            },
+            tunjiang:{
+                trigger:{player:'phaseEnd'},
+    			direct:true,
+    			filter:function(event,player){
+    				return !player.getStat('damage')&&player.countUsed()>=2;
+    			},
+                content:function(){
+                    'step 0'
+                    var target=null;
+                    for(var i=0;i<game.players.length;i++){
+                        if(game.players[i].side==player.side&&game.players[i]!=player){
+                            target=game.players[i];break;
+                        }
+                    }
+                    if(target){
+                        event.target=target;
+                        player.chooseControl('cancel2',function(){
+                            if(target.countCards('h')>=player.countCards('h')){
+                                return 1;
+                            }
+                            return 0;
+                        }).set('prompt',get.prompt('xingzhao')).set('choiceList',[
+                            '摸两张牌','令'+get.translation(target)+'摸两张牌'
+                        ]);
+                    }
+                    else{
+                        player.chooseBool(get.prompt('xingzhao'));
+                    }
+                    'step 1'
+                    if(event.target){
+                        if(result.index==0){
+                            player.logSkill('xingzhao');
+                            player.draw(2);
+                        }
+                        else if(result.index==1){
+                            player.logSkill('xingzhao',event.target);
+                            event.target.draw(2);
+                        }
+                    }
+                    else{
+                        if(result.bool){
+                            player.logSkill('xingzhao');
+                            player.draw(2);
+                        }
+                    }
+                }
+            },
+            xingzhao:{
+                inherit:'xunxun',
+                mark:true,
+                intro:{
+                    content:function(storage,player){
+                        var num=0;
+                        for(var i=0;i<game.players.length;i++){
+                            if(game.players[i].side==player.side){
+                                num+=game.players[i].storage.longchuanzhibao;
+                            }
+                        }
+                        var str='无技能';
+                        if(num>=1){
+                            str='具有技能“恂恂”';
+                        }
+                        if(num>=2){
+                            str+='；当你或队友使用装备牌时，其摸一张牌';
+                        }
+                        if(num>=3){
+                            str+='；你和队友跳过判定阶段';
+                        }
+                        return str;
+                    }
+                },
+                filter:function(event,player){
+                    var num=0;
+                    for(var i=0;i<game.players.length;i++){
+                        if(game.players[i].side==player.side){
+                            if(game.players[i].storage.longchuanzhibao) return true;
+                        }
+                    }
+                    return false;
+                },
+                global:['xingzhao2','xingzhao3']
+            },
+            xingzhao2:{
+                trigger:{player:'useCard'},
+                forced:true,
+                filter:function(event,player){
+                    if(get.type(event.card)!='equip') return false;
+                    var num=0,bool=false;
+                    for(var i=0;i<game.players.length;i++){
+                        if(game.players[i].side==player.side){
+                            num+=game.players[i].storage.longchuanzhibao;
+                            if(game.players[i].hasSkill('xingzhao')){
+                                bool=true;
+                            }
+                        }
+                    }
+                    return bool&&num>=2;
+                },
+                content:function(){
+                    player.draw();
+                }
+            },
+            xingzhao3:{
+                trigger:{player:'phaseJudgeBefore'},
+                forced:true,
+                filter:function(event,player){
+                    var num=0,bool=false;
+                    for(var i=0;i<game.players.length;i++){
+                        if(game.players[i].side==player.side){
+                            num+=game.players[i].storage.longchuanzhibao;
+                            if(game.players[i].hasSkill('xingzhao')){
+                                bool=true;
+                            }
+                        }
+                    }
+                    return bool&&num>=3;
+                },
+                content:function(){
+                    trigger.untrigger();
+                    trigger.finish();
+                    game.log(player,'跳过了判定阶段');
+                }
+            },
             xionghuangjiu:{
 				trigger:{source:'damageBegin'},
 				filter:function(event,player){

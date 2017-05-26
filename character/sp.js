@@ -105,8 +105,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		taoqian:['male','qun',3,['zhaohuo','yixiang','yirang']],
 
             // wangyun:['male','qun',4,['wylianji','moucheng','jingong']],
-            // liuqi:['male','qun',3,['wenji','tunjiang']],
-            // tangzi:['male','wu',4,['xingzhao']],
     	},
     	characterIntro:{
     		huangfusong:'字义真。安定郡朝那县（今宁夏彭阳）人。于黄巾起义时，以中郎将身份讨伐黄巾，用火攻大破张梁、张宝。[45]  后接替董卓进攻张梁，连胜七阵。掘张角墓，拜左车骑将军、冀州牧，因拒绝贿赂宦官而被免职。[46]  董卓死，王允命其与吕布等共至郿坞抄籍董卓家产、人口，皇甫嵩将坞中所藏良家子女，尽行释放。',
@@ -6426,7 +6424,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					else{
     						return 'draw_card';
     					}
-    				});
+    				}).set('prompt',get.prompt('moukui'));
     				"step 1"
     				if(result.control=='draw_card'){
     					player.draw();
@@ -8542,12 +8540,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             miheng:'祢衡',
             taoqian:'陶谦',
 
-            xingzhao:'兴棹',
-            xingzhao_info:'锁定技，若你和队友持有的龙船至宝数合计为：1个或以上，你具有技能“恂恂”；2个或以上，你和队友使用装备牌时摸一张牌；3个或以上，你和队友跳过判定阶段',
-            wenji:'问计',
-            wenji_info:'队友的出牌阶段开始时，你可令其交给你一张手牌，若此牌为锦囊牌，则其他非队友角色计算与你的距离+1直到你的下个回合开始',
-            tunjiang:'屯江',
-            tunjiang_info:'结束阶段，若你于此回合的出牌阶段使用了两张或更多的牌且未造成伤害，你可令你或队友摸两张牌',
             wylianji:'连计',
             wylianji_info:'出牌阶段限一次，你可以交给一名其他角色一张【杀】或黑色锦囊牌，并令该角色将牌堆中的随机一张武器牌置入装备区（可替换原装备）。然后该角色选择一项：1.对除你以外的角色使用该牌，并将装备区里的武器牌交给该牌的一个目标角色；2.视为你对其使用此牌，并将装备区内的武器牌交给你。',
             moucheng:'谋逞',

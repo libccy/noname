@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-    '1.9.29',
+    '1.9.29.2',
     'image/background/huangtian_bg.jpg',
     'image/background/ol_bg.jpg',
     'image/background/september_bg.jpg',
@@ -1313,6 +1313,8 @@ window.noname_asset_list=[
     'image/mode/versus/character/boss_tuntianchiwen.jpg',
     'image/mode/versus/character/boss_yuhuoshiyuan.jpg',
     'image/mode/versus/character/boss_yunpingqinglong.jpg',
+    'image/mode/versus/character/liuqi.jpg',
+    'image/mode/versus/character/tangzi.jpg',
     'image/splash/boss.jpg',
     'image/splash/chess.jpg',
     'image/splash/guozhan.jpg',

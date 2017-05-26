@@ -2974,7 +2974,10 @@ div:not(.handcards)>.card>.info>span,
 
 #arena.selecting:not(.video) .player[data-position='0'] .marks>.card:not(.selectable)>.image,
 #arena.selecting:not(.video) .player[data-position='0'] .judges>.card:not(.selectable)>.image,
-#arena.selecting:not(.video) .player[data-position='0'] .judges>.card:not(.selectable)>.background {
+#arena.selecting:not(.video) .player[data-position='0'] .judges>.card:not(.selectable)>.background,
+#arena.selecting:not(.video) .player .marks>.card:not(.selectable)>.image,
+#arena.selecting:not(.video) .player .judges>.card:not(.selectable)>.image,
+#arena.selecting:not(.video) .player .judges>.card:not(.selectable)>.background {
 	opacity: 1;
 }
 

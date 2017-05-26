@@ -1,8 +1,9 @@
 window.noname_update={
-    version:'1.9.29.1',
+    version:'1.9.29.2',
     update:'1.9.29',
     changeLog:[
         'bug修复',
+        '同舟武将'
     ],
     files:[
         'game/game.js',
@@ -10,13 +11,12 @@ window.noname_update={
         // 'game/config.js',
         // 'game/source.js',
         // 'game/pressure.js',
-        // 'game/asset.js',
+        'game/asset.js',
         // 'card/*',
-        // 'card/standard.js',
+        'card/gwent.js',
         // 'character/*',
-        // 'character/rank.js',
+        'character/sp.js',
         // 'mode/boss.js',
-        // 'mode/versus.js',
         'mode/guozhan.js',
         'mode/versus.js',
         // 'mode/chess.js',
@@ -26,7 +26,7 @@ window.noname_update={
         // 'theme/music/style.css',
         // 'theme/woodden/style.css',
         // 'theme/simple/style.css',
-        // 'layout/default/layout.css',
+        'layout/default/layout.css',
         // 'layout/default/phone.css',
         // 'layout/default/menu.css',
         // 'theme/style/cardback/*',

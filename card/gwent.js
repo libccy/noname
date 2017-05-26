@@ -1239,6 +1239,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		skill:{
 			gw_qinpendayu:{
     			mark:true,
+				nopop:true,
     			intro:{
     				content:'手牌上限-1直到下一回合结束'
     			},
@@ -1250,6 +1251,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
     		},
 			gw_birinongwu:{
 				mark:true,
+				nopop:true,
 	            intro:{
 	                content:'不能使用杀直到下一回合结束'
 	            },
@@ -1263,6 +1265,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseDrawBegin'},
     			forced:true,
     			mark:true,
+				nopop:true,
     			intro:{
     				content:'下个摸牌阶段摸牌数-1'
     			},

@@ -4665,6 +4665,16 @@
 						intro:'选将框打开时直接显示全部武将（可能使游戏在开始时卡顿）',
                         init:false,
                     },
+					siguo_character:{
+						name:'专属武将出场率',
+						init:'increase',
+						item:{
+							increase:'大概率出现',
+							normal:'与其他武将一致',
+							off:'不出现',
+						},
+						frequent:true
+					},
 					ban_weak:{
 		                name:'屏蔽弱将',
 						init:true,
