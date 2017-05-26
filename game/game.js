@@ -4527,6 +4527,12 @@
 						else{
 							map.change_identity.hide();
 						}
+						if(config.versus_mode=='siguo'){
+							map.siguo_character.show();
+						}
+						else{
+							map.siguo_character.hide();
+						}
 					},
 					versus_mode:{
 						name:'游戏模式',
