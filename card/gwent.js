@@ -330,7 +330,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						player:function(player){
 							return game.countPlayer(function(current){
 								if(get.distance(player,current,'pure')==1){
-									var att=get.attitude(player,current);
+									var att=get.sgn(get.attitude(player,current));
 									if(current==player.next){
 										return -att*1.5;
 									}
