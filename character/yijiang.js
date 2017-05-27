@@ -6940,8 +6940,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			init:function(player){
     				player.storage.xiansi=[];
     			},
-    			unique:true,
-    			forceunique:true,
     			content:function(){
     				"step 0"
     				player.chooseTarget(get.prompt('xiansi'),[1,2],function(card,player,target){
@@ -7006,23 +7004,56 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     				return false;
     			},
+                direct:true,
+                delay:0,
     			content:function(){
-    				"step 0"
-    				event.target=game.findPlayer(function(current){
-    					return current.storage.xiansi;
-    				});
+                    "step 0"
+                    var targets=game.filterPlayer(function(current){
+                        if(current.storage.xiansi){
+    						return current.storage.xiansi.length>1&&player.canUse('sha',current,true,true);
+    					}
+                        return false;
+                    });
+                    if(targets.length==1){
+                        event.target=targets[0];
+                        event.goto(2);
+                    }
+                    else if(targets.length>0){
+                        player.chooseTarget(true,'选择陷嗣的目标',function(card,player,target){
+                            return _status.event.list.contains(target);
+                        }).set('list',targets).set('ai',function(target){
+                            var player=_status.event.player;
+                            return get.effect(target,{name:'sha'},player,player);
+                        });
+                    }
+                    else{
+                        event.finish();
+                    }
+                    "step 1"
+                    if(result.bool&&result.targets.length){
+                        event.target=result.targets[0];
+                    }
+                    else{
+                        event.finish();
+                    }
+    				"step 2"
     				if(event.target){
-    					player.chooseCardButton(2,event.target.storage.xiansi).set('ai',function(){
-    						return 1;
-    					});
+                        if(event.target.storage.xiansi.length==2){
+                            event.directresult=event.target.storage.xiansi.slice(0);
+                        }
+                        else{
+                            player.chooseCardButton('移去两张“逆”',2,event.target.storage.xiansi,true);
+                        }
     				}
     				else{
     					event.finish();
     				}
-    				"step 1"
-    				if(result.bool){
-    					for(var i=0;i<result.links.length;i++){
-    						event.target.storage.xiansi.remove(result.links[i]);
+    				"step 3"
+    				if(event.directresult||result.bool){
+                        player.logSkill('xiansi2');
+                        var links=event.directresult||result.links;
+    					for(var i=0;i<links.length;i++){
+    						event.target.storage.xiansi.remove(links[i]);
     					}
     					event.target.syncStorage('xiansi');
     					if(!event.target.storage.xiansi.length){
@@ -7031,9 +7062,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					else{
     						event.target.markSkill('xiansi');
     					}
-    					event.target.$throw(result.links);
-    					for(var i=0;i<result.links.length;i++){
-    						ui.discardPile.appendChild(result.links[i]);
+    					event.target.$throw(links);
+                        game.log(event.target,'被移去了',links);
+    					for(var i=0;i<links.length;i++){
+    						ui.discardPile.appendChild(links[i]);
     					}
     					player.useCard({name:'sha'},event.target);
     				}

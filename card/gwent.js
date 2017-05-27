@@ -270,7 +270,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					useful:[6,1],
 					result:{
 						player:function(player){
-							return game.countPlayer(function(current){
+							return 1+game.countPlayer(function(current){
 								if(current!=player&&current.isMaxHandcard()){
 									return -get.sgn(get.attitude(player,current));
 								}
