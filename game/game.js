@@ -25347,7 +25347,13 @@
 			ui.arena.classList.remove('dragging');
 			_status.dragline.length=0;
 		},
-		swapSeat:function(player1,player2,prompt,behind){
+		swapSeat:function(player1,player2,prompt,behind,noanimate){
+			if(noanimate){
+				player1.style.transition='all 0s';
+				player2.style.transition='all 0s';
+				ui.refresh(player1);
+				ui.refresh(player2);
+			}
 			if(behind){
 				var totalPopulation=game.players.length+game.dead.length+1;
 				for(var iwhile=0;iwhile<totalPopulation;iwhile++){
@@ -25389,6 +25395,12 @@
 				if(prompt!=false){
 					game.log(player1,'和',player2,'交换了座位');
 				}
+			}
+			if(noanimate){
+				setTimeout(function(){
+					player1.style.transition='';
+					player2.style.transition='';
+				},200);
 			}
 		},
 		swapPlayer:function(player,player2){
