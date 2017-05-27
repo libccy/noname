@@ -773,6 +773,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                     }
                     if(duallist.length&&Math.random()<0.5){
                         event.friendChoice=duallist.randomGet();
+                        list[game.me.identity].remove(event.friendChoice);
                         duallist.length=0;
                     }
                     else{
@@ -781,7 +782,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                     var myChoice=list[game.me.identity].randomGets(7);
                     if(duallist.length){
                         var myChoiceName=duallist.randomGet();
-                        if(list[game.me.identity].contains(myChoiceName)){
+                        if(list[game.me.identity].contains(myChoiceName)&&!myChoice.contains(myChoiceName)){
                             myChoice.randomRemove();
                             myChoice.push(myChoiceName);
                         }
