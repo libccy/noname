@@ -957,6 +957,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                player.addTempSkill('bfengshi4');
 	            }
 	        },
+			bfengshi4:{},
 	        yinbo:{
 	            enable:'phaseUse',
 	            usable:1,
