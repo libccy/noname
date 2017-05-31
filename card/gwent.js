@@ -411,6 +411,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						var rank=get.rank(current,true);
 						if(current.maxHp>=3){
 							if(current.hp<=1){
+								if(att>0) return att*3+2;
 								return att*3;
 							}
 							else if(current.hp==2){

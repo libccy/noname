@@ -1459,7 +1459,7 @@ div:not(.handcards)>.card>.info>span,
 	position: relative;
 	margin: 8px;
 }
-.content>.caption + .buttons{
+.content>.caption + .buttons:not(*:last-child){
 	margin: 0
 }
 .content>.config {

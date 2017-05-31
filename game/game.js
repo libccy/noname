@@ -34951,7 +34951,7 @@
                     _status.clicked2=true;
                 });
 				if(heightset){
-					dialog.style.height=(game.layout=='long2'?410:360)+'px';
+					dialog.style.height=(game.layout=='long2'?410:350)+'px';
 					dialog._scrollset=true;
 				}
                 dialog.getCurrentCapt=function(link,capt,noalph){
@@ -39976,7 +39976,7 @@
 						ui.dialog.classList.add('scroll1');
 						ui.dialog.classList.add('scroll2');
 						if(game.layout!='default'){
-							ui.dialog.style.height=Math.min(height1,(game.layout=='long2'&&ui.arena.classList.contains('choose-character'))?410:360)+'px';
+							ui.dialog.style.height=Math.min(height1,(game.layout=='long2'&&ui.arena.classList.contains('choose-character'))?410:350)+'px';
 							ui.dialog._scrollset=true;
 						}
 					}

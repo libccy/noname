@@ -6020,7 +6020,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						if(players[i]!=player&&players[i].getEquip(1)) list.push(players[i].getEquip(1));
     					}
     				}
-    				var dialog=ui.create.dialog('神工',list);
+    				var dialog=ui.create.dialog(get.prompt('shengong'),list);
     				for(var i=0;i<dialog.buttons.length;i++){
     					dialog.buttons[i].querySelector('.info').innerHTML=get.translation(get.owner(dialog.buttons[i].link));
     				}
