@@ -2318,10 +2318,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							seats.style.display='none';
 						}
 
-						dialog.add(ui.create.div('.placeholder'));
+						dialog.add(ui.create.div('.placeholder.add-setting'));
 						if(game.layout=='default'){
 							dialog.add(ui.create.div('.placeholder.add-setting'));
 							dialog.add(ui.create.div('.placeholder.add-setting'));
+						}
+						else{
+							dialog.content.lastChild.style.height='0px';
 						}
 					};
 					var removeSetting=function(){
