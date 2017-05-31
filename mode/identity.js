@@ -725,9 +725,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									node.remove();
 									game.uncheck();
 									game.check();
-									for(var i=0;i<seats.firstChild.childElementCount;i++){
-										if(get.distance(game.zhu,game.me,'absolute')===seats.firstChild.childNodes[i].link){
-											seats.firstChild.childNodes[i].classList.add('bluebg');
+									for(var i=0;i<seats.childElementCount;i++){
+										if(get.distance(game.zhu,game.me,'absolute')===seats.childNodes[i].link){
+											seats.childNodes[i].classList.add('bluebg');
 										}
 									}
 								}
