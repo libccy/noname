@@ -639,13 +639,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 					var addSetting=function(dialog){
 						dialog.add('选择身份').classList.add('add-setting');
-						var table=document.createElement('table');
-						table.style.margin='0 auto';
-						table.style.maxWidth='400px';
-						table.classList.add('pointertable');
+						var table=document.createElement('div');
 						table.classList.add('add-setting');
-						var tr=document.createElement('tr');
-						table.appendChild(tr);
+						table.style.margin='0';
+						table.style.width='100%';
+						table.style.position='relative';
 						var listi;
 						if(event.zhongmode){
 							listi=['random','zhu','mingzhong','zhong','nei','fan'];
@@ -655,14 +653,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 
 						for(var i=0;i<listi.length;i++){
-							var td=document.createElement('td');
-							tr.appendChild(td);
+							var td=ui.create.div('.shadowed.reduce_radius.pointerdiv');
+							td.style.position='relative';
+							td.style.display='inline-block';
 							td.link=listi[i];
-							td.style.fontSize='25px';
-							td.style.fontFamily='xinwei';
+							td.style.padding='5px';
+							td.style.paddingLeft='8px';
+							td.style.paddingRight='8px';
+							td.style.fontSize='18px';
+							td.style.margin='4px';
+							td.style.marginLeft='6px';
+							td.style.marginRight='6px';
 							if(td.link===game.me.identity){
-								td.classList.add('thundertext');
+								td.classList.add('bluebg');
 							}
+							table.appendChild(td);
 							td.innerHTML='<span>'+get.translation(listi[i]+'2')+'</span>';
 							td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
 								if(_status.dragged) return;
@@ -680,13 +685,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									delete game.zhu.isZhu;
 									delete game.zhu.identityShown;
 								}
-								var current=this.parentNode.querySelector('.thundertext');
+								var current=this.parentNode.querySelector('.bluebg');
 								if(current){
-									current.classList.remove('thundertext');
+									current.classList.remove('bluebg');
 								}
-								current=seats.querySelector('.thundertext');
+								current=seats.querySelector('.bluebg');
 								if(current){
-									current.classList.remove('thundertext');
+									current.classList.remove('bluebg');
 								}
 								if(link=='random'){
 									if(event.zhongmode){
@@ -697,12 +702,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									}
 									for(var i=0;i<this.parentNode.childElementCount;i++){
 										if(this.parentNode.childNodes[i].link==link){
-											this.parentNode.childNodes[i].classList.add('thundertext');
+											this.parentNode.childNodes[i].classList.add('bluebg');
 										}
 									}
 								}
 								else{
-									this.classList.add('thundertext');
+									this.classList.add('bluebg');
 								}
 								num=get.config('choice_'+link);
 								if(event.zhongmode){
@@ -722,7 +727,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									game.check();
 									for(var i=0;i<seats.firstChild.childElementCount;i++){
 										if(get.distance(game.zhu,game.me,'absolute')===seats.firstChild.childNodes[i].link){
-											seats.firstChild.childNodes[i].classList.add('thundertext');
+											seats.firstChild.childNodes[i].classList.add('bluebg');
 										}
 									}
 								}
@@ -743,33 +748,37 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						dialog.content.appendChild(table);
 
 						dialog.add('选择座位').classList.add('add-setting');
-						var seats=document.createElement('table');
-						seats.classList.add('pointertable');
+						var seats=document.createElement('div');
 						seats.classList.add('add-setting');
-						seats.style.margin='0 auto';
-						seats.style.maxWidth=(60*get.playerNumber()-1)+'px';
-						var tr=document.createElement('tr');
-						seats.appendChild(tr);
+						seats.style.margin='0';
+						seats.style.width='100%';
+						seats.style.position='relative';
 						for(var i=2;i<=game.players.length;i++){
-							var td=document.createElement('td');
-							tr.appendChild(td);
-							td.style.width='40px';
-							td.style.fontSize='25px';
-							td.style.fontFamily='xinwei';
-							td.innerHTML='<span>'+get.cnNumber(i,true)+'</span>';
+							var td=ui.create.div('.shadowed.reduce_radius.pointerdiv');
+							td.style.position='relative';
+							td.style.display='inline-block';
+							td.style.padding='5px';
+							td.style.paddingLeft='8px';
+							td.style.paddingRight='8px';
+							td.style.fontSize='18px';
+							td.style.margin='4px';
+							td.style.marginLeft='6px';
+							td.style.marginRight='6px';
+							td.innerHTML=get.cnNumber(i,true);
 							td.link=i-1;
+							seats.appendChild(td);
 							if(get.distance(game.zhu,game.me,'absolute')===i-1){
-								td.classList.add('thundertext');
+								td.classList.add('bluebg');
 							}
 							td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
 								if(_status.dragged) return;
 								if(_status.justdragged) return;
 								if(get.distance(game.zhu,game.me,'absolute')==this.link) return;
-								var current=this.parentNode.querySelector('.thundertext');
+								var current=this.parentNode.querySelector('.bluebg');
 								if(current){
-									current.classList.remove('thundertext');
+									current.classList.remove('bluebg');
 								}
-								this.classList.add('thundertext');
+								this.classList.add('bluebg');
 								for(var i=0;i<game.players.length;i++){
 									if(get.distance(game.players[i],game.me,'absolute')==this.link){
 										game.swapSeat(game.zhu,game.players[i],false);return;

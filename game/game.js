@@ -4674,8 +4674,8 @@
 						name:'专属武将出场率',
 						init:'increase',
 						item:{
-							increase:'大概率出现',
-							normal:'与其他武将一致',
+							increase:'大概率',
+							normal:'默认概率',
 							off:'不出现',
 						},
 						frequent:true
@@ -12951,7 +12951,7 @@
 					return this;
 				},
 				smoothAvatar:function(){
-					var div=ui.create.div('.fulldiv');
+					var div=ui.create.div('.fullsize');
 					div.style.background=getComputedStyle(this.node.avatar).background;
 					this.node.avatar.appendChild(div);
 					ui.refresh(div);
@@ -33785,7 +33785,7 @@
                         text.style.left='30px';
                         text.style.top='50px';
                         text.style.wordBreak='break-all';
-						var pre=ui.create.node('pre.fulldiv',text);
+						var pre=ui.create.node('pre.fullsize',text);
 						pre.style.margin=0;
 						pre.style.padding=0;
 						pre.style.position='relative';
@@ -39966,7 +39966,7 @@
 						ui.dialog.classList.add('scroll1');
 						ui.dialog.classList.add('scroll2');
 						if(game.layout!='default'){
-							ui.dialog.style.height=Math.min(height1,400)+'px';
+							ui.dialog.style.height=Math.min(height1,410)+'px';
 							ui.dialog._scrollset=true;
 						}
 					}

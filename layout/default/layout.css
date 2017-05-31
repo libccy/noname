@@ -1089,7 +1089,7 @@ body>.background.upper {
 	transition-property: top,box-shadow,opacity,transform;
 	transition-duration: 0.5s;
 }
-.fulldiv{
+.fullsize{
 	width: 100%;
 	height: 100%;
 	left: 0;

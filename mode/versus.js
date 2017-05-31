@@ -793,32 +793,36 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                     var addSetting=function(dialog){
     					dialog.add('选择座位').classList.add('add-setting');
     					var seats=document.createElement('table');
-                        seats.classList.add('pointertable');
-    					seats.classList.add('add-setting');
-    					seats.style.margin='0 auto';
-    					seats.style.width='200px';
-    					var tr=document.createElement('tr');
-    					seats.appendChild(tr);
+						seats.classList.add('add-setting');
+						seats.style.margin='0';
+						seats.style.width='100%';
+						seats.style.position='relative';
     					for(var i=1;i<=game.players.length;i++){
-    						var td=document.createElement('td');
-    						tr.appendChild(td);
-    						td.style.width='40px';
-    						td.style.fontSize='25px';
-    						td.style.fontFamily='xinwei';
-    						td.innerHTML='<span>'+get.cnNumber(i,true)+'</span>';
-    						td.link=i-1;
+                            var td=ui.create.div('.shadowed.reduce_radius.pointerdiv');
+							td.style.position='relative';
+							td.style.display='inline-block';
+							td.style.padding='5px';
+							td.style.paddingLeft='8px';
+							td.style.paddingRight='8px';
+							td.style.fontSize='18px';
+							td.style.margin='4px';
+							td.style.marginLeft='6px';
+							td.style.marginRight='6px';
+							td.innerHTML=get.cnNumber(i,true);
+							td.link=i-1;
+							seats.appendChild(td);
     						if(get.distance(_status.firstAct,game.me,'absolute')===i-1){
-    							td.classList.add('thundertext');
+    							td.classList.add('bluebg');
     						}
     						td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
     							if(_status.dragged) return;
     							if(_status.justdragged) return;
     							if(get.distance(_status.firstAct,game.me,'absolute')==this.link) return;
-    							var current=this.parentNode.querySelector('.thundertext');
+    							var current=this.parentNode.querySelector('.bluebg');
     							if(current){
-    								current.classList.remove('thundertext');
+    								current.classList.remove('bluebg');
     							}
-    							this.classList.add('thundertext');
+    							this.classList.add('bluebg');
     							_status.firstAct=game.me;
     							for(var i=0;i<this.link;i++){
     								_status.firstAct=_status.firstAct.previous;
@@ -1079,32 +1083,36 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				var addSetting=function(dialog){
     					dialog.add('选择座位').classList.add('add-setting');
     					var seats=document.createElement('table');
-                        seats.classList.add('pointertable');
-    					seats.classList.add('add-setting');
-    					seats.style.margin='0 auto';
-    					seats.style.width='200px';
-    					var tr=document.createElement('tr');
-    					seats.appendChild(tr);
-    					for(var i=1;i<=game.players.length;i++){
-    						var td=document.createElement('td');
-    						tr.appendChild(td);
-    						td.style.width='40px';
-    						td.style.fontSize='25px';
-    						td.style.fontFamily='xinwei';
-    						td.innerHTML='<span>'+get.cnNumber(i,true)+'</span>';
-    						td.link=i-1;
+						seats.classList.add('add-setting');
+						seats.style.margin='0';
+						seats.style.width='100%';
+						seats.style.position='relative';
+						for(var i=1;i<=game.players.length;i++){
+							var td=ui.create.div('.shadowed.reduce_radius.pointerdiv');
+							td.style.position='relative';
+							td.style.display='inline-block';
+							td.style.padding='5px';
+							td.style.paddingLeft='8px';
+							td.style.paddingRight='8px';
+							td.style.fontSize='18px';
+							td.style.margin='4px';
+							td.style.marginLeft='6px';
+							td.style.marginRight='6px';
+							td.innerHTML=get.cnNumber(i,true);
+							td.link=i-1;
+							seats.appendChild(td);
     						if(get.distance(_status.firstAct,game.me,'absolute')===i-1){
-    							td.classList.add('thundertext');
+    							td.classList.add('bluebg');
     						}
     						td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
     							if(_status.dragged) return;
     							if(_status.justdragged) return;
     							if(get.distance(_status.firstAct,game.me,'absolute')==this.link) return;
-    							var current=this.parentNode.querySelector('.thundertext');
+    							var current=this.parentNode.querySelector('.bluebg');
     							if(current){
-    								current.classList.remove('thundertext');
+    								current.classList.remove('bluebg');
     							}
-    							this.classList.add('thundertext');
+    							this.classList.add('bluebg');
     							_status.firstAct=game.me;
     							for(var i=0;i<this.link;i++){
     								_status.firstAct=_status.firstAct.previous;

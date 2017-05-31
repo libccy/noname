@@ -2280,31 +2280,35 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var addSetting=function(dialog){
 						dialog.add('选择座位').classList.add('add-setting');
 						var seats=document.createElement('table');
-						seats.classList.add('pointertable');
 						seats.classList.add('add-setting');
-						seats.style.margin='0 auto';
-						seats.style.maxWidth=(60*parseInt(get.config('player_number')))+'px';
-						var tr=document.createElement('tr');
-						seats.appendChild(tr);
+						seats.style.margin='0';
+						seats.style.width='100%';
+						seats.style.position='relative';
 						for(var i=1;i<=game.players.length;i++){
-							var td=document.createElement('td');
-							tr.appendChild(td);
-							td.style.width='40px';
-							td.style.fontSize='25px';
-							td.style.fontFamily='xinwei';
+							var td=ui.create.div('.shadowed.reduce_radius.pointerdiv');
+							td.style.position='relative';
+							td.style.display='inline-block';
+							td.style.padding='5px';
+							td.style.paddingLeft='8px';
+							td.style.paddingRight='8px';
+							td.style.fontSize='18px';
+							td.style.margin='4px';
+							td.style.marginLeft='6px';
+							td.style.marginRight='6px';
 							td.innerHTML='<span>'+get.cnNumber(i,true)+'</span>';
 							td.link=i-1;
+							seats.appendChild(td);
 							td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
 								if(_status.dragged) return;
 								if(_status.justdragged) return;
 								if(_status.cheat_seat){
-									_status.cheat_seat.classList.remove('thundertext');
+									_status.cheat_seat.classList.remove('bluebg');
 									if(_status.cheat_seat==this){
 										delete _status.cheat_seat;
 										return;
 									}
 								}
-								this.classList.add('thundertext');
+								this.classList.add('bluebg');
 								_status.cheat_seat=this;
 							});
 						}
