@@ -2314,8 +2314,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 
 						dialog.add(ui.create.div('.placeholder'));
-						dialog.add(ui.create.div('.placeholder'));
-						dialog.add(ui.create.div('.placeholder'));
+						if(game.layout=='default'){
+							dialog.add(ui.create.div('.placeholder'));
+							dialog.add(ui.create.div('.placeholder'));
+						}
 					};
 					var removeSetting=function(){
 						var dialog=_status.event.dialog;

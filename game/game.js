@@ -10582,7 +10582,7 @@
                     var directh=true;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'&&target.countCards('h')){
-							event.dialog.add('手牌');
+							event.dialog.addText('手牌');
 							var hs=target.getCards('h');
 							hs.randomSort();
 							if(event.visible||target.isUnderControl(true)){
@@ -10594,12 +10594,12 @@
 							}
 						}
 						else if(event.position[i]=='e'&&target.countCards('e')){
-							event.dialog.add('装备牌');
+							event.dialog.addText('装备牌');
 							event.dialog.add(target.getCards('e'));
                             directh=false;
 						}
 						else if(event.position[i]=='j'&&target.countCards('j')){
-							event.dialog.add('判定牌');
+							event.dialog.addText('判定牌');
 							event.dialog.add(target.getCards('j'));
                             directh=false;
 						}
@@ -10676,7 +10676,7 @@
                     var directh=true;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'&&target.countCards('h')){
-							event.dialog.add('手牌');
+							event.dialog.addText('手牌');
 							var hs=target.getCards('h');
 							hs.randomSort();
 							if(event.visible||target.isUnderControl(true)){
@@ -10688,12 +10688,12 @@
 							}
 						}
 						else if(event.position[i]=='e'&&target.countCards('e')){
-							event.dialog.add('装备牌');
+							event.dialog.addText('装备牌');
 							event.dialog.add(target.getCards('e'));
                             directh=false;
 						}
 						else if(event.position[i]=='j'&&target.countCards('j')){
-							event.dialog.add('判定牌');
+							event.dialog.addText('判定牌');
 							event.dialog.add(target.getCards('j'));
                             directh=false;
 						}
@@ -10787,7 +10787,7 @@
                     var directh=true;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'&&target.countCards('h')){
-							event.dialog.add('手牌');
+							event.dialog.addText('手牌');
 							var hs=target.getCards('h');
 							hs.randomSort();
 							if(event.visible||target.isUnderControl(true)){
@@ -10799,12 +10799,12 @@
 							}
 						}
 						else if(event.position[i]=='e'&&target.countCards('e')){
-							event.dialog.add('装备牌');
+							event.dialog.addText('装备牌');
 							event.dialog.add(target.getCards('e'));
                             directh=false;
 						}
 						else if(event.position[i]=='j'&&target.countCards('j')){
-							event.dialog.add('判定牌');
+							event.dialog.addText('判定牌');
 							event.dialog.add(target.getCards('j'));
                             directh=false;
 						}
@@ -39959,13 +39959,17 @@
 					}
 				}
 				else{
-					if(height1<=190||(height2>=height1&&height2>=210)){
+					if(!ui.dialog._scrollset&&(height1<=190||(height2>=height1&&height2>=210))){
 						ui.dialog.classList.remove('scroll1');
 						ui.dialog.classList.remove('scroll2');
 					}
 					else{
 						ui.dialog.classList.add('scroll1');
 						ui.dialog.classList.add('scroll2');
+						if(game.layout!='default'){
+							ui.dialog.style.height=Math.min(height1,400)+'px';
+							ui.dialog._scrollset=true;
+						}
 					}
 					if(game.layout=='long2'){
 						if(height1+240>=ui.arena.offsetHeight){
