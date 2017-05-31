@@ -32110,6 +32110,9 @@
                                     list3.push(i);
                                 }
                             }
+							list3.sort(function(a,b){
+								return a>b?1:-1;
+							});
     						selectname.onchange=function(){
                                 var skills;
     							skillopt.innerHTML='';
