@@ -4143,8 +4143,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{global:'phaseEnd'},
     			check:function(event,player){
     				if(get.damageEffect(event.player,player,player,'thunder')>0){
-    					if(get.is.altered('touxi')){
-    						if(get.attitude(player,event.player)<0&&event.player.hp==1&&player.hp>1){
+    					if(get.is.altered('touxi')&&get.attitude(player,event.player)<0&&player.countCards('he')){
+    						if(event.player.hp==1&&player.hp>1){
     							return true;
     						}
     					}
@@ -4172,18 +4172,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					event.finish();
     				}
     				else{
-    					if(get.is.altered('touxi')){
-    						player.damage(trigger.player);
-    					}
-    					else{
-    						if(player.countCards('he')){
-    	                        var att=get.attitude(trigger.player,player);
-    							trigger.player.discardPlayerCard(player,'he',function(button){
-    	                            if(att>0) return 0;
-    	                            return get.buttonValue(button);
-    	                        });
-    						}
-    					}
+						if(player.countCards('he')){
+	                        var att=get.attitude(trigger.player,player);
+							trigger.player[get.is.altered('touxi')?'gainPlayerCard':'discardPlayerCard'](player,'he',function(button){
+	                            if(att>0) return 0;
+	                            return get.buttonValue(button);
+	                        });
+						}
     				}
     			},
     			ai:{
@@ -9508,7 +9503,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
     		touxi:'偷袭',
     		touxi_info:'在其他角色的结束阶段，你可以进行一次判定，若结果为黑色，你对其造成一点雷电伤害，且直到下一回合开始不能再次发动偷袭；若结果为红色，对方可以弃置你的一张牌',
-    		touxi_info_alter:'在其他角色的结束阶段，你可以进行一次判定，若结果为黑色，你对其造成一点雷电伤害，且直到下一回合开始不能再次发动偷袭；若结果为红色，对方对你造成一点伤害',
+    		touxi_info_alter:'在其他角色的结束阶段，你可以进行一次判定，若结果为黑色，你对其造成一点雷电伤害，且直到下一回合开始不能再次发动偷袭；若结果为红色，对方可以获得你的一张牌',
     		minjing:'明镜',
     		minjing_info:'若你没有防具牌，你视为装备了光纱天衣',
     		jqimou:'奇谋',

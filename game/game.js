@@ -8954,6 +8954,9 @@
 							if(typeof info.prompt2=='function'){
 								next.prompt2=info.prompt2(trigger,player);
 							}
+							else if(info.prompt2!=false&&lib.translate[event.skill+'_info']){
+								next.prompt2=lib.translate[event.skill+'_info'];
+							}
     					}
     				}
     				"step 3"
@@ -9699,7 +9702,7 @@
 								}
 								event.dialog=ui.create.dialog(str);
 								if(event.prompt2){
-									event.dialog.addText(event.prompt2);
+									event.dialog.addText(event.prompt2,event.prompt2.length<=20);
 								}
                                 if(Array.isArray(event.selectCard)){
                                     event.promptbar=event.dialog.add('0/'+get.numStr(event.selectCard[1],'card'));
@@ -10229,7 +10232,7 @@
 							}
 							event.dialog=ui.create.dialog(str);
 							if(event.prompt2){
-								event.dialog.addText(event.prompt2);
+								event.dialog.addText(event.prompt2,event.prompt2.length<=20);
 							}
 							event.promptbar=event.dialog.add('0/'+get.numStr(event.selectCard[1],'card'));
 							event.custom.add.card=function(){
@@ -10476,7 +10479,7 @@
 						else if(event.prompt){
 							event.dialog=ui.create.dialog(event.prompt);
 							if(event.prompt2){
-								event.dialog.addText(event.prompt2);
+								event.dialog.addText(event.prompt2,event.prompt2.length<=20);
 							}
 						}
 						game.pause();
