@@ -1030,7 +1030,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					};
 					if(lib.onfree){
 						lib.onfree.push(function(){
-							event.dialogxx=ui.create.characterDialog();
+							event.dialogxx=ui.create.characterDialog('heightset');
 							if(ui.cheat2){
 								ui.cheat2.animate('controlpressdownx',500);
 								ui.cheat2.classList.remove('disabled');
@@ -1038,7 +1038,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						});
 					}
 					else{
-						event.dialogxx=ui.create.characterDialog();
+						event.dialogxx=ui.create.characterDialog('heightset');
 					}
 
 					ui.create.cheat2=function(){

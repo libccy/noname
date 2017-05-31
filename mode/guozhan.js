@@ -2411,7 +2411,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							ui.arena.classList.remove('selecting');
 						};
 						var createCharacterDialog=function(){
-							event.dialogxx=ui.create.characterDialog(function(i){
+							event.dialogxx=ui.create.characterDialog('heightset',function(i){
 								if(i.indexOf('gz_shibing')==0) return true;
 								if(get.config('onlyguozhan')){
 									if(!lib.characterPack.mode_guozhan[i]) return true;

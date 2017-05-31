@@ -10584,7 +10584,7 @@
                     var directh=true;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'&&target.countCards('h')){
-							event.dialog.addText('手牌');
+							event.dialog.addText('手牌区');
 							var hs=target.getCards('h');
 							hs.randomSort();
 							if(event.visible||target.isUnderControl(true)){
@@ -10596,12 +10596,12 @@
 							}
 						}
 						else if(event.position[i]=='e'&&target.countCards('e')){
-							event.dialog.addText('装备牌');
+							event.dialog.addText('装备区');
 							event.dialog.add(target.getCards('e'));
                             directh=false;
 						}
 						else if(event.position[i]=='j'&&target.countCards('j')){
-							event.dialog.addText('判定牌');
+							event.dialog.addText('判定区');
 							event.dialog.add(target.getCards('j'));
                             directh=false;
 						}
@@ -10678,7 +10678,7 @@
                     var directh=true;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'&&target.countCards('h')){
-							event.dialog.addText('手牌');
+							event.dialog.addText('手牌区');
 							var hs=target.getCards('h');
 							hs.randomSort();
 							if(event.visible||target.isUnderControl(true)){
@@ -10690,12 +10690,12 @@
 							}
 						}
 						else if(event.position[i]=='e'&&target.countCards('e')){
-							event.dialog.addText('装备牌');
+							event.dialog.addText('装备区');
 							event.dialog.add(target.getCards('e'));
                             directh=false;
 						}
 						else if(event.position[i]=='j'&&target.countCards('j')){
-							event.dialog.addText('判定牌');
+							event.dialog.addText('判定区');
 							event.dialog.add(target.getCards('j'));
                             directh=false;
 						}
@@ -10789,7 +10789,7 @@
                     var directh=true;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'&&target.countCards('h')){
-							event.dialog.addText('手牌');
+							event.dialog.addText('手牌区');
 							var hs=target.getCards('h');
 							hs.randomSort();
 							if(event.visible||target.isUnderControl(true)){
@@ -10801,12 +10801,12 @@
 							}
 						}
 						else if(event.position[i]=='e'&&target.countCards('e')){
-							event.dialog.addText('装备牌');
+							event.dialog.addText('装备区');
 							event.dialog.add(target.getCards('e'));
                             directh=false;
 						}
 						else if(event.position[i]=='j'&&target.countCards('j')){
-							event.dialog.addText('判定牌');
+							event.dialog.addText('判定区');
 							event.dialog.add(target.getCards('j'));
                             directh=false;
 						}
@@ -34442,7 +34442,7 @@
                 //         return ui.create.characterDialog2.apply(this,arguments);
                 //     }
                 // }
-				var filter,str,noclick,thisiscard,seperate,expandall,onlypack;
+				var filter,str,noclick,thisiscard,seperate,expandall,onlypack,heightset;
 				for(var i=0;i<arguments.length;i++){
 					if(arguments[i]==='thisiscard'){
 						thisiscard=true;
@@ -34450,6 +34450,9 @@
                     else if(arguments[i]==='expandall'){
                         expandall=true;
                     }
+					else if(arguments[i]==='heightset'){
+						heightset=true;
+					}
 					else if(typeof arguments[i]=='string'&&arguments[i].indexOf('onlypack:')==0){
 						onlypack=arguments[i].slice(9);
 					}
@@ -34947,6 +34950,10 @@
                 dialog.addEventListener(lib.config.touchscreen?'touchend':'mouseup',function(){
                     _status.clicked2=true;
                 });
+				if(heightset){
+					dialog.style.height=(game.layout=='long2'?410:360)+'px';
+					dialog._scrollset=true;
+				}
                 dialog.getCurrentCapt=function(link,capt,noalph){
                     var currentcapt=noalph?this.currentcapt2:this.currentcapt;
                     if(this.seperatelist&&noalph){
@@ -39969,7 +39976,7 @@
 						ui.dialog.classList.add('scroll1');
 						ui.dialog.classList.add('scroll2');
 						if(game.layout!='default'){
-							ui.dialog.style.height=Math.min(height1,410)+'px';
+							ui.dialog.style.height=Math.min(height1,(game.layout=='long2'&&ui.arena.classList.contains('choose-character'))?410:360)+'px';
 							ui.dialog._scrollset=true;
 						}
 					}

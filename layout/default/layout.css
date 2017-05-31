@@ -1459,6 +1459,9 @@ div:not(.handcards)>.card>.info>span,
 	position: relative;
 	margin: 8px;
 }
+.content>.caption + .buttons{
+	margin: 0
+}
 .content>.config {
 	height: 20px;
 	line-height: 20px;

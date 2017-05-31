@@ -634,7 +634,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     							delete _status.createControl;
     						}
     						var createCharacterDialog=function(){
-    							event.dialogxx=ui.create.characterDialog(function(name){
+    							event.dialogxx=ui.create.characterDialog('heightset',function(name){
     								if(lib.character[name][4]){
     									if(lib.character[name][4].contains('jiangeboss')) return true;
     									if(lib.character[name][4].contains('jiangemech')) return true;
@@ -887,7 +887,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						delete _status.createControl;
 					}
 					var createCharacterDialog=function(){
-						event.dialogxx=ui.create.characterDialog(function(name){
+						event.dialogxx=ui.create.characterDialog('heightset',function(name){
                             if(name==event.friendChoice) return true;
 							if(lib.character[name][1]!=game.me.identity) return true;
 						});
@@ -1213,7 +1213,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				};
     				if(lib.onfree){
     					lib.onfree.push(function(){
-    						event.dialogxx=ui.create.characterDialog();
+    						event.dialogxx=ui.create.characterDialog('heightset');
     						if(ui.cheat2){
                                 ui.cheat2.animate('controlpressdownx',500);
     							ui.cheat2.classList.remove('disabled');
@@ -1221,7 +1221,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     					});
     				}
     				else{
-    					event.dialogxx=ui.create.characterDialog();
+    					event.dialogxx=ui.create.characterDialog('heightset');
     				}
     				ui.create.cheat2=function(){
     					ui.cheat2=ui.create.control('自由选将',function(){
@@ -1432,10 +1432,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     					var dialog=event.xdialog;
     					if(!dialog){
     						if(get.config('expand_dialog')){
-    							dialog=event.xdialog||ui.create.characterDialog(event.filterChoice,'expandall');
+    							dialog=event.xdialog||ui.create.characterDialog('heightset',event.filterChoice,'expandall');
     						}
     						else{
-    							dialog=event.xdialog||ui.create.characterDialog(event.filterChoice);
+    							dialog=event.xdialog||ui.create.characterDialog('heightset',event.filterChoice);
     						}
     					}
     					var names=[];
@@ -2235,7 +2235,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				event.videoId=lib.status.videoId++;
     				var func=function(filter,id,selected,map,choiceFour){
     					lib.choiceFour=choiceFour;
-    					var dialog=ui.create.characterDialog(filter,'expandall').open();
+    					var dialog=ui.create.characterDialog('heightset',filter,'expandall').open();
     					dialog.videoId=id;
     					for(var i in map){
     						var player=lib.playerOL[i];
