@@ -791,9 +791,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                     dialog.buttons[7].node.name.innerHTML=get.verticalStr('队友选择');
 
                     var addSetting=function(dialog){
-    					dialog.add('选择座位');
+    					dialog.add('选择座位').classList.add('add-setting');
     					var seats=document.createElement('table');
-    					seats.classList.add('pointertable');
+                        seats.classList.add('pointertable');
+    					seats.classList.add('add-setting');
     					seats.style.margin='0 auto';
     					seats.style.width='200px';
     					var tr=document.createElement('tr');
@@ -840,14 +841,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                         }
     				};
     				var removeSetting=function(){
-    					var dialog=_status.event.dialog;
-    					if(dialog.querySelector('table')&&!get.config('change_identity')){
-    						dialog.querySelector('table').previousSibling.remove();
-    						dialog.querySelector('table').nextSibling.remove();
-    						dialog.querySelector('table').nextSibling.remove();
-    						dialog.querySelector('table').nextSibling.remove();
-    						dialog.querySelector('table').remove();
-    					}
+                        var dialog=_status.event.dialog;
+						if(dialog){
+							dialog.style.height='';
+							delete dialog._scrollset;
+							var list=Array.from(dialog.querySelectorAll('.add-setting'));
+							while(list.length){
+								list.shift().remove();
+							}
+                            ui.update();
+						}
     				};
     				event.addSetting=addSetting;
     				event.removeSetting=removeSetting;
@@ -1074,9 +1077,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				event.list=list;
 
     				var addSetting=function(dialog){
-    					dialog.add('选择座位');
+    					dialog.add('选择座位').classList.add('add-setting');
     					var seats=document.createElement('table');
-    					seats.classList.add('pointertable');
+                        seats.classList.add('pointertable');
+    					seats.classList.add('add-setting');
     					seats.style.margin='0 auto';
     					seats.style.width='200px';
     					var tr=document.createElement('tr');
@@ -1132,19 +1136,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
     					dialog.add(ui.create.div('.placeholder'));
                         if(game.layout=='default'){
-                            dialog.add(ui.create.div('.placeholder'));
-        					dialog.add(ui.create.div('.placeholder'));
+                            dialog.add(ui.create.div('.placeholder.add-setting'));
+        					dialog.add(ui.create.div('.placeholder.add-setting'));
                         }
     				};
     				var removeSetting=function(){
-    					var dialog=_status.event.dialog;
-    					if(dialog.querySelector('table')&&!get.config('change_identity')){
-    						dialog.querySelector('table').previousSibling.remove();
-    						dialog.querySelector('table').nextSibling.remove();
-    						dialog.querySelector('table').nextSibling.remove();
-    						dialog.querySelector('table').nextSibling.remove();
-    						dialog.querySelector('table').remove();
-    					}
+                        var dialog=_status.event.dialog;
+						if(dialog){
+							dialog.style.height='';
+							delete dialog._scrollset;
+							var list=Array.from(dialog.querySelectorAll('.add-setting'));
+							while(list.length){
+								list.shift().remove();
+							}
+                            ui.update();
+						}
     				};
     				event.addSetting=addSetting;
     				event.removeSetting=removeSetting;

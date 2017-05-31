@@ -4517,7 +4517,6 @@
                         else{
                             map.replace_handcard_two.hide();
                             map.replace_character_two.hide();
-                            map.change_identity.remove();
 							map.two_assign.hide();
                             map.two_phaseswap.hide();
                         }
