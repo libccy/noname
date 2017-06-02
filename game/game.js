@@ -10982,7 +10982,12 @@
 						event.finish();
 						return;
 					}
-					player.lose(cards);
+					var next=player.lose(cards);
+					for(var i=0;i<cards.length;i++){
+						if(!next.cards.contains(cards[i])){
+							cards[i].discard();
+						}
+					}
 					player.using=cards;
 					var cardaudio=true;
 					if(event.skill){
