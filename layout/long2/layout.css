@@ -165,6 +165,7 @@
 }
 #arena.choose-character>.dialog .placeholder{
     margin-bottom: 4px;
+    height: 0px;
 }
 #arena.choose-character>.dialog.noupdate .placeholder{
     margin-bottom: 0;

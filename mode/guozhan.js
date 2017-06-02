@@ -2319,13 +2319,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 
 						dialog.add(ui.create.div('.placeholder.add-setting'));
-						if(game.layout=='default'){
-							dialog.add(ui.create.div('.placeholder.add-setting'));
-							dialog.add(ui.create.div('.placeholder.add-setting'));
-						}
-						else{
-							dialog.content.lastChild.style.height='0px';
-						}
+						dialog.add(ui.create.div('.placeholder.add-setting'));
+						if(get.is.phoneLayout()) dialog.add(ui.create.div('.placeholder.add-setting'));
 					};
 					var removeSetting=function(){
 						var dialog=_status.event.dialog;
