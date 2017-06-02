@@ -1363,7 +1363,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				chooseButton:{
 					dialog:function(event,player){
-						return ui.create.dialog('权杖：选择一张牌使用',event.lanquancards);
+						return ui.create.dialog('选择一张牌使用',event.lanquancards);
 					},
 					filter:function(button,player){
 						var evt=_status.event.getParent();
@@ -1515,7 +1515,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hunmo_info:'出牌阶段，你可以令一名手牌数少于2的角色摸一张牌，或令一名手牌数大于2的角色弃置一张手牌，每阶段对除你之外的每名角色最多发动一次，对你最多发动X+1次，X为你本回合对其他角色发动魂墨的次数',
 			huihun:'回魂',
 			huihun_info:'结束阶段，你可以从弃牌堆中获得本回合使用的前两张红色牌',
-			lanquan:'揽权',
+			lanquan:'远略',
 			lanquan_backup:'揽权',
 			lanquan_info:'出牌阶段限一次，你可以观看牌堆顶的6张牌，并选择一张使用',
 
