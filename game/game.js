@@ -10396,6 +10396,7 @@
         						item.firstChild.link=event.controls[i];
                             }
 							event.dialog.forcebutton=true;
+							event.dialog.classList.add('forcebutton');
                             event.dialog.open();
                         }
 						else{

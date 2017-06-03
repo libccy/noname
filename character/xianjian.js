@@ -890,7 +890,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					content:'limited'
 				},
 				check:function(event,player){
-					console.log(player.name,event.player.name);
 					return get.attitude(player,event.player)>=3;
 				},
     			filter:function(event,player){

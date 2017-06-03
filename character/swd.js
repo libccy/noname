@@ -7268,15 +7268,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 line:'fire',
                 filter:function(event,player){
                     return !player.storage.xuehuang&&
-    					player.countCards('he',{color:'red'})>0&&
-    					player.countCards('he',{color:'black'})==0;
+    					player.countCards('h',{color:'red'})>0&&
+    					player.countCards('h',{color:'black'})==0;
                 },
                 content:function(){
     				'step 0'
     				player.storage.xuehuang=true;
                     player.awakenSkill('xuehuang');
                     player.showHandcards();
-    				var cards=player.getCards('he');
+    				var cards=player.getCards('h');
                     player.discard(cards);
     				event.num=cards.length;
     				'step 1'
@@ -7295,7 +7295,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     order:9,
                     result:{
                         player:function(player){
-    						if(player.countCards('he',{color:'red'})<2) return 0;
+    						if(player.countCards('h',{color:'red'})<2) return 0;
     						if(player.hasCard(function(card){
     							return get.color(card)=='red'&&get.value(card)>8;
     						})){
@@ -8625,6 +8625,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				if(event.isMine()){
     					ui.auto.hide();
     					event.dialog=ui.create.dialog('脉轮：选择一个效果');
+                        event.dialog.forcebutton=true;
+                        event.dialog.classList.add('forcebutton');
     					var effects=lib.skill.mailun.effects;
     					var clickItem=function(){
     						event.choice=this.link;
@@ -9737,7 +9739,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		yulin_info:'每当你即将受到伤害，你可以弃置一张装备牌抵消此伤害',
     		funiao_info:'出牌阶段限一次，你可以将一张手牌交给一名其他角色，然后摸一张牌',
     		funiao_old_info:'出牌阶段，你可以交给一名角色一张手牌，然后观看其手牌，每个阶段对一名角色只能发动一次',
-    		xuehuang_info:'限定技，出牌阶段，若你没有黑色牌，你可以展示并弃置所有牌，每弃置一张牌视为使用一张火杀，随机指定两名敌人为目标',
+    		xuehuang_info:'限定技，出牌阶段，若你没有黑色手牌，你可以展示并弃置所有手牌，每弃置一张牌视为使用一张火杀，随机指定两名敌人为目标',
     		zhuyu_info:'每当一名横置的角色即将受到伤害时，你可以弃置一张红色牌令此伤害+1并变为火属性',
     		ningshuang_info:'每当你成为黑色牌的目标，你可以弃置一张黑色牌将其横置，并摸一张牌，若其已经模置则改为将其翻面',
     		zaowu_old_info:'出牌阶段，你可以弃置三张不同类型的牌，创造任意两张牌并获得之',

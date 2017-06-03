@@ -16,7 +16,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_laduoweide:['male','wei',4,['gwxiaoshou']],
 			gw_dagong:['male','qun',4,['tianbian']],
 
-			gw_bulanwang:['male','qun',4,['bolang']],
+			// gw_bulanwang:['male','qun',4,['bolang']],
 			// gw_kuite:['male','qun',3,[]],
 			// gw_fuertaisite:['male','qun',3,[]],
 			// gw_hengsaite:['male','wei',4,['jinsheng']],
@@ -1518,7 +1518,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huihun:'回魂',
 			huihun_info:'结束阶段，你可以从弃牌堆中获得本回合使用的前两张红色牌',
 			lanquan:'远略',
-			lanquan_backup:'揽权',
+			lanquan_backup:'远略',
 			lanquan_info:'出牌阶段限一次，你可以观看牌堆顶的6张牌，并选择一张使用',
 
 			chaoyong:'潮涌',

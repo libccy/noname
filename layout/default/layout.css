@@ -1424,6 +1424,10 @@ div:not(.handcards)>.card>.info>span,
 	bottom: auto !important;
 	min-height: 0px !important;
 }
+.dialog.forcebutton{
+	width: 400px;
+	left: calc(50% - 200px);
+}
 .dialog.nobutton .content>div:last-child {
 	padding-bottom: 8px;
 }
