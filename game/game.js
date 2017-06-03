@@ -36275,7 +36275,7 @@
 				if(!noclick){
 					lib.setIntro(node);
 				}
-				node.storage={uncheck:[]};
+				node.storage={uncheck:[],vanishtag:[]};
 				if(info!='noclick'){
 					node.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.card);
 					if(lib.config.touchscreen){
@@ -41171,9 +41171,10 @@
 						lib.onwash[i]();
 					}
 					for(i=0;i<ui.discardPile.childNodes.length;i++){
-						if(get.info(ui.discardPile.childNodes[i]).vanish||
-						ui.discardPile.childNodes[i].storage.vanish) continue;
-						cards.push(ui.discardPile.childNodes[i]);
+						var currentcard=ui.discardPile.childNodes[i];
+						currentcard.storage.vanishtag=[];
+						if(get.info(currentcard).vanish||currentcard.storage.vanish) continue;
+						cards.push(currentcard);
 					}
 					cards.randomSort();
 					for(var i=0;i<cards.length;i++){

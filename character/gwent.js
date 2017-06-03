@@ -16,7 +16,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_laduoweide:['male','wei',4,['gwxiaoshou']],
 			gw_dagong:['male','qun',4,['tianbian']],
 
-			// gw_bulanwang:['male','qun',4,['jielve']],
+			gw_bulanwang:['male','qun',4,['bolang']],
 			// gw_kuite:['male','qun',3,[]],
 			// gw_fuertaisite:['male','qun',3,[]],
 			// gw_hengsaite:['male','wei',4,['jinsheng']],
@@ -1464,6 +1464,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_zhangyujushou:'章鱼巨兽',
 			gw_zhuoertan:'卓尔坦',
 
+			bolang:'搏浪',
+			bolang_info:'准备阶段，你可以观看牌堆顶的6张牌，然后将其中至多3张移入弃牌堆；每当你造成一次伤害，你可以从弃牌堆中获得一张以此法移入弃牌堆的牌',
 			lingji:'灵计',
 			lingji_info:'出牌阶段限一次，你可以摸两张牌并弃置两张牌，若弃置的牌花色相同，你获得一张随机铜卡；若弃置的牌点数相同，你获得一张随机银卡',
 			gwjinyan:'金焰',
