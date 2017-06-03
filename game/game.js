@@ -26976,23 +26976,29 @@
 			}
 			else{
 				if(key){
-					if(value==undefined){
-						if(mode==lib.config.mode) delete lib.storage[key];
-					}
-					else{
-						if(mode==lib.config.mode) lib.storage[key]=value;
-					}
-					game.getDB('data',mode,function(config){
-						if(!config) config={};
+					if(mode==lib.config.mode){
 						if(value==undefined){
-							delete config[key];
+							delete lib.storage[key];
 						}
 						else{
-							config[key]=value;
+							lib.storage[key]=value;
 						}
-						config.version=lib.version;
-						game.putDB('data',mode,config);
-					});
+						lib.storage.version=lib.version;
+						game.putDB('data',mode,lib.storage);
+					}
+					else{
+						game.getDB('data',mode,function(config){
+							if(!config) config={};
+							if(value==undefined){
+								delete config[key];
+							}
+							else{
+								config[key]=value;
+							}
+							config.version=lib.version;
+							game.putDB('data',mode,config);
+						});
+					}
 				}
 				else{
 					game.putDB('data',mode,get.copy(lib.storage));
