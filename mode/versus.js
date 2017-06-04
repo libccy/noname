@@ -41,6 +41,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                     lib.character[i]=lib.characterPack.mode_versus[i];
                 }
                 lib.cardPack.mode_versus=['zong','xionghuangjiu','tongzhougongji','lizhengshangyou'];
+                lib.translate.mode_versus_character_config='四国武将';
             }
     	},
     	start:function(){
