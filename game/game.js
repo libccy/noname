@@ -25945,6 +25945,10 @@
 						if(event.replacing){
 							this.link=event.replacing;
 							this.setBackground(event.replacing,'character');
+
+							this.nodename.innerHTML=get.slimName(event.replacing);
+							this.nodename.dataset.nature=get.groupnature(lib.character[event.replacing][1]);
+
 							delete event.replacing;
 							if(this.classList.contains('moved')){
 								event.custom.add.window();

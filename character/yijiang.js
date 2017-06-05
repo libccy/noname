@@ -4996,7 +4996,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				"step 1"
     				if(result.control=='移动装备'){
     					player.logSkill('qieting',trigger.player);
-    					player.choosePlayerCard(trigger.player,'e','将一张装备牌移至你的装备区');
+    					player.choosePlayerCard(trigger.player,'e','将一张装备牌移至你的装备区').set('filterButton',function(button){
+                            return !_status.event.player.getEquip(button.link);
+                        });
     				}
     				else{
     					if(result.control=='draw_card'){
