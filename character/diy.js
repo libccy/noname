@@ -868,7 +868,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.skill!='luweiyan') return false;
 					for(var i=0;i<event.targets.length;i++){
-						if(player.canUse('sha',event.targets[i]),false){
+						if(player.canUse('sha',event.targets[i],false)){
 							return true;
 						}
 					}

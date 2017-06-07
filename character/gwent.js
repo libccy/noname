@@ -21,7 +21,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			// gw_fuertaisite:['male','qun',3,[]],
 			// gw_hengsaite:['male','wei',4,['jinsheng']],
 			gw_fulisi:['male','qun',3,['lanquan']],
-			gw_gaier:['male','qun',3,['hunmo']],
+			gw_gaier:['male','shu',3,['hunmo']],
 
 			gw_jieluote:['male','qun',6,['fayin']],
 			gw_yenaifa:['female','qun',3,['xuezhou']],
@@ -443,20 +443,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			hunmo:{
 				enable:'phaseUse',
+				usable:1,
 				filter:function(event,player){
 					return game.hasPlayer(function(current){
 						return lib.skill.hunmo.filterTarget(null,player,current);
 					});
 				},
 				filterTarget:function(card,player,target){
+					if(target==player) return false;
 					if(target.countCards('h')==2) return false;
-					if(target!=player){
-						return !target.hasSkill('hunmo2');
-					}
-					else{
-						return player.storage.hunmo2>=player.storage.hunmo1;
-					}
+					return true;
 				},
+				selectTarget:[1,Infinity],
 				content:function(){
 					var nh=target.countCards('h');
 					if(nh<2){
@@ -465,16 +463,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else if(nh>2){
 						target.chooseToDiscard('h',true);
 					}
-					if(target!=player){
-						target.addTempSkill('hunmo2');
-						player.storage.hunmo2++;
-					}
-					else{
-						player.storage.hunmo1++;
+				},
+				contentAfter:function(){
+					var nh=player.countCards('h');
+					if(nh<targets.length){
+						player.draw(targets.length-nh);
 					}
 				},
 				ai:{
-					order:11,
+					order:function(){
+						var player=_status.event.player;
+						if(player.countCards('h')<2) return 11;
+						return (_status.event.getRand()<0.5)?4:1;
+					},
 					threaten:1.2,
 					result:{
 						target:function(player,target){
@@ -488,22 +489,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 0;
 						}
 					}
-				},
-				group:'hunmo_count',
-				subSkill:{
-					count:{
-						trigger:{player:'phaseUseBegin'},
-						silent:true,
-						content:function(){
-							player.storage.hunmo1=0;
-							player.storage.hunmo2=0;
-						}
-					}
 				}
 			},
-			hunmo2:{},
-			hunmo3:{},
-			hunmo4:{},
 			shuijian:{
 				trigger:{player:'phaseBegin'},
 				direct:true,
@@ -1514,7 +1501,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwbaquan:'霸权',
 			gwbaquan_info:'出牌阶段限一次，你可以获得一名其他角色的所有牌，然后还给其等量的牌，若你归还的牌均为你获得的牌且该角色体力值不小于你，你对其造成一点伤害',
 			hunmo:'魂墨',
-			hunmo_info:'出牌阶段，你可以令一名手牌数少于2的角色摸一张牌，或令一名手牌数大于2的角色弃置一张手牌，每阶段对除你之外的每名角色最多发动一次，对你最多发动X+1次，X为你本回合对其他角色发动魂墨的次数',
+			hunmo_info:'出牌阶段限一次，你可以选择任意名手牌数不等于2的其他角色，令其中手牌数小于2的角色摸一张牌，手牌数大于2的角色弃置一张手牌，然后你将手牌数补至选定的目标数',
 			huihun:'回魂',
 			huihun_info:'结束阶段，你可以从弃牌堆中获得本回合使用的前两张红色牌',
 			lanquan:'远略',
