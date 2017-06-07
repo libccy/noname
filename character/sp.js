@@ -2251,6 +2251,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				},
     				result:{
     					player:function(player,target){
+                            if(get.attitude(player,target)<0) return -1;
     						var eff=get.recoverEffect(target,player,player);
     						if(eff<0) return 0;
     						if(eff>0){
