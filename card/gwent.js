@@ -924,6 +924,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:7,
 				}
 			},
+
 			gw_zirankuizeng:{
 				fullborder:'silver',
 				type:'spell',
@@ -967,7 +968,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:7,
 				}
 			},
-
 			gw_qinpendayu:{
 				fullborder:'bronze',
 				type:'spell',
@@ -1027,9 +1027,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'spell_bronze',
 				enable:true,
 				usable:1,
-				filterTarget:function(card,player,target){
-					return !target.isLinked();
-				},
+				filterTarget:true,
 				selectTarget:-1,
 				content:function(){
 					target.addSkill('gw_ciguhanshuang');
