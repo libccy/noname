@@ -652,6 +652,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				onLose:function(){
 					player.unmarkSkill('lianyaohu_skill');
 				},
+				clearLose:true,
 				ai:{
 					equipValue:6
 				},
@@ -1949,6 +1950,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				equipDelay:false,
 				loseDelay:false,
+				clearLose:true,
 				onLose:function(){
 					player.storage.nigong=0;
 					player.unmarkSkill('nigong');
@@ -1964,6 +1966,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				skills:['xujin'],
 				equipDelay:false,
 				loseDelay:false,
+				clearLose:true,
 				onLose:function(){
 					player.storage.xujin=0;
 				},

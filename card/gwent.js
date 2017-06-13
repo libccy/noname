@@ -678,7 +678,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'spell_silver',
 				vanish:true,
 				enable:true,
-				filterTarget:true,
+				filterTarget:function(card,player,target){
+					return target!=player;
+				},
 				content:function(){
 					'step 0'
 					if(!player.countCards('h')){

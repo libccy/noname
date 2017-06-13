@@ -253,6 +253,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
+				clearLose:true,
 				equipDelay:false,
 				loseDelay:false,
 				skills:['muniu_skill','muniu_skill2','muniu_skill6','muniu_skill7'],

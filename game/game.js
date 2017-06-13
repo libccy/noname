@@ -16151,6 +16151,12 @@
                                 this.removeSkillTrigger(info.skills[j]);
                             }
                         }
+						if(info.clearLose&&typeof info.onLose=='function'){
+							var next=game.createEvent('lose_'+card.name);
+        					next.setContent(info.onLose);
+        					next.player=this;
+        					next.card=card;
+						}
                     }
                     else{
                         var es=this.getCards('e');
