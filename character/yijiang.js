@@ -2964,6 +2964,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return event.skill=='zhanjue';
     			},
     			content:function(){
+                    if(typeof player.storage.zhanjue!='number'){
+                        player.storage.zhanjue=0;
+                    }
     				if(player.storage.zhanjue2==player){
     					player.draw(2);
     					player.storage.zhanjue+=2;

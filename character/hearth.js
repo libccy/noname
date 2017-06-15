@@ -1002,7 +1002,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         return get.max(list,get.skillRank,'item');
     				};
     				if(event.isMine()){
-    					var dialog=ui.create.dialog();
+    					var dialog=ui.create.dialog('forcebutton');
     					dialog.add('选择获得一项技能');
     					var clickItem=function(){
     						_status.event._result=this.link;
@@ -3236,7 +3236,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					return get.max(list,get.skillRank,'item');
     				};
     				if(event.isMine()){
-    					var dialog=ui.create.dialog();
+    					var dialog=ui.create.dialog('forcebutton');
     					dialog.add('选择获得一项技能');
     					var clickItem=function(){
     						_status.event._result=this.link;

@@ -525,7 +525,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yunhuo:{
 				trigger:{player:'phaseBegin'},
 				filter:function(event,player){
-					return game.roundNumber%4==0&&event.skill!='yunhuo2';
+					return game.roundNumber%4==0&&event.skill!='yunhuo';
 				},
 				forced:true,
 				content:function(){

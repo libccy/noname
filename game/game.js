@@ -35071,6 +35071,7 @@
 				var i;
 				var hidden=false;
                 var notouchscroll=false;
+				var forcebutton=false;
 				var dialog=ui.create.div('.dialog');
 				dialog.contentContainer=ui.create.div('.content-container',dialog);
 				dialog.content=ui.create.div('.content',dialog.contentContainer);
@@ -35084,6 +35085,7 @@
 					if(typeof arguments[i]=='boolean') dialog.static=arguments[i];
                     else if(arguments[i]=='hidden') hidden=true;
 					else if(arguments[i]=='notouchscroll') notouchscroll=true;
+					else if(arguments[i]=='forcebutton') forcebutton=true;
 					else dialog.add(arguments[i]);
 				}
 				if(!hidden){
@@ -35096,6 +35098,10 @@
     				dialog.contentContainer.style.WebkitOverflowScrolling='touch';
     				dialog.ontouchstart=ui.click.dragtouchdialog;
                 }
+				if(forcebutton){
+					dialog.forcebutton=true;
+					dialog.classList.add('forcebutton');
+				}
 				return dialog;
 			},
 			line2:function(){

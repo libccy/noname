@@ -6777,7 +6777,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					return get.max(list,get.skillRank,'item');
     				};
     				if(event.isMine()){
-                        var dialog=ui.create.dialog();
+                        var dialog=ui.create.dialog('forcebutton');
         				dialog.add('选择获得一项技能');
         				_status.event.list=list;
         				var clickItem=function(){
@@ -6896,7 +6896,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					}
     				}
     				if(onlylist) return list;
-    				var dialog=ui.create.dialog();
+    				var dialog=ui.create.dialog('forcebutton');
     				dialog.add('选择获得一项技能');
     				_status.event.list=list;
     				var clickItem=function(){
@@ -8624,9 +8624,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.removeSkill('mailun8');
     				if(event.isMine()){
     					ui.auto.hide();
-    					event.dialog=ui.create.dialog('脉轮：选择一个效果');
-                        event.dialog.forcebutton=true;
-                        event.dialog.classList.add('forcebutton');
+    					event.dialog=ui.create.dialog('脉轮：选择一个效果','forcebutton');
     					var effects=lib.skill.mailun.effects;
     					var clickItem=function(){
     						event.choice=this.link;
