@@ -5287,6 +5287,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				next.logSkill=event.name;
     				next.ai=function(card){
     					if(get.tag(trigger.card,'multitarget')&&!get.tag(card,'multineg')) return 0;
+                        if(get.value(trigger.card,trigger.player,'raw')<5) return 0;
+                        if(get.tag(trigger.card,'respondSha')&&player.hasSha()) return 0;
+                        if(get.tag(trigger.card,'respondShan')&&player.hasShan()) return 0;
     					if(get.effect(player,trigger.card,trigger.player,player)<0){
     						return 7-get.value(card);
     					}

@@ -932,19 +932,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'spell',
 				subtype:'spell_silver',
 				vanish:true,
-				enable:function(card,player){
-					if(!player.storage.gw_zirankuizeng) return false;
-					var evtcard=player.storage.gw_zirankuizeng[0];
-					var targets=player.storage.gw_zirankuizeng[1];
-					if(!lib.filter.cardEnabled(evtcard,player)) return false;
-					for(var i=0;i<targets.length;i++){
-						if(!targets[i].isIn()) return false;
-						if(!player.canUse(evtcard,targets[i],false)){
-							return false;
-						}
-					}
-					return true;
-				},
+				enable:true,
 				notarget:true,
 				// contentBefore:function(){
 				// 	player.$skill('自然馈赠','legend','water');
@@ -952,18 +940,93 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				// },
 				content:function(){
 					'step 0'
-					var info=player.storage.gw_zirankuizeng;
-					player.useCard(game.createCard(info[0]),info[1]);
-					'step 1'
-					player.draw();
+    				var list=[];
+    				for(var i in lib.card){
+						if(lib.card[i].subtype=='spell_bronze') list.push([cards[0].suit,cards[0].number,i]);
+    				}
+    				var dialog=ui.create.dialog('自然馈赠',[list,'vcard']);
+					var rand=get.rand();
+					var aozu=game.hasPlayer(function(current){
+						return player.canUse('gw_aozuzhilei',current)&&current.hp<=3&&get.effect(current,{name:'gw_aozuzhilei'},player,player)>0;
+					});
+					var aozu2=game.hasPlayer(function(current){
+						return player.canUse('gw_aozuzhilei',current)&&current.hp<=2&&get.effect(current,{name:'gw_aozuzhilei'},player,player)>0;
+					});
+					var aozu3=game.hasPlayer(function(current){
+						return player.canUse('gw_aozuzhilei',current)&&get.effect(current,{name:'gw_aozuzhilei'},player,player)>0;
+					});
+					var baoxue=game.hasPlayer(function(current){
+						return player.canUse('gw_baoxueyaoshui',current)&&get.attitude(player,current)<0&&[2,3].contains(current.countCards('h'))&&!current.hasSkillTag('noh');
+					});
+					var baoxue2=game.hasPlayer(function(current){
+						return player.canUse('gw_baoxueyaoshui',current)&&get.attitude(player,current)<0&&[2].contains(current.countCards('h'))&&!current.hasSkillTag('noh');
+					});
+					var baoxue3=game.hasPlayer(function(current){
+						return player.canUse('gw_baoxueyaoshui',current)&&get.attitude(player,current)<0&&current.countCards('h')>=2&&!current.hasSkillTag('noh');
+					});
+					var nongwu=game.hasPlayer(function(current){
+						return get.attitude(player,current)<0&&(get.attitude(player,current.getNext())<0||get.attitude(player,current.getPrevious())<0);
+					});
+					var nongwu2=game.hasPlayer(function(current){
+						return get.attitude(player,current)<0&&get.attitude(player,current.getNext())<0&&get.attitude(player,current.getPrevious())<0;
+					});
+					console.log(baoxue2,baoxue,baoxue3,aozu2,aozu,aozu3,nongwu2,nongwu);
+    				player.chooseButton(dialog,true,function(button){
+						var name=button.link[2];
+						switch(name){
+							case 'gw_birinongwu':
+								if(nongwu2) return 3;
+								if(nongwu) return 1;
+								return 0;
+							case 'gw_baoxueyaoshui':
+								if(baoxue2) return 2;
+								if(baoxue) return 1.5;
+								if(baoxue3) return 0.5;
+								return 0;
+							case 'gw_aozuzhilei':
+								if(aozu2) return 2.5;
+								if(aozu) return 1.2;
+								if(aozu3) return 0.2;
+								return 0;
+						}
+						if(game.hasPlayer(function(current){
+							return player.canUse(name,current)&&get.effect(current,{name:name},player,player)>0;
+						})){
+							return Math.random();
+						}
+    					return 0;
+    				}).filterButton=function(button){
+						var name=button.link[2];
+						if(!lib.card[name].notarget){
+							return game.hasPlayer(function(current){
+								return player.canUse(name,current);
+							})
+						}
+    					return true;
+    				};
+    				'step 1'
+					var fakecard=game.createCard(result.links[0][2]);
+					event.fakecard=fakecard;
+					console.log(fakecard);
+					if(get.info(fakecard).notarget){
+						player.useCard(fakecard);
+						event.finish();
+					}
+					else{
+						player.chooseTarget('选择'+get.translation(fakecard)+'的目标',function(card,player,target){
+							return player.canUse(fakecard,target);
+						},true);
+					}
+					'step 2'
+					if(result.bool&&result.targets&&result.targets.length){
+						player.useCard(event.fakecard,result.targets);
+					}
 				},
 				ai:{
 					value:6,
 					useful:[4,1],
 					result:{
 						player:function(player){
-							var info=player.storage.gw_zirankuizeng;
-							if(info&&info[0]&&get.tag(info[0],'norepeat')) return 0;
 							return 1;
 						}
 					},
@@ -976,7 +1039,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'spell_bronze',
 				enable:true,
 				filterTarget:true,
-				selectTarget:-1,
+	            changeTarget:function(player,targets){
+	                game.filterPlayer(function(current){
+	                    return get.distance(targets[0],current,'pure')==1;
+	                },targets);
+				},
 				usable:1,
 				content:function(){
 					target.addTempSkill('gw_qinpendayu',{player:'phaseAfter'});
@@ -985,12 +1052,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					value:4,
 					useful:[3,1],
 					result:{
-						target:function(player,target){
-							if(target.needsToDiscard()) return -1;
-							if(target.needsToDiscard(1)) return -0.7;
-							if(target.needsToDiscard(2)) return -0.4;
-							return -0.1;
-						}
+						player:function(player,target){
+	                        return game.countPlayer(function(current){
+	                            if(current==target||(get.distance(target,current,'pure')==1)){
+	        						var num=-get.sgn(get.attitude(player,current));
+									if(current.needsToDiscard()) return num;
+									if(current.needsToDiscard(1)) return 0.7*num;
+									if(current.needsToDiscard(2)) return 0.4*num;
+									return 0.1*num;
+	        					}
+	                        });
+	                    }
 					},
 					order:1.2,
 					tag:{
@@ -1006,7 +1078,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:true,
 				usable:1,
 				filterTarget:true,
-				selectTarget:-1,
+	            changeTarget:function(player,targets){
+	                game.filterPlayer(function(current){
+	                    return get.distance(targets[0],current,'pure')==1;
+	                },targets);
+				},
 				content:function(){
 					target.addTempSkill('gw_birinongwu',{player:'phaseAfter'});
 				},
@@ -1014,7 +1090,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					value:4,
 					useful:[3,1],
 					result:{
-						target:-0.5
+						player:function(player,target){
+	                        return game.countPlayer(function(current){
+	                            if(current==target||(get.distance(target,current,'pure')==1)){
+	        						return -get.sgn(get.attitude(player,current));
+	        					}
+	                        });
+	                    }
 					},
 					order:1.2,
 					tag:{
@@ -1030,7 +1112,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:true,
 				usable:1,
 				filterTarget:true,
-				selectTarget:-1,
+	            changeTarget:function(player,targets){
+	                game.filterPlayer(function(current){
+	                    return get.distance(targets[0],current,'pure')==1;
+	                },targets);
+				},
 				content:function(){
 					target.addSkill('gw_ciguhanshuang');
 				},
@@ -1038,7 +1124,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					value:4,
 					useful:[3,1],
 					result:{
-						target:-0.5
+						player:function(player,target){
+	                        return game.countPlayer(function(current){
+	                            if(current==target||(get.distance(target,current,'pure')==1)){
+	        						return -get.sgn(get.attitude(player,current));
+	        					}
+	                        });
+	                    }
 					},
 					order:1.2,
 					tag:{
@@ -1369,21 +1461,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					game.delay();
 				}
 			},
-			_gw_zirankuizeng:{
-				trigger:{player:'useCard'},
-				silent:true,
-				filter:function(event,player){
-					if(!lib.config.cards.contains('gwent')) return false;
-					if(get.info(event.card).complexTarget) return false;
-					if(!event.targets) return false;
-					if(event.card.name=='gw_zirankuizeng') return false;
-					return ((['spell_bronze','spell_silver'].contains(get.subtype(event.card))||get.type(event.card)=='trick')&&
-						event.cards[0]&&event.cards[0]==event.card);
-				},
-				content:function(){
-					player.storage.gw_zirankuizeng=[trigger.cards[0],trigger.targets.concat(trigger.addedTargets||[])];
-				}
-			},
 			_gainspell:{
 				trigger:{player:'drawBegin'},
 				silent:true,
@@ -1478,7 +1555,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_zuihouyuanwang:'最后愿望',
 			gw_zuihouyuanwang_info:'摸X张牌并弃置X张牌，X为存活角色数',
 			gw_zirankuizeng:'自然馈赠',
-			gw_zirankuizeng_info:'重新结算一遍你上一张使用的非金法术（自然馈赠除外）或非转化普通锦囊牌，然后摸一张牌',
+			gw_zirankuizeng_info:'选择任意一张铜卡法术使用',
 			gw_poxiao:'破晓',
 			gw_poxiao_info:'选择一项：弃置一名角色判定区内的所有牌，或随机获得一张铜卡法术（破晓除外）并展示之',
 			gw_zumoshoukao:'阻魔手铐',
@@ -1497,13 +1574,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_baoxueyaoshui_info:'令一名角色弃置两张手牌并摸一张牌',
 			gw_birinongwu:'蔽日浓雾',
 			gw_birinongwu_bg:'雾',
-			gw_birinongwu_info:'出牌阶段对所有角色使用，目标不能使用杀直到下一回合结束',
+			gw_birinongwu_info:'出牌阶段对一名角色及其相邻角色使用，目标不能使用杀直到下一回合结束',
 			gw_qinpendayu:'倾盆大雨',
 			gw_qinpendayu_bg:'雨',
-			gw_qinpendayu_info:'出牌阶段对所有角色使用，目标手牌上限-1直到下一回合结束',
+			gw_qinpendayu_info:'出牌阶段对一名角色及其相邻角色使用，目标手牌上限-1直到下一回合结束',
 			gw_ciguhanshuang:'刺骨寒霜',
 			gw_ciguhanshuang_bg:'霜',
-			gw_ciguhanshuang_info:'出牌阶段对所有角色使用，目标下个摸牌阶段摸牌数-1',
+			gw_ciguhanshuang_info:'出牌阶段对一名角色及其相邻角色使用，目标下个摸牌阶段摸牌数-1',
 			gw_wenyi:'瘟疫',
 			gw_wenyi_info:'令所有体力值为全场最少的角色随机弃置一张牌',
 			gw_yanziyaoshui:'燕子药水',

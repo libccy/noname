@@ -721,13 +721,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                    player:function(player,target){
 	                        return game.countPlayer(function(current){
 	                            if(current==target||(get.distance(target,current,'pure')==1&&current.countCards('he'))){
-	        						var att=get.attitude(player,current);
-	                                if(att>0){
-	                                    return -1;
-	                                }
-	                                else if(att<0){
-	                                    return 1;
-	                                }
+	        						return -get.sgn(get.attitude(player,current));
 	        					}
 	                        });
 	                    }
