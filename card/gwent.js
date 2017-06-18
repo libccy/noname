@@ -645,29 +645,31 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				vanish:true,
 				enable:true,
 				filterTarget:function(card,player,target){
-					return target!=player&&target.countCards('e')>0;
+					return target!=player&&target.countCards('h')>0;
 				},
 				content:function(){
-					var cards=target.getCards('e');
-					target.gain(cards,'draw2');
-					target.draw(cards.length);
+					'step 0'
+					var cards=target.getCards('h');
+					target.lose(cards,ui.special);
+					target.storage.gw_youer=cards;
+					target.addSkill('gw_youer');
+					'step 1'
+					player.draw();
 				},
 				ai:{
 					basic:{
-						order:6,
+						order:10,
 						value:7,
 						useful:[3,1],
 					},
 					result:{
 						target:function(player,target){
-							var num=target.countCards('e');
-							if(target.hasSkillTag('noe')){
-								num*=1.5;
+							if(target.hasSkillTag('noh')) return 3;
+							var num=-Math.sqrt(target.countCards('h'));
+							if(player.hasSha()&&player.canUse('sha',target)){
+								num-=2;
 							}
-							if(target==_status.currentPhase){
-								num*=1.2;
-							}
-							return num/1.5;
+							return num;
 						},
 					},
 				}
@@ -787,6 +789,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
     				var list=[];
     				for(var i in lib.card){
     					if(lib.card[i].mode&&lib.card[i].mode.contains(lib.config.mode)==false) continue;
+						if(lib.card[i].vanish) continue;
     					if(lib.card[i].type=='delay') list.push([cards[0].suit,cards[0].number,i]);
     				}
     				var dialog=ui.create.dialog('卜天术',[list,'vcard']);
@@ -970,7 +973,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					var nongwu2=game.hasPlayer(function(current){
 						return get.attitude(player,current)<0&&get.attitude(player,current.getNext())<0&&get.attitude(player,current.getPrevious())<0;
 					});
-					console.log(baoxue2,baoxue,baoxue3,aozu2,aozu,aozu3,nongwu2,nongwu);
     				player.chooseButton(dialog,true,function(button){
 						var name=button.link[2];
 						switch(name){
@@ -1007,7 +1009,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
     				'step 1'
 					var fakecard=game.createCard(result.links[0][2]);
 					event.fakecard=fakecard;
-					console.log(fakecard);
 					if(get.info(fakecard).notarget){
 						player.useCard(fakecard);
 						event.finish();
@@ -1330,6 +1331,31 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			gw_youer:{
+    			trigger:{global:['phaseEnd','dieBegin']},
+    			forced:true,
+    			audio:false,
+    			mark:true,
+    			intro:{
+    				content:'cards'
+    			},
+    			content:function(){
+    				if(player.storage.gw_youer){
+						if(trigger.name=='phase'){
+							player.gain(player.storage.gw_youer);
+						}
+    					else{
+							player.$throw(player.storage.gw_youer,1000);
+		    				for(var i=0;i<player.storage.gw_youer.length;i++){
+		    					ui.discardPile.appendChild(player.storage.gw_youer[i]);
+		    				}
+		    				game.log(player,'弃置了',player.storage.gw_youer);
+						}
+    				}
+					delete player.storage.gw_youer;
+    				player.removeSkill('gw_youer');
+    			},
+    		},
 			gw_qinpendayu:{
     			mark:true,
 				nopop:true,
@@ -1567,7 +1593,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_fuyuan:'复原',
 			gw_fuyuan_info:'对一名濒死状态角色使用，目标回复一点体力并获得一点护甲',
 			gw_youer:'诱饵',
-			gw_youer_info:'令一名装备区内有牌的其他角色将装备区内的牌收回手牌，然后摸等量的牌',
+			gw_youer_bg:'饵',
+			gw_youer_info:'将一名其他角色的所有手牌移出游戏，然后摸一张牌，当前回合结束后该角色将以此法失去的牌收回手牌',
 			gw_tongdi:'通敌',
 			gw_tongdi_info:'交给一名角色一张手牌，然后观看其手牌并获得其中两张',
 			gw_baoxueyaoshui:'暴雪药水',
