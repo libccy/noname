@@ -1149,19 +1149,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					trigger.num++;
-					player.addTempSkill('ciqiu3','damageAfter');
+					trigger._ciqiu3=true;
 				},
 				group:['ciqiu2']
 			},
 			ciqiu2:{
-				trigger:{source:'damage'},
+				trigger:{global:'dying'},
+				priority:9,
 				filter:function(event,player){
-					return player.hasSkill('ciqiu3')&&event.player.hp<=0;
+					return event.player!=player&&event.parent._ciqiu3&&event.parent.source==player;
+				},
+				check:function(event,player){
+					return get.attitude(player,event.player)<0;
 				},
 				forced:true,
+				logTarget:'player',
 				content:function(){
-					trigger.player.die(trigger);
-					player.removeSkill('ciqiu');
+					'step 0'
+					trigger.player.die();
+					player.removeSkill('ciqiu2');
+					'step 1'
+					if(!trigger.player.isAlive()){
+						trigger.untrigger(true);
+						trigger.finish();
+					}
 				}
 			},
 			ciqiu3:{},
@@ -1389,7 +1400,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			juedao_info:'出牌阶段，你可以弃置一张手牌，横置你的武将牌；锁定技，若你处于连环状态，你进攻距离-1、防御距离+1。',
 			geju_info:'准备阶段开始时，你可以摸X张牌（X为攻击范围内不含有你的势力数）。',
 			siji_info:'弃牌阶段结束后，你可以摸2X张牌（X为你于此阶段内弃置的【杀】的数量）。',
-			ciqiu_info:'锁定技，每当你使用【杀】对目标角色造成伤害时，若该角色未受伤，你令此伤害+1；锁定技，每当未受伤的角色因受到你使用【杀】造成的伤害而扣减体力后，若该角色的体力值为0，你令其死亡，然后你失去“刺酋”。 ',
+			ciqiu_info:'锁定技，每当你使用【杀】对目标角色造成伤害时，若该角色未受伤，你令此伤害+1；若其因此进入濒死状态，你令其死亡，然后你失去“刺酋”。 ',
 			shuaiyan_info:'每当其他角色于你的回合外回复体力后，你可以令该角色选择一项：1.令你摸一张牌；2.令你弃置其一张牌。',
 			moshou_info:'锁定技，你不能成为乐不思蜀和兵粮寸断的目标。',
 			xicai_info:'你可以立即获得对你造成伤害的牌',
