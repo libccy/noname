@@ -2155,6 +2155,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						var att=get.attitude(player,target);
     						if(att==0) return 0;
     						var es=target.getCards('e');
+                            if(es.length==1&&att>0) return 0;
     						for(var i=0;i<es.length;i++){
     							var val=get.equipValue(es[i],target);
     							if(val<=4){
