@@ -470,7 +470,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			zhuquezhizhang:{
 				type:'jiqi',
 				fullskin:true,
-				global:'g_zhuquezhizhang`',
+				global:'g_zhuquezhizhang',
 				ai:{
 					value:8,
 					useful:6.5,
