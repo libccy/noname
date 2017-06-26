@@ -2224,6 +2224,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			nvquan:{
+				locked:true,
 				group:['nvquan1','nvquan2','nvquan3'],
 			},
 			nvquan1:{

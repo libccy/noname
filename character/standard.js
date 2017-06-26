@@ -1528,6 +1528,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			wushuang:{
 				forced:true,
+				locked:true,
 				group:['wushuang1','wushuang2']
 			},
 			wushuang1:{
