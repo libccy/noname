@@ -463,7 +463,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
     				'step 1'
 					event.nametarget=result.links[0];
 					player.chooseTarget(true,'使用'+get.translation(event.nametarget)+'替换一名角色的武将牌',function(card,player,target){
-						return !target.isUnseen();
+						return !target.isUnseen()&&!target.isMin();
 					}).ai=function(target){
 						if(target==event.aitarget){
 							return 1;
