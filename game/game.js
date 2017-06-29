@@ -23111,9 +23111,19 @@
 			over:function(str){
 				var dialog=ui.create.dialog('hidden');
 				dialog.content.innerHTML=str;
+				dialog.forcebutton=true;
 				dialog.open();
 				if(game.chess){
 					dialog.classList.add('center');
+				}
+				if(game.layout=='long2'&&!game.chess){
+					ui.arena.classList.add('choose-character');
+					if(ui.me) ui.me.hide();
+					if(ui.mebg) ui.mebg.hide()
+					if(ui.autonode) ui.autonode.hide();
+					if(lib.config.radius_size!='off'){
+						if(ui.historybar) ui.historybar.style.borderRadius='0 0 0 4px';
+					}
 				}
 			}
 		},
@@ -41190,7 +41200,10 @@
 					for(i=0;i<ui.discardPile.childNodes.length;i++){
 						var currentcard=ui.discardPile.childNodes[i];
 						currentcard.storage.vanishtag=[];
-						if(get.info(currentcard).vanish||currentcard.storage.vanish) continue;
+						if(get.info(currentcard).vanish||currentcard.storage.vanish){
+							currentcard.remove();
+							continue;
+						}
 						cards.push(currentcard);
 					}
 					cards.randomSort();

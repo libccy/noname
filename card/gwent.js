@@ -1016,7 +1016,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					else{
 						player.chooseTarget('选择'+get.translation(fakecard)+'的目标',function(card,player,target){
 							return player.canUse(fakecard,target);
-						},true);
+						},true).ai=function(target){
+							return get.effect(target,fakecard,player,player);
+						};
 					}
 					'step 2'
 					if(result.bool&&result.targets&&result.targets.length){

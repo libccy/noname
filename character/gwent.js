@@ -103,10 +103,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			mark:true,
     			filter:function(event,player){
 					if(game.roundNumber%3==0) return false;
-    				return player.hp-event.num<game.roundNumber%3;
+    				return player.hp-event.num<2;
     			},
     			content:function(){
-    				trigger.num=Math.max(0,player.hp-game.roundNumber%3);
+    				trigger.num=Math.max(0,player.hp-2);
     			},
 				group:['gwjinyan_gain','gwjinyan_hp'],
 				subSkill:{
@@ -127,10 +127,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'roundStart'},
 						forced:true,
 						filter:function(event,player){
-							return player.hp<game.roundNumber%3;
+							if(game.roundNumber%3==0) return false;
+							return player.hp<2;
 						},
 						content:function(){
-							player.hp=game.roundNumber%3;
+							player.hp=2;
 							if(player.maxHp<player.hp){
 								player.maxHp=player.hp;
 							}
@@ -164,6 +165,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					for(var i=0;i<ui.discardPile.childElementCount;i++){
 						var card=ui.discardPile.childNodes[i];
+						if(card.storage.vanishtag.contains('gwshenyu')) continue;
 						if(get.type(card)=='spell'&&get.subtype(card)!='spell_gold'){
 							return true;
 						}
@@ -175,6 +177,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var list=[];
 					for(var i=0;i<ui.discardPile.childElementCount;i++){
 						var card=ui.discardPile.childNodes[i];
+						if(card.storage.vanishtag.contains('gwshenyu')) continue;
 						if(get.type(card)=='spell'&&get.subtype(card)!='spell_gold'){
 							list.push(card);
 						}
@@ -235,6 +238,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 4'
 					if(result.bool){
+						result.links[0].storage.vanishtag.add('gwshenyu');
 						event.target.gain(result.links,'gain2','log');
 					}
 				},
@@ -451,45 +455,66 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					if(target==player) return false;
 					if(target.hasSkill('hunmo2')) return false;
-					if(target.countCards('h')==2) return false;
-					return true;
+					var nh=player.countCards('h');
+					var nh2=target.countCards('h');
+					if(nh<2) return nh2<2;
+					else return nh2>=2;
 				},
 				content:function(){
-					var nh=target.countCards('h');
-					if(nh<2){
-						target.draw();
-					}
-					else if(nh>2){
-						target.chooseToDiscard('h',true);
-					}
+					'step 0'
 					target.addTempSkill('hunmo2');
-
-					if(player.countCards('h')<=player.hp){
-						player.draw();
+					player.addTempSkill('hunmo3');
+					if(player.countCards('h')<2){
+						game.asyncDraw([target,player]);
+					}
+					else{
+						player.chooseToDiscard('h',true).delay=false;
+						target.chooseToDiscard('h',true).delay=false;
+					}
+					'step 1'
+					game.delay();
+					if(typeof player.storage.hunmo!='number'){
+						player.storage.hunmo=1;
+					}
+					else{
+						player.storage.hunmo++;
 					}
 				},
 				ai:{
 					order:function(){
 						var player=_status.event.player;
-						if(player.countCards('h')<=player.hp) return 11;
-						return (_status.event.getRand()<0.5)?3.5:1;
+						if(player.countCards('h')<2) return 11;
+						return 6;
 					},
 					threaten:1.2,
 					result:{
 						target:function(player,target){
-							var nh=target.countCards('h');
-							if(nh<2) return 1;
-							if(nh>2){
-								if(target.hasSkillTag('noh')) return 0;
-								if(target.hasSkillTag('nodiscard')) return 0;
+							if(player.countCards('h')<2) return 1;
+							if(player.hasCard(function(card){
+								return get.value(card)<=5
+							})){
 								return -1;
 							}
-							return 0;
 						}
 					}
+				},
+				group:'hunmo_draw',
+				subSkill:{
+					draw:{
+						trigger:{player:'phaseEnd'},
+						filter:function(event,player){
+							return player.hasSkill('hunmo3')&&player.countCards('h')<2;
+						},
+						frequent:true,
+						content:function(){
+							var num=2-player.countCards('h');
+							if(num>0) player.draw(num);
+						}
+					},
 				}
 			},
 			hunmo2:{},
+			hunmo3:{},
 			shuijian:{
 				trigger:{player:'phaseBegin'},
 				direct:true,
@@ -1455,9 +1480,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lingji:'灵计',
 			lingji_info:'出牌阶段限一次，你可以摸两张牌并弃置两张牌，若弃置的牌花色相同，你获得一张随机铜卡；若弃置的牌点数相同，你获得一张随机银卡',
 			gwjinyan:'金焰',
-			gwjinyan_info:'锁定技，准备阶段，若游戏轮数为3的倍数，你获得一张随机金卡；你的体力值不能小于X，X为游戏轮数除3的余数',
+			gwjinyan_info:'锁定技，准备阶段，若游戏轮数为3的倍数，你获得一张随机金卡；当游戏轮数不是3的倍数时，你的体力值不能少于2',
 			gwshenyu:'神愈',
-			gwshenyu_info:'准备阶段，你可以令一名角色选择一项：回复一点体力，或从弃牌堆中获得一张非金法术牌',
+			gwshenyu_info:'准备阶段，你可以令一名角色选择一项：回复一点体力，或从弃牌堆中获得一张非金法术牌（直到洗牌前该牌不能再以此法获得）',
 			junchi:'骏驰',
 			junchi_info:'每当一名其他角色使用一张杀，若目标不是你，你可以对杀的目标使用一张牌，并摸一张牌；每当一名其他角色使用一张金卡，你可以在此回合结束后获得一个额外回合',
 			junchi_old_info:'当一名其他角色使用杀对一个目标结算后，该角色可以交给你一张牌，然后你可以对杀的目标使用一张牌，若如此做，你回复一点体力，杀的使用者摸一张牌',
@@ -1500,7 +1525,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwbaquan:'霸权',
 			gwbaquan_info:'出牌阶段限一次，你可以获得一名其他角色的所有牌，然后还给其等量的牌，若你归还的牌均为你获得的牌且该角色体力值不小于你，你对其造成一点伤害',
 			hunmo:'魂墨',
-			hunmo_info:'出牌阶段，你可以令一名手牌数小于2的其他角色摸一张牌，或令一名手牌数大于2的其他角色弃置一张手牌；若你的手牌数不大于当前体力值，你摸一张牌',
+			hunmo_info:'出牌阶段，若你手牌数小于2，你可以选择一名手牌数小于2的角色与其各摸一张牌；若你手牌数不小于2，你可以选择一名手牌数不小于2的角色与你各弃置一张手牌；结束阶段，若你发动过魂墨，你可以将手牌数补至2；同一阶段不能对同一角色发动两次',
 			huihun:'回魂',
 			huihun_info:'结束阶段，你可以从弃牌堆中获得本回合使用的前两张红色牌',
 			lanquan:'远略',

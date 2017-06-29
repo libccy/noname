@@ -153,6 +153,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return 0;
 				},
 				effect:function(){
+					'step 0'
 					if(result.bool==false){
 						if(!card.storage.fulei){
 							card.storage.fulei=1;
@@ -162,6 +163,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 						player.damage(card.storage.fulei,'thunder','nosource');
 					}
+					'step 1'
 					player.addJudgeNext(card);
 				},
 				cancel:function(){
