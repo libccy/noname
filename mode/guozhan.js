@@ -69,6 +69,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			else{
 				if(get.config('guozhanpile')){
 					lib.card.list=lib.guozhanPile.slice(0);
+					game.fixedPile=true;
 				}
 				game.prepareArena();
 				// game.delay();
@@ -84,6 +85,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			if(_status.connectMode){
 				if(lib.configOL.guozhanpile){
 					lib.card.list=lib.guozhanPile.slice(0);
+					game.fixedPile=true;
 				}
 				game.broadcastAll(function(pack){
 					for(var i=0;i<game.players.length;i++){

@@ -1494,7 +1494,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				priority:-11,
 				filter:function(event,player){
+					if(_status.connectMode) return false;
 					if(!lib.config.cards.contains('gwent')) return false;
+					if(game.fixedPile) return false;
 					return event.num>0&&event.parent.name=='phaseDraw';
 				},
 				content:function(){

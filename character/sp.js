@@ -202,6 +202,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hanba:['swd_muyun'],
     		dongbai:['dongzhuo']
     	},
+        card:{
+            wy_meirenji:{
+                fullskin:true,
+            },
+            wy_xiaolicangdao:{
+                fullskin:true,
+            }
+        },
     	skill:{
             weikui:{
                 audio:'kuiwei',
@@ -8611,6 +8619,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             miheng:'祢衡',
             taoqian:'陶谦',
 
+            wy_meirenji:'美人计',
+            wy_meirenji_info:'出牌阶段，对一名有手牌的其他男性角色使用。每名女性角色各获得其一张手牌并将一张手牌交给你，然后比较你与其的手牌数，手牌少的角色对手牌多的角色造成1点伤害',
+            wy_xiaolicangdao:'笑里藏刀',
+            wy_xiaolicangdao_info:'出牌阶段，对一名其他角色使用。该角色摸X张牌（X为其已损失的体力值且至多为5），然后你对其造成1点伤害',
             weikui:'伪溃',
             weikui2:'伪溃',
             weikui_info:'出牌阶段限一次，你可以失去1点体力并选择一名有手牌的其他角色，你观看其手牌：若其手牌中有【闪】，则视为你对其使用【杀】,且本回合你计算与其的距离视为1；若其手牌中没有【闪】，你弃置其中一张牌',

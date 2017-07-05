@@ -87,6 +87,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     		else if(_status.mode=='jiange'||_status.mode=='siguo'||_status.mode=='four'){
     			if(_status.mode=='four'&&!get.config('enable_all_cards_four')){
     				lib.card.list=lib.cardsFour;
+                    game.fixedPile=true;
     			}
                 else if(_status.mode=='siguo'){
                     for(var i=0;i<lib.card.list.length;i++){
@@ -108,6 +109,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				lib.translate.wuzhong_info+='若对方存活角色多于己方，则额外摸一张牌';
     				lib.translate.zhuge_info='锁定技，出牌阶段，你使用杀的次数上限+3';
     				lib.card.list=lib.cardsThree;
+                    game.fixedPile=true;
     			}
     			ui.create.cardsAsync();
     			game.finishCards();
