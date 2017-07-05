@@ -1,8 +1,8 @@
 window.noname_update={
-    version:'1.9.30.3',
+    version:'1.9.31',
     // update:'1.9.30',
     changeLog:[
-        'bug修复',
+        '新武将',
     ],
     files:[
         // 'game/game.js',
