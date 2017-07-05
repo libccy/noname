@@ -104,7 +104,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             miheng:['male','qun',3,['kuangcai','shejian']],
     		taoqian:['male','qun',3,['zhaohuo','yixiang','yirang']],
 
-            wangyun:['male','qun',4,['wylianji','moucheng','jingong']],
+            wangyun:['male','qun',4,['wylianji','moucheng']],
     	},
     	characterIntro:{
     		huangfusong:'字义真。安定郡朝那县（今宁夏彭阳）人。于黄巾起义时，以中郎将身份讨伐黄巾，用火攻大破张梁、张宝。[45]  后接替董卓进攻张梁，连胜七阵。掘张角墓，拜左车骑将军、冀州牧，因拒绝贿赂宦官而被免职。[46]  董卓死，王允命其与吕布等共至郿坞抄籍董卓家产、人口，皇甫嵩将坞中所藏良家子女，尽行释放。',
@@ -215,6 +215,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             }
         },
     	skill:{
+            wylianji:{},
+            moucheng:{
+                derivation:['jingong','wy_meirenji','wy_xiaolicangdao']
+            },
+            jingong:{},
             weikui:{
                 audio:'kuiwei',
                 enable:'phaseUse',
@@ -8639,7 +8644,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             moucheng:'谋逞',
             moucheng_info:'觉醒技，当其他角色使用因“连计”交给其的牌累计造成伤害达到3点后，你失去技能“连计”，然后获得技能“矜功”',
             jingong:'矜功',
-            jingong_info:'出牌阶段限一次，你可以将一张装备牌或【杀】当一张随机锦囊牌使用（三选一，其中一张为笑里藏刀或美人计），然后本回合的结束阶段，若你于本回合内未造成过伤害，你失去1点体力',
+            jingong_info:'出牌阶段限一次，你可以将一张装备牌或【杀】当一张随机锦囊牌使用（三选一，其中一张为【美人计】或【笑里藏刀】），然后本回合的结束阶段，若你于本回合内未造成过伤害，你失去1点体力',
             zhaohuo:'招祸',
             zhaohuo_info:'锁定技，当其他角色进入濒死状态时，你的体力上限变为1点，你每以此法减少1点体力上限，你摸一张牌',
             yixiang:'义襄',
