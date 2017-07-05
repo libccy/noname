@@ -104,7 +104,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             miheng:['male','qun',3,['kuangcai','shejian']],
     		taoqian:['male','qun',3,['zhaohuo','yixiang','yirang']],
 
-            // wangyun:['male','qun',4,['wylianji','moucheng','jingong']],
+            wangyun:['male','qun',4,['wylianji','moucheng','jingong']],
     	},
     	characterIntro:{
     		huangfusong:'字义真。安定郡朝那县（今宁夏彭阳）人。于黄巾起义时，以中郎将身份讨伐黄巾，用火攻大破张梁、张宝。[45]  后接替董卓进攻张梁，连胜七阵。掘张角墓，拜左车骑将军、冀州牧，因拒绝贿赂宦官而被免职。[46]  董卓死，王允命其与吕布等共至郿坞抄籍董卓家产、人口，皇甫嵩将坞中所藏良家子女，尽行释放。',
@@ -205,9 +205,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
         card:{
             wy_meirenji:{
                 fullskin:true,
+                vanish:true,
+                derivation:'wangyun',
             },
             wy_xiaolicangdao:{
                 fullskin:true,
+                vanish:true,
+                derivation:'wangyun',
             }
         },
     	skill:{
@@ -8618,6 +8622,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		huangfusong:'皇甫嵩',
             miheng:'祢衡',
             taoqian:'陶谦',
+            wangyun:'王允',
 
             wy_meirenji:'美人计',
             wy_meirenji_info:'出牌阶段，对一名有手牌的其他男性角色使用。每名女性角色各获得其一张手牌并将一张手牌交给你，然后比较你与其的手牌数，手牌少的角色对手牌多的角色造成1点伤害',
@@ -8629,7 +8634,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             lizhan:'励战',
             lizhan_info:'结束阶段，你可以令任意名已受伤的角色摸一张牌',
             wylianji:'连计',
-            wylianji_info:'出牌阶段限一次，你可以交给一名其他角色一张【杀】或黑色锦囊牌，并令该角色将牌堆中的随机一张武器牌置入装备区（可替换原装备）。然后该角色选择一项：1.对除你以外的角色使用该牌，并将装备区里的武器牌交给该牌的一个目标角色；2.视为你对其使用此牌，并将装备区内的武器牌交给你。',
+            wylianji_info:'出牌阶段限一次，你可以展示一张【杀】或黑色锦囊牌，并令一名其他角色将牌堆中的随机一张武器牌置入装备区（可替换原装备）。然后该角色选择一项：1.对除你以外的角色使用该牌，并将装备区里的武器牌交给该牌的一个目标角色；2.视为你对其使用此牌，并将装备区内的武器牌交给你。',
+            // from here
             moucheng:'谋逞',
             moucheng_info:'觉醒技，当其他角色使用因“连计”交给其的牌累计造成伤害达到3点后，你失去技能“连计”，然后获得技能“矜功”',
             jingong:'矜功',
