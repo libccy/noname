@@ -74,10 +74,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		zhangrang:['male','qun',3,['taoluan']],
             sunziliufang:['male','wei',3,['guizao','jiyu']],
 
-            // xinxianying:['male','wei',3,[]],
-            // wuxian:['male','wei',3,[]],
-            // xushi:['male','wei',3,[]],
-    		// caojie:['male','wei',3,[]],
+            xinxianying:['male','wei',3,[]],
+            wuxian:['male','wei',3,[]],
+            xushi:['male','wei',3,[]],
+    		caojie:['male','wei',3,[]],
     	},
     	characterIntro:{
     		huaxiong:'董卓旗下名将，自荐抵抗山东地区反对董卓的诸侯联军于汜水关前，他先后斩杀济北相鲍信之弟鲍忠和孙坚部将祖茂、以及袁术部将俞涉和韩馥手下潘凤等人，最后关东联军派出关羽与之一对一决斗而被杀。',
@@ -7448,6 +7448,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		huanghao:'黄皓',
     		zhangrang:'张让',
     		cenhun:'岑昏',
+            xinxianying:'辛宪英',
+            wuxian:'吴苋',
+            xushi:'徐氏',
+    		caojie:'曹节',
 
     		guizao:'瑰藻',
     		guizao_info:'弃牌阶段结束时，若你于此阶段弃置牌的数量不小于2且它们的花色各不相同，你可以回复1点体力或摸一张牌',

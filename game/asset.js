@@ -2718,7 +2718,7 @@ window.noname_skin_list={
     weiyan:2,
     wenpin:1,
     wuguotai:3,
-    wuxian:2,
+    wuxian:1,
     wuyi:2,
     xiahouba:1,
     xiahoudun:1,
