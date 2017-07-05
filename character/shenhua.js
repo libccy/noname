@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     	connect:true,
     	character:{
     		xiahouyuan:['male','wei',4,['xinshensu']],
-    		caoren:['male','wei',4,['jushou','jiewei']],
+    		caoren:['male','wei',4,['xinjushou','xinjiewei']],
     		huangzhong:['male','shu',4,['xinliegong']],
     		weiyan:['male','shu',4,['xinkuanggu','qimou']],
     		xiaoqiao:['female','wu',3,['xintianxiang','hongyan']],
@@ -82,6 +82,182 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		caiwenji:'名琰，原字昭姬，晋时避司马昭讳，改字文姬，东汉末年陈留圉（今河南开封杞县）人，东汉大文学家蔡邕的女儿，是中国历史上著名的才女和文学家，精于天文数理，既博学能文，又善诗赋，兼长辩才与音律。代表作有《胡笳十八拍》、《悲愤诗》等 。',
     	},
     	skill:{
+            xinjushou:{
+                audio:'jushou',
+                trigger:{player:'phaseEnd'},
+    			content:function(){
+                    'step 0'
+    				player.draw(4);
+    				player.turnOver();
+                    'step 1'
+                    player.chooseCard('h',true,'弃置一张手牌，若以此法弃置的是装备牌，则你改为使用之').set('ai',function(card){
+                        if(get.type(card)=='equip'){
+                            return 5-get.value(card);
+                        }
+                        return -get.value(card);
+                    }).set('filterCard',lib.filter.cardDiscardable);
+                    'step 2'
+                    if(result.bool&&result.cards.length){
+                        if(get.type(result.cards[0])=='equip'){
+                            player.$give(result.cards,player);
+                            player.lose(result.cards,ui.special);
+                            event.toequip=result.cards[0];
+                        }
+                        else{
+                            player.discard(result.cards[0]);
+                        }
+                    }
+                    'step 3'
+                    if(event.toequip){
+                        game.delay();
+                    }
+                    'step 4'
+                    if(event.toequip){
+                        player.equip(event.toequip);
+                    }
+    			},
+    			ai:{
+    				effect:{
+    					target:function(card,player,target){
+    						if(card.name=='guiyoujie') return [0,1];
+    					}
+    				}
+    			},
+            },
+            xinjiewei:{
+                audio:'yanzheng',
+                enable:'chooseToUse',
+    			filterCard:true,
+    			position:'e',
+    			viewAs:{name:'wuxie'},
+    			filter:function(event,player){
+    				return player.countCards('e')>0;
+    			},
+    			viewAsFilter:function(player){
+    				return player.countCards('e')>0;
+    			},
+    			prompt:'将一张装备区内的牌当无懈可击使用',
+    			check:function(card){return 8-get.equipValue(card)},
+    			threaten:1.2,
+                group:'xinjiewei_move',
+                subSkill:{
+                    move:{
+                        trigger:{player:'turnOverEnd'},
+            			direct:true,
+            			audio:'jiewei',
+                        filter:function(event,player){
+                            return !player.isTurnedOver();
+                        },
+            			content:function(){
+                            "step 0"
+            				player.chooseCardTarget({
+            					ai1:function(card){
+            						return 7-get.useful(card);
+            					},
+            					ai2:function(target){
+            						var player=_status.event.player;
+            						if(ui.selected.targets.length==0){
+            							if(target.countCards('j')&&get.attitude(player,target)>0) return 10;
+            							if(get.attitude(player,target)<0){
+            								var players=game.filterPlayer();
+            								for(var i=0;i<players.length;i++){
+            									if(get.attitude(player,players[i])>0){
+            										if((target.getEquip(1)&&!players[i].getEquip(1))||
+            										(target.getEquip(2)&&!players[i].getEquip(2))||
+            										(target.getEquip(3)&&!players[i].getEquip(3))||
+            										(target.getEquip(4)&&!players[i].getEquip(4))||
+            										(target.getEquip(5)&&!players[i].getEquip(5))) return -get.attitude(player,target);
+            									}
+            								}
+            							}
+            							return 0;
+            						}
+            						return -get.attitude(player,target)*get.attitude(player,ui.selected.targets[0]);
+            					},
+            					multitarget:true,
+            					filterTarget:function(card,player,target){
+            						if(ui.selected.targets.length){
+            							var from=ui.selected.targets[0];
+            							var judges=from.getCards('j');
+            							for(var i=0;i<judges.length;i++){
+            								if(!target.hasJudge(judges[i].viewAs||judges[i].name)) return true;
+            							}
+            							if(target.isMin()) return false;
+            							if((from.getEquip(1)&&!target.getEquip(1))||
+            								(from.getEquip(2)&&!target.getEquip(2))||
+            								(from.getEquip(3)&&!target.getEquip(3))||
+            								(from.getEquip(4)&&!target.getEquip(4))||
+            								(from.getEquip(5)&&!target.getEquip(5))) return true;
+            							return false;
+            						}
+            						else{
+            							return target.countCards('ej')>0;
+            						}
+            					},
+            					selectTarget:2,
+            					filterCard:lib.filter.cardDiscardable,
+            					prompt:get.prompt('jiewei'),
+                                prompt2:'弃置一张牌，然后移动场上的一张牌',
+                                position:'he',
+            					targetprompt:['被移走','移动目标'],
+            					target:target
+            				});
+            				"step 1"
+            				if(!result.bool){
+            					event.finish();
+            					return;
+            				}
+            				player.discard(result.cards);
+            				player.logSkill('jiewei',result.targets,false);
+            				player.line2(result.targets);
+            				event.targets=result.targets;
+            				"step 2"
+            				game.delay();
+            				"step 3"
+            				if(targets.length==2){
+            					player.choosePlayerCard('ej',true,function(button){
+            						var player=_status.event.player;
+            						var targets0=_status.event.targets0;
+            						var targets1=_status.event.targets1;
+            						if(get.attitude(player,targets0)>get.attitude(player,targets1)){
+            							return get.position(button.link)=='j'?10:0;
+            						}
+            						else{
+            							if(get.position(button.link)=='j') return -10;
+            							return get.equipValue(button.link);
+            						}
+            					},targets[0]).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
+            						var targets1=_status.event.targets1;
+            						if(get.position(button.link)=='j'){
+            							return !targets1.hasJudge(button.link.viewAs||button.link.name);
+            						}
+            						else{
+            							return !targets1.countCards('e',{subtype:get.subtype(button.link)});
+            						}
+            					});
+            				}
+            				else{
+            					event.finish();
+            				}
+            				"step 4"
+            				if(result.bool&&result.links.length){
+            					var link=result.links[0];
+            					if(get.position(link)=='e'){
+            						event.targets[1].equip(link);
+            					}
+            					else if(link.viewAs){
+            						event.targets[1].addJudge({name:link.viewAs},[link]);
+            					}
+            					else{
+            						event.targets[1].addJudge(link);
+            					}
+            					event.targets[0].$give(link,event.targets[1])
+            					game.delay();
+            				}
+            			}
+                    }
+                }
+            },
     		jianchu:{
     			trigger:{player:'shaBegin'},
     			filter:function(event){
@@ -4186,6 +4362,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		xinsheng:'新生',
     		qimou:'奇谋',
     		xinqiangxi:'强袭',
+            xinjushou:'据守',
+            xinjiewei:'解围',
+            xinjiewei_info:'你可以将装备区里的牌当【无懈可击】使用；当你从背面翻至正面时，你可以弃置一张牌，然后移动场上的一张牌',
+            xinjushou_info:'结束阶段，你可以翻面并摸四张牌，然后弃置一张手牌，若以此法弃置的是装备牌，则你改为使用之',
     		jixi_info:'出牌阶段，你可以把任意一张田当【顺手牵羊】使用',
     		xinqiangxi_info:'出牌阶段各限一次，你可以选择一项：1. 失去一点体力并对你攻击范围内的一名其他角色造成一点伤害；2. 弃置一张装备牌并对你攻击范围内的一名其他角色造成一点伤害 ',
     		qimou_info:'限定技，出牌阶段，你可以失去任意点体力，然后直到回合结束，你的进攻距离+X，且你可以多使用X张【杀】（X为你失去的体力值）',

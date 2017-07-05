@@ -984,6 +984,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					selectTarget:2,
     					filterCard:lib.filter.cardDiscardable,
     					prompt:get.prompt('liguang'),
+						prompt2:'弃置一张手牌，然后移动场上的一张牌',
     					targetprompt:['被移走','移动目标'],
     					target:target
     				});

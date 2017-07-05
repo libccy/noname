@@ -10331,6 +10331,9 @@
 						game.pause();
 						if(event.prompt!=false){
 							event.dialog=ui.create.dialog(event.prompt||'请选择卡牌和目标');
+							if(event.prompt2){
+								event.dialog.addText(event.prompt2,event.prompt2.length<=20);
+							}
 						}
 					}
                     else if(event.isOnline()){
@@ -24900,8 +24903,8 @@
 		delay:function(time,time2){
 			if(_status.paused) return;
 			game.pause();
-			if(time==undefined) time=1;
-			if(time2==undefined) time2=0;
+			if(typeof time!='number') time=1;
+			if(typeof time2!='number') time2=0;
 			time=time*lib.config.duration+time2;
 			if(lib.config.speed=='vvfast') time/=3;
 			_status.timeout=setTimeout(game.resume,time);
