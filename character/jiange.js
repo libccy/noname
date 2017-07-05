@@ -506,6 +506,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                        return true;
 	                    }
 	                }
+					return false;
 	            },
 	            content:function(){
 	                "step 0"

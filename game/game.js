@@ -14518,6 +14518,9 @@
                     next._args=Array.from(arguments);
                     return next;
 				},
+				viewHandcards:function(target){
+					return this.viewCards(get.translation(target)+'的手牌',target.getCards('h'));
+				},
                 useResult:function(result,event){
                     event=event||_status.event;
                     if(result._sendskill){

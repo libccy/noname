@@ -22,7 +22,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		sp_sunshangxiang:['female','shu',3,['liangzhu','fanxiang']],
     		caoang:['male','wei',4,['kaikang']],
     		re_yuanshu:['male','qun',4,['wangzun','tongji']],
-    		sp_caoren:['male','wei',4,['kuiwei','yanzheng']],
+    		sp_caoren:['male','wei',4,['weikui','lizhan']],
     		zhangbao:['male','qun',3,['zhoufu','yingbin']],
     		zhangliang:['male','qun',3,['fulu','fuji']],
     		maliang:['male','shu',3,['xiemu','naman']],
@@ -203,6 +203,80 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		dongbai:['dongzhuo']
     	},
     	skill:{
+            weikui:{
+                audio:'kuiwei',
+                enable:'phaseUse',
+                usable:1,
+                filterTarget:function(card,player,target){
+                    return target!=player&&target.countCards('h');
+                },
+                content:function(){
+                    'step 0'
+                    player.loseHp();
+                    'step 1'
+                    if(target.countCards('h','shan')){
+                        player.viewHandcards(target);
+                        player.useCard({name:'sha'},target);
+                        player.storage.weikui2=target;
+                        player.addTempSkill('weikui2');
+                    }
+                    else{
+                        player.discardPlayerCard(target,'visible',true);
+                    }
+                },
+                ai:{
+                    order:8,
+                    result:{
+                        target:function(player,target){
+                            if(player.hp<=2) return 0;
+                            if(player.hp==3) return target.hp<=2?-1:0;
+                            return -1;
+                        }
+                    }
+                }
+            },
+            weikui2:{
+                onremove:true,
+                mod:{
+	                globalFrom:function(from,to){
+	                    if(to==from.storage.weikui2) return -Infinity;
+	                }
+	            },
+	            mark:'character',
+	            intro:{
+	                content:'与$的距离视为1直到回合结束'
+	            },
+            },
+            lizhan:{
+                audio:'yanzheng',
+                trigger:{player:'phaseEnd'},
+	            direct:true,
+	            filter:function(event,player){
+	                for(var i=0;i<game.players.length;i++){
+	                    if(game.players[i].isDamaged()){
+	                        return true;
+	                    }
+	                }
+                    return false;
+	            },
+	            content:function(){
+	                'step 0'
+	                player.chooseTarget(get.prompt('lizhan'),[1,Infinity],function(card,player,target){
+	                    return target.isDamaged();
+	                }).set('ai',function(target){
+	                    return get.attitude(player,target);
+	                });
+	                'step 1'
+	                if(result.bool){
+	                    player.logSkill('lizhan',result.targets);
+	                    game.asyncDraw(result.targets);
+	                }
+	            },
+	            ai:{
+	                expose:0.3,
+	                threaten:1.3
+	            }
+            },
             zhaohuo:{
                 trigger:{global:'dying'},
     			forced:true,
@@ -1129,16 +1203,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				'step 1'
     				if(result.bool){
     					if(result.cards[0].name=='shan'){
-    						var hs=target.getCards('h');
-    						if(hs.length){
-    							player.viewCards(get.translation(target)+'的手牌',hs);
-    						}
+                            player.viewHandcards(target);
     					}
     					else{
-    						var hs=player.getCards('h');
-    						if(hs.length){
-    							target.viewCards(get.translation(player)+'的手牌',hs);
-    						}
+                            target.viewHandcards(player);
     					}
     				}
     			},
@@ -8543,12 +8611,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             miheng:'祢衡',
             taoqian:'陶谦',
 
+            weikui:'伪溃',
+            weikui2:'伪溃',
+            weikui_info:'出牌阶段限一次，你可以失去1点体力并选择一名有手牌的其他角色，你观看其手牌：若其手牌中有【闪】，则视为你对其使用【杀】,且本回合你计算与其的距离视为1；若其手牌中没有【闪】，你弃置其中一张牌',
+            lizhan:'励战',
+            lizhan_info:'结束阶段，你可以令任意名已受伤的角色摸一张牌',
             wylianji:'连计',
             wylianji_info:'出牌阶段限一次，你可以交给一名其他角色一张【杀】或黑色锦囊牌，并令该角色将牌堆中的随机一张武器牌置入装备区（可替换原装备）。然后该角色选择一项：1.对除你以外的角色使用该牌，并将装备区里的武器牌交给该牌的一个目标角色；2.视为你对其使用此牌，并将装备区内的武器牌交给你。',
             moucheng:'谋逞',
             moucheng_info:'觉醒技，当其他角色使用因“连计”交给其的牌累计造成伤害达到3点后，你失去技能“连计”，然后获得技能“矜功”',
             jingong:'矜功',
-            jingong_info:'出牌阶段限一次，你可以将一张装备牌或【杀】当一张随机锦囊牌使用（三选一），然后本回合的结束阶段，若你于本回合内未造成过伤害，你失去1点体力',
+            jingong_info:'出牌阶段限一次，你可以将一张装备牌或【杀】当一张随机锦囊牌使用（三选一，含笑里藏刀和美人计），然后本回合的结束阶段，若你于本回合内未造成过伤害，你失去1点体力',
             zhaohuo:'招祸',
             zhaohuo_info:'锁定技，当其他角色进入濒死状态时，你的体力上限变为1点，你每以此法减少1点体力上限，你摸一张牌',
             yixiang:'义襄',

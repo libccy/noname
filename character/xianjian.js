@@ -2917,7 +2917,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else{
-						player.viewCards('读心',target.getCards('h'));
+						player.viewHandcards(target);
 						event.finish();
 					}
 					'step 1'

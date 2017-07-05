@@ -983,7 +983,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					target.viewCards(get.translation(player)+'的手牌',player.getCards('h'));
+					target.viewHandcards(player);
 					"step 1"
 					if(!target.countCards('h')){
 						event._result={index:1};
