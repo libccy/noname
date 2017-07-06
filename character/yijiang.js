@@ -171,7 +171,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 filter:function(event,player){
                     if(!player.countCards('h')) return false;
                     if(player.getStat('skill').zhongjian&&!player.hasSkill('zhongjian2')) return false;
-                    return true;
+                    return game.hasPlayer(function(current){
+                        return current!=player&&current.countCards('h')>current.hp;
+                    });
                 },
                 filterCard:true,
                 check:function(){
@@ -180,7 +182,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 discard:false,
                 lose:false,
                 filterTarget:function(card,player,target){
-                    return target.countCards('h')>target.hp;
+                    return target!=player&&target.countCards('h')>target.hp;
                 },
                 content:function(){
                     'step 0'
@@ -255,7 +257,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     if(player.isHealthy()){
                         event.type=0;
                         player.chooseBool(get.prompt('caishi'),'手牌上限+1，然后本回合你的牌不能对其他角色使用',function(){
-                            return false;
+                            return player.skipList.contains('phaseUse');
                         });
                     }
                     else{
