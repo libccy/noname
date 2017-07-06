@@ -345,6 +345,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     'step 2'
                     var equip1=player.getEquip(1);
                     if(equip1){
+                        for(var i=0;i<event.list.length;i++){
+                            if(event.list[i].isDead()) event.list.splice(i--,1);
+                        }
                         if(event.list.length>1){
                             player.chooseTarget(true,'将'+get.translation(equip1)+'交给一名角色',function(card,player,target){
                                 return _status.event.list.contains(target);
@@ -376,9 +379,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                                 var card=ui.selected.cards[0];
                                 var bool=(card.name!='sha');
                                 if(game.hasPlayer(function(current){
-                                    return target.canUse(card,current,bool);
+                                    return target.canUse(card,current,bool)&&get.effect(current,card,target,player)>0;
                                 })){
-                                    return 1;
+                                    var num=1;
+                                    if(target.getEquip(1)){
+                                        num=0.6;
+                                    }
+                                    if(target.hasSkillTag('noe')) 2*num;
+                                    return num;
                                 }
                             }
                             return 0;
@@ -387,9 +395,131 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 }
             },
             moucheng:{
-                derivation:['jingong','wy_meirenji','wy_xiaolicangdao']
+                derivation:['jingong','wy_meirenji','wy_xiaolicangdao'],
+                trigger:{global:'damageEnd'},
+                forced:true,
+                popup:false,
+                filter:function(event,player){
+                    return event.source!=player&&event.getParent(2).name=='useCard'&&event.getParent(3).name=='wylianjiInserted';
+                },
+                init:function(player){
+                    player.storage.moucheng=0;
+                },
+                intro:{
+                    content:'已造成#点伤害'
+                },
+                unique:true,
+                content:function(){
+                    player.storage.moucheng+=trigger.num;
+                    if(player.hasSkill('moucheng')){
+                        player.markSkill('moucheng');
+                        player.syncStorage('moucheng');
+                    }
+                    if(player.storage.moucheng>=3){
+                        event.trigger('mouchengAwaken');
+                    }
+                },
+                group:'moucheng_awaken',
+                subSkill:{
+                    awaken:{
+                        trigger:{player:'mouchengAwaken'},
+                        forced:true,
+                        skillAnimation:true,
+                        content:function(){
+                            player.awakenSkill('moucheng');
+                            player.removeSkill('wylianji');
+                            player.addSkill('jingong');
+                        }
+                    }
+                }
             },
-            jingong:{},
+            jingong:{
+    			enable:'phaseUse',
+    			filter:function(event,player){
+                    return player.countCards('he',function(card){
+                        return card.name=='sha'||get.type(card,'trick')=='trick';
+                    });
+    			},
+                delay:0,
+                usable:1,
+                content:function(){
+                    'step 0'
+                    var list=get.inpile('trick','trick').randomGets(2);
+                    if(Math.random()<0.5){
+                        list.push('wy_meirenji');
+                    }
+                    else{
+                        list.push('wy_xiaolicangdao');
+                    }
+                    for(var i=0;i<list.length;i++){
+                        list[i]=['锦囊','',list[i]];
+                    }
+                    player.chooseButton('矜功',[[list,'vcard']]).set('filterButton',function(button,player){
+                        return game.hasPlayer(function(current){
+                            return player.canUse(button.link[2],current,true,false);
+                        });
+                    }).set('ai',function(button){
+                        var player=_status.event.player;
+    					var name=button.link[2];
+                        if(game.hasPlayer(function(current){
+                            return player.canUse(name,current)&&get.effect(current,{name:name},player,player)>0;
+                        })){
+                            return Math.random();
+                        }
+                        return 0;
+                    });
+                    'step 1'
+                    if(result.bool){
+                        var name=result.links[0][2];
+                        event.fakecard={name:name};
+                        player.chooseCardTarget({
+                            filterCard:function(card){
+    							return card.name=='sha'||get.type(card,'trick')=='trick';
+    						},
+                            position:'he',
+                            filterTarget:lib.filter.filterTarget,
+                            selectTarget:lib.filter.selectTarget,
+                            ai1:function(card){
+                                return 7-get.value(card);
+                            },
+                            ai2:function(target){
+                                var card=_status.event.fakecard;
+                                var player=_status.event.player;
+                                return get.effect(target,card,player,player);
+                            },
+                            _get_card:event.fakecard,
+                            prompt:'将一张装备牌或【杀】当作'+get.translation(name)+'使用'
+                        }).set('fakecard',event.fakecard);
+                    }
+                    else{
+                        event.finish();
+                    }
+                    'step 2'
+                    if(result.bool){
+                        player.useCard(event.fakecard,result.cards,result.targets);
+                    }
+                },
+    			ai:{
+    				order:2,
+    				result:{
+    					player:function(player){
+                            if((player.hp<=2||player.needsToDiscard())&&!player.getStat('damage')) return 0;
+                            return 1;
+                        }
+    				}
+    			}
+            },
+            jingong2:{
+                trigger:{player:'phaseEnd'},
+                forced:true,
+                filter:function(event,player){
+                    return !player.getStat('damage');
+                },
+                content:function(){
+                    player.loseHp();
+                }
+            },
+            jingong3:{},
             weikui:{
                 audio:'kuiwei',
                 enable:'phaseUse',
@@ -8814,6 +8944,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             moucheng:'谋逞',
             moucheng_info:'觉醒技，当其他角色使用因“连计”交给其的牌累计造成伤害达到3点后，你失去技能“连计”，然后获得技能“矜功”',
             jingong:'矜功',
+            jingong2:'矜功',
+            jingong_backup:'矜功',
             jingong_info:'出牌阶段限一次，你可以将一张装备牌或【杀】当一张随机锦囊牌使用（三选一，其中一张为【美人计】或【笑里藏刀】），然后本回合的结束阶段，若你于本回合内未造成过伤害，你失去1点体力',
             zhaohuo:'招祸',
             zhaohuo_info:'锁定技，当其他角色进入濒死状态时，你的体力上限变为1点，你每以此法减少1点体力上限，你摸一张牌',

@@ -15924,7 +15924,7 @@
                 },
 				canUse:function(card,player,distance,includecard){
 					if(typeof card=='string') card={name:card};
-					if(!lib.filter.cardEnabled(card,player)) return false;
+					if(includecard!=false&&!lib.filter.cardEnabled(card,player)) return false;
 					if(includecard&&!lib.filter.cardUsable(card,this)) return false;
 					if(distance==false) return lib.filter.targetEnabled(card,this,player);
 					return lib.filter.filterTarget(card,this,player);
