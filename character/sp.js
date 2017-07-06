@@ -207,11 +207,99 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 fullskin:true,
                 vanish:true,
                 derivation:'wangyun',
+                type:'trick',
+                enable:true,
+                filterTarget:function(card,player,target){
+                    return target.countCards('h')&&target!=player&&target.sex=='male';
+                },
+                content:function(){
+                    'step 0'
+                    event.list=game.filterPlayer(function(current){
+                        return current!=player&&current!=target&&current.sex=='female';
+                    }).sortBySeat();
+                    'step 1'
+                    if(target.countCards('h')&&event.list.length){
+                        event.current=event.list.shift();
+                        event.current.gainPlayerCard(target,true);
+                        target.line2([event.current,player]);
+                    }
+                    else{
+                        event.goto(4);
+                    }
+                    'step 2'
+                    event.current.chooseCard('h',true,'将一张手牌交给'+get.translation(player));
+                    'step 3'
+                    if(result.bool){
+                        event.current.give(result.cards,player,true);
+                    }
+                    event.goto(1);
+                    'step 4'
+                    var n1=target.countCards('h');
+                    var n2=player.countCards('h');
+                    if(n1>n2){
+                        target.damage(player);
+                        player.line(target);
+                    }
+                    else if(n1<n2){
+                        player.damage(target);
+                        target.line(player);
+                    }
+                },
+                ai:{
+                    order:6,
+                    result:{
+                        target:function(player,target){
+                            var num=game.countPlayer(function(current){
+                                return current!=player&&current!=target&&current.sex=='female';
+                            });
+                            var nh=target.countCards('h');
+                            num=Math.min(num,nh);
+                            var nh1=nh-num;
+                            var nh2=player.countCards('h')-1+num;
+                            if(nh1==nh2&&num==0) return 0;
+                            if(nh2<=nh1) return -3;
+                            if(player.hp==1||num==1) return 0;
+                            return -1;
+                        }
+                    }
+                }
             },
             wy_xiaolicangdao:{
                 fullskin:true,
                 vanish:true,
                 derivation:'wangyun',
+                type:'trick',
+                enable:true,
+                filterTarget:function(card,player,target){
+                    return target!=player;
+                },
+                content:function(){
+                    'step 0'
+                    var num=Math.min(5,target.maxHp-target.hp);
+                    if(num) target.draw(num);
+                    'step 1'
+                    target.damage();
+                },
+                ai:{
+                    order:6,
+                    tag:{
+                        damage:1
+                    },
+                    result:{
+                        target:function(player,target){
+                            var num=Math.min(5,target.maxHp-target.hp);
+                            if(target.hp==1){
+                                if(num>=3) return 0;
+                                if(!target.hasSkillTag('maixie_hp')){
+                                    return -3;
+                                }
+                                return -1;
+                            }
+                            if(num==2) return 0;
+                            return -2+num+(Math.pow(target.hp,0.2)-1);
+                        }
+                    }
+                }
             }
         },
     	skill:{
@@ -310,6 +398,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     if(equip1){
                         game.delay();
                         target.give(equip1,player);
+                        target.line(player);
                     }
                 },
                 content3:function(){
@@ -359,6 +448,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         else{
                             if(event.list.length==1){
                                 player.give(equip1,event.list[0]);
+                                player.line(event.list);
                             }
                             event.finish();
                         }
@@ -369,6 +459,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     'step 3'
                     if(result.bool&&result.targets.length&&event.equip1){
                         player.give(event.equip1,result.targets[0]);
+                        player.line(result.targets);
                     }
                 },
                 ai:{
@@ -437,7 +528,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			enable:'phaseUse',
     			filter:function(event,player){
                     return player.countCards('he',function(card){
-                        return card.name=='sha'||get.type(card,'trick')=='trick';
+                        return card.name=='sha'||get.type(card)=='equip';
                     });
     			},
                 delay:0,
@@ -464,6 +555,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         if(game.hasPlayer(function(current){
                             return player.canUse(name,current)&&get.effect(current,{name:name},player,player)>0;
                         })){
+                            if(name=='wy_meirenji'||name=='wy_xiaolicangdao') return Math.random()+0.5;
                             return Math.random();
                         }
                         return 0;
@@ -474,7 +566,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         event.fakecard={name:name};
                         player.chooseCardTarget({
                             filterCard:function(card){
-    							return card.name=='sha'||get.type(card,'trick')=='trick';
+    							return card.name=='sha'||get.type(card)=='equip';
     						},
                             position:'he',
                             filterTarget:lib.filter.filterTarget,
@@ -497,6 +589,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     'step 2'
                     if(result.bool){
                         player.useCard(event.fakecard,result.cards,result.targets);
+                        player.addTempSkill('jingong2');
                     }
                 },
     			ai:{
