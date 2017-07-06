@@ -14909,6 +14909,16 @@
                     next.setContent('gain');
 					return next;
 				},
+				give:function(cards,target,hidden){
+					if(hidden===true){
+						target.gain(cards,this);
+						this.$giveAuto(cards,target);
+					}
+					else{
+						target.gain(cards,this);
+						this.$give(cards,target);
+					}
+				},
 				lose:function(){
 					var next=game.createEvent('lose');
 					next.player=this;
@@ -15914,7 +15924,8 @@
                 },
 				canUse:function(card,player,distance,includecard){
 					if(typeof card=='string') card={name:card};
-					if(includecard&&!lib.filter.filterCard(card,this)) return false;
+					if(!lib.filter.cardEnabled(card,player)) return false;
+					if(includecard&&!lib.filter.cardUsable(card,this)) return false;
 					if(distance==false) return lib.filter.targetEnabled(card,this,player);
 					return lib.filter.filterTarget(card,this,player);
 				},
@@ -18697,6 +18708,14 @@
 				getRand:function(){
 					if(!this._rand) this._rand=Math.random();
 					return this._rand;
+				},
+				insert:function(func,map){
+					var next=game.createEvent(this.name+'Inserted',false);
+					next.setContent(func);
+					for(var i in map){
+						next.set(i,map[i]);
+					}
+					return next;
 				},
 				backup:function(skill){
 					this._backup={

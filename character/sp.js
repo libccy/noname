@@ -215,7 +215,177 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             }
         },
     	skill:{
-            wylianji:{},
+            wylianji:{
+                enable:'phaseUse',
+                usable:1,
+                filter:function(event,player){
+                    return player.hasCard(lib.skill.wylianji.filterCard);
+                },
+                check:function(card){
+                    if(card.name=='sha') return 1;
+                    else{
+                        if(get.tag(card,'damage')){
+                            if(get.tag(card,'multineg')) return 5;
+                            return 2;
+                        }
+                    }
+                    return 0;
+                },
+                filterCard:function(card){
+                    return card.name=='sha'||(get.type(card,'trick')=='trick'&&get.color(card)=='black'&&!get.info(card).multitarget)&&get.info(card).enable;
+                },
+                filterTarget:function(card,player,target){
+                    return target!=player&&!target.isMin()&&
+                    (player.canUse(card,target,false)||game.hasPlayer(function(current){
+                        return current!=player&&target.canUse(card,current);
+                    }));
+                },
+                discard:false,
+                lose:true,
+                delay:0,
+                content:function(){
+                    'step 0'
+                    player.showCards(get.translation(player)+'对'+get.translation(target)+'发动了【连计】',cards);
+                    'step 1'
+                    var equip1=get.cardPile(function(card){
+                        return get.subtype(card)=='equip1';
+                    },'cardPile');
+                    target.$draw(equip1);
+                    target.equip(equip1);
+                    game.delay();
+                    'step 2'
+                    var card=cards[0];
+                    var bool1=game.hasPlayer(function(current){
+                        return current!=player&&target.canUse(card,current);
+                    });
+                    var bool2=player.canUse(card,target,false);
+                    if(bool1&&bool2){
+                        target.chooseControl(function(){
+                            return 0;
+                        }).set('choiceList',[
+                            '对除'+get.translation(player)+'以外的角色使用'+get.translation(cards)+'，并将装备区里的武器牌交给该牌的一个目标角色',
+                            '视为'+get.translation(player)+'对你使用'+get.translation(cards)+'，并将装备区内的武器牌交给'+get.translation(player)
+                        ]);
+                    }
+                    else if(bool1){
+                        event.directindex=0;
+                    }
+                    else if(bool2){
+                        event.directindex=1;
+                    }
+                    else{
+                        event.finish();
+                    }
+                    'step 3'
+                    var card=cards[0];
+                    if(result&&typeof event.directindex!='number'){
+                        event.directindex=result.index;
+                    }
+                    if(event.directindex==1){
+                        event.insert(lib.skill.wylianji.content2,{
+                            player:player,
+                            target:target,
+                            card:card
+                        })
+                    }
+                    else{
+                        event.insert(lib.skill.wylianji.content3,{
+                            player:target,
+                            card:card,
+                            targets:game.filterPlayer(function(current){
+                                return current!=player;
+                            })
+                        });
+                    }
+                },
+                content2:function(){
+                    'step 0'
+                    player.useCard(card,target);
+                    'step 1'
+                    if(!get.owner(card)){
+                        target.gain(card,'gain2');
+                    }
+                    'step 2'
+                    var equip1=target.getEquip(1);
+                    if(equip1){
+                        game.delay();
+                        target.give(equip1,player);
+                    }
+                },
+                content3:function(){
+                    'step 0'
+                    var select=get.select(get.info(card).selectTarget);
+                    if(select[1]==-1){
+                        for(var i=0;i<targets.length;i++){
+                            if(!player.canUse(card,targets[i])){
+                                targets.splice(i--,1);
+                            }
+                        }
+                        if(targets.length){
+                            player.useCard(card,targets);
+                        }
+                        event.list=targets.slice(0);
+                        event.goto(2);
+                    }
+                    else{
+                        player.chooseTarget(select,'选择'+get.translation(card)+'的目标',true,function(cardx,player,target){
+                            var card=_status.event.card;
+                            return _status.event.targets.contains(target)&&player.canUse(card,target);
+                        }).set('ai',function(target){
+                            var card=_status.event.card;
+                            var player=_status.event.player;
+                            return get.effect(target,card,player,player);
+                        }).set('targets',targets).set('card',card);
+                    }
+                    'step 1'
+                    if(result.bool){
+                        player.useCard(card,result.targets);
+                        event.list=result.targets.slice(0);
+                    }
+                    'step 2'
+                    var equip1=player.getEquip(1);
+                    if(equip1){
+                        if(event.list.length>1){
+                            player.chooseTarget(true,'将'+get.translation(equip1)+'交给一名角色',function(card,player,target){
+                                return _status.event.list.contains(target);
+                            }).set('ai',function(target){
+                                return get.attitude(player,target);
+                            }).set('list',_status.event.list);
+                            event.equip1=equip1;
+                        }
+                        else{
+                            if(event.list.length==1){
+                                player.give(equip1,event.list[0]);
+                            }
+                            event.finish();
+                        }
+                    }
+                    else{
+                        event.finish();
+                    }
+                    'step 3'
+                    if(result.bool&&result.targets.length&&event.equip1){
+                        player.give(event.equip1,result.targets[0]);
+                    }
+                },
+                ai:{
+                    order:7,
+                    result:{
+                        target:function(player,target){
+                            if(ui.selected.cards.length){
+                                var card=ui.selected.cards[0];
+                                var bool=(card.name!='sha');
+                                if(game.hasPlayer(function(current){
+                                    return target.canUse(card,current,bool);
+                                })){
+                                    return 1;
+                                }
+                            }
+                            return 0;
+                        }
+                    }
+                }
+            },
             moucheng:{
                 derivation:['jingong','wy_meirenji','wy_xiaolicangdao']
             },
@@ -8639,7 +8809,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             lizhan:'励战',
             lizhan_info:'结束阶段，你可以令任意名已受伤的角色摸一张牌',
             wylianji:'连计',
-            wylianji_info:'出牌阶段限一次，你可以展示一张【杀】或黑色锦囊牌，并令一名其他角色将牌堆中的随机一张武器牌置入装备区（可替换原装备）。然后该角色选择一项：1.对除你以外的角色使用该牌，并将装备区里的武器牌交给该牌的一个目标角色；2.视为你对其使用此牌，并将装备区内的武器牌交给你。',
+            wylianji_info:'出牌阶段限一次，你可以展示一张【杀】或黑色锦囊牌，并令一名其他角色将牌堆中的随机一张武器牌置入装备区（可替换原装备）。然后该角色选择一项：1.对除你以外的角色使用该牌，并将装备区里的武器牌交给该牌的一个目标角色；2.令你对其使用此牌，然后获得此牌，并将装备区内的武器牌交给你。',
             // from here
             moucheng:'谋逞',
             moucheng_info:'觉醒技，当其他角色使用因“连计”交给其的牌累计造成伤害达到3点后，你失去技能“连计”，然后获得技能“矜功”',
