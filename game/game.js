@@ -14306,7 +14306,8 @@
 							next.ai=arguments[i];
 						}
 						else if(typeof arguments[i]=='string'){
-							next.prompt=arguments[i];
+							if(next.prompt) next.prompt2=arguments[i];
+							else next.prompt=arguments[i];
 						}
 						else if(get.itemtype(arguments[i])=='dialog'){
 							next.dialog=arguments[i];
@@ -19394,6 +19395,7 @@
 				return (_status.event._aiexclude.contains(card)==false);
 			},
 			filterCard:function(card,player,event){
+				if(get.info(card).toself&&!lib.filter.targetEnabled(card,player,player)) return false;
 				return (lib.filter.cardEnabled(card,player,event)&&
 					lib.filter.cardUsable(card,player,event));
 			},
@@ -26467,6 +26469,7 @@
 					};
                     if(card.modTarget==undefined) card.modTarget=true;
 					if(card.content==undefined) card.content=lib.element.content.equipCard;
+					if(card.toself==undefined) card.toself=true;
 					if(card.ai==undefined) card.ai={basic:{}};
 					if(card.ai.basic==undefined) card.ai.basic={};
 					if(card.ai.result==undefined) card.ai.result={target:1.5};

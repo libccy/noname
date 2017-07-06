@@ -89,6 +89,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				enable:true,
+				toself:true,
 				filterTarget:function(card,player,target){
 					return target==player;
 				},
@@ -1591,6 +1592,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			tianxianjiu:{
 				fullskin:true,
 				type:'basic',
+				toself:true,
 				enable:function(event,player){
 					return !player.hasSkill('tianxianjiu');
 				},

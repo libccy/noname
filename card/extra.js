@@ -8,6 +8,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				audio:true,
 				fullskin:true,
 				type:"basic",
+				toself:true,
 				enable:function(event,player){
 					return !player.hasSkill('jiu');
 				},

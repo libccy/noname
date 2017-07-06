@@ -74,9 +74,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		zhangrang:['male','qun',3,['taoluan']],
             sunziliufang:['male','wei',3,['guizao','jiyu']],
 
-            xinxianying:['male','wei',3,[]],
-            wuxian:['male','wei',3,[]],
-            xushi:['male','wei',3,[]],
+            xinxianying:['male','wei',3,['zhongjian','caishi']],
+            wuxian:['male','shu',3,[]],
+            xushi:['male','wu',3,[]],
     		caojie:['male','wei',3,[]],
     	},
     	characterIntro:{
@@ -165,6 +165,150 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		liuchen:['liushan'],
     	},
     	skill:{
+            zhongjian:{
+                enable:'phaseUse',
+                usable:2,
+                filter:function(event,player){
+                    if(!player.countCards('h')) return false;
+                    if(player.getStat('skill').zhongjian&&!player.hasSkill('zhongjian2')) return false;
+                    return true;
+                },
+                filterCard:true,
+                check:function(){
+                    return Math.random();
+                },
+                discard:false,
+                lose:false,
+                filterTarget:function(card,player,target){
+                    return target.countCards('h')>target.hp;
+                },
+                content:function(){
+                    'step 0'
+                    player.showCards(cards);
+                    'step 1'
+                    var num=target.countCards('h')-target.hp;
+                    if(num<=0){
+                        event.finish();
+                        return;
+                    }
+                    var hs=target.getCards('h').randomGets(num);
+                    target.showCards(hs);
+                    var colors=[];
+                    var numbers=[];
+                    for(var i=0;i<cards.length;i++){
+                        colors.add(get.color(cards[i]));
+                        numbers.add(get.number(cards[i]));
+                    }
+                    event.bool1=false;
+                    event.bool2=false;
+                    for(var i=0;i<hs.length;i++){
+                        if(!event.bool1&&colors.contains(get.color(hs[i]))) event.bool1=true;
+                        if(!event.bool2&&numbers.contains(get.number(hs[i]))) event.bool2=true;
+                    }
+                    'step 2'
+                    if(event.bool1){
+                        player.chooseControl(function(event,player){
+                            return _status.event.bool?0:1;
+                        }).set('bool',(get.attitude(player,target)>=0||player.countCards('h')<target.countCards('h'))).set('choiceList',['摸一张牌','弃置'+get.translation(target)+'一张牌']);
+                    }
+                    else{
+                        event.goto(4);
+                    }
+                    'step 3'
+                    if(result&&typeof result.index=='number'){
+                        if(result.index==0) player.draw();
+                        else player.discardPlayerCard(target,'he',true);
+                    }
+                    'step 4'
+                    if(event.bool2){
+                        player.addTempSkill('zhongjian2');
+                    }
+                    if(!event.bool1&&!event.bool2){
+                        player.addTempSkill('zhongjian3');
+                        player.popup('杯具');
+                    }
+                },
+                ai:{
+                    order:8,
+                    result:{
+                        player:function(player,target){
+                            var num=target.countCards('h')-target.hp;
+                            if(get.attitude(player,target)<0) return 1.5*num;
+                            return num;
+                        }
+                    }
+                }
+            },
+            zhongjian2:{},
+            zhongjian3:{
+                mod:{
+                    maxHandcard:function(player,num){
+                        return num-1;
+                    }
+                }
+            },
+            caishi:{
+                trigger:{player:'phaseDrawBegin'},
+                direct:true,
+                content:function(){
+                    'step 0'
+                    if(player.isHealthy()){
+                        event.type=0;
+                        player.chooseBool(get.prompt('caishi'),'手牌上限+1，然后本回合你的牌不能对其他角色使用',function(){
+                            return false;
+                        });
+                    }
+                    else{
+                        event.type=1;
+                        player.chooseControl('cancel2',function(){
+                            return 1;
+                        }).set('prompt',get.prompt('caishi')).set('choiceList',['手牌上限+1，然后本回合你的牌不能对其他角色使用','回复1点体力，然后本回合你的牌不能对自己使用']);
+                    }
+                    'step 1'
+                    if(event.type){
+                        if(result.control!='cancel2'){
+                            player.logSkill('caishi');
+                            if(result.index==0){
+                                player.addTempSkill('caishi2');
+                            }
+                            else if(result.index==1){
+                                player.recover();
+                                player.addTempSkill('caishi3');
+                            }
+                        }
+                    }
+                    else{
+                        if(result.bool){
+                            player.logSkill('caishi');
+                            player.addTempSkill('caishi2');
+                        }
+                    }
+                }
+            },
+            caishi2:{
+                mod:{
+                    maxHandcard:function(player,num){
+                        return num+1;
+                    },
+                    playerEnabled:function(card,player,target){
+    					if(player!=target) return false;
+    				}
+                }
+            },
+            caishi3:{
+                mod:{
+                    playerEnabled:function(card,player,target){
+    					if(player==target) return false;
+    				}
+                }
+            },
+            ttt:{
+                mod:{
+                    targetEnabled:function(card){
+                        if(card.name=='tao') return false;
+                    }
+                }
+            },
     		jyzongshi:{
     			audio:2,
     			trigger:{player:['chooseToCompareAfter','compareMultipleAfter'],target:['chooseToCompareAfter','compareMultipleAfter']},
@@ -7453,6 +7597,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             xushi:'徐氏',
     		caojie:'曹节',
 
+            zhongjian:'忠鉴',
+            zhongjian_info:'出牌阶段限一次，你可以展示一张手牌，然后展示手牌数大于体力值的一名其他角色X张手牌（X为其手牌数和体力值之差）。若以此法展示的牌与你展示的牌：有颜色相同的，你摸一张牌或弃置其一张牌；有点数相同的，本回合此技能改为“出牌阶段限两次”；均不同，你的手牌上限-1',
+            caishi:'才识',
+            caishi_info:'摸牌阶段开始时，你可以选择一项：1.手牌上限+1，然后本回合你的牌不能对其他角色使用；2.回复1点体力，然后本回合你的牌不能对自己使用',
     		guizao:'瑰藻',
     		guizao_info:'弃牌阶段结束时，若你于此阶段弃置牌的数量不小于2且它们的花色各不相同，你可以回复1点体力或摸一张牌',
     		jiyu:'讥谀',

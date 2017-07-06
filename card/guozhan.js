@@ -299,6 +299,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:6,
 					result:{
 						target:-1
+					},
+					tag:{
+						multitarget:1,
+						multineg:1,
 					}
 				}
 			},
@@ -857,6 +861,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return player.hasSkill('xietianzi');
 				},
+				toself:true,
 				forced:true,
 				popup:false,
 				priority:-50,

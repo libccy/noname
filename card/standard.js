@@ -202,6 +202,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'basic',
 				cardcolor:'red',
+				toself:true,
 				enable:function(card,player){
 					return player.hp<player.maxHp;
 				},
@@ -774,6 +775,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:true,
 				selectTarget:-1,
 				cardcolor:'red',
+				toself:true,
 				filterTarget:function(card,player,target){
 					return target==player;
 				},

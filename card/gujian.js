@@ -361,6 +361,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            fullskin:true,
 	            type:'trick',
 	            enable:true,
+				toself:true,
 	            filterTarget:function(card,player,target){
 	                return target==player;
 	            },

@@ -43,6 +43,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				enable:true,
+				toself:true,
 				filterTarget:function(card,player,target){
 					return player==target;
 				},
@@ -340,6 +341,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				enable:true,
 				type:'trick',
+				toself:true,
 				filterTarget:function(card,player,target){
 					return player==target;
 				},
@@ -363,6 +365,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'trick',
 				enable:true,
 				discard:false,
+				toself:true,
 				selectTarget:-1,
 				filterTarget:function(card,player,target){
 					return target==player;
@@ -475,6 +478,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:true,
 				selectTarget:-1,
 				modTarget:true,
+				toself:true,
 				filterTarget:function(card,player,target){return player==target},
 				content:function(){
 					target.gainMaxHp();

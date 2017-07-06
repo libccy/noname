@@ -272,6 +272,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			du:{
 				type:'basic',
 				fullskin:true,
+				toself:true,
 				ai:{
 					value:-5,
 					useful:6,
