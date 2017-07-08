@@ -75,7 +75,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             sunziliufang:['male','wei',3,['guizao','jiyu']],
 
             xinxianying:['male','wei',3,['zhongjian','caishi']],
-            wuxian:['male','shu',3,[]],
+            wuxian:['male','shu',3,['fumian','daiyan']],
             xushi:['male','wu',3,[]],
     		caojie:['male','wei',3,[]],
     	},
@@ -7599,6 +7599,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             xushi:'徐氏',
     		caojie:'曹节',
 
+            fumian:'福绵',
+            fumian_info:'结束阶段，你可以选择一项：1.下回合摸牌阶段多摸一张牌；2.下回合你使用红色牌可以多选择1个目标。选择完成后，此项不能再次被选择且另一个选项的数字+1，直到两个选项都被选择过，重置此技能',
+            daiyan:'怠宴',
+            daiyan_info:'准备阶段，你可以选择一名其他角色，该角色从牌堆获得一张【桃】；若该角色上回合以此法成为过目标，其失去1点体力',
             zhongjian:'忠鉴',
             zhongjian_info:'出牌阶段限一次，你可以展示一张手牌，然后展示手牌数大于体力值的一名其他角色X张手牌（X为其手牌数和体力值之差）。若以此法展示的牌与你展示的牌：有颜色相同的，你摸一张牌或弃置其一张牌；有点数相同的，本回合此技能改为“出牌阶段限两次”；均不同，你的手牌上限-1',
             caishi:'才识',
