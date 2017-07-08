@@ -10290,9 +10290,12 @@
 								str+='个目标';
 							}
 							event.dialog=ui.create.dialog(str);
-							event.dialog.add('0/'+get.numStr(get.select(event.selectTarget)[1],'target'));
+							if(event.prompt2){
+								event.dialog.addText(event.prompt2,event.prompt2.length<=20);
+							}
+							event.promptbar=event.dialog.add('0/'+get.numStr(get.select(event.selectTarget)[1],'target'));
 							event.custom.add.target=function(){
-								_status.event.dialog.content.childNodes[1].innerHTML=
+								_status.event.promptbar.innerHTML=
 								ui.selected.targets.length+'/'+get.numStr(get.select(event.selectTarget)[1],'target');
 							}
 						}
@@ -14261,6 +14264,32 @@
                     next.setContent('chooseCardTarget');
                     next._args=Array.from(arguments);
 					return next;
+				},
+				chooseControlList:function(){
+					var list=[];
+					var prompt=null;
+					var forced='cancel2';
+					var func=null;
+					for(var i=0;i<arguments.length;i++){
+						if(typeof arguments[i]=='string'){
+							if(!prompt){
+								prompt=arguments[i];
+							}
+							else{
+								list.push(arguments[i]);
+							}
+						}
+						else if(Array.isArray(arguments[i])){
+							list=arguments[i];
+						}
+						else if(arguments[i]===true){
+							forced=null;
+						}
+						else if(typeof arguments[i]=='function'){
+							func=arguments[i];
+						}
+					}
+					return this.chooseControl(forced,func).set('choiceList',list).set('prompt',prompt);
 				},
 				chooseControl:function(){
 					var next=game.createEvent('chooseControl');
@@ -19415,6 +19444,12 @@
             targetEnabled2:function(card,player,target){
                 if(lib.filter.targetEnabled(card,player,target)) return true;
 				if(card==undefined) return false;
+
+				var mod=game.checkMod(card,player,target,'unchanged','playerEnabled',player);
+				if(mod==false) return false;
+				var mod=game.checkMod(card,player,target,'unchanged','targetEnabled',target);
+				if(mod==false) return false;
+
 				var filter=get.info(card).modTarget;
 				if(typeof filter=='boolean') return filter;
 				if(typeof filter=='function') return filter(card,player,target);
@@ -26468,6 +26503,7 @@
 						return target==player;
 					};
                     if(card.modTarget==undefined) card.modTarget=true;
+					if(card.allowMultiple==undefined) card.allowMultiple=false;
 					if(card.content==undefined) card.content=lib.element.content.equipCard;
 					if(card.toself==undefined) card.toself=true;
 					if(card.ai==undefined) card.ai={basic:{}};
@@ -26516,6 +26552,7 @@
 					if(card.enable==undefined) card.enable=true;
 					if(card.filterTarget==undefined) card.filterTarget=lib.filter.judge;
 					if(card.content==undefined) card.content=lib.element.content.addJudgeCard;
+					if(card.allowMultiple==undefined) card.allowMultiple=false;
 				}
 			}
 			for(i in lib.skill){

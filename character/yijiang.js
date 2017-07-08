@@ -165,6 +165,196 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		liuchen:['liushan'],
     	},
     	skill:{
+            daiyan:{
+                trigger:{player:'phaseBegin'},
+                direct:true,
+                init:function(){
+                    lib.onwash.push(function(){
+                        delete _status.daiyan_notao;
+                    });
+                },
+                content:function(){
+                    'step 0'
+                    player.chooseTarget(get.prompt('daiyan'),function(card,player,target){
+                        return target!=player;
+                    }).set('ai',function(target){
+                        var player=_status.event.player;
+                        var att=get.attitude(player,target);
+                        if(att>0){
+                            if(_status.daiyan_notao){
+                                return 0;
+                            }
+                            else{
+                                if(target==player.storage.daiyan) return 0;
+                                return 2*att/Math.sqrt(1+target.hp);
+                            }
+                        }
+                        else{
+                            if(_status.daiyan_notao){
+                                if(target==player.storage.daiyan) return -3*att;
+                                return -att;
+                            }
+                            else{
+                                return 0;
+                            }
+                        }
+                    });
+                    'step 1'
+                    if(result.bool){
+                        var target=result.targets[0];
+                        player.logSkill('daiyan',target);
+                        var tao=get.cardPile('tao','cardPile');
+                        if(tao){
+                            target.gain(tao,'gain2');
+                        }
+                        else{
+                            _status.daiyan_notao=true;
+                        }
+                        if(target==player.storage.daiyan){
+                            target.loseHp();
+                        }
+                        player.storage.daiyan=target;
+                    }
+                    else{
+                        delete player.storage.daiyan;
+                    }
+                },
+                ai:{
+                    threaten:1.6
+                }
+            },
+            fumian:{
+                trigger:{player:'phaseEnd'},
+                direct:true,
+                content:function(){
+                    'step 0'
+                    delete player.storage.fumian;
+                    delete player.storage.fumian_markcount;
+                    if(player.storage.fumian_choice=='draw'){
+                        player.chooseBool(get.prompt('fumian'),'下回合你使用红色牌可以多选择两个目标');
+                    }
+                    else if(player.storage.fumian_choice=='red'){
+                        player.chooseBool(get.prompt('fumian'),'下回合摸牌阶段多摸两张牌');
+                    }
+                    else{
+                        player.chooseControlList(get.prompt('fumian'),'下回合摸牌阶段多摸一张牌','下回合你使用红色牌可以多选择一个目标',function(event,player){
+                            if(player.hp==1||player.countCards('h')<=1) return 0;
+                            return 1;
+                        });
+                    }
+                    'step 1'
+                    if(player.storage.fumian_choice=='draw'){
+                        if(result.bool){
+                            player.logSkill('fumian');
+                            player.storage.fumian='red';
+                            player.storage.fumian_markcount=2;
+                            player.markSkill('fumian');
+                            delete player.storage.fumian_choice;
+                        }
+                    }
+                    else if(player.storage.fumian_choice=='red'){
+                        if(result.bool){
+                            player.logSkill('fumian');
+                            player.storage.fumian='draw';
+                            player.storage.fumian_markcount=2;
+                            player.markSkill('fumian');
+                            delete player.storage.fumian_choice;
+                        }
+                    }
+                    else{
+                        if(result.index!=2){
+                            player.logSkill('fumian');
+                            if(result.index==0){
+                                player.storage.fumian='draw';
+                                player.storage.fumian_choice='draw';
+                            }
+                            else if(result.index==1){
+                                player.storage.fumian='red';
+                                player.storage.fumian_choice='red';
+                            }
+                            player.storage.fumian_markcount=1;
+                            player.markSkill('fumian');
+                        }
+                    }
+                },
+                intro:{
+                    content:function(storage,player){
+                        if(storage=='draw') return '下回合摸牌阶段多摸'+get.cnNumber(player.storage.fumian_markcount)+'张牌';
+                        if(storage=='red') return '下回合你使用红色牌可以多选择'+get.cnNumber(player.storage.fumian_markcount)+'个目标';
+                    }
+                },
+                group:['fumian_draw','fumian_red','fumian_mark'],
+                subSkill:{
+                    draw:{
+                        trigger:{player:'phaseDrawBegin'},
+                        forced:true,
+                        filter:function(event,player){
+                            return player.storage.fumian=='draw'&&typeof player.storage.fumian_markcount=='number';
+                        },
+                        content:function(){
+                            trigger.num+=player.storage.fumian_markcount;
+                            player.unmarkSkill('fumian');
+                        }
+                    },
+                    red:{
+                        trigger:{player:'useCard'},
+            			direct:true,
+            			filter:function(event,player){
+                            if(get.color(event.card)!='red') return false;
+                            var info=get.info(event.card);
+                            if(info.allowMultiple==false) return false;
+                            if(event.targets&&!info.multitarget){
+                                if(game.hasPlayer(function(current){
+                                    return lib.filter.targetEnabled2(event.card,player,current)&&!event.targets.contains(current);
+                                })){
+                                    return true;
+                                }
+            				}
+                            return false;
+            			},
+            			content:function(){
+            				'step 0'
+                            var prompt2='额外指定';
+                            if(player.storage.fumian_markcount==2){
+                                prompt2+='至多两';
+                            }
+                            else{
+                                prompt2+='一';
+                            }
+                            prompt2+='名'+get.translation(trigger.card)+'的目标'
+        					player.chooseTarget([1,player.storage.fumian_markcount],get.prompt('fumian'),function(card,player,target){
+        						var trigger=_status.event.getTrigger();
+        						if(trigger.targets.contains(target)) return false;
+        						return lib.filter.targetEnabled2(trigger.card,_status.event.player,target);
+        					}).set('prompt2',prompt2).set('ai',function(target){
+        						var trigger=_status.event.getTrigger();
+        						var player=_status.event.player;
+        						return get.effect(target,trigger.card,player,player);
+        					});
+            				'step 1'
+            				if(result.bool){
+            					game.delay(0.5);
+            					event.targets=result.targets;
+            				}
+            				else{
+            					event.finish();
+            				}
+            				'step 2'
+            				if(event.targets){
+            					player.logSkill('fumian',event.targets);
+            					trigger.targets.addArray(event.targets);
+            				}
+            			}
+                    },
+                    mark:{
+                        trigger:{player:'phaseUseAfter'},
+                        silent:true,
+                        content:function(){
+                            player.unmarkSkill('fumian');
+                        }
+                    }
+                }
+            },
             zhongjian:{
                 enable:'phaseUse',
                 usable:2,
@@ -262,9 +452,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     }
                     else{
                         event.type=1;
-                        player.chooseControl('cancel2',function(){
+                        player.chooseControlList(get.prompt('caishi'),'手牌上限+1，然后本回合你的牌不能对其他角色使用','回复1点体力，然后本回合你的牌不能对自己使用',function(){
                             return 1;
-                        }).set('prompt',get.prompt('caishi')).set('choiceList',['手牌上限+1，然后本回合你的牌不能对其他角色使用','回复1点体力，然后本回合你的牌不能对自己使用']);
+                        });
                     }
                     'step 1'
                     if(event.type){
