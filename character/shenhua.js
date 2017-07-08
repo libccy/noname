@@ -822,7 +822,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			ai:{
     				effect:{
     					target:function(card,player,target,current){
-    						if(card.name=='sha'){
+    						if(card.name=='sha'&&get.attitude(player,target)<0){
     							if(_status.event.name=='xiangle') return;
     							var bs=player.getCards('h',{type:'basic'});
     							if(bs.length<2) return 0;

@@ -8612,7 +8612,7 @@
 			basic:'基本',
 			equip:'装备',
 			trick:'锦囊',
-			delay:'延迟锦囊',
+			delay:'延时锦囊',
 			character:'角色',
 			revive:'复活',
 			equip1:'武器',

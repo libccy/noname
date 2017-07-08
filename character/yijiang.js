@@ -74,10 +74,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		zhangrang:['male','qun',3,['taoluan']],
             sunziliufang:['male','wei',3,['guizao','jiyu']],
 
-            xinxianying:['male','wei',3,['zhongjian','caishi']],
-            wuxian:['male','shu',3,['fumian','daiyan']],
-            xushi:['male','wu',3,['wengua','fuzhu']],
-    		caojie:['male','wei',3,[]],
+            xinxianying:['female','wei',3,['zhongjian','caishi']],
+            wuxian:['female','shu',3,['fumian','daiyan']],
+            xushi:['female','wu',3,['wengua','fuzhu']],
+    		caojie:['female','qun',3,['shouxi','huimin']],
     	},
     	characterIntro:{
     		huaxiong:'董卓旗下名将，自荐抵抗山东地区反对董卓的诸侯联军于汜水关前，他先后斩杀济北相鲍信之弟鲍忠和孙坚部将祖茂、以及袁术部将俞涉和韩馥手下潘凤等人，最后关东联军派出关羽与之一对一决斗而被杀。',
@@ -165,6 +165,179 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		liuchen:['liushan'],
     	},
     	skill:{
+            shouxi:{
+                trigger:{target:'shaBefore'},
+                direct:true,
+                init:function(player){
+                    player.storage.shouxi=[];
+                },
+                content:function(){
+                    'step 0'
+                    var list=['sha','shan','tao','jiu','taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman','lebu','bingliang','shandian'];
+                    for(var i=0;i<player.storage.shouxi.length;i++){
+                        list.remove(player.storage.shouxi[i]);
+                    }
+                    for(var i=0;i<list.length;i++){
+                        list[i]=[get.type(list[i]),'',list[i]];
+                    }
+                    player.chooseButton([get.prompt('shouxi',trigger.player),[list,'vcard']]).set('ai',function(button){
+    					return Math.random();
+    				});
+                    'step 1'
+                    if(result.bool){
+                        player.logSkill('shouxi');
+                        var name=result.links[0][2];
+                        var card=game.createCard(name,get.type(name),'');
+                        event.cardname=name;
+                        player.storage.shouxi.add(name);
+                        player.showCards(get.translation(player)+'声明了'+get.translation(name),card);
+                    }
+                    else{
+                        event.finish();
+                    }
+                    'step 2'
+                    var name=event.cardname;
+    				trigger.player.chooseToDiscard('守玺：弃置一张'+get.translation(name)+'，否则杀对'+get.translation(player)+'无效',function(card){
+    					return card.name==_status.event.cardname;
+    				}).set('ai',function(card){
+    					if(_status.event.att<0){
+    						return 10-get.value(card);
+    					}
+    					return 0;
+    				}).set('att',get.attitude(trigger.player,player)).set('cardname',name);
+    				'step 3'
+    				if(result.bool==false){
+    					trigger.finish();
+    					trigger.untrigger();
+    				}
+                    else{
+                        trigger.player.gainPlayerCard(player);
+                    }
+                },
+                ai:{
+    				effect:{
+    					target:function(card,player,target,current){
+    						if(card.name=='sha'&&get.attitude(player,target)<0){
+    							return 0.3;
+    						}
+    					}
+    				}
+    			}
+            },
+            huimin:{
+                trigger:{player:'phaseEnd'},
+                check:function(event,player){
+                    return game.countPlayer(function(current){
+                        if(current.countCards('h')<current.hp){
+                            return get.sgn(player,current);
+                        }
+                    })>0;
+                },
+                content:function(){
+                    'step 0'
+                    event.list=game.filterPlayer(function(current){
+                        return current.countCards('h')<current.hp;
+                    }).sortBySeat();
+                    player.draw(event.list.length);
+                    'step 1'
+                    player.chooseTarget(true,function(card,player,target){
+                        var list=_status.event.list;
+                        return list.contains(target);
+                    },'选择一名角色作为分牌起点').set('ai',function(target){
+                        var player=_status.event.player;
+                        var att=get.attitude(player,target);
+                        if(att<=0) return att;
+                        var list=_status.event.list;
+                        var index=list.indexOf(target);
+                        var prev;
+                        if(index==0){
+                            prev=list[list.length-1];
+                        }
+                        else{
+                            prev=list[index-1];
+                        }
+                        console.log(target.name,prev.name);
+                        if(get.attitude(player,prev)<0) return att;
+                        return 0;
+                    }).set('list',event.list);
+                    'step 2'
+                    var index=event.list.indexOf(result.targets[0]);
+                    if(index<0) index=0;
+                    var tmp=event.list.splice(index);
+                    event.list=tmp.concat(event.list);
+                    player.line(result.targets,'green');
+                    player.chooseCard('h','选择要分配的手牌',event.list.length,true);
+                    'step 3'
+                    var cards=result.cards;
+                    player.lose(cards,ui.special);
+                    event.togain=cards;
+                    if(result.bool&&cards.length){
+                        var dialog=ui.create.dialog('惠民',cards,true);
+    					_status.dieClose.push(dialog);
+    					dialog.videoId=lib.status.videoId++;
+                        event.preResult=dialog.videoId;
+    					game.addVideo('cardDialog',null,['惠民',get.cardsInfo(cards),dialog.videoId]);
+    					game.broadcast(function(cards,id){
+    						var dialog=ui.create.dialog('惠民',cards,true);
+    						_status.dieClose.push(dialog);
+    						dialog.videoId=id;
+    					},cards,dialog.videoId);
+                    }
+                    else{
+                        event.finish();
+                    }
+                    'step 4'
+                    game.delay();
+                    'step 5'
+                    if(event.list.length&&event.togain.length){
+                        event.current=event.list.shift();
+                        var next=event.current.chooseButton(true,function(button){
+							return get.value(button.link,_status.event.player);
+						});
+						next.set('dialog',event.preResult);
+						next.set('closeDialog',false);
+						next.set('dialogdisplay',true);
+                        next.set('cardFilter',event.togain.slice(0));
+                        next.set('filterButton',function(button){
+                            return _status.event.cardFilter.contains(button.link);
+                        })
+                    }
+                    else{
+                        for(var i=0;i<ui.dialogs.length;i++){
+    						if(ui.dialogs[i].videoId==event.preResult){
+    							var dialog=ui.dialogs[i];
+    							dialog.close();
+    							_status.dieClose.remove(dialog);
+    							if(dialog.buttons.length){
+    								for(var i=0;i<dialog.buttons.length;i++){
+    									ui.discardPile.appendChild(dialog.buttons[i].link);
+    								}
+    							}
+    							break;
+    						}
+    					}
+    					game.broadcast(function(id){
+    						var dialog=get.idDialog(id);
+    						if(dialog){
+    							dialog.close();
+    							_status.dieClose.remove(dialog);
+    						}
+    					},event.preResult);
+    					game.addVideo('cardDialog',null,event.preResult);
+                        event.finish();
+                    }
+                    'step 6'
+                    var card=result.links[0];
+                    if(card){
+						event.current.gain(card);
+						event.current.$gain2(card);
+                        event.togain.remove(card);
+					}
+					game.log(event.current,'选择了',card);
+					game.delay();
+                    event.goto(5);
+                }
+            },
             fuzhu:{
                 trigger:{global:'phaseEnd'},
                 filter:function(event,player){
@@ -7965,6 +8138,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             xushi:'徐氏',
     		caojie:'曹节',
 
+            shouxi:'守玺',
+            shouxi_info:'当你成为【杀】的目标后，你可声明一种未以此法声明过的基本牌或锦囊牌的牌名。若使用者弃置一张你声明的牌，其获得你的一张牌；若否，则此【杀】对你无效',
+            huimin:'惠民',
+            huimin_info:'结束阶段，你可以摸X张牌并展示等量手牌（X为手牌数小于其体力值的角色数），然后从你指定的一名角色开始这些角色依次选择并获得其中一张',
             wengua:'问卦',
             wengua2:'问卦',
             wengua_info:'每名角色的出牌阶段限一次，其可以交给你一张牌，你可以将此牌置于牌堆顶或牌堆底，然后你与其从另一端各摸一张牌',
