@@ -56,6 +56,8 @@ window.noname_character_rank={
         'swd_shuwaner',
     ],
     a:[
+        'xushi',
+        'wuxian',
         'pal_tangyurou',
         'gw_luobo',
         'gw_aigeleisi',
@@ -289,7 +291,6 @@ window.noname_character_rank={
     ],
     bp:[
         'wangyun',
-        'xinxianying',
         'pal_xiaoman',
         'pal_jiangyunfan',
         'pal_longyou',
@@ -457,6 +458,8 @@ window.noname_character_rank={
         'guanyinping',
     ],
     b:[
+        'xinxianying',
+        'caojie',
         'hs_shirencao',
         'sp_daqiao',
         'hs_jiawodun',

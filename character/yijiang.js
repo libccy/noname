@@ -229,7 +229,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 check:function(event,player){
                     return game.countPlayer(function(current){
                         if(current.countCards('h')<current.hp){
-                            return get.sgn(player,current);
+                            return get.sgn(get.attitude(player,current));
                         }
                     })>0;
                 },
@@ -256,7 +256,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         else{
                             prev=list[index-1];
                         }
-                        console.log(target.name,prev.name);
                         if(get.attitude(player,prev)<0) return att;
                         return 0;
                     }).set('list',event.list);
@@ -566,7 +565,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     }
                 },
                 ai:{
-                    threaten:1.6
+                    threaten:2,
+                    expose:0.2
                 }
             },
             fumian:{
@@ -630,7 +630,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     }
                 },
                 ai:{
-                    threaten:1.5,
+                    threaten:1.3,
                 },
                 group:['fumian_draw','fumian_red','fumian_mark'],
                 subSkill:{
@@ -649,12 +649,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         trigger:{player:'useCard'},
             			direct:true,
             			filter:function(event,player){
+                            if(player.storage.fumian!='red') return false;
                             if(get.color(event.card)!='red') return false;
                             var info=get.info(event.card);
                             if(info.allowMultiple==false) return false;
                             if(event.targets&&!info.multitarget){
                                 if(game.hasPlayer(function(current){
-                                    return lib.filter.targetEnabled2(event.card,player,current)&&!event.targets.contains(current);
+                                    return lib.filter.targetEnabled2(event.card,player,current)&&lib.filter.targetInRange(event.card,player,current)&&!event.targets.contains(current);
                                 })){
                                     return true;
                                 }
@@ -673,8 +674,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             prompt2+='名'+get.translation(trigger.card)+'的目标'
         					player.chooseTarget([1,player.storage.fumian_markcount],get.prompt('fumian'),function(card,player,target){
         						var trigger=_status.event.getTrigger();
+                                var player=_status.event.player;
         						if(trigger.targets.contains(target)) return false;
-        						return lib.filter.targetEnabled2(trigger.card,_status.event.player,target);
+        						return lib.filter.targetEnabled2(trigger.card,player,target)&&lib.filter.targetInRange(trigger.card,player,target);
         					}).set('prompt2',prompt2).set('ai',function(target){
         						var trigger=_status.event.getTrigger();
         						var player=_status.event.player;
