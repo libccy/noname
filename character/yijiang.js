@@ -76,7 +76,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
             xinxianying:['male','wei',3,['zhongjian','caishi']],
             wuxian:['male','shu',3,['fumian','daiyan']],
-            xushi:['male','wu',3,[]],
+            xushi:['male','wu',3,['wengua','fuzhu']],
     		caojie:['male','wei',3,[]],
     	},
     	characterIntro:{
@@ -165,6 +165,179 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		liuchen:['liushan'],
     	},
     	skill:{
+            fuzhu:{
+                trigger:{global:'phaseEnd'},
+                filter:function(event,player){
+                    return event.player!=player&&event.player.sex=='male'&&ui.cardPile.childElementCount<=player.hp*10;
+                },
+                check:function(event,player){
+                    return get.attitude(player,event.player)<0&&get.effect(event.player,{name:'sha'},player,player)>0;
+                },
+                logTarget:'player',
+                skillAnimation:true,
+                content:function(){
+                    'step 0'
+                    var list=[];
+                    for(var i=0;i<ui.cardPile.childElementCount;i++){
+                        if(ui.cardPile.childNodes[i].name=='sha'){
+                            list.push(ui.cardPile.childNodes[i]);
+                            ui.cardPile.childNodes[i].remove();
+                            i--;
+                        }
+                    }
+                    event.list=list;
+                    'step 1'
+                    if(event.list.length){
+                        player.useCard(event.list.shift(),trigger.player);
+                        event.redo();
+                    }
+                    'step 2'
+                    var cards=get.cards(ui.cardPile.childElementCount+1);
+                    for(var i=0;i<cards.length;i++){
+                        ui.cardPile.insertBefore(cards[i],ui.cardPile.childNodes[get.rand(ui.cardPile.childElementCount)]);
+                    }
+                },
+                ai:{
+                    threaten:1.5
+                }
+            },
+            wengua:{
+                global:'wengua2'
+            },
+            wengua2:{
+                enable:'phaseUse',
+                filter:function(event,player){
+                    if(player.hasSkill('wengua3')) return false;
+                    return player.countCards('h')&&game.hasPlayer(function(current){
+                        return current.hasSkill('wengua')&&current!=player;
+                    });
+                },
+                direct:true,
+                delay:0,
+                filterCard:true,
+                discard:false,
+                lose:false,
+                prompt:function(){
+                    var player=_status.event.player;
+                    var list=game.filterPlayer(function(current){
+                        return current.hasSkill('wengua')&&current!=player;
+                    });
+                    var str='将一张手牌交给'+get.translation(list);
+                    if(list.length>1) str+='中的一人';
+                    return str;
+                },
+                check:function(card){
+                    if(card.name=='sha') return 5;
+                    return 8-get.value(card);
+                },
+    			content:function(){
+                    "step 0"
+                    var targets=game.filterPlayer(function(current){
+                        return current.hasSkill('wengua')&&current!=player;
+                    });
+                    if(targets.length==1){
+                        event.target=targets[0];
+                        event.goto(2);
+                    }
+                    else if(targets.length>0){
+                        player.chooseTarget(true,'选择【问卦】的目标',function(card,player,target){
+                            return _status.event.list.contains(target);
+                        }).set('list',targets).set('ai',function(target){
+                            var player=_status.event.player;
+                            return get.attitude(player,target);
+                        });
+                    }
+                    else{
+                        event.finish();
+                    }
+                    "step 1"
+                    if(result.bool&&result.targets.length){
+                        event.target=result.targets[0];
+                    }
+                    else{
+                        event.finish();
+                    }
+    				"step 2"
+    				if(event.target){
+                        player.logSkill('wengua',event.target);
+                        player.addTempSkill('wengua3');
+                        player.give(cards,event.target);
+                        event.card=cards[0];
+    				}
+                    else{
+                        event.finish();
+                    }
+                    "step 3"
+                    if(event.target.getCards('h').contains(event.card)){
+                        event.target.chooseControlList('问卦','将'+get.translation(event.card)+'置于牌堆顶','将'+get.translation(event.card)+'置于牌堆底',true,function(){
+                            return 1;
+                        });
+                    }
+                    else{
+                        event.finish();
+                    }
+                    "step 4"
+                    event.target.lose(event.card,ui.special);
+                    event.index=result.index;
+                    game.broadcastAll(function(player){
+                        var cardx=ui.create.card();
+                        cardx.classList.add('infohidden');
+                        cardx.classList.add('infoflip');
+                        player.$throw(cardx,1000,'nobroadcast');
+                    },event.target);
+                    "step 5"
+                    game.delay();
+                    "step 6"
+                    event.card.fix();
+                    if(event.index==1){
+                        game.log(event.target,'将获得的牌置于牌堆底');
+                        ui.cardPile.appendChild(event.card);
+                        if(ui.cardPile.childElementCount==1){
+                            event.togain=[ui.cardPile.firstChild];
+                            ui.cardPile.firstChild.remove();
+                        }
+                        else{
+                            event.togain=get.cards(2);
+                        }
+                    }
+                    else{
+                        game.log(player,'将获得的牌置于牌堆顶');
+                        ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
+                        if(ui.cardPile.childElementCount==1){
+                            event.togain=[ui.cardPile.firstChild];
+                            ui.cardPile.firstChild.remove();
+                        }
+                        else{
+                            event.togain=[ui.cardPile.lastChild,ui.cardPile.lastChild.previousSibling];
+                            ui.cardPile.lastChild.remove();
+                            ui.cardPile.lastChild.remove();
+                        }
+                    }
+                    if(event.togain.length){
+                        player.gain(event.togain.shift());
+                        player.$draw();
+                    }
+                    if(event.togain.length){
+                        event.target.gain(event.togain.shift());
+                        event.target.$draw();
+                    }
+    			},
+    			ai:{
+    				order:2,
+                    threaten:1.5,
+    				result:{
+    					player:function(player,target){
+    						var target=game.findPlayer(function(current){
+    							return current.hasSkill('wengua');
+    						});
+    						if(target){
+    							return get.attitude(player,target);
+    						}
+    					}
+    				}
+    			}
+            },
+            wengua3:{},
             daiyan:{
                 trigger:{player:'phaseBegin'},
                 direct:true,
@@ -282,6 +455,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         if(storage=='draw') return '下回合摸牌阶段多摸'+get.cnNumber(player.storage.fumian_markcount)+'张牌';
                         if(storage=='red') return '下回合你使用红色牌可以多选择'+get.cnNumber(player.storage.fumian_markcount)+'个目标';
                     }
+                },
+                ai:{
+                    threaten:1.5,
                 },
                 group:['fumian_draw','fumian_red','fumian_mark'],
                 subSkill:{
@@ -7365,7 +7541,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         event.goto(2);
                     }
                     else if(targets.length>0){
-                        player.chooseTarget(true,'选择陷嗣的目标',function(card,player,target){
+                        player.chooseTarget(true,'选择【陷嗣】的目标',function(card,player,target){
                             return _status.event.list.contains(target);
                         }).set('list',targets).set('ai',function(target){
                             var player=_status.event.player;
@@ -7789,6 +7965,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             xushi:'徐氏',
     		caojie:'曹节',
 
+            wengua:'问卦',
+            wengua2:'问卦',
+            wengua_info:'每名角色的出牌阶段限一次，其可以交给你一张牌，你可以将此牌置于牌堆顶或牌堆底，然后你与其从另一端各摸一张牌',
+            fuzhu:'伏诛',
+            fuzhu_info:'一名男性角色的结束阶段，若牌堆剩余牌数不大于你体力值的十倍，则你可以依次对其使用牌堆中所有的【杀】（不能超过游戏人数），然后洗牌',
             fumian:'福绵',
             fumian_info:'结束阶段，你可以选择一项：1.下回合摸牌阶段多摸一张牌；2.下回合你使用红色牌可以多选择1个目标。选择完成后，此项不能再次被选择且另一个选项的数字+1，直到两个选项都被选择过，重置此技能',
             daiyan:'怠宴',
