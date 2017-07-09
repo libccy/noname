@@ -1287,12 +1287,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							return true;
 						}
 					})){
-						player.chooseControl().set('choiceList',[
+						player.chooseControl(function(){
+							return choice;
+						}).set('choiceList',[
 							'弃置一名角色判定区内的所有牌',
 							'随机获得一张铜卡法术（破晓除外）并展示之'
-						],function(){
-							return choice;
-						});
+						]);
 					}
 					else{
 						event.directfalse=true;
