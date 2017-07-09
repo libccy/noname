@@ -358,8 +358,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         }
                     }
                     event.list=list;
+                    event.num=0;
                     'step 1'
-                    if(event.list.length){
+                    if(event.list.length&&event.num<game.players.length){
+                        event.num++;
                         player.useCard(event.list.shift(),trigger.player);
                         event.redo();
                     }
