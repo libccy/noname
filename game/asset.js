@@ -294,6 +294,7 @@ window.noname_asset_list=[
     'image/character/caochun.jpg',
     'image/character/caohong.jpg',
     'image/character/caohong.jpg',
+    'image/character/caojie.jpg',
     'image/character/caopi.jpg',
     'image/character/caoren.jpg',
     'image/character/caorui.jpg',
