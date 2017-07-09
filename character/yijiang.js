@@ -231,7 +231,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         if(current.countCards('h')<current.hp){
                             return get.sgn(get.attitude(player,current));
                         }
-                    })>0;
+                    })>=0;
                 },
                 content:function(){
                     'step 0'
@@ -307,14 +307,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     							var dialog=ui.dialogs[i];
     							dialog.close();
     							_status.dieClose.remove(dialog);
-    							if(dialog.buttons.length){
-    								for(var i=0;i<dialog.buttons.length;i++){
-    									ui.discardPile.appendChild(dialog.buttons[i].link);
-    								}
-    							}
     							break;
     						}
     					}
+                        if(event.togain.length){
+                            for(var i=0;i<dialog.buttons.length;i++){
+                                ui.discardPile.appendChild(event.togain[i]);
+                            }
+                        }
     					game.broadcast(function(id){
     						var dialog=get.idDialog(id);
     						if(dialog){
