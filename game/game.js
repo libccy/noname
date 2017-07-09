@@ -15880,6 +15880,13 @@
 							// if(name.name&&lib.card[name.name]&&lib.card[name.name].markimage){
 							// 	node.node.image.style.left=lib.card[name.name].markimage;
 							// }
+
+							if(name.classList.contains('fullborder')){
+								node.classList.add('fakejudge');
+								node.classList.add('fakemark');
+								(node.querySelector('.background')||ui.create.div('.background',node)).innerHTML=lib.translate[name.name+'_bg']||get.translation(name.name)[0];
+							}
+
 							name=name.name;
 						}
 						else{
@@ -42326,7 +42333,10 @@
 					name=node.link.name;
 				}
 				if(get.position(node)=='j'&&node.viewAs&&node.viewAs!=name){
-					uiintro.add(get.translation(node.viewAs)+'<br><div class="text center" style="padding-top:5px;">（'+get.translation(node)+'）</div>');
+					uiintro.add(get.translation(node.viewAs));
+					uiintro.add('<div class="text center">（'+get.translation(get.translation(node))+'）</div>');
+					// uiintro.add(get.translation(node.viewAs)+'<br><div class="text center" style="padding-top:5px;">（'+get.translation(node)+'）</div>');
+					uiintro.nosub=true;
 					name=node.viewAs;
 				}
 				else{
@@ -42408,47 +42418,49 @@
                 }
                 else{
                     if(lib.translate[name+'_info']){
-    					if(get.subtype(node)=='equip1'){
-    						var added=false;
-    						if(lib.card[node.name]&&lib.card[node.name].distance){
-    							var dist=lib.card[node.name].distance;
-    							if(dist.attackFrom){
-    								added=true;
-    								uiintro.add('<div class="text center">攻击范围：'+(-dist.attackFrom+1)+'</div>');
-    							}
-    						}
-    						if(!added){
-    							uiintro.add('<div class="text center">攻击范围：1</div>');
-    						}
-    					}
-                        else if(get.subtype(node)){
-                            uiintro.add('<div class="text center">'+get.translation(get.subtype(node))+'</div>');
-                        }
-    					else if(lib.card[name]&&lib.card[name].addinfomenu){
-    						uiintro.add('<div class="text center">'+lib.card[name].addinfomenu+'</div>');
-    					}
-    					else if(lib.card[name]&&lib.card[name].derivation){
-                            if(typeof lib.card[name].derivation=='string'){
-                                uiintro.add('<div class="text center">来源：'+get.translation(lib.card[name].derivation)+'</div>');
-                            }
-    						else if(lib.card[name].derivationpack){
-                                uiintro.add('<div class="text center">来源：'+get.translation(lib.card[name].derivationpack+'_card_config')+'包</div>');
-                            }
-    					}
-                        else{
-							if(lib.card[name].unique){
-								uiintro.add('<div class="text center">特殊'+get.translation(lib.card[name].type)+'牌</div>');
-							}
-                            else{
-								uiintro.add('<div class="text center">'+get.translation(lib.card[name].type)+'牌</div>');
-							}
-                        }
-						if(lib.card[name].unique&&lib.card[name].type=='equip'){
-							if(lib.cardPile.guozhan&&lib.cardPack.guozhan.contains(name)){
-								uiintro.add('<div class="text center">专属装备</div>').style.marginTop='-5px';
-							}
-							else{
-								uiintro.add('<div class="text center">特殊装备</div>').style.marginTop='-5px';
+						if(!uiintro.nosub){
+							if(get.subtype(node)=='equip1'){
+	    						var added=false;
+	    						if(lib.card[node.name]&&lib.card[node.name].distance){
+	    							var dist=lib.card[node.name].distance;
+	    							if(dist.attackFrom){
+	    								added=true;
+	    								uiintro.add('<div class="text center">攻击范围：'+(-dist.attackFrom+1)+'</div>');
+	    							}
+	    						}
+	    						if(!added){
+	    							uiintro.add('<div class="text center">攻击范围：1</div>');
+	    						}
+	    					}
+	                        else if(get.subtype(node)){
+	                            uiintro.add('<div class="text center">'+get.translation(get.subtype(node))+'</div>');
+	                        }
+	    					else if(lib.card[name]&&lib.card[name].addinfomenu){
+	    						uiintro.add('<div class="text center">'+lib.card[name].addinfomenu+'</div>');
+	    					}
+	    					else if(lib.card[name]&&lib.card[name].derivation){
+	                            if(typeof lib.card[name].derivation=='string'){
+	                                uiintro.add('<div class="text center">来源：'+get.translation(lib.card[name].derivation)+'</div>');
+	                            }
+	    						else if(lib.card[name].derivationpack){
+	                                uiintro.add('<div class="text center">来源：'+get.translation(lib.card[name].derivationpack+'_card_config')+'包</div>');
+	                            }
+	    					}
+	                        else{
+								if(lib.card[name].unique){
+									uiintro.add('<div class="text center">特殊'+get.translation(lib.card[name].type)+'牌</div>');
+								}
+	                            else{
+									uiintro.add('<div class="text center">'+get.translation(lib.card[name].type)+'牌</div>');
+								}
+	                        }
+							if(lib.card[name].unique&&lib.card[name].type=='equip'){
+								if(lib.cardPile.guozhan&&lib.cardPack.guozhan.contains(name)){
+									uiintro.add('<div class="text center">专属装备</div>').style.marginTop='-5px';
+								}
+								else{
+									uiintro.add('<div class="text center">特殊装备</div>').style.marginTop='-5px';
+								}
 							}
 						}
 						if(lib.translate[name+'_info']){

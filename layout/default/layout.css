@@ -1337,7 +1337,8 @@ div:not(.handcards)>.card>.info>span,
 	display: none !important
 }
 .judges>.card.fakejudge.fullskin>.background,
-.judges>.card.fakejudge.fullborder>.background {
+.judges>.card.fakejudge.fullborder>.background,
+.marks>.card.fakemark.fullborder>.background {
 	display: block !important;
 	font-family: 'huangcao' !important;
 	padding-top: 4px !important;
