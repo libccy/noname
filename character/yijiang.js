@@ -795,12 +795,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             caishi:{
                 trigger:{player:'phaseDrawBegin'},
                 direct:true,
+                init:function(player){
+                    player.storage.caishi=0;
+                },
+                intro:{
+                    content:'手牌上限+#'
+                },
                 content:function(){
                     'step 0'
                     if(player.isHealthy()){
                         event.type=0;
-                        player.chooseBool(get.prompt('caishi'),'手牌上限+1，然后本回合你的牌不能对其他角色使用',function(){
-                            return player.skipList.contains('phaseUse');
+                        player.chooseBool(get.prompt('caishi'),'手牌上限+1，然后本回合你的牌不能对其他角色使用',function(event,player){
+                            return player.skipList.contains('phaseUse')||!player.needsToDiscard(1);
                         });
                     }
                     else{
@@ -815,6 +821,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             player.logSkill('caishi');
                             if(result.index==0){
                                 player.addTempSkill('caishi2');
+                                player.storage.caishi++;
+                                player.markSkill('caishi');
                             }
                             else if(result.index==1){
                                 player.recover();
@@ -826,15 +834,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         if(result.bool){
                             player.logSkill('caishi');
                             player.addTempSkill('caishi2');
+                            player.storage.caishi++;
+                            player.markSkill('caishi');
                         }
                     }
+                },
+                mod:{
+                    maxHandcard:function(player,num){
+                        if(typeof player.storage.caishi=='number') return num+player.storage.caishi;
+                    },
                 }
             },
             caishi2:{
                 mod:{
-                    maxHandcard:function(player,num){
-                        return num+1;
-                    },
                     playerEnabled:function(card,player,target){
     					if(player!=target) return false;
     				}

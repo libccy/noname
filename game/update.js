@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.9.31.1',
+    version:'1.9.31.2',
     update:'1.9.31',
     changeLog:[
         '新武将',
