@@ -3,6 +3,70 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'swd',
 		card:{
+
+			liuxinghuoyu:{
+				fullskin:true,
+				type:'trick',
+				enable:true,
+				filterTarget:true,
+				cardcolor:'red',
+				cardnature:'fire',
+				content:function(){
+					"step 0"
+					if(target.countCards('he')<2){
+						event.directfalse=true;
+					}
+					else{
+						target.chooseToDiscard('he',2).ai=function(card){
+							if(target.hasSkillTag('nofire')) return 0;
+							if(get.damageEffect(target,player,target,'fire')>=0) return 0;
+							if(player.hasSkillTag('notricksource')) return 0;
+							if(target.hasSkillTag('notrick')) return 0;
+							if(card.name=='tao') return 0;
+							if(target.hp==1&&card.name=='jiu') return 0;
+							if(target.hp==1&&get.type(card)!='basic'){
+								return 10-get.value(card);
+							}
+							return 8-get.value(card);
+						};
+					}
+					"step 1"
+					if(event.directfalse||!result.bool){
+						target.damage('fire');
+					}
+				},
+				ai:{
+					basic:{
+						order:4,
+						value:7,
+						useful:2,
+					},
+					result:{
+						target:function(player,target){
+							if(target.hasSkillTag('nofire')) return 0;
+							if(get.damageEffect(target,player,player)<0&&get.attitude(player,target)>0){
+								return -2;
+							}
+							var nh=target.countCards('he');
+							if(target==player) nh--;
+							switch(nh){
+								case 0:case 1:return -2;
+								case 2:return -1.5;
+								case 3:return -1;
+								default:return -0.7;
+							}
+						}
+					},
+					tag:{
+						damage:1,
+						fireDamage:1,
+						natureDamage:1,
+						discard:1,
+						loseCard:1,
+						position:'he',
+					}
+				}
+			},
 			dujian:{
 				fullskin:true,
 				type:'basic',
@@ -4665,6 +4729,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			'护甲：和体力类似，每点护甲可抵挡一点伤害，但不影响手牌上限'
 		},
 		translate:{
+			liuxinghuoyu:'流星火羽',
+			liuxinghuoyu_info:'出牌阶段，对一名角色使用，令目标弃置2张牌，或受到一点火焰伤害',
 			g_yuchan_equip:'玉蝉',
 			yuchanqian_duanzao:'玉蝉',
 			yuchanqian_equip1_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
@@ -5033,6 +5099,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			lianyaohu_info:'出牌阶段各限一次，你可以选择一项：1.弃置一张手牌，并将一名其他角色的一张手牌置入炼妖壶；2.弃置两张炼妖壶中的牌，从牌堆中获得一张与弃置的牌类别均不相同的牌',
 		},
 		list:[
+			['diamond',3,'liuxinghuoyu','fire'],
+			['heart',6,'liuxinghuoyu','fire'],
+			['heart',9,'liuxinghuoyu','fire'],
+
 			['spade',1,'baihupifeng'],
 			['club',1,'fengxueren'],
 			['diamond',1,'langeguaiyi'],

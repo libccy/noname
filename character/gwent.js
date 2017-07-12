@@ -278,7 +278,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-				group:'junchi_gold'
+				// group:'junchi_gold'
 			},
 			junchi_old:{
 				trigger:{global:'shaAfter'},
@@ -1469,7 +1469,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_aokeweisite:'奥克维斯特',
 			gw_kaxier:'卡西尔',
 			gw_luobo:'萝卜',
-			gw_mieren:'米尔恩',
+			gw_mieren:'尔米恩',
 			gw_sanhanya:'三寒鸦',
 			gw_shanhu:'珊瑚',
 			gw_zhangyujushou:'章鱼巨兽',
@@ -1484,7 +1484,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwshenyu:'神愈',
 			gwshenyu_info:'准备阶段，你可以令一名角色选择一项：回复一点体力，或从弃牌堆中获得一张非金法术牌（直到洗牌前该牌不能再以此法获得）',
 			junchi:'骏驰',
-			junchi_info:'每当一名其他角色使用一张杀，若目标不是你，你可以对杀的目标使用一张牌，并摸一张牌；每当一名其他角色使用一张金卡，你可以在此回合结束后获得一个额外回合',
+			junchi_info:'每当一名其他角色使用一张杀，若目标不是你，你可以对杀的目标使用一张牌，并摸一张牌',
 			junchi_old_info:'当一名其他角色使用杀对一个目标结算后，该角色可以交给你一张牌，然后你可以对杀的目标使用一张牌，若如此做，你回复一点体力，杀的使用者摸一张牌',
 			gw_dudayuanshuai1:'杜达元帅',
 			gw_dudayuanshuai1_info:'当你成为其他角色使用牌的目标时，你可以使用此牌取消之，然后获得对你使用的牌',

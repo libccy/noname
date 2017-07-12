@@ -877,69 +877,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 				}
 			},
-			liuxinghuoyu:{
-				fullskin:true,
-				type:'trick',
-				enable:true,
-				filterTarget:true,
-				cardcolor:'red',
-				cardnature:'fire',
-				content:function(){
-					"step 0"
-					if(target.countCards('he')<2){
-						event.directfalse=true;
-					}
-					else{
-						target.chooseToDiscard('he',2).ai=function(card){
-							if(target.hasSkillTag('nofire')) return 0;
-							if(get.damageEffect(target,player,target,'fire')>=0) return 0;
-							if(player.hasSkillTag('notricksource')) return 0;
-							if(target.hasSkillTag('notrick')) return 0;
-							if(card.name=='tao') return 0;
-							if(target.hp==1&&card.name=='jiu') return 0;
-							if(target.hp==1&&get.type(card)!='basic'){
-								return 10-get.value(card);
-							}
-							return 8-get.value(card);
-						};
-					}
-					"step 1"
-					if(event.directfalse||!result.bool){
-						target.damage('fire');
-					}
-				},
-				ai:{
-					basic:{
-						order:4,
-						value:7,
-						useful:2,
-					},
-					result:{
-						target:function(player,target){
-							if(target.hasSkillTag('nofire')) return 0;
-							if(get.damageEffect(target,player,player)<0&&get.attitude(player,target)>0){
-								return -2;
-							}
-							var nh=target.countCards('he');
-							if(target==player) nh--;
-							switch(nh){
-								case 0:case 1:return -2;
-								case 2:return -1.5;
-								case 3:return -1;
-								default:return -0.7;
-							}
-						}
-					},
-					tag:{
-						damage:1,
-						fireDamage:1,
-						natureDamage:1,
-						discard:1,
-						loseCard:1,
-						position:'he',
-					}
-				}
-			},
 			qiankundai:{
 				fullskin:true,
 				type:'equip',
@@ -1113,8 +1050,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			huoshan_info:'出牌阶段，对自己使用。若判定结果为红桃2~9，则目标角色受到2点火焰伤害，距离目标1以内的其他角色受到1点火焰伤害。若判定不为红桃2~9，将之移动到下家的判定区里。',
 			hongshui:'洪水',
 			hongshui_info:'出牌阶段，对自己使用。若判定结果为梅花2~9，该角色随机弃置3张牌，距离该角色为X的角色随机弃置3-X张牌，若没有牌则失去一点体力，X至少为1',
-			liuxinghuoyu:'流星火羽',
-			liuxinghuoyu_info:'出牌阶段，对一名角色使用，令目标弃置2张牌，或受到一点火焰伤害',
 			qiankundai:'乾坤袋',
 			qiankundai_info:'你的手牌上限+1。当你失去该装备时，你摸一张牌。',
 			hufu:'虎符',
@@ -1130,9 +1065,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['club',1,'qiankundai'],
 			['heart',6,'huoshan','fire'],
 			['club',7,'hongshui'],
-			['diamond',3,'liuxinghuoyu','fire'],
-			['heart',6,'liuxinghuoyu','fire'],
-			['heart',9,'liuxinghuoyu','fire'],
 			['heart',3,'yihuajiemu'],
 			["diamond",3,'guohe'],
 
