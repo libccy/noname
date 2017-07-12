@@ -8743,12 +8743,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					event.finish();
     				}
     				"step 3"
-    				if(result.bool){
-    					event.target1.useCard({name:'sha'},event.target2);
-    				}
-    				else{
-    					event.target2.useCard({name:'sha'},event.target1);
-    				}
+                    if(!result.tie){
+                        if(result.bool){
+        					event.target1.useCard({name:'sha'},event.target2);
+        				}
+        				else{
+        					event.target2.useCard({name:'sha'},event.target1);
+        				}
+                    }
     			}
     		},
     		gongao:{
