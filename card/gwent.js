@@ -695,7 +695,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.$giveAuto(result.cards,target);
 					target.gain(result.cards,player);
 					'step 2'
-					player.gainPlayerCard(target,'h',true,2,'visible');
+					player.gainPlayerCard(target,'h',true,2,'visible').set('ai',function(button){
+						return get.value(button.link);
+					});
 				},
 				ai:{
 					basic:{
