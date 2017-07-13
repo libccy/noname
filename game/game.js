@@ -394,6 +394,27 @@
 						},
 						unfrequent:true,
 					},
+					max_loadtime:{
+						name:'最长载入时间',
+						intro:'设置游戏从启动到完成载入所需的最长时间，超过此时间未完成载入会报错，若设备较慢或安装了较多扩展可适当延长此时间',
+						init:'5000',
+						unfrequent:true,
+						item:{
+							5000:'5秒',
+							10000:'10秒',
+							20000:'20秒',
+							60000:'60秒'
+						},
+						onclick:function(item){
+							game.saveConfig('max_loadtime',item);
+							if(item=='5000'){
+								localStorage.removeItem(lib.configprefix+'loadtime');
+							}
+							else{
+								localStorage.setItem(lib.configprefix+'loadtime',item);
+							}
+						}
+					},
 					mousewheel:{
 						name:'滚轮控制手牌',
 						init:true,
@@ -5360,6 +5381,9 @@
 			node.style.WebkitOverflowScrolling='touch';
 			return node;
 		},
+		setMousewheel:function(node){
+			if(lib.config.mousewheel) node.onmousewheel=ui.click.mousewheel;
+		},
 		setLongPress:function(node,func){
 			node.addEventListener('touchstart',ui.click.longpressdown);
 			node.addEventListener('touchend',ui.click.longpresscancel);
@@ -5421,7 +5445,7 @@
 		},
 		init:{
             init:function(){
-                window.resetGameTimeout=setTimeout(lib.init.reset,5000);
+                window.resetGameTimeout=setTimeout(lib.init.reset,parseInt(localStorage.getItem(lib.configprefix+'loadtime'))||5000);
                 if(window.cordovaLoadTimeout){
                     clearTimeout(window.cordovaLoadTimeout);
                     delete window.cordovaLoadTimeout;
@@ -39211,7 +39235,7 @@
 						current.classList.remove('active');
 					}
 					this.classList.add('active');
-					intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+get.translation(this.link)+'</span>'+lib.translate[this.link+'_info'];
+					intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+get.translation(this.link)+'</span>'+get.skillInfoTranslation(this.link);
 					var info=get.info(this.link);
 					if(info.derivation){
 						var derivation=info.derivation;
@@ -39219,7 +39243,7 @@
 							derivation=[derivation];
 						}
 						for(var i=0;i<derivation.length;i++){
-							intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+get.translation(derivation[i])+'</span>'+lib.translate[derivation[i]+'_info'];
+							intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+get.translation(derivation[i])+'</span>'+get.skillInfoTranslation(derivation[i]);
 						}
 					}
 					if(lib.config.background_speak&&e!=='init'){
@@ -41475,6 +41499,18 @@
             }
             return get.translation(str);
         },
+		skillInfoTranslation:function(name){
+			var str=lib.translate[name+'_info'];
+			if(!str) return '';
+			return str;
+			// return str.replace(/锁定技/g,'<span class="yellowtext">锁定技</span>').
+			// 	replace(/限定技/g,'<span class="yellowtext">限定技</span>').
+			// 	replace(/觉醒技/g,'<span class="greentext">觉醒技</span>').
+			// 	replace(/主将技/g,'<span class="bluetext">主将技</span>').
+			// 	replace(/副将技/g,'<span class="bluetext">副将技</span>').
+			// 	replace(/阵法技/g,'<span class="bluetext">阵法技</span>').
+			// 	replace(/主公技/g,'<span class="firetext">主公技</span>');
+		},
 		translation:function(str,arg){
 			if(str&&typeof str=='object'&&str.name){
 				var str2;
@@ -41886,7 +41922,7 @@
 					var skilltrans=get.translation(skills[i]).slice(0,2);
 					str+='<div class="skill" style="'+opacity+
 					'">【'+skilltrans+'】</div><div style="'+opacity+'">'+
-					lib.translate[skills[i]+'_info']+'</div><div style="display:block;height:10px"></div>';
+					get.skillInfoTranslation(skills[i])+'</div><div style="display:block;height:10px"></div>';
 				}
 			}
 			return str;
@@ -42058,17 +42094,17 @@
                             else{
                                 forbidstr+='（双将禁用）<br>';
                             }
-                            forbidstr+=lib.translate[skills[i]+'_info']+'</div></div>'
+                            forbidstr+=get.skillInfoTranslation(skills[i])+'</div></div>'
                             uiintro.add(forbidstr);
                         }
 						else if(!skills2.contains(skills[i])){
-							uiintro.add('<div style="opacity:0.5"><div class="skill">【'+translation+'】</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
+							uiintro.add('<div style="opacity:0.5"><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
 						}
                         else if(lib.skill[skills[i]].temp||!node.skills.contains(skills[i])){
-                            uiintro.add('<div><div class="skill thundertext thunderauto">【'+translation+'】</div><div class="thundertext thunderauto">'+lib.translate[skills[i]+'_info']+'</div></div>');
+                            uiintro.add('<div><div class="skill thundertext thunderauto">【'+translation+'】</div><div class="thundertext thunderauto">'+get.skillInfoTranslation(skills[i])+'</div></div>');
                         }
 						else if(lib.skill[skills[i]].frequent){
-							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+lib.translate[skills[i]+'_info']+'<br><div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">自动发动</div></div></div>');
+							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'<br><div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">自动发动</div></div></div>');
 							var underlinenode=uiintro.content.lastChild.querySelector('.underlinenode');
 							if(lib.config.autoskilllist.contains(skills[i])){
 								underlinenode.classList.remove('on');
@@ -42080,7 +42116,7 @@
 							uiintro.add('<div><div class="skill">'+get.translation(skills[i])+'</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
 						}
 						else{
-							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
+							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
 						}
 						if(lib.translate[skills[i]+'_append']){
 							uiintro._place_text=uiintro.add('<div class="text">'+lib.translate[skills[i]+'_append']+'</div>')
@@ -42193,7 +42229,8 @@
 								introadded=true;
 								uiintro.add('<div class="text center">更改皮肤</div>');
 							}
-							var buttons=ui.create.div('.buttons.smallzoom');
+							var buttons=ui.create.div('.buttons.smallzoom.scrollbuttons');
+							lib.setMousewheel(buttons);
 							var nameskin=(avatar2?node.name2:node.name);
 							if(nameskin.indexOf('gz_')==0){
 								nameskin=nameskin.slice(3);
@@ -42584,10 +42621,10 @@
     					if(lib.translate[skills[i]+'_info']){
     						translation=get.translation(skills[i]).slice(0,2);
 							if(lib.skill[skills[i]]&&lib.skill[skills[i]].nobracket){
-								uiintro.add('<div><div class="skill">'+get.translation(skills[i])+'</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
+								uiintro.add('<div><div class="skill">'+get.translation(skills[i])+'</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
 							}
 							else{
-								uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
+								uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
 							}
 							if(lib.translate[skills[i]+'_append']){
 								uiintro._place_text=uiintro.add('<div class="text">'+lib.translate[skills[i]+'_append']+'</div>')
@@ -42632,7 +42669,8 @@
                                 introadded=true;
                                 uiintro.add('<div class="text center">更改皮肤</div>');
                             }
-                            var buttons=ui.create.div('.buttons.smallzoom');
+                            var buttons=ui.create.div('.buttons.smallzoom.scrollbuttons');
+							lib.setMousewheel(buttons);
                             for(var i=0;i<=num;i++){
                                 var button=ui.create.div('.button.character.pointerdiv',buttons,function(){
                                     if(this._link){

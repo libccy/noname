@@ -1264,6 +1264,20 @@ div:not(.handcards)>.card>.info>span,
 	transform: scale(0.8);
 	transform-origin: top left;
 }
+.buttons.scrollbuttons {
+	white-space: nowrap;
+	overflow-x: scroll;
+	overflow-y: hidden;
+	width: 100%;
+	margin-left: 0px;
+	margin-right: 0px;
+}
+.buttons.scrollbuttons .button:first-child{
+	margin-left: 10px;
+}
+.buttons.scrollbuttons .button:last-child{
+	margin-right: 10px;
+}
 /*.buttons.smallzoom .card.button>.name,
 .buttons.smallzoom .card.button>.info{
 	transform: scale(0.8) !important;

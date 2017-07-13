@@ -72,16 +72,23 @@ html{
 	color: rgb(117,186,255);
 }
 .control .thundertext,.thundertext.thunderauto,
-.dialog.popped .bluetext{
+.dialog.popped .bluetext,
+.menubg .bluetext{
 	color: rgba(29, 63, 137, 1);
 }
 .control .controlthundertext{
 	color: rgb(62, 41, 30);
 }
-.dialog.popped .yellowtext{
+.dialog.popped .yellowtext,
+.menubg .yellowtext{
 	color:#631515;
 }
-.dialog.popped .greentext,.control span.greentext,.poisontext.poisonauto{
+.dialog.popped .firetext,
+.menubg .firetext{
+	color:#a20000;
+}
+.dialog.popped .greentext,
+.menubg .greentext,.control span.greentext,.poisontext.poisonauto{
 	color:#00312d;
 }
 .control span.firetext{
