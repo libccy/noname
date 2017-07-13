@@ -1033,19 +1033,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				logTarget:'target',
 				content:function(){
-					"step 0"
-					var next=trigger.target.chooseToRespond({name:'shan'});
-					next.autochoose=lib.filter.autoRespondShan;
-					next.set('ai',function(card){
-						if(_status.event.player.countCards('h','shan')>1){
-							return get.unuseful2(card);
-						}
-						return -1;
-					});
-					"step 1"
-					if(result.bool==false){
-						trigger.untrigger();
-						trigger.directHit=true;
+					if(typeof trigger.shanRequired=='number'){
+						trigger.shanRequired++;
+					}
+					else{
+						trigger.shanRequired=2;
 					}
 				}
 			},

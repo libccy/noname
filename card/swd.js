@@ -4646,7 +4646,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					})
 					"step 1"
 					if(result.bool){
-						trigger.target.chooseToRespond({name:'shan'}).autochoose=lib.filter.autoRespondShan;
+						trigger.target.chooseToRespond({name:'shan'},'萨登荆环：请额外打出一张闪响应杀').autochoose=lib.filter.autoRespondShan;
 					}
 					else{
 						event.finish();

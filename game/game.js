@@ -9431,6 +9431,9 @@
 								}
 								else{
 									event.dialog=ui.create.dialog(event.prompt);
+									if(event.prompt2){
+										event.dialog.addText(event.prompt2);
+									}
 								}
 							}
 							else if(event.prompt=='function'){
@@ -9608,6 +9611,7 @@
 						if(event.isMine()){
 							game.pause();
 							if(event.dialog) event.dialog=ui.create.dialog(event.dialog);
+							if(event.prompt2) event.dialog.addText(event.prompt2);
 						}
                         else if(event.isOnline()){
                             event.send();
@@ -13964,6 +13968,12 @@
 							}
 							else{
 								str+='牌';
+							}
+							if(_status.event.getParent().name=='useCard'){
+								var cardname=_status.event.name;
+								if(lib.card[cardname]&&lib.translate[cardname]){
+									str+='响应'+lib.translate[cardname];
+								}
 							}
 							next.dialog=str;
 						}
@@ -19915,7 +19925,8 @@
                         return;
                     }
                     event.acted.push(player);
-					var str=get.translation(trigger.player.name)+'濒死，是否帮助？<br><div class="text center" style="margin-top:10px">当前体力：'+trigger.player.hp+'</div>';
+					var str=get.translation(trigger.player.name)+'濒死，是否帮助？';
+					var str2='当前体力：'+trigger.player.hp;
 					if(lib.config.tao_enemy&&event.dying.side!=player.side&&lib.config.mode!='identity'&&lib.config.mode!='guozhan'&&!event.dying.hasSkillTag('revertsave')){
 						event._result={bool:false}
 					}
@@ -19935,6 +19946,7 @@
 							},
 							filterTarget:trigger.player,
 							prompt:str,
+							prompt2:str2,
 							ai1:function(card){
                                 if(typeof card=='string'){
                                     var info=get.info(card);

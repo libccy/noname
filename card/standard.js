@@ -72,6 +72,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){return player!=target},
 				content:function(){
 					"step 0"
+					if(typeof event.shanRequired!='number'||!event.shanRequired||event.shanRequired<0){
+						event.shanRequired=1;
+					}
+					"step 1"
 					if(event.skipShan){
 						event._result={bool:true};
 					}
@@ -80,26 +84,38 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						var next=target.chooseToRespond({name:'shan'});
+						if(event.shanRequired>1){
+							next.set('prompt2','（共需打出张'+event.shanRequired+'闪）');
+						}
 						next.set('ai',function(card){
 							var target=_status.event.player;
 							var evt=_status.event.getParent();
+							if(target.countCards('h','shan')<_status.event.shanRequired){
+								return -1
+							}
 							if(target.hasSkillTag('useShan')){
 								return 11-get.value(card);
 							}
 							if(get.damageEffect(target,evt.player,target,evt.card.nature)>=0) return -1;
 							return 11-get.value(card);
-						});
+						}).set('shanRequired',event.shanRequired);
 						next.autochoose=lib.filter.autoRespondShan;
 					}
-					"step 1"
+					"step 2"
 					if(result.bool==false){
 						event.trigger('shaHit');
 					}
 					else{
-						event.trigger('shaMiss');
-						event.responded=result;
+						event.shanRequired--;
+						if(event.shanRequired>0){
+							event.goto(1);
+						}
+						else{
+							event.trigger('shaMiss');
+							event.responded=result;
+						}
 					}
-					"step 2"
+					"step 3"
 					if(result.bool==false&&!event.unhurt){
 						target.damage(get.nature(event.card));
 						event.result={bool:true}

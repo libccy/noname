@@ -850,7 +850,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				global:'g_shihuifen',
 	            content:function(){
 	                'step 0'
-	                _status.currentPhase.chooseToRespond({name:'shan'},'石灰粉<br><div style="height:10px;display:block"></div><div class="text">打出一张闪，否则本回合无法对其他角色使用卡牌');
+					var next=_status.currentPhase.chooseToRespond({name:'shan'});
+	                next.set('prompt2','否则本回合无法对其他角色使用卡牌');
 	                'step 1'
 	                if(!result.bool){
 	                    _status.currentPhase.addTempSkill('shihuifen','phaseUseAfter');

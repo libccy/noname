@@ -1540,19 +1540,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				priority:-1,
 				content:function(){
-					"step 0"
-					var next=trigger.target.chooseToRespond({name:'shan'});
-					next.autochoose=lib.filter.autoRespondShan;
-					next.set('ai',function(card){
-						if(_status.event.player.countCards('h','shan')>1){
-							return get.unuseful2(card);
-						}
-						return -1;
-					});
-					"step 1"
-					if(result.bool==false){
-						trigger.untrigger();
-						trigger.directHit=true;
+					if(typeof trigger.shanRequired=='number'){
+						trigger.shanRequired++;
+					}
+					else{
+						trigger.shanRequired=2;
 					}
 				}
 			},
@@ -1566,7 +1558,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				priority:-1,
 				content:function(){
 					"step 0"
-					var next=trigger.turn.chooseToRespond({name:'sha'});
+					var next=trigger.turn.chooseToRespond({name:'sha'},'请打出一张杀响应决斗');
+					next.set('prompt2','（共需打出2张杀）');
 					next.autochoose=lib.filter.autoRespondSha;
 					next.set('ai',function(card){
 						var player=_status.event.player;
@@ -1757,7 +1750,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jieyin_info:'出牌阶段，你可以弃置两张牌并选择1名已经受伤的男性角色，你与其各回复一点体力，每阶段限一次',
 			qingnang_info:'出牌阶段，你可以弃置一张手牌令一名角色回复一点体力，每阶段限一次',
 			jijiu_info:'回合外，你可以将一张红色牌当[桃]使用',
-			wushuang_info:'锁定技，你使用的[杀]或[决斗]需要两张[闪]或[杀]响应',
+			wushuang_info:'锁定技，你使用的【杀】或【决斗】需要两张【闪】或【杀】响应',
 			lijian_info:'出牌阶段，你可以弃一张牌，视为一名男性角色对另一名男性角色使用一张[决斗]，每阶段限一次',
 			biyue_info:'结束阶段，你可以摸一张牌',
 		},

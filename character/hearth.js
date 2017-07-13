@@ -7864,7 +7864,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		aoshu_info:'出牌阶段限一次，你可以将一张黑桃牌当作无中生有使用',
 
     		qianhou:'千喉',
-    		qianhou_info:'锁定技，准备阶段，你视为使用一张随机普通锦囊牌（随机指定目标）；若目标只有1人且不是你，你可以将一张手牌转化为此锦囊',
+    		qianhou_info:'锁定技，准备阶段，你视为使用一张随机普通锦囊牌（随机指定目标）；若目标只有1人且不是你，你可以弃置一张手牌并获得此锦囊',
     		fengxing:'风行',
     		fengxing_info:'每当你于回合外首次失去牌，你可以弃置一张牌并摸两张牌',
     		xinci:'心刺',

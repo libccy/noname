@@ -5237,7 +5237,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     				"step 3"
     				if(event.num){
-    					trigger.target.chooseToRespond({name:'shan'}).ai=get.unuseful2;
+    					var next=trigger.target.chooseToRespond({name:'shan'},'请打出一张闪响应燎原');
+                        next.ai=get.unuseful2;
+                        if(event.num>1) next.set('prompt2','共需额外打出'+event.num+'张闪');
     				}
     				else{
     					event.finish();
