@@ -1629,7 +1629,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
                     'step 1'
                     if(player.countCards('h')&&event.cardname){
-                        player.chooseCard('是否将一张手牌转化为'+get.translation(event.cardname)+'？','h').ai=function(card){
+                        player.chooseToDiscard('是否弃置一张手牌并获得'+get.translation(event.cardname)+'？','h').ai=function(card){
                             return get.value({name:event.cardname})-get.value(card);
                         }
                     }
@@ -1639,9 +1639,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     'step 2'
                     if(result.bool){
                         var card=result.cards[0];
-                        card.init([card.suit,card.number,event.cardname]);
-                        player.$draw(game.createCard({name:event.cardname,suit:' ',number:' '}));
-                        game.log(player,'将一张手牌转化为',{name:event.cardname});
+                        var fakecard=game.createCard(event.cardname,card.suit,card.number);
+                        player.gain(fakecard,'gain2','log');
                     }
     			}
     		},
@@ -2115,9 +2114,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			check:function(card){
     				return 8-get.value(card)
     			},
-    			discard:false,
-    			lose:false,
-    			delay:false,
+    			// discard:false,
+    			// lose:false,
+    			// delay:false,
     			content:function(){
     				'step 0'
     				var names=[];
@@ -2162,27 +2161,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					lib.translate[name+'_info']=get.translation(names[0])+'、'+
     					get.translation(names[1])+'、'+get.translation(names[2]);
     				}
-    				cards[0].style.transitionDuration='0.2s';
-    				ui.refresh(cards[0]);
-    				cards[0].classList.add('opaque');
-    				event.cardname=name;
-    				if(player!=game.me){
-    					var fakecard=game.createCard(name);
-    					fakecard.node.info.remove();
-    					player.$draw(fakecard);
-    				}
-    				game.delay(0,200);
-    				'step 1'
-    				cards[0].style.transitionDuration='0s';
-    				ui.refresh(cards[0]);
-    				cards[0].classList.remove('fullskin');
-    				cards[0].init([cards[0].suit,cards[0].number,event.cardname]);
-    				game.delay(0,100);
-    				'step 2'
-    				cards[0].style.transitionDuration='';
-    				ui.refresh(cards[0]);
-    				cards[0].classList.remove('opaque');
-    				game.delay(0,200);
+                    var fakecard=game.createCard(name,cards[0].suit,cards[0].number);
+                    player.gain(fakecard,'gain2');
+    				// cards[0].style.transitionDuration='0.2s';
+    				// ui.refresh(cards[0]);
+    				// cards[0].classList.add('opaque');
+    				// event.cardname=name;
+    				// if(player!=game.me){
+    				// 	var fakecard=game.createCard(name);
+    				// 	fakecard.node.info.remove();
+    				// 	player.$draw(fakecard);
+    				// }
+    				// game.delay(0,200);
+                    // stp 1
+    				// cards[0].style.transitionDuration='0s';
+    				// ui.refresh(cards[0]);
+    				// cards[0].classList.remove('fullskin');
+    				// cards[0].init([cards[0].suit,cards[0].number,event.cardname]);
+    				// game.delay(0,100);
+    				// stp 2
+    				// cards[0].style.transitionDuration='';
+    				// ui.refresh(cards[0]);
+    				// cards[0].classList.remove('opaque');
+    				// game.delay(0,200);
     			},
     			template:{
     				type:'hsyaoshui',
@@ -7637,7 +7638,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		qingzun_info:'本局对战中，每当你使用一张青玉牌，你的手牌上限+1；当你累计使用两张青玉牌后，你可以于准备阶段摸一张牌；当你累计使用六张青玉牌后，你可以于结束阶段摸一张牌',
     		qingzun_info_alter:'本局对战中，每当你使用一张青玉牌，你的手牌上限+1；当你累计使用三张青玉牌后，你可以于准备阶段摸一张牌；当你累计使用九张青玉牌后，你可以于结束阶段摸一张牌',
     		lianjin:'炼金',
-    		lianjin_info:'出牌阶段限一次，你可以将一张手牌永久转化为一张由三张随机牌组成的药水；当你因弃置而失去药水牌时，你随机获得药水的组成卡牌之一',
+    		lianjin_info:'出牌阶段限一次，你可以弃置一张手牌并获得一张由三张随机牌组成的药水；当你因弃置而失去药水牌时，你随机获得药水的组成卡牌之一',
     		shouji:'收集',
     		shouji_info:'每当你使用一张杀，你可以获得一张目标随机手牌的复制；每当你的杀被闪避，你可以获得一张目标随机非特殊装备牌的复制；每回合限各限一次',
     		guimou:'鬼谋',

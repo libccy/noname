@@ -461,6 +461,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				enable:true,
+				cardcolor:'red',
 				selectTarget:-1,
 				filterTarget:true,
 				contentBefore:function(){

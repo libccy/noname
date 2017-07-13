@@ -1282,7 +1282,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.showCards(event.cards);
 					player.chooseTarget(true,'选择一名男性角色送出'+get.translation(event.card),function(card,player,target){
 						return target.sex=='male';
-					});
+					}).set('ai',function(target){
+						var att=get.attitude(_status.event.player,target);
+						if(_status.event.neg) return -att;
+						return att;
+					}).set('neg',get.value(card,player,'raw')<0);
 					"step 2"
 					player.line(result.targets,'green');
 					result.targets[0].$gain2(event.card);
