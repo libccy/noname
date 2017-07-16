@@ -8376,6 +8376,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		songci:{
     			audio:2,
     			enable:'phaseUse',
+                unique:true,
     			filter:function(){
     				return game.hasPlayer(function(current){
     					return !current.storage.songci;

@@ -978,7 +978,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
     				player.chooseButton(dialog,true,function(button){
 						var name=button.link[2];
 						switch(name){
-							case 'gw_birinongwu':
+							case 'gw_ciguhanshuang':
 								if(nongwu2) return 3;
 								if(nongwu) return 1;
 								return 0;
@@ -1431,10 +1431,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:function(storage,player){
 						if(storage>=2){
-							return '锁定技，准备阶段，你令手牌数为全场最多的所有其他角色各随机弃置一张手牌，若目标不包含敌方角色，将一名随机敌方角色追加为额外目标，结算X次（重复'+storage+'次）';
+							return '锁定技，准备阶段，你令手牌数为全场最多的所有其他角色各随机弃置一张手牌，若目标不包含敌方角色，将一名随机敌方角色追加为额外目标（重复'+storage+'次）';
 						}
 						else{
-							return '锁定技，准备阶段，你令手牌数为全场最多的所有其他角色各随机弃置一张手牌，若目标不包含敌方角色，将一名随机敌方角色追加为额外目标，结算X次';
+							return '锁定技，准备阶段，你令手牌数为全场最多的所有其他角色各随机弃置一张手牌，若目标不包含敌方角色，将一名随机敌方角色追加为额外目标';
 						}
 					}
 				},

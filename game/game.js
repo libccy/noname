@@ -41692,7 +41692,7 @@
                 for(var j=0;j<lib.character[i][3].length;j++){
                     var skill=lib.character[i][3][j];
 					var info=lib.skill[skill];
-                    if(info&&!info.unique&&!info.temp&&info.bond){
+                    if(info&&!info.unique&&!info.temp){
 						if(func&&!func(info,skill)) continue;
                         list.add(skill);
                     }
