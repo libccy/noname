@@ -165,7 +165,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					for(var i=0;i<ui.discardPile.childElementCount;i++){
 						var card=ui.discardPile.childNodes[i];
-						if(card.storage.vanishtag.contains('gwshenyu')) continue;
+						if(card.vanishtag.contains('gwshenyu')) continue;
 						if(get.type(card)=='spell'&&get.subtype(card)!='spell_gold'){
 							return true;
 						}
@@ -177,7 +177,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var list=[];
 					for(var i=0;i<ui.discardPile.childElementCount;i++){
 						var card=ui.discardPile.childNodes[i];
-						if(card.storage.vanishtag.contains('gwshenyu')) continue;
+						if(card.vanishtag.contains('gwshenyu')) continue;
 						if(get.type(card)=='spell'&&get.subtype(card)!='spell_gold'){
 							list.push(card);
 						}
@@ -238,7 +238,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 4'
 					if(result.bool){
-						result.links[0].storage.vanishtag.add('gwshenyu');
+						result.links[0].vanishtag.add('gwshenyu');
 						event.target.gain(result.links,'gain2','log');
 					}
 				},

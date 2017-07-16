@@ -18698,13 +18698,13 @@
 					return node;
 				},
                 uncheck:function(skill){
-                    if(skill) this.storage.uncheck.add(skill);
+                    if(skill) this._uncheck.add(skill);
                     this.classList.add('uncheck');
                 },
                 recheck:function(skill){
-                    if(skill) this.storage.uncheck.remove(skill);
-                    else this.storage.uncheck.length=0;
-                    if(this.storage.uncheck.length==0) this.classList.remove('uncheck');
+                    if(skill) this._uncheck.remove(skill);
+                    else this._uncheck.length=0;
+                    if(this._uncheck.length==0) this.classList.remove('uncheck');
                 },
 				discard:function(){
 					ui.discardPile.appendChild(this);
@@ -36448,7 +36448,9 @@
 				if(!noclick){
 					lib.setIntro(node);
 				}
-				node.storage={uncheck:[],vanishtag:[]};
+				node.storage={};
+				node.vanishtag=[];
+				node._uncheck=[];
 				if(info!='noclick'){
 					node.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.card);
 					if(lib.config.touchscreen){
@@ -41345,7 +41347,7 @@
 					}
 					for(i=0;i<ui.discardPile.childNodes.length;i++){
 						var currentcard=ui.discardPile.childNodes[i];
-						currentcard.storage.vanishtag=[];
+						currentcard.vanishtag.length=0;
 						if(get.info(currentcard).vanish||currentcard.storage.vanish){
 							currentcard.remove();
 							continue;
