@@ -975,7 +975,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					attackFrom:function(from,to,distance){
-						return distance-from.hp;
+						return distance-from.hp+1;
 					}
 				}
 			},
@@ -1515,7 +1515,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwzhanjiang:'斩将',
 			gwzhanjiang_info:'每轮限一次，在一名角色的准备阶段，你可以弃置一张牌，然后所有角色可以对该角色使用一张杀，出杀的角色在响应时摸一张牌，当有至少两名角色响应后停止结算',
 			gwchuanxin:'穿心',
-			gwchuanxin_info:'你的攻击范围+X，X为你当前体力值；每当你对一名角色使用杀结算完毕后，你可以亮出牌堆顶的一张牌，若为黑色，视为对目标再使用一张杀',
+			gwchuanxin_info:'你的攻击范围基数为你当前体力值；每当你对一名角色使用杀结算完毕后，你可以亮出牌堆顶的一张牌，若为黑色，视为对目标再使用一张杀',
 			fengjian:'风剑',
 			fengjian_info:'每当你使用一张锦囊牌，你可以视为对一名不是此牌目标的角色使用一张雷杀，若如此做，你获得潜行直到下一回合开始',
 			huandie:'幻蝶',

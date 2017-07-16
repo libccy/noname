@@ -42190,9 +42190,6 @@
 					tr=document.createElement('tr');
 					table.appendChild(tr);
 					td=document.createElement('td');
-					td.innerHTML='范围';
-					tr.appendChild(td);
-					td=document.createElement('td');
 					td.innerHTML='距离';
 					tr.appendChild(td);
 					td=document.createElement('td');
@@ -42201,12 +42198,12 @@
 					td=document.createElement('td');
 					td.innerHTML='行动';
 					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML='伤害';
+					tr.appendChild(td);
 
 					tr=document.createElement('tr');
 					table.appendChild(tr);
-					td=document.createElement('td');
-					td.innerHTML=get.numStr(node.getAttackRange());
-					tr.appendChild(td);
 					td=document.createElement('td');
 					if(node==game.me||!game.me||!game.me.isIn()){
 						td.innerHTML='-';
@@ -42220,6 +42217,16 @@
 					tr.appendChild(td);
 					td=document.createElement('td');
 					td.innerHTML=node.stat.length-1;
+					tr.appendChild(td);
+					td=document.createElement('td');
+
+					(function(){
+						num=0;
+						for(var j=0;j<node.stat.length;j++){
+							if(typeof node.stat[j].damage=='number') num+=node.stat[j].damage;
+						}
+						td.innerHTML=num;
+					}());
 					tr.appendChild(td);
 					table.style.width='calc(100% - 20px)';
 					table.style.marginLeft='10px';
