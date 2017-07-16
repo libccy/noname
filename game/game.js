@@ -16606,7 +16606,7 @@
                             var group=lib.character[player.name1][1];
                             targets=game.filterPlayer(function(target){
                                 if(func&&!func(target)) return false;
-                                return lib.character[target.name1][1]!=group;
+                                return target.identity=='ye'||lib.character[target.name1][1]!=group;
                             });
                         }
                     }
@@ -16619,6 +16619,44 @@
                     targets.remove(player);
                     return targets;
                 },
+				getFriends:function(func){
+					var player=this;
+                    var targets;
+                    var mode=get.mode();
+                    if(mode=='identity'){
+                        switch(player.identity){
+                            case 'zhu':case 'zhong':case 'mingzhong':targets=game.filterPlayer(function(target){
+                                if(func&&!func(target)) return false;
+                                return ['zhu','zhong','mingzhong'].contains(target.identity);
+                            });break;
+                            case 'nei':targets=[];break;
+                            case 'fan':targets=game.filterPlayer(function(target){
+                                if(func&&!func(target)) return false;
+                                return target.identity=='fan';
+                            });break;
+                        }
+                    }
+                    else if(mode=='guozhan'){
+                        if(player.identity=='ye'){
+                            targets=[];
+                        }
+                        else{
+                            var group=lib.character[player.name1][1];
+                            targets=game.filterPlayer(function(target){
+                                if(func&&!func(target)) return false;
+                                return target.identity!='ye'&&lib.character[target.name1][1]==group;
+                            });
+                        }
+                    }
+                    else{
+                        targets=game.filterPlayer(function(target){
+                            if(func&&!func(target)) return false;
+                            return target.side==player.side;
+                        });
+                    }
+                    targets.remove(player);
+                    return targets;
+				},
 				isEnemyOf:function(){
 					return !this.isFriendOf.apply(this,arguments);
 				},
@@ -24183,7 +24221,7 @@
                                 }
                                 else{
                                     try{
-                                        lib.node.fs.rmdir(__dirname+'/extension/'+extname);
+                                        lib.node.fs.rmdir(__dirname+'/extension/'+extname,function(){});
                                     }
                                     catch(e){}
                                 }

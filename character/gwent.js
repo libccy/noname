@@ -1475,6 +1475,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_zhangyujushou:'章鱼巨兽',
 			gw_zhuoertan:'卓尔坦',
 
+			gwjushi:'巨噬',
+			gwjushi_info:'出牌阶段限一次，你可以将一名距离1以内的其他角色的一张随机牌置于你的武将牌上；当你受到伤害后，“巨噬”牌将回到原来的位置；准备阶段，若你有“巨噬”牌，你移去之然后增加一点体力和体力上限',
 			bolang:'搏浪',
 			bolang_info:'准备阶段，你可以观看牌堆顶的6张牌，然后将其中至多3张移入弃牌堆；每当你造成一次伤害，你可以从弃牌堆中获得一张以此法移入弃牌堆的牌',
 			lingji:'灵计',
