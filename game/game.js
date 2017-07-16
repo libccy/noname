@@ -41685,13 +41685,15 @@
 			}
 			return skills;
 		},
-        gainableSkills:function(){
+        gainableSkills:function(func){
             var list=[];
             for(var i in lib.character){
                 if(lib.character[i][4]&&lib.character[i][4].contains('boss')) continue;
                 for(var j=0;j<lib.character[i][3].length;j++){
                     var skill=lib.character[i][3][j];
-                    if(lib.skill[skill]&&!lib.skill[skill].unique){
+					var info=lib.skill[skill];
+                    if(info&&!info.unique&&!info.temp&&info.bond){
+						if(func&&!func(info,skill)) continue;
                         list.add(skill);
                     }
                 }

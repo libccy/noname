@@ -1018,7 +1018,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     							else{
     								translation=translation.slice(0,2);
     							}
-    							var item=dialog.add('<div class="popup pointerdiv" style="width:50%;display:inline-block"><div class="skill">【'+
+    							var item=dialog.add('<div class="popup pointerdiv" style="width:80%;display:inline-block"><div class="skill">【'+
     							translation+'】</div><div>'+lib.translate[list[i]+'_info']+'</div></div>');
     							item.firstChild.addEventListener('click',clickItem);
     							item.firstChild.link=list[i];
@@ -3253,7 +3253,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     							else{
     								translation=translation.slice(0,2);
     							}
-    							var item=dialog.add('<div class="popup pointerdiv" style="width:50%;display:inline-block"><div class="skill">【'+
+    							var item=dialog.add('<div class="popup pointerdiv" style="width:80%;display:inline-block"><div class="skill">【'+
     							translation+'】</div><div>'+lib.translate[list[i]+'_info']+'</div></div>');
     							item.firstChild.addEventListener('click',clickItem);
     							item.firstChild.link=list[i];

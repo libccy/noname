@@ -32,7 +32,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			gw_aigeleisi:['female','wu',3,['gwshenyu']],
 			gw_aokeweisite:['male','qun',4,['yunhuo']],
-			// gw_kaxier:['male','wu',4,[]],
+			gw_kaxier:['male','wu',4,['gwfengchi']],
 			gw_luobo:['male','qun',3,['junchi']],
 			gw_mieren:['male','shu',3,['lingji']],
 			gw_sanhanya:['male','shu',3,['gwjinyan']],
@@ -54,6 +54,64 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			gwfengchi:{
+				trigger:{player:'phaseUseBegin'},
+				frequent:true,
+				content:function(){
+					'step 0'
+    				var list=get.gainableSkills(function(info){
+						if(typeof info.enable=='string') return info.enable=='phaseUse';
+						if(Array.isArray(info.enable)) return info.enable.contains('phaseUse');
+					});
+    				list.remove(player.getSkills());
+    				list=list.randomGets(3);
+    				event.skillai=function(){
+                        return get.max(list,get.skillRank,'item');
+    				};
+    				if(event.isMine()){
+    					var dialog=ui.create.dialog('forcebutton');
+    					dialog.add('风驰：选择获得一项技能');
+    					var clickItem=function(){
+    						_status.event._result=this.link;
+    						dialog.close();
+    						game.resume();
+    					};
+    					for(var i=0;i<list.length;i++){
+    						if(lib.translate[list[i]+'_info']){
+    							var translation=get.translation(list[i]);
+    							if(translation[0]=='新'&&translation.length==3){
+    								translation=translation.slice(1,3);
+    							}
+    							else{
+    								translation=translation.slice(0,2);
+    							}
+    							var item=dialog.add('<div class="popup pointerdiv" style="width:80%;display:inline-block"><div class="skill">【'+
+    							translation+'】</div><div>'+lib.translate[list[i]+'_info']+'</div></div>');
+    							item.firstChild.addEventListener('click',clickItem);
+    							item.firstChild.link=list[i];
+    						}
+    					}
+    					dialog.add(ui.create.div('.placeholder'));
+    					event.switchToAuto=function(){
+    						event._result=event.skillai();
+    						dialog.close();
+    						game.resume();
+    					};
+    					_status.imchoosing=true;
+    					game.pause();
+    				}
+    				else{
+    					event._result=event.skillai();
+    				}
+    				'step 1'
+    				_status.imchoosing=false;
+    				var link=result;
+    				player.addTempSkill(link,'phaseUseAfter');
+    				player.popup(link);
+    				game.log(player,'获得了技能','【'+get.translation(link)+'】');
+    				game.delay();
+				}
+			},
 			lingji:{
 				enable:'phaseUse',
 				usable:1,
@@ -1475,6 +1533,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_zhangyujushou:'章鱼巨兽',
 			gw_zhuoertan:'卓尔坦',
 
+			gwfengchi:'风驰',
+			gwfengchi_info:'出牌阶段开始时，你可以随机观看3个可以在出牌阶段使用的技能，并获得其中一个技能直到此阶段结束',
 			gwjushi:'巨噬',
 			gwjushi_info:'出牌阶段限一次，你可以将一名距离1以内的其他角色的一张随机牌置于你的武将牌上；当你受到伤害后，“巨噬”牌将回到原来的位置；准备阶段，若你有“巨噬”牌，你移去之然后增加一点体力和体力上限',
 			bolang:'搏浪',
