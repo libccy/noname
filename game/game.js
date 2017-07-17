@@ -11795,6 +11795,7 @@
 						if(lib.config.reverse_sort) sort=-sort;
 						cards[num].fix();
 						cards[num].style.transform='';
+						cards[num].vanishtag.length=0;
 						if(player==game.me){
 							cards[num].classList.add('drawinghidden');
 						}

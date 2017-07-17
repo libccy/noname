@@ -931,7 +931,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:7,
 				}
 			},
-
 			gw_zirankuizeng:{
 				fullborder:'silver',
 				type:'spell',
@@ -1028,7 +1027,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					value:6,
+					value:7,
 					useful:[4,1],
 					result:{
 						player:function(player){
@@ -1038,6 +1037,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:7,
 				}
 			},
+
 			gw_qinpendayu:{
 				fullborder:'bronze',
 				type:'spell',
@@ -1054,7 +1054,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					target.addTempSkill('gw_qinpendayu',{player:'phaseAfter'});
 				},
 				ai:{
-					value:4,
+					value:[5,1],
 					useful:[3,1],
 					result:{
 						player:function(player,target){
@@ -1092,7 +1092,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					target.addTempSkill('gw_birinongwu',{player:'phaseAfter'});
 				},
 				ai:{
-					value:4,
+					value:[5,1],
 					useful:[3,1],
 					result:{
 						player:function(player,target){
@@ -1126,7 +1126,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					target.addSkill('gw_ciguhanshuang');
 				},
 				ai:{
-					value:4,
+					value:[5,1],
 					useful:[3,1],
 					result:{
 						player:function(player,target){
@@ -1189,7 +1189,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					target.loseMaxHp(true);
 				},
 				ai:{
-					value:4,
+					value:[4,1],
 					useful:[3,1],
 					result:{
 						target:function(player,target){
@@ -1219,7 +1219,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					value:4,
+					value:[4.5,1],
 					useful:[4,1],
 					result:{
 						target:function(player,target){
@@ -1259,7 +1259,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					basic:{
 						order:1.8,
-						value:[6,1],
+						value:[5,1],
 						useful:[4,1],
 					},
 					result:{
@@ -1282,7 +1282,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var choice=1;
 					if(game.countPlayer(function(current){
-						if(current.countCards('j')){
+						if(current.countCards('j')||current.hasSkillTag('weather')){
 							if(get.attitude(player,current)>0){
 								choice=0;
 							}
@@ -1292,7 +1292,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						player.chooseControl(function(){
 							return choice;
 						}).set('choiceList',[
-							'弃置一名角色判定区内的所有牌',
+							'解除任意名角色的天气效果并移除其判定区内的牌',
 							'随机获得一张铜卡法术（破晓除外）并展示之'
 						]);
 					}
@@ -1301,10 +1301,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					if(!event.directfalse&&result.index==0){
-						player.chooseTarget(true,'弃置一名角色判定区内的所有牌',function(card,player,target){
-							return target.countCards('j');
+						player.chooseTarget(true,[1,Infinity],'解除任意名角色的天气效果并移除其判定区内的牌',function(card,player,target){
+							return target.countCards('j')||target.hasSkillTag('weather');
 						}).ai=function(target){
-							return get.attitude(player,target)*target.countCards('j');
+							return get.attitude(player,target);
 						};
 					}
 					else{
@@ -1320,14 +1320,27 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					'step 2'
-					if(result.targets[0]){
-						player.line(result.targets[0],'green');
-						result.targets[0].discard(result.targets[0].getCards('j'));
+					event.list=result.targets.slice(0).sortBySeat();
+					'step 3'
+					if(event.list.length){
+						var target=event.list.shift();
+						player.line(target,'green');
+						var cards=target.getCards('j');
+						if(cards.length){
+							target.discard(cards);
+						}
+						if(target.hasSkillTag('weather')){
+							target.removeSkill('gw_qinpendayu');
+							target.removeSkill('gw_birinongwu');
+							target.removeSkill('gw_ciguhanshuang');
+						}
+						event.redo();
 					}
 				},
 				ai:{
 					order:4,
-					useful:[3,1],
+					value:[5,1],
+					useful:[4,1],
 					result:{
 						player:1,
 					}
@@ -1370,7 +1383,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
     				maxHandcard:function(player,num){
     					return num-1;
     				}
-    			}
+    			},
+				ai:{
+					weather:true
+				}
     		},
 			gw_birinongwu:{
 				mark:true,
@@ -1382,7 +1398,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                cardEnabled:function(card){
 	                    if(card.name=='sha') return false;
 	                }
-	            }
+	            },
+				ai:{
+					weather:true
+				}
 			},
 			gw_ciguhanshuang:{
 				trigger:{player:'phaseDrawBegin'},
@@ -1398,7 +1417,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
     			content:function(){
     				trigger.num--;
     				player.removeSkill('gw_ciguhanshuang');
-    			}
+    			},
+				ai:{
+					weather:true
+				}
 			},
 			gw_dieyi:{
 				init:function(player){
@@ -1589,7 +1611,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_zirankuizeng:'自然馈赠',
 			gw_zirankuizeng_info:'选择任意一张铜卡法术使用',
 			gw_poxiao:'破晓',
-			gw_poxiao_info:'选择一项：弃置一名角色判定区内的所有牌，或随机获得一张铜卡法术（破晓除外）并展示之',
+			gw_poxiao_info:'选择一项：解除任意名角色的天气效果并移除其判定区内的牌，或随机获得一张铜卡法术（破晓除外）并展示之',
 			gw_zumoshoukao:'阻魔手铐',
 			gw_zumoshoukao_info:'令一名角色失去所有护甲且非锁定技失效直到下一回合结束',
 			gw_aozuzhilei:'奥祖之雷',
@@ -1607,13 +1629,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_baoxueyaoshui_info:'令一名角色弃置两张手牌并摸一张牌',
 			gw_birinongwu:'蔽日浓雾',
 			gw_birinongwu_bg:'雾',
-			gw_birinongwu_info:'出牌阶段对一名角色及其相邻角色使用，目标不能使用杀直到下一回合结束',
+			gw_birinongwu_info:'天气牌，出牌阶段对一名角色及其相邻角色使用，目标不能使用杀直到下一回合结束',
 			gw_qinpendayu:'倾盆大雨',
 			gw_qinpendayu_bg:'雨',
-			gw_qinpendayu_info:'出牌阶段对一名角色及其相邻角色使用，目标手牌上限-1直到下一回合结束',
+			gw_qinpendayu_info:'天气牌，出牌阶段对一名角色及其相邻角色使用，目标手牌上限-1直到下一回合结束',
 			gw_ciguhanshuang:'刺骨寒霜',
 			gw_ciguhanshuang_bg:'霜',
-			gw_ciguhanshuang_info:'出牌阶段对一名角色及其相邻角色使用，目标下个摸牌阶段摸牌数-1',
+			gw_ciguhanshuang_info:'天气牌，出牌阶段对一名角色及其相邻角色使用，目标下个摸牌阶段摸牌数-1',
 			gw_wenyi:'瘟疫',
 			gw_wenyi_info:'令所有体力值为全场最少的角色随机弃置一张牌',
 			gw_yanziyaoshui:'燕子药水',

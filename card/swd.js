@@ -3,7 +3,48 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'swd',
 		card:{
-
+			yihuajiemu:{
+				fullskin:true,
+				type:'trick',
+				enable:true,
+				singleCard:true,
+				filterTarget:function(card,player,target){
+					if(target.isMin()) return false;
+					if(ui.selected.targets.length){
+						return target.getCards('e',{subtype:'equip5'}).length==0;
+					}
+					else{
+						return target.getCards('e',{subtype:'equip5'}).length>0;
+					}
+				},
+				selectTarget:2,
+				multitarget:true,
+				complexTarget:true,
+				content:function(){
+					if(target.getEquip(5)){
+						target.$give(target.getEquip(5),event.addedTarget);
+						event.addedTarget.equip(target.getEquip(5));
+						game.delay();
+					}
+				},
+				ai:{
+					order:1,
+					result:{
+						target:function(player,target){
+							if(target.getCards('e',{subtype:'equip5'}).length){
+								if(get.attitude(target,player)>0){
+									return -0.5;
+								}
+								return -1;
+							}
+							return 1;
+						}
+					},
+					tag:{
+						loseCard:1
+					}
+				}
+			},
 			liuxinghuoyu:{
 				fullskin:true,
 				type:'trick',
@@ -4729,6 +4770,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			'护甲：和体力类似，每点护甲可抵挡一点伤害，但不影响手牌上限'
 		},
 		translate:{
+			yihuajiemu:'移花接木',
+			yihuajiemu_info:'对一名装备区内有宝物的角色使用，将其宝物牌转移至另一名角色',
 			liuxinghuoyu:'流星火羽',
 			liuxinghuoyu_info:'出牌阶段，对一名角色使用，令目标弃置2张牌，或受到一点火焰伤害',
 			g_yuchan_equip:'玉蝉',
@@ -5099,6 +5142,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			lianyaohu_info:'出牌阶段各限一次，你可以选择一项：1.弃置一张手牌，并将一名其他角色的一张手牌置入炼妖壶；2.弃置两张炼妖壶中的牌，从牌堆中获得一张与弃置的牌类别均不相同的牌',
 		},
 		list:[
+			['heart',3,'yihuajiemu'],
+			['diamond',1,'yihuajiemu'],
+			['diamond',7,'yihuajiemu'],
+
 			['diamond',3,'liuxinghuoyu','fire'],
 			['heart',6,'liuxinghuoyu','fire'],
 			['heart',9,'liuxinghuoyu','fire'],

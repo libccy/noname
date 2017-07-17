@@ -534,48 +534,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			yihuajiemu:{
-				fullskin:true,
-				type:'trick',
-				enable:true,
-				singleCard:true,
-				filterTarget:function(card,player,target){
-					if(target.isMin()) return false;
-					if(ui.selected.targets.length){
-						return target.getCards('e',{subtype:'equip5'}).length==0;
-					}
-					else{
-						return target.getCards('e',{subtype:'equip5'}).length>0;
-					}
-				},
-				selectTarget:2,
-				multitarget:true,
-				complexTarget:true,
-				content:function(){
-					if(target.getEquip(5)){
-						target.$give(target.getEquip(5),event.addedTarget);
-						event.addedTarget.equip(target.getEquip(5));
-						game.delay();
-					}
-				},
-				ai:{
-					order:1,
-					result:{
-						target:function(player,target){
-							if(target.getCards('e',{subtype:'equip5'}).length){
-								if(get.attitude(target,player)>0){
-									return -0.5;
-								}
-								return -1;
-							}
-							return 1;
-						}
-					},
-					tag:{
-						loseCard:1
-					}
-				}
-			},
 			fudichouxin:{
 				fullskin:true,
 				type:'trick',
@@ -1036,8 +994,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			toulianghuanzhu:'偷梁换柱',
 			toulianghuanzhu_info:'出牌阶段对一名有手牌的角色使用，选择另一名有手牌的角色获得目标两张手牌（不足则全拿），然后还给其等量手牌',
 			toulianghuanzhu_bg:'柱',
-			yihuajiemu:'移花接木',
-			yihuajiemu_info:'对一名装备区内有宝物的角色使用，将其宝物牌转移至另一名角色',
 			fudichouxin:'釜底抽薪',
 			fudichouxin_info:'与一名角色进行拼点，若成功则获得双方拼点牌',
 			shuiyanqijun:'水攻',
@@ -1065,15 +1021,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['club',1,'qiankundai'],
 			['heart',6,'huoshan','fire'],
 			['club',7,'hongshui'],
-			['heart',3,'yihuajiemu'],
 			["diamond",3,'guohe'],
 
 			['diamond',4,'fudichouxin'],
-			['diamond',1,'yihuajiemu'],
 			['club',6,'fudichouxin'],
 			['spade',1,'fudichouxin'],
 			['club',7,'shuiyanqijun'],
-			['diamond',7,'yihuajiemu'],
 			['club',8,'shuiyanqijun'],
 			['club',8,'guohe'],
 			['spade',9,'shuiyanqijun'],

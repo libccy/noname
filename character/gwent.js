@@ -16,7 +16,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_laduoweide:['male','wei',4,['gwxiaoshou']],
 			gw_dagong:['male','qun',4,['tianbian']],
 
-			// gw_bulanwang:['male','qun',4,['bolang']],
+			gw_bulanwang:['male','qun',4,['bolang']],
 			// gw_kuite:['male','qun',3,[]],
 			// gw_fuertaisite:['male','qun',3,[]],
 			// gw_hengsaite:['male','wei',4,['jinsheng']],
@@ -32,12 +32,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			gw_aigeleisi:['female','wu',3,['gwshenyu']],
 			gw_aokeweisite:['male','qun',4,['yunhuo']],
-			gw_kaxier:['male','wu',4,['gwfengchi']],
+			gw_kaxier:['male','shu',4,['gwfengchi']],
 			gw_luobo:['male','qun',3,['junchi']],
 			gw_mieren:['male','shu',3,['lingji']],
 			gw_sanhanya:['male','shu',3,['gwjinyan']],
 			gw_shanhu:['female','qun',3,['shuijian']],
-			// gw_zhangyujushou:['male','wu',4,[]],
+			gw_zhangyujushou:['male','wu',4,['gwjushi']],
 			gw_zhuoertan:['male','wu',3,['hupeng']],
 		},
 		characterIntro:{
@@ -54,9 +54,130 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			bolang:{
+				trigger:{player:'phaseBegin'},
+				frequent:true,
+				init:function(player){
+					player.storage.bolang=[];
+				},
+				content:function(){
+					'step 0'
+					var cards=[];
+					for(var i=0;i<ui.cardPile.childElementCount;i++){
+						cards.push(ui.cardPile.childNodes[i]);
+					}
+					player.chooseCardButton('搏浪：将至多3张牌移至弃牌堆',[1,3],cards.slice(0,6)).ai=function(button){
+						if(button.link==cards[0]||button.link==cards[1]){
+							return get.value(button.link)-5;
+						}
+						else if(button.link==cards[4]||button.link==cards[5]){
+							return get.value(button.link)/5;
+						}
+					};
+					'step 1'
+					if(result.bool){
+						for(var i=0;i<player.storage.bolang.length;i++){
+							if(!player.storage.bolang[i].vanishtag.contains('bolang')){
+								player.storage.bolang.splice(i--,1);
+							}
+						}
+						player.storage.bolang.addArray(result.links);
+						for(var i=0;i<result.links.length;i++){
+							result.links[i].vanishtag.add('bolang');
+							result.links[i].discard();
+						}
+					}
+				},
+				group:'bolang_gain',
+				subSkill:{
+					gain:{
+						trigger:{source:'damageEnd'},
+						direct:true,
+						filter:function(event,player){
+							for(var i=0;i<player.storage.bolang.length;i++){
+								if(player.storage.bolang[i].vanishtag.contains('bolang')){
+									return true;
+								}
+							}
+						},
+						content:function(){
+							'step 0'
+							var list=[];
+							for(var i=0;i<player.storage.bolang.length;i++){
+								if(player.storage.bolang[i].vanishtag.contains('bolang')){
+									list.push(player.storage.bolang[i]);
+								}
+							}
+							player.chooseCardButton(true,list,get.prompt('bolang'));
+							'step 1'
+							if(result.bool){
+								player.logSkill('bolang');
+								player.gain(result.links,'gain2');
+							}
+						}
+					}
+				}
+			},
+			gwjushi:{
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return !player.hasSkill('gwjushi2');
+				},
+				filterTarget:function(card,player,target){
+					return target!=player&&get.distance(player,target)<=1&&target.countCards('he');
+				},
+				content:function(){
+					var hs=target.getCards('he');
+					if(hs.length){
+						var card=hs.randomGet();
+						target.$give(card,player);
+						player.storage.gwjushi2=card;
+						player.storage.gwjushi3=target;
+						player.storage.gwjushi4=get.position(card);
+						target.lose(card,ui.special);
+						player.addSkill('gwjushi2');
+					}
+				}
+			},
+			gwjushi2:{
+				mark:'card',
+				intro:{
+					content:'受到伤害时，令此牌回归原位；准备阶段，你获得此牌'
+				},
+				trigger:{player:['phaseBegin','damageEnd']},
+				forced:true,
+				content:function(){
+					var card=player.storage.gwjushi2;
+					var target=player.storage.gwjushi3;
+					if(trigger.name=='damage'){
+						if(target.isIn()){
+							if(player.storage.gwjushi4=='e'&&get.type(card)=='equip'){
+								target.equip(card);
+								player.$give(card,target);
+								game.delay();
+							}
+							else{
+								player.give(card,target);
+							}
+						}
+						else{
+							card.discard();
+						}
+					}
+					else{
+						player.gain(card,'gain2');
+					}
+					player.removeSkill('gwjushi2');
+				},
+				onremove:['gwjushi2','gwjushi3','gwjushi4'],
+				ai:{
+					threaten:1.5
+				}
+			},
 			gwfengchi:{
 				trigger:{player:'phaseUseBegin'},
-				frequent:true,
+				forced:true,
 				content:function(){
 					'step 0'
     				var list=get.gainableSkills(function(info){
@@ -1534,9 +1655,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_zhuoertan:'卓尔坦',
 
 			gwfengchi:'风驰',
-			gwfengchi_info:'出牌阶段开始时，你可以随机观看3个可以在出牌阶段使用的技能，并获得其中一个技能直到此阶段结束',
+			gwfengchi_info:'锁定技，出牌阶段开始时，你随机观看3个可以在出牌阶段使用的技能，并获得其中一个技能直到此阶段结束',
 			gwjushi:'巨噬',
-			gwjushi_info:'出牌阶段限一次，你可以将一名距离1以内的其他角色的一张随机牌置于你的武将牌上；当你受到伤害后，“巨噬”牌将回到原来的位置；准备阶段，若你有“巨噬”牌，你移去之然后增加一点体力和体力上限',
+			gwjushi2:'巨噬',
+			gwjushi_info:'出牌阶段限一次，你可以将一名距离1以内的其他角色的一张随机牌置于你的武将牌上；当你受到伤害后，令“巨噬”牌回到原来的位置；准备阶段，你获得武将牌上的“巨噬”牌',
 			bolang:'搏浪',
 			bolang_info:'准备阶段，你可以观看牌堆顶的6张牌，然后将其中至多3张移入弃牌堆；每当你造成一次伤害，你可以从弃牌堆中获得一张以此法移入弃牌堆的牌',
 			lingji:'灵计',
