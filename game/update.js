@@ -1,9 +1,8 @@
 window.noname_update={
-    version:'1.9.31.2',
-    update:'1.9.31',
+    version:'1.9.32',
+    // update:'1.9.31',
     changeLog:[
-        '新武将',
-        'bug修复'
+        '新武将、乱斗',
     ],
     files:[
         // 'game/game.js',
@@ -16,7 +15,7 @@ window.noname_update={
         // 'card/gwent.js',
         // 'character/*',
         // 'character/gwent.js',
-        'character/yijiang.js',
+        // 'character/yijiang.js',
         // 'mode/identity.js',
         // 'mode/guozhan.js',
         // 'mode/versus.js',

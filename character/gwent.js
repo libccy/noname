@@ -93,6 +93,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					gain:{
 						trigger:{source:'damageEnd'},
 						direct:true,
+						usable:1,
 						filter:function(event,player){
 							for(var i=0;i<player.storage.bolang.length;i++){
 								if(player.storage.bolang[i].vanishtag.contains('bolang')){
@@ -1660,7 +1661,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwjushi2:'巨噬',
 			gwjushi_info:'出牌阶段限一次，你可以将一名距离1以内的其他角色的一张随机牌置于你的武将牌上；当你受到伤害后，令“巨噬”牌回到原来的位置；准备阶段，你获得武将牌上的“巨噬”牌',
 			bolang:'搏浪',
-			bolang_info:'准备阶段，你可以观看牌堆顶的6张牌，然后将其中至多3张移入弃牌堆；每当你造成一次伤害，你可以从弃牌堆中获得一张以此法移入弃牌堆的牌',
+			bolang_info:'准备阶段，你可以观看牌堆顶的6张牌，然后将其中至多3张移入弃牌堆；每当你造成一次伤害，你可以从弃牌堆中获得一张以此法移入弃牌堆的牌（每回合限发动一次）',
 			lingji:'灵计',
 			lingji_info:'出牌阶段限一次，你可以摸两张牌并弃置两张牌，若弃置的牌花色相同，你获得一张随机铜卡；若弃置的牌点数相同，你获得一张随机银卡',
 			gwjinyan:'金焰',
