@@ -413,6 +413,9 @@
 #arena[data-player_height='short'] .timerbar>div{
     top: 165px;
 }
+#arena .player[data-position='0']>.damage.dieidentity{
+    opacity: 1 !important;
+}
 
 /*--------位置(8人)------*/
 #arena[data-number='8']>.player[data-position='1']{top:calc(30% - 128px);left:calc(-300% / 94 + 4375% / 47 - 735px + 720px);}

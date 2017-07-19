@@ -3667,6 +3667,7 @@
 							map.connect_enhance_zhu.hide();
 							map.connect_double_nei.hide();
 							map.connect_zhong_card.show();
+							map.connect_special_identity.hide();
 						}
 						else{
 							map.connect_player_number.show();
@@ -3678,6 +3679,13 @@
 								map.connect_double_nei.hide();
 							}
 							map.connect_zhong_card.hide();
+
+							if(config.connect_player_number=='8'){
+								map.connect_special_identity.show();
+							}
+							else{
+								map.connect_special_identity.hide();
+							}
 						}
 					},
                     connect_identity_mode:{
@@ -3716,7 +3724,7 @@
 						name:'双内奸',
 						init:false,
 						restart:true,
-                        frequent:true,
+                        // frequent:true,
 						intro:'开启后游戏中将有两个内奸（内奸胜利条件仍为主内1v1时击杀主公）'
 					},
 		            connect_double_character:{
@@ -3725,6 +3733,13 @@
 		                frequent:true,
 		                restart:true,
 		            },
+					connect_special_identity:{
+						name:'特殊身份',
+						init:false,
+						restart:true,
+                        frequent:true,
+						intro:'开启后游戏中将增加军师、大将、贼首三个身份'
+					},
                     connect_ban_weak:{
 		                name:'屏蔽弱将',
 						init:true,
@@ -3757,6 +3772,7 @@
 							map.ban_identity2.hide();
                             map.ban_identity3.hide();
 							map.zhong_card.show();
+							map.special_identity.hide();
 						}
 						else{
 							map.player_number.show();
@@ -3786,6 +3802,12 @@
 								map.ban_identity3.show();
 							}
 							map.zhong_card.hide();
+							if(config.player_number=='8'){
+								map.special_identity.show();
+							}
+							else{
+								map.special_identity.hide();
+							}
 						}
 						if(config.double_character){
 							map.double_hp.show();
@@ -3833,6 +3855,13 @@
 		                frequent:true,
 		                restart:true,
 		            },
+					special_identity:{
+						name:'特殊身份',
+						init:false,
+						restart:true,
+                        frequent:true,
+						intro:'开启后游戏中将增加军师、大将、贼首三个身份'
+					},
 					zhong_card:{
 						name:'明忠卡牌替换',
 						init:true,

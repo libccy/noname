@@ -251,7 +251,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				var enhance_zhu=false;
 				if(_status.connectMode){
-					enhance_zhu=(_status.mode!='zhong'&&lib.configOL.enhance_zhu&&get.population('fan')>=3)
+					enhance_zhu=(_status.mode!='zhong'&&lib.configOL.enhance_zhu&&get.population('fan')>=3);
 				}
 				else{
 					enhance_zhu=(_status.mode!='zhong'&&get.config('enhance_zhu')&&get.population('fan')>=3);
@@ -307,6 +307,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(player==game.zhong){
 						state[i].zhong=true;
 					}
+					if(player.special_identity){
+						state[i].special_identity=player.special_identity;
+					}
 					state[i].shown=player.ai.shown;
 				}
 				return state;
@@ -316,6 +319,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var player=lib.playerOL[i];
 					if(player){
 						player.identity=state[i].identity;
+						if(state[i].special_identity){
+							player.special_identity=state[i].special_identity;
+							if(player.node.dieidentity){
+								player.node.dieidentity.innerHTML=get.translation(state[i].special_identity);
+								player.node.identity.firstChild.innerHTML=get.translation(state[i].special_identity+'_bg');
+							}
+						}
 						if(typeof state[i].zhu=='boolean'){
 							game.zhu=player;
 							player.isZhu=state[i].zhu;
@@ -1185,12 +1195,46 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						game.players[i].identityShown=false;
 					}
+					if(lib.configOL.special_identity&&!event.zhongmode&&game.players.length==8){
+						var map={};
+						var zhongs=game.filterPlayer(function(current){
+							return current.identity=='zhong';
+						});
+						var fans=game.filterPlayer(function(current){
+							return current.identity=='fan';
+						});
+						if(fans.length>=1){
+							map.identity_zeishou=fans.randomRemove();
+						}
+						if(zhongs.length>1){
+							map.identity_dajiang=zhongs.randomRemove();
+							map.identity_junshi=zhongs.randomRemove();
+						}
+						else if(zhongs.length==1){
+							if(Math.random()<0.5){
+								map.identity_dajiang=zhongs.randomRemove();
+							}
+							else{
+								map.identity_junshi=zhongs.randomRemove();
+							}
+						}
+						game.broadcastAll(function(zhu,map){
+							for(var i in map){
+								map[i].special_identity=i;
+							}
+						},game.zhu,map);
+						event.special_identity=map;
+					}
+
 					game.zhu.setIdentity();
 					game.zhu.identityShown=true;
 					game.zhu.isZhu=(game.zhu.identity=='zhu');
 					game.zhu.node.identity.classList.remove('guessing');
 					game.me.setIdentity();
 					game.me.node.identity.classList.remove('guessing');
+					if(game.me.special_identity){
+						game.me.node.identity.firstChild.innerHTML=get.translation(game.me.special_identity+'_bg');
+					}
 
 					for(var i=0;i<game.players.length;i++){
 						game.players[i].send(function(zhu,zhuid,me,identity){
@@ -1204,6 +1248,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							zhu.node.identity.classList.remove('guessing');
 							me.setIdentity(identity);
 							me.node.identity.classList.remove('guessing');
+							if(me.special_identity){
+								me.node.identity.firstChild.innerHTML=get.translation(me.special_identity+'_bg');
+							}
 							ui.arena.classList.add('choose-character');
 						},game.zhu,game.zhu.identity,game.players[i],game.players[i].identity);
 					}
@@ -1306,7 +1353,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									num3=num2;
 								}
 							}
-							list.push([game.players[i],['选择角色',[event.list.randomRemove(num+num3),'character']],selectButton,true]);
+							var str='选择角色';
+							if(game.players[i].special_identity){
+								str+='（'+get.translation(game.players[i].special_identity)+'）';
+							}
+							list.push([game.players[i],[str,[event.list.randomRemove(num+num3),'character']],selectButton,true]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -1329,6 +1380,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						if(!lib.playerOL[i].name){
 							lib.playerOL[i].init(result[i][0],result[i][1]);
+						}
+					}
+					if(event.special_identity){
+						for(var i in event.special_identity){
+							game.zhu.addSkill(i);
 						}
 					}
 					game.broadcast(function(result){
@@ -1360,6 +1416,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			nei2:"内奸",
 			fan2:"反贼",
 			random2:"随机",
+			identity_junshi_bg:'师',
+			identity_dajiang_bg:'将',
+			identity_zeishou_bg:'首',
+			identity_junshi:'军师',
+			identity_dajiang:'大将',
+			identity_zeishou:'贼首',
 			ai_strategy_1:'均衡',
 			ai_strategy_2:'偏反',
 			ai_strategy_3:'偏主',
@@ -1376,7 +1438,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				$dieAfter:function(){
 					if(_status.video) return;
 					if(!this.node.dieidentity){
-						var node=ui.create.div('.damage.dieidentity',get.translation(this.identity+'2'),this);
+						var str;
+						if(this.special_identity){
+							str=get.translation(this.special_identity);
+						}
+						else{
+							str=get.translation(this.identity+'2');
+						}
+						var node=ui.create.div('.damage.dieidentity',str,this);
 						ui.refresh(node);
 						node.style.opacity=1;
 						this.node.dieidentity=node;
@@ -1399,11 +1468,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				dieAfter:function(source){
 					if(!this.identityShown){
-						game.broadcastAll(function(player){
+						game.broadcastAll(function(player,identity,identity2,zhu){
 							player.setIdentity(player.identity);
 							player.identityShown=true;
 							player.node.identity.classList.remove('guessing');
-						},this);
+							if(identity){
+								zhu.removeSkill(identity);
+								player.node.identity.firstChild.innerHTML=get.translation(identity+'_bg');
+								game.log(player,'的身份是','#g'+get.translation(identity));
+							}
+							else{
+								game.log(player,'的身份是','#g'+get.translation(identity2+'2'));
+							}
+						},this,this.special_identity,this.identity,game.zhu);
 					}
 					game.checkResult();
 					if(game.zhu&&game.zhu.isZhu){
@@ -1872,6 +1949,27 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			identity_junshi:{
+				name:'军师',
+				mark:true,
+				intro:{
+					content:'准备阶段开始时，可以观看牌堆顶的三张牌，然后将这些牌以任意顺序置于牌堆顶或牌堆底'
+				}
+			},
+			identity_dajiang:{
+				name:'大将',
+				mark:true,
+				intro:{
+					content:'手牌上限+1'
+				}
+			},
+			identity_zeishou:{
+				name:'贼首',
+				mark:true,
+				intro:{
+					content:'手牌上限-1'
+				}
+			},
 			dongcha:{
 				trigger:{player:'phaseBegin'},
 				direct:true,
@@ -2000,7 +2098,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		help:{
-			'身份模式':'<div style="margin:10px">选项</div><ul style="margin-top:0"><li>加强主公<br>反贼人数多于2时主公会额外增加一个技能（每个主公的额外技能固定，非常备主公增加天命）</ul>'+
+			'身份模式':'<div style="margin:10px">选项</div><ul style="margin-top:0"><li>加强主公<br>反贼人数多于2时主公会额外增加一个技能（每个主公的额外技能固定，非常备主公增加天命）<li>特殊身份<br><ul style="padding-left:20px;padding-top:5px"><li>军师：忠臣身份。只要军师存活，主公在准备阶段开始时，可以观看牌堆顶的三张牌，然后将这些牌以任意顺序置于牌堆顶或牌堆底<li>大将：忠臣身份。只要大将存活，主公手牌上限+1<li>贼首：反贼身份，只要贼首存活，主公手牌上限-1</ul></ul>'+
 			'<div style="margin:10px">明忠</div><ul style="margin-top:0"><li>本模式需要8名玩家进行游戏，使用的身份牌为：1主公、2忠臣、4反贼和1内奸。游戏开始时，每名玩家随机获得一个身份，由系统随机选择一名忠臣身份的玩家亮出身份（将忠臣牌正面朝上放在面前），其他身份（包括主公）的玩家不亮出身份。<li>'+
 			'首先由亮出身份的忠臣玩家随机获得六张武将牌，挑选一名角色，并将选好的武将牌展示给其他玩家。之后其余每名玩家随机获得三张武将牌，各自从其中挑选一张同时亮出<li>'+
 			'亮出身份牌的忠臣增加1点体力上限。角色濒死和死亡的结算及胜利条件与普通身份局相同。',
