@@ -880,6 +880,40 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							game.players[i].identityShown=false;
 						}
 					}
+
+					if(get.config('special_identity')&&!event.zhongmode&&game.players.length==8){
+						for(var i=0;i<game.players.length;i++){
+							delete game.players[i].special_identity;
+						}
+						event.special_identity=[];
+						var zhongs=game.filterPlayer(function(current){
+							return current.identity=='zhong';
+						});
+						var fans=game.filterPlayer(function(current){
+							return current.identity=='fan';
+						});
+						if(fans.length>=1){
+							fans.randomRemove().special_identity='identity_zeishou';
+							event.special_identity.push('identity_zeishou');
+						}
+						if(zhongs.length>1){
+							zhongs.randomRemove().special_identity='identity_dajiang';
+							zhongs.randomRemove().special_identity='identity_junshi';
+							event.special_identity.push('identity_dajiang');
+							event.special_identity.push('identity_junshi');
+						}
+						else if(zhongs.length==1){
+							if(Math.random()<0.5){
+								zhongs.randomRemove().special_identity='identity_dajiang';
+								event.special_identity.push('identity_dajiang');
+							}
+							else{
+								zhongs.randomRemove().special_identity='identity_junshi';
+								event.special_identity.push('identity_junshi');
+							}
+						}
+					}
+
 					if(!game.zhu) game.zhu=game.me;
 					else{
 						game.zhu.setIdentity();
@@ -968,6 +1002,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								addSetting(dialog);
 							}
 						}
+					}
+					if(game.me.special_identity){
+						dialog.setCaption('选择角色（'+get.translation(game.me.special_identity)+'）');
+						game.me.node.identity.firstChild.innerHTML=get.translation(game.me.special_identity+'_bg');
+					}
+					else{
+						dialog.setCaption('选择角色');
+						game.me.setIdentity();
 					}
 					if(!event.chosen.length){
 						game.me.chooseButton(dialog,true).set('onfree',true).selectButton=function(){
@@ -1131,6 +1173,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					setTimeout(function(){
 						ui.arena.classList.remove('choose-character');
 					},500);
+
+					if(event.special_identity){
+						for(var i=0;i<event.special_identity.length;i++){
+							game.zhu.addSkill(event.special_identity[i]);
+						}
+					}
 				});
 			},
 			chooseCharacterOL:function(){

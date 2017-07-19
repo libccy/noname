@@ -64,7 +64,7 @@ window.config={
 	background_audio:true,
 	background_speak:true,
 	glow_phase:'yellow',
-	die_flip:true,
+	die_move:'flip',
 
 	skin:{},
 	gameRecord:{},

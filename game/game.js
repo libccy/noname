@@ -2183,12 +2183,6 @@
 						init:true,
 						unfrequent:true,
 					},
-					die_flip:{
-						name:'阵亡效果',
-						intro:'阵亡后武将位置会随机移动',
-						init:true,
-						unfrequent:true,
-					},
 					animation:{
 						name:'游戏特效',
 						intro:'开启后出现属性伤害、回复体力等情况时会显示动画',
@@ -2200,6 +2194,17 @@
 						intro:'开启后觉醒技、限定技将显示全屏文字',
 						init:true,
 						unfrequent:true,
+					},
+					die_move:{
+						name:'阵亡效果',
+						intro:'阵亡后武将的显示效果',
+						init:'flip',
+						unfrequent:true,
+						item:{
+							off:'关闭',
+							move:'移动',
+							flip:'翻面',
+						}
 					},
 					target_shake:{
 						name:'目标效果',
@@ -18285,14 +18290,14 @@
                     game.broadcast(function(player){
                         player.$die();
                     },this);
-					if(lib.config.die_flip){
-                        this.$dieflip();
+					if(lib.config.die_move!='off'){
+                        this.$dieflip(lib.config.die_move);
 					}
                     if(lib.element.player.$dieAfter){
                         lib.element.player.$dieAfter.call(this);
                     }
 				},
-                $dieflip:function(){
+                $dieflip:function(type){
                     var top0=ui.window.offsetHeight/2;
                     var left0=ui.window.offsetWidth/2;
                     var ratio=(left0-this.offsetLeft)/(top0-this.offsetTop);
@@ -18305,8 +18310,15 @@
                         top=Math.random()*5+10;
                     }
                     var transform='translate('+left+'px,'+top+'px) '+
-                    'rotate('+(Math.random()*20-10)+'deg) '+
-                    ((Math.random()-0.5<0)?'rotateX(180deg)':'rotateY(180deg)');
+                    'rotate('+(Math.random()*20-10)+'deg) ';
+					if(type=='flip'){
+						if(game.layout=='long'||game.layout=='long2'){
+							transform+='rotateY(180deg)';
+						}
+						else{
+							transform+=((Math.random()-0.5<0)?'rotateX(180deg)':'rotateY(180deg)');
+						}
+					}
                     if(get.is.mobileMe(this)){
                         this.node.avatar.style.transform=transform;
                         this.node.avatar2.style.transform=transform;
@@ -20860,7 +20872,7 @@
                             player.setNickname();
                             if(info.dead){
                                 player.classList.add('dead');
-                                if(lib.config.die_flip){
+                                if(lib.config.die_move){
             						player.$dieflip();
             					}
                                 if(lib.element.player.$dieAfter){
