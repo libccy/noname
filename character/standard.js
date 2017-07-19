@@ -835,6 +835,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.bottom=[];
 						event.status=true;
 						event.dialog=ui.create.dialog('按顺序选择置于牌堆顶的牌（先选择的在上）',cards);
+						for(var i=0;i<event.dialog.buttons.length;i++){
+							event.dialog.buttons[i].classList.add('pointerdiv');
+						}
 						event.switchToAuto=function(){
 							event._result='ai';
 							event.dialog.close();
