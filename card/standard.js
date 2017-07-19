@@ -1686,6 +1686,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					};
 					'step 1'
 					var list=game.filterPlayer(function(current){
+						if(game.checkMod(trigger.card,player,trigger.target,current,'unchanged','wuxieEnabled',current)==false) return false;
+						if(game.checkMod(trigger.card,player,trigger.target,current,'unchanged','wuxieRespondable',player)==false) return false;
 						return current.hasWuxie();
 					});
 					event.list=list;

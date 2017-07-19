@@ -19525,10 +19525,8 @@
                 if(lib.filter.targetEnabled(card,player,target)) return true;
 				if(card==undefined) return false;
 
-				var mod=game.checkMod(card,player,target,'unchanged','playerEnabled',player);
-				if(mod==false) return false;
-				var mod=game.checkMod(card,player,target,'unchanged','targetEnabled',target);
-				if(mod==false) return false;
+				if(game.checkMod(card,player,target,'unchanged','playerEnabled',player)==false) return false;
+				if(game.checkMod(card,player,target,'unchanged','targetEnabled',target)==false) return false;
 
 				var filter=get.info(card).modTarget;
 				if(typeof filter=='boolean') return filter;

@@ -1437,13 +1437,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 					targetInRange:function(card){
 						if(get.color(card)=='red') return true;
-					}
-				},
-				ai:{
-					playernowuxie:true,
-					skillTagFilter:function(player,tag,arg){
-						if(arg&&get.color(arg)=='red') return true;
-						return false;
+					},
+					wuxieRespondable:function(card,player,target){
+						if(get.color(card)=='red'&&player!=target) return false;
 					}
 				},
 				global:'boss_fentian2'
@@ -2378,9 +2374,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			fengqi2:{
-				ai:{
-					playernowuxie:true
-				}
+				mod:{
+                    wuxieRespondable:function(){
+                        return false;
+                    }
+    			}
 			},
 			gaiming:{
 				trigger:{player:'judgeBefore'},

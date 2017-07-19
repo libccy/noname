@@ -2846,10 +2846,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					if(get.type(card)=='delay'&&player!=target){
     						return false;
     					}
-    				}
-    			},
-    			ai:{
-    				playernowuxie:true
+    				},
+                    wuxieRespondable:function(){
+                        return false;
+                    }
     			}
     		},
     		jianshu:{
@@ -3689,15 +3689,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			mod:{
     				globalFrom:function(from,to){
     					if(to.hasSkill('tanhu2')) return -Infinity;
-    				}
-    			},
-    			trigger:{player:'useCardToBegin'},
-    			frequent:true,
-    			filter:function(event){
-    				return get.type(event.card)=='trick'&&event.target&&event.target.hasSkill('tanhu2');
-    			},
-    			content:function(){
-    				player.draw();
+    				},
+                    wuxieRespondable:function(card,player,target){
+                        if(target.hasSkill('tanhu2')) return false;
+                    }
     			}
     		},
     		jiqiao:{
@@ -9161,7 +9156,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		tanhu:'探虎',
     		tanhu2:'探虎',
     		tanhu3:'探虎',
-    		tanhu_info:'出牌阶段限一次，你可以与一名其他角色拼点。若你赢，你获得以下技能直到回合结束：你与该角色的距离为1，你对该角色使用普通锦囊牌时可以摸一张牌',
+    		tanhu_info:'出牌阶段限一次，你可以与一名其他角色拼点。若你赢，你获得以下技能直到回合结束：你与该角色的距离为1，你对该角色使用的普通锦囊牌不能被无懈可击响应',
     		mouduan:'谋断',
     		mouduan_info:'通常状态下，你拥有标记“武”并拥有技能“激昂”和“谦逊”。当你的手牌数为2张或以下时，你须将你的标记翻面为“文”，将该两项技能转化为“英姿”和“克己”。任一角色的回合开始前，你可弃一张牌将标记翻回',
     		jiqiao:'机巧',
