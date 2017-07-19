@@ -7,7 +7,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_aisinie:['female','wu',3,['huihun']],
 			gw_enxier:['male','wei',4,['gwbaquan']],
 
-
 			gw_kaerweite:['male','shu',4,['gwjiquan']],
 			gw_falanxisika:['female','wu',3,['shewu']],
 			gw_haluo:['male','qun',4,['nuhou']],

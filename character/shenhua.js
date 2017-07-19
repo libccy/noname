@@ -1010,6 +1010,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.logSkill('qiaobian',result.targets);
     					player.discard(result.cards);
     					event.targets=result.targets;
+                        if(!event.targets.length) event.finish();
     				}
     				else{
     					event.finish();
@@ -1112,6 +1113,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.logSkill('qiaobian',result.targets,false);
     				player.line2(result.targets);
     				event.targets=result.targets;
+                    if(!event.targets.length) event.finish();
     				"step 2"
     				game.delay();
     				"step 3"

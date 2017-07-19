@@ -14260,7 +14260,12 @@
                             next.glow_result=true;
                         }
 						else if(typeof arguments[i]=='string'){
-							next.prompt=arguments[i];
+							if(next.prompt){
+								next.prompt2=arguments[i];
+							}
+							else{
+								next.prompt=arguments[i];
+							}
 						}
 					}
 					if(next.filterCard==undefined) next.filterCard=lib.filter.all;
@@ -14292,7 +14297,12 @@
 							else next.filterTarget=arguments[i];
 						}
 						else if(typeof arguments[i]=='string'){
-							next.prompt=arguments[i];
+							if(next.prompt){
+								next.prompt2=arguments[i];
+							}
+							else{
+								next.prompt=arguments[i];
+							}
 						}
 					}
 					if(next.filterTarget==undefined) next.filterTarget=lib.filter.all;
@@ -15008,14 +15018,24 @@
                     next.setContent('gain');
 					return next;
 				},
-				give:function(cards,target,hidden){
+				give:function(cards,target){
+					var shown=[],hidden=[];
+					var hs=this.getCards('h');
+					for(var i=0;i<cards.length;i++){
+						if(hs.contains(cards[i])){
+							hidden.push(cards[i]);
+						}
+						else{
+							shown.push(cards[i]);
+						}
+					}
+					if(shown.length) this.$give(shown,target);
+					if(hidden.length) this.$giveAuto(hidden,target);
 					if(hidden===true){
 						target.gain(cards,this);
-						this.$giveAuto(cards,target);
 					}
 					else{
 						target.gain(cards,this);
-						this.$give(cards,target);
 					}
 				},
 				lose:function(){

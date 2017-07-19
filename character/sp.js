@@ -105,6 +105,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		taoqian:['male','qun',3,['zhaohuo','yixiang','yirang']],
 
             wangyun:['male','qun',4,['wylianji','moucheng']],
+            sunqian:['male','shu',3,['qianya','shuimeng']],
+            xizhicai:['male','wei',3,['tiandu','xianfu','chouce']],
+            quyi:['male','qun',4,['fuqi','jiaozi']],
     	},
     	characterIntro:{
     		huangfusong:'字义真。安定郡朝那县（今宁夏彭阳）人。于黄巾起义时，以中郎将身份讨伐黄巾，用火攻大破张梁、张宝。[45]  后接替董卓进攻张梁，连胜七阵。掘张角墓，拜左车骑将军、冀州牧，因拒绝贿赂宦官而被免职。[46]  董卓死，王允命其与吕布等共至郿坞抄籍董卓家产、人口，皇甫嵩将坞中所藏良家子女，尽行释放。',
@@ -230,7 +233,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     event.current.chooseCard('h',true,'将一张手牌交给'+get.translation(player));
                     'step 3'
                     if(result.bool){
-                        event.current.give(result.cards,player,true);
+                        event.current.give(result.cards,player);
                     }
                     event.goto(1);
                     'step 4'
@@ -303,6 +306,124 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             }
         },
     	skill:{
+            shuimeng:{
+                trigger:{player:'phaseUseAfter'},
+                direct:true,
+                filter:function(event,player){
+                    return player.countCards('h');
+                },
+                content:function(){
+                    'step 0'
+                    player.chooseTarget(get.prompt('shuimeng'),function(card,player,target){
+                        return target!=player&&target.countCards('h');
+                    }).set('ai',function(target){
+                        if(!_status.event.goon) return 0;
+                        return -get.attitude(_status.event.player,target);
+                    }).set('goon',player.needsToDiscard()||player.hasCard(function(card){
+                        var val=get.value(card);
+                        if(val<0) return true;
+                        if(val<=5){
+                            return card.number>=11;
+                        }
+                        if(val<=6){
+                            return card.number>=12;
+                        }
+                        return false;
+                    }));
+                    'step 1'
+                    if(result.bool){
+                        player.logSkill('shuimeng',result.targets);
+                        event.target=result.targets[0];
+                        player.chooseToCompare(event.target);
+                    }
+                    else{
+                        event.finish();
+                    }
+                    'step 2'
+                    if(result.bool){
+                        player.useCard({name:'wuzhong'},player);
+                    }
+                    else{
+                        event.target.useCard({name:'guohe'},player);
+                    }
+                }
+            },
+            qianya:{
+                trigger:{target:'useCardToBegin'},
+                direct:true,
+                filter:function(event,player){
+                    return get.type(event.card,'trick')=='trick'&&player.countCards('h');
+                },
+                content:function(){
+                    'step 0'
+                    var nh=player.countCards('h');
+                    player.chooseCardTarget({
+                        filterCard:true,
+                        filterTarget:function(card,player,target){
+                            return target!=player;
+                        },
+                        selectCard:[1,nh],
+                        ai1:function(card){
+                            if(_status.event.du) return -get.value(card);
+                            else if(_status.event.shuimeng){
+                                if(_status.event.player.needsToDiscard(2-ui.selected.cards.length)){
+                                    return 10-get.value(card);
+                                }
+                                else{
+                                    return 0;
+                                }
+                            }
+                            else if(_status.event.cardname=='lebu'){
+                                if(_status.event.player.needsToDiscard(1-ui.selected.cards.length)){
+                                    return 8-get.value(card);
+                                }
+                                else{
+                                    if(!ui.selected.cards.length){
+                                        return 6-get.value(card);
+                                    }
+                                    return 0;
+                                }
+                            }
+                            else if(_status.event.cardname=='shunshou'){
+                                if(_status.event.nh<=2) return get.value(card);
+                            }
+                            if(ui.selected.cards.length) return 0;
+                            return 7-get.value(card);
+                        },
+                        ai2:function(target){
+                            var att=get.attitude(_status.event.player,target);
+                            var num=Math.sqrt(1+nh2);
+                            if(_status.event.du) return 0.5-att;
+                            else if(_status.event.shuimeng){
+                                return att/num;
+                            }
+                            else if(_status.event.cardname=='lebu'){
+                                return att/num;
+                            }
+                            else if(_status.event.cardname=='shunshou'){
+                                if(_status.event.nh<=2) return att/num;
+                            }
+                            var nh2=target.countCards('h');
+                            if(_status.event.nh>nh2+1){
+                                return att/num;
+                            }
+                            return 0;
+                        },
+                        du:player.hasCard(function(card){
+                            return get.value(card)<0;
+                        }),
+                        shuimeng:trigger.getParent(2).name=='shuimeng',
+                        nh:nh,
+                        cardname:trigger.card.name,
+                        prompt:get.prompt('qianya')
+                    });
+                    'step 1'
+                    if(result.bool){
+                        player.logSkill('qianya',result.targets);
+                        player.give(result.cards,result.targets[0]);
+                    }
+                }
+            },
             wylianji:{
                 enable:'phaseUse',
                 usable:1,
@@ -9019,7 +9140,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             miheng:'祢衡',
             taoqian:'陶谦',
             wangyun:'王允',
+            sunqian:'孙乾',
+            xizhicai:'戏志才',
+            quyi:'麹义',
 
+            qianya:'谦雅',
+            qianya_info:'当你成为锦囊牌的目标后，你可以将任意张手牌交给一名其他角色',
+            shuimeng:'说盟',
+            shuimeng_info:'出牌阶段结束时，你可以与一名角色拼点，若你赢，视为你使用【无中生有】；若你没赢，视为其对你使用【过河拆桥】',
+            xianfu:'先辅',
+            xianfu_info:'锁定技，游戏开始时，你选择一名其他角色，当其受到伤害后，你受到等量的伤害，当其回复体力后，你回复等量的体力',
+            chouce:'筹策',
+            chouce_info:'当你受到1点伤害后，你可以判定，若结果为：黑色，你弃置一名角色区域里的一张牌；红色，你选择一名角色，其摸一张牌，若其是“先辅”选择的角色，改为其摸两张牌',
+            fuqi:'伏骑',
+            fuqi_info:'锁定技，与你距离为1的其他角色不能使用或打出牌响应你使用的牌',
+            jiaozi:'骄恣',
+            jiaozi_info:'锁定技，若你的手牌数是全场唯一最多的，你造成或受到的伤害均+1',
             wy_meirenji:'美人计',
             wy_meirenji_info:'出牌阶段，对一名有手牌的其他男性角色使用。每名女性角色各获得其一张手牌并将一张手牌交给你，然后比较你与其的手牌数，手牌少的角色对手牌多的角色造成1点伤害',
             wy_xiaolicangdao:'笑里藏刀',
