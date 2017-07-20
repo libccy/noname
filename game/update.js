@@ -2,7 +2,7 @@ window.noname_update={
     version:'1.9.32',
     // update:'1.9.31',
     changeLog:[
-        '新武将、乱斗',
+        '新武将',
     ],
     files:[
         // 'game/game.js',

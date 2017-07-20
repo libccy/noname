@@ -433,6 +433,137 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     }
                 }
             },
+            xianfu:{
+                trigger:{global:'gameStart'},
+                forced:true,
+                filter:function(){
+                    return game.players.length>1;
+                },
+                content:function(){
+                    'step 0'
+                    player.chooseTarget('选择【先辅】的目标',lib.translate.xianfu_info,true,function(card,player,target){
+                        return target!=player&&!target.hasSkill('xianfu2');
+                    }).set('ai',function(target){
+                        var att=get.attitude(_status.event.player,target);
+                        if(att>0) return att+1;
+                        if(att==0) return Math.random();
+                        return att;
+                    });
+                    'step 1'
+                    if(result.bool){
+                        var target=result.targets[0];
+                        player.line(target,'green');
+                        game.log(target,'成为了','【先辅】','的目标');
+                        target.storage.xianfu2=player;
+                        target.addSkill('xianfu2');
+                    }
+                }
+            },
+            xianfu2:{
+                mark:'character',
+                intro:{
+                    content:'当你受到伤害后，$受到等量的伤害，当你回复体力后，$回复等量的体力'
+                },
+                nopop:true,
+                trigger:{player:['damageAfter','recoverAfter']},
+                forced:true,
+                popup:false,
+                filter:function(event,player){
+                    return player.storage.xianfu2&&player.storage.xianfu2.isIn()&&event.num>0;
+                },
+                content:function(){
+                    'step 0'
+                    game.delay(0.5);
+                    'step 1'
+                    var target=player.storage.xianfu2;
+                    player.line(target,'green');
+                    target.logSkill('xianfu');
+                    target[trigger.name](trigger.num);
+                    game.delay();
+                },
+                group:'xianfu3',
+                onremove:true,
+            },
+            xianfu3:{
+                trigger:{global:'dieAfter'},
+                silent:true,
+                filter:function(event,player){
+                    return event.player==player.storage.xianfu2;
+                },
+                content:function(){
+                    player.removeSkill('xianfu2');
+                }
+            },
+            chouce:{
+                trigger:{player:'damageEnd'},
+                content:function(){
+                    'step 0'
+                    player.judge();
+                    'step 1'
+                    event.color=result.color;
+                    if(event.color=='black'){
+                        player.chooseTarget('弃置一名角色区域内的一张牌',true,function(card,player,target){
+                            return target.countCards('hej');
+                        }).set('ai',function(target){
+                            var player=_status.event.player;
+                            var att=get.attitude(player,target);
+                            if(att<0){
+                                att=-Math.sqrt(-att);
+                            }
+                            else{
+                                att=Math.sqrt(att);
+                            }
+                            return att*lib.card.guohe.ai.result.target(player,target);
+                        })
+                    }
+                    else{
+                        var next=player.chooseTarget('令一名角色摸一张牌',true);
+                        var xianfu=game.findPlayer(function(current){
+                            return current.hasSkill('xianfu2')&&current.storage.xianfu2==player;
+                        });
+                        if(xianfu){
+                            next.set('prompt2','（若目标为'+get.translation(xianfu)+'则改为摸两张牌）');
+                        }
+                        next.set('ai',function(target){
+                            var player=_status.event.player;
+                            var att=get.attitude(player,target)/Math.sqrt(1+target.countCards('h'));
+                            if(target.storage.xianfu2==player) return att*2;
+                            return att;
+                        })
+                    }
+                    'step 2'
+                    if(result.bool){
+                        var target=result.targets[0];
+                        player.line(target,'green');
+                        if(event.color=='black'){
+                            player.discardPlayerCard(target,'hej',true);
+                        }
+                        else{
+                            if(target.hasSkill('xianfu2')&&target.storage.xianfu2==player){
+                                target.draw(2);
+                            }
+                            else{
+                                target.draw();
+                            }
+                        }
+                    }
+                },
+                ai:{
+                    maixie:true,
+					maixie_hp:true,
+					effect:{
+						target:function(card,player,target){
+							if(get.tag(card,'damage')){
+								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
+								if(!target.hasFriend()) return;
+								if(target.hp>=4) return [1,get.tag(card,'damage')*1.5];
+								if(target.hp==3) return [1,get.tag(card,'damage')*1];
+								if(target.hp==2) return [1,get.tag(card,'damage')*0.5];
+							}
+						}
+					}
+                }
+            },
             wylianji:{
                 enable:'phaseUse',
                 usable:1,
@@ -9158,6 +9289,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             shuimeng:'说盟',
             shuimeng_info:'出牌阶段结束时，你可以与一名角色拼点，若你赢，视为你使用【无中生有】；若你没赢，视为其对你使用【过河拆桥】',
             xianfu:'先辅',
+            xianfu2:'先辅',
+            xianfu2_bg:'辅',
             xianfu_info:'锁定技，游戏开始时，你选择一名其他角色，当其受到伤害后，你受到等量的伤害，当其回复体力后，你回复等量的体力',
             chouce:'筹策',
             chouce_info:'当你受到1点伤害后，你可以判定，若结果为：黑色，你弃置一名角色区域里的一张牌；红色，你选择一名角色，其摸一张牌，若其是“先辅”选择的角色，改为其摸两张牌',
