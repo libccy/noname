@@ -364,17 +364,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         },
                         selectCard:[1,nh],
                         ai1:function(card){
+                            var player=_status.event.player;
+                            var cardname=_status.event.cardname;
                             if(_status.event.du) return -get.value(card);
                             else if(_status.event.shuimeng){
-                                if(_status.event.player.needsToDiscard(2-ui.selected.cards.length)){
+                                if(player.needsToDiscard(2-ui.selected.cards.length)){
                                     return 10-get.value(card);
                                 }
                                 else{
                                     return 0;
                                 }
                             }
-                            else if(_status.event.cardname=='lebu'){
-                                if(_status.event.player.needsToDiscard(1-ui.selected.cards.length)){
+                            else if(cardname=='lebu'){
+                                if(player.needsToDiscard(1-ui.selected.cards.length)){
                                     return 8-get.value(card);
                                 }
                                 else{
@@ -384,8 +386,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                                     return 0;
                                 }
                             }
-                            else if(_status.event.cardname=='shunshou'){
+                            else if(cardname=='shunshou'){
                                 if(_status.event.nh<=2) return get.value(card);
+                            }
+                            else if(cardname=='huogong'){
+                                if(player.hp==1) return get.value(card);
                             }
                             if(ui.selected.cards.length) return 0;
                             return 7-get.value(card);
@@ -393,15 +398,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         ai2:function(target){
                             var att=get.attitude(_status.event.player,target);
                             var num=Math.sqrt(1+nh2);
+                            var cardname=_status.event.cardname;
                             if(_status.event.du) return 0.5-att;
                             else if(_status.event.shuimeng){
                                 return att/num;
                             }
-                            else if(_status.event.cardname=='lebu'){
+                            else if(cardname=='lebu'){
                                 return att/num;
                             }
-                            else if(_status.event.cardname=='shunshou'){
+                            else if(cardname=='shunshou'){
                                 if(_status.event.nh<=2) return att/num;
+                            }
+                            else if(cardname=='huogong'){
+                                if(_status.event.player.hp==1) return att/num;
                             }
                             var nh2=target.countCards('h');
                             if(_status.event.nh>nh2+1){
