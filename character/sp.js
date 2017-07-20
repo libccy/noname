@@ -564,6 +564,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
                 }
             },
+            fuqi:{
+                mod:{
+                    wuxieRespondable:function(card,player,target,current){
+                        if(player!=current&&get.distance(player,current)<=1){
+                            return false;
+                        }
+                    }
+                },
+                ai:{
+                    norespond:true,
+                    skillTagFilter:function(player,tag,arg){
+                        if(tag=='norespond'&&Array.isArray(arg)){
+                            if(get.distance(player,arg[1])<=1) return true;
+                        }
+                        return false;
+                    }
+                }
+            },
             wylianji:{
                 enable:'phaseUse',
                 usable:1,
@@ -3956,6 +3974,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     }
     			}
     		},
+			jiaozi:{
+				trigger:{player:'damageBegin',source:'damageBegin'},
+				forced:true,
+				filter:function(event,player){
+					return player.isMaxHandcard(true);
+				},
+                content:function(){
+                    trigger.num++;
+                }
+			},
     		jiqiao:{
     			trigger:{player:'phaseUseBegin'},
     			direct:true,

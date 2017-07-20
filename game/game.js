@@ -16910,7 +16910,7 @@
                 },
 				isMaxHp:function(equal){
 					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()) continue;
+						if(game.players[i].isOut()||game.players[i]==this) continue;
 						if(equal){
 							if(game.players[i].hp>=this.hp) return false;
 						}
@@ -16922,7 +16922,7 @@
 				},
 				isMinHp:function(equal){
 					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()) continue;
+						if(game.players[i].isOut()||game.players[i]==this) continue;
 						if(equal){
 							if(game.players[i].hp<=this.hp) return false;
 						}
@@ -16935,7 +16935,7 @@
 				isMaxCard:function(equal){
 					var nh=this.countCards('he');
 					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()) continue;
+						if(game.players[i].isOut()||game.players[i]==this) continue;
 						if(equal){
 							if(game.players[i].countCards('he')>=nh) return false;
 						}
@@ -16948,7 +16948,7 @@
 				isMinCard:function(equal){
 					var nh=this.countCards('he');
 					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()) continue;
+						if(game.players[i].isOut()||game.players[i]==this) continue;
 						if(equal){
 							if(game.players[i].countCards('he')<=nh) return false;
 						}
@@ -16961,7 +16961,7 @@
 				isMaxHandcard:function(equal){
 					var nh=this.countCards('h');
 					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()) continue;
+						if(game.players[i].isOut()||game.players[i]==this) continue;
 						if(equal){
 							if(game.players[i].countCards('h')>=nh) return false;
 						}
@@ -16974,7 +16974,7 @@
 				isMinHandcard:function(equal){
 					var nh=this.countCards('h');
 					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()) continue;
+						if(game.players[i].isOut()||game.players[i]==this) continue;
 						if(equal){
 							if(game.players[i].countCards('h')<=nh) return false;
 						}
@@ -19706,6 +19706,12 @@
 			},
 			cardRespondable:function(card,player){
 				if(_status.event.name!='chooseToRespond') return true;
+				var source=_status.event.getParent().player;
+				if(source!=player){
+					if(source.hasSkillTag('norespond',false,[card,player],true)){
+						return false;
+					}
+				}
 				if(player==undefined) player=_status.event.player;
 				var mod=game.checkMod(card,player,'unchanged','cardRespondable',player);
 				if(mod!='unchanged') return mod;
