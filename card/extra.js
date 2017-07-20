@@ -55,7 +55,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					basic:{
 						useful:function(card,i){
 							if(_status.event.player.hp>1){
-								if(i==0) return 5;
+								if(i==0) return 4;
 								return 1;
 							}
 							if(i==0) return 7.3;

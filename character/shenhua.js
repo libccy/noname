@@ -146,114 +146,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             			direct:true,
             			audio:'jiewei',
                         filter:function(event,player){
-                            return !player.isTurnedOver();
+                            return !player.isTurnedOver()&&player.canMoveCard();
                         },
             			content:function(){
                             "step 0"
-            				player.chooseCardTarget({
-            					ai1:function(card){
-            						return 7-get.useful(card);
-            					},
-            					ai2:function(target){
-            						var player=_status.event.player;
-            						if(ui.selected.targets.length==0){
-            							if(target.countCards('j')&&get.attitude(player,target)>0) return 10;
-            							if(get.attitude(player,target)<0){
-            								var players=game.filterPlayer();
-            								for(var i=0;i<players.length;i++){
-            									if(get.attitude(player,players[i])>0){
-            										if((target.getEquip(1)&&!players[i].getEquip(1))||
-            										(target.getEquip(2)&&!players[i].getEquip(2))||
-            										(target.getEquip(3)&&!players[i].getEquip(3))||
-            										(target.getEquip(4)&&!players[i].getEquip(4))||
-            										(target.getEquip(5)&&!players[i].getEquip(5))) return -get.attitude(player,target);
-            									}
-            								}
-            							}
-            							return 0;
-            						}
-            						return -get.attitude(player,target)*get.attitude(player,ui.selected.targets[0]);
-            					},
-            					multitarget:true,
-            					filterTarget:function(card,player,target){
-            						if(ui.selected.targets.length){
-            							var from=ui.selected.targets[0];
-            							var judges=from.getCards('j');
-            							for(var i=0;i<judges.length;i++){
-            								if(!target.hasJudge(judges[i].viewAs||judges[i].name)) return true;
-            							}
-            							if(target.isMin()) return false;
-            							if((from.getEquip(1)&&!target.getEquip(1))||
-            								(from.getEquip(2)&&!target.getEquip(2))||
-            								(from.getEquip(3)&&!target.getEquip(3))||
-            								(from.getEquip(4)&&!target.getEquip(4))||
-            								(from.getEquip(5)&&!target.getEquip(5))) return true;
-            							return false;
-            						}
-            						else{
-            							return target.countCards('ej')>0;
-            						}
-            					},
-            					selectTarget:2,
-            					filterCard:lib.filter.cardDiscardable,
-            					prompt:get.prompt('jiewei'),
-                                prompt2:'弃置一张牌，然后移动场上的一张牌',
-                                position:'he',
-            					targetprompt:['被移走','移动目标'],
-            					target:target
-            				});
-            				"step 1"
-            				if(!result.bool){
-            					event.finish();
-            					return;
-            				}
-            				player.discard(result.cards);
-            				player.logSkill('jiewei',result.targets,false);
-            				player.line2(result.targets);
-            				event.targets=result.targets;
-            				"step 2"
-            				game.delay();
-            				"step 3"
-            				if(targets.length==2){
-            					player.choosePlayerCard('ej',true,function(button){
-            						var player=_status.event.player;
-            						var targets0=_status.event.targets0;
-            						var targets1=_status.event.targets1;
-            						if(get.attitude(player,targets0)>get.attitude(player,targets1)){
-            							return get.position(button.link)=='j'?10:0;
-            						}
-            						else{
-            							if(get.position(button.link)=='j') return -10;
-            							return get.equipValue(button.link);
-            						}
-            					},targets[0]).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
-            						var targets1=_status.event.targets1;
-            						if(get.position(button.link)=='j'){
-            							return !targets1.hasJudge(button.link.viewAs||button.link.name);
-            						}
-            						else{
-            							return !targets1.countCards('e',{subtype:get.subtype(button.link)});
-            						}
-            					});
-            				}
-            				else{
-            					event.finish();
-            				}
-            				"step 4"
-            				if(result.bool&&result.links.length){
-            					var link=result.links[0];
-            					if(get.position(link)=='e'){
-            						event.targets[1].equip(link);
-            					}
-            					else if(link.viewAs){
-            						event.targets[1].addJudge({name:link.viewAs},[link]);
-            					}
-            					else{
-            						event.targets[1].addJudge(link);
-            					}
-            					event.targets[0].$give(link,event.targets[1])
-            					game.delay();
-            				}
+                            player.chooseToDiscard('he',get.prompt('xinjiewei'),'弃置一张牌并移动场上的一张牌',lib.filter.cardDiscardable).set('ai',function(card){
+                                if(!_status.event.check) return 0;
+                                return 7-get.value(card);
+                            }).set('check',player.canMoveCard(true)).set('logSkill','xinjiewei');
+                            "step 1"
+                            if(result.bool){
+                                player.moveCard(true);
+                            }
+                            else{
+                                event.finish();
+                            }
             			}
                     }
                 }
@@ -951,7 +858,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					event.finish();
     				}
     				else{
-    					var next=player.chooseToDiscard('是否发动巧变跳过判定阶段？');
+    					var next=player.chooseToDiscard(get.prompt('qiaobian'),'弃置一张手牌并跳过判定阶段');
     					next.set('ai',get.unuseful2);
     					next.set('logSkill','qiaobian');
     				}
@@ -985,41 +892,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     				check=(num>=2&&num2>0);
 
-    				player.chooseCardTarget({
-    					ai1:function(card){
-    						var evt=_status.event;
-    						if(!evt.check) return 0;
-    						return 6-get.useful(card);
-    					},
-    					ai2:function(target){
-    						var evt=_status.event;
-    						if(!evt.check) return 0;
-    						return 1-get.attitude(evt.player,target);
-    					},
-    					filterTarget:function(card,player,target){
-    						return target.countCards('h')>0;
-    					},
-    					selectTarget:[0,2],
-    					filterCard:lib.filter.cardDiscardable,
-    					prompt:'是否发动巧变跳过摸牌阶段？',
-    					check:check,
-    					target:target
-    				});
-    				"step 1"
+                    player.chooseToDiscard(get.prompt('qiaobian'),'弃置一张手牌并跳过摸牌阶段，然后可以获得至多两名角色各一张手牌',lib.filter.cardDiscardable).set('ai',function(card){
+                        if(!_status.event.check) return 0;
+                        return 7-get.value(card);
+                    }).set('check',check).set('logSkill','qiaobian');
+                    "step 1"
+                    if(result.bool){
+        				trigger.finish();
+        				trigger.untrigger();
+                        player.chooseTarget([1,2],'获得至多两名角色各一张手牌',function(card,player,target){
+                            return target!=player&&target.countCards('h');
+                        }).set('ai',function(target){
+                            return 1-get.attitude(_status.event.player,target);
+                        })
+                    }
+                    else{
+                        event.finish();
+                    }
+                    "step 2"
     				if(result.bool){
-    					player.logSkill('qiaobian',result.targets);
-    					player.discard(result.cards);
+                        player.line(result.targets,'green');
     					event.targets=result.targets;
                         if(!event.targets.length) event.finish();
     				}
     				else{
     					event.finish();
     				}
-    				"step 2"
-    				player.gainMultiple(event.targets);
-    				trigger.finish();
-    				trigger.untrigger();
     				"step 3"
+    				player.gainMultiple(event.targets);
+    				"step 4"
     				game.delay();
     			},
     			ai:{
@@ -1035,128 +936,39 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			direct:true,
     			content:function(){
     				"step 0"
-    				var check=game.hasPlayer(function(current){
-    					return get.attitude(player,current)>0&&current.countCards('j');
-    				});
-    				if(!check){
-    					if(player.countCards('h')>player.hp+1){
-    						check=false;
-    					}
-    					else if(player.countCards('h',{name:['wuzhong']})){
-    						check=false;
-    					}
-    					else{
-    						check=true;
-    					}
-    				}
-    				player.chooseCardTarget({
-    					ai1:function(card){
-    						if(!_status.event.check) return 0;
-    						return 7-get.useful(card);
-    					},
-    					ai2:function(target){
-    						if(!_status.event.check) return 0;
-    						var player=_status.event.player;
-    						if(ui.selected.targets.length==0){
-    							if(target.countCards('j')&&get.attitude(player,target)>0) return 10;
-    							if(get.attitude(player,target)<0){
-    								var players=game.filterPlayer();
-    								for(var i=0;i<players.length;i++){
-    									if(get.attitude(player,players[i])>0){
-    										if((target.getEquip(1)&&!players[i].getEquip(1))||
-    										(target.getEquip(2)&&!players[i].getEquip(2))||
-    										(target.getEquip(3)&&!players[i].getEquip(3))||
-    										(target.getEquip(4)&&!players[i].getEquip(4))||
-    										(target.getEquip(5)&&!players[i].getEquip(5))) return -get.attitude(player,target);
-    									}
-    								}
-    							}
-    							return 0;
-    						}
-    						return -get.attitude(player,target)*get.attitude(player,ui.selected.targets[0]);
-    					},
-    					multitarget:true,
-    					filterTarget:function(card,player,target){
-    						if(ui.selected.targets.length){
-    							var from=ui.selected.targets[0];
-    							var judges=from.getCards('j');
-    							for(var i=0;i<judges.length;i++){
-    								if(!target.hasJudge(judges[i].viewAs||judges[i].name)) return true;
-    							}
-    							if(target.isMin()) return false;
-    							if((from.getEquip(1)&&!target.getEquip(1))||
-    								(from.getEquip(2)&&!target.getEquip(2))||
-    								(from.getEquip(3)&&!target.getEquip(3))||
-    								(from.getEquip(4)&&!target.getEquip(4))||
-    								(from.getEquip(5)&&!target.getEquip(5))) return true;
-    							return false;
-    						}
-    						else{
-    							return target.countCards('ej')>0;
-    						}
-    					},
-    					selectTarget:2,
-    					filterCard:lib.filter.cardDiscardable,
-    					prompt:'是否发动巧变跳过出牌阶段？',
-    					targetprompt:['被移走','移动目标'],
-    					check:check,
-    					target:target
-    				});
-    				"step 1"
-    				if(!result.bool){
-    					event.finish();
-    					return;
-    				}
-    				trigger.untrigger();
-    				trigger.finish();
-    				player.discard(result.cards);
-    				player.logSkill('qiaobian',result.targets,false);
-    				player.line2(result.targets);
-    				event.targets=result.targets;
-                    if(!event.targets.length) event.finish();
-    				"step 2"
-    				game.delay();
-    				"step 3"
-    				if(targets.length==2){
-    					player.choosePlayerCard('ej',function(button){
-    						var player=_status.event.player;
-    						var targets0=_status.event.targets0;
-    						var targets1=_status.event.targets1;
-    						if(get.attitude(player,targets0)>get.attitude(player,targets1)){
-    							return get.position(button.link)=='j'?10:0;
-    						}
-    						else{
-    							if(get.position(button.link)=='j') return -10;
-    							return get.equipValue(button.link);
-    						}
-    					},targets[0]).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
-    						var targets1=_status.event.targets1;
-    						if(get.position(button.link)=='j'){
-    							return !targets1.hasJudge(button.link.viewAs||button.link.name);
-    						}
-    						else{
-    							return !targets1.countCards('e',{subtype:get.subtype(button.link)});
-    						}
-    					});
-    				}
-    				else{
-    					event.finish();
-    				}
-    				"step 4"
-    				if(result.bool&&result.links.length){
-    					var link=result.links[0];
-    					if(get.position(link)=='e'){
-    						event.targets[1].equip(link);
-    					}
-    					else if(link.viewAs){
-    						event.targets[1].addJudge({name:link.viewAs},[link]);
-    					}
-    					else{
-    						event.targets[1].addJudge(link);
-    					}
-    					event.targets[0].$give(link,event.targets[1])
-    					game.delay();
-    				}
+                    var check;
+                    if(!player.canMoveCard(true)){
+                        check=false;
+                    }
+                    else{
+                        check=game.hasPlayer(function(current){
+        					return get.attitude(player,current)>0&&current.countCards('j');
+        				});
+        				if(!check){
+        					if(player.countCards('h')>player.hp+1){
+        						check=false;
+        					}
+        					else if(player.countCards('h',{name:['wuzhong']})){
+        						check=false;
+        					}
+        					else{
+        						check=true;
+        					}
+        				}
+                    }
+                    player.chooseToDiscard(get.prompt('qiaobian'),'弃置一张手牌并跳过出牌阶段，然后可以移动场上的一张牌',lib.filter.cardDiscardable).set('ai',function(card){
+                        if(!_status.event.check) return 0;
+                        return 7-get.value(card);
+                    }).set('check',check).set('logSkill','qiaobian');
+                    "step 1"
+                    if(result.bool){
+        				trigger.untrigger();
+        				trigger.finish();
+                        player.moveCard();
+                    }
+                    else{
+                        event.finish();
+                    }
     			},
     			ai:{
     				expose:0.2
@@ -1172,7 +984,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			content:function(){
     				"step 0"
     				var discard=player.countCards('h')>player.hp;
-    				var next=player.chooseToDiscard('是否发动巧变跳过弃牌阶段？');
+    				var next=player.chooseToDiscard(get.prompt('qiaobian'),'弃置一张手牌并跳过弃牌阶段');
     				next.logSkill='qiaobian';
     				next.ai=function(card){
     					if(discard){

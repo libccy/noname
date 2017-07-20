@@ -11044,6 +11044,110 @@
                     event.choosing=false;
 					if(event.dialog) event.dialog.close();
 				},
+				moveCard:function(){
+					'step 0'
+					if(!player.canMoveCard()){
+						event.finish();
+						return;
+					}
+					var next=player.chooseTarget(2,function(card,player,target){
+						if(ui.selected.targets.length){
+							var from=ui.selected.targets[0];
+							var js=from.getCards('j');
+							for(var i=0;i<js.length;i++){
+								if(!target.hasJudge(js[i])) return true;
+							}
+							if(target.isMin()) return false;
+							var es=from.getCards('e');
+							for(var i=0;i<es.length;i++){
+								if(!target.getEquip(get.subtype(es[i]))) return true;
+							}
+							return false;
+						}
+						else{
+							return target.countCards('ej')>0;
+						}
+					});
+					next.set('ai',function(target){
+						var player=_status.event.player;
+						var att=get.attitude(player,target);
+						if(ui.selected.targets.length==0){
+							if(att>0){
+								if(target.countCards('j')) return 10;
+							}
+							else if(att<0){
+								if(game.hasPlayer(function(current){
+									if(get.attitude(player,current)>0){
+										var es=target.getCards('e');
+										for(var i=0;i<es.length;i++){
+											if(!current.getEquip(get.subtype(es[i]))) return true;
+										}
+									}
+								})){
+									return -att;
+								}
+							}
+							return 0;
+						}
+						return -att*get.attitude(player,ui.selected.targets[0]);
+					});
+					next.set('multitarget',true);
+					next.set('targetprompt',_status.event.targetprompt||['被移走','移动目标']);
+					next.set('prompt',event.prompt||'移动场上的一张牌');
+					if(event.prompt2) next.set('prompt2',event.prompt2);
+					if(event.forced) next.set('forced',true);
+    				'step 1'
+					if(result.bool){
+						player.line2(result.targets,'green');
+	    				event.targets=result.targets;
+					}
+    				else{
+						event.finish();
+					}
+    				'step 2'
+    				game.delay();
+    				'step 3'
+    				if(targets.length==2){
+    					player.choosePlayerCard('ej',true,function(button){
+    						var player=_status.event.player;
+    						var targets0=_status.event.targets0;
+    						var targets1=_status.event.targets1;
+    						if(get.attitude(player,targets0)>get.attitude(player,targets1)){
+    							return get.position(button.link)=='j'?10:0;
+    						}
+    						else{
+    							if(get.position(button.link)=='j') return -10;
+    							return get.equipValue(button.link);
+    						}
+    					},targets[0]).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
+    						var targets1=_status.event.targets1;
+    						if(get.position(button.link)=='j'){
+    							return !targets1.hasJudge(button.link);
+    						}
+    						else{
+    							return !targets1.countCards('e',{subtype:get.subtype(button.link)});
+    						}
+    					});
+    				}
+    				else{
+    					event.finish();
+    				}
+    				'step 4'
+    				if(result.bool&&result.links.length){
+    					var link=result.links[0];
+    					if(get.position(link)=='e'){
+    						event.targets[1].equip(link);
+    					}
+    					else if(link.viewAs){
+    						event.targets[1].addJudge({name:link.viewAs},[link]);
+    					}
+    					else{
+    						event.targets[1].addJudge(link);
+    					}
+    					event.targets[0].$give(link,event.targets[1])
+    					game.delay();
+    				}
+				},
 				useCard:function(){
 					"step 0"
 					if(!card){
@@ -14630,6 +14734,68 @@
 				viewHandcards:function(target){
 					return this.viewCards(get.translation(target)+'的手牌',target.getCards('h'));
 				},
+				canMoveCard:function(withatt){
+					var player=this;
+					return game.hasPlayer(function(current){
+						var att=get.attitude(player,current);
+						if(!withatt||att<=0){
+							var es=current.getCards('e');
+							for(var i=0;i<es.length;i++){
+								if(game.hasPlayer(function(current2){
+									if(withatt){
+										var att2=get.attitude(player,current2);
+										if(att2<=0) return false;
+									}
+									return current!=current2&&!current2.isMin()&&!current2.getEquip(get.subtype(es[i]));
+								})){
+									return true;
+								}
+							}
+						}
+						if(!withatt||att>0){
+							var js=current.getCards('j');
+							for(var i=0;i<js.length;i++){
+								if(game.hasPlayer(function(current2){
+									if(withatt){
+										var att2=get.attitude(player,current2);
+										if(att2>0) return false;
+									}
+									return current!=current2&&!current2.hasJudge(js[i]);
+								})){
+									return true;
+								}
+							}
+						}
+					});
+				},
+				moveCard:function(){
+					var next=game.createEvent('moveCard');
+					next.player=this;
+					for(var i=0;i<arguments.length;i++){
+						if(typeof arguments[i]=='boolean'){
+							next.forced=arguments[i];
+						}
+						else if(typeof arguments[i]=='string'){
+							if(next.prompt){
+								next.prompt2=arguments[i];
+							}
+							else{
+								next.prompt=arguments[i];
+							}
+						}
+						else if(Array.isArray(arguments[i])){
+							for(var j=0;j<arguments[i].length;j++){
+								if(typeof arguments[i][j]!='string') break;
+							}
+							if(j==arguments[i].length){
+								next.targetprompt=arguments[i];
+							}
+						}
+					}
+                    next.setContent('moveCard');
+                    next._args=Array.from(arguments);
+					return next;
+				},
                 useResult:function(result,event){
                     event=event||_status.event;
                     if(result._sendskill){
@@ -16958,6 +17124,9 @@
 					return false;
 				},
 				hasJudge:function(name){
+					if(name&&typeof name=='object'){
+						name=name.viewAs||name.name;
+					}
 					var judges=this.node.judges.childNodes;
 					for(var i=0;i<judges.length;i++){
 						if(judges[i].classList.contains('removing')) continue;
@@ -38891,7 +39060,7 @@
 				}
 				else{
 					ui.selected.targets.add(this);
-					if(_status.event.name=='chooseToUse'||_status.event.name=='chooseCardTarget'){
+					if(_status.event.name=='chooseTarget'||_status.event.name=='chooseToUse'||_status.event.name=='chooseCardTarget'){
 						var targetprompt=null;
 						if(_status.event.targetprompt){
 							targetprompt=_status.event.targetprompt;
