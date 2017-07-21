@@ -182,6 +182,7 @@ window.noname_character_rank={
         'xizhicai',
     ],
     am:[
+        'gw_fuertaisite',
         'gw_hengsaite',
         'gw_kuite',
         'sunqian',
