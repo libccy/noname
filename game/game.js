@@ -9018,8 +9018,11 @@
     					}
     				}
     				"step 3"
-    				if(result&&result.bool==false) return;
     				var info=get.info(event.skill);
+    				if(result&&result.bool==false){
+						if(info.oncancel) info.oncancel(trigger,player);
+						return;
+					}
     				var next=game.createEvent(event.skill);
                     if(typeof info.usable=='number'){
                         player.addSkill('counttrigger');
@@ -14177,7 +14180,14 @@
 								next.prompt2=arguments[i];
 							}
 							else{
-								next.prompt=arguments[i];
+								if(arguments[i].indexOf('###')==0){
+									var prompts=arguments[i].slice(3).split('###');
+									next.prompt=prompts[0];
+									next.prompt2=prompts[1];
+								}
+								else{
+									next.prompt=arguments[i];
+								}
 							}
 						}
                         if(arguments[i]===null){
@@ -14368,7 +14378,14 @@
 								next.prompt2=arguments[i];
 							}
 							else{
-								next.prompt=arguments[i];
+								if(arguments[i].indexOf('###')==0){
+									var prompts=arguments[i].slice(3).split('###');
+									next.prompt=prompts[0];
+									next.prompt2=prompts[1];
+								}
+								else{
+									next.prompt=arguments[i];
+								}
 							}
 						}
 					}
@@ -14405,7 +14422,14 @@
 								next.prompt2=arguments[i];
 							}
 							else{
-								next.prompt=arguments[i];
+								if(arguments[i].indexOf('###')==0){
+									var prompts=arguments[i].slice(3).split('###');
+									next.prompt=prompts[0];
+									next.prompt2=prompts[1];
+								}
+								else{
+									next.prompt=arguments[i];
+								}
 							}
 						}
 					}
@@ -14518,8 +14542,19 @@
 							next.ai=arguments[i];
 						}
 						else if(typeof arguments[i]=='string'){
-							if(next.prompt) next.prompt2=arguments[i];
-							else next.prompt=arguments[i];
+							if(next.prompt){
+								next.prompt2=arguments[i];
+							}
+							else{
+								if(arguments[i].indexOf('###')==0){
+									var prompts=arguments[i].slice(3).split('###');
+									next.prompt=prompts[0];
+									next.prompt2=prompts[1];
+								}
+								else{
+									next.prompt=arguments[i];
+								}
+							}
 						}
 						else if(get.itemtype(arguments[i])=='dialog'){
 							next.dialog=arguments[i];
@@ -14780,7 +14815,14 @@
 								next.prompt2=arguments[i];
 							}
 							else{
-								next.prompt=arguments[i];
+								if(arguments[i].indexOf('###')==0){
+									var prompts=arguments[i].slice(3).split('###');
+									next.prompt=prompts[0];
+									next.prompt2=prompts[1];
+								}
+								else{
+									next.prompt=arguments[i];
+								}
 							}
 						}
 						else if(Array.isArray(arguments[i])){
@@ -24527,6 +24569,7 @@
             else{
                 card=ui.create.card(ui.special);
             }
+			card.storage.vanish=true;
 			return card.init([suit,number,name,nature]);
 		},
 		forceOver:function(bool,callback){
@@ -40747,6 +40790,11 @@
             else{
                 return '是否发动【'+get.skillTranslation(skill,player)+'】？';
             }
+        },
+		prompt2:function(skill,target,player){
+			var str=get.prompt.apply(this,arguments);
+			if(!lib.translate[skill+'_info']) return str;
+			return '###'+str+'###'+lib.translate[skill+'_info'];
         },
         url:function(master){
 			var url=lib.config.updateURL||lib.updateURL;

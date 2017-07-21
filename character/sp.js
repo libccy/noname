@@ -3069,7 +3069,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			group:'tuifeng2',
     			ai:{
-    				threaten:0.8
+    				threaten:0.8,
+                    maixie:true,
+                    maixie_hp:true
     			}
     		},
     		tuifeng2:{

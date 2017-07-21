@@ -18,7 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_bulanwang:['male','qun',4,['bolang']],
 			// gw_kuite:['male','qun',3,[]],
 			// gw_fuertaisite:['male','qun',3,[]],
-			// gw_hengsaite:['male','wei',4,['jinsheng']],
+			gw_hengsaite:['male','wei',3,['jielue']],
 			gw_fulisi:['male','qun',3,['lanquan']],
 			gw_gaier:['male','shu',3,['hunmo']],
 
@@ -53,6 +53,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			jielue:{
+				trigger:{player:'useCard'},
+				frequent:true,
+				oncancel:function(event,player){
+					player.addTempSkill('jielue2');
+				},
+				usable:1,
+				filter:function(event,player){
+					return !player.hasSkill('jielue2')&&get.type(event.card)=='basic';
+				},
+				check:function(event,player){
+					return get.value(event.card)>3;
+				},
+				content:function(){
+					player.gain([game.createCard(trigger.card),game.createCard(trigger.card)],'gain2');
+				},
+				ai:{
+					pretao:true
+				}
+			},
+			jielue2:{},
 			bolang:{
 				trigger:{player:'phaseBegin'},
 				frequent:true,
@@ -931,7 +952,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			nuhou:{
+			nuhou_old:{
 				enable:'phaseUse',
 				usable:1,
 				position:'he',
@@ -962,6 +983,44 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player:1
 					},
 				},
+			},
+			nuhou:{
+				trigger:{player:'damageEnd'},
+    			direct:true,
+    			filter:function(event,player){
+    				return player.countCards('he')>0;
+    			},
+    			content:function(){
+    				'step 0'
+    				player.chooseToDiscard(get.prompt2('nuhou'),'he').set('ai',function(card){
+    					return 8-get.useful(card);
+    				}).set('logSkill','nuhou');
+    				'step 1'
+    				if(result.bool){
+						var targets=player.getEnemies();
+						if(targets.length){
+							var target=targets.randomGet();
+							player.line(target,'green');
+							target.damage();
+							target.randomDiscard();
+						}
+    				}
+    			},
+    			ai:{
+    				threaten:0.8,
+					maixie:true,
+					maixie_hp:true,
+					effect:{
+						target:function(card,player,target){
+							if(get.tag(card,'damage')){
+								var nh=target.countCards('he');
+								if(player.hasSkillTag('jueqing',false,target)||nh==0) return [1,-2];
+								if(!target.hasFriend()||nh<=1) return;
+								if(target.hp>=2) return [1,get.tag(card,'damage')*0.5];
+							}
+						}
+					}
+    			}
 			},
 			shewu:{
 				enable:'phaseUse',
@@ -1654,6 +1713,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_zhangyujushou:'章鱼巨兽',
 			gw_zhuoertan:'卓尔坦',
 
+			jielue:'劫掠',
+			jielue_info:'当你于回合内首次使用基本牌时，你可以获得两张该牌的复制',
 			gwfengchi:'风驰',
 			gwfengchi_info:'锁定技，出牌阶段开始时，你随机观看3个可以在出牌阶段使用的技能，并获得其中一个技能直到此阶段结束',
 			gwjushi:'巨噬',
@@ -1691,7 +1752,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwjiquan:'集权',
 			gwjiquan_info:'出牌阶段限一次，你可以从任意名角色处各获得一张牌，每拿一张牌，被拿牌的角色视为对你使用一张杀',
 			nuhou:'怒吼',
-			nuhou_info:'出牌阶段限一次，你可以弃置一张牌，然后所有敌人随机弃置一张牌',
+			nuhou_info:'每当你受到一次伤害，你可以弃置一张牌，然后对一名随机敌人造成一点伤害并随机弃置其一张牌',
 			shewu:'蛇舞',
 			shewu_info:'出牌阶段限一次，你可以弃置1至3张牌然后摸3张牌；若你弃置了至少2张牌，你本回合使用卡牌无视距离；若你弃置了3张牌，你回复一点体力',
 			gwzhanjiang:'斩将',

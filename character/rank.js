@@ -179,8 +179,11 @@ window.noname_character_rank={
         're_lidian',
         'hs_kalimosi',
         'hs_zhihuanhua',
+        'xizhicai',
     ],
     am:[
+        'gw_hengsaite',
+        'sunqian',
         'pal_anu',
         'gw_mieren',
         'gw_sanhanya',
@@ -293,6 +296,7 @@ window.noname_character_rank={
         'hs_mojinbaozi',
     ],
     bp:[
+        'quyi',
         'wangyun',
         'pal_xiaoman',
         'pal_jiangyunfan',
