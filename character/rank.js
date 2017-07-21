@@ -183,6 +183,7 @@ window.noname_character_rank={
     ],
     am:[
         'gw_hengsaite',
+        'gw_kuite',
         'sunqian',
         'pal_anu',
         'gw_mieren',

@@ -12289,7 +12289,7 @@
 				},
 				loseMaxHp:function(){
 					"step 0"
-					game.log(player,'失去了'+get.cnNumber(num)+'点体力上限');
+					game.log(player,'减少了'+get.cnNumber(num)+'点体力上限');
 					if(!event.forced&&typeof player.singleHp==='boolean'){
 						if(num%2==1){
 							if(player.singleHp){
@@ -12321,7 +12321,7 @@
 				},
 				gainMaxHp:function(){
 					"step 0"
-					game.log(player,'获得了'+get.cnNumber(num)+'点体力上限');
+					game.log(player,'增加了'+get.cnNumber(num)+'点体力上限');
 					if(!event.forced&&typeof player.singleHp==='boolean'){
 						if(num%2==1){
 							if(player.singleHp){
@@ -26800,6 +26800,7 @@
             if(info.subSkill&&!sub){
                 for(var j in info.subSkill){
                     lib.skill[i+'_'+j]=info.subSkill[j];
+					lib.skill[i+'_'+j].sub=true;
                     if(info.subSkill[j].name){
                         lib.translate[i+'_'+j]=info.subSkill[j].name;
                     }
@@ -41975,7 +41976,7 @@
                 for(var j=0;j<lib.character[i][3].length;j++){
                     var skill=lib.character[i][3][j];
 					var info=lib.skill[skill];
-                    if(info&&!info.unique&&!info.temp){
+                    if(info&&!info.unique&&!info.temp&&!info.sub){
 						if(func&&!func(info,skill)) continue;
                         list.add(skill);
                     }

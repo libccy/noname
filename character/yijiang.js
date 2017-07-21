@@ -769,8 +769,36 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         player.addTempSkill('zhongjian2');
                     }
                     if(!event.bool1&&!event.bool2){
-                        player.addTempSkill('zhongjian3');
+                        if(player.hasSkill('caishi')&&typeof player.storage.caishi=='number'){
+                            player.storage.caishi--;
+                            if(player.storage.caishi<=0){
+                                player.unmarkSkill('caishi');
+                                if(player.storage.caishi<0){
+                                    player.markSkill('zhongjian');
+                                }
+                            }
+                            else{
+                                player.updateMarks();
+                            }
+                        }
+                        else{
+                            player.unmarkSkill('zhongjian');
+                            if(player.hasSkill('zhongjian3')){
+                                player.storage.zhongjian3--;
+                            }
+                            else{
+                                player.addSkill('zhongjian3');
+                            }
+                        }
                         player.popup('杯具');
+                    }
+                },
+                intro:{
+                    content:function(storage,player){
+                        return '手牌上限'+player.storage.caishi;
+                    },
+                    markcount:function(storage,player){
+                        return player.storage.caishi;
                     }
                 },
                 ai:{
@@ -786,9 +814,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             },
             zhongjian2:{},
             zhongjian3:{
+                init:function(player){
+                    player.storage.zhongjian3=-1;
+                },
+                mark:true,
+                onremove:true,
+                intro:{
+                    content:'手牌上限#'
+                },
                 mod:{
                     maxHandcard:function(player,num){
-                        return num-1;
+                        if(typeof player.storage.zhongjian3=='number') return num+player.storage.zhongjian3;
                     }
                 }
             },
@@ -798,8 +834,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 init:function(player){
                     player.storage.caishi=0;
                 },
+                onremove:function(player){
+                    player.unmarkSkill('zhongjian');
+                    delete player.storage.caishi;
+                },
                 intro:{
-                    content:'手牌上限+#'
+                    content:function(storage){
+                        if(storage>0) return '手牌上限+'+storage;
+                        if(storage<0) return '手牌上限'+storage;
+                        return '手牌上限无变化';
+                    },
                 },
                 content:function(){
                     'step 0'
@@ -822,7 +866,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             if(result.index==0){
                                 player.addTempSkill('caishi2');
                                 player.storage.caishi++;
-                                player.markSkill('caishi');
+                                if(player.storage.caishi>=0){
+                                    player.unmarkSkill('zhongjian');
+                                    if(player.storage.caishi>0){
+                                        player.markSkill('caishi');
+                                    }
+                                }
+                                else{
+                                    player.updateMarks();
+                                }
                             }
                             else if(result.index==1){
                                 player.recover();
@@ -835,7 +887,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             player.logSkill('caishi');
                             player.addTempSkill('caishi2');
                             player.storage.caishi++;
-                            player.markSkill('caishi');
+                            if(player.storage.caishi>=0){
+                                player.unmarkSkill('zhongjian');
+                                if(player.storage.caishi>0){
+                                    player.markSkill('caishi');
+                                }
+                            }
+                            else{
+                                player.updateMarks();
+                            }
                         }
                     }
                 },
@@ -8168,6 +8228,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             daiyan:'怠宴',
             daiyan_info:'准备阶段，你可以选择一名其他角色，该角色从牌堆获得一张【桃】；若该角色上回合以此法成为过目标，其失去1点体力',
             zhongjian:'忠鉴',
+            zhongjian_bg:'鉴',
+            zhongjian3:'忠鉴',
+            zhongjian3_bg:'鉴',
             zhongjian_info:'出牌阶段限一次，你可以展示一张手牌，然后展示手牌数大于体力值的一名其他角色X张手牌（X为其手牌数和体力值之差）。若以此法展示的牌与你展示的牌：有颜色相同的，你摸一张牌或弃置其一张牌；有点数相同的，本回合此技能改为“出牌阶段限两次”；均不同，你的手牌上限-1',
             caishi:'才识',
             caishi_info:'摸牌阶段开始时，你可以选择一项：1.手牌上限+1，然后本回合你的牌不能对其他角色使用；2.回复1点体力，然后本回合你的牌不能对自己使用',

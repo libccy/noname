@@ -16,8 +16,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_dagong:['male','qun',4,['tianbian']],
 
 			gw_bulanwang:['male','qun',4,['bolang']],
-			// gw_kuite:['male','qun',3,[]],
-			// gw_fuertaisite:['male','qun',3,[]],
+			gw_kuite:['male','qun',4,['gwxuezhan']],
+			gw_fuertaisite:['male','qun',3,['zhengjun']],
 			gw_hengsaite:['male','wei',3,['jielue']],
 			gw_fulisi:['male','qun',3,['lanquan']],
 			gw_gaier:['male','shu',3,['hunmo']],
@@ -53,6 +53,62 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			zhengjun:{
+				init:function(player){
+					player.storage.zhengjun=[];
+					player.storage.zhengjun_one=[];
+				},
+				trigger:{player:'zhengjun'},
+				forced:true,
+				intro:{
+					content:'已经使用或打出过至少两张同名牌的牌有：$'
+				},
+				content:function(){
+					'step 0'
+					player.markSkill('zhengjun');
+					player.gainMaxHp();
+					'step 1'
+					player.recover();
+				},
+				group:['zhengjun_one','zhengjun_draw'],
+				subSkill:{
+					one:{
+						trigger:{player:['useCard','respondAfter']},
+						silent:true,
+						content:function(){
+							if(player.storage.zhengjun_one.contains(trigger.card.name)){
+								if(!player.storage.zhengjun.contains(trigger.card.name)){
+									player.storage.zhengjun.add(trigger.card.name);
+									event.trigger('zhengjun');
+								}
+							}
+							else{
+								player.storage.zhengjun_one.add(trigger.card.name);
+							}
+						}
+					},
+					draw:{
+						trigger:{player:'phaseDrawBegin'},
+		    			forced:true,
+						filter:function(event,player){
+							return player.storage.zhengjun.length>=2;
+						},
+		    			content:function(){
+		    				trigger.num+=Math.floor(player.storage.zhengjun.length/2);
+		    			}
+					}
+				}
+			},
+			gwxuezhan:{
+				trigger:{player:'phaseBegin'},
+				filter:function(event,player){
+					return player.isMinHandcard();
+				},
+				frequent:true,
+				content:function(){
+					player.gain(game.createCard('gw_shizizhaohuan'),'gain2');
+				}
+			},
 			jielue:{
 				trigger:{player:'useCard'},
 				frequent:true,
@@ -1713,6 +1769,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_zhangyujushou:'章鱼巨兽',
 			gw_zhuoertan:'卓尔坦',
 
+			zhengjun:'整军',
+			zhengjun_info:'锁定技，你在摸牌阶段额外摸X/2张牌（向下取整），X为你在本局游戏中累计使用或打出过至少两张同名牌的牌数；每当X的值增加，你增加一点体力和体力上限',
+			gwxuezhan:'血战',
+			gwxuezhan_info:'准备阶段，若你的手牌数为全场最少或之一，你可以获得一张十字召唤',
 			jielue:'劫掠',
 			jielue_info:'当你于回合内首次使用基本牌时，你可以获得两张该牌的复制',
 			gwfengchi:'风驰',
