@@ -91,17 +91,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{player:'phaseEnd'},
 		    			frequent:true,
 						filter:function(event,player){
-							return player.storage.zhengjun.length>=2;
+							return player.storage.zhengjun.length>=1;
 						},
 		    			content:function(){
 							'step 0'
+							if(player.storage.zhengjun.length==1){
+								player.draw();
+								event.finish();
+								return;
+							}
 							event.cards=get.cards(player.storage.zhengjun.length);
-							player.chooseCardButton('整军：获得其中一张牌',true).set('ai',function(button){
+							player.chooseCardButton('整军：获得其中一张牌',true,event.cards).set('ai',function(button){
 								return get.useful(button.link);
 							});
 							'step 1'
 							if(result.bool){
-								var card=result.cards[0];
+								var card=result.links[0];
+								card.fix();
 								player.gain(card,'draw');
 								event.cards.remove(card);
 							}
@@ -1784,7 +1790,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_zhuoertan:'卓尔坦',
 
 			zhengjun:'整军',
-			zhengjun_info:'结束阶段，若X不小于2，你可以观看牌堆顶的X张牌并获得其中一张，X为你在本局游戏中累计使用或打出过至少两张同名牌的牌数；每当X的值增加，你增加一点体力和体力上限',
+			zhengjun_info:'结束阶段，你可以观看牌堆顶的X张牌并获得其中一张，X为你在本局游戏中累计使用或打出过至少两张同名牌的牌数；每当X的值增加，你增加一点体力和体力上限',
 			gwxuezhan:'血战',
 			gwxuezhan_info:'准备阶段，若你的手牌数为全场最少或之一，你可以获得一张十字召唤',
 			jielue:'劫掠',

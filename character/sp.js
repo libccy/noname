@@ -987,6 +987,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 frequent:true,
                 filter:function(event,player){
                     if(event.player.hp<=player.hp) return false;
+                    if(event.targets.length>1) return false;
                     var hs=player.getCards('h');
                     var names=['sha','shan','tao','jiu'];
                     for(var i=0;i<hs.length;i++){

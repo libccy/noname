@@ -8105,7 +8105,7 @@
 				var mode=lib.config.all.mode.slice(0);
 				mode.remove('connect');
 				mode.remove('brawl');
-				var banned=['yxs_luzhishen','xuhuang','zhenji','shen_guanyu','zhurong',
+				var banned=['yxs_luzhishen','xuhuang','zhenji','shen_guanyu','shen_caocao','zhurong',
 					'daqiao','lingcao','liuzan','lusu','luxun','yanwen','zhouyu','xiahouyuan',
 					'zhuzhi','old_caozhen','guojia','simayi','sp_pangde','swd_kangnalishi'];
 				var bannedcards=['zengbin','toulianghuanzhu','huoshan','hongshui','guiyoujie','fengyinzhidan'];

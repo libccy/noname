@@ -5079,6 +5079,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			longfan_info:'出牌阶段限一次，你可以进行一次判定，然后按花色执行以下效果。红桃：你回复一点体力；方片：你摸一张牌；梅花：你弃置一名其他角色的一张牌；黑桃：无事发生',
 			// longfan_info:'0000：翻面；1111：弃手牌；2222：弃装备牌；3333：受伤害；4444：流失体力；5555：连环；6666：摸牌；7777：回复体力；8888：弃置判定牌；9999：置衡',
 			guiyoujie:'鬼幽结',
+			guiyoujie_bg:'结',
 			guiyoujie_info:'出牌阶段，对一名其他角色使用。若判定结果为黑色，其摸一张牌并翻面。',
 			yufulu:'御夫录',
 			yufulu_info:'出牌阶段，可弃置一张武器牌令一名角色受到一点伤害，然后该角色获得此武器牌',
@@ -5268,7 +5269,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 
 			// ['club',1,'fengyinzhidan'],
 			// ['diamond',1,'fengyinzhidan'],
-			['heart',1,'fengyinzhidan'],
+			// ['heart',1,'fengyinzhidan'],
 			['spade',1,'fengyinzhidan'],
 
 			['heart',9,'yuruyi'],
