@@ -13602,6 +13602,23 @@
 					if(num==undefined) return 0;
 					return num;
 				},
+				getStockSkills:function(unowned){
+					var list=[];
+					if(lib.character[this.name]&&!this.isUnseen(0)){
+						list.addArray(lib.character[this.name][3]);
+					}
+					if(lib.character[this.name2]&&!this.isUnseen(1)){
+						list.addArray(lib.character[this.name2][3]);
+					}
+					if(!unowned){
+						for(var i=0;i<list.length;i++){
+							if(!this.hasSkill(list[i])){
+								list.splice(i--,1);
+							}
+						}
+					}
+					return list;
+				},
 				getCards:function(arg1,arg2){
 					if(typeof arg1!='string'){
 						arg1='h';

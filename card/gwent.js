@@ -638,6 +638,249 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 
+			gw_ganhan:{
+				fullborder:'gold',
+				type:'spell',
+				subtype:'spell_gold',
+				vanish:true,
+				enable:true,
+				notarget:true,
+				contentBefore:function(){
+					player.line(game.filterPlayer());
+					player.$skill('干旱','legend','metal');
+					game.delay(2);
+				},
+				content:function(){
+					'step 0'
+					event.num=0;
+					event.targets=game.filterPlayer().sortBySeat();
+					'step 1'
+					if(event.num<targets.length){
+						ui.clear();
+						var target=targets[event.num];
+						target.loseMaxHp(true);
+						event.num++;
+						event.redo();
+					}
+					'step 2'
+					ui.clear();
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:7,
+					useful:[5,1],
+					result:{
+						player:function(player,target){
+							if(player.hasUnknown()) return 0;
+							return game.countPlayer(function(current){
+								var att=-get.sgn(get.attitude(player,current));
+								if(current.isHealthy()){
+									switch(current.hp){
+										case 1:return att*3;
+										case 2:return att*2;
+										case 3:return att*1.5;
+										case 4:return att;
+										default:return att*0.5;
+									}
+								}
+								else if(current.maxHp-current.hp==1){
+									switch(current.hp){
+										case 1:return att*0.5;
+										case 2:return att*0.3;
+										case 3:return att*0.2;
+										default:return att*0.15;
+									}
+								}
+								else{
+									return att*0.1;
+								}
+							});
+						}
+					},
+					order:0.5,
+				}
+			},
+			gw_huangjiashenpan:{
+				fullborder:'gold',
+				type:'spell',
+				subtype:'spell_gold',
+				vanish:true,
+				enable:true,
+				notarget:true,
+				contentBefore:function(){
+					player.$skill('皇家审判','legend','metal');
+					game.delay(2);
+				},
+				content:function(){
+					'step 0'
+					var list=get.libCard(function(info){
+						return info.subtype=='spell_gold';
+					});
+					list.remove('gw_huangjiashenpan');
+					if(list.length){
+						player.chooseVCardButton(list,true,'notype').ai=function(){
+							return Math.random();
+						};
+					}
+					'step 1'
+					if(result.bool){
+						player.gain(game.createCard(result.links[0][2]),'draw');
+					}
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:8,
+					useful:[6,1],
+					result:{
+						player:1
+					},
+					order:0.1,
+				}
+			},
+			gw_tunshi:{
+				fullborder:'gold',
+				type:'spell',
+				subtype:'spell_gold',
+				vanish:true,
+				enable:function(event,player){
+					if(player.maxHp==1) return false;
+					var list=player.getEnemies();
+					for(var i=0;i<list.length;i++){
+						if(list[i].getStockSkills().length) return true;
+					}
+				},
+				notarget:true,
+				contentBefore:function(){
+					player.$skill('吞噬','legend','metal');
+					game.delay(2);
+				},
+				content:function(){
+					var list=player.getEnemies();
+					for(var i=0;i<list.length;i++){
+						if(!list[i].getStockSkills().length){
+							list.splice(i--,1);
+						}
+					}
+					if(list.length){
+						var target=list.randomGet();
+						target.addExpose(0.1);
+						player.line(target);
+						var skill=target.getStockSkills().randomGet();
+						target.popup(skill);
+						player.addSkill(skill);
+						target.removeSkill(skill);
+						player.loseMaxHp(true);
+						target.gainMaxHp(true);
+						target.recover();
+					}
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:8,
+					useful:[6,1],
+					result:{
+						player:1
+					},
+					order:0.4,
+				}
+			},
+			gw_chongci:{
+				fullborder:'gold',
+				type:'spell',
+				subtype:'spell_gold',
+				vanish:true,
+				enable:function(event,player){
+					if(player.maxHp==1) return false;
+					var list=player.getEnemies();
+					for(var i=0;i<list.length;i++){
+						if(list[i].getStockSkills().length) return true;
+					}
+				},
+				notarget:true,
+				contentBefore:function(){
+					player.$skill('冲刺','legend','metal');
+					game.delay(2);
+				},
+				content:function(){
+					'step 0'
+					event.hs=player.getCards('h');
+					event.es=player.getCards('e');
+					player.discard(event.hs.concat(event.es));
+					'step 1'
+					var hs2=[];
+					for(var i=0;i<event.hs.length;i++){
+						var type=get.type(event.hs[i],'trick');
+						var cardname=event.hs[i].name;
+						var list=game.findCards(function(name){
+							if(cardname==name) return;
+							if(get.type({name:name},'trick')==type){
+								return true;
+							}
+						});
+    					if(!list.length){
+    						list=[cardname];
+    					}
+						hs2.push(game.createCard(list.randomGet()));
+					}
+					if(hs2.length){
+						player.gain(hs2,'draw');
+					}
+					'step 2'
+					var es2=[];
+					for(var i=0;i<event.es.length;i++){
+						var subtype=get.subtype(event.es[i]);
+						var cardname=event.es[i].name;
+						var list=game.findCards(function(name){
+							if(cardname==name) return;
+							if(get.subtype({name:name})==subtype){
+								return true;
+							}
+						});
+    					if(!list.length){
+    						list=[cardname];
+    					}
+						es2.push(game.createCard(list.randomGet()));
+					}
+					if(es2.length){
+						player.$draw(es2);
+						for(var i=0;i<es2.length;i++){
+							player.equip(es2[i]);
+						}
+					}
+					'step 3'
+					player.addTempSkill('qianxing',{player:'phaseBegin'});
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:8,
+					useful:[6,1],
+					result:{
+						player:1
+					},
+					order:0.2,
+				}
+			},
+
 			gw_youer:{
 				fullborder:'silver',
 				type:'spell',
@@ -1581,14 +1824,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			spell_silver:'银卡法术',
 			spell_bronze:'铜卡法术',
 
+			gw_nuhaifengbao:'怒海风暴',
+			gw_nuhaifengbao_info:'',
 			gw_ganhan:'干旱',
-			gw_ganhan_info:'所有角色减少一点体力上限，然后结束出牌阶段',
+			gw_ganhan_info:'所有角色减少一点体力上限（不触发技能），然后结束出牌阶段',
 			gw_huangjiashenpan:'皇家审判',
 			gw_huangjiashenpan_info:'获得任意一张金卡法术（皇家审判除外），然后结束出牌阶段',
 			gw_chongci:'冲刺',
-			gw_chongci_info:'弃置所有牌，每弃置一张牌，便随机获得一张类别相同且价值更高的牌（若为装备牌则立即装备之），获得潜行直到下一回合开始，然后结束出牌阶段',
+			gw_chongci_info:'弃置所有牌，每弃置一张手牌，便随机获得一张类别相同的牌；每弃置一张装备区内的牌，随机装备一件类别相同的装备；获得潜行直到下一回合开始，然后结束出牌阶段',
 			gw_tunshi:'吞噬',
-			gw_tunshi_info:'随机移除一名敌方角色的一个随机技能，并获得此技能，被移除技能的角色增加一点体力和体力上限，然后结束出牌阶段',
+			gw_tunshi_info:'随机移除一名敌方角色的一个随机技能，你获得此技能并减少一点体力限，被移除技能的角色增加一点体力和体力上限，然后结束出牌阶段',
 			gw_dieyi:'蝶翼',
 			gw_dieyi_equip1:'蝶翼·器',
 			gw_dieyi_equip2:'蝶翼·衣',
