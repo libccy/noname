@@ -5537,6 +5537,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{player:'damageEnd'},
     			frequent:true,
     			locked:false,
+                notemp:true,
     			init:function(player){
     				player.storage.quanji=[];
     			},

@@ -924,21 +924,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				vanish:true,
 				enable:true,
 				filterTarget:function(card,player,target){
-					return target!=player;
+					return target!=player&&target.countCards('h');
 				},
 				content:function(){
-					'step 0'
-					if(!player.countCards('h')){
-						event.finish();
-					}
-					else{
-						player.chooseCard('h','将一张手牌交给'+get.translation(target),true);
-					}
-					'step 1'
-					player.$giveAuto(result.cards,target);
-					target.gain(result.cards,player);
-					'step 2'
-					player.gainPlayerCard(target,'h',true,2,'visible').set('ai',function(button){
+					player.gainPlayerCard(target,'h',true,'visible').set('ai',function(button){
 						return get.value(button.link);
 					});
 				},
@@ -949,16 +938,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						useful:[5,1],
 					},
 					result:{
-						target:function(player,target){
-							if(player.countCards('h','gw_tongdi')==player.countCards('h')) return 0;
-							if(!target.countCards('h')) return 0;
-							return -1;
-						},
-						player:function(player,target){
-							if(player.countCards('h','gw_tongdi')==player.countCards('h')) return 0;
-							if(!target.countCards('h')) return 0;
-							return 0.5;
-						},
+						target:-1
 					},
 				}
 			},
@@ -1281,6 +1261,74 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 
+			gw_nuhaifengbao:{
+				fullborder:'silver',
+				type:'spell',
+				subtype:'spell_silver',
+				enable:true,
+				filterTarget:function(card,player,target){
+					return !target.hasSkill('gw_nuhaifengbao');
+				},
+				content:function(){
+					target.addSkill('gw_nuhaifengbao');
+				},
+				ai:{
+					value:[7,1],
+					useful:[4,1],
+					result:{
+						target:-1.5
+					},
+					order:1.2,
+				}
+			},
+			gw_baishuang:{
+				fullborder:'silver',
+				type:'spell',
+				subtype:'spell_silver',
+				enable:true,
+				filterTarget:function(card,player,target){
+					return !target.hasSkill('gw_ciguhanshuang');
+				},
+				selectTarget:[1,3],
+				content:function(){
+					target.addSkill('gw_ciguhanshuang');
+				},
+				ai:{
+					value:[7.5,1],
+					useful:[5,1],
+					result:{
+						target:-1
+					},
+					order:1.2,
+				}
+			},
+			gw_baobaoshu:{
+				fullborder:'silver',
+				type:'spell',
+				subtype:'spell_silver',
+				enable:true,
+				filterTarget:function(card,player,target){
+					return !target.hasSkill('gw_baobaoshu');
+				},
+				selectTarget:[1,2],
+				content:function(){
+					target.addSkill('gw_baobaoshu');
+				},
+				ai:{
+					value:[7.5,1],
+					useful:[5,1],
+					result:{
+						target:function(player,target){
+							if(target.needsToDiscard()) return -1;
+							if(target.needsToDiscard(1)) return -0.7;
+							if(target.needsToDiscard(2)) return -0.4;
+							return -0.1*num;
+						}
+					},
+					order:1.2,
+				}
+			},
+
 			gw_qinpendayu:{
 				fullborder:'bronze',
 				type:'spell',
@@ -1294,7 +1342,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                    return get.distance(targets[0],current,'pure')==1;
 	                },targets);
 				},
-				usable:1,
 				content:function(){
 					target.addTempSkill('gw_qinpendayu',{player:'phaseAfter'});
 				},
@@ -1316,10 +1363,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                    }
 					},
 					order:1.2,
-					tag:{
-						multitarget:1,
-						multineg:1,
-					}
 				}
 			},
 			gw_birinongwu:{
@@ -1327,7 +1370,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'spell',
 				subtype:'spell_bronze',
 				enable:true,
-				usable:1,
 				filterTarget:function(card,player,target){
 					return !target.hasSkill('gw_birinongwu');
 				},
@@ -1353,10 +1395,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                    }
 					},
 					order:1.2,
-					tag:{
-						multitarget:1,
-						multineg:1,
-					}
 				}
 			},
 			gw_ciguhanshuang:{
@@ -1364,7 +1402,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'spell',
 				subtype:'spell_bronze',
 				enable:true,
-				usable:1,
 				filterTarget:function(card,player,target){
 					return !target.hasSkill('gw_ciguhanshuang');
 				},
@@ -1390,10 +1427,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                    }
 					},
 					order:1.2,
-					tag:{
-						multitarget:1,
-						multineg:1,
-					}
 				}
 			},
 			gw_baoxueyaoshui:{
@@ -1582,9 +1615,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							target.discard(cards);
 						}
 						if(target.hasSkillTag('weather')){
-							target.removeSkill('gw_qinpendayu');
-							target.removeSkill('gw_birinongwu');
-							target.removeSkill('gw_ciguhanshuang');
+							var skills=target.getSkills();
+							for(var i=0;i<skills.length;i++){
+								var info=get.info(skills[i]);
+								if(info&&info.ai&&info.ai.weather){
+									target.removeSkill(skills[i]);
+								}
+							}
 						}
 						event.redo();
 					}
@@ -1600,6 +1637,47 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			gw_baobaoshu:{
+				mark:true,
+				nopop:true,
+	            intro:{
+	                content:'不能使用基本牌直到下一回合结束'
+	            },
+	            mod:{
+	                cardEnabled:function(card){
+	                    if(get.type(card)=='basic') return false;
+	                }
+	            },
+				ai:{
+					weather:true
+				}
+			},
+			gw_nuhaifengbao:{
+				mark:true,
+				intro:{
+					content:'结束阶段随机弃置一张牌（剩余#回合）'
+				},
+				init:function(player){
+					player.storage.gw_nuhaifengbao=2;
+				},
+				trigger:{player:'phaseEnd'},
+				forced:true,
+				content:function(){
+					player.randomDiscard();
+					player.storage.gw_nuhaifengbao--;
+					if(player.storage.gw_nuhaifengbao>0){
+						player.updateMarks();
+					}
+					else{
+						player.removeSkill('gw_nuhaifengbao');
+					}
+				},
+				onremove:true,
+				ai:{
+					neg:true,
+					weather:true
+				}
+			},
 			gw_youer:{
     			trigger:{global:['phaseEnd','dieBegin']},
     			forced:true,
@@ -1824,8 +1902,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			spell_silver:'银卡法术',
 			spell_bronze:'铜卡法术',
 
+			gw_guaiwuchaoxue:'怪物巢穴',
+			gw_guaiwuchaoxue_info:'获得一个随机卖血技能直到下一回合开始，令一名随机敌方角色对你造成一点伤害，然后获得一点护甲',
+			gw_baobaoshu:'雹暴术',
+			gw_baobaoshu_info:'天气牌，出牌阶段对至多两名角色使用，目标不能使用基本牌直到下一回合结束',
+			gw_baishuang:'白霜',
+			gw_baishuang_info:'天气牌，出牌阶段对至多三名角色使用，目标下个摸牌阶段摸牌数-1',
 			gw_nuhaifengbao:'怒海风暴',
-			gw_nuhaifengbao_info:'',
+			gw_nuhaifengbao_bg:'海',
+			gw_nuhaifengbao_info:'天气牌，出牌阶段对一名角色使用，目标在结束阶段随机弃置一张牌，持续2回合',
 			gw_ganhan:'干旱',
 			gw_ganhan_info:'所有角色减少一点体力上限（不触发技能），然后结束出牌阶段',
 			gw_huangjiashenpan:'皇家审判',
@@ -1887,7 +1972,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_youer_bg:'饵',
 			gw_youer_info:'将一名其他角色的所有手牌移出游戏，然后摸一张牌，当前回合结束后该角色将以此法失去的牌收回手牌',
 			gw_tongdi:'通敌',
-			gw_tongdi_info:'交给一名角色一张手牌，然后观看其手牌并获得其中两张',
+			gw_tongdi_info:'观看一名其他角色的手牌并获得其中一张',
 			gw_baoxueyaoshui:'暴雪药水',
 			gw_baoxueyaoshui_info:'令一名角色弃置两张手牌并摸一张牌',
 			gw_birinongwu:'蔽日浓雾',
@@ -1902,9 +1987,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_wenyi:'瘟疫',
 			gw_wenyi_info:'令所有体力值为全场最少的角色随机弃置一张牌',
 			gw_yanziyaoshui:'燕子药水',
-			gw_yanziyaoshui_info:'令一名角色摸一张牌，若其手牌数为全场最少，改为摸三张',
-			gw_guaiwuchaoxue:'怪物巢穴',
-			gw_guaiwuchaoxue_info:'选择手牌中的一张杀、闪或酒，获得两张该牌的复制',
+			gw_yanziyaoshui_info:'令一名角色摸一张牌，若其手牌数为全场最少或之一，改为摸两张',
 			gw_shanbengshu:'山崩术',
 			gw_shanbengshu_info:'所有角色随机弃置一张牌',
 		},

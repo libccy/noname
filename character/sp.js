@@ -3041,6 +3041,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		tuifeng:{
     			trigger:{player:'damageEnd'},
     			direct:true,
+                notemp:true,
     			filter:function(event,player){
     				return player.countCards('h')>0;
     			},

@@ -220,6 +220,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				unique:true,
 				group:'renjie2',
+				notemp:true,
 				mark:true,
 				filter:function(event){
 					return event.num>0;

@@ -5466,6 +5466,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		yishan:{
     			group:'yishan2',
+                notemp:true,
     			trigger:{player:'damageEnd'},
     			filter:function(event,player){
     				var content=player.storage.yishan;
