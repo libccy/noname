@@ -15055,7 +15055,7 @@
 						if(typeof arguments[i]=='number'){
 							num=arguments[i];
 						}
-						else if(get.itemtype(arguments[i])=='select'){
+						else if(get.itemtype(arguments[i])=='position'){
 							position=arguments[i];
 						}
 						else if(typeof arguments[i]=='boolean'){

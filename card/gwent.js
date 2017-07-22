@@ -1676,9 +1676,160 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						player:1,
 					}
 				}
+			},
+			gw_kunenfayin:{
+				fullborder:'bronze',
+				type:'spell',
+				subtype:'spell_bronze',
+				enable:true,
+				filterTarget:function(card,player,target){
+					return !target.hasSkill('gw_kunenfayin');
+				},
+				content:function(){
+					target.addSkill('gw_kunenfayin');
+				},
+				ai:{
+					basic:{
+						order:2,
+						value:[5,1],
+						useful:[4,1],
+					},
+					result:{
+						target:function(player,target){
+							return get.threaten(target,player);
+						}
+					},
+				}
+			},
+			gw_yanziyaoshui:{
+				fullborder:'bronze',
+				type:'spell',
+				subtype:'spell_bronze',
+				enable:true,
+				filterTarget:true,
+				content:function(){
+					if(target.isMinHandcard()){
+						target.draw(2);
+					}
+					else{
+						target.draw();
+					}
+				},
+				ai:{
+					basic:{
+						order:6,
+						value:[6,1],
+						useful:[4,1],
+					},
+					result:{
+						target:function(player,target){
+							if(target.isMinHandcard()) return 2;
+							return 1;
+						}
+					},
+				}
+			},
+			gw_wenyi:{
+				fullborder:'bronze',
+				type:'spell',
+				subtype:'spell_bronze',
+				enable:true,
+				filterTarget:function(card,player,target){
+					return target.isMinHp();
+				},
+				selectTarget:-1,
+				content:function(){
+					target.randomDiscard();
+				},
+				ai:{
+					basic:{
+						order:6,
+						value:[6,1],
+						useful:[4,1],
+					},
+					result:{
+						target:-1
+					},
+					tag:{
+						multitarget:1,
+						multineg:1
+					}
+				}
+			},
+			gw_shanbengshu:{
+				fullborder:'bronze',
+				type:'spell',
+				subtype:'spell_bronze',
+				enable:function(event,player){
+					var list=player.getEnemies();
+					for(var i=0;i<list.length;i++){
+						if(list[i].countCards('e')){
+							return true;
+						}
+					}
+					return false;
+				},
+				filterTarget:function(card,player,target){
+					return target==player;
+				},
+				selectTarget:-1,
+				content:function(){
+					var list=target.getEnemies();
+					for(var i=0;i<list.length;i++){
+						if(!list[i].countCards('e')){
+							list.splice(i--,1);
+						}
+					}
+					var target=list.randomGet();
+					player.line(target);
+					target.randomDiscard('e',2);
+				},
+				ai:{
+					basic:{
+						order:9,
+						value:[6,1],
+						useful:[4,1],
+					},
+					result:{
+						target:1
+					},
+					tag:{
+						multitarget:1,
+						multineg:1
+					}
+				}
 			}
 		},
 		skill:{
+			gw_kunenfayin:{
+				mark:true,
+				intro:{
+					content:'不能成为其他角色的锦囊牌目标（剩余#回合）'
+				},
+				mod:{
+    				targetEnabled:function(card,player,target,now){
+    					if(player!=target){
+    						if(get.type(card,'trick')=='trick') return false;
+    					}
+    				}
+    			},
+				init:function(player){
+					player.storage.gw_kunenfayin=3;
+				},
+				trigger:{player:'phaseEnd'},
+				forced:true,
+				popup:false,
+				content:function(){
+					player.storage.gw_kunenfayin--;
+					if(player.storage.gw_kunenfayin>0){
+						player.updateMarks();
+					}
+					else{
+						player.removeSkill('gw_kunenfayin');
+					}
+				},
+				onremove:true
+			},
 			gw_baobaoshu:{
 				mark:true,
 				nopop:true,
@@ -2031,7 +2182,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_yanziyaoshui:'燕子药水',
 			gw_yanziyaoshui_info:'令一名角色摸一张牌，若其手牌数为全场最少或之一，改为摸两张',
 			gw_shanbengshu:'山崩术',
-			gw_shanbengshu_info:'所有角色随机弃置一张牌',
+			gw_shanbengshu_info:'出牌阶段对自己使用，令一名随机敌方角色随机弃置两件装备',
+			gw_kunenfayin:'昆恩法印',
+			gw_kunenfayin_info:'出牌阶段对一名角色使用，目标不能成为其他角色的锦囊牌目标，持续3轮',
 		},
 		cardType:{
 			spell:0.5,
