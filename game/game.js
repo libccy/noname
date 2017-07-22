@@ -22,7 +22,7 @@
         versionOL:25,
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
         mirrorURL:'https://coding.net/u/libccy/p/noname/git/raw',
-        hallURL:'websha.cn',
+        hallURL:'noname.pub',
 		assetURL:'',
 		changeLog:[],
 		updates:[],

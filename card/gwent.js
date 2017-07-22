@@ -2216,6 +2216,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 
 			['heart',4,'gw_baoxueyaoshui'],
 			['spade',8,'gw_baoxueyaoshui'],
+
+			['spade',8,'shanbengshu'],
+			['spade',2,'kunenfayin'],
+			['club',3,'wenyi'],
+			['heart',8,'yanziyaoshui'],
 		],
 	};
 });
