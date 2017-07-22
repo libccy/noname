@@ -1328,6 +1328,48 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:1.2,
 				}
 			},
+			gw_guaiwuchaoxue:{
+				fullborder:'silver',
+				type:'spell',
+				subtype:'spell_silver',
+				enable:true,
+				filterTarget:function(card,player,target){
+					return target==player;
+				},
+				selectTarget:-1,
+				content:function(){
+					var list=get.gainableSkills(function(info,skill){
+						return !info.notemp&&info.ai&&info.ai.maixie_hp&&!player.hasSkill(skill);
+					});
+					if(list.length){
+						var skill=list.randomGet();
+						player.popup(skill);
+						player.addTempSkill(skill,{player:'phaseBegin'});
+						var enemies=player.getEnemies();
+						if(enemies.length){
+							var source=enemies.randomGet();
+							source.line(player);
+							source.addExpose(0.1);
+							player.damage(source);
+							player.changeHujia();
+						}
+					}
+				},
+				ai:{
+					value:[7,1],
+					useful:[3,1],
+					result:{
+						target:function(player,target){
+							if(target.hp<=1||target.hujia) return 0;
+							if(target.hasSkillTag('maixie_hp')) return 1;
+							if(target.hp==2&&target.needsToDiscard(1)) return 0;
+							if(target.hp==3&&target.needsToDiscard()) return 0;
+							return 1;
+						}
+					},
+					order:1,
+				}
+			},
 
 			gw_qinpendayu:{
 				fullborder:'bronze',
@@ -1903,7 +1945,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			spell_bronze:'铜卡法术',
 
 			gw_guaiwuchaoxue:'怪物巢穴',
-			gw_guaiwuchaoxue_info:'获得一个随机卖血技能直到下一回合开始，令一名随机敌方角色对你造成一点伤害，然后获得一点护甲',
+			gw_guaiwuchaoxue_info:'随机获得一个卖血技能直到下一回合开始；令一名随机敌方角色对你造成一点伤害，然后获得一点护甲',
 			gw_baobaoshu:'雹暴术',
 			gw_baobaoshu_info:'天气牌，出牌阶段对至多两名角色使用，目标不能使用基本牌直到下一回合结束',
 			gw_baishuang:'白霜',
