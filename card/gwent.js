@@ -1750,7 +1750,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'spell_bronze',
 				enable:true,
 				filterTarget:function(card,player,target){
-					return target.isMinHp();
+					return target.isMinHp()&&target.countCards('he');
 				},
 				selectTarget:-1,
 				content:function(){
