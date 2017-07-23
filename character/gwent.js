@@ -40,6 +40,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_zhuoertan:['male','wu',3,['hupeng']],
 
 			gw_meizi:['female','wei',3,['gwjieyin']],
+			gw_aimin:['female','wu',3,['huanshu']],
 		},
 		characterIntro:{
 			gw_huoge:'那个老年痴呆?不知道他是活着还是已经被制成标本了!',
@@ -1880,7 +1881,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_zhangyujushou:'章鱼巨兽',
 			gw_zhuoertan:'卓尔坦',
 			gw_meizi:'梅兹',
+			gw_aimin:'艾敏',
 
+			huanshu:'幻术',
+			huanshu_info:'结束阶段，你可以将一张手牌背面朝上置于你的武将牌上；当一名敌方角色使用一张与之颜色相同的普通锦囊牌时，你展示并移去此牌，取消锦囊的效果，然后摸两张牌；准备阶段，你移去武将牌上的“幻术”牌',
 			gwjieyin:'结印',
 			gwjieyin_info:'出牌阶段，你可以视为使用瘟疫、燕子药水或昆恩法印（不能重复使用同一法术），技能两轮重置一次',
 			zhengjun:'整军',

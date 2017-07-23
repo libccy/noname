@@ -380,6 +380,7 @@ window.noname_asset_list=[
     'image/character/guotufengji.jpg',
     'image/character/guyong.jpg',
     'image/character/gw_aigeleisi.jpg',
+    'image/character/gw_aimin.jpg',
     'image/character/gw_airuiting.jpg',
     'image/character/gw_aisinie.jpg',
     'image/character/gw_aokeweisite.jpg',
