@@ -242,8 +242,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						silent:true,
 						content:function(){
 							if(typeof player.storage.gwjieyin_round=='number'){
-								if((game.roundNumber-player.storage.gwjieyin_round)%2==0){
+								var num=game.roundNumber-player.storage.gwjieyin_round;
+								if(num&&num%2==0){
 									player.storage.gwjieyin.length=0;
+									player.storage.gwjieyin_round=game.roundNumber;
 								}
 							}
 							else{

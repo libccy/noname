@@ -861,12 +861,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						es2.push(game.createCard(list.randomGet()));
 					}
 					if(es2.length){
+						event.delay=true;
 						player.$draw(es2);
 						for(var i=0;i<es2.length;i++){
 							player.equip(es2[i]);
 						}
 					}
 					'step 3'
+					if(event.delay) game.delay();
 					player.addTempSkill('qianxing',{player:'phaseBegin'});
 				},
 				contentAfter:function(){
@@ -1816,6 +1818,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		skill:{
 			gw_kunenfayin:{
 				mark:true,
+				nopop:true,
 				intro:{
 					content:'不能成为其他角色的普通锦囊牌的目标（剩余#回合）'
 				},
@@ -1873,6 +1876,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{player:'phaseEnd'},
 				forced:true,
+				nopop:true,
 				content:function(){
 					player.randomDiscard();
 					player.storage.gw_nuhaifengbao--;
@@ -1971,6 +1975,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseEnd'},
 				forced:true,
 				mark:true,
+				nopop:true,
 				process:function(player){
 					if(player.hasSkill('gw_dieyi')){
 						player.storage.gw_dieyi++;

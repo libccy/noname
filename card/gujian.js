@@ -226,7 +226,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            content:function(){
 	                target.$gain2(cards);
 	                target.storage.mapodoufu=card;
-	                target.storage.mapodoufu_markcount=3;
+	                target.storage.mapodoufu_markcount=2;
 	                target.addSkill('mapodoufu');
 	            },
 	            ai:{
@@ -1034,7 +1034,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            nopop:true,
 	            intro:{
 	                content:function(storage,player){
-	                    return '你受到杀造成的伤害时有50%的机率令伤害-1（剩余'+player.storage.gudonggeng_markcount+'回合）'
+	                    return '当你下一次受到杀造成的伤害时，令伤害-1（剩余'+player.storage.gudonggeng_markcount+'回合）'
 	                }
 	            },
 	            content:function(){
@@ -1053,11 +1053,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                damage:{
 	                    trigger:{player:'damageBegin'},
 	                    filter:function(event,player){
-	                        return event.card&&event.card.name=='sha'&&event.num>0&&Math.random()<0.5;
+	                        return event.card&&event.card.name=='sha'&&event.num>0;
 	                    },
 	                    forced:true,
 	                    content:function(){
 	                        trigger.num--;
+							delete player.storage.gudonggeng;
+		                    delete player.storage.gudonggeng_markcount;
+		                    player.removeSkill('gudonggeng');
 	                    }
 	                }
 	            },
@@ -1226,14 +1229,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            nopop:true,
 	            intro:{
 	                content:function(storage,player){
-	                    return '结束阶段有，你50%机率摸一张牌（剩余'+player.storage.tanhuadong_markcount+'回合）'
+	                    return '出牌阶段结束时，你摸一张牌（剩余'+player.storage.tanhuadong_markcount+'回合）'
 	                }
 	            },
 	            content:function(){
-	                if(Math.random()<0.5){
-	                    player.logSkill('tanhuadong');
-	                    player.draw();
-	                }
 	                player.storage.tanhuadong_markcount--;
 	                if(player.storage.tanhuadong_markcount==0){
 	                    delete player.storage.tanhuadong;
@@ -1243,7 +1242,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                else{
 	                    player.updateMarks();
 	                }
-	            }
+	            },
+				group:'tanhuadong_draw',
+				subSkill:{
+					draw:{
+						trigger:{player:'phaseUseEnd'},
+						forced:true,
+						content:function(){
+							player.draw();
+						}
+					}
+				}
 	        },
 	        mapodoufu:{
 	            mark:'card',
@@ -1253,24 +1262,23 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            nopop:true,
 	            intro:{
 	                content:function(storage,player){
-	                    return '结束阶段，你有65%的机率弃置一名随机敌人的一张随机牌（剩余'+player.storage.mapodoufu_markcount+'回合）'
+	                    return '结束阶段，你随机弃置一名随机敌人的一张随机牌（剩余'+player.storage.mapodoufu_markcount+'回合）'
 	                }
 	            },
 	            content:function(){
-	                if(Math.random()<0.65){
-	                    var list=player.getEnemies();
-	                    for(var i=0;i<list.length;i++){
-	                        if(!list[i].countCards('he')){
-	                            list.splice(i--,1);
-	                        }
-	                    }
-	                    var target=list.randomGet();
-	                    if(target){
-	                        player.logSkill('mapodoufu',target);
-	                        target.discard(target.getCards('he').randomGet());
-	                        target.addExpose(0.2);
-	                    }
-	                }
+                    var list=player.getEnemies();
+                    for(var i=0;i<list.length;i++){
+                        if(!list[i].countCards('he')){
+                            list.splice(i--,1);
+                        }
+                    }
+                    var target=list.randomGet();
+                    if(target){
+                        player.logSkill('mapodoufu',target);
+                        target.discard(target.getCards('he').randomGet());
+                        target.addExpose(0.2);
+                    }
+
 	                player.storage.mapodoufu_markcount--;
 	                if(player.storage.mapodoufu_markcount==0){
 	                    delete player.storage.mapodoufu;
@@ -1580,7 +1588,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	        chunbing:'春饼',
 	        chunbing_info:'你的手牌上限+1，持续五回合',
 	        gudonggeng:'骨董羹',
-	        gudonggeng_info:'你受到杀造成的伤害时有50%的机率令伤害-1，持续三回合',
+	        gudonggeng_info:'当你下一次受到杀造成的伤害时，令伤害-1，持续三回合',
 	        yougeng:'酉羹',
 	        yougeng_info:'准备阶段，若你的体力值为全场最少或之一，你回复一点体力，持续两回合',
 	        liyutang:'鲤鱼汤',
@@ -1590,7 +1598,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	        xiajiao:'虾饺',
 	        xiajiao_info:'你在摸牌阶段额外摸一张牌，并在摸牌阶段时弃置一张牌，持续三回合',
 	        tanhuadong:'昙花冻',
-	        tanhuadong_info:'结束阶段，你有50%的机率摸一张牌，持续三回合',
+	        tanhuadong_info:'出牌阶段结束时，你摸一张牌，持续三回合',
 	        qingtuan:'青团',
 	        qingtuan_info:'你在回合内使用首张杀时摸一张牌，持续两回合',
 	        luyugeng:'鲈鱼羹',
@@ -1600,7 +1608,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	        molicha:'茉莉茶',
 	        molicha_info:'弃置判定区内的所有牌；你不能成为过河拆桥或延时锦囊牌的目标，持续五回合',
 	        mapodoufu:'麻婆豆腐',
-	        mapodoufu_info:'结束阶段，你有65%的机率弃置一名随机敌人的一张随机牌，持续三回合',
+	        mapodoufu_info:'结束阶段，你弃置一名随机敌人的一张随机牌，持续两回合',
 	    },
 	    list:[
 	        ['spade',2,'tanhuadong'],

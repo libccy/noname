@@ -13602,7 +13602,7 @@
 					if(num==undefined) return 0;
 					return num;
 				},
-				getStockSkills:function(unowned){
+				getStockSkills:function(unowned,unique){
 					var list=[];
 					if(lib.character[this.name]&&!this.isUnseen(0)){
 						list.addArray(lib.character[this.name][3]);
@@ -13615,6 +13615,14 @@
 							if(!this.hasSkill(list[i])){
 								list.splice(i--,1);
 							}
+						}
+					}
+					if(!unique){
+						for(var i=0;i<list.length;i++){
+							var info=lib.skill[list[i]];
+		                    if(!info||info.unique||info.temp||info.sub){
+								list.splice(i--,1);
+		                    }
 						}
 					}
 					return list;
