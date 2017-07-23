@@ -56,6 +56,78 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			huanshu:{
+				trigger:{player:'phaseEnd'},
+				direct:true,
+				filter:function(event,player){
+					return player.countCards('h')>0&&!player.hasSkill('huangshu2');
+				},
+				content:function(){
+					"step 0"
+					player.chooseCard(get.prompt2('huanshu')).ai=function(card){
+						return 6-get.value(card);
+					};
+					"step 1"
+					if(result.bool){
+						player.$give(result.cards,player);
+						player.logSkill('huanshu');
+						player.storage.huanshu2=result.cards[0];
+						player.lose(result.cards,ui.special);
+						player.addSkill('huanshu2');
+					}
+				},
+				ai:{
+					threaten:1.4
+				},
+			},
+			huanshu2:{
+				intro:{
+					content:function(storage,player){
+						if(player.isUnderControl(true)){
+							return '当一名敌方角色使用'+get.translation(get.color(storage))+'锦囊牌时，移去'+get.translation(storage)+'，取消锦囊的效果，并摸两张牌';
+						}
+						else{
+							return '当一名敌方角色使用与“幻术”牌颜色相同的锦囊牌时，移去“幻术”牌，取消锦囊的效果，并摸两张牌';
+						}
+					},
+					onunmark:function(storage,player){
+						if(storage){
+							storage.discard();
+							delete player.storage.huanshu2;
+						}
+					}
+				},
+				trigger:{global:'useCard'},
+				forced:true,
+				filter:function(event,player){
+					return player.getEnemies().contains(event.player)&&
+						get.type(event.card,'trick')=='trick'&&get.color(event.card)==get.color(player.storage.huanshu2);
+				},
+				mark:true,
+				content:function(){
+					'step 0'
+					game.delay(0.5);
+					player.addExpose(0.1);
+					trigger.player.addExpose(0.1);
+					'step 1'
+					player.showCards(player.storage.huanshu2,get.translation(player)+'发动了【幻术】');
+					'step 2'
+					player.removeSkill('huanshu2');
+					trigger.untrigger();
+					trigger.finish();
+					player.draw(2);
+				},
+				group:'huanshu3'
+			},
+			huanshu3:{
+				trigger:{player:'phaseBegin'},
+				forced:true,
+				content:function(){
+					player.$throw(player.storage.huanshu2);
+					game.log(player,'弃置了',player.storage.huanshu2);
+					player.removeSkill('huanshu2');
+				}
+			},
 			gwjieyin:{
 				group:'gwjieyin_reset',
 				init:function(player){
@@ -1884,7 +1956,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_aimin:'艾敏',
 
 			huanshu:'幻术',
-			huanshu_info:'结束阶段，你可以将一张手牌背面朝上置于你的武将牌上；当一名敌方角色使用一张与之颜色相同的普通锦囊牌时，你展示并移去此牌，取消锦囊的效果，然后摸两张牌；准备阶段，你移去武将牌上的“幻术”牌',
+			huanshu2:'幻术',
+			huanshu3:'幻术',
+			huanshu_info:'结束阶段，你可以将一张手牌背面朝上置于你的武将牌上；当一名敌方角色使用一张与之颜色相同的锦囊牌时，你展示并移去此牌，取消锦囊的效果，然后摸两张牌；准备阶段，你移去武将牌上的“幻术”牌',
 			gwjieyin:'结印',
 			gwjieyin_info:'出牌阶段，你可以视为使用瘟疫、燕子药水或昆恩法印（不能重复使用同一法术），技能两轮重置一次',
 			zhengjun:'整军',

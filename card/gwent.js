@@ -1197,6 +1197,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					var nongwu2=game.hasPlayer(function(current){
 						return get.attitude(player,current)<0&&get.attitude(player,current.getNext())<0&&get.attitude(player,current.getPrevious())<0;
 					});
+					var yanzi=game.hasPlayer(function(current){
+						return get.attitude(player,current)>0&&current.isMinHandcard();
+					});
     				player.chooseButton(dialog,true,function(button){
 						var name=button.link[2];
 						switch(name){
@@ -1214,6 +1217,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								if(aozu) return 1.2;
 								if(aozu3) return 0.2;
 								return 0;
+							case 'gw_yanziyaoshui':
+								if(yanzi) return 2;
+								return 0.6;
 						}
 						if(game.hasPlayer(function(current){
 							return player.canUse(name,current)&&get.effect(current,{name:name},player,player)>0;
@@ -1276,7 +1282,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					value:[7,1],
 					useful:[4,1],
 					result:{
-						target:-1.5
+						target:function(player,target){
+							return -2/Math.sqrt(1+target.hp);
+						}
 					},
 					order:1.2,
 				}
@@ -1322,7 +1330,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(target.needsToDiscard()) return -1;
 							if(target.needsToDiscard(1)) return -0.7;
 							if(target.needsToDiscard(2)) return -0.4;
-							return -0.1*num;
+							return -0.1;
 						}
 					},
 					order:1.2,

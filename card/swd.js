@@ -5206,8 +5206,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['club',13,'sadengjinhuan'],
 
 			['club',2,'lingjiandai'],
-			['spade',3,'lingjiandai'],
-			['heart',5,'lingjiandai'],
+			// ['spade',3,'lingjiandai'],
+			// ['heart',5,'lingjiandai'],
 			['diamond',8,'lingjiandai'],
 
 			['club',2,'jiguanshu'],
