@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-    '1.9.32',
+    '1.9.34',
     'image/background/huangtian_bg.jpg',
     'image/background/ol_bg.jpg',
     'image/background/september_bg.jpg',
@@ -400,6 +400,7 @@ window.noname_asset_list=[
     'image/character/gw_laduoweide.jpg',
     'image/character/gw_luobo.jpg',
     'image/character/gw_luoqi.jpg',
+    'image/character/gw_meizi.jpg',
     'image/character/gw_mieren.jpg',
     'image/character/gw_sanhanya.jpg',
     'image/character/gw_shanhu.jpg',

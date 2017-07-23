@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.9.33',
+    version:'1.9.34',
     update:'1.9.32',
     changeLog:[
         'bug修复',
@@ -15,6 +15,7 @@ window.noname_update={
         'card/gwent.js',
         'card/swd.js',
         // 'character/*',
+        'character/hearth.js',
         'character/extra.js',
         'character/gwent.js',
         'character/sp.js',

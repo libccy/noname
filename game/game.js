@@ -14193,19 +14193,7 @@
 							next.filterCard=get.filter(arguments[i]);
 						}
 						else if(typeof arguments[i]=='string'){
-							if(next.prompt){
-								next.prompt2=arguments[i];
-							}
-							else{
-								if(arguments[i].indexOf('###')==0){
-									var prompts=arguments[i].slice(3).split('###');
-									next.prompt=prompts[0];
-									next.prompt2=prompts[1];
-								}
-								else{
-									next.prompt=arguments[i];
-								}
-							}
+							get.evtprompt(next,arguments[i]);
 						}
                         if(arguments[i]===null){
                             for(var i=0;i<arguments.length;i++){
@@ -14391,19 +14379,7 @@
                             next.glow_result=true;
                         }
 						else if(typeof arguments[i]=='string'){
-							if(next.prompt){
-								next.prompt2=arguments[i];
-							}
-							else{
-								if(arguments[i].indexOf('###')==0){
-									var prompts=arguments[i].slice(3).split('###');
-									next.prompt=prompts[0];
-									next.prompt2=prompts[1];
-								}
-								else{
-									next.prompt=arguments[i];
-								}
-							}
+							get.evtprompt(next,arguments[i]);
 						}
 					}
 					if(next.filterCard==undefined) next.filterCard=lib.filter.all;
@@ -14435,19 +14411,7 @@
 							else next.filterTarget=arguments[i];
 						}
 						else if(typeof arguments[i]=='string'){
-							if(next.prompt){
-								next.prompt2=arguments[i];
-							}
-							else{
-								if(arguments[i].indexOf('###')==0){
-									var prompts=arguments[i].slice(3).split('###');
-									next.prompt=prompts[0];
-									next.prompt2=prompts[1];
-								}
-								else{
-									next.prompt=arguments[i];
-								}
-							}
+							get.evtprompt(next,arguments[i]);
 						}
 					}
 					if(next.filterTarget==undefined) next.filterTarget=lib.filter.all;
@@ -14559,19 +14523,7 @@
 							next.ai=arguments[i];
 						}
 						else if(typeof arguments[i]=='string'){
-							if(next.prompt){
-								next.prompt2=arguments[i];
-							}
-							else{
-								if(arguments[i].indexOf('###')==0){
-									var prompts=arguments[i].slice(3).split('###');
-									next.prompt=prompts[0];
-									next.prompt2=prompts[1];
-								}
-								else{
-									next.prompt=arguments[i];
-								}
-							}
+							get.evtprompt(next,arguments[i]);
 						}
 						else if(get.itemtype(arguments[i])=='dialog'){
 							next.dialog=arguments[i];
@@ -14828,19 +14780,7 @@
 							next.forced=arguments[i];
 						}
 						else if(typeof arguments[i]=='string'){
-							if(next.prompt){
-								next.prompt2=arguments[i];
-							}
-							else{
-								if(arguments[i].indexOf('###')==0){
-									var prompts=arguments[i].slice(3).split('###');
-									next.prompt=prompts[0];
-									next.prompt2=prompts[1];
-								}
-								else{
-									next.prompt=arguments[i];
-								}
-							}
+							get.evtprompt(next,arguments[i]);
 						}
 						else if(Array.isArray(arguments[i])){
 							for(var j=0;j<arguments[i].length;j++){
@@ -40601,6 +40541,21 @@
     			return false;
     		},
         },
+		evtprompt:function(next,str){
+			if(next.prompt){
+				next.prompt2=str;
+			}
+			else{
+				if(str.indexOf('###')==0){
+					var prompts=str.slice(3).split('###');
+					if(prompts[0]) next.prompt=prompts[0];
+					if(prompts[1]) next.prompt2=prompts[1];
+				}
+				else{
+					next.prompt=str;
+				}
+			}
+		},
 		autoViewAs:function(card,cards){
 			var info=get.info(card);
 			if(info.autoViewAs){

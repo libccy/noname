@@ -4557,7 +4557,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			mod:{
     				targetEnabled:function(card,player,target,now){
     					if(player!=target){
-    						if(get.type(card)=='trick') return false;
+    						if(get.type(card,'trick')=='trick') return false;
     					}
     				}
     			}
@@ -7779,7 +7779,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		luoshi:'落石',
     		luoshi_info:'锁定技，每当你受到一次伤害，你与伤害来源各随机弃置一张牌',
     		moyao:'魔曜',
-    		moyao_info:'锁定技，你不能成为其他角色的普通锦囊牌的目标',
+    		moyao_info:'锁定技，你不能成为其他角色的锦囊牌的目标',
     		jiaohui:'教诲',
     		jiaohui_info:'结束阶段，若你没有于本回合内造成伤害，你可以令一名角色摸一张牌或回复一点体力',
     		chenshui:'沉睡',

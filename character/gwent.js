@@ -38,6 +38,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_shanhu:['female','qun',3,['shuijian']],
 			gw_zhangyujushou:['male','wu',4,['gwjushi']],
 			gw_zhuoertan:['male','wu',3,['hupeng']],
+
+			gw_meizi:['female','wei',3,['gwjieyin']],
 		},
 		characterIntro:{
 			gw_huoge:'那个老年痴呆?不知道他是活着还是已经被制成标本了!',
@@ -53,6 +55,95 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			gwjieyin:{
+				group:'gwjieyin_reset',
+				init:function(player){
+					player.storage.gwjieyin=[];
+				},
+				enable:'phaseUse',
+				filter:function(event,player){
+					return player.storage.gwjieyin.length<3;
+				},
+				chooseButton:{
+    				dialog:function(event,player){
+    					return ui.create.dialog('结印',[[['','','gw_wenyi'],['','','gw_yanziyaoshui'],['','','gw_kunenfayin']],'vcard'],'hidden');
+    				},
+					filter:function(button,player){
+						if(player.storage.gwjieyin.contains(button.link[2])){
+							return false;
+						}
+						return true;
+					},
+					check:function(button){
+						var player=_status.event.player;
+						if(button.link[2]=='gw_yanziyaoshui'){
+							if(game.hasPlayer(function(current){
+								return get.attitude(player,current)>1&&current.isMinHandcard();
+							})){
+								return 3;
+							}
+							else if((game.roundNumber-player.storage.gwjieyin_round)%2==0){
+								return 0;
+							}
+							else{
+								return 0.5;
+							}
+						}
+						else if(button.link[2]=='gw_wenyi'){
+							if(game.countPlayer(function(current){
+								if(current.isMinHp()&&current.countCards('he')){
+									return -get.sgn(get.attitude(player,current));
+								}
+							})>0){
+								return 2;
+							}
+							else{
+								return 0;
+							}
+						}
+						else{
+							return 1;
+						}
+					},
+    				backup:function(links,player){
+    					return {
+    						filterCard:function(){return false},
+    						selectCard:-1,
+    						viewAs:{name:links[0][2]},
+    						popname:true,
+    						onuse:function(result,player){
+								player.logSkill('gwjieyin');
+								player.storage.gwjieyin.add(result.card.name);
+    						}
+    					}
+    				},
+    				prompt:function(links,player){
+    					return '选择'+get.translation(links[0][2])+'的目标';
+    				}
+    			},
+				subSkill:{
+					reset:{
+						trigger:{player:'phaseBegin'},
+						silent:true,
+						content:function(){
+							if(typeof player.storage.gwjieyin_round=='number'){
+								if((game.roundNumber-player.storage.gwjieyin_round)%2==0){
+									player.storage.gwjieyin.length=0;
+								}
+							}
+							else{
+								player.storage.gwjieyin_round=game.roundNumber;
+							}
+						}
+					}
+				},
+				ai:{
+					order:6,
+					result:{
+						player:1
+					}
+				}
+			},
 			zhengjun:{
 				init:function(player){
 					player.storage.zhengjun=[];
@@ -1788,7 +1879,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_shanhu:'珊瑚',
 			gw_zhangyujushou:'章鱼巨兽',
 			gw_zhuoertan:'卓尔坦',
+			gw_meizi:'梅兹',
 
+			gwjieyin:'结印',
+			gwjieyin_info:'出牌阶段，你可以视为使用瘟疫、燕子药水或昆恩法印（不能重复使用同一法术），技能两轮重置一次',
 			zhengjun:'整军',
 			zhengjun_info:'结束阶段，你可以观看牌堆顶的X张牌并获得其中一张，X为你在本局游戏中累计使用或打出过至少两张同名牌的牌数；每当X的值增加，你增加一点体力和体力上限',
 			gwxuezhan:'血战',
