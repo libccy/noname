@@ -43175,7 +43175,14 @@
 			if(!from||!to) return 0;
 			var att=get.rawAttitude.apply(this,arguments);
 			if(from.isMad()) att=-att;
-			if(to.isMad()&&att>0) att=0;
+			if(to.isMad()&&att>0){
+				if(to.identity=='zhu'){
+					att=1;
+				}
+				else{
+					att=0;
+				}
+			}
 			if(!_status.tempnofake){
 				_status.tempnofake=true;
 				if(from.ai.modAttitudeFrom){

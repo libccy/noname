@@ -779,6 +779,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target.popup(skill);
 						player.addSkill(skill);
 						target.removeSkill(skill);
+						player.loseHp();
 						player.loseMaxHp(true);
 						target.gainMaxHp(true);
 						target.recover();
@@ -794,7 +795,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					value:8,
 					useful:[6,1],
 					result:{
-						player:1
+						player:function(player){
+							if(player.hp<=2) return 0;
+							return 1;
+						}
 					},
 					order:0.4,
 				}
@@ -1320,7 +1324,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				selectTarget:[1,2],
 				content:function(){
-					target.addSkill('gw_baobaoshu');
+					target.addTempSkill('gw_baobaoshu',{player:'phaseAfter'});
 				},
 				ai:{
 					value:[7.5,1],

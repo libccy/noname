@@ -1770,7 +1770,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 							if(card){
 								if(game.hasPlayer(function(current){
-									return (get.attitude(target,current)<0&&
+									return (!current.hujia&&
+										get.attitude(target,current)<0&&
 										target.canUse(card,current,true,true)&&
 										get.effect(current,card,target)>0);
 								})){

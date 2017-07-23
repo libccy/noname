@@ -58,6 +58,7 @@ window.noname_character_rank={
     a:[
         'gw_meizi',
         'gw_aimin',
+        'gw_puxila',
         'gw_bulanwang',
         'gw_kaxier',
         'gw_zhangyujushou',

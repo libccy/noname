@@ -4128,6 +4128,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     							if(player.storage.huomo.tao&&player.storage.huomo.jiu) return false;
     						}
     					}
+                        else{
+                            return false;
+                        }
     				},
     				result:{
     					player:1

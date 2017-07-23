@@ -403,6 +403,7 @@ window.noname_asset_list=[
     'image/character/gw_luoqi.jpg',
     'image/character/gw_meizi.jpg',
     'image/character/gw_mieren.jpg',
+    'image/character/gw_puxila.jpg',
     'image/character/gw_sanhanya.jpg',
     'image/character/gw_shanhu.jpg',
     'image/character/gw_telisi.jpg',

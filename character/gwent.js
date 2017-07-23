@@ -41,6 +41,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			gw_meizi:['female','wei',3,['gwjieyin']],
 			gw_aimin:['female','wu',3,['huanshu']],
+			gw_puxila:['female','qun',3,['gwqinwu']],
 		},
 		characterIntro:{
 			gw_huoge:'那个老年痴呆?不知道他是活着还是已经被制成标本了!',
@@ -56,6 +57,47 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			gwqinwu:{
+				trigger:{player:'useCard'},
+				filter:function(event,player){
+					return get.type(event.card)=='basic';
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('gwqinwu')).ai=function(target){
+						var att=get.attitude(player,target);
+						if(att<=0) return 0;
+						att+=1-get.distance(player,target,'absolute')/game.players.length;
+						if(target.hasSkill('gwqinwu')){
+							att/=1.5;
+						}
+						if(target.hasJudge('lebu')||target.skipList.contains('phaseUse')){
+							att/=2;
+						}
+						return att;
+					}
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('gwqinwu',target);
+						target.draw();
+						if(!target.hasSkill('gwqinwu')){
+							target.addTempSkill('gwqinwu',{player:'phaseAfter'});
+							target.addTempSkill('gwqinwu2',{player:'phaseAfter'});
+						}
+					}
+				},
+				ai:{
+					threaten:1.5
+				}
+			},
+			gwqinwu2:{
+				mark:true,
+				intro:{
+					content:'获得【琴舞】直到下一回合结束'
+				}
+			},
 			huanshu:{
 				trigger:{player:'phaseEnd'},
 				direct:true,
@@ -1583,8 +1625,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					next.prompt=get.prompt('xuezhou');
 					next.choiceList=[
-						'每当一名其他角色受到一次伤害，该角色失去一点体力，你回复一点体力',
-						'每当一名其他角色造成一次伤害，该角色失去一点体力，你（若不是受伤害角色）回复一点体力'
+						'每当一名其他角色在一个回合中首次受到伤害，该角色失去一点体力，你回复一点体力',
+						'每当一名其他角色在一个回合中首次造成伤害，该角色失去一点体力，你（若不是受伤害角色）回复一点体力'
 					];
 					'step 1'
 					if(result.control=='cancel2'){
@@ -1610,6 +1652,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!_status.xuezhou) return false;
 					if(player==_status.xuezhou) return false;
 					if(!player.isIn()||!_status.xuezhou.isIn()) return false;
+					if(_status.currentPhase.hasSkill('xuezhou_hp2')) return false;
 					switch(_status.xuezhou.storage.xuezhou){
 						case 1:return player==event.player;
 						case 2:return player==event.source;
@@ -1620,6 +1663,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					game.delayx();
+					_status.currentPhase.addTempSkill('xuezhou_hp2');
 					'step 1'
 					_status.xuezhou.logSkill('xuezhou',player);
 					player.loseHp();
@@ -1628,6 +1672,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			xuezhou_hp2:{},
 			fayin:{
 				trigger:{player:'shaBegin'},
 				direct:true,
@@ -1954,7 +1999,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_zhuoertan:'卓尔坦',
 			gw_meizi:'梅兹',
 			gw_aimin:'艾敏',
+			gw_puxila:'普希拉',
 
+			gwqinwu:'琴舞',
+			gwqinwu2:'琴舞',
+			gwqinwu_info:'每当你使用一张基本牌，你可以令一名角色摸一张牌并获得技能【琴舞】直到其下一回合结束',
 			huanshu:'幻术',
 			huanshu2:'幻术',
 			huanshu3:'幻术',
@@ -2016,7 +2065,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huandie:'幻蝶',
 			huandie_info:'准备阶段，你可以摸一张牌，并令任意名其他角色摸两张牌，若如此做，此回合结束时，所有手牌数大于体力值的角色需弃置两张手牌',
 			xuezhou:'血咒',
-			xuezhou_info:'准备阶段，你可以选择一项效果直到下一回合开始：1. 每当一名其他角色受到一次伤害，该角色失去一点体力，你回复一点体力；2. 每当一名其他角色造成一次伤害，该角色失去一点体力，你（若不是受伤害角色）回复一点体力',
+			xuezhou_info:'准备阶段，你可以选择一项效果直到下一回合开始：1. 每当一名其他角色在一个回合中首次受到伤害，该角色失去一点体力，你回复一点体力；2. 每当一名其他角色在一个回合中首次造成伤害，该角色失去一点体力，你（若不是受伤害角色）回复一点体力',
 			fayin:'法印',
 			fayin_info:'每当你使用一张杀，你可以弃置一张牌并获得一个随机法印效果：1. 目标随机弃置两张牌；2. 目标进入混乱状态直到下一回合开始；3. 对目标造成一点火属性伤害；4. 获得一点护甲；5. 令目标翻面并摸一张牌',
 			gwbaquan:'霸权',
