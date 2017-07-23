@@ -768,59 +768,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else{
-						if(!card.expired){
-							var target=player.next;
-							for(var iwhile=0;iwhile<10;iwhile++){
-								if(target.hasJudge('hongshui')){
-									target=target.next;
-								}
-								else{
-									break;
-								}
-							}
-							if(target.hasJudge('hongshui')||target==player){
-								ui.discardPile.appendChild(card);
-							}
-							else{
-								if(card.name!='hongshui'){
-									target.addJudge('hongshui',card);
-								}
-								else{
-									target.addJudge(card);
-								}
-							}
-						}
-						else{
-							card.expired=false;
-						}
+						player.addJudgeNext(card);
 					}
 				},
 				cancel:function(){
-					if(!card.expired){
-						var target=player.next;
-						for(var iwhile=0;iwhile<10;iwhile++){
-							if(target.hasJudge('hongshui')){
-								target=target.next;
-							}
-							else{
-								break;
-							}
-						}
-						if(target.hasJudge('hongshui')||target==player){
-							ui.discardPile.appendChild(card);
-						}
-						else{
-							if(card.name!='hongshui'){
-								target.addJudge('hongshui',card);
-							}
-							else{
-								target.addJudge(card);
-							}
-						}
-					}
-					else{
-						card.expired=false;
-					}
+					player.addJudgeNext(card);
 				},
 				ai:{
 					basic:{

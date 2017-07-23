@@ -54,6 +54,7 @@ window.noname_character_rank={
         'hs_aya',
         'hs_tyrande',
         'swd_shuwaner',
+        'pal_yueqi',
     ],
     a:[
         'gw_meizi',
@@ -70,7 +71,6 @@ window.noname_character_rank={
         'gw_zhuoertan',
         'gw_gaier',
         'pal_mingxiu',
-        'pal_yueqi',
         'pal_luozhaoyan',
         'pal_xia',
         'hs_yashaji',

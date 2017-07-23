@@ -5753,7 +5753,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			filter:function(event,player){
     				if(!player.countCards('h',{suit:'spade'})) return false;
     				return !game.hasPlayer(function(current){
-    					return current.hasJudge('shandian');
+    					return current.hasJudge('fulei');
     				});
     			},
     			forced:true,
@@ -5761,22 +5761,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return false;
     			},
     			content:function(){
-    				'step 0'
-    				var card=get.cardPile('shandian',true);
-    				if(card){
-    					player.addJudge(card);
-    					player.$draw(card);
-    					game.delay();
-    				}
-    				else{
-    					event.finish();
-    				}
-    				'step 1'
-    				game.delay();
+    				var card=game.createCard('fulei');
+					player.addJudge(card);
+					player.$draw(card);
+					game.delay(2);
     			},
     			ai:{
     				threaten:1.5
-    			}
+    			},
+                group:'zuzhou_remove',
+                subSkill:{
+                    remove:{
+                        trigger:{global:'damageEnd'},
+                        filter:function(event,player){
+                            return event.card&&event.card.name=='fulei';
+                        },
+                        forced:true,
+                        content:function(){
+                            trigger.card.expired=true;
+                            game.log(trigger.card,'被移去');
+                        }
+                    }
+                }
     		},
     		mdzhoufu:{
     			enable:'phaseUse',
@@ -5798,7 +5804,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				ui.special.appendChild(cards[0]);
     			},
     			check:function(card){
-    				if(get.suit(card)=='spade'&&card.number>=2&&card.number<=9){
+    				if(get.suit(card)=='spade'){
     					return 6-get.value(card);
     				}
     				return -1;
@@ -7897,7 +7903,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		mdzhoufu2:'缚魂',
     		mdzhoufu_info:'出牌阶段，你可以将一张黑色手牌置于一名其他角色的武将牌上，在其判定时以此牌作为判定结果，然后你获得亮出的判定牌',
     		zuzhou:'诅咒',
-    		zuzhou_info:'锁定技，准备阶段，若场上没有闪电且你手牌中有黑桃牌，你将牌堆中的一张闪电置于你的判定区',
+    		zuzhou_info:'锁定技，准备阶段，若场上没有浮雷且你手牌中有黑桃牌，你将牌堆中的一张浮雷置于你的判定区；当一名角色受到浮雷伤害时，你移去此浮雷',
     		zuzhou_old_info:'每当你造成或受到一次伤害，你可以令伤害目标或来源进行一次判定，若结果为黑色，其流失一点体力',
     		jingxiang:'镜像',
     		jingxiang_info:'每回合限一次，当你需要打出卡牌时，你可以观看一名角色的手牌并将其视为你的手牌打出',

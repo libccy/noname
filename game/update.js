@@ -23,6 +23,7 @@ window.noname_update={
         'character/swd.js',
         'character/rank.js',
         'character/yijiang.js',
+        'character/xianjian.js',
         // 'mode/identity.js',
         // 'mode/guozhan.js',
         // 'mode/versus.js',

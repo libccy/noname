@@ -869,13 +869,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tianwu:{
 				trigger:{player:'useCardToBegin'},
 				filter:function(event,player){
+					if(get.is.altered('tianwu')&&player.hasSkill('tianwu2')) return false;
 					return event.targets&&event.targets.length==1&&player.getEnemies().contains(event.target);
 				},
+				alter:true,
 				frequent:true,
 				content:function(){
 					trigger.target.getDebuff();
+					player.addTempSkill('tianwu2');
 				}
 			},
+			tianwu2:{},
 			shiying:{
     			trigger:{global:'dieBefore'},
 				skillAnimation:'epic',
@@ -4284,6 +4288,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chengxin_info:'每四轮限一次，当一名角色进入濒死状态时，你可以令其将体力值回复至1，然后该角色防止一切伤害直到下一回合结束',
 			tianwu:'天舞',
 			tianwu_info:'每当你使用卡牌指定一名敌方角色为惟一目标，你可以对其施加一个随机的负面效果',
+			tianwu_info_alter:'每当你使用卡牌指定一名敌方角色为惟一目标，你可以对其施加一个随机的负面效果，每回合限发动一次',
 			liguang:'离光',
 			liguang_info:'结束阶段，你可以弃置一张手牌并将场上的一张牌移动到另一个合理的位置',
 			shiying:'逝影',

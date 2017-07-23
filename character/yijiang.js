@@ -5785,11 +5785,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					game.delay(2);
     					trigger.player.$give(result.links[0],player);
     					player.equip(result.links[0]);
+                        player.addExpose(0.2);
     				}
     			},
-    			ai:{
-    				expose:0.1
-    			}
     		},
     		qieting2:{
     			trigger:{player:'useCard'},
