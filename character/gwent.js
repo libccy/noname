@@ -42,6 +42,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_meizi:['female','wei',3,['gwjieyin']],
 			gw_aimin:['female','wu',3,['huanshu']],
 			gw_puxila:['female','qun',3,['gwqinwu']],
+
+			gw_xigedelifa:['female','qun',3,['gwfusheng']],
+			gw_laomaotou:['male','qun',4,[]],
+			gw_qigaiwang:['male','qun',3,[]],
 		},
 		characterIntro:{
 			gw_huoge:'那个老年痴呆?不知道他是活着还是已经被制成标本了!',
@@ -57,6 +61,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			gwfusheng:{
+                enable:'chooseToUse',
+    			filter:function(event,player){
+    				return event.type=='dying'&&event.dying&&!event.dying.isTurnedOver();
+    			},
+    			filterTarget:function(card,player,target){
+    				return target==_status.event.dying;
+    			},
+    			selectTarget:-1,
+    			content:function(){
+					target.turnOver();
+    				target.recover();
+    				player.draw();
+    			},
+    			ai:{
+    				order:0.1,
+    				skillTagFilter:function(player){
+    					if(!_status.event.dying||_status.event.dying.isTurnedOver()) return false;
+    				},
+    				save:true,
+    				result:{
+    					target:3
+    				},
+    				threaten:1.6
+    			},
+            },
 			gwqinwu:{
 				trigger:{player:'useCard'},
 				filter:function(event,player){
@@ -2003,6 +2033,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_aimin:'艾敏',
 			gw_puxila:'普希拉',
 
+			gw_xigedelifa:'希格德莉法',
+			gw_laomaotou:'毛矛头',
+			gw_laomaotou2:'毛矛头',
+			gw_qigaiwang:'乞丐王',
+
+			gwfusheng:'复生',
+			gwfusheng_info:'在当一名未翻面角色的濒死状态，你可以令其翻面并回复一点体力，然后你摸一张牌',
 			gwqinwu:'琴舞',
 			gwqinwu2:'琴舞',
 			gwqinwu_info:'每当你使用一张基本牌，你可以令一名角色摸一张牌并获得技能【琴舞】直到其下一回合结束',

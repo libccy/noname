@@ -8165,7 +8165,7 @@
 				ui.arena.classList.remove('selecting');
 			},
             p:function(name,i,skin){
-                var list=['swd','hs','pal','gjqt','ow'];
+                var list=['swd','hs','pal','gjqt','ow','gw'];
                 if(!lib.character[name]){
                     for(var j=0;j<list.length;j++){
                         if(lib.character[list[j]+'_'+name]){
