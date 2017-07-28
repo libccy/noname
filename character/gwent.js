@@ -44,8 +44,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_puxila:['female','qun',3,['gwqinwu']],
 
 			gw_xigedelifa:['female','qun',3,['gwfusheng']],
-			gw_laomaotou:['male','qun',4,[]],
-			gw_qigaiwang:['male','qun',3,[]],
+			// gw_laomaotou:['male','qun',4,[]],
+			gw_qigaiwang:['male','qun',4,['julian']],
 		},
 		characterIntro:{
 			gw_huoge:'那个老年痴呆?不知道他是活着还是已经被制成标本了!',
@@ -61,6 +61,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			julian:{
+				trigger:{player:'phaseUseBegin'},
+				frequent:true,
+				filter:function(event,player){
+					return !player.isMaxHandcard();
+				},
+				content:function(){
+					var num=0;
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i]!=player){
+							num=Math.max(num,game.players[i].countCards('h'));
+						}
+					}
+					var dh=num-player.countCards('h');
+					if(dh>0){
+						player.draw(dh);
+					}
+				}
+			},
 			gwfusheng:{
                 enable:'chooseToUse',
     			filter:function(event,player){
@@ -73,7 +92,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			content:function(){
 					target.turnOver();
     				target.recover();
-    				player.draw();
+					if(player!=target){
+						game.asyncDraw([player,target]);
+					}
+    				else{
+						player.draw();
+					}
     			},
     			ai:{
     				order:0.1,
@@ -2038,8 +2062,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_laomaotou2:'毛矛头',
 			gw_qigaiwang:'乞丐王',
 
+			test:'每当你使用一张牌，你随机重铸一张手牌',
+			gwchenshui:'沉睡',
+			gwchenshui_info:'锁定技，你防止即将造成或受到的伤害，改为令伤害来随机源获得对方一张牌；结束阶段，若你自上次沉睡起累计发动了至少3次沉睡效果，你解除沉睡状态，对所有敌方角色造成一点伤害，然后切换至觉醒状态',
+			gwliedi:'裂地',
+			gwliedi_info:'锁定技，你对其他角色造成的伤害+X，X为你到该角色距离的一半，向上取整；结束阶段，若你连续两轮未造成伤害，你切换至沉睡状态',
+			julian:'巨敛',
+			julian_info:'出牌阶段开始时，你可以摸若干张牌直到你的手牌数为全场最多或之一',
 			gwfusheng:'复生',
-			gwfusheng_info:'在当一名未翻面角色的濒死状态，你可以令其翻面并回复一点体力，然后你摸一张牌',
+			gwfusheng_info:'当一名未翻面的角色进入濒死状态时，你可以令其翻面并回复一点体力，然后你与其各摸一张牌（目标为自己时只摸一张）',
 			gwqinwu:'琴舞',
 			gwqinwu2:'琴舞',
 			gwqinwu_info:'每当你使用一张基本牌，你可以令一名角色摸一张牌并获得技能【琴舞】直到其下一回合结束',

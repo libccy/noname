@@ -38,7 +38,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_bolvar:['male','wei',4,['yuanzheng','bzhuiji']],
     		hs_fuding:['male','wei',4,['shengdun','fbeifa']],
     		hs_xuanzhuanjijia:['male','shu',2,['jixuan']],
-    		hs_ysera:['female','wu',4,['chenshui']],
+    		hs_ysera:['female','wu',4,['bimeng']],
     		hs_alextrasza:['female','shu',5,['fushi']],
     		hs_nozdormu:['male','qun',5,['shixu']],
     		hs_sapphiron:['male','wei',4,['bingdong','stuxi']],
@@ -4586,7 +4586,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     			},
     		},
-    		chenshui:{
+    		bimeng:{
     			trigger:{player:'phaseEnd'},
     			frequent:true,
     			content:function(){
@@ -7788,8 +7788,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		moyao_info:'锁定技，你不能成为其他角色的锦囊牌的目标',
     		jiaohui:'教诲',
     		jiaohui_info:'结束阶段，若你没有于本回合内造成伤害，你可以令一名角色摸一张牌或回复一点体力',
-    		chenshui:'沉睡',
-    		chenshui_info:'结束阶段，你可以将一张随机梦境牌加入你的手牌',
+    		bimeng:'碧梦',
+    		bimeng_info:'结束阶段，你可以将一张随机梦境牌加入你的手牌',
     		hsmengjing:'梦境',
     		hsmengjing_card_config:'梦境',
     		hsmengjing_feicuiyoulong:'翡翠幼龙',
