@@ -44,7 +44,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_puxila:['female','qun',3,['gwqinwu']],
 
 			gw_xigedelifa:['female','qun',3,['gwfusheng']],
-			// gw_laomaotou:['male','qun',4,[]],
+			// gw_laomaotou:['male','qun',4,['gwchenshui']],
 			gw_qigaiwang:['male','qun',4,['julian']],
 		},
 		characterIntro:{
@@ -61,6 +61,69 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			gwchenshui:{
+				trigger:{player:'damageBefore',source:'damageBefore'},
+				forced:true,
+				init:function(player){
+					player.storage.gwchenshui=0;
+				},
+				mark:true,
+				intro:{
+					content:function(storage){
+						if(!storage){
+							return '未发动过沉睡效果';
+						}
+						else{
+							return '累计发动过'+storage+'次沉睡效果';
+						}
+					}
+				},
+				logTarget:function(event,player){
+					if(player==event.source) return event.player;
+					return event.source;
+				},
+				content:function(){
+					trigger.untrigger();
+					trigger.finish();
+					player.storage.gwchenshui++;
+					player.updateMarks();
+					if(trigger.source!=trigger.player&&trigger.source.isIn()&&trigger.player.isIn()){
+						var cards=trigger.player.getCards('he');
+						if(cards.length){
+							trigger.player.give(cards.randomGet(),trigger.source);
+						}
+					}
+				},
+				onremove:true,
+				group:'gwchenshui_juexing',
+				subSkill:{
+					juexing:{
+						trigger:{player:'phaseEnd'},
+						filter:function(event,player){
+							return player.storage.gwchenshui>=3;
+						},
+						skillAnimation:true,
+						animationStr:'觉醒',
+						forced:true,
+						content:function(){
+							'step 0'
+							player.removeSkill('gwchenshui');
+							player.addSkill('gwliedi');
+							event.list=player.getEnemies().sortBySeat();
+							'step 1'
+							if(event.list.length){
+								var target=event.list.shift();
+								player.line(target,'green');
+								target.damage();
+								event.redo();
+							}
+						}
+					}
+				}
+			},
+			gwliedi:{
+
+			},
 			julian:{
 				trigger:{player:'phaseUseBegin'},
 				frequent:true,
@@ -2064,6 +2127,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			test:'每当你使用一张牌，你随机重铸一张手牌',
 			gwchenshui:'沉睡',
+			gwchenshui_bg:'睡',
 			gwchenshui_info:'锁定技，你防止即将造成或受到的伤害，改为令伤害来随机源获得对方一张牌；结束阶段，若你自上次沉睡起累计发动了至少3次沉睡效果，你解除沉睡状态，对所有敌方角色造成一点伤害，然后切换至觉醒状态',
 			gwliedi:'裂地',
 			gwliedi_info:'锁定技，你对其他角色造成的伤害+X，X为你到该角色距离的一半，向上取整；结束阶段，若你连续两轮未造成伤害，你切换至沉睡状态',

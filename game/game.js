@@ -15194,6 +15194,9 @@
 				give:function(cards,target){
 					var shown=[],hidden=[];
 					var hs=this.getCards('h');
+					if(get.itemtype(cards)=='card'){
+						cards=[cards];
+					}
 					for(var i=0;i<cards.length;i++){
 						if(hs.contains(cards[i])){
 							hidden.push(cards[i]);
