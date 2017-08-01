@@ -1244,10 +1244,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
     				};
     				'step 1'
 					var fakecard=game.createCard(result.links[0][2]);
+					var info=get.info(fakecard);
 					event.fakecard=fakecard;
-					if(get.info(fakecard).notarget){
+					if(info.notarget){
 						player.useCard(fakecard);
 						event.finish();
+					}
+					else if(info.selectTarget==-1){
+						player.useCard(fakecard,game.filterPlayer(function(current){
+							return player.canUse(fakecard,current);
+						}).sortBySeat());
 					}
 					else{
 						player.chooseTarget('选择'+get.translation(fakecard)+'的目标',function(card,player,target){

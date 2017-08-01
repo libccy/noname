@@ -44,7 +44,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_puxila:['female','qun',3,['gwqinwu']],
 
 			gw_xigedelifa:['female','qun',3,['gwfusheng']],
-			// gw_laomaotou:['male','qun',4,['gwchenshui']],
+			gw_laomaotou:['male','qun',4,['gwchenshui']],
 			gw_qigaiwang:['male','qun',4,['julian']],
 		},
 		characterIntro:{
@@ -108,7 +108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							'step 0'
 							player.removeSkill('gwchenshui');
-							player.addSkill('gwliedi');
+							player.setAvatar('gw_laomaotou','gw_laomaotou2');
 							event.list=player.getEnemies().sortBySeat();
 							'step 1'
 							if(event.list.length){
@@ -117,12 +117,66 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								target.damage();
 								event.redo();
 							}
+							'step 2'
+							player.addSkill('gwliedi');
+						}
+					}
+				},
+				ai:{
+					threaten:0.6,
+					effect:{
+						target:function(card,player,target){
+							if(get.tag(card,'damage')){
+								if(player.hasSkillTag('jueqing',false,target)) return;
+								if(!target.countCards('he')) return 'zeroplayertarget';
+							}
 						}
 					}
 				}
 			},
 			gwliedi:{
-
+				trigger:{source:'damageBegin'},
+				forced:true,
+				filter:function(event,player){
+					return event.player!=player&&player.distanceTo(event.player)>=2;
+				},
+				content:function(){
+					trigger.num+=Math.floor(Math.max(1,player.distanceTo(trigger.player))/2);
+				},
+				group:['gwliedi_sleep','gwliedi_damage'],
+				onremove:true,
+				subSkill:{
+					damage:{
+						trigger:{source:'damageEnd'},
+						silent:true,
+						filter:function(event,player){
+							return event.player!=player;
+						},
+						content:function(){
+							player.storage.gwliedi=-1;
+						},
+					},
+					sleep:{
+						trigger:{player:'phaseEnd'},
+						silent:true,
+						content:function(){
+							if(player.storage.gwliedi!=1){
+								if(player.storage.gwliedi==-1){
+									player.storage.gwliedi=0;
+								}
+								else{
+									player.storage.gwliedi=1;
+								}
+							}
+							else{
+								player.logSkill('gwliedi');
+								player.addSkill('gwchenshui');
+								player.removeSkill('gwliedi');
+								player.setAvatar('gw_laomaotou','gw_laomaotou');
+							}
+						}
+					}
+				}
 			},
 			julian:{
 				trigger:{player:'phaseUseBegin'},
@@ -2130,7 +2184,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwchenshui_bg:'睡',
 			gwchenshui_info:'锁定技，你防止即将造成或受到的伤害，改为令伤害来随机源获得对方一张牌；结束阶段，若你自上次沉睡起累计发动了至少3次沉睡效果，你解除沉睡状态，对所有敌方角色造成一点伤害，然后切换至觉醒状态',
 			gwliedi:'裂地',
-			gwliedi_info:'锁定技，你对其他角色造成的伤害+X，X为你到该角色距离的一半，向上取整；结束阶段，若你连续两轮未造成伤害，你切换至沉睡状态',
+			gwliedi_info:'锁定技，你造成的伤害+X，X为你到该角色距离的一半，向下取整；结束阶段，若你连续两轮未造成伤害，你切换至沉睡状态',
 			julian:'巨敛',
 			julian_info:'出牌阶段开始时，你可以摸若干张牌直到你的手牌数为全场最多或之一',
 			gwfusheng:'复生',
