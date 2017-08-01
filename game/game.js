@@ -8078,25 +8078,25 @@
 						}
 					}
 					if(list.length){
-						var str=list[0];
-						gl(str,function(folders,files){
-							if(files.length>1){
-								for(var i=0;i<files.length;i++){
-									if(files[i].indexOf('extension.js')!=-1){
-										files.splice(i--,1);
-									}
-									else{
-										if(i%5==0){
-											str+='\n\t\t\t';
+						for(var i=0;i<list.length;i++){
+							(function(str){
+								gl(str,function(folders,files){
+									if(files.length>1){
+										for(var i=0;i<files.length;i++){
+											if(files[i].indexOf('extension.js')!=-1){
+												files.splice(i--,1);
+											}
+											else{
+												if(i%5==0){
+													str+='\n\t\t\t';
+												}
+												str+='"'+files[i]+'",';
+											}
 										}
-										str+='"'+files[i]+'",';
+										console.log(str.slice(0,str.length-1));
 									}
-								}
-								console.log(str.slice(0,str.length-1));
-							}
-						});
-						for(var i=1;i<list.length;i++){
-							get.extensionPackage(list[i]);
+								});
+							}(list[i]));
 						}
 					}
 				});

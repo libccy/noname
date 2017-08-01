@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.9.33.2',
+    version:'1.9.34',
     update:'1.9.33.1',
     changeLog:[
         'bug修复',
@@ -7,7 +7,7 @@ window.noname_update={
     files:[
         'game/game.js',
         // 'game/package.js',
-        // 'game/config.js',
+        'game/config.js',
         // 'game/source.js',
         // 'game/pressure.js',
         'game/asset.js',
