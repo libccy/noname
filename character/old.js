@@ -253,7 +253,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                return false;
 	            },
 	            filter:function(event,player){
-	                return event.card&&event.card.name=='sha'&&(get.color(event.card)=='red'||event.player.hasSkill('jiu'));
+	                return event.card&&event.card.name=='sha'&&(get.color(event.card)=='red'||event.source.hasSkill('jiu'));
 	            },
 	            content:function(){
 	                player.loseMaxHp();

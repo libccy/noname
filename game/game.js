@@ -33041,7 +33041,7 @@
                             }
 
                             var loading=ui.create.div('.loading.config.toggle','载入中...',page);
-							lib.init.js(extensionURL.replace(/raw\.githubusercontent\.com/,'rawgit.com')+'package.js',null,function(){
+							var loaded=function(list){
 								var list=window.noname_extension_list;
 								delete window.noname_extension_list;
 								loading.style.display='none';
@@ -33094,9 +33094,29 @@
 										download.link=list[i].netdisk;
 									}
 								}
-							},function(){
-								loading.innerHTML='连接失败';
-							});
+							};
+							if(game.download){
+								lib.init.req(extensionURL+'package.js',function(){
+									try{
+										eval(this.responseText);
+										if(!window.noname_extension_list){
+											throw('err');
+										}
+									}
+									catch(e){
+										loading.innerHTML='连接失败';
+										return;
+									}
+									loaded();
+								},function(){
+									loading.innerHTML='连接失败';
+								});
+							}
+							else{
+								lib.init.js(extensionURL.replace(/raw\.githubusercontent\.com/,'rawgit.com')+'package.js',null,loaded,function(){
+									loading.innerHTML='连接失败';
+								});
+							}
                         };
                     }());
 					var active=start.firstChild.querySelector('.active');
@@ -42478,7 +42498,14 @@
 						td.innerHTML='-';
 					}
 					else{
-						td.innerHTML=get.numStr(Math.max(1,game.me.distanceTo(node)));
+						var dist1=get.numStr(Math.max(1,game.me.distanceTo(node)));
+						var dist2=get.numStr(Math.max(1,node.distanceTo(game.me)));
+						if(dist1==dist2){
+							td.innerHTML=dist1;
+						}
+						else{
+							td.innerHTML=dist1+'/'+dist2;
+						}
 					}
 					tr.appendChild(td);
 					td=document.createElement('td');
