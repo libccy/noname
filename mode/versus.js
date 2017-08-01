@@ -1327,6 +1327,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     		},
     		chooseCharacterFour:function(){
     			var next=game.createEvent('chooseCharacter',false);
+                next.showConfig=true;
     			next.ai=function(player,list,list2){
     				if(player.identity=='zhu'){
     					list2.randomSort();
@@ -1397,8 +1398,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     					}
     				}
     				for(var i=0;i<game.players.length;i++){
-    					game.players[i].node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate['unknown'+get.distance(_status.firstAct,game.players[i],'absolute')]),game.players[i]);
-    					game.players[i].node.name_seat.style.opacity=1;
+                        if(!game.players[i].node.name_seat){
+                            game.players[i].node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate['unknown'+get.distance(_status.firstAct,game.players[i],'absolute')]),game.players[i]);
+        					game.players[i].node.name_seat.style.opacity=1;
+                        }
     				}
     				if(get.config('ladder')){
     					var date=new Date();
@@ -1426,6 +1429,51 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     					_status.ladder=true;
     					_status.ladder_mmr=0;
     				}
+                    event.addSetting=function(){
+                        var cs=function(link,node){
+                            game.swapPlayer(node._link);
+                            _status.rechoose=true;
+                            for(var i=0;i<game.players.length;i++){
+                                game.players[i].uninit();
+                                game.players[i].node.name_seat.style.display='';
+                                game.players[i].classList.remove('selectedx');
+                            }
+                            game.resume();
+                        };
+                        if(!event.seatsbutton){
+                            event.seatsbutton=[
+                                ui.create.control('一号位',cs),
+                                ui.create.control('一号位',cs),
+                                ui.create.control('一号位',cs),
+                                ui.create.control('换边',function(){
+                                    if(_status.firstAct.side==game.me.side){
+                                        cs(null,{_link:_status.firstAct.nextSeat});
+                                    }
+                                    else{
+                                        cs(null,{_link:_status.firstAct});
+                                    }
+                                })
+                            ];
+                        }
+                        var seats=[];
+                        for(var i=0;i<game.players.length;i++){
+                            if(game.players[i]!=game.me&&game.players[i].side==game.me.side){
+                                seats.add([1+get.distance(_status.firstAct,game.players[i],'absolute'),game.players[i]]);
+                            }
+                            seats.sort(function(a,b){
+                                return a[0]-b[0];
+                            });
+                        }
+                        for(var i=0;i<event.seatsbutton.length;i++){
+                            if(i<seats.length){
+                                event.seatsbutton[i].firstChild.innerHTML=get.cnNumber(seats[i][0],true)+'号位';
+                                event.seatsbutton[i].firstChild._link=seats[i][1];
+                            }
+                        }
+                    };
+                    if(get.config('change_identity')&&!get.config('four_assign')&&!get.config('four_phaseswap')){
+                        event.addSetting();
+                    }
     				"step 1"
     				if(event.current==game.me||(event.four_assign&&event.current.side==game.me.side)){
     					var dialog=event.xdialog;
@@ -1457,13 +1505,24 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				}
     				else{
     					event.ai(event.current,event.list.randomGets(3),event.list2);
-    					event.current.node.name_seat.remove();
+    					event.current.node.name_seat.style.display='none';
     					if(!event.four_assign){
     						event.current=event.current.next;
     						event.redo();
     					}
     				}
     				"step 2"
+                    if(_status.rechoose){
+                        delete _status.rechoose;
+                        event.goto(0);
+                        return;
+                    }
+                    if(event.seatsbutton){
+                        for(var i=0;i<event.seatsbutton.length;i++){
+                            event.seatsbutton[i].close();
+                        }
+                        delete event.seatsbutton;
+                    }
     				event.current.classList.remove('selectedx');
     				if(event.current.side==game.me.side){
     					event.current.init(result.buttons[0].link);

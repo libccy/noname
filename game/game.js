@@ -4575,8 +4575,13 @@
 							map.two_assign.hide();
                             map.two_phaseswap.hide();
                         }
-						if(config.versus_mode=='two'||config.versus_mode=='siguo'){
-							map.change_identity.show();
+						if(config.versus_mode=='two'||config.versus_mode=='siguo'||config.versus_mode=='four'){
+							if(config.versus_mode=='four'&&(config.four_assign||config.four_phaseswap)){
+								map.change_identity.hide();
+							}
+							else{
+								map.change_identity.show();
+							}
 						}
 						else{
 							map.change_identity.hide();
@@ -4679,14 +4684,33 @@
 						onclick:function(bool){
 							game.saveConfig('change_identity',bool,this._link.config.mode);
 							if(!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
-							var dialog;
-							if(ui.cheat2&&ui.cheat2.backup) dialog=ui.cheat2.backup;
-							else dialog=_status.event.dialog;
-                            if(!_status.brawl||!_status.brawl.noAddSetting){
-                                if(!dialog.querySelector('table')&&get.config('change_identity')) _status.event.getParent().addSetting(dialog);
-    							else _status.event.getParent().removeSetting(dialog);
-                            }
-							ui.update();
+							if(_status.mode=='four'){
+								if(get.config('four_assign')||get.config('four_phaseswap')) return;
+								if(bool){
+									if(_status.event.parent.addSetting){
+										_status.event.parent.addSetting();
+									}
+								}
+								else{
+									var seats=_status.event.parent.seatsbutton;
+									if(seats){
+										while(seats.length){
+											seats.shift().remove();
+										}
+										delete _status.event.parent.seatsbutton;
+									}
+								}
+							}
+							else{
+								var dialog;
+								if(ui.cheat2&&ui.cheat2.backup) dialog=ui.cheat2.backup;
+								else dialog=_status.event.dialog;
+	                            if(!_status.brawl||!_status.brawl.noAddSetting){
+	                                if(!dialog.querySelector('table')&&get.config('change_identity')) _status.event.getParent().addSetting(dialog);
+	    							else _status.event.getParent().removeSetting(dialog);
+	                            }
+								ui.update();
+							}
 						}
 					},
 					change_choice:{
