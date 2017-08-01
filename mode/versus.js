@@ -147,13 +147,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			}
     		}
     		else if(_status.mode=='four'){
+                _status.fouralign=[0,1,2,3,4];
     			var list=[
     				['zhong','ezhong','ezhong','zhong','zhong','ezhong','ezhong','zhong'],
     				['zhong','ezhong','zhong','ezhong','ezhong','zhong','ezhong','zhong'],
     				['zhong','ezhong','ezhong','zhong','ezhong','zhong','zhong','ezhong'],
     				['zhong','ezhong','zhong','ezhong','zhong','ezhong','zhong','ezhong'],
     				['zhong','ezhong','ezhong','zhong','ezhong','zhong','ezhong','zhong'],
-    			].randomGet();
+    			][_status.fouralign.randomRemove()];
     			var rand1=Math.floor(Math.random()*4);
     			var rand2=Math.floor(Math.random()*4);
     			for(var i=0;i<list.length;i++){
@@ -1435,7 +1436,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                             _status.rechoose=true;
                             for(var i=0;i<game.players.length;i++){
                                 game.players[i].uninit();
-                                game.players[i].node.name_seat.style.display='';
+                                if(game.players[i].node.name_seat) game.players[i].node.name_seat.style.display='';
                                 game.players[i].classList.remove('selectedx');
                             }
                             game.resume();
@@ -1471,8 +1472,73 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                             }
                         }
                     };
-                    if(get.config('change_identity')&&!get.config('four_assign')&&!get.config('four_phaseswap')){
-                        event.addSetting();
+                    if(!get.config('four_assign')&&!get.config('four_phaseswap')){
+                        if(get.config('change_identity')){
+                            event.addSetting();
+                        }
+                        if(get.config('fouralign')){
+                            event.fouralignbutton=ui.create.control('变阵',function(){
+                                if(!_status.fouralign.length||(_status.fouralign.length==1&&_status.fouralign[0]==0)){
+                                    _status.fouralign=[0,1,2,3,4];
+                                }
+                                var list=[
+                                    ['zhong','ezhong','ezhong','zhong','zhong','ezhong','ezhong','zhong'],
+                                    ['zhong','ezhong','zhong','ezhong','ezhong','zhong','ezhong','zhong'],
+                                    ['zhong','ezhong','ezhong','zhong','ezhong','zhong','zhong','ezhong'],
+                                    ['zhong','ezhong','zhong','ezhong','zhong','ezhong','zhong','ezhong'],
+                                    ['zhong','ezhong','ezhong','zhong','ezhong','zhong','ezhong','zhong'],
+                                ][_status.fouralign.shift()];
+                                var rand1=Math.floor(Math.random()*4);
+                                var rand2=Math.floor(Math.random()*4);
+                                for(var i=0;i<list.length;i++){
+                                    if(list[i]=='zhong'){
+                                        if(rand1==0){
+                                            list[i]='zhu';
+                                        }
+                                        rand1--;
+                                    }
+                                    else{
+                                        if(rand2==0){
+                                            list[i]='ezhu';
+                                        }
+                                        rand2--;
+                                    }
+                                }
+
+                                var side=Math.random()<0.5;
+                                var num=game.players.indexOf(_status.firstAct);
+                                list=list.splice(8-num).concat(list);
+
+                                for(var i=0;i<8;i++){
+                                    if(list[i][0]=='e'){
+                                        game.players[i].side=side;
+                                        game.players[i].identity=list[i].slice(1);
+                                    }
+                                    else{
+                                        game.players[i].side=!side;
+                                        game.players[i].identity=list[i];
+                                    }
+                                    if(game.players[i].identity=='zhu'){
+                                        game[game.players[i].side+'Zhu']=game.players[i];
+                                        game.players[i].isZhu=true;
+                                    }
+                                    game.players[i].setIdentity(game.players[i].identity);
+                                    game.players[i].node.identity.dataset.color=get.translation(game.players[i].side+'Color');
+                                    if(game.players[i].node.name_seat){
+                                        game.players[i].node.name_seat.remove();
+                                        delete game.players[i].node.name_seat;
+                                    }
+                                }
+
+                                _status.rechoose=true;
+                                for(var i=0;i<game.players.length;i++){
+                                    game.players[i].uninit();
+                                    if(game.players[i].node.name_seat) game.players[i].node.name_seat.style.display='';
+                                    game.players[i].classList.remove('selectedx');
+                                }
+                                game.resume();
+                            });
+                        }
                     }
     				"step 1"
     				if(event.current==game.me||(event.four_assign&&event.current.side==game.me.side)){
@@ -1589,6 +1655,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     					ui.control.style.transitionDuration='';
     				},500);
     				lib.init.onfree();
+                    delete _status.fouralign;
+                    if(event.fouralignbutton){
+                        event.fouralignbutton.close();
+                        delete event.fouralignbutton;
+                    }
     			});
     		},
     		chooseCharacterThree:function(){

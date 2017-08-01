@@ -4530,6 +4530,7 @@
 							map.four_assign.show();
                             map.four_phaseswap.show();
 							map.expand_dialog.show();
+							map.fouralign.show();
 						}
 						else{
 							map.change_choice.show();
@@ -4541,6 +4542,7 @@
 							map.four_assign.hide();
 							map.four_phaseswap.hide();
                             map.expand_dialog.hide();
+							map.fouralign.hide();
 						}
 						if(config.versus_mode=='three'||config.versus_mode=='one'){
 							map.enable_all_three.show();
@@ -4677,6 +4679,10 @@
 								delete ui.cheat2;
 							}
 						}
+					},
+					fouralign:{
+						name:'自由选择阵型',
+						init:false
 					},
                     change_identity:{
 						name:'自由选择座位',
