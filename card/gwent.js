@@ -1836,12 +1836,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
     				}
     			},
 				init:function(player){
-					if(game.players.length>=6){
-						player.storage.gw_kunenfayin=3;
-					}
-					else{
-						player.storage.gw_kunenfayin=2;
-					}
+					// if(game.players.length>=6){
+					// 	player.storage.gw_kunenfayin=3;
+					// }
+					// else{
+					// 	player.storage.gw_kunenfayin=2;
+					// }
+					player.storage.gw_kunenfayin=3;
 				},
 				trigger:{player:'phaseEnd'},
 				forced:true,
@@ -2213,7 +2214,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_shanbengshu:'山崩术',
 			gw_shanbengshu_info:'出牌阶段对自己使用，令一名随机敌方角色随机弃置两件装备',
 			gw_kunenfayin:'昆恩法印',
-			gw_kunenfayin_info:'出牌阶段对一名角色使用，目标不能成为其他角色的普通锦囊牌的目标，持续2回合（存活角色数不少于6时改为3）',
+			gw_kunenfayin_info:'出牌阶段对一名角色使用，目标不能成为其他角色的普通锦囊牌的目标，持续3回合',
 		},
 		cardType:{
 			spell:0.5,
