@@ -8192,6 +8192,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return !player.storage.duijue;
     			},
     			filterTarget:function(card,player,target){
+                    if(target.hp<=1) return false;
     				if(get.mode()=='identity'&&_status.mode=='zhong'&&game.zhu&&!game.zhu.isZhu){
     					return target==game.zhong;
     				}
@@ -9705,7 +9706,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		xuying_info:'锁定技，每当你即将受到伤害，你防止此伤害，若你此时有手牌，你流失一点体力',
     		yinguo_info:'除你之外的任意一名角色即将受到受到伤害时，若有伤害来源，你可以弃置一张牌将伤害来源和目标对调',
     		yueren_info:'每当你使用一张杀，可以进行一次判定，若结果为黑色，你弃置目标一张牌，若结果为红色，你将此杀收回，每回合限发动一次',
-    		duijue_info:'限定技，出牌阶段，你可以指定一名非主公的其他角色，你结束出牌阶段，并在回合结束后将所有其他角色移出游戏，然后该角色与你轮流进行回合，直到有一方死亡为止',
+    		duijue_info:'限定技，出牌阶段，你可以指定一名非主公且体力值大于1的其他角色，你结束出牌阶段，并在回合结束后将所有其他角色移出游戏，然后该角色与你轮流进行回合，直到有一方死亡为止',
     		wuying_info:'锁定技，你的杀和单体x锦囊目标锁定为范围内的所有角色',
     		xiehun_info:'锁定技，受到来自你伤害的角色进入混乱状态，行为不受控制，且会攻击队友，直到你的下一回合开始',
     		jumo_info:'锁定技，结束阶段，你摸X-1张牌，X为未进入混乱状态的角色数与进入混乱状态的角色数之差（若为双将则改为X）',

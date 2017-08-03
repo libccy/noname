@@ -69,13 +69,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard'},
 				forced:true,
 				filter:function(event,player){
-					return ['basic','trick'].contains(get.type(event.card))&&player.countCards('h')>0;
+					return get.type(event.card)!='equip'&&player.countCards('h',{color:get.color(event.card)})>0;
 				},
 				content:function(){
 					'step 0'
+					var cards=player.getCards('h',{suit:get.suit(trigger.card)});
+					if(!cards.length){
+						cards=player.getCards('h',{color:get.color(trigger.card)});
+					}
+					if(!cards.length){
+						event.finish();
+						return;
+					}
+					event.chosen=cards.randomGet();
 					game.delay(0.5)
 					'step 1'
-					var card=player.getCards('h').randomGet();
+					var card=event.chosen;
 					player.lose(card,ui.special);
 					player.$throw(card,1000);
 					game.delay(0.5);
@@ -2236,11 +2245,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_haizhiyezhu:'海之野猪',
 			gw_nitelila:'尼斯里拉',
 
-			
+			shuangxi:'霜袭',
+			shuangxi_info:'每两轮限一次，你可以视为使用一张【刺骨寒霜】；若你本回合造成过伤害，改为使用【白霜】',
 			gwfengshi:'风蚀',
 			gwfengshi_info:'结束阶段，你可以选择一项：1. 为自己施加一个随机负面效果，并对两名随机敌人施加一个随机负面效果；2. 为自己施加两个随机正面效果，并对一名随机敌人施加一个随机正面效果',
 			yangfan:'扬帆',
-			yangfan_info:'锁定技，每当你使用一张基本牌或普通锦囊牌，你随机重铸一张手牌',
+			yangfan_info:'锁定技，每当你使用一张非装备牌，你随机重铸一张与其花色相同的牌；若没有花色相同的手牌，改为随机重铸一张与其颜色相同的牌',
 			gwchenshui:'沉睡',
 			gwchenshui_bg:'睡',
 			gwchenshui_info:'锁定技，你防止即将造成或受到的伤害，改为令伤害来随机源获得对方一张牌；结束阶段，若你自上次沉睡起累计发动了至少3次沉睡效果，你解除沉睡状态，对所有敌方角色造成一点伤害，然后切换至觉醒状态',

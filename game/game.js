@@ -19747,7 +19747,7 @@
 					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player);
 					if(mod!='unchanged') return mod;
 					if(typeof filter=='boolean') return filter;
-					if(typeof filter=='function') return filter(card,player);
+					if(typeof filter=='function') return filter(card,player,event);
 				}
 			},
 			cardRespondable:function(card,player){

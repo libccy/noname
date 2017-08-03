@@ -75,11 +75,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				lianheng:true,
-				enable:function(card,player){
+				enable:function(card,player,event){
 					if(get.mode()=='guozhan'&&!player.isMajor()) return false;
 					if(player.hasSkill('xietianzi')) return false;
 					if(_status.currentPhase!=player) return false;
-					return _status.event.getParent().name=='phaseUse';
+					return (event||_status.event).getParent().name=='phaseUse';
 				},
 				filterTarget:function(card,player,target){
 					return player==target;
