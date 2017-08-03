@@ -35171,8 +35171,9 @@
                         node.appendChild(newlined);
                     }
                     else if(newlined){
-                        var span=document.createElement('span');
+                        var span=ui.create.div('.tdnode.pointerdiv.shadowed.reduce_radius');
                         span.style.margin='3px';
+						span.style.width='auto';
     					span.innerHTML=' '+namecapt[i].toUpperCase()+' ';
     					span.link=namecapt[i];
     					span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
@@ -35254,7 +35255,7 @@
     					}
                     };
                     for(var i=0;i<groups.length;i++){
-                        var span=document.createElement('span');
+                        var span=ui.create.div('.tdnode.pointerdiv.shadowed.reduce_radius.reduce_margin');
                         span.style.margin='3px';
                         newlined.appendChild(span);
                         span.innerHTML=get.translation(groups[i]);
@@ -35267,7 +35268,7 @@
                     newlined.appendChild(span);
                     span.style.margin='8px';
 
-                    packsource=document.createElement('span');
+                    packsource=ui.create.div('.tdnode.pointerdiv.shadowed.reduce_radius.reduce_margin');
                     packsource.style.margin='3px';
                     newlined.appendChild(packsource);
 					var filternode=null;

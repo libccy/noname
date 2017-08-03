@@ -3566,6 +3566,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			filter:function(event,player){
     				return !player.hasSkill('xunbao2');
     			},
+                derivation:['hsbaowu_cangbaotu','hsbaowu_huangjinyuanhou'],
     			priority:1,
     			// filterCard:true,
     			// check:function(card){

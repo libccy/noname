@@ -3151,15 +3151,23 @@ div:hover>.intro {
 }
 
 .tdnode{
-	position:relative;
-	display:inline-block;
-	padding:5px;
-	padding-left:8px;
-	padding-right:8px;
-	font-size:18px;
-	margin:4px;
-	margin-left:6px;
-	margin-right:6px;
+	position:relative !important;
+	display:inline-block !important;
+	padding:5px !important;
+	padding-left:8px !important;
+	padding-right:8px !important;
+	font-size:18px !important;
+	margin:4px !important;
+	margin-left:6px !important;
+	margin-right:6px !important;
+	width: auto !important;
+}
+.tdnode.thundertext{
+	background-image: linear-gradient(rgba(47,101,150,1), rgba(43, 90, 132,1)) !important;
+}
+.tdnode.reduce_margin{
+	margin-left: 4px !important;
+	margin-right: 4px !important;
 }
 
 .shadowed,
