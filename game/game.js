@@ -34920,7 +34920,7 @@
                 //         return ui.create.characterDialog2.apply(this,arguments);
                 //     }
                 // }
-				var filter,str,noclick,thisiscard,seperate,expandall,onlypack,heightset;
+				var filter,str,noclick,thisiscard,seperate,expandall,onlypack,heightset,precharacter;
 				for(var i=0;i<arguments.length;i++){
 					if(arguments[i]==='thisiscard'){
 						thisiscard=true;
@@ -34930,6 +34930,9 @@
                     }
 					else if(arguments[i]==='heightset'){
 						heightset=true;
+					}
+					else if(arguments[i]=='precharacter'){
+						precharacter=true;
 					}
 					else if(typeof arguments[i]=='string'&&arguments[i].indexOf('onlypack:')==0){
 						onlypack=arguments[i].slice(9);
@@ -35122,6 +35125,9 @@
                                     dialog.buttons[i].classList.add('nodisplay');
                                 }
                                 else{
+									if(dialog.buttons[i].activate){
+										dialog.buttons[i].activate();
+									}
                                     dialog.buttons[i].classList.remove('nodisplay');
                                 }
                             }
@@ -35154,7 +35160,7 @@
                         newlined=document.createElement('div');
                         newlined.style.marginTop='5px';
                         newlined.style.display='block';
-                        newlined.style.fontFamily='xinwei';
+                        // newlined.style.fontFamily='xinwei';
                         if(get.is.phoneLayout()){
                             newlined.style.fontSize='32px';
                         }
@@ -35500,7 +35506,12 @@
 					}
 				}
 				else{
-					dialog.add([list,'character'],noclick);
+					if(precharacter){
+						dialog.add([list,'precharacter'],noclick);
+					}
+					else{
+						dialog.add([list,'character'],noclick);
+					}
 				}
 				dialog.add(ui.create.div('.placeholder'));
 				for(i=0;i<dialog.buttons.length;i++){
@@ -36375,8 +36386,18 @@
 				// });
 				return node;
 			},
-			button:function(item,type,position,noclick){
-				var node;
+			prebutton:function(item,type,position,noclick){
+				var node=ui.create.div(position);
+				node.style.display='none';
+				node.link=item;
+				node.activate=function(){
+					ui.create.button(item,type,position,noclick,node);
+					delete node.activate;
+				}
+				_status.prebutton.push(node);
+				return node;
+			},
+			button:function(item,type,position,noclick,node){
 				switch(type){
 					case 'blank':
 					node=ui.create.div('.button.card',position);
@@ -36419,7 +36440,14 @@
 					break;
 
 					case 'character':case 'player':
-					node=ui.create.div('.button.character',position);
+					if(node){
+						node.classList.add('button');
+						node.classList.add('character');
+						node.style.display='';
+					}
+					else{
+						node=ui.create.div('.button.character',position);
+					}
 					node.link=item;
 					if(type=='character'){
 						node.setBackground(item,'character');
@@ -36531,8 +36559,27 @@
 			},
 			buttons:function(list,type,position,noclick,zoom){
 				var buttons=[];
+				var pre=(type.slice(0,3)=='pre');
+				if(pre){
+					if(!_status.prebutton){
+						_status.prebutton=[];
+						lib.onfree.push(function(){
+							for(var i=0;i<_status.prebutton.length;i++){
+								if(_status.prebutton[i].activate){
+									_status.prebutton[i].activate();
+								}
+							}
+							delete _status.prebutton;
+						});
+					}
+				}
 				for(var i=0;i<list.length;i++){
-					buttons.push(ui.create.button(list[i],type,position,noclick));
+					if(pre){
+						buttons.push(ui.create.prebutton(list[i],type.slice(3),position,noclick));
+					}
+					else{
+						buttons.push(ui.create.button(list[i],type,position,noclick));
+					}
 				}
 				return buttons;
 			},

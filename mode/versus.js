@@ -1548,7 +1548,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     							dialog=event.xdialog||ui.create.characterDialog('heightset',event.filterChoice,'expandall');
     						}
     						else{
-    							dialog=event.xdialog||ui.create.characterDialog('heightset',event.filterChoice);
+    							dialog=event.xdialog||ui.create.characterDialog('heightset',event.filterChoice,'precharacter');
     						}
     					}
     					var names=[];
@@ -1567,7 +1567,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     					event.xdialog=dialog;
     					dialog.static=true;
     					event.current.classList.add('selectedx');
-    					game.delay();
+    					game.delay(0.5);
     				}
     				else{
     					event.ai(event.current,event.list.randomGets(3),event.list2);
