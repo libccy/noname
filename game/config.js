@@ -41,6 +41,7 @@ window.config={
 	game:'sgs',
 	duration:500,
 	hoveration:1000,
+	doubleclick_intro:true,
 	cheat:false,
 	volumn_background:8,
 	volumn_audio:8,

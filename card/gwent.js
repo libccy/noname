@@ -861,14 +861,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						es2.push(game.createCard(list.randomGet()));
 					}
 					if(es2.length){
-						event.delay=true;
+						game.delay();
 						player.$draw(es2);
 						for(var i=0;i<es2.length;i++){
 							player.equip(es2[i]);
 						}
 					}
 					'step 3'
-					if(event.delay) game.delay();
 					player.addTempSkill('qianxing',{player:'phaseBegin'});
 				},
 				contentAfter:function(){

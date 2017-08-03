@@ -380,6 +380,12 @@
 							'2500':'2.5秒',
 						}
 					},
+					doubleclick_intro:{
+						name:'双击显示武将资料',
+						init:true,
+						unfrequent:true,
+						intro:'双击武将头像后显示其资料卡',
+					},
 					video:{
 						name:'保存录像',
 						init:'20',
@@ -1076,7 +1082,7 @@
 					change_skin:{
 						name:'开启换肤',
 						init:true,
-						intro:'双点头像或在右键菜单中换肤，皮肤可在选项-文件-图片文件-皮肤图片中添加'
+						intro:'在武将的右键菜单中换肤，皮肤可在选项-文件-图片文件-皮肤图片中添加'
 					},
 					change_skin_auto:{
 						name:'自动换肤',
@@ -8137,7 +8143,7 @@
 				mode.remove('brawl');
 				var banned=['yxs_luzhishen','xuhuang','zhenji','shen_guanyu','shen_caocao','zhurong',
 					'daqiao','lingcao','liuzan','lusu','luxun','yanwen','zhouyu','xiahouyuan',
-					'zhuzhi','old_caozhen','guojia','simayi','sp_pangde','swd_kangnalishi'];
+					'zhuzhi','old_caozhen','guojia','simayi','sp_pangde','swd_kangnalishi','hs_siwangzhiyi'];
 				var bannedcards=['zengbin','toulianghuanzhu','huoshan','hongshui','guiyoujie','fengyinzhidan'];
 				for(var i=0;i<mode.length;i++){
 					game.saveConfig(mode[i]+'_banned',banned);
@@ -39035,9 +39041,9 @@
 				game.check();
 			},
 			avatar:function(){
-				if(!lib.config.change_skin) return;
+				if(!lib.config.doubleclick_intro) return;
 				if(this.parentNode.isUnseen(0)) return;
-                if(!this.parentNode.name) return;
+                if(!lib.character[this.parentNode.name]) return;
 				var avatar=this;
 				var player=this.parentNode;
 				if(!this._doubleClicking){
@@ -39047,12 +39053,14 @@
 					},500);
 					return;
 				}
-				ui.click.skin(this,player.name);
+				// ui.click.skin(this,player.name);
+				game.pause2();
+				ui.click.charactercard(player.name,null,null,true);
 			},
 			avatar2:function(){
-				if(!lib.config.change_skin) return;
+				if(!lib.config.doubleclick_intro) return;
 				if(this.parentNode.classList.contains('unseen2')) return;
-                if(!this.parentNode.name2) return;
+                if(!lib.character[this.parentNode.name2]) return;
 				var avatar=this;
 				var player=this.parentNode;
 				if(!this._doubleClicking){
@@ -39062,7 +39070,9 @@
 					},500);
 					return;
 				}
-				ui.click.skin(this,player.name2);
+				// ui.click.skin(this,player.name2);
+				game.pause2();
+				ui.click.charactercard(player.name2,null,null,true);
 			},
 			player:function(){
 				return ui.click.target.apply(this,arguments);
@@ -39432,7 +39442,7 @@
 					delete this.logvtimeout;
 				}
 			},
-			charactercard:function(name,sourcenode,noedit){
+			charactercard:function(name,sourcenode,noedit,resume){
 				if(_status.dragged) return;
 				if(lib.config.theme!='simple'){
 					ui.window.classList.add('shortcutpaused');
@@ -39460,6 +39470,7 @@
 					ui.menuContainer.classList.remove('blur');
 					this.delete();
 					e.stopPropagation();
+					if(resume) game.resume2();
 					return false;
 				}
 				var uiintro=ui.create.div('.menubg.charactercard',layer);
@@ -39497,13 +39508,13 @@
 									if(this._link){
                                         lib.config.skin[nameskin]=this._link;
                                         bg.style.backgroundImage=this.style.backgroundImage;
-										sourcenode.style.backgroundImage=this.style.backgroundImage;
+										if(sourcenode) sourcenode.style.backgroundImage=this.style.backgroundImage;
                                         game.saveConfig('skin',lib.config.skin);
                                     }
                                     else{
                                         delete lib.config.skin[nameskin];
 										bg.setBackground(nameskin,'character');
-                                        sourcenode.setBackground(nameskin,'character');
+                                        if(sourcenode) sourcenode.setBackground(nameskin,'character');
                                         game.saveConfig('skin',lib.config.skin);
                                     }
                                 });
@@ -39578,7 +39589,7 @@
 					else{
 						ban.classList.remove('active');
 					}
-					if(sourcenode.updateBanned){
+					if(sourcenode&&sourcenode.updateBanned){
 						sourcenode.updateBanned();
 					}
 				};

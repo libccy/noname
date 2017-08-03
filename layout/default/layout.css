@@ -3152,7 +3152,7 @@ div:hover>.intro {
 
 .tdnode{
 	position:relative !important;
-	display:inline-block !important;
+	display:inline-block;
 	padding:5px !important;
 	padding-left:8px !important;
 	padding-right:8px !important;
