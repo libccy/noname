@@ -3150,6 +3150,18 @@ div:hover>.intro {
 	border-radius: 4px;
 }
 
+.tdnode{
+	position:relative;
+	display:inline-block;
+	padding:5px;
+	padding-left:8px;
+	padding-right:8px;
+	font-size:18px;
+	margin:4px;
+	margin-left:6px;
+	margin-right:6px;
+}
+
 .shadowed,
 .menubutton.large.shadowed {
 	background: rgba(0,0,0,0.2);

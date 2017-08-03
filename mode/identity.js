@@ -666,17 +666,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 
 						for(var i=0;i<listi.length;i++){
-							var td=ui.create.div('.shadowed.reduce_radius.pointerdiv');
-							td.style.position='relative';
-							td.style.display='inline-block';
+							var td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
 							td.link=listi[i];
-							td.style.padding='5px';
-							td.style.paddingLeft='8px';
-							td.style.paddingRight='8px';
-							td.style.fontSize='18px';
-							td.style.margin='4px';
-							td.style.marginLeft='6px';
-							td.style.marginRight='6px';
 							if(td.link===game.me.identity){
 								td.classList.add('bluebg');
 							}
@@ -767,16 +758,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						seats.style.width='100%';
 						seats.style.position='relative';
 						for(var i=2;i<=game.players.length;i++){
-							var td=ui.create.div('.shadowed.reduce_radius.pointerdiv');
-							td.style.position='relative';
-							td.style.display='inline-block';
-							td.style.padding='5px';
-							td.style.paddingLeft='8px';
-							td.style.paddingRight='8px';
-							td.style.fontSize='18px';
-							td.style.margin='4px';
-							td.style.marginLeft='6px';
-							td.style.marginRight='6px';
+							var td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
 							td.innerHTML=get.cnNumber(i,true);
 							td.link=i-1;
 							seats.appendChild(td);
