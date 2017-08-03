@@ -46,6 +46,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_xigedelifa:['female','qun',3,['gwfusheng']],
 			gw_laomaotou:['male','qun',4,['gwchenshui']],
 			gw_qigaiwang:['male','qun',4,['julian']],
+
+			gw_bierna:['female','qun',4,['gwfengshi']],
+			gw_haizhiyezhu:['male','qun',4,['yangfan']],
+			gw_nitelila:['male','qun',4,['shuangxi']],
 		},
 		characterIntro:{
 			gw_huoge:'那个老年痴呆?不知道他是活着还是已经被制成标本了!',
@@ -61,6 +65,66 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			yangfan:{
+				trigger:{player:'useCard'},
+				forced:true,
+				filter:function(event,player){
+					return ['basic','trick'].contains(get.type(event.card))&&player.countCards('h')>0;
+				},
+				content:function(){
+					'step 0'
+					game.delay(0.5)
+					'step 1'
+					var card=player.getCards('h').randomGet();
+					player.lose(card,ui.special);
+					player.$throw(card,1000);
+					game.delay(0.5);
+					game.log(player,'重铸了',card);
+					'step 2'
+					player.draw().log=false;
+				},
+				ai:{
+					pretao:true
+				}
+			},
+			gwfengshi:{
+				trigger:{player:'phaseEnd'},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseControlList(['为自己施加一个随机负面效果，并对两名随机敌人施加一个随机负面效果','为自己施加两个随机正面效果，并对一名随机敌人施加一个随机正面效果'],function(){
+						if(player.getEnemies().length<2) return 1;
+						if(player.hp<=1) return 1;
+						if(player.hp==2&&Math.random()<0.5) return 1;
+						return 0;
+					});
+					'step 1'
+					if(result.index!=2){
+						player.logSkill('gwfengshi');
+						if(result.index==0){
+							event.debuff=[player].addArray(player.getEnemies().randomGets(2));
+						}
+						else{
+							event.buff=[player,player,player.getEnemies().randomGet()];
+						}
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if(event.debuff&&event.debuff.length){
+						player.line(event.debuff.shift().getDebuff(false).addExpose(0.1),'green');
+						event.redo();
+					}
+					'step 3'
+					if(event.buff&&event.buff.length){
+						player.line(event.buff.shift().getBuff(false).addExpose(0.1),'green');
+						event.redo();
+					}
+					'step 4'
+					game.delay();
+				}
+			},
 			gwchenshui:{
 				trigger:{player:'damageBefore',source:'damageBefore'},
 				forced:true,
@@ -2168,7 +2232,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_laomaotou2:'毛矛头',
 			gw_qigaiwang:'乞丐王',
 
-			test:'每当你使用一张牌，你随机重铸一张手牌',
+			gw_bierna:'碧尔娜',
+			gw_haizhiyezhu:'海之野猪',
+			gw_nitelila:'尼斯里拉',
+
+			
+			gwfengshi:'风蚀',
+			gwfengshi_info:'结束阶段，你可以选择一项：1. 为自己施加一个随机负面效果，并对两名随机敌人施加一个随机负面效果；2. 为自己施加两个随机正面效果，并对一名随机敌人施加一个随机正面效果',
+			yangfan:'扬帆',
+			yangfan_info:'锁定技，每当你使用一张基本牌或普通锦囊牌，你随机重铸一张手牌',
 			gwchenshui:'沉睡',
 			gwchenshui_bg:'睡',
 			gwchenshui_info:'锁定技，你防止即将造成或受到的伤害，改为令伤害来随机源获得对方一张牌；结束阶段，若你自上次沉睡起累计发动了至少3次沉睡效果，你解除沉睡状态，对所有敌方角色造成一点伤害，然后切换至觉醒状态',

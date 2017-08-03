@@ -3753,7 +3753,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					str+='对'+get.translation(trigger.targets);
     				}
     				str+='的'+get.translation(trigger.card)+'失效'
-    				var next=player.chooseToDiscard('he',{type:'equip'},get.prompt('gongshen')).prompt2=str;
+    				var next=player.chooseToDiscard('he',{type:'equip'},get.prompt('gongshen'));
+                    next.prompt2=str;
     				next.logSkill='gongshen';
     				next.ai=function(card){
     					if(effect<0){
