@@ -752,18 +752,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			gwjinyan:{
-				trigger:{player:['damageBegin','loseHpBegin']},
+				trigger:{player:['damageBefore']},
     			forced:true,
-    			priority:-55,
     			mark:true,
     			filter:function(event,player){
-					if(game.roundNumber%3==0) return false;
-    				return player.hp-event.num<2;
+					return game.roundNumber%3!=0;
     			},
     			content:function(){
-    				trigger.num=Math.max(0,player.hp-2);
+    				trigger.untrigger();
+					trigger.finish();
     			},
-				group:['gwjinyan_gain','gwjinyan_hp'],
+				group:['gwjinyan_gain'],
 				subSkill:{
 					gain:{
 						trigger:{player:'phaseBegin'},
@@ -777,21 +776,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.gain(game.createCard(list.randomGet()),'gain2');
 							}
 						}
-					},
-					hp:{
-						trigger:{global:'roundStart'},
-						forced:true,
-						filter:function(event,player){
-							if(game.roundNumber%3==0) return false;
-							return player.hp<2;
-						},
-						content:function(){
-							player.hp=2;
-							if(player.maxHp<player.hp){
-								player.maxHp=player.hp;
-							}
-							player.update();
-						}
 					}
 				},
     			ai:{
@@ -799,12 +783,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(game.roundNumber%3==0) return 1.6;
 						return 0.8;
 					},
+					nofire:true,
+					nothunder:true,
+					nodamage:true,
+					skillTagFilter:function(){
+						if(game.roundNumber%3==0) return false;
+					},
     				effect:{
     					target:function(card,player,target){
-							if(game.roundNumber%3==0) return;
-    						if(get.tag(card,'damage')||get.tag(card,'loseHp')){
-    							if(target.hp<=game.roundNumber%3) return 0;
-    						}
+    						if(game.roundNumber%3!=0&&get.tag(card,'damage')){
+								return [0,0];
+							}
     					}
     				}
     			}
@@ -2214,7 +2203,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lingji:'灵计',
 			lingji_info:'出牌阶段限一次，你可以摸两张牌并弃置两张牌，若弃置的牌花色相同，你获得一张随机铜卡；若弃置的牌点数相同，你获得一张随机银卡',
 			gwjinyan:'金焰',
-			gwjinyan_info:'锁定技，准备阶段，若游戏轮数为3的倍数，你获得一张随机金卡；当游戏轮数不是3的倍数时，你的体力值不能少于2',
+			gwjinyan_info:'锁定技，准备阶段，若游戏轮数为3的倍数，你获得一张随机金卡；当游戏轮数不是3的倍数时，你防止所有伤害',
 			gwshenyu:'神愈',
 			gwshenyu_info:'准备阶段，你可以令一名角色选择一项：回复一点体力，或从弃牌堆中获得一张非金法术牌（直到洗牌前该牌不能再以此法获得）',
 			junchi:'骏驰',

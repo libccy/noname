@@ -104,3 +104,7 @@ body[data-background_color_music='blue'] #arena.mobile:not(.chess) .player[data-
 	background: linear-gradient(#4b4b4b, #464646);
 	box-shadow: rgba(0,0,0,0.6) 0 0 5px inset;
 }
+
+#arena:not(.chess) .player[data-position='0']>.equips>.equip5>.image{
+	background-position: -6px -6px;
+}

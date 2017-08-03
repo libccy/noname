@@ -30,3 +30,8 @@
     right: 3px;
     top: 3px;
 }
+
+
+#arena:not(.chess) .player[data-position='0']>.equips>.equip5>.image{
+	background-position: -4px -4px;
+}

@@ -38698,15 +38698,19 @@
 					_status.mouseleft=false;
 					_status.mousedragorigin=null;
 					_status.dragstatuschanged=false;
-					ui.canvas.width=ui.arena.offsetWidth;
-					ui.canvas.height=ui.arena.offsetHeight;
+					if(ui.arena){
+						ui.canvas.width=ui.arena.offsetWidth;
+						ui.canvas.height=ui.arena.offsetHeight;
+					}
 					if(tmpflag){
 						ui.click[get.itemtype(tmpflag)].call(tmpflag);
 						game.check();
 					}
 					// ui.updatehl();
 				}
-				ui.arena.classList.remove('dragging');
+				if(ui.arena){
+					ui.arena.classList.remove('dragging');
+				}
 			},
 			mousemove:function(){
 				if(!lib.config.hover_handcard&&this.parentNode&&this.parentNode.parentNode==ui.me){
@@ -39044,8 +39048,10 @@
 				if(!lib.config.doubleclick_intro) return;
 				if(this.parentNode.isUnseen(0)) return;
                 if(!lib.character[this.parentNode.name]) return;
+				if(!ui.menuContainer) return;
 				var avatar=this;
 				var player=this.parentNode;
+				if(!game.players.contains(player)&&!game.dead.contains(player)) return;
 				if(!this._doubleClicking){
 					this._doubleClicking=true;
 					setTimeout(function(){
@@ -39061,8 +39067,10 @@
 				if(!lib.config.doubleclick_intro) return;
 				if(this.parentNode.classList.contains('unseen2')) return;
                 if(!lib.character[this.parentNode.name2]) return;
+				if(!ui.menuContainer) return;
 				var avatar=this;
 				var player=this.parentNode;
+				if(!game.players.contains(player)&&!game.dead.contains(player)) return;
 				if(!this._doubleClicking){
 					this._doubleClicking=true;
 					setTimeout(function(){

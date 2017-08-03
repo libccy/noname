@@ -1681,6 +1681,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								var info=get.info(skills[i]);
 								if(info&&info.ai&&info.ai.weather){
 									target.removeSkill(skills[i]);
+									game.log(target,'解除了','【'+get.translation(skills[i])+'】','的效果');
 								}
 							}
 						}
@@ -1755,11 +1756,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'spell_bronze',
 				enable:true,
 				filterTarget:function(card,player,target){
-					return target.isMinHp()&&target.countCards('he');
+					return target.isMinHp()&&target.countCards('h');
 				},
 				selectTarget:-1,
 				content:function(){
-					target.randomDiscard();
+					target.randomDiscard('h');
 				},
 				ai:{
 					basic:{
@@ -1795,14 +1796,30 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				selectTarget:-1,
 				content:function(){
 					var list=target.getEnemies();
+					var equips=[];
 					for(var i=0;i<list.length;i++){
-						if(!list[i].countCards('e')){
-							list.splice(i--,1);
+						equips.addArray(list[i].getCards('e'));
+					}
+					equips=equips.randomGets(2);
+					if(equips.length==2){
+						var target1=get.owner(equips[0]);
+						var target2=get.owner(equips[1]);
+						if(target1==target2){
+							target1.discard(equips);
+							player.line(target1);
+						}
+						else{
+							target1.discard(equips[0]).delay=false;
+							target2.discard(equips[1]);
+							player.line(target1);
+							player.line(target2);
 						}
 					}
-					var target=list.randomGet();
-					player.line(target);
-					target.randomDiscard('e',2);
+					else if(equips.length){
+						var target1=get.owner(equips[0]);
+						target1.discard(equips[0]);
+						player.line(target1);
+					}
 				},
 				ai:{
 					basic:{
@@ -2207,11 +2224,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_ciguhanshuang_bg:'霜',
 			gw_ciguhanshuang_info:'天气牌，出牌阶段对一名角色及其相邻角色使用，目标下个摸牌阶段摸牌数-1',
 			gw_wenyi:'瘟疫',
-			gw_wenyi_info:'令所有体力值为全场最少的角色随机弃置一张牌',
+			gw_wenyi_info:'令所有体力值为全场最少的角色随机弃置一张手牌',
 			gw_yanziyaoshui:'燕子药水',
 			gw_yanziyaoshui_info:'令一名角色摸一张牌，若其手牌数为全场最少或之一，改为摸两张',
 			gw_shanbengshu:'山崩术',
-			gw_shanbengshu_info:'出牌阶段对自己使用，令一名随机敌方角色随机弃置两件装备',
+			gw_shanbengshu_info:'出牌阶段对自己使用，随机弃置两件敌方角色场上的装备',
 			gw_kunenfayin:'昆恩法印',
 			gw_kunenfayin_info:'出牌阶段对一名角色使用，目标不能成为其他角色的普通锦囊牌的目标，持续3回合',
 		},

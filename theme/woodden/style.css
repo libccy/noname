@@ -242,3 +242,7 @@ html{
 .menubg.charactercard>.ava>.avatar{
     box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 0 5px;
 }
+
+#arena:not(.chess) .player[data-position='0']>.equips>.equip5>.image{
+	background-position: -6px -6px;
+}

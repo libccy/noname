@@ -1575,10 +1575,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     						game.pause();
     						var list=_status.mylist.slice(0);
     						if(_status.double_character){
-    							event.dialog=ui.create.dialog('','hidden');
+    							event.dialog=ui.create.dialog('','hidden','forcebutton');
     						}
     						else{
-    							event.dialog=ui.create.dialog('','hidden');
+    							event.dialog=ui.create.dialog('','hidden','forcebutton');
     						}
 
     						var buttons=ui.create.div('.buttons',event.dialog.content);

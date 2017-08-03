@@ -2145,6 +2145,10 @@ div:not(.handcards)>.card>.info>span,
     background-position: -4px -4px;
     background-repeat: no-repeat;
 }
+
+#arena:not(.chess) .player[data-position='0']>.equips>div>.image{
+    background-size: 115%;
+}
 /*.equips>div:hover>.info{display: inline-block;
 	animation:equip_hover 1s;
 	-webkit-animation:equip_hover 1s;

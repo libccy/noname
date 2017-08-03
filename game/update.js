@@ -3,6 +3,7 @@ window.noname_update={
     // update:'1.9.34',
     changeLog:[
         'bug修复',
+        '双击头像显示资料'
     ],
     files:[
         'game/game.js',
