@@ -6196,7 +6196,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return type=='basic'||type=='trick';
     			},
     			content:function(){
-    				if(!event.isMine()) game.delay(0.5);
+    				game.delay(0.5);
     				player.chooseToDiscard(true,'he');
     			}
     		},
