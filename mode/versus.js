@@ -1563,6 +1563,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                     if(_status.rechoose){
                         delete _status.rechoose;
                         event.goto(0);
+                        var dialog=event.xdialog;
+    					if(dialog){
+                            for(var i=0;i<dialog.buttons.length;i++){
+    							dialog.buttons[i].classList.remove('unselectable');
+    							dialog.buttons[i].classList.remove('noclick');
+        					}
+    					}
                         return;
                     }
                     if(event.seatsbutton){

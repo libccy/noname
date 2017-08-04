@@ -49,7 +49,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			gw_bierna:['female','qun',4,['gwfengshi']],
 			gw_haizhiyezhu:['male','qun',4,['yangfan']],
-			gw_nitelila:['male','qun',4,['shuangxi']],
+			gw_nitelila:['male','wei',4,['shuangxi']],
 		},
 		characterIntro:{
 			gw_huoge:'那个老年痴呆?不知道他是活着还是已经被制成标本了!',
@@ -65,6 +65,65 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			shuangxi:{
+				enable:'phaseUse',
+				round:2,
+				filterTarget:function(card,player,target){
+					if(player.getStat('damage')){
+						return player.canUse('gw_baishuang',target);
+					}
+					else{
+						return player.canUse('gw_ciguhanshuang',target);
+					}
+				},
+				// changeTarget:function(player,targets){
+				// 	if(!player.getStat('damage')){
+				// 		game.filterPlayer(function(current){
+		        //             return get.distance(targets[0],current,'pure')==1;
+		        //         },targets);
+				// 	}
+				// },
+				selectTarget:function(){
+					if(_status.event.player.getStat('damage')){
+						return [1,3];
+					}
+					else{
+						return 1;
+					}
+				},
+				delay:0,
+				multitarget:true,
+				multiline:true,
+				prompt:function(){
+					if(_status.event.player.getStat('damage')){
+						return '视为使用一张【白霜】';
+					}
+					else{
+						return '视为使用一张【刺骨寒霜】';
+					}
+				},
+				content:function(){
+					if(player.getStat('damage')){
+						player.useCard({name:'gw_baishuang'},targets);
+					}
+					else{
+						player.useCard({name:'gw_ciguhanshuang'},targets);
+					}
+				},
+				ai:{
+					order:1,
+					result:{
+						player:function(player,target){
+							if(player.getStat('damage')){
+								return get.effect(target,{name:'gw_baishuang'},player,player);
+							}
+							else{
+								return get.effect(target,{name:'gw_ciguhanshuang'},player,player);
+							}
+						}
+					}
+				}
+			},
 			yangfan:{
 				trigger:{player:'useCard'},
 				forced:true,
@@ -2246,7 +2305,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_nitelila:'尼斯里拉',
 
 			shuangxi:'霜袭',
-			shuangxi_info:'每两轮限一次，你可以视为使用一张【刺骨寒霜】；若你本回合造成过伤害，改为使用【白霜】',
+			shuangxi_info:'每两轮限一次，出牌阶段，你可以视为使用一张【刺骨寒霜】；若你在本回合造成过伤害，改为使用【白霜】',
 			gwfengshi:'风蚀',
 			gwfengshi_info:'结束阶段，你可以选择一项：1. 为自己施加一个随机负面效果，并对两名随机敌人施加一个随机负面效果；2. 为自己施加两个随机正面效果，并对一名随机敌人施加一个随机正面效果',
 			yangfan:'扬帆',
