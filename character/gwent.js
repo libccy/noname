@@ -160,7 +160,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					player.chooseControlList(['为自己施加一个随机负面效果，并对两名随机敌人施加一个随机负面效果','为自己施加两个随机正面效果，并对一名随机敌人施加一个随机正面效果'],function(){
+					player.chooseControlList(get.prompt('gwfengshi'),['为自己施加一个随机负面效果，并对两名随机敌人施加一个随机负面效果','为自己施加两个随机正面效果，并对一名随机敌人施加一个随机正面效果'],function(){
 						if(player.getEnemies().length<2) return 1;
 						if(player.hp<=1) return 1;
 						if(player.hp==2&&Math.random()<0.5) return 1;
@@ -2309,7 +2309,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwfengshi:'风蚀',
 			gwfengshi_info:'结束阶段，你可以选择一项：1. 为自己施加一个随机负面效果，并对两名随机敌人施加一个随机负面效果；2. 为自己施加两个随机正面效果，并对一名随机敌人施加一个随机正面效果',
 			yangfan:'扬帆',
-			yangfan_info:'锁定技，每当你使用一张非装备牌，你随机重铸一张与其花色相同的牌；若没有花色相同的手牌，改为随机重铸一张与其颜色相同的牌',
+			yangfan_info:'锁定技，每当你使用一张非装备牌，你随机重铸一张与其花色相同的手牌；若没有花色相同的手牌，改为随机重铸一张与其颜色相同的手牌',
 			gwchenshui:'沉睡',
 			gwchenshui_bg:'睡',
 			gwchenshui_info:'锁定技，你防止即将造成或受到的伤害，改为令伤害来随机源获得对方一张牌；结束阶段，若你自上次沉睡起累计发动了至少3次沉睡效果，你解除沉睡状态，对所有敌方角色造成一点伤害，然后切换至觉醒状态',

@@ -1338,10 +1338,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					useful:[5,1],
 					result:{
 						target:function(player,target){
-							if(target.needsToDiscard()) return -1;
-							if(target.needsToDiscard(1)) return -0.7;
-							if(target.needsToDiscard(2)) return -0.4;
-							return -0.1;
+							return -Math.sqrt(target.countCards('h'));
 						}
 					},
 					order:1.2,
@@ -1878,15 +1875,26 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				nopop:true,
 	            intro:{
-	                content:'不能使用基本牌直到下一回合结束'
+	                content:'每使用一张基本牌或锦囊牌，需弃置一张牌'
 	            },
-	            mod:{
-	                cardEnabled:function(card){
-	                    if(get.type(card)=='basic') return false;
-	                }
-	            },
+				trigger:{player:'useCard'},
+    			forced:true,
+    			filter:function(event,player){
+    				if(player.countCards('he')==0) return false;
+    				var type=get.type(event.card,'trick');
+    				return type=='basic'||type=='trick';
+    			},
+    			content:function(){
+    				if(!event.isMine()) game.delay(0.5);
+    				player.chooseToDiscard(true,'he');
+    			},
 				ai:{
-					weather:true
+					weather:true,
+					effect:{
+						player:function(card,player){
+							if(!player.needsToDiscard()) return 'zeroplayertarget';
+						}
+					}
 				}
 			},
 			gw_nuhaifengbao:{
@@ -2144,7 +2152,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_guaiwuchaoxue:'怪物巢穴',
 			gw_guaiwuchaoxue_info:'随机获得一个卖血技能直到下一回合开始；令一名随机敌方角色对你造成一点伤害，然后获得一点护甲',
 			gw_baobaoshu:'雹暴术',
-			gw_baobaoshu_info:'天气牌，出牌阶段对至多两名角色使用，目标不能使用基本牌直到下一回合结束',
+			gw_baobaoshu_info:'天气牌，出牌阶段对至多两名角色使用，目标每使用一张基本牌或锦囊牌，需弃置一张牌，直到下一回合结束',
 			gw_baishuang:'白霜',
 			gw_baishuang_info:'天气牌，出牌阶段对至多三名角色使用，目标下个摸牌阶段摸牌数-1',
 			gw_nuhaifengbao:'怒海风暴',
