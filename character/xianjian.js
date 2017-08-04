@@ -570,28 +570,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			linghuo:{
-				init:function(player){
-					player.storage.linghuo=-1;
-				},
-				intro:{
-					content:function(storage,player){
-						var num=2-(game.roundNumber-storage);
-						if(num>0){
-							return get.cnNumber(num)+'轮后技能重置';
-						}
-						return '技能可发动';
-					},
-					markcount:function(storage,player){
-						var num=2-(game.roundNumber-storage);
-						if(num>0){
-							return num;
-						}
-						return 0;
-					}
-				},
+				round:2,
 				trigger:{global:'phaseEnd'},
 				filter:function(event,player){
-					if(2-(game.roundNumber-player.storage.linghuo)>0) return false;
 					return event.player.getStat('damage')&&event.player!=player;
 				},
 				check:function(event,player){
@@ -605,58 +586,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					trigger.player.damage('fire');
-					player.storage.linghuo=game.roundNumber;
-					player.syncStorage('linghuo');
-					player.markSkill('linghuo');
 				},
-				group:'linghuo_mark',
-				subSkill:{
-					mark:{
-						trigger:{global:'roundStart'},
-						silent:true,
-						content:function(){
-							if(2-(game.roundNumber-player.storage.linghuo)>0){
-								player.updateMarks();
-							}
-							else{
-								player.unmarkSkill('linghuo');
-							}
-						}
-					}
-				}
 			},
 			guijin:{
-				init:function(player){
-					player.storage.guijin=-2;
-				},
-				intro:{
-					content:function(storage,player){
-						var num=3-(game.roundNumber-storage);
-						if(num>0){
-							return get.cnNumber(num)+'轮后技能重置';
-						}
-						return '技能可发动';
-					},
-					markcount:function(storage,player){
-						var num=3-(game.roundNumber-storage);
-						if(num>0){
-							return num;
-						}
-						return 0;
-					}
-				},
-				group:'guijin_mark',
+				round:3,
 				enable:'phaseUse',
 				delay:0,
-				filter:function(event,player){
-					return 3-(game.roundNumber-player.storage.guijin)<=0;
-				},
 				content:function(){
 					'step 0'
 					event.cards=get.cards(4);
-					player.storage.guijin=game.roundNumber;
-					player.syncStorage('guijin');
-					player.markSkill('guijin');
 					'step 1'
 					if(event.cards.length){
 						var more=false,remain=false,nomore=false;
@@ -751,20 +689,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 1;
 						}
 					}
-				},
-				subSkill:{
-					mark:{
-						trigger:{global:'roundStart'},
-						silent:true,
-						content:function(){
-							if(3-(game.roundNumber-player.storage.guijin)>0){
-								player.updateMarks();
-							}
-							else{
-								player.unmarkSkill('guijin');
-							}
-						}
-					}
 				}
 			},
 			guijin2:{
@@ -781,28 +705,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			chengxin:{
-				init:function(player){
-					player.storage.chengxin=-3;
-				},
-				intro:{
-					content:function(storage,player){
-						var num=4-(game.roundNumber-storage);
-						if(num>0){
-							return get.cnNumber(num)+'轮后技能重置';
-						}
-						return '技能可发动';
-					},
-					markcount:function(storage,player){
-						var num=4-(game.roundNumber-storage);
-						if(num>0){
-							return num;
-						}
-						return 0;
-					}
-				},
+				round:4,
 				enable:'chooseToUse',
     			filter:function(event,player){
-					if(4-(game.roundNumber-player.storage.chengxin)>0) return false;
     				return event.type=='dying';
     			},
     			filterTarget:function(card,player,target){
@@ -812,9 +717,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			content:function(){
     				target.recover(1-target.hp);
 					target.addTempSkill('chengxin2',{player:'phaseAfter'});
-					player.storage.chengxin=game.roundNumber;
-					player.syncStorage('chengxin');
-					player.markSkill('chengxin');
     			},
     			ai:{
     				order:6,
@@ -827,22 +729,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				result:{
     					target:3
     				},
-    			},
-				group:'chengxin_mark',
-				subSkill:{
-					mark:{
-						trigger:{global:'roundStart'},
-						silent:true,
-						content:function(){
-							if(4-(game.roundNumber-player.storage.chengxin)>0){
-								player.updateMarks();
-							}
-							else{
-								player.unmarkSkill('chengxin');
-							}
-						}
-					}
-				}
+    			}
 			},
 			chengxin2:{
 				trigger:{player:'damageBefore'},

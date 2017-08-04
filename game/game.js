@@ -8977,6 +8977,9 @@
                         player.storage.counttrigger&&player.storage.counttrigger[event.skill]>=info.usable){
                         event.finish();
                     }
+					else if(info.round&&(info.round-(game.roundNumber-player.storage[event.skill+'_roundcount'])>0)){
+						event.finish();
+					}
     				else{
     					var hidden=player.hiddenSkills.slice(0);
     					game.expandSkills(hidden);
@@ -11589,6 +11592,12 @@
 							case 'throw2':player.$throw(cards.length);break;
 							default:info.prepare(cards,player,targets);
 						}
+					}
+					if(info.round){
+						var roundname=skill+'_roundcount';
+						player.storage[roundname]=game.roundNumber;
+						player.syncStorage(roundname);
+						player.markSkill(roundname);
 					}
 					"step 1"
 					var info=get.info(event.skill);
@@ -15880,6 +15889,12 @@
 					}
 					if(this.checkShow){
 						this.checkShow(name);
+					}
+					if(info.round){
+						var roundname=name+'_roundcount';
+						this.storage[roundname]=game.roundNumber;
+						this.syncStorage(roundname);
+						this.markSkill(roundname);
 					}
 					game.trySkillAudio(name,this,true);
 					if(game.chess){
@@ -25605,6 +25620,7 @@
 							if(info.viewAs&&info.viewAsFilter&&info.viewAsFilter(player)==false) enable=false;
 							if(info.usable&&get.skillCount(skills2[i])>=info.usable) enable=false;
 	                        if(info.chooseButton&&_status.event.noButton) enable=false;
+							if(info.round&&(info.round-(game.roundNumber-player.storage[skills2[i]+'_roundcount'])>0)) enable=false;
 						}
 						if(enable){
 							if(event.isMine()||!event._aiexclude.contains(skills2[i])){
@@ -26820,6 +26836,56 @@
 					game.finishSkill(i+'_'+j,true);
                 }
             }
+			if(info.round){
+				var k=i+'_roundcount';
+				if(typeof info.group=='string'){
+					info.group=[info.group,k];
+				}
+				else if(Array.isArray(info.group)){
+					info.group.add(k);
+				}
+				else{
+					info.group=[k];
+				}
+				lib.skill[k]=(function(round,name){
+					return {
+						init:function(player){
+							player.storage[name]=1-round;
+						},
+						intro:{
+							content:function(storage,player){
+								var num=round-(game.roundNumber-storage);
+								if(num>0){
+									return get.cnNumber(num)+'轮后技能重置';
+								}
+								return '技能可发动';
+							},
+							markcount:function(storage,player){
+								var num=round-(game.roundNumber-storage);
+								if(num>0){
+									return num;
+								}
+								return 0;
+							}
+						},
+						trigger:{global:'roundStart'},
+						forced:true,
+						popup:false,
+						silent:true,
+						content:function(){
+							var skill=event.name.slice(0,event.name.indexOf('_roundcount'));
+							if(lib.skill[skill].round-(game.roundNumber-player.storage[event.name])>0){
+								player.updateMarks();
+							}
+							else{
+								player.unmarkSkill(event.name);
+							}
+						}
+					};
+				}(info.round,k));
+				lib.translate[k]=lib.translate[i]||'';
+				lib.translate[k+'_bg']=lib.translate[i+'_bg']||lib.translate[k][0];
+			}
             if(info.marktext){
                 lib.translate[i+'_bg']=info.marktext;
             }

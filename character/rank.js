@@ -185,6 +185,9 @@ window.noname_character_rank={
         'xizhicai',
     ],
     am:[
+        'gw_haizhiyezhu',
+        'gw_nitelila',
+        'gw_bierna',
         'gw_fuertaisite',
         'gw_hengsaite',
         'gw_kuite',
