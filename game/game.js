@@ -39179,7 +39179,7 @@
 				}
 				// ui.click.skin(this,player.name);
 				game.pause2();
-				ui.click.charactercard(player.name,null,null,true);
+				ui.click.charactercard(player.name,null,null,true,this);
 			},
 			avatar2:function(){
 				if(!lib.config.doubleclick_intro) return;
@@ -39198,7 +39198,7 @@
 				}
 				// ui.click.skin(this,player.name2);
 				game.pause2();
-				ui.click.charactercard(player.name2,null,null,true);
+				ui.click.charactercard(player.name2,null,null,true,this);
 			},
 			player:function(){
 				return ui.click.target.apply(this,arguments);
@@ -39568,7 +39568,7 @@
 					delete this.logvtimeout;
 				}
 			},
-			charactercard:function(name,sourcenode,noedit,resume){
+			charactercard:function(name,sourcenode,noedit,resume,avatar){
 				if(_status.dragged) return;
 				if(lib.config.theme!='simple'){
 					ui.window.classList.add('shortcutpaused');
@@ -39635,12 +39635,14 @@
                                         lib.config.skin[nameskin]=this._link;
                                         bg.style.backgroundImage=this.style.backgroundImage;
 										if(sourcenode) sourcenode.style.backgroundImage=this.style.backgroundImage;
+										if(avatar) avatar.style.backgroundImage=this.style.backgroundImage;
                                         game.saveConfig('skin',lib.config.skin);
                                     }
                                     else{
                                         delete lib.config.skin[nameskin];
 										bg.setBackground(nameskin,'character');
-                                        if(sourcenode) sourcenode.setBackground(nameskin,'character');
+										if(sourcenode) sourcenode.setBackground(nameskin,'character');
+                                        if(avatar) avatar.setBackground(nameskin,'character');
                                         game.saveConfig('skin',lib.config.skin);
                                     }
                                 });

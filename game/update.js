@@ -1,9 +1,8 @@
 window.noname_update={
-    version:'1.9.35',
-    // update:'1.9.34',
+    version:'1.9.35.1',
+    // update:'1.9.35',
     changeLog:[
         'bug修复',
-        '双击头像显示资料'
     ],
     files:[
         'game/game.js',
@@ -11,15 +10,15 @@ window.noname_update={
         // 'game/config.js',
         // 'game/source.js',
         // 'game/pressure.js',
-        // 'game/asset.js',
+        'game/asset.js',
         // 'card/*',
         // 'card/standard.js',
-        // 'card/gwent.js',
+        'card/gwent.js',
         // 'card/gujian.js',
         // 'character/*',
         // 'character/hearth.js',
         // 'character/old.js',
-        // 'character/gwent.js',
+        'character/gwent.js',
         // 'character/sp.js',
         // 'character/swd.js',
         // 'character/rank.js',
