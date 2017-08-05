@@ -1070,6 +1070,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				multitarget:true,
 				targetprompt:['被借刀','出杀目标'],
 				complexTarget:true,
+				multicheck:function(){
+					return game.hasPlayer(function(current){
+						if(current.getEquip(1)){
+							return game.hasPlayer(function(current2){
+								return lib.filter.filterTarget({name:'sha'},current,current2);
+							})
+						}
+					});
+				},
 				filterTarget:function(card,player,target){
 					if(ui.selected.targets.length==0){
 						return (player!=target&&target.getCards('e',{subtype:'equip1'}).length);

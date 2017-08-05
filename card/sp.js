@@ -296,7 +296,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			shengdong:{
 	            fullskin:true,
-	            enable:true,
+	            enable:function(){
+					return game.countPlayer()>2;
+				},
 				chongzhu:function(){
 					return game.countPlayer()<=2;
 				},

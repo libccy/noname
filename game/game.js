@@ -12597,6 +12597,11 @@
 						event.finish();
 						return;
 					}
+					if(event.draw){
+						game.delay(0,300);
+                        player.$draw(card);
+					}
+					"step 2"
 					if(card.clone){
                         game.broadcast(function(card,player){
                             if(card.clone){
@@ -12608,7 +12613,7 @@
 					}
 					player.equiping=true;
 					player.lose(player.getCards('e',{subtype:get.subtype(card)}),false);
-					"step 2"
+					"step 3"
 					if(player.isMin()){
 						event.finish();
 						card.discard();
@@ -12624,9 +12629,6 @@
     					}
                     },get.subtype(card));
 					player.$equip(card);
-                    if(event.draw){
-                        player.$draw(card);
-                    }
 					game.addVideo('equip',player,get.cardInfo(card));
 					game.log(player,'装备了',card);
 					"step 3"
@@ -12649,10 +12651,6 @@
 						if(info.equipDelay!='false') game.delayx();
 					}
 					delete player.equiping;
-                    "step 4"
-                    if(event.draw){
-                        game.delay();
-                    }
 				},
 				addJudge:function(){
 					"step 0"
@@ -14485,6 +14483,9 @@
 						next.forced=true;
 						next.onresult=function(result){
 							if(result.bool){
+								if(info.multitarget&&result.targets.length<get.select(info.selectTarget)[0]){
+									return;
+								}
 								player.useCard(card,result.targets);
 							}
 						}
@@ -15663,10 +15664,13 @@
                     }
                     return this;
                 },
-				equip:function(card){
+				equip:function(card,draw){
 					var next=game.createEvent('equip');
 					next.card=card;
 					next.player=this;
+					if(draw){
+						next.draw=true;
+					}
 					next.setContent(lib.element.content.equip);
                     return next;
 				},
