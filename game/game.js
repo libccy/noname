@@ -10430,6 +10430,10 @@
 					}
 					if(event.dialog) event.dialog.close();
 					event.resume();
+					"step 2"
+					if(event.onresult){
+						event.onresult(event.result);
+					}
 				},
 				chooseCardTarget:function(){
 					"step 0"
@@ -14441,6 +14445,50 @@
                     next.setContent('chooseCard');
                     next._args=Array.from(arguments);
 					return next;
+				},
+				chooseUseTarget:function(card){
+					// not online-ready
+					if(typeof card=='string'){
+						card={name:card};
+					}
+					var name=card.name;
+					var info=lib.card[name];
+					var player=this;
+					if(info.selectTarget==-1){
+						var targets=game.filterPlayer(function(current){
+							return lib.filter.filterTarget(card,player,current);
+						});
+						if(targets.length){
+							targets.sort(lib.sort.seat);
+							player.useCard(card,targets);
+						}
+					}
+					else if(info.notarget){
+						player.useCard(card);
+					}
+					else if(game.hasPlayer(function(current){
+						return player.canUse(card,current);
+					})){
+						if(info.multicheck&&!info.multicheck(card,player)){
+							return;
+						}
+						var next=player.chooseTarget('选择'+get.translation(card)+'的目标');
+						next._get_card=card;
+						next.filterTarget=lib.filter.filterTarget;
+						next.ai=get.effect;
+						if(typeof info.selectTarget=='function'){
+							next.selectTarget=info.selectTarget;
+						}
+						else{
+							next.selectTarget=get.select(info.selectTarget);
+						}
+						next.forced=true;
+						next.onresult=function(result){
+							if(result.bool){
+								player.useCard(card,result.targets);
+							}
+						}
+					}
 				},
 				chooseTarget:function(){
 					var next=game.createEvent('chooseTarget');

@@ -1242,29 +1242,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
     					return true;
     				};
     				'step 1'
-					var fakecard=game.createCard(result.links[0][2]);
-					var info=get.info(fakecard);
-					event.fakecard=fakecard;
-					if(info.notarget){
-						player.useCard(fakecard);
-						event.finish();
-					}
-					else if(info.selectTarget==-1){
-						player.useCard(fakecard,game.filterPlayer(function(current){
-							return player.canUse(fakecard,current);
-						}).sortBySeat());
-					}
-					else{
-						player.chooseTarget('选择'+get.translation(fakecard)+'的目标',function(card,player,target){
-							return player.canUse(fakecard,target);
-						},true).ai=function(target){
-							return get.effect(target,fakecard,player,player);
-						};
-					}
-					'step 2'
-					if(result.bool&&result.targets&&result.targets.length){
-						player.useCard(event.fakecard,result.targets);
-					}
+					player.chooseUseTarget(game.createCard(result.links[0][2],get.suit(card),get.number(card)));
 				},
 				ai:{
 					value:7,

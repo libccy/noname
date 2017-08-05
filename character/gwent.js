@@ -50,6 +50,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_bierna:['female','qun',4,['gwfengshi']],
 			gw_haizhiyezhu:['male','qun',4,['yangfan']],
 			gw_nitelila:['male','wei',4,['shuangxi']],
+
+			gw_linjing:['male','wu',4,['gwyewu']],
 		},
 		characterIntro:{
 			gw_huoge:'那个老年痴呆?不知道他是活着还是已经被制成标本了!',
@@ -65,6 +67,66 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			gwyewu:{
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					if(!player.countCards('he')) return false;
+					var targets=player.getEnemies();
+					for(var i=0;i<targets.length;i++){
+						if(targets[i].countCards('he')) return true;
+					}
+					return false;
+				},
+				filterCard:true,
+				position:'he',
+				check:function(card){
+					return 8-get.value(card);
+				},
+				content:function(){
+					'step 0'
+					event.targets=player.getEnemies();
+					event.color=get.color(cards[0]);
+					event.num=0;
+					'step 1'
+					event.repeat=false;
+					var list=game.filterPlayer(function(current){
+						return event.targets.contains(current)&&current.countCards('he');
+					});
+					if(list.length){
+						var target=list.randomGet();
+						var card=target.randomDiscard()[0];
+						player.line(target,'green');
+						event.num++;
+						if(card&&get.color(card)==event.color){
+							event.redo();
+						}
+					}
+					'step 2'
+					var togain=[];
+					for(var i=0;i<event.num;i++){
+						togain.push(game.createCard('gw_wuyao'));
+					}
+					player.gain(togain,'gain2');
+				},
+				global:'gw_wuyao',
+				ai:{
+					order:8,
+					result:{
+						player:1
+					}
+				}
+			},
+			gw_wuyao:{
+				trigger:{player:'phaseAfter'},
+				silent:true,
+				content:function(){
+					var cards=player.getCards('h','gw_wuyao');
+					if(cards.length){
+						player.lose(cards).position=null;
+					}
+				}
+			},
 			shuangxi:{
 				enable:'phaseUse',
 				round:2,
@@ -2225,6 +2287,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		card:{
+			gw_wuyao:{
+				type:'special',
+				fullimage:true,
+				derivation:'gw_linjing',
+				vanish:true,
+				addinfo:'杀',
+				autoViewAs:'sha',
+				ai:{
+					order:function(){
+						return lib.card.sha.ai.order()+0.5;
+					}
+				}
+			},
 			gw_dudayuanshuai1:{
 				type:'special',
 				fullimage:true,
@@ -2304,6 +2379,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_haizhiyezhu:'海之野猪',
 			gw_nitelila:'尼斯里拉',
 
+			gw_linjing:'林精',
+			gw_nvyemo:'女夜魔',
+			gw_mierjiata:'米尔加塔',
+
+			gw_wuyao:'雾妖',
+			gw_wuyao_info:'在你行动时可当作杀使用；回合结束后，从手牌中消失',
+			gwyewu:'叶舞',
+			gwyewu_info:'出牌阶段限一次，你可以弃置一张牌，并弃置一名随机敌人的一张随机牌；若目标弃置的牌与你弃置的牌颜色相同，则重复发动；每以此法弃置一张敌方角色的牌，你获得一张【雾妖】',
 			shuangxi:'霜袭',
 			shuangxi_info:'每两轮限一次，出牌阶段，你可以视为使用一张【刺骨寒霜】；若你在本回合造成过伤害，改为使用【白霜】',
 			gwfengshi:'风蚀',

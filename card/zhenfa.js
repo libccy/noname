@@ -7,10 +7,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'zhenfa',
 				chongzhu:true,
 				enable:true,
-				filterTarget:true,
-				selectTarget:-1,
-				multitarget:true,
+				notarget:true,
 				content:function(){
+					var targets=game.filterPlayer();
 					var n=targets.length;
 					while(n--){
 						game.swapSeat(targets.randomGet(),targets.randomGet());
@@ -34,33 +33,33 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return current!=player&&current.isFriendOf(player);
 					});
 				},
-				filterTarget:function(card,player,target){
-					if(player.inline()) return player.inline(target);
-					if(!player.getNext()) return false;
-					var list=game.filterPlayer(function(current){
-						return current!=player&&current.isFriendOf(player);
-					});
-					list.sort(function(a,b){
-						return get.distance(player,a,'absolute')-get.distance(player,b,'absolute');
-					});
-					return target==list[0];
-				},
-				selectTarget:-1,
-				multitarget:true,
-				multiline:true,
+				notarget:true,
 				content:function(){
-					if(targets.length==1){
-						game.swapSeat(targets[0],game.me.getNext(),true,true);
-					}
-					else{
+					if(player.inline()){
+						var targets=game.filterPlayer(function(current){
+							return player.inline(current);
+						});
+						player.line(targets);
 						game.asyncDraw(targets);
+					}
+					else if(player.getNext()){
+						var list=game.filterPlayer(function(current){
+							return current!=player&&current.isFriendOf(player);
+						});
+						if(list.length){
+							list.sort(function(a,b){
+								return get.distance(player,a,'absolute')-get.distance(player,b,'absolute');
+							});
+							player.line(list[0]);
+							game.swapSeat(list[0],player.getNext(),true,true);
+						}
 					}
 				},
 				mode:['guozhan'],
 				ai:{
 					order:6.5,
 					result:{
-						target:1,
+						player:1,
 					},
 					tag:{
 						draw:1
@@ -80,7 +79,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				selectTarget:-1,
 				content:function(){
-					target.chooseToDiscard('he',true);
+					target.chooseToDiscard('he',true).delay=false;
 				},
 				mode:['guozhan'],
 				ai:{
@@ -101,14 +100,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return current.isNotMajor();
 					});
 				},
-				multitarget:true,
-				multiline:true,
 				filterTarget:function(card,player,target){
 					return target.isNotMajor();
 				},
 				selectTarget:-1,
 				content:function(){
-					game.asyncDraw(targets);
+					target.draw(false);
+					target.$draw();
 				},
 				mode:['guozhan'],
 				ai:{
@@ -211,12 +209,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return current!=player&&current.identity==player.identity&&!player.inline(current);
 					});
 				},
-				filterTarget:function(card,player,target){
-					return target.identity==player.identity;
-				},
-				multitarget:true,
-				selectTarget:-1,
+				notarget:true,
 				content:function(){
+					var targets=game.filterPlayer(function(current){
+						return current.identity==player.identity;
+					});
 					targets.sortBySeat();
 					for(var i=1;i<targets.length;i++){
 						game.swapSeat(targets[i],targets[i-1].next,false);
@@ -227,7 +224,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:7,
 					result:{
-						target:1,
+						player:1,
 					},
 				}
 			},

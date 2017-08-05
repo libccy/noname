@@ -2330,43 +2330,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					if(result.bool){
-						var name=result.links[0][2];
-						var info=lib.card[name];
-						var card=game.createCard(name);
-						if(info.selectTarget==-1){
-							var targets=game.filterPlayer(function(current){
-								return lib.filter.filterTarget(card,player,current);
-							});
-							if(targets.length){
-								targets.sort(lib.sort.seat);
-								player.useCard(card,targets);
-							}
-							event.finish();
-						}
-						else if(info.notarget){
-							player.useCard(card);
-						}
-						else{
-							var next=player.chooseTarget('选择'+get.translation(name)+'的目标');
-							next._get_card=card;
-							next.filterTarget=lib.filter.filterTarget;
-							next.ai=get.effect;
-							if(typeof info.selectTarget=='function'){
-								next.selectTarget=info.selectTarget;
-							}
-							else{
-								next.selectTarget=get.select(info.selectTarget);
-							}
-							event.card=card;
-						}
-					}
-					else{
-						event.finish();
-					}
-					'step 2'
-					if(result.bool){
-						// player.addTempSkill('fengqi2',{player:'useCardAfter'});
-						player.useCard(event.card,result.targets);
+						player.chooseUseTarget(result.links[0][2]);
 					}
 				},
 				ai:{
