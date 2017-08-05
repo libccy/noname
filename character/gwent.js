@@ -109,7 +109,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					player.gain(togain,'gain2');
 				},
-				global:'gw_wuyao',
 				ai:{
 					order:8,
 					result:{
@@ -117,7 +116,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			gw_wuyao:{
+			g_gw_wuyao:{
 				trigger:{player:'phaseAfter'},
 				silent:true,
 				content:function(){
@@ -2298,7 +2297,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:function(){
 						return lib.card.sha.ai.order()+0.5;
 					}
-				}
+				},
+				global:'g_gw_wuyao'
 			},
 			gw_dudayuanshuai1:{
 				type:'special',
@@ -2383,6 +2383,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_nvyemo:'女夜魔',
 			gw_mierjiata:'米尔加塔',
 
+			gouhun:'勾魂',
+			gouhun_info:'出牌阶段限一次，你可以展示至多4张手牌，令一名其他角色获得其中一张，然后将其余展示的牌置于弃牌堆。若如此做，目标需在其下个准备阶段交给你数量等同于你展示牌数的手牌，若手牌数不足，则其交给你全部手牌，并进入混乱状态直到回合结束',
 			gw_wuyao:'雾妖',
 			gw_wuyao_info:'在你行动时可当作杀使用；回合结束后，从手牌中消失',
 			gwyewu:'叶舞',
