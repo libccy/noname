@@ -1327,7 +1327,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					useful:[5,1],
 					result:{
 						target:function(player,target){
-							return -Math.sqrt(target.countCards('h'));
+							return -Math.sqrt(target.countCards('h'))-0.5;
 						}
 					},
 					order:1.2,
