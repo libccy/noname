@@ -42432,6 +42432,9 @@
 			}
 			return null;
 		},
+		cardPile2:function(name){
+			return get.cardPile(name,'cardPile');
+		},
 		aiStrategy:function(){
 			switch(get.config('ai_strategy')){
 				case 'ai_strategy_1':return 1;

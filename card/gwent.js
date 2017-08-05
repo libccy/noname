@@ -1100,15 +1100,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				// },
 				content:function(){
     				var list=[];
-					list.push(get.cardPile('juedou','cardPile'));
-					list.push(get.cardPile('huogong','cardPile'));
-					list.push(get.cardPile('nanman','cardPile'));
-					list.push(get.cardPile('huoshaolianying','cardPile'));
+					list.push(get.cardPile2('juedou'));
+					list.push(get.cardPile2('huogong'));
+					list.push(get.cardPile2('nanman'));
+					list.push(get.cardPile2('huoshaolianying'));
 					for(var i=0;i<list.length;i++){
 						if(!list[i]) list.splice(i--,1);
 					}
 					list=[list.randomGet()];
-					var sha=get.cardPile('sha','cardPile');
+					var sha=get.cardPile2('sha');
 					if(sha){
 						if(list.length){
 							list.push(sha);
@@ -1116,7 +1116,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						else{
 							sha.remove();
 							list.push(sha);
-							var sha2=get.cardPile('sha','cardPile');
+							var sha2=get.cardPile2('sha');
 							if(sha2){
 								list.push(sha2);
 							}
@@ -2208,7 +2208,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_youer_bg:'饵',
 			gw_youer_info:'将一名其他角色的所有手牌移出游戏，然后摸一张牌，当前回合结束后该角色将以此法失去的牌收回手牌',
 			gw_tongdi:'通敌',
-			gw_tongdi_info:'观看一名其他角色的手牌并获得其中一张，然后令目标装备一件进攻马',
+			gw_tongdi_info:'观看一名其他角色的手牌并获得其中一张，然后令目标从牌堆或弃牌堆中装备一件进攻马',
 			gw_baoxueyaoshui:'暴雪药水',
 			gw_baoxueyaoshui_info:'令一名角色弃置两张手牌并摸一张牌',
 			gw_birinongwu:'蔽日浓雾',

@@ -550,7 +550,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     if(result.bool){
                         var target=result.targets[0];
                         player.logSkill('daiyan',target);
-                        var tao=get.cardPile('tao','cardPile');
+                        var tao=get.cardPile2('tao');
                         if(tao){
                             target.gain(tao,'gain2');
                         }

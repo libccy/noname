@@ -614,9 +614,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     'step 0'
                     player.showCards(get.translation(player)+'对'+get.translation(target)+'发动了【连计】',cards);
                     'step 1'
-                    var equip1=get.cardPile(function(card){
+                    var equip1=get.cardPile2(function(card){
                         return get.subtype(card)=='equip1';
-                    },'cardPile');
+                    });
                     target.$draw(equip1);
                     target.equip(equip1);
                     game.delay();

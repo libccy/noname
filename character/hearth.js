@@ -5097,7 +5097,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				var type=get.type(trigger.card);
-    				var card=get.cardPile(function(card){
+    				var card=get.cardPile2(function(card){
     					return get.type(card)==type;
     				});
     				if(card){
