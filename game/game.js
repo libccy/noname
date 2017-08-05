@@ -12631,7 +12631,7 @@
 					player.$equip(card);
 					game.addVideo('equip',player,get.cardInfo(card));
 					game.log(player,'装备了',card);
-					"step 3"
+					"step 4"
 					var info=get.info(card);
 					if(info.onEquip&&(!info.filterEquip||info.filterEquip(card,player))){
                         if(Array.isArray(info.onEquip)){
