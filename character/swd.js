@@ -6118,6 +6118,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return event.player.countCards('e');
     			},
     			direct:true,
+                logTarget:'player',
     			content:function(){
     				player.discardPlayerCard(trigger.player,'e',get.prompt('polang',trigger.player)).logSkill='polang';
     			},
@@ -6363,7 +6364,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				var num=player.countCards('h')-trigger.source.countCards('h');
     				event.num=num;
     				if(num>0){
-    					var next=player.chooseToDiscard(num,'是否弃置'+num+'张手牌，并对'+get.translation(trigger.source)+'造成一点伤害？');
+    					var next=player.chooseToDiscard(num,get.prompt('pozhen',trigger.source),'弃置'+num+'张手牌，并对'+get.translation(trigger.source)+'造成一点伤害');
     					next.logSkill=['pozhen',trigger.source];
     					next.ai=function(card){
     						if(get.damageEffect(trigger.source,player,player)>0&&num<=2){
@@ -6373,7 +6374,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					}
     				}
     				else if(num<0){
-    					player.chooseBool('是否弃置'+get.translation(trigger.source)+(-num)+'张手牌？').ai=function(){
+    					player.chooseBool(get.prompt('pozhen',trigger.source),'弃置'+get.translation(trigger.source)+(-num)+'张手牌').ai=function(){
     						return get.attitude(player,trigger.source)<0;
     					}
     				}

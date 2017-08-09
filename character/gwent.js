@@ -2331,6 +2331,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				derivation:'gw_zhuoertan',
 				vanish:true,
 				addinfo:'捣蛋鬼',
+				ai:{
+					value:-1
+				}
 			},
 		},
 		translate:{
@@ -2452,7 +2455,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwxiaoshou:'枭首',
 			gwxiaoshou_info:'出牌阶段限两次，你可以弃置一张牌对场上体力值最高（或之一）的一名角色造成一点伤害',
 			kuanglie:'狂猎',
-			kuanglie_info:'锁定技，当一名其他角色成为你的黑色牌的目标后，该角色随机弃置一张牌；每当你发动两次“狂猎”，你摸一张牌',
+			kuanglie_info:'锁定技，每当一名敌方角色成为你的黑色牌的目标，你视为对其使用【刺骨寒霜】；在一名角色受到【刺骨寒霜】的影响后，你随机获得一张【狂猎】牌',
+			lingshuang:'凛霜',
+			lingshuang_info:'每当你失去最后一张基本牌，你可以视为对距离2以内的所有敌方角色使用【刺骨寒霜】；在一名角色受到【刺骨寒霜】影响时，你可以弃置一张手牌将其效果改为“摸牌数-2”',
 			gwjiquan:'集权',
 			gwjiquan_info:'出牌阶段限一次，你可以从任意名角色处各获得一张牌，每拿一张牌，被拿牌的角色视为对你使用一张杀',
 			nuhou:'怒吼',

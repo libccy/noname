@@ -2507,7 +2507,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				event.current=player.next;
     				"step 1"
     				event.current.animate('target');
-    				event.current.chooseToUse('乱舞：使用一张杀或流失一点体力',{name:'sha'},function(card,player,target){
+    				event.current.chooseToUse('乱武：使用一张杀或流失一点体力',{name:'sha'},function(card,player,target){
     					if(player==target) return false;
     					if(!player.canUse('sha',target)) return false;
     					if(get.distance(player,target)<=1) return true;

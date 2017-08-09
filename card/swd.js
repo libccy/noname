@@ -5227,7 +5227,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['diamond',2,'jiguanyuan'],
 			['diamond',4,'jiguantong'],
 			['club',7,'jiguantong'],
-			['spade',1,'shenmiguo'],
+			// ['spade',1,'shenmiguo'],
 			['spade',2,'shenmiguo'],
 			['heart',1,'shenmiguo'],
 			['club',3,'jiguanfeng'],

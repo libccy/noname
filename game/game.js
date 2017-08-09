@@ -15942,7 +15942,7 @@
 					if(this.checkShow){
 						this.checkShow(name);
 					}
-					if(info.round){
+					if(info&&info.round){
 						var roundname=name+'_roundcount';
 						this.storage[roundname]=game.roundNumber;
 						this.syncStorage(roundname);
