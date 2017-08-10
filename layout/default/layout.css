@@ -122,11 +122,19 @@ table {
 	margin: 0;
 	position: absolute;
 	left: 0;
-	top: 16px;
+	top: 11px;
 	text-align: center;
 	pointer-events: none;
 	display: block;
 	font-family: 'xinwei'
+}
+#time>div{
+	margin: 0;
+	padding: 0;
+	display: inline-block;
+	margin-left: 6px;
+	margin-right: 6px;
+	position: relative;
 }
 #shortcut {
 	width: 100%;
@@ -533,6 +541,27 @@ table {
 #arena #me>div>div>.card {
 	position: absolute;
 	left: 8px;
+}
+
+.touchinfo{
+	padding: 6px;
+	position: absolute;
+	color: white;
+	text-shadow: black 0 0 2px;
+	top: 0;
+	margin: 0;
+	font-family: 'xinwei'
+}
+.touchinfo.left{
+	left: 0;
+}
+.touchinfo.right{
+	left: auto;
+	right: 0;
+	text-align: right;
+}
+#window.touchinfohidden>.touchinfo{
+	opacity: 0;
 }
 
 .roundarenabutton {

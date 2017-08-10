@@ -2563,7 +2563,7 @@
                             map.clear_log.hide();
                         }
 						if(get.is.phoneLayout()){
-                            map.show_time2.show();
+							map.show_time2.show();
                             map.show_time.hide();
 							if(lib.config.show_time2){
 								map.watchface.show();
@@ -2573,7 +2573,7 @@
 							}
                         }
                         else{
-                            map.show_time2.hide();
+							map.show_time2.hide();
                             map.show_time.show();
                             map.watchface.hide();
                         }
@@ -2690,6 +2690,11 @@
                             ui.roundmenu.dataset.watchface=item;
                         }
                     },
+					show_time3:{
+						name:'显示游戏时间',
+						init:false,
+						unfrequent:true
+					},
 					show_statusbar_android:{
 						name:'显示状态栏',
 						init:false,
@@ -2999,11 +3004,25 @@
 						unfrequent:true,
 						onclick:function(bool){
 							game.saveConfig('show_cardpile',bool);
-							if(lib.config.show_cardpile){
+							if(bool){
 								ui.cardPileButton.style.display='';
 							}
 							else{
 								ui.cardPileButton.style.display='none';
+							}
+						}
+					},
+					show_cardpile_number:{
+						name:'显示剩余牌数',
+						init:false,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_cardpile_number',bool);
+							if(bool){
+								ui.cardPileNumber.style.display='';
+							}
+							else{
+								ui.cardPileNumber.style.display='none';
 							}
 						}
 					},
@@ -28344,6 +28363,7 @@
     					}
                         ui.arena.classList.remove('menupaused');
                         ui.historybar.classList.remove('menupaused');
+						ui.window.classList.remove('touchinfohidden');
     					ui.config2.classList.remove('pressdown2');
                     }
 				};
@@ -28604,6 +28624,7 @@
     						ui.config2.classList.add('pressdown2');
     						ui.arena.classList.add('menupaused');
     						ui.historybar.classList.add('menupaused');
+							ui.window.classList.add('touchinfohidden');
                             menuContainer.classList.remove('hidden');
     						for(var i=0;i<menuUpdates.length;i++){
     							menuUpdates[i]();
@@ -36091,6 +36112,8 @@
 					ui.arena.dataset.framedecoration=lib.config.border_style.slice(7);
 				}
 
+				ui.gameinfo=ui.create.div('#time',ui.window);
+
 				ui.arenalog=ui.create.div('#arenalog',ui.arena);
 				if(lib.config.show_log=='off'){
 					ui.arenalog.style.display='none';
@@ -36126,6 +36149,47 @@
                     ui.roundmenu.classList.add('clock');
                 }
                 ui.roundmenu.dataset.watchface=lib.config.watchface||'none';
+				if(get.is.phoneLayout()){
+					if(lib.config.show_time3){
+						ui.time3=ui.create.div('.touchinfo.left',ui.window);
+					}
+					ui.cardPileNumber=ui.create.div('.touchinfo.right',ui.window);
+				}
+				else{
+					if(lib.config.show_time3){
+						ui.time3=ui.create.div(ui.gameinfo);
+					}
+					ui.cardPileNumber=ui.create.div(ui.gameinfo);
+				}
+				if(!lib.config.show_cardpile_number){
+					ui.cardPileNumber.style.display='none';
+				}
+				if(ui.time3){
+					ui.time3.starttime=get.utc();
+					ui.time3.interval=setInterval(function(){
+						var num=Math.round((get.utc()-ui.time3.starttime)/1000);
+						if(num>=3600){
+							var num1=Math.floor(num/3600);
+							var num2=Math.floor((num-num1*3600)/60);
+							if(num2<10){
+								num2='0'+num2.toString();
+							}
+							var num3=num-num1*3600-num2*60;
+							if(num3<10){
+								num3='0'+num3.toString();
+							}
+							ui.time3.innerHTML=num+':'+num2+':'+num3;
+						}
+						else{
+							var num1=Math.floor(num/60);
+							var num2=num-num1*60;
+							if(num2<10){
+								num2='0'+num2.toString();
+							}
+							ui.time3.innerHTML=num1+':'+num2;
+						}
+					},1000);
+				}
 				if(get.is.nomenu()){
 					if(!['menu','system'].contains(lib.config.round_menu_func)){
 						lib.config.round_menu_func='system';
@@ -36298,7 +36362,7 @@
 				ui.controls=[];
 				ui.style={};
 
-                ui.time=ui.create.div('#time',ui.window);
+                ui.time=ui.create.div(ui.gameinfo);
                 var timeInterval=function(){
                     var date=new Date();
                     var hours=date.getHours();
@@ -36980,6 +37044,7 @@
 						ui.create.card(ui.cardPile).init(lib.card.list[i]);
 					}
 				}
+				ui.cardPileNumber.innerHTML='0轮 剩余牌: '+ui.cardPile.childElementCount;
 			},
 		},
 		click:{
@@ -40036,6 +40101,7 @@
 				node.appendChild(ui.sidebar3);
 				ui.historybar.classList.add('paused');
 				ui.arena.classList.add('paused');
+				ui.window.classList.add('touchinfohidden');
                 ui.time.hide();
 				if(game.onpause){
 					game.onpause();
@@ -40050,6 +40116,7 @@
                 ui.time.show();
 				ui.historybar.classList.remove('paused');
 				ui.arena.classList.remove('paused');
+				ui.window.classList.remove('touchinfohidden');
 				game.resume2();
 				e.stopPropagation();
 				if(game.onresume){

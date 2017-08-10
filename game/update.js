@@ -2,7 +2,8 @@ window.noname_update={
     version:'1.9.36',
     // update:'1.9.35',
     changeLog:[
-        '新武将',
+        '武将修改',
+        '显示剩余牌堆数'
     ],
     files:[
         'game/game.js',
