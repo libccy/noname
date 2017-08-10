@@ -13,7 +13,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			// diy_zhouyu:['male','wu',3,['xiongzi','yaliang']],
 			diy_caiwenji:['female','qun',3,['beige','guihan']],
 			diy_lukang:['male','wu',4,['luweiyan','qianxun']],
-			diy_xuhuang:['male','wei',4,['diyduanliang']],
+			// diy_xuhuang:['male','wei',4,['diyduanliang']],
 			// diy_dianwei:['male','wei',4,['diyqiangxi']],
 			// diy_huangzhong:['male','shu',4,['liegong','fuli']],
 			// diy_weiyan:['male','shu',4,['diykuanggu']],

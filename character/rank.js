@@ -307,6 +307,8 @@ window.noname_character_rank={
         'diy_caiwenji',
         'hs_mijiaojisi',
         'hs_mojinbaozi',
+        'xuhuang',
+        'liuye',
     ],
     bp:[
         'gw_qigaiwang',
@@ -585,7 +587,6 @@ window.noname_character_rank={
         'luxun',
         'zhangjiao',
         'zhurong',
-        'xuhuang',
         'jsp_zhaoyun',
         'tianfeng',
         'old_zhonghui',

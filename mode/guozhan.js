@@ -193,7 +193,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_zhenji:['female','wei',3,['luoshen','qingguo']],
 				gz_xiahouyuan:['male','wei',4,['shensu']],
 				gz_zhanghe:['male','wei',4,['qiaobian']],
-				gz_xuhuang:['male','wei',4,['duanliang']],
+				gz_xuhuang:['male','wei',4,['gzduanliang']],
 				gz_caoren:['male','wei',4,['jushou']],
 				gz_dianwei:['male','wei',4,['qiangxi']],
 				gz_xunyu:['male','wei',3,['quhu','jieming']],
@@ -2831,6 +2831,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			duoshi_info:'出牌阶段限四次，你可以将一张红色手牌当【以逸待劳】使用。',
 			gzxiaoguo:'骁果',
 			gzxiaoguo_info:'其他角色的结束阶段开始时，你可以弃置一张基本牌，令该角色选择一项：1.弃置一张装备牌；2.受到你对其造成的1点伤害。',
+			gzduanliang:'断粮',
+			gzduanliang_info:'你可以将一张黑色基本牌或黑色装备牌当【兵粮寸断】使用；你可以对距离为2的角色使用【兵粮寸断】',
 		},
 		junList:['liubei','zhangjiao'],
 		guozhanPile:[

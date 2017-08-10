@@ -26,7 +26,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             menghuo:['male','shu',4,['huoshou','zaiqi']],
     		zhurong:['female','shu',4,['juxiang','lieren']],
     		caopi:['male','wei',3,['xingshang','fangzhu','songwei'],['zhu']],
-    		xuhuang:['male','wei',4,['duanliang']],
+    		xuhuang:['male','wei',4,['duanliang','jiezi']],
     		re_lusu:['male','wu',3,['haoshi','redimeng']],
     		sunjian:['male','wu',4,['yinghun']],
     		dongzhuo:['male','qun',8,['jiuchi','roulin','benghuai','baonue'],['zhu']],
@@ -2003,8 +2003,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				event.goto(1);
     			}
     		},
+            jiezi:{
+                trigger:{global:'phaseDrawSkipped'},
+                forced:true,
+                filter:function(event,player){
+                    return event.player!=player;
+                },
+                content:function(){
+                    player.draw();
+                }
+            },
+            gzduanliang:{
+                group:['duanliang1','duanliang2'],
+    			ai:{
+    				threaten:1.2
+    			}
+            },
     		duanliang:{
-    			group:['duanliang1','duanliang2'],
+    			group:['duanliang1','duanliang3'],
     			ai:{
     				threaten:1.2
     			}
@@ -2036,6 +2052,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     			}
     		},
+            duanliang3:{
+                mod:{
+    				targetInRange:function(card,player,target){
+    					if(card.name=='bingliang'){
+                            if(target.countCards('h')>=player.countCards('h')) return true;
+    					}
+    				}
+    			}
+            },
     		haoshi:{
     			audio:2,
     			trigger:{player:'phaseDrawBegin'},
@@ -4236,6 +4261,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		luanwu:'乱武',
     		wansha:'完杀',
     		weimu:'帷幕',
+            jiezi:'截辎',
+            jiezi_info:'锁定技，一名其他角色跳过摸牌阶段后，你摸一张牌',
     		huoshou_info:'【南蛮入侵】对你无效；你是任何【南蛮入侵】造成伤害的来源。',
     		zaiqi_info:'摸牌阶段，若你已受伤，你可以改为展示牌堆顶的X张牌，X为你已损失的体力值，其中每有一张♥牌，你回复1点体力，然后弃掉这些♥牌，将其余的牌收入手牌。',
     		juxiang_info:'南蛮入侵】对你无效；若其他角色使用的【南蛮入侵】在结算完时进入弃牌堆，你立即获得它。',
@@ -4243,7 +4270,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		xingshang_info:'你可以立即获得死亡角色的所有牌。',
     		fangzhu_info:'你每受到一次伤害，可令除你以外的任一角色补X张牌，X为你已损失的体力值，然后该角色将其武将牌翻面。',
     		songwei_info:'主公技，其他魏势力的角色的判定牌结果为♠或♣且生效后，可以让你摸一张牌。',
-    		duanliang_info:'出牌阶段，你可以将你的任意一张♠或♣的基本牌或装备牌当【兵粮寸断】使用；你可以对与你距离2以内的角色使用【兵粮寸断】。',
+    		duanliang_info:'你可以将一张黑色基本牌或装备牌当做【兵粮寸断】使用；若一名角色的手牌数大于或等于你的手牌数，你对其使用【兵粮寸断】没有距离限制',
     		haoshi_info:'摸牌阶段，你可以额外摸两张牌，若此时你的手牌数多于五张，你必须将一半(向下取整)的手牌交给场上除你外手牌数最少的一名角色。',
     		dimeng_info:'出牌阶段，你可以选择其他两名角色，你弃掉等同于这两名角色手牌数量之差的牌，然后交换他们的手牌，每回合限一次。',
     		yinghun_old_info:'准备阶段，若你已受伤，可选择一名其他角色执行下列两项中的一项： 1.摸X张牌，然后弃一张牌。 2.摸一张牌，然后弃X张牌。 X为你已损失的体力值，每回合限一次。',

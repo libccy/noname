@@ -20,6 +20,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				selectTarget:2,
 				multitarget:true,
 				complexTarget:true,
+				multicheck:function(){
+					return game.hasPlayer(function(current){
+						return current.getEquip(5);
+					})&&game.hasPlayer(function(current){
+						return !current.getEquip(5);
+					});
+				},
 				content:function(){
 					if(target.getEquip(5)){
 						target.$give(target.getEquip(5),event.addedTarget);

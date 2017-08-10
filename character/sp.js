@@ -108,6 +108,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             sunqian:['male','shu',3,['qianya','shuimeng']],
             xizhicai:['male','wei',3,['tiandu','xianfu','chouce']],
             quyi:['male','qun',4,['fuqi','jiaozi']],
+
+            liuye:['male','wei',3,['polu','choulve']],
     	},
     	characterIntro:{
     		huangfusong:'字义真。安定郡朝那县（今宁夏彭阳）人。于黄巾起义时，以中郎将身份讨伐黄巾，用火攻大破张梁、张宝。[45]  后接替董卓进攻张梁，连胜七阵。掘张角墓，拜左车骑将军、冀州牧，因拒绝贿赂宦官而被免职。[46]  董卓死，王允命其与吕布等共至郿坞抄籍董卓家产、人口，皇甫嵩将坞中所藏良家子女，尽行释放。',
@@ -206,6 +208,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		dongbai:['dongzhuo']
     	},
         card:{
+            ly_piliche:{
+                fullskin:true,
+                vanish:true,
+                derivation:'liuye',
+                type:'equip',
+                subtype:'equip1',
+				distance:{attackFrom:-8},
+                skills:['ly_piliche'],
+            },
             wy_meirenji:{
                 fullskin:true,
                 vanish:true,
@@ -306,6 +317,106 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             }
         },
     	skill:{
+            choulve:{
+                trigger:{player:'phaseUseBegin'},
+                direct:true,
+                filter:function(event,player){
+                    return game.hasPlayer(function(current){
+                        return current!=player&&current.countCards('he');
+                    })
+                },
+                content:function(){
+                    'step 0'
+                    var str='令一名其他角色交给你一张牌';
+                    if(player.storage.choulve){
+                        str+='若其如此做，视为你使用'+get.translation(player.storage.choulve);
+                    }
+                    player.chooseTarget(get.prompt('choulve'),str,function(card,player,target){
+                        return target!=player&&target.countCards('he');
+                    }).set('ai',function(target){
+                        var player=_status.event.player;
+                        if(get.attitude(player,target)>=0&&get.attitude(target,player)>=0){
+                            return Math.sqrt(target.countCards('he'));
+                        }
+                        return 0;
+                    });
+                    'step 1'
+                    if(result.bool){
+                        var target=result.targets[0];
+                        player.logSkill('choulve',target);
+                        target.chooseCard('he','是否交给'+get.translation(player)+'一张牌？',
+                            player.storage.choulve?('若如此做，视为'+get.translation(player)+
+                            '使用'+get.translation(player.storage.choulve)):null).set('ai',function(card){
+                            if(_status.event.goon) return 7-get.value(card);
+                            return 0;
+                        }).set('goon',get.attitude(target,player)>1);
+                        event.target=target;
+                    }
+                    else{
+                        event.finish();
+                    }
+                    'step 2'
+                    if(result.bool){
+                        event.target.give(result.cards,player);
+                        if(player.storage.choulve){
+                            player.chooseUseTarget(player.storage.choulve);
+                        }
+                    }
+                },
+                group:'choulve_damage',
+                subSkill:{
+                    damage:{
+                        trigger:{player:'damageEnd'},
+                        silent:true,
+                        content:function(){
+                            if(trigger.card&&get.info(trigger.card).enable&&get.type(trigger.card)!='delay'){
+                                if(trigger.cards&&trigger.cards.length==1&&trigger.cards[0]==trigger.card){
+                                    player.storage.choulve=game.createCard(trigger.card);
+                                }
+                                else{
+                                    player.storage.choulve=trigger.card.name;
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            polu:{
+                trigger:{player:['phaseBegin','damageEnd']},
+                forced:true,
+                filter:function(event,player){
+                    return !player.getEquip('ly_piliche');
+                },
+                content:function(){
+                    if(trigger.name=='phase'){
+                        player.useCard(game.createCard('ly_piliche','diamond',1),player);
+                    }
+                    else{
+                        player.draw();
+                    }
+                }
+            },
+            ly_piliche:{
+                trigger:{source:'damageEnd'},
+                check:function(event,player){
+                    return get.attitude(player,event.player)<0;
+                },
+                filter:function(event,player){
+                    if(event.card&&get.type(event.card)=='delay') return false;
+                    return event.player.isIn()&&(event.player.getEquip(2)||event.player.getEquip(3));
+                },
+                logTarget:'player',
+                content:function(){
+                    var equip2=trigger.player.getEquip(2);
+                    var equip3=trigger.player.getEquip(3);
+                    var cards=[];
+                    if(equip2) cards.push(equip2);
+                    if(equip3) cards.push(equip3);
+                    if(cards.length){
+                        trigger.player.discard(cards);
+                    }
+                }
+            },
             shuimeng:{
                 trigger:{player:'phaseUseAfter'},
                 direct:true,
@@ -9364,7 +9475,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             sunqian:'孙乾',
             xizhicai:'戏志才',
             quyi:'麹义',
+            liuye:'刘晔',
 
+            ly_piliche:'霹雳车',
+            ly_piliche_info:'当你对其他角色造成伤害后，若造成伤害牌不为延时锦囊牌，你可以弃置其装备区里的防具牌与+1坐骑牌',
+            polu:'破橹',
+            polu_info:'锁定技，回合开始时，若你的装备区里没有【霹雳车】，你使用之；当你受到1点伤害后，若你的装备区里没有【霹雳车】，你摸一张牌',
+            choulve:'筹略',
+            choulve_info:'出牌阶段开始时，你可以令一名其他角色交给你一张牌，若其如此做，视为你使用上一张对你造成伤害且不为延时锦囊牌的牌',
             qianya:'谦雅',
             qianya_info:'当你成为锦囊牌的目标后，你可以将任意张手牌交给一名其他角色',
             shuimeng:'说盟',
