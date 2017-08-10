@@ -20230,6 +20230,7 @@
 					if((player==_status.roundStart||_status.roundSkipped)&&!trigger.skill){
 						delete _status.roundSkipped;
 						game.roundNumber++;
+						ui.cardPileNumber.innerHTML=game.roundNumber+'轮 剩余牌: '+ui.cardPile.childNodes.length;
 						for(var i=0;i<game.players.length;i++){
 							if(game.players[i].isOut()&&game.players[i].outCount>0){
 								game.players[i].outCount--;
@@ -37044,7 +37045,7 @@
 						ui.create.card(ui.cardPile).init(lib.card.list[i]);
 					}
 				}
-				ui.cardPileNumber.innerHTML='0轮 剩余牌: '+ui.cardPile.childElementCount;
+				ui.cardPileNumber.innerHTML='0轮 剩余牌: '+ui.cardPile.childNodes.length;
 			},
 		},
 		click:{
@@ -41943,6 +41944,7 @@
 				}
 				list.push(ui.cardPile.removeChild(ui.cardPile.firstChild));
 			}
+			ui.cardPileNumber.innerHTML=game.roundNumber+'轮 剩余牌: '+ui.cardPile.childNodes.length;
 			if(card) return list[0];
 			return list;
 		},
