@@ -1527,6 +1527,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					threaten:1.5,
 					save:true,
+					respondTao:true,
 				}
 			},
 			wushuang:{

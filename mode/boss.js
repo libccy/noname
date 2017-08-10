@@ -4512,7 +4512,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageAfter'},
 				direct:true,
 				filter:function(event,player){
-					return player.countCards('h','tao')>0;
+					return player.hasSkillTag('respondTao')||player.countCards('h','tao')>0;
 				},
 				content:function(){
 					player.chooseToUse({name:'tao'},'神躯：是否使用一张桃？').logSkill='shenqu';
