@@ -1655,6 +1655,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				var info=get.info(event.card);
     				if(info.type!='trick') return false;
     				if(info.multitarget) return false;
+                    if(event.targets.length>1) return true;
     				return game.hasPlayer(function(current){
     					return !event.targets.contains(current)&&lib.filter.targetEnabled2(event.card,event.player,current);
     				});
@@ -1662,13 +1663,54 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			direct:true,
     			content:function(){
     				'step 0'
-    				player.chooseTarget(get.prompt('sheyan'),function(card,player,target){
-    					return !trigger.targets.contains(target)&&lib.filter.targetEnabled2(trigger.card,trigger.player,target);
-    				}).set('ai',function(target){
-    					var trigger=_status.event.getTrigger();
-    					return get.effect(target,trigger.card,trigger.player,player);
+                    var bool1=(trigger.targets.length>1);
+                    var bool2=game.hasPlayer(function(current){
+    					return !trigger.targets.contains(current)&&lib.filter.targetEnabled2(trigger.card,trigger.player,current);
     				});
-    				'step 1'
+                    if(bool1&&bool2){
+                        player.chooseControlList(true,get.prompt('sheyan'),['为'+get.translation(trigger.card)+'增加一个目标','为'+get.translation(trigger.card)+'减少一个目标'],function(event,player){
+                            if(_status.event.add) return 0;
+                            return 1;
+                        }).set('add',get.effect(player,trigger.card,trigger.player,player)>=0);
+                    }
+                    else if(bool2){
+                        event.type='add';
+                        event.goto(2);
+                        event.unchosen=true;
+                    }
+                    else{
+                        event.type='remove';
+                        event.goto(2);
+                        event.unchosen=true;
+                    }
+                    'step 1'
+                    if(result.control=='cancel2'){
+                        event.finish();
+                    }
+                    else if(result.index==1){
+                        event.type='remove';
+                    }
+                    else{
+                        event.type='add';
+                    }
+                    'step 2'
+                    if(event.type=='add'){
+                        player.chooseTarget(event.unchosen?get.prompt('sheyan'):null,'为'+get.translation(trigger.card)+'增加一个目标',function(card,player,target){
+        					return !trigger.targets.contains(target)&&lib.filter.targetEnabled2(trigger.card,trigger.player,target);
+        				}).set('ai',function(target){
+        					var trigger=_status.event.getTrigger();
+        					return get.effect(target,trigger.card,trigger.player,_status.event.player);
+        				});
+                    }
+                    else{
+                        player.chooseTarget(event.unchosen?get.prompt('sheyan'):null,'为'+get.translation(trigger.card)+'减少一个目标',function(card,player,target){
+        					return _status.event.targets.contains(target);
+        				}).set('ai',function(target){
+                            var trigger=_status.event.getTrigger();
+        					return -get.effect(target,trigger.card,trigger.player,_status.event.player);
+        				}).set('targets',trigger.targets);
+                    }
+    				'step 3'
     				if(result.bool){
     					if(!event.isMine()) game.delay(0.5);
     					event.target=result.targets[0];
@@ -1676,9 +1718,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				else{
     					event.finish();
     				}
-    				'step 2'
+    				'step 4'
     				player.logSkill('sheyan',event.target);
-    				trigger.targets.push(event.target);
+    				if(event.type=='add'){
+                        trigger.targets.push(event.target);
+                    }
+                    else{
+                        trigger.targets.remove(event.target);
+                    }
     			},
     			ai:{
     				expose:0.2
@@ -5269,7 +5316,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			audio:2,
     			trigger:{player:'phaseDrawBegin'},
     			check:function(event,player){
-    				return player.countCards('h')-player.countCards('h',{type:'equip'})+2<=player.hp;
+    				return player.countCards('h')-player.countCards('h',{type:'equip'})<=player.hp;
     			},
     			content:function(){
     				trigger.num+=2;
@@ -5290,15 +5337,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					content:function(){
     						'step 0'
     						player.removeSkill('tunchu_choose');
-    						if(player.countCards('h')){
-    							player.chooseCard('h',true);
+                            var nh=player.countCards('h');
+    						if(nh){
+    							player.chooseCard('h',[1,nh],true,'将任意张手牌置于你的武将牌上').set('ai',function(card){
+                                    if(ui.selected.cards.length>=3) return -get.value(card);
+                                    return 6-get.value(card);
+                                });
     						}
     						else{
     							event.finish();
     						}
     						'step 1'
     						player.lose(result.cards,ui.special);
-    						player.storage.tunchu=player.storage.tunchu.concat(result.cards);
+    						player.storage.tunchu.addArray(result.cards);
     						player.markSkill('tunchu');
     						player.syncStorage('tunchu');
     					}
@@ -5306,14 +5357,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				disable:{
     					mod:{
     						cardEnabled:function(card,player){
-    							if(player.storage.tunchu&&player.storage.tunchu.length&&
-    								(card.name=='sha'||card.name=='juedou')){
+    							if(player.storage.tunchu&&player.storage.tunchu.length&&card.name=='sha'){
     								return false;
     							}
     						},
     						cardUsable:function(card,player){
-    							if(player.storage.tunchu&&player.storage.tunchu.length&&
-    								(card.name=='sha'||card.name=='juedou')){
+    							if(player.storage.tunchu&&player.storage.tunchu.length&&card.name=='sha'){
     								return false;
     							}
     						},
@@ -5326,7 +5375,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{global:'phaseEnd'},
     			direct:true,
     			filter:function(event,player){
-    				return player.storage.tunchu&&player.storage.tunchu.length>0&&event.player.countCards('h')==0&&event.player.isAlive();
+    				return player.storage.tunchu&&player.storage.tunchu.length>0&&event.player.countCards('h')<event.player.hp&&event.player.isAlive();
     			},
     			content:function(){
     				'step 0'
@@ -9385,7 +9434,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		bingzheng:'秉正',
     		bingzheng_info:'出牌阶段结束时，你可以令手牌数不等于体力值的一名角色弃置一张手牌或摸一张牌。然后若其手牌数等于体力值，你摸一张牌，且可以交给该角色一张牌',
     		sheyan:'舍宴',
-    		sheyan_info:'当你成为一张普通锦囊牌的目标时（带有指向目标的锦囊除外），你可以令一名其他角色也成为此牌的目标',
+    		sheyan_info:'当你成为一张普通锦囊牌的目标时（带有指向目标的锦囊除外），你可以为此牌增加一个目标或减少一个目标（目标数至少为一）',
     		fuman:'抚蛮',
     		fuman2:'抚蛮',
     		fuman_info:'出牌阶段，你可以将一张【杀】交给一名本回合未获得过“抚蛮”牌的其他角色，然后其于下个回合结束之前使用“抚蛮”牌时，你摸一张牌',
@@ -9530,9 +9579,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		danji:'单骑',
     		danji_info:'觉醒技，准备阶段开始时，若你的手牌数大于你的体力值，你减1点体力上限，然后获得“马术”和“怒斩”',
     		tunchu:'屯储',
-    		tunchu_info:'摸牌阶段摸牌时，你可以额外摸两张牌，若如此做，将一张手牌置于你的武将上，称为“粮”，只要你的武将牌上有“粮”，你便不能使用【杀】和【决斗】',
+    		tunchu_info:'摸牌阶段摸牌时，你可以额外摸两张牌，然后将任意张手牌置于你的武将上，称为“粮”，只要你的武将牌上有“粮”，你便不能使用【杀】',
     		shuliang:'输粮',
-    		shuliang_info:'每当一名角色的结束阶段开始时，若其没有手牌，你可以移去一张“粮”，然后该角色摸两张牌',
+    		shuliang_info:'每当一名角色的结束阶段开始时，若其手牌数少于体力值，你可以移去一张“粮”，然后该角色摸两张牌',
     		jieyuan:'竭缘',
     		jieyuan_more:'竭缘',
     		jieyuan_less:'竭缘',

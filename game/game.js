@@ -5856,6 +5856,12 @@
         			this.splice(pos,1);
         			return this;
         		};
+                Array.prototype.removeArray=function(arr){
+                    for(var i=0;i<arr.length;i++){
+                        this.remove(arr[i]);
+                    }
+                    return this;
+                };
         		Array.prototype.randomGet=function(){
         			var arr=this.slice(0);
         			for(var i=0;i<arguments.length;i++) arr.remove(arguments[i]);

@@ -57,6 +57,8 @@ window.noname_character_rank={
         'pal_yueqi',
     ],
     a:[
+        'gw_linjing',
+        'lifeng',
         'gw_meizi',
         'gw_aimin',
         'gw_puxila',
@@ -185,6 +187,9 @@ window.noname_character_rank={
         'xizhicai',
     ],
     am:[
+        'dongyun',
+        'gw_xigedelifa',
+        'gw_laomaotou',
         'gw_haizhiyezhu',
         'gw_nitelila',
         'gw_bierna',
@@ -304,6 +309,7 @@ window.noname_character_rank={
         'hs_mojinbaozi',
     ],
     bp:[
+        'gw_qigaiwang',
         'quyi',
         'wangyun',
         'pal_xiaoman',
@@ -328,7 +334,6 @@ window.noname_character_rank={
         'jiling',
         'zhangren',
         'yanbaihu',
-        'dongyun',
         'sunziliufang',
         'shen_zhouyu',
         'yj_jushou',
@@ -481,7 +486,6 @@ window.noname_character_rank={
         'yxs_weizhongxian',
         'cenhun',
         'huanghao',
-        'lifeng',
         'panzhangmazhong',
         'jsp_guanyu',
         'wenpin',
