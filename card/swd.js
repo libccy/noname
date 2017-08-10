@@ -2584,7 +2584,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.showCards(get.translation(player)+'发动了【白兽之琥】',player.getCards('h','baishouzhihu'));
 						player.logSkill('_baishouzhihu',result.targets);
-						player.discardPlayerCard(result.targets[0],'he',true);
+						result.targets[0].randomDiscard();
+						// player.discardPlayerCard(result.targets[0],'he',true);
 					}
 					else{
 						event.finish();
@@ -2816,7 +2817,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						player.logSkill('baishouzhihu_equip1',result.targets);
-						player.discardPlayerCard(result.targets[0],'he',true);
+						result.targets[0].randomDiscard();
+						// player.discardPlayerCard(result.targets[0],'he',true);
 					}
 					else{
 						event.finish();
@@ -4879,13 +4881,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			qinglongzhigui_equip5_info:'结束阶段，你摸一张牌',
 			baishouzhihu:'白兽之琥',
 			g_baishouzhihu:'白兽之琥',
-			baishouzhihu_info:'可用于煅造装备；此牌在你手牌中时，每当你弃置卡牌，你可以弃置一名其他角色的一张牌',
+			baishouzhihu_info:'可用于煅造装备；此牌在你手牌中时，每当你弃置卡牌，你可以弃置一名其他角色的一张随机牌',
 			baishouzhihu_duanzao:'风牙',
-			baishouzhihu_equip1_info:'结束阶段，你可以弃置一名其他角色的一张牌',
-			baishouzhihu_equip2_info:'结束阶段，你可以弃置一名其他角色的一张牌',
-			baishouzhihu_equip3_info:'结束阶段，你可以弃置一名其他角色的一张牌',
-			baishouzhihu_equip4_info:'结束阶段，你可以弃置一名其他角色的一张牌',
-			baishouzhihu_equip5_info:'结束阶段，你可以弃置一名其他角色的一张牌',
+			baishouzhihu_equip1_info:'结束阶段，你可以弃置一名其他角色的一张随机牌',
+			baishouzhihu_equip2_info:'结束阶段，你可以弃置一名其他角色的一张随机牌',
+			baishouzhihu_equip3_info:'结束阶段，你可以弃置一名其他角色的一张随机牌',
+			baishouzhihu_equip4_info:'结束阶段，你可以弃置一名其他角色的一张随机牌',
+			baishouzhihu_equip5_info:'结束阶段，你可以弃置一名其他角色的一张随机牌',
 			zhuquezhizhang:'朱雀之璋',
 			g_zhuquezhizhang:'朱雀之璋',
 			zhuquezhizhang_info:'可用于煅造装备；此牌在你手牌中时，每当你受到其他角色造成的伤害，你对伤害来源造成一点火属性伤害',
