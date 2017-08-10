@@ -3,7 +3,7 @@ window.noname_update={
     // update:'1.9.35',
     changeLog:[
         '武将修改',
-        '显示剩余牌堆数'
+        '可显示游戏时间和剩余牌数'
     ],
     files:[
         'game/game.js',
