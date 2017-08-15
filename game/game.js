@@ -15568,6 +15568,12 @@
 					if(this.hasSkill('fengyin')){
 						list.remove(5);
 					}
+					if(this.hp==1){
+						list.remove(3);
+						if(list.length>1) list.remove(2);
+					}
+					if(!list.length) return this;
+					var num=list.randomGet();
 					switch(list.randomGet()){
 						case 1:this.randomDiscard(nodelay?false:'he');break;
 						case 2:this.loseHp();break;

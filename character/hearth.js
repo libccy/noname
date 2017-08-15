@@ -3850,7 +3850,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				draw:{
     					trigger:{player:'useCard'},
     					frequent:true,
-    					filter:function(event){
+                        usable:3,
+    					filter:function(event,player){
+                            if(_status.currentPhase!=player) return false;
     						return (get.type(event.card)=='trick'&&event.cards[0]&&event.cards[0]==event.card);
     					},
     					content:function(){
@@ -7740,7 +7742,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		lianzhan:'连斩',
     		lianzhan_info:'每当你造成一次伤害，若此伤害是你本回合第一次造成伤害，你摸两张牌；否则你增加一点体力上限并回复一点体力',
     		shifa:'魔瘾',
-    		shifa_info:'锁定技，每当你使用一张非转化的普通锦囊牌，你摸一张牌；出牌阶段开始时，你令你与一名随机敌人各获得一张随机普通锦囊牌',
+    		shifa_info:'锁定技，每当你于回合内使用一张非转化的普通锦囊牌，你摸一张牌（每回合最多发动3次）；出牌阶段开始时，你令你与一名随机敌人各获得一张随机普通锦囊牌',
     		yuanzheng:'远征',
     		yuanzheng_info:'每当你对距离1以外的角色使用一张牌，你可以弃置目标区域内的一张牌',
     		bzhuiji:'追击',
