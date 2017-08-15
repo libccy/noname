@@ -1458,7 +1458,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                         if(get.config('change_identity')){
                             event.addSetting();
                         }
-                        if(get.config('fouralign')){
+                        if(get.config('fouralign')&&!event.fouralignbutton){
                             event.fouralignbutton=ui.create.control('变阵',function(){
                                 if(!_status.fouralign.length||(_status.fouralign.length==1&&_status.fouralign[0]==0)){
                                     _status.fouralign=[0,1,2,3,4];

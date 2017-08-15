@@ -5626,7 +5626,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.chooseCardButton(player.storage.quanji,true);
     				"step 1"
     				var card=result.links[0];
-    				player.discard(card);
+                    card.discard();
+    				player.$throw(card);
     				player.storage.quanji.remove(card);
     				if(!player.storage.quanji.length){
     					player.unmarkSkill('quanji');

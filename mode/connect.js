@@ -5,6 +5,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 	    start:function(){
 	        var directstartmode=lib.config.directstartmode;
 	        ui.create.menu(true);
+			event.textnode=ui.create.div('','输入联机地址');
 	        var createNode=function(){
 	            if(event.created) return;
 	            if(directstartmode&&lib.node){
@@ -39,10 +40,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 	            node.style.textAlign='center';
 
 	            var connect=function(e){
+					event.textnode.innerHTML='正在连接...';
 	                clearTimeout(event.timeout);
 	                if(e) e.preventDefault();
 	                game.saveConfig('last_ip',node.innerHTML);
-	                game.connect(node.innerHTML);
+	                game.connect(node.innerHTML,function(success){
+						if(!success&&event.textnode){
+							alert('连接失败');
+							event.textnode.innerHTML='输入联机地址';
+						}
+					});
 	            };
 	            node.addEventListener('keydown',function(e){
 	                if(e.keyCode==13){
@@ -52,7 +59,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 	            ui.window.appendChild(node);
 	            ui.ipnode=node;
 
-	            var text=ui.create.div();
+	            var text=event.textnode;
 	            text.style.width='400px';
 	            text.style.height='30px';
 	            text.style.lineHeight='30px';
@@ -61,7 +68,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 	            text.style.padding='10px';
 	            text.style.left='calc(50% - 200px)';
 	            text.style.top='calc(50% - 80px)';
-	            text.innerHTML='输入联机地址';
 	            text.style.textAlign='center';
 	            ui.window.appendChild(text);
 	            ui.iptext=text;
@@ -117,11 +123,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 	            game.roomId=info[2];
 	            var n=5;
 	            var connect=function(){
+					event.textnode.innerHTML='正在连接...';
 	                game.connect(info[0],function(success){
 	                    if(!success&&n--){
 	                        createNode();
 	                        event.timeout=setTimeout(connect,1000);
 	                    }
+						else{
+							event.textnode.innerHTML='输入联机地址';
+						}
 	                });
 	            };
 	            event.timeout=setTimeout(connect,500);
