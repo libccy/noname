@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.9.36.2',
+    version:'1.9.36.3',
     update:'1.9.36.1',
     changeLog:[
         '自定义按钮高度',

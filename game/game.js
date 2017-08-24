@@ -2138,7 +2138,7 @@
 								ui.css.buttonsheet=lib.init.sheet(
 									'#system>div>div{padding-top:'+cbnum1+'px;padding-bottom:'+cbnum2+'px}',
 									'#control>.control>div{padding-top:'+cbnum3+'px;padding-bottom:'+cbnum4+'px}',
-									'#control>.control{padding-top:'+cbnum5+'px;padding-bottom:'+cbnum6+'px}',
+									'#control>.control{padding-top:'+cbnum5+'px;padding-bottom:'+cbnum6+'px}'
 								);
 							}
 						}
