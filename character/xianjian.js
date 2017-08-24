@@ -1539,6 +1539,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					phase:{
 						trigger:{global:'phaseAfter'},
 		    			priority:-50,
+						forced:true,
 						filter:function(event,player){
 							return player.storage.qixia.length>=4;
 						},
@@ -4212,7 +4213,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			binxin:'冰心',
 			binxin_info:'在一名角色的结束阶段，若其体力值为1，你可以令其获得一点护甲',
 			qixia:'绮霞',
-			qixia_info:'当你累计使用或打出了4种不同花色的牌后，你可以于本回合结束后获得一个额外回合',
+			qixia_info:'锁定技，当你累计使用或打出了4种不同花色的牌后，你于本回合结束后获得一个额外回合',
 			jianzhen:'剑阵',
 			jianzhen_info:'锁定技，当你使用杀对目标结算完毕后，其他角色可以对该目标使用一张杀',
 			husha:'虎煞',

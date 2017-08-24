@@ -12144,7 +12144,12 @@
 						if(lib.config.reverse_sort) sort=-sort;
 						cards[num].fix();
 						cards[num].style.transform='';
-						cards[num].vanishtag.length=0;
+						// cards[num].vanishtag.length=0;
+						for(var num2=0;num2<cards[num].vanishtag.length;num2++){
+							if(cards[num].vanishtag[num2][0]!='_'){
+								cards[num].vanishtag.splice(num2--,1);
+							}
+						}
 						if(player==game.me){
 							cards[num].classList.add('drawinghidden');
 						}

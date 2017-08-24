@@ -1002,7 +1002,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					for(var i=0;i<ui.discardPile.childElementCount;i++){
 						var card=ui.discardPile.childNodes[i];
-						if(card.vanishtag.contains('gwshenyu')) continue;
+						if(card.vanishtag.contains('_gwshenyu')) continue;
 						if(get.type(card)=='spell'&&get.subtype(card)!='spell_gold'){
 							return true;
 						}
@@ -1014,7 +1014,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var list=[];
 					for(var i=0;i<ui.discardPile.childElementCount;i++){
 						var card=ui.discardPile.childNodes[i];
-						if(card.vanishtag.contains('gwshenyu')) continue;
+						if(card.vanishtag.contains('_gwshenyu')) continue;
 						if(get.type(card)=='spell'&&get.subtype(card)!='spell_gold'){
 							list.push(card);
 						}
@@ -1075,7 +1075,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 4'
 					if(result.bool){
-						result.links[0].vanishtag.add('gwshenyu');
+						result.links[0].vanishtag.add('_gwshenyu');
 						event.target.gain(result.links,'gain2','log');
 					}
 				},
@@ -2440,7 +2440,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwjinyan:'金焰',
 			gwjinyan_info:'锁定技，准备阶段，若游戏轮数为3的倍数，你获得一张随机金卡；当游戏轮数不是3的倍数时，你防止所有伤害',
 			gwshenyu:'神愈',
-			gwshenyu_info:'准备阶段，你可以令一名角色选择一项：回复一点体力，或从弃牌堆中获得一张非金法术牌（直到洗牌前该牌不能再以此法获得）',
+			gwshenyu_info:'准备阶段，你可以令一名角色选择一项：回复一点体力，或从弃牌堆中获得一张非金法术牌（直到洗牌入牌堆前该牌不能再以此法获得）',
 			junchi:'骏驰',
 			junchi_info:'每当一名其他角色使用一张杀，若目标不是你，你可以对杀的目标使用一张牌，并摸一张牌',
 			junchi_old_info:'当一名其他角色使用杀对一个目标结算后，该角色可以交给你一张牌，然后你可以对杀的目标使用一张牌，若如此做，你回复一点体力，杀的使用者摸一张牌',

@@ -8477,7 +8477,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				"step 0"
-    				player.chooseCardButton(target,target.getCards('h')).filterButton=function(button){
+    				player.chooseCardButton(target,target.getCards('h')).set('ai',function(button){
+                        return get.value(button.link);
+                    }).filterButton=function(button){
     					return get.suit(button.link)=='club';
     				}
     				"step 1"
