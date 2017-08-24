@@ -1,8 +1,8 @@
 window.noname_update={
-    version:'1.9.36.1.1',
+    version:'1.9.36.2',
     update:'1.9.36.1',
     changeLog:[
-        'bug修复',
+        '自定义按钮高度',
     ],
     files:[
         'game/game.js',
