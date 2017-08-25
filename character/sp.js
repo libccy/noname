@@ -2205,18 +2205,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				'step 0'
-    				var list=[];
+    				var list;
     				if(_status.connectMode){
     					list=get.charactersOL(function(i){
     						return lib.character[i][1]!='shu';
     					});
     				}
     				else{
-    					for(var i in lib.character){
-    						if(!lib.filter.characterDisabled(i)&&lib.character[i][1]=='shu'){
-    							list.push(i);
-    						}
-    					}
+                        list=get.gainableCharacters(function(info){
+                            return info[1]=='shu';
+                        });
     				}
     				var players=game.players.concat(game.dead);
     				for(var i=0;i<players.length;i++){

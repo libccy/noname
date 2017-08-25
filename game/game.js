@@ -19970,6 +19970,17 @@
                     }
                 }
             },
+			characterDisabled2:function(i){
+				var info=lib.character[i];
+				if(info[4]){
+					if(info[4].contains('boss')) return true;
+					if(info[4].contains('hiddenboss')) return true;
+					if(info[4].contains('minskin')) return true;
+					if(info[4].contains('unseen')) return true;
+					if(info[4].contains('forbidai')&&!_status.event.isMine()) return true;
+				}
+				return false;
+			},
 			cardEnabled:function(card,player,event){
 				card=get.autoViewAs(card,null,player);
 				if(player==undefined) player=_status.event.player;
@@ -42428,6 +42439,16 @@
             }
             return list;
         },
+		gainableCharacters:function(func){
+			var list=[];
+			for(var i in lib.character){
+				var info=lib.character[i];
+				if(func&&!func(info,i)) continue;
+				if(lib.filter.characterDisabled2(i)) continue;
+				list.push(i);
+			}
+			return list;
+		},
 		selectableTargets:function(sort){
 			var selectable=[];
 			for(var i=0;i<game.players.length;i++){

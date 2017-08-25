@@ -1537,7 +1537,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				for(var i in lib.character){
-    					if(i.indexOf('stone_')==0) continue;
+    					if(lib.filter.characterDisabled2(i)) continue;
     					var add=false;
     					for(var j=0;j<lib.character[i][3].length;j++){
     						var info=lib.skill[lib.character[i][3][j]];

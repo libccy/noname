@@ -928,12 +928,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				'step 0'
-                    var list=[];
-					for(var i in lib.character){
-						if(!lib.filter.characterDisabled(i)&&lib.character[i][2]>=5){
-							list.push(i);
-						}
-					}
+                    var list=get.gainableCharacters(function(info){
+                        return info[2]>=5;
+                    });
     				var players=game.players.concat(game.dead);
     				for(var i=0;i<players.length;i++){
     					list.remove(players[i].name);
