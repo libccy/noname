@@ -413,6 +413,7 @@ window.noname_asset_list=[
     'image/character/gw_meizi.jpg',
     'image/character/gw_mieren.jpg',
     'image/character/gw_nitelila.jpg',
+    'image/character/gw_nvyemo.jpg',
     'image/character/gw_puxila.jpg',
     'image/character/gw_qigaiwang.jpg',
     'image/character/gw_sanhanya.jpg',

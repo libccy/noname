@@ -53,6 +53,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			gw_linjing:['male','wu',4,['gwyewu']],
 			gw_kanbi:['male','qun',1,['gwfutian']],
+			gw_nvyemo:['female','shu',3,['gwgouhun']],
 		},
 		characterIntro:{
 			gw_huoge:'那个老年痴呆?不知道他是活着还是已经被制成标本了!',
@@ -68,6 +69,117 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			gwgouhun:{
+				enable:'phaseUse',
+				usable:1,
+				filterCard:true,
+				discard:false,
+				prepare:'give',
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countCards('h');
+				},
+				check:function(card){
+					return 7-get.value(card);
+				},
+				content:function(){
+					'step 0'
+					target.gain(cards,player);
+					event.card=cards[0];
+					event.suit=get.suit(cards[0]);
+					'step 1'
+					var hs=target.getCards('h');
+					var num1=0;
+					var num2=0;
+					for(var i=0;i<hs.length;i++){
+						if(get.suit(hs[i])==event.suit){
+							num1++;
+						}
+						else{
+							num2++;
+						}
+					}
+					event.num1=num1;
+					event.num2=num2;
+					var list=[
+						'将手牌中的'+get.translation(event.suit)+'牌交给'+get.translation(player),
+						'弃置手牌中的非'+get.translation(event.suit)+'牌',
+						'进入混乱状态直到下一回合结束'
+					];
+					if(num1&&num2){
+						target.chooseControlList(list,true,function(){
+							if(num1>2&&num2>3){
+								return 2;
+							}
+							if(num1>num2/2){
+								return 1;
+							}
+							else if(num1<num2/2){
+								return 0;
+							}
+							return get.rand(2);
+						});
+					}
+					else if(num1){
+						list.splice(1,1);
+						target.chooseControlList(list,true,function(){
+							if(num1>2) return 1;
+							return 0;
+						});
+					}
+					else if(num2){
+						list.splice(0,1);
+						target.chooseControlList(list,true,function(){
+							if(num2>3) return 1;
+							return 0;
+						});
+					}
+					else{
+						target.goMad({player:'phaseAfter'});
+						event.finish();
+					}
+					'step 2'
+					var index=result.index;
+					var cards1=target.getCards('h',function(card){
+						return get.suit(card)==event.suit;
+					});
+					var cards2=target.getCards('h',function(card){
+						return get.suit(card)!=event.suit;
+					});
+					if(typeof index=='number'){
+						if(event.num1&&event.num2){
+							if(index==0){
+								target.give(cards1,player);
+							}
+							else if(index==1){
+								target.discard(cards2);
+							}
+							else{
+								target.goMad({player:'phaseAfter'});
+							}
+						}
+						else{
+							if(index==1){
+								target.goMad({player:'phaseAfter'});
+							}
+							else if(event.num1){
+								target.give(cards1,player);
+							}
+							else{
+								target.discard(cards2);
+							}
+						}
+					}
+				},
+				ai:{
+					threaten:1.5,
+					order:9,
+					result:{
+						target:function(player,target){
+							return -Math.sqrt(target.countCards('h'));
+						}
+					}
+				}
+			},
 			gwfutian:{
 				trigger:{player:'damageBefore'},
 				forced:true,
@@ -2484,8 +2596,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwzhongmo_info:'锁定技，你跳过摸牌阶段，改为获得两张随机的稀有度不同的法术牌',
 			gwfutian:'覆天',
 			gwfutian_info:'锁定技，你防止一切伤害；准备阶段，你须弃置一名其他角色的一张手牌；若你以此法累计弃置弃置的总点数达到了24，你变身为汉姆多尔',
-			gouhun:'勾魂',
-			gouhun_info:'出牌阶段限一次，你可以交给一名有手牌的其他角色一张手牌，然后令其选择一项：1. 将手牌中与此牌花色相同的其它牌（至少一张）交给你；2. 弃置手牌中与此牌花色不同的牌（至少一张）；3. 进入混乱状态直到下一回合结束',
+			gwgouhun:'勾魂',
+			gwgouhun_info:'出牌阶段限一次，你可以交给一名有手牌的其他角色一张手牌，然后令其选择一项：1. 将手牌中与此牌花色相同的牌（至少一张）交给你；2. 弃置手牌中与此牌花色不同的牌（至少一张）；3. 进入混乱状态直到下一回合结束',
 			gw_wuyao:'雾妖',
 			gw_wuyao_info:'在你行动时可当作杀使用；回合结束后，从手牌中消失',
 			gwyewu:'叶舞',
