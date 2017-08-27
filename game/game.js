@@ -42434,7 +42434,12 @@
         gainableSkills:function(func){
             var list=[];
             for(var i in lib.character){
-                if(lib.character[i][4]&&lib.character[i][4].contains('boss')) continue;
+                if(lib.character[i][4]){
+					if(lib.character[i][4].contains('boss')) continue;
+					if(lib.character[i][4].contains('hiddenboss')) continue;
+					if(lib.character[i][4].contains('minskin')) return true;
+					if(lib.character[i][4].contains('unseen')) return true;
+				}
                 for(var j=0;j<lib.character[i][3].length;j++){
                     var skill=lib.character[i][3][j];
 					var info=lib.skill[skill];
@@ -43704,6 +43709,9 @@
 				delete _status.tempnofake;
 			}
 			return att;
+		},
+		sgnAttitude:function(){
+			return get.sgn(get.attitude.apply(this,arguments));
 		},
 		useful:function(card){
 			if(get.position(card)=='j') return -1;

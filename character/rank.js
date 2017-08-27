@@ -14,9 +14,9 @@ window.noname_character_rank={
         'gjqt_bailitusu',
         'swd_huanglei',
         'hs_medivh',
+        'pal_yuejinzhao',
     ],
     ap:[
-        'pal_yuejinzhao',
         'ow_zhaliya',
         'pal_liumengli',
         'pal_yuntianhe',

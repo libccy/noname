@@ -2761,15 +2761,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						var num=0;
     						var players=game.filterPlayer();
     						for(var i=0;i<players.length;i++){
-    							var att=get.attitude(player,players[i]);
     							var del=players[i].maxHp-players[i].hp;
     							if(get.is.altered('shouyin')) del=Math.min(2,del);
-    							if(att>0){
-    								num+=del;
-    							}
-    							else if(att<0){
-    								num-=del;
-    							}
+                                del/=Math.pow(1+players[i].hp,0.2);
+                                num+=get.sgnAttitude(player,players[i])*del;
     						}
     						return num;
     					}
