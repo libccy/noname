@@ -610,7 +610,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.asyncDraw([player,target]);
 					}
     				else{
-						player.draw();
+						player.draw(2);
 					}
     			},
     			ai:{
@@ -2616,7 +2616,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			julian:'巨敛',
 			julian_info:'出牌阶段开始时，你可以摸若干张牌直到你的手牌数为全场最多或之一',
 			gwfusheng:'复生',
-			gwfusheng_info:'当一名未翻面的角色进入濒死状态时，你可以令其翻面并回复一点体力，然后你与其各摸一张牌（目标为自己时只摸一张）',
+			gwfusheng_info:'当一名未翻面的角色进入濒死状态时，你可以令其翻面并回复一点体力，然后你与其各摸一张牌',
 			gwqinwu:'琴舞',
 			gwqinwu2:'琴舞',
 			gwqinwu_info:'每当你使用一张基本牌，你可以令一名角色摸一张牌并获得技能【琴舞】直到其下一回合结束',
