@@ -2067,23 +2067,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			threaten:1.4,
     			check:function(event,player){
     				if(player.countCards('h')<=1) return true;
-    				var min=[];
-    				var temp=player.next.countCards('h');
-    				var players=game.filterPlayer();
-    				for(var i=0;i<players.length;i++){
-    					if(players[i]!=player&&players[i].countCards('h')<temp){
-    						temp=players[i].countCards('h');
-    					}
-    				}
-    				for(var i=0;i<players.length;i++){
-    					if(players[i]!=player&&players[i].countCards('h')==temp){
-    						min.push(players[i]);
-    					}
-    				}
-    				for(var i=0;i<min.length;i++){
-    					if(get.attitude(player,min[i])>0) return true;
-    				}
-    				return false;
+                    return game.hasPlayer(function(current){
+                        return current!=player&&current.isMinHandcard()&&get.attitude(player,current)>0;
+                    });
     			},
     			content:function(){
     				trigger.num+=2;

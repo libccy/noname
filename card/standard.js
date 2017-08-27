@@ -1329,7 +1329,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(eff<=0) return get.buttonValue(button);
 						if(trigger.target.hp==1) return false;
 						if(player.hasSkill('jiu')||player.hasSkill('tianxianjiu')||
-						player.hasSkill('luoyi2')||player.hasSkill('reluoyi2')) return false;
+						player.hasSkill('luoyi2')||player.hasSkill('reluoyi2')) return -1;
 						if(_status.event.dialog.buttons.length<2) return -1;
 						var num=0;
 						for(var i=0;i<_status.event.dialog.buttons.length;i++){

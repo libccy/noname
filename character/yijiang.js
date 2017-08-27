@@ -4654,6 +4654,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			viewAs:{name:'sha'},
     			prompt:'将两张手牌当杀使用或打出',
     			check:function(card){
+                    if(player.hasSkill('wusheng')&&get.color(card)=='red') return 0;
                     if(_status.event.name=='chooseToRespond'){
                         if(card.name=='sha') return 0;
                         return 6-get.useful(card);
@@ -4678,14 +4679,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		fuhun2:{
     			trigger:{source:'damageAfter'},
     			forced:true,
-    			filter:function(event){
+    			filter:function(event,player){
+                    if(player.hasSkill('fuhun3')) return false;
     				return event.getParent().skill=='fuhun';
     			},
     			content:function(){
     				player.addTempSkill('wusheng');
     				player.addTempSkill('paoxiao');
+                    player.addTempSkill('fuhun3');
     			}
     		},
+            fuhun3:{},
     		fencheng:{
     			skillAnimation:'epic',
     			animationColor:'fire',

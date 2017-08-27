@@ -13662,7 +13662,7 @@
 					this.updateMarks();
 					return this;
 				},
-				updateMark:function(i){
+				updateMark:function(i,storage){
 					if(!this.marks[i]){
 						if(lib.skill[i]&&lib.skill[i].intro&&(this.storage[i]||lib.skill[i].intro.markcount)){
 							this.markSkill(i);
@@ -13671,6 +13671,9 @@
 						else{
 							return this;
 						}
+					}
+					if(storage&&this.storage[i]){
+						this.syncStorage(i);
 					}
 					if(i=='ghujia'||((!this.marks[i].querySelector('.image')||this.storage[i+'_markcount'])&&
 						lib.skill[i]&&lib.skill[i].intro&&!lib.skill[i].intro.nocount&&
@@ -16257,6 +16260,10 @@
                     }
                 },
 				markSkill:function(name,info,card){
+					if(info===true){
+						this.syncStorage(name);
+						info=null;
+					}
 					if(get.itemtype(card)=='card'){
 						game.addVideo('markSkill',this,[name,get.cardInfo(card)]);
 					}

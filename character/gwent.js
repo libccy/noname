@@ -52,6 +52,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_nitelila:['male','wei',4,['shuangxi']],
 
 			gw_linjing:['male','wu',4,['gwyewu']],
+			gw_kanbi:['male','qun',1,['gwfutian']],
 		},
 		characterIntro:{
 			gw_huoge:'那个老年痴呆?不知道他是活着还是已经被制成标本了!',
@@ -67,6 +68,97 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			gwfutian:{
+				trigger:{player:'damageBefore'},
+				forced:true,
+				content:function(){
+					trigger.untrigger();
+					trigger.finish();
+				},
+				ai:{
+					nofire:true,
+					nothunder:true,
+					nodamage:true,
+					effect:{
+						target:function(card,player,target,current){
+							if(get.tag(card,'damage')) return [0,0];
+						}
+					},
+				},
+				init:function(player){
+					player.storage.gwfutian=0;
+				},
+				intro:{
+					content:'弃置的牌总点数：#'
+				},
+				unique:true,
+				onremove:true,
+				group:'gwfutian_discard',
+				subSkill:{
+					discard:{
+						trigger:{player:'phaseBegin'},
+						forced:true,
+						filter:function(event,player){
+							return game.hasPlayer(function(current){
+								return current!=player&&current.countCards('h');
+							});
+						},
+						content:function(){
+							'step 0'
+							player.chooseTarget('覆天：弃置一名角色的一张手牌',function(card,player,target){
+								return target!=player&&target.countCards('h');
+							}).set('ai',function(target){
+								if(target.hasSkillTag('noh')) return 0;
+								return -get.attitude(player,target)/Math.sqrt(target.countCards('h'));
+							});
+							'step 1'
+							if(result.bool){
+								var target=result.targets[0];
+								player.discardPlayerCard(target,'h',true);
+								player.line(target,'green');
+							}
+							else{
+								event.finish();
+							}
+							'step 2'
+							if(result.bool&&result.cards&&result.cards.length){
+								player.storage.gwfutian+=get.number(result.cards[0]);
+								player.markSkill('gwfutian',true);
+							}
+							'step 3'
+							if(player.storage.gwfutian>=24){
+								player.$skill('覆天','legend','metal');
+								player.removeSkill('gwfutian');
+								player.addSkill('gwzhongmo');
+								player.setAvatar('gw_kanbi','gw_hanmuduoer');
+								player.maxHp+=4;
+								player.hp=player.maxHp;
+								player.update();
+							}
+						}
+					}
+				}
+			},
+			gwzhongmo:{
+				trigger:{player:'phaseDrawBefore'},
+				forced:true,
+				content:function(){
+					trigger.untrigger();
+					trigger.finish();
+					var list=['bronze','silver','gold'];
+					list.randomRemove();
+					var cards=[];
+					for(var i=0;i<list.length;i++){
+						var list2=get.typeCard('spell_'+list[i]);
+						if(list2.length){
+							cards.push(game.createCard(list2.randomGet()));
+						}
+					}
+					if(cards.length){
+						player.gain(cards,'draw2');
+					}
+				}
+			},
 			gwyewu:{
 				enable:'phaseUse',
 				usable:1,
@@ -2391,9 +2483,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwzhongmo:'终末',
 			gwzhongmo_info:'锁定技，你跳过摸牌阶段，改为获得两张随机的稀有度不同的法术牌',
 			gwfutian:'覆天',
-			gwfutian_info:'锁定技，你防止一切伤害；准备阶段，你须弃置一名其他角色的一张手牌；',
+			gwfutian_info:'锁定技，你防止一切伤害；准备阶段，你须弃置一名其他角色的一张手牌；若你以此法累计弃置弃置的总点数达到了24，你变身为汉姆多尔',
 			gouhun:'勾魂',
-			gouhun_info:'出牌阶段限一次，你可以交给一名有手牌的其他角色一张手牌，然后令其选择一项：1. 将手牌中与此牌花色相同的其它牌（至少一张）交给你；2. 弃置除此牌之外的所有其它手牌；3. 进入混乱状态直到下一回合结束',
+			gouhun_info:'出牌阶段限一次，你可以交给一名有手牌的其他角色一张手牌，然后令其选择一项：1. 将手牌中与此牌花色相同的其它牌（至少一张）交给你；2. 弃置手牌中与此牌花色不同的牌（至少一张）；3. 进入混乱状态直到下一回合结束',
 			gw_wuyao:'雾妖',
 			gw_wuyao_info:'在你行动时可当作杀使用；回合结束后，从手牌中消失',
 			gwyewu:'叶舞',
