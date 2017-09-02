@@ -2003,7 +2003,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                    player.storage.jijia=4;
 	                    player.storage.jijia2=0;
 	                    player.markSkill('jijia');
-	                    if(lib.config.skill_animation){
+	                    if(lib.config.skill_animation_type!='off'){
 	                        player.logSkill('chongzhuang');
 	                        player.$skill('重装')
 	                    }

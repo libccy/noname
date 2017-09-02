@@ -2004,6 +2004,59 @@ div:not(.handcards)>.card>.info>span,
 #arena:not(.hide_turned):not(.oldlayout) .player.turnedover>.turned{
 	opacity: 0.2;
 }
+#window>.damage.fullscreenavatar{
+	text-align: center;
+	font-family: 'xinwei';
+	top: calc(50% - 200px);
+	height: 400px;
+	transform-origin: center;
+}
+#window>.damage.fullscreenavatar>div{
+	width: 220px;
+	height: 100%;
+	left: calc(50% - 100px);
+	display: inline-block;
+	position: absolute;
+	top: 0;
+}
+#window>.damage.fullscreenavatar>div:first-child{
+	-webkit-mask-image: linear-gradient(transparent, black, black, transparent);
+}
+#window>.damage.fullscreenavatar>div:first-child>div{
+	background-size: cover;
+	background-position: 50%;
+	width: 200px;
+	left: 10px;
+	top: 0;
+	height: 100%;
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.5) 0 0 10px;
+}
+#window>.damage.fullscreenavatar>div:last-child{
+	display: table;
+}
+#window>.damage.fullscreenavatar>div:last-child>div{
+	display: block;
+	position: relative;
+	width: auto;
+	height: auto;
+	font-size: 90px;
+	text-align: right;
+	top: auto;
+	bottom: 30px;
+	position: absolute;
+	left: auto;
+	right: 30px;
+}
+#window>.damage.fullscreenavatar>.name>div{
+	display: block;
+	position: relative;
+	width: auto;
+	height: auto;
+	top: 30px;
+	position: absolute;
+	left: 20px;
+	font-size: 40px;
+}
 .player>.damage,
 #window>.damage {
 	font-family: 'huangcao','xinwei';

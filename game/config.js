@@ -117,7 +117,7 @@ window.config={
 	vertical_scroll:false,
 	handcard_scroll:0,
 	animation:true,
-	skill_animation:true,
+	skill_animation_type:'default',
 	paused:false,
 	title:false,
 	button_press:true,

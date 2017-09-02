@@ -2317,11 +2317,16 @@
 						init:true,
 						unfrequent:true,
 					},
-					skill_animation:{
+					skill_animation_type:{
 						name:'技能特效',
 						intro:'开启后觉醒技、限定技将显示全屏文字',
-						init:true,
+						init:'default',
 						unfrequent:true,
+						item:{
+							default:'默认',
+							old:'旧版',
+							off:'关闭'
+						}
 					},
 					die_move:{
 						name:'阵亡效果',
@@ -11717,8 +11722,8 @@
 					if(!info.direct){
 						game.log(player,str,'【'+get.skillTranslation(skill,player)+'】');
                         if(info.logv!==false) game.logv(player,skill,targets);
-						if(lib.config.skill_animation&&lib.skill[skill]&&lib.skill[skill].skillAnimation){
-							player.$skill(lib.skill[skill].animationStr||lib.translate[skill],lib.skill[skill].skillAnimation,lib.skill[skill].animationColor);
+						if(lib.config.skill_animation_type!='off'&&lib.skill[skill]&&lib.skill[skill].skillAnimation){
+							player.$skill(lib.skill[skill].animationStr||lib.translate[skill],lib.skill[skill].skillAnimation,lib.skill[skill].animationColor,lib.config.skill_animation_type=='default');
 						}
 						else{
 							player.popup(get.skillTranslation(skill,player));
@@ -16085,8 +16090,8 @@
 						nopop=true;
 					}
 					if(lib.translate[name]){
-						if(lib.config.skill_animation&&lib.skill[name]&&lib.skill[name].skillAnimation){
-							this.$skill(lib.skill[name].animationStr||lib.translate[name],lib.skill[name].skillAnimation,lib.skill[name].animationColor);
+						if(lib.config.skill_animation_type!='off'&&lib.skill[name]&&lib.skill[name].skillAnimation){
+							this.$skill(lib.skill[name].animationStr||lib.translate[name],lib.skill[name].skillAnimation,lib.skill[name].animationColor,lib.config.skill_animation_type=='default');
 						}
 						else if(!nopop) this.popup(get.skillTranslation(name,this));
 						if(typeof targets=='object'&&targets.length){
@@ -18469,13 +18474,24 @@
 						return true;
 					}
 				},
-				$skill:function(name,type,color){
+				$skill:function(name,type,color,avatar){
 					if(typeof type!='string') type='legend';
 					game.delay(2);
-					this.playerfocus(1500);
+					if(!avatar){
+						this.playerfocus(1500);
+					}
+					else{
+						game.addVideo('playerfocus2');
+						game.broadcastAll(function(){
+	                        ui.arena.classList.add('playerfocus');
+							setTimeout(function(){
+								ui.arena.classList.remove('playerfocus');
+							},1500)
+	                    });
+					}
 					var that=this;
 					setTimeout(function(){
-                        game.broadcastAll(function(that,type,name,color){
+                        game.broadcastAll(function(that,type,name,color,avatar){
                             if(lib.config.animation&&!lib.config.low_performance){
     							if(game.chess){
     								that['$'+type+'2'](1200);
@@ -18485,10 +18501,10 @@
     							}
     						}
     						if(name){
-    							that.$fullscreenpop(name,color);
+    							that.$fullscreenpop(name,color,avatar);
     						}
-                        },that,type,name,color);
-					},300);
+                        },that,type,name,color,avatar);
+					},avatar?0:300);
 				},
 				$fire:function(){
 					game.addVideo('flame',this,'fire');
@@ -18645,19 +18661,44 @@
 					game.animate.flame(left+this.offsetWidth/2,
 						top+this.offsetHeight-30,700,'recover');
 				},
-				$fullscreenpop:function(str,nature){
+				$fullscreenpop:function(str,nature,avatar){
                     game.broadcast(function(player,str,nature){
                         player.$fullscreenpop(str,nature);
                     },this,str,nature);
-					game.addVideo('fullscreenpop',this,[str,nature]);
-					var node=ui.create.div('.damage',ui.window);
-					node.innerHTML=str;
+					game.addVideo('fullscreenpop',this,[str,nature,avatar]);
+					var node=ui.create.div('.damage');
+					if(avatar&&lib.character[this.name]&&this.node&&this.node.avatar){
+						node.classList.add('fullscreenavatar');
+						ui.create.div('',ui.create.div(node));
+						// if(this.node.name){
+						// 	ui.create.div('.name',node).appendChild(this.node.name.cloneNode(true));
+						// }
+						ui.create.div('',str.split('').join('<br>'),ui.create.div(node));
+						node.firstChild.firstChild.style.backgroundImage=this.node.avatar.style.backgroundImage;
+					}
+					else{
+						node.innerHTML=str;
+					}
 					node.dataset.nature=nature||'soil';
+					if(avatar){
+						var rect1=ui.window.getBoundingClientRect();
+						var rect2=this.getBoundingClientRect();
+						var dx=Math.round(2*rect2.left+rect2.width-rect1.width);
+						var dy=Math.round(2*rect2.top+rect2.height-rect1.height);
+						node.style.transform='scale(0.5) translate('+dx+'px,'+dy+'px)';
+					}
+					ui.window.appendChild(node);
 					ui.refresh(node);
-					node.classList.add('damageadded');
+					if(avatar){
+						node.style.transform='scale(1)';
+						node.style.opacity=1;
+					}
+					else{
+						node.classList.add('damageadded');
+					}
 					setTimeout(function(){
 						node.delete();
-					},1000);
+					},avatar?1300:1000);
 				},
 				$damagepop:function(num,nature,font){
 					if(typeof num=='number'||typeof num=='string'){
@@ -22787,6 +22828,12 @@
 					console.log(player);
 				}
 			},
+			playerfocus2:function(){
+				ui.arena.classList.add('playerfocus');
+				setTimeout(function(){
+					ui.arena.classList.remove('playerfocus');
+				},1500)
+			},
 			identityText:function(player,str){
 				if(player&&str){
 					player.node.identity.firstChild.innerHTML=str;
@@ -23322,7 +23369,7 @@
 			},
 			fullscreenpop:function(player,content){
 				if(player&&content){
-					player.$fullscreenpop(content[0],content[1]);
+					player.$fullscreenpop(content[0],content[1],content[2]);
 				}
 				else{
 					console.log(player);
