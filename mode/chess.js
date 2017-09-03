@@ -1975,6 +1975,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				node.style.backgroundImage=p.node.avatar.style.backgroundImage;
     				node.link=p;
     				node.listen(ui.click.chessInfo);
+                    lib.setIntro(node);
+                    node.linkplayer=true;
     				p.instance=node;
     				if(_status.currentPhase==p){
     					node.classList.add('glow2');

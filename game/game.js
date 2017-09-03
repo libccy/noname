@@ -8363,6 +8363,7 @@
 					}
 				}
 				ui.arena.classList.remove('selecting');
+				ui.arena.classList.remove('tempnoe');
 			},
             p:function(name,i,skin){
                 var list=['swd','hs','pal','gjqt','ow','gw'];
@@ -18675,11 +18676,12 @@
 						// }
 						ui.create.div('',str.split('').join('<br>'),ui.create.div(node));
 						node.firstChild.firstChild.style.backgroundImage=this.node.avatar.style.backgroundImage;
+						node.dataset.nature=nature||'unknown';
 					}
 					else{
 						node.innerHTML=str;
+						node.dataset.nature=nature||'soil';
 					}
-					node.dataset.nature=nature||'soil';
 					if(avatar){
 						var rect1=ui.window.getBoundingClientRect();
 						var rect2=this.getBoundingClientRect();
@@ -26018,6 +26020,9 @@
 				}
 				else{
 					ui.arena.classList.add('selecting');
+					if(event.filterTarget&&(!event.filterCard||!event.position||(typeof event.position=='string'&&event.position.indexOf('e')==-1))){
+						ui.arena.classList.add('tempnoe');
+					}
 					game.countChoose();
 					if(!_status.noconfirm&&!_status.event.noconfirm){
 						if(!_status.mousedown||_status.mouseleft){
@@ -26081,6 +26086,7 @@
 			}
 			if(args.length==0){
 				ui.arena.classList.remove('selecting');
+				ui.arena.classList.remove('tempnoe');
 				_status.imchoosing=false;
 				_status.lastdragchange.length=0;
 				_status.mousedragging=null;
@@ -42907,7 +42913,10 @@
 				uiintro.add(caption);
 				uiintro.add('<div class="text center" style="padding-bottom:5px">'+content+'</div>');
 			}
-			else if(node.classList.contains('player')){
+			else if(node.classList.contains('player')||node.linkplayer){
+				if(node.linkplayer){
+					node=node.link;
+				}
 				var capt=get.translation(node.name);
 				if(lib.character[node.name]&&lib.character[node.name][1]){
 					capt+='&nbsp;&nbsp;'+lib.translate[lib.character[node.name][1]];

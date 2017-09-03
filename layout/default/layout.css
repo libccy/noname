@@ -2012,9 +2012,9 @@ div:not(.handcards)>.card>.info>span,
 	transform-origin: center;
 }
 #window>.damage.fullscreenavatar>div{
-	width: 220px;
+	width: 500px;
 	height: 100%;
-	left: calc(50% - 100px);
+	left: calc(50% - 250px);
 	display: inline-block;
 	position: absolute;
 	top: 0;
@@ -2026,10 +2026,28 @@ div:not(.handcards)>.card>.info>span,
 	background-size: cover;
 	background-position: 50%;
 	width: 200px;
-	left: 10px;
+	left: 150px;
 	top: 0;
 	height: 100%;
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.5) 0 0 10px;
+}
+#window>.damage.fullscreenavatar[data-nature='thunder']:not(.noshadow)>div:first-child>div{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 10px, rgba(0, 0, 0,0.3) 0 0 30px, rgba(100, 74, 139,1) 0 0 60px;
+}
+#window>.damage.fullscreenavatar[data-nature='metal']>div:first-child>div{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 10px, rgba(255, 0, 0,0.1) 0 0 30px, rgba(255, 203, 0,0.6) 0 0 80px;
+}
+#window>.damage.fullscreenavatar[data-nature='wood']>div:first-child>div{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 10px, rgba(0, 0, 0,0.3) 0 0 30px, rgba(57, 123, 4,1) 0 0 60px;
+}
+#window>.damage.fullscreenavatar[data-nature='water']>div:first-child>div{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 10px, rgba(0, 0, 0,0.3) 0 0 30px, rgba(78, 117, 140,1) 0 0 60px, rgba(78, 117, 140,1) 0 0 60px;
+}
+#window>.damage.fullscreenavatar[data-nature='soil']>div:first-child>div{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 10px, rgba(0, 0, 0,0.3) 0 0 30px, rgba(128, 59, 2,1) 0 0 60px;
+}
+#window>.damage.fullscreenavatar[data-nature='fire']>div:first-child>div{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 20px, rgba(0, 0, 0,0.3) 0 0 40px, rgba(232, 53, 53, 1) 0 0 80px;
 }
 #window>.damage.fullscreenavatar>div:last-child{
 	display: table;
@@ -2045,7 +2063,7 @@ div:not(.handcards)>.card>.info>span,
 	bottom: 30px;
 	position: absolute;
 	left: auto;
-	right: 30px;
+	right: 165px;
 }
 #window>.damage.fullscreenavatar>.name>div{
 	display: block;
@@ -3091,6 +3109,10 @@ div:not(.handcards)>.card>.info>span,
 	opacity: 1;
 }
 
+#arena.tempnoe .player.selectable .equips>.card{
+	pointer-events: none;
+}
+
 .unselectable:not(.selected):not(.removing) {
 	opacity: 0.6 !important
 }
@@ -3503,6 +3525,10 @@ div[data-color="unknownm"],
 span[data-color="unknownm"] {
 	text-shadow: rgba(0,0,0,0.5) 0 0 2px,rgba(0,0,0,0.2) 0 0 5px,rgba(0,0,0,0.2) 0 0 5px,
 		rgba(0,0,0,0.2) 0 0 5px,black 0 0 1px;
+}
+div[data-nature="unknown"] {
+	text-shadow: rgba(0, 0, 0,0.2) 0 0 2px,rgba(0, 0, 0,0.2) 0 0 5px,rgba(0, 0, 0,0.2) 0 0 10px,
+		rgba(0, 0, 0,0.2) 0 0 10px,rgba(0, 0, 0,0.2) 0 0 20px,rgba(0, 0, 0,0.2) 0 0 20px,rgba(0,0,0,0.6) 0 0 1px;
 }
 
 div[data-decoration="gold"]::before,
@@ -4120,6 +4146,17 @@ div:hover>.wunature {
 }
 
 /*--------动画--------*/
+@keyframes shadow_thunder {
+	0% {
+		box-shadow: rgba(0, 0, 0,1) 0 0 1px, rgba(0, 0, 0,0.1) 0 0 40px, rgba(100, 74, 139,0.5) 0 0 60px, rgba(100, 74, 139, 0.5) 0 0 100px, black 0 0 1px;
+	}
+	50% {
+		box-shadow: rgba(0, 0, 0,1) 0 0 1px, rgba(0, 0, 0,0.3) 0 0 40px, rgba(100, 74, 139,1) 0 0 60px, rgba(100, 74, 139,1) 0 0 100px, black 0 0 1px;
+	}
+	100% {
+		box-shadow: rgba(0, 0, 0,1) 0 0 1px, rgba(0, 0, 0,0.1) 0 0 40px, rgba(100, 74, 139,0.5) 0 0 60px, rgba(100, 74, 139,0.5) 0 0 100px, black 0 0 1px;
+	}
+}
 @keyframes cardeffect {
 	0% {
 		opacity: 0;
