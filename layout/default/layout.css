@@ -2049,10 +2049,10 @@ div:not(.handcards)>.card>.info>span,
 #window>.damage.fullscreenavatar[data-nature='fire']>div:first-child>div{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 20px, rgba(0, 0, 0,0.3) 0 0 40px, rgba(232, 53, 53, 1) 0 0 80px;
 }
-#window>.damage.fullscreenavatar>div:last-child{
+#window>.damage.fullscreenavatar>.text{
 	display: table;
 }
-#window>.damage.fullscreenavatar>div:last-child>div{
+#window>.damage.fullscreenavatar>.text>div{
 	display: block;
 	position: relative;
 	width: auto;
@@ -2064,6 +2064,23 @@ div:not(.handcards)>.card>.info>span,
 	position: absolute;
 	left: auto;
 	right: 165px;
+	transform: scale(2.5);
+	opacity: 0;
+}
+#window>.damage.fullscreenavatar>.textbg{
+	transition: all 0s;
+	display: none;
+}
+#window>.damage.fullscreenavatar.flashtext>.textbg{
+	display: block;
+}
+/*#window>.damage.fullscreenavatar.flashtext>.text:not(.textbg)>div{
+	transform: scale(2);
+	opacity: 0;
+}*/
+#window>.damage.fullscreenavatar.flashtext>.text>div{
+	transform: none;
+	opacity: 1;
 }
 #window>.damage.fullscreenavatar>.name>div{
 	display: block;
@@ -2074,6 +2091,9 @@ div:not(.handcards)>.card>.info>span,
 	position: absolute;
 	left: 20px;
 	font-size: 40px;
+}
+#window>.damage.fullscreenavatar.removing{
+	transition: all 0.3s;
 }
 .player>.damage,
 #window>.damage {
