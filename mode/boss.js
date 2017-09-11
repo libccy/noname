@@ -471,6 +471,98 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		card:{
+			sadouchengbing:{
+				type:'trick',
+				fullskin:true,
+				modeimage:'boss',
+				enable:true,
+			},
+			yihuajiemu:{
+				type:'trick',
+				fullskin:true,
+				modeimage:'boss',
+				enable:true,
+			},
+			guilongzhanyueado:{
+				type:'equip',
+				fullimage:true,
+				subtype:'equip1',
+				distance:{attackFrom:-2},
+				skills:[],
+				ai:{
+					equipValue:8
+				}
+			},
+			guofengyupao:{
+				type:'equip',
+				fullimage:true,
+				subtype:'equip1',
+				distance:{attackFrom:-2},
+				skills:[],
+				ai:{
+					equipValue:8
+				}
+			},
+			qimenbagua:{
+				type:'equip',
+				fullimage:true,
+				subtype:'equip1',
+				distance:{attackFrom:-2},
+				skills:[],
+				ai:{
+					equipValue:8
+				}
+			},
+			chixueqingfeng:{
+				type:'equip',
+				fullimage:true,
+				subtype:'equip1',
+				distance:{attackFrom:-2},
+				skills:[],
+				ai:{
+					equipValue:8
+				}
+			},
+			chiyanzhenhunqin:{
+				type:'equip',
+				fullimage:true,
+				subtype:'equip1',
+				distance:{attackFrom:-2},
+				skills:[],
+				ai:{
+					equipValue:8
+				}
+			},
+			juechenjinge:{
+				type:'equip',
+				fullimage:true,
+				subtype:'equip1',
+				distance:{attackFrom:-2},
+				skills:[],
+				ai:{
+					equipValue:8
+				}
+			},
+			xiuluolianyuji:{
+				type:'equip',
+				fullimage:true,
+				subtype:'equip1',
+				distance:{attackFrom:-2},
+				skills:[],
+				ai:{
+					equipValue:8
+				}
+			},
+			xuwangzhimian:{
+				type:'equip',
+				fullimage:true,
+				subtype:'equip1',
+				distance:{attackFrom:-2},
+				skills:[],
+				ai:{
+					equipValue:8
+				}
+			},
 			honghuangzhili:{
 				type:'trick',
 				enable:true,
@@ -577,7 +669,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		cardPack:{
-			mode_boss:['honghuangzhili']
+			mode_boss:['honghuangzhili','guilongzhanyueado','guofengyupao','chiyanzhenhunqin','qimenbagua','xuwangzhimian','juechenjinge','xiuluolianyuji','chixueqingfeng']
 		},
 		init:function(){
 			for(var i in lib.characterPack.mode_boss){
@@ -1022,20 +1114,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				init:function(){
-					// for(var i=0;i<ui.cardPile.childElementCount;i++){
-					// 	var node=ui.cardPile.childNodes[i];
-					// 	switch(node.name){
-					// 		case 'bagua':
-					// 	}
-					// 	if(node.name=='shandian'){
-					// 		node.classList.remove('fullskin');
-					// 		node.classList.remove('thunder');
-					// 		node.init([node.suit,node.number,'honghuangzhili']);
-					// 	}
-					// 	else if(['huoshan','hongshui','fulei'].contains(node)){
-					// 		node.remove();
-					// 	}
-					// }
+					for(var i=0;i<ui.cardPile.childElementCount;i++){
+						var node=ui.cardPile.childNodes[i];
+						if(node.name=='wuzhong'){
+							node.init([node.suit,node.number,'sadouchengbing']);
+						}
+						else if(node.name=='jiedao'){
+							node.init([node.suit,node.number,'yihuajiemu']);
+						}
+						else if(['lebu','bingliang'].contains(node.name)){
+							node.remove();
+						}
+					}
 
 				}
 			},
@@ -1063,7 +1153,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							node.classList.remove('thunder');
 							node.init([node.suit,node.number,'honghuangzhili']);
 						}
-						else if(['huoshan','hongshui','fulei'].contains(node)){
+						else if(['huoshan','hongshui','fulei'].contains(node.name)){
 							node.remove();
 						}
 					}
@@ -1093,7 +1183,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							node.classList.remove('thunder');
 							node.init([node.suit,node.number,'honghuangzhili']);
 						}
-						else if(['huoshan','hongshui','fulei'].contains(node)){
+						else if(['huoshan','hongshui','fulei'].contains(node.name)){
 							node.remove();
 						}
 					}
@@ -4839,6 +4929,27 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_taotie:'饕餮',
 			boss_zhuyin:'烛阴',
 
+			sadouchengbing:'撒豆成兵',
+			sadouchengbing_info:'出牌阶段对自己使用，若你的势力为“神”，摸X张牌；否则将你手牌补至X；（X为你的体力上限且至多为5）',
+			yihuajiemu:'移花接木',
+			yihuajiemu_info:'出牌阶段对一名有牌的其他角色使用，令其使用一张【杀】，或交给你两张牌',
+			guilongzhanyueado:'鬼龙斩月刀',
+			guilongzhanyueado_info:'锁定技，你使用的红色【杀】不能被【闪】响应',
+			guofengyupao:'国风玉袍',
+			guofengyupao_info:'锁定技，你不能成为其他角色使用普通锦囊牌的目标',
+			chiyanzhenhunqin:'赤焰镇魂琴',
+			chiyanzhenhunqin_info:'锁定技，你造成的伤害均视为具有火属性',
+			qimenbagua:'奇门八卦',
+			qimenbagua_info:'锁定技，其他角色使用的【杀】对你无效',
+			juechenjinge:'绝尘金戈',
+			juechenjinge_info:'锁定技，敌方角色计算与己方其他角色距离+1',
+			xiuluolianyuji:'修罗炼狱戟',
+			xiuluolianyuji_info:'你使用【杀】可以额外指定任意名攻击范围内的其他角色为目标；锁定技，你使用【杀】造成的伤害+1，然后令受到伤害的角色回复1点体力',
+			xuwangzhimian:'虚妄之冕',
+			xuwangzhimian_info:'锁定技，摸牌阶段，你额外摸两张牌；你的手牌上限-1',
+			chixueqingfeng:'赤血青锋',
+			chixueqingfeng_info:'锁定技，你使用【杀】结算结束前，目标角色不能使用或打出手牌，且此【杀】无视其防具',
+
 			honghuangzhili:'洪荒之力',
 			honghuangzhili_cbg:'洪',
 			honghuangzhili_info:'若该角色的势力是神，你获得其一张牌，其【神裔】无效直到其下家的回合（这个下家是动态变化的，会随着一个人的死或者复活而变化）开始；若该角色的势力不是神，其翻面。',
@@ -5108,6 +5219,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			jiwu:'极武',
 			jiwu_info:'出牌阶段，你可以弃置一张手牌，然后获得一项：“强袭”、“烈刃”、“旋风”、“完杀”，直到回合结束',
 
+			mode_boss_card_config:'挑战卡牌',
 			mode_boss_character_config:'挑战武将',
 		},
 		get:{
