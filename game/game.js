@@ -18672,12 +18672,23 @@
 						node.classList.add('fullscreenavatar');
 						ui.create.div('',ui.create.div(node));
 						// ui.create.div('',str.split('').join('<br>'),ui.create.div('.text.textbg',node));
-						ui.create.div('',str.split('').join('<br>'),ui.create.div('.text',node));
+						ui.create.div('','<div>'+str.split('').join('</div><br><div>')+'</div>',ui.create.div('.text',node));
 						node.firstChild.firstChild.style.backgroundImage=this.node.avatar.style.backgroundImage;
 						node.dataset.nature=nature||'unknown';
 						setTimeout(function(){
-							node.classList.add('flashtext');
-						},200);
+							// node.lastChild.firstChild.firstChild.classList.add('flashtext');
+							var num=0;
+							var nodes=node.lastChild.firstChild.querySelectorAll('div');
+							var interval=setInterval(function(){
+								if(num<nodes.length){
+									nodes[num].classList.add('flashtext');
+									num++;
+								}
+								else{
+									clearInterval(interval);
+								}
+							},100);
+						},100);
 					}
 					else{
 						node.innerHTML=str;

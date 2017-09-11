@@ -1,8 +1,8 @@
 window.noname_update={
-    version:'1.9.36.3',
-    update:'1.9.36.1',
+    version:'1.9.37',
+    // update:'1.9.36.1',
     changeLog:[
-        '自定义按钮高度',
+        '神武再世',
     ],
     files:[
         'game/game.js',

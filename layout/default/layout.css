@@ -2064,8 +2064,12 @@ div:not(.handcards)>.card>.info>span,
 	position: absolute;
 	left: auto;
 	right: 165px;
-	transform: scale(2.5);
+}
+#window>.damage.fullscreenavatar>.text>div>div{
+	transform: scale(4);
 	opacity: 0;
+	display: inline-block;
+	position: relative;
 }
 #window>.damage.fullscreenavatar>.textbg{
 	transition: all 0s;
@@ -2078,7 +2082,7 @@ div:not(.handcards)>.card>.info>span,
 	transform: scale(2);
 	opacity: 0;
 }*/
-#window>.damage.fullscreenavatar.flashtext>.text>div{
+#window>.damage.fullscreenavatar>.text>div>.flashtext{
 	transform: none;
 	opacity: 1;
 }
