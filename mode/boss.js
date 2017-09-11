@@ -47,8 +47,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"step 1"
 			var bosslist=ui.create.div('#bosslist.hidden');
 			event.bosslist=bosslist;
-			bosslist.ontouchmove = ui.click.touchScroll;
-			bosslist.style.WebkitOverflowScrolling='touch';
+			lib.setScroll(bosslist);
+			// bosslist.ontouchmove = ui.click.touchScroll;
+			// bosslist.style.WebkitOverflowScrolling='touch';
 			if(!lib.config.touchscreen&&lib.config.mousewheel){
 				bosslist._scrollspeed=30;
 				bosslist._scrollnum=10;
