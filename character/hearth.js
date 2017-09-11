@@ -58,7 +58,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_zhanzhenggushu:['male','wei',6,['biri']],
     		hs_ronghejuren:['male','shu',8,['ronghuo']],
     		hs_shanlingjuren:['male','wu',8,['luoshi']],
-    		hs_aedwin:['male','wu',3,['lianzhan']],
+    		hs_aedwin:['male','wu',4,['lianzhan']],
     		hs_mijiaojisi:['female','wu',3,['kuixin']],
     		hs_huzhixiannv:['female','wu',3,['jingmeng','qingliu']],
     		hs_totemic:['male','wu',3,['peiyu']],

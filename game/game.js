@@ -11919,7 +11919,7 @@
 				discard:function(){
 					"step 0"
 					game.log(player,'弃置了',cards);
-					player.lose(cards);
+					player.lose(cards,event.position);
 					if(event.animate!=false){
                         event.discardid=lib.status.videoId++;
                         game.broadcastAll(function(player,cards,id){
@@ -15332,6 +15332,9 @@
 						else if(typeof arguments[i]=='boolean'){
 							next.animate=arguments[i];
 						}
+						else if(get.objtype(arguments[i])=='div'){
+							next.position=arguments[i];
+						}
 					}
 					if(next.cards==undefined) _status.event.next.remove(next);
                     next.setContent('discard');
@@ -18478,9 +18481,9 @@
 				},
 				$skill:function(name,type,color,avatar){
 					if(typeof type!='string') type='legend';
-					game.delay(2);
 					if(!avatar){
 						this.playerfocus(1500);
+						game.delay(2);
 					}
 					else{
 						game.addVideo('playerfocus2');
@@ -18488,8 +18491,9 @@
 	                        ui.arena.classList.add('playerfocus');
 							setTimeout(function(){
 								ui.arena.classList.remove('playerfocus');
-							},1500)
+							},1800)
 	                    });
+						game.delay(3);
 					}
 					var that=this;
 					setTimeout(function(){
@@ -18676,19 +18680,16 @@
 						ui.create.div('','<div>'+str.split('').join('</div><br><div>')+'</div>',ui.create.div('.text',node));
 						node.firstChild.firstChild.style.backgroundImage=this.node.avatar.style.backgroundImage;
 						node.dataset.nature=nature||'unknown';
-						setTimeout(function(){
-							// node.lastChild.firstChild.firstChild.classList.add('flashtext');
-							var num=0;
-							var nodes=node.lastChild.firstChild.querySelectorAll('div');
-							var interval=setInterval(function(){
-								if(num<nodes.length){
-									nodes[num].classList.add('flashtext');
-									num++;
-								}
-								else{
-									clearInterval(interval);
-								}
-							},100);
+						var num=0;
+						var nodes=node.lastChild.firstChild.querySelectorAll('div');
+						var interval=setInterval(function(){
+							if(num<nodes.length){
+								nodes[num].classList.add('flashtext');
+								num++;
+							}
+							else{
+								clearInterval(interval);
+							}
 						},100);
 					}
 					else{
@@ -18714,7 +18715,7 @@
 					setTimeout(function(){
 						node.delete();
 						node.style.transform='scale(1.5)'
-					},avatar?1300:1000);
+					},avatar?1600:1000);
 				},
 				$damagepop:function(num,nature,font){
 					if(typeof num=='number'||typeof num=='string'){
@@ -42510,7 +42511,7 @@
                 for(var j=0;j<lib.character[i][3].length;j++){
                     var skill=lib.character[i][3][j];
 					var info=lib.skill[skill];
-                    if(info&&!info.unique&&!info.temp&&!info.sub){
+                    if(info&&!info.unique&&!info.temp&&!info.sub&&!info.fixed){
 						if(func&&!func(info,skill)) continue;
                         list.add(skill);
                     }

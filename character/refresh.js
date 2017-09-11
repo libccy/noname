@@ -1202,6 +1202,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						game.trySkillAudio('zhaxiang',player);
 					}
+				},
+				ai:{
+					maihp:true
 				}
 			},
 			zhaxiang2:{

@@ -8,7 +8,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		caoren:['male','wei',4,['xinjushou','xinjiewei']],
     		huangzhong:['male','shu',4,['xinliegong']],
     		weiyan:['male','shu',4,['xinkuanggu','qimou']],
-    		xiaoqiao:['female','wu',3,['xintianxiang','hongyan']],
+    		xiaoqiao:['female','wu',3,['retianxiang','hongyan']],
     		zhoutai:['male','wu',4,['buqu','fenji']],
     		sp_zhangjiao:['male','qun',3,['releiji','guidao','huangtian'],['zhu']],
     		// yuji:['male','qun',3,['guhuo']],
@@ -2570,7 +2570,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		wansha:{
     			locked:true,
-    			global:'wansha2'
+    			global:'wansha2',
+                trigger:{global:'dying'},
+                priority:15,
+                forced:true,
+                filter:function(event,player){
+                    return _status.currentPhase==player&&event.player!=player;
+                },
+                content:function(){}
     		},
     		wansha2:{
     			mod:{
@@ -3566,6 +3573,134 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.popup('tianxiang');
     			}
     		},
+            retianxiang:{
+                audio:'tianxiang',
+    			trigger:{player:'damageBefore'},
+    			direct:true,
+    			filter:function(event,player){
+    				return player.countCards('he',{suit:'heart'})>0&&event.num>0;
+    			},
+    			content:function(){
+    				"step 0"
+    				player.chooseCardTarget({
+    					filterCard:function(card,player){
+    						return get.suit(card)=='heart'&&lib.filter.cardDiscardable(card,player);
+    					},
+    					filterTarget:function(card,player,target){
+    						return player!=target;
+    					},
+    					position:'he',
+    					ai1:function(card){
+    						return 10-get.value(card);
+    					},
+    					ai2:function(target){
+    						var att=get.attitude(_status.event.player,target);
+    						var trigger=_status.event.getTrigger();
+    						var da=0;
+    						if(_status.event.player.hp==1){
+    							da=10;
+    						}
+    						var eff=get.damageEffect(target,trigger.source,target);
+    						if(att==0) return 0.1+da;
+    						if(eff>=0&&att>0){
+    							return att+da;
+    						}
+                            if(att>0&&target.hp>1){
+                                if(target.maxHp-target.hp>=3) return att*1.1+da;
+                                if(target.maxHp-target.hp>=2) return att*0.9+da;
+                            }
+                            return -att+da;
+    					},
+    					prompt:get.prompt('retianxiang'),
+                        prompt2:lib.translate.retianxiang_info
+    				});
+    				"step 1"
+    				if(result.bool){
+                        player.discard(result.cards,ui.special);
+                        var target=result.targets[0];
+                        player.chooseControlList(true,function(event,player){
+                            var target=_status.event.target;
+                            var att=get.attitude(player,target);
+                            if(target.hasSkillTag('maihp')) att=-att;
+                            if(att>0){
+                                return 0;
+                            }
+                            else{
+                                return 1;
+                            }
+                        },
+                            ['令'+get.translation(target)+'受到伤害来源对其造成的1点伤害，然后摸X张牌（X为其已损失体力值且至多为5）',
+                            '令'+get.translation(target)+'失去1点体力，然后获得'+get.translation(result.cards)]).set('target',target);
+    					player.logSkill(event.name,target);
+    					trigger.untrigger();
+                        trigger.finish();
+                        event.target=target;
+                        event.card=result.cards[0];
+    				}
+                    else{
+                        event.finish();
+                    }
+                    "step 2"
+                    if(typeof result.index=='number'){
+                        if(result.index){
+                            event.target.loseHp().type='retianxiang';
+                            event.target.addSkill('retianxiang3');
+                            event.target.storage.retianxiang3=event.card;
+                        }
+                        else{
+                            event.target.damage(trigger.source).type='retianxiang';
+                            event.target.addSkill('retianxiang2');
+                            if(get.position(event.card)=='s'){
+                                event.card.discard();
+                            }
+                        }
+                    }
+    			},
+    			ai:{
+                    maixie_fake:true,
+    				effect:{
+    					target:function(card,player,target){
+    						if(player.hasSkillTag('jueqing',false,target)) return;
+    						if(get.tag(card,'damage')&&target.countCards('he')>1) return 0.7;
+    					}
+    				},
+    			}
+            },
+            retianxiang3:{
+                trigger:{player:'loseHpAfter'},
+                forced:true,
+                popup:false,
+                filter:function(event){
+                    return event.type=='retianxiang';
+                },
+                vanish:true,
+                content:function(){
+                    player.gain(player.storage.retianxiang3,'gain2');
+                    player.removeSkill('retianxiang3');
+                },
+                onremove:function(player){
+                    var card=player.storage.retianxiang3;
+                    if(get.position(card)=='s'){
+                        card.discard();
+                    }
+                    delete player.storage.retianxiang3;
+                }
+            },
+            retianxiang2:{
+                trigger:{player:'damageAfter'},
+                forced:true,
+                popup:false,
+                filter:function(event){
+                    return event.type=='retianxiang';
+                },
+                vanish:true,
+                content:function(){
+                    if(player.isDamaged()){
+                        player.draw(player.maxHp-player.hp);
+                    }
+                    player.removeSkill('retianxiang2');
+                },
+            },
     		xintianxiang:{
     			audio:'tianxiang',
     			trigger:{player:'damageBefore'},
@@ -4181,6 +4316,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		xinqiangxi:'强袭',
             xinjushou:'据守',
             xinjiewei:'解围',
+            retianxiang:'天香',
+            retianxiang_info:'当你受到伤害时，你可以弃置一张红桃手牌，防止此次伤害并选择一名其他角色，然后你选择一项：1.令其受到伤害来源对其造成的1点伤害，然后摸X张牌（X为其已损失体力值且至多为5）；2.令其失去1点体力，然后获得你弃置的牌。',
             xinjiewei_info:'你可以将装备区里的牌当【无懈可击】使用；当你从背面翻至正面时，你可以弃置一张牌，然后移动场上的一张牌',
             xinjushou_info:'结束阶段，你可以翻面并摸四张牌，然后弃置一张手牌，若以此法弃置的是装备牌，则你改为使用之',
     		jixi_info:'出牌阶段，你可以把任意一张田当【顺手牵羊】使用',
