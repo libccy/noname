@@ -1013,7 +1013,7 @@ window.noname_asset_list=[
     'image/mode/boss/character/boss_zuoci.jpg',
     'image/mode/boss/card/chixueqingfeng.jpg',
     'image/mode/boss/card/chiyanzhenhunqin.jpg',
-    'image/mode/boss/card/guilongzhanyueado.jpg',
+    'image/mode/boss/card/guilongzhanyuedao.jpg',
     'image/mode/boss/card/guofengyupao.jpg',
     'image/mode/boss/card/honghuangzhili.png',
     'image/mode/boss/card/juechenjinge.jpg',

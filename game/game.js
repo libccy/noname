@@ -16830,6 +16830,8 @@
                         }
                     }
                     else{
+						var info=lib.skill[skill];
+						if(info&&info.fixed) return skill;
                         this.unmarkSkill(skill);
 						game.broadcastAll(function(player,skill){
 							player.skills.remove(skill);
@@ -16837,7 +16839,6 @@
 						},this,skill);
     					this.checkConflict(skill);
                         delete this.tempSkills[skill];
-                        var info=lib.skill[skill];
                         if(info){
                             if(info.onremove){
 								if(typeof info.onremove=='function'){

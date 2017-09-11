@@ -1412,6 +1412,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						if(!info) return false;
     						var skills=event.player.getSkills();
     						for(var i=0;i<info[3].length;i++){
+                                if(lib.skill[info[3][i]].fixed) continue;
     							if(skills.contains(info[3][i])) return true;
     						}
     					}
@@ -1447,6 +1448,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						var skills=trigger.player.getSkills();
     						var list=[];
     						for(var i=0;i<info[3].length;i++){
+                                if(lib.skill[info[3][i]].fixed) continue;
     							if(skills.contains(info[3][i])){
     								list.push(info[3][i]);
     							}
