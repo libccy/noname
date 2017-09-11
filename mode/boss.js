@@ -778,7 +778,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		cardPack:{
-			mode_boss:['honghuangzhili','guilongzhanyuedao','guofengyupao','chiyanzhenhunqin','qimenbagua','xuwangzhimian','juechenjinge','xiuluolianyuji','chixueqingfeng']
+			mode_boss:['honghuangzhili','sadouchengbing','yihuajiemu','guilongzhanyuedao','guofengyupao','chiyanzhenhunqin','qimenbagua','xuwangzhimian','juechenjinge','xiuluolianyuji','chixueqingfeng']
 		},
 		init:function(){
 			for(var i in lib.characterPack.mode_boss){
