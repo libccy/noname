@@ -78,6 +78,9 @@ table {
 #window.modepaused>#arena>#roundmenu {
 	opacity: 0.3;
 }
+#window.shortcutpaused>.modeshortcutpause {
+	opacity: 0.3 !important;
+}
 #window.shortcutpaused.modepaused>.modenopause.popup-container:not(.filter-character) {
 	opacity: 0.3;
 }

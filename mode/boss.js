@@ -1007,6 +1007,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					dialog.classList.add('fixed');
 					ui.window.appendChild(dialog);
 					dialog.classList.add('bosscharacter');
+					dialog.classList.add('modeshortcutpause');
 					dialog.classList.add('withbg');
 					// dialog.add('0/3');
 					dialog.add([list.slice(0,20),'character']);
