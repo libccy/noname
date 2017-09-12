@@ -448,7 +448,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				game.addRecentCharacter(game.me.name);
 			}
 			event.trigger('gameStart');
-			game.gameDraw(game.boss);
+			game.gameDraw(game.boss,game.bossinfo.gameDraw||4);
 			game.bossPhaseLoop();
 			setTimeout(function(){
 				ui.updatehl();
@@ -1169,6 +1169,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				loopFirst:function(){
 					return game.boss.nextSeat.nextSeat;
 				},
+				gameDraw:function(player){
+					return player==game.boss?8:4;
+				},
 				minion:{
 					'2':'boss_zhuyin',
 					'8':'boss_zhuyin',
@@ -1188,6 +1191,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				chongzheng:0,
 				loopFirst:function(){
 					return game.boss.nextSeat.nextSeat;
+				},
+				gameDraw:function(player){
+					return player==game.boss?8:4;
 				},
 				minion:{
 					'2':'boss_zhuyin',
@@ -1209,6 +1215,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				loopFirst:function(){
 					return game.boss.nextSeat.nextSeat;
 				},
+				gameDraw:function(player){
+					return player==game.boss?8:4;
+				},
 				minion:{
 					'2':'boss_zhuyin',
 					'8':'boss_zhuyin',
@@ -1228,6 +1237,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				chongzheng:0,
 				loopFirst:function(){
 					return game.boss.nextSeat.nextSeat;
+				},
+				gameDraw:function(player){
+					return player==game.boss?8:4;
 				},
 				minion:{
 					'2':'boss_zhuyin',
@@ -1486,7 +1498,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				chongzheng:4,
 			},
 			boss_lvbu1:{
-				loopType:2
+				loopType:2,
+				gameDraw:function(player){
+					return player==game.boss?8:4;
+				},
 			},
 			boss_zuoci:{
 				chongzheng:4,
@@ -5392,7 +5407,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			boss_baonu:{
 				unique:true,
-				group:'boss_baonu2',
 				trigger:{player:'changeHp',global:'boss_baonuwash'},
 				forced:true,
 				priority:100,
@@ -5476,14 +5490,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					}
-				}
-			},
-			boss_baonu2:{
-				trigger:{player:'gameDrawBegin'},
-				forced:true,
-				popup:false,
-				content:function(){
-					player.draw(4,false);
 				}
 			},
 			qiwu:{
