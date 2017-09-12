@@ -108,3 +108,14 @@ body[data-background_color_music='blue'] #arena.mobile:not(.chess) .player[data-
 #arena:not(.chess) .player[data-position='0']>.equips>.equip5>.image{
 	background-position: -6px -6px;
 }
+
+#window .player.minskin.obstacle[data-obscolor='blue']{
+    background: repeating-linear-gradient(
+        135deg,
+        rgba(0, 133, 255, 0.5),
+        rgba(0, 133, 255, 0.5) 10px,
+        rgba(0, 0, 0, 0) 10px,
+        rgba(0, 0, 0, 0) 20px
+    );
+    box-shadow: rgba(0, 133, 255, 0.5) 0 0 0 1px;
+}

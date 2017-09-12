@@ -5825,7 +5825,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						event.finish();
     					}
     					else if(lib.config.autoskilllist.contains('lqingcheng')){
-    						player.chooseBool('是否再次发动？');
+    						player.chooseBool('是否再次发动【倾城】？');
     					}
     					else{
     						event._result={bool:true};

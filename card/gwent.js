@@ -1518,7 +1518,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target.isDamaged();
 				},
 				content:function(){
+					'step 0'
 					target.loseMaxHp(true);
+					'step 1'
+					if(target.isDamaged()&&target.countCards('h')<target.maxHp){
+						event.goto(0);
+					}
 				},
 				ai:{
 					value:[4,1],
@@ -2183,7 +2188,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_butianshu:'卜天术',
 			gw_butianshu_info:'出牌阶段对任意角色使用，将任意一张延时锦囊牌置入其判定区',
 			gw_zhihuanjun:'致幻菌',
-			gw_zhihuanjun_info:'出牌阶段对一名已受伤角色使用，令其减少一点体力上限',
+			gw_zhihuanjun_info:'出牌阶段对一名已受伤角色使用，令其减少一点体力上限；若该角色仍处于受伤状态且手牌数小于体力上限，则重复此结算',
 			gw_niuquzhijing:'纽曲之镜',
 			gw_niuquzhijing_info:'令全场体力最多的角色减少一点体力和体力上限，体力最少的角色增加一点体力和体力上限（不触发技能），然后结束出牌阶段',
 			gw_ansha:'暗杀',

@@ -46,7 +46,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			}
     		}
     		if(get.config('chess_card')){
-    			lib.card.list=lib.card.list.concat(lib.chess_cardlist);
+    			lib.card.list.addArray(lib.chess_cardlist);
     		}
     		ui.create.cardsAsync();
     		game.finishCards();
@@ -1581,9 +1581,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				grid.listen(ui.click.obstacle);
     				lib.posmap[pos]=grid;
     				game.obstacles.push(grid);
+                    return grid;
     			}
+                return null;
     		},
+            addTempObstacle:function(x,y,num){
+                var node=game.addObstacle(x,y);
+                if(node){
+                    game.colorObstacle(node,'blue');
+                    node.tempObstacle=num;
+                }
+            },
     		removeObstacle:function(pos){
+                if(get.is.div(pos)){
+                    pos=pos.dataset.position;
+                }
     			var node=lib.posmap[pos];
     			if(node&&game.obstacles.contains(node)){
     				game.addVideo('removeObstacle',null,pos);
@@ -1592,6 +1604,48 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				node.delete();
     			}
     		},
+            moveObstacle:function(pos,x,y){
+                if(get.is.div(pos)){
+                    pos=pos.dataset.position;
+                }
+                var node=lib.posmap[pos];
+                if(node&&game.obstacles.contains(node)){
+                    pos=parseInt(pos);
+                    var x2=pos%ui.chesswidth+x;
+                    var y2=Math.floor(pos/ui.chesswidth)+y;
+                    if(x2>=ui.chesswidth){
+    					x2=ui.chesswidth-1;
+    				}
+    				if(y2>=ui.chessheight){
+    					y2=ui.chessheight-1;
+    				}
+                    if(x2<0){
+                        x2=0;
+                    }
+                    if(y2<0){
+                        y2=0;
+                    }
+    				var pos2=y2*ui.chesswidth+x2;
+                    if(!lib.posmap[pos2]){
+                        game.addVideo('moveObstacle',null,[pos,x,y]);
+                        node.dataset.position=pos2;
+                        delete lib.posmap[pos];
+                        lib.posmap[pos2]=node;
+                        return true;
+                    }
+                }
+                return false;
+            },
+            colorObstacle:function(pos,color){
+                if(get.is.div(pos)){
+                    pos=pos.dataset.position;
+                }
+                var node=lib.posmap[pos];
+                if(node&&game.obstacles.contains(node)){
+                    game.addVideo('colorObstacle',null,[pos,color]);
+                    node.dataset.obscolor=color;
+                }
+            },
     		addOverDialog:function(dialog,result){
     			if(ui.finishGame){
     				ui.finishGame.remove();
@@ -3938,6 +3992,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     		}
     	},
     	skill:{
+            _tempobstacle:{
+                trigger:{player:'phaseAfter'},
+                silent:true,
+                content:function(){
+                    var list=game.obstacles.slice(0);
+                    for(var i=0;i<list.length;i++){
+                        if(typeof list[i].tempObstacle=='number'){
+                            if(--list[i].tempObstacle==0){
+                                game.removeObstacle(list[i]);
+                            }
+                        }
+                    }
+                }
+            },
     		_attackmove:{
     			trigger:{player:'damageEnd'},
     			forced:true,
@@ -4966,31 +5034,69 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			filter:function(event,player){
     				var num=0;
     				var xy=player.getXY();
-    				if(game.obstacles.contains(player.getNeighbour(-1,0))||xy[0]==0) num++;
-    				if(game.obstacles.contains(player.getNeighbour(1,0))||xy[0]+1>=ui.chesswidth) num++;
-    				if(game.obstacles.contains(player.getNeighbour(0,-1))||xy[1]==0) num++;
-    				if(game.obstacles.contains(player.getNeighbour(0,1))||xy[1]+1>=ui.chessheight) num++;
+                    var neighbour;
+    				neighbour=player.getNeighbour(-1,0);
+    				if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.contains(neighbour)){
+    					num++;
+    				}
+                    else if(xy[0]==0){
+                        num++;
+                    }
+    				neighbour=player.getNeighbour(1,0);
+    				if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.contains(neighbour)){
+    					num++;
+    				}
+                    else if(xy[0]+1>=ui.chesswidth){
+                        num++;
+                    }
+    				neighbour=player.getNeighbour(0,-1);
+    				if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.contains(neighbour)){
+    					num++;
+    				}
+                    else if(xy[1]==0){
+                        num++;
+                    }
+    				neighbour=player.getNeighbour(0,1);
+    				if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.contains(neighbour)){
+    					num++;
+    				}
+                    else if(xy[1]+1>=ui.chessheight){
+                        num++;
+                    }
     				return num>=3;
     			},
     			content:function(){
     				'step 0'
     				event.obstacles=[];
+                    event.movemap={};
     				var neighbour;
     				neighbour=player.getNeighbour(-1,0);
-    				if(neighbour&&game.obstacles.contains(neighbour)){
+    				if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.contains(neighbour)){
     					event.obstacles.push(neighbour);
+                        if(player.movable(-2,0)){
+                            event.movemap['[-1,0]']=neighbour;
+                        }
     				}
     				neighbour=player.getNeighbour(1,0);
-    				if(neighbour&&game.obstacles.contains(neighbour)){
+    				if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.contains(neighbour)){
     					event.obstacles.push(neighbour);
+                        if(player.movable(2,0)){
+                            event.movemap['[1,0]']=neighbour;
+                        }
     				}
     				neighbour=player.getNeighbour(0,-1);
-    				if(neighbour&&game.obstacles.contains(neighbour)){
+    				if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.contains(neighbour)){
     					event.obstacles.push(neighbour);
+                        if(player.movable(0,-2)){
+                            event.movemap['[0,-1]']=neighbour;
+                        }
     				}
     				neighbour=player.getNeighbour(0,1);
-    				if(neighbour&&game.obstacles.contains(neighbour)){
+    				if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.contains(neighbour)){
     					event.obstacles.push(neighbour);
+                        if(player.movable(0,2)){
+                            event.movemap['[0,1]']=neighbour;
+                        }
     				}
     				if(!event.obstacles.length){
     					event.finish();
@@ -5006,7 +5112,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     					event.chooseObstacle=true;
     					game.pause();
     					_status.imchoosing=true;
-    					event.dialog=ui.create.dialog('选择一个与你相邻的障碍清除之');
+    					event.dialog=ui.create.dialog('移动一个与你相邻的路障');
     					event.dialog.add('<div class="text">'+lib.translate._chess_chuzhang_info+'</div>');
     					event.custom.replace.confirm=function(){
     						player.getStat().skill._chess_chuzhang--;
@@ -5023,7 +5129,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     					if(!event.obstacle){
     						event.obstacle=event.obstacles.randomGet();
     					}
-    					game.removeObstacle(event.obstacle.dataset.position);
+                        var moved=false;
+                        for(var i in event.movemap){
+                            if(event.movemap[i]==event.obstacle){
+                                var xy=JSON.parse(i);
+                                if(game.moveObstacle(event.obstacle,xy[0],xy[1])){
+                                    moved=true;
+                                    break;
+                                }
+                            }
+                        }
+                        if(!moved){
+                            game.removeObstacle(event.obstacle);
+                        }
+                        player.popup('除障');
+                        game.delay();
     				}
     				for(var i=0;i<event.obstacles.length;i++){
     					event.obstacles[i].classList.remove('glow');
@@ -5403,13 +5523,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     		epic:'史诗',
     		legend:'传说',
 
-    		chess_shezhang:'设置障碍',
-    		chess_shezhang_info:'在你的一个相邻位置设置障碍，摸一张牌',
-    		chess_chuzhang:'清除障碍',
-    		chess_chuzhang_info:'清除一个在你相邻位置的障碍，摸一张牌',
+    		chess_shezhang:'设置路障',
+    		chess_shezhang_info:'选择一名角色，在其四周设置临时路障，持续X回合（X为存活角色数）',
+    		chess_chuzhang:'清除路障',
+    		chess_chuzhang_info:'将你相邻的路障而后推移一格，每影响一个路障你摸一张牌',
 
     		_chess_chuzhang:'除障',
-    		_chess_chuzhang_info:'出牌阶段限一次，若你周围四格至少有三个为障碍或在边缘外，你可以选择清除其中一个障碍',
+    		_chess_chuzhang_info:'出牌阶段限一次，若你周围四格至少有三个为障碍或在边缘外，你可以选择将其中一个障碍向后推移一格（若无法推移则改为清除之）',
 
     		arenaAdd:'援军',
     		arenaAdd_info:'出牌阶段限一次，你可以令一名未出场的已方角色加入战场。战斗结束后，该角色无论是否存活均不能再次出场',
@@ -5521,18 +5641,32 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			type:'basic',
     			fullskin:true,
     			modeimage:'chess',
-    			enable:function(card,player){
-    				if(player.movable(-1,0)) return true;
-    				if(player.movable(1,0)) return true;
-    				if(player.movable(0,-1)) return true;
-    				if(player.movable(0,1)) return true;
+    			enable:true,
+    			filterTarget:function(card,player,target){
+                    if(target.movable(-1,0)) return true;
+    				if(target.movable(1,0)) return true;
+    				if(target.movable(0,-1)) return true;
+    				if(target.movable(0,1)) return true;
     				return false;
     			},
-    			filterTarget:function(card,player,target){
-    				return player==target;
-    			},
-    			selectTarget:-1,
-    			content:function(){
+                content:function(){
+                    var xy=target.getXY();
+                    var x=xy[0];
+                    var y=xy[1];
+                    if(target.movable(-1,0)){
+                        game.addTempObstacle(x-1,y,game.countPlayer());
+                    }
+                    if(target.movable(1,0)){
+                        game.addTempObstacle(x+1,y,game.countPlayer());
+                    }
+                    if(target.movable(0,1)){
+                        game.addTempObstacle(x,y+1,game.countPlayer());
+                    }
+                    if(target.movable(0,-1)){
+                        game.addTempObstacle(x,y-1,game.countPlayer());
+                    }
+                },
+    			content_old:function(){
     				'step 0'
     				var pos=parseInt(player.dataset.position);
     				var poses=[];
@@ -5586,7 +5720,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			},
     			ai:{
     				result:{
-    					player:1,
+    					target:function(player,target){
+                            if(target.getNeighbours().length) return 0;
+                            return -1;
+                        },
     				},
     				order:1
     			}
@@ -5600,12 +5737,38 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			},
     			selectTarget:-1,
     			enable:function(event,player){
-    				if(game.obstacles.contains(player.getNeighbour(-1,0))) return true;
-    				if(game.obstacles.contains(player.getNeighbour(1,0))) return true;
-    				if(game.obstacles.contains(player.getNeighbour(0,-1))) return true;
-    				if(game.obstacles.contains(player.getNeighbour(0,1))) return true;
+    				if(game.obstacles.contains(player.getNeighbour(-1,0))&&player.movable(-2,0)) return true;
+    				if(game.obstacles.contains(player.getNeighbour(1,0))&&player.movable(2,0)) return true;
+    				if(game.obstacles.contains(player.getNeighbour(0,-1))&&player.movable(0,-2)) return true;
+    				if(game.obstacles.contains(player.getNeighbour(0,1))&&player.movable(0,2)) return true;
     			},
-    			content:function(){
+                content:function(){
+                    var neighbour,num=0;
+    				neighbour=player.getNeighbour(-1,0);
+    				if(neighbour&&game.obstacles.contains(neighbour)&&player.movable(-2,0)){
+    					game.moveObstacle(neighbour,-1,0);
+                        num++;
+    				}
+    				neighbour=player.getNeighbour(1,0);
+    				if(neighbour&&game.obstacles.contains(neighbour)&&player.movable(2,0)){
+    					game.moveObstacle(neighbour,1,0);
+                        num++;
+    				}
+    				neighbour=player.getNeighbour(0,-1);
+    				if(neighbour&&game.obstacles.contains(neighbour)&&player.movable(0,-2)){
+    					game.moveObstacle(neighbour,0,-1);
+                        num++;
+    				}
+    				neighbour=player.getNeighbour(0,1);
+    				if(neighbour&&game.obstacles.contains(neighbour)&&player.movable(0,2)){
+    					game.moveObstacle(neighbour,0,1);
+                        num++;
+    				}
+                    if(num){
+                        player.draw(num);
+                    }
+                },
+    			content_old:function(){
     				'step 0'
     				event.obstacles=[];
     				var neighbour;
@@ -5659,7 +5822,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				result:{
     					player:1
     				},
-    				order:7
+    				order:8
     			}
     		},
     		leader_2:{
@@ -5750,7 +5913,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     	cardPack:{
     		mode_chess:['chess_shezhang','chess_chuzhang']
     	},
-    	chess_cardlist:[],
+    	chess_cardlist:[
+            ['heart',1,'chess_shezhang'],
+            ['diamond',1,'chess_shezhang'],
+            ['club',1,'chess_chuzhang'],
+            ['spade',1,'chess_chuzhang']
+        ],
     	rank:{
     		rarity:{
     	        legend:[

@@ -38,7 +38,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			for(var i=0;i<toLoad.length;i++){
 				game[toLoad[i]]=result.game[toLoad[i]];
 			}
-			toLoad=['_attackmove','_phasequeue','_chessmove','_chesscenter'];
+			toLoad=['_attackmove','_phasequeue','_chessmove','_chesscenter','_tempobstacle'];
 			for(var i=0;i<toLoad.length;i++){
 				lib.skill[toLoad[i]]=result.skill[toLoad[i]];
 			}

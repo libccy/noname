@@ -609,8 +609,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 trigger:{player:'damageEnd'},
                 content:function(){
                     'step 0'
-                    player.judge();
+                    event.num=trigger.num;
                     'step 1'
+                    player.judge();
+                    'step 2'
                     event.color=result.color;
                     if(event.color=='black'){
                         player.chooseTarget('弃置一名角色区域内的一张牌',true,function(card,player,target){
@@ -642,7 +644,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             return att;
                         })
                     }
-                    'step 2'
+                    'step 3'
                     if(result.bool){
                         var target=result.targets[0];
                         player.line(target,'green');
@@ -657,6 +659,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                                 target.draw();
                             }
                         }
+                    }
+                    'step 4'
+                    if(--event.num>0){
+                        player.chooseBool('是否再次发动【筹策】？');
+                    }
+                    else{
+                        event.finish();
+                    }
+                    'step 5'
+                    if(result.bool){
+                        event.goto(1);
                     }
                 },
                 ai:{

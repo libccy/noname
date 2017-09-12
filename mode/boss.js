@@ -486,7 +486,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				modTarget:true,
 				content:function(){
 					var num=Math.min(5,target.maxHp);
-					if(target.identity=='shen'){
+					if(target.group=='shen'){
 						target.draw(num);
 					}
 					else{
@@ -505,7 +505,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							var num=Math.min(5,target.maxHp);
-							if(target.identity=='shen'){
+							if(target.group=='shen'){
 								return Math.sqrt(num);
 							}
 							else{
@@ -1792,6 +1792,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				content:function(){
 					player.recover();
+					player.removeSkill('xiuluolianyuji2');
 				}
 			},
 			xiuluolianyuji:{

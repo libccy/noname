@@ -212,6 +212,17 @@
       rgba(0,0,0,0.1) 20px
     );
 }
+#window .player.obstacle[data-obscolor='blue']{
+    background: repeating-linear-gradient(
+        135deg,
+        rgba(0, 64, 162, 0.4),
+        rgba(0, 64, 162, 0.4) 10px,
+        rgba(0, 0, 0, 0) 10px,
+        rgba(0, 0, 0, 0) 20px
+    );
+    box-shadow: rgba(0, 64, 162, 0.6) 0 0 0 1px;
+}
+
 .playergrid.temp{
     opacity:0.3;
 }

@@ -430,7 +430,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.judge>0){
 						event.cards.push(result.card);
 						if(lib.config.autoskilllist.contains('luoshen')){
-							player.chooseBool('是否再次发动？');
+							player.chooseBool('是否再次发动【洛神】？');
 						}
 						else{
 							event._result={bool:true};

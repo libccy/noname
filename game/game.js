@@ -22900,12 +22900,19 @@
 				if(pos){
 					game.addObstacle(pos[0],pos[1]);
 				}
-				else{
-					console.log(pos)
-				}
 			},
 			removeObstacle:function(pos){
 				game.removeObstacle(pos);
+			},
+			moveObstacle:function(pos){
+				if(pos){
+					game.moveObstacle(pos[0],pos[1],pos[2]);
+				}
+			},
+			colorObstacle:function(pos){
+				if(pos){
+					game.colorObstacle(pos[0],pos[1]);
+				}
 			},
 			moveTox:function(player,pos){
 				if(player&&player.dataset){
