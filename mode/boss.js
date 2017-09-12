@@ -663,8 +663,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			xuwangzhimian:{
 				type:'equip',
 				fullimage:true,
-				subtype:'equip1',
-				distance:{attackFrom:-2},
+				subtype:'equip5',
 				skills:['xuwangzhimian'],
 				nomod:true,
 				nopower:true,
@@ -710,10 +709,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		},
 		characterPack:{
 			mode_boss:{
-				boss_hundun:['male','shen',20,['boss_xiongshou','boss_wuzang','boss_xiangde','boss_yinzei'],['qun','boss','bossallowed'],'qun'],
-				boss_qiongqi:['male','shen',16,['boss_xiongshou','boss_zhue','boss_futai','boss_yandu'],['qun','boss','bossallowed'],'qun'],
-				boss_taotie:['male','shen',20,['boss_xiongshou','boss_tanyu','boss_cangmu','boss_jicai'],['qun','boss','bossallowed'],'qun'],
-				boss_taowu:['male','shen',16,['boss_xiongshou','boss_minwan','boss_nitai','boss_luanchang'],['qun','boss','bossallowed'],'qun'],
+				boss_hundun:['male','shen',20,['boss_xiongshou','boss_wuzang','boss_xiangde','boss_yinzei','boss_yinzei_switch'],['qun','boss','bossallowed'],'qun'],
+				boss_qiongqi:['male','shen',16,['boss_xiongshou','boss_zhue','boss_futai','boss_yandu','boss_yandu_switch'],['qun','boss','bossallowed'],'qun'],
+				boss_taotie:['male','shen',20,['boss_xiongshou','boss_tanyu','boss_cangmu','boss_jicai','boss_jicai_switch'],['qun','boss','bossallowed'],'qun'],
+				boss_taowu:['male','shen',16,['boss_xiongshou','boss_minwan','boss_nitai','boss_luanchang','boss_luanchang_switch'],['qun','boss','bossallowed'],'qun'],
 				boss_zhuyin:['male','shen',4,['boss_xiongshou'],['qun','hiddenboss','bossallowed'],'qun'],
 
 				boss_chiyanshilian:['male','',0,['boss_chiyan','boss_chiyan_intro1','boss_chiyan_intro2','boss_chiyan_intro3'],['boss'],'zhu'],
@@ -1293,6 +1292,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				init:function(){
+					game.addGlobalSkill('boss_shenwuzaishi');
 					var list=['lebu','bingliang'];
 					for(var i=0;i<game.players.length;i++){
 						switch(game.players[i].name){
@@ -1503,6 +1503,127 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			boss_yinzei_switch:{
+				unique:true,
+				group:['boss_yinzei_switch_on','boss_yinzei_switch_off'],
+				subSkill:{
+					off:{
+						trigger:{global:'gameStart'},
+						content:function(){
+							player.disableSkill('boss_yinzei_awake','boss_yinzei');
+						},
+						silent:true
+					},
+					on:{
+						trigger:{player:'changeHp'},
+						filter:function(event,player){
+							return player.hp<=player.maxHp/2;
+						},
+						forced:true,
+						skillAnimation:true,
+						animationColor:'thunder',
+						content:function(){
+							player.enableSkill('boss_yinzei_awake');
+							player.removeSkill('boss_yinzei_switch');
+						}
+					}
+				}
+			},
+			boss_jicai_switch:{
+				unique:true,
+				group:['boss_jicai_switch_on','boss_jicai_switch_off'],
+				subSkill:{
+					off:{
+						trigger:{global:'gameStart'},
+						content:function(){
+							player.disableSkill('boss_jicai_awake','boss_jicai');
+						},
+						silent:true
+					},
+					on:{
+						trigger:{player:'changeHp'},
+						filter:function(event,player){
+							return player.hp<=player.maxHp/2;
+						},
+						forced:true,
+						skillAnimation:true,
+						animationColor:'thunder',
+						content:function(){
+							player.enableSkill('boss_jicai_awake');
+							player.removeSkill('boss_jicai_switch');
+						}
+					}
+				}
+			},
+			boss_luanchang_switch:{
+				unique:true,
+				group:['boss_luanchang_switch_on','boss_luanchang_switch_off'],
+				subSkill:{
+					off:{
+						trigger:{global:'gameStart'},
+						content:function(){
+							player.disableSkill('boss_luanchang_awake','boss_luanchang');
+						},
+						silent:true
+					},
+					on:{
+						trigger:{player:'changeHp'},
+						filter:function(event,player){
+							return player.hp<=player.maxHp/2;
+						},
+						forced:true,
+						skillAnimation:true,
+						animationColor:'thunder',
+						content:function(){
+							player.enableSkill('boss_luanchang_awake');
+							player.removeSkill('boss_luanchang_switch');
+						}
+					}
+				}
+			},
+			boss_yandu_switch:{
+				unique:true,
+				group:['boss_yandu_switch_on','boss_yandu_switch_off'],
+				subSkill:{
+					off:{
+						trigger:{global:'gameStart'},
+						content:function(){
+							player.disableSkill('boss_yandu_awake','boss_yandu');
+						},
+						silent:true
+					},
+					on:{
+						trigger:{player:'changeHp'},
+						filter:function(event,player){
+							return player.hp<=player.maxHp/2;
+						},
+						forced:true,
+						skillAnimation:true,
+						animationColor:'thunder',
+						content:function(){
+							player.enableSkill('boss_yandu_awake');
+							player.removeSkill('boss_yandu_switch');
+						}
+					}
+				}
+			},
+			boss_shenwuzaishi:{
+				trigger:{global:'dieAfter'},
+				silent:true,
+				filter:function(event,player){
+					return player.side!=game.boss.side;
+				},
+				content:function(){
+					if(player==trigger.source&&trigger.player.name=='boss_zhuyin'){
+						player.draw(3);
+						player.recover();
+					}
+					else if(trigger.player.side==player.side){
+						player.draw(player.group=='shen'?3:1);
+						player.recover();
+					}
+				}
+			},
 			boss_wuzang:{
 				trigger:{player:'phaseDrawBegin'},
 				forced:true,
@@ -5574,25 +5695,29 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_xiangde:'相德',
 			boss_xiangde_info:'锁定技，其他角色对你造成伤害时，若其装备区内有武器牌，此伤害+1',
 			boss_yinzei:'隐贼',
-			boss_yinzei_info:'锁定技，若你没有手牌，其他角色对你造成伤害后，随机弃置一张牌',
+			boss_yinzei_switch:'隐贼',
+			boss_yinzei_info:'体力值首次减少至一半或更少时激活此技能。锁定技，若你没有手牌，其他角色对你造成伤害后，随机弃置一张牌',
 			boss_zhue:'助恶',
 			boss_zhue_info:'锁定技，每当一名其他角色造成伤害后，你与伤害来源各摸一张牌',
 			boss_futai:'复态',
 			boss_futai_info:'锁定技，你的回合外，其他角色不能使用【桃】；你的回合开始时，你令所有角色回复1点体力',
 			boss_yandu:'厌笃',
-			boss_yandu_info:'锁定技，其他角色回合结束后，若其未造成过伤害，你获得其一张牌',
+			boss_yandu_switch:'厌笃',
+			boss_yandu_info:'体力值首次减少至一半或更少时激活此技能。锁定技，其他角色回合结束后，若其未造成过伤害，你获得其一张牌',
 			boss_minwan:'冥顽',
 			boss_minwan_info:'锁定技，当你于回合内使用牌对其他角色造成伤害后，你于此回合内使用牌只能指定你与这些角色为目标，且你每使用一张牌，摸一张牌',
 			boss_nitai:'拟态',
 			boss_nitai_info:'锁定技，防止你于回合内受到的伤害；你于回合外受到火属性伤害+1',
 			boss_luanchang:'乱常',
-			boss_luanchang_info:'锁定技，回合开始时，你视为使用【南蛮入侵】；回合结束时，你视为使用【万箭齐发】',
+			boss_luanchang_switch:'乱常',
+			boss_luanchang_info:'体力值首次减少至一半或更少时激活此技能。锁定技，回合开始时，你视为使用【南蛮入侵】；回合结束时，你视为使用【万箭齐发】',
 			boss_tanyu:'贪欲',
 			boss_tanyu_info:'锁定技，跳过你的弃牌阶段；结束阶段，若你的手牌数为全场最多，失去1点体力',
 			boss_cangmu:'藏目',
 			boss_cangmu_info:'锁定技，你令摸牌阶段摸牌基数改为X（X为存活角色数）',
 			boss_jicai:'积财',
-			boss_jicai_info:'锁定技，一名角色回复体力后，你与其各摸一张牌',
+			boss_jicai_switch:'积财',
+			boss_jicai_info:'体力值首次减少至一半或更少时激活此技能。锁定技，一名角色回复体力后，你与其各摸一张牌',
 			boss_xiongshou:'凶兽',
 			boss_xiongshou_info:'锁定技，你使用【杀】对体力值小于你的角色造成的伤害+1；你与其他角色距离-1；你不能被翻面',
 			sadouchengbing:'撒豆成兵',
