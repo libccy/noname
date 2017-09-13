@@ -3121,29 +3121,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.chooseControl('ok').set('dialog',content);
 					})
 				},
-				checkShow:function(skill){
-					var sourceSkill=get.info(skill);
-	                if(sourceSkill&&sourceSkill.sourceSkill){
-						skill=sourceSkill.sourceSkill;
-	                }
-					if(game.expandSkills(this.getSkills()).contains(skill)) return false;
-					if(lib.skill.global.contains(skill)) return false;
-					if(this.isUnseen(0)){
-						var skills=game.expandSkills(lib.character[this.name1][3].slice(0));
-						if(skills.contains(skill)){
-							this.showCharacter(0);
-							return true;
-						}
-					}
-					if(this.isUnseen(1)){
-						var skills=game.expandSkills(lib.character[this.name2][3].slice(0));
-						if(skills.contains(skill)){
-							this.showCharacter(1);
-							return true;
-						}
-					}
-					return false;
-				},
 				checkViceSkill:function(skill,disable){
 					if(game.expandSkills(lib.character[this.name2][3].slice(0)).contains(skill)){
 						return true;

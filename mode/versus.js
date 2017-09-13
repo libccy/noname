@@ -881,7 +881,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					var createCharacterDialog=function(){
 						event.dialogxx=ui.create.characterDialog('heightset',function(name){
-                            if(name==event.friendChoice) return true;
+                            // if(name==event.friendChoice) return true;
 							if(lib.character[name][1]!=game.me.identity) return true;
 						});
 						if(ui.cheat2){
@@ -933,9 +933,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
     				game.me.chooseButton(dialog,true).set('onfree',true).set('filterButton',function(button){
-                        if(button==button.parentNode.lastChild) return false;
+                        if(button.link==_status.event.friendChoice) return false;
                         return true;
-                    });
+                    }).set('friendChoice',event.friendChoice);
                     if(!ui.cheat&&get.config('change_choice')){
                         ui.create.cheat();
                     }

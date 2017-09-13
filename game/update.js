@@ -1,8 +1,7 @@
 window.noname_update={
-    version:'1.9.37.1',
+    version:'1.9.37.2',
     update:'1.9.37',
     changeLog:[
-        '神武再世',
         'bug修复'
     ],
     files:[
@@ -27,8 +26,8 @@ window.noname_update={
         // 'character/xianjian.js',
         // 'mode/identity.js',
         'mode/boss.js',
-        // 'mode/guozhan.js',
-        // 'mode/versus.js',
+        'mode/guozhan.js',
+        'mode/versus.js',
         // 'mode/connect.js',
         'mode/chess.js',
         'mode/tafang.js',
