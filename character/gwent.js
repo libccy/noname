@@ -56,6 +56,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_nvyemo:['female','shu',3,['gwgouhun']],
 
 			gw_kairuisi:['female','qun',3,['gwweitu']],
+			gw_oudimu:['male','shu',3,['gwjingshi']],
+			gw_shasixiwusi:['male','qun',4,['gwjingtian']],
 		},
 		characterIntro:{
 			gw_huoge:'那个老年痴呆?不知道他是活着还是已经被制成标本了!',
@@ -2657,7 +2659,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_kanbi:'坎毕',
 			gw_hanmuduoer:'汉姆多尔',
 			gw_kairuisi:'凯瑞斯',
+			gw_oudimu:'欧迪姆',
+			gw_shasixiwusi:'沙斯西乌斯',
 
+			gwjingshi:'镜师',
+			gwjingshi_info:'出牌阶段限一次，你可以猜测手牌中黑色牌最多的角色是谁，若猜对，你可以执行任意一项操作',
+			gwjingtian:'经天',
+			gwjingtian_info:'锁定技，牌堆顶的9张牌对你始终可见；你可以跳过摸牌阶段，改为选择至多3名其他角色，在他们的下个准备阶段获得牌堆顶前9张中的任意一张牌',
 			gwweitu:'卫土',
 			gwweitu_info:'锁定技，每当你弃置一张牌，若你的护甲数小于3，你获得一点护甲；每当你的护甲为你累计抵消3次伤害，你获得一张随机银卡法术',
 			gwzhongmo:'终末',
@@ -2708,7 +2716,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			bolang:'搏浪',
 			bolang_info:'准备阶段，你可以观看牌堆顶的6张牌，然后将其中至多3张移入弃牌堆；每当你造成一次伤害，你可以从弃牌堆中获得一张以此法移入弃牌堆的牌（每回合限发动一次）',
 			lingji:'灵计',
-			lingji_info:'出牌阶段限一次，你可以摸两张牌并弃置两张牌，若弃置的牌花色相同，你获得一张随机铜卡；若弃置的牌点数相同，你获得一张随机银卡',
+			lingji_info:'出牌阶段限一次，你可以摸两张牌并弃置两张牌，若弃置的牌花色相同，你获得一张随机铜卡并展示；若弃置的牌点数相同，你获得一张随机银卡并展示',
 			gwjinyan:'金焰',
 			gwjinyan_info:'锁定技，准备阶段，若游戏轮数为3的倍数，你获得一张随机金卡；当游戏轮数不是3的倍数时，你防止所有伤害',
 			gwshenyu:'神愈',

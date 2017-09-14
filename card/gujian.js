@@ -308,19 +308,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            range:{global:1},
 	            content:function(){
 	                target.$gain2(cards);
-	                target.discard(target.getCards('j'));
 	                target.storage.molicha=card;
-	                target.storage.molicha_markcount=5;
+	                target.storage.molicha_markcount=4;
 	                target.addSkill('molicha');
 	            },
 	            ai:{
 	                order:2,
 	                value:4,
 	                result:{
-	                    target:function(player,target){
-	                        if(target.countCards('j')) return 2;
-	                        return 1;
-	                    }
+	                    target:1
 	                }
 	            }
 	        },
@@ -1172,12 +1168,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            nopop:true,
 	            intro:{
 	                content:function(storage,player){
-	                    return '你不能成为过河拆桥或延时锦囊牌的目标（剩余'+player.storage.molicha_markcount+'回合）'
+	                    return '你不能成为其他角色的黑色牌的目标（剩余'+player.storage.molicha_markcount+'回合）'
 	                }
 	            },
 	            mod:{
-					targetEnabled:function(card){
-						if(get.type(card)=='delay'||card.name=='guohe'){
+					targetEnabled:function(card,player,target){
+						if(player!=target&&get.color(card)=='black'){
 							return false;
 						}
 					}
@@ -1188,6 +1184,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                    delete player.storage.molicha;
 	                    delete player.storage.molicha_markcount;
 	                    player.removeSkill('molicha');
+						player.logSkill('molicha');
 	                }
 	                else{
 	                    player.updateMarks();
@@ -1607,7 +1604,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	        yuanbaorou:'元宝肉',
 	        yuanbaorou_info:'你在出牌阶段可以额外使用一张杀，持续三回合',
 	        molicha:'茉莉茶',
-	        molicha_info:'弃置判定区内的所有牌；你不能成为过河拆桥或延时锦囊牌的目标，持续五回合',
+	        molicha_info:'你不能成为其他角色的黑色牌的目标，持续四回合',
 	        mapodoufu:'麻婆豆腐',
 	        mapodoufu_info:'结束阶段，你弃置一名随机敌人的一张随机牌，持续两回合',
 	    },
