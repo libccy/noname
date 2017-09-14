@@ -5444,6 +5444,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}).set('prompt','选择一个形态');
 					'step 2'
 					var hp=player.hp;
+					player.removeSkill('boss_baonu',true);
 					if(result.control=='暴怒战神'){
 						player.init('boss_lvbu2');
 					}

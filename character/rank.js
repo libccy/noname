@@ -57,6 +57,7 @@ window.noname_character_rank={
         'pal_yueqi',
     ],
     a:[
+        'gw_kairuisi',
         'gw_kanbi',
         'gw_nvyemo',
         'gw_linjing',

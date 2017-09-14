@@ -54,6 +54,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_linjing:['male','wu',4,['gwyewu']],
 			gw_kanbi:['male','qun',1,['gwfutian']],
 			gw_nvyemo:['female','shu',3,['gwgouhun']],
+
+			gw_kairuisi:['female','qun',3,['gwweitu']],
 		},
 		characterIntro:{
 			gw_huoge:'那个老年痴呆?不知道他是活着还是已经被制成标本了!',
@@ -69,6 +71,69 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			gwweitu:{
+				trigger:{player:'discardAfter'},
+				forced:true,
+				filter:function(event,player){
+					return player.hujia<3;
+				},
+				content:function(){
+					var num=Math.min(trigger.cards.length,3-player.hujia);
+					if(num>0){
+						player.changeHujia(num);
+					}
+				},
+				init:function(player){
+					player.storage.gwweitu=0;
+				},
+				intro:{
+					content:'护甲自上次计算起已抵挡#点伤害'
+				},
+				group:'gwweitu_gain',
+				subSkill:{
+					gain:{
+						trigger:{player:'damageZero'},
+						filter:function(event){
+    						return event.hujia;
+    					},
+    					forced:true,
+    					content:function(){
+    						player.storage.gwweitu++;
+							if(player.storage.gwweitu>=3){
+								player.storage.gwweitu-=3;
+								player.unmarkSkill('gwweitu');
+								var list=get.typeCard('spell_silver');
+								if(list.length){
+									player.gain(game.createCard(list.randomGet()),'draw');
+								}
+							}
+							else{
+								player.markSkill('gwweitu',true);
+							}
+    					}
+					}
+				},
+				ai:{
+					threaten:0.7,
+					effect:{
+						target:function(card,player,target,current){
+							if(get.tag(card,'discard')&&target.hujia<3&&
+								target.countCards('he')&&current<0){
+								return 0;
+							}
+						},
+						player:function(card,player){
+							if(player.hujia>=3) return;
+							if(_status.event.name!='chooseToUse'||_status.event.player!=player) return;
+							if(get.type(card)=='basic') return;
+							if(get.tag(card,'gain')) return;
+							if(get.value(card,player,'raw')>=7) return;
+							if(player.needsToDiscard()>1) return;
+							return 'zeroplayertarget';
+						}
+					}
+				}
+			},
 			gwgouhun:{
 				enable:'phaseUse',
 				usable:1,
@@ -2591,7 +2656,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_mierjiata:'米尔加塔',
 			gw_kanbi:'坎毕',
 			gw_hanmuduoer:'汉姆多尔',
+			gw_kairuisi:'凯瑞斯',
 
+			gwweitu:'卫土',
+			gwweitu_info:'锁定技，每当你弃置一张牌，若你的护甲数小于3，你获得一点护甲；每当你的护甲为你累计抵消3次伤害，你获得一张随机银卡法术',
 			gwzhongmo:'终末',
 			gwzhongmo_info:'锁定技，你跳过摸牌阶段，改为获得两张随机的稀有度不同的法术牌',
 			gwfutian:'覆天',
@@ -2659,7 +2727,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yunhuo:'陨火',
 			yunhuo_info:'锁定技，准备阶段，若游戏轮数为4的倍数，你令所有敌方角色随机弃置一张手牌（若没有手牌改为受到一点火焰伤害），然后在此回合结束后获得一个额外回合',
 			yinzhang:'银杖',
-			yinzhang_info:'出牌阶段限一次，你可以弃置一张牌，然后从3张随机亮出的牌中选择一张加入手牌',
+			yinzhang_info:'出牌阶段限一次，你可以弃置一张牌，然后从3张随机亮出的银卡法术中选择一张加入手牌',
 			tianbian:'天变',
 			tianbian_info:'出牌阶段开始时，你可以选择一项：随机使用一张对全场有正面效果的牌；或随机使用一张对全场有负面效果的牌',
 			gwxiaoshou:'枭首',

@@ -16840,7 +16840,7 @@
                     }
                     else{
 						var info=lib.skill[skill];
-						if(info&&info.fixed) return skill;
+						if(info&&info.fixed&&arguments[1]!==true) return skill;
                         this.unmarkSkill(skill);
 						game.broadcastAll(function(player,skill){
 							player.skills.remove(skill);
