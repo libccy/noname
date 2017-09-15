@@ -419,8 +419,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageBefore'},
 				forced:true,
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				},
 				ai:{
 					nofire:true,
@@ -490,8 +489,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseDrawBefore'},
 				forced:true,
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 					var list=['bronze','silver','gold'];
 					list.randomRemove();
 					var cards=[];
@@ -715,8 +713,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.source;
 				},
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 					player.storage.gwchenshui++;
 					player.updateMarks();
 					if(trigger.source!=trigger.player&&trigger.source.isIn()&&trigger.player.isIn()){
@@ -958,8 +955,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.showCards(player.storage.huanshu2,get.translation(player)+'发动了【幻术】');
 					'step 2'
 					player.removeSkill('huanshu2');
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 					player.draw(2);
 				},
 				group:'huanshu3'
@@ -1391,8 +1387,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return game.roundNumber%3!=0;
     			},
     			content:function(){
-    				trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
     			},
 				group:['gwjinyan_gain'],
 				subSkill:{

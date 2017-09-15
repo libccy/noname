@@ -736,8 +736,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				forced:true,
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				},
 				ai:{
 					nofire:true,
@@ -1029,8 +1028,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseDrawBefore'},
 				content:function(){
 					"step 0"
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 					"step 1"
 					event.cards=get.cards(5);
 					if(event.isMine()==false){

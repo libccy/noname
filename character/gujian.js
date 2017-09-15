@@ -885,8 +885,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 1"
 					if(result.bool){
-						trigger.untrigger();
-						trigger.finish();
+						trigger.cancel();
 						if(trigger.source){
 							trigger.source.recover();
 						}
@@ -1464,8 +1463,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				}
 			},
 			yuling2:{
