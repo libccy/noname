@@ -816,8 +816,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				},
 				ai:{
 					nofire:true,

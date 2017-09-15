@@ -19397,7 +19397,7 @@
 					this.finished=true;
 				},
 				cancel:function(){
-					this.untrigger();
+					this.untrigger.call(this,arguments);
 					this.finish();
 				},
 				goto:function(step){

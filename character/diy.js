@@ -330,8 +330,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					if(result.bool){
-						trigger.untrigger();
-						trigger.finish();
+						trigger.cancel();
 						player.logSkill('fuchou',trigger.player);
 						trigger.player.gain(result.cards,player);
 						if(get.position(result.cards[0])=='h'){
@@ -601,8 +600,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					if(!result.bool){
-						trigger.untrigger();
-						trigger.finish();
+						trigger.cancel();
 					}
 				}
 			},
@@ -638,8 +636,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 					event.cards=get.cards(player.maxHp-player.hp+1);
 					player.showCards(event.cards);
 					"step 1"
@@ -1037,8 +1034,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				},
 				ai:{
 					effect:{
@@ -1170,8 +1166,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.removeSkill('ciqiu2');
 					'step 1'
 					if(!trigger.player.isAlive()){
-						trigger.untrigger(true);
-						trigger.finish();
+						trigger.cancel(true);
 					}
 				}
 			},
