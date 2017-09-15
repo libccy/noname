@@ -722,8 +722,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}).set('eff',eff);
     				"step 1"
     				if(result.bool==false){
-    					trigger.finish();
-    					trigger.untrigger();
+    					trigger.cancel();
     				}
     			},
     			ai:{
@@ -768,8 +767,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				"step 1"
     				if(result.bool){
     					player.logSkill('fangquan',result.targets);
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     					player.addSkill('fangquan2');
     					player.storage.fangquan=result.targets[0];
     				}
@@ -864,8 +862,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     				"step 1"
     				if(result.bool){
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     				}
     			}
     		},
@@ -898,8 +895,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     }).set('check',check).set('logSkill','qiaobian');
                     "step 1"
                     if(result.bool){
-        				trigger.finish();
-        				trigger.untrigger();
+        				trigger.cancel();
                         player.chooseTarget([1,2],'获得至多两名角色各一张手牌',function(card,player,target){
                             return target!=player&&target.countCards('h');
                         }).set('ai',function(target){
@@ -962,8 +958,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     }).set('check',check).set('logSkill','qiaobian');
                     "step 1"
                     if(result.bool){
-        				trigger.untrigger();
-        				trigger.finish();
+        				trigger.cancel();
                         player.moveCard();
                     }
                     else{
@@ -996,8 +991,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				};
     				"step 1"
     				if(result.bool){
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     				}
     			}
     		},
@@ -1757,8 +1751,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return (event.card.name=='nanman');
     			},
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			},
     		},
     		huoshou2:{
@@ -1788,8 +1781,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				"step 0"
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     				event.cards=get.cards(player.maxHp-player.hp);
     				player.showCards(event.cards);
     				"step 1"
@@ -1840,8 +1832,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return (event.card.name=='nanman');
     			},
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			}
     		},
     		juxiang2:{
@@ -3135,8 +3126,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.$gain2(result.card);
     				player.addTempSkill('shuangxiong2');
     				player.storage.shuangxiong=get.color(result.card);
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			}
     		},
     		shuangxiong2:{
@@ -3405,8 +3395,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.logSkill('shensu2',result.targets);
     					player.discard(result.cards[0]);
     					player.useCard({name:'sha'},result.targets[0]);
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     				}
     			}
     		},
@@ -3429,8 +3418,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.logSkill('shensu4',result.targets);
     					player.turnOver();
     					player.useCard({name:'sha'},result.targets[0],false);
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     				}
     			}
     		},
@@ -3632,8 +3620,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             ['令'+get.translation(target)+'受到伤害来源对其造成的1点伤害，然后摸X张牌（X为其已损失体力值且至多为5）',
                             '令'+get.translation(target)+'失去1点体力，然后获得'+get.translation(result.cards)]).set('target',target);
     					player.logSkill(event.name,target);
-    					trigger.untrigger();
-                        trigger.finish();
+                        trigger.cancel();
                         event.target=target;
                         event.card=result.cards[0];
     				}
@@ -3847,8 +3834,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			priority:15,
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			},
     			ai:{
     				nofire:true,
@@ -4003,8 +3989,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				for(var i=0;i<player.storage.buqu.length-1;i++){
     					if(get.number(event.card)&&get.number(event.card)==get.number(player.storage.buqu[i])) return;
     				}
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     				if(player.hp<=0){
     					player.hp=1;
     					player.update();
