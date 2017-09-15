@@ -73,6 +73,174 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			gwjingtian:{
+				clickable:function(player){
+					player.addTempSkill('gwjingtian2');
+					player.directgain(get.cards());
+					player.$draw();
+					player.storage.gwjingtian--;
+					player.updateMark('gwjingtian',true);
+					player.logSkill('gwjingtian');
+					if(_status.imchoosing){
+						delete _status.event._cardChoice;
+						delete _status.event._targetChoice;
+						game.check();
+					}
+				},
+				clickableFilter:function(player){
+					return player.storage.gwjingtian>0&&!player.hasSkill('gwjingtian2');
+				},
+				init:function(player){
+					player.storage.gwjingtian=0;
+				},
+				trigger:{player:'phaseDrawBefore'},
+				forced:true,
+				content:function(){
+					trigger.cancel();
+					player.storage.gwjingtian+=3;
+					player.updateMark('gwjingtian',true);
+				},
+				group:'gwjingtian_ai',
+				mark:true,
+				intro:{
+					mark:function(dialog,content,player){
+						if(player.isUnderControl(true)){
+							if(_status.gameStarted&&player.storage.gwjingtian>0&&!player.hasSkill('gwjingtian2')){
+								dialog.add(ui.create.div('.menubutton.pointerdiv','点击发动',function(){
+									lib.skill.gwjingtian.clickable(player);
+								}));
+							}
+							var list=[];
+							var num=Math.min(9,ui.cardPile.childElementCount);
+							for(var i=0;i<num;i++){
+								list.push(ui.cardPile.childNodes[i]);
+							}
+							dialog.addSmall(list);
+						}
+						else{
+							dialog.addText('剩余'+content+'次');
+						}
+					},
+					content:function(content,player){
+						if(player.isUnderControl(true)){
+							var list=[];
+							var num=Math.min(9,ui.cardPile.childElementCount);
+							for(var i=0;i<num;i++){
+								list.push(ui.cardPile.childNodes[i]);
+							}
+							return get.translation(list);
+						}
+						else{
+							return '剩余'+content+'次';
+						}
+					}
+				},
+				subSkill:{
+					ai:{
+						trigger:{global:'drawAfter'},
+						filter:function(event,player){
+							return (_status.auto||!player.isUnderControl(true))&&player.storage.gwjingtian>0&&!player.hasSkill('gwjingtian2');
+						},
+						popup:false,
+						check:function(event,player){
+							var value=0,card=ui.cardPile.firstChild;
+							if(card){
+								value=get.value(card);
+							}
+							if(value>=6) return true;
+							if(value>=5&&get.type(card)!='equip'&&player.storage.gwjingtian>=3) return true;
+							if(player.storage.gwjingtian>3&&value>3) return true;
+							return false;
+						},
+						content:function(){
+							lib.skill.gwjingtian.clickable(player);
+						}
+					}
+				}
+			},
+			gwjingtian2:{},
+			gwjingshi:{
+				enable:'phaseUse',
+				usable:1,
+				direct:true,
+				delay:0,
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return current.countCards('h');
+					})
+				},
+				content:function(){
+					'step 0'
+					var targets=game.filterPlayer(function(current){
+						return current.countCards('h');
+					});
+					var num=targets.length;
+					for(var i=0;i<targets.length;i++){
+						targets[i]=[targets[i],targets[i].countCards('h',{color:'black'})];
+					}
+					targets.sort(function(a,b){
+						return b[1]-a[1];
+					});
+					for(var i=1;i<targets.length;i++){
+						if(targets[i][1]<targets[0][1]){
+							targets.splice(i);break;
+						}
+					}
+					for(var i=0;i<targets.length;i++){
+						targets[i]=targets[i][0];
+					}
+					event.targets=targets;
+					var rand=Math.random();
+					var choice=targets.randomGet();
+					player.chooseTarget('猜测手牌中黑色牌最多的角色',true,function(card,player,target){
+						return target.countCards('h');
+					}).set('ai',function(target){
+						if(rand<0.6||player==game.me){
+							return target.isMaxHandcard()?1:0;
+						}
+						else if(rand<0.8){
+							return target==choice?1:0;
+						}
+						else{
+							return Math.random();
+						}
+					});
+					'step 1'
+					if(event.targets.contains(result.targets[0])){
+						player.popup('成功');
+						game.log(player,'发动','【镜师】','成功');
+						var dialog=ui.create.dialog('hidden');
+						dialog.add('获得任意一名角色的一张手牌');
+						var list=game.filterPlayer(function(current){
+							return current!=player&&current.countCards('h');
+						}).sortBySeat();
+						for(var i=0;i<list.length;i++){
+							dialog.addText(get.translation(list[i]));
+							dialog.add(list[i].getCards('h'));
+						}
+						player.chooseButton(dialog,true).set('ai',function(button){
+							if(get.attitude(player,get.owner(button))>0) return -1;
+							return get.value(button.link);
+						});
+					}
+					else{
+						player.popup('失败');
+						game.log(player,'发动','【镜师】','失败');
+						event.finish();
+					}
+					'step 2'
+					if(result.bool&&result.links&&result.links.length){
+						var owner=get.owner(result.links[0]);
+						if(owner){
+							owner.give(result.links,player);
+							player.line(owner);
+						}
+						else{
+							player.gain(result.links,'gain2');
+						}
+					}
+				}
+			},
 			gwweitu:{
 				trigger:{player:'discardAfter'},
 				forced:true,
@@ -2663,9 +2831,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_shasixiwusi:'沙斯西乌斯',
 
 			gwjingshi:'镜师',
-			gwjingshi_info:'出牌阶段限一次，你可以猜测手牌中黑色牌最多的角色是谁，若猜对，你可以执行任意一项操作',
+			gwjingshi_info:'出牌阶段限一次，你可以猜测手牌中黑色牌最多的角色是谁，若猜对，你可以观看所有其他角色的手牌并获得任意一张',
 			gwjingtian:'经天',
-			gwjingtian_info:'锁定技，牌堆顶的9张牌对你始终可见；你可以跳过摸牌阶段，改为选择至多3名其他角色，在他们的下个准备阶段获得牌堆顶前9张中的任意一张牌',
+			gwjingtian_info:'锁定技，牌堆顶的9张牌对你始终可见；你始终跳过摸牌阶段，改为获得3枚“经天”标记；每名角色的回合限一次，你可以在任意时间点移去一枚“经天”标记，然后获得牌堆顶的一张牌',
 			gwweitu:'卫土',
 			gwweitu_info:'锁定技，每当你弃置一张牌，若你的护甲数小于3，你获得一点护甲；每当你的护甲为你累计抵消3次伤害，你获得一张随机银卡法术',
 			gwzhongmo:'终末',

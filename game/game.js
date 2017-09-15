@@ -3689,6 +3689,38 @@
     			    name:'开启',
     			    init:false,
     			    restart:true,
+					onswitch:function(bool){
+						if(bool){
+							var storage={boss:{},versus:{},translate:{}};
+							var loadversus=function(){
+								game.loadModeAsync('versus',function(mode){
+									for(var i in mode.translate){
+										storage.translate[i]=mode.translate[i];
+									}
+									for(var i in mode.jiangeboss){
+										if(mode.jiangeboss[i][4].contains('bossallowed')){
+											storage.versus[i]=mode.jiangeboss[i];
+										}
+									}
+									localStorage.setItem('boss_storage_playpackconfig',JSON.stringify(storage));
+								});
+							};
+							game.loadModeAsync('boss',function(mode){
+								for(var i in mode.translate){
+									storage.translate[i]=mode.translate[i];
+								}
+								for(var i in mode.characterPack.mode_boss){
+									if(mode.characterPack.mode_boss[i][4].contains('bossallowed')){
+										storage.boss[i]=mode.characterPack.mode_boss[i];
+									}
+								}
+								loadversus();
+							});
+						}
+						else{
+							localStorage.removeItem('boss_storage_playpackconfig');
+						}
+					}
     			},
     			intro:{
     			    name:'将剑阁和挑战模式的武将添加到其它模式',
@@ -7652,6 +7684,7 @@
 					delete lib.imported.character;
 					delete lib.imported.card;
 					delete lib.imported.mode;
+					delete lib.imported.play;
 					for(var i in lib.init){
 						if(i.indexOf('setMode_')==0){
 							delete lib.init[i];
@@ -15463,28 +15496,28 @@
                     next.setContent('gain');
 					return next;
 				},
-				give:function(cards,target){
+				give:function(cards,target,visible){
 					var shown=[],hidden=[];
-					var hs=this.getCards('h');
 					if(get.itemtype(cards)=='card'){
 						cards=[cards];
 					}
-					for(var i=0;i<cards.length;i++){
-						if(hs.contains(cards[i])){
-							hidden.push(cards[i]);
-						}
-						else{
-							shown.push(cards[i]);
+					if(visible){
+						shown.addArray(cards);
+					}
+					else{
+						var hs=this.getCards('h');
+						for(var i=0;i<cards.length;i++){
+							if(hs.contains(cards[i])){
+								hidden.push(cards[i]);
+							}
+							else{
+								shown.push(cards[i]);
+							}
 						}
 					}
 					if(shown.length) this.$give(shown,target);
 					if(hidden.length) this.$giveAuto(hidden,target);
-					if(hidden===true){
-						target.gain(cards,this);
-					}
-					else{
-						target.gain(cards,this);
-					}
+					target.gain(cards,this);
 				},
 				lose:function(){
 					var next=game.createEvent('lose');
@@ -19362,6 +19395,10 @@
 			event:{
 				finish:function(){
 					this.finished=true;
+				},
+				cancel:function(){
+					this.untrigger();
+					this.finish();
 				},
 				goto:function(step){
 					this.step=step-1;
@@ -26371,6 +26408,9 @@
                 script.remove();
 				var content=lib.imported.mode[name];
 				delete lib.imported.mode[name];
+				if(get.is.empty(lib.imported.mode)){
+					delete lib.imported.mode;
+				}
                 callback(content);
             });
         },
@@ -31275,6 +31315,9 @@
     						}
     						game.saveConfig('plays',lib.config.plays);
                         }
+						if(this.onswitch){
+							this.onswitch(bool);
+						}
 						updateNodes();
 					};
 
@@ -31321,6 +31364,9 @@
                                 };
                             }
                             var cfgnode=createConfig(cfg);
+							if(cfg.onswitch){
+								cfgnode.onswitch=cfg.onswitch;
+							}
                             page.appendChild(cfgnode);
                         }
                         return node;
@@ -40512,6 +40558,9 @@
                 }
                 game.saveConfig('autoskilllist',list);
             },
+			skillbutton:function(){
+				this.func(this.link);
+			},
 			autoskill2:function(e){
 				this.classList.toggle('on');
 				if(this.classList.contains('on')){
@@ -42454,7 +42503,9 @@
                         str2+='（'+get.translation(str)+'）';
                     }
                     else{
-                        str2+='【'+get.translation(str.suit)+str.number+'】'
+						str2+='【'+get.translation(str.suit)+str.number+'】';
+						// var len=str2.length-1;
+                        // str2=str2.slice(0,len)+'<span style="letter-spacing: -2px">'+str2[len]+'·</span>'+get.translation(str.suit)+str.number;
                     }
 				}
 				return str2;
@@ -43055,6 +43106,19 @@
 							}
 							underlinenode.link=skills[i];
 							underlinenode.listen(ui.click.autoskill2);
+						}
+						else if(lib.skill[skills[i]].clickable&&node.isIn()&&node.isUnderControl(true)){
+							var intronode=uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'<br><div class="menubutton skillbutton" style="position:relative;margin-top:5px">点击发动</div></div></div>').querySelector('.skillbutton');
+							intronode.link=node;
+							intronode.func=lib.skill[skills[i]].clickable;
+							intronode.listen(ui.click.skillbutton);
+							if(!_status.gameStarted||(lib.skill[skills[i]].clickableFilter&&!lib.skill[skills[i]].clickableFilter(node))){
+								intronode.classList.add('disabled');
+								intronode.style.opacity=0.5;
+							}
+							else{
+								intronode.classList.add('pointerdiv');
+							}
 						}
 						else if(lib.skill[skills[i]].nobracket){
 							uiintro.add('<div><div class="skill">'+get.translation(skills[i])+'</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');

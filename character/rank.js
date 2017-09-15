@@ -57,6 +57,7 @@ window.noname_character_rank={
         'pal_yueqi',
     ],
     a:[
+        'gw_shasixiwusi',
         'gw_kairuisi',
         'gw_kanbi',
         'gw_nvyemo',
@@ -190,6 +191,7 @@ window.noname_character_rank={
         'xizhicai',
     ],
     am:[
+        'gw_oudimu',
         'dongyun',
         'gw_xigedelifa',
         'gw_laomaotou',

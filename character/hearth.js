@@ -1896,25 +1896,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			}
     		},
     		yushou_misha:{
-    			trigger:{player:'damageBegin'},
+    			trigger:{player:'damageEnd'},
     			forced:true,
     			filter:function(event,player){
     				return event.num>=1;
     			},
-    			usable:1,
     			content:function(){
-    				if(trigger.num>=1){
-    					trigger.num--;
-    					// player.removeSkill('yushou_misha');
-    					// player.draw();
-    				}
+    				player.changeHujia();
     			},
     			ai:{
     				effect:{
     					target:function(card,player,target){
     						if(get.tag(card,'damage')){
     							if(player.hasSkillTag('jueqing',false,target)) return;
-    							return 0.5;
+    							return 0.6;
     						}
     					}
     				}
@@ -7623,7 +7618,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		yushou:'御兽',
     		yushou_info:'出牌阶段，你可以弃置一张牌并召唤一个随机的野兽宠物，回合开始阶段，你随机失去一个宠物',
     		yushou_misha:'米莎',
-    		yushou_misha_info:'你每回合受到的首次伤害-1',
+    		yushou_misha_info:'每当你受到一次伤害，你获得一点护甲',
     		yushou_huofu:'霍弗',
     		yushou_huofu_info:'你可以将一张黑色牌当作决斗使用',
     		yushou_leiouke:'雷欧克',
