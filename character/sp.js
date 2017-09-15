@@ -1442,8 +1442,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				'step 0'
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     				if(trigger.player.countCards('e')){
     					trigger.player.chooseControl(function(event,player){
     						if(player.hp==1) return 1;
@@ -1596,8 +1595,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					}
     				}
     				else{
-    					trigger.finish();
-    					trigger.untrigger();
+    					trigger.cancel();
     					event.finish();
     				}
     				'step 3'
@@ -1638,8 +1636,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			priority:-11,
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     				player.storage.kuanshi2.skip('phaseDraw');
     				player.removeSkill('kuanshi2');
     			},
@@ -3733,8 +3730,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						}
     					}
     					else{
-    						trigger.untrigger();
-    						trigger.finish();
+    						trigger.cancel();
     					}
     				}
     				else{
@@ -4242,8 +4238,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{player:'damageBefore'},
     			forced:true,
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			},
     			ai:{
     				nofire:true,
@@ -4391,8 +4386,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						ui.special.appendChild(trigger.card);
     						trigger.player.markSkill('zhenwei2');
     					}
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     					trigger.player.addSkill('zhenwei2');
     				}
     				game.delay();
@@ -4547,8 +4541,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return num>=3;
     			},
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     				var num=game.countPlayer(function(target){
     					return target.hp==player.hp;
     				});
@@ -4834,8 +4827,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						}
     						'step 1'
     						player.draw();
-    						trigger.untrigger();
-    						trigger.finish();
+    						trigger.cancel();
     					}
     				},
     				target:{
@@ -4860,8 +4852,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						"step 1"
     						if(result.bool){
     							trigger.player.draw();
-    							trigger.untrigger();
-    							trigger.finish();
+    							trigger.cancel();
     						}
     					},
     				}
@@ -5703,8 +5694,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.logSkill('qingyi2',result.targets);
     					player.discard(result.cards[0]);
     					player.useCard({name:'sha'},result.targets[0]);
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     				}
     				player.removeSkill('qingyi3');
     			}
@@ -5724,8 +5714,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			forced:true,
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			},
     			ai:{
     				nofire:true,
@@ -6254,8 +6243,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.storage.biluan+=ng.length;
     				player.markSkill('biluan');
     				game.addVideo('storage',player,['biluan',player.storage.biluan]);
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			},
     			mod:{
     				globalTo:function(from,to,distance){
@@ -6348,8 +6336,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return '残蚀：是否改为摸'+get.cnNumber(num)+'张牌？';
     			},
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     				var num=game.countPlayer(function(current){
     					if(player.hasZhuSkill('guiming')&&current.group=='wu'&&current!=player) return true;
     					return current.isDamaged();
@@ -6554,8 +6541,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			trigger:{target:'useCardToBefore'},
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     				player.draw();
     			},
     			ai:{
@@ -7649,8 +7635,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				targets.sort(lib.sort.seat);
     				event.targets=targets;
     				event.num=0;
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     				player.line(targets,'green');
     				"step 1"
     				if(num<event.targets.length){

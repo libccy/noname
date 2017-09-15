@@ -291,8 +291,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.logSkill('tuxi',result.targets);
 						player.gainMultiple(result.targets);
-						trigger.finish();
-						trigger.untrigger();
+						trigger.cancel();
 					}
 					else{
 						event.finish();
@@ -1187,8 +1186,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countUsed('sha')==0;
 				},
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				}
 			},
 			kurou:{

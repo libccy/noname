@@ -2323,8 +2323,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.$giveAuto(cards,trigger.player);
 					}
 					'step 3'
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 					player.die();
 				}
 			}
