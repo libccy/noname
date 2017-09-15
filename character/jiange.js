@@ -258,8 +258,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	            },
 	            content:function(){
 	                "step 0"
-	                trigger.untrigger();
-	                trigger.finish();
+	                trigger.cancel();
 	                event.cards=get.cards(2);
 	                player.showCards(event.cards);
 	                "step 1"
@@ -348,8 +347,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	            },
 	            forced:true,
 	            content:function(){
-	                trigger.untrigger();
-	                trigger.finish();
+	                trigger.cancel();
 	            },
 	            ai:{
 					nofire:true,

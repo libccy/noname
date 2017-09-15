@@ -222,8 +222,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('eff',eff);
 					"step 1"
 					if(result.bool==false){
-						trigger.finish();
-						trigger.untrigger();
+						trigger.cancel();
 					}
 				},
 				ai:{
@@ -1413,8 +1412,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                return event.num>0;
 	            },
 	            content:function(){
-	                trigger.untrigger();
-	                trigger.finish();
+	                trigger.cancel();
 	                trigger.player.recover(trigger.num);
 	            },
 	            ai:{
@@ -1970,8 +1968,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	            trigger:{player:'damageBefore'},
 				forced:true,
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				},
 				ai:{
 					nofire:true,

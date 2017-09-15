@@ -279,8 +279,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                });
 	                'step 1'
 	                if(result.bool){
-	                    trigger.untrigger();
-	                    trigger.finish();
+	                    trigger.cancel();
 	                    trigger.player.loseMaxHp(true);
 	                }
 	            }

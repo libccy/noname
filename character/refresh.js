@@ -401,8 +401,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					player.addTempSkill('reluoyi2',{player:'phaseBefore'});
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 					"step 1"
 					event.cards=get.cards(3);
 					player.showCards(event.cards,'裸衣');
@@ -1442,8 +1441,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 					event.cards=get.cards(4);
 					player.chooseCardButton(event.cards,2,'选择获得两张牌').set('ai',get.buttonValue);
 					"step 1"

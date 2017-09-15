@@ -280,8 +280,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                                 trigger.num++;
                             }
                             else{
-                                trigger.untrigger();
-                                trigger.finish();
+                                trigger.cancel();
                             }
                         }
                     },
@@ -749,8 +748,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     return player.hp>0&&event.num>0;
                 },
                 content:function(){
-                    trigger.untrigger();
-                    trigger.finish();
+                    trigger.cancel();
                     player.changeHujia(trigger.num);
                 }
             },
@@ -762,8 +760,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 },
                 unique:true,
                 content:function(){
-                    trigger.untrigger();
-                    trigger.finish();
+                    trigger.cancel();
                     player.addSkill('qianfu2');
                     player.hp=1;
                     player.update();
@@ -804,8 +801,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
         				mark:true,
         				forced:true,
         				content:function(){
-        					trigger.untrigger();
-        					trigger.finish();
+        					trigger.cancel();
         				},
         				ai:{
         					nothunder:true,
@@ -822,8 +818,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         forced:true,
                         popup:false,
                         content:function(){
-                            trigger.untrigger();
-                            trigger.finish();
+                            trigger.cancel();
                         }
                     },
                     revive:{
@@ -2577,8 +2572,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			content:function(){
     				'step 0'
     				event.cards=get.cards(3);
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     				player.$draw(event.cards.slice(0));
     				for(var i=0;i<event.cards.length;i++){
     					if(get.type(event.cards[i])=='equip'){
@@ -4374,8 +4368,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				next.logSkill=['biri',trigger.targets];
     				"step 1"
     				if(result.bool){
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     				}
     			},
     			ai:{
@@ -5271,8 +5264,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			forced:true,
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			},
     			ai:{
     				nofire:true,
@@ -6025,8 +6017,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				"step 1"
     				if(result.bool){
     					game.log(trigger.player,'收回了',trigger.cards);
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     					game.delay();
     				}
     				else{
