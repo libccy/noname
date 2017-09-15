@@ -442,8 +442,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(event.card.name=='sha'&&!event.card.nature) return true;
 				},
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				},
 				ai:{
 					effect:{

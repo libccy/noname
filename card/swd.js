@@ -2189,8 +2189,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				content:function(){
 					'step 0'
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 					player.discard(player.getCards('he'));
 					player.removeSkill('huanpodan_skill');
 					'step 1'
@@ -3265,8 +3264,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					node.classList.add('thrownhighlight');
 					ui.arena.classList.add('thrownhighlight');
 					if(card){
-						trigger.untrigger();
-						trigger.finish();
+						trigger.cancel();
 						trigger.result={
 							card:card,
 							judge:trigger.judge(card),
@@ -3338,8 +3336,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return player.maxHp>0;
 				},
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 					player.hp=1;
 					player.draw();
 					player.discard(player.getCards('e',{subtype:'equip5'}));
@@ -3441,8 +3438,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return get.type(event.card,'trick')=='trick';
 				},
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				},
 				ai:{
 					notrick:true,
@@ -4717,8 +4713,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return event.nature=='thunder';
 				},
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 					player.recover(trigger.num);
 				},
 				ai:{

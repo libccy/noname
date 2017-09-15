@@ -1354,8 +1354,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return (event.card.name=='sha'&&get.color(event.card)=='black')
 				},
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				},
 				ai:{
 					effect:{
