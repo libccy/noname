@@ -20471,8 +20471,7 @@
                     game.log(player,'获得了','【免疫】');
                 },
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			},
     			ai:{
     				nofire:true,
@@ -20523,8 +20522,7 @@
 					return player.hp>=player.maxHp;
 				},
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				},
 			},
 			_turnover:{
@@ -20537,8 +20535,7 @@
 					// 	game.players[i].in();
 					// }
 					if(player.isTurnedOver()){
-						trigger.untrigger();
-						trigger.finish();
+						trigger.cancel();
 						player.turnOver();
 						player.phaseSkipped=true;
 					}

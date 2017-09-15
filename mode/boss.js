@@ -1773,8 +1773,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return _status.currentPhase==player;
 						},
 						content:function(){
-							trigger.untrigger();
-							trigger.finish();
+							trigger.cancel();
 						}
 					},
 					out:{
@@ -1835,8 +1834,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseDiscardBefore'},
 				forced:true,
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				},
 				group:'boss_tanyu_hp',
 				subSkill:{
@@ -1894,8 +1892,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return !player.isTurnedOver();
 						},
 						content:function(){
-							trigger.untrigger();
-							trigger.finish();
+							trigger.cancel();
 							game.log(player,'取消了翻面');
 						},
 					}
@@ -2008,8 +2005,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			},
     			ai:{
     				effect:{
@@ -2402,8 +2398,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return !player.isTurnedOver();
 				},
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 					game.log(player,'取消了翻面');
 				},
 				ai:{
@@ -3427,8 +3422,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					node.classList.add('thrownhighlight');
 					ui.arena.classList.add('thrownhighlight');
 					if(card){
-						trigger.untrigger();
-						trigger.finish();
+						trigger.cancel();
 						trigger.result={
 							card:card,
 							judge:trigger.judge(card),
@@ -3864,8 +3858,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return false;
 						},
 						content:function(){
-							trigger.untrigger();
-							trigger.finish();
+							trigger.cancel();
 						}
 					},
 					end:{
@@ -4296,8 +4289,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return lib.skill.tengjia1.filter(event,player);
 				},
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				},
 				ai:{
 					effect:{
@@ -4552,8 +4544,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseDrawBefore'},
 				forced:true,
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				},
 				ai:{
 					noh:true,
@@ -4844,8 +4835,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				}
 			},
 			huanhua3:{
@@ -5008,8 +4998,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return event.nature=='fire';
 				},
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 					player.recover();
 				},
 				ai:{
@@ -5356,8 +5345,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				priority:10,
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 					player.loseHp();
 				},
 				audio:2,

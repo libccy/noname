@@ -6129,8 +6129,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			forced:true,
     			popup:false,
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			},
     			ai:{
     				effect:{
@@ -7197,8 +7196,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			unique:true,
     			popup:false,
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			},
     			ai:{
     				threaten:0.1
@@ -7210,8 +7208,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			unique:true,
     			popup:false,
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			},
     			ai:{
     				effect:{
@@ -8453,8 +8450,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			forced:true,
     			popup:false,
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			},
     			ai:{
     				effect:{

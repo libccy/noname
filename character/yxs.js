@@ -1155,8 +1155,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageBefore'},
 				forced:true,
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 					player.loseHp();
 				},
 				ai:{
@@ -1254,8 +1253,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					game.log(player,'发动了察觉，',trigger.card,'对',trigger.target,'失效')
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				},
 				ai:{
 					effect:{
@@ -1792,8 +1790,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return suits.length>=2;
 				},
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 					player.addSkill('nichang2');
 				}
 			},
@@ -2314,8 +2311,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.logSkill=['feigong',trigger.player];
 					"step 1"
 					if(result.bool){
-						trigger.untrigger();
-						trigger.finish();
+						trigger.cancel();
 					}
 				},
 				ai:{

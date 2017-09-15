@@ -427,8 +427,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								player.$throw(card,1000);
 								player.updateMarks('huangjintianbingfu');
 								player.syncStorage('huangjintianbingfu');
-								trigger.untrigger();
-								trigger.finish();
+								trigger.cancel();
 								player.logSkill('hongfa');
 								game.delay();
 							}
@@ -726,8 +725,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							'step 0'
-							trigger.untrigger();
-							trigger.finish();
+							trigger.cancel();
 							trigger.card.fix();
 							player.showCards(get.translation(player)+'发动了【章武】',[trigger.card]);
 							var owner=get.owner(trigger.card);
@@ -1349,8 +1347,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return get.type(event.card,'trick')=='trick'&&get.color(event.card)=='black';
 				},
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				},
 				ai:{
 					effect:{
@@ -1372,8 +1369,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return event.card.name=='shunshou'||event.card.name=='lebu';
 				},
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				},
 				ai:{
 					effect:{
@@ -1395,8 +1391,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return player.countCards('h')==0&&(event.card.name=='sha'||event.card.name=='juedou');
 				},
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				},
 				ai:{
 					effect:{

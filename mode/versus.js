@@ -3920,8 +3920,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                     return bool&&num>=3;
                 },
                 content:function(){
-                    trigger.untrigger();
-                    trigger.finish();
+                    trigger.cancel();
                     game.log(player,'跳过了判定阶段');
                 }
             },
@@ -4776,8 +4775,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				content:'已获得大雾标记'
     			},
                 content:function(){
-                    trigger.untrigger();
-                    trigger.finish();
+                    trigger.cancel();
                 },
                 ai:{
     				nofire:true,
@@ -4839,8 +4837,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			trigger:{player:'phaseDrawBefore'},
                 content:function(){
                     "step 0"
-                    trigger.untrigger();
-                    trigger.finish();
+                    trigger.cancel();
                     event.cards=get.cards(2);
                     player.showCards(event.cards);
                     "step 1"
@@ -4873,8 +4870,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			},
     			forced:true,
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			},
     			ai:{
     				nofire:true,
