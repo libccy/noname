@@ -2176,8 +2176,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     				"step 2"
     				if(!result.bool){
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     					trigger.player.skip('phaseDiscard');
     				}
     			},
@@ -3776,8 +3775,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				"step 1"
     				if(result.bool){
     					game.delay(2);
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     				}
     				else{
     					event.finish();
@@ -3825,8 +3823,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     				"step 1"
     				if(result.bool){
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     					player.logSkill('xiaozhan');
     				}
     			},
@@ -3978,8 +3975,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.logSkill('guisi');
     					trigger.player.gain(result.cards,player);
     					player.$give(result.cards,trigger.player);
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     				}
     			},
     		},
@@ -4841,8 +4837,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				"step 1"
     				if(result.bool){
     					// player.chooseToDiscard('h',true);
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     					trigger.player.hp=1;
     					if(trigger.player.maxHp<1) trigger.player.maxHp=1;
     					trigger.player.update();
@@ -5305,8 +5300,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     				"step 2"
     				if(result.suit!='heart'){
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     				}
     			}
     		},
@@ -7134,8 +7128,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				"step 1"
     				if(result.bool){
     					game.delay();
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     				}
     			}
     		},
@@ -7642,8 +7635,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				"step 1"
     				switch(result.suit){
     					case 'spade':{
-    						trigger.untrigger();
-    						trigger.finish();
+    						trigger.cancel();
     						break;
     					}
     					case 'heart':{
@@ -7793,8 +7785,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return eff<=0;
     			},
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     				player.recover();
     			},
     		},
@@ -7955,8 +7946,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			forced:true,
     			priority:10,
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     				player.loseHp();
     			}
     		},
@@ -8002,8 +7992,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			content:function(){
     				if(Math.random()>(1.3+trigger.targets.length/5)/trigger.targets.length){
     					trigger.target.popup('失误');
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     				}
     			}
     		},
@@ -8386,8 +8375,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{player:'damageBefore'},
     			forced:true,
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     				if(player.countCards('h')) player.loseHp();
     			},
     			ai:{
@@ -8921,8 +8909,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			forced:true,
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			},
     		},
     		ljifeng:{
@@ -8966,8 +8953,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.logSkill('ljifeng',result.targets);
     					player.discard(result.cards);
     					player.useCard({name:'sha'},result.targets).animate=false;
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     				}
     			}
     		},

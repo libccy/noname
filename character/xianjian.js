@@ -171,8 +171,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return false;
     			},
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     				player.draw(2);
 					player.recover();
 					player.addTempSkill('txianqu2');
@@ -736,8 +735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			mark:true,
     			forced:true,
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			},
     			ai:{
     				nofire:true,
@@ -788,8 +786,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'player',
     			content:function(){
 					'step 0'
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 					player.awakenSkill('shiying');
 					player.storage.shiying=true;
 
@@ -998,8 +995,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     return player.hp>0&&event.num>0;
                 },
                 content:function(){
-                    trigger.untrigger();
-                    trigger.finish();
+                    trigger.cancel();
                     player.draw(2*trigger.num);
                 },
 				group:'tanhua_remove',
@@ -1301,8 +1297,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addSkill('fenglue_draw');
 						player.storage.fenglue_draw_num=0;
 						player.storage.fenglue_draw=event.target;
-						trigger.untrigger();
-						trigger.finish();
+						trigger.cancel();
 						event.cards=result.cards.slice(0);
 						player.lose(event.cards,ui.special);
 					}
@@ -3792,8 +3787,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					"step 1"
 					if(result.bool){
-						trigger.untrigger();
-						trigger.finish();
+						trigger.cancel();
 					}
 				}
 			},
@@ -4006,8 +4000,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						return;
 					}
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 					// player.popup('xiaoyao');
 				},
 				ai:{
@@ -4064,8 +4057,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				},
 				ai:{
 					nofire:true,
