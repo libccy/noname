@@ -569,8 +569,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.player.die();
 					'step 1'
 					if(!trigger.player.isAlive()){
-						trigger.untrigger(true);
-						trigger.finish();
+						trigger.cancel(true);
 					}
 				}
 			},
@@ -1604,8 +1603,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					if(!trigger.player.isAlive()){
-						trigger.untrigger(true);
-						trigger.finish();
+						trigger.cancel(true);
 					}
 				},
 				ai:{

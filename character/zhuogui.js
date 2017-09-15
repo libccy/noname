@@ -119,8 +119,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return lib.skill.tengjia1.filter(event,player);
 				},
 				content:function(){
-					trigger.untrigger();
-					trigger.finish();
+					trigger.cancel();
 				},
 				ai:{
 					effect:{

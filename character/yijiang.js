@@ -207,8 +207,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}).set('att',get.attitude(trigger.player,player)).set('cardname',name);
     				'step 3'
     				if(result.bool==false){
-    					trigger.finish();
-    					trigger.untrigger();
+    					trigger.cancel();
     				}
                     else{
                         trigger.player.gainPlayerCard(player);
@@ -1448,8 +1447,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					else{
     						player.$giveAuto(card,trigger.source);
     					}
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     				}
     				else{
     					trigger.source.chooseToDiscard(event.num,true,'he');
@@ -4364,8 +4362,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				'step 1'
     				if(result.bool){
     					player.logSkill('mingjian',result.targets);
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     					var target=result.targets[0];
     					target.addSkill('mingjian2');
     					var hs=player.getCards('h');
@@ -5038,8 +5035,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				if(trigger.player.countCards('ej')){
     					player.gainPlayerCard(trigger.player,'ej',true);
     				}
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			}
     		},
     		sanyao:{
@@ -6130,8 +6126,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				});
     				"step 1"
     				if(result.bool){
-    					trigger.untrigger();
-    					trigger.finish();
+    					trigger.cancel();
     					player.logSkill('xinxuanhuo',result.targets);
     					event.target=result.targets[0];
     					event.target.draw(2);
@@ -6182,8 +6177,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				game.log(player,'发动了智迟，',trigger.card,'对',trigger.target,'失效')
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			},
     			mark:true,
     			intro:{
@@ -6360,8 +6354,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				"step 0"
     				player.loseHp();
     				"step 1"
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     				"step 2"
     				if(trigger.player.countCards('he')){
     					player.discardPlayerCard(trigger.player,'he',true);
@@ -6385,8 +6378,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return (get.type(event.card)=='trick');
     			},
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			},
     			ai:{
     				effect:{
@@ -6412,8 +6404,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return get.type(event.card,'trick')=='trick';
     			},
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			},
     			ai:{
     				notrick:true,
@@ -6565,8 +6556,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return (event.card.name=='sha'&&get.color(event.card)=='black')
     			},
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			},
     			ai:{
     				effect:{
@@ -6587,8 +6577,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			priority:16,
     			check:function(){return false;},
     			content:function(){
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     				var ex=0;
     				if(trigger.card&&trigger.card.name=='sha'){
     					if(player.hasSkill('jiu')) ex++;
@@ -7649,8 +7638,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					event.finish();
     				}
     				"step 2"
-    				trigger.untrigger();
-    				trigger.finish();
+    				trigger.cancel();
     			},
     			ai:{
     				expose:0.5
