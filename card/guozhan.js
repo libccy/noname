@@ -315,6 +315,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					return target!=player;
 				},
+				selectTarget:[1,2],
 				content:function(){
 					target.addTempSkill('diaohulishan');
 				},

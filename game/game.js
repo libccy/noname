@@ -9023,13 +9023,16 @@
     					event.bool=false;
     					return;
     				}
+					_status.imchoosing=true;
     				game.pause();
     				"step 3"
+					_status.imchoosing=false;
     				if(event.bool){
     					if(game.changeCoin){
     						game.changeCoin(-3);
     					}
     					var hs=game.me.getCards('h');
+						game.addVideo('lose',game.me,[get.cardsInfo(hs),[],[]]);
     					for(var i=0;i<hs.length;i++){
     						hs[i].discard(false);
     					}
@@ -25015,6 +25018,9 @@
 			ui.control.show();
 			ui.clear();
             game.stopCountChoose();
+			if(ui.time3){
+				clearInterval(ui.time3.interval);
+			}
 			if(game.layout=='long2'&&!game.chess){
 				ui.arena.classList.add('choose-character');
 				ui.me.hide();
@@ -43106,15 +43112,15 @@
 						}
 						else if(lib.skill[skills[i]].clickable&&node.isIn()&&node.isUnderControl(true)){
 							var intronode=uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'<br><div class="menubutton skillbutton" style="position:relative;margin-top:5px">点击发动</div></div></div>').querySelector('.skillbutton');
-							intronode.link=node;
-							intronode.func=lib.skill[skills[i]].clickable;
-							intronode.listen(ui.click.skillbutton);
 							if(!_status.gameStarted||(lib.skill[skills[i]].clickableFilter&&!lib.skill[skills[i]].clickableFilter(node))){
 								intronode.classList.add('disabled');
 								intronode.style.opacity=0.5;
 							}
 							else{
+								intronode.link=node;
+								intronode.func=lib.skill[skills[i]].clickable;
 								intronode.classList.add('pointerdiv');
+								intronode.listen(ui.click.skillbutton);
 							}
 						}
 						else if(lib.skill[skills[i]].nobracket){

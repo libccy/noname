@@ -1,6 +1,6 @@
 window.noname_update={
-    version:'1.9.38',
-    update:'1.9.37.2',
+    version:'1.9.38.0',
+    update:'1.9.38',
     changeLog:[
         'bug修复'
     ],
@@ -10,11 +10,11 @@ window.noname_update={
         // 'game/config.js',
         // 'game/source.js',
         // 'game/pressure.js',
-        'game/asset.js',
+        // 'game/asset.js',
         // 'card/*',
         // 'card/standard.js',
         // 'card/gwent.js',
-        // 'card/gujian.js',
+        'card/guozhan.js',
         // 'character/*',
         // 'character/hearth.js',
         'character/gwent.js',
@@ -22,13 +22,13 @@ window.noname_update={
         // 'character/standard.js',
         // 'character/sp.js',
         // 'character/swd.js',
-        'character/rank.js',
+        // 'character/rank.js',
         // 'character/yijiang.js',
         // 'character/xianjian.js',
         // 'mode/identity.js',
-        'mode/boss.js',
+        // 'mode/boss.js',
         // 'mode/guozhan.js',
-        'mode/versus.js',
+        // 'mode/versus.js',
         // 'mode/connect.js',
         // 'mode/chess.js',
         // 'mode/tafang.js',
@@ -46,6 +46,6 @@ window.noname_update={
         // 'layout/mobile/layout.css',
         // 'layout/newlayout/global.css',
         // 'layout/mode/chess.css',
-        'extension/boss/extension.js',
+        // 'extension/boss/extension.js',
     ]
 }

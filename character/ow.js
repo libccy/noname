@@ -4,7 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'ow',
 	    character:{
 	        ow_liekong:['female','shu',3,['shanxian','shanhui']],
-	        ow_sishen:['male','shu',3,['xiandan','yihun','shouge']],
+	        ow_sishen:['male','shu',4,['xiandan','yihun','shouge']],
 	        ow_tianshi:['female','qun',3,['shouhu','ziyu','feiying']],
 	        ow_falaozhiying:['female','shu',3,['feidan','huoyu','feiying']],
 	        ow_zhixuzhiguang:['female','qun',3,['guangshu']],

@@ -6892,6 +6892,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return player.countCards('he')>=num;
     			},
     			check:function(card){
+                    if(ui.selected.cards.length>=2){
+                        return 4-get.value(card);
+                    }
     				return 6-get.value(card);
     			},
     			selectCard:function(card){
