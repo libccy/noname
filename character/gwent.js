@@ -107,8 +107,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(player.isUnderControl(true)){
 							if(_status.gameStarted&&player.storage.gwjingtian>0&&!player.hasSkill('gwjingtian2')){
 								dialog.add(ui.create.div('.menubutton.pointerdiv','点击发动',function(){
-									this.remove();
-									lib.skill.gwjingtian.clickable(player);
+									if(!this.disabled){
+										this.disabled=true;
+										this.classList.add('disabled');
+										this.style.opacity=0.5;
+										lib.skill.gwjingtian.clickable(player);
+									}
 								}));
 							}
 							var list=[];
