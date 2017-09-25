@@ -1029,7 +1029,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     'step 1'
                     if(target.countCards('h','shan')){
                         player.viewHandcards(target);
-                        player.useCard({name:'sha'},target);
+                        player.useCard({name:'sha'},target,false);
                         player.storage.weikui2=target;
                         player.addTempSkill('weikui2');
                     }

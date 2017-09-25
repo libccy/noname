@@ -19155,6 +19155,12 @@
 						if(this.node.background.innerHTML.length>1) this.node.background.classList.add('tight');
 						else this.node.background.classList.remove('tight');
 					}
+					if(!lib.card[bg].fullborder&&this.node.avatar&&this.node.framebg){
+						this.node.avatar.remove();
+						this.node.framebg.remove();
+						delete this.node.avatar;
+						delete this.node.framebg;
+					}
 					if(info.noname&&!this.classList.contains('button')){
 						this.node.name.style.display='none';
 					}

@@ -646,6 +646,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'shaBegin'},
 				priority:5,
 				logTarget:'target',
+				check:function(event,player){
+					return get.attitude(player,event.target)<=0;
+				},
 				filter:function(event,player){
 					return event.target.countCards('he');
 				},
