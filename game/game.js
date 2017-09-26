@@ -41673,6 +41673,8 @@
         typeCard:function(type,filter){
             var list=[];
             for(var i in lib.card){
+				if(lib.card[i].mode&&lib.card[i].mode.contains(get.mode())==false) continue;
+				if(lib.card[i].vanish||lib.card[i].destroy) continue;
                 if(typeof filter=='function'&&!filter(i)) continue;
 				if(lib.config.bannedcards.contains(i)) continue;
                 if(!lib.translate[i+'_info']) continue;
@@ -41690,6 +41692,8 @@
 		libCard:function(filter){
 			var list=[];
 			for(var i in lib.card){
+				if(lib.card[i].mode&&lib.card[i].mode.contains(get.mode())==false) continue;
+				if(lib.card[i].vanish||lib.card[i].destroy) continue;
 				if(lib.config.bannedcards.contains(i)) continue;
 				if(!lib.translate[i+'_info']) continue;
 				if(filter(lib.card[i],i)){

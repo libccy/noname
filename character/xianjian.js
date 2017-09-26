@@ -1963,6 +1963,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'drawBegin'},
 				forced:true,
 				popup:false,
+				priority:5,
 				content:function(){
 					if(player.storage.feng<2){
 						player.storage.feng++;

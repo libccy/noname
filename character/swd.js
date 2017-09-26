@@ -649,6 +649,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		kbolan:{
     			trigger:{player:'drawBegin'},
     			frequent:true,
+                priority:5,
     			content:function(){
     				trigger.num++;
     				trigger.id=trigger.id||get.id();

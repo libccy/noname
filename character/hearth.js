@@ -115,10 +115,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_tgolem:['male','wu',4,['xinwuyan','guozaix']],
 
             hs_heifengqishi:['male','qun',4,['hstianqi']],
-            hs_yuhuozhe:['male','qun',4,['hstianqi']],
-            hs_wuyaowang:['male','qun',4,['hstianqi']],
-            hs_aerfusi:['male','qun',4,['hstianqi']],
-            hs_baiguyoulong:['male','qun',4,['hstianqi']],
+            // hs_yuhuozhe:['male','qun',4,['hstianqi']],
+            // hs_wuyaowang:['male','qun',4,['hstianqi']],
+            // hs_aerfusi:['male','qun',4,['hstianqi']],
+            // hs_baiguyoulong:['male','qun',4,['hstianqi']],
             hs_yangyanwageli:['male','qun',4,['hstianqi']],
     	},
     	characterIntro:{
@@ -307,6 +307,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         intro:{
                             content:'锁定技，你的摸牌数始终-1'
                         },
+                        priority:5,
                         trigger:{player:'drawBegin'},
                         forced:true,
                         content:function(){
@@ -7523,7 +7524,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hsnitai:'拟态',
             hsnitai_info:'锁定技，出牌阶段开始时，你获得一张随机炉石角色的技能牌',
             hstianqi:'天启',
-            hstianqi_info:'出牌阶段限一次，你可以选择一项：弃置一张手牌并随机装备一件天启骑士（不能替换现有装备），或弃置一张装备区内的牌并摸两张牌',
+            hstianqi_info:'出牌阶段限一次，你可以选择一项：弃置一张手牌并随机装备一件天启骑士（不能替换现有装备），或弃置一张装备区内的牌并摸两张牌；若你此时装备区内集齐了4件天启骑士，你获得游戏胜利',
+            hspuzhao:'普照',
+            hspuzhao_info:'出牌阶段限一次，你可以弃置一张红桃牌，然后令至多3名随机友方角色各摸一张牌',
+            hsyanxin:'炎心',
+            hsyanxin_info:'锁定技，你摸到的首张牌为红色的概率比其他角色多50%',
             ysjqisha:'七煞',
             ysjqisha_ju:'惧之煞',
             ysjqisha_kuang:'狂之煞',
