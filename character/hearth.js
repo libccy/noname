@@ -113,6 +113,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_huolituteng:['male','wei',3,['hllingxi']],
             hs_manyututeng:['male','wu',3,['zhaochao']],
             hs_tgolem:['male','wu',4,['xinwuyan','guozaix']],
+
+            hs_heifengqishi:['male','qun',4,['hstianqi']],
+            hs_yuhuozhe:['male','qun',4,['hstianqi']],
+            hs_wuyaowang:['male','qun',4,['hstianqi']],
+            hs_aerfusi:['male','qun',4,['hstianqi']],
+            hs_baiguyoulong:['male','qun',4,['hstianqi']],
+            hs_yangyanwageli:['male','qun',4,['hstianqi']],
     	},
     	characterIntro:{
     		hs_jaina:'戴林·普罗德摩尔之女。 在吉安娜成年早期，她致力于阻止将引发第三次战争的天灾瘟疫传播，当战况加剧后，吉安娜获得了新部落大酋长萨尔的信任，成为团结艾泽拉斯各族携手对抗燃烧军团的关键人物。当战争结束后，吉安娜管理着塞拉摩岛，致力于促进部落与联盟间的关系。吉安娜的和平立场与性格在接任萨尔成为部落大酋长的加尔鲁什·地狱咆哮以一颗魔法炸弹夷平塞拉摩后改变了。身为肯瑞托的新领袖，她拥有让加尔鲁什为他酿成的惨剧付出血的代价的权力与决心。',
@@ -7504,7 +7511,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_huolituteng:'活力图腾',
             hs_manyututeng:'蛮鱼图腾',
             hs_tgolem:'图腾魔像',
+            hs_heifengqishi:'黑锋骑士',
 
+            hschaoxi:'潮袭',
+            hschaoxi_info:'锁定技，每当你造成一次伤害，你获得两张随机鱼人牌',
+            hsnitai:'拟态',
+            hsnitai_info:'锁定技，出牌阶段开始时，你获得一张随机炉石角色的技能牌',
+            hstianqi:'天启',
+            hstianqi_info:'出牌阶段限一次，你可以选择一项：弃置一张手牌并随机装备一件天启骑士（不能替换现有装备），或弃置一张装备区内的牌并摸两张牌',
             ysjqisha:'七煞',
             ysjqisha_ju:'惧之煞',
             ysjqisha_kuang:'狂之煞',
