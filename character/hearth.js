@@ -7512,6 +7512,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_manyututeng:'蛮鱼图腾',
             hs_tgolem:'图腾魔像',
             hs_heifengqishi:'黑锋骑士',
+            hs_yuhuozhe:'浴火者',
+            hs_wuyaowang:'巫妖王',
+            hs_aerfusi:'阿尔福斯',
+            hs_baiguyoulong:'白骨幼龙',
+            hs_yangyanwageli:'阳焰瓦格里',
 
             hschaoxi:'潮袭',
             hschaoxi_info:'锁定技，每当你造成一次伤害，你获得两张随机鱼人牌',

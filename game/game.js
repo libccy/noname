@@ -20189,6 +20189,14 @@
 				}
 				return false;
 			},
+			skillDisabled:function(skill){
+				if(!lib.translate[skill]||!lib.translate[skill+'_info']) return true;
+				var info=lib.skill[skill];
+				if(info&&!info.unique&&!info.temp&&!info.sub&&!info.fixed&&!info.vanish){
+					return false;
+				}
+				return true;
+			},
 			cardEnabled:function(card,player,event){
 				card=get.autoViewAs(card,null,player);
 				if(player==undefined) player=_status.event.player;
@@ -42674,11 +42682,9 @@
 				}
                 for(var j=0;j<lib.character[i][3].length;j++){
                     var skill=lib.character[i][3][j];
-					var info=lib.skill[skill];
-                    if(info&&!info.unique&&!info.temp&&!info.sub&&!info.fixed){
-						if(func&&!func(info,skill)) continue;
-                        list.add(skill);
-                    }
+					if(lib.filter.skillDisabled(skill)) continue;
+					if(func&&!func(lib.skill[skill],skill,i)) continue;
+                    list.add(skill);
                 }
             }
             return list;
