@@ -43596,6 +43596,9 @@
 								uiintro._place_text=placetext;
 							}
 						}
+						if(lib.translate[name+'_append']){
+							uiintro.add('<div class="text" style="display:inline">'+lib.translate[name+'_append']+'</div>');
+						}
     				}
     				uiintro.add(ui.create.div('.placeholder.slim'));
                 }

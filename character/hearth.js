@@ -86,7 +86,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
     		hs_tanghangu:['male','shu',5,['zhongji']],
     		hs_aya:['female','wu',3,['ayuling','qingzun']],
-    		// hs_barnes:['male','wei',3,[]],
+    		hs_barnes:['male','shu',4,['hsnitai']],
     		// hs_nuogefu:['male','wei',3,[]],
     		hs_kazhakusi:['male','shu',3,['lianjin']],
     		// hs_lazi:['male','wei',3,[]],
@@ -119,7 +119,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             // hs_wuyaowang:['male','qun',4,['hstianqi']],
             // hs_aerfusi:['male','qun',4,['hstianqi']],
             // hs_baiguyoulong:['male','qun',4,['hstianqi']],
-            hs_yangyanwageli:['male','qun',4,['hstianqi']],
+            hs_yangyanwageli:['female','qun',3,['hspuzhao','hsyanxin']],
     	},
     	characterIntro:{
     		hs_jaina:'戴林·普罗德摩尔之女。 在吉安娜成年早期，她致力于阻止将引发第三次战争的天灾瘟疫传播，当战况加剧后，吉安娜获得了新部落大酋长萨尔的信任，成为团结艾泽拉斯各族携手对抗燃烧军团的关键人物。当战争结束后，吉安娜管理着塞拉摩岛，致力于促进部落与联盟间的关系。吉安娜的和平立场与性格在接任萨尔成为部落大酋长的加尔鲁什·地狱咆哮以一颗魔法炸弹夷平塞拉摩后改变了。身为肯瑞托的新领袖，她拥有让加尔鲁什为他酿成的惨剧付出血的代价的权力与决心。',
@@ -200,6 +200,298 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_malfurion:['hs_malorne'],
     	},
     	skill:{
+            hsnitai:{
+                trigger:{player:'phaseUseBegin'},
+                forced:true,
+                video:function(player,data){
+                    var skill=data[0];
+                    var name=data[1];
+                    console.log(skill,name);
+                    lib.skill.hsnitai.process(skill,name);
+                },
+                onremove:function(player){
+                    player.removeSkill('hsnitai_card');
+                },
+                process:function(skill,name){
+                    var cardname='hsnitai_'+skill;
+                    lib.translate[cardname]=lib.translate[skill];
+                    lib.translate[cardname+'_info']='出牌阶段对自己使用，获得技能'+lib.translate[skill]+'（替换前一个以此法获得的技能）';
+                    lib.translate[cardname+'_append']='<div class="skill">【'+lib.translate[skill]+'】</div><div>'+
+					get.skillInfoTranslation(skill)+'</div>';
+                    lib.card[cardname]=lib.card[cardname]||{
+                        enable:true,
+                        type:'character',
+                        image:'character/'+name,
+                        fullimage:true,
+                        vanish:true,
+                        derivation:'hs_barnes',
+                        filterTarget:function(card,player,target){
+                            return player==target;
+                        },
+                        selectTarget:-1,
+                        content:function(){
+                            var skill=card.name.slice(8);
+                            if(!target.hasSkill(skill)){
+                                target.$gain2(card);
+                                target.removeSkill('hsnitai_card');
+                                target.storage.hsnitai_card=card;
+                                player.syncStorage('hsnitai_card');
+                                target.addAdditionalSkill('hsnitai_card',skill);
+                                target.addSkill('hsnitai_card');
+                                game.log(target,'获得技能','【'+get.translation(skill)+'】');
+                            }
+                        },
+                        ai:{
+                            order:function(){
+                                if(_status.event.player.hasSkill('hsnitai_card')) return 1;
+                                return 9;
+                            },
+                            result:{
+                                target:function(player,target){
+                                    if(!player.hasSkill('hsnitai_card')||player.needsToDiscard()) return 1;
+                                    return 0;
+                                }
+                            }
+                        }
+                    };
+                },
+                content:function(){
+                    var current=game.expandSkills(player.getSkills());
+                    var list=get.gainableSkills(function(info,skill,name){
+                        if(current.contains(skill)) return false;
+                        return lib.characterPack.hearth&&lib.characterPack.hearth[name];
+                    });
+                    if(!list.length){
+                        return;
+                    }
+                    var skill=list.randomGet();
+                    var source=[];
+                    for(var i in lib.characterPack.hearth){
+                        if(lib.characterPack.hearth[i][3].contains(skill)){
+                            source.push(i);
+                        }
+                    }
+                    if(!source.length){
+                        return;
+                    }
+                    var name=source.randomGet();
+                    game.addVideo('skill',player,['hsnitai',[skill,name]]);
+                    lib.skill.hsnitai.process(skill,name);
+                    player.gain(game.createCard('hsnitai_'+skill),'gain2');
+                },
+                subSkill:{
+                    card:{
+                        mark:'card',
+                        onremove:true,
+                        intro:{
+                            name:function(storage){
+                                var skill=storage.name.slice(8);
+                                return '拟态：'+lib.translate[skill];
+                            },
+                            content:function(storage){
+                                var skill=storage.name.slice(8);
+                                return lib.translate[skill+'_info'];
+                            }
+                        }
+                    }
+                }
+            },
+            hspuzhao:{
+	            enable:'phaseUse',
+	            usable:1,
+	            filterCard:{suit:'heart'},
+	            position:'he',
+	            filter:function(event,player){
+	                return player.countCards('he',{suit:'heart'})>0;
+	            },
+	            check:function(card){
+	                return 7-get.value(card);
+	            },
+	            content:function(){
+	                var targets=player.getFriends();
+                    if(targets.length){
+                        targets.push(player);
+                        if(targets.length>3){
+                            targets=targets.randomGets(3);
+                        }
+                        targets.sortBySeat();
+                        player.line(targets,'green');
+                        for(var i=0;i<targets.length;i++){
+                            targets[i].addExpose(0.2);
+                        }
+                        game.asyncDraw(targets);
+                    }
+                    else{
+                        player.draw(2);
+                    }
+	            },
+	            ai:{
+	                order:10,
+	                expose:0.3,
+	                result:{
+	                    player:1
+	                }
+	            }
+	        },
+            hsyanxin:{
+                trigger:{player:'drawBegin'},
+                priority:-5,
+                filter:function(event,player){
+                    if(game.fixedPile) return false;
+                    if(event.num<=0) return false;
+                    if(ui.cardPile.childNodes.length==0) return false;
+                    if(get.color(ui.cardPile.firstChild)=='red') return false;
+                    return true;
+                },
+                forced:true,
+                popup:false,
+                content:function(){
+                    var card=ui.cardPile.firstChild;
+                    if(lib.inpile.contains(card.name)){
+                        for(var i=1;i<ui.cardPile.childElementCount;i++){
+                            var card2=ui.cardPile.childNodes[i];
+                            if(get.color(card2)=='red'){
+                                ui.cardPile.insertBefore(card2,card);
+                                break;
+                            }
+                        }
+                    }
+                    else{
+                        card.init([['heart','diamond'].randomGet(),card.number,card.name,card.nature]);
+                    }
+                }
+            },
+            hstianqi:{
+                enable:'phaseUse',
+                usable:1,
+                filter:function(event,player){
+                    return player.countCards('he');
+                },
+                position:'he',
+                filterCard:function(card,player){
+                    if(get.position(card)=='h'){
+                        if(player.getEquip(1)&&player.getEquip(2)&&
+                            player.getEquip(3)&&player.getEquip(4)){
+                            return false;
+                        }
+                        return true;
+                    }
+                    else{
+                        return true;
+                    }
+                },
+                check:function(card){
+                    if(get.position(card)=='h'){
+                        if(get.type(card)=='equip'){
+                            return 9-get.value(card);
+                        }
+                        return 7-get.value(card);
+                    }
+                    else{
+                        if(card.name.indexOf('hstianqi_')!=0){
+                            return (9-get.value(card))/5;
+                        }
+                        return 0;
+                    }
+                },
+                discard:false,
+                lose:false,
+                delay:0,
+                content:function(){
+                    'step 0'
+                    event.position=get.position(cards[0]);
+                    player.discard(cards);
+                    'step 1'
+                    if(event.position=='h'){
+                        var list=[];
+                        if(!player.getEquip(1)){
+                            list.push({name:'hstianqi_dalian',suit:'spade',number:1});
+                        }
+                        if(!player.getEquip(2)){
+                            list.push({name:'hstianqi_shali',suit:'heart',number:1});
+                        }
+                        if(!player.getEquip(3)){
+                            list.push({name:'hstianqi_suolasi',suit:'diamond',number:1});
+                        }
+                        if(!player.getEquip(4)){
+                            list.push({name:'hstianqi_nazigelin',suit:'club',number:1});
+                        }
+                        if(list.length){
+                            player.equip(game.createCard(list.randomGet()),true);
+                        }
+                    }
+                    else{
+                        player.draw(2);
+                        event.finish();
+                    }
+                    'step 2'
+                    var es=player.getCards('e');
+                    var num=0;
+                    for(var i=0;i<es.length;i++){
+                        if(es[i].name.indexOf('hstianqi_')==0){
+                            num++;
+                        }
+                    }
+                    if(num==4){
+                        if(game.showIdentity){
+                            game.showIdentity();
+                        }
+                        if(player.isUnderControl(true)||player.getFriends().contains(game.me)){
+                            game.over(true);
+                        }
+                        else{
+                            game.over(false);
+                        }
+                    }
+                    else{
+                        if(!event.isMine()){
+                            game.delay(0.5);
+                        }
+                    }
+                },
+                ai:{
+                    order:9,
+                    threaten:function(player,target){
+                        var es=target.getCards('e');
+                        var num=0;
+                        for(var i=0;i<es.length;i++){
+                            if(es[i].name.indexOf('hstianqi_')==0){
+                                num++;
+                            }
+                        }
+                        switch(num){
+                            case 0:return 1;
+                            case 1:return 1.3;
+                            case 2:return 1.6;
+                            case 3:return 4;
+                            default:return 1;
+                        }
+                    },
+                    result:{
+                        player:1
+                    }
+                }
+            },
+            hstianqi_dalian:{
+                trigger:{source:'damageEnd'},
+				forced:true,
+				filter:function(event,player){
+					return player.isDamaged();
+				},
+				content:function(){
+					player.recover(trigger.num);
+				}
+            },
+            hstianqi_shali:{
+                trigger:{player:'recoverEnd'},
+				forced:true,
+				filter:function(event,player){
+					return event.num>0;
+				},
+				content:function(){
+					player.changeHujia(trigger.num);
+				}
+            },
             ysjqisha:{
                 trigger:{source:'damageEnd',player:'damageEnd'},
                 forced:true,
@@ -6648,6 +6940,67 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hsjixie:0.5
     	},
     	card:{
+            hstianqi_dalian:{
+                type:'equip',
+    			subtype:'equip1',
+    			distance:{attackFrom:-1},
+    			fullimage:true,
+    			vanish:true,
+                destroy:'hstianqi',
+    			derivation:'hs_heifengqishi',
+    			skills:['hstianqi_dalian'],
+    			ai:{
+    				equipValue:10
+    			}
+            },
+            hstianqi_shali:{
+                type:'equip',
+    			subtype:'equip2',
+    			distance:{attackFrom:-1},
+    			fullimage:true,
+    			vanish:true,
+                destroy:'hstianqi',
+    			derivation:'hs_heifengqishi',
+    			skills:['hstianqi_shali'],
+    			ai:{
+    				equipValue:10
+    			}
+            },
+            hstianqi_nazigelin:{
+                type:'equip',
+    			subtype:'equip4',
+    			distance:{globalFrom:-1},
+    			fullimage:true,
+    			vanish:true,
+                destroy:'hstianqi',
+    			derivation:'hs_heifengqishi',
+    			onEquip:function(){
+                    player.changeHujia();
+                },
+                equipDelay:false,
+    			ai:{
+    				equipValue:10
+    			}
+            },
+            hstianqi_suolasi:{
+                type:'equip',
+    			subtype:'equip3',
+    			distance:{globalTo:1},
+    			fullimage:true,
+    			vanish:true,
+                destroy:'hstianqi',
+    			derivation:'hs_heifengqishi',
+                onLose:function(){
+                    if(player.isDamaged()){
+                        player.logSkill('hstianqi_suolasi');
+                        player.recover();
+                    }
+                },
+                loseDelay:false,
+    			ai:{
+    				equipValue:10
+    			}
+            },
             hsjixie_zhadan:{
                 enable:true,
 				fullimage:true,
@@ -7519,6 +7872,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_baiguyoulong:'白骨幼龙',
             hs_yangyanwageli:'阳焰瓦格里',
 
+            hstianqi_dalian:'达里安',
+            hstianqi_dalian_info:'每当你造成一次伤害，你回复等量的体力',
+            hstianqi_shali:'莎莉',
+            hstianqi_shali_info:'每当你回复体力，你获得等量的护甲',
+            hstianqi_nazigelin:'纳兹戈林',
+            hstianqi_nazigelin_info:'当你装备此牌时，你获得一点护甲',
+            hstianqi_suolasi:'索拉斯',
+            hstianqi_suolasi_info:'当你失去此牌时，你回复一点体力',
             hschaoxi:'潮袭',
             hschaoxi_info:'锁定技，每当你造成一次伤害，你获得两张随机鱼人牌',
             hsnitai:'拟态',
@@ -7526,9 +7887,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hstianqi:'天启',
             hstianqi_info:'出牌阶段限一次，你可以选择一项：弃置一张手牌并随机装备一件天启骑士（不能替换现有装备），或弃置一张装备区内的牌并摸两张牌；若你此时装备区内集齐了4件天启骑士，你获得游戏胜利',
             hspuzhao:'普照',
-            hspuzhao_info:'出牌阶段限一次，你可以弃置一张红桃牌，然后令至多3名随机友方角色各摸一张牌',
+            hspuzhao_info:'出牌阶段限一次，你可以弃置一张红桃牌，然后令至多三名随机友方角色各摸一张牌（若你无其他队友，改为摸两张牌）',
             hsyanxin:'炎心',
-            hsyanxin_info:'锁定技，你摸到的首张牌为红色的概率比其他角色多50%',
+            hsyanxin_info:'锁定技，在你摸牌时，若牌堆中有红色牌，你摸到的首张牌必为红色',
             ysjqisha:'七煞',
             ysjqisha_ju:'惧之煞',
             ysjqisha_kuang:'狂之煞',
@@ -7819,7 +8180,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		malymowang:'魔网',
     		malymowang2:'魔网',
     		malymowang_info:'锁定技，你的锦囊牌在每回合中造成的首次伤害+1；出牌阶段开始时，你从3张随机锦囊中选择一张加入手牌',
-    		malymowang_info_alter:'锁定技，你的锦囊牌在每回合中造成的首次伤害+1；出牌阶段开始时，随机获得一张普通锦牌牌',
+    		malymowang_info_alter:'锁定技，你的锦囊牌在每回合中造成的首次伤害+1；出牌阶段开始时，你随机获得一张普通锦牌牌',
     		lingzhou:'灵咒',
     		lingzhou_info:'每当你使用一张非转化的锦囊牌，可令一名角色摸一张牌或回复一点体力',
     		mieshi:'灭世',
