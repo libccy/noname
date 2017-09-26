@@ -216,6 +216,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 subtype:'equip1',
 				distance:{attackFrom:-8},
                 skills:['ly_piliche'],
+                destroy:'polu'
             },
             wy_meirenji:{
                 fullskin:true,
@@ -9476,7 +9477,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             liuye:'刘晔',
 
             ly_piliche:'霹雳车',
-            ly_piliche_info:'当你对其他角色造成伤害后，若造成伤害牌不为延时锦囊牌，你可以弃置其装备区里的防具牌与+1坐骑牌',
+            ly_piliche_info:'当你对其他角色造成伤害后，若造成伤害牌不为延时锦囊牌，你可以弃置其装备区里的防具牌与+1坐骑牌；当你失去此装备时，销毁之',
             polu:'破橹',
             polu_info:'锁定技，回合开始时，若你的装备区里没有【霹雳车】，你使用之；当你受到1点伤害后，若你的装备区里没有【霹雳车】，你摸一张牌',
             choulve:'筹略',

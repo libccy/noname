@@ -5818,7 +5818,9 @@
 
         			var that=this;
         			this.timeout=setTimeout(function(){
-        				position.appendChild(that);
+						if(!that.destroyed){
+							position.appendChild(that);
+						}
         				that.classList.remove('removing');
         				delete that.destiny;
         			},time);
@@ -12161,6 +12163,16 @@
 						event.finish();
 					}
 					"step 1"
+					for(var i=0;i<cards.length;i++){
+						if(cards[i].destroyed){
+							if(player.hasSkill(cards[i].destroyed)){
+								delete cards[i].destroyed;
+							}
+							else{
+								cards.splice(i--,1);
+							}
+						}
+					}
 					if(cards.length==0){
 						event.finish();
 						return;
@@ -12290,7 +12302,12 @@
 						cards[i].style.transform+=' scale(0.2)';
                         cards[i].classList.remove('glow');
                         cards[i].recheck();
-						if(event.position){
+						var info=lib.card[cards[i].name];
+						if(info.destroy){
+							cards[i].delete();
+							cards[i].destroyed=info.destroy;
+						}
+						else if(event.position){
 							cards[i].goto(event.position);
 						}
 						else{
@@ -12805,6 +12822,15 @@
 						event.finish();
 						return;
 					}
+					if(card.destroyed){
+						if(player.hasSkill(card.destroyed)){
+							delete card.destroyed;
+						}
+						else{
+							event.finish();
+							return;
+						}
+					}
 					if(event.draw){
 						game.delay(0,300);
                         player.$draw(card);
@@ -12869,6 +12895,15 @@
                         }
                     }
 					"step 1"
+					if(cards[0].destroyed){
+						if(player.hasSkill(cards[0].destroyed)){
+							delete cards[0].destroyed;
+						}
+						else{
+							event.finish();
+							return;
+						}
+					}
 					cards[0].fix();
 					cards[0].style.transform='';
 					cards[0].classList.remove('drawinghidden');
@@ -19388,7 +19423,9 @@
                     if(this._uncheck.length==0) this.classList.remove('uncheck');
                 },
 				discard:function(){
-					ui.discardPile.appendChild(this);
+					if(!this.destroyed){
+						ui.discardPile.appendChild(this);
+					}
 					this.fix();
 					this.classList.remove('glow');
 				}
