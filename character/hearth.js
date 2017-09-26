@@ -1046,6 +1046,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 content:function(){
                     trigger.cancel();
                     player.changeHujia(trigger.num);
+                },
+                ai:{
+                    neg:true
                 }
             },
             qianfu:{
