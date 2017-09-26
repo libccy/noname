@@ -7716,7 +7716,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.storage.cunsi=true;
     				game.delay();
     				target.addSkill('yongjue');
-    				target.markSkillCharacter('yongjue',player,'存嗣','$<div><div class="skill">【勇决】</div><div>每当其他角色于回合内使用一张杀，若目标不是你，你可以获得之，每回合限一次</div></div>');
+    				target.markSkillCharacter('yongjue',player,'存嗣','<div class="skill">【勇决】</div><div>每当其他角色于回合内使用一张杀，若目标不是你，你可以获得之，每回合限一次</div>');
     				"step 1"
     				player.turnOver();
     			},

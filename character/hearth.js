@@ -206,7 +206,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 video:function(player,data){
                     var skill=data[0];
                     var name=data[1];
-                    console.log(skill,name);
                     lib.skill.hsnitai.process(skill,name);
                 },
                 onremove:function(player){
@@ -284,13 +283,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         mark:'card',
                         onremove:true,
                         intro:{
-                            name:function(storage){
-                                var skill=storage.name.slice(8);
-                                return '拟态：'+lib.translate[skill];
-                            },
                             content:function(storage){
                                 var skill=storage.name.slice(8);
-                                return lib.translate[skill+'_info'];
+                                return '<div class="skill">【'+lib.translate[skill]+'】</div><div>'+
+            					get.skillInfoTranslation(skill)+'</div>';
                             }
                         }
                     }

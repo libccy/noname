@@ -43423,7 +43423,10 @@
 				if(typeof info.mark=='function'){
 					var stint=info.mark(uiintro,player.storage[node.skill],player);
 					if(stint){
-						uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+stint+'</div>');
+						var placetext=uiintro.add('<div class="text" style="display:inline">'+stint+'</div>');
+						if(stint.indexOf('<div class="skill"')!=0){
+							uiintro._place_text=placetext;
+						}
 						// if(stint.length<=100){
 						// 	uiintro.add('<div class="text center">'+stint+'</div>');
 						// }
@@ -43439,7 +43442,10 @@
 							uiintro.add('<div class="caption">'+stint.slice(1)+'</div>');
 						}
 						else{
-							uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+stint+'</div>');
+							var placetext=uiintro.add('<div class="text" style="display:inline">'+stint+'</div>');
+							if(stint.indexOf('<div class="skill"')!=0){
+								uiintro._place_text=placetext;
+							}
 						}
 						// else if(stint.length<=100){
 						// 	uiintro.add('<div class="text center">'+stint+'</div>');
