@@ -160,7 +160,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				changeTarget:function(player,targets){
 					var target=targets[0];
 					game.filterPlayer(function(current){
-						return current.isMajor()==target.isMajor()&&current!=target;
+						return current.isMajor()==target.isMajor()&&current!=target&&!current.hasSkill('diaohulishan');
 					},targets);
 				},
 				content:function(){
@@ -209,7 +209,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					targets.push(player);
 					if(target.identity!='ye'){
 						game.filterPlayer(function(current){
-							return target!=current&&target.identity==current.identity;
+							return target!=current&&target.identity==current.identity&&!current.hasSkill('diaohulishan');
 						},targets);
 					}
 				},

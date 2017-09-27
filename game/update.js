@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.9.39',
+    version:'1.9.39.1',
     update:'1.9.38.1',
     changeLog:[
         'bug修复'
@@ -26,7 +26,7 @@ window.noname_update={
         // 'character/yijiang.js',
         // 'character/xianjian.js',
         // 'mode/identity.js',
-        // 'mode/boss.js',
+        'mode/boss.js',
         // 'mode/guozhan.js',
         // 'mode/versus.js',
         // 'mode/connect.js',

@@ -1121,7 +1121,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						while(event.enemy.length<3){
 							var name=event.list.randomRemove();
-							if(lib.boss[lib.storage.current].randchoice){
+							if(lib.boss[lib.storage.current]&&lib.boss[lib.storage.current].randchoice){
 								name=lib.boss[lib.storage.current].randchoice(name,event.enemy);
 							}
 							event.enemy.push(name);
