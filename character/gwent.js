@@ -2749,8 +2749,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var evt=event.getParent(3)._trigger;
 					if(evt.gw_dudayuanshuai1){
-						evt.untrigger();
-		                evt.finish();
+						evt.cancel();
 					}
 					if(evt.cards){
 						player.gain(evt.cards,'gain2');

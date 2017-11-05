@@ -14,8 +14,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(evt.jinchan){
 						var type=get.type(evt.card,'trick');
 						if(type=='basic'||type=='trick'){
-							evt.untrigger();
-			                evt.finish();
+							evt.cancel();
 						}
 					}
 					player.draw(2);

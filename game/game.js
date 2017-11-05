@@ -9599,7 +9599,7 @@
 					var name=event.card.viewAs||event.card.name;
 					if(event.cancelled&&!event.direct){
 						if(lib.card[name].cancel){
-							var next=game.createEvent(name+'Cancelled');
+							var next=game.createEvent(name+'Cancel');
 							next.setContent(lib.card[name].cancel);
 							next.card=event.card;
 							next.player=player;
@@ -25694,8 +25694,8 @@
 			}
 			else if(event.finished){
 				if(event._triggered==1){
-					if(event.type=='card') event.trigger('useCardToCancelled');
-					event.trigger(event.name+'Cancelled');
+					if(event.type=='card') event.trigger('useCardToOmitted');
+					event.trigger(event.name+'Omitted');
 					event._triggered=4;
 				}
 				else if(event._triggered==2){

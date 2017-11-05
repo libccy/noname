@@ -1713,12 +1713,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(event.list.length==0){
 						event.finish();
 						if(!event.state){
-							trigger.untrigger();
 							if(event.triggername=='phaseJudge'){
+								trigger.untrigger();
 								trigger.cancelled=true;
 							}
 							else{
-								trigger.finish();
+								trigger.cancel();
 							}
 						}
 					}
@@ -1822,12 +1822,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						if(!event.state){
-							trigger.untrigger();
 							if(event.triggername=='phaseJudge'){
+								trigger.untrigger();
 								trigger.cancelled=true;
 							}
 							else{
-								trigger.finish();
+								trigger.cancel();
 							}
 						}
 					}

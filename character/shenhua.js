@@ -1995,7 +1995,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			}
     		},
             jiezi:{
-                trigger:{global:'phaseDrawSkipped'},
+                trigger:{global:['phaseDrawSkipped','phaseDrawCancelled']},
                 forced:true,
                 filter:function(event,player){
                     return event.player!=player;

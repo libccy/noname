@@ -32,8 +32,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				global:'g_jinlianzhu',
 	            content:function(){
 	                var evt=event.getParent(3)._trigger;
-	                evt.untrigger();
-	                evt.finish();
+	                evt.cancel()
 	                if(evt.source){
 	                    evt.source.draw();
 	                }

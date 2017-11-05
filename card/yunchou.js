@@ -418,8 +418,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						event.finish();
 						return;
 					}
-					info.evt.untrigger();
-					info.evt.finish();
+					info.evt.cancel();
 					event.source=info.source;
 					event.source.storage.youdishenru=player;
 					event.source.addSkill('youdishenru');
