@@ -77,7 +77,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             xinxianying:['female','wei',3,['zhongjian','caishi']],
             wuxian:['female','shu',3,['fumian','daiyan']],
             xushi:['female','wu',3,['wengua','fuzhu']],
-    		caojie:['female','qun',3,['shouxi','huimin']],
+            caojie:['female','qun',3,['shouxi','huimin']],
+
+            caiyong:['male','qun',3,['bizhuan','tongbo']],
+            jikang:['male','wei',3,['qingxian','juexiang']],
+            // xuezong:['male','wu',3,['jianzheng','zhuandui','tianbian']],
+    		// qinmi:['male','shu',3,['funan','jiexun']],
     	},
     	characterIntro:{
     		huaxiong:'董卓旗下名将，自荐抵抗山东地区反对董卓的诸侯联军于汜水关前，他先后斩杀济北相鲍信之弟鲍忠和孙坚部将祖茂、以及袁术部将俞涉和韩馥手下潘凤等人，最后关东联军派出关羽与之一对一决斗而被杀。',
@@ -165,6 +170,488 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		liuchen:['liushan'],
     	},
     	skill:{
+            qingxian:{
+                group:['qingxian_jilie','qingxian_rouhe'],
+                subSkill:{
+                    rouhe:{
+                        trigger:{player:'recoverEnd'},
+                        direct:true,
+                        content:function(){
+                            'step 0'
+                            player.chooseTarget(get.prompt('qingxian'),function(card,player,target){
+                                return target!=player;
+                            }).set('ai',function(target){
+                                var att=get.attitude(_status.event.player,target);
+                                if(target.isHealthy()&&att>0) return 0;
+                                if(target.hp==1&&att!=0){
+                                    if(att>0) return 9;
+                                    else return 10;
+                                }
+                                else{
+                                    return Math.sqrt(Math.abs(att));
+                                }
+                            }).set('prompt2','当你回复体力后，你可以令一名其他角色执行一项：失去1点体力，随机使用一张装备牌；回复1点体力，弃置一张装备牌。若其以此法使用或弃置的牌为梅花，你回复1点体力');
+                            'step 1'
+                            if(result.bool){
+                                var target=result.targets[0];
+                                player.logSkill('qingxian',target);
+                                event.insert(lib.skill.qingxian.content_choose,{target:target,player:player});
+
+                            }
+                        }
+                    },
+                    jilie:{
+                        trigger:{player:'damageEnd'},
+                        filter:function(event,player){
+                            return event.source&&event.source.isIn()&&event.source!=player;
+                        },
+                        check:function(event,player){
+                            if(get.attitude(player,event.source)>0&&event.source.isHealthy()){
+                                return false;
+                            }
+                            return true;
+                        },
+                        logTarget:'source',
+                        prompt2:'当你受到伤害后，你可以令伤害来源执行一项：失去1点体力，随机使用一张装备牌；回复1点体力，弃置一张装备牌。若其以此法使用或弃置的牌为梅花，你回复1点体力',
+                        content:function(){
+                            event.insert(lib.skill.qingxian.content_choose,{target:trigger.source,player:player});
+                        }
+                    }
+                },
+                content_choose:function(){
+                    'step 0'
+                    var index;
+                    if(get.attitude(player,target)>0){
+                        if(target.isHealthy()){
+                            index=0;
+                        }
+                        else{
+                            index=1;
+                        }
+                    }
+                    else{
+                        if(target.isHealthy()&&target.countCards('e')){
+                            index=1;
+                        }
+                        else{
+                            index=0;
+                        }
+                    }
+                    player.chooseControlList(
+                        ['令'+get.translation(target)+'失去1点体力，随机使用一张装备牌',
+                        '令'+get.translation(target)+'回复1点体力，弃置一张装备牌'],
+                        true,function(event,player){
+                        return _status.event.index;
+                    }).set('index',index);
+                    'step 1'
+                    if(result.index==0){
+                        target.loseHp();
+                        event.card=get.cardPile(function(card){
+                            return get.type(card)=='equip';
+                        });
+                        if(event.card){
+                            target.equip(event.card,true).set('delay',true);
+                            event.goto(3);
+                        }
+                        else{
+                            event.finish();
+                        }
+                    }
+                    else{
+                        target.recover();
+                        if(target.countCards('he',{type:'equip'})){
+                            target.chooseToDiscard('he',true,'弃置一张装备牌',function(card){
+                                return get.type(card)=='equip';
+                            }).set('ai',function(card){
+                                var val=-get.value(card);
+                                if(get.suit(card)=='club'){
+                                    val+=_status.event.att*10;
+                                }
+                                return val;
+                            }).set('att',get.sgnAttitude(target,player));
+                        }
+                        else{
+                            event.finish();
+                        }
+                    }
+                    'step 2'
+                    if(result&&result.cards){
+                        event.card=result.cards[0];
+                    }
+                    'step 3'
+                    if(event.card&&get.suit(event.card)=='club'){
+                        player.recover();
+                    }
+                }
+            },
+            juexiang:{
+                trigger:{player:'dieBegin'},
+                direct:true,
+                skillAnimation:true,
+                animationColor:'thunder',
+                content:function(){
+                    'step 0'
+                    player.chooseTarget(get.prompt('juexiang'),function(card,player,target){
+                        return target!=player;
+                    }).set('ai',function(target){
+                        return get.attitude(_status.event.player,target)/Math.sqrt(target.hp+1);
+                    });
+                    'step 1'
+                    if(result.bool){
+                        var target=result.targets[0]
+                        player.logSkill('juexiang',target);
+                        target.addSkill(lib.skill.juexiang.derivation.randomGet());
+                        target.addTempSkill('juexiang_club',{player:'phaseBegin'});
+                    }
+                },
+                derivation:['juexiang_ji','juexiang_lie','juexiang_rou','juexiang_he'],
+                subSkill:{
+                    ji:{
+                        mark:true,
+                        nopop:true,
+                        intro:{
+                            content:'info'
+                        },
+                        trigger:{player:'damageEnd'},
+                        filter:function(event,player){
+                            return event.source&&event.source.isIn()&&event.source!=player;
+                        },
+                        check:function(event,player){
+                            return get.attitude(player,event.source)<0;
+                        },
+                        logTarget:'source',
+                        content:function(){
+                            trigger.source.loseHp();
+                            var card=get.cardPile(function(card){
+                                return get.type(card)=='equip';
+                            });
+                            if(card){
+                                trigger.source.equip(card,true).set('delay',true);
+                            }
+                        }
+                    },
+                    lie:{
+                        mark:true,
+                        nopop:true,
+                        intro:{
+                            content:'info'
+                        },
+                        trigger:{player:'recoverEnd'},
+                        direct:true,
+                        content:function(){
+                            'step 0'
+                            player.chooseTarget(get.prompt2('juexiang_lie'),function(card,player,target){
+                                return target!=player;
+                            }).set('ai',function(target){
+                                return -get.attitude(player,target)/(1+target.hp);
+                            });
+                            'step 1'
+                            if(result.bool){
+                                var target=result.targets[0];
+                                player.logSkill('juexiang_lie',target);
+                                target.loseHp();
+                                var card=get.cardPile(function(card){
+                                    return get.type(card)=='equip';
+                                });
+                                if(card){
+                                    target.equip(card,true).set('delay',true);
+                                }
+                            }
+                        }
+                    },
+                    rou:{
+                        mark:true,
+                        nopop:true,
+                        intro:{
+                            content:'info'
+                        },
+                        trigger:{player:'damageEnd'},
+                        filter:function(event,player){
+                            return event.source&&event.source.isIn()&&event.source!=player;
+                        },
+                        check:function(event,player){
+                            var att=get.attitude(player,event.source);
+                            if(player.isHealthy()){
+                                return att<0;
+                            }
+                            else{
+                                return att>0
+                            }
+                        },
+                        logTarget:'source',
+                        content:function(){
+                            trigger.source.recover();
+                            if(trigger.source.countCards('he',{type:'equip'})){
+                                trigger.source.chooseToDiscard('he',true,'弃置一张装备牌',function(card){
+                                    return get.type(card)=='equip';
+                                });
+                            }
+                        }
+                    },
+                    he:{
+                        mark:true,
+                        nopop:true,
+                        intro:{
+                            content:'info'
+                        },
+                        trigger:{player:'recoverEnd'},
+                        direct:true,
+                        content:function(){
+                            'step 0'
+                            player.chooseTarget(get.prompt2('juexiang_he'),function(card,player,target){
+                                return target!=player;
+                            }).set('ai',function(target){
+                                var att=get.attitude(_status.event.player,target);
+                                if(target.isHealthy()&&target.countCards('he')){
+                                    return -att;
+                                }
+                                else{
+                                    return 10*att/(1+target.hp);
+                                }
+                            });
+                            'step 1'
+                            if(result.bool){
+                                var target=result.targets[0];
+                                player.logSkill('juexiang_he',target);
+                                target.recover();
+                                if(target.countCards('he',{type:'equip'})){
+                                    target.chooseToDiscard('he',true,'弃置一张装备牌',function(card){
+                                        return get.type(card)=='equip';
+                                    });
+                                }
+                            }
+                        }
+                    },
+                    club:{
+                        mark:true,
+                        nopop:true,
+                        intro:{
+                            content:'info'
+                        },
+                        mod:{
+            				targetEnabled:function(card,player,target){
+            					if(get.suit(card)=='club'&&player!=target){
+            						return false;
+            					}
+            				}
+            			}
+                    }
+                }
+            },
+            bizhuan:{
+                trigger:{player:'useCardAfter',target:'useCardToBegin'},
+                filter:function(event,player){
+                    if(event.name!='useCard'&&event.player==event.target) return false;
+                    if(player.storage.bizhuan.length>=4) return false;
+                    return get.suit(event.card)=='spade';
+                },
+                init:function(player){
+                    player.storage.bizhuan=[];
+                },
+                intro:{
+                    content:'cards'
+                },
+                frequent:true,
+                content:function(){
+                    var card=get.cards()[0];
+                    ui.special.appendChild(card);
+                    player.$draw(card);
+                    game.delay();
+                    player.storage.bizhuan.push(card);
+                    player.markSkill('bizhuan');
+                },
+                mod:{
+                    maxHandcard:function(player,num){
+                        return num+player.storage.bizhuan.length;
+                    }
+                }
+            },
+            tongbo:{
+                trigger:{player:'phaseDrawAfter'},
+				direct:true,
+				filter:function(event,player){
+					return player.storage.bizhuan&&player.storage.bizhuan.length&&event.num>0;
+				},
+                locked:false,
+				content:function(){
+					"step 0"
+                    var four=false;
+                    var nofour=!player.hasFriend();
+                    if(player.storage.bizhuan.length==4){
+                        var suits=['club','spade','heart','diamond'];
+                        var list=player.getCards('h').concat(player.storage.bizhuan);
+                        for(var i=0;i<list.length;i++){
+                            suits.remove(get.suit(list[i]));
+                            if(suits.length==0){
+                                four=true;
+                                break;
+                            }
+                        }
+                    }
+                    var suits2=[];
+                    if(four){
+                        suits2=['club','spade','heart','diamond'];
+                        for(var i=0;i<player.storage.bizhuan.length;i++){
+                            suits2.remove(get.suit(player.storage.bizhuan[i]));
+                        }
+                    }
+					player.chooseCard('选择任意张手牌与“书”交换',[1,Math.min(player.countCards('h'),player.storage.bizhuan.length)]).set('ai',function(card){
+                        var val=get.value(card);
+                        if(_status.event.four&&!_status.event.nofour){
+                            var suits=_status.event.suits2.slice(0);
+                            for(var i=0;i<ui.selected.cards.length;i++){
+                                suits.remove(get.suit(ui.selected.cards[i]));
+                            }
+                            if(suits.contains(get.suit(card))){
+                                if(val<0) return 10;
+                                return 1;
+                            }
+                            else{
+                                return 0;
+                            }
+                        }
+                        else{
+    						if(val<0) return 10;
+    						if(_status.event.player.skipList.contains('phaseUse')){
+    							return val;
+    						}
+    						return 10-val;
+                        }
+					}).set('four',four).set('suits2',suits2).set('nofour',nofour);
+                    event.four=four;
+                    event.nofour=nofour;
+					"step 1"
+					if(result.bool){
+						player.logSkill('tongbo');
+						player.lose(result.cards,ui.special)._triggered=null;
+						player.storage.bizhuan=player.storage.bizhuan.concat(result.cards);
+                        player.syncStorage('bizhuan');
+						event.num=result.cards.length;
+					}
+					else{
+						event.finish();
+					}
+					"step 2"
+                    var suits2={
+                        heart:0,
+                        diamond:0,
+                        spade:0,
+                        club:0
+                    };
+                    for(var i=0;i<player.storage.bizhuan.length;i++){
+                        suits2[get.suit(player.storage.bizhuan[i])]++;
+                    }
+					player.chooseCardButton(player.storage.bizhuan,'选择'+event.num+'张牌作为手牌',event.num,true).set('ai',function(button){
+                        var val=get.value(button.link);
+                        if(_status.event.four||_status.event.nofour){
+                            var suits=get.copy(_status.event.suits2);
+                            for(var i=0;i<ui.selected.buttons.length;i++){
+                                suits[get.suit(ui.selected.buttons[i].link)]--;
+                            }
+                            var num=suits[get.suit(button.link)];
+                            if(_status.event.nofour){
+                                for(var i in suits){
+                                    if(suits[i]==0) return val;
+                                }
+                                if(num!=2){
+                                    if(val<=0) return 0.01;
+                                    return val;
+                                }
+                                else{
+                                    return 0;
+                                }
+                            }
+                            else{
+                                if(num>1){
+                                    if(val<=0) return 0.01;
+                                    return val;
+                                }
+                                else{
+                                    return 0;
+                                }
+                            }
+                        }
+                        else{
+    						if(val<0) return -10;
+    						if(_status.event.player.skipList.contains('phaseUse')){
+    							return -val;
+    						}
+    						return val;
+                        }
+					}).set('four',event.four).set('suits2',suits2).set('nofour',event.nofour);
+					if(player==game.me&&!event.isMine()){
+						game.delay(0.5);
+					}
+					"step 3"
+					player.gain(result.links)._triggered=null;
+					for(var i=0;i<result.links.length;i++){
+						player.storage.bizhuan.remove(result.links[i]);
+					}
+					player.syncStorage('bizhuan');
+					if(player==game.me&&_status.auto){
+						game.delay(0.5);
+					}
+                    "step 4"
+                    suits2=['club','spade','heart','diamond'];
+                    for(var i=0;i<player.storage.bizhuan.length;i++){
+                        suits2.remove(get.suit(player.storage.bizhuan[i]));
+                    }
+                    if(suits2.length>0){
+                        event.finish();
+                    }
+                    "step 5"
+                    event.cards=player.storage.bizhuan.slice(0);
+                    player.storage.bizhuan.length=0;
+                    player.unmarkSkill('bizhuan');
+                    "step 6"
+					if(event.cards.length>1){
+						player.chooseCardButton('将所有“书”交给任意名其他角色',true,event.cards,[1,event.cards.length]).set('ai',function(button){
+                            if(ui.selected.buttons.length==0) return 1;
+                            return 0;
+						});
+					}
+                    else if(event.cards.length==1){
+                        event._result={links:event.cards.slice(0),bool:true};
+                    }
+					else{
+						event.finish();
+					}
+					"step 7"
+					if(result.bool){
+						for(var i=0;i<result.links.length;i++){
+							event.cards.remove(result.links[i]);
+						}
+						event.togive=result.links.slice(0);
+						player.chooseTarget('将'+get.translation(result.links)+'交给一名其他角色',true,function(card,player,target){
+                            return target!=player;
+                        }).set('ai',function(target){
+                            var att=get.attitude(_status.event.player,target);
+							if(_status.event.enemy){
+                                return -att;
+                            }
+                            else if(att>0){
+                                return att/(1+target.countCards('h'));
+                            }
+                            else{
+                                return att/100;
+                            }
+						}).set('enemy',get.value(event.togive[0])<0);
+					}
+					else{
+						event.finish();
+					}
+					"step 8"
+					if(result.targets.length){
+						result.targets[0].gain(event.togive,'draw');
+						player.line(result.targets[0],'green');
+                        game.log(result.targets[0],'获得了'+get.cnNumber(event.togive.length)+'张','#g“书”');
+						event.goto(6);
+					}
+				},
+                ai:{
+                    combo:'bizhuan'
+                }
+            },
             shouxi:{
                 trigger:{target:'shaBefore'},
                 direct:true,
@@ -8212,7 +8699,41 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             wuxian:'吴苋',
             xushi:'徐氏',
     		caojie:'曹节',
+            xuezong:'薛综',
+            jikang:'嵇康',
+            qinmi:'秦宓',
+            caiyong:'蔡邕',
 
+            bizhuan:'辟撰',
+            bizhuan_bg:'书',
+            bizhuan_info:'当你使用黑桃牌后，或你成为其他角色使用黑桃牌的目标后，你可以将牌堆顶的一张牌置于武将牌上，称为“书”；你至多拥有四张“书”，你每有一张“书” ，手牌上限+1',
+            tongbo:'通博',
+            tongbo_info:'摸牌阶段摸牌后，你可以用任意张牌替换等量的“书”，然后若你的“书”包含四种花色，你将所有“书”交给任意名其他角色',
+            qingxian:'清弦',
+            qingxian_info:'当你受到伤害/回复体力后，你可以令伤害来源/一名其他角色执行一项：失去1点体力，随机使用一张装备牌；回复1点体力，弃置一张装备牌。若其以此法使用或弃置的牌为梅花，你回复1点体力',
+            juexiang:'绝响',
+            juexiang_info:'当你死亡后，你可以令一名角色随机获得“清弦残谱”其中一个技能，然后直到其下回合开始，其不能被选择为其他角色使用梅花牌的目标',
+            juexiang_ji:'激弦',
+            juexiang_ji_info:'当你受到伤害后，你可以令伤害来源失去1点体力，随机使用一张装备',
+            juexiang_lie:'烈弦',
+            juexiang_lie_info:'当你回复体力后，你可以令一名其他角色失去1点体力，随机使用一张装备',
+            juexiang_rou:'柔弦',
+            juexiang_rou_info:'当你受到伤害后，你可以令伤害来源回复1点体力，弃置一张装备',
+            juexiang_he:'和弦',
+            juexiang_he_info:'当你回复体力后，你可以令一名其他角色回复1点体力，弃置一张装备',
+            juexiang_club:'绝响',
+            juexiang_club_bg:'响',
+            juexiang_club_info:'直到下回合开始，不能被选择为其他角色使用梅花牌的目标',
+            jianzheng:'谏征',
+            jianzheng_info:'当一名其他角色使用【杀】指定目标时，若你在其攻击范围内且你不是目标，则你可以将一张手牌置于牌堆顶，取消所有目标，然后若此【杀】不为黑色，你成为目标',
+            zhuandui:'专对',
+            zhuandui_info:'当你使用【杀】指定目标/成为【杀】的目标后，你可以与目标角色/此【杀】使用者拼点，若你赢，此杀不能被【闪】响应/对你无效',
+            tianbian:'天辩',
+            tianbian_info:'你拼点时，可以改为用牌堆顶的一张牌进行拼点；当你拼点的牌亮出后，若此牌花色为红桃，则点数视为K',
+            funan:'复难',
+            funan_info:'其他角色使用或打出牌响应你使用的牌时，你可令其获得你使用的牌（其本回合不能使用或打出这张牌），然后你获得其使用或打出的牌',
+            jiexun:'诫训',
+            jiexun_info:'结束阶段，你可令一名其他角色摸等同于场上方块牌数的牌，然后弃置X张牌（X为此前该技能发动过的次数）。若有角色因此法弃置了所有牌，则你失去“诫训”，然后你发动“复难”时，无须令其获得你使用的牌',
             shouxi:'守玺',
             shouxi_info:'当你成为【杀】的目标后，你可声明一种未以此法声明过的基本牌或锦囊牌的牌名。若使用者弃置一张你声明的牌，其获得你的一张牌；若否，则此【杀】对你无效',
             huimin:'惠民',

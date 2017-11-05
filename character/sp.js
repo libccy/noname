@@ -774,14 +774,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         event.directindex=result.index;
                     }
                     if(event.directindex==1){
-                        event.insert(lib.skill.wylianji.content2,{
+                        event.insert(lib.skill.wylianji.content_use,{
                             player:player,
                             target:target,
                             card:card
                         })
                     }
                     else{
-                        event.insert(lib.skill.wylianji.content3,{
+                        event.insert(lib.skill.wylianji.content_give,{
                             player:target,
                             card:card,
                             targets:game.filterPlayer(function(current){
@@ -790,7 +790,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         });
                     }
                 },
-                content2:function(){
+                content_use:function(){
                     'step 0'
                     player.useCard(card,target);
                     'step 1'
@@ -805,7 +805,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         target.line(player);
                     }
                 },
-                content3:function(){
+                content_give:function(){
                     'step 0'
                     var select=get.select(get.info(card).selectTarget);
                     if(select[1]==-1){

@@ -9254,6 +9254,9 @@
 							if(typeof info.prompt2=='function'){
 								next.prompt2=info.prompt2(trigger,player);
 							}
+							else if(typeof info.prompt2=='string'){
+								next.prompt2=info.prompt2;
+							}
 							else if(info.prompt2!=false&&lib.translate[event.skill+'_info']){
 								next.prompt2=lib.translate[event.skill+'_info'];
 							}
@@ -12888,6 +12891,9 @@
 						if(info.equipDelay!='false') game.delayx();
 					}
 					delete player.equiping;
+					if(event.delay){
+						game.delayx();
+					}
 				},
 				addJudge:function(){
 					"step 0"
@@ -19474,6 +19480,11 @@
                         }
                     }
                     else{
+						if(typeof key!='string'){
+							console.log('warning: using non-string object as event key');
+							console.log(key,value);
+							console.log(_status.event);
+						}
                         this[key]=value;
                         this._set.push([key,value]);
                     }
@@ -41931,6 +41942,10 @@
 			if(!info) return 0;
 			if(info.ai){
 				if(info.ai.halfneg) return 0;
+				if(typeof info.ai.combo=='string'&&_status.event.player&&
+					!_status.event.player.hasSkill(info.ai.combo)){
+					return 0;
+				}
 				if(info.ai.neg) return -1;
 			}
 			return 1;
@@ -43028,6 +43043,9 @@
 						return '已发动';
 					}
 					return '未发动';
+				}
+				case 'info':{
+					return lib.translate[skill+'_info'];
 				}
 				case 'cardCount':{
 					if(typeof content=='object'&&typeof content.length=='number'){

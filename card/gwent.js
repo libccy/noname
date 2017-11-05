@@ -1357,7 +1357,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var source=enemies.randomGet();
 							source.line(player);
 							source.addExpose(0.1);
-							player.damage(source);
+							player.damage(source,'nocard');
 							player.recover();
 						}
 					}

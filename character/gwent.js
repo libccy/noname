@@ -13,7 +13,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			gw_airuiting:['male','wei',4,['kuanglie']],
 			gw_laduoweide:['male','wei',4,['gwxiaoshou']],
-			gw_dagong:['male','qun',4,['tianbian']],
+			gw_dagong:['male','qun',4,['gwtianbian']],
 
 			gw_bulanwang:['male','qun',4,['bolang']],
 			gw_kuite:['male','qun',4,['gwxuezhan']],
@@ -1877,7 +1877,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				},
     			}
     		},
-			tianbian:{
+			gwtianbian:{
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
 				content:function(){
@@ -1906,10 +1906,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					player.chooseControl('选项一','选项二','cancel2',function(){
 						return choice;
-					}).set('prompt',get.prompt('tianbian')).set('choiceList',['随机使用一张对全场有正面效果的牌','随机使用一张对全场有负面效果的牌']);
+					}).set('prompt',get.prompt('gwtianbian')).set('choiceList',['随机使用一张对全场有正面效果的牌','随机使用一张对全场有负面效果的牌']);
 					'step 1'
 					if(result.control!='cancel2'){
-						player.logSkill('tianbian');
+						player.logSkill('gwtianbian');
 						var list=[];
 						for(var i in lib.card){
 							if(lib.inpile.contains(i)&&
@@ -2903,8 +2903,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yunhuo_info:'锁定技，准备阶段，若游戏轮数为4的倍数，你令所有敌方角色随机弃置一张手牌（若没有手牌改为受到一点火焰伤害），然后在此回合结束后获得一个额外回合',
 			yinzhang:'银杖',
 			yinzhang_info:'出牌阶段限一次，你可以弃置一张牌，然后从3张随机亮出的银卡法术中选择一张加入手牌',
-			tianbian:'天变',
-			tianbian_info:'出牌阶段开始时，你可以选择一项：随机使用一张对全场有正面效果的牌；或随机使用一张对全场有负面效果的牌',
+			gwtianbian:'天变',
+			gwtianbian_info:'出牌阶段开始时，你可以选择一项：随机使用一张对全场有正面效果的牌；或随机使用一张对全场有负面效果的牌',
 			gwxiaoshou:'枭首',
 			gwxiaoshou_info:'出牌阶段限两次，你可以弃置一张牌对场上体力值最高（或之一）的一名角色造成一点伤害',
 			kuanglie:'狂猎',

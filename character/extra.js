@@ -645,15 +645,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					player.chooseCard('选择任意张手牌与星交换',[1,player.countCards('h')]).ai=function(card){
-						return 1;
+					player.chooseCard('选择任意张手牌与“星”交换',[1,Math.min(player.countCards('h'),player.storage.qixing.length)]).ai=function(card){
+						var val=get.value(card);
+						if(val<0) return 10;
+						if(player.skipList.contains('phaseUse')){
+							return val;
+						}
+						return -val;
 					};
 					"step 1"
 					if(result.bool){
 						player.logSkill('qixing');
 						player.lose(result.cards,ui.special)._triggered=null;
 						player.storage.qixing=player.storage.qixing.concat(result.cards);
-						game.addVideo('storage',player,['qixing',get.cardsInfo(player.storage.qixing),'cards']);
+						player.syncStorage('qixing');
 						event.num=result.cards.length;
 					}
 					else{
@@ -661,12 +666,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 2"
 					player.chooseCardButton(player.storage.qixing,'选择'+event.num+'张牌作为手牌',event.num,true).ai=function(button){
-						if(player.skipList.contains('phaseUse')&&button.link!='du'){
-							return -get.value(button.link);
+						var val=get.value(button.link);
+						if(val<0) return -10;
+						if(player.skipList.contains('phaseUse')){
+							return -val;
 						}
-						return get.value(button.link);
+						return val;
 					}
-					if(player==game.me&&_status.auto){
+					if(player==game.me&&!event.isMine()){
 						game.delay(0.5);
 					}
 					"step 3"
@@ -674,7 +681,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<result.links.length;i++){
 						player.storage.qixing.remove(result.links[i]);
 					}
-					game.addVideo('storage',player,['qixing',get.cardsInfo(player.storage.qixing),'cards']);
+					player.syncStorage('qixing');
 					if(player==game.me&&_status.auto){
 						game.delay(0.5);
 					}

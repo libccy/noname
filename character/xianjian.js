@@ -672,6 +672,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						result.targets[0].gain(event.togive,'draw');
 						result.targets[0].skip('phaseDraw');
 						result.targets[0].addTempSkill('guijin2',{player:'phaseBegin'});
+						game.log(result.targets[0],'获得了'+get.cnNumber(event.togive.length)+'张','#g“归烬”牌');
 						player.line(result.targets[0],'green');
 						event.goto(1);
 					}
@@ -1505,7 +1506,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				init:function(player){
 					player.storage.qixia=[];
 				},
-				mark:true,
+				// mark:true,
 				intro:{
 					content:function(storage){
 						if(!storage.length){
@@ -1526,7 +1527,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(suit){
 						player.storage.qixia.add(suit);
 						player.syncStorage('qixia');
-						player.updateMarks();
+						player.markSkill('qixia');
 					}
 				},
 				group:'qixia_phase',
@@ -1542,7 +1543,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.insertPhase();
 							player.storage.qixia.length=0;
 							player.syncStorage('qixia');
-							player.updateMarks();
+							player.unmarkSkill('qixia');
 		    			}
 					}
 				}
