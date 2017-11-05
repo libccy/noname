@@ -2,10 +2,10 @@ window.noname_update={
     version:'1.9.40',
     // update:'1.9.38.1',
     changeLog:[
-        '原7武将',
-        '诸侯伐董',
+        '原7武将、新张宝',
+        '诸侯伐董、神之试炼',
         '武将称号',
-        'bug修复（父魂）'
+        'bug修复（父魂、截辎、穿心、先辅、魔箭）'
     ],
     files:[
         // 'game/game.js',

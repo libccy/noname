@@ -590,7 +590,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     var target=player.storage.xianfu2;
                     player.line(target,'green');
                     target.logSkill('xianfu');
-                    target[trigger.name](trigger.num);
+                    target[trigger.name](trigger.num,trigger.source||'nosource');
                     game.delay();
                 },
                 group:'xianfu3',
@@ -1416,6 +1416,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		chuanxin:{
     			trigger:{source:'damageBefore'},
     			filter:function(event,player){
+                    if(_status.currentPhase!=player) return false;
+                    if(!_status.event.getParent('phaseUse')) return false;
     				if(event.card&&(event.card.name=='sha'||event.card.name=='juedou')){
     					if(get.mode()=='guozhan'){
     						return (event.player.identity!='qun'||player.identity=='ye')&&

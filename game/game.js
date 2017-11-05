@@ -17265,7 +17265,7 @@
 						if(player.identity=='unknown'||player.identity=='ye') return false;
 						return this.identity==player.identity;
 					}
-					if(typeof this.side=='boolean'&&typeof player.side=='boolean'){
+					if(this.side!=undefined&&typeof player.side=='boolean'){
 						return this.side==player.side;
 					}
 					return this==player;
@@ -19445,6 +19445,7 @@
 				cancel:function(){
 					this.untrigger.call(this,arguments);
 					this.finish();
+					this.trigger(this.name+'Cancelled');
 				},
 				goto:function(step){
 					this.step=step-1;
