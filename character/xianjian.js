@@ -4056,6 +4056,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageBefore'},
 				filter:function(event){
 					if(event.nature) return true;
+					return false;
 				},
 				forced:true,
 				content:function(){

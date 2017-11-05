@@ -1,8 +1,8 @@
 window.noname_update={
-    version:'1.9.39.1',
+    version:'1.9.40',
     // update:'1.9.38.1',
     changeLog:[
-        '原7武将、新张宝',
+        '蔡邕、嵇康、新张宝',
         // '诸侯伐董、神之试炼',
         // '武将称号',
         'bug修复'
