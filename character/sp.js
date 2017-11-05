@@ -6921,42 +6921,55 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				trigger.position.appendChild(player.storage.zhoufu2);
     				game.log(player,'的判定牌改为',player.storage.zhoufu2);
     				game.delay(2);
-    				"step 1"
-    				if(player.storage.zhoufu3.isAlive()&&player.storage.zhoufu3.hasSkill('yingbin')){
-    					player.storage.zhoufu3.logSkill('yingbin');
-    					player.storage.zhoufu3.draw(2);
-    				}
     				player.removeSkill('zhoufu2');
-    				delete player.storage.zhoufu2;
-    				delete player.storage.zhoufu3;
+                    delete player.storage.zhoufu2;
+                    delete player.storage.zhoufu2_markcount;
+                    if(player.storage.zhoufu3.isIn()){
+                        player.storage.zhoufu3.line(player,'green');
+                    }
+    				"step 1"
+                    player.addTempSkill('zhoufu3');
     			},
     			intro:{
     				content:'card'
-    			},
-    			group:'zhoufu3'
+    			}
     		},
     		zhoufu3:{
     			trigger:{player:'phaseEnd'},
-    			forced:true,
+    			silent:true,
     			content:function(){
-    				if(player.storage.zhoufu2){
-    					player.unmark(player.storage.zhoufu2.name);
-    					if(player.storage.zhoufu3.isAlive()){
-    						player.storage.zhoufu3.gain(player.storage.zhoufu2);
-    						player.$give(player.storage.zhoufu2,player.storage.zhoufu3);
-    						game.delay();
-    					}
-    					else{
-    						ui.discardPile.appendChild(player.storage.zhoufu2);
-    					}
-    				}
-    				player.removeSkill('zhoufu2');
-    				delete player.storage.zhoufu2;
+                    if(player.storage.zhoufu3.isIn()){
+                        player.storage.zhoufu3.logSkill('zhoufu',player);
+                        player.loseHp();
+                    }
     				delete player.storage.zhoufu3;
     			},
+                onremove:true
     		},
     		yingbin:{
     			audio:2,
+                trigger:{global:'useCard'},
+                filter:function(event,player){
+                    return event.player.hasSkill('zhoufu2')&&event.player.storage.zhoufu3==player&&
+                        get.suit(event.player.storage.zhoufu2)==get.suit(event.card);
+                },
+                forced:true,
+                content:function(){
+                    'step 0'
+                    game.delay(0.5);
+                    'step 1'
+                    player.draw();
+                    if(trigger.player.storage.zhoufu2_markcount==1){
+                        trigger.player.removeSkill('zhoufu2');
+                        delete trigger.player.storage.zhoufu2;
+                        delete trigger.player.storage.zhoufu2_markcount;
+                        delete trigger.player.storage.zhoufu3;
+                    }
+                    else{
+                        trigger.player.storage.zhoufu2_markcount=1;
+                        trigger.player.updateMark('zhoufu2');
+                    }
+                }
     		},
     		kuiwei:{
     			audio:2,
@@ -9871,8 +9884,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		xiemu_info:'每当你成为其他角色的黑色牌的目标，可以弃置一张杀并摸两张牌',
     		spmengjin_info:'每当你使用一张杀，可以弃置目标一张牌',
     		fenxun_info:'出牌阶段限一次，你可以弃置一张牌并选择一名其他角色，然后本回合你计算与其的距离视为1',
-    		yingbin_info:'受到“咒缚”技能影响的角色进行判定时，你可以摸两张牌。',
-    		zhoufu_info:'出牌阶段限一次，你可以指定一名其他角色并将一张手牌移出游戏(将此牌置于该角色的武将牌旁)。若如此做，该角色进行判定时，改为将此牌作为判定牌。该角色的结束阶段，若此牌仍在该角色旁，你将此牌收入手牌。',
+    		yingbin_info:'锁定技，有“咒”的角色使用与“咒”花色相同的牌时，你摸一张牌；当你因同一名角色的同一张“咒”的效果摸第二张牌时，移去该“咒”',
+    		zhoufu_info:'出牌阶段限一次，你可以将一张手牌置于一名没有"咒"的其他角色武将牌旁，称为"咒"。当有“咒”的角色判定时，将"咒"作为判定牌；一名角色回合结束时，若有角色于此回合因判定移除过“咒”，则你令这些角色各失去1点体力',
     		yanzheng_info:'若你的手牌数大于你的体力值，你可以将你装备区内的牌当【无懈可击】使用',
     		kuiwei_info:'结束阶段开始时，你可以摸2+X张牌，然后将你的武将牌翻面。在你的下个摸牌阶段开始时，你须弃置X张牌。（X等于当时场上装备区内的武器牌的数量）',
     		tongji_info:'锁定技。若你的手牌数大于你的体力值，则只要你在任一其他角色的攻击范围内，该角色使用【杀】时便不能指定你以外的角色为目标',

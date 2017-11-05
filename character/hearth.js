@@ -6120,8 +6120,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.storage.mdzhoufu2.clone.classList.add('thrownhighlight');
     					game.addVideo('highlightnode',player,get.cardInfo(player.storage.mdzhoufu2));
     				}
-    				if(player.storage.mdzhoufu3.isAlive()){
-    					// player.storage.mdzhoufu3.draw();
+    				if(player.storage.mdzhoufu3.isIn()){
+                        player.storage.mdzhoufu3.line(player,'green');
     					player.storage.mdzhoufu3.gain(player.judging[0]);
     					player.storage.mdzhoufu3.$gain2(player.judging[0]);
     				}
