@@ -733,6 +733,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				boss_mingxingzhu:['male','shen',3,['boss_qingzhu','boss_jiazu','boss_jiding'],['qun','hiddenboss','bossallowed']],
 				boss_shaohao:['male','shen',6,['boss_shenyi','boss_shenen','boss_baiyi'],['qun','hiddenboss','bossallowed']],
 
+				// boss_xuanlinshilian:['male','',0,['boss_baimang','boss_baimang_intro1','boss_baimang_intro2','boss_baimang_intro3'],['boss'],'qun'],
+				// boss_xuanwu:['male','shen',4,['boss_shenyi','boss_kuangxiao','boss_baimang2'],['qun','hiddenboss','bossallowed']],
+				// boss_shuishengonggong:['male','shen',5,['boss_shenyi','boss_xingqiu','boss_baimang3'],['qun','hiddenboss','bossallowed']],
+				// boss_shuishenxuanming:['male','shen',3,['boss_qingzhu','boss_jiazu','boss_jiding'],['qun','hiddenboss','bossallowed']],
+				// boss_zhuanxu:['male','shen',6,['boss_shenyi','boss_shenen','boss_baiyi'],['qun','hiddenboss','bossallowed']],
+
 				boss_zhuoguiquxie:['male','',0,['boss_bianshen','boss_bianshen_intro1','boss_bianshen_intro2','boss_bianshen_intro3','boss_bianshen_intro4'],['boss'],'shu'],
 				boss_nianshou_heti:['male','shen',12,['boss_nianrui','boss_mengtai','boss_nbianshen','boss_nbianshenx'],['shu','boss','bossallowed'],'shu'],
 				boss_nianshou_jingjue:['male','shen',12,['boss_nianrui','boss_mengtai','boss_jingjue','boss_nbianshen'],['shu','hiddenboss','bossallowed'],'shu'],
@@ -6138,6 +6144,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_jinshenrushou:'金神蓐收',
 			boss_mingxingzhu:'明刑柱',
 			boss_shaohao:'少昊',
+
+			boss_xuanlinshilian:'玄鳞试炼',
+			boss_xuanwu:'玄武',
+			boss_shuishenxuanming:'水神玄冥',
+			boss_shuishengonggong:'水神共工',
+			boss_zhuanxu:'颛顼',
 
 			boss_baiyi:'白仪',
 			boss_baiyi_info:'锁定技，每名敌方角色的摸牌阶段，若当前轮数小于3，其少摸一张牌；第五轮开始时，每名敌方角色弃置两张牌；当己方角色受到的雷电伤害时，若当前轮数小于7，其防止此伤害',
