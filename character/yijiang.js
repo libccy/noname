@@ -382,7 +382,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 filter:function(event,player){
                     if(player.hasSkill('wengua3')) return false;
                     return player.countCards('h')&&game.hasPlayer(function(current){
-                        return current.hasSkill('wengua')&&current!=player;
+                        return current.hasSkill('wengua');
                     });
                 },
                 direct:true,
@@ -393,7 +393,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 prompt:function(){
                     var player=_status.event.player;
                     var list=game.filterPlayer(function(current){
-                        return current.hasSkill('wengua')&&current!=player;
+                        return current.hasSkill('wengua');
                     });
                     var str='将一张手牌交给'+get.translation(list);
                     if(list.length>1) str+='中的一人';
@@ -406,7 +406,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			content:function(){
                     "step 0"
                     var targets=game.filterPlayer(function(current){
-                        return current.hasSkill('wengua')&&current!=player;
+                        return current.hasSkill('wengua');
                     });
                     if(targets.length==1){
                         event.target=targets[0];
@@ -434,8 +434,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				if(event.target){
                         player.logSkill('wengua',event.target);
                         player.addTempSkill('wengua3');
-                        player.give(cards,event.target);
                         event.card=cards[0];
+                        if(event.target!=player){
+                            player.give(cards,event.target);
+                        }
     				}
                     else{
                         event.finish();
@@ -465,7 +467,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     if(event.index==1){
                         game.log(event.target,'将获得的牌置于牌堆底');
                         ui.cardPile.appendChild(event.card);
-                        if(ui.cardPile.childElementCount==1){
+                        if(ui.cardPile.childElementCount==1||player==event.target){
                             event.togain=[ui.cardPile.firstChild];
                             ui.cardPile.firstChild.remove();
                         }
@@ -476,9 +478,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     else{
                         game.log(player,'将获得的牌置于牌堆顶');
                         ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
-                        if(ui.cardPile.childElementCount==1){
-                            event.togain=[ui.cardPile.firstChild];
-                            ui.cardPile.firstChild.remove();
+                        if(ui.cardPile.childElementCount==1||player==event.target){
+                            event.togain=[ui.cardPile.lastChild];
+                            ui.cardPile.lastChild.remove();
                         }
                         else{
                             event.togain=[ui.cardPile.lastChild,ui.cardPile.lastChild.previousSibling];
@@ -512,7 +514,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             },
             wengua3:{},
             daiyan:{
-                trigger:{player:'phaseBegin'},
+                trigger:{player:'phaseEnd'},
                 direct:true,
                 init:function(){
                     lib.onwash.push(function(){
@@ -549,7 +551,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     if(result.bool){
                         var target=result.targets[0];
                         player.logSkill('daiyan',target);
-                        var tao=get.cardPile2('tao');
+                        var tao=get.cardPile2(function(card){
+                            return get.suit(card)=='heart'&&get.type(card)=='basic';
+                        });
                         if(tao){
                             target.gain(tao,'gain2');
                         }
@@ -566,91 +570,95 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     }
                 },
                 ai:{
-                    threaten:2,
+                    threaten:1.5,
                     expose:0.2
                 }
             },
             fumian:{
-                trigger:{player:'phaseEnd'},
+                trigger:{player:'phaseBegin'},
                 direct:true,
                 content:function(){
                     'step 0'
-                    delete player.storage.fumian;
-                    delete player.storage.fumian_markcount;
                     if(player.storage.fumian_choice=='draw'){
-                        player.chooseBool(get.prompt('fumian'),'下回合你使用红色牌可以多选择两个目标');
+                        player.chooseControlList(get.prompt('fumian'),'摸牌阶段多摸一张牌','你使用红色牌可以多选择两个目标',function(event,player){
+                            if(player.hp==1||player.countCards('h')<=1) return 0;
+                            return 1;
+                        });
                     }
                     else if(player.storage.fumian_choice=='red'){
-                        player.chooseBool(get.prompt('fumian'),'下回合摸牌阶段多摸两张牌');
+                        player.chooseControlList(get.prompt('fumian'),'摸牌阶段多摸两张牌','你使用红色牌可以多选择一个目标',function(event,player){
+                            return 0;
+                        });
                     }
                     else{
-                        player.chooseControlList(get.prompt('fumian'),'下回合摸牌阶段多摸一张牌','下回合你使用红色牌可以多选择一个目标',function(event,player){
-                            if(player.hp==1||player.countCards('h')<=1) return 0;
+                        player.chooseControlList(get.prompt('fumian'),'摸牌阶段多摸一张牌','你使用红色牌可以多选择一个目标',function(event,player){
+                            if(player.hp==1||player.countCards('h')<player.hp) return 0;
                             return 1;
                         });
                     }
                     'step 1'
                     if(player.storage.fumian_choice=='draw'){
-                        if(result.bool){
-                            player.logSkill('fumian');
-                            player.storage.fumian='red';
-                            player.storage.fumian_markcount=2;
-                            player.markSkill('fumian');
+                        if(result.index==0){
+                            player.storage.fumian_draw=1;
+                        }
+                        else if(result.index==1){
+                            player.storage.fumian_red=2;
                             delete player.storage.fumian_choice;
                         }
                     }
                     else if(player.storage.fumian_choice=='red'){
-                        if(result.bool){
-                            player.logSkill('fumian');
-                            player.storage.fumian='draw';
-                            player.storage.fumian_markcount=2;
-                            player.markSkill('fumian');
+                        if(result.index==0){
+                            player.storage.fumian_draw=2;
                             delete player.storage.fumian_choice;
+                        }
+                        else if(result.index==1){
+                            player.storage.fumian_red=1;
                         }
                     }
                     else{
-                        if(result.index!=2){
-                            player.logSkill('fumian');
-                            if(result.index==0){
-                                player.storage.fumian='draw';
-                                player.storage.fumian_choice='draw';
-                            }
-                            else if(result.index==1){
-                                player.storage.fumian='red';
-                                player.storage.fumian_choice='red';
-                            }
-                            player.storage.fumian_markcount=1;
-                            player.markSkill('fumian');
+                        if(result.index==0){
+                            player.storage.fumian_draw=1;
+                            player.storage.fumian_choice='draw';
+                        }
+                        else if(result.index==1){
+                            player.storage.fumian_red=1;
+                            player.storage.fumian_choice='red';
                         }
                     }
-                },
-                intro:{
-                    content:function(storage,player){
-                        if(storage=='draw') return '下回合摸牌阶段多摸'+get.cnNumber(player.storage.fumian_markcount)+'张牌';
-                        if(storage=='red') return '下回合你使用红色牌可以多选择'+get.cnNumber(player.storage.fumian_markcount)+'个目标';
+                    if(result.index==0){
+                        player.logSkill('fumian');
+                        player.addTempSkill('fumian_draw');
+                    }
+                    else if(result.index==1){
+                        player.logSkill('fumian');
+                        player.addTempSkill('fumian_red');
                     }
                 },
                 ai:{
                     threaten:1.3,
                 },
-                group:['fumian_draw','fumian_red','fumian_mark'],
                 subSkill:{
                     draw:{
                         trigger:{player:'phaseDrawBegin'},
                         forced:true,
+                        popup:false,
+                        onremove:true,
                         filter:function(event,player){
-                            return player.storage.fumian=='draw'&&typeof player.storage.fumian_markcount=='number';
+                            return typeof player.storage.fumian_draw=='number';
                         },
                         content:function(){
-                            trigger.num+=player.storage.fumian_markcount;
-                            player.unmarkSkill('fumian');
+                            trigger.num+=player.storage.fumian_draw;
                         }
                     },
                     red:{
                         trigger:{player:'useCard'},
             			direct:true,
+                        mark:true,
+                        onremove:true,
+                        intro:{
+                            content:'你使用红色牌可以多选择#个目标'
+                        },
             			filter:function(event,player){
-                            if(player.storage.fumian!='red') return false;
                             if(get.color(event.card)!='red') return false;
                             var info=get.info(event.card);
                             if(info.allowMultiple==false) return false;
@@ -666,14 +674,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             			content:function(){
             				'step 0'
                             var prompt2='额外指定';
-                            if(player.storage.fumian_markcount==2){
+                            if(player.storage.fumian_red==2){
                                 prompt2+='至多两';
                             }
                             else{
                                 prompt2+='一';
                             }
                             prompt2+='名'+get.translation(trigger.card)+'的目标'
-        					player.chooseTarget([1,player.storage.fumian_markcount],get.prompt('fumian'),function(card,player,target){
+        					player.chooseTarget([1,player.storage.fumian_red],get.prompt('fumian'),function(card,player,target){
         						var trigger=_status.event.getTrigger();
                                 var player=_status.event.player;
         						if(trigger.targets.contains(target)) return false;
@@ -685,7 +693,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
         					});
             				'step 1'
             				if(result.bool){
-            					game.delay(0.5);
+            					if(!event.isMine()) game.delay(0.5);
             					event.targets=result.targets;
             				}
             				else{
@@ -697,13 +705,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             					trigger.targets.addArray(event.targets);
             				}
             			}
-                    },
-                    mark:{
-                        trigger:{player:'phaseUseAfter'},
-                        silent:true,
-                        content:function(){
-                            player.unmarkSkill('fumian');
-                        }
                     }
                 }
             },
@@ -4651,7 +4652,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			viewAs:{name:'sha'},
     			prompt:'将两张手牌当杀使用或打出',
     			check:function(card){
-                    if(player.hasSkill('wusheng')&&get.color(card)=='red') return 0;
+                    if(_status.event.player.hasSkill('wusheng')&&get.color(card)=='red') return 0;
                     if(_status.event.name=='chooseToRespond'){
                         if(card.name=='sha') return 0;
                         return 6-get.useful(card);
@@ -5145,7 +5146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     				'step 1'
     				if(result.bool){
-    					game.delay(0.5);
+    					if(!event.isMine()) game.delay(0.5);
     					event.target=result.targets[0];
     				}
     				else{
@@ -8218,13 +8219,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             huimin_info:'结束阶段，你可以摸X张牌并展示等量手牌（X为手牌数小于其体力值的角色数），然后从你指定的一名角色开始这些角色依次选择并获得其中一张',
             wengua:'问卦',
             wengua2:'问卦',
-            wengua_info:'每名角色的出牌阶段限一次，其可以交给你一张牌，你可以将此牌置于牌堆顶或牌堆底，然后你与其从另一端各摸一张牌',
+            wengua_info:'其他角色/你的出牌阶段限一次，其可以交给你一张牌，(若当前回合角色为你，则跳过此步骤)，你可以将此牌/一张牌置于牌堆顶或牌堆底，然后你与其/你从另一端摸一张牌',
             fuzhu:'伏诛',
             fuzhu_info:'一名男性角色的结束阶段，若牌堆剩余牌数不大于你体力值的十倍，则你可以依次对其使用牌堆中所有的【杀】（不能超过游戏人数），然后洗牌',
             fumian:'福绵',
-            fumian_info:'结束阶段，你可以选择一项：1.下回合摸牌阶段多摸一张牌；2.下回合你使用红色牌可以多选择1个目标。选择完成后，此项不能再次被选择且另一个选项的数字+1，直到两个选项都被选择过，重置此技能',
+            fumian_info:'准备阶段，你可以选择一项：1.摸牌阶段多摸一张牌；2.使用红色牌可以多选择一个目标。若与你上回合选择的选项不同，则该选项数值+1并复原此技能',
             daiyan:'怠宴',
-            daiyan_info:'准备阶段，你可以选择一名其他角色，该角色从牌堆获得一张【桃】；若该角色上回合以此法成为过目标，其失去1点体力',
+            daiyan_info:'结束阶段，你可以令一名其他角色从牌堆中获得一张红桃基本牌，然后若其于上回合成为过该技能目标，则其失去1点体力',
             zhongjian:'忠鉴',
             zhongjian_bg:'鉴',
             zhongjian3:'忠鉴',
