@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.9.40',
+    version:'1.9.39.1',
     // update:'1.9.38.1',
     changeLog:[
         '原7武将、新张宝',
