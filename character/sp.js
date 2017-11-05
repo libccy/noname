@@ -701,7 +701,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     norespond:true,
                     skillTagFilter:function(player,tag,arg){
                         if(tag=='norespond'&&Array.isArray(arg)){
-                            if(get.distance(player,arg[1])<=1) return true;
+                            if(get.distance(arg[1],player)<=1) return true;
                         }
                         return false;
                     }

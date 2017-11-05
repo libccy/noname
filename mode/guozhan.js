@@ -1235,13 +1235,36 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				filter:function(event){
 					return !event.iwhile;
 				},
+				direct:true,
 				content:function(){
-					if(player==trigger.player){
-						trigger.num1+=3;
+					'step 0'
+					player.chooseControl('点数+3','点数-3','cancel2').set('prompt',get.prompt('yingyang')).set('ai',function(){
+						if(_status.event.small) return 1;
+						else return 0;
+					}).set('small',trigger.small);
+					'step 1'
+					if(result.index!=2){
+						player.logSkill('yingyang');
+						if(result.index==0){
+							game.log(player,'拼点牌点数+3');
+							if(player==trigger.player){
+								trigger.num1+=3;
+							}
+							else{
+								trigger.num2+=3;
+							}
+						}
+						else{
+							game.log(player,'拼点牌点数-3');
+							if(player==trigger.player){
+								trigger.num1-=3;
+							}
+							else{
+								trigger.num2-=3;
+							}
+						}
 					}
-					else{
-						trigger.num2+=3;
-					}
+
 				}
 			},
 			gzqianxi:{

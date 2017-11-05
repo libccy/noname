@@ -11766,6 +11766,9 @@
 							else{
 								checkShow=false;
 							}
+							if(lib.skill[skill].textAnimation){
+								checkShow=false;
+							}
 							player.$skill(lib.skill[skill].animationStr||lib.translate[skill],lib.skill[skill].skillAnimation,lib.skill[skill].animationColor,checkShow);
 						}
 						else{
@@ -15084,7 +15087,13 @@
                     return next;
 				},
 				viewHandcards:function(target){
-					return this.viewCards(get.translation(target)+'的手牌',target.getCards('h'));
+					var cards=target.getCards('h');
+					if(cards.length){
+						return this.viewCards(get.translation(target)+'的手牌',cards);
+					}
+					else{
+						return false;
+					}
 				},
 				canMoveCard:function(withatt){
 					var player=this;
@@ -16173,6 +16182,9 @@
 								checkShow=checkShow||'main';
 							}
 							else{
+								checkShow=false;
+							}
+							if(lib.skill[name].textAnimation){
 								checkShow=false;
 							}
 							this.$skill(lib.skill[name].animationStr||lib.translate[name],lib.skill[name].skillAnimation,lib.skill[name].animationColor,checkShow);
@@ -20215,9 +20227,10 @@
 					if(typeof filter=='function') return filter(card,player,event);
 				}
 			},
-			cardRespondable:function(card,player){
-				if(_status.event.name!='chooseToRespond') return true;
-				var source=_status.event.getParent().player;
+			cardRespondable:function(card,player,event){
+				event=event||_status.event;
+				if(event.name!='chooseToRespond') return true;
+				var source=event.getParent().player;
 				if(source!=player){
 					if(source.hasSkillTag('norespond',false,[card,player],true)){
 						return false;

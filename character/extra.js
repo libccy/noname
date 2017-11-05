@@ -864,10 +864,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.yeyan=true;
 					if(cards.length==4){
 						player.loseHp(3);
-						target.damage('fire',3);
+						target.damage('fire',3,'nocard');
 					}
 					else{
-						target.damage('fire');
+						target.damage('fire','nocard');
 					}
 				},
 				intro:{

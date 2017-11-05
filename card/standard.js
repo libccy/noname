@@ -1524,8 +1524,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			bagua_skill:{
 				trigger:{player:'chooseToRespondBegin'},
 				filter:function(event,player){
+					console.log(123);
 					if(event.responded) return false;
 					if(!event.filterCard({name:'shan'})) return false;
+					if(!lib.filter.cardRespondable({name:'sha'},player,event)) return false;
 					var evt=event.getParent();
 					if(evt.player&&evt.player.hasSkillTag('unequip',false,evt.card)) return false;
 					return true;
