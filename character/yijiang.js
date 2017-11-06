@@ -81,8 +81,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
             caiyong:['male','qun',3,['bizhuan','tongbo']],
             jikang:['male','wei',3,['qingxian','juexiang']],
-            // xuezong:['male','wu',3,['jianzheng','zhuandui','tianbian']],
-    		// qinmi:['male','shu',3,['funan','jiexun']],
+            // qinmi:['male','wu',3,['jianzheng','zhuandui','tianbian']],
+    		// xuezong:['male','shu',3,['funan','jiexun']],
     	},
     	characterIntro:{
     		huaxiong:'董卓旗下名将，自荐抵抗山东地区反对董卓的诸侯联军于汜水关前，他先后斩杀济北相鲍信之弟鲍忠和孙坚部将祖茂、以及袁术部将俞涉和韩馥手下潘凤等人，最后关东联军派出关羽与之一对一决斗而被杀。',
