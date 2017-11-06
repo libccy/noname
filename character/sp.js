@@ -480,12 +480,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             var cardname=_status.event.cardname;
                             if(_status.event.du) return -get.value(card);
                             else if(_status.event.shuimeng){
-                                if(player.needsToDiscard(2-ui.selected.cards.length)){
-                                    return 10-get.value(card);
+                                if(cardname=='wuzhong'){
+                                    if(player.needsToDiscard(2-ui.selected.cards.length)){
+                                        return 10-get.value(card);
+                                    }
                                 }
-                                else{
-                                    return 0;
+                                else if(cardname=='guohe'){
+                                    if(player.needsToDiscard(-1-ui.selected.cards.length)){
+                                        return 10-get.value(card);
+                                    }
                                 }
+                                return 0;
                             }
                             else if(cardname=='lebu'){
                                 if(player.needsToDiscard(1-ui.selected.cards.length)){
@@ -509,6 +514,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         },
                         ai2:function(target){
                             var att=get.attitude(_status.event.player,target);
+                            var nh2=target.countCards('h');
                             var num=Math.sqrt(1+nh2);
                             var cardname=_status.event.cardname;
                             if(_status.event.du) return 0.5-att;
@@ -524,7 +530,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             else if(cardname=='huogong'){
                                 if(_status.event.player.hp==1) return att/num;
                             }
-                            var nh2=target.countCards('h');
                             if(_status.event.nh>nh2+1){
                                 return att/num;
                             }
