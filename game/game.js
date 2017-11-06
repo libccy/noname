@@ -23208,6 +23208,9 @@
 					player.smoothAvatar();
 				}
 			},
+			arenaNumber:function(content){
+				ui.arena.dataset.number=content;
+			},
 			reinit:function(source,content){
 				if(source&&content){
 					source.uninit();
@@ -23329,6 +23332,12 @@
 			hidePlayer:function(player){
 				if(player){
 					player.hide();
+				}
+			},
+			deleteHandcards:function(player){
+				if(player){
+					player.node.handcards1.delete();
+					player.node.handcards2.delete();
 				}
 			},
 			hideCharacter:function(player,num){
