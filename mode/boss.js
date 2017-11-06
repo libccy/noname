@@ -733,11 +733,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				boss_mingxingzhu:['male','shen',3,['boss_qingzhu','boss_jiazu','boss_jiding'],['qun','hiddenboss','bossallowed']],
 				boss_shaohao:['male','shen',6,['boss_shenyi','boss_shenen','boss_baiyi'],['qun','hiddenboss','bossallowed']],
 
-				boss_xuanlinshilian:['male','',0,['boss_xuanlin','boss_xuanlin_intro1','boss_xuanlin_intro2','boss_xuanlin_intro3'],['boss'],'qun'],
-				boss_xuanwu:['male','shen',4,['boss_shenyi','boss_lingqu','boss_xuanlin2'],['qun','hiddenboss','bossallowed']],
-				boss_shuishengonggong:['male','shen',5,['boss_shenyi','boss_juehong','boss_xuanlin3'],['qun','hiddenboss','bossallowed']],
-				boss_shuishenxuanming:['female','shen',5,['boss_shenyi','boss_zirun','boss_xuanlin3'],['qun','hiddenboss','bossallowed']],
-				boss_zhuanxu:['male','shen',6,['boss_shenyi','boss_shenen','boss_zaoyi'],['qun','hiddenboss','bossallowed']],
+				boss_xuanlinshilian:['male','',0,['boss_xuanlin','boss_xuanlin_intro1','boss_xuanlin_intro2','boss_xuanlin_intro3'],['boss'],'wei'],
+				boss_xuanwu:['male','shen',4,['boss_shenyi','boss_lingqu','boss_xuanlin2'],['wei','hiddenboss','bossallowed']],
+				boss_shuishengonggong:['male','shen',5,['boss_shenyi','boss_juehong','boss_xuanlin3'],['wei','hiddenboss','bossallowed']],
+				boss_shuishenxuanming:['female','shen',5,['boss_shenyi','boss_zirun','boss_xuanlin3'],['wei','hiddenboss','bossallowed']],
+				boss_zhuanxu:['male','shen',6,['boss_shenyi','boss_shenen','boss_zaoyi'],['wei','hiddenboss','bossallowed']],
 
 				boss_zhuoguiquxie:['male','',0,['boss_bianshen','boss_bianshen_intro1','boss_bianshen_intro2','boss_bianshen_intro3','boss_bianshen_intro4'],['boss'],'shu'],
 				boss_nianshou_heti:['male','shen',12,['boss_nianrui','boss_mengtai','boss_nbianshen','boss_nbianshenx'],['shu','boss','bossallowed'],'shu'],
@@ -2879,6 +2879,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					game.addBossFellow(game.me==game.boss?7:5,'boss_shuishengonggong');
 					game.changeBoss('boss_shuishenxuanming',game.boss.nextSeat);
+					game.boss.previousSeat.maxHp--;
+					game.boss.previousSeat.update();
+					game.boss.nextSeat.maxHp--;
+					game.boss.nextSeat.update();
 					'step 3'
 					var dnum=0;
 					var dead=game.dead.slice(0);
@@ -5242,6 +5246,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_baimang_intro2:{nobracket:true},
 			boss_baimang_intro3:{nobracket:true},
 			boss_baimang_intro4:{nobracket:true},
+			boss_xuanlin_intro1:{nobracket:true},
+			boss_xuanlin_intro2:{nobracket:true},
+			boss_xuanlin_intro3:{nobracket:true},
+			boss_xuanlin_intro4:{nobracket:true},
 			zhanjiang:{
 				trigger:{player:'phaseBegin'},
 				filter:function(event,player){
@@ -6664,6 +6672,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_qingmu_intro3:'&nbsp;第三关',
 			boss_qingmu_intro3_info:'挑战太昊、木神勾芒、树精',
 			boss_qingmu_intro3_append:'每通过一关，游戏轮数清零，阵亡角色复活，所有角色重置武将和区域内的牌，并获得4-X张起始手牌，X为阵亡角色数',
+
+			boss_xuanlin_intro1:'&nbsp;第一关',
+			boss_xuanlin_intro1_info:'挑战玄武',
+			boss_xuanlin_intro2:'&nbsp;第二关',
+			boss_xuanlin_intro2_info:'挑战水神玄冥、水神共工',
+			boss_xuanlin_intro3:'&nbsp;第三关',
+			boss_xuanlin_intro3_info:'挑战颛顼、水神玄冥、水神共工',
+			boss_xuanlin_intro3_append:'每通过一关，游戏轮数清零，阵亡角色复活，所有角色重置武将和区域内的牌，并获得4-X张起始手牌，X为阵亡角色数',
 
 			boss_baimang_intro1:'&nbsp;第一关',
 			boss_baimang_intro1_info:'挑战白虎',
