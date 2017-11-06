@@ -5042,6 +5042,23 @@
                             }
                         }
                     },
+					room_button:{
+						name:'创建服务器按钮',
+                        init:false,
+                        frequent:true,
+						intro:'开启后可创建一个空房间但不加入游戏',
+                        onclick:function(bool){
+                            game.saveConfig('room_button',bool,'connect');
+                            if(ui.connectRoom){
+                                if(bool){
+                                    ui.connectRoom.style.display='';
+                                }
+                                else{
+                                    ui.connectRoom.style.display='none';
+                                }
+                            }
+                        }
+					}
                 }
             },
 			boss:{
@@ -21287,6 +21304,9 @@
 									game.reload();
 								}
 							});
+							if(!get.config('room_button')){
+								ui.connectRoom.style.display='none';
+							}
 
 							ui.connectEvents=ui.create.div('.forceopaque.menubutton.large.connectevents.pointerdiv','约战',ui.window,ui.click.connectEvents);
 							ui.connectEventsCount=ui.create.div('.forceopaque.menubutton.icon.connectevents.highlight.hidden','',ui.window);
@@ -36479,8 +36499,14 @@
 					ui.window.classList.add('server');
 					var serverinfo=ui.create.div('.serverinfo',ui.window);
 					ui.create.div('','服务器正在运行',serverinfo);
-					ui.create.div('','<div>房间人数：</div><div id="server_count">0</div>',serverinfo);
-					ui.create.div('','<div>房间状态：</div><div id="server_status">空闲</div>',serverinfo);
+					var serverinfotable=ui.create.table(2,2,ui.create.div(serverinfo));
+					serverinfotable.style.display='inline-block';
+					serverinfotable.firstChild.firstChild.innerHTML='房间人数：';
+					serverinfotable.firstChild.lastChild.id='server_count';
+					serverinfotable.firstChild.lastChild.innerHTML='0';
+					serverinfotable.lastChild.firstChild.innerHTML='房间状态：';
+					serverinfotable.lastChild.lastChild.id='server_status';
+					serverinfotable.lastChild.lastChild.innerHTML='空闲';
 					ui.create.div('.menubutton.large','关闭服务器',function(){
 						if(_status.gameStarted&&!confirm('关闭服务器当前进行的游戏将终止且不可恢复，是否确定关闭？')){
 							return;
