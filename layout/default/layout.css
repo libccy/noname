@@ -42,6 +42,40 @@ table {
 	transition-property: opacity;
 	overflow: hidden
 }
+#window.server>div:not(.serverinfo){
+	display: none !important;
+}
+#window.server>.serverinfo{
+	width: 400px;
+	height: 200px;
+	font-family: 'xinwei';
+	text-align: center;
+	left: calc(50% - 200px);
+	top: calc(50% - 100px);
+}
+#window.server>.serverinfo>div{
+	position: relative;
+	display: block;
+	font-size: 20px;
+	margin-top: 10px;
+}
+#window.server>.serverinfo>div>div{
+	position: relative;
+	display: inline-block;
+}
+#window.server>.serverinfo>div>div:last-child{
+	width: 60px;
+	text-align: left;
+	white-space: nowrap;
+}
+#window.server>.serverinfo>div>.menubutton.large:last-child{
+	width: auto;
+	margin-top: 30px;
+	cursor: pointer;
+}
+#window.server>.serverinfo>div:first-child{
+	font-size: 40px;
+}
 .statusbar #window {
 	top: 20px;
 	height: calc(100% - 20px);
@@ -2937,6 +2971,10 @@ div:not(.handcards)>.card>.info>span,
 	top: auto;
 	right: 20px;
 	bottom: 20px;
+}
+.connectevents.server{
+	left: 20px;
+	right: auto;
 }
 .connectevents.left{
 	transform: translateX(-85px);

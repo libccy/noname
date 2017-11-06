@@ -5722,6 +5722,14 @@
                     window.isNonameServer=window.location.href.slice(index+18);
                     window.indexedDB=null;
                 }
+				else{
+					index=localStorage.getItem(lib.configprefix+'asserver');
+					if(index){
+						window.isNonameServer=index;
+						window.isNonameServerIp=lib.hallURL;
+					}
+				}
+
 				var htmlbg=localStorage.getItem(lib.configprefix+'background');
 				if(htmlbg){
 					if(htmlbg[0]=='['){
@@ -5743,12 +5751,6 @@
 						document.documentElement.style.backgroundPosition='50% 50%';
 					}
 				}
-
-				// index=localStorage.getItem(lib.configprefix+'asserver');
-				// if(index){
-				// 	window.isNonameServer=index;
-				// 	window.isNonameServerIp=lib.hallURL;
-				// }
 
                 lib.get=get;
                 lib.ui=ui;
@@ -7893,6 +7895,9 @@
                 for(var i in lib.element.client){
                     client[i]=lib.element.client[i];
                 }
+				if(window.isNonameServer){
+					document.querySelector('#server_count').innerHTML=lib.node.clients.length;
+				}
                 ws.on('message',function(messagestr){
                     var message;
                     try{
@@ -9459,11 +9464,16 @@
                         game.onlinezhu='1';
                     }
                     _status.waitingForPlayer=true;
-
+					if(window.isNonameServer){
+						document.querySelector('#server_status').innerHTML='等待中';
+					}
                     game.pause();
                     'step 1'
                     _status.waitingForPlayer=false;
                     lib.configOL.gameStarted=true;
+					if(window.isNonameServer){
+						document.querySelector('#server_status').innerHTML='游戏中';
+					}
                     if(game.onlineroom){
                         game.send('server','config',lib.configOL);
                     }
@@ -21271,6 +21281,13 @@
                             ui.rooms.push(player);
                         }
 						if(events){
+							ui.connectRoom=ui.create.div('.forceopaque.menubutton.large.connectevents.server.pointerdiv','创建服务器',ui.window,function(){
+								if(confirm('通过此选项可创建一个新房间但不加入游戏。是否继续？')){
+									localStorage.setItem(lib.configprefix+'asserver','hall');
+									game.reload();
+								}
+							});
+
 							ui.connectEvents=ui.create.div('.forceopaque.menubutton.large.connectevents.pointerdiv','约战',ui.window,ui.click.connectEvents);
 							ui.connectEventsCount=ui.create.div('.forceopaque.menubutton.icon.connectevents.highlight.hidden','',ui.window);
 							ui.connectClients=ui.create.div('.forceopaque.menubutton.large.connectevents.pointerdiv.left','在线',ui.window,ui.click.connectClients);
@@ -26624,8 +26641,8 @@
                         }
                         lib.configOL.banned=lib.config['connect_'+name+'_banned'];
                         lib.configOL.bannedcards=lib.config['connect_'+name+'_bannedcards'];
-                        lib.configOL.version=lib.versionOL;
                     }
+					lib.configOL.version=lib.versionOL;
                     for(var i in lib.cardPackList){
                         if(lib.configOL.cardPack.contains(i)){
                             lib.card.list=lib.card.list.concat(lib.cardPackList[i]);
@@ -27580,10 +27597,12 @@
                 delete ui.rooms;
             }
 			if(ui.connectEvents){
+				ui.connectRoom.remove();
 				ui.connectEvents.remove();
 				ui.connectEventsCount.remove();
 				ui.connectClients.remove();
 				ui.connectClientsCount.remove();
+				delete ui.connectRoom;
 				delete ui.connectEvents;
 				delete ui.connectEventsCount;
 				delete ui.connectClients;
@@ -36456,6 +36475,20 @@
 					},1000);
 				}
 				lib.setPressure(ui.window,ui.click.pressurepause);
+				if(window.isNonameServer){
+					ui.window.classList.add('server');
+					var serverinfo=ui.create.div('.serverinfo',ui.window);
+					ui.create.div('','服务器正在运行',serverinfo);
+					ui.create.div('','<div>房间人数：</div><div id="server_count">0</div>',serverinfo);
+					ui.create.div('','<div>房间状态：</div><div id="server_status">空闲</div>',serverinfo);
+					ui.create.div('.menubutton.large','关闭服务器',function(){
+						if(_status.gameStarted&&!confirm('关闭服务器当前进行的游戏将终止且不可恢复，是否确定关闭？')){
+							return;
+						}
+						localStorage.removeItem(lib.configprefix+'asserver');
+						game.reload();
+					},ui.create.div('',serverinfo));
+				}
 
 				ui.window.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.window);
 				ui.system=ui.create.div("#system.",ui.window);
