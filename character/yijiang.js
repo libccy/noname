@@ -82,7 +82,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             caiyong:['male','qun',3,['bizhuan','tongbo']],
             jikang:['male','wei',3,['qingxian','juexiang']],
             qinmi:['male','wu',3,['jianzheng','zhuandui','tianbian']],
-    		// xuezong:['male','shu',3,['funan','jiexun']],
+    		xuezong:['male','wu',3,['funan','jiexun']],
     	},
     	characterIntro:{
     		huaxiong:'董卓旗下名将，自荐抵抗山东地区反对董卓的诸侯联军于汜水关前，他先后斩杀济北相鲍信之弟鲍忠和孙坚部将祖茂、以及袁术部将俞涉和韩馥手下潘凤等人，最后关东联军派出关羽与之一对一决斗而被杀。',
@@ -170,6 +170,119 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		liuchen:['liushan'],
     	},
     	skill:{
+            funan:{
+                trigger:{global:['respondAfter','useCardAfter']},
+                filter:function(event,player){
+                    if(!event.respondTo) return false;
+                    if(event.player==player) return false;
+                    if(player!=event.respondTo[0]) return false;
+                    if(get.itemtype(event.cards)!='cards') return false;
+                    if(['h','e','j'].contains(get.position(event.cards[0]))) return false;
+                    if(get.itemtype(event.respondTo[1])!='card') return false;
+                    if(['h','e','j'].contains(get.position(event.respondTo[1]))) return false;
+                    return true;
+                },
+                logTarget:'player',
+                check:function(event,player){
+                    if(get.attitude(player,event.player)>=0) return true;
+                    if(player.hasSkill('funan_jiexun')&&player.storage.funan_jiexun==event.player) return true;
+                    if(event.cards.length>1) return true;
+                    return get.value(event.cards[0])>get.value(event.respondTo[1]);
+                },
+                content:function(){
+                    'step 0'
+                    if(!player.hasSkill('funan_jiexun')||player.storage.funan_jiexun!=trigger.player){
+                        trigger.player.gain(trigger.respondTo[1],'gain2');
+                        trigger.player.addTempSkill('funan_use');
+                        if(!trigger.player.storage.funan_use){
+                            trigger.player.storage.funan_use=[];
+                        }
+                        trigger.player.storage.funan_use.add(trigger.respondTo[1]);
+                    }
+                    'step 1'
+                    player.gain(trigger.cards,'gain2');
+                },
+                subSkill:{
+                    jiexun:{
+                        mark:'character',
+                        intro:{
+                            content:'你发动“复难”时，无须令$获得你使用的牌'
+                        },
+                        trigger:{global:'dieAfter'},
+                        silent:true,
+                        filter:function(event,player){
+                            return player.storage.funan_jiexun==event.player;
+                        },
+                        onremove:true,
+                        content:function(){
+                            player.removeSkill('funan_jiexun');
+                        }
+                    },
+                    use:{
+                        onremove:true,
+                        mod:{
+                            cardEnabled:function(card,player){
+                                if(player.storage.funan_use&&player.storage.funan_use.contains(card)){
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            jiexun:{
+                trigger:{player:'phaseEnd'},
+                filter:function(event,player){
+                    return game.hasPlayer(function(current){
+                        return current.countCards('ej',{suit:'diamond'});
+                    });
+                },
+                init:function(player){
+                    player.storage.jiexun=0;
+                },
+                onremove:true,
+                direct:true,
+                content:function(){
+                    'step 0'
+                    var num1=game.countPlayer(function(current){
+                        return current.countCards('ej',{suit:'diamond'});
+                    });
+                    var num2=player.storage.jiexun;
+                    event.num1=num1;
+                    event.num2=num2;
+                    var str='令目标摸'+get.cnNumber(num1)+'张牌';
+                    if(num2){
+                        str+='，然后弃置'+get.cnNumber(num2)+'张牌；若目标因此法弃置了所有牌，则你失去“诫训”，然后你发动“复难”时，无须令其获得你使用的牌';
+                    }
+                    player.chooseTarget(get.prompt('jiexun')).set('ai',function(target){
+                        return _status.event.coeff*get.attitude(_status.event.player,target);
+                    }).set('coeff',num1>=num2?1:-1).set('prompt2',str);
+                    'step 1'
+                    if(result.bool){
+                        var target=result.targets[0];
+                        event.target=target;
+                        player.logSkill('jiexun',target);
+                        target.draw(event.num1);
+                        player.storage.jiexun++;
+                    }
+                    else{
+                        event.finish();
+                    }
+                    'step 2'
+                    if(event.num2){
+                        event.target.chooseToDiscard(event.num2,true,'he');
+                    }
+                    else{
+                        event.finish();
+                    }
+                    'step 3'
+                    if(!event.target.countCards('he')){
+                        player.removeSkill('jiexun');
+                        player.storage.funan_jiexun=event.target;
+                        player.addSkill('funan_jiexun');
+                    }
+                }
+            },
             zhuandui:{
                 group:['zhuandui_respond','zhuandui_use'],
                 subSkill:{
@@ -8879,6 +8992,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             qinmi:'秦宓',
             caiyong:'蔡邕',
 
+            funan_jiexun:'诫训',
             bizhuan:'辟撰',
             bizhuan_bg:'书',
             bizhuan_info:'当你使用黑桃牌后，或你成为其他角色使用黑桃牌的目标后，你可以将牌堆顶的一张牌置于武将牌上，称为“书”；你至多拥有四张“书”，你每有一张“书” ，手牌上限+1',

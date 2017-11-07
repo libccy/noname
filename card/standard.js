@@ -1685,6 +1685,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							id:id,
 							id2:id2
 						});
+						if(!isJudge){
+							next.set('respondTo',[source,card]);
+						}
 						if(game.online){
 							_status.event._resultid=id;
 							game.resume();
@@ -1809,7 +1812,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					'step 8'
 					if(event.wuxieresult){
-						event.wuxieresult.useResult(event.wuxieresult2);
+						var next=event.wuxieresult.useResult(event.wuxieresult2);
+						if(event.triggername!='phaseJudge'){
+							next.respondTo=[trigger.player,trigger.card];
+						}
 					}
 					'step 9'
 					if(event.wuxieresult){

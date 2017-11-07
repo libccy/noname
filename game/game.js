@@ -9987,7 +9987,10 @@
                         if(info&&info.onrespond){
                             info.onrespond(event.result,player);
                         }
-						player.respond(event.result.cards,event.result.card,event.animate,event.result.skill,event.source);
+						var next=player.respond(event.result.cards,event.result.card,event.animate,event.result.skill,event.source);
+						if(event.parent.card&&event.parent.type=='card'){
+							next.set('respondTo',[event.parent.player,event.parent.card]);
+						}
 					}
 					if(event.dialog&&event.dialog.close) event.dialog.close();
 				},
@@ -11660,6 +11663,7 @@
 						next.card=card;
 						next.cards=cards;
 						next.player=player;
+						next.type='precard';
 					}
 					else if(info.reverseOrder&&get.is.versus()&&targets.length>1){
 						var next=game.createEvent(card.name+'ContentBefore');
@@ -11668,6 +11672,7 @@
 						next.card=card;
 						next.cards=cards;
 						next.player=player;
+						next.type='precard';
 					}
 					"step 2"
 					if(targets[num]&&targets[num].isDead()) return;
@@ -11749,6 +11754,7 @@
 						next.cards=cards;
 						next.player=player;
 						next.preResult=event.preResult;
+						next.type='postcard';
 					}
 					"step 5"
                     if(event.postAi){
@@ -15255,11 +15261,14 @@
                     }
                     if(result.card||!result.skill){
 						result.used=result.card||result.cards[0];
-                        this.useCard(result.card,result.cards,result.targets,result.skill).oncard=event.oncard;
+						var next=this.useCard(result.card,result.cards,result.targets,result.skill);
+                        next.oncard=event.oncard;
+						next.respondTo=event.respondTo;
+						return next;
                     }
                     else if(result.skill){
 						result.used=result.skill;
-                        this.useSkill(result.skill,result.cards,result.targets);
+                        return this.useSkill(result.skill,result.cards,result.targets);
                     }
                 },
 				useCard:function(){
