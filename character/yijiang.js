@@ -170,10 +170,105 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		liuchen:['liushan'],
     	},
     	skill:{
+            zhuandui:{
+                group:['zhuandui_respond','zhuandui_use'],
+                subSkill:{
+                    use:{
+                        trigger:{player:'shaBegin'},
+                        check:function(event,player){
+                            return get.attitude(player,event.target)<0;
+                        },
+                        filter:function(event,player){
+                            return player.countCards('h')>0&&event.target.countCards('h')>0&&event.target!=player;
+                        },
+                        logTarget:'target',
+                        content:function(){
+                            'step 0'
+                            player.chooseToCompare(trigger.target);
+                            'step 1'
+                            if(result.bool){
+                                trigger.directHit=true;
+                            }
+                        }
+                    },
+                    respond:{
+                        trigger:{target:'shaBegin'},
+                        check:function(event,player){
+                            return get.effect(player,event.card,event.player,player)<0;
+                        },
+                        filter:function(event,player){
+                            return player.countCards('h')>0&&event.player.countCards('h')>0&&event.player!=player;
+                        },
+                        logTarget:'player',
+                        content:function(){
+                            'step 0'
+                            player.chooseToCompare(trigger.player);
+                            'step 1'
+                            if(result.bool){
+                                trigger.skipShan=true;
+                            }
+                        }
+                    }
+                },
+                ai:{
+                    effect:{
+                        target:{
+                            function(card,player,target,current){
+                                if(card.name=='sha'&&current<0) return 0.7;
+                            }
+                        }
+                    }
+                }
+            },
+            tianbian:{
+                trigger:{player:'chooseCardBegin'},
+                check:function(event,player){
+                    return player.hasCard(function(card){
+                        var val=get.value(card);
+                        return val<0||(val<=4&&card.number>=11);
+                    });
+                },
+                filter:function(event){
+                    return event.type=='compare'&&!event.directresult;
+                },
+                content:function(){
+                    var cards=get.cards();
+                    ui.discardPile.appendChild(cards[0]);
+                    cards[0].vanishtag.add('tianbian');
+                    trigger.directresult=cards;
+                    trigger.untrigger();
+                },
+                group:'tianbian_number',
+                subSkill:{
+                    number:{
+                        trigger:{player:'compare',target:'compare'},
+        				filter:function(event,player){
+                            if(event.iwhile) return false;
+                            if(event.player==player){
+                                return get.suit(event.card1)=='heart'&&event.card1.vanishtag.contains('tianbian');
+                            }
+                            else{
+                                return get.suit(event.card2)=='heart'&&event.card2.vanishtag.contains('tianbian');
+                            }
+        				},
+        				silent:true,
+        				content:function(){
+                            game.log(player,'拼点牌点数视为13');
+                            if(player==trigger.player){
+                                trigger.num1=13;
+                            }
+                            else{
+                                trigger.num2=13;
+                            }
+        				}
+                    }
+                }
+            },
             jianzheng:{
                 trigger:{global:'useCard'},
                 filter:function(event,player){
-                    return event.card.name=='sha'&&!event.targets.contains(player)&&get.distance(event.player,player,'attack')<=1;
+                    return event.player!=player&&event.card.name=='sha'&&!event.targets.contains(player)&&
+                        get.distance(event.player,player,'attack')<=1;
                 },
                 direct:true,
                 content:function(){
@@ -201,7 +296,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             effect+=6;
                         }
                     }
-					player.chooseCard('h',get.prompt2('jianzheng')).set('ai',function(card){
+					player.chooseCard('h',get.prompt2('jianzheng',trigger.player)).set('ai',function(card){
                         if(_status.event.effect>=0){
                             var val=get.value(card);
                             if(val<0) return 10-val;
@@ -235,6 +330,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     if(event.card){
     					event.card.fix();
     					ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
+                    }
+                    "step 5"
+                    if(get.color(trigger.card)!='black'){
+                        trigger.targets.push(player);
+                        trigger.player.line(player);
+                        game.delay();
+                        trigger.trigger('useCard');
                     }
                 }
             },
@@ -8801,6 +8903,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             jianzheng_info:'当一名其他角色使用【杀】指定目标时，若你在其攻击范围内且你不是目标，则你可以将一张手牌置于牌堆顶，取消所有目标，然后若此【杀】不为黑色，你成为目标',
             zhuandui:'专对',
             zhuandui_info:'当你使用【杀】指定目标/成为【杀】的目标后，你可以与目标角色/此【杀】使用者拼点，若你赢，此杀不能被【闪】响应/对你无效',
+            zhuandui_use_info:'当你使用【杀】指定目标后，你可以与目标角色拼点，若你赢，此杀不能被【闪】响应',
+            zhuandui_respond_info:'当你成为【杀】的目标后，你可以与此【杀】使用者拼点，若你赢，此杀对你无效',
             tianbian:'天辩',
             tianbian_info:'你拼点时，可以改为用牌堆顶的一张牌进行拼点；当你拼点的牌亮出后，若此牌花色为红桃，则点数视为K',
             funan:'复难',

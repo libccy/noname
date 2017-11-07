@@ -10148,7 +10148,7 @@
                     "step 1"
                     event.list=targets.slice(0);
                     event.list.unshift(player);
-                    player.chooseCardOL(event.list,'请选择拼点牌',true).set('ai',event.ai).set('source',player).aiCard=function(target){
+                    player.chooseCardOL(event.list,'请选择拼点牌',true).set('type','compare').set('ai',event.ai).set('source',player).aiCard=function(target){
                         var hs=target.getCards('h');
                         var event=_status.event;
                         event.player=target;
@@ -10260,19 +10260,19 @@
                         player.wait(sendback);
                         event.ol=true;
                         player.send(function(ai){
-                            game.me.chooseCard('请选择拼点牌',true).set('glow_result',true).ai=ai;
+                            game.me.chooseCard('请选择拼点牌',true).set('type','compare').set('glow_result',true).ai=ai;
                             game.resume();
                         },event.ai);
                     }
                     else{
                         event.localPlayer=true;
-                        player.chooseCard('请选择拼点牌',true).set('glow_result',true).ai=event.ai;
+                        player.chooseCard('请选择拼点牌',true).set('type','compare').set('glow_result',true).ai=event.ai;
                     }
                     if(target.isOnline()){
                         target.wait(sendback);
                         event.ol=true;
                         target.send(function(ai){
-                            game.me.chooseCard('请选择拼点牌',true).set('glow_result',true).ai=ai;
+                            game.me.chooseCard('请选择拼点牌',true).set('type','compare').set('glow_result',true).ai=ai;
                             game.resume();
                         },event.ai);
                     }
@@ -10284,7 +10284,7 @@
                         event.card1=result.cards[0];
                     }
                     if(event.localTarget){
-                        target.chooseCard('请选择拼点牌',true).set('glow_result',true).ai=event.ai;
+                        target.chooseCard('请选择拼点牌',true).set('type','compare').set('glow_result',true).ai=event.ai;
                     }
                     "step 3"
                     if(event.localTarget){
@@ -10336,6 +10336,7 @@
 					var str;
 					if(event.num1>event.num2){
 						event.result.bool=true;
+						event.result.winner=player;
                         str=get.translation(player.name)+'拼点成功';
 						player.popup('胜');
 						target.popup('负');
@@ -10349,6 +10350,7 @@
 							target.popup('平');
 						}
 						else{
+							event.result.winner=target;
 							player.popup('负');
 							target.popup('胜');
 						}
@@ -10571,39 +10573,51 @@
                 },
 				chooseCard:function(){
 					"step 0"
-					game.check();
-					if(event.isMine()){
-						game.pause();
-						if(event.prompt!=false){
-							var str;
-							if(typeof event.prompt=='string') str=event.prompt;
-							else{
-								str='请选择'
-								var range=get.select(event.selectCard);
-								if(range[0]==range[1]) str+=get.cnNumber(range[0]);
-								else if(range[1]==Infinity) str+='至少'+get.cnNumber(range[0]);
-								else str+=get.cnNumber(range[0])+'至'+get.cnNumber(range[1]);
-								str+='张';
-								if(event.position=='h'||event.position==undefined) str+='手';
-								if(event.position=='e') str+='装备';
-								str+='牌';
-							}
-							event.dialog=ui.create.dialog(str);
-							if(event.prompt2){
-								event.dialog.addText(event.prompt2,event.prompt2.length<=20);
-							}
-							event.promptbar=event.dialog.add('0/'+get.numStr(event.selectCard[1],'card'));
-							event.custom.add.card=function(){
-								_status.event.promptbar.innerHTML=
-								ui.selected.cards.length+'/'+get.numStr(_status.event.selectCard[1],'card');
+					if(event.directresult){
+						event.result={
+							buttons:[],
+							cards:event.directresult.slice(0),
+							targets:[],
+							confirm:'ok',
+							bool:true,
+							links:[]
+						};
+					}
+					else{
+						game.check();
+						if(event.isMine()){
+							game.pause();
+							if(event.prompt!=false){
+								var str;
+								if(typeof event.prompt=='string') str=event.prompt;
+								else{
+									str='请选择'
+									var range=get.select(event.selectCard);
+									if(range[0]==range[1]) str+=get.cnNumber(range[0]);
+									else if(range[1]==Infinity) str+='至少'+get.cnNumber(range[0]);
+									else str+=get.cnNumber(range[0])+'至'+get.cnNumber(range[1]);
+									str+='张';
+									if(event.position=='h'||event.position==undefined) str+='手';
+									if(event.position=='e') str+='装备';
+									str+='牌';
+								}
+								event.dialog=ui.create.dialog(str);
+								if(event.prompt2){
+									event.dialog.addText(event.prompt2,event.prompt2.length<=20);
+								}
+								event.promptbar=event.dialog.add('0/'+get.numStr(event.selectCard[1],'card'));
+								event.custom.add.card=function(){
+									_status.event.promptbar.innerHTML=
+									ui.selected.cards.length+'/'+get.numStr(_status.event.selectCard[1],'card');
+								}
 							}
 						}
-					}
-                    else if(event.isOnline()){
-                        event.send();
-                    }
-					else{
-						event.result='ai';
+	                    else if(event.isOnline()){
+	                        event.send();
+	                    }
+						else{
+							event.result='ai';
+						}
 					}
 					"step 1"
                     if(event.result=='ai'){
@@ -10624,7 +10638,7 @@
                     }
                     "step 2"
 					event.resume();
-                    if(event.glow_result&&event.result.cards){
+                    if(event.glow_result&&event.result.cards&&!event.directresult){
                         for(var i=0;i<event.result.cards.length;i++){
                             event.result.cards[i].classList.add('glow');
                         }

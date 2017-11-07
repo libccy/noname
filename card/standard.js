@@ -76,11 +76,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						event.shanRequired=1;
 					}
 					"step 1"
-					if(event.skipShan){
-						event._result={bool:true};
-					}
-					else if(event.directHit){
+					if(event.directHit){
 						event._result={bool:false};
+					}
+					else if(event.skipShan){
+						event._result={bool:true};
 					}
 					else{
 						var next=target.chooseToRespond({name:'shan'});
