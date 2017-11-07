@@ -233,13 +233,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	            direct:true,
 	            content:function(){
 	                "step 0"
-	                game.delay(0.5);
 	                player.chooseTarget(get.prompt('juechen'),function(card,player,target){
 	                    return player!=target&&!trigger.targets.contains(target)&&target.countCards('he')>0;
-	                }).ai=function(target){
+	                }).set('autodelay',true).ai=function(target){
 	                    return -get.attitude(player,target);
 	                }
-	                "step 1"
+					"step 1"
 	                if(result.bool){
 	                    player.logSkill('juechen',result.targets);
 	                    player.discardPlayerCard(true,result.targets[0],'he');

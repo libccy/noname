@@ -953,7 +953,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				content:function(){
 					'step 0'
-					game.delay(0.5);
+					game.delayx();
 					player.addExpose(0.1);
 					trigger.player.addExpose(0.1);
 					'step 1'

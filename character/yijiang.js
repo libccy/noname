@@ -81,7 +81,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
             caiyong:['male','qun',3,['bizhuan','tongbo']],
             jikang:['male','wei',3,['qingxian','juexiang']],
-            // qinmi:['male','wu',3,['jianzheng','zhuandui','tianbian']],
+            qinmi:['male','wu',3,['jianzheng','zhuandui','tianbian']],
     		// xuezong:['male','shu',3,['funan','jiexun']],
     	},
     	characterIntro:{
@@ -170,8 +170,81 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		liuchen:['liushan'],
     	},
     	skill:{
+            jianzheng:{
+                trigger:{global:'useCard'},
+                filter:function(event,player){
+                    return event.card.name=='sha'&&!event.targets.contains(player)&&get.distance(event.player,player,'attack')<=1;
+                },
+                direct:true,
+                content:function(){
+                    "step 0"
+					var effect=0;
+                    for(var i=0;i<trigger.targets.length;i++){
+						effect-=get.effect(trigger.targets[i],trigger.card,trigger.player,player);
+					}
+                    if(effect>0){
+                        if(get.color(trigger.card)!='black'){
+                            effect=0;
+                        }
+                        else{
+                            effect=1;
+                        }
+                        if(trigger.targets.length==1){
+                            if(trigger.targets[0].hp==1){
+                                effect++;
+                            }
+                            if(effect>0&&trigger.targets[0].countCards('h')<player.countCards('h')){
+                                effect++;
+                            }
+                        }
+                        if(effect>0){
+                            effect+=6;
+                        }
+                    }
+					player.chooseCard('h',get.prompt2('jianzheng')).set('ai',function(card){
+                        if(_status.event.effect>=0){
+                            var val=get.value(card);
+                            if(val<0) return 10-val;
+    						return _status.event.effect-val;
+                        }
+                        return 0;
+                    }).set('effect',effect).set('logSkill',['jianzheng',trigger.player]);
+					"step 1"
+                    if(result.bool&&result.cards){
+                        event.card=result.cards[0];
+                        trigger.targets.length=0;
+                        trigger.untrigger();
+    				}
+    				else{
+    					event.finish();
+    				}
+    				"step 2"
+    				if(!event.isMine()) game.delayx();
+    				"step 3"
+    				if(event.card){
+                        player.logSkill('jianzheng',trigger.player);
+                        player.lose(result.cards,ui.special);
+                        game.broadcastAll(function(player){
+                            var cardx=ui.create.card();
+                            cardx.classList.add('infohidden');
+                            cardx.classList.add('infoflip');
+                            player.$throw(cardx,1000,'nobroadcast');
+                        },player);
+    				}
+                    "step 4"
+                    if(event.card){
+    					event.card.fix();
+    					ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
+                    }
+                }
+            },
             qingxian:{
                 group:['qingxian_jilie','qingxian_rouhe'],
+                ai:{
+                    threaten:0.8,
+                    maixie:true,
+                    maixie_hp:true
+                },
                 subSkill:{
                     rouhe:{
                         trigger:{player:'recoverEnd'},
@@ -1180,7 +1253,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
         					});
             				'step 1'
             				if(result.bool){
-            					if(!event.isMine()) game.delay(0.5);
+            					if(!event.isMine()) game.delayx();
             					event.targets=result.targets;
             				}
             				else{
@@ -5633,7 +5706,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     				'step 1'
     				if(result.bool){
-    					if(!event.isMine()) game.delay(0.5);
+    					if(!event.isMine()) game.delayx();
     					event.target=result.targets[0];
     				}
     				else{

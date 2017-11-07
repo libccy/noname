@@ -565,7 +565,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'player',
 				content:function(){
 					'step 0'
-					game.delay(0.5);
+					game.delayx();
 					trigger.player.die();
 					'step 1'
 					if(!trigger.player.isAlive()){
@@ -2297,9 +2297,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						str+='对'+get.translation(trigger.targets);
 					}
 					str+='的'+get.translation(trigger.card)+'失效';
-					if(event.isMine()||effect<0){
-						game.delay(0.5);
-					}
 					var next=player.chooseToDiscard('h',{name:'sha'},get.prompt('feigong'));
 					next.prompt2=str;
 					next.ai=function(card){
@@ -2308,6 +2305,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						return -1;
 					}
+					next.autodelay=true;
 					next.logSkill=['feigong',trigger.player];
 					"step 1"
 					if(result.bool){

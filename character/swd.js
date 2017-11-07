@@ -1016,11 +1016,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     							return lib.filter.targetEnabled({name:'sha'},player,target);
     						}).set('ai',function(target){
     							return get.effect(target,{name:'sha'},_status.event.player);
-    						});
+    						}).set('autodelay',0.5);
     						'step 1'
     						if(result.bool){
     							player.logSkill('xuanying');
-    							if(!event.isMine()) game.delay(0.5);
     							player.link();
     							player.useCard({name:'sha'},result.targets,false);
     						}
@@ -2095,10 +2094,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				"step 0"
-    				game.delay(0.5);
     				player.chooseTarget(get.prompt('yuchen'),function(card,player,target){
     					return player!=target&&target.countCards('he')>0;
-    				}).ai=function(target){
+    				}).set('autodelay',trigger.name=='respond'?0.5:1).ai=function(target){
     					return -get.attitude(player,target);
     				};
     				"step 1"
@@ -2390,10 +2388,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					}
     				}
     				event.cards=cards;
-    				game.delay(0.5);
     				player.chooseTarget(get.prompt('fzhenwei'),function(card,player,target){
     					return target!=trigger.player;
-    				}).ai=function(target){
+    				}).set('autodelay',0.5).ai=function(target){
     					var att=get.attitude(player,target);
     					if(att<=0) return 0;
     					if(att>3){
@@ -5374,11 +5371,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				"step 0"
-    				game.delay(0.5);
     				player.chooseTarget([1,1],'请选择巧械的目标',function(card,player,target){
     					if(player==target) return false;
     					return target.countCards('he')>0;
-    				}).ai=function(target){
+    				}).set('autodelay',0.5).ai=function(target){
     					return -get.attitude(player,target);
     				};
     				"step 1"
@@ -6161,7 +6157,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				"step 0"
-    				game.delay(0.5);
     				player.chooseCardTarget({
     					prompt:get.prompt('xielei'),
     					filterCard:lib.filter.cardDiscardable,
@@ -6182,7 +6177,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						return get.damageEffect(target,player,player,'thunder');
     					}
     				});
-    				"step 1"
+                    "step 1"
+                    if(result.bool&&!event.isMine()){
+                        game.delayx();
+                    }
+    				"step 2"
     				if(result.bool){
     					player.logSkill('xielei',result.targets,'thunder');
     					player.discard(result.cards);

@@ -4652,9 +4652,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					str+='对'+get.translation(trigger.targets);
     				}
     				str+='的'+get.translation(trigger.card)+'失效？';
-    				if(event.isMine()||effect<0){
-    					game.delay(0.5);
-    				}
     				var next=player.chooseToDiscard('h',function(card){
     					return card.name=='shan';
     				},str);
@@ -4664,6 +4661,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					}
     					return -1;
     				}
+                    next.autodelay=true;
     				next.logSkill=['biri',trigger.targets];
     				"step 1"
     				if(result.bool){
@@ -5638,13 +5636,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				'step 0'
-    				if(!event.isMine()) game.delay(0.5);
-    				'step 1'
     				player.addTempSkill('fengxing2');
     				player.chooseToDiscard('he',get.prompt('fengxing')).set('ai',function(card){
     					return 7-get.value(card);
-    				}).logSkill='fengxing';
-    				'step 2'
+    				}).set('autodelay',0.5).logSkill='fengxing';
+    				'step 1'
     				if(result.bool){
     					player.draw(2);
     				}
@@ -5903,6 +5899,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     }
                     return '从三张随机牌中选择一张代替'+name1+'对'+name2+'使用的'+get.translation(event.card);
                 },
+                autodelay:true,
     			content:function(){
                     'step 0'
                     var list=[],list1=[],list2=[];
@@ -5940,7 +5937,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         );
                         event.card=card;
     					game.log(player,'将',trigger.card,'变为',card);
-    					if(!event.isMine()) game.delay();
+    					// if(!event.isMine()) game.delayx();
     					trigger.untrigger();
     					trigger.card=card;
     					trigger.cards=[card];
@@ -5956,7 +5953,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     else{
                         player.line(trigger.player,'green');
                     }
-                    game.delay(0.5);
+                    game.delayx(0.5);
     				'step 3'
     				trigger.trigger('useCard');
     			},

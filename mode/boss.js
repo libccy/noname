@@ -1665,14 +1665,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				group:'boss_lingqu_cancel',
 				subSkill:{
 					cancel:{
-						trigger:{player:'damageBefore'},
+						trigger:{player:'damageBegin'},
 						priority:-11,
 						forced:true,
 						filter:function(event){
 							return event.num>1;
 						},
 						content:function(){
-							trigger.cancel();
+							trigger.num=0;
 						}
 					}
 				}

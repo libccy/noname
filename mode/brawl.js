@@ -1015,6 +1015,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 	                    node.style.left='calc(50% - 60px)';
 	                    node.style.top='calc(50% - 60px)';
 	                    node.index=i;
+						node.style.borderRadius='100%';
+						node.node.avatar.style.borderRadius='100%';
+						node.node.name.remove();
 	                    setPos(node);
 	                    this.appendChild(node);
 	                }

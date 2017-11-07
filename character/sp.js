@@ -590,7 +590,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 },
                 content:function(){
                     'step 0'
-                    game.delay(0.5);
+                    game.delayx();
                     'step 1'
                     var target=player.storage.xianfu2;
                     player.line(target,'green');
@@ -1843,7 +1843,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     }
     				'step 3'
     				if(result.bool){
-    					if(!event.isMine()) game.delay(0.5);
+    					if(!event.isMine()) game.delayx();
     					event.target=result.targets[0];
     				}
     				else{
@@ -1997,7 +1997,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			content:function(){
     				'step 0'
-    				game.delay(0.5);
+    				game.delayx();
     				'step 1'
     				player.line(player.storage.fuman2,'green');
     				player.storage.fuman2.draw();
@@ -2166,7 +2166,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				});
     				'step 1'
     				if(result.bool){
-    					if(!event.isMine()&&!_status.connectMode) game.delay(0.5);
+    					if(!event.isMine()&&!_status.connectMode) game.delayx();
     					event.target=result.targets[0];
     				}
     				else{
@@ -3823,10 +3823,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     				return false;
     			},
+                autodelay:true,
     			content:function(){
-    				'step 0'
-    				game.delay(0.5);
-    				'step 1'
     				trigger.targets.add(player);
     				trigger.player.line(player,'green');
     			}
@@ -6959,10 +6957,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         get.suit(event.player.storage.zhoufu2)==get.suit(event.card);
                 },
                 forced:true,
+                autodelay:true,
                 content:function(){
-                    'step 0'
-                    game.delay(0.5);
-                    'step 1'
                     player.draw();
                     if(trigger.player.storage.zhoufu2_markcount==1){
                         trigger.player.removeSkill('zhoufu2');

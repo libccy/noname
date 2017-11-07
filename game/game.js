@@ -9284,7 +9284,17 @@
 							}
     					}
     				}
-    				"step 3"
+					"step 3"
+					var info=get.info(event.skill);
+					if(result&&result.bool!=false&&info.autodelay&&(info.forced||!event.isMine())){
+						if(typeof info.autodelay=='number'){
+							game.delayx(info.autodelay);
+						}
+						else{
+							game.delayx();
+						}
+					}
+    				"step 4"
     				var info=get.info(event.skill);
     				if(result&&result.bool==false){
 						if(info.oncancel) info.oncancel(trigger,player);
@@ -10088,6 +10098,17 @@
 					if(event.promptdiscard){
 						event.promptdiscard.close();
 					}
+					"step 3"
+					if(event.result.bool&&event.result.cards&&event.result.cards.length&&
+						!game.online&&event.autodelay&&!event.isMine()){
+						if(typeof event.autodelay=='number'){
+							game.delayx(event.autodelay);
+						}
+						else{
+							game.delayx();
+						}
+					}
+					"step 4"
 					if(event.logSkill&&event.result.bool&&!game.online){
 						if(typeof event.logSkill=='string'){
 							player.logSkill(event.logSkill);
@@ -10666,6 +10687,14 @@
 					"step 2"
 					if(event.onresult){
 						event.onresult(event.result);
+					}
+					if(event.result.bool&&event.autodelay&&!event.isMine()){
+						if(typeof event.autodelay=='number'){
+							game.delayx(event.autodelay);
+						}
+						else{
+							game.delayx();
+						}
 					}
 				},
 				chooseCardTarget:function(){

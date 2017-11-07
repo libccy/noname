@@ -90,7 +90,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						next.set('ai',function(card){
 							var target=_status.event.player;
 							var evt=_status.event.getParent();
-							if(target.countCards('h','shan')<_status.event.shanRequired){
+							if(_status.event.shanRequired>1&&target.countCards('h','shan')<_status.event.shanRequired){
 								return -1
 							}
 							if(target.hasSkillTag('useShan')){

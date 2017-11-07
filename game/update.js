@@ -1,9 +1,9 @@
 window.noname_update={
-    version:'1.9.40.1',
+    version:'1.9.40.2',
     // update:'1.9.38.1',
     changeLog:[
         // '武将称号',
-        '神之试炼',
+        // '神之试炼',
         'bug修复'
     ],
     files:[
