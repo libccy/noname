@@ -65,12 +65,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{target:'useCardToBefore'},
 						priority:6,
 						forced:true,
-						// mark:true,
-						// intro:{
-						// 	nocount:true,
-						// 	content:'直到下一回合开始，当成为某类型的卡牌的惟一目标时，将目标转移给某名其他角色'
-						// },
 						onremove:true,
+						group:'mhuanyi_die',
 						filter:function(event,player){
 							if(!player.storage.mhuanyi_target) return false;
 							if(event.player==player.storage.mhuanyi_target[0]) return false;
@@ -93,6 +89,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger.untrigger();
 							trigger.trigger('useCardToBefore');
 							trigger.trigger(trigger.card.name+'Before');
+							player.removeSkill('mhuanyi_target');
+						}
+					},
+					die:{
+						trigger:{global:'dieAfter'},
+						silent:true,
+						filter:function(event,player){
+							if(!player.storage.mhuanyi_target) return false;
+							return event.player==player.storage.mhuanyi_target[0];
+						},
+						content:function(){
 							player.removeSkill('mhuanyi_target');
 						}
 					}
