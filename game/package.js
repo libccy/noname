@@ -11,6 +11,7 @@ window.noname_package={
         yxs:'英雄杀',
         hearth:'炉石传说',
         gwent:'昆特牌',
+        mtg:'万智牌',
         ow:'守望先锋',
         swd:'轩辕剑',
         gujian:'古剑奇谭',

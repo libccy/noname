@@ -1561,6 +1561,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				forced:true,
 				filter:function(event,player){
+					if(event.card.storage&&event.card.storage.nowuxie) return false;
 					if(event.name!='phaseJudge'){
 						var info=get.info(event.card);
 						if(!event.target){

@@ -5534,7 +5534,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			}
     		},
     		mieji:{
-    			trigger:{player:'useCardBegin'},
+    			trigger:{player:'useCard'},
     			direct:true,
     			audio:2,
     			filter:function(event,player){
@@ -5546,7 +5546,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.chooseTarget(get.prompt('mieji'),function(card,player,target){
     					var trigger=_status.event.getTrigger();
     					return lib.filter.filterTarget(trigger.card,player,target)&&target!=trigger.targets[0];
-    				}).set('ai',function(target){
+    				}).set('autodelay',true).set('ai',function(target){
     					var trigger=_status.event.getTrigger();
     					var player=_status.event.player;
     					return get.effect(target,trigger.card,player,player);

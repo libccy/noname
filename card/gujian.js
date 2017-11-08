@@ -1320,6 +1320,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	        mutoumianju_skill:{
 				enable:'chooseToUse',
 				filterCard:true,
+				usable:1,
 				viewAs:{name:'sha'},
 				viewAsFilter:function(player){
 					if(!player.countCards('h')) return false;
@@ -1577,7 +1578,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	        mutoumianju:'木头面具',
 	        mutoumianju_info:'你可以将一张手牌当作杀使用',
 	        mutoumianju_skill:'木杀',
-	        mutoumianju_skill_info:'你可以将一张手牌当作杀使用',
+	        mutoumianju_skill_info:'出牌阶段限一次，你可以将一张手牌当作杀使用',
 	        heilonglinpian:'黑龙鳞片',
 	        heilonglinpian_info:'出牌阶段对自己使用，获得一点护甲，直到下一回合开始，你的防御距离+1',
 

@@ -8839,7 +8839,15 @@
 				for(var i=0;i<cards.length;i++){
 					cards[i].discard();
 				}
+				player.removeEquipTrigger();
 				player.update();
+			},
+			to:function(){
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=game.me){
+						cheat.t(i);
+					}
+				}
 			},
 			k:function(i){
 				if(i==undefined) i=1;
@@ -9665,7 +9673,17 @@
 							event.num--;
 						}
 						if(event.num>0){
-							player.draw(event.num);
+							var num=event.num;
+							if(event.attachDraw){
+								for(var i=0;i<event.attachDraw.length;i++){
+									ui.cardPile.insertBefore(event.attachDraw[i],ui.cardPile.firstChild);
+								}
+								num+=event.attachDraw.length;
+							}
+							var next=player.draw(num);
+							if(event.attachDraw){
+								next.minnum=event.attachDraw.length;
+							}
 						}
 					}
                     "step 1"
@@ -11999,6 +12017,9 @@
     				// 		game.playAudio('effect','draw');
     				// 	}
                     // });
+					if(typeof event.minnum=='number'&&num<event.minnum){
+						num=event.minnum;
+					}
 					if(event.drawDeck){
 						if(event.drawDeck>num){
 							event.drawDeck=num;
@@ -12385,9 +12406,9 @@
                         cards[i].classList.remove('glow');
                         cards[i].recheck();
 						var info=lib.card[cards[i].name];
-						if(info.destroy){
+						if(info.destroy||cards[i]._destroy){
 							cards[i].delete();
-							cards[i].destroyed=info.destroy;
+							cards[i].destroyed=info.destroy||cards[i]._destroy;
 						}
 						else if(event.position){
 							cards[i].goto(event.position);
@@ -19127,6 +19148,9 @@
 							card[3]='thunder';
 						}
 					}
+					else if(typeof card=='object'){
+						card=[card.suit,card.number,card.name,card.nature];
+					}
                     if(!lib.card[card[2]]){
                         lib.card[card[2]]={};
                     }
@@ -19177,6 +19201,7 @@
 					this.classList.remove('fullimage');
 					this.classList.remove('fullborder');
 					this.node.name.dataset.nature='';
+					this.node.info.classList.remove('red');
 					if(!lib.config.hide_card_image&&lib.card[bg].fullskin){
 						this.classList.add('fullskin');
 						if(img){
@@ -41820,6 +41845,7 @@
             for(var i in lib.card){
 				if(lib.card[i].mode&&lib.card[i].mode.contains(get.mode())==false) continue;
 				// if(lib.card[i].vanish||lib.card[i].destroy) continue;
+				if(lib.card[i].destroy) continue;
                 if(typeof filter=='function'&&!filter(i)) continue;
 				if(lib.config.bannedcards.contains(i)) continue;
                 if(!lib.translate[i+'_info']) continue;
@@ -41838,7 +41864,8 @@
 			var list=[];
 			for(var i in lib.card){
 				if(lib.card[i].mode&&lib.card[i].mode.contains(get.mode())==false) continue;
-				if(lib.card[i].vanish||lib.card[i].destroy) continue;
+				// if(lib.card[i].vanish||lib.card[i].destroy) continue;
+				if(lib.card[i].destroy) continue;
 				if(lib.config.bannedcards.contains(i)) continue;
 				if(!lib.translate[i+'_info']) continue;
 				if(filter(lib.card[i],i)){

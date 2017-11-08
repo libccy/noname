@@ -427,7 +427,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xiaoyue:{
-				trigger:{player:'phaseBegin'},
+				trigger:{global:'roundStart'},
 				forced:true,
 				filter:function(event,player){
 					return player.countCards('h','sha');
@@ -4149,7 +4149,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lingdi:'灵笛',
 			lingdi_info:'出牌阶段，你可以弃置一张本回合与此法弃置的牌花色均不同的手牌，然后选择一名与你距离为X的角色与其各摸一张牌，X为本回合发动灵笛的次数（含此次）',
 			xiaoyue:'啸月',
-			xiaoyue_info:'锁定技，准备阶段，若你手牌中有杀，你将手牌中的一张随机杀对一名随机敌方角色使用，然后获得一点护甲',
+			xiaoyue_info:'锁定技，每轮开始时，若你手牌中有杀，你将手牌中的一张随机杀对一名随机敌方角色使用，然后获得一点护甲',
 			minsha:'冥煞',
 			minsha_info:'出牌阶段限一次，你可以弃置两张牌，对一名体力值大于1的其他角色造成一点雷属性伤害，然后距离目标1以内的所有其他角色随机弃置一张牌',
 			xhuanlei:'唤雷',
