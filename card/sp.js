@@ -654,10 +654,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					for(var i=0;i<cards.length;i++){
-						ui.special.appendChild(cards[i]);
+						if(!cards[i].destroyed){
+							ui.special.appendChild(cards[i]);
+						}
+						else{
+							cards[i].remove();
+							cards.splice(i--,1);
+						}
 					}
 					var muniu=player.getEquip(5);
-					if(!muniu){
+					if(!muniu||!cards.length){
 						for(var i=0;i<cards.length;i++){
 							ui.discardPile.appendChild(cards[i]);
 						}

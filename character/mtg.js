@@ -19,19 +19,217 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mtg_ayeni:'金鬃阿耶尼是使用白色法术的鹏洛客。他长于净化身体与心灵的法术：用咒语来治疗、强化盟友，以及唤醒他人内在的心灵精华。',
 		},
 	    skill:{
+			mhuanyi:{
+				round:2,
+				trigger:{player:'phaseEnd'},
+				direct:true,
+				addintro:function(storage,player){
+					if(player.hasSkill('mhuanyi_target')){
+						return '直到下一回合开始，当成为某类型的卡牌的惟一目标时，将目标转移给某名其他角色；'
+					}
+					return '';
+				},
+				content:function(){
+					'step 0'
+					var rand=Math.random();
+					player.chooseTarget(get.prompt2('mhuanyi'),function(card,player,target){
+						return target!=player;
+					}).set('ai',function(target){
+						if(get.attitude(player,target)<0){
+							return rand;
+						}
+						return 0;
+					});
+					'step 1'
+					if(result.bool){
+						event.target=result.targets[0];
+						if(player.isUnderControl(true)){
+							player.line(event.target,'green');
+						}
+						player.chooseControl('基本牌','非基本牌','cancel2',function(){
+							return Math.floor(Math.random()*2);
+						}).set('prompt','选择一种卡牌类型');
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if(result.control&&result.control!='cancel2'){
+						player.logSkill('mhuanyi');
+						player.storage.mhuanyi_target=[event.target,result.index];
+						player.addTempSkill('mhuanyi_target',{player:'phaseBegin'});
+					}
+				},
+				subSkill:{
+					target:{
+						trigger:{target:'useCardToBefore'},
+						priority:6,
+						forced:true,
+						// mark:true,
+						// intro:{
+						// 	nocount:true,
+						// 	content:'直到下一回合开始，当成为某类型的卡牌的惟一目标时，将目标转移给某名其他角色'
+						// },
+						onremove:true,
+						filter:function(event,player){
+							if(!player.storage.mhuanyi_target) return false;
+							if(event.player==player.storage.mhuanyi_target[0]) return false;
+							if(get.type(event.card)=='basic'){
+								if(player.storage.mhuanyi_target[1]!=0) return false;
+							}
+							else{
+								if(player.storage.mhuanyi_target[1]!=1) return false;
+							}
+							if(!lib.filter.targetEnabled2(event.card,event.player,player.storage.mhuanyi_target[0])){
+								return false;
+							}
+							return true;
+						},
+						logTarget:function(event,player){
+							return player.storage.mhuanyi_target[0];
+						},
+						content:function(){
+							trigger.target=player.storage.mhuanyi_target[0];
+							trigger.untrigger();
+							trigger.trigger('useCardToBefore');
+							trigger.trigger(trigger.card.name+'Before');
+							player.removeSkill('mhuanyi_target');
+						}
+					}
+				}
+			},
 			msuoling:{
-				enable:'chooseToUse',
-				// round:1,
-    			filterCard:function(card){
-    				return get.type(card,'trick')=='trick';
-    			},
-    			viewAsFilter:function(player){
-    				return player.countCards('h',{type:['trick','delay']})>0;
-    			},
-    			viewAs:{name:'wuxie',{storage:{nowuxie:true}}},
-    			prompt:'将一张锦囊牌当无懈可击使用',
-    			check:function(card){return 8-get.value(card)},
-    			threaten:1.2
+				trigger:{global:'useCard'},
+				direct:true,
+				priority:5.5,
+				round:1,
+				filter:function(event,player){
+					if(get.type(event.card)=='trick'&&event.cards.length==1&&event.cards[0]==event.card){
+						if(event.player==player) return false;
+						if(!player.countCards('he',{suit:get.suit(event.card)})) return false;
+						return true;
+					}
+					return false;
+				},
+				content:function(){
+					'step 0'
+					var att=get.attitude(player,trigger.player);
+					var suit=get.suit(trigger.card);
+					player.chooseToDiscard('he',get.prompt2('msuoling',trigger.player),function(card){
+						return get.suit(card)==suit;
+					}).set('autodelay',true).set('logSkill',['msuoling',trigger.player]).ai=function(card){
+						if(att<0){
+							return 8-get.value(card);
+						}
+						return 0;
+					};
+					'step 1'
+					if(result.bool){
+						trigger.cancel();
+						player.chooseUseTarget(trigger.card);
+					}
+				}
+			},
+			msuoling_old:{
+				enable:'phaseUse',
+				usable:1,
+				subSkill:{
+					ai:{
+						onremove:true
+					}
+				},
+				filter:function(event,player){
+					var nh=player.countCards('h');
+					if(nh<=1||nh>=5) return false;
+					return lib.skill.msuoling.getc(player).number>0;
+				},
+				getc:function(player){
+					var hs=player.getCards('h');
+					for(var i=0;i<hs.length;i++){
+						if(hs[i].mtongnian_link){
+							return hs[i];
+						}
+					}
+					return -1;
+				},
+				getn:function(player){
+					var hs=player.getCards('h');
+					var ns=[];
+					for(var i=0;i<hs.length;i++){
+						if(!hs[i].mtongnian_link){
+							ns.push(hs[i].number);
+						}
+					}
+					return ns;
+				},
+				test:function(player){
+					var cs=lib.skill.msuoling.getc(player).number;
+					var ns=lib.skill.msuoling.getn(player);
+					return lib.skill.msuoling.calc(ns,cs);
+				},
+				calc:function(arr, num){
+					for(var i=0;i<arr.length;i++){
+						if(arr[i]==num){
+							return true;
+						}
+					}
+					if(arr.length>1){
+						for(var i=0;i<arr.length-1;i++){
+							for(var j=i+1;j<arr.length;j++){
+								var brr=[];
+								for(var k=0;k<arr.length;k++){
+									if(k!=i&&k!=j){
+										brr.push(arr[k]);
+									}
+								}
+								if(lib.skill.msuoling.calc(brr.concat([arr[i]+arr[j]]),num)) return true;
+								if(lib.skill.msuoling.calc(brr.concat([arr[i]-arr[j]]),num)) return true;
+								if(lib.skill.msuoling.calc(brr.concat([arr[i]*arr[j]]),num)) return true;
+								if(lib.skill.msuoling.calc(brr.concat([arr[i]/arr[j]]),num)) return true;
+							}
+						}
+					}
+					return false;
+				},
+				check:function(card){
+					// if(player.isUnderControl(true)) return 0;
+					var player=_status.event.player;
+					if(player.hasSkill('msuoling_ai')){
+						return false;
+					}
+					if(lib.skill.msuoling.test(player)){
+						return true;
+					}
+					else{
+						player.addTempSkill('msuoling_ai',{player:['gainAfter','phaseAfter']});
+						return false;
+					}
+				},
+				content:function(){
+					'step 0'
+					player.showHandcards();
+					'step 1'
+					if(lib.skill.msuoling.test(player)){
+						var card=lib.skill.msuoling.getc(player);
+						card.classList.remove('glow');
+						delete card.mtongnian_link;
+						delete card._destroy;
+
+						var list=lib.skill.mtongnian.getList(player);
+						if(list.length){
+							var card=list.randomGet();
+							var fake=game.createCard(card);
+							fake.mtongnian_link=card;
+							player.gain(fake,'draw')._triggered=null;
+							fake.classList.add('glow');
+							fake._destroy='mtongnian';
+						}
+					}
+				},
+				selectCard:[1,Infinity],
+				ai:{
+					order:11
+				}
 			},
 			mtongnian:{
 				trigger:{player:'phaseUseBegin'},
@@ -53,12 +251,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					var list=lib.skill.mtongnian.getList(player);
-					var card=list.randomGet();
-					var fake=game.createCard(card);
-					fake.mtongnian_link=card;
-					player.gain(fake,'draw')._triggered=null;
-					fake.classList.add('glow');
-					fake._destroy='mtongnian';
+					if(list.length){
+						var card=list.randomGet();
+						var fake=game.createCard(card);
+						fake.mtongnian_link=card;
+						player.gain(fake,'draw')._triggered=null;
+						fake.classList.add('glow');
+						fake._destroy='mtongnian';
+					}
 				},
 				group:['mtongnian_change','mtongnian_use','mtongnian_lose'],
 				subSkill:{
@@ -197,9 +397,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mtongnian:'通念',
 			mtongnian_info:'锁定技，出牌阶段开始时，你获得一张替身牌，此牌对应一名随机敌人的一张随机手牌；每当你使用一张非替身牌，随机更换替身牌对应的牌；当你使用替身牌时，改为使用替身牌对应的牌；当出牌阶段结束，或替身牌离开手牌区，或敌方角色没有手牌时，销毁替身牌',
 			msuoling:'塑灵',
-			msuoling_info:'你可以将一张锦囊牌当作无懈可击使用，此无懈可击不能被其它无懈可击响应',
+			msuoling_info:'每轮限一次，当一名其他角色使用一张非转化的普通锦囊牌时，你可以弃置一张与之花色相同的牌取消之，然后你视为使用该锦囊牌',
+			msuoling_old_info:'出牌阶段限一次，若你手牌中有替身牌且手牌数不超过5，你可以展示手牌，若其中的非替身手牌能通过四则运算得到你的替身牌的点数，你将替身牌转化为非替身牌，然后获得一张新的替身牌（此技能托管无效）',
 			mhuanyi:'幻逸',
-			mhuanyi_info:'结束阶段，你可以将【效果1】分配给任意名角色，然后将【效果2】分配给其余角色（分配结果对其他角色不可见）。效果1：当目标对你首次使用卡牌时，若此牌为基本牌，则取消之；效果2：当目标对你首次使用卡牌时，若此牌为非基本牌，则取消之',
+			mhuanyi_info:'每两轮限一次，结束阶段，你可以选择一名其他角色和一种卡牌类型（选择结果对其他角色不可见），直到下一回合开始，当你首次成为该类型卡牌的惟一目标时，你将目标转移给你指定的角色（目标须合法）',
 	    },
 	};
 });

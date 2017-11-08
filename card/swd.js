@@ -2957,6 +2957,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target!=player&&target.countCards('h')>0;
 				},
 				content:function(){
+					'step 0'
 					var card=target.getCards('h').randomGet();
 					var hu=player.getEquip('lianyaohu');
 					if(card&&hu){
@@ -2965,7 +2966,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 						target.$give(card,player);
 						target.lose(card,ui.special);
-						hu.storage.shouna.push(card);
+						event.card=card;
+						event.hu=hu;
+					}
+					'step 1'
+					if(!event.card.destroyed){
+						event.hu.storage.shouna.push(event.card);
 						player.updateMarks();
 					}
 				},

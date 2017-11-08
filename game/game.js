@@ -14803,6 +14803,7 @@
 					}
 					var name=card.name;
 					var info=lib.card[name];
+					if(!info.enable) return;
 					var player=this;
 					if(info.selectTarget==-1){
 						var targets=game.filterPlayer(function(current){
@@ -19550,6 +19551,9 @@
 					}
 					this.fix();
 					this.classList.remove('glow');
+				},
+				hasPosition(){
+					return ['h','e','j'].contains(get.position(this));
 				}
 			},
 			button:{
@@ -27473,11 +27477,19 @@
 						},
 						intro:{
 							content:function(storage,player){
+								var str='';
+								var info=get.info(name.slice(0,name.indexOf('_roundcount')));
+								if(info&&info.addintro){
+									str+=info.addintro(storage,player);
+								}
 								var num=round-(game.roundNumber-storage);
 								if(num>0){
-									return get.cnNumber(num)+'轮后技能重置';
+									str+=get.cnNumber(num)+'轮后技能重置';
 								}
-								return '技能可发动';
+								else{
+									str+='技能可发动';
+								}
+								return str;
 							},
 							markcount:function(storage,player){
 								var num=round-(game.roundNumber-storage);
@@ -41323,6 +41335,13 @@
 	};
 	var get={
         is:{
+			freePosition:function(cards){
+				for(var i=0;i<cards.length;i++){
+					if(!cards[i].hasPosition) return false;
+					if(cards[i].hasPosition()) return false;
+				}
+				return true;
+			},
 			nomenu:function(name,item){
 				var menus=['system','menu'];
 				var configs={
@@ -44192,8 +44211,15 @@
 			return 10-get.useful(card);
 		},
 		value:function(card,player,method){
-			var aii=get.info(card).ai;
 			var value;
+			if(Array.isArray(card)){
+				value=0;
+				for(var i=0;i<card.length;i++){
+					value+=get.value(card[i],player,method);
+				}
+				return value/Math.sqrt(card.length);
+			}
+			var aii=get.info(card).ai;
 			if(aii&&aii.value) value=aii.value;
 			else if(aii&&aii.basic) value=aii.basic.value;
 			if(value==undefined) return 0;
