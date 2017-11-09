@@ -10,7 +10,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            filterTarget:function(card,player,target){
 	                return !target.hasSkill('luyugeng');
 	            },
-	            range:{global:1},
+	            //range:{global:1},
 	            content:function(){
 	                target.$gain2(cards);
 	                target.storage.luyugeng=card;
@@ -59,7 +59,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            filterTarget:function(card,player,target){
 	                return !target.hasSkill('chunbing');
 	            },
-	            range:{global:1},
+	            //range:{global:1},
 	            content:function(){
 	                target.$gain2(cards);
 	                target.storage.chunbing=card;
@@ -90,7 +90,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            filterTarget:function(card,player,target){
 	                return !target.hasSkill('gudonggeng');
 	            },
-	            range:{global:1},
+	            //range:{global:1},
 	            content:function(){
 	                target.$gain2(cards);
 	                target.storage.gudonggeng=card;
@@ -115,7 +115,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            filterTarget:function(card,player,target){
 	                return !target.hasSkill('liyutang');
 	            },
-	            range:{global:1},
+	            //range:{global:1},
 	            content:function(){
 	                target.$gain2(cards);
 	                target.storage.liyutang=card;
@@ -141,7 +141,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            filterTarget:function(card,player,target){
 	                return !target.hasSkill('mizhilianou');
 	            },
-	            range:{global:1},
+	            //range:{global:1},
 	            content:function(){
 	                target.$gain2(cards);
 	                target.storage.mizhilianou=card;
@@ -176,7 +176,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            filterTarget:function(card,player,target){
 	                return !target.hasSkill('xiajiao');
 	            },
-	            range:{global:1},
+	            //range:{global:1},
 	            content:function(){
 	                target.$gain2(cards);
 	                target.storage.xiajiao=card;
@@ -199,7 +199,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            filterTarget:function(card,player,target){
 	                return !target.hasSkill('tanhuadong');
 	            },
-	            range:{global:1},
+	            //range:{global:1},
 	            content:function(){
 	                target.$gain2(cards);
 	                target.storage.tanhuadong=card;
@@ -221,7 +221,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            filterTarget:function(card,player,target){
 	                return !target.hasSkill('mapodoufu');
 	            },
-	            range:{global:1},
+	            //range:{global:1},
 	            content:function(){
 	                target.$gain2(cards);
 	                target.storage.mapodoufu=card;
@@ -245,7 +245,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            filterTarget:function(card,player,target){
 	                return !target.hasSkill('qingtuan');
 	            },
-	            range:{global:1},
+	            //range:{global:1},
 	            content:function(){
 	                target.$gain2(cards);
 	                target.storage.qingtuan=card;
@@ -278,7 +278,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            filterTarget:function(card,player,target){
 	                return !target.hasSkill('yougeng');
 	            },
-	            range:{global:1},
+	            //range:{global:1},
 	            content:function(){
 	                target.$gain2(cards);
 	                target.storage.yougeng=card;
@@ -304,7 +304,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            filterTarget:function(card,player,target){
 	                return !target.hasSkill('molicha');
 	            },
-	            range:{global:1},
+	            //range:{global:1},
 	            content:function(){
 	                target.$gain2(cards);
 	                target.storage.molicha=card;
@@ -326,7 +326,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            filterTarget:function(card,player,target){
 	                return !target.hasSkill('yuanbaorou');
 	            },
-	            range:{global:1},
+	            //range:{global:1},
 	            content:function(){
 	                target.$gain2(cards);
 	                target.storage.yuanbaorou=card;
@@ -744,28 +744,23 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:true,
 				fullskin:true,
 	            filterTarget:function(card,player,target){
-	                return target!=player;
+	                return target.hp>=player.hp;
 	            },
 	            content:function(){
 	                'step 0'
-	                target.draw('visible');
+	                target.draw();
 	                'step 1'
-	                if(Array.isArray(result)&&get.suit(result[0])=='spade'){
-	                    return;
-	                }
-	                else{
-	                    target.damage();
-	                }
+					target.loseHp();
 	            },
 	            ai:{
 	                order:2,
-	                value:[4,1],
-	                useful:1,
+					value:[5,1],
+					useful:[4,1],
 	                result:{
 	                    target:-1.5
 	                },
 	                tag:{
-	                    damage:1
+	                    // damage:1
 	                }
 	            }
 	        },
@@ -1539,7 +1534,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	        // longxugou:'龙须钩',
 	        // longxugou_info:'龙须钩',
 	        mianlijinzhen:'棉里针',
-	        mianlijinzhen_info:'令一名角色摸一张牌并展示，若不是黑桃，你对其造成一点伤害',
+	        mianlijinzhen_info:'出牌阶段对一名体力值不小于你的角色使用，目标摸一张牌然后失去一点体力',
 	        // shenhuofeiya:'神火飞鸦',
 	        // shenhuofeiya_info:'神火飞鸦',
 	        // tuhunsha:'土魂砂',

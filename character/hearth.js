@@ -5837,7 +5837,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			animationColor:'thunder',
     			derivation:'xinci',
     			filter:function(event,player){
-    				return !player.storage.anying&&player.countCards('he',{color:'black'})>1;
+    				return !player.storage.anying&&player.countCards('he',{color:'black'})>0;
     			},
     			filterCard:{color:'black'},
     			position:'he',
@@ -5848,7 +5848,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.storage.anying=true;
     				player.awakenSkill('anying');
     				player.removeSkill('shengguang');
-    				player.addSkill('xinci');
+    				player.addAdditionalSkill('anying','xinci');
     			},
     			ai:{
     				order:1,

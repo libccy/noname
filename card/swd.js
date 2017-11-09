@@ -3357,7 +3357,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return event.player.hp<=0&&player.hp>1;
 				},
 				check:function(event,player){
-					return get.attitude(player,event.player)>=3;
+					return get.attitude(player,event.player)>=3&&!event.player.hasSkillTag('nosave');
 				},
 				logTarget:'player',
 				content:function(){

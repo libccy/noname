@@ -873,7 +873,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(get.prompt2('gwqinwu')).ai=function(target){
 						var att=get.attitude(player,target);
 						if(att<=0) return 0;
-						att+=1-get.distance(player,target,'absolute')/game.players.length;
+						if(att<3) return att;
+						att=10-get.distance(player,target,'absolute')/game.players.length;
 						if(target.hasSkill('gwqinwu')){
 							att/=1.5;
 						}
@@ -1246,6 +1247,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.storage.gwjushi4=get.position(card);
 						target.lose(card,ui.special);
 						player.addSkill('gwjushi2');
+					}
+				},
+				ai:{
+					order:8,
+					result:{
+						target:-1
 					}
 				}
 			},

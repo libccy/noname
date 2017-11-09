@@ -5740,9 +5740,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			group:'daixing2',
     			trigger:{player:'phaseEnd'},
     			direct:true,
+                filter:function(event,player){
+                    return player.getCards('he')>0;
+                },
     			content:function(){
     				"step 0"
-    				var next=player.chooseToDiscard('请选择发动代形的卡牌','he',[1,player.countCards('he')]);
+    				var next=player.chooseToDiscard(get.prompt2('daixing'),'he',[1,player.countCards('he')]);
     				next.logSkill='daixing';
     				next.ai=function(card){
     					if(ui.selected.cards.length>=2) return 0;
@@ -8178,10 +8181,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			filterTarget:function(card,player,target){
                     if(target.hp<=1) return false;
-    				if(get.mode()=='identity'&&_status.mode=='zhong'&&game.zhu&&!game.zhu.isZhu){
-    					return target==game.zhong;
-    				}
-    				if(target.identity=='zhu'||get.is.jun(target)) return false;
+    				// if(get.mode()=='identity'&&_status.mode=='zhong'&&game.zhu&&!game.zhu.isZhu){
+    				// 	return target==game.zhong;
+    				// }
+    				// if(target.identity=='zhu'||get.is.jun(target)) return false;
     				return player!=target;
     			},
     			content:function(){
@@ -8204,14 +8207,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				'step 0'
     				targets[0].phase('duijue');
     				'step 1'
-    				if(targets[0].isDead()||targets[1].isDead()){
+                    ui.duijueLoop.round--;
+                    ui.duijueLoop.innerHTML=get.cnNumber(ui.duijueLoop.round)+'回合';
+    				if(targets[0].isDead()||targets[1].isDead()||ui.duijueLoop.round==0){
     					event.goto(3);
     				}
     				else{
     					targets[1].phase('duijue');
     				}
     				'step 2'
-    				if(targets[0].isDead()||targets[1].isDead()){
+                    ui.duijueLoop.round--;
+                    ui.duijueLoop.innerHTML=get.cnNumber(ui.duijueLoop.round)+'回合';
+    				if(targets[0].isDead()||targets[1].isDead()||ui.duijueLoop.round==0){
     					event.goto(3);
     				}
     				else{
@@ -8221,6 +8228,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				for(var i=0;i<event.backup.length;i++){
     					event.backup[i].in('duijue');
     				}
+                    if(ui.duijueLoop){
+                        ui.duijueLoop.remove();
+                        delete ui.duijueLoop;
+                    }
     			},
     			init:function(player){
     				player.storage.duijue=false;
@@ -8252,17 +8263,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					event.finish();
     					return;
     				}
-    				var next=game.createEvent('duijueLoop');
-    				next.targets=[target,player];
-    				next.num=0;
-    				next.setContent(lib.skill.duijue.duijueLoop);
-    				next.backup=[];
+                    var next=player.insertEvent('duijueLoop',lib.skill.duijue.duijueLoop,{
+                        targets:[target,player],
+        				num:0,
+        				backup:[],
+                        source:player,
+                    });
     				for(var i=0;i<game.players.length;i++){
     					if(game.players[i]!=player&&game.players[i]!=target){
     						game.players[i].out('duijue');
     						next.backup.push(game.players[i]);
     					}
     				}
+                    if(!ui.duijueLoop){
+                        ui.duijueLoop=ui.create.system('六回合',null,true);
+                        lib.setPopped(ui.duijueLoop,function(){
+                            var uiintro=ui.create.dialog('hidden');
+                            uiintro.add('对决');
+                            uiintro.addText(get.cnNumber(ui.duijueLoop.round)+'回合后结束');
+                            uiintro.add(ui.create.div('.placeholder.slim'));
+                            return uiintro;
+                        },180);
+                        ui.duijueLoop.round=6;
+                    }
     			}
     		},
     		duijue2:{
@@ -9690,7 +9713,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		xuying_info:'锁定技，每当你即将受到伤害，你防止此伤害，若你此时有手牌，你流失一点体力',
     		yinguo_info:'除你之外的任意一名角色即将受到受到伤害时，若有伤害来源，你可以弃置一张牌将伤害来源和目标对调',
     		yueren_info:'每当你使用一张杀，可以进行一次判定，若结果为黑色，你弃置目标一张牌，若结果为红色，你将此杀收回，每回合限发动一次',
-    		duijue_info:'限定技，出牌阶段，你可以指定一名非主公且体力值大于1的其他角色，你结束出牌阶段，并在回合结束后将所有其他角色移出游戏，然后该角色与你轮流进行回合，直到有一方死亡为止',
+    		duijue_info:'限定技，出牌阶段，你可以指定一名体力值大于1的其他角色，你结束出牌阶段，并在回合结束后将所有其他角色移出游戏，然后该角色与你轮流进行回合，直到有一方死亡或一共进行六个回合为止',
     		wuying_info:'锁定技，你的杀和单体x锦囊目标锁定为范围内的所有角色',
     		xiehun_info:'锁定技，受到来自你伤害的角色进入混乱状态，行为不受控制，且会攻击队友，直到你的下一回合开始',
     		jumo_info:'锁定技，结束阶段，你摸X-1张牌，X为未进入混乱状态的角色数与进入混乱状态的角色数之差（若为双将则改为X）',

@@ -1182,6 +1182,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			keji:{
 				audio:4,
 				trigger:{player:'phaseDiscardBefore'},
+				frequent:function(event,player){
+					return !player.needsToDiscard();
+				},
 				filter:function(event,player){
 					return player.countUsed('sha')==0;
 				},

@@ -6007,28 +6007,6 @@
         			}
         			return this;
         		};
-        		HTMLDivElement.prototype.transform=function(transform){
-        			var str='';
-        			for(var i in transform){
-        				switch(i){
-        					case 'scale':str+='scale('+transform[i]+') ';break;
-        					case 'rotate':str+='rotate('+transform[i]+'deg) ';break;
-        				}
-        			}
-        			if(typeof transform=='object'){
-        				if(transform.left&&transform.top){
-        					str+='translate('+parseInt(transform.left)+'px,'+parseInt(transform.top)+'px) ';
-        				}
-        				else if(transform.left){
-        					str+='translate('+parseInt(transform.left)+'px) ';
-        				}
-        				else if(transform.top){
-        					str+='translate(0,'+parseInt(transform.top)+'px) ';
-        				}
-        			}
-        			this.style.transform=str;
-        			return this;
-        		};
         		HTMLTableElement.prototype.get=function(row,col){
         			if(row<this.childNodes.length){
         				return this.childNodes[row].childNodes[col];
@@ -8053,9 +8031,9 @@
 					ui.css.styles.sheet.insertRule('#window #control{font-family: STHeiti,SimHei,Microsoft JhengHei,Microsoft YaHei,WenQuanYi Micro Hei,Helvetica,Arial,sans-serif}',0);
 				}
 				switch(lib.config.glow_phase){
-					case 'yellow':ui.css.styles.sheet.insertRule('#arena .player:not(.selectable):not(.selected).glow_phase {box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgb(235, 239, 59) 0 0 15px, rgb(199, 64, 64) 0 0 15px !important;}',0);break;
+					case 'yellow':ui.css.styles.sheet.insertRule('#arena .player:not(.selectable):not(.selected).glow_phase {box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgb(217, 152, 62) 0 0 15px, rgb(217, 152, 62) 0 0 15px !important;}',0);break;
 					case 'green':ui.css.styles.sheet.insertRule('#arena .player:not(.selectable):not(.selected).glow_phase {box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;}',0);break;
-					case 'purple':ui.css.styles.sheet.insertRule('#arena .player:not(.selectable):not(.selected).glow_phase {box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgb(178, 59, 239) 0 0 15px, rgb(199, 64, 101) 0 0 15px !important;}',0);break;
+					case 'purple':ui.css.styles.sheet.insertRule('#arena .player:not(.selectable):not(.selected).glow_phase {box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgb(189, 62, 170) 0 0 15px, rgb(189, 62, 170) 0 0 15px !important;}',0);break;
 				}
 			},
 			layout:function(layout,nosave){
@@ -14418,6 +14396,21 @@
                     next.setContent('phase');
 					return next;
 				},
+				insertEvent:function(name,content,arg){
+					var evt=_status.event.getParent('phase');
+					var next;
+					if(evt&&evt.parent&&evt.parent.next){
+						next=game.createEvent(name,null,evt.parent);
+					}
+					else{
+						next=game.createEvent(name);
+					}
+					for(var i in arg){
+						next[i]=arg[i];
+					}
+                    next.setContent(content);
+					return next;
+				},
 				phase:function(skill){
 					var next=game.createEvent('phase');
 					next.player=this;
@@ -15574,6 +15567,11 @@
 					next.target=target;
 					next.setContent('swapHandcards');
 					return next;
+				},
+				directequip:function(cards){
+					for(var i=0;i<cards.length;i++){
+						this.$equip(cards[i]);
+					}
 				},
 				directgain:function(cards){
 					var hs=this.getCards('h');
@@ -19375,7 +19373,7 @@
                     }
 					this.node.name2.innerHTML=get.translation(card[0])+card[1]+' '+name;
 					this.suit=card[0];
-					this.number=card[1];
+					this.number=parseInt(card[1])||0;
 					this.name=card[2];
 					this.classList.add('card');
 					if(card[3]){
@@ -42353,6 +42351,26 @@
 			}
             return num.toString();
         },
+		rawName:function(str){
+			var str2=lib.translate[str];
+			if(!str2) return '';
+			if(str2.indexOf('sp')==0){
+				str2=str2.slice(2);
+			}
+			else if(str2.indexOf('界sp')==0){
+				str2=str2.slice(3);
+			}
+			else if(str2.indexOf('界')==0&&lib.characterPack.refresh&&lib.characterPack.refresh[str]){
+				str2=str2.slice(1);
+			}
+			else if(str2.indexOf('旧')==0&&lib.characterPack.old&&lib.characterPack.old[str]){
+				str2=str2.slice(1);
+			}
+			else if(str2.indexOf('新')==0&&str.indexOf('re_')==0){
+				str2=str2.slice(1);
+			}
+			return str2;
+		},
 		slimName:function(str){
 			var str2=lib.translate[str];
 			if(!str2) return '';

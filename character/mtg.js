@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mtg_jiding:['male','qun',4,['mbaizhan','msilian']],
 			// mtg_qianzhuo:['female','shu',3,[]],
 			mtg_jiesi:['male','wei',3,['mtongnian','msuoling','mhuanyi']],
-			// mtg_lilianna:['female','qun',3,[]],
+			mtg_lilianna:['female','qun',3,['lingyong','mduohun']],
 			// mtg_nisha:['female','wu',3,[]],
 			// mtg_ayeni:['male','qun',4,[]],
 	    },
@@ -19,6 +19,180 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mtg_ayeni:'金鬃阿耶尼是使用白色法术的鹏洛客。他长于净化身体与心灵的法术：用咒语来治疗、强化盟友，以及唤醒他人内在的心灵精华。',
 		},
 	    skill:{
+			mduohun:{
+				trigger:{player:'dyingAfter'},
+				forced:true,
+				filter:function(event,player){
+					return event.source&&event.source.isIn()&&event.source.hp>0;
+				},
+				logTarget:'source',
+				content:function(){
+					trigger.source.loseHp();
+				},
+				ai:{
+    				threaten:function(player,target){
+    					if(target.hp==1) return 0.6;
+						return 1;
+    				},
+    				effect:{
+    					target:function(card,player,target,current){
+    						if(!target.hasFriend()) return;
+    						if(target.hp<=1&&get.tag(card,'damage')) return [1,0,0,-1];
+    					}
+    				}
+    			}
+			},
+			lingyong:{
+				enable:'phaseUse',
+				filter:function(event,player){
+					return player.hasSkillTag('lingyong');
+				},
+				unique:true,
+    			forceunique:true,
+				group:'lingyong2',
+				direct:true,
+				delay:0,
+				skillAnimation:true,
+				animationColor:'thunder',
+				content:function(){
+					'step 0'
+					var list=[];
+					var list2=[];
+					var skills=player.getSkills();
+					for(var i=0;i<skills.length;i++){
+						var info=lib.skill[skills[i]];
+						if(info.ai&&info.ai.lingyong){
+							list.push(skills[i].slice(9));
+							list2.push(skills[i]);
+						}
+					}
+					event.list=list;
+					event.list2=list2;
+					if(list.length>1){
+						var dialog=ui.create.dialog('灵俑','hidden');
+	    				dialog.add([list,'character']);
+	    				player.chooseButton(dialog,true);
+					}
+					else if(list.length==1){
+						event.directresult=list[0];
+					}
+					else{
+						event.finish();
+					}
+					player.logSkill('lingyong');
+					'step 1'
+					if(!event.directresult){
+						if(result&&result.bool&&result.links[0]){
+							event.directresult=result.links[0];
+						}
+						else{
+							event.finish();
+							return;
+						}
+					}
+					if(event.directresult){
+						var storage={};
+						for(var i=0;i<event.list2.length;i++){
+							var skill=event.list2[i];
+							storage[skill]=player.storage[skill];
+						}
+						player.removeSkill(event.list2);
+						event.list2.remove('lingyong_'+event.directresult);
+						delete storage['lingyong_'+event.directresult];
+						var name=event.directresult;
+						player.storage.lingyong3={
+							name:'mtg_lilianna',
+							hp:player.hp,
+							maxHp:player.maxHp,
+							skills:event.list2.slice(0),
+							name2:name,
+							storage:storage,
+							hs:player.getCards('h'),
+							es:player.getCards('e')
+						}
+	    				player.reinit('mtg_lilianna',name);
+						player.maxHp=1;
+						player.update();
+						player.addSkill('lingyong3');
+						player.lose(player.getCards('he'),ui.special)._triggered=null;
+
+						var evt=_status.event.getParent('phaseUse');
+						if(evt&&evt.name=='phaseUse'){
+							evt.skipped=true;
+						}
+						player.insertPhase();
+					}
+				},
+				ai:{
+					order:1,
+					result:{
+						player:function(player,target){
+							return 1;
+							// if(player.hp<=1) return 1;
+							// if(!player.needsToDiscard(player.hp-1)) return 1;
+							// return 0;
+						}
+					}
+				}
+			},
+			lingyong2:{
+				trigger:{global:'dieAfter'},
+				forced:true,
+				filter:function(event,player){
+					return ![player.name,player.name1,player.name2].contains(event.player.name);
+				},
+				content:function(){
+					var name='lingyong_'+trigger.player.name;
+					lib.translate[name]=get.rawName(trigger.player.name).replace(/<br>/g,'')+'之俑';
+					lib.skill[name]={
+						intro:{
+							content:'出牌阶段，你可以移去此标记，然后变身为'+get.translation(trigger.player)
+						},
+						mark:'character',
+						onremove:true,
+						ai:{
+							lingyong:true
+						}
+					}
+					player.storage[name]=trigger.player;
+					player.addSkill(name);
+				}
+			},
+			lingyong3:{
+				trigger:{player:'dieBefore'},
+				forced:true,
+				priority:-9,
+				onremove:true,
+				mark:'character',
+				intro:{
+					content:'死亡前变回莉莲娜'
+				},
+				content:function(){
+					'step 0'
+					if(player.storage.lingyong3){
+						player.reinit(player.storage.lingyong3.name2,'mtg_lilianna');
+						player.maxHp=player.storage.lingyong3.maxHp;
+						player.hp=player.storage.lingyong3.hp;
+						player.update();
+						for(var i in player.storage.lingyong3.storage){
+							player.storage[i]=player.storage.lingyong3.storage[i];
+						}
+						player.addSkill(player.storage.lingyong3.skills);
+						trigger.cancel();
+						player.lose(player.getCards('he'),ui.discardPile)._triggered=null;
+					}
+					'step 1'
+					if(player.storage.lingyong3){
+						player.directgain(player.storage.lingyong3.hs);
+						player.directequip(player.storage.lingyong3.es);
+					}
+					player.removeSkill('lingyong3');
+				},
+				ai:{
+					nosave:true,
+					threaten:0.8
+				}
+			},
 			mhuanyi:{
 				round:2,
 				trigger:{player:'phaseEnd'},
@@ -397,6 +571,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mtg_nisha:'妮莎',
 			mtg_ayeni:'阿耶尼',
 
+			mduohun:'夺魂',
+			mduohun_info:'锁定技，当你解除濒死状态后，令你进入濒死状态的角色失去一点体力',
+			lingyong:'灵俑',
+			lingyong2:'灵俑',
+			lingyong3:'灵俑',
+			lingyong3_bg:'俑',
+			lingyong_info:'锁定技，每当一名角色死亡，你获得一枚对应该角色主将的灵俑标记；出牌阶段，你可以弃置一枚灵俑标记，并变身为标记对应的角色（体力上限设为1），若如此做，你将你的牌移出游戏，结束出牌阶段并获得一个额外回合；处于变身状态的你在死亡前变回原形',
 			mbaizhan:'百战',
 			mbaizhan_info:'锁定技，每当你造成一点伤害，你获得一点护甲',
 			msilian:'祀炼',
