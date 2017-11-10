@@ -15,6 +15,7 @@ window.noname_update={
         'card/swd.js',
         'card/gujian.js',
         'card/yunchou.js',
+        'card/hearth.js',
         // 'card/gwent.js',
         // 'card/guozhan.js',
         // 'character/*',

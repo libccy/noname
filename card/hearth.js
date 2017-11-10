@@ -348,12 +348,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				selectTarget:-1,
 				modTarget:true,
 				content:function(){
+					'step 0'
 					target.changeHujia();
 					target.draw();
+					'step 1'
+					if(player.countCards('he')){
+						player.chooseToDiscard('he',true);
+					}
 				},
 				ai:{
 					order:8.5,
-					value:8,
+					value:7,
 					useful:3,
 					result:{
 						target:1
@@ -443,6 +448,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(event.num){
 						var enemies=event.current.getEnemies();
+						enemies.remove(player);
 						for(var i=0;i<enemies.length;i++){
 							if(!enemies[i].countCards('h')){
 								enemies.splice(i--,1);
@@ -459,7 +465,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					order:1.5,
+					order:8.5,
 					wuxie:function(){
 						return 0;
 					},
@@ -508,49 +514,45 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			shenenshu:{
 				fullskin:true,
 				enable:true,
-				filterTarget:function(card,player,target){
-					return target!=player;
-				},
 				type:'trick',
+				selectTarget:-1,
+				filterTarget:function(card,player,target){
+					return target==player;
+				},
+				modTarget:true,
 				content:function(){
-					var num=player.countCards('h')-target.countCards('h');
-					if(num<-3) num=-3;
-					if(num>3) num=3;
-					if(num>0){
-						target.draw(num);
+					'step 0'
+					var cards=target.getCards('h',function(card){
+						return get.type(card)!='basic';
+					});
+					if(cards.length){
+						target.lose(cards)._triggered=null;
 					}
-					else if(num<0){
-						player.draw(-num);
-					}
-					else{
-						game.asyncDraw([target,player]);
+					event.num=1+cards.length;
+					'step 1'
+					var cards=[];
+					var list=get.typeCard('basic');
+					list.remove('du');
+					if(list.length){
+						for(var i=0;i<event.num;i++){
+							cards.push(game.createCard(list.randomGet()));
+						}
+						target.directgain(cards);
 					}
 				},
 				ai:{
-					order:10,
-					value:7,
-					useful:2,
+					order:1,
 					result:{
 						target:function(player,target){
-							var nh=player.countCards('h')-target.countCards('h');
-							if(!player.hasSkill('jizhi')){
-								nh--;
+							var hs=target.getCards('h');
+							for(var i=0;i<hs.length;i++){
+								if(get.type(hs[i])!='basic'&&get.useful(hs[i])>=6){
+									return 0;
+								}
 							}
-							if(nh>0) return nh;
-							if(nh==0) return 1;
-							return 0;
-						},
-						player:function(player,target){
-							var nh=target.countCards('h')-player.countCards('h');
-							if(!player.hasSkill('jizhi')){
-								nh++;
-							}
-							if(nh>0) return nh;
-							if(nh==0) return 1;
-							return 0;
+							return 1;
 						}
-					},
-					expose:0.2
+					}
 				}
 	        },
 			zhiliaobo:{
@@ -562,19 +564,20 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'trick',
 				content:function(){
 					'step 0'
-					target.recover();
-					'step 1'
 					target.judge(function(card){
 						return get.color(card)=='red'?1:0;
 					});
-					'step 2'
+					'step 1'
 					if(result.bool){
-						target.draw();
+						target.recover();
+					}
+					else{
+						target.changeHujia();
 					}
 				},
 				ai:{
 					order:4,
-					value:[8,3],
+					value:[7,3],
 					useful:[6,3],
 					result:{
 						target:function(player,target){
@@ -676,19 +679,19 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			linghunzhihuo:'灵魂之火',
 			linghunzhihuo_info:'对一名角色造成一点火焰伤害，然后随机弃置一张手牌',
 			shenenshu:'神恩术',
-			shenenshu_info:'对一名其他角色使用，令你与目标中手牌数较少的摸若干张牌，直到手牌数相等（X不大于3），若手牌数已相等，改为你与目标各摸一张牌',
+			shenenshu_info:'出牌阶段对自己使用，获得一张随机基本牌，并将手牌中的非基本牌替换为基本牌',
 			zhiliaobo:'治疗波',
-			zhiliaobo_info:'对一名受伤角色使用，令其回复一点体力，并进行一次判定，若结果为红色则目标摸一张牌',
+			zhiliaobo_info:'出牌阶段对一名受伤角色使用，目标进行一次判定，若结果为红色，则回复一点体力，否则获得一点护甲',
 			yuansuhuimie:'元素毁灭',
 			yuansuhuimie_info:'对所有角色使用，令目标弃置0~2张牌，并受到2-X点雷电伤害，X为其弃置的手牌数',
 			xingjiegoutong:'星界沟通',
 			xingjiegoutong_info:'增加一点体力上限并回复一点体力，弃置你的所有手牌',
 			tanshezhiren:'弹射之刃',
-			tanshezhiren_info:'出牌阶段对自己使用，依次按敌方-友方-敌方-的顺序随机弃置阵营内一名随机角色的一张牌，共结算X次，X为存活角色数，若X为偶数，改为X-1',
+			tanshezhiren_info:'出牌阶段对自己使用，依次按敌方-友方-敌方-的顺序随机弃置阵营内一名随机角色的一张牌（目标不包含你），共结算X次，X为存活角色数，若X为偶数，改为X-1',
 			chuansongmen:'传送门',
 			chuansongmen_info:'摸一张牌并展示，若发生在出牌阶段，你可以立即使用摸到的牌，若如此做，你将传送门收回手牌（每阶段最多收回2张传送门）',
 			dunpaigedang:'盾牌格挡',
-			dunpaigedang_info:'获得一点护甲值，摸一张牌',
+			dunpaigedang_info:'获得一点护甲值，摸一张牌，然后弃置一张牌',
 			siwangchanrao:'死亡缠绕',
 			siwangchanrao_infox:'弃置一名其他角色的一张手牌，若其此时没有手牌，则你摸一张牌',
 			shihuawuqi:'石化武器',
@@ -703,8 +706,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			jihuocard_info:'摸一张牌，本回合手牌上限+2',
 		},
 		list:[
-			// ['heart',2,'shenenshu'],
-			// ['diamond',12,'shenenshu'],
+			['heart',2,'shenenshu'],
+			['diamond',12,'shenenshu'],
 			['club',7,'zhiliaobo'],
 			['spade',1,'zhiliaobo'],
 			['spade',13,'yuansuhuimie'],

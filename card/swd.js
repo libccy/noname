@@ -505,9 +505,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					wuxie:function(){
-						return 0;
-					},
 					order:1,
 					result:{
 						target:1
