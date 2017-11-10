@@ -607,61 +607,72 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					return target.countCards('h')>0;
 				},
-				selectTarget:2,
-				multitarget:true,
-				singleCard:true,
-				targetprompt:['被拿牌','得牌'],
 				content:function(){
-					"step 0"
-					target.addTempSkill('toulianghuanzhu2');
-					var hs=target.getCards('h');
-					event.num=Math.min(2,hs.length);
-					if(event.num){
-						var gived=hs.randomGets(event.num);
-						event.addedTarget.gain(gived,target);
-						target.$giveAuto(gived,event.addedTarget);
-						game.delay();
-					}
-					else{
-						event.finish();
-					}
-					"step 1"
-					if(event.addedTarget.countCards('h')){
-						if(_status.auto&&event.addedTarget==game.me){
-							game.delay();
+					'step 0'
+					var hs=player.getCards('h');
+					if(hs.length){
+						var minval=get.value(hs[0]);
+						var colors=[get.color(hs[0])];
+						for(var i=1;i<hs.length;i++){
+							var val=get.value(hs[i]);
+							if(val<minval){
+								minval=val;
+								colors=[get.color(hs[i])];
+							}
+							else if(val==minval){
+								colors.add(get.color(hs[i]));
+							}
 						}
-						event.addedTarget.chooseCard(true,event.num,'选择'+get.cnNumber(event.num)+'张手牌还给'+get.translation(target)).ai=get.disvalue;
+						player.chooseCardButton('偷梁换柱',target.getCards('h')).ai=function(button){
+							var val=get.value(button.link)-minval;
+							if(val>=0){
+								if(colors.contains(get.color(button.link))){
+									val+=3;
+								}
+							}
+							return val;
+						}
+					}
+					else{
+						player.viewHandcards(target);
+						event.finish();
+					}
+					'step 1'
+					if(result.bool){
+						event.card=result.links[[0]];
+						player.chooseCard('h',true,'用一张手牌替换'+get.translation(event.card)).ai=function(card){
+							return -get.value(card);
+						};
 					}
 					else{
 						event.finish();
 					}
-					"step 2"
-					target.gain(result.cards,event.addedTarget);
-					event.addedTarget.$give(event.num,target);
+					'step 2'
+					if(result.bool){
+						player.gain(event.card,target);
+						target.gain(result.cards,player);
+						player.$giveAuto(result.cards,target);
+						target.$giveAuto(event.card,player);
+						game.log(player,'与',target,'交换了一张手牌');
+						if(get.color(event.card)==get.color(result.cards[0])){
+							player.draw();
+						}
+					}
 				},
 				ai:{
-					order:6.5,
+					order:8,
 					tag:{
 						loseCard:1,
-						multitarget:1,
-						multineg:1,
 						norepeat:1,
 					},
 					result:{
 						target:function(player,target){
-							if(ui.selected.targets.length){
-								if(target==player&&target.countCards('h')<=1) return 0;
-								return 0.5;
-							}
-							if(target.hasSkill('toulianghuanzhu2')) return 0;
-							return -0.5;
+							if(player.countCards('h')<=1) return 0;
+							return -1;
 						}
 					},
-					wuxie:function(){
-						return 0;
-					},
-					useful:[3,1],
-					value:[4,1]
+					useful:[4,1],
+					value:[6,1]
 				}
 			},
 			hufu:{
@@ -942,7 +953,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			geanguanhuo:'隔岸观火',
 			geanguanhuo_info:'出牌阶段对一名其他角色使用，令目标与一名你指定的另一名角色拼点，赢的角色获得对方的一张牌；若点数相同，目标可弃置你一张牌（存活角色不超过2时可重铸）',
 			toulianghuanzhu:'偷梁换柱',
-			toulianghuanzhu_info:'出牌阶段对一名有手牌的角色使用，选择另一名有手牌的角色获得目标两张手牌（不足则全拿），然后还给其等量手牌',
+			toulianghuanzhu_info:'出牌阶段对一名其他角色使用，你观看其手牌，然后可以用一张手牌替牌其中的一张；若两张牌颜色相同，你摸一张牌',
 			toulianghuanzhu_bg:'柱',
 			fudichouxin:'釜底抽薪',
 			fudichouxin_info:'与一名角色进行拼点，若成功则获得双方拼点牌',

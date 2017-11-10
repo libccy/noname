@@ -254,20 +254,34 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				nodelay:true,
-				chongzhu:true,
+				// chongzhu:true,
 				global:'g_shencaojie',
 				content:function(){
-					event.getParent('g_shencaojie')._trigger.num++;
+					var evt=event.getParent('g_shencaojie')._trigger;
+					if(evt){
+						if(evt.player==player){
+							evt.num--;
+						}
+						else{
+							evt.num++;
+						}
+					}
 				},
 				ai:{
 					order:1,
-					useful:1,
-					value:5,
+					useful:5,
+					value:6,
 					result:{
 						target:function(player,target){
-							if(get.attitude(player,target)>0) return 0;
-							if(get.damageEffect(target,player,target)>=0) return 0;
-							return -1;
+							if(target==player){
+								if(get.damageEffect(target,player,target)>=0) return 0;
+								return 1;
+							}
+							else{
+								if(get.attitude(player,target)>0) return 0;
+								if(get.damageEffect(target,player,target)>=0) return 0;
+								return -1;
+							}
 						}
 					},
 				}
@@ -2308,7 +2322,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			g_shencaojie:{
-				trigger:{source:'damageBegin'},
+				trigger:{source:'damageBegin',player:'damageBegin'},
 				direct:true,
 				filter:function(event,player){
 					if(get.type(event.card)!='trick') return false;
@@ -4855,7 +4869,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			// pantao:'蟠桃',
 			// pantao_info:'出牌阶段对自己使用，或对濒死角色使用，目标回复两点体力并获得一点护甲',
 			shencaojie:'神草结',
-			shencaojie_info:'你的锦囊牌即将造成伤害时对目标使用，令此伤害+1',
+			shencaojie_info:'你的锦囊牌即将造成伤害时对目标使用，令此伤害+1；你即将受到锦囊牌伤害时对自己使用，令此伤害-1',
 			yuruyi:'玉如意',
 			yuruyi_ab:'如意',
 			yuruyi_info:'你有更高的机率摸到好牌',

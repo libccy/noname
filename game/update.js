@@ -1,6 +1,6 @@
 window.noname_update={
-    version:'1.9.41',
-    // update:'1.9.38.1',
+    version:'1.9.41.1',
+    update:'1.9.41',
     changeLog:[
         'bug修复'
     ],
@@ -12,7 +12,9 @@ window.noname_update={
         // 'game/pressure.js',
         // 'game/asset.js',
         // 'card/*',
-        // 'card/standard.js',
+        'card/swd.js',
+        'card/gujian.js',
+        'card/yunchou.js',
         // 'card/gwent.js',
         // 'card/guozhan.js',
         // 'character/*',

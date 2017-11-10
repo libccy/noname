@@ -330,7 +330,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            content:function(){
 	                target.$gain2(cards);
 	                target.storage.yuanbaorou=card;
-	                target.storage.yuanbaorou_markcount=3;
+	                target.storage.yuanbaorou_markcount=4;
 	                target.addSkill('yuanbaorou');
 	            },
 	            ai:{
@@ -393,15 +393,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            unique:true,
 	            skills:['yuheng_skill'],
 	            ai:{
-	                equipValue:function(card,player){
-	                    if(player.hp>=4) return 5;
-	                    if(player.hp>=3) return 4;
-	                    if(player.hp>=2) return 2;
-	                    return 1;
-	                },
-					basic:{
-						equipValue:4
-					}
+	                equipValue:6
 	            }
 	        },
 	        yuheng_plus:{
@@ -415,15 +407,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            cardimage:'yuheng',
 	            skills:['yuheng_plus_skill'],
 	            ai:{
-	                equipValue:function(card,player){
-	                    if(player.hp>=4) return 7;
-	                    if(player.hp>=3) return 6;
-	                    if(player.hp>=2) return 2.5;
-	                    return 1;
-	                },
-					basic:{
-						equipValue:5
-					}
+	                equipValue:7
 	            }
 	        },
 	        yuheng_pro:{
@@ -437,16 +421,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            cardimage:'yuheng',
 	            skills:['yuheng_pro_skill'],
 	            ai:{
-	                equipValue:function(card,player){
-	                    if(player.hp>=4) return 7.5;
-	                    if(player.hp>=3) return 6;
-	                    if(player.hp>=2) return 2.5;
-	                    return 1;
-	                },
-
-					basic:{
-						equipValue:7
-					}
+	                equipValue:8
 	            }
 	        },
 	        shujinsan:{
@@ -1335,26 +1310,32 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	        yuheng_skill:{
 	            enable:'phaseUse',
 	            usable:1,
-	            filterTarget:function(card,player,target){
-	                return target!=player&&target.countCards('h')>0;
-	            },
+				filterCard:{suit:'spade'},
+				check:function(card){
+					return 8-get.value(card);
+				},
+				filter:function(event,player){
+					var enemies=player.getEnemies();
+					for(var i=0;i<enemies.length;i++){
+						if(enemies[i].countCards('h',{suit:'spade'})) return true;
+					}
+					return false;
+				},
 	            content:function(){
-	                'step 0'
-	                player.loseHp();
+					var enemies=player.getEnemies();
+					var list=[];
+					for(var i=0;i<enemies.length;i++){
+						var hs=enemies[i].getCards('h',{suit:'spade'});
+						if(hs.length){
+							list.push([enemies[i],hs]);
+						}
+					}
+					if(list.length){
+						var current=list.randomGet();
+						player.line(current[0]);
+						current[0].give(current[1].randomGet(),player,true);
+					}
 	                'step 1'
-	                var hs=target.getCards('h');
-	                if(hs.length){
-	                    var card=hs.randomGet();
-	                    player.gain(card,target);
-	                    target.$give(card,player);
-	                    if(get.suit(card)=='spade'){
-	                        event.bool=true;
-	                    }
-	                }
-	                'step 2'
-	                if(event.bool){
-	                    target.loseHp();
-	                }
 	                var card=player.getEquip('yuheng');
 	                if(card){
 	                    if(typeof card.storage.yuheng!='number'){
@@ -1370,48 +1351,44 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                }
 	            },
 	            ai:{
-	                order:6,
+	                order:9,
 	                result:{
-	                    target:function(player,target){
-	                        if(get.attitude(player,target)>=0) return 0;
-	                        var nh=target.countCards('h');
-	                        var num=-1/Math.sqrt(1+nh);
-	                        if(player.hp>=4) return num;
-	                        if(player.hp>=3&&nh<=2) return num;
-	                        if(player.hp>=2&&target.hp==1&&nh<=2) return num;
-	                        return 0;
-	                    }
+	                    player:1
 	                }
 	            }
 	        },
 	        yuheng_plus_temp:{},
 	        yuheng_plus_skill:{
-	            enable:'phaseUse',
+				enable:'phaseUse',
 	            usable:1,
+				filterCard:{color:'black'},
+				check:function(card){
+					return 8-get.value(card);
+				},
 	            filter:function(event,player){
-	                return !player.hasSkill('yuheng_plus_temp');
-	            },
-	            filterTarget:function(card,player,target){
-	                return target!=player&&target.countCards('h')>0;
+	                // if(player.hasSkill('yuheng_plus_temp')) return false;
+					var enemies=player.getEnemies();
+					for(var i=0;i<enemies.length;i++){
+						if(enemies[i].countCards('h',{suit:'spade'})) return true;
+					}
+					return false;
 	            },
 	            content:function(){
-	                'step 0'
-	                player.loseHp();
+					var enemies=player.getEnemies();
+					var list=[];
+					for(var i=0;i<enemies.length;i++){
+						var hs=enemies[i].getCards('h',{suit:'spade'});
+						if(hs.length){
+							list.push([enemies[i],hs]);
+						}
+					}
+					if(list.length){
+						var current=list.randomGet();
+						player.line(current[0]);
+						current[0].give(current[1].randomGet(),player,true);
+					}
 	                'step 1'
-	                var hs=target.getCards('h');
-	                if(hs.length){
-	                    var card=hs.randomGet();
-	                    player.gain(card,target);
-	                    target.$give(card,player);
-	                    if(get.color(card)=='black'){
-	                        event.bool=true;
-	                    }
-	                }
-	                'step 2'
-	                if(event.bool){
-	                    target.loseHp();
-	                }
-	                var card=player.getEquip('yuheng_plus');
+					var card=player.getEquip('yuheng_plus');
 	                if(card){
 	                    if(typeof card.storage.yuheng!='number'){
 	                        card.storage.yuheng=1;
@@ -1425,55 +1402,58 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                }
 	            },
 	            ai:{
-	                order:6,
+	                order:9,
 	                result:{
-	                    target:function(player,target){
-	                        if(get.attitude(player,target)>=0) return 0;
-	                        var nh=target.countCards('h');
-	                        var num=-1/Math.sqrt(1+nh);
-	                        if(player.hp>=4) return num;
-	                        if(player.hp>=3&&nh<=2) return num;
-	                        if(player.hp>=2&&target.hp==1&&nh<=2) return num;
-	                        return 0;
-	                    }
+	                    player:1
 	                }
 	            }
 	        },
 	        yuheng_pro_skill:{
-	            enable:'phaseUse',
-	            filterTarget:function(card,player,target){
-	                return target!=player&&target.countCards('h')>0;
-	            },
+				enable:'phaseUse',
+				filterCard:{color:'black'},
+				check:function(card){
+					return 8-get.value(card);
+				},
+				filter:function(event,player){
+					var enemies=player.getEnemies();
+					for(var i=0;i<enemies.length;i++){
+						if(enemies[i].countCards('h',{suit:'spade'})) return true;
+					}
+					return false;
+				},
 	            content:function(){
-	                'step 0'
-	                player.loseHp();
+					var enemies=player.getEnemies();
+					var list=[];
+					for(var i=0;i<enemies.length;i++){
+						var hs=enemies[i].getCards('h',{suit:'spade'});
+						if(hs.length){
+							list.push([enemies[i],hs]);
+						}
+					}
+					if(list.length){
+						var current=list.randomGet();
+						player.line(current[0]);
+						current[0].give(current[1].randomGet(),player,true);
+					}
 	                'step 1'
-	                var hs=target.getCards('h');
-	                if(hs.length){
-	                    var card=hs.randomGet();
-	                    player.gain(card,target);
-	                    target.$give(card,player);
-	                    if(get.color(card)=='black'){
-	                        event.bool=true;
+	                var card=player.getEquip('yuheng');
+	                if(card){
+	                    if(typeof card.storage.yuheng!='number'){
+	                        card.storage.yuheng=1;
 	                    }
-	                }
-	                'step 2'
-	                if(event.bool){
-	                    target.loseHp();
+	                    else{
+	                        card.storage.yuheng++;
+	                    }
+	                    if(card.storage.yuheng>=3){
+	                        card.init([card.suit,card.number,'yuheng_plus',card.nature]);
+	                        player.addTempSkill('yuheng_plus_temp');
+	                    }
 	                }
 	            },
 	            ai:{
-	                order:6,
+	                order:9,
 	                result:{
-	                    target:function(player,target){
-	                        if(get.attitude(player,target)>=0) return 0;
-	                        var nh=target.countCards('h');
-	                        var num=-1/Math.sqrt(1+nh);
-	                        if(player.hp>=4) return num;
-	                        if(player.hp>=3&&nh<=2) return num;
-	                        if(player.hp>=2&&target.hp==1&&nh<=2) return num;
-	                        return 0;
-	                    }
+	                    player:1
 	                }
 	            }
 	        },
@@ -1562,12 +1542,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	        yuheng_skill:'玉衡',
 	        yuheng_plus_skill:'玉衡',
 	        yuheng_pro_skill:'玉衡',
-	        yuheng_info:'出牌阶段限一次，你可以失去一点体力，然后获得一名其他角色的一张手牌并展示，若为黑桃牌，该角色也失去一点体力（此牌在本局游戏中第三次和第七次发动效果后，分别自动获得一次强化）',
-	        yuheng_plus_info:'由普通玉衡强化得到，将玉衡技能描述中的“黑桃牌”改为“黑色牌”',
-	        yuheng_pro_info:'由普通玉衡二次强化得到，将玉横技能描述中的“黑桃牌”改为“黑色牌”，并去掉使用次数限制',
-	        yuheng_skill_info:'出牌阶段限一次，你可以失去一点体力，然后获得一名其他角色的手牌并展示，若为黑桃牌，该角色也失去一点体力',
-	        yuheng_plus_skill_info:'出牌阶段限一次，你可以失去一点体力，然后获得一名其他角色的手牌并展示，若为黑色牌，该角色也失去一点体力',
-	        yuheng_pro_skill_info:'出牌阶段，你可以失去一点体力，然后获得一名其他角色的手牌并展示，若为黑色牌，该角色也失去一点体力',
+	        yuheng_info:'出牌阶段限一次，若敌方角色有黑桃手牌，你可以弃置一张黑桃手牌，然后获得一名随机敌方角色的一张随机黑桃手牌（此牌在本局游戏中第三次和第七次发动效果后，分别自动获得一次强化）',
+	        yuheng_plus_info:'由普通玉衡强化得到，将玉衡技能描述中的“弃置一张黑桃手牌”改为“弃置一张黑色手牌”',
+	        yuheng_pro_info:'由普通玉衡二次强化得到，将玉横技能描述中的“弃置一张黑桃手牌”改为“弃置一张黑色手牌”，并去掉使用次数限制',
+	        yuheng_skill_info:'出牌阶段限一次，若敌方角色有黑桃手牌，你可以弃置一张黑桃手牌，然后获得一名随机敌方角色的一张随机黑桃手牌',
+	        yuheng_plus_skill_info:'出牌阶段限一次，若敌方角色有黑桃手牌，你可以弃置一张黑色手牌，然后获得一名随机敌方角色的一张随机黑桃手牌',
+	        yuheng_pro_skill_info:'出牌阶段限，若敌方角色有黑桃手牌，你可以弃置一张黑色手牌，然后获得一名随机敌方角色的一张随机黑桃手牌',
 	        shujinsan:'舒筋散',
 	        shujinsan_info:'出牌阶段对任意角色使用，目标可弃置任意张牌，并摸等量的牌',
 	        mutoumianju:'木头面具',
@@ -1597,7 +1577,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	        luyugeng:'鲈鱼羹',
 	        luyugeng_info:'准备阶段，你对一名体力值全场最高的随机敌人造成一点雷属性伤害，持续两回合',
 	        yuanbaorou:'元宝肉',
-	        yuanbaorou_info:'你在出牌阶段可以额外使用一张杀，持续三回合',
+	        yuanbaorou_info:'你在出牌阶段可以额外使用一张杀，持续四回合',
 	        molicha:'茉莉茶',
 	        molicha_info:'你不能成为其他角色的黑色牌的目标，持续四回合',
 	        mapodoufu:'麻婆豆腐',
