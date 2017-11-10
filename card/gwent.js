@@ -2142,6 +2142,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			spell_silver:'银卡法术',
 			spell_bronze:'铜卡法术',
 
+			gw_youlanzhimeng:'幽蓝之梦',
 			gw_guaiwuchaoxue:'怪物巢穴',
 			gw_guaiwuchaoxue_info:'出牌阶段限用一次，随机获得一个卖血技能直到下一回合开始；令一名随机敌方角色对你造成一点伤害，然后你回复一点体力',
 			gw_baobaoshu:'雹暴术',
