@@ -1279,7 +1279,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(get.effect(event.target,card,player,player)>0){
 								if(get.attitude(player,event.target)>0&&get.tag(card,'damage')){
 									for(var i=0;i<ui.selected.cards.length;i++){
-										if(get.tag(ui.selected.cards[i]),'damage'){
+										if(get.tag(ui.selected.cards[i],'damage')){
 											return 0;
 										}
 									}
@@ -3025,7 +3025,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<player.storage.shuiyun.length;i++){
 						types.add(get.type(player.storage.shuiyun[i],'trick'));
 					}
-					player.chooseCard(get.prompt('shuiyun'),function(card){
+					player.chooseCard(get.prompt2('shuiyun'),function(card){
 						return !types.contains(get.type(card,'trick'));
 					}).ai=function(card){
 						return 11-get.value(card);
@@ -3080,17 +3080,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['shuiyun5']
 			},
 			shuiyun5:{
-				trigger:{global:'dying'},
-				priority:6,
-				filter:function(event,player){
-					return event.player.hp<=0&&player.storage.shuiyun&&player.storage.shuiyun.length;
-				},
-				direct:true,
-				content:function(){
-					"step 0"
-					player.chooseCardButton(player.storage.shuiyun,get.prompt('shuiyun',trigger.player)).ai=function(button){
-						return get.attitude(player,trigger.player)>2?1:0;
-					}
+				enable:'chooseToUse',
+                filter:function(event,player){
+                    return event.type=='dying'&&event.dying&&event.dying.hp<=0&&player.storage.shuiyun.length>0;
+                },
+                filterTarget:function(card,player,target){
+                    return target==_status.event.dying;
+                },
+                delay:0,
+                selectTarget:-1,
+                content:function(){
+                    "step 0"
+    				player.chooseCardButton(get.translation('shuiyun'),player.storage.shuiyun,true);
 					"step 1"
 					if(result.bool){
 						player.storage.shuiyun.remove(result.links[0]);
@@ -3099,27 +3100,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						player.$throw(result.links);
 						ui.discardPile.appendChild(result.links[0]);
-						trigger.player.recover();
-						// if(trigger.player!=player){
-						// 	trigger.player.draw();
-						// }
-						player.logSkill('shuiyun5',trigger.player,'thunder');
+						target.recover();
 						if(typeof player.storage.shuiyun_count=='number'){
 							player.storage.shuiyun_count++;
 						}
-						game.addVideo('storage',player,['shuiyun',get.cardsInfo(player.storage.shuiyun),'cards']);
+						player.syncStorage('shuiyun');
 					}
 					else{
 						event.finish();
 					}
-					"step 2"
-					if(trigger.player!=player){
-						game.delay();
-					}
-				},
-				ai:{
-					expose:0.3
-				}
+                },
+                ai:{
+                    order:6,
+                    skillTagFilter:function(player){
+                        return player.storage.shuiyun.length>0;
+                    },
+                    save:true,
+                    result:{
+                        target:3
+                    },
+                    threaten:1.6
+                }
 			},
 			wangyou:{
 				trigger:{global:'phaseEnd'},
@@ -4286,8 +4287,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shuiyun2:'水蕴',
 			shuiyun5:'水蕴',
 			shuiyun3:'水蕴',
-			shuiyun_info:'结束阶段，你可以将一张与武将牌上的牌类别均不相同的手牌置于武将牌上称为“蕴”；任意一名角色进入濒死状态时，你可以弃置一张“蕴”令其回复1点体力',
-			shuiyun_info_alter:'结束阶段，你可以将一张与武将牌上的牌类别均不相同的手牌置于武将牌上称为“蕴”（不能超过2张）；任意一名角色进入濒死状态时，你可以弃置一张“蕴”令其回复1点体力',
+			shuiyun_info:'结束阶段，你可以将一张与武将牌上的牌类别均不相同的手牌置于武将牌上称为“蕴”；任意一名角色处于濒死状态时，你可以弃置一张“蕴”令其回复1点体力',
+			shuiyun_info_alter:'结束阶段，你可以将一张与武将牌上的牌类别均不相同的手牌置于武将牌上称为“蕴”（不能超过2张）；任意一名角色处于濒死状态时，你可以弃置一张“蕴”令其回复1点体力',
 			wangyou:'忘忧',
 			wangyou_info:'其他角色的结束阶段，你可以弃置一张牌，令此回合内受过伤害的所有角色各摸一张牌',
 			changnian:'长念',

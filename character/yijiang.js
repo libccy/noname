@@ -325,10 +325,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 },
                 ai:{
                     effect:{
-                        target:{
-                            function(card,player,target,current){
-                                if(card.name=='sha'&&current<0) return 0.7;
-                            }
+                        target:function(card,player,target,current){
+                            if(card.name=='sha'&&current<0) return 0.7;
                         }
                     }
                 }
@@ -3398,7 +3396,49 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			group:'chunlao2'
     		},
-    		chunlao2:{
+            chunlao2:{
+                enable:'chooseToUse',
+                filter:function(event,player){
+                    return event.type=='dying'&&event.dying&&event.dying.hp<=0&&player.storage.chunlao.length>0;
+                },
+                filterTarget:function(card,player,target){
+                    return target==_status.event.dying;
+                },
+                direct:true,
+                delay:0,
+                selectTarget:-1,
+                content:function(){
+                    "step 0"
+    				player.chooseCardButton(get.translation('chunlao'),player.storage.chunlao,true);
+    				"step 1"
+    				if(result.bool){
+    					player.logSkill('chunlao');
+    					player.$throw(result.links);
+    					player.storage.chunlao.remove(result.links[0]);
+    					ui.discardPile.appendChild(result.links[0]);
+    					player.syncStorage('chunlao');
+    					target.useCard({name:'jiu'},target);
+    					if(!player.storage.chunlao.length){
+    						player.unmarkSkill('chunlao');
+    					}
+    					else{
+    						player.markSkill('chunlao');
+    					}
+    				}
+                },
+                ai:{
+                    order:6,
+                    skillTagFilter:function(player){
+                        return player.storage.chunlao.length>0;
+                    },
+                    save:true,
+                    result:{
+                        target:3
+                    },
+                    threaten:1.6
+                },
+            },
+    		chunlao2_old:{
     			trigger:{global:'dying'},
     			priority:6,
     			filter:function(event,player){
@@ -9098,7 +9138,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		xianzhen_info:'出牌阶段，你可以与一名角色拼点。若你赢，你获得以下技能直到回合结束：无视与该角色的距离；无视防具且可使用任意数量的【杀】。若你没赢，你不能使用【杀】直到回合结束。每回合限一次',
     		jinjiu:'禁酒',
     		jinjiu_info:'锁定技，你的【酒】均视为【杀】',
-    		chunlao:'醇醪',
+            chunlao:'醇醪',
+    		chunlao2:'醇醪',
     		chunlao_info:'结束阶段开始时，若没有“醇”，你可以将至少一张【杀】置于你的武将牌上，称为“醇”。当一名角色处于濒死状态时，你可以移去一张“醇”，视为该角色使用一张【酒】',
     		lihuo:'疠火',
     		lihuo_info:'你可以将一张普通【杀】当火【杀】使用。若以此法使用的【杀】造成了伤害，则此【杀】结算后你失去1点体力；你使用火【杀】指定目标后，可以额外指定一个目标',
