@@ -2673,6 +2673,7 @@
 						}
 						if(get.is.phoneLayout()){
                             map.remember_round_button.show();
+							map.popequip.show();
 							map.filternode_button.show();
                             map.show_pause.hide();
                             map.show_auto.hide();
@@ -2685,6 +2686,7 @@
                             map.show_replay.show();
                             map.show_round_menu.hide();
                             map.remember_round_button.hide();
+							map.popequip.hide();
 							map.filternode_button.hide();
                         }
 						if(lib.config.show_card_prompt){
@@ -3010,6 +3012,12 @@
                         },
                         unfrequent:true
                     },
+					popequip:{
+						name:'触屏装备选择',
+						intro:'设置触屏布局中选择装备的方式',
+                        init:true,
+                        unfrequent:true,
+					},
 					filternode_button:{
 						name:'触屏筛选按钮',
 						intro:'设置自由选将对话框中筛选按钮的样式',
@@ -25978,12 +25986,14 @@
 			var custom=event.custom||{};
 			var ok=true,auto=true;
 			var player=event.player;
+			var auto_confirm=lib.config.auto_confirm;
 			if(!event.filterButton&&!event.filterCard&&!event.filterTarget&&(!event.skill||!event._backup)){
                 if(event.choosing){
                     _status.imchoosing=true;
                 }
                 return;
             }
+			player.node.equips.classList.remove('popequip');
 			if(event.filterButton){
 				var dialog=event.dialog;
 				range=get.select(event.selectButton);
@@ -26111,6 +26121,13 @@
 						if(!event.forced||selectableCards||event.complexSelect){
                             ok=false;
                         }
+					}
+
+					if(lib.config.popequip&&get.is.phoneLayout()&&
+						typeof event.position=='string'&&event.position.indexOf('e')!=-1&&
+						player.node.equips.querySelector('.card.selectable')){
+						player.node.equips.classList.add('popequip');
+						auto_confirm=false;
 					}
 				}
 				if(custom.add.card){
@@ -26328,7 +26345,7 @@
 						}
 					}
 				}
-				if(ok&&auto&&(lib.config.auto_confirm||(skillinfo&&skillinfo.direct))&&(!_status.mousedragging||!_status.mouseleft)&&
+				if(ok&&auto&&(auto_confirm||(skillinfo&&skillinfo.direct))&&(!_status.mousedragging||!_status.mouseleft)&&
 				!_status.mousedown&&!_status.touchnocheck){
 					if(ui.confirm){
 						if(!skillinfo||!skillinfo.preservecancel){
@@ -26389,6 +26406,7 @@
 					cards[j].updateTransform();
 				}
 				ui.selected.cards.length=0;
+				_status.event.player.node.equips.classList.remove('popequip');
 			}
 			if((args.length==0||args.contains('target'))){
 				for(j=0;j<game.players.length;j++){
@@ -39755,6 +39773,17 @@
 					custom.add.card();
 				}
 				game.check();
+
+				if(lib.config.popequip&&get.is.phoneLayout()&&
+					arguments[0]!='popequip'&&ui.arena&&ui.arena.classList.contains('selecting')&&
+					this.parentNode.classList.contains('popequip')){
+					var rect=this.getBoundingClientRect();
+					ui.click.touchpop();
+					ui.click.intro.call(this.parentNode,{
+						clientX:rect.left+18,
+						clientY:rect.top+12
+					});
+				}
 			},
 			avatar:function(){
 				if(!lib.config.doubleclick_intro) return;
@@ -40473,7 +40502,10 @@
                     ui.historybar.style.zIndex='';
 					delete _status.currentlogv;
 					if(!ui.arena.classList.contains('menupaused')) game.resume2();
-					e.stopPropagation();
+					if(e&&e.stopPropagation) e.stopPropagation();
+					if(uiintro._onclose){
+						uiintro._onclose();
+					}
 					return false;
 				}
 				layer.addEventListener(lib.config.touchscreen?'touchend':'click',clicklayer);
@@ -40500,6 +40532,9 @@
                     ui.historybar.style.zIndex='';
 					delete _status.currentlogv;
 					if(!ui.arena.classList.contains('menupaused')) game.resume2();
+					if(uiintro._onclose){
+						uiintro._onclose();
+					}
 				};
                 var currentpop=this;
                 _status.removePop=function(node){
@@ -40509,7 +40544,13 @@
                     delete _status.removePop;
                     return true;
                 };
-				if(!lib.config.touchscreen){
+				if(uiintro.clickintro){
+					uiintro.listen(function(){
+						_status.clicked=true;
+					});
+					uiintro._clickintro=clicklayer;
+				}
+				else if(!lib.config.touchscreen){
 					uiintro.addEventListener('mouseleave',clickintro);
 					uiintro.addEventListener('click',clickintro);
 				}
@@ -42828,7 +42869,7 @@
 			}
 			return skills;
 		},
-        gainableSkills:function(func){
+        gainableSkills:function(func,player){
             var list=[];
             for(var i in lib.character){
                 if(lib.character[i][4]){
@@ -42839,8 +42880,10 @@
 				}
                 for(var j=0;j<lib.character[i][3].length;j++){
                     var skill=lib.character[i][3][j];
+					var info=lib.skill[skill];
 					if(lib.filter.skillDisabled(skill)) continue;
-					if(func&&!func(lib.skill[skill],skill,i)) continue;
+					if(func&&!func(info,skill,i)) continue;
+					if(player&&player.hasSkill&&info.ai&&info.ai.combo&&!player.hasSkill(info.ai.combo)) continue;
                     list.add(skill);
                 }
             }
@@ -43957,6 +44000,58 @@
                         }
     				}
                 }
+			}
+			else if(node.classList.contains('equips')&&ui.arena.classList.contains('selecting')){
+				(function(){
+					uiintro.add('选择装备');
+					uiintro.addSmall(Array.from(node.childNodes),true);
+					uiintro.clickintro=true;
+					ui.control.hide();
+					uiintro._onclose=function(){
+						ui.control.show();
+					}
+					var confirmbutton;
+					for(var i=0;i<uiintro.buttons.length;i++){
+						var button=uiintro.buttons[i];
+						button.classList.add('pointerdiv');
+						if(button.link.classList.contains('selected')){
+							button.classList.add('selected');
+						}
+						button.listen(function(e){
+							ui.click.card.call(this.link,'popequip');
+							ui.click.window.call(ui.window,e);
+							if(this.link.classList.contains('selected')){
+								this.classList.add('selected');
+							}
+							else{
+								this.classList.remove('selected');
+							}
+							if(ui.confirm&&ui.confirm.str&&ui.confirm.str.indexOf('o')!=-1){
+								confirmbutton.classList.remove('disabled');
+							}
+							else{
+								confirmbutton.classList.add('disabled');
+							}
+						});
+					}
+					var buttoncontainer=uiintro.add(ui.create.div());
+					buttoncontainer.style.display='block';
+					confirmbutton=ui.create.div('.menubutton.large.pointerdiv','确定',function(){
+						if(ui.confirm&&ui.confirm.str&&ui.confirm.str.indexOf('o')!=-1){
+							uiintro._clickintro();
+							ui.click.ok(ui.confirm.firstChild);
+						}
+					},buttoncontainer);
+					confirmbutton.style.position='relative';
+					setTimeout(function(){
+						if(ui.confirm&&ui.confirm.str&&ui.confirm.str.indexOf('o')!=-1){
+							confirmbutton.classList.remove('disabled');
+						}
+						else{
+							confirmbutton.classList.add('disabled');
+						}
+					},300);
+				}());
 			}
 			else if(node.classList.contains('identity')&&node.dataset.career){
 				var career=node.dataset.career;

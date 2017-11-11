@@ -81,7 +81,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
             caiyong:['male','qun',3,['bizhuan','tongbo']],
             jikang:['male','wei',3,['qingxian','juexiang']],
-            qinmi:['male','wu',3,['jianzheng','zhuandui','tianbian']],
+            qinmi:['male','shu',3,['jianzheng','zhuandui','tianbian']],
     		xuezong:['male','wu',3,['funan','jiexun']],
     	},
     	characterIntro:{
@@ -456,7 +456,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 ai:{
                     threaten:0.8,
                     maixie:true,
-                    maixie_hp:true
+                    maixie_hp:true,
+                    effect:{
+    					target:function(card,player,target){
+    						if(get.tag(card,'damage')){
+    							if(target.hp>1&&target.hasFriend()) return 0.8;
+    						}
+    					}
+    				}
                 },
                 subSkill:{
                     rouhe:{

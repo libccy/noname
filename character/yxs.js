@@ -1699,6 +1699,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.tongling++;
 					player.syncStorage('tongling');
 					player.markSkill('tongling');
+				},
+				ai:{
+					combo:'fanpu'
 				}
 			},
 			fanpu:{
@@ -1738,6 +1741,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					combo:'tongling',
 					order:2,
 					result:{
 						target:function(player,target){

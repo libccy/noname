@@ -1299,7 +1299,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				var list=get.gainableSkills(function(info){
 						if(typeof info.enable=='string') return info.enable=='phaseUse';
 						if(Array.isArray(info.enable)) return info.enable.contains('phaseUse');
-					});
+					},player);
     				list.remove(player.getSkills());
     				list=list.randomGets(3);
     				event.skillai=function(){

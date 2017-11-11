@@ -1,8 +1,8 @@
 window.noname_update={
-    version:'1.9.41.1',
-    update:'1.9.41',
+    version:'1.9.42',
+    // update:'1.9.41',
     changeLog:[
-        'bug修复'
+        '优化触屏装备选择'
     ],
     files:[
         // 'game/game.js',
