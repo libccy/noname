@@ -3993,7 +3993,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                 },
                 trigger:{source:'damageEnd'},
                 silent:true,
-                function(event,player){
+                filter:function(event,player){
                     return event.player.storage.longchuanzhibao>0;
                 },
                 content:function(){
@@ -5359,6 +5359,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				if(lib.storage.single_control){
     					game.onSwapControl();
     				}
+                    game.triggerEnter(source);
     				"step 2"
     				// if(_status.currentPhase==source){
     				// 	source.skip('phase');
@@ -5390,6 +5391,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     						break;
     					}
     				}
+                    game.triggerEnter(source);
     			},
     			replacePlayerOL:function(){
     				'step 0'
@@ -5518,6 +5520,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				source.draw(4);
     				_status.event.parent.parent.parent.untrigger(false,source);
     				game.addVideo('reinit',source,[name,color]);
+                    game.triggerEnter(source);
     			},
     		},
     		player:{
@@ -5986,7 +5989,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                                 else{
                                     att=_status.siguoai[2];break;
                                 }
-                                break;
                             }
                         }
                         if(map2[to.side]>=4){

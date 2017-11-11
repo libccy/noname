@@ -1557,7 +1557,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		},
     		huashen2:{
     			audio:2,
-    			trigger:{player:['phaseBegin','phaseEnd'],global:'gameStart'},
+    			trigger:{player:['phaseBegin','phaseEnd','enterGame'],global:'gameStart'},
     			filter:function(event,player,name){
     				if(name=='phaseBegin'&&game.phaseNumber==1) return false;
     				return true;

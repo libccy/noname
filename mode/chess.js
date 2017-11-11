@@ -1371,7 +1371,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     								if(targets.length==0){
     									if(randomMove.length){
     										var list=randomMove.slice(0);
-    										while(true){
+    										while(list.length){
     											var thismove=list.randomRemove();
     											if(player[thismove]()){
     												event.moved=true;
@@ -1542,6 +1542,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			else if(game.players.length){
     				game.setChessInfo(game.players[0]);
     			}
+
+                game.triggerEnter(player);
 
     			return player;
     		},

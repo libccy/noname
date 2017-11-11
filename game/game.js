@@ -8343,7 +8343,7 @@
 				var banned=['yxs_luzhishen','zhenji','shen_guanyu','shen_caocao','zhurong',
 					'daqiao','lingcao','liuzan','lusu','luxun','yanwen','zhouyu','xiahouyuan',
 					'zhuzhi','old_caozhen','guojia','simayi','sp_pangde','swd_kangnalishi','hs_siwangzhiyi'];
-				var bannedcards=['zengbin','toulianghuanzhu','huoshan','hongshui','guiyoujie','fengyinzhidan'];
+				var bannedcards=['zengbin','huoshan','hongshui','guiyoujie','fengyinzhidan'];
 				for(var i=0;i<mode.length;i++){
 					game.saveConfig(mode[i]+'_banned',banned);
 					game.saveConfig(mode[i]+'_bannedcards',bannedcards);
@@ -11515,7 +11515,7 @@
                             if(lib.config.background_audio){
                                 var sex=player.sex=='female'?'female':'male';
                                 var audioinfo=lib.card[card.name].audio;
-        						if(audioinfo||true){
+        						// if(audioinfo||true){
         							if(card.name=='sha'&&(card.nature=='fire'||card.nature=='thunder')){
         								game.playAudio('card',sex,card.name+'_'+card.nature);
         							}
@@ -11527,10 +11527,10 @@
                                             game.playAudio('card',sex,card.name);
                                         }
         							}
-        						}
-        						else if(get.type(card)!='equip'){
-        							game.playAudio('card/default');
-        						}
+        						// }
+        						// else if(get.type(card)!='equip'){
+        						// 	game.playAudio('card/default');
+        						// }
                             }
                         },player,card);
 					}
@@ -12109,17 +12109,17 @@
                             if(lib.config.background_audio){
     							var sex=player.sex=='female'?'female':'male';
                                 var audioinfo=lib.card[card.name].audio;
-    							if(audioinfo||true){
+    							// if(audioinfo||true){
                                     if(typeof audioinfo=='string'&&audioinfo.indexOf('ext:')==0){
                                         game.playAudio('..','extension',audioinfo.slice(4),card.name+'_'+sex);
                                     }
                                     else{
                                         game.playAudio('card',sex,card.name);
                                     }
-    							}
-    							else{
-    								game.playAudio('card/default');
-    							}
+    							// }
+    							// else{
+    							// 	game.playAudio('card/default');
+    							// }
     						}
                         },player,card);
 					}
@@ -12831,7 +12831,8 @@
     						if(lib.character[player.name]&&lib.character[player.name][4].contains('die_audio')){
     							game.playAudio('die',player.name);
     						}
-    						else if(true){
+    						// else if(true){
+							else{
     							game.playAudio('die',player.name,function(){
 									game.playAudio('die',player.name.slice(player.name.indexOf('_')+1));
 								});
@@ -19550,7 +19551,7 @@
 					this.fix();
 					this.classList.remove('glow');
 				},
-				hasPosition(){
+				hasPosition:function(){
 					return ['h','e','j'].contains(get.position(this));
 				}
 			},
@@ -25439,7 +25440,7 @@
                     ui.ladder.innerHTML=game.getLadderName(lib.storage.ladder.current);
                 }
             }
-			if(true){
+			// if(true){
 				if(game.players.length){
 					table=document.createElement('table');
 					tr=document.createElement('tr');
@@ -25627,7 +25628,7 @@
 					dialog.add(ui.create.div('.placeholder'));
 					dialog.content.appendChild(table);
 				}
-			}
+			// }
 			dialog.add(ui.create.div('.placeholder'));
 
             var clients=game.players.concat(game.dead);
@@ -28299,6 +28300,13 @@
 			if(character) player.init(character);
 			game.players.push(player);game.arrangePlayers();
 			return player;
+		},
+		triggerEnter:function(player){
+			var next=game.createEvent('enterGame',false);
+			next.player=player;
+			next.setContent(function(){
+				event.trigger('enterGame');
+			});
 		},
 		restorePlayer:function(player){
 			if(game.players.contains(player)||game.dead.contains(player)) return;
@@ -31033,7 +31041,6 @@
                                         case 'equip5':return 4.5;
                                         default:return 4;
                                     }
-                                    break;
                                 }
                                 case 'zhenfa':return 5;
                                 default:return 6;
@@ -34876,73 +34883,6 @@
 								noderevive.classList.remove('unselectable');
 							}
 							checkCheat();
-						});
-					}());
-					(function(){
-						if(true) return;
-						var page=ui.create.div('');
-						var node=ui.create.div('.menubutton.large','换人',start.firstChild,clickMode);
-						node.link=page;
-						page.classList.add('menu-sym');
-						var caption=ui.create.div('','选择一个换人目标',page);
-						caption.style.margin='5px';
-						caption.style.marginTop='6px';
-						var row3=ui.create.div('.menu-buttons.leftbutton',page);
-						row3.style.marginTop='3px';
-
-						var currentrow3=null;
-						var clickrow3=function(){
-							if(game.changeCoin){
-								game.changeCoin(-10);
-							}
-							game.swapPlayer(this.link);
-						};
-						menuUpdates.push(function(){
-							if(_status.connectMode||(lib.config.mode!='identity'&&lib.config.mode!='guozhan')){
-								node.classList.add('off');
-								var active=start.firstChild.querySelector('.active');
-								if(active==node){
-									node.classList.remove('active');
-									node.link.remove();
-                                    active=start.firstChild.firstChild;
-                                    if(!_status.connectMode){
-                                        cheatButton.style.display='';
-                                    }
-									active.classList.add('active');
-									rightPane.appendChild(active.link);
-								}
-                                return;
-							}
-							var list=[];
-							for(var i=0;i<game.players.length;i++){
-								if(lib.character[game.players[i].name]&&
-									game.players[i].isAlive()&&game.players[i]!=game.me){
-									list.push(game.players[i]);
-								}
-							}
-							if(_status.video){
-								node.remove();
-							}
-							if(!_status.video&&list.length&&game.phaseNumber&&!_status.event.isMine()){
-								node.classList.remove('off');
-								row3.innerHTML='';
-								var buttons=ui.create.buttons(list,'player',row3,true);
-								for(var i=0;i<buttons.length;i++){
-									buttons[i].listen(clickrow3);
-								}
-							}
-							else{
-								node.classList.add('off');
-								var active=start.firstChild.querySelector('.active');
-								if(active==node){
-									node.classList.remove('active');
-									node.link.remove();
-									active=start.firstChild.firstChild;
-									active.classList.add('active');
-									rightPane.appendChild(active.link);
-									cheatButton.style.display='';
-								}
-							}
 						});
 					}());
 					(function(){
@@ -43265,7 +43205,6 @@
 						}
 						return false;
 					}
-					break;
 				}
 				case 'character':case 'characters':{
 					if(typeof content=='string'){
@@ -43281,7 +43220,6 @@
 						}
 						return false;
 					}
-					break;
 				}
 				default:{
 					if(typeof type=='string'){

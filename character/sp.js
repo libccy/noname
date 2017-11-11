@@ -551,7 +551,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 }
             },
             xianfu:{
-                trigger:{global:'gameStart'},
+                trigger:{global:'gameStart',player:'enterGame'},
                 forced:true,
                 filter:function(){
                     return game.players.length>1;
@@ -1722,7 +1722,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						if(ui.selected.cards.length>=Math.ceil(list.length/2)) return 0;
     						var value=get.value(card);
     						if(_status.event.getParent().player.isHealthy()){
-    							value+=(get.tag(card,'damage')?1.5:0)+(get.tag(card,'draw'?2:0));
+    							value+=(get.tag(card,'damage')?1.5:0)+(get.tag(card,'draw')?2:0);
     						}
     						return value;
     					}
@@ -3207,7 +3207,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					return num+player.maxHp;
     				}
     			},
-    			trigger:{global:'gameStart'},
+    			trigger:{global:'gameStart',player:'enterGame'},
     			forced:true,
     			content:function(){
     				player.draw(player.maxHp,false);
