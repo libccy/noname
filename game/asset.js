@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-    '1.9.41',
+    '1.9.43',
     'image/background/huangtian_bg.jpg',
     'image/background/ol_bg.jpg',
     'image/background/september_bg.jpg',
@@ -613,6 +613,8 @@ window.noname_asset_list=[
     'image/character/mtg_qianzhuo.jpg',
     'image/character/nianshou.jpg',
     'image/character/niutou.jpg',
+    'image/character/ns_wangyun.jpg',
+    'image/character/ns_zuoci.jpg',
     'image/character/old_caoxiu.jpg',
     'image/character/old_caozhen.jpg',
     'image/character/old_huaxiong.jpg',

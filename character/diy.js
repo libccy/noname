@@ -2,6 +2,8 @@
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'diy',
+		connect:true,
+		connectBanned:['diy_tianyu','diy_yangyi','diy_lukang'],
 		character:{
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
@@ -29,7 +31,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:['male','wei',4,['chezhen','youzhan']],
 
 			ns_zuoci:['male','qun',3,['nsxinsheng','nsdunxing']],
-			ns_wangyun:["male","qun",4,["nsliangji","nsjugong","nschengmou"]],
+			ns_wangyun:["male","qun",4,["liangji","jugong","chengmou"]],
 		},
 		characterIntro:{
 			diy_feishi:'字公举，生卒年不详，益州犍为郡南安县（今四川省乐山市）人。刘璋占据益州时，以费诗为绵竹县县令。刘备进攻刘璋夺取益州，费诗举城而降，后受拜督军从事，转任牂牁郡太守，再为州前部司马。',
@@ -48,6 +50,219 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuji:['zuoci']
 		},
 		skill:{
+			rejizhi:{
+				audio:2,
+				usable:3,
+				trigger:{player:'useCard'},
+				frequent:true,
+				filter:function(event){
+					var type=get.type(event.card,'trick');
+					return (type=='trick'||type=='equip')&&event.cards[0]&&event.cards[0]==event.card;
+				},
+				content:function(){
+					"step 0"
+					var cards=get.cards();
+					player.gain(cards,'gain2','log');
+					if(get.type(cards[0])!='basic'){
+						event.finish();
+					}
+					"step 1"
+					player.chooseToDiscard('h',true);
+				},
+				ai:{
+					threaten:1.4
+				}
+			},
+			yiesheng:{
+				enable:'phaseUse',
+				filterCard:{color:'black'},
+				filter:function(event,player){
+					return player.countCards('h',{color:'black'})>0;
+				},
+				selectCard:[1,Infinity],
+				prompt:'弃置任意张黑色手牌并摸等量的牌',
+				check:function(card){return 5-get.value(card)},
+				content:function(){
+					player.draw(cards.length);
+				},
+				ai:{
+					order:1,
+					result:{
+						player:1
+					},
+				},
+			},
+			jugong: {
+				trigger: {
+					global: "damageEnd",
+				},
+				usable: 1,
+				frequent: true,
+				locked: false,
+				notemp: true,
+				init: function(player) {
+					player.storage.jugong = [];
+				},
+				filter: function(event, player) {
+					return event.card && (event.card.name == 'sha' || event.card.name == 'juedou') && event.notLink() && _status.currentPhase != player;
+
+				},
+				content: function() {
+					"step 0"
+					player.draw();
+					"step 1"
+					if (player.countCards('h')) {
+						player.chooseCard('将' + get.cnNumber(1) + '张手牌置于武将牌上作为“功”', 1, true);
+					} else {
+						event.finish();
+					}
+					"step 2"
+					if (result.cards && result.cards.length) {
+						player.lose(result.cards, ui.special);
+						player.storage.jugong = player.storage.jugong.concat(result.cards);
+						player.syncStorage('jugong');
+						player.markSkill('jugong');
+						game.log(player, '将', result.cards, '置于武将牌上作为“功”');
+					}
+				},
+				intro: {
+					content: "cards",
+				},
+				group: "jugong_1",
+				subSkill: {
+					"1": {
+						trigger: {
+							player: "damageBegin",
+						},
+						filter: function(event, player) {
+							return player.storage.jugong.length > 1;
+						},
+						content: function() {
+							'step 0'
+							player.chooseCardButton('移去两张“功”', 2, player.storage.jugong, true);
+							'step 1'
+							if (event.directresult || result.bool) {
+								player.logSkill('jugong');
+								var links = event.directresult || result.links;
+								for (var i = 0; i < links.length; i++) {
+									player.storage.jugong.remove(links[i]);
+								}
+								player.syncStorage('jugong');
+								if (!player.storage.jugong.length) {
+									player.unmarkSkill('jugong');
+								} else {
+									player.markSkill('jugong');
+								}
+								player.$throw(links);
+								game.log(player, '被移去了', links);
+								for (var i = 0; i < links.length; i++) {
+									ui.discardPile.appendChild(links[i]);
+								}
+							}
+							'step 2'
+							trigger.cancel();
+						},
+						sub: true,
+					},
+				},
+				ai: {
+					maixie: true,
+					maixie_hp: true,
+					threaten: 0.8,
+					effect: {
+						target: function(card, player, target) {
+							if (get.tag(card, 'damage')) {
+								if (player.hasSkillTag('jueqing', false, target)) return [1, -2];
+								if (!target.hasFriend()) return;
+								if (target.hp >= 4) return [0.5, get.tag(card, 'damage') * 2];
+								if (!target.hasSkill('paiyi') && target.hp > 1) return [0.5, get.tag(card, 'damage') * 1.5];
+								if (target.hp == 3) return [0.5, get.tag(card, 'damage') * 1];
+								if (target.hp == 2) return [1, get.tag(card, 'damage') * 0.5];
+							}
+						},
+					},
+				},
+			},
+			liangji:{
+				enable: "phaseUse",
+				usable: 1,
+				filterTarget: function(card, player, target) {
+					return target != player;
+				},
+				content: function() {
+					'step 0'
+					player.chooseCard('h', '连计：将1张牌置于' + get.translation(target) + '的武将牌上', true).set('ai', function(card) {
+						if (get.attitude(_status.event.player, _status.event.getParent().player) > 0) {
+							return 7 - get.value(card);
+						}
+						return -get.value(card);
+					});
+					'step 1'
+					if (result.bool) {
+						player.$give(result.cards, target);
+						player.lose(result.cards, ui.special);
+						target.storage.liangji_1 = result.cards;
+						target.storage.liangji_1_source = target;
+						target.syncStorage('liangji_1');
+						target.addSkill('liangji_1');
+					}
+				},
+				ai: {
+					order: 1,
+					result: {
+						target:function(player, target) {
+							if(target.sex=='female') return 1.5;
+							if(target.sex=='male') return 1;
+						}
+					},
+				},
+				subSkill: {
+					"1": {
+						trigger: {
+							player: "phaseDrawBegin",
+						},
+						forced: true,
+						mark: true,
+						intro: {
+							content: "cards",
+						},
+						content: function() {
+							'step 0'
+							var cards = player.storage.liangji_1;
+							if (cards) {
+								player.gain(cards, 'gain2');
+							}
+							player.storage.liangji_1 = 0;
+							'step 1'
+							if (player.sex == 'male') player.addTempSkill('wushuang');
+							if (player.sex == 'female') player.addTempSkill('lijian');
+							player.removeSkill('liangji_1');
+						},
+						sub: true,
+					},
+				},
+			},
+			chengmou:{
+				trigger: {
+					player: "phaseDrawBegin",
+				},
+				frequent: true,
+				filter: function(event, player) {
+					return player.storage.jugong.length > 0;
+				},
+				content: function(){
+					'step 0'
+					if (player.storage.jugong.length > 2) player.loseHp();
+					'step 1'
+					var cards = player.storage.jugong;
+
+					if (cards) {
+						player.gain(cards, 'gain2');
+					}
+					player.storage.jugong = [];
+					player.unmarkSkill('jugong');
+				}
+			},
 			nsxinsheng:{
 				trigger:{source:'damageEnd'},
 				frequent:true,
@@ -97,11 +312,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					var dialog=ui.create.dialog(get.prompt('liangce'),trigger.remained,'hidden');
 					dialog.classList.add('noselect');
-					player.chooseTarget(dialog).ai=function(target){
+					player.chooseTarget(dialog).set('ai',function(target){
+						var trigger=_status.event.getTrigger();
+						var player=_status.event.player;
 						var att=get.attitude(player,target);
 						if(du>=trigger.remained.length/2) return -att;
 						return att;
-					}
+					});
 					'step 1'
 					if(result.bool){
 						player.logSkill('liangce',result.targets);
@@ -346,7 +563,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!player.hasShan()&&get.effect(player,trigger.card,trigger.player,player)<0){
 						bool=true;
 					}
-					player.chooseCard('he',get.prompt('fuchou',trigger.player)).ai=function(card){
+					player.chooseCard('he',get.prompt('fuchou',trigger.player)).set('ai',function(card){
+						var player=_status.event.player;
 						if(bool){
 							if(player.hp<=1){
 								if(get.tag(card,'save')) return 0;
@@ -355,7 +573,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 6-get.value(card);
 						}
 						return -get.value(card);
-					}
+					});
 					'step 1'
 					if(result.bool){
 						trigger.cancel();
@@ -461,9 +679,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.isDamaged()&&result.links&&result.links.length){
 						if(get.type(result.links[0])=='basic'){
 							player.chooseTarget([1,player.maxHp-player.hp],
-							'选择至多'+get.cnNumber(player.maxHp-player.hp)+'名角色各摸一张牌').ai=function(target){
-								return get.attitude(player,target);
-							}
+							'选择至多'+get.cnNumber(player.maxHp-player.hp)+'名角色各摸一张牌').set('ai',function(target){
+								return get.attitude(_status.event.player,target);
+							});
 						}
 						else{
 							player.storage.kangyin2=player.maxHp-player.hp;
@@ -523,9 +741,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(get.attitude(player,trigger.player)<0&&trigger.player.needsToDiscard()){
 						bool=true;
 					}
-					player.chooseCardButton(get.prompt('zhucheng',_status.currentPhase),player.storage.zhucheng).ai=function(button){
-						return bool?1:0;
-					}
+					player.chooseCardButton(get.prompt('zhucheng',_status.currentPhase),player.storage.zhucheng).set('ai',function(button){
+						return _status.event.bool?1:0;
+					}).set('bool',bool);
 					'step 1'
 					if(result.bool){
 						player.logSkill('zhucheng',_status.currentPhase);
@@ -620,12 +838,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						bool=true;
 					}
 					var num=player.storage.zhucheng.length;
-					trigger.player.chooseToDiscard('弃置'+get.cnNumber(num)+'张牌，或令杀无效','he',num).ai=function(card){
-						if(bool){
+					trigger.player.chooseToDiscard('弃置'+get.cnNumber(num)+'张牌，或令杀无效','he',num).set('ai',function(card){
+						if(_status.event.bool){
 							return 10-get.value(card);
 						}
 						return 0;
-					}
+					}).set('bool',bool);
 					'step 1'
 					if(!result.bool){
 						trigger.cancel();
@@ -902,10 +1120,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseTarget('是否视为使用一张杀？',function(card,player,target){
-						return trigger.targets.contains(target)&&player.canUse('sha',target,false);
-					}).ai=function(target){
+						return _status.event.targets.contains(target)&&player.canUse('sha',target,false);
+					}).set('ai',function(target){
+						var player=_status.event.player;
 						return get.effect(target,{name:'sha'},player,player);
-					}
+					}).set('targets',trigger.targets);
 					'step 1'
 					if(result.bool){
 						player.useCard({name:'sha'},result.targets,false);
@@ -1120,8 +1339,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						bool=1;
 					}
 					trigger.player.chooseControl(function(){
-						return bool;
-					}).set('prompt','率言').set('choiceList',['令'+get.translation(player)+'摸一张牌','令'+get.translation(player)+'弃置你一张牌']);
+						return _status.event.bool;
+					}).set('prompt','率言').set('bool',bool).set('choiceList',['令'+get.translation(player)+'摸一张牌','令'+get.translation(player)+'弃置你一张牌']);
 					"step 1"
 					if(result.control=='选项一'){
 						player.draw();
@@ -1352,12 +1571,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_zuoci:'左慈',
 			ns_wangyun:'王允',
 
-			nslianji:'环计',
-			nslianji_info:'出牌阶段限一次，你可以选择一名其他角色并将一张手牌置于其武将牌上。目标角色于摸牌阶段开始时，获得此牌。若其为男性角色，则获得技能【无双】，若其为女性角色，则获得技能【离间】，直到回合结束。',
-			nsjugong:'居功',
-			nsjugong_info:'回合外每名角色的回合限一次，每当场上有角色因受到【杀】或【决斗】造成的伤害，你可以摸一张牌并且将一张手牌置于你的武将牌上，称之为“功”。在你即将受到伤害时，你可以弃置两张“功”，防止此伤害。',
-			nschengmou:'逞谋',
-			nschengmou_info:'摸牌阶段开始时，若你有“功”牌，你获得之，若你所获得的“功”牌多于两张，你须失去一点体力。',
+
+			rejizhi:'集智',
+			rejizhi_info:'当你使用一张装备牌或锦囊牌时，你可以摸一张牌并展示之，若此牌是基本牌，你须弃置一张手牌，每回合限3次',
+    		yiesheng:'回雪',
+    		yiesheng_info:'出牌阶段，你可以弃置任意数量的黑色手牌，然后摸等量的牌。',
+			liangji:'环计',
+			liangji_info:'出牌阶段限一次，你可以选择一名其他角色并将一张手牌置于其武将牌上。目标角色于摸牌阶段开始时，获得此牌。若其为男性角色，则获得技能【无双】，若其为女性角色，则获得技能【离间】，直到回合结束。',
+			jugong:'居功',
+			jugong_info:'回合外每名角色的回合限一次，每当场上有角色因受到【杀】或【决斗】造成的伤害，你可以摸一张牌并且将一张手牌置于你的武将牌上，称之为“功”。在你即将受到伤害时，你可以弃置两张“功”，防止此伤害。',
+			chengmou:'逞谋',
+			chengmou_info:'摸牌阶段开始时，若你有“功”牌，你获得之，若你所获得的“功”牌多于两张，你须失去一点体力。',
 			nsxinsheng:'新生',
 			nsxinsheng_info:'每当你对其他角色造成伤害后，若你未受伤，则你可以增加X点体力上限并摸X张牌，X为伤害点数',
 			nsdunxing:'遁形',

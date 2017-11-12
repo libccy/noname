@@ -7426,6 +7426,10 @@
 									continue;
 								}
 							}
+							if(Array.isArray(lib[j])&&Array.isArray(character[i][j])){
+								lib[j].addArray(character[i][j]);
+								continue;
+							}
 							for(k in character[i][j]){
 								if(j=='character'){
 									if(!character[i][j][k][4]){
@@ -7464,6 +7468,9 @@
 												lib.cardPack.mode_derivation.push(k);
 											}
 										}
+									}
+									else if(Array.isArray(lib[j][k])&&Array.isArray(character[i][j][k])){
+										lib[j][k].addArray(character[i][j][k]);
 									}
 									else{
 										console.log('dublicate '+j+' in character '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+character[i][j][k]);
@@ -8684,7 +8691,7 @@
 		        var list=lib.rank.s.concat(lib.rank.ap).concat(lib.rank.a).concat(lib.rank.am).
 		            concat(lib.rank.bp).concat(lib.rank.b).concat(lib.rank.bm).concat(lib.rank.c).concat(lib.rank.d);
 		        for(var i in lib.character){
-		            if(i!='zuoci'&&i!='miheng'&&i.indexOf('boss_')!=0&&i.indexOf('tafang_')!=0&&!list.contains(i)) console.log(get.translation(i));
+		            if(!lib.connectBanned.contains(i)&&i.indexOf('boss_')!=0&&i.indexOf('tafang_')!=0&&!list.contains(i)) console.log(get.translation(i));
 		        }
 		    },
 			h:function(player){
@@ -9102,7 +9109,12 @@
     					}
     					if(character[i].forbid&&character[i].forbid.contains(lib.config.mode)) continue;
     					if(character[i].mode&&character[i].mode.contains(lib.config.mode)==false) continue;
-    					for(j in character[i]){
+
+						if(Array.isArray(lib[j])&&Array.isArray(character[i][j])){
+							lib[j].addArray(character[i][j]);
+							continue;
+						}
+						for(j in character[i]){
     						if(j=='mode'||j=='forbid') continue;
     						for(k in character[i][j]){
     							if(j=='character'){
@@ -9124,6 +9136,9 @@
     								if(lib[j][k]==undefined){
     									lib[j][k]=character[i][j][k];
     								}
+									else if(Array.isArray(lib[j][k])&&Array.isArray(character[i][j][k])){
+										lib[j][k].addArray(character[i][j][k]);
+									}
     								else{
     									console.log('dublicate '+j+' in character '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+character[i][j][k]);
     								}
@@ -30696,6 +30711,7 @@
 						var charactersToAlter=[];
 						for(var i in info){
 							if(info[i][4]&&info[i][4].contains('unseen')) continue;
+							if(connectMenu&&lib.connectBanned.contains(i)) continue;
 							list.push(i);
 							for(var j=0;j<info[i][3].length;j++){
 								if(!lib.skill[info[i][3][j]]){
@@ -41929,7 +41945,7 @@
                 var pack=lib.characterPack[lib.configOL.characterPack[i]];
                 for(var j in pack){
 					if(typeof func=='function'&&func(j)) continue;
-					if(j=='zuoci'||j=='miheng') continue;
+					if(lib.connectBanned.contains(j)) continue;
                     if(lib.character[j]) libCharacter[j]=pack[j];
                 }
             }

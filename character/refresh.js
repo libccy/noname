@@ -256,29 +256,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-			rejizhi:{
-				audio:2,
-				usable:3,
-				trigger:{player:'useCard'},
-				frequent:true,
-				filter:function(event){
-					var type=get.type(event.card,'trick');
-					return (type=='trick'||type=='equip')&&event.cards[0]&&event.cards[0]==event.card;
-				},
-				content:function(){
-					"step 0"
-					var cards=get.cards();
-					player.gain(cards,'gain2','log');
-					if(get.type(cards[0])!='basic'){
-						event.finish();
-					}
-					"step 1"
-					player.chooseToDiscard('h',true);
-				},
-				ai:{
-					threaten:1.4
-				}
-			},
 			retuxi:{
 				audio:2,
 				trigger:{player:'phaseDrawBefore'},
@@ -1546,12 +1523,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reguose:'国色',
 			fenwei:'奋威',
 			chulao:'除疠',
-			rejizhi:'集智',
 			liyu:'利驭',
 			rerende:'仁德',
 			rerende_info:'出牌阶段，你可以将至少一张手牌交给其他角色，然后你于此阶段内不能再以此法交给该角色牌；若你于此阶段内给出的牌首次达到两张，你可以视为使用一张基本牌',
 			liyu_info:'当你使用【杀】对一名其他角色造成伤害后，该角色可令你获得其一张牌，若如此做，则视为你对其选择的另一名角色使用一张【决斗】',
-			rejizhi_info:'当你使用一张装备牌或锦囊牌时，你可以摸一张牌并展示之，若此牌是基本牌，你须弃置一张手牌，每回合限3次',
 			xunxun_info:'摸牌阶段，你可以改为观看牌堆顶的四张牌，然后获得其中的两张牌，将其余的牌以任意顺序置于牌堆底。',
 			wangxi_info:'每当你对其他角色造成1点伤害后，或受到其他角色造成的1点伤害后，你可与该角色各摸一张牌。',
 			reguose_info:'出牌阶段限一次，你可以选择一项：将一张方片花色牌当做【乐不思蜀】使用；或弃置一张方片花色牌并弃置场上的一张【乐不思蜀】。选择完成后，你摸一张牌。',

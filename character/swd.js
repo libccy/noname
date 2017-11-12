@@ -1848,11 +1848,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					if(num<=1) return att*2;
     					if(num==2){
     						for(var i=0;i<cards.length;i++){
-    							if(get.value(cards[i])>6,target,'raw') return att;
+    							if(get.value(cards[i],target,'raw')>6) return att;
     						}
     						if(target==player){
     							for(var i=0;i<2;i++){
-    								if(get.value(cards[i])>6,target,'raw') return -1;
+    								if(get.value(cards[i],target,'raw')>6) return -1;
     							}
     						}
     						return att/2;
@@ -3857,25 +3857,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				},
     				order:8,
     			}
-    		},
-    		yiesheng:{
-    			enable:'phaseUse',
-    			filterCard:{color:'black'},
-    			filter:function(event,player){
-    				return player.countCards('h',{color:'black'})>0;
-    			},
-    			selectCard:[1,Infinity],
-    			prompt:'弃置任意张黑色手牌并摸等量的牌',
-    			check:function(card){return 5-get.value(card)},
-    			content:function(){
-    				player.draw(cards.length);
-    			},
-    			ai:{
-    				order:1,
-    				result:{
-    					player:1
-    				},
-    			},
     		},
     		dangping:{
     			trigger:{source:'damageAfter'},
@@ -9561,8 +9542,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		xiangu_info:'锁定技，你的手牌上限不会因体力值的减少而减少。',
     		hujing:'壶境',
     		hujing_info:'锁定技，准备阶段，若牌堆或弃牌堆中有炼妖壶，你装备之；当你的装备区内有炼妖壶时，你的手牌上限+2',
-    		yiesheng:'回雪',
-    		yiesheng_info:'出牌阶段，你可以弃置任意数量的黑色手牌，然后摸等量的牌。',
     		huajian:'化剑',
     		huajian_info:'出牌阶段结束时，你可以将一张牌当作杀对任意一名角色使用',
     		xuanyuan:'轩辕',
