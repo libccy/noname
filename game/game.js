@@ -13529,6 +13529,7 @@
 					this.hiddenSkills=[];
                     this.awakenedSkills=[];
 					this.forbiddenSkills={};
+					this.subplayers=[];
 					this.stat=[{card:{},skill:{}}];
 					this.tempSkills={};
 					this.storage={};
@@ -37372,11 +37373,12 @@
 				node.additionalSkills={};
 				node.disabledSkills={};
 				node.hiddenSkills=[];
-                node.awakenedSkills=[];
+				node.awakenedSkills=[];
 				node.forbiddenSkills={};
 				node.popups=[];
 				node.damagepopups=[];
 				node.judging=[];
+                node.subplayers=[];
 				node.stat=[{card:{},skill:{}}];
 				node.tempSkills={};
 				node.storage={};
