@@ -3,6 +3,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     return {
     	name:'shenhua',
     	connect:true,
+        connectBanned:['zuoci'],
     	character:{
     		xiahouyuan:['male','wei',4,['xinshensu']],
     		caoren:['male','wei',4,['xinjushou','xinjiewei']],

@@ -3,6 +3,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     return {
     	name:'sp',
     	connect:true,
+        connectBanned:['miheng'],
     	character:{
     		yangxiu:['male','wei',3,['jilei','danlao']],
     		chenlin:['male','wei',3,['bifa','songci']],

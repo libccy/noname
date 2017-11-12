@@ -29,7 +29,9 @@
 		canvasUpdates:[],
 		video:[],
 		skilllist:[],
+		connectBanned:[],
 		characterIntro:{},
+		characterTitle:{},
 		characterPack:{},
 		cardPack:{},
 		onresize:[],
@@ -41436,6 +41438,20 @@
     			return false;
     		},
         },
+		colorspan:function(str){
+			if(str[0]=='#'){
+				var color;
+				switch(str[1]){
+					case 'r':color='fire';break;
+					case 'p':color='legend';break;
+					case 'b':color='blue';break;
+					case 'g':color='green';break;
+					default:return str.slice(2);
+				}
+				return '<span class="'+color+'text '+color+'auto">'+str.slice(2)+'</span>';
+			}
+			return str;
+		},
 		evtprompt:function(next,str){
 			if(next.prompt){
 				next.prompt2=str;
@@ -43309,6 +43325,10 @@
 				}
 				uiintro.add(capt);
 
+				if(lib.characterTitle[node.name]){
+					uiintro.addText(get.colorspan(lib.characterTitle[node.name]));
+				}
+
                 if(node.isUnderControl()){
                     var hs=node.getCards('h');
                     if(hs.length){
@@ -43814,6 +43834,11 @@
 				else{
 					uiintro.add(get.translation(character));
 				}
+
+				if(lib.characterTitle[node.link]){
+					uiintro.addText(get.colorspan(lib.characterTitle[node.link]));
+				}
+
                 if(node._banning){
                     var clickBanned=function(){
                         var banned=lib.config[this.bannedname]||[];

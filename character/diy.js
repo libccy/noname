@@ -27,6 +27,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_zaozhirenjun:['male','wei',3,['liangce','jianbi','juntun']],
 			diy_yangyi:['male','shu',3,['choudu','liduan']],
 			diy_tianyu:['male','wei',4,['chezhen','youzhan']],
+
+			ns_zuoci:['male','qun',3,['nsxinsheng','nsdunxing']],
+			ns_wangyun:["male","qun",4,["nsliangji","nsjugong","nschengmou"]],
 		},
 		characterIntro:{
 			diy_feishi:'字公举，生卒年不详，益州犍为郡南安县（今四川省乐山市）人。刘璋占据益州时，以费诗为绵竹县县令。刘备进攻刘璋夺取益州，费诗举城而降，后受拜督军从事，转任牂牁郡太守，再为州前部司马。',
@@ -38,10 +41,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_yangyi:'字威公，襄阳（今湖北襄阳）人，三国时期蜀汉政治家。最初，为荆州刺史傅群的主簿，后投奔关羽，任为功曹。羽遣其至成都，大受刘备赞赏，擢为尚书。建兴三年（225年）任丞相参军，此后一直跟随诸葛亮战斗。亮卒，他部署安全退军。亮生前定蒋琬继己任，仪仅拜中军师。建兴十三年（235年），因多出怨言，被削职流放至汉嘉郡。但杨仪仍不自省，又上书诽谤，言辞激烈，最后下狱，自杀身亡。',
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
+		characterTitle:{
+			ns_zuoci:'#bskystarwuwei'
+		},
 		perfectPair:{
 			yuji:['zuoci']
 		},
 		skill:{
+			nsxinsheng:{
+				trigger:{source:'damageEnd'},
+				frequent:true,
+				filter:function(event,player){
+					return player.isHealthy();
+				},
+				content:function(){
+					player.gainMaxHp(trigger.num,true);
+					player.draw(trigger.num);
+				}
+			},
+			nsdunxing:{
+				trigger:{player:'damageBefore'},
+				filter:function(event,player){
+					return player.isDamaged();
+				},
+				content:function(){
+					trigger.cancel();
+					player.loseMaxHp(trigger.num,true);
+					player.draw(trigger.num);
+				}
+			},
 			liangce:{
 				enable:'phaseUse',
 				viewAs:{name:'wugu'},
@@ -1321,6 +1349,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_caiwenji:'蔡昭姬',
 			diy_zhenji:'甄宓',
 
+			ns_zuoci:'左慈',
+			ns_wangyun:'王允',
+
+			nslianji:'环计',
+			nslianji_info:'出牌阶段限一次，你可以选择一名其他角色并将一张手牌置于其武将牌上。目标角色于摸牌阶段开始时，获得此牌。若其为男性角色，则获得技能【无双】，若其为女性角色，则获得技能【离间】，直到回合结束。',
+			nsjugong:'居功',
+			nsjugong_info:'回合外每名角色的回合限一次，每当场上有角色因受到【杀】或【决斗】造成的伤害，你可以摸一张牌并且将一张手牌置于你的武将牌上，称之为“功”。在你即将受到伤害时，你可以弃置两张“功”，防止此伤害。',
+			nschengmou:'逞谋',
+			nschengmou_info:'摸牌阶段开始时，若你有“功”牌，你获得之，若你所获得的“功”牌多于两张，你须失去一点体力。',
+			nsxinsheng:'新生',
+			nsxinsheng_info:'每当你对其他角色造成伤害后，若你未受伤，则你可以增加X点体力上限并摸X张牌，X为伤害点数',
+			nsdunxing:'遁形',
+			nsdunxing_info:'每当你即将受到其他角色造成的伤害时，若你已受伤，则你可以防止此伤害，改为失去X点体力上限并摸X张牌，X为伤害点数',
 			liangce:'粮策',
 			liangce_info:'①出牌阶段限一次，你可以将一张基本牌当【五谷丰登】使用。②当因执行【五谷丰登】的效果而亮出的牌因效果执行完毕而置入弃牌堆后，你可以选择一名角色，令该角色获取之',
 			jianbi:'坚壁',
