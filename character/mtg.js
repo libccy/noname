@@ -110,9 +110,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							hs:player.getCards('h'),
 							es:player.getCards('e')
 						}
-	    				player.reinit('mtg_lilianna',name);
-						player.maxHp=1;
-						player.update();
+	    				player.reinit('mtg_lilianna',name,[1,1]);
 						player.addSkill('lingyong3');
 						player.lose(player.getCards('he'),ui.special)._triggered=null;
 
@@ -170,9 +168,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					if(player.storage.lingyong3){
-						player.reinit(player.storage.lingyong3.name2,'mtg_lilianna');
-						player.maxHp=player.storage.lingyong3.maxHp;
-						player.hp=player.storage.lingyong3.hp;
+						player.reinit(player.storage.lingyong3.name2,'mtg_lilianna',[
+							player.storage.lingyong3.hp,
+							player.storage.lingyong3.maxHp
+						]);
 						player.update();
 						for(var i in player.storage.lingyong3.storage){
 							player.storage[i]=player.storage.lingyong3.storage[i];

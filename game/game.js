@@ -13450,36 +13450,42 @@
 					for(var i=0;i<info2[3].length;i++){
 						this.addSkill(info2[3][i]);
 					}
-					var num;
-					if(maxHp===false){
-						num=0;
+					if(Array.isArray(maxHp)){
+						this.maxHp=maxHp[1];
+						this.hp=maxHp[0];
 					}
 					else{
-						if(typeof maxHp!='number'){
-							maxHp=info2[2];
+						var num;
+						if(maxHp===false){
+							num=0;
 						}
-						num=maxHp-info1[2];
-					}
-					if(typeof this.singleHp=='boolean'){
-						if(num%2!=0){
-							if(this.singleHp){
-								this.maxHp+=(num+1)/2;
-								this.singleHp=false;
+						else{
+							if(typeof maxHp!='number'){
+								maxHp=info2[2];
+							}
+							num=maxHp-info1[2];
+						}
+						if(typeof this.singleHp=='boolean'){
+							if(num%2!=0){
+								if(this.singleHp){
+									this.maxHp+=(num+1)/2;
+									this.singleHp=false;
+								}
+								else{
+									this.maxHp+=(num-1)/2;
+									this.singleHp=true;
+									if(!game.online){
+										this.doubleDraw();
+									}
+								}
 							}
 							else{
-								this.maxHp+=(num-1)/2;
-								this.singleHp=true;
-								if(!game.online){
-									this.doubleDraw();
-								}
+								this.maxHp+=num/2;
 							}
 						}
 						else{
-							this.maxHp+=num/2;
+							this.maxHp+=num;
 						}
-					}
-					else{
-						this.maxHp+=num;
 					}
 					game.broadcast(function(player,from,to,skills){
 						player.reinit(from,to,null,true);
@@ -13529,7 +13535,6 @@
 					this.hiddenSkills=[];
                     this.awakenedSkills=[];
 					this.forbiddenSkills={};
-					this.subplayers=[];
 					this.stat=[{card:{},skill:{}}];
 					this.tempSkills={};
 					this.storage={};
@@ -16742,6 +16747,58 @@
 					if(includecard&&!lib.filter.cardUsable(card,this)) return false;
 					if(distance==false) return lib.filter.targetEnabled(card,this,player);
 					return lib.filter.filterTarget(card,this,player);
+				},
+				addSubPlayer:function(cfg){
+					var skill='subplayer_'+cfg.name+'_'+get.id();
+					lib.skill[skill]={
+						intro:{
+							content:cfg.intro||''
+						},
+						mark:'character',
+						onremove:true,
+						ai:{
+							subplayer:true
+						}
+					}
+					if(!cfg.handcards){
+						cfg.handcards=[];
+					}
+					if(!cfg.equips){
+						cfg.equips=[];
+					}
+					if(!cfg.skills){
+						cfg.skills=[];
+					}
+					lib.translate[skill]=cfg.caption||get.rawName(trigger.player.name);
+					this.storage[skill]=cfg;
+					this.addSkill(skill);
+				},
+				removeSubPlayer:function(){
+
+				},
+				callSubPlayer:function(){
+
+				},
+				getSubPlayers:function(){
+					var skills=this.getSkills();
+					var list=[];
+					for(var i=0;i<skills.length;i++){
+						var name=skills[i];
+						var info=lib.skill[name];
+						if(info.ai&&info.ai.subplayer&&this.storage[name]&&this.storage[name].name){
+							list.push(name);
+						}
+					}
+					return list;
+				},
+				getSubPlayerNames:function(list){
+					if(!list){
+						list=this.getSubPlayers();
+					}
+					var names=[];
+					for(var i=0;i<list.length;i++){
+						names.push(this.storage[list[i]].name);
+					}
 				},
                 addSkillTrigger:function(skill,hidden,triggeronly){
                     var info=lib.skill[skill];
@@ -37378,7 +37435,6 @@
 				node.popups=[];
 				node.damagepopups=[];
 				node.judging=[];
-                node.subplayers=[];
 				node.stat=[{card:{},skill:{}}];
 				node.tempSkills={};
 				node.storage={};
