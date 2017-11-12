@@ -45,81 +45,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lingyong:{
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.hasSkillTag('lingyong');
+					return !player.hasSkill('subplayer')&&player.getSubPlayers('lingyong_get').length>0;
 				},
 				unique:true,
     			forceunique:true,
-				group:'lingyong2',
+				group:'lingyong_get',
 				direct:true,
 				delay:0,
 				skillAnimation:true,
 				animationColor:'thunder',
 				content:function(){
-					'step 0'
-					var list=[];
-					var list2=[];
-					var skills=player.getSkills();
-					for(var i=0;i<skills.length;i++){
-						var info=lib.skill[skills[i]];
-						if(info.ai&&info.ai.lingyong){
-							list.push(skills[i].slice(9));
-							list2.push(skills[i]);
-						}
-					}
-					event.list=list;
-					event.list2=list2;
-					if(list.length>1){
-						var dialog=ui.create.dialog('灵俑','hidden');
-	    				dialog.add([list,'character']);
-	    				player.chooseButton(dialog,true);
-					}
-					else if(list.length==1){
-						event.directresult=list[0];
-					}
-					else{
-						event.finish();
-					}
-					player.logSkill('lingyong');
-					'step 1'
-					if(!event.directresult){
-						if(result&&result.bool&&result.links[0]){
-							event.directresult=result.links[0];
-						}
-						else{
-							event.finish();
-							return;
-						}
-					}
-					if(event.directresult){
-						var storage={};
-						for(var i=0;i<event.list2.length;i++){
-							var skill=event.list2[i];
-							storage[skill]=player.storage[skill];
-						}
-						player.removeSkill(event.list2);
-						event.list2.remove('lingyong_'+event.directresult);
-						delete storage['lingyong_'+event.directresult];
-						var name=event.directresult;
-						player.storage.lingyong3={
-							name:'mtg_lilianna',
-							hp:player.hp,
-							maxHp:player.maxHp,
-							skills:event.list2.slice(0),
-							name2:name,
-							storage:storage,
-							hs:player.getCards('h'),
-							es:player.getCards('e')
-						}
-	    				player.reinit('mtg_lilianna',name,[1,1]);
-						player.addSkill('lingyong3');
-						player.lose(player.getCards('he'),ui.special)._triggered=null;
-
-						var evt=_status.event.getParent('phaseUse');
-						if(evt&&evt.name=='phaseUse'){
-							evt.skipped=true;
-						}
-						player.insertPhase();
-					}
+					player.callSubPlayer('lingyong_get');
 				},
 				ai:{
 					order:1,
@@ -131,65 +67,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							// return 0;
 						}
 					}
-				}
-			},
-			lingyong2:{
-				trigger:{global:'dieAfter'},
-				forced:true,
-				filter:function(event,player){
-					return ![player.name,player.name1,player.name2].contains(event.player.name);
 				},
-				content:function(){
-					var name='lingyong_'+trigger.player.name;
-					lib.translate[name]=get.rawName(trigger.player.name).replace(/<br>/g,'')+'之俑';
-					lib.skill[name]={
-						intro:{
-							content:'出牌阶段，你可以移去此标记，然后变身为'+get.translation(trigger.player)
+				subSkill:{
+					get:{
+						trigger:{global:'dieAfter'},
+						forced:true,
+						filter:function(event,player){
+							return ![player.name,player.name1,player.name2].contains(event.player.name);
 						},
-						mark:'character',
-						onremove:true,
-						ai:{
-							lingyong:true
+						content:function(){
+							player.addSubPlayer({
+								name:trigger.player.name,
+								skills:lib.character[trigger.player.name][3],
+								hs:get.cards(2),
+								intro:'出牌阶段，你可以调遣此随从',
+								intro2:'xx'
+							});
 						}
 					}
-					player.storage[name]=trigger.player;
-					player.addSkill(name);
-				}
-			},
-			lingyong3:{
-				trigger:{player:'dieBefore'},
-				forced:true,
-				priority:-9,
-				onremove:true,
-				mark:'character',
-				intro:{
-					content:'死亡前变回莉莲娜'
-				},
-				content:function(){
-					'step 0'
-					if(player.storage.lingyong3){
-						player.reinit(player.storage.lingyong3.name2,'mtg_lilianna',[
-							player.storage.lingyong3.hp,
-							player.storage.lingyong3.maxHp
-						]);
-						player.update();
-						for(var i in player.storage.lingyong3.storage){
-							player.storage[i]=player.storage.lingyong3.storage[i];
-						}
-						player.addSkill(player.storage.lingyong3.skills);
-						trigger.cancel();
-						player.lose(player.getCards('he'),ui.discardPile)._triggered=null;
-					}
-					'step 1'
-					if(player.storage.lingyong3){
-						player.directgain(player.storage.lingyong3.hs);
-						player.directequip(player.storage.lingyong3.es);
-					}
-					player.removeSkill('lingyong3');
-				},
-				ai:{
-					nosave:true,
-					threaten:0.8
 				}
 			},
 			mhuanyi:{

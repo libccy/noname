@@ -5577,7 +5577,7 @@
 			'<div style="margin:10px">游戏操作</div><ul style="margin-top:0"><li>在命令框中输出结果<br>game.print(str)<li>清除命令框中的内容<br>cls<li>上一条/下一条输入的内容<br>up/down<li>游戏结束<br>game.over(bool)'+
 			'<li>角色资料<br>lib.character<li>卡牌资料<br>lib.card</ul>',
 			'游戏名词':'<ul><li>护甲：和体力类似，每点护甲可抵挡一点伤害，但不影响手牌上限'+
-			'<li>子武将：通过技能获得，拥有独立的技能、手牌区和装备区（共享判定区），出场时替代主武将的位置；子武将死亡时自动切换回主武将'
+			'<li>随从：通过技能获得，拥有独立的技能、手牌区和装备区（共享判定区），出场时替代主武将的位置；随从死亡时自动切换回主武将'
 		},
 		setIntro:function(node,func){
 			if(lib.config.touchscreen){
@@ -5911,6 +5911,9 @@
                                 else if(nameinfo[4][i].indexOf('mode:')==0){
                                     modeimage=nameinfo[4][i].slice(5);break;
                                 }
+								else if(nameinfo[4][i].indexOf('character:')==0){
+									name=nameinfo[4][i].slice(10);break;
+								}
         					}
         				}
                         if(extimage){
@@ -8975,6 +8978,104 @@
 		},
 		element:{
 			content:{
+				exitSubPlayer:function(){
+					'step 0'
+					if(player.storage.subplayer){
+						var current=player.storage.subplayer.name2;
+						player.reinit(current,player.storage.subplayer.name,[
+							player.storage.subplayer.hp,
+							player.storage.subplayer.maxHp
+						]);
+						player.update();
+						if(event.remove){
+							delete player.storage.subplayer.storage[current];
+							player.storage.subplayer.skills.remove(current);
+							game.log(player,'牺牲了随从','#g'+current);
+						}
+						else{
+							game.log(player,'收回了随从','#g'+current);
+						}
+						for(var i in player.storage.subplayer.storage){
+							player.storage[i]=player.storage.subplayer.storage[i];
+						}
+						player.addSkill(player.storage.subplayer.skills);
+						if(event.remove){
+							player.lose(player.getCards('he'),ui.discardPile)._triggered=null;
+						}
+						else{
+							player.storage[current].hs=player.getCards('h');
+							player.storage[current].es=player.getCards('e');
+							player.lose(player.getCards('he'),ui.special)._triggered=null;
+						}
+					}
+					'step 1'
+					if(player.storage.subplayer){
+						player.directgain(player.storage.subplayer.hs);
+						player.directequip(player.storage.subplayer.es);
+					}
+					player.removeSkill('subplayer');
+				},
+				callSubPlayer:function(){
+					'step 0'
+					var list=player.getSubPlayers(event.tag);
+					event.list=list;
+					if(!event.directresult){
+						if(list.length>1){
+							var dialog=ui.create.dialog('调遣一个随从','hidden');
+		    				dialog.add([list,'character']);
+		    				player.chooseButton(dialog,true);
+						}
+						else if(list.length==1){
+							event.directresult=list[0];
+						}
+						else{
+							event.finish();
+						}
+					}
+					else{
+						if(!list.contains(event.directresult)){
+							event.finish();
+						}
+					}
+					'step 1'
+					if(!event.directresult){
+						if(result&&result.bool&&result.links[0]){
+							event.directresult=result.links[0];
+						}
+						else{
+							event.finish();
+							return;
+						}
+					}
+					if(event.directresult){
+						var storage={};
+						for(var i=0;i<event.list.length;i++){
+							var skill=event.list[i];
+							storage[skill]=player.storage[skill];
+						}
+						var cfg=player.storage[event.directresult];
+						var source=cfg.source||player.name;
+						var name=event.directresult;
+						game.log(player,'调遣了随从','#b'+name);
+						player.storage.subplayer={
+							name:source,
+							name2:event.directresult,
+							hp:player.hp,
+							maxHp:player.maxHp,
+							skills:event.list.slice(0),
+							storage:storage,
+							hs:player.getCards('h'),
+							es:player.getCards('e'),
+							intro2:cfg.intro2
+						}
+						player.removeSkill(event.list);
+	    				player.reinit(source,name,[cfg.hp,cfg.maxHp]);
+						player.addSkill('subplayer');
+						player.lose(player.getCards('he'),ui.special)._triggered=null;
+						if(cfg.hs.length) player.directgain(cfg.hs);
+						if(cfg.es.length) player.directequip(cfg.es);
+					}
+				},
 				reverseOrder:function(){
 					"step 0"
 					game.delay();
@@ -16756,20 +16857,30 @@
 						},
 						mark:'character',
 						onremove:true,
+						subplayer:cfg.skill||_status.event.name,
 						ai:{
 							subplayer:true
 						}
 					}
-					if(!cfg.handcards){
-						cfg.handcards=[];
+					cfg.hs=cfg.hs||[];
+					cfg.es=cfg.es||[];
+					cfg.skills=cfg.skills||[];
+					cfg.hp=cfg.hp||1;
+					cfg.maxHp=cfg.maxHp||1;
+					cfg.sex=cfg.sex||'male';
+					cfg.group=cfg.group||'qun';
+					cfg.skill=cfg.skill||_status.event.name;
+					if(!cfg.source){
+						if(this.hasSkill(_status.event.name)&&this.name2&&lib.character[this.name2]&&
+							lib.character[this.name2][3].contains(_status.event.name)){
+							cfg.source=this.name2;
+						}
+						else{
+							cfg.source=this.name;
+						}
 					}
-					if(!cfg.equips){
-						cfg.equips=[];
-					}
-					if(!cfg.skills){
-						cfg.skills=[];
-					}
-					lib.translate[skill]=cfg.caption||get.rawName(trigger.player.name);
+					lib.character[skill]=[cfg.sex,cfg.group,cfg.maxHp,cfg.skills,['character:'+cfg.name]];
+					lib.translate[skill]=cfg.caption||get.rawName(cfg.name);
 					this.storage[skill]=cfg;
 					this.addSkill(skill);
 				},
@@ -16777,28 +16888,37 @@
 
 				},
 				callSubPlayer:function(){
-
+					if(this.hasSkill('subplayer')) return;
+					var next=game.createEvent('callSubPlayer');
+					next.player=this;
+					for(var i=0;i<arguments.length;i++){
+						if(typeof arguments[i]=='string'){
+							next.tag=arguments[i];
+						}
+					}
+					next.setContent('callSubPlayer');
+					return next;
 				},
-				getSubPlayers:function(){
+				exitSubPlayer:function(remove){
+					if(!this.hasSkill('subplayer')) return;
+					var next=game.createEvent('exitSubPlayer');
+					next.player=this;
+					next.remove=remove;
+					next.setContent('exitSubPlayer');
+					return next;
+				},
+				getSubPlayers:function(tag){
 					var skills=this.getSkills();
 					var list=[];
 					for(var i=0;i<skills.length;i++){
 						var name=skills[i];
 						var info=lib.skill[name];
+						if(tag&&info.subplayer!=tag) continue;
 						if(info.ai&&info.ai.subplayer&&this.storage[name]&&this.storage[name].name){
 							list.push(name);
 						}
 					}
 					return list;
-				},
-				getSubPlayerNames:function(list){
-					if(!list){
-						list=this.getSubPlayers();
-					}
-					var names=[];
-					for(var i=0;i<list.length;i++){
-						names.push(this.storage[list[i]].name);
-					}
 				},
                 addSkillTrigger:function(skill,hidden,triggeronly){
                     var info=lib.skill[skill];
@@ -20667,6 +20787,30 @@
             zhu:{},
             zhuSkill:{},
 			unequip:{ai:{unequip:true}},
+			subplayer:{
+				trigger:{player:'dieBefore'},
+				forced:true,
+				priority:-9,
+				onremove:true,
+				mark:'character',
+				intro:{
+					content:function(storage,player){
+						if(typeof storage.intro2=='string') return storage.intro2;
+						if(typeof storage.intro2=='function') return storage.intro2(storage,player);
+						return '死亡前变回'+get.translation(storage.name);
+					},
+					name:function(storage){
+						return get.rawName(storage.name2);
+					}
+				},
+				content:function(){
+					trigger.cancel();
+					player.exitSubPlayer(true);
+				},
+				ai:{
+					nosave:true
+				}
+			},
 			autoswap:{
 				trigger:{player:['chooseToUseBegin','chooseToRespondBegin','chooseToDiscardBegin','chooseToCompareBegin',
 				'chooseButtonBegin','chooseCardBegin','chooseTargetBegin','chooseCardTargetBegin','chooseControlBegin',
