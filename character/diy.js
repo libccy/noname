@@ -33,6 +33,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_zuoci:['male','qun',3,['nsxinsheng','nsdunxing']],
 			ns_lvzhi:['female','qun',3,['nsnongquan','nsdufu']],
 			ns_wangyun:["male","qun",4,["liangji","jugong","chengmou"]],
+			ns_nanhua:["male","qun",3,["nshuanxian","nstaiping","nsshoudao"]],
+			ns_nanhua_left:["male","qun",2,[],['unseen']],
+			ns_nanhua_right:["female","qun",2,[],['unseen']],
 		},
 		characterIntro:{
 			diy_feishi:'字公举，生卒年不详，益州犍为郡南安县（今四川省乐山市）人。刘璋占据益州时，以费诗为绵竹县县令。刘备进攻刘璋夺取益州，费诗举城而降，后受拜督军从事，转任牂牁郡太守，再为州前部司马。',
@@ -45,12 +48,291 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
-			ns_zuoci:'#bskystarwuwei'
+			ns_zuoci:'#bskystarwuwei',
+			ns_lvzhi:'#bskystarwuwei',
+			ns_wangyun:'#rSukincen',
+			ns_nanhua:'#g戒除联盟',
 		},
 		perfectPair:{
 			yuji:['zuoci']
 		},
 		skill:{
+			nstaiping:{
+				trigger:{player:'damageEnd'},
+				filter:function(event,player){
+					return player.storage.nshuanxian_damage&&player.getSubPlayers('nshuanxian').length;
+				},
+			},
+			nsshoudao:{},
+			nshuanxian:{
+				trigger:{global:'gameStart',player:'enterGame'},
+				forced:true,
+				nosub:true,
+				unique:true,
+				group:['nshuanxian_left','nshuanxian_right','nshuanxian_damage','nshuanxian_swap'],
+				content:function(){
+					player.storage.nshuanxian_right=player.addSubPlayer({
+						name:'ns_nanhua_right',
+						skills:['nshuanxian_left','nshuanxian_draw','nshuanxian_swap'],
+						hp:2,
+						maxHp:2,
+						hs:get.cards(2),
+						skill:'nshuanxian',
+						intro:'你的本体回合结束后，切换至此随从并进行一个额外的回合；若你的上家与下家不同，在你的下家的准备阶段，切换至此随从',
+						intro2:'当前回合结束后切换回本体',
+						onremove:function(player){
+							delete player.storage.nshuanxian_right;
+						}
+					});
+				},
+				ai:{
+					maixie:true,
+					effect:{
+						target:function(card,player,target){
+    						if(get.tag(card,'damage')){
+    							if(!target.hasFriend()) return;
+    							if(!target.storage.nshuanxian_damage) return [0.5,1];
+    						}
+    					}
+					}
+				},
+				// mod:{
+				// 	globalFrom:function(from,to,distance){
+                //
+				// 	},
+				// 	globalTo:function(from,to,distance){
+                //
+				// 	}
+				// },
+				// global:'nshuanxian_choose',
+				subSkill:{
+					chosen:{},
+					leftdist:{
+						mod:{
+							globalFrom:function(from,to,distance){
+
+							},
+							globalTo:function(from,to,distance){
+
+							}
+						}
+					},
+					rightdist:{
+						mod:{
+							globalFrom:function(from,to,distance){
+
+							},
+							globalTo:function(from,to,distance){
+
+							}
+						}
+					},
+					swap:{
+						trigger:{global:'phaseBegin'},
+						forced:true,
+						popup:false,
+						filter:function(event,player){
+							return event.player!=player;
+						},
+						priority:20,
+						content:function(){
+							var next=player.getNext();
+							var prev=player.getPrevious();
+							var left=player.storage.nshuanxian_left;
+							var right=player.storage.nshuanxian_right;
+							if(prev==next||(trigger.player!=next&&trigger.player!=prev)){
+								if(player.hasSkill('subplayer')){
+									player.exitSubPlayer();
+								}
+							}
+							else if(prev==trigger.player&&player.name!=left&&left){
+								if(!player.hasSkill('subplayer')){
+									player.callSubPlayer(left);
+								}
+								else{
+									player.toggleSubPlayer(left);
+								}
+							}
+							else if(next==trigger.player&&player.name!=right&&right){
+								if(!player.hasSkill('subplayer')){
+									player.callSubPlayer(right);
+								}
+								else{
+									player.toggleSubPlayer(right);
+								}
+							}
+						}
+					},
+					damage:{
+						trigger:{player:'damageEnd'},
+						forced:true,
+						filter:function(event,player){
+							return !player.storage.nshuanxian_damage;
+						},
+						content:function(){
+							player.storage.nshuanxian_damage=true;
+							player.storage.nshuanxian_left=player.addSubPlayer({
+								name:'ns_nanhua_left',
+								skills:['nshuanxian_middle','nshuanxian_draw','nshuanxian_swap'],
+								hp:2,
+								maxHp:2,
+								hs:get.cards(2),
+								skill:'nshuanxian',
+								intro:'你的本体回合开始前，切换至此随从并进行一个额外的回合；若你的上家与下家不同，在你的上家的准备阶段，切换至此随从',
+								intro2:'当前回合结束后切换回本体',
+								onremove:function(player){
+									delete player.storage.nshuanxian_left;
+								}
+							});
+						}
+					},
+					draw:{
+						trigger:{player:'phaseDrawBegin'},
+						silent:true,
+						filter:function(event){
+							return event.num>0;
+						},
+						content:function(){
+							trigger.num--;
+						}
+					},
+					left:{
+						trigger:{player:'phaseBefore'},
+						forced:true,
+						popup:false,
+						priority:50,
+						filter:function(event,player){
+							if(event.skill=='nshuanxian_middle') return false;
+							if(event.skill=='nshuanxian_right') return false;
+							var left=player.storage.nshuanxian_left;
+							if(player.hasSkill('subplayer')){
+								if(!left) return player.name==player.storage.nshuanxian_right;
+								return player.storage.subplayer.skills.contains(left);
+							}
+							else{
+								if(!left) return false;
+								return player.hasSkill(left);
+							}
+						},
+						content:function(){
+							if(player.hasSkill('subplayer')){
+								var left=player.storage.nshuanxian_left;
+								if(left&&player.storage.subplayer.skills.contains(left)){
+									player.toggleSubPlayer(player.storage.nshuanxian_left);
+								}
+								else{
+									player.exitSubPlayer();
+								}
+							}
+							else{
+								player.callSubPlayer(player.storage.nshuanxian_left);
+							}
+						}
+					},
+					middle:{
+						trigger:{player:['phaseAfter','phaseCancelled']},
+						forced:true,
+						popup:false,
+						priority:-50,
+						filter:function(event,player){
+							if(player.hasSkill('nshuanxian_chosen')) return false;
+							return true;
+						},
+						content:function(){
+							player.exitSubPlayer();
+							player.insertPhase();
+						}
+					},
+					right:{
+						trigger:{player:['phaseAfter','phaseCancelled']},
+						forced:true,
+						popup:false,
+						priority:-50,
+						filter:function(event,player){
+							if(player.hasSkill('nshuanxian_chosen')) return false;
+							if(player.hasSkill('subplayer')) return false;
+							var right=player.storage.nshuanxian_right;
+							if(!right) return false;
+							return player.hasSkill(right);
+						},
+						content:function(){
+							player.callSubPlayer(player.storage.nshuanxian_right);
+							player.insertPhase();
+							player.addTempSkill('nshuanxian_chosen',['phaseBegin','phaseCancelled']);
+						}
+					},
+					end:{
+						trigger:{player:['phaseAfter','phaseCancelled']},
+						forced:true,
+						popup:false,
+						priority:-50,
+						filter:function(event,player){
+							if(player.hasSkill('nshuanxian_chosen')) return false;
+							return true;
+						},
+						content:function(){
+							if(player.hasSkill('subplayer')){
+								player.exitSubPlayer();
+							}
+						},
+						content_old:function(){
+							'step 0'
+							var controls=['本体'];
+							var left=player.storage.nshuanxian_left;
+							var right=player.storage.nshuanxian_right;
+							if(player.hasSkill('subplayer')){
+								if(player.storage.subplayer.skills.contains(left)){
+									controls.unshift('幻身·左');
+								}
+								if(player.storage.subplayer.skills.contains(right)){
+									controls.push('幻身·右');
+								}
+							}
+							else{
+								if(player.hasSkill(left)){
+									controls.unshift('幻身·左');
+								}
+								if(player.hasSkill(right)){
+									controls.push('幻身·右');
+								}
+							}
+							if(controls.length>1){
+								player.chooseControl(controls,function(event,player){
+									return Math.floor(Math.random()*_status.event.num);
+								}).set('prompt','选择一个形态直到下一回合开始').set('num',controls.length);
+							}
+							else{
+								event.finish();
+							}
+							'step 1'
+							switch(result.control){
+								case '幻身·左':{
+									if(!player.hasSkill('subplayer')){
+										player.callSubPlayer(player.storage.nshuanxian_left);
+									}
+									else{
+										player.toggleSubPlayer(player.storage.nshuanxian_left);
+									}
+									break;
+								}
+								case '幻身·右':{
+									if(!player.hasSkill('subplayer')){
+										player.callSubPlayer(player.storage.nshuanxian_right);
+									}
+									break;
+								}
+								default:{
+									if(player.hasSkill('subplayer')){
+										player.exitSubPlayer();
+									}
+									break;
+								}
+							}
+							player.addTempSkill('nshuanxian_chosen','phaseBegin');
+						}
+					}
+				}
+			},
 			nsnongquan:{
 				enable:'phaseUse',
 				filter:function(event,player){
@@ -1616,7 +1898,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_zuoci:'左慈',
 			ns_wangyun:'王允',
 			ns_lvzhi:'吕后',
+			ns_nanhua:'南华',
+			ns_nanhua_left:'幻身·左',
+			ns_nanhua_right:'幻身·右',
 
+			nshuanxian:'幻仙',
+			nshuanxian_info:'锁定技，游戏开始时，你获得随从“幻身·右”，当你首次受到伤害时，你获得随从“幻身·左”（体力上限2，初始手牌2，摸牌阶段少摸一张牌）；在你的回合中（如果有对应幻身），你以【幻身·左-本体-幻身·右】的顺序进行3个连续回合',
+			nstaiping:'太平',
+			nstaiping_info:'当你受到一点伤害后（首次伤害除外），你可以选择一项: ①令一个“幻身”增加一点体力上限。②令一个“幻身”回复一点体力。',
+			nsshoudao:'授道',
+			nsshoudao_info:'当“幻身”全部死亡时，你获得技能“雷击”和“鬼道”。当你死亡时，若此时有两个“幻身”，你可以令一名其他角色获得技能“雷击”和“鬼道”。若有一个“幻身”，你可以令一名其他角色获得技能“雷击”或“鬼道”。(杀死你的角色除外)',
 			nsnongquan:'弄权',
 			nsnongquan_info:'出牌阶段不限次数，你可以将最后一张手牌当【无中生有】使用',
 			nsdufu:'毒妇',

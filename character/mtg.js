@@ -48,15 +48,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return !player.hasSkill('subplayer')&&player.getSubPlayers('lingyong_get').length>0;
 				},
-				unique:true,
-    			forceunique:true,
+				nosub:true,
 				group:'lingyong_get',
 				direct:true,
 				delay:0,
 				skillAnimation:true,
 				animationColor:'thunder',
 				content:function(){
-					player.callSubPlayer('lingyong_get');
+					player.callSubPlayer().set('tag','lingyong_get');
 				},
 				ai:{
 					order:1,
@@ -77,9 +76,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return ![player.name,player.name1,player.name2].contains(event.player.name);
 						},
 						content:function(){
+							var skills=lib.character[trigger.player.name][3].slice(0);
+							for(var i=0;i<skills.length;i++){
+								if(lib.skill[skills[i]].nosub){
+									skills.splice(i--,1);
+								}
+							}
 							player.addSubPlayer({
 								name:trigger.player.name,
-								skills:lib.character[trigger.player.name][3],
+								skills:skills,
 								hs:get.cards(2),
 								intro:'出牌阶段，你可以调遣此随从（直到随从死亡不可再次切换）'
 							});

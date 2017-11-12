@@ -8989,7 +8989,59 @@
 		element:{
 			content:{
 				toggleSubPlayer:function(){
+					'step 0'
+					var list=event.list||player.storage.subplayer.skills.slice(0);
+					list.remove(player.storage.subplayer.name2);
+					event.list=list;
+					if(!event.directresult){
+						if(list.length>1){
+							var dialog=ui.create.dialog('更换一个随从','hidden');
+		    				dialog.add([list,'character']);
+		    				player.chooseButton(dialog,true);
+						}
+						else if(list.length==1){
+							event.directresult=list[0];
+						}
+						else{
+							event.finish();
+						}
+					}
+					else{
+						if(!list.contains(event.directresult)){
+							event.finish();
+						}
+					}
+					'step 1'
+					if(!event.directresult){
+						if(result&&result.bool&&result.links[0]){
+							event.directresult=result.links[0];
+						}
+						else{
+							event.finish();
+							return;
+						}
+					}
+					if(player.storage.subplayer){
+						var current=player.storage.subplayer.name2;
+						if(event.directresult==current){
+							event.finish();
+							return;
+						}
+						player.storage[current].hp=player.hp;
+						player.storage[current].maxHp=player.maxHp;
+						player.storage[current].hs=player.getCards('h');
+						player.storage[current].es=player.getCards('e');
+						player.lose(player.getCards('he'),ui.special)._triggered=null;
 
+						var cfg=player.storage[event.directresult];
+						player.storage.subplayer.name2=event.directresult;
+						player.reinit(current,event.directresult,[
+							cfg.hp,
+							cfg.maxHp
+						]);
+						if(cfg.hs.length) player.directgain(cfg.hs);
+						if(cfg.es.length) player.directequip(cfg.es);
+					}
 				},
 				exitSubPlayer:function(){
 					'step 0'
@@ -9011,6 +9063,9 @@
 						]);
 						player.update();
 						if(event.remove){
+							if(player.storage[current].onremove){
+								player.storage[current].onremove(player);
+							}
 							delete player.storage[current];
 							player.storage.subplayer.skills.remove(current);
 							game.log(player,'牺牲了随从','#g'+current);
@@ -9026,6 +9081,10 @@
 						player.directequip(player.storage.subplayer.es);
 					}
 					player.removeSkill('subplayer');
+					'step 2'
+					if(event.remove){
+						event.trigger('removeSubPlayer');
+					}
 				},
 				callSubPlayer:function(){
 					'step 0'
@@ -9063,7 +9122,7 @@
 						var cfg=player.storage[event.directresult];
 						var source=cfg.source||player.name;
 						var name=event.directresult;
-						game.log(player,'调遣了随从','#b'+name);
+						game.log(player,'调遣了随从','#g'+name);
 						player.storage.subplayer={
 							name:source,
 							name2:event.directresult,
@@ -15722,6 +15781,9 @@
 					for(var i=0;i<cards.length;i++){
 						this.$equip(cards[i]);
 					}
+					if(!_status.video){
+						game.addVideo('directequip',this,get.cardsInfo(cards));
+					}
 				},
 				directgain:function(cards){
 					var hs=this.getCards('h');
@@ -16866,6 +16928,7 @@
 				},
 				addSubPlayer:function(cfg){
 					var skill='subplayer_'+cfg.name+'_'+get.id();
+					game.log(this,'获得了随从','#g'+get.translation(cfg.name))
 					cfg.hs=cfg.hs||[];
 					cfg.es=cfg.es||[];
 					cfg.skills=cfg.skills||[];
@@ -16883,7 +16946,6 @@
 							cfg.source=this.name;
 						}
 					}
-
 					game.broadcastAll(function(player,skill,cfg){
 						lib.skill[skill]={
 							intro:{
@@ -16901,9 +16963,21 @@
 					},this,skill,cfg);
 					game.addVideo('addSubPlayer',this,[skill,lib.skill[skill],lib.character[skill],lib.translate[skill],{name:cfg.name}]);
 					this.addSkill(skill);
+					return skill;
 				},
-				removeSubPlayer:function(){
-
+				removeSubPlayer:function(name){
+					if(this.hasSkill('subplayer')&&this.name==name){
+						this.exitSubPlayer(true);
+					}
+					else{
+						if(player.storage[name].onremove){
+							player.storage[name].onremove(player);
+						}
+						this.removeSkill(name);
+						delete this.storage[name];
+						game.log(player,'牺牲了随从','#g'+name);
+						_status.event.trigger('removeSubPlayer');
+					}
 				},
 				callSubPlayer:function(){
 					if(this.hasSkill('subplayer')) return;
@@ -16911,10 +16985,22 @@
 					next.player=this;
 					for(var i=0;i<arguments.length;i++){
 						if(typeof arguments[i]=='string'){
-							next.tag=arguments[i];
+							next.directresult=arguments[i];
 						}
 					}
 					next.setContent('callSubPlayer');
+					return next;
+				},
+				toggleSubPlayer:function(){
+					if(!this.hasSkill('subplayer')) return;
+					var next=game.createEvent('toggleSubPlayer');
+					next.player=this;
+					for(var i=0;i<arguments.length;i++){
+						if(typeof arguments[i]=='string'){
+							next.directresult=arguments[i];
+						}
+					}
+					next.setContent('toggleSubPlayer');
 					return next;
 				},
 				exitSubPlayer:function(remove){
@@ -20932,6 +21018,7 @@
     		},
 			mad:{
 				mark:true,
+				locked:true,
 				intro:{
 					content:'已进入混乱状态',
 					name:'混乱',
@@ -24104,6 +24191,14 @@
 			directgain:function(player,cards){
 				if(player&&cards){
 					player.directgain(get.infoCards(cards));
+				}
+				else{
+					console.log(player);
+				}
+			},
+			directequip:function(player,cards){
+				if(player&&cards){
+					player.directequip(get.infoCards(cards));
 				}
 				else{
 					console.log(player);
@@ -35934,6 +36029,7 @@
 						}
 
 						if(lib.character[i][4].contains('stonehidden')) continue;
+						if(lib.character[i][4].contains('unseen')) continue;
 						if(lib.config.banned.contains(i)) continue;
 						if(filter&&filter(i)) continue;
 						list.push(i);
@@ -43164,8 +43260,8 @@
                 if(lib.character[i][4]){
 					if(lib.character[i][4].contains('boss')) continue;
 					if(lib.character[i][4].contains('hiddenboss')) continue;
-					if(lib.character[i][4].contains('minskin')) return true;
-					if(lib.character[i][4].contains('unseen')) return true;
+					if(lib.character[i][4].contains('minskin')) continue;
+					if(lib.character[i][4].contains('unseen')) continue;
 				}
                 for(var j=0;j<lib.character[i][3].length;j++){
                     var skill=lib.character[i][3][j];
