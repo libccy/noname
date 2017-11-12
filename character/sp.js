@@ -1443,6 +1443,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			logTarget:'player',
     			check:function(event,player){
+                    if(event.player.hasSkill('subplayer')) return false;
     				if(get.attitude(player,event.player)<0){
     					if(event.player.hp==1) return false;
     					return true;

@@ -8988,35 +8988,37 @@
 		},
 		element:{
 			content:{
+				toggleSubPlayer:function(){
+
+				},
 				exitSubPlayer:function(){
 					'step 0'
 					if(player.storage.subplayer){
 						var current=player.storage.subplayer.name2;
+						if(event.remove){
+							player.lose(player.getCards('he'),ui.discardPile)._triggered=null;
+						}
+						else{
+							player.storage[current].hp=player.hp;
+							player.storage[current].maxHp=player.maxHp;
+							player.storage[current].hs=player.getCards('h');
+							player.storage[current].es=player.getCards('e');
+							player.lose(player.getCards('he'),ui.special)._triggered=null;
+						}
 						player.reinit(current,player.storage.subplayer.name,[
 							player.storage.subplayer.hp,
 							player.storage.subplayer.maxHp
 						]);
 						player.update();
 						if(event.remove){
-							delete player.storage.subplayer.storage[current];
+							delete player.storage[current];
 							player.storage.subplayer.skills.remove(current);
 							game.log(player,'牺牲了随从','#g'+current);
 						}
 						else{
 							game.log(player,'收回了随从','#g'+current);
 						}
-						for(var i in player.storage.subplayer.storage){
-							player.storage[i]=player.storage.subplayer.storage[i];
-						}
 						player.addSkill(player.storage.subplayer.skills);
-						if(event.remove){
-							player.lose(player.getCards('he'),ui.discardPile)._triggered=null;
-						}
-						else{
-							player.storage[current].hs=player.getCards('h');
-							player.storage[current].es=player.getCards('e');
-							player.lose(player.getCards('he'),ui.special)._triggered=null;
-						}
 					}
 					'step 1'
 					if(player.storage.subplayer){
@@ -9058,11 +9060,6 @@
 						}
 					}
 					if(event.directresult){
-						var storage={};
-						for(var i=0;i<event.list.length;i++){
-							var skill=event.list[i];
-							storage[skill]=player.storage[skill];
-						}
 						var cfg=player.storage[event.directresult];
 						var source=cfg.source||player.name;
 						var name=event.directresult;
@@ -9073,7 +9070,6 @@
 							hp:player.hp,
 							maxHp:player.maxHp,
 							skills:event.list.slice(0),
-							storage:storage,
 							hs:player.getCards('h'),
 							es:player.getCards('e'),
 							intro2:cfg.intro2
@@ -16894,7 +16890,6 @@
 								content:cfg.intro||''
 							},
 							mark:'character',
-							onremove:true,
 							subplayer:cfg.skill,
 							ai:{
 								subplayer:true
