@@ -333,15 +333,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     if(player.storage.choulve){
                         str+='若其如此做，视为你使用'+get.translation(player.storage.choulve);
                     }
+                    var goon=true;
+                    if(player.storage.choulve){
+                        goon=game.hasPlayer(function(current){
+                            return player.canUse(player.storage.choulve,current)&&get.effect(current,player.storage.choulve,player,player)>0;
+                        });
+                    }
                     player.chooseTarget(get.prompt('choulve'),str,function(card,player,target){
                         return target!=player&&target.countCards('he');
                     }).set('ai',function(target){
+                        if(!_status.event.goon) return 0;
                         var player=_status.event.player;
                         if(get.attitude(player,target)>=0&&get.attitude(target,player)>=0){
                             return Math.sqrt(target.countCards('he'));
                         }
                         return 0;
-                    });
+                    }).set('goon',goon);
                     'step 1'
                     if(result.bool){
                         var target=result.targets[0];

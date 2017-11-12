@@ -235,12 +235,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							if(target.isLinked()) return 1;
-							if(get.attitude(player,target)>=0) return -1;
-							if(ui.selected.targets.length) return -1;
+							if(get.attitude(player,target)>=0) return -0.9;
+							if(ui.selected.targets.length) return -0.9;
 							if(game.hasPlayer(function(current){
 								return get.attitude(player,current)<=-1&&current!=target&&!current.isLinked();
 							})){
-								return -1;
+								return -0.9;
 							}
 							return 0;
 						}

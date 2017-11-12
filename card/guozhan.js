@@ -90,7 +90,24 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(evt&&evt.name=='phaseUse'){
 						evt.skipped=true;
 					}
-					target.addSkill('xietianzi');
+					target.insertEvent('xietianzi',lib.card.xietianzi.content_phase);
+					// target.addSkill('xietianzi');
+				},
+				content_phase:function(){
+					"step 0"
+					player.removeSkill('xietianzi');
+					if(player.countCards('he')>0){
+						player.chooseToDiscard('he','是否弃置一张牌并获得一个额外回合？').set('ai',function(card){
+							return 10-get.value(card);
+						});
+					}
+					else{
+						event.finish();
+					}
+					"step 1"
+					if(result.bool){
+						player.insertPhase();
+					}
 				},
 				ai:{
 					order:0.5,

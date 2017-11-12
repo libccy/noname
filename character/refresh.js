@@ -956,9 +956,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						effect:function(card,player,target){
 							if(get.tag(card,'damage')){
 								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
-								if(player.hp>=4) return [1,get.tag(card,'damage')*2];
-								if(target.hp==3) return [1,get.tag(card,'damage')*1.5];
-								if(target.hp==2) return [1,get.tag(card,'damage')*0.5];
+								if(!target.hasFriend()) return;
+								var num=1;
+								if(get.attitude(player,target)>0){
+									if(player.needsToDiscard()){
+										num=0.7;
+									}
+									else{
+										num=0.5;
+									}
+								}
+								if(player.hp>=4) return [1,num*2];
+								if(target.hp==3) return [1,num*1.5];
+								if(target.hp==2) return [1,num*0.5];
 							}
 						}
 					},

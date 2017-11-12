@@ -9083,7 +9083,7 @@
 					player.removeSkill('subplayer');
 					'step 2'
 					if(event.remove){
-						event.trigger('removeSubPlayer');
+						event.trigger('subPlayerDie');
 					}
 				},
 				callSubPlayer:function(){
@@ -14591,14 +14591,24 @@
 					this.node.identity.dataset.color=identity;
 					return this;
 				},
-				insertPhase:function(skill){
+				insertPhase:function(skill,insert){
 					var evt=_status.event.getParent('phase');
 					var next;
 					if(evt&&evt.parent&&evt.parent.next){
-						next=game.createEvent('phase',null,evt.parent);
+						evt=evt.parent;
+						next=game.createEvent('phase',null,evt);
+					}
+					else if(_status.event.parent&&_status.event.parent.next){
+						evt=_status.event.parent;
+						next=game.createEvent('phase',null,evt);
 					}
 					else{
+						evt=null;
 						next=game.createEvent('phase');
+					}
+					if(evt&&insert&&evt.next.contains(next)){
+						evt.next.remove(next);
+						evt.next.unshift(next);
 					}
 					next.player=this;
 					next.skill=skill||_status.event.name;
@@ -14617,6 +14627,7 @@
 					for(var i in arg){
 						next[i]=arg[i];
 					}
+					next.player=this;
                     next.setContent(content);
 					return next;
 				},
@@ -16758,7 +16769,8 @@
     						player.marks[id]._name=target;
     						player.marks[id].info={
     							name:name,
-    							content:content
+    							content:content,
+								id:id
     						};
     						player.marks[id].setBackground(target,'character');
     						game.addVideo('changeMarkCharacter',player,{
@@ -16771,7 +16783,8 @@
     					else{
     						player.marks[id]=player.markCharacter(target,{
     							name:name,
-    							content:content
+    							content:content,
+								id:id
     						});
     						player.marks[id]._name=target;
     						game.addVideo('markCharacter',player,{
@@ -17086,6 +17099,11 @@
                     }
 					return this;
                 },
+				addSkillLog:function(skill){
+					this.addSkill(skill);
+					this.popup(skill);
+					game.log(this,'获得了技能','【'+get.translation(skill)+'】');
+				},
 				addSkill:function(skill,checkConflict,nobroadcast){
 					if(Array.isArray(skill)){
 						for(var i=0;i<skill.length;i++){
@@ -20919,6 +20937,10 @@
 				},
 				content:function(){
 					trigger.cancel();
+					var evt=trigger.getParent('damage');
+					if(evt.player==player){
+						evt.untrigger(false,player);
+					}
 					player.exitSubPlayer(true);
 				},
 				ai:{
@@ -44005,6 +44027,19 @@
 				}
 				else if(info.name!==false){
 					uiintro.add(get.translation(node.skill));
+				}
+				if(typeof info.id=='string'&&info.id.indexOf('subplayer')==0&&
+					player.isUnderControl(true)&&player.storage[info.id]&&!_status.video){
+					var storage=player.storage[info.id];
+					uiintro.addText('当前体力：'+storage.hp+'/'+storage.maxHp);
+					if(storage.hs.length){
+						uiintro.addText('手牌区');
+						uiintro.addSmall(storage.hs);
+					}
+					if(storage.es.length){
+						uiintro.addText('装备区');
+						uiintro.addSmall(storage.es);
+					}
 				}
 				if(typeof info.mark=='function'){
 					var stint=info.mark(uiintro,player.storage[node.skill],player);

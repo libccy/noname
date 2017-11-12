@@ -60,10 +60,155 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nstaiping:{
 				trigger:{player:'damageEnd'},
 				filter:function(event,player){
-					return player.storage.nshuanxian_damage&&player.getSubPlayers('nshuanxian').length;
+					return !event.nshuanxian&&player.getSubPlayers('nshuanxian').length;
 				},
+				direct:true,
+				priority:-0.1,
+				ai:{
+					maixie:true,
+					maixie_hp:true
+				},
+				content:function(){
+					'step 0'
+					event.num=trigger.num;
+					'step 1'
+					var left=player.storage.nshuanxian_left;
+					var right=player.storage.nshuanxian_right;
+					var list=[];
+					var choice=0;
+					var hpleft=0;
+					var maxleft=0;
+					if(left&&player.hasSkill(left)){
+						if(player.storage[left].hp<player.storage[left].maxHp){
+							list.push('令幻身·左回复一点体力');
+							hpleft=player.storage[left].hp;
+						}
+						list.push('令幻身·左增加一点体力上限');
+						maxleft=player.storage[left].hp;
+					}
+					if(left&&player.hasSkill(right)){
+						if(player.storage[right].hp<player.storage[right].maxHp){
+							list.push('令幻身·右回复一点体力');
+							if(!hpleft||player.storage[right].hp<hpleft||
+								(player.storage[right].hp==hpleft&&Math.random()<0.5)){
+								choice=list.length-1;
+							}
+						}
+						list.push('令幻身·右增加一点体力上限');
+						if(!hpleft&&maxleft&&choice==0){
+							if(player.storage[right].maxHp<maxleft||
+								(player.storage[right].maxHp==maxleft&&Math.random()<0.5)){
+								choice=list.length-1;
+							}
+						}
+					}
+					if(!list.length){
+						event.finish();
+						return;
+					}
+					event.map={};
+					for(var i=0;i<list.length;i++){
+						event.map['选项'+get.cnNumber(i+1,true)]=list[i];
+					}
+					player.chooseControlList(list,function(){
+						return _status.event.choice;
+					}).set('prompt',get.prompt('nstaiping')).set('choice',choice);
+					'step 2'
+					var left=player.storage.nshuanxian_left;
+					var right=player.storage.nshuanxian_right;
+					if(result.control!='cancel2'){
+						player.logSkill('nstaiping');
+						switch(event.map[result.control]){
+							case '令幻身·左回复一点体力':player.storage[left].hp++;break;
+							case '令幻身·左增加一点体力上限':player.storage[left].maxHp++;break;
+							case '令幻身·右回复一点体力':player.storage[right].hp++;break;
+							case '令幻身·右增加一点体力上限':player.storage[right].maxHp++;break;
+						}
+						game.log(player,event.map[result.control].replace(/一/,'了一'));
+					}
+					'step 3'
+					if(event.num>1){
+						event.num--;
+						event.goto(1);
+					}
+				}
 			},
-			nsshoudao:{},
+			nsshoudao:{
+				group:['nsshoudao_gain','nsshoudao_die'],
+				subSkill:{
+					gain:{
+						trigger:{player:'subPlayerDie'},
+						forced:true,
+						filter:function(event,player){
+							var left=player.storage.nshuanxian_left;
+							if(left&&player.hasSkill(left)) return false;
+							var right=player.storage.nshuanxian_right;
+							if(right&&player.hasSkill(right)) return false;
+							if(!player.storage.nshuanxian_damage) return false;
+							return true;
+						},
+						content:function(){
+							player.addSkill('releiji');
+							player.addSkill('guidao');
+						}
+					},
+					die:{
+						trigger:{player:'dieBegin'},
+						direct:true,
+						filter:function(event,player){
+							if(game.countPlayer()<=2) return false;
+							var left=player.storage.nshuanxian_left;
+							if(left&&player.hasSkill(left)) return true;
+							var right=player.storage.nshuanxian_right;
+							if(right&&player.hasSkill(right)) return true;
+							return false;
+						},
+						content:function(){
+							'step 0'
+							var str;
+							var left=player.storage.nshuanxian_left;
+							var right=player.storage.nshuanxian_right;
+							if(left&&player.hasSkill(left)&&right&&player.hasSkill(right)){
+								str='令一名其他角色获得技能【雷击】和【鬼道】';
+							}
+							else{
+								str='令一名其他角色获得技能【雷击】或【鬼道】';
+							}
+							if(trigger.source){
+								str+='（'+get.translation(trigger.source)+'除外）';
+							}
+							player.chooseTarget(function(card,player,target){
+								return target!=player&&target!=_status.event.source;
+							},get.prompt('nsshoudao')).set('ai',function(target){
+								if(target.hasSkill('releiji')) return 0;
+								return get.attitude(_status.event.player,target);
+							}).set('source',trigger.source).set('prompt2',str);
+							'step 1'
+							var goon=false;
+							if(result.bool){
+								var target=result.targets[0];
+								player.logSkill('nsshoudao',target);
+								var left=player.storage.nshuanxian_left;
+								var right=player.storage.nshuanxian_right;
+								if(left&&player.hasSkill(left)&&right&&player.hasSkill(right)){
+									target.addSkillLog('releiji');
+									target.addSkillLog('guidao');
+								}
+								else{
+									event.target=target;
+									player.chooseControl('releiji','guidao').set('prompt','令'+get.translation(target)+'获得一项技能');
+									goon=true;
+								}
+							}
+							if(!goon){
+								event.finish();
+							}
+							'step 2'
+							event.target.addSkillLog(result.control);
+						}
+					}
+				}
+			},
 			nshuanxian:{
 				trigger:{global:'gameStart',player:'enterGame'},
 				forced:true,
@@ -86,12 +231,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				ai:{
-					maixie:true,
 					effect:{
 						target:function(card,player,target){
     						if(get.tag(card,'damage')){
     							if(!target.hasFriend()) return;
-    							if(!target.storage.nshuanxian_damage) return [0.5,1];
+    							if(!target.storage.nshuanxian_damage){
+									if(get.attitude(player,target)<=0) return [0.5,1];
+									return [1,1];
+								}
     						}
     					}
 					}
@@ -184,6 +331,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									delete player.storage.nshuanxian_left;
 								}
 							});
+							trigger.nshuanxian=true;
 						}
 					},
 					draw:{
@@ -200,7 +348,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{player:'phaseBefore'},
 						forced:true,
 						popup:false,
-						priority:50,
+						priority:40,
 						filter:function(event,player){
 							if(event.skill=='nshuanxian_middle') return false;
 							if(event.skill=='nshuanxian_right') return false;
@@ -233,21 +381,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{player:['phaseAfter','phaseCancelled']},
 						forced:true,
 						popup:false,
-						priority:-50,
+						priority:-40,
 						filter:function(event,player){
 							if(player.hasSkill('nshuanxian_chosen')) return false;
 							return true;
 						},
 						content:function(){
 							player.exitSubPlayer();
-							player.insertPhase();
+							player.insertPhase(null,true);
 						}
 					},
 					right:{
 						trigger:{player:['phaseAfter','phaseCancelled']},
 						forced:true,
 						popup:false,
-						priority:-50,
+						priority:-40,
 						filter:function(event,player){
 							if(player.hasSkill('nshuanxian_chosen')) return false;
 							if(player.hasSkill('subplayer')) return false;
@@ -257,7 +405,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							player.callSubPlayer(player.storage.nshuanxian_right);
-							player.insertPhase();
+							player.insertPhase(null,true);
 							player.addTempSkill('nshuanxian_chosen',['phaseBegin','phaseCancelled']);
 						}
 					},
@@ -265,7 +413,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{player:['phaseAfter','phaseCancelled']},
 						forced:true,
 						popup:false,
-						priority:-50,
+						priority:-40,
 						filter:function(event,player){
 							if(player.hasSkill('nshuanxian_chosen')) return false;
 							return true;
