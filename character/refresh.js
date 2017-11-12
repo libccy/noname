@@ -358,6 +358,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.gainPlayerCard([1,trigger.num],get.prompt('fankui',trigger.source),trigger.source,get.buttonValue,'he').set('logSkill',['refankui',trigger.source]);
 				},
 				ai:{
+					maixie_defend:true,
 					effect:{
 						target:function(card,player,target){
 							if(player.countCards('he')>1&&get.tag(card,'damage')){
@@ -443,6 +444,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					maixie_defend:true,
 					expose:0.4
 				}
 			},
@@ -1457,6 +1459,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.asyncDraw([trigger.player,trigger.source],trigger.num);
 					"step 1"
 					game.delay();
+				},
+				ai:{
+					maixie:true,
+					maixie_hp:true
 				}
 			}
 		},

@@ -513,7 +513,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 },
                 ai:{
                     threaten:0.8,
-                    maixie_fake:true,
+					maixie_defend:true,
                 },
                 subSkill:{
                     ju:{
@@ -969,7 +969,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     								if(button.link[3]=='fire') return 2.95;
     								else if(button.link[3]=='fire') return 2.92;
     								else return 2.9;
-                                    break;
                                 default:return 2+_status.event.getRand()*2;
     						}
     					}
@@ -2674,6 +2673,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			ai:{
     				maixie:true,
     				maixie_hp:true,
+					maixie_defend:true,
     				effect:{
     					target:function(card,player,target){
     						if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
@@ -3259,6 +3259,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				// player.markSkill('kuangluan');
     			},
     			ai:{
+                    maixie_defend:true,
     				threaten:0.3
     			},
     			// group:['kuangluan2','kuangluan3']
@@ -3397,7 +3398,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.storage.mobao=[];
     				}
     				player.storage.mobao.add(trigger.source);
-    			}
+    			},
+                ai:{
+                    maixie_defend:true,
+                }
     		},
     		mobao3:{
     			trigger:{player:'phaseEnd'},
@@ -4039,6 +4043,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			group:['yufa2','yufa3'],
     			ai:{
+                    maixie:true,
+                    maixie_hp:true,
     				expose:0.1
     			}
     		},
@@ -4780,7 +4786,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						trigger.source.discard(hs.randomGet())
     					}
     				}
-    			}
+    			},
+                ai:{
+                    maixie_defend:true,
+                }
     		},
     		ronghuo:{
     			trigger:{player:'useCardToBefore'},
@@ -5583,6 +5592,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			ai:{
     				nohujia:true,
+                    maixie:true,
+                    maixie_hp:true,
     				skillTagFilter:function(player){
     					return player.hp>player.countCards('h');
     				},

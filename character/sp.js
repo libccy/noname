@@ -1510,7 +1510,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					source.storage.hengjiang2=trigger.num;
     					source.addTempSkill('hengjiang2');
     				}
-    			}
+    			},
+                ai:{
+                    maixie_defend:true,
+                }
     		},
     		hengjiang2:{
     			mark:true,
@@ -6507,6 +6510,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     			},
     			ai:{
+                    maixie_defend:true,
     				threaten:0.7
     			}
     		},

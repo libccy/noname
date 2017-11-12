@@ -6368,6 +6368,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     			},
     			ai:{
+                    maixie_defend:true,
     				effect:{
     					target:function(card,player,target){
     						if(get.tag(card,'damage')){

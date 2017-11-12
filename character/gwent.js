@@ -2093,6 +2093,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				threaten:0.8,
 					maixie:true,
 					maixie_hp:true,
+					maixie_defend:true,
 					effect:{
 						target:function(card,player,target){
 							if(get.tag(card,'damage')){

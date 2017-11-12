@@ -661,6 +661,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					maixie_defend:true,
 					effect:{
 						target:function(card,player,target){
 							if(get.tag(card,'damage')){
@@ -722,6 +723,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					maixie_defend:true,
 					threaten:0.8
 				}
 			},
@@ -1203,6 +1205,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.unmarkSkill('xuanning');
 					}
 					game.addVideo('storage',player,['xuanning',player.storage.xuanning]);
+				},
+				ai:{
+					maixie_defend:true,
 				}
 			},
 			liuguang:{

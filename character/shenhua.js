@@ -1730,7 +1730,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				for(var i=0;i<trigger.num;i++){
     					lib.skill.huashen.get(player);
     				}
-    			}
+    			},
+                ai:{
+                    maixie_hp:true
+                }
     		},
             huoshou:{
     			locked:true,
@@ -3538,7 +3541,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				trigger.trigger('damageBefore');
     			},
     			ai:{
-                    maixie_fake:true,
+                    maixie_defend:true,
     				effect:{
     					target:function(card,player,target){
     						if(player.hasSkillTag('jueqing',false,target)) return;
@@ -3645,7 +3648,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     }
     			},
     			ai:{
-                    maixie_fake:true,
+                    maixie_defend:true,
     				effect:{
     					target:function(card,player,target){
     						if(player.hasSkillTag('jueqing',false,target)) return;
@@ -3760,7 +3763,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				trigger.trigger('damageBefore');
     			},
     			ai:{
-                    maixie_fake:true,
+                    maixie_defend:true,
     				effect:{
     					target:function(card,player,target){
     						if(player.hasSkillTag('jueqing',false,target)) return;

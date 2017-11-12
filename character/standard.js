@@ -162,6 +162,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.gainPlayerCard(get.prompt('fankui',trigger.source),trigger.source,get.buttonValue,'he').set('logSkill',['fankui',trigger.source]);
 				},
 				ai:{
+					maixie_defend:true,
 					effect:{
 						target:function(card,player,target){
 							if(player.countCards('he')>1&&get.tag(card,'damage')){
@@ -260,7 +261,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					result:{
+					maixie_defend:true,
+					effect:{
 						target:function(card,player,target){
 							if(player.hasSkillTag('jueqing',false,target)) return [1,-1];
 							if(get.tag(card,'damage')&&get.damageEffect(target,player,player)>0) return [1,0,0,-1.5];

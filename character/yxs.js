@@ -165,6 +165,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.source.addJudge(card);
 					trigger.source.$draw(card);
 					game.delay();
+				},
+				ai:{
+					maixie_defend:true,
 				}
 			},
 			liebo:{
@@ -2183,6 +2186,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:'source',
 				ai:{
+					maixie_defend:true,
 					expose:0.3,
 					result:{
 						target:function(card,player,target){
@@ -2346,6 +2350,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					maixie_defend:true,
 					effect:{
 						target:function(card,player,target){
 							if(get.tag(card,'damage')) return [1,0,0,-1];

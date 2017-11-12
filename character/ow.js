@@ -806,7 +806,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	            },
 	            group:'maoding2',
 	            ai:{
-	                threaten:1.5
+	                threaten:1.5,
+					maixie_defend:true
 	            }
 	        },
 	        maoding2:{
@@ -1844,7 +1845,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                            if(Math.random()<0.7) return '选项四';
 	                            return '选项二';
 	                        }
-	                        return '';
 	                    }).set('prompt','冰墙<br><br><div class="text center">选项一：防御距离+'+num+
 	                    '</div><br><div class="text center">选项二：防御距离-'+num+
 	                    '</div><br><div class="text center">选项三：进攻距离+'+num+

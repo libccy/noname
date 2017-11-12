@@ -457,6 +457,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     threaten:0.8,
                     maixie:true,
                     maixie_hp:true,
+                    maixie_defend:true,
                     effect:{
     					target:function(card,player,target){
     						if(get.tag(card,'damage')){
@@ -621,6 +622,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             if(card){
                                 trigger.source.equip(card,true).set('delay',true);
                             }
+                        },
+                        ai:{
+                            maixie_defend:true,
                         }
                     },
                     lie:{
@@ -679,6 +683,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                                     return get.type(card)=='equip';
                                 });
                             }
+                        },
+                        ai:{
+                            maixie_defend:true,
                         }
                     },
                     he:{
@@ -5283,6 +5290,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.gain(trigger.source.getEquip(1),trigger.source);
     				}
     			},
+                ai:{
+                    maixie_defend:true,
+                }
     		},
     		anjian:{
     			audio:2,
@@ -7874,6 +7884,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				trigger.source.chooseToDiscard(true);
     			},
     			ai:{
+                    maixie_defend:true,
     				threaten:0.9
     			}
     		},
@@ -8063,6 +8074,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     			},
     			ai:{
+                    maixie_defend:true,
     				effect:{
     					target:function(card,player,target){
     						if(player.hasSkillTag('jueqing',false,target)) return [1,-1.5];
@@ -8090,6 +8102,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			locked:true,
     			group:['enyuan1','enyuan2'],
     			ai:{
+                    maixie_defend:true,
     				effect:{
     					target:function(card,player,target){
     						if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
@@ -8766,7 +8779,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.equip(result.links[0]);
     					trigger.source.$give(result.links[0],player);
     				}
-    			}
+    			},
+                ai:{
+                    maixie_defend:true,
+                }
     		},
     		zquanji:{
     			trigger:{global:'phaseBegin'},

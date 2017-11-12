@@ -19,7 +19,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:25,
+        versionOL:26,
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
         mirrorURL:'https://coding.net/u/libccy/p/noname/git/raw',
         hallURL:'noname.pub',
@@ -5576,6 +5576,8 @@
 			'<li>使用卡牌<br>player.useCard(card,<br>targets)<li>死亡<br>player.die()<li>复活<br>player.revive(hp)</ul>'+
 			'<div style="margin:10px">游戏操作</div><ul style="margin-top:0"><li>在命令框中输出结果<br>game.print(str)<li>清除命令框中的内容<br>cls<li>上一条/下一条输入的内容<br>up/down<li>游戏结束<br>game.over(bool)'+
 			'<li>角色资料<br>lib.character<li>卡牌资料<br>lib.card</ul>',
+			'游戏名词':'<ul><li>护甲：和体力类似，每点护甲可抵挡一点伤害，但不影响手牌上限'+
+			'<li>子武将：通过技能获得，拥有独立的技能、手牌区和装备区（共享判定区），出场时替代主武将的位置；子武将死亡时自动切换回主武将'
 		},
 		setIntro:function(node,func){
 			if(lib.config.touchscreen){

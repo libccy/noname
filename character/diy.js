@@ -31,6 +31,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:['male','wei',4,['chezhen','youzhan']],
 
 			ns_zuoci:['male','qun',3,['nsxinsheng','nsdunxing']],
+			ns_lvzhi:['female','qun',3,['nsnongquan','nsdufu']],
 			ns_wangyun:["male","qun",4,["liangji","jugong","chengmou"]],
 		},
 		characterIntro:{
@@ -50,6 +51,50 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuji:['zuoci']
 		},
 		skill:{
+			nsnongquan:{
+				enable:'phaseUse',
+				filter:function(event,player){
+					return player.countCards('h')==1&&player.canUse('wuzhong',player);
+				},
+				direct:true,
+				delay:0,
+				content:function(){
+					player.useCard({name:'wuzhong'},player.getCards('h'),player,'nsnongquan');
+				},
+				ai:{
+					order:10,
+					result:{
+						player:function(player,target){
+							return 10-get.value(player.getCards('h')[0]);
+						}
+					}
+				}
+			},
+			nsdufu:{
+				trigger:{source:'damageBefore'},
+				check:function(event,player){
+					return event.player.hasSkillTag('maixie');
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('nsdufu'),function(card,player,target){
+						return target!=player;
+					}).set('ai',function(target){
+						if(_status.event.bool){
+							return -get.attitude(_status.event.player,target);
+						}
+						return 0;
+					}).set('bool',trigger.player.hasSkillTag('maixie_defend'));
+					'step 1'
+					if(result.bool){
+						player.logSkill('nsdufu',result.targets);
+						trigger.source=result.targets[0];
+						trigger.untrigger();
+						trigger.trigger('damageBefore');
+					}
+				}
+			},
 			rejizhi:{
 				audio:2,
 				usable:3,
@@ -1570,8 +1615,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			ns_zuoci:'左慈',
 			ns_wangyun:'王允',
+			ns_lvzhi:'吕后',
 
-
+			nsnongquan:'弄权',
+			nsnongquan_info:'出牌阶段不限次数，你可以将最后一张手牌当【无中生有】使用',
+			nsdufu:'毒妇',
+			nsdufu_info:'每当你即将造成一次伤害时，你可以为此伤害重新指定伤害来源',
 			rejizhi:'集智',
 			rejizhi_info:'当你使用一张装备牌或锦囊牌时，你可以摸一张牌并展示之，若此牌是基本牌，你须弃置一张手牌，每回合限3次',
     		yiesheng:'回雪',

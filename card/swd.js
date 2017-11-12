@@ -4744,7 +4744,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				check:function(event,player){
 					var att=get.attitude(player,event.target);
 					if(player.hasSkill('jiu')) return att>0;
-					if(event.target.hasSkillTag('maixie_hp')||event.target.hasSkillTag('maixie_fake')){
+					if(event.target.hasSkillTag('maixie_hp')||event.target.hasSkillTag('maixie_defend')){
 						return att<=0;
 					}
 					if(player.hasSkill('tianxianjiu')) return false;
@@ -4788,8 +4788,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			'轩辕剑':'<ul><li>零件、祭器牌可用于煅造装备，煅造得到强化装备，并可装备给距离1以内的角色<li>'+
 			'煅造装备时失去牌不触发技能<li>'+
 			'进行洗牌时强化装备将从弃牌堆中消失，不进入牌堆<li>'+
-			'专属、特殊装备无法被强化<li>'+
-			'护甲：和体力类似，每点护甲可抵挡一点伤害，但不影响手牌上限'
+			'专属、特殊装备无法被强化'
 		},
 		translate:{
 			// yihuajiemu:'移花接木',

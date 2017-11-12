@@ -130,6 +130,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				intro:{
 					content:'mark'
+				},
+				ai:{
+					maixie:true,
+					maixie_hp:true
 				}
 			},
 			shenfen:{
