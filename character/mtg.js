@@ -2,6 +2,7 @@
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'mtg',
+		connect:true,
 	    character:{
 			mtg_jiding:['male','qun',4,['mbaizhan','msilian']],
 			// mtg_qianzhuo:['female','shu',3,[]],
@@ -80,8 +81,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								name:trigger.player.name,
 								skills:lib.character[trigger.player.name][3],
 								hs:get.cards(2),
-								intro:'出牌阶段，你可以调遣此随从',
-								intro2:'xx'
+								intro:'出牌阶段，你可以调遣此随从（直到随从死亡不可再次切换）'
 							});
 						}
 					}
@@ -471,7 +471,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lingyong2:'灵俑',
 			lingyong3:'灵俑',
 			lingyong3_bg:'俑',
-			lingyong_info:'锁定技，每当一名角色死亡，你获得一枚对应该角色主将的灵俑标记；出牌阶段，你可以弃置一枚灵俑标记，并变身为标记对应的角色（体力上限设为1），若如此做，你将你的牌移出游戏，结束出牌阶段并获得一个额外回合；处于变身状态的你在死亡前变回原形',
+			lingyong_info:'锁定技，每当一名其他角色死亡，你获得一个与该角色同名且体力上限为1、初始手牌为2的随从；出牌阶段，你可以调遣以此法获得的随从（直到随从死亡不可再次切换）',
 			mbaizhan:'百战',
 			mbaizhan_info:'锁定技，每当你造成一点伤害，你获得一点护甲',
 			msilian:'祀炼',

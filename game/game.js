@@ -8304,6 +8304,16 @@
 				window.lib=lib;
 				window._status=_status;
 			},
+			dy:function(){
+				var next=game.me.next;
+				for(var i=0;i<10;i++){
+					if(next.identity!='zhu'){
+						break;
+					}
+					next=next.next;
+				}
+				next.die();
+			},
 			x:function(){
 				var gl=function(dir,callback){
 					var files=[],folders=[];
@@ -9075,6 +9085,8 @@
 						if(cfg.hs.length) player.directgain(cfg.hs);
 						if(cfg.es.length) player.directequip(cfg.es);
 					}
+					'step 2'
+					game.delay();
 				},
 				reverseOrder:function(){
 					"step 0"
@@ -13525,6 +13537,7 @@
 							this.sex=info2[0];
 							this.name=to;
 						}
+						this.smoothAvatar(true);
 						this.node.avatar2.setBackground(to,'character');
 						this.node.name2.innerHTML=get.slimName(to);
 					}
@@ -13536,6 +13549,7 @@
 							this.name=to;
 							this.sex=info2[0];
 						}
+						this.smoothAvatar(false);
 						this.node.avatar.setBackground(to,'character');
 						this.node.name.innerHTML=get.slimName(to);
 					}
@@ -13644,10 +13658,15 @@
 
 					return this;
 				},
-				smoothAvatar:function(){
+				smoothAvatar:function(vice){
 					var div=ui.create.div('.fullsize');
 					div.style.background=getComputedStyle(this.node.avatar).background;
-					this.node.avatar.appendChild(div);
+					if(vice){
+						this.node.avatar2.appendChild(div);
+					}
+					else{
+						this.node.avatar.appendChild(div);
+					}
 					ui.refresh(div);
 					div.style.transition='all 1s';
 					setTimeout(function(){
@@ -13656,7 +13675,7 @@
 							div.remove();
 						},2000);
 					},100);
-					game.addVideo('smoothAvatar',this);
+					game.addVideo('smoothAvatar',this,vice);
 				},
 				changeSeat:function(position,video){
 					var player=this;
@@ -16851,17 +16870,6 @@
 				},
 				addSubPlayer:function(cfg){
 					var skill='subplayer_'+cfg.name+'_'+get.id();
-					lib.skill[skill]={
-						intro:{
-							content:cfg.intro||''
-						},
-						mark:'character',
-						onremove:true,
-						subplayer:cfg.skill||_status.event.name,
-						ai:{
-							subplayer:true
-						}
-					}
 					cfg.hs=cfg.hs||[];
 					cfg.es=cfg.es||[];
 					cfg.skills=cfg.skills||[];
@@ -16879,9 +16887,24 @@
 							cfg.source=this.name;
 						}
 					}
-					lib.character[skill]=[cfg.sex,cfg.group,cfg.maxHp,cfg.skills,['character:'+cfg.name]];
-					lib.translate[skill]=cfg.caption||get.rawName(cfg.name);
-					this.storage[skill]=cfg;
+
+					game.broadcastAll(function(player,skill,cfg){
+						lib.skill[skill]={
+							intro:{
+								content:cfg.intro||''
+							},
+							mark:'character',
+							onremove:true,
+							subplayer:cfg.skill,
+							ai:{
+								subplayer:true
+							}
+						}
+						lib.character[skill]=[cfg.sex,cfg.group,cfg.maxHp,cfg.skills,['character:'+cfg.name]];
+						lib.translate[skill]=cfg.caption||get.rawName(cfg.name);
+						player.storage[skill]=cfg;
+					},this,skill,cfg);
+					game.addVideo('addSubPlayer',this,[skill,lib.skill[skill],lib.character[skill],lib.translate[skill],{name:cfg.name}]);
 					this.addSkill(skill);
 				},
 				removeSubPlayer:function(){
@@ -17028,7 +17051,17 @@
 									intro=intro.replace(/&/g,get.cnNumber(this.storage[skill]));
 									intro=intro.replace(/\$/g,get.translation(this.storage[skill]));
 								}
-                                this.markSkillCharacter(skill,this.storage[skill],get.translation(skill),intro);
+								var caption;
+								if(typeof info.intro.name=='function'){
+                                    caption=info.intro.name(this.storage[skill],this);
+                                }
+								else if(typeof info.intro.name=='string'){
+									caption=info.name;
+								}
+								else{
+									caption=get.translation(skill);
+								}
+                                this.markSkillCharacter(skill,this.storage[skill],caption,intro);
 							}
 							else{
 								this.markSkill(skill);
@@ -20797,10 +20830,10 @@
 					content:function(storage,player){
 						if(typeof storage.intro2=='string') return storage.intro2;
 						if(typeof storage.intro2=='function') return storage.intro2(storage,player);
-						return '死亡前变回'+get.translation(storage.name);
+						return '死亡前切换回主武将'
 					},
 					name:function(storage){
-						return get.rawName(storage.name2);
+						return get.rawName(storage.name);
 					}
 				},
 				content:function(){
@@ -23549,9 +23582,28 @@
 					console.log(player);
 				}
 			},
-			smoothAvatar:function(player){
-				if(player&&player.node&&player.node.avatar){
-					player.smoothAvatar();
+			smoothAvatar:function(player,vice){
+				if(player&&player.node){
+					if(vice){
+						if(player.node.avatar2){
+							player.smoothAvatar(vice);
+						}
+					}
+					else{
+						if(player.node.avatar){
+							player.smoothAvatar(vice);
+						}
+					}
+				}
+			},
+			addSubPlayer:function(player,content){
+				if(player&&content&&content[0]&&content[1]&&
+					content[2]&&content[3]&&content[4]){
+					var skill=content[0];
+					lib.skill[skill]=content[1];
+					lib.character[skill]=content[2];
+					lib.translate[skill]=content[3];
+					player.storage[skill]=content[4];
 				}
 			},
 			arenaNumber:function(content){
@@ -25937,6 +25989,12 @@
 							newvid.name2=get.mode()+'::'+newvid.name2;
 						}
 					}
+				}
+				if(newvid.name1&&newvid.name1.indexOf('subplayer_')==0){
+					newvid.name1=newvid.name1.slice(10,newvid.name1.lastIndexOf('_'));
+				}
+				if(newvid.name2&&newvid.name2.indexOf('subplayer_')==0){
+					newvid.name1=newvid.name2.slice(10,newvid.name1.lastIndexOf('_'));
 				}
 				lib.videos.unshift(newvid);
 				store.put(newvid);
