@@ -657,6 +657,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(get.color(event.card)==get.color(result.cards[0])){
 							player.draw();
 						}
+						target.addTempSkill('toulianghuanzhu_ai1');
+					}
+					else{
+						target.addTempSkill('toulianghuanzhu_ai2');
 					}
 				},
 				ai:{
@@ -668,6 +672,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							if(player.countCards('h')<=1) return 0;
+							if(target.hasSkill('toulianghuanzhu_ai2')) return 0;
+							if(target.hasSkill('toulianghuanzhu_ai1')) return 0.5;
 							return -1;
 						}
 					},
@@ -818,6 +824,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			toulianghuanzhu_ai1:{},
+			toulianghuanzhu_ai2:{},
 			suolianjia:{
 				trigger:{player:'damageBefore'},
 				filter:function(event){

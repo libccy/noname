@@ -447,6 +447,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				autoViewAs:'tianxianjiu',
 				global:['g_yuchan_swap','g_yuchan_equip'],
 				addinfo:'仙',
+				savable:function(card,player,dying){
+					return dying==player;
+				},
 				ai:{
 					value:6,
 					useful:1

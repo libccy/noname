@@ -14,7 +14,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yxs_napolun:['male','wei',4,['tongling','fanpu']],
 			yxs_kaisa:['male','shu',4,['ducai']],
 			yxs_zhuyuanzhang:['male','wu',4,['qiangyun']],
-			yxs_jinke:['male','qun',3,['cike','qiangxi']],
+			// yxs_jinke:['male','qun',3,['cike','qiangxi']],
 			yxs_libai:['male','qun',3,['miaobi','zhexian']],
 			yxs_luban:['male','wu',3,['guifu','lshengong']],
 			yxs_lvzhi:['female','shu',4,['zhensha','xumou']],
@@ -1047,6 +1047,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					var num=target.hp-player.hp;
+					if(num>2){
+						num=2;
+					}
+					if(num<-2){
+						num=-2;
+					}
 					if(num>0){
 						target.damage(num);
 					}
@@ -2866,7 +2872,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sanbanfu:'三板斧',
 			sanbanfu_info:'当你对其他角色使用杀时，你可以使此杀有如下效果：若对方没有出闪，其受到2点伤害；若对方打出了一张闪，你与其各受到1点伤害；若对方打出了两张闪，你受到一点伤害',
 			bingsheng:'兵圣',
-			bingsheng_info:'出牌阶段限一次，你可以弃置两张花色不同的手牌，指定一名其他角色使其体力值与你相同',
+			bingsheng_info:'出牌阶段限一次，你可以弃置两张花色不同的手牌，指定一名其他角色使其体力值与你相同（体力最多变化2点）',
 			taolue:'韬略',
 			taolue_info:'锁定技，你的手牌上限+1',
 			shentan:'神探',

@@ -38,6 +38,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_nanhua_right:["female","qun",2,[],['unseen']],
 			ns_huamulan:['female','qun',3,['nscongjun','xiaoji','gongji']],
 			ns_huangzu:['male','qun',4,['nsjihui','nsmouyun']],
+			ns_jinke:['male','qun',4,['nspinmin','nsshishou']],
 
 			ns_yanliang:['male','qun',4,['nsduijue','nsshuangxiong','dualside'],['dualside:ns_wenchou']],
 			ns_wenchou:['male','qun',2,['nsguanyong','dualside'],['unseen']],
@@ -58,12 +59,86 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_wangyun:'#rSukincen',
 			ns_nanhua:'#g戒除联盟',
 			ns_huamulan:'#p哎别管我是谁',
+			ns_jinke:'#p哎别管我是谁',
 			ns_huangzu:'#r小芯儿童鞋',
+			ns_yanliang:'#r丶橙续缘',
+			ns_wenchou:'#r丶橙续缘',
 		},
 		perfectPair:{
 			yuji:['zuoci']
 		},
 		skill:{
+			nspinmin:{
+				trigger:{player:'dieBefore'},
+				forced:true,
+				filter:function(event,player){
+					return player.maxHp>0;
+				},
+				content:function(){
+					trigger.cancel();
+					player.hp=1;
+					player.update();
+					if(_status.currentPhase==player){
+						var num=4;
+						// if(game.countPlayer()>=7){
+						// 	num=5;
+						// }
+						if(!player.hasSkill('nspinmin_used')&&player.maxHp<num){
+							player.gainMaxHp(true);
+							player.addTempSkill('nspinmin_used');
+						}
+					}
+					else{
+						player.loseMaxHp(true);
+					}
+				},
+				subSkill:{
+					used:{}
+				}
+			},
+			nsshishou:{
+				trigger:{player:'loseEnd'},
+				forced:true,
+				filter:function(event,player){
+					if(_status.currentPhase!=player) return false;
+					for(var i=0;i<event.cards.length;i++){
+						if(event.cards[i].original=='h') return true;
+					}
+					return false;
+				},
+				content:function(){
+					'step 0'
+					player.loseHp();
+					'step 1'
+					player.draw();
+				},
+				group:'nsshishou_use',
+				subSkill:{
+					use:{
+						mod:{
+							cardEnabled:function(card,player){
+								if(_status.currentPhase!=player) return;
+								if(get.cardCount(true,player)>=4){
+									return false;
+								}
+							}
+						}
+					}
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(get.tag(card,'save')){
+								if(_status.currentPhase==player) return 0;
+								if(target.maxHp>1&&player!=target) return 0;
+							}
+							if(get.tag(card,'recover')){
+								if(_status.currentPhase==player) return 0;
+							}
+						}
+					}
+				}
+			},
 			nsduijue:{
 				trigger:{player:'phaseUseBegin'},
     			direct:true,
@@ -2250,7 +2325,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_huangzu:'黄祖',
 			ns_yanliang:'颜良',
 			ns_wenchou:'文丑',
+			ns_jinke:'荆轲',
 
+			nspinmin:'拼命',
+			nspinmin_info:'锁定技，当你于回合内死亡时，你不死亡并增加一点体力上限（每回合最多增加1点且不能超过4）；当你于回合外死亡时，你不死亡并减少一点体力上限（体力上限为0会导致你死亡）',
+			nsshishou:'失手',
+			nsshishou_info:'锁定技，当你于回合内失去手牌时，你失去一点体力并摸一张牌；你回合内使用的牌数不能超过4',
 			nsduijue:'对决',
 			nsduijue_info:'出牌阶段开始时，你可以弃置一张手牌，若如此做，此阶段你可以将一张与此牌颜色不同的手牌当作[决斗]使用',
 			nsshuangxiong:'双雄',
