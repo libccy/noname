@@ -13018,7 +13018,7 @@
 						}
                         if(game.online&&player==game.me&&!_status.over&&!game.controlOver&&!ui.exit){
                             if(lib.mode[lib.configOL.mode].config.dierestart){
-                                ui.exit=ui.create.control('退出房间',ui.click.exit);
+								ui.create.exit();
                             }
                         }
 
@@ -21724,6 +21724,12 @@
                     game.saveConfig('recentIP',lib.config.recentIP);
                     _status.connectMode=true;
 
+					if(localStorage.getItem(lib.configprefix+'tmp_roomId')){
+						lib.configOL.mode=lib.config.connect_mode;
+						game.roomId=parseInt(localStorage.getItem(lib.configprefix+'tmp_roomId'));
+						localStorage.removeItem(lib.configprefix+'tmp_roomId');
+					}
+
                     game.clearArena();
                     game.clearConnect();
                     ui.pause.hide();
@@ -21779,7 +21785,7 @@
                             game.reload();
                         },true);
 
-                        if(window.isNonameServer){
+						if(window.isNonameServer){
                             var cfg='pagecfg'+window.isNonameServer;
                             if(lib.config[cfg]){
                                 lib.configOL=lib.config[cfg][0];
@@ -21963,6 +21969,9 @@
                     game.ip=ip;
                     game.servermode=state.servermode;
                     game.roomId=state.roomId;
+					if(state.over){
+						_status.over=true;
+					}
                     if(observe){
                         game.onlineID=null;
                         game.roomId=null;
@@ -22180,8 +22189,8 @@
 						if(lib.config.show_cardpile){
 	                        ui.cardPileButton.style.display='';
 	                    }
-                        if(!observe&&game.me&&game.me.isDead()){
-                            ui.exit=ui.create.control('退出房间',ui.click.exit);
+                        if(!observe&&game.me&&(game.me.isDead()||_status.over)){
+							ui.create.exit();
                         }
 						ui.updatehl();
                     });
@@ -22722,6 +22731,21 @@
                 game.ws.send(JSON.stringify(get.stringifiedResult(args)));
             }
         },
+		sendTo:function(id,message){
+			var ws={wsid:id};
+			for(var i in lib.element.nodews){
+				ws[i]=lib.element.nodews[i];
+			}
+			var client={
+				ws:ws,
+				id:ws.wsid,
+				closed:false
+			};
+			for(var i in lib.element.client){
+				client[i]=lib.element.client[i];
+			}
+			client.send(message);
+		},
         createServer:function(){
             lib.node.clients=[];
             lib.node.banned=[];
@@ -25658,7 +25682,7 @@
     				}
     			}
                 if(!ui.exit){
-                    ui.exit=ui.create.control('退出房间',ui.click.exit);
+                    ui.create.exit();
                 }
 				if(ui.giveup){
 					ui.giveup.remove();
@@ -26178,7 +26202,15 @@
     			}
             }
 			if(!ui.restart){
-				ui.restart=ui.create.control('restart',game.reload);
+				if(game.onlineroom&&typeof game.roomId=='number'){
+					ui.restart=ui.create.control('restart',function(){
+						localStorage.setItem(lib.configprefix+'tmp_roomId',game.roomId);
+						game.reload();
+					});
+				}
+				else{
+					ui.restart=ui.create.control('restart',game.reload);
+				}
 			}
 			if(ui.tempnowuxie){
 				ui.tempnowuxie.close();
@@ -29176,6 +29208,11 @@
                 ui.chatButton=chat;
                 lib.setPopped(chat,ui.click.chat,220);
             },
+			exit:function(){
+				if(!ui.exit){
+					ui.exit=ui.create.control('退出房间',ui.click.exit);
+				}
+			},
             roomInfo:function(){
                 var chat=ui.create.system(game.online?'房间信息':'房间设置',function(){
                     if(!game.online||game.onlinezhu){
@@ -42360,7 +42397,8 @@
                 mode:_status.mode,
 				dying:_status.dying,
                 servermode:window.isNonameServer,
-                roomId:game.roomId
+                roomId:game.roomId,
+				over:_status.over
             };
             for(var i in lib.playerOL){
                 state.players[i]=lib.playerOL[i].getState();

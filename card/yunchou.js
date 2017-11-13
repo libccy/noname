@@ -614,7 +614,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						var minval=get.value(hs[0]);
 						var colors=[get.color(hs[0])];
 						for(var i=1;i<hs.length;i++){
-							var val=get.value(hs[i]);
+							var val=get.value(hs[i],player,'raw');
 							if(val<minval){
 								minval=val;
 								colors=[get.color(hs[i])];
@@ -624,7 +624,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						player.chooseCardButton('偷梁换柱',target.getCards('h')).ai=function(button){
-							var val=get.value(button.link)-minval;
+							var val=get.value(button.link,player,'raw')-minval;
 							if(val>=0){
 								if(colors.contains(get.color(button.link))){
 									val+=3;

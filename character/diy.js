@@ -235,8 +235,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function(card,player,target){
     						if(get.tag(card,'damage')){
     							if(!target.hasFriend()) return;
+								if(target.hp<=2) return;
     							if(!target.storage.nshuanxian_damage){
-									if(get.attitude(player,target)<=0) return [0.5,1];
+									if(get.attitude(player,target)<0||get.tag(card,'multineg')) return [0,1];
 									return [1,1];
 								}
     						}
