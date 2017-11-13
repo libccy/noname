@@ -20499,6 +20499,10 @@
                         },player);
                         player.unwait('ai');
                     }
+
+					if(window.isNonameServer){
+						document.querySelector('#server_count').innerHTML=lib.node.clients.length;
+					}
                     return this;
                 }
             },
