@@ -21724,7 +21724,9 @@
                     lib.config.recentIP.remove(_status.ip);
                     lib.config.recentIP.unshift(_status.ip);
                     lib.config.recentIP.splice(5);
-                    game.saveConfig('reconnect_info',[_status.ip,null]);
+					if(!lib.config.reconnect_info||lib.config.reconnect_info[0]!=_status.ip){
+						game.saveConfig('reconnect_info',[_status.ip,null]);
+					}
                     game.saveConfig('recentIP',lib.config.recentIP);
                     _status.connectMode=true;
 
@@ -21771,6 +21773,8 @@
 						lib.message.client.updaterooms(list,clients);
                         lib.message.client.updateevents(events);
                         ui.exitroom=ui.create.system('退出房间',function(){
+							game.saveConfig('tmp_owner_roomId');
+							game.saveConfig('tmp_user_roomId');
                             if(ui.rooms){
                                 game.saveConfig('reconnect_info');
                             }
@@ -37903,6 +37907,8 @@
                             game.send('startGame');
                         }
                         else{
+							game.saveConfig('tmp_owner_roomId');
+							game.saveConfig('tmp_user_roomId');
                             game.saveConfig('reconnect_info');
                             game.reload();
                         }
@@ -38517,6 +38523,10 @@
 					}
                 }
 				if(!ui.exit||!ui.exit.stay){
+					if(lib.config.reconnect_info){
+						lib.config.reconnect_info.length=1;
+						game.saveConfig('reconnect_info',lib.config.reconnect_info);
+					}
 					game.saveConfig('tmp_user_roomId',undefined,false,function(){
 						game.reload();
 					});
