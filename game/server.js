@@ -307,8 +307,9 @@
                     rooms[i].servermode=false;
                     for(var j in clients){
                         if(clients[j].room==rooms[i]&&clients[j]!=this){
-                            clients[j].close();
-                            delete clients[j];
+                            clients[j].sendl('selfclose');
+                            // clients[j].close();
+                            // delete clients[j];
                         }
                     }
                 }

@@ -2,7 +2,6 @@
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'mtg',
-		connect:true,
 	    character:{
 			mtg_jiding:['male','qun',4,['mbaizhan','msilian']],
 			// mtg_qianzhuo:['female','shu',3,[]],

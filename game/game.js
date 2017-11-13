@@ -20569,8 +20569,7 @@
                         }
                         else{
                             localStorage.setItem(lib.configprefix+'directstart',true);
-							game.saveConfig('tmp_user_roomId');
-							setTimeout(game.reload,100);
+							game.reload();
                         }
                     }
                     else{
@@ -21475,7 +21474,7 @@
                     if(lib.node.banned.contains(banned_info)){
                         this.send('denied','banned');
                     }
-                    else if(config.id&&lib.playerOL&&lib.playerOL[config.id]&&lib.playerOL[config.id].isOffline()){
+                    else if(config.id&&lib.playerOL&&lib.playerOL[config.id]){
                         var player=lib.playerOL[config.id];
                         player.setNickname();
                         player.ws=this;
@@ -21676,7 +21675,9 @@
                         avatar:lib.config.connect_avatar,
                         nickname:lib.config.connect_nickname
                     },lib.config.banned_info);
-					ui.create.connecting(true);
+					if(ui.connecting&&!ui.connecting.splashtimeout){
+						ui.connecting.firstChild.innerHTML='重连成功';
+					}
                 },
                 onconnection:function(id){
                     var ws={wsid:id};
@@ -21696,6 +21697,17 @@
                         lib.wsOL[id].onclose();
                     }
                 },
+				selfclose:function(){
+					if(game.online||game.onlineroom){
+                        if((game.servermode||game.onlinehall)&&_status.over){
+
+                        }
+                        else{
+							game.saveConfig('tmp_user_roomId');
+                        }
+                    }
+					game.ws.close();
+				},
                 reloadroom:function(forced){
                     if(window.isNonameServer&&(forced||!_status.protectingroom)){
                         game.reload();
@@ -21792,14 +21804,14 @@
                         },true);
 
 						if(typeof lib.config.tmp_owner_roomId=='number'){
-							if(!game.roomId&&ui.rooms[lib.config.tmp_owner_roomId].roomempty){
+							if(typeof game.roomId!='number'&&ui.rooms[lib.config.tmp_owner_roomId].roomempty){
 								lib.configOL.mode=lib.config.connect_mode;
 								game.roomId=lib.config.tmp_owner_roomId;
 							}
 							game.saveConfig('tmp_owner_roomId');
 						}
 						if(typeof lib.config.tmp_user_roomId=='number'){
-							if(!game.roomId){
+							if(typeof game.roomId!='number'){
 								if(!ui.rooms[lib.config.tmp_user_roomId].roomempty){
 									game.roomId=lib.config.tmp_user_roomId;
 								}
@@ -22000,6 +22012,7 @@
                             game.createEvent('game',false).setContent(lib.init.startOnline);
                             game.loop();
                             game.send('inited');
+							ui.create.connecting(true);
                         });
                     }
                     if(_status.event.parent){
@@ -22250,6 +22263,7 @@
 							ui.create.exit();
                         }
 						ui.updatehl();
+						ui.create.connecting(true);
                     });
                 },
                 exec:function(func){
@@ -29290,6 +29304,16 @@
 					ui.connecting=ui.create.div('.fullsize.connectlayer');
 					document.body.appendChild(ui.connecting);
 					ui.create.div('','正在重连...',ui.connecting);
+					ui.connecting.splashtimeout=setTimeout(function(){
+						if(ui.connecting){
+							delete ui.connecting.splashtimeout;
+						}
+					},300);
+					// setTimeout(function(){
+					// 	if(ui.connecting){
+					// 		ui.connecting.firstChild.show();
+					// 	}
+					// },1000);
 				}
 			},
             roomInfo:function(){

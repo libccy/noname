@@ -42,7 +42,7 @@ table {
 	transition-property: opacity;
 	overflow: hidden
 }
-#window.connecting{
+#window.connecting>*:not(#system){
 	opacity: 0.5;
 }
 .fullsize.connectlayer{
@@ -58,6 +58,7 @@ table {
 	text-shadow: black 0 0 2px;
 	position: relative;
 	font-family: 'xinwei';
+	transition: all 0.5s;
 }
 #window.server>div:not(.serverinfo){
 	display: none !important;
