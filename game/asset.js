@@ -622,6 +622,8 @@ window.noname_asset_list=[
     'image/character/ns_huamulan.jpg',
     'image/character/ns_huangzu.jpg',
     'image/character/ns_jinke.jpg',
+    'image/character/ns_yanliang.jpg',
+    'image/character/ns_wenchou.jpg',
     'image/character/old_caoxiu.jpg',
     'image/character/old_caozhen.jpg',
     'image/character/old_huaxiong.jpg',

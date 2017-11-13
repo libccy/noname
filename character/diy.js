@@ -39,7 +39,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_huamulan:['female','qun',3,['nscongjun','xiaoji','gongji']],
 			ns_huangzu:['male','qun',4,['nsjihui','nsmouyun']],
 			ns_jinke:['male','qun',4,['nspinmin','nsshishou']],
-
 			ns_yanliang:['male','qun',4,['nsduijue','nsshuangxiong','dualside'],['dualside:ns_wenchou']],
 			ns_wenchou:['male','qun',2,['nsguanyong','dualside'],['unseen']],
 		},
