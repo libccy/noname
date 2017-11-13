@@ -42,6 +42,23 @@ table {
 	transition-property: opacity;
 	overflow: hidden
 }
+#window.connecting{
+	opacity: 0.5;
+}
+.fullsize.connectlayer{
+	display: table;
+	text-align: center;
+	z-index: 100;
+}
+.connectlayer>div{
+	display: table-cell;
+	vertical-align: middle;
+	font-size: 60px;
+	color: white;
+	text-shadow: black 0 0 2px;
+	position: relative;
+	font-family: 'xinwei';
+}
 #window.server>div:not(.serverinfo){
 	display: none !important;
 }

@@ -1,8 +1,9 @@
 window.noname_update={
-    version:'1.9.42',
+    version:'1.9.43',
     // update:'1.9.41',
     changeLog:[
-        '优化触屏装备选择'
+        '部分DIY比赛武将',
+        '联机断线重连、重开改进'
     ],
     files:[
         // 'game/game.js',

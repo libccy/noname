@@ -20565,7 +20565,8 @@
                         }
                         else{
                             localStorage.setItem(lib.configprefix+'directstart',true);
-                            game.reload();
+							game.saveConfig('tmp_user_roomId');
+							setTimeout(game.reload,100);
                         }
                     }
                     else{
@@ -21671,6 +21672,7 @@
                         avatar:lib.config.connect_avatar,
                         nickname:lib.config.connect_nickname
                     },lib.config.banned_info);
+					ui.create.connecting(true);
                 },
                 onconnection:function(id){
                     var ws={wsid:id};
@@ -21709,10 +21711,12 @@
                     else{
                         game.switchMode(lib.configOL.mode);
                     }
+					ui.create.connecting(true);
                 },
                 enterroomfailed:function(){
                     alert('请稍后再试');
                     _status.enteringroom=false;
+					ui.create.connecting(true);
                 },
                 roomlist:function(list,events,clients,wsid){
                     game.online=true;
@@ -21723,12 +21727,6 @@
                     game.saveConfig('reconnect_info',[_status.ip,null]);
                     game.saveConfig('recentIP',lib.config.recentIP);
                     _status.connectMode=true;
-
-					if(localStorage.getItem(lib.configprefix+'tmp_roomId')){
-						lib.configOL.mode=lib.config.connect_mode;
-						game.roomId=parseInt(localStorage.getItem(lib.configprefix+'tmp_roomId'));
-						localStorage.removeItem(lib.configprefix+'tmp_roomId');
-					}
 
                     game.clearArena();
                     game.clearConnect();
@@ -21785,6 +21783,42 @@
                             game.reload();
                         },true);
 
+						if(typeof lib.config.tmp_owner_roomId=='number'){
+							if(!game.roomId&&ui.rooms[lib.config.tmp_owner_roomId].roomempty){
+								lib.configOL.mode=lib.config.connect_mode;
+								game.roomId=lib.config.tmp_owner_roomId;
+							}
+							game.saveConfig('tmp_owner_roomId');
+						}
+						if(typeof lib.config.tmp_user_roomId=='number'){
+							if(!game.roomId){
+								if(!ui.rooms[lib.config.tmp_user_roomId].roomempty){
+									game.roomId=lib.config.tmp_user_roomId;
+								}
+								else{
+									ui.create.connecting();
+									(function(){
+										var n=10;
+										var id=lib.config.tmp_user_roomId;
+										var interval=setInterval(function(){
+											if(n>0){
+												n--;
+												if(!ui.rooms[id].roomempty){
+													clearInterval(interval);
+													game.send('server','enter',game.roomId,lib.config.connect_nickname,lib.config.connect_avatar);
+												}
+											}
+											else{
+												ui.create.connecting(true);
+												clearInterval(interval);
+											}
+										},500);
+									}());
+								}
+							}
+							game.saveConfig('tmp_user_roomId');
+						}
+
 						if(window.isNonameServer){
                             var cfg='pagecfg'+window.isNonameServer;
                             if(lib.config[cfg]){
@@ -21804,6 +21838,7 @@
                             }
                         }
                         else if(typeof game.roomId=='number'){
+							ui.create.connecting();
                             game.send('server','enter',game.roomId,lib.config.connect_nickname,lib.config.connect_avatar);
                         }
 						lib.init.onfree();
@@ -21870,6 +21905,7 @@
                     }
                     else{
                         game.saveConfig('reconnect_info',[_status.ip,id]);
+						game.saveConfig('tmp_user_roomId',roomId);
                     }
                     lib.config.recentIP.remove(_status.ip);
                     lib.config.recentIP.unshift(_status.ip);
@@ -21981,6 +22017,9 @@
                     }
                     else{
                         game.saveConfig('reconnect_info',[_status.ip,game.onlineID]);
+						if(!observe){
+							game.saveConfig('tmp_user_roomId',game.roomId);
+						}
                     }
                     _status.connectMode=true;
                     lib.configOL=config;
@@ -26204,8 +26243,14 @@
 			if(!ui.restart){
 				if(game.onlineroom&&typeof game.roomId=='number'){
 					ui.restart=ui.create.control('restart',function(){
-						localStorage.setItem(lib.configprefix+'tmp_roomId',game.roomId);
-						game.reload();
+						game.broadcastAll(function(){
+							if(ui.exit){
+								ui.exit.stay=true;
+								ui.exit.firstChild.innerHTML='返回房间';
+							}
+						});
+						game.saveConfig('tmp_owner_roomId',game.roomId);
+						setTimeout(game.reload,100);
 					});
 				}
 				else{
@@ -28667,6 +28712,7 @@
 					config[key]=value;
 				}
 				localStorage.setItem(lib.configprefix+'config',JSON.stringify(config));
+				callback();
 			}
 			else{
 				if(value==undefined){
@@ -29211,6 +29257,21 @@
 			exit:function(){
 				if(!ui.exit){
 					ui.exit=ui.create.control('退出房间',ui.click.exit);
+				}
+			},
+			connecting:function(bool){
+				if(bool){
+					ui.window.classList.remove('connecting');
+					if(ui.connecting){
+						ui.connecting.delete();
+						delete ui.connecting;
+					}
+				}
+				else{
+					ui.window.classList.add('connecting');
+					ui.connecting=ui.create.div('.fullsize.connectlayer');
+					document.body.appendChild(ui.connecting);
+					ui.create.div('','正在重连...',ui.connecting);
 				}
 			},
             roomInfo:function(){
@@ -38455,7 +38516,14 @@
 	                    game.saveConfig('reconnect_info');
 					}
                 }
-                game.reload();
+				if(!ui.exit||!ui.exit.stay){
+					game.saveConfig('tmp_user_roomId',undefined,false,function(){
+						game.reload();
+					});
+				}
+				else{
+					game.reload();
+				}
             },
             shortcut:function(show){
                 if(show===false){
