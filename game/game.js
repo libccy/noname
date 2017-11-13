@@ -21842,8 +21842,18 @@
                             }
                         }
                         else if(typeof game.roomId=='number'){
-							ui.create.connecting();
-                            game.send('server','enter',game.roomId,lib.config.connect_nickname,lib.config.connect_avatar);
+							var room=ui.rooms[game.roomId];
+							if(game.roomIdServer&&(room.serving||!room.version)){
+								console.log();
+								if(lib.config.reconnect_info){
+									lib.config.reconnect_info[2]=null;
+									game.saveConfig('reconnect_info',lib.config.reconnect_info);
+								}
+							}
+							else{
+								ui.create.connecting();
+	                            game.send('server','enter',game.roomId,lib.config.connect_nickname,lib.config.connect_avatar);
+							}
                         }
 						lib.init.onfree();
                     }
@@ -38516,6 +38526,8 @@
                         lib.config.reconnect_info[2]=game.roomId;
                         game.saveConfig('reconnect_info',lib.config.reconnect_info);
                     }
+					game.reload();
+					return;
                 }
                 else{
 					if(typeof game.roomId!='number'){
