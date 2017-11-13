@@ -109,6 +109,15 @@ body[data-background_color_music='blue'] #arena.mobile:not(.chess) .player[data-
 	background-position: -6px -6px;
 }
 
+.woodbg{
+	color:rgba(77, 60, 51,0.8) !important;
+	text-shadow:none !important;
+}
+.woodbg .menubutton.large{
+	background: url('wood3.png') !important;
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 0 5px !important;
+}
+
 #window .player.minskin.obstacle[data-obscolor='blue']{
     background: repeating-linear-gradient(
         135deg,

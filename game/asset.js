@@ -2625,6 +2625,7 @@ window.noname_asset_list=[
     'theme/music/wood.png',
     'theme/music/wood3.png',
     'theme/simple/card.png',
+    'theme/simple/card2.png',
     'theme/simple/grid.png',
     'theme/simple/unknown.png',
     'theme/simple/wood.png',

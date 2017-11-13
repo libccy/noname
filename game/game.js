@@ -38750,31 +38750,116 @@
                     }
                 }
                 else{
-                    var nodes=[];
-    				_status.clickingidentity=[this.parentNode,nodes];
-    				var num=1;
-					var dy=30;
-					if(get.is.phoneLayout()){
-						dy=40;
+					var list2=get.copy(list);
+					if(game.getIdentityList2){
+						game.getIdentityList2(list2);
 					}
-    				for(var i in list){
-    					if(this.firstChild.innerHTML!=list[i]){
-    						var node=ui.create.div('.identity.hidden.pointerdiv',this.parentNode,ui.click.identity2);
-    						ui.create.div(node).innerHTML=list[i];
-    						node.dataset.color=i;
-    						ui.refresh(node);
-    						node.show();
-    						var transstr='translateY('+((num++)*dy)+'px)';
-    						if(get.is.phoneLayout()){
-    							transstr+=' scale(1.3)';
-    						}
-    						if(get.is.newLayout()&&this.parentNode.classList.contains('linked')){
-    							transstr+=' rotate(90deg)';
-    						}
-    						node.style.transform=transstr;
-    						nodes.push(node);
-    					}
-    				}
+					var rect=this.getBoundingClientRect();
+					this._customintro=function(uiintro){
+						if(get.mode()=='guozhan'){
+							uiintro.clickintro=true;
+						}
+						else{
+							uiintro.touchclose=true;
+						}
+						// if(lib.config.theme!='woodden'){
+						uiintro.classList.add('woodbg');
+						// }
+						if(get.is.phoneLayout()){
+							uiintro.style.width='100px';
+						}
+						else{
+							uiintro.style.width='85px';
+						}
+						var source=this.parentNode;
+						for(var i in list){
+							var node=ui.create.div();
+							node.classList.add('guessidentity');
+							node.classList.add('pointerdiv');
+							ui.create.div('.menubutton.large',list2[i],node);
+							if(!get.is.phoneLayout()){
+								node.firstChild.style.fontSize='24px';
+								node.firstChild.style.lineHeight='24px';
+							}
+							if(get.mode()=='guozhan'){
+								if(source._guozhanguess){
+									if(!source._guozhanguess.contains(i)){
+										node.classList.add('transparent');
+									}
+								}
+								node.listen(function(){
+									var list=[];
+									if(this.link[2]!='unknown'){
+										this.classList.toggle('transparent');
+										if(!this.classList.contains('transparent')){
+											var info=this.link;
+											info[0].firstChild.innerHTML=info[1];
+				                            info[0].dataset.color=info[2];
+											list.add(info[2]);
+										}
+									}
+									else{
+										var info=this.link;
+										info[0].firstChild.innerHTML=info[1];
+			                            info[0].dataset.color=info[2];
+										return;
+									}
+									for(var i=0;i<this.parentNode.childNodes.length;i++){
+										if(!this.parentNode.childNodes[i].classList.contains('transparent')){
+											var info=this.parentNode.childNodes[i].link;
+											if(!list.length){
+												info[0].firstChild.innerHTML=info[1];
+					                            info[0].dataset.color=info[2];
+											}
+											list.add(info[2]);
+										}
+									}
+									source._guozhanguess=list;
+								});
+							}
+							else{
+								node.listen(function(){
+									var info=this.link;
+									info[0].firstChild.innerHTML=info[1];
+		                            info[0].dataset.color=info[2];
+									_status.clicked=false;
+								});
+							}
+
+							node.link=[this,list[i],i];
+							uiintro.add(node);
+						}
+					};
+					ui.click.touchpop();
+					ui.click.intro.call(this,{
+						clientX:rect.left+rect.width/2,
+						clientY:rect.top+rect.height/2+30
+					});
+                    // var nodes=[];
+    				// _status.clickingidentity=[this.parentNode,nodes];
+    				// var num=1;
+					// var dy=30;
+					// if(get.is.phoneLayout()){
+					// 	dy=45;
+					// }
+    				// for(var i in list){
+    				// 	if(this.firstChild.innerHTML!=list[i]){
+    				// 		var node=ui.create.div('.identity.hidden.pointerdiv',this.parentNode,ui.click.identity2);
+    				// 		ui.create.div(node).innerHTML=list[i];
+    				// 		node.dataset.color=i;
+    				// 		ui.refresh(node);
+    				// 		node.show();
+    				// 		var transstr='translateY('+((num++)*dy)+'px)';
+    				// 		if(get.is.phoneLayout()){
+    				// 			transstr+=' scale(1.3)';
+    				// 		}
+    				// 		if(get.is.newLayout()&&this.parentNode.classList.contains('linked')){
+    				// 			transstr+=' rotate(90deg)';
+    				// 		}
+    				// 		node.style.transform=transstr;
+    				// 		nodes.push(node);
+    				// 	}
+    				// }
                 }
 			},
 			identity2:function(){
@@ -41101,6 +41186,9 @@
 				else if(!lib.config.touchscreen){
 					uiintro.addEventListener('mouseleave',clickintro);
 					uiintro.addEventListener('click',clickintro);
+				}
+				else if(uiintro.touchclose){
+					uiintro.listen(clickintro);
 				}
 
 				game.pause2();

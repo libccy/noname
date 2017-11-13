@@ -2144,6 +2144,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				return list;
 			},
+			getIdentityList2:function(list){
+				for(var i in list){
+					switch(i){
+						case 'unknown':list[i]='未知';break;
+						case 'ye':list[i]='野心家';break;
+						case 'qun':list[i]+='雄';break;
+						default:list[i]+='国';
+					}
+				}
+			},
 			getVideoName:function(){
 				var str=get.translation(game.me.name1)+'/'+get.translation(game.me.name2);
 				var str2=get.cnNumber(parseInt(get.config('player_number')))+'人'+

@@ -159,6 +159,17 @@ body{
 	box-shadow: rgba(0,0,0,0.6) 0 0 5px inset;
 }
 
+
+.woodbg{
+	color:rgba(77, 60, 51,1) !important;
+	text-shadow:none !important;
+}
+.woodbg .menubutton.large{
+	background: url('card2.png') !important;
+	background-size: 100% 100% !important;
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 0 5px !important;
+}
+
 .player>.glassbg{
 	left: 0;
 	top: 0;

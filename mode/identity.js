@@ -390,6 +390,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			getIdentityList2:function(list){
+				for(var i in list){
+					switch(i){
+						case 'fan':list[i]='反贼';break;
+						case 'zhong':list[i]='忠臣';break;
+						case 'nei':list[i]='内奸';break;
+						case 'zhu':list[i]='主公';break;
+						case 'cai':list[i]='未知';break;
+					}
+				}
+			},
 			getVideoName:function(){
 				var str=get.translation(game.me.name);
 				if(game.me.name2){
@@ -1633,7 +1644,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(this.ai.shown<-0.5) this.ai.shown=-0.5;
 
 					var marknow=(!_status.connectMode&&this!=game.me&&get.config('auto_mark_identity')&&this.ai.identity_mark!='finished');
-					if(true){
+					// if(true){
 						if(marknow&&_status.clickingidentity&&_status.clickingidentity[0]==this){
 							for(var i=0;i<_status.clickingidentity[1].length;i++){
 								_status.clickingidentity[1][i].delete();
@@ -1704,7 +1715,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								this.ai.identity_mark='finished';
 							}
 						}
-					}
+					// }
 
 				},
 			}
