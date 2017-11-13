@@ -1542,6 +1542,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				order:function(){
                         return get.order({name:'sha'})+0.1;
                     },
+                    respondSha:true,
     				skillTagFilter:function(player,tag,arg){
     					if(arg!='use') return false;
     					if(!player.countCards('he',{color:'red'})) return false;

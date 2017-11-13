@@ -1298,6 +1298,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				prompt:'将一张手牌当杀使用',
 				check:function(card){return 5-get.value(card)},
 				ai:{
+					respondSha:true,
 					order:function(){
 	                    return get.order({name:'sha'})+0.1;
 	                },
@@ -1463,7 +1464,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                content:'使用卡牌无法指定其他角色为目标'
 	            },
 	            mod:{
-	                playerEnabled:function(card,player,target){
+					playerEnabled:function(card,player,target){
 	                    if(player!=target) return false;
 	                }
 	            }

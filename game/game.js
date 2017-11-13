@@ -13487,6 +13487,11 @@
 							lib.element.player.inits[i](this);
 						}
 					}
+					if(this._inits){
+						for(var i=0;i<this._inits.length;i++){
+							this._inits[i](this);
+						}
+					}
 					this.update();
 					return this;
 				},
@@ -13586,13 +13591,18 @@
 				reinit:function(from,to,maxHp,online){
 					var info1=lib.character[from];
 					var info2=lib.character[to];
+					var smooth=true;
+					if(maxHp=='nosmooth'){
+						smooth=false;
+						maxHp=null;
+					}
 					if(this.name2==from){
 						this.name2=to;
 						if(this.isUnseen(0)&&!this.isUnseen(1)){
 							this.sex=info2[0];
 							this.name=to;
 						}
-						this.smoothAvatar(true);
+						if(smooth) this.smoothAvatar(true);
 						this.node.avatar2.setBackground(to,'character');
 						this.node.name2.innerHTML=get.slimName(to);
 					}
@@ -13604,7 +13614,7 @@
 							this.name=to;
 							this.sex=info2[0];
 						}
-						this.smoothAvatar(false);
+						if(smooth) this.smoothAvatar(false);
 						this.node.avatar.setBackground(to,'character');
 						this.node.name.innerHTML=get.slimName(to);
 					}
@@ -20967,6 +20977,81 @@
 				content:function(){
 					game.modeSwapPlayer(player);
 				},
+			},
+			dualside:{
+				subSkill:{
+					turn:{
+						trigger:{player:['turnOverAfter','dieBefore']},
+						silent:true,
+						filter:function(event,player){
+							if(player.storage.dualside_over) return false;
+							return Array.isArray(player.storage.dualside);
+						},
+						content:function(){
+							var cfg=player.storage.dualside;
+							var bool=player.isTurnedOver();
+							if(trigger.name=='die'){
+								bool=!bool;
+							}
+							if(bool){
+								cfg[1]=player.hp;
+								cfg[2]=player.maxHp;
+								player.reinit(cfg[0],cfg[3],[cfg[4],cfg[5]]);
+								player.unmarkSkill('dualside');
+								player.markSkillCharacter('dualside',{name:cfg[0]},'正面','当前体力：'+cfg[1]+'/'+cfg[2]);
+							}
+							else{
+								cfg[4]=player.hp;
+								cfg[5]=player.maxHp;
+								player.reinit(cfg[3],cfg[0],[cfg[1],cfg[2]]);
+								player.unmarkSkill('dualside');
+								player.markSkillCharacter('dualside',{name:cfg[3]},'背面','当前体力：'+cfg[4]+'/'+cfg[5]);
+							}
+
+							if(trigger.name=='die'){
+								trigger.cancel();
+								delete player.storage.dualside;
+								player.storage.dualside_over=true;
+								player.unmarkSkill('dualside');
+							}
+						}
+					},
+					init:{
+						trigger:{global:'gameStart',player:'enterGame'},
+						silent:true,
+						content:function(){
+							var list=[player.name,player.name1,player.name2];
+							for(var i=0;i<list.length;i++){
+								if(list[i]&&lib.character[list[i]]){
+									var info=lib.character[list[i]];
+									if(info[3].contains('dualside')&&info[4]){
+										player.storage.dualside=[list[i],player.hp,player.maxHp];
+										for(var j=0;j<info[4].length;j++){
+											if(info[4][j].indexOf('dualside:')==0){
+												var name2=info[4][j].slice(9);
+												var info2=lib.character[name2];
+												player.storage.dualside.push(name2);
+												player.storage.dualside.push(info2[2]);
+												player.storage.dualside.push(info2[2]);
+											}
+										}
+									}
+								}
+							}
+							var cfg=player.storage.dualside;
+							if(get.mode()=='guozhan'){
+								if(player.name1==cfg[0]){
+									player.showCharacter(0);
+								}
+								else{
+									player.showCharacter(1);
+								}
+							}
+							player.markSkillCharacter('dualside',{name:cfg[3]},'背面','当前体力：'+cfg[4]+'/'+cfg[5]);
+						}
+					}
+				},
+				group:['dualside_init','dualside_turn']
 			},
             fengyin:{
                 init:function(player,skill){

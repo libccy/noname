@@ -3,7 +3,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'diy',
 		connect:true,
-		connectBanned:['diy_tianyu','diy_yangyi','diy_lukang'],
+		connectBanned:['diy_tianyu','diy_yangyi','diy_lukang','ns_huamulan'],
 		character:{
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
@@ -36,6 +36,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_nanhua:["male","qun",3,["nshuanxian","nstaiping","nsshoudao"]],
 			ns_nanhua_left:["male","qun",2,[],['unseen']],
 			ns_nanhua_right:["female","qun",2,[],['unseen']],
+			ns_huamulan:['female','qun',3,['nscongjun','xiaoji','gongji']],
+			ns_huangzu:['male','qun',4,['nsjihui','nsmouyun']],
+
+			ns_yanliang:['male','qun',4,['nsduijue','nsshuangxiong','dualside'],['dualside:ns_wenchou']],
+			ns_wenchou:['male','qun',2,['nsguanyong','dualside'],['unseen']],
 		},
 		characterIntro:{
 			diy_feishi:'字公举，生卒年不详，益州犍为郡南安县（今四川省乐山市）人。刘璋占据益州时，以费诗为绵竹县县令。刘备进攻刘璋夺取益州，费诗举城而降，后受拜督军从事，转任牂牁郡太守，再为州前部司马。',
@@ -52,11 +57,202 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_lvzhi:'#bskystarwuwei',
 			ns_wangyun:'#rSukincen',
 			ns_nanhua:'#g戒除联盟',
+			ns_huamulan:'#p哎别管我是谁',
+			ns_huangzu:'#r小芯儿童鞋',
 		},
 		perfectPair:{
 			yuji:['zuoci']
 		},
 		skill:{
+			nsduijue:{
+				trigger:{player:'phaseUseBegin'},
+    			direct:true,
+				filter:function(event,player){
+					return player.countCards('h');
+				},
+    			content:function(){
+    				"step 0"
+					var color={
+						black:player.countCards('h',function(card){
+							return get.color(card)=='red'&&get.value(card)<8;
+						}),
+						red:player.countCards('h',function(card){
+							return get.color(card)=='black'&&get.value(card)<8;
+						})
+					};
+    				player.chooseToDiscard(get.prompt2('nsduijue')).set('ai',function(card){
+						var num=_status.event.color[get.color(card)];
+						if(_status.event.goon&&num>=1){
+							return 7+num-get.value(card);
+						}
+					}).set('goon',game.hasPlayer(function(current){
+						return get.effect(current,{name:'juedou'},player,player)>0;
+					})).set('color',color).set('logSkill','nsduijue');
+    				"step 1"
+					if(result.bool){
+						player.addTempSkill('nsduijue_use');
+	    				player.storage.nsduijue_use=get.color(result.cards[0]);
+					}
+    			},
+				subSkill:{
+					use:{
+						enable:'phaseUse',
+		    			viewAs:{name:'juedou'},
+						filter:function(event,player){
+							return player.hasCard(function(card){
+			    				return get.color(card)!=player.storage.nsduijue_use;
+			    			});
+						},
+		    			filterCard:function(card,player){
+		    				return get.color(card)!=player.storage.nsduijue_use;
+		    			},
+		    			check:function(card){
+		    				return 8-get.value(card);
+		    			},
+		    			ai:{
+		    				basic:{
+		    					order:10
+		    				}
+		    			}
+					}
+				}
+			},
+			nsshuangxiong:{
+				trigger:{player:'juedouBegin',target:'juedouBegin'},
+				check:function(event,player){
+					return player.isTurnedOver();
+				},
+				content:function(){
+					player.turnOver();
+				}
+			},
+			nsguanyong:{
+				enable:'chooseToRespond',
+				filterCard:true,
+				viewAs:{name:'sha'},
+				viewAsFilter:function(player){
+					if(!player.countCards('h')) return false;
+				},
+				prompt:'将一张手牌当杀打出',
+				check:function(card){return 7-get.value(card)},
+				ai:{
+					respondSha:true,
+	                skillTagFilter:function(player,tag,arg){
+						if(arg!='respond') return false;
+						if(!player.countCards('h')) return false;
+					},
+				}
+			},
+			nsjihui:{
+				trigger:{global:'discardAfter'},
+				filter:function(event,player){
+					return event.cards.length>=3;
+				},
+				content:function(){
+					player.insertPhase();
+					player.storage.nsjihui_use=_status.currentPhase;
+					player.addSkill('nsjihui_use');
+				},
+				subSkill:{
+					use:{
+						mark:'character',
+						intro:{
+							content:'使用牌只能指定自己与$为目标'
+						},
+						trigger:{player:'phaseAfter'},
+						forced:true,
+						popup:false,
+						filter:function(event,player){
+							return event.skill=='nsjihui';
+						},
+						onremove:true,
+						content:function(){
+							player.removeSkill('nsjihui_use');
+						},
+						mod:{
+							playerEnabled:function(card,player,target){
+							   if(player!=target&&player.storage.nsjihui_use!=target) return false;
+						   }
+						}
+					}
+				}
+			},
+			nsmouyun:{
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.hp%2==1||game.roundNumber%2==1;
+				},
+				filterTarget:function(card,player,target){
+					return target.isMinHp()&&target!=player&&target.isDamaged();
+				},
+				content:function(){
+					if(target.isDamaged()){
+						player.discardPlayerCard(target,'hej',target.maxHp-target.hp,true);
+					}
+				},
+				ai:{
+					order:10,
+					result:{
+						target:function(player,target){
+							return target.hp-target.maxHp;
+						}
+					}
+				}
+			},
+			nscongjun:{
+				forbid:['guozhan'],
+				unique:true,
+				forceunique:true,
+				init:function(player){
+					if(player.storage.nscongjun_show) return false;
+					var change=function(target){
+						if(target==player){
+							var list;
+		    				if(_status.connectMode){
+		    					list=get.charactersOL(function(i){
+		    						return lib.character[i][0]!='male';
+		    					});
+		    				}
+		    				else{
+		                        list=get.gainableCharacters(function(info){
+		                            return info[0]=='male';
+		                        });
+		    				}
+							var name=list.randomGet();
+							target.reinit('ns_huamulan',name,'nosmooth');
+							target.storage.nscongjun_show=name;
+							target.addSkill('nscongjun_show');
+							player._inits.remove(change);
+						}
+					}
+					if(!player._inits){
+						player._inits=[];
+					}
+					player._inits.push(change);
+				},
+				subSkill:{
+					show:{
+						trigger:{global:'useCard'},
+						filter:function(event,player){
+							return player.getEnemies().contains(event.player)&&event.card.name=='wuxie'&&event.getRand()<0.1;
+						},
+						direct:true,
+						skillAnimation:true,
+						animationColor:'thunder',
+						content:function(){
+							'step 0'
+							game.delay(0.5);
+							'step 1'
+							player.reinit(player.storage.nscongjun_show,'ns_huamulan','nosmooth');
+							player.logSkill('nscongjun_show',trigger.player);
+							'step 2'
+							player.removeSkill('nscongjun_show');
+							trigger.player.damage(2);
+						}
+					}
+				}
+			},
 			nstaiping:{
 				trigger:{player:'damageEnd'},
 				filter:function(event,player){
@@ -2050,7 +2246,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_nanhua:'南华',
 			ns_nanhua_left:'幻身·左',
 			ns_nanhua_right:'幻身·右',
+			ns_huamulan:'sp花木兰',
+			ns_huangzu:'黄祖',
+			ns_yanliang:'颜良',
+			ns_wenchou:'文丑',
 
+			nsduijue:'对决',
+			nsduijue_info:'出牌阶段开始时，你可以弃置一张手牌，若如此做，此阶段你可以将一张与此牌颜色不同的手牌当作[决斗]使用',
+			nsshuangxiong:'双雄',
+			nsshuangxiong_info:'当你使用[决斗]或被使用[决斗]时，你可以将武将牌翻面',
+			nsshuangxiong_append:'背面武将：文丑，2体力，你可以将一张牌当[杀]打出',
+			nsguanyong:'冠勇',
+			nsguanyong_info:'你可以将一张牌当[杀]打出',
+			nsjihui:'急恚',
+			nsjihui_info:'锁定技，每当一名角色一次弃置了三张或更多的牌，你获得一个额外回合；你的额外回合内，你使用牌只能指定你与上一回合角色为目标',
+			nsmouyun:'谋运',
+			nsmouyun_info:'出牌阶段限一次，若你的体力值或当前轮数为奇数，你可以弃置场上体力值最少的一名其他角色区域内的X张牌。（X为其损失的体力值）',
+			nscongjun:'从军',
+			nscongjun_info:'锁定技，游戏开始时，你变身为一名随机男性角色；当一名敌方角色使用无懈可击时，你有小概率亮出此武将并变回花木兰，然后对该角色造成2点伤害',
 			nshuanxian:'幻仙',
 			nshuanxian_info:'锁定技，游戏开始时，你获得随从“幻身·右”，当你首次受到伤害时，你获得随从“幻身·左”（体力上限2，初始手牌2，摸牌阶段少摸一张牌）；在你的回合中（如果有对应幻身），你以【幻身·左-本体-幻身·右】的顺序进行3个连续回合',
 			nstaiping:'太平',

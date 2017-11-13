@@ -3141,7 +3141,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return get.color(card)!=player.storage.shuangxiong;
     			},
     			check:function(card){
-    				return 6-get.value(card);
+    				return 8-get.value(card);
     			},
     			ai:{
     				basic:{
