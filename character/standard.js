@@ -367,42 +367,45 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					player.draw(2*trigger.num);
+					event.cards=get.cards(2*trigger.num);
 					"step 1"
-					event.cards=result;
+					if(event.cards.length>1){
+						player.chooseCardButton('将“遗计”牌分配给任意角色',true,event.cards,[1,event.cards.length]).set('ai',function(button){
+                            if(ui.selected.buttons.length==0) return 1;
+                            return 0;
+						});
+					}
+                    else if(event.cards.length==1){
+                        event._result={links:event.cards.slice(0),bool:true};
+                    }
+					else{
+						event.finish();
+					}
 					"step 2"
-					player.chooseCardTarget({
-						filterCard:function(card){
-							return _status.event.getParent().cards.contains(card);
-						},
-						selectCard:[1,event.cards.length],
-						filterTarget:function(card,player,target){
-							return player!=target;
-						},
-						ai1:function(card){
-							if(ui.selected.cards.length>0) return -1;
-							if(card.name=='du') return 20;
-							return (_status.event.player.countCards('h')-_status.event.player.hp);
-						},
-						ai2:function(target){
-							var att=get.attitude(_status.event.player,target);
-							if(ui.selected.cards.length&&ui.selected.cards[0].name=='du'){
-								if(target.hasSkillTag('nodu')) return 0;
-								return 1-att;
-							}
-							return att-4;
-						},
-						prompt:'请选择要送人的卡牌'
-					});
-					"step 3"
 					if(result.bool){
-						player.line(result.targets,'green');
-						result.targets[0].gain(result.cards,player);
-						player.$give(result.cards.length,result.targets[0]);
-						for(var i=0;i<result.cards.length;i++){
-							event.cards.remove(result.cards[i]);
+						for(var i=0;i<result.links.length;i++){
+							event.cards.remove(result.links[i]);
 						}
-						if(event.cards.length) event.goto(2);
+						event.togive=result.links.slice(0);
+						player.chooseTarget('将'+get.translation(result.links)+'交给一名角色',true).set('ai',function(target){
+                            var att=get.attitude(_status.event.player,target);
+							if(_status.event.enemy){
+                                return -att;
+                            }
+                            else if(att>0){
+                                return att/(1+target.countCards('h'));
+                            }
+                            else{
+                                return att/100;
+                            }
+						}).set('enemy',get.value(event.togive[0])<0);
+					}
+					"step 3"
+					if(result.targets.length){
+						result.targets[0].gain(event.togive,'draw');
+						player.line(result.targets[0],'green');
+                        game.log(result.targets[0],'获得了'+get.cnNumber(event.togive.length)+'张牌');
+						event.goto(1);
 					}
 				},
 				ai:{
@@ -422,7 +425,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										num=0.5;
 									}
 								}
-								console.log(num);
 								if(target.hp>=4) return [1,num*2];
 								if(target.hp==3) return [1,num*1.5];
 								if(target.hp==2) return [1,num*0.5];

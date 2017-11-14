@@ -44059,6 +44059,9 @@
                 }
 
 				var skills=node.getSkills(false,false);
+				for(var i in node.forbiddenSkills){
+					skills.add(i);
+				}
                 skills=skills.slice(0);
 				var skills2=game.filterSkills(skills,node);
                 if(node==game.me&&node.hiddenSkills.length){

@@ -216,7 +216,7 @@ window.config={
 		['qingnang','yiji'],
 		['qingnang','reyiji'],
 		['qingjian','tuntian'],
-		['yiji','tuntian'],
+		// ['yiji','tuntian'],
 		['reyiji','tuntian'],
 		['tuntian','guidao'],
 		['tuntian','tiandao'],
