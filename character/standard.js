@@ -265,7 +265,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target){
 							if(player.hasSkillTag('jueqing',false,target)) return [1,-1];
-							if(get.tag(card,'damage')&&get.damageEffect(target,player,player)>0) return [1,0,0,-1.5];
+							return 0.8;
+							// if(get.tag(card,'damage')&&get.damageEffect(target,player,player)>0) return [1,0,0,-1.5];
 						}
 					}
 				}
@@ -334,7 +335,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tiandu:{
 				audio:2,
 				trigger:{player:'judgeEnd'},
-				frequent:'check',
+				frequent:function(event){
+					if(event.result.card.name=='du') return false;
+					if(get.mode()=='guozhan') return false;
+					return true;
+				},
 				check:function(event){
 					if(event.result.card.name=='du') return false;
 					return true;

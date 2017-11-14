@@ -2138,7 +2138,7 @@
 									cbnum4=0;
 								}
 								ui.css.buttonsheet=lib.init.sheet(
-									'#system>div>div{padding-top:'+cbnum1+'px;padding-bottom:'+cbnum2+'px}',
+									'#system>div>div, .caption>div>.tdnode{padding-top:'+cbnum1+'px !important;padding-bottom:'+cbnum2+'px !important}',
 									'#control>.control>div{padding-top:'+cbnum3+'px;padding-bottom:'+cbnum4+'px}',
 									'#control>.control{padding-top:'+cbnum5+'px;padding-bottom:'+cbnum6+'px}'
 								);
@@ -38512,7 +38512,8 @@
 								ui.create.div('.name','<span style="opacity:0.6">'+(button.info[i][0]||'无名玩家'),node);
 							}
 							if(button.info[i][3]){
-								ui.create.div('.menubutton.videotext',uiintro.content,button.info[i][3]);
+								ui.create.div('.videostatus',node,button.info[i][3].slice(0,80));
+								node.classList.add('videonodestatus')
 							}
 						}
 					};

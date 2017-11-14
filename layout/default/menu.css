@@ -1284,7 +1284,18 @@ input.fileinput::-webkit-file-upload-button {
 	height: 30px;
 	line-height: 30px;
 	font-size: 18px;
-	font-family: 'xinwei';
+	font-family: 'lishu','xinwei';
+}
+.onlineclient .videonode.videonodestatus{
+	height: auto;
+}
+.onlineclient .videonode.videonodestatus>.videostatus{
+	position: relative;
+	display: block;
+	margin-left: 10px;
+	margin-top: 30px;
+	margin-bottom: 5px;
+	width: calc(100% - 20px);
 }
 .onlineevent>div{
 	text-align: left;
