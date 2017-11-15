@@ -7753,6 +7753,12 @@
 					}
                     ui.create.arena();
 					game.createEvent('game',false).setContent(lib.init.start);
+					if(lib.mode[lib.config.mode]&&lib.mode[lib.config.mode].fromextension){
+						var startstr=mode[lib.config.mode].start.toString();
+						if(startstr.indexOf('onfree')==-1){
+							setTimeout(lib.init.onfree,500);
+						}
+					}
 					delete lib.init.start;
 					game.loop();
 				}
@@ -25591,7 +25597,8 @@
 			lib.mode[name]={
 				name:info2.translate,
 				config:info2.config,
-				splash:imgsrc
+				splash:imgsrc,
+				fromextension:true
 			}
 			lib.init['setMode_'+name]=function(){
 				game.import('mode',function(lib,game,ui,get,ai,_status){
@@ -27383,6 +27390,12 @@
                 }
 
                 game.createEvent('game',false).setContent(mode[lib.config.mode].start);
+				if(lib.mode[lib.config.mode]&&lib.mode[lib.config.mode].fromextension){
+					var startstr=mode[lib.config.mode].start.toString();
+					if(startstr.indexOf('onfree')==-1){
+						setTimeout(lib.init.onfree,500);
+					}
+				}
                 delete lib.imported.mode[name];
 
 				if(!lib.db){
