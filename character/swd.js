@@ -5719,11 +5719,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			}
     		},
     		daixing:{
-    			group:'daixing2',
+    			group:['daixing2','daixing3'],
     			trigger:{player:'phaseEnd'},
     			direct:true,
                 filter:function(event,player){
-                    return player.getCards('he')>0;
+                    return player.countCards('he')>0;
                 },
     			content:function(){
     				"step 0"
@@ -5771,6 +5771,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     			}
     		},
+            daixing3:{
+                trigger:{player:['damageEnd','damageZero']},
+                silent:true,
+                filter:function(event,player){
+                    return player.storage.daixing>0&&event.hujia>0;
+                },
+                content:function(){
+                    player.storage.daixing-=trigger.hujia;
+                    if(player.storage.daixing<0){
+                        player.storage.daixing=0;
+                    }
+                }
+            },
     		swd_wuxie:{
     			mod:{
     				targetEnabled:function(card,player,target){
@@ -9716,7 +9729,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		liaoyuan_info_alter:'每当你使用一张杀指定目标后，你可以弃置一张与此杀花色相同的牌，若如此做，目标需额外打出一张闪，若目标没打出闪，此杀的伤害+1',
     		yishan_info:'每当你受到一次伤害，你可以重新获得最近失去的两张牌',
     		huanhun_info:'当一名角色进入濒死状态时，你可以弃置一张红色牌并令其进行一次判定，若结果为红色，其回复一点体力',
-    		daixing_info:'结束阶段，你可以任意张牌并获得等量的护甲，这些护甲将在你的下个准备阶段消失',
+    		daixing_info:'结束阶段，你可以弃置任意张牌并获得等量的护甲；这些护甲将在你的下个准备阶段消失',
     		swd_wuxie_info:'锁定技，你不能成为其他角色的延时锦囊的目标',
     		lqingcheng_info:'结束阶段，你可以进行判定，若为红色则可以继续判定，最多判定3次，判定结束后将判定成功的牌收入手牌',
     		xianjiang_old_info:'出牌阶段，你可以将一张装备牌永久转化为任意一张其它装备牌，一张牌在一个阶段只能转化一次',
