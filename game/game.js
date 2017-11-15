@@ -25594,7 +25594,10 @@
 				splash:imgsrc
 			}
 			lib.init['setMode_'+name]=function(){
-				mode[name]=info;
+				game.import('mode',function(lib,game,ui,get,ai,_status){
+					info.name=name;
+					return info;
+				});
 			}
             if(!lib.config.extensionInfo[extname]){
                 lib.config.extensionInfo[extname]={};

@@ -1,10 +1,8 @@
 window.noname_update={
-    version:'1.9.43.1',
+    version:'1.9.43.2',
     update:'1.9.43',
     changeLog:[
-        'bug修复',
-        '部分DIY比赛武将',
-        '联机断线重连、重开改进'
+        'bug修复'
     ],
     files:[
         'game/game.js',
@@ -22,7 +20,7 @@ window.noname_update={
         // 'character/*',
         // 'character/hearth.js',
         // 'character/gwent.js',
-        // 'character/old.js',
+        'character/swd.js',
         'character/standard.js',
         // 'character/sp.js',
         // 'character/swd.js',
