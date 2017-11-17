@@ -23129,6 +23129,20 @@
 					init:true
                 }
             };
+			if(obj.package&&obj.package.author){
+				lib.extensionMenu['extension_'+obj.name].author={
+    			    name:'作者：'+obj.package.author,
+                    clear:true,
+					nopointer:true,
+    			}
+			}
+			if(obj.package&&obj.package.intro){
+				lib.extensionMenu['extension_'+obj.name].intro={
+					name:obj.package.intro,
+                    clear:true,
+					nopointer:true,
+    			}
+			}
 			for(var i in obj.config){
 				lib.extensionMenu['extension_'+obj.name][i]=obj.config[i];
 			}
@@ -23140,8 +23154,11 @@
 					name:'编辑此扩展',
 					clear:true,
 					onclick:function(){
-						if(game.editExtension){
+						if(game.editExtension&&lib.extensionPack&&lib.extensionPack[obj.name]){
 							game.editExtension(obj.name);
+						}
+						else{
+							alert('无法编辑未启用的扩展，请启用此扩展并重启后重试')
 						}
 					}
 				}
@@ -32271,9 +32288,61 @@
                         inputExtName.style.width='80px';
                         inputExtName.style.textAlign='center';
                         inputExtLine.appendChild(inputExtName);
+
+						var buttonConfirmOnclick=function(){
+                            buttonConfirm.style.display='none';
+                            inputExtSpan.style.display='none';
+                            inputExtName.style.display='none';
+							authorExtLine.style.display='none';
+							introExtLine.style.display='none';
+							okExtLine.style.display='none';
+                            buttonRename.style.display='';
+                            buttonSave.style.display='';
+                            buttonReset.style.display='';
+                            buttonExport.style.display='';
+							inputExtSpan.innerHTML='扩展名称：';
+                        };
+						var createExtLine=function(str,str2){
+							var infoExtLine=ui.create.div(pageboard);
+							infoExtLine.style.display='none';
+	                        infoExtLine.style.padding='0 10px 10px 10px';
+	                        infoExtLine.style.height='22px';
+	                        infoExtLine.style.lineHeight='22px';
+	                        infoExtLine.style.whiteSpace='nowrap';
+	                        infoExtLine.style.overflow='visible';
+							if(typeof str=='boolean'){
+								var inputConfirm=document.createElement('button');
+		                        inputConfirm.innerHTML='确定';
+								inputConfirm.onclick=buttonConfirmOnclick;
+		                        infoExtLine.appendChild(inputConfirm);
+								return infoExtLine;
+							}
+	                        var infoExtSpan=document.createElement('span');
+	                        infoExtSpan.innerHTML='扩展'+str+'：';
+	                        infoExtLine.appendChild(infoExtSpan);
+	                        var infoExtName=document.createElement('input');
+	                        infoExtName.type='text';
+	                        infoExtName.style.width='80px';
+							infoExtName.value=str2||'';
+	                        infoExtName.style.textAlign='center';
+	                        infoExtLine.appendChild(infoExtName);
+							return infoExtLine;
+						};
+						var authorExtLine=createExtLine('作者',lib.config.connect_nickname);
+                        var introExtLine=createExtLine('描述','暂无描述');
+						var okExtLine=createExtLine(true);
+
                         game.editExtension=function(name){
                             page.currentExtension=name||'无名扩展';
                             inputExtName.value=page.currentExtension;
+							if(name&&lib.extensionPack[name]){
+								authorExtLine.querySelector('input').value=lib.extensionPack[name].author||'';
+								introExtLine.querySelector('input').value=lib.extensionPack[name].intro||'';
+							}
+							else{
+								authorExtLine.querySelector('input').value=lib.config.connect_nickname||'';
+								introExtLine.querySelector('input').value='暂无描述';
+							}
                             if(name){
                                 inputExtName.disabled=true;
                                 buttonConfirm.style.display='none';
@@ -32287,6 +32356,7 @@
                             else{
                                 inputExtName.disabled=false;
                                 buttonConfirm.style.display='';
+								inputExtSpan.innerHTML='扩展名：';
                                 inputExtSpan.style.display='';
                                 inputExtName.style.display='';
                                 buttonRename.style.display='none';
@@ -32296,6 +32366,9 @@
                             }
 							exportExtLine.style.display='none';
                             shareExtLine.style.display='none';
+							authorExtLine.style.display='none';
+							introExtLine.style.display='none';
+							okExtLine.style.display='none';
                             dash1.reset(name);
                             dash2.reset(name);
                             dash3.reset(name);
@@ -32362,7 +32435,9 @@
                                 str+=',package:'+get.stringify({
                                     character:dash1.content.pack,
                                     card:dash2.content.pack,
-                                    skill:dash3.content.pack
+                                    skill:dash3.content.pack,
+									intro:introExtLine.querySelector('input').value||'',
+									author:authorExtLine.querySelector('input').value||''
                                 });
                                 var files={character:[],card:[],skill:[]};
                                 for(var i in dash1.content.image){
@@ -32396,25 +32471,19 @@
                         var buttonConfirm=document.createElement('button');
                         buttonConfirm.innerHTML='确定';
                         buttonConfirm.style.marginLeft='5px';
-                        buttonConfirm.onclick=function(){
-                            buttonConfirm.style.display='none';
-                            inputExtSpan.style.display='none';
-                            inputExtName.style.display='none';
-                            buttonRename.style.display='';
-                            buttonSave.style.display='';
-                            buttonReset.style.display='';
-                            buttonExport.style.display='';
-                        };
+                        buttonConfirm.onclick=buttonConfirmOnclick;
                         inputExtLine.appendChild(buttonConfirm);
                         var buttonRename=document.createElement('button');
-                        buttonRename.innerHTML='改名';
+                        buttonRename.innerHTML='选项';
                         buttonRename.style.marginLeft='2px';
                         buttonRename.style.marginRight='2px';
                         buttonRename.style.display='none';
                         buttonRename.onclick=function(){
-                            buttonConfirm.style.display='';
                             inputExtSpan.style.display='';
                             inputExtName.style.display='';
+							authorExtLine.style.display='';
+							introExtLine.style.display='';
+							okExtLine.style.display='block';
                             inputExtName.disabled=false;
                             buttonRename.style.display='none';
                             buttonSave.style.display='none';
