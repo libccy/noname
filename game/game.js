@@ -23254,18 +23254,36 @@
                 game.importedPack=obj;
             }
 		},
-        importExtension:function(data,finishLoad,exportext){
+        importExtension:function(data,finishLoad,exportext,pkg){
             if(!window.JSZip){
                 lib.init.js(lib.assetURL+'game','jszip',function(){
-                    game.importExtension(data,finishLoad,exportext);
+                    game.importExtension(data,finishLoad,exportext,pkg);
                 });
             }
             else if(get.objtype(data)=='object'){
                 var zip=new JSZip();
+				var filelist=[];
                 for(var i in data){
                     zip.file(i,data[i]);
+					filelist.push(i);
                 }
                 if(exportext){
+					if(pkg){
+						filelist.remove('extension.js');
+						pkg.files=filelist;
+						window.xxx=zip.generate({type:"arraybuffer"})
+						pkg.size=zip.generate({type:"arraybuffer"}).byteLength;
+						if(pkg.size<1000){
+							pkg.size=pkg.size+'B';
+						}
+						else if(pkg.size<1000000){
+							pkg.size=Math.round(pkg.size/1000)+'KB';
+						}
+						else{
+							pkg.size=Math.round(pkg.size/100000)/10+'MB';
+						}
+						zip.file('package.js','window.noname_extension_package='+JSON.stringify(pkg));
+					}
                     var blob = zip.generate({type:"blob"});
 					var fileNameToSaveAs = exportext;
 					fileNameToSaveAs=fileNameToSaveAs.replace(/\\|\/|\:|\?|\"|\*|<|>|\|/g,'.');
@@ -32479,7 +32497,13 @@
                                     extension[i]=dash2.content.image[i];
                                 }
                                 if(exportext){
-                                    game.importExtension(extension,null,page.currentExtension);
+                                    game.importExtension(extension,null,page.currentExtension,{
+										intro:introExtLine.querySelector('input').value||'',
+										author:authorExtLine.querySelector('input').value||'',
+										diskURL:diskExtLine.querySelector('input').value||'',
+										forumURL:forumExtLine.querySelector('input').value||'',
+										version:versionExtLine.querySelector('input').value||'',
+									});
                                 }
                                 else{
                                     game.importExtension(extension,function(){
@@ -34606,7 +34630,44 @@
 										loading.innerHTML='连接失败';
 										return;
 									}
-									loaded();
+									var list=window.noname_extension_list;
+									if(Array.isArray(list)){
+										list[i]={
+											name:list[i],
+											files:[]
+										};
+										var num=0;
+										for(var i=0;i<list.length;i++){
+											if(typeof list[i]=='string'){
+												num++;
+												lib.init.req(extensionURL+list[i]+'/package.js',(function(obj){
+													return function(){
+														num--;
+														if(window.noname_extension_package){
+															for(var i in window.noname_extension_package){
+																obj[i]=window.noname_extension_package[i];
+															}
+															obj.netdisk=obj.netdisk||obj.diskURL;
+															obj.forum=obj.forum||obj.forumURL;
+															delete window.noname_extension_package;
+														}
+														if(num==0){
+															loaded();
+														}
+													};
+												}(list[i])),function(){
+													num--;
+													if(num==0){
+														loaded();
+													}
+												});
+											}
+										}
+										loaded();
+									}
+									else{
+										loading.innerHTML='连接失败';
+									}
 								},function(){
 									loading.innerHTML='连接失败';
 								});
