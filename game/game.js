@@ -30689,15 +30689,6 @@
 						node.link=page;
 						node.mode='create';
                         var pageboard=ui.create.div(page);
-                        // var inputExtLine=ui.create.div(pageboard);
-                        // inputExtLine.style.padding='10px';
-                        // inputExtLine.style.height='22px';
-                        // inputExtLine.style.lineHeight='22px';
-                        // inputExtLine.style.whiteSpace='nowrap';
-                        // inputExtLine.style.overflow='visible';
-                        // var inputExtSpan=document.createElement('span');
-                        // inputExtSpan.innerHTML='扩展名：';
-                        // inputExtLine.appendChild(inputExtSpan);
 
 						var importextensionexpanded=false;
                         var importExtension;
@@ -32274,6 +32265,7 @@
 						node.mode='create';
                         var pageboard=ui.create.div(page);
                         var inputExtLine=ui.create.div(pageboard);
+						inputExtLine.style.transition='all 0s';
                         inputExtLine.style.padding='10px';
                         inputExtLine.style.height='22px';
                         inputExtLine.style.lineHeight='22px';
@@ -32295,12 +32287,20 @@
                             inputExtName.style.display='none';
 							authorExtLine.style.display='none';
 							introExtLine.style.display='none';
+							forumExtLine.style.display='none';
+							diskExtLine.style.display='none';
+							versionExtLine.style.display='none';
 							okExtLine.style.display='none';
+							inputExtLine.style.padding='10px';
                             buttonRename.style.display='';
                             buttonSave.style.display='';
                             buttonReset.style.display='';
                             buttonExport.style.display='';
 							inputExtSpan.innerHTML='扩展名称：';
+							inputExtName.style.width='100px';
+	                        inputExtName.style.textAlign='';
+
+							dashboard.style.display='';
                         };
 						var createExtLine=function(str,str2){
 							var infoExtLine=ui.create.div(pageboard);
@@ -32318,18 +32318,20 @@
 								return infoExtLine;
 							}
 	                        var infoExtSpan=document.createElement('span');
-	                        infoExtSpan.innerHTML='扩展'+str+'：';
+	                        infoExtSpan.innerHTML=str+'：';
 	                        infoExtLine.appendChild(infoExtSpan);
 	                        var infoExtName=document.createElement('input');
 	                        infoExtName.type='text';
-	                        infoExtName.style.width='80px';
+	                        infoExtName.style.width='100px';
 							infoExtName.value=str2||'';
-	                        infoExtName.style.textAlign='center';
 	                        infoExtLine.appendChild(infoExtName);
 							return infoExtLine;
 						};
-						var authorExtLine=createExtLine('作者',lib.config.connect_nickname);
-                        var introExtLine=createExtLine('描述','暂无描述');
+						var authorExtLine=createExtLine('扩展作者',lib.config.connect_nickname);
+						var introExtLine=createExtLine('扩展描述','暂无描述');
+						var versionExtLine=createExtLine('扩展版本','1.0');
+						var diskExtLine=createExtLine('网盘地址');
+						var forumExtLine=createExtLine('讨论地址');
 						var okExtLine=createExtLine(true);
 
                         game.editExtension=function(name){
@@ -32338,10 +32340,16 @@
 							if(name&&lib.extensionPack[name]){
 								authorExtLine.querySelector('input').value=lib.extensionPack[name].author||'';
 								introExtLine.querySelector('input').value=lib.extensionPack[name].intro||'';
+								diskExtLine.querySelector('input').value=lib.extensionPack[name].diskURL||'';
+								forumExtLine.querySelector('input').value=lib.extensionPack[name].forumURL||'';
+								versionExtLine.querySelector('input').value=lib.extensionPack[name].version||'';
 							}
 							else{
 								authorExtLine.querySelector('input').value=lib.config.connect_nickname||'';
 								introExtLine.querySelector('input').value='暂无描述';
+								diskExtLine.querySelector('input').value='';
+								forumExtLine.querySelector('input').value='';
+								versionExtLine.querySelector('input').value='1.0';
 							}
                             if(name){
                                 inputExtName.disabled=true;
@@ -32357,6 +32365,8 @@
                                 inputExtName.disabled=false;
                                 buttonConfirm.style.display='';
 								inputExtSpan.innerHTML='扩展名：';
+		                        inputExtName.style.width='80px';
+		                        inputExtName.style.textAlign='center';
                                 inputExtSpan.style.display='';
                                 inputExtName.style.display='';
                                 buttonRename.style.display='none';
@@ -32364,11 +32374,18 @@
                                 buttonReset.style.display='none';
                                 buttonExport.style.display='none';
                             }
+
+							dashboard.style.display='';
+
 							exportExtLine.style.display='none';
                             shareExtLine.style.display='none';
 							authorExtLine.style.display='none';
 							introExtLine.style.display='none';
+							forumExtLine.style.display='none';
+							diskExtLine.style.display='none';
+							versionExtLine.style.display='none';
 							okExtLine.style.display='none';
+							inputExtLine.style.padding='10px';
                             dash1.reset(name);
                             dash2.reset(name);
                             dash3.reset(name);
@@ -32437,7 +32454,10 @@
                                     card:dash2.content.pack,
                                     skill:dash3.content.pack,
 									intro:introExtLine.querySelector('input').value||'',
-									author:authorExtLine.querySelector('input').value||''
+									author:authorExtLine.querySelector('input').value||'',
+									diskURL:diskExtLine.querySelector('input').value||'',
+									forumURL:forumExtLine.querySelector('input').value||'',
+									version:versionExtLine.querySelector('input').value||'',
                                 });
                                 var files={character:[],card:[],skill:[]};
                                 for(var i in dash1.content.image){
@@ -32483,13 +32503,21 @@
                             inputExtName.style.display='';
 							authorExtLine.style.display='';
 							introExtLine.style.display='';
+							forumExtLine.style.display='';
+							diskExtLine.style.display='';
+							versionExtLine.style.display='';
 							okExtLine.style.display='block';
+							inputExtLine.style.padding='20px 10px 10px 10px';
                             inputExtName.disabled=false;
                             buttonRename.style.display='none';
                             buttonSave.style.display='none';
                             buttonReset.style.display='none';
                             buttonExport.style.display='none';
 							inputExtSpan.innerHTML='扩展名称：';
+							inputExtName.style.width='100px';
+	                        inputExtName.style.textAlign='';
+
+							dashboard.style.display='none';
                         };
                         inputExtLine.appendChild(buttonRename);
                         var buttonReset=document.createElement('button');
