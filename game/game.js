@@ -32489,6 +32489,7 @@
                             buttonSave.style.display='none';
                             buttonReset.style.display='none';
                             buttonExport.style.display='none';
+							inputExtSpan.innerHTML='扩展名称：';
                         };
                         inputExtLine.appendChild(buttonRename);
                         var buttonReset=document.createElement('button');
