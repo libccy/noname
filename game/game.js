@@ -32612,7 +32612,7 @@
                         shareExtLine.style.marginBottom='5px';
                         shareExtLine.innerHTML='已导出扩展。<span class="hrefnode">分享扩展</span><span class="closenode">×</span>';
                         shareExtLine.querySelectorAll('span')[0].onclick=function(){
-							game.open('https://tieba.baidu.com/p/5037850317');
+							game.open('https://tieba.baidu.com/p/5438480822');
 						};
                         shareExtLine.querySelectorAll('span')[1].onclick=function(){
                             shareExtLine.style.display='none';
@@ -34636,7 +34636,7 @@
 							};
 							window.extension={};
 							if(game.download){
-								lib.init.req(extensionURL+'package.js',function(){
+								lib.init.req(extensionURL+'catalog.js',function(){
 									try{
 										eval(this.responseText);
 										// if(!window.noname_extension_list){
@@ -34655,7 +34655,7 @@
 								});
 							}
 							else{
-								lib.init.js(extensionURL.replace(/raw\.githubusercontent\.com/,'rawgit.com')+'package.js',null,loaded,function(){
+								lib.init.js(extensionURL.replace(/raw\.githubusercontent\.com/,'rawgit.com')+'catalog.js',null,loaded,function(){
 									delete window.extension;
 									loading.innerHTML='连接失败';
 								});
