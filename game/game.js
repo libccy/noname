@@ -32485,7 +32485,7 @@
                                 var files={character:[],card:[],skill:[]};
                                 for(var i in dash1.content.image){
                                     files.character.push(i);
-                                }e
+                                }
                                 for(var i in dash2.content.image){
                                     files.card.push(i);
                                 }
