@@ -2,8 +2,7 @@ window.noname_update={
     version:'1.9.44',
     update:'1.9.43',
     changeLog:[
-        '扩展可添加作者等信息',
-        '升级后扩展目录中的所有扩展将显示为未更新的状态，无视或选择更新均可'
+        '扩展可添加作者等信息'
     ],
     files:[
         'game/game.js',

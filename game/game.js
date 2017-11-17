@@ -23271,7 +23271,6 @@
 					if(pkg){
 						filelist.remove('extension.js');
 						pkg.files=filelist;
-						window.xxx=zip.generate({type:"arraybuffer"})
 						pkg.size=zip.generate({type:"arraybuffer"}).byteLength;
 						if(pkg.size<1000){
 							pkg.size=pkg.size+'B';
@@ -23282,7 +23281,13 @@
 						else{
 							pkg.size=Math.round(pkg.size/100000)/10+'MB';
 						}
-						zip.file('package.js','window.noname_extension_package='+JSON.stringify(pkg));
+						var pkgstr='extension["'+exportext+'"]={\n';
+						for(var i in pkg){
+							pkgstr+='\t'+i+':'+JSON.stringify(pkg[i])+',\n'
+						}
+						pkgstr=pkgstr.slice(0,pkgstr.length-2);
+						pkgstr+='\n};';
+						zip.file('package.js',pkgstr);
 					}
                     var blob = zip.generate({type:"blob"});
 					var fileNameToSaveAs = exportext;
@@ -32346,7 +32351,7 @@
 							return infoExtLine;
 						};
 						var authorExtLine=createExtLine('扩展作者',lib.config.connect_nickname);
-						var introExtLine=createExtLine('扩展描述','暂无描述');
+						var introExtLine=createExtLine('扩展描述');
 						var versionExtLine=createExtLine('扩展版本','1.0');
 						var diskExtLine=createExtLine('网盘地址');
 						var forumExtLine=createExtLine('讨论地址');
@@ -32364,7 +32369,7 @@
 							}
 							else{
 								authorExtLine.querySelector('input').value=lib.config.connect_nickname||'';
-								introExtLine.querySelector('input').value='暂无描述';
+								introExtLine.querySelector('input').value='';
 								diskExtLine.querySelector('input').value='';
 								forumExtLine.querySelector('input').value='';
 								versionExtLine.querySelector('input').value='1.0';
@@ -32500,8 +32505,8 @@
                                     game.importExtension(extension,null,page.currentExtension,{
 										intro:introExtLine.querySelector('input').value||'',
 										author:authorExtLine.querySelector('input').value||'',
-										diskURL:diskExtLine.querySelector('input').value||'',
-										forumURL:forumExtLine.querySelector('input').value||'',
+										netdisk:diskExtLine.querySelector('input').value||'',
+										forum:forumExtLine.querySelector('input').value||'',
 										version:versionExtLine.querySelector('input').value||'',
 									});
                                 }
@@ -34565,8 +34570,14 @@
 
                             var loading=ui.create.div('.loading.config.toggle','载入中...',page);
 							var loaded=function(list){
-								var list=window.noname_extension_list;
-								delete window.noname_extension_list;
+								var list=[];
+								var extension=window.extension;
+								for(var i in extension){
+									extension[i].name=i;
+									list.push(extension[i]);
+								}
+								list.randomSort();
+								delete window.extension;
 								loading.style.display='none';
 								for(var i =0;i<list.length;i++){
 									var node=ui.create.div('.videonode.menubutton.extension.large',page,clickExtension);
@@ -34590,7 +34601,12 @@
 										download.listen(downloadExtension);
 	                                    if(lib.config.extensions.contains(list[i].name)){
 	                                        download.classList.remove('active');
-	                                        if(lib.config['extension_'+list[i].name+'_version']!=list[i].version){
+											if(lib.extensionPack[list[i].name]&&lib.extensionPack[list[i].name].version==list[i].version){
+												download.classList.add('transparent2');
+	                                            download.classList.remove('active');
+	                                            download.innerHTML='已安装';
+											}
+	                                        else if(lib.config['extension_'+list[i].name+'_version']!=list[i].version){
 	                                            download.innerHTML='更新扩展';
 	                                            download.classList.add('highlight');
 												download.classList.add('update');
@@ -34618,62 +34634,29 @@
 									}
 								}
 							};
+							window.extension={};
 							if(game.download){
 								lib.init.req(extensionURL+'package.js',function(){
 									try{
 										eval(this.responseText);
-										if(!window.noname_extension_list){
-											throw('err');
-										}
+										// if(!window.noname_extension_list){
+										// 	throw('err');
+										// }
 									}
 									catch(e){
+										delete window.extension;
 										loading.innerHTML='连接失败';
 										return;
 									}
-									var list=window.noname_extension_list;
-									if(Array.isArray(list)){
-										list[i]={
-											name:list[i],
-											files:[]
-										};
-										var num=0;
-										for(var i=0;i<list.length;i++){
-											if(typeof list[i]=='string'){
-												num++;
-												lib.init.req(extensionURL+list[i]+'/package.js',(function(obj){
-													return function(){
-														num--;
-														if(window.noname_extension_package){
-															for(var i in window.noname_extension_package){
-																obj[i]=window.noname_extension_package[i];
-															}
-															obj.netdisk=obj.netdisk||obj.diskURL;
-															obj.forum=obj.forum||obj.forumURL;
-															delete window.noname_extension_package;
-														}
-														if(num==0){
-															loaded();
-														}
-													};
-												}(list[i])),function(){
-													num--;
-													if(num==0){
-														loaded();
-													}
-												});
-											}
-										}
-										loaded();
-									}
-									else{
-										loading.innerHTML='连接失败';
-									}
+									loaded();
 								},function(){
+									delete window.extension;
 									loading.innerHTML='连接失败';
 								});
 							}
 							else{
 								lib.init.js(extensionURL.replace(/raw\.githubusercontent\.com/,'rawgit.com')+'package.js',null,loaded,function(){
+									delete window.extension;
 									loading.innerHTML='连接失败';
 								});
 							}
