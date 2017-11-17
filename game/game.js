@@ -32422,6 +32422,17 @@
                             buttonExport.style.display='none';
                         };
                         inputExtLine.appendChild(buttonRename);
+                        var buttonReset=document.createElement('button');
+                        buttonReset.innerHTML='重置';
+                        buttonReset.style.marginLeft='2px';
+                        buttonReset.style.marginRight='2px';
+                        buttonReset.style.display='none';
+                        buttonReset.onclick=function(){
+							if(confirm('当前扩展将被清除，是否确定？')){
+								game.editExtension();
+							}
+                        };
+                        inputExtLine.appendChild(buttonReset);
                         var buttonSave=document.createElement('button');
                         buttonSave.innerHTML='保存';
                         buttonSave.style.marginLeft='2px';
@@ -32435,15 +32446,6 @@
                             processExtension();
                         };
                         inputExtLine.appendChild(buttonSave);
-                        var buttonReset=document.createElement('button');
-                        buttonReset.innerHTML='重置';
-                        buttonReset.style.marginLeft='2px';
-                        buttonReset.style.marginRight='2px';
-                        buttonReset.style.display='none';
-                        buttonReset.onclick=function(){
-                            game.editExtension();
-                        };
-                        inputExtLine.appendChild(buttonReset);
                         var buttonExport=document.createElement('button');
                         buttonExport.innerHTML='导出';
                         buttonExport.style.marginLeft='2px';

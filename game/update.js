@@ -1,7 +1,8 @@
 window.noname_update={
-    version:'1.9.43.2',
+    version:'1.9.44',
     update:'1.9.43',
     changeLog:[
+        '新扩展导出选项',
         'bug修复'
     ],
     files:[
