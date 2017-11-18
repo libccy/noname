@@ -16,7 +16,7 @@ window.noname_update={
         // 'card/yunchou.js',
         // 'card/hearth.js',
         // 'card/gwent.js',
-        // 'card/guozhan.js',
+        'card/standard.js',
         // 'character/*',
         // 'character/hearth.js',
         // 'character/gwent.js',

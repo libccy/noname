@@ -32612,7 +32612,7 @@
                         shareExtLine.style.marginBottom='5px';
                         shareExtLine.innerHTML='已导出扩展。<span class="hrefnode">分享扩展</span><span class="closenode">×</span>';
                         shareExtLine.querySelectorAll('span')[0].onclick=function(){
-							game.open('https://tieba.baidu.com/p/5438480822');
+							game.open('https://tieba.baidu.com/p/5439380222');
 						};
                         shareExtLine.querySelectorAll('span')[1].onclick=function(){
                             shareExtLine.style.display='none';

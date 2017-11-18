@@ -523,6 +523,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						_status.dieClose.push(dialog);
 						dialog.videoId=id;
 					},cards,dialog.videoId);
+					game.log(event.card,'亮出了',cards);
 				},
 				content:function(){
 					"step 0"
@@ -654,7 +655,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					basic:{
-						order:9,
+						order:1,
 						useful:[3,1],
 						value:0
 					},
