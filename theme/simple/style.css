@@ -198,6 +198,9 @@ body{
 	background-size: cover;
 	-webkit-filter: blur(3px);
 }
+.popup-container>.prompt-container>div>div{
+	background: rgba(0,0,0,0.6);
+}
 
 .popup-container>.menu.visual>.button.dashedmenubutton{
 	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px !important;

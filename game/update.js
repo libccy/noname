@@ -1,8 +1,8 @@
 window.noname_update={
-    version:'1.9.44',
+    version:'1.9.44.1',
     update:'1.9.43',
     changeLog:[
-        '扩展可添加作者等信息'
+        'bug修复'
     ],
     files:[
         'game/game.js',
@@ -38,7 +38,7 @@ window.noname_update={
         // 'mode/stone.js',
         // 'theme/music/style.css',
         // 'theme/woodden/style.css',
-        // 'theme/simple/style.css',
+        'theme/simple/style.css',
         // 'layout/default/layout.css',
         // 'layout/default/phone.css',
         'layout/default/menu.css',

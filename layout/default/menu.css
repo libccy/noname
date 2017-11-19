@@ -1560,7 +1560,7 @@ input.fileinput::-webkit-file-upload-button {
 .popup-container>.prompt-container>div>div>div{
 	display: block;
 	width: calc(100% - 10px);
-	margin-top: 10px;
+	margin-top: 15px;
 	margin-left: 10px;
 	margin-right: 10px;
 	margin-bottom: 0;
@@ -1569,10 +1569,10 @@ input.fileinput::-webkit-file-upload-button {
 	width: 230px;
 }
 .popup-container>.prompt-container>div>div>div:first-child{
-	text-align: left;
+	/*text-align: left;*/
 }
 .popup-container>.prompt-container>div>div>div:last-child{
-	margin-bottom: 10px;
+	margin-bottom: 15px;
 }
 .popup-container>.prompt-container>div>div>div>input{
 	text-align: left;

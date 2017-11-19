@@ -24926,9 +24926,14 @@
 			}
 		},
 		prompt:function(){
-			var str,forced,callback;
+			var str,forced,callback,noinput=false;
 			for(var i=0;i<arguments.length;i++){
-				if(typeof arguments[i]=='string'){
+				if(arguments[i]=='alert'){
+					forced=true;
+					callback=function(){};
+					noinput=true;
+				}
+				else if(typeof arguments[i]=='string'){
 					str=arguments[i];
 				}
 				else if(typeof arguments[i]=='boolean'){
@@ -24942,6 +24947,9 @@
 				return;
 			}
 			try{
+				if(noinput){
+					throw('e');
+				}
 				var result=prompt(str);
 				callback(result);
 			}
@@ -24960,9 +24968,15 @@
 				});
 				var strnode=ui.create.div('',str||'',dialog);
 				var input=ui.create.node('input',ui.create.div(dialog));
+				if(noinput){
+					input.style.display='none';
+				}
 				var controls=ui.create.div(dialog);
 				var clickConfirm=function(){
-					if(input.value){
+					if(noinput){
+						promptContainer.remove();
+					}
+					else if(input.value){
 						callback(input.value);
 						promptContainer.remove();
 					}
@@ -24977,24 +24991,32 @@
 				if(!forced){
 					ui.create.div('.menubutton.large','取消',controls,clickCancel);
 				}
-				input.onkeydown=function(e){
-					if(e.keyCode==13){
-						clickConfirm();
-					}
-					else if(e.keyCode==27){
-						clickCancel();
-					}
+				if(noinput){
+					confirmNode.classList.remove('disabled');
 				}
-				input.onkeyup=function(){
-					if(input.value){
-						confirmNode.classList.remove('disabled');
+				else{
+					input.onkeydown=function(e){
+						if(e.keyCode==13){
+							clickConfirm();
+						}
+						else if(e.keyCode==27){
+							clickCancel();
+						}
 					}
-					else{
-						confirmNode.classList.remove('disabled');
+					input.onkeyup=function(){
+						if(input.value){
+							confirmNode.classList.remove('disabled');
+						}
+						else{
+							confirmNode.classList.remove('disabled');
+						}
 					}
+					input.focus();
 				}
-				input.focus();
 			}
+		},
+		alert:function(str){
+			game.prompt(str,'alert');
 		},
 		print:function(){
 			if(!_status.toprint){
@@ -28813,16 +28835,28 @@
 			}
 		},
 		showChangeLog:function(){
-			if(lib.version!=lib.config.version){
-				game.saveConfig('version',lib.version);
+			if(lib.version!=lib.config.version||_status.extensionChangeLog){
 				var ul=document.createElement('ul');
 				ul.style.textAlign='left';
-				for(var i=0;i<lib.changeLog.length;i++){
+				var caption;
+				if(lib.version!=lib.config.version){
+					for(var i=0;i<lib.changeLog.length;i++){
+						var li=document.createElement('li');
+						li.innerHTML=lib.changeLog[i];
+						ul.appendChild(li);
+					}
+					caption=lib.version+'更新内容';
+				}
+				else{
+					caption='扩展更新';
+				}
+				game.saveConfig('version',lib.version);
+				for(var i in _status.extensionChangeLog){
 					var li=document.createElement('li');
-					li.innerHTML=lib.changeLog[i];
+					li.innerHTML=i+'：'+_status.extensionChangeLog[i];
 					ul.appendChild(li);
 				}
-				var dialog=ui.create.dialog(lib.version+'更新内容','hidden');
+				var dialog=ui.create.dialog(caption,'hidden');
 				dialog.content.appendChild(ul);
 				dialog.open();
 				var hidden=false;
@@ -28838,6 +28872,17 @@
 					game.resume();
 				});
 				lib.init.onfree();
+			}
+		},
+		showExtensionChangeLog:function(str,extname){
+			extname=extname||_status.extension;
+			var cfg='extension_'+extname+'_changelog';
+			if(lib.extensionPack[extname]&&lib.extensionPack[extname].version!=lib.config[cfg]){
+				game.saveConfig(cfg,lib.extensionPack[extname].version);
+				if(!_status.extensionChangeLog){
+					_status.extensionChangeLog={};
+					_status.extensionChangeLog[extname]=str;
+				}
 			}
 		},
 		saveConfig:function(key,value,local,callback){
