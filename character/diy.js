@@ -41,6 +41,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_jinke:['male','qun',4,['nspinmin','nsshishou']],
 			ns_yanliang:['male','qun',4,['nsduijue','nsshuangxiong','dualside'],['dualside:ns_wenchou']],
 			ns_wenchou:['male','qun',2,['nsguanyong','dualside'],['unseen']],
+
+			ns_caocao:['male','wei',4,['nscaiyi','nsgefa','nshaoling']],
+			ns_zhugeliang:['male','shu',3,['nsguanxing','kongcheng','nsxingyun']],
 		},
 		characterIntro:{
 			diy_feishi:'字公举，生卒年不详，益州犍为郡南安县（今四川省乐山市）人。刘璋占据益州时，以费诗为绵竹县县令。刘备进攻刘璋夺取益州，费诗举城而降，后受拜督军从事，转任牂牁郡太守，再为州前部司马。',
@@ -62,11 +65,226 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_huangzu:'#r小芯儿童鞋',
 			ns_yanliang:'#r丶橙续缘',
 			ns_wenchou:'#r丶橙续缘',
+			ns_caocao:'#r一瞬间丶遗忘',
+			ns_zhugeliang:'#p死不死什么的',
+
 		},
 		perfectPair:{
 			yuji:['zuoci']
 		},
 		skill:{
+			nsguanxing:{
+				trigger:{player:'phaseBegin'},
+				forced:true,
+				filter:function(event,player){
+					return player.hp>0;
+				},
+				content:function(){
+					'step 0'
+					event.cards=get.cards(game.countPlayer());
+					event.chosen=[];
+					event.num=player.hp;
+					'step 1'
+					var js=player.getCards('j');
+					var pos;
+					var choice=-1;
+					var getval=function(card,pos){
+						if(js[pos]){
+							return (get.judge(js[pos]))(card);
+						}
+						else{
+							return get.value(card);
+						}
+					};
+					for(pos=0;pos<Math.min(event.cards.length,js.length+2);pos++){
+						var max=getval(event.cards[pos],pos);
+						for(var j=pos+1;j<event.cards.length;j++){
+							var current=getval(event.cards[j],pos);
+							if(current>max){
+								choice=j;
+								max=current;
+							}
+						}
+						if(choice!=-1){
+							break;
+						}
+					}
+					player.chooseCardButton('观星：选择要移动的牌（还能移动'+event.num+'张）',event.cards).set('filterButton',function(button){
+						return !_status.event.chosen.contains(button.link);
+					}).set('chosen',event.chosen).set('ai',function(button){
+						return button.link==_status.event.choice?1:0;
+					}).set('choice',event.cards[choice]);
+					event.pos=pos;
+					'step 2'
+					if(result.bool){
+						var card=result.links[0];
+						var index=event.cards.indexOf(card);
+						event.card=card;
+						event.chosen.push(card);
+						event.cards.remove(event.card);
+						var buttons=event.cards.slice(0);
+						player.chooseControl(function(){
+							return _status.event.controlai;
+						}).set('controlai',event.pos||0).set('sortcard',buttons).set('tosort',card);
+					}
+					else{
+						event.goto(4);
+					}
+					'step 3'
+					if(typeof result.index=='number'){
+						if(result.index>event.cards.length){
+							ui.cardPile.appendChild(event.card);
+						}
+						else{
+							event.cards.splice(result.index,0,event.card);
+						}
+						event.num--;
+						if(event.num>0){
+							event.goto(1);
+						}
+					}
+					'step 4'
+					while(event.cards.length){
+						ui.cardPile.insertBefore(event.cards.pop(),ui.cardPile.firstChild);
+					}
+					var js=player.getCards('j');
+					if(js.length==1){
+						if((get.judge(js[0]))(ui.cardPile.firstChild)<0){
+							player.addTempSkill('guanxing_fail');
+						}
+					}
+				},
+				ai:{
+					guanxing:true
+				}
+			},
+			nshaoling:{
+				skillAnimation:true,
+				animationColor:'water',
+				unique:true,
+				mark:true,
+				init:function(player){
+					player.storage.nshaoling=false;
+				},
+				enable:'phaseUse',
+				filter:function(event,player){
+					return !player.storage.nshaoling;
+				},
+				intro:{
+					content:'limited'
+				},
+				filterTarget:function(card,player,target){
+					return target!=player;
+				},
+				content:function(){
+					"step 0"
+					player.awakenSkill('nshaoling');
+					player.storage.nshaoling=true;
+					event.targets=game.filterPlayer();
+					event.targets.remove(player);
+					event.targets.remove(target);
+					event.targets.sortBySeat();
+					"step 1"
+					if(event.targets.length){
+						event.current=event.targets.shift();
+						if(event.current.countCards('he')&&target.isAlive()){
+							event.current.chooseToUse({name:'sha'},target,-1);
+						}
+					}
+					else{
+						event.finish();
+					}
+					"step 2"
+					if(result.bool==false){
+						if(event.current.countCards('he')){
+							event.current.chooseCard('he',true,'交给'+get.translation(player)+'一张牌');
+						}
+						else{
+							event.goto(4);
+						}
+					}
+					else{
+						event.goto(1);
+					}
+					"step 3"
+					if(result.bool){
+						event.current.give(result.cards,player);
+					}
+					"step 4"
+					player.useCard({name:'sha'},event.current,false);
+					event.goto(1);
+				},
+				ai:{
+					order:5,
+					result:{
+						target:function(player,target){
+							var players=game.filterPlayer();
+							if(player.hp>1){
+								if(game.phaseNumber<game.players.length) return 0;
+								if(player.hasUnknown()) return 0;
+							}
+							var effect=0;
+							for(var i=0;i<players.length;i++){
+								if(players[i]!=target&&players[i]!=player&&players[i].countCards('he'))
+								effect+=get.effect(target,{name:'sha'},players[i],target);
+							}
+							return effect;
+						}
+					}
+				}
+			},
+			nsgefa:{
+				enable:'chooseToUse',
+				filter:function(event,player){
+					return player.hp<=0;
+				},
+				filterCard:{suit:'club'},
+				position:'he',
+				viewAs:{name:'tao'},
+				prompt:'将一张梅花牌当桃使用',
+				check:function(card){return 15-get.value(card)},
+				ai:{
+					skillTagFilter:function(player){
+						return player.countCards('he',{suit:'club'})>0;
+					},
+					threaten:1.5,
+					save:true,
+					respondTao:true,
+				}
+			},
+			nscaiyi:{
+				trigger:{global:'drawAfter'},
+				check:function(event,player){
+					if(get.attitude(player,event.player)>=0) return false;
+					if(get.effect(event.player,{name:'sha'},player,player)<=0) return false;
+					if(get.effect(player,{name:'sha'},event.player,player)>=0) return true;
+					return player.hasShan()&&player.hp>=event.player.hp;
+				},
+				filter:function(event,player){
+					return player!=event.player&&event.result.length>0;
+				},
+				logTarget:'player',
+				content:function(){
+					'step 0'
+					player.viewCards(get.translation(trigger.player)+'摸到的牌',trigger.result);
+					if(!event.isMine()){
+						game.delayx();
+					}
+					'step 1'
+					var list=[];
+					for(var i=0;i<trigger.result.length;i++){
+						if(trigger.result[i].name=='sha'){
+							list.push(trigger.result[i]);
+						}
+					}
+					if(list.length){
+						player.useCard({name:'sha'},trigger.player);
+					}
+					else{
+						trigger.player.useCard({name:'sha'},player);
+					}
+				}
+			},
 			nspinmin:{
 				trigger:{player:'dieBefore'},
 				forced:true,
@@ -2326,6 +2544,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_wenchou:'文丑',
 			ns_jinke:'荆轲',
 
+			ns_caocao:'曹操',
+			ns_zhugeliang:'诸葛亮',
+
+			nsguanxing:'观星',
+			nsguanxing_info:'锁定技，准备阶段，你观看牌堆的X张牌(X为场上存活人数)并且任意移动Y张牌(Y为你当前体力值)',
+			nscaiyi:'猜疑',
+			nscaiyi_info:'其他角色摸牌后，你可以观看其摸到的牌，若其中有【杀】，则视为你对其使用一张【杀】，若其中没有【杀】，则视为其对你使用一张【杀】（计入出杀次数）',
+			nsgefa:'割发',
+			nsgefa_info:'当你的体力值等于0或更低时，你可以将任意一张♣牌当【桃】使用',
+			nshaoling:'号令',
+			nshaoling_info:'限定技，出牌阶段，你可以指定一名其他角色，令另外所有其他角色角色选择一项：1、对该角色使用一张【杀】；2、交给你一张牌，然后视为你对其使用一张【杀】',
 			nspinmin:'拼命',
 			nspinmin_info:'锁定技，当你于回合内死亡时，你不死亡并增加一点体力上限（每回合最多增加1点且不能超过4）；当你于回合外死亡时，你不死亡并减少一点体力上限（体力上限为0会导致你死亡）',
 			nsshishou:'失手',

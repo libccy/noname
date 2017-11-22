@@ -793,6 +793,91 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseBegin'},
 				frequent:true,
 				content:function(){
+					'step 0'
+					event.num=Math.min(5,game.countPlayer());
+					event.cards=get.cards(event.num);
+					event.chosen=[];
+					'step 1'
+					var js=player.getCards('j');
+					var pos;
+					var choice=-1;
+					var getval=function(card,pos){
+						if(js[pos]){
+							return (get.judge(js[pos]))(card);
+						}
+						else{
+							return get.value(card);
+						}
+					};
+					for(pos=0;pos<Math.min(event.cards.length,js.length+2);pos++){
+						var max=getval(event.cards[pos],pos);
+						for(var j=pos+1;j<event.cards.length;j++){
+							var current=getval(event.cards[j],pos);
+							if(current>max){
+								choice=j;
+								max=current;
+							}
+						}
+						if(choice!=-1){
+							break;
+						}
+					}
+					player.chooseCardButton('观星：选择要移动的牌（还能移动'+event.num+'张）',event.cards).set('filterButton',function(button){
+						return !_status.event.chosen.contains(button.link);
+					}).set('chosen',event.chosen).set('ai',function(button){
+						return button.link==_status.event.choice?1:0;
+					}).set('choice',event.cards[choice]);
+					event.pos=pos;
+					'step 2'
+					if(result.bool){
+						var card=result.links[0];
+						var index=event.cards.indexOf(card);
+						event.card=card;
+						event.chosen.push(card);
+						event.cards.remove(event.card);
+						var buttons=event.cards.slice(0);
+						player.chooseControl(function(){
+							return _status.event.controlai;
+						}).set('controlai',event.pos||0).set('sortcard',buttons).set('tosort',card);
+					}
+					else{
+						event.goto(4);
+					}
+					'step 3'
+					if(typeof result.index=='number'){
+						if(result.index>event.cards.length){
+							ui.cardPile.appendChild(event.card);
+						}
+						else{
+							event.cards.splice(result.index,0,event.card);
+						}
+						event.num--;
+						if(event.num>0){
+							event.goto(1);
+						}
+					}
+					'step 4'
+					while(event.cards.length){
+						ui.cardPile.insertBefore(event.cards.pop(),ui.cardPile.firstChild);
+					}
+					var js=player.getCards('j');
+					if(js.length==1){
+						if((get.judge(js[0]))(ui.cardPile.firstChild)<0){
+							player.addTempSkill('guanxing_fail');
+						}
+					}
+				},
+				ai:{
+					guanxing:true
+				}
+			},
+			guanxing_fail:{},
+			guanxing_old:{
+				audio:2,
+				audioname:['jiangwei'],
+				trigger:{player:'phaseBegin'},
+				frequent:true,
+				content:function(){
 					"step 0"
 					if(player.isUnderControl()){
 						game.modeSwapPlayer(player);
@@ -810,7 +895,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var top=[];
 						var judges=player.node.judges.childNodes;
 						var stopped=false;
-						if(!player.countCards('h','wuxie')){
+						if(!player.hasWuxie()){
 							for(var i=0;i<judges.length;i++){
 								var judge=get.judge(judges[i]);
 								cards.sort(function(a,b){

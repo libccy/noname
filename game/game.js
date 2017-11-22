@@ -10960,7 +10960,12 @@
 				chooseControl:function(){
 					"step 0"
 					if(event.controls.length==0){
-						if(event.choiceList){
+						if(event.sortcard){
+							for(var i=0;i<event.sortcard.length+2;i++){
+								event.controls.push(get.cnNumber(i,true));
+							}
+						}
+						else if(event.choiceList){
 							for(var i=0;i<event.choiceList.length;i++){
 								event.controls.push('选项'+get.cnNumber(i+1,true));
 							}
@@ -10978,15 +10983,50 @@
 						event.controls.push('cancel2');
 					}
 					if(event.isMine()){
-                        if(event.dialogcontrol){
+						if(event.sortcard){
+							var prompt=event.prompt||'选择一个位置';
+							if(event.tosort){
+								prompt+='放置'+get.translation(event.tosort);
+							}
+							event.dialog=ui.create.dialog(prompt,'hidden');
+							event.dialog.addSmall(event.sortcard);
+							var buttons=event.dialog.content.lastChild;
+							for(var i=0;i<event.dialog.buttons.length+2;i++){
+                            	var item=ui.create.div('.button.card.pointerdiv.mebg');
+								item.style.width='50px';
+								buttons.insertBefore(item,event.dialog.buttons[i]);
+								item.innerHTML='<div style="font-family: xinwei;font-size: 25px;height: 75px;line-height: 25px;top: 8px;left: 10px;width: 30px;">第'+get.cnNumber(i+1,true)+'张</div>';
+								if(i==event.dialog.buttons.length+1){
+									item.firstChild.innerHTML='牌堆底';
+								}
+								item.link=get.cnNumber(i,true);
+								item.listen(ui.click.dialogcontrol);
+							}
+
+							event.dialog.forcebutton=true;
+							event.dialog.classList.add('forcebutton');
+                            event.dialog.open();
+						}
+                        else if(event.dialogcontrol){
                             event.dialog=ui.create.dialog(event.prompt||'选择一项','hidden');
                             for(var i=0;i<event.controls.length;i++){
-                                var item=event.dialog.add('<div class="popup text" style="width:calc(100% - 10px);display:inline-block">'+event.controls[i]+'</div>');
+                                var item=event.dialog.add('<div class="popup text pointerdiv" style="width:calc(100% - 10px);display:inline-block">'+event.controls[i]+'</div>');
         						item.firstChild.listen(ui.click.dialogcontrol);
         						item.firstChild.link=event.controls[i];
                             }
 							event.dialog.forcebutton=true;
 							event.dialog.classList.add('forcebutton');
+							if(event.addDialog){
+								for(var i=0;i<event.addDialog.length;i++){
+									if(get.itemtype(event.addDialog[i])=='cards'){
+										event.dialog.addSmall(event.addDialog[i]);
+									}
+									else{
+										event.dialog.add(event.addDialog[i]);
+									}
+								}
+								event.dialog.add(ui.create.div('.placeholder.slim'));
+							}
                             event.dialog.open();
                         }
 						else{
