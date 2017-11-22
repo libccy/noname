@@ -13374,6 +13374,12 @@
 			},
 			player:{
 				init:function(character,character2,skill){
+					if(typeof character=='string'&&!lib.character[character]){
+						lib.character[character]=get.character(character);
+					}
+					if(typeof character2=='string'&&!lib.character[character2]){
+						lib.character[character2]=get.character(character2);
+					}
 					if(!lib.character[character]) return;
 					if(get.is.jun(character2)){
 						var tmp=character;
@@ -15515,6 +15521,9 @@
 						var next=this.useCard(result.card,result.cards,result.targets,result.skill);
                         next.oncard=event.oncard;
 						next.respondTo=event.respondTo;
+						if(event.addCount===false){
+							next.addCount=false;
+						}
 						return next;
                     }
                     else if(result.skill){
@@ -23270,7 +23279,7 @@
                 if(exportext){
 					if(pkg){
 						filelist.remove('extension.js');
-						pkg.files=filelist;
+						pkg.files=filelist.slice(0);
 						pkg.size=zip.generate({type:"arraybuffer"}).byteLength;
 						if(pkg.size<1000){
 							pkg.size=pkg.size+'B';
@@ -43000,7 +43009,19 @@
             if(typeof num!='number') num=false;
 			if(name==_status.lord) return num?Math.round(7*(num-1)/8+1):'ap';
 			var rank=lib.rank;
-			var skills=lib.character[name][3];
+			var skills;
+			if(lib.character[name]){
+				skills=lib.character[name][3];
+			}
+			else{
+				var tmpinfo=get.character(name);
+				if(tmpinfo){
+					skills=tmpinfo[3];
+				}
+				else{
+					skills=[];
+				}
+			}
 			for(var i=0;i<skills.length;i++){
 				if(lib.config.alteredSkills.contains(skills[i])){
 					name=lib.rank.a[0];break;

@@ -1421,7 +1421,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						},player);
 						event.jiu=true;
 					}
-					player.chooseToUse(get.prompt('qinglong'),{name:'sha'},trigger.target,-1).logSkill='qinglong_skill';
+					player.chooseToUse(get.prompt('qinglong'),{name:'sha'},trigger.target,-1).set('addCount',false).logSkill='qinglong_skill';
 					"step 1"
 					if(result.bool);
 					else if(event.jiu){

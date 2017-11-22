@@ -4467,7 +4467,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								else{
 									return trigger.player.countCards('h')>1;
 								}
-								break;
 							}
 							case 'e':{
 								if(ui.selected.cards.length){
@@ -4476,7 +4475,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								else{
 									return trigger.player.countCards('e')>1;
 								}
-								break;
 							}
 						}
 					});

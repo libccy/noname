@@ -602,6 +602,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 	                        // player.animate('zoomin');
 	                        player.classList.add('zoomin3');
 	                        player.hide();
+							player.style.transitionDuration='0.7s'
 	                        setTimeout(function(){
 	                            player.style.transitionProperty='none';
 	                            player.classList.remove('zoomin3');

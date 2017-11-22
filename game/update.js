@@ -1,8 +1,9 @@
 window.noname_update={
-    version:'1.9.44.1',
-    update:'1.9.43',
+    version:'1.9.45',
+    update:'1.9.44.1',
     changeLog:[
-        'bug修复'
+        'bug修复',
+        '部分DIY比赛武将'
     ],
     files:[
         'game/game.js',
@@ -10,7 +11,7 @@ window.noname_update={
         // 'game/config.js',
         // 'game/source.js',
         // 'game/pressure.js',
-        // 'game/asset.js',
+        'game/asset.js',
         // 'card/*',
         // 'card/gujian.js',
         // 'card/yunchou.js',
@@ -20,8 +21,8 @@ window.noname_update={
         // 'character/*',
         // 'character/hearth.js',
         // 'character/gwent.js',
-        'character/swd.js',
-        'character/standard.js',
+        // 'character/swd.js',
+        // 'character/standard.js',
         // 'character/sp.js',
         // 'character/swd.js',
         // 'character/rank.js',
@@ -38,10 +39,10 @@ window.noname_update={
         // 'mode/stone.js',
         // 'theme/music/style.css',
         // 'theme/woodden/style.css',
-        'theme/simple/style.css',
+        // 'theme/simple/style.css',
         // 'layout/default/layout.css',
         // 'layout/default/phone.css',
-        'layout/default/menu.css',
+        // 'layout/default/menu.css',
         // 'theme/style/cardback/*',
         // 'layout/long/layout.css',
         // 'layout/long2/layout.css',
