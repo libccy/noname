@@ -2652,6 +2652,12 @@
 						else{
 							map.show_handcardbutton.hide();
 						}
+						if(lib.config.touchscreen){
+							map.pop_logv.hide();
+						}
+						else{
+							map.pop_logv.show();
+						}
 						if(lib.device){
 							if(lib.device=='android'){
 								map.show_statusbar_android.show();
@@ -2754,6 +2760,11 @@
                                 ui.window.classList.remove('rightbar');
                             }
 						}
+					},
+					pop_logv:{
+						name:'自动弹出记录',
+						init:false,
+						unfrequent:true
 					},
 					show_log:{
 						name:'历史记录栏',
@@ -28727,7 +28738,7 @@
             }
             else{
                 // node.addEventListener('mouseenter',ui.click.intro);
-				node.addEventListener('mousemove',ui.click.logv);
+				node.addEventListener(lib.config.pop_logv?'mousemove':'click',ui.click.logv);
 				node.addEventListener('mouseleave',ui.click.logvleave);
             }
             node.logvid=logvid;

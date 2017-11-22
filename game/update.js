@@ -3,7 +3,7 @@ window.noname_update={
     update:'1.9.44.1',
     changeLog:[
         'bug修复',
-        '部分DIY比赛武将'
+        '部分DIY比赛武将（曹操，诸葛亮，王越，于吉，辛宪英，哀泣女妖）'
     ],
     files:[
         'game/game.js',
@@ -19,7 +19,7 @@ window.noname_update={
         // 'card/gwent.js',
         'card/standard.js',
         // 'character/*',
-        // 'character/hearth.js',
+        'character/hearth.js',
         // 'character/gwent.js',
         'character/diy.js',
         'character/standard.js',

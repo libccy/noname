@@ -120,6 +120,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             // hs_aerfusi:['male','qun',4,['hstianqi']],
             // hs_baiguyoulong:['male','qun',4,['hstianqi']],
             hs_yangyanwageli:['female','qun',3,['hspuzhao','hsyanxin']],
+
+            hs_aiqinvyao:['famale','qun',4,['nsaiqi','nsbeiming']],
     	},
     	characterIntro:{
     		hs_jaina:'戴林·普罗德摩尔之女。 在吉安娜成年早期，她致力于阻止将引发第三次战争的天灾瘟疫传播，当战况加剧后，吉安娜获得了新部落大酋长萨尔的信任，成为团结艾泽拉斯各族携手对抗燃烧军团的关键人物。当战争结束后，吉安娜管理着塞拉摩岛，致力于促进部落与联盟间的关系。吉安娜的和平立场与性格在接任萨尔成为部落大酋长的加尔鲁什·地狱咆哮以一颗魔法炸弹夷平塞拉摩后改变了。身为肯瑞托的新领袖，她拥有让加尔鲁什为他酿成的惨剧付出血的代价的权力与决心。',
@@ -193,6 +195,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_shaku:'艾雅曾调查过沙库尔，看看他有没有私藏了什么好东西。',
     		hs_laxiao:'什么？身为死亡之翼的儿子，拉西奥居然不是龙牌？你似乎知道的太多了…',
     	},
+        characterTitle:{
+            hs_aiqinvyao:'#bSnonamekill'
+        },
     	perfectPair:{
     		hs_sthrall:['hs_totemic','hs_alakir','hs_neptulon','hs_yngvar'],
     		hs_anduin:['hs_wvelen','hs_mijiaojisi'],
@@ -200,6 +205,57 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		hs_malfurion:['hs_malorne'],
     	},
     	skill:{
+            nsaiqi:{
+                trigger:{player:'useCard'},
+                forced:true,
+                init:function(player){
+                    player.storage.nsaiqi=[];
+                },
+                intro:{
+                    content:'cards'
+                },
+                filter:function(event,player){
+                    if(ui.cardPile.firstChild&&ui.cardPile.firstChild.vanishtag.contains('nsaiqi')){
+                        return false;
+                    }
+                    return true;
+                },
+                onremove:'lose',
+                content:function(){
+                    var cards=get.cards(3);
+                    for(var i=0;i<cards.length;i++){
+                        cards[i].vanishtag.add('nsaiqi');
+                    }
+                    player.storage.nsaiqi.addArray(cards);
+                    player.syncStorage('nsaiqi');
+                    player.markSkill('nsaiqi');
+                },
+                mod:{
+                    maxHandcard:function(player,num){
+                        return num+1;
+                    }
+                }
+            },
+            nsbeiming:{
+                trigger:{player:'nsaiqiAfter'},
+                forced:true,
+                filter:function(event,player){
+                    return player.storage.nsaiqi.length>=9;
+                },
+                content:function(){
+                    'step 0'
+                    player.draw();
+                    'step 1'
+                    player.chooseCardButton(player.storage.nsaiqi,true,'将顺序将牌置于牌堆顶（先选择的在上）',player.storage.nsaiqi.length);
+                    'step 2'
+                    var list=result.links.slice(0);
+                    while(list.length){
+                        ui.cardPile.insertBefore(list.pop(),ui.cardPile.firstChild);
+                    }
+                    player.storage.nsaiqi.length=0;
+                    player.unmarkSkill('nsaiqi');
+                }
+            },
             hsnitai:{
                 trigger:{player:'phaseUseBegin'},
                 forced:true,
@@ -7878,7 +7934,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             hs_aerfusi:'阿尔福斯',
             hs_baiguyoulong:'白骨幼龙',
             hs_yangyanwageli:'阳焰瓦格里',
+            hs_aiqinvyao:'哀泣女妖',
 
+            nsaiqi:'哀泣',
+            nsaiqi_info:'锁定技，每当你使用一张牌，你移除牌堆顶的3张牌；你的手牌上限始终+1',
+            nsbeiming:'悲鸣',
+            nsbeiming_info:'锁定技，当你移除的牌不少于9张时，你摸一张牌，然后将移除的牌以任意顺序置于牌堆顶；当被移除过的牌在牌堆顶时（洗牌后重置），你的不能发动【哀泣】移除牌',
             hstianqi_dalian:'达里安',
             hstianqi_dalian_info:'每当你造成一次伤害，你回复等量的体力',
             hstianqi_shali:'莎莉',
