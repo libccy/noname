@@ -1572,96 +1572,118 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				for(var i in slist){
     					list.push(i);
     				}
+                    event.switchToAuto=function(){
+                        var currentbutton=event.dialog.querySelector('.selected.button');
+                        if(!currentbutton){
+                            currentbutton=event.dialog.buttons[0];
+                            currentbutton.classList.add('selected');
+                        }
+                        event.clickControl(player.storage.huashen.owned[currentbutton.link].randomGet());
+                    }
+
+                    event.clickControl=function(link,type){
+                        if(link!='cancel2'){
+                            var currentname;
+                            if(type=='ai'){
+                                currentname=event.currentname;
+                            }
+                            else{
+                                currentname=event.dialog.querySelector('.selected.button').link;
+                            }
+                            var mark=player.marks.huashen;
+                            if(trigger.name=='game'){
+                                mark.hide();
+                                // mark.style.transform='scale(0.8)';
+                                mark.style.transition='all 0.3s';
+                                setTimeout(function(){
+                                    mark.style.transition='all 0s';
+                                    ui.refresh(mark);
+                                    mark.setBackground(currentname,'character');
+                                    if(mark.firstChild){
+                                        mark.firstChild.remove();
+                                    }
+                                    setTimeout(function(){
+                                        mark.style.transition='';
+                                        mark.show();
+                                        // mark.style.transform='';
+                                    },50);
+                                },500);
+                            }
+                            else{
+                                if(mark.firstChild){
+                                    mark.firstChild.remove();
+                                }
+                                mark.setBackground(currentname,'character');
+                            }
+                            player.addAdditionalSkill('huashen',link);
+                            player.logSkill('huashen2');
+                            game.log(player,'获得技能','【'+get.translation(link)+'】');
+                            player.popup(link);
+
+                            if(event.dialog&&event.dialog.buttons){
+                                for(var i=0;i<event.dialog.buttons.length;i++){
+                                    if(event.dialog.buttons[i].classList.contains('selected')){
+                                        var name=event.dialog.buttons[i].link;
+                                        player.sex=lib.character[name][0];
+                                        player.group=lib.character[name][1];
+                                        // player.node.identity.style.backgroundColor=get.translation(player.group+'Color');
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if(event.triggername=='phaseBegin'){
+                                (function(){
+                                    var skills=[link];
+                                    var list=[];
+                                    game.expandSkills(skills);
+                                    var triggerevent=event._trigger;
+                                    var name='phaseBegin';
+                                    for(i=0;i<skills.length;i++){
+                                        var trigger=get.info(skills[i]).trigger;
+                                        if(trigger){
+                                            var add=false;
+                                            if(player==triggerevent.player&&trigger.player){
+                                                if(typeof trigger.player=='string'){
+                                                    if(trigger.player==name) add=true;
+                                                }
+                                                else if(trigger.player.contains(name)) add=true;
+                                            }
+                                            if(trigger.global){
+                                                if(typeof trigger.global=='string'){
+                                                    if(trigger.global==name) add=true;
+                                                }
+                                                else if(trigger.global.contains(name)) add=true;
+                                            }
+                                            if(add&&player.isOut()==false) list.push(skills[i]);
+                                        }
+                                    }
+                                    for(var i=0;i<list.length;i++){
+                                        game.createTrigger('phaseBegin',list[i],player,triggerevent);
+                                    }
+                                }());
+                            }
+                        }
+                        if(type!='ai'){
+                            // ui.auto.show();
+                            event.dialog.close();
+                            event.control.close();
+                            game.resume();
+                        }
+                    };
     				if(event.isMine()){
     					event.dialog=ui.create.dialog('选择获得一项技能',[list,'character']);
+                        for(var i=0;i<event.dialog.buttons.length;i++){
+                            event.dialog.buttons[i].classList.add('pointerdiv');
+                        }
     					if(trigger.name=='game'){
     						event.control=ui.create.control();
     					}
     					else{
     						event.control=ui.create.control(['cancel2']);
     					}
-    					event.clickControl=function(link){
-    						if(link!='cancel2'){
-    							var currentname=event.dialog.querySelector('.selected.button').link;
-    							var mark=player.marks.huashen;
-    							if(trigger.name=='game'){
-    								mark.hide();
-    								// mark.style.transform='scale(0.8)';
-    								mark.style.transition='all 0.3s';
-    								setTimeout(function(){
-    									mark.style.transition='all 0s';
-    									ui.refresh(mark);
-    									mark.setBackground(currentname,'character');
-    									if(mark.firstChild){
-    										mark.firstChild.remove();
-    									}
-    									setTimeout(function(){
-    										mark.style.transition='';
-    										mark.show();
-    										// mark.style.transform='';
-    									},50);
-    								},500);
-    							}
-    							else{
-    								if(mark.firstChild){
-    									mark.firstChild.remove();
-    								}
-    								mark.setBackground(currentname,'character');
-    							}
-    							player.addAdditionalSkill('huashen',link);
-    							player.logSkill('huashen2');
-    							game.log(player,'获得技能','【'+get.translation(link)+'】');
-    							player.popup(link);
-
-    							for(var i=0;i<event.dialog.buttons.length;i++){
-    								if(event.dialog.buttons[i].classList.contains('selected')){
-    									var name=event.dialog.buttons[i].link;
-    									player.sex=lib.character[name][0];
-    									player.group=lib.character[name][1];
-    									// player.node.identity.style.backgroundColor=get.translation(player.group+'Color');
-    									break;
-    								}
-    							}
-
-    							if(event.triggername=='phaseBegin'){
-    								(function(){
-    									var skills=[link];
-    									var list=[];
-    									game.expandSkills(skills);
-    									var triggerevent=event._trigger;
-    									var name='phaseBegin';
-    									for(i=0;i<skills.length;i++){
-    										var trigger=get.info(skills[i]).trigger;
-    										if(trigger){
-    											var add=false;
-    											if(player==triggerevent.player&&trigger.player){
-    												if(typeof trigger.player=='string'){
-    													if(trigger.player==name) add=true;
-    												}
-    												else if(trigger.player.contains(name)) add=true;
-    											}
-    											if(trigger.global){
-    												if(typeof trigger.global=='string'){
-    													if(trigger.global==name) add=true;
-    												}
-    												else if(trigger.global.contains(name)) add=true;
-    											}
-    											if(add&&player.isOut()==false) list.push(skills[i]);
-    										}
-    									}
-    									for(var i=0;i<list.length;i++){
-    										game.createTrigger('phaseBegin',list[i],player,triggerevent);
-    									}
-    								}());
-    							}
-    						}
-    						ui.auto.show();
-    						event.dialog.close();
-    						event.control.close();
-    						game.resume();
-    					};
     					event.control.custom=event.clickControl;
-    					ui.auto.hide();
+    					// ui.auto.hide();
     					game.pause();
     					for(var i=0;i<event.dialog.buttons.length;i++){
     						event.dialog.buttons[i].classList.add('selectable');
@@ -1712,7 +1734,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					}
     				}
     				else{
-    					event.finish();
+                        var skills=[];
+                        var map={};
+                        for(var i=0;i<list.length;i++){
+                            var sub=player.storage.huashen.owned[list[i]];
+                            skills.addArray(sub);
+                            for(var j=0;j<sub.length;j++){
+                                map[sub]=list[i];
+                            }
+                        }
+                        var add=player.additionalSkills.huashen;
+                        if(typeof add=='string'){
+                            add=[add];
+                        }
+                        if(Array.isArray(add)){
+                            for(var i=0;i<add.length;i++){
+                                skills.remove(add[i]);
+                            }
+                        }
+                        var cond='out';
+                        if(event.triggername=='phaseBegin'){
+                            cond='in';
+                        }
+                        skills.randomSort();
+                        skills.sort(function(a,b){
+                            return get.skillRank(b,cond)-get.skillRank(a,cond);
+                        });
+                        var choice=skills[0];
+                        event.currentname=map[choice];
+                        event.clickControl(choice,'ai');
     				}
     			}
     		},

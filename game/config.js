@@ -1,5 +1,6 @@
 window.config={
-	forbidai:['zuoci','miheng'],
+	forbidai:[],
+	forbidai_user:['miheng'],
 	forbidall:['xiahouyuan','huangzhong','weiyan','dianwei','zhangjiao',
 	'caocao','simayi','guanyu','zhangfei','zhaoyun','ganning','lvmeng','lvbu'],
 	forbidversus:['swd_kangnalishi'],

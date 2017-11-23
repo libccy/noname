@@ -1,8 +1,9 @@
 window.noname_update={
     version:'1.9.45',
-    update:'1.9.44.1',
+    // update:'1.9.44.1',
     changeLog:[
         'bug修复',
+        '自定义AI禁选（武将资料->禁用）',
         '部分DIY比赛武将',
         'players:["ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","hs_aiqinvyao"]',
     ],

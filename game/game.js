@@ -6789,7 +6789,7 @@
 
 	                var extensionlist=[];
 	                if(!localStorage.getItem(lib.configprefix+'disable_extension')){
-						if(lib.config.extensions.length){
+						if(lib.config.extensions&&lib.config.extensions.length){
 							window.resetExtension=function(){
 								for(var i=0;i<lib.config.extensions.length;i++){
 									game.saveConfig('extension_'+lib.config.extensions[i]+'_enable',false);
@@ -7453,6 +7453,9 @@
 									}
 									if(character[i][j][k][4].contains('boss')||
 										character[i][j][k][4].contains('hiddenboss')){
+										lib.config.forbidai.add(k);
+									}
+									if(lib.config.forbidai_user&&lib.config.forbidai_user.contains(k)){
 										lib.config.forbidai.add(k);
 									}
 									for(var l=0;l<character[i][j][k][3].length;l++){
@@ -9312,6 +9315,9 @@
     									character[i][j][k][4].contains('hiddenboss')){
     									lib.config.forbidai.add(k);
     								}
+									if(lib.config.forbidai_user&&lib.config.forbidai_user.contains(k)){
+										lib.config.forbidai.add(k);
+									}
     								for(var l=0;l<character[i][j][k][3].length;l++){
     									lib.skilllist.add(character[i][j][k][3][l]);
     								}
@@ -25749,6 +25755,9 @@
                             pack[i][j][4].contains('hiddenboss')){
                             lib.config.forbidai.add(j);
                         }
+						if(lib.config.forbidai_user&&lib.config.forbidai_user.contains(j)){
+							lib.config.forbidai.add(j);
+						}
                         for(var l=0;l<pack[i][j][3].length;l++){
                             lib.skilllist.add(pack[i][j][3][l]);
                         }
@@ -43296,18 +43305,72 @@
             }
 			return num?Math.round(9*(num-1)/8+1):'x';
 		},
-		skillRank:function(skill){
+		skillRank:function(skill,type,grouped){
 			var info=lib.skill[skill];
+			var player=_status.event.skillRankPlayer||_status.event.player;
 			if(!info) return 0;
 			if(info.ai){
 				if(info.ai.halfneg) return 0;
-				if(typeof info.ai.combo=='string'&&_status.event.player&&
-					!_status.event.player.hasSkill(info.ai.combo)){
+				if(typeof info.ai.combo=='string'&&player&&!player.hasSkill(info.ai.combo)){
 					return 0;
 				}
 				if(info.ai.neg) return -1;
 			}
-			return 1;
+			var num=1;
+			var threaten=1;
+			if(info.ai&&info.ai.threaten){
+				if(typeof info.ai.threaten=='number'){
+					threaten=info.ai.threaten;
+				}
+				else if(typeof info.ai.threaten=='function'&&player){
+					threaten=info.ai.threaten(player,player);
+				}
+			}
+			if(type=='in'){
+				if(info.enable=='phaseUse') num+=0.5;
+				if(info.trigger&&['phaseBegin','phaseDrawBegin','phaseUseBegin','phaseEnd'].contains(info.trigger.player)){
+					num+=0.5;
+				}
+				if(info.trigger&&((typeof info.trigger.player=='string'&&info.trigger.player.indexOf('use')==0)||info.trigger.source)){
+					num+=0.3;
+				}
+				if(num>1&&threaten>1){
+					num+=Math.sqrt(threaten)-1;
+				}
+			}
+			else if(type=='out'){
+				if(threaten<1){
+					num=1/Math.sqrt(threaten);
+				}
+				if(info.trigger&&(info.trigger.global||info.trigger.target||(typeof info.trigger.player=='string'&&
+				(info.trigger.player.indexOf('damage')==0||info.trigger.player.indexOf('lose')==0)))) num+=0.1;
+				if(info.ai){
+					if(info.ai.maixie||info.ai.maixie_hp||info.ai.maixie_defend){
+						num+=0.5;
+					}
+					if(info.ai.nolose||info.ai.noh||info.ai.noe||info.ai.nodiscard){
+						num+=0.3;
+					}
+				}
+			}
+			if(!grouped){
+				var groups=game.expandSkills([skill]);
+				groups.remove(skill);
+				var ggt=[];
+				for(var i=0;i<groups.length;i++){
+					var gi=get.skillRank(groups[i],type,true);
+					if(gi<0){
+						num-=0.5;
+					}
+					else if(gi>1){
+						ggt.push(gi);
+					}
+				}
+				if(ggt.length){
+					num+=Math.max.apply(this,ggt)-1+ggt.length/20;
+				}
+			}
+			return num;
 		},
         targetsInfo:function(targets){
             var info=[];
@@ -45113,6 +45176,24 @@
 							banall=true;
                         }
                     }
+					if(node._banning=='offline'){
+						var cfg=ui.create.div('.config','AI可选',page);
+                        cfg.classList.add('toggle');
+                        cfg.listen(function(){
+							this.classList.toggle('on');
+							if(this.classList.contains('on')){
+								lib.config.forbidai_user.remove(character);
+							}
+							else{
+								lib.config.forbidai_user.add(character);
+							}
+							game.saveConfig('forbidai_user',lib.config.forbidai_user);
+						});
+                        ui.create.div(ui.create.div(cfg));
+                        if(!lib.config.forbidai_user.contains(character)){
+                            cfg.classList.add('on');
+                        }
+					}
 					ui.create.div('.menubutton.pointerdiv',banall?'全部禁用':'全部启用',uiintro.content,function(){
 						if(this.innerHTML=='全部禁用'){
 							for(var i=0;i<page.childElementCount;i++){
