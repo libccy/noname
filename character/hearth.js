@@ -1253,7 +1253,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         }
                         for(var i=0;i<list.length;i++){
                             if(get.type(list[i])=='basic'){
-                                ui.discardPile.appendChild(list[i]);
+                                list[i].discard();
                                 list2.push(list[i]);
                             }
                         }
@@ -3895,7 +3895,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.gain(result.links,'draw');
     				event.cards.remove(result.links[0]);
     				for(var i=0;i<event.cards.length;i++){
-    					ui.discardPile.appendChild(event.cards[i]);
+    					event.cards[i].discard();
     				}
     			},
     			ai:{
@@ -6075,7 +6075,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.removeSkill('bingjia2');
     				game.addVideo('storage',player,['bingjia',null]);
     				'step 1'
-    				ui.discardPile.appendChild(player.storage.bingjia);
+    				player.storage.bingjia.discard();
     				delete player.storage.bingjia;
     				player.changeHujia();
     				player.addTempSkill('mianyi');
@@ -6178,7 +6178,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			mark:'card',
     			content:function(){
     				"step 0"
-    				ui.discardPile.appendChild(player.storage.mdzhoufu2);
+    				player.storage.mdzhoufu2.discard();
     				player.$throw(player.storage.mdzhoufu2);
     				if(player.storage.mdzhoufu2.clone){
     					player.storage.mdzhoufu2.clone.classList.add('thrownhighlight');
@@ -6190,7 +6190,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.storage.mdzhoufu3.$gain2(player.judging[0]);
     				}
     				else{
-    					ui.discardPile.appendChild(player.judging[0]);
+    					player.judging[0].discard();
     					game.delay(1.5);
     				}
     				player.removeSkill('mdzhoufu2');

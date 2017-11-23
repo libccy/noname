@@ -12533,6 +12533,9 @@
 						if(lib.config.reverse_sort) sort=-sort;
 						cards[num].fix();
 						cards[num].style.transform='';
+						if(_status.discarded){
+							_status.discarded.remove(cards[num]);
+						}
 						// cards[num].vanishtag.length=0;
 						for(var num2=0;num2<cards[num].vanishtag.length;num2++){
 							if(cards[num].vanishtag[num2][0]!='_'){
@@ -12641,6 +12644,14 @@
 							cards[i].destroyed=info.destroy||cards[i]._destroy;
 						}
 						else if(event.position){
+							if(_status.discarded){
+								if(event.position==ui.discardPile){
+									_status.discarded.add(cards[i]);
+								}
+								else{
+									_status.discarded.remove(cards[i]);
+								}
+							}
 							cards[i].goto(event.position);
 						}
 						else{
@@ -13071,7 +13082,7 @@
 						_status.dying.remove(player);
 
                         for(var i=0;i<cards.length;i++){
-							cards[i].goto(ui.discardPile);
+							cards[i].discard();
 						}
                         if(game.online&&player==game.me&&!_status.over&&!game.controlOver&&!ui.exit){
                             if(lib.mode[lib.configOL.mode].config.dierestart){
@@ -13253,6 +13264,9 @@
 						cards[0].style.transform='';
 						cards[0].classList.add('drawinghidden');
 						player.node.judges.insertBefore(cards[0],player.node.judges.firstChild);
+						if(_status.discarded){
+							_status.discarded.remove(cards[0]);
+						}
 						ui.updatej(player);
                         game.broadcast(function(player,card,viewAs){
                             card.fix();
@@ -19000,6 +19014,9 @@
 					}
 					if(!equipped){
 						player.node.equips.appendChild(card);
+						if(_status.discarded){
+							_status.discarded.remove(card);
+						}
 					}
                     var info=get.info(card);
                     if(info.skills){
@@ -19957,12 +19974,20 @@
                     else this._uncheck.length=0;
                     if(this._uncheck.length==0) this.classList.remove('uncheck');
                 },
-				discard:function(){
+				discard:function(bool){
 					if(!this.destroyed){
 						ui.discardPile.appendChild(this);
 					}
 					this.fix();
 					this.classList.remove('glow');
+					if(bool===false){
+						ui.cardPile.insertBefore(this,ui.cardPile.childNodes[Math.floor(Math.random()*ui.cardPile.childNodes.length)]);
+					}
+					else{
+						if(_status.discarded){
+							_status.discarded.add(this);
+						}
+					}
 				},
 				hasPosition:function(){
 					return ['h','e','j'].contains(get.position(this));
@@ -21290,6 +21315,7 @@
                         },player);
 					}
 					_status.currentPhase=player;
+					_status.discarded=[];
 					game.phaseNumber++;
                     game.syncState();
 					game.addVideo('phaseChange',player);
@@ -24392,7 +24418,7 @@
 				}
 				var cards=player.getCards('hej');
 				for(var i=0;i<cards.length;i++){
-					cards[i].goto(ui.discardPile);
+					cards[i].discard();
 				}
 				while(player.node.marks.childNodes.length>1){
 					player.node.marks.lastChild.remove();
@@ -39317,7 +39343,7 @@
 				if(ui.discardPile.childNodes.length){
 					var list=[];
 					for(var i=0;i<ui.discardPile.childNodes.length;i++){
-						list.push(ui.discardPile.childNodes[i]);
+						list.unshift(ui.discardPile.childNodes[i]);
 					}
 					uiintro.addSmall([list,'card']);
 				}
@@ -42423,6 +42449,15 @@
     			return false;
     		},
         },
+		discarded:function(){
+			var list=_status.discarded.slice(0);
+			for(var i=0;i<list.length;i++){
+				if(list[i].parentNode!=ui.discardPile){
+					list.splice(i--,1);
+				}
+			}
+			return list;
+		},
 		colorspan:function(str){
 			if(str[0]=='#'){
 				var color;
@@ -43539,6 +43574,9 @@
 					var cards=[],i;
 					for(var i=0;i<lib.onwash.length;i++){
 						lib.onwash[i]();
+					}
+					if(_status.discarded){
+						_status.discarded.length=0;
 					}
 					for(i=0;i<ui.discardPile.childNodes.length;i++){
 						var currentcard=ui.discardPile.childNodes[i];

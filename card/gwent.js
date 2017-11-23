@@ -126,7 +126,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						player.line(target);
 						target.removeEquipTrigger();
 						for(var i=0;i<ej.length;i++){
-							ui.discardPile.appendChild(game.createCard(ej[i]));
+							game.createCard(ej[i]).discard();
 							ej[i].init([ej[i].suit,ej[i].number,'gw_dieyi_'+(get.subtype(ej[i])||'judge')]);
 						}
 						event.redo();
@@ -1933,7 +1933,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
     					else{
 							player.$throw(player.storage.gw_youer,1000);
 		    				for(var i=0;i<player.storage.gw_youer.length;i++){
-		    					ui.discardPile.appendChild(player.storage.gw_youer[i]);
+		    					player.storage.gw_youer[i].discard();
 		    				}
 		    				game.log(player,'弃置了',player.storage.gw_youer);
 						}

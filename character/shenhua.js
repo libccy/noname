@@ -1793,7 +1793,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				for(var i=0;i<event.cards.length;i++){
     					if(get.suit(event.cards[i])=='heart'){
     						num++;
-    						ui.discardPile.appendChild(event.cards[i]);
+    						event.cards[i].discard();
     						event.cards.splice(i--,1);
     					}
     				}
@@ -1980,6 +1980,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				var list=game.filterPlayer(function(current){
     					return current!=player&&current.hasZhuSkill('songwei',player);
     				});
+                    list.sortBySeat();
     				event.list=list;
     				'step 1'
     				if(event.list.length){
@@ -2456,6 +2457,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				var list=game.filterPlayer(function(target){
     					return player!=target&&target.hp<target.maxHp&&target.hasZhuSkill('baonue',player);
     				});
+                    list.sortBySeat();
     				event.list=list;
     				'step 1'
     				if(event.list.length){
@@ -3890,7 +3892,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.hp=1-player.storage.gzbuqu.length;
     					game.log(player,'移去了不屈牌',player.storage.gzbuqu);
     					while(player.storage.gzbuqu.length){
-    						ui.discardPile.appendChild(player.storage.gzbuqu.shift());
+    						player.storage.gzbuqu.shift().discard();
     					}
     					player.unmarkSkill('gzbuqu');
     					player.dying({});
@@ -3930,7 +3932,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     							player.hp-=player.storage.gzbuqu.length-1;
     							player.update();
     							while(player.storage.gzbuqu.length){
-    								ui.discardPile.appendChild(player.storage.gzbuqu.shift());
+    								player.storage.gzbuqu.shift().discard();
     							}
     							player.unmarkSkill('gzbuqu');
     							delete player.nodying;
@@ -3953,7 +3955,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						}
     						'step 1'
     						for(var i=0;i<result.links.length;i++){
-    							ui.discardPile.appendChild(result.links[i]);
+    							result.links[i].discard();
     							player.storage.gzbuqu.remove(result.links[i]);
     						}
     						player.$throw(result.links);
@@ -4010,7 +4012,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					if(storage&&storage.length){
     						player.$throw(storage);
     						for(var i=0;i<storage.length;i++){
-    							ui.discardPile.appendChild(storage[i]);
+    							storage[i].discard();
     						}
     						delete player.storage.buqu;
     					}

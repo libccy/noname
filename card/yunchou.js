@@ -131,7 +131,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						game.log(player,'将'+get.cnNumber(result.links.length)+'张牌置于牌堆顶');
 					}
 					for(var i=0;i<event.dialog.buttons.length;i++){
-						ui.discardPile.appendChild(event.dialog.buttons[i].link);
+						event.dialog.buttons[i].link.discard();
 					}
 					'step 2'
 					var dialog=event.dialog;

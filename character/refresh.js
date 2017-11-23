@@ -332,7 +332,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},trigger.player.judging[0]);
 							game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging[0].clone]));
 						}
-						ui.discardPile.appendChild(trigger.player.judging[0]);
+						trigger.player.judging[0].discard();
 						trigger.player.judging[0]=result.cards[0];
 						if(!get.owner(result.cards[0],'judge')){
 							trigger.position.appendChild(result.cards[0]);
@@ -387,7 +387,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<cards.length;i++){
 						if(get.type(cards[i])!='basic'&&cards[i].name!='juedou'&&
 							(get.type(cards[i])!='equip'||get.subtype(cards[i])!='equip1')){
-							ui.discardPile.appendChild(cards[i]);
+							cards[i].discard();
 							cards.splice(i--,1);
 						}
 					}
@@ -797,7 +797,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						else{
 							game.log(player,'展示并弃掉了',event.card);
-							ui.discardPile.appendChild(event.card);
+							event.card.discard();
 						}
 						game.addVideo('deletenode',player,[get.cardInfo(event.node)]);
 						event.node.delete();
@@ -822,7 +822,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						game.log(player,'展示并弃掉了',event.card);
-						ui.discardPile.appendChild(event.card);
+						event.card.discard();
 						game.addVideo('deletenode',player,[get.cardInfo(event.node)]);
 						event.node.delete();
 						game.broadcast(function(card){
@@ -1282,7 +1282,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.line(result.targets,'green');
 					result.targets[0].$gain2(event.card);
 					for(var i=0;i<cards.length-1;i++){
-						ui.discardPile.appendChild(cards[i]);
+						cards[i].discard();
 					}
 					game.delay(0,1000);
 					"step 3"

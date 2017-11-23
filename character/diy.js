@@ -49,8 +49,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_yuji:['male','qun',3,['nsyaowang','nshuanhuo']],
 			ns_xinxianying:['female','wei',3,['nsdongcha','nscaijian','nsgongjian']],
 			// ns_guanlu:['male','wei',3,[]],
-			// ns_simazhao:['male','wei',3,[]],
-			// ns_sunjian:['male','wei',3,[]],
+			ns_simazhao:['male','wei',3,['nszhaoxin','nsxiuxin','nsshijun']],
+			ns_sunjian:['male','wu',4,['nswulie','nshunyou','nscangxi']],
 		},
 		characterIntro:{
 			diy_feishi:'字公举，生卒年不详，益州犍为郡南安县（今四川省乐山市）人。刘璋占据益州时，以费诗为绵竹县县令。刘备进攻刘璋夺取益州，费诗举城而降，后受拜督军从事，转任牂牁郡太守，再为州前部司马。',
@@ -80,11 +80,277 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_wangyue:'#p废城君',
 			ns_sunjian:'#b兔子两只2',
 			ns_yuji:'#g蔚屿凉音',
+			ns_simazhao:'#r一纸载春秋',
 		},
 		perfectPair:{
 			yuji:['zuoci']
 		},
 		skill:{
+			nszhaoxin:{
+				mark:true,
+				intro:{
+					mark:function(dialog,content,player){
+						var hs=player.getCards('h');
+						if(hs.length){
+							dialog.addSmall();
+						}
+						else{
+							dialog.addText('无手牌');
+						}
+					},
+					content:function(content,player){
+						var hs=player.getCards('h');
+						if(hs.length){
+							return get.translation(hs);
+						}
+						else{
+							return '无手牌';
+						}
+					}
+				},
+			},
+			nsxiuxin:{
+				mod:{
+					targetEnabled:function(card,player,target){
+						var suit=get.suit(card);
+						if(suit&&!target.countCards('h',{suit:suit})){
+							return false;
+						}
+					}
+				}
+			},
+			nscangxi:{
+    			unique:true,
+    			global:'nscangxi2',
+    			zhuSkill:true,
+				init:function(player){
+					player.storage.nscangxi=0;
+				},
+				intro:{
+					content:'手牌上限+#'
+				},
+				mod:{
+					maxHandcard:function(player,num){
+						return num+player.storage.nscangxi;
+					}
+				}
+    		},
+    		nscangxi2:{
+				trigger:{player:'phaseDiscardEnd'},
+    			filter:function(event,player){
+					if(!event.cards||event.cards.length<=1) return false;
+    				if(player.group!='wu') return false;
+    				return game.hasPlayer(function(target){
+    					return player!=target&&target.hasZhuSkill('nscangxi',player);
+    				});
+    			},
+				direct:true,
+    			content:function(){
+    				'step 0'
+    				var list=game.filterPlayer(function(current){
+    					return current!=player&&current.hasZhuSkill('nscangxi',player);
+    				});
+					list.sortBySeat();
+    				event.list=list;
+    				'step 1'
+    				if(event.list.length){
+    					var current=event.list.shift();
+    					event.current=current;
+    					player.chooseBool(get.prompt('nscangxi',current)).set('choice',get.attitude(player,current)>0);
+    				}
+    				else{
+    					event.finish();
+    				}
+    				'step 2'
+    				if(result.bool){
+    					player.logSkill('nscangxi',event.current);
+    					player.judge(function(card){
+							return _status.event.att*(get.color(card)=='black'?1:0);
+						}).set('att',get.sgnAttitude(player,event.current));
+    				}
+					else{
+						event.goto(1);
+					}
+					'step 3'
+					if(result.color=='black'){
+						var name=get.translation(event.current.name);
+						var att=0;
+						if(event.current.needsToDiscard()){
+							att=1;
+						}
+						player.chooseControlList(['令'+name+'摸一张牌展示','令'+name+'手牌上永久+1','弃置一张牌并令'+name+'获得一张本回进入弃牌堆的牌'],function(){
+							return _status.event.att;
+						}).set('att',att);
+					}
+					else{
+						event.goto(1);
+					}
+					'step 4'
+					switch(result.index){
+						case 0: event.current.draw('visible');break;
+						case 1: {
+							if(typeof event.current.storage.nscangxi!='number'){
+								event.current.storage.nscangxi=0;
+							}
+							event.current.storage.nscangxi++;
+							event.current.syncStorage('nscangxi');
+							event.current.markSkill('nscangxi');
+							break;
+						}
+						case 2: {
+							player.chooseToDiscard(true,'he');
+							break;
+						}
+					}
+					if(result.index!=2){
+						event.goto(1);
+					}
+					'step 5'
+					if(result.bool){
+						var discarded=get.discarded();
+						if(discarded.length){
+							event.current.chooseCardButton('选择一张获得之',discarded,true).set('ai',function(button){
+								return get.value(button.link);
+							});
+						}
+						else{
+							event.goto(1);
+						}
+					}
+					else{
+						event.goto(1);
+					}
+					'step 6'
+					if(result.bool&&result.links&&result.links.length){
+						event.current.gain(result.links,'gain2');
+					}
+					event.goto(1);
+    			}
+    		},
+			nswulie:{
+				trigger:{player:'phaseBegin'},
+				skillAnimation:true,
+				animationColor:'metal',
+				unique:true,
+				check:function(){
+					return false;
+				},
+				filter:function(event,player){
+					return ui.discardPile.childElementCount>0;
+				},
+				content:function(){
+					'step 0'
+					player.awakenSkill('nswulie');
+					player.loseMaxHp();
+					'step 1'
+					player.chooseCardButton(Array.from(ui.discardPile.childNodes),'将至多3张任意顺置于牌堆顶（先选择的在上）',true,[1,3]);
+					'step 2'
+					if(result.bool){
+						var cards=result.links.slice(0);
+						while(cards.length){
+							ui.cardPile.insertBefore(cards.pop(),ui.cardPile.firstChild);
+						}
+						player.addTempSkill('nswulie_end');
+					}
+				},
+				subSkill:{
+					end:{
+						trigger:{player:'phaseEnd'},
+						check:function(){
+							return false;
+						},
+						filter:function(event,player){
+							return ui.discardPile.childElementCount>0;
+						},
+						content:function(){
+							'step 0'
+							player.loseMaxHp();
+							'step 1'
+							player.chooseCardButton(Array.from(ui.discardPile.childNodes),'将至多3张任意顺置于牌堆顶（先选择的在上）',true,[1,3]);
+							'step 2'
+							if(result.bool){
+								var cards=result.links.slice(0);
+								while(cards.length){
+									ui.cardPile.insertBefore(cards.pop(),ui.cardPile.firstChild);
+								}
+							}
+						}
+					}
+				}
+			},
+			nshunyou:{
+				enable:'phaseUse',
+				usable:1,
+				filterCard:{type:'basic'},
+				filter:function(event,player){
+					return player.countCards('h',{type:'basic'});
+				},
+				content:function(){
+					'step 0'
+					var equip=null, trick=null;
+					for(var i=0;i<ui.discardPile.childElementCount;i++){
+						var type=get.type(ui.discardPile.childNodes[i],'trick');
+						if(type=='trick'){
+							trick=ui.discardPile.childNodes[i];
+						}
+						else if(type=='equip'){
+							equip=ui.discardPile.childNodes[i];
+						}
+						if(trick&&equip){
+							break;
+						}
+					}
+					var list=[];
+					if(trick) list.push(trick);
+					if(equip) list.push(equip);
+					if(!list.length){
+						player.draw(Math.min(3,1+player.maxHp-player.hp));
+					}
+					else{
+						player.gain(list,'gain2');
+						event.equip=equip;
+					}
+					'step 1'
+					if(event.equip&&get.owner(event.equip)==player){
+						player.chooseTarget('是否将'+get.translation(event.equip)+'装备给一其角色？',function(card,player,target){
+							return target!=player
+						}).set('ai',function(target){
+							var att=get.attitude(_status.event.player,target);
+							if(att>1){
+								if(!target.getEquip(_status.event.subtype)) return att;
+							}
+							return 0;
+						}).set('subtype',get.subtype(event.equip));
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if(result.bool){
+						player.line(result.targets,'green');
+						player.$give(event.equip,result.targets[0]);
+						player.lose(event.equip,ui.special);
+					}
+					else{
+						event.finish();
+					}
+					'step 3'
+					game.delay(0.5);
+					'step 4'
+					result.targets[0].equip(event.equip);
+					'step 5'
+					game.delay();
+				},
+				check:function(card){
+					return 7-get.value(card);
+				},
+				ai:{
+					order:7,
+					result:{
+						player:1
+					}
+				}
+			},
 			nsgongjian:{
     			trigger:{player:'phaseDiscardEnd'},
     			forced:true,
@@ -1604,7 +1870,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.$throw(links);
 								game.log(player, '被移去了', links);
 								for (var i = 0; i < links.length; i++) {
-									ui.discardPile.appendChild(links[i]);
+									links[i].discard();
 								}
 							}
 							'step 2'
@@ -2197,7 +2463,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('zhucheng',_status.currentPhase);
 						player.$throw(result.links[0]);
 						player.storage.zhucheng.remove(result.links[0]);
-						ui.discardPile.appendChild(result.links[0]);
+						result.links[0].discard();
 						player.syncStorage('zhucheng');
 						if(player.storage.zhucheng.length==0){
 							player.unmarkSkill('zhucheng');
@@ -2338,7 +2604,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<event.cards.length;i++){
 						if(get.suit(event.cards[i])=='heart'){
 							num++;
-							ui.discardPile.appendChild(event.cards[i]);
+							event.cards[i].discard();
 							event.cards.splice(i--,1);
 						}
 					}
@@ -2705,7 +2971,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						var card=get.cards()[0];
-						ui.discardPile.appendChild(card);
+						card.discard();
 						player.showCards(card);
 						event.bool=get.color(card)=='red';
 						event.target=result.targets[0];
@@ -3035,13 +3301,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_caocaosp:'sp曹操',
 			ns_xinxianying:'辛宪英',
 			ns_sunjian:'孙坚',
+			ns_simazhao:'司马昭',
+			ns_guanlu:'管辂',
 
+			nszhaoxin:'昭心',
+			nszhaoxin_info:'锁定技，你始终展示手牌',
+			nsxiuxin:'修心',
+			nsxiuxin_info:'锁定技，若你没有某种花色的手牌，你不能成为这种花色的牌的目标',
+			nsshijun:'弑君',
+			nsshijun_info:'锁定技，你造成伤害后，你失去一点体力，令此伤害+1',
 			nshunyou:'魂佑',
-			nshunyou_info:'每回合一次，弃置一张基本牌，获得弃牌堆底的一张装备牌和一张锦囊牌，然后你可以将那张装备牌装备给任意角色（允许替换）。如果弃牌堆没有装备以及锦囊牌，则改为摸X张牌，X为损失的体力加一（最多3张）',
+			nshunyou_info:'出阶段限一次，你可以弃置一张基本牌，获得弃牌堆底的一张装备牌和一张锦囊牌，然后你可以将那张装备牌装备给一名角色（允许替换）。如果弃牌堆没有装备以及锦囊牌，则改为摸X张牌，X为损失的体力加一（最多3张）',
 			nswulie:'武烈',
-			nswulie_info:'限定，回合开始，你可以失去1体力上限，从弃牌堆选择最多三张牌以任意顺序放置于牌堆顶。如此，此回合的结束阶段，你可以失去一体力上限也可以如此做',
+			nswulie_info:'限定技，准备阶段，你可以失去1点体力上限，从弃牌堆选择最多三张牌以任意顺序放置于牌堆顶。若如此做，此回合的结束阶段，你可以重复此操作',
 			nscangxi:'藏玺',
-			nscangxi_info:'主公技，其他吴势力的弃牌阶段结束时，若弃置了至少X张牌（X为主公以外的错过的吴势力角色），其可以选择判定，若是黑色，则其选择一项，1，令主公摸一张并且展示，直到主公的回合开始或者进入濒死以前，主公不可以使用打出此花色的牌，2，主公手牌上限永久加一（每名角色只能使得主公手牌上限增加一）。3，额外弃置一张牌，令主公获得本回合进入弃牌堆的一张牌',
+			nscangxi2:'藏玺',
+			nscangxi_info:'主公技，其他吴势力角色的弃牌阶段结束时，若其弃置了至少两张牌，则可以选择判定，若是黑色，则其选择一项，1，令主公摸一张并且展示；2，主公手牌上限永久加一；3，额外弃置一张牌，令主公获得本回合进入弃牌堆的一张牌',
 			nsdongcha:'洞察',
 			nsdongcha_info:'锁定技，单体锦囊牌无法对你造成伤害。其它角色于其回合内第二次使用锦囊牌指定你为目标时，取消之',
 			nscaijian:'才鉴',

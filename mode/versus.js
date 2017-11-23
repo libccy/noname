@@ -441,7 +441,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     		if(event.replaceCard&&result.bool){
     			var hs=game.me.getCards('h');
     			for(var i=0;i<hs.length;i++){
-    				ui.discardPile.appendChild(hs[i]);
+    				hs[i].discard(false);
     			}
     			game.me.directgain(get.cards(hs.length));
     		}

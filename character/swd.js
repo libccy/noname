@@ -538,7 +538,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						if(card){
     							player.showCards(card,get.translation(player)+'发动了【陷阱】');
     							player.storage.sxianjing.remove(card);
-    							ui.discardPile.appendChild(card);
+    							card.discard();
     							player.syncStorage('sxianjing');
     							if(player.storage.sxianjing.length){
     								player.updateMarks();
@@ -599,7 +599,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				event.suits=suits;
     				for(var i=0;i<event.list.length;i++){
     					suits.add(get.suit(event.list[i]));
-    					ui.discardPile.appendChild(event.list[i]);
+    					event.list[i].discard();
     				}
     				'step 2'
     				if(event.suits.contains('diamond')){
@@ -1827,7 +1827,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				if(ui.cardPile.childNodes.length<3){
     					var discardcards=get.cards(3);
     					for(var i=0;i<discardcards.length;i++){
-    						ui.discardPile.appendChild(discardcards[i]);
+    						discardcards[i].discard();
     					}
     				}
     				for(var i=0;i<3;i++){
@@ -2492,7 +2492,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			content:function(){
     				trigger.num--;
     				player.removeSkill('fuyan2');
-    				ui.discardPile.appendChild(player.storage.fuyan2);
+    				player.storage.fuyan2.discard();
     				delete player.storage.fuyan2;
     			},
     			intro:{
@@ -3256,7 +3256,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				if(ui.cardPile.childNodes.length<num){
     					var discardcards=get.cards(num);
     					for(var i=0;i<discardcards.length;i++){
-    						ui.discardPile.appendChild(discardcards[i]);
+    						discardcards[i].discard();
     					}
     				}
     				for(var i=0;i<num;i++){
@@ -5852,7 +5852,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				"step 1"
     				for(var i=0;i<cards.length;i++){
     					if(get.suit(event.cards[i])!='heart'){
-    						ui.discardPile.appendChild(cards[i]);
+    						cards[i].discard();
     						event.cards.splice(i--,1);
     					}
     				}
@@ -7760,7 +7760,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				"step 2"
     				if(event.card){
     					player.logSkill('tianlun',trigger.player);
-    					ui.discardPile.appendChild(trigger.player.judging[0]);
+    					trigger.player.judging[0].discard();
     					trigger.player.judging[0]=event.card;
     					trigger.position.appendChild(event.card);
     					game.log(trigger.player,'的判定牌改为',event.card);

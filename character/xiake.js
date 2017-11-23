@@ -59,7 +59,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                player.draw();
 	                "step 1"
 	                for(var i=0;i<cards.length;i++){
-	                    ui.discardPile.appendChild(cards[i]);
+	                    cards[i].discard();
 	                }
 	            },
 	            ai:{

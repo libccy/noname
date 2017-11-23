@@ -195,7 +195,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.player.judging[0].clone.classList.remove('thrownhighlight');
 						game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging[0].clone]));
 					}
-					ui.discardPile.appendChild(trigger.player.judging[0]);
+					trigger.player.judging[0].discard();
 					trigger.player.judging[0]=card;
 					trigger.position.appendChild(card);
 					game.log(trigger.player,'的判定牌改为',card);

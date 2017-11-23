@@ -344,7 +344,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 },
                 content:function(){
                     var cards=get.cards();
-                    ui.discardPile.appendChild(cards[0]);
+                    cards[0].discard();
                     cards[0].vanishtag.add('tianbian');
                     trigger.directresult=cards;
                     trigger.untrigger();
@@ -1098,7 +1098,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					}
                         if(event.togain.length){
                             for(var i=0;i<dialog.buttons.length;i++){
-                                ui.discardPile.appendChild(event.togain[i]);
+                                event.togain[i].discard();
                             }
                         }
     					game.broadcast(function(id){
@@ -2838,7 +2838,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     							event.cards2.push(cards[i]);
     						}
     						else{
-    							ui.discardPile.appendChild(cards[i]);
+    							cards[i].discard();
     						}
     					}
     				}
@@ -3429,7 +3429,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.logSkill('chunlao');
     					player.$throw(result.links);
     					player.storage.chunlao.remove(result.links[0]);
-    					ui.discardPile.appendChild(result.links[0]);
+    					result.links[0].discard();
     					player.syncStorage('chunlao');
     					target.useCard({name:'jiu'},target);
     					if(!player.storage.chunlao.length){
@@ -3471,7 +3471,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.logSkill('chunlao',trigger.player);
     					player.$throw(result.links);
     					player.storage.chunlao.remove(result.links[0]);
-    					ui.discardPile.appendChild(result.links[0]);
+    					result.links[0].discard();
     					player.syncStorage('chunlao');
     					trigger.player.useCard({name:'jiu'},trigger.player);
     					if(!player.storage.chunlao.length){
@@ -3719,7 +3719,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.$throw([button]);
     					player.line(trigger.player,'green');
     					game.log(player,'将',button,'置于弃牌堆');
-    					ui.discardPile.appendChild(button);
+    					button.discard();
     					trigger.player.addTempSkill('sidi3');
     					player.storage.sidi.remove(button);
     					player.syncStorage('sidi');
@@ -5363,7 +5363,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			content:function(){
     				player.$throw(player.storage.xinpojun2,1000);
     				for(var i=0;i<player.storage.xinpojun2.length;i++){
-    					ui.discardPile.appendChild(player.storage.xinpojun2[i]);
+    					player.storage.xinpojun2[i].discard();
     				}
     				game.log(player,'弃置了',player.storage.xinpojun2);
     				delete player.storage.xinpojun2;
@@ -5405,7 +5405,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.draw();
     				"step 1"
     				for(var i=0;i<cards.length;i++){
-    					ui.discardPile.appendChild(cards[i]);
+    					cards[i].discard();
     				}
     			},
     			ai:{
@@ -8416,7 +8416,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						cards.remove(result.links[i]);
     					}
     					for(var i=0;i<cards.length;i++){
-    						ui.discardPile.appendChild(cards[i]);
+    						cards[i].discard();
     					}
     					event.cards2=cards2;
     				}
@@ -8584,7 +8584,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				onunmark:function(storage,player){
     					if(storage&&storage.length){
     						for(var i=0;i<storage.length;i++){
-    							ui.discardPile.appendChild(storage[i]);
+    							storage[i].discard();
     						}
     						player.$throw(storage);
     						player.storage.xiansi.length=0;
@@ -8670,7 +8670,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					event.target.$throw(links);
                         game.log(event.target,'被移去了',links);
     					for(var i=0;i<links.length;i++){
-    						ui.discardPile.appendChild(links[i]);
+    						links[i].discard();
     					}
     					player.useCard({name:'sha'},event.target);
     				}

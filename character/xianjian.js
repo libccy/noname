@@ -1184,7 +1184,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				game.addVideo('skill',event.player,['ywuhun',data]);
     				game.animate.window(2);
 					while(ui.cardPile.childElementCount){
-						ui.discardPile.appendChild(ui.cardPile.firstChild);
+						ui.cardPile.firstChild.discard();
 					}
 					for(var i=0;i<event.cardPile.length;i++){
 						if(event.cardPile[i].parentNode==ui.discardPile){
@@ -2974,7 +2974,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 2"
 					player.$throw(player.storage.ctianfu2);
-					ui.discardPile.appendChild(player.storage.ctianfu2);
+					player.storage.ctianfu2.discard();
 					delete player.storage.ctianfu2;
 					delete player.storage.ctianfu3;
 					player.removeSkill('ctianfu2');
@@ -2989,7 +2989,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				popup:false,
 				content:function(){
-					ui.discardPile.appendChild(player.storage.ctianfu2);
+					player.storage.ctianfu2.discard();
 					delete player.storage.ctianfu2;
 					delete player.storage.ctianfu3;
 					player.removeSkill('ctianfu2');
@@ -3050,7 +3050,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					onunmark:function(storage,player){
 						if(storage&&storage.length){
 							for(var i=0;i<storage.length;i++){
-								ui.discardPile.appendChild(storage[i]);
+								storage[i].discard();
 							}
 							player.$throw(storage);
 							delete player.storage.shuiyun;
@@ -3099,7 +3099,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.unmarkSkill('shuiyun');
 						}
 						player.$throw(result.links);
-						ui.discardPile.appendChild(result.links[0]);
+						result.links[0].discard();
 						target.recover();
 						if(typeof player.storage.shuiyun_count=='number'){
 							player.storage.shuiyun_count++;
@@ -3407,7 +3407,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					if(player.storage.xshuangren){
-						ui.discardPile.appendChild(player.storage.xshuangren);
+						player.storage.xshuangren.discard();
 						player.$throw(player.storage.xshuangren);
 					}
 				}
@@ -3921,7 +3921,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=event.players[event.num];
 						if(player.storage.zhimeng2){
 							if(trigger.name=='die'&&player==trigger.player){
-								ui.discardPile.appendChild(player.storage.zhimeng2);
+								player.storage.zhimeng2.discard();
 							}
 							else{
 								game.log(player,'发动织梦，获得了',player.storage.zhimeng2);

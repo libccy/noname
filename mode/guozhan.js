@@ -422,7 +422,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							'step 1'
 							if(result.bool){
 								var card=result.links[0];
-								ui.discardPile.appendChild(card);
+								card.discard();
 								player.storage.huangjintianbingfu.remove(card);
 								player.$throw(card,1000);
 								player.updateMarks('huangjintianbingfu');

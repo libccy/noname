@@ -2689,7 +2689,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(ui.cardPile.childNodes.length<num){
 						var discardcards=get.cards(num);
 						for(var i=0;i<discardcards.length;i++){
-							ui.discardPile.appendChild(discardcards[i]);
+							discardcards[i].discard();
 						}
 					}
 					for(var i=0;i<num;i++){

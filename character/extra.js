@@ -339,7 +339,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger.player.judging[0].clone.delete();
 							game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging[0].clone]));
 						}
-						ui.discardPile.appendChild(trigger.player.judging[0]);
+						trigger.player.judging[0].discard();
 						trigger.player.judging[0]=result.cards[0];
 						trigger.position.appendChild(result.cards[0]);
 						game.log(trigger.player,'的判定牌改为',result.cards[0]);
@@ -1066,7 +1066,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.gain(cards2,'log');
 					if(cards2.length) player.$gain2(cards2);
 					for(var i=0;i<cards.length;i++){
-						ui.discardPile.appendChild(cards[i]);
+						cards[i].discard();
 					}
 					game.delay(2);
 				},

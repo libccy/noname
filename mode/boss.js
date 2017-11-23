@@ -2466,7 +2466,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.players[i].removeEquipTrigger();
 						var hej=game.players[i].getCards('hej');
 						for(var j=0;j<hej.length;j++){
-							ui.discardPile.appendChild(hej[j]);
+							hej[j].discard(false);
 						}
 						game.players[i].hp=game.players[i].maxHp;
 						game.players[i].hujia=0;
@@ -2543,7 +2543,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.players[i].removeEquipTrigger();
 						var hej=game.players[i].getCards('hej');
 						for(var j=0;j<hej.length;j++){
-							ui.discardPile.appendChild(hej[j]);
+							hej[j].discard(false);
 						}
 						game.players[i].hp=game.players[i].maxHp;
 						game.players[i].hujia=0;
@@ -2637,7 +2637,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.players[i].removeEquipTrigger();
 						var hej=game.players[i].getCards('hej');
 						for(var j=0;j<hej.length;j++){
-							ui.discardPile.appendChild(hej[j]);
+							hej[j].discard(false);
 						}
 						game.players[i].hp=game.players[i].maxHp;
 						game.players[i].hujia=0;
@@ -2714,7 +2714,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.players[i].removeEquipTrigger();
 						var hej=game.players[i].getCards('hej');
 						for(var j=0;j<hej.length;j++){
-							ui.discardPile.appendChild(hej[j]);
+							hej[j].discard(false);
 						}
 						game.players[i].hp=game.players[i].maxHp;
 						game.players[i].hujia=0;
@@ -2807,7 +2807,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.players[i].removeEquipTrigger();
 						var hej=game.players[i].getCards('hej');
 						for(var j=0;j<hej.length;j++){
-							ui.discardPile.appendChild(hej[j]);
+							hej[j].discard(false);
 						}
 						game.players[i].hp=game.players[i].maxHp;
 						game.players[i].hujia=0;
@@ -2897,7 +2897,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.players[i].removeEquipTrigger();
 						var hej=game.players[i].getCards('hej');
 						for(var j=0;j<hej.length;j++){
-							ui.discardPile.appendChild(hej[j]);
+							hej[j].discard(false);
 						}
 						game.players[i].hp=game.players[i].maxHp;
 						game.players[i].hujia=0;
@@ -2991,7 +2991,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.players[i].removeEquipTrigger();
 						var hej=game.players[i].getCards('hej');
 						for(var j=0;j<hej.length;j++){
-							ui.discardPile.appendChild(hej[j]);
+							hej[j].discard(false);
 						}
 						game.players[i].hp=game.players[i].maxHp;
 						game.players[i].hujia=0;
@@ -3082,7 +3082,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.players[i].removeEquipTrigger();
 						var hej=game.players[i].getCards('hej');
 						for(var j=0;j<hej.length;j++){
-							ui.discardPile.appendChild(hej[j]);
+							hej[j].discard(false);
 						}
 						game.players[i].hp=game.players[i].maxHp;
 						game.players[i].hujia=0;
@@ -4136,7 +4136,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.dialog.videoId=event.videoId;
 
 					game.addVideo('judge1',player,[get.cardInfo(card),judgestr,event.videoId]);
-					for(var i=0;i<event.cards.length;i++) ui.discardPile.appendChild(event.cards[i]);
+					for(var i=0;i<event.cards.length;i++) event.cards[i].discard();
 					// var node=card.copy('thrown','center',ui.arena).animate('start');
 					var node;
 					if(game.chess){

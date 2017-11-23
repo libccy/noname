@@ -1094,7 +1094,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.showCards([player.storage.shoujia],get.translation(player)+'发动了【兽夹】');
 					'step 1'
-					ui.discardPile.appendChild(player.storage.shoujia);
+					player.storage.shoujia.discard();
 	                delete player.storage.shoujia;
 					delete player.storage.shoujia2;
 					player.removeSkill('shoujia2');
@@ -1127,7 +1127,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                return event.player==player.storage.shoujia2;
 	            },
 	            content:function(){
-	                ui.discardPile.appendChild(player.storage.shoujia);
+	                player.storage.shoujia.discard();
 	                player.$throw(player.storage.shoujia);
 	                game.log(player.storage.shoujia,'被置入弃牌堆')
 	                delete player.storage.shoujia;
@@ -1595,7 +1595,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.showCards([player.storage.dulei],get.translation(player)+'发动了【诡雷】');
 					'step 1'
-					ui.discardPile.appendChild(player.storage.dulei);
+					player.storage.dulei.discard();
 					delete player.storage.dulei;
 					player.removeSkill('dulei2');
 					game.addVideo('storage',player,['dulei',null]);
@@ -3319,7 +3319,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                player.removeEquipTrigger();
 	                var cards=player.getCards('he');
 	                for(var i=0;i<cards.length;i++){
-	                    ui.discardPile.appendChild(cards[i]);
+	                    cards[i].discard();
 	                }
 	                player.directgain(player.storage.shanxian_h);
 	                for(var i=0;i<player.storage.shanxian_e.length;i++){

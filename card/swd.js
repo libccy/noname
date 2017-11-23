@@ -1158,7 +1158,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						time+=200;
 						setTimeout((function(card,name,last){
 							return function(){
-								ui.discardPile.appendChild(game.createCard(card));
+								game.createCard(card).discard();
 								card.init([card.suit,card.number,name,card.nature]);
 								card.style.transform='scale(1.1)';
 								card.classList.add('glow');
@@ -2936,7 +2936,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						game.log(player,'弃置了',result.links);
 						for(var i=0;i<result.links.length;i++){
 							event.hu.storage.shouna.remove(result.links[i]);
-							ui.discardPile.appendChild(result.links[i]);
+							result.links[i].discard();
 							type.add(get.type(result.links[i],'trick'));
 						}
 						for(var i=0;i<ui.cardPile.childNodes.length;i++){
@@ -3272,7 +3272,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					event.dialog.videoId=event.videoId;
 
 					game.addVideo('judge1',player,[get.cardInfo(card),judgestr,event.videoId]);
-					for(var i=0;i<event.cards.length;i++) ui.discardPile.appendChild(event.cards[i]);
+					for(var i=0;i<event.cards.length;i++) event.cards[i].discard();
 					// var node=card.copy('thrown','center',ui.arena).animate('start');
 					var node;
 					if(game.chess){
@@ -4212,7 +4212,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					for(var i=0;i<cards.length;i++){
-						ui.discardPile.appendChild(cards[i]);
+						cards[i].discard();
 					}
 					var name=lib.skill.lingjianduanzao.process(cards);
 					var card=game.createCard(name);

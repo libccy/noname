@@ -398,7 +398,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						if(cards[0]){
-							ui.discardPile.appendChild(cards[0]);
+							cards[0].discard();
 						}
 						event.finish();
 					}
@@ -413,7 +413,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target.gain(cards,'gain2');
 					}
 					else{
-						ui.discardPile.appendChild(cards[0]);
+						cards[0].discard();
 					}
 				},
 				ai:{

@@ -249,7 +249,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						while(card.cards.length){
 							var card2=card.cards.shift();
 							if(card2.parentNode.id=='special'){
-								ui.discardPile.appendChild(card2);
+								card2.discard();
 							}
 						}
 					}
@@ -665,7 +665,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					var muniu=player.getEquip(5);
 					if(!muniu||!cards.length){
 						for(var i=0;i<cards.length;i++){
-							ui.discardPile.appendChild(cards[i]);
+							cards[i].discard();
 						}
 						event.finish();
 						return;

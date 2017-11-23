@@ -1982,7 +1982,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(ui.cardPile.childNodes.length<4){
 						var discardcards=get.cards(4);
 						for(var i=0;i<discardcards.length;i++){
-							ui.discardPile.appendChild(discardcards[i]);
+							discardcards[i].discard();
 						}
 					}
 					player.chooseControl('heart2','diamond2','club2','spade2','cancel').ai=function(event){
@@ -2017,7 +2017,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					if(event.cards&&event.cards.length){
 						if(get.suit(event.cards[event.cards.length-1])==event.suit){
-							ui.discardPile.appendChild(event.cards.pop());
+							event.cards.pop().discard();
 						}
 						if(event.cards.length){
 							player.gain(event.cards,'draw2');

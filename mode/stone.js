@@ -519,7 +519,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     		if(result.bool){
     			var hs=game.me.getCards('h');
     			for(var i=0;i<hs.length;i++){
-    				ui.discardPile.appendChild(hs[i]);
+    				hs[i].discard(false);
     			}
     			if(_status.mode=='deck'){
     				game.me.drawDeck(1,false);
