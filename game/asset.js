@@ -632,7 +632,7 @@ window.noname_asset_list=[
     'image/character/ns_yuji.jpg',
     'image/character/ns_xinxianying.jpg',
     'image/character/ns_guanlu.jpg',
-    // 'image/character/ns_simazhao.jpg',
+    'image/character/ns_simazhao.jpg',
     'image/character/ns_sunjian.jpg',
     'image/character/old_caoxiu.jpg',
     'image/character/old_caozhen.jpg',

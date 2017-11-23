@@ -48,7 +48,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_wangyue:['male','qun',4,['nsjianshu','nscangjian']],
 			ns_yuji:['male','qun',3,['nsyaowang','nshuanhuo']],
 			ns_xinxianying:['female','wei',3,['nsdongcha','nscaijian','nsgongjian']],
-			// ns_guanlu:['male','wei',3,[]],
+			ns_guanlu:['male','wei',3,['nsbugua','nstuiyan','nstianji']],
 			ns_simazhao:['male','wei',3,['nszhaoxin','nsxiuxin','nsshijun']],
 			ns_sunjian:['male','wu',4,['nswulie','nshunyou','nscangxi']],
 		},
@@ -86,13 +86,221 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuji:['zuoci']
 		},
 		skill:{
+			nstianji:{
+    			trigger:{global:'dying'},
+    			priority:6,
+    			unique:true,
+				skillAnimation:true,
+				animationColor:'water',
+    			filter:function(event,player){
+    				return event.player.hp<=0&&event.player!=player;
+    			},
+				logTarget:'player',
+				check:function(event,player){
+					return get.attitude(player,event.player)>1;
+				},
+    			content:function(){
+					'step 0'
+    				player.loseMaxHp();
+					'step 1'
+					trigger.player.recover(1-trigger.player.hp);
+					'step 2'
+					trigger.player.gainMaxHp();
+    			}
+    		},
+			nsbugua:{
+				group:'nsbugua_use',
+				ai:{
+					threaten:1.4,
+					order:9.5,
+					result:{
+						player:1
+					}
+				},
+				subSkill:{
+					use:{
+						enable:'phaseUse',
+						usable:2,
+						filterCard:true,
+						check:function(card){
+							return 9-get.value(card);
+						},
+						filter:function(event,player){
+							if(!player.getCards('h')) return false;
+							if(player.getStat().skill.nsbugua_use){
+								return player.hasSkill('nsbugua_twice');
+							}
+							return true;
+						},
+						content:function(){
+							'step 0'
+							player.throwDice();
+							'step 1'
+							var cards=get.cards(6);
+							var cards2=cards.slice(0);
+							var card=(cards2.splice(event.num-1,1))[0];
+							player.showCards(get.translation(player)+'亮出了'+get.translation(card),cards).set('hiddencards',cards2);
+							card.discard();
+							var name=null;
+							switch(get.suit(card)){
+								case 'club':{
+									if(card.number%2==0){
+										name='guohe';
+									}
+									else{
+										name='jiedao';
+									}
+									break;
+								}
+								case 'spade':{
+									if(card.number%2==0){
+										name='nanman';
+									}
+									else{
+										name='juedou';
+									}
+									break;
+								}
+								case 'diamond':{
+									if(card.number%2==0){
+										name='shunshou';
+									}
+									else{
+										name='huogong';
+									}
+									break;
+								}
+								case 'heart':{
+									if(card.number%2==0){
+										name='wuzhong';
+									}
+									else{
+										name='wanjian';
+									}
+									break;
+								}
+							}
+							var togain=get.cardPile(name,'cardPile');
+							if(togain){
+								player.gain(togain,'gain2');
+							}
+							else{
+								player.draw();
+							}
+							event.list=cards2;
+							'step 2'
+							player.chooseCardButton(event.list,true,'按顺序将牌置于牌堆顶（先选择的在上）',event.list.length);
+							'step 3'
+							var list=result.links.slice(0);
+							while(list.length){
+								ui.cardPile.insertBefore(list.pop(),ui.cardPile.firstChild);
+							}
+						},
+					},
+					twice:{}
+				}
+			},
+			nstuiyan:{
+				trigger:{player:'useCard'},
+				filter:function(event,player){
+					return _status.currentPhase==player&&event.getParent('phaseUse',true)&&!player.hasSkill('nstuiyan_fail')&&
+						typeof player.storage.nstuiyan=='number'&&event.card.number>player.storage.nstuiyan;
+				},
+				forced:true,
+				content:function(){
+					player.draw();
+				},
+				onremove:function(player){
+					delete player.storage.nstuiyan;
+					delete player.storage.nstuiyan2;
+				},
+				intro:{
+					mark:function(dialog,content,player){
+						dialog.addText('上一张点数：'+player.storage.nstuiyan);
+						dialog.addText('总点数：'+player.storage.nstuiyan2);
+					},
+					content:function(storage,player){
+						return '上一张牌点数：'+storage+'；总点数：'+player.storage.nstuiyan2;
+					}
+				},
+				group:['nstuiyan_use','nstuiyan_clear','nstuiyan_disable'],
+				subSkill:{
+					use:{
+						trigger:{player:'useCard'},
+						silent:true,
+						priority:-1,
+						filter:function(event,player){
+							return _status.currentPhase==player&&event.getParent('phaseUse',true)&&typeof event.card.number=='number';
+						},
+						content:function(){
+							if(typeof player.storage.nstuiyan!='number'){
+								player.storage.nstuiyan=0;
+							}
+							if(typeof player.storage.nstuiyan2!='number'){
+								player.storage.nstuiyan2=0;
+							}
+							player.storage.nstuiyan=trigger.card.number;
+							player.storage.nstuiyan2+=trigger.card.number;
+							player.markSkill('nstuiyan');
+							if(player.storage.nstuiyan2%8==0){
+								player.addTempSkill('nsbugua_twice');
+							}
+						}
+					},
+					clear:{
+						trigger:{player:['phaseUseAfter','phaseAfter']},
+						silent:true,
+						content:function(){
+							delete player.storage.nstuiyan;
+							delete player.storage.nstuiyan2;
+							player.unmarkSkill('nstuiyan');
+						}
+					},
+					disable:{
+						trigger:{player:'useCard'},
+						filter:function(event,player){
+							return _status.currentPhase==player&&event.getParent('phaseUse',true)&&!player.hasSkill('nstuiyan_fail')&&
+								(event.card.number<=player.storage.nstuiyan||typeof event.card.number!='number');
+						},
+						silent:true,
+						content:function(){
+							player.addTempSkill('nstuiyan_fail');
+						},
+					},
+					fail:{}
+				},
+    			ai:{
+    				threaten:1.4
+    			}
+			},
+			nsshijun:{
+				trigger:{source:'damageBegin'},
+				forced:true,
+				content:function(){
+					trigger.num++;
+					trigger.nsshijun=true;
+				},
+				subSkill:{
+					hp:{
+						trigger:{source:'damageAfter'},
+						silent:true,
+						filter:function(event){
+							return event.nsshijun;
+						},
+						content:function(){
+							player.loseHp();
+						}
+					}
+				},
+				group:'nsshijun_hp'
+			},
 			nszhaoxin:{
 				mark:true,
 				intro:{
 					mark:function(dialog,content,player){
 						var hs=player.getCards('h');
 						if(hs.length){
-							dialog.addSmall();
+							dialog.addSmall(hs);
 						}
 						else{
 							dialog.addText('无手牌');
@@ -1452,7 +1660,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				nosub:true,
 				unique:true,
-				group:['nshuanxian_left','nshuanxian_right','nshuanxian_damage','nshuanxian_swap'],
+				group:['nshuanxian_left','nshuanxian_right','nshuanxian_damage','nshuanxian_swap','nshuanxian_draw'],
 				content:function(){
 					player.storage.nshuanxian_right=player.addSubPlayer({
 						name:'ns_nanhua_right',
@@ -3304,12 +3512,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_simazhao:'司马昭',
 			ns_guanlu:'管辂',
 
+			nsbugua:'卜卦',
+			nsbugua_use_info:'弃置一张手牌，并将牌堆顶的六张牌反面朝上逐张按先后顺序排放，然后抛骰子，展示牌序号与骰子显示的点数一致的牌，然后你根据这张牌的花色、点数随机获得牌堆中相应的一张牌',
+			nsbugua_info:'出牌阶段限一次，你可以弃置一张手牌，并将牌堆顶的六张牌反面朝上逐张按先后顺序排放，然后抛骰子，展示牌序号与骰子显示的点数一致的牌，然后你根据这张牌的花色、点数按以下规则随机获得牌堆中相应的一张牌：乾（红桃偶数）：无中生有；坤（黑桃奇数）：决斗；震（黑桃偶数）：南蛮入侵；巽（红桃奇数）：万箭齐发；坎（梅花偶数）：过河拆桥、兑（梅花奇数）：借刀杀人、艮（方片偶数）：顺手牵羊、离（方片奇数）：火攻。若牌堆中无此牌则摸一张牌，然后你观看未展示的另外五张牌并按任意顺序将其置于牌堆顶。',
+			nstuiyan:'推演',
+			nstuiyan_info:'锁定技，出牌阶段，若你使用的牌点数比上一张使用的牌点数大，你摸一张牌，否则你本回合不能再以此法摸牌；若你使用的牌点数之和刚好等于8的倍数，此回合你可发动【卜卦】的上限次数改为两次。',
+			nstianji:'天机',
+			nstianji_info:'限定技，当一名其他角色进入濒死状态，你可自减一点体力上限，令其回复体力至1并增加一点体力上限',
 			nszhaoxin:'昭心',
 			nszhaoxin_info:'锁定技，你始终展示手牌',
 			nsxiuxin:'修心',
 			nsxiuxin_info:'锁定技，若你没有某种花色的手牌，你不能成为这种花色的牌的目标',
 			nsshijun:'弑君',
-			nsshijun_info:'锁定技，你造成伤害后，你失去一点体力，令此伤害+1',
+			nsshijun_info:'锁定技，你造成伤害时，你令此伤害+1，并在结算后失去一点体力',
 			nshunyou:'魂佑',
 			nshunyou_info:'出阶段限一次，你可以弃置一张基本牌，获得弃牌堆底的一张装备牌和一张锦囊牌，然后你可以将那张装备牌装备给一名角色（允许替换）。如果弃牌堆没有装备以及锦囊牌，则改为摸X张牌，X为损失的体力加一（最多3张）',
 			nswulie:'武烈',
@@ -3363,7 +3578,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nscongjun:'从军',
 			nscongjun_info:'锁定技，游戏开始时，你变身为一名随机男性角色；当一名敌方角色使用无懈可击时，你有小概率亮出此武将并变回花木兰，然后对该角色造成2点伤害',
 			nshuanxian:'幻仙',
-			nshuanxian_info:'锁定技，游戏开始时，你获得随从“幻身·右”，当你首次受到伤害时，你获得随从“幻身·左”（体力上限2，初始手牌2，摸牌阶段少摸一张牌）；在你的回合中（如果有对应幻身），你以【幻身·左-本体-幻身·右】的顺序进行3个连续回合',
+			nshuanxian_info:'锁定技，游戏开始时，你获得随从“幻身·右”，当你首次受到伤害时，你获得随从“幻身·左”（体力上限2，初始手牌2）；你与幻身在摸牌阶段均少摸一张牌；在你的回合中（如果有对应幻身），你以【幻身·左-本体-幻身·右】的顺序进行3个连续回合',
 			nstaiping:'太平',
 			nstaiping_info:'当你受到一点伤害后（首次伤害除外），你可以选择一项: ①令一个“幻身”增加一点体力上限。②令一个“幻身”回复一点体力。',
 			nsshoudao:'授道',
