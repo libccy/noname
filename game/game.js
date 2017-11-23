@@ -29074,17 +29074,17 @@
 				var players=null,cards=null;
 				if(lib.version!=lib.config.version){
 					for(var i=0;i<lib.changeLog.length;i++){
-						if(lib.changeLog[i].indexOf('players:')==0){
+						if(lib.changeLog[i].indexOf('players://')==0){
 							try{
-								players=JSON.parse(lib.changeLog[i].slice(8));
+								players=JSON.parse(lib.changeLog[i].slice(10));
 							}
 							catch(e){
 								players=null;
 							}
 						}
-						else if(lib.changeLog[i].indexOf('cards:')==0){
+						else if(lib.changeLog[i].indexOf('cards://')==0){
 							try{
-								cards=JSON.parse(lib.changeLog[i].slice(6));
+								cards=JSON.parse(lib.changeLog[i].slice(8));
 							}
 							catch(e){
 								cards=null;
@@ -35264,7 +35264,9 @@
                                             else{
                                                 str2=update.changeLog[0];
         										for(var i=1;i<update.changeLog.length;i++){
-        											str2+='；'+update.changeLog[i];
+													if(update.changeLog[i].indexOf('://')==-1){
+														str2+='；'+update.changeLog[i];
+													}
         										}
                                             }
     										navigator.notification.confirm(
