@@ -4185,28 +4185,28 @@ div:hover>.wunature {
 	transform: rotateX(-90deg) rotateY(45deg);
 }
 .dice[data-side="3"] {
-	transform: rotateX(-15deg) rotateY(-45deg) rotateZ(-90deg)
+	transform: rotateX(165deg) rotateY(-45deg) rotateZ(90deg)
 }
 .dice[data-side="3"].up-front {
-	transform: rotateX(-90deg) rotateY(-45deg) rotateZ(-90deg)
+	transform: rotateX(90deg) rotateY(-45deg) rotateZ(90deg)
 }
 .dice[data-side="4"] {
-	transform: rotateX(-15deg) rotateY(45deg) rotateZ(90deg)
+	transform: rotateX(345deg) rotateY(-45deg) rotateZ(90deg)
 }
 .dice[data-side="4"].up-front {
-	transform: rotateX(-90deg) rotateY(45deg) rotateZ(90deg)
+	transform: rotateX(270deg) rotateY(-45deg) rotateZ(90deg)
 }
 .dice[data-side="5"] {
-	transform: rotateX(165deg) rotateY(45deg) rotateZ(0deg)
+	transform: rotateX(345deg) rotateY(-45deg) rotateZ(180deg)
 }
 .dice[data-side="5"].up-front {
-	transform: rotateX(90deg) rotateY(45deg) rotateZ(0deg)
+	transform: rotateX(270deg) rotateY(-45deg) rotateZ(180deg)
 }
 .dice[data-side="6"] {
-	transform: rotateX(75deg) rotateY(180deg) rotateZ(45deg)
+	transform: rotateX(255deg) rotateY(0deg) rotateZ(135deg)
 }
 .dice[data-side="6"].up-front {
-	transform: rotateX(0deg) rotateY(180deg) rotateZ(45deg)
+	transform: rotateX(180deg) rotateY(0deg) rotateZ(135deg)
 }
 .dice>div{
 	position: absolute;
