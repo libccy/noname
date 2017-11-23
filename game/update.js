@@ -1,9 +1,9 @@
 window.noname_update={
-    version:'1.9.45',
+    version:'1.9.44.1',
     update:'1.9.44.1',
     changeLog:[
         'bug修复',
-        '部分DIY比赛武将（曹操，诸葛亮，王越，于吉，辛宪英，哀泣女妖）'
+        '部分DIY比赛武将'
     ],
     files:[
         'game/game.js',
