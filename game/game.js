@@ -23496,6 +23496,11 @@
             else if(get.objtype(data)=='object'){
                 var zip=new JSZip();
 				var filelist=[];
+				var filelist2=[];
+				if(data._filelist){
+					filelist2=data._filelist;
+					delete data._filelist;
+				}
                 for(var i in data){
                     zip.file(i,data[i]);
 					filelist.push(i);
@@ -23504,6 +23509,7 @@
 					if(pkg){
 						filelist.remove('extension.js');
 						pkg.files=filelist.slice(0);
+						pkg.files.addArray(filelist2);
 						pkg.size=zip.generate({type:"arraybuffer"}).byteLength;
 						if(pkg.size<1000){
 							pkg.size=pkg.size+'B';
@@ -32828,13 +32834,24 @@
                                     extension[i]=dash2.content.image[i];
                                 }
                                 if(exportext){
-                                    game.importExtension(extension,null,page.currentExtension,{
-										intro:introExtLine.querySelector('input').value||'',
-										author:authorExtLine.querySelector('input').value||'',
-										netdisk:diskExtLine.querySelector('input').value||'',
-										forum:forumExtLine.querySelector('input').value||'',
-										version:versionExtLine.querySelector('input').value||'',
-									});
+									var proexport=function(){
+										game.importExtension(extension,null,page.currentExtension,{
+											intro:introExtLine.querySelector('input').value||'',
+											author:authorExtLine.querySelector('input').value||'',
+											netdisk:diskExtLine.querySelector('input').value||'',
+											forum:forumExtLine.querySelector('input').value||'',
+											version:versionExtLine.querySelector('input').value||'',
+										});
+									};
+									if(game.getFileList){
+										game.getFileList('extension/'+page.currentExtension,function(folders,files){
+											extension._filelist=files;
+											proexport();
+										});
+									}
+									else{
+										proexport();
+									}
                                 }
                                 else{
                                     game.importExtension(extension,function(){
