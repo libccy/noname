@@ -3521,7 +3521,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nstianji_info:'限定技，当一名其他角色进入濒死状态，你可自减一点体力上限，令其回复体力至1并增加一点体力上限',
 			nszhaoxin:'昭心',
 			nszhaoxin_info:'锁定技，你始终展示手牌',
-			nsxiuxin:'修心',
+			nsxiuxin:'穆穆',
 			nsxiuxin_info:'锁定技，若你没有某种花色的手牌，你不能成为这种花色的牌的目标',
 			nsshijun:'弑君',
 			nsshijun_info:'锁定技，你造成伤害时，你令此伤害+1，并在结算后失去一点体力',

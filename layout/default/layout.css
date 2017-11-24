@@ -1445,6 +1445,61 @@ div:not(.handcards)>.card>.info>span,
 	pointer-events: none;
 }
 
+.mark-container.marks{
+	left: 0;
+	top: 0;
+	position: relative;
+	margin-bottom: 0;
+	margin-top: 0;
+}
+.mark-container.marks>div{
+	position: relative !important;
+	margin: 8px;
+	width: 48px !important;
+	height: 48px !important;
+}
+.mark-container.marks>.card>.background.skillmark,
+.mark-container.marks>.card.fakemark.fullborder>.background {
+	padding-top: calc(17px / 2) !important;
+	zoom: 2;
+}
+.mark-container.marks>.card.overflowmark {
+	overflow: visible;
+}
+.mark-container.marks>div>.markcount.menubutton {
+	font-size: 18px;
+	width: 24px;
+	height: 24px;
+	line-height: 28px;
+	position: absolute;
+	left: 32px;
+	top: 28px;
+	border-radius: 100%;
+}
+.mark-container.marks>.card.fullskin>.image{
+	background-size: 100%;
+	background-position: 0 0;
+}
+.mark-container.marks>.card.fullskin>.info{
+	transform: scale(0.6) !important;
+    transform-origin: top right;
+    left: auto !important;
+    right: 3px !important;
+    display: block;
+    top: 2px;
+}
+.mark-container.marks>.card.fullskin>.name{
+	transform: scale(0.5) !important;
+	transform-origin: top left;
+	left: 3px !important;
+	display: block;
+	top: 3px !important;
+}
+.mark-container.marks>.card.fullskin>.name.long{
+	transform: scale(0.48) !important;
+    top: 1px !important;
+}
+
 .button.card>.background {
 	font-size: 68px;
 	height: 68px;
@@ -4170,7 +4225,7 @@ div:hover>.wunature {
     transform-style: preserve-3d;
 	left: calc(50% - 100px);
 	top: calc(50% - 100px);
-	transition: transform 0.3s linear;
+	transition: transform 2s ease;
 }
 .dice[data-side="1"] {
 	transform: rotateX(75deg) rotateY(0deg) rotateZ(45deg)

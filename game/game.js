@@ -18929,8 +18929,6 @@
 						var diceContainer=ui.create.div('.fullsize.dice-container',ui.window);
 						ui.window.classList.add('dicepaused');
 						var dice=ui.create.div('.dice');
-						dice.style.opacity=0;
-						dice.style.transform='scale(0.5)';
 						var side;
 
 						side=ui.create.div('.side.front',dice);
@@ -18976,37 +18974,43 @@
 						ui.create.div('.side.cover.y',dice);
 						ui.create.div('.side.cover.z',dice);
 
+						var map={
+							1:[75,0,45],
+							2:[-15,45,0],
+							3:[165,-45,90],
+							4:[345,-45,90],
+							5:[345,-45,180],
+							6:[255,0,135]
+						};
+						dice.roll=function(deg){
+							if(typeof deg=='number'){
+								dice.current[0]+=deg;
+								deg=dice.current;
+							}
+							deg=deg.slice(0);
+							dice.current=deg;
+							this.style.transform='rotateX('+deg[0]+'deg) rotateY('+deg[1]+'deg) rotateZ('+deg[2]+'deg)';
+						};
+						dice.roll(map[num]);
 						diceContainer.appendChild(dice);
 						ui.refresh(dice);
-						dice.style.transform='';
-						dice.style.opacity='';
-						var seq=[1,2,3,4,5,6];
-						seq.remove(num);
-						dice.dataset.side=seq.randomRemove();
-						var numed=1;
+						dice.roll(1025);
+
 						dice.addEventListener('webkitTransitionEnd',function(){
-							if(seq.length){
-								dice.dataset.side=seq.randomRemove();
+							if(!dice.over){
+								dice.style.transition='transform 0.8s ease';
+								dice.roll(-20);
+								dice.over=true;
 							}
-							else if(numed==1){
-								dice.dataset.side=num;
-								numed=2;
-							}
-							else if(numed==2){
-								numed=0;
-								dice.style.transitionDuration='0.8s';
-								dice.classList.add('up-front');
-							}
-							else{
+							else if(!dice.resumed){
 								setTimeout(function(){
 									diceContainer.delete();
 									ui.window.classList.remove('dicepaused');
-								},500);
+								},300);
 								if(!game.online){
-									setTimeout(function(){
-										game.resume();
-									},1000);
+									setTimeout(game.resume,800);
 								}
+								dice.resumed=true;
 							}
 						});
 					},num);
@@ -23512,7 +23516,24 @@
 						}
 						var pkgstr='extension["'+exportext+'"]={\n';
 						for(var i in pkg){
-							pkgstr+='\t'+i+':'+JSON.stringify(pkg[i])+',\n'
+							var pkgfrag;
+							if(i=='files'){
+								var pkgjs=JSON.stringify(pkg[i]);
+								var pkgfrag='';
+								var pkgbuffer=0;
+								for(var j=0;j<pkgjs.length;j++){
+									pkgfrag+=pkgjs[j];
+									pkgbuffer++;
+									if(pkgbuffer>=80&&pkgjs[j]==','&&pkgjs[j-1]=='"'){
+										pkgfrag+='\n\t\t';
+										pkgbuffer=0;
+									}
+								}
+							}
+							else{
+								pkgfrag=JSON.stringify(pkg[i]);
+							}
+							pkgstr+='\t'+i+':'+pkgfrag+',\n'
 						}
 						pkgstr=pkgstr.slice(0,pkgstr.length-2);
 						pkgstr+='\n};';
@@ -41687,7 +41708,7 @@
 					this.remove();
                     ui.historybar.style.zIndex='';
 					delete _status.currentlogv;
-					if(!ui.arena.classList.contains('menupaused')) game.resume2();
+					if(!ui.arena.classList.contains('menupaused')&&!uiintro.noresume) game.resume2();
 					if(e&&e.stopPropagation) e.stopPropagation();
 					if(uiintro._onclose){
 						uiintro._onclose();
@@ -41717,7 +41738,7 @@
 					this.delete();
                     ui.historybar.style.zIndex='';
 					delete _status.currentlogv;
-					if(!ui.arena.classList.contains('menupaused')) game.resume2();
+					if(!ui.arena.classList.contains('menupaused')&&!uiintro.noresume) game.resume2();
 					if(uiintro._onclose){
 						uiintro._onclose();
 					}
@@ -41743,6 +41764,7 @@
 				else if(uiintro.touchclose){
 					uiintro.listen(clickintro);
 				}
+				uiintro._close=clicklayer;
 
 				game.pause2();
 				return uiintro;
@@ -44673,25 +44695,25 @@
 						}
 					}
 				}
-                if(get.is.phoneLayout()){
-                    var storage=node.storage;
-                    for(i in storage){
-                        if(get.info(i)&&get.info(i).intro){
-                            intro=get.info(i).intro;
-                            if(node.getSkills().concat(lib.skill.global).contains(i)==false&&!intro.show) continue;
-                            var name=intro.name?intro.name:get.translation(i);
-                            if(typeof name=='function'){
-                                name=name(storage[i],node);
-                            }
-                            translation='<div><div class="skill">『'+name.slice(0,2)+'』</div><div>';
-                            var stint=get.storageintro(intro.content,storage[i],node,null,i);
-                            if(stint){
-                                translation+=stint+'</div></div>';
-                                uiintro.add(translation);
-                            }
-                        }
-                    }
-                }
+                // if(get.is.phoneLayout()){
+                //     var storage=node.storage;
+                //     for(i in storage){
+                //         if(get.info(i)&&get.info(i).intro){
+                //             intro=get.info(i).intro;
+                //             if(node.getSkills().concat(lib.skill.global).contains(i)==false&&!intro.show) continue;
+                //             var name=intro.name?intro.name:get.translation(i);
+                //             if(typeof name=='function'){
+                //                 name=name(storage[i],node);
+                //             }
+                //             translation='<div><div class="skill">『'+name.slice(0,2)+'』</div><div>';
+                //             var stint=get.storageintro(intro.content,storage[i],node,null,i);
+                //             if(stint){
+                //                 translation+=stint+'</div></div>';
+                //                 uiintro.add(translation);
+                //             }
+                //         }
+                //     }
+                // }
 
 				if(lib.config.right_range&&_status.gameStarted){
 					uiintro.add(ui.create.div('.placeholder'));
@@ -44769,6 +44791,31 @@
                         }
 						uiintro.content.lastChild.querySelector('.skill>.card').style.transform='';
                     }
+					if(get.is.phoneLayout()!=111){
+						var markCoutainer=ui.create.div('.mark-container.marks');
+						for(var i in node.marks){
+							var nodemark=node.marks[i].cloneNode(true);
+							nodemark.classList.add('pointerdiv');
+							nodemark.link=node.marks[i];
+							nodemark.style.transform='';
+							markCoutainer.appendChild(nodemark);
+							nodemark.listen(function(){
+								uiintro.noresume=true;
+								var rect=this.link.getBoundingClientRect();
+								ui.click.intro.call(this.link,{
+									clientX:rect.left+rect.width,
+									clientY:rect.top+rect.height/2,
+								});
+								if(lib.config.touchscreen){
+									uiintro._close();
+								}
+							});
+						}
+						if(markCoutainer.childElementCount){
+							uiintro.addText('标记');
+							uiintro.add(markCoutainer);
+						}
+					}
                 }
                 var modepack=lib.characterPack['mode_'+get.mode()];
                 if(lib.config.show_favourite&&lib.character[node.name]&&game.players.contains(node)&&
