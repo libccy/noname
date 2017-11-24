@@ -44791,7 +44791,7 @@
                         }
 						uiintro.content.lastChild.querySelector('.skill>.card').style.transform='';
                     }
-					if(get.is.phoneLayout()!=111){
+					if(get.is.phoneLayout()){
 						var markCoutainer=ui.create.div('.mark-container.marks');
 						for(var i in node.marks){
 							var nodemark=node.marks[i].cloneNode(true);
