@@ -822,7 +822,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							break;
 						}
 					}
-					player.chooseCardButton('观星：选择要移动的牌（还能移动'+event.num+'张）',event.cards).set('filterButton',function(button){
+					player.chooseCardButton('观星：选择要移动的牌',event.cards).set('filterButton',function(button){
 						return !_status.event.chosen.contains(button.link);
 					}).set('chosen',event.chosen).set('ai',function(button){
 						return button.link==_status.event.choice?1:0;

@@ -1,11 +1,8 @@
 window.noname_update={
-    version:'1.9.45.1',
+    version:'1.9.45.2',
     update:'1.9.45',
     changeLog:[
-        'bug修复',
-        '自定义AI禁选（武将资料->禁用）',
-        '部分DIY比赛武将',
-        'players://["ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","hs_aiqinvyao"]',
+        'bug修复'
     ],
     files:[
         'game/game.js',
@@ -24,7 +21,7 @@ window.noname_update={
         // 'character/hearth.js',
         // 'character/gwent.js',
         'character/diy.js',
-        // 'character/standard.js',
+        'character/standard.js',
         // 'character/sp.js',
         // 'character/swd.js',
         // 'character/rank.js',
