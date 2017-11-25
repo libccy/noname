@@ -43,7 +43,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_wenchou:['male','qun',2,['nsguanyong','dualside'],['unseen']],
 
 			ns_caocao:['male','wei',4,['nscaiyi','nsgefa','nshaoling']],
-			ns_caocaosp:['male','wei',3,['nsjianxiong','nsxionglue']],
+			ns_caocaosp:['male','qun',3,['nsjianxiong','nsxionglue']],
 			ns_zhugeliang:['male','shu',3,['nsguanxing','kongcheng','nsyunxing']],
 			ns_wangyue:['male','qun',4,['nsjianshu','nscangjian']],
 			ns_yuji:['male','qun',3,['nsyaowang','nshuanhuo']],
@@ -127,11 +127,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 9-get.value(card);
 						},
 						filter:function(event,player){
-							if(!player.getCards('h')) return false;
-							if(player.getStat().skill.nsbugua_use){
-								return player.hasSkill('nsbugua_twice');
+							if(!player.storage.nstuiyan2_done&&player.getStat().skill.nsbugua_use){
+								return false;
 							}
-							return true;
+							return player.countCards('h');
 						},
 						content:function(){
 							'step 0'
@@ -213,19 +212,75 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				onremove:function(player){
 					delete player.storage.nstuiyan;
+					delete player.storage.nstuiyan_done;
 					delete player.storage.nstuiyan2;
+					delete player.storage.nstuiyan2_done;
 				},
 				intro:{
 					mark:function(dialog,content,player){
-						dialog.addText('上一张点数：'+player.storage.nstuiyan);
-						dialog.addText('总点数：'+player.storage.nstuiyan2);
+						if(player.storage.nstuiyan_done){
+							dialog.addText('推演摸牌已结束');
+						}
+						else{
+							dialog.addText('上一张点数：'+player.storage.nstuiyan);
+						}
+						if(player.storage.nstuiyan2_done){
+							dialog.addText('总点数8的倍数已达成');
+						}
+						else{
+							dialog.addText('总点数：'+player.storage.nstuiyan2);
+						}
 					},
 					content:function(storage,player){
-						return '上一张牌点数：'+storage+'；总点数：'+player.storage.nstuiyan2;
+						var str='';
+						if(player.storage.nstuiyan_done){
+							str+='推演摸牌已结束；'
+						}
+						else{
+							str+='上一张牌点数：'+storage+'；';
+						}
+						if(player.storage.nstuiyan2_done){
+							str+='总点数8的倍数已达成';
+						}
+						else{
+							str+='总点数：'+player.storage.nstuiyan2;
+						}
+						return str;
+					},
+					markcount:function(storage,player){
+						if(player.storage.nstuiyan2_done){
+							if(player.storage.nstuiyan_done){
+								return 0;
+							}
+							else{
+								return player.storage.nstuiyan;
+							}
+						}
+						else{
+							return player.storage.nstuiyan2;
+						}
 					}
 				},
 				group:['nstuiyan_use','nstuiyan_clear','nstuiyan_disable'],
 				subSkill:{
+					bugua:{
+						trigger:{player:'useCardAfter'},
+						direct:true,
+						filter:function(event,player){
+							return player.countCards('h');
+						},
+						content:function(){
+							'step 0'
+							player.removeSkill('nstuiyan_bugua');
+							player.chooseToDiscard('he','推演：是否发动一次【卜卦】？').set('ai',function(card){
+								return 8-get.value(card);
+							}).set('logSkill','nstuiyan');
+							'step 1'
+							if(result.bool){
+								event.insert(lib.skill.nsbugua.subSkill.use.content,{player:player});
+							}
+						}
+					},
 					use:{
 						trigger:{player:'useCard'},
 						silent:true,
@@ -242,10 +297,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							player.storage.nstuiyan=trigger.card.number;
 							player.storage.nstuiyan2+=trigger.card.number;
-							player.markSkill('nstuiyan');
 							if(player.storage.nstuiyan2%8==0){
-								player.addTempSkill('nsbugua_twice');
+								player.storage.nstuiyan2_done=true;
+								// player.addTempSkill('nstuiyan_bugua');
 							}
+							player.markSkill('nstuiyan');
 						}
 					},
 					clear:{
@@ -253,7 +309,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						silent:true,
 						content:function(){
 							delete player.storage.nstuiyan;
+							delete player.storage.nstuiyan_done;
 							delete player.storage.nstuiyan2;
+							delete player.storage.nstuiyan2_done;
 							player.unmarkSkill('nstuiyan');
 						}
 					},
@@ -265,6 +323,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						silent:true,
 						content:function(){
+							player.storage.nstuiyan_done=true;
 							player.addTempSkill('nstuiyan_fail');
 						},
 					},
@@ -3517,7 +3576,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nsbugua_use_info:'弃置一张手牌，并将牌堆顶的六张牌反面朝上逐张按先后顺序排放，然后抛骰子，展示牌序号与骰子显示的点数一致的牌，然后你根据这张牌的花色、点数随机获得牌堆中相应的一张牌',
 			nsbugua_info:'出牌阶段限一次，你可以弃置一张手牌，并将牌堆顶的六张牌反面朝上逐张按先后顺序排放，然后抛骰子，展示牌序号与骰子显示的点数一致的牌，然后你根据这张牌的花色、点数按以下规则随机获得牌堆中相应的一张牌：乾（红桃偶数）：无中生有；坤（黑桃奇数）：决斗；震（黑桃偶数）：南蛮入侵；巽（红桃奇数）：万箭齐发；坎（梅花偶数）：过河拆桥、兑（梅花奇数）：借刀杀人、艮（方片偶数）：顺手牵羊、离（方片奇数）：火攻。若牌堆中无此牌则摸一张牌，然后你观看未展示的另外五张牌并按任意顺序将其置于牌堆顶。',
 			nstuiyan:'推演',
-			nstuiyan_info:'锁定技，出牌阶段，若你使用的牌点数比上一张使用的牌点数大，你摸一张牌，否则你本回合不能再以此法摸牌；若你使用的牌点数之和刚好等于8的倍数，此回合你可发动【卜卦】的上限次数改为两次。',
+			nstuiyan_info:'锁定技，出牌阶段，若你使用的牌点数比上一张使用的牌点数大，你摸一张牌，否则你本回合不能再以此法摸牌；当你使用的牌点数首次达到8的倍数时，你额外获得一次【卜卦】的机会',
 			nstianji:'天机',
 			nstianji_info:'限定技，当一名其他角色进入濒死状态，你可自减一点体力上限，令其回复体力至1并增加一点体力上限',
 			nszhaoxin:'昭心',
