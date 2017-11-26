@@ -1245,6 +1245,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
+				delay:0,
 				filter:function(event,player){
 					return game.hasPlayer(function(current){
 						return current.sex=='male';
@@ -1260,33 +1261,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 'red';
 					});
 					"step 1"
-					var num=20;
-					var card;
-					event.cards=[];
-					while(num--){
-						card=get.cards(0);
-						event.cards.push(card);
-						if(get.color(card)==result.control) break;
-						else if(get.type(card,'trick')==result.control) break;
+					event.card=get.cardPile(function(card){
+						if(get.color(card)==result.control) return true;
+						if(get.type(card,'trick')==result.control) return true;
+						return false;
+					},'cardPile');
+					if(!event.card){
+						event.finish();
+						return;
 					}
-					event.card=card;
-					player.showCards(event.cards);
+					player.showCards([event.card]);
+					"step 2"
 					player.chooseTarget(true,'选择一名男性角色送出'+get.translation(event.card),function(card,player,target){
 						return target.sex=='male';
 					}).set('ai',function(target){
 						var att=get.attitude(_status.event.player,target);
 						if(_status.event.neg) return -att;
 						return att;
-					}).set('neg',get.value(card,player,'raw')<0);
-					"step 2"
-					player.line(result.targets,'green');
-					result.targets[0].$gain2(event.card);
-					for(var i=0;i<cards.length-1;i++){
-						cards[i].discard();
-					}
-					game.delay(0,1000);
+					}).set('neg',get.value(event.card,player,'raw')<0);
 					"step 3"
-					result.targets[0].gain(event.card,'log');
+					player.line(result.targets,'green');
+					result.targets[0].gain(event.card,'gain2');
 
 				},
 				ai:{
@@ -1551,7 +1546,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reguicai_info:'在任意角色的判定牌生效前，你可以打出一张牌代替之',
 			zhuhai_info:'一名其他角色的结束阶段开始时，若该角色本回合造成过伤害，你可以对其使用一张【杀】。',
 			qianxin_info:'觉醒技，当你造成一次伤害后，若你已受伤，你须减1点体力上限，并获得技能“荐言”。',
-			jianyan_info:'出牌阶段限一次，你可以声明一种牌的类别或颜色，然后连续亮出牌堆顶的牌，直到亮出符合你声明的牌为止，选择一名男性角色，该角色获得此牌',
+			jianyan_info:'出牌阶段限一次，你可以声明一种牌的类别或颜色，并亮出牌库中第一张符合你声明的牌，然后你令一名男性角色获得此牌',
 			rekurou_info:'出牌阶段限一次，你可以弃置一张牌，然后失去1点体力。',
 			zhaxiang_info:'锁定技 每当你失去1点体力后，你摸三张牌。然后若此时是你的出牌阶段，则直到回合结束，你使用红色【杀】无距离限制且不能被【闪】响应，你可以额外使用一张【杀】。',
 			qiaomeng_info:'每当你使用黑色【杀】对一名角色造成伤害后，你可以弃置该角色装备区里的一张牌，若此牌是坐骑牌，你于此牌置入弃牌堆时获得之。',

@@ -2953,6 +2953,7 @@
 							}
 							else{
 								ui.roundmenu.style.display='none';
+								alert('关闭触屏按钮后可通过手势打开菜单（默认为下划）')
 							}
 						}
 					},
@@ -13841,7 +13842,7 @@
 
 					return this;
 				},
-				smoothAvatar:function(vice){
+				smoothAvatar:function(vice,video){
 					var div=ui.create.div('.fullsize');
 					div.style.background=getComputedStyle(this.node.avatar).background;
 					if(vice){
@@ -13858,7 +13859,9 @@
 							div.remove();
 						},2000);
 					},100);
-					game.addVideo('smoothAvatar',this,vice);
+					if(video!=false){
+						game.addVideo('smoothAvatar',this,vice);
+					}
 				},
 				changeSeat:function(position,video){
 					var player=this;
@@ -14025,21 +14028,61 @@
                     this.node.nameol.innerHTML=str||this.nickname||'';
                     return this;
                 },
-                setAvatar:function(name,name2){
+                setAvatar:function(name,name2,video){
                     var node;
     				if(this.name2==name){
     					node=this.node.avatar2;
+						this.smoothAvatar(true,video);
     				}
     				else if(this.name==name){
     					node=this.node.avatar;
+						this.smoothAvatar(false,video);
     				}
                     if(node){
 						node.setBackground(name2,'character');
 						if(this==game.me&&ui.fakeme){
 							ui.fakeme.style.backgroundImage=node.style.backgroundImage;
 						}
+						if(video!=false){
+							game.addVideo('setAvatar',this,[name,name2]);
+						}
 					}
+					game.broadcast(function(player,name,name2){
+						player.setAvatar(name,name2,false);
+					},this,name,name2);
                 },
+				setAvatarQueue:function(name, list){
+					var node;
+					var player=this;
+					if(player.name2==name){
+						node=player.node.avatar2;
+					}
+					else{
+						node=player.node.avatar;
+					}
+					if(node._avatarqueue){
+						for(var i=0;i<list.length;i++){
+							node._avatarqueue.push(list[i]);
+						}
+					}
+					else{
+						var func=function(){
+							if(node._avatarqueue.length){
+								player.setAvatar(name,node._avatarqueue.shift(),false);
+							}
+							else{
+								clearInterval(node._avatarqueueinterval);
+								delete node._avatarqueue;
+								delete node._avatarqueueinterval;
+								player.setAvatar(name,name);
+							}
+						};
+						node._avatarqueue=list.slice(0);
+						node._avatarqueueinterval=setInterval(func,1000);
+						func();
+					}
+					game.addVideo('setAvatarQueue',this,[name,list]);
+				},
 				update:function(){
 					if(_status.video&&arguments.length==0) return;
 					if(this.hp>=this.maxHp) this.hp=this.maxHp;
@@ -24182,6 +24225,16 @@
 					}
 				}
 			},
+			setAvatar:function(player,content){
+				if(player&&content&&content.length==2){
+					player.setAvatar(content[0],content[1])
+				}
+			},
+			setAvatarQueue:function(player,content){
+				if(player&&content&&content.length==2){
+					player.setAvatarQueue(content[0],content[1])
+				}
+			},
 			addSubPlayer:function(player,content){
 				if(player&&content&&content[0]&&content[1]&&
 					content[2]&&content[3]&&content[4]){
@@ -29135,15 +29188,37 @@
 					ul.appendChild(li);
 				}
 				var dialog=ui.create.dialog(caption,'hidden');
-				dialog.content.appendChild(ul);
+				var lic=ui.create.div(dialog.content);
+				lic.style.display='block';
+				ul.style.display='inline-block';
+				ul.style.marginLeft='-40px';
+				lic.appendChild(ul);
 				if(players){
-					dialog.addSmall([players,'character']);
+					for(var i=0;i<players.length;i++){
+						if(!lib.character[players[i]]){
+							players.splice(i--,1);
+						}
+					}
+					if(players.length){
+						dialog.addSmall([players,'character']);
+						dialog.classList.add('forcebutton');
+						dialog.classList.add('withbg');
+					}
 				}
 				if(cards){
 					for(var i=0;i<cards.length;i++){
-						cards[i]=[get.translation(get.type(cards[i])),'',cards[i]]
+						if(!lib.card[cards[i]]){
+							cards.splice(i--,1);
+						}
 					}
-					dialog.addSmall([cards,'vcard']);
+					if(cards.length){
+						for(var i=0;i<cards.length;i++){
+							cards[i]=[get.translation(get.type(cards[i])),'',cards[i]]
+						}
+						dialog.addSmall([cards,'vcard']);
+						dialog.classList.add('forcebutton');
+						dialog.classList.add('withbg');
+					}
 				}
 				dialog.open();
 				var hidden=false;

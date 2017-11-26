@@ -1479,8 +1479,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						}
     					}
     					player.storage.huashen.owned[name]=skills;
-    					player.popup(name);
+    					// player.popup(name);
     					game.log(player,'获得了一个化身');
+                        if(lib.character[player.name2]&&lib.character[player.name2][3].contains('huashen')){
+                            player.setAvatarQueue(player.name2,[name]);
+                        }
+                        else{
+                            player.setAvatarQueue(player.name,[name]);
+                        }
     				}
     			},
     			group:['huashen1','huashen2'],
@@ -1617,6 +1623,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             }
                             player.addAdditionalSkill('huashen',link);
                             player.logSkill('huashen2');
+                            if(lib.character[player.name2]&&lib.character[player.name2][3].contains('huashen')){
+                                player.setAvatarQueue(player.name2,[currentname]);
+                            }
+                            else{
+                                player.setAvatarQueue(player.name,[currentname]);
+                            }
                             game.log(player,'获得技能','【'+get.translation(link)+'】');
                             player.popup(link);
 

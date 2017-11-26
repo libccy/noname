@@ -1367,18 +1367,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 content:function(){
                     'step 0'
                     if(player.storage.fumian_choice=='draw'){
-                        player.chooseControlList(get.prompt('fumian'),'摸牌阶段多摸一张牌','你使用红色牌可以多选择两个目标',function(event,player){
+                        player.chooseControlList(get.prompt('fumian'),'摸牌阶段多摸一张牌','使用红色牌可以多选择两个目标（限一次）',function(event,player){
                             if(player.hp==1||player.countCards('h')<=1) return 0;
                             return 1;
                         });
                     }
                     else if(player.storage.fumian_choice=='red'){
-                        player.chooseControlList(get.prompt('fumian'),'摸牌阶段多摸两张牌','你使用红色牌可以多选择一个目标',function(event,player){
+                        player.chooseControlList(get.prompt('fumian'),'摸牌阶段多摸两张牌','使用红色牌可以多选择一个目标（限一次）',function(event,player){
                             return 0;
                         });
                     }
                     else{
-                        player.chooseControlList(get.prompt('fumian'),'摸牌阶段多摸一张牌','你使用红色牌可以多选择一个目标',function(event,player){
+                        player.chooseControlList(get.prompt('fumian'),'摸牌阶段多摸一张牌','使用红色牌可以多选择一个目标（限一次）',function(event,player){
                             if(player.hp==1||player.countCards('h')<player.hp) return 0;
                             return 1;
                         });
@@ -1437,16 +1437,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             trigger.num+=player.storage.fumian_draw;
                         }
                     },
+                    red2:{},
                     red:{
                         trigger:{player:'useCard'},
             			direct:true,
                         mark:true,
                         onremove:true,
                         intro:{
-                            content:'你使用红色牌可以多选择#个目标'
+                            content:'你使用红色牌可以多选择#个目标（限一次）'
                         },
             			filter:function(event,player){
                             if(get.color(event.card)!='red') return false;
+                            if(player.hasSkill('fumian_red2')) return false;
                             var info=get.info(event.card);
                             if(info.allowMultiple==false) return false;
                             if(event.targets&&!info.multitarget){
@@ -1490,6 +1492,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             				if(event.targets){
             					player.logSkill('fumian',event.targets);
             					trigger.targets.addArray(event.targets);
+                                player.addTempSkill('fumian_red2');
             				}
             			}
                     }
@@ -9098,7 +9101,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             fuzhu:'伏诛',
             fuzhu_info:'一名男性角色的结束阶段，若牌堆剩余牌数不大于你体力值的十倍，则你可以依次对其使用牌堆中所有的【杀】（不能超过游戏人数），然后洗牌',
             fumian:'福绵',
-            fumian_info:'准备阶段，你可以选择一项：1.摸牌阶段多摸一张牌；2.使用红色牌可以多选择一个目标。若与你上回合选择的选项不同，则该选项数值+1并复原此技能',
+            fumian_info:'准备阶段，你可以选择一项：1.摸牌阶段多摸一张牌；2.使用红色牌可以多选择一个目标（限一次）。若与你上回合选择的选项不同，则该选项数值+1并复原此技能',
             daiyan:'怠宴',
             daiyan_info:'结束阶段，你可以令一名其他角色从牌堆中获得一张红桃基本牌，然后若其于上回合成为过该技能目标，则其失去1点体力',
             zhongjian:'忠鉴',

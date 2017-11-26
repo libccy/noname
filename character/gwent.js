@@ -1011,8 +1011,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						else if(button.link[2]=='gw_wenyi'){
 							if(game.countPlayer(function(current){
-								if(current.isMinHp()&&current.countCards('he')){
-									return -get.sgn(get.attitude(player,current));
+								if(current.isMinHp()){
+									if(!current.countCards('h')){
+										return -2*get.sgn(get.attitude(player,current));
+									}
+									else{
+										return -get.sgn(get.attitude(player,current));
+									}
 								}
 							})>0){
 								return 2;

@@ -1467,13 +1467,13 @@ div:not(.handcards)>.card>.info>span,
 	overflow: visible;
 }
 .mark-container.marks>div>.markcount.menubutton {
-	font-size: 18px;
-	width: 24px;
-	height: 24px;
-	line-height: 28px;
-	position: absolute;
-	left: 32px;
-	top: 28px;
+	font-size: 12px;
+    width: 16px;
+    height: 16px;
+    line-height: 18px;
+    position: absolute;
+    left: 36px;
+    top: 34px;
 	border-radius: 100%;
 }
 .mark-container.marks>.card.fullskin>.image{

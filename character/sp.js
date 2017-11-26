@@ -5539,13 +5539,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					trigger:{source:'damageBegin'},
     					direct:true,
     					filter:function(event,player){
-    						if(!player.countCards('h',{color:'black'})) return false;
-    						return event.player.hp>=player.hp&&player!=event.player;
+                            if(!player.hasSkill('fenxin_nei')){
+                                if(!player.countCards('h',{color:'black'})) return false;
+                            }
+    						return (event.player.hp>=player.hp||player.hasSkill('fenxin_fan'))&&player!=event.player;
     					},
     					content:function(){
     						'step 0'
     						var goon=(get.attitude(player,trigger.player)<0);
-    						var next=player.chooseToDiscard(get.prompt('jieyuan',trigger.player),{color:'black'});
+    						var next=player.chooseToDiscard(get.prompt('jieyuan',trigger.player));
+                            if(!player.hasSkill('fenxin_nei')){
+                                next.set('filterCard',function(card){
+                                    return get.color(card)=='black';
+                                });
+                                next.set('prompt2','弃置一张黑色手牌令伤害+1');
+                            }
+                            else{
+                                next.set('prompt2','弃置一张手牌令伤害+1');
+                            }
     						next.set('ai',function(card){
     							if(_status.event.goon){
     								return 8-get.value(card);
@@ -5564,14 +5575,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					audio:true,
     					trigger:{player:'damageBegin'},
     					filter:function(event,player){
-    						if(!player.countCards('h',{color:'red'})) return false;
-    						return event.source&&event.source.hp>=player.hp&&player!=event.source;
+                            if(!player.hasSkill('fenxin_nei')){
+                                if(!player.countCards('h',{color:'red'})) return false;
+                            }
+    						return event.source&&(event.source.hp>=player.hp||player.hasSkill('fenxin_zhong'))&&player!=event.source;
     					},
     					direct:true,
     					content:function(){
     						"step 0"
-    						var next=player.chooseToDiscard('竭缘：是否弃置一张红色手牌令伤害-1？',{color:'red'});
-    						next.set('ai',function(card){
+    						var next=player.chooseToDiscard(get.prompt('jieyuan'),{color:'red'});
+                            if(!player.hasSkill('fenxin_nei')){
+                                next.set('filterCard',function(card){
+                                    return get.color(card)=='red';
+                                });
+                                next.set('prompt2','弃置一张红色手牌令伤害-1');
+                            }
+                            else{
+                                next.set('prompt2','弃置一张手牌令伤害-1');
+                            }
+                            next.set('ai',function(card){
     							var player=_status.event.player;
     							if(player.hp==1||_status.event.getTrigger().num>1){
     								return 9-get.value(card);
@@ -5584,7 +5606,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						next.logSkill='jieyuan_less';
     						"step 1"
     						if(result.bool){
-    							game.delay();
     							trigger.num--;
     						}
     					}
@@ -5595,7 +5616,40 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				threaten:1.5
     			}
     		},
-    		fenxin:{
+            fenxin:{
+                mode:['identity'],
+                trigger:{global:'dieAfter'},
+                filter:function(event,player){
+                    return ['fan','zhong','nei'].contains(event.player.identity)&&!player.hasSkill('fenxin_'+event.player.identity);
+                },
+                forced:true,
+                content:function(){
+                    player.addSkill('fenxin_'+trigger.player.identity);
+                    player.markSkill('fenxin');
+                },
+                intro:{
+                    mark:function(dialog,content,player){
+                        if(player.hasSkill('fenxin_zhong')){
+                            dialog.addText('你发动“竭缘”减少伤害无体力值限制');
+                        }
+                        if(player.hasSkill('fenxin_fan')){
+                            dialog.addText('你发动“竭缘”增加伤害无体力值限制');
+                        }
+                        if(player.hasSkill('fenxin_nei')){
+                            dialog.addText('将“竭缘”中的黑色手牌和红色手牌改为一张牌');
+                        }
+                    }
+                },
+                subSkill:{
+                    fan:{},
+                    zhong:{},
+                    nei:{}
+                },
+                ai:{
+                    combo:'jieyuan'
+                }
+            },
+    		fenxin_old:{
     			mode:['identity'],
     			trigger:{source:'dieBegin'},
     			init:function(player){
@@ -9732,8 +9786,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		jieyuan_more:'竭缘',
     		jieyuan_less:'竭缘',
     		jieyuan_info:'当你对一名其他角色造成伤害时，若其体力值大于或等于你的体力值，你可弃置一张黑色手牌令此伤害+1；当你受到一名其他角色造成的伤害时，若其体力值大于或等于你的体力值，你可弃置一张红色手牌令此伤害-1。',
-    		fenxin:'焚心',
-    		fenxin_info:'限定技，当你杀死一名非主公角色时，在其翻开身份牌之前，你可以与该角色交换身份牌。（你的身份为主公时不能发动此技能）',
+            fenxin:'焚心',
+    		fenxin_info:'锁定技，一名其他角色死亡后，若其身份为：忠臣，你发动“竭缘”减少伤害无体力值限制；反贼，你发动“竭缘”增加伤害无体力值限制；内奸，将“竭缘”中的黑色手牌和红色手牌改为一张牌。',
+    		fenxin_old_info:'限定技，当你杀死一名非主公角色时，在其翻开身份牌之前，你可以与该角色交换身份牌。（你的身份为主公时不能发动此技能）',
     		shixin:'释衅',
     		shixin_info:'锁定技，当你受到火属性伤害时，你防止此伤害',
     		qingyi:'轻逸',

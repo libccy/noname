@@ -1746,11 +1746,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'spell_bronze',
 				enable:true,
 				filterTarget:function(card,player,target){
-					return target.isMinHp()&&target.countCards('h');
+					return target.isMinHp();
 				},
 				selectTarget:-1,
 				content:function(){
-					target.randomDiscard('h');
+					if(target.countCards('h')){
+						target.randomDiscard('h');
+					}
+					else{
+						target.loseHp();
+					}
 				},
 				ai:{
 					basic:{
@@ -1759,7 +1764,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						useful:[4,1],
 					},
 					result:{
-						target:-1
+						target:function(player,target){
+							if(target.countCards('h')) return -1;
+							return -2;
+						}
 					},
 					tag:{
 						multitarget:1,
@@ -1832,36 +1840,43 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				nopop:true,
 				intro:{
-					content:'不能成为其他角色的普通锦囊牌的目标（剩余#回合）'
+					content:'防止所有非属性伤害（剩余个#角色的回合）'
 				},
-				mod:{
-    				targetEnabled:function(card,player,target,now){
-    					if(player!=target){
-    						if(get.type(card)=='trick') return false;
-    					}
-    				}
-    			},
 				init:function(player){
-					// if(game.players.length>=6){
-					// 	player.storage.gw_kunenfayin=3;
-					// }
-					// else{
-					// 	player.storage.gw_kunenfayin=2;
-					// }
-					player.storage.gw_kunenfayin=3;
+					player.storage.gw_kunenfayin=Math.min(5,game.countPlayer());
 				},
-				trigger:{player:'phaseEnd'},
+				trigger:{player:'damageBefore'},
+				filter:function(event){
+					return !event.nature;
+				},
 				forced:true,
-				popup:false,
 				content:function(){
-					player.storage.gw_kunenfayin--;
-					if(player.storage.gw_kunenfayin>0){
-						player.updateMarks();
-					}
-					else{
-						player.removeSkill('gw_kunenfayin');
+					trigger.cancel();
+				},
+				ai:{
+					nodamage:true,
+					effect:{
+						target:function(card,player,target,current){
+							if(get.tag(card,'damage')&&!get.tag(card,'natureDamage')) return [0,0];
+						}
+					},
+				},
+				subSkill:{
+					count:{
+						trigger:{global:'phaseEnd'},
+						silent:true,
+						content:function(){
+							player.storage.gw_kunenfayin--;
+							if(player.storage.gw_kunenfayin>0){
+								player.updateMarks();
+							}
+							else{
+								player.removeSkill('gw_kunenfayin');
+							}
+						},
 					}
 				},
+				group:'gw_kunenfayin_count',
 				onremove:true
 			},
 			gw_baobaoshu:{
@@ -2226,13 +2241,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_ciguhanshuang_bg:'霜',
 			gw_ciguhanshuang_info:'天气牌，出牌阶段对一名角色及其相邻角色使用，目标下个摸牌阶段摸牌数-1',
 			gw_wenyi:'瘟疫',
-			gw_wenyi_info:'令所有体力值为全场最少的角色随机弃置一张手牌',
+			gw_wenyi_info:'令所有体力值为全场最少的角色随机弃置一张手牌；若没有手牌，改为失去一点体力',
 			gw_yanziyaoshui:'燕子药水',
 			gw_yanziyaoshui_info:'令一名角色摸一张牌，若其手牌数为全场最少或之一，改为摸两张',
 			gw_shanbengshu:'山崩术',
 			gw_shanbengshu_info:'出牌阶段对自己使用，随机弃置两件敌方角色场上的装备',
 			gw_kunenfayin:'昆恩法印',
-			gw_kunenfayin_info:'出牌阶段对一名角色使用，目标不能成为其他角色的普通锦囊牌的目标，持续3回合',
+			gw_kunenfayin_info:'出牌阶段对一名角色使用，目标防止所有非属性伤害，持续X个角色的回合（X为存活角色数且最多为5）',
 		},
 		cardType:{
 			spell:0.5,

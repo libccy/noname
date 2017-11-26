@@ -121,17 +121,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					use:{
 						enable:'phaseUse',
-						usable:2,
+						usable:1,
 						filterCard:true,
 						check:function(card){
 							return 9-get.value(card);
 						},
 						filter:function(event,player){
-							if(!player.storage.nstuiyan2_done&&player.getStat().skill.nsbugua_use){
-								return false;
-							}
-							return player.countCards('h');
+							// if(!player.storage.nstuiyan2_done&&player.getStat().skill.nsbugua_use){
+							// 	return false;
+							// }
+							return player.countCards('he');
 						},
+						position:'he',
 						content:function(){
 							'step 0'
 							player.throwDice();
@@ -206,7 +207,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return _status.currentPhase==player&&event.getParent('phaseUse',true)&&!player.hasSkill('nstuiyan_fail')&&
 						typeof player.storage.nstuiyan=='number'&&event.card.number>player.storage.nstuiyan;
 				},
-				forced:true,
+				frequent:true,
 				content:function(){
 					player.draw();
 				},
@@ -297,9 +298,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							player.storage.nstuiyan=trigger.card.number;
 							player.storage.nstuiyan2+=trigger.card.number;
-							if(player.storage.nstuiyan2%8==0){
+							if(player.storage.nstuiyan2%8==0&&!player.storage.nstuiyan2_done){
 								player.storage.nstuiyan2_done=true;
-								// player.addTempSkill('nstuiyan_bugua');
+								player.addTempSkill('nstuiyan_bugua');
 							}
 							player.markSkill('nstuiyan');
 						}
@@ -3576,7 +3577,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nsbugua_use_info:'弃置一张手牌，并将牌堆顶的六张牌反面朝上逐张按先后顺序排放，然后抛骰子，展示牌序号与骰子显示的点数一致的牌，然后你根据这张牌的花色、点数随机获得牌堆中相应的一张牌',
 			nsbugua_info:'出牌阶段限一次，你可以弃置一张手牌，并将牌堆顶的六张牌反面朝上逐张按先后顺序排放，然后抛骰子，展示牌序号与骰子显示的点数一致的牌，然后你根据这张牌的花色、点数按以下规则随机获得牌堆中相应的一张牌：乾（红桃偶数）：无中生有；坤（黑桃奇数）：决斗；震（黑桃偶数）：南蛮入侵；巽（红桃奇数）：万箭齐发；坎（梅花偶数）：过河拆桥、兑（梅花奇数）：借刀杀人、艮（方片偶数）：顺手牵羊、离（方片奇数）：火攻。若牌堆中无此牌则摸一张牌，然后你观看未展示的另外五张牌并按任意顺序将其置于牌堆顶。',
 			nstuiyan:'推演',
-			nstuiyan_info:'锁定技，出牌阶段，若你使用的牌点数比上一张使用的牌点数大，你摸一张牌，否则你本回合不能再以此法摸牌；当你使用的牌点数首次达到8的倍数时，你额外获得一次【卜卦】的机会',
+			nstuiyan_info:'出牌阶段，若你使用的牌点数比上一张使用的牌点数大，你可以摸一张牌，反之你本回合不能再以此法摸牌；当你使用的牌点数首次达到8的倍数时，你可以在结算后立即发动一次【卜卦】',
 			nstianji:'天机',
 			nstianji_info:'限定技，当一名其他角色进入濒死状态，你可自减一点体力上限，令其回复体力至1并增加一点体力上限',
 			nszhaoxin:'昭心',
