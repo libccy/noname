@@ -18393,6 +18393,13 @@
 
                         dx=this.offsetLeft+this.offsetWidth/2-52-node.offsetLeft;
     					dy=this.offsetTop+this.offsetHeight/2-52-node.offsetTop;
+
+						if(get.is.mobileMe(this)){
+							dx+=get.cardOffset();
+							if(ui.arena.classList.contains('oblongcard')){
+								dy-=16;
+							}
+						}
                     }
 					node.style.transitionDuration='0.8s';
 					ui.refresh(node);
@@ -18796,6 +18803,12 @@
 						else{
                             dx=this.offsetLeft+this.offsetWidth/2-52-nx;
     						dy=this.offsetTop+this.offsetHeight/2-52-ny;
+							if(get.is.mobileMe(this)){
+								dx+=get.cardOffset();
+								if(ui.arena.classList.contains('oblongcard')){
+									dy-=16;
+								}
+							}
                         }
 						if(node.style.transform&&node.style.transform!='none'&&node.style.transform.indexOf('translate')==-1){
 							node.style.transform+=' translate('+dx+'px,'+dy+'px)';
@@ -18834,6 +18847,12 @@
 						else{
                             dx=this.offsetLeft+this.offsetWidth/2-52-nx;
     						dy=this.offsetTop+this.offsetHeight/2-52-ny;
+							if(get.is.mobileMe(this)){
+								dx+=get.cardOffset();
+								if(ui.arena.classList.contains('oblongcard')){
+									dy-=16;
+								}
+							}
                         }
 						if(node.style.transform&&node.style.transform!='none'&&node.style.transform.indexOf('translate')==-1){
 							node.style.transform+=' translate('+dx+'px,'+dy+'px)';
@@ -20106,6 +20125,13 @@
 						dx=player.offsetLeft+player.offsetWidth/2-52-this.offsetLeft;
 						dy=player.offsetTop+player.offsetHeight/2-52-this.offsetTop;
 					}
+					if(get.is.mobileMe(player)){
+						dx+=get.cardOffset();
+						if(ui.arena.classList.contains('oblongcard')){
+							dy-=16;
+						}
+					}
+
 
 					if(this.style.transform&&this.style.transform!='none'&&this.style.transform.indexOf('translate')==-1){
 						this.style.transform+=' translate('+dx+'px,'+dy+'px)';
@@ -42747,6 +42773,11 @@
 				}
 			}
 			return list;
+		},
+		cardOffset:function(){
+			var x=ui.arena.getBoundingClientRect();
+			var y=ui.window.getBoundingClientRect();
+			return -y.width/2+(x.left+x.width/2);
 		},
 		colorspan:function(str){
 			if(str[0]=='#'){

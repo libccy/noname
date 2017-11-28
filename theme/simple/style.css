@@ -122,11 +122,11 @@ body{
 
 .card:empty,.card.infohidden{
     background: url('../style/cardback/image/official.png');
-    background-size: cover;
+    background-size: 100% 100%;
 }
 .card.infohidden:not(.infoflip){
 	background: url('../style/cardback/image/official2.png');
-	background-size: cover;
+	background-size: 100% 100%;
 }
 
 #system>div>.glow {
