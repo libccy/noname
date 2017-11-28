@@ -16,7 +16,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
     		swd_chenjingchou:['male','wu',3,['youyin','yihua']],
     		swd_duguningke:['female','qun',3,['nlianji','touxi']],
-    		swd_guyue:['male','wei',3,['gtiandao','qinyin','wangchen']],
+    		swd_guyue:['male','wei',3,['gtiandao','gxianyin','wangchen']],
     		swd_tuobayuer:['female','shu',4,['liuhong','poyue','niepan']],
     		swd_yuwentuo:['male','shu',4,['wushuang','xielei','kunlunjing']],
     		swd_yuxiaoxue:['female','wei',3,['huanhun','daixing','yinyue']],
@@ -223,6 +223,140 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		swd_luchengxuan:['swd_xiarou'],
     	},
     	skill:{
+            gxianyin:{
+                enable:'phaseUse',
+                usable:1,
+                delay:0,
+                content:function(){
+                    'step 0'
+                    var max=0;
+                    var choice='club';
+                    var map={
+                        club:0,
+                        heart:0,
+                        diamond:0,
+                        spade:0
+                    };
+                    for(var i in map){
+                        var hs=player.getCards('h',{suit:i});
+                        for(var j=0;j<hs.length;j++){
+                            var val=get.value(hs[j],player,'raw');
+                            if(val>7){
+                                map[i]=0;break;
+                            }
+                            else if(val<=5){
+                                map[i]++;
+                                if(val<=4){
+                                    map[i]+=0.5;
+                                }
+                                if(val<0){
+                                    map[i]+=2;
+                                }
+                            }
+                        }
+                        if(map[i]>max){
+                            choice=i;
+                            max=map[i];
+                        }
+                    }
+                    var controls=['heart2','spade2','diamond2','club2'];
+                    for(var i=0;i<controls.length;i++){
+                        if(!player.countCards('h',{suit:controls[i].slice(0,controls[i].length-1)})){
+                            controls.splice(i--,1);
+                        }
+                    }
+                    if(!controls.contains(choice)){
+                        choice=controls.randomGet();
+                    }
+                    player.chooseControl(controls,function(){
+                        return choice;
+                    }).set('prompt','移去一种花色的手牌');
+                    'step 1'
+                    var hs=player.getCards('h',{suit:result.control.slice(0,result.control.length-1)});
+                    if(hs.length){
+                        player.lose(hs,ui.discardPile)._triggered=null;
+                        player.$throw(hs);
+                        game.log(player,'移去了',hs);
+                    }
+                    else{
+                        event.finish();
+                        return;
+                    }
+                    var controls=['heart2','spade2','diamond2','club2'];
+                    controls.remove(result.control);
+                    var rand=Math.random();
+                    var list=controls.slice(0);
+                    if(player.hasShan()){
+                        list.remove('diamond2')
+                    }
+                    player.chooseControl(controls,function(){
+                        if(!player.hasShan()&&controls.contains('diamond2')){
+                            return 'diamond2';
+                        }
+                        if(rand<0.5){
+                            return list[0];
+                        }
+                        if(rand<0.8){
+                            return list[1];
+                        }
+                        if(list.length>=3){
+                            return controls[2];
+                        }
+                        else{
+                            return controls[0];
+                        }
+                    }).set('prompt','选择一个花色从牌堆中获得'+hs.length+'张该花色的牌');
+                    event.num=hs.length;
+                    'step 2'
+                    if(result.control){
+                        var suit=result.control.slice(0,result.control.length-1);
+                        var cards=[];
+                        for(var i=0;i<event.num;i++){
+                            var card=get.cardPile(function(card){
+                                return get.suit(card)==suit;
+                            });
+                            if(card){
+                                ui.special.appendChild(card);
+                                cards.push(card);
+                            }
+                            else{
+                                break;
+                            }
+                        }
+                        if(cards.length){
+                            player.directgain(cards);
+                            player.$draw(cards.length);
+                            game.delay();
+                            game.log(player,'获得了'+get.cnNumber(cards.length)+'张','#y'+get.translation(suit+'2')+'牌');
+                        }
+                    }
+                },
+                ai:{
+                    order:7,
+                    result:{
+                        player:function(player){
+                            var list=['club','heart','diamond','spade'];
+                            for(var i=0;i<list.length;i++){
+                                var hs=player.getCards('h',{suit:list[i]});
+                                var bool=false;
+                                for(var j=0;j<hs.length;j++){
+                                    var val=get.value(hs[j],player);
+                                    if(val>7){
+                                        bool=false;break;
+                                    }
+                                    else if(val<=4){
+                                        bool=true;
+                                    }
+                                }
+                                if(bool){
+                                    return 1;
+                                }
+                            }
+                            return 0;
+                        }
+                    }
+                }
+            },
     		yeying:{
     			enable:'phaseUse',
     			usable:1,
@@ -4466,6 +4600,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			direct:true,
     			filter:function(event,player){
     				if(event.cards){
+                        // if(!get.is.altered('wangchen')) return true;
     					for(var i=0;i<event.cards.length;i++){
     						if(get.type(event.cards[i])=='basic') return true;
     					}
@@ -4475,25 +4610,52 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			alter:true,
     			content:function(){
     				"step 0"
-    				player.chooseTarget(get.prompt('wangchen')).ai=function(target){
-    					if(get.is.altered('wangchen')){
-    						return -get.attitude(player,target)/Math.sqrt(target.hp);
-    					}
+    				player.chooseTarget(get.prompt('wangchen'),function(card,player,target){
+                        return target!=player;
+                    }).ai=function(target){
+    					// if(get.is.altered('wangchen')){
+    					// 	return -get.attitude(player,target)/Math.sqrt(target.hp);
+    					// }
                         if(target.hasSkillTag('noturn')) return 0;
     					return get.attitude(player,target)*(target.isTurnedOver()?1:-1);
+                        // return -get.attitude(player,target)*get.threaten(target,player);
     				}
     				"step 1"
     				if(result.bool){
     					var target=result.targets[0]
     					player.logSkill('wangchen',target);
+                        // target.out('wangchen');
+                        // if(!player.storage.wangchen){
+                        //     player.storage.wangchen=[];
+                        // }
+                        // player.storage.wangchen.push(target);
+    					target.turnOver();
     					if(get.is.altered('wangchen')){
-    						target.loseHp();
-    					}
-    					else{
-    						target.turnOver();
+    						target.changeHujia();
     					}
     				}
     			},
+                // group:'wangchen_in',
+                // onremove:function(player){
+                //     for(var i=0;i<player.storage.wangchen.length;i++){
+                //         player.storage.wangchen[i].in('wangchen');
+                //     }
+                //     delete player.storage.wangchen;
+                // },
+                // subSkill:{
+                //     in:{
+                //         trigger:{player:['phaseBegin','dieBegin']},
+                //         direct:true,
+                //         filter:function(event,player){
+                //             return Array.isArray(player.storage.wangchen);
+                //         },
+                //         content:function(){
+                //             for(var i=0;i<player.storage.wangchen.length;i++){
+                //                 player.storage.wangchen[i].in('wangchen');
+                //             }
+                //         }
+                //     }
+                // },
     			ai:{
     				expose:0.5,
     				threaten:2,
@@ -9278,6 +9440,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		swd_shuwaner:'舒莞儿',
     		swd_xiaohuanglong:'小黄龙',
 
+            gxianyin:'仙音',
+            gxianyin_info:'出牌阶段限一次，你可以选择一种花色，将你的手牌中该花色的牌移至弃牌堆，然后选择另一种花色，从牌堆中获得等量的该花色的牌',
+            // gxianyin_info_alter:'',
             mujia:'木甲',
             mujia_info:'锁定技，游戏开始时，你获得一个体力上限为3的云狐；你的手牌上限基数为云狐的体力值；你受到的伤害由云狐承担',
             xiufu:'修复',
@@ -9486,8 +9651,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		fushen_info:'回合开始前，你可以将自己移出游戏，并代替另一名角色进行一回合，然后流失一点体力',
     		fushen2:'附身',
     		wangchen:'忘尘',
-    		wangchen_info:'若你于弃牌阶段弃置了基本牌，可令一名角色翻面',
-    		wangchen_info_alter:'若你于弃牌阶段弃置了基本牌，可令一名角色失去一点体力',
+            wangchen_info:'弃牌阶段结束时，若你于此阶段弃置了基本牌，你可以令一名角色翻面',
+            wangchen_info_alter:'弃牌阶段结束时，若你于此阶段弃置了基本牌，你可以令一名角色翻面并获得一点护甲',
+    		// wangchen_info:'若你于弃牌阶段弃置了基本牌，可令一名角色翻面',
+    		// wangchen_info:'弃牌阶段结束时，若你于此阶段弃置了基本牌，可将一名其他角色移出游戏直到你死亡或下一回合开始',
     		guiyin:'归隐',
     		guiyin_info:'若你于弃牌阶段弃置了至少两张牌，你可以摸两张牌',
     		shejie:'设界',

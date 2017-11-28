@@ -2,9 +2,8 @@ window.noname_update={
     version:'1.9.45.3',
     update:'1.9.45',
     changeLog:[
-        '武将修改',
-        'players://["ns_guanlu","ns_caocaosp","re_xushu","wuxian","lingju"]',
-        'cards://["gw_kunenfayin","gw_wenyi"]',
+        // '武将修改',
+        // 'players://["swd_guyuesheng"]',
     ],
     files:[
         'game/game.js',
