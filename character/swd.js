@@ -3882,13 +3882,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				str+='的'+get.translation(trigger.card)+'失效'
     				var next=player.chooseToDiscard('he',{type:'equip'},get.prompt('gongshen'));
                     next.prompt2=str;
-    				next.logSkill='gongshen';
+    				next.logSkill=['gongshen',trigger.player];
+                    next.autodelay=true;
     				next.ai=function(card){
     					if(effect<0){
     						var val=9-get.value(card);
     						var nme=trigger.card.name;
-    						if(nme=='tao') return val;
-    						if(nme=='shunshou'&&player==trigger.targets[0]) return val;
+                            if(get.value(trigger.card)>=7&&get.type(trigger.card)=='trick') return val;
+                            if(nme=='tao') return val;
+                            if(nme=='wuzhong') return val;
+                            if(nme=='zengbin') return val;
+    						if(nme=='wangmeizhike') return val;
+                            if(nme=='shunshou'&&player==trigger.targets[0]) return val;
+    						if(nme=='guohe'&&player==trigger.targets[0]) return val;
     						if(nme=='liuxinghuoyu') return val;
     						if(nme=='nanman') return val;
     						if(nme=='wanjian') return val;
@@ -3897,7 +3903,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						if((nme=='juedou')&&(player==trigger.targets[0]||trigger.targets[0].hp==1)) return val;
     						if(nme=='chenhuodajie') return val;
     						if(nme=='lebu'&&trigger.targets[0].countCards('h')>trigger.targets[0].hp) return val;
-    						if(nme=='sha'&&trigger.targets[0].hp==1&&!trigger.targets[0].countCards('h','shan')) return val;
+    						if(nme=='sha'&&trigger.targets[0].hp==1&&!trigger.targets[0].hasShan()) return val;
     						if(nme=='jiedao'&&trigger.targets[0]==player) return val;
     						if(nme=='yihuajiemu'&&trigger.targets[0]==player) return val;
     						if(nme=='shuiyanqijun'&&trigger.targets.contains(player)) return val;
@@ -3907,14 +3913,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     				"step 1"
     				if(result.bool){
-    					game.delay(2);
+    					// game.delay(2);
     					trigger.cancel();
     				}
-    				else{
-    					event.finish();
-    				}
-    				"step 2"
-    				ui.clear();
     			},
     			ai:{
     				effect:{
@@ -9444,7 +9445,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             gxianyin_info:'出牌阶段限一次，你可以选择一种花色，将你的手牌中该花色的牌移至弃牌堆，然后选择另一种花色，从牌堆中获得等量的该花色的牌',
             // gxianyin_info_alter:'',
             mujia:'木甲',
-            mujia_info:'锁定技，游戏开始时，你获得一个体力上限为3的云狐；你的手牌上限基数为云狐的体力值；你受到的伤害由云狐承担',
+            mujia_info:'锁定技，游戏开始时，你获得一个体力上限为3的云狐；你弃牌阶段弃置的牌改为由云狐获得',
+            cqiaoxie:'巧械',
+            cqiaoxie_info:'出牌阶段限一次，你可以将一张锦囊牌当作零件袋使用；每当你使用一张零件牌，你获得一点技能点数',
             xiufu:'修复',
             xiufu_info:'出牌阶段，你可以弃置一张装备牌或机关牌，令云狐回复一点体力',
             yhshengong:'神工',

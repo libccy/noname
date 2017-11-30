@@ -1529,7 +1529,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			mark:true
     		},
     		huashen1:{
-    			trigger:{global:['gameStart','phaseBefore']},
+    			trigger:{global:['gameStart','phaseBefore'],player:'enterGame'},
     			forced:true,
     			popup:false,
     			priority:10,
@@ -1597,7 +1597,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                                 currentname=event.dialog.querySelector('.selected.button').link;
                             }
                             var mark=player.marks.huashen;
-                            if(trigger.name=='game'){
+                            if(trigger.name=='game'||trigger.name=='enterGame'){
                                 mark.hide();
                                 // mark.style.transform='scale(0.8)';
                                 mark.style.transition='all 0.3s';

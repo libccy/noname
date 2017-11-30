@@ -3810,7 +3810,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var noneed=(trigger.card.name=='tao'&&trigger.targets[0]==player&&player.hp==player.maxHp-1);
 					player.chooseTarget(get.prompt('runxin'),function(card,player,target){
 						return target.hp<target.maxHp
-					}).ai=function(target){
+					}).set('autodelay',true).ai=function(target){
 						var num=get.attitude(player,target);
 						if(num>0){
 							if(noneed&&player==target){

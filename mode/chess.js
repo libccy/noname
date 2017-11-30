@@ -15,6 +15,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     		// }
     		if(lib.config.test_game){
     			_status.mode='combat';
+                game.saveConfig('additional_player',false,true);
     		}
     		if(_status.mode=='combat'){
     			_status.first_less=true;
