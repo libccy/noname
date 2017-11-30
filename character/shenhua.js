@@ -48,6 +48,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		sp_zhugeliang:['pangtong'],
     		sunce:['zhouyu','taishici','daqiao']
     	},
+        characterFilter:{
+            zuoci:function(){
+                return get.mode()!='guozhan';
+            }
+        },
     	characterIntro:{
     		huangzhong:'字汉升，今河南南阳人。汉末三国时期蜀汉名将。本为刘表部下中郎将，后归刘备，并助刘备攻益州刘璋，在定军山一战中阵斩曹操部下名将夏侯渊。备称汉中王后改封后将军，赐关内侯。',
     		weiyan:'字文长，义阳人。三国时期蜀汉名将，诸葛亮死后，魏延因被陷害谋反而遭杨仪一党所杀。',
@@ -1531,11 +1536,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                                 }
                             }
                         }
-    					var skill=player.additionalSkills.huashen[0];
-    					if(skill){
-    						dialog.add('<div><div class="skill">【'+get.translation(skill)+
-    						'】</div><div>'+lib.translate[skill+'_info']+'</div></div>');
-    					}
+                        if(player.additionalSkills.huashen){
+                            var skill=player.additionalSkills.huashen[0];
+        					if(skill){
+        						dialog.add('<div><div class="skill">【'+get.translation(skill)+
+        						'】</div><div>'+lib.translate[skill+'_info']+'</div></div>');
+        					}
+                        }
     				}
     			},
     			mark:true
@@ -1761,7 +1768,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             var sub=player.storage.huashen.owned[list[i]];
                             skills.addArray(sub);
                             for(var j=0;j<sub.length;j++){
-                                map[sub]=list[i];
+                                map[sub[j]]=list[i];
                             }
                         }
                         var add=player.additionalSkills.huashen;

@@ -36924,6 +36924,7 @@
 						if(lib.character[i][4].contains('stonehidden')) continue;
 						if(lib.character[i][4].contains('unseen')) continue;
 						if(lib.config.banned.contains(i)) continue;
+						if(lib.characterFilter[i]&&!lib.characterFilter[i]()) continue;
 						if(filter&&filter(i)) continue;
 						list.push(i);
 						if(namecapt.indexOf(getCapt(i))==-1){

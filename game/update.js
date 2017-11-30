@@ -1,9 +1,9 @@
 window.noname_update={
-    version:'1.9.45.4',
-    update:'1.9.45.3',
+    version:'1.9.46',
+    // update:'1.9.45.3',
     changeLog:[
-        // '武将修改',
-        // 'players://["swd_guyuesheng"]',
+        'bug修复',
+        'players://["old_lingju","yj_jushou","swd_guyue","ns_duangui"]',
     ],
     files:[
         'game/game.js',
