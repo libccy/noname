@@ -383,7 +383,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                                     player.storage.choulve=game.createCard(trigger.card);
                                 }
                                 else{
-                                    player.storage.choulve=trigger.card.name;
+                                    player.storage.choulve={name:trigger.card.name};
                                 }
                             }
                         }
