@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-    '1.9.45',
+    '1.9.46',
     'image/background/huangtian_bg.jpg',
     'image/background/ol_bg.jpg',
     'image/background/september_bg.jpg',
@@ -634,9 +634,11 @@ window.noname_asset_list=[
     'image/character/ns_guanlu.jpg',
     'image/character/ns_simazhao.jpg',
     'image/character/ns_sunjian.jpg',
+    'image/character/ns_duangui.jpg',
     'image/character/old_caoxiu.jpg',
     'image/character/old_caozhen.jpg',
     'image/character/old_huaxiong.jpg',
+    'image/character/old_lingju.jpg',
     'image/character/old_lingtong.jpg',
     'image/character/old_madai.jpg',
     'image/character/old_quancong.jpg',

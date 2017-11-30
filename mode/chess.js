@@ -902,7 +902,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     						return;
     					}
     				}
-    				if(player==game.me){
+    				if(player==game.me&&get.config('single_control')){
     					for(var i=0;i<game.players.length;i++){
     						if(game.players[i].side==player.side){
     							game.modeSwapPlayer(game.players[i]);
@@ -1254,7 +1254,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			replaceChessPlayer:function(){
     				'step 0'
     				if(get.config('additional_player')){
-    					if(!event.enemy&&!_status.auto){
+    					if(!event.enemy&&!_status.auto&&(game.me.isDead()||get.config('single_control'))){
     						event.dialog=ui.create.dialog('选择替补角色',[_status.additionallist.randomGets(parseInt(get.config('choice_number'))),'character']);
     						event.filterButton=function(){return true;};
     						event.player=game.me;

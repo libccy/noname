@@ -1350,6 +1350,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				var link=result;
     				player.addTempSkill(link,'phaseUseAfter');
     				player.popup(link);
+					player.flashAvatar('gwfengchi',link);
     				game.log(player,'获得了技能','【'+get.translation(link)+'】');
     				game.delay();
 				}

@@ -1463,6 +1463,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			init:function(player){
     				player.storage.huashen={
     					list:[],
+                        shown:[],
     					owned:{},
     					player:player,
     				}
@@ -1481,11 +1482,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					player.storage.huashen.owned[name]=skills;
     					// player.popup(name);
     					game.log(player,'获得了一个化身');
-                        if(lib.character[player.name2]&&lib.character[player.name2][3].contains('huashen')){
-                            player.setAvatarQueue(player.name2,[name]);
-                        }
-                        else{
-                            player.setAvatarQueue(player.name,[name]);
+                        if(player.isUnderControl(true)){
+                            player.flashAvatar('huashen',name);
                         }
     				}
     			},
@@ -1519,6 +1517,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					if(list.length){
     						dialog.addSmall([list,'character']);
     					}
+                        if(!player.isUnderControl(true)){
+                            for(var i=0;i<dialog.buttons.length;i++){
+                                if(!content.shown.contains(dialog.buttons[i].link)){
+                                    dialog.buttons[i].node.group.remove();
+                                    dialog.buttons[i].node.hp.remove();
+                                    dialog.buttons[i].node.intro.remove();
+                                    dialog.buttons[i].node.name.innerHTML='未<br>知';
+                                    dialog.buttons[i].node.name.dataset.nature='';
+                                    dialog.buttons[i].style.background='';
+                                    dialog.buttons[i]._nointro=true;
+                                    dialog.buttons[i].classList.add('menubg');
+                                }
+                            }
+                        }
     					var skill=player.additionalSkills.huashen[0];
     					if(skill){
     						dialog.add('<div><div class="skill">【'+get.translation(skill)+
@@ -1596,6 +1608,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             else{
                                 currentname=event.dialog.querySelector('.selected.button').link;
                             }
+                            player.storage.huashen.shown.add(currentname);
                             var mark=player.marks.huashen;
                             if(trigger.name=='game'||trigger.name=='enterGame'){
                                 mark.hide();
@@ -1623,12 +1636,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             }
                             player.addAdditionalSkill('huashen',link);
                             player.logSkill('huashen2');
-                            if(lib.character[player.name2]&&lib.character[player.name2][3].contains('huashen')){
-                                player.setAvatarQueue(player.name2,[currentname]);
-                            }
-                            else{
-                                player.setAvatarQueue(player.name,[currentname]);
-                            }
+                            player.flashAvatar('huashen',currentname);
                             game.log(player,'获得技能','【'+get.translation(link)+'】');
                             player.popup(link);
 
@@ -1695,6 +1703,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     						event.control=ui.create.control(['cancel2']);
     					}
     					event.control.custom=event.clickControl;
+                        event.control.replaceTransition=false;
     					// ui.auto.hide();
     					game.pause();
     					for(var i=0;i<event.dialog.buttons.length;i++){
@@ -3026,6 +3035,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			position:'he',
     			ai:{
+                    damage:true,
     				order:8,
     				result:{
     					player:function(player,target){

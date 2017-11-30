@@ -402,6 +402,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				content:function(){
 					trigger.num++;
+				},
+				ai:{
+					damageBonus:true
 				}
 			},
 			reganglie:{

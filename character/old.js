@@ -21,7 +21,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	        old_wangyi:['female','wei',3,['oldzhenlie','oldmiji']],
 	        old_caozhen:['male','wei',4,['sidi']],
 	        old_quancong:['male','wu',4,['zhenshan']],
-	        old_yuanshu:['male','qun',4,['yongsi','weidi']],
+			old_yuanshu:['male','qun',4,['yongsi','weidi']],
+	        old_lingju:['female','qun',3,['jieyuan','fenxin_old']],
 	    },
 	    skill:{
 	        zhenshan:{

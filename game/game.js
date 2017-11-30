@@ -33,6 +33,7 @@
 		characterIntro:{},
 		characterTitle:{},
 		characterPack:{},
+		characterFilter:{},
 		cardPack:{},
 		onresize:[],
         onphase:[],
@@ -14083,6 +14084,33 @@
 					}
 					game.addVideo('setAvatarQueue',this,[name,list]);
 				},
+				flashAvatar:function(skill,name){
+					if(lib.skill[name]&&!lib.character[name]){
+						var stop=false;
+						var list=lib.config.all.characters.slice(0);
+						for(var i in lib.characterPack){
+							list.add(i);
+						}
+						for(var i=0;i<list.length;i++){
+							for(var j in lib.characterPack[list[i]]){
+								if(lib.characterPack[list[i]][j][3].contains(name)){
+									name=j;
+									stop=true;
+									break;
+								}
+							}
+							if(stop){
+								break;
+							}
+						}
+					}
+					if(lib.character[this.name2]&&lib.character[this.name2][3].contains(skill)){
+						this.setAvatarQueue(this.name2,[name]);
+					}
+					else{
+						this.setAvatarQueue(this.name,[name]);
+					}
+				},
 				update:function(){
 					if(_status.video&&arguments.length==0) return;
 					if(this.hp>=this.maxHp) this.hp=this.maxHp;
@@ -20746,6 +20774,10 @@
 				},
 				replace:function(){
 					// this.animate('controlpressdownx',500);
+					if(this.replaceTransition===false){
+						this.style.transitionProperty='none';
+						ui.refresh(this);
+					}
 
 					while(this.childNodes.length) this.firstChild.remove();
 					var i,controls;
@@ -20767,6 +20799,12 @@
 						this.style.width=width+'px';
 					}
 					ui.updatec();
+					if(this.replaceTransition===false){
+						var that=this;
+						setTimeout(function(){
+							that.style.transitionProperty='';
+						},200);
+					}
 					return this;
 				}
 			},
@@ -20914,6 +20952,7 @@
 				if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) return true;
                 if(lib.character[i][4]&&lib.character[i][4].contains('unseen')) return true;
                 if(lib.config.forbidai.contains(i)) return true;
+				if(lib.characterFilter[i]&&!lib.characterFilter[i]()) return true;
                 if(_status.connectMode){
                     if(lib.configOL.banned.contains(i)) return true;
                     if(lib.config.replacecharacter[i]&&libCharacter&&libCharacter[lib.config.replacecharacter[i]]) return true;
@@ -20975,6 +21014,7 @@
 					if(info[4].contains('minskin')) return true;
 					if(info[4].contains('unseen')) return true;
 					if(info[4].contains('forbidai')&&!_status.event.isMine()) return true;
+					if(lib.characterFilter[i]&&!lib.characterFilter[i]()) return true;
 				}
 				return false;
 			},
@@ -44711,6 +44751,7 @@
 				return uiintro;
 			}
 			var i,translation,intro,str;
+			if(node._nointro) return;
 			if(typeof node._customintro=='function'){
 				if(node._customintro(uiintro)===false) return;
 			}

@@ -4520,6 +4520,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			viewAs:{name:'juedou'},
     			group:['zhanjue2','zhanjue3','zhanjue4'],
     			ai:{
+                    damage:true,
     				order:1,
     				effect:{
     					player:function(card,player,target){
@@ -8694,7 +8695,82 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     			}
     		},
-    		shibei:{
+            shibei:{
+                trigger:{player:'damageEnd'},
+                forced:true,
+                audio:2,
+                content:function(){
+                    if(player.hasSkill('shibei_damaged')){
+                        player.loseHp();
+                    }
+                    else{
+                        player.recover();
+                    }
+                },
+                group:'shibei_mark',
+                subSkill:{
+                    mark:{
+                        trigger:{player:'damageAfter'},
+                        silent:true,
+                        content:function(){
+                            player.addTempSkill('shibei_damaged');
+                        }
+                    },
+                    damaged:{},
+                    ai:{}
+                },
+                ai:{
+                    maixie_defend:true,
+                    threaten:0.9,
+                    effect:{
+                        target:function(card,player,target){
+                            if(player.hasSkillTag('jueqing')) return;
+                            if(target.hujia) return;
+                            if(player._shibei_tmp) return;
+                            if(target.hasSkill('shibei_ai')) return;
+                            if(_status.event.getParent('useCard',true)||_status.event.getParent('_wuxie',true)) return;
+                            if(get.tag(card,'damage')){
+                                if(target.hasSkill('shibei_damaged')){
+                                    return [1,-2];
+                                }
+                                else{
+                                    if(get.attitude(player,target)>0&&target.hp>1){
+                                        return 0;
+                                    }
+                                    if(get.attitude(player,target)<0&&!player.hasSkillTag('damageBonus')){
+                                        if(card.name=='sha') return;
+                                        var sha=false;
+                                        player._shibei_tmp=true;
+                                        var num=player.countCards('h',function(card){
+                                            if(card.name=='sha'){
+                                                if(sha){
+                                                    return false;
+                                                }
+                                                else{
+                                                    sha=true;
+                                                }
+                                            }
+                                            return get.tag(card,'damage')&&player.canUse(card,target)&&get.effect(target,card,player,player)>0;
+                                        });
+                                        delete player._shibei_tmp;
+                                        if(player.hasSkillTag('damage')){
+                                            num++;
+                                        }
+                                        if(num<2){
+                                            var enemies=player.getEnemies();
+                                            if(enemies.length==1&&enemies[0]==target&&player.needsToDiscard()){
+                                                return;
+                                            }
+                                            return 0;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            shibei_old:{
     			audio:2,
     			trigger:{player:'damageAfter'},
     			forced:true,
@@ -9262,7 +9338,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		zpaiyi:'排异',
     		zpaiyi_info:'结束阶段，将一张“权”移动到任何合理的区域，若不是你的区域，你可以摸一张牌',
     		shibei:'矢北',
-    		shibei_info:'锁定技，每当你受到一次伤害，需进行一次判定，若结果为红色且是你回合内受到的第一次伤害，你回复一点体力；若结果为黑色且你在本回合内受到过不止一次伤害，你失去一点体力',
+    		shibei_info:'锁定技，当你受到伤害后：若此伤害是你本回合第一次受到伤害，则你回复1点体力；若不是你本回合第一次受到伤害，则你失去1点体力。',
     		jianying:'渐营',
     		jianying_info:'每当你于出牌阶段内使用的牌与此阶段你使用的上一张牌点数或花色相同时，你可以摸一张牌',
     		xinenyuan:'恩怨',

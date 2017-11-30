@@ -51,6 +51,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_guanlu:['male','wei',3,['nsbugua','nstuiyan','nstianji']],
 			ns_simazhao:['male','wei',3,['nszhaoxin','nsxiuxin','nsshijun']],
 			ns_sunjian:['male','wu',4,['nswulie','nshunyou','nscangxi']],
+
+			ns_duangui:['male','qun',3,[]],
 		},
 		characterIntro:{
 			diy_feishi:'字公举，生卒年不详，益州犍为郡南安县（今四川省乐山市）人。刘璋占据益州时，以费诗为绵竹县县令。刘备进攻刘璋夺取益州，费诗举城而降，后受拜督军从事，转任牂牁郡太守，再为州前部司马。',

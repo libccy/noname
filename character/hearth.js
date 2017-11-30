@@ -1673,7 +1673,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				else{
     					player.draw(2);
     				}
-    			}
+    			},
+                ai:{
+					damageBonus:true
+				}
     		},
     		lianzhan2:{},
     		kuixin:{

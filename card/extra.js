@@ -390,6 +390,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						delete player.node.jiu2;
 					}
 				},
+				ai:{
+					damageBonus:true
+				},
 				group:'jiu2'
 			},
 			jiu2:{

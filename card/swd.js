@@ -4779,6 +4779,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.draw(2);
 					player.removeSkill('tianxianjiu');
+				},
+				ai:{
+					damageBonus:true
 				}
 			},
 		},

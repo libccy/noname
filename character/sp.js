@@ -5699,7 +5699,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				},player,trigger.player,trigger.player.identityShown);
     				player.line(trigger.player,'green');
     				player.storage.fenxin=true;
-    				player.awakenSkill('fenxin');
+    				player.awakenSkill('fenxin_old');
     			}
     		},
     		qingyi:{
@@ -8371,6 +8371,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				targets[0].damage('fire');
     			},
     			ai:{
+                    damage:true,
     				threaten:1.5,
     				order:7,
     				result:{
@@ -8743,6 +8744,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     }
     			},
     			ai:{
+                    damage:true,
     				order:2,
     				result:{
     					target:function(player,target){
@@ -9787,6 +9789,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		jieyuan_less:'竭缘',
     		jieyuan_info:'当你对一名其他角色造成伤害时，若其体力值大于或等于你的体力值，你可弃置一张黑色手牌令此伤害+1；当你受到一名其他角色造成的伤害时，若其体力值大于或等于你的体力值，你可弃置一张红色手牌令此伤害-1。',
             fenxin:'焚心',
+            fenxin_old:'焚心',
     		fenxin_info:'锁定技，一名其他角色死亡后，若其身份为：忠臣，你发动“竭缘”减少伤害无体力值限制；反贼，你发动“竭缘”增加伤害无体力值限制；内奸，将“竭缘”中的黑色手牌和红色手牌改为一张牌。',
     		fenxin_old_info:'限定技，当你杀死一名非主公角色时，在其翻开身份牌之前，你可以与该角色交换身份牌。（你的身份为主公时不能发动此技能）',
     		shixin:'释衅',
