@@ -49,8 +49,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		sunce:['zhouyu','taishici','daqiao']
     	},
         characterFilter:{
-            zuoci:function(){
-                return get.mode()!='guozhan';
+            zuoci:function(mode){
+                return mode!='guozhan';
             }
         },
     	characterIntro:{

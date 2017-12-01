@@ -24,6 +24,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_yuanshu:['male','qun',4,['yongsi','weidi']],
 	        old_lingju:['female','qun',3,['jieyuan','fenxin_old']],
 	    },
+		characterFilter:{
+			old_lingju:function(mode){
+				return mode=='identity';
+			}
+		},
 	    skill:{
 	        zhenshan:{
 				trigger:{player:'chooseToRespondBegin'},

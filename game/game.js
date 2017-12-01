@@ -20952,7 +20952,7 @@
 				if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) return true;
                 if(lib.character[i][4]&&lib.character[i][4].contains('unseen')) return true;
                 if(lib.config.forbidai.contains(i)) return true;
-				if(lib.characterFilter[i]&&!lib.characterFilter[i]()) return true;
+				if(lib.characterFilter[i]&&!lib.characterFilter[i](get.mode())) return true;
                 if(_status.connectMode){
                     if(lib.configOL.banned.contains(i)) return true;
                     if(lib.config.replacecharacter[i]&&libCharacter&&libCharacter[lib.config.replacecharacter[i]]) return true;
@@ -21014,7 +21014,7 @@
 					if(info[4].contains('minskin')) return true;
 					if(info[4].contains('unseen')) return true;
 					if(info[4].contains('forbidai')&&!_status.event.isMine()) return true;
-					if(lib.characterFilter[i]&&!lib.characterFilter[i]()) return true;
+					if(lib.characterFilter[i]&&!lib.characterFilter[i](get.mode())) return true;
 				}
 				return false;
 			},
@@ -36924,7 +36924,7 @@
 						if(lib.character[i][4].contains('stonehidden')) continue;
 						if(lib.character[i][4].contains('unseen')) continue;
 						if(lib.config.banned.contains(i)) continue;
-						if(lib.characterFilter[i]&&!lib.characterFilter[i]()) continue;
+						if(lib.characterFilter[i]&&!lib.characterFilter[i](get.mode())) continue;
 						if(filter&&filter(i)) continue;
 						list.push(i);
 						if(namecapt.indexOf(getCapt(i))==-1){
