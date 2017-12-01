@@ -1411,23 +1411,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					if(trigger.delay==false) game.delay();
 					"step 1"
-					var du=false;
+					var du=1;
 					if(trigger.cards.length==1&&trigger.cards[0].name=='du'){
-						du=true;
+						du=-1;
 					}
-					else if(trigger.cards.length==2){
+					else{
 						for(var i=0;i<trigger.cards.length;i++){
 							if(trigger.cards[i].name=='du'){
-								du=true;break;
+								du=-1;break;
 							}
+						}
+						if(du==-1&&trigger.cards.length>2){
+							du=0;
 						}
 					}
 					player.chooseTarget(get.prompt('lzhangyi'),function(card,player,target){
 						return player!=target
 					}).set('du',du).ai=function(target){
 						var att=get.attitude(_status.event.player,target);
-						if(_status.event.du) return -att;
-						return att;
+						return att*_status.event.du;
 					};
 					"step 2"
 					if(result.bool){

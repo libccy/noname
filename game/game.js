@@ -8862,6 +8862,9 @@
 				game.check();
 			},
 			t:function(num){
+				if(game.players.contains(num)){
+					num=game.players.indexOf(num);
+				}
 				if(num==undefined){
 					for(var i=0;i<game.players.length;i++) cheat.t(i);
 					return;

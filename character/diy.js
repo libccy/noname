@@ -2005,6 +2005,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			nsnongquan:{
 				enable:'phaseUse',
+				// usable:4,
 				filter:function(event,player){
 					return player.countCards('h')==1&&player.canUse('wuzhong',player);
 				},
@@ -3659,7 +3660,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nsshoudao:'授道',
 			nsshoudao_info:'当左右“幻身”全部死亡时，你获得技能“雷击”和“鬼道”。当你死亡时，若此时有两个“幻身”，你可以令一名其他角色获得技能“雷击”和“鬼道”。若有一个“幻身”，你可以令一名其他角色获得技能“雷击”或“鬼道”。(杀死你的角色除外)',
 			nsnongquan:'弄权',
-			nsnongquan_info:'出牌阶段不限次数，你可以将最后一张手牌当【无中生有】使用',
+			nsnongquan_info:'出牌阶段，你可以将最后一张手牌当作【无中生有】使用',
 			nsdufu:'毒妇',
 			nsdufu_info:'每当你即将造成一次伤害时，你可以为此伤害重新指定伤害来源',
 			rejizhi:'集智',
