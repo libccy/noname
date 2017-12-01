@@ -1569,9 +1569,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.delay(0.5);
 							'step 1'
 							player.reinit(player.storage.nscongjun_show,'ns_huamulan','nosmooth');
-							player.logSkill('nscongjun_show',trigger.player);
+							player.logSkill('nscongjun_show');
 							'step 2'
 							player.removeSkill('nscongjun_show');
+							player.line(trigger.player,'green');
 							trigger.player.damage(2);
 						}
 					}

@@ -13737,6 +13737,10 @@
 						if(smooth) this.smoothAvatar(false);
 						this.node.avatar.setBackground(to,'character');
 						this.node.name.innerHTML=get.slimName(to);
+
+						if(this==game.me&&ui.fakeme){
+							ui.fakeme.style.backgroundImage=this.node.avatar.style.backgroundImage;
+						}
 					}
 					else{
 						return this;
@@ -14029,7 +14033,7 @@
                     this.node.nameol.innerHTML=str||this.nickname||'';
                     return this;
                 },
-                setAvatar:function(name,name2,video){
+                setAvatar:function(name,name2,video,fakeme){
                     var node;
     				if(this.name2==name){
     					node=this.node.avatar2;
@@ -14041,7 +14045,7 @@
     				}
                     if(node){
 						node.setBackground(name2,'character');
-						if(this==game.me&&ui.fakeme){
+						if(this==game.me&&ui.fakeme&&fakeme!==false){
 							ui.fakeme.style.backgroundImage=node.style.backgroundImage;
 						}
 						if(video!=false){
@@ -14069,13 +14073,13 @@
 					else{
 						var func=function(){
 							if(node._avatarqueue.length){
-								player.setAvatar(name,node._avatarqueue.shift(),false);
+								player.setAvatar(name,node._avatarqueue.shift(),false,false);
 							}
 							else{
 								clearInterval(node._avatarqueueinterval);
 								delete node._avatarqueue;
 								delete node._avatarqueueinterval;
-								player.setAvatar(name,name);
+								player.setAvatar(name,name,false,false);
 							}
 						};
 						node._avatarqueue=list.slice(0);
