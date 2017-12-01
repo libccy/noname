@@ -534,7 +534,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     	},
     	element:{
     		card:{
-    			moveTo:function(player,method){
+                moveTo:function(player){
+                    var rect1=this.getBoundingClientRect();
+                    var rect2=player.getBoundingClientRect();
+                    var dx=rect2.left+rect2.width/2-(rect1.left+rect1.width/2);
+                    var dy=rect2.top+rect2.height/2-(rect1.top+rect1.height/2);
+                    this.style.transform+=' translate('+dx+'px,'+dy+'px)';
+                },
+    			moveTox:function(player,method){
     				this.fixed=true;
     				if(this.parentNode==ui.arena){
     					var rect=player.getBoundingClientRect();
@@ -1122,9 +1129,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     					this.$randomMove(node,130,0);
 
     					setTimeout(function(){
-    						node.removeAttribute('style');
-    						node.dataset.position=player.dataset.position;
-    						node.delete();
+                            lib.element.card.moveTo.call(node,player);
+                            setTimeout(function(){
+                                node.delete();
+                            },200);
+    						// node.removeAttribute('style');
+    						// node.dataset.position=player.dataset.position;
+    						// node.delete();
     					},700);
     				}
     			},

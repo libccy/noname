@@ -1546,6 +1546,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							target.storage.nscongjun_show=name;
 							target.addSkill('nscongjun_show');
 							player._inits.remove(change);
+							player.hp=player.maxHp;
+							player.update();
 						}
 					}
 					if(!player._inits){
