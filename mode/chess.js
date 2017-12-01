@@ -4011,8 +4011,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
             },
     		_attackmove:{
     			trigger:{player:'damageEnd'},
-    			forced:true,
-    			popup:false,
+    			silent:true,
     			priority:50,
     			filter:function(event,player){
     				if(!event.source) return false;
