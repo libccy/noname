@@ -5592,11 +5592,19 @@
 			'游戏名词':'<ul><li>护甲：和体力类似，每点护甲可抵挡一点伤害，但不影响手牌上限'+
 			'<li>随从：通过技能获得，拥有独立的技能、手牌区和装备区（共享判定区），出场时替代主武将的位置；随从死亡时自动切换回主武将'
 		},
-		setIntro:function(node,func){
+		setIntro:function(node,func,left){
 			if(lib.config.touchscreen){
-				lib.setLongPress(node,ui.click.intro);
+				if(left){
+					node.listen(ui.click.touchintro);
+				}
+				else{
+					lib.setLongPress(node,ui.click.intro);
+				}
 			}
 			else{
+				if(left){
+					node.listen(ui.click.intro);
+				}
 				if(lib.config.hover_all){
 					lib.setHover(node,ui.click.hoverplayer);
 				}
@@ -5604,7 +5612,9 @@
 					node.oncontextmenu=ui.click.rightplayer;
 				}
 			}
-			lib.setPressure(node,ui.click.rightpressure);
+			if(!left){
+				lib.setPressure(node,ui.click.rightpressure);
+			}
 			if(func){
 				node._customintro=func;
 			}
@@ -19837,6 +19847,7 @@
                         this.classList.remove('epic');
 						this.classList.remove('legend');
                         this.classList.remove('unique');
+						this.style.background='';
                         var subtype=get.subtype(this);
                         if(subtype){
                             this.classList.remove(subtype);
@@ -41091,6 +41102,15 @@
 				}
 				game.check();
 			},
+			touchintro:function(){
+				var rect=this.getBoundingClientRect();
+				ui.click.touchpop();
+				ui.click.intro.call(this,{
+					clientX:rect.left+18,
+					clientY:rect.top+12
+				});
+				_status.clicked=false;
+			},
 			card:function(){
 				delete this._waitingfordrag;
 				if(_status.dragged) return;
@@ -42616,7 +42636,7 @@
 					}
 				}
 				else{
-					if((!ui.dialog.buttons||!ui.dialog.buttons.length)&&!ui.dialog.forcebutton&&ui.dialog.classList.contains('fullheight')==false){
+					if((!ui.dialog.buttons||!ui.dialog.buttons.length)&&!ui.dialog.forcebutton&&ui.dialog.classList.contains('fullheight')==false&&get.mode()!='stone'){
 						ui.dialog.classList.add('nobutton');
 						if(ui.dialog.content.offsetHeight<240){
 							if(!ui.dialog._heightset){
@@ -44042,7 +44062,7 @@
 				if(method=='raw'||method=='pure'||method=='absolute') return n;
 			}
 			else if(to.isMin(true)||from.isMin(true)){
-				if(method=='raw'||method=='pure'||method=='absolute') return 1;
+				if(method=='raw'||method=='pure'||method=='absolute') return n;
 			}
 			else{
 				var length=game.players.length;

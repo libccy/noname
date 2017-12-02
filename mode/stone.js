@@ -455,8 +455,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				_status.friendRage=0;
     				_status.enemyRage=0;
 
-    				lib.setIntro(ui.friendBar);
-    				lib.setIntro(ui.enemyBar);
+    				lib.setIntro(ui.friendBar,null,true);
+    				lib.setIntro(ui.enemyBar,null,true);
     			}
     		}
     		_status.friendCount=ui.create.system('',null,true);
@@ -1721,7 +1721,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			if(!player.node.career){
     				player.node.career=ui.create.div('.menubutton.round.identity',player);
     				player.node.career.dataset.career=career;
-    				lib.setIntro(player.node.career);
+    				lib.setIntro(player.node.career,null,true);
     			}
     			if(!player.deckCards) player.deckCards=[];
     			for(var i=0;i<deck.length;i++){
@@ -5604,7 +5604,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				threaten:1.6
     			}
     		},
-
+            shaman_fali:{
+                trigger:{global:'damageBegin'},
+                forced:true,
+                filter:function(event,player){
+                    return event.source&&event.source!=player&&
+                    event.source==player.getLeader()&&event.notLink()&&
+                    event.card&&get.type(event.card)=='stonecard';
+                },
+                content:function(){
+                    trigger.num++;
+                },
+                ai:{
+                    threaten:1.3
+                }
+            },
     		stone_zhiyin:{
     			trigger:{global:'useCard'},
     			forced:true,
@@ -6374,10 +6388,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			forced:true,
     			unique:true,
     			filter:function(event,player){
-    				return event.player.side!=player.side&&!player.hasSkill('stone_qianxing');
+    				return event.player.side!=player.side&&!player.hasSkill('qianxing');
     			},
     			content:function(){
-    				player.addSkill('stone_qianxing');
+    				player.addTempSkill('qianxing',{player:'phaseBegin'});
     			}
     		},
 
@@ -6723,7 +6737,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     					player.maxHp++;
     					player.hp++;
     					player.update();
-    					player.addSkill('stone_qianxing');
+    					player.addTempSkill('qianxing',{player:'phaseBegin'});
     				}
     				else{
     					player.draw();
@@ -8488,7 +8502,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				threaten:2
     			}
     		},
-    		shaman_fali:{
+    		shaman_fali_old:{
     			trigger:{global:'phaseEnd'},
     			forced:true,
     			direct:true,
@@ -8712,16 +8726,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			}
     		},
     		stone_qianxing:{
-    			trigger:{player:'phaseBegin'},
-    			forced:true,
-    			unique:true,
+    			trigger:{source:'fellow'},
+    			silent:true,
+                unique:true,
     			content:function(){
-    				player.removeSkill('stone_qianxing');
-    			},
-    			mod:{
-    				targetEnabled:function(){
-    					return false;
-    				}
+    				player.addTempSkill('qianxing',{player:'phaseBegin'});
     			}
     		},
     		stone_kutongsiseng1:{
@@ -10038,7 +10047,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     		shaman_tuteng:'图腾',
     		shaman_tuteng_info:'你跳过摸牌阶段',
     		shaman_fali:'空气',
-    		shaman_fali_info:'已方主将的结束阶段，令所有手牌数不大于1的友方随从摸一张牌',
+    		shaman_fali_info:'已方主将使用的法术牌伤害+1',
     		shaman_zhiliao:'治疗',
     		shaman_zhiliao_info:'在你的结束阶段，令所有友方随从回复一点体力',
     		shaman_zhuore:'灼热',
@@ -10126,7 +10135,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     		stone_wuyi:'巫医',
     		stone_langren:'狼人',
     		stone_qianxing:'潜行',
-    		stone_qianxing_info:'在你的回合开始前，不能成为任何卡牌的目标',
+    		stone_qianxing_info:'你出场时，获得潜行直到下一回合开始',
 
     		stone_mingguangjisi:'明光祭司',
     		stone_nianqingjisi:'年轻祭司',

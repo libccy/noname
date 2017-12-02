@@ -2105,6 +2105,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(_status.connectMode) return false;
 					if(!lib.config.cards.contains('gwent')) return false;
+					if(player.isMin()) return false;
 					if(game.fixedPile) return false;
 					return event.num>0&&event.parent.name=='phaseDraw';
 				},
@@ -2128,12 +2129,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								});
 								if(get.mode()=='stone'){
 									list.remove('gw_aerdeyin');
+									list.remove('gw_niuquzhijing');
 								}
 							}
 							else{
 								list=get.libCard(function(info){
 									return info.subtype=='spell_silver';
 								});
+								if(get.mode()=='stone'){
+									list.remove('gw_butianshu');
+								}
 							}
 							if(list&&list.length){
 								ui.cardPile.insertBefore(game.createCard(list.randomGet()),ui.cardPile.firstChild);
