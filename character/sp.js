@@ -755,6 +755,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     var equip1=get.cardPile2(function(card){
                         return get.subtype(card)=='equip1';
                     });
+                    if(!equip1){
+                        player.popup('连计失败');
+                        game.log('牌堆中无装备');
+                        event.finish();
+                        return;
+                    }
                     target.$draw(equip1);
                     target.equip(equip1);
                     game.delay();
