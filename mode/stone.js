@@ -5277,7 +5277,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			},
     			stoneact:4,
     			filterTarget:function(card,player,target){
-    				return target.isMin()&&target.side!=player.side;
+    				return target.isMin()&&target.side!=player.side&&target.countCards('h')<=1;
     			},
     			content:function(){
     				target.getLeader().removeFellow(target);
@@ -10166,7 +10166,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     		spell_jingshenkongzhi:'精神控制',
     		spell_jingshenkongzhi_info:'将一名敌方随从吸收为己方',
     		spell_anyingkuangluan:'暗影狂乱',
-    		spell_anyingkuangluan_info:'将一名敌方随从吸收为己方，并令其于下个回合结束后死亡',
+    		spell_anyingkuangluan_info:'将一名手牌数不超过1的敌方随从吸收为己方，并令其于下个回合结束后死亡',
     		spell_anyingkuangluan_die:'暗影狂乱',
     		spell_anyingkuangluan_die_info:'下个回合结束后死亡',
     		spell_binghuan:'冰环',

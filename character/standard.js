@@ -240,6 +240,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(event,player){
 					return (get.attitude(player,event.source)<=0);
 				},
+				logTarget:'source',
 				content:function(){
 					"step 0"
 					player.judge(function(card){

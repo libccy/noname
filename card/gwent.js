@@ -756,6 +756,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(player.maxHp==1) return false;
 					var list=player.getEnemies();
 					for(var i=0;i<list.length;i++){
+						if(list[i].isMin()) continue;
 						if(list[i].getStockSkills().length) return true;
 					}
 				},
@@ -767,7 +768,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var list=player.getEnemies();
 					for(var i=0;i<list.length;i++){
-						if(!list[i].getStockSkills().length){
+						if(list[i].isMin()||!list[i].getStockSkills().length){
 							list.splice(i--,1);
 						}
 					}

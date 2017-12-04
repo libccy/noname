@@ -4055,7 +4055,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.update();
     				'step 1'
     				lib.skill.gzbuqu.process(player);
-    			}
+    			},
+                ai:{
+                    mingzhi:true
+                }
     		},
     		buqu:{
     			audio:2,

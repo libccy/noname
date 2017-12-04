@@ -943,7 +943,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				mod:{
 					globalTo:function(from,to,distance){
 						if(game.hasPlayer(function(current){
-							return current.hasSkill('heyi')&&current.inline(to);
+							return current.hasSkill('heyi')&&current.inline(to)&&current!=to;
 						})){
 							return distance+1;
 						}
@@ -1759,6 +1759,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(player.identity!='unknown') return true;
 							if(Math.random()<0.5) return true;
 							var info=get.info(_status.event.skill);
+							if(info&&info.ai&&info.ai.mingzhi==true) return true;
 							if(info&&info.ai&&info.ai.maixie) return true;
 							var group=lib.character[player.name1][1];
 							var popu=get.population(lib.character[player.name1][1])

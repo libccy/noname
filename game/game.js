@@ -11718,6 +11718,18 @@
 							}
 							return 0;
 						}
+						if(att>0){
+							var es=ui.selected.targets[0].getCards('e');
+							var i;
+							for(i=0;i<es.length;i++){
+								if(!target.getEquip(get.subtype(es[i]))){
+									break;
+								}
+							}
+							if(i==es.length){
+								return 0;
+							}
+						}
 						return -att*get.attitude(player,ui.selected.targets[0]);
 					});
 					next.set('multitarget',true);
