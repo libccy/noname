@@ -5758,7 +5758,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			direct:true,
     			content:function(){
     				"step 0"
-    				var next=player.chooseToDiscard('he',get.prompt('huanhun'),function(card){
+    				var next=player.chooseToDiscard('he',get.prompt2('huanhun',trigger.player),function(card){
     					return get.color(card)=='red';
     				});
     				next.logSkill=['huanhun',trigger.player];

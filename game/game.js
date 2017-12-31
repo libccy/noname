@@ -11025,7 +11025,13 @@
 								prompt+='放置'+get.translation(event.tosort);
 							}
 							event.dialog=ui.create.dialog(prompt,'hidden');
-							event.dialog.addSmall(event.sortcard);
+							if(event.sortcard&&event.sortcard.length){
+								event.dialog.addSmall(event.sortcard);
+							}
+							else{
+								event.dialog.buttons=[];
+								event.dialog.add(ui.create.div('.buttons'));
+							}
 							var buttons=event.dialog.content.lastChild;
 							var sortnum=2;
 							if(event.sorttop){
@@ -11430,6 +11436,9 @@
 							cards.push(event.result.links[i]);
 						}
 						event.result.cards=event.result.links.slice(0);
+						if(event.boolline){
+							player.line(target,'green');
+						}
 						var next=target.discard(cards);
 						if(event.delay===false){
 							next.delay=event.delay;
@@ -11567,6 +11576,9 @@
 						}
 					}
 					"step 4"
+					if(event.boolline){
+						player.line(target,'green');
+					}
 					player.gain(event.cards,target);
 				},
 				showHandcards:function(){
@@ -44028,7 +44040,9 @@
 					game.shuffleNumber++;
 					var cards=[],i;
 					for(var i=0;i<lib.onwash.length;i++){
-						lib.onwash[i]();
+						if(lib.onwash[i]()=='remove'){
+							lib.onwash.splice(i--,1);
+						}
 					}
 					if(_status.discarded){
 						_status.discarded.length=0;

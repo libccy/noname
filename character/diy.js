@@ -3,7 +3,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'diy',
 		connect:true,
-		connectBanned:['diy_tianyu','diy_yangyi','diy_lukang','ns_huamulan','ns_yuji'],
+		connectBanned:['diy_tianyu','diy_yangyi','diy_lukang','ns_huamulan','ns_yuji','ns_duangui'],
 		character:{
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
@@ -52,10 +52,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_simazhao:['male','wei',3,['nszhaoxin','nsxiuxin','nsshijun']],
 			ns_sunjian:['male','wu',4,['nswulie','nshunyou','nscangxi']],
 
-			// ns_duangui:['male','qun',3,[]],
-			// ns_masu:['male','qun',3,[]],
-			// ns_zhangxiu:['male','qun',3,[]],
-			// ns_lvziming:['male','qun',3,[]],
+			ns_duangui:['male','qun',3,['nscuanquan','nsjianning','nschangshi','nsbaquan']],
+			ns_zhangbao:['male','qun',3,['nsfuhuo','nswangfeng']],
+			ns_masu:['male','shu',3,['nstanbing','nsxinzhan']],
+			ns_zhangxiu:['male','qun',4,['nsbaiming','nsfuge']],
+			ns_lvmeng:['male','wu',3,['nsqinxue','nsbaiyi']],
+			ns_shenpei:['male','qun',3,['nshunji','shibei']],
+
 			// ns_zhaoyun:['male','qun',3,[]],
 			// ns_yuji:['male','qun',3,[]],
 			// ns_lvmeng:['male','qun',3,[]],
@@ -63,6 +66,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			// ns_lisu:['male','qun',3,[]],
 			// ns_sunhao:['male','qun',3,[]],
 		},
+        characterFilter:{
+            ns_duangui:function(mode){
+                return mode=='identity'&&_status.mode=='normal';
+            }
+        },
 		characterIntro:{
 			diy_feishi:'字公举，生卒年不详，益州犍为郡南安县（今四川省乐山市）人。刘璋占据益州时，以费诗为绵竹县县令。刘备进攻刘璋夺取益州，费诗举城而降，后受拜督军从事，转任牂牁郡太守，再为州前部司马。',
 			diy_liuyan:'字元海，新兴（今山西忻州北）人，匈奴族，匈奴首领冒顿单于之后[1]  ，南匈奴单于于夫罗之孙，左贤王刘豹之子，母呼延氏，十六国时期前赵政权开国皇帝，304年－310年在位。',
@@ -79,6 +87,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_wangyun:'#rSukincen',
 			ns_guanlu:'#rSukincen',
 			ns_nanhua:'#g戒除联盟',
+			ns_shenpei:'#g戒除联盟',
 			ns_huamulan:'#p哎别管我是谁',
 			ns_jinke:'#p哎别管我是谁',
 			ns_huangzu:'#r小芯儿童鞋',
@@ -88,15 +97,708 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_caocaosp:'#g希望教主',
 			ns_zhugeliang:'#p死不死什么的',
 			ns_xinxianying:'#b扶苏公子',
+			ns_zhangbao:'#b扶苏公子',
 			ns_wangyue:'#p废城君',
 			ns_sunjian:'#b兔子两只2',
+			ns_lvmeng:'#b兔子两只2',
 			ns_yuji:'#g蔚屿凉音',
 			ns_simazhao:'#r一纸载春秋',
+			ns_duangui:'#b宝宝酱紫萌萌哒',
+			ns_masu:'#g修女',
+			ns_zhangxiu:'#p本因坊神策',
 		},
 		perfectPair:{
 			yuji:['zuoci']
 		},
 		skill:{
+			nsbaiyi:{
+				trigger:{player:'phaseDiscardBefore'},
+				forced:true,
+				filter:function(event,player){
+					return player.storage.nsqinxue&&player.storage.nsqinxue.length;
+				},
+				content:function(){
+					'step 0'
+					trigger.cancel();
+					var num=player.storage.nsqinxue.length;
+					player.chooseToDiscard('白衣：请弃置'+get.cnNumber(num)+'张牌','he',true,num);
+					'step 1'
+					if(result.bool&&result.cards.length==3){
+						var type=[];
+						for(var i=0;i<result.cards.length;i++){
+							type.add(get.type(result.cards[i],'trick'));
+						}
+						if(type.length==3&&trigger.getParent().skill!='nsbaiyi'){
+							player.insertPhase();
+						}
+						else{
+							event.goon=true;
+							var cards=get.cards(result.cards.length);
+							event.cards=cards;
+							player.chooseCardButton(cards,'获得一张牌',true);
+						}
+					}
+					'step 2'
+					if(event.goon&&result.bool&&result.links.length){
+						player.gain(result.links,'draw');
+						for(var i=0;i<event.cards.length;i++){
+							if(!result.links.contains(event.cards[i])){
+								event.cards[i].discard();
+							}
+						}
+					}
+				},
+				ai:{
+					threaten:1.5,
+					combo:'nsqinxue'
+				}
+			},
+			nsqinxue:{
+				trigger:{player:'useCard'},
+				init:function(player){
+					player.storage.nsqinxue=[];
+				},
+				forced:true,
+				filter:function(event,player){
+					var type=get.type(event.card,'trick');
+					if(player.storage.nsqinxue.contains(type)) return false;
+					return ['basic','trick','equip'].contains(type);
+				},
+				content:function(){
+					var type=null;
+					var type0=get.type(trigger.card,'trick');
+					switch(type0){
+						case 'basic':type='trick';break;
+						case 'trick':type='equip';break;
+						case 'equip':type='basic';break;
+					}
+					var card=get.cardPile(function(card){
+						return get.type(card,'trick')==type;
+					});
+					if(card){
+						player.gain(card,'gain2');
+						player.storage.nsqinxue.push(type0);
+					}
+				},
+				group:'nsqinxue_clear',
+				subSkill:{
+					clear:{
+						trigger:{player:'phaseAfter'},
+						silent:true,
+						content:function(){
+							player.storage.nsqinxue=[];
+						}
+					}
+				}
+			},
+			nsfuge:{
+				trigger:{player:'phaseAfter'},
+				filter:function(event,player){
+					return !player.storage.nsfuge;
+				},
+				init:function(player){
+					lib.onwash.push(function(){
+						delete player.storage.nsfuge;
+					});
+				},
+				skillAnimation:true,
+				check:function(event,player){
+					return player.hp==1||player.maxHp-player.hp>=2;
+				},
+				content:function(){
+					player.storage.nsfuge=true;
+					player.insertPhase();
+				},
+				group:'nsfuge_draw',
+				subSkill:{
+					draw:{
+						trigger:{player:'phaseDrawBegin'},
+						silent:true,
+						filter:function(event,player){
+							var evt=event.getParent('phase');
+							return evt&&evt.skill=='nsfuge';
+						},
+						content:function(){
+							trigger.num+=player.maxHp-player.hp;
+						}
+					}
+				}
+			},
+			nsbaiming:{
+				trigger:{player:'useCard'},
+				direct:true,
+				filter:function(event,player){
+					if(player.additionalSkills.nsbaiming) return false;
+					return event.card&&event.card.name=='sha'&&player.storage.nsbaiming&&player.storage.nsbaiming.length>0;
+				},
+				group:'nsbaiming_clear',
+				init:function(player){
+					var check=function(list){
+						for(var i=0;i<list.length;i++){
+							var info=lib.skill[list[i]];
+							if(info&&info.trigger){
+								for(var j in info.trigger){
+									var cond=info.trigger[j];
+									if(typeof cond=='string'){
+										cond=[cond];
+									}
+									if(j=='player'||j=='global'){
+										if(cond.indexOf('shaBefore')!=-1) return true;
+										if(cond.indexOf('shaBegin')!=-1) return true;
+										if(cond.indexOf('shaEnd')!=-1) return true;
+										if(cond.indexOf('shaAfter')!=-1) return true;
+									}
+									if(j=='source'||j=='global'){
+										if(cond.indexOf('damageBefore')!=-1) return true;
+										if(cond.indexOf('damageBegin')!=-1) return true;
+										if(cond.indexOf('damageEnd')!=-1) return true;
+										if(cond.indexOf('damageAfter')!=-1) return true;
+									}
+								}
+							}
+						}
+						return false;
+					};
+					player.storage.nsbaiming=get.gainableSkills(function(info,skill){
+						var list=[skill];
+						game.expandSkills(list);
+						return check(list);
+					},player);
+				},
+				content:function(){
+					'step 0'
+    				var list=player.storage.nsbaiming.slice(0);
+    				event.skillai=function(){
+    					return get.max(list,get.skillRank,'item');
+    				};
+    				if(event.isMine()){
+    					var dialog=ui.create.dialog('forcebutton');
+    					dialog.add(get.prompt('nsbaiming'));
+    					var clickItem=function(){
+    						_status.event._result=this.link;
+    						dialog.close();
+    						game.resume();
+    					};
+    					for(var i=0;i<list.length;i++){
+    						if(lib.translate[list[i]+'_info']){
+    							var translation=get.translation(list[i]);
+    							if(translation[0]=='新'&&translation.length==3){
+    								translation=translation.slice(1,3);
+    							}
+    							else{
+    								translation=translation.slice(0,2);
+    							}
+    							var item=dialog.add('<div class="popup pointerdiv" style="width:80%;display:inline-block"><div class="skill">【'+
+    							translation+'】</div><div>'+lib.translate[list[i]+'_info']+'</div></div>');
+    							item.firstChild.addEventListener('click',clickItem);
+    							item.firstChild.link=list[i];
+    						}
+    					}
+    					dialog.add(ui.create.div('.placeholder'));
+    					event.switchToAuto=function(){
+    						event._result=event.skillai();
+    						dialog.close();
+    						game.resume();
+    					};
+						event.confirm=ui.create.confirm('c');
+						event.custom.replace.confirm=function(){
+							event._result=null;
+    						dialog.close();
+    						game.resume();
+						};
+    					_status.imchoosing=true;
+    					game.pause();
+    				}
+    				else{
+    					event._result=event.skillai();
+    				}
+    				'step 1'
+    				_status.imchoosing=false;
+					if(event.confirm){
+						event.confirm.close();
+					}
+					if(typeof result=='string'){
+						player.logSkill('nsbaiming');
+						var link=result;
+	    				player.addAdditionalSkill('nsbaiming',link);
+						player.logSkill('nsbaiming');
+	    				player.popup(link);
+	    				game.log(player,'获得了技能','【'+get.translation(link)+'】');
+	    				game.delay();
+						player.storage.nsbaiming.remove(link);
+						trigger.nsbaiming=true;
+					}
+				},
+				subSkill:{
+					clear:{
+						trigger:{player:'useCardAfter'},
+						silent:true,
+						filter:function(event){
+							return event.nsbaiming==true;
+						},
+						content:function(){
+							player.removeAdditionalSkill('nsbaiming');
+						}
+					}
+				}
+			},
+			nsxinzhan:{
+				enable:'phaseUse',
+				filterCard:[1,Infinity],
+				filter:function(event,player){
+					return player.countCards('h')>0;
+				},
+				usable:1,
+				selectCard:[1,Infinity],
+				check:function(card){
+					var player=_status.event.player;
+					if(player.countCards('h')>=8&&game.hasPlayer(function(current){
+						return current.isDamaged()&&get.attitude(player,current)>3;
+					})){
+						if(ui.selected.cards.length>=6){
+							return 0;
+						}
+						return 1;
+					}
+					else{
+						if(ui.selected.cards.length>=2){
+							return 0;
+						}
+						if(player.countCards('h',function(card){
+							return get.value(card)<0;
+						})){
+							return 8-get.value(card,player,'raw');
+						}
+						else{
+							return 4-get.value(card,player,'raw');
+						}
+					}
+				},
+				discard:false,
+				prepare:'give2',
+				content:function(){
+					target.gain(cards,player);
+					var num=Math.floor(cards.length/2);
+					if(num>=3){
+						target.loseMaxHp(true);
+					}
+					else if(num){
+						target.loseHp(num);
+					}
+				},
+				filterTarget:function(card,player,target){
+					return target!=player;
+				},
+				ai:{
+					order:10,
+					result:{
+						target:function(player,target){
+							if(ui.selected.cards.length>=6){
+								if(target.isDamaged()) return 2;
+								return 1;
+							}
+							if(ui.selected.cards.length==1){
+								return 1;
+							}
+							return -1;
+						}
+					}
+				}
+			},
+			nstanbing:{
+				trigger:{player:'phaseDrawBegin'},
+				filter:function(event,player){
+					return player.countCards('h')>0;
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseToDiscard('h',get.prompt2('nstanbing')).set('ai',function(card){
+						if(!player.needsToDiscard(1)){
+							return get.translation(card.name).length-1;
+						}
+						return 0;
+					}).logSkill='nstanbing';
+					'step 1'
+					if(result.bool){
+						player.draw(get.translation(result.cards[0].name).length);
+						player.addTempSkill('nstanbing_sha');
+					}
+				},
+				subSkill:{
+					sha:{
+						mod:{
+    						cardEnabled:function(card,player){
+    							if(card.name=='sha'){
+    								return false;
+    							}
+    						},
+    						cardUsable:function(card,player){
+    							if(card.name=='sha'){
+    								return false;
+    							}
+    						},
+    					}
+					}
+				}
+			},
+			nswangfeng:{
+    			trigger:{global:'judge'},
+    			filter:function(event,player){
+    				return player.countCards('he',{color:'red'})>0;
+    			},
+    			direct:true,
+    			content:function(){
+    				"step 0"
+    				player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
+    				get.translation(trigger.player.judging[0])+'，'+get.prompt('guidao'),'he',function(card){
+    					return get.color(card)=='red';
+    				}).set('ai',function(card){
+    					var trigger=_status.event.getTrigger();
+    					var player=_status.event.player;
+    					var judging=_status.event.judging;
+    					var result=trigger.judge(card)-trigger.judge(judging);
+    					var attitude=get.attitude(player,trigger.player);
+    					if(attitude==0||result==0) return 0;
+    					if(attitude>0){
+    						return result;
+    					}
+    					else{
+    						return -result;
+    					}
+    				}).set('judging',trigger.player.judging[0]);
+    				"step 1"
+    				if(result.bool){
+    					player.respond(result.cards,'highlight');
+    				}
+    				else{
+    					event.finish();
+    				}
+    				"step 2"
+    				if(result.bool){
+    					player.logSkill('nswangfeng');
+    					player.$gain2(trigger.player.judging[0]);
+    					player.gain(trigger.player.judging[0]);
+    					trigger.player.judging[0]=result.cards[0];
+    					if(!get.owner(result.cards[0],'judge')){
+    						trigger.position.appendChild(result.cards[0]);
+    					}
+    					game.log(trigger.player,'的判定牌改为',result.cards[0]);
+    				}
+    				"step 3"
+    				game.delay(2);
+    			},
+    			ai:{
+    				tag:{
+    					rejudge:1
+    				}
+    			}
+    		},
+			nsfuhuo:{
+    			enable:'phaseUse',
+    			usable:1,
+    			filterCard:true,
+    			filterTarget:function(card,player,target){
+    				return player!=target&&!target.hasSkill('nsfuhuo2');
+    			},
+    			prepare:'throw',
+    			discard:false,
+    			content:function(){
+    				target.$gain2(cards);
+    				target.storage.nsfuhuo2=cards[0];
+    				target.addSkill('nsfuhuo2');
+    				target.storage.nsfuhuo3=player;
+    				ui.special.appendChild(cards[0]);
+    				target.syncStorage('nsfuhuo2');
+    			},
+    			check:function(card){
+    				return 6-get.value(card)
+    			},
+    			ai:{
+    				expose:0.1,
+    				order:1,
+    				result:{
+    					target:function(player,target){
+							if(target.hasSkillTag('maixie')) return 0;
+							return -1;
+						}
+    				}
+    			},
+				group:['nsfuhuo_die','nsfuhuo_gain'],
+				subSkill:{
+					die:{
+						trigger:{player:'dieBegin'},
+						silent:true,
+						content:function(){
+							for(var i=0;i<game.players.length;i++){
+								if(game.players[i].hasSkill('nsfuhuo2')&&game.players[i].storage.nsfuhuo3==player){
+									game.players[i].removeSkill('nsfuhuo2');
+								}
+							}
+						}
+					},
+					gain:{
+						trigger:{player:'phaseBegin'},
+						silent:true,
+						content:function(){
+							for(var i=0;i<game.players.length;i++){
+								if(game.players[i].hasSkill('nsfuhuo2')&&game.players[i].storage.nsfuhuo3==player){
+									var card=game.players[i].storage.nsfuhuo2;
+									game.players[i].removeSkill('nsfuhuo2');
+									game.players[i].$give(card,player);
+									player.gain(card);
+								}
+							}
+						}
+					}
+				}
+    		},
+    		nsfuhuo2:{
+    			trigger:{player:'respondAfter'},
+    			forced:true,
+    			priority:10,
+    			mark:'card',
+				popup:false,
+				filter:function(event,player){
+					return event.card&&event.card.name=='shan'&&player.storage.nsfuhuo3&&player.storage.nsfuhuo3.isIn();
+				},
+    			content:function(){
+					'step 0'
+    				player.storage.nsfuhuo3.logSkill('nsfuhuo',player);
+					player.judge(function(card){
+						var suit=get.suit(card);
+						if(suit=='heart'||suit=='diamond'){
+							return -1;
+						}
+						else{
+							return 0;
+						}
+					});
+					'step 1'
+					var source=player.storage.nsfuhuo3;
+					if(result.suit=='diamond'){
+						player.damage('fire',source);
+						if(player.countCards('h')){
+							player.randomDiscard('h');
+						}
+					}
+					else if(result.suit=='heart'){
+						player.damage('fire',2,source);
+					}
+    			},
+    			intro:{
+    				content:'card'
+    			},
+				onremove:function(player){
+					player.storage.nsfuhuo2.discard();
+					delete player.storage.nsfuhuo2;
+					delete player.storage.nsfuhuo3;
+				},
+				ai:{
+					noShan:true
+				}
+    		},
+			nshunji:{
+				enable:'phaseUse',
+    			viewAs:{name:'wanjian'},
+				usable:1,
+				delay:0,
+				selectCard:0,
+    			group:['nshunji_damage','nshunji_draw'],
+    			subSkill:{
+					draw:{
+						trigger:{player:'useCard'},
+						silent:true,
+						filter:function(event){
+							return event.skill=='nshunji';
+						},
+						content:function(){
+							player.draw();
+						}
+					},
+    				damage:{
+    					trigger:{global:'damageAfter'},
+    					silent:true,
+    					filter:function(event){
+    						return event.getParent(2).skill=='nshunji';
+    					},
+    					content:function(){
+							'step 0'
+							if(player.countCards('he')){
+								trigger.player.discardPlayerCard(player,'弃置'+get.translation(player)+'的一张牌，或取消并摸一张牌','he').set('boolline',true);
+							}
+    						else{
+								trigger.player.draw();
+								event.finish();
+							}
+							'step 1'
+							if(!result.bool){
+								trigger.player.draw();
+							}
+    					}
+    				}
+    			}
+			},
+			nsbaquan:{
+				trigger:{player:'phaseEnd'},
+				filter:function(event,player){
+					return player.countCards('h')>0;
+				},
+				check:function(event,player){
+					if(player.hasShan()||player.hujia>0) return false;
+					var nh=player.countCards('h');
+					if(player.hp==1){
+						return nh<=3;
+					}
+					if(player.hp==2){
+						return nh<=1;
+					}
+					return false;
+				},
+				content:function(){
+					var cards=player.getCards('h');
+					player.discard(cards);
+					player.changeHujia(cards.length);
+					player.storage.nsbaquan=true;
+				},
+				group:'nsbaquan_clear',
+				subSkill:{
+					clear:{
+						trigger:{player:'phaseBegin'},
+						forced:true,
+						filter:function(event,player){
+							return player.storage.nsbaquan&&player.hujia>0;
+						},
+						content:function(){
+							player.changeHujia(-player.hujia);
+							game.log(player,'失去了所有护甲');
+							delete player.storage.nsbaquan;
+						}
+					}
+				}
+			},
+			nschangshi:{
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.identity=='fan';
+				},
+				filterTarget:function(card,player,target){
+					if(target==player) return false;
+					if(ui.selected.targets.length){
+						return target.hp!=ui.selected.targets[0].hp;
+					}
+					return true;
+				},
+				multitarget:true,
+				selectTarget:2,
+				content:function(){
+					var tmp=targets[0].hp;
+					targets[0].hp=targets[1].hp;
+					targets[1].hp=tmp;
+					targets[0].update();
+					targets[1].update();
+					if(Math.abs(targets[0].hp-targets[1].hp)==1){
+						player.loseHp();
+					}
+					else{
+						player.die();
+					}
+				},
+				ai:{
+					order:10,
+					result:{
+						target:function(player,target){
+							if(target==game.zhu) return -1;
+							if(get.attitude(player,target)>3){
+								var num=game.zhu.hp-target.hp;
+								if(num==1){
+									return 1;
+								}
+								if(num>1){
+									if(player.hp==1) return num;
+									if(target.hp==1) return num;
+									if(num>=3) return num;
+								}
+							}
+							return 0;
+						}
+					}
+				}
+			},
+			nsjianning:{
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.identity=='nei';
+				},
+				filterTarget:function(card,player,target){
+					return target.countCards('h')<player.countCards('h');
+				},
+				content:function(){
+					'step 0'
+					player.swapHandcards(target);
+					'step 1'
+					target.damage();
+				},
+				ai:{
+					order:10,
+					result:{
+						target:function(player,target){
+							if(!player.countCards('h',function(card){
+								return get.value(card)>=8;
+							})&&player.countCards('h')-target.countCards('h')<=1){
+								if(target.hp==1||player.countCards('h',function(card){
+									return get.value(card)<0;
+								})){
+									return get.damageEffect(target,player,target);
+								}
+							}
+							return 0;
+						}
+					}
+				}
+			},
+			nscuanquan:{
+				init:function(player){
+					player.storage.nscuanquan=0;
+				},
+				forced:true,
+				unique:true,
+				forceunique:true,
+				skillAnimation:true,
+				animationColor:'thunder',
+				trigger:{player:'damageAfter'},
+				filter:function(event,player){
+					return player.identity=='zhong'&&player.storage.nscuanquan==3&&game.zhu&&game.zhu.isZhu;
+				},
+				group:'nscuanquan_count',
+				subSkill:{
+					count:{
+						trigger:{player:'damageEnd'},
+						silent:true,
+						content:function(){
+							player.storage.nscuanquan++;
+						}
+					}
+				},
+				logTarget:function(){
+					return [game.zhu];
+				},
+				content:function(){
+					player.awakenSkill('nscuanquan');
+					var tmp=player.maxHp;
+					player.identity='zhu';
+					player.maxHp=game.zhu.hp;
+					player.showIdentity();
+					player.update();
+					game.zhu.identity='zhong';
+					game.zhu.maxHp=tmp;
+					game.zhu.showIdentity();
+					game.zhu.update();
+					game.zhu=player;
+				}
+			},
 			nstianji:{
     			trigger:{global:'dying'},
     			priority:6,
@@ -3588,6 +4290,40 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_simazhao:'司马昭',
 			ns_guanlu:'管辂',
 
+			ns_duangui:'段珪',
+			ns_shenpei:'审配',
+			ns_zhangbao:'张宝',
+			ns_masu:'马谡',
+			ns_zhangxiu:'张绣',
+			ns_lvmeng:'吕蒙',
+
+			nsqinxue:'勤学',
+			nsqinxue_info:'每个效果每回合只能使用一次。①当你使用一张基本牌时，你从牌堆随机获得一张锦囊牌；②当你使用一张锦囊牌时，你从牌堆随机获得一张装备牌；③当你使用一张装备牌时，你从牌堆随机获得一张基本牌',
+			nsbaiyi:'白衣',
+			nsbaiyi_info:'锁定技，若你本回合发动过勤学，你跳过弃牌阶段，改为弃置X张牌（X为本回合发动勤学次数）；若你弃置了3张类别不同的牌，你获得一个额外回合（不可连续获得回合），否则你观看牌堆顶的X张牌并获得其中一张',
+			nsbaiming:'百鸣',
+			nsbaiming_info:'当你使用【杀】时，你可以获得一项未获得过且与杀或伤害相关的技能，此【杀】结算完毕后，你失去以此法获得的技能',
+			nsfuge:'覆戈',
+			nsfuge_info:'你的回合结束后，你可以执行一个额外的回合，此回合的摸牌阶段，你于摸牌阶段额外摸X张牌（X为你已损失的体力值）；若如此做，直到洗牌前，你不能再发动此技能',
+			nstanbing:'谈兵',
+			nstanbing_info:'牌阶段开始时，你可弃置一张牌，然后摸X张牌(X为你弃置牌的名称字数)，若如此做，本回合你不可使用或打出【杀】',
+			nsxinzhan:'心战',
+			nsxinzhan_info:'出牌阶段限一次，你可将任意张手牌交给一名其他角色，若如此做，该角色失去X点体力(X为你交给其的牌张数的一半，向下取整)，若你给的牌达到六张，则改为该角色失去一点体力上限',
+			nsfuhuo:'符火',
+			nsfuhuo2:'符火',
+			nsfuhuo_info:'出牌阶段限一次，你可将一张手牌置于一名武将牌上没有“符”的角色的武将牌上，称为“符”，若如此做，其回合外使用或打出【闪】时，你可令其判定，若结果为：红桃，你对其造成2点火焰伤害；方块，你弃置其一张手牌，然后对其造成1点火焰伤害。你的下个回合开始时，你获得其武将牌上的“符”',
+			nswangfeng:'望风',
+			nswangfeng_info:'在判定牌生效前，你可以打出一张红色牌替换之',
+			nshunji:'混击',
+			nshunji_info:'出牌阶段限一次，你可以摸一张牌，视为使用一张【万箭齐发】。此【万箭齐发】造成伤害时，受伤害角色选择一项：①弃置你一张牌；②摸一张牌',
+			nscuanquan:'篡权',
+			nscuanquan_info:'锁定技，如果你的身份为忠臣，则在受伤三次后与主公，互换身份和体力上限',
+			nsjianning:'奸佞',
+			nsjianning_info:'出牌阶段限一次，如果你的身份为内奸，你可以与一名手牌数比你少的角色交换手牌，并对其造成一点伤害',
+			nschangshi:'常仕',
+			nschangshi_info:'出牌阶段限一次，如果你的身份为反贼，你可以指定两名其他角色互换体力；如果两名角色体力之差等于1，你失去一点体力，否则你立即死亡',
+			nsbaquan:'霸权',
+			nsbaquan_info:'回合结束时，你可以弃置所有手牌，并获得相应点数的护甲，你的新一回合开始时清除所有护甲',
 			nsbugua:'卜卦',
 			nsbugua_use_info:'弃置一张牌，并将牌堆顶的六张牌反面朝上逐张按先后顺序排放，然后抛骰子，展示牌序号与骰子显示的点数一致的牌，然后你根据这张牌的花色、点数随机获得牌堆中相应的一张牌',
 			nsbugua_info:'出牌阶段限一次，你可以弃置一张牌，并将牌堆顶的六张牌反面朝上逐张按先后顺序排放，然后抛骰子，展示牌序号与骰子显示的点数一致的牌，然后你根据这张牌的花色、点数按以下规则随机获得牌堆中相应的一张牌：乾（红桃偶数）：无中生有；坤（黑桃奇数）：决斗；震（黑桃偶数）：南蛮入侵；巽（红桃奇数）：万箭齐发；坎（梅花偶数）：过河拆桥、兑（梅花奇数）：借刀杀人、艮（方片偶数）：顺手牵羊、离（方片奇数）：火攻。若牌堆中无此牌则摸一张牌，然后你观看未展示的另外五张牌并按任意顺序将其置于牌堆顶。',

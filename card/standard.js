@@ -96,6 +96,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(target.hasSkillTag('useShan')){
 								return 11-get.value(card);
 							}
+							if(target.hasSkillTag('noShan')){
+								return -1;
+							}
 							if(get.damageEffect(target,evt.player,target,evt.card.nature)>=0) return -1;
 							return 11-get.value(card);
 						}).set('shanRequired',event.shanRequired);
@@ -746,6 +749,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
 						if(evt.player.hasSkillTag('notricksource')) return 0;
 						if(evt.target.hasSkillTag('notrick')) return 0;
+						if(evt.target.hasSkillTag('noShan')){
+							return -1;
+						}
 						return 11-get.value(card);
 					});
 					next.autochoose=lib.filter.autoRespondShan;

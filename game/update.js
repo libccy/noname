@@ -3,8 +3,8 @@ window.noname_update={
     // update:'1.9.45.3',
     changeLog:[
         'bug修复',
-        'DIY比赛武将',
-        'players://["old_lingju","yj_jushou","swd_guyue","ns_duangui","yxs_luobinhan"]',
+        '部分DIY比赛武将',
+        'players://["old_lingju","yj_jushou","swd_guyue","ns_duangui","ns_shenpei","ns_masu","ns_zhangxiu","ns_zhangbao","yxs_luobinhan"]',
     ],
     files:[
         'game/game.js',

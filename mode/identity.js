@@ -1718,6 +1718,28 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					// }
 
 				},
+				showIdentity:function(){
+					this.node.identity.classList.remove('guessing');
+					this.identityShown=true;
+					this.ai.shown=1;
+					this.setIdentity();
+					if(this.special_identity){
+						this.node.identity.firstChild.innerHTML=get.translation(game.players[i].special_identity+'_bg');
+					}
+					if(this.identity=='zhu'){
+						this.isZhu=true;
+					}
+					else{
+						delete this.isZhu;
+					}
+					if(_status.clickingidentity){
+						for(var i=0;i<_status.clickingidentity[1].length;i++){
+							_status.clickingidentity[1][i].delete();
+							_status.clickingidentity[1][i].style.transform='';
+						}
+						delete _status.clickingidentity;
+					}
+				}
 			}
 		},
 		get:{

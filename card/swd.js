@@ -2009,6 +2009,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(get.damageEffect(target,player,target,'fire')>=0) return 0;
 						if(player.hasSkillTag('notricksource')) return 0;
 						if(target.hasSkillTag('notrick')) return 0;
+						if(target.hasSkillTag('noShan')){
+							return -1;
+						}
 						return 11-get.value(card);
 					};
 					next.autochoose=lib.filter.autoRespondShan;

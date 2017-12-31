@@ -6961,7 +6961,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				target.syncStorage('zhoufu2');
     			},
     			check:function(card){
-    				return 3-get.value(card)
+    				return 6-get.value(card)
     			},
     			ai:{
     				expose:0.1,
@@ -8993,6 +8993,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		chongzhen:{
     			group:['chongzhen1','chongzhen2'],
     			ai:{
+                    combo:'longdan',
     				mingzhi:false,
     				effect:{
     					target:function(card,player,target,current){

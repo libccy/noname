@@ -132,6 +132,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					content:'mark'
 				},
 				ai:{
+					combo:'shenfen',
 					maixie:true,
 					maixie_hp:true
 				}

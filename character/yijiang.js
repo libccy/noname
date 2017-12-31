@@ -356,15 +356,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
         				filter:function(event,player){
                             if(event.iwhile) return false;
                             if(event.player==player){
-                                return get.suit(event.card1)=='heart'&&event.card1.vanishtag.contains('tianbian');
+                                return get.suit(event.card1)=='heart';//&&event.card1.vanishtag.contains('tianbian');
                             }
                             else{
-                                return get.suit(event.card2)=='heart'&&event.card2.vanishtag.contains('tianbian');
+                                return get.suit(event.card2)=='heart';//&&event.card2.vanishtag.contains('tianbian');
                             }
         				},
         				silent:true,
         				content:function(){
-                            game.log(player,'拼点牌点数视为13');
+                            game.log(player,'拼点牌点数视为','#y13');
                             if(player==trigger.player){
                                 trigger.num1=13;
                             }
