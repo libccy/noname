@@ -123,16 +123,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=player.storage.nsqinxue.length;
 					player.chooseToDiscard('白衣：请弃置'+get.cnNumber(num)+'张牌','he',true,num);
 					'step 1'
-					if(result.bool&&result.cards.length==3){
-						var type=[];
-						for(var i=0;i<result.cards.length;i++){
-							type.add(get.type(result.cards[i],'trick'));
+					if(result.bool&&result.cards.length){
+						event.goon=true;
+						if(result.cards.length==3){
+							var type=[];
+							for(var i=0;i<result.cards.length;i++){
+								type.add(get.type(result.cards[i],'trick'));
+							}
+							if(type.length==3&&trigger.getParent().skill!='nsbaiyi'){
+								event.goon=false;
+								player.insertPhase();
+							}
 						}
-						if(type.length==3&&trigger.getParent().skill!='nsbaiyi'){
-							player.insertPhase();
-						}
-						else{
-							event.goon=true;
+						if(event.goon){
 							var cards=get.cards(result.cards.length);
 							event.cards=cards;
 							player.chooseCardButton(cards,'获得一张牌',true);
@@ -183,7 +186,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'nsqinxue_clear',
 				subSkill:{
 					clear:{
-						trigger:{player:'phaseAfter'},
+						trigger:{global:'phaseAfter'},
 						silent:true,
 						content:function(){
 							player.storage.nsqinxue=[];
