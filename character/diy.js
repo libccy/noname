@@ -2875,16 +2875,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect: {
 						target: function(card, player, target) {
 							if (get.tag(card, 'damage')) {
-								if (player.hasSkillTag('jueqing', false, target)) return [1, -2];
+								if (player.hasSkillTag('jueqing', false, target)) return;
 								if (!target.hasFriend()) return;
-								if (target.hp >= 4) return [0.5, get.tag(card, 'damage') * 2];
-								if (!target.hasSkill('paiyi') && target.hp > 1) return [0.5, get.tag(card, 'damage') * 1.5];
-								if (target.hp == 3) return [0.5, get.tag(card, 'damage') * 1];
-								if (target.hp == 2) return [1, get.tag(card, 'damage') * 0.5];
+								return 0.8;
 							}
-						},
-					},
-				},
+						}
+					}
+				}
 			},
 			liangji:{
 				enable: "phaseUse",
