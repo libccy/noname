@@ -207,6 +207,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			selectCard:[0,Infinity],
     			selectTarget:2,
     			complexCard:true,
+                complexSelect:true,
     			filterTarget:function(card,player,target){
     				if(player==target) return false;
     				if(ui.selected.targets.length==0) return true;
