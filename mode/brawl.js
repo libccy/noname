@@ -2068,6 +2068,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 	                        var line1=ui.create.div(style2,this);
 	                        var line2=ui.create.div(style2,this);
 	                        line2.style.lineHeight='50px';
+							line2.style.overflow='scroll';
+							lib.setScroll(line2);
+							var container=this.parentNode.parentNode;
+							setTimeout(function(){
+								var rect1=container.getBoundingClientRect();
+								var rect2=line2.getBoundingClientRect();
+								line2.style.height=(rect1.height-(rect2.top-rect1.top))+'px';
+							},1000);
 	                        if(_status.extensionmade.contains(name)){
 	                            ui.create.node('button','管理扩展',line1,function(){
 	                                ui.click.configMenu();
@@ -2142,8 +2150,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 	                if(init){
 	                    this.style.transition='all 0s';
 	                    this.style.height=(this.offsetHeight-10)+'px';
-	                    this.style.overflow='scroll';
-	                    lib.setScroll(this);
+	                    // this.style.overflow='scroll';
+	                    // lib.setScroll(this);
 	                    var style2={position:'relative',display:'block',left:0,top:0,marginBottom:'6px',padding:0,width:'100%'};
 	                    var style3={marginLeft:'4px',marginRight:'4px',position:'relative'}
 
@@ -2158,6 +2166,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 	                    var line2=ui.create.div(style2,this);
 	                    line1.style.marginBottom='10px';
 	                    line2.style.lineHeight='50px';
+						line2.style.overflow='scroll';
+						lib.setScroll(line2);
+						var container=this.parentNode.parentNode;
+						setTimeout(function(){
+							var rect1=container.getBoundingClientRect();
+							var rect2=line2.getBoundingClientRect();
+							line2.style.height=(rect1.height-(rect2.top-rect1.top))+'px';
+						},1000);
 	                    var scenes=[];
 	                    for(var i in lib.storage.scene){
 	                        scenes.push([i,i]);

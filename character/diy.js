@@ -4131,6 +4131,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.isLinked()==false) player.link();
 				},
 				ai:{
+					link:true,
 					order:2,
 					result:{
 						player:function(player){

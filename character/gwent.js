@@ -1363,7 +1363,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.draw(2);
 					'step 1'
 					player.chooseToDiscard('he',2,true).ai=function(card){
-						var val=get.value(card);
+						var val=-get.value(card);
 						if(ui.selected.cards.length){
 							if(get.suit(card)==get.suit(ui.selected.cards[0])) val++;
 							if(get.number(card)==get.number(ui.selected.cards[0])) val+=3;

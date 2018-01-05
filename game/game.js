@@ -4771,7 +4771,7 @@
 							map.enable_all_three.hide();
 							map.enable_all_cards.hide();
 						}
-                        if(config.versus_mode=='jiange'||config.versus_mode=='two'||
+                        if(config.versus_mode=='jiange'||config.versus_mode=='two'||config.versus_mode=='endless'||
 							config.versus_mode=='three'||config.versus_mode=='one'||config.versus_mode=='siguo'){
                             map.free_choose.show();
                         }
@@ -4822,6 +4822,7 @@
 							three:'统率',
 							jiange:'剑阁',
 							siguo:'四国',
+							// endless:'无尽',
                             // one:'<span style="display:inline-block;width:100%;text-align:center">1v1</span>',
                             two:'<span style="display:inline-block;width:100%;text-align:center">2v2</span>',
 							four:'<span style="display:inline-block;width:100%;text-align:center">4v4</span>'

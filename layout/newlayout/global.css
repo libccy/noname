@@ -251,6 +251,8 @@
 
 #arena.mobile.uslim_player .player:not([data-position='0'])>.count,
 #arena.mobile.lslim_player .player:not([data-position='0'])>.count,
+#arena.mobile.uslim_player.chess .player>.count,
+#arena.mobile.lslim_player.chess .player>.count,
 #arena:not(.mobile).uslim_player .player>.count,
 #arena:not(.mobile).lslim_player .player>.count{
     z-index: 3 !important;
