@@ -24,7 +24,7 @@ window.noname_update={
         'character/gwent.js',
         'character/diy.js',
         // 'character/standard.js',
-        // 'character/shenhua.js',
+        'character/shenhua.js',
         // 'character/refresh.js',
         // 'character/yijiang.js',
         // 'character/sp.js',

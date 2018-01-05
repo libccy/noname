@@ -2210,6 +2210,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			multitarget:true,
     			multiline:true,
+                complexSelect:true,
     			content:function(){
     				targets[0].swapHandcards(targets[1]);
     			},
