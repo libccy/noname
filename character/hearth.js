@@ -2715,6 +2715,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			filter:function(event,player){
     				return event.source&&event.source.isAlive()&&event.source!=player&&event.source.countCards('h')>0;
     			},
+                logTarget:'source',
     			content:function(){
     				var card=trigger.source.getCards('h').randomGet();
     				if(card){
