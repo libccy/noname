@@ -410,6 +410,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				enable:true,
 				selectTarget:-1,
+				modTarget:true,
 				content:function(){
 					target.damage('fire');
 				},

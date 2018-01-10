@@ -522,9 +522,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				modTarget:true,
 				content:function(){
 					'step 0'
-					var cards=target.getCards('h',function(card){
-						return get.type(card)!='basic';
-					});
+					var cards=target.getCards('h');
 					if(cards.length){
 						target.lose(cards)._triggered=null;
 					}
@@ -679,7 +677,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			linghunzhihuo:'灵魂之火',
 			linghunzhihuo_info:'对一名角色造成一点火焰伤害，然后随机弃置一张手牌',
 			shenenshu:'神恩术',
-			shenenshu_info:'出牌阶段对自己使用，获得一张随机基本牌，并将手牌中的非基本牌替换为基本牌',
+			shenenshu_info:'出牌阶段对自己使用，获得一张随机基本牌，并将所有手牌替换为基本牌',
 			zhiliaobo:'治疗波',
 			zhiliaobo_info:'出牌阶段对一名受伤角色使用，目标进行一次判定，若结果为红色，则回复一点体力，否则获得一点护甲',
 			yuansuhuimie:'元素毁灭',

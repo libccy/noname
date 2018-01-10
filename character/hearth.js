@@ -1093,6 +1093,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 }
             },
             qingtian:{
+                trigger:{player:'damageBegin'},
+                forced:true,
+                filter:function(event,player){
+                    return player.isMaxHp(true);
+                },
+                check:function(){
+                    return false;
+                },
+                content:function(){
+                    trigger.num++;
+                }
+            },
+            qingtian_old:{
                 trigger:{player:'recoverBefore'},
                 forced:true,
                 filter:function(event,player){
@@ -8001,7 +8014,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             shouwang_info:'每名角色每局限一次，当一名角色进入濒死状态时，你可以令其回复一点体力并获得一点护甲',
             shouwang_info_alter:'每名角色每局限一次，当一名角色进入濒死状态时，你可以令其回复一点体力',
             qingtian:'擎天',
-            qingtian_info:'锁定技，若你的体力值大于0，你防止即将回复的体力，改为获得等量护甲',
+            qingtian_info:'锁定技，若你的体力值为全场最多，你受到的伤害始终+1',
             qianfu:'潜伏',
             qianfu2:'潜伏',
             qianfu2_bg:'伏',
@@ -8140,8 +8153,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		xianji_info:'其他角色可以在其结束阶段弃置1~2张手牌并令你摸等量的牌，若如此做，直到其下一回合结束，每当你使用卡牌指定其为目标时，其摸一张牌',
     		xueren:'血刃',
     		xueren_info:'每当你使用杀造成伤害，你可以令受伤害角色与你各流失一点体力，然后你摸两张牌',
-    		maoxian:'冒险',
-    		maoxian2:'冒险',
+    		maoxian:'奇旅',
+    		maoxian2:'奇旅',
     		maoxian_info:'出牌阶段限两次，你可以从三个随机亮出的技能中选择一个作为你的技能',
     		tanmi:'探秘',
     		tanmi_info:'在一名其他角色的结束阶段，若你没有手牌，你可以摸两张牌并可以使用两张牌',

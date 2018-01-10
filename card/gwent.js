@@ -440,7 +440,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					event.aitarget=target;
 					var list=[];
 					for(var i in lib.character){
-						if(!lib.filter.characterDisabled(i)&&!!lib.filter.characterDisabled2(i)){
+						if(!lib.filter.characterDisabled(i)&&!lib.filter.characterDisabled2(i)){
 							list.push(i);
 						}
 					}

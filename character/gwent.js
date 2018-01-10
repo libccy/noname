@@ -47,7 +47,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_laomaotou:['male','qun',4,['gwchenshui']],
 			gw_qigaiwang:['male','qun',4,['julian']],
 
-			gw_bierna:['female','qun',4,['gwfengshi']],
+			gw_bierna:['female','qun',3,['gwfengshi']],
 			gw_haizhiyezhu:['male','qun',4,['yangfan']],
 			gw_nitelila:['male','wei',4,['shuangxi']],
 
@@ -58,6 +58,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_kairuisi:['female','qun',3,['gwweitu']],
 			gw_oudimu:['male','shu',3,['gwjingshi']],
 			gw_shasixiwusi:['male','qun',4,['gwjingtian']],
+
+			gw_yioufeisisp:['male','wu',3,['gwminxiang']],
+			gw_lanbote:['male','qun',4,['gwlangshi']],
+			gw_fenghuang:['male','wu',3,['gwminxiang']],
+			gw_diandian:['male','wu',6,['gwmaoxian']],
+			gw_yisilinni:['male','wu',3,['gwminxiang']],
+			gw_feilafanruide:['male','wu',3,['gwminxiang']],
 		},
 		characterIntro:{
 			gw_huoge:'那个老年痴呆?不知道他是活着还是已经被制成标本了!',
@@ -73,6 +80,171 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			gwmaoxian:{
+				subSkill:{
+					card:{
+						mark:'card',
+						intro:{
+							content:'card'
+						}
+					}
+				},
+				enable:'phaseUse',
+				usable:1,
+				direct:true,
+				delay:0,
+				content:function(){
+
+				},
+				ai:{
+					order:1
+				}
+			},
+			gwmaoxian_old:{
+				trigger:{global:'gameStart',player:['enterGame','phaseBefore']},
+				forced:true,
+				filter:function(event,player){
+					return !player.storage.gwmaoxian;
+				},
+				content:function(){
+					player.storage.gwmaoxian=10;
+					player.storage.gwmaoxian_skill=[];
+					event.insert(lib.skill.gwmaoxian.learn,{player:player});
+				},
+				learn:function(){
+					var list={
+						draw:{
+							bronze:[1,'准备阶段，你获得一张随机铜卡法术'],
+							basic:[1,'准备阶段，你从牌堆中获得一张杀'],
+							silver:[2,'结束阶段，你获得一张随机银卡法术'],
+							trick:[3,'结束阶段，你从3张随机亮出的普通锦囊牌中选择一张获得之'],
+							gold:[3,'出牌阶段开始时，你获得一张随机金卡法术'],
+							equip:[3,'出牌阶段开始时，你在装备区内的空余位置装备一件随机装备'],
+						},
+						attack:{
+							sha:[1,'你可以将一张手牌当作杀使用'],
+							huogong:[1,'你可以将一张手牌当作火攻使用'],
+							aoe:[2,'出牌阶段限一次，你可以弃置两张牌，视为使用一张南蛮入侵'],
+							shas:[2,'每当你使用一张杀，你可以追加一名无视距离的目标'],
+
+						},
+						defend:{
+
+						},
+						assist:{
+
+						},
+						control:{
+
+						}
+					}
+				}
+			},
+			gwminxiang:{
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					var hs=player.getCards('h');
+					var names=[];
+					for(var i=0;i<hs.length;i++){
+						if(['basic','trick'].contains(get.type(hs[i]))&&!get.info(hs[i]).multitarget){
+							names.add(hs[i].name);
+						}
+					}
+					for(var i=0;i<names.length;i++){
+						if(game.countPlayer(function(current){
+							return current!=player&&lib.filter.targetEnabled2({name:names[i]},player,current);
+						})>1){
+							return true;
+						}
+					}
+					return false;
+				},
+				check:function(card){
+					if(get.tag(card,'damage')){
+						return get.value(card)+3;
+					}
+					return get.value(card);
+				},
+				filterCard:function(card,player){
+					if(!['basic','trick'].contains(get.type(card))) return false;
+					return game.countPlayer(function(current){
+						return current!=player&&lib.filter.targetEnabled2({name:card.name},player,current);
+					})>1;
+				},
+				filterTarget:function(card,player,target){
+					if(player==target||!ui.selected.cards.length) return false;
+					return lib.filter.targetEnabled2({name:ui.selected.cards[0].name},player,target);
+				},
+				targetprompt:['先出牌','后出牌'],
+				selectTarget:2,
+				multitarget:true,
+				content:function(){
+					'step 0'
+					event.draw=0;
+					targets[0].useCard({name:cards[0].name},targets[1],'noai');
+					'step 1'
+					if(targets[0].isIn()&&targets[1].isIn()){
+						targets[1].useCard({name:cards[0].name},targets[0],'noai');
+					}
+					'step 2'
+					if(event.draw){
+						player.draw(event.draw);
+					}
+				},
+				group:'gwminxiang_draw',
+				multiline:true,
+				subSkill:{
+					draw:{
+						trigger:{global:'damageAfter'},
+						silent:true,
+						filter:function(event,player){
+							var evt=event.getParent(3);
+							return evt.name=='gwminxiang'&&evt.player==player;
+						},
+						content:function(){
+							trigger.getParent(3).draw+=trigger.num;
+						}
+					}
+				},
+				ai:{
+					order:8,
+					result:{
+						target:function(player,target){
+							if(!ui.selected.cards.length) return 0;
+							return get.effect(target,{name:ui.selected.cards[0].name},target,target);
+						}
+					},
+					expose:0.4,
+					threaten:1.6,
+				}
+			},
+			gwlangshi:{
+				trigger:{source:'damageEnd'},
+				direct:true,
+				filter:function(event,player){
+					if(event.parent.name=='gwlangshi') return false;
+					return game.hasPlayer(function(current){
+						return current!=event.player&&current!=player&&current.hp>=event.player.hp;
+					});
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('gwlangshi'),function(card,player,target){
+						return target!=trigger.player&&target!=player&&target.hp>=trigger.player.hp;
+					}).set('ai',function(card,player,target){
+						return get.damageEffect(target,player,player);
+					});
+					'step 1'
+					if(result.bool){
+						player.logSkill('gwlangshi',result.targets);
+						result.targets[0].damage(player);
+					}
+				},
+				ai:{
+					threaten:1.5
+				}
+			},
 			gwjingtian:{
 				clickable:function(player){
 					player.addTempSkill('gwjingtian2');
@@ -2843,6 +3015,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_oudimu:'欧迪姆',
 			gw_shasixiwusi:'沙斯西乌斯',
 
+			gw_yioufeisisp:'伊欧菲斯',
+			gw_diandian:'店店',
+			gw_feilafanruide:'菲拉凡德苪',
+			gw_fenghuang:'凤凰',
+			gw_yisilinni:'伊斯琳妮',
+			gw_lanbote:'兰伯特',
+
+			gwmaoxian:'幻笔',
+			gwmaoxian_info:'出牌阶段限一次，你可以创造一张冒险牌，然后你为其指定一个价格，其他角色依次可以向你支付对应的牌，然后获得一张此冒险牌的复制',
+			gwminxiang:'冥想',
+			gwminxiang_info:'出牌阶段限一次，你可以弃置一张基本牌或普通锦囊牌并选择两名角色，令目标分别视为对对方使用一张与弃置的牌同名的牌；每当有角色因此受到一点伤害，你在结算后摸一张牌',
+			gwlangshi:'狼噬',
+			gwlangshi_info:'每当你造成一次伤害，你可以对一名体力值不小于受伤害角色的其他角色造一点伤害',
 			gwjingshi:'镜师',
 			gwjingshi_info:'出牌阶段限一次，你可以猜测手牌中黑色牌最多的角色是谁，若猜对，你可以观看所有其他角色的手牌并获得任意一张',
 			gwjingtian:'经天',

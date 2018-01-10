@@ -907,7 +907,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					basic:{
 						order:5,
 						useful:1,
-						value:4.5
+						value:5.5
 					},
 					result:{
 						target:-1.5,

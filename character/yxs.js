@@ -898,19 +898,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						if(event.cards.length) event.goto(2);
 					}
-				},
-				ai:{
-					effect:{
-						target:function(card,player,target){
-							if(get.tag(card,'damage')){
-								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
-								if(!target.hasFriend()) return;
-								if(target.hp>=4) return [1,get.tag(card,'damage')*2];
-								if(target.hp==3) return [1,get.tag(card,'damage')*1.5];
-								if(target.hp==2) return [1,get.tag(card,'damage')*0.5];
-							}
-						}
-					}
 				}
 			},
 			yanyi:{
