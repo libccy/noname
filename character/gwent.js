@@ -62,7 +62,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisisp:['male','wu',3,['gwminxiang']],
 			gw_lanbote:['male','qun',4,['gwlangshi']],
 			gw_fenghuang:['male','wu',3,['gwminxiang']],
-			gw_diandian:['male','wu',6,['gwmaoxian']],
+			gw_diandian:['male','wu',3,['gwhuanbi']],
 			gw_yisilinni:['male','wu',3,['gwminxiang']],
 			gw_feilafanruide:['male','wu',3,['gwminxiang']],
 		},
@@ -80,24 +80,53 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
-			gwmaoxian:{
-				subSkill:{
-					card:{
-						mark:'card',
-						intro:{
-							content:'card'
-						}
-					}
-				},
+			gwhuanbi:{
 				enable:'phaseUse',
 				usable:1,
-				direct:true,
-				delay:0,
+				filterCard:true,
+				position:'he',
+				check:function(card){
+					return 8-get.value(card);
+				},
 				content:function(){
-
+					'step 0'
+					player.chooseVCardButton(get.typeCard('gwmaoxian').randomGets(3),true,'选择一张冒险牌');
+					'step 1'
+					if(result.bool){
+						event.card=game.createCard(result.links[0][2]);
+						player.gain(event.card,'gain2');
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					var list=game.filterPlayer(function(current){
+						return current!=player&&current.countCards('h');
+					});
+					if(list.length){
+						event.target=list.randomGet();
+						event.target.chooseCard('h','是否交给'+get.translation(event.player)+'一张手牌并获得冒险牌？').set('ai',function(card){
+							if(get.attitude(event.target,player)>0){
+								return 11-get.value(card);
+							}
+							return 7-get.value(card);
+						}).set('promptx',[event.card]);
+					}
+					else{
+						event.finish();
+					}
+					'step 3'
+					if(result.bool){
+						event.target.line(player,'green');
+						event.target.give(result.cards,player);
+						event.target.gain(game.createCard(event.card),'gain2');
+					}
 				},
 				ai:{
-					order:1
+					order:8,
+					result:{
+						player:1
+					}
 				}
 			},
 			gwmaoxian_old:{
@@ -2911,6 +2940,790 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		card:{
+			gwmaoxian_yioufeisi:{
+				type:'gwmaoxian',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_diandian',
+				image:'character/gw_yioufeisisp',
+				enable:true,
+				filterTarget:function(card,player,target){
+					return target!=player;
+				},
+				selectTarget:2,
+				multitarget:true,
+				multiline:true,
+				content:function(){
+					'step 0'
+					targets[0].useCard({name:'sha'},targets[1],'noai');
+					'step 1'
+					if(targets[0].isIn()&&targets[1].isIn()){
+						targets[1].useCard({name:'sha'},targets[0],'noai');
+					}
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:10,
+					order:1,
+					result:{
+						target:function(player,target){
+							return -get.effect(target,{name:'sha'},target,target);
+						}
+					}
+				}
+			},
+			gwmaoxian_luoqi:{
+				type:'gwmaoxian',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_diandian',
+				image:'character/gw_luoqi',
+				enable:true,
+				filterTarget:function(card,player,target){
+					return player.canUse('sha',target,false);
+				},
+				content:function(){
+					'step 0'
+					player.useCard({name:'sha'},target,false).animate=false;
+					'step 1'
+					event.targets=game.filterPlayer(function(current){
+						return current.canUse('sha',target,false)&&current!=player;
+					});
+					event.targets.sortBySeat();
+					'step 2'
+					if(event.targets.length){
+						event.current=event.targets.shift();
+						if(event.current.hasSha()){
+							event.current.chooseToUse({name:'sha'},'是否对'+get.translation(target)+'使用一张杀？',target,-1);
+						}
+						event.redo();
+					}
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:10,
+					order:1,
+					result:{
+						target:function(player,target){
+							return -get.effect(target,{name:'sha'},player,target);
+						}
+					}
+				}
+			},
+			gwmaoxian_jieluote:{
+				type:'gwmaoxian',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_diandian',
+				image:'character/gw_jieluote',
+				enable:true,
+				filterTarget:true,
+				content:function(){
+					if(target.isMaxHp()&&target.hp>2){
+						target.damage(2);
+					}
+					else{
+						target.damage();
+					}
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:10,
+					order:1,
+					tag:{
+						damage:1
+					},
+					result:{
+						player:function(player,target){
+							var eff=get.damageEffect(target,player,player);
+							if(eff>0){
+								eff=Math.sqrt(eff);
+								if(target.isMaxHp()&&target.hp>2){
+									switch(target.hp){
+										case 3:return eff*2;
+										case 4:return eff*1.5;
+										default:return eff*1.1;
+									}
+								}
+								else{
+									switch(target.hp){
+										case 1:return eff*1.6;
+										case 2:return eff*1.1;
+										default:return eff;
+									}
+								}
+							}
+							return 0;
+						}
+					}
+				}
+			},
+			gwmaoxian_yenaifa:{
+				type:'gwmaoxian',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_diandian',
+				image:'character/gw_yenaifa',
+				enable:true,
+				notarget:true,
+				content:function(){
+					'step 0'
+					event.targets=player.getEnemies().randomGets(3).sortBySeat();
+					'step 1'
+					if(event.targets.length){
+						player.line(event.targets.shift().getDebuff(false).addExpose(0.1));
+						event.redo();
+					}
+					'step 2'
+					game.delay();
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:10,
+					order:1,
+					result:{
+						player:1
+					}
+				}
+			},
+			gwmaoxian_telisi:{
+				type:'gwmaoxian',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_diandian',
+				image:'character/gw_telisi',
+				enable:true,
+				notarget:true,
+				content:function(){
+					'step 0'
+					event.targets=player.getFriends().randomGets(3);
+					event.targets.add(player);
+					event.targets.sortBySeat();
+					'step 1'
+					if(event.targets.length){
+						player.line(event.targets.shift().getBuff(false).addExpose(0.1));
+						event.redo();
+					}
+					'step 2'
+					game.delay();
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:10,
+					order:1,
+					result:{
+						player:1
+					}
+				}
+			},
+			gwmaoxian_hengsaite:{
+				type:'gwmaoxian',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_diandian',
+				image:'character/gw_hengsaite',
+				enable:true,
+				filterTarget:function(card,player,target){
+					return target!=player;
+				},
+				content:function(){
+					var list=[];
+					for(var i=0;i<3;i++){
+						list.push(game.createCard('sha'));
+					}
+					target.gain(list,'gain2');
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:10,
+					order:1,
+					result:{
+						target:function(player,target){
+							return 1/Math.sqrt(target.countCards('h')+1);
+						}
+					}
+				}
+			},
+			gwmaoxian_fuertaisite:{
+				type:'gwmaoxian',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_diandian',
+				image:'character/gw_fuertaisite',
+				enable:true,
+				filterTarget:true,
+				selectTarget:[1,2],
+				content:function(){
+					target.changeHujia();
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:10,
+					order:1,
+					result:{
+						target:function(player,target){
+							var num=1/Math.sqrt(target.hp+1);
+							if(target.hasSkillTag('maixie_hp')){
+								num*=0.7;
+							}
+							if(target.hp==1){
+								num*=1.5;
+							}
+							return num;
+						}
+					}
+				}
+			},
+			gwmaoxian_laduoweide:{
+				type:'gwmaoxian',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_diandian',
+				image:'character/gw_laduoweide',
+				enable:true,
+				filterTarget:true,
+				content:function(){
+					target.addTempSkill('fengyin',{player:'phaseAfter'});
+					target.damage();
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:10,
+					order:1,
+					result:{
+						target:function(player,target){
+							var num=1/Math.sqrt(target.hp+1);
+							if(target.hasSkillTag('maixie_hp')){
+								num*=1.5;
+							}
+							return -num;
+						}
+					}
+				}
+			},
+			gwmaoxian_enxier:{
+				type:'gwmaoxian',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_diandian',
+				image:'character/gw_enxier',
+				enable:true,
+				filterTarget:function(card,player,target){
+					return Math.abs(target.countCards('h')-player.countCards('h'))<=1;
+				},
+				content:function(){
+					player.swapHandcards(target);
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:10,
+					order:1,
+					result:{
+						target:function(player,target){
+							var dh=target.countCards('h')-player.countCards('h');
+							if(dh>0) return -1;
+							if(dh==0&&player.needsToDiscard()) return -0.5;
+							return 0;
+						}
+					}
+				}
+			},
+			gwmaoxian_fulisi:{
+				type:'gwmaoxian',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_diandian',
+				image:'character/gw_fulisi',
+				enable:true,
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countCards('h');
+				},
+				selectTarget:[1,3],
+				content:function(){
+					'step 0'
+					if(player.countCards('h')){
+						player.chooseCardButton(get.translation(target)+'的手牌（可用一张手牌替换）',target.getCards('h')).ai=function(button){
+							return get.value(button.link)-5;
+						}
+					}
+					else{
+						player.viewHandcards(target);
+						event.finish();
+					}
+					'step 1'
+					if(result.bool){
+						event.card=result.links[[0]];
+						player.chooseCard('h',true,'用一张手牌替换'+get.translation(event.card)).ai=function(card){
+							return -get.value(card);
+						};
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if(result.bool){
+						player.gain(event.card,target);
+						target.gain(result.cards,player);
+						player.$giveAuto(result.cards,target);
+						target.$giveAuto(event.card,player);
+						game.log(player,'与',target,'交换了一张手牌');
+					}
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:10,
+					order:1,
+					result:{
+						target:-1
+					}
+				}
+			},
+			gwmaoxian_kaerweite:{
+				type:'gwmaoxian',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_diandian',
+				image:'character/gw_kaerweite',
+				enable:true,
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countCards('h');
+				},
+				selectTarget:[1,2],
+				multitarget:true,
+				multiline:true,
+				content:function(){
+					player.gainMultiple(targets);
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:10,
+					order:1,
+					result:{
+						target:function(player,target){
+							if(target.hasSkillTag('nolose')||target.hasSkillTag('noh')){
+								return 0;
+							}
+							return -1/Math.sqrt(1+target.countCards('h'));
+						}
+					}
+				}
+			},
+			gwmaoxian_bulanwang:{
+				type:'gwmaoxian',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_diandian',
+				image:'character/gw_bulanwang',
+				enable:true,
+				notarget:true,
+				content:function(){
+					'step 0'
+					player.chooseToDiscard('he',[1,3],'弃置至多3张牌并摸弃牌数2倍的牌').set('ai',function(card){
+						return 9-get.value(card);
+					});
+					'step 1'
+					if(result.bool){
+						player.draw(2*result.cards.length);
+					}
+					player.skip('phaseDiscard');
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:10,
+					order:1,
+					result:{
+						player:function(player,target){
+							if(player.hasCard('he',function(card){
+								return get.value(card)<9;
+							})){
+								return 1;
+							}
+							return 0;
+						}
+					}
+				}
+			},
+			gwmaoxian_kuite:{
+				type:'gwmaoxian',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_diandian',
+				image:'character/gw_kuite',
+				enable:true,
+				filterTarget:function(card,player,target){
+					return target.countCards('h')>=player.countCards('h')&&player.canUse('juedou',target);
+				},
+				content:function(){
+					'step 0'
+					player.useCard({name:'juedou'},target).animate=false;
+					'step 1'
+					if(player.isIn()&&target.isIn()){
+						player.useCard({name:'juedou'},target);
+					}
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:10,
+					order:1,
+					result:{
+						target:function(player,target){
+							return get.effect(target,{name:'juedou'},player,target);
+						}
+					}
+				}
+			},
+			gwmaoxian_haluo:{
+				type:'gwmaoxian',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_diandian',
+				image:'character/gw_haluo',
+				enable:true,
+				filterTarget:function(card,player,target){
+					return target.isMinHp();
+				},
+				selectTarget:-1,
+				content:function(){
+					target.damage();
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:10,
+					order:1,
+					result:{
+						target:-1.5
+					},
+					tag:{
+						damage:1
+					}
+				}
+			},
+			gwmaoxian_dagong:{
+				type:'gwmaoxian',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_diandian',
+				image:'character/gw_dagong',
+				enable:true,
+				content:function(){
+					target.addSkill('gw_ciguhanshuang');
+					target.addSkill('gw_birinongwu');
+					target.addSkill('gw_qinpendayu');
+				},
+				filterTarget:function(card,player,target){
+					return !target.hasSkill('gw_ciguhanshuang')||
+						!target.hasSkill('gw_qinpendayu')||
+						!target.hasSkill('gw_birinongwu');
+				},
+	            changeTarget:function(player,targets){
+	                game.filterPlayer(function(current){
+	                    return get.distance(targets[0],current,'pure')==1;
+	                },targets);
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:10,
+					order:1,
+					result:{
+						target:function(player,target){
+							return get.effect(target,{name:'gw_ciguhanshuang'},player,target);
+						}
+					}
+				}
+			},
+			gwmaoxian_gaier:{
+				type:'gwmaoxian',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_diandian',
+				image:'character/gw_gaier',
+				enable:true,
+				filterTarget:true,
+				content:function(){
+					'step 0'
+					var str1='令'+get.translation(target);
+					var str2='一点体力和体力上限'
+					player.chooseControlList([str1+'增加'+str2,str1+'减少'+str2],function(){
+						if(get.attitude(player,target)>0) return 0;
+						return 1;
+					});
+					'step 1'
+					if(result.index==0){
+						target.gainMaxHp(true);
+						target.recover();
+					}
+					else{
+						target.loseHp();
+						target.loseMaxHp(true);
+					}
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:10,
+					order:1,
+					result:{
+						player:function(player,target){
+							var num=1;
+							if(target.hasSkillTag('maixie_hp')){
+								num=1.5;
+							}
+							return num/Math.sqrt(target.hp+1);
+						}
+					}
+				}
+			},
+			gwmaoxian_airuiting:{
+				type:'gwmaoxian',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_diandian',
+				image:'character/gw_airuiting',
+				enable:true,
+				filterTarget:function(card,player,target){
+					return target!=player;
+				},
+				selectTarget:-1,
+				content:function(){
+					'step 0'
+					target.chooseToUse({name:'sha'},'使用一张杀，或失去一点体力');
+					'step 1'
+					if(!result.bool){
+						target.loseHp();
+					}
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:10,
+					order:1,
+					result:{
+						target:function(player,target){
+							if(target.hasSha()){
+								if(Math.random()<0.5) return 1;
+								return 0;
+							}
+							if(target.countCards('h')>=2){
+								return 0;
+							}
+							else{
+								return -1;
+							}
+						}
+					}
+				}
+			},
+			gwmaoxian_aisinie:{
+				type:'gwmaoxian',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_diandian',
+				image:'character/gw_aisinie',
+				enable:true,
+				notarget:true,
+				content:function(){
+					'step 0'
+					player.recover();
+					'step 1'
+					var list=get.typeCard('spell_silver');
+					if(list.length){
+						player.chooseVCardButton('获得一张银卡法术',list,true);
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if(result.bool){
+						player.gain(game.createCard(result.links[0][2]),'gain2');
+					}
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:10,
+					order:1,
+					result:{
+						player:1
+					}
+				}
+			},
+			gwmaoxian_falanxisika:{
+				type:'gwmaoxian',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_diandian',
+				image:'character/gw_falanxisika',
+				enable:true,
+				notarget:true,
+				content:function(){
+					'step 0'
+					var list=get.typeCard('spell_gold');
+					list.remove('gw_huangjiashenpan');
+					if(list.length){
+						player.chooseVCardButton('使用一张金卡法术',list.randomGets(3),true).ai=function(button){
+							var info=get.info(button.link[2]);
+							if(info&&info.ai&&info.ai.result&&info.ai.result.player){
+								return info.ai.result.player(player,player);
+							}
+							return 0;
+						};
+					}
+					else{
+						event.finish();
+					}
+					'step 1'
+					if(result.bool){
+						player.useCard(game.createCard(result.links[0][2]));
+					}
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:10,
+					order:1,
+					result:{
+						player:1
+					}
+				}
+			},
+			gwmaoxian_huoge:{
+				type:'gwmaoxian',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_diandian',
+				image:'character/gw_huoge',
+				enable:true,
+				notarget:true,
+				content:function(){
+					'step 0'
+					event.cards=get.cards(6);
+					player.chooseCardButton(event.cards,[1,2],'选择至多两牌依次使用之').set('filterButton',function(button){
+						return game.hasPlayer(function(current){
+							return player.canUse(button.link,current);
+						});
+					}).set('ai',function(button){
+						return get.value(button.link);
+					});
+					'step 1'
+					if(result.bool){
+						event.list=result.links.slice(0);
+						for(var i=0;i<event.cards.length;i++){
+							if(!event.list.contains(event.cards[i])){
+								event.cards[i].discard();
+							}
+						}
+					}
+					'step 2'
+					if(event.list.length){
+						player.chooseUseTarget(event.list.shift());
+						event.redo();
+					}
+				},
+				contentAfter:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				},
+				ai:{
+					value:10,
+					order:1,
+					result:{
+						player:1
+					}
+				}
+			},
 			gw_wuyao:{
 				type:'special',
 				fullimage:true,
@@ -2960,6 +3773,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 		},
+    	cardType:{
+    		gwmaoxian:0.5
+    	},
 		translate:{
 			gw_huoge:'霍格',
 			gw_aisinie:'埃丝涅',
@@ -2969,7 +3785,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_dagong:'达贡',
 			gw_airuiting:'艾瑞汀',
 			gw_fuertaisite:'弗尔泰斯特',
-			gw_falanxisika:'法兰西斯卡',
+			gw_falanxisika:'法兰茜斯卡',
 			gw_haluo:'哈洛',
 			gw_hengsaite:'亨赛特',
 			gw_kaerweite:'卡尔维特',
@@ -3022,8 +3838,49 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yisilinni:'伊斯琳妮',
 			gw_lanbote:'兰伯特',
 
-			gwmaoxian:'幻笔',
-			gwmaoxian_info:'出牌阶段限一次，你可以创造一张冒险牌，然后你为其指定一个价格，其他角色依次可以向你支付对应的牌，然后获得一张此冒险牌的复制',
+			gwmaoxian_yioufeisi:'伊欧菲斯',
+			gwmaoxian_yioufeisi_info:'选择两名角色，令目标依次视为对对方使用一张杀，然后结束出牌阶段',
+			gwmaoxian_luoqi:'罗契',
+			gwmaoxian_luoqi_info:'选择一名角色视为对其使用一张不计入出杀次数的杀，然后所有其他角色可以视为对其使用一张杀，然后结束出牌阶段',
+			gwmaoxian_jieluote:'杰洛特',
+			gwmaoxian_jieluote_info:'对一名角色造成一点伤害，若目标体力值大于2且为全场最多，改为造成2点伤害，然后结束出牌阶段',
+			gwmaoxian_yenaifa:'叶奈法',
+			gwmaoxian_yenaifa_info:'对至多3名随机敌方角色施加一个随机负面效果，然后结束出牌阶段',
+			gwmaoxian_telisi:'特丽斯',
+			gwmaoxian_telisi_info:'对至多3名随机友方角色施加一个随机正面效果，然后结束出牌阶段',
+			gwmaoxian_hengsaite:'亨赛特',
+			gwmaoxian_hengsaite_info:'令一名其他角色获得3张杀，然后结束出牌阶段',
+			gwmaoxian_fuertaisite:'弗尔泰斯特',
+			gwmaoxian_fuertaisite_info:'令至多两名角色各获得一点护甲，然后结束出牌阶段',
+			gwmaoxian_laduoweide:'拉多维德',
+			gwmaoxian_laduoweide_info:'令一名角色的非锁定技失效直到其下一回合结束，并对其造成一点伤害，然后结束出牌阶段',
+			gwmaoxian_enxier:'恩希尔',
+			gwmaoxian_enxier_info:'与一名手牌并不超过1的其他角色交换手牌，然后结束出牌阶段',
+			gwmaoxian_fulisi:'符里斯',
+			gwmaoxian_fulisi_info:'选择至多三名角色，观看目标的手牌并可以用自己的手牌交换一张，然后结束出牌阶段',
+			gwmaoxian_kaerweite:'卡尔维特',
+			gwmaoxian_kaerweite_info:'获得至多两名角色各一张手牌，然后结束出牌阶段',
+			gwmaoxian_bulanwang:'布兰王',
+			gwmaoxian_bulanwang_info:'弃置至多3张牌并摸数量等于弃牌数2倍的牌，跳过弃牌阶段，然后结束出牌阶段',
+			gwmaoxian_kuite:'奎特',
+			gwmaoxian_kuite_info:'视为对一名手牌数不小于你的角色连续使用2张决斗，然后结束出牌阶段',
+			gwmaoxian_haluo:'哈洛',
+			gwmaoxian_haluo_info:'对所有体力值全场最少的角色造成一点伤害，然后结束出牌阶段',
+			gwmaoxian_dagong:'达贡',
+			gwmaoxian_dagong_info:'视为同时使用刺骨寒霜、蔽日浓雾和倾盆大雨，然后结束出牌阶段',
+			gwmaoxian_gaier:'盖尔',
+			gwmaoxian_gaier_info:'令一名角色增加或减少一点体力和体力上限，然后结束出牌阶段',
+			gwmaoxian_airuiting:'艾瑞汀',
+			gwmaoxian_airuiting_info:'令所有其他角色选择一项：使用一张杀，或失去一点体力，然后结束出牌阶段',
+			gwmaoxian_aisinie:'埃丝涅',
+			gwmaoxian_aisinie_info:'回复一点体力并获得任意一张银卡法术，然后结束出牌阶段',
+			gwmaoxian_falanxisika:'法兰茜斯卡',
+			gwmaoxian_falanxisika_info:'随机观看3张金卡法术并使用其中一张，然后结束出牌阶段',
+			gwmaoxian_huoge:'霍格',
+			gwmaoxian_huoge_info:'观看牌堆顶的6张牌，使用至多2张，然后弃掉其余的牌，然后结束出牌阶段',
+			gwmaoxian:'冒险',
+			gwhuanbi:'幻笔',
+			gwhuanbi_info:'出牌阶段限一次，你可以弃置一张牌，并创造一张冒险牌，然后随机选择一名有手牌的角色，被选中的角色可以交给你一张手牌并获得一张该牌的复制',
 			gwminxiang:'冥想',
 			gwminxiang_info:'出牌阶段限一次，你可以弃置一张基本牌或普通锦囊牌并选择两名角色，令目标分别视为对对方使用一张与弃置的牌同名的牌；每当有角色因此受到一点伤害，你在结算后摸一张牌',
 			gwlangshi:'狼噬',

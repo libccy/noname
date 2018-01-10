@@ -263,12 +263,19 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			geanguanhuo:{
 				fullskin:true,
 				type:'trick',
-				enable:true,
 				filterTarget:function(card,player,target){
 					return target!=player&&target.countCards('h')>0;
 				},
+				enable:function(){
+					return game.countPlayer()>2;
+				},
 				chongzhu:function(){
 					return game.countPlayer()<=2;
+				},
+				multicheck:function(card,player){
+					return game.countPlayer(function(current){
+						return current!=player&&current.countCards('h');
+					})>1;
 				},
 				multitarget:true,
 				multiline:true,

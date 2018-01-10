@@ -15,7 +15,7 @@ window.noname_update={
         'game/asset.js',
         // 'card/*',
         'card/extra.js',
-        // 'card/yunchou.js',
+        'card/yunchou.js',
         'card/hearth.js',
         'card/gwent.js',
         // 'card/standard.js',

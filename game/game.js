@@ -10838,6 +10838,11 @@
 								if(event.prompt2){
 									event.dialog.addText(event.prompt2,event.prompt2.length<=20);
 								}
+								if(Array.isArray(event.promptx)){
+									for(var i=0;i<event.promptx.length;i++){
+										event.dialog.add(event.promptx[i]);
+									}
+								}
 								event.promptbar=event.dialog.add('0/'+get.numStr(event.selectCard[1],'card'));
 								event.custom.add.card=function(){
 									_status.event.promptbar.innerHTML=
@@ -15274,9 +15279,6 @@
 					else if(game.hasPlayer(function(current){
 						return player.canUse(card,current);
 					})){
-						if(info.multicheck&&!info.multicheck(card,player)){
-							return;
-						}
 						var next=player.chooseTarget('选择'+get.translation(card)+'的目标');
 						next._get_card=card;
 						next.filterTarget=lib.filter.filterTarget;
@@ -17179,6 +17181,8 @@
                 },
 				canUse:function(card,player,distance,includecard){
 					if(typeof card=='string') card={name:card};
+					var info=get.info(card);
+					if(info.multicheck&&!info.multicheck(card,this)) return false;
 					if(includecard!=false&&!lib.filter.cardEnabled(card,player)) return false;
 					if(includecard&&!lib.filter.cardUsable(card,this)) return false;
 					if(distance==false) return lib.filter.targetEnabled(card,this,player);
