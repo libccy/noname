@@ -3148,9 +3148,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				derivation:'gw_diandian',
 				image:'character/gw_hengsaite',
 				enable:true,
-				filterTarget:function(card,player,target){
-					return target!=player;
-				},
+				filterTarget:true,
 				content:function(){
 					var list=[];
 					for(var i=0;i<3;i++){
@@ -3169,6 +3167,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:1,
 					result:{
 						target:function(player,target){
+							if(target==player) return 0.1;
 							return 1/Math.sqrt(target.countCards('h')+1);
 						}
 					}
@@ -3849,7 +3848,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwmaoxian_telisi:'特丽斯',
 			gwmaoxian_telisi_info:'对至多3名随机友方角色施加一个随机正面效果，然后结束出牌阶段',
 			gwmaoxian_hengsaite:'亨赛特',
-			gwmaoxian_hengsaite_info:'令一名其他角色获得3张杀，然后结束出牌阶段',
+			gwmaoxian_hengsaite_info:'令一名角色获得3张杀，然后结束出牌阶段',
 			gwmaoxian_fuertaisite:'弗尔泰斯特',
 			gwmaoxian_fuertaisite_info:'令至多两名角色各获得一点护甲，然后结束出牌阶段',
 			gwmaoxian_laduoweide:'拉多维德',
