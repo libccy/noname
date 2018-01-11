@@ -3,7 +3,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'gwent',
 		character:{
-			gw_huoge:['male','qun',3,['yinzhang']],
+			gw_huoge:['male','qun',3,['gwjinli']],
 			gw_aisinie:['female','wu',3,['huihun']],
 			gw_enxier:['male','wei',4,['gwbaquan']],
 
@@ -61,10 +61,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			gw_yioufeisisp:['male','wu',3,['gwminxiang']],
 			gw_lanbote:['male','qun',4,['gwlangshi']],
-			gw_fenghuang:['male','wu',3,['gwminxiang']],
+			gw_fenghuang:['male','shu',4,['gwliaotian']],
 			gw_diandian:['male','wu',3,['gwhuanbi']],
 			gw_yisilinni:['male','wu',3,['gwminxiang']],
-			gw_feilafanruide:['male','wu',3,['gwminxiang']],
+			gw_feilafanruide:['male','wei',3,['yinzhang']],
 		},
 		characterIntro:{
 			gw_huoge:'那个老年痴呆?不知道他是活着还是已经被制成标本了!',
@@ -80,6 +80,107 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			gw_xianzumaijiu:{
+				trigger:{source:'damageEnd'},
+				filter:function(event){
+					return (event.card&&(event.card.name=='sha'));
+				},
+				forced:true,
+				temp:true,
+				vanish:true,
+				onremove:function(player){
+					if(player.node.jiu){
+						player.node.jiu.delete();
+						player.node.jiu2.delete();
+						delete player.node.jiu;
+						delete player.node.jiu2;
+					}
+				},
+				content:function(){
+					var list=player.getFriends();
+					list.add(player);
+					game.asyncDraw(list);
+					player.removeSkill('gw_xianzumaijiu');
+				},
+				ai:{
+					damageBonus:true
+				}
+			},
+			gwjinli:{
+				trigger:{player:'phaseEnd'},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('gwjinli')).ai=function(target){
+						return get.attitude(player,target);
+					};
+					'step 1'
+					if(result.bool){
+						player.logSkill('gwjinli',result.targets);
+						result.targets[0].addSkill('gwjinli_jiu');
+					}
+				},
+				subSkill:{
+					jiu:{
+						init:function(player){
+							player.storage.gwjinli_jiu_markcount=2;
+						},
+						onremove:true,
+						mark:'image',
+						intro:{
+							content:'结束阶段，随机获得一个正面效果；两回合后将先祖麦酒收入手牌'
+						},
+						trigger:{player:'phaseEnd'},
+						forced:true,
+						content:function(){
+							'step 0'
+							player.getBuff();
+							'step 1'
+							player.storage.gwjinli_jiu_markcount--;
+							if(player.storage.gwjinli_jiu_markcount<=0){
+								player.removeSkill('gwjinli_jiu');
+								player.gain(game.createCard('gw_xianzumaijiu'),'gain2');
+							}
+							else{
+								player.updateMark('gwjinli_jiu',true);
+							}
+						}
+					}
+				}
+			},
+			gwliaotian:{
+				enable:'phaseUse',
+				delay:0,
+				usable:2,
+				filter:function(event,player){
+					var hs=player.getCards('h');
+					if(hs.length<2) return false;
+					var color=get.color(hs[0]);
+					for(var i=1;i<hs.length;i++){
+						if(get.color(hs[i])!=color) return false;
+					}
+					return true;
+				},
+				content:function(){
+					'step 0'
+					var hs=player.getCards('h');
+					event.num=hs.length;
+					player.lose(hs,ui.discardPile);
+					'step 1'
+					player.draw(event.num,'nodelay');
+					'step 2'
+					var targets=player.getEnemies();
+					if(targets.length){
+						player.useCard({name:'sha'},targets.randomGet(),false);
+					}
+				},
+				ai:{
+					order:9,
+					result:{
+						player:1
+					}
+				}
+			},
 			gwhuanbi:{
 				enable:'phaseUse',
 				usable:1,
@@ -261,7 +362,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseTarget(get.prompt2('gwlangshi'),function(card,player,target){
 						return target!=trigger.player&&target!=player&&target.hp>=trigger.player.hp;
-					}).set('ai',function(card,player,target){
+					}).set('ai',function(target){
 						return get.damageEffect(target,player,player);
 					});
 					'step 1'
@@ -2940,6 +3041,106 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		card:{
+			gwjinli_jiu:{
+				fullimage:true,
+				gainnable:false,
+				image:'card/gw_xianzumaijiu'
+			},
+			gw_xianzumaijiu:{
+				type:'special',
+				fullborder:'gold',
+				vanish:true,
+				derivation:'gw_huoge',
+				toself:true,
+				enable:function(event,player){
+					return !player.hasSkill('gw_xianzumaijiu');
+				},
+				savable:function(card,player,dying){
+					return dying==player;
+				},
+				usable:1,
+				selectTarget:-1,
+				logv:false,
+				modTarget:true,
+				filterTarget:function(card,player,target){
+					return target==player;
+				},
+				content:function(){
+					"step 0"
+					if(target.isDying()) target.recover();
+					else{
+						target.addTempSkill('gw_xianzumaijiu',['phaseAfter','shaAfter']);
+						if(cards&&cards.length){
+							card=cards[0];
+						}
+						if(target==targets[0]&&card.clone&&(card.clone.parentNode==player.parentNode||card.clone.parentNode==ui.arena)){
+							card.clone.moveDelete(target);
+							game.addVideo('gain2',target,get.cardsInfo([card]));
+						}
+						if(!target.node.jiu&&lib.config.jiu_effect){
+							target.node.jiu=ui.create.div('.playerjiu',target.node.avatar);
+							target.node.jiu2=ui.create.div('.playerjiu',target.node.avatar2);
+						}
+					}
+				},
+				ai:{
+					basic:{
+						useful:function(card,i){
+							if(_status.event.player.hp>1){
+								if(i==0) return 5;
+								return 1;
+							}
+							if(i==0) return 7.3;
+							return 3;
+						},
+						value:function(card,player,i){
+							if(player.hp>1){
+								if(i==0) return 5;
+								return 1;
+							}
+							if(i==0) return 7.3;
+							return 3;
+						},
+					},
+					order:function(){
+						return get.order({name:'sha'})+0.2;
+					},
+					result:{
+						target:function(player,target){
+							if(target&&target.isDying()) return 2;
+							if(lib.config.mode=='stone'&&!player.isMin()){
+								if(player.getActCount()+1>=player.actcount) return false;
+							}
+							var shas=player.getCards('h','sha');
+							if(shas.length>1&&player.getCardUsable('sha')>1){
+								return 0;
+							}
+							var card;
+							if(shas.length){
+								for(var i=0;i<shas.length;i++){
+									if(lib.filter.filterCard(shas[i],target)){
+										card=shas[i];break;
+									}
+								}
+							}
+							else if(player.hasSha()){
+								card={name:'sha'};
+							}
+							if(card){
+								if(game.hasPlayer(function(current){
+									return (!current.hujia&&
+										get.attitude(target,current)<0&&
+										target.canUse(card,current,true,true)&&
+										get.effect(current,card,target)>0);
+								})){
+									return 1;
+								}
+							}
+							return 0;
+						},
+					},
+				}
+			},
 			gwmaoxian_yioufeisi:{
 				type:'gwmaoxian',
 				fullborder:'gold',
@@ -2972,7 +3173,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:1,
 					result:{
 						target:function(player,target){
-							return -get.effect(target,{name:'sha'},target,target);
+							return get.effect(target,{name:'sha'},target,target);
 						}
 					}
 				}
@@ -3837,6 +4038,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yisilinni:'伊斯琳妮',
 			gw_lanbote:'兰伯特',
 
+			gwjinli:'金醴',
+			gwjinli_jiu:'先祖麦酒',
+			gwjinli_info:'结束阶段，你可以将一张先祖麦酒置于一名角色的武将牌上',
+			gw_xianzumaijiu:'先祖麦酒',
+			gw_xianzumaijiu_info:'出牌阶段对自己使用，你使用下一张杀造成伤害后，令所有友方角色摸一张牌；濒死阶段，对自己使用，回复1点体力',
+			gwliaotian:'燎天',
+			gwliaotian_info:'出牌阶段限2次，若你有至少两张手牌且颜色均相同，你可以重铸你的全部手牌，并视为对一名随机敌方角色使用一张不计入出杀次数的杀',
 			gwmaoxian_yioufeisi:'伊欧菲斯',
 			gwmaoxian_yioufeisi_info:'选择两名角色，令目标依次视为对对方使用一张杀，然后结束出牌阶段',
 			gwmaoxian_luoqi:'罗契',

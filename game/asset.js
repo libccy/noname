@@ -82,6 +82,7 @@ window.noname_asset_list=[
     'image/card/gw_tunshi.jpg',
     'image/card/gw_wenyi.jpg',
     'image/card/gw_wuyao.jpg',
+    'image/card/gw_xianzumaijiu.jpg',
     'image/card/gw_xinsheng.jpg',
     'image/card/gw_yanziyaoshui.jpg',
     'image/card/gw_yigeniyin.jpg',

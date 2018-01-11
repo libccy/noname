@@ -1722,8 +1722,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:function(event,player){
 					return !player.hasSkill('tianxianjiu');
 				},
-				savable:function(card,player){
-					return _status.event.dying==player;
+				savable:function(card,player,dying){
+					return dying==player;
 				},
 				usable:1,
 				selectTarget:-1,
@@ -1743,6 +1743,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(target==targets[0]&&card.clone&&(card.clone.parentNode==player.parentNode||card.clone.parentNode==ui.arena)){
 							card.clone.moveDelete(target);
 							game.addVideo('gain2',target,get.cardsInfo([card]));
+						}
+						if(!target.node.jiu&&lib.config.jiu_effect){
+							target.node.jiu=ui.create.div('.playerjiu',target.node.avatar);
+							target.node.jiu2=ui.create.div('.playerjiu',target.node.avatar2);
 						}
 					}
 				},
@@ -4779,6 +4783,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				temp:true,
 				vanish:true,
+				onremove:function(player){
+					if(player.node.jiu){
+						player.node.jiu.delete();
+						player.node.jiu2.delete();
+						delete player.node.jiu;
+						delete player.node.jiu2;
+					}
+				},
 				content:function(){
 					player.draw(2);
 					player.removeSkill('tianxianjiu');

@@ -17925,6 +17925,11 @@
 					var player=this;
                     var targets;
                     var mode=get.mode();
+					var self=false;
+					if(func===true){
+						func=null;
+						self=true;
+					}
                     if(mode=='identity'){
                         switch(player.identity){
                             case 'zhu':case 'zhong':case 'mingzhong':targets=game.filterPlayer(function(target){
@@ -17956,7 +17961,12 @@
                             return target.side==player.side;
                         });
                     }
-                    targets.remove(player);
+					if(self){
+						targets.add(player);
+					}
+                    else{
+						targets.remove(player);
+					}
                     return targets;
 				},
 				isEnemyOf:function(){
