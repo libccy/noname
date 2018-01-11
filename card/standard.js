@@ -649,6 +649,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'trick',
 				enable:true,
 				selectTarget:-1,
+				cardcolor:'red',
 				reverseOrder:true,
 				filterTarget:function(card,player,target){
 					return target.hp<target.maxHp;

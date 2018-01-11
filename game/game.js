@@ -17188,6 +17188,12 @@
 					if(distance==false) return lib.filter.targetEnabled(card,this,player);
 					return lib.filter.filterTarget(card,this,player);
 				},
+				hasUseTarget:function(card,distance,includecard){
+					var player=this;
+					return game.hasPlayer(function(current){
+						return player.canUse(card,current,distance,includecard);
+					});
+				},
 				addSubPlayer:function(cfg){
 					var skill='subplayer_'+cfg.name+'_'+get.id();
 					game.log(this,'获得了随从','#g'+get.translation(cfg.name))
