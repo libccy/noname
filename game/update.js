@@ -3,7 +3,7 @@ window.noname_update={
     update:'1.9.46',
     changeLog:[
         'bug修复',
-        // '部分DIY比赛武将',
+        '部分DIY比赛武将',
         'players://["gw_yioufeisisp","gw_diandian","gw_fenghuang","gw_yisilinni","gw_lanbote","gw_feilafanruide"]',
     ],
     files:[

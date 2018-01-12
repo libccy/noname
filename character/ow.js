@@ -1217,6 +1217,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	                return target!=player&&get.distance(player,target,'attack')<=1;
 	            },
 	            check:function(card){
+					if(card.name=='sha'&&_status.event.player.countCards('h','sha')<3) return 0;
 	                return 6-get.value(card);
 	            },
 	            content:function(){
