@@ -1349,6 +1349,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					var list=get.gainableSkills(function(info,skill){
 						return !info.notemp&&info.ai&&info.ai.maixie_hp&&!player.hasSkill(skill);
 					});
+					list.remove('guixin');
 					if(list.length){
 						var skill=list.randomGet();
 						player.popup(skill);
