@@ -1390,7 +1390,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                },targets);
 				},
 				content:function(){
-					target.addTempSkill('gw_qinpendayu',{player:'phaseAfter'});
+					target.addSkill('gw_qinpendayu');
 				},
 				ai:{
 					value:[5,1],
@@ -1426,7 +1426,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	                },targets);
 				},
 				content:function(){
-					target.addTempSkill('gw_birinongwu',{player:'phaseAfter'});
+					target.addSkill('gw_birinongwu');
 				},
 				ai:{
 					value:[5,1],
@@ -1962,7 +1962,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
     			mark:true,
 				nopop:true,
     			intro:{
-    				content:'手牌上限-1直到下一回合结束'
+    				content:'手牌上限-1直到下一个弃牌阶段结束'
     			},
     			mod:{
     				maxHandcard:function(player,num){
@@ -1971,13 +1971,23 @@ game.import('card',function(lib,game,ui,get,ai,_status){
     			},
 				ai:{
 					weather:true
+				},
+				group:'gw_qinpendayu_clear',
+				subSkill:{
+					clear:{
+						trigger:{player:'phaseDiscardAfter'},
+						silent:true,
+						content:function(){
+							player.removeSkill('gw_qinpendayu');
+						}
+					}
 				}
     		},
 			gw_birinongwu:{
 				mark:true,
 				nopop:true,
 	            intro:{
-	                content:'不能使用杀直到下一回合结束'
+	                content:'不能使用杀直到下一个出牌阶段结束'
 	            },
 	            mod:{
 	                cardEnabled:function(card){
@@ -1986,6 +1996,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	            },
 				ai:{
 					weather:true
+				},
+				group:'gw_birinongwu_clear',
+				subSkill:{
+					clear:{
+						trigger:{player:'phaseUseAfter'},
+						silent:true,
+						content:function(){
+							player.removeSkill('gw_birinongwu');
+						}
+					}
 				}
 			},
 			gw_ciguhanshuang:{
@@ -2239,10 +2259,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_baoxueyaoshui_info:'令一名角色弃置两张手牌并摸一张牌',
 			gw_birinongwu:'蔽日浓雾',
 			gw_birinongwu_bg:'雾',
-			gw_birinongwu_info:'天气牌，出牌阶段对一名角色及其相邻角色使用，目标不能使用杀直到下一回合结束',
+			gw_birinongwu_info:'天气牌，出牌阶段对一名角色及其相邻角色使用，目标不能使用杀直到下一个出牌阶段结束',
 			gw_qinpendayu:'倾盆大雨',
 			gw_qinpendayu_bg:'雨',
-			gw_qinpendayu_info:'天气牌，出牌阶段对一名角色及其相邻角色使用，目标手牌上限-1直到下一回合结束',
+			gw_qinpendayu_info:'天气牌，出牌阶段对一名角色及其相邻角色使用，目标手牌上限-1直到下一个弃牌阶段结束',
 			gw_ciguhanshuang:'刺骨寒霜',
 			gw_ciguhanshuang_bg:'霜',
 			gw_ciguhanshuang_info:'天气牌，出牌阶段对一名角色及其相邻角色使用，目标下个摸牌阶段摸牌数-1',

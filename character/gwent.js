@@ -3251,7 +3251,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				vanish:true,
 				derivation:'gw_diandian',
 				image:'character/gw_yioufeisisp',
-				enable:true,
+				enable:function(){
+					return game.countPlayer()>2;
+				},
 				filterTarget:function(card,player,target){
 					return target!=player;
 				},
@@ -3320,7 +3322,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:1,
 					result:{
 						target:function(player,target){
-							return -get.effect(target,{name:'sha'},player,target);
+							return get.effect(target,{name:'sha'},player,target);
 						}
 					}
 				}
@@ -3359,6 +3361,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(eff>0){
 								eff=Math.sqrt(eff);
 								if(target.isMaxHp()&&target.hp>2){
+									if(get.attitude(player,target)>0) return 0;
 									switch(target.hp){
 										case 3:return eff*2;
 										case 4:return eff*1.5;
@@ -3588,34 +3591,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return target!=player&&target.countCards('h');
 				},
 				selectTarget:[1,3],
+				multitarget:true,
+				multiline:true,
 				content:function(){
 					'step 0'
-					if(player.countCards('h')){
-						player.chooseCardButton(get.translation(target)+'的手牌（可用一张手牌替换）',target.getCards('h')).ai=function(button){
-							return get.value(button.link)-5;
+					var dialog=ui.create.dialog('弃置至多2张手牌','hidden');
+					for(var i=0;i<targets.length;i++){
+						var hs=targets[i].getCards('h');
+						if(hs.length){
+							dialog.addText(get.translation(targets[i]));
+							dialog.add(hs);
 						}
 					}
-					else{
-						player.viewHandcards(target);
-						event.finish();
-					}
+					player.chooseButton(dialog,[1,2]).ai=function(button){
+						return get.value(button.link,get.owner(button.link));
+					};
 					'step 1'
 					if(result.bool){
-						event.card=result.links[[0]];
-						player.chooseCard('h',true,'用一张手牌替换'+get.translation(event.card)).ai=function(card){
-							return -get.value(card);
-						};
-					}
-					else{
-						event.finish();
-					}
-					'step 2'
-					if(result.bool){
-						player.gain(event.card,target);
-						target.gain(result.cards,player);
-						player.$giveAuto(result.cards,target);
-						target.$giveAuto(event.card,player);
-						game.log(player,'与',target,'交换了一张手牌');
+						var owner1=get.owner(result.links[0]);
+						var owner2=get.owner(result.links[1]);
+						if(owner1==owner2){
+							owner1.discard(result.links.slice(0));
+						}
+						else{
+							owner1.discard(result.links[0]).delay=false;
+							owner2.discard(result.links[1]);
+						}
 					}
 				},
 				contentAfter:function(){
@@ -4170,7 +4171,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwmaoxian_enxier:'恩希尔',
 			gwmaoxian_enxier_info:'与一名手牌并不超过1的其他角色交换手牌，然后结束出牌阶段',
 			gwmaoxian_fulisi:'符里斯',
-			gwmaoxian_fulisi_info:'选择至多三名角色，观看目标的手牌并可以用自己的手牌交换一张，然后结束出牌阶段',
+			gwmaoxian_fulisi_info:'选择至多三名角色，观看目标的手牌并可以弃置其中1~2张，然后结束出牌阶段',
 			gwmaoxian_kaerweite:'卡尔维特',
 			gwmaoxian_kaerweite_info:'获得至多两名角色各一张手牌，然后结束出牌阶段',
 			gwmaoxian_bulanwang:'布兰王',

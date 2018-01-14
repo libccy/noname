@@ -4,12 +4,12 @@ window.noname_update={
     changeLog:[
         'bug修复',
         '部分DIY比赛武将',
-        'players://["gw_yioufeisisp","gw_diandian","gw_fenghuang","gw_yisilinni","gw_lanbote","gw_feilafanruide"]',
+        'players://["ns_yujisp","ns_yangyi","ns_liuzhang","gw_yioufeisisp","gw_diandian","gw_fenghuang","gw_yisilinni","gw_lanbote","gw_feilafanruide"]',
     ],
     files:[
         'game/game.js',
         // 'game/package.js',
-        // 'game/config.js',
+        'game/config.js',
         // 'game/source.js',
         // 'game/pressure.js',
         'game/asset.js',

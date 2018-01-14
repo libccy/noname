@@ -3,7 +3,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'diy',
 		connect:true,
-		connectBanned:['diy_tianyu','diy_yangyi','diy_lukang','ns_huamulan','ns_yuji','ns_duangui'],
+		connectBanned:['diy_tianyu','diy_yangyi','diy_lukang','ns_huamulan','ns_yuji','ns_duangui','ns_liuzhang'],
 		character:{
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
@@ -59,8 +59,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_lvmeng:['male','wu',3,['nsqinxue','nsbaiyi']],
 			ns_shenpei:['male','qun',3,['nshunji','shibei']],
 
+			ns_yujisp:['male','qun',3,['nsguhuo']],
+			ns_yangyi:['male','shu',3,['nsjuanli','nsyuanchou']],
+			ns_liuzhang:['male','qun',3,['nsanruo','nsxunshan','nskaicheng']],
 			// ns_zhaoyun:['male','qun',3,[]],
-			// ns_yuji:['male','qun',3,[]],
 			// ns_lvmeng:['male','qun',3,[]],
 			// ns_zhaoyunshen:['male','qun',3,[]],
 			// ns_lisu:['male','qun',3,[]],
@@ -91,6 +93,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_huamulan:'#p哎别管我是谁',
 			ns_jinke:'#p哎别管我是谁',
 			ns_huangzu:'#r小芯儿童鞋',
+			ns_lisu:'#r小芯儿童鞋',
 			ns_yanliang:'#r丶橙续缘',
 			ns_wenchou:'#r丶橙续缘',
 			ns_caocao:'#r一瞬间丶遗忘',
@@ -101,16 +104,227 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_wangyue:'#p废城君',
 			ns_sunjian:'#b兔子两只2',
 			ns_lvmeng:'#b兔子两只2',
+			ns_yujisp:'#b兔子两只2',
 			ns_yuji:'#g蔚屿凉音',
 			ns_simazhao:'#r一纸载春秋',
 			ns_duangui:'#b宝宝酱紫萌萌哒',
 			ns_masu:'#g修女',
 			ns_zhangxiu:'#p本因坊神策',
+			ns_yangyi:'#p本因坊神策',
+			ns_liuzhang:'#r矮子剑薄荷糖',
 		},
 		perfectPair:{
 			yuji:['zuoci']
 		},
 		skill:{
+			// nsanruo:{
+            //
+			// },
+			nsjuanli:{
+				enable:'phaseUse',
+				usable:1,
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countCards('h');
+				},
+				filter:function(event,player){
+					return player.countCards('h');
+				},
+				init:function(player){
+					player.storage.nsjuanli_win=[];
+					player.storage.nsjuanli_lose=[];
+				},
+				intro:{
+					content:function(storage,player){
+						var str='';
+						if(player.storage.nsjuanli_win.length){
+							str+=get.translation(player.storage.nsjuanli_win)+'与你距离-1直到与你下次赌牌';
+						}
+						if(player.storage.nsjuanli_lose.length){
+							if(str.length){
+								str+='；';
+							}
+							str+=get.translation(player.storage.nsjuanli_lose)+'与你距离+1直到与你下次赌牌';
+						}
+						return str;
+					}
+				},
+				onremove:['nsjuanli_win','nsjuanli_lose'],
+				content:function(){
+					'step 0'
+					player.storage.nsjuanli_win.remove(target);
+					player.storage.nsjuanli_lose.remove(target);
+					event.prompt2='赌牌的两名角色分别亮开一张手牌，若花色相同则赌牌平局，若花色不同，则依次展示牌堆顶的牌直到翻开的牌与其中一人亮出牌的花色相同，则该角色获得赌牌的胜利';
+					player.chooseCard('h',true).set('prompt2',event.prompt2);
+					'step 1'
+					if(result.bool){
+						event.card1=result.cards[0];
+						target.chooseCard('h',true).set('prompt2',event.prompt2);
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if(result.bool){
+						event.card2=result.cards[0];
+					}
+					else{
+						event.finish();
+					}
+					'step 3'
+					player.$compare(event.card1,event.target,event.card2);
+					game.delay(0,1500);
+					game.log(player,'亮出的牌为',event.card1);
+					game.log(target,'亮出的牌为',event.card2);
+					'step 4'
+					var suit1=get.suit(event.card1);
+					var suit2=get.suit(event.card2);
+					if(suit1==suit2){
+						game.broadcastAll(function(str){
+							var dialog=ui.create.dialog(str);
+							dialog.classList.add('center');
+							setTimeout(function(){
+								dialog.close();
+							},1000);
+						},'平局');
+						game.delay(2);
+						if(!player.storage.nsjuanli_win.length&&!player.storage.nsjuanli_lose.length){
+							player.unmarkSkill('nsjuanli');
+						}
+					}
+					else{
+						var cards=[];
+						for(var i=0;i<1000;i++){
+							var current=get.cards();
+							if(current&&current.length){
+								current=current[0];
+								current.discard();
+								cards.push(current);
+								var suit=get.suit(current);
+								if(suit==suit1){
+									player.showCards(cards,get.translation(player)+'赌牌获胜');
+									player.storage.nsjuanli_win.add(target);
+									target.loseHp();
+									player.markSkill('nsjuanli');
+									break;
+								}
+								else if(suit==suit2){
+									player.showCards(cards,get.translation(target)+'赌牌获胜');
+									player.storage.nsjuanli_lose.add(target);
+									target.recover();
+									player.markSkill('nsjuanli');
+									break;
+								}
+							}
+							else{
+								break;
+							}
+						}
+					}
+				},
+				mod:{
+					globalTo:function(from,to,distance){
+						if(to.storage.nsjuanli_win&&to.storage.nsjuanli_win.contains(from)){
+							return distance-1;
+						}
+						if(to.storage.nsjuanli_lose&&to.storage.nsjuanli_lose.contains(from)){
+							return distance+1;
+						}
+					}
+				},
+				ai:{
+					order:4,
+					result:{
+						target:function(player,target){
+							if(target.isHealthy()){
+								return -1/(1+target.hp);
+							}
+							else{
+								return -0.3/(1+target.hp);
+							}
+						}
+					}
+				}
+			},
+			nsyuanchou:{
+				trigger:{target:'useCardToBefore'},
+				forced:true,
+				priority:15,
+				check:function(event,player){
+					return get.effect(event.target,event.card,event.player,player)<0;
+				},
+				filter:function(event,player){
+					return get.type(event.card,'trick')=='trick'&&get.distance(event.player,player)>1;
+				},
+				content:function(){
+					trigger.cancel();
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target,current){
+							if(get.type(card,'trick')=='trick'&&get.distance(player,target)>1) return 'zeroplayertarget';
+						},
+					}
+				}
+			},
+			nsguhuo:{
+				trigger:{player:'useCardAfter'},
+				forced:true,
+				filter:function(event,player){
+					if(event.parent.name=='nsguhuo') return false;
+					if(event.card==event.cards[0]){
+						var type=get.type(event.card,'trick');
+						var names=[];
+						if(get.cardPile(function(card){
+							if(get.type(card,'trick')!=type) return false;
+							if(get.info(card).multitarget) return false;
+							if(names.contains(card.name)) return false;
+							if(player.hasUseTarget(card)){
+								return true;
+							}
+							else{
+								names.add(card.name);
+								return false;
+							}
+						})){
+							return true;
+						}
+					}
+					return true;
+				},
+				content:function(){
+					var type=get.type(trigger.card,'trick');
+					var names=[];
+					var card=get.cardPile(function(card){
+						if(get.type(card,'trick')!=type) return false;
+						if(get.info(card).multitarget) return false;
+						if(names.contains(card.name)) return false;
+						if(player.hasUseTarget(card)){
+							return true;
+						}
+						else{
+							names.add(card.name);
+							return false;
+						}
+					});
+					if(card){
+						var info=get.info(card);
+						var targets=game.filterPlayer(function(current){
+							return lib.filter.filterTarget(card,player,current);
+						});
+						if(targets.length){
+							targets.sort(lib.sort.seat);
+							var select=get.select(info.selectTarget);
+							if(select[0]==-1||select[1]==-1){
+								player.useCard(card,targets,'noai');
+							}
+							else if(targets.length>=select[0]){
+								var num=select[0]+Math.floor(Math.random()*(select[1]-select[0]+1));
+								player.useCard(card,targets.randomGets(num),'noai');
+							}
+						}
+					}
+				}
+			},
 			nsbaiyi:{
 				trigger:{player:'phaseDiscardBefore'},
 				forced:true,
@@ -4298,6 +4512,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_zhangxiu:'张绣',
 			ns_lvmeng:'吕蒙',
 
+			ns_yujisp:'于吉',
+			ns_lisu:'李肃',
+			ns_yangyi:'杨仪',
+			ns_liuzhang:'刘璋',
+
+			nsanruo:'暗弱',
+			nsanruo_info:'锁定技，你手牌中的[杀]和普通锦囊牌(除[借刀杀人]外)均对你不可见。但你可以正常使用之',
+			nsxunshan:'循善',
+			nsxunshan_info:'锁定技，你使用【暗弱】牌可以为其指定任意名合法目标',
+			nskaicheng:'开城',
+			nskaicheng_info:'主公技，你的回合内，你可以将一张【暗弱】牌交给一名群势力其他角色观看，其可以选择是否告诉你此牌的名字。然后你选择一项：使用这张牌并摸一张牌；或结束此回合',
+			nsjuanli:'狷戾',
+			nsjuanli_info:'出牌阶段限一次，你可以和一名有手牌的其他角色进行赌牌，若你赢，目标角色失去1点体力且该角色与你距离-1直到与你下次赌牌，若你没赢，目标角色回复1点体力，且该角色与你距离+1直到与你的下次赌牌。（赌牌:赌牌的两名角色分别亮开一张手牌，若花色相同则赌牌平局，若花色不同，则依次展示牌堆顶的牌直到翻开的牌与其中一人亮出牌的花色相同，则该角色获得赌牌的胜利）',
+			nsyuanchou:'远筹',
+			nsyuanchou_info:'锁定技，当你成为锦囊牌的目标时，若来源角色与你的距离大于1，则取消之',
+			nsguhuo:'蛊惑',
+			nsguhuo_info:'锁定技，每当你使用一张牌。则你对一名随机角色从牌堆(牌堆无则从弃牌堆)随机使用一张同类别卡牌',
 			nsqinxue:'勤学',
 			nsqinxue_info:'每个效果每回合只能使用一次。①当你使用一张基本牌时，你从牌堆随机获得一张锦囊牌；②当你使用一张锦囊牌时，你从牌堆随机获得一张装备牌；③当你使用一张装备牌时，你从牌堆随机获得一张基本牌',
 			nsbaiyi:'白衣',
@@ -4334,7 +4565,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nstianji_info:'限定技，当一名其他角色进入濒死状态，你可自减一点体力上限，令其回复体力至1并增加一点体力上限',
 			nszhaoxin:'昭心',
 			nszhaoxin_info:'锁定技，你始终展示手牌',
-			nsxiuxin:'休穆',
+			nsxiuxin:'修穆',
 			nsxiuxin_info:'锁定技，若你没有某种花色的手牌，你不能成为这种花色的牌的目标',
 			nsshijun:'弑君',
 			nsshijun_info:'锁定技，你造成伤害时，你令此伤害+1，并在结算后失去一点体力',

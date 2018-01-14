@@ -1,5 +1,5 @@
 (function(){
-    if(typeof require !== 'function') return;
+    if(typeof require !== 'function'||typeof document !== 'undefined') return;
     global.window=global;
     require(__dirname+'/update.js');
     var fs=require('fs');
@@ -1899,6 +1899,8 @@ window.noname_asset_list=[
 	'image/character/ns_huamulan.jpg',
 	'image/character/ns_huangzu.jpg',
 	'image/character/ns_jinke.jpg',
+	'image/character/ns_lisu.jpg',
+	'image/character/ns_liuzhang.jpg',
 	'image/character/ns_lvmeng.jpg',
 	'image/character/ns_lvzhi.jpg',
 	'image/character/ns_masu.jpg',
@@ -1912,8 +1914,10 @@ window.noname_asset_list=[
 	'image/character/ns_wangyun.jpg',
 	'image/character/ns_wenchou.jpg',
 	'image/character/ns_xinxianying.jpg',
+	'image/character/ns_yangyi.jpg',
 	'image/character/ns_yanliang.jpg',
 	'image/character/ns_yuji.jpg',
+	'image/character/ns_yujisp.jpg',
 	'image/character/ns_zhangbao.jpg',
 	'image/character/ns_zhangxiu.jpg',
 	'image/character/ns_zhugeliang.jpg',
