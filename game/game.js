@@ -15255,7 +15255,7 @@
                     next._args=Array.from(arguments);
 					return next;
 				},
-				chooseUseTarget:function(card){
+				chooseUseTarget:function(card,prompt){
 					// not online-ready
 					if(typeof card=='string'){
 						card={name:card};
@@ -15279,7 +15279,7 @@
 					else if(game.hasPlayer(function(current){
 						return player.canUse(card,current);
 					})){
-						var next=player.chooseTarget('选择'+get.translation(card)+'的目标');
+						var next=player.chooseTarget(prompt||'选择'+get.translation(card)+'的目标');
 						next._get_card=card;
 						next.filterTarget=lib.filter.filterTarget;
 						next.ai=get.effect;
@@ -19923,6 +19923,10 @@
 					this.classList.remove('fullskin');
 					this.classList.remove('fullimage');
 					this.classList.remove('fullborder');
+					this.dataset.cardName=card[2];
+					this.dataset.cardType=info.type||'';
+					this.dataset.cardSubype=info.subtype||'';
+					this.dataset.cardMultitarget=info.multitarget?'1':'0';
 					this.node.name.dataset.nature='';
 					this.node.info.classList.remove('red');
 					if(!lib.config.hide_card_image&&lib.card[bg].fullskin){

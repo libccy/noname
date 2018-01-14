@@ -117,9 +117,119 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuji:['zuoci']
 		},
 		skill:{
-			// nsanruo:{
-            //
-			// },
+			nsanruo:{
+				unique:true,
+            	init:function(player){
+					player.node.handcards1.classList.add('nsanruo');
+					player.node.handcards2.classList.add('nsanruo');
+					if(!ui.css.nsanruo){
+						ui.css.nsanruo=lib.init.sheet(
+							'.handcards.nsanruo>.card[data-card-type="trick"]:not(*[data-card-multitarget="1"])>*,'+
+							'.handcards.nsanruo>.card[data-card-name="sha"]>*{visibility:hidden !important}'
+						);
+					}
+				},
+				onremove:function(player){
+					player.node.handcards1.classList.add('nsanruo');
+					player.node.handcards2.classList.add('nsanruo');
+				},
+				ai:{
+					neg:true
+				}
+			},
+			nsxunshan:{
+				mod:{
+					selectTarget:function(card,player,range){
+						if(!player.hasSkill('nsanruo')) return;
+						if(_status.auto) return;
+						if(get.position(card)!='h'||get.owner(card)!=player) return;
+						if(get.info(card).multitarget) return;
+    					if(card.name=='sha'||get.type(card)=='trick') range[1]=game.countPlayer();
+    				},
+					// playerEnabled:function(card,player,target,current){
+					// 	if(current==false) return;
+					// 	var filter=get.info(card).modTarget;
+					// 	if(typeof filter=='boolean'&&filter) return 'forceEnable';
+					// 	if(typeof filter=='function'&&filter(card,player,target)) return 'forceEnable';
+					// }
+					// targetInRange:function(card,player){
+					// 	if(_status.auto) return;
+					// 	if(get.position(card)!='h'||get.owner(card)!=player) return;
+					// 	if(get.info(card).multitarget) return;
+    				// 	if(card.name=='sha'||get.type(card)=='trick') return true;
+					// }
+				},
+				ai:{
+					combo:'nsanruo'
+				}
+			},
+			nskaicheng:{
+    			enable:'phaseUse',
+				usable:1,
+    			zhuSkill:true,
+				unique:true,
+    			filter:function(event,player){
+    				if(!player.hasZhuSkill('nskaicheng')) return false;
+					if(!player.hasCard(function(card){
+						if(get.info(card).multitarget) return false;
+						return card.name=='sha'||get.type(card)=='trick';
+					})){
+						return false;
+					}
+    				return game.hasPlayer(function(current){
+    					return current!=player&&current.group=='qun';
+    				});
+    			},
+				filterCard:function(card){
+					if(get.info(card).multitarget) return false;
+					return card.name=='sha'||get.type(card)=='trick';
+				},
+				filterTarget:function(card,player,target){
+					return player!=target&&target.group=='qun';
+				},
+				lose:false,
+				content:function(){
+					'step 0'
+					target.chooseBool(function(){
+						return get.attitude(target,player)>0;
+					},'是否将'+get.translation(cards)+'告知'+get.translation(player));
+					'step 1'
+					if(!player.hasUseTarget(cards[0])){
+						if(result.bool){
+							player.chooseControl('确定').set('prompt','你展示的手牌为'+get.translation(cards));
+						}
+						else{
+							event.hidden=true;
+							player.chooseControl('确定').set('prompt',get.translation(target)+'拒绝告知你卡牌信息');
+						}
+					}
+					else{
+						if(result.bool){
+							player.chooseBool('是否使用展示的牌？','你展示的手牌为'+get.translation(cards)+'。如果你使用此牌，则在结算后摸一张牌；如果你不使用此牌，则结束出牌阶段');
+						}
+						else{
+							event.hidden=true;
+							player.chooseBool('是否使用展示的牌？',get.translation(target)+'拒绝告知你卡牌信息。如果你使用此牌，则在结算后摸一张牌；如果你不使用此牌，则结束出牌阶段');
+						}
+					}
+					'step 2'
+					if(result.bool){
+						player.chooseUseTarget(cards[0],event.hidden?'选择此牌的目标':null);
+					}
+					else{
+						var evt=_status.event.getParent('phaseUse');
+						if(evt){
+							evt.skipped=true;
+						}
+						event.finish();
+					}
+					'step 3'
+					player.draw();
+				},
+				ai:{
+					combo:'nsanruo'
+				}
+			},
 			nsjuanli:{
 				enable:'phaseUse',
 				usable:1,
@@ -4518,9 +4628,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_liuzhang:'刘璋',
 
 			nsanruo:'暗弱',
-			nsanruo_info:'锁定技，你手牌中的[杀]和普通锦囊牌(除[借刀杀人]外)均对你不可见。但你可以正常使用之',
+			nsanruo_info:'锁定技，你手牌中的[杀]和普通锦囊牌(借刀杀人等带有指向目标的锦囊除外)均对你不可见。但你可以正常使用之',
 			nsxunshan:'循善',
-			nsxunshan_info:'锁定技，你使用【暗弱】牌可以为其指定任意名合法目标',
+			nsxunshan_info:'锁定技，你使用【暗弱】牌可以为其指定任意名合法目标（托管无效）',
 			nskaicheng:'开城',
 			nskaicheng_info:'主公技，你的回合内，你可以将一张【暗弱】牌交给一名群势力其他角色观看，其可以选择是否告诉你此牌的名字。然后你选择一项：使用这张牌并摸一张牌；或结束此回合',
 			nsjuanli:'狷戾',
