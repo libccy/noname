@@ -45251,6 +45251,18 @@
                     return;
                 }
 				var name=node.name;
+				if(node.parentNode.cardMod){
+					var moded=false;
+					for(var i in node.parentNode.cardMod){
+						var item=node.parentNode.cardMod[i](node);
+						if(Array.isArray(item)){
+							moded=true;
+							uiintro.add(item[0]);
+							uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+item[1]+'</div>');
+						}
+					}
+					if(moded) return uiintro;
+				}
 				if(node.link&&node.link.name&&lib.card[node.link.name]){
 					name=node.link.name;
 				}

@@ -120,6 +120,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nsanruo:{
 				unique:true,
             	init:function(player){
+					if(!player.node.handcards1.cardMod){
+						player.node.handcards1.cardMod={};
+					}
+					if(!player.node.handcards2.cardMod){
+						player.node.handcards2.cardMod={};
+					}
+					var cardMod=function(card){
+						if(get.info(card).multitarget) return;
+						if(card.name=='sha'||get.type(card)=='trick') return ['暗弱','杀或普通锦囊牌对你不可见'];
+					};
+					player.node.handcards1.cardMod.nsanruo=cardMod;
+					player.node.handcards2.cardMod.nsanruo=cardMod;
 					player.node.handcards1.classList.add('nsanruo');
 					player.node.handcards2.classList.add('nsanruo');
 					if(!ui.css.nsanruo){
@@ -130,8 +142,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				onremove:function(player){
-					player.node.handcards1.classList.add('nsanruo');
-					player.node.handcards2.classList.add('nsanruo');
+					player.node.handcards1.classList.remove('nsanruo');
+					player.node.handcards2.classList.remove('nsanruo');
+					delete player.node.handcards1.cardMod.nsanruo;
+					delete player.node.handcards2.cardMod.nsanruo;
 				},
 				ai:{
 					neg:true
