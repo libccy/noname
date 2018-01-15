@@ -387,7 +387,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					for(var i=0;i<names.length;i++){
 						if(game.countPlayer(function(current){
-							return current!=player&&lib.filter.targetEnabled2({name:names[i]},player,current);
+							return current!=player&&lib.filter.targetEnabled3({name:names[i]},player,current);
 						})>1){
 							return true;
 						}
@@ -403,12 +403,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:function(card,player){
 					if(!['basic','trick'].contains(get.type(card))) return false;
 					return game.countPlayer(function(current){
-						return current!=player&&lib.filter.targetEnabled2({name:card.name},player,current);
+						return current!=player&&lib.filter.targetEnabled3({name:card.name},player,current);
 					})>1;
 				},
 				filterTarget:function(card,player,target){
 					if(player==target||!ui.selected.cards.length) return false;
-					return lib.filter.targetEnabled2({name:ui.selected.cards[0].name},player,target);
+					return lib.filter.targetEnabled3({name:ui.selected.cards[0].name},player,target);
 				},
 				targetprompt:['先出牌','后出牌'],
 				selectTarget:2,

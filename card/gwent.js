@@ -474,10 +474,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					var target=result.targets[0];
+					var hp=target.hp;
     				target.reinit(target.name,event.nametarget);
-                    target.hp=target.maxHp;
+                    target.hp=Math.min(hp+1,target.maxHp);
                     target.update();
 					player.line(target,'green');
+					'step 3'
+					game.triggerEnter(target);
 				},
 				contentAfter:function(){
 					var evt=_status.event.getParent('phaseUse');
@@ -2224,7 +2227,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_aerdeyin:'阿尔德印',
 			gw_aerdeyin_info:'对相邻的角色造成一点伤害，目标摸一张牌并移出游戏一轮，然后结束出牌阶段',
 			gw_xinsheng:'新生',
-			gw_xinsheng_info:'随机观看12张武将牌，选择一张替代一名角色的武将牌，然后结束出牌阶段',
+			gw_xinsheng_info:'选择一名角色，随机观看12张武将牌，选择一张替代其武将牌，并令其增加一点体力，然后结束出牌阶段',
 			gw_zhongmozhizhan:'终末之战',
 			gw_zhongmozhizhan_info:'将所有角色区域内的所有牌置入弃牌堆（不触发技能），然后结束出牌阶段',
 			gw_butianshu:'卜天术',

@@ -21152,7 +21152,7 @@
 					lib.filter.cardUsable(card,player,event));
 			},
 			targetEnabled:function(card,player,target){
-				if(card==undefined) return false;
+				if(!card) return false;
 				var info=get.info(card);
 				var filter=info.filterTarget;
 				var mod=game.checkMod(card,player,target,'unchanged','playerEnabled',player);
@@ -21166,7 +21166,7 @@
 			},
             targetEnabled2:function(card,player,target){
                 if(lib.filter.targetEnabled(card,player,target)) return true;
-				if(card==undefined) return false;
+				if(!card) return false;
 
 				if(game.checkMod(card,player,target,'unchanged','playerEnabled',player)==false) return false;
 				if(game.checkMod(card,player,target,'unchanged','targetEnabled',target)==false) return false;
@@ -21174,6 +21174,17 @@
 				var filter=get.info(card).modTarget;
 				if(typeof filter=='boolean') return filter;
 				if(typeof filter=='function') return filter(card,player,target);
+                return false;
+            },
+            targetEnabled3:function(card,player,target){
+				if(!card) return false;
+				var info=get.info(card);
+
+				if(info.filterTarget==true) return true;
+				if(typeof info.filterTarget=='function'&&info.filterTarget(card,player,target)) return true;
+
+				if(info.modTarget==true) return true;
+				if(typeof info.modTarget=='function'&&info.modTarget(card,player,target)) return true;
                 return false;
             },
 			targetInRange:function(card,player,target){
