@@ -34,7 +34,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			get.chessDistance=result.get.chessDistance;
 			get.rawAttitude=result.get.rawAttitude;
 			var toLoad=['addChessPlayer','addObstacle','removeObstacle','isChessNeighbour',
-				'draw2','updateCanvas2','setChessInfo','modeSwapPlayer'];
+				'draw2','updateCanvas2','setChessInfo','modeSwapPlayer','initChess'];
 			for(var i=0;i<toLoad.length;i++){
 				game[toLoad[i]]=result.game[toLoad[i]];
 			}

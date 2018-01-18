@@ -701,14 +701,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				if(_status.currentChessFocus){
     					cancelAnimationFrame(_status.currentChessFocus);
     				}
-    				var count=12;
-    				var ddx=Math.floor(dx/12);
-    				var ddy=Math.floor(dy/12);
+    				var count=lib.config.low_performance?6:12;
+    				var ddx=Math.floor(dx/count);
+    				var ddy=Math.floor(dy/count);
     				if(dx||dy){
-    					_status.currentChessFocus=requestAnimationFrame(function(){
+                        var chessFocus=function(){
     						if(count--){
     							ui.chessContainer.scrollLeft+=ddx;
     							ui.chessContainer.scrollTop+=ddy;
+                                _status.currentChessFocus=requestAnimationFrame(chessFocus);
     						}
     						else{
     							ui.chessContainer.scrollLeft+=dx%12;
@@ -716,7 +717,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     							cancelAnimationFrame(_status.currentChessFocus);
     							delete _status.currentChessFocus;
     						}
-    					});
+    					};
+    					_status.currentChessFocus=requestAnimationFrame(chessFocus);
     				}
     			},
     			getXY:function(){
@@ -1395,80 +1397,80 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     		obstacles:[],
             initChess:function(){
                 ui.chess.style.height=148*ui.chessheight+'px';
-        		ui.chess.style.width=148*ui.chesswidth+'px';
-        		if(!lib.config.touchscreen){
-        			ui.chess.addEventListener('mousedown',function(e){
-        				if(Array.isArray(e.path)){
-        					for(var i=0;i<e.path.length;i++){
-        						var itemtype=get.itemtype(e.path[i]);
-        						if(itemtype=='button'||itemtype=='card'||itemtype=='player'){
-        							return;
-        						}
-        					}
-        				}
-        				this._chessdrag=[e,this.parentNode.scrollLeft,this.parentNode.scrollTop];
-        			});
-        			ui.chess.addEventListener('mouseleave',function(){
-        				this._chessdrag=null;
-        			});
-        			ui.chess.addEventListener('mouseup',function(){
-        				if(this._chessdrag){
-        					this._chessdrag=null;
-        				}
-        			});
-        			ui.chess.addEventListener('mousemove',function(e){
-        				if(this._chessdrag){
-        					this.parentNode.scrollLeft=this._chessdrag[1]-e.x+this._chessdrag[0].x;
-        					this.parentNode.scrollTop=this._chessdrag[2]-e.y+this._chessdrag[0].y;
-        					_status.clicked=true;
-        				}
-        				e.preventDefault();
-        			});
-        			ui.chessContainer.addEventListener('mousewheel',function(){
-        				if(_status.currentChessFocus){
-        					cancelAnimationFrame(_status.currentChessFocus);
-        					delete _status.currentChessFocus;
-        				}
-        			},{passive:true});
-        		}
+                ui.chess.style.width=148*ui.chesswidth+'px';
+                if(!lib.config.touchscreen){
+                	ui.chess.addEventListener('mousedown',function(e){
+                		if(Array.isArray(e.path)){
+                			for(var i=0;i<e.path.length;i++){
+                				var itemtype=get.itemtype(e.path[i]);
+                				if(itemtype=='button'||itemtype=='card'||itemtype=='player'){
+                					return;
+                				}
+                			}
+                		}
+                		this._chessdrag=[e,this.parentNode.scrollLeft,this.parentNode.scrollTop];
+                	});
+                	ui.chess.addEventListener('mouseleave',function(){
+                		this._chessdrag=null;
+                	});
+                	ui.chess.addEventListener('mouseup',function(){
+                		if(this._chessdrag){
+                			this._chessdrag=null;
+                		}
+                	});
+                	ui.chess.addEventListener('mousemove',function(e){
+                		if(this._chessdrag){
+                			this.parentNode.scrollLeft=this._chessdrag[1]-e.x+this._chessdrag[0].x;
+                			this.parentNode.scrollTop=this._chessdrag[2]-e.y+this._chessdrag[0].y;
+                			_status.clicked=true;
+                		}
+                		e.preventDefault();
+                	});
+                	ui.chessContainer.addEventListener('mousewheel',function(){
+                		if(_status.currentChessFocus){
+                			cancelAnimationFrame(_status.currentChessFocus);
+                			delete _status.currentChessFocus;
+                		}
+                	},{passive:true});
+                }
 
-        		ui.chessscroll1=ui.create.div('.chessscroll.left',ui.chessContainer);
-        		ui.chessscroll2=ui.create.div('.chessscroll.right',ui.chessContainer);
-        		var chessscroll=function(){
-        			if(lib.config.touchscreen) return;
-        			var direction=this.direction;
-        			var speed=parseInt(get.config('chessscroll_speed'));
-        			if(!speed) return;
-        			var interval=setInterval(function(){
-        				ui.chessContainer.scrollLeft+=speed*direction;
-        			},16);
-        			_status.chessscrolling=interval;
-        		};
-        		var leavescroll=function(){
-        			if(_status.chessscrolling){
-        				clearInterval(_status.chessscrolling);
-        				delete _status.chessscrolling;
-        			}
-        		};
-        		ui.chessscroll1.direction=-1;
-        		ui.chessscroll1.addEventListener('mouseenter',chessscroll);
-        		ui.chessscroll1.addEventListener('mouseleave',leavescroll);
+                ui.chessscroll1=ui.create.div('.chessscroll.left',ui.chessContainer);
+                ui.chessscroll2=ui.create.div('.chessscroll.right',ui.chessContainer);
+                var chessscroll=function(){
+                	if(lib.config.touchscreen) return;
+                	var direction=this.direction;
+                	var speed=parseInt(get.config('chessscroll_speed'));
+                	if(!speed) return;
+                	var interval=setInterval(function(){
+                		ui.chessContainer.scrollLeft+=speed*direction;
+                	},16);
+                	_status.chessscrolling=interval;
+                };
+                var leavescroll=function(){
+                	if(_status.chessscrolling){
+                		clearInterval(_status.chessscrolling);
+                		delete _status.chessscrolling;
+                	}
+                };
+                ui.chessscroll1.direction=-1;
+                ui.chessscroll1.addEventListener('mouseenter',chessscroll);
+                ui.chessscroll1.addEventListener('mouseleave',leavescroll);
 
-        		ui.chessscroll2.direction=1;
-        		ui.chessscroll2.addEventListener('mouseenter',chessscroll);
-        		ui.chessscroll2.addEventListener('mouseleave',leavescroll);
+                ui.chessscroll2.direction=1;
+                ui.chessscroll2.addEventListener('mouseenter',chessscroll);
+                ui.chessscroll2.addEventListener('mouseleave',leavescroll);
 
-        		for(var i=0;i<ui.chesswidth;i++){
-        			for(var j=0;j<ui.chessheight;j++){
-        				var pos='[data-position="'+(i+j*ui.chesswidth)+'"]';
-        				ui.chesssheet.sheet.insertRule('#arena.chess #chess>.player'+pos+
-        				'{left:'+(14+i*148)+'px;top:'+(14+j*148)+'px}',0);
-        				ui.chesssheet.sheet.insertRule('#arena.chess #chess>.card'+pos+
-        				'{left:'+(22+i*148)+'px;top:'+(22+j*148)+'px}',0);
-        				ui.chesssheet.sheet.insertRule('#arena.chess #chess>.popup'+pos+
-        				'{left:'+(19+i*148)+'px;top:'+(142+j*148)+'px}',0);
-        			}
-        		}
+                for(var i=0;i<ui.chesswidth;i++){
+                	for(var j=0;j<ui.chessheight;j++){
+                		var pos='[data-position="'+(i+j*ui.chesswidth)+'"]';
+                		ui.chesssheet.sheet.insertRule('#arena.chess #chess>.player'+pos+
+                		'{left:'+(14+i*148)+'px;top:'+(14+j*148)+'px}',0);
+                		ui.chesssheet.sheet.insertRule('#arena.chess #chess>.card'+pos+
+                		'{left:'+(22+i*148)+'px;top:'+(22+j*148)+'px}',0);
+                		ui.chesssheet.sheet.insertRule('#arena.chess #chess>.popup'+pos+
+                		'{left:'+(19+i*148)+'px;top:'+(142+j*148)+'px}',0);
+                	}
+                }
             },
     		getVideoName:function(){
     			var str='战棋'+get.translation(_status.mode)+' - '+_status.friendCount+'v'+_status.enemyCount;
