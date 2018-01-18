@@ -3,6 +3,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'swd',
 		card:{
+			hufu:{
+				fullskin:true,
+				type:'basic',
+				global:['g_hufu_sha','g_hufu_shan','g_hufu_jiu'],
+				savable:function(card,player,dying){
+					return dying==player;
+				},
+				ai:{
+					value:[7.5,5,2],
+					useful:[7.5,5,2],
+				}
+			},
 			// yihuajiemu:{
 			// 	fullskin:true,
 			// 	type:'trick',
@@ -2165,8 +2177,74 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				skills:['guiyanfadao']
 			},
+			qiankundai:{
+				fullskin:true,
+				type:'equip',
+				subtype:'equip5',
+				onLose:function(){
+					player.draw();
+				},
+				skills:['qiankundai'],
+				ai:{
+					order:9.5,
+					equipValue:function(card,player){
+						if(player.countCards('h','qiankundai')) return 6;
+						return 1;
+					},
+					basic:{
+						equipValue:5,
+					}
+				}
+			},
 		},
 		skill:{
+			qiankundai:{
+				mod:{
+					maxHandcard:function(player,num){
+						return num+1;
+					}
+				},
+			},
+			g_hufu_sha:{
+				enable:['chooseToRespond','chooseToUse'],
+				filter:function(event,player){
+					return player.countCards('h','hufu')>0;
+				},
+				filterCard:{name:'hufu'},
+				viewAs:{name:'sha'},
+				prompt:'将一张玉符当杀使用或打出',
+				check:function(card){return 1},
+				ai:{
+					order:1,
+					useful:7.5,
+					value:7.5
+				}
+			},
+			g_hufu_shan:{
+				enable:['chooseToRespond','chooseToUse'],
+				filter:function(event,player){
+					return player.countCards('h','hufu')>0;
+				},
+				filterCard:{name:'hufu'},
+				viewAs:{name:'shan'},
+				prompt:'将一张玉符当闪使用或打出',
+				check:function(){return 1},
+				ai:{
+					order:1,
+					useful:7.5,
+					value:7.5
+				}
+			},
+			g_hufu_jiu:{
+				enable:['chooseToRespond','chooseToUse'],
+				filter:function(event,player){
+					return player.countCards('h','hufu')>0;
+				},
+				filterCard:{name:'hufu'},
+				viewAs:{name:'jiu'},
+				prompt:'将一张玉符当酒使用',
+				check:function(){return 1},
+			},
 			zhiluxiaohu:{
 				trigger:{source:'damageAfter'},
 				forced:true,
@@ -4812,6 +4890,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			'专属、特殊装备无法被强化'
 		},
 		translate:{
+			qiankundai:'乾坤袋',
+			qiankundai_info:'你的手牌上限+1。当你失去该装备时，你摸一张牌。',
+			hufu:'玉符',
+			hufu_bg:'符',
+			g_hufu_sha:'符杀',
+			g_hufu_shan:'符闪',
+			g_hufu_jiu:'符酒',
+			hufu_info:'你可以将一张玉符当作杀、闪或酒使用或打出',
 			// yihuajiemu:'移花接木',
 			// yihuajiemu_info:'对一名装备区内有宝物的角色使用，将其宝物牌转移至另一名角色',
 			liuxinghuoyu:'流星火羽',
@@ -5185,6 +5271,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			lianyaohu_info:'出牌阶段各限一次，你可以选择一项：1.弃置一张手牌，并将一名其他角色的一张手牌置入炼妖壶；2.弃置两张炼妖壶中的牌，从牌堆中获得一张与弃置的牌类别均不相同的牌',
 		},
 		list:[
+			['heart',1,'hufu'],
+			['spade',1,'hufu'],
+			['club',1,'qiankundai'],
 			// ['heart',3,'yihuajiemu'],
 			// ['diamond',1,'yihuajiemu'],
 			// ['diamond',7,'yihuajiemu'],

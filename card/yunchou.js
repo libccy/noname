@@ -475,9 +475,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					if(target.isMinHandcard()) target.draw(2);
+					if(target.isMinHp()){
+						target.recover();
+						event.rec=true;
+					}
 					'step 1'
-					if(target.isMinHp()) target.recover();
+					if(target.isMinHandcard()){
+						target.draw(event.rec?1:2);
+					}
 				},
 				ai:{
 					order:2.5,
@@ -688,18 +693,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					value:[6,1]
 				}
 			},
-			hufu:{
-				fullskin:true,
-				type:'basic',
-				global:['g_hufu_sha','g_hufu_shan','g_hufu_jiu'],
-				savable:function(card,player,dying){
-					return dying==player;
-				},
-				ai:{
-					value:[7.5,5,2],
-					useful:[7.5,5,2],
-				}
-			},
 			huoshan:{
 				fullskin:true,
 				type:'delay',
@@ -810,25 +803,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 				}
 			},
-			qiankundai:{
-				fullskin:true,
-				type:'equip',
-				subtype:'equip5',
-				onLose:function(){
-					player.draw();
-				},
-				skills:['qiankundai'],
-				ai:{
-					order:9.5,
-					equipValue:function(card,player){
-						if(player.countCards('h','qiankundai')) return 6;
-						return 1;
-					},
-					basic:{
-						equipValue:5,
-					}
-				}
-			},
 		},
 		skill:{
 			toulianghuanzhu_ai1:{},
@@ -903,53 +877,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},trigger.player,-1).targetRequired=true;
 				}
 			},
-			qiankundai:{
-				mod:{
-					maxHandcard:function(player,num){
-						return num+1;
-					}
-				},
-			},
-			g_hufu_sha:{
-				enable:['chooseToRespond','chooseToUse'],
-				filter:function(event,player){
-					return player.countCards('h','hufu')>0;
-				},
-				filterCard:{name:'hufu'},
-				viewAs:{name:'sha'},
-				prompt:'将一张虎符当杀使用或打出',
-				check:function(card){return 1},
-				ai:{
-					order:1,
-					useful:7.5,
-					value:7.5
-				}
-			},
-			g_hufu_shan:{
-				enable:['chooseToRespond','chooseToUse'],
-				filter:function(event,player){
-					return player.countCards('h','hufu')>0;
-				},
-				filterCard:{name:'hufu'},
-				viewAs:{name:'shan'},
-				prompt:'将一张虎符当闪使用或打出',
-				check:function(){return 1},
-				ai:{
-					order:1,
-					useful:7.5,
-					value:7.5
-				}
-			},
-			g_hufu_jiu:{
-				enable:['chooseToRespond','chooseToUse'],
-				filter:function(event,player){
-					return player.countCards('h','hufu')>0;
-				},
-				filterCard:{name:'hufu'},
-				viewAs:{name:'jiu'},
-				prompt:'将一张虎符当酒使用',
-				check:function(){return 1},
-			},
 		},
 		translate:{
 			diaobingqianjiang:'调兵遣将',
@@ -975,26 +902,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			shuiyanqijun:'水攻',
 			shuiyanqijun_info:'令所有有装备的角色各弃置一张装备牌',
 			wangmeizhike:'望梅止渴',
-			wangmeizhike_info:'出牌阶段对一名角色使用，若没有角色手牌比目标少，目标摸两张牌；若没有角色体力比目标少，目标回复一点体力',
+			wangmeizhike_info:'出牌阶段对一名角色使用，若没有角色体力比目标少，目标回复一点体力；若没有角色手牌比目标少，目标摸两张牌（若目标回复了体力则改为摸一张）',
 			chenhuodajie:'趁火打劫',
 			chenhuodajie_info:'任意一名其他角色受到伤害时对其使用，获得其一张牌',
 			huoshan:'火山',
 			huoshan_info:'出牌阶段，对自己使用。若判定结果为红桃2~9，则目标角色受到2点火焰伤害，距离目标1以内的其他角色受到1点火焰伤害。若判定不为红桃2~9，将之移动到下家的判定区里。',
 			hongshui:'洪水',
 			hongshui_info:'出牌阶段，对自己使用。若判定结果为梅花2~9，该角色随机弃置3张牌，距离该角色为X的角色随机弃置3-X张牌，若没有牌则失去一点体力，X至少为1',
-			qiankundai:'乾坤袋',
-			qiankundai_info:'你的手牌上限+1。当你失去该装备时，你摸一张牌。',
-			hufu:'虎符',
-			hufu_bg:'符',
-			g_hufu_sha:'符杀',
-			g_hufu_shan:'符闪',
-			g_hufu_jiu:'符酒',
-			hufu_info:'你可以将一张虎符当作杀、闪或酒使用或打出',
 		},
 		list:[
-			['heart',1,'hufu'],
-			['spade',1,'hufu'],
-			['club',1,'qiankundai'],
 			['heart',6,'huoshan','fire'],
 			['club',7,'hongshui'],
 			["diamond",3,'guohe'],

@@ -3678,7 +3678,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				notarget:true,
 				content:function(){
 					'step 0'
-					player.chooseToDiscard('he',[1,3],'弃置至多3张牌并摸弃牌数2倍的牌').set('ai',function(card){
+					player.chooseToDiscard('he',[1,2],'弃置至多2张牌并摸弃牌数2倍的牌').set('ai',function(card){
 						return 9-get.value(card);
 					});
 					'step 1'
@@ -4175,7 +4175,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwmaoxian_kaerweite:'卡尔维特',
 			gwmaoxian_kaerweite_info:'获得至多两名角色各一张手牌，然后结束出牌阶段',
 			gwmaoxian_bulanwang:'布兰王',
-			gwmaoxian_bulanwang_info:'弃置至多3张牌并摸数量等于弃牌数2倍的牌，跳过弃牌阶段，然后结束出牌阶段',
+			gwmaoxian_bulanwang_info:'弃置至多2张牌并摸数量等于弃牌数2倍的牌，跳过弃牌阶段，然后结束出牌阶段',
 			gwmaoxian_kuite:'奎特',
 			gwmaoxian_kuite_info:'视为对一名手牌数不小于你的角色连续使用2张决斗，然后结束出牌阶段',
 			gwmaoxian_haluo:'哈洛',

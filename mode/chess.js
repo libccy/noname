@@ -2946,9 +2946,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				if(!_status.enterArena){
     					ui.wuxie.show();
     					ui.auto.show();
-    					ui.control.style.display='none';
     					ui.control.style.top='';
-    					ui.control.style.transition='';
+                        if(!get.is.safari()){
+        					ui.control.style.transition='';
+        					ui.control.style.display='none';
+                        }
     					event.finish();
     				}
     				else{
@@ -3498,9 +3500,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     				lib.init.onfree();
     				game.pause();
     				'step 7'
-    				ui.control.style.display='none';
     				ui.control.style.top='';
-    				ui.control.style.transition='';
+                    if(!get.is.safari()){
+                        ui.control.style.transition='';
+                        ui.control.style.display='none';
+                    }
     				ui.arena.classList.remove('leaderhide');
     				ui.wuxie.show();
     				ui.auto.show();
@@ -3925,9 +3929,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     					event.asboss.close();
     					delete ui.asboss;
     				}
-    				ui.control.style.display='none';
     				ui.control.style.top='';
-    				ui.control.style.transition='';
+                    if(!get.is.safari()){
+                        ui.control.style.transition='';
+                        ui.control.style.display='none';
+                    }
 
     				var glows=event.bosses.querySelectorAll('.glow');
     				var glows2=event.jiange.querySelectorAll('.glow2');

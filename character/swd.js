@@ -5753,14 +5753,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			trigger:{global:'dying'},
     			priority:6,
     			filter:function(event,player){
-    				return event.player.hp<=0&&player.countCards('he')>0;
+                    if(event.player.hp>0) return false;
+                    if(get.is.altered('huanhun')) return player.countCards('h',{color:'red'})>0;
+    				return player.countCards('he')>0;
     			},
+                alter:true,
     			direct:true,
     			content:function(){
     				"step 0"
-    				var next=player.chooseToDiscard('he',get.prompt2('huanhun',trigger.player),function(card){
-    					return get.color(card)=='red';
-    				});
+    				var next=player.chooseToDiscard(get.is.altered('huanhun')?'h':'he',get.prompt2('huanhun',trigger.player),function(card){
+                        if(get.is.altered('huanhun')){
+                            return get.color(card)=='red';
+                        }
+                        else{
+                            return true;
+                        }
+                    });
     				next.logSkill=['huanhun',trigger.player];
     				next.ai=function(card){
     					if(card.name=='tao') return 0;
@@ -5771,8 +5779,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				};
     				"step 1"
     				if(result.bool){
+                        event.card=result.cards[0];
     					trigger.player.judge(function(card){
-    						return get.color(card)=='red'?1:-1;
+    						return get.color(card)=='red'?1:0;
     					});
     				}
     				else{
@@ -5782,6 +5791,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				if(result.bool){
     					trigger.player.recover();
     				}
+                    else if(event.card.isInPile()){
+                        trigger.player.gain(event.card,'gain2');
+                    }
     			},
     			ai:{
     				threaten:1.6,
@@ -5843,14 +5855,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return get.attitude(player,event.player)>0;
     			},
     			logTarget:'player',
-    			alter:true,
+    			// alter:true,
     			content:function(){
     				"step 0"
-    				if(get.is.altered('yinyue')){
-    					trigger.player.draw();
-    					event.finish();
-    				}
-    				else if(trigger.player!=player&&trigger.player.countCards('h')>=player.countCards('h')){
+    				// if(get.is.altered('yinyue')){
+    				// 	trigger.player.draw();
+    				// 	event.finish();
+    				// }
+    				// else
+                    if(trigger.player!=player&&trigger.player.countCards('h')>=player.countCards('h')){
     					game.asyncDraw([trigger.player,player]);
     				}
     				else{
@@ -9898,7 +9911,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		liaoyuan_info:'每当你使用一张杀指定目标后，你可以弃置任意张与此杀花色相同的牌，若如此做，目标需额外打出等量的闪，每少打出一张闪，此杀的伤害+1',
     		liaoyuan_info_alter:'每当你使用一张杀指定目标后，你可以弃置一张与此杀花色相同的牌，若如此做，目标需额外打出一张闪，若目标没打出闪，此杀的伤害+1',
     		yishan_info:'每当你受到一次伤害，你可以重新获得最近失去的两张牌',
-    		huanhun_info:'当一名角色进入濒死状态时，你可以弃置一张红色牌并令其进行一次判定，若结果为红色，其回复一点体力',
+            huanhun_info:'当一名角色进入濒死状态时，你可以弃置一张牌并令其进行一次判定，若结果为红色，其回复一点体力，否则其获得你弃置的牌',
+    		huanhun_info_alter:'当一名角色进入濒死状态时，你可以弃置一张红色手牌并令其进行一次判定，若结果为红色，其回复一点体力，否则其获得你弃置的牌',
     		daixing_info:'结束阶段，你可以弃置任意张牌并获得等量的护甲；这些护甲将在你的下个准备阶段消失',
     		swd_wuxie_info:'锁定技，你不能成为其他角色的延时锦囊的目标',
     		lqingcheng_info:'结束阶段，你可以进行判定，若为红色则可以继续判定，最多判定3次，判定结束后将判定成功的牌收入手牌',

@@ -20295,6 +20295,9 @@
 				},
 				hasPosition:function(){
 					return ['h','e','j'].contains(get.position(this));
+				},
+				isInPile:function(){
+					return ['c','d'].contains(get.position(this));
 				}
 			},
 			button:{
@@ -42771,6 +42774,10 @@
 	};
 	var get={
         is:{
+			safari:function(){
+				var ua=navigator.userAgent.toLowerCase();
+				return ua.indexOf('safari'!=-1)&&ua.indexOf('chrome')==-1;
+			},
 			freePosition:function(cards){
 				for(var i=0;i<cards.length;i++){
 					if(!cards[i].hasPosition) return false;
