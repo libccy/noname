@@ -2808,7 +2808,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				player.turnOver(false);
     			},
     			ai:{
-    				order:1,
+    				order:0.5,
     				skillTagFilter:function(player){
     					if(player.storage.niepan) return false;
     					if(player.hp>0) return false;
@@ -2817,7 +2817,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				result:{
     					player:function(player){
     						if(player.hp==0) return 10;
-    						if(player.hp<=2&&player.countCards('he')<=1) return 10;
+    						if(player.hp<=1&&player.countCards('he')<=1) return 10;
     						return 0;
     					}
     				},

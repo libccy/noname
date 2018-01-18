@@ -2463,6 +2463,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					use:{
 						enable:'phaseUse',
 		    			viewAs:{name:'juedou'},
+						usable:2,
 						filter:function(event,player){
 							return player.hasCard(function(card){
 			    				return get.color(card)!=player.storage.nsduijue_use;
@@ -4733,7 +4734,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nsshishou:'失手',
 			nsshishou_info:'锁定技，当你于回合内失去手牌时，你失去一点体力并摸一张牌；你回合内使用的牌数不能超过4',
 			nsduijue:'对决',
-			nsduijue_info:'出牌阶段开始时，你可以弃置一张手牌，若如此做，此阶段你可以将一张与此牌颜色不同的手牌当作[决斗]使用',
+			nsduijue_info:'出牌阶段开始时，你可以弃置一张手牌，若如此做，此阶段你可以将一张与此牌颜色不同的手牌当作[决斗]使用（限2次）',
 			nsshuangxiong:'双雄',
 			nsshuangxiong_info:'当你使用[决斗]或被使用[决斗]时，你可以将武将牌翻面',
 			nsshuangxiong_append:'背面武将：文丑，2体力，你可以将一张牌当[杀]打出',
