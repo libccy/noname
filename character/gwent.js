@@ -80,6 +80,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			gwmaoxian_hengsaite_sha:{
+				trigger:{global:'damageAfter'},
+				silent:true,
+				filter:function(event){
+					return event.getParent(3).name=='gwmaoxian_hengsaite';
+				},
+				content:function(){
+					var card=game.createCard('sha');
+					player.gain(card);
+					player.$draw(card);
+				}
+			},
 			gwhuanshuang:{
 				trigger:{player:['phaseBegin','phaseEnd']},
 				direct:true,
@@ -3456,13 +3468,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				derivation:'gw_diandian',
 				image:'character/gw_hengsaite',
 				enable:true,
-				filterTarget:true,
+				notarget:true,
 				content:function(){
-					var list=[];
-					for(var i=0;i<3;i++){
-						list.push(game.createCard('sha'));
+					var targets=game.filterPlayer(function(current){
+						return player.canUse('wanjian',current);
+					}).sortBySeat();
+					if(targets.length){
+						player.addTempSkill('gwmaoxian_hengsaite_sha');
+						player.useCard({name:'wanjian'},targets);
 					}
-					target.gain(list,'gain2');
 				},
 				contentAfter:function(){
 					var evt=_status.event.getParent('phaseUse');
@@ -3474,9 +3488,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					value:10,
 					order:1,
 					result:{
-						target:function(player,target){
-							if(target==player) return 0.1;
-							return 1/Math.sqrt(target.countCards('h')+1);
+						player:function(player,target){
+							var targets=game.filterPlayer(function(current){
+								return player.canUse('wanjian',target);
+							});
+							var eff=0;
+							for(var i=0;i<targets.length;i++){
+								eff+=get.sgn(get.effect(targets[i],{name:'wanjian'},player,player))/Math.sqrt(targets[i].hp+1);
+							}
+							return get.sgn(eff);
 						}
 					}
 				}
@@ -4155,7 +4175,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwmaoxian_yioufeisi:'伊欧菲斯',
 			gwmaoxian_yioufeisi_info:'选择两名角色，令目标依次视为对对方使用一张杀，然后结束出牌阶段',
 			gwmaoxian_luoqi:'罗契',
-			gwmaoxian_luoqi_info:'选择一名角色视为对其使用一张不计入出杀次数的杀，然后所有其他角色可以视为对其使用一张杀，然后结束出牌阶段',
+			gwmaoxian_luoqi_info:'选择一名角色视为对其使用一张不计入出杀次数的杀，然后所有其他角色可以对目标使用一张杀，然后结束出牌阶段',
 			gwmaoxian_jieluote:'杰洛特',
 			gwmaoxian_jieluote_info:'对一名角色造成一点伤害，若目标体力值大于2且为全场最多，改为造成2点伤害，然后结束出牌阶段',
 			gwmaoxian_yenaifa:'叶奈法',
@@ -4163,7 +4183,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwmaoxian_telisi:'特丽斯',
 			gwmaoxian_telisi_info:'对至多3名随机友方角色施加一个随机正面效果，然后结束出牌阶段',
 			gwmaoxian_hengsaite:'亨赛特',
-			gwmaoxian_hengsaite_info:'令一名角色获得3张杀，然后结束出牌阶段',
+			gwmaoxian_hengsaite_info:'视为使用一张万箭齐发，每当有一名角色因此受到伤害，你获得一张杀，然后结束出牌阶段',
 			gwmaoxian_fuertaisite:'弗尔泰斯特',
 			gwmaoxian_fuertaisite_info:'令至多两名角色各获得一点护甲，然后结束出牌阶段',
 			gwmaoxian_laduoweide:'拉多维德',

@@ -19891,6 +19891,7 @@
                     if(this.name){
                         this.classList.remove('epic');
 						this.classList.remove('legend');
+						this.classList.remove('gold');
                         this.classList.remove('unique');
 						this.style.background='';
                         var subtype=get.subtype(this);
@@ -19904,6 +19905,9 @@
                     else if(info.legend){
                         this.classList.add('legend');
                     }
+					else if(info.gold){
+						this.classList.add('gold');
+					}
 					else if(info.unique){
 						this.classList.add('unique');
 					}

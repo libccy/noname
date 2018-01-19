@@ -41,7 +41,7 @@ window.noname_update={
         // 'theme/music/style.css',
         // 'theme/woodden/style.css',
         // 'theme/simple/style.css',
-        // 'layout/default/layout.css',
+        'layout/default/layout.css',
         // 'layout/default/phone.css',
         // 'layout/default/menu.css',
         // 'theme/style/cardback/*',

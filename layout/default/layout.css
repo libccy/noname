@@ -3839,7 +3839,7 @@ div[data-decoration="bronze"]::after{
 .card.fullskin.legend>.name {
 	color: white;
 	background: rgba(106, 27, 154, 0.6);
-	border: 1px solid rgba(106, 27, 154, 1);
+	border: 1px solid rgb(158, 102, 0);
 	box-shadow: rgba(0,0,0,0.4) 0 0 10px inset;
 }
 .card.fullskin.legend>.name2 {
