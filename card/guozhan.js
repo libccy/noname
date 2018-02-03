@@ -581,7 +581,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								}
 								return 0.3;
 							}
-							return 1;
+							return Math.sqrt(target.countCards('he'));
 						},
 					},
 					tag:{

@@ -1316,6 +1316,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return 8-get.value(card);
 				},
 				filter:function(event,player){
+					if(!player.countCards('h',{suit:'spade'})) return false;
 					var enemies=player.getEnemies();
 					for(var i=0;i<enemies.length;i++){
 						if(enemies[i].countCards('h',{suit:'spade'})) return true;
@@ -1368,6 +1369,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 	            filter:function(event,player){
 	                // if(player.hasSkill('yuheng_plus_temp')) return false;
+					if(!player.countCards('h',{color:'black'})) return false;
 					var enemies=player.getEnemies();
 					for(var i=0;i<enemies.length;i++){
 						if(enemies[i].countCards('h',{suit:'spade'})) return true;
@@ -1416,6 +1418,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return 8-get.value(card);
 				},
 				filter:function(event,player){
+					if(!player.countCards('h',{color:'black'})) return false;
 					var enemies=player.getEnemies();
 					for(var i=0;i<enemies.length;i++){
 						if(enemies[i].countCards('h',{suit:'spade'})) return true;

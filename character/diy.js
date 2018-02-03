@@ -2026,11 +2026,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.log(player,'获得了','【'+get.translation(result)+'】');
 
 					var names=[];
-					var players=game.players.concat(game.dead);
-					for(var i=0;i<players.length;i++){
+					for(var i=0;i<game.players.length;i++){
 						names.add(game.players[i].name);
 						names.add(game.players[i].name1);
 						names.add(game.players[i].name2);
+					}
+					for(var i=0;i<game.dead.length;i++){
+						names.add(game.dead[i].name);
+						names.add(game.dead[i].name1);
+						names.add(game.dead[i].name2);
 					}
 					var list=get.gainableSkills(function(info,skill,name){
 						if(names.contains(name)) return false;

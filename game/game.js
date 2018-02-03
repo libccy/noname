@@ -13277,9 +13277,13 @@
 						game.addVideo('gain2',player,get.cardsInfo([card.clone]));
 					}
 					player.equiping=true;
-					player.lose(player.getCards('e',{subtype:get.subtype(card)}),false);
+					var current=player.getCards('e',{subtype:get.subtype(card)});
+					if(current.length){
+						player.lose(current,false);
+						event.swapped=true;
+					}
 					"step 3"
-					if(player.isMin()){
+					if(player.isMin() || player.countCards('e',{subtype:get.subtype(card)})){
 						event.finish();
 						card.discard();
 						delete player.equiping;
@@ -42598,12 +42602,19 @@
 				if(offset12>40){
 					offset12=90-hs1[i].node.info.offsetWidth;
 					hs1[i].node.info.querySelector('span').style.display='none';
-					hs1[i].node.name.style.transform='translateY(16px)';
+					if(hs1.node.name.classList.contains('long')){
+						hs1[i].node.name.style.transform='translateY(16px)  scale(0.85)';
+						hs1[i].node.name.style.transformOrigin='top left';
+					}
+					else{
+						hs1[i].node.name.style.transform='translateY(16px)';
+					}
 					hs1[i].node.info.style.transform='translateX(-'+offset12+'px) translateY(-3px)';
 				}
 				else{
 					hs1[i].node.info.querySelector('span').style.display='';
 					hs1[i].node.name.style.transform='';
+					hs1[i].node.name.style.transformOrigin='';
 					hs1[i].node.info.style.transform='translateX(-'+offset12+'px)';
 				}
 			}
@@ -42635,12 +42646,19 @@
 				if(offset22>40){
 					offset22=90-hs2[i].node.info.offsetWidth;
 					hs2[i].node.info.querySelector('span').style.display='none';
-					hs2[i].node.name.style.transform='translateY(16px)';
+					if(hs2.node.name.classList.contains('long')){
+						hs2[i].node.name.style.transform='translateY(16px)  scale(0.85)';
+						hs2[i].node.name.style.transformOrigin='top left';
+					}
+					else{
+						hs2[i].node.name.style.transform='translateY(16px)';
+					}
 					hs2[i].node.info.style.transform='translateX(-'+offset22+'px) translateY(-3px)';
 				}
 				else{
 					hs2[i].node.info.querySelector('span').style.display='';
 					hs2[i].node.name.style.transform='';
+					hs2[i].node.name.style.transformOrigin='';
 					hs2[i].node.info.style.transform='translateX(-'+offset22+'px)';
 				}
 			}
@@ -44924,7 +44942,7 @@
 						else if(!skills2.contains(skills[i])){
 							uiintro.add('<div style="opacity:0.5"><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
 						}
-                        else if(lib.skill[skills[i]].temp||!node.skills.contains(skills[i])){
+                        else if(lib.skill[skills[i]].temp||!node.skills.contains(skills[i])||lib.skill[skills[i]].thundertext){
                             uiintro.add('<div><div class="skill thundertext thunderauto">【'+translation+'】</div><div class="thundertext thunderauto">'+get.skillInfoTranslation(skills[i])+'</div></div>');
                         }
 						else if(lib.skill[skills[i]].frequent){

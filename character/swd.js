@@ -25,7 +25,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		swd_shuijing:['female','qun',4,['mojian','duanyue','tuzhen']],
     		swd_quxian:['female','qun',3,['mojian','huanxia']],
     		swd_xiyan:['male','qun',3,['jiefen','datong']],
-    		swd_cheyun:['female','wu',3,['shengong','xianjiang','qiaoxie']],
+    		swd_cheyun:['female','wu',3,['cyxianjiang','cyqiaoxie','shengong']],
     		swd_huanyuanzhi:['male','qun',3,['tianshu','lanzhi','mufeng']],
     		swd_murongshi:['female','shu',4,['duanyi','guxing']],
     		swd_jipeng:['male','wu',3,['reyingzi','guozao']],
@@ -223,6 +223,267 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		swd_luchengxuan:['swd_xiarou'],
     	},
     	skill:{
+            cyqiaoxie:{
+    			trigger:{player:['loseEnd','equipEnd']},
+    			frequent:true,
+                alter:true,
+    			filter:function(event,player){
+                    if(event.name=='equip'){
+                        if(get.is.altered('cyqiaoxie')){
+                            return event.swapped||player.countCards('h')<=player.hp;
+                        }
+                        return true;
+                    }
+                    else if(!player.equiping){
+                        for(var i=0;i<event.cards.length;i++){
+        					if(event.cards[i].original=='e') return true;
+        				}
+                    }
+    				return false;
+    			},
+    			content:function(){
+    				"step 0"
+                    if(trigger.name=='equip'){
+                        if(!get.is.altered('cyqiaoxie')||player.countCards('h')<=player.hp){
+                            player.draw();
+                        }
+                        if(!trigger.swapped){
+                            event.finish();
+                        }
+                    }
+                    "step 1"
+                    var list=get.inpile('jiguan',function(name){
+                        return player.hasUseTarget(name);
+                    });
+                    if(list.length){
+                        player.chooseVCardButton(list.randomGets(3),get.prompt('cyqiaoxie'));
+                    }
+                    else{
+                        event.finish();
+                    }
+                    "step 2"
+                    if(result.bool){
+                        player.logSkill('cyqiaoxie');
+                        player.chooseUseTarget(game.createCard(result.links[0][2]));
+                    }
+    			}
+    		},
+            cyxianjiang:{
+	            trigger:{player:'useCardToBegin'},
+                init:function(player){
+                    player.storage.cyxianjiang=[];
+                },
+	            filter:function(event,player){
+                    if(event.target!=player&&event.targets&&event.targets.length==1){
+                        var es=event.target.getCards('e');
+                        for(var i=0;i<es.length;i++){
+                            if(!player.countCards('e',es[i].name)&&!player.storage.cyxianjiang.contains(es[i].name)){
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+	            },
+                direct:true,
+	            content:function(){
+                    'step 0'
+                    player.choosePlayerCard(trigger.target,'e',get.prompt('cyxianjiang')).set('ai',get.buttonValue).set('filterButton',function(button){
+                        return !player.countCards('e',button.link.name)&&!player.storage.cyxianjiang.contains(button.link.name);
+                    });
+                    'step 1'
+                    if(result.bool){
+                        player.logSkill('cyxianjiang');
+                        var card=result.links[0];
+                        player.equip(game.createCard(card),true);
+                        player.storage.cyxianjiang.add(card.name);
+                    }
+	            },
+                group:'cyxianjiang_clear',
+                subSkill:{
+                    clear:{
+                        trigger:{global:'phaseAfter'},
+                        silent:true,
+                        content:function(){
+                            player.storage.cyxianjiang.length=0;
+                        }
+                    }
+                }
+	        },
+            cyzhencha:{
+                enable:'phaseUse',
+                usable:1,
+                filter:function(event,player){
+                    if(!game.hasPlayer(function(current){
+                        return current!=player&&current.countCards('h');
+                    })){
+                        return false;
+                    }
+                    if(!player.countCards('h',{type:'basic'})) return false;
+                    var es=player.getCards('e');
+                    for(var i=0;i<es.length;i++){
+                        if(!es[i].classList.contains('epic')&&!es[i].classList.contains('legend')&&!es[i].classList.contains('gold')){
+                            return true;
+                        }
+                    }
+                    return false;
+                },
+                filterCard:{type:'basic'},
+                filterTarget:function(card,player,target){
+                    return target!=player&&target.countCards('h');
+                },
+                check:function(card){
+                    return 7-get.value(card);
+                },
+                content:function(){
+                    'step 0'
+                    player.viewHandcards(target);
+                    'step 1'
+                    if(target.countCards('h',{color:get.color(cards[0])})){
+                        var es=player.getCards('e');
+                        es.randomSort();
+                        for(var i=0;i<es.length;i++){
+                            if(!es[i].classList.contains('epic')&&!es[i].classList.contains('legend')&&!es[i].classList.contains('gold')){
+                                es[i].classList.add('gold');
+                                es[i].nopower=true;
+                                es[i].storage.cyzhencha=true;
+                                break;
+                            }
+                        }
+                        var num=0;
+                        for(var i=0;i<es.length;i++){
+                            if(es[i].storage.cyzhencha){
+                                num++;
+                            }
+                        }
+                        var list=['shuiyun','liuzi','yijin','qingling','qiandian'];
+                        for(var i=0;i<list.length;i++){
+                            if(i<num){
+                                player.addSkill('cyzhencha_'+list[i]);
+                            }
+                        }
+                    }
+                    else{
+                        player.draw();
+                    }
+                },
+                ai:{
+                    order:2,
+                    result:{
+                        player:function(player,target){
+                            return target.countCards('h');
+                        }
+                    }
+                }
+            },
+            cyzhencha_shuiyun:{
+                trigger:{player:'phaseBegin'},
+    			direct:true,
+                thundertext:true,
+    			content:function(){
+    				"step 0"
+    				player.chooseTarget([1,1],'水云：你可以弃置一名角色的一张牌',function(card,player,target){
+    					if(player==target) return false;
+    					return target.countCards('he')>0;
+    				}).set('autodelay',0.5).ai=function(target){
+    					return -get.attitude(player,target);
+    				};
+    				"step 1"
+    				if(result.bool){
+    					player.logSkill('cyzhencha_shuiyun',result.targets);
+    					player.discardPlayerCard(result.targets[0],'he',true);
+    				}
+    				else{
+    					event.finish();
+    				}
+    			},
+                onremove:function(player){
+                    _status.event.insert(lib.skill.cyzhencha_shuiyun.content,{player:player});
+                }
+            },
+            cyzhencha_liuzi:{
+                trigger:{player:'phaseDrawBegin'},
+    			frequent:true,
+                thundertext:true,
+    			content:function(){
+                    trigger.num++;
+    			},
+                onremove:function(player){
+                    player.draw();
+                }
+            },
+            cyzhencha_yijin:{
+                trigger:{player:'phaseBegin'},
+    			direct:true,
+                thundertext:true,
+    			content:function(){
+    				"step 0"
+    				player.chooseTarget([1,1],'水云：你可以弃置一名角色的一张牌',function(card,player,target){
+    					if(player==target) return false;
+    					return target.countCards('he')>0;
+    				}).set('autodelay',0.5).ai=function(target){
+    					return -get.attitude(player,target);
+    				};
+    				"step 1"
+    				if(result.bool){
+    					player.logSkill('cyzhencha_shuiyun',result.targets);
+    					player.discardPlayerCard(result.targets[0],'he',true);
+    				}
+    				else{
+    					event.finish();
+    				}
+    			},
+                onremove:function(player){
+                    _status.event.insert(lib.skill.cyzhencha_shuiyun.content,{player:player});
+                }
+            },
+            cyzhencha_qingling:{
+                inhert:'cyzhencha_shuiyun'
+            },
+            cyzhencha_qiandian:{
+                inhert:'cyzhencha_shuiyun'
+            },
+            cyqiaoxie_old:{
+    			enable:'phaseUse',
+    			filterCard:function(card){
+    				return get.type(card,'trick')=='trick';
+    			},
+    			usable:1,
+    			filter:function(event,player){
+                    var current=[];
+                    var es=player.getCards('e');
+                    for(var i=0;i<es.length;i++){
+                        current.add(get.subtype(es[i]));
+                    }
+                    if(current.length==5) return false;
+    				// if(get.is.altered('xianjiang')&&player.countCards('e')) return false;
+    				if(player.countCards('h',{type:'trick'})) return true;
+    				if(player.countCards('h',{type:'delay'})) return true;
+    				return false;
+    			},
+    			selectCard:1,
+    			check:function(card){
+    				return 8-get.value(card);
+    			},
+    			content:function(){
+                    var current=[];
+                    var es=player.getCards('e');
+                    for(var i=0;i<es.length;i++){
+                        current.add(get.subtype(es[i]));
+                    }
+                    var list=get.inpile('equip',function(name){
+                        return !current.contains(lib.card[name].subtype);
+                    });
+                    if(list.length){
+        				player.equip(game.createCard(list.randomGet()),true);
+                    }
+    			},
+    			ai:{
+    				result:{
+    					player:1
+    				},
+    				order:9
+    			}
+    		},
             gxianyin:{
                 enable:'phaseUse',
                 usable:1,
@@ -7259,20 +7520,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				return player.countCards('h')>0;
     			},
     			filterTarget:function(card,player,target){
-    				return player!=target&&target.countCards('he')>0;
+    				return player!=target&&target.countCards('h')>0;
     			},
     			check:function(card){
     				return 7-get.value(card);
     			},
     			selectTarget:[1,2],
     			content:function(){
-    				target.chooseToDiscard(true,'he');
+    				target.chooseToDiscard(true,'h');
     			},
     			ai:{
     				order:9,
     				result:{
     					target:function(player,target){
-    						if(target.countCards('he')==1) return -1.5;
+    						if(target.countCards('h')==1) return -1.5;
     						return -1;
     					}
     				},
@@ -9454,11 +9715,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		swd_shuwaner:'舒莞儿',
     		swd_xiaohuanglong:'小黄龙',
 
+            cyshuiyun:'水云',
+            cyshuiyun_info:'准备阶段，你可以弃置一名其他角色的一张牌；每当你失去此技能，你可以弃置一名其他角色的一张牌',
+            cyliuzi:'流紫',
+            cyliuzi_info:'摸牌阶段，你可以额外摸一张牌；每当你失去此技能，你可以摸一张牌',
+            cyyijin:'异金',
+            cyyijin_info:'出牌阶段，你可以对一名体力值为全场最多的角色造成一点伤害；每当你失去此技能，你可以对一名体力值为全场最多的角色造成一点伤害',
+            cyqingling:'青凌',
+            cyqingling_info:'弃牌阶段，若你弃置了至少一张牌，你可以获得一点护甲；每当你失去此技能，你可以获得一点护甲',
+            cyqiandian:'千靛',
+            cyqiandian_info:'结束阶段，你可以视为使用一张惊雷闪；每当你失去此技能，你可以视为使用一张惊雷闪',
             gxianyin:'仙音',
             gxianyin_info:'出牌阶段限一次，你可以选择一种花色，将你的手牌中该花色的牌移至弃牌堆，然后选择另一种花色，从牌堆中获得等量的该花色的牌',
             // gxianyin_info_alter:'',
-            mujia:'木甲',
-            mujia_info:'锁定技，游戏开始时，你获得一个体力上限为3的云狐；你弃牌阶段弃置的牌改为由云狐获得',
+            cyxianjiang:'仙匠',
+            cyxianjiang_info:'每当你使用一张牌指定惟一目标时，你可以复制对方装备区内的一张牌（不能复制已有的装备，同一回合最多复制1张同名装备），并置入你的装备区',
+            cyqiaoxie:'巧械',
+            cyqiaoxie_info:'每当你装备一件装备，你可以摸一张牌；每当你失去一件装备牌，你可以随机观看3张机关牌，并使用其中一张',
+            cyqiaoxie_info_alter:'每当你装备一件装备，若你手牌数不大于体力值，你可以摸一张牌；每当你失去一件装备牌，你可以随机观看3张机关牌，并使用其中一张',
+            cyzhencha:'侦察',
+            cyzhencha_info:'出牌阶段限一次，若你的装备区内的可强化装备，你可以弃置一张基本牌并观看一名其他角色的手牌，若其中有与你弃置的牌颜色相同的牌，你随机升级装备区内的一件装备，否则你摸一张牌；你根据装备区内升级的装备数获得额外技能',
+            cylingjia:'灵甲',
+            cylingjia_info:'出牌阶段限一次，你可以弃置一张装备牌，然后令云狐随机装备一件装备（不替换现有装备）并将其强化',
+            cyqiaobo:'巧补',
+            cyqiaobo_info:'出牌阶段限一次，你可以弃置一张锦囊牌，然后令云狐回复一点体力',
             cqiaoxie:'巧械',
             cqiaoxie_info:'出牌阶段限一次，你可以将一张锦囊牌当作零件袋使用；每当你使用一张零件牌，你获得一点技能点数',
             xiufu:'修复',
@@ -9932,7 +10212,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		tianshu_info:'出牌阶段，你可以弃置一张锦囊牌，然后获得一名其他角色的一项技能直到该角色死亡（替换以此法获得的前一个技能）',
     		zaowu_info:'出牌阶段限一次，你可以将一张黑桃或红桃手牌当作封印之蛋使用',
     		luomei_info:'每当你使用或打出一张梅花花色的牌，你可以摸一张牌',
-    		xingdian_info:'出牌阶段限一次，你可以弃置一张手牌，然后指定至多两名角色令其各弃置一张牌',
+    		xingdian_info:'出牌阶段限一次，你可以弃置一张手牌，然后指定至多两名角色令其各弃置一张手牌',
     		yulin_info:'每当你即将受到伤害，你可以弃置一张装备牌抵消此伤害',
     		funiao_info:'出牌阶段限一次，你可以将一张手牌交给一名其他角色，然后摸一张牌',
     		funiao_old_info:'出牌阶段，你可以交给一名角色一张手牌，然后观看其手牌，每个阶段对一名角色只能发动一次',

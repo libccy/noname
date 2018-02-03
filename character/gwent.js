@@ -3490,7 +3490,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						player:function(player,target){
 							var targets=game.filterPlayer(function(current){
-								return player.canUse('wanjian',target);
+								return player.canUse('wanjian',current);
 							});
 							var eff=0;
 							for(var i=0;i<targets.length;i++){
@@ -4163,6 +4163,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yisilinni:'伊斯琳妮',
 			gw_lanbote:'兰伯特',
 
+			kuanglie:'狂猎',
+			kuanglie_info:'锁定技，每当一名敌方角色成为你的黑色牌的目标，你视为对其使用【刺骨寒霜】；在一名角色受到【刺骨寒霜】的影响后，你随机获得一张【狂猎】牌',
+			lingshuang:'凛霜',
+			lingshuang_info:'每当你失去最后一张基本牌，你可以视为对距离2以内的所有敌方角色使用【刺骨寒霜】；在一名角色受到【刺骨寒霜】影响时，你可以弃置一张手牌将其效果改为“摸牌数-2”',
+			gwshuangwu:'霜舞',
+			gwshuangwu_info:'锁定技，每当你造成一次伤害，你视为对目标使用刺骨寒霜；你对处于刺骨寒霜的角色造成的伤害+1',
 			gwhuanshuang:'幻霜',
 			gwhuanshuang_info:'准备或结束阶段，你可以从三张随机亮出的铜卡法术中选择一张使用，并结算两次',
 			gwjinli:'金醴',
@@ -4297,10 +4303,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwtianbian_info:'出牌阶段开始时，你可以选择一项：随机使用一张对全场有正面效果的牌；或随机使用一张对全场有负面效果的牌',
 			gwxiaoshou:'枭首',
 			gwxiaoshou_info:'出牌阶段限两次，你可以弃置一张牌对场上体力值最高（或之一）的一名角色造成一点伤害',
-			kuanglie:'狂猎',
-			kuanglie_info:'锁定技，每当一名敌方角色成为你的黑色牌的目标，你视为对其使用【刺骨寒霜】；在一名角色受到【刺骨寒霜】的影响后，你随机获得一张【狂猎】牌',
-			lingshuang:'凛霜',
-			lingshuang_info:'每当你失去最后一张基本牌，你可以视为对距离2以内的所有敌方角色使用【刺骨寒霜】；在一名角色受到【刺骨寒霜】影响时，你可以弃置一张手牌将其效果改为“摸牌数-2”',
 			gwjiquan:'集权',
 			gwjiquan_info:'出牌阶段限一次，你可以从任意名角色处各获得一张牌，每拿一张牌，被拿牌的角色视为对你使用一张杀',
 			nuhou:'怒吼',

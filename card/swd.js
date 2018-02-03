@@ -950,7 +950,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					if(player.countCards('he')){
-						player.chooseCard(true,'he');
+						player.chooseCard(true,'he').set('prompt2','你将'+
+						get.translation(cards)+'和选择牌置于'+get.translation(target)+
+						'的武将牌上，然后摸一张牌；'+get.translation(target)+
+						'于下一结束阶段获得武将牌上的牌');
 					}
 					else{
 						event.finish();
@@ -1100,7 +1103,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<es.length;i++){
 						if(lib.inpile.contains(es[i].name)&&
 							!lib.card[es[i].name].nopower&&
-							!lib.card[es[i].name].unique){
+							!lib.card[es[i].name].unique&&
+							!es[i].nopower){
 							return true;
 						}
 					}
@@ -1139,7 +1143,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					var cards=[];
 					var time=0;
 					for(var i=0;i<es.length;i++){
-						if(!lib.inpile.contains(es[i].name)||lib.card[es[i].name].nopower||lib.card[es[i].name].unique){
+						if(!lib.inpile.contains(es[i].name)||lib.card[es[i].name].nopower||lib.card[es[i].name].unique||es[i].nopower){
 							es.splice(i--,1);
 						}
 					}
@@ -4265,6 +4269,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(!lib.inpile.contains(card.name)) return false;
 						if(lib.card[card.name].nopower) return false;
 						if(lib.card[card.name].unique) return false;
+						if(card.nopower) return false;
 					}
 					if(ui.selected.cards.length){
 						var type2=get.type(ui.selected.cards[0]);
@@ -4287,7 +4292,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<es.length;i++){
 						if(lib.inpile.contains(es[i].name)&&
 							!lib.card[es[i].name].nopower&&
-							!lib.card[es[i].name].unique){
+							!lib.card[es[i].name].unique&&
+							!es[i].nopower){
 							return true;
 						}
 					}
@@ -4311,7 +4317,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						player.line(target,'green');
-						target.equip(event.card);
+						target.equip(event.card)._triggered=null;
 						target.$gain2(event.card);
 						game.delay();
 					}
@@ -4885,7 +4891,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		},
 		help:{
 			'轩辕剑':'<ul><li>零件、祭器牌可用于煅造装备，煅造得到强化装备，并可装备给距离1以内的角色<li>'+
-			'煅造装备时失去牌不触发技能<li>'+
+			'煅造装备时失去牌以及装备牌的过程不触发任何技能（如枭姬、祈禳） <li>'+
 			'进行洗牌时强化装备将从弃牌堆中消失，不进入牌堆<li>'+
 			'专属、特殊装备无法被强化'
 		},
