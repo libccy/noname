@@ -4032,7 +4032,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                 }
             },
     		_attackmove:{
-    			trigger:{player:'damageEnd'},
+    			trigger:{player:'damage'},
     			silent:true,
     			priority:50,
     			filter:function(event,player){

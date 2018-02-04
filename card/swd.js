@@ -4309,7 +4309,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					var card=game.createCard(name);
 					player.chooseTarget(function(card,player,target){
 						return !target.isMin()&&get.distance(player,target)<=1;
-					},'选择一个目标装备'+get.translation(card.name)).ai=function(target){
+					},'选择一个目标装备'+get.translation(card.name),true).ai=function(target){
 						return get.effect(target,card,player,player);
 					}
 					event.card=card;
@@ -4890,7 +4890,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			jiguan:0.45
 		},
 		help:{
-			'轩辕剑':'<ul><li>零件、祭器牌可用于煅造装备，煅造得到强化装备，并可装备给距离1以内的角色<li>'+
+			'轩辕剑':'<ul><li>零件、祭器牌可用于煅造装备，煅造得到强化装备，并装备给距离1以内的角色<li>'+
 			'煅造装备时失去牌以及装备牌的过程不触发任何技能（如枭姬、祈禳） <li>'+
 			'进行洗牌时强化装备将从弃牌堆中消失，不进入牌堆<li>'+
 			'专属、特殊装备无法被强化'
@@ -5114,7 +5114,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			hslingjian_shijianhuisu_equip4_info:'当你的装备区内没有其他牌时，你的进攻距离+1',
 			hslingjian_shijianhuisu_equip5_info:'出牌阶段限一次，你可以弃置一张牌，然后令一名其他角色将其装备区内的牌收回手牌',
 			_lingjianduanzao:'煅造',
-			_lingjianduanzao_info:'出牌阶段，你可以将一张装备牌和一张可煅造的牌合成为一件强化装备，并可装备给距离1以内的一名角色',
+			_lingjianduanzao_info:'出牌阶段，你可以将一张装备牌和一张可煅造的牌合成为一件强化装备，并装备给距离1以内的一名角色',
 			jiguanshu:'机关鼠',
 			jiguanshu_info:'出牌阶段对自己使用，用随机祭器强化装备区内的一张随机装备，然后用随机零件强化其余的装备',
 			lingjiandai:'零件袋',

@@ -8114,7 +8114,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		wzhanyi_info:'你可以跳过出牌阶段，改为摸三张牌并展示之，将摸到的装备牌置于装备区，然后可以使用手牌中的杀',
     		shengteng:'升腾',
     		shengteng_info:'锁定技，每当你使用锦囊牌造成伤害，你增加一点体力上限并回复一点体力',
-    		yuansu:'元素',
+    		yuansu:'寂灭',
     		yuansu_info:'出牌阶段限一次，若你已损失的体力值不少于3，你可以将体力上限降至与体力值相同，视为使用一张元素毁灭',
     		nuyan:'怒焰',
     		nuyan2:'怒焰',

@@ -42602,7 +42602,7 @@
 				if(offset12>40){
 					offset12=90-hs1[i].node.info.offsetWidth;
 					hs1[i].node.info.querySelector('span').style.display='none';
-					if(hs1.node.name.classList.contains('long')){
+					if(hs1[i].node.name.classList.contains('long')){
 						hs1[i].node.name.style.transform='translateY(16px)  scale(0.85)';
 						hs1[i].node.name.style.transformOrigin='top left';
 					}
@@ -42646,7 +42646,7 @@
 				if(offset22>40){
 					offset22=90-hs2[i].node.info.offsetWidth;
 					hs2[i].node.info.querySelector('span').style.display='none';
-					if(hs2.node.name.classList.contains('long')){
+					if(hs2[i].node.name.classList.contains('long')){
 						hs2[i].node.name.style.transform='translateY(16px)  scale(0.85)';
 						hs2[i].node.name.style.transformOrigin='top left';
 					}

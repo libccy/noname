@@ -2244,7 +2244,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				priority:-1,
 				content:function(){
-					if(typeof trigger.num=='number'){
+					if(typeof trigger.shanRequired=='number'){
 						trigger.shanRequired++;
 					}
 					else{

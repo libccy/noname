@@ -275,12 +275,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 },
 	            filter:function(event,player){
                     if(event.target!=player&&event.targets&&event.targets.length==1){
-                        var es=event.target.getCards('e');
-                        for(var i=0;i<es.length;i++){
-                            if(!player.countCards('e',es[i].name)&&!player.storage.cyxianjiang.contains(es[i].name)){
-                                return true;
-                            }
-                        }
+                        if(player.storage.cyxianjiang.contains(event.target)) return false;
+                        return event.target.countCards('e',function(card){
+                            return !player.countCards('he',card.name);
+                        });
                     }
                     return false;
 	            },
@@ -288,14 +286,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	            content:function(){
                     'step 0'
                     player.choosePlayerCard(trigger.target,'e',get.prompt('cyxianjiang')).set('ai',get.buttonValue).set('filterButton',function(button){
-                        return !player.countCards('e',button.link.name)&&!player.storage.cyxianjiang.contains(button.link.name);
+                        return !player.countCards('he',button.link.name);
                     });
                     'step 1'
                     if(result.bool){
                         player.logSkill('cyxianjiang');
                         var card=result.links[0];
                         player.equip(game.createCard(card),true);
-                        player.storage.cyxianjiang.add(card.name);
+                        player.storage.cyxianjiang.add(trigger.target);
                     }
 	            },
                 group:'cyxianjiang_clear',
@@ -9729,10 +9727,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             gxianyin_info:'出牌阶段限一次，你可以选择一种花色，将你的手牌中该花色的牌移至弃牌堆，然后选择另一种花色，从牌堆中获得等量的该花色的牌',
             // gxianyin_info_alter:'',
             cyxianjiang:'仙匠',
-            cyxianjiang_info:'每当你使用一张牌指定惟一目标时，你可以复制对方装备区内的一张牌（不能复制已有的装备，同一回合最多复制1张同名装备），并置入你的装备区',
+            cyxianjiang_info:'每当你使用一张牌指定惟一目标时，你可以复制对方装备区内的一张你没有的牌，并置入你的装备区，同一回合对一名角色最多发动一次',
             cyqiaoxie:'巧械',
             cyqiaoxie_info:'每当你装备一件装备，你可以摸一张牌；每当你失去一件装备牌，你可以随机观看3张机关牌，并使用其中一张',
-            cyqiaoxie_info_alter:'每当你装备一件装备，若你手牌数不大于体力值，你可以摸一张牌；每当你失去一件装备牌，你可以随机观看3张机关牌，并使用其中一张',
+            cyqiaoxie_info_alter:'每当你装备一件装备，若你的手牌数不大于体力值，你可以摸一张牌；每当你失去一件装备牌，你可以随机观看3张机关牌，并使用其中一张',
             cyzhencha:'侦察',
             cyzhencha_info:'出牌阶段限一次，若你的装备区内的可强化装备，你可以弃置一张基本牌并观看一名其他角色的手牌，若其中有与你弃置的牌颜色相同的牌，你随机升级装备区内的一件装备，否则你摸一张牌；你根据装备区内升级的装备数获得额外技能',
             cylingjia:'灵甲',

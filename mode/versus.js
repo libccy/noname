@@ -6093,10 +6093,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
     			if(from.side==to.side){
     				if(to.identity=='zhu'){
     					if(_status.connectMode){
-    						if(_status.mode=='4v4') return 10;
+    						if(_status.mode=='4v4') return 7;
     					}
     					else{
-    						if(lib.storage.main_zhu||_status.mode=='four') return 10;
+    						if(lib.storage.main_zhu||_status.mode=='four') return 7;
     					}
     				}
     				return 6;
