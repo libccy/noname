@@ -3350,7 +3350,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			mark:true,
     			discard:false,
     			delay:0,
-    			check:function(card){return 6-get.value(card);},
+    			check:function(card){
+                    if(_status.event.player.hp==1) return 8-get.value(card);
+                    return 6-get.value(card);
+                },
     			selectTarget:2,
     			multitarget:true,
     			content:function(){

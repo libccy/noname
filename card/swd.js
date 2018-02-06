@@ -1931,6 +1931,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.addTempSkill('zhufangshenshi');
 				},
 				ai:{
+					norepeat:1,
 					value:4,
 					wuxie:function(){
 						return 0;

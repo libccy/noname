@@ -285,7 +285,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'spell',
 				subtype:'spell_gold',
 				vanish:true,
-				enable:true,
+				enable:function(card,player){
+					return game.hasPlayer(function(current){
+						return get.distance(player,current,'pure')==1;
+					});
+				},
 				notarget:true,
 				contentBefore:function(){
 					player.$skill('阿尔德印','legend','metal');
