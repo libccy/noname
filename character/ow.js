@@ -782,7 +782,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	            ai:{
 	                order:5,
 	                expose:0.2,
-	                return:{
+	                result:{
 	                    target:function(player,target){
 	                        return 1/Math.max(1,target.hp);
 	                    }

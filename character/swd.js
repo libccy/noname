@@ -266,7 +266,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         player.logSkill('cyqiaoxie');
                         player.chooseUseTarget(game.createCard(result.links[0][2]));
                     }
-    			}
+    			},
+                ai:{
+                    noe:true,
+					reverseEquip:true,
+					effect:{
+						target:function(card,player,target,current){
+							if(get.type(card)=='equip') return [1,3];
+						}
+					}
+                }
     		},
             cyxianjiang:{
 	            trigger:{player:'useCardToBegin'},

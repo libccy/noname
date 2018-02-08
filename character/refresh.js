@@ -631,6 +631,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:function(card,player,target){
 						if(!target.hasFriend()) return;
+						if(player==target) return;
 						var type=get.type(card);
 						var nh=target.countCards();
 						if(type=='trick'){

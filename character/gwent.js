@@ -3315,7 +3315,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					event.targets.sortBySeat();
 					'step 2'
-					if(event.targets.length){
+					if(event.targets.length&&target.isIn()){
 						event.current=event.targets.shift();
 						if(event.current.hasSha()){
 							event.current.chooseToUse({name:'sha'},'是否对'+get.translation(target)+'使用一张杀？',target,-1);

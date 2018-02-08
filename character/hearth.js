@@ -2410,7 +2410,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			viewAsFilter:function(player){
     				if(!player.countCards('he',{suit:'spade'})) return false;
     			},
-    			prompt:'将一张黑桃手牌当作无中生有使用',
+    			prompt:'将一张黑桃牌当作无中生有使用',
     			check:function(card){return 7-get.value(card)},
     			ai:{
     				threaten:1.4,
