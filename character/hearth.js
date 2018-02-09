@@ -7598,7 +7598,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			selectTarget:-1,
     			content:function(){
-    				target.damage(Math.ceil(Math.random()*2));
+    				target.damage();
     			},
     			contentAfter:function(){
     				if(!player.isTurnedOver()){
@@ -7611,7 +7611,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					target:-2
     				},
     				tag:{
-    					damage:2,
+    					damage:1,
     					multitarget:1,
     					multineg:1,
     				},
@@ -7632,7 +7632,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			selectTarget:-1,
     			content:function(){
-    				if(target.countCards('hej')) player.gainPlayerCard(target,'hej',true,Math.ceil(Math.random()*2));
+    				if(target.countCards('hej')) player.gainPlayerCard(target,'hej',true);
     			},
     			contentAfter:function(){
     				if(!player.isTurnedOver()){
@@ -7647,6 +7647,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				tag:{
     					multitarget:1,
     					multineg:1,
+                        loseCard:1,
+                        gain:1
     				},
     				useful:5,
     				value:10,
@@ -8178,9 +8180,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		bingyan_info:'出牌阶段限一次，你可以将一张红色牌当作炽羽袭，或将一张黑色牌当作惊雷闪使用',
     		hsshenqi:'神器',
     		hsshenqi_morijingxiang:'末日镜像',
-    		hsshenqi_morijingxiang_info:'限武将牌正面朝上时使用，从所有其他角色的区域内各获得1~2张牌；使用后将武将牌翻至背面',
+    		hsshenqi_morijingxiang_info:'限武将牌正面朝上时使用，从所有其他角色的区域内各获得一张牌；使用后将武将牌翻至背面',
     		hsshenqi_kongbusangzhong:'恐怖丧钟',
-    		hsshenqi_kongbusangzhong_info:'限武将牌正面朝上时使用，对所有其他角色各造成1~2点伤害；使用后将武将牌翻至背面',
+    		hsshenqi_kongbusangzhong_info:'限武将牌正面朝上时使用，对所有其他角色各造成一点伤害；使用后将武将牌翻至背面',
     		hsshenqi_nengliangzhiguang:'能量之光',
     		hsshenqi_nengliangzhiguang_info:'限武将牌正面朝上时使用，令一名角色增加一点体力上限，回复一点体力，并摸四张牌；使用后将武将牌翻至背面',
     		hsbaowu:'宝物',

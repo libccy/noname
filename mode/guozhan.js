@@ -3491,10 +3491,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(this.identity=='unknown') return false;
 					if(!lib.group.contains(this.identity)) return true;
 					var min=game.players.length;
-					for(var i=0;i<lib.group.length;i++){
-						var num=get.population(lib.group[i]);
-						if(num>0){
-							min=Math.min(min,num);
+					if(game.hasPlayer(function(current){
+						return current.identity=='ye';
+					})){
+						min=1;
+					}
+					else{
+						for(var i=0;i<lib.group.length;i++){
+							var num=get.population(lib.group[i]);
+							if(num>0){
+								min=Math.min(min,num);
+							}
 						}
 					}
 					return get.population(this.identity)==min;
