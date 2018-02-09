@@ -286,8 +286,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'spell_gold',
 				vanish:true,
 				enable:function(card,player){
+					var enemies=player.getEnemies();
 					return game.hasPlayer(function(current){
-						return get.distance(player,current,'pure')==1;
+						return enemies.contains(current)&&get.distance(player,current,'pure')==1;
 					});
 				},
 				notarget:true,
@@ -297,8 +298,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
+					var enemies=player.getEnemies();
 					var list=game.filterPlayer(function(current){
-						return get.distance(player,current,'pure')==1;
+						return enemies.contains(current)&&get.distance(player,current,'pure')==1;
 					});
 					event.list=list.sortBySeat();
 					'step 1'
@@ -307,15 +309,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						event.target=target;
 						player.line(target,'green');
 						target.damage();
-						target.draw(false);
-						target.$draw();
 					}
 					else{
 						delete event.target;
 					}
 					'step 2'
 					if(event.target){
-						event.target.out();
+						if(!event.target.isTurnedOver()){
+							event.target.turnOver();
+							event.target.addSkill('gw_aerdeyin');
+						}
 						event.goto(1);
 					}
 					'step 3'
@@ -1840,6 +1843,38 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			gw_aerdeyin:{
+				trigger:{global:'roundStart'},
+				silent:true,
+				mark:true,
+				intro:{
+					content:'新的一轮开始时，若武将牌正面朝上，则在当前回合结束后进行一个额外回合，否则将武将牌翻回正面'
+				},
+				content:function(){
+					if(player.isTurnedOver()){
+						player.turnOver();
+						player.removeSkill('gw_aerdeyin');
+						player.logSkill('gw_aerdeyin');
+					}
+					else{
+						player.insertPhase();
+					}
+				},
+				group:'gw_aerdeyin_phase',
+				subSkill:{
+					phase:{
+						trigger:{player:'phaseBefore'},
+						silent:true,
+						filter:function(event,player){
+							return event.skill=='gw_aerdeyin';
+						},
+						content:function(){
+							player.removeSkill('gw_aerdeyin');
+							player.logSkill('gw_aerdeyin');
+						}
+					}
+				}
+			},
 			gw_kunenfayin:{
 				mark:true,
 				nopop:true,
@@ -2220,11 +2255,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_hudiewu:'蝴蝶舞',
 			gw_hudiewu_info:'将其他角色在场上的所有牌替换为蝶翼（每当你失去一张蝶翼，你获得一枚“蝶翼”标记；在任意角色的结束阶段，你移去所有“蝶翼”标记，并随机弃置等量的牌），然后结束出牌阶段',
 			gw_yigeniyin:'伊格尼印',
-			gw_yigeniyin_info:'对敌方角色中体力值最大的一名随机角色造成一点火焰伤害，然后对场上体力值最大的所有角色各造成一点火焰伤害，然后结束出牌阶段',
+			gw_yigeniyin_info:'对敌方角色中体力值最高的一名随机角色造成一点火焰伤害，然后对场上体力值最高的所有角色各造成一点火焰伤害，然后结束出牌阶段',
 			gw_leizhoushu:'雷咒术',
 			gw_leizhoushu_info:'获得技能雷咒术（在每个准备阶段令全场牌数最多的所有其他角色各随机弃置一张牌，若目标不包含敌方角色，将一名随机敌方角色追加为额外目标，结算X次，X为本局获得此技能的次数），然后结束出牌阶段',
 			gw_aerdeyin:'阿尔德印',
-			gw_aerdeyin_info:'对相邻的角色造成一点伤害，目标摸一张牌并移出游戏一轮，然后结束出牌阶段',
+			gw_aerdeyin_bg:'印',
+			gw_aerdeyin_info:'对相邻的敌方角色造成一点伤害，若目标武将牌正面朝上，则将其翻面；新的一轮开始时，若目标武将牌正面朝上，则在当前回合结束后进行一个额外回合，否则将武将牌翻回正面',
 			gw_xinsheng:'新生',
 			gw_xinsheng_info:'选择一名角色，随机观看12张武将牌，选择一张替代其武将牌，并令其增加一点体力，然后结束出牌阶段',
 			gw_zhongmozhizhan:'终末之战',

@@ -495,6 +495,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 enable:'phaseUse',
                 usable:1,
                 delay:0,
+                filter:function(event,player){
+                    return player.countCards('h');
+                },
                 content:function(){
                     'step 0'
                     var max=0;

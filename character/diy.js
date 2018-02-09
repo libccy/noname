@@ -2268,7 +2268,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.targets.length){
 						event.current=event.targets.shift();
 						if(event.current.countCards('he')&&target.isAlive()){
-							event.current.chooseToUse({name:'sha'},target,-1);
+							event.current.chooseToUse({name:'sha'},target,-1,'号令').set('prompt2','选择一项：1. 对'+get.translation(event.current)+'使用一张杀；2. 取消并交给'+get.translation(player)+'一张牌，然后视'+get.translation(player)+'为对你使用一张杀');
 						}
 					}
 					else{
