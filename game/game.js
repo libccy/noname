@@ -15260,26 +15260,42 @@
                     next._args=Array.from(arguments);
 					return next;
 				},
-				chooseUseTarget:function(card,prompt){
+				chooseUseTarget:function(card,prompt,includecard){
 					// not online-ready
 					if(typeof card=='string'){
 						card={name:card};
 					}
+					var discard=function(){
+						if(get.itemtype(card)=='card'&&card.discard){
+							card.discard();
+						}
+					};
 					var name=card.name;
 					var info=lib.card[name];
-					if(!info.enable) return;
+					if(!info.enable){
+						discard();
+						return false;
+					}
 					var player=this;
-					if(info.selectTarget==-1){
+					if(get.select(info.selectTarget)[1]==-1){
 						var targets=game.filterPlayer(function(current){
 							return lib.filter.filterTarget(card,player,current);
 						});
 						if(targets.length){
 							targets.sort(lib.sort.seat);
-							player.useCard(card,targets);
+							var next=player.useCard(card,targets);
+							if(includecard===false){
+								next.addCount=false;
+							}
+							return next;
 						}
 					}
 					else if(info.notarget){
-						player.useCard(card);
+						var next=player.useCard(card);
+						if(includecard===false){
+							next.addCount=false;
+						}
+						return next;
 					}
 					else if(game.hasPlayer(function(current){
 						return player.canUse(card,current);
@@ -15298,12 +15314,19 @@
 						next.onresult=function(result){
 							if(result.bool){
 								if(info.multitarget&&result.targets.length<get.select(info.selectTarget)[0]){
-									return;
+									discard();
+									return false;
 								}
-								player.useCard(card,result.targets);
+								var next=player.useCard(card,result.targets);
+								if(includecard===false){
+									next.addCount=false;
+								}
+								return next;
 							}
 						}
 					}
+					discard();
+					return false;
 				},
 				chooseTarget:function(){
 					var next=game.createEvent('chooseTarget');

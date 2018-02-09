@@ -80,6 +80,68 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			jielue:{
+				trigger:{player:'phaseUseBegin'},
+				filter:function(event,player){
+					var list=player.getFriends();
+					for(var i=0;i<list.length;i++){
+						var hs=list[i].getCards('h');
+						for(var j=0;j<hs.length;j++){
+							if(player.hasUseTarget(hs[j])){
+								return true;
+							}
+						}
+					}
+					return false;
+				},
+				forced:true,
+				content:function(){
+					'step 0'
+					var list=player.getFriends();
+					var cards=[];
+					for(var i=0;i<list.length;i++){
+						var hs=list[i].getCards('h');
+						var usables=[];
+						for(var j=0;j<hs.length;j++){
+							if(player.hasUseTarget(hs[j])){
+								usables.push(hs[j]);
+							}
+						}
+						if(usables.length){
+							cards.push(usables);
+						}
+					}
+					var touse=[];
+					var owners=[];
+					for(var i=0;i<2;i++){
+						if(cards.length){
+							var card=cards.randomRemove().randomRemove();
+							var owner=get.owner(card);
+							owner.lose(card,ui.special);
+							owner.$give(card,player);
+							player.line(owner,'green');
+							touse.push(card);
+							owners.push(owner);
+						}
+					}
+					event.touse=touse;
+					event.owners=owners;
+					'step 1'
+					game.delayx(1.5);
+					'step 2'
+					if(event.touse.length){
+						player.chooseUseTarget(event.touse.shift(),null,false);
+						event.redo();
+					}
+					'step 3'
+					game.asyncDraw(event.owners);
+					'step 4'
+					game.delay();
+				},
+				ai:{
+					threaten:1.5
+				}
+			},
 			gwmaoxian_hengsaite_sha:{
 				trigger:{global:'damageAfter'},
 				silent:true,
@@ -1565,7 +1627,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.gain(game.createCard('gw_shizizhaohuan'),'gain2');
 				}
 			},
-			jielue:{
+			jielue_old:{
 				trigger:{player:'useCard'},
 				frequent:true,
 				oncancel:function(event,player){
@@ -1573,13 +1635,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				usable:1,
 				filter:function(event,player){
-					return !player.hasSkill('jielue2')&&get.type(event.card)=='basic';
+					if(event.cards.length.length==1&&event.cards[0]==event.card){
+						return !player.hasSkill('jielue2')&&get.type(event.card)=='basic'&&!event.card.storage.jielue;
+					}
+					return false;
 				},
 				check:function(event,player){
 					return get.value(event.card)>3;
 				},
 				content:function(){
-					player.gain([game.createCard(trigger.card),game.createCard(trigger.card)],'gain2');
+					var card1=game.createCard(trigger.card);
+					var card2=game.createCard(trigger.card);
+					card1.storage.jielue=true;
+					card2.storage.jielue=true;
+					player.gain([card1,card2],'gain2');
 				},
 				ai:{
 					pretao:true
@@ -4270,7 +4339,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwxuezhan:'血战',
 			gwxuezhan_info:'准备阶段，若你的手牌数为全场最少或之一，你可以获得一张十字召唤',
 			jielue:'劫掠',
-			jielue_info:'当你于回合内首次使用基本牌时，你可以获得两张该牌的复制',
+			jielue_info:'锁定技，出牌阶段开始时，你从两个随机队友处各获得一张可使用的牌并依次使用之，然后被拿牌的队友摸一张牌',
+			jielue_old_info:'当你于回合内首次使用基本牌时，你可以获得两张该牌的复制（使用复制的牌时不触发此技能）',
 			gwfengchi:'风驰',
 			gwfengchi_info:'锁定技，出牌阶段开始时，你随机观看3个可以在出牌阶段使用的技能，并获得其中一个技能直到此阶段结束',
 			gwjushi:'巨噬',
