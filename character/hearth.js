@@ -6040,17 +6040,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     game.delayx(0.5);
     				'step 3'
     				trigger.trigger('useCard');
+                    trigger.insertAfter(lib.skill.huanjue.draw,{player:trigger.player});
     			},
+                draw:function(){
+                    player.draw();
+                },
     			ai:{
     				expose:0.2,
     				threaten:function(player,target){
                         if(target.storage.counttrigger&&target.storage.counttrigger.huanjue) return 1.8;
                         return 0.6;
-                    },
-                    effect:{
-                        target:function(player,target){
-                            if(player!=target&&_status.currentPhase==target) return 0;
-                        }
                     }
     			}
     		},
@@ -7997,7 +7996,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             yindan:'引弹',
             yindan_info:'出牌阶段限一次，你可以弃置一张黑桃牌并流失一点体力，然后获得两张炸弹机器人',
             huanjue:'幻觉',
-            huanjue_info:'每名角色的回合限一次，当你使用卡牌指定其他角色为惟一目标，或当其他角色使用卡牌指定你为惟一目标时，你可以从三张随机亮出的牌中选择一张代替此牌',
+            huanjue_info:'每名角色的回合限一次，当你使用卡牌指定其他角色为惟一目标，或当其他角色使用卡牌指定你为惟一目标时，你可以从三张随机亮出的牌中选择一张代替此牌，然后该牌的使用者在结算后摸一张牌',
             yinzong:'影踪',
             yinzong_info:'锁定技，每当你失去装备区内牌，你获得潜行直到下一回合开始',
             tansuo:'探索',

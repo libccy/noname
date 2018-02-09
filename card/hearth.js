@@ -364,8 +364,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					target.changeHujia();
 					target.draw();
 					'step 1'
-					if(player.countCards('he')){
-						player.chooseToDiscard('he',true);
+					if(target.countCards('he')){
+						target.chooseToDiscard('he',true);
 					}
 				},
 				ai:{

@@ -9,6 +9,7 @@
 		event:{
 			finished:true,
 			next:[],
+			after:[]
 		},
 		ai:{},
 		lastdragchange:[],
@@ -20432,7 +20433,16 @@
 					return this._rand;
 				},
 				insert:function(func,map){
-					var next=game.createEvent(this.name+'Inserted',false);
+					var next=game.createEvent(this.name+'Inserted',false,this);
+					next.setContent(func);
+					for(var i in map){
+						next.set(i,map[i]);
+					}
+					return next;
+				},
+				insertAfter:function(func,map){
+					var next=game.createEvent(this.name+'Inserted',false,{next:[]});
+					this.after.push(next);
 					next.setContent(func);
 					for(var i in map){
 						next.set(i,map[i]);
@@ -22529,6 +22539,7 @@
                             _status.event={
                                 finished:true,
                                 next:[],
+								after:[]
                             };
                             _status.paused=false;
                             game.createEvent('game',false).setContent(lib.init.startOnline);
@@ -22743,6 +22754,7 @@
                         _status.event={
                             finished:true,
                             next:[],
+							after:[]
                         };
                         _status.paused=false;
 						_status.dying=get.parsedResult(state.dying)||[];
@@ -25930,6 +25942,7 @@
 				step:0,
 				finished:false,
 				next:[],
+				after:[],
 				custom:{
 					add:{},
 					replace:{}
@@ -26991,6 +27004,17 @@
 					event.trigger(event.name+'After');
 					event._triggered++;
 				}
+				else if(event.after&&event.after.length){
+					var next=event.after.shift();
+					if(next.player&&next.player.skipList.contains(next.name)){
+						event.trigger(next.name+'Skipped');
+						next.player.skipList.remove(next.name);
+					}
+					else{
+						next.parent=event;
+						_status.event=next;
+					}
+				}
 				else{
 					if(event.parent){
 						if(event.result){
@@ -27856,6 +27880,7 @@
                 _status.event={
                     finished:true,
                     next:[],
+					after:[]
                 };
                 _status.paused=false;
 
