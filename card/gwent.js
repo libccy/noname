@@ -852,6 +852,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
     					}
 						hs2.push(game.createCard(list.randomGet()));
 					}
+					var list=get.libCard(function(info){
+						return info.type=='spell'&&info.subtype!='spell_gold';
+					});
+					if(list.length){
+						hs2.push(game.createCard(list.randomGet()));
+					}
 					if(hs2.length){
 						player.gain(hs2,'draw');
 					}
@@ -2236,7 +2242,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_huangjiashenpan:'皇家审判',
 			gw_huangjiashenpan_info:'获得任意一张金卡法术（皇家审判除外），然后结束出牌阶段',
 			gw_chongci:'冲刺',
-			gw_chongci_info:'弃置所有牌，每弃置一张手牌，便随机获得一张类别相同的牌；每弃置一张装备区内的牌，随机装备一件类别相同的装备；获得潜行直到下一回合开始，然后结束出牌阶段',
+			gw_chongci_info:'弃置所有牌并随机获得一张非金法术牌，每弃置一张手牌，便随机获得一张类别相同的牌；每弃置一张装备区内的牌，随机装备一件类别相同的装备；获得潜行直到下一回合开始，然后结束出牌阶段',
 			gw_tunshi:'吞噬',
 			gw_tunshi_info:'随机移除一名敌方角色的一个随机技能，你获得此技能并减少一点体力和体力上限，被移除技能的角色增加一点体力和体力上限，然后结束出牌阶段',
 			gw_dieyi:'蝶翼',

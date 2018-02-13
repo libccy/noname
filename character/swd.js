@@ -3075,6 +3075,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				mingzhi:false,
     				effect:{
     					target:function(card,player,target){
+            				if(player==_status.currentPhase) return;
     						if(!game.hasPlayer(function(current){
     							return get.distance(player,current,'attack')>1&&player!=current&&get.attitude(player,current)>=0;
     						})){
