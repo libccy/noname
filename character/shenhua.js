@@ -1589,7 +1589,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				if(name=='phaseBegin'&&game.phaseNumber==1) return false;
     				return true;
     			},
-    			priority:-9,
+    			priority:50,
     			forced:true,
     			popup:false,
     			content:function(){

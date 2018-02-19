@@ -378,6 +378,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             jianzheng:{
                 trigger:{global:'useCard'},
                 filter:function(event,player){
+                    if(!player.countCards('h')) return false;
                     return event.player!=player&&event.card.name=='sha'&&!event.targets.contains(player)&&
                         get.distance(event.player,player,'attack')<=1;
                 },
@@ -6334,7 +6335,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}).set('ai',function(target){
     					var trigger=_status.event.getTrigger();
     					var player=_status.event.player;
-    					return get.effect(target,trigger.card,player,player)+1;
+    					return get.effect(target,trigger.card,player,player)+0.01;
     				});
     				"step 1"
     				if(result.bool){
