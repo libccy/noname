@@ -4588,7 +4588,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		qinwang:{
     			unique:true,
     			group:['qinwang1','qinwang2'],
-    			zhuSkill:true
+    			zhuSkill:true,
+                subSkill:{
+                    ai:{}
+                }
     		},
     		qinwang1:{
     			audio:2,
@@ -4700,6 +4703,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				if(event.current==undefined) event.current=player.next;
     				if(event.current==player){
     					player.addSkill('jijiang3');
+                        player.addTempSkill('qinwang_ai');
     					event.getParent(2).step=0;
     					event.finish();
     				}
@@ -4744,7 +4748,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			ai:{
     				result:{
     					target:function(player,target){
-    						if(player.hasSkill('jijiang3')) return 0;
+                            if(player.hasSkill('jijiang3')) return 0;
+    						if(player.hasSkill('qinwang_ai')) return 0;
     						return get.effect(target,{name:'sha'},player,target);
     					}
     				},
