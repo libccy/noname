@@ -1549,7 +1549,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			mark:true
     		},
     		huashen1:{
-    			trigger:{global:['gameStart','phaseBefore'],player:'enterGame'},
+    			trigger:{global:'gameStart',player:'enterGame'},
     			forced:true,
     			popup:false,
     			priority:10,
@@ -1580,11 +1580,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     				}
     				lib.skill.huashen.get(player,2);
     				player.storage.huasheninited=true;
+                    event.trigger('huashenStart');
     			}
     		},
     		huashen2:{
     			audio:2,
-    			trigger:{player:['phaseBegin','phaseEnd','enterGame'],global:'gameStart'},
+    			trigger:{player:['phaseBegin','phaseEnd','huashenStart']},
     			filter:function(event,player,name){
     				if(name=='phaseBegin'&&game.phaseNumber==1) return false;
     				return true;
@@ -1642,54 +1643,56 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                                 }
                                 mark.setBackground(currentname,'character');
                             }
-                            player.addAdditionalSkill('huashen',link);
-                            player.logSkill('huashen2');
-                            player.flashAvatar('huashen',currentname);
-                            game.log(player,'获得技能','【'+get.translation(link)+'】');
-                            player.popup(link);
+                            if(!player.additionalSkills.huashen||!player.additionalSkills.huashen.contains(link)){
+                                player.addAdditionalSkill('huashen',link);
+                                player.logSkill('huashen2');
+                                player.flashAvatar('huashen',currentname);
+                                game.log(player,'获得技能','【'+get.translation(link)+'】');
+                                player.popup(link);
 
-                            if(event.dialog&&event.dialog.buttons){
-                                for(var i=0;i<event.dialog.buttons.length;i++){
-                                    if(event.dialog.buttons[i].classList.contains('selected')){
-                                        var name=event.dialog.buttons[i].link;
-                                        player.sex=lib.character[name][0];
-                                        player.group=lib.character[name][1];
-                                        // player.node.identity.style.backgroundColor=get.translation(player.group+'Color');
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if(event.triggername=='phaseBegin'){
-                                (function(){
-                                    var skills=[link];
-                                    var list=[];
-                                    game.expandSkills(skills);
-                                    var triggerevent=event._trigger;
-                                    var name='phaseBegin';
-                                    for(i=0;i<skills.length;i++){
-                                        var trigger=get.info(skills[i]).trigger;
-                                        if(trigger){
-                                            var add=false;
-                                            if(player==triggerevent.player&&trigger.player){
-                                                if(typeof trigger.player=='string'){
-                                                    if(trigger.player==name) add=true;
-                                                }
-                                                else if(trigger.player.contains(name)) add=true;
-                                            }
-                                            if(trigger.global){
-                                                if(typeof trigger.global=='string'){
-                                                    if(trigger.global==name) add=true;
-                                                }
-                                                else if(trigger.global.contains(name)) add=true;
-                                            }
-                                            if(add&&player.isOut()==false) list.push(skills[i]);
+                                if(event.dialog&&event.dialog.buttons){
+                                    for(var i=0;i<event.dialog.buttons.length;i++){
+                                        if(event.dialog.buttons[i].classList.contains('selected')){
+                                            var name=event.dialog.buttons[i].link;
+                                            player.sex=lib.character[name][0];
+                                            player.group=lib.character[name][1];
+                                            // player.node.identity.style.backgroundColor=get.translation(player.group+'Color');
+                                            break;
                                         }
                                     }
-                                    for(var i=0;i<list.length;i++){
-                                        game.createTrigger('phaseBegin',list[i],player,triggerevent);
-                                    }
-                                }());
+                                }
+
+                                if(event.triggername=='phaseBegin'){
+                                    (function(){
+                                        var skills=[link];
+                                        var list=[];
+                                        game.expandSkills(skills);
+                                        var triggerevent=event._trigger;
+                                        var name='phaseBegin';
+                                        for(i=0;i<skills.length;i++){
+                                            var trigger=get.info(skills[i]).trigger;
+                                            if(trigger){
+                                                var add=false;
+                                                if(player==triggerevent.player&&trigger.player){
+                                                    if(typeof trigger.player=='string'){
+                                                        if(trigger.player==name) add=true;
+                                                    }
+                                                    else if(trigger.player.contains(name)) add=true;
+                                                }
+                                                if(trigger.global){
+                                                    if(typeof trigger.global=='string'){
+                                                        if(trigger.global==name) add=true;
+                                                    }
+                                                    else if(trigger.global.contains(name)) add=true;
+                                                }
+                                                if(add&&player.isOut()==false) list.push(skills[i]);
+                                            }
+                                        }
+                                        for(var i=0;i<list.length;i++){
+                                            game.createTrigger('phaseBegin',list[i],player,triggerevent);
+                                        }
+                                    }());
+                                }
                             }
                         }
                         if(type!='ai'){

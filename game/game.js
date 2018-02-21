@@ -21617,7 +21617,7 @@
             counttrigger:{
                 trigger:{global:'phaseAfter'},
                 silent:true,
-                priority:-25,
+                priority:-100,
                 content:function(){
                     player.removeSkill('counttrigger');
                     delete player.storage.counttrigger;
@@ -21626,7 +21626,7 @@
 			_recovercheck:{
 				trigger:{player:'recoverBefore'},
 				forced:true,
-				priority:20,
+				priority:100,
 				popup:false,
 				filter:function(event,player){
 					return player.hp>=player.maxHp;
@@ -21638,7 +21638,7 @@
 			_turnover:{
 				trigger:{player:'phaseBefore'},
 				forced:true,
-				priority:20,
+				priority:100,
 				popup:false,
 				content:function(){
 					// for(var i=0;i<game.players.length;i++){
@@ -21671,7 +21671,7 @@
 			_phasebegin:{
 				trigger:{player:'phaseBegin'},
 				forced:true,
-				priority:20,
+				priority:100,
 				popup:false,
 				content:function(){
                     while(ui.dialogs.length){
