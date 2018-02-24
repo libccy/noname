@@ -5759,6 +5759,15 @@
 		},
 		init:{
             init:function(){
+				if(typeof __dirname==='string'&&__dirname.length){
+					var dirsplit=__dirname.split('/');
+					for(var i=0;i<dirsplit.length;i++){
+						if(dirsplit[i]){
+							lib.configprefix+=dirsplit[i][0];
+						}
+					}
+					lib.configprefix+='_';
+				}
                 window.resetGameTimeout=setTimeout(lib.init.reset,parseInt(localStorage.getItem(lib.configprefix+'loadtime'))||5000);
                 if(window.cordovaLoadTimeout){
                     clearTimeout(window.cordovaLoadTimeout);
@@ -8407,13 +8416,15 @@
 				mode.remove('connect');
 				mode.remove('brawl');
 				var banned=['yxs_luzhishen','zhenji','shen_guanyu','shen_caocao','zhurong',
-					'daqiao','lingcao','liuzan','lusu','luxun','yanwen','zhouyu','xiahouyuan',
+					'daqiao','lingcao','liuzan','lusu','luxun','yanwen','zhouyu','ns_wangyue','gw_yenaifa',
 					'zhuzhi','old_caozhen','guojia','simayi','sp_pangde','swd_kangnalishi','hs_siwangzhiyi'];
-				var bannedcards=['zengbin','huoshan','hongshui','guiyoujie','fengyinzhidan'];
+				var bannedcards=['zengbin','huoshan','hongshui','guiyoujie','fengyinzhidan','sifeizhenmian'];
 				for(var i=0;i<mode.length;i++){
 					game.saveConfig(mode[i]+'_banned',banned);
 					game.saveConfig(mode[i]+'_bannedcards',bannedcards);
 				}
+				game.saveConfig('cards',lib.config.all.cards);
+				game.saveConfig('characters',lib.config.all.characters);
 				game.saveConfig('change_skin',false);
 				game.saveConfig('show_splash','off');
 				game.saveConfig('show_favourite',false);
@@ -8422,6 +8433,7 @@
 				game.saveConfig('plays',['cardpile']);
 				game.saveConfig('tao_enemy',true);
 				game.saveConfig('layout','long2');
+				game.saveConfig('hp_style','ol');
 				game.saveConfig('background_music','music_off');
 				game.saveConfig('background_audio',false);
 				game.saveConfig('background_speak',false);
