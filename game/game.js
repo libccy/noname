@@ -5763,7 +5763,8 @@
 					var dirsplit=__dirname.split('/');
 					for(var i=0;i<dirsplit.length;i++){
 						if(dirsplit[i]){
-							lib.configprefix+=dirsplit[i][0];
+							var c=dirsplit[i][0];
+							lib.configprefix+=/[A-Z]|[a-z]/.test(c)?c:'_';
 						}
 					}
 					lib.configprefix+='_';
