@@ -2279,12 +2279,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					draw:{
 						trigger:{player:'phaseEnd'},
 						filter:function(event,player){
-							return player.hasSkill('hunmo3')&&player.countCards('h')<2;
+							return player.getStat('skill').hunmo>=3;
 						},
 						frequent:true,
 						content:function(){
-							var num=2-player.countCards('h');
-							if(num>0) player.draw(num);
+							'step 0'
+							player.chooseTarget(get.prompt('魂墨：造成一点伤害')).ai=function(target){
+								return get.damageEffect(target,player,player);
+							}
+							'step 1'
+							if(result.bool){
+								player.logSkill('hunmo_draw',result.targets);
+								result.targets[0].damage();
+							}
 						}
 					},
 				}
@@ -4294,7 +4301,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwminxiang_info:'出牌阶段限一次，你可以弃置一张基本牌或普通锦囊牌并选择两名角色，令目标分别视为对对方使用一张与弃置的牌同名的牌；每当有角色因此受到一点伤害，你在结算后摸一张牌',
 			gwlangshi:'狼噬',
 			gwlangshi_info:'每当你造成一次伤害，你可以对一名体力值不小于受伤害角色的其他角色造一点伤害',
-			gwjingshi:'镜师',
+			gwjingshi:'血契',
 			gwjingshi_info:'出牌阶段限一次，你可以猜测手牌中黑色牌最多的角色是谁，若猜对，你可以观看所有其他角色的手牌并获得任意一张',
 			gwjingtian:'经天',
 			gwjingtian_info:'锁定技，牌堆顶的9张牌对你始终可见；你始终跳过摸牌阶段，改为获得3枚“经天”标记；每名角色的回合限一次，你可以在任意时间点移去一枚“经天”标记，然后获得牌堆顶的一张牌',
@@ -4394,7 +4401,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwbaquan:'霸权',
 			gwbaquan_info:'出牌阶段限一次，你可以获得一名其他角色的所有牌，然后还给其等量的牌，若你归还的牌均为你获得的牌且该角色体力值不小于你，你对其造成一点伤害',
 			hunmo:'魂墨',
-			hunmo_info:'出牌阶段，若你手牌数小于2，你可以选择一名手牌数小于2的角色与其各摸一张牌；若你手牌数不小于2，你可以选择一名手牌数不小于2的角色与你各弃置一张手牌；结束阶段，若你发动过魂墨，你可以将手牌数补至2；同一阶段不能对同一角色发动两次',
+			hunmo_info:'出牌阶段，若你手牌数小于2，你可以选择一名手牌数小于2的角色与其各摸一张牌；若你手牌数不小于2，你可以选择一名手牌数不小于2的角色与你各弃置一张手牌；结束阶段，若你发动过至少3次魂墨，你可以造成一点伤害；同一阶段不能对同一角色发动两次',
 			huihun:'回魂',
 			huihun_info:'结束阶段，你可以从弃牌堆中获得本回合使用的前两张红色牌',
 			lanquan:'远略',

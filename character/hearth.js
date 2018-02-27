@@ -270,7 +270,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 process:function(skill,name){
                     var cardname='hsnitai_'+skill;
                     lib.translate[cardname]=lib.translate[skill];
-                    lib.translate[cardname+'_info']='出牌阶段对自己使用，获得技能'+lib.translate[skill]+'（替换前一个以此法获得的技能）';
+                    lib.translate[cardname+'_info']='出牌阶段对自己使用，获得技能'+lib.translate[skill]+'（替换前一个以此法获得的技能，效果持续2回合）';
                     lib.translate[cardname+'_append']='<div class="skill">【'+lib.translate[skill]+'】</div><div>'+
 					get.skillInfoTranslation(skill)+'</div>';
                     lib.card[cardname]=lib.card[cardname]||{
@@ -290,6 +290,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                                 target.$gain2(card);
                                 target.removeSkill('hsnitai_card');
                                 target.storage.hsnitai_card=card;
+                                target.storage.hsnitai_card_count=1;
                                 player.syncStorage('hsnitai_card');
                                 target.addAdditionalSkill('hsnitai_card',skill);
                                 target.addSkill('hsnitai_card');
@@ -337,12 +338,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 subSkill:{
                     card:{
                         mark:'card',
-                        onremove:true,
+                        onremove:['hsnitai_card','hsnitai_card_count'],
                         intro:{
                             content:function(storage){
                                 var skill=storage.name.slice(8);
                                 return '<div class="skill">【'+lib.translate[skill]+'】</div><div>'+
             					get.skillInfoTranslation(skill)+'</div>';
+                            }
+                        },
+                        trigger:{player:'phaseUseBegin'},
+                        priority:-10,
+                        silent:true,
+                        content:function(){
+                            if(player.storage.hsnitai_card_count>0){
+                                player.storage.hsnitai_card_count--;
+                            }
+                            else{
+                                player.removeSkill('hsnitai_card');
                             }
                         }
                     }

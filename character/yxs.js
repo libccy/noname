@@ -1702,7 +1702,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				trigger:{global:'damageAfter'},
 				filter:function(event,player){
-					return event.player!=player&&player.storage.tongling<3;
+					return event.source&&event.source.isFriendsOf(player)&&player.storage.tongling<3;
 				},
 				content:function(){
 					player.storage.tongling++;
@@ -1719,8 +1719,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return player.storage.tongling>=3;
 				},
+				filterTarget:function(card,player,target){
+					return player.canUse('sha',target);
+				},
+				selectTarget:[1,3],
+				multitarget:true,
+				multiline:true,
+				content:function(){
+					player.storage.tongling-=3;
+					player.unmarkSkill('tongling');
+					player.syncStorage('tongling');
+					player.useCard({name:'sha'},targets,false);
+				},
+				ai:{
+					combo:'tongling',
+					order:2
+				}
+			},
+			fanpu_old:{
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.storage.tongling>=3;
+				},
 				promptfunc:function(){
-					return '令自己在本轮内不能成为出杀的目标（选择自己），或对攻击范围内的一名其他角色造成一点伤害'
+					return '令自己在本轮内不能成为出杀的目标（选择自己），或对攻击范围内的至多两名角色使用一张杀'
 				},
 				filterTarget:function(card,player,target){
 					return player==target||get.distance(player,target,'attack')<=1;
@@ -2934,9 +2957,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ducai3:'独裁',
 			ducai_info:'出牌阶段限一次，你可以弃置一张牌，则本轮内除你外的角色不能使用或打出与该手牌花色相同的手牌',
 			tongling:'统领',
-			tongling_info:'每当其他角色受到一次伤害时，你获得1个统领标记（标记上限为3）',
+			tongling_info:'锁定技，每当一名友方角色造成一次伤害，你获得1个统领标记（标记上限为3）',
 			fanpu:'反扑',
-			fanpu_info:'出牌阶段限一次，你可以弃掉3个统领标记并选择1项执行：（1）本轮内不能成为【杀】的目标；（2）对你攻击范围内的1名其他角色造成1点伤害。',
+			fanpu_info:'出牌阶段限一次，你可以移去3枚统领标记并视为对攻击范围内的至多3名角色使用一张杀',
 			fenghuo:'烽火',
 			fenghuo_info:'你可以将一张装备区内的牌当作南蛮入侵使用',
 			weiyi:'威仪',

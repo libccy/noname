@@ -18031,6 +18031,12 @@
 					}
 					return this==player;
 				},
+				isFriendsOf:function(player){
+					return player.getFriends(true).contains(this);
+				},
+				isEnemiesOf:function(player){
+					return player.getEnemies().contains(this);
+				},
 				isAlive:function(){
 					return this.classList.contains('dead')==false;
 				},

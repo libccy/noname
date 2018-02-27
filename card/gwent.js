@@ -979,7 +979,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				selectTarget:-1,
 				content:function(){
 					target.recover();
-					target.changeHujia();
+					target.draw();
 				},
 				ai:{
 					basic:{
@@ -2294,7 +2294,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_zhuoshao:'灼烧',
 			gw_zhuoshao_info:'对任意名体力值为全场最高的角色使用，造成一点火属性伤害',
 			gw_fuyuan:'复原',
-			gw_fuyuan_info:'对一名濒死状态角色使用，目标回复一点体力并获得一点护甲',
+			gw_fuyuan_info:'对一名濒死状态角色使用，目标回复一点体力并摸一张牌',
 			gw_youer:'诱饵',
 			gw_youer_bg:'饵',
 			gw_youer_info:'将一名其他角色的所有手牌移出游戏，然后摸一张牌，当前回合结束后该角色将以此法失去的牌收回手牌',
