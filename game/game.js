@@ -44000,6 +44000,17 @@
 			}
 			return str2;
 		},
+		rawName2:function(str){
+			var str2=lib.translate[str];
+			if(!str2) return '';
+			if(str2.indexOf('sp')==0){
+				str2=str2.slice(2);
+			}
+			else if(str2.indexOf('界sp')==0){
+				str2=str2.slice(3);
+			}
+			return str2;
+		},
 		slimName:function(str){
 			var str2=lib.translate[str];
 			if(!str2) return '';

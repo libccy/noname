@@ -260,38 +260,98 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 trigger:{player:'phaseUseBegin'},
                 forced:true,
                 video:function(player,data){
-                    var skill=data[0];
+                    var skills=data[0];
                     var name=data[1];
-                    lib.skill.hsnitai.process(skill,name);
+                    lib.skill.hsnitai.process(skills,name);
                 },
                 onremove:function(player){
                     player.removeSkill('hsnitai_card');
                 },
-                process:function(skill,name){
-                    var cardname='hsnitai_'+skill;
-                    lib.translate[cardname]=lib.translate[skill];
-                    lib.translate[cardname+'_info']='出牌阶段对自己使用，获得技能'+lib.translate[skill]+'（替换前一个以此法获得的技能，效果持续2回合）';
-                    lib.translate[cardname+'_append']='<div class="skill">【'+lib.translate[skill]+'】</div><div>'+
-					get.skillInfoTranslation(skill)+'</div>';
+                process:function(skills,name){
+                    var cardname='hsnitai_'+name;
+                    lib.translate[cardname]=lib.translate[name];
+                    lib.translate[cardname+'_info']='出牌阶段对自己使用，获得'+get.translation(name)+'的一个技能（替换前一个以此法获得的技能，效果持续2回合）';
+                    lib.translate[cardname+'_append']='';
+                    for(var i=0;i<skills.length;i++){
+                        lib.translate[cardname+'_append']+='<div class="skill">【'+lib.translate[skills[i]]+'】</div><div>'+
+    					get.skillInfoTranslation(skills[i])+'</div>';
+                        if(i<skills.length){
+                            lib.translate[cardname+'_append']+='<br>'
+                        }
+                    }
                     lib.card[cardname]=lib.card[cardname]||{
                         enable:true,
                         type:'character',
                         image:'character/'+name,
                         fullimage:true,
                         vanish:true,
+                        skills:skills,
                         derivation:'hs_barnes',
                         filterTarget:function(card,player,target){
                             return player==target;
                         },
                         selectTarget:-1,
                         content:function(){
-                            var skill=card.name.slice(8);
+                            'step 0'
+                            var list=lib.card[card.name].skills;
+                            for(var i=0;i<list.length;i++){
+                                if(target.hasSkill(list[i])){
+                                    list.splice(i--,1);
+                                }
+                            }
+                            if(!list.length){
+                                event.finish();
+                                return;
+                            }
+                            if(list.length==1){
+                                event._result=list[0];
+                            }
+                            else if(event.isMine()){
+            					var dialog=ui.create.dialog('forcebutton');
+            					dialog.add('选择获得一项技能');
+            					var clickItem=function(){
+            						_status.event._result=this.link;
+            						dialog.close();
+            						game.resume();
+            					};
+            					for(var i=0;i<list.length;i++){
+            						if(lib.translate[list[i]+'_info']){
+            							var translation=get.translation(list[i]);
+            							if(translation[0]=='新'&&translation.length==3){
+            								translation=translation.slice(1,3);
+            							}
+            							else{
+            								translation=translation.slice(0,2);
+            							}
+            							var item=dialog.add('<div class="popup pointerdiv" style="width:80%;display:inline-block"><div class="skill">【'+
+            							translation+'】</div><div>'+lib.translate[list[i]+'_info']+'</div></div>');
+            							item.firstChild.addEventListener('click',clickItem);
+            							item.firstChild.link=list[i];
+            						}
+            					}
+            					dialog.add(ui.create.div('.placeholder'));
+            					event.switchToAuto=function(){
+            						event._result=event.skillai();
+            						dialog.close();
+            						game.resume();
+            					};
+            					_status.imchoosing=true;
+            					game.pause();
+            				}
+            				else{
+            					event._result=event.skillai();
+            				}
+                            'step 1'
+                            var skill=result;
                             if(!target.hasSkill(skill)){
+                                player.popup(skill);
                                 target.$gain2(card);
                                 target.removeSkill('hsnitai_card');
                                 target.storage.hsnitai_card=card;
                                 target.storage.hsnitai_card_count=1;
+                                target.storage.hsnitai_card_skill=skill;
                                 player.syncStorage('hsnitai_card');
+                                player.syncStorage('hsnitai_card_skill');
                                 target.addAdditionalSkill('hsnitai_card',skill);
                                 target.addSkill('hsnitai_card');
                                 game.log(target,'获得技能','【'+get.translation(skill)+'】');
@@ -331,17 +391,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         return;
                     }
                     var name=source.randomGet();
-                    game.addVideo('skill',player,['hsnitai',[skill,name]]);
-                    lib.skill.hsnitai.process(skill,name);
-                    player.gain(game.createCard('hsnitai_'+skill),'gain2');
+                    var skills=[skill];
+                    var nameskills=lib.characterPack.hearth[name][3]
+                    for(var i=0;i<nameskills.length;i++){
+                        if(list.contains(nameskills[i])){
+                            skills.add(nameskills[i]);
+                        }
+                    }
+                    game.addVideo('skill',player,['hsnitai',[skills,name]]);
+                    lib.skill.hsnitai.process(skills,name);
+                    player.gain(game.createCard('hsnitai_'+name),'gain2');
                 },
                 subSkill:{
                     card:{
                         mark:'card',
-                        onremove:['hsnitai_card','hsnitai_card_count'],
+                        onremove:['hsnitai_card','hsnitai_card_count','hsnitai_card_skill'],
                         intro:{
-                            content:function(storage){
-                                var skill=storage.name.slice(8);
+                            content:function(storage,player){
+                                var skill=player.storage.hsnitai_card_skill;
+                                // var skill=storage.name.slice(8);
                                 return '<div class="skill">【'+lib.translate[skill]+'】</div><div>'+
             					get.skillInfoTranslation(skill)+'</div>';
                             }
