@@ -1564,7 +1564,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					target.addTempSkill('fengyin',{player:'phaseAfter'});
 					if(target.hujia){
-						target.changeHujia(-target.hujia);
+						target.changeHujia(-1);
 					}
 				},
 				ai:{
@@ -2288,7 +2288,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_poxiao:'破晓',
 			gw_poxiao_info:'选择一项：解除任意名角色的天气效果并移除其判定区内的牌，或随机获得一张铜卡法术（破晓除外）并展示之',
 			gw_zumoshoukao:'阻魔手铐',
-			gw_zumoshoukao_info:'令一名角色失去所有护甲且非锁定技失效直到下一回合结束',
+			gw_zumoshoukao_info:'令一名角色失去一点护甲且非锁定技失效直到下一回合结束',
 			gw_aozuzhilei:'奥祖之雷',
 			gw_aozuzhilei_info:'对一名体力值不小于你的角色造成一点雷属性伤害，然后该角色摸一张牌',
 			gw_zhuoshao:'灼烧',

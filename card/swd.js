@@ -5221,6 +5221,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			touzhi:'投掷',
 			touzhi_info:'出牌阶段，可弃置一张武器牌令一名角色受到一点伤害，然后该角色获得此武器牌',
 			xixueguizhihuan:'吸血鬼指环',
+			xixueguizhihuan_ab:'血环',
 			xixueguizhihuan_info:'锁定技，每当你使用杀造成一点伤害，你回复一点体力',
 			xixue:'吸血',
 			xixue_info:'锁定技，每当你使用杀造成一点伤害，你回复一点体力',
