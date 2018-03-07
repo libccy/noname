@@ -440,6 +440,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			},
     			selectCard:2,
     			check:function(card){
+                    var player=_status.event.player;
+                    var targets=game.filterPlayer(function(current){
+                        return player.canUse('wanjian',current);
+                    });
+                    var num=0;
+                    for(var i=0;i<targets.length;i++){
+                        var eff=get.sgn(get.effect(targets[i],{name:'wanjian'},player,player));
+                        if(targets[i].hp==1){
+                            eff*=1.5;
+                        }
+                        num+=eff;
+                    }
+                    if(!player.needsToDiscard(-1)){
+                        if(targets.length>=7){
+                            if(num<2) return 0;
+                        }
+                        else if(targets.length>=5){
+                            if(num<1.5) return 0;
+                        }
+                    }
     				return 6-get.value(card);
     			},
     			ai:{
@@ -3254,6 +3274,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			selectCard:2,
     			complexCard:true,
     			check:function(card){
+                    var player=_status.event.player;
+                    var targets=game.filterPlayer(function(current){
+                        return player.canUse('wanjian',current);
+                    });
+                    var num=0;
+                    for(var i=0;i<targets.length;i++){
+                        var eff=get.sgn(get.effect(targets[i],{name:'wanjian'},player,player));
+                        if(targets[i].hp==1){
+                            eff*=1.5;
+                        }
+                        num+=eff;
+                    }
+                    if(!player.needsToDiscard(-1)){
+                        if(targets.length>=7){
+                            if(num<2) return 0;
+                        }
+                        else if(targets.length>=5){
+                            if(num<1.5) return 0;
+                        }
+                    }
     				return 6-get.value(card);
     			},
     			ai:{

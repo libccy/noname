@@ -2989,6 +2989,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			audio:2,
     			enable:'phaseUse',
     			usable:1,
+                filter:function(event,player){
+                    return player.countCards('h',{type:['trick','delay'],color:'black'});
+                },
     			filterCard:function(card){
     				return get.color(card)=='black'&&get.type(card,'trick')=='trick';
     			},

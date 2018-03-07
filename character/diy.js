@@ -1808,7 +1808,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					player.chooseToUse(get.prompt('nsjianxiong',trigger.player),trigger.player,-1);
+					player.chooseToUse(function(card){
+						return !get.info(card).multitarget;
+					},get.prompt('nsjianxiong',trigger.player),trigger.player,-1);
 					'step 1'
 					if(event.damaged){
 						trigger.cancel();
