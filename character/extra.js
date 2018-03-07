@@ -139,6 +139,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			shenfen:{
 				audio:2,
+				unique:true,
 				enable:'phaseUse',
 				filter:function(event,player){
 					return !player.storage.shenfen&&player.storage.baonu>=6;
