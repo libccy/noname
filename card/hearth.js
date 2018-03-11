@@ -96,6 +96,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					useful:3,
 					result:{
 						target:function(player,target){
+							if(get.attitude(player,target)>0){
+								var js=target.getCards('j');
+								if(js.length){
+									var jj=js[0].viewAs?{name:js[0].viewAs}:js[0];
+									if(jj.name=='zhaomingdan') return 3;
+									if(js.length==1&&get.effect(target,jj,target,player)>=0){
+										return 0;
+									}
+									return 3;
+								}
+							}
 							var es=target.getCards('e');
 							var nh=target.countCards('h');
 							var noe=(es.length==0||target.hasSkillTag('noe'));
@@ -104,15 +115,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(noh&&noe) return 0;
 							if(noh&&noe2) return 0.01;
 							if(get.attitude(player,target)<=0) return (target.countCards('he'))?-1.5:1.5;
-							var js=target.getCards('j');
-							if(js.length){
-								var jj=js[0].viewAs?{name:js[0].viewAs}:js[0];
-								if(jj.name=='zhaomingdan') return 3;
-								if(js.length==1&&get.effect(target,jj,target,player)>=0){
-									return 0;
-								}
-								return 3;
-							}
 							return 0.1;
 						}
 					}

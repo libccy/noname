@@ -724,6 +724,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.gain(result.links,'gain2');
 						}
 					}
+				},
+				ai:{
+					order:10,
+					result:{
+						player:10
+					}
 				}
 			},
 			gwweitu:{

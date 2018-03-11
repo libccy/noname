@@ -6883,6 +6883,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			enable:'phaseUse',
     			usable:1,
     			group:'tanlin4',
+                alter:true,
     			filterTarget:function(card,player,target){
     				return player!=target&&target.countCards('h');
     			},
@@ -6897,8 +6898,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     					if(target.hasSkill('tanlin2')==false){
     						target.addSkill('tanlin2');
     						player.addSkill('tanlin3');
-    						player.gain([result.target]);
-    						player.$gain2([result.target]);
+                            if(get.is.altered('tanlin')){
+                                player.gain([result.target]);
+        						player.$gain2([result.target]);
+                            }
+    						else{
+                                player.gain([result.player,result.target]);
+        						player.$gain2([result.player,result.target]);
+                            }
     					}
     				}
     				else{
@@ -10214,7 +10221,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		ningjian_info:'你可以将一张红色牌当闪、黑色牌当杀使用或打出',
     		taixu_info:'限定技，你可以弃置你的所有牌（至少1张），并对一名体力值大于1为其他角色造成X点火焰伤害，X为你已损失的体力值且至少为1',
     		duoren_info:'每当你闪避一张杀，你可以立即获得来源的武器牌',
-    		tanlin_info:'出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你获得对方拼点牌、对该角色使用卡牌无视距离且可以额外使用一张杀直到回合结束，若你没赢，你受到该角色的一点伤害。',
+            tanlin_info:'出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你获得双方拼点牌、对该角色使用卡牌无视距离且可以额外使用一张杀直到回合结束，若你没赢，你受到该角色的一点伤害。',
+    		tanlin_info_alter:'出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你获得对方拼点牌、对该角色使用卡牌无视距离且可以额外使用一张杀直到回合结束，若你没赢，你受到该角色的一点伤害。',
     		pozhen_info:'每当你受到一次伤害，若你的手牌数大于伤害来源，你可以弃置X张手牌对其造成一点伤害；若你的手牌数小于伤害来源，你可以弃置其X张手牌。X为你与伤害来源的手牌数之差。',
     		pozhen_info_alter:'每当你受到一次伤害，若你的手牌数小于伤害来源，你可以弃置其X张手牌。X为你与伤害来源的手牌数之差。',
     		yunchou_info:'出牌阶段限一次，你可以弃置一张手牌，并弃置一名其他角色的一张手牌，若两张牌颜色相同，你摸一张牌，否则对方摸一张牌',

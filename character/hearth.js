@@ -5748,7 +5748,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     maixie:true,
                     maixie_hp:true,
     				skillTagFilter:function(player){
-    					return player.hp>player.countCards('h');
+    					return player.hp>player.countCards('h')&&player.hp>1;
     				},
     				threaten:function(player,target){
     					if(!target.hujia) return 0.8;
@@ -8414,7 +8414,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		xinci_bg:'暗',
     		xinci_info:'出牌阶段限一次，你可以弃置一张黑色牌令一名角色流失一点体力',
     		zhongjia:'战甲',
-    		zhongjia_info:'锁定技，每当你受到一次伤害，你获得一点护甲；当你的体力值大于手牌数时，你的护甲不为你抵挡伤害',
+    		zhongjia_info:'锁定技，每当你受到一次伤害，你获得一点护甲；当你的体力值大于1且大于手牌数时，你的护甲不为你抵挡伤害',
     		dunji:'盾击',
     		dunji_info:'出牌阶段限一次，你可以对攻击范围内的至多X名其他角色各造成一点伤害，并失去等量的护甲，X为你的护甲数',
     		qiaodong:'巧动',
