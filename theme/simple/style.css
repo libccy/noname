@@ -15,6 +15,19 @@ body{
 	position: absolute;
 	display: block;
 }
+.glass_ui .dialog.scroll1.scroll2,
+.glass_ui .menubg.charactercard,
+.glass_ui .menu {
+	backdrop-filter: blur(3px);
+	-webkit-backdrop-filter: blur(3px);
+	background: rgba(0, 0, 0, 0.4);
+	box-shadow: rgba(0, 0, 0, 0.5) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 3px 10px;
+}
+#window.glass_ui .dialog.popped:not(.menu) {
+	backdrop-filter: blur(3px);
+	-webkit-backdrop-filter: blur(3px);
+	box-shadow: rgba(0, 0, 0, 0.6) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 3px 10px;
+}
 #system>div>div,#mebg,.control,.player,.card,.avatar,.avatar2,.button,#window>.dialog.popped,
 #arena:not(.long) .player.unseen .equips:not(*:empty),
 #arena.long .player.unseen2 .equips:not(*:empty),.menu,.menubutton,#splash>div,

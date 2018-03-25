@@ -70,6 +70,6 @@ window.noname_package={
     theme:{
         woodden:'木纹',
         music:'音乐',
-        simple:'简约',
+        simple:'简约'
     }
 };

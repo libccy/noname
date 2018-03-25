@@ -5458,6 +5458,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     			audio:2,
     			trigger:{player:'phaseDrawBegin'},
     			check:function(event,player){
+                    if(player.storage.tunchu&&player.storage.tunchu.length) return false;
     				return player.countCards('h')-player.countCards('h',{type:'equip'})<=player.hp;
     			},
     			content:function(){
@@ -9791,7 +9792,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     		danji:'单骑',
     		danji_info:'觉醒技，准备阶段开始时，若你的手牌数大于你的体力值，你减1点体力上限，然后获得“马术”和“怒斩”',
     		tunchu:'屯储',
-    		tunchu_info:'摸牌阶段摸牌时，你可以额外摸两张牌，然后将任意张手牌置于你的武将上，称为“粮”，只要你的武将牌上有“粮”，你便不能使用【杀】',
+    		tunchu_info:'摸牌阶段摸牌时，若你没有“粮”，你可以额外摸两张牌，然后将任意张手牌置于你的武将上，称为“粮”，只要你的武将牌上有“粮”，你便不能使用【杀】',
     		shuliang:'输粮',
     		shuliang_info:'每当一名角色的结束阶段开始时，若其手牌数少于体力值，你可以移去一张“粮”，然后该角色摸两张牌',
     		jieyuan:'竭缘',

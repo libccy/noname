@@ -2298,6 +2298,21 @@
 							}
 						}
 					},
+					glass_ui:{
+						name:'玻璃主题',
+						intro:'为游戏主题打开玻璃效果（手机暂不支持）',
+						init:false,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('glass_ui',bool);
+							if(bool){
+								ui.window.classList.add('glass_ui');
+							}
+							else{
+								ui.window.classList.remove('glass_ui');
+							}
+						}
+					},
 					damage_shake:{
 						name:'伤害抖动',
 						intro:'角色受到伤害时的抖动效果',
@@ -8429,6 +8444,7 @@
 				game.saveConfig('change_skin',false);
 				game.saveConfig('show_splash','off');
 				game.saveConfig('show_favourite',false);
+				game.saveConfig('animation', false);
 				// game.saveConfig('characters',lib.config.all.characters);
 				// game.saveConfig('cards',lib.config.all.cards);
 				game.saveConfig('plays',['cardpile']);
@@ -35429,6 +35445,7 @@
     					li2.innerHTML='素材版本：'+(lib.config.asset_version||'无')+'<p style="margin-top:8px"></p>';
 						li3.innerHTML='更新地址：<span>'+trimurl(lib.config.updateURL||lib.updateURL)+'</span><p style="margin-top:8px"></p>';
 						li3.style.whiteSpace='nowrap';
+						// li3.style.display='none';// coding
 
     					var button1,button2,button3,button4,button5;
 
@@ -35856,7 +35873,7 @@
 								else{
 									updatep1.style.display='';
 									updatep2.style.display='';
-			                        updatep3.style.display='';
+			                        updatep3.style.display='none'; // coding
 									updatepx.style.display='none';
 									updatep4.innerHTML='更新';
 								}
@@ -35880,6 +35897,7 @@
 
 						var button6=document.createElement('button');
     					button6.innerHTML='设为国内镜像';
+    					button6.style.display='none';// coding
                         // button6.style.marginLeft='5px';
     					button6.onclick=function(){
 							game.saveConfig('updateURL',lib.mirrorURL);
@@ -38032,6 +38050,9 @@
                 }
 				if(lib.config.blur_ui){
                     ui.window.classList.add('blur_ui');
+                }
+				if(lib.config.glass_ui){
+                    ui.window.classList.add('glass_ui');
                 }
 				if(lib.config.custom_button){
 					lib.configMenu.appearence.config.custom_button.onclick('skip');
