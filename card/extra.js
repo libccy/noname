@@ -460,9 +460,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(player.hasSkillTag('unequip',false,card)) return;
 							if(card.name=='nanman'||card.name=='wanjian') return 'zerotarget';
 							if(card.name=='sha'){
-	    						var equip1=player.getEquip(1);
-	    						if(equip1&&equip1.name=='zhuque') return 2;
-	    						if(equip1&&equip1.name=='qinggang') return 1;
+								var equip1=player.getEquip(1);
+								if(equip1&&equip1.name=='zhuque') return 2;
+								if(equip1&&equip1.name=='qinggang') return 1;
 								if(!card.nature) return 'zerotarget';
 							}
 						}

@@ -6534,7 +6534,9 @@
 							game.saveConfigValue('brokenFile');
 							if(!lib.node.http) lib.node.http=require('http');
 							if(!lib.node.https) lib.node.https=require('https');
-							var request = (url.indexOf('https')==0?lib.node.https:lib.node.http).get(encodeURI(url), function(response) {
+							var opts = require('url').parse(encodeURI(url));
+							opts.headers={'User-Agent': navigator.userAgent};
+							var request = (url.indexOf('https')==0?lib.node.https:lib.node.http).get(opts, function(response) {
 								var stream=response.pipe(file);
 								stream.on('finish',function(){
 									lib.config.brokenFile.remove(folder);
@@ -28630,6 +28632,13 @@
 				}
 				return;
 			}
+			if(info.available&&info.available(mode)==false){
+				lib.skill[i]={};
+				if(lib.translate[i+'_info']){
+					lib.translate[i+'_info']='此模式下不可用';
+				}
+				return;
+			}
 			if(info.viewAs){
 				if(typeof info.viewAs=='string'){
 					info.viewAs={name:info.viewAs};
@@ -35873,7 +35882,7 @@
 								else{
 									updatep1.style.display='';
 									updatep2.style.display='';
-									updatep3.style.display='none'; // coding
+									// updatep3.style.display='none'; // coding
 									updatepx.style.display='none';
 									updatep4.innerHTML='更新';
 								}
@@ -35897,7 +35906,7 @@
 
 						var button6=document.createElement('button');
 						button6.innerHTML='设为国内镜像';
-						button6.style.display='none';// coding
+						// button6.style.display='none';// coding
 						// button6.style.marginLeft='5px';
 						button6.onclick=function(){
 							game.saveConfig('updateURL',lib.mirrorURL);
@@ -44128,6 +44137,9 @@
 			if(!lib.card[obj.name]) return;
 			if(method=='trick'&&lib.card[obj.name].type=='delay') return 'trick';
 			return lib.card[obj.name].type;
+		},
+		type2:function(card){
+			return get.type(card,'trick');
 		},
 		subtype:function(obj){
 			if(typeof obj=='string') obj={name:obj};

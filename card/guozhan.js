@@ -11,7 +11,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'equip1',
 				nomod:true,
 				nopower:true,
-	            unique:true,
+				unique:true,
 				global:'g_feilongduofeng_ai',
 				distance:{attackFrom:-1},
 				skills:['feilongduofeng','feilongduofeng2'],
@@ -37,7 +37,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'equip2',
 				nomod:true,
 				nopower:true,
-	            unique:true,
+				unique:true,
 				global:['g_taipingyaoshu','g_taipingyaoshu_ai'],
 				skills:['taipingyaoshu'],
 				ai:{

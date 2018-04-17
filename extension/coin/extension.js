@@ -8,7 +8,7 @@ game.import('play',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		arenaReady:function(){
-	        if(_status.video||_status.connectMode) return;
+			if(_status.video||_status.connectMode) return;
 			if(lib.config.mode!='chess'||get.config('chess_mode')!='leader'){
 				var str;
 				if(lib.config.coin_display_playpackconfig=='text'){
@@ -106,7 +106,7 @@ game.import('play',function(lib,game,ui,get,ai,_status){
 					return uiintro;
 				},220,400);
 			}
-	    },
+		},
 		game:{
 			changeCoin:function(num){
 				if(typeof num=='number'&&ui.coin){
@@ -299,21 +299,21 @@ game.import('play',function(lib,game,ui,get,ai,_status){
 						//******************************************************
 						// Yet Another Particle Engine
 						var cos = Math.cos,
-						    sin = Math.sin,
-						    sqrt = Math.sqrt,
-						    abs = Math.abs,
-						    atan2 = Math.atan2,
-						    log = Math.log,
-						    random = Math.random,
-						    PI = Math.PI,
-						    sqr = function(v){return v*v;},
-						    particles = [],
-						    drawScale = 1,
-						    emitters = [],
-						    forces  = [],
-						    collidedMass = 0,
-						    maxParticles = 100,
-						    emissionRate = 1,
+							sin = Math.sin,
+							sqrt = Math.sqrt,
+							abs = Math.abs,
+							atan2 = Math.atan2,
+							log = Math.log,
+							random = Math.random,
+							PI = Math.PI,
+							sqr = function(v){return v*v;},
+							particles = [],
+							drawScale = 1,
+							emitters = [],
+							forces  = [],
+							collidedMass = 0,
+							maxParticles = 100,
+							emissionRate = 1,
 							minParticleSize = 2;
 
 						//-------------------------------------------------------
@@ -325,65 +325,65 @@ game.import('play',function(lib,game,ui,get,ai,_status){
 						}
 						Vector.prototype = {
 						  add : function(vector) {
-						    this.x += vector.x;
-						    this.y += vector.y;
-						    this.z += vector.z;
-						    return this;
+							this.x += vector.x;
+							this.y += vector.y;
+							this.z += vector.z;
+							return this;
 						  },
 						  subtract : function(vector) {
-						    this.x -= vector.x;
-						    this.y -= vector.y;
-						    this.z -= vector.z;
-						    return this;
+							this.x -= vector.x;
+							this.y -= vector.y;
+							this.z -= vector.z;
+							return this;
 						  },
 						  multiply : function(another) {
-						    this.x /= another.x;
-						    this.y /= another.y;
-						    this.z /= another.z;
-						    return this;
+							this.x /= another.x;
+							this.y /= another.y;
+							this.z /= another.z;
+							return this;
 						  },
 						  divide : function(another) {
-						    this.x /= another.x;
-						    this.y /= another.y;
-						    this.z /= another.z;
-						    return this;
+							this.x /= another.x;
+							this.y /= another.y;
+							this.z /= another.z;
+							return this;
 						  },
 						  scale : function(factor) {
-						    this.x *= factor;
-						    this.y *= factor;
-						    this.z *= factor;
-						    return this;
+							this.x *= factor;
+							this.y *= factor;
+							this.z *= factor;
+							return this;
 						  },
 						  magnitude : function () {
-						    return sqrt(sqr(this.x + this.y));
+							return sqrt(sqr(this.x + this.y));
 						  },
 						  distance : function (another) {
-						    return abs(sqrt(sqr(this.x - another.x) + sqr(this.y - another.y)));
+							return abs(sqrt(sqr(this.x - another.x) + sqr(this.y - another.y)));
 						  },
 						  angle : function (angle, magnitude) {
-						    if(angle && magnitude)
-						      return Vector.fromAngle(angle, magnitude);
-						    return atan2(this.y, this.x);
+							if(angle && magnitude)
+							  return Vector.fromAngle(angle, magnitude);
+							return atan2(this.y, this.x);
 						  },
 						  clone : function() {
-						    return new Vector(this.x, this.y, this.z);
+							return new Vector(this.x, this.y, this.z);
 						  },
 						  equals : function(another) {
-						    return this.x === another.x&&
+							return this.x === another.x&&
 								this.y === another.y&&
 								this.z === another.z;
 						  },
 						  random : function(r) {
-						    this.x += (random() * r * 2) - r;
-						    this.y += (random() * r * 2) - r;
-						    return this;
+							this.x += (random() * r * 2) - r;
+							this.y += (random() * r * 2) - r;
+							return this;
 						  }
 						};
 						Vector.fromAngle = function (angle, magnitude) {
 						  return new Vector(
-						    magnitude * cos(angle),
-						    magnitude * sin(angle),
-						    magnitude * sin(angle));
+							magnitude * cos(angle),
+							magnitude * sin(angle),
+							magnitude * sin(angle));
 						};
 
 						//******************************************************
@@ -404,41 +404,41 @@ game.import('play',function(lib,game,ui,get,ai,_status){
 						  var totalAccelerationY = 0;
 
 						  for (var i = 0; i < fields.length; i++) {
-						    var field = fields[i];
-						    var vectorX = field.pos.x - this.pos.x;
-						    var vectorY = field.pos.y - this.pos.y;
-						    var distance = this.pos.distance(field.pos);
-						    if(distance < 1) field.grow(this);
-						    if(distance < 100) this.doubleSize = true;
-						    var force = G(this.forceBetween(field, distance));
-						    totalAccelerationX += vectorX * force;
-						    totalAccelerationY += vectorY * force;
+							var field = fields[i];
+							var vectorX = field.pos.x - this.pos.x;
+							var vectorY = field.pos.y - this.pos.y;
+							var distance = this.pos.distance(field.pos);
+							if(distance < 1) field.grow(this);
+							if(distance < 100) this.doubleSize = true;
+							var force = G(this.forceBetween(field, distance));
+							totalAccelerationX += vectorX * force;
+							totalAccelerationY += vectorY * force;
 						  }
 						  this.ac = new Vector(totalAccelerationX, totalAccelerationY);
 
 						  totalAccelerationX = 0;
 						  totalAccelerationY = 0;
 						  for (var i = 0; i < particles.length; i++) {
-						    var field = particles[i];
-						    if(field === this || !field.alive) continue;
-						    var vectorX = field.pos.x - this.pos.x;
-						    var vectorY = field.pos.y - this.pos.y;
-						    var distance = this.pos.distance(field.pos);
-						    if(distance < 1) {
-						      if(this.mass >= field.mass) {
-						        var massRatio = this.mass / field.mass;
-						        if(particles.length <= maxParticles && this.mass>40) {
-						          this.alive = false;
-						          this.nova = true;
-						          collidedMass += this.mass;
-						        } else this.grow(field);
-						      } else this.alive = false;
-						    }
-						    if(this.alive) {
-						      var force = G(this.forceBetween(field, distance));
-						      totalAccelerationX += vectorX * G(force);
-						      totalAccelerationY += vectorY * G(force);
-						    }
+							var field = particles[i];
+							if(field === this || !field.alive) continue;
+							var vectorX = field.pos.x - this.pos.x;
+							var vectorY = field.pos.y - this.pos.y;
+							var distance = this.pos.distance(field.pos);
+							if(distance < 1) {
+							  if(this.mass >= field.mass) {
+								var massRatio = this.mass / field.mass;
+								if(particles.length <= maxParticles && this.mass>40) {
+								  this.alive = false;
+								  this.nova = true;
+								  collidedMass += this.mass;
+								} else this.grow(field);
+							  } else this.alive = false;
+							}
+							if(this.alive) {
+							  var force = G(this.forceBetween(field, distance));
+							  totalAccelerationX += vectorX * G(force);
+							  totalAccelerationY += vectorY * G(force);
+							}
 						  }
 
 						  var travelDist = this.pos.distance(this.lastPos ? this.lastPos : this.pos);
@@ -471,12 +471,12 @@ game.import('play',function(lib,game,ui,get,ai,_status){
 						  var remainingMass = this.mass;
 						  var num = 0;
 						  while(remainingMass > 0) {
-						    var np = new Particle(this.pos.clone().random(this.mass), new Vector(0,0));
-						    np.mass = 1 + Math.random() * (remainingMass - 1);
-						    if(num>=maxParts-1) np.mass = remainingMass;
-						    np.mass = np.mass < minMass ? minMass : np.mass;
-						    remainingMass -= np.mass;
-						    num++;
+							var np = new Particle(this.pos.clone().random(this.mass), new Vector(0,0));
+							np.mass = 1 + Math.random() * (remainingMass - 1);
+							if(num>=maxParts-1) np.mass = remainingMass;
+							np.mass = np.mass < minMass ? minMass : np.mass;
+							remainingMass -= np.mass;
+							num++;
 						  }
 						  this.nova = true;
 						  delete this.size;
@@ -498,14 +498,14 @@ game.import('play',function(lib,game,ui,get,ai,_status){
 						}
 						ParticleEmitter.prototype.emit = function() {
 						  var angle = this.vc.angle() +
-						      this.ang - (Math.random() * this.ang * 2);
+							  this.ang - (Math.random() * this.ang * 2);
 						  var magnitude = this.vc.magnitude();
 						  var position = this.pos.clone();
-						        position.add(
-						        new Vector(
-						          ~~((Math.random() * 100) - 50) * drawScale,
-						          ~~((Math.random() * 100) - 50) * drawScale
-						        ));
+								position.add(
+								new Vector(
+								  ~~((Math.random() * 100) - 50) * drawScale,
+								  ~~((Math.random() * 100) - 50) * drawScale
+								));
 						  var velocity = Vector.fromAngle(angle, magnitude);
 						  return new Particle(position,velocity);
 						};
@@ -546,11 +546,11 @@ game.import('play',function(lib,game,ui,get,ai,_status){
 						});
 
 						var renderToCanvas = function (width, height, renderFunction) {
-						    var buffer = document.createElement('canvas');
-						    buffer.width = width;
-						    buffer.height = height;
-						    renderFunction(buffer.getContext('2d'));
-						    return buffer;
+							var buffer = document.createElement('canvas');
+							buffer.width = width;
+							buffer.height = height;
+							renderFunction(buffer.getContext('2d'));
+							return buffer;
 						};
 
 						maxParticles = 500;
@@ -560,12 +560,12 @@ game.import('play',function(lib,game,ui,get,ai,_status){
 						emitters = [
 						  //br
 						  new ParticleEmitter(
-						    new Vector(
-						      canvasWidth / 2 * drawScale + 400,
-						      canvasHeight / 2 * drawScale
-						      ),
-						    Vector.fromAngle(2, 5),
-						    1
+							new Vector(
+							  canvasWidth / 2 * drawScale + 400,
+							  canvasHeight / 2 * drawScale
+							  ),
+							Vector.fromAngle(2, 5),
+							1
 						  ),
 						  //   // bl
 						  //   new ParticleEmitter(
@@ -576,14 +576,14 @@ game.import('play',function(lib,game,ui,get,ai,_status){
 						  //   Vector.fromAngle(1.5, 1),
 						  //   1
 						  // ),
-						    // tl
+							// tl
 						  new ParticleEmitter(
-						    new Vector(
-						      canvasWidth / 2 * drawScale - 400,
-						      canvasHeight / 2 * drawScale
-						      ),
-						    Vector.fromAngle(5, 5),
-						    1
+							new Vector(
+							  canvasWidth / 2 * drawScale - 400,
+							  canvasHeight / 2 * drawScale
+							  ),
+							Vector.fromAngle(5, 5),
+							1
 						  ),
 						  //   // tr
 						  //   new ParticleEmitter(
@@ -597,8 +597,8 @@ game.import('play',function(lib,game,ui,get,ai,_status){
 						];
 						forces  = [
 						  new Force(
-						    new Vector((canvasWidth / 2 * drawScale) ,
-						               (canvasHeight / 2 * drawScale)), 1800)
+							new Vector((canvasWidth / 2 * drawScale) ,
+									   (canvasHeight / 2 * drawScale)), 1800)
 						];
 
 						var loop=function() {
@@ -635,35 +635,35 @@ game.import('play',function(lib,game,ui,get,ai,_status){
 						var c2 = 'rgba(255,64,32,';
 						var addNewParticles=function() {
 						  var _emit = function() {
-						    var ret = 0;
-						    for (var i = 0; i < emitters.length; i++) {
-						      for (var j = 0; j < emissionRate; j++) {
-						        var p = emitters[i].emit();
-						        p.color = ( ctr % 10 === 0 )?
+							var ret = 0;
+							for (var i = 0; i < emitters.length; i++) {
+							  for (var j = 0; j < emissionRate; j++) {
+								var p = emitters[i].emit();
+								p.color = ( ctr % 10 === 0 )?
 								  ( Math.random() * 5 <= 1 ? c2 : rndc() )
-						          : rndc();
-						        p.mass = ~~(Math.random() * 5);
-						        particles.push(p);
-						        ret += p.mass;
-						        ctr++;
-						      }
-						    }
-						    return ret;
+								  : rndc();
+								p.mass = ~~(Math.random() * 5);
+								particles.push(p);
+								ret += p.mass;
+								ctr++;
+							  }
+							}
+							return ret;
 						  };
 						  if(collidedMass !== 0) {
-						    while(collidedMass !== 0) {
-						      collidedMass -= _emit();
-						      collidedMass = collidedMass<0 ? 0 :collidedMass;
-						    }
+							while(collidedMass !== 0) {
+							  collidedMass -= _emit();
+							  collidedMass = collidedMass<0 ? 0 :collidedMass;
+							}
 						  }
 						  if (particles.length > maxParticles)
-						    return;
+							return;
 						  _emit();
 						}
 
 						var CLIPOFFSCREEN = 1,
-						    BUFFEROFFSCREEN = 2,
-						    LOOPSCREEN = 3;
+							BUFFEROFFSCREEN = 2,
+							LOOPSCREEN = 3;
 
 						var isPositionAliveAndAdjust=function(particle,check) {
 						  return true;
@@ -693,77 +693,77 @@ game.import('play',function(lib,game,ui,get,ai,_status){
 						var plotParticles=function(boundsX, boundsY) {
 						  var currentParticles = [];
 						  for (var i = 0; i < particles.length; i++) {
-						    var particle = particles[i];
-						    particle.reactToForces(forces);
-						    if(!isPositionAliveAndAdjust(particle))
-						      continue;
-						    particle.move();
-						    currentParticles.push(particle);
+							var particle = particles[i];
+							particle.reactToForces(forces);
+							if(!isPositionAliveAndAdjust(particle))
+							  continue;
+							particle.move();
+							currentParticles.push(particle);
 						  }
 						}
 
 						var offscreenCache = {};
 						var renderParticle=function(p) {
-						    var position = p.pos;
-						    if(!p.size) p.size = Math.floor(p.mass / 100);
+							var position = p.pos;
+							if(!p.size) p.size = Math.floor(p.mass / 100);
 
 
-						    if(!p.opacity) p.opacity = 0.05;
-						    if(p.velocity > 0) {
-						      if(p.opacity<=0.18)
-						        p.opacity += 0.04;
-						    }
-						      if(p.opacity>0.08)
-						        p.opacity -= 0.02;
+							if(!p.opacity) p.opacity = 0.05;
+							if(p.velocity > 0) {
+							  if(p.opacity<=0.18)
+								p.opacity += 0.04;
+							}
+							  if(p.opacity>0.08)
+								p.opacity -= 0.02;
 
-						    var actualSize = p.size / drawScale;
-						    actualSize = actualSize < minParticleSize ? minParticleSize : actualSize;
-						    if(p.mass>8) actualSize *= 2;
-						    if(p.nova) {
-						      actualSize *= 4;
-						      p.nova = false;
-						    }
-						    if(p.doubleSize) {
-						      p.doubleSize = false;
-						      actualSize *= 2;
-						    }
-						    // if(p.supernova) {
-						    //   actualSize *= 6;
-						    //   opacity = 0.15;
-						    //   p.supernovaDur = p.supernovaDur - 1;
-						    //   if(p.supernovaDur === 0)
-						    //     p.supernova = false;
-						    // }
-						    var cacheKey = actualSize + '_' + p.opacity + '_' + p.color;
-						    var cacheValue = offscreenCache[cacheKey];
-						    if(!cacheValue) {
-						      cacheValue = renderToCanvas(actualSize * 32, actualSize * 32, function(ofsContext) {
-						        var opacity = p.opacity;
-						        var fills = [
-						          {size:actualSize/2,  opacity:1},
-						          {size:actualSize,  opacity:opacity},
-						          {size:actualSize * 2, opacity:opacity / 2},
-						          {size:actualSize * 4, opacity:opacity / 3},
-						          {size:actualSize * 8, opacity:opacity / 5},
-						          {size:actualSize * 16, opacity:opacity / 16}
-						        ];
-						        ofsContext.beginPath();
-						        for(var f in fills) {
-						          f = fills[f];
-						          ofsContext.fillStyle = p.color + f.opacity + ')';
-						          ofsContext.arc(
-						            actualSize * 16,
-						            actualSize * 16,
-						            f.size , 0, Math.PI*2, true);
-						          ofsContext.fill();
-						        }
-						        ofsContext.closePath();
-						      });
-						      offscreenCache[cacheKey] = cacheValue;
-						    }
-						      var posX = p.pos.x / drawScale;
-						    var posY = p.pos.y / drawScale;
-						    ctx.drawImage(cacheValue, posX, posY);
+							var actualSize = p.size / drawScale;
+							actualSize = actualSize < minParticleSize ? minParticleSize : actualSize;
+							if(p.mass>8) actualSize *= 2;
+							if(p.nova) {
+							  actualSize *= 4;
+							  p.nova = false;
+							}
+							if(p.doubleSize) {
+							  p.doubleSize = false;
+							  actualSize *= 2;
+							}
+							// if(p.supernova) {
+							//   actualSize *= 6;
+							//   opacity = 0.15;
+							//   p.supernovaDur = p.supernovaDur - 1;
+							//   if(p.supernovaDur === 0)
+							//     p.supernova = false;
+							// }
+							var cacheKey = actualSize + '_' + p.opacity + '_' + p.color;
+							var cacheValue = offscreenCache[cacheKey];
+							if(!cacheValue) {
+							  cacheValue = renderToCanvas(actualSize * 32, actualSize * 32, function(ofsContext) {
+								var opacity = p.opacity;
+								var fills = [
+								  {size:actualSize/2,  opacity:1},
+								  {size:actualSize,  opacity:opacity},
+								  {size:actualSize * 2, opacity:opacity / 2},
+								  {size:actualSize * 4, opacity:opacity / 3},
+								  {size:actualSize * 8, opacity:opacity / 5},
+								  {size:actualSize * 16, opacity:opacity / 16}
+								];
+								ofsContext.beginPath();
+								for(var f in fills) {
+								  f = fills[f];
+								  ofsContext.fillStyle = p.color + f.opacity + ')';
+								  ofsContext.arc(
+									actualSize * 16,
+									actualSize * 16,
+									f.size , 0, Math.PI*2, true);
+								  ofsContext.fill();
+								}
+								ofsContext.closePath();
+							  });
+							  offscreenCache[cacheKey] = cacheValue;
+							}
+							  var posX = p.pos.x / drawScale;
+							var posY = p.pos.y / drawScale;
+							ctx.drawImage(cacheValue, posX, posY);
 						}
 
 						var fills = [
@@ -773,27 +773,27 @@ game.import('play',function(lib,game,ui,get,ai,_status){
 
 						var renderScene=function(ofsContext) {
 						  for (var i = 0; i < forces.length; i++) {
-						    var p = forces[i];
-						    var position = p.pos;
-						    var opacity = 1;
+							var p = forces[i];
+							var position = p.pos;
+							var opacity = 1;
 
-						    ofsContext.beginPath();
-						    for(var f in fills) {
-						      f = fills[f];
-						      var o = p.burp === true ? 1 : f.opacity;
-						      p.burp = false;
-						      // ofsContext.fillStyle = 'rgba(255,255,255,' + o + ')';
-						      // ofsContext.arc(position.x / drawScale,
-						      //   position.y / drawScale,
-						      //   f.size / drawScale, 0, Math.PI*2, true);
-						      // ofsContext.fill();
-						    }
-						    ofsContext.closePath();
+							ofsContext.beginPath();
+							for(var f in fills) {
+							  f = fills[f];
+							  var o = p.burp === true ? 1 : f.opacity;
+							  p.burp = false;
+							  // ofsContext.fillStyle = 'rgba(255,255,255,' + o + ')';
+							  // ofsContext.arc(position.x / drawScale,
+							  //   position.y / drawScale,
+							  //   f.size / drawScale, 0, Math.PI*2, true);
+							  // ofsContext.fill();
+							}
+							ofsContext.closePath();
 						  }
 
 						  for (var i = 0; i < particles.length; i++) {
-						    var p = particles[i];
-						    renderParticle(p);
+							var p = particles[i];
+							renderParticle(p);
 						  }
 						}
 
@@ -933,7 +933,7 @@ game.import('play',function(lib,game,ui,get,ai,_status){
 
 						flakeMove.prototype.update = function() {
 							var x = this.x,
-							    y = this.y;
+								y = this.y;
 
 							// 左右摆动(余弦)
 							this.velX *= 0.98;

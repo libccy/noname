@@ -1,66 +1,66 @@
 (function(){
-    if(typeof require !== 'function'||typeof document !== 'undefined') return;
-    global.window=global;
-    require(__dirname+'/update.js');
-    var fs=require('fs');
-    var path=require('path');
-    fs.readFile('game/asset.js','utf-8',function(err, current){
-        var assetlist='\t\''+window.noname_update.version+'\'';
-        var skinlist='\nwindow.noname_skin_list={\n';
-        var get = function(dir,callback){
-            fs.readdir(dir,function(err,list){
-                var shift=function(){
-                    if(list.length){
-                        var filename=list.shift();
-                        var delay=false;
-                        if(!/\.|~|_/.test(filename[0])){
-                            var url=dir+'/'+filename;
-                            var stat=fs.statSync(url);
-                            if(stat.isFile()){
-                                if(['.jpg','.png','.mp3','.ttf'].indexOf(path.extname(url))!=-1){
-                                    assetlist+=',\n\t\''+path.relative(path.dirname(__dirname),url)+'\'';
-                                }
-                            }
-                            else if(stat.isDirectory()){
-                                if(dir==path.dirname(__dirname)+'/image/skin'){
-                                    fs.readdir(url,function(err,list){
-                                        var num=0;
-                                        for(var i=0;i<list.length;i++){
-                                            var url2=url+'/'+list[i];
-                                            var stat=fs.statSync(url2);
-                                            if(stat.isFile()&&path.extname(url2)=='.jpg'){
-                                                num++;
-                                            }
-                                        }
-                                        skinlist+='\t'+filename+':'+num+',\n';
-                                        shift();
-                                    });
-                                    delay=true;
-                                }
-                                else{
-                                    get(url,shift);
-                                    delay=true;
-                                }
-                            }
-                        }
-                        if(!delay){
-                            shift();
-                        }
-                    }
-                    else{
-                        callback();
-                    }
-                }
-                shift();
-            });
-        };
-        get(path.dirname(__dirname),function(){
-            current=current.slice(0,current.lastIndexOf('window.noname_asset_list=[')+26);
-            fs.writeFile('game/asset.js',current+'\n'+assetlist+'\n];'+skinlist.slice(0,skinlist.length-2)+'\n};','utf-8',function(){
-                console.log('done');
-            });
-        });
-    });
+	if(typeof require !== 'function'||typeof document !== 'undefined') return;
+	global.window=global;
+	require(__dirname+'/update.js');
+	var fs=require('fs');
+	var path=require('path');
+	fs.readFile('game/asset.js','utf-8',function(err, current){
+		var assetlist='\t\''+window.noname_update.version+'\'';
+		var skinlist='\nwindow.noname_skin_list={\n';
+		var get = function(dir,callback){
+			fs.readdir(dir,function(err,list){
+				var shift=function(){
+					if(list.length){
+						var filename=list.shift();
+						var delay=false;
+						if(!/\.|~|_/.test(filename[0])){
+							var url=dir+'/'+filename;
+							var stat=fs.statSync(url);
+							if(stat.isFile()){
+								if(['.jpg','.png','.mp3','.ttf'].indexOf(path.extname(url))!=-1){
+									assetlist+=',\n\t\''+path.relative(path.dirname(__dirname),url)+'\'';
+								}
+							}
+							else if(stat.isDirectory()){
+								if(dir==path.dirname(__dirname)+'/image/skin'){
+									fs.readdir(url,function(err,list){
+										var num=0;
+										for(var i=0;i<list.length;i++){
+											var url2=url+'/'+list[i];
+											var stat=fs.statSync(url2);
+											if(stat.isFile()&&path.extname(url2)=='.jpg'){
+												num++;
+											}
+										}
+										skinlist+='\t'+filename+':'+num+',\n';
+										shift();
+									});
+									delay=true;
+								}
+								else{
+									get(url,shift);
+									delay=true;
+								}
+							}
+						}
+						if(!delay){
+							shift();
+						}
+					}
+					else{
+						callback();
+					}
+				}
+				shift();
+			});
+		};
+		get(path.dirname(__dirname),function(){
+			current=current.slice(0,current.lastIndexOf('window.noname_asset_list=[')+26);
+			fs.writeFile('game/asset.js',current+'\n'+assetlist+'\n];'+skinlist.slice(0,skinlist.length-2)+'\n};','utf-8',function(){
+				console.log('done');
+			});
+		});
+	});
 })();
 
 window.noname_asset_list=[

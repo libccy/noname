@@ -117,6 +117,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				mark:true,
 				audio:2,
+				unique:true,
 				filter:function(event){
 					return event.num>0;
 				},

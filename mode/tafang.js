@@ -17,8 +17,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				ui.roundmenu.style.display='';
 			}
 			if(lib.config.player_border=='normal'&&(lib.config.layout=='long'||lib.config.layout=='long2')){
-                ui.arena.classList.add('lslim_player');
-            }
+				ui.arena.classList.add('lslim_player');
+			}
 			for(var i in result.element){
 				for(var j in result.element[i]){
 					if(j!='dieAfter'){
@@ -50,27 +50,27 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			}
-	        // if(!localStorage.getItem(lib.configprefix+'playback')){
-	        //     game.loadMap();
-	        // }
+			// if(!localStorage.getItem(lib.configprefix+'playback')){
+			//     game.loadMap();
+			// }
 			"step 2"
 			var result='basic_medium';
 			_status.map=lib.tafang.map[result];
-	        _status.mapname=result;
+			_status.mapname=result;
 			ui.chesssheet=document.createElement('style');
 			document.head.appendChild(ui.chesssheet);
 			var playback=localStorage.getItem(lib.configprefix+'playback');
 			lib.mechlist=[];
-	        for(var i in lib.characterPack.mode_tafang){
-	            if(i.indexOf('tafang_mech_')==0){
+			for(var i in lib.characterPack.mode_tafang){
+				if(i.indexOf('tafang_mech_')==0){
 					lib.characterPack.mode_tafang[i][3].push(i+'_skill');
-	                lib.mechlist.push(i);
-	            }
-	            lib.character[i]=lib.characterPack.mode_tafang[i];
-	            if(!lib.character[i][4]){
-	                lib.character[i][4]=[];
-	            }
-	        }
+					lib.mechlist.push(i);
+				}
+				lib.character[i]=lib.characterPack.mode_tafang[i];
+				if(!lib.character[i][4]){
+					lib.character[i][4]=[];
+				}
+			}
 			ui.create.cardsAsync();
 			game.finishCards();
 			game.addGlobalSkill('autoswap');
@@ -105,7 +105,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			}
 			_status.mylist=[];
-	        _status.enemylist=[];
+			_status.enemylist=[];
 			"step 3"
 			ui.arena.classList.add('chess');
 			if(event.video){
@@ -115,7 +115,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						break;
 					}
 				}
-	            _status.map=lib.tafang.map[_status.mapname];
+				_status.map=lib.tafang.map[_status.mapname];
 				game.playerMap=lib.posmap;
 			}
 			ui.chesswidth=_status.map.size[0];
@@ -239,7 +239,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			}
 			lib.init.onfree();
-	        event.trigger('gameStart');
+			event.trigger('gameStart');
 			game.phaseLoopTafang();
 		},
 		element:{
@@ -295,19 +295,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		},
 		tafang:{
 			map:{
-	            basic_small:{
-	                name:'小型战场',
+				basic_small:{
+					name:'小型战场',
 					size:[6,11],
 					obstacle:[]
-	            },
-	            basic_medium:{
-	                name:'中型战场',
+				},
+				basic_medium:{
+					name:'中型战场',
 					size:[9,11],
-	            },
-	            basic_large:{
-	                name:'大型战场',
+				},
+				basic_large:{
+					name:'大型战场',
 					size:[12,11],
-	            },
+				},
 			}
 		},
 		game:{
@@ -777,8 +777,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			loadMap:function(){
-	            var next=game.createEvent('loadMap');
-	            next.setContent(function(){
+				var next=game.createEvent('loadMap');
+				next.setContent(function(){
 					if(!lib.storage.map){
 						lib.storage.map=['basic_small','basic_medium','basic_large'];
 					}
@@ -790,10 +790,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						sceneview._scrollspeed=30;
 						sceneview._scrollnum=10;
 						sceneview.onmousewheel=function(){
-		                    if(!this.classList.contains('lockscroll')){
-		                        ui.click.mousewheel.apply(this,arguments);
-		                    }
-		                };
+							if(!this.classList.contains('lockscroll')){
+								ui.click.mousewheel.apply(this,arguments);
+							}
+						};
 					}
 					lib.setScroll(sceneview);
 					var switchScene=function(){
@@ -801,125 +801,125 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						sceneview.delete();
 						setTimeout(game.resume,300);
 					}
-	                var clickScene=function(e){
-	                    if(this.classList.contains('unselectable')) return;
-	                    if(this._clicking) return;
-	                    if(e&&e.stopPropagation) e.stopPropagation();
-	                    if(this.classList.contains('flipped')){
-	                        return;
-	                    }
+					var clickScene=function(e){
+						if(this.classList.contains('unselectable')) return;
+						if(this._clicking) return;
+						if(e&&e.stopPropagation) e.stopPropagation();
+						if(this.classList.contains('flipped')){
+							return;
+						}
 						if(this.classList.contains('glow3')){
 							this.classList.remove('glow3');
 							lib.storage.newmap.remove(this.name);
 							game.save('newmap',lib.storage.newmap);
 						}
-	                    var sceneNode=this.parentNode;
-	                    var current=document.querySelector('.flipped.scene');
-	                    if(current){
-	                        restoreScene(current,true);
-	                    }
-	                    this.content.innerHTML='';
+						var sceneNode=this.parentNode;
+						var current=document.querySelector('.flipped.scene');
+						if(current){
+							restoreScene(current,true);
+						}
+						this.content.innerHTML='';
 						ui.create.div('.menubutton.large.enter','进入',this.content,switchScene).link=this.name;
-	                    sceneNode.classList.add('lockscroll');
-	                    var node=this;
-	                    node._clicking=true;
-	                    setTimeout(function(){
-	                        node._clicking=false;
-	                    },700);
-	                    sceneNode.dx=ui.window.offsetWidth/2-(-sceneNode.scrollLeft+this.offsetLeft+this.offsetWidth/2);
-	                    if(Math.abs(sceneNode.dx)<20){
-	                        sceneNode.dx=0;
-	                    }
-	                    if(!sceneNode.sceneInterval&&sceneNode.dx){
-	                        sceneNode.sceneInterval=setInterval(function(){
-	                            var dx=sceneNode.dx;
-	                            if(Math.abs(dx)<=2){
-	                                sceneNode.scrollLeft-=dx;
-	                                clearInterval(sceneNode.sceneInterval);
-	                                delete sceneNode.sceneInterval;
-	                            }
-	                            else{
-	                                var ddx=dx/Math.sqrt(Math.abs(dx))*1.5;
-	                                sceneNode.scrollLeft-=ddx;
-	                                sceneNode.dx-=ddx;
-	                            }
-	                        },16);
-	                    }
-	                    node.style.transition='all ease-in 0.2s';
+						sceneNode.classList.add('lockscroll');
+						var node=this;
+						node._clicking=true;
+						setTimeout(function(){
+							node._clicking=false;
+						},700);
+						sceneNode.dx=ui.window.offsetWidth/2-(-sceneNode.scrollLeft+this.offsetLeft+this.offsetWidth/2);
+						if(Math.abs(sceneNode.dx)<20){
+							sceneNode.dx=0;
+						}
+						if(!sceneNode.sceneInterval&&sceneNode.dx){
+							sceneNode.sceneInterval=setInterval(function(){
+								var dx=sceneNode.dx;
+								if(Math.abs(dx)<=2){
+									sceneNode.scrollLeft-=dx;
+									clearInterval(sceneNode.sceneInterval);
+									delete sceneNode.sceneInterval;
+								}
+								else{
+									var ddx=dx/Math.sqrt(Math.abs(dx))*1.5;
+									sceneNode.scrollLeft-=ddx;
+									sceneNode.dx-=ddx;
+								}
+							},16);
+						}
+						node.style.transition='all ease-in 0.2s';
 						node.style.transform='perspective(1600px) rotateY(90deg) scale(0.75)';
 						var onEnd=function(){
-	                        node.removeEventListener('webkitTransitionEnd',onEnd);
-	                        node.classList.add('flipped');
-	                        sceneNode.classList.add('lockscroll');
-	                        node.style.transition='all ease-out 0.4s';
+							node.removeEventListener('webkitTransitionEnd',onEnd);
+							node.classList.add('flipped');
+							sceneNode.classList.add('lockscroll');
+							node.style.transition='all ease-out 0.4s';
 							node.style.transform='perspective(1600px) rotateY(180deg) scale(1)'
 						};
 						node.listenTransition(onEnd);
-	                }
-	                ui.click.scene=clickScene;
-	                var restoreScene=function(node,forced){
-	                    if(node._clicking&&!forced) return;
-	                    if(node.transformInterval){
-	                        clearInterval(node.transformInterval);
-	                        delete node.transformInterval;
-	                    }
-	                    var sceneNode=node.parentNode;
-	                    node._clicking=true;
-	                    setTimeout(function(){
-	                        node._clicking=false;
-	                    },700);
-	                    node.style.transition='all ease-in 0.2s';
+					}
+					ui.click.scene=clickScene;
+					var restoreScene=function(node,forced){
+						if(node._clicking&&!forced) return;
+						if(node.transformInterval){
+							clearInterval(node.transformInterval);
+							delete node.transformInterval;
+						}
+						var sceneNode=node.parentNode;
+						node._clicking=true;
+						setTimeout(function(){
+							node._clicking=false;
+						},700);
+						node.style.transition='all ease-in 0.2s';
 						node.style.transform='perspective(1600px) rotateY(90deg) scale(0.75)';
 						var onEnd=function(){
-	                        node.removeEventListener('webkitTransitionEnd',onEnd);
-	                        node.classList.remove('flipped');
-	                        if(!sceneNode.querySelector('.flipped')){
-	                            sceneNode.classList.remove('lockscroll');
-	                        }
-	                        node.style.transition='all ease-out 0.4s';
+							node.removeEventListener('webkitTransitionEnd',onEnd);
+							node.classList.remove('flipped');
+							if(!sceneNode.querySelector('.flipped')){
+								sceneNode.classList.remove('lockscroll');
+							}
+							node.style.transition='all ease-out 0.4s';
 							node.style.transform='perspective(1600px) rotateY(0deg) scale(0.7)'
 						};
 						node.listenTransition(onEnd);
-	                }
-	                ui.click.scene2=restoreScene;
-	                var createScene=function(name){
-	                    var scene=lib.tafang.map[name];
-	                    var node=ui.create.div('.scene',clickScene);
-	                    node.style.transform='perspective(1600px) rotateY(0deg) scale(0.7)';
-	                    node.name=name;
-	                    node.bgnode=ui.create.div('.background.player',node);
-	                    node.info=scene;
-	                    ui.create.div('.avatar.menu',node.bgnode);
-	                    node.namenode=ui.create.div('.name',node,(scene.name));
-	                    if(lib.storage.map.contains(name)){
-	                        if(lib.storage.newmap.contains(name)){
-	                            node.classList.add('glow3');
-	                        }
-	                        node.namenode.dataset.nature='soilm';
-	                    }
-	                    else{
-	                        node.classList.add('unselectable');
-	                        node.namenode.innerHTML=('未开启');
-	                    }
-	                    var content=ui.create.div('.menu',node);
-	                    lib.setScroll(content);
-	                    node.content=content;
-	                    sceneview.appendChild(node);
-	                    return node;
-	                }
-	                event.custom.add.window=function(){
-	                    var current=document.querySelector('.flipped.scene');
-	                    if(current){
-	                        restoreScene(current);
-	                    }
-	                }
-	                for(var i in lib.tafang.map){
-	                    createScene(i);
-	                }
-	                ui.window.appendChild(sceneview.animate('start'));
-	                game.pause();
-	            });
-	        },
+					}
+					ui.click.scene2=restoreScene;
+					var createScene=function(name){
+						var scene=lib.tafang.map[name];
+						var node=ui.create.div('.scene',clickScene);
+						node.style.transform='perspective(1600px) rotateY(0deg) scale(0.7)';
+						node.name=name;
+						node.bgnode=ui.create.div('.background.player',node);
+						node.info=scene;
+						ui.create.div('.avatar.menu',node.bgnode);
+						node.namenode=ui.create.div('.name',node,(scene.name));
+						if(lib.storage.map.contains(name)){
+							if(lib.storage.newmap.contains(name)){
+								node.classList.add('glow3');
+							}
+							node.namenode.dataset.nature='soilm';
+						}
+						else{
+							node.classList.add('unselectable');
+							node.namenode.innerHTML=('未开启');
+						}
+						var content=ui.create.div('.menu',node);
+						lib.setScroll(content);
+						node.content=content;
+						sceneview.appendChild(node);
+						return node;
+					}
+					event.custom.add.window=function(){
+						var current=document.querySelector('.flipped.scene');
+						if(current){
+							restoreScene(current);
+						}
+					}
+					for(var i in lib.tafang.map){
+						createScene(i);
+					}
+					ui.window.appendChild(sceneview.animate('start'));
+					game.pause();
+				});
+			},
 		},
 		skill:{
 			tafang_mech_weixingxianjing_skill:{

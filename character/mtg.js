@@ -2,14 +2,14 @@
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'mtg',
-	    character:{
+		character:{
 			mtg_jiding:['male','qun',4,['mbaizhan','msilian']],
 			// mtg_qianzhuo:['female','shu',3,[]],
 			mtg_jiesi:['male','wei',3,['mtongnian','msuoling','mhuanyi']],
 			mtg_lilianna:['female','qun',3,['lingyong','mduohun']],
 			// mtg_nisha:['female','wu',3,[]],
 			// mtg_ayeni:['male','qun',4,[]],
-	    },
+		},
 		characterIntro:{
 			mtg_jiding:'这名白色魔法的使用者极其注重忠诚，正义和荣誉。他曾全力追捕茜卓纳拉，如今已不可思议地与这位火焰法师成为伙伴。',
 			mtg_qianzhuo:'茜卓纳拉是使用红色法术力的旅法师。她擅长使用火焰：除了火焰，还是火焰。茜卓性格冲动、易怒、富有激情，不断增长的火焰法术能力随时都准备爆发。她的火花在还很年轻时便已点燃，如今已是相当有经验的烈焰术士和旅法师。',
@@ -18,7 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mtg_nisha:'赞迪卡妖精部落玖瑞加的一名战士，做事倾尽全力，与大地有密切的联系，还擅使元素魔法。她能够引导时空的魔法生机地脉，为土地赋予生命。',
 			mtg_ayeni:'金鬃阿耶尼是使用白色法术的鹏洛客。他长于净化身体与心灵的法术：用咒语来治疗、强化盟友，以及唤醒他人内在的心灵精华。',
 		},
-	    skill:{
+		skill:{
 			mduohun:{
 				trigger:{player:'dyingAfter'},
 				forced:true,
@@ -30,17 +30,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.source.loseHp();
 				},
 				ai:{
-    				threaten:function(player,target){
-    					if(target.hp==1) return 0.6;
+					threaten:function(player,target){
+						if(target.hp==1) return 0.6;
 						return 1;
-    				},
-    				effect:{
-    					target:function(card,player,target,current){
-    						if(!target.hasFriend()) return;
-    						if(target.hp<=1&&get.tag(card,'damage')) return [1,0,0,-1];
-    					}
-    				}
-    			}
+					},
+					effect:{
+						target:function(card,player,target,current){
+							if(!target.hasFriend()) return;
+							if(target.hp<=1&&get.tag(card,'damage')) return [1,0,0,-1];
+						}
+					}
+				}
 			},
 			lingyong:{
 				enable:'phaseUse',
@@ -463,9 +463,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			}
-	    },
-	    translate:{
-	        mtg_jiding:'基定',
+		},
+		translate:{
+			mtg_jiding:'基定',
 			mtg_qianzhuo:'茜卓',
 			mtg_jiesi:'杰斯',
 			mtg_lilianna:'莉莲娜',
@@ -490,6 +490,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			msuoling_old_info:'出牌阶段限一次，若你手牌中有替身牌且手牌数不超过5，你可以展示手牌，若其中的非替身手牌能通过四则运算得到你的替身牌的点数，你将替身牌转化为非替身牌，然后获得一张新的替身牌（此技能托管无效）',
 			mhuanyi:'幻逸',
 			mhuanyi_info:'每两轮限一次，结束阶段，你可以选择一名其他角色和一种卡牌类型（选择结果对其他角色不可见），直到下一回合开始，当你首次成为该类型卡牌的惟一目标时，你将目标转移给你指定的角色（目标须合法）',
-	    },
+		},
 	};
 });

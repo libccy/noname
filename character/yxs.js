@@ -92,21 +92,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			guimian:{
-	            trigger:{source:'damageEnd'},
-	            forced:true,
-	            filter:function(event,player){
-	                return event.card&&event.card.name=='sha'&&_status.currentPhase==player;
-	            },
-	            content:function(){
-	                player.getStat().card.sha--;
-	            }
-	        },
+				trigger:{source:'damageEnd'},
+				forced:true,
+				filter:function(event,player){
+					return event.card&&event.card.name=='sha'&&_status.currentPhase==player;
+				},
+				content:function(){
+					player.getStat().card.sha--;
+				}
+			},
 			lyuxue:{
 				trigger:{source:'damageEnd'},
 				forced:true,
 				logTarget:'player',
 				filter:function(event,player){
-                    if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.contains(event.player)) return false;
 					return event.player.isIn()&&!event.player.hasSkill('lyuxue2');
 				},
 				content:function(){
@@ -614,11 +614,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					trigger.directHit=true;
 				},
-	            mod:{
-	                targetInRange:function(card){
-	                    if(card.name=='sha') return true;
-	                },
-	            },
+				mod:{
+					targetInRange:function(card){
+						if(card.name=='sha') return true;
+					},
+				},
 			},
 			lguiyin:{
 				unique:true,
@@ -863,7 +863,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageEnd'},
 				frequent:true,
 				filter:function(event){
-                    if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.contains(event.player)) return false;
 					return event.player.isAlive()&&event.parent.name=='yanyi'&&event.player.hp<event.player.maxHp;
 				},
 				content:function(){
@@ -1338,7 +1338,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageEnd'},
 				direct:true,
 				filter:function(event,player){
-                    if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.contains(event.player)) return false;
 					if(event.player.isDead()) return false;
 					var nh=event.player.countCards('h');
 					if(nh==0) return false;

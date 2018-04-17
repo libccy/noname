@@ -556,8 +556,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target:1
 					},
 					order:function(){
-	                    return get.order({name:'sha'})+0.1;
-	                },
+						return get.order({name:'sha'})+0.1;
+					},
 				}
 			},
 			xuejibingbao:{
@@ -733,7 +733,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'equip5',
 				nomod:true,
 				nopower:true,
-	            unique:true,
+				unique:true,
 				skills:['donghuangzhong'],
 				ai:{
 					equipValue:7
@@ -745,7 +745,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'equip1',
 				nomod:true,
 				nopower:true,
-	            unique:true,
+				unique:true,
 				skills:['xuanyuanjian','xuanyuanjian2','xuanyuanjian3'],
 				enable:function(card,player){
 					return player.hasSkill('xuanyuan')||player.hp>2;
@@ -770,7 +770,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				skills:['pangufu'],
 				nomod:true,
 				nopower:true,
-	            unique:true,
+				unique:true,
 				distance:{attackFrom:-3},
 				ai:{
 					equipValue:8
@@ -784,7 +784,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				loseDelay:false,
 				nomod:true,
 				nopower:true,
-	            unique:true,
+				unique:true,
 				onEquip:function(){
 					player.markSkill('lianyaohu_skill');
 				},
@@ -804,7 +804,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				skills:['haotianta'],
 				nomod:true,
 				nopower:true,
-	            unique:true,
+				unique:true,
 				ai:{
 					equipValue:7
 				}
@@ -816,7 +816,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				skills:['kongxin'],
 				nomod:true,
 				nopower:true,
-	            unique:true,
+				unique:true,
 				ai:{
 					equipValue:6
 				}
@@ -828,7 +828,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				skills:['shennongding'],
 				nomod:true,
 				nopower:true,
-	            unique:true,
+				unique:true,
 				ai:{
 					equipValue:6
 				}
@@ -840,7 +840,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				skills:['kongdongyin'],
 				nomod:true,
 				nopower:true,
-	            unique:true,
+				unique:true,
 				ai:{
 					equipValue:function(card,player){
 						if(player.hp==2) return 7;
@@ -859,7 +859,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				skills:['kunlunjingc'],
 				nomod:true,
 				nopower:true,
-	            unique:true,
+				unique:true,
 				ai:{
 					equipValue:6
 				}
@@ -871,7 +871,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				skills:['nvwashi'],
 				nomod:true,
 				nopower:true,
-	            unique:true,
+				unique:true,
 				ai:{
 					equipValue:5
 				}
@@ -2545,8 +2545,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:function(){
-	                    return get.order({name:'sha'})+0.11;
-	                },
+						return get.order({name:'sha'})+0.11;
+					},
 					result:{
 						target:function(player,target){
 							return get.effect(target,{name:'sha'},player,target);

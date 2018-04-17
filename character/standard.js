@@ -375,13 +375,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(event.cards.length>1){
 						player.chooseCardButton('将“遗计”牌分配给任意角色',true,event.cards,[1,event.cards.length]).set('ai',function(button){
-                            if(ui.selected.buttons.length==0) return 1;
-                            return 0;
+							if(ui.selected.buttons.length==0) return 1;
+							return 0;
 						});
 					}
-                    else if(event.cards.length==1){
-                        event._result={links:event.cards.slice(0),bool:true};
-                    }
+					else if(event.cards.length==1){
+						event._result={links:event.cards.slice(0),bool:true};
+					}
 					else{
 						event.finish();
 					}
@@ -392,23 +392,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						event.togive=result.links.slice(0);
 						player.chooseTarget('将'+get.translation(result.links)+'交给一名角色',true).set('ai',function(target){
-                            var att=get.attitude(_status.event.player,target);
+							var att=get.attitude(_status.event.player,target);
 							if(_status.event.enemy){
-                                return -att;
-                            }
-                            else if(att>0){
-                                return att/(1+target.countCards('h'));
-                            }
-                            else{
-                                return att/100;
-                            }
+								return -att;
+							}
+							else if(att>0){
+								return att/(1+target.countCards('h'));
+							}
+							else{
+								return att/100;
+							}
 						}).set('enemy',get.value(event.togive[0])<0);
 					}
 					"step 3"
 					if(result.targets.length){
 						result.targets[0].gain(event.togive,'draw');
 						player.line(result.targets[0],'green');
-                        game.log(result.targets[0],'获得了'+get.cnNumber(event.togive.length)+'张牌');
+						game.log(result.targets[0],'获得了'+get.cnNumber(event.togive.length)+'张牌');
 						event.goto(1);
 					}
 				},
@@ -564,6 +564,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target){
+							if(target.hasSkillTag('nogain')) return 0;
 							if(ui.selected.cards.length&&ui.selected.cards[0].name=='du'){
 								if(target.hasSkillTag('nodu')) return 0;
 								return -10;
@@ -1139,8 +1140,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!player.countCards('h','shan')) return false;
 							},
 							order:function(){
-			                    return get.order({name:'sha'})+0.1;
-			                },
+								return get.order({name:'sha'})+0.1;
+							},
 							useful:-1,
 							value:-1
 						}

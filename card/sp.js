@@ -294,15 +294,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				selectTarget:-1
 			},
 			shengdong:{
-	            fullskin:true,
-	            enable:function(){
+				fullskin:true,
+				enable:function(){
 					return game.countPlayer()>2;
 				},
 				chongzhu:function(){
 					return game.countPlayer()<=2;
 				},
 				singleCard:true,
-	            type:'trick',
+				type:'trick',
 				selectTarget:2,
 				multitarget:true,
 				targetprompt:['给一张牌','得两张牌'],
@@ -361,19 +361,22 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							if(!ok) return 0;
-							if(ui.selected.targets.length==1) return 2;
+							if(ui.selected.targets.length==1){
+								if(target.hasSkillTag('nogain')) return 0;
+								return 2;
+							}
 							if(target.countCards('he')==0) return 0;
 							if(player.hasFriend()) return -1;
 							return 0;
 						}
 					}
 				}
-	        },
-	        zengbin:{
-	            fullskin:true,
-	            enable:true,
-	            type:'trick',
-	            filterTarget:true,
+			},
+			zengbin:{
+				fullskin:true,
+				enable:true,
+				type:'trick',
+				filterTarget:true,
 				content:function(){
 					'step 0'
 					target.draw(3);
@@ -411,11 +414,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				}
-	        },
-	        caomu:{
-	            fullskin:true,
-	            enable:true,
-	            type:'delay',
+			},
+			caomu:{
+				fullskin:true,
+				enable:true,
+				type:'delay',
 				filterTarget:function(card,player,target){
 					return (lib.filter.judge(card,player,target)&&player!=target);
 				},
@@ -460,7 +463,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					},
 				}
-	        }
+			}
 		},
 		skill:{
 			lanyinjia:{
@@ -974,22 +977,22 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			muniu_skill_info:'出牌阶段限一次，你可以将一张手牌扣置于你装备区里的【木牛流马】下，若如此做，你可以将此装备移动到一名其他角色的装备区里；你可以将此装备牌下的牌如手牌般使用或打出。',
 			du:'毒',
 			du_info:'当你因使用、打出或弃置而失去此牌时，你失去一点体力',
-	        shengdong:'声东击西',
+			shengdong:'声东击西',
 			shengdong_info:'出牌阶段，对一名其他角色使用。你交给目标角色一张手牌，若如此做，其将两张牌交给另一名由你选择的其他角色（不足则全给，存活角色不超过2时可重铸）',
-	        zengbin:'增兵减灶',
-	        zengbin_info:'出牌阶段，对一名角色使用。目标角色摸三张牌，然后选择一项：1.弃置一张非基本牌；2.弃置两张牌',
-	        caomu:'草木皆兵',
-	        caomu_info:'出牌阶段，对一名其他角色使用。将【草木皆兵】放置于该角色的判定区里，若判定结果不为梅花：摸牌阶段，目标角色少摸一张牌；摸牌阶段结束时，与其距离为1的角色各摸一张牌',
+			zengbin:'增兵减灶',
+			zengbin_info:'出牌阶段，对一名角色使用。目标角色摸三张牌，然后选择一项：1.弃置一张非基本牌；2.弃置两张牌',
+			caomu:'草木皆兵',
+			caomu_info:'出牌阶段，对一名其他角色使用。将【草木皆兵】放置于该角色的判定区里，若判定结果不为梅花：摸牌阶段，目标角色少摸一张牌；摸牌阶段结束时，与其距离为1的角色各摸一张牌',
 		},
 		list:[
 			['spade',1,'caomu'],
 			['club',3,'caomu'],
 			['heart',12,'shengdong',],
-	        ['club',9,'shengdong'],
+			['club',9,'shengdong'],
 			['spade',9,'shengdong'],
-	        ['diamond',4,'zengbin'],
-	        ['heart',6,'zengbin'],
-	        ['spade',7,'zengbin'],
+			['diamond',4,'zengbin'],
+			['heart',6,'zengbin'],
+			['spade',7,'zengbin'],
 			['spade',3,'du'],
 			['spade',9,'du'],
 			['club',3,'du'],
