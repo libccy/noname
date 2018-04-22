@@ -122,6 +122,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hs_yangyanwageli:['female','qun',3,['hspuzhao','hsyanxin']],
 
 			hs_aiqinvyao:['famale','qun',4,['nsaiqi','nsbeiming']],
+
+			hs_yelinlonghou:['female','qun',4,['ylyuchu']],
+			hs_yelinchulong:["male","qun",1,[],['unseen']],
+			hs_ashamoer:['female','wei',3,['asyouzhang']],
+			hs_fengjianhuanfengzhe:['male','wei',3,['tuteng','huanfeng']],
+			hs_taisi:['female','wei',3,['hsxingyi','hshuanling']],
+			// hs_bingshuangnvwang:['female','wei',3,['hsshuangshi','hs']]
 		},
 		characterIntro:{
 			hs_jaina:'戴林·普罗德摩尔之女。 在吉安娜成年早期，她致力于阻止将引发第三次战争的天灾瘟疫传播，当战况加剧后，吉安娜获得了新部落大酋长萨尔的信任，成为团结艾泽拉斯各族携手对抗燃烧军团的关键人物。当战争结束后，吉安娜管理着塞拉摩岛，致力于促进部落与联盟间的关系。吉安娜的和平立场与性格在接任萨尔成为部落大酋长的加尔鲁什·地狱咆哮以一颗魔法炸弹夷平塞拉摩后改变了。身为肯瑞托的新领袖，她拥有让加尔鲁什为他酿成的惨剧付出血的代价的权力与决心。',
@@ -205,6 +212,477 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hs_malfurion:['hs_malorne'],
 		},
 		skill:{
+			hshuanling:{
+				trigger:{player:'phaseEnd'},
+				direct:true,
+				filter:function(event,player){
+					return player.storage.hshuanling.length&&player.countCards('he');
+				},
+				init:function(player){
+					player.storage.hshuanling=[];
+				},
+				intro:{
+					content:'cards'
+				},
+				content:function(){
+					'step 0'
+					var num=Math.min(
+						Math.max(1,player.countCards('e')),
+						player.storage.hshuanling.length
+					);
+					var next=player.chooseToDiscard('he',get.prompt2('hshuanling'),[1,num]);
+					next.ai=function(card){
+						if(get.position(card)=='e') return 7-get.value(card);
+						return 8-get.value(card);
+					};
+					next.logSkill='hshuanling';
+					next.delay=false;
+					'step 1'
+					if(result.bool){
+						event.num=result.cards.length;
+						player.draw(event.num);
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if(event.num){
+						var enemies=player.getEnemies();
+						var list=player.storage.hshuanling.slice(0);
+						while(list.length){
+							var choice=list.randomRemove();
+							var card=game.createCard(choice);
+							var target=null;
+							for(var i=0;i<enemies.length;i++){
+								if(lib.filter.targetEnabled2(card,player,enemies[i])){
+									target=enemies[i];
+									break;
+								}
+							}
+							if(target){
+								player.storage.hshuanling.remove(choice);
+								if(!player.storage.hshuanling.length){
+									player.unmarkSkill('hshuanling');
+								}
+								else{
+									player.syncStorage('hshuanling');
+									player.updateMarks();
+								}
+								player.useCard(card,target);
+								break;
+							}
+						}
+						event.num--;
+						event.redo();
+					}
+				},
+				group:['hshuanling_count'],
+				subSkill:{
+					// clear:{
+					// 	trigger:{player:'phaseAfter'},
+					// 	silent:true,
+					// 	content:function(){
+					// 		player.storage.hshuanling.length=0;
+					// 	}
+					// },
+					count:{
+						trigger:{global:'useCard'},
+						silent:true,
+						filter:function(event,player){
+							if(get.is.converted(event)) return false;
+							if(!event.player.isEnemiesOf(player)) return false;
+							if(get.type(event.card)!='trick') return false;
+							if(event.targets.length!=1) return false;
+							if(!event.targets[0].isFriendsOf(player)) return false;
+							if(get.info(event.card).multitarget) return false;
+							if(get.info(event.card).singleCard) return false;
+							if(!get.info(event.card).enable) return false;
+							return true;
+						},
+						content:function(){
+							player.storage.hshuanling.add(trigger.card);
+							player.markSkill('hshuanling');
+						}
+					}
+				}
+			},
+			hsxiujian:{
+				trigger:{player:'useCardToAfter'},
+				forced:true,
+				filter:function(event,player){
+					return get.type2(event.card)=='trick'&&event.target.isEnemiesOf(player);
+				},
+				content:function(){
+					player.useCard({name:'sha'},trigger.target,false);
+				}
+			},
+			hsxingyi:{
+				trigger:{global:'useSkillAfter'},
+				forced:true,
+				filter:function(event,player){
+					if(lib.filter.skillDisabled(event.skill)) return false;
+					if(!game.expandSkills(event.player.getStockSkills()).contains(event.skill)) return false;
+					return _status.currentPhase==event.player&&event.player.isEnemiesOf(player);
+				},
+				content:function(){
+					player.addTempSkill(trigger.skill,{player:'phaseAfter'});
+				}
+			},
+			hshuanling_old:{
+				trigger:{player:'useCardAfter'},
+				forced:true,
+				subSkill:{
+					basic:{},
+					trick:{}
+				},
+				usable:1,
+				filter:function(event,player){
+					if(!event.targets) return false;
+					if(event.targets.length>1) return false;
+					if(event.targets[0]==player) return false;
+					return get.type2(event.card)=='trick';
+				},
+				content:function(){
+					var list=get.inpile2('trick');
+					while(list.length){
+						var name=list.randomRemove();
+						if(!lib.card[name].multitarget&&
+							player.canUse(name,trigger.targets[0])&&
+							get.effect(trigger.targets[0],{name:name},player,player)>0){
+							player.useCard(game.createCard(name),trigger.targets[0],false);
+							break;
+						}
+					}
+				}
+			},
+			hshuanling_old2:{
+				trigger:{player:'useCard'},
+				filter:function(event,player){
+					// if(get.is.converted(event)) return false;
+					if(!player.countCards('he')) return false;
+					// if(!event.targets||!event.targets.contains(player)) return false;
+					var info=get.info(event.card);
+					if(info.type!='trick'&&info.type!='basic') return false;
+					if(info.multitarget) return false;
+					if(event.targets.length>1) return true;
+					return game.hasPlayer(function(current){
+						return !event.targets.contains(current)&&lib.filter.targetEnabled2(event.card,event.player,current);
+					});
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					var bool1=(trigger.targets.length>1);
+					var bool2=game.hasPlayer(function(current){
+						return !trigger.targets.contains(current)&&lib.filter.targetEnabled2(trigger.card,trigger.player,current);
+					});
+					if(bool1&&bool2){
+						player.chooseControlList(true,get.prompt('hshuanling'),[
+							'弃置任意张牌 ，并为'+get.translation(trigger.card)+'增加等量的目标',
+							'弃置任意张牌 ，并为'+get.translation(trigger.card)+'减少等量的目标'],function(event,player){
+							if(_status.event.add) return 0;
+							return 1;
+						}).set('add',get.effect(player,trigger.card,trigger.player,player)>=0);
+					}
+					else if(bool2){
+						event.type='add';
+						event.goto(2);
+						event.unchosen=true;
+					}
+					else{
+						event.type='remove';
+						event.goto(2);
+						event.unchosen=true;
+					}
+					'step 1'
+					if(result.control=='cancel2'){
+						event.finish();
+					}
+					else if(result.index==1){
+						event.type='remove';
+					}
+					else{
+						event.type='add';
+					}
+					'step 2'
+					if(event.type=='add'){
+						var num=game.countPlayer(function(current){
+							return !trigger.targets.contains(current)&&lib.filter.targetEnabled2(trigger.card,trigger.player,current);
+						});
+						var num2=game.countPlayer(function(current){
+							if(!trigger.targets.contains(current)&&lib.filter.targetEnabled2(trigger.card,trigger.player,current)){
+								return get.effect(current,trigger.card,player,player)>0;
+							}
+							return false;
+						});
+						if(num2>2) num2=2;
+						player.chooseCardTarget({
+							selectCard:[1,num],
+							selectTarget:function(){
+								return ui.selected.cards.length;
+							},
+							position:'he',
+							prompt:event.unchosen?get.prompt('hshuanling'):null,
+							prompt2:'弃置任意张牌，并为'+get.translation(trigger.card)+'增加等量的目标',
+							filterTarget:function(card,player,target){
+								return !trigger.targets.contains(target)&&lib.filter.targetEnabled2(trigger.card,trigger.player,target);
+							},
+							ai1:function(card){
+								if(ui.selected.cards.length>=num2) return 0;
+								return get.value(trigger.card)-get.value(card)-1;
+							},
+							ai2:function(target){
+								var trigger=_status.event.getTrigger();
+								return get.effect(target,trigger.card,trigger.player,_status.event.player);
+							}
+						});
+					}
+					else{
+						var num=trigger.targets.length-1;
+						var num2=game.countPlayer(function(current){
+							if(trigger.targets.contains(current)){
+								return get.effect(current,trigger.card,player,player)<0;
+							}
+							return false;
+						});
+						if(num2>2) num2=2;
+						player.chooseCardTarget({
+							selectCard:[1,num],
+							selectTarget:function(){
+								return ui.selected.cards.length;
+							},
+							prompt:event.unchosen?get.prompt('hshuanling'):null,
+							prompt2:'弃置任意张牌，并为'+get.translation(trigger.card)+'减少等量的目标',
+							filterTarget:function(card,player,target){
+								return trigger.targets.contains(target);
+							},
+							ai1:function(card){
+								if(!player.needsToDiscard(ui.selected.cards.length)) return 0;
+								if(ui.selected.cards.length>=num2) return 0;
+								return Math.max(5,get.value(trigger.card))-get.value(card)-1;
+							},
+							ai2:function(target){
+								var trigger=_status.event.getTrigger();
+								return -get.effect(target,trigger.card,trigger.player,_status.event.player);
+							}
+						});
+					}
+					'step 3'
+					if(result.bool){
+						if(!event.isMine()) game.delayx();
+						event.targets=result.targets.slice(0);
+						event.cards=result.cards.slice(0);
+					}
+					else{
+						event.finish();
+					}
+					'step 4'
+					player.logSkill('hshuanling',event.targets);
+					player.discard(event.cards).delay=false;
+					if(event.type=='add'){
+						for(var i=0;i<event.targets.length;i++){
+							trigger.targets.push(event.targets[i]);
+						}
+					}
+					else{
+						for(var i=0;i<event.targets.length;i++){
+							trigger.targets.remove(event.targets[i]);
+						}
+					}
+				},
+				ai:{
+					expose:0.2
+				}
+			},
+			asyouzhang:{
+				trigger:{player:'phaseEnd'},
+				frequent:true,
+				filter:function(event,player){
+					if(player.countCards('h',{type:'basic'})==0) return true;
+					if(player.countCards('h',{type:['trick','delay']})==0) return true;
+					if(player.countCards('e')==0) return true;
+					return false;
+				},
+				content:function(){
+					'step 0'
+					if(player.countCards('h',{type:'basic'})==0){
+						var card=get.cardPile(function(card){
+							return get.type(card)=='basic';
+						});
+						if(card){
+							player.gain(card,'draw');
+						}
+						event.basiccard=card;
+					}
+					'step 1'
+					if(event.basiccard){
+						if(player.hasUseTarget(event.basiccard)){
+							var next=player.chooseToUse();
+							next.filterCard=function(card){
+								return card==event.basiccard;
+							};
+							next.prompt='是否使用'+get.translation(event.basiccard)+'？';
+						}
+					}
+					'step 2'
+					if(player.countCards('h',{type:['trick','delay']})==0){
+						var card=get.cardPile(function(card){
+							return get.type(card)=='trick'||get.type(card)=='delay';
+						});
+						if(card){
+							player.gain(card,'draw');
+						}
+						event.trickcard=card;
+					}
+					'step 3'
+					if(event.trickcard){
+						if(player.hasUseTarget(event.trickcard)){
+							var next=player.chooseToUse();
+							next.filterCard=function(card){
+								return card==event.trickcard;
+							};
+							next.prompt='是否使用'+get.translation(event.trickcard)+'？';
+						}
+					}
+					'step 4'
+					if(player.countCards('h',{type:'equip'})==0){
+						var card=get.cardPile(function(card){
+							return get.type(card)=='equip';
+						});
+						if(card){
+							player.gain(card,'draw');
+						}
+						event.equipcard=card;
+					}
+					'step 5'
+					if(event.equipcard){
+						if(player.hasUseTarget(event.equipcard)){
+							var next=player.chooseToUse();
+							next.filterCard=function(card){
+								return card==event.equipcard;
+							};
+							next.prompt='是否使用'+get.translation(event.equipcard)+'？';
+						}
+					}
+				}
+			},
+			ylyuchu:{
+				trigger:{player:'recoverAfter'},
+				forced:true,
+				filter:function(event,player){
+					if(player.hasSkill('subplayer')) return false;
+					return player.storage.ylyuchu.length<3;
+				},
+				init:function(player){
+					if(!player.storage.ylyuchu) player.storage.ylyuchu=[];
+				},
+				ai:{
+					threaten:0.7
+				},
+				// onremove:function(player){
+				// 	delete player.storage.ylyuchu;
+				// 	delete player.storage.ylyuchu2;
+				// 	delete player.storage.ylyuchu3;
+				// },
+				group:['ylyuchu_swap','ylyuchu_phase'],
+				subSkill:{
+					chosen:{},
+					swap:{
+						trigger:{player:'phaseEnd'},
+						silent:true,
+						filter:function(event,player){
+							return player.storage.ylyuchu.length;
+						},
+						content:function(){
+							var list=game.filterPlayer();
+							list.remove(player);
+							player.storage.ylyuchu2=list.randomGets(player.storage.ylyuchu.length);
+							player.storage.ylyuchu3=player.storage.ylyuchu.slice(0).randomSort();
+						}
+					},
+					phase:{
+						trigger:{global:'phaseBefore'},
+						forced:true,
+						popup:false,
+						filter:function(event,player){
+							if(player.hasSkill('subplayer')) return false;
+							if(player.storage.ylyuchu2&&player.storage.ylyuchu3){
+								var idx=player.storage.ylyuchu2.indexOf(event.player);
+								var target=player.storage.ylyuchu3[idx];
+								if(target&&player.storage.ylyuchu.contains(target)){
+									return true;
+								}
+							}
+							return false;
+						},
+						content:function(){
+							if(player.storage.ylyuchu2&&player.storage.ylyuchu3){
+								var idx=player.storage.ylyuchu2.indexOf(trigger.player);
+								var target=player.storage.ylyuchu3[idx];
+								if(target&&player.storage.ylyuchu.contains(target)){
+									player.callSubPlayer(target);
+									player.storage.ylyuchu2[idx]=null;
+								}
+							}
+						}
+					},
+					exit:{
+						trigger:{player:['phaseAfter']},
+						forced:true,
+						popup:false,
+						priority:-60,
+						content:function(){
+							player.exitSubPlayer();
+						}
+					},
+					draw:{
+						trigger:{player:'phaseDrawBegin'},
+						silent:true,
+						filter:function(event){
+							return event.num>0;
+						},
+						content:function(){
+							trigger.num--;
+						}
+					},
+					enter:{
+						trigger:{global:'phaseAfter'},
+						forced:true,
+						popup:false,
+						priority:-60,
+						filter:function(event,player){
+							return event.player!=player;
+						},
+						content:function(){
+							player.insertPhase(null,true);
+						}
+					}
+				},
+				content:function(){
+					'step 0'
+					event.num=trigger.num;
+					'step 1'
+					if(event.num&&player.storage.ylyuchu.length<3){
+						var skill=player.addSubPlayer({
+							name:'hs_yelinchulong',
+							skills:['ylyuchu_draw','ylyuchu_exit','ylyuchu_enter'],
+							hp:2,
+							maxHp:2,
+							hs:get.cards(2),
+							skill:skill,
+							// intro:'下个敌方回合开始前，随机切换至此随从',
+							intro2:'当前回合结束后进行一个额外回合并切换回本体',
+							onremove:function(player){
+								player.storage.ylyuchu.remove(skill);
+								delete lib.skill[skill];
+							}
+						});
+						player.storage.ylyuchu.push(skill);
+						event.num--;
+						event.redo();
+					}
+				}
+			},
 			nsaiqi:{
 				trigger:{player:'useCard'},
 				forced:true,
@@ -557,27 +1035,41 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					'step 2'
-					var es=player.getCards('e');
-					var num=0;
-					for(var i=0;i<es.length;i++){
-						if(es[i].name.indexOf('hstianqi_')==0){
-							num++;
-						}
+					if(!event.isMine()){
+						game.delay(0.5);
 					}
-					if(num==4){
-						if(game.showIdentity){
-							game.showIdentity();
-						}
-						if(player.isUnderControl(true)||player.getFriends().contains(game.me)){
-							game.over(true);
-						}
-						else{
-							game.over(false);
-						}
-					}
-					else{
-						if(!event.isMine()){
-							game.delay(0.5);
+				},
+				group:'hstianqi_win',
+				subSkill:{
+					win:{
+						trigger:{player:'phaseBegin'},
+						priority:30,
+						forced:true,
+						skillAnimation:true,
+						animationColor:'legend',
+						filter:function(event,player){
+							var es=player.getCards('e');
+							var num=0;
+							for(var i=0;i<es.length;i++){
+								if(es[i].name.indexOf('hstianqi_')==0){
+									num++;
+								}
+							}
+							return num==4;
+						},
+						content:function(){
+							'step 0'
+							game.delay();
+							'step 1'
+							if(game.showIdentity){
+								game.showIdentity();
+							}
+							if(player.isUnderControl(true)||player.getFriends().contains(game.me)){
+								game.over(true);
+							}
+							else{
+								game.over(false);
+							}
 						}
 					}
 				},
@@ -6875,6 +7367,57 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('zuling');
 				}
 			},
+			huanfeng:{
+				skillAnimation:'epic',
+				animationColor:'thunder',
+				trigger:{player:'phaseBegin'},
+				forced:true,
+				unique:true,
+				filter:function(event,player){
+					// if(player.storage.huanfeng_awake) return false;
+					var skills=['tuteng1','tuteng2','tuteng3','tuteng4'];
+					for(var i=0;i<skills.length;i++){
+						if(!player.hasSkill(skills[i])){
+							return false;
+						}
+					}
+					return true;
+				},
+				content:function(){
+					// player.storage.huanfeng_awake=true;
+					player.removeSkill('tuteng1');
+					player.removeSkill('tuteng2');
+					player.removeSkill('tuteng3');
+					player.removeSkill('tuteng4');
+					// player.awakenSkill('huanfeng');
+					player.storage.huanfeng_end=player.addSubPlayer({
+						name:'hs_alakir',
+						hp:3,
+						maxHp:3,
+						skills:lib.character.hs_alakir[3],
+						hs:get.cards(4)
+					});
+					player.callSubPlayer(player.storage.huanfeng_end);
+					game.createTrigger('phaseBegin','shengdun',player,trigger);
+				},
+				// group:'huanfeng_end',
+				subSkill:{
+					end:{
+						temp:true,
+						vanish:true,
+						trigger:{player:'phaseEnd'},
+						silent:true,
+						filter:function(event,player){
+							return player.storage.huanfeng_end;
+						},
+						content:function(){
+							
+							player.insertPhase();
+							delete player.storage.huanfeng_end;
+						}
+					}
+				}
+			},
 			tuteng_h:{
 				mod:{
 					maxHandcard:function(player,num){
@@ -7998,6 +8541,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hs_kchromaggus:'克洛玛古斯',
 			hs_kaituozhe:'开拓者',
 
+			hs_yelinlonghou:'夜鳞龙后',
+			hs_yelinchulong:'雏龙',
 			hs_ronghejuren:'熔核巨人',
 			hs_shanlingjuren:'山岭巨人',
 			hs_mijiaojisi:'秘教祭司',
@@ -8033,7 +8578,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hs_baiguyoulong:'白骨幼龙',
 			hs_yangyanwageli:'阳焰瓦格里',
 			hs_aiqinvyao:'哀泣女妖',
+			hs_ashamoer:'阿莎摩尔',
+			hs_fengjianhuanfengzhe:'风剪唤风者',
+			hs_taisi:'苔丝',
 
+			// hsxiujian:'袖箭',
+			// hsxiujian_info:'锁定技，在你对一名敌方角色使用一张锦囊牌后，你视为对其使用一张杀',
+			// hsyingzong:'影踪',
+			// hsyingzong_info:'',
+			hsxingyi:'星移',
+			hsxingyi_info:'锁定技，每当一名敌方角色于回合内使用主动技能，你获得此技能直到下一回合结束',
+
+			hshuanling:'幻灵',
+			hshuanling_bg:'灵',
+			hshuanling_info:'结束阶段，你可以弃置至多X张牌（X为你装备区内的牌数且至少为1）并摸等量的牌，每弃置一张牌，你视为对一个敌机敌人使用一张本局敌方角色对友方角色使用过的单目标非转化普通锦囊牌',
+			// hshuanling_info:'锁定技，当你于回合内使用首张指定其他角色为惟一目标的锦囊牌后，你视为对其随机使用一张锦囊牌（此牌对你有正面效果）',
+			// hshuanling_info:'每当你使用一张基本牌或普通锦囊牌，你可以弃置任意张牌令其增加或减少等量的目标',
+			huanfeng:'唤风',
+			huanfeng_info:'锁定技，准备阶段，若你有4个图腾，你失去所有图腾，然后获得并召唤随从奥拉基尔',
+			asyouzhang:'幽瘴',
+			asyouzhang_info:'结束阶段，若你的手牌中没有基本牌/锦囊牌/装备牌，你可以获得牌堆顶的一张基本牌/锦囊牌/装备牌，并可以立即使用',
+			ylyuchu:'育雏',
+			ylyuchu_info:'锁定技，每当你回复一点体力，你获得一只雏龙随从（不超过3只）；结束阶段，你每有一只雏龙，便随机选择一名其他角色，在该角色的下个回合开始前你切换至该雏龙，然后在此回合结束后进行一个额外回合并切换回本体',
 			nsaiqi:'哀泣',
 			nsaiqi_info:'锁定技，每当你使用一张牌，你移除牌堆顶的3张牌；你的手牌上限始终+1',
 			nsbeiming:'悲鸣',
@@ -8051,7 +8617,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hsnitai:'拟态',
 			hsnitai_info:'锁定技，出牌阶段开始时，你获得一张随机炉石角色的技能牌',
 			hstianqi:'天启',
-			hstianqi_info:'出牌阶段限一次，你可以选择一项：弃置一张手牌并随机装备一件天启骑士（不能替换现有装备），或弃置一张装备区内的牌并摸两张牌；若你此时装备区内集齐了4件天启骑士，你获得游戏胜利',
+			hstianqi_info:'出牌阶段限一次，你可以选择一项：弃置一张手牌并随机装备一件天启骑士（不能替换现有装备），或弃置一张装备区内的牌并摸两张牌；准备阶段，若你装备区内集齐了4件天启骑士，你获得游戏胜利',
 			hspuzhao:'普照',
 			hspuzhao_info:'出牌阶段限一次，你可以弃置一张红桃牌，然后令至多三名随机友方角色各摸一张牌（若你无其他队友，改为摸两张牌）',
 			hsyanxin:'炎心',

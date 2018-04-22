@@ -4423,6 +4423,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					trigger.num++;
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(card.name=='sha'){
+								return [1,-2];
+							}
+						}
+					}
 				}
 			},
 			baihupifeng:{

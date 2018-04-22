@@ -3390,9 +3390,13 @@
 							var node=this;
 							if(node._clearing){
 								var noname_inited=localStorage.getItem('noname_inited');
+								var onlineKey=localStorage.getItem(lib.configprefix+'key');
 								localStorage.clear();
 								if(noname_inited){
 									localStorage.setItem('noname_inited',noname_inited);
+								}
+								if(onlineKey){
+									localStorage.setItem(lib.configprefix+'key',onlineKey);
 								}
 								game.deleteDB('config');
 								game.deleteDB('data');
@@ -6182,9 +6186,13 @@
 							if(e.shiftKey){
 								if(confirm('是否重置游戏？')){
 									var noname_inited=localStorage.getItem('noname_inited');
+									var onlineKey=localStorage.getItem(lib.configprefix+'key');
 									localStorage.clear();
 									if(noname_inited){
 										localStorage.setItem('noname_inited',noname_inited);
+									}
+									if(onlineKey){
+										localStorage.setItem(lib.configprefix+'key',onlineKey);
 									}
 									if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
 									game.reload();
@@ -6237,9 +6245,13 @@
 							if(e.shiftKey){
 								if(confirm('是否重置游戏？')){
 									var noname_inited=localStorage.getItem('noname_inited');
+									var onlineKey=localStorage.getItem(lib.configprefix+'key');
 									localStorage.clear();
 									if(noname_inited){
 										localStorage.setItem('noname_inited',noname_inited);
+									}
+									if(onlineKey){
+										localStorage.setItem(lib.configprefix+'key',onlineKey);
 									}
 									if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
 									game.reload();
@@ -6287,6 +6299,12 @@
 				if(window.noname_update){
 					lib.version=window.noname_update.version;
 					lib.changeLog=window.noname_update.changeLog;
+					if(window.noname_update.players){
+						lib.changeLog.push('players://'+JSON.stringify(window.noname_update.players));
+					}
+					if(window.noname_update.cards){
+						lib.changeLog.push('cards://'+JSON.stringify(window.noname_update.cards));
+					}
 					delete window.noname_update;
 				}
 				var noname_inited=localStorage.getItem('noname_inited');
@@ -6333,12 +6351,12 @@
 								else if(lib.config.confirm_exit){
 									navigator.notification.confirm(
 										'是否退出游戏？',
-										 function(index){
-											 switch(index){
-												 case 2:game.saveConfig('null');game.reload();break;
-												 case 3:navigator.app.exitApp();break;
-											 }
-										 },
+										function(index){
+											switch(index){
+												case 2:game.saveConfig('null');game.reload();break;
+												case 3:navigator.app.exitApp();break;
+											}
+										},
 										'确认退出',
 										['取消','重新开始','退出']
 									);
@@ -7129,9 +7147,13 @@
 									 }
 									 else if(index==3){
 										var noname_inited=localStorage.getItem('noname_inited');
+										var onlineKey=localStorage.getItem(lib.configprefix+'key');
 										localStorage.clear();
 										if(noname_inited){
-											localStorage.setItem('noname_inited',true);
+											localStorage.setItem('noname_inited',noname_inited);
+										}
+										if(onlineKey){
+											localStorage.setItem(lib.configprefix+'key',onlineKey);
 										}
 										if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
 										setTimeout(function(){
@@ -22373,6 +22395,7 @@
 							ui.connectClients=ui.create.div('.forceopaque.menubutton.large.connectevents.pointerdiv.left','在线',ui.window,ui.click.connectClients);
 							ui.connectClientsCount=ui.create.div('.forceopaque.menubutton.icon.connectevents.highlight.left','1',ui.window);
 							if(events.length){
+								console.log(events)
 								ui.connectEventsCount.innerHTML=events.length;
 								ui.connectEventsCount.show();
 							}
@@ -31284,9 +31307,13 @@
 												alert('导入成功');
 												if(!lib.db){
 													var noname_inited=localStorage.getItem('noname_inited');
+													var onlineKey=localStorage.getItem(lib.configprefix+'key');
 													localStorage.clear();
 													if(noname_inited){
 														localStorage.setItem('noname_inited',noname_inited);
+													}
+													if(onlineKey){
+														localStorage.setItem(lib.configprefix+'key',onlineKey);
 													}
 													for(var i in data){
 														localStorage.setItem(i,data[i]);
@@ -42893,6 +42920,9 @@
 	};
 	var get={
 		is:{
+			converted:function(event){
+				return !(event.cards&&event.card&&event.cards.length==1&&event.cards[0]==event.card);
+			},
 			safari:function(){
 				var ua=navigator.userAgent.toLowerCase();
 				return ua.indexOf('safari'!=-1)&&ua.indexOf('chrome')==-1;
@@ -43448,6 +43478,9 @@
 				}
 			}
 			return list;
+		},
+		inpile2:function(type){
+			return get.inpile(type,'trick');
 		},
 		typeCard:function(type,filter){
 			var list=[];

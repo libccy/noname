@@ -819,13 +819,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'spell',
 				subtype:'spell_gold',
 				vanish:true,
-				enable:function(event,player){
-					if(player.maxHp==1) return false;
-					var list=player.getEnemies();
-					for(var i=0;i<list.length;i++){
-						if(list[i].getStockSkills().length) return true;
-					}
-				},
+				enable:true,
 				notarget:true,
 				contentBefore:function(){
 					player.$skill('冲刺','legend','metal');

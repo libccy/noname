@@ -1,6 +1,8 @@
 (function(){
 	var WebSocketServer=require('ws').Server;
 	var wss=new WebSocketServer({port:8080});
+	var bannedKeys=[];
+	var bannedIps=[];
 
 	var rooms=[{},{},{},{},{},{}];
 	var events=[];
@@ -71,6 +73,12 @@
 			}
 		},
 		events:function(cfg,id,type){
+			if(bannedKeys.indexOf(id)!=-1){
+				bannedIps.push(this._socket.remoteAddress);
+				console.log(id, this._socket.remoteAddress);
+				this.close();
+				return;
+			}
 			var changed=false;
 			var time=(new Date()).getTime();
 			if(cfg&&id){
@@ -253,6 +261,13 @@
 	};
 	wss.on('connection',function(ws){
 		ws.sendl=util.sendl;
+		if(bannedIps.indexOf(ws._socket.remoteAddress)!=-1){
+			ws.sendl('denied','banned');
+			setTimeout(function(){
+				ws.close();
+			},500);
+			return;
+		}
 		ws.wsid=util.getid();
 		clients[ws.wsid]=ws;
 		ws.sendl('roomlist',util.getroomlist(),util.checkevents(),util.getclientlist(ws),ws.wsid);

@@ -1972,6 +1972,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(event.type=='add'){
 						player.chooseTarget(event.unchosen?get.prompt('sheyan'):null,'为'+get.translation(trigger.card)+'增加一个目标',function(card,player,target){
+							var trigger=_status.event.getTrigger();
 							return !trigger.targets.contains(target)&&lib.filter.targetEnabled2(trigger.card,trigger.player,target);
 						}).set('ai',function(target){
 							var trigger=_status.event.getTrigger();

@@ -1530,6 +1530,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			qiankunbiao_info:'随机弃置一名其他角色和其相邻角色的一张牌',
 
 			bingpotong:'天女散花',
+			bingpotong_ab:'散花',
 			bingpotong_info:'出牌阶段对至多3名角色使用，你与每个目标依次同时展示一张手牌，若颜色相同，你弃置展示的手牌，目标失去一点体力并终止结算',
 			feibiao:'飞镖',
 			feibiao_info:'出牌阶段，对一名距离1以外的角色使用，令其弃置一张黑色手牌或流失一点体力',

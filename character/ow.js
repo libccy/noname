@@ -2913,7 +2913,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(num>1) return att/3;
 								return att/4;
 							}
-							return att;
+							return att*1.1;
 						}
 						return att;
 					});

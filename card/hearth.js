@@ -411,9 +411,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else{
-						if(cards[0]){
-							cards[0].discard();
-						}
+						// if(cards[0]){
+						// 	cards[0].discard();
+						// }
 						event.finish();
 					}
 					'step 1'
@@ -424,6 +424,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						else{
 							target.addTempSkill('chuansongmen2');
 						}
+						cards[0].fix();
 						target.gain(cards,'gain2');
 					}
 					else{

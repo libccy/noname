@@ -23,6 +23,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_quancong:['male','wu',4,['zhenshan']],
 			old_yuanshu:['male','qun',4,['yongsi','weidi']],
 			old_lingju:['female','qun',3,['jieyuan','fenxin_old']],
+			old_maliang:['male','shu',3,['xiemu','naman']],
+			old_chenqun:['male','wei',3,['dingpin','oldfaen']],
 		},
 		characterFilter:{
 			old_lingju:function(mode){
@@ -30,6 +32,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			oldfaen:{
+				audio:'faen',
+				trigger:{global:['turnOverAfter','linkAfter']},
+				filter:function(event,player){
+					if(event.name=='link') return event.player.isLinked();
+					return true;
+				},
+				check:function(event,player){
+					return get.attitude(player,event.player)>0;
+				},
+				logTarget:'player',
+				content:function(){
+					trigger.player.draw();
+				},
+				ai:{
+					expose:0.2
+				}
+			},
 			zhenshan:{
 				trigger:{player:'chooseToRespondBegin'},
 				filter:function(event,player){
@@ -370,7 +390,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_caozhen:'旧曹真',
 			old_quancong:'旧全琮',
 			old_lingju:'旧灵雎',
+			old_maliang:'旧马良',
+			old_chenqun:'旧陈群',
 
+			oldfaen:'法恩',
+			oldfaen_info:'当一名角色翻面或横置后，你可以令其摸一张牌。',
 			zhenshan:'振赡',
 			zhenshan_use:'振赡',
 			zhenshan_use_backup:'振赡',

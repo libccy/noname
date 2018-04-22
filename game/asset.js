@@ -1,70 +1,5 @@
-(function(){
-	if(typeof require !== 'function'||typeof document !== 'undefined') return;
-	global.window=global;
-	require(__dirname+'/update.js');
-	var fs=require('fs');
-	var path=require('path');
-	fs.readFile('game/asset.js','utf-8',function(err, current){
-		var assetlist='\t\''+window.noname_update.version+'\'';
-		var skinlist='\nwindow.noname_skin_list={\n';
-		var get = function(dir,callback){
-			fs.readdir(dir,function(err,list){
-				var shift=function(){
-					if(list.length){
-						var filename=list.shift();
-						var delay=false;
-						if(!/\.|~|_/.test(filename[0])){
-							var url=dir+'/'+filename;
-							var stat=fs.statSync(url);
-							if(stat.isFile()){
-								if(['.jpg','.png','.mp3','.ttf'].indexOf(path.extname(url))!=-1){
-									assetlist+=',\n\t\''+path.relative(path.dirname(__dirname),url)+'\'';
-								}
-							}
-							else if(stat.isDirectory()){
-								if(dir==path.dirname(__dirname)+'/image/skin'){
-									fs.readdir(url,function(err,list){
-										var num=0;
-										for(var i=0;i<list.length;i++){
-											var url2=url+'/'+list[i];
-											var stat=fs.statSync(url2);
-											if(stat.isFile()&&path.extname(url2)=='.jpg'){
-												num++;
-											}
-										}
-										skinlist+='\t'+filename+':'+num+',\n';
-										shift();
-									});
-									delay=true;
-								}
-								else{
-									get(url,shift);
-									delay=true;
-								}
-							}
-						}
-						if(!delay){
-							shift();
-						}
-					}
-					else{
-						callback();
-					}
-				}
-				shift();
-			});
-		};
-		get(path.dirname(__dirname),function(){
-			current=current.slice(0,current.lastIndexOf('window.noname_asset_list=[')+26);
-			fs.writeFile('game/asset.js',current+'\n'+assetlist+'\n];'+skinlist.slice(0,skinlist.length-2)+'\n};','utf-8',function(){
-				console.log('done');
-			});
-		});
-	});
-})();
-
 window.noname_asset_list=[
-	'1.9.47',
+	'1.9.49.1',
 	'audio/background/music_danji.mp3',
 	'audio/background/music_default.mp3',
 	'audio/background/music_diaochan.mp3',
@@ -1726,18 +1661,21 @@ window.noname_asset_list=[
 	'image/character/hs_anduin.jpg',
 	'image/character/hs_anomalus.jpg',
 	'image/character/hs_antonidas.jpg',
+	'image/character/hs_ashamoer.jpg',
 	'image/character/hs_aya.jpg',
 	'image/character/hs_baiguyoulong.jpg',
 	'image/character/hs_bannabusi.jpg',
 	'image/character/hs_barnes.jpg',
 	'image/character/hs_bchillmaw.jpg',
 	'image/character/hs_bilanyoulong.jpg',
+	'image/character/hs_bingshuangnvwang.jpg',
 	'image/character/hs_blingtron.jpg',
 	'image/character/hs_bolvar.jpg',
 	'image/character/hs_brann.jpg',
 	'image/character/hs_enzoth.jpg',
 	'image/character/hs_fachaotuteng.jpg',
 	'image/character/hs_fandral.jpg',
+	'image/character/hs_fengjianhuanfengzhe.jpg',
 	'image/character/hs_fenjie.jpg',
 	'image/character/hs_finley.jpg',
 	'image/character/hs_fuding.jpg',
@@ -1799,6 +1737,7 @@ window.noname_asset_list=[
 	'image/character/hs_shuiwenxuejia.jpg',
 	'image/character/hs_siwangzhiyi.jpg',
 	'image/character/hs_sthrall.jpg',
+	'image/character/hs_taisi.jpg',
 	'image/character/hs_tanghangu.jpg',
 	'image/character/hs_tgolem.jpg',
 	'image/character/hs_totemic.jpg',
@@ -1818,6 +1757,8 @@ window.noname_asset_list=[
 	'image/character/hs_xuefashi.jpg',
 	'image/character/hs_yangyanwageli.jpg',
 	'image/character/hs_yashaji.jpg',
+	'image/character/hs_yelinchulong.jpg',
+	'image/character/hs_yelinlonghou.jpg',
 	'image/character/hs_yelise.jpg',
 	'image/character/hs_yinggencao.jpg',
 	'image/character/hs_yngvar.jpg',
@@ -1924,10 +1865,12 @@ window.noname_asset_list=[
 	'image/character/ns_zuoci.jpg',
 	'image/character/old_caoxiu.jpg',
 	'image/character/old_caozhen.jpg',
+	'image/character/old_chenqun.jpg',
 	'image/character/old_huaxiong.jpg',
 	'image/character/old_lingju.jpg',
 	'image/character/old_lingtong.jpg',
 	'image/character/old_madai.jpg',
+	'image/character/old_maliang.jpg',
 	'image/character/old_quancong.jpg',
 	'image/character/old_wangyi.jpg',
 	'image/character/old_xusheng.jpg',
@@ -2145,6 +2088,7 @@ window.noname_asset_list=[
 	'image/character/swd_youzhao.jpg',
 	'image/character/swd_yuchiyanhong.jpg',
 	'image/character/swd_yuli.jpg',
+	'image/character/swd_yunhu.jpg',
 	'image/character/swd_yuwentuo.jpg',
 	'image/character/swd_yuxiaoxue.jpg',
 	'image/character/swd_zhanggao.jpg',

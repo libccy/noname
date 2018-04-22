@@ -29,6 +29,7 @@ window.noname_source_list=[
 	'game/asset.js',
 	'game/codemirror.js',
 	'game/config.js',
+	'game/directory.js',
 	'game/game.js',
 	'game/http.js',
 	'game/jszip.js',
