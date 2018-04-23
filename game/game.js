@@ -7057,7 +7057,7 @@
 					}
 				};
 
-				if(window.indexedDB){
+				if(window.indexedDB||localStorage.getItem(lib.configprefix+'nodb')){
 					var request = window.indexedDB.open(lib.configprefix+'data',4);
 					request.onupgradeneeded=function(e){
 						var db=e.target.result;
@@ -22314,7 +22314,7 @@
 				selfclose:function(){
 					if(game.online||game.onlineroom){
 						if((game.servermode||game.onlinehall)&&_status.over){
-
+							// later
 						}
 						else{
 							game.saveConfig('tmp_user_roomId');

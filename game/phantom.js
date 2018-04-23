@@ -2,7 +2,7 @@ var fs = require('fs');
 var webpage = require('webpage')
 var load = function(id){
 	var page = webpage.create();
-	page.settings.userAgent = 'SpecialAgent';
+	page.settings.userAgent = 'NonameServer';
 	page.open('file://'+fs.workingDirectory+'/index.html?server='+id, function(status) {
 		if(status !== 'success') {
 			console.log(fs.workingDirectory);
