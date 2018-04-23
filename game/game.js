@@ -5803,7 +5803,7 @@
 				var index=window.location.href.indexOf('index.html?server=');
 				if(index!=-1){
 					window.isNonameServer=window.location.href.slice(index+18);
-					window.indexedDB=null;
+					window.nodb=true;
 				}
 				else{
 					index=localStorage.getItem(lib.configprefix+'asserver');
@@ -6319,375 +6319,12 @@
 					lib.assetURL=noname_inited;
 				}
 
-				ui.css={menu:lib.init.css(lib.assetURL+'layout/default','menu',function(){
-					ui.css.default=lib.init.css(lib.assetURL+'layout/default','layout');
-				})};
-
-				if(lib.device){
-					lib.init.cordovaReady=function(){
-						if(lib.device=='android'){
-							document.addEventListener("pause", function(){
-								if(!_status.paused2&&!_status.event.isMine()){
-									ui.click.pause();
-								}
-								if(ui.backgroundMusic){
-									ui.backgroundMusic.pause();
-								}
-							});
-							document.addEventListener("resume", function(){
-								if(ui.backgroundMusic){
-									ui.backgroundMusic.play();
-								}
-							});
-							document.addEventListener("backbutton", function(){
-								if(ui.arena&&ui.arena.classList.contains('menupaused')){
-									if(window.saveNonameInput){
-										window.saveNonameInput();
-									}
-									else{
-										ui.click.configMenu();
-									}
-								}
-								else if(lib.config.confirm_exit){
-									navigator.notification.confirm(
-										'是否退出游戏？',
-										function(index){
-											switch(index){
-												case 2:game.saveConfig('null');game.reload();break;
-												case 3:navigator.app.exitApp();break;
-											}
-										},
-										'确认退出',
-										['取消','重新开始','退出']
-									);
-								}
-								else{
-									navigator.app.exitApp();
-								}
-							});
-						}
-						game.download=function(url,folder,onsuccess,onerror,dev,onprogress){
-							if(url.indexOf('http')!=0){
-								url=get.url(dev)+url;
-							}
-							var fileTransfer = new FileTransfer();
-							folder=lib.assetURL+folder;
-							if(onprogress){
-								fileTransfer.onprogress=function(progressEvent){
-									onprogress(progressEvent.loaded,progressEvent.total);
-								};
-							}
-							lib.config.brokenFile.add(folder);
-							game.saveConfigValue('brokenFile');
-							fileTransfer.download(encodeURI(url),encodeURI(folder),function(){
-								lib.config.brokenFile.remove(folder);
-								game.saveConfigValue('brokenFile');
-								if(onsuccess){
-									onsuccess();
-								}
-							},onerror);
-						};
-						game.readFile=function(filename,callback,onerror){
-							window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
-								entry.getFile(filename,{},function(fileEntry){
-									fileEntry.file(function(fileToLoad){
-										var fileReader = new FileReader();
-										fileReader.onload = function(e){
-											callback(e.target.result);
-										};
-										fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
-									},onerror);
-								},onerror);
-							},onerror);
-						};
-						game.writeFile=function(data,path,name,callback){
-							if(Object.prototype.toString.call(data)=='[object File]'){
-								var fileReader = new FileReader();
-								fileReader.onload = function(e){
-									game.writeFile(e.target.result,path,name,callback);
-								};
-								fileReader.readAsArrayBuffer(data, "UTF-8");
-							}
-							else{
-								window.resolveLocalFileSystemURL(lib.assetURL+path,function(entry){
-									entry.getFile(name,{create:true},function(fileEntry){
-										fileEntry.createWriter(function(fileWriter){
-											fileWriter.onwriteend=callback;
-											fileWriter.write(data);
-										});
-									});
-								});
-							}
-						};
-						game.removeFile=function(dir,callback){
-							window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
-								entry.getFile(dir,{},function(fileEntry){
-									fileEntry.remove();
-									if(callback){
-										callback();
-									}
-								});
-							});
-						};
-						game.getFileList=function(dir,callback){
-							var files=[],folders=[];
-							window.resolveLocalFileSystemURL(lib.assetURL+dir,function(entry){
-								var dirReader=entry.createReader();
-								var entries=[];
-								var readEntries=function(){
-									dirReader.readEntries(function(results){
-										if(!results.length){
-											entries.sort();
-											for(var i=0;i<entries.length;i++){
-												if(entries[i].isDirectory){
-													folders.push(entries[i].name);
-												}
-												else{
-													files.push(entries[i].name);
-												}
-											}
-											callback(folders,files);
-										}
-										else{
-											entries=entries.concat(Array.from(results));
-											readEntries();
-										}
-									});
-								};
-								readEntries();
-							});
-						};
-						game.ensureDirectory=function(list,callback,file){
-							var directorylist;
-							var num=0;
-							if(file){
-								num=1;
-							}
-							if(typeof list=='string'){
-								directorylist=[list];
-							}
-							else{
-								var directorylist=list.slice(0);
-							}
-							window.resolveLocalFileSystemURL(lib.assetURL,function(rootEntry){
-								var access=function(entry,dir,callback){
-									if(dir.length<=num){
-										callback();
-									}
-									else{
-										var str=dir.shift();
-										entry.getDirectory(str,{create:false},function(entry){
-											access(entry,dir,callback);
-										},function(){
-											entry.getDirectory(str,{create:true},function(entry){
-												access(entry,dir,callback);
-											});
-										});
-									}
-								}
-								var createDirectory=function(){
-									if(directorylist.length){
-										access(rootEntry,directorylist.shift().split('/'),createDirectory);
-									}
-									else{
-										callback();
-									}
-								};
-								createDirectory();
-							});
-						}
-						if(ui.updateUpdate){
-							ui.updateUpdate();
-						}
-						var showbar=function(){
-							if(window.StatusBar){
-								if(lib.device=='android'){
-									if(lib.config.show_statusbar_android){
-										window.StatusBar.overlaysWebView(false);
-										window.StatusBar.backgroundColorByName('black');
-										window.StatusBar.show();
-									}
-								}
-								else if(lib.device=='ios'){
-									if(lib.config.show_statusbar_ios!='off'&&lib.config.show_statusbar_ios!='auto'){
-										if(lib.config.show_statusbar_ios=='default'){
-											window.StatusBar.overlaysWebView(false);
-										}
-										else{
-											window.StatusBar.overlaysWebView(true);
-										}
-										window.StatusBar.backgroundColorByName('black');
-										window.StatusBar.show();
-									}
-								}
-							}
-						}
-						if(lib.arenaReady){
-							lib.arenaReady.push(showbar);
-						}
-						else{
-							showbar();
-						}
-					}
-				}
-				else if(typeof window.require=='function'){
-					lib.node={
-						fs:require('fs'),
-						debug:function(){
-							require('electron').remote.getCurrentWindow().toggleDevTools();
-						}
-					};
-					game.download=function(url,folder,onsuccess,onerror,dev,onprogress){
-						if(url.indexOf('http')!=0){
-							url=get.url(dev)+url;
-						}
-						game.ensureDirectory(folder,function(){
-							try{
-								var file = lib.node.fs.createWriteStream(__dirname+'/'+folder);
-							}
-							catch(e){
-								onerror();
-							}
-							lib.config.brokenFile.add(folder);
-							game.saveConfigValue('brokenFile');
-							if(!lib.node.http) lib.node.http=require('http');
-							if(!lib.node.https) lib.node.https=require('https');
-							var opts = require('url').parse(encodeURI(url));
-							opts.headers={'User-Agent': navigator.userAgent};
-							var request = (url.indexOf('https')==0?lib.node.https:lib.node.http).get(opts, function(response) {
-								var stream=response.pipe(file);
-								stream.on('finish',function(){
-									lib.config.brokenFile.remove(folder);
-									game.saveConfigValue('brokenFile');
-									if(onsuccess){
-										onsuccess();
-									}
-								});
-								stream.on('error',onerror);
-								if(onprogress){
-									var streamInterval=setInterval(function(){
-										if(stream.closed){
-											clearInterval(streamInterval);
-										}
-										else{
-											onprogress(stream.bytesWritten);
-										}
-									},200);
-								}
-							});
-						},true);
-					};
-					game.readFile=function(filename,callback,onerror){
-						lib.node.fs.readFile(__dirname+'/'+filename,function(err,data){
-							if(err){
-								onerror(err);
-							}
-							else{
-								callback(data);
-							}
-						});
-					};
-					game.writeFile=function(data,path,name,callback){
-						if(Object.prototype.toString.call(data)=='[object File]'){
-							var fileReader = new FileReader();
-							fileReader.onload = function(e){
-								game.writeFile(e.target.result,path,name,callback);
-							};
-							fileReader.readAsArrayBuffer(data, "UTF-8");
-						}
-						else{
-							get.zip(function(zip){
-								zip.file('i',data);
-								lib.node.fs.writeFile(__dirname+'/'+path+'/'+name,zip.files.i.asNodeBuffer(),null,callback);
-							});
-						}
-					};
-					game.removeFile=function(filename,callback){
-						lib.node.fs.unlink(__dirname+'/'+filename);
-					};
-					game.getFileList=function(dir,callback){
-						var files=[],folders=[];
-						dir=__dirname+'/'+dir;
-						lib.node.fs.readdir(dir,function(err,filelist){
-							for(var i=0;i<filelist.length;i++){
-								if(filelist[i][0]!='.'&&filelist[i][0]!='_'){
-									if(lib.node.fs.statSync(dir+'/'+filelist[i]).isDirectory()){
-										folders.push(filelist[i]);
-									}
-									else{
-										files.push(filelist[i]);
-									}
-								}
-							}
-							callback(folders,files);
-						});
-					};
-					game.ensureDirectory=function(list,callback,file){
-						var directorylist;
-						var num=0;
-						if(file){
-							num=1;
-						}
-						if(typeof list=='string'){
-							directorylist=[list];
-						}
-						else{
-							var directorylist=list.slice(0);
-						}
-						var access=function(str,dir,callback){
-							if(dir.length<=num){
-								callback();
-							}
-							else{
-								str+='/'+dir.shift();
-								lib.node.fs.access(__dirname+str,function(e){
-									if(e){
-										try{
-											lib.node.fs.mkdir(__dirname+str,function(){
-												access(str,dir,callback);
-											});
-										}
-										catch(e){
-											console.log(e);
-										}
-									}
-									else{
-										access(str,dir,callback);
-									}
-								});
-							}
-						}
-						var createDirectory=function(){
-							if(directorylist.length){
-								access('',directorylist.shift().split('/'),createDirectory);
-							}
-							else{
-								callback();
-							}
-						};
-						createDirectory();
-					};
-					if(ui.updateUpdate){
-						ui.updateUpdate();
-					}
-				}
-				else{
-					window.onbeforeunload=function(){
-						if(lib.config.confirm_exit&&!_status.reloading){
-							return '是否离开游戏？'
-						}
-						else{
-							return null;
-						}
-					}
-				}
-
-				lib.config=window.config;
-				lib.configOL={};
-				delete window.config;
-				var config2;
-
+				var config3=null;
 				var proceed=function(config2){
+					if(config3===null){
+						config3=config2;
+						return;
+					}
 					if(config2.mode) lib.config.mode=config2.mode;
 					if(lib.config.mode_config[lib.config.mode]==undefined) lib.config.mode_config[lib.config.mode]={};
 					for(var i in lib.config.mode_config.global){
@@ -7056,8 +6693,387 @@
 						document.addEventListener('touchmove',ui.click.windowtouchmove);
 					}
 				};
+				var proceed2=function(){
+					if(config3){
+						proceed(config3);
+					}
+					else{
+						config3=true;
+					}
+				};
 
-				if(window.indexedDB&&!localStorage.getItem(lib.configprefix+'nodb')){
+				ui.css={menu:lib.init.css(lib.assetURL+'layout/default','menu',function(){
+					ui.css.default=lib.init.css(lib.assetURL+'layout/default','layout');
+					proceed2();
+				})};
+
+				if(lib.device){
+					lib.init.cordovaReady=function(){
+						if(lib.device=='android'){
+							document.addEventListener("pause", function(){
+								if(!_status.paused2&&!_status.event.isMine()){
+									ui.click.pause();
+								}
+								if(ui.backgroundMusic){
+									ui.backgroundMusic.pause();
+								}
+							});
+							document.addEventListener("resume", function(){
+								if(ui.backgroundMusic){
+									ui.backgroundMusic.play();
+								}
+							});
+							document.addEventListener("backbutton", function(){
+								if(ui.arena&&ui.arena.classList.contains('menupaused')){
+									if(window.saveNonameInput){
+										window.saveNonameInput();
+									}
+									else{
+										ui.click.configMenu();
+									}
+								}
+								else if(lib.config.confirm_exit){
+									navigator.notification.confirm(
+										'是否退出游戏？',
+										function(index){
+											switch(index){
+												case 2:game.saveConfig('null');game.reload();break;
+												case 3:navigator.app.exitApp();break;
+											}
+										},
+										'确认退出',
+										['取消','重新开始','退出']
+									);
+								}
+								else{
+									navigator.app.exitApp();
+								}
+							});
+						}
+						game.download=function(url,folder,onsuccess,onerror,dev,onprogress){
+							if(url.indexOf('http')!=0){
+								url=get.url(dev)+url;
+							}
+							var fileTransfer = new FileTransfer();
+							folder=lib.assetURL+folder;
+							if(onprogress){
+								fileTransfer.onprogress=function(progressEvent){
+									onprogress(progressEvent.loaded,progressEvent.total);
+								};
+							}
+							lib.config.brokenFile.add(folder);
+							game.saveConfigValue('brokenFile');
+							fileTransfer.download(encodeURI(url),encodeURI(folder),function(){
+								lib.config.brokenFile.remove(folder);
+								game.saveConfigValue('brokenFile');
+								if(onsuccess){
+									onsuccess();
+								}
+							},onerror);
+						};
+						game.readFile=function(filename,callback,onerror){
+							window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
+								entry.getFile(filename,{},function(fileEntry){
+									fileEntry.file(function(fileToLoad){
+										var fileReader = new FileReader();
+										fileReader.onload = function(e){
+											callback(e.target.result);
+										};
+										fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
+									},onerror);
+								},onerror);
+							},onerror);
+						};
+						game.writeFile=function(data,path,name,callback){
+							if(Object.prototype.toString.call(data)=='[object File]'){
+								var fileReader = new FileReader();
+								fileReader.onload = function(e){
+									game.writeFile(e.target.result,path,name,callback);
+								};
+								fileReader.readAsArrayBuffer(data, "UTF-8");
+							}
+							else{
+								window.resolveLocalFileSystemURL(lib.assetURL+path,function(entry){
+									entry.getFile(name,{create:true},function(fileEntry){
+										fileEntry.createWriter(function(fileWriter){
+											fileWriter.onwriteend=callback;
+											fileWriter.write(data);
+										});
+									});
+								});
+							}
+						};
+						game.removeFile=function(dir,callback){
+							window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
+								entry.getFile(dir,{},function(fileEntry){
+									fileEntry.remove();
+									if(callback){
+										callback();
+									}
+								});
+							});
+						};
+						game.getFileList=function(dir,callback){
+							var files=[],folders=[];
+							window.resolveLocalFileSystemURL(lib.assetURL+dir,function(entry){
+								var dirReader=entry.createReader();
+								var entries=[];
+								var readEntries=function(){
+									dirReader.readEntries(function(results){
+										if(!results.length){
+											entries.sort();
+											for(var i=0;i<entries.length;i++){
+												if(entries[i].isDirectory){
+													folders.push(entries[i].name);
+												}
+												else{
+													files.push(entries[i].name);
+												}
+											}
+											callback(folders,files);
+										}
+										else{
+											entries=entries.concat(Array.from(results));
+											readEntries();
+										}
+									});
+								};
+								readEntries();
+							});
+						};
+						game.ensureDirectory=function(list,callback,file){
+							var directorylist;
+							var num=0;
+							if(file){
+								num=1;
+							}
+							if(typeof list=='string'){
+								directorylist=[list];
+							}
+							else{
+								var directorylist=list.slice(0);
+							}
+							window.resolveLocalFileSystemURL(lib.assetURL,function(rootEntry){
+								var access=function(entry,dir,callback){
+									if(dir.length<=num){
+										callback();
+									}
+									else{
+										var str=dir.shift();
+										entry.getDirectory(str,{create:false},function(entry){
+											access(entry,dir,callback);
+										},function(){
+											entry.getDirectory(str,{create:true},function(entry){
+												access(entry,dir,callback);
+											});
+										});
+									}
+								}
+								var createDirectory=function(){
+									if(directorylist.length){
+										access(rootEntry,directorylist.shift().split('/'),createDirectory);
+									}
+									else{
+										callback();
+									}
+								};
+								createDirectory();
+							});
+						}
+						if(ui.updateUpdate){
+							ui.updateUpdate();
+						}
+						var showbar=function(){
+							if(window.StatusBar){
+								if(lib.device=='android'){
+									if(lib.config.show_statusbar_android){
+										window.StatusBar.overlaysWebView(false);
+										window.StatusBar.backgroundColorByName('black');
+										window.StatusBar.show();
+									}
+								}
+								else if(lib.device=='ios'){
+									if(lib.config.show_statusbar_ios!='off'&&lib.config.show_statusbar_ios!='auto'){
+										if(lib.config.show_statusbar_ios=='default'){
+											window.StatusBar.overlaysWebView(false);
+										}
+										else{
+											window.StatusBar.overlaysWebView(true);
+										}
+										window.StatusBar.backgroundColorByName('black');
+										window.StatusBar.show();
+									}
+								}
+							}
+						}
+						if(lib.arenaReady){
+							lib.arenaReady.push(showbar);
+						}
+						else{
+							showbar();
+						}
+					}
+				}
+				else if(typeof window.require=='function'){
+					lib.node={
+						fs:require('fs'),
+						debug:function(){
+							require('electron').remote.getCurrentWindow().toggleDevTools();
+						}
+					};
+					game.download=function(url,folder,onsuccess,onerror,dev,onprogress){
+						if(url.indexOf('http')!=0){
+							url=get.url(dev)+url;
+						}
+						game.ensureDirectory(folder,function(){
+							try{
+								var file = lib.node.fs.createWriteStream(__dirname+'/'+folder);
+							}
+							catch(e){
+								onerror();
+							}
+							lib.config.brokenFile.add(folder);
+							game.saveConfigValue('brokenFile');
+							if(!lib.node.http) lib.node.http=require('http');
+							if(!lib.node.https) lib.node.https=require('https');
+							var opts = require('url').parse(encodeURI(url));
+							opts.headers={'User-Agent': navigator.userAgent};
+							var request = (url.indexOf('https')==0?lib.node.https:lib.node.http).get(opts, function(response) {
+								var stream=response.pipe(file);
+								stream.on('finish',function(){
+									lib.config.brokenFile.remove(folder);
+									game.saveConfigValue('brokenFile');
+									if(onsuccess){
+										onsuccess();
+									}
+								});
+								stream.on('error',onerror);
+								if(onprogress){
+									var streamInterval=setInterval(function(){
+										if(stream.closed){
+											clearInterval(streamInterval);
+										}
+										else{
+											onprogress(stream.bytesWritten);
+										}
+									},200);
+								}
+							});
+						},true);
+					};
+					game.readFile=function(filename,callback,onerror){
+						lib.node.fs.readFile(__dirname+'/'+filename,function(err,data){
+							if(err){
+								onerror(err);
+							}
+							else{
+								callback(data);
+							}
+						});
+					};
+					game.writeFile=function(data,path,name,callback){
+						if(Object.prototype.toString.call(data)=='[object File]'){
+							var fileReader = new FileReader();
+							fileReader.onload = function(e){
+								game.writeFile(e.target.result,path,name,callback);
+							};
+							fileReader.readAsArrayBuffer(data, "UTF-8");
+						}
+						else{
+							get.zip(function(zip){
+								zip.file('i',data);
+								lib.node.fs.writeFile(__dirname+'/'+path+'/'+name,zip.files.i.asNodeBuffer(),null,callback);
+							});
+						}
+					};
+					game.removeFile=function(filename,callback){
+						lib.node.fs.unlink(__dirname+'/'+filename);
+					};
+					game.getFileList=function(dir,callback){
+						var files=[],folders=[];
+						dir=__dirname+'/'+dir;
+						lib.node.fs.readdir(dir,function(err,filelist){
+							for(var i=0;i<filelist.length;i++){
+								if(filelist[i][0]!='.'&&filelist[i][0]!='_'){
+									if(lib.node.fs.statSync(dir+'/'+filelist[i]).isDirectory()){
+										folders.push(filelist[i]);
+									}
+									else{
+										files.push(filelist[i]);
+									}
+								}
+							}
+							callback(folders,files);
+						});
+					};
+					game.ensureDirectory=function(list,callback,file){
+						var directorylist;
+						var num=0;
+						if(file){
+							num=1;
+						}
+						if(typeof list=='string'){
+							directorylist=[list];
+						}
+						else{
+							var directorylist=list.slice(0);
+						}
+						var access=function(str,dir,callback){
+							if(dir.length<=num){
+								callback();
+							}
+							else{
+								str+='/'+dir.shift();
+								lib.node.fs.access(__dirname+str,function(e){
+									if(e){
+										try{
+											lib.node.fs.mkdir(__dirname+str,function(){
+												access(str,dir,callback);
+											});
+										}
+										catch(e){
+											console.log(e);
+										}
+									}
+									else{
+										access(str,dir,callback);
+									}
+								});
+							}
+						}
+						var createDirectory=function(){
+							if(directorylist.length){
+								access('',directorylist.shift().split('/'),createDirectory);
+							}
+							else{
+								callback();
+							}
+						};
+						createDirectory();
+					};
+					if(ui.updateUpdate){
+						ui.updateUpdate();
+					}
+				}
+				else{
+					window.onbeforeunload=function(){
+						if(lib.config.confirm_exit&&!_status.reloading){
+							return '是否离开游戏？'
+						}
+						else{
+							return null;
+						}
+					}
+				}
+
+				lib.config=window.config;
+				lib.configOL={};
+				delete window.config;
+				var config2;
+				if(localStorage.getItem(lib.configprefix+'nodb')){
+					window.nodb=true;
+				}
+				if(window.indexedDB&&!window.nodb){
 					var request = window.indexedDB.open(lib.configprefix+'data',4);
 					request.onupgradeneeded=function(e){
 						var db=e.target.result;
@@ -7140,12 +7156,12 @@
 						if(navigator.notification){
 							navigator.notification.confirm(
 								'游戏似乎未正常载入，是否重置游戏？',
-								 function(index){
-									 if(index==2){
-										 localStorage.removeItem('noname_inited');
-										 window.location.reload();
-									 }
-									 else if(index==3){
+								function(index){
+									if(index==2){
+										localStorage.removeItem('noname_inited');
+										window.location.reload();
+									}
+									else if(index==3){
 										var noname_inited=localStorage.getItem('noname_inited');
 										var onlineKey=localStorage.getItem(lib.configprefix+'key');
 										localStorage.clear();
@@ -7159,8 +7175,8 @@
 										setTimeout(function(){
 											window.location.reload();
 										},200);
-									 }
-								 },
+									}
+								},
 								'确认退出',
 								['取消','重新下载','重置设置']
 							);
@@ -29562,7 +29578,9 @@
 					config[key]=value;
 				}
 				localStorage.setItem(lib.configprefix+'config',JSON.stringify(config));
-				callback();
+				if(callback){
+					callback();
+				}
 			}
 			else{
 				if(value==undefined){
@@ -36568,7 +36586,7 @@
 						}
 					}());
 					(function(){
-						if(!window.indexedDB) return;
+						if(!window.indexedDB||window.nodb) return;
 						var page=ui.create.div('');
 						var node=ui.create.div('.menubutton.large','录像',start.firstChild,clickMode);
 						node.type='video';
