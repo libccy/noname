@@ -7057,7 +7057,7 @@
 					}
 				};
 
-				if(window.indexedDB||localStorage.getItem(lib.configprefix+'nodb')){
+				if(window.indexedDB&&!localStorage.getItem(lib.configprefix+'nodb')){
 					var request = window.indexedDB.open(lib.configprefix+'data',4);
 					request.onupgradeneeded=function(e){
 						var db=e.target.result;
