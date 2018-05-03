@@ -22411,7 +22411,6 @@
 							ui.connectClients=ui.create.div('.forceopaque.menubutton.large.connectevents.pointerdiv.left','在线',ui.window,ui.click.connectClients);
 							ui.connectClientsCount=ui.create.div('.forceopaque.menubutton.icon.connectevents.highlight.left','1',ui.window);
 							if(events.length){
-								console.log(events)
 								ui.connectEventsCount.innerHTML=events.length;
 								ui.connectEventsCount.show();
 							}

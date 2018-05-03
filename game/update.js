@@ -1,23 +1,14 @@
 window.noname_update={
-	version:'1.9.49.1',
-	update:'1.9.49',
+	version:'1.9.49.2',
+	update:'1.9.49.1',
 	changeLog:[
 		'bug修复'
 	],
 	files:[
-		'card/gujian.js',
-		'card/gwent.js',
-		'card/hearth.js',
-		'card/swd.js',
+		'character/gujian.js',
 		'character/gwent.js',
 		'character/hearth.js',
-		'character/old.js',
-		'character/ow.js',
-		'character/sp.js',
-		'game/asset.js',
-		'game/game.js',
-		'game/server.js',
-		'game/source.js',
-		'game/update.js'
+		'character/swd.js',
+		'game/game.js'
 	]
 };

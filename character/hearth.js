@@ -247,17 +247,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					if(event.num){
-						var enemies=player.getEnemies();
+						var targets=game.filterPlayer();
 						var list=player.storage.hshuanling.slice(0);
 						while(list.length){
 							var choice=list.randomRemove();
 							var card=game.createCard(choice);
-							var target=null;
-							for(var i=0;i<enemies.length;i++){
-								if(lib.filter.targetEnabled2(card,player,enemies[i])){
-									target=enemies[i];
+							var target;
+							while(targets.length){
+								target=targets.randomRemove();
+								if(lib.filter.targetEnabled2(card,player,target)&&
+									get.effect(target,card,player,player)>0){
 									break;
 								}
+								target = null;
 							}
 							if(target){
 								player.storage.hshuanling.remove(choice);
@@ -293,7 +295,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!event.player.isEnemiesOf(player)) return false;
 							if(get.type(event.card)!='trick') return false;
 							if(event.targets.length!=1) return false;
-							if(!event.targets[0].isFriendsOf(player)) return false;
+							// if(!event.targets[0].isFriendsOf(player)) return false;
 							if(get.info(event.card).multitarget) return false;
 							if(get.info(event.card).singleCard) return false;
 							if(!get.info(event.card).enable) return false;
@@ -8591,7 +8593,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			hshuanling:'幻灵',
 			hshuanling_bg:'灵',
-			hshuanling_info:'结束阶段，你可以弃置至多X张牌（X为你装备区内的牌数且至少为1）并摸等量的牌，每弃置一张牌，你视为对一个敌机敌人使用一张本局敌方角色对友方角色使用过的单目标非转化普通锦囊牌',
+			hshuanling_info:'结束阶段，你可以弃置至多X张牌（X为你装备区内的牌数且至少为1）并摸等量的牌，每弃置一张牌，你随机使用一张本局敌方角色使用过的单目标非转化普通锦囊牌，随机指定一个具有正收益的角色为目标',
 			// hshuanling_info:'锁定技，当你于回合内使用首张指定其他角色为惟一目标的锦囊牌后，你视为对其随机使用一张锦囊牌（此牌对你有正面效果）',
 			// hshuanling_info:'每当你使用一张基本牌或普通锦囊牌，你可以弃置任意张牌令其增加或减少等量的目标',
 			huanfeng:'唤风',

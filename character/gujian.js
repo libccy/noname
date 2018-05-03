@@ -403,6 +403,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				filterCard:function(card){
+					if(ui.selected.cards.length&&card.name==ui.selected.cards[0].name) return false;
 					var info=get.info(card);
 					return info.type=='equip'&&!info.nomod&&!info.unique&&lib.inpile.contains(card.name);
 				},

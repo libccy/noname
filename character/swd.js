@@ -229,10 +229,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				alter:true,
 				filter:function(event,player){
 					if(event.name=='equip'){
-						if(get.is.altered('cyqiaoxie')){
-							return event.swapped||player.countCards('h')<=player.hp;
-						}
-						return true;
+						return event.swapped||player.countCards('h')<=player.hp;
 					}
 					else if(!player.equiping){
 						for(var i=0;i<event.cards.length;i++){
@@ -244,7 +241,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					if(trigger.name=='equip'){
-						if(!get.is.altered('cyqiaoxie')||player.countCards('h')<=player.hp){
+						if(player.countCards('h')<=player.hp){
 							player.draw();
 						}
 						if(!trigger.swapped){
@@ -256,7 +253,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return player.hasUseTarget(name);
 					});
 					if(list.length){
-						player.chooseVCardButton(list.randomGets(3),get.prompt('cyqiaoxie'));
+						player.chooseVCardButton(list.randomGets(get.is.altered('cyqiaoxie')?2:3),get.prompt('cyqiaoxie'));
 					}
 					else{
 						event.finish();
@@ -9749,8 +9746,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			cyxianjiang:'仙匠',
 			cyxianjiang_info:'每当你使用一张牌指定惟一目标时，你可以复制对方装备区内的一张你没有的牌，并置入你的装备区，同一回合对一名角色最多发动一次',
 			cyqiaoxie:'巧械',
-			cyqiaoxie_info:'每当你装备一件装备，你可以摸一张牌；每当你失去一件装备牌，你可以随机观看3张机关牌，并使用其中一张',
-			cyqiaoxie_info_alter:'每当你装备一件装备，若你的手牌数不大于体力值，你可以摸一张牌；每当你失去一件装备牌，你可以随机观看3张机关牌，并使用其中一张',
+			cyqiaoxie_info:'每当你装备一件装备，若你的手牌数不大于体力值，你可以摸一张牌；每当你失去一件装备牌，你可以随机观看3张机关牌，并使用其中一张',
+			cyqiaoxie_info_alter:'每当你装备一件装备，若你的手牌数不大于体力值，你可以摸一张牌；每当你失去一件装备牌，你可以随机观看2张机关牌，并使用其中一张',
 			cyzhencha:'侦察',
 			cyzhencha_info:'出牌阶段限一次，若你的装备区内的可强化装备，你可以弃置一张基本牌并观看一名其他角色的手牌，若其中有与你弃置的牌颜色相同的牌，你随机升级装备区内的一件装备，否则你摸一张牌；你根据装备区内升级的装备数获得额外技能',
 			cylingjia:'灵甲',
