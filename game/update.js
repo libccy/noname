@@ -1,14 +1,10 @@
 window.noname_update={
-	version:'1.9.49.2',
-	update:'1.9.49.1',
+	version:'1.9.49.3',
+	update:'1.9.49.2',
 	changeLog:[
-		'bug修复'
+		'GitLab镜像（替换Coding）'
 	],
 	files:[
-		'character/gujian.js',
-		'character/gwent.js',
-		'character/hearth.js',
-		'character/swd.js',
 		'game/game.js'
 	]
 };

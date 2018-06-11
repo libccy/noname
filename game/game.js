@@ -35461,7 +35461,7 @@
 								return 'GitHub';
 							}
 							if(str==lib.mirrorURL){
-								return 'Coding';
+								return 'GitLab';
 							}
 							var index;
 							index=str.indexOf('://');
@@ -35949,7 +35949,7 @@
 						// li3.lastChild.appendChild(button4);
 
 						var button6=document.createElement('button');
-						button6.innerHTML='设为GitLab镜像';
+						button6.innerHTML='设为备用镜像';
 						// button6.style.display='none';// coding
 						// button6.style.marginLeft='5px';
 						button6.onclick=function(){
@@ -35961,7 +35961,7 @@
 						li3.lastChild.appendChild(button6);
 
 						button5=document.createElement('button');
-						button5.innerHTML='设为GitHub镜像';
+						button5.innerHTML='设为默认镜像';
 						// button5.style.marginLeft='5px';
 						button5.onclick=function(){
 							game.saveConfig('updateURL');
