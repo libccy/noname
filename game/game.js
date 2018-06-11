@@ -22,7 +22,7 @@
 		configprefix:'noname_0.9_',
 		versionOL:26,
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
-		mirrorURL:'https://coding.net/u/libccy/p/noname/git/raw',
+		mirrorURL:'https://gitlab.com/isgs/noname/raw/master',
 		hallURL:'noname.pub',
 		assetURL:'',
 		changeLog:[],
