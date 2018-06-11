@@ -22,7 +22,7 @@
 		configprefix:'noname_0.9_',
 		versionOL:26,
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
-		mirrorURL:'https://gitlab.com/isgs/noname/raw/master',
+		mirrorURL:'https://gitlab.com/isgs/noname/raw',
 		hallURL:'noname.pub',
 		assetURL:'',
 		changeLog:[],
@@ -35949,7 +35949,7 @@
 						// li3.lastChild.appendChild(button4);
 
 						var button6=document.createElement('button');
-						button6.innerHTML='设为国内镜像';
+						button6.innerHTML='设为GitLab镜像';
 						// button6.style.display='none';// coding
 						// button6.style.marginLeft='5px';
 						button6.onclick=function(){
@@ -35961,7 +35961,7 @@
 						li3.lastChild.appendChild(button6);
 
 						button5=document.createElement('button');
-						button5.innerHTML='设为默认镜像';
+						button5.innerHTML='设为GitHub镜像';
 						// button5.style.marginLeft='5px';
 						button5.onclick=function(){
 							game.saveConfig('updateURL');
