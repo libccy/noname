@@ -6937,7 +6937,7 @@
 							if(!lib.node.http) lib.node.http=require('http');
 							if(!lib.node.https) lib.node.https=require('https');
 							var opts = require('url').parse(encodeURI(url));
-							opts.headers={'User-Agent': navigator.userAgent};
+							opts.headers={'User-Agent': 'AppleWebkit'};
 							var request = (url.indexOf('https')==0?lib.node.https:lib.node.http).get(opts, function(response) {
 								var stream=response.pipe(file);
 								stream.on('finish',function(){
