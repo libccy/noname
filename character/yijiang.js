@@ -37,7 +37,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caifuren:['female','qun',3,['qieting','xianzhou']],
 			yj_jushou:['male','qun',3,['jianying','shibei']],
 			zhangsong:['male','shu',3,['qiangzhi','xiantu']],
-			zhuhuan:['male','wu',4,['youdi']],
+			zhuhuan:['male','wu',4,['fenli','pingkou']],
 			xiahoushi:['female','shu',3,['qiaoshi','yanyu']],
 
 			panzhangmazhong:['male','wu',4,['anjian','duodao']],
@@ -56,7 +56,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuchen:['male','shu',4,['zhanjue','qinwang'],['zhu']],
 			zhangyi:['male','shu',4,['wurong','shizhi']],
 			sunxiu:['male','wu',3,['yanzhu','xingxue','zhaofu'],['zhu']],
-			zhuzhi:['male','wu',4,['anguo']],
+			zhuzhi:['male','wu',4,['xinanguo']],
 			quancong:['male','wu',4,['yaoming']],
 			gongsunyuan:['male','qun',4,['huaiyi']],
 			guotufengji:['male','qun',3,['jigong','shifei']],
@@ -170,6 +170,170 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuchen:['liushan'],
 		},
 		skill:{
+			fenli:{
+				group:['fenli_draw','fenli_use','fenli_discard'],
+				subSkill:{
+					draw:{
+						trigger:{player:'phaseDrawBefore'},
+						prompt:'是否发动【奋励】跳过摸牌阶段？',
+						filter:function(event,player){
+							return player.isMaxHandcard();
+						},
+						check:function(event,player){
+							if(player.storage.pingkou) return false;
+							return game.hasPlayer(function(current){
+								return get.attitude(player,current)<0&&current.hp==1&&get.damageEffect(current,player,player)>0;
+							});
+						},
+						content:function(){
+							trigger.cancel();
+						}
+					},
+					use:{
+						trigger:{player:'phaseUseBefore'},
+						prompt:'是否发动【奋励】跳过出牌阶段？',
+						filter:function(event,player){
+							return player.isMaxHp();
+						},
+						check:function(event,player){
+							if(!player.needsToDiscard()||(player.countCards('e')&&player.isMaxEquip())) return true;
+							if(player.storage.pingkou) return false;
+							return game.hasPlayer(function(current){
+								return get.attitude(player,current)<0&&current.hp==1&&get.damageEffect(current,player,player)>0;
+							});
+						},
+						content:function(){
+							trigger.cancel();
+						}
+					},
+					discard:{
+						trigger:{player:'phaseDiscardBefore'},
+						prompt:'是否发动【奋励】跳过弃牌阶段？',
+						filter:function(event,player){
+							return player.isMaxEquip()&&player.countCards('e');
+						},
+						content:function(){
+							trigger.cancel();
+						}
+					}
+				},
+				ai:{
+					combo:'pingkou'
+				}
+			},
+			pingkou:{
+				group:['pingkou_init','pingkou_count'],
+				subSkill:{
+					init:{
+						trigger:{player:'phaseBegin'},
+						silent:true,
+						content:function(){
+							player.storage.pingkou=0;
+						}
+					},
+					count:{
+						trigger:{player:[
+							'phaseJudgeCancelled','phaseJudgeSkipped',
+							'phaseDrawCancelled','phaseDrawSkipped',
+							'phaseUseCancelled','phaseUseSkipped',
+							'phaseDiscardCancelled','phaseDiscardSkipped'
+						]},
+						silent:true,
+						content:function(){
+							player.storage.pingkou++;
+							console.log(event.triggername,trigger.name)
+						}
+					}
+				},
+				trigger:{player:'phaseEnd'},
+				direct:true,
+				filter:function(event,player){
+					return player.storage.pingkou>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget([1,player.storage.pingkou],get.prompt2('pingkou'),function(card,player,target){
+						return target!=player;
+					}).set('ai',function(target){
+						var player=_status.event.player;
+						return get.damageEffect(target,player,player);
+					});
+					'step 1'
+					if(result.bool){
+						player.logSkill('pingkou',result.targets);
+						event.targets=result.targets.slice(0).sortBySeat();
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if(event.targets&&event.targets.length){
+						event.targets.shift().damage();
+						event.redo();
+					}
+				},
+				ai:{
+					combo:'fenli',
+					effect:{
+						target:function(card){
+							if(card.name=='lebu'||card.name=='bingliang') return 0.5;
+						}
+					}
+				}
+			},
+			xinanguo:{
+				audio:'anguo',
+				enable:'phaseUse',
+				usable:1,
+				filterTarget:function(card,player,target){
+					if(player==target) return false;
+					if(player.isMinHandcard()||target.isMinHandcard()) return true;
+					if(player.isMinEquip()||target.isMinEquip()) return true;
+					if((player.isMinHp()&&player.isDamaged())||(target.isMinHp()&&target.isDamaged())) return true;
+					return false;
+				},
+				content:function(){
+					'step 0'
+					if(target.isMinHandcard()){
+						target.draw();
+						event.h=true;
+					}
+					if(target.isMinHp()&&target.isDamaged()){
+						target.recover();
+						event.hp=true;
+					}
+					if(target.isMinEquip()){
+						target.equip(game.createCard(get.inpile('equip').randomGet()),true);
+						event.e=true;
+					}
+					'step 1'
+					if(!event.h&&player.isMinHandcard()){
+						player.draw();
+					}
+					if(!event.hp&&player.isMinHp()&&player.isDamaged()){
+						target.recover();
+					}
+					if(!event.e&&player.isMinEquip()){
+						player.equip(game.createCard(get.inpile('equip').randomGet()),true);
+					}
+				},
+				ai:{
+					threaten:1.6,
+					order:9,
+					result:{
+						player:function(player,target){
+							if(get.attitude(player,target)<=0){
+								if(target.isMinHandcard()||target.isMinEquip()||target.isMinHp()) return -1;
+							}
+							var num=0;
+							if(player.isMinHandcard()||target.isMinHandcard()) num++;
+							if(player.isMinEquip()||target.isMinEquip()) num++;
+							if((player.isMinHp()&&player.isDamaged())||(target.isMinHp()&&target.isDamaged())) num+=2.1;
+							return num;
+						}
+					}
+				}
+			},
 			pindi:{
 				enable:'phaseUse',
 				filterTarget:function(card,player,target){
@@ -9235,6 +9399,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qinmi:'秦宓',
 			caiyong:'蔡邕',
 
+			fenli:'奋励',
+			fenli_info:'若你的手牌数为全场最多，你可以跳过摸牌阶段；若你的体力值为全场最多，你可以跳过出牌阶段；若你的装备区里有牌且数量为全场最多，你可以跳过弃牌阶段。',
+			pingkou:'平寇',
+			pingkou_info:'回合结束时，你可以对至多X名其他角色各造成1点伤害（X为你本回合跳过的阶段数）。',
+			xinanguo:'安国',
+			xinanguo_info:'出牌阶段限一次，你可以选择一名其他角色，若其手牌数为全场最少，其摸一张牌；体力值为全场最低，回复1点体力；装备区内牌数为全场最少，随机使用一张装备牌。然后若该角色有未执行的效果且你满足条件，你执行之。',
 			pindi:'品第',
 			pindi_info:'出牌阶段，你可以弃置一张牌并选择一名其他角色（不能弃置相同类型牌且不能指定相同的角色），然后令其执行一项：摸X张牌；弃置X张牌（X为本回合此技能发动次数）。若其已受伤，你须横置自身。',
 			funan_jiexun:'诫训',

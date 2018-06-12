@@ -77,6 +77,14 @@ get(path.dirname(__dirname),function(){
 			apply('changeLog',updates.changeLog);
 			updatelist+=',';
 		}
+		if(updates.players){
+			apply('players',updates.players);
+			updatelist+=',';
+		}
+		if(updates.cards){
+			apply('cards',updates.cards);
+			updatelist+=',';
+		}
 		var changes = stdout.split('\n');
 		for(var i=0;i<changes.length;i++){
 			var extname=path.extname(changes[i]);

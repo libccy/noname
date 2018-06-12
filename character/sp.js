@@ -111,6 +111,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			quyi:['male','qun',4,['fuqi','jiaozi']],
 
 			liuye:['male','wei',3,['polu','choulve']],
+			beimihu:['female','qun',3,['zongkui','guju','baijia']],
 		},
 		characterIntro:{
 			huangfusong:'字义真。安定郡朝那县（今宁夏彭阳）人。于黄巾起义时，以中郎将身份讨伐黄巾，用火攻大破张梁、张宝。[45]  后接替董卓进攻张梁，连胜七阵。掘张角墓，拜左车骑将军、冀州牧，因拒绝贿赂宦官而被免职。[46]  董卓死，王允命其与吕布等共至郿坞抄籍董卓家产、人口，皇甫嵩将坞中所藏良家子女，尽行释放。',
@@ -319,6 +320,175 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			baijia:{
+				unique:true,
+				ai:{
+					combo:'guju'
+				},
+				trigger:{player:'phaseBegin'},
+				forced:true,
+				skillAnimation:true,
+				animationColor:'epic',
+				filter:function(event,player){
+					return player.hasSkill('guju')&&player.storage.guju>=7;
+				},
+				content:function(){
+					player.awakenSkill('baijia');
+					player.gainMaxHp();
+					player.recover();
+					var list=game.filterPlayer();
+					for(var i=0;i<list.length;i++){
+						if(list[i]!=player&&!list[i].hasSkill('zongkui_mark')){
+							list[i].addSkill('zongkui_mark');
+							player.line(list[i],'green');
+						}
+					}
+					player.removeSkill('guju');
+					player.addSkill('bmcanshi');
+				}
+			},
+			bmcanshi:{
+				group:['bmcanshi_add','bmcanshi_remove'],
+				subSkill:{
+					add:{
+						trigger:{player:'useCard'},
+						filter:function(event,player){
+							if(!event.targets||event.targets.length!=1) return false;
+							var info=get.info(event.card);
+							if(info.multitarget) return false;
+							if(info.allowMultiple==false) return false;
+							if(info.type=='equip') return false;
+							if(info.type=='delay') return false;
+							return game.hasPlayer(function(current){
+								if(!current.hasSkill('zongkui_mark')) return false;
+								return !event.targets.contains(current)&&lib.filter.filterTarget2(event.card,player,current);
+							});
+						},
+						direct:true,
+						content:function(){
+							'step 0'
+							player.chooseTarget(get.prompt2('bmcanshi'),[1,Infinity],function(card,player,target){
+								if(!target.hasSkill('zongkui_mark')) return false;
+								var trigger=_status.event.getTrigger();
+								return !trigger.targets.contains(target)&&lib.filter.filterTarget2(trigger.card,player,target);
+							}).set('ai',function(target){
+								var player=_status.event.player;
+								return get.effect(target,_status.event.getTrigger().card,player,player);
+							});
+							'step 1'
+							if(result.bool){
+								if(!event.isMine()&&!_status.connectMode) game.delayx();
+								event.targets=result.targets.slice(0);
+								for(var i=0;i<event.targets.length;i++){
+									event.targets[i].removeSkill('zongkui_mark');
+								}
+							}
+							else{
+								event.finish();
+							}
+							'step 2'
+							player.logSkill('bmcanshi',event.targets);
+							trigger.targets.addArray(event.targets);
+						}
+					},
+					remove:{
+						trigger:{target:'useCardToBefore'},
+						check:function(event,player){
+							return get.attitude(event.player,player)<0&&get.effect(player,event.card,event.player,player)<0;
+						},
+						logTarget:'player',
+						filter:function(event,player){
+							if(!event.targets||event.targets.length!=1) return false;
+							return event.player.hasSkill('zongkui_mark');
+						},
+						content:function(){
+							trigger.cancel();
+							game.delay();
+							trigger.player.removeSkill('zongkui_mark');
+						}
+					}
+				}
+			},
+			guju:{
+				init:function(player){
+					player.storage.guju=0;
+				},
+				intro:{
+					content:'已因此技能获得#张牌'
+				},
+				trigger:{global:'damageAfter'},
+				forced:true,
+				filter:function(event,player){
+					return event.player!=player&&event.player.hasSkill('zongkui_mark');
+				},
+				content:function(){
+					player.draw();
+					player.storage.guju++;
+					player.markSkill('guju');
+				},
+				ai:{
+					combo:'zongkui'
+				}
+			},
+			zongkui:{
+				trigger:{player:'phaseBegin'},
+				direct:true,
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return current!=player&&!current.hasSkill('zongkui_mark');
+					});
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('zongkui'),function(card,player,target){
+						return target!=player&&!target.hasSkill('zongkui_mark');
+					}).set('ai',function(target){
+						var num=target.isMinHp()?0.5:(1+Math.random());
+						if(get.attitude(_status.event.player,target)<0){
+							num+=0.5;
+						}
+						return num;
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('zongkui',target);
+						target.addSkill('zongkui_mark');
+					}
+				},
+				group:'zongkui_round',
+				subSkill:{
+					mark:{
+						mark:true,
+						intro:{
+							content:'已获得“傀”标记'
+						}
+					},
+					round:{
+						trigger:{global:'roundStart'},
+						forced:true,
+						filter:function(event,player){
+							return game.hasPlayer(function(current){
+								return current.isMinHp(true);
+							});
+						},
+						content:function(){
+							var targets=game.filterPlayer(function(current){
+								return current.isMinHp(true);
+							});
+							if (targets.length==1){
+								var target=targets[0];
+								player.logSkill('zongkui',target);
+								target.addSkill('zongkui_mark');
+							}
+						}
+					}
+				},
+				ai:{
+					combo:'guju',
+					threaten:1.4
+				}
+			},
 			zishu:{
 				subSkill:{
 					discard:{
@@ -381,6 +551,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					threaten:1.2,
 					nogain:1
 				},
 				group:['zishu_draw','zishu_discard','zishu_discard2','zishu_discard3']
@@ -443,7 +614,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					threaten:1.5
+					threaten:1.8
 				}
 			},
 			choulve:{
@@ -9700,7 +9871,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xizhicai:'戏志才',
 			quyi:'麹义',
 			liuye:'刘晔',
+			beimihu:'卑弥呼',
 
+			zongkui:'纵傀',
+			zongkui_mark:'纵傀',
+			zongkui_mark_bg:'傀',
+			zongkui_info:'回合开始时，你可以指定一名未拥有“傀”标记的其他角色，令其获得一枚“傀”标记。每轮游戏开始时，体力值最少且没有“傀”标记的一名其他角色也获得一个“傀”标记。',
+			guju:'骨疽',
+			guju_info:'锁定技，拥有“傀”标记的角色受到伤害后，你摸一张牌。',
+			baijia:'拜假',
+			baijia_info:'觉醒技，准备阶段，若你因“骨疽”获得牌不小于7张，则你增加1点体力上限，回复1点体力，然后令所有未拥有“傀”标记的其他角色获得“傀”标记，最后失去技能“骨疽”，并获得技能“蚕食”。',
+			bmcanshi:'蚕食',
+			bmcanshi_info:'一名角色使用牌指定你为唯一目标时，若其有“傀”标记，你可以取消之，然后其失去“傀”标记；你使用牌仅指定一名角色为目标时，你可以额外指定任意名带有“傀”标记的角色为目标，然后其失去“傀”标记。',
 			zishu:'自书',
 			zishu_info:'锁定技，你的回合外，你获得的牌均会在当前回合结束后置入弃牌堆；你的回合内，当你不因此技能效果获得牌时，额外摸一张牌。',
 			yingyuan:'应援',

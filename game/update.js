@@ -1,10 +1,24 @@
 window.noname_update={
-	version:'1.9.49.3',
+	version:'1.9.50',
 	update:'1.9.49.2',
 	changeLog:[
-		'GitLab镜像（替换Coding）'
+		'GitLab镜像（替换Coding）',
+		'iPhone X优化',
+		'卑弥呼、朱治、朱桓'
+	],
+	players:[
+		'beimihu',
+		'zhuran',
+		'zhuzhi'
 	],
 	files:[
-		'game/game.js'
+		'character/old.js',
+		'character/sp.js',
+		'character/yijiang.js',
+		'game/asset.js',
+		'game/directory.js',
+		'game/game.js',
+		'game/update.js',
+		'layout/default/layout.css'
 	]
 };

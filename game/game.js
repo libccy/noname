@@ -8473,7 +8473,7 @@
 				mode.remove('brawl');
 				var banned=['yxs_luzhishen','zhenji','shen_guanyu','shen_caocao','zhurong',
 					'daqiao','lingcao','liuzan','lusu','luxun','yanwen','zhouyu','ns_wangyue','gw_yenaifa',
-					'zhuzhi','old_caozhen','guojia','simayi','sp_pangde','swd_kangnalishi','hs_siwangzhiyi'];
+					'old_caozhen','guojia','simayi','sp_pangde','swd_kangnalishi','hs_siwangzhiyi'];
 				var bannedcards=['zengbin','huoshan','hongshui','guiyoujie','fengyinzhidan','sifeizhenmian'];
 				for(var i=0;i<mode.length;i++){
 					game.saveConfig(mode[i]+'_banned',banned);
@@ -18184,6 +18184,32 @@
 					}
 					return true;
 				},
+				isMaxEquip:function(equal){
+					var nh=this.countCards('e');
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].isOut()||game.players[i]==this) continue;
+						if(equal){
+							if(game.players[i].countCards('e')>=nh) return false;
+						}
+						else{
+							if(game.players[i].countCards('e')>nh) return false;
+						}
+					}
+					return true;
+				},
+				isMinEquip:function(equal){
+					var nh=this.countCards('e');
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].isOut()||game.players[i]==this) continue;
+						if(equal){
+							if(game.players[i].countCards('e')<=nh) return false;
+						}
+						else{
+							if(game.players[i].countCards('e')<nh) return false;
+						}
+					}
+					return true;
+				},
 				isLinked:function(){
 					if(get.is.linked2(this)){
 						return this.classList.contains('linked2');
@@ -21322,6 +21348,10 @@
 			},
 			filterTarget:function(card,player,target){
 				return (lib.filter.targetEnabled(card,player,target)&&
+					lib.filter.targetInRange(card,player,target));
+			},
+			filterTarget2:function(card,player,target){
+				return (lib.filter.targetEnabled2(card,player,target)&&
 					lib.filter.targetInRange(card,player,target));
 			},
 			notMe:function(card,player,target){

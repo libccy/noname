@@ -25,6 +25,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_lingju:['female','qun',3,['jieyuan','fenxin_old']],
 			old_maliang:['male','shu',3,['xiemu','naman']],
 			old_chenqun:['male','wei',3,['dingpin','oldfaen']],
+			old_zhuhuan:['male','wu',4,['youdi']],
+			old_zhuzhi:['male','wu',4,['anguo']],
 		},
 		characterFilter:{
 			old_lingju:function(mode){
@@ -392,6 +394,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_lingju:'旧灵雎',
 			old_maliang:'旧马良',
 			old_chenqun:'旧陈群',
+			old_zhuhuan:'旧朱桓',
+			old_zhuzhi:'旧朱治',
 
 			oldfaen:'法恩',
 			oldfaen_info:'当一名角色翻面或横置后，你可以令其摸一张牌。',

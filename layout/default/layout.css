@@ -1342,6 +1342,7 @@ div:not(.handcards)>.card>.info>span,
 	top: 69px;
 }
 .buttons.smallzoom {
+	display: block;
 	zoom: 0.65
 }
 .buttons .card.button>.name {
