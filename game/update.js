@@ -1,10 +1,8 @@
 window.noname_update={
-	version:'1.9.50',
+	version:'1.9.50.1',
 	update:'1.9.49.2',
 	changeLog:[
-		'GitLab镜像（替换Coding）',
-		'iPhone X优化',
-		'卑弥呼、朱治、朱桓'
+		'bug修复'
 	],
 	players:[
 		'beimihu',
