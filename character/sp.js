@@ -431,16 +431,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zongkui:{
-				trigger:{player:'phaseBegin'},
+				trigger:{player:'phaseBegin',global:'roundStart'},
 				direct:true,
 				filter:function(event,player){
 					return game.hasPlayer(function(current){
+						if(event.name=='roundStart'&&!current.isMinHp()) return false;
 						return current!=player&&!current.hasSkill('zongkui_mark');
 					});
 				},
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt2('zongkui'),function(card,player,target){
+						if(_status.event.round&&!target.isMinHp()) return false;
 						return target!=player&&!target.hasSkill('zongkui_mark');
 					}).set('ai',function(target){
 						var num=target.isMinHp()?0.5:(1+Math.random());
@@ -448,7 +450,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							num+=0.5;
 						}
 						return num;
-					});
+					}).set('round',event.triggername=='roundStart');
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
@@ -456,31 +458,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.addSkill('zongkui_mark');
 					}
 				},
-				group:'zongkui_round',
 				subSkill:{
 					mark:{
 						mark:true,
 						intro:{
 							content:'已获得“傀”标记'
-						}
-					},
-					round:{
-						trigger:{global:'roundStart'},
-						forced:true,
-						filter:function(event,player){
-							return game.hasPlayer(function(current){
-								return current.isMinHp(true);
-							});
-						},
-						content:function(){
-							var targets=game.filterPlayer(function(current){
-								return current.isMinHp(true);
-							});
-							if (targets.length==1){
-								var target=targets[0];
-								player.logSkill('zongkui',target);
-								target.addSkill('zongkui_mark');
-							}
 						}
 					}
 				},
@@ -9876,7 +9858,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zongkui:'纵傀',
 			zongkui_mark:'纵傀',
 			zongkui_mark_bg:'傀',
-			zongkui_info:'回合开始时，你可以指定一名未拥有“傀”标记的其他角色，令其获得一枚“傀”标记。每轮游戏开始时，体力值最少且没有“傀”标记的一名其他角色也获得一个“傀”标记。',
+			zongkui_info:'回合开始时，你可以指定一名未拥有“傀”标记的其他角色，令其获得一枚“傀”标记。每轮游戏开始时，你可以指定一名体力值最少且没有“傀”标记的其他角色，令其获得一枚“傀”标记。',
 			guju:'骨疽',
 			guju_info:'锁定技，拥有“傀”标记的角色受到伤害后，你摸一张牌。',
 			baijia:'拜假',
