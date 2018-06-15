@@ -302,8 +302,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.recover();
 						event.hp=true;
 					}
+					event.equip=get.cardPile(function(card){
+						return get.type(card)=='equip';
+					});
 					if(target.isMinEquip()){
-						target.equip(game.createCard(get.inpile('equip').randomGet()),true);
+						target.equip(event.equip||game.createCard(get.inpilefull('equip').randomGet()),true);
 						event.e=true;
 					}
 					'step 1'
@@ -314,16 +317,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.recover();
 					}
 					if(!event.e&&player.isMinEquip()){
-						var list=[];
-						for(var i in lib.cardPile){
-							for(var j=0;j<lib.cardPile[i].length;i++){
-								var name=lib.cardPile[i][j][0];
-								if(lib.inpile.contains(name)&&get.type(name)=='equip'){
-									list.push(lib.cardPile[i][j]);
-								}
-							}
-						}
-						player.equip(game.createCard(list.randomGet()),true);
+						player.equip(event.equip||game.createCard(get.inpilefull('equip').randomGet()),true);
 					}
 				},
 				ai:{

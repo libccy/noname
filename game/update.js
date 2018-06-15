@@ -1,6 +1,6 @@
 window.noname_update={
-	version:'1.9.50.1',
-	update:'1.9.49.2',
+	version:'1.9.50.2',
+	update:'1.9.50.1',
 	changeLog:[
 		'bug修复'
 	],
@@ -10,13 +10,7 @@ window.noname_update={
 		'zhuzhi'
 	],
 	files:[
-		'character/old.js',
-		'character/sp.js',
 		'character/yijiang.js',
-		'game/asset.js',
-		'game/directory.js',
 		'game/game.js',
-		'game/update.js',
-		'layout/default/layout.css'
 	]
 };

@@ -43499,6 +43499,23 @@
 				return obj;
 			}
 		},
+		inpilefull:function(type){
+			var list=[];
+			for(var i in lib.cardPile){
+				for(var j=0;j<lib.cardPile[i].length;j++){
+					var info=lib.cardPile[i][j];
+					if(lib.inpile.contains(info[2])&&get.type(info[2])==type){
+						list.push({
+							name:info[2],
+							suit:info[0],
+							number:info[1],
+							nature:info[3]
+						});
+					}
+				}
+			}
+			return list;
+		},
 		inpile:function(type,filter){
 			var list=[];
 			if(filter=='trick'){
