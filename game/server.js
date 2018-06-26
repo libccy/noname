@@ -72,6 +72,16 @@
 				util.updaterooms();
 			}
 		},
+		key:function(id){
+			clearTimeout(this.keyCheck);
+			delete this.keyCheck;
+			if(bannedKeys.indexOf(id)!=-1){
+				bannedIps.push(this._socket.remoteAddress);
+				console.log(id, this._socket.remoteAddress);
+				this.close();
+				return;
+			}
+		},
 		events:function(cfg,id,type){
 			if(bannedKeys.indexOf(id)!=-1){
 				bannedIps.push(this._socket.remoteAddress);
@@ -268,6 +278,12 @@
 			},500);
 			return;
 		}
+		ws.keyCheck=setTimeout(function(){
+			ws.sendl('denied','key');
+			setTimeout(function(){
+				ws.close();
+			},500);
+		},2000);
 		ws.wsid=util.getid();
 		clients[ws.wsid]=ws;
 		ws.sendl('roomlist',util.getroomlist(),util.checkevents(),util.getclientlist(ws),ws.wsid);

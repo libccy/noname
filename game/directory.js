@@ -88,7 +88,7 @@ get(path.dirname(__dirname),function(){
 		var changes = stdout.split('\n');
 		for(var i=0;i<changes.length;i++){
 			var extname=path.extname(changes[i]);
-			if(!changes[i]||(extname!='.js'&&extname!='.css')){
+			if(!changes[i]||(extname!='.js'&&extname!='.css')||changes[i]=='game/update.js'){
 				changes.splice(i--,1);
 			}
 		}

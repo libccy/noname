@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'1.9.50',
+	'1.9.51',
 	'audio/background/music_danji.mp3',
 	'audio/background/music_default.mp3',
 	'audio/background/music_diaochan.mp3',
@@ -1810,6 +1810,7 @@ window.noname_asset_list=[
 	'image/character/liyan.jpg',
 	'image/character/lusu.jpg',
 	'image/character/luxun.jpg',
+	'image/character/luzhi.jpg',
 	'image/character/lvbu.jpg',
 	'image/character/lvmeng.jpg',
 	'image/character/machao.jpg',
@@ -1996,6 +1997,7 @@ window.noname_asset_list=[
 	'image/character/sp_jiangwei.jpg',
 	'image/character/sp_jiaxu.jpg',
 	'image/character/sp_liubei.jpg',
+	'image/character/sp_liuqi.jpg',
 	'image/character/sp_lvmeng.jpg',
 	'image/character/sp_machao.jpg',
 	'image/character/sp_pangde.jpg',

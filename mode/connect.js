@@ -143,6 +143,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			else{
 				createNode();
 			}
+			if(!game.onlineKey){
+				game.onlineKey=localStorage.getItem(lib.configprefix+'key');
+				if(!game.onlineKey){
+					game.onlineKey=get.id();
+					localStorage.setItem(lib.configprefix+'key',game.onlineKey);
+				}
+			}
 			_status.connectDenied=createNode;
 			for(var i in lib.element.event){
 				event.parent[i]=lib.element.event[i];

@@ -112,6 +112,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			liuye:['male','wei',3,['polu','choulve']],
 			beimihu:['female','qun',3,['zongkui','guju','baijia']],
+
+			// sp_liuqi:['male','qun',3,['wenji','tunjiang']],
+			// luzhi:['male','wei',3,['qingzhong','weijing']],
 		},
 		characterIntro:{
 			huangfusong:'字义真。安定郡朝那县（今宁夏彭阳）人。于黄巾起义时，以中郎将身份讨伐黄巾，用火攻大破张梁、张宝。[45]  后接替董卓进攻张梁，连胜七阵。掘张角墓，拜左车骑将军、冀州牧，因拒绝贿赂宦官而被免职。[46]  董卓死，王允命其与吕布等共至郿坞抄籍董卓家产、人口，皇甫嵩将坞中所藏良家子女，尽行释放。',
@@ -320,6 +323,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			// wenji:{
+			// 	trigger:{player:'phaseUseBegin'},
+
+			// },
+			// tunjiang:{
+
+			// },
 			baijia:{
 				unique:true,
 				ai:{
@@ -9854,7 +9864,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			quyi:'麹义',
 			liuye:'刘晔',
 			beimihu:'卑弥呼',
+			// luzhi:'',
 
+			// qingzhong:'清忠',
+			// qingzhong_info:'出牌阶段开始时，你可以摸两张牌，若如此做，本阶段结束时，你与手牌数最少的角色交换手牌。',
+			// weijing:'卫境',
+			// weijing_info:'每轮限一次，你可以在需要使用【杀】或【闪】时，视为使用一张【杀】或【闪】。',
+			// wenji:'问计',
+			// wenji_info:'出牌阶段开始时，你可以令一名其他角色交给你一张牌。你于本回合内使用与该牌同名的牌不能被其他角色响应。',
+			// tunjiang:'屯江',
+			// tunjiang_info:'结束阶段，若你未跳过本回合的出牌阶段，且你于本回合出牌阶段内未使用牌指定过其他角色为目标，则你可以摸X张牌（X为全场势力数）。',
 			zongkui:'纵傀',
 			zongkui_mark:'纵傀',
 			zongkui_mark_bg:'傀',

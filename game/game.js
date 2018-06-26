@@ -7190,7 +7190,11 @@
 					}
 					else{
 						if(confirm('游戏似乎未正常载入，是否重置游戏？')){
+							var onlineKey=localStorage.getItem(lib.configprefix+'key');
 							localStorage.clear();
+							if(onlineKey){
+								localStorage.setItem(lib.configprefix+'key',onlineKey);
+							}
 							if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
 							setTimeout(function(){
 								window.location.reload();
@@ -22395,6 +22399,7 @@
 					ui.create.connecting(true);
 				},
 				roomlist:function(list,events,clients,wsid){
+					game.send('server','key',game.onlineKey);
 					game.online=true;
 					game.onlinehall=true;
 					lib.config.recentIP.remove(_status.ip);
@@ -22941,6 +22946,12 @@
 						case 'gaming':alert('加入失败：游戏已开始');break;
 						case 'number':alert('加入失败：房间已满');break;
 						case 'banned':alert('加入失败：房间拒绝你加入');break;
+						case 'key':
+							alert('您的游戏版本过低，请升级到最新版');
+							game.saveConfig('tmp_owner_roomId');
+							game.saveConfig('tmp_user_roomId');
+							game.saveConfig('reconnect_info');
+							break;
 						case 'offline':
 						if(_status.paused&&_status.event.name=='game'){
 							setTimeout(game.resume,500);
@@ -39117,14 +39128,6 @@
 		click:{
 			connectEvents:function(){
 				if(this.info){
-					if(!game.onlineKey){
-						game.onlineKey=localStorage.getItem(lib.configprefix+'key');
-						if(!game.onlineKey){
-							game.onlineKey=get.id();
-							localStorage.setItem(lib.configprefix+'key',game.onlineKey);
-						}
-					}
-
 					var button=this;
 					var layer=ui.create.div('.poplayer',ui.window);
 					var uiintro=ui.create.dialog('hidden','notouchscroll');
