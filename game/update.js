@@ -1,20 +1,18 @@
 window.noname_update={
-	version:'1.9.51',
-	update:'1.9.50.2',
+	version:'1.9.52',
+	update:'1.9.51',
 	changeLog:[
-		'bug修复'
+		'新武将'
 	],
-	// players:[
-		// 'sp_liuqi',
-		// 'luzhi'
-	// ],
+	players:[
+		'sp_liuqi',
+		'luzhi'
+	],
 	files:[
+		'character/diy.js',
 		'character/sp.js',
-		'game/asset.js',
-		'game/directory.js',
+		'character/yijiang.js',
 		'game/game.js',
-		'game/server.js',
-		'mode/connect.js',
-		'mode/versus.js'
+		'mode/boss.js'
 	]
 };

@@ -5285,10 +5285,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<players.length;i++){
 						if(players[i]!=player){
 							var e=players[i].getEquip('qinggang');
-							if(e.length){
-								player.gain(e,players[i]);
-								players[i].$give(e,player);
-								break;
+							if(e){
+								player.line(players[i],'green');
+								players[i].give(e,player);
 							}
 						}
 					}

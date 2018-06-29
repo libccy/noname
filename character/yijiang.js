@@ -2887,13 +2887,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.storage.zongzuo=true;
-					var list=['wei','shu','wu','qun'];
-					var num=game.countPlayer(function(current){
-						if(list.contains(current.group)){
-							list.remove(current.group);
-							return true;
-						}
-					});
+					var num=game.countGroup();
 					player.gainMaxHp(num);
 					event.num=num;
 					'step 1'
@@ -2907,8 +2901,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						audio:'zongzuo',
 						filter:function(event,player){
-							var list=['wei','shu','wu','qun'];
-							if(!list.contains(event.player.group)) return false;
+							if(!lib.group.contains(event.player.group)) return false;
 							if(game.hasPlayer(function(current){
 								return current.group==event.player.group;
 							})){
@@ -7892,14 +7885,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zongshi:{
 				mod:{
 					maxHandcard:function(player,num){
-						var list=['wei','shu','wu','qun'];
-						var num2=game.countPlayer(function(current){
-							if(list.contains(current.group)){
-								list.remove(current.group);
-								return true;
-							}
-						});
-						return num+num2;
+						return num+game.countGroup();
 					}
 				}
 			},
@@ -7910,14 +7896,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('h')<=player.maxHp||player.skipList.contains('phaseUse');
 				},
 				content:function(){
-					var list=['wei','shu','wu','qun'];
-					var num=game.countPlayer(function(current){
-						if(list.contains(current.group)){
-							list.remove(current.group);
-							return true;
-						}
-					});
-					trigger.num+=num;
+					trigger.num+=game.countGroup();
 					player.addTempSkill('zishou2');
 
 				},

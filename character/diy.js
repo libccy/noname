@@ -3964,28 +3964,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseEnd'},
 				frequent:true,
 				filter:function(event,player){
-					var list=['wei','shu','wu','qun'];
-					var players=game.filterPlayer();
-					var num=0;
-					for(var i=0;i<players.length&&list.length;i++){
-						if(list.contains(players[i].group)){
-							list.remove(players[i].group);
-							num++;
-						}
-					}
-					return player.countCards('h')<num;
+					return player.countCards('h')<game.countGroup();
 				},
 				content:function(){
-					var list=['wei','shu','wu','qun'];
-					var players=game.filterPlayer();
-					var num=0;
-					for(var i=0;i<players.length&&list.length;i++){
-						if(list.contains(players[i].group)){
-							list.remove(players[i].group);
-							num++;
-						}
-					}
-					player.draw(num-player.countCards('h'));
+					player.draw(game.countGroup()-player.countCards('h'));
 				},
 				ai:{
 					threaten:1.3

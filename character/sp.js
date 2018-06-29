@@ -113,8 +113,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuye:['male','wei',3,['polu','choulve']],
 			beimihu:['female','qun',3,['zongkui','guju','baijia']],
 
-			// sp_liuqi:['male','qun',3,['wenji','tunjiang']],
-			// luzhi:['male','wei',3,['qingzhong','weijing']],
+			sp_liuqi:['male','qun',3,['spwenji','sptunjiang']],
+			luzhi:['male','wei',3,['qingzhong','weijing']],
 		},
 		characterIntro:{
 			huangfusong:'字义真。安定郡朝那县（今宁夏彭阳）人。于黄巾起义时，以中郎将身份讨伐黄巾，用火攻大破张梁、张宝。[45]  后接替董卓进攻张梁，连胜七阵。掘张角墓，拜左车骑将军、冀州牧，因拒绝贿赂宦官而被免职。[46]  董卓死，王允命其与吕布等共至郿坞抄籍董卓家产、人口，皇甫嵩将坞中所藏良家子女，尽行释放。',
@@ -323,13 +323,220 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
-			// wenji:{
-			// 	trigger:{player:'phaseUseBegin'},
-
-			// },
-			// tunjiang:{
-
-			// },
+			qingzhong:{
+				trigger:{player:'phaseUseBegin'},
+				check:function(event,player){
+					if(game.hasPlayer(function(current){
+						return current!=player&&current.isMinHandcard();
+					})){
+						return true;
+					}
+					if(player.countCards('h')<=2) return true;
+					if(player.countCards('h')<=3&&!player.countCards('h','shan')) return true;
+					if(player.countCards('h',{type:'basic'})<=1) return true;
+					return false;
+				},
+				content:function(){
+					player.draw(2);
+					player.addTempSkill('qingzhong_give');
+				},
+				subSkill:{
+					give:{
+						trigger:{player:'phaseUseEnd'},
+						filter:function(event,player){
+							return !player.isMinHandcard(true);
+						},
+						forced:true,
+						content:function(){
+							'step 0'
+							var list=game.filterPlayer(function(current){
+								return current.isMinHandcard();
+							});
+							if(list.length==1){
+								if(list[0]!=player){
+									player.line(list[0],'green');
+									player.swapHandcards(list[0]);
+								}
+								event.finish();
+							}
+							else{
+								player.chooseTarget(true,'清忠：选择一名手牌最少的角色与其交换手牌',function(card,player,target){
+									return target.isMinHandcard();
+								}).set('ai',function(target){
+									return get.attitude(_status.event.player,target);
+								});
+							}
+							'step 1'
+							if(result.bool){
+								var target=result.targets[0];
+								if(target!=player){
+									player.line(target,'green');
+									player.swapHandcards(target);
+								}
+							}
+						}
+					}
+				}
+			},
+			weijing:{
+				group:['weijing_sha','weijing_shan'],
+				subSkill:{
+					sha:{
+						enable:'chooseToUse',
+						viewAs:{name:'sha'},
+						filterCard:function(){return false},
+						viewAsFilter:function(player){
+							if(player.hasSkill('weijing_disable')) return false;
+						},
+						selectCard:-1,
+						mark:false,
+						precontent:function(){
+							player.addTempSkill('weijing_disable','roundStart');
+						},
+						prompt:'视为使用一张杀',
+						ai:{
+							order:function(){
+								if(!player.hasShan()&&!game.hasPlayer(function(current){
+									return player.canUse('sha',current)&&current.hp==1&&get.effect(current,{name:'sha'},player,player)>0;
+								})){
+									return 0;
+								}
+								return 2.95;
+							},
+							skillTagFilter:function(player,tag,arg){
+								if(player.hasSkill('weijing_disable')) return false;
+								if(arg!='use') return false;
+							},
+							respondSha:true,
+						}
+					},
+					shan:{
+						enable:'chooseToRespond',
+						viewAs:{name:'shan'},
+						mark:false,
+						filterCard:function(){return false},
+						viewAsFilter:function(player){
+							if(player.hasSkill('weijing_disable')) return false;
+						},
+						onrespond:function(event,player){
+							player.addTempSkill('weijing_disable','roundStart');
+						},
+						selectCard:-1,
+						prompt:'视为使用一张闪',
+						ai:{
+							order:function(){
+								if(player.hasSkill('qingzhong_give')) return 2.95;
+								return 3.15;
+							},
+							skillTagFilter:function(player){
+								if(player.hasSkill('weijing_disable')) return false;
+							},
+							respondShan:true,
+						}
+					},
+					disable:{
+						mark:true,
+						intro:{
+							content:'本轮已发动'
+						}
+					}
+				}
+			},
+			spwenji:{
+				trigger:{player:'phaseUseBegin'},
+				direct:true,
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return current!=player&&current.countCards('he');
+					});
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('spwenji'),function(card,player,target){
+						return target!=player&&target.countCards('he');
+					}).set('ai',function(target){
+						var att=get.attitude(_status.event.player,target);
+						if(att>0) return Math.sqrt(att)/10;
+						return 5-att;
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('spwenji',target);
+						target.chooseCard('he',true,'问计：将一张牌交给'+get.translation(player));
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if(result.bool){
+						player.addTempSkill('spwenji_respond');
+						player.storage.spwenji_respond=result.cards[0].name;
+						event.target.give(result.cards,player);
+					}
+				},
+				subSkill:{
+					respond:{
+						onremove:true,
+						mod:{
+							wuxieRespondable:function(card,player,target,current){
+								if(player!=current&&player.storage.spwenji_respond==card.name){
+									return false;
+								}
+							}
+						},
+						ai:{
+							norespond:true,
+							skillTagFilter:function(player,tag,arg){
+								if(tag=='norespond'&&Array.isArray(arg)){
+									var evt=arg[2].getParent();
+									if(evt.type=='card'&&evt.name==player.storage.spwenji_respond) return true;
+								}
+								return false;
+							}
+						}
+					}
+				}
+			},
+			sptunjiang:{
+				trigger:{player:'phaseUseBegin'},
+				silent:true,
+				content:function(){
+					player.addTempSkill('sptunjiang_count');
+					player.addTempSkill('sptunjiang_end');
+				},
+				subSkill:{
+					count:{
+						trigger:{player:'useCard'},
+						silent:true,
+						filter:function(event,player){
+							if(event.targets){
+								for(var i=0;i<event.targets.length;i++){
+									if(event.targets[i]!=player){
+										return true;
+									}
+								}
+							}
+							return false;
+						},
+						content:function(){
+							player.addTempSkill('sptunjiang_used');
+						}
+					},
+					used:{},
+					end:{
+						trigger:{player:'phaseEnd'},
+						frequent:true,
+						filter:function(event,player){
+							return !player.hasSkill('sptunjiang_used');
+						},
+						content:function(){
+							player.draw(game.countGroup());
+						}
+					}
+				}
+			},
 			baijia:{
 				unique:true,
 				ai:{
@@ -2752,14 +2959,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseDrawBegin'},
 				forced:true,
 				content:function(){
-					var list=['wei','shu','wu','qun'];
-					var num=game.countPlayer(function(current){
-						if(list.contains(current.group)){
-							list.remove(current.group);
-							return true;
-						}
-					});
-					trigger.num+=num-2;
+					trigger.num+=game.countGroup()-2;
 				}
 			},
 			xinyongsi2:{
@@ -9100,14 +9300,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseDrawBegin'},
 				forced:true,
 				content:function(){
-					var list=['wei','shu','wu','qun'];
-					var num=game.countPlayer(function(current){
-						if(list.contains(current.group)){
-							list.remove(current.group);
-							return true;
-						}
-					});
-					trigger.num+=num;
+					trigger.num+=game.countGroup();
 				}
 			},
 			yongsi2:{
@@ -9115,14 +9308,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseDiscardBegin'},
 				forced:true,
 				content:function(){
-					var list=['wei','shu','wu','qun'];
-					var num=game.countPlayer(function(current){
-						if(list.contains(current.group)){
-							list.remove(current.group);
-							return true;
-						}
-					});
-					player.chooseToDiscard(num,'he',true);
+					player.chooseToDiscard(game.countGroup(),'he',true);
 				}
 			},
 			bifa:{
@@ -9864,16 +10050,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			quyi:'麹义',
 			liuye:'刘晔',
 			beimihu:'卑弥呼',
-			// luzhi:'',
+			luzhi:'鲁芝',
+			sp_liuqi:'刘琦',
 
-			// qingzhong:'清忠',
-			// qingzhong_info:'出牌阶段开始时，你可以摸两张牌，若如此做，本阶段结束时，你与手牌数最少的角色交换手牌。',
-			// weijing:'卫境',
-			// weijing_info:'每轮限一次，你可以在需要使用【杀】或【闪】时，视为使用一张【杀】或【闪】。',
-			// wenji:'问计',
-			// wenji_info:'出牌阶段开始时，你可以令一名其他角色交给你一张牌。你于本回合内使用与该牌同名的牌不能被其他角色响应。',
-			// tunjiang:'屯江',
-			// tunjiang_info:'结束阶段，若你未跳过本回合的出牌阶段，且你于本回合出牌阶段内未使用牌指定过其他角色为目标，则你可以摸X张牌（X为全场势力数）。',
+			qingzhong:'清忠',
+			qingzhong_info:'出牌阶段开始时，你可以摸两张牌，若如此做，本阶段结束时，你与手牌数最少的角色交换手牌。',
+			weijing:'卫境',
+			weijing_info:'每轮限一次，你可以在需要使用【杀】或【闪】时，视为使用一张【杀】或【闪】。',
+			spwenji:'问计',
+			spwenji_info:'出牌阶段开始时，你可以令一名其他角色交给你一张牌。你于本回合内使用与该牌同名的牌不能被其他角色响应。',
+			sptunjiang:'屯江',
+			sptunjiang_info:'结束阶段，若你未跳过本回合的出牌阶段，且你于本回合出牌阶段内未使用牌指定过其他角色为目标，则你可以摸X张牌（X为全场势力数）。',
 			zongkui:'纵傀',
 			zongkui_mark:'纵傀',
 			zongkui_mark_bg:'傀',

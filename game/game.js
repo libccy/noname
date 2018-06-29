@@ -12512,6 +12512,9 @@
 						}
 						player.logSkill(event.skill);
 						player.checkShow(event.skill,true);
+						if(lib.skill[event.skill].onrespond&&!game.online){
+							lib.skill[event.skill].onrespond(event,player);
+						}
 					}
 					else if(lib.config.show_card_prompt&&!lib.config.hide_card_prompt_basic){
 						player.popup(card.name,'wood');
@@ -21264,7 +21267,7 @@
 				if(event.name!='chooseToRespond') return true;
 				var source=event.getParent().player;
 				if(source!=player){
-					if(source.hasSkillTag('norespond',false,[card,player],true)){
+					if(source.hasSkillTag('norespond',false,[card,player,event],true)){
 						return false;
 					}
 				}
@@ -23056,7 +23059,7 @@
 			}
 		},
 		suit:['club','spade','diamond','heart'],
-		group:['wei','shu','wu','qun'],
+		group:['wei','shu','wu','qun','shen'],
 		nature:['fire','thunder','poison'],
 		linked:['fire','thunder'],
 	};
@@ -28802,7 +28805,7 @@
 								}
 								var num=round-(game.roundNumber-storage);
 								if(num>0){
-									str+=get.cnNumber(num)+'轮后技能重置';
+									str+=get.cnNumber(num)+'轮后'+(info.roundtext||'技能重置');
 								}
 								else{
 									str+='技能可发动';
@@ -29964,6 +29967,15 @@
 				}
 			}
 			return cards;
+		},
+		countGroup:function(){
+			var list=lib.group.slice(0);
+			return game.countPlayer(function(current){
+				if(list.contains(current.group)){
+					list.remove(current.group);
+					return true;
+				}
+			});
 		},
 		players:[],
 		dead:[],
