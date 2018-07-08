@@ -1614,6 +1614,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				popup:false,
 				content:function(){
+					'step 0'
+					event.trigger('playercontrol');
+					'step 1'
 					var slist=player.storage.huashen.owned;
 					var list=[];
 					for(var i in slist){
@@ -4457,7 +4460,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			beige_info:'一名角色每受到【杀】造成的一次伤害，你可以弃一张牌，并令其进行一次判定，判定结果为：♥该角色回复1点体力；♦︎该角色摸两张牌；♣伤害来源弃两张牌；♠伤害来源将其武将牌翻面',
 			duanchang_info:'锁定技，杀死你的角色失去当前的所有技能直到游戏结束。',
 			// fushen_info:'回合开始前，你可以选择与任意一名角色交换控制权，该角色可选择在下一个回合开始前与你换回',
-			huashen_info:'所有人都展示武将牌后，你随机获得两张未加入游戏的武将牌，选一张置于你面前并声明该武将的一项技能，你拥有该技能且同时将性别和势力属性变成与该武将相同知道该化身被替换。在你的每个准备阶段和结束后，你可以替换化身牌，你须为新的化身重新声明一项技能（你不可声明锁定技、觉醒技或主公技）。',
+			huashen_info:'所有人都展示武将牌后，你随机获得两张未加入游戏的武将牌，选一张置于你面前并声明该武将的一项技能，你拥有该技能且同时将性别和势力属性变成与该武将相同知道该化身被替换。在你的每个准备阶段和结束后，你可以替换化身牌，你须为新的化身重新声明一项技能（你不可声明限定技、觉醒技或主公技）。',
 			xinsheng_info:'你每受到1点伤害，可获得一张新化身牌。',
 			jiangwei:'姜维',
 			liushan:'刘禅',

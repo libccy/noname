@@ -3,10 +3,12 @@ var path=require('path');
 var exec = require('child_process').exec;
 global.window=global;
 require(__dirname+'/update.js');
+require(__dirname+'/asset.js');
 
 var updates=window.noname_update;
-var assetlist='window.noname_asset_list=[\n\t\''+updates.version+'\'';
+var assetlist='';
 var skinlist='window.noname_skin_list={\n';
+var entrylist=[];
 var get = function(dir,callback){
 	fs.readdir(dir,function(err,list){
 		var shift=function(){
@@ -18,7 +20,9 @@ var get = function(dir,callback){
 					var stat=fs.statSync(url);
 					if(stat.isFile()){
 						if(['.jpg','.png','.mp3','.ttf'].indexOf(path.extname(url))!=-1){
-							assetlist+=',\n\t\''+path.relative(path.dirname(__dirname),url)+'\'';
+							var assetentry=path.relative(path.dirname(__dirname),url);
+							assetlist+=',\n\t\''+assetentry+'\'';
+							entrylist.push(assetentry);
 						}
 					}
 					else if(stat.isDirectory()){
@@ -55,10 +59,26 @@ var get = function(dir,callback){
 	});
 };
 
+
 get(path.dirname(__dirname),function(){
-	fs.writeFile('game/asset.js',assetlist+'\n];\n'+skinlist.slice(0,skinlist.length-2)+'\n};','utf-8',function(){
-		console.log('udpated asset.js');
-	});
+	var diff=false;
+	if(window.noname_asset_list.length==entrylist.length+1){
+		for(var i=0;i<entrylist.length;i++){
+			if(entrylist[i]!=window.noname_asset_list[i+1]){
+				diff=true;
+				break;
+			}
+		}
+	}
+	else{
+		diff=true;
+	}
+	if(diff){
+		var assetversion='window.noname_asset_list=[\n\t\''+updates.version+'\'';
+		fs.writeFile('game/asset.js',assetversion+assetlist+'\n];\n'+skinlist.slice(0,skinlist.length-2)+'\n};','utf-8',function(){
+			console.log('udpated asset.js');
+		});
+	}
 	exec('git diff --name-only', (error, stdout, stderr) => {
 		var updatelist='window.noname_update={\n\tversion:\''+updates.version+'\',';
 		updatelist+='\n\tupdate:\''+(updates.update||'')+'\',';

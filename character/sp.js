@@ -396,6 +396,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						prompt:'视为使用一张杀',
 						ai:{
 							order:function(){
+								var player=_status.event.player;
 								if(!player.hasShan()&&!game.hasPlayer(function(current){
 									return player.canUse('sha',current)&&current.hp==1&&get.effect(current,{name:'sha'},player,player)>0;
 								})){
@@ -417,6 +418,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filterCard:function(){return false},
 						viewAsFilter:function(player){
 							if(player.hasSkill('weijing_disable')) return false;
+							if(!lib.filter.cardRespondable({name:'sha'},player)) return false;
 						},
 						onrespond:function(event,player){
 							player.addTempSkill('weijing_disable','roundStart');
@@ -430,6 +432,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							skillTagFilter:function(player){
 								if(player.hasSkill('weijing_disable')) return false;
+								if(!lib.filter.cardRespondable({name:'sha'},player)) return false;
 							},
 							respondShan:true,
 						}
@@ -2809,13 +2812,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filterCard:{name:'shan'},
 						viewAs:{name:'sha'},
 						viewAsFilter:function(player){
-							if(!player.storage.fanghun) return false;
+							if(!player.storage.fanghun||player.storage.fanghun<0) return false;
 							if(!player.countCards('h','shan')) return false;
 						},
 						prompt:'将一张闪当杀使用或打出',
 						onuse:function(result,player){
 							player.storage.fanghun--;
-							if(!player.storage.fanghun){
+							if(!player.storage.fanghun||player.storage.fanghun<0){
+								player.storage.fanghun=0;
 								player.unmarkSkill('fanghun');
 							}
 							else{
@@ -2831,7 +2835,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							respondSha:true,
 							skillTagFilter:function(player){
-								if(!player.storage.fanghun) return false;
+								if(!player.storage.fanghun||player.storage.fanghun<0) return false;
 								if(!player.countCards('h','shan')) return false;
 							},
 							order:function(){
@@ -2847,12 +2851,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						viewAs:{name:'shan'},
 						prompt:'将一张杀当闪打出',
 						viewAsFilter:function(player){
-							if(!player.storage.fanghun) return false;
+							if(!player.storage.fanghun||player.storage.fanghun<0) return false;
 							if(!player.countCards('h','sha')) return false;
 						},
 						onrespond:function(result,player){
 							player.storage.fanghun--;
-							if(!player.storage.fanghun){
+							if(!player.storage.fanghun||player.storage.fanghun<0){
+								player.storage.fanghun=0;
 								player.unmarkSkill('fanghun');
 							}
 							else{
@@ -2863,12 +2868,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai:{
 							respondShan:true,
 							skillTagFilter:function(player){
-								if(!player.storage.fanghun) return false;
+								if(!player.storage.fanghun||player.storage.fanghun<0) return false;
 								if(!player.countCards('h','sha')) return false;
 							},
 							effect:{
 								target:function(card,player,target,current){
-									if(!player.storage.fanghun) return false;
+									if(!player.storage.fanghun||player.storage.fanghun<0) return 0;
 									if(get.tag(card,'respondShan')&&current<0) return 0.6
 								}
 							},
@@ -5949,8 +5954,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseDrawBegin'},
 				check:function(event,player){
-					if(player.storage.tunchu&&player.storage.tunchu.length) return false;
 					return player.countCards('h')-player.countCards('h',{type:'equip'})<=player.hp;
+				},
+				filter:function(event,player){
+					if(player.storage.tunchu&&player.storage.tunchu.length) return false;
+					return true;
 				},
 				content:function(){
 					trigger.num+=2;

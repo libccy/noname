@@ -1,18 +1,13 @@
 window.noname_update={
-	version:'1.9.52',
-	update:'1.9.51',
+	version:'1.9.52.1',
+	update:'1.9.52',
 	changeLog:[
-		'新武将'
-	],
-	players:[
-		'sp_liuqi',
-		'luzhi'
+		'bug修复（李丰、赵襄、鲁芝、左慈）'
 	],
 	files:[
-		'character/diy.js',
+		'character/shenhua.js',
 		'character/sp.js',
-		'character/yijiang.js',
-		'game/game.js',
-		'mode/boss.js'
+		'game/directory.js',
+		'game/game.js'
 	]
 };
