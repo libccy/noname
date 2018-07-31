@@ -39839,7 +39839,7 @@
 					if(game.getIdentityList2){
 						game.getIdentityList2(list2);
 					}
-					var rect=this.getBoundingClientRect();
+					var rect=this.parentNode.getBoundingClientRect();
 					this._customintro=function(uiintro){
 						if(get.mode()=='guozhan'){
 							uiintro.clickintro=true;
@@ -39889,7 +39889,10 @@
 						}
 					};
 					ui.click.touchpop();
-					ui.click.intro.call(this,e);
+					ui.click.intro.call(this,{
+						clientX:(rect.left+rect.width)*game.documentZoom,
+						clientY:(rect.top)*game.documentZoom
+					});
 					// var nodes=[];
 					// _status.clickingidentity=[this.parentNode,nodes];
 					// var num=1;
