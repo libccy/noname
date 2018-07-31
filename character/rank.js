@@ -192,6 +192,7 @@ window.noname_character_rank={
 		'maliang',
 	],
 	am:[
+		'caocao',
 		'gw_oudimu',
 		'guanyinping',
 		'dongyun',
@@ -318,6 +319,7 @@ window.noname_character_rank={
 		'liuye',
 	],
 	bp:[
+		'zhenji',
 		'gw_qigaiwang',
 		'quyi',
 		'wangyun',
@@ -587,7 +589,6 @@ window.noname_character_rank={
 		're_lvbu',
 		'chendong',
 		'simayi',
-		'zhenji',
 		'ganning',
 		'luxun',
 		'zhangjiao',
@@ -618,7 +619,6 @@ window.noname_character_rank={
 		'machao',
 		're_gongsunzan',
 		'caohong',
-		'caocao',
 		'lvbu',
 		'yujin',
 	],

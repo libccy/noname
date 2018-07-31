@@ -130,6 +130,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:true,
 				content:function(){
 					'step 0'
+					if(!target.countCards('e',function(card){
+						return lib.filter.cardDiscardable(card,target);
+					})){
+						target.damage('thunder');
+						event.finish();
+						return;
+					}
 					target.chooseControl('discard_card','take_damage',function(event,player){
 						if(get.damageEffect(player,event.player,player,'thunder')>=0){
 							return 'take_damage';

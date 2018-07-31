@@ -2566,6 +2566,48 @@ div:not(.handcards)>.card>.info>span,
 	top: 2px;
 }
 
+.identity .identitycircle {
+	position: relative;
+	width: 20px;
+	height: 20px;
+	left: 1px;
+	top: 1px;
+	border-radius: 100%;
+}
+
+.identitycircle > div {
+	width: 18px;
+	height: 18px;
+	left: 1px;
+	top: 1px;
+	border-radius: 100%;
+	overflow: hidden;
+}
+
+.identitycircle > div > div {
+	width: 9px;
+	height: 9px;
+	left: 9px;
+	top: 0px;
+	transform-origin: bottom left;
+}
+
+.identitycircle > div > div[data-color='wei'] {
+	background-image: radial-gradient(circle at bottom left, rgb(157, 198, 255), rgb(117, 147, 189))
+}
+
+.identitycircle > div > div[data-color='shu'] {
+	background-image: radial-gradient(circle at bottom left, rgb(185, 72, 36), rgb(158, 62, 31))
+}
+
+.identitycircle > div > div[data-color='wu'] {
+	background-image: radial-gradient(circle at bottom left, rgb(120, 218, 83), rgb(104, 189, 73))
+}
+
+.identitycircle > div > div[data-color='qun'] {
+	background-image: radial-gradient(circle at bottom left, rgb(255, 218, 71), rgb(224, 191, 62))
+}
+
 .unseen>.avatar,.unseen>.name:not(.name2),
 .unseen2>.avatar2,.unseen2>.name2 {
 	opacity: 0 !important;

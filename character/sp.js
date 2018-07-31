@@ -6381,14 +6381,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){},
 				mod:{
-					maxHandcard:function(player,num){
-						var hs=player.getCards('h');
-						for(var i=0;i<hs.length;i++){
-							if(get.type(hs[i])!='basic'){
-								num++;
-							}
+					ignoredHandcard:function(card,player){
+						if(get.type(card)!='basic'){
+							return true;
 						}
-						return num;
 					},
 					cardDiscardable:function(card,player,name){
 						if(name=='phaseDiscard'&&get.type(card)!='basic') return false;

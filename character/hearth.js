@@ -2582,15 +2582,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			longyi:{
 				mod:{
-					maxHandcard:function(player,num){
-						var hs=player.getCards('h');
-						for(var i=0;i<hs.length;i++){
-							if(get.color(hs[i])=='black'){
-								num++;
-							}
+					ignoredHandcard:function(card,player){
+						if(get.color(card)=='black'){
+							return true;
 						}
-						return num;
-					},
+					}
 				},
 			},
 			zhongji:{
@@ -5138,14 +5134,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xiaorong:{
 				mod:{
-					maxHandcard:function(player,num){
-						var hs=player.getCards('h');
-						for(var i=0;i<hs.length;i++){
-							if(get.type(hs[i])=='equip'){
-								num++;
-							}
+					ignoredHandcard:function(card,player){
+						if(get.type(card)=='equip'){
+							return true;
 						}
-						return num;
 					},
 				},
 				trigger:{player:'phaseEnd'},
@@ -7413,7 +7405,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return player.storage.huanfeng_end;
 						},
 						content:function(){
-							
+
 							player.insertPhase();
 							delete player.storage.huanfeng_end;
 						}

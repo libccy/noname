@@ -2,7 +2,7 @@ window.config={
 	forbidai:['miheng','ns_liuzhang'],
 	forbidai_user:[],
 	forbidall:['xiahouyuan','huangzhong','weiyan','dianwei','zhangjiao',
-	'caocao','simayi','guanyu','zhangfei','zhaoyun','ganning','lvmeng','lvbu'],
+	're_caocao','simayi','guanyu','zhangfei','zhaoyun','ganning','lvmeng','lvbu'],
 	forbidversus:['swd_kangnalishi'],
 	forbidstone:['zhugedan','pal_xuanxiao','hs_malfurion','lusu','chenlin','hs_siwangzhiyi',
 		'gjqt_bailitusu','yuanshao','swd_anka','swd_nicole','daqiao','re_daqiao','hs_xuanzhuanjijia',
@@ -13,7 +13,7 @@ window.config={
 	],
 	replacecharacter:{
 		zhangjiao:'sp_zhangjiao',
-		caocao:'re_caocao',
+		re_caocao:'caocao',
 		simayi:'re_simayi',
 		guanyu:'re_guanyu',
 		zhangfei:'re_zhangfei',

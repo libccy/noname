@@ -2329,7 +2329,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:10,
 					result:{
 						player:function(player){
-							if(player.countCards('h')<player.getHandcardLimit()){
+							if(!player.needsToDiscard(1)){
 								return 1;
 							}
 							return 0;
@@ -3052,15 +3052,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			fulin2:{
 				mod:{
-					maxHandcard:function(player,num){
-						if(player.storage.fulin&&player.storage.fulin.length){
-							var hs=player.getCards('h');
-							for(var i=0;i<player.storage.fulin.length;i++){
-								if(hs.contains(player.storage.fulin[i])){
-									num++;
-								}
-							}
-							return num;
+					ignoredHandcard:function(card,player){
+						if(player.storage.fulin&&player.storage.fulin.contains(card)){
+							return true;
 						}
 					}
 				},

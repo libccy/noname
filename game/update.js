@@ -1,13 +1,28 @@
 window.noname_update={
-	version:'1.9.52.1',
-	update:'1.9.52',
+	version:'1.9.53',
+	update:'1.9.52.1',
 	changeLog:[
-		'bug修复（李丰、赵襄、鲁芝、左慈）'
+		'国战标身份改进、bug修复',
+		'新版标准武将（需在武将菜单中手动开启）'
+	],
+	players:[
+		'caocao',
+		'huangyueying',
+		'zhenji',
+		'sunquan',
+		'zhugeliang',
+		'diaochan'
 	],
 	files:[
-		'character/shenhua.js',
+		'card/guozhan.js',
+		'card/standard.js',
+		'character/hearth.js',
+		'character/rank.js',
 		'character/sp.js',
-		'game/directory.js',
-		'game/game.js'
+		'character/standard.js',
+		'character/yijiang.js',
+		'game/config.js',
+		'game/game.js',
+		'layout/default/layout.css'
 	]
 };
