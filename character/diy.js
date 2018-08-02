@@ -1170,10 +1170,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'nsbugua_use',
 				ai:{
 					threaten:1.4,
-					order:9.5,
-					result:{
-						player:1
-					}
 				},
 				subSkill:{
 					use:{
@@ -1190,6 +1186,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return player.countCards('he');
 						},
 						position:'he',
+						ai:{
+							order:9.5,
+							result:{
+								player:1
+							}
+						},
 						content:function(){
 							'step 0'
 							player.throwDice();
