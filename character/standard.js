@@ -1453,7 +1453,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				alter:true,
 				filter:function(event){
-					return (get.type(event.card)=='trick'&&event.cards[0]&&event.cards[0]==event.card);
+					if(!get.is.altered('xinjizhi')&&get.type(event.card)=='delay') return false;
+					return (get.type(event.card,'trick')=='trick'&&event.cards[0]&&event.cards[0]==event.card);
 				},
 				init:function(player){
 					player.storage.xinjizhi=0;
@@ -2257,7 +2258,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jizhi_info:'每当你使用一张非转化的普通锦囊牌，可以摸一张牌',
 			xinjizhi:'集智',
 			xinjizhi_info:'每当你使用一张非转化的普通锦囊牌，可以摸一张牌',
-			xinjizhi_info_alter:'每当你使用一张非转化的普通锦囊牌，可以摸一张牌，如果摸到的是基本牌，你可以弃置这张牌，然后本回合手牌上限+1',
+			xinjizhi_info_alter:'每当你使用一张非转化的锦囊牌，可以摸一张牌，如果摸到的是基本牌，你可以弃置这张牌，然后本回合手牌上限+1',
 			xinqicai:'奇才',
 			xinqicai_info:'锁定技，你使用的锦囊牌无距离限制',
 			xinqicai_info_alter:'锁定技，你使用的锦囊牌无距离限制，你装备区内的牌不能被弃置',
