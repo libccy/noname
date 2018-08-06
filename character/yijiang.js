@@ -4858,7 +4858,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					var yep=false;
-					if(!player.storage.jijianging){
+					if(!player.storage.jijianging&&!trigger.jijiang){
 						var players=game.filterPlayer();
 						for(var i=0;i<players.length;i++){
 							var nh=players[i].countCards('h');
@@ -4891,6 +4891,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return (get.attitude(event.player,event.source)-2);
 						});
 						next.set('source',player);
+						next.set('jijiang',true);
 						next.autochoose=lib.filter.autoRespondSha;
 					}
 					else{
@@ -4968,6 +4969,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 						next.set('source',player);
 						next.set('target',target);
+						next.set('jijiang',true);
 						next.autochoose=lib.filter.autoRespondSha;
 					}
 					else{

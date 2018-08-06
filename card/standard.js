@@ -368,8 +368,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						var num=player.countCards('h','sha');
-						if(num>1) return 4+num;
-						return 2+num;
+						if(num>1) return 6+num;
+						return 3+num;
 					},
 					basic:{
 						equipValue:5

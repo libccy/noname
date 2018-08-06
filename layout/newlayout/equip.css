@@ -88,6 +88,7 @@
 .equips>.card>.name2{
 	display:block;
 	margin-left:5px;
+	white-space: nowrap;
 }
 .equips>.card>div{
 	animation:none !important;

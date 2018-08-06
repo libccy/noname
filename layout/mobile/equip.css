@@ -135,6 +135,7 @@
 #arena.chess .player .equips>.card>.name2{
 	display:block;
 	margin-left:5px;
+	white-space: nowrap;
 }
 #arena.oblongcard:not(.chess).textequip .player[data-position='0'] .equips>.card>.name2{
 	line-height: 29px;

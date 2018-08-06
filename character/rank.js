@@ -317,6 +317,7 @@ window.noname_character_rank={
 		'hs_mojinbaozi',
 		'xuhuang',
 		'liuye',
+		'sunshangxiang',
 	],
 	bp:[
 		'zhenji',
@@ -544,7 +545,6 @@ window.noname_character_rank={
 		'swd_zhanggao',
 		'simalang',
 		'sp_caoren',
-		'sunshangxiang',
 		'daqiao',
 		'swd_luchengxuan',
 		'dongzhuo',

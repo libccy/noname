@@ -25,7 +25,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhouyu:['male','wu',3,['yingzi','fanjian']],
 			daqiao:['female','wu',3,['guose','liuli']],
 			luxun:['male','wu',3,['qianxun','lianying']],
-			sunshangxiang:['female','wu',3,['xiaoji','jieyin']],
+			sunshangxiang:['female','wu',3,['xiaoji','xinjieyin']],
 			huatuo:['male','qun',3,['qingnang','jijiu']],
 			lvbu:['male','qun',4,['wushuang']],
 			diaochan:['female','qun',3,['lijian','xinbiyue']],
@@ -697,6 +697,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				audioname:['liushan'],
 				trigger:{player:'chooseToRespondBegin'},
+				check:function(event){
+					if(event.jijiang) return false;
+					return true;
+				},
 				filter:function(event,player){
 					if(event.responded) return false;
 					if(player.storage.jijianging) return false;
@@ -720,6 +724,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return (get.attitude(event.player,event.source)-2);
 						});
 						next.set('source',player);
+						next.set('jijiang',true);
 						next.autochoose=lib.filter.autoRespondSha;
 					}
 					else{
@@ -785,6 +790,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 						next.set('source',player);
 						next.set('target',target);
+						next.set('jijiang',true);
 						next.autochoose=lib.filter.autoRespondSha;
 					}
 					else{
@@ -1548,12 +1554,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return 6-get.value(card)
 				},
+				delay:0,
 				content:function(){
-					var num=cards.length;
-					if(get.is.altered('xinzhiheng')&&player.countCards('h')==0){
-						num++;
-					}
-					player.draw(num);
+					'step 0'
+					if(!player.hasSkill('xinzhiheng_delay')) game.delayx();
+					'step 1'
+					player.draw(cards.length);
+				},
+				group:'xinzhiheng_draw',
+				subSkill:{
+					draw:{
+						trigger:{player:'loseEnd'},
+						silent:true,
+						filter:function(event,player){
+							if(event.getParent(2).skill!='xinzhiheng') return false;
+							if(!get.is.altered('xinzhiheng')) return false;
+							if(player.countCards('h')) return false;
+							for(var i=0;i<event.cards.length;i++){
+								if(event.cards[i].original=='h') return true;
+							}
+							return false;
+						},
+						content:function(){
+							player.draw();
+							player.addTempSkill('xinzhiheng_delay','xinzhihengAfter');
+						}
+					},
+					delay:{}
 				},
 				ai:{
 					order:1,
@@ -1951,7 +1978,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.hp<player.maxHp)
 						return 6-get.value(card)
 					return 4-get.value(card)
-
 				},
 				filterTarget:function(card,player,target){
 					if(target.sex!='male') return false;
@@ -1974,6 +2000,143 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:4
 					},
 					threaten:2,
+				}
+			},
+			xinjieyin:{
+				group:['xinjieyin_old','xinjieyin_new'],
+				alter:true,
+				subSkill:{
+					new:{
+						audio:'jieyin',
+						enable:'phaseUse',
+						filterCard:true,
+						usable:1,
+						position:'he',
+						check:function(card){
+							var player=_status.event.player;
+							if(get.position(card)=='e'){
+								var subtype=get.subtype(card);
+								if(!game.hasPlayer(function(current){
+									return current!=player&&current.hp!=player.hp&&get.attitude(player,current)>0&&!current.countCards('e',{subtype:subtype});
+								})){
+									return 0;
+								}
+								if(player.countCards('h',{subtype:subtype})) return 20-get.value(card);
+								return 10-get.value(card);
+							}
+							else{
+								if(player.countCards('e')) return 0;
+								if(player.countCards('h',{type:'equip'})) return 0;
+								return 8-get.value(card);
+							}
+						},
+						filterTarget:function(card,player,target){
+							if(target.sex!='male') return false;
+							if(target.countCards('e',{subtype:get.subtype(ui.selected.cards[0])})) return false;
+							return true;
+						},
+						discard:false,
+						delay:0,
+						lose:false,
+						content:function(){
+							'step 0'
+							if(get.position(cards[0])=='e'){
+								player.$give(cards,target);
+								target.equip(cards[0]);
+							}
+							else{
+								player.discard(cards);
+							}
+							'step 1'
+							if(player.hp>target.hp){
+								player.draw();
+								if(target.isDamaged()) target.recover();
+							}
+							else if(player.hp<target.hp){
+								target.draw();
+								if(player.isDamaged()) player.recover();
+							}
+						},
+						ai:{
+							order:function(){
+								var player=_status.event.player;
+								var es=player.getCards('e');
+								for(var i=0;i<es.length;i++){
+									if(player.countCards('h',{subtype:get.subtype(es[i])})) return 10;
+								}
+								return 2;
+							},
+							result:{
+								target:function(player,target){
+									var goon=function(){
+										var es=player.getCards('e');
+										for(var i=0;i<es.length;i++){
+											if(player.countCards('h',{subtype:get.subtype(es[i])})) return true;
+										}
+										return false;
+									}
+									if(player.hp<target.hp){
+										if(player.isHealthy()){
+											if(!player.needsToDiscard(1)||goon()) return 0.1;
+											return 0;
+										}
+										return 1.5;
+									}
+									if(player.hp>target.hp){
+										if(target.isHealthy()){
+											if(!player.needsToDiscard(1)||goon()) return 0.1;
+											return 0;
+										}
+										return 1;
+									}
+									return 0;
+								}
+							}
+						}
+					},
+					old:{
+						audio:'jieyin',
+						enable:'phaseUse',
+						filterCard:true,
+						usable:1,
+						selectCard:2,
+						filter:function(event,player){
+							if(get.is.altered('xinjieyin')) return false;
+							return player.countCards('h')>=2;
+						},
+						check:function(card){
+							var player=get.owner(card);
+							if(player.countCards('h')>player.hp)
+								return 8-get.value(card)
+							if(player.hp<player.maxHp)
+								return 6-get.value(card)
+							return 4-get.value(card)
+						},
+						filterTarget:function(card,player,target){
+							if(target.sex!='male') return false;
+							if(target.hp>=target.maxHp) return false;
+							if(target==player) return false;
+							return true;
+						},
+						content:function(){
+							player.recover();
+							target.recover();
+						},
+						ai:{
+							order:5.5,
+							result:{
+								player:function(player){
+									if(player.hp<player.maxHp) return 4;
+									if(player.countCards('h')>player.hp) return 0
+									return -1;
+								},
+								target:4
+							}
+						}
+					}
+				},
+				ai:{
+					threaten:2.3
 				}
 			},
 			qingnang:{
@@ -2217,6 +2380,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lianying:'连营',
 			xiaoji:'枭姬',
 			jieyin:'结姻',
+			xinjieyin:'结姻',
 			qingnang:'青囊',
 			jijiu:'急救',
 			wushuang:'无双',
@@ -2282,6 +2446,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lianying_info:'每当你失去最后一张手牌，可摸一张牌',
 			xiaoji_info:'每当你失去一张装备牌，可以摸两张牌',
 			jieyin_info:'出牌阶段，你可以弃置两张牌并选择1名已经受伤的男性角色，你与其各回复一点体力，每阶段限一次',
+			xinjieyin_info:'出牌阶段，你可以弃置两张牌并选择1名已经受伤的男性角色，你与其各回复一点体力，每阶段限一次',
+			xinjieyin_old_info:'出牌阶段，你可以弃置两张牌并选择1名已经受伤的男性角色，你与其各回复一点体力，每阶段限一次',
+			xinjieyin_new_info:'出牌阶段限1次，你可以选择一名男性角色，弃置一张手牌或将一张装备牌置于其装备区，你与其体力较高的角色摸一张牌，体力值较低的角色回复1点体力',
+			xinjieyin_info_alter:'出牌阶段限1次，你可以选择一名男性角色，弃置一张手牌或将一张装备牌置于其装备区，你与其体力较高的角色摸一张牌，体力值较低的角色回复1点体力',
 			qingnang_info:'出牌阶段，你可以弃置一张手牌令一名角色回复一点体力，每阶段限一次',
 			jijiu_info:'回合外，你可以将一张红色牌当[桃]使用',
 			wushuang_info:'锁定技，你使用的【杀】或【决斗】需要两张【闪】或【杀】响应',
