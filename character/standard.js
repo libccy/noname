@@ -2032,7 +2032,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						filterTarget:function(card,player,target){
 							if(target.sex!='male') return false;
-							if(target.countCards('e',{subtype:get.subtype(ui.selected.cards[0])})) return false;
+							var card=ui.selected.cards[0];
+							if(!card) return false;
+							if(get.position(card)=='e'&&target.countCards('e',{subtype:get.subtype(card)})) return false;
 							return true;
 						},
 						discard:false,
