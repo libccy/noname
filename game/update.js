@@ -7,6 +7,10 @@ window.noname_update={
 	files:[
 		'card/standard.js',
 		'character/shenhua.js',
-		'game/game.js'
+		'character/standard.js',
+		'character/yijiang.js',
+		'game/asset.js',
+		'game/game.js',
+		'mode/guozhan.js'
 	]
 };

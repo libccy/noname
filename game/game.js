@@ -11425,27 +11425,35 @@
 					}
 					var directh=true;
 					for(var i=0;i<event.position.length;i++){
-						if(event.position[i]=='h'&&target.countCards('h')){
-							event.dialog.addText('手牌区');
+						if(event.position[i]=='h'){
 							var hs=target.getCards('h');
-							hs.randomSort();
-							if(event.visible||target.isUnderControl(true)){
-								event.dialog.add(hs);
+							if(hs.length){
+								event.dialog.addText('手牌区');
+								hs.randomSort();
+								if(event.visible||target.isUnderControl(true)){
+									event.dialog.add(hs);
+									directh=false;
+								}
+								else{
+									event.dialog.add([hs,'blank']);
+								}
+							}
+						}
+						else if(event.position[i]=='e'){
+							var es=target.getCards('e');
+							if(es.length){
+								event.dialog.addText('装备区');
+								event.dialog.add(es);
 								directh=false;
 							}
-							else{
-								event.dialog.add([hs,'blank']);
+						}
+						else if(event.position[i]=='j'){
+							var js=target.getCards('j');
+							if(js.length){
+								event.dialog.addText('判定区');
+								event.dialog.add(js);
+								directh=false;
 							}
-						}
-						else if(event.position[i]=='e'&&target.countCards('e')){
-							event.dialog.addText('装备区');
-							event.dialog.add(target.getCards('e'));
-							directh=false;
-						}
-						else if(event.position[i]=='j'&&target.countCards('j')){
-							event.dialog.addText('判定区');
-							event.dialog.add(target.getCards('j'));
-							directh=false;
 						}
 					}
 					if(event.dialog.buttons.length==0){
@@ -11498,6 +11506,19 @@
 				},
 				discardPlayerCard:function(){
 					"step 0"
+					if(event.directresult){
+						event.result={
+							buttons:[],
+							cards:event.directresult.slice(0),
+							links:event.directresult.slice(0),
+							targets:[],
+							confirm:'ok',
+							bool:true
+						};
+						event.cards=event.directresult.slice(0);
+						event.goto(2);
+						return;
+					}
 					if(!event.dialog) event.dialog=ui.create.dialog('hidden');
 					else if(!event.isMine){
 						event.dialog.style.display='none';
@@ -11595,7 +11616,7 @@
 					event.dialog.close();
 					"step 2"
 					event.resume();
-					if(event.result.bool&&event.result.buttons&&!game.online){
+					if(event.result.bool&&event.result.links&&!game.online){
 						if(event.logSkill){
 							if(typeof event.logSkill=='string'){
 								player.logSkill(event.logSkill);
@@ -11609,17 +11630,34 @@
 							cards.push(event.result.links[i]);
 						}
 						event.result.cards=event.result.links.slice(0);
-						if(event.boolline){
-							player.line(target,'green');
-						}
-						var next=target.discard(cards);
+						event.cards=cards;
+					}
+					"step 3"
+					if(event.boolline){
+						player.line(target,'green');
+					}
+					if(!event.chooseonly){
+						var next=target.discard(event.cards);
 						if(event.delay===false){
-							next.delay=event.delay;
+							next.set('delay',false);
 						}
 					}
 				},
 				gainPlayerCard:function(){
 					"step 0"
+					if(event.directresult){
+						event.result={
+							buttons:[],
+							cards:event.directresult.slice(0),
+							links:event.directresult.slice(0),
+							targets:[],
+							confirm:'ok',
+							bool:true
+						};
+						event.cards=event.directresult.slice(0);
+						event.goto(2);
+						return;
+					}
 					if(!event.dialog) event.dialog=ui.create.dialog('hidden');
 					else if(!event.isMine){
 						event.dialog.style.display='none';
@@ -11656,7 +11694,7 @@
 							}
 						}
 						else if(event.position[i]=='e'){
-							var es=target.getGainableCards('e');
+							var es=target.getGainableCards(player,'e');
 							if(es.length){
 								event.dialog.addText('装备区');
 								event.dialog.add(es);
@@ -11664,7 +11702,7 @@
 							}
 						}
 						else if(event.position[i]=='j'){
-							var js=target.getGainableCards('j');
+							var js=target.getGainableCards(player,'j');
 							if(js.length){
 								event.dialog.addText('判定区');
 								event.dialog.add(js);
@@ -11760,7 +11798,12 @@
 					if(event.boolline){
 						player.line(target,'green');
 					}
-					player.gain(event.cards,target);
+					if(!event.chooseonly){
+						var next=player.gain(event.cards,target);
+						if(event.delay===false){
+							next.set('delay',false);
+						}
+					}
 				},
 				showHandcards:function(){
 					"step 0"
@@ -12704,32 +12747,25 @@
 					event.num=0;
 					event.cardlist=[];
 					'step 1'
+					player.gainPlayerCard(targets[num],event.position,true).set('boolline',false).set('chooseonly',true);
+					'step 2'
 					var current=targets[num];
-					var card;
-					if(cards){
-						card=cards[num];
-					}
-					else{
-						card=current.getCards(event.position).randomGet();
+					var card=null;
+					if(result.bool){
+						card=result.cards[0];
 					}
 					if(card){
-						if(typeof event.animation=='string'){
-							current['$'+event.animation](card,player);
-						}
-						else{
-							current.$giveAuto(card,player);
-						}
 						current.lose(card,ui.special).set('type','gain');
 					}
 					event.cardlist[num]=card||null;
 					event.num++;
 					if(event.num<targets.length){
-						event.redo();
+						event.goto(1);
 					}
 					else{
 						event.num=0;
 					}
-					'step 2'
+					'step 3'
 					var current=targets[num];
 					var card=event.cardlist[num];
 					if(card){
@@ -12745,7 +12781,7 @@
 					if(event.num<targets.length){
 						event.redo();
 					}
-					'step 2'
+					'step 4'
 					if(!event.delayed) game.delay();
 				},
 				gain:function(){
@@ -16313,18 +16349,12 @@
 					},this,cards);
 					return this;
 				},
-				gainMultiple:function(targets,position,animation){
+				gainMultiple:function(targets,position){
 					var next=game.createEvent('gainMultiple',false);
 					next.setContent('gainMultiple');
 					next.player=this;
 					next.targets=targets;
-					next.animation=animation;
-					if(Array.isArray(position)){
-						next.cards=position;
-					}
-					else{
-						next.position=position||'h';
-					}
+					next.position=position||'h';
 					return next;
 				},
 				gain:function(){

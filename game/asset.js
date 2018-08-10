@@ -1510,6 +1510,7 @@ window.noname_asset_list=[
 	'image/card/zong.png',
 	'image/character/baiwuchang.jpg',
 	'image/character/beimihu.jpg',
+	'image/character/bianfuren.jpg',
 	'image/character/bulianshi.jpg',
 	'image/character/buzhi.jpg',
 	'image/character/caifuren.jpg',

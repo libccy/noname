@@ -61,7 +61,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		perfectPair:{
 			xiahoudun:['xiahouyuan'],
 			zhenji:['caopi'],
-			caocao:['xuzhu','dianwei'],
+			caocao:['xuzhu','dianwei','bianfuren'],
 			huangzhong:['weiyan'],
 			zhugeliang:['huangyueying'],
 			liubei:['guanyu','zhangfei','ganfuren'],
@@ -71,7 +71,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunquan:['zhoutai'],
 			lvbu:['diaochan'],
 			machao:['madai','mayunlu'],
-			zhangliao:['zangba']
+			zhangliao:['zangba'],
+			ganning:['lingtong'],
 		},
 		skill:{
 			hujia:{

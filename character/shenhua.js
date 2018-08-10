@@ -47,7 +47,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuanshao:['yanwen'],
 			menghuo:['zhurong'],
 			sp_zhugeliang:['pangtong'],
-			sunce:['zhouyu','taishici','daqiao']
+			sunce:['zhouyu','taishici','daqiao'],
+			zuoci:['yuji'],
+			xunyu:['xunyou'],
 		},
 		characterFilter:{
 			zuoci:function(mode){

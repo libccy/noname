@@ -8054,6 +8054,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						var recover=0,lose=1,players=game.filterPlayer();
 						for(var i=0;i<players.length;i++){
+							if(players[i].hp==1&&get.damageEffect(players[i],player,player)>0&&!players[i].hasSha()){
+								return (button.link[2]=='juedou')?2:-1;
+							}
 							if(!players[i].isOut()){
 								if(players[i].hp<players[i].maxHp){
 									if(get.attitude(player,players[i])>0){

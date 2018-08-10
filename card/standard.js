@@ -953,10 +953,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				filterTarget:function(card,player,target){
 					if(player==target) return false;
-					return (target.countCards('hej')>0);
+					return target.countGainableCards(player,'hej')>0;
 				},
 				content:function(){
-					if(target.countCards('hej')){
+					if(target.countGainableCards(player,'hej')){
 						player.gainPlayerCard('hej',target,true);
 					}
 				},
@@ -1043,7 +1043,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								if(js.length){
 									var jj=js[0].viewAs?{name:js[0].viewAs}:js[0];
 									if(jj.name=='guohe'||js.length>1||get.effect(target,jj,target,player)<0){
-										return 2;
+										return 3;
 									}
 								}
 								if(target.getEquip('baiyin')&&target.isDamaged()&&
@@ -1127,8 +1127,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						gain:1,
 						use:1,
 						useSha:1,
-						multitarget:1,
-						multineg:1,
 						loseCard:1,
 					}
 				}
