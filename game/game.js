@@ -11520,9 +11520,7 @@
 					var directh=true;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
-							var hs=target.getCards('h',function(card){
-								return lib.filter.canBeDiscarded(card,player,target);
-							});
+							var hs=target.getDiscardableCards(player,'h');
 							if(hs.length){
 								event.dialog.addText('手牌区');
 								hs.randomSort();
@@ -11536,9 +11534,7 @@
 							}
 						}
 						else if(event.position[i]=='e'){
-							var es=target.getCards('e',function(card){
-								return lib.filter.canBeDiscarded(card,player,target);
-							});
+							var es=target.getDiscardableCards(player,'e');
 							if(es.length){
 								event.dialog.addText('装备区');
 								event.dialog.add(es);
@@ -11546,9 +11542,7 @@
 							}
 						}
 						else if(event.position[i]=='j'){
-							var js=target.getCards('j',function(card){
-								return lib.filter.canBeDiscarded(card,player,target);
-							});
+							var js=target.getDiscardableCards(player,'j');
 							if(js.length){
 								event.dialog.addText('判定区');
 								event.dialog.add(js);
@@ -11647,27 +11641,35 @@
 					}
 					var directh=true;
 					for(var i=0;i<event.position.length;i++){
-						if(event.position[i]=='h'&&target.countCards('h')){
-							event.dialog.addText('手牌区');
-							var hs=target.getCards('h');
-							hs.randomSort();
-							if(event.visible||target.isUnderControl(true)){
-								event.dialog.add(hs);
+						if(event.position[i]=='h'){
+							var hs=target.getGainableCards(player,'h');
+							if(hs.length){
+								event.dialog.addText('手牌区');
+								hs.randomSort();
+								if(event.visible||target.isUnderControl(true)){
+									event.dialog.add(hs);
+									directh=false;
+								}
+								else{
+									event.dialog.add([hs,'blank']);
+								}
+							}
+						}
+						else if(event.position[i]=='e'){
+							var es=target.getGainableCards('e');
+							if(es.length){
+								event.dialog.addText('装备区');
+								event.dialog.add(es);
 								directh=false;
 							}
-							else{
-								event.dialog.add([hs,'blank']);
+						}
+						else if(event.position[i]=='j'){
+							var js=target.getGainableCards('j');
+							if(js.length){
+								event.dialog.addText('判定区');
+								event.dialog.add(js);
+								directh=false;
 							}
-						}
-						else if(event.position[i]=='e'&&target.countCards('e')){
-							event.dialog.addText('装备区');
-							event.dialog.add(target.getCards('e'));
-							directh=false;
-						}
-						else if(event.position[i]=='j'&&target.countCards('j')){
-							event.dialog.addText('判定区');
-							event.dialog.add(target.getCards('j'));
-							directh=false;
 						}
 					}
 					if(event.dialog.buttons.length==0){
@@ -14723,8 +14725,32 @@
 					}
 					return cards;
 				},
+				getDiscardableCards:function(player,arg1,arg2){
+					var cards=this.getCards(arg1,arg2);
+					for(var i=0;i<cards.length;i++){
+						if(!lib.filter.canBeDiscarded(cards[i],player,this)){
+							cards.splice(i--,1);
+						}
+					}
+					return cards;
+				},
+				getGainableCards:function(player,arg1,arg2){
+					var cards=this.getCards(arg1,arg2);
+					for(var i=0;i<cards.length;i++){
+						if(!lib.filter.canBeGained(cards[i],player,this)){
+							cards.splice(i--,1);
+						}
+					}
+					return cards;
+				},
 				countCards:function(arg1,arg2){
 					return this.getCards(arg1,arg2).length;
+				},
+				countDiscardableCards:function(player,arg1,arg2){
+					return this.getDiscardableCards(player,arg1,arg2).length;
+				},
+				countGainableCards:function(player,arg1,arg2){
+					return this.getGainableCards(player,arg1,arg2).length;
 				},
 				getOriginalSkills:function(){
 					var skills=[];
@@ -21444,6 +21470,12 @@
 			canBeDiscarded:function(card,player,target,event){
 				event=event||_status.event;
 				var mod=game.checkMod(card,player,target,event.getParent().name,'unchanged','canBeDiscarded',target);
+				if(mod!='unchanged') return mod;
+				return true;
+			},
+			canBeGained:function(card,player,target,event){
+				event=event||_status.event;
+				var mod=game.checkMod(card,player,target,event.getParent().name,'unchanged','canBeGained',target);
 				if(mod!='unchanged') return mod;
 				return true;
 			},

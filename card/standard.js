@@ -1021,14 +1021,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				filterTarget:function(card,player,target){
 					if(player==target) return false;
-					return target.countCards('hej',function(card){
-						return lib.filter.canBeDiscarded(card,player,target);
-					})>0;
+					return target.countDiscardableCards(player,'hej');
 				},
 				content:function(){
-					if(target.countCards('hej',function(card){
-						return lib.filter.canBeDiscarded(card,player,target);
-					})){
+					if(target.countDiscardableCards(player,'hej')){
 						player.discardPlayerCard('hej',target,true);
 					}
 				},

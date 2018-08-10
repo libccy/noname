@@ -5,15 +5,8 @@ window.noname_update={
 		'变包武将'
 	],
 	files:[
-		'character/diy.js',
-		'character/extra.js',
-		'character/hearth.js',
+		'card/standard.js',
 		'character/shenhua.js',
-		'character/sp.js',
-		'character/yijiang.js',
-		'game/asset.js',
-		'game/directory.js',
-		'game/game.js',
-		'mode/guozhan.js'
+		'game/game.js'
 	]
 };
