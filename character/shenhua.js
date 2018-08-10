@@ -43,6 +43,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zuoci:['male','qun',3,['huashen','xinsheng']],
 		},
 		perfectPair:{
+			jiaxu:['liqueguosi'],
 			yuanshao:['yanwen'],
 			menghuo:['zhurong'],
 			sp_zhugeliang:['pangtong'],
@@ -700,7 +701,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				priority:-10,
 				derivation:'guanxing',
-				trigger:{player:'phaseBegin'},
+				trigger:{player:'phaseBeginStart'},
 				forced:true,
 				filter:function(event,player){
 					if(player.storage.zhiji) return false;
@@ -726,7 +727,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.hp>player.maxHp) player.hp=player.maxHp;
 					player.update();
 					player.addSkill('guanxing');
-					game.createTrigger('phaseBegin','guanxing',player,trigger);
 				}
 			},
 			xiangle:{
@@ -1196,7 +1196,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				derivation:['reyingzi','yinghun'],
 				unique:true,
-				trigger:{player:'phaseBegin'},
+				trigger:{player:'phaseBeginStart'},
 				filter:function(event,player){
 					return player.hp==1&&!player.storage.hunzi;
 				},
@@ -1208,7 +1208,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkill('yinghun');
 					player.awakenSkill('hunzi');
 					player.storage.hunzi=true;
-					game.createTrigger('phaseBegin','yinghun',player,trigger);
 				},
 				ai:{
 					threaten:function(player,target){
@@ -1605,7 +1604,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			huashen2:{
 				audio:2,
-				trigger:{player:['phaseBegin','phaseEnd','huashenStart']},
+				trigger:{player:['phaseBeginStart','phaseEnd','huashenStart']},
 				filter:function(event,player,name){
 					if(name=='phaseBegin'&&game.phaseNumber==1) return false;
 					return true;
@@ -1685,37 +1684,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									}
 								}
 
-								if(event.triggername=='phaseBegin'){
-									(function(){
-										var skills=[link];
-										var list=[];
-										game.expandSkills(skills);
-										var triggerevent=event._trigger;
-										var name='phaseBegin';
-										for(i=0;i<skills.length;i++){
-											var trigger=get.info(skills[i]).trigger;
-											if(trigger){
-												var add=false;
-												if(player==triggerevent.player&&trigger.player){
-													if(typeof trigger.player=='string'){
-														if(trigger.player==name) add=true;
-													}
-													else if(trigger.player.contains(name)) add=true;
-												}
-												if(trigger.global){
-													if(typeof trigger.global=='string'){
-														if(trigger.global==name) add=true;
-													}
-													else if(trigger.global.contains(name)) add=true;
-												}
-												if(add&&player.isOut()==false) list.push(skills[i]);
-											}
-										}
-										for(var i=0;i<list.length;i++){
-											game.createTrigger('phaseBegin',list[i],player,triggerevent);
-										}
-									}());
-								}
+								// if(event.triggername=='phaseBegin'){
+								// 	(function(){
+								// 		var skills=[link];
+								// 		var list=[];
+								// 		game.expandSkills(skills);
+								// 		var triggerevent=event._trigger;
+								// 		var name='phaseBegin';
+								// 		for(i=0;i<skills.length;i++){
+								// 			var trigger=get.info(skills[i]).trigger;
+								// 			if(trigger){
+								// 				var add=false;
+								// 				if(player==triggerevent.player&&trigger.player){
+								// 					if(typeof trigger.player=='string'){
+								// 						if(trigger.player==name) add=true;
+								// 					}
+								// 					else if(trigger.player.contains(name)) add=true;
+								// 				}
+								// 				if(trigger.global){
+								// 					if(typeof trigger.global=='string'){
+								// 						if(trigger.global==name) add=true;
+								// 					}
+								// 					else if(trigger.global.contains(name)) add=true;
+								// 				}
+								// 				if(add&&player.isOut()==false) list.push(skills[i]);
+								// 			}
+								// 		}
+								// 		for(var i=0;i<list.length;i++){
+								// 			game.createTrigger('phaseBegin',list[i],player,triggerevent);
+								// 		}
+								// 	}());
+								// }
 							}
 						}
 						if(type!='ai'){
@@ -2596,16 +2595,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				unique:true,
 				enable:'phaseUse',
-				filter:function(event,player){
-					return !player.storage.luanwu;
-				},
-				init:function(player){
-					player.storage.luanwu=false;
-				},
-				mark:true,
-				intro:{
-					content:'limited'
-				},
+				limited:true,
 				skillAnimation:'epic',
 				animationColor:'thunder',
 				filterTarget:function(card,player,target){
@@ -2616,8 +2606,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				multiline:true,
 				content:function(){
 					"step 0"
-					player.unmarkSkill('luanwu')
-					player.storage.luanwu=true;
+					player.awakenSkill('luanwu');
 					event.current=player.next;
 					"step 1"
 					event.current.animate('target');
@@ -3584,6 +3573,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					trigger.directHit=true;
 				},
+				locked:false,
 				mod:{
 					attackFrom:function(from,to,distance){
 						if(get.zhu(from,'shouyue')) return distance-1;

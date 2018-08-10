@@ -9,6 +9,7 @@ var updates=window.noname_update;
 var assetlist='';
 var skinlist='window.noname_skin_list={\n';
 var entrylist=[];
+var entrymap={};
 var get = function(dir,callback){
 	fs.readdir(dir,function(err,list){
 		var shift=function(){
@@ -37,6 +38,7 @@ var get = function(dir,callback){
 									}
 								}
 								skinlist+='\t'+filename+':'+num+',\n';
+								entrymap[filename]=num;
 								shift();
 							});
 							delay=true;
@@ -67,6 +69,20 @@ get(path.dirname(__dirname),function(){
 			if(entrylist[i]!=window.noname_asset_list[i+1]){
 				diff=true;
 				break;
+			}
+		}
+		if(!diff){
+			for(var i in entrymap){
+				if(window.noname_skin_list[i]!==entrymap[i]){
+					diff=true;
+					break;
+				}
+			}
+			for(var i in noname_skin_list){
+				if(window.noname_skin_list[i]!==entrymap[i]){
+					diff=true;
+					break;
+				}
 			}
 		}
 	}

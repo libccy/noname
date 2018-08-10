@@ -267,9 +267,359 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 				gz_jun_liubei:['male','shu',4,['zhangwu','jizhao','shouyue','wuhujiangdaqi']],
 				gz_jun_zhangjiao:['male','qun',4,['wuxin','hongfa','wendao','huangjintianbingfu']],
+
+				gz_liqueguosi:['male','qun',4,['xiongsuan']],
+				gz_zuoci:['male','qun',3,['gzhuashen','gzxinsheng']],
 			}
 		},
 		skill:{
+			gzxinsheng:{
+				trigger:{player:'damageEnd'},
+				frequent:true,
+				content:function(){
+					game.log(player,'获得了一张','#g化身');
+					lib.skill.gzhuashen.addCharacter(player,_status.characterlist.randomGet());
+					game.delayx();
+				}
+			},
+			gzhuashen:{
+				unique:true,
+				group:['gzhuashen_add','gzhuashen_swap','gzhuashen_remove','gzhuashen_disallow','gzhuashen_flash'],
+				init:function(player){
+					player.storage.gzhuashen=[];
+					player.storage.gzhuashen_removing=[];
+					player.storage.gzhuashen_trigger=[];
+					player.storage.gzhuashen_map={};
+				},
+				onremove:function(player){
+					delete player.storage.gzhuashen;
+					delete player.storage.gzhuashen_removing;
+					delete player.storage.gzhuashen_trigger;
+					delete player.storage.gzhuashen_map;
+				},
+				ondisable:true,
+				mark:true,
+				intro:{
+					mark:function(dialog,storage,player){
+						if(storage&&storage.length){
+							if(player.isUnderControl(true)){
+								dialog.addSmall([storage,'character']);
+								var skills=[];
+								for(var i in player.storage.gzhuashen_map){
+									skills.addArray(player.storage.gzhuashen_map[i]);
+								}
+								dialog.addText('可用技能：'+(skills.length?get.translation(skills):'无'));
+							}
+							else{
+								return '共有'+get.cnNumber(storage.length)+'张“化身”'
+							}
+						}
+						else{
+							return '没有化身';
+						}
+					},
+					content:function(storage,player){
+						if(player.isUnderControl(true)){
+							var skills=[];
+							for(var i in player.storage.gzhuashen_map){
+								skills.addArray(player.storage.gzhuashen_map[i]);
+							}
+							return get.translation(storage)+'；可用技能：'+(skills.length?get.translation(skills):'无');
+						}
+						else{
+							return '共有'+get.cnNumber(storage.length)+'张“化身”'
+						}
+					}
+				},
+				filterSkill:function(name){
+					var skills=lib.character[name][3].slice(0);
+					for(var i=0;i<skills.length;i++){
+						var info=lib.skill[skills[i]];
+						if(info.unique||info.limited||info.mainSkill||info.viceSkill||get.is.locked(skills[i])){
+							skills.splice(i--,1);
+						}
+					}
+					return skills;
+				},
+				addCharacter:function(player,name){
+					var skills=lib.skill.gzhuashen.filterSkill(name);
+					if(skills.length){
+						player.storage.gzhuashen_map[name]=skills;
+						for(var i=0;i<skills.length;i++){
+							player.addAdditionalSkill('gzhuashen',skills[i],true);
+						}
+					}
+					player.storage.gzhuashen.add(name);
+					player.updateMarks('gzhuashen');
+					_status.characterlist.remove(name);
+				},
+				removeCharacter:function(player,name){
+					var skills=lib.skill.gzhuashen.filterSkill(name);
+					if(skills.length){
+						delete player.storage.gzhuashen_map[name];
+						for(var i=0;i<skills.length;i++){
+							var remove=true;
+							for(var j in player.storage.gzhuashen_map){
+								if(j!=name&&game.expandSkills(player.storage.gzhuashen_map[j].slice(0)).contains(skills[i])){
+									remove=false;break;
+								}
+							}
+							if(remove){
+								player.removeAdditionalSkill('gzhuashen',skills[i]);
+								player.storage.gzhuashen_removing.remove(skills[i]);
+							}
+						}
+					}
+					player.storage.gzhuashen.remove(name);
+					player.updateMarks('gzhuashen');
+					_status.characterlist.add(name);
+				},
+				getSkillSources:function(player,skill){
+					if(player.getStockSkills().contains(skill)) return [];
+					var sources=[];
+					for(var i in player.storage.gzhuashen_map){
+						if(game.expandSkills(player.storage.gzhuashen_map[i].slice(0)).contains(skill)) sources.push(i);
+					}
+					return sources;
+				},
+				subfrequent:['add'],
+				subSkill:{
+					add:{
+						trigger:{player:'phaseBeginStart'},
+						frequent:true,
+						filter:function(event,player){
+							return player.storage.gzhuashen.length<2;
+						},
+						content:function(){
+							'step 0'
+							var list=_status.characterlist.randomGets(5);
+							if(!list.length){
+								event.finish();
+								return;
+							}
+							player.chooseButton([1,2]).set('ai',function(button){
+								return get.rank(button.link,true);
+							}).set('createDialog',['选择至多两张武将牌作为“化身”',[list,'character']]);
+							'step 1'
+							if(result.bool){
+								for(var i=0;i<result.links.length;i++){
+									lib.skill.gzhuashen.addCharacter(player,result.links[i]);
+								}
+								game.delayx();
+								player.addTempSkill('gzhuashen_triggered');
+								game.log(player,'获得了'+get.cnNumber(result.links.length)+'张','#g化身');
+							}
+						}
+					},
+					swap:{
+						trigger:{player:'phaseBeginStart'},
+						direct:true,
+						filter:function(event,player){
+							if(player.hasSkill('gzhuashen_triggered')) return false;
+							return player.storage.gzhuashen.length>=2;
+						},
+						content:function(){
+							'step 0'
+							var list=player.storage.gzhuashen.slice(0);
+							if(!list.length){
+								event.finish();
+								return;
+							}
+							player.chooseButton().set('ai',function(){
+								return Math.random()-0.3;
+							}).set('createDialog',['是否替换一张“化身”？',[list,'character']]);
+							'step 1'
+							if(result.bool){
+								player.logSkill('gzhuashen');
+								game.log(player,'替换了一张','#g化身');
+								lib.skill.gzhuashen.removeCharacter(player,result.links[0]);
+								lib.skill.gzhuashen.addCharacter(player,_status.characterlist.randomGet());
+								game.delayx();
+							}
+						}
+					},
+					triggered:{},
+					flash:{
+						hookTrigger:{
+							log:function(player,skill){
+								var sources=lib.skill.gzhuashen.getSkillSources(player,skill);
+								if(sources.length){
+									player.flashAvatar('gzhuashen',sources.randomGet());
+									player.storage.gzhuashen_removing.add(skill);
+								}
+							}
+						},
+						trigger:{player:['useSkillBegin','useCard','respond']},
+						silent:true,
+						filter:function(event,player){
+							return event.skill&&lib.skill.gzhuashen.getSkillSources(player,event.skill).length>0;
+						},
+						content:function(){
+							lib.skill.gzhuashen_flash.hookTrigger.log(player,trigger.skill);
+						}
+					},
+					clear:{
+						trigger:{player:'phaseAfter'},
+						silent:true,
+						content:function(){
+							player.storage.gzhuashen_trigger.length=0;
+						}
+					},
+					disallow:{
+						trigger:{player:['triggerBefore']},
+						silent:true,
+						hookTrigger:{
+							before:function(event,player,name){
+								for(var i=0;i<player.storage.gzhuashen_trigger.length;i++){
+									var info=player.storage.gzhuashen_trigger[i];
+									if(info[0]==event._trigger&&info[1]==name){
+										return true;
+									}
+								}
+								return false;
+							}
+						},
+						content:function(){
+							trigger.cancelled=true;
+						}
+					},
+					remove:{
+						trigger:{player:['useSkillAfter','useCardAfter','respondAfter','triggerAfter']},
+						hookTrigger:{
+							after:function(event,player){
+								if(event._direct&&!player.storage.gzhuashen_removing.contains(event.skill)) return false;
+								return lib.skill.gzhuashen.getSkillSources(player,event.skill).length>0;
+							}
+						},
+						silent:true,
+						filter:function(event,player){
+							return event.skill&&lib.skill.gzhuashen.getSkillSources(player,event.skill).length>0;
+						},
+						content:function(){
+							'step 0'
+							if(trigger.name=='trigger'){
+								player.storage.gzhuashen_trigger.push([trigger._trigger,trigger.triggername]);
+							}
+							var sources=lib.skill.gzhuashen.getSkillSources(player,trigger.skill);
+							if(sources.length==1){
+								event.directresult=sources[0];
+							}
+							else{
+								player.chooseButton(true).set('createDialog',['移除一张“化身”牌',[sources,'character']]);
+							}
+							'step 1'
+							if(!event.directresult&&result&&result.links[0]){
+								event.directresult=result.links[0];
+							}
+							// game.broadcastAll(function(name){
+							// 	var img=name;
+							// 	if(img.indexOf('gz_')==0){
+							// 		img=name.slice(3);
+							// 	}
+							// 	lib.card['gzhuashen_'+name]={
+							// 		fullborder:'bronze',
+							// 		image:'character/'+img
+							// 	}
+							// 	lib.translate['gzhuashen_'+name]=lib.translate[name];
+							// },event.directresult);
+							// 'step 2'
+							var name=event.directresult;
+							lib.skill.gzhuashen.removeCharacter(player,name);
+							// player.$throw(game.createCard('gzhuashen_'+name),'','');
+							game.log(player,'移除了化身牌','#g'+get.translation(name));
+							// game.delayx(2);
+						}
+					}
+				},
+				ai:{
+					nofrequent:true,
+					skillTagFilter:function(player,tag,arg){
+						if(arg&&player.storage.gzhuashen){
+							if(lib.skill.gzhuashen.getSkillSources(player,arg).length>0){
+								return true;
+							}
+						}
+						return false;
+					}
+				}
+			},
+			xiongsuan:{
+				limited:true,
+				enable:'phaseUse',
+				filterCard:true,
+				filter:function(event,player){
+					return player.countCards('h');
+				},
+				filterTarget:function(card,player,target){
+					return target.sameIdentityAs(player);
+				},
+				check:function(card){
+					return 7-get.value(card);
+				},
+				content:function(){
+					'step 0'
+					player.awakenSkill('xiongsuan');
+					target.damage();
+					'step 1'
+					player.draw(3);
+					var list=[];
+					var skills=target.getOriginalSkills();
+					for(var i=0;i<skills.length;i++){
+						if(lib.skill[skills[i]].limited&&target.awakenedSkills.contains(skills[i])){
+							list.push(skills[i]);
+						}
+					}
+					if(list.length==1){
+						target.storage.xiongsuan_restore=list[0];
+						target.addTempSkill('xiongsuan_restore','phaseBegin');
+						event.finish();
+					}
+					else if(list.length>1){
+						player.chooseControl(list).set('prompt','选择一个限定技在回合结束后重置之');
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					target.storage.xiongsuan_restore=result.control;
+					target.addTempSkill('xiongsuan_restore','phaseBegin');
+				},
+				subSkill:{
+					restore:{
+						trigger:{player:'phaseAfter'},
+						silent:true,
+						content:function(){
+							player.restoreSkill(player.storage.xiongsuan_restore);
+						}
+					}
+				},
+				ai:{
+					order:4,
+					damage:true,
+					result:{
+						target:function(player,target){
+							if(get.damageEffect(target,player,player)>0) return 10;
+							if(target.hp>1){
+								var skills=target.getOriginalSkills();
+								for(var i=0;i<skills.length;i++){
+									if(lib.skill[skills[i]].limited&&target.awakenedSkills.contains(skills[i])){
+										return 8;
+									}
+								}
+							}
+							if(target.hp>=4) return 5;
+							if(target.hp==3){
+								if(player.countCards('h')<=2&&game.hasPlayer(function(current){
+									return current.hp<=1&&get.attitude(player,current)<0;
+								})){
+									return 3;
+								}
+							}
+							return 0;
+						}
+					}
+				}
+			},
 			gzsuishi:{
 				audio:'suishi',
 				trigger:{global:'dying'},
@@ -489,6 +839,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			huangjintianbingfu:{
+				unique:true,
+				forceunique:true,
 				nopop:true,
 				mark:true,
 				intro:{
@@ -842,6 +1194,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			gzjixi:{
 				inherit:'jixi',
+				mainSkill:true,
 				init:function(player){
 					if(player.checkMainSkill('gzjixi')){
 						player.removeMaxHp();
@@ -856,6 +1209,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				init:function(player){
 					player.checkViceSkill('ziliang');
 				},
+				viceSkill:true,
 				direct:true,
 				content:function(){
 					'step 0'
@@ -872,7 +1226,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.unmarkSkill('tuntian');
 						}
 						else{
-							player.updateMarks();
+							player.updateMarks('tuntian');
 						}
 						trigger.player.gain(card);
 						if(trigger.player==player){
@@ -954,6 +1308,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				init:function(player){
 					player.checkMainSkill('tianfu');
 				},
+				mainSkill:true,
 				inherit:'kanpo',
 				zhenfa:'inline',
 				viewAsFilter:function(player){
@@ -966,6 +1321,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.removeMaxHp();
 					}
 				},
+				viceSkill:true,
 				inherit:'guanxing',
 				filter:function(event,player){
 					return !player.hasSkill('guanxing');
@@ -1171,6 +1527,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				init:function(player){
 					player.checkMainSkill('baoling');
 				},
+				mainSkill:true,
 				forced:true,
 				filter:function(event,player){
 					return player.hasViceCharacter();
@@ -1679,7 +2036,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			_mingzhi1:{
-				trigger:{player:'phaseBegin'},
+				trigger:{player:'phaseBeginStart'},
 				priority:19,
 				forced:true,
 				popup:false,
@@ -2766,6 +3123,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 			gz_jun_liubei:'君刘备',
 			gz_jun_zhangjiao:'君张角',
+			gz_liqueguosi:'李傕郭汜',
+
+			xiongsuan:'凶算',
+			xiongsuan_info:'限定技，出牌阶段，你可以弃置一张手牌并选择与你势力相同的一名角色，对其造成1点伤害，然后你摸三张牌。若该角色有已发动的限定技，则你选择其中一个限定技，此回合结束后视为该限定技未发动过。',
+			gzhuashen:'化身',
+			gzhuashen_info:'准备阶段开始时，若你的“化身”不足两张，则你可以观看剩余武将牌堆中的五张牌，然后扣置其中至多两张武将牌在你的武将旁，称为“化身”；若“化身”有两张以上，则你可以用剩余武将牌堆顶的一张牌替换一张“化身”。你可以于相应的时机明置并发动“化身”的一个技能，技能结算完成后将该“化身”放回剩余武将牌堆。你每个时机只能发动一张“化身”的技能，且不能发动带有技能类型的技能（锁定技、限定技等）。',
+			gzxinsheng:'新生',
+			gzxinsheng_info:'当你受到伤害后，你可以从剩余武将牌堆中扣置一张牌加入到“化身”牌中。',
 
 			wuxin:'悟心',
 			wuxin_info:'摸牌阶段开始时，你可以观看牌堆顶的X张牌（X为群势力角色的数量），然后将这些牌以任意顺序置于牌堆顶',
@@ -3069,6 +3434,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			player:{
+				sameIdentityAs:function(target){
+					if(this==target) return true;
+					if(target.identity=='unknown'||target.identity=='ye') return false;
+					if(this.identity=='unknown'){
+						var identity=lib.character[this.name1][1];
+						if(this.wontYe()) return identity==target.identity;
+						return false;
+					}
+					else{
+						return this.identity==target.identity;
+					}
+				},
 				getModeState:function(){
 					return {
 						unseen:this.isUnseen(0),

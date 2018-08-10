@@ -2761,11 +2761,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						list.remove(players[i].name1);
 						list.remove(players[i].name2);
 					}
-					var dialog=ui.create.dialog('将武将牌替换为一名角色','hidden');
-					dialog.add([list.randomGets(5),'character']);
-					player.chooseButton(dialog,true).ai=function(button){
+					// var dialog=ui.create.dialog();
+					// dialog.add([list.randomGets(5),'character']);
+					player.chooseButton(true).set('ai',function(button){
 						return get.rank(button.link,true)-lib.character[button.link][2];
-					};
+					}).set('createDialog',['将武将牌替换为一名角色',[list.randomGets(5),'character']]);
 					player.awakenSkill('fuhan');
 					'step 1'
 					var num=player.storage.fanghun2;
@@ -7540,7 +7540,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						trigger.player.storage.zhoufu2_markcount=1;
-						trigger.player.updateMark('zhoufu2');
+						trigger.player.updateMarks();
 					}
 				}
 			},
@@ -8649,13 +8649,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				enable:'phaseUse',
 				audio:2,
-				mark:true,
-				filter:function(event,player){
-					return !player.storage.xiongyi;
-				},
-				init:function(player){
-					player.storage.xiongyi=false;
-				},
+				limited:true,
 				filterTarget:function(card,player,target){
 					if(get.mode()=='guozhan'){
 						if(player==target) return true;
@@ -8685,7 +8679,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					player.storage.xiongyi=true;
 					player.awakenSkill('xiongyi');
 					game.asyncDraw(targets,3);
 					"step 1"
@@ -8699,9 +8692,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.recover();
 						}
 					}
-				},
-				intro:{
-					content:'limited'
 				},
 				ai:{
 					order:1,

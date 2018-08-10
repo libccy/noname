@@ -2246,24 +2246,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'water',
 				unique:true,
-				mark:true,
-				init:function(player){
-					player.storage.nshaoling=false;
-				},
+				limited:true,
 				enable:'phaseUse',
-				filter:function(event,player){
-					return !player.storage.nshaoling;
-				},
-				intro:{
-					content:'limited'
-				},
 				filterTarget:function(card,player,target){
 					return target!=player;
 				},
 				content:function(){
 					"step 0"
 					player.awakenSkill('nshaoling');
-					player.storage.nshaoling=true;
 					event.targets=game.filterPlayer();
 					event.targets.remove(player);
 					event.targets.remove(target);
@@ -4069,15 +4059,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guihan:{
 				unique:true,
 				enable:'chooseToUse',
-				mark:true,
 				skillAnimation:'epic',
-				init:function(player){
-					player.storage.guihan=false;
-				},
+				limited:true,
 				filter:function(event,player){
 					if(event.type!='dying') return false;
 					if(player!=event.dying) return false;
-					if(player.storage.guihan) return false;
 					return true;
 				},
 				filterTarget:function(card,player,target){
@@ -4087,7 +4073,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.awakenSkill('guihan');
 					player.recover();
-					player.storage.guihan=true;
 					"step 1"
 					player.draw(2);
 					"step 2"
@@ -4115,9 +4100,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					threaten:function(player,target){
 						if(!target.storage.guihan) return 0.8;
 					}
-				},
-				intro:{
-					content:'limited'
 				}
 			},
 			luweiyan:{

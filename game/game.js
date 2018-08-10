@@ -20,7 +20,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-		versionOL:26,
+		versionOL:27,
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
 		mirrorURL:'https://gitlab.com/isgs/noname/raw',
 		hallURL:'noname.pub',
@@ -9026,7 +9026,6 @@
 			setting:"设置",
 			start:"开始",
 			random:"随机",
-			_phasebegin:'回合开始',
 			_out:'无效',
 			agree:'同意',
 			refuse:'拒绝',
@@ -9099,6 +9098,58 @@
 		},
 		element:{
 			content:{
+				phasing:function(){
+					'step 0'
+					while(ui.dialogs.length){
+						ui.dialogs[0].close();
+					}
+					if(!player.noPhaseDelay&&lib.config.show_phase_prompt){
+						player.popup('回合开始');
+					}
+					if(lib.config.glow_phase){
+						if(_status.currentPhase){
+							_status.currentPhase.classList.remove('glow_phase');
+							game.broadcast(function(player){
+								player.classList.remove('glow_phase');
+							},_status.currentPhase);
+						}
+						player.classList.add('glow_phase');
+						game.broadcast(function(player){
+							player.classList.add('glow_phase');
+						},player);
+					}
+					_status.currentPhase=player;
+					_status.discarded=[];
+					game.phaseNumber++;
+					game.syncState();
+					game.addVideo('phaseChange',player);
+					if(game.phaseNumber==1&&lib.configOL.observe){
+						lib.configOL.observeReady=true;
+						game.send('server','config',lib.configOL);
+					}
+					game.log();
+					game.log(player,'的回合开始');
+					player._noVibrate=true;
+					if(get.config('identity_mode')!='zhong'&&!_status.connectMode){
+						var num;
+						switch(get.config('auto_identity')){
+							case 'one':num=1;break;
+							case 'two':num=2;break;
+							case 'three':num=3;break;
+							case 'always':num=-1;break;
+							default:num=0;break;
+						}
+						if(num&&!_status.identityShown&&game.phaseNumber>game.players.length*num&&game.showIdentity){
+							if(!_status.video) player.popup('显示身份');
+							_status.identityShown=true;
+							game.showIdentity(false);
+						}
+					}
+					player.ai.tempIgnore=[];
+					player.stat.push({card:{},skill:{}});
+					'step 1'
+					event.trigger('phaseBeginStart');
+				},
 				toggleSubPlayer:function(){
 					'step 0'
 					var list=event.list||player.storage.subplayer.skills.slice(0);
@@ -9486,8 +9537,23 @@
 				},
 				createTrigger:function(){
 					"step 0"
+					if(player._hookTrigger){
+						for(var i=0;i<player._hookTrigger.length;i++){
+							var info=lib.skill[player._hookTrigger[i]].hookTrigger;
+							if(info){
+								if(info.before&&info.before(event,player,event.triggername)){
+									event.trigger('triggerBefore');
+									break;
+								}
+							}
+						}
+					}
+					"step 1"
 					var info=get.info(event.skill);
-					if(info.filter&&!info.filter(trigger,player,event.triggername)){
+					if(event.cancelled){
+						event.finish();
+					}
+					else if(info.filter&&!info.filter(trigger,player,event.triggername)){
 						event.finish();
 					}
 					else if(event._trigger._notrigger.contains(player)&&!lib.skill.global.contains(event.skill)){
@@ -9501,35 +9567,35 @@
 						event.finish();
 					}
 					else{
-						var hidden=player.hiddenSkills.slice(0);
-						game.expandSkills(hidden);
-						if(hidden.contains(event.skill)){
-							if(!info.silent&&player.hasSkillTag('nomingzhi',false,null,true)){
-								event.finish();
-							}
-							else if(!info.direct){
-								event.trigger('triggerHidden');
+						var fullskills=game.expandSkills(player.getSkills().concat(lib.skill.global));
+						if(!fullskills.contains(event.skill)){
+							var hidden=player.hiddenSkills.slice(0);
+							game.expandSkills(hidden);
+							if(hidden.contains(event.skill)){
+								if(!info.silent&&player.hasSkillTag('nomingzhi',false,null,true)){
+									event.finish();
+								}
+								else if(!info.direct){
+									event.trigger('triggerHidden');
+								}
+								else{
+									event.skillHidden=true;
+								}
 							}
 							else{
-								event.skillHidden=true;
+								event.finish();
 							}
 						}
 					}
-					"step 1"
-					if(event.cancelled){
-						event.finish();
-					}
-					else{
-						event.trigger('triggerBefore');
-					}
 					"step 2"
-					var info=get.info(event.skill);
 					if(event.cancelled){
 						event.finish();
 						return;
 					}
+					var info=get.info(event.skill);
 					if(!event.revealed&&!info.forced){
 						var checkFrequent=function(info){
+							if(player.hasSkillTag('nofrequent',false,event.skill)) return false;
 							if(typeof info.frequent=='boolean') return info.frequent;
 							if(typeof info.frequent=='function') return info.frequent(trigger,player);
 							if(info.frequent=='check'&&typeof info.check=='function') return info.check(trigger,player);
@@ -9538,15 +9604,18 @@
 						if(info.direct&&player.isUnderControl()){
 							game.modeSwapPlayer(player);
 							event._result={bool:true};
+							event._direct=true;
 						}
 						else if(checkFrequent(info)&&!lib.config.autoskilllist.contains(event.skill)){
 							event._result={bool:true};
 						}
 						else if(info.direct){
 							event._result={bool:true};
+							event._direct=true;
 						}
 						else if(info.direct&&player.isOnline()){
 							event._result={bool:true};
+							event._direct=true;
 						}
 						else{
 							var str;
@@ -9581,18 +9650,21 @@
 					}
 					"step 3"
 					var info=get.info(event.skill);
-					if(result&&result.bool!=false&&info.autodelay&&(info.forced||!event.isMine())){
-						if(typeof info.autodelay=='number'){
-							game.delayx(info.autodelay);
-						}
-						else{
-							game.delayx();
+					if(result&&result.bool!=false){
+						if(info.autodelay&&(info.forced||!event.isMine())){
+							if(typeof info.autodelay=='number'){
+								game.delayx(info.autodelay);
+							}
+							else{
+								game.delayx();
+							}
 						}
 					}
 					"step 4"
 					var info=get.info(event.skill);
 					if(result&&result.bool==false){
 						if(info.oncancel) info.oncancel(trigger,player);
+						event.finish();
 						return;
 					}
 					var next=game.createEvent(event.skill);
@@ -9629,6 +9701,18 @@
 							}
 							else{
 								player.logSkill(event.skill,false,info.line);
+							}
+						}
+					}
+					"step 5"
+					if(player._hookTrigger){
+						for(var i=0;i<player._hookTrigger.length;i++){
+							var info=lib.skill[player._hookTrigger[i]].hookTrigger;
+							if(info){
+								if(info.after&&info.after(event,player,event.triggername)){
+									event.trigger('triggerAfter');
+									break;
+								}
 							}
 						}
 					}
@@ -13988,11 +14072,12 @@
 				},
 				smoothAvatar:function(vice,video){
 					var div=ui.create.div('.fullsize');
-					div.style.background=getComputedStyle(this.node.avatar).background;
 					if(vice){
+						div.style.background=getComputedStyle(this.node.avatar2).background;
 						this.node.avatar2.appendChild(div);
 					}
 					else{
+						div.style.background=getComputedStyle(this.node.avatar).background;
 						this.node.avatar.appendChild(div);
 					}
 					ui.refresh(div);
@@ -14640,6 +14725,16 @@
 				},
 				countCards:function(arg1,arg2){
 					return this.getCards(arg1,arg2).length;
+				},
+				getOriginalSkills:function(){
+					var skills=[];
+					if(lib.character[this.name]&&!this.isUnseen(0)){
+						skills.addArray(lib.character[this.name][3]);
+					}
+					if(this.name2&&lib.character[this.name2]&&!this.isUnseen(1)){
+						skills.addArray(lib.character[this.name2][3]);
+					}
+					return skills;
 				},
 				getSkills:function(arg2,arg3,arg4){
 					var skills=this.skills.slice(0);
@@ -16923,6 +17018,14 @@
 					else if(info&&info.logv!==false){
 						game.logv(this,name,targets);
 					}
+					if(this._hookTrigger){
+						for(var i=0;i<this._hookTrigger.length;i++){
+							var info=lib.skill[this._hookTrigger[i]].hookTrigger;
+							if(info&&info.log){
+								info.log(this,name,targets);
+							}
+						}
+					}
 				},
 				unprompt:function(){
 					if(this.node.prompt){
@@ -17471,6 +17574,12 @@
 							}
 						}
 					}
+					if(info.hookTrigger){
+						if(!this._hookTrigger){
+							this._hookTrigger=[];
+						}
+						this._hookTrigger.add(skill);
+					}
 					return this;
 				},
 				addSkillLog:function(skill){
@@ -17597,6 +17706,14 @@
 					if(!nounmark) this.unmarkSkill(skill);
 					this.disableSkill(skill+'_awake',skill);
 					this.awakenedSkills.add(skill);
+					if(this.storage[skill]===false) this.storage[skill]=true;
+					return this;
+				},
+				restoreSkill:function(skill,nomark){
+					if(this.storage[skill]===true) this.storage[skill]=false;
+					this.awakenedSkills.remove(skill);
+					this.enableSkill(skill+'_awake',skill);
+					if(!nomark) this.markSkill(skill);
 					return this;
 				},
 				disableSkill:function(skill,skills){
@@ -17726,6 +17843,14 @@
 								for(var j=0;j<info.trigger[i].length;j++){
 									removeTrigger(i,info.trigger[i][j]);
 								}
+							}
+						}
+					}
+					if(info.hookTrigger){
+						if(this._hookTrigger){
+							this._hookTrigger.remove(skill);
+							if(!this._hookTrigger.length){
+								delete this._hookTrigger;
 							}
 						}
 					}
@@ -21806,61 +21931,6 @@
 						}
 						event.trigger('roundStart');
 					}
-				},
-			},
-			_phasebegin:{
-				trigger:{player:'phaseBegin'},
-				forced:true,
-				priority:100,
-				popup:false,
-				content:function(){
-					while(ui.dialogs.length){
-						ui.dialogs[0].close();
-					}
-					if(!player.noPhaseDelay&&lib.config.show_phase_prompt){
-						player.popup('回合开始');
-					}
-					if(lib.config.glow_phase){
-						if(_status.currentPhase){
-							_status.currentPhase.classList.remove('glow_phase');
-							game.broadcast(function(player){
-								player.classList.remove('glow_phase');
-							},_status.currentPhase);
-						}
-						player.classList.add('glow_phase');
-						game.broadcast(function(player){
-							player.classList.add('glow_phase');
-						},player);
-					}
-					_status.currentPhase=player;
-					_status.discarded=[];
-					game.phaseNumber++;
-					game.syncState();
-					game.addVideo('phaseChange',player);
-					if(game.phaseNumber==1&&lib.configOL.observe){
-						lib.configOL.observeReady=true;
-						game.send('server','config',lib.configOL);
-					}
-					game.log();
-					game.log(player,'的回合开始');
-					player._noVibrate=true;
-					if(get.config('identity_mode')!='zhong'&&!_status.connectMode){
-						var num;
-						switch(get.config('auto_identity')){
-							case 'one':num=1;break;
-							case 'two':num=2;break;
-							case 'three':num=3;break;
-							case 'always':num=-1;break;
-							default:num=0;break;
-						}
-						if(num&&!_status.identityShown&&game.phaseNumber>game.players.length*num&&game.showIdentity){
-							if(!_status.video) player.popup('显示身份');
-							_status.identityShown=true;
-							game.showIdentity(false);
-						}
-					}
-					player.ai.tempIgnore=[];
-					player.stat.push({card:{},skill:{}});
 				},
 			},
 			_usecard:{
@@ -27205,8 +27275,16 @@
 				}
 				else if(event._triggered==1){
 					if(event.type=='card') event.trigger('useCardToBegin');
-					event.trigger(event.name+'Begin');
-					event._triggered++;
+					if(event.name=='phase'&&!event._begun){
+						var next=game.createEvent('phasing',false,event);
+						next.player=event.player;
+						next.setContent('phasing');
+						event._begun=true;
+					}
+					else{
+						event.trigger(event.name+'Begin');
+						event._triggered++;
+					}
 				}
 				else{
 					if(player&&player.classList.contains('dead')&&!event.forceDie&&event.name!='phaseLoop'){
@@ -28787,6 +28865,15 @@
 				}
 				if(lib.translate[i+'_info']==undefined){
 					lib.translate[i+'_info']=lib.translate[info.inherit+'_info'];
+				}
+			}
+			if(info.limited){
+				if(info.mark===undefined) info.mark=true;
+				if(!info.intro) info.intro={};
+				if(info.intro.content===undefined) info.intro.content='limited';
+				if(info.skillAnimation===undefined) info.skillAnimation=true;
+				if(info.init===undefined) info.init=function(player){
+					player.storage[i]=false;
 				}
 			}
 			if(info.subSkill&&!sub){
@@ -42482,11 +42569,22 @@
 			},
 			autoskill2:function(e){
 				this.classList.toggle('on');
-				if(this.classList.contains('on')){
-					lib.config.autoskilllist.remove(this.link);
+				var list=[];
+				if(lib.skill[this.link].frequent){
+					list.push(this.link);
 				}
-				else{
-					lib.config.autoskilllist.add(this.link);
+				if(lib.skill[this.link].subfrequent){
+					for(var i=0;i<lib.skill[this.link].subfrequent.length;i++){
+						list.push(this.link+'_'+lib.skill[this.link].subfrequent[i]);
+					}
+				}
+				for(var i=0;i<list.length;i++){
+					if(this.classList.contains('on')){
+						lib.config.autoskilllist.remove(list[i]);
+					}
+					else{
+						lib.config.autoskilllist.add(list[i]);
+					}
 				}
 				game.saveConfig('autoskilllist',lib.config.autoskilllist);
 				ui.click.touchpop();
@@ -45219,9 +45317,21 @@
 						else if(lib.skill[skills[i]].temp||!node.skills.contains(skills[i])||lib.skill[skills[i]].thundertext){
 							uiintro.add('<div><div class="skill thundertext thunderauto">【'+translation+'】</div><div class="thundertext thunderauto">'+get.skillInfoTranslation(skills[i])+'</div></div>');
 						}
-						else if(lib.skill[skills[i]].frequent){
+						else if(lib.skill[skills[i]].frequent||lib.skill[skills[i]].subfrequent){
 							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'<br><div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">自动发动</div></div></div>');
 							var underlinenode=uiintro.content.lastChild.querySelector('.underlinenode');
+							if(lib.skill[skills[i]].frequent){
+								if(lib.config.autoskilllist.contains(skills[i])){
+									underlinenode.classList.remove('on');
+								}
+							}
+							if(lib.skill[skills[i]].subfrequent){
+								for(var j=0;j<lib.skill[skills[i]].subfrequent.length;j++){
+									if(lib.config.autoskilllist.contains(skills[i]+'_'+lib.skill[skills[i]].subfrequent[j])){
+										underlinenode.classList.remove('on');
+									}
+								}
+							}
 							if(lib.config.autoskilllist.contains(skills[i])){
 								underlinenode.classList.remove('on');
 							}

@@ -143,18 +143,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				enable:'phaseUse',
 				filter:function(event,player){
-					return !player.storage.shenfen&&player.storage.baonu>=6;
-				},
-				init:function(player){
-					player.storage.shenfen=false;
+					return player.storage.baonu>=6;
 				},
 				skillAnimation:true,
 				animationColor:'metal',
-				mark:true,
+				limited:true,
 				content:function(){
 					"step 0"
 					player.awakenSkill('shenfen');
-					player.storage.shenfen=true;
 					player.storage.baonu-=6;
 					event.targets=game.filterPlayer();
 					event.targets.remove(player);
@@ -174,9 +170,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						event.redo();
 					}
-				},
-				intro:{
-					content:'limited'
 				},
 				ai:{
 					order:10,
@@ -845,12 +838,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:3,
 				animationColor:'fire',
 				skillAnimation:'legend',
-				filter:function(event,player){
-					return !player.storage.yeyan;
-				},
-				init:function(player){
-					player.storage.yeyan=false;
-				},
 				filterTarget:function(card,player,target){
 					var length=ui.selected.cards.length;
 					return (length==0||length==4);
@@ -863,7 +850,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				complexCard:true,
-				mark:true,
+				limited:true,
 				selectCard:[0,4],
 				line:'fire',
 				check:function(){return -1},
@@ -883,9 +870,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						target.damage('fire','nocard');
 					}
-				},
-				intro:{
-					content:'limited'
 				},
 				ai:{
 					order:1,

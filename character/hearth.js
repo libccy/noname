@@ -7364,7 +7364,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huanfeng:{
 				skillAnimation:'epic',
 				animationColor:'thunder',
-				trigger:{player:'phaseBegin'},
+				trigger:{player:'phaseBeginStart'},
 				forced:true,
 				unique:true,
 				filter:function(event,player){
@@ -7392,7 +7392,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						hs:get.cards(4)
 					});
 					player.callSubPlayer(player.storage.huanfeng_end);
-					game.createTrigger('phaseBegin','shengdun',player,trigger);
+					// game.createTrigger('phaseBegin','shengdun',player,trigger);
 				},
 				// group:'huanfeng_end',
 				subSkill:{

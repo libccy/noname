@@ -1,19 +1,19 @@
 window.noname_update={
-	version:'1.9.53.1',
-	update:'1.9.53',
+	version:'1.9.54',
+	update:'1.9.53.1',
 	changeLog:[
-		'bug修复'
-	],
-	players:[
-		'sunshangxiang'
+		'变包武将'
 	],
 	files:[
-		'card/standard.js',
-		'character/gwent.js',
-		'character/rank.js',
-		'character/standard.js',
+		'character/diy.js',
+		'character/extra.js',
+		'character/hearth.js',
+		'character/shenhua.js',
+		'character/sp.js',
 		'character/yijiang.js',
-		'layout/mobile/equip.css',
-		'layout/newlayout/equip.css'
+		'game/asset.js',
+		'game/directory.js',
+		'game/game.js',
+		'mode/guozhan.js'
 	]
 };

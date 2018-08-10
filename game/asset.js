@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'1.9.51',
+	'1.9.54',
 	'audio/background/music_danji.mp3',
 	'audio/background/music_default.mp3',
 	'audio/background/music_diaochan.mp3',
@@ -733,10 +733,10 @@ window.noname_asset_list=[
 	'audio/skill/luoyan4.mp3',
 	'audio/skill/luoyi1.mp3',
 	'audio/skill/luoyi2.mp3',
-	'audio/skill/luoying11.mp3',
-	'audio/skill/luoying12.mp3',
-	'audio/skill/luoying21.mp3',
-	'audio/skill/luoying22.mp3',
+	'audio/skill/luoying_discard1.mp3',
+	'audio/skill/luoying_discard2.mp3',
+	'audio/skill/luoying_judge1.mp3',
+	'audio/skill/luoying_judge2.mp3',
 	'audio/skill/manjuan.mp3',
 	'audio/skill/mazui.mp3',
 	'audio/skill/meibu1.mp3',
@@ -1796,6 +1796,7 @@ window.noname_asset_list=[
 	'image/character/lingcao.jpg',
 	'image/character/lingju.jpg',
 	'image/character/lingtong.jpg',
+	'image/character/liqueguosi.jpg',
 	'image/character/liru.jpg',
 	'image/character/litong.jpg',
 	'image/character/liubei.jpg',
@@ -2894,5 +2895,5 @@ window.noname_skin_list={
 	zhugeliang:5,
 	zhuran:1,
 	zhurong:3,
-	zuoci:3
+	zuoci:4
 };
