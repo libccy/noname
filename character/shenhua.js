@@ -1973,7 +1973,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.chooseToCompare(trigger.player);
 					"step 1"
-					if(result.bool&&trigger.player.countCards('he')){
+					if(result.bool&&trigger.player.countGainableCards(player,'he')){
 						player.gainPlayerCard(trigger.player,true,'he');
 					}
 				}

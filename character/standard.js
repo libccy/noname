@@ -182,7 +182,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageEnd'},
 				direct:true,
 				filter:function(event,player){
-					return (event.source&&event.source.countCards('he')&&event.source!=player);
+					return (event.source&&event.source.countGainableCards(player,'he')&&event.source!=player);
 				},
 				content:function(){
 					player.gainPlayerCard(get.prompt('fankui',trigger.source),trigger.source,get.buttonValue,'he').set('logSkill',['fankui',trigger.source]);

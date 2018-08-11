@@ -6,11 +6,21 @@ window.noname_update={
 	],
 	files:[
 		'card/standard.js',
+		'card/guozhan.js',
+		'character/diy.js',
+		'character/extra.js',
+		'character/hearth.js',
+		'character/refresh.js',
 		'character/shenhua.js',
+		'character/sp.js',
+		'character/yijiang.js',
 		'character/standard.js',
+		'character/xianjian.js',
 		'character/yijiang.js',
 		'game/asset.js',
 		'game/game.js',
+		'game/directory.js',
+		'layout/default/layout.css',
 		'mode/guozhan.js'
 	]
 };

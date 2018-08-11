@@ -1036,6 +1036,12 @@ table {
 .dialog.character>.packnode>div:last-child {
 	margin-bottom: 9px;
 }
+.dialog.popped .caption>.text>ul>li:not(*:last-child){
+	margin-bottom: 8px;
+}
+.dialog.popped .caption>.caption>div>.skillinfo:not(*:last-child){
+	margin-bottom: 8px;
+}
 
 #sidebar>div,#sidebar3>div {
 	margin: 10px;

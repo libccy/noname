@@ -6120,14 +6120,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(att<0) return false;
 						if(att>0) return true;
 					}
-					var cards=event.player.getCards('e');
+					var cards=event.player.getGainableCards(player,'e');
 					for(var i=0;i<cards.length;i++){
 						if(get.equipValue(cards[i])>=6) return true;
 					}
 					return false;
 				},
 				content:function(){
-					if(trigger.player.countCards('ej')){
+					if(trigger.player.countGainableCards(player,'ej')){
 						player.gainPlayerCard(trigger.player,'ej',true);
 					}
 					trigger.cancel();

@@ -11267,6 +11267,9 @@
 							}
 							else if(event.prompt){
 								event.dialog=ui.create.dialog(event.prompt);
+								if(event.prompt2){
+									event.dialog.addText(event.prompt2,event.prompt2.length<=20||event.centerprompt2);
+								}
 							}
 						}
 						game.pause();
@@ -18541,6 +18544,9 @@
 				hasSkill:function(skill){
 					return game.expandSkills(this.getSkills()).contains(skill);
 				},
+				hasStockSkill:function(skill,arg1,arg2){
+					return this.getStockSkills(arg1,arg2).contains(skill);
+				},
 				hasZhuSkill:function(skill,player){
 					if(!this.hasSkill(skill)) return false;
 					var mode=get.mode();
@@ -18692,6 +18698,13 @@
 						}
 					}
 					return false;
+				},
+				canEquip:function(name,replace){
+					if(get.type(name)=='card'){
+						name=get.equiptype(name);
+					}
+					if(!replace&&this.getEquip(name)) return false;
+					return true;
 				},
 				getEquip:function(name){
 					var es=this.getCards('e');
@@ -44470,6 +44483,11 @@
 			if(!lib.card[obj.name]) return;
 			return lib.card[obj.name].subtype;
 		},
+		equiptype:function(card){
+			var subtype=get.subtype(card);
+			if(subtype.indexOf('equip')==0) return parseInt(subtype[5]);
+			return 0;
+		},
 		suit:function(card){
 			if(get.itemtype(card)=='cards'){
 				var suit=get.suit(card[0])
@@ -45361,7 +45379,7 @@
 				for(i=0;i<skills.length;i++){
 					if(lib.skill[skills[i]]&&lib.skill[skills[i]].nopop) continue;
 					if(lib.translate[skills[i]+'_info']){
-						translation=get.translation(skills[i]).slice(0,2);
+						translation=lib.translate[skills[i]+'_ab']||get.translation(skills[i]).slice(0,2);
 						if(node.forbiddenSkills[skills[i]]){
 							var forbidstr='<div style="opacity:0.5"><div class="skill">【'+translation+'】</div><div>';
 							if(node.forbiddenSkills[skills[i]].length){
@@ -46016,7 +46034,7 @@
 					var skills=infoitem[3];
 					for(i=0;i<skills.length;i++){
 						if(lib.translate[skills[i]+'_info']){
-							translation=get.translation(skills[i]).slice(0,2);
+							translation=lib.translate[skills[i]+'_ab']||get.translation(skills[i]).slice(0,2);
 							if(lib.skill[skills[i]]&&lib.skill[skills[i]].nobracket){
 								uiintro.add('<div><div class="skill">'+get.translation(skills[i])+'</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
 							}

@@ -12,7 +12,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_sumei:['female','shu',3,['sheying','dujiang','huahu']],
 			pal_shenqishuang:['female','wei',3,['qixia','jianzhen','binxin']],
 
-			pal_jingtian:['male','wu',3,['sajin','jubao']],
+			pal_jingtian:['male','wu',3,['sajin','jtjubao']],
 			pal_xuejian:['female','shu',3,['xshuangren','shenmu','duci']],
 			pal_longkui:['female','qun',3,['fenxing','diewu','lingyu']],
 			pal_zixuan:['female','wei',3,['shuiyun','wangyou','changnian']],
@@ -3271,10 +3271,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					threaten:1.5
 				}
 			},
-			jubao:{
+			jtjubao:{
 				trigger:{global:'discardAfter'},
 				filter:function(event,player){
-					if(player.hasSkill('jubao2')) return false;
+					if(player.hasSkill('jtjubao2')) return false;
 					if(event.player==player) return false;
 					if(_status.currentPhase==player) return false;
 					for(var i=0;i<event.cards.length;i++){
@@ -3299,14 +3299,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var card=cards.randomGet();
 						player.gain(card,'log');
 						player.$gain2(card);
-						player.addTempSkill('jubao2');
+						player.addTempSkill('jtjubao2');
 					}
 				},
 				ai:{
 					threaten:1.5
 				}
 			},
-			jubao2:{},
+			jtjubao2:{},
 			duci:{
 				trigger:{player:'loseEnd'},
 				direct:true,
@@ -4297,8 +4297,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			changnian_info:'你死亡时，可以将所有牌交给一名其他角色，令其获得技能【追思】',
 			sajin:'洒金',
 			sajin_info:'出牌阶段限一次，你可以弃置一张手牌并指定任意名角色进行判定，若判定颜色与你弃置的牌相同，该角色回复一点体力',
-			jubao:'聚宝',
-			jubao_info:'当其他角色于你的回合外首次弃置非基本牌时，你可以获得其中的随机一张',
+			jtjubao:'聚宝',
+			jtjubao_info:'当其他角色于你的回合外首次弃置非基本牌时，你可以获得其中的随机一张',
 			guiyuan:'归元',
 			guiyuan_info:'出牌阶段限一次，你可以弃置一张杀，然后回复一点体力并摸一张牌',
 			xshuangren:'双刃',

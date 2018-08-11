@@ -4,6 +4,32 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		name:'guozhan',
 		connect:true,
 		card:{
+			dinglanyemingzhu:{
+				mode:['guozhan'],
+				fullskin:true,
+				type:'equip',
+				subtype:'equip5',
+				nomod:true,
+				nopower:true,
+				unique:true,
+				global:'g_dinglanyemingzhu_ai',
+				skills:['dinglanyemingzhu_skill'],
+				ai:{
+					equipValue:function(card,player){
+						if(player.hasSkill('jubao')) return 8;
+						if(player.hasSkill('gzzhiheng')) return 6;
+						if(game.hasPlayer(function(current){
+							return current.hasSkill('jubao')&&get.attitude(player,current)<=0;
+						})){
+							return 0;
+						}
+						return 7;
+					},
+					basic:{
+						equipValue:6.5
+					}
+				}
+			},
 			feilongduofeng:{
 				mode:['guozhan'],
 				fullskin:true,
@@ -639,6 +665,31 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			dinglanyemingzhu_skill:{
+				inherit:'gzzhiheng',
+				filter:function(event,player){
+					return !player.hasSkill('gzzhiheng');
+				},
+				selectCard:function(){
+					var player=_status.event.player;
+					return [1,player.maxHp];
+				},
+				prompt:'出牌阶段限一次，你可以弃置至多X张牌（X为你的体力上限），然后摸等量的牌'
+			},
+			g_dinglanyemingzhu_ai:{
+				ai:{
+					effect:{
+						player:function(card,player){
+							if(player.hasSkill('jubao')) return;
+							if(card.name=='dinglanyemingzhu'&&game.hasPlayer(function(current){
+								return current.hasSkill('jubao')&&get.attitude(player,current)<=0;
+							})){
+								return [0,0,0,0];
+							}
+						}
+					}
+				}
+			},
 			g_feilongduofeng_ai:{
 				ai:{
 					effect:{
@@ -1164,6 +1215,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		translate:{
+			dinglanyemingzhu:'定澜夜明珠',
+			dinglanyemingzhu_bg:'珠',
+			dinglanyemingzhu_info:'锁定技，你视为拥有技能“制衡”，若你已经有“制衡”，则改为取消弃置牌数的限制。',
+			dinglanyemingzhu_skill:'制衡',
+			dinglanyemingzhu_skill_info:'出牌阶段限一次，你可以弃置至多X张牌（X为你的体力上限），然后摸等量的牌',
 			feilongduofeng:'飞龙夺凤',
 			feilongduofeng2:'飞龙夺凤',
 			feilongduofeng_info:'当你使用【杀】指定一名角色为目标后，你可令该角色弃置一张牌。你使用【杀】杀死一名角色后，若你所属的势力是全场最少的（或之一），你可令该角色的使用者选择是否从未使用的武将牌中选择一张与你势力相同的武将牌重新加入游戏',
