@@ -716,11 +716,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				unique:true,
 				filter:function(event,player){
-					return game.hasPlayer(function(current){
+					if(game.hasPlayer(function(current){
 						return current.countCards('ej',function(card){
 							return card.name=='dinglanyemingzhu';
 						});
-					});
+					})){
+						return true;
+					}
+					for(var i=0;i<ui.discardPile.childElementCount;i++){
+						if(ui.discardPile.childNodes[i].name=='dinglanyemingzhu'){
+							return true;
+						}
+					}
+					return false;
 				},
 				content:function(){
 					'step 0'
