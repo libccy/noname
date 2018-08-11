@@ -2013,6 +2013,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filterCard:true,
 						usable:1,
 						position:'he',
+						filter:function(event,player){
+							if(!get.is.altered('xinjieyin')) return false;
+							return player.countCards('he')>0;
+						},
 						check:function(card){
 							var player=_status.event.player;
 							if(get.position(card)=='e'){
