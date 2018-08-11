@@ -780,10 +780,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				filterCard:{type:'equip'},
 				position:'he',
+				usable:1,
 				check:function(card){
 					var num=7-get.value(card);
 					if(get.position(card)=='h'){
 						num+=3;
+					}
+					else{
+						var player=_status.event.player;
+						var zhu=get.zhu(player,'jiahe');
+						if(zhu.storage.yuanjiangfenghuotu>=5&&!player.hasSkillTag('noe')){
+							return num-5;
+						}
 					}
 					return num;
 				},
@@ -831,7 +839,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.finish();
 						return;
 					}
-					list.push('cancel2');
 					var prompt2='你可以获得下列一项技能直到回合结束';
 					if(list.length>=5){
 						if(event.done){
@@ -841,6 +848,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							prompt2+=' (1/2)';
 						}
 					}
+					list.push('cancel2');
 					player.chooseControl(list).set('prompt',get.translation('yuanjiangfenghuotu')).
 					set('prompt2',prompt2).set('centerprompt2',true).set('ai',function(evt,player){
 						var controls=_status.event.controls;
