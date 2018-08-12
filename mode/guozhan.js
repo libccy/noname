@@ -320,7 +320,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					trigger.cancel();
 					'step 1'
-					player.mayChangeVice();
+					if(player.sameIdentityAs(trigger.player)){
+						trigger.player.mayChangeVice();
+					}
 				}
 			},
 			diancai:{
