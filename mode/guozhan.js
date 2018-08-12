@@ -1339,6 +1339,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						hookTrigger:{
 							after:function(event,player){
 								if(event._direct&&!player.storage.gzhuashen_removing.contains(event.skill)) return false;
+								if(lib.skill[event.skill].silent) return false;
 								return lib.skill.gzhuashen.getSkillSources(player,event.skill).length>0;
 							}
 						},

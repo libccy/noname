@@ -1,8 +1,9 @@
 window.noname_update={
-	version:'1.9.54',
+	version:'1.9.54.1',
 	update:'1.9.53.1',
 	changeLog:[
-		'变包武将'
+		'变包武将',
+		'bug修复'
 	],
 	files:[
 		'card/standard.js',
@@ -16,7 +17,6 @@ window.noname_update={
 		'character/yijiang.js',
 		'character/standard.js',
 		'character/xianjian.js',
-		'character/yijiang.js',
 		'game/asset.js',
 		'game/game.js',
 		'game/directory.js',

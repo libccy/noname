@@ -8091,6 +8091,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'dieAfter'},
 				priority:-10,
 				silent:true,
+				locked:false,
+				onremove:function(player){
+					delete player.storage.qiluan;
+				},
 				filter:function(event){
 					return _status.currentPhase!=event.player;
 				},
@@ -8102,12 +8106,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.storage.qiluan++;
 					}
 				},
-				group:['qiluan2','qiluan3']
+				group:['qiluan2','qiluan3','qiluan4']
 			},
 			qiluan2:{
 				audio:2,
 				trigger:{global:'phaseAfter'},
-				forced:true,
+				frequent:true,
 				filter:function(event,player){
 					return player.storage.qiluan?true:false;
 				},
@@ -8123,7 +8127,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			qiluan3:{
 				trigger:{source:'dieAfter'},
-				forced:true,
+				frequent:true,
 				priority:-10,
 				filter:function(event){
 					return _status.currentPhase==event.player;
@@ -8131,11 +8135,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var num=3;
 					if(player.storage.qiluan){
-						num+=3*player.storage.qiluan;
+						if(get.mode()!='guozhan'){
+							num+=3*player.storage.qiluan;
+						}
 						player.storage.qiluan=0;
 					}
 					player.draw(num);
 				},
+			},
+			qiluan4:{
+				trigger:{global:'phaseBegin'},
+				silent:true,
+				content:function(){
+					player.storage.qiluan=0;
+				}
 			},
 			shangyi:{
 				audio:2,
