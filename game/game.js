@@ -9620,7 +9620,7 @@
 							else{
 								var keep=false;
 								for(var i in player.additionalSkills){
-									if(i.indexOf('hidden:')==0&&player.additionalSkills[i].contains(event.skill)){
+									if(i.indexOf('hidden:')==0&&game.expandSkills(player.additionalSkills[i]).contains(event.skill)){
 										keep=true;break;
 									}
 								}
