@@ -384,7 +384,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'useCardToBefore'},
 						filter:function(event,player){
 							if(!['basic','trick'].contains(get.type(event.card,'trick'))) return false;
-							return event.target&&event.target.sameIdentityAs(player)&&event.targets.length==1&&player.storage.qianhuan.length;
+							return event.target&&player.sameIdentityAs(event.target)&&event.targets.length==1&&player.storage.qianhuan.length;
 						},
 						direct:true,
 						content:function(){
