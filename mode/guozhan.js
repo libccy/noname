@@ -350,7 +350,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							for(var i=0;i<player.storage.qianhuan.length;i++){
 								suits.add(get.suit(player.storage.qianhuan[i]));
 							}
-							return event.player.sameIdentityAs(player)&&player.countCards('h',function(card){
+							return player.sameIdentityAs(event.player)&&player.countCards('h',function(card){
 								return !suits.contains(get.suit(card));
 							});
 						},
