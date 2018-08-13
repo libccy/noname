@@ -9583,7 +9583,15 @@
 								}
 							}
 							else{
-								event.finish();
+								var keep=false;
+								for(var i in player.additionalSkills){
+									if(i.indexOf('hidden:')==0&&player.additionalSkills[i].contains(event.skill)){
+										keep=true;break;
+									}
+								}
+								if(!keep){
+									event.finish();
+								}
 							}
 						}
 					}
@@ -14821,7 +14829,7 @@
 						}
 					}
 					for(var i in this.additionalSkills){
-						if(Array.isArray(this.additionalSkills[i])){
+						if(Array.isArray(this.additionalSkills[i])&&(arg2||i.indexOf('hidden:')!==0)){
 							for(j=0;j<this.additionalSkills[i].length;j++){
 								if(this.additionalSkills[i][j]){
 									skills.add(this.additionalSkills[i][j]);

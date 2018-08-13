@@ -641,7 +641,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.chooseTarget('选择一个目标装备'+get.translation(card),function(card,player,target){
 							return target.canEquip(_status.event.subtype);
 						}).set('subtype',get.equiptype(card)).set('ai',function(target){
-							return get.attitude(_status.event.player,target);
+							var att=get.attitude(_status.event.player,target);
+							if(target.hasSkillTag('noe')) att+=3;
+							return att;
 						});
 					}
 					else{
@@ -1307,7 +1309,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(skills.length){
 						player.storage.gzhuashen_map[name]=skills;
 						for(var i=0;i<skills.length;i++){
-							player.addAdditionalSkill('gzhuashen',skills[i],true);
+							player.addAdditionalSkill('hidden:gzhuashen',skills[i],true);
 						}
 					}
 					player.storage.gzhuashen.add(name);
@@ -1346,7 +1348,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							if(remove){
-								player.removeAdditionalSkill('gzhuashen',skills[i]);
+								player.removeAdditionalSkill('hidden:gzhuashen',skills[i]);
 								player.storage.gzhuashen_removing.remove(skills[i]);
 							}
 						}
