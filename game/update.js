@@ -2,7 +2,8 @@ window.noname_update={
 	version:'1.9.55.1',
 	update:'1.9.54.1',
 	changeLog:[
-		'势备篇卡牌'
+		'势备篇卡牌',
+		'bug修复'
 	],
 	files:[
 		'card/guozhan.js',
