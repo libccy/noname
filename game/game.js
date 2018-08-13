@@ -10144,6 +10144,9 @@
 				},
 				chooseToUse:function(){
 					"step 0"
+					if(game.modeSwapPlayer&&!_status.auto&&player.isUnderControl()&&!lib.filter.wuxieSwap(trigger)){
+						game.modeSwapPlayer(player);
+					}
 					var skills=player.getSkills(true);
 					game.expandSkills(skills);
 					for(var i=0;i<skills.length;i++){
@@ -10385,6 +10388,9 @@
 						event.result={bool:false};
 					}
 					else{
+						if(game.modeSwapPlayer&&!_status.auto&&player.isUnderControl()&&!lib.filter.wuxieSwap(trigger)){
+							game.modeSwapPlayer(player);
+						}
 						game.check();
 						if(event.isMine()){
 							game.pause();
@@ -10443,6 +10449,9 @@
 						}
 					}
 					else{
+						if(game.modeSwapPlayer&&!_status.auto&&player.isUnderControl()&&!lib.filter.wuxieSwap(trigger)){
+							game.modeSwapPlayer(player);
+						}
 						event.rangecards=player.getCards(event.position);
 						for(var i=0;i<event.rangecards.length;i++){
 							if(lib.filter.cardDiscardable(event.rangecards[i],player,event)){
@@ -17526,14 +17535,14 @@
 						this.classList.remove('linked');
 					}
 				},
-				canUse:function(card,player,distance,includecard){
+				canUse:function(card,target,distance,includecard){
 					if(typeof card=='string') card={name:card};
 					var info=get.info(card);
 					if(info.multicheck&&!info.multicheck(card,this)) return false;
-					if(includecard!=false&&!lib.filter.cardEnabled(card,player)) return false;
+					if(includecard!=false&&!lib.filter.cardEnabled(card,this)) return false;
 					if(includecard&&!lib.filter.cardUsable(card,this)) return false;
-					if(distance==false) return lib.filter.targetEnabled(card,this,player);
-					return lib.filter.filterTarget(card,this,player);
+					if(distance==false) return lib.filter.targetEnabled(card,this,target);
+					return lib.filter.filterTarget(card,this,target);
 				},
 				hasUseTarget:function(card,distance,includecard){
 					var player=this;

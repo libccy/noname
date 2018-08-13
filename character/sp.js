@@ -4401,6 +4401,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				init:function(player){
 					player.storage.luanzhan=0;
 				},
+				init2:function(player){
+					player.markSkill('luanzhan');
+				},
 				content:function(){
 					if(typeof player.storage.luanzhan=='number'){
 						player.storage.luanzhan+=trigger.num;
@@ -4408,7 +4411,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						player.storage.luanzhan=trigger.num;
 					}
-					player.markSkill('luanzhan');
+					if(player.hasSkill('luanzhan')){
+						player.markSkill('luanzhan');
+					}
 				},
 				group:'luanzhan_cancel',
 				subSkill:{
@@ -8719,6 +8724,39 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 1;
 						},
 					}
+				}
+			},
+			gzshushen:{
+				audio:'shushen',
+				trigger:{player:'recoverAfter'},
+				direct:true,
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return player!=current&&player.sameIdentityAs(current);
+					});
+				},
+				content:function(){
+					'step 0'
+					event.num=trigger.num||1;
+					"step 1"
+					player.chooseTarget(get.prompt2('gzshushen'),function(card,player,target){
+						return target!=player&&player.sameIdentityAs(target);
+					}).set('ai',function(target){
+						return get.attitude(_status.event.player,target);
+					});
+					"step 2"
+					if(result.bool){
+						player.logSkill('gzshushen',result.targets);
+						result.targets[0].draw();
+						if(event.num>1){
+							event.num--;
+							event.goto(1);
+						}
+					}
+				},
+				ai:{
+					threaten:0.8,
+					expose:0.1
 				}
 			},
 			shushen:{

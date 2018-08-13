@@ -221,7 +221,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_liushan:['male','shu',3,['xiangle','fangquan']],
 				gz_menghuo:['male','shu',4,['huoshou','zaiqi']],
 				gz_zhurong:['female','shu',4,['juxiang','lieren']],
-				gz_ganfuren:['female','shu',3,['shushen','shenzhi']],
+				gz_ganfuren:['female','shu',3,['gzshushen','shenzhi']],
 				gz_yuji:['male','qun',3,['qianhuan']],
 
 				gz_sunquan:['male','wu',4,['gzzhiheng']],
@@ -4161,6 +4161,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gz_masu:'马谡',
 			gz_yuji:'于吉',
 
+			gzshushen:'淑慎',
+			gzshushen_info:'当你回复1点体力时，你可令与你势力相同的一名其他角色摸一张牌。',
 			_lianheng:'连横',
 			lianheng_tag:'连',
 			guo_tag:'国',

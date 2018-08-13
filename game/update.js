@@ -2,7 +2,7 @@ window.noname_update={
 	version:'1.9.55',
 	update:'1.9.54.1',
 	changeLog:[
-		'bug修复'
+		'势备篇卡牌'
 	],
 	files:[
 		'card/guozhan.js',
@@ -11,6 +11,7 @@ window.noname_update={
 		'character/gwent.js',
 		'character/hearth.js',
 		'character/shenhua.js',
+		'character/sp.js',
 		'character/yijiang.js',
 		'game/asset.js',
 		'game/game.js',
