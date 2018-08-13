@@ -3145,7 +3145,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(!_status.event.yes) return false;
 							if(player.identity!='unknown') return true;
 							if(Math.random()<0.5) return true;
-							var info=get.info(_status.event.skill);
+							var info=get.info(_status.event.hsskill);
 							if(info&&info.ai&&info.ai.mingzhi==true) return true;
 							if(info&&info.ai&&info.ai.maixie) return true;
 							var group=lib.character[player.name1][1];
@@ -3174,9 +3174,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						var info=get.info(trigger.skill);
 						var next=player.chooseBool('是否明置'+get.translation(event.name)+'以发动【'+get.translation(trigger.skill)+'】？');
-						next.yes=!info.check||info.check(trigger._trigger,player);
-						next.skill=trigger.skill;
-						next.ai=nai
+						next.set('yes',!info.check||info.check(trigger._trigger,player));
+						next.set('hsskill',trigger.skill);
+						next.set('ai',nai);
 					}
 					"step 1"
 					if(result.bool){
@@ -3188,10 +3188,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else if(event.name2){
 						var info=get.info(trigger.skill);
 						var next=player.chooseBool('是否明置'+get.translation(event.name2)+'以发动【'+get.translation(trigger.skill)+'】？');
-						next.yes=!info.check||info.check(trigger._trigger,player);
-						next.ai=function(){
+						next.set('yes',!info.check||info.check(trigger._trigger,player));
+						next.set('ai',function(){
 							return _status.event.yes;
-						};
+						});
 					}
 					else{
 						event.finish();
