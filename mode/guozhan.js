@@ -4444,7 +4444,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			['heart',10,'sha'],
 			['heart',11,'sha'],
 			['heart',12,'huoshaolianying','fire',['lianheng']],
-			['heart',13,'shuiyanqijunx','thunder'],
+			['heart',13,'shuiyanqijunx'],
 
 			['club',1,'yuxi'],
 			['club',2,'huxinjing',null,['lianheng']],
@@ -4457,7 +4457,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			['club',9,'jiu'],
 			['club',10,'lulitongxin'],
 			['club',11,'huoshaolianying','fire',['lianheng']],
-			['club',12,'shuiyanqijunx','thunder'],
+			['club',12,'shuiyanqijunx'],
 			['club',13,'wuxie',null,['guo']],
 
 			['diamond',1,'xietianzi',null,['lianheng']],
