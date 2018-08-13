@@ -1,26 +1,17 @@
 window.noname_update={
-	version:'1.9.54.1',
-	update:'1.9.53.1',
+	version:'1.9.55',
+	update:'1.9.54.1',
 	changeLog:[
-		'变包武将',
 		'bug修复'
 	],
 	files:[
-		'card/standard.js',
-		'card/guozhan.js',
-		'character/diy.js',
-		'character/extra.js',
+		'character/gujian.js',
+		'character/gwent.js',
 		'character/hearth.js',
-		'character/refresh.js',
 		'character/shenhua.js',
-		'character/sp.js',
 		'character/yijiang.js',
-		'character/standard.js',
-		'character/xianjian.js',
 		'game/asset.js',
 		'game/game.js',
-		'game/directory.js',
-		'layout/default/layout.css',
 		'mode/guozhan.js'
 	]
 };

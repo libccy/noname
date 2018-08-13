@@ -762,7 +762,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					lib.card[cardname]=lib.card[cardname]||{
 						enable:true,
 						type:'character',
-						image:'character/'+name,
+						image:'character:'+name,
 						fullimage:true,
 						vanish:true,
 						skills:skills,

@@ -6035,7 +6035,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					player.awakenSkill('fuli');
-					player.recover(player.maxHp);
+					player.recover(player.maxHp-player.hp);
 					"step 1"
 					player.turnOver();
 					player.storage.fuli=true;
@@ -6126,6 +6126,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return false;
 				},
+				logTarget:'player',
 				content:function(){
 					if(trigger.player.countGainableCards(player,'ej')){
 						player.gainPlayerCard(trigger.player,'ej',true);

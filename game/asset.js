@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'1.9.54',
+	'1.9.55',
 	'audio/background/music_danji.mp3',
 	'audio/background/music_default.mp3',
 	'audio/background/music_diaochan.mp3',
@@ -2881,6 +2881,7 @@ window.noname_skin_list={
 	yuanshu:4,
 	yuejin:3,
 	yufan:1,
+	yuji:1,
 	yujin:1,
 	zhangbao:1,
 	zhangchunhua:4,

@@ -3450,7 +3450,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullborder:'gold',
 				vanish:true,
 				derivation:'gw_diandian',
-				image:'character/gw_yioufeisisp',
+				image:'character:gw_yioufeisisp',
 				enable:function(){
 					return game.countPlayer()>2;
 				},
@@ -3489,7 +3489,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullborder:'gold',
 				vanish:true,
 				derivation:'gw_diandian',
-				image:'character/gw_luoqi',
+				image:'character:gw_luoqi',
 				enable:true,
 				filterTarget:function(card,player,target){
 					return player.canUse('sha',target,false);
@@ -3532,7 +3532,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullborder:'gold',
 				vanish:true,
 				derivation:'gw_diandian',
-				image:'character/gw_jieluote',
+				image:'character:gw_jieluote',
 				enable:true,
 				filterTarget:true,
 				content:function(){
@@ -3586,7 +3586,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullborder:'gold',
 				vanish:true,
 				derivation:'gw_diandian',
-				image:'character/gw_yenaifa',
+				image:'character:gw_yenaifa',
 				enable:true,
 				notarget:true,
 				content:function(){
@@ -3619,7 +3619,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullborder:'gold',
 				vanish:true,
 				derivation:'gw_diandian',
-				image:'character/gw_telisi',
+				image:'character:gw_telisi',
 				enable:true,
 				notarget:true,
 				content:function(){
@@ -3654,7 +3654,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullborder:'gold',
 				vanish:true,
 				derivation:'gw_diandian',
-				image:'character/gw_hengsaite',
+				image:'character:gw_hengsaite',
 				enable:true,
 				notarget:true,
 				content:function(){
@@ -3694,7 +3694,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullborder:'gold',
 				vanish:true,
 				derivation:'gw_diandian',
-				image:'character/gw_fuertaisite',
+				image:'character:gw_fuertaisite',
 				enable:true,
 				filterTarget:true,
 				selectTarget:[1,2],
@@ -3729,7 +3729,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullborder:'gold',
 				vanish:true,
 				derivation:'gw_diandian',
-				image:'character/gw_laduoweide',
+				image:'character:gw_laduoweide',
 				enable:true,
 				filterTarget:true,
 				content:function(){
@@ -3761,7 +3761,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullborder:'gold',
 				vanish:true,
 				derivation:'gw_diandian',
-				image:'character/gw_enxier',
+				image:'character:gw_enxier',
 				enable:true,
 				filterTarget:function(card,player,target){
 					return Math.abs(target.countCards('h')-player.countCards('h'))<=1;
@@ -3793,7 +3793,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullborder:'gold',
 				vanish:true,
 				derivation:'gw_diandian',
-				image:'character/gw_fulisi',
+				image:'character:gw_fulisi',
 				enable:true,
 				filterTarget:function(card,player,target){
 					return target!=player&&target.countCards('h');
@@ -3846,7 +3846,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullborder:'gold',
 				vanish:true,
 				derivation:'gw_diandian',
-				image:'character/gw_kaerweite',
+				image:'character:gw_kaerweite',
 				enable:true,
 				filterTarget:function(card,player,target){
 					return target!=player&&target.countCards('h');
@@ -3881,7 +3881,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullborder:'gold',
 				vanish:true,
 				derivation:'gw_diandian',
-				image:'character/gw_bulanwang',
+				image:'character:gw_bulanwang',
 				enable:true,
 				notarget:true,
 				content:function(){
@@ -3921,7 +3921,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullborder:'gold',
 				vanish:true,
 				derivation:'gw_diandian',
-				image:'character/gw_kuite',
+				image:'character:gw_kuite',
 				enable:true,
 				filterTarget:function(card,player,target){
 					return target.countCards('h')>=player.countCards('h')&&player.canUse('juedou',target);
@@ -3955,7 +3955,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullborder:'gold',
 				vanish:true,
 				derivation:'gw_diandian',
-				image:'character/gw_haluo',
+				image:'character:gw_haluo',
 				enable:true,
 				filterTarget:function(card,player,target){
 					return target.isMinHp();
@@ -3986,7 +3986,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullborder:'gold',
 				vanish:true,
 				derivation:'gw_diandian',
-				image:'character/gw_dagong',
+				image:'character:gw_dagong',
 				enable:true,
 				content:function(){
 					target.addSkill('gw_ciguhanshuang');
@@ -4024,7 +4024,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullborder:'gold',
 				vanish:true,
 				derivation:'gw_diandian',
-				image:'character/gw_gaier',
+				image:'character:gw_gaier',
 				enable:true,
 				filterTarget:true,
 				content:function(){
@@ -4070,7 +4070,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullborder:'gold',
 				vanish:true,
 				derivation:'gw_diandian',
-				image:'character/gw_airuiting',
+				image:'character:gw_airuiting',
 				enable:true,
 				filterTarget:function(card,player,target){
 					return target!=player;
@@ -4114,7 +4114,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullborder:'gold',
 				vanish:true,
 				derivation:'gw_diandian',
-				image:'character/gw_aisinie',
+				image:'character:gw_aisinie',
 				enable:true,
 				notarget:true,
 				content:function(){
@@ -4152,7 +4152,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullborder:'gold',
 				vanish:true,
 				derivation:'gw_diandian',
-				image:'character/gw_falanxisika',
+				image:'character:gw_falanxisika',
 				enable:true,
 				notarget:true,
 				content:function(){
@@ -4195,7 +4195,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullborder:'gold',
 				vanish:true,
 				derivation:'gw_diandian',
-				image:'character/gw_huoge',
+				image:'character:gw_huoge',
 				enable:true,
 				notarget:true,
 				content:function(){

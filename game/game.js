@@ -12749,6 +12749,7 @@
 					event.delayed=false;
 					event.num=0;
 					event.cardlist=[];
+					event.cards=[];
 					'step 1'
 					player.gainPlayerCard(targets[num],event.position,true).set('boolline',false).set('chooseonly',true);
 					'step 2'
@@ -12758,6 +12759,7 @@
 						card=result.cards[0];
 					}
 					if(card){
+						event.cards.add(card);
 						current.lose(card,ui.special).set('type','gain');
 					}
 					event.cardlist[num]=card||null;
@@ -12771,7 +12773,7 @@
 					'step 3'
 					var current=targets[num];
 					var card=event.cardlist[num];
-					if(card){
+					if(card&&event.cards.contains(card)){
 						if(current==game.me||current.isOnline()||(player==game.me&&!event.delayed)){
 							player.gain(card,current);
 							event.delayed=true;
@@ -18681,6 +18683,10 @@
 					if(this.hasSkillTag('respondShan',true,null,true)) return true;
 					return false;
 				},
+				mayHaveShan:function(){
+					return this.hasShan();
+					// modify: later
+				},
 				hasCard:function(name,position){
 					if(typeof name=='function'){
 						var hs=this.getCards(position);
@@ -20320,7 +20326,12 @@
 							}
 						}
 						else if(lib.card[bg].image){
-							this.setBackground(lib.card[bg].image);
+							if(lib.card[bg].image.indexOf('character:')==0){
+								this.setBackground(lib.card[bg].image.slice(10),'character');
+							}
+							else{
+								this.setBackground(lib.card[bg].image);
+							}
 						}
 						else{
 							var cardPack=lib.cardPack['mode_'+get.mode()];
@@ -45269,6 +45280,9 @@
 						if(content&&content.length){
 							return get.translation(content);
 						}
+					}
+					if(Array.isArray(content)&&!content.length){
+						return '没有卡牌';
 					}
 					return false;
 				}

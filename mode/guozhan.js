@@ -215,6 +215,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_menghuo:['male','shu',4,['huoshou','zaiqi']],
 				gz_zhurong:['female','shu',4,['juxiang','lieren']],
 				gz_ganfuren:['female','shu',3,['shushen','shenzhi']],
+				gz_yuji:['male','qun',3,['qianhuan']],
 
 				gz_sunquan:['male','wu',4,['gzzhiheng']],
 				gz_ganning:['male','wu',4,['qixi']],
@@ -280,6 +281,109 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			qianhuan:{
+				group:['qianhuan_add','qianhuan_use'],
+				init:function(player){
+					player.storage.qianhuan=[];
+				},
+				intro:{
+					content:'cards'
+				},
+				subSkill:{
+					add:{
+						trigger:{global:'damageEnd'},
+						filter:function(event,player){
+							var suits=[];
+							for(var i=0;i<player.storage.qianhuan.length;i++){
+								suits.add(get.suit(player.storage.qianhuan[i]));
+							}
+							return event.player.sameIdentityAs(player)&&player.countCards('h',function(card){
+								return !suits.contains(get.suit(card));
+							});
+						},
+						direct:true,
+						content:function(){
+							'step 0'
+							var suits=[];
+							for(var i=0;i<player.storage.qianhuan.length;i++){
+								suits.add(get.suit(player.storage.qianhuan[i]));
+							}
+							player.chooseCard('he',get.prompt2('qianhuan'),function(card){
+								return !_status.event.suits.contains(get.suit(card));
+							}).set('ai',function(card){
+								if(!_status.event.temp){
+									return 9-get.value(card);
+								}
+								return 0;
+							}).set('temp',!player.hasStockSkill('qianhuan')).set('suits',suits);
+							'step 1'
+							if(result.bool){
+								var card=result.cards[0]
+								player.storage.qianhuan.add(card);
+								player.lose(card,ui.special);
+								player.$give(card,player);
+								player.markSkill('qianhuan',true);
+								player.logSkill('qianhuan');
+							}
+						}
+					},
+					use:{
+						trigger:{global:'useCardToBefore'},
+						filter:function(event,player){
+							if(!['basic','trick'].contains(get.type(event.card,'trick'))) return false;
+							return event.target&&event.target.sameIdentityAs(player)&&event.targets.length==1&&player.storage.qianhuan.length;
+						},
+						direct:true,
+						content:function(){
+							'step 0'
+							var goon=get.effect(trigger.target,trigger.card,trigger.player,player)<0;
+							if(goon){
+								if(['tiesuo','diaohulishan','lianjunshengyan','zhibi','chiling','lulitongxin'].contains(trigger.card.name)){
+									goon=false;
+								}
+								else if(trigger.card.name=='sha'){
+									if(trigger.target.mayHaveShan()||trigger.target.hp>=3){
+										goon=false;
+									}
+								}
+								else if(trigger.card.name=='guohe'){
+									if(trigger.target.countCards('he')>=3||!trigger.target.countCards('h')){
+										goon=false;
+									}
+								}
+								else if(trigger.card.name=='shuiyanqijunx'){
+									if(trigger.target.countCards('e')<=1||trigger.target.hp>=3){
+										goon=false;
+									}
+								}
+								else if(get.tag(trigger.card,'damage')&&trigger.target.hp>=3){
+									goon=false;
+								}
+							}
+							player.chooseButton().set('goon',goon).set('ai',function(button){
+								if(_status.event.goon) return 1;
+								return 0;
+							}).set('createDialog',[get.prompt('qianhuan'),'<div class="text center">移去一张“千幻”牌令'+
+							get.translation(trigger.player)+'对'+get.translation(trigger.target)+'的'+get.translation(trigger.card)+'失效</div>',player.storage.qianhuan]);
+							'step 1'
+							if(result.bool){
+								var card=result.links[0];
+								player.storage.qianhuan.remove(card);
+								if(player.storage.qianhuan.length){
+									player.updateMarks('qianhuan');
+								}
+								else{
+									player.unmarkSkill('qianhuan');
+								}
+								card.discard();
+								player.$throw(card);
+								player.logSkill('qianhuan',trigger.player);
+								trigger.cancel();
+							}
+						}
+					}
+				}
+			},
 			gzjili:{
 				subSkill:{
 					count:{
@@ -692,6 +796,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(get.type(event.shown[i],'trick')==type){
 							list.push(event.shown[i]);
 						}
+						else{
+							event.shown[i].discard();
+						}
 					}
 					if(list.length){
 						player.gain(list,'gain2');
@@ -794,7 +901,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				check:function(card){
 					var num=7-get.value(card);
 					if(get.position(card)=='h'){
-						num+=3;
+						if(zhu.storage.yuanjiangfenghuotu>=5){
+							return num-3;
+						}
+						return num+3;
 					}
 					else{
 						var player=_status.event.player;
@@ -1126,10 +1236,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			gzxinsheng:{
 				trigger:{player:'damageEnd'},
-				frequent:true,
+				// frequent:true,
 				content:function(){
 					game.log(player,'获得了一张','#g化身');
-					lib.skill.gzhuashen.addCharacter(player,_status.characterlist.randomGet());
+					lib.skill.gzhuashen.addCharacter(player,_status.characterlist.randomGet(),true);
 					game.delayx();
 				}
 			},
@@ -1192,7 +1302,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					return skills;
 				},
-				addCharacter:function(player,name){
+				addCharacter:function(player,name,show){
 					var skills=lib.skill.gzhuashen.filterSkill(name);
 					if(skills.length){
 						player.storage.gzhuashen_map[name]=skills;
@@ -1203,6 +1313,26 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.storage.gzhuashen.add(name);
 					player.updateMarks('gzhuashen');
 					_status.characterlist.remove(name);
+					if(show){
+						lib.skill.gzhuashen.drawCharacter(player,[name]);
+					}
+				},
+				drawCharacter:function(player,list){
+					game.broadcastAll(function(player,list){
+						if(player.isUnderControl(true)){
+							var cards=[];
+							for(var i=0;i<list.length;i++){
+								var cardname='huashen_card_'+list[i];
+								lib.card[cardname]={
+									fullimage:true,
+									image:'character:'+list[i]
+								}
+								lib.translate[cardname]=lib.translate[list[i]];
+								cards.push(game.createCard(cardname,'',''));
+							}
+							player.$draw(cards);
+						}
+					},player,list);
 				},
 				removeCharacter:function(player,name){
 					var skills=lib.skill.gzhuashen.filterSkill(name);
@@ -1256,6 +1386,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								for(var i=0;i<result.links.length;i++){
 									lib.skill.gzhuashen.addCharacter(player,result.links[i]);
 								}
+								lib.skill.gzhuashen.drawCharacter(player,result.links.slice(0));
 								game.delayx();
 								player.addTempSkill('gzhuashen_triggered');
 								game.log(player,'获得了'+get.cnNumber(result.links.length)+'张','#g化身');
@@ -1284,7 +1415,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								player.logSkill('gzhuashen');
 								game.log(player,'替换了一张','#g化身');
 								lib.skill.gzhuashen.removeCharacter(player,result.links[0]);
-								lib.skill.gzhuashen.addCharacter(player,_status.characterlist.randomGet());
+								lib.skill.gzhuashen.addCharacter(player,_status.characterlist.randomGet(),true);
 								game.delayx();
 							}
 						}
@@ -1363,23 +1494,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(!event.directresult&&result&&result.links[0]){
 								event.directresult=result.links[0];
 							}
-							// game.broadcastAll(function(name){
-							// 	var img=name;
-							// 	if(img.indexOf('gz_')==0){
-							// 		img=name.slice(3);
-							// 	}
-							// 	lib.card['gzhuashen_'+name]={
-							// 		fullborder:'bronze',
-							// 		image:'character/'+img
-							// 	}
-							// 	lib.translate['gzhuashen_'+name]=lib.translate[name];
-							// },event.directresult);
-							// 'step 2'
 							var name=event.directresult;
 							lib.skill.gzhuashen.removeCharacter(player,name);
-							// player.$throw(game.createCard('gzhuashen_'+name),'','');
 							game.log(player,'移除了化身牌','#g'+get.translation(name));
-							// game.delayx(2);
 						}
 					}
 				},
@@ -3992,7 +4109,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gz_lvfan:'吕范',
 			gz_shamoke:'沙摩柯',
 			gz_masu:'马谡',
+			gz_yuji:'于吉',
 
+			qianhuan:'千幻',
+			qianhuan_bg:'幻',
+			qianhuan_info:'当与你势力相同的一名角色受到伤害后，你可以将一张与你武将牌上花色均不同的牌置于你的武将牌上。当一名与你势力相同的角色成为基本牌或锦囊牌的唯一目标时，你可以移去一张“千幻”牌，取消之。',
 			gzjili:'蒺藜',
 			gzjili_info:'当你于一回合内使用或打出第X张牌时，你可以摸X张牌（X为你的攻击范围）。',
 			gzzhiman:'制蛮',

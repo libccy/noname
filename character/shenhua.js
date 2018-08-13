@@ -887,7 +887,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						var next=player.chooseToDiscard(get.prompt('qiaobian'),'弃置一张手牌并跳过判定阶段');
 						next.set('ai',get.unuseful2);
-						next.set('logSkill','qiaobian');
+						next.set('logSkill','qiaobian1');
 					}
 					"step 1"
 					if(result.bool){
@@ -921,7 +921,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseToDiscard(get.prompt('qiaobian'),'弃置一张手牌并跳过摸牌阶段，然后可以获得至多两名角色各一张手牌',lib.filter.cardDiscardable).set('ai',function(card){
 						if(!_status.event.check) return 0;
 						return 7-get.value(card);
-					}).set('check',check).set('logSkill','qiaobian');
+					}).set('check',check).set('logSkill','qiaobian2');
 					"step 1"
 					if(result.bool){
 						trigger.cancel();
@@ -984,7 +984,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseToDiscard(get.prompt('qiaobian'),'弃置一张手牌并跳过出牌阶段，然后可以移动场上的一张牌',lib.filter.cardDiscardable).set('ai',function(card){
 						if(!_status.event.check) return 0;
 						return 7-get.value(card);
-					}).set('check',check).set('logSkill','qiaobian');
+					}).set('check',check).set('logSkill','qiaobian3');
 					"step 1"
 					if(result.bool){
 						trigger.cancel();
@@ -1008,7 +1008,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					var discard=player.countCards('h')>player.hp;
-					var next=player.chooseToDiscard(get.prompt('qiaobian'),'弃置一张手牌并跳过弃牌阶段');
+					var next=player.chooseToDiscard(get.prompt('qiaobian4'),'弃置一张手牌并跳过弃牌阶段');
 					next.logSkill='qiaobian';
 					next.ai=function(card){
 						if(discard){
@@ -1342,11 +1342,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			guzheng:{
 				audio:2,
-				unique:true,
-				gainable:true,
+				// unique:true,
+				// gainable:true,
 				trigger:{global:'discardAfter'},
 				filter:function(event,player){
-					if(event.player!=player&&event.player.classList.contains('dead')==false&&
+					if(event.player!=player&&event.player.isIn()&&
 					event.cards&&event.cards.length&&event.getParent(2).name=='phaseDiscard'){
 						for(var i=0;i<event.cards.length;i++){
 							if(get.position(event.cards[i])=='d'){
@@ -1497,6 +1497,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				get:function(player,num){
 					if(typeof num!='number') num=1;
+					var list=[];
 					while(num--){
 						var name=player.storage.huashen.list.randomRemove();
 						var skills=lib.character[name][3].slice(0);
@@ -1509,9 +1510,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.storage.huashen.owned[name]=skills;
 						// player.popup(name);
 						game.log(player,'获得了一个化身');
-						if(player.isUnderControl(true)){
-							player.flashAvatar('huashen',name);
+						list.push(name);
+					}
+					if(player.isUnderControl(true)){
+						var cards=[];
+						for(var i=0;i<list.length;i++){
+							var cardname='huashen_card_'+list[i];
+							lib.card[cardname]={
+								fullimage:true,
+								image:'character:'+list[i]
+							}
+							lib.translate[cardname]=lib.translate[list[i]];
+							cards.push(game.createCard(cardname,'',''));
 						}
+						player.$draw(cards);
 					}
 				},
 				group:['huashen1','huashen2'],
