@@ -12142,6 +12142,19 @@
 					if(event.animate!=false){
 						if((card.name=='wuxie'||card.name=='youdishenru')&&event.getParent().source){
 							var lining=event.getParent().sourcex||event.getParent().source2||event.getParent().source;
+							if(get.mode()=='guozhan'&&card.hasTag&&card.hasTag('guo')){
+								if(!Array.isArray(lining)){
+									lining=[lining];
+								}
+								if(lining.length){
+									lining.addArray(game.filterPlayer(function(current){
+										return current.sameIdentityAs(lining[0],true);
+									}));
+								}
+								if(lining.length==1){
+									lining=lining[0];
+								}
+							}
 							if(lining==player&&event.getParent().sourcex2){
 								lining=event.getParent().sourcex2;
 							}
@@ -12188,6 +12201,7 @@
 					if(event.oncard){
 						event.oncard(event.card,event.player);
 					}
+					event.excluded=[];
 					event.trigger('useCard');
 					event._oncancel=function(){
 						game.broadcastAll(function(id){
@@ -12279,6 +12293,7 @@
 					if(targets[num]&&targets[num].isDead()) return;
 					if(targets[num]&&targets[num].isOut()) return;
 					if(targets[num]&&targets[num].removed) return;
+					if(targets[num]&&event.excluded.contains(targets[num])) return;
 					var info=get.info(card);
 					if(targets.length==0&&!info.notarget) return;
 					var next=game.createEvent(card.name);
@@ -20735,6 +20750,12 @@
 							_status.discarded.add(this);
 						}
 					}
+				},
+				hasTag:function(tag){
+					if(this.cardid&&_status.cardtag&&_status.cardtag[tag]&&_status.cardtag[tag].contains(this.cardid)){
+						return true;
+					}
+					return false;
 				},
 				hasPosition:function(){
 					return ['h','e','j'].contains(get.position(this));
@@ -44911,14 +44932,27 @@
 						str2='雷'+str2;
 					}
 				}
-				if(get.itemtype(str)=='card'&&str.suit&&str.number){
-					if(arg=='viewAs'&&str.viewAs!=str.name&&str.viewAs){
-						str2+='（'+get.translation(str)+'）';
+				if(get.itemtype(str)=='card'){
+					if(_status.cardtag&&str.cardid){
+						var tagstr='';
+						for(var i in _status.cardtag){
+							if(_status.cardtag[i].contains(str.cardid)){
+								tagstr+=lib.translate[i+'_tag'];
+							}
+						}
+						if(tagstr){
+							str2+='·'+tagstr;
+						}
 					}
-					else{
-						str2+='【'+get.translation(str.suit)+str.number+'】';
-						// var len=str2.length-1;
-						// str2=str2.slice(0,len)+'<span style="letter-spacing: -2px">'+str2[len]+'·</span>'+get.translation(str.suit)+str.number;
+					if(str.suit&&str.number){
+						if(arg=='viewAs'&&str.viewAs!=str.name&&str.viewAs){
+							str2+='（'+get.translation(str)+'）';
+						}
+						else{
+							str2+='【'+get.translation(str.suit)+str.number+'】';
+							// var len=str2.length-1;
+							// str2=str2.slice(0,len)+'<span style="letter-spacing: -2px">'+str2[len]+'·</span>'+get.translation(str.suit)+str.number;
+						}
 					}
 				}
 				return str2;

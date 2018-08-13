@@ -126,7 +126,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"step 2"
 			game.broadcast(function(cardtag){
 				_status.cardtag=cardtag;
-				console.log(ui.cardPile,lib.cardOL,cardtag)
 			},_status.cardtag);
 			if(ui.coin){
 				_status.coinCoeff=get.coinCoeff([game.me.name1,game.me.name2]);
@@ -295,11 +294,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				prompt:'将可连横的牌交给一名与你势力不同的角色，或未确定势力的角色，若你交给与你势力不同的角色，则你摸一张牌',
 				filter:function(event,player){
 					return (player.getCards('h',function(card){
-						return _status.cardtag.lianheng.contains(card.cardid);
+						return card.hasTag('lianheng');
 					}).length);
 				},
 				filterCard:function(card){
-					return _status.cardtag.lianheng.contains(card.cardid);
+					return card.hasTag('lianheng');
 				},
 				filterTarget:function(card,player,target){
 					if(target==player) return false;
@@ -4520,17 +4519,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					return this.identity!=target.identity;
 				},
-				sameIdentityAs:function(target){
-					if(this==target) return true;
-					if(target.identity=='unknown'||target.identity=='ye'||this.identity=='ye') return false;
-					if(this.identity=='unknown'){
-						var identity=lib.character[this.name1][1];
-						if(this.wontYe()) return identity==target.identity;
-						return false;
+				sameIdentityAs:function(target,shown){
+					if(shown){
+						if(this.identity=='ye'||this.identity=='unknown') return false;
 					}
 					else{
-						return this.identity==target.identity;
+						if(this==target) return true;
+						if(target.identity=='unknown'||target.identity=='ye'||this.identity=='ye') return false;
+						if(this.identity=='unknown'){
+							var identity=lib.character[this.name1][1];
+							if(this.wontYe()) return identity==target.identity;
+							return false;
+						}
 					}
+					return this.identity==target.identity;
 				},
 				getModeState:function(){
 					return {

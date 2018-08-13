@@ -1576,24 +1576,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'shaMiss'},
 				silent:true,
 				onremove:true,
-				init:function(player){
-					if(!player.storage.fangtian_guozhan_trigger){
-						player.storage.fangtian_guozhan_trigger=[];
-					}
-				},
 				content:function(){
-					player.storage.fangtian_guozhan_trigger.add(trigger.card);
-				},
-				group:['fangtian_guozhan_cancel','fangtian_guozhan_remove']
-			},
-			fangtian_guozhan_cancel:{
-				trigger:{player:'shaBefore'},
-				silent:true,
-				filter:function(event,player){
-					return player.storage.fangtian_guozhan_trigger&&player.storage.fangtian_guozhan_trigger.contains(event.card);
-				},
-				content:function(){
-					trigger.cancel();
+					trigger.getParent().excluded.addArray(trigger.getParent().targets);
 				}
 			},
 			fangtian_guozhan_remove:{
@@ -1806,6 +1790,25 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							next.nouse=true;
 						}
 					};
+					event.settle=function(){
+						if(!event.state){
+							if(event.triggername=='phaseJudge'){
+								trigger.untrigger();
+								trigger.cancelled=true;
+							}
+							else{
+								trigger.cancel();
+								if(get.mode()=='guozhan'&&get.itemtype(event.statecard)=='card'&&event.statecard.hasTag('guo')){
+									if(trigger.target.identity!='ye'&&trigger.target.identity!='unknown'){
+										trigger.getParent().excluded.addArray(game.filterPlayer(function(current){
+											return current.identity==trigger.target.identity;
+										}));
+									}
+								}
+							}
+						}
+						event.finish();
+					};
 					'step 1'
 					var list=game.filterPlayer(function(current){
 						if(event.triggername=='phaseJudge'){
@@ -1825,16 +1828,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					});
 					'step 2'
 					if(event.list.length==0){
-						event.finish();
-						if(!event.state){
-							if(event.triggername=='phaseJudge'){
-								trigger.untrigger();
-								trigger.cancelled=true;
-							}
-							else{
-								trigger.cancel();
-							}
-						}
+						event.settle();
 					}
 					else if(_status.connectMode&&(event.list[0].isOnline()||event.list[0]==game.me)){
 						event.goto(4);
@@ -1930,6 +1924,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 9'
 					if(event.wuxieresult){
 						if(result=='wuxied'){
+							if(!event.statecard){
+								if(event.wuxieresult2&&event.wuxieresult2.used){
+									event.statecard=event.wuxieresult2.used;
+								}
+								else{
+									event.statecard=true;
+								}
+							}
 							event.state=!event.state;
 						}
 						event.goto(1);
@@ -1938,15 +1940,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						event.goto(2);
 					}
 					else{
-						if(!event.state){
-							if(event.triggername=='phaseJudge'){
-								trigger.untrigger();
-								trigger.cancelled=true;
-							}
-							else{
-								trigger.cancel();
-							}
-						}
+						event.settle();
 					}
 					delete event.resultOL;
 					delete event.wuxieresult;
