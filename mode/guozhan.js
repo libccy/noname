@@ -1091,6 +1091,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						silent:true,
 						content:function(){
 							player.mayChangeVice();
+							event.skill='gzqice';
+							event.trigger('skillAfter');
 						}
 					}
 				},
@@ -1521,7 +1523,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					remove:{
-						trigger:{player:['useSkillAfter','useCardAfter','respondAfter','triggerAfter']},
+						trigger:{player:['useSkillAfter','useCardAfter','respondAfter','triggerAfter','skillAfter']},
 						hookTrigger:{
 							after:function(event,player){
 								if(event._direct&&!player.storage.gzhuashen_removing.contains(event.skill)) return false;
