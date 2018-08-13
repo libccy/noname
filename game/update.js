@@ -5,6 +5,8 @@ window.noname_update={
 		'bug修复'
 	],
 	files:[
+		'card/guozhan.js',
+		'card/standard.js',
 		'character/gujian.js',
 		'character/gwent.js',
 		'character/hearth.js',

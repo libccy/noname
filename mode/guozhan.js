@@ -29,6 +29,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			if(get.config('onlyguozhan')&&!playback){
 				game.arrangeTrigger=true;
 			}
+			lib.card.sha.complexTarget=true;
 		},
 		onreinit:function(){
 			var pack=lib.characterPack.mode_guozhan;
@@ -4447,6 +4448,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			['club',1,'yuxi'],
 			['heart',3,'taipingyaoshu'],
 			['diamond',6,'dinglanyemingzhu'],
+			['spade',2,'minguangkai'],
 		],
 		element:{
 			content:{
@@ -4946,7 +4948,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				isMinor:function(){
-					if(this.identity=='unknown') return false;
+					if(this.identity=='unknown'||this.isMajor()) return false;
+					if(!game.hasPlayer(function(current){
+						return current.isMajor();
+					})){
+						return false;
+					}
 					if(!lib.group.contains(this.identity)) return true;
 					var min=game.players.length;
 					if(game.hasPlayer(function(current){

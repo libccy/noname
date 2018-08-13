@@ -4,6 +4,19 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		name:'guozhan',
 		connect:true,
 		card:{
+			minguangkai:{
+				mode:['guozhan'],
+				fullskin:true,
+				type:'equip',
+				subtype:'equip2',
+				cardimage:'suolianjia',
+				skills:['minguangkai_cancel','minguangkai_link'],
+				ai:{
+					basic:{
+						equipValue:6
+					}
+				}
+			},
 			dinglanyemingzhu:{
 				mode:['guozhan'],
 				fullskin:true,
@@ -665,6 +678,51 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			minguangkai_cancel:{
+				trigger:{target:'useCardToBefore'},
+				forced:true,
+				priority:15,
+				check:function(event,player){
+					return get.effect(event.target,event.card,event.player,player)<0;
+				},
+				filter:function(event,player){
+					if(['huoshaolianying','huogong'].contains(event.card.name)) return true;
+					if(event.card.name=='sha') return event.card.nature=='fire';
+					return false;
+				},
+				content:function(){
+					trigger.cancel();
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target,current){
+							if(['huoshaolianying','huogong'].contains(card.name)||(card.name=='sha'&&card.nature=='fire')){
+								return 'zeroplayertarget';
+							}
+						},
+					}
+				}
+			},
+			minguangkai_link:{
+				trigger:{player:'linkBefore'},
+				forced:true,
+				priority:20,
+				filter:function(event,player){
+					return player.isMinor()&&!player.isLinked();
+				},
+				content:function(){
+					trigger.cancel();
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target,current){
+							if(target.isMinor()&&['tiesuo','lulitongxin'].contains(card.name)){
+								return 'zeroplayertarget';
+							}
+						},
+					}
+				}
+			},
 			dinglanyemingzhu_skill:{
 				inherit:'gzzhiheng',
 				filter:function(event,player){
@@ -1091,16 +1149,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				group:'undist'
 			},
 			huxinjing:{
-				trigger:{player:'damageBegin'},
-				priority:10,
-				forced:true,
-				filter:function(event){
+				trigger:{player:'damageBefore'},
+				// forced:true,
+				filter:function(event,player){
 					if(event.source&&event.source.hasSkillTag('unequip',false,event.card)) return false;
-					return event.num>0;
+					return event.num>=player.hp;
 				},
 				content:function(){
-					trigger.num--;
-					player.addSkill('huxinjing2');
+					trigger.cancel();
+					var e2=player.getEquip('huxinjing');
+					if(e2){
+						player.discard(e2);
+					}
 				}
 			},
 			huxinjing2:{
@@ -1215,6 +1275,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		translate:{
+			minguangkai:'明光铠',
+			minguangkai_cancel:'明光铠',
+			minguangkai_link:'明光铠',
+			minguangkai_info:'锁定技，当你成为【火烧连营】、【火攻】或火【杀】的目标时，取消之；若你是小势力角色，你不会被横置。',
 			dinglanyemingzhu:'定澜夜明珠',
 			dinglanyemingzhu_bg:'珠',
 			dinglanyemingzhu_info:'锁定技，你视为拥有技能“制衡”，若你已经有“制衡”，则改为取消弃置牌数的限制。',
@@ -1269,7 +1333,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			jingfanma_info:'你的进攻距离+1',
 			huxinjing_bg:'镜',
 			huxinjing:'护心镜',
-			huxinjing_info:'抵消一点伤害',
+			huxinjing_info:'当你受到伤害时，若伤害值大于或等于你的体力值，则你可以将【护心镜】置入弃牌堆，然后防止此伤害。',
 		},
 		list:[
 			['heart',9,'yuanjiao'],
