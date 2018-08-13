@@ -9545,16 +9545,17 @@
 					event.choice=[];
 					event.num=0;
 					var filter=function(i){
-						if(list[i][1]==list[0][1]&&list[i][1].hasStockSkill(list[i][0],true,true,true)){
-							if(get.info(list[i][0]).forced){
+						if(list[i][1]==list[0][1]&&list[i][1].hasSkill(list[i][0],true)){
+							var info=get.info(list[i][0]);
+							if(info.forced||info.popup===false){
 								return false;
 							}
 							return true;
 						}
 						return false;
 					}
-					var filter2=function(i){
-						return lib.filter.filterTrigger(event.source,list[i][1],event.triggername,list[i][0]);
+					var filter2=function(info){
+						return lib.filter.filterTrigger(trigger,info[1],event.triggername,info[0]);
 					}
 					if(filter(0)){
 						event.choice.push(list[0]);
@@ -9566,7 +9567,7 @@
 					}
 					if(event.choice.length>1){
 						for(var i=0;i<event.choice.length;i++){
-							if(!filter2(i)){
+							if(!filter2(event.choice[i])){
 								event.choice.splice(i--,1);
 								if(event.choice.length<=1) break;
 							}
@@ -9594,7 +9595,7 @@
 					var info=event.list[event.num];
 					if(info){
 						event.list.splice(event.num,1);
-						game.createTrigger(event.triggername,info[0],info[1],event.source);
+						game.createTrigger(event.triggername,info[0],info[1],trigger);
 					}
 					event.goto(0);
 				},
@@ -18617,11 +18618,11 @@
 				distanceFrom:function(target,method){
 					return get.distance(target,this,method);
 				},
-				hasSkill:function(skill){
-					return game.expandSkills(this.getSkills()).contains(skill);
+				hasSkill:function(skill,arg2,arg3,arg4){
+					return game.expandSkills(this.getSkills(arg2,arg3,arg4)).contains(skill);
 				},
 				hasStockSkill:function(skill,arg1,arg2,arg3){
-					return this.getStockSkills(arg1,arg2,arg3).contains(skill);
+					return game.expandSkills(this.getStockSkills(arg1,arg2,arg3)).contains(skill);
 				},
 				hasZhuSkill:function(skill,player){
 					if(!this.hasSkill(skill)) return false;
@@ -21148,18 +21149,11 @@
 						return b[2]-a[2];
 					});
 					if(list.length){
-						if(game.arrangeTrigger){
-							var next=game.createEvent('arrangeTrigger',false,event);
-							next.setContent('arrangeTrigger');
-							next.list=list;
-							next.source=event;
-							next.triggername=name;
-						}
-						else{
-							for(var i=0;i<list.length;i++){
-								game.createTrigger(name,list[i][0],list[i][1],event);
-							}
-						}
+						var next=game.createEvent('arrangeTrigger',false,event);
+						next.setContent('arrangeTrigger');
+						next.list=list;
+						next._trigger=event;
+						next.triggername=name;
 					}
 				},
 				untrigger:function(all,player){
@@ -21515,7 +21509,7 @@
 					for(var i=0;i<player._hookTrigger.length;i++){
 						var info=lib.skill[player._hookTrigger[i]].hookTrigger;
 						if(info){
-							if(info.block&&info.block(event,player,name)){
+							if(info.block&&info.block(event,player,name,skill)){
 								return false;
 							}
 						}
@@ -26398,7 +26392,7 @@
 		},
 		createTrigger:function(name,skill,player,event){
 			if(player.isOut()||player.isDead()||player.removed) return;
-			var next=game.createEvent('trigger',false,event);
+			var next=game.createEvent('trigger',false);
 			next.skill=skill;
 			next.player=player;
 			next.triggername=name;

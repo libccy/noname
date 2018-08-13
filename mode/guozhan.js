@@ -26,9 +26,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			}
-			if(get.config('onlyguozhan')&&!playback){
-				game.arrangeTrigger=true;
-			}
 			lib.card.sha.complexTarget=true;
 		},
 		onreinit:function(){
@@ -341,6 +338,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				intro:{
 					content:'cards'
+				},
+				ai:{
+					threaten:1.8
 				},
 				subSkill:{
 					add:{
@@ -1511,10 +1511,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 					disallow:{
 						hookTrigger:{
-							block:function(event,player,name){
+							block:function(event,player,name,skill){
 								for(var i=0;i<player.storage.gzhuashen_trigger.length;i++){
 									var info=player.storage.gzhuashen_trigger[i];
-									if(info[0]==event&&info[1]==name){
+									if(info[0]==event&&info[1]==name&&
+									lib.skill.gzhuashen.getSkillSources(player,skill).length>0){
 										return true;
 									}
 								}
@@ -3055,7 +3056,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						var nono=(get.damageEffect(trigger.player,player,trigger.player)>=0);
-						trigger.player.chooseToDiscard('he',{type:'equip'}).set('ai',function(card){
+						trigger.player.chooseToDiscard('弃置一张装备牌，或受到一点伤害','he',{type:'equip'}).set('ai',function(card){
 							if(_status.event.nono){
 								return 0;
 							}

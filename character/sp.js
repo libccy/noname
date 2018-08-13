@@ -8430,7 +8430,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(get.damageEffect(trigger.player,player,player)<=0){
 						nono=true;
 					}
-					var next=player.chooseToDiscard(get.prompt('xiaoguo',trigger.player),{type:'basic'});
+					var next=player.chooseToDiscard('弃置一张装备牌并令'+get.translation(player)+'摸一张牌，或受到一点伤害',get.prompt('xiaoguo',trigger.player),{type:'basic'});
 					next.set('ai',function(card){
 						if(_status.event.nono) return 0;
 						return 8-get.useful(card);
