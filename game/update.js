@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'1.9.55',
+	version:'1.9.55.1',
 	update:'1.9.54.1',
 	changeLog:[
 		'势备篇卡牌'
