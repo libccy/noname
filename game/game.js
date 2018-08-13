@@ -9535,40 +9535,75 @@
 						event.callback();
 					}
 				},
-				createTrigger:function(){
-					"step 0"
-					if(player._hookTrigger){
-						for(var i=0;i<player._hookTrigger.length;i++){
-							var info=lib.skill[player._hookTrigger[i]].hookTrigger;
-							if(info){
-								if(info.before&&info.before(event,player,event.triggername)){
-									event.trigger('triggerBefore');
-									break;
-								}
+				arrangeTrigger:function(){
+					'step 0'
+					var list=event.list;
+					if(!list.length){
+						event.finish();
+						return;
+					}
+					event.choice=[];
+					event.num=0;
+					var filter=function(i){
+						if(list[i][1]==list[0][1]&&list[i][1].hasStockSkill(list[i][0],true,true,true)){
+							if(get.info(list[i][0]).forced){
+								return false;
+							}
+							return true;
+						}
+						return false;
+					}
+					var filter2=function(i){
+						return lib.filter.filterTrigger(event.source,list[i][1],event.triggername,list[i][0]);
+					}
+					if(filter(0)){
+						event.choice.push(list[0]);
+						for(var i=1;i<list.length;i++){
+							if(filter(i)){
+								event.choice.push(list[i]);
 							}
 						}
 					}
-					"step 1"
-					var info=get.info(event.skill);
-					if(event.cancelled){
-						event.finish();
+					if(event.choice.length>1){
+						for(var i=0;i<event.choice.length;i++){
+							if(!filter2(i)){
+								event.list.splice(i--,1);
+								if(event.list.length<=1) break;
+							}
+						}
 					}
-					else if(info.filter&&!info.filter(trigger,player,event.triggername)){
-						event.finish();
+					if(event.choice.length<=1){
+						event.goto(3);
 					}
-					else if(event._trigger._notrigger.contains(player)&&!lib.skill.global.contains(event.skill)){
-						event.finish();
+					'step 1'
+					var controls=[];
+					event.current=event.choice[0][1]
+					for(var i=0;i<event.choice.length;i++){
+						controls.push(event.choice[i][0]);
 					}
-					else if(typeof info.usable=='number'&&player.hasSkill('counttrigger')&&
-						player.storage.counttrigger&&player.storage.counttrigger[event.skill]>=info.usable){
-						event.finish();
+					event.current.chooseControl(controls).set('prompt','选择下一个触发的技能');
+					'step 2'
+					if(result.control){
+						for(var i=0;i<event.list.length;i++){
+							if(event.list[i][0]==result.control&&event.list[i][1]==event.current){
+								event.num=i;break;
+							}
+						}
 					}
-					else if(info.round&&(info.round-(game.roundNumber-player.storage[event.skill+'_roundcount'])>0)){
-						event.finish();
+					'step 3'
+					var info=event.list[event.num];
+					if(info){
+						event.list.splice(event.num,1);
+						game.createTrigger(event.triggername,info[0],info[1],event.source);
 					}
-					else{
+					event.goto(0);
+				},
+				createTrigger:function(){
+					"step 0"
+					if(lib.filter.filterTrigger(trigger,player,event.triggername,event.skill)){
 						var fullskills=game.expandSkills(player.getSkills().concat(lib.skill.global));
 						if(!fullskills.contains(event.skill)){
+							var info=get.info(event.skill);
 							var hidden=player.hiddenSkills.slice(0);
 							game.expandSkills(hidden);
 							if(hidden.contains(event.skill)){
@@ -9595,7 +9630,10 @@
 							}
 						}
 					}
-					"step 2"
+					else{
+						event.finish();
+					}
+					"step 1"
 					if(event.cancelled){
 						event.finish();
 						return;
@@ -9656,7 +9694,7 @@
 							}
 						}
 					}
-					"step 3"
+					"step 2"
 					var info=get.info(event.skill);
 					if(result&&result.bool!=false){
 						if(info.autodelay&&(info.forced||!event.isMine())){
@@ -9668,7 +9706,7 @@
 							}
 						}
 					}
-					"step 4"
+					"step 3"
 					var info=get.info(event.skill);
 					if(result&&result.bool==false){
 						if(info.oncancel) info.oncancel(trigger,player);
@@ -9712,7 +9750,7 @@
 							}
 						}
 					}
-					"step 5"
+					"step 4"
 					if(player._hookTrigger){
 						for(var i=0;i<player._hookTrigger.length;i++){
 							var info=lib.skill[player._hookTrigger[i]].hookTrigger;
@@ -21052,8 +21090,17 @@
 						return b[2]-a[2];
 					});
 					if(list.length){
-						for(var i=0;i<list.length;i++){
-							game.createTrigger(name,list[i][0],list[i][1],event);
+						if(game.arrangeTrigger){
+							var next=game.createEvent('arrangeTrigger',false,event);
+							next.setContent('arrangeTrigger');
+							next.list=list;
+							next.source=event;
+							next.triggername=name;
+						}
+						else{
+							for(var i=0;i<list.length;i++){
+								game.createTrigger(name,list[i][0],list[i][1],event);
+							}
 						}
 					}
 				},
@@ -21403,6 +21450,33 @@
 				return !(_status.event.excludeButton&&_status.event.excludeButton.contains(button));
 			},
 			filterButton:function(button){
+				return true;
+			},
+			filterTrigger:function(event,player,name,skill){
+				if(player._hookTrigger){
+					for(var i=0;i<player._hookTrigger.length;i++){
+						var info=lib.skill[player._hookTrigger[i]].hookTrigger;
+						if(info){
+							if(info.block&&info.block(event,player,name)){
+								return false;
+							}
+						}
+					}
+				}
+				var info=get.info(skill);
+				if(info.filter&&!info.filter(event,player,name)){
+					return false;
+				}
+				if(event._notrigger.contains(player)&&!lib.skill.global.contains(skill)){
+					return false;
+				}
+				if(typeof info.usable=='number'&&player.hasSkill('counttrigger')&&
+					player.storage.counttrigger&&player.storage.counttrigger[skill]>=info.usable){
+					return false;
+				}
+				if(info.round&&(info.round-(game.roundNumber-player.storage[skill+'_roundcount'])>0)){
+					return false;
+				}
 				return true;
 			},
 			characterDisabled:function(i,libCharacter){

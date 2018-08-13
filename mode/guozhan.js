@@ -26,6 +26,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			}
+			if(get.config('onlyguozhan')&&!playback){
+				game.arrangeTrigger=true;
+			}
 		},
 		onreinit:function(){
 			var pack=lib.characterPack.mode_guozhan;
@@ -1450,21 +1453,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					disallow:{
-						trigger:{player:['triggerBefore']},
-						silent:true,
 						hookTrigger:{
-							before:function(event,player,name){
+							block:function(event,player,name){
 								for(var i=0;i<player.storage.gzhuashen_trigger.length;i++){
 									var info=player.storage.gzhuashen_trigger[i];
-									if(info[0]==event._trigger&&info[1]==name){
+									if(info[0]==event&&info[1]==name){
 										return true;
 									}
 								}
 								return false;
 							}
-						},
-						content:function(){
-							trigger.cancelled=true;
 						}
 					},
 					remove:{
