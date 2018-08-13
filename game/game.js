@@ -20570,6 +20570,33 @@
 					if(!_status.connectMode&&!_status.video){
 						this.cardid=get.id();
 					}
+					var tags=[];
+					if(Array.isArray(card[4])){
+						tags.addArray(card[4]);
+					}
+					if(this.cardid){
+						if(!_status.cardtag){
+							_status.cardtag={};
+						}
+						for(var i in _status.cardtag){
+							if(_status.cardtag[i].contains(this.cardid)){
+								tags.add(i);
+							}
+						}
+						if(tags.length){
+							var tagstr=' <span class="cardtag">';
+							for(var i=0;i<tags.length;i++){
+								var tag=tags[i];
+								if(!_status.cardtag[tag]){
+									_status.cardtag[tag]=[];
+								}
+								_status.cardtag[tag].add(this.cardid);
+								tagstr+=lib.translate[tag+'_tag'];
+							}
+							tagstr+='</span>';
+							this.node.range.innerHTML+=tagstr;
+						}
+					}
 					return this;
 				},
 				updateTransform:function(bool,delay){
@@ -44264,9 +44291,9 @@
 				}
 				else if(game.online){
 					card=ui.create.card();
+					card.cardid=id;
 					if(info&&info[2]) card.init(info);
 					lib.cardOL[id]=card;
-					card.cardid=id;
 				}
 			}
 			catch(e){

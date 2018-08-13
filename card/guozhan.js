@@ -113,7 +113,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			xietianzi:{
 				fullskin:true,
 				type:'trick',
-				lianheng:true,
 				enable:function(card,player,event){
 					if(get.mode()=='guozhan'&&!player.isMajor()) return false;
 					if(player.hasSkill('xietianzi')) return false;
@@ -372,7 +371,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			diaohulishan:{
 				fullskin:true,
 				type:'trick',
-				lianheng:true,
 				enable:true,
 				global:'g_diaohulishan',
 				filterTarget:function(card,player,target){
@@ -408,7 +406,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			huxinjing:{
-				lianheng:true,
 				fullskin:true,
 				type:"equip",
 				subtype:"equip2",
@@ -422,7 +419,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			huoshaolianying:{
 				fullskin:true,
 				type:'trick',
-				lianheng:true,
 				filterTarget:function(card,player,target){
 					if(get.mode()=='guozhan'){
 						var next=player.getNext();
@@ -673,7 +669,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'equip',
 				subtype:'equip4',
-				lianheng:true,
 				distance:{globalFrom:-1},
 			},
 		},
@@ -1176,52 +1171,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.removeSkill('huxinjing2');
 				}
 			},
-			_lianheng:{
-				mode:['guozhan'],
-				enable:'phaseUse',
-				prompt:'将可连横的牌交给一名与你势力不同的角色，或未确定势力的角色，若你交给与你势力不同的角色，则你摸一张牌',
-				filter:function(event,player){
-					return (player.getCards('h',function(card){
-						return get.info(card).lianheng;
-					}).length);
-				},
-				filterCard:function(card){
-					return get.info(card).lianheng;
-				},
-				filterTarget:function(card,player,target){
-					if(target==player) return false;
-					if(player.isUnseen()) return target.isUnseen();
-					if(player.identity=='ye') return true;
-					return target.identity!=player.identity;
-				},
-				prepare:'give',
-				discard:false,
-				// delay:0.5,
-				content:function(){
-					"step 0"
-					target.gain(cards,player);
-					"step 1"
-					if(!target.isUnseen()){
-						player.draw();
-					}
-				},
-				ai:{
-					basic:{
-						order:2
-					},
-					result:{
-						player:function(player,target){
-							if(target.isUnseen()) return 0;
-							if(player.isMajor()) return 0;
-							return 0.5;
-						},
-						target:function(player,target){
-							if(target.isUnseen()) return 0;
-							return 1;
-						}
-					},
-				}
-			},
 			wuliu_skill:{},
 			g_wuliu_skill:{
 				mod:{
@@ -1306,7 +1255,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			chiling_info:'出牌阶段，对所有没有势力的角色使用。目标角色选择一项：1、明置一张武将牌，然后摸一张牌；2、弃置一张装备牌；3、失去1点体力。当【敕令】因判定或弃置而置入弃牌堆时，系统将之移出游戏，然后系统于当前回合结束后视为对所有没有势力的角色使用【敕令】',
 			diaohulishan:'调虎离山',
 			diaohulishan_info:'出牌阶段，对至多两名其他角色使用。目标角色于此回合结束之前不计入距离的计算且不能使用牌且不是牌的合法目标。此牌结算结束时，你摸一张牌',
-			_lianheng:'连横',
 			huoshaolianying:'火烧连营',
 			huoshaolianying_bg:'烧',
 			huoshaolianying_info_guozhan:'出牌阶段，对你的下家和与其处于同一队列的角色使用，每名角色受到一点火焰伤害',
