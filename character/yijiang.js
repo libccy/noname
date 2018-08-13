@@ -8046,7 +8046,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<list.length;i++){
 							list[i]=['锦囊','',list[i]];
 						}
-						return ui.create.dialog([list,'vcard']);
+						return ui.create.dialog(get.translation('qice'),[list,'vcard']);
 					},
 					filter:function(button,player){
 						return lib.filter.filterCard({name:button.link[2]},player,_status.event.getParent());

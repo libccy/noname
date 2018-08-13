@@ -1103,7 +1103,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<list.length;i++){
 							list[i]=['锦囊','',list[i]];
 						}
-						return ui.create.dialog([list,'vcard']);
+						return ui.create.dialog(get.translation('gzqice'),[list,'vcard']);
 					},
 					filter:function(button,player){
 						var card={name:button.link[2]};
@@ -1139,12 +1139,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						var players=game.filterPlayer();
 						var shunshou=false;
+						var guohe=false;
+						var juedou=false;
 						for(var i=0;i<players.length;i++){
 							if(!players[i].isOut()){
 								if(players[i].hp==1&&get.damageEffect(players[i],player,player)>0&&!players[i].hasSha()){
-									return (button.link[2]=='juedou')?2:-1;
+									juedou=true;
 								}
-								if(player.canUse('shunshou',players[i])&&get.attitude(player,players[i])<0){
+								if(player.canUse('shunshou',players[i])&&get.attitude(player,players[i])<-1){
 									shunshou=true;
 								}
 								if(players[i].countCards('j')&&get.attitude(player,players[i])>2){
@@ -1152,9 +1154,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 							}
 						}
-						if(guohe) return (button.link[2]=='guohe')?1.5:-1;
-						if(shunshou) return (button.link[2]=='shunshou')?1:-1;
-						return (button.link[2]=='wuzhong')?1:-1;
+						if(juedou&&button.link[2]=='juedou') return 3;
+						if(guohe&&button.link[2]=='guohe') return 2;
+						if(shunshou&&button.link[2]=='shunshou') return 1.5;
+						if(button.link[2]=='wuzhong') return 1;
+						return 0;
 					},
 					backup:function(links,player){
 						return {
@@ -1182,6 +1186,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							audio:2,
 							popname:true,
 							viewAs:{name:links[0][2]},
+							ai1:function(){
+								return 1;
+							}
 						}
 					},
 					prompt:function(links,player){
@@ -1198,8 +1205,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							for(var i=0;i<cards.length;i++){
 								num+=Math.max(0,get.value(cards[i],player,'raw'));
 							}
-							num/=cards.length;
-							num*=Math.min(cards.length,player.hp);
 							return 12-num;
 						}
 					},

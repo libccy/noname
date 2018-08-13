@@ -12156,8 +12156,9 @@
 									lining=[lining];
 								}
 								if(lining.length){
+									var evt=event.getParent()._trigger;
 									lining.addArray(game.filterPlayer(function(current){
-										return current.sameIdentityAs(lining[0],true);
+										return current.sameIdentityAs(lining[0],true)&&evt.targets&&evt.targets.contains(current);
 									}));
 								}
 								if(lining.length==1){
