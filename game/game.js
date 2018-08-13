@@ -9567,8 +9567,8 @@
 					if(event.choice.length>1){
 						for(var i=0;i<event.choice.length;i++){
 							if(!filter2(i)){
-								event.list.splice(i--,1);
-								if(event.list.length<=1) break;
+								event.choice.splice(i--,1);
+								if(event.choice.length<=1) break;
 							}
 						}
 					}
