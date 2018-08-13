@@ -14666,12 +14666,15 @@
 					if(num==undefined) return 0;
 					return num;
 				},
-				getStockSkills:function(unowned,unique){
+				getStockSkills:function(unowned,unique,hidden){
 					var list=[];
-					if(lib.character[this.name]&&!this.isUnseen(0)){
+					if(lib.character[this.name]&&(hidden||!this.isUnseen(0))){
 						list.addArray(lib.character[this.name][3]);
 					}
-					if(lib.character[this.name2]&&!this.isUnseen(1)){
+					if(lib.character[this.name1]&&(hidden||!this.isUnseen(0))){
+						list.addArray(lib.character[this.name1][3]);
+					}
+					if(lib.character[this.name2]&&(hidden||!this.isUnseen(1))){
 						list.addArray(lib.character[this.name2][3]);
 					}
 					if(!unowned){
@@ -18554,8 +18557,8 @@
 				hasSkill:function(skill){
 					return game.expandSkills(this.getSkills()).contains(skill);
 				},
-				hasStockSkill:function(skill,arg1,arg2){
-					return this.getStockSkills(arg1,arg2).contains(skill);
+				hasStockSkill:function(skill,arg1,arg2,arg3){
+					return this.getStockSkills(arg1,arg2,arg3).contains(skill);
 				},
 				hasZhuSkill:function(skill,player){
 					if(!this.hasSkill(skill)) return false;
