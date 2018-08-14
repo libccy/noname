@@ -2346,7 +2346,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			yizhi:{
 				init:function(player){
-					if(player.checkViceSkill('yizhi')){
+					if(player.checkViceSkill('yizhi')&&!player.viceChanged){
 						player.removeMaxHp();
 					}
 				},
@@ -2600,7 +2600,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			hunshang:{
 				init:function(player){
-					if(player.checkViceSkill('hunshang')){
+					if(player.checkViceSkill('hunshang')&&!player.viceChanged){
 						player.removeMaxHp();
 					}
 				},
@@ -4729,8 +4729,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						_status.characterlist.remove(name);
 						_status.characterlist.add(this.name2);
 						game.log(this,'将副将变更为','#g'+get.translation(name));
+						this.viceChanged=true;
 						if(this.isUnseen(1)){
-							this.showCharacter(1,false,true);
+							this.showCharacter(1,false);
 						}
 						this.reinit(this.name2,name,false);
 					}
@@ -4742,7 +4743,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				hasViceCharacter:function(){
 					return this.name2.indexOf('gz_shibing')!=0;
 				},
-				showCharacter:function(num,log,notrigger){
+				showCharacter:function(num,log){
 					if(num==0&&!this.isUnseen(0)){
 						return;
 					}
@@ -4841,7 +4842,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						this.addSkill(skills[i]);
 					}
 					this.checkConflict();
-					if(!notrigger){
+					if(!this.viceChanged){
 						var initdraw=parseInt(get.config('initshow_draw'));
 						if(!_status.initshown&&!_status.overing&&initdraw&&this.isAlive()&&_status.mode!='mingjiang'){
 							this.popup('首亮');

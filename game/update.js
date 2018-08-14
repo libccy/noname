@@ -1,21 +1,10 @@
 window.noname_update={
-	version:'1.9.55.2',
-	update:'1.9.54.1',
+	version:'1.9.55.3',
+	update:'1.9.55.2',
 	changeLog:[
-		'势备篇卡牌',
 		'bug修复'
 	],
 	files:[
-		'card/guozhan.js',
-		'card/standard.js',
-		'character/gujian.js',
-		'character/gwent.js',
-		'character/hearth.js',
-		'character/shenhua.js',
-		'character/sp.js',
-		'character/yijiang.js',
-		'game/asset.js',
-		'game/game.js',
 		'mode/guozhan.js'
 	]
 };
