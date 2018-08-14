@@ -1613,7 +1613,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					restore:{
-						trigger:{player:'phaseAfter'},
+						trigger:{global:'phaseAfter'},
 						silent:true,
 						content:function(){
 							player.restoreSkill(player.storage.xiongsuan_restore);
