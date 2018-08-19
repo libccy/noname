@@ -470,11 +470,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jiexun:{
 				trigger:{player:'phaseEnd'},
-				filter:function(event,player){
-					return game.hasPlayer(function(current){
-						return current.countCards('ej',{suit:'diamond'});
-					});
-				},
+				// filter:function(event,player){
+				// 	return game.hasPlayer(function(current){
+				// 		return current.countCards('ej',{suit:'diamond'});
+				// 	});
+				// },
 				init:function(player){
 					player.storage.jiexun=0;
 				},
@@ -492,7 +492,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(num2){
 						str+='，然后弃置'+get.cnNumber(num2)+'张牌；若目标因此法弃置了所有牌，则你失去“诫训”，然后你发动“复难”时，无须令其获得你使用的牌';
 					}
-					player.chooseTarget(get.prompt('jiexun')).set('ai',function(target){
+					player.chooseTarget(get.prompt('jiexun'),function(card,player,target){
+						return target!=player;
+					}).set('ai',function(target){
 						return _status.event.coeff*get.attitude(_status.event.player,target);
 					}).set('coeff',num1>=num2?1:-1).set('prompt2',str);
 					'step 1'
@@ -500,7 +502,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						event.target=target;
 						player.logSkill('jiexun',target);
-						target.draw(event.num1);
+						if(event.num1){
+							target.draw(event.num1);
+						}
 						player.storage.jiexun++;
 					}
 					else{
@@ -1416,6 +1420,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:true,
 				discard:false,
 				lose:false,
+				position:'he',
 				prompt:function(){
 					var player=_status.event.player;
 					var list=game.filterPlayer(function(current){
