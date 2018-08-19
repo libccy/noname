@@ -1043,6 +1043,10 @@ table {
 	margin-bottom: 8px;
 }
 
+.skillversion{
+	padding-bottom: 5px;
+}
+
 #sidebar>div,#sidebar3>div {
 	margin: 10px;
 	position: relative;
