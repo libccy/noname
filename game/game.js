@@ -42394,6 +42394,8 @@
 					this.classList.add('active');
 					intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+get.translation(this.link)+'</span>'+get.skillInfoTranslation(this.link);
 					var info=get.info(this.link);
+					var skill=this.link;
+					var skillnode=this;
 					if(info.derivation){
 						var derivation=info.derivation;
 						if(typeof derivation=='string'){
@@ -42402,6 +42404,21 @@
 						for(var i=0;i<derivation.length;i++){
 							intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+get.translation(derivation[i])+'</span>'+get.skillInfoTranslation(derivation[i]);
 						}
+					}
+					if(info.alter){
+						intro2.innerHTML+='<br><br><div class="hrefnode skillversion">切换版本</div>';
+						intro2.querySelector('.hrefnode.skillversion').listen(function(){
+							if(lib.config.alteredSkills.contains(skill)){
+								lib.config.alteredSkills.remove(skill);
+								lib.translate[skill+'_info']=lib.translate[skill+'_info_origin'];
+							}
+							else{
+								lib.config.alteredSkills.push(skill);
+								lib.translate[skill+'_info']=lib.translate[skill+'_info_alter'];
+							}
+							game.saveConfig('alteredSkills',lib.config.alteredSkills);
+							clickSkill.call(skillnode,'init');
+						});
 					}
 					if(lib.config.background_speak&&e!=='init'){
 						var audioname=this.link;
@@ -43402,6 +43419,7 @@
 				return true;
 			},
 			altered:function(skill){
+				if(_status.connectMode) return true;
 				return lib.config.alteredSkills.contains(skill);
 			},
 			node:function(obj){

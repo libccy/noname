@@ -2,7 +2,8 @@ window.noname_update={
 	version:'1.9.55.4',
 	update:'1.9.55.2',
 	changeLog:[
-		'bug修复'
+		'bug修复',
+		'技能可单独选择新旧版'
 	],
 	files:[
 		'mode/guozhan.js',
