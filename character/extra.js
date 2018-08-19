@@ -113,31 +113,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			baonu:{
-				trigger:{source:'damageEnd',player:'damageEnd'},
-				forced:true,
-				mark:true,
-				audio:2,
-				unique:true,
-				filter:function(event){
-					return event.num>0;
-				},
-				init:function(player){
-					player.storage.baonu=2;
-					game.addVideo('storage',player,['baonu',player.storage.baonu]);
-				},
-				content:function(){
-					player.storage.baonu+=trigger.num;
-					game.addVideo('storage',player,['baonu',player.storage.baonu]);
-				},
-				intro:{
+				  		audio:2,
+			  			mark:true,
+						marktext:'暴怒',
+						init:function(player){
+					        player.storage.baonu=2;
+						player.markSkill('baonu');
+			    			player.syncStorage('baonu');
+							},
+				       trigger:{source:'damageEnd',player:'damageEnd'},
+  				               forced:true,
+					       filter:function(event){
+					return event.num>0; 
+						},
+				       content:function(){
+		   			       player.storage.baonu+=trigger.num;
+					       player.markSkill('baonu');
+			                       player.syncStorage('baonu');
+								},
+				        intro:{
 					content:'mark'
-				},
-				ai:{
+				            },
+				       ai:{
 					combo:'shenfen',
 					maixie:true,
 					maixie_hp:true
-				}
-			},
+				              }
+		                 	},
 			shenfen:{
 				audio:2,
 				unique:true,
@@ -152,6 +154,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.awakenSkill('shenfen');
 					player.storage.baonu-=6;
+					player.markSkill('baonu');
+			    	        player.syncStorage('baonu');
 					event.targets=game.filterPlayer();
 					event.targets.remove(player);
 					event.targets.sort(lib.sort.seat);
@@ -1214,7 +1218,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			// kuangfeng2_info:'已获得狂风标记',
 			kuangfeng3:'狂风',
 			kuangfeng_info:'结束阶段，你可以弃掉1枚“星”指定一名角色：直到你的下回合开始，该角色每次受到的火焰伤害+1。',
-			baonu:'暴怒',
+			baonu:'狂暴',
 			baonu_info:'锁定技，游戏开始时，你获得两枚暴怒标记，每当你造成或受到一点伤害，你获得一枚暴怒标记',
 			shenfen:'神愤',
 			shenfen_info:'限定技，出牌阶段，你可以弃置6枚暴怒标记，对场上所有其他角色造成一点伤害，然后令其弃置4张牌',
