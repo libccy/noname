@@ -1,12 +1,15 @@
 window.noname_update={
-	version:'1.9.55.4',
+	version:'1.9.56',
 	update:'1.9.55.2',
 	changeLog:[
 		'bug修复',
-		'技能可单独选择新旧版'
+		'技能可单独选择新旧版（默认新版）'
 	],
 	files:[
 		'mode/guozhan.js',
+		'game/config.js',
+		'game/game.js',
+		'character/extra.js',
 		'character/yijiang.js',
 	]
 };

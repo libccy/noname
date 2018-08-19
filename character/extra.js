@@ -520,9 +520,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			guixin:{
 				audio:2,
+				alter:true,
 				trigger:{player:'damageEnd'},
 				check:function(event,player){
-					if(player.isTurnedOver()) return true;
+					if(player.isTurnedOver()||event.num>1) return true;
 					var num=game.countPlayer(function(current){
 						if(current.countCards('he')&&current!=player&&get.attitude(player,current)<=0){
 							return true;
@@ -539,26 +540,47 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					targets.remove(player);
 					targets.sort(lib.sort.seat);
 					event.targets=targets;
+					event.count=trigger.num;
+					"step 1"
 					event.num=0;
 					player.line(targets,'green');
-					"step 1"
+					"step 2"
 					if(num<event.targets.length){
-						var hej=event.targets[num].getCards('hej')
-						if(hej.length){
-							var card=hej.randomGet();
-							player.gain(card,event.targets[num]);
-							if(get.position(card)=='h'){
-								event.targets[num].$giveAuto(card,player);
+						if(!get.is.altered('guixin')){
+							if(event.targets[num].countGainableCards(player,'hej')){
+								player.gainPlayerCard(event.targets[num],true);
 							}
-							else{
-								event.targets[num].$give(card,player);
+						}
+						else{
+							var hej=event.targets[num].getCards('hej')
+							if(hej.length){
+								var card=hej.randomGet();
+								player.gain(card,event.targets[num]);
+								if(get.position(card)=='h'){
+									event.targets[num].$giveAuto(card,player);
+								}
+								else{
+									event.targets[num].$give(card,player);
+								}
 							}
 						}
 						event.num++;
 						event.redo();
 					}
-					"step 2"
+					"step 3"
 					player.turnOver();
+					"step 4"
+					event.count--;
+					if(event.count){
+						player.chooseBool(get.prompt2('guixin'));
+					}
+					else{
+						event.finish();
+					}
+					"step 5"
+					if(event.count&&result.bool){
+						event.goto(1);
+					}
 				},
 				ai:{
 					maixie:true,
@@ -1193,7 +1215,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yeyan:'业炎',
 			shelie_info:'摸牌阶段，你可以改为从牌堆顶亮出五张牌，你获得不同花色的牌各一张',
 			gongxin_info:'出牌阶段，你可以观看一名其他角色的手牌，并可以展示其中一张红桃牌，然后将其弃置或置于牌堆顶，每阶段限一次。',
-			guixin_info:'当你受到1次伤害后，你可以随机获得每名其他角色区域里的一张牌，然后你翻面',
+			guixin_info:'当你受到1点伤害后，你可以获得每名其他角色区域里的一张牌，然后你翻面',
+			guixin_info_alter:'当你受到1点伤害后，你可以随机获得每名其他角色区域里的一张牌，然后你翻面',
 			qinyin_info:'弃牌阶段结束时，若你于此阶段内弃置过你的至少两张手牌，则你可以选择一项：1. 所有角色各回复1点体力；2. 所有角色各失去1点体力。',
 			// qinyin_info:'每当你于弃牌阶段内因你的弃置而失去第X张手牌时（X至少为2），你可以选择一项：1.令所有角色各回复1点体力；2.令所有角色各失去1点体力。每阶段限一次。',
 			yeyan_info:'限定技，出牌阶段，你可以对一至三名角色造成至多共3点火焰伤害（你可以任意分配每名目标角色受到的伤害点数），若你将对一名角色分配2点或更多的火焰伤害，你须先弃置四张不同花色的手牌再失去3点体力。',

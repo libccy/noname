@@ -81,6 +81,7 @@ window.config={
 	customBackgroundPack:[],
 	favouriteCharacter:[],
 	recentIP:[],
+	vintageSkills:[],
 	alteredSkills:[],
 	brokenFile:[],
 

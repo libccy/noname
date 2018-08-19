@@ -29016,7 +29016,7 @@
 			var info=lib.skill[i];
 			if(info.alter){
 				lib.translate[i+'_info_origin']=lib.translate[i+'_info'];
-				if(lib.config.alteredSkills.contains(i)){
+				if(!lib.config.vintageSkills.contains(i)){
 					lib.translate[i+'_info']=lib.translate[i+'_info_alter'];
 				}
 			}
@@ -32476,7 +32476,7 @@
 								if(lib.skill[info[i][3][j]].alter){
 									alterableSkills.add(info[i][3][j]);
 									alterableCharacters.add(i);
-									if(!lib.config.alteredSkills.contains(info[i][3][j])){
+									if(lib.config.vintageSkills.contains(info[i][3][j])){
 										charactersToAlter.add(i);
 									}
 								}
@@ -32523,17 +32523,17 @@
 									onclick:function(bool){
 										if(bool){
 											for(var i=0;i<alterableSkills.length;i++){
-												lib.config.alteredSkills.add(alterableSkills[i]);
+												lib.config.vintageSkills.remove(alterableSkills[i]);
 												lib.translate[alterableSkills[i]+'_info']=lib.translate[alterableSkills[i]+'_info_alter'];
 											}
 										}
 										else{
 											for(var i=0;i<alterableSkills.length;i++){
-												lib.config.alteredSkills.remove(alterableSkills[i]);
+												lib.config.vintageSkills.add(alterableSkills[i]);
 												lib.translate[alterableSkills[i]+'_info']=lib.translate[alterableSkills[i]+'_info_origin'];
 											}
 										}
-										game.saveConfig('alteredSkills',lib.config.alteredSkills);
+										game.saveConfig('vintageSkills',lib.config.vintageSkills);
 									}
 								});
 								cfgnode2.style.marginTop='0px';
@@ -42406,17 +42406,24 @@
 						}
 					}
 					if(info.alter){
-						intro2.innerHTML+='<br><br><div class="hrefnode skillversion">切换版本</div>';
-						intro2.querySelector('.hrefnode.skillversion').listen(function(){
-							if(lib.config.alteredSkills.contains(skill)){
-								lib.config.alteredSkills.remove(skill);
-								lib.translate[skill+'_info']=lib.translate[skill+'_info_origin'];
-							}
-							else{
-								lib.config.alteredSkills.push(skill);
+						intro2.innerHTML+='<br><br><div class="hrefnode skillversion"></div>';
+						var skillversionnode=intro2.querySelector('.hrefnode.skillversion');
+						if(lib.config.vintageSkills.contains(skill)){
+							skillversionnode.innerHTML='切换至新版';
+						}
+						else{
+							skillversionnode.innerHTML='切换至旧版';
+						}
+						skillversionnode.listen(function(){
+							if(lib.config.vintageSkills.contains(skill)){
+								lib.config.vintageSkills.remove(skill);
 								lib.translate[skill+'_info']=lib.translate[skill+'_info_alter'];
 							}
-							game.saveConfig('alteredSkills',lib.config.alteredSkills);
+							else{
+								lib.config.vintageSkills.push(skill);
+								lib.translate[skill+'_info']=lib.translate[skill+'_info_origin'];
+							}
+							game.saveConfig('vintageSkills',lib.config.vintageSkills);
 							clickSkill.call(skillnode,'init');
 						});
 					}
@@ -43420,7 +43427,7 @@
 			},
 			altered:function(skill){
 				if(_status.connectMode) return true;
-				return lib.config.alteredSkills.contains(skill);
+				return !lib.config.vintageSkills.contains(skill);
 			},
 			node:function(obj){
 				var str=Object.prototype.toString.call(obj);
@@ -44186,7 +44193,7 @@
 				}
 			}
 			for(var i=0;i<skills.length;i++){
-				if(lib.config.alteredSkills.contains(skills[i])){
+				if(!lib.config.vintageSkills.contains(skills[i])){
 					name=lib.rank.a[0];break;
 				}
 			}
