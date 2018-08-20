@@ -233,33 +233,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			baonu:{
-				  		audio:2,
-			  			mark:true,
-						marktext:'暴怒',
-						init:function(player){
-					        player.storage.baonu=2;
-						player.markSkill('baonu');
-			    			player.syncStorage('baonu');
-							},
-				       trigger:{source:'damageEnd',player:'damageEnd'},
-  				               forced:true,
-					       filter:function(event){
+				audio:2,
+				mark:true,
+				marktext:'暴怒',
+				init:function(player){
+					player.storage.baonu=2;
+					player.markSkill('baonu');
+					player.syncStorage('baonu');
+				},
+				trigger:{source:'damageEnd',player:'damageEnd'},
+				forced:true,
+				filter:function(event){
 					return event.num>0; 
-						},
-				       content:function(){
-		   			       player.storage.baonu+=trigger.num;
-					       player.markSkill('baonu');
-			                       player.syncStorage('baonu');
-								},
-				        intro:{
+				},
+				content:function(){
+					player.storage.baonu+=trigger.num;
+					player.markSkill('baonu');
+					player.syncStorage('baonu');
+				},
+				intro:{
 					content:'mark'
-				            },
-				       ai:{
+				},
+				ai:{
 					combo:'shenfen',
 					maixie:true,
 					maixie_hp:true
-				              }
-		                 	},
+				}
+			},
 			shenfen:{
 				audio:2,
 				unique:true,
@@ -652,12 +652,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function (){
 					"step 0"
 					player.chooseTarget(true,get.prompt('wuhun2'),function(card,player,target){
+						if(player==target) return false;
 						if(!target.storage.wuhun_mark) return false;
-						for(var i=0;i<game.players.length;i++){
-						if(game.players[i].storage.wuhun_mark>target.storage.wuhun_mark){
-						return false;
+							for(var i=0;i<game.players.length;i++){
+							if(game.players[i].storage.wuhun_mark>target.storage.wuhun_mark){
+							return false;
+							}
 						}
-					}
 						return true;
 					}).set('ai',function(target){
 						return -ai.get.attitude(_status.event.player,target);
@@ -699,7 +700,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return -2;
 					})
 					"step 1"
-					if(result.judge==2){
+					if(result.judge==-2){
 						player.die();
 					}
 					player.removeSkill('wuhun3');
@@ -1480,10 +1481,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kuangfeng3:'狂风',
 			kuangfeng_info:'结束阶段，你可以弃掉1枚“星”指定一名角色：直到你的下回合开始，该角色每次受到的火焰伤害+1。',
 			baonu:'狂暴',
-<<<<<<< HEAD
 			baonu_bg:'暴',
-=======
->>>>>>> f0ffe0d256b6b804a130740339a50835b2b6437d
 			baonu_info:'锁定技，游戏开始时，你获得两枚暴怒标记，每当你造成或受到一点伤害，你获得一枚暴怒标记',
 			shenfen:'神愤',
 			shenfen_info:'限定技，出牌阶段，你可以弃置6枚暴怒标记，对场上所有其他角色造成一点伤害，然后令其弃置4张牌',
