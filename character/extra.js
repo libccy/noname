@@ -789,7 +789,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(num<event.targets.length){
 						if(!get.is.altered('guixin')){
 							if(event.targets[num].countGainableCards(player,'hej')){
-								player.gainPlayerCard(event.targets[num],true);
+								player.gainPlayerCard(event.targets[num],true,'hej');
 							}
 						}
 						else{
