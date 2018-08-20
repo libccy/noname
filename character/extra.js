@@ -25,6 +25,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return player.storage.baonu>=6;
 				},
+				usable:1,
 				skillAnimation:true,
 				animationColor:'metal',
 				content:function(){
@@ -52,8 +53,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.redo();
 					         }				
 				        "step 3"
-				player.turnOver();
-				           },
+						player.turnOver();
+				},
 				ai:{
 					combo:'baonu',
 					order:10,
@@ -76,7 +77,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.storage.baonu>=2;
 				},
 				filterTarget:function(card,player,target){
-					return target!=player;
+					return target!=player&&!target.hasSkill('ol_wuqian_targeted');
 				},
 				content:function(){
 					player.storage.baonu-=2;
