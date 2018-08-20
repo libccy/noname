@@ -113,23 +113,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard'},
 				forced:true,
 				filter:function(event){
-					return (get.type(event.card,'trick')=='trick'&&event.cards[0]&&event.cards[0]==event.card);
+					return get.type(event.card)=='trick';
 				},
 				content:function(){
 					'step 0'
 					if(player.storage.baonu>0){
-						player.chooseControl('选项一','选项二').set('prompt','无谋<br><br><div class="text">1:弃置一枚[暴]标记</div><br><div class="text">2:受到一点伤害</div></br>').ai=function(){
-							if(player.storage.baonu>6) return '选项一';
-							if(player.hp+player.num('h','tao')>3) return '选项二';
-							return '选项一';
-						};
+						player.chooseControlList([
+							'移去一枚【暴怒】标记',
+							'失去一点体力'
+						]).set('ai',function(event,player){
+							if(player.storage.baonu>6) return 0;
+							if(player.hp+player.num('h','tao')>3) return 1;
+							return 0;
+						});
 					}
 					else{
 						player.loseHp();
 						event.finish();
 					}
 					'step 1'
-					if(result.control=='选项一'){
+					if(result.index==0){
 						player.storage.baonu--;
 						player.syncStorage('baonu');
 						player.updateMarks('baonu');
@@ -274,7 +277,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('shenfen');
 					player.storage.baonu-=6;
 					player.markSkill('baonu');
-			    	        player.syncStorage('baonu');
+					player.syncStorage('baonu');
 					event.targets=game.filterPlayer();
 					event.targets.remove(player);
 					event.targets.sort(lib.sort.seat);

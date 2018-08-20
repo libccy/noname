@@ -1,8 +1,8 @@
 window.noname_update={
-	version:'1.9.57',
+	version:'1.9.57.1',
 	update:'1.9.56',
 	changeLog:[
-		'神吕布、神关羽（by我只是赵云）'
+		'bug修复'
 	],
 	files:[
 		'card/extra.js',
