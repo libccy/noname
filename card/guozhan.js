@@ -912,8 +912,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			taipingyaoshu:{
 				trigger:{player:'damageBefore'},
-				filter:function(event){
-					if(event.source&&event.source.hasSkillTag('unequip',false,event.card)) return false;
+				filter:function(event,player){
+					if(event.source&&event.source.hasSkillTag('unequip',false,{
+						name:event.card?event.card.name:null,
+						target:player,
+						card:event.card
+					})) return false;
 					if(event.nature) return true;
 				},
 				forced:true,
@@ -925,7 +929,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					nothunder:true,
 					effect:{
 						target:function(card,player,target,current){
-							if(player.hasSkillTag('unequip',false,card)) return;
+							if(player.hasSkillTag('unequip',false,{
+								name:card?card.name:null,
+								target:player,
+								card:card
+							})) return;
 							if(get.tag(card,'natureDamage')) return 'zerotarget';
 							if(card.name=='tiesuo'){
 								return [0,0];
@@ -1147,7 +1155,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageBefore'},
 				// forced:true,
 				filter:function(event,player){
-					if(event.source&&event.source.hasSkillTag('unequip',false,event.card)) return false;
+					if(event.source&&event.source.hasSkillTag('unequip',false,{
+						name:event.card?event.card.name:null,
+						target:player,
+						card:event.card
+					})) return false;
 					return event.num>=player.hp;
 				},
 				content:function(){

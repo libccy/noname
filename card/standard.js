@@ -1392,8 +1392,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				priority:6,
 				audio:true,
-				filter:function(event){
-					if(event.player.hasSkillTag('unequip',false,event.card)) return false;
+				filter:function(event,player){
+					if(event.player.hasSkillTag('unequip',false,{
+						name:event.card?event.card.name:null,
+						target:player,
+						card:event.card
+					})) return false;
 					return (event.card.name=='sha'&&get.color(event.card)=='black')
 				},
 				content:function(){
@@ -1402,7 +1406,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player){
-							if(player.hasSkillTag('unequip',false,card)) return;
+							if(player.hasSkillTag('unequip',false,{
+								name:card?card.name:null,
+								target:player,
+								card:card
+							})) return;
 							if(card.name=='sha'&&get.color(card)=='black') return 'zerotarget';
 						}
 					}
@@ -1621,7 +1629,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(!event.filterCard({name:'shan'})) return false;
 					if(!lib.filter.cardRespondable({name:'sha'},player,event)) return false;
 					var evt=event.getParent();
-					if(evt.player&&evt.player.hasSkillTag('unequip',false,evt.card)) return false;
+					if(evt.player&&evt.player.hasSkillTag('unequip',false,{
+						name:evt.card?evt.card.name:null,
+						target:player,
+						card:evt.card
+					})) return false;
 					return true;
 				},
 				audio:true,
@@ -1642,7 +1654,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target,effect){
-							if(player.hasSkillTag('unequip',false,card)) return;
+							if(player.hasSkillTag('unequip',false,{
+								name:card?card.name:null,
+								target:player,
+								card:card
+							})) return;
 							if(get.tag(card,'respondShan')) return 0.5;
 						}
 					}

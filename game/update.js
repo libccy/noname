@@ -1,15 +1,17 @@
 window.noname_update={
-	version:'1.9.56',
-	update:'1.9.55.2',
+	version:'1.9.57',
+	update:'1.9.56',
 	changeLog:[
-		'bug修复',
-		'技能可单独选择新旧版（默认新版）'
+		'神吕布、神关羽（by我只是赵云）'
 	],
 	files:[
-		'mode/guozhan.js',
-		'game/config.js',
-		'game/game.js',
+		'card/extra.js',
+		'card/guozhan.js',
+		'card/standard.js',
+		'card/swd.js',
+		'card/yunchou.js',
 		'character/extra.js',
-		'character/yijiang.js',
+		'game/asset.js',
+		'mode/boss.js'
 	]
 };

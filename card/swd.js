@@ -3544,7 +3544,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				priority:15,
 				filter:function(event,player){
-					if(event.source&&event.source.hasSkillTag('unequip',false,event.card)) return false;
+					if(event.source&&event.source.hasSkillTag('unequip',false,{
+						name:event.card?event.card.name:null,
+						target:player,
+						card:event.card
+					})) return false;
 					return get.type(event.card,'trick')=='trick';
 				},
 				content:function(){
@@ -3554,7 +3558,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					notrick:true,
 					effect:{
 						target:function(card,player,target,current){
-							if(player.hasSkillTag('unequip',false,card)) return;
+							if(player.hasSkillTag('unequip',false,{
+								name:card?card.name:null,
+								target:player,
+								card:card
+							})) return;
 							if(get.type(card)=='trick'&&get.tag(card,'damage')){
 								return 'zeroplayertarget';
 							}
@@ -4720,7 +4728,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageBegin'},
 				forced:true,
 				filter:function(event,player){
-					if(event.source&&event.source.hasSkillTag('unequip',false,event.card)) return false;
+					if(event.source&&event.source.hasSkillTag('unequip',false,{
+						name:event.card?event.card.name:null,
+						target:player,
+						card:event.card
+					})) return false;
 					if(Math.random()>1/3) return false;
 					return true;
 				},

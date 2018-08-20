@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'1.9.55',
+	'1.9.56',
 	'audio/background/music_danji.mp3',
 	'audio/background/music_default.mp3',
 	'audio/background/music_diaochan.mp3',
@@ -765,6 +765,10 @@ window.noname_asset_list=[
 	'audio/skill/naman2.mp3',
 	'audio/skill/niepan1.mp3',
 	'audio/skill/niepan2.mp3',
+	'audio/skill/ol_shenfen1.mp3',
+	'audio/skill/ol_shenfen2.mp3',
+	'audio/skill/ol_wuqian1.mp3',
+	'audio/skill/ol_wuqian2.mp3',
 	'audio/skill/paiyi1.mp3',
 	'audio/skill/paiyi2.mp3',
 	'audio/skill/paoxiao1.mp3',

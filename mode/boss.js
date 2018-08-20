@@ -2359,7 +2359,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				trigger:{target:'shaBefore'},
 				forced:true,
 				filter:function(event,player){
-					if(event.player.hasSkillTag('unequip',false,event.card)) return false;
+					if(event.player.hasSkillTag('unequip',false,{
+						name:event.card?event.card.name:null,
+						target:player,
+						card:event.card
+					})) return false;
 					return true;
 				},
 				content:function(){
@@ -2368,7 +2372,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target){
-							if(player.hasSkillTag('unequip',false,card)) return;
+							if(player.hasSkillTag('unequip',false,{
+								name:card?card.name:null,
+								target:player,
+								card:card
+							})) return;
 							if(card.name=='sha') return 'zerotarget';
 						}
 					}
