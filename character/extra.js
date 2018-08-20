@@ -141,6 +141,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.loseHp();
 					}
 				},
+				ai:{
+					effect:{
+						player:function(card,player){
+							if (get.type(card)=='trick'&&get.value(card)<6){
+								return [0,-2];
+							}
+						}
+					}
+				}
 			},
 			qinyin:{
 				audio:2,
