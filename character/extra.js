@@ -621,8 +621,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			wuhun:{
-			trigger:{
-                              player:"damageEnd",
+				trigger:{
+                player:"damageEnd",
                               },
                               alter:true,
                        filter:function (event,player){
@@ -649,8 +649,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             sub:true,
                                 },
                           },
-          group:["wuhun2","wuhun4","wuhun5"],
-                                }
+         		group:["wuhun2","wuhun4","wuhun5"],
+            },
 			wuhun2:{
 				trigger:{
 				player:'dieBegin',
@@ -715,7 +715,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					})
 					"step 1"
 					if(result.judge==-2){
-						player.removeSkill('wuhun3');
 						player.die();
 					}
 					player.removeSkill('wuhun3');
