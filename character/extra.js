@@ -235,7 +235,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			baonu:{
 				audio:2,
 				mark:true,
-				marktext:'暴怒',
 				init:function(player){
 					player.storage.baonu=2;
 					player.markSkill('baonu');
