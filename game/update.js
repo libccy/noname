@@ -1,17 +1,15 @@
 window.noname_update={
-	version:'1.9.57.1',
-	update:'1.9.56',
+	version:'1.9.84',
+	update:'1.9.83',
 	changeLog:[
-		'bug修复'
+		'星火燎原（by 苏婆玛丽奥）'
 	],
 	files:[
-		'card/extra.js',
-		'card/guozhan.js',
-		'card/standard.js',
-		'card/swd.js',
-		'card/yunchou.js',
-		'character/extra.js',
+		'character/diy.js',
+		'character/xinghuoliaoyuan.js',
+		'character/sp.js',
 		'game/asset.js',
-		'mode/boss.js'
+		'game/config.js',
+		'game/package.js'
 	]
 };

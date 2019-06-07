@@ -396,6 +396,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nsguhuo:{
 				trigger:{player:'useCardAfter'},
 				forced:true,
+				usable:2,
 				filter:function(event,player){
 					if(event.parent.name=='nsguhuo') return false;
 					if(event.card==event.cards[0]){
@@ -860,7 +861,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					expose:0.1,
-					order:1,
+					order:4,
 					result:{
 						target:function(player,target){
 							if(target.hasSkillTag('maixie')) return 0;
@@ -969,7 +970,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							'step 0'
 							if(player.countCards('he')){
-								trigger.player.discardPlayerCard(player,'弃置'+get.translation(player)+'的一张牌，或取消并摸一张牌','he').set('boolline',true);
+								trigger.player.discardPlayerCard(player,'混击','he').set('boolline',true).set('prompt2','弃置'+get.translation(player)+'的一张牌，或取消并摸一张牌');
 							}
 							else{
 								trigger.player.draw();
@@ -2546,10 +2547,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			nsmouyun:{
 				enable:'phaseUse',
-				usable:1,
-				filter:function(event,player){
-					return player.hp%2==1||game.roundNumber%2==1;
-				},
+				round:2,
 				filterTarget:function(card,player,target){
 					return target.isMinHp()&&target!=player&&target.isDamaged();
 				},
@@ -3093,7 +3091,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			rejizhi:{
+			diyjizhi:{
 				audio:2,
 				usable:3,
 				trigger:{player:'useCard'},
@@ -3135,173 +3133,182 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			jugong: {
-				trigger: {
-					global: "damageEnd",
-				},
-				usable: 1,
-				frequent: true,
-				locked: false,
-				notemp: true,
-				init: function(player) {
-					player.storage.jugong = [];
-				},
-				filter: function(event, player) {
-					return event.card && (event.card.name == 'sha' || event.card.name == 'juedou') && event.notLink() && _status.currentPhase != player;
-
-				},
-				content: function() {
-					"step 0"
-					player.draw();
-					"step 1"
-					if (player.countCards('h')) {
-						player.chooseCard('将' + get.cnNumber(1) + '张手牌置于武将牌上作为“功”', 1, true);
-					} else {
-						event.finish();
-					}
-					"step 2"
-					if (result.cards && result.cards.length) {
-						player.lose(result.cards, ui.special);
-						player.storage.jugong = player.storage.jugong.concat(result.cards);
-						player.syncStorage('jugong');
-						player.markSkill('jugong');
-						game.log(player, '将', result.cards, '置于武将牌上作为“功”');
-					}
-				},
-				intro: {
-					content: "cards",
-				},
-				group: "jugong_1",
-				subSkill: {
-					"1": {
-						trigger: {
-							player: "damageBegin",
-						},
-						filter: function(event, player) {
-							return player.storage.jugong.length > 1;
-						},
-						content: function() {
-							'step 0'
-							player.chooseCardButton('移去两张“功”', 2, player.storage.jugong, true);
-							'step 1'
-							if (event.directresult || result.bool) {
-								player.logSkill('jugong');
-								var links = event.directresult || result.links;
-								for (var i = 0; i < links.length; i++) {
-									player.storage.jugong.remove(links[i]);
-								}
-								player.syncStorage('jugong');
-								if (!player.storage.jugong.length) {
-									player.unmarkSkill('jugong');
-								} else {
-									player.markSkill('jugong');
-								}
-								player.$throw(links);
-								game.log(player, '被移去了', links);
-								for (var i = 0; i < links.length; i++) {
-									links[i].discard();
-								}
-							}
-							'step 2'
-							trigger.cancel();
-						},
-						sub: true,
-					},
-				},
-				ai: {
-					maixie: true,
-					maixie_hp: true,
-					threaten: 0.8,
-					effect: {
-						target: function(card, player, target) {
-							if (get.tag(card, 'damage')) {
-								if (player.hasSkillTag('jueqing', false, target)) return;
-								if (!target.hasFriend()) return;
-								return 0.8;
-							}
-						}
-					}
-				}
-			},
 			liangji:{
-				enable: "phaseUse",
-				usable: 1,
-				filterTarget: function(card, player, target) {
-					return target != player;
+                audio:["liangji",2], 
+                enable:"phaseUse",
+                usable:1,
+                filterTarget:function (card,player,target){
+					return target!=player;
 				},
-				content: function() {
+							content:function (){
 					'step 0'
-					player.chooseCard('h', '连计：将1张牌置于' + get.translation(target) + '的武将牌上', true).set('ai', function(card) {
-						if (get.attitude(_status.event.player, _status.event.getParent().player) > 0) {
-							return 7 - get.value(card);
+					player.chooseCard('h','环计：将1张牌置于'+get.translation(target)+'的武将牌上',true).set('ai',function(card){
+						if(get.attitude(_status.event.player,_status.event.getParent().player)>0){
+							return 7-get.value(card);
 						}
 						return -get.value(card);
 					});
 					'step 1'
-					if (result.bool) {
-						player.$give(result.cards, target);
-						player.lose(result.cards, ui.special);
-						target.storage.liangji_1 = result.cards;
-						target.storage.liangji_1_source = target;
+					if(result.bool){
+						player.$give(result.cards,target);
+						player.lose(result.cards,ui.special);
+						target.storage.liangji_1=result.cards;
+						target.storage.liangji_1_source=target;
 						target.syncStorage('liangji_1');
 						target.addSkill('liangji_1');
 					}
 				},
-				ai: {
-					order: 1,
-					result: {
-						target:function(player, target) {
-							if(target.sex=='female') return 1.5;
-							if(target.sex=='male') return 1;
-						}
-					},
-				},
-				subSkill: {
-					"1": {
-						trigger: {
-							player: "phaseDrawBegin",
-						},
-						forced: true,
-						mark: true,
-						intro: {
-							content: "cards",
-						},
-						content: function() {
-							'step 0'
-							var cards = player.storage.liangji_1;
-							if (cards) {
-								player.gain(cards, 'gain2');
+                ai:{
+                    order:1,
+                    result:{
+                        target:function (player,target){
+							if(get.attitude(player,target)>0){
+								return Math.sqrt(target.countCards('he'));
 							}
-							player.storage.liangji_1 = 0;
-							'step 1'
-							if (player.sex == 'male') player.addTempSkill('wushuang');
-							if (player.sex == 'female') player.addTempSkill('lijian');
-							player.removeSkill('liangji_1');
+							return 0;
 						},
-						sub: true,
+                        player:1,
+                    },
+                },
+                subSkill:{
+                    "1":{
+                        trigger:{
+                            player:"phaseDrawBegin",
+                        },
+                        forced:true,
+                        mark:true,
+                        intro:{
+                            content:"cards",
+                        },
+                        content:function (){
+                'step 0'
+                var cards=player.storage.liangji_1;
+                if(cards){
+                    player.gain(cards,'gain2');
+                   }                  
+                  player.storage.liangji_1=0;                                            
+             
+                'step 1'            
+					if(player.sex=='male')player.addTempSkill('wushuang');                                  
+					if(player.sex=='female')player.addTempSkill('lijian');
+						player.removeSkill('liangji_1');                                    
+					},
+						sub:true,
 					},
 				},
 			},
-			chengmou:{
-				trigger: {
-					player: "phaseDrawBegin",
+ 			jugong:{
+                audio:["jingong",2], 
+                trigger:{
+                    global:"damageEnd",
+                },
+                usable:1,
+                frequent:true,
+                locked:false,
+                notemp:true,
+                marktext:"功",
+                init:function (player){
+					player.storage.jugong=[];
 				},
-				frequent: true,
-				filter: function(event, player) {
-					return player.storage.jugong.length > 0;
+                filter:function (event,player){
+					return event.card&&(event.card.name=='sha'||event.card.name=='juedou')&&event.notLink()                
+					&&_status.currentPhase!=player;
 				},
-				content: function(){
-					'step 0'
-					if (player.storage.jugong.length > 2) player.loseHp();
-					'step 1'
-					var cards = player.storage.jugong;
-
-					if (cards) {
-						player.gain(cards, 'gain2');
+                content:function (){
+					"step 0"
+					player.draw();
+					"step 1"
+					if(player.countCards('h')){
+						player.chooseCard('将'+get.cnNumber(1)+'张手牌置于武将牌上作为“功”',1,true);
 					}
-					player.storage.jugong = [];
-					player.unmarkSkill('jugong');
-				}
+					else{
+						event.finish();
+					}
+					"step 2"
+					if(result.cards&&result.cards.length){
+						player.lose(result.cards,ui.special);
+						player.storage.jugong=player.storage.jugong.concat(result.cards);
+						player.syncStorage('jugong');
+						player.markSkill('jugong');
+						game.log(player,'将',result.cards,'置于武将牌上作为“功”');
+					}
+				},
+                intro:{
+                    content:"cards",
+                },
+                group:"jugong_1",
+                subSkill:{
+                    "1":{
+                        trigger:{
+                            player:"damageBegin",
+                        },
+                        filter:function (event,player){        
+                            return player.storage.jugong.length>1;
+						},
+						content:function (){
+							"step 0" 
+							player.chooseCardButton('移去两张“功”',2,player.storage.jugong,true);
+							"step 1"
+							if(event.directresult||result.bool){
+								player.logSkill('jugong');
+								var links=event.directresult||result.links;
+								for(var i=0;i<links.length;i++){
+									player.storage.jugong.remove(links[i]);
+								}
+								player.syncStorage('jugong');
+								if(!player.storage.jugong.length){
+									player.unmarkSkill('jugong');
+							}
+							else{
+								player.markSkill('jugong');
+							}
+							player.$throw(links);
+							game.log(player,'被移去了',links);
+							for(var i=0;i<links.length;i++){
+								ui.discardPile.appendChild(links[i]);}
+							}
+							"step 2"
+							trigger.cancel();               
+						},
+						sub:true,
+                    },
+                },
+                ai:{                               
+                    effect:{
+                        target:function (card,player,target){
+							if(get.tag(card,'damage')){
+								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
+								if(!target.hasFriend()) return;
+								if(target.hp>=4) return [0.5,get.tag(card,'damage')*2];
+								if(!target.hasSkill('paiyi')&&target.hp>1) return [0.5,get.tag(card,'damage')*1.5];
+								if(target.hp==3) return [0.5,get.tag(card,'damage')*0.2];
+								if(target.hp==2) return [0.1,get.tag(card,'damage')*0.1];
+							}
+						},
+                    },
+                },
+            },
+			chengmou:{
+                audio:["moucheng",2],
+                trigger:{
+                    player:"phaseDrawBegin",
+                },
+                frequent:true,
+                filter:function (event,player){        
+                    return player.storage.jugong.length>0;
+    			},
+                content:function (){
+					'step 0'
+					if(player.storage.jugong.length>2) player.loseHp();
+					'step 1'
+				var cards=player.storage.jugong;
+						if(cards){                    
+				player.gain(cards,'gain2');                    
+						}                             
+				player.storage.jugong=[];   
+					'step 2'
+				trigger.cancel();
+				},    
 			},
 			nsxinsheng:{
 				trigger:{source:'damageEnd'},
@@ -3529,7 +3536,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					}
-					trigger.player.chooseCard('立断：将一张手牌交给'+get.translation(player)+'，或取消并使用'+get.translation(trigger.cards)).ai=function(card){
+					trigger.player.chooseCard('立断').set('prompt2','将一张手牌交给'+get.translation(player)+'，或取消并使用'+get.translation(trigger.cards)).ai=function(card){
 						if(bool){
 							if(att>0){
 								return 8-get.value(card);
@@ -4628,7 +4635,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nsyuanchou:'远筹',
 			nsyuanchou_info:'锁定技，当你成为锦囊牌的目标时，若来源角色与你的距离大于1，则取消之',
 			nsguhuo:'蛊惑',
-			nsguhuo_info:'锁定技，每当你使用一张牌。则你对一名随机角色从牌堆(牌堆无则从弃牌堆)随机使用一张同类别卡牌',
+			nsguhuo_info:'锁定技，你在一个回合中使用前两张牌时，你对一名随机角色从牌堆(牌堆无则从弃牌堆)随机使用一张同类别卡牌',
 			nsqinxue:'勤学',
 			nsqinxue_info:'每个效果每回合只能使用一次。①当你使用一张基本牌时，你从牌堆随机获得一张锦囊牌；②当你使用一张锦囊牌时，你从牌堆随机获得一张装备牌；③当你使用一张装备牌时，你从牌堆随机获得一张基本牌',
 			nsbaiyi:'白衣',
@@ -4685,7 +4692,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nsjianxiong:'奸雄',
 			nsjianxiong_info:'当你成为一名角色牌的目标后你可以对该角色使用一张牌，若此牌对其造成伤害，则该角色的牌失效。若失效的为黑色牌，则你摸一张牌',
 			nsxionglue:'雄略',
-			nsxionglue_info:'出牌阶段限一次，你可以弃置一张黑色手牌，然后从随机亮出的三张锦囊牌中选择一张加入手牌',
+			nsxionglue_info:'出牌阶段限一次，你可以弃置一张黑色手牌，然后发现一张锦囊牌',
 			nsyaowang:'妖妄',
 			nsyaowang_info:'回合开始阶段你可以选择一名角色然后获得其其中一项技能直到回合结束，然后该角色随机获得一项未上场武将的其中一项技能直到其回合结束',
 			nshuanhuo:'幻惑',
@@ -4718,7 +4725,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nsjihui:'急恚',
 			nsjihui_info:'锁定技，每当一名角色一次弃置了三张或更多的牌，你获得一个额外回合；你的额外回合内，你使用牌只能指定你与上一回合角色为目标',
 			nsmouyun:'谋运',
-			nsmouyun_info:'出牌阶段限一次，若你的体力值或当前轮数为奇数，你可以弃置场上体力值最少的一名其他角色区域内的X张牌。（X为其损失的体力值）',
+			nsmouyun_info:'每两轮限一次，你可以弃置场上体力值最少的一名其他角色区域内的X张牌。（X为其损失的体力值）',
 			nscongjun:'从军',
 			nscongjun_info:'锁定技，游戏开始时，你变身为一名随机男性角色；当一名敌方角色使用无懈可击时，你有小概率亮出此武将并变回花木兰，然后对该角色造成2点伤害',
 			nshuanxian:'幻仙',
@@ -4731,16 +4738,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nsnongquan_info:'出牌阶段，你可以将最后一张手牌当作【无中生有】使用',
 			nsdufu:'毒妇',
 			nsdufu_info:'每当你即将造成一次伤害时，你可以为此伤害重新指定伤害来源',
-			rejizhi:'集智',
-			rejizhi_info:'当你使用一张装备牌或锦囊牌时，你可以摸一张牌并展示之，若此牌是基本牌，你须弃置一张手牌，每回合限3次',
+			diyjizhi:'集智',
+			diyjizhi_info:'当你使用一张装备牌或锦囊牌时，你可以摸一张牌并展示之，若此牌是基本牌，你须弃置一张手牌，每回合限3次',
 			yiesheng:'回雪',
 			yiesheng_info:'出牌阶段，你可以弃置任意数量的黑色手牌，然后摸等量的牌。',
 			liangji:'环计',
-			liangji_info:'出牌阶段限一次，你可以选择一名其他角色并将一张手牌置于其武将牌上。目标角色于摸牌阶段开始时，获得此牌。若其为男性角色，则获得技能【无双】，若其为女性角色，则获得技能【离间】，直到回合结束。',
-			jugong:'居功',
-			jugong_info:'回合外每名角色的回合限一次，每当场上有角色因受到【杀】或【决斗】造成的伤害，你可以摸一张牌并且将一张手牌置于你的武将牌上，称之为“功”。在你即将受到伤害时，你可以弃置两张“功”，防止此伤害。',
-			chengmou:'逞谋',
-			chengmou_info:'摸牌阶段开始时，若你有“功”牌，你获得之，若你所获得的“功”牌多于两张，你须失去一点体力。',
+            liangji_info:'出牌阶段限一次，你可以选择一名其他角色并将一张手牌置于其武将牌上。目标角色于摸牌阶段开始时，获得此牌。若其为男性角色，则获得技能【无双】，若其为女性角色，则获得技能【离间】，直到回合结束。',
+            chengmou:'逞谋',
+            chengmou_info:'摸牌阶段开始时，若你有“功”牌，你获得之并跳过摸牌阶段，若你所获得的“功”牌多于两张，你须失去一点体力。',
+            jugong:'居功',
+            jugong_info:'回合外每名角色的回合限一次，每当场上有角色因受到【杀】或【决斗】造成的伤害，你可以摸一张牌并且将一张手牌置于你的武将牌上，称之为“功”。在你即将受到伤害时，你可以弃置两张“功”，防止此伤害。',
 			nsxinsheng:'新生',
 			nsxinsheng_info:'每当你对其他角色造成伤害后，若你未受伤，则你可以增加X点体力上限并摸X张牌，X为伤害点数',
 			nsdunxing:'遁形',

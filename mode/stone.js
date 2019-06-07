@@ -6391,7 +6391,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return event.player.side!=player.side&&!player.hasSkill('qianxing');
 				},
 				content:function(){
-					player.addTempSkill('qianxing',{player:'phaseBegin'});
+					player.tempHide();
 				}
 			},
 
@@ -6737,7 +6737,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.maxHp++;
 						player.hp++;
 						player.update();
-						player.addTempSkill('qianxing',{player:'phaseBegin'});
+						player.tempHide();
 					}
 					else{
 						player.draw();
@@ -8730,7 +8730,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				unique:true,
 				content:function(){
-					player.addTempSkill('qianxing',{player:'phaseBegin'});
+					player.tempHide();
 				}
 			},
 			stone_kutongsiseng1:{

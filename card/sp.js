@@ -382,14 +382,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					target.draw(3);
 					'step 1'
 					if(target.countCards('he',{type:'basic'})<target.countCards('he')){
-						target.chooseToDiscard('弃置一张非基本牌（或取消并弃置两张牌）','he',function(card){
+						target.chooseToDiscard('增兵减灶','he',function(card){
 							return get.type(card)!='basic';
 						}).set('ai',function(card){
 							if(_status.event.goon) return 8-get.value(card);
 							return 11-get.value(card);
 						}).set('goon',target.countCards('h',function(card){
 							return get.value(card,target,'raw')<8;
-						})>1);
+						})>1).set('prompt2','弃置一张非基本牌，或取消并弃置两张牌');
 						event.more=true;
 					}
 					else{

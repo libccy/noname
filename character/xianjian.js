@@ -722,7 +722,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:6,
 					threaten:1.4,
 					skillTagFilter:function(player){
-						if(4-(game.roundNumber-player.storage.chengxin)>0) return false;
+						if(4-(game.roundNumber-player.storage.chengxin_roundcount)>0) return false;
 						if(!_status.event.dying) return false;
 					},
 					save:true,
@@ -758,7 +758,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(get.is.altered('tianwu')&&player.hasSkill('tianwu2')) return false;
 					return event.targets&&event.targets.length==1&&player.getEnemies().contains(event.target);
 				},
-				alter:true,
+				// alter:true,
 				frequent:true,
 				content:function(){
 					trigger.target.getDebuff();
@@ -1034,7 +1034,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ywuhun:{
 				trigger:{player:'phaseBefore'},
 				forced:true,
-				alter:true,
+				// alter:true,
 				filter:function(event){
 					return event.parent.name!='ywuhun';
 				},
@@ -1101,9 +1101,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					player.markSkill('ywuhun');
-					if(get.is.altered('ywuhun')){
-						player.addSkill('ywuhun_end');
-					}
+					player.addSkill('ywuhun_end');
 					player.phase('ywuhun');
 					'step 2'
 					player.removeSkill('ywuhun_end');
@@ -1598,7 +1596,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(event.current.hasSha()){
 							event.current.chooseToUse({name:'sha'},'是否对'+get.translation(trigger.target)+'使用一张杀？',trigger.target,-1);
 						}
-						event.redo();
+						else{
+							event.redo();
+						}
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if (!result.bool){
+						event.goto(1);
 					}
 				},
 				ai:{
@@ -1933,7 +1940,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return player.countCards('h','sha')>0;
 				},
-				alter:true,
+				// alter:true,
 				usable:1,
 				group:'tianjian_discard',
 				subSkill:{
@@ -2127,7 +2134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					threaten:1.2,
 				},
-				alter:true,
+				// alter:true,
 				content:function(){
 					'step 0'
 					player.storage.danqing.length=0;
@@ -2260,7 +2267,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.line(result.targets[0],'green');
 						game.delay();
-						result.targets[0].addTempSkill('qianxing',{player:'phaseBegin'});
+						result.targets[0].tempHide();
 					}
 				}
 			},
@@ -2828,7 +2835,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event){
 					return event.num!=0;
 				},
-				alter:true,
+				// alter:true,
 				content:function(){
 					if(get.is.altered('xfenxin')){
 						player.draw();
@@ -3002,7 +3009,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.shuiyun=[];
 					player.storage.shuiyun_count=0;
 				},
-				alter:true,
+				// alter:true,
 				filter:function(event,player){
 					if(player.storage.shuiyun.length>=3) return false;
 					if(player.storage.shuiyun.length>=2&&get.is.altered('shuiyun')) return false;
@@ -3486,9 +3493,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return player.storage.xuanning&&player.countCards('he')+player.storage.xuanning>=3;
 				},
-				alter:true,
+				// alter:true,
 				content:function(){
 					"step 0"
+					// trigger.cancel();
 					var ainum=0;
 					var num=3-player.storage.xuanning;
 					var players=game.filterPlayer();
@@ -3501,7 +3509,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					if(num){
-						var next=player.chooseToDiscard(num,get.prompt('qianfang'),'he');
+						var next=player.chooseToDiscard(num,get.prompt2('qianfang'),'he');
 						next.ai=function(card){
 							if(ainum>=0){
 								switch(num){
@@ -3516,7 +3524,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.logged=true;
 					}
 					else{
-						player.chooseBool(get.prompt('qianfang')).ai=function(){
+						player.chooseBool(get.prompt2('qianfang')).ai=function(){
 							return ainum>=0;
 						}
 					}
@@ -3524,11 +3532,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.storage.xuanning=0;
 						player.unmarkSkill('xuanning');
-						if(!get.is.altered('qianfang')){
-							player.addTempSkill('qianfang2');
+						if(!event.logged){
+							player.logSkill('qianfang');
 						}
-						if(!event.logged) player.logSkill('qianfang');
-						player.useCard({name:'wanjian'},event.targets);
+						player.useCard({name:'wanjian'},'qianfang',event.targets);
 					}
 					else{
 						event.finish();
@@ -3537,6 +3544,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					expose:0.1,
 					threaten:1.5
+				},
+				group:'qianfang_draw',
+				subSkill:{
+					draw:{
+						trigger:{source:'damageEnd'},
+						forced:true,
+						filter:function(event,player){
+							if(event._notrigger.contains(event.player)) return false;
+							if(!event.player.isEnemiesOf(player)) return false;
+							return event.parent.skill=='qianfang';
+						},
+						popup:false,
+						content:function(){
+							player.draw();
+						}
+					}
 				}
 			},
 			qianfang2:{
@@ -3549,7 +3572,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			poyun:{
 				trigger:{source:'damageEnd'},
-				alter:true,
+				// alter:true,
 				filter:function(event,player){
 					if(event._notrigger.contains(event.player)) return false;
 					return player.storage.xuanning>0&&event.player.countCards('he')>0;
@@ -3587,7 +3610,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			poyun3:{},
 			zhuyue:{
 				enable:'phaseUse',
-				alter:true,
+				// alter:true,
 				filter:function(event,player){
 					if(get.is.altered('zhuyue')){
 						return player.hasCard(function(card){
@@ -3842,7 +3865,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				locked:true,
 				unique:true,
 				gainable:true,
-				alter:true,
+				// alter:true,
 				group:'zhimeng3',
 				content:function(){
 					"step 0"
@@ -3938,6 +3961,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tannang:{
 				enable:'chooseToUse',
 				usable:1,
+				locked:false,
 				filterCard:function(card){
 					return get.suit(card)=='club';
 				},
@@ -4185,8 +4209,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yanshi_info:'觉醒技，结束阶段，若你累计有4个回合使用过机关牌，你增加一点体力和体力上限，然后用随机装备填满你的装备区',
 			ywuhun:'雾魂',
 			ywuhun_bg:'魂',
-			ywuhun_info:'锁定技，回合开始前，你获得一个额外的回合，并在此回合结束后复原场上及牌堆中的所有牌',
-			ywuhun_info_alter:'锁定技，回合开始前，你获得一个额外的回合，并在此回合结束后复原场上及牌堆中的所有牌；当你在此回合中造成伤害后，终止所有结算并结束此回合',
+			ywuhun_info:'锁定技，回合开始前，你获得一个额外的回合，并在此回合结束后复原场上及牌堆中的所有牌；当你在此回合中造成伤害后，终止所有结算并结束此回合',
+			// ywuhun_info_alter:'锁定技，回合开始前，你获得一个额外的回合，并在此回合结束后复原场上及牌堆中的所有牌；当你在此回合中造成伤害后，终止所有结算并结束此回合',
 			feichen:'飞尘',
 			feichen_info:'',
 			tanhua:'昙华',
@@ -4211,7 +4235,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qixia:'绮霞',
 			qixia_info:'锁定技，当你累计使用或打出了4种不同花色的牌后，你于本回合结束后获得一个额外回合',
 			jianzhen:'剑阵',
-			jianzhen_info:'锁定技，当你使用杀对目标结算完毕后，其他角色可以对该目标使用一张杀',
+			jianzhen_info:'锁定技，当你使用杀对目标结算完毕后，其他角色可以对该目标使用一张杀，当有人选择出杀后终止此结算',
 			husha:'虎煞',
 			husha_bg:'煞',
 			husha_info:'每当你于出牌阶段造成一点伤害，你获得一枚虎煞标记（标记数不超过3）；结束阶段，你可以选择一项：1. 移去一枚虎煞标记，视为对任意角色使用一张杀；2. 移去两枚虎煞标记，视为使用一张南蛮入侵；3. 移去三枚虎煞标记，视为对除你之外的角色使用一张元素毁灭',
@@ -4313,7 +4337,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			poyun_info:'每当你造成一次伤害，你可以弃置一枚玄凝标记，然后弃置对方两张牌',
 			poyun_info_alter:'每当你造成一次伤害，你可以弃置一枚玄凝标记，然后弃置对方一张牌',
 			qianfang:'千方',
-			qianfang_info:'准备阶段，若你有玄凝标记，可以弃置3-X张牌和所有玄凝标记，视为使用了一张【万箭齐发】，若如此做，你本回合的摸牌阶段摸牌数+1。X为你的玄凝标记数',
+			qianfang_info:'准备阶段，若你有玄凝标记，你可以弃置3-X张牌和所有玄凝标记，视为使用了一张【万箭齐发】，每当一名敌方角色因此牌受到伤害，你摸一张牌。X为你的玄凝标记数',
 			qianfang_info_alter:'准备阶段，若你有玄凝标记，可以弃置3-X张牌和所有玄凝标记，视为使用了一张【万箭齐发】，X为你的玄凝标记数',
 			longxi:'龙息',
 			longxi2:'龙息',

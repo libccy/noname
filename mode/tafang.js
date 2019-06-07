@@ -42,6 +42,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			for(var i=0;i<toLoad.length;i++){
 				lib.skill[toLoad[i]]=result.skill[toLoad[i]];
 			}
+			ui.placeChess=result.ui.placeChess;
+			ui.click.moveContainer=result.ui.click.moveContainer;
 			for(var i in lib.skill){
 				if(lib.skill[i].changeSeat){
 					lib.skill[i]={};
@@ -75,7 +77,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			game.finishCards();
 			game.addGlobalSkill('autoswap');
 			ui.chessContainer=ui.create.div('#chess-container',ui.arena);
-			lib.setScroll(ui.chessContainer);
+			ui.chessContainer.move=ui.click.moveContainer;
+			ui.chessContainer.chessLeft=0;
+			ui.chessContainer.chessTop=0;
+			// lib.setScroll(ui.chessContainer);
 			ui.chess=ui.create.div('#chess',ui.chessContainer);
 			ui.canvas2=document.createElement('canvas');
 			ui.canvas2.id='canvas2';
@@ -625,7 +630,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								if(!lib.posmap[i.toString()]){
 									var grid=ui.create.div('.player.minskin.playerblank.glow',clickGrid,ui.chess);
 									grid.animate('start');
-									grid.dataset.position=i;
+									ui.placeChess(grid,i);
 									event.playergrids.push(grid);
 								}
 							}

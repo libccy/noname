@@ -524,7 +524,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
-					return target.sameIdentityAs(player);
+					return player.sameIdentityAs(target);
 				},
 				selectTarget:-1,
 				content:function(){
@@ -954,6 +954,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				position:'he',
 				usable:1,
 				check:function(card){
+					var zhu=get.zhu(_status.event.player,'jiahe');
+					if(!zhu) return 0;
 					var num=7-get.value(card);
 					if(get.position(card)=='h'){
 						if(zhu.storage.yuanjiangfenghuotu>=5){
@@ -1476,8 +1478,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(result.bool){
 								player.logSkill('gzhuashen');
 								game.log(player,'替换了一张','#g化身');
-								lib.skill.gzhuashen.removeCharacter(player,result.links[0]);
 								lib.skill.gzhuashen.addCharacter(player,_status.characterlist.randomGet(),true);
+								lib.skill.gzhuashen.removeCharacter(player,result.links[0]);
 								game.delayx();
 							}
 						}
@@ -3471,8 +3473,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				uiintro.add('<div class="text chat">国战牌堆：'+(lib.configOL.guozhanpile?'开启':'关闭'));
 				last=uiintro.add('<div class="text chat">国战武将：'+(lib.configOL.onlyguozhan?'开启':'关闭'));
 				if(!lib.configOL.onlyguozhan){
-					uiintro.add('<div class="text chat">屏蔽弱将：'+(lib.configOL.ban_weak?'开启':'关闭'));
-					last=uiintro.add('<div class="text chat">屏蔽强将：'+(lib.configOL.ban_strong?'开启':'关闭'));
+					// uiintro.add('<div class="text chat">屏蔽弱将：'+(lib.configOL.ban_weak?'开启':'关闭'));
+					// last=uiintro.add('<div class="text chat">屏蔽强将：'+(lib.configOL.ban_strong?'开启':'关闭'));
 					if(lib.configOL.banned.length){
 						last=uiintro.add('<div class="text chat">禁用武将：'+get.translation(lib.configOL.banned));
 					}
@@ -3920,8 +3922,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					if(result.buttons){
 						game.me.init(result.buttons[0].link,result.buttons[1].link,false);
+						game.addRecentCharacter(result.buttons[0].link,result.buttons[1].link);
 					}
-					game.addRecentCharacter(game.me.name,game.me.name2);
 					// game.me.setIdentity(game.me.group);
 					event.list.remove(game.me.name);
 					event.list.remove(game.me.name2);

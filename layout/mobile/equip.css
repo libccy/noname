@@ -24,6 +24,10 @@
 #arena.chess.uslim_player .player .equips{
 	left:3px;
 }
+#arena.mslim_player .player:not([data-position='0']) .equips,
+#arena.chess.mslim_player .player .equips{
+	left:5px;
+}
 .player:not([data-position='0']).minskin .equips,
 #arena.chess .player.minskin .equips{
 	transform:scale(0.73);
@@ -184,6 +188,10 @@
 #arena.chess.uslim_player .player.linked .equips{
 	transform:rotate(90deg) translate(-159px,-6px);
 }
+#arena.mslim_player .player:not([data-position='0']).linked .equips,
+#arena.chess.mslim_player .player.linked .equips{
+	transform:rotate(90deg) translate(-157px,-6px);
+}
 .player:not([data-position='0']).minskin.linked .equips,
 #arena.chess .player.minskin.linked .equips{
 	transform:rotate(90deg) translate(-92px,-6px) scale(0.73);
@@ -195,6 +203,10 @@
 #arena.uslim_player .player:not([data-position='0']).minskin.linked .equips,
 #arena.chess.uslim_player .player.minskin.linked .equips{
 	transform:rotate(90deg) translate(-99px,-6px) scale(0.73);
+}
+#arena.mslim_player .player:not([data-position='0']).minskin.linked .equips,
+#arena.chess.mslim_player .player.minskin.linked .equips{
+	transform:rotate(90deg) translate(-97px,-6px) scale(0.73);
 }
 .player:not([data-position='0']).linked .identity,
 #arena.chess .player.linked .identity{

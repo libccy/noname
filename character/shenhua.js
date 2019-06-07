@@ -791,7 +791,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('ai',function(target){
 						if(!_status.event.fang) return -1;
 						if(target.hasJudge('lebu')) return -1;
-						return get.attitude(player,target)-4;
+						if(get.attitude(player,target)>4){
+							return get.threaten(target)/Math.sqrt(target.hp+1)/Math.sqrt(target.countCards('h')+1);
+						}
+						return 0;
 					}).set('fang',fang);
 					"step 1"
 					if(result.bool){
@@ -1579,17 +1582,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-				mark:true
-			},
-			huashen1:{
-				trigger:{global:'gameStart',player:'enterGame'},
-				forced:true,
-				popup:false,
-				priority:10,
-				filter:function(event,player){
-					return !player.storage.huasheninited;
-				},
-				content:function(){
+				setup:function(player,gain){
 					for(var i in lib.character){
 						if(lib.filter.characterDisabled2(i)) continue;
 						var add=false;
@@ -1611,9 +1604,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.storage.huashen.list.remove([game.players[i].name1]);
 						player.storage.huashen.list.remove([game.players[i].name2]);
 					}
-					lib.skill.huashen.get(player,2);
 					player.storage.huasheninited=true;
-					event.trigger('huashenStart');
+					if(gain){
+						player.markSkill('huashen');
+						lib.skill.huashen.get(player,2);
+						_status.event.trigger('huashenStart');
+					}
+				}
+			},
+			huashen1:{
+				trigger:{global:'gameStart',player:['enterGame','damageBefore']},
+				forced:true,
+				popup:false,
+				priority:10,
+				filter:function(event,player){
+					return !player.storage.huasheninited;
+				},
+				content:function(){
+					lib.skill.huashen.setup(player,trigger.name!='damage');
 				}
 			},
 			huashen2:{
@@ -1628,6 +1636,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				content:function(){
 					'step 0'
+					if(get.is.empty(player.storage.huashen.owned)){
+						if(!player.storage.huasheninited){
+							lib.skill.huashen.setup(player,false);
+						}
+						event.finish();
+						return;
+					}
 					event.trigger('playercontrol');
 					'step 1'
 					var slist=player.storage.huashen.owned;
@@ -1829,8 +1844,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.skillRank(b,cond)-get.skillRank(a,cond);
 						});
 						var choice=skills[0];
-						event.currentname=map[choice];
-						event.clickControl(choice,'ai');
+						if(choice){
+							event.currentname=map[choice];
+							event.clickControl(choice,'ai');
+						}
 					}
 				}
 			},
@@ -1848,6 +1865,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<trigger.num;i++){
 						lib.skill.huashen.get(player);
 					}
+					player.markSkill('huashen');
 				},
 				ai:{
 					maixie_hp:true

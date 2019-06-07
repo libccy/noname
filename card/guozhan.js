@@ -151,6 +151,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:0.5,
 					value:4,
 					useful:2,
+					tag:{
+						norepeat:1
+					},
 					result:{
 						target:function(player,target){
 							if(target.countCards('he')>=2) return 1;

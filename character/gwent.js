@@ -27,7 +27,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_telisi:['female','wei',3,['huandie']],
 			gw_xili:['female','wu',3,['fengjian']],
 			gw_luoqi:['male','wei',4,['gwzhanjiang']],
-			gw_yioufeisi:['male','wu',4,['gwchuanxin']],
+			// gw_yioufeisi:['male','wu',4,['gwchuanxin']],
 
 			gw_aigeleisi:['female','wu',3,['gwshenyu']],
 			gw_aokeweisite:['male','qun',4,['yunhuo']],
@@ -65,6 +65,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_diandian:['male','wu',3,['gwhuanbi']],
 			gw_yisilinni:['female','wu',3,['gwhuanshuang']],
 			gw_feilafanruide:['male','wei',3,['yinzhang']],
+
+			gw_saqiya:['female','shu',4,['sqlongwu']]
 		},
 		characterIntro:{
 			gw_huoge:'那个老年痴呆?不知道他是活着还是已经被制成标本了!',
@@ -80,6 +82,147 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
 		skill:{
+			sqlongyin:{
+				trigger:{player:'phaseBeginStart'},
+				forced:true,
+				check:function(){
+					return false;
+				},
+				init:function(player){
+					player.storage.sqlongyin='sqlongwu';
+				},
+				content:function(){
+					var list=['sqlongnu','sqlonghuo','sqlongwu'];
+					var map={
+						sqlongwu:'gw_saqiya',
+						sqlongnu:'gw_saqiya1',
+						sqlonghuo:'gw_saqiya2'
+					}
+					list.remove(player.storage.sqlongyin);
+					if(list.length==2){
+						var name=list.randomGet();
+						player.removeSkill(player.storage.sqlongyin);
+						player.addSkill(name);
+						player.storage.sqlongyin=name;
+						player.setAvatar('gw_saqiya',map[name]);
+					}
+				}
+			},
+			sqlongnu:{
+				group:'sqlongyin',
+				trigger:{player:'phaseBegin'},
+				frequent:true,
+				content:function(){
+					'step 0'
+					player.discoverCard(ui.cardPile.childNodes,function(button){
+						var card=button.link;
+						var player=_status.event.player;
+						var value=get.value(card,player);
+						if(player.countCards('h',card.name)){
+							value=Math.max(value,9);
+						}
+						return value;
+					},'nogain');
+					'step 1'
+					if(player.countCards('h',function(card){
+						return card!=result.card&&card.name==result.card.name;
+					})){
+						event.current=result.card;
+						player.chooseTarget('是否改为对一名角色造成一点火属性伤害？').set('ai',function(target){
+							return get.damageEffect(target,null,player,player,'fire');
+						});
+					}
+					else{
+						player.gain(result.card,'draw');
+						event.finish();
+					}
+					'step 2'
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target,'fire');
+						target.damage('fire','nocard');
+						// player.discoverCard(ui.cardPile.childNodes);
+					}
+					else{
+						player.gain(event.current,'draw');
+					}
+				},
+			},
+			sqlonghuo:{
+				group:'sqlongyin',
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.countCards('h');
+				},
+				delay:false,
+				content:function(){
+					'step 0'
+					var hs=player.getCards('h');
+					player.discard(hs).set('delay',false);
+					event.hs=hs;
+					'step 1'
+					player.draw(event.hs.length);
+					'step 2'
+					var enemies=player.getEnemies();
+					for(var i=0;i<enemies.length;i++){
+						var hs=enemies[i].getCards('h');
+						var same=[];
+						for(var j=0;j<hs.length;j++){
+							for(var k=0;k<event.hs.length;k++){
+								if(hs[j].name==event.hs[k].name){
+									same.push(hs[j]);
+									break;
+								}
+							}
+						}
+						if(same.length){
+							enemies[i].discard(same.randomGet()).set('delay',false);
+							event.discarded=true;
+							player.line(enemies[i],'green');
+						}
+					}
+					'step 3'
+					if(event.discarded){
+						game.delay();
+					}
+				},
+				ai:{
+					order:5,
+					result:{
+						player:1
+					}
+				}
+			},
+			sqlongwu:{
+				group:'sqlongyin',
+				trigger:{player:'phaseEnd'},
+				frequent:true,
+				filter:function(event,player){
+					return player.countCards('h');
+				},
+				content:function(){
+					'step 0'
+					var max=1;
+					var map={};
+					var hs=player.getCards('h');
+					for(var i=0;i<hs.length;i++){
+						var name=hs[i].name;
+						if(!map[name]){
+							map[name]=1;
+						}
+						else{
+							map[name]++;
+							if(map[name]>max){
+								max=map[name];
+							}
+						}
+					}
+					player.draw(max);
+					'step 1'
+					player.chooseToUse();
+				}
+			},
 			jielue:{
 				trigger:{player:'phaseUseBegin'},
 				filter:function(event,player){
@@ -425,7 +568,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							bronze:[1,'准备阶段，你获得一张随机铜卡法术'],
 							basic:[1,'准备阶段，你从牌堆中获得一张杀'],
 							silver:[2,'结束阶段，你获得一张随机银卡法术'],
-							trick:[3,'结束阶段，你从3张随机亮出的普通锦囊牌中选择一张获得之'],
+							trick:[3,'结束阶段，你发现一张普通锦囊牌'],
 							gold:[3,'出牌阶段开始时，你获得一张随机金卡法术'],
 							equip:[3,'出牌阶段开始时，你在装备区内的空余位置装备一件随机装备'],
 						},
@@ -810,7 +953,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							dialog.add(list[i].getCards('h'));
 						}
 						player.chooseButton(dialog,true).set('ai',function(button){
-							if(get.attitude(player,get.owner(button))>0) return -1;
+							if(get.attitude(player,get.owner(button.link))>0) return -1;
 							return get.value(button.link);
 						});
 					}
@@ -845,10 +988,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.hujia<3;
 				},
 				content:function(){
-					var num=Math.min(trigger.cards.length,3-player.hujia);
-					if(num>0){
-						player.changeHujia(num);
-					}
+					player.changeHujia();
+					// var num=Math.min(trigger.cards.length,3-player.hujia);
+					// if(num>0){
+					// 	player.changeHujia();
+					// }
 				},
 				init:function(player){
 					player.storage.gwweitu=0;
@@ -1113,15 +1257,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				filterCard:true,
-				position:'he',
+				position:'h',
 				check:function(card){
 					return 8-get.value(card);
 				},
+				global:'g_gw_yewu',
 				content:function(){
 					'step 0'
 					event.targets=player.getEnemies();
 					event.color=get.color(cards[0]);
-					event.num=0;
+					event.nh=0;
+					event.ne=0;
 					'step 1'
 					event.repeat=false;
 					var list=game.filterPlayer(function(current){
@@ -1131,15 +1277,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=list.randomGet();
 						var card=target.randomDiscard()[0];
 						player.line(target,'green');
-						event.num++;
+						if(get.position(card)=='e'){
+							event.ne++;
+						}
+						else{
+							event.nh++;
+						}
 						if(card&&get.color(card)==event.color){
 							event.redo();
 						}
 					}
 					'step 2'
 					var togain=[];
-					for(var i=0;i<event.num;i++){
+					for(var i=0;i<event.nh;i++){
 						togain.push(game.createCard('gw_wuyao'));
+					}
+					for(var i=0;i<event.ne;i++){
+						togain.push(game.createCard('gw_lang'));
 					}
 					player.gain(togain,'gain2');
 				},
@@ -1150,11 +1304,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			g_gw_wuyao:{
+			g_gw_yewu:{
 				trigger:{player:'phaseAfter'},
 				silent:true,
 				content:function(){
-					var cards=player.getCards('h','gw_wuyao');
+					var cards=player.getCards('h','gw_wuyao').concat(player.getCards('h','gw_lang'));
 					if(cards.length){
 						player.lose(cards).position=null;
 					}
@@ -1456,6 +1610,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			gwqinwu:{
 				trigger:{player:'useCard'},
+				usable:1,
 				filter:function(event,player){
 					return get.type(event.card)=='basic';
 				},
@@ -2138,6 +2293,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			junchi:{
 				trigger:{global:'shaAfter'},
 				direct:true,
+				usable:1,
 				filter:function(event,player){
 					return event.player!=player&&event.target!=player&&event.target.isIn()&&player.hasCard(function(card){
 						return player.canUse(card,event.target,false)&&!get.info(card).multitarget;
@@ -2346,27 +2502,41 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var nh=player.countCards('h');
 					var nh2=target.countCards('h');
 					if(nh<2) return nh2<2;
-					else return nh2>=2;
+					return nh2>=2&&target.countDiscardableCards(player,'h');
+				},
+				prompt:function(event){
+					var nh=event.player.countCards('h');
+					if(nh<2) return '选择一名手牌数小于2的其他角色，观看牌堆顶的两张牌，你获得一张并交给其另一张';
+					return '选择一名手牌数大于2的其他角色，你弃置一张手牌，然后观看并弃置其一张手牌';
 				},
 				content:function(){
 					'step 0'
 					target.addTempSkill('hunmo2');
-					player.addTempSkill('hunmo3');
-					if(player.countCards('h')<2){
-						game.asyncDraw([target,player]);
+					var nh=player.countCards('h');
+					if(nh<2){
+						event.cards=get.cards(2);
+						player.chooseCardButton(event.cards,'获得一张牌并交给'+get.translation(target)+'另一张牌',true);
 					}
 					else{
 						player.chooseToDiscard('h',true).delay=false;
-						target.chooseToDiscard('h',true).delay=false;
+						event.discard=true;
 					}
 					'step 1'
-					game.delay();
-					if(typeof player.storage.hunmo!='number'){
-						player.storage.hunmo=1;
+					if(event.discard){
+						player.discardPlayerCard(target,'h',true,'visible');
+
 					}
 					else{
-						player.storage.hunmo++;
+						if(result.links&&result.links.length){
+							player.gain(result.links,false);
+							event.cards.remove(result.links[0]);
+							target.gain(event.cards,false);
+							player.$drawAuto(result.links);
+							target.$drawAuto(event.cards);
+						}
 					}
+					'step 2'
+					game.delay();
 				},
 				ai:{
 					order:function(){
@@ -2386,7 +2556,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-				group:'hunmo_draw',
+				// group:'hunmo_draw',
 				subSkill:{
 					draw:{
 						trigger:{player:'phaseEnd'},
@@ -2936,7 +3106,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.delay();
 						}
 						player.useCard({name:'sha',nature:'thunder'},result.targets,false);
-						player.addTempSkill('qianxing',{player:'phaseBegin'});
+						player.tempHide();
 					}
 				},
 				ai:{
@@ -2954,7 +3124,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				// 			return event.getParent(3).name=='fengjian';
 				// 		},
 				// 		content:function(){
-				// 			player.addTempSkill('qianxing',{player:'phaseBegin'});
+				// 			player.tempHide();
 				// 		}
 				// 	}
 				// }
@@ -3347,7 +3517,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		card:{
 			gwjinli_jiu:{
 				fullimage:true,
-				gainnable:false,
+				gainable:false,
 				image:'card/gw_xianzumaijiu'
 			},
 			gw_xianzumaijiu:{
@@ -4248,8 +4418,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:function(){
 						return lib.card.sha.ai.order()+0.5;
 					}
-				},
-				global:'g_gw_wuyao'
+				}
+			},
+			gw_lang:{
+				type:'special',
+				fullimage:true,
+				derivation:'gw_linjing',
+				vanish:true,
+				addinfo:'酒',
+				autoViewAs:'jiu',
+				ai:{
+					order:function(){
+						return lib.card.jiu.ai.order()+0.5;
+					}
+				}
 			},
 			gw_dudayuanshuai1:{
 				type:'special',
@@ -4351,6 +4533,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_yisilinni:'伊斯琳妮',
 			gw_lanbote:'兰伯特',
 
+			gw_saqiya:'萨琪亚',
+
+			// sqlongyin:'龙影',
+			// sqlongyin_info:'',
+			sqlongnu:'龙怒',
+			sqlongnu_info:'准备阶段，你可以发现一张牌堆中的牌，若你手牌中有同名牌，你可以改为造成一点火属性伤害锁定技。准备阶段开始时，你随机切换至一种形态',
+			sqlonghuo:'龙火',
+			sqlonghuo_info:'出牌阶段限一次，你可以弃置所有手牌并摸等量的牌，若敌方角色手牌中与你弃置的牌同名的牌，则随机弃置其中一张。准备阶段开始时，你随机切换至一种形态',
+			sqlongwu:'龙舞',
+			sqlongwu_info:'结束阶段，你可以摸X张牌，然后可以使用一张牌，X为手牌中同名牌数最多的牌的数量。准备阶段开始时，你随机切换至一种形态',
 			kuanglie:'狂猎',
 			kuanglie_info:'锁定技，每当你使用黑色牌指定其他角色为目标后，目标随机弃置一张牌；每当你以此法累计弃置2张牌后，你摸一张牌',
 			// kuanglie_info:'锁定技，每当一名敌方角色成为你的黑色牌的目标，你视为对其使用【刺骨寒霜】；在一名角色受到【刺骨寒霜】的影响后，你随机获得一张【狂猎】牌',
@@ -4359,7 +4551,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwshuangwu:'霜舞',
 			gwshuangwu_info:'锁定技，每当你造成一次伤害，你视为对目标使用刺骨寒霜；你对处于刺骨寒霜的角色造成的伤害+1',
 			gwhuanshuang:'幻霜',
-			gwhuanshuang_info:'准备阶段，你可以从三张随机亮出的铜卡法术中选择一张使用，并结算两次',
+			gwhuanshuang_info:'准备阶段，你可以发现一张铜卡法术并使用之，此牌结算两次',
 			gwjinli:'金醴',
 			gwjinli_jiu:'先祖麦酒',
 			gwjinli_info:'出牌阶段限一次，你可以弃置一张手牌，并将一张先祖麦酒置于一名角色的武将牌上',
@@ -4420,7 +4612,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwjingtian:'经天',
 			gwjingtian_info:'锁定技，牌堆顶的9张牌对你始终可见；你始终跳过摸牌阶段，改为获得3枚“经天”标记；每名角色的回合限一次，你可以在任意时间点移去一枚“经天”标记，然后获得牌堆顶的一张牌',
 			gwweitu:'卫土',
-			gwweitu_info:'锁定技，每当你弃置一张牌，若你的护甲数小于3，你获得一点护甲；每当你的护甲为你累计抵消3次伤害，你获得一张随机银卡法术',
+			gwweitu_info:'锁定技，每当你弃置牌，若你的护甲数小于3，你获得一点护甲；每当你的护甲为你累计抵消3次伤害，你获得一张随机银卡法术',
 			gwzhongmo:'终末',
 			gwzhongmo_info:'锁定技，你跳过摸牌阶段，改为获得两张随机的稀有度不同的法术牌',
 			gwfutian:'覆天',
@@ -4429,8 +4621,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwgouhun_info:'出牌阶段限一次，你可以交给一名有手牌的其他角色一张手牌，然后令其选择一项：1. 将手牌中与此牌花色相同的牌（至少一张）交给你；2. 弃置手牌中与此牌花色不同的牌（至少一张）；3. 进入混乱状态直到下一回合结束',
 			gw_wuyao:'雾妖',
 			gw_wuyao_info:'在你行动时可当作杀使用；回合结束后，从手牌中消失',
+			gw_lang:'狼',
+			gw_lang_info:'在你行动时可当作酒使用；回合结束后，从手牌中消失',
 			gwyewu:'叶舞',
-			gwyewu_info:'出牌阶段限一次，你可以弃置一张牌，并弃置一名随机敌人的一张随机牌；若目标弃置的牌与你弃置的牌颜色相同，则重复发动；每以此法弃置一张敌方角色的牌，你获得一张【雾妖】',
+			gwyewu_info:'出牌阶段限一次，你可以弃置一张手牌，并弃置一名随机敌人的一张随机牌；若目标弃置的牌与你弃置的牌颜色相同，则重复发动；每以此法弃置一张敌方角色的手牌，你获得一张【雾妖】；每以此法弃置一张敌方角色的手牌，你获得一张【狼】',
 			shuangxi:'霜袭',
 			shuangxi_info:'每两轮限一次，出牌阶段，你可以视为使用一张【刺骨寒霜】；若你在本回合造成过伤害，改为使用【白霜】',
 			gwfengshi:'风蚀',
@@ -4448,7 +4642,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwfusheng_info:'当一名未翻面的角色进入濒死状态时，你可以令其翻面并回复一点体力，然后你与其各摸一张牌',
 			gwqinwu:'琴舞',
 			gwqinwu2:'琴舞',
-			gwqinwu_info:'每当你使用一张基本牌，你可以令一名角色摸一张牌并获得技能【琴舞】直到其下一回合结束',
+			gwqinwu_info:'出牌阶段限一次，每当你使用一张基本牌，你可以令一名角色摸一张牌并获得技能【琴舞】直到其下一回合结束',
 			huanshu:'幻术',
 			huanshu2:'幻术',
 			huanshu3:'幻术',
@@ -4476,7 +4670,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwshenyu:'神愈',
 			gwshenyu_info:'准备阶段，你可以令一名角色选择一项：回复一点体力，或从弃牌堆中获得一张非金法术牌（直到洗牌入牌堆前该牌不能再以此法获得）',
 			junchi:'骏驰',
-			junchi_info:'每当一名其他角色使用一张杀，若目标不是你，你可以对杀的目标使用一张牌，并摸一张牌',
+			junchi_info:'每当一名其他角色使用一张杀，若目标不是你，你可以对杀的目标使用一张牌，并摸一张牌，每回合限一次',
 			junchi_old_info:'当一名其他角色使用杀对一个目标结算后，该角色可以交给你一张牌，然后你可以对杀的目标使用一张牌，若如此做，你回复一点体力，杀的使用者摸一张牌',
 			gw_dudayuanshuai1:'杜达元帅',
 			gw_dudayuanshuai1_info:'当你成为其他角色使用牌的目标时，你可以使用此牌取消之，然后获得对你使用的牌',
@@ -4489,7 +4683,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yunhuo:'陨火',
 			yunhuo_info:'锁定技，准备阶段，若游戏轮数为4的倍数，你令所有敌方角色随机弃置一张手牌（若没有手牌改为受到一点火焰伤害），然后在此回合结束后获得一个额外回合',
 			yinzhang:'银杖',
-			yinzhang_info:'出牌阶段限一次，你可以弃置一张牌，然后从3张随机亮出的银卡法术中选择一张加入手牌',
+			yinzhang_info:'出牌阶段限一次，你可以弃置一张牌，然后发现一张银卡法术',
 			gwtianbian:'天变',
 			gwtianbian_info:'出牌阶段开始时，你可以选择一项：随机使用一张对全场有正面效果的牌；或随机使用一张对全场有负面效果的牌',
 			gwxiaoshou:'枭首',
@@ -4501,7 +4695,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shewu:'蛇舞',
 			shewu_info:'出牌阶段限一次，你可以弃置1至3张牌然后摸3张牌；若你弃置了至少2张牌，你本回合使用卡牌无视距离；若你弃置了3张牌，你回复一点体力',
 			gwzhanjiang:'斩将',
-			gwzhanjiang_info:'每轮限一次，在一名角色的准备阶段，你可以弃置一张牌，然后所有角色可以对该角色使用一张杀，出杀的角色在响应时摸一张牌，当有至少两名角色响应后停止结算',
+			gwzhanjiang_info:'每轮限一次，在一名角色的准备阶段，你可以弃置一张牌，然后所有角色可以对该角色使用一张杀，出杀的角色在响应时摸一张牌，当有至少两名角色响应后终止结算',
 			gwchuanxin:'穿心',
 			gwchuanxin_info:'你的攻击范围基数为你当前体力值；每当你对一名角色使用杀结算完毕后，你可以亮出牌堆顶的一张牌，若为黑色，视为对目标再使用一张杀',
 			fengjian:'风剑',
@@ -4515,7 +4709,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwbaquan:'霸权',
 			gwbaquan_info:'出牌阶段限一次，你可以获得一名其他角色的所有牌，然后还给其等量的牌，若你归还的牌均为你获得的牌且该角色体力值不小于你，你对其造成一点伤害',
 			hunmo:'魂墨',
-			hunmo_info:'出牌阶段，若你手牌数小于2，你可以选择一名手牌数小于2的角色与其各摸一张牌；若你手牌数不小于2，你可以选择一名手牌数不小于2的角色与你各弃置一张手牌；结束阶段，若你发动过至少3次魂墨，你可以造成一点伤害；同一阶段不能对同一角色发动两次',
+			hunmo_info:'出牌阶段，若你手牌数少于2，你可以选择一名手牌数小于2的其他角色，观看牌堆顶的两张牌，你获得一张并交给其另一张；若你手牌数不少2，你可以选择一名手牌数不少于2的其他角色，你弃置一张手牌，然后观看并弃置其一张手牌。每回合对同一名角色最多发动一次',
 			huihun:'回魂',
 			huihun_info:'结束阶段，你可以从弃牌堆中获得本回合使用的前两张红色牌',
 			lanquan:'远略',

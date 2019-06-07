@@ -91,7 +91,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					ui.create.control('跳过向导',function(){
 						clear();
 						clear2();
-						game.resume();
+						// game.resume();
+						// lib.cheat.cfg(); // owidgets
 					});
 					ui.create.control('继续',step2);
 				}
@@ -347,9 +348,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				else{
 					uiintro.add('<div class="text chat">卡牌替换：'+(lib.configOL.zhong_card?'开启':'关闭'));
 				}
-				uiintro.add('<div class="text chat">出牌时限：'+lib.configOL.choose_timeout+'秒');
-				uiintro.add('<div class="text chat">屏蔽弱将：'+(lib.configOL.ban_weak?'开启':'关闭'));
-				var last=uiintro.add('<div class="text chat">屏蔽强将：'+(lib.configOL.ban_strong?'开启':'关闭'));
+				var last=uiintro.add('<div class="text chat">出牌时限：'+lib.configOL.choose_timeout+'秒');
+				// uiintro.add('<div class="text chat">屏蔽弱将：'+(lib.configOL.ban_weak?'开启':'关闭'));
+				// var last=uiintro.add('<div class="text chat">屏蔽强将：'+(lib.configOL.ban_strong?'开启':'关闭'));
 				if(lib.configOL.banned.length){
 					last=uiintro.add('<div class="text chat">禁用武将：'+get.translation(lib.configOL.banned));
 				}
@@ -612,6 +613,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<list.length;i++){
 							back.push(list[i]);
 						}
+					}
+					if(typeof lib.config.test_game=='string'&&player==game.me.next){
+						player.init(lib.config.test_game);
 					}
 				}
 				next.setContent(function(){
@@ -1148,12 +1152,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.me.init(event.modchosen[0],event.modchosen[1]);
 					}
 					else if(result.buttons.length==2){
-						game.me.init(result.buttons[0].link,result.buttons[1].link)
+						game.me.init(result.buttons[0].link,result.buttons[1].link);
+						game.addRecentCharacter(result.buttons[0].link,result.buttons[1].link);
 					}
 					else{
-						game.me.init(result.buttons[0].link)
+						game.me.init(result.buttons[0].link);
+						game.addRecentCharacter(result.buttons[0].link);
 					}
-					game.addRecentCharacter(game.me.name,game.me.name2);
 					event.list.remove(game.me.name);
 					event.list.remove(game.me.name2);
 					if(game.me==game.zhu&&game.players.length>4){

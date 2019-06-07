@@ -4,31 +4,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'standard',
 		connect:true,
 		character:{
-			caocao:['male','wei',4,['hujia','xinjianxiong'],['zhu']],
+			caocao:['male','wei',4,['hujia','jianxiong'],['zhu']],
 			simayi:['male','wei',3,['fankui','guicai']],
 			xiahoudun:['male','wei',4,['ganglie']],
 			zhangliao:['male','wei',4,['tuxi']],
 			xuzhu:['male','wei',4,['luoyi']],
 			guojia:['male','wei',3,['tiandu','yiji']],
-			zhenji:['female','wei',3,['xinluoshen','qingguo']],
+			zhenji:['female','wei',3,['luoshen','qingguo']],
 			liubei:['male','shu',4,['rende','jijiang'],['zhu']],
 			guanyu:['male','shu',4,['wusheng']],
 			zhangfei:['male','shu',4,['paoxiao']],
-			zhugeliang:['male','shu',3,['xinguanxing','kongcheng']],
+			zhugeliang:['male','shu',3,['guanxing','kongcheng']],
 			zhaoyun:['male','shu',4,['longdan']],
 			machao:['male','shu',4,['mashu','tieji']],
-			huangyueying:['female','shu',3,['xinjizhi','xinqicai']],
-			sunquan:['male','wu',4,['xinzhiheng','xinjiuyuan'],['zhu']],
+			huangyueying:['female','shu',3,['jizhi','qicai']],
+			sunquan:['male','wu',4,['zhiheng','jiuyuan'],['zhu']],
 			ganning:['male','wu',4,['qixi']],
 			lvmeng:['male','wu',4,['keji']],
 			huanggai:['male','wu',4,['kurou']],
 			zhouyu:['male','wu',3,['yingzi','fanjian']],
 			daqiao:['female','wu',3,['guose','liuli']],
 			luxun:['male','wu',3,['qianxun','lianying']],
-			sunshangxiang:['female','wu',3,['xiaoji','xinjieyin']],
+			sunshangxiang:['female','wu',3,['xiaoji','jieyin']],
 			huatuo:['male','qun',3,['qingnang','jijiu']],
 			lvbu:['male','qun',4,['wushuang']],
-			diaochan:['female','qun',3,['lijian','xinbiyue']],
+			diaochan:['female','qun',3,['lijian','biyue']],
+			huaxiong:['male','qun',6,['yaowu']],
 		},
 		characterIntro:{
 			liubei:'先主姓刘，讳备，字玄德，涿郡涿县人，汉景帝子中山靖王胜之后也。以仁德治天下。',
@@ -56,7 +57,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huatuo:'字元化，一名旉，沛国谯人，“建安三神医”之一。集平生之所得著《青囊经》，现已失传。',
 			lvbu:'字奉先，五原郡九原县人。三国第一猛将，曾独力战刘关张三人，其武力世之无双。时人语曰：“人中有吕布，马中有赤兔。”',
 			diaochan:'中国古代四大美女之一，有闭月羞花之貌。司徒王允之义女，由王允授意施行连环计，离间董卓、吕布，借布手除卓。后貂蝉成为吕布的妾。',
-
+			huaxiong:'董卓旗下名将，自荐抵抗山东地区反对董卓的诸侯联军于汜水关前，他先后斩杀济北相鲍信之弟鲍忠和孙坚部将祖茂、以及袁术部将俞涉和韩馥手下潘凤等人，最后关东联军派出关羽与之一对一决斗而被杀。',
 		},
 		perfectPair:{
 			xiahoudun:['xiahouyuan'],
@@ -109,6 +110,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var event=_status.event;
 								return (get.attitude(event.player,event.source)-2);
 							});
+							next.set('skillwarn','替'+get.translation(player)+'打出一张闪');
 							next.autochoose=lib.filter.autoRespondShan;
 							next.set('source',player);
 						}
@@ -147,31 +149,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target){
 							if(player.hasSkillTag('jueqing',false,target)) return [1,-1];
-							if(get.tag(card,'damage')) return [1,0.5];
-						}
-					}
-				}
-			},
-			xinjianxiong:{
-				audio:'jianxiong',
-				alter:true,
-				trigger:{player:'damageEnd'},
-				filter:function(event,player){
-					return get.itemtype(event.cards)=='cards'&&get.position(event.cards[0])=='d';
-				},
-				content:function(){
-					player.gain(trigger.cards);
-					player.$gain2(trigger.cards);
-					if(get.is.altered('xinjianxiong')){
-						player.draw();
-					}
-				},
-				ai:{
-					maixie:true,
-					maixie_hp:true,
-					effect:{
-						target:function(card,player,target){
-							if(player.hasSkillTag('jueqing',false,target)) return [1,-1];
 							if(get.tag(card,'damage')) return [1,0.55];
 						}
 					}
@@ -182,7 +159,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageEnd'},
 				direct:true,
 				filter:function(event,player){
-					return (event.source&&event.source.countGainableCards(player,'he')&&event.source!=player);
+					return (event.source&&event.source.countGainableCards(player,'he')&&event.num>0&&event.source!=player);
 				},
 				content:function(){
 					player.gainPlayerCard(get.prompt('fankui',trigger.source),trigger.source,get.buttonValue,'he').set('logSkill',['fankui',trigger.source]);
@@ -209,7 +186,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
-					get.translation(trigger.player.judging[0])+'，'+get.prompt('guicai')).set('ai',function(card){
+					get.translation(trigger.player.judging[0])+'，'+get.prompt('guicai'),'h').set('ai',function(card){
 						var trigger=_status.event.getTrigger();
 						var player=_status.event.player;
 						var judging=_status.event.judging;
@@ -256,7 +233,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						rejudge:1,
 					}
 				}
-			},
+			},	
 			ganglie:{
 				audio:2,
 				trigger:{player:'damageEnd'},
@@ -510,7 +487,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinluoshen:{
 				audio:'luoshen',
-				alter:true,
+				// alter:true,
 				trigger:{player:'phaseBegin'},
 				frequent:true,
 				content:function(){
@@ -726,6 +703,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 						next.set('source',player);
 						next.set('jijiang',true);
+						next.set('skillwarn','替'+get.translation(player)+'打出一张杀');
 						next.autochoose=lib.filter.autoRespondSha;
 					}
 					else{
@@ -792,6 +770,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						next.set('source',player);
 						next.set('target',target);
 						next.set('jijiang',true);
+						next.set('skillwarn','替'+get.translation(player)+'打出一张杀');
 						next.autochoose=lib.filter.autoRespondSha;
 					}
 					else{
@@ -887,7 +866,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinguanxing:{
 				audio:'guanxing',
-				alter:true,
+				// alter:true,
 				trigger:{player:['phaseBegin','phaseEnd']},
 				frequent:true,
 				filter:function(event,player,name){
@@ -1458,7 +1437,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'jizhi',
 				trigger:{player:'useCard'},
 				frequent:true,
-				alter:true,
+				// alter:true,
 				filter:function(event){
 					if(!get.is.altered('xinjizhi')&&get.type(event.card)=='delay') return false;
 					return (get.type(event.card,'trick')=='trick'&&event.cards[0]&&event.cards[0]==event.card);
@@ -1524,7 +1503,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			xinqicai:{
-				alter:true,
+				// alter:true,
 				mod:{
 					targetInRange:function(card,player,target,now){
 						var type=get.type(card);
@@ -1541,7 +1520,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinzhiheng:{
 				audio:'zhiheng',
 				enable:'phaseUse',
-				alter:true,
+				// alter:true,
 				usable:1,
 				position:'he',
 				filterCard:true,
@@ -1633,7 +1612,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinjiuyuan:{
 				audio:'jiuyuan',
 				unique:true,
-				alter:true,
+				// alter:true,
 				trigger:{target:'taoBegin'},
 				zhuSkill:true,
 				forced:true,
@@ -2005,7 +1984,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinjieyin:{
 				group:['xinjieyin_old','xinjieyin_new'],
-				alter:true,
+				// alter:true,
 				subSkill:{
 					new:{
 						audio:'jieyin',
@@ -2306,7 +2285,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'biyue',
 				trigger:{player:'phaseEnd'},
 				frequent:true,
-				alter:true,
+				// alter:true,
 				content:function(){
 					var num=1;
 					if(get.is.altered('xinbiyue')&&!player.countCards('h')){
@@ -2314,11 +2293,48 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					player.draw(num);
 				},
-			}
+			},
+			yaowu:{
+				trigger:{player:'damageEnd'},
+				priority:1,
+				audio:2,
+				filter:function(event){
+					if(event.card&&(event.card.name=='sha')){
+						if(get.color(event.card)=='red') return true;
+					}
+					return false;
+				},
+				forced:true,
+				check:function(){
+					return false;
+				},
+				content:function(){
+					trigger.source.chooseDrawRecover(true);
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target,current){
+							if(card.name=='sha'&&(get.color(card)=='red')){
+								return [1,-2];
+							}
+						}
+					}
+				}
+			},
 		},
 		translate:{
 			caocao:'曹操',
+			hujia:'护驾',
+			hujia_info:'主公技，魏势力角色可以替你打出[闪]',
+			jianxiong:'奸雄',
+			jianxiong_info:'你可以立即获得对你造成伤害的牌',
+
 			simayi:'司马懿',
+			fankui:'反馈',
+			fankui_info:'当你受到伤害后，你可以获得伤害来源的一张牌',
+			guicai:'鬼才',
+			guicai_info:'在任意角色的判定牌生效前，你可以打出一张手牌代替之',
+
 			xiahoudun:'夏侯惇',
 			zhangliao:'张辽',
 			xuzhu:'许褚',
@@ -2342,12 +2358,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huatuo:'华佗',
 			lvbu:'吕布',
 			diaochan:'貂蝉',
+			huaxiong:'华雄',
 
-			hujia:'护驾',
-			jianxiong:'奸雄',
-			xinjianxiong:'奸雄',
-			fankui:'反馈',
-			guicai:'鬼才',
+			
 			ganglie:'刚烈',
 			tuxi:'突袭',
 			luoyi:'裸衣',
@@ -2398,12 +2411,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinbiyue:'闭月',
 			pileTop:'牌堆顶',
 			pileBottom:'牌堆底',
-			hujia_info:'主公技，魏势力角色可以替你打出[闪]',
-			jianxiong_info:'你可以立即获得对你造成伤害的牌',
-			xinjianxiong_info:'你可以立即获得对你造成伤害的牌',
-			xinjianxiong_info_alter:'你可以立即获得对你造成伤害的牌，然后摸一张牌',
-			fankui_info:'当你受到伤害时，可以获得伤害来源的一张牌',
-			guicai_info:'在任意角色的判定牌生效前，你可以打出一张手牌代替之',
 			ganglie_info:'每当你受到一次伤害，可进行一次判定，若结果不为红桃，则伤害来源须弃置两张手牌或受到来自你的一点伤害',
 			tuxi_info:'摸牌阶段，你可以改为从1~2名其他角色各抽取一张手牌',
 			luoyi_info:'摸牌阶段，你可以少摸一张牌，若如此做，你本回合内[杀]或[决斗]造成的伤害+1',
@@ -2464,6 +2471,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			biyue_info:'结束阶段，你可以摸一张牌',
 			xinbiyue_info:'结束阶段，你可以摸一张牌',
 			xinbiyue_info_alter:'结束阶段，你可以摸一张牌，如果你没有手牌，改为摸2张牌',
+			yaowu:'耀武',
+			yaowu_info:'锁定技，当任意一名角色使用红色【杀】对你造成伤害时，该角色回复1点体力或摸一张牌。',
 		},
 	};
 });

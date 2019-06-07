@@ -34,6 +34,66 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			oldanxu:{
+				enable:'phaseUse',
+				usable:1,
+				multitarget:true,
+				audio:2,
+				filterTarget:function(card,player,target){
+					if(player==target) return false;
+					var num=target.countCards('h');
+					if(ui.selected.targets.length){
+						return num<ui.selected.targets[0].countCards('h');
+					}
+					var players=game.filterPlayer();
+					for(var i=0;i<players.length;i++){
+						if(num>players[i].countCards('h')) return true;
+					}
+					return false;
+				},
+				selectTarget:2,
+				content:function(){
+					'step 0'
+					var gainner,giver;
+					if(targets[0].countCards('h')<targets[1].countCards('h')){
+						gainner=targets[0];
+						giver=targets[1];
+					}
+					else{
+						gainner=targets[1];
+						giver=targets[0];
+					}
+					gainner.gainPlayerCard(giver,'h',true).set('visible',true);
+					'step 1'
+					if(result.bool&&result.links.length&&get.suit(result.links[0])!='spade'){
+						player.draw();
+					}
+				},
+				ai:{
+					order:10.5,
+					threaten:2,
+					result:{
+						target:function(player,target){
+							var num=target.countCards('h');
+							var att=get.attitude(player,target);
+							if(ui.selected.targets.length==0){
+								if(att>0) return -1;
+								var players=game.filterPlayer();
+								for(var i=0;i<players.length;i++){
+									var num2=players[i].countCards('h');
+									var att2=get.attitude(player,players[i]);
+									if(att2>=0&&num2<num) return -1;
+								}
+								return 0;
+							}
+							else{
+								return 1;
+							}
+						},
+						player:0.1
+					}
+				}
+			},
 			oldfaen:{
 				audio:'faen',
 				trigger:{global:['turnOverAfter','linkAfter']},
@@ -397,6 +457,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_zhuhuan:'旧朱桓',
 			old_zhuzhi:'旧朱治',
 
+			oldanxu:'安恤',
+			oldanxu_info:'出牌阶段限一次，你可以选择手牌数不相等的两名其他角色，令其中手牌少的角色获得手牌多的角色的一张手牌并展示之，然后若此牌不为黑桃，你摸一张牌。',
 			oldfaen:'法恩',
 			oldfaen_info:'当一名角色翻面或横置后，你可以令其摸一张牌。',
 			zhenshan:'振赡',

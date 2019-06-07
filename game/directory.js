@@ -6,6 +6,19 @@ require(__dirname+'/update.js');
 require(__dirname+'/asset.js');
 
 var updates=window.noname_update;
+var newversion=false;
+var commit=false
+if(process.argv[2]){
+	if(/[0-9]/.test(process.argv[2][0])){
+		newversion=true;
+		updates.update = updates.version;
+		updates.version = '1.9.' + process.argv[2];
+		commit=updates.version;
+	}
+	else{
+		commit=process.argv[2];
+	}
+}
 var assetlist='';
 var skinlist='window.noname_skin_list={\n';
 var entrylist=[];
@@ -89,48 +102,75 @@ get(path.dirname(__dirname),function(){
 	else{
 		diff=true;
 	}
+	var next=function(){
+		exec('git diff --name-only', (error, stdout, stderr) => {
+			var updatelist='window.noname_update={\n\tversion:\''+updates.version+'\',';
+			updatelist+='\n\tupdate:\''+(updates.update||'')+'\',';
+			var apply=function(name,list){
+				updatelist+='\n\t'+name+':[\n';
+				for(var i=0;i<list.length;i++){
+					updatelist+='\t\t\''+list[i]+'\'';
+					if(i<list.length-1){
+						updatelist+=',';
+					}
+					updatelist+='\n';
+				}
+				updatelist+='\t]';
+			};
+			if(updates.changeLog){
+				apply('changeLog',updates.changeLog);
+				updatelist+=',';
+			}
+			if(updates.players){
+				apply('players',updates.players);
+				updatelist+=',';
+			}
+			if(updates.cards){
+				apply('cards',updates.cards);
+				updatelist+=',';
+			}
+			var changes = stdout.split('\n');
+			for(var i=0;i<changes.length;i++){
+				var extname=path.extname(changes[i]);
+				if(!changes[i]||(extname!='.js'&&extname!='.css')||changes[i]=='game/update.js'){
+					changes.splice(i--,1);
+				}
+			}
+			var files;
+			if(newversion){
+				files = [];
+			}
+			else{
+				files = updates.files || [];
+			}
+			for(var i=0;i<changes.length;i++){
+				if(files.indexOf(changes[i])===-1){
+					files.push(changes[i])
+				}
+			}
+			files.sort(function(a,b){
+				if (a>b) return 1;
+				if (a<b) return -1;
+				return 0;
+			})
+			apply('files',files);
+			fs.writeFile('game/update.js',updatelist+'\n};','utf-8',function(){
+				console.log('updated update.js');
+				if(commit && typeof commit==='string'){
+					exec('git add . && git commit -am '+commit);
+					console.log('committed '+commit);
+				}
+			});
+		});
+	}
 	if(diff){
 		var assetversion='window.noname_asset_list=[\n\t\''+updates.version+'\'';
 		fs.writeFile('game/asset.js',assetversion+assetlist+'\n];\n'+skinlist.slice(0,skinlist.length-2)+'\n};','utf-8',function(){
 			console.log('udpated asset.js');
+			next();
 		});
 	}
-	exec('git diff --name-only', (error, stdout, stderr) => {
-		var updatelist='window.noname_update={\n\tversion:\''+updates.version+'\',';
-		updatelist+='\n\tupdate:\''+(updates.update||'')+'\',';
-		var apply=function(name,list){
-			updatelist+='\n\t'+name+':[\n';
-			for(var i=0;i<list.length;i++){
-				updatelist+='\t\t\''+list[i]+'\'';
-				if(i<list.length-1){
-					updatelist+=',';
-				}
-				updatelist+='\n';
-			}
-			updatelist+='\t]';
-		};
-		if(updates.changeLog){
-			apply('changeLog',updates.changeLog);
-			updatelist+=',';
-		}
-		if(updates.players){
-			apply('players',updates.players);
-			updatelist+=',';
-		}
-		if(updates.cards){
-			apply('cards',updates.cards);
-			updatelist+=',';
-		}
-		var changes = stdout.split('\n');
-		for(var i=0;i<changes.length;i++){
-			var extname=path.extname(changes[i]);
-			if(!changes[i]||(extname!='.js'&&extname!='.css')||changes[i]=='game/update.js'){
-				changes.splice(i--,1);
-			}
-		}
-		apply('files',changes);
-		fs.writeFile('game/update.js',updatelist+'\n};','utf-8',function(){
-			console.log('updated update.js');
-		});
-	});
+	else{
+		next();
+	}
 });

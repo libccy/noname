@@ -4,7 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'extra',
 		character:{
 			shen_guanyu:['male','shen',5,['wuhun','wushen'],['shu']],
-			shen_zhaoyun:['male','shen',2,['juejing','longhun'],['shu']],
+			shen_zhaoyun:['male','shen',2,['xinjuejing','xinlonghun'],['shu']],
 			shen_zhugeliang:['male','shen',3,['qixing','kuangfeng','dawu'],['shu']],
 			shen_lvmeng:['male','shen',3,['shelie','gongxin'],['wu']],
 			shen_zhouyu:['male','shen',4,['yeyan','qinyin'],['wu']],
@@ -252,6 +252,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				mark:true,
 				marktext:'暴',
+				unique:true,
 				init:function(player){
 					player.storage.baonu=2;
 					player.markSkill('baonu');
@@ -625,7 +626,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{
                 player:"damageEnd",
                               },
-                              alter:true,
+                            //   alter:true,
                        filter:function (event,player){
                        if(event.source==undefined) return false                           
                        if(!get.is.altered('wuhun')) return false    
@@ -776,7 +777,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}, 
 			guixin:{
 				audio:2,
-				alter:true,
+				// alter:true,
 				trigger:{player:'damageEnd'},
 				check:function(event,player){
 					if(player.isTurnedOver()||event.num>1) return true;
@@ -1299,6 +1300,155 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.num=2+player.maxHp-player.hp;
 				}
 			},
+			xinlonghun:{
+				group:['xinlonghun1','xinlonghun2','xinlonghun3','xinlonghun4','xinlonghun_num','xinlonghun_discard'],
+				ai:{
+					skillTagFilter:function(player,tag){
+						switch(tag){
+							case 'respondSha':{
+								if(player.countCards('he',{suit:'diamond'})==0) return false;
+								break;
+							}
+							case 'respondShan':{
+								if(player.countCards('he',{suit:'club'})==0) return false;
+								break;
+							}
+							case 'save':{
+								if(player.countCards('he',{suit:'heart'})==0) return false;
+								break;
+							}
+						}
+					},
+					save:true,
+					respondSha:true,
+					respondShan:true,
+					threaten:1.8
+				},
+				subSkill:{
+					num:{
+						trigger:{source:['damageBegin','recoverBegin']},
+						forced:true,
+						popup:false,
+						filter:function(event){
+							var evt=event.getParent();
+							return (evt.skill=='xinlonghun1'||evt.skill=='xinlonghun2')&&evt.cards&&evt.cards.length==2;
+						},
+						content:function(){
+							trigger.num++;
+						}
+					},
+					discard:{
+						trigger:{player:['useCardAfter','respondAfter']},
+						forced:true,
+						logTarget:function(){
+							return _status.currentPhase;
+						},
+						autodelay:function(event){
+							return event.name=='respond'?0.5:false;
+						},
+						filter:function(evt){
+							return (evt.skill=='xinlonghun3'||evt.skill=='xinlonghun4')&&
+								evt.cards&&evt.cards.length==2&&_status.currentPhase.countDiscardableCards('he');
+						},
+						content:function(){
+							player.discardPlayerCard(_status.currentPhase,'he',true);
+						}
+					}
+				}
+			},
+			xinlonghun1:{
+				audio:true,
+				enable:['chooseToUse','chooseToRespond'],
+				prompt:function(){
+					return '将至多两张红桃牌当作桃使用';
+				},
+				position:'he',
+				check:function(card,event){
+					if(ui.selected.cards.length) return 0;
+					return 10-get.value(card);
+				},
+				selectCard:[1,2],
+				viewAs:{name:'tao'},
+				filter:function(event,player){
+					return player.countCards('he',{suit:'heart'})>0;
+				},
+				filterCard:function(card){
+					return get.suit(card)=='heart';
+				}
+			},
+			xinlonghun2:{
+				audio:true,
+				enable:['chooseToUse','chooseToRespond'],
+				prompt:function(){
+					return '将至多两张方片牌当作火杀使用或打出';
+				},
+				position:'he',
+				check:function(card,event){
+					if(ui.selected.cards.length) return 0;
+					return 10-get.value(card);
+				},
+				selectCard:[1,2],
+				viewAs:{name:'sha',nature:'fire'},
+				filter:function(event,player){
+					return player.countCards('he',{suit:'diamond'})>0;
+				},
+				filterCard:function(card){
+					return get.suit(card)=='diamond';
+				}
+			},
+			xinlonghun3:{
+				audio:true,
+				enable:['chooseToUse','chooseToRespond'],
+				prompt:function(){
+					return '将至多两张黑桃牌当作无懈可击使用';
+				},
+				position:'he',
+				check:function(card,event){
+					if(ui.selected.cards.length) return 0;
+					return 7-get.value(card);
+				},
+				selectCard:[1,2],
+				viewAs:{name:'wuxie'},
+				viewAsFilter:function(player){
+					return player.countCards('he',{suit:'spade'})>0;
+				},
+				filterCard:function(card){
+					return get.suit(card)=='spade';
+				}
+			},
+			xinlonghun4:{
+				audio:true,
+				enable:['chooseToUse','chooseToRespond'],
+				prompt:function(){
+					return '将至多两张梅花牌当作闪打出';
+				},
+				position:'he',
+				check:function(card,event){
+					if(ui.selected.cards.length) return 0;
+					return 10-get.value(card);
+				},
+				selectCard:[1,2],
+				viewAs:{name:'shan'},
+				filter:function(event,player){
+					return player.countCards('he',{suit:'club'})>0;
+				},
+				filterCard:function(card){
+					return get.suit(card)=='club';
+				}
+			},
+			xinjuejing:{
+				mod:{
+					maxHandcard:function(player,num){
+						return 2+num;
+					}
+				},
+				audio:true,
+				trigger:{player:['dyingBegin','dyingAfter']},
+				forced:true,
+				content:function(){
+					player.draw();
+				}
+			},
 			shelie:{
 				audio:2,
 				trigger:{player:'phaseDrawBefore'},
@@ -1434,6 +1584,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_zhugeliang:'神诸葛亮',
 			shen_zhouyu:'神周瑜',
 			shen_lvbu:'神吕布',
+			xinjuejing:'绝境',
+			xinjuejing_info:'锁定技，你的手牌上限+2；当你进入或脱离濒死状态时，你摸一张牌',
+			xinlonghun:'龙魂',
+			xinlonghun1:'龙魂♥︎',
+			xinlonghun2:'龙魂♦︎',
+			xinlonghun3:'龙魂♠︎',
+			xinlonghun4:'龙魂♣︎',
+			xinlonghun_info:'你可以将同花色的X张牌按下列规则使用或打出：红桃当【桃】，方块当具火焰伤害的【杀】，梅花当【闪】，黑桃当【无懈可击】。若你以此法使用了两张红色牌，则此牌回复值或伤害值+1。若你以此法使用了两乡长黑色牌，则你弃置当前回合角色一张牌',
 			longhun:'龙魂',
 			longhun1:'龙魂♥︎',
 			longhun2:'龙魂♦︎',

@@ -58,9 +58,9 @@
 	left:6px;
     right: auto;
 }
-.player .equips{
+/* .player .equips{ */
     /*z-index: 4;*/
-}
+/* } */
 
 #arena:not(.chess).mobile .player[data-position='0']:not(.minskin)>.identity{
     left: 102px;
@@ -293,6 +293,12 @@
 /*#arena>.skillbar>.skillbartext:hover{
     opacity: 1;
 }*/
+@keyframes skillbarglow{
+	0%{box-shadow: rgba(0, 0, 0, 0.1) 0 0 0 1px, rgba(255, 0, 0, 0.4) 0 0 5px}
+	50%{box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px,rgba(255, 0, 0, 0.4) 0 0 5px,
+        rgba(255, 0, 0, 0.4) 0 0 12px, rgba(255, 0, 0, 1) 0 0 30px, rgba(255, 0, 0, 0.2) 0 0 30px}
+	100%{box-shadow: rgba(0, 0, 0, 0.1) 0 0 0 1px, rgba(255, 0, 0, 0.4) 0 0 5px}
+}
 @-webkit-keyframes skillbarglow{
 	0%{box-shadow: rgba(0, 0, 0, 0.1) 0 0 0 1px, rgba(255, 0, 0, 0.4) 0 0 5px}
 	50%{box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px,rgba(255, 0, 0, 0.4) 0 0 5px,

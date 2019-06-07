@@ -19,7 +19,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wuguotai:['female','wu',3,['ganlu','buyi']],
 			lingtong:['male','wu',4,['xuanfeng']],
 			liubiao:['male','qun',3,['zongshi','zishou']],
-			huaxiong:['male','qun',6,['yaowu']],
 			wangyi:['female','wei',3,['zhenlie','miji']],
 			yufan:['male','wu',3,['zhiyan','zongxuan']],
 			chengong:['male','qun',3,['mingce','zhichi']],
@@ -86,7 +85,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xuezong:['male','wu',3,['funan','jiexun']],
 		},
 		characterIntro:{
-			huaxiong:'董卓旗下名将，自荐抵抗山东地区反对董卓的诸侯联军于汜水关前，他先后斩杀济北相鲍信之弟鲍忠和孙坚部将祖茂、以及袁术部将俞涉和韩馥手下潘凤等人，最后关东联军派出关羽与之一对一决斗而被杀。',
 			caozhi:'字子建，沛国谯人，三国曹魏著名文学家，建安文学代表人物。魏武帝曹操之子，魏文帝曹丕之弟，生前曾为陈王，去世后谥号“思”，因此又称陈思王。南朝宋文学家谢灵运更有“天下才有一石，曹子建独占八斗”的评价。王士祯尝论汉魏以来二千年间诗家堪称“仙才”者，曹植、李白、苏轼三人耳。',
 			gaoshun:'中国东汉末年将领，吕布帐下中郎将。史载高顺为人清白有威严，不好饮酒，所统率的部队精锐非常，号称“陷阵营”。屡进忠言于吕布，吕布虽知其忠而不能用。曹操击破吕布后，高顺被曹操所杀。',
 			chengong:'字公台，东汉末年吕布帐下谋士，东郡东武阳人。性情刚直，足智多谋，年少时与海内知名之士相互结交。192年，陈宫等人主张曹操接任兖州牧。但此后陈宫因曹操杀害边让而与曹操反目，并游说张邈等人背叛曹操迎吕布入兖州，辅助吕布攻打曹操。吕布战败后，随吕布等一同被曹操所擒，决意赴死。',
@@ -404,7 +402,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:8,
 					threaten:1.8,
 					result:{
-						player:1
+						player:function(player,target){
+							if(target.isEnemiesOf(player)&&!target.countCards('he')) return 0;
+							return 1;
+						}
 					}
 				}
 			},
@@ -6361,7 +6362,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiantu:{
 				unique:true,
 				audio:2,
-				gainnable:true,
+				gainable:true,
 				forceunique:true,
 				trigger:{global:'phaseUseBegin'},
 				filter:function(event,player){
@@ -7917,33 +7918,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			yaowu:{
-				trigger:{player:'damageEnd'},
-				priority:1,
-				audio:2,
-				filter:function(event){
-					if(event.card&&(event.card.name=='sha')){
-						if(get.color(event.card)=='red') return true;
-					}
-					return false;
-				},
-				forced:true,
-				check:function(){
-					return false;
-				},
-				content:function(){
-					trigger.source.chooseDrawRecover(true);
-				},
-				ai:{
-					effect:{
-						target:function(card,player,target,current){
-							if(card.name=='sha'&&(get.color(card)=='red')){
-								return [1,-2];
-							}
-						}
-					}
-				}
-			},
 			olddanshou:{
 				trigger:{source:'damageEnd'},
 				priority:9,
@@ -9320,7 +9294,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xunyou:'荀攸',
 			caozhang:'曹彰',
 			liubiao:'刘表',
-			huaxiong:'华雄',
 			zhuran:'朱然',
 			yujin:'旧于禁',
 			masu:'旧马谡',
@@ -9704,7 +9677,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			paiyi:'排异',
 			sanyao:'散谣',
 			zhiman:'制蛮',
-			yaowu:'耀武',
 			qianxi:'潜袭',
 			qianxi2:'潜袭',
 			qianxi2_bg:'袭',
@@ -9721,7 +9693,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jiefan_info:'限定技，出牌阶段，你可以选择一名角色，令攻击范围内含有该角色的所有角色各选择一项：1.弃置一张武器牌；2.令其摸一张牌。',
 			fuli_info:'限定技，当你处于濒死状态时，可以将体力回复至体力上限，然后翻面',
 			qianxi_info:'准备阶段，你可以摸一张牌，并弃置一张牌，然后令一名距离为1的角色不能使用或打出与你弃置的牌颜色相同的手牌，直到回合结束。',
-			yaowu_info:'锁定技，当任意一名角色使用红色【杀】对你造成伤害时，该角色回复1点体力或摸一张牌。',
 			zhiman_info:'当你对一名其他角色造成伤害时，你可以防止此伤害，然后获得其装备区或判定区的一张牌。',
 			sanyao_info:'出牌阶段限一次，你可以弃置一张牌并指定一名体力最多(或之一)的角色，你对其造成1点伤害。',
 			paiyi_info:'出牌阶段限一次，你可以移去一张“权”并选择一名角色，令其摸两张牌，然后若其手牌多于你，你对其造成1伤害。',

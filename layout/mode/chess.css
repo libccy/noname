@@ -23,6 +23,7 @@
     top: 0;
     left: 0;
     background-size: cover;
+    clip-path: polygon(-10px 0, 130px 0, 130px 130px, -10px 130px);
     -webkit-clip-path: polygon(-10px 0, 130px 0, 130px 130px, -10px 130px);
 }
 #window:not(.nopointer) .dialog.fullheight .buttons .button.character:not(.squarebutton):not(.selectable){
@@ -37,14 +38,17 @@
     height :calc(100% - 121px);
     left:0;
     top:0;
-    overflow:scroll;
+    overflow:hidden;
     text-align:center;
     position: absolute;
 }
 #chess{
     margin-top:36px;
     margin-bottom:36px;
-    position:relative;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transition: all 0s;
 }
 #arena .card.thrown{
     z-index:4;
@@ -103,10 +107,13 @@
 #control{
     top:calc(100% - 155px);
 }
+#arena.ipad #control{
+    top:calc(100% - 165px);
+}
 .fakeme{
     width:120px;
     height:120px;
-    border-radius:0px;
+    border-radius:0px !important;
     top:0;
 }
 #window[data-radius_size='increase'] .fakeme,
@@ -121,6 +128,7 @@
     left:calc(100% - 120px);
     text-align:center;
     transition: all 0s;
+    clip-path: polygon(-10px 0, 130px 0, 130px 130px, -10px 130px);
     -webkit-clip-path: polygon(-10px 0, 130px 0, 130px 130px, -10px 130px);
 }
 .fakeme.player.zoomed{
@@ -250,9 +258,9 @@
 #arena.leadercontrol>#control{
     transition: all 0.5s !important;
 }
-.player.treasure{
+/* .player.treasure{ */
     /*box-shadow: none;*/
-}
+/* } */
 .player.treasure .count,
 .player.treasure .identity{
     display: none;
@@ -308,4 +316,30 @@ br.finish_game{
     top: 5px;
     width: calc(100% - 10px);
     height: calc(100% - 10px);
+}
+
+#arena.chess #chess>.player{
+    left: 14px;
+    top: 14px;
+}
+
+
+#window.rightbar #system,
+#window.leftbar #system{
+    width: calc(100% - 62px);
+}
+#window.leftbar #system{
+    left: 50px;
+}
+
+#historybar {
+    border-radius: 0;
+    top: 0;
+    height: calc(100% - 121px);
+}
+#window.rightbar #historybar{
+    left: calc(100% - 50px);
+}
+#window.leftbar #historybar{
+    left: 0;
 }

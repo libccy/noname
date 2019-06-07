@@ -587,6 +587,7 @@
 	top: 20%;
 	border-radius: 100%;
 	box-shadow: rgba(0,0,0,0.2) 1px -1px 2px inset, rgba(255,255,255,0.15) -1px 1px 5px inset;
+    filter: brightness(1.5);
     -webkit-filter: brightness(1.5);
 }
 .popup-container>.menu.visual>.hpbutton>div:nth-child(1)>div{
@@ -704,6 +705,7 @@
 	border-radius: 0px;
 }
 .themebutton>.fakeplayer.me{
+	clip-path: polygon(-10px 0, 32px 0, 32px 32px, -10px 32px);
 	-webkit-clip-path: polygon(-10px 0, 32px 0, 32px 32px, -10px 32px);
 }
 .themebutton>div>div>div{
@@ -1405,6 +1407,9 @@ input.fileinput::-webkit-file-upload-button {
 	bottom: 0;
 	width: 100%;
 }
+.favmode{
+	float: right;
+}
 #create-extension{
 	height: calc(100% - 5px);
 	width: calc(100% - 10px);
@@ -1568,9 +1573,9 @@ input.fileinput::-webkit-file-upload-button {
 	position: relative;
 	width: 230px;
 }
-.popup-container>.prompt-container>div>div>div:first-child{
+/* .popup-container>.prompt-container>div>div>div:first-child{ */
 	/*text-align: left;*/
-}
+/* } */
 .popup-container>.prompt-container>div>div>div:last-child{
 	margin-bottom: 15px;
 }

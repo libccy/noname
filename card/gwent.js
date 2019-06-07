@@ -199,7 +199,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var enemies=player.getEnemies();
 							var players=game.filterPlayer();
 							var func=function(current){
-								return current.hp;
+								if(current) return current.hp;
+								return 0;
 							};
 							var max1=get.max(enemies,func);
 							for(var i=0;i<players.length;i++){
@@ -287,9 +288,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				vanish:true,
 				enable:function(card,player){
 					var enemies=player.getEnemies();
-					return game.hasPlayer(function(current){
-						return enemies.contains(current)&&get.distance(player,current,'pure')==1;
-					});
+					return enemies.length>0;
 				},
 				notarget:true,
 				contentBefore:function(){
@@ -299,10 +298,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var enemies=player.getEnemies();
-					var list=game.filterPlayer(function(current){
-						return enemies.contains(current)&&get.distance(player,current,'pure')==1;
-					});
-					event.list=list.sortBySeat();
+					event.list=[enemies.randomGet()];
 					'step 1'
 					if(event.list.length){
 						var target=event.list.shift();
@@ -879,7 +875,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					'step 3'
-					player.addTempSkill('qianxing',{player:'phaseBegin'});
+					player.tempHide();
 				},
 				contentAfter:function(){
 					var evt=_status.event.getParent('phaseUse');
@@ -1544,7 +1540,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					},
-					order:8,
+					order:2,
 				}
 			},
 			gw_zumoshoukao:{
@@ -1557,9 +1553,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					target.addTempSkill('fengyin',{player:'phaseAfter'});
-					if(target.hujia){
-						target.changeHujia(-1);
-					}
+					// if(target.hujia){
+					// 	target.changeHujia(-1);
+					// }
 				},
 				ai:{
 					value:[4.5,1],
@@ -1567,10 +1563,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							var threaten=get.threaten(target,player,true);
-							if(target.hujia){
-								threaten*=(target.hujia+1);
-							}
-							else if(target.hasSkill('fengyin')){
+							if(target.hasSkill('fengyin')){
 								return 0;
 							}
 							if(target.hasSkillTag('maixie_hp')){
@@ -2260,7 +2253,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_leizhoushu_info:'获得技能雷咒术（在每个准备阶段令全场牌数最多的所有其他角色各随机弃置一张牌，若目标不包含敌方角色，将一名随机敌方角色追加为额外目标，结算X次，X为本局获得此技能的次数），然后结束出牌阶段',
 			gw_aerdeyin:'阿尔德印',
 			gw_aerdeyin_bg:'印',
-			gw_aerdeyin_info:'对相邻的敌方角色造成一点伤害，若目标武将牌正面朝上，则将其翻面；新的一轮开始时，若目标武将牌正面朝上，则在当前回合结束后进行一个额外回合，否则将武将牌翻回正面',
+			gw_aerdeyin_info:'对一名随机敌方角色造成一点伤害，若目标武将牌正面朝上，则将其翻面；新的一轮开始时，若目标武将牌正面朝上，则在当前回合结束后进行一个额外回合，否则将武将牌翻回正面',
 			gw_xinsheng:'新生',
 			gw_xinsheng_info:'选择一名角色，随机观看12张武将牌，选择一张替代其武将牌，并令其增加一点体力，然后结束出牌阶段',
 			gw_zhongmozhizhan:'终末之战',
@@ -2282,7 +2275,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gw_poxiao:'破晓',
 			gw_poxiao_info:'选择一项：解除任意名角色的天气效果并移除其判定区内的牌，或随机获得一张铜卡法术（破晓除外）并展示之',
 			gw_zumoshoukao:'阻魔手铐',
-			gw_zumoshoukao_info:'令一名角色失去一点护甲且非锁定技失效直到下一回合结束',
+			gw_zumoshoukao_info:'令一名角色非锁定技失效直到下一回合结束',
 			gw_aozuzhilei:'奥祖之雷',
 			gw_aozuzhilei_info:'对一名体力值不小于你的角色造成一点雷属性伤害，然后该角色摸一张牌',
 			gw_zhuoshao:'灼烧',

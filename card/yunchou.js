@@ -621,6 +621,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
+					if(!target.countCards('h')){
+						event.finish();
+						return;
+					}
 					var hs=player.getCards('h');
 					if(hs.length){
 						var minval=get.value(hs[0]);
@@ -916,7 +920,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			huoshan:'火山',
 			huoshan_info:'出牌阶段，对自己使用。若判定结果为红桃2~9，则目标角色受到2点火焰伤害，距离目标1以内的其他角色受到1点火焰伤害。若判定不为红桃2~9，将之移动到下家的判定区里。',
 			hongshui:'洪水',
-			hongshui_info:'出牌阶段，对自己使用。若判定结果为梅花2~9，该角色随机弃置3张牌，距离该角色为X的角色随机弃置3-X张牌，若没有牌则失去一点体力，X至少为1',
+			hongshui_info:'出牌阶段，对自己使用。若判定结果为梅花2~9，该角色随机弃置3张牌，距离该角色为X的角色随机弃置3-X张牌，若没有牌则失去一点体力',
 		},
 		list:[
 			['heart',6,'huoshan','fire'],

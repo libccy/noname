@@ -19,7 +19,12 @@ body {
 	height: 100%;
 	padding: 0;
 	margin: 0;
+	left: 0;
+	top: 0;
+	position: absolute;
+	overflow: hidden;
 	text-rendering: optimizeLegibility;
+	transform-origin: top left;
 	font-family: 'STHeiti','SimHei','Microsoft JhengHei','Microsoft YaHei','WenQuanYi Micro Hei',Helvetica,Arial,sans-serif
 }
 
@@ -95,15 +100,15 @@ table {
 	font-size: 40px;
 }
 .statusbar #window {
-	top: 20px;
-	height: calc(100% - 20px);
+	top: 24px;
+	height: calc(100% - 24px);
 }
 #statusbg{
 	position:absolute;
 	left: 0;
 	top: 0;
 	width: 100%;
-	height: 20px;
+	height: 24px;
 	background: rgba(0,0,0,0.4);
 	display: none;
 }
@@ -141,6 +146,9 @@ table {
 }
 #window.shortcutpaused>#arena>div:not(#timer):not(.removing):not(.hidden):not(#autonode) {
 	opacity: 0.3 !important;
+}
+#window.shortcutpaused>#system {
+	z-index: 31;
 }
 #window.systempaused>#system {
 	opacity: 0.3 !important;
@@ -258,6 +266,66 @@ table {
 #shortcut>div[data-position="5"] {
 	left: calc(50% - 50px);
 	top: calc(50% - 50px);
+}
+#shortcut>.favmodelist:not(.menubutton){
+	width: 130px;
+	height: 300px;
+	top: calc(50% - 150px);
+	left: calc(50% - 430px);
+	overflow: visible;
+}
+#shortcut>.favmodelist>.menubutton.large{
+	display: block;
+	position: absolute;
+	left: 0;
+	letter-spacing: 0;
+}
+#shortcut>.favmodelist>[data-type="even"]{
+	top: calc(50% - 45px);
+}
+#shortcut>.favmodelist>[data-type="odd"]{
+	top: calc(50% - 20px);
+}
+#shortcut>.favmodelist>[data-position="0"]{
+	transition-duration: 0.5s;
+}
+#shortcut.hidden>.favmodelist>[data-position="0"]{
+	transform: translateX(-140px);
+}
+#shortcut>.favmodelist>[data-position="1"]{
+	transition-duration: 0.6s;
+	transform: translateY(50px);
+}
+#shortcut.hidden>.favmodelist>[data-position="1"]{
+	transform: translateY(50px) translateX(-150px);
+}
+#shortcut>.favmodelist>[data-position="2"]{
+	transition-duration: 0.4s;
+	transform: translateY(-50px);
+}
+#shortcut.hidden>.favmodelist>[data-position="2"]{
+	transform: translateY(-50px) translateX(-130px);
+}
+#shortcut>.favmodelist>[data-position="3"]{
+	transition-duration: 0.7s;
+	transform: translateY(100px);
+}
+#shortcut.hidden>.favmodelist>[data-position="3"]{
+	transform: translateY(100px) translateX(-160px);
+}
+#shortcut>.favmodelist>[data-position="4"]{
+	transition-duration: 0.3s;
+	transform: translateY(-100px);
+}
+#shortcut.hidden>.favmodelist>[data-position="4"]{
+	transform: translateY(-100px) translateX(-120px);
+}
+#shortcut>.favmodelist>[data-position="5"]{
+	transition-duration: 0.8s;
+	transform: translateY(150px);
+}
+#shortcut.hidden>.favmodelist>[data-position="5"]{
+	transform: translateY(150px) translateX(-170px);
 }
 #shortcut.hidden {
 	pointer-events: none;
@@ -407,6 +475,7 @@ table {
 	line-height: 18px;
 }
 #window:not(.low_performance) #arena #arenalog>div {
+	animation: game_start 0.5s;
 	-webkit-animation: game_start 0.5s;
 }
 /*#arena[data-font_size='14']{
@@ -928,7 +997,8 @@ table {
 	width: calc(100% - 12px);
 	white-space: nowrap;
 	z-index: 3;
-	pointer-events: none
+	pointer-events: none;
+	transition-property: opacity;
 }
 #system>div {
 	height: 100%;
@@ -1080,6 +1150,10 @@ body>.background {
 body>.background.upper {
 	z-index: -4
 }
+body>.background.land {
+	transition: all 2s;
+	background-size:cover;
+}
 
 .popup {
 	padding: 5px;
@@ -1107,8 +1181,8 @@ body>.background.upper {
 
 .out {
 	opacity: 0.3 !important;
-	filter: blur(3px);
-	-webkit-filter: blur(3px)
+	/* filter: blur(3px); */
+	/* -webkit-filter: blur(3px) */
 }
 .blurbg {
 	filter: blur(3px) !important;
@@ -1124,9 +1198,11 @@ body>.background.upper {
 	-webkit-filter: blur(6px) !important;
 }
 .invert-color {
+	filter: invert(1);
 	-webkit-filter: invert(1);
 }
 .zoominanim {
+	animation: zoomin 0.5s;
 	-webkit-animation: zoomin 0.5s;
 }
 .zoomin {
@@ -1232,6 +1308,9 @@ body>.background.upper {
 	left: 6px;
 	text-align: center;
 }
+.card.fullimage>.name.long {
+	top: 6px;
+}
 .card>.name2 {
 	display: none;
 }
@@ -1268,6 +1347,12 @@ body>.background.upper {
 }
 .card>.cardframebg[data-auto='bronze']{
 	background-image:url('../../theme/style/card/image/border_bronze.jpg');
+}
+.card>.cardframebg[data-auto='wood']{
+	background-image:url('../../theme/style/card/image/border_wood.jpg');
+}
+.card>.cardframebg[data-auto='map']{
+	background-image:url('../../theme/style/card/image/border_map.jpg');
 }
 .card>.cardavatar{
 	width: calc(100% - 6px);
@@ -1425,6 +1510,9 @@ div:not(.handcards)>.card>.info>span,
 .card.fullborder>div:not(.background){
 	color: white;
 	text-shadow: black 0px 0px 2px;
+}
+.card.fullimage>.name{
+	line-height: 18px;
 }
 
 .equips>.card>.background {
@@ -1589,7 +1677,7 @@ div:not(.handcards)>.card>.info>span,
 	bottom: auto !important;
 	min-height: 0px !important;
 }
-.dialog.forcebutton{
+.dialog.forcebutton,.dialog.forcebutton-auto{
 	width: 400px;
 	left: calc(50% - 200px);
 }
@@ -1944,6 +2032,7 @@ div:not(.handcards)>.card>.info>span,
 }
 .player>.avatar.disabled,
 .player>.avatar2.disabled{
+	filter: grayscale(1);
 	-webkit-filter: grayscale(1);
 	opacity: 0.8;
 }
@@ -2141,6 +2230,7 @@ div:not(.handcards)>.card>.info>span,
 	top: 0;
 }
 #window>.damage.fullscreenavatar>div:first-child{
+	mask-image: linear-gradient(transparent, black, black, transparent);
 	-webkit-mask-image: linear-gradient(transparent, black, black, transparent);
 }
 #window>.damage.fullscreenavatar>div:first-child>div{
@@ -3419,9 +3509,9 @@ div:hover>.intro {
 .dialog.scroll2{box-shadow:0 10px 10px -9px rgba(0,0,0,0.1),0 10px 0 -9px rgba(0,0,0,0.05)}
 .dialog.scroll1.scroll2{box-shadow:0 -10px 10px -9px rgba(0,0,0,0.1),0 -10px 0 -9px rgba(0,0,0,0.05),
 	0 10px 10px -9px rgba(0,0,0,0.1),0 10px 0 -9px rgba(0,0,0,0.05);}*/
-.selected,.target {
+/* .selected,.target { */
 /*transform: scale(1.05);*/
-}
+/* } */
 /*.player.target{-webkit-filter:brightness(1.2)}*/
 
 .target {
@@ -4011,11 +4101,11 @@ div[data-decoration="bronze"]::after{
 	box-shadow: none;
 	background-color: red;
 }
-#arena>.skillbar.full {
+/* #arena>.skillbar.full { */
     /*transform: scale(1.1);*/
     /*box-shadow: rgba(0, 0, 0, 0.1) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
     -webkit-animation:skillbarglow 3s infinite;*/
-}
+/* } */
 #arena>.skillbar>.skillbartext {
 	font-family: 'xinwei';
 	font-size: 35px;
@@ -4107,9 +4197,9 @@ div[data-decoration="bronze"]::after{
 #chess>.player .wunature {
 	display: block;
 }
-div:hover>.wunature {
+/* div:hover>.wunature { */
 	/*opacity: 0.5;*/
-}
+/* } */
 .button.noclick .wunature,
 .player.treasure .wunature {
 	display: none !important;

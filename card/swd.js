@@ -318,10 +318,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				selectTarget:-1,
 				modTarget:true,
-				usable:1,
+				// usable:1,
 				content:function(){
 					'step 0'
-					event.num=3;
+					event.num=2;
 					var list=[];
 					event.list=list;
 					for(var i=0;i<lib.inpile.length;i++){
@@ -512,6 +512,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					var cards=[];
 					var list=get.typeCard('jiguan');
+					for(var i=0;i<list.length;i++){
+						if(lib.card[list[i]].derivation){
+							list.splice(i--,1);
+						}
+					}
 					if(list.length){
 						for(var i=0;i<event.num;i++){
 							cards.push(game.createCard(list.randomGet()));
@@ -1214,10 +1219,27 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				range:{global:1},
 				wuxieable:true,
 				filterTarget:function(card,player,target){
-					return !target.hasSkill('jiguanyaoshu_skill')&&!target.isMin();
+					for(var i=1;i<=5;i++){
+						if(!target.getEquip(i)){
+							return !target.hasSkill('jiguanyaoshu_skill')&&!target.isMin();
+						}
+					}
+					return false;
 				},
 				content:function(){
-					var card=game.createCard(get.inpile('equip').randomGet());
+					var types=[];
+					for(var i=1;i<=5;i++){
+						if(!target.getEquip(i)){
+							types.push('equip'+i);
+						}
+					}
+					var list=get.inpile('equip');
+					for(var i=0;i<list.length;i++){
+						if(!types.contains(lib.card[list[i]].subtype)){
+							list.splice(i--,1);
+						}
+					}
+					var card=game.createCard(list.randomGet());
 					target.$gain2(card);
 					target.equip(card);
 					target.addSkill('jiguanyaoshu_skill');
@@ -1481,7 +1503,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return player!=target&&!target.hasSkill('qianxing');
 				},
 				content:function(){
-					target.addTempSkill('qianxing',{player:'phaseBegin'});
+					target.tempHide();
 				},
 				ai:{
 					order:2,
@@ -1878,8 +1900,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				effect:function(){
 					if(result.bool==false){
-						player.turnOver();
-						player.draw();
+						player.loseHp();
+						player.randomDiscard();
 					}
 				},
 				ai:{
@@ -1931,7 +1953,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.addTempSkill('zhufangshenshi');
 				},
 				ai:{
-					norepeat:1,
+					tag:{
+						norepeat:1
+					},
 					value:4,
 					wuxie:function(){
 						return 0;
@@ -3129,13 +3153,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseEnd'},
 				direct:true,
 				filter:function(event,player){
-					return player.countCards('h')>0;
+					return player.countCards('h',{color:'red'})>0;
 				},
 				content:function(){
 					'step 0'
 					player.chooseCardTarget({
 						filterTarget:true,
-						filterCard:lib.filter.cardDiscardable,
+						filterCard:function(card,player,event){
+							if(get.color(card)!='red') return false;
+							return lib.filter.cardDiscardable(card,player,event);
+						},
 						ai1:function(card){
 							return 8-get.useful(card);
 						},
@@ -3574,35 +3601,45 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filterCard:true,
-				position:'he',
 				check:function(card){
 					return 6-get.value(card);
 				},
 				filter:function(event,player){
-					return !player.isTurnedOver();
+					return player.countCards('he');
 				},
 				filterTarget:function(card,player,target){
-					return target!=player&&!target.isMad();
+					return target!=player&&target.countCards('h');
 				},
+				position:'he',
 				content:function(){
 					'step 0'
-					player.judge(function(card){
-						return get.color(card)=='black'?1:0;
-					});
+					target.judge();
 					'step 1'
-					if(result.color=='red'){
-						game.asyncDraw([player,target]);
+					if(result.suit!='heart'){
+						var hs=target.getCards('h');
+						while(hs.length){
+							var chosen=hs.randomRemove();
+							if(target.hasUseTarget(chosen)&&!get.info(chosen).multitarget){
+								var list=game.filterPlayer(function(current){
+									return lib.filter.targetEnabled2(chosen,target,current);
+								});
+								if(list.length){
+									target.useCard(chosen,list.randomGet());
+									event.finish();
+									break;
+								}
+							}
+						}
 					}
-					else{
-						if(!player.isTurnedOver()) player.turnOver();
-						target.goMad({player:'phaseAfter'});
-					}
+					'step 2'
+					player.draw();
 				},
 				ai:{
 					order:10,
 					result:{
 						target:function(player,target){
-							return -target.countCards('h');
+							if(!target.countCards('h')) return 0;
+							return -1;
 						}
 					}
 				}
@@ -3858,7 +3895,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						player.logSkill('hslingjian_yinmilichang_equip1',result.targets);
-						result.targets[0].addTempSkill('qianxing',{player:'phaseBegin'});
+						result.targets[0].tempHide();
 					}
 				}
 			},
@@ -4345,10 +4382,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				global:'hslingjian_chaofeng_disable',
 				nopop:true,
 				unique:true,
-				gainnable:true,
+				gainable:true,
 				mark:true,
 				intro:{
-					content:'锁定技，若你的手牌数大于你的体力值，则只要你在任一其他角色的攻击范围内，该角色使用【杀】时便不能指定你以外的角色为目标',
+					content:'锁定技，与你相邻的角色只能选择你为出杀目标',
 				},
 				subSkill:{
 					disable:{
@@ -4358,8 +4395,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								if(card.name=='sha'){
 									if(target.hasSkill('hslingjian_chaofeng')) return;
 									if(game.hasPlayer(function(current){
-										return (current.hasSkill('hslingjian_chaofeng')&&
-											current.hp<current.countCards('h')&&get.distance(player,current,'attack')<=1);
+										return (current.hasSkill('hslingjian_chaofeng')&&get.distance(player,current,'pure')<=1);
 									})){
 										return false;
 									}
@@ -4657,21 +4693,19 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						case 'heart':player.recover();break;
 						case 'diamond':player.draw();break;
 						case 'club':{
-							player.chooseTarget('弃置一名角色的一张牌',function(card,player,target){
-								return player!=target&&target.countCards('he')>0;
-							}).ai=function(target){
-								return -get.attitude(player,target);
-							};
+							var targets=player.getEnemies();
+							for(var i=0;i<targets.length;i++){
+								if(!targets[i].countCards('he')){
+									targets.splice(i--,1);
+								}
+							}
+							if(targets.length){
+								var target=targets.randomGet();
+								player.line(target);
+								target.randomDiscard();
+							}
 							break;
 						}
-					}
-					if(result.suit!='club'){
-						event.finish();
-					}
-					"step 2"
-					if(result.bool&&result.targets&&result.targets.length){
-						player.line(result.targets[0],'green');
-						player.discardPlayerCard(result.targets[0],'he',true);
 					}
 				},
 				ai:{
@@ -4996,7 +5030,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			yuchandui:'兑玉蝉',
 			yuchandui_info:'在你行动时可当作雪肌冰鲍使用；可用于煅造装备；在你使用一张牌后，此牌会随机切换形态',
 			yangpijuan:'羊皮卷',
-			yangpijuan_info:'出牌阶段对自己使用，选择一种卡牌类别，从3张随机该类别的卡牌中选择一张加入手牌',
+			yangpijuan_info:'出牌阶段对自己使用，选择一种卡牌类别，发现一张该类别的卡牌',
 			// pantao:'蟠桃',
 			// pantao_info:'出牌阶段对自己使用，或对濒死角色使用，目标回复两点体力并获得一点护甲',
 			shencaojie:'神草结',
@@ -5005,7 +5039,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			yuruyi_ab:'如意',
 			yuruyi_info:'你有更高的机率摸到好牌',
 			fengyinzhidan:'封印之蛋',
-			fengyinzhidan_info:'出牌阶段限用一次，随机使用三张普通锦囊牌（随机指定目标）',
+			fengyinzhidan_info:'随机使用两张普通锦囊牌（随机指定目标）',
 			shuchui:'鼠槌',
 			shuchui_info:'出牌阶段限一次，你可以指定一名攻击范围内的角色，依次将手牌中的至多3张杀对该角色使用，若杀造成了伤害，你摸一张牌',
 			zhiluxiaohu:'指路小狐',
@@ -5079,7 +5113,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			jiguanyuan_info:'出牌阶段对一名其他角色使用，你将此牌和一张其它牌置于一名其他角色的武将牌上，然后摸一张牌；该角色于下一结束阶段获得武将牌上的牌',
 			jiguantong:'机关火筒',
 			jiguantong_ab:'火筒',
-			jiguantong_info:'出牌阶段对所有其他角色使用，目标弃置一张手牌，或受到一点火焰伤害；若没有人因此受到伤害，使用者摸一张牌',
+			jiguantong_info:'出牌阶段对所有其他角色使用，目标弃置一张手牌，或受到一点火焰伤害；若没有人选择受到伤害，使用者摸一张牌',
 			jiutiansuanchi:'九天算尺',
 			jiutiansuanchi_info:'每当你使用杀造成伤害，你可以弃置一张牌并展示受伤害角色的一张手牌，若此牌与你弃置的牌花色或点数相同，此杀的伤害+2',
 			shenmiguo:'神秘果',
@@ -5164,7 +5198,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			hslingjian_shijianhuisu:'时间回溯',
 			hslingjian_shijianhuisu_info:'可用于煅造装备；令一名其他角色将其装备牌收回手牌',
 			hslingjian_chaofeng:'嘲讽',
-			hslingjian_chaofeng_info:'锁定技，若你的手牌数大于你的体力值，则只要你在任一其他角色的攻击范围内，该角色使用【杀】时便不能指定你以外的角色为目标',
+			hslingjian_chaofeng_info:'锁定技，与你相邻的角色只能选择你为出杀目标',
 			qinglonglingzhu:'青龙灵珠',
 			qinglonglingzhu_ab:'灵珠',
 			qinglonglingzhu_info:'每当你造成一次属性伤害，你可以获得对方的一张牌',
@@ -5230,13 +5264,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			caoyao_info:'出牌阶段，对距离为1以内的角色使用，回复一点体力。',
 			langeguaiyi:'蓝格怪衣',
 			langeguaiyi_bg:'格',
-			langeguaiyi_info:'出牌阶段限一次，你可以进行一次判定，然后按花色执行以下效果。红桃：你回复一点体力；方片：你摸一张牌；梅花：你弃置一名其他角色的一张牌；黑桃：无事发生',
+			langeguaiyi_info:'出牌阶段限一次，你可以进行一次判定，然后按花色执行以下效果。红桃：你回复一点体力；方片：你摸一张牌；梅花：你令一名随机敌方角色随机弃置一张牌；黑桃：无事发生',
 			longfan:'龙帆',
-			longfan_info:'出牌阶段限一次，你可以进行一次判定，然后按花色执行以下效果。红桃：你回复一点体力；方片：你摸一张牌；梅花：你弃置一名其他角色的一张牌；黑桃：无事发生',
+			longfan_info:'出牌阶段限一次，你可以进行一次判定，然后按花色执行以下效果。红桃：你回复一点体力；方片：你摸一张牌；梅花：你令一名随机敌方角色随机弃置一张牌；黑桃：无事发生',
 			// longfan_info:'0000：翻面；1111：弃手牌；2222：弃装备牌；3333：受伤害；4444：流失体力；5555：连环；6666：摸牌；7777：回复体力；8888：弃置判定牌；9999：置衡',
 			guiyoujie:'鬼幽结',
 			guiyoujie_bg:'结',
-			guiyoujie_info:'出牌阶段，对一名其他角色使用。若判定结果为黑色，其摸一张牌并翻面。',
+			guiyoujie_info:'出牌阶段，对一名其他角色使用。若判定结果为黑色，其失去一点体力并随机弃置一张牌',
 			yufulu:'御夫录',
 			yufulu_info:'出牌阶段，可弃置一张武器牌令一名角色受到一点伤害，然后该角色获得此武器牌',
 			touzhi:'投掷',
@@ -5256,9 +5290,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			guangshatianyi_bg:'纱',
 			guangshatianyi_info:'锁定技，每当你即将受到伤害，有三分之一的概率令伤害减一',
 			sifeizhenmian:'四非真面',
-			sifeizhenmian_info:'出牌阶段限一次，若你没翻面，你可以弃置一张牌并指定一名其他角色进行判定，若结果为黑色，你翻面，该角色进入混乱状态直到下一回合结束；若结果为红色，你与其各摸一张牌',
+			sifeizhenmian_info:'出牌阶段限一次，你可以弃置一张牌并令一名有手牌的其他角色进行一次判定，若结果为不为红桃且目标有可用的手牌，目标随机使用一张手牌（随机指定目标），否则你摸一张牌',
 			yiluan:'意乱',
-			yiluan_info:'出牌阶段限一次，若你没翻面，你可以弃置一张牌并指定一名其他角色进行判定，若结果为黑色，你翻面，该角色进入混乱状态直到下一回合结束；若结果为红色，你与其各摸一张牌',
+			yiluan_info:'出牌阶段限一次，你可以弃置一张牌并令一名有手牌的其他角色进行一次判定，若结果为不为红桃且目标有可用的手牌，目标随机使用一张手牌（随机指定目标），否则你摸一张牌',
 			donghuangzhong:'东皇钟',
 			xuanyuanjian:'轩辕剑',
 			xuanyuanjian2:'轩辕剑',
@@ -5287,7 +5321,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			lianhua_info:'出牌阶段限一次，你可以弃置两张炼妖壶中的牌，从牌堆中获得一张与弃置的牌类别均不相同的牌',
 			shouna:'收纳',
 			shouna_info:'出牌阶段限一次，你可以弃置一张手牌，并将一名其他角色的一张手牌置入炼妖壶',
-			donghuangzhong_info:'结束阶段，你可以弃置一张手牌，并选择一名角色将一张随机单体延时锦囊置入其判定区',
+			donghuangzhong_info:'结束阶段，你可以弃置一张红色手牌，并选择一名角色将一张随机单体延时锦囊置入其判定区',
 			xuanyuanjian_info:'装备时获得一点护甲；每当你即将造成一次伤害，你令此伤害加一并变为雷属性，并在伤害结算后流失一点体力。任何时候，若你体力值不超过2，则立即失去轩辕剑',
 			pangufu_info:'锁定技，每当你造成一次伤害，受伤角色须弃置一张牌',
 			haotianta_info:'锁定技，任意一名角色进行判定前，你观看牌堆顶的2张牌，并选择一张作为判定结果，此结果不可被更改，也不能触发技能',

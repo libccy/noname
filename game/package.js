@@ -1,11 +1,12 @@
 window.noname_package={
 	character:{
-		standard:'标准',
-		shenhua:'神话再临',
 		refresh:'界限突破',
+		shenhua:'神话再临',
+		xinghuoliaoyuan:'星火燎原',
 		yijiang:'一将成名',
 		sp:'SP',
 		extra:'神将',
+		standard:'标准',
 		old:'怀旧',
 		diy:'DIY',
 		yxs:'英雄杀',
@@ -28,6 +29,7 @@ window.noname_package={
 		gujian:'古剑奇谭',
 		hearth:'炉石传说',
 		gwent:'昆特牌',
+		mtg:'万智牌',
 	},
 	play:{
 		boss:'诸神降临',
@@ -39,12 +41,35 @@ window.noname_package={
 		identity:'身份',
 		guozhan:'国战',
 		versus:'对决',
-		connect:'联机',
+		// connect:'联机',
 		boss:'挑战',
 		chess:'战棋',
 		tafang:'塔防',
 		stone:'炉石',
 		brawl:'乱斗',
+	},
+	submode:{
+		identity:{
+			normal:'身份模式',
+			zhong:'忠胆英杰'
+		},
+		guozhan:{
+			normal:'国战模式',
+			mingjiang:'明将国战'
+		},
+		versus:{
+			four:'四人对抗',
+			three:'统率三军',
+			two:'欢乐成双',
+			jiange:'守卫剑阁',
+			siguo:'四国争霸',
+			standard:'自由对决'
+		},
+		chess:{
+			combat:'战棋模式',
+			three:'战棋统率',
+			leader:'战棋君主'
+		}
 	},
 	background:{
 		ol_bg:'龙纹',

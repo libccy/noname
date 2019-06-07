@@ -3,6 +3,7 @@
 	var _status={
 		paused:false,
 		paused2:false,
+		paused3:false,
 		over:false,
 		clicked:false,
 		auto:false,
@@ -168,29 +169,29 @@
 						unfrequent:true,
 						intro:'拖拽时显示虚线，可能降低游戏速度',
 					},
-					enable_pressure:{
-						name:'启用压感',
-						init:false,
-						intro:'开启后可通过按压执行操作',
-						unfrequent:true,
-					},
-					pressure_taptic:{
-						name:'触觉反馈',
-						init:false,
-						intro:'开启后按压操作执行时将产生震动',
-						unfrequent:true,
-					},
-					pressure_click:{
-						name:'按压操作',
-						init:'pause',
-						intro:'在空白区域按压时的操作',
-						unfrequent:true,
-						item:{
-							pause:'暂停',
-							config:'选项',
-							auto:'托管',
-						}
-					},
+					// enable_pressure:{
+					// 	name:'启用压感',
+					// 	init:false,
+					// 	intro:'开启后可通过按压执行操作',
+					// 	unfrequent:true,
+					// },
+					// pressure_taptic:{
+					// 	name:'触觉反馈',
+					// 	init:false,
+					// 	intro:'开启后按压操作执行时将产生震动',
+					// 	unfrequent:true,
+					// },
+					// pressure_click:{
+					// 	name:'按压操作',
+					// 	init:'pause',
+					// 	intro:'在空白区域按压时的操作',
+					// 	unfrequent:true,
+					// 	item:{
+					// 		pause:'暂停',
+					// 		config:'选项',
+					// 		auto:'托管',
+					// 	}
+					// },
 					touchscreen:{
 						name:'触屏模式',
 						init:false,
@@ -336,6 +337,7 @@
 						unfrequent:true,
 						item:{
 							pause:'暂停',
+							shortcut:'工具',
 							config:'选项',
 							auto:'托管',
 						},
@@ -471,6 +473,11 @@
 						},
 						unfrequent:true,
 					},
+					errstop:{
+						name:'出错时停止游戏',
+						init:false,
+						unfrequent:true
+					},
 					update:function(config,map){
 						if('ontouchstart' in document){
 							map.touchscreen.show();
@@ -492,19 +499,19 @@
 							map.enable_vibrate.hide();
 							map.keep_awake.hide();
 						}
-						if(config.enable_pressure){
-							map.pressure_click.show();
-							if(lib.device){
-								map.pressure_taptic.show();
-							}
-							else{
-								map.pressure_taptic.hide();
-							}
-						}
-						else{
-							map.pressure_click.hide();
-							map.pressure_taptic.hide();
-						}
+						// if(config.enable_pressure){
+						// 	map.pressure_click.show();
+						// 	if(lib.device){
+						// 		map.pressure_taptic.show();
+						// 	}
+						// 	else{
+						// 		map.pressure_taptic.hide();
+						// 	}
+						// }
+						// else{
+						// 	map.pressure_click.hide();
+						// 	map.pressure_taptic.hide();
+						// }
 						if(lib.config.touchscreen){
 							map.mousewheel.hide();
 							map.hover_all.hide();
@@ -573,6 +580,12 @@
 						else{
 							map.confirm_exit.hide();
 						}
+						if(config.dev){
+							map.errstop.show();
+						}
+						else{
+							map.errstop.hide();
+						}
 					}
 				}
 			},
@@ -616,8 +629,9 @@
 							default:'旧版',
 							newlayout:'对称',
 							mobile:'默认',
-							long:'新版',
+							long:'宽屏',
 							long2:'手杀',
+							nova:'新版'
 						},
 						visualMenu:function(node,link){
 							node.className='button character themebutton '+lib.config.theme;
@@ -642,7 +656,7 @@
 										me.style.bottom='4px';
 									}
 								}
-								else if(link=='long2'){
+								else if(link=='long2'||link=='nova'){
 									me.style.display='none';
 								}
 								else{
@@ -668,6 +682,10 @@
 									else if(link=='mobile'||link=='newlayout'){
 										player.style.width='24px';
 										player.style.height='29px';
+									}
+									else if(link=='nova') {
+										player.style.width='20px';
+										player.style.height='24px';
 									}
 									else{
 										player.style.width='20px';
@@ -733,6 +751,19 @@
 											player.style.bottom='45px';
 										}
 									}
+									else if(link=='nova'){
+										if(i==0){
+											player.style.bottom='2px';
+											player.style.left='3px';
+										}
+										if(i==3){
+											player.style.left='calc(50% - 10px)';
+										}
+										if(i==1||i==2){
+											player.style.left='3px';
+											player.style.bottom=(i*30)+'px';
+										}
+									}
 
 									if(i==0&&(link=='mobile'||link=='long')){
 										player.classList.add('me');
@@ -785,6 +816,30 @@
 						onclick:function(item){
 							game.saveConfig('player_height',item);
 							ui.arena.dataset.player_height=item;
+						}
+					},
+					player_height_nova:{
+						name:'角色高度',
+						init:'short',
+						item:{
+							// auto:'自动',
+							short:'矮',
+							default:'中',
+							long:'高',
+						},
+						onclick:function(item){
+							game.saveConfig('player_height_nova',item);
+							// if(item=='auto'){
+							// 	if(parseInt(ui.arena.dataset.number)>=7){
+							// 		ui.arena.dataset.player_height_nova='short';
+							// 	}
+							// 	else{
+							// 		ui.arena.dataset.player_height_nova='default';
+							// 	}
+							// }
+							// else{
+								ui.arena.dataset.player_height_nova=item;
+							// }
 						}
 					},
 					// background_color_music:{
@@ -841,14 +896,14 @@
 							switch(zoom){
 								case 'esmall':zoom=0.8;break;
 								case 'vsmall':zoom=0.9;break;
-								case 'small':zoom=0.95;break;
+								case 'small':zoom=0.93;break;
 								case 'big':zoom=1.05;break;
 								case 'vbig':zoom=1.1;break;
 								case 'ebig':zoom=1.2;break;
 								default:zoom=1;
 							}
 							game.documentZoom=game.deviceZoom*zoom;
-							document.documentElement.style.zoom=game.documentZoom;
+							ui.updatez();
 						}
 					},
 					image_background:{
@@ -1844,7 +1899,8 @@
 						intro:'设置角色的边框宽度',
 						unfrequent:true,
 						item:{
-							slim:'窄',
+							slim:'细',
+							narrow:'窄',
 							normal:'中',
 							wide:'宽'
 						},
@@ -1861,6 +1917,12 @@
 							}
 							else{
 								ui.arena.classList.remove('uslim_player');
+							}
+							if(item=='narrow'){
+								ui.arena.classList.add('mslim_player');
+							}
+							else{
+								ui.arena.classList.remove('mslim_player');
 							}
 							if(item=='normal'&&lib.config.mode!='brawl'&&(game.layout=='long'||game.layout=='long2')){
 								ui.arena.classList.add('lslim_player');
@@ -2333,7 +2395,7 @@
 					animation:{
 						name:'游戏特效',
 						intro:'开启后出现属性伤害、回复体力等情况时会显示动画',
-						init:true,
+						init:false,
 						unfrequent:true,
 					},
 					skill_animation_type:{
@@ -2440,7 +2502,7 @@
 								linked=true;
 							}
 							game.saveConfig('cardshape',item);
-							if(item=='oblong'&&(game.layout=='long'||game.layout=='mobile'||game.layout=='long2')){
+							if(item=='oblong'&&(game.layout=='long'||game.layout=='mobile'||game.layout=='long2'||game.layout=='nova')){
 								ui.arena.classList.add('oblongcard');
 								ui.window.classList.add('oblongcard');
 							}
@@ -2620,7 +2682,7 @@
 						}
 						else{
 							map.textequip.hide();
-							if(lib.config.layout=='long2'){
+							if(lib.config.layout=='long2'||lib.config.layout=='nova'){
 								map.phonelayout.show();
 								map.cardshape.show();
 							}
@@ -2641,6 +2703,12 @@
 							else{
 								map.player_height.hide();
 							}
+						}
+						if(lib.config.layout=='nova'){
+							map.player_height_nova.show();
+						}
+						else{
+							map.player_height_nova.hide();
 						}
 						if(lib.config.touchscreen){
 							map.cursor_style.hide();
@@ -3065,6 +3133,12 @@
 						name:'显示添加收藏',
 						intro:'在角色的右键菜单中显示添加收藏',
 						init:false,
+						unfrequent:true
+					},
+					show_favmode:{
+						name:'显示模式收藏',
+						intro:'快捷菜单中显示收藏模式',
+						init:true,
 						unfrequent:true
 					},
 					show_favourite_menu:{
@@ -3984,16 +4058,16 @@
 						frequent:true,
 						intro:'开启后游戏中将增加军师、大将、贼首三个身份'
 					},
-					connect_ban_weak:{
-						name:'屏蔽弱将',
-						init:true,
-						restart:true,
-					},
-					connect_ban_strong:{
-						name:'屏蔽强将',
-						init:false,
-						restart:true,
-					},
+					// connect_ban_weak:{
+					// 	name:'屏蔽弱将',
+					// 	init:true,
+					// 	restart:true,
+					// },
+					// connect_ban_strong:{
+					// 	name:'屏蔽强将',
+					// 	init:false,
+					// 	restart:true,
+					// },
 					connect_enhance_zhu:{
 						name:'加强主公',
 						init:false,
@@ -4156,16 +4230,16 @@
 						init:true,
 						intro:'根据角色的出牌行为自动标记可能的身份',
 					},
-					ban_weak:{
-						name:'屏蔽弱将',
-						init:true,
-						restart:true,
-					},
-					ban_strong:{
-						name:'屏蔽强将',
-						init:false,
-						restart:true,
-					},
+					// ban_weak:{
+					// 	name:'屏蔽弱将',
+					// 	init:true,
+					// 	restart:true,
+					// },
+					// ban_strong:{
+					// 	name:'屏蔽强将',
+					// 	init:false,
+					// 	restart:true,
+					// },
 					enhance_zhu:{
 						name:'加强主公',
 						init:false,
@@ -4445,16 +4519,16 @@
 						restart:true,
 						intro:'开启后将使用国战君主替换原武将牌'
 					},
-					connect_ban_weak:{
-						name:'屏蔽弱将',
-						init:false,
-						restart:true,
-					},
-					connect_ban_strong:{
-						name:'屏蔽强将',
-						init:false,
-						restart:true,
-					},
+					// connect_ban_weak:{
+					// 	name:'屏蔽弱将',
+					// 	init:false,
+					// 	restart:true,
+					// },
+					// connect_ban_strong:{
+					// 	name:'屏蔽强将',
+					// 	init:false,
+					// 	restart:true,
+					// },
 				},
 				config:{
 					update:function(config,map){
@@ -4538,16 +4612,16 @@
 						},
 						restart:true,
 					},
-					ban_weak:{
-						name:'屏蔽弱将',
-						init:true,
-						restart:true,
-					},
-					ban_strong:{
-						name:'屏蔽强将',
-						init:false,
-						restart:true,
-					},
+					// ban_weak:{
+					// 	name:'屏蔽弱将',
+					// 	init:true,
+					// 	restart:true,
+					// },
+					// ban_strong:{
+					// 	name:'屏蔽强将',
+					// 	init:false,
+					// 	restart:true,
+					// },
 					free_choose:{
 						name:'自由选将',
 						init:true,
@@ -4740,16 +4814,16 @@
 							'5':'5人',
 						}
 					},
-					connect_ban_weak:{
-						name:'屏蔽弱将',
-						init:true,
-						restart:true,
-					},
-					connect_ban_strong:{
-						name:'屏蔽强将',
-						init:false,
-						restart:true,
-					},
+					// connect_ban_weak:{
+					// 	name:'屏蔽弱将',
+					// 	init:true,
+					// 	restart:true,
+					// },
+					// connect_ban_strong:{
+					// 	name:'屏蔽强将',
+					// 	init:false,
+					// 	restart:true,
+					// },
 				},
 				config:{
 					update:function(config,map){
@@ -4836,16 +4910,17 @@
 					},
 					versus_mode:{
 						name:'游戏模式',
-						init:'three',
+						init:'four',
 						item:{
-							standard:'自由',
+							four:'对抗',
 							three:'统率',
+							two:'欢乐',
 							jiange:'剑阁',
 							siguo:'四国',
+							standard:'自由'
 							// endless:'无尽',
+							// triple:'血战',
 							// one:'<span style="display:inline-block;width:100%;text-align:center">1v1</span>',
-							two:'<span style="display:inline-block;width:100%;text-align:center">2v2</span>',
-							four:'<span style="display:inline-block;width:100%;text-align:center">4v4</span>'
 						},
 						restart:true,
 						frequent:true,
@@ -5005,16 +5080,16 @@
 						},
 						frequent:true
 					},
-					ban_weak:{
-						name:'屏蔽弱将',
-						init:true,
-						restart:true,
-					},
-					ban_strong:{
-						name:'屏蔽强将',
-						init:false,
-						restart:true
-					},
+					// ban_weak:{
+					// 	name:'屏蔽弱将',
+					// 	init:true,
+					// 	restart:true,
+					// },
+					// ban_strong:{
+					// 	name:'屏蔽强将',
+					// 	init:false,
+					// 	restart:true
+					// },
 					ladder_reset:{
 						name:'重置天梯数据',
 						onclick:function(){
@@ -5153,16 +5228,16 @@
 						},
 						intro:'只控制一名角色，其他角色由AI控制'
 					},
-					ban_weak:{
-						name:'屏蔽弱将',
-						init:true,
-						restart:true,
-					},
-					ban_strong:{
-						name:'屏蔽强将',
-						init:false,
-						restart:true,
-					},
+					// ban_weak:{
+					// 	name:'屏蔽弱将',
+					// 	init:true,
+					// 	restart:true,
+					// },
+					// ban_strong:{
+					// 	name:'屏蔽强将',
+					// 	init:false,
+					// 	restart:true,
+					// },
 				}
 			},
 			chess:{
@@ -5202,14 +5277,14 @@
 							map.free_choose.hide();
 							map.change_choice.hide();
 						}
-						if(config.chess_mode!='leader'){
-							map.ban_weak.show();
-							map.ban_strong.show();
-						}
-						else{
-							map.ban_weak.hide();
-							map.ban_strong.hide();
-						}
+						// if(config.chess_mode!='leader'){
+						// 	map.ban_weak.show();
+						// 	map.ban_strong.show();
+						// }
+						// else{
+						// 	map.ban_weak.hide();
+						// 	map.ban_strong.hide();
+						// }
 					},
 					chess_leader_save:{
 						name:'选择历程',
@@ -5316,16 +5391,16 @@
 							}
 						},
 					},
-					ban_weak:{
-						name:'屏蔽弱将',
-						init:true,
-						restart:true,
-					},
-					ban_strong:{
-						name:'屏蔽强将',
-						init:false,
-						restart:true,
-					},
+					// ban_weak:{
+					// 	name:'屏蔽弱将',
+					// 	init:true,
+					// 	restart:true,
+					// },
+					// ban_strong:{
+					// 	name:'屏蔽强将',
+					// 	init:false,
+					// 	restart:true,
+					// },
 					chessscroll_speed:{
 						name:'边缘滚动速度',
 						init:'20',
@@ -5381,16 +5456,16 @@
 						name:'显示距离',
 						init:true,
 					},
-					ban_weak:{
-						name:'屏蔽弱将',
-						init:true,
-						restart:true,
-					},
-					ban_strong:{
-						name:'屏蔽强将',
-						init:false,
-						restart:true,
-					},
+					// ban_weak:{
+					// 	name:'屏蔽弱将',
+					// 	init:true,
+					// 	restart:true,
+					// },
+					// ban_strong:{
+					// 	name:'屏蔽强将',
+					// 	init:false,
+					// 	restart:true,
+					// },
 					chessscroll_speed:{
 						name:'边缘滚动速度',
 						intro:'鼠标移至屏幕边缘时自动滚屏',
@@ -5572,16 +5647,16 @@
 							}
 						},
 					},
-					ban_weak:{
-						name:'屏蔽弱将',
-						init:true,
-						restart:true,
-					},
-					ban_strong:{
-						name:'屏蔽强将',
-						init:false,
-						restart:true,
-					},
+					// ban_weak:{
+					// 	name:'屏蔽弱将',
+					// 	init:true,
+					// 	restart:true,
+					// },
+					// ban_strong:{
+					// 	name:'屏蔽强将',
+					// 	init:false,
+					// 	restart:true,
+					// },
 				}
 			},
 		},
@@ -5611,7 +5686,8 @@
 			'<div style="margin:10px">游戏操作</div><ul style="margin-top:0"><li>在命令框中输出结果<br>game.print(str)<li>清除命令框中的内容<br>cls<li>上一条/下一条输入的内容<br>up/down<li>游戏结束<br>game.over(bool)'+
 			'<li>角色资料<br>lib.character<li>卡牌资料<br>lib.card</ul>',
 			'游戏名词':'<ul><li>护甲：和体力类似，每点护甲可抵挡一点伤害，但不影响手牌上限'+
-			'<li>随从：通过技能获得，拥有独立的技能、手牌区和装备区（共享判定区），出场时替代主武将的位置；随从死亡时自动切换回主武将'
+			'<li>随从：通过技能获得，拥有独立的技能、手牌区和装备区（共享判定区），出场时替代主武将的位置；随从死亡时自动切换回主武将'+
+			'<li>发现：从三张随机亮出的牌中选择一张，若无特殊说明，则获得此牌'
 		},
 		setIntro:function(node,func,left){
 			if(lib.config.touchscreen){
@@ -5633,18 +5709,18 @@
 					node.oncontextmenu=ui.click.rightplayer;
 				}
 			}
-			if(!left){
-				lib.setPressure(node,ui.click.rightpressure);
-			}
+			// if(!left){
+			// 	lib.setPressure(node,ui.click.rightpressure);
+			// }
 			if(func){
 				node._customintro=func;
 			}
 		},
-		setPressure:function(node,func){
-			if(window.Pressure){
-				window.Pressure.set(node,{change: func}, {polyfill: false});
-			}
-		},
+		// setPressure:function(node,func){
+		// 	if(window.Pressure){
+		// 		window.Pressure.set(node,{change: func}, {polyfill: false});
+		// 	}
+		// },
 		setPopped:function(node,func,width,height,forceclick,paused2){
 			node._poppedfunc=func;
 			node._poppedwidth=width;
@@ -6041,7 +6117,7 @@
 						}
 					};
 					this.addEventListener('webkitTransitionEnd',callback);
-					setTimeout(callback,time||1000);
+					return setTimeout(callback,time||1000);
 				};
 				HTMLDivElement.prototype.setPosition=function(){
 					var position;
@@ -6295,6 +6371,44 @@
 						_status.windowLoaded=true;
 					}
 				};
+				window.onerror=function(msg, src, line, column, err){
+					var str=msg + '\n' + _status.event.name + ': ' + _status.event.step;
+					str+='\n'+_status.event.parent.name+': '+_status.event.parent.step;
+					str+='\n'+_status.event.parent.parent.name+': '+_status.event.parent.parent.step;
+					var evt=_status.event;
+					if(evt.player||evt.target||evt.source||evt.skill||evt.card){
+						str+='\n-------------'
+					}
+					if(evt.player){
+						str+='\nplayer: ' + evt.player.name;
+					}
+					if(evt.target){
+						str+='\ntarget: ' + evt.target.name;
+					}
+					if(evt.source){
+						str+='\nsource: ' + evt.source.name;
+					}
+					if(evt.skill){
+						str+='\nskill: ' + evt.skill.name;
+					}
+					if(evt.card){
+						str+='\ncard: ' + evt.card.name;
+					}
+					alert(str);
+					window.ea=Array.from(arguments);
+					window.em=msg;
+					window.el=line;
+					window.ec=column;
+					window.eo=err;
+					game.print(msg);
+					game.print(line);
+					game.print(column);
+					game.print(err.stack);
+					if(!lib.config.errstop){
+						_status.withError=true;
+						game.loop();
+					}
+				};
 
 				if(window.noname_update){
 					lib.version=window.noname_update.version;
@@ -6387,6 +6501,11 @@
 					for(i in pack.play){
 						lib.config.all.plays.push(i);
 						lib.translate[i+'_play_config']=pack.play[i];
+					}
+					for(i in pack.submode){
+						for(var j in pack.submode[i]){
+							lib.translate[i+'|'+j]=pack.submode[i][j];
+						}
 					}
 
 					if(!lib.config.gameRecord){
@@ -6556,7 +6675,7 @@
 						lib.init.js(lib.assetURL+'card',lib.config.all.cards,packLoaded,packLoaded);
 						lib.init.js(lib.assetURL+'character',lib.config.all.characters,packLoaded,packLoaded);
 						lib.init.js(lib.assetURL+'character','rank',packLoaded,packLoaded);
-						if(lib.device!='ios'&&lib.config.enable_pressure) lib.init.js(lib.assetURL+'game','pressure');
+						// if(lib.device!='ios'&&lib.config.enable_pressure) lib.init.js(lib.assetURL+'game','pressure');
 					};
 
 					var layout=lib.config.layout;
@@ -7204,35 +7323,10 @@
 				}
 			},
 			onload:function(){
-				if(navigator.userAgent.toLowerCase().indexOf('crosswalk')!=-1){
-					lib.crosswalk=true;
-				}
-				if(lib.device=='android'&&window.devicePixelRatio>1&&document.documentElement.offsetWidth<900&&!lib.crosswalk){
-					game.documentZoom=Math.round(document.documentElement.offsetWidth/96)/10;
-					game.deviceZoom=game.documentZoom;
-					document.documentElement.style.zoom=game.documentZoom;
-				}
-				else{
-					if(lib.device=='ios'){
-						if(document.documentElement.offsetWidth<900){
-							var zoom=Math.round(document.documentElement.offsetWidth/96)/10;
-							var metas=document.head.querySelectorAll('meta');
-							for(var j=0;j<metas.length;j++){
-								if(metas[j].name=='viewport'){
-									metas[j].content="user-scalable=no, initial-scale="+zoom+", maximum-scale="+zoom+", minimum-scale="+zoom+", width=device-width, height=device-height";
-									break;
-								}
-							}
-							game.metaZoom=zoom;
-							var barHeight=Math.round(20/zoom);
-							lib.init.sheet(
-								'.statusbar #window{top:'+barHeight+'px;height:calc(100% - '+barHeight+'px)}',
-								'.statusbar #statusbg{height:'+barHeight+'px}'
-							);
-						}
-					}
-					game.documentZoom=1;
-					game.deviceZoom=1;
+				ui.updated();
+				game.documentZoom=game.deviceZoom;
+				if(game.documentZoom!=1){
+					ui.updatez();
 				}
 				ui.background=ui.create.div('.background');
 				ui.background.style.backgroundSize="cover";
@@ -7249,7 +7343,7 @@
 				document.documentElement.style.backgroundSize='';
 				document.documentElement.style.backgroundPosition='';
 				document.body.insertBefore(ui.background,document.body.firstChild);
-				document.body.onresize=ui.updatex;
+				document.body.onresize=ui.updatexr;
 				if(lib.config.touchscreen){
 					document.body.addEventListener('touchstart',function(e){
 						this.startX=e.touches[0].clientX/game.documentZoom;
@@ -8112,7 +8206,11 @@
 					sScriptURL=str;
 				}
 				else{
-					sScriptURL=get.url(master)+str;
+					var url=get.url(master);
+					if(url[url.length-1]!='/'){
+						url+='/';
+					}
+					sScriptURL=url+str;
 				}
 				var oReq=new XMLHttpRequest();
 				if(onload) oReq.addEventListener("load",onload);
@@ -8178,7 +8276,7 @@
 					else{
 						ui.arena.classList.remove('mobile');
 					}
-					if(game.layout=='mobile'||game.layout=='long'||game.layout=='long2'){
+					if(game.layout=='mobile'||game.layout=='long'||game.layout=='long2'||game.layout=='nova'){
 						if(game.me&&game.me.node.handcards2.childNodes.length){
 							while(game.me.node.handcards2.childNodes.length){
 								game.me.node.handcards1.appendChild(game.me.node.handcards2.firstChild);
@@ -8191,7 +8289,7 @@
 					else{
 						ui.arena.classList.remove('oldlayout');
 					}
-					if(lib.config.cardshape=='oblong'&&(game.layout=='long'||game.layout=='mobile'||game.layout=='long2')){
+					if(lib.config.cardshape=='oblong'&&(game.layout=='long'||game.layout=='mobile'||game.layout=='long2'||game.layout=='nova')){
 						ui.arena.classList.add('oblongcard');
 						ui.window.classList.add('oblongcard');
 					}
@@ -8250,6 +8348,12 @@
 					}
 					else{
 						ui.arena.classList.remove('uslim_player');
+					}
+					if(lib.config.player_border=='narrow'){
+						ui.arena.classList.add('mslim_player');
+					}
+					else{
+						ui.arena.classList.remove('mslim_player');
 					}
 					ui.updatej();
 					ui.updatem();
@@ -8475,21 +8579,51 @@
 				var mode=lib.config.all.mode.slice(0);
 				mode.remove('connect');
 				mode.remove('brawl');
-				var banned=['yxs_luzhishen','shen_guanyu','shen_caocao','caopi','re_daqiao',
+				var banned=['shen_guanyu','shen_caocao','caopi','re_daqiao','caorui',
 					'daqiao','lingcao','liuzan','lusu','luxun','yanwen','zhouyu','ns_wangyue','gw_yenaifa',
-					'old_caozhen','guojia','simayi','swd_kangnalishi','hs_siwangzhiyi','hs_nozdormu','old_zhuzhi'];
-				var bannedcards=['zengbin','huoshan','hongshui','guiyoujie','fengyinzhidan','sifeizhenmian','lebu'];
+					'old_caozhen','swd_jiangziya','xuhuang','maliang','guojia','simayi','swd_kangnalishi','hs_siwangzhiyi','hs_nozdormu','old_zhuzhi'];
+				var bannedcards=['zengbin'];
+				var favs=["hs_tuoqi","hs_siwangxianzhi","hs_xukongzhiying","hs_hsjiasha","gjqt_xieyi","gjqt_yunwuyue","gjqt_beiluo",
+					"gjqt_cenying","shen_lvmeng","shen_zhaoyun","shen_zhugeliang","ow_ana","chenlin","ns_guanlu","hs_guldan","swd_guyue",
+					"pal_jiangyunfan","mtg_jiesi","swd_lanyin","pal_liumengli","swd_muyun","pal_nangonghuang","swd_muyue","pal_murongziying",
+					"swd_qiner","pal_shenqishuang","hs_taisi","wangji","pal_xingxuan","xunyou","hs_yelise","pal_yuejinzhao","pal_yueqi",
+					"gjqt_yuewuyi","swd_yuxiaoxue","ow_zhaliya","zhangchunhua","hs_zhihuanhua","swd_zhiyin","old_zhonghui","gjqt_bailitusu",
+					"hs_barnes","ow_dva","swd_hengai","pal_jushifang","hs_kazhakusi","hs_lafamu","ow_liekong","hs_lreno","pal_mingxiu",
+					"swd_murongshi","gw_oudimu","gjqt_ouyangshaogong","hs_pyros","qinmi","gw_sanhanya","hs_selajin","swd_shuwaner",
+					"swd_situqiang","hs_xialikeer","pal_xuejian","swd_yuchiyanhong","swd_yuwentuo","swd_zhaoyun","zhugeliang","gw_aigeleisi",
+					"gw_aimin","gjqt_aruan","hs_aya","swd_cheyun","swd_chenjingchou","gw_diandian","swd_huzhongxian","hs_jinglinglong",
+					"hs_kaituozhe","hs_kalimosi","gw_linjing","ow_luxiao","re_luxun","hs_morgl","swd_sikongyu","hs_sthrall","sunquan",
+					"sunshangxiang","gw_yioufeisisp","gw_yisilinni","hs_yogg","hs_ysera","pal_yuntianhe","zhugejin","zhugeke","gw_zhuoertan",
+					"hs_anduin","swd_anka","ow_banzang","ow_chanyata","diaochan","swd_duguningke","sp_diaochan","hetaihou","ns_huamulan",
+					"swd_huanglei","swd_huanyuanzhi","re_huatuo","gw_huoge","pal_jiangcheng","yj_jushou","swd_kendi","yxs_libai",
+					"mtg_lilianna","xin_liru","liuxie","pal_lixiaoyao","pal_longkui","ns_nanhua","swd_qi","swd_septem","gw_shasixiwusi",
+					"ow_tianshi","swd_weida","gjqt_xiayize","swd_xiyan","hs_xsylvanas","hs_yelinlonghou","ow_yuanshi","zuoci"];
+				var vintage=['tianjian','shuiyun','zhuyue','zhimeng','poyun','qianfang','xfenxin','danqing','ywuhun','tianwu','xuelu',
+					'shahun','yuling','duhun','liaoyuan','touxi','wangchen','poyue','kunlunjing','huanhun','yunchou','tuzhen','cyqiaoxie',
+					'mufeng','duanyi','guozao','yaotong','pozhen','tanlin','susheng','jikong','shouyin','jilve','hxunzhi','huodan','shanxian',
+					'ziyu','kuoyin','feiren','zihui','jidong','baoxue','aqianghua','maoding','bfengshi','zhongdun','pingzhang','maichong',
+					'guozai','jingxiang','yuelu','liechao','fengnu','hanshuang','enze','malymowang','xshixin','qingzun'];
+				var favmodes=["versus|three", "versus|four", "versus|two", "chess|combat"];
 				for(var i=0;i<mode.length;i++){
 					game.saveConfig(mode[i]+'_banned',banned);
 					game.saveConfig(mode[i]+'_bannedcards',bannedcards);
 				}
+				var characters=lib.config.all.characters.slice(0);
+				characters.remove('standard');
+				characters.remove('old');
+				game.saveConfig('vintageSkills', vintage);
+				game.saveConfig('favouriteCharacter',favs);
+				game.saveConfig('favouriteMode',favmodes);
 				game.saveConfig('theme','simple');
+				game.saveConfig('player_border', 'slim');
 				game.saveConfig('cards',lib.config.all.cards);
-				game.saveConfig('characters',lib.config.all.characters);
+				game.saveConfig('characters',characters);
 				game.saveConfig('change_skin',false);
 				game.saveConfig('show_splash','off');
 				game.saveConfig('show_favourite',false);
 				game.saveConfig('animation', false);
+				game.saveConfig('hover_all', false);
+				game.saveConfig('asset_version', 'v1.9');
 				// game.saveConfig('characters',lib.config.all.characters);
 				// game.saveConfig('cards',lib.config.all.cards);
 				game.saveConfig('plays',['cardpile']);
@@ -8500,6 +8634,7 @@
 				game.saveConfig('background_audio',false);
 				game.saveConfig('background_speak',false);
 				game.saveConfig('show_volumn',false);
+				game.saveConfig('show_replay',true);
 				game.saveConfig('autostyle',true);
 				game.saveConfig('debug',true);
 				game.saveConfig('dev',true);
@@ -8608,17 +8743,17 @@
 					var sa=0,sb=0,sc=0,sd=0;
 					for(var i in lib.character){
 						switch(lib.character[i][1]){
-							case 'wei':a++;if(lib.config.forbidall.contains(i)) sa++;break;
-							case 'shu':b++;if(lib.config.forbidall.contains(i)) sb++;break;
-							case 'wu':c++;if(lib.config.forbidall.contains(i)) sc++;break;
-							case 'qun':d++;if(lib.config.forbidall.contains(i)) sd++;break;
+							case 'wei':a++;if(lib.config.banned.contains(i)) sa++;break;
+							case 'shu':b++;if(lib.config.banned.contains(i)) sb++;break;
+							case 'wu':c++;if(lib.config.banned.contains(i)) sc++;break;
+							case 'qun':d++;if(lib.config.banned.contains(i)) sd++;break;
 						}
 					}
 					console.log('魏：'+(a-sa)+'/'+a);
 					console.log('蜀：'+(b-sb)+'/'+b);
 					console.log('吴：'+(c-sc)+'/'+c);
 					console.log('群：'+(d-sd)+'/'+d);
-					console.log(((a+b+c+d)-(sa+sb+sc+sd))+'/'+(a+b+c+d));
+					console.log('已启用：'+((a+b+c+d)-(sa+sb+sc+sd))+'/'+(a+b+c+d));
 				}());
 				(function(){
 					var a=0,b=0,c=0,d=0;
@@ -8690,7 +8825,11 @@
 							}
 						}
 					}
-					console.log((a+b+c+d)+'/'+(aa+bb+cc+dd));
+					var arr=[];
+					for(var i=1;i<=13;i++){
+						arr.push(num[i]);
+					}
+					console.log((a+b+c+d)+'/'+(aa+bb+cc+dd),...arr)
 				}());
 			},
 			id:function(){
@@ -8741,7 +8880,12 @@
 				}
 				else{
 					if(bool){
-						game.saveConfig('test_game','single');
+						if(typeof bool==='string'){
+							game.saveConfig('test_game',bool);
+						}
+						else{
+							game.saveConfig('test_game','_');
+						}
 					}
 					else{
 						game.saveConfig('test_game',true);
@@ -8814,7 +8958,8 @@
 				var list=lib.rank.s.concat(lib.rank.ap).concat(lib.rank.a).concat(lib.rank.am).
 					concat(lib.rank.bp).concat(lib.rank.b).concat(lib.rank.bm).concat(lib.rank.c).concat(lib.rank.d);
 				for(var i in lib.character){
-					if(!lib.connectBanned.contains(i)&&i.indexOf('boss_')!=0&&i.indexOf('tafang_')!=0&&!list.contains(i)) console.log(get.translation(i));
+					if(lib.config.forbidai.contains(i)) continue;
+					if(i.indexOf('boss_')!=0&&i.indexOf('tafang_')!=0&&!list.contains(i)) console.log(get.translation(i),i);
 				}
 			},
 			h:function(player){
@@ -8966,6 +9111,13 @@
 			to:function(){
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=game.me){
+						cheat.t(i);
+					}
+				}
+			},
+			tm:function(){
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]==game.me){
 						cheat.t(i);
 					}
 				}
@@ -9147,6 +9299,10 @@
 					}
 					player.ai.tempIgnore=[];
 					player.stat.push({card:{},skill:{}});
+					if(ui.land&&ui.land.player==player){
+						game.addVideo('destroyLand');
+						ui.land.destroy();
+					}
 					'step 1'
 					event.trigger('phaseBeginStart');
 				},
@@ -9539,6 +9695,9 @@
 					'step 0'
 					var list=event.list;
 					if(!list.length){
+						if(trigger._triggering==this){
+							delete trigger._triggering;
+						}
 						event.finish();
 						return;
 					}
@@ -9693,14 +9852,26 @@
 							else if(info.prompt2!=false&&lib.translate[event.skill+'_info']){
 								next.prompt2=lib.translate[event.skill+'_info'];
 							}
+							if(trigger.skillwarn){
+								if(next.prompt2){
+									next.prompt2='<span class="thundertext">'+trigger.skillwarn+'。</span>'+next.prompt2;
+								}
+								else{
+									next.prompt2=trigger.skillwarn;
+								}
+							}
 						}
 					}
 					"step 2"
 					var info=get.info(event.skill);
 					if(result&&result.bool!=false){
-						if(info.autodelay&&(info.forced||!event.isMine())){
-							if(typeof info.autodelay=='number'){
-								game.delayx(info.autodelay);
+						var autodelay=info.autodelay;
+						if(typeof autodelay=='function'){
+							autodelay=autodelay(trigger,player);
+						}
+						if(autodelay&&(info.forced||!event.isMine())){
+							if(typeof autodelay=='number'){
+								game.delayx(autodelay);
 							}
 							else{
 								game.delayx();
@@ -10145,7 +10316,7 @@
 				},
 				chooseToUse:function(){
 					"step 0"
-					if(game.modeSwapPlayer&&!_status.auto&&player.isUnderControl()&&!lib.filter.wuxieSwap(trigger)){
+					if(game.modeSwapPlayer&&!_status.auto&&player.isUnderControl()&&!lib.filter.wuxieSwap(event)){
 						game.modeSwapPlayer(player);
 					}
 					var skills=player.getSkills(true);
@@ -10175,7 +10346,7 @@
 							event.fakeforce=false;
 						}
 					}
-					if(event.player.isUnderControl()){
+					if(event.player.isUnderControl()&&!_status.auto){
 						event.result={
 							bool:false
 						}
@@ -10389,7 +10560,8 @@
 						event.result={bool:false};
 					}
 					else{
-						if(game.modeSwapPlayer&&!_status.auto&&player.isUnderControl()&&!lib.filter.wuxieSwap(trigger)){
+						// &&!lib.filter.wuxieSwap(trigger)
+						if(game.modeSwapPlayer&&!_status.auto&&player.isUnderControl()){
 							game.modeSwapPlayer(player);
 						}
 						game.check();
@@ -10426,8 +10598,8 @@
 					event.resume();
 					if(event.result.bool&&!game.online){
 						var info=get.info(event.result.skill);
-						if(info&&info.onrespond){
-							info.onrespond(event.result,player);
+						if(info&&info.prerespond){
+							info.prerespond(event.result,player);
 						}
 						var next=player.respond(event.result.cards,event.result.card,event.animate,event.result.skill,event.source);
 						if(event.parent.card&&event.parent.type=='card'){
@@ -10450,7 +10622,8 @@
 						}
 					}
 					else{
-						if(game.modeSwapPlayer&&!_status.auto&&player.isUnderControl()&&!lib.filter.wuxieSwap(trigger)){
+						// &&!lib.filter.wuxieSwap(trigger)
+						if(game.modeSwapPlayer&&!_status.auto&&player.isUnderControl()){
 							game.modeSwapPlayer(player);
 						}
 						event.rangecards=player.getCards(event.position);
@@ -10830,6 +11003,136 @@
 					}
 					else if(event.preserve=='lose'){
 						event.preserve=!event.result.bool;
+					}
+				},
+				chooseSkill:function(){
+					'step 0'
+					var list;
+					if(typeof event.target=='string'){
+						list=get.gainableSkillsName(event.target,event.func);
+					}
+					else{
+						list=event.target.getGainableSkills(event.func);
+					}
+					if(!list.length){
+						event.finish();
+						event.result={bool:false};
+						return;
+					}
+					event.skillai=function(list){
+						return get.max(list,get.skillRank,'item');
+					};
+					if(event.isMine()){
+						var dialog=ui.create.dialog('forcebutton');
+						dialog.add(event.prompt||'选择获得一项技能');
+						_status.event.list=list;
+						var clickItem=function(){
+							_status.event._result=this.link;
+							game.resume();
+						};
+						for(i=0;i<list.length;i++){
+							if(lib.translate[list[i]+'_info']){
+								var translation=get.translation(list[i]);
+								if(translation[0]=='新'&&translation.length==3){
+									translation=translation.slice(1,3);
+								}
+								else{
+									translation=translation.slice(0,2);
+								}
+								var item=dialog.add('<div class="popup pointerdiv" style="width:80%;display:inline-block"><div class="skill">【'+
+								translation+'】</div><div>'+lib.translate[list[i]+'_info']+'</div></div>');
+								item.firstChild.addEventListener('click',clickItem);
+								item.firstChild.link=list[i];
+							}
+						}
+						dialog.add(ui.create.div('.placeholder'));
+						event.dialog=dialog;
+						event.switchToAuto=function(){
+							event._result=event.skillai(event.list);
+							game.resume();
+						};
+						_status.imchoosing=true;
+						game.pause();
+					}
+					else{
+						event._result=event.skillai(list);
+					}
+					'step 1'
+					_status.imchoosing=false;
+					if(event.dialog){
+						event.dialog.close();
+					}
+					event.result={bool:true,skill:result};
+				},
+				discoverCard:function(){
+					'step 0'
+					var num=event.num||3;
+					var choice;
+					if(typeof event.list=='string'||typeof event.list=='function'){
+						choice=get.inpile(event.list).randomGets(num);
+					}
+					else if(Array.isArray(event.list)){
+						choice=event.list.randomGets(num);
+					}
+					else{
+						choice=Array.from(event.list).randomGets(num);
+					}
+					if(choice.length){
+						var prompt=event.prompt;
+						if(!prompt){
+							prompt='选择一张牌';
+							if(event.use){
+								prompt+='使用之';
+							}
+							else if(!event.nogain){
+								prompt+='获得之';
+							}
+						}
+						if(typeof choice[0]==='string'){
+							var next=player.chooseVCardButton(choice,prompt,event.forced);
+							if(event.ai){
+								next.set('ai',event.ai);
+							}
+						}
+						else if(get.itemtype(choice[0])=='card'){
+							var next=player.chooseCardButton(choice,prompt,event.forced);
+							if(event.ai){
+								next.set('ai',event.ai);
+							}
+						}
+						else{
+							event.finish();
+						}
+					}
+					else{
+						event.finish();
+					}
+					'step 1'
+					event.result={
+						bool:result.bool,
+						card:null,
+						choice:null
+					};
+					if(result.bool&&result.links.length){
+						var link=result.links[0];
+						var togain=null;
+						if(get.itemtype(link)=='card'){
+							event.result.card=link;
+							togain=link;
+						}
+						else if(Array.isArray(link)){
+							event.result.choice=link[2];
+							togain=game.createCard(link[2]);
+						}
+						if(togain){
+							if(event.use){
+								player.chooseUseTarget(togain);
+							}
+							else if(!event.nogain){
+								player.gain(togain,'draw');
+								game.log(player,'获得了一张牌');
+							}
+						}
 					}
 				},
 				chooseButton:function(){
@@ -11482,6 +11785,9 @@
 					else{
 						event.dialog.add('选择'+get.translation(target)+'的一张牌');
 					}
+					if(event.prompt2){
+						event.dialog.addText(event.prompt2);
+					}
 					var directh=true;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
@@ -11596,6 +11902,9 @@
 					}
 					if(event.prompt){
 						event.dialog.add(event.prompt);
+					}
+					if(event.prompt2){
+						event.dialog.addText(event.prompt2);
 					}
 					var directh=true;
 					for(var i=0;i<event.position.length;i++){
@@ -11736,6 +12045,9 @@
 					if(event.prompt){
 						event.dialog.add(event.prompt);
 					}
+					if(event.prompt2){
+						event.dialog.addText(event.prompt2);
+					}
 					var directh=true;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
@@ -11833,7 +12145,7 @@
 					}
 					event.result.cards=event.result.links.slice(0);
 					event.cards=cards;
-					if(!_status.connectMode&&(target.isUnderControl(true)||player.isUnderControl(true))){
+					if(!_status.connectMode&&(target.isUnderControl(true)||player.isUnderControl(true)||event.visible)){
 						target.$give(cards,player);
 					}
 					else{
@@ -11911,6 +12223,7 @@
 					}
 					game.broadcast(function(str,cards,cards2,id){
 						var dialog=ui.create.dialog(str,cards);
+						dialog.forcebutton=true;
 						dialog.videoId=id;
 						if(cards2){
 							for(var i=0;i<dialog.buttons.length;i++){
@@ -12091,7 +12404,7 @@
 						event.finish();
 						return;
 					}
-					var next=player.lose(cards);
+					var next=player.lose(cards).set('type','use');
 					for(var i=0;i<cards.length;i++){
 						if(!next.cards.contains(cards[i])){
 							cards[i].discard();
@@ -12149,7 +12462,7 @@
 							}
 						},player,card);
 					}
-					if(event.animate!=false){
+					if(event.animate!=false&&event.line!=false){
 						if((card.name=='wuxie'||card.name=='youdishenru')&&event.getParent().source){
 							var lining=event.getParent().sourcex||event.getParent().source2||event.getParent().source;
 							if(get.mode()=='guozhan'&&card.hasTag&&card.hasTag('guo')){
@@ -12788,8 +13101,8 @@
 				},
 				swapHandcards:function(){
 					'step 0'
-					event.cards1=player.getCards('h');
-					event.cards2=target.getCards('h');
+					event.cards1=event.cards1||player.getCards('h');
+					event.cards2=event.cards2||target.getCards('h');
 					player.$giveAuto(event.cards1,target);
 					target.$giveAuto(event.cards2,player);
 					'step 1'
@@ -13568,12 +13881,14 @@
 						game.addVideo('gain2',player,get.cardsInfo([card.clone]));
 					}
 					player.equiping=true;
+					"step 3"
 					var current=player.getCards('e',{subtype:get.subtype(card)});
 					if(current.length){
 						player.lose(current,false);
 						event.swapped=true;
+						event.redo();
 					}
-					"step 3"
+					"step 4"
 					if(player.isMin() || player.countCards('e',{subtype:get.subtype(card)})){
 						event.finish();
 						card.discard();
@@ -13591,7 +13906,7 @@
 					player.$equip(card);
 					game.addVideo('equip',player,get.cardInfo(card));
 					game.log(player,'装备了',card);
-					"step 4"
+					"step 5"
 					var info=get.info(card);
 					if(info.onEquip&&(!info.filterEquip||info.filterEquip(card,player))){
 						if(Array.isArray(info.onEquip)){
@@ -14185,6 +14500,12 @@
 
 					return this;
 				},
+				getLeft:function(){
+					return this.offsetLeft;
+				},
+				getTop:function(){
+					return this.offsetTop;
+				},
 				smoothAvatar:function(vice,video){
 					var div=ui.create.div('.fullsize');
 					if(vice){
@@ -14279,14 +14600,14 @@
 					}
 					if(refnode){
 						lib.placePoppedDialog(dialog,{
-							clientX:(ui.arena.offsetLeft+this.offsetLeft+refnode.offsetLeft+refnode.offsetWidth/2)*game.documentZoom,
-							clientY:(ui.arena.offsetTop+this.offsetTop+refnode.offsetTop+refnode.offsetHeight/4)*game.documentZoom
+							clientX:(ui.arena.offsetLeft+this.getLeft()+refnode.offsetLeft+refnode.offsetWidth/2)*game.documentZoom,
+							clientY:(ui.arena.offsetTop+this.getTop()+refnode.offsetTop+refnode.offsetHeight/4)*game.documentZoom
 						});
 					}
 					else{
 						lib.placePoppedDialog(dialog,{
-							clientX:(this.offsetLeft+this.offsetWidth/2)*game.documentZoom,
-							clientY:(this.offsetTop+this.offsetHeight/4)*game.documentZoom
+							clientX:(this.getLeft()+this.offsetWidth/2)*game.documentZoom,
+							clientY:(this.getTop()+this.offsetHeight/4)*game.documentZoom
 						});
 					}
 					if(dialog._mod_height){
@@ -14668,10 +14989,10 @@
 						},this,target,config);
 						game.addVideo('line',this,[target.dataset.position,config]);
 						game.linexy([
-							this.offsetLeft+this.offsetWidth/2,
-							this.offsetTop+this.offsetHeight/2,
-							target.offsetLeft+target.offsetWidth/2,
-							target.offsetTop+target.offsetHeight/2
+							this.getLeft()+this.offsetWidth/2,
+							this.getTop()+this.offsetHeight/2,
+							target.getLeft()+target.offsetWidth/2,
+							target.getTop()+target.offsetHeight/2
 						],config,true);
 					}
 				},
@@ -14858,6 +15179,14 @@
 						}
 					}
 					return cards;
+				},
+				getGainableSkills:function(func){
+					var list=[];
+					var names=[this.name,this.name1,this.name2];
+					for(var i=0;i<names.length;i++){
+						list.addArray(get.gainableSkillsName(names[i],func));
+					}
+					return list;
 				},
 				countCards:function(arg1,arg2){
 					return this.getCards(arg1,arg2).length;
@@ -15461,6 +15790,46 @@
 						next.setContent('chooseToCompare');
 					}
 					next._args=Array.from(arguments);
+					return next;
+				},
+				chooseSkill:function(target){
+					var next=game.createEvent('chooseSkill');
+					next.player=this;
+					next.setContent('chooseSkill');
+					next.target=target;
+					for(var i=1;i<arguments.length;i++){
+						if(typeof arguments[i]=='string'){
+							next.prompt=arguments[i];
+						}
+						else if(typeof arguments[i]=='function'){
+							next.func=arguments[i];
+						}
+					}
+				},
+				discoverCard:function(list){
+					var next=game.createEvent('discoverCard');
+					next.player=this;
+					next.setContent('discoverCard');
+					next.list=list||lib.inpile.slice(0);
+					next.forced=true;
+					for(var i=1;i<arguments.length;i++){
+						if(typeof arguments[i]=='boolean'){
+							next.forced=arguments[i];
+						}
+						else if(typeof arguments[i]=='string'){
+							switch(arguments[i]){
+								case 'use': next.use=true; break;
+								case 'nogain': next.nogain=true; break;
+								default: next.prompt=arguments[i];
+							}
+						}
+						else if(typeof arguments[i]=='number'){
+							next.num=arguments[i];
+						}
+						else if(typeof arguments[i]==='function'){
+							next.ai=arguments[i];
+						}
+					}
 					return next;
 				},
 				chooseCardButton:function(){
@@ -16384,10 +16753,12 @@
 					next.setContent('respond');
 					return next;
 				},
-				swapHandcards:function(target){
+				swapHandcards:function(target,cards1,cards2){
 					var next=game.createEvent('swapHandcards',false);
 					next.player=this;
 					next.target=target;
+					if(cards1) next.cards1=cards1;
+					if(cards2) next.cards2=cards2;
 					next.setContent('swapHandcards');
 					return next;
 				},
@@ -16696,7 +17067,7 @@
 						case 1:this.draw(nodelay?'nodelay':1);break;
 						case 2:this.recover();break;
 						case 3:this.changeHujia();break;
-						case 4:this.addTempSkill('qianxing',{player:'phaseBegin'});break;
+						case 4:this.tempHide();
 						case 5:this.discard(this.getCards('j')).delay=(!nodelay);break;
 						case 6:{
 							if(this.isLinked()) this.link();
@@ -16843,6 +17214,9 @@
 				},
 				unMad:function(){
 					this.removeSkill('mad');
+				},
+				tempHide:function(){
+					this.addTempSkill('qianxing',{player:'phaseBegin'});
 				},
 				addExpose:function(num){
 					if(typeof this.ai.shown=='number'&&!this.identityShown&&this.ai.shown<1){
@@ -17552,6 +17926,23 @@
 						return player.canUse(card,current,distance,includecard);
 					});
 				},
+				getUseValue:function(card,distance,includecard){
+					if(typeof(card)=='string'){
+						card={name:card};
+					}
+					var player=this;
+					var targets=game.filterPlayer();
+					var min=0;
+					for(var i=0;i<targets.length;i++){
+						if(player.canUse(card,targets[i],distance,includecard)){
+							var eff=get.effect(targets[i],card,player,player);
+							if(eff>min){
+								min=eff;
+							}
+						}
+					}
+					return min;
+				},
 				addSubPlayer:function(cfg){
 					var skill='subplayer_'+cfg.name+'_'+get.id();
 					game.log(this,'获得了随从','#g'+get.translation(cfg.name))
@@ -18191,6 +18582,9 @@
 							player.style.transform='';
 							player.node.avatar.style.transform='';
 							player.node.avatar2.style.transform='';
+							if(game.chess){
+								ui.placeChess(player,player.dataset.position);
+							}
 							if(player==game.me) ui.me.removeAttribute('style');
 						}
 					},time)
@@ -18745,10 +19139,10 @@
 					}
 					return false;
 				},
-				hasSha:function(respond){
+				hasSha:function(respond,noauto){
 					if(this.countCards('h','sha')) return true;
 					if(this.countCards('h','hufu')) return true;
-					if(this.countCards('h','yuchanqian')) return true;
+					if(!noauto&&this.countCards('h','yuchanqian')) return true;
 					if(this.hasSkillTag('respondSha',true,respond?'respond':'use',true)) return true;
 					return false;
 				},
@@ -18826,6 +19220,14 @@
 						}
 					}
 					return null;
+				},
+				$drawAuto:function(cards,target){
+					if(this.isUnderControl(true,target)){
+						this.$draw(cards);
+					}
+					else{
+						this.draw(cards.length);
+					}
 				},
 				$draw:function(num,init,config){
 					if(init!==false&&init!=='nobroadcast'){
@@ -18905,8 +19307,8 @@
 						dx*=coeff;
 						dy*=coeff;
 
-						node.style.left=(this.offsetLeft+this.offsetWidth/2-52-dx)+'px';
-						node.style.top=(this.offsetTop+this.offsetHeight/2-52-dy)+'px';
+						node.style.left=(this.getLeft()+this.offsetWidth/2-52-dx)+'px';
+						node.style.top=(this.getTop()+this.offsetHeight/2-52-dy)+'px';
 						this.parentNode.appendChild(node);
 					}
 					else{
@@ -18914,8 +19316,8 @@
 						node.style.left='calc(50% - 52px)';
 						node.style.top='calc(50% - 52px)';
 
-						dx=this.offsetLeft+this.offsetWidth/2-52-node.offsetLeft;
-						dy=this.offsetTop+this.offsetHeight/2-52-node.offsetTop;
+						dx=this.getLeft()+this.offsetWidth/2-52-node.offsetLeft;
+						dy=this.getTop()+this.offsetHeight/2-52-node.offsetTop;
 
 						if(get.is.mobileMe(this)){
 							dx+=get.cardOffset();
@@ -19213,12 +19615,13 @@
 					}
 				},
 				$throwordered:function(){
-					if(lib.config.low_performance){
-						return this.$throwordered2.apply(this,arguments);
-					}
-					else{
-						return this.$throwordered1.apply(this,arguments);
-					}
+					return this.$throwordered2.apply(this,arguments);
+					// if(lib.config.low_performance){
+					// 	return this.$throwordered2.apply(this,arguments);
+					// }
+					// else{
+					// 	return this.$throwordered1.apply(this,arguments);
+					// }
 				},
 				$throwordered1:function(node,nosource){
 					node.classList.add('thrown');
@@ -19324,8 +19727,8 @@
 							dy=rect.top+this.offsetHeight/2-52-ny;
 						}
 						else{
-							dx=this.offsetLeft+this.offsetWidth/2-52-nx;
-							dy=this.offsetTop+this.offsetHeight/2-52-ny;
+							dx=this.getLeft()+this.offsetWidth/2-52-nx;
+							dy=this.getTop()+this.offsetHeight/2-52-ny;
 							if(get.is.mobileMe(this)){
 								dx+=get.cardOffset();
 								if(ui.arena.classList.contains('oblongcard')){
@@ -19368,8 +19771,8 @@
 							dy=rect.top+this.offsetHeight/2-52-ny;
 						}
 						else{
-							dx=this.offsetLeft+this.offsetWidth/2-52-nx;
-							dy=this.offsetTop+this.offsetHeight/2-52-ny;
+							dx=this.getLeft()+this.offsetWidth/2-52-nx;
+							dy=this.getTop()+this.offsetHeight/2-52-ny;
 							if(get.is.mobileMe(this)){
 								dx+=get.cardOffset();
 								if(ui.arena.classList.contains('oblongcard')){
@@ -19484,8 +19887,8 @@
 					var ny=parseCalc(node.style.top);
 					nx=nx[0]*ui.arena.offsetWidth/100+nx[1];
 					ny=ny[0]*ui.arena.offsetHeight/100+ny[1];
-					var dx=this.offsetLeft+this.offsetWidth/2-52-nx;
-					var dy=this.offsetTop+this.offsetHeight/2-52-ny;
+					var dx=this.getLeft()+this.offsetWidth/2-52-nx;
+					var dy=this.getTop()+this.offsetHeight/2-52-ny;
 					if(flipx) dx=-dx;
 					if(flipy) dy=-dy;
 					if(trans){
@@ -19691,8 +20094,8 @@
 							// node.style.top='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*80+'px)';
 
 							node.listenTransition(function(){
-								var dx=player.offsetLeft+player.offsetWidth/2-52-node.offsetLeft;
-								var dy=player.offsetTop+player.offsetHeight/2-52-node.offsetTop;
+								var dx=player.getLeft()+player.offsetWidth/2-52-node.offsetLeft;
+								var dy=player.getTop()+player.offsetHeight/2-52-node.offsetTop;
 								if(node.style.transform&&node.style.transform!='none'&&node.style.transform.indexOf('translate')==-1){
 									node.style.transform+=' translate('+dx+'px,'+dy+'px)';
 								}
@@ -19906,8 +20309,8 @@
 						top=rect.top;
 					}
 					else{
-						left=this.offsetLeft;
-						top=this.offsetTop;
+						left=this.getLeft();
+						top=this.getTop();
 					}
 					game.animate.flame(left+this.offsetWidth/2,
 						top+this.offsetHeight-20,700,'fire');
@@ -19921,8 +20324,8 @@
 						top=rect.top;
 					}
 					else{
-						left=this.offsetLeft;
-						top=this.offsetTop;
+						left=this.getLeft();
+						top=this.getTop();
 					}
 					game.animate.flame(left+this.offsetWidth/2,
 						top+this.offsetHeight-30,700,'thunder');
@@ -19956,12 +20359,12 @@
 					game.addVideo('flame',this,'rare');
 					var left,top;
 					if(game.chess){
-						left=this.offsetLeft-ui.arena.offsetLeft;
-						top=this.offsetTop-ui.arena.offsetTop;
+						left=this.getLeft()-ui.arena.offsetLeft;
+						top=this.getTop()-ui.arena.offsetTop;
 					}
 					else{
-						left=this.offsetLeft;
-						top=this.offsetTop;
+						left=this.getLeft();
+						top=this.getTop();
 					}
 					if(this.classList.contains('minskin')){
 						top+=15;
@@ -19974,12 +20377,12 @@
 					game.addVideo('flame',this,'epic');
 					var left,top;
 					if(game.chess){
-						left=this.offsetLeft-ui.arena.offsetLeft;
-						top=this.offsetTop-ui.arena.offsetTop;
+						left=this.getLeft()-ui.arena.offsetLeft;
+						top=this.getTop()-ui.arena.offsetTop;
 					}
 					else{
-						left=this.offsetLeft;
-						top=this.offsetTop;
+						left=this.getLeft();
+						top=this.getTop();
 					}
 					if(this.classList.contains('minskin')){
 						top+=15;
@@ -19992,12 +20395,12 @@
 					game.addVideo('flame',this,'legend');
 					var left,top;
 					if(game.chess){
-						left=this.offsetLeft-ui.arena.offsetLeft;
-						top=this.offsetTop-ui.arena.offsetTop;
+						left=this.getLeft()-ui.arena.offsetLeft;
+						top=this.getTop()-ui.arena.offsetTop;
 					}
 					else{
-						left=this.offsetLeft;
-						top=this.offsetTop;
+						left=this.getLeft();
+						top=this.getTop();
 					}
 					if(this.classList.contains('minskin')){
 						top+=15;
@@ -20012,8 +20415,8 @@
 						}
 					},this);
 					game.addVideo('flame',this,'coin');
-					var left=this.offsetLeft-ui.arena.offsetLeft;
-					var top=this.offsetTop-ui.arena.offsetTop;
+					var left=this.getLeft()-ui.arena.offsetLeft;
+					var top=this.getTop()-ui.arena.offsetTop;
 					if(this.classList.contains('minskin')){
 						top+=15;
 					}
@@ -20028,8 +20431,8 @@
 						}
 					},this);
 					game.addVideo('flame',this,'dust');
-					var left=this.offsetLeft-ui.arena.offsetLeft;
-					var top=this.offsetTop-ui.arena.offsetTop;
+					var left=this.getLeft()-ui.arena.offsetLeft;
+					var top=this.getTop()-ui.arena.offsetTop;
 					if(this.classList.contains('minskin')){
 						top+=15;
 					}
@@ -20046,8 +20449,8 @@
 						top=rect.top;
 					}
 					else{
-						left=this.offsetLeft;
-						top=this.offsetTop;
+						left=this.getLeft();
+						top=this.getTop();
 					}
 					game.animate.flame(left+this.offsetWidth/2,
 						top+this.offsetHeight-30,700,'recover');
@@ -20173,17 +20576,17 @@
 					},this,source);
 					if(source&&source!=this&&lib.config.damage_shake){
 						var left,top;
-						if(source.offsetTop==this.offsetTop){
+						if(source.getTop()==this.getTop()){
 							left=20;
 							top=0;
 						}
 						else{
-							var ratio=(source.offsetLeft-this.offsetLeft)/(source.offsetTop-this.offsetTop);
+							var ratio=(source.getLeft()-this.getLeft())/(source.getTop()-this.getTop());
 							left=Math.abs(20*ratio/Math.sqrt(1+ratio*ratio));
 							top=Math.abs(20/Math.sqrt(1+ratio*ratio));
 						}
-						if(source.offsetLeft-this.offsetLeft>0) left=-left;
-						if(source.offsetTop-this.offsetTop>0) top=-top;
+						if(source.getLeft()-this.getLeft()>0) left=-left;
+						if(source.getTop()-this.getTop()>0) top=-top;
 						if(get.is.mobileMe(this)){
 							if(this.classList.contains('linked')){
 								this.node.avatar.style.transform='translate('+left+'px,'+top+'px) rotate(-90deg)';
@@ -20196,6 +20599,9 @@
 						}
 						else if(this.classList.contains('linked')&&get.is.newLayout()){
 							this.style.transform='translate('+left+'px,'+top+'px) rotate(-90deg)';
+						}
+						else if(this._chesstransform){
+							this.style.transform='translate('+(left+this._chesstransform[0])+'px,'+(top+this._chesstransform[1])+'px)';
 						}
 						else{
 							this.style.transform='translate('+left+'px,'+top+'px)';
@@ -20220,6 +20626,9 @@
 						else if(this.classList.contains('linked')&&get.is.newLayout()){
 							this.style.transform='scale('+zoom2+') rotate(-90deg)';
 						}
+						else if(game.chess&&this._chesstransform){
+							this.style.transform='translate('+this._chesstransform[0]+'px,'+this._chesstransform[1]+'px) scale('+zoom2+')';
+						}
 						else{
 							this.style.transform='scale('+zoom2+')';
 						}
@@ -20241,14 +20650,18 @@
 				$dieflip:function(type){
 					var top0=ui.window.offsetHeight/2;
 					var left0=ui.window.offsetWidth/2;
-					var ratio=(left0-this.offsetLeft)/(top0-this.offsetTop);
+					var ratio=(left0-this.getLeft())/(top0-this.getTop());
 					var left=Math.abs(50*ratio/Math.sqrt(1+ratio*ratio));
 					var top=Math.abs(50/Math.sqrt(1+ratio*ratio));
-					if(left0-this.offsetLeft>0) left=-left;
-					if(top0-this.offsetTop>0) top=-top;
+					if(left0-this.getLeft()>0) left=-left;
+					if(top0-this.getTop()>0) top=-top;
 					if(get.is.mobileMe(this)){
 						left=-Math.random()*5-10;
 						top=Math.random()*5+10;
+					}
+					if(this._chesstransform){
+						left+=this._chesstransform[0];
+						top+=this._chesstransform[1];
 					}
 					var transform='translate('+left+'px,'+top+'px) '+
 					'rotate('+(Math.random()*20-10)+'deg) ';
@@ -20445,7 +20858,12 @@
 							}
 						}
 						else if(lib.card[bg].image){
-							this.node.avatar.setBackground(lib.card[bg].image);
+							if(lib.card[bg].image.indexOf('character:')==0){
+								this.node.avatar.setBackground(lib.card[bg].image.slice(10),'character');
+							}
+							else{
+								this.node.avatar.setBackground(lib.card[bg].image);
+							}
 						}
 						else{
 							var cardPack=lib.cardPack['mode_'+get.mode()];
@@ -20637,7 +21055,7 @@
 						if(this._transform&&this.parentNode&&this.parentNode.parentNode&&
 							this.parentNode.parentNode.parentNode==ui.me&&
 							(!_status.mousedown||_status.mouseleft)&&
-							(!this.parentNode.parentNode.classList.contains('scrollh')||game.layout=='long2')){
+							(!this.parentNode.parentNode.classList.contains('scrollh')||(game.layout=='long2'||game.layout=='nova'))){
 							if(bool){
 								this.style.transform=this._transform+' translateY(-20px)';
 							}
@@ -20679,15 +21097,15 @@
 						var ny=[50,-52];
 						nx=nx[0]*ui.arena.offsetWidth/100+nx[1];
 						ny=ny[0]*ui.arena.offsetHeight/100+ny[1];
-						dx=player.offsetLeft+player.offsetWidth/2-52-nx;
-						dy=player.offsetTop+player.offsetHeight/2-52-ny;
+						dx=player.getLeft()+player.offsetWidth/2-52-nx;
+						dy=player.getTop()+player.offsetHeight/2-52-ny;
 					}
 					else{
 						this.style.left=this.offsetLeft+'px';
 						this.style.top=this.offsetTop+'px';
 
-						dx=player.offsetLeft+player.offsetWidth/2-52-this.offsetLeft;
-						dy=player.offsetTop+player.offsetHeight/2-52-this.offsetTop;
+						dx=player.getLeft()+player.offsetWidth/2-52-this.offsetLeft;
+						dy=player.getTop()+player.offsetHeight/2-52-this.offsetTop;
 					}
 					if(get.is.mobileMe(player)){
 						dx+=get.cardOffset();
@@ -21154,22 +21572,23 @@
 						next.list=list;
 						next._trigger=event;
 						next.triggername=name;
+						event._triggering=next;
 					}
 				},
 				untrigger:function(all,player){
+					var evt=this._triggering;
 					if(all){
-						this.next.length=0;
+						if(evt&&evt.list) evt.list.length=0;
 						this._triggered=5;
 					}
-					else if(player){
-						this._notrigger.add(player);
-						for(var i=0;i<this.next.length;i++){
-							if(this.next[i].player==player) this.next.splice(i--,1);
-						}
-					}
 					else{
-						for(var i=0;i<this.next.length;i++){
-							if(this.next[i]._trigger==this) this.next.splice(i--,1);
+						if(player){
+							this._notrigger.add(player);
+						}
+						if(evt&&evt.list){
+							for(var i=0;i<evt.list.length;i++){
+								if(evt.list[i][1]==player) evt.list.splice(i--,1);
+							}
 						}
 					}
 				}
@@ -21177,7 +21596,12 @@
 			dialog:{
 				add:function(item,noclick,zoom){
 					if(typeof item=='string'){
-						if(noclick){
+						if(item.indexOf('###')==0){
+							var items=item.slice(3).split('###');
+							this.add(items[0],noclick,zoom);
+							this.addText(items[1],noclick,zoom);
+						}
+						else if(noclick){
 							var strstr=item;
 							item=ui.create.div('',this.content);
 							item.innerHTML=strstr;
@@ -21203,6 +21627,15 @@
 						var buttons=ui.create.div('.buttons',this.content);
 						if(zoom) buttons.classList.add('smallzoom');
 						this.buttons=this.buttons.concat(ui.create.buttons(item[0],item[1],buttons,noclick));
+					}
+					if(this.buttons.length) {
+						if(this.forcebutton!==false) this.forcebutton=true;
+						if(this.buttons.length>3||(zoom&&this.buttons.length>5)){
+							this.classList.remove('forcebutton-auto');
+						}
+						else{
+							this.classList.add('forcebutton-auto');
+						}
 					}
 					ui.update();
 					return item;
@@ -21551,16 +21984,16 @@
 					if(double_character&&lib.config.forbiddouble.contains(i)){
 						return true;
 					}
-					if(lib.configOL.ban_weak){
-						if(lib.config.replacecharacter[i]&&libCharacter&&libCharacter[lib.config.replacecharacter[i]]) return true;
-						if(lib.config.forbidall.contains(i)) return true;
-						if(!double_character&&get.rank(i,true)<=2){
-							return true;
-						}
-					}
-					if(lib.configOL.ban_strong&&get.rank(i,true)>=8){
-						return true;
-					}
+					// if(lib.configOL.ban_weak){
+					// 	if(lib.config.replacecharacter[i]&&libCharacter&&libCharacter[lib.config.replacecharacter[i]]) return true;
+					// 	if(lib.config.forbidall.contains(i)) return true;
+					// 	if(!double_character&&get.rank(i,true)<=2){
+					// 		return true;
+					// 	}
+					// }
+					// if(lib.configOL.ban_strong&&get.rank(i,true)>=8){
+					// 	return true;
+					// }
 				}
 				else{
 					if(lib.config.banned.contains(i)) return true;
@@ -21577,16 +22010,16 @@
 					if(double_character&&lib.config.forbiddouble.contains(i)){
 						return true;
 					}
-					if(get.config('ban_weak')){
-						if(lib.config.replacecharacter[i]&&lib.character[lib.config.replacecharacter[i]]) return true;
-						if(lib.config.forbidall.contains(i)) return true;
-						if(!double_character&&get.rank(i,true)<=2){
-							return true;
-						}
-					}
-					if(get.config('ban_strong')&&get.rank(i,true)>=8){
-						return true;
-					}
+					// if(get.config('ban_weak')){
+					// 	if(lib.config.replacecharacter[i]&&lib.character[lib.config.replacecharacter[i]]) return true;
+					// 	if(lib.config.forbidall.contains(i)) return true;
+					// 	if(!double_character&&get.rank(i,true)<=2){
+					// 		return true;
+					// 	}
+					// }
+					// if(get.config('ban_strong')&&get.rank(i,true)>=8){
+					// 	return true;
+					// }
 				}
 			},
 			characterDisabled2:function(i){
@@ -21722,10 +22155,18 @@
 					if(typeof mod=='boolean') return mod;
 					if(typeof mod=='number') extra=mod;
 				}
-				var range=get.info(card).range;
-				if(range==undefined) return true;
+				var info=get.info(card);
+				var range=info.range;
+				var outrange=info.outrange;
+				if(range==undefined&&outrange==undefined) return true;
+				
 				for(var i in range){
-					if(range[i]<get.distance(player,target,i)+extra) return false;
+					var distance=get.distance(player,target,i)+extra;
+					if(range[i]<distance) return false;
+				}
+				for(var i in outrange){
+					var distance=get.distance(player,target,i)+extra;
+					if(outrange[i]>distance) return false;
 				}
 				return true;
 			},
@@ -21889,6 +22330,7 @@
 			others:{},
 			zhu:{},
 			zhuSkill:{},
+			land_used:{},
 			unequip:{ai:{unequip:true}},
 			subplayer:{
 				trigger:{player:'dieBefore'},
@@ -23412,6 +23854,68 @@
 			}
 			return node;
 		},
+		changeLand:function(url,player){
+			game.addVideo('changeLand',player,url);
+			if(url.indexOf('/')===-1){
+				url='image/card/'+url;
+			}
+			if(url.indexOf('.png')==-1&&url.indexOf('.jpg')==-1){
+				url+='.jpg';
+			}
+			var name=url.slice(url.lastIndexOf('/')+1,url.lastIndexOf('.'));
+			var skill=name+'_skill';
+			var node=ui.create.div('.background.upper.land');
+			node.setBackgroundImage(url);
+			node.destroy=function(){
+				if (this.skill) {
+					game.removeGlobalSkill(this.skill);
+					if(this.system){
+						this.system.remove();
+					}
+				}
+				this.classList.add('hidden');
+				var node=this;
+				setTimeout(function(){
+					node.remove();
+				},3000);
+				if(ui.land==this){
+					ui.land=null;
+				}
+			}
+			if(ui.land){
+				document.body.insertBefore(node,ui.land);
+				ui.land.destroy();
+			}
+			else{
+				node.classList.add('hidden');
+				document.body.insertBefore(node,ui.window);
+				ui.refresh(node);
+				node.classList.remove('hidden');
+			}
+			ui.land=node;
+			if(name){
+				node.name=name;
+				node.skill=skill;
+				if(player){
+					node.player=player;
+					player.addTempSkill('land_used');
+				}
+				node.system=ui.create.system(lib.translate[skill],null,true,true);
+				lib.setPopped(node.system,function(){
+					var uiintro=ui.create.dialog('hidden');
+					var str='地图';
+					if(player){
+						str='来源：'+get.translation(player);
+					}
+					var caption=uiintro.addText(str);
+					caption.style.margin='0';
+					uiintro._place_text=uiintro.add('<div class="text">'+lib.translate[skill+'_info']+'</div>');
+					uiintro.add(ui.create.div('.placeholder.slim'));
+					return uiintro;
+				},200);
+				game.addGlobalSkill(skill);
+			}
+		},
 		checkFileList:function(updates,proceed){
 			var n=updates.length;
 			if(!n){
@@ -24627,6 +25131,14 @@
 					}
 				}
 			},
+			changeLand:function(player,url){
+				game.changeLand(url,player);
+			},
+			destroyLand:function(){
+				if(ui.land){
+					ui.land.destroy();
+				}
+			},
 			playAudio:function(str){
 				game.playAudio(str,'video');
 			},
@@ -24723,17 +25235,6 @@
 			colorObstacle:function(pos){
 				if(pos){
 					game.colorObstacle(pos[0],pos[1]);
-				}
-			},
-			moveTox:function(player,pos){
-				if(player&&player.dataset){
-					delete lib.posmap[player.dataset.position];
-					player.dataset.position=pos;
-					lib.posmap[pos]=player;
-					game.delay();
-				}
-				else{
-					console.log(player);
 				}
 			},
 			thrownhighlight1:function(){
@@ -25724,7 +26225,7 @@
 				if(game.chess){
 					dialog.classList.add('center');
 				}
-				if(game.layout=='long2'&&!game.chess){
+				if((game.layout=='long2'||game.layout=='nova')&&!game.chess){
 					ui.arena.classList.add('choose-character');
 					if(ui.me) ui.me.hide();
 					if(ui.mebg) ui.mebg.hide()
@@ -26658,7 +27159,7 @@
 			lib.skill.global.remove(skill);
 			delete lib.skill.globalmap[skill];
 			for(var i in lib.hook.globalskill){
-				lib.hook.globalskill.remove(skill);
+				lib.hook.globalskill[i].remove(skill);
 			}
 		},
 		resetSkills:function(){
@@ -26811,7 +27312,7 @@
 			if(ui.time3){
 				clearInterval(ui.time3.interval);
 			}
-			if(game.layout=='long2'&&!game.chess){
+			if((game.layout=='long2'||game.layout=='nova')&&!game.chess){
 				ui.arena.classList.add('choose-character');
 				ui.me.hide();
 				ui.mebg.hide()
@@ -27319,7 +27820,7 @@
 			}
 
 			if(lib.config.test_game&&!_status.connectMode){
-				if(lib.config.test_game!='single'){
+				if(typeof lib.config.test_game!=='string'){ 
 					switch(lib.config.mode){
 						case 'identity':game.saveConfig('mode','guozhan');break;
 						case 'guozhan':game.saveConfig('mode','versus');break;
@@ -27436,6 +27937,10 @@
 			if(_status.paused||_status.paused2||_status.over){
 				return;
 			}
+			if(_status.paused3){
+				_status.paused3='paused';
+				return;
+			}
 			if(lib.status.dateDelaying){
 				lib.status.dateDelayed+=lib.getUTC(new Date())-lib.getUTC(lib.status.dateDelaying);
 				delete lib.status.dateDelaying;
@@ -27501,6 +28006,7 @@
 					if(event.name=='phase'&&!event._begun){
 						var next=game.createEvent('phasing',false,event);
 						next.player=event.player;
+						next.skill=event.skill;
 						next.setContent('phasing');
 						event._begun=true;
 					}
@@ -27531,7 +28037,7 @@
 						event.finish();
 					}
 					else{
-						if(lib.config.compatiblemode||(_status.connectMode&&!lib.config.debug)){
+						if(_status.withError||lib.config.compatiblemode||(_status.connectMode&&!lib.config.debug)){
 							try{
 								event.content(event,step,source,player,target,targets,
 									card,cards,skill,forced,num,trigger,result,
@@ -28559,7 +29065,7 @@
 						},300);
 					},400);
 				};
-				event.aiMove=function(){
+				event.aiMove=function(friend){
 					var list=[];
 					for(var i=0;i<event.avatars.length;i++){
 						if(!event.avatars[i].classList.contains('moved')){
@@ -28568,8 +29074,14 @@
 					}
 					for(var i=0;i<list.length;i++){
 						if(Math.random()<0.7||i==list.length-1){
-							event.moveAvatar(list[i],event.enemy.length);
-							event.enemy.push(list[i]);
+							if(friend){
+								event.moveAvatar(list[i],event.friend.length+event.config.width*(event.config.height-1));
+								event.friend.push(list[i]);
+							}
+							else{
+								event.moveAvatar(list[i],event.enemy.length);
+								event.enemy.push(list[i]);
+							}
 							list[i].classList.add('moved');
 							break;
 						}
@@ -28684,6 +29196,13 @@
 						game.resume();
 					}
 				};
+				event.skipnode=ui.create.system('跳过',function(){
+					this.remove();
+					event._skiprest=true;
+					if(event.imchoosing){
+						game.resume();
+					}
+				});
 				if(get.config('change_choice')){
 					event.replacenode=ui.create.system('换将',function(){
 						event.promptbar.hide();
@@ -28853,6 +29372,7 @@
 				lib.init.onfree();
 				'step 2'
 				if(event.checkredo()) return;
+				if(event._skiprest) return;
 				if(event.side<2){
 					event.imchoosing=true;
 					if(event.side==0){
@@ -28877,7 +29397,15 @@
 				}
 				delete event.imchoosing;
 				if(event.checkredo()) return;
-				if(event.friend.length+event.enemy.length<event.config.width*2-1){
+				if(event._skiprest){
+					while(event.enemy.length<event.config.width){
+						event.aiMove();
+					}
+					while(event.friend.length<event.config.width){
+						event.aiMove(true);
+					}
+				}
+				else if(event.friend.length+event.enemy.length<event.config.width*2-1){
 					if(event.side==1){
 						game.delay(event.fast?1:2);
 						event.promptbar.hide();
@@ -28900,6 +29428,7 @@
 				}
 				'step 4'
 				if(event.checkredo()) return;
+				if(event.skipnode) event.skipnode.delete();
 				if(event.replacenode) event.replacenode.delete();
 				if(event.reselectnode) event.reselectnode.delete();
 				if(event.freechoosenode) event.freechoosenode.delete();
@@ -29132,7 +29661,7 @@
 				lib.skill[k]=(function(round,name){
 					return {
 						init:function(player){
-							player.storage[name]=1-round;
+							if(typeof player.storage[name]!=='number') player.storage[name]=1-round;
 						},
 						intro:{
 							content:function(storage,player){
@@ -30070,8 +30599,8 @@
 				_status.roundStart=player.next||player.getNext()||game.players[0];
 			}
 			var players=game.players.concat(game.dead);
-			player.style.top=player.offsetTop+'px';
-			player.style.left=player.offsetLeft+'px';
+			player.style.left=player.getLeft()+'px';
+			player.style.top=player.getTop()+'px';
 			if(player==undefined) player=game.dead[0]||game.me.next;
 			var position=parseInt(player.dataset.position);
 			for(var i=0;i<players.length;i++){
@@ -30634,27 +31163,38 @@
 
 				var openMenu=function(node,e,onclose){
 					popupContainer.innerHTML='';
-					if(e){
-						node.style.left=e.x+'px';
-						node.style.top=e.y+'px';
-					}
+					var left=Math.round(e.clientX/game.documentZoom);
+					var zoom=get.is.phoneLayout?1.3:1;
 					popupContainer.appendChild(node);
-					var rect=node.getBoundingClientRect();
+					// var rect=node.getBoundingClientRect();
 					if(node.classList.contains('visual')){
-						var num=node.querySelectorAll('.menu.visual>div').length;
-						node.style.top=(e.y-node.offsetHeight/2+30)+'px';
+						// var num=node.querySelectorAll('.menu.visual>div').length;
+						// node.style.top=(e.y-node.offsetHeight/2+30)+'px';
 						for(var i=0;i<node.childElementCount;i++){
 							if(node.childNodes[i].update){
 								node.childNodes[i].update();
 							}
 						}
-						if(node.offsetTop<10){
-							node.style.top='10px';
-						}
+						// if(node.offsetTop<10){
+						// 	node.style.top='10px';
+						// }
 					}
-					else if(get.is.phoneLayout()&&rect.top*1.3+rect.height*1.3+20>ui.window.offsetHeight){
-						node.style.top=(ui.window.offsetHeight-20-rect.height*1.3)/1.3+'px';
+					// else if(get.is.phoneLayout()&&rect.top*1.3+rect.height*1.3+20>ui.window.offsetHeight){
+					// 	node.style.top=(ui.winheightdow.offsetHeight-20-rect.height*1.3)/1.3+'px';
+					// }
+					// if(e){
+					var height=node.offsetHeight;
+					var idealtop=e.clientY/game.documentZoom;
+					if(idealtop<10){
+						idealtop=10;
 					}
+					else if((idealtop+height)*zoom+10>ui.window.offsetHeight){
+						idealtop=(ui.window.offsetHeight-10)/zoom-height;
+					}
+					node.style.top=idealtop+'px';
+					node.style.left=left+'px';
+					// }
+
 					popupContainer.classList.remove('hidden');
 					popupContainer.onclose=onclose;
 				};
@@ -30680,16 +31220,16 @@
 						var pos2=ui.window.getBoundingClientRect();
 						if(this._link.menu.classList.contains('visual')){
 							openMenu(this._link.menu,{
-								x:pos1.left+pos1.width+5-pos2.left,
-								y:pos1.top-pos2.top
+								clientX:pos1.left+pos1.width+5-pos2.left,
+								clientY:pos1.top-pos2.top
 							},function(){
 								node.classList.remove('on');
 							});
 						}
 						else if(this._link.menu.childElementCount>10){
 							openMenu(this._link.menu,{
-								x:pos1.left+pos1.width+5-pos2.left,
-								y:Math.min((ui.window.offsetHeight-400)/2,pos1.top-pos2.top)
+								clientX:pos1.left+pos1.width+5-pos2.left,
+								clientY:Math.min((ui.window.offsetHeight-400)/2,pos1.top-pos2.top)
 							},function(){
 								node.classList.remove('on');
 							});
@@ -30697,8 +31237,8 @@
 						}
 						else{
 							openMenu(this._link.menu,{
-								x:pos1.left+pos1.width+5-pos2.left,
-								y:pos1.top-pos2.top
+								clientX:pos1.left+pos1.width+5-pos2.left,
+								clientY:pos1.top-pos2.top
 							},function(){
 								node.classList.remove('on');
 							});
@@ -30768,13 +31308,7 @@
 							active._link.remove();
 						}
 						this.classList.add('active');
-						menuTabBar.style.transform='translateX('+(this.getBoundingClientRect().left-this.parentNode.firstChild.getBoundingClientRect().left)+'px)';
-						// if((game.deviceZoom!=1||lib.crosswalk||lib.device=='ios')&&get.is.phoneLayout()){
-						//     menuTabBar.style.left=(this.offsetLeft/game.documentZoom)+'px';
-						// }
-						// else{
-						//     menuTabBar.style.left=this.offsetLeft+'px';
-						// }
+						menuTabBar.style.transform='translateX('+(this.getBoundingClientRect().left-this.parentNode.firstChild.getBoundingClientRect().left)/game.documentZoom+'px)';
 						menuContent.appendChild(this._link);
 					};
 					ui.click.menuTab=function(tab){
@@ -32173,8 +32707,8 @@
 								var pos1=this.getBoundingClientRect();
 								var pos2=ui.window.getBoundingClientRect();
 								openMenu(this.menu,{
-									x:pos1.left+pos1.width+5-pos2.left,
-									y:pos1.top-pos2.top
+									clientX:pos1.left+pos1.width+5-pos2.left,
+									clientY:pos1.top-pos2.top
 								});
 							});
 							addbutton.menu=ui.create.div('.menu');
@@ -32247,6 +32781,13 @@
 							filelist.listen(clickFileList);
 							lib.setScroll(filelist);
 							game.getFileList(path,function(folders,files){
+								var sort=function(a,b){
+									if(a>b) return 1;
+									if(a<b) return -1;
+									return 0;
+								}
+								folders.sort(sort);
+								files.sort(sort);
 								var parent=path;
 								if(parent){
 									parent+='/';
@@ -35910,7 +36451,7 @@
 						li2.innerHTML='素材版本：'+(lib.config.asset_version||'无')+'<p style="margin-top:8px"></p>';
 						li3.innerHTML='更新地址：<span>'+trimurl(lib.config.updateURL||lib.updateURL)+'</span><p style="margin-top:8px"></p>';
 						li3.style.whiteSpace='nowrap';
-						// li3.style.display='none';// coding
+						li3.style.display='none';// coding
 
 						var button1,button2,button3,button4,button5;
 
@@ -36338,7 +36879,7 @@
 								else{
 									updatep1.style.display='';
 									updatep2.style.display='';
-									// updatep3.style.display='none'; // coding
+									updatep3.style.display='none'; // coding
 									updatepx.style.display='none';
 									updatep4.innerHTML='更新';
 								}
@@ -36362,7 +36903,7 @@
 
 						var button6=document.createElement('button');
 						button6.innerHTML='设为备用镜像';
-						// button6.style.display='none';// coding
+						button6.style.display='none';// coding
 						// button6.style.marginLeft='5px';
 						button6.onclick=function(){
 							game.saveConfig('updateURL',lib.mirrorURL);
@@ -38009,7 +38550,7 @@
 					_status.clicked2=true;
 				});
 				if(heightset){
-					dialog.style.height=(game.layout=='long2'?380:350)+'px';
+					dialog.style.height=((game.layout=='long2'||game.layout=='nova')?380:350)+'px';
 					dialog._scrollset=true;
 				}
 				dialog.getCurrentCapt=function(link,capt,noalph){
@@ -38443,7 +38984,7 @@
 						ui.window.show();
 					},1000);
 				}
-				lib.setPressure(ui.window,ui.click.pressurepause);
+				// lib.setPressure(ui.window,ui.click.pressurepause);
 				if(window.isNonameServer){
 					ui.window.classList.add('server');
 					var serverinfo=ui.create.div('.serverinfo',ui.window);
@@ -38468,8 +39009,17 @@
 				ui.window.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.window);
 				ui.system=ui.create.div("#system.",ui.window);
 				ui.arena=ui.create.div('#arena.nome',ui.window);
+				if(lib.device=='ios'&&!get.is.phoneLayout()){
+					ui.arena.classList.add('ipad');
+				}
 				ui.arena.setNumber=function(num){
 					this.dataset.number=num;
+					// if(game.layout=='nova'&&parseInt(num)<7){
+					// 	ui.arena.classList.add('player_autolong');
+					// }
+					// else if(lib.config.player_height_nova!='long'){
+					// 	ui.arena.classList.remove('player_autolong');
+					// }
 					// if(game.layout=='long'&&parseInt(num)<parseInt(lib.config.fewplayer)){
 					//     this.classList.add('fewplayer');
 					// }
@@ -38496,6 +39046,9 @@
 				if(lib.config.player_border=='slim'){
 					ui.arena.classList.add('uslim_player');
 				}
+				if(lib.config.player_border=='narrow'){
+					ui.arena.classList.add('mslim_player');
+				}
 				if(lib.config.player_border=='normal'&&lib.config.mode!='brawl'&&(game.layout=='long'||game.layout=='long2')){
 					ui.arena.classList.add('lslim_player');
 				}
@@ -38507,7 +39060,7 @@
 				if(game.layout=='long'||game.layout=='mobile'){
 					if(lib.config.textequip=='text') ui.arena.classList.add('textequip');
 				}
-				if(game.layout=='long'||game.layout=='long2'||game.layout=='mobile'){
+				if(game.layout=='long'||game.layout=='long2'||game.layout=='mobile'||game.layout=='nova'){
 					if(lib.config.cardshape=='oblong'){
 						ui.window.classList.add('oblongcard');
 						ui.arena.classList.add('oblongcard');
@@ -38533,6 +39086,8 @@
 				lib.init.cssstyles();
 
 				ui.arena.dataset.player_height=lib.config.player_height||'default';
+				ui.arena.dataset.player_height_nova=lib.config.player_height_nova||'default';
+				// if(lib.config.player_height_nova=='long') ui.arena.classList.add('player_autolong');
 				ui.arena.dataset.target_shake=lib.config.target_shake||'off';
 				ui.backgroundMusic=document.createElement('audio');
 				ui.backgroundMusic.volume=lib.config.volumn_background/8;
@@ -38711,14 +39266,16 @@
 				switch(lib.config.ui_zoom){
 					case 'esmall':zoom=0.8;break;
 					case 'vsmall':zoom=0.9;break;
-					case 'small':zoom=0.95;break;
+					case 'small':zoom=0.93;break;
 					case 'big':zoom=1.05;break;
 					case 'vbig':zoom=1.1;break;
 					case 'ebig':zoom=1.2;break;
 					default:zoom=1;
 				}
 				game.documentZoom=game.deviceZoom*zoom;
-				document.documentElement.style.zoom=game.documentZoom;
+				if(zoom!=1){
+					ui.updatez();
+				}
 
 				ui.system1=ui.create.div('#system1',ui.system);
 				ui.system2=ui.create.div('#system2',ui.system);
@@ -38885,6 +39442,64 @@
 				ui.create.div('.menubutton.round','<span>记录</span>',ui.shortcut,ui.click.pause).dataset.position=4;
 				ui.shortcut.autobutton=ui.create.div('.menubutton.round','<span>托管</span>',ui.shortcut,ui.click.auto);
 				ui.shortcut.autobutton.dataset.position=2;
+				ui.favmodelist=ui.create.div('.favmodelist',ui.shortcut);
+				ui.favmodelist.update=function(){
+					this.innerHTML='';
+					var num=Math.min(6,lib.config.favouriteMode.length);
+					for(var i=0;i<num;i++){
+						this.add(lib.config.favouriteMode[i],i);
+					}
+					var mode=get.mode();
+					if(typeof get.config(mode+'_mode')=='string'){
+						mode+='|'+get.config(mode+'_mode');
+					}
+					if(lib.config.favouriteMode.contains(mode)){
+						ui.favmode.classList.add('glow');
+					}
+					else{
+						ui.favmode.classList.remove('glow');
+					}
+				};
+				ui.favmodelist.add=function(name,index){
+					var info=name.split('|');
+					var mode=info[0];
+					var submode=info[1];
+					var node=ui.create.div('.menubutton.large',this);
+					var num=Math.min(6,lib.config.favouriteMode.length);
+					node.dataset.type=num%2==0?'even':'odd';
+					node.dataset.position=index;
+					var str=lib.translate[name]||lib.translate[mode]||'';
+					if(str.length==2){
+						str+='模式';
+					}
+					node.innerHTML=str;
+					node.listen(function(){
+						game.saveConfig('mode',mode);
+						if(submode){
+							game.saveConfig(mode+'_mode',submode,mode);
+						}
+						game.reload();
+					});
+				};
+				ui.favmode=ui.create.system('收藏',function(){
+					var mode=get.mode();
+					if(typeof _status.mode=='string'){
+						mode+='|'+_status.mode;
+					}
+					if(this.classList.contains('glow')){
+						this.classList.remove('glow');
+						lib.config.favouriteMode.remove(mode);
+					}
+					else{
+						this.classList.add('glow');
+						lib.config.favouriteMode.add(mode);
+					}
+					game.saveConfig('favouriteMode',lib.config.favouriteMode);
+					ui.favmodelist.update();
+					_status.clicked=true;
+				});
+				ui.favmode.style.display='none';
+				ui.favmodelist.update();
 				// ui.create.div('.menubutton.round','<span>菜单</span>',ui.shortcut,ui.click.config).dataset.position=5;
 
 
@@ -38969,8 +39584,15 @@
 					},500);
 				}
 			},
-			system:function(str,func,right){
-				var node=ui.create.div(right?ui.system2:ui.system1);
+			system:function(str,func,right,before){
+				var parent=right?ui.system2:ui.system1;
+				var node=ui.create.div();
+				if(before){
+					parent.insertBefore(node,parent.firstChild);
+				}
+				else{
+					parent.appendChild(node);
+				}
 				node.innerHTML=str;
 				if(func){
 					node.listen(func);
@@ -39975,14 +40597,18 @@
 					ui.shortcut.classList.toggle('hidden');
 				}
 				if(ui.shortcut.classList.contains('hidden')){
-					if(lib.config.show_statusbar_ios=='auto'){
+					ui.favmode.style.display='none';
+					if(window.StatusBar&&lib.config.show_statusbar_ios=='auto'){
 						document.body.classList.remove('statusbar');
 						window.StatusBar.hide();
 					}
 					ui.window.classList.remove('shortcutpaused');
 				}
 				else{
-					if(lib.config.show_statusbar_ios=='auto'){
+					if(lib.config.show_favmode){
+						ui.favmode.style.display='';
+					}
+					if(window.StatusBar&&lib.config.show_statusbar_ios=='auto'){
 						document.body.classList.add('statusbar');
 						window.StatusBar.overlaysWebView(true);
 						window.StatusBar.backgroundColorByName('black');
@@ -40666,9 +41292,9 @@
 						time:get.utc()
 					}
 				}
-				if(window.ForceTouch&&!_status.paused2&&!_status.forcetouchinterval&&lib.config.enable_pressure){
-					_status.forcetouchinterval=setInterval(ui.click.forcetouch,30);
-				}
+				// if(window.ForceTouch&&!_status.paused2&&!_status.forcetouchinterval&&lib.config.enable_pressure){
+				// 	_status.forcetouchinterval=setInterval(ui.click.forcetouch,30);
+				// }
 			},
 			windowtouchmove:function(e){
 				e.preventDefault();
@@ -40712,6 +41338,23 @@
 				if(_status.mousedragging&&e.touches.length){
 					e.preventDefault();
 					var item=document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY);
+					if(game.chess&&ui.selected.cards.length){
+						var itemtype=get.itemtype(item);
+						if(itemtype!='card'&&itemtype!='button'){
+							var ex=e.touches[0].clientX/game.documentZoom-ui.arena.offsetLeft;
+							var ey=e.touches[0].clientY/game.documentZoom-ui.arena.offsetTop;
+							for(var i=0;i<game.players.length;i++){
+								var left=-ui.chessContainer.chessLeft+ui.chess.offsetLeft+game.players[i].getLeft();
+								var top=-ui.chessContainer.chessTop+ui.chess.offsetTop+game.players[i].getTop();
+								var width=game.players[i].offsetWidth;
+								var height=game.players[i].offsetHeight;
+								if(ex>left&&ex<left+width&&ey>top&&ey<top+height){
+									item=game.players[i];
+									break;
+								}
+							}
+						}
+					}
 					while(item){
 						if(lib.config.enable_touchdragline&&_status.mouseleft&&!game.chess){
 							ui.canvas.width=ui.arena.offsetWidth;
@@ -40768,10 +41411,10 @@
 							var ey=e.touches[0].clientY/game.documentZoom-ui.arena.offsetTop;
 							var exx=ex,eyy=ey;
 							if(game.chess){
-								ex-=-ui.chessContainer.scrollLeft+ui.chess.offsetLeft;
-								ey-=-ui.chessContainer.scrollTop+ui.chess.offsetTop;
+								ex-=-ui.chessContainer.chessLeft+ui.chess.offsetLeft;
+								ey-=-ui.chessContainer.chessTop+ui.chess.offsetTop;
 							}
-							if(itemtype!='player'||(ex>item.offsetLeft&&ex<item.offsetLeft+item.offsetWidth&&
+							if(itemtype!='player'||game.chess||(ex>item.offsetLeft&&ex<item.offsetLeft+item.offsetWidth&&
 								ey>item.offsetTop&&ey<item.offsetTop+item.offsetHeight)){
 								var targetfixed=false;
 								if(itemtype=='player'){
@@ -40864,10 +41507,10 @@
 			},
 			windowtouchend:function(e){
 				delete _status.force;
-				if(_status.forcetouchinterval){
-					clearInterval(_status.forcetouchinterval);
-					delete _status.forcetouchinterval;
-				}
+				// if(_status.forcetouchinterval){
+				// 	clearInterval(_status.forcetouchinterval);
+				// 	delete _status.forcetouchinterval;
+				// }
 				if(window.inSplash) return;
 				if(e.touches.length==1&&!_status.dragged&&!_status.draggingtouchdialog){
 					ui.click.pause();
@@ -41054,6 +41697,23 @@
 				}
 				var node=_status.currentmouseenter;
 				var sourceitem=document.elementFromPoint(e.clientX,e.clientY);
+				if(game.chess&&ui.selected.cards.length){
+					var itemtype=get.itemtype(sourceitem);
+					if(itemtype!='card'&&itemtype!='button'){
+						for(var i=0;i<game.players.length;i++){
+							var ex=e.clientX/game.documentZoom-ui.arena.offsetLeft;
+							var ey=e.clientY/game.documentZoom-ui.arena.offsetTop;
+							var left=-ui.chessContainer.chessLeft+ui.chess.offsetLeft+game.players[i].getLeft();
+							var top=-ui.chessContainer.chessTop+ui.chess.offsetTop+game.players[i].getTop();
+							var width=game.players[i].offsetWidth;
+							var height=game.players[i].offsetHeight;
+							if(ex>left&&ex<left+width&&ey>top&&ey<top+height){
+								sourceitem=game.players[i];
+								break;
+							}
+						}
+					}
+				}
 				var item=sourceitem;
 				if(_status.mousedragging){
 					e.preventDefault();
@@ -41145,10 +41805,10 @@
 							var ey=e.clientY/game.documentZoom-ui.arena.offsetTop;
 							var exx=ex,eyy=ey;
 							if(game.chess){
-								ex-=-ui.chessContainer.scrollLeft+ui.chess.offsetLeft;
-								ey-=-ui.chessContainer.scrollTop+ui.chess.offsetTop;
+								ex-=-ui.chessContainer.chessLeft+ui.chess.offsetLeft;
+								ey-=-ui.chessContainer.chessTop+ui.chess.offsetTop;
 							}
-							if(itemtype!='player'||(ex>item.offsetLeft&&ex<item.offsetLeft+item.offsetWidth&&
+							if(itemtype!='player'||game.chess||(ex>item.offsetLeft&&ex<item.offsetLeft+item.offsetWidth&&
 								ey>item.offsetTop&&ey<item.offsetTop+item.offsetHeight)){
 								var targetfixed=false;
 								if(itemtype=='player'){
@@ -41357,10 +42017,10 @@
 			},
 			windowmouseup:function(e){
 				delete _status.force;
-				if(_status.forcetouchinterval){
-					clearInterval(_status.forcetouchinterval);
-					delete _status.forcetouchinterval;
-				}
+				// if(_status.forcetouchinterval){
+				// 	clearInterval(_status.forcetouchinterval);
+				// 	delete _status.forcetouchinterval;
+				// }
 				if(window.inSplash) return;
 				if(_status.draggingdialog){
 					var ddialog=_status.draggingdialog;
@@ -41494,9 +42154,9 @@
 				if(_status.longpressing&&_status.longpressing!=this){
 					ui.click.longpresscancel.call(_status.longpressing);
 				}
-				if(window.ForceTouch&&!_status.forcetouchinterval&&lib.config.enable_pressure){
-					_status.forcetouchinterval=setInterval(ui.click.forcetouch,30);
-				}
+				// if(window.ForceTouch&&!_status.forcetouchinterval&&lib.config.enable_pressure){
+				// 	_status.forcetouchinterval=setInterval(ui.click.forcetouch,30);
+				// }
 				_status.longpressing=this;
 			},
 			longpresscallback:function(){
@@ -42837,87 +43497,87 @@
 				ui.click.touchpop();
 				e.stopPropagation();
 			},
-			forcetouch:function(){
-				if(_status.force||_status.dragged){
-					clearInterval(_status.forcetouchinterval);
-					delete _status.forcetouchinterval;
-					return;
-				}
-				window.ForceTouch.getForceTouchData(function(ForceTouchData){
-					if(ForceTouchData.touches[0]){
-						var force = parseFloat(ForceTouchData.touches[0].force);
-						if(force > 0.2){
-							_status.force=true;
-							var taptic=false;
-							if(_status.longpressing){
-								delete _status.longpressing._waitingfordrag;
-								ui.click.touchpop();
-								ui.click.longpresscallback.call(_status.longpressing);
-								taptic=true;
-							}
-							else if(!_status.forceright){
-								_status.forceright=true;
-								setTimeout(function(){
-									_status.forceright=false;
-								},600);
-								if(_status.mousedragging){
-									_status.mousedragging=null;
-									_status.mouseleft=false;
-									_status.mousedragorigin=null;
-									_status.dragstatuschanged=false;
-									game.uncheck();
-									game.check();
-								}
-								switch(lib.config.pressure_click){
-									case 'pause':ui.click.pause();break;
-									case 'auto':ui.click.auto();break;
-									case 'config':ui.click.config();break;
-								}
-								taptic=true;
-							}
-							if(taptic&&lib.config.pressure_taptic){
-								if(window.TapticEngine){
-									window.TapticEngine.generateTapticFeedback();
-								}
-								else{
-									game.vibrate(50);
-								}
-							}
-						}
-					}
-				});
-			},
-			pressurepause:function(force,event){
-				if(!_status.force&&!_status.mousedragging&&force>=0.5&&!_status.forceright){
-					_status.force=true;
-					_status.forceright=true;
-					setTimeout(function(){
-						_status.forceright=false;
-					},600);
-					switch(lib.config.pressure_click){
-						case 'pause':ui.click.pause();break;
-						case 'auto':ui.click.auto();break;
-						case 'config':ui.click.config();break;
-					}
-				}
-			},
-			rightpressure:function(force, event){
-				if(force>0){
-					_status.force=true;
-				}
-				if(force>=0.5){
-					if(_status.mousedragging){
-						_status.mousedragging=null;
-						_status.mouseleft=false;
-						_status.mousedragorigin=null;
-						_status.dragstatuschanged=false;
-						game.uncheck();
-						game.check();
-					}
-					ui.click.rightplayer.call(this,event);
-					_status.clickedplayer=false;
-				}
-			},
+			// forcetouch:function(){
+			// 	if(_status.force||_status.dragged){
+			// 		clearInterval(_status.forcetouchinterval);
+			// 		delete _status.forcetouchinterval;
+			// 		return;
+			// 	}
+			// 	window.ForceTouch.getForceTouchData(function(ForceTouchData){
+			// 		if(ForceTouchData.touches[0]){
+			// 			var force = parseFloat(ForceTouchData.touches[0].force);
+			// 			if(force > 0.2){
+			// 				_status.force=true;
+			// 				var taptic=false;
+			// 				if(_status.longpressing){
+			// 					delete _status.longpressing._waitingfordrag;
+			// 					ui.click.touchpop();
+			// 					ui.click.longpresscallback.call(_status.longpressing);
+			// 					taptic=true;
+			// 				}
+			// 				else if(!_status.forceright){
+			// 					_status.forceright=true;
+			// 					setTimeout(function(){
+			// 						_status.forceright=false;
+			// 					},600);
+			// 					if(_status.mousedragging){
+			// 						_status.mousedragging=null;
+			// 						_status.mouseleft=false;
+			// 						_status.mousedragorigin=null;
+			// 						_status.dragstatuschanged=false;
+			// 						game.uncheck();
+			// 						game.check();
+			// 					}
+			// 					switch(lib.config.pressure_click){
+			// 						case 'pause':ui.click.pause();break;
+			// 						case 'auto':ui.click.auto();break;
+			// 						case 'config':ui.click.config();break;
+			// 					}
+			// 					taptic=true;
+			// 				}
+			// 				if(taptic&&lib.config.pressure_taptic){
+			// 					if(window.TapticEngine){
+			// 						window.TapticEngine.generateTapticFeedback();
+			// 					}
+			// 					else{
+			// 						game.vibrate(50);
+			// 					}
+			// 				}
+			// 			}
+			// 		}
+			// 	});
+			// },
+			// pressurepause:function(force,event){
+			// 	if(!_status.force&&!_status.mousedragging&&force>=0.5&&!_status.forceright){
+			// 		_status.force=true;
+			// 		_status.forceright=true;
+			// 		setTimeout(function(){
+			// 			_status.forceright=false;
+			// 		},600);
+			// 		switch(lib.config.pressure_click){
+			// 			case 'pause':ui.click.pause();break;
+			// 			case 'auto':ui.click.auto();break;
+			// 			case 'config':ui.click.config();break;
+			// 		}
+			// 	}
+			// },
+			// rightpressure:function(force, event){
+			// 	if(force>0){
+			// 		_status.force=true;
+			// 	}
+			// 	if(force>=0.5){
+			// 		if(_status.mousedragging){
+			// 			_status.mousedragging=null;
+			// 			_status.mouseleft=false;
+			// 			_status.mousedragorigin=null;
+			// 			_status.dragstatuschanged=false;
+			// 			game.uncheck();
+			// 			game.check();
+			// 		}
+			// 		ui.click.rightplayer.call(this,event);
+			// 		_status.clickedplayer=false;
+			// 	}
+			// },
 			rightplayer:function(e){
 				if(this._nopup) return false;
 				if(_status.clickedplayer){
@@ -42948,6 +43608,7 @@
 				}
 				game.closePopped();
 				switch(lib.config.right_click){
+					case 'shortcut':ui.click.shortcut();break;
 					case 'pause':ui.click.pause();break;
 					case 'auto':ui.click.auto();break;
 					case 'config':ui.click.config();break;
@@ -43016,7 +43677,7 @@
 			}
 			if(stayleft){
 				var fullwidth=0;
-				var fullright=(game.layout=='long'||game.layout=='long2'||game.chess||parseInt(ui.arena.dataset.number)<=5);
+				var fullright=(game.layout=='long'||game.layout=='long2'||game.chess||(game.layout!='nova'&&parseInt(ui.arena.dataset.number)<=5));
 				for(var i=0;i<widths.length;i++){
 					fullwidth+=widths[i]+6;
 					if(get.is.phoneLayout()) fullwidth+=6;
@@ -43031,8 +43692,8 @@
 				}
 				if(fullright){
 					fullwidth+=124;
-					if(game.layout=='long2'&&ui.arena.dataset.number=='8'&&get.mode()!='boss'){
-						fullwidth+=game.me.offsetLeft;
+					if((game.layout=='long2'||game.layout=='nova')&&ui.arena.dataset.number=='8'&&get.mode()!='boss'){
+						fullwidth+=game.me.getLeft();
 					}
 				}
 				else{
@@ -43042,8 +43703,8 @@
 					var current_offset=stayleft._offset;
 					if(fullright){
 						stayleft._offset=Math.ceil(-ui.arena.offsetWidth/2)+135;
-						if(game.layout=='long2'&&ui.arena.dataset.number=='8'&&get.mode()!='boss'){
-							stayleft._offset+=game.me.offsetLeft;
+						if((game.layout=='long2'||game.layout=='nova')&&ui.arena.dataset.number=='8'&&get.mode()!='boss'){
+							stayleft._offset+=game.me.getLeft();
 						}
 					}
 					else{
@@ -43086,6 +43747,17 @@
 			for(var i=0;i<lib.onresize.length;i++){
 				lib.onresize[i]();
 			}
+			var cfg=game.documentZoom/game.deviceZoom;
+			ui.updated();
+			game.documentZoom=cfg*game.deviceZoom;
+			ui.updatez();
+			delete ui._updatexr;
+		},
+		updatexr:function(){
+			if(ui._updatexr){
+				clearTimeout(ui._updatexr);
+			}
+			ui._updatexr=setTimeout(ui.updatex,500);
 		},
 		updatejm:function(player,nodes,start,inv){
 			if(typeof start!='number'){
@@ -43286,6 +43958,32 @@
 				node.classList.add('fold0');
 			}
 		},
+		updated:function(){
+			if (document.documentElement.offsetWidth<900 || document.documentElement.offsetHeight < 500) {
+				game.deviceZoom=Math.min(
+					Math.round(document.documentElement.offsetWidth/98)/10,
+					Math.round(document.documentElement.offsetHeight/50)/10
+				);
+			}
+			else {
+				game.deviceZoom=1;
+			}
+		},
+		updatez:function(){
+			var width=document.documentElement.offsetWidth;
+			var height=document.documentElement.offsetHeight;
+			var zoom=game.documentZoom;
+			if(zoom!=1){
+				document.body.style.width=Math.round(width/zoom)+'px';
+				document.body.style.height=Math.round(height/zoom)+'px';
+				document.body.style.transform='scale('+(Math.floor(zoom*100)/100)+')';
+			}
+			else{
+				document.body.style.width=width+'px';
+				document.body.style.height=height+'px';
+				document.body.style.transform='';
+			}
+		},
 		update:function(){
 			for(var i=0;i<ui.updates.length;i++){
 				ui.updates[i]();
@@ -43344,7 +44042,7 @@
 					}
 				}
 				else{
-					if(!ui.dialog._scrollset&&(height1<=190||(height2>=height1&&height2>=210))){
+					if(!ui.dialog.forcebutton&&!ui.dialog._scrollset&&(height1<=190||(height2>=height1&&height2>=210))){
 						ui.dialog.classList.remove('scroll1');
 						ui.dialog.classList.remove('scroll2');
 					}
@@ -43352,11 +44050,11 @@
 						ui.dialog.classList.add('scroll1');
 						ui.dialog.classList.add('scroll2');
 						if(game.layout!='default'){
-							ui.dialog.style.height=Math.min(height1,(game.layout=='long2'&&ui.arena.classList.contains('choose-character'))?380:350)+'px';
+							ui.dialog.style.height=Math.min(height1,((game.layout=='long2'||game.layout=='nova')&&ui.arena.classList.contains('choose-character'))?380:350)+'px';
 							ui.dialog._scrollset=true;
 						}
 					}
-					if(game.layout=='long2'){
+					if(game.layout=='long2'||game.layout=='nova'){
 						if(height1+240>=ui.arena.offsetHeight){
 							ui.dialog.classList.add('scroll3');
 						}
@@ -43426,8 +44124,9 @@
 				return true;
 			},
 			altered:function(skill){
-				if(_status.connectMode) return true;
-				return !lib.config.vintageSkills.contains(skill);
+				return false;
+				// if(_status.connectMode) return true;
+				// return !lib.config.vintageSkills.contains(skill);
 			},
 			node:function(obj){
 				var str=Object.prototype.toString.call(obj);
@@ -43475,18 +44174,19 @@
 			},
 			phoneLayout:function(){
 				if(!lib.config.phonelayout) return false;
-				return (game.layout=='mobile'||game.layout=='long'||game.layout=='long2');
+				return (game.layout=='mobile'||game.layout=='long'||game.layout=='long2'||game.layout=='nova');
 			},
 			singleHandcard:function(){
-				if(game.singleHandcard||game.layout=='mobile'||game.layout=='long'||game.layout=='long2'){
+				if(game.singleHandcard||game.layout=='mobile'||game.layout=='long'||game.layout=='long2'||game.layout=='nova'){
 					return true;
 				}
 				return false;
 			},
 			linked2:function(player){
+				if(game.chess) return true;
 				if(lib.config.link_style2!='rotate') return true;
-				if(game.chess) return false;
-				if(game.layout=='long'||game.layout=='long2') return true;
+				// if(game.chess) return false;
+				if(game.layout=='long'||game.layout=='long2'||game.layout=='nova') return true;
 				if(player.dataset.position=='0'){
 					return ui.arena.classList.contains('oblongcard');
 				}
@@ -44179,22 +44879,24 @@
 			if(typeof num!='number') num=false;
 			if(name==_status.lord) return num?Math.round(7*(num-1)/8+1):'ap';
 			var rank=lib.rank;
-			var skills;
-			if(lib.character[name]){
-				skills=lib.character[name][3];
-			}
-			else{
-				var tmpinfo=get.character(name);
-				if(tmpinfo){
-					skills=tmpinfo[3];
+			if(lib.characterPack.standard[name]||lib.characterPack.shenhua[name]){
+				var skills;
+				if(lib.character[name]){
+					skills=lib.character[name][3];
 				}
 				else{
-					skills=[];
+					var tmpinfo=get.character(name);
+					if(tmpinfo){
+						skills=tmpinfo[3];
+					}
+					else{
+						skills=[];
+					}
 				}
-			}
-			for(var i=0;i<skills.length;i++){
-				if(!lib.config.vintageSkills.contains(skills[i])){
-					name=lib.rank.a[0];break;
+				for(var i=0;i<skills.length;i++){
+					if(skills[i].alter&&!lib.config.vintageSkills.contains(skills[i])){
+						name=lib.rank.a[0];break;
+					}
 				}
 			}
 			if(rank.s.contains(name)) return num?Math.round(8*(num-1)/8+1):'s';
@@ -45113,13 +45815,41 @@
 			}
 			return list;
 		},
+		gainableSkillsName:function(name, func){
+			var list=[];
+			if(name&&lib.character[name]){
+				if(lib.character[name][4]){
+					if(lib.character[name][4].contains('boss')) return list;
+					if(lib.character[name][4].contains('hiddenboss')) return list;
+					if(lib.character[name][4].contains('minskin')) return list;
+					if(lib.character[name][4].contains('unseen')) return list;
+				}
+				for(var j=0;j<lib.character[name][3].length;j++){
+					var skill=lib.character[name][3][j];
+					var info=lib.skill[skill];
+					if(lib.filter.skillDisabled(skill)) continue;
+					if(func&&!func(info,skill,name)) continue;
+					list.add(skill);
+				}
+			}
+			return list;
+		},
 		gainableCharacters:function(func){
 			var list=[];
 			for(var i in lib.character){
 				var info=lib.character[i];
-				if(func&&!func(info,i)) continue;
+				if(typeof func=='function'&&!func(info,i)) continue;
+				if(lib.filter.characterDisabled(i)) continue;
 				if(lib.filter.characterDisabled2(i)) continue;
 				list.push(i);
+			}
+			if(func===true){
+				var players=game.players.concat(game.dead);
+				for(var i=0;i<players.length;i++){
+					list.remove(players[i].name);
+					list.remove(players[i].name1);
+					list.remove(players[i].name2);
+				}
 			}
 			return list;
 		},
@@ -45323,9 +46053,11 @@
 				}
 				return false;
 			};
-			for(var i=0;i<ui.cardPile.childNodes.length;i++){
-				if(filter(ui.cardPile.childNodes[i])){
-					return ui.cardPile.childNodes[i];
+			if(create!='discardPile'){
+				for(var i=0;i<ui.cardPile.childNodes.length;i++){
+					if(filter(ui.cardPile.childNodes[i])){
+						return ui.cardPile.childNodes[i];
+					}
 				}
 			}
 			if(create!='cardPile'){
@@ -45334,27 +46066,30 @@
 						return ui.discardPile.childNodes[i];
 					}
 				}
-				if(create=='field'){
-					var found=null;
-					game.findPlayer(function(current){
-						var ej=current.getCards('ej');
-						for(var i=0;i<ej.length;i++){
-							if(filter(ej[i])){
-								found=ej[i];
-								return true;
-							}
+			}
+			if(create=='field'){
+				var found=null;
+				game.findPlayer(function(current){
+					var ej=current.getCards('ej');
+					for(var i=0;i<ej.length;i++){
+						if(filter(ej[i])){
+							found=ej[i];
+							return true;
 						}
-					});
-					return found;
-				}
-				else if(create){
-					return game.createCard(name);
-				}
+					}
+				});
+				return found;
+			}
+			if(create&&!['cardPile','discardPile','field'].contains(create)){
+				return game.createCard(name);
 			}
 			return null;
 		},
 		cardPile2:function(name){
 			return get.cardPile(name,'cardPile');
+		},
+		discardPile:function(name){
+			return get.cardPile(name,'discardPile');
 		},
 		aiStrategy:function(){
 			switch(get.config('ai_strategy')){
@@ -46552,6 +47287,9 @@
 		useful:function(card){
 			if(get.position(card)=='j') return -1;
 			if(get.position(card)=='e') return get.equipValue(card);
+			if(card._modUseful){
+				return card._modUseful();
+			}
 			var i=0;
 			if(_status.event.player){
 				i=_status.event.player.getCards('h',card.name).indexOf(card);
@@ -46589,6 +47327,9 @@
 					value+=get.value(card[i],player,method);
 				}
 				return value/Math.sqrt(card.length);
+			}
+			if(card._modValue){
+				return card._modValue(player,method);
 			}
 			var aii=get.info(card).ai;
 			if(aii&&aii.value) value=aii.value;
@@ -46810,23 +47551,46 @@
 				result2+=temp02;
 				result1+=temp01;
 				if(get.attitude(player,target)<0){
-					result2*=threaten;
-				}
-				else{
 					result2*=Math.sqrt(threaten);
 				}
-				if(target.hp<=1) result2*=2;
-				if(target.hp==2) result2*=1.1;
-				if(target.countCards('h')==0){
-					result2*=1.1;
-					if(get.tag(card,'respondSha')||get.tag(card,'respondShan')) result2*=1.4;
+				else{
+					result2*=Math.sqrt(Math.sqrt(threaten));
 				}
-				if(target.countCards('h')==1) result2*=1.05;
-				if(target.countCards('h')==2) result2*=1.02;
-				if(target.countCards('h')>3) result2*=0.9;
+				// *** continue here ***
+				if(target.hp==1) result2*=2.5;
+				if(target.hp==2) result2*=1.8;
+				if(target.countCards('h')==0){
+					if(get.tag(card,'respondSha')||get.tag(card,'respondShan')){
+						result2*=1.7;
+					}
+					else{
+						result2*=1.5;
+					}
+				}
+				if(target.countCards('h')==1) result2*=1.3;
+				if(target.countCards('h')==2) result2*=1.1;
+				if(target.countCards('h')>3) result2*=0.5;
 				if(target.hp==4) result2*=0.9;
 				if(target.hp==5) result2*=0.8;
 				if(target.hp>5) result2*=0.6;
+				// if(get.attitude(player,target)<0){
+				// 	result2*=threaten;
+				// }
+				// else{
+				// 	result2*=Math.sqrt(threaten);
+				// }
+				// if(target.hp<=1) result2*=2;
+				// if(target.hp==2) result2*=1.1;
+				// if(target.countCards('h')==0){
+				// 	result2*=1.1;
+				// 	if(get.tag(card,'respondSha')||get.tag(card,'respondShan')) result2*=1.4;
+				// }
+				// if(target.countCards('h')==1) result2*=1.05;
+				// if(target.countCards('h')==2) result2*=1.02;
+				// if(target.countCards('h')>3) result2*=0.9;
+				// if(target.hp==4) result2*=0.9;
+				// if(target.hp==5) result2*=0.8;
+				// if(target.hp>5) result2*=0.6;
 			}
 			else{
 				result2+=temp02;
