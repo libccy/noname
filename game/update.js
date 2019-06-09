@@ -1,8 +1,10 @@
 window.noname_update={
-	version:'1.9.85',
+	version:'1.9.86',
 	update:'1.9.85',
 	changeLog:[
-		'英雄杀之秦琼（by Sukincen）'
+		'英雄杀之秦琼（by Sukincen）',
+		'阴包武将（by 极光）',
+		'新GBK字体'
 	],
 	files:[
 		'character/diy.js',
