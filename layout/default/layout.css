@@ -495,6 +495,7 @@ table {
 	height: 90%;
 	top: calc(5% + 10px);
 	left: 3%;
+	transition-property: opacity
 }
 #arena.right:not(.noleft) {
 	left: 240px;
