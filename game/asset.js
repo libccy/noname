@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'1.9.83',
+	'1.9.84',
 	'audio/background/music_danji.mp3',
 	'audio/background/music_default.mp3',
 	'audio/background/music_diaochan.mp3',
@@ -2403,6 +2403,7 @@ window.noname_asset_list=[
 	'image/character/yxs_kaisa.jpg',
 	'image/character/yxs_lanlinwang.jpg',
 	'image/character/yxs_libai.jpg',
+	'image/character/yxs_qinqiong.jpg',
 	'image/character/yxs_lishimin.jpg',
 	'image/character/yxs_luban.jpg',
 	'image/character/yxs_luobinhan.jpg',
