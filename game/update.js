@@ -6,10 +6,17 @@ window.noname_update={
 	],
 	files:[
 		'character/diy.js',
-		'character/xinghuoliaoyuan.js',
+		'character/extra.js',
+		'character/old.js',
+		'character/refresh.js',
+		'character/shenhua.js',
 		'character/sp.js',
+		'character/standard.js',
+		'character/xinghuoliaoyuan.js',
+		'character/yijiang.js',
 		'game/asset.js',
 		'game/config.js',
+		'game/game.js',
 		'game/package.js'
 	]
 };

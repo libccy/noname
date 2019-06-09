@@ -5,7 +5,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		connectBanned:['qinmi'],
 		character:{
-			caozhang:['male','wei',4,['jiangchi']],
 			guohuai:['male','wei',4,['jingce']],
 			zhangchunhua:['female','wei',3,['jueqing','shangshi']],
 			caozhi:['male','wei',3,['luoying','jiushi']],
@@ -83,6 +82,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jikang:['male','wei',3,['qingxian','juexiang']],
 			qinmi:['male','shu',3,['jianzheng','zhuandui','tianbian']],
 			xuezong:['male','wu',3,['funan','jiexun']],
+			
+			old_huaxiong:['male','qun',6,['shiyong']],
 		},
 		characterIntro:{
 			caozhi:'字子建，沛国谯人，三国曹魏著名文学家，建安文学代表人物。魏武帝曹操之子，魏文帝曹丕之弟，生前曾为陈王，去世后谥号“思”，因此又称陈思王。南朝宋文学家谢灵运更有“天下才有一石，曹子建独占八斗”的评价。王士祯尝论汉魏以来二千年间诗家堪称“仙才”者，曹植、李白、苏轼三人耳。',
@@ -148,6 +149,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunziliufang:'孙资在曹操手下历任县令，参丞相军事；刘放曾有劝王松归顺曹操之举，为曹操所欣赏，遂招为司空府官，又外放历任几处县令。魏国初建之际，孙资与刘放俱任秘书郎。曹丕继位后，二人一同掌握机密。曹睿病危时，二人力荐曹爽，又推荐招回司马懿辅政。最后，曹睿独召曹爽、司马懿、刘放、孙资同受诏命，而免去曹宇、夏侯献、曹肇、秦朗的官职。',
 			huanghao:'宦官。为后主刘禅所宠，专秉朝政。黄皓与大将军姜维不睦，维启后主杀之，后主不从。皓阴以心腹阎宇替维。景耀六年，蜀亡，邓艾预欲杀之，皓贿赂左右得免。及后主迁洛阳，皓为司马昭凌迟处死。',
 			zhangrang:'汉中常侍。同赵忠、曹节、段珪等为“十常侍”，为灵帝所宠。让等专权乱政、卖官索财，朝野皆痛恨之。郎中张钧上书奏请诛杀十常侍，帝不允，让等阴杀钧。及灵帝崩，大将军何进欲杀让等，让阴结何太后，招进入宫，斩杀之。部将袁绍引兵攻让，让等劫帝走河上。追急，让投水自尽。',
+			jikang:'嵇（jī）康（224年－263年，一作223年－262年），字叔夜。谯国铚县（今安徽省濉溪县）人。三国时期曹魏思想家、音乐家、文学家。<br>嵇康幼年聪颖，博览群书，广习诸艺，又喜爱老庄学说。身长七尺八寸，容止出众。后娶魏武帝曹操曾孙女长乐亭主为妻，拜郎中，调中散大夫，世称“嵇中散”。后隐居不仕，屡拒为官。因得罪司隶校尉钟会，遭其构陷，而被掌权的大将军司马昭处死，时年四十岁。',
+			xinxianying:'辛氏（191年—269年），字宪英，祖籍陇西，颍川阳翟（今河南禹州）人。魏晋时期著名才女，曹魏侍中辛毗之女，卫尉羊耽之妻。辛宪英聪朗有才鉴，曾劝弟辛敞尽忠职守，预言钟会将会叛乱。泰始五年（公元269年），辛宪英逝世，享年七十九岁。',
+			wuxian:'穆皇后吴氏（？—245年），陈留（今河南开封）人，车骑将军吴懿之妹，三国时期蜀汉昭烈帝刘备的皇后。<br>吴氏早年丧父，其父生前与刘焉交情深厚，所以全家跟随刘焉来到蜀地。后刘焉听相面者说吴氏有大贵之相，于是为儿子刘瑁迎娶吴氏。刘瑁死后，吴氏成为寡妇。<br>建安十九年（214年），刘备平定益州，纳吴氏为夫人。建安二十四年（219年），刘备自称汉中王，立吴氏为汉中王后。章武元年（221年），刘备称帝，建立蜀汉，立吴氏为皇后。章武三年（223年），刘备去世，太子刘禅即位，尊嫡母吴氏为皇太后。延熙八年（245年），吴氏去世，谥号穆皇后，葬入刘备的惠陵。',
+			qinmi:'秦宓（？－226年），字子敕。广汉郡绵竹县（今四川德阳北）人。三国蜀汉时大臣、学者。秦宓善舌辩。早年仕于益州牧刘璋麾下，后降刘备。刘备伐吴时，秦宓劝阻，刘备大怒，欲杀秦宓。因诸葛亮及时求情，才保住性命，仅被下狱，后被释放，拜左中郎将、长水校尉。吴蜀同盟后，孙权派张温至成都回访。酒宴之上，秦宓与张温舌战，说得张温无言以对。后官至大司农。建兴四年（226年），秦宓病逝。',
+			xushi:'徐氏，孙权之弟孙翊的妻子，著名烈女。孙翊的部下妫览、戴员买通家将边鸿将孙翊杀死，并将全部罪责推给边鸿，又谋杀了前来查问的太守孙河。徐夫人一面用美人计色诱妫览、戴员，令其放松警惕；一面对孙翊生前亲信孙高、傅婴说明真相并晓以大义，最终成功地在内室中将杀夫凶手妫览、戴员诛杀。',
+			xuezong:'薛综（？―243年），字敬文，沛郡竹邑（今安徽濉溪）人，三国时期吴国名臣。少时避乱至交州，师从刘熙。士燮归附孙权，召其为五官中郎将，出任合浦、交阯太守。后从征至九真，回朝任谒者仆射。232年，升任尚书仆射。240年，改任选曹尚书。242年，担任太子少傅，兼任选部职任。243年，薛综去世。薛综是当时名儒，著有诗赋难论数万言，集为《私载》，并著有《五宗图述》、《二京解》。',
+			caiyong:'蔡邕（133年－192年），字伯喈。陈留郡圉县（今河南杞县南）人。东汉时期名臣，文学家、书法家，才女蔡文姬之父。蔡邕早年拒朝廷征召之命，后被征辟为司徒掾属，任河平长、郎中、议郎等职，曾参与续写《东观汉记》及刻印熹平石经。后因罪被流放朔方，几经周折，避难江南十二年。董卓掌权时，强召蔡邕为祭酒。三日之内，历任侍御史、治书侍御史、尚书、侍中、左中郎将等职，封高阳乡侯，世称“蔡中郎”。董卓被诛杀后，蔡邕因在王允座上感叹而被下狱，不久便死于狱中，年六十。',
+			caojie:'曹节（196年―260年），沛国谯县（今安徽亳州）人，汉献帝刘协第二任皇后，魏武帝曹操的女儿。建安十八年（213年），曹操将女儿曹宪、曹节、曹华三姐妹同时入宫中，封为夫人。建安十九年（214年），并封为贵人。曹操废掉汉献帝第一位皇后伏寿,将她囚禁而死。曹操要汉献帝立曹节为皇后，汉献帝只得依从。建安二十五年（220年），曹操去世，曹丕袭封魏王位。曹丕授意华歆去逼汉献帝让位。曹节怒斥华歆，华歆只好退出宫去。第二天又逼汉献帝将帝位禅让给曹丕。并以武力威胁，向曹节索要玺印，曹节无奈，将玺印掷于栏板之下。面对曹丕篡位，她极为愤怒，高喊：“老天有眼，决不让你长久！”汉献帝被废为山阳公，曹节为山阳公夫人。景元元年（260年），曹节病逝，仍以汉朝礼仪合葬于献帝的禅陵，谥号献穆皇后。',
 		},
 		perfectPair:{
 			wuguotai:['sunjian','sunshangxiang'],
@@ -2107,9 +2116,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			taoluan:{
-				enable:'phaseUse',
+				enable:'chooseToUse',
 				filter:function(event,player){
-					return !player.hasSkill('taoluan3');
+					return !player.hasSkill('taoluan3')&&player.countCards('he')>0;
 				},
 				init:function(player){
 					player.storage.taoluan=[];
@@ -2140,25 +2149,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						var players=game.filterPlayer();
 						if(player.countCards('h',button.link)) return 0;
-						if(button.link=='wuzhong'){
+						if(button.link[2]=='wuzhong'){
 							if(player.countCards('h')<player.hp){
 								return 3+Math.random();
 							}
 							return 0;
 						}
-						if(button.link=='tao'){
+						if(button.link[2]=='tao'){
 							return 3+Math.random();
 						}
-						if(button.link=='sha'){
+						if(button.link[2]=='sha'){
 							return 2+Math.random();
 						}
-						if(button.link=='juedou'){
+						if(button.link[2]=='juedou'){
 							return 2+Math.random();
 						}
-						if(button.link=='guohe'){
+						if(button.link[2]=='guohe'){
 							return 2+Math.random();
 						}
-						if(button.link=='shunshou'){
+						if(button.link[2]=='shunshou'){
 							for(var i=0;i<players.length;i++){
 								if(player.canUse('shunshou',players[i])&&get.attitude(player,players[i])<0){
 									return 2+Math.random();
@@ -2166,20 +2175,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							return 0;
 						}
-						if(button.link=='tiesuo'){
+						if(button.link[2]=='tiesuo'){
 							return 1+Math.random();
 						}
-						if(button.link=='jiu'){
+						if(button.link[2]=='jiu'){
 							if(get.effect(player,{name:'jiu'})>0){
 								return 1+Math.random();
 							}
 							return 0;
 						}
-						if(button.link=='nanman'||button.link=='wanjian'||button.link=='taoyuan'||button.link=='wugu'){
+						if(button.link[2]=='nanman'||button.link[2]=='wanjian'||button.link[2]=='taoyuan'||button.link[2]=='wugu'){
 							var eff=0;
 							for(var i=0;i<players.length;i++){
 								if(players[i]!=player){
-									eff+=get.effect(players[i],{name:button.link},player,player);
+									eff+=get.effect(players[i],{name:button.link[2]},player,player);
 								}
 							}
 							if(eff>0){
@@ -2192,12 +2201,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					backup:function(links,player){
 						return {
-							filterCard:false,
-							selectCard:0,
+							filterCard:true,
+							selectCard:1,
 							popname:true,
+							check:function(card){
+								return 6-get.value(card);
+							},
+							position:'he',
 							viewAs:{name:links[0][2]},
 							onuse:function(result,player){
-								player.storage.taoluan.push(result.card.name);
+								player.storage.taoluan.add(result.card.name);
 							},
 						}
 					},
@@ -2222,16 +2235,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 0;
 						}
 					},
-					threaten:1.6,
+					threaten:1.9,
 				},
-				group:['taoluan2']
+				group:['taoluan2','taoluan4']
 			},
 			taoluan2:{
 				trigger:{player:['useCardAfter','respondAfter']},
 				forced:true,
 				popup:false,
 				filter:function(event,player){
-					return event.skill=='taoluan_backup'||event.skill=='taoluan5';
+					return event.skill=='taoluan_backup'||event.skill=='taoluan5'||event.skill=='taoluan4';
 				},
 				content:function(){
 					'step 0'
@@ -2252,8 +2265,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.target=target;
 					player.line(target,'green');
 					var type=get.type(trigger.card,'trick');
-					target.chooseCard('滔乱<br><br><div class="text center">交给'+get.translation(player)+'一张'+get.translation(type)+'牌，或令其失去一点体力且滔乱无效直到回合',function(card,player,target){
-						return get.type(card,'trick')==_status.event.cardType;
+					target.chooseCard('滔乱<br><br><div class="text center">交给'+get.translation(player)+'一张不为'+get.translation(type)+'牌的牌，或令其失去一点体力且滔乱无效直到回合结束','he',function(card,player,target){
+						return get.type(card,'trick')!=_status.event.cardType;
 					}).set('cardType',type).set('ai',function(card){
 						if(_status.event.att){
 							return 11-get.value(card);
@@ -2274,41 +2287,38 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			taoluan3:{},
 			taoluan4:{
-				trigger:{player:'chooseToRespondBegin'},
+				prompt:'将一张牌当做闪使用',
+				enable:'chooseToRespond',
 				filter:function(event,player){
-					if(event.responded) return false;
-					if(!event.filterCard({name:'shan'})) return false;
-					if(player.storage.taoluan.contains('shan')) return false;
-					return true;
+					if(event.parent.name!='sha') return false;
+					return !player.storage.taoluan.contains('shan')&&!player.hasSkill('taoluan3');
 				},
-				check:function(event,player){
-					var allshown=true,players=game.filterPlayer();
-					for(var i=0;i<players.length;i++){
-						if(players[i]!=player&&players[i].countCards('h')>1&&get.attitude(player,players[i])>0){
-							return 1;
-						}
-					}
-					return 0;
+				onuse:function(result,player){
+					player.storage.taoluan.add('shan');
 				},
-				content:function(){
-					trigger.untrigger();
-					trigger.responded=true;
-					trigger.result={bool:true,card:{name:'shan'},skill:'taoluan_backup'};
-					player.storage.taoluan.push('shan');
-				},
+				filterCard:true,
+				position:'he',
+				selectCard:1,
+				viewAs:{name:'shan'},
+				ai:{
+					skillTagFilter:function(player){
+						return !player.storage.taoluan.contains('shan')&&!player.hasSkill('taoluan3');
+					},
+					threaten:1.5,
+					respondShan:true,
+				}
 			},
 			taoluan5:{
-				enable:'chooseToUse',
+				/*enable:'chooseToUse',
 				filter:function(event,player){
 					return event.type=='dying'&&!player.storage.taoluan.contains('tao');
 				},
 				onuse:function(result,player){
-					player.storage.taoluan.push('tao');
+					player.storage.taoluan.add('tao');
 				},
-				filterCard:function(){
-					return false;
-				},
-				selectCard:-1,
+				filterCard:true,
+				position:'he',
+				selectCard:1,
 				viewAs:{name:'tao'},
 				ai:{
 					skillTagFilter:function(player){
@@ -2316,7 +2326,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					threaten:1.5,
 					save:true,
-				}
+				}*/
 			},
 			taoluan_backup:{},
 			jishe:{
@@ -5748,11 +5758,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectCard:2,
 				position:'h',
 				audio:2,
-				derivation:['wusheng','paoxiao'],
+				derivation:['new_rewusheng','new_repaoxiao'],
 				viewAs:{name:'sha'},
 				prompt:'将两张手牌当杀使用或打出',
 				check:function(card){
-					if(_status.event.player.hasSkill('wusheng')&&get.color(card)=='red') return 0;
+					if(_status.event.player.hasSkill('new_rewusheng')&&get.color(card)=='red') return 0;
 					if(_status.event.name=='chooseToRespond'){
 						if(card.name=='sha') return 0;
 						return 6-get.useful(card);
@@ -5763,7 +5773,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					respondSha:true,
 					order:function(item,player){
-						if(player.hasSkill('wusheng')&&player.hasSkill('paoxiao')){
+						if(player.hasSkill('new_rewusheng')&&player.hasSkill('new_repaoxiao')){
 							return 1;
 						}
 						if(player.countCards('h')<4){
@@ -5782,8 +5792,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.getParent().skill=='fuhun';
 				},
 				content:function(){
-					player.addTempSkill('wusheng');
-					player.addTempSkill('paoxiao');
+					player.addTempSkill('new_rewusheng');
+					player.addTempSkill('new_repaoxiao');
 					player.addTempSkill('fuhun3');
 				}
 			},
@@ -7075,6 +7085,75 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					expose:0.5,
 				}
 			},
+			old_anxu:{
+				enable:'phaseUse',
+				usable:1,
+				multitarget:true,
+				audio:'anxu',
+				filterTarget:function(card,player,target){
+					if(player==target) return false;
+					var num=target.countCards('h');
+					if(ui.selected.targets.length){
+						return num<ui.selected.targets[0].countCards('h');
+					}
+					var players=game.filterPlayer();
+					for(var i=0;i<players.length;i++){
+						if(num>players[i].countCards('h')) return true;
+					}
+					return false;
+				},
+				selectTarget:2,
+				content:function(){
+					'step 0'
+					var gainner,giver;
+					if(targets[0].countCards('h')<targets[1].countCards('h')){
+						gainner=targets[0];
+						giver=targets[1];
+					}
+					else{
+						gainner=targets[1];
+						giver=targets[0];
+					}
+					gainner.gainPlayerCard(giver,true);
+					event.gainner=gainner;
+					event.giver=giver;
+					'step 1'
+					if(result.cards){
+					    event.bool=false;
+					    var card=result.cards[0];
+					    event.gainner.showCards(card);
+					    if(get.suit(card)!='spade') event.bool=true;
+					}
+					'step 2'
+					if(event.bool){
+						player.draw();
+					}
+				},
+				ai:{
+					order:10.5,
+					threaten:2.3,
+					result:{
+						target:function(player,target){
+							var num=target.countCards('h');
+							var att=get.attitude(player,target);
+							if(ui.selected.targets.length==0){
+								if(att>0) return -1;
+								var players=game.filterPlayer();
+								for(var i=0;i<players.length;i++){
+									var num2=players[i].countCards('h');
+									var att2=get.attitude(player,players[i]);
+									if(att2>=0&&num2<num) return -1;
+								}
+								return 0;
+							}
+							else{
+								return 1;
+							}
+						},
+						player:0.1
+					}
+				}
+			},
 			anxu:{
 				enable:'phaseUse',
 				usable:1,
@@ -7118,7 +7197,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:10.5,
-					threaten:2,
+					threaten:1.6,
 					result:{
 						target:function(player,target){
 							var num=target.countCards('h');
@@ -9292,7 +9371,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangchunhua:'张春华',
 			lingtong:'凌统',
 			xunyou:'荀攸',
-			caozhang:'曹彰',
 			liubiao:'刘表',
 			zhuran:'朱然',
 			yujin:'旧于禁',
@@ -9440,7 +9518,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			taoluan4:'滔乱',
 			taoluan5:'滔乱',
 			taoluan_backup:'滔乱',
-			taoluan_info:'出牌阶段，你可视为使用任意一张基本牌或普通锦囊牌（此牌不得是本局游戏你以此法使用过的牌），然后你令一名其他角色选择一项：1.交给你一张与你以此法使用的牌类别相同的牌；2.你失去1点体力且滔乱无效直到回合结束',
+			taoluan_info:'若场上没有濒死的角色，则你可以将一张牌当做任意一张基本牌或普通锦囊牌使用（此牌不得是本局游戏你以此法使用过的牌），然后你令一名其他角色选择一项：1.交给你一张与你以此法使用的牌类别不同的牌；2.你失去1点体力且滔乱无效直到回合结束',
 			jiaozhao:'矫诏',
 			jiaozhao2:'矫诏',
 			jiaozhao_info:'出牌阶段限一次，你可以展示一张手牌，然后选择距离最近的一名其他角色，该角色声明一张基本牌的牌名。在此出牌阶段内，你可以将此手牌当声明的牌使用且你不能被选择为目标',
@@ -9666,6 +9744,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhiyan:'直言',
 			zongxuan:'纵玄',
 			anxu:'安恤',
+			old_anxu:'安恤',
 			zhuiyi:'追忆',
 			gongji:'弓骑',
 			qiuyuan:'求援',
@@ -9705,6 +9784,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gongji_info:'出牌阶段，你可以弃置一张牌，令你的攻击范围无限，直到回合结束，然后若你以此法弃置的牌为装备牌，你可以弃置一名其他角色的一张牌。每回合限一次。',
 			zhuiyi_info:'你死亡时，可以令一名其他角色（杀死你的角色除外）摸三张牌，然后令其回复1点体力。',
 			anxu_info:'出牌阶段限一次，你可以选择两名手牌数不同的其他角色，令其中手牌多的角色将一张手牌交给手牌少的角色，然后若这两名角色手牌数相等，你摸一张牌或回复1点体力',
+			old_anxu_info:'出牌阶段限一次，你可以选择两名手牌数不同的其他角色，令其中手牌少的角色获得手牌多的角色的一张手牌并展示之。然后若此牌不为黑桃，则你摸一张牌。',
 			zongxuan_info:'每当你的牌被弃置，你可以将其按任意顺序置于牌堆顶',
 			zhiyan_info:'结束阶段，你可以令一名角色摸一张并展示之，若是装备牌，其立即装备之并回复一点体力',
 			miji_info:'结束阶段，若你已受伤，可以摸X张牌，然后可以将等量的牌交给一名其他角色，X为你已损失的体力值',

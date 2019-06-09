@@ -2571,7 +2571,7 @@
 					},
 					name_font:{
 						name:'人名字体',
-						init:'xinwei',
+						init:'xingkai',
 						unfrequent:true,
 						item:{},
 						textMenu:function(node,link){
@@ -12958,7 +12958,8 @@
 					}
 					var cards;
 					if(num>0){
-						cards=get.cards(num);
+						if(event.bottom) cards=get.bottomCards(num);
+						else cards=get.cards(num);
 					}
 					else{
 						cards=[];
@@ -16624,6 +16625,9 @@
 						}
 						else if(arguments[i]=='visible'){
 							next.visible=true;
+						}
+						else if(arguments[i]=='bottom'){
+							next.bottom=true;
 						}
 						else if(typeof arguments[i]=='object'&&arguments[i].drawDeck!=undefined){
 							next.drawDeck=arguments[i].drawDeck;
@@ -44208,6 +44212,64 @@
 				return false;
 			},
 		},
+		bottomCards:function(num){
+			if(_status.waitingForCards){
+				ui.create.cards.apply(ui.create,_status.waitingForCards);
+				delete _status.waitingForCards;
+			}
+			var list=[];
+			var card=false;
+			if(typeof num!='number') num=1;
+			if(num==0) {card=true;num=1;}
+			if(num<0) num=1;
+			while(num--){
+				if(ui.cardPile.hasChildNodes()==false){
+					if(_status.maxShuffle!=undefined){
+						if(_status.maxShuffle==0){
+							if(_status.maxShuffleCheck){
+								game.over(_status.maxShuffleCheck());
+							}
+							else{
+								game.over('平局');
+							}
+							return [];
+						}
+						_status.maxShuffle--;
+					}
+					game.shuffleNumber++;
+					var cards=[],i;
+					for(var i=0;i<lib.onwash.length;i++){
+						if(lib.onwash[i]()=='remove'){
+							lib.onwash.splice(i--,1);
+						}
+					}
+					if(_status.discarded){
+						_status.discarded.length=0;
+					}
+					for(i=0;i<ui.discardPile.childNodes.length;i++){
+						var currentcard=ui.discardPile.childNodes[i];
+						currentcard.vanishtag.length=0;
+						if(get.info(currentcard).vanish||currentcard.storage.vanish){
+							currentcard.remove();
+							continue;
+						}
+						cards.push(currentcard);
+					}
+					cards.randomSort();
+					for(var i=0;i<cards.length;i++){
+						ui.cardPile.appendChild(cards[i]);
+					}
+				}
+				if(ui.cardPile.hasChildNodes()==false){
+					game.over('平局');
+					return [];
+				}
+				list.push(ui.cardPile.removeChild(ui.cardPile.lastChild));
+			}
+			if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=game.roundNumber+'轮 剩余牌: '+ui.cardPile.childNodes.length;
+			if(card) return list[0];
+			return list;
+		},
 		discarded:function(){
 			var list=_status.discarded.slice(0);
 			for(var i=0;i<list.length;i++){
@@ -45400,6 +45462,12 @@
 			}
 		},
 		number:function(card){
+			if(_status.event.name=='judge'){
+				var owner=get.owner(card);
+				if(owner){
+					if(owner.hasSkill('zhenyi_spade_red')||owner.hasSkill('zhenyi_spade_black')) return 5;
+				}
+			}
 			return card.number;
 		},
 		nature:function(card){

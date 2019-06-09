@@ -90,7 +90,8 @@ window.noname_package={
 		xiaozhuan:'小篆',
 		xinwei:'新魏',
 		huangcao:'黄草',
-		lishu:'隶书',
+		yuanli:'隶书',
+		xingkai:'行楷',
 	},
 	theme:{
 		woodden:'木纹',

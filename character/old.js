@@ -17,7 +17,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_lingtong:['male','wu',4,['oldxuanfeng']],
 			old_madai:['male','shu',4,['mashu','oldqianxi']],
 			old_caoxiu:['male','wei',4,['taoxi']],
-			old_huaxiong:['male','qun',6,['shiyong']],
 			old_wangyi:['female','wei',3,['oldzhenlie','oldmiji']],
 			old_caozhen:['male','wei',4,['sidi']],
 			old_quancong:['male','wu',4,['zhenshan']],
@@ -27,6 +26,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_chenqun:['male','wei',3,['dingpin','oldfaen']],
 			old_zhuhuan:['male','wu',4,['youdi']],
 			old_zhuzhi:['male','wu',4,['anguo']],
+			
+			old_machao:['male','qun',4,['zhuiji','cihuai']],
+			old_bulianshi:['female','wu',3,['old_anxu','zhuiyi']],
 		},
 		characterFilter:{
 			old_lingju:function(mode){
@@ -447,7 +449,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_zhuran:'旧朱然',
 			old_madai:'旧马岱',
 			old_caoxiu:'旧曹休',
-			old_huaxiong:'旧华雄',
+			old_huaxiong:'华雄',
 			old_wangyi:'旧王异',
 			old_caozhen:'旧曹真',
 			old_quancong:'旧全琮',
@@ -456,6 +458,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_chenqun:'旧陈群',
 			old_zhuhuan:'旧朱桓',
 			old_zhuzhi:'旧朱治',
+			old_machao:'旧马超',
+			old_bulianshi:'旧步练师',
 
 			oldanxu:'安恤',
 			oldanxu_info:'出牌阶段限一次，你可以选择手牌数不相等的两名其他角色，令其中手牌少的角色获得手牌多的角色的一张手牌并展示之，然后若此牌不为黑桃，你摸一张牌。',

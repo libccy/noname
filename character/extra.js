@@ -11,6 +11,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_simayi:['male','shen',4,['renjie','sbaiyin','lianpo'],['wei']],
 			shen_caocao:['male','shen',3,['guixin','feiying'],['wei']],
 			shen_lvbu:['male','shen',5,['baonu','wumou','ol_wuqian','ol_shenfen'],['qun']],
+			"shen_liubei":["male","shen",6,["nzry_longnu","nzry_jieying"],["shu"]],
+			"shen_luxun":["male","shen",4,["nzry_junlve","nzry_cuike","nzry_dinghuo"],["wu"]],
 		},
 		characterIntro:{
 			shen_guanyu:'关羽，字云长。曾水淹七军、擒于禁、斩庞德、威震华夏，吓得曹操差点迁都躲避，但是东吴偷袭荆州，关羽兵败被害。后传说吕蒙因关羽之魂索命而死。',
@@ -436,7 +438,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jilue:{
 				unique:true,
-				group:['jilue_guicai','jilue_fangzhu','jilue_wansha','jilue_zhiheng','jilue_jizhi']
+				group:['jilue_guicai','jilue_fangzhu','jilue_wansha','jilue_zhiheng','jilue_jizhi','rezhiheng_draw','jilue_jizhi_clear']
 			},
 			jilue_guicai:{
 				audio:true,
@@ -447,7 +449,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					player.chooseCard('是否弃置一枚“忍”，并发动【鬼才】？').ai=function(card){
+					player.chooseCard('是否弃置一枚“忍”，并发动【鬼才】？','he').ai=function(card){
 						var trigger=_status.event.parent._trigger;
 						var player=_status.event.player;
 						var result=trigger.judge(card)-trigger.judge(trigger.player.judging[0]);
@@ -546,12 +548,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				position:'he',
 				filterCard:true,
 				selectCard:[1,Infinity],
-				prompt:'弃置一枚“忍”，然后弃置任意张牌并摸等量的牌',
-				check:function(card){return 6-get.value(card)},
+				prompt:'弃置一枚“忍”，然后弃置任意张牌并摸等量的牌。若弃置了所有的手牌，则可以多摸一张牌。',
+				check:function(card){
+					var player=_status.event.player;
+					if(get.position(card)=='h'&&!player.countCards('h',function(card){
+						return get.value(card)>=8;
+					})){
+						return 8-get.value(card);
+					}
+					return 6-get.value(card)
+				},
 				content:function(){
+					'step 0'
 					player.storage.renjie--;
 					player.updateMarks();
-					player.draw(cards.length);
+					event.num=player.hasSkill('rezhiheng_delay')?1:0;
+					'step 1'
+					player.draw(event.num+cards.length);
 				},
 				ai:{
 					order:1,
@@ -578,13 +591,50 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return (get.type(event.card)=='trick'&&event.cards[0]&&event.cards[0]==event.card)&&player.storage.renjie>0;
 				},
+				init:function(player){
+					player.storage.jilue_jizhi=0;
+				},
 				content:function(){
+					'step 0'
 					player.storage.renjie--;
 					player.updateMarks();
 					player.draw();
+					'step 1'
+					event.card=result[0];
+					if(get.type(event.card)=='basic'){
+						player.chooseBool('是否弃置'+get.translation(event.card)+'并令本回合手牌上限+1？').set('ai',function(evt,player){
+							return _status.currentPhase==player&&player.needsToDiscard(-3)&&_status.event.value<6;
+						}).set('value',get.value(event.card,player));
+					}
+					'step 2'
+					if(result.bool){
+						player.discard(event.card);
+						player.storage.jilue_jizhi++;
+						if(_status.currentPhase==player){
+							player.markSkill('jilue_jizhi');
+						}
+					}
 				},
 				ai:{
 					threaten:1.4
+				},
+				mod:{
+					maxHandcard:function(player,num){
+						return num+player.storage.jilue_jizhi;
+					}
+				},
+				intro:{
+					content:'本回合手牌上限+#',
+				},
+				subSkill:{
+					clear:{
+						trigger:{global:'phaseAfter'},
+						silent:true,
+						content:function(){
+							player.storage.jilue_jizhi=0;
+							player.unmarkSkill('jilue_jizhi');
+						}
+					}
 				}
 			},
 			wushen:{
@@ -1573,9 +1623,300 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:10,
 					expose:0.4,
 				}
-			}
+			},
+			
+			"nzry_longnu":{
+						mark:true,
+						locked:true,
+						marktext:'龙',
+						intro:{
+							content:function(storage,player,skill){
+								if(player.storage.nzry_longnu==true) return '锁定技，出牌阶段开始时，你减1点体力上限并摸一张牌，然后本回合你的锦囊牌均视为雷杀且无使用次数限制';
+								return '锁定技，出牌阶段开始时，你流失一点体力并摸一张牌，然后本回合你的红色手牌均视为火杀且无距离限制';
+							},
+						},
+						audio:2,
+						trigger:{
+							player:'phaseUseBegin'
+						},
+						forced:true,
+						content:function(){
+							if(player.storage.nzry_longnu==true){
+								player.storage.nzry_longnu=false;
+								player.loseMaxHp();
+								player.draw();
+								player.addTempSkill('nzry_longnu_2',{player:'phaseAfter'});
+							}else{
+								player.storage.nzry_longnu=true;
+								player.loseHp();
+								player.draw();
+								player.addTempSkill('nzry_longnu_1',{player:'phaseAfter'});
+							};
+						},
+						subSkill:{
+							'1':{
+								mod:{
+									cardEnabled:function(card,player){
+										if(_status.event.skill!='nzry_longnu_1'&&(card.name!='sha'||card.nature!='fire')&&get.color(card)=='red') return false;
+									},
+									cardUsable:function(card,player){
+										if(_status.event.skill!='nzry_longnu_1'&&(card.name!='sha'||card.nature!='fire')&&get.color(card)=='red') return false;
+									},
+									cardRespondable:function(card,player){
+										if(_status.event.skill!='nzry_longnu_1'&&(card.name!='sha'||card.nature!='fire')&&get.color(card)=='red') return false;
+									},
+									cardSavable:function(card,player){
+										if(_status.event.skill!='nzry_longnu_1'&&(card.name!='sha'||card.nature!='fire')&&get.color(card)=='red') return false;
+									},
+									targetInRange:function(card){
+										if((card.name=='sha'&&card.nature=='fire')||_status.event.skill=='nzry_longnu_1') return true;
+									},
+								},
+								prompt:'本回合你的红色手牌均视为火杀且无距离限制',
+								enable:['chooseToUse','chooseToRespond'],
+								filterCard:{color:'red'},
+								viewAs:{name:'sha',nature:'fire'},
+								check:function(){return 1},
+								ai:{
+									effect:{
+										target:function(card,player,target,current){
+											if(get.tag(card,'respondSha')&&current<0) return 0.6
+										}
+									},
+									respondSha:true,
+									order:4,
+									useful:-1,
+									value:-1
+								},
+							},
+							'2':{
+								prompt:'本回合你的锦囊牌均视为雷杀且无使用次数限制',
+								mod:{
+									cardEnabled:function(card,player){
+										if(_status.event.skill!='nzry_longnu_2'&&get.type(card,'trick')=='trick') return false;
+									},
+									cardUsable:function(card,player){
+										if(_status.event.skill!='nzry_longnu_2'&&get.type(card,'trick')=='trick') return false;
+									},
+									cardRespondable:function(card,player){
+										if(_status.event.skill!='nzry_longnu_2'&&get.type(card,'trick')=='trick') return false;
+									},
+									cardSavable:function(card,player){
+										if(_status.event.skill!='nzry_longnu_2'&&get.type(card,'trick')=='trick') return false;
+									},
+									cardUsable:function(card,player){
+										if(card.name=='sha'&&card.nature=='thunder') return Infinity;
+									},
+								},
+								enable:['chooseToUse','chooseToRespond'],
+								filterCard:function(card){
+									return get.type(card,'trick')=='trick';
+								},
+								viewAs:{name:'sha',nature:'thunder'},
+								check:function(){return 1},
+								ai:{
+									effect:{
+										target:function(card,player,target,current){
+											if(get.tag(card,'respondSha')&&current<0) return 0.6
+										}
+									},
+									respondSha:true,
+									order:4,
+									useful:-1,
+									value:-1
+								},
+							},
+						},
+					},
+					"nzry_jieying":{
+					audio:2,
+						init:function(player){
+							if(!player.isLinked()){
+								player.link();
+								player.logSkill('nzry_jieying');
+							};
+						},
+						group:["nzry_jieying_1","nzry_jieying_2"],
+						subSkill:{
+							'1':{
+								audio:2,
+								trigger:{
+									player:'linkAfter'
+								},
+								forced:true,
+								filter:function (event,player){
+									return !player.isLinked();
+								},
+								content:function(){
+									setTimeout(function(){
+										if(!player.isLinked()) player.link();
+									},1200);
+								},	
+							},
+							'2':{
+								audio:2,
+								trigger:{
+									player:'phaseEnd',
+								},
+								direct:true,
+								content:function(){
+									"step 0"
+									player.chooseTarget(true,get.prompt('nzry_jieying'),function(card,player,target){
+										return target!=player;
+									}).ai=function(target){
+										if(!target.isLinked()) return get.attitude(player,target);
+										return 1;
+									};
+									"step 1"
+									if(result.bool){
+										player.line(result.targets);
+										player.logSkill('nzry_jieying');
+										result.targets[0].link();
+									}else{
+										event.finish();
+									};
+								},
+							},
+						},
+					},
+					"_nzry_jieying":{
+						mod:{
+							maxHandcard:function (player,num){
+								if(game.countPlayer(function(current){return current.hasSkill('nzry_jieying')})>0&&player.isLinked()) return num+2;
+							},
+						},
+					},
+					"nzry_junlve":{
+						audio:2,
+						init:function(player){
+							if(!player.storage.nzry_junlve) player.storage.nzry_junlve=0;
+						},
+						marktext:"军",
+						intro:{
+							content:'当前有#个“军略”标记',
+						},
+						mark:true,
+						trigger:{
+							player:"damageAfter",
+							source:"damageAfter",
+						},
+						forced:true,
+						content:function(){
+							player.storage.nzry_junlve++;
+							player.syncStorage('nzry_junlve');
+							game.log(player,'获得一个“军略”标记');
+						},
+					},
+					"nzry_cuike":{
+						audio:2,
+						trigger:{
+							player:"phaseUseBegin",
+						},
+						direct:true,
+						content:function(){
+							'step 0'
+							if(player.storage.nzry_junlve%2==1){
+								player.chooseTarget('是否发动【摧克】来对一名角色造成一点伤害？').ai=function(target){
+									return -get.attitude(player,target);
+								};
+							}else if(player.storage.nzry_junlve%2==0){
+								player.chooseTarget('是否发动【摧克】来横置一名角色并弃置其区域内的一张牌？').ai=function(target){
+									return -get.attitude(player,target);
+								};
+							}else{
+								event.finish();
+							};
+							'step 1'
+							if(result.bool){
+								player.line(result.targets);
+								player.logSkill('nzry_cuike');
+								if(player.storage.nzry_junlve%2==1){
+									result.targets[0].damage();
+								}else{
+									result.targets[0].link();
+									player.discardPlayerCard(result.targets[0],1,'hej');
+								};
+							};
+							'step 2'
+							if(player.storage.nzry_junlve>7){
+								player.chooseBool().set('ai',function(){
+									return true;
+								}).set('prompt','是否弃置所有“军略”标记并对所有其他角色造成一点伤害？');
+							}else{
+								event.finish();
+							};
+							'step 3'
+							if(result.bool){
+								player.line(game.players);
+								player.logSkill('nzry_cuike');
+								player.storage.nzry_junlve=0;
+								player.syncStorage('nzry_junlve');
+								game.log(player,'移去了所有“军略”标记');
+								for(var i=0;i<game.players.length;i++){
+									if(game.players[i]!=player) game.players[i].damage();
+								};
+							};
+						},
+					},
+					"nzry_dinghuo":{
+						audio:2,
+						limited:true,
+						init:function (player){
+							player.storage.nzry_dinghuo=false;
+						},
+						intro:{
+							content:"limited",
+						},
+						unique:true,
+						mark:true,
+						skillAnimation:true,
+						trigger:{
+							player:"phaseUseBegin",
+						},
+						filter:function (event,player){
+							return !player.storage.nzry_dinghuo&&player.storage.nzry_junlve>0;
+						},
+						check:function (event,player){
+							var num=game.countPlayer(function(current){return get.attitude(player,current)<0&&current.isLinked()});
+							return player.storage.nzry_junlve>=num&&num==game.countPlayer(function(current){return get.attitude(player,current)<0});
+						},
+						content:function (){
+							'step 0'
+							player.awakenSkill('nzry_dinghuo');
+							player.storage.nzry_dinghuo=true;
+							player.chooseTarget([0,player.storage.nzry_junlve],'请选择【绽火】的目标',function(card,player,target){
+								return target.isLinked();
+							}).ai=function(target){
+								return -get.attitude(player,target);
+							};
+							'step 1'
+							if(result.bool){
+								player.line(result.targets);
+								player.storage.nzry_junlve=0;
+								player.syncStorage('nzry_junlve');
+								game.log(player,'移去了所有“军略”标记');
+								for(var i=0;i<result.targets.length;i++){
+									result.targets[i].discard(result.targets[i].get('e'));
+									result.targets[i].damage('fire');
+								};
+							};
+						},
+					},
 		},
 		translate:{
+			"shen_luxun":"神陆逊",
+			"nzry_junlve":"军略",
+			"nzry_junlve_info":"锁定技，当你受到或造成伤害后，你获得一个“军略”标记",
+			"nzry_cuike":"摧克",
+			"nzry_cuike_info":"出牌阶段开始时，若“军略”标记的数量为奇数，你可以对一名角色造成一点伤害;若“军略”标记的数量为偶数，你可以横置一名角色并弃置其区域内的一张牌。若“军略”标记的数量超过7个，你可以移去全部“军略”标记并对所有其他角色造成一点伤害",
+			"nzry_dinghuo":"绽火",
+			"nzry_dinghuo_info":"限定技，出牌阶段开始时，你可以移去全部“军略”标记，令至多等量的已横置角色弃置所有装备区内的牌，然后受到1点火焰伤害",
+			"shen_liubei":"神刘备",
+			"nzry_longnu":"龙怒",
+			"nzry_longnu_info":"转换技，锁定技，①出牌阶段开始时，你流失1点体力并摸一张牌，然后本回合你的红色手牌均视为火杀且无距离限制。②出牌阶段开始时，你减1点体力上限并摸一张牌，然后本回合你的锦囊牌均视为雷杀且无使用次数限制",
+			"nzry_jieying":"结营",
+			"nzry_jieying_info":"锁定技，你始终处于横置状态;已横置的角色手牌上限+2;结束阶段，你横置一名其他角色",
+			
 			shen_zhaoyun:'神赵云',
 			shen_guanyu:'神关羽',
 			shen_lvmeng:'神吕蒙',
@@ -1591,7 +1932,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinlonghun2:'龙魂♦︎',
 			xinlonghun3:'龙魂♠︎',
 			xinlonghun4:'龙魂♣︎',
-			xinlonghun_info:'你可以将同花色的X张牌按下列规则使用或打出：红桃当【桃】，方块当具火焰伤害的【杀】，梅花当【闪】，黑桃当【无懈可击】。若你以此法使用了两张红色牌，则此牌回复值或伤害值+1。若你以此法使用了两乡长黑色牌，则你弃置当前回合角色一张牌',
+			xinlonghun_info:'你可以将同花色的X张牌按下列规则使用或打出：红桃当【桃】，方块当具火焰伤害的【杀】，梅花当【闪】，黑桃当【无懈可击】。若你以此法使用了两张红色牌，则此牌回复值或伤害值+1。若你以此法使用了两张黑色牌，则你弃置当前回合角色一张牌',
 			longhun:'龙魂',
 			longhun1:'龙魂♥︎',
 			longhun2:'龙魂♦︎',
@@ -1617,7 +1958,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbaiyin:'拜印',
 			sbaiyin_info:'觉醒技，准备阶段开始时，若你拥有的“忍”标记枚数不小于4，你减1点体力上限，然后获得“极略”',
 			jilue:'极略',
-			jilue_info:'每当一名角色的判定牌生效前，若你有手牌，你可以弃1枚“忍”标记发动“鬼才”；每当你受到伤害后，你可以弃1枚“忍”标记，发动“放逐”；每当你使用锦囊牌时，你可以弃1枚“忍”标记，发动“集智”；出牌阶段限一次，若你有牌，你可以弃1枚“忍”标记，发动“制衡”；出牌阶段，你可以弃1枚“忍”标记，执行“完杀”的效果，直到回合结束。',
+			jilue_info:'每当一名角色的判定牌生效前，若你有手牌，你可以弃1枚“忍”标记发动“鬼才”(界)；每当你受到伤害后，你可以弃1枚“忍”标记，发动“放逐”；每当你使用锦囊牌时，你可以弃1枚“忍”标记，发动“集智”(界)；出牌阶段限一次，若你有牌，你可以弃1枚“忍”标记，发动“制衡”(界)；出牌阶段，你可以弃1枚“忍”标记，执行“完杀”的效果，直到回合结束。',
 			jilue_guicai:'鬼才',
 			jilue_fangzhu:'放逐',
 			jilue_wansha:'完杀',
