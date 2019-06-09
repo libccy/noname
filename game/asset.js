@@ -2469,6 +2469,7 @@ window.noname_asset_list=[
 	'image/character/yxs_kaisa.jpg',
 	'image/character/yxs_lanlinwang.jpg',
 	'image/character/yxs_libai.jpg',
+	'image/character/yxs_qinqiong.jpg',
 	'image/character/yxs_lishimin.jpg',
 	'image/character/yxs_luban.jpg',
 	'image/character/yxs_luobinhan.jpg',
