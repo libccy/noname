@@ -1,15 +1,15 @@
 window.noname_update={
-	version:'1.9.84',
-	update:'1.9.83',
+	version:'1.9.85',
+	update:'1.9.84',
 	changeLog:[
-		'星火燎原（by 苏婆玛丽奥）'
+		'英雄杀之秦琼（by Sukincen）'
 	],
 	files:[
-		'character/diy.js',
-		'character/xinghuoliaoyuan.js',
+		'character/yxs.js',
+		/*'character/xinghuoliaoyuan.js',
 		'character/sp.js',
 		'game/asset.js',
 		'game/config.js',
-		'game/package.js'
+		'game/package.js'*/
 	]
 };
