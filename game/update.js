@@ -1,6 +1,6 @@
 window.noname_update={
 	version:'1.9.85',
-	update:'1.9.84',
+	update:'1.9.85',
 	changeLog:[
 		'英雄杀之秦琼（by Sukincen）'
 	],
