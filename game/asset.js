@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'1.9.85',
+	'1.9.85.1',
 	'audio/background/music_danji.mp3',
 	'audio/background/music_default.mp3',
 	'audio/background/music_diaochan.mp3',
