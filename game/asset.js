@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'1.9.84',
+	'1.9.85',
 	'audio/background/music_danji.mp3',
 	'audio/background/music_default.mp3',
 	'audio/background/music_diaochan.mp3',
@@ -1414,6 +1414,7 @@ window.noname_asset_list=[
 	'font/xingkai.ttf',
 	'font/xinwei.ttf',
 	'font/yuanli.ttf',
+	'font/shousha.ttf',
 	'image/background/huangtian_bg.jpg',
 	'image/background/ol_bg.jpg',
 	'image/background/september_bg.jpg',
