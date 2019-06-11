@@ -1120,7 +1120,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard'},
 				frequent:true,
 				filter:function(event){
-					return (get.type(event.card,'trick')=='trick'&&event.cards[0]&&event.cards[0]==event.card);
+					return (get.type(event.card)=='trick');
 				},
 				init:function(player){
 					player.storage.rejizhi=0;
@@ -1392,7 +1392,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					halfneg:true
 				}
 			},
-			reqicai:{
+			/*reqicai:{
 				trigger:{player:'equipEnd'},
 				frequent:true,
 				content:function(){
@@ -1404,7 +1404,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(type=='trick'||type=='delay') return true;
 					}
 				},
-			},
+			},*/
 			retuxi:{
 				audio:2,
 				trigger:{player:'phaseDrawBefore'},
@@ -1774,7 +1774,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.storage.reqianxun2=player.storage.reqianxun2.concat(player.getCards('h'));
 					game.addVideo('storage',player,['reqianxun2',get.cardsInfo(player.storage.reqianxun2),'cards']);
-					player.lose(player.getCards('h'),ui.special);
+					player.lose(player.getCards('h'),ui.special,'toStorage');
 					player.addSkill('reqianxun2');
 				},
 				ai:{
@@ -1802,7 +1802,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				audio:false,
 				content:function(){
-					player.gain(player.storage.reqianxun2);
+					player.gain(player.storage.reqianxun2,'fromStorage');
 					player.removeSkill('reqianxun2');
 					player.storage.reqianxun2=[];
 					game.addVideo('storage',player,['reqianxun2',get.cardsInfo(player.storage.reqianxun2),'cards']);
@@ -2094,7 +2094,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					"step 3"
 					if(result.bool){
-						player.lose(result.cards,ui.special);
+						player.lose(result.cards,ui.special,'toStorage');
 						if(result.targets[0].hasSkill('reyiji2')){
 							result.targets[0].storage.reyiji2=result.targets[0].storage.reyiji2.concat(result.cards);
 						}
@@ -2158,7 +2158,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:false,
 				content:function(){
 					player.$draw(player.storage.reyiji2.length);
-					player.gain(player.storage.reyiji2);
+					player.gain(player.storage.reyiji2,'fromStorage');
 					delete player.storage.reyiji2;
 					player.removeSkill('reyiji2');
 					game.delay();
@@ -2689,7 +2689,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rebiyue:'闭月',
 			rebiyue_info:'结束阶段，你可以摸一张牌，若你没有手牌，则改为摸两张牌',
 			rejizhi:'集智',
-			rejizhi_info:'当你使用非转化的普通锦囊牌时，可以摸一张牌，若此牌为基本牌，则可以弃置之，然后令本回合手牌上限+1。',
+			rejizhi_info:'当你使用非延时锦囊牌时，你可以摸一张牌。若此牌为基本牌，则你可以弃置之，然后令本回合手牌上限+1。',
 			reqicai:'奇才',
 			reqicai_info:'锁定技，你使用锦囊牌无距离限制，你装备区内的牌不能被其他角色弃置',
 			rezhiheng:'制衡',
