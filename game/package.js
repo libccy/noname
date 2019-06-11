@@ -92,6 +92,7 @@ window.noname_package={
 		huangcao:'黄草',
 		yuanli:'隶书',
 		xingkai:'行楷',
+		shousha:'手杀',
 	},
 	theme:{
 		woodden:'木纹',
