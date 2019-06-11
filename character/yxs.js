@@ -195,7 +195,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
                 content:function (){                             
           var target=player.storage.yxs_menshen2;
-		    			trigger.player.line(target,'green');															
+		    			trigger.player.line(target,'green');
+			trigger.targets.remove(player);
+				  		trigger.targets.push(target);	
 								trigger.target = target;							
     },
        }, 
