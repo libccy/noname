@@ -1,25 +1,25 @@
 window.noname_update={
-	version:'1.9.86',
-	update:'1.9.85',
+	version:'1.9.86.1',
+	update:'1.9.85.1',
 	changeLog:[
-		'英雄杀之秦琼（by Sukincen）',
-		'阴包武将（by 极光）',
-		'新GBK字体'
+		'修复BUG',
+		//'阴包武将（by 极光）',
+		'新手杀字体（方正隶变体）'
 	],
 	files:[
-		'character/diy.js',
+		//'character/diy.js',
 		'character/yxs.js',
-		'character/extra.js',
-		'character/old.js',
+		/*'character/extra.js',
+		'character/old.js',*/
 		'character/refresh.js',
-		'character/shenhua.js',
+		/*'character/shenhua.js',
 		'character/sp.js',
 		'character/standard.js',
 		'character/xinghuoliaoyuan.js',
-		'character/yijiang.js',
+		'character/yijiang.js',*/
 		'game/asset.js',
-		'game/config.js',
-		'game/game.js',
+		//'game/config.js',
+		//'game/game.js',
 		'game/package.js'
 	]
 };
