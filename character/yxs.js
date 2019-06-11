@@ -2933,7 +2933,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			yxs_fanji:"反击",
             yxs_fanji2:"反击",
-            yxs_fanji_info:"当你受伤【杀】或【决斗】造成的伤害后，你可以对伤害来源使用一张【杀】。若此【杀】为红色，其不可闪避",
+            yxs_fanji_info:"当你受到【杀】或【决斗】造成的伤害后，你可以对伤害来源使用一张【杀】。若此【杀】为红色，其不可闪避",
             yxs_menshen:"门神",
             yxs_menshen2:"门神",
             yxs_menshen3:"门神",
