@@ -11,14 +11,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_simayi:['male','shen',4,['renjie','sbaiyin','lianpo'],['wei']],
 			shen_caocao:['male','shen',3,['guixin','feiying'],['wei']],
 			shen_lvbu:['male','shen',5,['baonu','wumou','ol_wuqian','ol_shenfen'],['qun']],
+			
 			"shen_liubei":["male","shen",6,["nzry_longnu","nzry_jieying"],["shu"]],
 			"shen_luxun":["male","shen",4,["nzry_junlve","nzry_cuike","nzry_dinghuo"],["wu"]],
+			"shen_zhangliao":["male","shen",4,["drlt_duorui","drlt_zhiti"],["wei"]],
+			"shen_ganning":["male","shen",3,["drlt_poxi","drlt_jieying"],["wu"]],
 		},
 		characterIntro:{
 			shen_guanyu:'关羽，字云长。曾水淹七军、擒于禁、斩庞德、威震华夏，吓得曹操差点迁都躲避，但是东吴偷袭荆州，关羽兵败被害。后传说吕蒙因关羽之魂索命而死。',
 			shen_lvmeng:'吕蒙，字子明，汝南富陂人，东吴名将，原有“吴下阿蒙”之贬称，后受孙权劝说，奋发读书，最终成就一代名将。',
 			shen_zhouyu:'字公瑾，庐江舒县人。东汉末年名将。有姿貌、精音律，江东有“曲有误，周郎顾”之语。周瑜少与孙策交好，后孙策遇刺身亡，孙权继任。周瑜将兵赴丧，以中护军的身份与长史张昭共掌众事，建安十三年（208年），周瑜率东吴军与刘备军联合，在赤壁击败曹操。此战也奠定了三分天下的基础。',
 			shen_zhugeliang:'字孔明、号卧龙，汉族，琅琊阳都人，三国时期蜀汉丞相、杰出的政治家、军事家、发明家、文学家。在世时被封为武乡侯，死后追谥忠武侯，后来东晋政权推崇诸葛亮军事才能，特追封他为武兴王。诸葛亮为匡扶蜀汉政权，呕心沥血、鞠躬尽瘁、死而后已。其代表作有《前出师表》、《后出师表》、《诫子书》等。曾发明木牛流马等，并改造连弩，可一弩十矢俱发。于234年在宝鸡五丈原逝世。',
+		},
+		characterTitle:{
+			shen_ganning:"体力上限：6",
 		},
 		skill:{
 			ol_shenfen:{
@@ -939,7 +945,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return get.value(card);
 					};
 					"step 2"
-					player.lose(result.cards,ui.special)._triggered=null;
+					player.lose(result.cards,ui.special,'toStorage');
 					player.storage.qixing=result.cards;
 					game.addVideo('storage',player,['qixing',get.cardsInfo(player.storage.qixing),'cards']);
 				},
@@ -985,7 +991,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						player.logSkill('qixing');
-						player.lose(result.cards,ui.special)._triggered=null;
+						player.lose(result.cards,ui.special,'toStorage');
 						player.storage.qixing=player.storage.qixing.concat(result.cards);
 						player.syncStorage('qixing');
 						event.num=result.cards.length;
@@ -1006,7 +1012,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.delay(0.5);
 					}
 					"step 3"
-					player.gain(result.links)._triggered=null;
+					player.gain(result.links,'fromStorage');
 					for(var i=0;i<result.links.length;i++){
 						player.storage.qixing.remove(result.links[i]);
 					}
@@ -1182,23 +1188,54 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				limited:true,
 				selectCard:[0,4],
 				line:'fire',
-				check:function(){return -1},
-				selectTarget:function(){
-					if(ui.selected.cards.length==4) return 1;
+				check:function (){return -1},
+                selectTarget:function (){
+					if(ui.selected.cards.length==4) return [1,2];
 					if(ui.selected.cards.length==0) return [1,3];
 					game.uncheck('target');
 					return [1,3];
 				},
-				content:function(){
+                multitarget:true,
+                multiline:true,
+                content:function (){
+					"step 0"
 					player.awakenSkill('yeyan');
-					player.storage.yeyan=true;
-					if(cards.length==4){
-						player.loseHp(3);
-						target.damage('fire',3,'nocard');
+					event.num=0;
+					"step 1"
+					if(cards.length==4) event.goto(2);
+					else {
+						if(event.num<targets.length){
+						targets[event.num].damage('fire',1,'nocard');
+						event.num++;
 					}
+					if(event.num==targets.length) event.finish();
+					else event.redo();
+					}
+					"step 2"
+					player.loseHp(3);
+					if(targets.length==1) event.goto(4);
 					else{
-						target.damage('fire','nocard');
+						player.chooseTarget('请选择受到2点伤害的角色',true,function(card,player,target){
+							return targets.contains(target)
+						}).set('ai',function(target){
+							return 1;
+						});
 					}
+					"step 3"
+					if(event.num<targets.length){
+						var dnum=1;
+						if(result.bool&&result.targets&&targets[event.num]==result.targets[0]) dnum=2;
+						targets[event.num].damage('fire',dnum,'nocard');
+						event.num++;
+					}
+					if(event.num==targets.length) event.finish();
+					else event.redo();
+					"step 4"
+					player.chooseControl("2点","3点").set('prompt','请选择伤害点数').set('ai',function(){
+						return "3点";
+					});
+					"step 5"
+					targets[0].damage('fire',result.control=="2点"?2:3,'nocard'); 
 				},
 				ai:{
 					order:1,
@@ -1802,9 +1839,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						content:function(){
-							player.storage.nzry_junlve++;
+							player.storage.nzry_junlve+=trigger.num;
 							player.syncStorage('nzry_junlve');
-							game.log(player,'获得一个“军略”标记');
+							game.log(player,'获得',trigger.num,'个“军略”标记');
 						},
 					},
 					"nzry_cuike":{
@@ -1870,9 +1907,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						unique:true,
 						mark:true,
 						skillAnimation:true,
-						trigger:{
-							player:"phaseUseBegin",
-						},
+						enable:'phaseUse',
 						filter:function (event,player){
 							return !player.storage.nzry_dinghuo&&player.storage.nzry_junlve>0;
 						},
@@ -1880,26 +1915,487 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var num=game.countPlayer(function(current){return get.attitude(player,current)<0&&current.isLinked()});
 							return player.storage.nzry_junlve>=num&&num==game.countPlayer(function(current){return get.attitude(player,current)<0});
 						},
+						filterTarget:function(card,player,target){
+							return target.isLinked();
+						},
+						selectTarget:function(){
+							return [1,_status.event.player.storage.nzry_junlve];
+						},
+						multiline:true,
+						multitarget:true,
 						content:function (){
 							'step 0'
 							player.awakenSkill('nzry_dinghuo');
 							player.storage.nzry_dinghuo=true;
-							player.chooseTarget([0,player.storage.nzry_junlve],'请选择【绽火】的目标',function(card,player,target){
+							/*player.chooseTarget([0,player.storage.nzry_junlve],'请选择【绽火】的目标',function(card,player,target){
 								return target.isLinked();
 							}).ai=function(target){
 								return -get.attitude(player,target);
+							};*/
+							'step 1'
+							player.storage.nzry_junlve=0;
+							player.syncStorage('nzry_junlve');
+							game.log(player,'移去了所有“军略”标记');
+							for(var i=0;i<targets.length;i++){
+								targets[i].discard(targets[i].getCards('e'));
+							}
+							player.chooseTarget(true,'对一名目标角色造成1点火焰伤害',function(card,player,target){
+							    return targets.contains(target);
+							}).ai=function(){return 1};
+							'step 2'
+							if(result.bool){
+							    result.targets[0].damage('fire','nocard');
+							}
+						},
+						ai:{
+							order:1,
+							result:{
+								target:function(player,target){
+									if(target.hasSkillTag('nofire')) return 0;
+									if(lib.config.mode=='versus') return -1;
+									if(player.hasUnknown()) return 0;
+									return get.damageEffect(target,player)-target.countCards('e');
+								}
+							}
+						}
+					},
+					
+					"drlt_duorui":{
+						audio:2,
+						init:function(player){
+							player.storage.drlt_duorui=[];
+						},
+						trigger:{
+							source:'damageAfter'
+						},
+						filter:function(event,player){
+						if(player.storage.drlt_duorui.length) return false;
+							return player!=event.player&&event.player.isAlive()&&_status.currentPhase==player;
+						},
+						check:function(event,player){
+							var list=[];
+							var skills=trigger.player.skills.slice(0);
+							for(var i=0;i<skills.length;i++){
+							 var info=get.info(skills[i])
+								if(info!=undefined&&!info.charlotte&&(!info.unique||info.gainable)) list.push(skills[i]);
+							};
+							return !player.storage.disableEquip.contains('equip5')&&list.length>0;
+						},
+						content:function(){
+							'step 0'
+							event.skills=[];
+							var skills=trigger.player.skills.slice(0);
+							for(var i=0;i<skills.length;i++){
+								var info=get.info(skills[i])
+								if(info!=undefined&&!info.charlotte&&(!info.unique||info.gainable)) event.skills.push(skills[i]);
+							};
+							if(player.storage.disableEquip.length<5){
+								var list=['武器','防具','防御马','攻击马','宝物'];
+								for(var i=0;i<player.storage.disableEquip.length;i++){
+									list.remove(get.translation(player.storage.disableEquip[i]));
+								};
+								var list1=['equip1','equip2','equip3','equip4','equip5'];
+								for(var i=0;i<player.storage.disableEquip.length;i++){
+									list1.remove(player.storage.disableEquip[i]);
+								};
+								player.chooseControl(list).set('ai',function(event){
+									if(list1.contains('equip5')&&event.skills.length>0) return '宝物';
+									return list.randomGet();
+								}).set('prompt','请选择需要废除的栏位');
+							}
+							'step 1'
+							if(result.control!=undefined){
+								if(result.control=='武器') player.disableEquip('equip1');
+								if(result.control=='防具') player.disableEquip('equip2');
+								if(result.control=='防御马') player.disableEquip('equip3');
+								if(result.control=='攻击马') player.disableEquip('equip4');
+								if(result.control=='宝物') player.disableEquip('equip5');
+							}
+							if(event.skills.length>0){
+								player.chooseControl(event.skills).set('prompt','请选择要获得的技能');
+							}
+							else event.finish();
+							'step 2'
+							player.addTempSkill(result.control,{player:'dieAfter'});
+							player.storage.drlt_duorui=[result.control];
+							player.storage.drlt_duorui_player=trigger.player;
+							trigger.player.storage.drlt_duorui=[result.control];
+							trigger.player.addTempSkill('drlt_duorui1',{player:'phaseAfter'});
+						},
+						group:['duorui_clear'],
+					},
+					"duorui_clear":{
+						trigger:{global:['phaseAfter','dieAfter'],},
+						filter:function(event,player){
+							if(!player.storage.drlt_duorui_player||!player.storage.drlt_duorui) return false;
+							return player.storage.drlt_duorui_player==event.player&&player.storage.drlt_duorui.length;
+						},
+						silent:true,
+						forced:true,
+						popup:false,
+						content:function(){
+							player.removeSkill(player.storage.drlt_duorui[0]);
+							delete player.storage.drlt_duorui_player;
+							player.storage.drlt_duorui=[];
+						},
+					},
+					"drlt_duorui1":{
+						init:function(player,skill){
+							player.disableSkill(skill,player.storage.drlt_duorui);
+						},
+						onremove:function(player,skill){
+							"step 0"
+							player.enableSkill(skill);
+							"step 1"
+							delete player.storage.drlt_duorui;
+						},
+						locked:true,
+						mark:true,
+						intro:{
+							content:function(storage,player,skill){
+								var list=[];
+								for(var i in player.disabledSkills){
+									if(player.disabledSkills[i].contains(skill)) list.push(i);
+								};
+								if(list.length){
+									var str='失效技能：';
+									for(var i=0;i<list.length;i++){
+										if(lib.translate[list[i]+'_info']) str+=get.translation(list[i])+'、';
+									};
+									return str.slice(0,str.length-1);
+								};
+							},
+						},
+					},
+					"drlt_zhiti":{
+					audio:2,
+					locked:true,
+						group:["drlt_zhiti_1","drlt_zhiti_2","drlt_zhiti_3","drlt_zhiti_4","drlt_zhiti_5"],
+						subSkill:{
+							'1':{
+								audio:2,
+								trigger:{
+									global:'juedouAfter'
+								},
+								forced:true,
+								filter:function(event,player){
+									return event.targets&&event.targets.contains(player)&&event.turn!=player&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
+								},
+								content:function(){
+									'step 0'
+									var list=[];
+									for(var i=0;i<player.storage.disableEquip.length;i++){
+										list.push(get.translation(player.storage.disableEquip[i]));
+									};
+									player.chooseControl(list).set('ai',function(event){
+										return list.randomGet();
+									}).set('prompt','请选择需要恢复的栏位');;
+									'step 1'
+									if(result.control=='武器') player.enableEquip('equip1');
+									if(result.control=='防具') player.enableEquip('equip2');
+									if(result.control=='防御马') player.enableEquip('equip3');
+									if(result.control=='攻击马') player.enableEquip('equip4');
+									if(result.control=='宝物') player.enableEquip('equip5');
+								},
+							},
+							'2':{
+								audio:2,
+								trigger:{
+									player:'juedouAfter',
+								},
+								forced:true,
+								filter:function(event,player){
+									return event.turn!=player&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
+								},
+								content:function(){
+									'step 0'
+									var list=[];
+									for(var i=0;i<player.storage.disableEquip.length;i++){
+										list.push(get.translation(player.storage.disableEquip[i]));
+									};
+									player.chooseControl(list).set('ai',function(event){
+										return list.randomGet();
+									}).set('prompt','请选择需要恢复的栏位');;
+									'step 1'
+									if(result.control=='武器') player.enableEquip('equip1');
+									if(result.control=='防具') player.enableEquip('equip2');
+									if(result.control=='防御马') player.enableEquip('equip3');
+									if(result.control=='攻击马') player.enableEquip('equip4');
+									if(result.control=='宝物') player.enableEquip('equip5');
+								},
+							},
+							'3':{
+								audio:2,
+								trigger:{
+									player:'chooseToCompareAfter'
+								},
+								forced:true,
+								filter:function(event,player){
+									return event.result.bool==true&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
+								},
+								content:function(){
+									'step 0'
+									var list=[];
+									for(var i=0;i<player.storage.disableEquip.length;i++){
+										list.push(get.translation(player.storage.disableEquip[i]));
+									};
+									player.chooseControl(list).set('ai',function(event){
+										return list.randomGet();
+									}).set('prompt','请选择需要恢复的栏位');;
+									'step 1'
+									if(result.control=='武器') player.enableEquip('equip1');
+									if(result.control=='防具') player.enableEquip('equip2');
+									if(result.control=='防御马') player.enableEquip('equip3');
+									if(result.control=='攻击马') player.enableEquip('equip4');
+									if(result.control=='宝物') player.enableEquip('equip5');
+								},
+							},
+							'4':{
+								audio:2,
+								trigger:{
+									global:'chooseToCompareAfter'
+								},
+								forced:true,
+								filter:function(event,player){
+									return (event.targets!=undefined&&event.targets.contains(player)||event.target==player)&&event.result.bool==false&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
+								},
+								content:function(){
+									'step 0'
+									var list=[];
+									for(var i=0;i<player.storage.disableEquip.length;i++){
+										list.push(get.translation(player.storage.disableEquip[i]));
+									};
+									player.chooseControl(list).set('ai',function(event){
+										return list.randomGet();
+									}).set('prompt','请选择需要恢复的栏位');;
+									'step 1'
+									if(result.control=='武器') player.enableEquip('equip1');
+									if(result.control=='防具') player.enableEquip('equip2');
+									if(result.control=='防御马') player.enableEquip('equip3');
+									if(result.control=='攻击马') player.enableEquip('equip4');
+									if(result.control=='宝物') player.enableEquip('equip5');
+								},
+							},
+							'5':{
+								audio:2,
+								trigger:{
+									player:['damageEnd']
+								},
+								forced:true,
+								filter:function(event,player){
+									return player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
+								},
+								content:function(){
+									'step 0'
+									var list=[];
+									for(var i=0;i<player.storage.disableEquip.length;i++){
+										list.push(get.translation(player.storage.disableEquip[i]));
+									};
+									player.chooseControl(list).set('ai',function(event){
+										return list.randomGet();
+									}).set('prompt','请选择需要恢复的栏位');;
+									'step 1'
+									if(result.control=='武器') player.enableEquip('equip1');
+									if(result.control=='防具') player.enableEquip('equip2');
+									if(result.control=='防御马') player.enableEquip('equip3');
+									if(result.control=='攻击马') player.enableEquip('equip4');
+									if(result.control=='宝物') player.enableEquip('equip5');
+								},
+							},
+						},
+					},
+					"_drlt_zhiti":{
+						mod:{
+							maxHandcard:function (player,num){
+								if(player.maxHp>player.hp&&game.countPlayer(function(current){return current!=player&&current.hasSkill('drlt_zhiti')&&get.distance(current,player,'attack')<=1})) return num-1;
+							},
+						},
+					},
+					'drlt_poxi':{
+						init:function (player,skill){
+							if(player.hasStockSkill(skill)&&!player.storage[skill]){
+								player.gainMaxHp(3);
+								player.storage[skill]=true;
+							}
+						},
+						audio:2,
+						enable:'phaseUse',
+						usable:1,
+						filterTarget:function(card,player,target){
+							//return target!=player&&target.countCards('h')>0;
+							return target!=player;
+						},
+						content:function(){
+							'step 0'
+							event.list1=[];
+							event.list2=[];
+							if(target.countCards('h')>0){
+								var chooseButton=player.chooseButton(4,'hidden',['你的手牌',player.getCards('h'),get.translation(target.name)+'的手牌',target.getCards('h'),'hidden']);
+							}else{
+								var chooseButton=player.chooseButton(4,'hidden',['你的手牌',player.getCards('h'),'hidden']);
+							}
+							chooseButton.set('ai',function(button){
+								//if(button.link.name=='du') return 1;
+								return 0;
+							});
+							chooseButton.filterButton=function(button){
+								for(var i=0;i<ui.selected.buttons.length;i++){
+									if(get.suit(button.link)==get.suit(ui.selected.buttons[i].link)) return false;
+								};
+								return true;
 							};
 							'step 1'
 							if(result.bool){
-								player.line(result.targets);
-								player.storage.nzry_junlve=0;
-								player.syncStorage('nzry_junlve');
-								game.log(player,'移去了所有“军略”标记');
-								for(var i=0;i<result.targets.length;i++){
-									result.targets[i].discard(result.targets[i].get('e'));
-									result.targets[i].damage('fire');
+								var list=result.links;
+								for(var i=0;i<list.length;i++){
+									if(get.owner(list[i])==player){
+										event.list1.push(list[i]);
+									}else{
+										event.list2.push(list[i]);
+									};
 								};
+								target.discard(event.list2);
+								player.discard(event.list1);
 							};
+							'step 2'
+							if(event.list1.length+event.list2.length==4){
+								if(event.list1.length==0) player.loseMaxHp();
+								if(event.list1.length==1){
+									var evt=_status.event;
+									for(var i=0;i<10;i++){
+										if(evt&&evt.getParent)evt=evt.getParent();
+										if(evt.name=='phaseUse'){
+										evt.skipped=true;
+											break;
+										};
+									};
+									player.addTempSkill('drlt_poxi1',{player:'phaseAfter'});
+								};
+								if(event.list1.length==3) player.recover();
+								if(event.list1.length==4) player.draw(4);
+							};
+						},
+						ai:{
+							order:13,
+							result:{
+								target:function(target,player){
+									return -1;
+								},
+							},
+						},
+					},
+					'drlt_poxi1':{
+						mod:{
+							maxHandcard:function (player,num){
+								return num-1;
+							},
+						},
+					},
+					'drlt_jieying':{
+						audio:2,
+						init:function (player){
+							player.storage.drlt_jieying=0;
+						},
+						marktext:"营",
+						intro:{
+							content:function(storage){
+								return '当前有'+storage+'个“营”';
+							},
+						},
+						mark:true,
+						group:["drlt_jieying_1","drlt_jieying_2","drlt_jieying_3"],
+						subSkill:{
+							'1':{
+								audio:'drlt_jieying',
+								trigger:{
+									global:'gameStart'
+								},
+								forced:true,
+								content:function(){
+									player.storage.drlt_jieying++;
+									player.syncStorage('drlt_jieying');
+									game.log(player,'获得了“营”标记');
+								},
+							},
+							'2':{
+								audio:'drlt_jieying',
+								trigger:{
+									player:"phaseEnd",
+								},
+								direct:true,
+								content:function(){
+									'step 0'
+									player.chooseTarget(get.prompt('drlt_jieying'),function(card,player,target){
+										return target.storage.drlt_jieying==undefined;
+									}).ai=function(target){
+										if(get.attitude(player,target)>0)
+										return 0.1;
+										if(get.attitude(player,target)<1&&(target.isTurnedOver()||target.countCards('h')<1))
+										return 0.2;
+											if(get.attitude(player,target)<1&&target.countCards('h')>0&&target.countCards('j',{name:'lebu'})>0)
+										return target.countCards('h')*0.8+target.getHandcardLimit()*0.7+2;
+										if(get.attitude(player,target)<1&&target.countCards('h')>0)
+										return target.countCards('h')*0.8+target.getHandcardLimit()*0.7;
+										return 1;
+									};
+									'step 1'
+									if(result.bool){
+										var target=result.targets[0];
+										player.line(target);
+										player.logSkill('drlt_jieying');
+										delete player.storage.drlt_jieying;
+										player.unmarkSkill('drlt_jieying');
+										game.log(player,'失去了“营”标记');
+										player.storage.drlt_jieying1=target;
+										if(target.storage.drlt_jieying==undefined) target.storage.drlt_jieying=0;
+										target.storage.drlt_jieying++;
+										target.markSkill('drlt_jieying');
+										game.log(target,'获得了“营”标记');
+									};
+								},
+							},
+							'3':{
+								audio:'drlt_jieying',
+								trigger:{
+									global:'phaseAfter'
+								},
+								forced:true,
+								filter:function(event,player){
+									return event.player!=player&&event.player.storage.drlt_jieying!=undefined
+								},
+								content:function(){		
+									if(trigger.player.countCards('h')>0){
+										trigger.player.give(trigger.player.getCards('h'),player);
+									}
+									if(player.storage.drlt_jieying==undefined) player.storage.drlt_jieying=0;
+									player.storage.drlt_jieying++;
+									delete trigger.player.storage.drlt_jieying;
+									trigger.player.unmarkSkill('drlt_jieying');
+									player.markSkill('drlt_jieying');
+									game.log(player,'获得了“营”标记');
+								},
+							},
+						},
+					},
+					'_drlt_jieying':{
+						mod:{
+							cardUsable:function (card,player,num){
+								if(player.storage.drlt_jieying!=undefined&&card.name=='sha') return num+1;
+							},
+							maxHandcard:function (player,num){
+								if(player.storage.drlt_jieying!=undefined) return num+1;
+							},
+						},
+						audio:'drlt_jieying',
+						trigger:{
+							player:'phaseDrawBegin'
+						},
+						forced:true,
+						filter:function(event,player){
+							return player.storage.drlt_jieying!=undefined;
+						},
+						content:function(){
+							trigger.num++;
 						},
 					},
 		},
@@ -1910,12 +2406,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_cuike":"摧克",
 			"nzry_cuike_info":"出牌阶段开始时，若“军略”标记的数量为奇数，你可以对一名角色造成一点伤害;若“军略”标记的数量为偶数，你可以横置一名角色并弃置其区域内的一张牌。若“军略”标记的数量超过7个，你可以移去全部“军略”标记并对所有其他角色造成一点伤害",
 			"nzry_dinghuo":"绽火",
-			"nzry_dinghuo_info":"限定技，出牌阶段开始时，你可以移去全部“军略”标记，令至多等量的已横置角色弃置所有装备区内的牌，然后受到1点火焰伤害",
+			"nzry_dinghuo_info":"限定技，出牌阶段，你可以移去全部“军略”标记，令至多等量的已横置角色弃置所有装备区内的牌。然后，你对其中一名角色造成1点火焰伤害",
 			"shen_liubei":"神刘备",
 			"nzry_longnu":"龙怒",
 			"nzry_longnu_info":"转换技，锁定技，①出牌阶段开始时，你流失1点体力并摸一张牌，然后本回合你的红色手牌均视为火杀且无距离限制。②出牌阶段开始时，你减1点体力上限并摸一张牌，然后本回合你的锦囊牌均视为雷杀且无使用次数限制",
 			"nzry_jieying":"结营",
 			"nzry_jieying_info":"锁定技，你始终处于横置状态;已横置的角色手牌上限+2;结束阶段，你横置一名其他角色",
+			
+			"shen_ganning":"神甘宁",
+			"shen_zhangliao":"神张辽",
+			
+			"drlt_poxi":"魄袭",
+			"drlt_poxi_info":"出牌阶段限一次，你可以观看一名其他角色的手牌，然后你可以弃置你与其手牌中的四张花色不同的牌。若如此做，根据此次弃置你的牌的数量执行以下效果：1.没有，扣减一点体力上限；2.一张，立即结束出牌阶段且本回合手牌上限-1；三张，恢复一点体力；四张，摸四张牌",
+			"drlt_jieying":"劫营",
+			"drlt_jieying_info":"游戏开始时，你获得一个“营”标记。结束阶段，你可以将“营”标记置于一名角色的武将牌旁；有“营”标记的角色摸牌阶段多摸一张牌、出牌阶段可多使用一张【杀】、手牌上限+1。有“营”标记的其他角色的回合结束后，你获得其所有手牌并收回“营”标记。",
+			"drlt_duorui1":"失效技能",
+			"drlt_duorui1_bg":"锐",
+			"drlt_duorui":"夺锐",
+			"drlt_duorui_info":"当你于出牌阶段内对一名其他角色造成伤害后，你可以废除你装备区内的一个装备栏（若已全部废除则可以跳过此步骤），然后获得其的一个技能直到其的下回合结束或其死亡(觉醒技，限定技，主公技等特殊技能除外)。若如此做，该角色该技能失效且你不能再发动〖夺锐〗直到你失去此技能。",
+			"drlt_zhiti":"止啼",
+			"drlt_zhiti_info":"锁定技，你范围内已受伤的其他角色手牌上限-1；当你拼点或【决斗】胜利，或受到伤害后，你恢复一个装备栏",
 			
 			shen_zhaoyun:'神赵云',
 			shen_guanyu:'神关羽',

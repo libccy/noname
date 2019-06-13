@@ -687,7 +687,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					players.sort(lib.sort.seat);
 					var choice=players[0];
 					var next=player.chooseTarget('是否移动木牛流马？',function(card,player,target){
-						return !target.isMin()&&player!=target&&!target.getEquip(5);
+						return !target.isMin()&&player!=target&&target.isEmpty(5);
 					});
 					next.set('ai',function(target){
 						return target==_status.event.choice?1:-1;

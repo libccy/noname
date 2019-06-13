@@ -209,7 +209,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         for(var i=0;i<event.toequip.length;i++){
                             if(get.type(card)=='equip'&&get.subtype(card)==get.subtype(event.toequip[i])) bool1=false;
                         }
-                        return (get.type(card)=='equip'&&!event.toequip.contains(card)&&bool1);
+                        return (get.type(card)=='equip'&&!event.toequip.contains(card)&&!target.isDisabled(get.subtype(card))&&bool1);
                     });
                     if(equip) event.toequip.push(equip);
                     else event.num=0;
@@ -1874,8 +1874,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 priority:15,
                 filter:function (event,player){
 					if(player.hasSkill('smh_huoji')||player.hasSkill('smh_lianhuan')) return false;
-					if(player.getEquip(2)) return false;
-					if(player.storage.lose_pos_equip&&player.storage.lose_pos_equip.contains('equip2')) return false;
+					if(!player.isEmpty(2)) return false;
 					if(event.nature) return true;
 					return get.type(event.card,'trick')=='trick';
 				},
@@ -3073,6 +3072,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.addVideo('gain2',player,get.cardsInfo([result.node]));
 						player.markSkill('xinfu_jijun');
 						game.addVideo('storage',player,['xinfu_jijun',get.cardsInfo(player.storage.xinfu_jijun),'cards']);
+						event.trigger("addCardToStorage");
 					}
 				},
                 init:function (player){
@@ -3561,7 +3561,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(get.suit(cards[i])=='heart') togain.push(cards[i]);
 						}
 						player.logSkill('xinfu_yingshi',result.targets);
-						player.lose(togain,ui.special);
+						player.lose(togain,ui.special,'toStorage');
 						player.$give(togain,result.targets[0]);
 						result.targets[0].storage.yingshi_heart=togain;
 						result.targets[0].addSkill('yingshi_heart');
@@ -3586,7 +3586,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						player.$give(result.links,trigger.source);
-						trigger.source.gain(result.links);
+						trigger.source.gain(result.links,'fromStorage');
 						player.storage.yingshi_heart.remove(result.links[0]);
 						player.syncStorage('yingshi_heart');
 						player.updateMarks('yingshi_heart');
@@ -4376,7 +4376,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var next=player.chooseTarget(2,function(card,player,target){
                         if(ui.selected.targets.length){
                             if(!event.ingame){
-                                return !target.getEquip(2)?true:false;
+                                return target.isEmpty(2)?true:false;
                             }
                             var from=ui.selected.targets[0];
                             if(target.isMin()) return false;
@@ -4384,7 +4384,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                                 for(var i=0;i<es.length;i++){
                                     if(['equip3','equip4'].contains(get.subtype(es[i]))&&target.getEquip('liulongcanjia')) continue;
                                     if(es[i].name=='liulongcanjia'&&target.countCards('e',{subtype:['equip3','equip4']})>1) continue;
-                                    if(!target.getEquip(get.subtype(es[i]))) return true;
+                                    if(target.isEmpty(get.subtype(es[i]))) return true;
                                 }
                                 return false;
                             }
@@ -4407,7 +4407,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                                             for(var i=0;i<es.length;i++){
                                                 if(['equip3','equip4'].contains(get.subtype(es[i]))&&current.getEquip('liulongcanjia')) continue;
                                                 else if(es[i].name=='liulongcanjia'&&target.countCards('e',{subtype:['equip3','equip4']})>1) continue;
-                                                else if(!current.getEquip(get.subtype(es[i]))) return true;
+                                                else if(current.isEmpty(get.subtype(es[i]))) return true;
                                             }
                                             return false;
                                         }
@@ -4421,7 +4421,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                                 for(i=0;i<es.length;i++){
                                     if(['equip3','equip4'].contains(get.subtype(es[i]))&&target.getEquip('liulongcanjia')) continue;
                                     if(es[i].name=='liulongcanjia'&&target.countCards('e',{subtype:['equip3','equip4']})>1) continue;
-                                    if(!target.getEquip(get.subtype(es[i]))) break;
+                                    if(target.isEmpty(get.subtype(es[i]))) break;
                                 }
                                 if(i==es.length) return 0;
                             }
@@ -5085,8 +5085,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return [1,3-player.storage.xinfu_zhaoxin.length];
 				},
                 discard:false,
+                lose:false,
                 content:function (){
 					'step 0'
+					player.lose(cards,ui.special,'toStorage')
 					player.$give(cards,player);
 					player.storage.xinfu_zhaoxin=player.storage.xinfu_zhaoxin.concat(cards);
 					player.markSkill('xinfu_zhaoxin');
@@ -5137,7 +5139,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					if(result.bool){
 						player.storage.xinfu_zhaoxin.remove(event.card);
-						player.give(event.card,trigger.player,true);
+						player.$give(event.card,trigger.player);
+				  trigger.player.gain(event.card,'fromStorage');
 						if(player.storage.xinfu_zhaoxin.length) player.markSkill('xinfu_zhaoxin');
 						else player.unmarkSkill('xinfu_zhaoxin');
 						player.chooseBool('是否对'+get.translation(trigger.player)+'造成一点伤害？').ai=function(){

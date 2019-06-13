@@ -93,7 +93,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 direct:true,
                 content:function (){
 					'step 0'
-					player.gainPlayerCard(get.prompt('new_liyu',trigger.player),trigger.player,'he').set('ai',function(card){
+					player.gainPlayerCard(get.prompt('new_liyu',trigger.player),trigger.player,'he','visibleMove').set('ai',function(card){
 						var player=_status.event.player;
 						var evt=_status.event.target;
 						if(get.type(card)=='equip'){
@@ -113,7 +113,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 1'
 					if(result.bool){
-						player.showCards(result.cards);
 						player.logSkill('new_liyu',trigger.player);
 						if(get.type(result.cards[0])!='equip'){
 							trigger.player.draw();
@@ -950,7 +949,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(target.sex!='male') return false;
 					var card=ui.selected.cards[0];
 					if(!card) return false;
-					if(get.position(card)=='e'&&target.countCards('e',{subtype:get.subtype(card)})) return false;
+					if(get.position(card)=='e'&&!target.isEmpty(get.subtype(card))) return false;
 					return true;
 				},
 				discard:false,

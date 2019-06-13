@@ -311,7 +311,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.hp=true;
 					}
 					event.equip=get.cardPile(function(card){
-						return get.type(card)=='equip';
+						return get.type(card)=='equip'&&!target.isDisabled(get.subtype(card));
 					});
 					if(target.isMinEquip()){
 						target.equip(event.equip||game.createCard(get.inpilefull('equip').randomGet()),true);
@@ -544,7 +544,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.attitude(player,event.target)<0;
 						},
 						filter:function(event,player){
-							return player.countCards('h')>0&&event.target.countCards('h')>0&&event.target!=player;
+							return player.canCompare(event.target);
 						},
 						logTarget:'target',
 						content:function(){
@@ -562,7 +562,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.effect(player,event.card,event.player,player)<0;
 						},
 						filter:function(event,player){
-							return player.countCards('h')>0&&event.player.countCards('h')>0&&event.player!=player;
+							return player.canCompare(event.target);
 						},
 						logTarget:'player',
 						content:function(){
@@ -794,7 +794,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.index==0){
 						target.loseHp();
 						event.card=get.cardPile(function(card){
-							return get.type(card)=='equip';
+							return get.type(card)=='equip'&&!target.isDisabled(get.subtype(card));
 						});
 						if(event.card){
 							target.equip(event.card,true).set('delay',true);
@@ -1012,6 +1012,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.delay();
 					player.storage.bizhuan.push(card);
 					player.markSkill('bizhuan');
+					event.trigger("addCardToStorage");
 				},
 				mod:{
 					maxHandcard:function(player,num){
@@ -1076,7 +1077,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						player.logSkill('tongbo');
-						player.lose(result.cards,ui.special)._triggered=null;
+						player.lose(result.cards,ui.special,'toStorage');
 						player.storage.bizhuan=player.storage.bizhuan.concat(result.cards);
 						player.syncStorage('bizhuan');
 						event.num=result.cards.length;
@@ -1136,7 +1137,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.delay(0.5);
 					}
 					"step 3"
-					player.gain(result.links)._triggered=null;
+					player.gain(result.links,'fromStorage');
 					for(var i=0;i<result.links.length;i++){
 						player.storage.bizhuan.remove(result.links[i]);
 					}
@@ -2991,7 +2992,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						target.$give(result.cards,player);
-						target.lose(result.cards,ui.special);
+						target.lose(result.cards,ui.special,'toStorage');
 						player.storage.kuangbi_draw=result.cards;
 						player.storage.kuangbi_draw_source=target;
 						player.syncStorage('kuangbi_draw');
@@ -3021,7 +3022,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							var cards=player.storage.kuangbi_draw;
 							if(cards){
-								player.gain(cards,'gain2');
+								player.gain(cards,'gain2','fromStorage');
 								var target=player.storage.kuangbi_draw_source;
 								if(target&&target.isAlive()){
 									target.draw(cards.length);
@@ -3423,7 +3424,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool&&result.cards&&result.cards.length){
 						event.target.$give(result.cards,player);
 						player.storage.jieyue2=result.cards[0];
-						event.target.lose(result.cards[0],ui.special);
+						event.target.lose(result.cards[0],ui.special,'toStorage');
 						player.syncStorage('jieyue2');
 						player.addSkill('jieyue2');
 					}
@@ -3482,7 +3483,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseBegin'},
 				forced:true,
 				content:function(){
-					player.gain(player.storage.jieyue2,'gain2');
+					player.gain(player.storage.jieyue2,'gain2','fromStorage');
 					player.storage.jieyue2=null;
 					player.removeSkill('jieyue2');
 				}
@@ -3527,7 +3528,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
-					return player!=target&&target.countCards('h')>0;
+					return player.canCompare(target);
 				},
 				filter:function(event,player){
 					return player.countCards('h')>0;
@@ -3661,7 +3662,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.storage.chunlao=player.storage.chunlao.concat(result.cards);
 						player.syncStorage('chunlao');
 						player.markSkill('chunlao');
-						player.lose(result.cards,ui.special);
+						player.lose(result.cards,ui.special,'toStorage');
 						player.$give(result.cards,player);
 					}
 				},
@@ -5610,7 +5611,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						game.addVideo('storage',trigger.target,['xinpojun2',get.cardsInfo(trigger.target.storage.xinpojun2),'cards']);
 						trigger.target.addSkill('xinpojun2');
-						trigger.target.lose(result.links,ui.special);
+						trigger.target.lose(result.links,ui.special,'toStorage');
 					}
 				},
 				ai:{
@@ -5627,7 +5628,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					if(player.storage.xinpojun2){
-						player.gain(player.storage.xinpojun2);
+						player.gain(player.storage.xinpojun2,'fromStorage');
 						delete player.storage.xinpojun2;
 					}
 					player.removeSkill('xinpojun2');
@@ -6188,7 +6189,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					player.chooseTarget(get.prompt('qiaoshui'),function(card,player,target){
-						return player!=target&&target.countCards('h')>0;
+						return player.canCompare(target);
 					}).set('ai',function(target){
 						return -get.attitude(_status.event.player,target)/target.countCards('h');
 					});
@@ -6671,7 +6672,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 2"
 					if(result.cards&&result.cards.length){
-						player.lose(result.cards,ui.special);
+						player.lose(result.cards,ui.special,'toStorage');
 						player.storage.quanji=player.storage.quanji.concat(result.cards);
 						player.syncStorage('quanji');
 						player.markSkill('quanji');
@@ -6855,7 +6856,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					var next;
 					if(trigger.player.hasCard(function(card){
-						return !player.getEquip(card);
+						return player.isEmpty(get.subtype(card));
 					},'e')){
 						next=player.chooseControl('移动装备','draw_card','cancel2',function(event,player){
 							var source=_status.event.source;
@@ -6883,7 +6884,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.control=='移动装备'){
 						player.logSkill('qieting',trigger.player);
 						player.choosePlayerCard(trigger.player,'e','将一张装备牌移至你的装备区').set('filterButton',function(button){
-							return !_status.event.player.getEquip(button.link);
+							return _status.event.player.isEmpty(get.subtype(button.link));
 						});
 					}
 					else{
@@ -6931,8 +6932,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:'player',
 				filter:function(event,player){
-					return player.hp<player.maxHp&&event.player!=player&&
-						player.countCards('h')>0&&event.player.countCards('h')>0;
+					return player.hp<player.maxHp&&player.canCompare(event.player);
 				},
 				content:function(){
 					"step 0"
@@ -7057,6 +7057,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'dieBegin'},
 				direct:true,
+				skillAnimation:true,
 				content:function(){
 					"step 0"
 					player.chooseTarget(get.prompt('zhuiyi'),function(card,player,target){
@@ -7076,10 +7077,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						var target=result.targets[0];
-						player.logSkill('zhuiyi',target);
-						target.recover();
-						target.draw(3);
+						var next=game.createEvent('zhuiyi',null,trigger.parent);
+						next.player=target;
+						next.source=player;
+						next.setContent(lib.skill.zhuiyi.contentx);
 					}
+				},
+				contentx:function(){
+				  event.source.logSkill('zhuiyi',player);
+				  event.source.line(player,'green');
+						player.recover();
+						player.draw(3);
 				},
 				ai:{
 					expose:0.5,
@@ -7114,14 +7122,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						gainner=targets[1];
 						giver=targets[0];
 					}
-					gainner.gainPlayerCard(giver,true);
+					gainner.gainPlayerCard(giver,true,'h','visibleMove');
 					event.gainner=gainner;
 					event.giver=giver;
 					'step 1'
 					if(result.cards){
 					    event.bool=false;
 					    var card=result.cards[0];
-					    event.gainner.showCards(card);
 					    if(get.suit(card)!='spade') event.bool=true;
 					}
 					'step 2'
@@ -7431,7 +7438,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						case 'trick':event.effect='';break;
 						case 'equip':event.effect='recover';break;
 					}
-					if(get.type(card)=='equip'){
+					if(get.type(card)=='equip'&&!event.target.isDisabled(get.sub(card))){
 						event.target.equip(card);
 						event.target.$draw(card);
 						game.delay();
@@ -8887,7 +8894,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.storage.xiansi=player.storage.xiansi.concat(result.links);
 						player.markSkill('xiansi');
 						player.syncStorage('xiansi');
-						event.current.lose(result.links,ui.special);
+						event.current.lose(result.links,ui.special,'toStorage');
 						event.current.$give(result.links,player);
 						event.goto(2);
 					}
@@ -9187,7 +9194,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:'player',
 				filter:function(event,player){
-					return event.player!=player&&event.player.countCards('h')>0&&player.countCards('h')>0;
+					return player.canCompare(event.player);
 				},
 				content:function(){
 					"step 0"
@@ -9241,6 +9248,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.zyexin.push(card);
 					player.$draw(card);
 					player.markSkill('zyexin');
+					event.trigger("addCardToStorage");
 					game.addVideo('storage',player,['zyexin',get.cardsInfo(player.storage.zyexin),'cards']);
 				},
 				group:'zyexin2'
@@ -9258,7 +9266,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				prompt:'用任意数量的手牌与等量的“权”交换',
 				content:function(){
 					"step 0"
-					player.lose(cards,ui.special)._triggered=null;
+					player.lose(cards,ui.special,'toStorage');
 					player.storage.zyexin=player.storage.zyexin.concat(cards);
 					player.chooseCardButton(player.storage.zyexin,'选择'+cards.length+'张牌作为手牌',cards.length,true).ai=function(button){
 						return get.value(button.link);
@@ -9267,7 +9275,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.delay();
 					}
 					"step 1"
-					player.gain(result.links)._triggered=null;
+					player.gain(result.links,'toStorage');
 					for(var i=0;i<result.links.length;i++){
 						player.storage.zyexin.remove(result.links[i]);
 					}

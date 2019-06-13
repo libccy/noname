@@ -9250,6 +9250,36 @@
 		},
 		element:{
 			content:{
+				disableEquip:function(){
+					event.trigger('disableEquip');
+					if(!player.isDisabled(event.pos)){
+						player.storage.disableEquip.add(event.pos);
+						//player.markSkill('_disableEquip');
+						player.syncStorage('_disableEquip');
+						var str=event.pos.slice(event.pos.length-1,event.pos.length);
+						if(player.get('e',str)!=undefined) player.discard(player.get('e',str));
+					 game.log(player,'废除了',get.translation(event.pos),'栏');
+					player.$disableEquip(event.pos);
+					}
+				},
+				enableEquip:function(){
+					event.trigger('enableEquip');
+					if(player.storage.disableEquip.contains(event.pos)){
+						player.storage.disableEquip.remove(event.pos);
+						player.syncStorage('_disableEquip');
+						//if(player.storage.disableEquip.length==0) player.unmarkSkill('_disableEquip');
+					};
+					game.log(player,'恢复了',get.translation(event.pos),'栏');
+					player.$enableEquip(event.pos);
+				},
+				disableJudge:function(){
+					var js=player.getCards('j');
+					if(js.length) player.discard(js);
+					player.storage._disableJudge=true;
+					player.markSkill('_disableJudge');
+					game.log(player,'废除了判定区');
+				},
+				/*----分界线----*/
 				phasing:function(){
 					'step 0'
 					while(ui.dialogs.length){
@@ -12145,7 +12175,7 @@
 					}
 					event.result.cards=event.result.links.slice(0);
 					event.cards=cards;
-					if(!_status.connectMode&&(target.isUnderControl(true)||player.isUnderControl(true)||event.visible)){
+					if((!_status.connectMode&&(target.isUnderControl(true)||player.isUnderControl(true)))||event.visibleMove){
 						target.$give(cards,player);
 					}
 					else{
@@ -12292,12 +12322,12 @@
 							var from=ui.selected.targets[0];
 							var js=from.getCards('j');
 							for(var i=0;i<js.length;i++){
-								if(!target.hasJudge(js[i])) return true;
+								if(!target.storage._disableJudge&&!target.hasJudge(js[i])) return true;
 							}
 							if(target.isMin()) return false;
 							var es=from.getCards('e');
 							for(var i=0;i<es.length;i++){
-								if(!target.getEquip(get.subtype(es[i]))) return true;
+								if(target.isEmpty(get.subtype(es[i]))) return true;
 							}
 							return false;
 						}
@@ -12317,7 +12347,7 @@
 									if(get.attitude(player,current)>0){
 										var es=target.getCards('e');
 										for(var i=0;i<es.length;i++){
-											if(!current.getEquip(get.subtype(es[i]))) return true;
+											if(current.isEmpty(get.subtype(es[i]))) return true;
 										}
 									}
 								})){
@@ -12330,7 +12360,7 @@
 							var es=ui.selected.targets[0].getCards('e');
 							var i;
 							for(i=0;i<es.length;i++){
-								if(!target.getEquip(get.subtype(es[i]))){
+								if(target.isEmpty(get.subtype(es[i]))){
 									break;
 								}
 							}
@@ -12371,10 +12401,10 @@
 						},targets[0]).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
 							var targets1=_status.event.targets1;
 							if(get.position(button.link)=='j'){
-								return !targets1.hasJudge(button.link);
+								return !targets1.storage._disableJudge&&!targets1.hasJudge(button.link);
 							}
 							else{
-								return !targets1.countCards('e',{subtype:get.subtype(button.link)});
+								return targets1.isEmpty(get.subtype(button.link));
 							}
 						});
 					}
@@ -14135,6 +14165,89 @@
 				},
 			},
 			player:{
+				//新函数
+				canCompare:function(target){
+					if(this==target) return false;
+					if(!this.countCards('h')||!target.countCards('h')) return false;
+					if(this.hasSkillTag('noCompareSource')||target.hasSkillTag('noCompareTarget')) return false;
+					return true;
+				},
+				disableEquip:function(pos){
+					if(typeof pos=='number') pos='equip'+pos;
+					var next=game.createEvent('disableEquip');
+					next.player=this;
+					next.pos=pos;
+					next.source=_status.event.player;
+					next.setContent('disableEquip');
+					return next;
+				},
+				$disableEquip:function(skill){
+					game.broadcast(function(player,skill){
+						player.$disableEquip(skill);
+					},this,skill);
+					var pos={equip1:'武器栏',equip2:'防具栏',equip3:'+1马栏',equip4:'-1马栏',equip5:'宝物栏'}[skill];
+					var card=game.createCard('feichu_'+skill,pos,'');
+					card.fix();
+					card.style.transform='';
+					card.classList.remove('drawinghidden');
+					card.classList.add('feichu');
+					delete card._transform;
+					var player=this;
+					var equipNum=get.equipNum(card);
+					var equipped=false;
+					for(var i=0;i<player.node.equips.childNodes.length;i++){
+						if(get.equipNum(player.node.equips.childNodes[i])>=equipNum){
+							player.node.equips.insertBefore(card,player.node.equips.childNodes[i]);
+							equipped=true;
+							break;
+						}
+					}
+					if(!equipped){
+						player.node.equips.appendChild(card);
+						if(_status.discarded){
+							_status.discarded.remove(card);
+						}
+					}
+					return player;
+				},
+				enableEquip:function(pos){
+					if(typeof pos=='number') pos='equip'+pos;
+					var next=game.createEvent('enableEquip');
+					next.player=this;
+					next.pos=pos;
+					next.source=_status.event.player;
+					next.setContent('enableEquip');
+					return next;
+				},
+				$enableEquip:function(skill){
+					game.broadcast(function(player,skill){
+						player.$enableEquip(skill);
+					},this,skill);
+					var player=this;
+					for(var i=0;i<player.node.equips.childNodes.length;i++){
+						if(player.node.equips.childNodes[i].name=='feichu_'+skill){
+							player.node.equips.removeChild(player.node.equips.childNodes[i]);
+							break;
+						}
+					}
+					return player;
+				},
+				isDisabled:function(arg){
+					if(typeof arg=='number') arg='equip'+arg;
+					if(this.storage.disableEquip&&this.storage.disableEquip.contains(arg)) return true;
+					return false;
+				},
+				isEmpty:function(num){
+					return !this.isDisabled(num)&&!this.getEquip(num);
+				},
+				disableJudge:function(){
+					var next=game.createEvent('disableJudge');
+					next.player=this;
+					next.source=_status.event.player;
+					next.setContent('disableJudge');
+					return next;
+				},
+				//原有函数
 				init:function(character,character2,skill){
 					if(typeof character=='string'&&!lib.character[character]){
 						lib.character[character]=get.character(character);
@@ -15101,7 +15214,7 @@
 						}
 						else if(arg1[i]=='e'){
 							for(j=0;j<this.node.equips.childElementCount;j++){
-								if(!this.node.equips.childNodes[j].classList.contains('removing')){
+								if(!this.node.equips.childNodes[j].classList.contains('removing')&&!this.node.equips.childNodes[j].classList.contains('feichu')){
 									cards.push(this.node.equips.childNodes[j]);
 								}
 							}
@@ -16315,6 +16428,9 @@
 						else if(arguments[i]=='visible'){
 							next.visible=true;
 						}
+						else if(arguments[i]=='visibleMove'){
+							next.visibleMove=true;
+						}
 						else if(typeof arguments[i]=='function'){
 							if(next.ai) next.filterButton=arguments[i];
 							else next.ai=arguments[i];
@@ -16394,7 +16510,7 @@
 										var att2=get.attitude(player,current2);
 										if(att2<=0) return false;
 									}
-									return current!=current2&&!current2.isMin()&&!current2.getEquip(get.subtype(es[i]));
+									return current!=current2&&!current2.isMin()&&current2.isEmpty(get.subtype(es[i]));
 								})){
 									return true;
 								}
@@ -16408,7 +16524,7 @@
 										var att2=get.attitude(player,current2);
 										if(att2>0) return false;
 									}
-									return current!=current2&&!current2.hasJudge(js[i]);
+									return current!=current2&&!current2.storage._disableJudge&&!current2.hasJudge(js[i]);
 								})){
 									return true;
 								}
@@ -16828,6 +16944,9 @@
 						else if(arguments[i]==='log'){
 							next.log=true;
 						}
+						else if(arguments[i]=='fromStorage'){
+						    next.fromStorage=true;
+						}
 						else if(typeof arguments[i]=='string'){
 							next.animate=arguments[i];
 						}
@@ -16881,6 +17000,9 @@
 						}
 						else if(get.objtype(arguments[i])=='div'){
 							next.position=arguments[i];
+						}
+						else if(arguments[i]=='toStorage'){
+						    next.toStorage=true;
 						}
 					}
 					if(next.cards){
@@ -20127,36 +20249,42 @@
 					}
 				},
 				$equip:function(card){
-					game.broadcast(function(player,card){
-						player.$equip(card);
-					},this,card);
-					card.fix();
-					card.style.transform='';
-					card.classList.remove('drawinghidden');
-					delete card._transform;
-					var player=this;
-					var equipNum=get.equipNum(card);
-					var equipped=false;
-					for(var i=0;i<player.node.equips.childNodes.length;i++){
-						if(get.equipNum(player.node.equips.childNodes[i])>=equipNum){
-							player.node.equips.insertBefore(card,player.node.equips.childNodes[i]);
-							equipped=true;
-							break;
-						}
+					if(this.storage.disableEquip!=undefined&&this.storage.disableEquip.contains(get.subtype(card))){
+						this.gain(card,'gain2');
+						game.log(this,'装备失败');
 					}
-					if(!equipped){
-						player.node.equips.appendChild(card);
-						if(_status.discarded){
-							_status.discarded.remove(card);
+					else{
+						game.broadcast(function(player,card){
+							player.$equip(card);
+						},this,card);
+						card.fix();
+						card.style.transform='';
+						card.classList.remove('drawinghidden');
+						delete card._transform;
+						var player=this;
+						var equipNum=get.equipNum(card);
+						var equipped=false;
+						for(var i=0;i<player.node.equips.childNodes.length;i++){
+							if(get.equipNum(player.node.equips.childNodes[i])>=equipNum){
+								player.node.equips.insertBefore(card,player.node.equips.childNodes[i]);
+								equipped=true;
+								break;
+							}
 						}
-					}
-					var info=get.info(card);
-					if(info.skills){
-						for(var i=0;i<info.skills.length;i++){
-							player.addSkillTrigger(info.skills[i]);
+						if(!equipped){
+							player.node.equips.appendChild(card);
+							if(_status.discarded){
+								_status.discarded.remove(card);
+							}
 						}
-					}
-					return player;
+						var info=get.info(card);
+						if(info.skills){
+							for(var i=0;i<info.skills.length;i++){
+								player.addSkillTrigger(info.skills[i]);
+							}
+						}
+						return player;
+					};
 				},
 				$gain:function(card,log,init){
 					if(init!==false){

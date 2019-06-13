@@ -29,6 +29,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			old_machao:['male','qun',4,['zhuiji','cihuai']],
 			old_bulianshi:['female','wu',3,['old_anxu','zhuiyi']],
+			old_zhugezhan:["male","shu",3,["old_zuilun","old_fuyin"]],
+			zhangliang:["male","qun",3,["old_jijun","old_fangtong"]],
 		},
 		characterFilter:{
 			old_lingju:function(mode){
@@ -36,6 +38,118 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			old_zuilun:{
+                subSkill:{
+                    e:{},
+                    h:{},
+                },
+                enable:"phaseUse",
+                usable:2,
+                filterTarget:function (card,player,target){
+					if(player==target) return false;
+					var pos='he';
+					if(player.hasSkill('old_zuilun_h')) pos='e';
+					if(player.hasSkill('old_zuilun_e')) pos='h';
+					return target.countGainableCards(player,pos)>0;
+				},
+                content:function (){
+					'step 0'
+					var pos='he';
+					if(player.hasSkill('old_zuilun_h')) pos='e';
+					if(player.hasSkill('old_zuilun_e')) pos='h';
+					player.gainPlayerCard(target,pos,true);
+					'step 1'
+					if(result.bool&&result.cards&&result.cards.length){
+						target.draw();
+						var pos=result.cards[0].original;
+						if(pos=='h'||pos=='e') player.addTempSkill('old_zuilun_'+pos,'phaseUseAfter');
+					}
+				},
+                ai:{
+                    order:7,
+                    result:{
+                        target:-1,
+                    },
+                },
+            },
+			old_fuyin:{
+				mod:{
+					targetEnabled:function(card,player,target){
+						if((card.name=='juedou'||card.name=='sha'||card.name=='huogong')&&player!=target&&player.countCards('h')>=target.countCards('h')&&!target.isEmpty(2)) return false;
+					},
+				},
+			},
+			"old_jijun":{
+                marktext:"方",
+                intro:{
+                    content:"cards",
+                },
+                enable:"phaseUse",
+                filterCard:true,
+                selectCard:[1,Infinity],
+                filter:function (event,player){
+					return player.countCards('h')>0;
+				},
+                check:function (card){
+					var player=_status.event.player;
+					if(player.storage.old_jijun&&(36-player.storage.old_jijun.length)<=player.countCards('h')) return 1;
+					return 5-get.value(card);
+				},
+                discard:false,
+                lose:false,
+                content:function (){
+					player.lose(cards,ui.special,'toStorage');
+					player.$give(cards,player);
+					if(!player.storage.old_jijun) player.storage.old_jijun=[];
+					player.storage.old_jijun.addArray(cards);
+					player.markSkill('old_jijun');
+				},
+            },
+            "old_fangtong":{
+                trigger:{
+                    player:"phaseEnd",
+                },
+                forced:true,
+                skillAnimation:true,
+                filter:function (event,player){
+					return (player.storage.old_jijun&&player.storage.old_jijun.length>35);
+				},
+                content:function (){
+					var bool=false;
+					if(player==game.me) bool=true;
+					else switch(get.mode()){
+						case 'identity':{
+							game.showIdentity();
+							var id1=player.identity;
+							var id2=game.me.identity;
+							if(['zhu','zhong','mingzhong'].contains(id1)){
+								if(['zhu','zhong','mingzhong'].contains(id2)) bool=true;
+								break;
+							}
+						   else if(id1=='fan'){
+								if(id2=='fan') bool=true;
+								break;
+							}
+							break;
+						}
+						case 'guozhan':{
+							if(game.me.isFriendOf(player)) bool=true;
+							break;
+						}
+						case 'versus':{
+							if(player.side==game.me.side) bool=true;
+							break;
+						}
+						case 'boss':{
+							if(player.side==game.me.side) bool=true;
+							break;
+						}
+						default:{}
+					}
+					game.over(bool);
+				},
+            },
+			
 			oldanxu:{
 				enable:'phaseUse',
 				usable:1,
@@ -460,7 +574,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_zhuzhi:'旧朱治',
 			old_machao:'旧马超',
 			old_bulianshi:'旧步练师',
+			old_zhugezhan:"旧诸葛瞻",
+			zhangliang:'张梁',
 
+			"old_jijun":"集军",
+            "old_jijun_info":"出牌阶段，你可以将任意张手牌置于你的武将牌上。（均称为“方”）",
+            "old_fangtong":"方统",
+            "old_fangtong_info":"锁定技，结束阶段，若你的“方”的数目大于等于36，则你所在的游戏阵营直接取得游戏胜利。",
+			old_zuilun:"罪论",
+            old_zuilun_info:"出牌阶段，你可以获得一名其他角色的一张牌（手牌、装备区各一次），然后该角色摸一张牌。",
+			old_fuyin:"父荫",
+			old_fuyin_info:"锁定技，若你的装备区内没有防具牌，手牌数大于或等于你的其他角色不能使用【杀】、【决斗】或【火攻】指定你为目标",
 			oldanxu:'安恤',
 			oldanxu_info:'出牌阶段限一次，你可以选择手牌数不相等的两名其他角色，令其中手牌少的角色获得手牌多的角色的一张手牌并展示之，然后若此牌不为黑桃，你摸一张牌。',
 			oldfaen:'法恩',

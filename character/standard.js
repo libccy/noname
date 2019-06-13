@@ -30,6 +30,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lvbu:['male','qun',4,['wushuang']],
 			diaochan:['female','qun',3,['lijian','biyue']],
 			huaxiong:['male','qun',6,['yaowu']],
+			gongsunzan:['male','qun',4,['yicong']],
 			
 			caozhang:['male','wei',4,['new_jiangchi']],
             xf_yiji:["male","shu",3,["xinfu_jijie","xinfu_jiyuan"],[]],
