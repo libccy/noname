@@ -242,7 +242,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				onLose:function(){
 					player.unmarkSkill('muniu_skill6');
-					if(event.parent.type!='equip'&&card&&card.cards&&card.cards.length){
+					if((event.getParent(2)&&event.getParent(2).name!='swapEquip')&&event.parent.type!='equip'&&card&&card.cards&&card.cards.length){
 						player.$throw(card.cards,1000);
 						player.popup('muniu');
 						game.log(card,'掉落了',card.cards);
@@ -678,6 +678,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					game.broadcast(function(muniu,cards){
 						muniu.cards=cards;
 					},muniu,muniu.cards);
+					event.trigger("addCardToStorage");
 					var players=game.filterPlayer(function(current){
 						if(!current.getEquip(5)&&current!=player&&!current.isTurnedOver()&&
 							get.attitude(player,current)>=3&&get.attitude(current,player)>=3){

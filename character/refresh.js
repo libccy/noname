@@ -2357,8 +2357,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				audio:2,
 				content:function(){
-					player.draw(3);
+				    var num=trigger.num;
+					player.draw(3*num);
 					if(_status.currentPhase==player){
+					    if(!player.storage.zhaxiang2) player.storage.zhaxiang2=0;
+					    player.storage.zhaxiang2+=num;
 						player.addTempSkill('zhaxiang2',{player:'phaseAfter'});
 					}
 					else{
@@ -2375,9 +2378,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(card.name=='sha'&&get.color(card)=='red') return true;
 					},
 					cardUsable:function(card,player,num){
-						if(card.name=='sha') return num+1;
+						if(card.name=='sha') return num+player.storage.zhaxiang2;
 					}
 				},
+				onremove:true,
 				trigger:{player:'shaBegin'},
 				forced:true,
 				filter:function(event,player){

@@ -39,6 +39,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			old_zuilun:{
+			            audio:'xinfu_zuilun',
                 subSkill:{
                     e:{},
                     h:{},
@@ -81,6 +82,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"old_jijun":{
                 marktext:"方",
+                audio:"xinfu_jijun",
                 intro:{
                     content:"cards",
                 },
@@ -104,11 +106,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.old_jijun.addArray(cards);
 					player.markSkill('old_jijun');
 				},
+				           ai:{order:1,result:{player:1}},
             },
             "old_fangtong":{
                 trigger:{
                     player:"phaseEnd",
                 },
+                audio:"xinfu_fangtong",
                 forced:true,
                 skillAnimation:true,
                 filter:function (event,player){
@@ -575,7 +579,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_machao:'旧马超',
 			old_bulianshi:'旧步练师',
 			old_zhugezhan:"旧诸葛瞻",
-			zhangliang:'张梁',
+			zhangliang:'旧张梁',
 
 			"old_jijun":"集军",
             "old_jijun_info":"出牌阶段，你可以将任意张手牌置于你的武将牌上。（均称为“方”）",

@@ -7511,7 +7511,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhenlie:{
 				audio:2,
 				filter:function(event,player){
-					return event.player!=player&&event.card&&(event.card.name=='sha'||get.type(event.card)=='trick');
+					return event.player!=player&&event.targets&&event.targets.contains(player)&&event.card&&(event.card.name=='sha'||get.type(event.card)=='trick');
 				},
 				logTarget:'player',
 				check:function(event,player){
@@ -7537,12 +7537,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				priority:10,
-				trigger:{target:'useCardToBefore'},
+				trigger:{global:'useCard'},
 				content:function(){
 					"step 0"
 					player.loseHp();
 					"step 1"
-					trigger.cancel();
+					trigger.targets.remove(player);
 					"step 2"
 					if(trigger.player.countCards('he')){
 						player.discardPlayerCard(trigger.player,'he',true);
@@ -8540,19 +8540,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				multitarget:true,
 				content:function(){
-					"step 0"
-					event.cards=[targets[0].getCards('e'),targets[1].getCards('e')];
-					targets[0].lose(event.cards[0],ui.special);
-					targets[1].lose(event.cards[1],ui.special);
-					if(event.cards[0].length) targets[0].$give(event.cards[0],targets[1]);
-					if(event.cards[1].length) targets[1].$give(event.cards[1],targets[0]);
-					"step 1"
-					for(var i=0;i<event.cards[1].length;i++){
-						targets[0].equip(event.cards[1][i]);
-					}
-					for(var i=0;i<event.cards[0].length;i++){
-						targets[1].equip(event.cards[0][i]);
-					}
+					targets[0].swapEquip(targets[1]);
 				},
 				ai:{
 					order:10,

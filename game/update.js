@@ -1,9 +1,7 @@
 window.noname_update={
-	version:'1.9.87',
-	update:'1.9.86.1',
+	version:'1.9.87.1',
+	update:'1.9.87',
 	changeLog:[
-		'雷包武将（by 极光）',
-		'旧张梁，黄巾雷使',
 		'修复BUG',
 	],
 	files:[

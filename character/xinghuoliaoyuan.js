@@ -892,7 +892,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
             },
             "xinfu_xingzhao":{
-                inherit:"xingzhao2",
+                audio:true,
                 group:["xz_xunxun","xinfu_xingzhao2"],
                 mark:true,
                 intro:{
@@ -929,6 +929,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
             },
             "xinfu_xingzhao2":{
+                audio:true,
                 trigger:{
                     player:"phaseDiscardBefore",
                 },
@@ -945,6 +946,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
             "xinfu_dianhu":{
+                audio:2,
                 trigger:{
                     global:"gameDrawAfter",
                 },
