@@ -1973,6 +1973,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return player!=event.player&&event.player.isAlive()&&_status.currentPhase==player;
 						},
 						check:function(event,player){
+							var trigger=event.getTrigger();
 							var list=[];
 							var skills=trigger.player.skills.slice(0);
 							for(var i=0;i<skills.length;i++){
