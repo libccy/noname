@@ -151,7 +151,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                	group:'yxs_menshen3',
 		           		onremove:true,
                 filter:function (event,player){
-        return game.player.length>1;
+        return game.players.length>1;
     },
                 content:function (){
               "step 0"
