@@ -52,7 +52,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhugedan:['male','wei',4,['gongao','juyi']],
 			sp_jiangwei:['male','wei',4,['kunfen','fengliang']],
 			sp_machao:['male','qun',4,['zhuiji','ol_shichou']],
-			sunhao:['male','wu',5,['canshi','chouhai','guiming']],
+			sunhao:['male','wu',5,['canshi','chouhai','guiming'],['zhu']],
 			shixie:['male','qun',3,['biluan','lixia']],
 			mayunlu:['female','shu',4,['fengpo','mashu']],
 			zhanglu:['male','qun',3,['yishe','bushi','midao']],

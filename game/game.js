@@ -9250,6 +9250,35 @@
 		},
 		element:{
 			content:{
+				swapEquip:function(){
+					"step 0"
+					game.log(player,'和',target,'交换了装备区中的牌')
+					var e1=player.getCards('e');
+					var todis1=[];
+					for(var i=0;i<e1.length;i++){
+						if(target.isDisabled(get.subtype(e1[i]))) todis1.push(e1[i]);
+					}
+					player.discard(todis1);
+					var e2=target.getCards('e');
+					var todis2=[];
+					for(var i=0;i<e2.length;i++){
+						if(player.isDisabled(get.subtype(e2[i]))) todis1.push(e2[i]);
+					}
+					target.discard(todis2);
+					"step 1"
+					event.cards=[player.getCards('e'),target.getCards('e')];
+					player.lose(event.cards[0],ui.special);
+					target.lose(event.cards[1],ui.special);
+					if(event.cards[0].length) player.$give(event.cards[0],target);
+					if(event.cards[1].length) target.$give(event.cards[1],player);
+					"step 2"
+					for(var i=0;i<event.cards[1].length;i++){
+					 player.equip(event.cards[1][i]);
+					}
+					for(var i=0;i<event.cards[0].length;i++){
+						target.equip(event.cards[0][i]);
+					}
+				},
 				disableEquip:function(){
 					event.trigger('disableEquip');
 					if(!player.isDisabled(event.pos)){
@@ -14166,6 +14195,13 @@
 			},
 			player:{
 				//新函数
+				swapEquip:function(target){
+					var next=game.createEvent('swapEquip');
+					next.player=this;
+					next.target=target;
+					next.setContent('swapEquip');
+					return next;
+				},
 				canCompare:function(target){
 					if(this==target) return false;
 					if(!this.countCards('h')||!target.countCards('h')) return false;
@@ -45561,7 +45597,7 @@
 				}
 				return suit;
 			}
-			else if(get.itemtype(card.cards)=='cards'){
+			else if(get.itemtype(card.cards)=='cards'&&card.name!='muniu'){
 				return get.suit(card.cards);
 			}
 			else{
@@ -45580,7 +45616,7 @@
 				}
 				return color;
 			}
-			else if(get.itemtype(card.cards)=='cards'){
+			else if(get.itemtype(card.cards)=='cards'&&card.name!='muniu'){
 				return get.color(card.cards);
 			}
 			else{

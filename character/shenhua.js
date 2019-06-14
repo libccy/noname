@@ -214,14 +214,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						unique:true,
 						derivation:['drlt_qingce'],
 						init:function(player){
-							player.storage.zbaijiang=false;
+							player.storage.drlt_hongju=false;
 						},
 						filter:function(event,player){
-							return !player.storage.zbaijiang&&player.storage.drlt_zhenrong&&player.storage.drlt_zhenrong.length>=3&&game.dead.length>0;
+							return !player.storage.drlt_hongju&&player.storage.drlt_zhenrong&&player.storage.drlt_zhenrong.length>=3&&game.dead.length>0;
 						},
 						content:function(){
 							'step 0'
-							player.storage.zbaijiang=true;
+							player.awakenSkill('drlt_hongju'),
+							player.storage.drlt_hongju=true;
 							var num=player.storage.drlt_zhenrong.length;
 							if(num>player.countCards('h')) num=player.countCards('h');
 							player.chooseCard('h',[1,num],'请选择需要替换“荣”的手牌').set('ai',function(card){
@@ -673,19 +674,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							'step 0'
 							event.cards=trigger.cards;
+							event.logged=false;
+							event.gived=[];
 							'step 1'
-							player.chooseTarget('是否将 '+get.translation(event.cards[0])+' 给予其他群雄角色？',function(card,player,target){
-								return target!=player&&target.group=='qun';
+							if(!game.hasPlayer(function(target){
+							   return target!=player&&target.group=='qun'&&!event.gived.contains(target);
+							})) event.finish();
+							else player.chooseTarget('是否将 '+get.translation(event.cards[0])+' 给予其他群雄角色？',function(card,player,target){
+								return target!=player&&target.group=='qun'&&!event.gived.contains(target);
 							}).ai=function(target){
 								if(event.cards[0].name=='du') return -get.attitude(player,target);
 								return get.attitude(player,target);
 							};
 							'step 2'
 							if(result.bool){
-							 player.logSkill('drlt_weidi',result.targets);
+							 if(!event.logged){
+							     player.logSkill('drlt_weidi');
+							     event.logged=true;
+							 }
 								player.line(result.targets);
 								player.$give(event.cards[0],result.targets[0]);
 								result.targets[0].gain(event.cards[0],player);
+								event.gived.add(result.targets[0]);
 							};
 							event.cards.remove(event.cards[0]);
 							if(event.cards.length>0) event.goto(1);
@@ -1361,10 +1371,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             var targets=result.targets;
             if(event.control==event.str1){
                 player.line(targets);
-                player.logSkill('nzry_kuizhu');
-                for(var i=0;i<targets.length;i++){
-                    targets[i].draw();
-                };
+                player.logSkill('nzry_kuizhu',targets);
+                game.asyncDraw(targets);
             }else{
                 var num=0;
                 for(var i=0;i<targets.length;i++){
@@ -1585,21 +1593,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							"2":{
 								audio:2,
 								trigger:{
-									player:['useCardAfter','respondAfter'],				
+									player:['useCard','respond'],				
 								},
 								filter:function (event,player){
-									return (event.name=='respond'&&event.card.name!='sha'||event.name=='useCard')&&event.cards.length>0&&player.storage.nzry_shicai!=undefined&&!player.storage.nzry_shicai.contains(get.type(event.card));
+									return (event.name=='respond'&&event.card.name!='sha'||event.name=='useCard')&&event.cards.length>0&&player.storage.nzry_shicai!=undefined&&!player.storage.nzry_shicai.contains(get.type(event.card,'trick'));
 								},
 								check:function (event,player){
 									return get.type(event.card)!='equip'&&event.card.name!='lebu'&&event.card.name!='bingliang';
 								},
 								content:function(){
-									player.storage.nzry_shicai.push(get.type(trigger.card));
+									player.storage.nzry_shicai.push(get.type(trigger.card,'trick'));
+									if(trigger.name=='useCard'&&['equip','delay'].contains(get.type(trigger.card))) trigger.cancel();
 									for(var i=0;i<trigger.cards.length;i++){
-										ui.cardPile.insertBefore(trigger.cards[i],ui.cardPile.firstChild);
-										if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=game.roundNumber+'轮 剩余牌: '+ui.cardPile.childNodes.length;
-										game.log(player,'将',trigger.cards[i],'置于牌堆顶');
-										player.lose(trigger.cards[i],ui.special);
+										if(get.position(trigger.cards[i])=='d'){
+										    ui.cardPile.insertBefore(trigger.cards[i],ui.cardPile.firstChild);
+										    if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=game.roundNumber+'轮 剩余牌: '+ui.cardPile.childNodes.length;
+										    game.log(player,'将',trigger.cards[i],'置于牌堆顶');
+										}
 									};
 									player.draw();
 								},	
@@ -2999,10 +3009,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jiang:{
 				audio:2,
-				trigger:{player:['shaBefore','juedouBefore'],target:['shaBefore','juedouBefore']},
+				trigger:{global:['useCard']},
 				filter:function(event,player){
-					if(event.card.name=='juedou') return true;
-					return get.color(event.card)=='red';
+					if(!(event.card.name=='juedou'||(event.card.name=='sha'&&get.color(event.card)=='red'))) return false;
+					return player==event.player||event.targets.contains(player);
 				},
 				frequent:true,
 				content:function(){
@@ -6308,7 +6318,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_chenglve":"成略",
 			"nzry_chenglve_info":"转换技，出牌阶段限一次，①你可以摸一张牌，然后弃置两张手牌。②你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制",
 			"nzry_shicai":"恃才",
-			"nzry_shicai_info":"当你使用一张牌结算后，若此牌与你本回合使用的牌类型均不同（包括装备牌），你可以将此牌置于牌堆顶，然后摸一张牌",
+			"nzry_shicai_info":"当你使用牌指定目标时，若此牌与你本回合使用的牌类型均不同（包括装备牌），则你可以将此牌置于牌堆顶，然后摸一张牌",
 			"nzry_cunmu":"寸目",
 			"nzry_cunmu_info":"锁定技，当你摸牌时，改为从牌堆底摸牌",
 			"nzry_kuizhu":"溃诛",
@@ -6355,7 +6365,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"drlt_yongsi":"庸肆",
 			"drlt_yongsi_info":"锁定技，摸牌阶段，你改为摸X张牌（X为存活势力数）；弃牌阶段，若你本回合：1.没有造成伤害，将手牌摸至当前体力值；2.造成的伤害超过1点，本回合手牌上限改为已损失体力值",
 			"drlt_weidi":"伪帝",
-			"drlt_weidi_info":"主公技，你于弃牌阶段弃置的牌可以以任意方式交给其他群雄角色",
+			"drlt_weidi_info":"主公技，你于弃牌阶段弃置的牌可以交给其他群雄角色各一张。",
 			"drlt_qianjie":"谦节",
 			"drlt_qianjie_info":"锁定技，你不能被横置，且不能成为延时类锦囊的目标。你不能成为其他角色拼点的目标。",
 			"drlt_jueyan":"决堰",
@@ -6371,7 +6381,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"drlt_hongju":"鸿举",
 			"drlt_hongju_info":"觉醒技，准备阶段，若“荣”的数量大于或等于3且场上有角色死亡，则你可以用任意张手牌替换等量的“荣”，然后扣减一点体力上限并获得技能“清侧”",
 			"drlt_qingce":"清侧",
-			"drlt_qingce_info":"出牌阶段，你可以移去一张“荣”，然后弃置场上的一张牌",
+			"drlt_qingce_info":"出牌阶段，你可以移去一张“荣”，然后弃置一名角色区域内的一张牌",
 
 			jianchu:'鞬出',
 			jianchu_info:'当你使用【杀】指定一名角色为目标后，你可以弃置其一张牌，若以此法弃置的牌为装备牌，此【杀】不可被【闪】响应，若不为装备牌，该角色获得此【杀】',

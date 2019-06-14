@@ -2073,7 +2073,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						group:["drlt_zhiti_1","drlt_zhiti_2","drlt_zhiti_3","drlt_zhiti_4","drlt_zhiti_5"],
 						subSkill:{
 							'1':{
-								audio:2,
+								audio:"drlt_zhiti",
 								trigger:{
 									global:'juedouAfter'
 								},
@@ -2099,7 +2099,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								},
 							},
 							'2':{
-								audio:2,
+								audio:"drlt_zhiti",
 								trigger:{
 									player:'juedouAfter',
 								},
@@ -2125,7 +2125,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								},
 							},
 							'3':{
-								audio:2,
+								audio:"drlt_zhiti",
 								trigger:{
 									player:'chooseToCompareAfter'
 								},
@@ -2151,7 +2151,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								},
 							},
 							'4':{
-								audio:2,
+								audio:"drlt_zhiti",
 								trigger:{
 									global:'chooseToCompareAfter'
 								},
@@ -2177,7 +2177,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								},
 							},
 							'5':{
-								audio:2,
+								audio:"drlt_zhiti",
 								trigger:{
 									player:['damageEnd']
 								},
@@ -2402,7 +2402,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		translate:{
 			"shen_luxun":"神陆逊",
 			"nzry_junlve":"军略",
-			"nzry_junlve_info":"锁定技，当你受到或造成伤害后，你获得一个“军略”标记",
+			"nzry_junlve_info":"锁定技，当你受到或造成伤害后，你获得X个“军略”标记(X为伤害点数)",
 			"nzry_cuike":"摧克",
 			"nzry_cuike_info":"出牌阶段开始时，若“军略”标记的数量为奇数，你可以对一名角色造成一点伤害;若“军略”标记的数量为偶数，你可以横置一名角色并弃置其区域内的一张牌。若“军略”标记的数量超过7个，你可以移去全部“军略”标记并对所有其他角色造成一点伤害",
 			"nzry_dinghuo":"绽火",
