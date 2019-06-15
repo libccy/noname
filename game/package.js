@@ -41,7 +41,7 @@ window.noname_package={
 		identity:'身份',
 		guozhan:'国战',
 		versus:'对决',
-		// connect:'联机',
+		connect:'联机',
 		boss:'挑战',
 		chess:'战棋',
 		tafang:'塔防',

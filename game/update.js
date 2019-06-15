@@ -1,8 +1,9 @@
 window.noname_update={
-	version:'1.9.87.1',
+	version:'1.9.88',
 	update:'1.9.87',
 	changeLog:[
-		'修复BUG'
+		'修复BUG',
+		'恢复联机模式'
 	],
 	files:[
 		'card/sp.js',
