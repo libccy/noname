@@ -2,12 +2,10 @@ window.noname_update={
 	version:'1.9.87.1',
 	update:'1.9.87',
 	changeLog:[
-		'修复BUG',
+		'修复BUG'
 	],
 	files:[
 		'card/sp.js',
-		//'character/diy.js',
-		//'character/yxs.js',
 		'character/extra.js',
 		'character/old.js',
 		'character/refresh.js',
@@ -17,7 +15,6 @@ window.noname_update={
 		'character/xinghuoliaoyuan.js',
 		'character/yijiang.js',
 		'game/asset.js',
-		//'game/config.js',
 		'game/game.js',
 		'game/package.js'
 	]
