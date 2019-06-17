@@ -1,22 +1,22 @@
 window.noname_update={
-	version:'1.9.88',
-	update:'1.9.87',
+	version:'1.9.88.1',
+	update:'1.9.88',
 	changeLog:[
-		'修复BUG',
-		'恢复联机模式'
+		'修复【门神】BUG',
+		//'恢复联机模式'
 	],
 	files:[
-		'card/sp.js',
-		'character/extra.js',
-		'character/old.js',
-		'character/refresh.js',
-		'character/shenhua.js',
-		'character/sp.js',
-		'character/standard.js',
-		'character/xinghuoliaoyuan.js',
-		'character/yijiang.js',
-		'game/asset.js',
-		'game/game.js',
-		'game/package.js'
+		//'card/sp.js',
+		//'character/extra.js',
+		'character/yxs.js',
+		//'character/refresh.js',
+		//'character/shenhua.js',
+		//'character/sp.js',
+		//'character/standard.js',
+		//'character/xinghuoliaoyuan.js',
+		//'character/yijiang.js',
+		//'game/asset.js',
+		//'game/game.js',
+		//'game/package.js'
 	]
 };
