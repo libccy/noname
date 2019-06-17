@@ -126,7 +126,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             },
                                    		
 			yxs_menshen3:{
-				trigger:{player:'phaseBegin'},
+				trigger:{
+					player:['phaseBegin','dieBegin'],
+				},
 				silent:true,
 				filter:function(event,player){
 					return game.hasPlayer(function(current){
