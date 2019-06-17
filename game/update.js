@@ -12,7 +12,7 @@ window.noname_update={
 		'card/standard.js',
 		'character/extra.js',
 		'character/old.js',
-		//'character/yxs.js',
+		'character/yxs.js',
 		//'character/refresh.js',
 		'character/shenhua.js',
 		'character/sp.js',
