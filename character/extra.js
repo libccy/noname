@@ -3,13 +3,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'extra',
 		character:{
-			shen_guanyu:['male','shen',5,['wuhun','wushen'],['shu']],
+			shen_guanyu:['male','shen',5,['new_wuhun','wushen'],['shu']],
 			shen_zhaoyun:['male','shen',2,['xinjuejing','xinlonghun'],['shu']],
 			shen_zhugeliang:['male','shen',3,['qixing','kuangfeng','dawu'],['shu']],
 			shen_lvmeng:['male','shen',3,['shelie','gongxin'],['wu']],
 			shen_zhouyu:['male','shen',4,['yeyan','qinyin'],['wu']],
 			shen_simayi:['male','shen',4,['renjie','sbaiyin','lianpo'],['wei']],
-			shen_caocao:['male','shen',3,['guixin','feiying'],['wei']],
+			shen_caocao:['male','shen',3,['new_guixin','feiying'],['wei']],
 			shen_lvbu:['male','shen',5,['baonu','wumou','ol_wuqian','ol_shenfen'],['qun']],
 			
 			"shen_liubei":["male","shen",6,["nzry_longnu","nzry_jieying"],["shu"]],
@@ -27,6 +27,183 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_ganning:"体力上限：6",
 		},
 		skill:{
+            "new_wuhun":{
+                audio:"wuhun",
+                group:["new_wuhun_mark","new_wuhun_die"],
+                trigger:{
+                    player:"damageEnd",
+                },
+                forced:true,
+                filter:function (event,player){
+					return event.source!=undefined;
+				},
+                content:function (){
+					var source=trigger.source
+					if(!source.storage.new_wuhun_mark){
+						source.storage.new_wuhun_mark=0;
+					}
+					source.storage.new_wuhun_mark+=trigger.num;
+					source.markSkill('new_wuhun_mark');
+				},
+                contentx:function (){
+					"step 0"
+					source.line(player,{color:[255, 255, 0]});
+					source.logSkill('new_wuhun_die',player);
+					game.delay(2);
+					"step 1"
+					player.judge(function(card){
+						if(['tao','taoyuan'].contains(card.name)) return 10;
+						return -10;
+					});
+					"step 2"
+					if(!result.bool){
+						lib.element.player.die.apply(player,[]);
+					}
+				},
+                subSkill:{
+                    die:{
+                        audio:"wuhun",
+                        skillAnimation:true,
+                        trigger:{
+                            player:"dieBegin",
+                        },
+                        forced:true,
+                        popup:false,
+                        filter:function (event,player){
+							return game.hasPlayer(function(current){
+								return current!=player&&current.storage.new_wuhun_mark!=undefined;
+							});
+						},
+                        content:function (){
+							"step 0"
+							var num=0;
+							for(var i=0;i<game.players.length;i++){
+								var current=game.players[i];
+								if(current!=player&&current.storage.new_wuhun_mark&&current.storage.new_wuhun_mark>num){
+									num=current.storage.new_wuhun_mark;
+								}
+							}
+							player.chooseTarget(true,'请选择【武魂】的目标',function(card,player,target){
+								return target!=player&&target.storage.new_wuhun_mark==num;
+							}).ai=function(target){
+								return -get.attitude(_status.event.player,target);
+							};
+							"step 1"
+							if(result.bool&&result.targets&&result.targets.length){
+								var next=game.createEvent('new_wuhun',null,trigger.parent);
+								next.player=result.targets[0];
+								next.source=player;
+								next.setContent(lib.skill.new_wuhun.contentx);
+							}
+						},
+                        sub:true,
+                    },
+                    mark:{
+                        marktext:"魇",
+                        intro:{
+                            name:"梦魇",
+                            content:"mark",
+                        },
+                        sub:true,
+                    },
+                },
+            },
+            "new_guixin":{
+                audio:"ext:无名扩展:2",
+                trigger:{
+                    player:"damageEnd",
+                },
+                check:function (event,player){
+					if(player.isTurnedOver()||event.num>1) return true;
+					var num=game.countPlayer(function(current){
+						if(current.countCards('he')&&current!=player&&get.attitude(player,current)<=0){
+							return true;
+						}
+						if(current.countCards('j')&&current!=player&&get.attitude(player,current)>0){
+							return true;
+						}
+					});
+					return num>=2;
+				},
+                content:function (){
+					"step 0"
+					var targets=game.filterPlayer();
+					targets.remove(player);
+					targets.sort(lib.sort.seat);
+					event.targets=targets;
+					event.count=trigger.num;
+					"step 1"
+					event.num=0;
+					player.line(targets,'green');
+					player.chooseControl('手牌区','装备区','判定区').set('ai',function(){
+						return Math.floor(Math.random()*3);
+					}).set('prompt','请选择优先获得的区域');
+					"step 2"
+					event.range={
+						手牌区:['h','e','j'],
+						装备区:['e','h','j'],
+						判定区:['j','e','h'],
+					}[result.control||'手牌区'];
+					"step 3"
+					if(num<event.targets.length){
+						var target=event.targets[num];
+						var range=event.range;
+						for(var i=0;i<range.length;i++){
+							var cards=target.getCards(range[i]);
+							if(cards.length){
+								var card=cards.randomGet();
+								player.gain(card);
+								target.$giveAuto(card,player);
+								game.delay();
+								break;
+							}
+						}
+						event.num++;
+						event.redo();
+					}
+					"step 4"
+					player.turnOver();
+					"step 5"
+					event.count--;
+					if(event.count){
+						player.chooseBool(get.prompt2('new_guixin'));
+					}
+					else{
+						event.finish();
+					}
+					"step 6"
+					if(event.count&&result.bool){
+						event.goto(1);
+					}
+				},
+                ai:{
+                    maixie:true,
+                    "maixie_hp":true,
+                    threaten:function (player,target){
+						if(target.hp==1) return 2.5;
+						return 1;
+					},
+                    effect:{
+                        target:function (card,player,target){
+							if(get.tag(card,'damage')){
+								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
+								if(target.hp==1) return 0.8;
+								if(target.isTurnedOver()) return [0,3];
+								var num=game.countPlayer(function(current){
+									if(current.countCards('he')&&current!=player&&get.attitude(player,current)<=0){
+										return true;
+									}
+									if(current.countCards('j')&&current!=player&&get.attitude(player,current)>0){
+										return true;
+									}
+								});
+								if(num>2) return [0,1];
+								if(num==2) return [0.5,1];
+							}
+						},
+                    },
+                },
+            },
 			ol_shenfen:{
 				audio:2,
 				enable:'phaseUse',
@@ -1973,7 +2150,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return player!=event.player&&event.player.isAlive()&&_status.currentPhase==player;
 						},
 						check:function(event,player){
-							var trigger=event.getTrigger();
 							var list=[];
 							var skills=trigger.player.skills.slice(0);
 							for(var i=0;i<skills.length;i++){
@@ -2518,6 +2694,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_wuqian_info:'出牌阶段，你可以弃2枚“暴怒”标记并选择一名其他角色，你视为拥有技能“无双”并令其防具无效，直到回合结束。',
 			ol_shenfen:'神愤',
 			ol_shenfen_info:'出牌阶段，你可以弃6枚“暴怒”标记并选择所有其他角色，对这些角色各造成1点伤害，然后这些角色先各弃置其装备区里的牌，再各弃置四张手牌，最后你将你的武将牌翻面。每阶段限一次。',
+            "new_wuhun":"武魂",
+            "new_wuhun_info":"锁定技，当你受到伤害后，伤害来源获得X个“梦魇”’标记（X为伤害点数）。锁定技，当你死亡时，你选择一名“梦魇”标记数量最多的其他角色。你的死亡流程结算完成后，该角色进行一次判定：若判定结果不为【桃】或【桃园结义】，则该角色立刻死亡。",
+            "new_guixin":"归心",
+            "new_guixin_info":"当你受到1点伤害后，你可以随机获得每名其他角色区域里的一张牌，然后你翻面",
 		},
 	};
 });
