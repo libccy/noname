@@ -376,7 +376,394 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				}
-			}
+			},
+			"wolong_card":{
+                type:"takaramono",
+                fullskin:true,
+                derivation:"pangdegong",
+            },
+            "fengchu_card":{
+               type:"takaramono",
+               fullskin:true,
+               derivation:"pangdegong",
+            },
+            "xuanjian_card":{
+                fullskin:true,
+                type:"takaramono",
+                derivation:"pangdegong",
+            },
+            "shuijing_card":{
+                fullskin:true,
+                type:"takaramono",
+                derivation:"pangdegong",
+            },
+            "rewrite_bagua":{
+                derivation:"majun",
+                cardimage:"bagua",
+                fullskin:true,
+                type:"equip",
+                subtype:"equip2",
+                ai:{
+                    basic:{
+                        equipValue:7.5,
+                        order:function (card,player){
+							if(player&&player.hasSkillTag('reverseEquip')){
+								return 8.5-get.equipValue(card,player)/20;
+							}
+							else{
+								return 8+get.equipValue(card,player)/20;
+							}
+						},
+                        useful:2,
+                        value:function (card,player){
+							var value=0;
+							var info=get.info(card);
+							var current=player.getEquip(info.subtype);
+							if(current&&card!=current){
+								value=get.value(current,player);
+							}
+							var equipValue=info.ai.equipValue;
+							if(equipValue==undefined){
+								equipValue=info.ai.basic.equipValue;
+							}
+							if(typeof equipValue=='function') return equipValue(card,player)-value;
+							if(typeof equipValue!='number') equipValue=0;
+							return equipValue-value;
+						},
+                    },
+                    result:{
+                        target:function (player,target){
+							return get.equipResult(player,target,name);
+						},
+                    },
+                },
+                skills:["rw_bagua_skill"],
+                enable:true,
+                selectTarget:-1,
+                filterTarget:function (card,player,target){
+					return target==player;
+				},
+                modTarget:true,
+                allowMultiple:false,
+                content:function (){
+					target.equip(card);
+				},
+                toself:true,
+            },
+            "rewrite_baiyin":{
+                derivation:"majun",
+                fullskin:true,
+                cardimage:"baiyin",
+                type:"equip",
+                subtype:"equip2",
+                onLose:function (){
+					player.recover();
+					player.draw(2);
+				},
+                skills:["rw_baiyin_skill"],
+                tag:{
+                    recover:1,
+                },
+                ai:{
+                    order:9.5,
+                    equipValue:function (card,player){
+						if(player.hp==player.maxHp) return 5;
+						if(player.countCards('h','baiyin')) return 6;
+						return 0;
+					},
+                    basic:{
+                        equipValue:5,
+                        order:function (card,player){
+							if(player&&player.hasSkillTag('reverseEquip')){
+								return 8.5-get.equipValue(card,player)/20;
+							}
+							else{
+								return 8+get.equipValue(card,player)/20;
+							}
+						},
+                        useful:2,
+                        value:function (card,player){
+							var value=0;
+							var info=get.info(card);
+							var current=player.getEquip(info.subtype);
+							if(current&&card!=current){
+								value=get.value(current,player);
+							}
+							var equipValue=info.ai.equipValue;
+							if(equipValue==undefined){
+								equipValue=info.ai.basic.equipValue;
+							}
+							if(typeof equipValue=='function') return equipValue(card,player)-value;
+							if(typeof equipValue!='number') equipValue=0;
+							return equipValue-value;
+						},
+                    },
+                    result:{
+                        target:function (player,target){
+							return get.equipResult(player,target,name);
+						},
+                    },
+                },
+                enable:true,
+                selectTarget:-1,
+                filterTarget:function (card,player,target){
+					return target==player;
+				},
+                modTarget:true,
+                allowMultiple:false,
+                content:function (){
+					target.equip(card);
+				},
+                toself:true,
+            },
+            "rewrite_lanyinjia":{
+                derivation:"majun",
+                cardimage:"lanyinjia",
+                fullskin:true,
+                type:"equip",
+                subtype:"equip2",
+                skills:["rw_lanyinjia","lanyinjia2"],
+                ai:{
+                    equipValue:6,
+                    basic:{
+                        order:function (card,player){
+							if(player&&player.hasSkillTag('reverseEquip')){
+								return 8.5-get.equipValue(card,player)/20;
+							}
+							else{
+								return 8+get.equipValue(card,player)/20;
+							}
+						},
+                        useful:2,
+                        equipValue:1,
+                        value:function (card,player){
+							var value=0;
+							var info=get.info(card);
+							var current=player.getEquip(info.subtype);
+							if(current&&card!=current){
+								value=get.value(current,player);
+							}
+							var equipValue=info.ai.equipValue;
+							if(equipValue==undefined){
+								equipValue=info.ai.basic.equipValue;
+							}
+							if(typeof equipValue=='function') return equipValue(card,player)-value;
+							if(typeof equipValue!='number') equipValue=0;
+							return equipValue-value;
+						},
+                    },
+                    result:{
+                        target:function (player,target){
+							return get.equipResult(player,target,name);
+						},
+                    },
+                },
+                enable:true,
+                selectTarget:-1,
+                filterTarget:function (card,player,target){
+					return target==player;
+				},
+                modTarget:true,
+                allowMultiple:false,
+                content:function (){
+					target.equip(card);
+				},
+                toself:true,
+            },
+            "rewrite_renwang":{
+                derivation:"majun",
+                cardimage:"renwang",
+                fullskin:true,
+                type:"equip",
+                subtype:"equip2",
+                skills:["rw_renwang_skill"],
+                ai:{
+                    basic:{
+                        equipValue:7.5,
+                        order:function (card,player){
+							if(player&&player.hasSkillTag('reverseEquip')){
+								return 8.5-get.equipValue(card,player)/20;
+							}
+							else{
+								return 8+get.equipValue(card,player)/20;
+							}
+						},
+                        useful:2,
+                        value:function (card,player){
+							var value=0;
+							var info=get.info(card);
+							var current=player.getEquip(info.subtype);
+							if(current&&card!=current){
+								value=get.value(current,player);
+							}
+							var equipValue=info.ai.equipValue;
+							if(equipValue==undefined){
+								equipValue=info.ai.basic.equipValue;
+							}
+							if(typeof equipValue=='function') return equipValue(card,player)-value;
+							if(typeof equipValue!='number') equipValue=0;
+							return equipValue-value;
+						},
+                    },
+                    result:{
+                        target:function (player,target){
+							return get.equipResult(player,target,name);
+						},
+                    },
+                },
+                enable:true,
+                selectTarget:-1,
+                filterTarget:function (card,player,target){
+					return target==player;
+				},
+                modTarget:true,
+                allowMultiple:false,
+                content:function (){
+					target.equip(card);
+				},
+                toself:true,
+            },
+            "rewrite_tengjia":{
+                derivation:"majun",
+                cardimage:"tengjia",
+                fullskin:true,
+                type:"equip",
+                subtype:"equip2",
+                cardnature:"fire",
+                ai:{
+                    equipValue:function (card,player){
+						if(player.hasSkillTag('maixie')&&player.hp>1) return 0;
+						if(player.hasSkillTag('noDirectDamage')) return 10;
+						if(get.damageEffect(player,player,player,'fire')>=0) return 10;
+						var num=3-game.countPlayer(function(current){
+							return get.attitude(current,player)<0;
+						});
+						if(player.hp==1) num+=4;
+						if(player.hp==2) num+=1;
+						if(player.hp==3) num--;
+						if(player.hp>3) num-=4;
+						return num;
+					},
+                    basic:{
+                        equipValue:3,
+                        order:function (card,player){
+							if(player&&player.hasSkillTag('reverseEquip')){
+								return 8.5-get.equipValue(card,player)/20;
+							}
+							else{
+								return 8+get.equipValue(card,player)/20;
+							}
+						},
+                        useful:2,
+                        value:function (card,player){
+							var value=0;
+							var info=get.info(card);
+							var current=player.getEquip(info.subtype);
+							if(current&&card!=current){
+								value=get.value(current,player);
+							}
+							var equipValue=info.ai.equipValue;
+							if(equipValue==undefined){
+								equipValue=info.ai.basic.equipValue;
+							}
+							if(typeof equipValue=='function') return equipValue(card,player)-value;
+							if(typeof equipValue!='number') equipValue=0;
+							return equipValue-value;
+						},
+                    },
+                    result:{
+                        target:function (player,target){
+							return get.equipResult(player,target,name);
+						},
+                    },
+                },
+                skills:["rw_tengjia1","rw_tengjia2","rw_tengjia3","rw_tengjia4"],
+                enable:true,
+                selectTarget:-1,
+                filterTarget:function (card,player,target){
+					return target==player;
+				},
+                modTarget:true,
+                allowMultiple:false,
+                content:function (){
+					target.equip(card);
+				},
+                toself:true,
+            },
+            "rewrite_zhuge":{
+                derivation:"majun",
+                cardimage:"zhuge",
+                distance:{
+                    attackFrom:-2,
+                },
+                fullskin:true,
+                type:"equip",
+                subtype:"equip1",
+                ai:{
+                    equipValue:function (card,player){
+						if(!game.hasPlayer(function(current){
+							return player.canUse('sha',current)&&get.effect(current,{name:'sha'},player,player)<0;
+						})){
+							return 1;
+						}
+						if(player.hasSha()&&_status.currentPhase==player){
+							if(player.getEquip('zhuge')||player.getCardUsable('sha')==0){
+								return 10;
+							}
+						}
+						var num=player.countCards('h','sha');
+						if(num>1) return 6+num;
+						return 3+num;
+					},
+                    basic:{
+                        equipValue:5,
+                        order:function (card,player){
+							if(player&&player.hasSkillTag('reverseEquip')){
+								return 8.5-get.equipValue(card,player)/20;
+							}
+							else{
+								return 8+get.equipValue(card,player)/20;
+							}
+						},
+                        useful:2,
+                        value:function (card,player){
+							var value=0;
+							var info=get.info(card);
+							var current=player.getEquip(info.subtype);
+							if(current&&card!=current){
+								value=get.value(current,player);
+							}
+							var equipValue=info.ai.equipValue;
+							if(equipValue==undefined){
+								equipValue=info.ai.basic.equipValue;
+							}
+							if(typeof equipValue=='function') return equipValue(card,player)-value;
+							if(typeof equipValue!='number') equipValue=0;
+							return equipValue-value;
+						},
+                    },
+                    tag:{
+                        valueswap:1,
+                    },
+                    result:{
+                        target:function (player,target){
+							return get.equipResult(player,target,name);
+						},
+                    },
+                },
+                skills:["zhuge_skill"],
+                enable:true,
+                selectTarget:-1,
+                filterTarget:function (card,player,target){
+					return target==player;
+				},
+                modTarget:true,
+                allowMultiple:false,
+                content:function (){
+					target.equip(card);
+				},
+                toself:true,
+            },
 		},
 		skill:{
 		 //OL马超
@@ -7445,7 +7832,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCard'},
 				frequent:true,
-				usable:3,
+				//usable:3,
 				filter:function(event,player){
 					if(!event.cards||event.cards.length!=1) return false;
 					if(_status.currentPhase!=player) return false;
@@ -11674,7 +12061,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yingjian_info:'准备阶段，你可以视为使用一张无视距离的杀',
 			xunzhi_info:'准备阶段开始时，若你的上家和下家与你的体力值均不相等，你可以失去1点体力。若如此做，你的手牌上限+2',
 			yawang_info:'锁定技，摸牌阶段开始时，你改为摸x张牌，然后你于出牌阶段内至多使用x张牌（x为与你体力值相等的角色数）',
-			fenyin_info:'你的回合内，当你使用牌时，若此牌与你于此回合内使用的上一张牌颜色不同，则你可以摸一张牌，每回合最多发动3次',
+			fenyin_info:'你的回合内，当你使用牌时，若此牌与你于此回合内使用的上一张牌颜色不同，则你可以摸一张牌。',
 			fuji_info:'当一名角色造成雷电伤害时，你可以令其进行一次判定，若结果为黑色，此伤害+1；若结果为红色，该角色获得此牌。',
 			fulu_info:'你可以将【杀】当雷【杀】使用。',
 			jilei_info:'每当你受到有来源的伤害时，你可以选择一种牌的类别，令伤害来源不能使用、打出或弃置其此类别的手牌，直到回合结束',

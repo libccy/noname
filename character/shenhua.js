@@ -305,8 +305,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.chooseTarget(get.prompt('drlt_zhenggu'),function(card,player,target){
 								return target!=player;
 							}).ai=function(target){
-								if(player.countCards('h')>target.countCards('h')) return get.attitude(player,target);
-								if(player.countCards('h')<target.countCards('h')) return -get.attitude(player,target);
+							    var player=_status.event.player;
+							    var num=(Math.min(5,player.countCards('h'))-target.countCards('h'));
+							    var att=get.attitude(player,target);
+							    return num*att;
 							};
 							"step 1"
 							if(result.bool){
@@ -336,7 +338,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							 player.removeSkill("drlt_zhenggu2");
 								var pl=player.storage.drlt_zhenggu;
 								if(pl.isAlive()){
-								var num=pl.countCards('h');
+								var num=Math.min(5,pl.countCards('h'));
 								var num1=0;
 								if(num-player.countCards('h')>0) num1=num-player.countCards('h');
 								if(num-player.countCards('h')<0) num1=num-player.countCards('h');
@@ -354,8 +356,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(pl.isAlive()){
 								var num=pl.countCards('h');
 								var num1=0;
-								if(player.countCards('h')-num>0) num1=player.countCards('h')-num;
-								if(player.countCards('h')-num<0) num1=player.countCards('h')-num;
+								var num2=Math.min(5,player.countCards('h'));
+								if(num2-num>0) num1=num2-num;
+								if(num2-num<0) num1=num2-num;
 								if(num1<0) pl.chooseToDiscard('h',-num1,true);
 								if(num1>0) pl.draw(num1);
 								}
@@ -2012,6 +2015,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.target.countCards('he')>0;
 				},
 				direct:true,
+				priority:8,
 				content:function(){
 					'step 0'
 					player.discardPlayerCard(trigger.target,get.prompt('jianchu',trigger.target)).set('ai',function(button){
@@ -2478,21 +2482,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					if(trigger.target.countCards('h')<=player.countCards('h')) trigger.directHit=true;
-					if(trigger.target.hp>=player.hp) player.addTempSkill('xinliegong2','shaAfter');
+					if(trigger.target.hp>=player.hp){
+					    if(typeof trigger.extraDamage!='number'){
+					    	trigger.extraDamage=0;
+					    }
+					    trigger.extraDamage++;
+					};
 				},
 				ai:{
 					threaten:0.5
-				}
-			},
-			xinliegong2:{
-				trigger:{source:'damageBegin'},
-				filter:function(event){
-					return event.card&&event.card.name=='sha'&&event.notLink();
-				},
-				forced:true,
-				audio:false,
-				content:function(){
-					trigger.num++;
 				}
 			},
 			tiaoxin:{
@@ -6375,7 +6373,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"drlt_huairou":"怀柔",
 			"drlt_huairou_info":"出牌阶段，你可以重铸装备牌",
 			"drlt_zhenggu":"镇骨",
-			"drlt_zhenggu_info":"结束阶段，你可以选择一名其他角色，你的回合结束后和该角色的下个回合结束时，其将手牌摸至或弃至与你手牌数相同",
+			"drlt_zhenggu_info":"结束阶段，你可以选择一名其他角色，你的回合结束后和该角色的下个回合结束时，其将手牌摸至或弃至X张。（X为你的手牌数且至多为5）",
 			"drlt_zhenrong":"徵荣",
 			"drlt_zhenrong_info":"当你对其他角色造成伤害后，若其手牌比你多，你可以将其一张牌置于你的武将牌上，称为“荣”",
 			"drlt_hongju":"鸿举",

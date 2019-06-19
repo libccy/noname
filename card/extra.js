@@ -10,7 +10,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:"basic",
 				toself:true,
 				enable:function(event,player){
-					return !player.hasSkill('jiu');
+					//return !player.hasSkill('jiu');
+					return true;
 				},
 				lianheng:true,
 				logv:false,
@@ -34,6 +35,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(cards&&cards.length){
 							card=cards[0];
 						}
+						if(!player.storage.jiu) player.storage.jiu=0;
+						player.storage.jiu++;
 						game.broadcastAll(function(target,card,gain2){
 							target.addSkill('jiu');
 							if(!target.node.jiu&&lib.config.jiu_effect){
@@ -43,8 +46,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(gain2&&card.clone&&(card.clone.parentNode==target.parentNode||card.clone.parentNode==ui.arena)){
 								card.clone.moveDelete(target);
 							}
-						},target,card,target==targets[0]);
-						if(target==targets[0]){
+						},target,card,target==targets[0]&&cards.length==1);
+						if(target==targets[0]&&cards.length==1){
 							if(card.clone&&(card.clone.parentNode==target.parentNode||card.clone.parentNode==ui.arena)){
 								game.addVideo('gain2',target,get.cardsInfo([card]));
 							}
@@ -347,7 +350,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						equipValue:3
 					},
 				},
-				skills:['tengjia1','tengjia2']
+				skills:['tengjia1','tengjia2','tengjia3']
 			},
 			baiyin:{
 				fullskin:true,
@@ -379,16 +382,22 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		skill:{
 			huogong2:{},
 			jiu:{
-				trigger:{source:'damageBegin'},
+				trigger:{player:'useCard'},
 				filter:function(event){
-					return event.card&&event.card.name=='sha'&&event.notLink();
+					return event.card&&event.card.name=='sha';
 				},
 				forced:true,
 				content:function(){
-					trigger.num++;
+					if(!trigger.baseDamage) trigger.baseDamage=1;
+					trigger.baseDamage+=player.storage.jiu;
+					game.broadcastAll(function(player){
+						player.removeSkill('jiu');
+					},player);
 				},
 				temp:true,
 				vanish:true,
+				silent:true,
+				popup:false,
 				onremove:function(player){
 					if(player.node.jiu){
 						player.node.jiu.delete();
@@ -396,6 +405,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						delete player.node.jiu;
 						delete player.node.jiu2;
 					}
+					delete player.storage.jiu;
 				},
 				ai:{
 					damageBonus:true
@@ -441,7 +451,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			tengjia1:{
-				trigger:{target:'useCardToBefore'},
+				trigger:{target:['useCardToBefore']},
 				forced:true,
 				priority:6,
 				audio:true,
@@ -453,7 +463,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					})) return false;
 					if(event.card.name=='nanman') return true;
 					if(event.card.name=='wanjian') return true;
-					if(event.card.name=='sha'&&!event.card.nature) return true;
 				},
 				content:function(){
 					trigger.cancel();
@@ -497,6 +506,22 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				}
+			},
+			tengjia3:{
+			    audio:'tengjia1',
+			    trigger:{target:'shaBegin'},
+			    filter:function(event,player){
+			        if(event.player.hasSkillTag('unequip',false,{
+						name:event.card?event.card.name:null,
+						target:player,
+						card:event.card
+					})) return false;
+					if(event.card.name=='sha'&&!event.card.nature) return true;
+					return false;
+			    },
+			    content:function(){
+			        trigger.cancel();
+			    },
 			},
 			baiyin_skill:{
 				trigger:{player:'damageBegin'},
@@ -572,6 +597,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			tengjia_info:'锁定技，【南蛮入侵】、【万箭齐发】和普通【杀】对你无效。你每次受到火焰伤害时，该伤害+1。',
 			tengjia1:'藤甲',
 			tengjia2:'藤甲',
+			tengjia3:'藤甲',
 			baiyin:'白银狮子',
 			baiyin_info:'锁定技，你每次受到伤害时，最多承受1点伤害（防止多余的伤害）；当你失去装备区里的【白银狮子】时，你回复1点体力。',
 			baiyin_skill:'白银狮子',

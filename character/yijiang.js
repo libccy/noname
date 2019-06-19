@@ -60,7 +60,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gongsunyuan:['male','qun',4,['huaiyi']],
 			guotufengji:['male','qun',3,['jigong','shifei']],
 
-			xin_yujin:['male','wei',4,['jieyue']],
 			xin_liru:['male','qun',3,['xinjuece','xinmieji','xinfencheng']],
 
 			guohuanghou:['female','wei',3,['jiaozhao','danxin']],
@@ -84,6 +83,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xuezong:['male','wu',3,['funan','jiexun']],
 			
 			old_huaxiong:['male','qun',6,['shiyong']],
+            "re_yujin":["male","wei",4,["zhenjun"],[]],
 		},
 		characterIntro:{
 			caozhi:'字子建，沛国谯人，三国曹魏著名文学家，建安文学代表人物。魏武帝曹操之子，魏文帝曹丕之弟，生前曾为陈王，去世后谥号“思”，因此又称陈思王。南朝宋文学家谢灵运更有“天下才有一石，曹子建独占八斗”的评价。王士祯尝论汉魏以来二千年间诗家堪称“仙才”者，曹植、李白、苏轼三人耳。',
@@ -178,6 +178,56 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuchen:['liushan'],
 		},
 		skill:{
+            zhenjun:{
+                audio:"jieyue",
+                trigger:{
+                    player:"phaseBegin",
+                },
+                filter:function (event,player){
+					return game.hasPlayer(function(current){
+						return current.countCards('h')>current.hp;
+					});
+				},
+                direct:true,
+                content:function (){
+					'step 0'
+					player.chooseTarget(get.prompt2('zhenjun'),function(card,player,target){
+					   return target.countCards('h')>target.hp; 
+					}).ai=function(target){
+						return -get.attitude(_status.event.player,target)*(target.countCards('e')+1);
+					};
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						var num=target.countCards('h')-target.hp;
+						player.line(target,'thunder');
+						player.logSkill('zhenjun',target);
+						player.discardPlayerCard(num,target,true);
+					}
+					'step 2'
+					if(result.cards&&result.cards.length){
+						event.num=0;
+						for(var i=0;i<result.cards.length;i++){
+							if(get.type(result.cards[i])!='equip'){
+								event.num++;
+							}
+						}
+						if(event.num>0){
+							var prompt='弃置'+get.cnNumber(event.num)+'张牌，或令'+get.translation(event.target)+'摸等量的牌';
+							player.chooseToDiscard(event.num,prompt,'he').ai=function(){
+								return 5-get.value(card);
+							}
+						}
+						else event.finish();
+					}
+					else event.finish();
+					'step 3'
+					if(!result.bool){
+						event.target.draw(event.num);
+					}
+				},
+            },
 			fenli:{
 				group:['fenli_draw','fenli_use','fenli_discard'],
 				subSkill:{
@@ -562,7 +612,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.effect(player,event.card,event.player,player)<0;
 						},
 						filter:function(event,player){
-							return player.canCompare(event.target);
+							return player.canCompare(event.player);
 						},
 						logTarget:'player',
 						content:function(){
@@ -1486,7 +1536,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 3"
 					if(event.target.getCards('h').contains(event.card)){
-						event.target.chooseControlList('问卦','将'+get.translation(event.card)+'置于牌堆顶','将'+get.translation(event.card)+'置于牌堆底',true,function(){
+						event.target.chooseControlList('问卦','将'+get.translation(event.card)+'置于牌堆顶','将'+get.translation(event.card)+'置于牌堆底',event.target==player,function(){
+						    if(get.attitude(event.target,player)<0) return 2;
 							return 1;
 						});
 					}
@@ -1494,14 +1545,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					"step 4"
-					event.target.lose(event.card,ui.special);
 					event.index=result.index;
+					if(event.index==0||event.index==1){
+					event.target.lose(event.card,ui.special);
 					game.broadcastAll(function(player){
 						var cardx=ui.create.card();
 						cardx.classList.add('infohidden');
 						cardx.classList.add('infoflip');
 						player.$throw(cardx,1000,'nobroadcast');
 					},event.target);
+					}
+					else event.finish();
 					"step 5"
 					game.delay();
 					"step 6"
@@ -1510,33 +1564,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.log(event.target,'将获得的牌置于牌堆底');
 						ui.cardPile.appendChild(event.card);
 						if(ui.cardPile.childElementCount==1||player==event.target){
-							event.togain=[ui.cardPile.firstChild];
-							ui.cardPile.firstChild.remove();
+							player.draw();
 						}
 						else{
-							event.togain=get.cards(2);
+						    player.draw();
+							target.draw();
 						}
 					}
-					else{
+					else if(event.index==0){
 						game.log(player,'将获得的牌置于牌堆顶');
 						ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
 						if(ui.cardPile.childElementCount==1||player==event.target){
-							event.togain=[ui.cardPile.lastChild];
-							ui.cardPile.lastChild.remove();
+							player.draw('bottom');
 						}
 						else{
-							event.togain=[ui.cardPile.lastChild,ui.cardPile.lastChild.previousSibling];
-							ui.cardPile.lastChild.remove();
-							ui.cardPile.lastChild.remove();
+							player.draw('bottom');
+							target.draw('bottom');
 						}
-					}
-					if(event.togain.length){
-						player.gain(event.togain.shift());
-						player.$draw();
-					}
-					if(event.togain.length){
-						event.target.gain(event.togain.shift());
-						event.target.$draw();
 					}
 				},
 				ai:{
@@ -7781,12 +7825,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shangshi:{
 				audio:2,
 				trigger:{player:['loseEnd','changeHp']},
-				forced:true,
+				frequent:true,
 				filter:function(event,player){
-					return (player.countCards('h')<Math.min(3,player.maxHp-player.hp));
+					return (player.countCards('h')<(player.maxHp-player.hp));
 				},
 				content:function(){
-					player.draw(Math.min(3,player.maxHp-player.hp)-player.countCards('h'));
+					player.draw(player.maxHp-player.hp-player.countCards('h'));
 				},
 				ai:{
 					noh:true,
@@ -8800,13 +8844,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					var next=player.chooseToDiscard(get.prompt('yuce'));
-					next.logSkill='yuce';
+					var next=player.chooseCard(get.prompt('yuce'));
 					next.set('ai',function(card){
-						return 7-get.value(card);
+					 if(get.type(card)=='basic') return 1;
+						return get.value(card);
 					});
 					"step 1"
 					if(result.bool){
+					    player.showCards(result.cards);
 						var type=get.type(result.cards[0],'trick');
 						if(trigger.source){
 							trigger.source.chooseToDiscard('弃置一张'+get.translation(type)+'牌或令'+get.translation(player)+'回复一点体力',function(card){
@@ -8830,7 +8875,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.recover();
 					}
 					else if(result.bool){
-						player.draw();
+						//player.draw();
 					}
 					else{
 						player.recover();
@@ -9369,7 +9414,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xunyou:'荀攸',
 			liubiao:'刘表',
 			zhuran:'朱然',
-			yujin:'旧于禁',
+			yujin:'毅重于禁',
 			masu:'旧马谡',
 			xin_masu:'马谡',
 			fazheng:'旧法正',
@@ -9418,7 +9463,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hanhaoshihuan:'韩浩史涣',
 			chengpu:'程普',
 			gaoshun:'高顺',
-			xin_yujin:'于禁',
+			xin_yujin:'节钺于禁',
 			xin_liru:'李儒',
 			guohuanghou:'郭皇后',
 			liuyu:'刘虞',
@@ -9436,7 +9481,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jikang:'嵇康',
 			qinmi:'秦宓',
 			caiyong:'蔡邕',
+            "re_yujin":"于禁",
 
+            zhenjun:"镇军",
+            "zhenjun_info":"准备阶段，你可以弃置一名手牌数多于体力值的角色的X张牌（X为其手牌数和体力值之差），然后选择一项：1.你弃置等同于其中非装备牌数量的牌；2.其摸等量的牌。",
 			fenli:'奋励',
 			fenli_info:'若你的手牌数为全场最多，你可以跳过摸牌阶段；若你的体力值为全场最多，你可以跳过出牌阶段；若你的装备区里有牌且数量为全场最多，你可以跳过弃牌阶段。',
 			pingkou:'平寇',
@@ -9661,7 +9709,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fuhun2:'父魂',
 			fuhun_info:'你可以将两张手牌当杀使用或打出；出牌阶段，若你以此法使用的杀造成了伤害，你获得技能“武圣”、“咆哮”直到回合结束。',
 			yuce:'御策',
-			yuce_info:'每当你受到一次伤害，可以弃置一张手牌，并令伤害来源选择一项：弃置一张相同类型的手牌并令你摸一张牌，或令你回复一点体力',
+			yuce_info:'当你受到伤害后，你可以展示一张手牌，并令伤害来源选择一项：弃置一张相同类型的手牌，或令你回复一点体力',
 			xiansi:'陷嗣',
 			xiansi_bg:'逆',
 			xiansi2:'陷嗣',
@@ -9795,7 +9843,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			luoying_info:'当其他角色的梅花牌，因弃牌或判定而进入弃牌堆时，你可以获得之。',
 			jiushi_info:'若你的武将牌正面朝上，你可以(在合理的时机)将你的武将牌翻面来视为使用一张【酒】;当你的武将牌背面朝上时你受到伤害，你可在伤害结算后将之翻回正面。',
 			jueqing_info:'锁定技，你即将造成的伤害均视为失去体力。',
-			shangshi_info:'锁定技，当你的手牌数小于X时，你立即将手牌补至X张（X为你已损失的体力值且最多为3）',
+			shangshi_info:'当你的手牌数小于X时，你可以立即将手牌补至X张（X为你已损失的体力值）',
 			xuanfeng_info:'当你失去装备区里的牌时，或于弃牌阶段弃置了两张或更多的手牌后，你可以依次弃置一至两名其他角色的共计两张牌。',
 			zhiyu_info:'每当你受到一次伤害后，你可以摸一张牌，然后展示所有手牌，若颜色均相同，伤害来源弃置一张手牌。',
 			qice_info:'出牌阶段，你可以将所有的手牌（至少一张）当做任意一张通常性锦囊牌使用，每阶段限一次。',
