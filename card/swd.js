@@ -3600,17 +3600,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			yiluan:{
 				enable:'phaseUse',
 				usable:1,
-				filterCard:true,
-				check:function(card){
-					return 6-get.value(card);
-				},
-				filter:function(event,player){
-					return player.countCards('he');
-				},
 				filterTarget:function(card,player,target){
 					return target!=player&&target.countCards('h');
 				},
-				position:'he',
 				content:function(){
 					'step 0'
 					target.judge();
@@ -3631,8 +3623,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					}
-					'step 2'
-					player.draw();
 				},
 				ai:{
 					order:10,
@@ -5290,9 +5280,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			guangshatianyi_bg:'纱',
 			guangshatianyi_info:'锁定技，每当你即将受到伤害，有三分之一的概率令伤害减一',
 			sifeizhenmian:'四非真面',
-			sifeizhenmian_info:'出牌阶段限一次，你可以弃置一张牌并令一名有手牌的其他角色进行一次判定，若结果为不为红桃且目标有可用的手牌，目标随机使用一张手牌（随机指定目标），否则你摸一张牌',
+			sifeizhenmian_info:'出牌阶段限一次，你可以令一名有手牌的其他角色进行一次判定，若结果为不为红桃且目标有可用的手牌，目标随机使用一张手牌（随机指定目标）',
 			yiluan:'意乱',
-			yiluan_info:'出牌阶段限一次，你可以弃置一张牌并令一名有手牌的其他角色进行一次判定，若结果为不为红桃且目标有可用的手牌，目标随机使用一张手牌（随机指定目标），否则你摸一张牌',
+			yiluan_info:'出牌阶段限一次，你可以令一名有手牌的其他角色进行一次判定，若结果为不为红桃且目标有可用的手牌，目标随机使用一张手牌（随机指定目标）',
 			donghuangzhong:'东皇钟',
 			xuanyuanjian:'轩辕剑',
 			xuanyuanjian2:'轩辕剑',
