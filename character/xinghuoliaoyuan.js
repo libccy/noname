@@ -3683,7 +3683,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return player!=target;
 					}).set('ai',function(target){
 						var player=_status.event.player;
-						if(player.countCards('h','sha')>player.countCards('h')/3&&player.countCards('h',{color:red})>player.countCards('h')/2) return 0;
+						if(player.countCards('h','sha')>player.countCards('h')/3&&player.countCards('h',{color:'red'})>player.countCards('h')/2) return 0;
 						if(target.countCards('he')==0) return 0.1;
 						return -get.attitude(_status.event.player,target);
 					});
