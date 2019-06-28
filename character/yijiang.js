@@ -215,7 +215,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						if(event.num>0){
 							var prompt='弃置'+get.cnNumber(event.num)+'张牌，或令'+get.translation(event.target)+'摸等量的牌';
-							player.chooseToDiscard(event.num,prompt,'he').ai=function(){
+							player.chooseToDiscard(event.num,prompt,'he').ai=function(card){
 								return 5-get.value(card);
 							}
 						}
@@ -7470,30 +7470,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						event.target=result.targets[0];
 						player.logSkill('zhiyan',result.targets);
+						event.bool=false;
+						event.target.draw('visible');
 					}
 					else{
 						event.finish();
 					}
 					"step 2"
-					var cards=get.cards();
-					var card=cards[0];
-					switch(get.type(card,'trick')){
-						case 'basic':event.effect='';break;
-						case 'trick':event.effect='';break;
-						case 'equip':event.effect='recover';break;
-					}
-					if(get.type(card)=='equip'&&!event.target.isDisabled(get.sub(card))){
-						event.target.equip(card);
-						event.target.$draw(card);
-						game.delay();
-					}
-					else{
-						event.target.gain(cards,'gain2','log');
+					var card=result[0];
+					if(get.type(card)=='equip'){
+						if(!event.target.isDisabled(get.subtype(card))){
+						    event.target.equip(card);
+						    game.delay();
+						}
+						event.bool=true;
 					}
 					"step 3"
-					switch(event.effect){
-						case 'recover':event.target.recover();break;
-					}
+					if(event.bool) target.recover();
 				},
 				ai:{
 					expose:0.2,

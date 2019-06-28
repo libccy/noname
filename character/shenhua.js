@@ -1038,7 +1038,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"nzry_juzhan":{
 						audio:2,
 						mark:true,
-						locked:true,
+						locked:false,
 						marktext:'拒',
 						intro:{
 							content:function(storage,player,skill){
@@ -1552,7 +1552,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							};
 						},
 						ai:{
-							order:13,
+							order:2.7,
 							result:{
 								player:function(player){
 									if((player.storage.nzry_chenglve==undefined||player.storage.nzry_chenglve==false)&&player.countCards('h')<3) return 0;
@@ -1580,8 +1580,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"nzry_shicai":{
 						group:["nzry_shicai_1","nzry_shicai_2","nzry_shicai_3"],
 						ai:{
-                  threaten:2.2,
-                  },
+					effect:{
+						target:function(card,player,target){
+							if(get.type(card)=='equip'&&!player.storage.nzry_shicai.contains('equip')&&get.equipResult(player,target,card.name)<=0) return [1,3];
+							if(card.name=='shandian'&&!player.storage.nzry_shicai.contains('trick')) return [1,3];
+						},
+					},
+					threaten:2.4,
+				},
 						subSkill:{
 							"1":{
 								trigger:{
@@ -1595,14 +1601,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							"2":{
 								audio:2,
+								prompt2:"当你使用牌指定目标时，若此牌与你本回合使用的牌类型均不同（包括装备牌），则你可以将此牌置于牌堆顶，然后摸一张牌",
 								trigger:{
 									player:['useCard','respond'],				
 								},
 								filter:function (event,player){
-									return (event.name=='respond'&&event.card.name!='sha'||event.name=='useCard')&&event.cards.length>0&&player.storage.nzry_shicai!=undefined&&!player.storage.nzry_shicai.contains(get.type(event.card,'trick'));
+									return ((event.name=='respond'&&event.card.name=='shan'&&event.parent.parent.name=='sha')||event.name=='useCard')&&event.cards.length>0&&player.storage.nzry_shicai!=undefined&&!player.storage.nzry_shicai.contains(get.type(event.card,'trick'));
 								},
 								check:function (event,player){
-									return get.type(event.card)!='equip'&&event.card.name!='lebu'&&event.card.name!='bingliang';
+									if(get.type(event.card)=='equip'){
+									    return get.equipResult(player,player,event.card.name)<=0;
+									}
+									return event.card.name!='lebu'&&event.card.name!='bingliang';
 								},
 								content:function(){
 									player.storage.nzry_shicai.push(get.type(trigger.card,'trick'));
@@ -1702,7 +1712,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					"nzry_zhenliang":{
 						mark:true,
-						locked:true,
+						locked:false,
 						marktext:'贞',
 						intro:{
 							content:function(storage,player,skill){
@@ -1814,7 +1824,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					"nzry_shenshi":{
 						mark:true,
-						locked:true,
+						locked:false,
 						marktext:'审',
 						intro:{
 							content:function(storage,player,skill){
