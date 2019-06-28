@@ -4551,7 +4551,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwshuangwu:'霜舞',
 			gwshuangwu_info:'锁定技，每当你造成一次伤害，你视为对目标使用刺骨寒霜；你对处于刺骨寒霜的角色造成的伤害+1',
 			gwhuanshuang:'幻霜',
-			gwhuanshuang_info:'准备阶段，你可以发现一张铜卡法术并使用之，此牌结算两次',
+			gwhuanshuang_info:'准备或结束阶段，你可以发现一张铜卡法术并使用之，此牌结算两次',
 			gwjinli:'金醴',
 			gwjinli_jiu:'先祖麦酒',
 			gwjinli_info:'出牌阶段限一次，你可以弃置一张手牌，并将一张先祖麦酒置于一名角色的武将牌上',

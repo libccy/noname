@@ -377,7 +377,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							list.push(list1.randomRemove());
 						}
 					}
-					player.chooseButton(true,['幻觉',[list,'vcard']]).ai=function(button){
+					player.chooseButton(true,['玄阵',[list,'vcard']]).ai=function(button){
 						var card={suit:trigger.card.suit,number:trigger.card.number,name:button.link[2]};
 						return get.effect(trigger.targets[0],card,trigger.player,player);
 					};
