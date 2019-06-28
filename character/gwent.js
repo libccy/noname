@@ -298,7 +298,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			gwhuanshuang:{
-				trigger:{player:['phaseBegin']},
+				trigger:{player:['phaseBegin','phaseEnd']},
 				direct:true,
 				filter:function(event,player){
 					return !player.hasSkill('gwhuanshuang_disable');
