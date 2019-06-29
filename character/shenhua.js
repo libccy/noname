@@ -1031,7 +1031,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.storage.kongsheng2.remove(player.storage.kongsheng2[i]);
 							};
 							player.removeSkill('kongsheng2');
-							delete player.storage.drlt_kongsheng2;
 						},
 					},
 			
@@ -1062,10 +1061,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return event.targets&&event.targets.contains(player)&&(player.storage.nzry_juzhan1==false||player.storage.nzry_juzhan1==undefined);
 								},
 								content:function(){
-									player.draw();
-									trigger.player.draw();
+								    game.asyncDraw([player,trigger.player]);
 									trigger.player.storage.nzry_juzhan=true;
-									trigger.player.markSkill('nzry_juzhan1');
 									player.storage.nzry_juzhan1=true;
 								},
 							},
@@ -1081,29 +1078,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return event.player.countCards('he')>0&&event.targets&&event.targets.length==1;
 								},
 								content:function(){
-									player.gainPlayerCard(trigger.targets[0],'he');
+									player.gainPlayerCard(trigger.targets[0],'he',true);
 									player.storage.nzry_juzhan1=false;
-									player.markSkill('nzry_juzhan1');
-									player.storage.nzry_juzhan2=true;
+									trigger.target.storage.nzry_juzhan2=true;
 								},
 							},
-						},
-					},
-					"nzry_juzhan1":{
-						marktext:'拒',
-						intro:{
-							content:'',
 						},
 					},
 					"_nzry_juzhan":{
 						mod:{
 							targetEnabled:function(card,player,target){
-								if(player.storage.nzry_juzhan2==true) return false;
+								if(target.storage.nzry_juzhan2==true) return false;
 							},
 						},
-						audio:2,
 						trigger:{							
-							player:'phaseAfter'
+							global:'phaseAfter'
 						},
 						filter:function (event,player){
 							return player.storage.nzry_juzhan==true||player.storage.nzry_juzhan2==true;
@@ -1113,108 +1102,106 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							if(player.storage.nzry_juzhan==true) delete player.storage.nzry_juzhan;
 							if(player.storage.nzry_juzhan2==true) delete player.storage.nzry_juzhan2;
-							player.unmarkSkill('nzry_juzhan1');
 						},
 					},
-					
-            "nzry_feijun":{
-                init:function (player){
-        player.storage.nzry_feijun=[];
-    },
-                marktext:"飞",
-                intro:{
-                    content:function (storage){
-            var str='';
-            for(var i=0;i<storage.length;i++){
-                str+='、';
-                str+=get.translation(storage[i].name);
-            };
-            str=str.slice(1);
-            return '已对'+str+'发动过〖飞军〗';
-        },
-                },
-                mark:true,
-                enable:"phaseUse",
-                usable:1,
-                position:"he",
-                audio:2,
-                filter:function (event,player){
-        return game.countPlayer(function(current){return current.countCards('h')>=player.countCards('h')})>0||game.countPlayer(function(current){return current.countCards('e')>player.countCards('e')})>0;
-    },
-                filterCard:true,
-                check:function (card){
-        return 5-get.value(card);
-    },
-                content:function (){
-        'step 0'
-        var list=[];
-        if(game.countPlayer(function(current){return current.countCards('h')>player.countCards('h')})>0) list.push('令一名手牌数大于你的角色交给你一张牌');
-        if(game.countPlayer(function(current){return current.countCards('e')>player.countCards('e')})>0) list.push('令一名装备区里牌数大于你的角色弃置一张装备牌');
-  if(list.length==0) event.finish();
-     else    if(list.length<2){
-      if(game.countPlayer(function(current){return current.countCards('h')>player.countCards('h')})>0) event._result={index:0};
-      else event._result={index:1};
-        }
-        else{
-        player.chooseControl().set('ai',function(){
-            if(game.hasPlayer(function(current){
-                return current.countCards('h')>player.countCards('h')&&get.attitude(player,current)<0
-            })) return 0;
-            return 1;
-        }).set('choiceList',list);
-        }
-        'step 1'
-        if(result.index==0){
-            event.control='令一名手牌数大于你的角色交给你一张牌';
-            player.chooseTarget(function(card,player,target){
-                return target.countCards('h')>player.countCards('h')&&target!=player;
-            },'请选择【飞军】的目标').ai=function(target){
-                return -get.attitude(player,target)
-            };
-        }else{
-            event.control='令一名装备区里牌数大于你的角色弃置一张装备牌';
-            player.chooseTarget(function(card,player,target){
-                return target.countCards('e')>player.countCards('e')&&target!=player;
-            },'请选择【飞军】的目标').ai=function(target){
-                return -get.attitude(player,target)
-            };
-        };
-        'step 2'
-        if(result.bool){
-            event.target=result.targets[0];
-            if(player.hasSkill('nzry_binglve')&&!player.storage.nzry_feijun.contains(event.target)){
-                player.draw(2);
-                player.storage.nzry_feijun.push(event.target);
-                player.syncStorage('nzry_feijun');
-                player.logSkill('nzry_binglve');
-            };
-            player.line(event.target);
-            if(event.control=='令一名手牌数大于你的角色交给你一张牌'){
-                event.target.chooseCard(1,'h',true).set('ai',function(card){
-                    return 6-get.value(card);
-                });
-            }else{
-                event.target.chooseToDiscard(1,'e',true);
-                event.finish();
-            };
-        }else{
-            event.finish();
-        };
-        'step 3'
-        if(result.bool){
-            event.target.$give(result.cards.length,player);
-            player.gain(result.cards,event.target);
-        };
-    },
-                ai:{
-                    order:11,
-                    result:{
-                        player:function (player){
-                if(game.countPlayer(function(current){return (current.countCards('h')>player.countCards('h')||current.countCards('e')>player.countCards('e'))&&get.attitude(player,current)<0&&!player.storage.nzry_feijun.contains(current)})>0||game.countPlayer(function(current){return current.countCards('h')>player.countCards('h')&&get.attitude(player,current)<0})>0||(player.countCards('h')>=2&&game.countPlayer(function(current){return current.countCards('e')>player.countCards('e')&&get.attitude(player,current)<0})>0)) return 1;
-            },
-                    },
-                },
-            },
+					"nzry_feijun":{
+						init:function (player){
+							player.storage.nzry_feijun=[];
+						},
+						marktext:"飞",
+						intro:{
+							content:function (storage){
+								var str='';
+								for(var i=0;i<storage.length;i++){
+									str+='、';
+									str+=get.translation(storage[i]);
+								};
+								str=str.slice(1);
+								return '已对'+str+'发动过〖飞军〗';
+							},
+						},
+						mark:true,
+						enable:"phaseUse",
+						usable:1,
+						position:"he",
+						audio:2,
+						filter:function (event,player){
+							return game.countPlayer(function(current){return current.countCards('h')>=player.countCards('h')})>0||game.countPlayer(function(current){return current.countCards('e')>player.countCards('e')})>0;
+						},
+						filterCard:true,
+						check:function (card){
+							return 5-get.value(card);
+						},
+						content:function (){
+							'step 0'
+							var list=[];
+							if(game.countPlayer(function(current){return current.countCards('h')>player.countCards('h')})>0) list.push('令一名手牌数大于你的角色交给你一张牌');
+							if(game.countPlayer(function(current){return current.countCards('e')>player.countCards('e')})>0) list.push('令一名装备区里牌数大于你的角色弃置一张装备牌');
+							if(list.length==0) event.finish();
+							else if(list.length<2){
+								if(game.countPlayer(function(current){return current.countCards('h')>player.countCards('h')})>0) event._result={index:0};
+								else event._result={index:1};
+							}
+							else{
+							player.chooseControl().set('ai',function(){
+								if(game.hasPlayer(function(current){
+									return current.countCards('h')>player.countCards('h')&&get.attitude(player,current)<0
+								})) return 0;
+								return 1;
+							}).set('choiceList',list);
+							}
+							'step 1'
+							if(result.index==0){
+								event.control='令一名手牌数大于你的角色交给你一张牌';
+								player.chooseTarget(function(card,player,target){
+									return target.countCards('h')>player.countCards('h')&&target!=player;
+								},'请选择【飞军】的目标').ai=function(target){
+									return -get.attitude(player,target)
+								};
+							}else{
+								event.control='令一名装备区里牌数大于你的角色弃置一张装备牌';
+								player.chooseTarget(function(card,player,target){
+									return target.countCards('e')>player.countCards('e')&&target!=player;
+								},'请选择【飞军】的目标').ai=function(target){
+									return -get.attitude(player,target)
+								};
+							};
+							'step 2'
+							if(result.bool){
+								event.target=result.targets[0];
+								if(player.hasSkill('nzry_binglve')&&!player.storage.nzry_feijun.contains(event.target)){
+									player.draw(2);
+									player.storage.nzry_feijun.push(event.target);
+									player.syncStorage('nzry_feijun');
+									player.logSkill('nzry_binglve');
+								};
+								player.line(event.target);
+								if(event.control=='令一名手牌数大于你的角色交给你一张牌'){
+									event.target.chooseCard(1,'h',true).set('ai',function(card){
+										return 6-get.value(card);
+									});
+								}else{
+									event.target.chooseToDiscard(1,'e',true);
+									event.finish();
+								};
+							}else{
+								event.finish();
+							};
+							'step 3'
+							if(result.bool){
+								event.target.$give(result.cards.length,player);
+								player.gain(result.cards,event.target);
+							};
+						},
+						ai:{
+							order:11,
+							result:{
+								player:function (player){
+									if(game.countPlayer(function(current){return (current.countCards('h')>player.countCards('h')||current.countCards('e')>player.countCards('e'))&&get.attitude(player,current)<0&&!player.storage.nzry_feijun.contains(current)})>0||game.countPlayer(function(current){return current.countCards('h')>player.countCards('h')&&get.attitude(player,current)<0})>0||(player.countCards('h')>=2&&game.countPlayer(function(current){return current.countCards('e')>player.countCards('e')&&get.attitude(player,current)<0})>0)) return 1;
+								},
+							},
+						},
+					},
 					"nzry_binglve":{},
 					"nzry_huaiju":{
 						marktext:"橘",
@@ -1268,47 +1255,47 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					"nzry_yili":{
 						audio:2,
-                trigger:{
-                    player:"phaseUseBegin",
-                },
-                direct:true,
-                content:function (){
-        'step 0'
-        player.chooseTarget(get.prompt('nzry_yili'),function(card,player,target){
-            return target!=player
-        }).ai=function(target){
-            if(player.storage.nzry_huaiju>1) return get.attitude(player,target);
-            return -1;
-        };
-        'step 1'
-        if(result.bool){
-            event.target=result.targets[0];
-            if(player.storage.nzry_huaiju>0){
-             player.chooseControl().set('choiceList',['流失一点体力','移去一个“橘”']).set('ai',function(){
-                 return 1;
-             });
-            }
-            else event._result={index:0};
-        }else{
-            event.finish();
-        };
-        'step 2'
-        if(result.index==1){
-            player.storage.nzry_huaiju--;
-            player.syncStorage('nzry_huaiju');
-            if(player.storage.nzry_huaiju<=0) player.unmarkSkill('nzry_huaiju');
-            game.log(player,'移去了1个“橘”');
-        }else{
-            player.loseHp();
-        };
-        player.line(event.target);
-        player.logSkill('nzry_huaiju');
-        if(event.target.storage.nzry_huaiju==undefined) event.target.storage.nzry_huaiju=0;
-        event.target.markSkill('nzry_huaiju');
-        event.target.storage.nzry_huaiju++;
-        event.target.syncStorage('nzry_huaiju');
-        game.log(event.target,'获得了1个“橘”');
-    },
+						trigger:{
+							player:"phaseUseBegin",
+						},
+						direct:true,
+						content:function (){
+							'step 0'
+							player.chooseTarget(get.prompt('nzry_yili'),function(card,player,target){
+								return target!=player
+							}).ai=function(target){
+								if(player.storage.nzry_huaiju>1) return get.attitude(player,target);
+								return -1;
+							};
+							'step 1'
+							if(result.bool){
+								event.target=result.targets[0];
+								if(player.storage.nzry_huaiju>0){
+									player.chooseControl().set('choiceList',['流失一点体力','移去一个“橘”']).set('ai',function(){
+										return 1;
+									});
+								}
+								else event._result={index:0};
+							}else{
+								event.finish();
+							};
+							'step 2'
+							if(result.index==1){
+								player.storage.nzry_huaiju--;
+								player.syncStorage('nzry_huaiju');
+								if(player.storage.nzry_huaiju<=0) player.unmarkSkill('nzry_huaiju');
+								game.log(player,'移去了1个“橘”');
+							}else{
+								player.loseHp();
+							};
+							player.line(event.target);
+							player.logSkill('nzry_huaiju');
+							if(event.target.storage.nzry_huaiju==undefined) event.target.storage.nzry_huaiju=0;
+							event.target.markSkill('nzry_huaiju');
+							event.target.storage.nzry_huaiju++;
+							event.target.syncStorage('nzry_huaiju');
+							game.log(event.target,'获得了1个“橘”');
+						},
 					},
 					"nzry_zhenglun":{
 						audio:2,
@@ -1331,70 +1318,70 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},	
 					},
 					"nzry_kuizhu":{
-                audio:2,
-                trigger:{
-                    player:"phaseDiscardAfter",
-                },
-                direct:true,
-                filter:function (event,player){
-        return event.num>0;
-    },
-                content:function (){
-        'step 0'
-        event.str1='令至多'+trigger.num+'名角色摸一张牌';
-        event.str2='对任意名体力值之和为'+trigger.num+'的角色造成一点伤害';
-        player.chooseControl().set('ai',function(){
-            if(game.countPlayer(function(current){return get.attitude(player,current)<0&&current.hp==trigger.num})>0&&trigger.num<=3) return 1;
-            return 0;
-        }).set('choiceList',[event.str1,event.str2]);
-        'step 1'
-        event.control=[event.str1,event.str2][result.index];
-        'step 2'
-        var str='请选择【溃诛】的目标';
-        if(event.bool==false) str='所选目标体力之和不足'+trigger.num+'，请重选';
-        if(event.control==event.str2){
-            player.chooseTarget(str,[1,Infinity],function(card,player,target){
-                var targets=ui.selected.targets;
-                var num=0;
-                for(var i=0;i<targets.length;i++){
-                    num+=targets[i].hp;
-                };
-                return num+target.hp<=trigger.num;
-            }).ai=function(target){
-                if(ui.selected.targets[0]!=undefined) return -1;
-                return get.attitude(player,target)<0;
-            };
-        }else{
-            player.chooseTarget('请选择【溃诛】的目标',[1,trigger.num]).ai=function(target){
-                return get.attitude(player,target);
-            };
-        };
-        'step 3'
-        if(result.bool){
-            var targets=result.targets;
-            if(event.control==event.str1){
-                player.line(targets);
-                player.logSkill('nzry_kuizhu',targets);
-                game.asyncDraw(targets);
-            }else{
-                var num=0;
-                for(var i=0;i<targets.length;i++){
-                    num+=targets[i].hp;
-                };
-                if(num<trigger.num){
-                    event.bool=false;
-                    event.goto(2);
-                }else{
-                    player.line(targets);
-                    player.logSkill('nzry_kuizhu');
-                    for(var i=0;i<targets.length;i++){
-                        targets[i].damage();
-                    };
-                    if(targets.length>=2) player.damage();
-                };
-            };
-        };
-    },
+						audio:2,
+						trigger:{
+							player:"phaseDiscardAfter",
+						},
+						direct:true,
+						filter:function (event,player){
+							return event.num>0;
+						},
+						content:function (){
+							'step 0'
+							event.str1='令至多'+trigger.num+'名角色摸一张牌';
+							event.str2='对任意名体力值之和为'+trigger.num+'的角色造成一点伤害';
+							player.chooseControl().set('ai',function(){
+								if(game.countPlayer(function(current){return get.attitude(player,current)<0&&current.hp==trigger.num})>0&&trigger.num<=3) return 1;
+								return 0;
+							}).set('choiceList',[event.str1,event.str2]);
+							'step 1'
+							event.control=[event.str1,event.str2][result.index];
+							'step 2'
+							var str='请选择【溃诛】的目标';
+							if(event.bool==false) str='所选目标体力之和不足'+trigger.num+'，请重选';
+							if(event.control==event.str2){
+								player.chooseTarget(str,[1,Infinity],function(card,player,target){
+									var targets=ui.selected.targets;
+									var num=0;
+									for(var i=0;i<targets.length;i++){
+										num+=targets[i].hp;
+									};
+									return num+target.hp<=trigger.num;
+								}).ai=function(target){
+									if(ui.selected.targets[0]!=undefined) return -1;
+									return get.attitude(player,target)<0;
+								};
+							}else{
+								player.chooseTarget('请选择【溃诛】的目标',[1,trigger.num]).ai=function(target){
+									return get.attitude(player,target);
+								};
+							};
+							'step 3'
+							if(result.bool){
+								var targets=result.targets;
+								if(event.control==event.str1){
+									player.line(targets);
+									player.logSkill('nzry_kuizhu',targets);
+									game.asyncDraw(targets);
+								}else{
+									var num=0;
+									for(var i=0;i<targets.length;i++){
+										num+=targets[i].hp;
+									};
+									if(num<trigger.num){
+										event.bool=false;
+										event.goto(2);
+									}else{
+										player.line(targets);
+										player.logSkill('nzry_kuizhu');
+										for(var i=0;i<targets.length;i++){
+											targets[i].damage();
+										};
+										if(targets.length>=2) player.damage();
+									};
+								};
+							};
+						},
 					},
 					"nzry_zhizheng":{
 						audio:2,
@@ -1502,10 +1489,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.logSkill('nzry_lijun1',zhu);
 							var list=[];
 							for(var i=0;i<trigger.cards.length;i++){
-							if(get.position(trigger.cards[i])=='d'){
-								list.push(trigger.cards[i]);
+								if(get.position(trigger.cards[i])=='d'){
+									list.push(trigger.cards[i]);
+								}
 							}
-						}
 							player.give(list,zhu);
 							zhu.chooseBool().set('ai',function(){
 								if(get.attitude(zhu,player)>0) return true;
@@ -1580,14 +1567,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"nzry_shicai":{
 						group:["nzry_shicai_1","nzry_shicai_2","nzry_shicai_3"],
 						ai:{
-					effect:{
-						target:function(card,player,target){
-							if(get.type(card)=='equip'&&!player.storage.nzry_shicai.contains('equip')&&get.equipResult(player,target,card.name)<=0) return [1,3];
-							if(card.name=='shandian'&&!player.storage.nzry_shicai.contains('trick')) return [1,3];
+							effect:{
+								target:function(card,player,target){
+									if(get.type(card)=='equip'&&!player.storage.nzry_shicai.contains('equip')&&get.equipResult(player,target,card.name)<=0) return [1,3];
+									if(card.name=='shandian'&&!player.storage.nzry_shicai.contains('trick')) return [1,3];
+								},
+							},
+							threaten:2.4,
 						},
-					},
-					threaten:2.4,
-				},
 						subSkill:{
 							"1":{
 								trigger:{
@@ -1795,7 +1782,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 						},
 					},
-					
 					'nzry_jianxiang':{
 						audio:2,
 						trigger:{
@@ -6365,7 +6351,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_fuyin":"父荫",
 			"xinfu_fuyin_info":"锁定技，你每回合第一次成为【杀】或【决斗】的目标后，若你的手牌数小于等于该角色，此牌对你无效。",
 			"drlt_wanglie":"往烈",
-			"drlt_wanglie_info":"出牌阶段，你使用的第一张牌无距离限制，你可以令此牌不能被响应，若如此做，本回合内你不能再使用牌",
+			"drlt_wanglie_info":"出牌阶段，你使用的第一张牌无距离限制；当你于回合内使用牌时，你可以令此牌不能被响应，若如此做，本回合内你不能再使用牌",
 			"drlt_xiongluan":"雄乱",
 			"drlt_xiongluan_info":"限定技，出牌阶段，你可以废除你的判定区和装备区，然后指定一名其他角色。直到回合结束，你对其使用牌无距离和次数限制，其不能使用和打出手牌",
 			"drlt_congjian":"从谏",

@@ -84,7 +84,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     return 18-get.value(event.card)-player.maxHp*2;
                 },
                 filter:function (event,player){
-                    if(_status.currentPhase!=player) return false;
+                    if(!player.isPhaseUsing()) return false;
                     if(event.cards){
                         if(get.type(event.card)!='trick') return false;
                         for(var i=0;i<event.cards.length;i++){
@@ -111,7 +111,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     player:"useCardAfter",
                 },
                 filter:function (event,player){
-                    if(_status.currentPhase!=player) return false;
+                    if(!player.isPhaseUsing()) return false;
                     if(get.type(event.card)==undefined) return false;
                     return (event.targets&&event.targets.length==1);
                 },
@@ -1104,7 +1104,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 },
                 direct:true,
                 filter:function (event,player){
-					if(_status.currentPhase!=player) return false;
+					if(!player.isPhaseUsing()) return false;
 					if(!['basic','trick'].contains(get.type(event.card))) return false;
 					if(get.tag(event.card,'damage')) return true;
 					return false;
@@ -2624,7 +2624,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.getParent().name=='draw'&&event.getParent(2).name!='xinfu_zhanji';
 				},
                 content:function (){
-					player.draw();
+					player.draw(false);
 				},
             },
             "xinfu_songsang":{
@@ -3431,7 +3431,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						if(bool) stat.skill[i]=0;
 					}
-					''
+					'step 3'
 					trigger.player.phaseUse();
 				},
                 group:["xinfu_guanwei_count","xinfu_guanwei_clear"],
@@ -5578,9 +5578,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_langxi":"狼袭",
             "xinfu_langxi_info":"准备阶段，你可以对一名体力小于或等于你的其他角色造成0～2点随机伤害。",
             "xinfu_yisuan":"亦算",
-            "xinfu_yisuan_info":"每回合限一次。当你于回合内使用的锦囊牌进入弃牌堆时，你可以减1点体力上限，从弃牌堆中获得之。",
+            "xinfu_yisuan_info":"每回合限一次。当你于出牌阶段使用的锦囊牌进入弃牌堆时，你可以减1点体力上限，从弃牌堆中获得之。",
             "xinfu_xingluan":"兴乱",
-            "xinfu_xingluan_info":"每回合限一次。当你于回合内使用的仅指定一个目标的牌结算完成后，你可以从牌堆中随机获得一张点数为6的牌。",
+            "xinfu_xingluan_info":"每回合限一次。当你于出牌阶段使用的仅指定一个目标的牌结算完成后，你可以从牌堆中随机获得一张点数为6的牌。",
             "xinfu_lveming":"掠命",
             "xinfu_lveming_info":"出牌阶段限一次，你可以选择一名装备区装备比你少的角色，令其选择一个点数，然后你进行判定：<br>若点数相同，你对其造成2点伤害；<br>若点数不同，则你随机获得其区域内的一张牌。",
             "xinfu_tunjun":"屯军",
@@ -5628,7 +5628,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             "xinfu_lianpian_info":"出牌阶段限三次。当你对一名角色连续使用牌时，你可以摸一张牌，然后可以将一张牌交给该角色。",
 			
             "xinfu_lingren":"凌人",
-            "xinfu_lingren_info":"出牌阶段限一次。当你使用带有“伤害”这一标签的基本牌或普通锦囊牌指定目标后，你可以猜测其中的一个目标的手牌中是否有基本牌，锦囊牌或装备牌。若你猜中的项目数：≥1，此牌对该角色的伤害+1；≥2，你摸两张牌；≥3，你获得技能〖奸雄〗(新界)和〖行殇〗直到下回合开始。",
+            "xinfu_lingren_info":"每回合限一次。当你于出牌阶段使用带有“伤害”这一标签的基本牌或普通锦囊牌指定目标后，你可以猜测其中的一个目标的手牌中是否有基本牌，锦囊牌或装备牌。若你猜中的项目数：≥1，此牌对该角色的伤害+1；≥2，你摸两张牌；≥3，你获得技能〖奸雄〗(新界)和〖行殇〗直到下回合开始。",
             "lingren_adddamage":"凌人",
             "lingren_adddamage_info":"",
             "lingren_jianxiong":"奸雄",

@@ -1,27 +1,20 @@
 window.noname_update={
-	version:'1.9.88.3',
-	update:'1.9.88.2',
+	version:'1.9.88.4',
+	update:'1.9.88.3',
 	changeLog:[
 		'修复BUG',
-		'轩辕剑，古剑奇谭部分技能调整',
+		'昆特牌，古剑奇谭部分技能调整',
 	],
 	files:[
-		//'card/sp.js',
-		//'card/extra.js',
-		//'card/standard.js',
-		//'character/extra.js',
-		'character/old.js',
-		'character/yxs.js',
-		//'character/refresh.js',
-		'card/swd.js',
 		'character/gujian.js',
+		'character/gwent.js',
 		'character/shenhua.js',
-		//'character/sp.js',
+		'character/sp.js',
 		//'character/standard.js',
 		'character/xinghuoliaoyuan.js',
 		'character/yijiang.js',
 		//'game/asset.js',
-		//'game/game.js',
+		'game/game.js',
 		//'game/package.js'
 	]
 };

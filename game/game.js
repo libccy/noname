@@ -13009,7 +13009,8 @@
 					}
 					if(event.log!=false){
 						if(num>0){
-							game.log(player,'摸了'+get.cnNumber(num)+'张牌');
+							if(event.bottom) game.log(player,'从牌堆底摸了'+get.cnNumber(num)+'张牌');
+							else game.log(player,'摸了'+get.cnNumber(num)+'张牌');
 						}
 						if(event.drawDeck){
 							game.log(player,'从牌库中获得了'+get.cnNumber(event.drawDeck)+'张牌');
@@ -13029,7 +13030,8 @@
 					if(event.animate!=false){
 						if(event.visible){
 							player.gain(cards,'gain2');
-							game.log(player,'摸了'+get.cnNumber(num)+'张牌（',cards,'）');
+							if(event.bottom) game.log(player,'从牌堆底摸了'+get.cnNumber(num)+'张牌（',cards,'）');
+							else game.log(player,'摸了'+get.cnNumber(num)+'张牌（',cards,'）');
 						}
 						else{
 							player.gain(cards,'draw');
@@ -14195,6 +14197,10 @@
 			},
 			player:{
 				//新函数
+				isPhaseUsing:function(notmeisok){
+					if(!notmeisok&&_status.currentPhase!=this) return false;
+					return _status.event.name=='phaseUse'||_status.event.getParent('phaseUse').name=='phaseUse';
+				},
 				swapEquip:function(target){
 					var next=game.createEvent('swapEquip');
 					next.player=this;
@@ -23993,6 +23999,13 @@
 		group:['wei','shu','wu','qun','shen'],
 		nature:['fire','thunder','poison'],
 		linked:['fire','thunder'],
+		groupnature:{
+			shen:'thunder',
+			wei:'water',
+			shu:'soil',
+			wu:'wood',
+			qun:'metal',
+		},
 	};
 	var game={
 		online:false,
@@ -29663,7 +29676,7 @@
 				}
 			});
 		},
-		asyncDraw:function(players,num,drawDeck){
+		asyncDraw:function(players,num,drawDeck,bottom){
 			for(var i=0;i<players.length;i++){
 				var num2=1;
 				if(typeof num=='number'){
@@ -29679,7 +29692,8 @@
 					players[i].draw(num2,false,drawDeck);
 				}
 				else{
-					players[i].draw(num2,false);
+				    if(bottom) players[i].draw(num2,false,'bottom');
+					else players[i].draw(num2,false);
 				}
 				players[i].$draw(num2);
 			}
@@ -44607,15 +44621,8 @@
 			return '暂无武将介绍';
 		},
 		groupnature:function(group,method){
-			var nature;
-			switch(group){
-				case 'shen':nature='thunder';break;
-				case 'wei':nature='water';break;
-				case 'shu':nature='soil';break;
-				case 'wu':nature='wood';break;
-				case 'qun':nature='metal';break;
-				default:return '';
-			}
+			var nature=lib.groupnature[group];
+			if(!nature) return '';
 			if(method=='raw'){
 				return nature;
 			}

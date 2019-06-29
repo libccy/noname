@@ -1449,8 +1449,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					event.list=list;
 					event.num=0;
+					event.total=game.players.length+game.dead.length;
 					'step 1'
-					if(event.list.length&&event.num<game.players.length){
+					if(event.list.length&&event.num<event.total&&trigger.player.isAlive()){
 						event.num++;
 						player.useCard(event.list.shift(),trigger.player);
 						event.redo();
@@ -1459,6 +1460,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var cards=get.cards(ui.cardPile.childElementCount+1);
 					for(var i=0;i<cards.length;i++){
 						ui.cardPile.insertBefore(cards[i],ui.cardPile.childNodes[get.rand(ui.cardPile.childElementCount)]);
+					}
+					for(var i=0;i<event.list.length;i++){
+						ui.cardPile.insertBefore(event.list[i],ui.cardPile.childNodes[get.rand(ui.cardPile.childElementCount)]);
 					}
 				},
 				ai:{
@@ -1487,7 +1491,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var list=game.filterPlayer(function(current){
 						return current.hasSkill('wengua');
 					});
-					var str='将一张手牌交给'+get.translation(list);
+					var str='将一张牌交给'+get.translation(list);
 					if(list.length>1) str+='中的一人';
 					return str;
 				},
@@ -1535,7 +1539,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					"step 3"
-					if(event.target.getCards('h').contains(event.card)){
+					if(event.target.getCards('he').contains(event.card)){
 						event.target.chooseControlList('问卦','将'+get.translation(event.card)+'置于牌堆顶','将'+get.translation(event.card)+'置于牌堆底',event.target==player,function(){
 						    if(get.attitude(event.target,player)<0) return 2;
 							return 1;
@@ -1567,8 +1571,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.draw();
 						}
 						else{
-						    player.draw();
-							target.draw();
+						    game.asyncDraw([player,target],null,null);
 						}
 					}
 					else if(event.index==0){
@@ -1578,8 +1581,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.draw('bottom');
 						}
 						else{
-							player.draw('bottom');
-							target.draw('bottom');
+							game.asyncDraw([player,target],null,null,true);
 						}
 					}
 				},
@@ -4173,7 +4175,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.phaseUse();
 					'step 1'
-					player.getStat().card={};
+					var stat=player.getStat();
+					stat.card={};
+					for(var i in stat.skill){
+						var bool=false;
+						var info=lib.skill[i];
+						if(info.enable!=undefined){
+							if(typeof info.enable=='string'&&info.enable=='phaseUse') bool=true;
+							else if(typeof info.enable=='object'&&info.enable.contains('phaseUse')) bool=true;
+						}
+						if(bool) stat.skill[i]=0;
+					}
 				}
 			},
 			longyin:{
@@ -5636,7 +5648,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'shaBegin'},
 				direct:true,
 				filter:function(event,player){
-					return event.target.hp>0&&event.target.countCards('he')>0;
+					return player.isPhaseUsing()&&event.target.hp>0&&event.target.countCards('he')>0;
 				},
 				audio:2,
 				logTarget:'target',

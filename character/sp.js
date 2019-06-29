@@ -2210,6 +2210,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					discard2:{
 						trigger:{global:'phaseAfter'},
+						audio:2,
 						forced:true,
 						filter:function(event,player){
 							if(_status.currentPhase!=player&&player.storage.zishu){
@@ -2244,13 +2245,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					draw:{
 						trigger:{player:'gainAfter'},
+						audio:2,
 						forced:true,
 						filter:function(event,player){
 							if(_status.currentPhase!=player) return false;
 							return event.getParent(2).name!='zishu_draw';
 						},
 						content:function(){
-							player.draw();
+							player.draw(false);
 						}
 					}
 				},
@@ -2261,6 +2263,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['zishu_draw','zishu_discard','zishu_discard2','zishu_discard3']
 			},
 			yingyuan:{
+			    audio:2,
 				trigger:{player:'useCardAfter'},
 				direct:true,
 				filter:function(event,player){
@@ -8247,7 +8250,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['shaBegin','juedouBegin']},
 				filter:function(event,player){
 					if(player.hasSkill('fengpo3')) return false;
-					return event.target&&event.targets&&event.targets.length==1;
+					return player.isPhaseUsing()&&event.target&&event.targets&&event.targets.length==1;
 				},
 				direct:true,
 				content:function(){
