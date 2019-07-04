@@ -2,7 +2,6 @@
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'extra',
-		connect:true,
 		character:{
 			shen_guanyu:['male','shen',5,['new_wuhun','wushen'],['shu']],
 			shen_zhaoyun:['male','shen',2,['xinjuejing','xinlonghun'],['shu']],
@@ -110,7 +109,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 },
             },
             "new_guixin":{
-                audio:"ext:无名扩展:2",
+                audio:"guixin",
                 trigger:{
                     player:"damageEnd",
                 },
@@ -2152,7 +2151,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						check:function(event,player){
 							var list=[];
-							var skills=trigger.player.skills.slice(0);
+							var skills=event.player.skills.slice(0);
 							for(var i=0;i<skills.length;i++){
 							 var info=get.info(skills[i])
 								if(info!=undefined&&!info.charlotte&&(!info.unique||info.gainable)) list.push(skills[i]);
