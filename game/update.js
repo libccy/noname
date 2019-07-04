@@ -1,18 +1,14 @@
 window.noname_update={
-	version:'1.9.88.4',
-	update:'1.9.88.3',
+	version:'1.9.89',
+	update:'1.9.88.4',
 	changeLog:[
-		'修复BUG',
-		'昆特牌，古剑奇谭部分技能调整',
+		'神武将开放联机使用',
+		'国战武将独立皮肤',
+		'新国战（请在更新后关闭相关扩展，避免产生冲突）',
 	],
 	files:[
-		'character/gujian.js',
-		'character/gwent.js',
-		'character/shenhua.js',
-		'character/sp.js',
-		//'character/standard.js',
-		'character/xinghuoliaoyuan.js',
-		'character/yijiang.js',
+		'character/extra.js',
+		'mode/guozhan.js',
 		//'game/asset.js',
 		'game/game.js',
 		//'game/package.js'

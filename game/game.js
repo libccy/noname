@@ -4482,22 +4482,31 @@
 						restart:true,
 					},
 					connect_initshow_draw:{
-						name:'首亮摸牌',
+						name:'首亮奖励',
 						item:{
-							'0':'关闭',
-							'1':'一张',
-							'2':'两张',
-							'3':'三张',
+							'off':'关闭',
+							'draw':'摸牌',
+							'mark':'标记',
 						},
-						init:'2',
+						init:'mark',
 						frequent:true,
-						intro:'第一个明置身份牌的角色可获得摸牌奖励'
+						intro:'第一个明置武将牌的角色可获得首亮奖励'
+					},
+					connect_aozhan:{
+					    name:'鏖战模式',
+					    init:true,
+					    intro:'若开启此选项，则将在游戏中引入“鏖战模式”的规则：<br>当游戏中仅剩四名或更少角色时（七人以下游戏时改为三名或更少），若此时全场没有超过一名势力相同的角色，则从一个新的回合开始，游戏进入鏖战模式直至游戏结束。<br>◇在鏖战模式下，【桃】只能当做【杀】或【闪】使用或打出，不能用来回复体力。<br>注：进入鏖战模式后，即使之后有两名或者更多势力相同的角色出现，仍然不会取消鏖战模式。',
+					},
+					connect_viewnext:{
+					    name:'观看下家副将',
+					    init:false,
+					    intro:'若开启此选项，所有的玩家将在挑选武将后，分发起始手牌之前，分别观看自己下家的副将。',
 					},
 					connect_zhulian:{
 						name:'珠联璧合',
 						init:true,
 						// frequent:true,
-						intro:'主将和副将都明置后，若为特定组合，可摸两张牌或回复一点体力'
+						intro:'主将和副将都明置后，若为特定组合，可获得【珠联璧合】标记'
 					},
 					connect_guozhanpile:{
 						name:'使用国战牌堆',
@@ -4563,22 +4572,44 @@
 						restart:true,
 					},
 					initshow_draw:{
-						name:'首亮摸牌',
+						name:'首亮奖励',
 						item:{
-							'0':'关闭',
-							'1':'一张',
-							'2':'两张',
-							'3':'三张',
+							'off':'关闭',
+							'draw':'摸牌',
+							'mark':'标记',
 						},
-						init:'2',
+						init:'mark',
 						frequent:true,
 						intro:'第一个明置身份牌的角色可获得摸牌奖励'
+					},
+					aozhan:{
+					    name:'鏖战模式',
+					    init:true,
+					    intro:'若开启此选项，则将在游戏中引入“鏖战模式”的规则：<br>当游戏中仅剩四名或更少角色时（七人以下游戏时改为三名或更少），若此时全场没有超过一名势力相同的角色，则从一个新的回合开始，游戏进入鏖战模式直至游戏结束。<br>◇在鏖战模式下，【桃】只能当做【杀】或【闪】使用或打出，不能用来回复体力。<br>注：进入鏖战模式后，即使之后有两名或者更多势力相同的角色出现，仍然不会取消鏖战模式。',
+					},
+					viewnext:{
+					    name:'观看下家副将',
+					    init:false,
+					    intro:'若开启此选项，所有的玩家将在挑选武将后，分发起始手牌之前，分别观看自己下家的副将。',
+					},
+					aozhan_bgm:{
+					    name:'鏖战背景音乐',
+					    item:{
+					        disabled:'不启用',
+					        online:'Online',
+					        chaoming:'潮鸣',
+					    },
+					    init:'chaoming',
+					    onclick:function(item){
+					        game.saveConfig('aozhan_bgm',item,this._link.config.mode);
+					        if(_status._aozhan==true) game.playBackgroundMusic();
+					    },
 					},
 					zhulian:{
 						name:'珠联璧合',
 						init:true,
 						// frequent:true,
-						intro:'主将和副将都明置后，若为特定组合，可摸两张牌或回复一点体力'
+						intro:'主将和副将都明置后，若为特定组合，可获得【珠联璧合】标记'
 					},
 					guozhanpile:{
 						name:'使用国战牌堆',
@@ -4592,6 +4623,13 @@
 						frequent:true,
 						restart:true,
 						intro:'开启武将技能将替换为国战版本并禁用非国战武将'
+					},
+					guozhanSkin:{
+						name:'使用国战皮肤',
+						init:true,
+						frequent:true,
+						restart:true,
+						intro:'开启此选项后，将会把有国战专属皮肤的武将替换为国战皮肤'
 					},
 					junzhu:{
 						name:'替换君主',
@@ -6013,7 +6051,7 @@
 									if(name.indexOf('gz_shibing')==0){
 										name=name.slice(3,11);
 									}
-									else{
+									else if(!get.config('guozhanSkin')||!lib.character[name]||!lib.character[name][4].contains('gzskin')){
 										name=name.slice(3);
 									}
 								}
@@ -24677,6 +24715,10 @@
 			if(lib.config.background_music=='music_off'){
 				ui.backgroundMusic.src='';
 			}
+			else if(get.mode()=='guozhan'&&_status._aozhan==true&&get.config('aozhan_bgm')!='disabled'){
+			    var aozhan=get.config('aozhan_bgm');
+			    ui.backgroundMusic.src=lib.assetURL+'audio/background/aozhan_'+aozhan+'.mp3';
+			}
 			else{
 				var music=lib.config.background_music;
 				if(music=='music_random'){
@@ -43083,8 +43125,11 @@
 				}).setBackground(name,'character');
 				var changeskinfunc=null;
 				var nameskin=name;
+				var nameskin2=name;
+				var gzbool=false;
 				if(nameskin.indexOf('gz_')==0){
 					nameskin=nameskin.slice(3);
+					gzbool=true;
 				}
 				var changeskin=function(){
 					var node=ui.create.div('.changeskin','可换肤',playerbg);
@@ -43115,9 +43160,16 @@
 									}
 									else{
 										delete lib.config.skin[nameskin];
-										bg.setBackground(nameskin,'character');
-										if(sourcenode) sourcenode.setBackground(nameskin,'character');
-										if(avatar) avatar.setBackground(nameskin,'character');
+										if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&get.config('guozhanSkin')){
+										    bg.setBackground(nameskin2,'character');
+										    if(sourcenode) sourcenode.setBackground(nameskin2,'character');
+									    	if(avatar) avatar.setBackground(nameskin2,'character');
+										}
+										else{
+										    bg.setBackground(nameskin,'character');
+									    	if(sourcenode) sourcenode.setBackground(nameskin,'character');
+								    		if(avatar) avatar.setBackground(nameskin,'character');
+										}
 										game.saveConfig('skin',lib.config.skin);
 									}
 								});
@@ -43126,7 +43178,8 @@
 									button.setBackgroundImage('image/skin/'+nameskin+'/'+i+'.jpg');
 								}
 								else{
-									button.setBackground(nameskin,'character','noskin');
+									if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&get.config('guozhanSkin')) button.setBackground(nameskin2,'character','noskin');
+									else button.setBackground(nameskin,'character','noskin');
 								}
 							}
 						};
@@ -46753,8 +46806,11 @@
 							var buttons=ui.create.div('.buttons.smallzoom.scrollbuttons');
 							lib.setMousewheel(buttons);
 							var nameskin=(avatar2?node.name2:node.name);
+							var nameskin2=nameskin;
+							var gzbool=false;
 							if(nameskin.indexOf('gz_')==0){
 								nameskin=nameskin.slice(3);
+								gzbool=true;
 							}
 							for(var i=0;i<=num;i++){
 								var button=ui.create.div('.button.character.pointerdiv',buttons,function(){
@@ -46769,13 +46825,14 @@
 										}
 									}
 									else{
+										delete lib.config.skin[nameskin];
 										if(avatar2){
-											delete lib.config.skin[nameskin];
-											node.node.avatar2.setBackground(nameskin,'character');
+											if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&get.config('guozhanSkin')) node.node.avatar2.setBackground(nameskin2,'character');
+											else node.node.avatar2.setBackground(nameskin,'character');
 										}
 										else{
-											delete lib.config.skin[nameskin];
-											node.node.avatar.setBackground(nameskin,'character');
+											if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&get.config('guozhanSkin')) node.node.avatar.setBackground(nameskin2,'character');
+											else node.node.avatar.setBackground(nameskin,'character');
 										}
 									}
 									game.saveConfig('skin',lib.config.skin);
@@ -46785,7 +46842,8 @@
 									button.setBackgroundImage('image/skin/'+nameskin+'/'+i+'.jpg');
 								}
 								else{
-									button.setBackground(nameskin,'character','noskin');
+									if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&get.config('guozhanSkin')) button.setBackground(nameskin2,'character','noskin');
+									else button.setBackground(nameskin,'character','noskin');
 								}
 							}
 							uiintro.add(buttons);
@@ -46809,8 +46867,11 @@
 								}
 							}
 							var nameskin=(avatar2?node.name2:node.name);
+							var nameskin2=nameskin;
+							var gzbool=false;
 							if(nameskin.indexOf('gz_')==0){
 								nameskin=nameskin.slice(3);
+								gzbool=true;
 							}
 							img.src=lib.assetURL+'image/skin/'+nameskin+'/'+num+'.jpg';
 						}
@@ -47238,8 +47299,11 @@
 						var num=1;
 						var introadded=false;
 						var nameskin=node.link;
+						var nameskin2=nameskin;
+						var gzbool=false;
 						if(nameskin.indexOf('gz_')==0){
 							nameskin=nameskin.slice(3);
+							gzbool=true;
 						}
 						var createButtons=function(num){
 							if(!num) return;
@@ -47258,7 +47322,8 @@
 									}
 									else{
 										delete lib.config.skin[nameskin];
-										node.setBackground(nameskin,'character');
+										if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&get.config('guozhanSkin')) node.setBackground(nameskin2,'character');
+										else node.setBackground(nameskin,'character');
 										game.saveConfig('skin',lib.config.skin);
 									}
 								});
@@ -47267,7 +47332,8 @@
 									button.setBackgroundImage('image/skin/'+nameskin+'/'+i+'.jpg');
 								}
 								else{
-									button.setBackground(nameskin,'character','noskin');
+									if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&get.config('guozhanSkin')) button.setBackground(nameskin2,'character','noskin');
+									else button.setBackground(nameskin,'character','noskin');
 								}
 							}
 							uiintro.add(buttons);
