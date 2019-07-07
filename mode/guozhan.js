@@ -295,7 +295,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 				gz_re_lidian:['male','wei',3,['xunxun','wangxi']],
 				gz_zangba:['male','wei',4,['hengjiang']],
-				gz_madai:['male','shu',4,['mashu','gzqianxi'],['gzskin']],
+				gz_madai:['male','shu',4,['mashu','qianxi'],['gzskin']],
 				gz_mifuren:['female','shu',3,['gzguixiu','gzcunsi']],
 				gz_sunce:['male','wu',4,['jiang','yingyang','baka_hunshang'],['gzskin']],
 				gz_chendong:['male','wu',4,['duanxie','fenming']],
