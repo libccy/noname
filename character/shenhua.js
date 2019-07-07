@@ -69,6 +69,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunce:['zhouyu','taishici','daqiao'],
 			zuoci:['yuji'],
 			xunyu:['xunyou'],
+			lukang:['luxun'],
+			yuanshu:['jiling'],
+			zhangxiu:['jiaxu'],
+			wangping:['jiangfei'],
 		},
 		characterFilter:{
 			zuoci:function(mode){
@@ -153,7 +157,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						mod:{
 							targetEnabled:function(card,player,target){
-								if(target.storage.disableEquip!=undefined&&target.storage.disableEquip.contains(get.subtype(card))) return false;
+								if(target.isDisabled(get.subtype(card))) return false;
 							},
 						},
 						trigger:{

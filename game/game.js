@@ -4526,7 +4526,7 @@
 						init:true,
 						// frequent:true,
 						restart:true,
-						intro:'开启后将使用国战君主替换原武将牌'
+						intro:'若开启此选项，玩家的第一个回合开始时，若其主武将牌有对应的君主武将牌，则其可以将此武将牌替换为对应的君主武将牌，然后重新调整体力上限。若玩家的体力上限因此增大，则玩家回复等量的体力。'
 					},
 					// connect_ban_weak:{
 					// 	name:'屏蔽弱将',
@@ -4636,7 +4636,7 @@
 						init:true,
 						// frequent:true,
 						restart:true,
-						intro:'开启后将使用国战君主替换原武将牌'
+						intro:'若开启此选项，玩家的第一个回合开始时，若其主武将牌有对应的君主武将牌，则其可以将此武将牌替换为对应的君主武将牌，然后重新调整体力上限。若玩家的体力上限因此增大，则玩家回复等量的体力。'
 					},
 					double_hp:{
 						name:'双将体力上限',
@@ -14314,10 +14314,17 @@
 				},
 				isDisabled:function(arg){
 					if(typeof arg=='number') arg='equip'+arg;
+					if(arg=='equip6'&&this.storage.disableEquip&&(this.storage.disableEquip.contains('equip3')||this.storage.disableEquip.contains('equip3'))) return true;
 					if(this.storage.disableEquip&&this.storage.disableEquip.contains(arg)) return true;
 					return false;
 				},
 				isEmpty:function(num){
+					if(num==6||num=='equip6'){
+					    if(!this.isEmpty(3)||!this.isEmpty(4)) return false;
+					}
+					else if([3,4,'equip3','equip4'].contains(num)){
+					    if(this.getEquip(6)) return false;
+					}
 					return !this.isDisabled(num)&&!this.getEquip(num);
 				},
 				disableJudge:function(){
@@ -19384,7 +19391,10 @@
 					if(get.type(name)=='card'){
 						name=get.equiptype(name);
 					}
-					if(!replace&&this.getEquip(name)) return false;
+					var range=get.subtype(name);
+					if(this.isDisabled(range)) return false;
+					if(['equip3','equip4'].contains(range)&&!this.isEmpty(6)) return false;
+					if(!replace&&!this.isEmpty(range)) return false;
 					return true;
 				},
 				getEquip:function(name){

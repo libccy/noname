@@ -1625,7 +1625,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			qilin_skill:{
 				trigger:{source:'damageBegin'},
 				filter:function(event,player){
-					return event.card&&event.card.name=='sha'&&event.notLink()&&event.player.getCards('e',{subtype:['equip3','equip4']}).length>0
+					return event.card&&event.card.name=='sha'&&event.notLink()&&event.player.getCards('e',{subtype:['equip3','equip4','equip6']}).length>0
 				},
 				direct:true,
 				audio:true,
@@ -1634,7 +1634,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					var att=(get.attitude(player,trigger.player)<=0);
 					var next=player.chooseButton();
 					next.set('att',att);
-					next.set('createDialog',['是否发动【麒麟弓】，弃置'+get.translation(trigger.player)+'的一张坐骑牌？',trigger.player.getCards('e',{subtype:['equip3','equip4']})]);
+					next.set('createDialog',['是否发动【麒麟弓】，弃置'+get.translation(trigger.player)+'的一张坐骑牌？',trigger.player.getCards('e',{subtype:['equip3','equip4','equip6']})]);
 					next.set('ai',function(button){
 						if(_status.event.att) return get.buttonValue(button);
 						return 0;

@@ -176,6 +176,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sundeng:['sunquan'],
 			liru:['dongzhuo'],
 			liuchen:['liushan'],
+			yujin:['xiahoudun'],
+			fazheng:['liubei'],
+			wuguotai:['sunjian'],
 		},
 		skill:{
             zhenjun:{

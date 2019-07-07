@@ -4,6 +4,37 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		name:'guozhan',
 		connect:true,
 		card:{
+			liulongcanjia:{
+				mode:['guozhan'],
+				fullskin:true,
+				type:'equip',
+				subtype:'equip6',
+				nomod:true,
+				nopower:true,
+				unique:true,
+				distance:{
+					globalFrom:-1,
+					globalTo:+1,
+				},
+				onEquip:function(){
+					var cards=player.getCards('e',{subtype:['equip3','equip4']});
+					if(cards.length) player.discard(cards);
+				},
+				skills:['liulongcanjia'],
+				ai:{
+					equipValue:function(card,player){
+						if(player.countCards('e',{subtype:['equip3','equip4']})>1) return 1;
+						if(player.hasSkill('gzzongyu')) return 9;
+						if(game.hasPlayer(function(current){
+							return current.hasSkill('gzzongyu')&&get.attitude(player,current)<=0;
+						}))	return 1;
+						return 7.2;
+					},
+					basic:{
+						equipValue:7.2
+					}
+				},
+			},
 			minguangkai:{
 				mode:['guozhan'],
 				fullskin:true,
@@ -53,7 +84,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				global:'g_feilongduofeng_ai',
 				distance:{attackFrom:-1},
-				skills:['feilongduofeng','feilongduofeng2'],
+				skills:['feilongduofeng','feilongduofeng3'],
 				ai:{
 					equipValue:function(card,player){
 						if(player.hasSkill('zhangwu')) return 9;
@@ -77,7 +108,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				nomod:true,
 				nopower:true,
 				unique:true,
-				global:['g_taipingyaoshu','g_taipingyaoshu_ai'],
+				global:['g_taipingyaoshu_ai'],
 				skills:['taipingyaoshu'],
 				ai:{
 					equipValue:function(card,player){
@@ -95,9 +126,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				onLose:function(){
 					'step 0'
-					player.loseHp();
-					'step 1'
 					player.draw(2);
+					'step 1'
+					player.loseHp();
 				}
 			},
 			yuxi:{
@@ -128,35 +159,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(evt&&evt.name=='phaseUse'){
 						evt.skipped=true;
 					}
-					target.insertEvent('xietianzi',lib.card.xietianzi.content_phase);
-					// target.addSkill('xietianzi');
+					target.addTempSkill('xietianzi');
 				},
-				content_phase:function(){
-					"step 0"
-					player.removeSkill('xietianzi');
-					if(player.countCards('he')>0){
-						player.chooseToDiscard('he','是否弃置一张牌并获得一个额外回合？').set('ai',function(card){
-							return 10-get.value(card);
-						});
-					}
-					else{
-						event.finish();
-					}
-					"step 1"
-					if(result.bool){
-						player.insertPhase();
-					}
-				},
+				
 				ai:{
 					order:0.5,
 					value:4,
 					useful:2,
-					tag:{
-						norepeat:1
-					},
 					result:{
 						target:function(player,target){
-							if(target.countCards('he')>=2) return 1;
+							if(target.countCards('h')>=2) return 1;
 							return 0;
 						}
 					}
@@ -281,11 +293,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					if(target==player){
-						target.draw(targets.length-1);
+                        var num=targets.length-1;
+						target.chooseDrawRecover(num,num,true);
 						event.finish();
 					}
 					else{
-						target.chooseDrawRecover(true);
+						target.draw();
 					}
 					'step 1'
 					target.link(false);
@@ -295,10 +308,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					value:4,
 					useful:2,
 					result:{
-						player:0.8,
-						target:1
-					}
-				}
+						player:1.3,
+						target:1,
+					},
+				},
 			},
 			chiling:{
 				fullskin:true,
@@ -676,6 +689,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			liulongcanjia:{
+			    mod:{
+			        targetEnabled:function(card,player,target){
+			            if(['equip3','equip4'].contains(get.subtype(card))) return false;
+			        },
+			    },
+			},
 			minguangkai_cancel:{
 				trigger:{target:'useCardToBefore'},
 				forced:true,
@@ -913,7 +933,31 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					game.addVideo('setIdentity',trigger.player,event.identity);
 				}
 			},
+			feilongduofeng3:{
+				trigger:{source:'dying'},
+				filter:function(event,player){
+					var evt=event.getParent('damage');
+					return evt&&evt.card&&evt.card.name=='sha'&&event.player.countGainableCards(player,'h')>0;
+				},
+				priority:7,
+				check:function(event,player){
+					return get.attitude(player,event.player)<0;
+				},
+				content:function(){
+					player.gainPlayerCard(trigger.player,true);
+				},
+			},
 			taipingyaoshu:{
+				mod:{
+					maxHandcard:function(player,num){
+						if(player.hasSkill('huangjintianbingfu')){
+							num+=player.storage.huangjintianbingfu.length;
+						}
+						return num+game.countPlayer(function(current){
+							return current.isFriendOf(player);
+						});
+					}
+				},
 				trigger:{player:'damageBefore'},
 				filter:function(event,player){
 					if(event.source&&event.source.hasSkillTag('unequip',false,{
@@ -945,23 +989,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			g_taipingyaoshu:{
-				mod:{
-					maxHandcard:function(player,num){
-						var source=game.findPlayer(function(current){
-							return current.hasSkill('taipingyaoshu')&&current.isFriendOf(player);
-						});
-						if(source){
-							if(source.hasSkill('huangjintianbingfu')){
-								num+=source.storage.huangjintianbingfu.length;
-							}
-							return num+game.countPlayer(function(current){
-								return current.isFriendOf(source);
-							});
-						}
-					}
-				},
-			},
+			g_taipingyaoshu:{},
 			yuxi_skill:{
 				trigger:{player:'phaseDrawBegin'},
 				forced:true,
@@ -1000,25 +1028,20 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xietianzi:{
-				trigger:{player:'phaseAfter'},
-				filter:function(event,player){
-					return player.hasSkill('xietianzi');
-				},
-				toself:true,
 				forced:true,
 				popup:false,
-				priority:-50,
+				filter:function(event,player){
+					return player.countCards('h')>0;
+				},
+				trigger:{
+					player:'phaseDiscardAfter',
+				},
 				content:function(){
 					"step 0"
 					player.removeSkill('xietianzi');
-					if(player.countCards('he')>0){
-						player.chooseToDiscard('he','是否弃置一张牌并获得一个额外回合？').set('ai',function(card){
-							return 10-get.value(card);
-						});
-					}
-					else{
-						event.finish();
-					}
+					player.chooseToDiscard('h','是否弃置一张手牌并获得一个额外回合？').set('ai',function(card){
+						return 10-get.value(card);
+					});
 					"step 1"
 					if(result.bool){
 						player.insertPhase();
@@ -1125,18 +1148,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					event.goto(1);
 				}
 			},
-			g_diaohulishan:{
-				trigger:{player:'useCardAfter'},
+			g_diaohulishan:{},
+			diaohulishan:{
+				trigger:{player:['damageBefore','loseHpBefore','recoverBefore']},
 				forced:true,
 				popup:false,
-				filter:function(event,player){
-					return event.card.name=='diaohulishan';
-				},
 				content:function(){
-					player.draw();
-				}
-			},
-			diaohulishan:{
+					trigger.cancel();
+				},
 				mod:{
 					cardEnabled:function(){
 						return false;
@@ -1146,13 +1165,20 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					targetEnabled:function(){
 						return false;
-					}
+					},
 				},
 				mark:true,
 				intro:{
-					content:'不计入距离的计算且不能使用牌且不是牌的合法目标'
+					content:'不计入距离的计算且不能使用牌且不是牌的合法目标且不能失去/回复体力和受到伤害'
 				},
-				group:'undist'
+				group:'undist',
+				ai:{
+					effect:{
+						target:function (card,player,target){
+							if(get.tag(card,'recover')||get.tag(card,'damage')) return 'zeroplayertarget';
+						},
+					},
+				},
 			},
 			huxinjing:{
 				trigger:{player:'damageBefore'},
@@ -1239,6 +1265,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		translate:{
+			
+			equip6:'坐骑',
+			liulongcanjia:'六龙骖驾',
+			liulongcanjia_info:'锁定技，你计算与其他角色的距离+1，其他角色计算与你的距离-1。</br>锁定技，当此牌进入你的装备区时，你弃置你装备区内其他坐骑牌；当此牌在你的装备区内，你不能使用其他坐骑牌（你的装备区便不能置入其他坐骑牌）。',
 			minguangkai:'明光铠',
 			minguangkai_cancel:'明光铠',
 			minguangkai_link:'明光铠',
@@ -1250,26 +1280,27 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			dinglanyemingzhu_skill_info:'出牌阶段限一次，你可以弃置至多X张牌（X为你的体力上限），然后摸等量的牌',
 			feilongduofeng:'飞龙夺凤',
 			feilongduofeng2:'飞龙夺凤',
-			feilongduofeng_info:'当你使用【杀】指定一名角色为目标后，你可令该角色弃置一张牌。你使用【杀】杀死一名角色后，若你所属的势力是全场最少的（或之一），你可令该角色的使用者选择是否从未使用的武将牌中选择一张与你势力相同的武将牌重新加入游戏',
+			feilongduofeng3:'飞龙夺凤',
+			feilongduofeng_info:'当你使用【杀】指定一名角色为目标后，你可令该角色弃置一张牌。当你使用【杀】令其他角色进入濒死状态时，你可以获得其一张手牌。',
 			taipingyaoshu:'太平要术',
-			taipingyaoshu_info:'锁定技，防止你受到的所有属性伤害；全场每有一名与你势力相同的角色存活，所有此势力角色的手牌上限便+1；当你失去装备区里的【太平要术】时，你失去1点体力，然后摸两张牌',
+			taipingyaoshu_info:'锁定技，防止你受到的所有属性伤害；全场每有一名与你势力相同的角色存活，你的手牌上限便+1；当你失去装备区里的【太平要术】时，你摸两张牌，然后失去1点体力。',
 			yuxi_skill:'玉玺',
 			yuxi_skill2:'玉玺',
 			yuxi:'玉玺',
 			yuxi_info:'锁定技，若你有明置的武将牌，你的势力视为唯一的大势力；锁定技，摸牌阶段，若你有明置的武将牌，你多摸一张牌；锁定技，出牌阶段开始时，若你有明置的武将牌，你视为使用【知己知彼】',
 			xietianzi:'挟令',
-			xietianzi_info:'出牌阶段，对自己使用。你结束出牌阶段，若如此做，此回合结束时，你可以弃置一张牌，获得一个额外的回合',
-			xietianzi_info_guozhan:'出牌阶段，对为大势力角色的你使用。你结束出牌阶段，若如此做，此回合结束时，你可以弃置一张牌，获得一个额外的回合',
+			xietianzi_info:'出牌阶段，对自己使用。你结束出牌阶段，若如此做，弃牌阶段结束时，你可以弃置一张手牌，获得一个额外的回合',
+			xietianzi_info_guozhan:'出牌阶段，对为大势力角色的你使用。你结束出牌阶段，若如此做，弃牌阶段结束时，你可以弃置一张手牌，获得一个额外的回合',
 			shuiyanqijunx:'水淹七军',
 			shuiyanqijunx_info:'出牌阶段，对一名装备区里有牌的其他角色使用。目标角色选择一项：1、弃置装备区里的所有牌；2、受到你造成的1点雷电伤害',
 			lulitongxin:'勠力同心',
 			lulitongxin_info:'出牌阶段，对所有大势力角色或所有小势力角色使用。若目标角色：不处于“连环状态”，其横置；处于“连环状态”，其摸一张牌',
 			lianjunshengyan:'联军盛宴',
-			lianjunshengyan_info:'出牌阶段，对你和你选择的除你的势力外的一个势力的所有角色。若目标角色：为你，你摸X张牌（X为该势力的角色数）；不为你，其选择一项：1、回复1点体力；2、摸一张牌，然后重置',
+			lianjunshengyan_info:'出牌阶段，对你和你选择的除你的势力外的一个势力的所有角色。若目标角色：为你，你摸X张牌或回复X点体力（X为该势力的角色数）；不为你，其摸一张牌，然后重置',
 			chiling:'敕令',
 			chiling_info:'出牌阶段，对所有没有势力的角色使用。目标角色选择一项：1、明置一张武将牌，然后摸一张牌；2、弃置一张装备牌；3、失去1点体力。当【敕令】因判定或弃置而置入弃牌堆时，系统将之移出游戏，然后系统于当前回合结束后视为对所有没有势力的角色使用【敕令】',
 			diaohulishan:'调虎离山',
-			diaohulishan_info:'出牌阶段，对至多两名其他角色使用。目标角色于此回合结束之前不计入距离的计算且不能使用牌且不是牌的合法目标。此牌结算结束时，你摸一张牌',
+			diaohulishan_info:'出牌阶段，对至多两名其他角色使用。目标角色于此回合结束之前不计入距离的计算且不能使用牌且不是牌的合法目标且不能失去或回复体力或受到伤害。',
 			huoshaolianying:'火烧连营',
 			huoshaolianying_bg:'烧',
 			huoshaolianying_info_guozhan:'出牌阶段，对你的下家和与其处于同一队列的角色使用，每名角色受到一点火焰伤害',
