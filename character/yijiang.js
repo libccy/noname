@@ -3320,6 +3320,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.showCards(cards);
 					'step 1'
 					ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
+					game.updateRoundNumber();
 					var n1=target.getCards('he',function(card){
 						if(!lib.filter.cardDiscardable(card,player)) return false;
 						return get.type(card,'trick')=='trick';
@@ -5169,6 +5170,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					if(event.card){
 						ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
+						game.updateRoundNumber();
 					}
 				},
 				group:['huomo_count','huomo_count2','huomo_use']
@@ -5247,21 +5249,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							filterCard:function(card){
 								return get.type(card)!='basic'&&get.color(card)=='black';
 							},
-							viewAs:{name:links[0][2],nature:links[0][3]},
+							viewAs:{name:links[0][2],nature:links[0][3],suit:null,number:null},
 							position:'he',
 							popname:true,
 							precontent:function(){
 								'step 0'
+								player.logSkill('huomo');
 								var card=event.result.cards[0];
 								event.card=card;
 								player.$throw(card,1000);
 								game.log(player,'将',card,'置于牌堆顶');
-								event.result.cards.length=0;
+								event.result.card={name:event.result.card.name};
+								event.result.cards=[];
 								player.lose(card);
 								'step 1'
 								game.delay();
 								'step 2'
 								ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
+								game.updateRoundNumber();
 							},
 						}
 					},
@@ -9661,7 +9666,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qinwang_info:'主公技，你可以弃置一张牌，然后视为你发动“激将”。若有角色响应，则该角色打出【杀】时摸一张牌',
 			huomo:'活墨',
 			huomo_use:'活墨',
-			huomo_use_backup:'活墨',
+			//huomo_use_backup:'活墨',
 			huomo_info:'每当你需要使用一张本回合内未使用过的基本牌时，你可以将一张黑色非基本牌置于牌堆顶，然后视为你使用了此基本牌',
 			huomo_use_info:'每当你需要使用一张本回合内未使用过的基本牌时，你可以将一张黑色非基本牌置于牌堆顶，然后视为你使用了此基本牌',
 			zuoding:'佐定',

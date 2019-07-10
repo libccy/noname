@@ -432,7 +432,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							'step 3'
-							if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=game.roundNumber+'轮 剩余牌: '+ui.cardPile.childNodes.length;
+							game.updateRoundNumber();
 							if(event.cards.length){
 								player.gain(event.cards,'draw');
 								event.finish();
@@ -1611,7 +1611,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									for(var i=0;i<trigger.cards.length;i++){
 										if(get.position(trigger.cards[i])=='d'){
 										    ui.cardPile.insertBefore(trigger.cards[i],ui.cardPile.firstChild);
-										    if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=game.roundNumber+'轮 剩余牌: '+ui.cardPile.childNodes.length;
+										    game.updateRoundNumber();
 										    game.log(player,'将',trigger.cards[i],'置于牌堆顶');
 										}
 									};

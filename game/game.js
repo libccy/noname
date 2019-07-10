@@ -6051,7 +6051,7 @@
 									if(name.indexOf('gz_shibing')==0){
 										name=name.slice(3,11);
 									}
-									else if(!get.config('guozhanSkin')||!lib.character[name]||!lib.character[name][4].contains('gzskin')){
+									else if(!lib.config.mode_config.guozhan.guozhanSkin||!lib.character[name]||!lib.character[name][4].contains('gzskin')){
 										name=name.slice(3);
 									}
 								}
@@ -22807,7 +22807,7 @@
 					if((player==_status.roundStart||_status.roundSkipped)&&!trigger.skill){
 						delete _status.roundSkipped;
 						game.roundNumber++;
-						if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=game.roundNumber+'轮 剩余牌: '+ui.cardPile.childNodes.length;
+						game.updateRoundNumber();
 						for(var i=0;i<game.players.length;i++){
 							if(game.players[i].isOut()&&game.players[i].outCount>0){
 								game.players[i].outCount--;
@@ -23054,23 +23054,25 @@
 					"step 0"
 					player.link();
 					event.logvid=trigger.getLogv();
+					if(!trigger.notLink()) event.finish();
 					"step 1"
-					var players=game.players.slice(0);
+					event.targets=game.filterPlayer(function(current){
+					    return current.isLinked();
+					});
 					lib.tempSortSeat=player;
-					players.sort(lib.sort.seat);
+					event.targets.sort(lib.sort.seat);
 					delete lib.tempSortSeat;
-					for(var i=0;i<players.length;i++){
-						if(players[i].isLinked()){
-							if(trigger.source){
-								players[i].damage(trigger.num,trigger.nature,trigger.source,trigger.cards,trigger.card);
-							}
-							else{
-								players[i].damage(trigger.num,trigger.nature,'nosource',trigger.cards,trigger.card);
-							}
-							return;
-						}
+					event._args=[trigger.num,trigger.nature,trigger.cards,trigger.card];
+					if(trigger.source) event._args.push(trigger.source);
+					else event._args.push("nosource");
+					delete event.player;
+					"step 2"
+					if(event.targets.length){
+					    var target=event.targets.shift();
+					    target.damage.apply(target,event._args.slice(0));
+					    event.redo();
 					}
-				}
+				},
 			},
 			_lianhuan2:{
 				trigger:{global:'damageAfter'},
@@ -23078,17 +23080,30 @@
 					return (event.nature&&lib.linked.contains(event.nature)&&event.player.isLinked()&&
 						event.player.classList.contains('dead')&&player.isLinked());
 				},
+				silent:true,
+				popup:false,
 				forced:true,
 				priority:-5,
 				content:function(){
 					"step 0"
 					trigger.player.removeLink();
+					if(!trigger.notLink()) event.finish();
 					"step 1"
-					if(trigger.source){
-						player.damage(trigger.num,trigger.nature,trigger.source,trigger.cards,trigger.card);
-					}
-					else{
-						player.damage(trigger.num,trigger.nature,'nosource',trigger.cards,trigger.card);
+					event.targets=game.filterPlayer(function(current){
+					    return current.isLinked();
+					});
+					lib.tempSortSeat=trigger.player;
+					event.targets.sort(lib.sort.seat);
+					delete lib.tempSortSeat;
+					event._args=[trigger.num,trigger.nature,trigger.cards,trigger.card];
+					if(trigger.source) event._args.push(trigger.source);
+					else event._args.push("nosource");
+					delete event.player;
+					"step 2"
+					if(event.targets.length){
+					    var target=event.targets.shift();
+					    target.damage.apply(target,event._args.slice(0));
+					    event.redo();
 					}
 				}
 			},
@@ -24725,8 +24740,8 @@
 			if(lib.config.background_music=='music_off'){
 				ui.backgroundMusic.src='';
 			}
-			else if(get.mode()=='guozhan'&&_status._aozhan==true&&get.config('aozhan_bgm')!='disabled'){
-			    var aozhan=get.config('aozhan_bgm');
+			else if(get.mode()=='guozhan'&&_status._aozhan==true&&lib.config.mode_config.guozhan.aozhan_bgm!='disabled'){
+			    var aozhan=lib.config.mode_config.guozhan.aozhan_bgm;
 			    ui.backgroundMusic.src=lib.assetURL+'audio/background/aozhan_'+aozhan+'.mp3';
 			}
 			else{
@@ -29727,6 +29742,11 @@
 					event.result.enemy[i]=event.enemylist[i].link;
 				}
 			});
+		},
+		updateRoundNumber:function(){
+		    game.broadcastAll(function(num1,num2){
+		        if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=num1+'轮 剩余牌: '+num2;
+		    },game.roundNumber,ui.cardPile.childNodes.length);
 		},
 		asyncDraw:function(players,num,drawDeck,bottom){
 			for(var i=0;i<players.length;i++){
@@ -40349,7 +40369,9 @@
 						ui.create.card(ui.cardPile).init(lib.card.list[i]);
 					}
 				}
-				if(ui.cardPileNumber) ui.cardPileNumber.innerHTML='0轮 剩余牌: '+ui.cardPile.childNodes.length;
+				game.broadcastAll(function(num){
+				    if(ui.cardPileNumber) ui.cardPileNumber.innerHTML='0轮 剩余牌: '+num;
+				},ui.cardPile.childNodes.length);
 			},
 		},
 		click:{
@@ -43170,7 +43192,7 @@
 									}
 									else{
 										delete lib.config.skin[nameskin];
-										if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&get.config('guozhanSkin')){
+										if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&lib.config.mode_config.guozhan.guozhanSkin){
 										    bg.setBackground(nameskin2,'character');
 										    if(sourcenode) sourcenode.setBackground(nameskin2,'character');
 									    	if(avatar) avatar.setBackground(nameskin2,'character');
@@ -43188,7 +43210,7 @@
 									button.setBackgroundImage('image/skin/'+nameskin+'/'+i+'.jpg');
 								}
 								else{
-									if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&get.config('guozhanSkin')) button.setBackground(nameskin2,'character','noskin');
+									if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&lib.config.mode_config.guozhan.guozhanSkin) button.setBackground(nameskin2,'character','noskin');
 									else button.setBackground(nameskin,'character','noskin');
 								}
 							}
@@ -44507,7 +44529,7 @@
 				}
 				list.push(ui.cardPile.removeChild(ui.cardPile.lastChild));
 			}
-			if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=game.roundNumber+'轮 剩余牌: '+ui.cardPile.childNodes.length;
+			game.updateRoundNumber();
 			if(card) return list[0];
 			return list;
 		},
@@ -45761,7 +45783,7 @@
 				}
 				list.push(ui.cardPile.removeChild(ui.cardPile.firstChild));
 			}
-			if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=game.roundNumber+'轮 剩余牌: '+ui.cardPile.childNodes.length;
+			game.updateRoundNumber();
 			if(card) return list[0];
 			return list;
 		},
@@ -46837,11 +46859,11 @@
 									else{
 										delete lib.config.skin[nameskin];
 										if(avatar2){
-											if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&get.config('guozhanSkin')) node.node.avatar2.setBackground(nameskin2,'character');
+											if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&lib.config.mode_config.guozhan.guozhanSkin) node.node.avatar2.setBackground(nameskin2,'character');
 											else node.node.avatar2.setBackground(nameskin,'character');
 										}
 										else{
-											if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&get.config('guozhanSkin')) node.node.avatar.setBackground(nameskin2,'character');
+											if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&lib.config.mode_config.guozhan.guozhanSkin) node.node.avatar.setBackground(nameskin2,'character');
 											else node.node.avatar.setBackground(nameskin,'character');
 										}
 									}
@@ -46852,7 +46874,7 @@
 									button.setBackgroundImage('image/skin/'+nameskin+'/'+i+'.jpg');
 								}
 								else{
-									if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&get.config('guozhanSkin')) button.setBackground(nameskin2,'character','noskin');
+									if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&lib.config.mode_config.guozhan.guozhanSkin) button.setBackground(nameskin2,'character','noskin');
 									else button.setBackground(nameskin,'character','noskin');
 								}
 							}
@@ -47332,7 +47354,7 @@
 									}
 									else{
 										delete lib.config.skin[nameskin];
-										if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&get.config('guozhanSkin')) node.setBackground(nameskin2,'character');
+										if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&lib.config.mode_config.guozhan.guozhanSkin) node.setBackground(nameskin2,'character');
 										else node.setBackground(nameskin,'character');
 										game.saveConfig('skin',lib.config.skin);
 									}
@@ -47342,7 +47364,7 @@
 									button.setBackgroundImage('image/skin/'+nameskin+'/'+i+'.jpg');
 								}
 								else{
-									if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&get.config('guozhanSkin')) button.setBackground(nameskin2,'character','noskin');
+									if(gzbool&&lib.character[nameskin2][4].contains('gzskin')&&lib.config.mode_config.guozhan.guozhanSkin) button.setBackground(nameskin2,'character','noskin');
 									else button.setBackground(nameskin,'character','noskin');
 								}
 							}

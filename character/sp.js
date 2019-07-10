@@ -92,7 +92,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			buzhi:['male','wu',3,['hongde','dingpan']],
 
 			sp_liubei:['male','shu',4,['zhaolie','shichou']],
-			caochun:['male','wei',4,['shanjia']],
+			caochun:['male','wei',4,['xinshanjia']],
 			zhuling:['male','wei',4,['zhanyi']],
 			dongbai:['female','qun',3,['lianzhu','xiehui']],
 
@@ -772,6 +772,82 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             },
 		},
 		skill:{
+		 //新服曹笨
+		 
+            xinshanjia:{
+                group:["xinshanjia_count"],
+                subSkill:{
+                    count:{
+                        forced:true,
+                        silent:true,
+                        popup:false,
+                        trigger:{
+                            player:"loseEnd",
+                        },
+                        filter:function (event,player){
+                var cs=event.cards;
+                for(var i=0;i<cs.length;i++){ 
+                    if(get.type(cs[i])=='equip'&&cs[i].original=='e') return true;
+                }
+                return false;
+            },
+                        content:function (){
+                var cs=trigger.cards;
+                var num=0;
+                for(var i=0;i<cs.length;i++){ 
+                    if(get.type(cs[i])=='equip'&&cs[i].original=='e') num++;
+                }
+                player.storage.xinshanjia+=num;
+                player.markSkill('xinshanjia');
+            },
+                    },
+                },
+                audio:"shanjia",
+                trigger:{
+                    player:"phaseUseBegin",
+                },
+                intro:{
+                    content:"本局游戏内已失去过#张装备区内的牌",
+                },
+                frequent:true,
+                init:function (player,skill){
+        if(!player.storage[skill]) player.storage[skill]=0;
+    },
+                content:function (){
+        'step 0'
+        player.draw(3);
+        'step 1'
+        var num=3-player.storage.xinshanjia;
+        if(num>0){
+            player.chooseToDiscard('he',true,num);
+        }
+        'step 2'
+        var bool=true;
+        if(result.cards){
+            for(var i=0;i<result.cards.length;i++){
+                if(['basic','trick'].contains(get.type(result.cards[i],'trick'))){
+                    bool=false;break;
+                }
+            }
+        }
+        if(bool){
+            player.chooseTarget('是否视为使用一张没有距离限制的【杀】？',function(card,player,target){
+                return player.canUse({name:'sha'},target,false);
+            }).ai=function(target){
+                var player=_status.event.player;
+                return get.effect(target,{name:'sha'},player,player);
+            };
+        }
+        else event.finish();
+        'step 3'
+        if(result.bool&&result.targets){
+            player.useCard({name:'sha'},result.targets);
+        }
+        else event.finish();
+        'step 4'
+        player.getStat().card.sha--;
+    },
+            },
 		 //OL马超
 		 ol_shichou:{
     audio:2,
@@ -11663,6 +11739,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             simazhao:"司马昭",
             wangyuanji:"王元姬",
 
+			xinshanjia:"缮甲",
+            "xinshanjia_info":"出牌阶段开始时，你可以摸三张牌，然后弃置3-X张牌(X为你本局游戏内失去过的装备区内的牌的数目且至多为3)。若你没有以此法弃置基本牌或锦囊牌，则你可以视为使用了一张不计入出牌阶段使用次数且无距离限制的【杀】。",
 			"new_meibu":"魅步",
             "new_meibu_info":"其他角色的出牌阶段开始时，若你在其攻击范围内，你可以弃置一张牌，令该角色于本回合内拥有“止息”。若你以此法弃置的牌不是【杀】或黑色锦囊牌，则本回合其与你距离视为1。",
             "new_mumu":"穆穆",

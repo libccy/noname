@@ -633,16 +633,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 1'
 					var tothrow=[];
-					for(var i=0;i<event.cards.length;i++){
+					for(var i=event.cards.length-1;i>=0;i--){
 						if(result.bool&&result.links.contains(event.cards[i])){
 							player.gain(event.cards[i],'gain2');
 						}
 						else{
-							event.cards[i].discard();
-							tothrow.push(event.cards[i])
+							ui.cardPile.insertBefore(event.cards[i],ui.cardPile.childNodes[0]);
 						}
 					}
-					player.$throw(tothrow);
+					game.updateRoundNumber();
 				},
             },
             "xinfu_qianxin":{
@@ -691,7 +690,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							ui.cardPile.appendChild(cards[i]);
 						}              
 					}
-					if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=game.roundNumber+'轮 剩余牌: '+ui.cardPile.childNodes.length;
+					game.updateRoundNumber();
 					game.log(player,'把',cards,'放在了牌堆里');
 				},
                 ai:{
@@ -4991,7 +4990,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.target=result.targets[0];
 						player.line(event.target,'green');
 						player.give(event.card,event.target);
-						if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=game.roundNumber+'轮 剩余牌: '+ui.cardPile.childNodes.length;
+						game.updateRoundNumber();
 					}
 				},
                 ai:{
