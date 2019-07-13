@@ -403,8 +403,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                                 for(var i=0;i<list.length;i++){
                                     num+=get.effect(list[i],{name:name},player,player);
                                 }
-                                if(num>0) return (1.7+Math.random())*Math.max(num,1);
-                                return 0;
+                                if(num<=0) return 0;
+                                if(list.length>1) return (1.7+Math.random())*Math.max(num,1);
                             }
                         }
                         return 1+Math.random();
@@ -432,6 +432,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                     return evt.filterCard(card,player,evt);
                 }
                 if(!lib.filter.filterCard(card,player,evt)) return false;
+                else if(evt.filterCard&&!evt.filterCard(card,player,evt)) return false;
                 if(info.changeTarget){
                     var list=game.filterPlayer(function(current){
                         return player.canUse(card,current);
@@ -461,7 +462,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                          var nature=links[1][3]||null;
                          var character=links[0];
                          var group=lib.character[character][1];
-                         return{
+                         var evt=_status.event;
+                         var next={
                              character:character,
                              group:group,
                              filterCard:function(){
@@ -477,19 +479,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                                  nature:nature,
                              },
                              filterTarget:function(card,player,target){
-                             var group=lib.skill.yigui_backup.group;
+                             var xx=lib.skill.yigui_backup;
+                             var evt=_status.event;
+                             var group=xx.group;
                              if(target.group!='unknown'&&target.group!=group) return false;
                              var info=get.info(card);
                              if(info.changeTarget){
                                  var targets=[target];
                                  info.changeTarget(player,targets);
                                   for(var i=0;i<targets.length;i++){
-                                     if(target.group!='unknown'&&target.group!=group) return false;
+                                     if(targets[i].group!='unknown'&&targets[i].group!=group) return false;
                                  }
                              }
-                             var evt=_status.event;
-                             if(evt.type=='dying') return evt.dying==target;
-                             else return lib.filter.filterTarget(card,player,target);
+                             if(evt.type=='dying') return target==evt.dying;
+                             if(xx.filterTargetx&&!xx.filterTargetx(card,player,target)) return false;
+                             return lib.filter.filterTarget(card,player,target);
                              },
                              onuse:function(result,player){
                                  player.logSkill('yigui');
@@ -502,12 +506,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                                  player.updateMarks('yigui');
                                  player.storage.yigui.used.add(result.card.name);
                              },
-                         }
+                         };
+                         if(evt.filterTarget) next.filterTargetx=evt.filterTarget;
+                         return next;
                     },
                     prompt:function(links,player){
                          var name=links[1][2];
                          var character=links[0];
-                         return '移除「'+get.translation(character)+'」并视为使用'+get.translation(name);
+                         var nature=links[1][3];
+                         return '移除「'+get.translation(character)+'」并视为使用'+(get.translation(nature)||'')+get.translation(name);
                     },
                 },
                 group:["yigui_init","yigui_refrain"],
@@ -624,7 +631,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							});
 							logger.line(player,'green');
 							logger.logSkill('xindiaodu');
-							player.draw(false);
+							player.draw('nodelay');
 						},
                         ai:{
                             reverseEquip:true,
@@ -8357,7 +8364,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return this.name2.indexOf('gz_shibing')!=0;
 				},
 				showCharacter:function(num,log){
-				    if(this.isDead()){
+				    if(_status.overing==true||this.isDead()){
 				        this.$showCharacter(num,log);
 				        return {};
 				    }
@@ -8367,12 +8374,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				        if((num==1||num==2)&&this.isUnseen(1)) toShow.add(this.name2);
 				        if(!toShow.length) return {};
 				        var next=game.createEvent('showCharacter');
-				    next.player=this;
-				    next.num=num;
-				    next.toShow=toShow;
-				    next._args=arguments;
-				    next.setContent('showCharacter');
-				    return next;
+				        next.player=this;
+				        next.num=num;
+				        next.toShow=toShow;
+				        next._args=arguments;
+				        next.setContent('showCharacter');
+				        return next;
 				    }
 				},
 				$showCharacter:function(num,log){
