@@ -203,11 +203,11 @@ window.config={
 		['anxian','yuling'],
 		['yinguo','yuling'],
 		['qingjian','yuling'],
-		['qingnang','yiji'],
-		['qingnang','reyiji'],
-		['qingjian','tuntian'],
+		//['qingnang','yiji'],
+		//['qingnang','reyiji'],
+		//['qingjian','tuntian'],
 		// ['yiji','tuntian'],
-		['reyiji','tuntian'],
+		// ['reyiji','tuntian'],
 		['tuntian','guidao'],
 		['tuntian','tiandao'],
 		['tuntian','huanshi'],
@@ -222,5 +222,7 @@ window.config={
 		['xiuhua','xiaoji'],
 		// ['jiushi','jushou'],
 		// ['jiushi','kuiwei'],
+		['zishu','xinfu_songsang'],
+		['zishu','shenxing'],
 	]
 };

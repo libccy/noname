@@ -29764,10 +29764,9 @@
 					players[i].draw(num2,false,drawDeck);
 				}
 				else{
-				    if(bottom) players[i].draw(num2,false,'bottom');
-					else players[i].draw(num2,false);
+				    if(bottom) players[i].draw(num2,'nodelay','bottom');
+				    else players[i].draw(num2,'nodelay');
 				}
-				players[i].$draw(num2);
 			}
 		},
 		asyncDrawAuto:function(players,num,drawDeck){
