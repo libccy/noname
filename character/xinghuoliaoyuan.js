@@ -2623,7 +2623,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.getParent().name=='draw'&&event.getParent(2).name!='xinfu_zhanji';
 				},
                 content:function (){
-					player.draw(false);
+					player.draw('nodelay');
 				},
             },
             "xinfu_songsang":{

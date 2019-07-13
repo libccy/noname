@@ -5259,7 +5259,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								event.card=card;
 								player.$throw(card,1000);
 								game.log(player,'将',card,'置于牌堆顶');
-								event.result.card={name:event.result.card.name};
+								event.result.card={name:event.result.card.name,nature:event.result.card.nature};
 								event.result.cards=[];
 								player.lose(card);
 								'step 1'
@@ -8163,10 +8163,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('h')>0
 				},
 				chooseButton:{
-					dialog:function(){
-						var list=['taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman'];
-						for(var i=0;i<list.length;i++){
-							list[i]=['锦囊','',list[i]];
+					dialog:function(player){
+						var list=[];
+						for(var i=0;i<lib.inpile.length;i++){
+						    if(get.type(lib.inpile[i])=='trick') list.push(['锦囊','',lib.inpile[i]]);
 						}
 						return ui.create.dialog(get.translation('qice'),[list,'vcard']);
 					},
@@ -8909,7 +8909,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseBegin'},
 				direct:true,
 				init:function(player){
-					player.storage.xiansi=[];
+					if(!player.storage.xiansi) player.storage.xiansi=[];
 				},
 				content:function(){
 					"step 0"
@@ -8969,7 +8969,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					var players=game.filterPlayer();
 					for(var i=0;i<players.length;i++){
-						if(players[i].storage.xiansi){
+						if(players[i].hasSkill('xiansi')){
 							return players[i].storage.xiansi.length>1&&player.canUse('sha',players[i],true,true);
 						}
 					}

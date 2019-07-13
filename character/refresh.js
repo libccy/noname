@@ -272,7 +272,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(get.itemtype(trigger.cards)=='cards'&&get.position(trigger.cards[0])=='d'){
 						player.gain(trigger.cards,"gain2");
 					}
-					player.draw();
+					player.draw('nodelay');
 				},
                 ai:{
                     maixie:true,

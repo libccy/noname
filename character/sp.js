@@ -2334,7 +2334,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return event.getParent(2).name!='zishu_draw';
 						},
 						content:function(){
-							player.draw(false);
+							player.draw('nodelay');
 						}
 					}
 				},

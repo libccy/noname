@@ -311,7 +311,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.chooseControlList([
 							'移去一枚【暴怒】标记',
 							'失去一点体力'
-						]).set('ai',function(event,player){
+						],true).set('ai',function(event,player){
 							if(player.storage.baonu>6) return 0;
 							if(player.hp+player.num('h','tao')>3) return 1;
 							return 0;
@@ -1945,27 +1945,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					"nzry_jieying":{
 					audio:2,
-						init:function(player){
-							if(!player.isLinked()){
-								player.link();
-								player.logSkill('nzry_jieying');
-							};
+						ai:{
+						    effect:{
+						        target:function(card){
+						            if(card.name=='tiesuo') return 'zeroplayertarget';
+						        },
+						    },
 						},
 						group:["nzry_jieying_1","nzry_jieying_2"],
 						subSkill:{
 							'1':{
 								audio:2,
 								trigger:{
-									player:'linkAfter'
+									player:'linkAfter',
+									global:'gameDrawAfter',
 								},
 								forced:true,
 								filter:function (event,player){
 									return !player.isLinked();
 								},
 								content:function(){
-									setTimeout(function(){
-										if(!player.isLinked()) player.link();
-									},1200);
+									if(!player.isLinked()) player.link();
 								},	
 							},
 							'2':{
