@@ -510,6 +510,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			tengjia3:{
 			    audio:'tengjia1',
 			    trigger:{target:'shaBegin'},
+			    forced:true,
 			    filter:function(event,player){
 			        if(event.player.hasSkillTag('unequip',false,{
 						name:event.card?event.card.name:null,
