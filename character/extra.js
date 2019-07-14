@@ -2151,13 +2151,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return player!=event.player&&event.player.isAlive()&&_status.currentPhase==player;
 						},
 						check:function(event,player){
-							var list=[];
+							if(player.isDisabled(5)) return false;
 							var skills=event.player.skills.slice(0);
 							for(var i=0;i<skills.length;i++){
 							 var info=get.info(skills[i])
-								if(info!=undefined&&!info.charlotte&&(!info.unique||info.gainable)) list.push(skills[i]);
-							};
-							return !player.storage.disableEquip.contains('equip5')&&list.length>0;
+								if(info!=undefined&&!info.charlotte&&(!info.unique||info.gainable)) return true;
+							}
 						},
 						content:function(){
 							'step 0'
@@ -2167,38 +2166,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var info=get.info(skills[i])
 								if(info!=undefined&&!info.charlotte&&(!info.unique||info.gainable)) event.skills.push(skills[i]);
 							};
-							if(player.storage.disableEquip.length<5){
-								var list=['武器','防具','防御马','攻击马','宝物'];
-								for(var i=0;i<player.storage.disableEquip.length;i++){
-									list.remove(get.translation(player.storage.disableEquip[i]));
-								};
-								var list1=['equip1','equip2','equip3','equip4','equip5'];
-								for(var i=0;i<player.storage.disableEquip.length;i++){
-									list1.remove(player.storage.disableEquip[i]);
-								};
-								player.chooseControl(list).set('ai',function(event){
-									if(list1.contains('equip5')&&event.skills.length>0) return '宝物';
-									return list.randomGet();
-								}).set('prompt','请选择需要废除的栏位');
+							if(player.countDisabled()<5){
+							    player.chooseToDisable().ai=function(event,player,list){
+							        if(list.contains('equip5')) return 'equip5';
+							        return list.randomGet();
+							    };
 							}
 							'step 1'
-							if(result.control!=undefined){
-								if(result.control=='武器') player.disableEquip('equip1');
-								if(result.control=='防具') player.disableEquip('equip2');
-								if(result.control=='防御马') player.disableEquip('equip3');
-								if(result.control=='攻击马') player.disableEquip('equip4');
-								if(result.control=='宝物') player.disableEquip('equip5');
-							}
 							if(event.skills.length>0){
-								player.chooseControl(event.skills).set('prompt','请选择要获得的技能');
+								player.chooseControl(event.skills).set('prompt','请选择要获得的技能').set('ai',function(){return event.skills.randomGet()});
 							}
 							else event.finish();
 							'step 2'
 							player.addTempSkill(result.control,{player:'dieAfter'});
+							player.popup(result.control,'thunder');
 							player.storage.drlt_duorui=[result.control];
 							player.storage.drlt_duorui_player=trigger.player;
 							trigger.player.storage.drlt_duorui=[result.control];
 							trigger.player.addTempSkill('drlt_duorui1',{player:'phaseAfter'});
+							game.log(player,'获得了技能','#g【'+get.translation(result.control)+'】')
 						},
 						group:['duorui_clear'],
 					},
@@ -2260,20 +2246,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return event.targets&&event.targets.contains(player)&&event.turn!=player&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
 								},
 								content:function(){
-									'step 0'
-									var list=[];
-									for(var i=0;i<player.storage.disableEquip.length;i++){
-										list.push(get.translation(player.storage.disableEquip[i]));
-									};
-									player.chooseControl(list).set('ai',function(event){
-										return list.randomGet();
-									}).set('prompt','请选择需要恢复的栏位');;
-									'step 1'
-									if(result.control=='武器') player.enableEquip('equip1');
-									if(result.control=='防具') player.enableEquip('equip2');
-									if(result.control=='防御马') player.enableEquip('equip3');
-									if(result.control=='攻击马') player.enableEquip('equip4');
-									if(result.control=='宝物') player.enableEquip('equip5');
+									player.chooseToEnable();
 								},
 							},
 							'2':{
@@ -2286,20 +2259,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return event.turn!=player&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
 								},
 								content:function(){
-									'step 0'
-									var list=[];
-									for(var i=0;i<player.storage.disableEquip.length;i++){
-										list.push(get.translation(player.storage.disableEquip[i]));
-									};
-									player.chooseControl(list).set('ai',function(event){
-										return list.randomGet();
-									}).set('prompt','请选择需要恢复的栏位');;
-									'step 1'
-									if(result.control=='武器') player.enableEquip('equip1');
-									if(result.control=='防具') player.enableEquip('equip2');
-									if(result.control=='防御马') player.enableEquip('equip3');
-									if(result.control=='攻击马') player.enableEquip('equip4');
-									if(result.control=='宝物') player.enableEquip('equip5');
+									player.chooseToEnable();
 								},
 							},
 							'3':{
@@ -2313,19 +2273,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								},
 								content:function(){
 									'step 0'
-									var list=[];
-									for(var i=0;i<player.storage.disableEquip.length;i++){
-										list.push(get.translation(player.storage.disableEquip[i]));
-									};
-									player.chooseControl(list).set('ai',function(event){
-										return list.randomGet();
-									}).set('prompt','请选择需要恢复的栏位');;
-									'step 1'
-									if(result.control=='武器') player.enableEquip('equip1');
-									if(result.control=='防具') player.enableEquip('equip2');
-									if(result.control=='防御马') player.enableEquip('equip3');
-									if(result.control=='攻击马') player.enableEquip('equip4');
-									if(result.control=='宝物') player.enableEquip('equip5');
+									player.chooseToEnable();
 								},
 							},
 							'4':{
@@ -2338,20 +2286,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return (event.targets!=undefined&&event.targets.contains(player)||event.target==player)&&event.result.bool==false&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
 								},
 								content:function(){
-									'step 0'
-									var list=[];
-									for(var i=0;i<player.storage.disableEquip.length;i++){
-										list.push(get.translation(player.storage.disableEquip[i]));
-									};
-									player.chooseControl(list).set('ai',function(event){
-										return list.randomGet();
-									}).set('prompt','请选择需要恢复的栏位');;
-									'step 1'
-									if(result.control=='武器') player.enableEquip('equip1');
-									if(result.control=='防具') player.enableEquip('equip2');
-									if(result.control=='防御马') player.enableEquip('equip3');
-									if(result.control=='攻击马') player.enableEquip('equip4');
-									if(result.control=='宝物') player.enableEquip('equip5');
+									player.chooseToEnable();
 								},
 							},
 							'5':{
@@ -2364,20 +2299,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
 								},
 								content:function(){
-									'step 0'
-									var list=[];
-									for(var i=0;i<player.storage.disableEquip.length;i++){
-										list.push(get.translation(player.storage.disableEquip[i]));
-									};
-									player.chooseControl(list).set('ai',function(event){
-										return list.randomGet();
-									}).set('prompt','请选择需要恢复的栏位');;
-									'step 1'
-									if(result.control=='武器') player.enableEquip('equip1');
-									if(result.control=='防具') player.enableEquip('equip2');
-									if(result.control=='防御马') player.enableEquip('equip3');
-									if(result.control=='攻击马') player.enableEquip('equip4');
-									if(result.control=='宝物') player.enableEquip('equip5');
+									player.chooseToEnable();
 								},
 							},
 						},

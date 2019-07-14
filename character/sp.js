@@ -4415,11 +4415,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						check:function(){return 1},
 						ai:{
-							effect:{
-								target:function(card,player,target,current){
-									if(get.tag(card,'respondSha')&&current<0) return 0.6
-								}
-							},
 							respondSha:true,
 							skillTagFilter:function(player){
 								if(!player.storage.fanghun||player.storage.fanghun<0) return false;
@@ -4457,12 +4452,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							skillTagFilter:function(player){
 								if(!player.storage.fanghun||player.storage.fanghun<0) return false;
 								if(!player.countCards('h','sha')) return false;
-							},
-							effect:{
-								target:function(card,player,target,current){
-									if(!player.storage.fanghun||player.storage.fanghun<0) return 0;
-									if(get.tag(card,'respondShan')&&current<0) return 0.6
-								}
 							},
 							order:4,
 							useful:-1,
@@ -5424,8 +5413,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.jianshu=false;
 				},
 				filterTarget:function(card,player,target){
+					if(target==player) return false;
 					if(ui.selected.targets.length){
-						return ui.selected.targets[0].canCompare(target)&&target.distanceTo(ui.selected.targets[0])<=1;
+						return !ui.selected.targets[0].hasSkillTag('noCompareSource')&&target.countCards('h')
+						&&!target.hasSkillTag('noCompareTarget')&&target.distanceTo(ui.selected.targets[0])<=1;
 					}
 					return true;
 				},

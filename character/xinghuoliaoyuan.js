@@ -2855,7 +2855,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.xinfu_qiai=true;
 					event.current=player.next;
 					"step 1"
-					event.current.chooseCard('交给'+get.translation(player)+'一张手牌','he',true).set('ai',function(card){
+					event.current.chooseCard('交给'+get.translation(player)+'一张牌','he',true).set('ai',function(card){
 						var evt=_status.event.getParent();
 						if(get.attitude(_status.event.player,evt.player)>2){
 							if(card.name=='jiu') return 120;
