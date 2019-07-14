@@ -1,25 +1,23 @@
 window.noname_update={
-	version:'1.9.89.3',
-	update:'1.9.89.2',
+	version:'1.9.89.4',
+	update:'1.9.89.3',
 	changeLog:[
-		'“神武再世”模式霸气回归，玩法大升级！神刘备、神陆逊加入战局，十大神将邀您共同面对相柳、朱厌、毕方、英招四大新妖兽！',
-		'统率三军模式将池更新',
-		'其他bug修复',
+		'界限突破•火包与新版嵇康(手杀)',
+		'其他BUG修复',
+		'players://["re_jikang","re_dianwei","re_xunyu","re_sp_zhugeliang","re_pangtong","xin_yuanshao","re_yanwen"]',
 	],
 	files:[
-		'card/extra.js',
+		'card/standard.js',
 		'character/extra.js',
+		'character/old.js',
 		'character/sp.js',
 		'character/yijiang.js',
 		'character/refresh.js',
 		'character/shenhua.js',
 		'character/xinghuoliaoyuan.js',
 		'mode/boss.js',
-		'mode/guozhan.js',
-		'mode/versus.js',
 		//'game/asset.js',
 		'game/game.js',
-		'game/config.js',
 		//'game/package.js'
 	]
 };

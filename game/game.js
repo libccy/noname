@@ -9271,6 +9271,7 @@
 			qianxing:'潜行',
 			mianyi:'免疫',
 			fengyin:'封印',
+			_disableJudge:"判定区",
 
 			pause:'暂停',
 			config:'选项',
@@ -9288,6 +9289,60 @@
 		},
 		element:{
 			content:{
+				chooseToEnable:function(){
+        'step 0'
+        var list=[];
+        for(var i=1;i<6;i++){
+            if(!player.isDisabled(i)) continue;
+            list.push('equip'+i);
+        }
+        if(!list.length) event.finish();
+        else{
+           event.list=list;
+           var next=player.chooseControl(list);
+           next.prompt='请选择恢复一个装备栏';
+           if(!event.ai) event.ai=function(event,player,list){
+               return list.randomGet();
+           }
+           event.ai=event.ai(event.getParent(),player,list);
+           next.ai=function(){
+               return event.ai;
+           };
+        }
+        'step 1'
+        event.result={control:result.control};
+        player.enableEquip(result.control);
+    },
+    chooseToDisable:function(){
+        'step 0'
+        var list=[];
+        for(var i=1;i<7;i++){
+            if((i==3||i==4)&&event.horse) continue;
+            if(i==6&&!event.horse) continue;
+            if(player.isDisabled(i)) continue;
+            list.push('equip'+i);
+        }
+        if(!list.length) event.finish();
+        else{
+           event.list=list;
+           var next=player.chooseControl(list);
+           next.prompt='请选择废除一个装备栏';
+           if(!event.ai) event.ai=function(event,player,list){
+               return list.randomGet();
+           }
+           event.ai=event.ai(event.getParent(),player,list);
+           next.ai=function(){
+               return event.ai;
+           };
+        }
+        'step 1'
+        event.result={control:result.control};
+        if(result.control=='equip6'){
+            player.disableEquip(3);
+            player.disableEquip(4);
+        }
+        else player.disableEquip(result.control);
+    },
 				swapEquip:function(){
 					"step 0"
 					game.log(player,'和',target,'交换了装备区中的牌')
@@ -14235,6 +14290,23 @@
 			},
 			player:{
 				//新函数
+				chooseToEnable:function(){
+        var next=game.createEvent('chooseToEnable');
+        next.player=this;
+        next.setContent('chooseToEnable');
+        return next;
+    },
+    chooseToDisable:function(horse){
+        var next=game.createEvent('chooseToDisable');
+        next.player=this;
+        if(horse) next.horse=true;
+        next.setContent('chooseToDisable');
+        return next;
+    },
+    countDisabled:function(){
+        if(!this.storage.disableEquip) return 0;
+        return this.storage.disableEquip.length;
+    },
 				isPhaseUsing:function(notmeisok){
 					if(!notmeisok&&_status.currentPhase!=this) return false;
 					return _status.event.name=='phaseUse'||_status.event.getParent('phaseUse').name=='phaseUse';
@@ -22674,6 +22746,48 @@
 				},
 				group:['dualside_init','dualside_turn']
 			},
+			_disableJudge:{
+				marktext:"废",
+				intro:{
+					content:"已经废除了判定区",
+				},
+				mod:{
+					targetEnabled:function(card,player,target){
+						if(target.storage._disableJudge&&get.type(card)=='delay') return false;
+					},
+				},
+			},
+			"_disableEquip":{
+						marktext:"废",
+						intro:{
+							content:function(storage,player,skill){
+								var str='';
+								for(var i=0;i<player.storage.disableEquip.length;i++){
+									str+='、'+get.translation(player.storage.disableEquip[i])+'栏';
+								};
+								str=str.slice(1,str.length)
+								str='已经废除了'+str;
+								return str;
+							},
+						},
+						mod:{
+							targetEnabled:function(card,player,target){
+								if(target.isDisabled(get.subtype(card))) return false;
+							},
+						},
+						trigger:{
+							player:['disableEquipBefore','enableEquipBefore','enterGame'],
+							global:'gameStart',
+						},
+						forced:true,
+						popup:false,
+						filter:function(event,player){
+							return player.storage.disableEquip==undefined;
+						},
+						content:function(){
+							player.storage.disableEquip=[];
+						},
+					},
 			fengyin:{
 				init:function(player,skill){
 					var skills=player.getSkills(true,false);
