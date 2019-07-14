@@ -659,6 +659,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				selectTarget:-1,
 				cardcolor:'red',
 				reverseOrder:true,
+				global:'taoyuan_nowuxie',
 				filterTarget:function(card,player,target){
 					//return target.hp<target.maxHp;
 					return true;
@@ -855,10 +856,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					if(event.turn==undefined) event.turn=target;
 					var evt=event.getParent('useCard')
-					if(typeof event.baseDamage!='number'||!evt.baseDamage){
-					    evt.baseDamage=1;
-					    event.evt=evt;
+					if(evt&&(typeof evt.baseDamage=='number'&&evt.baseDamage>0)){
+					   event.baseDamage=evt.baseDamage;
 					}
+					else event.baseDamage=1;
+					if(typeof event.extraDamage!='number'){
+						event.extraDamage=0;
+					}
+					event.playerCards=[];
+					event.targetCards=[];
 					"step 1"
 					event.trigger('juedou');
 					"step 2"
@@ -904,18 +910,22 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						if(result.bool){
-							if(event.turn==target) event.turn=player;
-							else event.turn=target;
+							if(event.turn==target){
+							    if(result.cards) event.targetCards.addArray(result.cards);
+							    event.turn=player;
+							}
+							else{
+							    if(result.cards) event.playerCards.addArray(result.cards);
+							    event.turn=target;
+							}
 							event.goto(1);
 						}
 						else{
-						var num=1;
-					    if(event.evt&&event.evt.baseDamage) num=event.evt.baseDamage;
 							if(event.turn==target){
-								target.damage(num);
+							    target.damage(event.baseDamage+event.extraDamage);
 							}
 							else{
-								player.damage(target,num);
+								player.damage(target,event.baseDamage+event.extraDamage);
 							}
 						}
 					}
@@ -1685,6 +1695,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							})) return;
 							if(get.tag(card,'respondShan')) return 0.5;
 						}
+					}
+				}
+			},
+			taoyuan_nowuxie:{
+			    mod:{
+					wuxieRespondable:function(card,player,target){
+						if(card.name=='taoyuan'&&target.isHealthy()) return false;
 					}
 				}
 			},
