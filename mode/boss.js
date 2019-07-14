@@ -1733,6 +1733,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				 	},
 					},
 					trigger:{player:['phaseUseBegin','phaseAfter','phaseDrawBegin']},
+					forced:true,
 					filter:function(event,player){
 					    return event.name=='phaseDraw'||player.countCards('h')<9;
 					},
