@@ -612,6 +612,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 									event.remained.push(dialog.buttons[i].link);
 								}
 								event.trigger('wuguRemained');
+								for(var i=0;i<event.remained.length;i++){
+									var current=event.remained[i];
+									if(!get.owner(current)) current.discard();
+								}
 							}
 							break;
 						}
