@@ -15,6 +15,7 @@ window.noname_source_list=[
 	'character/gujian.js',
 	'character/gwent.js',
 	'character/hearth.js',
+	'character/mobile.js',
 	'character/mtg.js',
 	'character/old.js',
 	'character/ow.js',

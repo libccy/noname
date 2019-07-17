@@ -1,23 +1,33 @@
 window.noname_update={
-	version:'1.9.89.4',
-	update:'1.9.89.3',
+	version:'1.9.90',
+	update:'1.9.89.4',
 	changeLog:[
-		'界限突破•火包与新版嵇康(手杀)',
-		'其他BUG修复',
-		'players://["re_jikang","re_dianwei","re_xunyu","re_sp_zhugeliang","re_pangtong","xin_yuanshao","re_yanwen"]',
+		'手杀武将单独分包',
+		'统率三军文聘和诸葛瑾',
+		'英文版三国杀特典武将凯撒',
+		'其他bug修复',
+		'players://["kaisa"]',
 	],
 	files:[
 		'card/standard.js',
+		'character/diy.js',
 		'character/extra.js',
+		'character/mobile.js',
 		'character/old.js',
 		'character/sp.js',
 		'character/yijiang.js',
 		'character/refresh.js',
 		'character/shenhua.js',
 		'character/xinghuoliaoyuan.js',
+		'character/yxs.js',
 		'mode/boss.js',
+		'mode/guozhan.js',
+		'mode/versus.js',
 		//'game/asset.js',
+		'game/config.js',
 		'game/game.js',
+		'game/package.js',
+		'game/source.js',
 		//'game/package.js'
 	]
 };

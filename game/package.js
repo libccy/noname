@@ -7,6 +7,7 @@ window.noname_package={
 		sp:'SP',
 		extra:'神将',
 		standard:'标准',
+		mobile:'移动版',
 		old:'怀旧',
 		diy:'DIY',
 		yxs:'英雄杀',

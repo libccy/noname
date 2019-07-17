@@ -8777,21 +8777,23 @@
 			},
 			c:function(){
 				(function(){
-					var a=0,b=0,c=0,d=0;
-					var sa=0,sb=0,sc=0,sd=0;
+					var a=0,b=0,c=0,d=0,e=0;
+					var sa=0,sb=0,sc=0,sd=0,sf=0;
 					for(var i in lib.character){
 						switch(lib.character[i][1]){
 							case 'wei':a++;if(lib.config.banned.contains(i)) sa++;break;
 							case 'shu':b++;if(lib.config.banned.contains(i)) sb++;break;
 							case 'wu':c++;if(lib.config.banned.contains(i)) sc++;break;
 							case 'qun':d++;if(lib.config.banned.contains(i)) sd++;break;
+							case 'western':e++;if(lib.config.banned.contains(i)) se++;break;
 						}
 					}
 					console.log('魏：'+(a-sa)+'/'+a);
 					console.log('蜀：'+(b-sb)+'/'+b);
 					console.log('吴：'+(c-sc)+'/'+c);
 					console.log('群：'+(d-sd)+'/'+d);
-					console.log('已启用：'+((a+b+c+d)-(sa+sb+sc+sd))+'/'+(a+b+c+d));
+					console.log('西：'+(e-se)+'/'+e);
+					console.log('已启用：'+((a+b+c+d+e)-(sa+sb+sc+sd+sc))+'/'+(a+b+c+d+e));
 				}());
 				(function(){
 					var a=0,b=0,c=0,d=0;
@@ -9227,6 +9229,7 @@
 			wu:'吴',
 			qun:'群',
 			shen:'神',
+			western:'西',
 			male:'男',
 			female:'女',
 			mad:'混乱',
@@ -12151,6 +12154,7 @@
 						}
 						event.result.cards=event.result.links.slice(0);
 						event.cards=cards;
+						event.trigger("rewriteDiscardResult");
 					}
 					"step 3"
 					if(event.boolline){
@@ -12297,27 +12301,15 @@
 					}
 					event.result.cards=event.result.links.slice(0);
 					event.cards=cards;
-					if((!_status.connectMode&&(target.isUnderControl(true)||player.isUnderControl(true)))||event.visibleMove){
+					event.trigger("rewriteGainResult");
+					"step 4"
+					if(event.visibleMove){
 						target.$give(cards,player);
 					}
 					else{
-						var hs=[],oths=[];
-						for(var i=0;i<cards.length;i++){
-							if(get.position(cards[i])=='h'){
-								hs.push(cards[i]);
-							}
-							else{
-								oths.push(cards[i]);
-							}
-						}
-						if(hs.length){
-							target.$give(hs.length,player);
-						}
-						if(oths.length){
-							target.$give(oths,player);
-						}
+						target.$giveAuto(cards,player);
 					}
-					"step 4"
+					"step 5"
 					if(event.boolline){
 						player.line(target,'green');
 					}
@@ -13849,6 +13841,8 @@
 					if(player.hp<=0&&!player.nodying) player.die(event.reason);
 				},
 				die:function(){
+					"step 0"
+					event.forceDie=true;
 					if(_status.roundStart==player){
 						_status.roundStart=player.next||player.getNext()||game.players[0];
 					}
@@ -13858,6 +13852,7 @@
 						unseen=true;
 					}
 					var logvid=game.logv(player,'die',source);
+					event.logvid=logvid;
 					if(unseen){
 						player.classList.add('unseen');
 					}
@@ -13875,10 +13870,9 @@
 					}
 					event.cards=player.getCards('hej');
 					event.playerCards=player.getCards('he');
-					if(event.cards.length){
-						player.$throw(event.cards,1000);
-						game.log(player,'弃置了',event.cards,logvid);
-					}
+					event.es=player.getCards('e');
+					event.hs=player.getCards('h');
+					
 					if(!game.reserveDead){
 						for(var mark in player.marks){
 							player.unmarkSkill(mark);
@@ -13926,9 +13920,7 @@
 						game.dead.push(player);
 						_status.dying.remove(player);
 
-						for(var i=0;i<cards.length;i++){
-							cards[i].discard();
-						}
+						
 						if(game.online&&player==game.me&&!_status.over&&!game.controlOver&&!ui.exit){
 							if(lib.mode[lib.configOL.mode].config.dierestart){
 								ui.create.exit();
@@ -13947,6 +13939,15 @@
 							}
 						}
 					},player,event.cards);
+					event.trigger('die');
+					"step 1"
+					if(event.cards.length){
+						player.$throw(event.cards,1000);
+						game.log(player,'弃置了',event.cards,event.logvid);
+						for(var i=0;i<event.cards.length;i++){
+							event.cards[i].discard();
+						}
+					}
 
 					if(!_status.connectMode&&player==game.me&&!_status.over&&!game.controlOver){
 						ui.control.show();
@@ -22550,6 +22551,8 @@
 					if(lib.character[name][1]=='shu') return 1;
 					if(lib.character[name][1]=='wu') return 2;
 					if(lib.character[name][1]=='qun') return 3;
+					if(lib.character[name][1]=='western') return 4;
+					return 5;
 				}
 				var del=groupSort(a)-groupSort(b);
 				if(del!=0) return del;
@@ -23166,6 +23169,7 @@
 				priority:-5,
 				content:function(){
 					"step 0"
+					event.forceDie=true;
 					player.link();
 					event.logvid=trigger.getLogv();
 					if(!trigger.notLink()) event.finish();
@@ -23173,13 +23177,12 @@
 					event.targets=game.filterPlayer(function(current){
 					    return current.isLinked();
 					});
-					lib.tempSortSeat=player;
+					lib.tempSortSeat=_status.currentPhase||player;
 					event.targets.sort(lib.sort.seat);
 					delete lib.tempSortSeat;
 					event._args=[trigger.num,trigger.nature,trigger.cards,trigger.card];
 					if(trigger.source) event._args.push(trigger.source);
 					else event._args.push("nosource");
-					delete event.player;
 					"step 2"
 					if(event.targets.length){
 					    var target=event.targets.shift();
@@ -23200,19 +23203,19 @@
 				priority:-5,
 				content:function(){
 					"step 0"
+					event.forceDie=true;
 					trigger.player.removeLink();
 					if(!trigger.notLink()) event.finish();
 					"step 1"
 					event.targets=game.filterPlayer(function(current){
 					    return current.isLinked();
 					});
-					lib.tempSortSeat=trigger.player;
+					lib.tempSortSeat=_status.currentPhase||trigger.player;
 					event.targets.sort(lib.sort.seat);
 					delete lib.tempSortSeat;
 					event._args=[trigger.num,trigger.nature,trigger.cards,trigger.card];
 					if(trigger.source) event._args.push(trigger.source);
 					else event._args.push("nosource");
-					delete event.player;
 					"step 2"
 					if(event.targets.length){
 					    var target=event.targets.shift();
@@ -24173,7 +24176,7 @@
 			}
 		},
 		suit:['club','spade','diamond','heart'],
-		group:['wei','shu','wu','qun','shen'],
+		group:['wei','shu','wu','qun','shen','western'],
 		nature:['fire','thunder','poison'],
 		linked:['fire','thunder'],
 		groupnature:{
@@ -24182,6 +24185,7 @@
 			shu:'soil',
 			wu:'wood',
 			qun:'metal',
+			western:'thunder',
 		},
 	};
 	var game={
@@ -33397,7 +33401,8 @@
 							if(info[name][1]=='shu') return 1;
 							if(info[name][1]=='wu') return 2;
 							if(info[name][1]=='qun') return 3;
-							return 4;
+							if(info[name][1]=='western') return 4;
+							return 5;
 						}
 						list.sort(function(a,b){
 							var del=groupSort(a)-groupSort(b);
@@ -34944,6 +34949,7 @@
 								['wu','吴'],
 								['qun','群'],
 								['shen','神'],
+								['western','西'],
 							],null,ui.create.div('.indent','势力：',newCharacter));
 							var options=ui.create.div('.add_skill.options','<span>主公<input type="checkbox" name="zhu"></span><span>BOSS<input type="checkbox" name="boss"></span><span>AI禁选<input type="checkbox" name="forbidai"></span><br>',newCharacter);
 							var addSkill=ui.create.div('.add_skill','添加技能<br>',newCharacter);
@@ -38250,7 +38256,7 @@
 				},true);
 			},
 			groupControl:function(dialog){
-				return ui.create.control('wei','shu','wu','qun',function(link,node){
+				return ui.create.control('wei','shu','wu','qun','western',function(link,node){
 					if(link=='全部'){
 						dialog.currentcapt='';
 						dialog.currentgroup='';
@@ -38678,11 +38684,19 @@
 				}
 				if(!thisiscard){
 					var groups=['wei','shu','wu','qun'];
+					var bool1=false;
+					var bool2=false;
 					for(var i in lib.character){
 						if(lib.character[i][1]=='shen'){
-							groups.add('shen');break;
+							bool1=true;
 						}
+						if(get.mode()=='guozhan'||lib.character[i][1]=='western'){
+							bool2=true;
+						}
+						if(bool1&&bool2) break;
 					}
+					if(bool1) groups.add('shen');
+					if(bool2&&get.mode()!='guozhan') groups.add('western');
 					var natures=['water','soil','wood','metal'];
 					var span=document.createElement('span');
 					newlined.appendChild(span);
@@ -38891,6 +38905,7 @@
 						if(lib.character[name][1]=='shu') return 1;
 						if(lib.character[name][1]=='wu') return 2;
 						if(lib.character[name][1]=='qun') return 3;
+						return 4
 					}
 				}
 				list.sort(function(a,b){
@@ -45655,19 +45670,25 @@
 		rawName:function(str){
 			var str2=lib.translate[str];
 			if(!str2) return '';
-			if(str2.indexOf('sp')==0){
+			if(str2.indexOf('SP')==0){
 				str2=str2.slice(2);
 			}
-			else if(str2.indexOf('界sp')==0){
+			else if(str2.indexOf('JSP')==0){
 				str2=str2.slice(3);
+			}
+			else if(str2.indexOf('☆SP')==0){
+				str2=str2.slice(3);
+			}
+			else if(str2.indexOf('手杀')==0){
+				str2=str2.slice(2);
 			}
 			else if(str2.indexOf('界')==0&&lib.characterPack.refresh&&lib.characterPack.refresh[str]){
 				str2=str2.slice(1);
 			}
-			else if(str2.indexOf('旧')==0&&lib.characterPack.old&&lib.characterPack.old[str]){
+			else if(str2.indexOf('旧')==0&&(lib.characterPack.old||lib.characterPack.mobile)&&(lib.characterPack.old[str]||lib.characterPack.mobile[str])){
 				str2=str2.slice(1);
 			}
-			else if(str2.indexOf('新')==0&&str.indexOf('re_')==0){
+			else if(str2.indexOf('新')==0&&(str.indexOf('re_')==0||str.indexOf('new_')==0)){
 				str2=str2.slice(1);
 			}
 			return str2;
@@ -45675,22 +45696,34 @@
 		rawName2:function(str){
 			var str2=lib.translate[str];
 			if(!str2) return '';
-			if(str2.indexOf('sp')==0){
+			if(str2.indexOf('SP')==0){
 				str2=str2.slice(2);
 			}
-			else if(str2.indexOf('界sp')==0){
+			else if(str2.indexOf('JSP')==0){
 				str2=str2.slice(3);
+			}
+			else if(str2.indexOf('☆SP')==0){
+				str2=str2.slice(3);
+			}
+			else if(str2.indexOf('手杀')==0){
+				str2=str2.slice(2);
 			}
 			return str2;
 		},
 		slimName:function(str){
 			var str2=lib.translate[str];
 			if(!str2) return '';
-			if(str2.indexOf('sp')==0){
+			if(str2.indexOf('SP')==0){
 				str2=str2.slice(2);
 			}
-			else if(str2.indexOf('界sp')==0){
+			else if(str2.indexOf('JSP')==0){
 				str2=str2.slice(3);
+			}
+			else if(str2.indexOf('☆SP')==0){
+				str2=str2.slice(3);
+			}
+			else if(str2.indexOf('手杀')==0){
+				str2=str2.slice(2);
 			}
 			return get.verticalStr(str2,true);
 		},
@@ -47629,7 +47662,7 @@
 			}
 		},
 		groups:function(){
-			return ['wei','shu','wu','qun'];
+			return ['wei','shu','wu','qun','western'];
 		},
 		types:function(){
 			var types=[];
