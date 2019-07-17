@@ -1701,7 +1701,93 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			        target.storage.boss_shedu+=trigger.num;
 			        target.markSkill('boss_shedu');
 			    },
+			    forced:true,
 			    global:'boss_shedu',
+			    mod:{
+                    cardEnabled:function (card,player){
+            if(_status.event.skill!='boss_duqu_sha'&&get.owner(card)!=undefined&&card.name=='tao') return false;
+        },
+                    cardUsable:function (card,player){
+            if(_status.event.skill!='boss_duqu_sha'&&get.owner(card)!=undefined&&card.name=='tao') return false;
+        },
+                    cardRespondable:function (card,player){
+            if(_status.event.skill!='boss_duqu_sha'&&get.owner(card)!=undefined&&card.name=='tao') return false;
+        },
+                    cardSavable:function (card,player){
+            if(_status.event.skill!='boss_duqu_sha'&&get.owner(card)!=undefined&&card.name=='tao') return false;
+        },
+                },
+                group:["boss_duqu_sha"],
+                subSkill:{
+                    sha:{
+                        enable:["chooseToUse","chooseToRespond"],
+                        filterCard:{
+                            name:"tao",
+                        },
+                        viewAs:{
+                            name:"sha",
+                        },
+                        viewAsFilter:function (player){
+                if(!player.countCards('h','tao')) return false;
+            },
+                        prompt:"将一张桃当杀使用或打出",
+                        check:function (){return 1},
+                        ai:{
+                            effect:{
+                                target:function (card,player,target,current){
+                        if(get.tag(card,'respondSha')&&current<0) return 0.6
+                    },
+                            },
+                            respondSha:true,
+                            skillTagFilter:function (player){
+                    if(!player.countCards('h','tao')) return false;
+                },
+                            order:function (){
+                    return get.order({name:'sha'})-0.1;
+                },
+                            useful:-1,
+                            value:-1,
+                            basic:{
+                                useful:[5,1],
+                                value:[5,1],
+                            },
+                            result:{
+                                target:function (player,target){
+                        if(player.hasSkill('jiu')&&!target.getEquip('baiyin')){
+                            if(get.attitude(player,target)>0){
+                                return -6;
+                            }
+                            else{
+                                return -3;
+                            }
+                        }
+                        return -1.5;
+                    },
+                            },
+                            tag:{
+                                respond:1,
+                                respondShan:1,
+                                damage:function (card){
+                        if(card.nature=='poison') return;
+                        return 1;
+                    },
+                                natureDamage:function (card){
+                        if(card.nature) return 1;
+                    },
+                                fireDamage:function (card,nature){
+                        if(card.nature=='fire') return 1;
+                    },
+                                thunderDamage:function (card,nature){
+                        if(card.nature=='thunder') return 1;
+                    },
+                                poisonDamage:function (card,nature){
+                        if(card.nature=='poison') return 1;
+                    },
+                            },
+                        },
+                        sub:true,
+                    },
+                },
 			},
 			boss_shedu:{
 			    trigger:{player:"phaseBefore"},
@@ -6855,20 +6941,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(player.countCards('h')==0) return false;
 					if(!player.hasSkill('qiangxi')) return true;
-					if(!player.hasSkill('lieren')) return true;
+					if(!player.hasSkill('retieji')) return true;
 					if(!player.hasSkill('xuanfeng')) return true;
 					if(!player.hasSkill('wansha')) return true;
 					return false;
 				},
 				filterCard:true,
+				position:'he',
 				check:function(card){
+					if(get.position(card)=='e'&&player.hasSkill('xuanfeng')) return 12-get.value(card);
 					return 7-get.value(card);
 				},
 				content:function(){
 					'step 0'
 					var list=[];
 					if(!player.hasSkill('qiangxi')) list.push('qiangxi');
-					if(!player.hasSkill('lieren')) list.push('lieren');
+					if(!player.hasSkill('retieji')) list.push('retieji');
 					if(!player.hasSkill('xuanfeng')) list.push('xuanfeng');
 					if(!player.hasSkill('wansha')) list.push('wansha');
 					if(list.length==1){
@@ -6892,7 +6980,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(list.contains('xuanfeng')) return 'xuanfeng';
 							if(list.contains('qiangxi')) return 'qiangxi';
 							if(list.contains('wansha')) return 'wansha';
-							return 'lieren';
+							return 'retieji';
 						}).set('prompt','选择获得一项技能直到回合结束');
 					}
 					'step 1'
