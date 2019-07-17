@@ -21,7 +21,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_wangyi:['female','wei',3,['oldzhenlie','oldmiji']],
 			old_caozhen:['male','wei',4,['sidi']],
 			old_quancong:['male','wu',4,['zhenshan']],
-			old_yuanshu:['male','qun',4,['yongsi','weidi']],
 			old_lingju:['female','qun',3,['jieyuan','fenxin_old']],
 			old_maliang:['male','shu',3,['xiemu','naman']],
 			old_chenqun:['male','wei',3,['dingpin','oldfaen']],
@@ -29,7 +28,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_zhuzhi:['male','wu',4,['anguo']],
 			
 			old_machao:['male','qun',4,['zhuiji','cihuai']],
-			old_bulianshi:['female','wu',3,['old_anxu','zhuiyi']],
 			old_zhugezhan:["male","shu",3,["old_zuilun","old_fuyin"]],
 			zhangliang:["male","qun",3,["old_jijun","old_fangtong"]],
 		},
@@ -562,7 +560,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		translate:{
-			old_yuanshu:'旧袁术',
+			old_yuanshu:'手杀袁术',
 			old_xusheng:'旧徐盛',
 			old_lingtong:'旧凌统',
 			old_zhuran:'旧朱然',
@@ -577,10 +575,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_chenqun:'旧陈群',
 			old_zhuhuan:'旧朱桓',
 			old_zhuzhi:'旧朱治',
-			old_machao:'旧马超',
-			old_bulianshi:'旧步练师',
+			old_machao:'☆SP马超',
 			old_zhugezhan:"旧诸葛瞻",
-			zhangliang:'旧张梁',
+			zhangliang:'SP张梁',
 
 			"old_jijun":"集军",
             "old_jijun_info":"出牌阶段，你可以将任意张手牌置于你的武将牌上。（均称为“方”）",

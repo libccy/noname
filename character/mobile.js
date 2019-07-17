@@ -1,0 +1,41 @@
+'use strict';
+game.import('character',function(lib,game,ui,get,ai,_status){
+	return {
+		name:'mobile',
+		connectBanned:['miheng'],
+		connect:true,
+		character:{
+			re_jikang:["male","wei",3,["new_qingxian","new_juexiang"]],
+			old_bulianshi:['female','wu',3,['anxu','zhuiyi']],
+			miheng:['male','qun',3,['kuangcai','shejian']],
+			taoqian:['male','qun',3,['zhaohuo','yixiang','yirang']],
+			liuzan:['male','wu',4,['fenyin']],lingcao:['male','wu',4,['dujin']],
+			sunru:['female','wu',3,['yingjian','shixin']],
+			lifeng:['male','shu',3,['tunchu','shuliang']],
+			zhuling:['male','wei',4,['zhanyi']],
+			liuye:['male','wei',3,['polu','choulve']],
+			zhaotongzhaoguang:["male","shu",4,["yizan_use","xinfu_longyuan"],[]],
+			majun:["male","wei",3,["xinfu_jingxie1","xinfu_qiaosi"],[]],
+			simazhao:["male","wei",3,["xinfu_daigong","xinfu_zhaoxin"],[]],
+			wangyuanji:["female","wei",3,["xinfu_qianchong","xinfu_shangjian"],[]],
+			pangdegong:["male","qun",3,["xinfu_pingcai","xinfu_pdgyingshi"],[]],
+			 re_sp_zhugeliang:["male","shu",3,["rehuoji","rekanpo","bazhen"],[]],
+			 re_xunyu:["male","wei",3,["quhu","rejieming"],[]],
+			 re_dianwei:["male","wei",4,["reqiangxi"],[]],
+			 re_yanwen:["male","qun",4,["reshuangxiong"],[]],
+			 re_pangtong:['male','shu',3,['xinlianhuan','niepan'],[]],
+			 xin_yuanshao:['male','qun',4,['reluanji','xueyi'],['zhu']],
+			 old_caochun:['male','wei',4,['shanjia']],
+			 old_yuanshu:['male','qun',4,['xinyongsi','yjixi']],
+		},
+		characterFilter:{
+		},
+		skill:{
+		},
+		translate:{
+			re_jikang:"新嵇康",
+			old_bulianshi:'新步练师',
+			old_caochun:'旧曹纯',
+		}
+	};
+});

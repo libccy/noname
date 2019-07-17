@@ -33,13 +33,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhenji:['female','wei',3,['reluoshen','qingguo']],
 			re_zhugeliang:['male','shu',3,['reguanxing','kongcheng']],
 			re_huaxiong:["male","qun",6,["new_reyaowu"]],
-			
-            re_sp_zhugeliang:["male","shu",3,["rehuoji","rekanpo","bazhen"],[]],
-            re_xunyu:["male","wei",3,["quhu","rejieming"],[]],
-            re_dianwei:["male","wei",4,["reqiangxi"],[]],
-            re_yanwen:["male","qun",4,["reshuangxiong"],[]],
-            re_pangtong:['male','shu',3,['xinlianhuan','niepan'],[]],
-            xin_yuanshao:['male','qun',4,['reluanji','xueyi'],['zhu']],
 		},
 		characterIntro:{
 			re_gongsunzan:'群雄之一。出身贵族，因母地位卑贱，只当了郡中小吏。他貌美，声音洪亮，机智善辩。后随卢植于缑氏山中读书，粗通经传。',
@@ -898,7 +891,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 content:function (){
 					"step 0"
 					player.chooseCardTarget({
-						position:'h',
+						position:'he',
 						filterCard:true,
 						selectCard:[1,Infinity],
 						filterTarget:function(card,player,target){
@@ -922,7 +915,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(target.countCards('h')>_status.event.player.countCards('h')) return 0;
 							return att-4;
 						},
-						prompt:'请选择要送人的卡牌'
+						prompt:get.prompt2('new_qingjian'),
 					});
 					"step 1"
 					if(result.bool){
@@ -1034,7 +1027,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return [1,-2];
 							}
 							if(card.name=='sha'&&(get.color(card)=='black')){
-								return [1,0.6];
+								return [0,-0.6];
 							}
 						},
                     },
@@ -1908,6 +1901,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				audio:2,
 				unique:true,
+				juexingji:true,
 				derivation:'gongxin',
 				trigger:{player:'phaseBegin'},
 				forced:true,
@@ -2159,6 +2153,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				mark:true,
 				skillAnimation:true,
+				limited:true,
 				trigger:{player:'phaseBegin'},
 				init:function(player){
 					player.storage.retishen=false;
@@ -2552,6 +2547,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			retieji:{
 				audio:2,
+				audioname:['boss_lvbu3'],
 				trigger:{player:'shaBegin'},
 				check:function(event,player){
 					return get.attitude(player,event.target)<0;
@@ -2712,6 +2708,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				audio:2,
 				unique:true,
+				juexingji:true,
 				trigger:{source:'damageAfter'},
 				forced:true,
 				derivation:'jianyan',
@@ -2820,6 +2817,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				unique:true,
 				mark:true,
+				limited:true,
 				trigger:{global:'useCard'},
 				priority:5,
 				filter:function(event,player){
@@ -3049,7 +3047,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             "new_tishen2":"替身",
             "new_tishen2_info":"",
             "new_qingjian":"清俭",
-            "new_qingjian_info":"每当你于摸牌阶段外获得牌时，你可以展示任意张手牌并交给一名其他角色。然后，当前回合角色本回合的手牌上限+X。（X为你给出的牌中包含的类别数）",
+            "new_qingjian_info":"每当你于摸牌阶段外获得牌时，你可以展示任意张牌并交给一名其他角色。然后，当前回合角色本回合的手牌上限+X（X为你给出的牌中包含的类别数）。每回合限一次。",
             "qingjian_add":"清俭",
             "qingjian_add_info":"",
             "new_reqingnang":"青囊",

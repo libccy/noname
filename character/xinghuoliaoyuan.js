@@ -1165,7 +1165,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						reality[get.type(he[i],'trick')]=true;
 					}
 					event.num=0;
-					var tl=['basic','trick','delay'];
+					var tl=['basic','trick','equip'];
 					for(var i=0;i<tl.length;i++){
 						if(event.choice[tl[i]]==reality[tl[i]]) event.num++;
 					}
@@ -1217,7 +1217,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(get.itemtype(trigger.cards)=='cards'&&get.position(trigger.cards[0])=='d'){
 						player.gain(trigger.cards,"gain2");
 					}
-					player.draw();
+					player.draw("nodelay");
 				},
                 ai:{
                     maixie:true,
@@ -1234,29 +1234,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 audio:1,
                 unique:true,
                 gainable:true,
-                trigger:{
-                    global:"dieEnd",
-                },
-                priority:5,
-                filter:function (event){
-					return event.playerCards&&event.playerCards.length>0
+                trigger:{global:'die'},
+				priority:5,
+				filter:function(event){
+					if(!event.playerCards||!event.playerCards.length) return false;
+					for(var i=0;i<event.playerCards.length;i++){
+					    if(!get.owner(event.playerCards[i])||get.owner(event.playerCards[i])==event.player) return true;
+					}
+					return false;
 				},
-                check:function (event){
+				check:function(event){
 					for(var i=0;i<event.playerCards.length;i++){
 						if(event.playerCards[i].name=='du') return false;
 					}
 					return true;
 				},
-                content:function (){
+				content:function(){
 					"step 0"
-					player.gain(trigger.playerCards);
-					player.$draw(trigger.playerCards);
+					event.togain=[];
+					for(var i=0;i<trigger.playerCards.length;i++){
+					    if(!get.owner(trigger.playerCards[i])||get.owner(trigger.playerCards[i])==trigger.player) event.togain.push(trigger.playerCards[i]);
+					}
+					player.gain(event.togain);
+					trigger.player.$give(event.togain.length,player);
 					game.delay();
 					"step 1"
-					for(var i=0;i<trigger.playerCards.length;i++){
-						trigger.cards.remove(trigger.playerCards[i]);
+					for(var i=0;i<event.togain.length;i++){
+						trigger.cards.remove(event.togain[i]);
 					}
-					trigger.playerCards.length=0;
 				},
             },
             "xinfu_fujian":{
@@ -2619,7 +2624,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 },
                 forced:true,
                 filter:function (event,player){
-					if(_status.currentPhase!=player||event.parent.parent.name=='phaseDraw') return false;
+					if(!player.isPhaseUsing()) return false;
 					return event.getParent().name=='draw'&&event.getParent(2).name!='xinfu_zhanji';
 				},
                 content:function (){
@@ -5096,7 +5101,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 },
                 filter:function (event,player){
 					if(!player.storage.xinfu_zhaoxin.length) return false;
-					if(event.player==player) return false;
 					return get.distance(player,event.player,'attack')<=1
 				},
                 direct:true,

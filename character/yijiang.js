@@ -21,7 +21,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wangyi:['female','wei',3,['zhenlie','miji']],
 			yufan:['male','wu',3,['zhiyan','zongxuan']],
 			chengong:['male','qun',3,['mingce','zhichi']],
-			bulianshi:['female','wu',3,['anxu','zhuiyi']],
+			bulianshi:['female','wu',3,['old_anxu','zhuiyi']],
 			handang:['male','wu',4,['gongji','jiefan']],
 			fuhuanghou:['female','qun',3,['zhuikong','qiuyuan']],
 			zhonghui:['male','wei',4,['quanji','zili']],
@@ -83,7 +83,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xuezong:['male','wu',3,['funan','jiexun']],
 			
 			old_huaxiong:['male','qun',6,['shiyong']],
-			re_jikang:["male","wei",3,["new_qingxian","new_juexiang"],[]],
+			
 			re_yujin:["male","wei",4,["zhenjun"],[]],
 		},
 		characterIntro:{
@@ -1023,7 +1023,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					jilie:{
 						trigger:{player:'damageEnd'},
 						filter:function(event,player){
-							return event.source&&event.source.isIn()&&event.source!=player;
+							return event.source&&event.source.isIn();
 						},
 						check:function(event,player){
 							if(get.attitude(player,event.source)>0&&event.source.isHealthy()){
@@ -1998,7 +1998,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var trigger=_status.event.getTrigger();
 								var player=_status.event.player;
 								if(trigger.targets.contains(target)) return false;
-								return lib.filter.targetEnabled2(trigger.card,player,target)&&lib.filter.targetInRange(trigger.card,player,target);
+								return lib.filter.targetEnabled2(trigger.card,player,target);
 							}).set('prompt2',prompt2).set('ai',function(target){
 								var trigger=_status.event.getTrigger();
 								var player=_status.event.player;
@@ -3422,6 +3422,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player!=target;
 				},
 				unique:true,
+				limited:true,
 				selectTarget:-1,
 				multitarget:true,
 				multiline:true,
@@ -5018,7 +5019,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								clone.delete();
 							}
 						},event.card1);
-						target.damage();
+						target.damage('nocard');
 					}
 					else if(name1!='sha'&&event.card2.name=='shan'){
 						player.discard(event.card1).set('animate',false);
@@ -5162,7 +5163,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var players=game.filterPlayer();
 						for(var i=0;i<players.length;i++){
 							var nh=players[i].countCards('h');
-							if(players[i].group=='shu'&&get.attitude(players[i],player)>1&&(nh>=4||(nh>=3&&players[i].countCards('h','sha')))){
+							if(player!=players[i]&&players[i].group=='shu'&&get.attitude(players[i],player)>2&&(nh>=3&&players[i].countCards('h','sha'))){
 								yep=true;break;
 							}
 						}
@@ -5234,7 +5235,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var player=_status.event.player,players=game.filterPlayer();
 					for(var i=0;i<players.length;i++){
 						var nh=players[i].countCards('h');
-						if(players[i].group=='shu'&&get.attitude(players[i],player)>1&&(nh>=4||(nh>=3&&players[i].countCards('h','sha')))){
+						if(players[i]!=player&&players[i].group=='shu'&&get.attitude(players[i],player)>2&&(nh>=3&&players[i].countCards('h','sha'))){
 							return 5-get.value(card);
 						}
 					}
@@ -5644,6 +5645,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					content:'limited'
 				},
 				unique:true,
+				limited:true,
 				content:function(){
 					'step 0'
 					player.storage.xingshuai=true;
@@ -6097,6 +6099,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player!=target;
 				},
 				unique:true,
+				limited:true,
 				selectTarget:-1,
 				mark:true,
 				line:'fire',
@@ -6256,6 +6259,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				audio:2,
 				unique:true,
+				limited:true,
 				mark:true,
 				init:function(player){
 					player.storage.jiefan=false;
@@ -6324,6 +6328,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				audio:2,
 				unique:true,
+				limited:true,
 				enable:'chooseToUse',
 				init:function(player){
 					player.storage.fuli=false;
@@ -6448,7 +6453,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				position:'he',
 				filterCard:true,
 				content:function(){
-					target.damage();
+					target.damage('nocard');
 				},
 				ai:{
 					result:{
@@ -6995,6 +7000,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				audio:3,
 				unique:true,
+			 juexingji:true,
 				trigger:{player:'phaseBegin'},
 				forced:true,
 				filter:function(event,player){
@@ -7057,6 +7063,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				audio:2,
 				unique:true,
+				limited:true,
 				enable:'phaseUse',
 				filter:function(event,player){
 					return !player.storage.xianzhou&&player.countCards('e')>0;
@@ -8349,7 +8356,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					switch(num){
 						case 1:player.discardPlayerCard(target,true);break;
 						case 2:target.chooseCard('选择一张牌交给'+get.translation(player),'he',true);break;
-						case 3:target.damage();break;
+						case 3:target.damage('nocard');break;
 						default:game.asyncDraw([player,target],2);
 					}
 					if(num!=2) event.finish();
@@ -8489,6 +8496,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xuanfeng:{
 				audio:2,
+				audioname:['boss_lvbu3'],
 				trigger:{player:['loseEnd','phaseDiscardEnd']},
 				direct:true,
 				filter:function(event,player){
@@ -9718,7 +9726,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qinmi:'秦宓',
 			caiyong:'蔡邕',
 			"re_yujin":"于禁",
-			"re_jikang":"新嵇康",
 
             "new_qingxian":"清弦",
             "new_qingxian_info":"出牌阶段限一次，你可以弃置至多X张牌并选择等量的其他角色。这些角色中，装备区内牌数少于你的回复1点体力，等于你的摸一张牌，多于你的失去1点体力。若你以此法指定的角色数等于X，则你摸一张牌。（X为你的体力值）",
