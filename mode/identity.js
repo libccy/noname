@@ -617,6 +617,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(typeof lib.config.test_game=='string'&&player==game.me.next){
 						player.init(lib.config.test_game);
 					}
+					if(player.group=='shen'){
+						    var list=lib.group.slice(0);
+						    list.remove('shen');
+						    if(list.length) player.group=list.randomGet();
+						}
+						player.node.name.dataset.nature=get.groupnature(player.group);
 				}
 				next.setContent(function(){
 					"step 0"
@@ -1143,21 +1149,48 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						ui.cheat2.close();
 						delete ui.cheat2;
 					}
+					var chooseGroup=false;
 					if(event.chosen.length){
-						game.me.init(event.chosen[0],event.chosen[1]);
+						if(lib.character[event.chosen[0]][1]=='shen'){
+						    chooseGroup=true;
+						}
 					}
 					else if(event.modchosen){
 						if(event.modchosen[0]=='random') event.modchosen[0]=result.buttons[0].link;
 						else event.modchosen[1]=result.buttons[0].link;
-						game.me.init(event.modchosen[0],event.modchosen[1]);
 					}
 					else if(result.buttons.length==2){
-						game.me.init(result.buttons[0].link,result.buttons[1].link);
+						event.choosed=[result.buttons[0].link,result.buttons[1].link];
 						game.addRecentCharacter(result.buttons[0].link,result.buttons[1].link);
+						if(lib.character[event.choosed[0]][1]=='shen'){
+						    chooseGroup=true;
+						}
 					}
 					else{
-						game.me.init(result.buttons[0].link);
+						event.choosed=[result.buttons[0].link];
+						if(lib.character[event.choosed[0]][1]=='shen'){
+						    chooseGroup=true;
+						}
 						game.addRecentCharacter(result.buttons[0].link);
+					}
+					if(chooseGroup){
+					     var list=lib.group.slice(0);
+						    list.remove('shen');
+						    game.me.chooseControl(list).prompt='请选择神武将的势力';
+					}
+					"step 2"
+					event.group=result.control||false;
+					if(event.chosen.length){
+						game.me.init(event.chosen[0],event.chosen[1]);
+					}
+					else if(event.modchosen){
+						game.me.init(event.modchosen[0],event.modchosen[1]);
+					}
+					else if(event.choosed.length==2){
+						game.me.init(event.choosed[0],event.choosed[1]);
+					}
+					else{
+						game.me.init(event.choosed[0]);
 					}
 					event.list.remove(game.me.name);
 					event.list.remove(game.me.name2);
@@ -1171,6 +1204,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							event.ai(game.players[i],event.list.splice(0,get.config('choice_'+game.players[i].identity)),null,event.list)
 						}
 					}
+					"step 3"
+					if(event.group){
+					    game.me.group=event.group;
+					    game.me.node.name.dataset.nature=get.groupnature(game.me.group);
+					    game.me.update();
+					}
+					"step 4"
 					setTimeout(function(){
 						ui.arena.classList.remove('choose-character');
 					},500);

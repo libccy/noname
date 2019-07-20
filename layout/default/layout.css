@@ -2469,6 +2469,10 @@ div:not(.handcards)>.card>.info>span,
 	border-radius: 21px;
 	z-index: 1
 }
+.equips>.equip6 {
+	bottom: 3;
+	left: calc(50% - 21px);
+}
 .equips>div>div:not(.image),.judges>div>div:not(.image),.marks>div>div:not(.image) {
 	display: none;
 }
@@ -3688,6 +3692,11 @@ div[data-nature='firemx'],
 span[data-nature='firemx'] {
 	text-shadow: black 0 0 1px,rgba(191, 0, 0,0.2) 0 0 2px,rgba(191, 0, 0,1) 0 0 2px,rgba(191, 0, 0,1) 0 0 5px,
 		rgba(191, 0, 0,1) 0 0 5px,black 0 0 1px;
+}
+div[data-nature='firemm'],
+span[data-nature='firemm'] {
+	text-shadow: black 0 0 1px,rgba(232, 53, 53,1) 0 0 2px,rgba(232, 53, 53,1) 0 0 2px,rgba(232, 53, 53,1) 0 0 2px,
+		rgba(232, 53, 53,1) 0 0 2px,black 0 0 1px;
 }
 
 .player .identity[data-color="mingzhong"] {

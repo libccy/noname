@@ -63,7 +63,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		perfectPair:{
 			jiaxu:['liqueguosi'],
-			yuanshao:['yanwen'],
+			re_yuanshao:['yanwen'],
 			menghuo:['zhurong'],
 			sp_zhugeliang:['pangtong'],
 			sunce:['zhouyu','taishici','daqiao'],
@@ -1180,9 +1180,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						filter:function(event,player){
-						    return event.player.storage.nzry_huaiju&&event.player.storage.nzry_huaiju>0;
+						    return !event.tachibanaed&&event.player.storage.nzry_huaiju&&event.player.storage.nzry_huaiju>0;
 						},
 						content:function(){
+						    trigger.tachibanaed=true;
 						    player.line(trigger.player,'green');
 						    if(trigger.name=='damage'){
 						        trigger.cancel();
@@ -1279,7 +1280,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.chooseControl().set('ai',function(){
 								if(game.countPlayer(function(current){return get.attitude(player,current)<0&&current.hp==trigger.num})>0&&trigger.num<=3) return 1;
 								return 0;
-							}).set('choiceList',[event.str1,event.str2]);
+							}).set('choiceList',[event.str1,event.str2]).set('prompt','是否发动【溃诛】？');
 							'step 1'
 							event.control=[event.str1,event.str2][result.index];
 							'step 2'
@@ -1293,10 +1294,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										num+=targets[i].hp;
 									};
 									return num+target.hp<=trigger.num;
-								}).ai=function(target){
+								}).set('ai',function(target){
 									if(ui.selected.targets[0]!=undefined) return -1;
 									return get.attitude(player,target)<0;
-								};
+								}).promptbar='none';
 							}else{
 								player.chooseTarget('请选择【溃诛】的目标',[1,trigger.num]).ai=function(target){
 									return get.attitude(player,target);
@@ -1369,7 +1370,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								},
 								content:function(){
 									'step 0'
-									player.chooseTarget(get.prompt('nzry_zhizheng'),function(card,player,target){
+									player.chooseTarget(get.prompt2('nzry_zhizheng'),function(card,player,target){
 										return get.distance(target,player,'attack')>1&&target.countDiscardableCards(player,'he');
 									}).ai=function(target){
 										return -get.attitude(player,target);
@@ -1528,9 +1529,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								audio:2,
 								prompt2:"当你使用牌指定目标时，若此牌与你本回合使用的牌类型均不同（包括装备牌），则你可以将此牌置于牌堆顶，然后摸一张牌",
 								trigger:{
-									player:['useCard','respond'],				
+									player:['useCard','useCardAfter','respond'],				
 								},
-								filter:function (event,player){
+								filter:function (event,player,name){
+									if(name=='useCard'&&!['equip','delay'].contains(get.type(event.card))) return false;
+									if(name=='useCardAfter'&&['equip','delay'].contains(get.type(event.card))) return false;
 									return ((event.name=='respond'&&event.card.name=='shan'&&event.parent.parent.name=='sha')||event.name=='useCard')&&event.cards.length>0&&player.storage.nzry_shicai!=undefined&&!player.storage.nzry_shicai.contains(get.type(event.card,'trick'));
 								},
 								check:function (event,player){
@@ -2187,7 +2190,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lianhuan4:{
 				mod:{
         selectTarget:function(card,player,range){
-            if(card.name=='tiesuo'&&range[1]<3) range[1]=3;
+            if(card.name=='tiesuo'&&player.hasSkill('xinlianhuan')&&range[1]<3) range[1]=3;
         },
     },
 			},
@@ -3139,12 +3142,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				// unique:true,
 				// gainable:true,
-				trigger:{global:'discardAfter'},
+				group:["guzheng_count"],
+				subSkill:{
+				    count:{
+				        trigger:{global:'discardAfter'},
+				        forced:true,
+				        silent:true,
+				        popup:false,
+				        filter:function(event,player){
+				            if(event.guzhenged) return false;
+				            if(!event.cards||!event.cards.length) return false;
+				            var evt=event.getParent('phaseDiscard');
+				            return evt&&evt.name=='phaseDiscard'&&evt.player!=player;
+				        },
+				        content:function(){
+				            var evt=event.getParent('phaseDiscard');
+				            trigger.guzhenged=true;
+				            if(!evt.guzhengcards) evt.guzhengcards=[];
+				            evt.guzhengcards.addArray(trigger.cards);
+				        },
+				        sub:true,
+				    },
+				},
+				trigger:{global:'phaseDiscardAfter'},
 				filter:function(event,player){
 					if(event.player!=player&&event.player.isIn()&&
-					event.cards&&event.cards.length&&event.getParent(2).name=='phaseDiscard'){
-						for(var i=0;i<event.cards.length;i++){
-							if(get.position(event.cards[i])=='d'){
+					event.guzhengcards&&event.guzhengcards.length){
+						for(var i=0;i<event.guzhengcards.length;i++){
+							if(get.position(event.guzhengcards[i])=='d'){
 								return true;
 							}
 						}
@@ -3154,10 +3179,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				checkx:function(event,player){
 					var du=false;
 					var num=0;
-					for(var i=0;i<event.cards.length;i++){
-						if(get.position(event.cards[i])=='d'){
+					for(var i=0;i<event.guzhengcards.length;i++){
+						if(get.position(event.guzhengcards[i])=='d'){
 							num++;
-							if(event.cards[i].name=='du'){
+							if(event.guzhengcards[i].name=='du'){
 								du=true;
 							}
 						}
@@ -3174,7 +3199,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
-					event.cards=trigger.cards.slice(0);
+					event.cards=trigger.guzhengcards.slice(0);
 					for(var i=0;i<event.cards.length;i++){
 						if(get.position(event.cards[i])!='d'){
 							event.cards.splice(i,1);i--;
@@ -4040,6 +4065,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filterTarget:function(card,player,target){
 							return target.isMinHandcard();
 						},
+						prompt:'将一半的手牌交给场上手牌数最少的一名角色',
 						forced:true,
 						ai2:function(target){
 							return get.attitude(_status.event.player,target);
@@ -6307,7 +6333,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_chenglve":"成略",
 			"nzry_chenglve_info":"转换技，出牌阶段限一次，①你可以摸一张牌，然后弃置两张手牌。②你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制",
 			"nzry_shicai":"恃才",
-			"nzry_shicai_info":"当你使用牌指定目标时，若此牌与你本回合使用的牌类型均不同（包括装备牌），则你可以将此牌置于牌堆顶，然后摸一张牌",
+			"nzry_shicai_info":"当你使用牌时，若此牌与你本回合使用的牌类型均不同（包括装备牌），则你可以将此牌置于牌堆顶，然后摸一张牌",
 			"nzry_cunmu":"寸目",
 			"nzry_cunmu_info":"锁定技，当你摸牌时，改为从牌堆底摸牌",
 			"nzry_kuizhu":"溃诛",
@@ -6440,7 +6466,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hunzi_info:'觉醒技，准备阶段，若你的体力为1，你须减1点体力上限，并永久获得技能“英姿”和“英魂”。',
 			zhiba_info:'主公技，其他吴势力角色的出牌阶段，可与你进行一次拼点，若该角色没赢，你可以获得双方拼点的牌；你的觉醒技发动后，你可以拒绝此拼点。每回合限一次。',
 			zhijian_info:'出牌阶段，你可以将你手牌中的一张装备牌置于一名其他角色装备区里（不得替换原装备），然后摸一张牌。',
-			guzheng_info:'其他角色的弃牌阶段结束时，你可将其弃置的一张牌返回其手牌，然后获得其弃置的其它牌',
+			guzheng_info:'其他角色的弃牌阶段结束时，你可将本阶段进入弃牌堆的一张牌返回其手牌，然后获得其它牌',
 			beige_info:'一名角色每受到【杀】造成的一次伤害，你可以弃一张牌，并令其进行一次判定，判定结果为：♥该角色回复1点体力；♦︎该角色摸两张牌；♣伤害来源弃两张牌；♠伤害来源将其武将牌翻面',
 			duanchang_info:'锁定技，杀死你的角色失去当前的所有技能直到游戏结束。',
 			// fushen_info:'回合开始前，你可以选择与任意一名角色交换控制权，该角色可选择在下一个回合开始前与你换回',

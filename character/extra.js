@@ -16,7 +16,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"shen_liubei":["male","shen",6,["nzry_longnu","nzry_jieying"],["shu"]],
 			"shen_luxun":["male","shen",4,["nzry_junlve","nzry_cuike","nzry_dinghuo"],["wu"]],
 			"shen_zhangliao":["male","shen",4,["drlt_duorui","drlt_zhiti"],["wei"]],
-			"shen_ganning":["male","shen",3,["drlt_poxi","drlt_jieying"],["wu"]],
+			"shen_ganning":["male","shen","3/6",["drlt_poxi","drlt_jieying"],["wu"]],
 		},
 		characterIntro:{
 			shen_guanyu:'关羽，字云长。曾水淹七军、擒于禁、斩庞德、威震华夏，吓得曹操差点迁都躲避，但是东吴偷袭荆州，关羽兵败被害。后传说吕蒙因关羽之魂索命而死。',
@@ -25,7 +25,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_zhugeliang:'字孔明、号卧龙，汉族，琅琊阳都人，三国时期蜀汉丞相、杰出的政治家、军事家、发明家、文学家。在世时被封为武乡侯，死后追谥忠武侯，后来东晋政权推崇诸葛亮军事才能，特追封他为武兴王。诸葛亮为匡扶蜀汉政权，呕心沥血、鞠躬尽瘁、死而后已。其代表作有《前出师表》、《后出师表》、《诫子书》等。曾发明木牛流马等，并改造连弩，可一弩十矢俱发。于234年在宝鸡五丈原逝世。',
 		},
 		characterTitle:{
-			shen_ganning:"体力上限：6",
+			//shen_ganning:"体力上限：6",
 		},
 		skill:{
             "new_wuhun":{
@@ -47,18 +47,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					source.markSkill('new_wuhun_mark');
 				},
                 contentx:function (){
-					"step 0"
-					source.line(player,{color:[255, 255, 0]});
-					source.logSkill('new_wuhun_die',player);
+							"step 0"
+							var num=0;
+							for(var i=0;i<game.players.length;i++){
+								var current=game.players[i];
+								if(current!=player&&current.storage.new_wuhun_mark&&current.storage.new_wuhun_mark>num){
+									num=current.storage.new_wuhun_mark;
+								}
+							}
+							player.chooseTarget(true,'请选择【武魂】的目标',function(card,player,target){
+								return target!=player&&target.storage.new_wuhun_mark==num;
+							}).set('ai',function(target){
+								return -get.attitude(_status.event.player,target);
+							}).set('forceDie',true);
+							"step 1"
+							if(result.bool&&result.targets&&result.targets.length){
+							var target=result.targets[0];
+							event.target=target;
+					player.logSkill('new_wuhun_die',target);
+				 player.line(target,{color:[255, 255, 0]});
 					game.delay(2);
-					"step 1"
-					player.judge(function(card){
+					}
+					"step 2"
+					target.judge(function(card){
 						if(['tao','taoyuan'].contains(card.name)) return 10;
 						return -10;
 					});
-					"step 2"
+					"step 3"
 					if(!result.bool){
-						lib.element.player.die.apply(player,[]);
+						lib.element.player.die.apply(target,[]);
 					}
 				},
                 subSkill:{
@@ -77,25 +94,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
                         content:function (){
 							"step 0"
-							var num=0;
-							for(var i=0;i<game.players.length;i++){
-								var current=game.players[i];
-								if(current!=player&&current.storage.new_wuhun_mark&&current.storage.new_wuhun_mark>num){
-									num=current.storage.new_wuhun_mark;
-								}
-							}
-							player.chooseTarget(true,'请选择【武魂】的目标',function(card,player,target){
-								return target!=player&&target.storage.new_wuhun_mark==num;
-							}).ai=function(target){
-								return -get.attitude(_status.event.player,target);
-							};
-							"step 1"
-							if(result.bool&&result.targets&&result.targets.length){
 								var next=game.createEvent('new_wuhun',null,trigger.parent);
-								next.player=result.targets[0];
-								next.source=player;
+								next.forceDie=true;
+								next.player=player;
 								next.setContent(lib.skill.new_wuhun.contentx);
-							}
 						},
                         sub:true,
                     },
@@ -452,7 +454,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.num>0; 
 				},
 				content:function(){
-					player.storage.baonu+=trigger.num;
+					if(player==trigger.player) player.storage.baonu+=trigger.num;
+					if(player==trigger.source) player.storage.baonu+=trigger.num;
 					player.markSkill('baonu');
 					player.syncStorage('baonu');
 				},
@@ -2315,12 +2318,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					'drlt_poxi':{
-						init:function (player,skill){
-							if(player.hasStockSkill(skill)&&!player.storage[skill]){
-								player.gainMaxHp(3);
-								player.storage[skill]=true;
-							}
-						},
 						audio:2,
 						enable:'phaseUse',
 						usable:1,

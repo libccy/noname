@@ -188,6 +188,7 @@
 #arena:not(.chess) .player[data-position='0']>.equips>.equip2{top: 10px;right: 10px;}
 #arena:not(.chess) .player[data-position='0']>.equips>.equip3{bottom: 10px;left: 10px;}
 #arena:not(.chess) .player[data-position='0']>.equips>.equip4{bottom: 10px;right: 10px;}
+#arena:not(.chess) .player[data-position='0']>.equips>.equip6{bottom: 10px;right: 10px;}
 
 #arena:not(.chess) .player[data-position='0']>.name,
 #arena:not(.chess) .player[data-position='0'].linked>.name{
@@ -305,7 +306,8 @@
     top:20px;
 }
 #arena.mobile.oblongcard:not(.chess):not(.textequip) .player[data-position='0']>.equips>.equip3,
-#arena.mobile.oblongcard:not(.chess):not(.textequip) .player[data-position='0']>.equips>.equip4{
+#arena.mobile.oblongcard:not(.chess):not(.textequip) .player[data-position='0']>.equips>.equip4,
+#arena.mobile.oblongcard:not(.chess):not(.textequip) .player[data-position='0']>.equips>.equip6{
     bottom:20px;
 }
 

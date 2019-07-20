@@ -808,6 +808,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						init:function(player){player.storage.gzweidi=[]},
 						enable:'phaseUse',
 						usable:1,
+						filter:function(event,player){
+					     return player.storage.gzweidi.length>0
+						},
 						filterTarget:function(card,player,target){return target!=player&&player.storage.gzweidi.contains(target)},
 						content:function(){
 							'step 0'
@@ -852,7 +855,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								trigger:{global:'gainBefore'},
 								silent:true,
 								filter:function(event,player){
-									if(player.storage.gzweidi.contains(event.player)||_status.currentPhase!=player) return false;
+									if(player==event.player||player.storage.gzweidi.contains(event.player)||_status.currentPhase!=player) return false;
 									if(event.cards.length){
 										if(event.getParent().name=='draw') return true;
 										for(var i=0;i<event.cards.length;i++) if(get.position(event.cards[i])=='c') return true;
@@ -1137,7 +1140,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								},
 								content:function(){
 									'step 0'
-									player.chooseBool('总御</br></br><div="center text">是否与'+get.translation(trigger.player)+'交换装备区内坐骑牌</div>');
+									player.chooseBool('是否发动【总御】，与'+get.translation(trigger.player)+'交换装备区内坐骑牌？');
 									'step 1'
 									if(result.bool){
 										player.logSkill('gzzongyu_others',trigger.player);
@@ -2459,7 +2462,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                 filterTarget:function (card,player,target){
         if(player==target) return false;
         for(var i=0;i<ui.selected.targets.length;i++){
-            if(ui.selected.targets[i].group==target.group) return false;
+            if(ui.selected.targets[i].isFriendOf(target)) return false;
         }
         return target.countCards('he')>0;
     },

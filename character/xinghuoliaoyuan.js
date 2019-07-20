@@ -30,7 +30,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuyan:"刘焉（？－194年），字君郎（《华阳国志》又作君朗）。江夏郡竟陵县（今湖北省天门市）人。东汉末年宗室、军阀，汉末群雄之一，西汉鲁恭王刘余之后。<br>刘焉初以汉朝宗室身份，拜为中郎，历任雒阳令、冀州刺史、南阳太守、宗正、太常等官。因益州刺史郄俭在益州大肆聚敛，贪婪成风，加上当时天下大乱。刘焉欲取得一安身立命之所，割据一方，于是向朝廷求为益州牧，封阳城侯，前往益州整饬吏治。郄俭为黄巾军所杀，刘焉进入益州，派张鲁盘踞汉中，张鲁截断交通，斩杀汉使，从此益州与中央道路不通。刘焉进一步对内打击地方豪强，巩固自身势力，益州因而处于半独立的状态。兴平元年（194年），刘焉因背疮迸发而逝世，其子刘璋继领益州牧。",
         },
 		characterTitle:{
-       		lijue:"体力上限：6",
+       		//lijue:"体力上限：6",
     	},
         perfectPair:{
             lijue:['guosi','jiaxu'],
@@ -71,12 +71,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             "xinfu_yisuan":{
                 usable:1,
                 audio:2,
-                init:function (player){
-                    if(player.hasStockSkill('xinfu_yisuan')&&!player.storage.xinfu_yisuan){
-                        player.gainMaxHp(2);
-                        player.storage.xinfu_yisuan=true;
-                    }
-                },
                 trigger:{
                     player:"useCardAfter",
                 },
@@ -2056,7 +2050,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 skillAnimation:true,
                 content:function (){
 					"step 0"
-					trigger.source.chooseBool('【许身】：是否将自己的武将牌替换为关索？').set('ai',function(){
+					trigger.source.chooseBool('【许身】：是否将自己的一张武将牌替换为“关索”？').set('ai',function(){
 						return true;
 					});
 					"step 1"
@@ -2069,12 +2063,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					"step 2"
-					var num=4;
-					if(game.zhu==trigger.source&&game.players.length>=5){
-						if(trigger.source.name2!=undefined) num++;
-						num++;
-					}
-					trigger.source.reinit(result.control,'guansuo',num);
+					trigger.source.reinit(result.control,'guansuo');
 					player.recover();
 					player.addSkill('xinfu_zhennan');
 				},
@@ -3479,8 +3468,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 forced:true,
                 filter:function (event,player){
 					if(!event.source) return false;
-					if(event.source.getAttackRange()==3) return false;
-					if(event.source.getAttackRange()<3&&event.num<=1) return false;
+					var range=event.source.getAttackRange();
+					if(range==3) return false;
+					if(range<3&&event.num<=1) return false;
 					return true;
 				},
                 priority:-9.5,
@@ -4968,6 +4958,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             "xinfu_jijie":{
                 enable:"phaseUse",
                 usable:1,
+                audio:2,
                 filter:function(){
                     return ui.cardPile.hasChildNodes();
                 },
@@ -5010,6 +5001,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     global:["gainEnd","dying"],
                 },
                 priority:6,
+                audio:2,
                 filter:function (event,player){
 					if(event.name=='dying') return true;
 					if(['gainPlayerCard','gainMultiple'].contains(event.parent.name)) return false;
@@ -5026,6 +5018,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             },
             "xinfu_daigong":{
                 usable:1,
+                audio:2,
                 trigger:{
                     player:"damageBegin",
                 },
@@ -5063,6 +5056,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 },
                 enable:"phaseUse",
                 usable:1,
+                audio:2,
                 init:function (player,skill){
 					if(!player.storage[skill]) player.storage[skill]=[];
 				},
@@ -5147,6 +5141,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
             },
             "xinfu_qianchong":{
+                audio:3,
                 mod:{
                     targetInRange:function (card,player,target){
 						if(player.storage.xinfu_qianchong.contains(get.type(card,'trick'))){
@@ -5213,6 +5208,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
             },
             "qc_weimu":{
+                audio:"xinfu_qianchong",
                 mod:{
                     targetEnabled:function (card,player,target){
 						var bool=true;
@@ -5227,7 +5223,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 },
             },
             "qc_mingzhe":{
-                audio:2,
+                audio:"xinfu_qianchong",
                 trigger:{
                     player:["useCardAfter","respondAfter","discardAfter"],
                 },
@@ -5260,6 +5256,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 trigger:{
                     global:"phaseEnd",
                 },
+                audio:2,
                 filter:function (event,player){
 					return player.storage.xinfu_shangjian<=player.hp&&player.storage.xinfu_shangjian>0;
 				},

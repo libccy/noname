@@ -71,7 +71,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhenji:['caopi'],
 			caocao:['xuzhu','dianwei','bianfuren'],
 			huangzhong:['weiyan'],
-			zhugeliang:['huangyueying'],
+			zhugeliang:['huangyueying','jiangwei','jiangfei'],
 			liubei:['guanyu','zhangfei','ganfuren'],
 			zhaoyun:['liushan'],
 			daqiao:['xiaoqiao'],
@@ -1279,6 +1279,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(event.cards.length-top.length)+'下');
 						game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
+						game.updateRoundNumber();
 						game.delay(2);
 					}
 				},

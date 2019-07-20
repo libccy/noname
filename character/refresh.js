@@ -1868,9 +1868,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.num=trigger.num;
 					"step 1"
 					player.judge(function(card){
-						if(get.color(card)=='red') return _status.event.eff;
+						if(get.color(card)=='red') return 1;
 						return 0;
-					}).set('eff',get.damageEffect(trigger.source,player,player));
+					});
 					"step 2"
 					if(result.color=='black'){
 						if(trigger.source.countCards('he')){
@@ -1882,13 +1882,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					event.num--;
 					if(event.num>0){
-						player.chooseBool('是否继续发动？');
+						player.chooseBool(get.prompt2('reganglie'));
 					}
 					else{
 						event.finish();
 					}
 					"step 3"
 					if(result.bool){
+						player.logSkill('reganglie',trigger.source);
 						event.goto(1);
 					}
 				},

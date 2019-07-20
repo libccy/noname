@@ -7352,10 +7352,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				skillAnimation:true,
 				content:function(){
-					"step 0"
-					player.chooseTarget(get.prompt('zhuiyi'),function(card,player,target){
+						var next=game.createEvent('zhuiyi',null,trigger.parent);
+						next.forceDie=true;
+						next.player=player;
+						if(trigger.source) next.source=trigger.source;
+						next.setContent(lib.skill.zhuiyi.contentx);
+				},
+				contentx:function(){
+				  "step 0"
+				  player.chooseTarget(get.prompt2('zhuiyi'),function(card,player,target){
 						return player!=target&&_status.event.source!=target;
-					}).set('ai',function(target){
+					}).set('forceDie',true).set('ai',function(target){
 						var num=get.attitude(_status.event.player,target);
 						if(num>0){
 							if(target.hp==1){
@@ -7366,21 +7373,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						return num;
-					}).set('source',trigger.source);
+					}).set('source',event.source);
 					"step 1"
 					if(result.bool){
-						var target=result.targets[0];
-						var next=game.createEvent('zhuiyi',null,trigger.parent);
-						next.player=target;
-						next.source=player;
-						next.setContent(lib.skill.zhuiyi.contentx);
+				  var target=result.targets[0];
+				  player.logSkill('zhuiyi',target);
+				  player.line(target,'green');
+						target.recover();
+						target.draw(3);
 					}
-				},
-				contentx:function(){
-				  event.source.logSkill('zhuiyi',player);
-				  event.source.line(player,'green');
-						player.recover();
-						player.draw(3);
 				},
 				ai:{
 					expose:0.5,
@@ -7442,7 +7443,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								for(var i=0;i<players.length;i++){
 									var num2=players[i].countCards('h');
 									var att2=get.attitude(player,players[i]);
-									if(att2>=0&&num2<num) return -1;
+									if(num2<num){
+									    if(att2>0) return -3;
+									    return -1;
+									}
 								}
 								return 0;
 							}
@@ -7450,7 +7454,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return 1;
 							}
 						},
-						player:0.1
+						player:1,
 					}
 				}
 			},
@@ -8512,30 +8516,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					player.chooseTarget([1,2],get.prompt('xuanfeng'),function(card,player,target){
+					event.count=2;
+					"step 1"
+					player.chooseTarget(get.prompt('xuanfeng'),function(card,player,target){
 						if(player==target) return false;
-						return target.countCards('he');
+						return target.countDiscardableCards(player,'he');
 					}).set('ai',function(target){
 						return -get.attitude(_status.event.player,target);
 					});
-					"step 1"
+					"step 2"
 					if(result.bool){
 						player.logSkill('xuanfeng',result.targets);
-						event.targets=result.targets
-						if(result.targets.length==1){
-							player.discardPlayerCard(event.targets[0],'he',[1,2],true);
-						}
-						else{
-							player.discardPlayerCard(event.targets[0],'he',true);
-						}
+						player.line(result.targets,'green');
+						player.discardPlayerCard(result.targets[0],'he',true);
+						event.count--;
 					}
-					else{
-						event.finish();
-					}
-					"step 2"
-					if(targets.length==2){
-						player.discardPlayerCard(targets[1],'he',true);
-					}
+					else event.finish();
+					"step 3"
+					if(event.count) event.goto(1);
 				},
 				ai:{
 					effect:{

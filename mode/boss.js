@@ -737,13 +737,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		characterPack:{
 			mode_boss:{
 				boss_hundun:['male','shen',25,['boss_xiongshou','boss_wuzang','boss_xiangde','boss_yinzei','boss_yinzei_switch'],['qun','boss','bossallowed'],'qun'],
-				boss_qiongqi:['male','shen',20,['boss_xiongshou','boss_zhue','boss_futai','boss_yandu','boss_yandu_switch'],['qun','boss','bossallowed'],'qun'],
+				boss_qiongqi:['male','shen','20/25',['boss_xiongshou','boss_zhue','boss_futai','boss_yandu','boss_yandu_switch'],['qun','boss','bossallowed'],'qun'],
 				boss_taotie:['male','shen',20,['boss_xiongshou','boss_tanyu','boss_cangmu','boss_jicai','boss_jicai_switch'],['qun','boss','bossallowed'],'qun'],
 				boss_taowu:['male','shen',25,['boss_xiongshou','boss_minwan','boss_nitai','boss_luanchang','boss_luanchang_switch'],['qun','boss','bossallowed'],'qun'],
 				boss_zhuyin:['male','shen',4,['boss_xiongshou'],['qun','hiddenboss','bossallowed'],'qun'],
 				
 				boss_xiangliu:['male','shen',25,['boss_yaoshou','boss_duqu','boss_jiushou','boss_echou','boss_echou_switch'],['qun','boss','bossallowed'],'qun'],
-				boss_zhuyan:['male','shen',25,['boss_yaoshou','boss_bingxian','boss_juyuan','boss_xushi','boss_xushi_switch'],['qun','boss','bossallowed'],'qun'],
+				boss_zhuyan:['male','shen','25/30',['boss_yaoshou','boss_bingxian','boss_juyuan','boss_xushi','boss_xushi_switch'],['qun','boss','bossallowed'],'qun'],
 				boss_bifang:['male','shen',25,['boss_yaoshou','boss_zhaohuo','boss_honglianx','boss_yanyu','boss_yanyu_switch'],['qun','boss','bossallowed'],'qun'],
 				boss_yingzhao:['male','shen',25,['boss_yaoshou','boss_fengdong','boss_xunyou','boss_sipu','boss_sipu_switch'],['qun','boss','bossallowed'],'qun'],
 
@@ -1905,7 +1905,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'gameStart'},
 						content:function(){
 							player.disableSkill('boss_xushi_awake','boss_xushi');
-							player.gainMaxHp(5);
 						},
 						silent:true
 					},
@@ -2575,7 +2574,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'gameStart'},
 						content:function(){
 							player.disableSkill('boss_yandu_awake','boss_yandu');
-							player.gainMaxHp(5);
 						},
 						silent:true
 					},
@@ -5665,11 +5663,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				group:['boss_manjia1','boss_manjia2']
 			},
 			boss_manjia1:{
-				trigger:{target:'useCardToBefore'},
+				trigger:{target:['useCardToBefore','shaBegin']},
 				forced:true,
 				priority:6,
-				filter:function(event,player){
+				filter:function(event,player,name){
 					if(player.getEquip(2)) return false;
+					if(name=='shaBegin') return lib.skill.tengjia3.filter(event,player);
 					return lib.skill.tengjia1.filter(event,player);
 				},
 				content:function(){
@@ -7484,7 +7483,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			shenqu:'神躯',
 			shenqu_info:'每名角色的准备阶段，若你的手牌数少于或等于你的体力上限数，你可以摸两张牌；当你受到伤害后，你可以使用一张【桃】',
 			jiwu:'极武',
-			jiwu_info:'出牌阶段，你可以弃置一张手牌，然后获得一项：“强袭”、“烈刃”、“旋风”、“完杀”，直到回合结束',
+			jiwu_info:'出牌阶段，你可以弃置一张牌，然后获得一项：“强袭”、“铁骑”(界)、“旋风”、“完杀”，直到回合结束',
 
 			mode_boss_card_config:'挑战卡牌',
 			mode_boss_character_config:'挑战武将',

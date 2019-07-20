@@ -9246,6 +9246,7 @@
 			wuColor:"#b2d9a9",
 			qunColor:"#f6f6f6",
 			shenColor:"#ffe14c",
+			westernColor:"#ffe14c",
 			basic:'基本',
 			equip:'装备',
 			trick:'锦囊',
@@ -11576,10 +11577,12 @@
 							if(event.prompt2){
 								event.dialog.addText(event.prompt2,event.prompt2.length<=20);
 							}
-							event.promptbar=event.dialog.add('0/'+get.numStr(get.select(event.selectTarget)[1],'target'));
-							event.custom.add.target=function(){
-								_status.event.promptbar.innerHTML=
-								ui.selected.targets.length+'/'+get.numStr(get.select(event.selectTarget)[1],'target');
+							if(event.promptbar!='none'){
+								event.promptbar=event.dialog.add('0/'+get.numStr(get.select(event.selectTarget)[1],'target'));
+								event.custom.add.target=function(){
+									_status.event.promptbar.innerHTML=
+									ui.selected.targets.length+'/'+get.numStr(get.select(event.selectTarget)[1],'target');
+								}
 							}
 						}
 						else if(get.itemtype(event.dialog)=='dialog'){
@@ -14452,14 +14455,17 @@
 						}
 					}
 
+					var hp1=get.infoHp(info[2]);
+					var maxHp1=get.infoMaxHp(info[2]);
+					
 					this.node.avatar.show();
 					this.node.count.show();
 					this.node.equips.show();
 					this.name=character;
 					this.sex=info[0];
 					this.group=info[1];
-					this.hp=info[2];
-					this.maxHp=info[2];
+					this.hp=hp1;
+					this.maxHp=maxHp1;
 					this.hujia=0;
 					this.node.intro.innerHTML=lib.config.intro;
 					this.node.name.dataset.nature=get.groupnature(this.group);
@@ -14489,7 +14495,8 @@
 
 						this.node.avatar2.show();
 						this.name2=character2;
-						var hp1=info[2],hp2=info2[2];
+						var hp2=get.infoHp(info2[2]);
+						var maxHp2=get.infoMaxHp(info2[2]);
 						var double_hp;
 						if(_status.connectMode){
 							double_hp='pingjun';
@@ -14499,16 +14506,31 @@
 						}
 						switch(double_hp){
 							case 'pingjun':{
-								this.maxHp=Math.floor((hp1+hp2)/2);
-								this.singleHp=((hp1+hp2)%2===1);
+								this.maxHp=Math.floor((maxHp1+maxHp2)/2);
+								this.hp=Math.floor((hp1+hp2)/2);
+								this.singleHp=((maxHp1+maxHp2)%2===1);
 								break;
 							}
-							case 'zuidazhi':this.maxHp=Math.max(hp1,hp2);break;
-							case 'zuixiaozhi':this.maxHp=Math.min(hp1,hp2);break;
-							case 'zonghe':this.maxHp=hp1+hp2;break;
-							default:this.maxHp=hp1+hp2-3;
+							case 'zuidazhi':{
+								this.maxHp=Math.max(maxHp1,maxHp2);
+								this.hp=Math.max(hp1,hp2);
+								break;
+							}
+							case 'zuixiaozhi':{
+								this.maxHp=Math.min(maxHp1,maxHp2);
+								this.hp=Math.min(hp1,hp2);
+								break;
+							}
+							case 'zonghe':{
+								this.maxHp=maxHp1+maxHp2;
+								this.hp=hp1+hp2;
+								break;
+							}
+							default:{
+								this.maxHp=maxHp1+maxHp2-3;
+								this.hp=hp1+hp2-3;
+							};
 						}
-						this.hp=this.maxHp;
 						this.node.count.classList.add('p2');
 						skills=skills.concat(info2[3]);
 
@@ -14692,7 +14714,7 @@
 						}
 						else{
 							if(typeof maxHp!='number'){
-								maxHp=info2[2];
+								maxHp=get.infoMaxHp(info2[2]);
 							}
 							num=maxHp-info1[2];
 						}
@@ -18890,16 +18912,16 @@
 					}
 					return num;
 				},
-				getAttackRange:function(){
+				getAttackRange:function(raw){
 					var player=this;
 					var range=0;
-					range=game.checkMod(player,player,range,'globalFrom',player);
+					if(raw) range=game.checkMod(player,player,range,'globalFrom',player);
 					range=game.checkMod(player,player,range,'attackFrom',player);
 					var equips=player.getCards('e');
 					for(var i=0;i<equips.length;i++){
 						var info=get.info(equips[i]).distance;
 						if(!info) continue;
-						if(info.globalFrom){
+						if(raw&&info.globalFrom){
 							range+=info.globalFrom;
 						}
 						if(info.attackFrom){
@@ -21014,6 +21036,10 @@
 					else if(typeof card=='object'){
 						card=[card.suit,card.number,card.name,card.nature];
 					}
+					var cardnum=card[1]||'';
+					if([1,11,12,13].contains(cardnum)){
+					cardnum={'1':'A','11':'J','12':'Q','13':'K'}[cardnum]
+					}
 					if(!lib.card[card[2]]){
 						lib.card[card[2]]={};
 					}
@@ -21217,7 +21243,7 @@
 						this.node.info.innerHTML=info.modinfo;
 					}
 					else{
-						this.node.info.innerHTML=get.translation(card[0])+'<span> </span>'+card[1];
+						this.node.info.innerHTML=get.translation(card[0])+'<span> </span>'+cardnum;
 					}
 					if(info.addinfo){
 						if(!this.node.addinfo){
@@ -21254,7 +21280,7 @@
 							this.node.name.classList.add('longlong');
 						}
 					}
-					this.node.name2.innerHTML=get.translation(card[0])+card[1]+' '+name;
+					this.node.name2.innerHTML=get.translation(card[0])+cardnum+' '+name;
 					this.suit=card[0];
 					this.number=parseInt(card[1])||0;
 					this.name=card[2];
@@ -22727,8 +22753,8 @@
 												var name2=info[4][j].slice(9);
 												var info2=lib.character[name2];
 												player.storage.dualside.push(name2);
-												player.storage.dualside.push(info2[2]);
-												player.storage.dualside.push(info2[2]);
+												player.storage.dualside.push(get.infoHp(info2[2]));
+												player.storage.dualside.push(get.infoMaxHp(info2[2]));
 											}
 										}
 									}
@@ -23175,7 +23201,7 @@
 					if(!trigger.notLink()) event.finish();
 					"step 1"
 					event.targets=game.filterPlayer(function(current){
-					    return current.isLinked();
+					    return current!=event.player&&current.isLinked();
 					});
 					lib.tempSortSeat=_status.currentPhase||player;
 					event.targets.sort(lib.sort.seat);
@@ -24176,7 +24202,7 @@
 			}
 		},
 		suit:['club','spade','diamond','heart'],
-		group:['wei','shu','wu','qun','shen','western'],
+		group:['wei','shu','wu','qun','shen'],
 		nature:['fire','thunder','poison'],
 		linked:['fire','thunder'],
 		groupnature:{
@@ -35094,7 +35120,8 @@
 									}
 								}
 								var hp=page.querySelector('input.new_hp').value;
-								hp=parseInt(hp)||1;
+								if(hp=='Infinity') hp=Infinity;
+								else if(hp.indexOf('/')==-1) hp=parseInt(hp)||1;
 								var skills=[];
 								for(var i=0;i<skillList.firstChild.childNodes.length;i++){
 									skills.add(skillList.firstChild.childNodes[i].skill);
@@ -40125,7 +40152,7 @@
 							if(infoitem[2]==0){
 								node.node.hp.hide();
 							}
-							else if(infoitem[2]<=3){
+							else if(get.infoHp(infoitem[2])<=3){
 								node.node.hp.dataset.condition='mid';
 							}
 							else{
@@ -40133,8 +40160,9 @@
 							}
 						}
 						else{
-							if(infoitem[2]>14){
-								node.node.hp.innerHTML=get.numStr(infoitem[2]);
+							if(typeof infoitem[2]=='string'||infoitem[2]>14){
+								if(typeof infoitem[2]=='string') node.node.hp.innerHTML=infoitem[2];
+								else node.node.hp.innerHTML=get.numStr(infoitem[2]);
 								node.node.hp.classList.add('text');
 							}
 							else{
@@ -42816,7 +42844,7 @@
 					var range=get.info(this).range;
 					if(range){
 						if(typeof range.attack==='number'){
-							player.createRangeShadow(Math.min(8,player.getAttackRange()+range.attack-1));
+							player.createRangeShadow(Math.min(8,player.getAttackRange(true)+range.attack-1));
 						}
 						else if(typeof range.global==='number'){
 							player.createRangeShadow(Math.min(8,player.getGlobalFrom()+range.global));
@@ -44469,6 +44497,20 @@
 		},
 	};
 	var get={
+		infoHp:function(hp){
+		    if(typeof hp=='number') return hp;
+		    else if(typeof hp=='string'&&hp.indexOf('/')!=-1){
+		       return parseInt(hp.slice(0,hp.indexOf('/')));
+		    }
+		    return 0;
+		},
+		infoMaxHp:function(hp){
+		    if(typeof hp=='number') return hp;
+		    else if(typeof hp=='string'&&hp.indexOf('/')!=-1){
+		       return parseInt(hp.slice(hp.indexOf('/')+1));
+		    }
+		    return 0;
+		},
 		is:{
 			converted:function(event){
 				return !(event.cards&&event.card&&event.cards.length==1&&event.cards[0]==event.card);
@@ -46146,11 +46188,15 @@
 						}
 					}
 					if(str.suit&&str.number){
+						var cardnum=str.number||'';
+						if([1,11,12,13].contains(cardnum)){
+							cardnum={'1':'A','11':'J','12':'Q','13':'K'}[cardnum]
+						}
 						if(arg=='viewAs'&&str.viewAs!=str.name&&str.viewAs){
 							str2+='（'+get.translation(str)+'）';
 						}
 						else{
-							str2+='【'+get.translation(str.suit)+str.number+'】';
+							str2+='【'+get.translation(str.suit)+cardnum+'】';
 							// var len=str2.length-1;
 							// str2=str2.slice(0,len)+'<span style="letter-spacing: -2px">'+str2[len]+'·</span>'+get.translation(str.suit)+str.number;
 						}
@@ -46737,8 +46783,8 @@
 					node=node.link;
 				}
 				var capt=get.translation(node.name);
-				if(lib.character[node.name]&&lib.character[node.name][1]){
-					capt+='&nbsp;&nbsp;'+lib.translate[lib.character[node.name][1]];
+				if(lib.character[node.name]&&(lib.character[node.name][1]||lib.group.contains(node.group))){
+					capt+='&nbsp;&nbsp;'+(lib.group.contains(node.group)?get.translation(node.group):lib.translate[lib.character[node.name][1]]);
 				}
 				uiintro.add(capt);
 

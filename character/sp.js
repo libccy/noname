@@ -4,7 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp',
 		connect:true,
 		character:{
-			lijue:["male","qun",4,["xinfu_langxi","xinfu_yisuan"],[]],
+			lijue:["male","qun","4/6",["xinfu_langxi","xinfu_yisuan"],[]],
             zhangji:["male","qun",4,["xinfu_lveming","xinfu_tunjun"],[]],
             fanchou:["male","qun",4,["xinfu_xingluan"],[]],
             guosi:["male","qun",4,["xinfu_tanbei","xinfu_sidao"],[]],
@@ -2529,7 +2529,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filterCard:function(){return false},
 						viewAsFilter:function(player){
 							if(player.hasSkill('weijing_disable')) return false;
-							if(!lib.filter.cardRespondable({name:'sha'},player)) return false;
+							if(!lib.filter.cardRespondable({name:'shan'},player)) return false;
+							if(_status.event.getParent().name!='sha') return false;
+							return true;
 						},
 						onrespond:function(event,player){
 							player.addTempSkill('weijing_disable','roundStart');
@@ -4132,20 +4134,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hengjiang:{
 				trigger:{player:'damageEnd'},
 				check:function(event,player){
-					return get.attitude(player,event.source)<0||!event.source.needsToDiscard(2);
+					return get.attitude(player,_status.currentPhase)<0||!_status.currentPhase.needsToDiscard(2);
 				},
 				filter:function(event){
-					return event.source&&event.source.isIn()&&event.num>0;
+					return _status.currentPhase&&_status.currentPhase.isIn()&&event.num>0;
 				},
-				logTarget:'source',
+				//logTarget:'source',
 				content:function(){
-					var source=trigger.source;
+					var source=_status.currentPhase;
 					if(source.hasSkill('hengjiang2')){
 						source.storage.hengjiang2+=trigger.num;
+						source.storage.hengjiang3.add(player);
 						source.updateMarks();
 					}
 					else{
-						source.storage.hengjiang3=player;
+						source.storage.hengjiang3=[player];
 						source.storage.hengjiang2=trigger.num;
 						source.addTempSkill('hengjiang2');
 					}
@@ -4170,12 +4173,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{player:'phaseDiscardEnd'},
 				filter:function(event,player){
-					return player.storage.hengjiang3.isIn()&&(!event.cards||event.cards.length==0);
+					if(event.cards&&event.cards.length) return false;
+					var players=player.storage.hengjiang3;
+					for(var i=0;i<players.length;i++){
+					    if(players[i].isIn()) return true;
+					}
+					return false;
 				},
 				forced:true,
 				popup:false,
 				content:function(){
-					player.storage.hengjiang3.draw();
+					var players=player.storage.hengjiang3;
+					for(var i=0;i<players.length;i++){
+					    if(players[i].isIn()){
+					        players[i].logSkill('hengjiang');
+					        players[i].line(player,'green');
+					    }
+					}
+					game.asyncDraw(player.storage.hengjiang3);
 				}
 			},
 			shuangren:{
@@ -9656,7 +9671,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zhoufu3:{
-				trigger:{player:'phaseEnd'},
+				trigger:{global:'phaseEnd'},
 				silent:true,
 				content:function(){
 					if(player.storage.zhoufu3.isIn()){
