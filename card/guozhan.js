@@ -1234,7 +1234,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(player.countCards('h')==0) return false;
 					if(!event.card) return false;
 					if(event.card.name!='sha') return false;
-					if(!event.notLink()) return functiofalse;
+					if(!event.notLink()) return false;
 					return game.hasPlayer(function(current){
 						return current!=event.player&&get.distance(event.player,current)<=1;
 					});
