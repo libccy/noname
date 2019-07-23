@@ -627,6 +627,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
                 },
                 audio:"wusheng",
+				audioname:['re_guanyu','guanzhang','jsp_guanyu','guansuo'],
                 enable:["chooseToRespond","chooseToUse"],
                 filterCard:function (card,player){
 					if(get.zhu(player,'shouyue')) return true;
@@ -1407,9 +1408,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					canBeDiscarded:function(card){
 						if(get.position(card)=='e') return false;
 					},
-					cardDiscardable:function(card){
-						if(get.position(card)=='e') return false;
-					}
 				},
 			},
 			rejizhi:{
@@ -1978,7 +1976,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			reyingzi:{
 				audio:2,
-				audioname:['sunce'],
+				audioname:['heqi','sunce'],
 				trigger:{player:'phaseDrawBegin'},
 				forced:true,
 				content:function(){
@@ -2579,6 +2577,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			reyicong:{
+				trigger:{
+					player:["changeHp"],
+				},
+				audio:2,
+				forced:true,
+				filter:function(event,player){
+					return get.sgn(player.hp-2)!=get.sgn(player.hp-2-event.num);
+				},
+				content:function (){},
 				mod:{
 					globalFrom:function(from,to,current){
 						if(from.hp>2) return current-1;
@@ -2774,7 +2781,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			reguose:{
-				audio:1,
+				audio:2,
 				enable:'phaseUse',
 				usable:1,
 				discard:false,
@@ -2816,6 +2823,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fenwei:{
 				skillAnimation:true,
 				audio:2,
+				audioname:['heqi'],
 				unique:true,
 				mark:true,
 				limited:true,

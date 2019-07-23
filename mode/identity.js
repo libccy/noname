@@ -617,7 +617,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(typeof lib.config.test_game=='string'&&player==game.me.next){
 						player.init(lib.config.test_game);
 					}
-					if(player.group=='shen'){
+					if(get.config('choose_group')&&player.group=='shen'){
 						    var list=lib.group.slice(0);
 						    list.remove('shen');
 						    if(list.length) player.group=list.randomGet();
@@ -1173,7 +1173,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						game.addRecentCharacter(result.buttons[0].link);
 					}
-					if(chooseGroup){
+					if(get.config('choose_group')&&chooseGroup){
 					     var list=lib.group.slice(0);
 						    list.remove('shen');
 						    game.me.chooseControl(list).prompt='请选择神武将的势力';

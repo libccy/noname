@@ -944,7 +944,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return get.attitude(player,event.player)<0;
 				},
 				content:function(){
-					player.gainPlayerCard(trigger.player,true);
+					player.gainPlayerCard(trigger.player,'h',true);
 				},
 			},
 			taipingyaoshu:{
@@ -1230,9 +1230,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageAfter'},
 				direct:true,
 				filter:function(event,player){
+					if(event.player.isDead()) return false;
 					if(player.countCards('h')==0) return false;
 					if(!event.card) return false;
 					if(event.card.name!='sha') return false;
+					if(!event.notLink()) return functiofalse;
 					return game.hasPlayer(function(current){
 						return current!=event.player&&get.distance(event.player,current)<=1;
 					});

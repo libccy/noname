@@ -1660,7 +1660,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     name:"tiesuo",
                 },
                 prompt:"将一张梅花牌当铁锁连环使用",
-                check:function (card){return 4-get.value(card)},
+                check:function (card){return 6-get.value(card)},
                 mark:true,
                 marktext:"凤",
                 intro:{
@@ -1758,7 +1758,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.suit(card)=='club';
 				},
                 check:function (card){
-					return 5-get.useful(card);
+					return -1;
 				},
                 content:function (){
 					player.draw();
@@ -1856,12 +1856,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 ai:{
                     order:1,
                     result:{
-                        target:function (player,target){
+                        target:0,
+                        /*target:function (player,target){
 							if(target.hasSkillTag('nofire')) return 0;
 							if(lib.config.mode=='versus') return -1;
 							if(player.hasUnknown()) return 0;
 							return get.damageEffect(target,player);
-						},
+						},*/
                     },
                 },
             },
@@ -2724,6 +2725,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
                     result:{
                         target:function (player,target){
+							var raweffect=function(player,target){
 							if(player.countCards('h','sha')){
 								return get.effect(target,{name:'sha'},player,target);
 							}else{
@@ -2745,6 +2747,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(att<=0&&!target.countCards('he')) return 1.5;
 							return -1.5;
 							}
+							}
+							var num=game.countPlayer(function(current){
+							    return current!=player&&current.hp==target.hp&&(raweffect(player,current)*get.attitude(player,current))>0
+							});
+							return raweffect(player,target)*(num-1);
 						},
                     },
                     expose:0.4,
@@ -4277,6 +4284,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
                 viewAs:{
                     name:"wuxie",
+                },
+                check:function(card){
+                    if(card.name=='wuxie') return 1000;
+                    return 0;
                 },
                 prompt:"将一张手牌当无懈可击使用",
                 threaten:1.2,

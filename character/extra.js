@@ -29,7 +29,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
             "new_wuhun":{
-                audio:"wuhun3",
+                audio:"wuhun2",
                 group:["new_wuhun_mark","new_wuhun_die"],
                 trigger:{
                     player:"damageEnd",
@@ -80,7 +80,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
                 subSkill:{
                     die:{
-                        audio:"wuhun3",
+                        audio:"wuhun2",
                         skillAnimation:true,
                         trigger:{
                             player:"dieBegin",
@@ -435,9 +435,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return !player.hasSkill('lianpo2');
 				},
 				content:function(){
+					player.addTempSkill('lianpo2');
 					player.insertPhase();
 				}
 			},
+			lianpo2:{},
 			baonu:{
 				audio:2,
 				mark:true,
@@ -1608,8 +1610,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					discard:{
-						trigger:{player:['useCardAfter','respondAfter']},
+						trigger:{player:['useCard','respond']},
 						forced:true,
+						popup:false,
 						logTarget:function(){
 							return _status.currentPhase;
 						},
@@ -1627,7 +1630,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xinlonghun1:{
-				audio:true,
+				audio:'longhun1',
 				enable:['chooseToUse','chooseToRespond'],
 				prompt:function(){
 					return '将至多两张红桃牌当作桃使用';
@@ -1647,7 +1650,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xinlonghun2:{
-				audio:true,
+				audio:'longhun2',
 				enable:['chooseToUse','chooseToRespond'],
 				prompt:function(){
 					return '将至多两张方片牌当作火杀使用或打出';
@@ -1667,7 +1670,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xinlonghun3:{
-				audio:true,
+				audio:'longhun3',
 				enable:['chooseToUse','chooseToRespond'],
 				prompt:function(){
 					return '将至多两张黑桃牌当作无懈可击使用';
@@ -1687,7 +1690,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xinlonghun4:{
-				audio:true,
+				audio:'longhun4',
 				enable:['chooseToUse','chooseToRespond'],
 				prompt:function(){
 					return '将至多两张梅花牌当作闪打出';
@@ -1712,7 +1715,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 2+num;
 					}
 				},
-				audio:true,
+				audio:'juejing',
 				trigger:{player:['dyingBegin','dyingAfter']},
 				forced:true,
 				content:function(){
@@ -1761,6 +1764,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			gongxin:{
 				audio:2,
+				audioname:['re_lvmeng'],
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
@@ -1982,11 +1986,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								direct:true,
 								content:function(){
 									"step 0"
-									player.chooseTarget(true,get.prompt('nzry_jieying'),function(card,player,target){
-										return target!=player;
+									player.chooseTarget(true,'请选择【结营】的目标',function(card,player,target){
+										return target!=player&&!target.isLinked();
 									}).ai=function(target){
-										if(!target.isLinked()) return get.attitude(player,target);
-										return 1;
+										return 1+Math.random();
 									};
 									"step 1"
 									if(result.bool){
@@ -2462,7 +2465,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								},
 								forced:true,
 								filter:function(event,player){
-									return player.storage.drlt_jieying==event.player;
+									return player.storage.drlt_jieying==event.player&&player!=event.player;
 								},
 								logTarget:'player',
 								content:function(){		

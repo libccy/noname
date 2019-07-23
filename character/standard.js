@@ -85,6 +85,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		skill:{
 			hujia:{
 				audio:2,
+				audioname:['re_caocao'],
 				unique:true,
 				zhuSkill:true,
 				trigger:{player:'chooseToRespondBegin'},
@@ -348,6 +349,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			tiandu:{
 				audio:2,
+				audioname:['re_guojia','xizhicai'],
 				trigger:{player:'judgeEnd'},
 				frequent:function(event){
 					if(event.result.card.name=='du') return false;
@@ -674,13 +676,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			jijiang:{
+				audio:'jijiang1',
+				audioname:['liushan','re_liubei'],
 				unique:true,
 				group:['jijiang1','jijiang2'],
 				zhuSkill:true,
 			},
 			jijiang1:{
 				audio:2,
-				audioname:['liushan'],
+				audioname:['liushan','re_liubei'],
 				trigger:{player:'chooseToRespondBegin'},
 				check:function(event){
 					if(event.jijiang) return false;
@@ -736,8 +740,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			jijiang2:{
-				audio:2,
-				audioname:['liushan'],
+				audio:'jijiang1',
+				audioname:['liushan','re_liubei'],
 				enable:'chooseToUse',
 				filter:function(event,player){
 					if(event.filterCard&&!event.filterCard({name:'sha'},player,event)) return false;
@@ -826,7 +830,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			wusheng:{
-				audio:3,
+				audio:2,
+				audioname:['re_guanyu','guanzhang','jsp_guanyu','guansuo'],
 				enable:['chooseToRespond','chooseToUse'],
 				filterCard:function(card,player){
 					if(get.zhu(player,'shouyue')) return true;
@@ -857,6 +862,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			paoxiao:{
+				audio:2,
+				audioname:['re_zhangfei','guanzhang','xiahouba'],
+				trigger:{player:'useCard'},
+				forced:true,
+				filter:function(event,player){
+					return event.card.name=='sha'&&player.getStat().card.sha>1&&event.getParent().type=='phase';
+				},
+				content:function(){},
 				mod:{
 					cardUsable:function(card,player,num){
 						if(card.name=='sha') return Infinity;
@@ -1319,6 +1332,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){}
 			},
 			longdan:{
+				audio:'longdan_sha',
+				audioname:['re_zhaoyun'],
 				group:['longdan_sha','longdan_shan','longdan_draw'],
 				subSkill:{
 					draw:{
@@ -1336,6 +1351,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					sha:{
 						audio:2,
+						audioname:['re_zhaoyun'],
 						enable:['chooseToUse','chooseToRespond'],
 						filterCard:{name:'shan'},
 						viewAs:{name:'sha'},
@@ -1362,7 +1378,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					shan:{
-						audio:2,
+						audio:'longdan_sha',
+						audioname:['re_zhaoyun'],
 						enable:['chooseToRespond'],
 						filterCard:{name:'sha'},
 						viewAs:{name:'shan'},
@@ -1676,7 +1693,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			qixi:{
-				audio:4,
+				audio:2,
+				audioname:['ganning','re_ganning'],
 				enable:'chooseToUse',
 				filterCard:function(card){
 					return get.color(card)=='black';
@@ -1690,7 +1708,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(card){return 4-get.value(card)}
 			},
 			keji:{
-				audio:4,
+				audio:2,
+				audioname:['re_lvmeng','sp_lvmeng'],
 				trigger:{player:'phaseDiscardBefore'},
 				frequent:function(event,player){
 					return !player.needsToDiscard();
@@ -1727,6 +1746,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yingzi:{
 				audio:2,
+				audioname:['sp_lvmeng'],
 				trigger:{player:'phaseDrawBegin'},
 				frequent:true,
 				content:function(){
@@ -1786,7 +1806,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			guose:{
-				audio:1,
+				audio:2,
 				filter:function(event,player){
 					return player.countCards('he',{suit:'diamond'})>0;
 				},
@@ -1804,6 +1824,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			liuli:{
 				audio:2,
+				audioname:['re_daqiao','daxiaoqiao'],
 				trigger:{target:'shaBefore'},
 				direct:true,
 				priority:5,
@@ -1928,7 +1949,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xiaoji:{
-				audio:4,
+				audio:2,
+				audioname:['sp_sunshangxiang'],
 				trigger:{player:'loseEnd'},
 				frequent:true,
 				filter:function(event,player){
@@ -2163,6 +2185,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jijiu:{
 				audio:2,
+				audioname:['re_huatuo'],
 				enable:'chooseToUse',
 				filter:function(event,player){
 					return _status.currentPhase!=player;
@@ -2184,12 +2207,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			wushuang:{
+				audio:'wushuang1',
 				forced:true,
 				locked:true,
 				group:['wushuang1','wushuang2']
 			},
 			wushuang1:{
 				audio:2,
+				audioname:['re_lvbu'],
 				trigger:{player:'shaBegin'},
 				forced:true,
 				filter:function(event,player){
@@ -2207,6 +2232,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			wushuang2:{
 				audio:2,
+				audioname:['re_lvbu'],
 				trigger:{player:'juedou',target:'juedou'},
 				forced:true,
 				filter:function(event,player){

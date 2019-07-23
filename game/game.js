@@ -4167,6 +4167,13 @@
 						frequent:true,
 						intro:'开启后游戏中将有两个内奸（内奸胜利条件仍为主内1v1时击杀主公）'
 					},
+					choose_group:{
+						name:'神武将选择势力',
+						init:true,
+						restart:true,
+						frequent:true,
+						intro:'若开启此选项，选择神武将的玩家需在亮出自己的武将牌之前为自己选择一个势力。'
+					},
 					double_character:{
 						name:'双将模式',
 						init:false,

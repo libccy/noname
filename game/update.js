@@ -1,26 +1,22 @@
 window.noname_update={
-	version:'1.9.90.1',
-	update:'1.9.90',
+	version:'1.9.90.2',
+	update:'1.9.90.1',
 	changeLog:[
-		'神武将选择势力（仅限单机身份模式）',
-		'bug修复',
+		'神武将选择势力设为可选选项',
+		'大量配音问题修复',
 	],
 	files:[
-		'card/extra.js',
 		'card/guozhan.js',
 		'character/extra.js',
+		'character/old.js',
 		'character/refresh.js',
 		'character/shenhua.js',
 		'character/sp.js',
 		'character/standard.js',
 		'character/xinghuoliaoyuan.js',
 		'character/yijiang.js',
-		'mode/boss.js',
 		'mode/guozhan.js',
 		'mode/identity.js',
-		'mode/versus.js',
 		'game/game.js',
-		'layout/default/layout.css',
-		'layout/mobile/layout.css',
 	]
 };
