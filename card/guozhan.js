@@ -279,7 +279,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				mode:['guozhan'],
 				filterTarget:function(card,player,target){
-					return target.identity!='unknown'&&(target.identity!=player.identity||target.identity=='ye');
+					return target!=player&&target.identity!='unknown'&&(target.identity!=player.identity||target.identity=='ye');
 				},
 				changeTarget:function(player,targets){
 					var target=targets[0];

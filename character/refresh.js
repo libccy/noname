@@ -1037,6 +1037,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			reguanxing:{
 				audio:'guanxing',
+				audioname:['jiangwei'],
 				trigger:{player:['phaseBegin','phaseEnd']},
 				frequent:true,
 				filter:function(event,player,name){

@@ -2822,10 +2822,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zishu:{
 				audio:2,
+				locked:true,
 				subSkill:{
 					discard:{
 						trigger:{player:'gainAfter'},
 						audio:"zishu",
+						forced:true,
 						filter:function(event,player){
 							return _status.currentPhase!=player;
 						},
@@ -5226,15 +5228,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xiehui:{
 				mod:{
-					maxHandcard:function(player,num){
-						var hs=player.getCards('h');
-						for(var i=0;i<hs.length;i++){
-							if(get.color(hs[i])=='black'){
-								num++;
-							}
+					ignoredHandcard:function(card,player){
+						if(get.color(card)=='black'){
+							return true;
 						}
-						return num;
 					},
+					cardDiscardable:function(card,player,name){
+						if(name=='phaseDiscard'&&get.color(card)=='black') return false;
+					}
 				},
 				trigger:{global:'gainBegin'},
 				forced:true,
@@ -8999,8 +9000,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.draw(nd);
 						}
 						else{
-							player.addTempSkill('fengpo2','useCardToAfter');
-							player.storage.fengpo=nd;
+							if(typeof trigger.extraDamage!='number'){
+					    	trigger.extraDamage=0;
+					    }
+					    trigger.extraDamage+=nd;
 						}
 					}
 				}

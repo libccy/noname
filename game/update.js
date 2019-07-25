@@ -1,22 +1,20 @@
 window.noname_update={
-	version:'1.9.90.2',
-	update:'1.9.90.1',
+	version:'1.9.90.3',
+	update:'1.9.90.2',
 	changeLog:[
-		'神武将选择势力设为可选选项',
-		'大量配音问题修复',
+		'解除祢衡的AI禁选限制',
+		'BUG修复',
 	],
 	files:[
 		'card/guozhan.js',
-		'character/extra.js',
-		'character/old.js',
 		'character/refresh.js',
 		'character/shenhua.js',
 		'character/sp.js',
-		'character/standard.js',
-		'character/xinghuoliaoyuan.js',
 		'character/yijiang.js',
+		'extension/boss/extension.js',
 		'mode/guozhan.js',
-		'mode/identity.js',
 		'game/game.js',
+		'game/config.js',
+		'game/package.js',
 	]
 };

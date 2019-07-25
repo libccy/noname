@@ -501,7 +501,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 						},
 						mark:true,
-						intro:{content:'本回合内可以多使用三张【杀】'},
+						marktext:'决',
+						intro:{name:'决堰 - 武器',content:'本回合内可以多使用三张【杀】'},
 					},
 					'drlt_jueyan2':{
 						mod:{
@@ -510,7 +511,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 						},
 						mark:true,
-						intro:{content:'本回合内使用牌没有距离限制'},
+						marktext:'决',
+						intro:{name:'决堰 - 坐骑',content:'本回合内使用牌没有距离限制'},
 					},
 					'drlt_jueyan3':{
 						mod:{
@@ -519,7 +521,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 						},
 						mark:true,
-						intro:{content:'本回合内手牌上限+3'},
+						marktext:'决',
+						intro:{name:'决堰 - 防具',content:'本回合内手牌上限+3'},
 					},
 					"drlt_poshi":{
 						audio:2,
@@ -687,8 +690,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai:{
 							order:13,
 							result:{
-								player:function(player){
-									if(player.countCards('h',{name:'sha'})>=2&&game.countPlayer(function(current){return get.attitude(player,current)<0})>0) return 1;
+								target:function(player,target){
+									var hs=player.countCards('h',{name:['sha','juedou']});
+									var ts=target.hp;
+									if(hs>=ts&&ts>1) return -1;
+									return 0;
 								},
 							},
 						},
@@ -736,6 +742,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							cardSavable:function(card,player){
 								if(get.position(card)=='h') return false;
+							},
+						},
+						ai:{
+							effect:{
+								target:function(card,player,target){
+									if(get.tag(card,'damage')) return [0,-999999];
+								},
 							},
 						},
 					},
@@ -3315,6 +3328,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			huashen:{
+				audio:'huashen2',
 				unique:true,
 				forbid:['guozhan'],
 				init:function(player){
@@ -3333,7 +3347,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var skills=lib.character[name][3].slice(0);
 						for(var i=0;i<skills.length;i++){
 							var info=lib.skill[skills[i]];
-							if(info.unique&&!info.gainable){
+							if(info.limited||info.juexingji||info.charlotte||info.zhuSkill){
 								skills.splice(i--,1);
 							}
 						}
@@ -3418,7 +3432,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!info){
 								continue;
 							}
-							if(info.gainable||!info.unique){
+							if(!info.limited&&!info.juexingji&&!info.charlotte&&!info.zhuSkill){
 								add=true;break;
 							}
 						}

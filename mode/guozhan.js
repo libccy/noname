@@ -6517,149 +6517,60 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			_zhenfazhaohuan:{
 				enable:'phaseUse',
 				usable:1,
-				getConfig:function(player){
-					var n1,n2,p1,p2;
-					var config={
-						inline:false,
-						siege:false
-					};
-					var config2={};
-					n1=player.getNext();
-					p1=player.getPrevious();
-					if(n1){
-						if(n1.isUnseen()){
-							config.inline=true;
-						}
-						else if(n1.identity!=player.identity){
-							n2=n1.getNext();
-							if(n2&&n2.isUnseen()){
-								config.siege=true;
-							}
+				getConfig:function(player,target){
+					var config={};
+					var skills=player.getSkills();
+					for(var i=0;i<skills.length;i++){
+						var info=get.info(skills[i]).zhenfa;
+						if(info){
+							config[info]=true;
 						}
 					}
-					if(p1){
-						if(p1.isUnseen()){
-							config.inline=true;
-						}
-						else if(p1.identity!=player.identity){
-							p2=p1.getPrevious();
-							if(p2&&p2.isUnseen()){
-								config.siege=true;
-							}
-						}
+					if(config.inline){
+					    var next=target.getNext();
+					    var previous=target.getPrevious();
+					    return (next==player||previous==player||next.inline(player)||previous.inline(player))
 					}
-					if(config.inline||config.siege){
-						var skills=player.getSkills();
-						for(var i=0;i<skills.length;i++){
-							var info=get.info(skills[i]).zhenfa;
-							if(info&&config[info]){
-								config2[info]=true;
-							}
-						}
+					else if(config.siege){
+				    	return (target==player.getNext().getNext()||target==player.getPrevious().getPrevious());
 					}
-					return config2;
+					return false;
 				},
 				filter:function(event,player){
-					if(game.countPlayer()<4) return false;
+					if(player.identity=='ye') return false;
 					if(player.hasSkill('undist')) return false;
-					var config=lib.skill._zhenfazhaohuan.getConfig(player);
-					return config.inline||config.siege;
+					if(game.countPlayer(function(current){
+					    return !current.hasSkill('undist');
+					})<4) return false;
+					return game.hasPlayer(function(current){
+					    return current!=player&&current.isUnseen()&&lib.skill._zhenfazhaohuan.getConfig(player,current);
+					});
 				},
 				content:function(){
 					'step 0'
-					var config=lib.skill._zhenfazhaohuan.getConfig(player);
-					if(config.siege){
-						event.siege=true;
-					}
-					if(!config.inline){
-						event.goto(3);
-					}
-					event.asked=[];
-					event.current=player;
-					event.dir=true;
-					event.askPlayer=function(){
-						event.directfalse=false;
-						if(event.current&&event.current.isUnseen()&&!event.asked.contains(event.current)){
-							player.line(event.current,'green');
-							event.asked.push(event.current);
-							if(lib.character[event.current.name1][1]==player.identity){
-								event.current.chooseControl([
-									'明置'+get.translation(event.current.name1),
-									'明置'+get.translation(event.current.name2),
-									'不明置'
-								],function(){
-									return Math.floor(Math.random()*3);
-								}).set('prompt',get.translation(player)+'发了阵法召唤，你可以明置一个武将');
-							}
-							else{
-								event.directfalse=true;
-								if(_status.connectMode){
-									event.current.chooseControl(
-										'不明置'
-									).set('prompt',get.translation(player)+'发了阵法召唤（你与其势力不同，无法明置武将）');
-								}
-							}
-						}
-						else{
-							event.directfalse=true;
-						}
-					};
-					event.checkResult=function(result,num){
-						if(!event.directfalse&&result.control!='不明置'){
-							if(result.index==0){
-								event.current.showCharacter(0);
-							}
-							else{
-								event.current.showCharacter(1);
-							}
-							if(event.current.identity=='ye'||num!=1){
-								if(event.dir){
-									event.dir=false;
-									event.current=player;
-									event.goto(num);
-								}
-							}
-							else{
-								event.goto(num);
-							}
-						}
-						else if(event.dir){
-							event.dir=false;
-							event.current=player;
-							event.goto(num);
-						}
-					}
+					event.list=game.filterPlayer(function(current){
+					    return current!=player&&current.isUnseen();
+					});
 					'step 1'
-					if(event.dir){
-						event.current=event.current.getNext();
+					event.current=event.list.shift();
+					if(lib.skill._zhenfazhaohuan.getConfig(player,event.current)){
+					    player.line(event.current,'green');
+					    if(event.current._group==player.group&&event.current.wontYe()){
+					        event.current.chooseControl('明置主将','明置副将','取消').set('prompt','是否响应'+get.translation(player)+'的阵法召唤？').ai=function(){return Math.floor(Math.random()*3)};
+					    }
 					}
-					else{
-						event.current=event.current.getPrevious();
-					}
-					event.askPlayer();
+					else event.goto(3);
 					'step 2'
-					event.checkResult(result,1);
+					if(result.control=='明置主将'){
+					    event.current.showCharacter(0);
+					}
+					else if(result.control=='明置副将'){
+					    event.current.showCharacter(1);
+					}
 					'step 3'
-					if(!event.siege){
-						event.finish();
-						return;
-					}
-					event.dir=true;
+					if(event.list.length) event.goto(1);
 					'step 4'
-					var str;
-					if(event.dir){
-						str='getNext';
-					}
-					else{
-						str='getPrevious';
-					}
-					event.current=player[str]();
-					if(event.current&&!event.current.isUnseen()&&event.current.identity!=player.identity){
-						event.current=event.current[str]();
-					}
-					event.askPlayer();
-					'step 5'
-					event.checkResult(result,4);
+					game.delay();
 				},
 				ai:{
 					order:5,

@@ -3364,6 +3364,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					count:{
 						trigger:{player:'gainEnd'},
 						audio:'fulin',
+						forced:true,
 						filter:function(event,player){
 							return _status.currentPhase==player;
 						},

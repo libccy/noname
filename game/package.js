@@ -81,6 +81,7 @@ window.noname_package={
 		huangtian_bg:'黄天',
 		september_bg:'九月',
 		yinxiang_bg:'印象',
+		kyoani_bg:'京都',
 	},
 	music:{
 		music_diaochan:'貂蝉',

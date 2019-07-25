@@ -16,7 +16,7 @@ game.import('play',function(lib,game,ui,get,ai,_status){
 				for(var i in lib.characterPack.mode_extension_boss){
 					lib.characterPack.mode_extension_boss[i][4].push('mode:boss');
 					lib.character[i]=lib.characterPack.mode_extension_boss[i];
-					if(typeof lib.character[i][2]!='number'){
+					if(typeof lib.character[i][2]!='number'&&(typeof lib.character[i][2]!='string'||lib.character[i][2].indexOf('/')==-1)){
 						lib.character[i][2]=Infinity;
 					}
 					if(!lib.config.boss_enableai_playpackconfig){

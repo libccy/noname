@@ -6051,6 +6051,7 @@
 					if(type){
 						var dbimage=null,extimage=null,modeimage=null;
 						var nameinfo;
+						var gzbool=false;
 						var mode=get.mode();
 						if(type=='character'){
 							if(lib.characterPack['mode_'+mode]&&lib.characterPack['mode_'+mode][name]){
@@ -6058,7 +6059,8 @@
 									if(name.indexOf('gz_shibing')==0){
 										name=name.slice(3,11);
 									}
-									else if(!lib.config.mode_config.guozhan.guozhanSkin||!lib.character[name]||!lib.character[name][4].contains('gzskin')){
+									else{
+										if(lib.config.mode_config.guozhan.guozhanSkin&&lib.character[name]&&lib.character[name][4].contains('gzskin'))  gzbool=true;
 										name=name.slice(3);
 									}
 								}
@@ -6106,7 +6108,7 @@
 						}
 						else{
 							if(type=='character'){
-								src='image/character/'+name+ext;
+								src='image/character/'+(gzbool?'gz_':'')+name+ext;
 							}
 							else{
 								src='image/'+type+'/'+subfolder+'/'+name+ext;
