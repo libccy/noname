@@ -1449,7 +1449,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard'},
 				frequent:true,
 				filter:function(event){
-					return (get.type(event.card)=='trick'&&event.cards[0]&&event.cards[0]==event.card);
+					return (get.type(event.card)=='trick'&&(!event.cards.length||event.cards[0]&&event.cards[0]==event.card));
 				},
 				content:function(){
 					player.draw();
@@ -1843,7 +1843,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filterTarget:function(card,player,target){
 							var trigger=_status.event.getTrigger();
 							if(get.distance(player,target,'attack')<=1&&
-								target!=trigger.player&&target!=player){
+								target!=trigger.player&&!trigger.targets.contains(target)){
 								if(player.canUse(trigger.card,target)) return true;
 							}
 							return false;
@@ -1866,15 +1866,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							return -1;
 						},
-						prompt:get.prompt('liuli')
+						prompt:get.prompt2('liuli')
 					});
 					"step 1"
 					if(result.bool){
 						player.discard(result.cards);
 						player.logSkill(event.name,result.targets);
 						trigger.target=result.targets[0];
-						trigger.targets.remove(player);
-						trigger.targets.push(result.targets[0]);
+						for(var i=0;i<trigger.targets.length;i++){
+						    if(trigger.targets[i]==player) break;
+						}
+						var t1=trigger.targets.slice(0,i);
+						var t2=trigger.targets.slice(i+1);
+						trigger.targets=t1.concat([result.targets[0]]).concat(t2);
 					}
 					else{
 						event.finish();

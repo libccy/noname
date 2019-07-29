@@ -290,18 +290,48 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						},targets);
 					}
 				},
+				contentBefore:function(){
+					var evt=event.getParent();
+					if(evt&&evt.targets&&evt.targets.contains(player)){
+						evt.fixedSeat=true;
+						evt.targets.remove(player);
+						evt.targets.push(player);
+					}
+				},
 				content:function(){
 					'step 0'
 					if(target==player){
-                        var num=targets.length-1;
-						target.chooseDrawRecover(num,num,true);
-						event.finish();
+						var num=targets.length-1;
+						event.num=num;
+						var damaged=target.maxHp-target.hp;
+						if(damaged==0){
+							target.draw(num);
+							event.finish();
+						}
+						else{
+							var list=[];
+							for(var i=0;i<=Math.min(num,damaged);i++){
+								list.push('摸'+i+'回'+(num-i));
+							}
+							target.chooseControl(list).set('prompt','请分配自己的摸牌数和回复量').ai=function(){
+								if(player.hasSkill('diaohulishan')) return 0;
+								if(_status._aozhan) return list.length-1;
+								return list.randomGet();
+							};
+						}
 					}
 					else{
 						target.draw();
 					}
 					'step 1'
-					target.link(false);
+					if(target!=player) target.link(false);
+					else if(typeof result.control=='string'){
+						var index=result.control.indexOf('回');
+						var draw=parseInt(result.control.slice(1,index));
+						var recover=parseInt(result.control.slice(index+1));
+						if(draw) target.draw(draw);
+						if(recover) target.recover(recover);
+					}
 				},
 				ai:{
 					order:3,

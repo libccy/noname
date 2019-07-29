@@ -685,7 +685,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}              
 					}
 					game.updateRoundNumber();
-					game.log(player,'把',cards,'放在了牌堆里');
+					game.log(player,'把',get.cnNumber(cards.length),'张牌放在了牌堆里');
 				},
                 ai:{
                     order:1,
@@ -1456,7 +1456,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         sub:true,
                     },
                 },
-                audio:"ext:新服杂碎:3",
+                audio:3,
                 trigger:{
                     player:"phaseBegin",
                 },
@@ -1507,7 +1507,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
             },
             "xinfu_jianjie1":{
-                audio:"ext:新服杂碎:3",
+                audio:3,
                 prompt:"你的第一个准备阶段，你令两名不同的角色分别获得龙印与凤印；出牌阶段限一次（你的第一个回合除外），或当拥有龙印、凤印的角色死亡时，你可以转移龙印、凤印。",
                 enable:"phaseUse",
                 usable:1,
@@ -1716,29 +1716,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.player.hasSkill('smh_huoji')||event.player.hasSkill('smh_lianhuan');
 				},
                 content:function (){
-					player.logSkill('xinfu_jianjie');
 					"step 0"
+					player.logSkill('xinfu_jianjie');
+					"step 1"
 					if(trigger.player.hasSkill('smh_huoji')){
 						player.chooseTarget('请将'+get.translation(trigger.player)+'的「龙印」交给一名角色',true).set('ai',function(target){
 							var player=_status.event.player;
 							return 10+get.attitude(player,target);
 						});
 					}else event.goto(2);
-					"step 1"
+					"step 2"
 					if(result.bool&&result.targets&&result.targets.length){
 						var target=result.targets[0];
 						player.line(target,'fire');
 						target.addSkill('smh_huoji');
 						game.delay();
 					}
-					"step 2"
+					"step 3"
 					if(trigger.player.hasSkill('smh_lianhuan')){
 						player.chooseTarget('请将'+get.translation(trigger.player)+'的「凤印」交给一名角色',true).set('ai',function(target){
 							var player=_status.event.player;
 							return 10+get.attitude(player,target);
 						});
 					}else event.finish();
-					"step 3"
+					"step 4"
 					if(result.bool&&result.targets&&result.targets.length){
 						var target=result.targets[0];
 						player.line(target,'green');
@@ -1782,7 +1783,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             "smh_yeyan":{
                 unique:true,
                 enable:"phaseUse",
-                audio:"ext:新服杂碎:3",
+                audio:3,
                 skillAnimation:true,
                 prompt:"限定技，出牌阶段，你可以对一至三名角色造成至多共3点火焰伤害（你可以任意分配每名目标角色受到的伤害点数），若你将对一名角色分配2点或更多的火焰伤害，你须先弃置四张不同花色的手牌再失去3点体力。",
                 filter:function (event,player){
@@ -1904,27 +1905,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             },
             "xinfu_chenghao":{
                 audio:2,
-                subSkill:{
-                    count:{
-                        trigger:{
-                            global:"damageBegin",
-                        },
-                        forced:true,
-                        filter:function (event,player){
-							return event.player.isLinked()&&event.notLink()&&event.nature;
-						},
-                        content:function (){
-							trigger.xinfu_chenghao=true;
-						},
-                        sub:true,
-                    },
-                },
-                group:["xinfu_chenghao_count"],
                 trigger:{
                     global:"damageEnd",
                 },
                 filter:function (event,player){
-					return event.xinfu_chenghao==true;
+					return event.player.isLinked()&&event.player.isAlive()&&event.notLink()&&event.nature;
 				},
                 frequent:true,
                 content:function (){
@@ -3399,16 +3384,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     global:"phaseUseEnd",
                 },
                 init:function (player){
-					player.storage.guanwei=[];
+					player.storage.guanwei={num:0,suit:[]};
 				},
                 filter:function (event,player){
-					if(player.storage.guanwei.length==1&&_status.currentPhase.countUsed()>1) return true;
+					if(player.storage.guanwei&&player.storage.guanwei.suit.length==1&&player.storage.guanwei.num>1) return true;
 					return false;
 				},
                 direct:true,
                 content:function (){
 					'step 0'
-					player.chooseToDiscard('he',get.prompt('xinfu_guanwei')).set('ai',function(card){
+					player.chooseToDiscard('he',get.prompt2('xinfu_guanwei')).set('ai',function(card){
 						if(get.attitude(_status.event.player,_status.currentPhase)<1) return 0;
 						return 9-get.value(card);
 					}).set('logSkill','xinfu_guanwei');
@@ -3441,13 +3426,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             global:"useCard",
                         },
                         filter:function (event,player){
-							return _status.currentPhase==event.player;
+							return event.player.isPhaseUsing();
 						},
                         silent:true,
                         content:function (){
-							if(!player.storage.guanwei.contains(get.suit(trigger.card))){
-								player.storage.guanwei.push(get.suit(trigger.card));
+							if(!player.storage.guanwei.suit.contains(get.suit(trigger.card))){
+								player.storage.guanwei.suit.push(get.suit(trigger.card));
 							}
+							player.storage.guanwei.num++;
 						},
                         sub:true,
                         forced:true,
@@ -3459,7 +3445,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         },
                         silent:true,
                         content:function (){
-							player.storage.guanwei=[];
+							player.storage.guanwei={num:0,suit:[]};
 						},
                         sub:true,
                         forced:true,
@@ -5081,6 +5067,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
                 discard:false,
                 lose:false,
+                delay:0,
                 content:function (){
 					'step 0'
 					player.lose(cards,ui.special,'toStorage')
@@ -5147,7 +5134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 4'
 					if(result.bool){
-						trigger.player.damage();
+						trigger.player.damage('nocard');
 					}
 				},
             },
@@ -5661,7 +5648,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             "xinfu_jianjie":"荐杰",
             "xinfu_jianjie_info":"你的第一个准备阶段，你令两名其他角色分别获得龙印与凤印；出牌阶段限一次（你的第一个回合除外），或当拥有龙印、凤印的角色死亡时，你可以转移龙印、凤印。",
             "xinfu_jianjie1":"荐杰",
-            "xinfu_jianjie1_info":"出牌阶段，你可以弃一张牌，视为一名男性角色对另一名男性角色使用一张[决斗]，每阶段限一次",
+            "xinfu_jianjie1_info":"",
             "smh_huoji":"火计",
             "smh_huoji_info":"",
             "smh_lianhuan":"连环",
@@ -5675,7 +5662,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             "xinfu_yinshi":"隐士",
             "xinfu_yinshi_info":"锁定技，若你没有龙印、凤印且没装备防具，防止你受到的属性伤害和锦囊牌造成的伤害。",
             "xinfu_chenghao":"称好",
-            "xinfu_chenghao_info":"当一名角色受到属性伤害后，若其处于“连环状态”且是伤害传导的起点，你可以观看牌堆顶的X+1张牌并分配给任意角色（X为横置的角色数量）。",
+            "xinfu_chenghao_info":"当一名角色受到属性伤害后，若其存活且处于“连环状态”且是伤害传导的起点，你可以观看牌堆顶的X张牌并分配给任意角色（X为横置的角色数量且包含该角色）。",
             "jianjie_faq":"关于龙凤印",
             "jianjie_faq_info":"龙印效果：获得“火计”。凤印效果：获得“连环”。（均一回合限使用三次） 龙凤印齐全：获得“业炎”，“业炎”发动后移除龙凤印。",
             "xinfu_wuniang":"武娘",

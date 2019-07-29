@@ -49,7 +49,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"luji":["male","wu",3,["nzry_huaiju","nzry_yili","nzry_zhenglun"],[]],
 			"sunliang":["male","wu",3,["nzry_kuizhu","nzry_zhizheng","nzry_lijun"],['zhu']],
 			"xuyou":["male","qun",3,["nzry_chenglve","nzry_shicai","nzry_cunmu"],[]],
-			"yl_luzhi":["male","qun",3,["nzry_mingren","nzry_zhenliang"],[]],
+			"yl_luzhi":["male","qun",3,["nzry_mingren","nzry_zhenliang"],["die_audio"]],
 			"kuailiangkuaiyue":["male","wei",3,["nzry_jianxiang","nzry_shenshi"],[]],
 			
 			"guanqiujian":["male","wei",4,["drlt_zhenrong","drlt_hongju"],[]],
@@ -130,7 +130,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"chendao":"陈到，字叔至，生卒年不详，豫州汝南（今河南驻马店平舆县）人。三国时期蜀汉将领，刘备帐下白毦兵统领，名位常亚于赵云，以忠勇著称。蜀汉建兴年间，任征西将军、永安都督，封亭侯。在任期间去世。",
 		},
 		skill:{
-			//废除装备栏和判定区
 			
 			//阴雷
 			"drlt_zhenrong":{
@@ -768,6 +767,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.chooseCardTarget({
 								filterCard:true,
 								selectCard:1,
+								position:'he',
 								filterTarget:function(card,player,target){
 									return player!=target&&trigger.targets.contains(target);
 								},
@@ -1346,11 +1346,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"nzry_zhizheng":{
 						audio:2,
 						group:["nzry_zhizheng_1","nzry_zhizheng_2"],
-						mod:{
-							playerEnabled:function(card,player,target){
-								if(target!=player&&player.isPhaseUsing()&&get.distance(target,player,'attack')>1) return false;
-							},
-						},
 						trigger:{
 							player:'useCardAfter'
 						},
@@ -1363,6 +1358,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.storage.nzry_zhizheng++;
 						},
 						subSkill:{
+							others:{
+								sub:true,
+								mod:{
+									targetEnabled:function(card,player,target){
+										if(player.hasSkill('nzry_zhizheng')&&player.isPhaseUsing()&&get.distance(target,player,'attack')>1) return false;
+									},
+								},
+							},
 							"1":{
 								trigger:{
 									player:['phaseUseBefore','phaseUseAfter']
@@ -1370,6 +1373,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								forced:true,
 								popup:false,
 								content:function(){
+									if(event.triggername=='phaseUseBefore') game.countPlayer(function(current){
+										if(current!=player){
+											current.addTempSkill('nzry_zhizheng_others','phaseUseAfter');
+										}
+									});
 									player.storage.nzry_zhizheng=0;
 								},	
 							},
@@ -2845,28 +2853,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.judge(function(card){
 						if(get.suit(card)=='heart') return -1;
 						return 1;
-					},ui.special).nogain=function(card){
-						return get.suit(card)!='heart';
-					};
+					},ui.special);
 					"step 1"
-					if(result.bool){
-						result.card.goto(ui.special);
+					var bool1=result.bool;
+					var bool2=!get.owner(result.card);
+					if(bool1&&bool2){
+						event.card=result.card;
+						event.node=result.node;
+					}
+					else{
+						if(bool2) result.card.discard();
+						event.finish();
+					}
+					"step 2"
+						event.card.goto(ui.special);
 						event.trigger("addCardToStorage");
-						player.storage.tuntian.push(result.card);
-						result.node.moveDelete(player);
+						player.storage.tuntian.push(event.card);
+						event.node.moveDelete(player);
 						game.broadcast(function(cardid,player){
 							var node=lib.cardOL[cardid];
 							if(node){
 								node.moveDelete(player);
 							}
-						},result.node.cardid,player);
-						game.addVideo('gain2',player,get.cardsInfo([result.node]));
+						},event.node.cardid,player);
+						game.addVideo('gain2',player,get.cardsInfo([event.node]));
 						player.markSkill('tuntian');
 						game.addVideo('storage',player,['tuntian',get.cardsInfo(player.storage.tuntian),'cards']);
-					}
 				},
 				init:function(player){
-					player.storage.tuntian=[];
+					if(!player.storage.tuntian) player.storage.tuntian=[];
 				},
 				intro:{
 					content:'cards'

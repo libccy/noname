@@ -3247,7 +3247,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var target=player.storage.xianfu2;
 					player.line(target,'green');
 					target.logSkill('xianfu');
-					target[trigger.name](trigger.num,trigger.source||'nosource');
+					target[trigger.name](trigger.num,'nosource');
 					game.delay();
 				},
 				group:'xianfu3',
@@ -3867,12 +3867,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return !event.player.isMad()&&!_status.connectMode;
 				},
 				content:function(){
-					game.countPlayer(function(current){
-						current.forceCountChoose={default:5};
-					});
+					player.forceCountChoose={chooseToUse:5,default:5};
 					player.addSkill('kuangcai_use');
 					player.addSkill('kuangcai_cancel');
-					ui.auto.hide();
+					//ui.auto.hide();
 				},
 				subSkill:{
 					use:{
@@ -3885,7 +3883,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return true;
 							},
 							cardEnabled:function(card,player){
-								if(player.forceCountChoose&&player.forceCountChoose.default<=0) return false;
+								if(player.forceCountChoose&&player.forceCountChoose.chooseToUse<=0) return false;
 							},
 						},
 						trigger:{player:'useCard'},
@@ -3900,7 +3898,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							player.draw();
-							player.forceCountChoose.default--;
+							player.forceCountChoose.chooseToUse--;
 						}
 					},
 					cancel:{
@@ -3908,10 +3906,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						priority:50,
 						silent:true,
 						content:function(){
-							game.countPlayer(function(current){
-								delete current.forceCountChoose;
-							});
-							ui.auto.show();
+							delete player.forceCountChoose;
+							//ui.auto.show();
 							player.removeSkill('kuangcai_use');
 							player.removeSkill('kuangcai_cancel');
 						}
@@ -11789,7 +11785,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.removeAdditionalSkill('baobian');
 					var list=[];
 					if(player.hp<=3){
-						if(trigger.num!=undefined&&trigger.num<0) player.logSkil('baobian');
+						if(trigger.num!=undefined&&trigger.num<0) player.logSkill('baobian');
 						list.push('tiaoxin');
 					}
 					if(player.hp<=2){

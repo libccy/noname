@@ -3348,6 +3348,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fulin:{
 				trigger:{player:'phaseDiscardBegin'},
 				audio:2,
+				forced:true,
 				content:function(){
 					player.addTempSkill('fulin2','phaseDiscardAfter');
 				},
@@ -3385,7 +3386,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(player.storage.fulin&&player.storage.fulin.contains(card)){
 							return true;
 						}
-					}
+					},
+					cardDiscardable:function(card,player,name){
+						if(name=='phaseDiscard'&&player.storage.fulin&&player.storage.fulin.contains(card)){
+							return false;
+						}
+					},
 				},
 			},
 			duliang:{
@@ -5401,7 +5407,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.responded) return false;
 					if(!event.filterCard({name:'shan'})) return false;
-					if(player.hasSkill('huomo2')) return false;
+					if(!lib.filter.cardRespondable({name:'sha'},player,event)) return false;
+					if(player.storage.huomo&&player.storage.huomo.shan) return false;
 					if(event.parent.name!='sha') return false;
 					var hs=player.getCards('he',{color:'black'});
 					for(var i=0;i<hs.length;i++){
@@ -5432,7 +5439,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.$throw(result.cards);
 						event.card=result.cards[0];
 						player.logSkill('huomo');
-						player.addTempSkill('huomo2');
+						if(!player.storage.huomo) player.storage.huomo={};
+						player.storage.huomo.shan=true;
 					}
 					else{
 						event.finish();
@@ -5461,15 +5469,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			huomo_count2:{
-				trigger:{player:'useCard'},
+				trigger:{player:['useCard','respond']},
 				silent:true,
+				filter:function(event){
+					if(get.type(event.card)!='basic') return false;
+					return event.name=='useCard'||(event.card.name=='shan'&&event.getParent(2).name=='sha');
+				},
 				content:function(){
 					if(!player.storage.huomo) player.storage.huomo={};
-					switch(trigger.card.name){
-						case 'sha':player.storage.huomo.sha=true;break;
-						case 'tao':player.storage.huomo.tao=true;break;
-						case 'jiu':player.storage.huomo.jiu=true;break;
-					}
+					player.storage.huomo[trigger.card.name]=true;
 				}
 			},
 			huomo_use:{
@@ -7853,7 +7861,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhenlie:{
 				audio:2,
 				filter:function(event,player){
-					return event.player!=player&&event.targets&&event.targets.contains(player)&&event.card&&(event.card.name=='sha'||get.type(event.card)=='trick');
+					return event.player!=player&&event.targets&&event.targets.contains(player)&&(!event.excluded||!event.excluded.contains(player))&&event.card&&(event.card.name=='sha'||get.type(event.card)=='trick');
 				},
 				logTarget:'player',
 				check:function(event,player){
@@ -7884,7 +7892,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.loseHp();
 					"step 1"
-					trigger.targets.remove(player);
+					trigger.excluded.add(player);
 					"step 2"
 					if(trigger.player.countCards('he')){
 						player.discardPlayerCard(trigger.player,'he',true);

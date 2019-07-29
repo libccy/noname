@@ -12448,6 +12448,7 @@
 							var from=ui.selected.targets[0];
 							var js=from.getCards('j');
 							for(var i=0;i<js.length;i++){
+								if(_status.event.nojudge) break;
 								if(!target.storage._disableJudge&&!target.hasJudge(js[i])) return true;
 							}
 							if(target.isMin()) return false;
@@ -12458,15 +12459,18 @@
 							return false;
 						}
 						else{
-							return target.countCards('ej')>0;
+							var range='ej';
+							if(_status.event.nojudge) range='e';
+							return target.countCards(range)>0;
 						}
 					});
+					next.set('nojudge',event.nojudge||false);
 					next.set('ai',function(target){
 						var player=_status.event.player;
 						var att=get.attitude(player,target);
 						if(ui.selected.targets.length==0){
 							if(att>0){
-								if(target.countCards('j')) return 10;
+								if(!_status.event.nojudge&&target.countCards('j')) return 10;
 							}
 							else if(att<0){
 								if(game.hasPlayer(function(current){
@@ -12551,6 +12555,7 @@
 						}
 						event.targets[0].$give(link,event.targets[1])
 						game.delay();
+						event.result={bool:true};
 					}
 				},
 				useCard:function(){
@@ -33755,7 +33760,7 @@
 						node.mode=mode;
 						var list=[];
 						for(var i=0;i<info.length;i++){
-							if(lib.card[info[i]].derivation&&mode!='mode_derivation') continue;
+							if(!lib.card[info[i]]||(lib.card[info[i]].derivation&&mode!='mode_derivation')) continue;
 							list.push(['',get.translation(get.type(info[i],'trick')),info[i]]);
 						}
 						var sortCard=function(card){
@@ -46030,7 +46035,11 @@
 			m=n;
 			m=game.checkMod(from,to,m,'attackFrom',from);
 			m=game.checkMod(from,to,m,'attackTo',to);
-			var equips1=from.getCards('e'),equips2=to.getCards('e');
+			var equips1=from.getCards('e',function(card){
+				return !ui.selected.cards||!ui.selected.cards.contains(card);
+			}),equips2=to.getCards('e',function(card){
+				return !ui.selected.cards||!ui.selected.cards.contains(card);
+			});
 			for(i=0;i<equips1.length;i++){
 				var info=get.info(equips1[i]).distance;
 				if(!info) continue;

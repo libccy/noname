@@ -1,8 +1,7 @@
 window.noname_update={
-	version:'1.9.90.3',
-	update:'1.9.90.2',
+	version:'1.9.90.4',
+	update:'1.9.90.3',
 	changeLog:[
-		'解除祢衡的AI禁选限制',
 		'BUG修复',
 	],
 	files:[
@@ -10,11 +9,10 @@ window.noname_update={
 		'character/refresh.js',
 		'character/shenhua.js',
 		'character/sp.js',
+		'character/standard.js',
+		'character/xinghuoliaoyuan.js',
 		'character/yijiang.js',
-		'extension/boss/extension.js',
 		'mode/guozhan.js',
 		'game/game.js',
-		'game/config.js',
-		'game/package.js',
 	]
 };

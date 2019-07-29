@@ -3871,104 +3871,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.awakenSkill('yongjin');
-					var friends=game.filterPlayer(function(current){
-						return get.attitude(player,current)>=4;
-					});
-					var vacancies={
-						equip1:0,
-						equip2:0,
-						equip3:0,
-						equip4:0,
-						equip5:0
-					};
-					for(var i=0;i<friends.length;i++){
-						for(var j=1;j<=5;j++){
-							if(friends[i].canEquip(j)){
-								vacancies['equip'+j]++;
-							}
-						}
-					}
-					var info=['请选择要移动的装备'];
-					var targets=game.filterPlayer().sortBySeat();
-					for(var i=0;i<targets.length;i++){
-						var es=targets[i].getCards('e');
-						if(es.length){
-							info.push('<div class="text center">'+get.translation(targets[i])+'</div>');
-							info.push(es);
-						}
-					}
-					var next=player.chooseButton(true,[1,3]);
-					next.set('createDialog',info);
-					next.set('filterButton',function(button){
-						return game.hasPlayer(function(current){
-							return current.isEmpty(get.subtype(button.link));
-						});
-					});
-					next.set('ai',function(button){
-						var player=_status.event.player;
-						var owner=get.owner(button.link);
-						var att=get.attitude(player,owner);
-						if(att>0) return 0;
-						var subtype=get.subtype(button.link);
-						var vacancies=_status.event.vacancies;
-						var num=vacancies[subtype];
-						for(var i=0;i<ui.selected.buttons.length;i++){
-							if(get.subtype(ui.selected.buttons[i])==subtype){
-								num--;
-							}
-						}
-						if(num>0){
-							var val=get.equipValue(button.link);
-							if(att>=-1){
-								val-=2;
-							}
-							return val;
-						}
-						return 0;
-					});
-					next.set('vacancies',vacancies);
+					event.count=3;
 					'step 1'
-					event.cards=result.links.slice(0);
-					event.num=0;
+					player.moveCard().nojudge=true;
+					event.count--;
 					'step 2'
-					if(event.num<event.cards.length){
-						var card=event.cards[event.num];
-						player.chooseTarget('选择一个目标装备'+get.translation(card),function(card,player,target){
-							return target!=get.owner(_status.event.cardx)&&target.canEquip(_status.event.cardx);
-						}).set('cardx',card).set('ai',function(target){
-							var att=get.attitude(_status.event.player,target);
-							if(target.hasSkillTag('noe')) att+=3;
-							return att;
-						});
-					}
-					else{
-						event.finish();
-					}
-					'step 3'
-					if(result.bool){
-						var card=event.cards[event.num];
-						var target=result.targets[0];
-						var source=get.owner(card);
-						player.line2([source,target],'green');
-						source.$give(card,target,false);
-						event.current=target;
-						game.delayx();
-					}
-					else{
-						delete event.current;
-					}
-					'step 4'
-					if(event.current){
-						var card=event.cards[event.num];
-						event.current.equip(card);
-					}
-					event.num++;
-					event.goto(2);
-				},
-				filter:function(event,player){
-					return game.hasPlayer(function(current){
-						return current.countCards('e');
-					});
+					if(event.count&&result.bool) event.goto(1);
 				},
 				ai:{
 					order:7,
@@ -8083,6 +7991,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				dieAfter:function(source){
 					this.showCharacter(2);
+					if(source&&source.identity!='unknown'){
+						if(source.identity=='ye') source.draw(3);
+						else if(this.identity=='ye') source.draw(1);
+						else if(this.identity!=source.identity) source.draw(get.population(this.identity)+1);
+						else source.discard(source.getCards('he'));
+					}
+					
 					if(get.is.jun(this.name1)){
 						var yelist=[];
 						for(var i=0;i<game.players.length;i++){
@@ -8097,12 +8012,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						},yelist);
 						_status.yeidentity.add(this.identity);
-					}
-					if(source&&source.identity!='unknown'){
-						if(source.identity=='ye') source.draw(3);
-						else if(this.identity=='ye') source.draw(1);
-						else if(this.identity!=source.identity) source.draw(get.population(this.identity)+1);
-						else source.discard(source.getCards('he'));
 					}
 					game.tryResult();
 				},

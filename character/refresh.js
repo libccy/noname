@@ -1205,7 +1205,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(player.storage.reluoshen&&player.storage.reluoshen.contains(card)){
 							return true;
 						}
-					}
+					},
+					cardDiscardable:function(card,player,name){
+						if(name=='phaseDiscard'&&player.storage.reluoshen&&player.storage.reluoshen.contains(card)){
+							return true;
+						}
+					},
 				},
 				group:'reluoshen_clear',
 				subSkill:{
@@ -2845,7 +2850,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.chooseTarget(get.prompt('fenwei'),
 						[1,trigger.targets.length],function(card,player,target){
-						return _status.event.getTrigger().targets.contains(target);
+						var evt=_status.event.getTrigger();
+						return evt.targets.contains(target)&&!evt.excluded.contains(target);
 					}).set('ai',function(target){
 						var trigger=_status.event.getTrigger();
 						if(game.phaseNumber>game.players.length*2&&trigger.targets.length>=game.players.length-1){
@@ -2858,9 +2864,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.awakenSkill('fenwei');
 						player.logSkill('fenwei',result.targets);
 						player.storage.fenwei=true;
-						for(var i=0;i<result.targets.length;i++){
-							trigger.targets.remove(result.targets[i]);
-						}
+						trigger.excluded.addArray(result.targets);
 						game.delay();
 					}
 				},
