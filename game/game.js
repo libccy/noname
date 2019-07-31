@@ -13913,6 +13913,7 @@
 						}
 					}
 					player.removeEquipTrigger();
+					
 					// for(var i in lib.skill.globalmap){
 					//     if(lib.skill.globalmap[i].contains(player)){
 					//         lib.skill.globalmap[i].remove(player);
@@ -13956,15 +13957,6 @@
 							}
 						}
 					},player,event.cards);
-					event.trigger('die');
-					"step 1"
-					if(event.cards.length){
-						player.$throw(event.cards,1000);
-						game.log(player,'弃置了',event.cards,event.logvid);
-						for(var i=0;i<event.cards.length;i++){
-							event.cards[i].discard();
-						}
-					}
 
 					if(!_status.connectMode&&player==game.me&&!_status.over&&!game.controlOver){
 						ui.control.show();
@@ -13992,6 +13984,16 @@
 						player.$die(source);
 					}
 					if(player.dieAfter) player.dieAfter(source);
+					event.trigger('die');
+					"step 1"
+					if(event.cards.length){
+						player.$throw(event.cards,1000);
+						game.log(player,'弃置了',event.cards,event.logvid);
+						for(var i=0;i<event.cards.length;i++){
+							event.cards[i].discard();
+						}
+					}
+					
 					if(typeof _status.coin=='number'&&source&&!_status.auto){
 						if(source==game.me||source.isUnderControl()){
 							_status.coin+=10;
@@ -14767,6 +14769,10 @@
 					this.update();
 				},
 				uninit:function(){
+					for(var i=1;i<6;i++){
+						this.enableEquip(i);
+					}
+					
 					this.node.avatar.hide();
 					this.node.count.hide();
 					if(this.node.wuxing){
@@ -27747,6 +27753,15 @@
 						dialog.addSmall(hs);
 					}
 				}
+				
+				for(var j=0;j<game.dead.length;j++){
+					var hs=game.dead[j].getCards('h');
+					if(hs.length){
+						dialog.add('<div class="text center">'+get.translation(game.dead[j])+'</div>');
+						dialog.addSmall(hs);
+					}
+				}
+				
 				dialog.add(ui.create.div('.placeholder.slim'));
 				if(lib.config.background_audio){
 					if(result2===true){
@@ -28140,6 +28155,14 @@
 				var hs=game.players[i].getCards('h');
 				if(hs.length){
 					dialog.add('<div class="text center">'+get.translation(game.players[i])+'</div>');
+					dialog.addSmall(hs);
+				}
+			}
+			for(var i=0;i<game.dead.length;i++){
+				if(!_status.connectMode&&game.dead[i].isUnderControl(true)&&game.layout!='long2') continue;
+				var hs=game.dead[i].getCards('h');
+				if(hs.length){
+					dialog.add('<div class="text center">'+get.translation(game.dead[i])+'</div>');
 					dialog.addSmall(hs);
 				}
 			}

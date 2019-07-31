@@ -148,7 +148,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(get.mode()=='guozhan'&&!player.isMajor()) return false;
 					if(player.hasSkill('xietianzi')) return false;
 					if(_status.currentPhase!=player) return false;
-					return (event||_status.event).getParent().name=='phaseUse';
+					var evt=event||_status.event;
+					var evt2=evt.getParent('chooseToUse');
+					return evt.type=='phase'||evt2.type=='phase';
 				},
 				filterTarget:function(card,player,target){
 					return player==target;

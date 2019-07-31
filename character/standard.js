@@ -1843,7 +1843,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filterTarget:function(card,player,target){
 							var trigger=_status.event.getTrigger();
 							if(get.distance(player,target,'attack')<=1&&
-								target!=trigger.player&&!trigger.targets.contains(target)){
+								target!=trigger.player){
 								if(player.canUse(trigger.card,target)) return true;
 							}
 							return false;
@@ -1871,14 +1871,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						player.discard(result.cards);
-						player.logSkill(event.name,result.targets);
-						trigger.target=result.targets[0];
-						for(var i=0;i<trigger.targets.length;i++){
-						    if(trigger.targets[i]==player) break;
+						var target=result.targets[0];
+						player.logSkill(event.name,target);
+						trigger.target=target;
+						var evt=trigger.getParent();
+						if(evt&&evt.targets&&evt.num){
+							trigger.targets[evt.num]=target;
+							evt.targets[evt.num]=target;
 						}
-						var t1=trigger.targets.slice(0,i);
-						var t2=trigger.targets.slice(i+1);
-						trigger.targets=t1.concat([result.targets[0]]).concat(t2);
 					}
 					else{
 						event.finish();
@@ -2334,7 +2334,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			yaowu:{
-				trigger:{player:'damageEnd'},
+				trigger:{player:'damage'},
 				priority:1,
 				audio:2,
 				filter:function(event){

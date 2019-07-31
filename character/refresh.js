@@ -1001,7 +1001,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             },
             "new_reyaowu":{
                 trigger:{
-                    player:"damageEnd",
+                    player:"damage",
                 },
                 priority:1,
                 audio:"yaowu",
@@ -1160,6 +1160,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			reluoshen:{
 				audio:'luoshen',
+				locked:false,
 				trigger:{player:'phaseBegin'},
 				frequent:true,
 				content:function(){

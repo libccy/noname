@@ -1112,16 +1112,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						player.logSkill('xinfu_lingren',result.targets);
-						event.targett=result.targets[0];
-						player.line('water',event.targett);
+						var target=result.targets[0];
+						event.target=target;
+						player.line('water',target);
 						event.choice={
 							basic:false,
 							trick:false,
 							equip:false,
 						}
 						player.chooseBool('是否押基本牌？').ai=function(event,player){
-							if(event.targett.countCards('h')) return true;
-							return false;
+							var rand=0.95;
+							if(!target.countCards('h',{type:['basic']})) rand=0;
+							return Math.random()<rand?true:false;
 						};
 					}
 					else{
@@ -1133,16 +1135,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.choice.basic=true;
 					}
 					player.chooseBool('是否押锦囊牌？').ai=function(event,player){
-						var num=event.targett.countCards('h');
-						return Math.random()<num>2?0:0.5;
+						var rand=0.95;
+							if(!target.countCards('h',{type:['trick','delay']})) rand=0;
+							return Math.random()<rand?true:false;
 					};
 					'step 3'
 					if(result.bool){
 						event.choice.trick=true;
 					}
 					player.chooseBool('是否押装备牌？').ai=function(event,player){
-						var num=event.targett.countCards('h');
-						return Math.random()<num>3?0:0.3;
+						var rand=0.95;
+							if(!target.countCards('h',{type:['equip']})) rand=0;
+							return Math.random()<rand?true:false;
 					};
 					'step 4'
 					if(result.bool){
@@ -1154,7 +1158,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trick:false,
 						equip:false,
 					}
-					var he=event.targett.getCards('h');
+					var he=target.getCards('h');
 					for(var i=0;i<he.length;i++){
 						reality[get.type(he[i],'trick')]=true;
 					}
@@ -1167,8 +1171,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.popup('猜对'+get.cnNumber(event.num)+'项');
 					game.log(player,'猜对了'+get.cnNumber(event.num)+'项');
 					if(event.num>0){
-						event.targett.addTempSkill('lingren_adddamage');
-						event.targett.storage.lingren={
+						target.addTempSkill('lingren_adddamage');
+						target.storage.lingren={
 							card:trigger.card,
 							//player:event.targett,
 						}
@@ -1399,6 +1403,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 intro:{
                     content:"mark",
                 },
+                locked:true,
             },
             "xionghuo_disable":{
                 mod:{
@@ -2560,15 +2565,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					event.cardt=target.getCards('h').randomGet();
 					target.showCards(event.cardt);
-					player.chooseCard('he',true).ai=function(card){
+					player.chooseCard('he').ai=function(card){
 						var numt=event.cardt.number;
-						if(card.number<numt) return 20-get.value(card);
-						else if(card.number==numt) return 15-get.value(card);
-						return 12-get.value(card);
+						var att=get.attitude(player,target);
+						var value=get.value(event.cardt);
+						if(card.number<numt||att>2) return value+6-get.value(card);
+						else if(card.number==numt) return value-get.value(card);
+						return -1;
 					};
 					'step 1'
-					player.showCards(result.cards);
-					event.cardp=result.cards;
+					if(!result.bool) event.finish();
+					else{
+						player.showCards(result.cards);
+						event.cardp=result.cards;
+					}
 					'step 2'
 					player.give(event.cardp,target);
 					target.give(event.cardt,player);
@@ -3857,12 +3867,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 filter:function (event,player){
 					if(player.hasSkill('xinfu_kannan_phase')) return false;
 					if(player.getStat().skill.xinfu_kannan>=player.hp) return false;
-					return true;
+					return player.countCards('h')>0;
 				},
                 filterTarget:function (card,player,target){
-					if(player.hasSkillTag('noCompareSource')||target.hasSkillTag('noCompareTarget')) return false;
 					if(target.hasSkill('xinfu_kannan_phase')) return false;
-					return target.countCards('h')&&target!=player;
+					return player.canCompare(target);
 				},
                 ai:{
                     order:function (){
@@ -3970,7 +3979,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
                     cardUsable:function (card,player,num){
-						if(typeof num=='number'&&player.countCards('j')){
+						if(typeof num=='number'&&player.countCards('j')&&card.name!='jiu'){
 							return Infinity;
 						}
 					},

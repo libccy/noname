@@ -43,7 +43,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangbao:['male','qun',3,['zhoufu','yingbin']],
 			huangjinleishi:['female','qun',3,['fulu','fuji']],
 			maliang:['male','shu',3,['zishu','yingyuan']],
-			sp_pangtong:['male','qun',3,['manjuan','zuixiang']],
+			sp_pangtong:['male','qun',3,['xinmanjuan','zuixiang']],
 			zhugedan:['male','wei',4,['gongao','juyi']],
 			sp_jiangwei:['male','wei',4,['kunfen','fengliang']],
 			sp_machao:['male','qun',4,['zhuiji','ol_shichou']],
@@ -1358,8 +1358,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					if(bool){
-						player.chooseTarget('是否视为使用一张没有距离限制的【杀】？',function(card,player,target){
-							return player.canUse({name:'sha'},target,false);
+						player.chooseTarget('是否视为使用一张【杀】？',function(card,player,target){
+							return player.canUse({name:'sha'},target);
 						}).ai=function(target){
 							var player=_status.event.player;
 							return get.effect(target,{name:'sha'},player,player);
@@ -6059,6 +6059,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						targets[0].chooseToDiscard('he',2,true);
 						targets[1].loseHp();
 					}
+					else if(result.tie){
+						targets[0].loseHp()
+						targets[1].loseHp()
+					}
 					else{
 						targets[1].chooseToDiscard('he',2,true);
 						targets[0].loseHp();
@@ -8809,10 +8813,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					if(player.storage.ranshang){
-						player.storage.ranshang++;
+						player.storage.ranshang+=trigger.num;
 					}
 					else{
-						player.storage.ranshang=1;
+						player.storage.ranshang=trigger.num;
 					}
 					player.markSkill('ranshang');
 					game.addVideo('storage',player,['ranshang',player.storage.ranshang]);
@@ -8850,15 +8854,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						(event.card.name=='nanman'||event.card.name=='wanjian');
 				},
 				content:function(){
-					player.addTempSkill('hanyong3','useCardAfter');
+					player.addTempSkill('hanyong3');
+					player.storage.hanyong3=trigger.card;
 				},
 			},
 			hanyong3:{
 				audio:false,
 				trigger:{source:'damageBegin'},
 				forced:true,
+				onremove:true,
 				filter:function(event,player){
-					return event.card&&(event.card.name=='nanman'||event.card.name=='wanjian')&&event.notLink();
+					return event.card==player.storage.hanyong3;
 				},
 				content:function(){
 					trigger.num++;
@@ -9417,6 +9423,44 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				}
+			},
+			xinmanjuan:{
+				audio:'manjuan',
+				forced:true,
+				priority:15,
+				trigger:{player:'gainEnd'},
+				filter:function(event,player){
+					return event.type!='xinmanjuan';
+				},
+				content:function(){
+					"step 0"
+					event.cards=trigger.cards.slice(0);
+					player.discard(event.cards);
+					if(_status.currentPhase!=player) event.finish();
+					"step 1"
+					event.card=event.cards.shift();
+					event.togain=[];
+					var number=get.number(event.card);
+					for(var i=0;i<ui.discardPile.childNodes.length;i++){
+						var current=ui.discardPile.childNodes[i];
+						if(current!=event.card&&get.number(current)==number) event.togain.push(current);
+					}
+					if(!event.togain.length) event.goto(4);
+					"step 2"
+					player.chooseButton(['是否获得其中的一张牌？',event.togain]).ai=function(button){
+						return get.value(button.link);
+					};
+					"step 3"
+					if(result.bool){
+						player.gain(result.links[0],'gain2').type='xinmanjuan';
+					}
+					"step 4"
+					if(event.cards.length) event.goto(1);
+				},
+				ai:{
+					threaten:4.2,
+					nogain:1
+				},
 			},
 			manjuan:{
 				audio:true,
@@ -10842,10 +10886,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:true,
 				selectCard:function(){
 					var player=_status.event.player;
-					var num=game.countPlayer(function(current){
-						return current.isDamaged();
-					});
-					return [1,Math.min(num,player.maxHp-player.hp)];
+					return player.maxHp-player.hp;
 				},
 				filterTarget:function(card,player,target){
 					return target.hp<target.maxHp;
@@ -10854,15 +10895,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.hp<player.maxHp;
 				},
 				selectTarget:function(){
-					return ui.selected.cards.length;
+					return [1,ui.selected.cards.length];
 				},
 				check:function(card){
-					var player=_status.event.player;
-					if(ui.selected.cards.length>=game.countPlayer(function(current){
-						return get.attitude(player,current)>0&&current.isDamaged();
-					})){
-						return -1;
-					}
 					if(get.color(card)=='black') return -1;
 					return 9-get.value(card);
 				},
@@ -12321,7 +12356,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caohong:'曹洪',
 			liuxie:'刘协',
 			xiahouba:'夏侯霸',
-			zhugejin:'诸葛谨',
+			zhugejin:'诸葛瑾',
 			zhugeke:'诸葛恪',
 			guanyinping:'关银屏',
 			ganfuren:'甘夫人',
@@ -12397,7 +12432,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wangyun:'王允',
 			sunqian:'孙乾',
 			xizhicai:'戏志才',
-			quyi:'麹义',
+			quyi:'麴义',
 			liuye:'刘晔',
 			beimihu:'卑弥呼',
 			luzhi:'鲁芝',
@@ -12433,7 +12468,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             wangyuanji:"王元姬",
 
 			xinshanjia:"缮甲",
-            "xinshanjia_info":"出牌阶段开始时，你可以摸三张牌，然后弃置3-X张牌(X为你本局游戏内失去过的装备区内的牌的数目且至多为3)。若你没有以此法弃置基本牌或锦囊牌，则你可以视为使用了一张不计入出牌阶段使用次数且无距离限制的【杀】。",
+            "xinshanjia_info":"出牌阶段开始时，你可以摸三张牌，然后弃置3-X张牌(X为你本局游戏内失去过的装备区内的牌的数目且至多为3)。若你没有以此法弃置基本牌或锦囊牌，则你可以视为使用了一张不计入出牌阶段使用次数的【杀】。",
 			"new_meibu":"魅步",
             "new_meibu_info":"其他角色的出牌阶段开始时，若你在其攻击范围内，你可以弃置一张牌，令该角色于本回合内拥有“止息”。若你以此法弃置的牌不是【杀】或黑色锦囊牌，则本回合其与你距离视为1。",
             "new_mumu":"穆穆",
@@ -12911,6 +12946,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			weizhong_info:'锁定技，每当你的体力上限增加或减少时，你摸一张牌。',
 			taichen_info:'出牌阶段限一次，你可以自减一点体力，视为对一名角色使用一张杀（不计入回合内出杀限制）',
 			manjuan_info:'其他角色的卡牌因弃置而进入弃牌堆后，你可以弃置一张花色与之不同的牌，然后获得之',
+			xinmanjuan:'漫卷',
+			xinmanjuan_info:'每当你将获得任何一张牌，将之置于弃牌堆。若此情况处于你的回合中，你可依次将与该牌点数相同的一张牌从弃牌堆置于你手上。',
 			zuixiang_info:'限定技，准备阶段开始时，你可以展示牌库顶的3张牌并置于你的武将牌上，你不可使用或打出与该些牌同类的牌，所有同类牌对你无效。之后每个你的准备阶段，你须重复展示一次，直至该些牌中任意两张点数相同时，将你武将牌上的全部牌置于你的手上。',
 			naman_info:'你可以获得其他角色打出的杀',
 			xiemu_info:'每当你成为其他角色的黑色牌的目标，可以弃置一张杀并摸两张牌',

@@ -662,11 +662,39 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:true,
 				selectTarget:-1,
 				cardcolor:'red',
-				reverseOrder:true,
-				global:'taoyuan_nowuxie',
+				//reverseOrder:true,
 				filterTarget:function(card,player,target){
 					//return target.hp<target.maxHp;
 					return true;
+				},
+				contentBefore:function(){
+					"step 0"
+					game.delay();
+					"step 1"
+					if(get.is.versus()){
+						player.chooseControl('顺时针','逆时针',function(event,player){
+							if(player.next.side==player.side) return '逆时针';
+							return '顺时针';
+						}).set('prompt','选择'+get.translation(card)+'的结算方向');
+					}
+					else{
+						event.goto(3);
+					}
+					"step 2"
+					if(result&&result.control=='顺时针'){
+						var evt=event.getParent();
+						evt.fixedSeat=true;
+						evt.targets.sortBySeat();
+						evt.targets.reverse();
+						if(evt.targets[evt.targets.length-1]==player){
+							evt.targets.unshift(evt.targets.pop());
+						}
+					}
+					"step 3"
+					var evt=event.getParent();
+					for(var i=0;i<evt.targets.length;i++){
+						if(evt.targets[i].isHealthy()) evt.excluded.push(evt.targets[i]);
+					}
 				},
 				content:function(){
 					target.recover();
@@ -1699,13 +1727,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							})) return;
 							if(get.tag(card,'respondShan')) return 0.5;
 						}
-					}
-				}
-			},
-			taoyuan_nowuxie:{
-			    mod:{
-					wuxieRespondable:function(card,player,target){
-						if(card.name=='taoyuan'&&target.isHealthy()) return false;
 					}
 				}
 			},

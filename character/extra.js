@@ -231,18 +231,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.targets.remove(player);
 					event.targets.sort(lib.sort.seat);
 					player.line(event.targets,'green');
+					event.targets2=event.targets.slice(0);
 					"step 1"
+					if(event.targets2.length){
+						event.targets2.shift().damage('nocard');
+						event.redo();
+					}
+					"step 2"
 					if(event.targets.length){
 						event.current=event.targets.shift()
 						event.current.discard(event.current.getCards('e')).delay=false;
 					}
-					"step 2"
-					event.current.chooseToDiscard('h',true,4).delay=false;
 					"step 3"
-					event.current.damage();
-					game.delay(0.5);
-					if(event.targets.length) event.goto(1);
+					event.current.chooseToDiscard('h',true,4).delay=false;
 					"step 4"
+					game.delay(0.5);
+					if(event.targets.length) event.goto(2);
+					"step 5"
 						player.turnOver();
 				},
 				ai:{

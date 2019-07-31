@@ -5914,17 +5914,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			gzweimu:{
 				audio:'weimu',
-				trigger:{target:'useCardToBefore'},
+				trigger:{target:'useCardToBefore',player:'addJudgeBefore'},
 				forced:true,
 				priority:15,
 				check:function(event,player){
-					return get.effect(event.target,event.card,event.player,player)<0;
+					return event.name=='addJudge'||(event.card.name!='chiling'&&get.effect(event.target,event.card,event.player,player)<0);
 				},
 				filter:function(event,player){
 					return get.type(event.card,'trick')=='trick'&&get.color(event.card)=='black';
 				},
 				content:function(){
 					trigger.cancel();
+					if(trigger.name=='addJudge'){
+						for(var i=0;i<trigger.cards.length;i++){
+							trigger.cards[i].discard();
+						}
+					}
 				},
 				ai:{
 					effect:{
@@ -5936,17 +5941,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			gzqianxun:{
 				audio:'reqianxun',
-				trigger:{target:'useCardToBefore'},
+				trigger:{target:'useCardToBefore',player:'addJudgeBefore'},
 				forced:true,
 				priority:15,
 				check:function(event,player){
-					return get.effect(event.target,event.card,event.player,player)<0;
+					return event.name=='addJudge'||get.effect(event.target,event.card,event.player,player)<0;
 				},
 				filter:function(event,player){
 					return event.card.name=='shunshou'||event.card.name=='lebu';
 				},
 				content:function(){
 					trigger.cancel();
+					if(trigger.name=='addJudge'){
+						for(var i=0;i<trigger.cards.length;i++){
+							trigger.cards[i].discard();
+						}
+					}
 				},
 				ai:{
 					effect:{

@@ -1,18 +1,22 @@
 window.noname_update={
-	version:'1.9.90.4',
-	update:'1.9.90.3',
+	version:'1.9.90.5',
+	update:'1.9.90.4',
 	changeLog:[
+		'SP庞统技能还原',
 		'BUG修复',
 	],
 	files:[
 		'card/guozhan.js',
+		'card/standard.js',
+		'character/extra.js',
 		'character/refresh.js',
 		'character/shenhua.js',
 		'character/sp.js',
 		'character/standard.js',
 		'character/xinghuoliaoyuan.js',
-		'character/yijiang.js',
+		'mode/boss.js',
 		'mode/guozhan.js',
+		'game/config.js',
 		'game/game.js',
 	]
 };

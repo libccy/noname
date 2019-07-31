@@ -174,7 +174,7 @@ window.config={
 		},
 		guozhan:{
 			difficulty:'normal',
-			initshow_draw:2,
+			initshow_draw:'mark',
 			dierestart:true
 		},
 	},
@@ -182,6 +182,7 @@ window.config={
 	customforbid:[],
 	forbid:[
 		['huashen'],
+		['xinmanjuan'],
 		['lianying','rende'],
 		['lianying','anxian'],
 		['lianying','yinguo'],

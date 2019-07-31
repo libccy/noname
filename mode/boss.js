@@ -1698,7 +1698,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			    content:function(){
 			        var target=trigger.source;
 			        if(!target.storage.boss_shedu) target.storage.boss_shedu=0;
-			        target.storage.boss_shedu+=trigger.num;
+			        target.storage.boss_shedu++;
 			        target.markSkill('boss_shedu');
 			    },
 			    forced:true,
@@ -1860,7 +1860,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			        return !event.player.hasSkill('boss_duqu')&&['tao','jiu'].contains(event.card.name);
 			    },
 			    content:function(){
-			        var target=event.player;
+			        var target=trigger.player;
 			        player.line(target);
 			        if(!target.storage.boss_shedu) target.storage.boss_shedu=0;
 			        target.storage.boss_shedu++;
@@ -6915,6 +6915,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			shenqu:{
+				audio:2,
 				group:'shenqu2',
 				trigger:{global:'phaseBegin'},
 				filter:function(event,player){
@@ -6936,6 +6937,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			jiwu:{
+				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
 					if(player.countCards('h')==0) return false;
@@ -7459,7 +7461,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_guiyin:'归隐',
 			boss_guiyin_info:'锁定技，体力值比你多的角色无法在回合内对你使用卡牌',
 			boss_gongshen:'工神',
-			boss_gongshen_info:'锁定技，除你之外的角色没有装备区；你不能成为其他角色的的延时锦囊目标',
+			boss_gongshen_info:'锁定技，除你之外的角色没有装备区；你不能成为其他角色的延时锦囊牌的目标',
 
 			fanghua:'芳华',
 			fanghua_info:'结束阶段，你可以令所有已翻面角色流失一点体力',
