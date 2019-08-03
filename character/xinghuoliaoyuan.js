@@ -1235,31 +1235,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 trigger:{global:'die'},
 				priority:5,
 				filter:function(event){
-					if(!event.playerCards||!event.playerCards.length) return false;
-					for(var i=0;i<event.playerCards.length;i++){
-					    if(!get.owner(event.playerCards[i])||get.owner(event.playerCards[i])==event.player) return true;
-					}
-					return false;
-				},
-				check:function(event){
-					for(var i=0;i<event.playerCards.length;i++){
-						if(event.playerCards[i].name=='du') return false;
-					}
-					return true;
+					return event.player.countCards('he')>0;
 				},
 				content:function(){
 					"step 0"
-					event.togain=[];
-					for(var i=0;i<trigger.playerCards.length;i++){
-					    if(!get.owner(trigger.playerCards[i])||get.owner(trigger.playerCards[i])==trigger.player) event.togain.push(trigger.playerCards[i]);
-					}
+					event.togain=trigger.player.getCards('he');
+					event.shown=trigger.player.getCards('e');
+					var num=event.togain.length-event.shown.length;
 					player.gain(event.togain);
-					trigger.player.$give(event.togain.length,player);
+					if(num) trigger.player.$give(num,player);
+					if(event.shown.length) trigger.player.$give(event.shown,player);
 					game.delay();
-					"step 1"
-					for(var i=0;i<event.togain.length;i++){
-						trigger.cards.remove(event.togain[i]);
-					}
 				},
             },
             "xinfu_fujian":{
@@ -2443,7 +2429,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					delete player.storage.xinfu_yanyu2;
 				},
                 trigger:{
-                    global:"loseEnd",
+                    global:["loseEnd","cardsDiscardEnd"],
                 },
                 direct:true,
                 filter:function (event,player){
@@ -2956,9 +2942,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(event.gains.length) player.gain(event.gains,'gain2');
 						if(event.discards.length){
 							player.$throw(event.discards);
-							for(var i=0;i<event.discards.length;i++){
-							   event.discards[i].discard();
-							}
+							game.cardsDiscard(event.discards);
 						}
 					}
 				},
@@ -3371,7 +3355,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.$throw(result.links);
 						var card=result.links[0];
-						card.discard();
+						game.cardsDiscard(card);
 						player.storage.xinfu_zengdao2.remove(card);
 						player.syncStorage('xinfu_zengdao2');
 						player.updateMarks('xinfu_zengdao2');

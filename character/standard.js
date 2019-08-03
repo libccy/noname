@@ -227,7 +227,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},trigger.player.judging[0]);
 							game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging[0].clone]));
 						}
-						trigger.player.judging[0].discard();
+						game.cardsDiscard(trigger.player.judging[0]);
 						trigger.player.judging[0]=result.cards[0];
 						if(!get.owner(result.cards[0],'judge')){
 							trigger.position.appendChild(result.cards[0]);

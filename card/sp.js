@@ -746,7 +746,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(!muniu.cards) return false;
 					lib.skill.muniu_skill.sync(muniu);
 					for(var i=0;i<muniu.cards.length;i++){
-						if(event.filterCard(muniu.cards[i],player,event)) return true;
+						if(event.filterCard(muniu.cards[i],player,event)&&lib.filter.cardRespondable(muniu.cards[i],player,event)) return true;
 					}
 					return false;
 				},
@@ -756,7 +756,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.chooseButton(['木牛流马',player.getEquip(5).cards]).set('filterButton',function(button){
 						var evt=_status.event.getTrigger();
 						if(evt&&evt.filterCard){
-							return evt.filterCard(button.link,_status.event.player,evt);
+							return evt.filterCard(button.link,_status.event.player,evt)&&lib.filter.cardRespondable(button.link,_status.event.player,evt);
 						}
 						return true;
 					}).set('ai',function(button){

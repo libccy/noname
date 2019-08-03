@@ -9302,6 +9302,11 @@
 		},
 		element:{
 			content:{
+				cardsDiscard:function(){
+					for(var i=0;i<cards.length;i++){
+						cards[i].discard();
+					}
+				},
 				chooseToEnable:function(){
         'step 0'
         var list=[];
@@ -10946,12 +10951,13 @@
 					};
 					"step 2"
 					var cards=[];
-					player.lose(result[0].cards);
+					player.lose(result[0].cards,ui.special);
 					for(var i=1;i<result.length;i++){
-						event.list[i].lose(result[i].cards);
+						event.list[i].lose(result[i].cards,ui.special);
 						cards.push(result[i].cards[0]);
 					}
 					event.cardlist=cards;
+					event.cards=cards;
 					event.card1=result[0].cards[0];
 					event.num1=event.card1.number;
 					event.iwhile=0;
@@ -10976,7 +10982,7 @@
 						game.delay(0,1500);
 					}
 					else{
-						event.finish();
+						event.goto(7);
 					}
 					"step 4"
 					event.result.num1[event.iwhile]=event.num1;
@@ -11025,6 +11031,13 @@
 					game.broadcastAll(ui.clear);
 					event.iwhile++;
 					event.goto(3);
+					"step 7"
+					event.cards.add(event.card1);
+					var cards2=[];
+					for(var i=0;i<event.cards.length;i++){
+						if(!get.owner(event.cards[i])) cards2.push(event.cards[i]);
+					}
+					game.cardsDiscard(cards2);
 				},
 				chooseToCompare:function(){
 					"step 0"
@@ -11097,8 +11110,8 @@
 							event.addToAI=true;
 						}
 					}
-					player.lose(event.card1);
-					target.lose(event.card2);
+					player.lose(event.card1,ui.special);
+					target.lose(event.card2,ui.special);
 					"step 5"
 					game.broadcast(function(){
 						ui.arena.classList.add('thrownhighlight');
@@ -11169,6 +11182,11 @@
 					else if(event.preserve=='lose'){
 						event.preserve=!event.result.bool;
 					}
+					"step 8"
+					var cards=[];
+					if(!get.owner(event.card1)) cards.push(event.card1);
+					if(!get.owner(event.card2)) cards.push(event.card2);
+					game.cardsDiscard(cards);
 				},
 				chooseSkill:function(){
 					'step 0'
@@ -13885,10 +13903,6 @@
 					else{
 						game.log(player,'阵亡')
 					}
-					event.cards=player.getCards('hej');
-					event.playerCards=player.getCards('he');
-					event.es=player.getCards('e');
-					event.hs=player.getCards('h');
 					
 					if(!game.reserveDead){
 						for(var mark in player.marks){
@@ -13986,14 +14000,14 @@
 					if(player.dieAfter) player.dieAfter(source);
 					event.trigger('die');
 					"step 1"
-					if(event.cards.length){
-						player.$throw(event.cards,1000);
-						game.log(player,'弃置了',event.cards,event.logvid);
-						for(var i=0;i<event.cards.length;i++){
-							event.cards[i].discard();
+					if(player.isDead()){
+						event.cards=player.getCards('hej');
+						if(event.cards.length){
+							player.$throw(event.cards,1000);
+							game.log(player,'弃置了',event.cards,event.logvid);
+							game.cardsDiscard(event.cards);
 						}
 					}
-					
 					if(typeof _status.coin=='number'&&source&&!_status.auto){
 						if(source==game.me||source.isUnderControl()){
 							_status.coin+=10;
@@ -14066,7 +14080,7 @@
 					"step 4"
 					if(player.isMin() || player.countCards('e',{subtype:get.subtype(card)})){
 						event.finish();
-						card.discard();
+						game.cardsDiscard(card);
 						delete player.equiping;
 						return;
 					}
@@ -14129,7 +14143,7 @@
 					delete cards[0]._transform;
 					var viewAs=typeof card=='string'?card:card.name;
 					if(!lib.card[viewAs]||!lib.card[viewAs].effect){
-						cards[0].discard();
+						game.cardsDiscard(cards[0]);
 					}
 					else{
 						cards[0].style.transform='';
@@ -14250,7 +14264,10 @@
 					game.addVideo('judge2',null,event.videoId);
 					ui.arena.classList.remove('thrownhighlight');
 					game.log(player,'的判定结果为',event.result.card);
-					if(!get.owner(event.result.card)) event.position.appendChild(event.result.card);
+					if(!get.owner(event.result.card)){
+						if(event.position==ui.discardPile) game.cardsDiscard(event.result.card);
+						else event.position.appendChild(event.result.card);
+					}
 				},
 				turnOver:function(){
 					game.log(player,'翻面');
@@ -14770,7 +14787,7 @@
 				},
 				uninit:function(){
 					for(var i=1;i<6;i++){
-						this.enableEquip(i);
+						if(this.isDisabled(i)) this.enableEquip(i);
 					}
 					
 					this.node.avatar.hide();
@@ -17600,7 +17617,7 @@
 							target=target.next;
 						}
 						if(target==this){
-							card.discard();
+							game.cardsDiscard(card);
 						}
 						else{
 							if(card.name!=name){
@@ -18054,9 +18071,7 @@
 							if(info.intro.onunmark=='throw'){
 								if(get.itemtype(this.storage[name])=='cards'){
 									this.$throw(this.storage[name]);
-									while(this.storage[name].length){
-										this.storage[name].shift().discard();
-									}
+									game.cardsDiscard(this.storage[name]);
 								}
 							}
 							else if(typeof info.intro.onunmark=='function'){
@@ -18747,9 +18762,7 @@
 												this.$throw(cards);
 											}
 											if(this.onremove=='discard'||this.onremove=='lose'){
-												for(var i=0;i<cards.length;i++){
-													cards[i].discard();
-												}
+												game.cardsDiscard(cards);
 												delete this.storage[skill];
 											}
 										}
@@ -23191,9 +23204,7 @@
 						player.draw();
 					}
 					"step 1"
-					for(var i=0;i<cards.length;i++){
-						cards[i].discard();
-					}
+					game.cardsDiscard(cards);
 				},
 				ai:{
 					basic:{
@@ -24235,6 +24246,14 @@
 		},
 	};
 	var game={
+		cardsDiscard:function(cards){
+			var type=get.itemtype(cards);
+			if(type!='cards'&&type!='card') return {};
+			var next=game.createEvent('cardsDiscard');
+			next.cards=type=='cards'?cards:[cards];
+			next.setContent('cardsDiscard');
+			return next;
+		},
 		online:false,
 		onlineID:null,
 		onlineKey:null,

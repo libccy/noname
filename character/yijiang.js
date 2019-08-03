@@ -855,7 +855,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.chooseToCompare(trigger.player);
 							'step 1'
 							if(result.bool){
-								trigger.skipShan=true;
+								trigger.cancel();
 							}
 						}
 					}
@@ -872,10 +872,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'chooseCardBegin'},
 				check:function(event,player){
-					return player.hasCard(function(card){
+					return !player.hasCard(function(card){
 						var val=get.value(card);
 						return val<0||(val<=4&&card.number>=11);
-					});
+					},'h');
 				},
 				filter:function(event){
 					return event.type=='compare'&&!event.directresult;
@@ -1648,9 +1648,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						if(event.togain.length){
-							for(var i=0;i<dialog.buttons.length;i++){
-								event.togain[i].discard();
-							}
+							game.cardsDiscard(event.togain);
 						}
 						game.broadcast(function(id){
 							var dialog=get.idDialog(id);
@@ -3416,15 +3414,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var cards=get.cards(2);
 						target.viewCards('督粮',cards);
 						event.cards2=[];
+						event.tothrow=[];
 						for(var i=0;i<cards.length;i++){
 							if(get.type(cards[i])=='basic'){
 								ui.special.appendChild(cards[i]);
 								event.cards2.push(cards[i]);
 							}
 							else{
-								cards[i].discard();
+								event.tothrow.push(cards[i]);
 							}
 						}
+						game.cardsDiscard(event.tothrow);
 					}
 					else{
 						target.addSkill('duliang2');
@@ -3590,43 +3590,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
 					game.updateRoundNumber();
-					var n1=target.getCards('he',function(card){
-						if(!lib.filter.cardDiscardable(card,player)) return false;
-						return get.type(card,'trick')=='trick';
-					});
-					var n2=target.getCards('he',function(card){
-						if(!lib.filter.cardDiscardable(card,player)) return false;
-						return get.type(card,'trick')!='trick';
-					});
-					if(n1.length>1||n2.length>2||(n1.length==1&&n2.length==2)){
-						target.chooseToDiscard('弃置一张锦囊牌，或两张非锦囊牌',true,'he',function(card,player){
-							if(!lib.filter.cardDiscardable(card,player)) return false;
-							if(!_status.event.nontrick){
-								return get.type(card,'trick')=='trick';
-							}
-							if(ui.selected.cards.length){
-								return get.type(card,'trick')!='trick';
-							}
-							return true;
-						}).set('ai',function(card){
-							if(get.type(card,'trick')=='trick'){
-								return 8-get.value(card);
-							}
-							return -get.value(card);
-						}).set('selectCard',function(){
-							if(ui.selected.cards.length==1&&get.type(ui.selected.cards[0],'trick')=='trick'){
-								return 1;
-							}
-							return 2;
-						}).set('nontrick',n2.length>=2).set('complexCard',true);
-					}
-					else{
-						if(n1.length){
-							target.discard(n1);
-						}
-						else if(n2.length){
-							target.discard(n2);
-						}
+					'step 2'
+					target.chooseToDiscard(true).prompt='请弃置一张锦囊牌，或依次弃置两张非锦囊牌。';
+					'step 3'
+					if((!result.cards||get.type(result.cards[0],'trick')!='trick')&&target.countCards('he',{type:['trick','delay']})){
+						target.chooseToDiscard(true,function(card){
+							return get.type(card,'trick')!='trick';
+						}).prompt='请弃置第二张非锦囊牌';
 					}
 				},
 				ai:{
@@ -4019,7 +3989,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('chunlao');
 						player.$throw(result.links);
 						player.storage.chunlao.remove(result.links[0]);
-						result.links[0].discard();
+						game.cardsDiscard(result.links[0]);
 						player.syncStorage('chunlao');
 						target.useCard({name:'jiu'},target);
 						if(!player.storage.chunlao.length){
@@ -5989,7 +5959,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.$throw(player.storage.xinpojun2,1000);
 					for(var i=0;i<player.storage.xinpojun2.length;i++){
-						player.storage.xinpojun2[i].discard();
+						game.cardsDiscard(player.storage.xinpojun2);
 					}
 					game.log(player,'弃置了',player.storage.xinpojun2);
 					delete player.storage.xinpojun2;
@@ -6030,9 +6000,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.draw();
 					"step 1"
-					for(var i=0;i<cards.length;i++){
-						cards[i].discard();
-					}
+					game.cardsDiscard(cards);
 				},
 				ai:{
 					basic:{
@@ -7091,7 +7059,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseCardButton(player.storage.quanji,true);
 					"step 1"
 					var card=result.links[0];
-					card.discard();
+					game.cardsDiscard(card);
 					player.$throw(card);
 					player.storage.quanji.remove(card);
 					if(!player.storage.quanji.length){
@@ -9072,9 +9040,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							cards2.push(result.links[i]);
 							cards.remove(result.links[i]);
 						}
-						for(var i=0;i<cards.length;i++){
-							cards[i].discard();
-						}
+						game.cardsDiscard(cards);
 						event.cards2=cards2;
 					}
 					else{
@@ -9241,9 +9207,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					content:'cards',
 					onunmark:function(storage,player){
 						if(storage&&storage.length){
-							for(var i=0;i<storage.length;i++){
-								storage[i].discard();
-							}
+							game.cardsDiscard(storage);
 							player.$throw(storage);
 							player.storage.xiansi.length=0;
 						}
@@ -9327,9 +9291,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						event.target.$throw(links);
 						game.log(event.target,'被移去了',links);
-						for(var i=0;i<links.length;i++){
-							links[i].discard();
-						}
+						game.cardsDiscard(links);
 						player.useCard({name:'sha'},event.target);
 					}
 				},

@@ -49,7 +49,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 audio:"qiangxi",
                 enable:"phaseUse",
                 filterCard:function (card){
-        return get.type(card)=='equip';
+        return get.subtype(card)=='equip1';
     },
                 selectCard:function (){
         return [0,1];
@@ -293,9 +293,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 cards2.push(result.links[i]);
                 cards.remove(result.links[i]);
             }
-            for(var i=0;i<cards.length;i++){
-                cards[i].discard();
-            }
+            game.cardsDiscard(cards);
             event.card2=cards2[0];
         }
         var time=1000-(get.utc()-event.time);
@@ -604,20 +602,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					};
 					"step 1"
 					if(result.bool){
+					var cards2=[];
 					for(var i=0;i<cards.length;i++){
 						if(get.type(cards[i])!='basic'&&cards[i].name!='juedou'&&
 							(get.type(cards[i])!='equip'||get.subtype(cards[i])!='equip1')){
-							cards[i].discard();
+							cards2.push(cards[i]);
 							cards.splice(i--,1);
 						}
 					}
 					player.gain(cards,'gain2');
+					game.cardsDiscard(cards2);
 					player.addTempSkill('reluoyi2',{player:'phaseBefore'});
 					trigger.cancel();
 					}
-					else for(var i=0;i<cards.length;i++){
-							cards[i].discard();
-					}
+					else game.cardsDiscard(cards);
 				},
             },
             "new_rewusheng":{
@@ -1783,7 +1781,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},trigger.player.judging[0]);
 							game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging[0].clone]));
 						}
-						trigger.player.judging[0].discard();
+						game.cardsDiscard(trigger.player.judging[0]);
 						trigger.player.judging[0]=result.cards[0];
 						if(!get.owner(result.cards[0],'judge')){
 							trigger.position.appendChild(result.cards[0]);

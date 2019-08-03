@@ -2824,7 +2824,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
-					return player!=target&&target.hasCard(function(card){
+					return target.hasCard(function(card){
 						return !get.info(card).unique;
 					},'e');
 				},

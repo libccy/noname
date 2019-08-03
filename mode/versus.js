@@ -5467,6 +5467,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			content:{
 				replacePlayer:function(){
 					"step 0"
+					var cards=source.getCards('hej');
+					if(cards.length){
+						source.$throw(cards,1000);
+						game.cardsDiscard(cards);
+					}
+					"step 1"
 					var list=(source.side==game.me.side)?_status.friend:_status.enemy;
 					if(list.length==0){
 						// if(game.friend.contains(source)){
@@ -5509,7 +5515,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						event.character=list[Math.floor(Math.random()*list.length)];
 					}
-					"step 1"
+					"step 2"
 					game.uncheck();
 					_status.friend.remove(event.character);
 					_status.enemy.remove(event.character);
@@ -5539,13 +5545,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.onSwapControl();
 					}
 					game.triggerEnter(source);
-					"step 2"
+					"step 3"
 					// if(_status.currentPhase==source){
 					// 	source.skip('phase');
 					// }
 				},
 				replacePlayerTwo:function(){
 					'step 0'
+					var cards=source.getCards('hej');
+					if(cards.length){
+						source.$throw(cards,1000);
+						game.cardsDiscard(cards);
+					}
 					game.delay();
 					'step 1'
 					source.revive(null,false);
@@ -5574,6 +5585,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				replacePlayerOL:function(){
 					'step 0'
+					var cards=source.getCards('hej');
+					if(cards.length){
+						source.$throw(cards,1000);
+						game.cardsDiscard(cards);
+					}
 					game.delay();
 					'step 1'
 					if(event.source.side==game.me.side){

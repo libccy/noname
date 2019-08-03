@@ -540,8 +540,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return !player.storage.drlt_poshi&&((player.storage.disableEquip!=undefined&&player.storage.disableEquip.length==5)||player.hp==1);
 						},
 						content:function(){
+							"step 0"
 							player.storage.drlt_poshi=true;
 							player.loseMaxHp();
+							"step 1"
 							var num=player.maxHp-player.countCards('h');
 							if(num>0) player.draw(num);
 							player.removeSkill('drlt_jueyan');
@@ -2862,7 +2864,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.node=result.node;
 					}
 					else{
-						if(bool2) result.card.discard();
+						if(bool2) game.cardsDiscard(result.card);
 						event.finish();
 					}
 					"step 2"
@@ -3183,7 +3185,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:["guzheng_count"],
 				subSkill:{
 				    count:{
-				        trigger:{global:'discardAfter'},
+				        trigger:{global:['discardAfter','cardsDiscardAfter']},
 				        forced:true,
 				        silent:true,
 				        popup:false,
@@ -3784,13 +3786,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.showCards(event.cards);
 					"step 1"
 					var num=0;
+					var cards2=[];
 					for(var i=0;i<event.cards.length;i++){
 						if(get.suit(event.cards[i])=='heart'){
 							num++;
-							event.cards[i].discard();
+							cards2.push(event.cards[i]);
 							event.cards.splice(i--,1);
 						}
 					}
+					game.cardsDiscard(cards2);
 					if(num){
 						player.recover(num);
 					}
@@ -3876,36 +3880,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'die'},
 				priority:5,
 				filter:function(event){
-					if(!event.playerCards||!event.playerCards.length) return false;
-					for(var i=0;i<event.playerCards.length;i++){
-					    if(!get.owner(event.playerCards[i])||get.owner(event.playerCards[i])==event.player) return true;
-					}
-					return false;
-				},
-				check:function(event){
-					for(var i=0;i<event.playerCards.length;i++){
-						if(event.playerCards[i].name=='du') return false;
-					}
-					return true;
+					return event.player.countCards('he')>0;
 				},
 				content:function(){
 					"step 0"
-					event.togain=[];
-					event.shown=[];
-					for(var i=0;i<trigger.playerCards.length;i++){
-					    if(!get.owner(trigger.playerCards[i])||get.owner(trigger.playerCards[i])==trigger.player){
-					    event.togain.push(trigger.playerCards[i]);
-					    if(trigger.es.contains(trigger.playerCards[i])) event.shown.push(trigger.playerCards[i]);
-					    }
-					}
+					event.togain=trigger.player.getCards('he');
+					event.shown=trigger.player.getCards('e');
+					var num=event.togain.length-event.shown.length;
 					player.gain(event.togain);
-					trigger.player.$give(event.togain.length-event.shown.length,player);
+					if(num) trigger.player.$give(num,player);
 					if(event.shown.length) trigger.player.$give(event.shown,player);
 					game.delay();
-					"step 1"
-					for(var i=0;i<event.togain.length;i++){
-						trigger.cards.remove(event.togain[i]);
-					}
 				},
 			},
 			fangzhu:{
@@ -5713,7 +5698,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.target.damage(trigger.source,'nocard').type='retianxiang';
 							event.target.addSkill('retianxiang2');
 							if(get.position(event.card)=='s'){
-								event.card.discard();
+								game.cardsDiscard(event.card);
 							}
 						}
 					}
@@ -5743,7 +5728,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove:function(player){
 					var card=player.storage.retianxiang3;
 					if(get.position(card)=='s'){
-						card.discard();
+						game.cardsDiscard(card);
 					}
 					delete player.storage.retianxiang3;
 				}
@@ -6085,9 +6070,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					onunmark:function(storage,player){
 						if(storage&&storage.length){
 							player.$throw(storage);
-							for(var i=0;i<storage.length;i++){
-								storage[i].discard();
-							}
+							game.cardsDiscard(storage);
 							delete player.storage.buqu;
 						}
 					}
@@ -6464,7 +6447,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"drlt_jueyan":"决堰",
 			"drlt_jueyan_info":"出牌阶段限一次，你可以废除一个装备栏，然后执行对应一项：武器栏，本回合内你可以多使用三张【杀】；防具栏，摸三张牌，本回合手牌上限+3；2个坐骑栏，本回合你使用的牌无距离限制；宝物栏，本回合获得技能集智",
 			"drlt_poshi":"破势",
-			"drlt_poshi_info":"觉醒技，准备阶段开始时，若你的装备栏均已被废除或体力值为1，则你扣减一点体力上限，失去技能“决堰”并获得技能“怀柔”",
+			"drlt_poshi_info":"觉醒技，准备阶段开始时，若你的装备栏均已被废除或体力值为1，则你扣减一点体力上限，将手牌摸至体力上限，失去技能“决堰”并获得技能“怀柔”",
 			"drlt_huairou":"怀柔",
 			"drlt_huairou_info":"出牌阶段，你可以重铸装备牌",
 			"drlt_zhenggu":"镇骨",
