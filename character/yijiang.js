@@ -182,238 +182,238 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wuguotai:['sunjian'],
 		},
 		skill:{
-            "new_qingxian":{
-                group:["qingxian_draw"],
-                enable:"phaseUse",
-                audio:"qingxian",
-                usable:1,
-                position:'he',
-                filterTarget:function (card,player,target){
-        return target!=player;
-    },
-                complexCard:true,
-                complexSelect:true,
-                selectTarget:function (){
-        return ui.selected.cards.length;
-    },
-                filterCard:true,
-                selectCard:function (){
-        var player=_status.event.player;
-        return [1,player.hp];
-    },
-                check:function (cardx){
-        var player=_status.event.player;
-        var number=game.countPlayer(function(target){
-            if(player==target) return false;
-            var pe=player.countCards('e',function(card){
-            return card!=cardx&&ui.selected.cards.contains(card)==false;
-        });
-            var te=target.countCards('e');
-            if(pe>te&&target.isDamaged()&&get.attitude(player,target)>2) return true;
-            else if(pe==te&&get.attitude(player,target)>2) return true;
-            else if(pe<te&&get.attitude(player,target)<0) return true;
-            return false;
-        });
-        if(ui.selected.cards.length<number) return 7-get.value(cardx);
-        else return 0;
-    },
-                targetprompt:function (target){
-        var pe=_status.event.player.countCards('e',function(card){
-            return ui.selected.cards.contains(card)==false;
-        });
-        var te=target.countCards('e');
-        if(pe>te) return "回复体力";
-        else if(pe==te) return "摸一张牌";
-        else if(pe<te) return "失去体力";
-    },
-                line:"thunder",
-                content:function (){
-        var pe=player.countCards('e');
-        var te=target.countCards('e');
-        if(pe>te) target.recover();
-        else if(pe==te) target.draw();
-        else if(pe<te) target.loseHp();
-    },
-                ai:{
-                    order:10,
-                    result:{
-                        target:function (player,target){
-                var pe=player.countCards('e',function(card){
-            return ui.selected.cards.contains(card)==false;
-        });
-                var te=target.countCards('e');
-                if(pe>te&&target.isDamaged()) return 2;
-                else if(pe==te) return 1;
-                else if(pe<te) return -2.5;
-                else return 0;
-            },
-                    },
-                },
-            },
-            "new_juexiang":{
-                audio:"qingxian_jilie",
-                trigger:{
-                    player:"dieBegin",
-                },
-                forced:true,
-                popup:false,
-                skillAnimation:true,
-                derivation:["new_canyun"],
-                content:function (){
-        "step 0"
-        player.chooseTarget('【绝响】：是否令一名其他角色获得技能〖残韵〗？',function(card,player,target){
-            return target!=player;
-        }).set('ai',function(target){
-            var att=get.attitude(_status.event.player,target);
-            if(target.countCards('ej',{suit:'club'})) att=att*2;
-            return 10+att;
-        });
-        "step 1"
-        var next=game.createEvent('new_juexiang',null,trigger.parent);
-        next.player=trigger.source;
-        next.playerx=player;
-        if(result.bool) next.target=result.targets[0];
-        next.setContent(lib.skill.new_juexiang.contentx);
-    },
-                contentx:function (){
-        "step 0"
-        if(player||target)event.playerx.logSkill('new_juexiang');
-        if(player){
-            player.discard(player.getCards('e'));
-            player.loseHp();
-        }
-        if(target){
-        event.playerx.line(target,'thunder');
-        target.addSkill('new_canyun');
-        target.discardPlayerCard('是否弃置自己区域内的一张梅花牌，获得技能〖绝响〗？',target,'hej').set('ai',function(card){
-                if(get.position(card)=='j') return 100+get.value(card);
-                return 100-get.value(card);
-            }).set('visible',true).set('filterButton',function(card){
-                return get.suit(card.link)=='club';
-            });
-        }
-        else event.finish()
-        "step 1"
-        if(result.bool) target.addSkill('new_juexiang');
-    },
-            },
-            "new_canyun":{
-                group:["qingxian_draw"],
-                complexCard:true,
-                complexSelect:true,
-                marktext:"韵",
-                init:function (player,skill){
-        if(!player.storage[skill]) player.storage[skill]=[];
-    },
-                intro:{
-                    content:function (storage){
-            var str='';
-            var str2='<li>出牌阶段限一次，你可以弃置至多X张牌并选择等量的其他角色（不能选择已经成为过〖残韵〗目标的角色）。这些角色中，装备区内牌数少于你的回复1点体力，等于你的摸一张牌，多于你的失去1点体力。若你以此法指定的角色数等于X，则你摸一张牌。（X为你的体力值）';
-            if(storage.length>0){
-                for(var i=0;i<storage.length;i++){
-                    str+='、';
-                    str+=get.translation(storage[i]);
-                };
-                str=str.slice(1);
-                str2+=('<br><li>已对'+str+'发动过〖残韵〗');
-            }
-            return str2;
-        },
-                },
-                mark:true,
-                enable:"phaseUse",
-                usable:1,
-                check:function (cardx){
-        var player=_status.event.player;
-        var number=game.countPlayer(function(target){
-            if(player==target) return false;
-            var pe=player.countCards('e',function(card){
-            return card!=cardx&&ui.selected.cards.contains(card)==false;
-        });
-            var te=target.countCards('e');
-            if(pe>te&&target.isDamaged()&&get.attitude(player,target)>2) return true;
-            else if(pe<te&&get.attitude(player,target)<0) return true;
-            return false;
-        });
-        if(ui.selected.cards.length<number) return 6-get.value(cardx);
-        else return 0;
-    },
-                filter:function (event,player){
-        if(!player.storage.new_canyun) player.storage.new_canyun=[];
-        return game.hasPlayer(function(current){
-            return current!=player&&!player.storage.new_canyun.contains(current);
-        });
-    },
-                filterTarget:function (card,player,target){
-        return target!=player&&!player.storage.new_canyun.contains(target);
-    },
-                selectTarget:function (){
-        return ui.selected.cards.length;
-    },
-                filterCard:true,
-                selectCard:function (){
-        var player=_status.event.player;
-        return [1,player.hp];
-    },
-                targetprompt:function (target){
-        var pe=_status.event.player.countCards('e',function(card){
-            return ui.selected.cards.contains(card)==false;
-        });
-        var te=target.countCards('e');
-        if(pe>te) return "回复体力";
-        else if(pe==te) return "摸一张牌";
-        else if(pe<te) return "失去体力";
-    },
-                line:"thunder",
-                position:"he",
-                content:function (){
-        player.storage.new_canyun.push(target);
-        var pe=player.countCards('e');
-        var te=target.countCards('e');
-        if(pe>te) target.recover();
-        else if(pe==te) target.draw();
-        else if(pe<te) target.loseHp();
-    },
-                ai:{
-                    order:10,
-                    result:{
-                        target:function (player,target){
-                var pe=player.countCards('e');
-                var te=target.countCards('e');
-                if(pe>te&&target.isDamaged()) return 2;
-                else if(pe==te) return 1;
-                else if(pe<te) return -2.5;
-                else return 0;
-            },
-                    },
-                },
-            },
-            "qingxian_draw":{
-                trigger:{
-                    player:["new_qingxianAfter","new_canyunAfter"],
-                },
-                forced:true,
-                popup:false,
-                silent:false,
-                filter:function (event,player){
-        return event.target==event.targets[event.targets.length-1]&&event.targets.length==player.hp;
-    },
-                content:function (){
-        player.draw();
-    },
-            },
-            zhenjun:{
-                audio:"jieyue",
-                trigger:{
-                    player:"phaseBegin",
-                },
-                filter:function (event,player){
+			"new_qingxian":{
+				group:["qingxian_draw"],
+				enable:"phaseUse",
+				audio:"qingxian",
+				usable:1,
+				position:'he',
+				filterTarget:function (card,player,target){
+		return target!=player;
+	},
+				complexCard:true,
+				complexSelect:true,
+				selectTarget:function (){
+		return ui.selected.cards.length;
+	},
+				filterCard:true,
+				selectCard:function (){
+		var player=_status.event.player;
+		return [1,player.hp];
+	},
+				check:function (cardx){
+		var player=_status.event.player;
+		var number=game.countPlayer(function(target){
+			if(player==target) return false;
+			var pe=player.countCards('e',function(card){
+			return card!=cardx&&ui.selected.cards.contains(card)==false;
+		});
+			var te=target.countCards('e');
+			if(pe>te&&target.isDamaged()&&get.attitude(player,target)>2) return true;
+			else if(pe==te&&get.attitude(player,target)>2) return true;
+			else if(pe<te&&get.attitude(player,target)<0) return true;
+			return false;
+		});
+		if(ui.selected.cards.length<number) return 7-get.value(cardx);
+		else return 0;
+	},
+				targetprompt:function (target){
+		var pe=_status.event.player.countCards('e',function(card){
+			return ui.selected.cards.contains(card)==false;
+		});
+		var te=target.countCards('e');
+		if(pe>te) return "回复体力";
+		else if(pe==te) return "摸一张牌";
+		else if(pe<te) return "失去体力";
+	},
+				line:"thunder",
+				content:function (){
+		var pe=player.countCards('e');
+		var te=target.countCards('e');
+		if(pe>te) target.recover();
+		else if(pe==te) target.draw();
+		else if(pe<te) target.loseHp();
+	},
+				ai:{
+					order:10,
+					result:{
+						target:function (player,target){
+				var pe=player.countCards('e',function(card){
+			return ui.selected.cards.contains(card)==false;
+		});
+				var te=target.countCards('e');
+				if(pe>te&&target.isDamaged()) return 2;
+				else if(pe==te) return 1;
+				else if(pe<te) return -2.5;
+				else return 0;
+			},
+					},
+				},
+			},
+			"new_juexiang":{
+				audio:"qingxian_jilie",
+				trigger:{
+					player:"dieBegin",
+				},
+				forced:true,
+				popup:false,
+				skillAnimation:true,
+				derivation:["new_canyun"],
+				content:function (){
+		"step 0"
+		player.chooseTarget('【绝响】：是否令一名其他角色获得技能〖残韵〗？',function(card,player,target){
+			return target!=player;
+		}).set('ai',function(target){
+			var att=get.attitude(_status.event.player,target);
+			if(target.countCards('ej',{suit:'club'})) att=att*2;
+			return 10+att;
+		});
+		"step 1"
+		var next=game.createEvent('new_juexiang',null,trigger.parent);
+		next.player=trigger.source;
+		next.playerx=player;
+		if(result.bool) next.target=result.targets[0];
+		next.setContent(lib.skill.new_juexiang.contentx);
+	},
+				contentx:function (){
+		"step 0"
+		if(player||target)event.playerx.logSkill('new_juexiang');
+		if(player){
+			player.discard(player.getCards('e'));
+			player.loseHp();
+		}
+		if(target){
+		event.playerx.line(target,'thunder');
+		target.addSkill('new_canyun');
+		target.discardPlayerCard('是否弃置自己区域内的一张梅花牌，获得技能〖绝响〗？',target,'hej').set('ai',function(card){
+				if(get.position(card)=='j') return 100+get.value(card);
+				return 100-get.value(card);
+			}).set('visible',true).set('filterButton',function(card){
+				return get.suit(card.link)=='club';
+			});
+		}
+		else event.finish()
+		"step 1"
+		if(result.bool) target.addSkill('new_juexiang');
+	},
+			},
+			"new_canyun":{
+				group:["qingxian_draw"],
+				complexCard:true,
+				complexSelect:true,
+				marktext:"韵",
+				init:function (player,skill){
+		if(!player.storage[skill]) player.storage[skill]=[];
+	},
+				intro:{
+					content:function (storage){
+			var str='';
+			var str2='<li>出牌阶段限一次，你可以弃置至多X张牌并选择等量的其他角色（不能选择已经成为过〖残韵〗目标的角色）。这些角色中，装备区内牌数少于你的回复1点体力，等于你的摸一张牌，多于你的失去1点体力。若你以此法指定的角色数等于X，则你摸一张牌。（X为你的体力值）';
+			if(storage.length>0){
+				for(var i=0;i<storage.length;i++){
+					str+='、';
+					str+=get.translation(storage[i]);
+				};
+				str=str.slice(1);
+				str2+=('<br><li>已对'+str+'发动过〖残韵〗');
+			}
+			return str2;
+		},
+				},
+				mark:true,
+				enable:"phaseUse",
+				usable:1,
+				check:function (cardx){
+		var player=_status.event.player;
+		var number=game.countPlayer(function(target){
+			if(player==target) return false;
+			var pe=player.countCards('e',function(card){
+			return card!=cardx&&ui.selected.cards.contains(card)==false;
+		});
+			var te=target.countCards('e');
+			if(pe>te&&target.isDamaged()&&get.attitude(player,target)>2) return true;
+			else if(pe<te&&get.attitude(player,target)<0) return true;
+			return false;
+		});
+		if(ui.selected.cards.length<number) return 6-get.value(cardx);
+		else return 0;
+	},
+				filter:function (event,player){
+		if(!player.storage.new_canyun) player.storage.new_canyun=[];
+		return game.hasPlayer(function(current){
+			return current!=player&&!player.storage.new_canyun.contains(current);
+		});
+	},
+				filterTarget:function (card,player,target){
+		return target!=player&&!player.storage.new_canyun.contains(target);
+	},
+				selectTarget:function (){
+		return ui.selected.cards.length;
+	},
+				filterCard:true,
+				selectCard:function (){
+		var player=_status.event.player;
+		return [1,player.hp];
+	},
+				targetprompt:function (target){
+		var pe=_status.event.player.countCards('e',function(card){
+			return ui.selected.cards.contains(card)==false;
+		});
+		var te=target.countCards('e');
+		if(pe>te) return "回复体力";
+		else if(pe==te) return "摸一张牌";
+		else if(pe<te) return "失去体力";
+	},
+				line:"thunder",
+				position:"he",
+				content:function (){
+		player.storage.new_canyun.push(target);
+		var pe=player.countCards('e');
+		var te=target.countCards('e');
+		if(pe>te) target.recover();
+		else if(pe==te) target.draw();
+		else if(pe<te) target.loseHp();
+	},
+				ai:{
+					order:10,
+					result:{
+						target:function (player,target){
+				var pe=player.countCards('e');
+				var te=target.countCards('e');
+				if(pe>te&&target.isDamaged()) return 2;
+				else if(pe==te) return 1;
+				else if(pe<te) return -2.5;
+				else return 0;
+			},
+					},
+				},
+			},
+			"qingxian_draw":{
+				trigger:{
+					player:["new_qingxianAfter","new_canyunAfter"],
+				},
+				forced:true,
+				popup:false,
+				silent:false,
+				filter:function (event,player){
+		return event.target==event.targets[event.targets.length-1]&&event.targets.length==player.hp;
+	},
+				content:function (){
+		player.draw();
+	},
+			},
+			zhenjun:{
+				audio:"jieyue",
+				trigger:{
+					player:"phaseBegin",
+				},
+				filter:function (event,player){
 					return game.hasPlayer(function(current){
 						return current.countCards('h')>current.hp;
 					});
 				},
-                direct:true,
-                content:function (){
+				direct:true,
+				content:function (){
 					'step 0'
 					player.chooseTarget(get.prompt2('zhenjun'),function(card,player,target){
 					   return target.countCards('h')>target.hp; 
@@ -451,7 +451,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.target.draw(event.num);
 					}
 				},
-            },
+			},
 			fenli:{
 				audio:2,
 				group:['fenli_draw','fenli_use','fenli_discard'],
@@ -1789,7 +1789,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 3"
 					if(event.target.getCards('he').contains(event.card)){
 						event.target.chooseControlList('问卦','将'+get.translation(event.card)+'置于牌堆顶','将'+get.translation(event.card)+'置于牌堆底',event.target==player,function(){
-						    if(get.attitude(event.target,player)<0) return 2;
+							if(get.attitude(event.target,player)<0) return 2;
 							return 1;
 						});
 					}
@@ -1819,7 +1819,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.draw();
 						}
 						else{
-						    game.asyncDraw([player,target],null,null);
+							game.asyncDraw([player,target],null,null);
 						}
 					}
 					else if(event.index==0){
@@ -2428,15 +2428,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					dialog:function(event,player){
 					 var list=[];
 						for(var i=0;i<lib.inpile.length;i++){
-						    var name=lib.inpile[i];
-						    if(player.storage.taoluan.contains(name)) continue;
-						    if(name=='sha'){
-						        list.push(['基本','','sha']);
-						        list.push(['基本','','sha','fire']);
-						        list.push(['基本','','sha','thunder']);
-						    }
-						    else if(get.type(name)=='trick') list.push(['锦囊','',name]);
-						    else if(get.type(name)=='basic') list.push(['基本','',name]);
+							var name=lib.inpile[i];
+							if(player.storage.taoluan.contains(name)) continue;
+							if(name=='sha'){
+								list.push(['基本','','sha']);
+								list.push(['基本','','sha','fire']);
+								list.push(['基本','','sha','thunder']);
+							}
+							else if(get.type(name)=='trick') list.push(['锦囊','',name]);
+							else if(get.type(name)=='basic') list.push(['基本','',name]);
 						}
 						if(list.length==0){
 							return ui.create.dialog('滔乱已无可用牌');
@@ -4127,6 +4127,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var att=get.attitude(player,trigger.player);
 					var nh=trigger.player.countCards('h');
 					var eff=get.effect(trigger.player,{name:'sha'},player,player);
+					if(!player.canUse({name:'sha'},trigger.player)) eff=0;
 					player.chooseCardButton(get.prompt('yonglve',trigger.player),trigger.player.getCards('j')).set('ai',function(button){
 						var name=button.link.viewAs||button.link.name;
 						var att=_status.event.att;
@@ -4144,7 +4145,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						trigger.player.discard(result.links);
-						player.useCard({name:'sha'},trigger.player,'yonglve');
+						if(player.canUse({name:'sha'},trigger.player)) player.useCard({name:'sha'},trigger.player,'yonglve');
 						player.storage.yonglve=false;
 					}
 					else{
@@ -7449,9 +7450,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.giver=giver;
 					'step 1'
 					if(result.cards){
-					    event.bool=false;
-					    var card=result.cards[0];
-					    if(get.suit(card)!='spade') event.bool=true;
+						event.bool=false;
+						var card=result.cards[0];
+						if(get.suit(card)!='spade') event.bool=true;
 					}
 					'step 2'
 					if(event.bool){
@@ -7472,8 +7473,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									var num2=players[i].countCards('h');
 									var att2=get.attitude(player,players[i]);
 									if(num2<num){
-									    if(att2>0) return -3;
-									    return -1;
+										if(att2>0) return -3;
+										return -1;
 									}
 								}
 								return 0;
@@ -7761,8 +7762,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var card=result[0];
 					if(get.type(card)=='equip'){
 						if(!event.target.isDisabled(get.subtype(card))){
-						    event.target.equip(card);
-						    game.delay();
+							event.target.equip(card);
+							game.delay();
 						}
 						event.bool=true;
 					}
@@ -8428,7 +8429,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					dialog:function(player){
 						var list=[];
 						for(var i=0;i<lib.inpile.length;i++){
-						    if(get.type(lib.inpile[i])=='trick') list.push(['锦囊','',lib.inpile[i]]);
+							if(get.type(lib.inpile[i])=='trick') list.push(['锦囊','',lib.inpile[i]]);
 						}
 						return ui.create.dialog(get.translation('qice'),[list,'vcard']);
 					},
@@ -9122,7 +9123,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					"step 1"
 					if(result.bool){
-					    player.showCards(result.cards);
+						player.showCards(result.cards);
 						var type=get.type(result.cards[0],'trick');
 						if(trigger.source){
 							trigger.source.chooseToDiscard('弃置一张不为'+get.translation(type)+'牌的牌或令'+get.translation(player)+'回复一点体力',function(card){
@@ -9750,16 +9751,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caiyong:'蔡邕',
 			"re_yujin":"于禁",
 
-            "new_qingxian":"清弦",
-            "new_qingxian_info":"出牌阶段限一次，你可以弃置至多X张牌并选择等量的其他角色。这些角色中，装备区内牌数少于你的回复1点体力，等于你的摸一张牌，多于你的失去1点体力。若你以此法指定的角色数等于X，则你摸一张牌。（X为你的体力值）",
-            "new_juexiang":"绝响",
-            "new_juexiang_info":"锁定技，当你死亡后，杀死你的角色弃置装备区内的所有牌并失去1点体力。然后，你可以令一名其他角色获得技能〖残韵〗。若该角色区域内有梅花牌，则其可以弃置其中的一张，然后其获得技能〖绝响〗。",
-            "new_canyun":"残韵",
-            "new_canyun_info":"出牌阶段限一次，你可以弃置至多X张牌并选择等量的其他角色（不能选择已经成为过〖残韵〗目标的角色）。这些角色中，装备区内牌数少于你的回复1点体力，等于你的摸一张牌，多于你的失去1点体力。若你以此法指定的角色数等于X，则你摸一张牌。（X为你的体力值）",
-            "qingxian_draw":"清弦",
-            "qingxian_draw_info":"",
-            zhenjun:"镇军",
-            "zhenjun_info":"准备阶段，你可以弃置一名手牌数多于体力值的角色的X张牌（X为其手牌数和体力值之差），然后选择一项：1.你弃置等同于其中非装备牌数量的牌；2.其摸等量的牌。",
+			"new_qingxian":"清弦",
+			"new_qingxian_info":"出牌阶段限一次，你可以弃置至多X张牌并选择等量的其他角色。这些角色中，装备区内牌数少于你的回复1点体力，等于你的摸一张牌，多于你的失去1点体力。若你以此法指定的角色数等于X，则你摸一张牌。（X为你的体力值）",
+			"new_juexiang":"绝响",
+			"new_juexiang_info":"锁定技，当你死亡后，杀死你的角色弃置装备区内的所有牌并失去1点体力。然后，你可以令一名其他角色获得技能〖残韵〗。若该角色区域内有梅花牌，则其可以弃置其中的一张，然后其获得技能〖绝响〗。",
+			"new_canyun":"残韵",
+			"new_canyun_info":"出牌阶段限一次，你可以弃置至多X张牌并选择等量的其他角色（不能选择已经成为过〖残韵〗目标的角色）。这些角色中，装备区内牌数少于你的回复1点体力，等于你的摸一张牌，多于你的失去1点体力。若你以此法指定的角色数等于X，则你摸一张牌。（X为你的体力值）",
+			"qingxian_draw":"清弦",
+			"qingxian_draw_info":"",
+			zhenjun:"镇军",
+			"zhenjun_info":"准备阶段，你可以弃置一名手牌数多于体力值的角色的X张牌（X为其手牌数和体力值之差），然后选择一项：1.你弃置等同于其中非装备牌数量的牌；2.其摸等量的牌。",
 			fenli:'奋励',
 			fenli_info:'若你的手牌数为全场最多，你可以跳过摸牌阶段；若你的体力值为全场最多，你可以跳过出牌阶段；若你的装备区里有牌且数量为全场最多，你可以跳过弃牌阶段。',
 			pingkou:'平寇',
@@ -9984,7 +9985,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fuhun2:'父魂',
 			fuhun_info:'你可以将两张手牌当杀使用或打出；出牌阶段，若你以此法使用的杀造成了伤害，你获得技能“武圣”、“咆哮”直到回合结束。',
 			yuce:'御策',
-			yuce_info:'当你受到伤害后，你可以展示一张手牌，并令伤害来源选择一项：弃置一张相同类型的手牌，或令你回复一点体力',
+			yuce_info:'当你受到伤害后，你可以展示一张手牌，并令伤害来源选择一项：弃置一张与此牌类型不同的手牌，或令你回复一点体力',
 			xiansi:'陷嗣',
 			xiansi_bg:'逆',
 			xiansi2:'陷嗣',

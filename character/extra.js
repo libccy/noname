@@ -28,17 +28,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//shen_ganning:"体力上限：6",
 		},
 		skill:{
-            "new_wuhun":{
-                audio:"wuhun2",
-                group:["new_wuhun_mark","new_wuhun_die"],
-                trigger:{
-                    player:"damageEnd",
-                },
-                forced:true,
-                filter:function (event,player){
+			"new_wuhun":{
+				audio:"wuhun2",
+				group:["new_wuhun_mark","new_wuhun_die"],
+				trigger:{
+					player:"damageEnd",
+				},
+				forced:true,
+				filter:function (event,player){
 					return event.source!=undefined;
 				},
-                content:function (){
+				content:function (){
 					var source=trigger.source
 					if(!source.storage.new_wuhun_mark){
 						source.storage.new_wuhun_mark=0;
@@ -46,7 +46,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					source.storage.new_wuhun_mark+=trigger.num;
 					source.markSkill('new_wuhun_mark');
 				},
-                contentx:function (){
+				contentx:function (){
 							"step 0"
 							var num=0;
 							for(var i=0;i<game.players.length;i++){
@@ -78,45 +78,45 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						lib.element.player.die.apply(target,[]);
 					}
 				},
-                subSkill:{
-                    die:{
-                        audio:"wuhun2",
-                        skillAnimation:true,
-                        trigger:{
-                            player:"dieBegin",
-                        },
-                        forced:true,
-                        popup:false,
-                        filter:function (event,player){
+				subSkill:{
+					die:{
+						audio:"wuhun2",
+						skillAnimation:true,
+						trigger:{
+							player:"dieBegin",
+						},
+						forced:true,
+						popup:false,
+						filter:function (event,player){
 							return game.hasPlayer(function(current){
 								return current!=player&&current.storage.new_wuhun_mark!=undefined;
 							});
 						},
-                        content:function (){
+						content:function (){
 							"step 0"
 								var next=game.createEvent('new_wuhun',null,trigger.parent);
 								next.forceDie=true;
 								next.player=player;
 								next.setContent(lib.skill.new_wuhun.contentx);
 						},
-                        sub:true,
-                    },
-                    mark:{
-                        marktext:"魇",
-                        intro:{
-                            name:"梦魇",
-                            content:"mark",
-                        },
-                        sub:true,
-                    },
-                },
-            },
-            "new_guixin":{
-                audio:"guixin",
-                trigger:{
-                    player:"damageEnd",
-                },
-                check:function (event,player){
+						sub:true,
+					},
+					mark:{
+						marktext:"魇",
+						intro:{
+							name:"梦魇",
+							content:"mark",
+						},
+						sub:true,
+					},
+				},
+			},
+			"new_guixin":{
+				audio:"guixin",
+				trigger:{
+					player:"damageEnd",
+				},
+				check:function (event,player){
 					if(player.isTurnedOver()||event.num>1) return true;
 					var num=game.countPlayer(function(current){
 						if(current.countCards('he')&&current!=player&&get.attitude(player,current)<=0){
@@ -128,7 +128,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					return num>=2;
 				},
-                content:function (){
+				content:function (){
 					"step 0"
 					var targets=game.filterPlayer();
 					targets.remove(player);
@@ -140,7 +140,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.line(targets,'green');
 					player.chooseControl('手牌区','装备区','判定区').set('ai',function(){
 						if(game.hasPlayer(function(current){
-						    return current.countCards('j')&&current!=player&&get.attitude(player,current)>0;
+							return current.countCards('j')&&current!=player&&get.attitude(player,current)>0;
 						})) return 2;
 						return Math.floor(Math.random()*3);
 					}).set('prompt','请选择优先获得的区域');
@@ -173,7 +173,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.count--;
 					if(event.count){
 						player.chooseBool(get.prompt2('new_guixin')).ai=function(){
-						    return lib.skill.new_guixin.check({num:event.count},player);
+							return lib.skill.new_guixin.check({num:event.count},player);
 						};
 					}
 					else{
@@ -185,15 +185,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.goto(1);
 					}
 				},
-                ai:{
-                    maixie:true,
-                    "maixie_hp":true,
-                    threaten:function (player,target){
+				ai:{
+					maixie:true,
+					"maixie_hp":true,
+					threaten:function (player,target){
 						if(target.hp==1) return 2.5;
 						return 1;
 					},
-                    effect:{
-                        target:function (card,player,target){
+					effect:{
+						target:function (card,player,target){
 							if(get.tag(card,'damage')){
 								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
 								if(target.hp==1) return 0.8;
@@ -210,9 +210,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(num==2) return [0.5,1];
 							}
 						},
-                    },
-                },
-            },
+					},
+				},
+			},
 			ol_shenfen:{
 				audio:2,
 				enable:'phaseUse',
@@ -674,7 +674,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger.player.judging[0].clone.delete();
 							game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging[0].clone]));
 						}
-						trigger.player.judging[0].discard();
+						game.cardsDiscard(trigger.player.judging[0]);
 						trigger.player.judging[0]=result.cards[0];
 						trigger.position.appendChild(result.cards[0]);
 						game.log(trigger.player,'的判定牌改为',result.cards[0]);
@@ -870,35 +870,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			wuhun:{
 				trigger:{
-                player:"damageEnd",
-                              },
-                            //   alter:true,
-                       filter:function (event,player){
-                       if(event.source==undefined) return false                           
-                       if(!get.is.altered('wuhun')) return false    
-                       return true;
-                              },
-                          forced:true,
-                            content:function (){
-                       if(!trigger.source.storage.wuhun_mark){
-                      trigger.source.storage.wuhun_mark=0;
-                                          }                 
-		      trigger.source.storage.wuhun_mark+=trigger.num;
-                      trigger.source.syncStorage('wuhun_mark');
-                      trigger.source.markSkill('wuhun_mark');
-                               },
-                       global:["wuhun_mark"],
-                      subSkill:{
-                        mark:{
-                        marktext:"魇",
-                          intro:{
-                            content:"mark",
-                                  },
-                            sub:true,
-                                },
-                          },
-         		group:["wuhun2","wuhun4","wuhun5"],
-            },
+				player:"damageEnd",
+							  },
+							//   alter:true,
+					   filter:function (event,player){
+					   if(event.source==undefined) return false						   
+					   if(!get.is.altered('wuhun')) return false	
+					   return true;
+							  },
+						  forced:true,
+							content:function (){
+					   if(!trigger.source.storage.wuhun_mark){
+					  trigger.source.storage.wuhun_mark=0;
+										  }				 
+			  trigger.source.storage.wuhun_mark+=trigger.num;
+					  trigger.source.syncStorage('wuhun_mark');
+					  trigger.source.markSkill('wuhun_mark');
+							   },
+					   global:["wuhun_mark"],
+					  subSkill:{
+						mark:{
+						marktext:"魇",
+						  intro:{
+							content:"mark",
+								  },
+							sub:true,
+								},
+						  },
+		 		group:["wuhun2","wuhun4","wuhun5"],
+			},
 			wuhun2:{
 				trigger:{
 				player:'dieBegin',
@@ -988,7 +988,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				popup:false,
 				filter:function(event){
-					if(event.source!=player&&event.source!=undefined&&!get.is.altered('wuhun')) return true                             
+					if(event.source!=player&&event.source!=undefined&&!get.is.altered('wuhun')) return true							 
 					return false;
 				},
 				content:function(){
@@ -1379,15 +1379,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectCard:[0,4],
 				line:'fire',
 				check:function (){return -1},
-                selectTarget:function (){
+				selectTarget:function (){
 					if(ui.selected.cards.length==4) return [1,2];
 					if(ui.selected.cards.length==0) return [1,3];
 					game.uncheck('target');
 					return [1,3];
 				},
-                multitarget:true,
-                multiline:true,
-                content:function (){
+				multitarget:true,
+				multiline:true,
+				content:function (){
 					"step 0"
 					player.awakenSkill('yeyan');
 					event.num=0;
@@ -1758,9 +1758,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					player.gain(cards2,'log');
 					if(cards2.length) player.$gain2(cards2);
-					for(var i=0;i<cards.length;i++){
-						cards[i].discard();
-					}
+					game.cardsDiscard(cards);
 					game.delay(2);
 				},
 				ai:{
@@ -1959,13 +1957,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					"nzry_jieying":{
 					audio:2,
+					locked:true,
 					global:"g_nzry_jieying",
 						ai:{
-						    effect:{
-						        target:function(card){
-						            if(card.name=='tiesuo') return 'zeroplayertarget';
-						        },
-						    },
+							effect:{
+								target:function(card){
+									if(card.name=='tiesuo') return 'zeroplayertarget';
+								},
+							},
 						},
 						group:["nzry_jieying_1","nzry_jieying_2"],
 						subSkill:{
@@ -1989,6 +1988,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									player:'phaseEnd',
 								},
 								direct:true,
+								filter:function(event,player){
+									return game.hasPlayer(function(current){
+										return current!=player&&!current.isLinked();
+									});
+								},
 								content:function(){
 									"step 0"
 									player.chooseTarget(true,'请选择【结营】的目标',function(card,player,target){
@@ -2132,11 +2136,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								targets[i].discard(targets[i].getCards('e'));
 							}
 							player.chooseTarget(true,'对一名目标角色造成1点火焰伤害',function(card,player,target){
-							    return targets.contains(target);
+								return targets.contains(target);
 							}).ai=function(){return 1};
 							'step 2'
 							if(result.bool){
-							    result.targets[0].damage('fire','nocard');
+								result.targets[0].damage('fire','nocard');
 							}
 						},
 						ai:{
@@ -2181,10 +2185,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(info!=undefined&&!info.charlotte&&(!info.unique||info.gainable)) event.skills.push(skills[i]);
 							};
 							if(player.countDisabled()<5){
-							    player.chooseToDisable().ai=function(event,player,list){
-							        if(list.contains('equip5')) return 'equip5';
-							        return list.randomGet();
-							    };
+								player.chooseToDisable().ai=function(event,player,list){
+									if(list.contains('equip5')) return 'equip5';
+									return list.randomGet();
+								};
 							}
 							'step 1'
 							if(event.skills.length>0){
@@ -2363,13 +2367,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									};
 								};
 								if(event.list1.length&&event.list2.length){
-							    	target.discard(event.list2).delay=false;
-					    			player.discard(event.list1).delay=false;
-					    			game.delay();
+									target.discard(event.list2).delay=false;
+									player.discard(event.list1).delay=false;
+									game.delay();
 								}
 								else{
-								    target.discard(event.list2);
-					    			player.discard(event.list1);
+									target.discard(event.list2);
+									player.discard(event.list1);
 								}
 							};
 							'step 2'
@@ -2475,12 +2479,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								logTarget:'player',
 								content:function(){		
 									if(trigger.player.isAlive()){
-								    	if(trigger.player.countCards('h')>0){
-						    				trigger.player.give(trigger.player.getCards('h'),player);
-								    	}
-								    	delete trigger.player.storage.drlt_jieying2;
-				    					trigger.player.unmarkSkill('drlt_jieying');
-				    					game.log(trigger.player,'失去了“营”标记');
+										if(trigger.player.countCards('h')>0){
+											trigger.player.give(trigger.player.getCards('h'),player);
+										}
+										delete trigger.player.storage.drlt_jieying2;
+										trigger.player.unmarkSkill('drlt_jieying');
+										game.log(trigger.player,'失去了“营”标记');
 									}
 									player.storage.drlt_jieying=player;
 									player.markSkill('drlt_jieying');
@@ -2569,8 +2573,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wuhun:'武魂',
 			wuhun2:'武魂',
 			wuhun3:'武魂',		
-            wuhun_info_alter:'锁定技，当你受到1点伤害后，你令伤害来源获得1枚“梦魇”标记；当你死亡时，你令拥有最多“梦魇”标记的一名其他角色判定，若结果不为【桃】或【桃园结义】，则该角色死亡。',
-            wuhun_info:'锁定技，杀死你的角色立即进入濒死状态',
+			wuhun_info_alter:'锁定技，当你受到1点伤害后，你令伤害来源获得1枚“梦魇”标记；当你死亡时，你令拥有最多“梦魇”标记的一名其他角色判定，若结果不为【桃】或【桃园结义】，则该角色死亡。',
+			wuhun_info:'锁定技，杀死你的角色立即进入濒死状态',
 			shelie:'涉猎',
 			gongxin:'攻心',
 			gongxin_discard:'弃置',
@@ -2630,10 +2634,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_wuqian_info:'出牌阶段，你可以弃2枚“暴怒”标记并选择一名其他角色，你视为拥有技能“无双”并令其防具无效，直到回合结束。',
 			ol_shenfen:'神愤',
 			ol_shenfen_info:'出牌阶段，你可以弃6枚“暴怒”标记并选择所有其他角色，然后这些角色先各弃置其装备区里的牌，再各弃置四张手牌，然后受到来自你的1点伤害。最后你将你的武将牌翻面。每阶段限一次。',
-            "new_wuhun":"武魂",
-            "new_wuhun_info":"锁定技，当你受到伤害后，伤害来源获得X个“梦魇”标记（X为伤害点数）。锁定技，当你死亡时，你选择一名“梦魇”标记数量最多的其他角色。你的死亡流程结算完成后，该角色进行一次判定：若判定结果不为【桃】或【桃园结义】，则该角色立刻死亡。",
-            "new_guixin":"归心",
-            "new_guixin_info":"当你受到1点伤害后，你可以随机获得每名其他角色区域里的一张牌，然后你翻面",
+			"new_wuhun":"武魂",
+			"new_wuhun_info":"锁定技，当你受到伤害后，伤害来源获得X个“梦魇”标记（X为伤害点数）。锁定技，当你死亡时，你选择一名“梦魇”标记数量最多的其他角色。你的死亡流程结算完成后，该角色进行一次判定：若判定结果不为【桃】或【桃园结义】，则该角色立刻死亡。",
+			"new_guixin":"归心",
+			"new_guixin_info":"当你受到1点伤害后，你可以随机获得每名其他角色区域里的一张牌，然后你翻面",
 		},
 	};
 });

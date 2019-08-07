@@ -44,6 +44,7 @@ window.noname_package={
 		versus:'对决',
 		connect:'联机',
 		boss:'挑战',
+		doudizhu:'斗地主',
 		chess:'战棋',
 		tafang:'塔防',
 		stone:'炉石',
