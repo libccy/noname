@@ -2580,6 +2580,7 @@ window.noname_asset_list=[
 	'image/character/mtg_qianzhuo.jpg',
 	'image/character/nianshou.jpg',
 	'image/character/niutou.jpg',
+	'image/character/ns_xinnanhua.jpg',
 	'image/character/ns_caocao.jpg',
 	'image/character/ns_caocaosp.jpg',
 	'image/character/ns_duangui.jpg',
