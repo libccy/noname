@@ -67,6 +67,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			// ns_zhaoyunshen:['male','qun',3,[]],
 			// ns_lisu:['male','qun',3,[]],
 			// ns_sunhao:['male','qun',3,[]],
+			ns_xinnanhua:['male','qun',3,['ns_xiandao','ns_xiuzheng','ns_chuanshu'],[]],
 		},
 		characterFilter:{
 			ns_duangui:function(mode){
@@ -91,6 +92,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_lvzhi:'#bskystarwuwei',
 			ns_wangyun:'#rSukincen',
 			ns_guanlu:'#rSukincen',
+			ns_xinnanhua:'#rSukincen',
 			ns_nanhua:'#g戒除联盟',
 			ns_shenpei:'#g戒除联盟',
 			ns_huamulan:'#p哎别管我是谁',
@@ -120,6 +122,191 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuji:['zuoci']
 		},
 		skill:{
+			 ns_chuanshu:{
+                audio:["xingshuai",2],
+                trigger:{
+                    global:"dying",
+                },
+                priority:8,
+                unique:true,
+                skillAnimation:true,
+                animationColor:"water",
+                filter:function (event,player){
+        return event.player.hp<=0&&event.player!=player;
+    },
+                check:function (event,player){
+        return get.attitude(player,event.player)>0;
+    },
+                logTarget:"player",
+                content:function (){
+       'step 0'
+          //  player.logSkill('ns_chuanshu',trigger.player);                       
+                trigger.player.chooseControl('releiji','guidao').set('prompt',''+get.translation(trigger.player)+'获得一项技能');
+                goon=true;                    
+        
+        if(!goon){
+            event.finish();
+        }
+        'step 1'
+         trigger.player.addSkillLog(result.control);
+         trigger.player.recover(1-trigger.player.hp);
+         trigger.player.draw(2);       
+         trigger.player.storage.ns_chuanshu2=player; 
+         trigger.player.addSkill('ns_chuanshu2');              
+         //game.broadcastAll()+trigger.player.node.avatar.setBackgroundImage('extension/群英会/ns_zhangjiao.jpg');        
+         player.removeSkill('ns_chuanshu');         
+         //player.awakenSkill('ns_chuanshu');             
+    },
+            },
+            ns_xiandao1:{
+                audio:["huashen",2],
+                forced:true,
+             //   noLose:true,                
+             //   locked:true,
+               // noRemove:true,
+             //   noDisable:true,
+                priority:10,
+                trigger:{
+                    global:"gameStart",
+                    player:["phaseEnd","enterGame"],
+                },
+                filter:function (event,player){                
+        return player.isAlive();
+    },
+                content:function (){       
+        var n=[1,2].randomGet();
+            if(n==1){
+                player.addTempSkill("releiji",{player:"phaseUseBegin"}); 
+                player.markSkill("releiji",{player:"phaseUseBegin"});                      
+            };
+            if(n==2){
+                player.addTempSkill("guidao",{player:"phaseUseBegin"});   
+                player.markSkill("guidao",{player:"phaseUseBegin"});                   
+            };
+    },
+            },
+            ns_xiandao2:{
+                audio:["huashen",2],
+                forced:true,
+              //  noLose:true,                     
+              //  locked:true,
+             //   noRemove:true,
+              //  noDisable:true,
+                trigger:{
+                    player:"damageBefore",
+                },
+                filter:function (event,player){   
+        if(!event.nature) return false;
+        return true;
+    },
+                content:function (){                                       
+    trigger.cancel();
+    event.finish();
+    },
+            },
+            ns_xiandao:{
+                forced:true,                
+               // noLose:true,                
+               // locked:true,
+                noRemove:true,
+              //  noDisable:true,
+                group:["ns_xiandao1","ns_xiandao2"],
+            },
+            ns_chuanshu2:{
+                audio:["songwei",2],
+                mark:"character",
+                intro:{
+                    content:"当你造成或受到一次伤害后，$摸一张牌",
+                },
+                nopop:true,
+                trigger:{
+                    source:"damageEnd",
+                    player:"damageEnd",
+                },
+                forced:true,
+                popup:false,
+                filter:function (event,player){
+        return player.storage.ns_chuanshu2&&player.storage.ns_chuanshu2.isIn()&&event.num>0;
+    },
+                content:function (){
+        'step 0'
+        game.delayx();
+        'step 1'
+        var target=player.storage.ns_chuanshu2;      
+        player.line(target,'green');
+        target.draw();
+        game.delay();
+    },
+                onremove:true,
+                group:"ns_chuanshu3",
+            },
+            ns_chuanshu3:{
+                audio:"ext:群英会:1",
+                trigger:{
+                    player:"dieBegin",
+                },
+                silent:true,
+                onremove:true,
+                filter:function (event,player){
+        return player.storage.ns_chuanshu2&&player.storage.ns_chuanshu2.isIn();
+    },
+                content:function (){   
+         'step 0'
+        game.delayx();
+        'step 1'
+        var target=player.storage.ns_chuanshu2;      
+        player.line(target,'green');                     
+        target.addSkill('ns_chuanshu');
+        target.update();
+    },
+                forced:true,
+                popup:false,
+            },
+            ns_xiuzheng:{
+                audio:["xinsheng",2],
+                enable:"phaseUse",
+                usable:1,
+                priority:10,
+                filter:function (event,player){
+        return (ui.cardPile.childElementCount+ui.discardPile.childElementCount)>=2;
+    },
+                filterTarget:function (card,player,target){
+        return player!=target;
+    },
+                content:function (){
+        "step 0"
+        event.cards=get.cards(2);
+        player.showCards(event.cards);
+        "step 1"      
+        if(get.color(event.cards[0])=='red'&&get.color(event.cards[1])=='red'){               
+           target.damage('fire');
+            }
+        if(get.color(event.cards[0])!=get.color(event.cards[1])){   
+           player.discardPlayerCard(target,"he",true);
+            }
+        if(get.color(event.cards[0])=='black'&&get.color(event.cards[1])=='black'){               
+           target.damage('thunder');
+            }               
+     "step 2"
+        if(event.cards.length){
+            player.gain(event.cards,'gain2');                        
+            game.delay();
+        }
+        "step 3"
+       player.chooseToDiscard(2,'he','请弃置两张牌').ai=function(card){
+                return 7-get.value(card);
+            };
+    },
+                ai:{
+                    threaten:0.5,
+                    order:13,
+                    result:{
+                        target:function (player,target){
+                return get.damageEffect(target,player);
+            },
+                    },
+                },
+            },
 			nsanruo:{
 				unique:true,
 				init:function(player){
@@ -4623,7 +4810,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_lisu:'李肃',
 			ns_yangyi:'杨仪',
 			ns_liuzhang:'刘璋',
-
+			ns_xinnanhua:'南华老仙',
+			
+          	ns_chuanshu:'传术',
+            ns_chuanshu_info:'<span class=yellowtext>限定技</span> 当一名其他角色进入濒死状态时，你可以令其选择获得技能【雷击】或【鬼道】，其回复体力至1并摸两张牌。当该被【传术】的角色造成或受到一次伤害后，你摸一张牌。其阵亡后，你重置技能【传术】',
+            ns_xiandao1:'仙道',
+            ns_xiandao1_info:'<font color=#f00>锁定技</font> 游戏开始和回合结束阶段，你随机获得技能【雷击】或【鬼道】，直到下个出牌阶段开始',
+            ns_xiandao2:'仙道',
+            ns_xiandao2_info:'<font color=#f00>锁定技</font> 你防止受到任何属性伤害',
+            ns_xiandao:'仙道',
+            ns_xiandao_info:'<font color=#f00>锁定技</font> 游戏开始、你进入游戏时和回合结束阶段，你随机获得技能【雷击】或【鬼道】，直到下个出牌阶段阶段开始。你防止受到任何属性伤害',
+            ns_chuanshu2:'术',
+            ns_chuanshu2_info:'<font color=#f00>锁定技</font> 当你造成或受到一次伤害后，南华老仙摸一张牌',
+            ns_chuanshu3:'术',
+            ns_chuanshu3_info:'<font color=#f00>锁定技</font> 当你【传术】的角色阵亡后，你重置技能【传术】',
+            ns_xiuzheng:'修真',
+            ns_xiuzheng_info:'出牌阶段限一次，你可选择一名其他角色，然后展示牌堆顶的两张牌，若同为红色，则其受到一点火焰伤害；若同为黑色，其受到一点雷电伤害；若颜色不相同，你弃置其一张牌。然后你获得这两张展示的牌后再弃置两张牌',
 			nsanruo:'暗弱',
 			nsanruo_info:'锁定技，你手牌中的[杀]和普通锦囊牌(借刀杀人等带有指向目标的锦囊除外)均对你不可见。但你可以正常使用之',
 			nsxunshan:'循善',
