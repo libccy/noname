@@ -528,6 +528,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				last.style.paddingBottom='8px';
 			},
 			getVideoName:function(){
+				if(_status.mode=='three'){
+					var zhu=game.findPlayer(function(current){
+						return current.side==game.me.side&&current.identity=='zhu';
+					});
+					var str=(game.me.side?'暖/':'冷/')+get.translation(zhu.previousSeat.name)+'/'+get.translation(zhu.name)+'/'+get.translation(zhu.nextSeat.name);
+					return ['统率三军',str]
+				}
 				var str=get.translation(game.me.name);
 				if(game.me.name2){
 					str+='/'+get.translation(game.me.name2);

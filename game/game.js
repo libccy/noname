@@ -19201,6 +19201,12 @@
 							});
 						}
 					}
+					else if(mode=='doudizhu'){
+						targets=game.filterPlayer(function(target){
+							if(func&&!func(target)) return false;
+							return target.identity!=player.identity;
+						});
+					}
 					else{
 						targets=game.filterPlayer(function(target){
 							if(func&&!func(target)) return false;
@@ -19244,6 +19250,12 @@
 							});
 						}
 					}
+					else if(mode=='doudizhu'){
+						targets=game.filterPlayer(function(target){
+							if(func&&!func(target)) return false;
+							return target.identity==player.identity;
+						});
+					}
 					else{
 						targets=game.filterPlayer(function(target){
 							if(func&&!func(target)) return false;
@@ -19266,6 +19278,9 @@
 						if(this==player) return true;
 						if(this.identity=='unknown'||this.identity=='ye') return false;
 						if(player.identity=='unknown'||player.identity=='ye') return false;
+						return this.identity==player.identity;
+					}
+					if(get.mode()=='doudizhu'){
 						return this.identity==player.identity;
 					}
 					if(this.side!=undefined&&typeof player.side=='boolean'){
@@ -21885,7 +21900,15 @@
 							if(info.selectButton!=undefined) this.selectButton=info.selectButton;
 							if(info.filterTarget!=undefined) this.filterTarget=get.filter(info.filterTarget);
 							if(info.selectTarget!=undefined) this.selectTarget=info.selectTarget;
-							if(info.filterCard!=undefined) this.filterCard=get.filter(info.filterCard);
+							if(info.filterCard!=undefined){
+								this.filterCard=function(card,player,event){
+									if(!info.ignoreMod&&player){
+										var mod=game.checkMod(card,player,'unchanged','cardEnabled',player);
+										if(mod!='unchanged') return mod;
+									}
+									return get.filter(info.filterCard)(card,player,event);
+								};
+							}
 							if(info.selectCard!=undefined) this.selectCard=info.selectCard;
 							if(info.position!=undefined) this.position=info.position;
 							if(info.forced!=undefined) this.forced=info.forced;
@@ -25684,6 +25707,10 @@
 				ui.updatehl();
 				for(var i=0;i<players.length;i++){
 					if(lib.config.mode=='identity'){
+						game.players[i].init(players[i].name,players[i].name2);
+						game.players[i].setIdentity(players[i].identity);
+					}
+					else if(lib.config.mode=='doudizhu'){
 						game.players[i].init(players[i].name,players[i].name2);
 						game.players[i].setIdentity(players[i].identity);
 					}

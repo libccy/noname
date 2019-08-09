@@ -3843,7 +3843,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'useCardAfter'},
 				forced:true,
 				filter:function(event,player){
-					return (event.card.name=='nanman'&&event.player!=player&&get.position(event.cards[0])=='d'&&get.itemtype(event.cards)=='cards');
+					return (event.card.name=='nanman'&&event.player!=player&&get.itemtype(event.cards)=='cards'&&get.position(event.cards[0])=='d');
 				},
 				content:function(){
 					player.gain(trigger.cards,'gain2');

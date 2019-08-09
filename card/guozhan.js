@@ -277,53 +277,69 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				enable:function(card,player){
-					return !player.isUnseen();
+					if(get.mode()=='guozhan') return !player.isUnseen();
+					return true;
 				},
-				mode:['guozhan'],
+				mode:['guozhan','boss'],
 				filterTarget:function(card,player,target){
-					return target!=player&&target.identity!='unknown'&&(target.identity!=player.identity||target.identity=='ye');
+					if(get.mode()=='guozhan') return target!=player&&target.identity!='unknown'&&(target.identity!=player.identity||target.identity=='ye');
+					return true;
+				},
+				selectTarget:function(){
+					return get.mode()=='guozhan'?1:-1;
 				},
 				changeTarget:function(player,targets){
-					var target=targets[0];
-					targets.push(player);
-					if(target.identity!='ye'){
+					if(get.mode()=='guozhan'){
+						var target=targets[0];
+						targets.push(player);
+						if(target.identity!='ye'){
 						game.filterPlayer(function(current){
 							return target!=current&&target.identity==current.identity&&!current.hasSkill('diaohulishan');
-						},targets);
+							},targets);
+						}
 					}
 				},
 				contentBefore:function(){
-					var evt=event.getParent();
-					if(evt&&evt.targets&&evt.targets.contains(player)){
-						evt.fixedSeat=true;
-						evt.targets.remove(player);
-						evt.targets.push(player);
+					if(get.mode()=='guozhan'){
+						var evt=event.getParent();
+						if(evt&&evt.targets&&evt.targets.contains(player)){
+							evt.fixedSeat=true;
+							evt.targets.remove(player);
+							evt.targets.push(player);
+						}
 					}
 				},
 				content:function(){
 					'step 0'
-					if(target==player){
-						var num=targets.length-1;
-						event.num=num;
-						var damaged=target.maxHp-target.hp;
-						if(damaged==0){
-							target.draw(num);
-							event.finish();
-						}
-						else{
-							var list=[];
-							for(var i=0;i<=Math.min(num,damaged);i++){
-								list.push('摸'+i+'回'+(num-i));
-							}
-							target.chooseControl(list).set('prompt','请分配自己的摸牌数和回复量').ai=function(){
-								if(player.hasSkill('diaohulishan')) return 0;
-								if(_status._aozhan) return list.length-1;
-								return list.randomGet();
-							};
-						}
+					if(get.mode()!='guozhan'){
+						if(player==target) target.draw(game.players.length);
+						else target.chooseDrawRecover(true);
+						event.finish();
 					}
 					else{
-						target.draw();
+						if(target==player){
+							var num=targets.length-1;
+							event.num=num;
+							var damaged=target.maxHp-target.hp;
+							if(damaged==0){
+								target.draw(num);
+								event.finish();
+							}
+							else{
+								var list=[];
+								for(var i=0;i<=Math.min(num,damaged);i++){
+									list.push('摸'+i+'回'+(num-i));
+								}
+								target.chooseControl(list).set('prompt','请分配自己的摸牌数和回复量').ai=function(){
+									if(player.hasSkill('diaohulishan')) return 0;
+									if(_status._aozhan) return list.length-1;
+									return list.randomGet();
+								};
+							}
+						}
+						else{
+							target.draw();
+						}
 					}
 					'step 1'
 					if(target!=player) target.link(false);
@@ -340,7 +356,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					value:4,
 					useful:2,
 					result:{
-						player:1.3,
+						player:1.5,
 						target:1,
 					},
 				},
@@ -1330,7 +1346,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			lulitongxin:'勠力同心',
 			lulitongxin_info:'出牌阶段，对所有大势力角色或所有小势力角色使用。若目标角色：不处于“连环状态”，其横置；处于“连环状态”，其摸一张牌',
 			lianjunshengyan:'联军盛宴',
-			lianjunshengyan_info:'出牌阶段，对你和你选择的除你的势力外的一个势力的所有角色。若目标角色：为你，你摸X张牌或回复X点体力（X为该势力的角色数）；不为你，其摸一张牌，然后重置',
+			lianjunshengyan_info:'出牌阶段，对你和你选择的除你的势力外的一个势力的所有角色。若目标角色：为你，你摸X张牌或回复X点体力（X为该势力的角色数）；不为你，其摸一张牌，然后重置。',
+			lianjunshengyan_info_boss:'出牌阶段，对场上所有角色使用。你摸X张牌（X为目存活角色数），其他角色依次选择回复1点体力或摸一张牌。',
 			chiling:'敕令',
 			chiling_info:'出牌阶段，对所有没有势力的角色使用。目标角色选择一项：1、明置一张武将牌，然后摸一张牌；2、弃置一张装备牌；3、失去1点体力。当【敕令】因判定或弃置而置入弃牌堆时，系统将之移出游戏，然后系统于当前回合结束后视为对所有没有势力的角色使用【敕令】',
 			diaohulishan:'调虎离山',

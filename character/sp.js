@@ -5743,8 +5743,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				filter:function(event,player){
 					var num;
-					if(get.mode()=='identity'){
+					var mode=get.mode();
+					if(mode=='identity'){
 						num=get.population('fan');
+					}
+					else if(mode=='versus'){
+						num=player.getEnemies().length;
 					}
 					else{
 						num=1;
@@ -9386,14 +9390,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				priority:9,
 				audio:2,
 				filter:function(event,player){
-					return event.player!=player&&get.type(event.card)=='trick'&&event.targets&&event.targets.length>1;
+					return event.player!=player&&!event.excluded.contains(player)&&get.type(event.card)=='trick'&&event.targets&&event.targets.length>1&&event.targets.contains(player);
 				},
 				check:function(event,player){
 					return get.tag(event.card,'multineg')||get.effect(player,event.card,event.player,player)<=0;
 				},
-				trigger:{target:'useCardToBefore'},
+				trigger:{global:'useCard'},
 				content:function(){
-					trigger.cancel();
+					trigger.excluded.add(player);
 					player.draw();
 				},
 				ai:{
@@ -12690,7 +12694,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hongde:'弘德',
 			hongde_info:'当你一次获得或失去至少两张牌后，你可以令一名其他角色摸一张牌',
 			dingpan:'定叛',
-			dingpan_info:'出牌阶段限X次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害（X为场上存活的反贼数，非身份模式改为1）',
+			dingpan_info_identity:'出牌阶段限X次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害（X为场上存活的反贼数）',
+			dingpan_info_versus:'出牌阶段限X次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害（X为场上存活的敌方角色数）',
+			dingpan_info:'出牌阶段限一次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害',
 			weidi:'伪帝',
 			weidi_info:'锁定技，你视为拥有当前主公的主公技',
 			juesi:'决死',

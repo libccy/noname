@@ -1,25 +1,18 @@
 window.noname_update={
-	version:'1.9.91.2',
-	update:'1.9.91.1',
+	version:'1.9.91.3',
+	update:'1.9.91.2',
 	changeLog:[
-		'新虎牢关（by 烟雨墨染）',
-		'斗地主模式（支持联机）',
 		'BUG修复',
 	],
 	files:[
 		'card/guozhan.js',
-		'character/extra.js',
-		'character/refresh.js',
 		'character/shenhua.js',
 		'character/sp.js',
-		'character/xinghuoliaoyuan.js',
 		'character/yijiang.js',
 		'mode/boss.js',
 		'mode/doudizhu.js',
 		'mode/guozhan.js',
 		'mode/versus.js',
-		'game/config.js',
-		'game/package.js',
 		'game/game.js',
 	]
 };

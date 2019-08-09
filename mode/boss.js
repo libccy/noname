@@ -1873,7 +1873,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_lvbu1:{
 				loopType:2,
 				gameDraw:function(player){
-					return player==game.boss?8:4;
+					if(player==game.boss) return 8;
+					if(player==game.boss.previous) return 5;
+					return 4;
+				},
+				loopFirst:function(){
+					return game.boss.nextSeat;
 				},
 				init:function(){
 					lib.inpile.remove('wugu');
@@ -1882,7 +1887,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					lib.inpile.remove('tengjia');
 					lib.inpile.remove('fangtian');
 					lib.inpile.remove('muniu');
-					lib.inpile.addArray(['wushuangfangtianji','shufazijinguan','hongmianbaihuapao','linglongshimandai']);
+					lib.inpile.addArray(['wushuangfangtianji','shufazijinguan','hongmianbaihuapao','linglongshimandai','lianjunshengyan']);
 					var equiplist=[];
 					for(var i=0;i<ui.cardPile.childElementCount;i++){
 						var node=ui.cardPile.childNodes[i];
@@ -1901,6 +1906,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						else if(node.name=='muniu'){
 							node.init([node.suit,node.number,'shufazijinguan']);
 							equiplist.push(node);
+						}
+						else if(node.name=='wugu'||node.name=='taoyuan'){
+							node.init([node.suit,node.number,'lianjunshengyan']);
 						}
 					}
 					equiplist.randomSort();
@@ -1970,7 +1978,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						filter:function (event,player){				 
-				return (player.getEquip(3)||player.getEquip(4))&&event.num>1; 
+				return (player.getEquip(3)||player.getEquip(4)); 
 			},
 						content:function(){
 				trigger.num++;

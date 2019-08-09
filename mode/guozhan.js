@@ -6609,10 +6609,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						data[identity][1]++;
 					}
-					var list=['wei','shu','wu','qun','ye'];
+					var list=lib.group.slice(0);
+					list.add('ye');
 					var str='';
 					for(var i=0;i<list.length;i++){
-						if(data[list[i]]){
+						if(list[i]!='shen'&&data[list[i]]){
 							str+=lib.translate[list[i]+'2']+'：'+data[list[i]][0]+'胜'+' '+data[list[i]][1]+'负<br>';
 						}
 					}
@@ -6758,18 +6759,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				if(game.me.identity=='ye'){
 					if(game.me.classList.contains('dead')){
-						game.over('战斗失败');
+						game.over(false);
 					}
 					else{
-						game.over('战斗胜利');
+						game.over(true);
 					}
 				}
 				else{
 					if(get.population(game.me.identity)==0){
-						game.over('战斗失败');
+						game.over(false);
 					}
 					else{
-						game.over('战斗胜利');
+						game.over(true);
 					}
 				}
 				game.showIdentity();

@@ -64,7 +64,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			
 			game.syncState();
 			event.trigger('gameStart');
-
+			
 			var players=get.players(lib.sort.position);
 			var info=[];
 			for(var i=0;i<players.length;i++){
@@ -74,24 +74,55 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					identity:players[i].identity
 				});
 			}
-			_status.videoInited=true,
+			_status.videoInited=true;
 			game.addVideo('init',null,info);
 
 			game.gameDraw(game.zhu||_status.firstAct||game.me);
 			game.phaseLoop(game.zhu||_status.firstAct||game.me);
 		},
 		game:{
+			addRecord:function(bool){
+				if(typeof bool=='boolean'){
+					var data=lib.config.gameRecord.doudizhu.data;
+					var identity=game.me.identity;
+					if(!data[identity]){
+						data[identity]=[0,0];
+					}
+					if(bool){
+						data[identity][0]++;
+					}
+					else{
+						data[identity][1]++;
+					}
+					var list=['zhu','fan'];
+					var str='';
+					for(var i=0;i<list.length;i++){
+						if(data[list[i]]){
+							str+=lib.translate[list[i]+'2']+'：'+data[list[i]][0]+'胜'+' '+data[list[i]][1]+'负<br>';
+						}
+					}
+					lib.config.gameRecord.doudizhu.str=str;
+					game.saveConfig('gameRecord',lib.config.gameRecord);
+				}
+			},
+			getState:function(){
+				var state={};
+				for(var i in lib.playerOL){
+					var player=lib.playerOL[i];
+					state[i]={identity:player.identity};
+				}
+				return state;
+			},
+			updateState:function(state){
+				for(var i in state){
+					var player=lib.playerOL[i];
+					if(player){
+						player.identity=state[i].identity;
+					}
+				}
+			},
 			getRoomInfo:function(uiintro){
-				uiintro.add('<div class="text chat">游戏模式：'+(lib.configOL.identity_mode=='zhong'?'明忠':'标准'));
 				uiintro.add('<div class="text chat">双将模式：'+(lib.configOL.double_character?'开启':'关闭'));
-				if(lib.configOL.identity_mode!='zhong'){
-					uiintro.add('<div class="text chat">双内奸：'+(lib.configOL.double_nei?'开启':'关闭'));
-					uiintro.add('<div class="text chat">加强主公：'+(lib.configOL.enhance_zhu?'开启':'关闭'));
-				}
-				else{
-					uiintro.add('<div class="text chat">卡牌替换：'+(lib.configOL.zhong_card?'开启':'关闭'));
-				}
-				var last=uiintro.add('<div class="text chat">出牌时限：'+lib.configOL.choose_timeout+'秒');
 				// uiintro.add('<div class="text chat">屏蔽弱将：'+(lib.configOL.ban_weak?'开启':'关闭'));
 				// var last=uiintro.add('<div class="text chat">屏蔽强将：'+(lib.configOL.ban_strong?'开启':'关闭'));
 				if(lib.configOL.banned.length){

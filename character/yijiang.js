@@ -3781,16 +3781,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jinjiu:{
 				mod:{
 					cardEnabled:function(card,player){
-						if(card.name=='jiu'&&_status.event.skill!='jinjiu') return false;
+						if(card.name=='jiu'&&get.position(card)=='h'&&_status.event.skill==undefined) return false;
 					},
 					cardUsable:function(card,player){
-						if(card.name=='jiu'&&_status.event.skill!='jinjiu') return false;
+						if(card.name=='jiu'&&get.position(card)=='h'&&_status.event.skill==undefined) return false;
 					},
 					cardRespondable:function(card,player){
-						if(card.name=='jiu'&&_status.event.skill!='jinjiu') return false;
+						if(card.name=='jiu'&&get.position(card)=='h'&&_status.event.skill==undefined) return false;
 					},
 					cardSavable:function(card,player){
-						if(card.name=='jiu'&&_status.event.skill!='jinjiu') return false;
+						if(card.name=='jiu'&&get.position(card)=='h'&&_status.event.skill==undefined) return false;
 					},
 				},
 				enable:['chooseToUse','chooseToRespond'],
@@ -5127,41 +5127,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.parent.skill=='zhanjue';
 				},
 				content:function(){
-					player.storage.zhanjue2=trigger.player;
+					trigger.player.addTempSkill('zhanjue5');
 				}
 			},
 			zhanjue4:{
 				audio:false,
-				trigger:{player:'juedouAfter'},
+				trigger:{player:'useCardAfter'},
 				forced:true,
 				popup:false,
 				filter:function(event,player){
 					return event.skill=='zhanjue';
 				},
 				content:function(){
+					var num=1;
+					if(player.hasSkill('zhanjue5')) num++;
+					var list=game.filterPlayer(function(current){
+						var bool=(current==player||current.hasSkill('zhanjue5'));
+						if(bool) current.removeSkill('zhanjue5');
+						return bool;
+					});
 					if(typeof player.storage.zhanjue!='number'){
 						player.storage.zhanjue=0;
 					}
-					if(player.storage.zhanjue2==player){
-						player.draw(2);
-						player.storage.zhanjue+=2;
-					}
-					else if(player.storage.zhanjue2){
-						if(player.storage.zhanjue2.isAlive()){
-							game.asyncDraw([player,player.storage.zhanjue2]);
-						}
-						else{
-							player.draw();
-						}
-						player.storage.zhanjue++;
-					}
-					else{
-						player.draw();
-						player.storage.zhanjue++;
-					}
-					delete player.storage.zhanjue2;
+					player.storage.zhanjue+=num;
+					game.asyncDraw(list,function(current){
+						return current==player?num:1;
+					});
 				}
 			},
+			zhanjue5:{},
 			qinwang:{
 				audio:'qinwang1',
 				unique:true,
@@ -5366,7 +5360,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zuoding2:{},
 			zuoding3:{
-				trigger:{global:'damageEnd'},
+				trigger:{global:'damage'},
 				silent:true,
 				content:function(){
 					player.addTempSkill('zuoding2');
@@ -5505,6 +5499,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							viewAs:{name:links[0][2],nature:links[0][3],suit:null,number:null},
 							position:'he',
 							popname:true,
+							ignoreMod:true,
 							precontent:function(){
 								'step 0'
 								player.logSkill('huomo');
