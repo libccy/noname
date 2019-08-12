@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'1.9.91.3',
+	version:'1.9.91.4',
 	update:'1.9.91.2',
 	changeLog:[
 		'BUG修复',
@@ -8,6 +8,7 @@ window.noname_update={
 		'card/guozhan.js',
 		'character/shenhua.js',
 		'character/sp.js',
+		'character/diy.js',
 		'character/yijiang.js',
 		'mode/boss.js',
 		'mode/doudizhu.js',
