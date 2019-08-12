@@ -154,8 +154,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
          trigger.player.storage.ns_chuanshu2=player; 
          trigger.player.addSkill('ns_chuanshu2');              
          //game.broadcastAll()+trigger.player.node.avatar.setBackgroundImage('extension/群英会/ns_zhangjiao.jpg');        
-         player.removeSkill('ns_chuanshu');         
-         //player.awakenSkill('ns_chuanshu');             
+         //player.removeSkill('ns_chuanshu');         
+         player.awakenSkill('ns_chuanshu');             
     },
             },
             ns_xiandao1:{
@@ -256,7 +256,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
         'step 1'
         var target=player.storage.ns_chuanshu2;      
         player.line(target,'green');                     
-        target.addSkill('ns_chuanshu');
+        //target.addSkill('ns_chuanshu');
+	target.restoreSkill('ns_chuanshu');		
         target.update();
     },
                 forced:true,
@@ -293,7 +294,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             game.delay();
         }
         "step 3"
-       player.chooseToDiscard(2,'he','请弃置两张牌').ai=function(card){
+       player.chooseToDiscard(2,'he','请弃置两张牌',true).ai=function(card){
                 return 7-get.value(card);
             };
     },
