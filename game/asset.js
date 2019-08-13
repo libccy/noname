@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'1.9.91.2',
+	'1.9.91.5',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/music_danji.mp3',
@@ -1788,6 +1788,7 @@ window.noname_asset_list=[
 	'font/yuanli.ttf',
 	'font/shousha.ttf',
 	'image/background/huangtian_bg.jpg',
+	'image/background/key_bg.jpg',
 	'image/background/kyoani_bg.jpg',
 	'image/background/ol_bg.jpg',
 	'image/background/september_bg.jpg',

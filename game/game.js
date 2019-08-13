@@ -9559,26 +9559,25 @@
 					}
 				},
 				disableEquip:function(){
-					event.trigger('disableEquip');
+					//event.trigger('disableEquip');
 					if(!player.isDisabled(event.pos)){
 						player.storage.disableEquip.add(event.pos);
 						//player.markSkill('_disableEquip');
 						player.syncStorage('_disableEquip');
-						var str=event.pos.slice(event.pos.length-1,event.pos.length);
-						if(player.get('e',str)!=undefined) player.discard(player.get('e',str));
+						if(player.getEquip(event.pos)) player.discard(player.getEquip(event.pos)).delay=false;
 					 game.log(player,'废除了',get.translation(event.pos),'栏');
 					player.$disableEquip(event.pos);
 					}
 				},
 				enableEquip:function(){
-					event.trigger('enableEquip');
-					if(player.storage.disableEquip.contains(event.pos)){
+					//event.trigger('enableEquip');
+					if(player.isDisabled(event.pos)){
 						player.storage.disableEquip.remove(event.pos);
 						player.syncStorage('_disableEquip');
 						//if(player.storage.disableEquip.length==0) player.unmarkSkill('_disableEquip');
+						game.log(player,'恢复了',get.translation(event.pos),'栏');
+						player.$enableEquip(event.pos);
 					};
-					game.log(player,'恢复了',get.translation(event.pos),'栏');
-					player.$enableEquip(event.pos);
 				},
 				disableJudge:function(){
 					var js=player.getCards('j');
@@ -9850,7 +9849,7 @@
 					}
 					while(player!=end);
 					event.changeCard=get.config('change_card');
-					if(lib.config.mode!='identity'&&lib.config.mode!='guozhan'){
+					if(_status.connectMode||lib.config.mode!='identity'&&lib.config.mode!='guozhan'&&lib.config.mode!='doudizhu'){
 						event.changeCard='disabled';
 					}
 					"step 1"
@@ -12773,7 +12772,7 @@
 					else if(lib.config.show_card_prompt){
 						if(get.type(event.card)=='equip'&&lib.config.hide_card_prompt_equip);
 						else if(get.type(event.card)=='basic'&&lib.config.hide_card_prompt_basic);
-						else{
+						else if(!event.nopopup){
 							if(lib.translate[event.card.name+'_pop']){
 								player.popup(lib.translate[event.card.name+'_pop'],'metal');
 							}
@@ -43202,7 +43201,7 @@
 					if(game.online){
 						if(game.onlinezhu){
 							if(!this.playerid&&game.connectPlayers){
-								if(lib.configOL.mode=='versus') return;
+								if(lib.configOL.mode=='versus'||lib.configOL.mode=='doudizhu') return;
 								if(lib.configOL.mode=='identity'&&lib.configOL.identity_mode=='zhong') return;
 								if(!this.classList.contains('unselectable2')&&lib.configOL.number<=2) return;
 								this.classList.toggle('unselectable2')
@@ -43268,7 +43267,7 @@
 						}
 					}
 					else{
-						if(lib.configOL.mode=='versus') return;
+						if(lib.configOL.mode=='versus'||lib.configOL.mode=='doudizhu') return;
 						if(lib.configOL.mode=='identity'&&lib.configOL.identity_mode=='zhong') return;
 						if(!this.classList.contains('unselectable2')&&lib.configOL.number<=2) return;
 						this.classList.toggle('unselectable2')
