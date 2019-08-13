@@ -1,9 +1,10 @@
 window.noname_update={
-	version:'1.9.91.5',
-	update:'1.9.91.4',
+	version:'1.9.91.6',
+	update:'1.9.91.5',
 	changeLog:[
-		'旧于吉回归',
+		'旧于吉回归',		
 		'BUG修复',
+		'新增背景、装备配音素材',
 	],
 	files:[
 		'card/extra.js',
@@ -13,6 +14,7 @@ window.noname_update={
 		'character/old.js',
 		'character/shenhua.js',
 		'character/sp.js',
+		'character/diy.js',
 		'character/xinghuoliaoyuan.js',
 		'character/yijiang.js',
 		'mode/boss.js',
