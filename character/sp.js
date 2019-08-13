@@ -3415,7 +3415,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return;
 					}
 					target.$draw(equip1);
-					target.equip(equip1);
+					target.useCard(equip1,target).set('animate',false).nopopup=true;
 					game.delay();
 					'step 2'
 					var card=cards[0];
@@ -8246,8 +8246,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var nh=player.countCards('h');
 							if(nh){
 								player.chooseCard('h',[1,nh],'将任意张手牌置于你的武将牌上').set('ai',function(card){
-									if(ui.selected.cards.length>=3) return -get.value(card);
-									return 6-get.value(card);
+									var player=_status.event.player;
+									var count=game.countPlayer(function(current){
+										return get.attitude(player,current)>2&&current.hp-current.countCards('h')>1;
+									});
+									if(ui.selected.cards.length>=count) return -get.value(card);
+									return 5-get.value(card);
 								});
 							}
 							else{
@@ -10057,7 +10061,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 3"
 					if(result.bool){
-						trigger.target.equip(event.card);
+						trigger.target.useCard(event.card).nopopup=true;
 					}
 				},
 				ai:{
@@ -11041,7 +11045,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(player.isDamaged()){
 						if(get.mode()=='guozhan'){
-							if(player.isMinor()){
+							if(player.isMinor(true)){
 								player.recover();
 							}
 						}

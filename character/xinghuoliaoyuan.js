@@ -212,7 +212,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.num>0) event.goto(1);
 					"step 3"
 					for (var i=0;i<event.toequip.length;i++){
-						target.equip(event.toequip[i]);
+						target.useCard(event.toequip[i],target).set('animate',false).set('nopopup',true);
 					}
 				},
 				ai:{
@@ -4035,6 +4035,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				chooseButton:{
 					dialog:function (){
 						var list=['sha','tao','jiu','taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman'];
+						if(get.mode()=='guozhan'){
+							list=list.concat(['xietianzi','shuiyanqijunx','lulitongxin','lianjunshengyan','chiling','diaohulishan','yuanjiao','huoshaolianying']);
+						}
 						for(var i=0;i<list.length;i++){
 							if(i<3){
 								list[i]=['基本','',list[i]];
@@ -4045,7 +4048,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						list.push(['基本','','sha','fire']);
 						list.push(['基本','','sha','thunder']);
-						return ui.create.dialog([list,'vcard']);
+						return ui.create.dialog('蛊惑',[list,'vcard']);
 					},
 					filter:function (button,player){
 						var evt=_status.event.getParent();
@@ -4065,6 +4068,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return '将一张手牌当'+get.translation(links[0][2])+'使用';
 					},
 				},
+				ai:{save:true},
 			},
 			"guhuo_guess":{
 				audio:2,
@@ -4081,7 +4085,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.logSkill('guhuo_guess');
 					player.addTempSkill('guhuo_phase');
-					player.popup(trigger.card.name);
+					player.popup(trigger.card.name,'metal');
+					player.line(trigger.targets,trigger.card.nature);
+					trigger.line=false;
 					event.prompt=get.translation(player)+'声明了'+get.translation(trigger.card.name)+'，是否质疑？';
 					event.guessers=game.filterPlayer(function(current){
 						return current!=player&&!current.hasSkill('chanyuan');
@@ -4188,20 +4194,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.hasSkill('guhuo_phase'))return false;
 					if(event.responded) return false;
 					if(!event.filterCard({name:'shan'})&&!event.filterCard({name:'sha'})) return false;
+					if(!lib.filter.cardRespondable({name:'shan'},player,event)&&!lib.filter.cardRespondable({name:'sha'},player,event)) return false;
 					if(!player.countCards('h')) return false;
 					return true;
 				},
 				direct:true,
 				content:function (){
 					"step 0"
-					if(trigger.filterCard({name:'shan'})) event.name='shan';
+					if(trigger.filterCard({name:'shan'})&&lib.filter.cardRespondable({name:'shan'},player,trigger)) event.name='shan';
 					else event.name='sha';
 					player.chooseCard('是否发动【蛊惑】，将一张手牌当做'+get.translation(event.name)+'打出？');
 					"step 1"
 					if(result.bool){
 						player.addTempSkill('guhuo_phase');
 						player.logSkill('guhuo_guess');
-						player.popup(event.name);
+						player.popup(event.name,'metal');
 						event.card=result.cards[0];
 						event.prompt=get.translation(player)+'声明了'+get.translation(event.name)+'，是否质疑？';
 						event.guessers=game.filterPlayer(function(current){

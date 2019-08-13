@@ -2035,9 +2035,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						content:function(){
-							player.storage.nzry_junlve+=trigger.num;
+							if(player==trigger.source){
+								player.storage.nzry_junlve+=trigger.num;
+								game.log(player,'获得了',trigger.num,'个“军略”标记');
+							}
+							if(player==trigger.player){
+								player.storage.nzry_junlve+=trigger.num;
+								game.log(player,'获得了',trigger.num,'个“军略”标记');
+							}
 							player.syncStorage('nzry_junlve');
-							game.log(player,'获得',trigger.num,'个“军略”标记');
 						},
 					},
 					"nzry_cuike":{

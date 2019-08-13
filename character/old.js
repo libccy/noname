@@ -3,6 +3,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'old',
 		character:{
+			yuji:['male','qun',3,['old_guhuo'],['forbidai']],
 			zhangjiao:['male','qun',3,['leiji','guidao','huangtian'],['zhu']],
 			masu:['male','shu',3,['xinzhan','huilei']],
 			xushu:['male','shu',3,['wuyan','jujian']],
@@ -37,22 +38,246 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			"old_guhuo":{
+				group:["old_guhuo_guess","old_guhuo_respond","old_guhuo_wuxie"],
+				enable:"chooseToUse",
+				filter:function (event,player){
+					if(!player.countCards('h')) return false;
+					var list=['sha','tao','jiu','taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman'];
+					if(get.mode()=='guozhan'){
+						list=list.concat(['xietianzi','shuiyanqijunx','lulitongxin','lianjunshengyan','chiling','diaohulishan','yuanjiao','huoshaolianying']);
+					}
+					for(var i=0;i<list.length;i++){
+						if(event.filterCard({name:list[i]},player)) return true;
+					}
+					return false;
+				},
+				chooseButton:{
+					dialog:function (){
+						var list=['sha','tao','jiu','taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman'];
+						if(get.mode()=='guozhan'){
+							list=list.concat(['xietianzi','shuiyanqijunx','lulitongxin','lianjunshengyan','chiling','diaohulishan','yuanjiao','huoshaolianying']);
+						}
+						for(var i=0;i<list.length;i++){
+							if(i<3){
+								list[i]=['基本','',list[i]];
+							}
+							else{
+								list[i]=['锦囊','',list[i]];
+							}
+						}
+						list.push(['基本','','sha','fire']);
+						list.push(['基本','','sha','thunder']);
+						return ui.create.dialog('蛊惑',[list,'vcard']);
+					},
+					filter:function (button,player){
+						var evt=_status.event.getParent();
+						if(evt&&evt.filterCard){
+							return evt.filterCard({name:button.link[2]},player,evt);
+						}
+						return true;
+					},
+					backup:function (links,player){
+						return {
+							filterCard:true,
+							selectCard:1,
+							viewAs:{name:links[0][2],nature:links[0][3]},
+						}
+					},
+					prompt:function (links,player){
+						return '将一张手牌当'+get.translation(links[0][2])+'使用';
+					},
+				},
+				ai:{save:true},
+			},
+			"old_guhuo_guess":{
+				audio:'guhuo_guess',
+				trigger:{
+					player:"useCardBefore",
+				},
+				filter:function (event,player){
+					return event.skill=="old_guhuo_backup"||event.skill=="old_guhuo_wuxie";
+				},
+				forced:true,
+				direct:true,
+				priority:15,
+				content:function (){
+					'step 0'
+					player.logSkill('old_guhuo_guess');
+					player.popup(trigger.card.name,'metal');
+					player.line(trigger.targets,trigger.card.nature);
+					trigger.line=false;
+					event.prompt=get.translation(player)+'声明了'+get.translation(trigger.card.name)+'，是否质疑？';
+					event.guessers=game.filterPlayer(function(current){
+						return current!=player;
+					});
+					event.guessers.sort(lib.sort.seat);
+					event.ally=[];
+					event.betray=[];
+					'step 1'
+					if(event.guessers.length==0) event.goto(3);
+					else{
+						event.guessers[0].chooseControl('质疑','不质疑').set('prompt',event.prompt).set('ai',function(){
+							if(get.attitude(event.guessers[0],player)>0) return '不质疑';
+							return Math.random()<0.5?'不质疑':'质疑';
+						});
+					}
+					'step 2'
+					if(!result.control) result.control='不质疑';
+					event.guessers[0].chat(result.control);
+					game.delay();
+					if(result.control=='不质疑'){
+						game.log(event.guessers[0],'#g不质疑');
+						event.ally.push(event.guessers[0]);
+					}else{
+						game.log(event.guessers[0],'#y质疑');
+						event.betray.push(event.guessers[0]);
+					}
+					event.guessers.remove(event.guessers[0]);
+					event.goto(1);
+					'step 3'
+					player.showCards(trigger.cards);
+					if(event.betray.length){
+						if(trigger.card.name==trigger.cards[0].name){
+							if(get.suit(trigger.cards[0])!='heart'){
+								game.log(player,'使用的','#y'+get.translation(trigger.card.name),'作废了');
+								player.discard(trigger.cards);
+								trigger.cancel();
+							}
+							for(var i=0;i<event.betray.length;i++){
+								event.betray[i].loseHp();
+							}
+						}
+						else{
+							game.log(player,'使用的','#y'+get.translation(trigger.card.name),'作废了');
+							player.discard(trigger.cards);
+							trigger.cancel();
+							game.asyncDraw(event.betray);
+							game.delay();
+						}
+					}
+				},
+			},
+			"old_guhuo_respond":{
+				trigger:{
+					player:"chooseToRespondBegin",
+				},
+				filter:function (event,player){
+					if(event.responded) return false;
+					if(!event.filterCard({name:'shan'})&&!event.filterCard({name:'sha'})) return false;
+					if(!player.countCards('h')) return false;
+					return true;
+				},
+				direct:true,
+				content:function (){
+					'step 0'
+					if(trigger.filterCard({name:'shan'})&&lib.filter.cardRespondable({name:'shan'},player,trigger)) event.name='shan';
+					else event.name='sha';
+					player.chooseCard('是否发动【蛊惑】，将一张手牌当做'+get.translation(event.name)+'打出？');
+					'step 1'
+					if(result.bool){
+						player.logSkill('old_guhuo_guess');
+						player.popup(event.name,'metal');
+						event.card=result.cards[0];
+						event.prompt=get.translation(player)+'声明了'+get.translation(event.name)+'，是否质疑？';
+						event.guessers=game.filterPlayer(function(current){
+							return current!=player;
+						});
+						event.guessers.sort(lib.sort.seat);
+						event.ally=[];
+						event.betray=[];
+					}
+					else event.finish();
+					'step 2'
+					if(event.guessers.length==0) event.goto(3);
+					else{
+						event.guessers[0].chooseControl('质疑','不质疑').set('prompt',event.prompt).set('ai',function(){
+							if(get.attitude(event.guessers[0],player)>0) return '不质疑';
+							return Math.random()<0.5?'不质疑':'质疑';
+						});
+					}
+					'step 3'
+					if(!result.control) result.control='不质疑';
+					event.guessers[0].chat(result.control);
+					game.delay();
+					if(result.control=='不质疑'){
+						game.log(event.guessers[0],'#g不质疑');
+						event.ally.push(event.guessers[0]);
+					}else{
+						game.log(event.guessers[0],'#y质疑');
+						event.betray.push(event.guessers[0]);
+					}
+					event.guessers.remove(event.guessers[0]);
+					event.goto(2);
+					'step 4'
+					var bool=true;
+					player.showCards(event.card);
+					if(event.betray.length){
+						if(event.name==event.card.name){
+							if(get.suit(event.card)!='heart'){
+								game.log(player,'使用的','#y'+get.translation(event.name),'作废了');
+								player.discard(event.card);
+								bool=false;
+							}
+							for(var i=0;i<event.betray.length;i++){
+								event.betray[i].loseHp();
+							}
+						}
+						else{
+							game.log(player,'使用的','#y'+get.translation(event.name),'作废了');
+							player.discard(event.card);
+							bool=false;
+							game.asyncDraw(event.betray);
+							game.delay();
+						}
+					}
+					if(!bool) event.finish();
+					'step 5'
+					trigger.untrigger();
+					trigger.responded=true;
+					trigger.result={bool:true,card:{name:event.name},cards:[event.card]};
+				},
+				ai:{
+					order:4,
+					useful:-1,
+					value:-1,
+				},
+			},
+			"old_guhuo_wuxie":{
+				log:false,
+				silent:true,
+				popup:false,
+				enable:"chooseToUse",
+				filterCard:true,
+				viewAsFilter:function (player){
+					return player.countCards('h')>0;
+				},
+				viewAs:{
+					name:"wuxie",
+				},
+				check:function(card){
+					if(card.name=='wuxie') return 1000;
+					return 0;
+				},
+				prompt:"将一张手牌当无懈可击使用",
+				threaten:1.2,
+			},
 			old_zuilun:{
-			            audio:'xinfu_zuilun',
-                subSkill:{
-                    e:{},
-                    h:{},
-                },
-                enable:"phaseUse",
-                usable:2,
-                filterTarget:function (card,player,target){
+						audio:'xinfu_zuilun',
+				subSkill:{
+					e:{},
+					h:{},
+				},
+				enable:"phaseUse",
+				usable:2,
+				filterTarget:function (card,player,target){
 					if(player==target) return false;
 					var pos='he';
 					if(player.hasSkill('old_zuilun_h')) pos='e';
 					if(player.hasSkill('old_zuilun_e')) pos='h';
 					return target.countGainableCards(player,pos)>0;
 				},
-                content:function (){
+				content:function (){
 					'step 0'
 					var pos='he';
 					if(player.hasSkill('old_zuilun_h')) pos='e';
@@ -65,13 +290,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(pos=='h'||pos=='e') player.addTempSkill('old_zuilun_'+pos,'phaseUseAfter');
 					}
 				},
-                ai:{
-                    order:7,
-                    result:{
-                        target:-1,
-                    },
-                },
-            },
+				ai:{
+					order:7,
+					result:{
+						target:-1,
+					},
+				},
+			},
 			old_fuyin:{
 				mod:{
 					targetEnabled:function(card,player,target){
@@ -80,44 +305,44 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"old_jijun":{
-                marktext:"方",
-                audio:"xinfu_jijun",
-                intro:{
-                    content:"cards",
-                },
-                enable:"phaseUse",
-                filterCard:true,
-                selectCard:[1,Infinity],
-                filter:function (event,player){
+				marktext:"方",
+				audio:"xinfu_jijun",
+				intro:{
+					content:"cards",
+				},
+				enable:"phaseUse",
+				filterCard:true,
+				selectCard:[1,Infinity],
+				filter:function (event,player){
 					return player.countCards('h')>0;
 				},
-                check:function (card){
+				check:function (card){
 					var player=_status.event.player;
 					if(player.storage.old_jijun&&(36-player.storage.old_jijun.length)<=player.countCards('h')) return 1;
 					return 5-get.value(card);
 				},
-                discard:false,
-                lose:false,
-                content:function (){
+				discard:false,
+				lose:false,
+				content:function (){
 					player.lose(cards,ui.special,'toStorage');
 					player.$give(cards,player);
 					if(!player.storage.old_jijun) player.storage.old_jijun=[];
 					player.storage.old_jijun.addArray(cards);
 					player.markSkill('old_jijun');
 				},
-				           ai:{order:1,result:{player:1}},
-            },
-            "old_fangtong":{
-                trigger:{
-                    player:"phaseEnd",
-                },
-                audio:"xinfu_fangtong",
-                forced:true,
-                skillAnimation:true,
-                filter:function (event,player){
+						   ai:{order:1,result:{player:1}},
+			},
+			"old_fangtong":{
+				trigger:{
+					player:"phaseEnd",
+				},
+				audio:"xinfu_fangtong",
+				forced:true,
+				skillAnimation:true,
+				filter:function (event,player){
 					return (player.storage.old_jijun&&player.storage.old_jijun.length>35);
 				},
-                content:function (){
+				content:function (){
 					var bool=false;
 					if(player==game.me) bool=true;
 					else switch(get.mode()){
@@ -151,7 +376,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					game.over(bool);
 				},
-            },
+			},
 			
 			oldanxu:{
 				enable:'phaseUse',
@@ -578,13 +803,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_machao:'☆SP马超',
 			old_zhugezhan:"旧诸葛瞻",
 			zhangliang:'SP张梁',
+			yuji:'旧于吉',
 
+			"old_guhuo":"蛊惑",
+			"old_guhuo_info":"你可以说出任何一种基本牌或普通锦囊牌，并正面朝下使用或打出一张手牌。体力值不为0的其他角色依次选择是否质疑。若无角色质疑，则该牌按你所述之牌结算。若有角色质疑则亮出验明：若为真，质疑者各失去1点体力；若为假，质疑者各摸一张牌。无论真假，弃置被质疑的牌。仅当被质疑的牌为红桃花色且为真时，该牌仍然可以进行结算。",
+			"old_guhuo_guess":"蛊惑",
+			"old_guhuo_wuxie":"蛊惑",
 			"old_jijun":"集军",
-            "old_jijun_info":"出牌阶段，你可以将任意张手牌置于你的武将牌上。（均称为“方”）",
-            "old_fangtong":"方统",
-            "old_fangtong_info":"锁定技，结束阶段，若你的“方”的数目大于等于36，则你所在的游戏阵营直接取得游戏胜利。",
+			"old_jijun_info":"出牌阶段，你可以将任意张手牌置于你的武将牌上。（均称为“方”）",
+			"old_fangtong":"方统",
+			"old_fangtong_info":"锁定技，结束阶段，若你的“方”的数目大于等于36，则你所在的游戏阵营直接取得游戏胜利。",
 			old_zuilun:"罪论",
-            old_zuilun_info:"出牌阶段，你可以获得一名其他角色的一张牌（手牌、装备区各一次），然后该角色摸一张牌。",
+			old_zuilun_info:"出牌阶段，你可以获得一名其他角色的一张牌（手牌、装备区各一次），然后该角色摸一张牌。",
 			old_fuyin:"父荫",
 			old_fuyin_info:"锁定技，若你的装备区内没有防具牌，手牌数大于或等于你的其他角色不能使用【杀】、【决斗】或【火攻】指定你为目标",
 			oldanxu:'安恤',

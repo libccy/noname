@@ -1924,7 +1924,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 4'
 					if(event.toequip){
-						player.equip(event.toequip);
+						player.useCard(event.toequip,player).nopopup=true;
 					}
 				},
 				ai:{
@@ -2477,7 +2477,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
-					return target.canUse({name:'sha'},player)&&target.countCards('he');
+					return lib.filter.targetInRange({name:'sha'},target,player)&&target.countCards('he');
 				},
 				content:function(){
 					"step 0"
@@ -6039,9 +6039,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			buqu:{
 				audio:2,
-				trigger:{player:'dieBefore'},
+				trigger:{player:'chooseToUseBefore'},
 				forced:true,
-				filter:function(event,player){return player.maxHp>0&&player.hp<=0},
+				filter:function(event,player){return event.type=='dying'&&player.isDying()&&event.dying==player},
 				content:function(){
 					"step 0"
 					event.card=get.cards()[0];
@@ -6053,19 +6053,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.markSkill('buqu');
 					"step 1"
 					for(var i=0;i<player.storage.buqu.length-1;i++){
-						if(get.number(event.card)&&get.number(event.card)==get.number(player.storage.buqu[i])) return;
+						if(get.number(event.card)&&get.number(event.card)==get.number(player.storage.buqu[i])){
+							player.storage.buqu.remove(event.card);
+							player.syncStorage('buqu');
+							player.markSkill('buqu');
+							game.cardsDiscard(event.card);
+							return;
+						};
 					}
 					trigger.cancel();
+					trigger.result={bool:true};
 					if(player.hp<=0){
-						player.hp=1;
-						player.update();
+						player.recover(1-player.hp);
 					}
 				},
 				mod:{
 					maxHandcard:function(player,num){
 						if(player.storage.buqu&&player.storage.buqu.length) return num-player.hp+player.storage.buqu.length;
-					}
+					},
 				},
+				ai:{save:true},
 				intro:{
 					content:'cards',
 					onunmark:function(storage,player){
@@ -6689,7 +6696,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kuanggu_info:'锁定技，每当你造成一点伤害，若受伤害角色与你的距离不大于1，你回复一点体力',
 			tianxiang_info:'当你即将受到伤害时，你可以弃置一张红桃牌将伤害转移给任意一名其他角色，然后该角色摸x张牌，x为其已损失体力值',
 			hongyan_info:'锁定技，你的黑桃牌均视为红桃',
-			buqu_info:'锁定技，在你死亡前，若你的体力值不大于0，亮出牌堆顶的一张牌并置于你的武将牌上，若此牌的点数与你武将牌上已有的牌点数均不同，则你回复至1体力。只要你的武将牌上有牌，你的手牌上限便与这些牌数量相等',
+			buqu_info:'锁定技，当你处于濒死状态时，你亮出牌堆顶的一张牌并置于你的武将牌上，称之为“创”。’若此牌的点数与你武将牌上已有的“创”点数均不同，则你回复至1体力。若点数相同，则将此牌置入弃牌堆。只要你的武将牌上有“创”，你的手牌上限便与“创”的数量相等',
 			leiji_info:'每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为黑桃，其受到两点雷电伤害',
 			guidao_info:'任意一名角色的判定生效前，你可以打出一张黑色牌替换之',
 			huangtian_info:'主公技，群雄角色可在他们各自的回合里给你一张【闪】或【闪电】。',

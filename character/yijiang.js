@@ -593,7 +593,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return get.type(card)=='equip'&&!target.isDisabled(get.subtype(card));
 					});
 					if(target.isMinEquip()){
-						target.equip(event.equip||game.createCard(get.inpilefull('equip').randomGet()),true);
+						target.useCard(event.equip||game.createCard(get.inpilefull('equip').randomGet()),target).set('animate',false).set('nopopup',true);
 						event.e=true;
 					}
 					'step 1'
@@ -604,7 +604,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.recover();
 					}
 					if(!event.e&&player.isMinEquip()){
-						player.equip(event.equip||game.createCard(get.inpilefull('equip').randomGet()),true);
+						player.useCard(event.equip||game.createCard(get.inpilefull('equip').randomGet()),player).set('animate',false).set('nopopup',true);
 					}
 				},
 				ai:{
@@ -1086,7 +1086,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.type(card)=='equip'&&!target.isDisabled(get.subtype(card));
 						});
 						if(event.card){
-							target.equip(event.card,true).set('delay',true);
+							target.useCard(event.card,target).set('delay',true).set('animate',false).set('nopopup',true);
 							event.goto(3);
 						}
 						else{
@@ -1164,7 +1164,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return get.type(card)=='equip';
 							});
 							if(card){
-								trigger.source.equip(card,true).set('delay',true);
+								trigger.source.useCard(card,trigger.source).set('delay',true).set('animate',false).set('nopopup',true);
 							}
 						},
 						ai:{
@@ -1196,7 +1196,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return get.type(card)=='equip';
 								});
 								if(card){
-									target.equip(card,true).set('delay',true);
+									target.useCard(card,target).set('delay',true).set('animate',false).set('nopopup',true);
 								}
 							}
 						}
@@ -3593,7 +3593,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					target.chooseToDiscard(true).prompt='请弃置一张锦囊牌，或依次弃置两张非锦囊牌。';
 					'step 3'
-					if((!result.cards||get.type(result.cards[0],'trick')!='trick')&&target.countCards('he',{type:['trick','delay']})){
+					if((!result.cards||get.type(result.cards[0],'trick')!='trick')&&target.countCards('he',function(card){
+						return get.type(card,'trick')!='trick';
+					})){
 						target.chooseToDiscard(true,function(card){
 							return get.type(card,'trick')!='trick';
 						}).prompt='请弃置第二张非锦囊牌';
@@ -5372,7 +5374,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.responded) return false;
 					if(!event.filterCard({name:'shan'})) return false;
-					if(!lib.filter.cardRespondable({name:'sha'},player,event)) return false;
+					if(!lib.filter.cardRespondable({name:'shan'},player,event)) return false;
 					if(player.storage.huomo&&player.storage.huomo.shan) return false;
 					if(event.parent.name!='sha') return false;
 					var hs=player.getCards('he',{color:'black'});
@@ -7757,7 +7759,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var card=result[0];
 					if(get.type(card)=='equip'){
 						if(!event.target.isDisabled(get.subtype(card))){
-							event.target.equip(card);
+							event.target.useCard(card,event.target).set('animate',false).set('nopopup',true);
 							game.delay();
 						}
 						event.bool=true;
