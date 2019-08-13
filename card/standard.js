@@ -1140,7 +1140,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return game.hasPlayer(function(current){
 						if(current.getEquip(1)){
 							return game.hasPlayer(function(current2){
-								return lib.filter.filterTarget({name:'sha'},current,current2);
+								return lib.filter.targetInRange({name:'sha'},current,current2);
 							})
 						}
 					});
@@ -1150,7 +1150,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return (player!=target&&target.getCards('e',{subtype:'equip1'}).length);
 					}
 					else{
-						return lib.filter.filterTarget({name:'sha'},ui.selected.targets[0],target);
+						return lib.filter.targetInRange({name:'sha'},ui.selected.targets[0],target);
 					}
 				},
 				content:function(){
@@ -1638,8 +1638,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(get.mode()!='guozhan') return;
 						if(!ui.selected.targets.length) return;
 						if(target.identity=='ye'||target.identity=='unknown') return;
-						for(var i=0;i<ui.selected.targets.length;i++){
-							if(target!=ui.selected.targets[i]&&target.identity==ui.selected.targets[i].identity){
+						var targets=ui.selected.targets.slice(0);
+						for(var i=0;i<targets.length;i++){
+							if(target!=targets[i]&&target.identity==targets[i].identity){
 								return false;
 							}
 						}

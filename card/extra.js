@@ -35,8 +35,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(cards&&cards.length){
 							card=cards[0];
 						}
-						if(!player.storage.jiu) player.storage.jiu=0;
-						player.storage.jiu++;
+						if(!target.storage.jiu) target.storage.jiu=0;
+						target.storage.jiu++;
 						game.broadcastAll(function(target,card,gain2){
 							target.addSkill('jiu');
 							if(!target.node.jiu&&lib.config.jiu_effect){
@@ -79,6 +79,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							if(target&&target.isDying()) return 2;
+							if(target&&!target.isPhaseUsing()) return 0;
 							if(lib.config.mode=='stone'&&!player.isMin()){
 								if(player.getActCount()+1>=player.actcount) return 0;
 							}

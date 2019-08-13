@@ -790,13 +790,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			dinglanyemingzhu_skill:{
-				inherit:'gzzhiheng',
+				inherit:'zhiheng',
 				filter:function(event,player){
 					return !player.hasSkill('gzzhiheng');
 				},
 				selectCard:function(){
 					var player=_status.event.player;
 					return [1,player.maxHp];
+				},
+				filterCard:function(card,player){
+					return card!=player.getEquip(5);
 				},
 				prompt:'出牌阶段限一次，你可以弃置至多X张牌（X为你的体力上限），然后摸等量的牌'
 			},
