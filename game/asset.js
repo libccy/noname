@@ -1526,7 +1526,7 @@ window.noname_asset_list=[
 	'image/background/zhanhuo_bg.jpg',
 	'image/background/zhulin_bg.jpg',	
 	'image/background/beipan_bg.jpg',
-	'image/background/lanting_bg.jpg',
+	'image/background/lanting_bg.png',
 	'image/background/lingju_bg.jpg',
 	'image/background/sanying_bg.jpg',
 	'image/background/wangshi_bg.jpg',
