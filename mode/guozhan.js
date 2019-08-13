@@ -827,9 +827,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							});
 							'step 2'
 							if(result.index==0) target.carryOutJunling(player,event.junling,targets);
-							else if(target!=player) {
+							else if(target!=player&&target.countCards('h')) {
 								event.num=target.countCards('h');
-								player.gain(target.get('h'),target);
+								player.gain(target.getCard('h'),target);
 								target.$give(event.num,player);
 								player.chooseCard('交给'+get.translation(target)+get.cnNumber(event.num)+'张牌','he',event.num,true).set('ai',function(card){
 									return -get.value(card);
@@ -5846,8 +5846,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzduanchang:{
 				audio:'duanchang',
 				trigger:{player:'dieBegin'},
-				popup:true,
-				silent:true,
+				forced:true,
 				filter:function(event,player){
 					return event.source&&event.source.isIn()&&event.source!=player&&
 					(event.source.hasMainCharacter()||event.source.hasViceCharacter());
@@ -6094,9 +6093,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				audio:'zhiheng',
 				selectCard:function(){
 					var player=_status.event.player;
-					if(player.hasSkill('dinglanyemingzhu_skill')) return [1,Infinity];
-					return [1,player.maxHp];
+					var range1=[1,player.maxHp];
+					if(player.hasSkill('dinglanyemingzhu_skill')){
+						for(var i=0;i<ui.selected.cards.length;i++){
+							if(ui.selected.cards[i]==player.getEquip(5)) return range1;
+						}
+						return [1,Infinity]
+					}
+					return range1;
 				},
+				filterCard:function(card,player){
+					if(ui.selected.cards.length<player.maxHp||!player.hasSkill('dinglanyemingzhu_skill')) return true;
+					return card!=player.getEquip(5);
+				},
+				complexCard:true,
+				complexSelect:true,
 				prompt:function(){
 					var player=_status.event.player;
 					if(player.hasSkill('dinglanyemingzhu_skill')) return '出牌阶段限一次，你可以弃置任意张牌，然后摸等量的牌';
@@ -7840,7 +7851,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						if(event.junling=='junling6'){
-							var cards=player.get('he');
+							var cards=player.getCards('he');
 							for(var i=0;i<result.cards.length;i++) cards.remove(result.cards[i]);
 							player.discard(cards);
 						}
@@ -8437,9 +8448,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					return false;
 				},
-				isMinor:function(){
+				isMinor:function(nomajor){
 					if(this.identity=='unknown'||this.isMajor()) return false;
-					if(!game.hasPlayer(function(current){
+					if(!nomajor&&!game.hasPlayer(function(current){
 						return current.isMajor();
 					})){
 						return false;
