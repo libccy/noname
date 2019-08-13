@@ -17,7 +17,7 @@ window.noname_package={
 		ow:'守望先锋',
 		swd:'轩辕剑',
 		gujian:'古剑奇谭',
-		xianjian:'仙剑奇侠传',
+		xianjian:'仙剑奇侠',
 	},
 	card:{
 		standard:'标准',
