@@ -18709,7 +18709,7 @@
 							this.awakenSkill(skill);
 							return;
 						}
-						if(_status.event) _status.event.addTrigger(skill,this);
+						if(_status.event&&_status.event.addTrigger) _status.event.addTrigger(skill,this);
 						if(info.init2&&!_status.video){
 							info.init2(this,skill);
 						}
