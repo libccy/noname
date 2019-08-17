@@ -792,7 +792,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			dinglanyemingzhu_skill:{
 				inherit:'zhiheng',
 				filter:function(event,player){
-					return !player.hasSkill('gzzhiheng');
+					return !player.hasSkill('gzzhiheng',true);
 				},
 				selectCard:function(){
 					var player=_status.event.player;
@@ -847,7 +847,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			feilongduofeng:{
 				trigger:{player:'shaBegin'},
-				priority:5,
+				priority:7,
 				logTarget:'target',
 				check:function(event,player){
 					return get.attitude(player,event.target)<=0;

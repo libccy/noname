@@ -1006,7 +1006,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(card==undefined||card.length==0) return;
 						var node=card.copy('thrown','hidden');
 						node.dataset.position=this.dataset.position;
-						this.parentNode.appendChild(node);
+						if(this.parentNode) this.parentNode.appendChild(node);
 						ui.refresh(node);
 						node.show();
 						this.$randomMove(node,130,0);

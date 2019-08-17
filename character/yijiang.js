@@ -2441,7 +2441,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(list.length==0){
 							return ui.create.dialog('滔乱已无可用牌');
 						}
-						return ui.create.dialog([list,'vcard']);
+						return ui.create.dialog('滔乱',[list,'vcard']);
 					},
 					filter:function(button,player){
 						return lib.filter.filterCard({name:button.link[2]},player,_status.event.getParent());
@@ -9417,8 +9417,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard'},
 				frequent:true,
 				filter:function(event,player){
+					if(event.jianyinged) return false;
 					if(!event.cards||event.cards.length!=1) return false;
-					if(_status.currentPhase!=player) return false;
+					if(!player.isPhaseUsing()) return false;
 					if(!player.storage.jianying) return false;
 					return get.suit(player.storage.jianying)==get.suit(event.cards[0])||
 						player.storage.jianying.number==event.cards[0].number;
@@ -9442,6 +9443,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.storage.jianying=trigger.cards[0];
+					trigger.jianyinged=true;
 				}
 			},
 			jianying2:{

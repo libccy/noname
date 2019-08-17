@@ -54,20 +54,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				chooseButton:{
 					dialog:function (){
-						var list=['sha','tao','jiu','taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman'];
-						if(get.mode()=='guozhan'){
-							list=list.concat(['xietianzi','shuiyanqijunx','lulitongxin','lianjunshengyan','chiling','diaohulishan','yuanjiao','huoshaolianying']);
-						}
-						for(var i=0;i<list.length;i++){
-							if(i<3){
-								list[i]=['基本','',list[i]];
+						var list=[];
+						for(var i=0;i<lib.inpile.length;i++){
+							var name=lib.inpile[i];
+							if(name=='wuxie') continue;
+							if(name=='sha'){
+								list.push(['基本','','sha']);
+								list.push(['基本','','sha','fire']);
+								list.push(['基本','','sha','thunder']);
 							}
-							else{
-								list[i]=['锦囊','',list[i]];
-							}
+							else if(get.type(name)=='trick') list.push(['锦囊','',name]);
+							else if(get.type(name)=='basic') list.push(['基本','',name]);
 						}
-						list.push(['基本','','sha','fire']);
-						list.push(['基本','','sha','thunder']);
 						return ui.create.dialog('蛊惑',[list,'vcard']);
 					},
 					filter:function (button,player){
@@ -105,6 +103,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.logSkill('old_guhuo_guess');
 					player.popup(trigger.card.name,'metal');
+					player.lose(trigger.cards,ui.special);
 					player.line(trigger.targets,trigger.card.nature);
 					trigger.line=false;
 					event.prompt=get.translation(player)+'声明了'+get.translation(trigger.card.name)+'，是否质疑？';
@@ -134,14 +133,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.betray.push(event.guessers[0]);
 					}
 					event.guessers.remove(event.guessers[0]);
-					event.goto(1);
+					if(event.guessers.length) event.goto(1);
 					'step 3'
 					player.showCards(trigger.cards);
 					if(event.betray.length){
 						if(trigger.card.name==trigger.cards[0].name){
 							if(get.suit(trigger.cards[0])!='heart'){
 								game.log(player,'使用的','#y'+get.translation(trigger.card.name),'作废了');
-								player.discard(trigger.cards);
+								game.cardsDiscard(trigger.cards);
 								trigger.cancel();
 							}
 							for(var i=0;i<event.betray.length;i++){
@@ -150,7 +149,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						else{
 							game.log(player,'使用的','#y'+get.translation(trigger.card.name),'作废了');
-							player.discard(trigger.cards);
+							game.cardsDiscard(trigger.cards);
 							trigger.cancel();
 							game.asyncDraw(event.betray);
 							game.delay();
@@ -178,6 +177,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.logSkill('old_guhuo_guess');
 						player.popup(event.name,'metal');
+						player.lose(result.cards,ui.special);
 						event.card=result.cards[0];
 						event.prompt=get.translation(player)+'声明了'+get.translation(event.name)+'，是否质疑？';
 						event.guessers=game.filterPlayer(function(current){
@@ -189,7 +189,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 2'
-					if(event.guessers.length==0) event.goto(3);
+					if(event.guessers.length==0) event.goto(4);
 					else{
 						event.guessers[0].chooseControl('质疑','不质疑').set('prompt',event.prompt).set('ai',function(){
 							if(get.attitude(event.guessers[0],player)>0) return '不质疑';
@@ -208,7 +208,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.betray.push(event.guessers[0]);
 					}
 					event.guessers.remove(event.guessers[0]);
-					event.goto(2);
+					if(event.guessers.length) event.goto(2);
 					'step 4'
 					var bool=true;
 					player.showCards(event.card);
@@ -216,7 +216,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(event.name==event.card.name){
 							if(get.suit(event.card)!='heart'){
 								game.log(player,'使用的','#y'+get.translation(event.name),'作废了');
-								player.discard(event.card);
+								game.cardsDiscard(event.card);
 								bool=false;
 							}
 							for(var i=0;i<event.betray.length;i++){
@@ -225,7 +225,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						else{
 							game.log(player,'使用的','#y'+get.translation(event.name),'作废了');
-							player.discard(event.card);
+							game.cardsDiscard(event.card);
 							bool=false;
 							game.asyncDraw(event.betray);
 							game.delay();

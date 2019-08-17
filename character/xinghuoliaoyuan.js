@@ -4034,20 +4034,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				chooseButton:{
 					dialog:function (){
-						var list=['sha','tao','jiu','taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman'];
-						if(get.mode()=='guozhan'){
-							list=list.concat(['xietianzi','shuiyanqijunx','lulitongxin','lianjunshengyan','chiling','diaohulishan','yuanjiao','huoshaolianying']);
-						}
-						for(var i=0;i<list.length;i++){
-							if(i<3){
-								list[i]=['基本','',list[i]];
+						var list=[];
+						for(var i=0;i<lib.inpile.length;i++){
+							var name=lib.inpile[i];
+							if(name=='wuxie') continue;
+							if(name=='sha'){
+								list.push(['基本','','sha']);
+								list.push(['基本','','sha','fire']);
+								list.push(['基本','','sha','thunder']);
 							}
-							else{
-								list[i]=['锦囊','',list[i]];
-							}
+							else if(get.type(name)=='trick') list.push(['锦囊','',name]);
+							else if(get.type(name)=='basic') list.push(['基本','',name]);
 						}
-						list.push(['基本','','sha','fire']);
-						list.push(['基本','','sha','thunder']);
 						return ui.create.dialog('蛊惑',[list,'vcard']);
 					},
 					filter:function (button,player){
@@ -4086,6 +4084,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.logSkill('guhuo_guess');
 					player.addTempSkill('guhuo_phase');
 					player.popup(trigger.card.name,'metal');
+					player.lose(trigger.cards,ui.special);
 					player.line(trigger.targets,trigger.card.nature);
 					trigger.line=false;
 					event.prompt=get.translation(player)+'声明了'+get.translation(trigger.card.name)+'，是否质疑？';
@@ -4121,7 +4120,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						event.guessers[0].popup('质疑正确','wood');
 						game.log(player,'使用的',trigger.card,'作废了');
-						player.discard(trigger.cards);
+						game.cardsDiscard(trigger.cards);
 						trigger.cancel();
 					}
 				},
@@ -4210,6 +4209,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('guhuo_guess');
 						player.popup(event.name,'metal');
 						event.card=result.cards[0];
+						player.lose(event.card,ui.special);
 						event.prompt=get.translation(player)+'声明了'+get.translation(event.name)+'，是否质疑？';
 						event.guessers=game.filterPlayer(function(current){
 							return current!=player&&!current.hasSkill('chanyuan');
@@ -4244,7 +4244,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						event.guessers[0].popup('质疑正确','wood');
 						game.log(player,'打出的','#y'+get.translation(event.name),'作废了');
-						player.discard(event.card);
+						game.cardsDiscard(event.card);
 						event.finish();
 					}
 					"step 5"
@@ -4508,8 +4508,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"phaseJudgeBefore",
 				},
 				forced:true,
+				priority:15,
 				content:function (){
 					trigger.cancel();
+					game.log(player,'跳过了判定阶段');
 				},
 			},
 			"pcaudio_wolong_card":{

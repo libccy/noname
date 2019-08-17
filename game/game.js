@@ -10030,6 +10030,70 @@
 				},
 				arrangeTrigger:function(){
 					'step 0'
+					event.filter1=function(info){
+						return lib.filter.filterTrigger(trigger,info[1],event.triggername,info[0]);
+					}
+					event.filter2=function(info2){
+					 var info=lib.skill[info2[0]];
+					 if(!lib.translate[info2[0]]||info2[0].indexOf('_')==0||info.popup===false||info.silent) return false;
+					 return true;
+					}
+					event.filter3=function(info,info2){
+						return event.filter2(info2)&&event.filter1(info2)&&info2[1]==info[1]&&info[2]==info2[2]&&info[1].hasSkill(info2[0],true);
+					}
+					event.num=0;
+					event.used=[];
+					'step 1'
+					var bool=false;
+					var list=event.list;
+					for(var i=0;i<list.length;i++){
+						if(event.filter1(list[i])){
+							bool=true;
+							event.num=i;
+							break;
+						}
+					}
+					if(!bool){
+						if(trigger._triggering==this){
+							delete trigger._triggering;
+						}
+						event.finish();
+						return;
+					}
+					event.choice=[];
+					if(event.num<list.length-1&&event.filter2(list[event.num])){
+						var current=list[event.num];
+						event.choice.push(current);
+						for(var i=event.num+1;i<list.length;i++){
+							if(event.filter3(current,list[i])) event.choice.push(list[i]);
+						}
+					}
+					if(event.choice.length<2) event.goto(4);
+					'step 2'
+					var controls=[];
+					event.current=event.choice[0][1]
+					for(var i=0;i<event.choice.length;i++){
+						controls.push(event.choice[i][0]);
+					}
+					event.current.chooseControl(controls).set('prompt','选择下一个触发的技能');
+					'step 3'
+					if(result.control){
+						for(var i=0;i<event.list.length;i++){
+							if(event.list[i][0]==result.control&&event.list[i][1]==event.current){
+								event.num=i;break;
+							}
+						}
+					}
+					'step 4'
+					var info=event.list[event.num];
+					if(info){
+						event.used.push(info);
+						event.list.splice(event.num,1);
+						game.createTrigger(event.triggername,info[0],info[1],trigger);
+					}
+					'step 5'
+					event.goto(1);
+					/*'step 0'
 					var list=event.list;
 					if(!list.length){
 						if(trigger._triggering==this){
@@ -10093,7 +10157,7 @@
 						event.list.splice(event.num,1);
 						game.createTrigger(event.triggername,info[0],info[1],trigger);
 					}
-					event.goto(0);
+					event.goto(0);*/
 				},
 				createTrigger:function(){
 					"step 0"
@@ -14954,7 +15018,7 @@
 				},
 				uninit:function(){
 					for(var i=1;i<6;i++){
-						if(this.isDisabled(i)) this.enableEquip(i);
+						if(this.isDisabled(i)) this.$enableEquip('equip'+i);
 					}
 					
 					this.node.avatar.hide();
@@ -18645,6 +18709,7 @@
 							this.awakenSkill(skill);
 							return;
 						}
+						if(_status.event) _status.event.addTrigger(skill,this);
 						if(info.init2&&!_status.video){
 							info.init2(this,skill);
 						}
@@ -21970,6 +22035,51 @@
 				notLink:function(){
 					return this.getParent().name!='_lianhuan'&&this.getParent().name!='_lianhuan2';
 				},
+				addTrigger:function(skill,player){
+			 	if(!player) return;
+			 	var evt=this.getParent('arrangeTrigger');
+		 		if(!evt||evt.name!='arrangeTrigger'||!evt.list) return;
+		 		if(typeof skill=='string') skill=[skill];
+		 		game.expandSkills(skill);
+		 		var filter=function(content){
+		  	 if(typeof content=='string') return content==triggername;
+		  	 return content.contains(triggername);
+		  	};
+		  	var trigger=evt._trigger;
+		  	var triggername=evt.triggername;
+		  	var func=function(skillx){
+				 	var info=lib.skill[skillx];
+			  	var bool=false;
+			  	for(var i in info.trigger){
+			  	 if(i!='global'&&trigger[i]!=player) continue;
+			  	 if(filter(info.trigger[i])){bool=true;break}
+			  	}
+			  	if(!bool) return;
+ 						var priority=0;
+		 				if(info.priority){
+				 			priority=info.priority*100;
+	 					}
+			 			if(!lib.translate[skillx]||skillx.indexOf('_')==0||info.popup===false||info.silent){
+ 							priority++;
+	 					}
+						var toadd=[skillx,player,priority];
+						if(evt.used){
+							for(var i=0;i<evt.used.length;i++){
+								if(evt.used[i][0]==toadd[0]&&evt.used[i][1]==toadd[1]) return;
+							}
+						};
+						for(var i=0;i<evt.list.length;i++){
+							if(evt.list[i][0]==toadd[0]&&evt.list[i][1]==toadd[1]) return;
+						}
+						evt.list.add(toadd);
+						evt.list.sort(function(a,b){
+							return b[2]-a[2];
+						});
+					}
+					for(var j=0;j<skill.length;j++){
+						func(skill[j]);
+					}
+				},
 				trigger:function(name){
 					if(_status.video) return;
 					if(name==='gameStart'){
@@ -22002,7 +22112,7 @@
 						if(info.priority){
 							num=info.priority*100;
 						}
-						if(info.forced){
+						if(!lib.translate[skill]||skill.indexOf('_')==0||info.popup===false||info.silent){
 							num++;
 						}
 						list.push([skill,player,num]);
@@ -22116,6 +22226,7 @@
 						next.list=list;
 						next._trigger=event;
 						next.triggername=name;
+						//next.starter=start;
 						event._triggering=next;
 					}
 				},
@@ -22804,6 +22915,33 @@
 					return 5;
 				}
 				var del=groupSort(a)-groupSort(b);
+				if(del!=0) return del;
+				var aa=a,bb=b;
+				if(a.indexOf('_')!=-1){
+					a=a.slice(a.indexOf('_')+1);
+				}
+				if(b.indexOf('_')!=-1){
+					b=b.slice(b.indexOf('_')+1);
+				}
+				if(a!=b){
+					return a>b?1:-1;
+				}
+				return aa>bb?1:-1;
+			},
+			card:function(a,b){
+				var typeSort=function(name){
+					var type=get.type(name);
+					if(!type) return 10;
+					if(type=='basic') return -1;
+					if(type=='trick') return 0;
+					if(type=='delay') return 1;
+					if(type=='equip'){
+						var type2=get.subtype(name);
+						return 1+parseInt(type2.slice(5)||7);
+					}
+					return 9;
+				}
+				var del=typeSort(a)-typeSort(b);
 				if(del!=0) return del;
 				var aa=a,bb=b;
 				if(a.indexOf('_')!=-1){
@@ -40810,6 +40948,7 @@
 						ui.create.card(ui.cardPile).init(lib.card.list[i]);
 					}
 				}
+				lib.inpile.sort(lib.sort.card);
 				game.broadcastAll(function(num){
 				    if(ui.cardPileNumber) ui.cardPileNumber.innerHTML='0轮 剩余牌: '+num;
 				},ui.cardPile.childNodes.length);
@@ -44982,7 +45121,9 @@
 					game.over('平局');
 					return [];
 				}
-				list.push(ui.cardPile.removeChild(ui.cardPile.lastChild));
+				var cardx=ui.cardPile.removeChild(ui.cardPile.lastChild);
+				cardx.original='c';
+				list.push(cardx);
 			}
 			game.updateRoundNumber();
 			if(card) return list[0];
@@ -46254,7 +46395,9 @@
 					game.over('平局');
 					return [];
 				}
-				list.push(ui.cardPile.removeChild(ui.cardPile.firstChild));
+				var cardx=ui.cardPile.removeChild(ui.cardPile.firstChild);
+				cardx.original='c';
+				list.push(cardx);
 			}
 			game.updateRoundNumber();
 			if(card) return list[0];

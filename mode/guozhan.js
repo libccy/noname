@@ -529,11 +529,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				mark:true,
 				marktext:'魂',
-				onunmark:function(player,skill){
-					_status.characterlist.addArray(player.storage[skill].character);
-					player.storage[skill].character=[];
-				},
 				intro:{
+					onunmark:function(storage,player){
+						_status.characterlist.addArray(storage.character);
+						storage.character=[];
+					},
 					mark:function(dialog,storage,player){
 						if(storage&&storage.character.length){
 							if(player.isUnderControl(true)){
@@ -829,7 +829,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(result.index==0) target.carryOutJunling(player,event.junling,targets);
 							else if(target!=player&&target.countCards('h')) {
 								event.num=target.countCards('h');
-								player.gain(target.getCard('h'),target);
+								player.gain(target.getCards('h'),target);
 								target.$give(event.num,player);
 								player.chooseCard('交给'+get.translation(target)+get.cnNumber(event.num)+'张牌','he',event.num,true).set('ai',function(card){
 									return -get.value(card);
@@ -858,7 +858,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									if(player==event.player||player.storage.gzweidi.contains(event.player)||_status.currentPhase!=player) return false;
 									if(event.cards.length){
 										if(event.getParent().name=='draw') return true;
-										for(var i=0;i<event.cards.length;i++) if(get.position(event.cards[i])=='c') return true;
+										for(var i=0;i<event.cards.length;i++) if(get.position(event.cards[i])=='c'||(!get.position(event.cards[i])&&event.cards[i].original=='c')) return true;
 									}
 									return false;
 								},
@@ -1021,7 +1021,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						global:'g_jianan',
 					},
 					g_jianan:{
-						trigger:{player:'phaseBeginStart'},
+						trigger:{player:'phaseBegin'},
 						filter:function(event,player){
 							if(!get.zhu(player,'jianan')) return false;
 							if(!player.countCards('he')) return false;
@@ -2222,7 +2222,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},
 						priority:1,
 						filter:function (event,player){
-				return event.skill=='new_longdan_shan';
+				return event.skill=='new_longdan_shan'&&event.getParent(2).name=='sha';
 			},
 						direct:true,
 						content:function (){
@@ -2498,7 +2498,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"baka_hunshang":{
 				skillAnimation:true,
 				audio:"hunshang",
-				derivation:["reyingzi","yinghun"],
+				derivation:["reyingzi","gzyinghun"],
 				viceSkill:true,
 				init:function (player){
 		if(player.checkViceSkill('baka_hunshang')&&!player.viceChanged){
@@ -2506,13 +2506,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		}
 	},
 				trigger:{
-					player:"phaseBeginStart",
+					player:"phaseBegin",
 				},
 				filter:function (event,player){
-		return player.hp==1;
+		return player.hp<=1;
 	},
 				forced:true,
-				priority:3,
+				//priority:3,
 				content:function (){
 		player.addTempSkill('baka_yingzi','phaseAfter');
 		player.addTempSkill('baka_yinghun','phaseAfter');
@@ -2537,7 +2537,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				filter:function (event,player){
 		return player.isDamaged();
 	},
-				priority:2,
+				//priority:2,
 				audio:"yinghun",
 				audioname:["sunce"],
 				trigger:{
@@ -2990,19 +2990,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				chooseButton:{
 					dialog:function (event,player){
 			var list=['yuanjiao','zhibi'];
-			if(player.storage.hmkguishu==1){
-				list.remove('yuanjiao');
-			}
-			else if(player.storage.hmkguishu==2){
-				list.remove('zhibi')
-			}
 			for(var i=0;i<list.length;i++){
 					list[i]=['锦囊','',list[i]];
 			}
-			return ui.create.dialog([list,'vcard']);
+			return ui.create.dialog('鬼术',[list,'vcard']);
 		},
 					filter:function (button,player){
-			return lib.filter.filterCard({name:button.link[2]},player,_status.event.getParent());
+			var name=button.link[2];
+			if(player.storage.hmkguishu==1&&name=='yuanjiao') return false;
+			if(player.storage.hmkguishu==2&&name=='zhibi') return false;
+			return lib.filter.filterCard({name:name},player,_status.event.getParent());
 		},
 					check:function (button){
 			var player=_status.event.player;
@@ -3109,7 +3106,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				content:function (){
 		"step 0"
-		var choice=["取消"];
+		var choice=[];
 		var skillm=lib.character[player.name1][3];
 		var skillv=lib.character[player.name2][3];
 		if(player.isUnseen(0)){
@@ -3126,7 +3123,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			}
 		}
-		if(choice.length==3) choice.push('全部明置')
+		if(choice.length==2) choice.push('全部明置')
 		player.chooseControl(choice);
 		"step 1"
 		if(result.control){
@@ -4148,7 +4145,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			jiahe_skill:{
-				trigger:{player:'phaseBeginStart'},
+				trigger:{player:'phaseBegin'},
 				direct:true,
 				audio:"jiahe",
 				filter:function(event,player){

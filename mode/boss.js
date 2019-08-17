@@ -1727,7 +1727,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							node.remove();
 						}
 					}
-
+					lib.inpile.sort(lib.sort.card);
 				}
 			},
 			boss_chiyanshilian:{
@@ -1747,6 +1747,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					lib.inpile.remove('hongshui');
 					lib.inpile.remove('fulei');
 					lib.inpile.add('honghuangzhili');
+					lib.inpile.sort(lib.sort.card);
 					for(var i=0;i<ui.cardPile.childElementCount;i++){
 						var node=ui.cardPile.childNodes[i];
 						if(node.name=='shandian'){
@@ -1888,6 +1889,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					lib.inpile.remove('fangtian');
 					lib.inpile.remove('muniu');
 					lib.inpile.addArray(['wushuangfangtianji','shufazijinguan','hongmianbaihuapao','linglongshimandai','lianjunshengyan']);
+					lib.inpile.sort(lib.sort.card);
 					var equiplist=[];
 					for(var i=0;i<ui.cardPile.childElementCount;i++){
 						var node=ui.cardPile.childNodes[i];
@@ -3134,14 +3136,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_futai2:{
 				mod:{
 					cardSavable:function(card,player){
-						if(card.name=='tao'&&game.hasPlayer(function(current){
+						if(card.name=='tao'&&!_status.event.skill&&game.hasPlayer(function(current){
 							return current!=player&&current.hasSkill('boss_futai')&&_status.currentPhase!=current;
 						})){
 							return false;
 						}
 					},
 					cardEnabled:function(card,player){
-						if(card.name=='tao'&&game.hasPlayer(function(current){
+						if(card.name=='tao'&&!_status.event.skill&&game.hasPlayer(function(current){
 							return current!=player&&current.hasSkill('boss_futai')&&_status.currentPhase!=current;
 						})){
 							return false;

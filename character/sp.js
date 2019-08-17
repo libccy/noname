@@ -3914,9 +3914,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							//ui.auto.show();
 							player.removeSkill('kuangcai_use');
 							player.removeSkill('kuangcai_cancel');
+							delete player.storage.counttrigger.kuangcai_use;
 						}
 					}
-				}
+				},
+				ai:{
+					threaten:4.5,
+				},
 			},
 			shejian:{
 				audio:2,
@@ -8731,7 +8735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<result.cards.length;i++){
 							suits.add(get.suit(result.cards[i]));
 						}
-						if(suits.length==4){
+						if(suits.length==4&&game.checkMod({name:'tao'},player,'unchanged','cardSavable',player)){
 							event.target.useCard({name:'tao'},trigger.player);
 						}
 					}
@@ -11899,6 +11903,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.target.countCards('h')>0;
 				},
 				logTarget:'target',
+				prompt2:'每当你发动“龙胆”使用或打出一张手牌时，你可以立即获得对方的一张手牌。',
 				content:function(){
 					var card=trigger.target.getCards('h').randomGet();
 					player.gain(card,trigger.target);
@@ -11915,6 +11920,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.source&&event.source.countCards('h')>0;
 				},
 				logTarget:'source',
+				prompt2:'每当你发动“龙胆”使用或打出一张手牌时，你可以立即获得对方的一张手牌。',
 				content:function(){
 					var card=trigger.source.getCards('h').randomGet();
 					player.gain(card,trigger.source);
@@ -12553,11 +12559,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diaodu:"调度",
 			diaodu_info:"当你使用装备牌时，你可以摸一张牌；出牌阶段开始时，你可以获得一名其他角色装备区里的一张牌，然后你可以将此牌交给另一名角色。",
 			diancai:'典财',
-			diancai_info:'其他角色的出牌阶段结束时，若你于此阶段失去了x张或更多的牌，则你可以将手牌摸至体力上限。',
+			diancai_info:'其他角色的出牌阶段结束时，若你于此阶段失去了X张或更多的牌，则你可以将手牌摸至体力上限。（X为你的体力值）',
 			zhengbi:'征辟',
-					zhengbi_info:'出牌阶段开始时，你可以选择一项：选择一名未受伤的其他角色，你对其使用的牌无距离限制且不计入使用次数直到回合结束；或将一张基本牌交给一名其他角色，然后其交给你一张非基本牌或两张基本牌。',
-					fengying:'奉迎',
-					fengying_info:'限定技，出牌阶段，你可以弃置所有手牌。若如此做，你可以令等量的角色将手牌摸至X张(X为其手牌上限且至多为5)。然后，你结束出牌阶段，并在当前回合结束后进行一个新的回合。',
+			zhengbi_info:'出牌阶段开始时，你可以选择一项：选择一名未受伤的其他角色，你对其使用的牌无距离限制且不计入使用次数直到回合结束；或将一张基本牌交给一名其他角色，然后其交给你一张非基本牌或两张基本牌。',
+			fengying:'奉迎',
+			fengying_info:'限定技，出牌阶段，你可以弃置所有手牌。若如此做，你可以令等量的角色将手牌摸至X张(X为其手牌上限且至多为5)。然后，你结束出牌阶段，并在当前回合结束后进行一个新的回合。',
 			
 			qingzhong:'清忠',
 			qingzhong_info:'出牌阶段开始时，你可以摸两张牌，若如此做，本阶段结束时，你与手牌数最少的角色交换手牌。',
