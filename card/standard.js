@@ -93,7 +93,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					else{
 						var next=target.chooseToRespond({name:'shan'});
 						if(event.shanRequired>1){
-							next.set('prompt2','（共需打出张'+event.shanRequired+'闪）');
+							next.set('prompt2','（共需打出'+event.shanRequired+'张闪）');
 						}
 						next.set('ai',function(card){
 							var target=_status.event.player;
