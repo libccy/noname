@@ -4,8 +4,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'old',
 		characterSort:{
 			old:{
-				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_chenqun","old_zhuhuan","old_zhuzhi"],
-				old_yijiang:["masu","xushu","fazheng","liru","yujin","xin_yujin","old_zhonghui","old_xusheng","old_zhuran","old_lingtong","old_madai","old_caoxiu","old_wangyi","old_caozhen","old_quancong"],
+				old_shenhua:["yuji","zhangjiao","old_zhugezhan"],
+				old_yijiang:["masu","xushu","fazheng","liru","yujin","xin_yujin","old_zhonghui","old_xusheng","old_zhuran","old_lingtong","old_madai","old_caoxiu","old_wangyi","old_caozhen","old_quancong","old_chenqun","old_zhuhuan","old_zhuzhi"],
 				old_sp:["old_lingju","old_maliang","old_machao","zhangliang"],
 			},
 		},
