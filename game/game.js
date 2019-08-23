@@ -36,6 +36,7 @@
 		characterTitle:{},
 		characterPack:{},
 		characterFilter:{},
+		characterSort:{},
 		cardPack:{},
 		onresize:[],
 		onphase:[],
@@ -3366,6 +3367,10 @@
 					background_speak:{
 						name:'人物配音',
 						init:true,
+					},
+					equip_audio:{
+						name:'装备配音',
+						init:false,
 					},
 					volumn_audio:{
 						name:'音效音量',
@@ -9930,7 +9935,7 @@
 					var i,j,k;
 					for(i in character){
 						if(character[i].character){
-							lib.characterPack[i]=character[i].character
+							lib.characterPack[i]=character[i].character;
 						}
 						if(character[i].forbid&&character[i].forbid.contains(lib.config.mode)) continue;
 						if(character[i].mode&&character[i].mode.contains(lib.config.mode)==false) continue;
@@ -9940,7 +9945,7 @@
 							continue;
 						}
 						for(j in character[i]){
-							if(j=='mode'||j=='forbid') continue;
+							if(j=='mode'||j=='forbid'||j=='characterSort') continue;
 							for(k in character[i][j]){
 								if(j=='character'){
 									if(!character[i][j][k][4]){
@@ -12851,6 +12856,7 @@
 					if(cardaudio){
 						game.broadcastAll(function(player,card){
 							if(lib.config.background_audio){
+								if(get.type(card)=='equip'&&!lib.config.equip_audio) return;
 								var sex=player.sex=='female'?'female':'male';
 								var audioinfo=lib.card[card.name].audio;
 								// if(audioinfo||true){
@@ -22937,7 +22943,8 @@
 					if(type=='delay') return 1;
 					if(type=='equip'){
 						var type2=get.subtype(name);
-						return 1+parseInt(type2.slice(5)||7);
+						if(type2&&type2.slice) return 1+parseInt(type2.slice(5)||7);
+						return 8.5
 					}
 					return 9;
 				}
@@ -33823,6 +33830,7 @@
 						node.mode=mode;
 						page.node=node;
 						var list=[];
+						var boolAI=true;
 						var alterableSkills=[];
 						var alterableCharacters=[];
 						var charactersToAlter=[];
@@ -33830,6 +33838,7 @@
 							if(info[i][4]&&info[i][4].contains('unseen')) continue;
 							if(connectMenu&&lib.connectBanned.contains(i)) continue;
 							list.push(i);
+							if(boolAI&&!lib.config.forbidai_user.contains(i)) boolAI=false;
 							for(var j=0;j<info[i][3].length;j++){
 								if(!lib.skill[info[i][3][j]]){
 									continue;
@@ -33868,14 +33877,36 @@
 							}
 							return aa>bb?1:-1;
 						});
+						var list2=list.slice(0);
 						var cfgnode=createConfig({
 							name:'开启',
 							_name:mode,
 							init:lib.config.characters.contains(mode),
 							onclick:togglePack
 						});
+						var cfgnodeAI=createConfig({
+							name:'AI禁选',
+							_name:mode,
+							init:boolAI,
+							intro:'将该武将包内的武将全部设置为AI禁选',
+							onclick:function(bool){
+								if(bool){
+									for(var i=0;i<list.length;i++){
+										lib.config.forbidai_user.add(list[i]);
+									}
+								}
+								else{
+									for(var i=0;i<list.length;i++){
+										lib.config.forbidai_user.remove(list[i]);
+									}
+								}
+								game.saveConfig('forbidai_user',lib.config.forbidai_user);
+							},
+						});
 						if(mode.indexOf('mode_')!=0){
+						cfgnodeAI.style.marginTop='0px';
 							page.appendChild(cfgnode);
+							page.appendChild(cfgnodeAI);
 							if(alterableCharacters.length){
 								var cfgnode2=createConfig({
 									name:'新版替换',
@@ -33901,6 +33932,9 @@
 								cfgnode2.style.marginTop='0px';
 								page.appendChild(cfgnode2);
 							}
+						}
+						else if(mode.indexOf('mode_extension')==0){
+							page.appendChild(cfgnodeAI);
 						}
 						else{
 							page.style.paddingTop='8px';
@@ -33946,14 +33980,100 @@
 								this.classList.remove('banned');
 							}
 						};
-						var buttons=ui.create.buttons(list,'character',page);
-						for(var i=0;i<buttons.length;i++){
-							buttons[i].classList.add('noclick');
-							buttons[i].listen(banCharacter);
-							buttons[i].node.hp.style.transition='all 0s';
-							buttons[i].node.hp._innerHTML=buttons[i].node.hp.innerHTML;
-							if(mode!='mode_banned'){
-								buttons[i].updateBanned=updateBanned;
+						if(lib.characterSort[mode]){
+							var listb=[];
+							if(!connectMenu){
+								listb=lib.config[get.mode()+'_banned']||[];
+							}
+							else{
+							var modex=menux.pages[0].firstChild.querySelector('.active');
+								if(modex&&modex.mode){
+									listb=lib.config['connect_'+modex.mode+'_banned'];
+								}
+							}
+							for(var pak in lib.characterSort[mode]){
+								var info=lib.characterSort[mode][pak];
+								var listx=[];
+								var boolx=false;
+								for(var ii=0;ii<list2.length;ii++){
+									if(info.contains(list2[ii])){
+										listx.add(list2[ii]);
+										if(!listb.contains(list2[ii])) boolx=true;
+										list2.splice(ii--,1);
+									}
+								}
+								if(listx.length){
+									var cfgnodeX=createConfig({
+										name:lib.translate[pak],
+										_name:pak,
+										init:boolx,
+										onclick:function(bool){
+											var banned=[];
+											if(connectMenu){
+												var modex=menux.pages[0].firstChild.querySelector('.active');
+												if(modex&&modex.mode){
+													banned=lib.config['connect_'+modex.mode+'_banned'];
+												}
+											}
+											else if(_status.connectMode) return;
+											else banned=lib.config[get.mode()+'_banned']||[];
+											var listx=lib.characterSort[mode][this._link.config._name];
+											if(bool){
+												for(var i=0;i<listx.length;i++){
+													banned.remove(listx[i]);
+												}
+											}
+											else{
+												for(var i=0;i<listx.length;i++){
+													banned.add(listx[i]);
+												}
+											}
+											game.saveConfig(connectMenu?('connect_'+modex.mode+'_banned'):(get.mode()+'_banned'),banned);
+											updateActive();
+										},
+									});
+									page.appendChild(cfgnodeX);
+									var buttons=ui.create.buttons(listx,'character',page);
+									for(var i=0;i<buttons.length;i++){
+										buttons[i].classList.add('noclick');
+										buttons[i].listen(banCharacter);
+										buttons[i].node.hp.style.transition='all 0s';
+										buttons[i].node.hp._innerHTML=buttons[i].node.hp.innerHTML;
+										if(mode!='mode_banned'){
+											buttons[i].updateBanned=updateBanned;
+										}
+									}
+								}
+							}
+							if(list2.length){
+								var cfgnodeX=createConfig({
+									name:'其他',
+									_name:'others',
+									clear:true,
+								});
+								page.appendChild(cfgnodeX);
+								var buttons=ui.create.buttons(list2,'character',page);
+								for(var i=0;i<buttons.length;i++){
+									buttons[i].classList.add('noclick');
+									buttons[i].listen(banCharacter);
+									buttons[i].node.hp.style.transition='all 0s';
+									buttons[i].node.hp._innerHTML=buttons[i].node.hp.innerHTML;
+									if(mode!='mode_banned'){
+										buttons[i].updateBanned=updateBanned;
+									}
+								}
+							}
+						}
+						else{
+							var buttons=ui.create.buttons(list,'character',page);
+							for(var i=0;i<buttons.length;i++){
+								buttons[i].classList.add('noclick');
+								buttons[i].listen(banCharacter);
+								buttons[i].node.hp.style.transition='all 0s';
+								buttons[i].node.hp._innerHTML=buttons[i].node.hp.innerHTML;
+								if(mode!='mode_banned'){
+									buttons[i].updateBanned=updateBanned;
+								}
 							}
 						}
 						page.classList.add('menu-buttons');
@@ -40638,7 +40758,14 @@
 
 					case 'text':
 					node=ui.create.div('.button.text',position);
-					node.innerHTML=lib.get.translate(item);
+					node.link=item;
+					node.innerHTML=item;
+					break;
+					
+					case 'textButton':
+					node=ui.create.div('.caption',position);
+					node.link=item;
+					node.innerHTML=item;
 					break;
 				}
 				if(!noclick){
