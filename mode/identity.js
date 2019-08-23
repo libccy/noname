@@ -290,7 +290,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					identity:players[i].identity
 				});
 			}
-			_status.videoInited=true,
+			_status.videoInited=true;
 			game.addVideo('init',null,info);
 
 			game.gameDraw(game.zhong||game.zhu||_status.firstAct||game.me);

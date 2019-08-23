@@ -209,6 +209,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						derivation:'guozhan',
 					},
 		},
+		characterSort:{
+		 mode_guozhan:{
+			 guozhan_default:["gz_caocao","gz_simayi","gz_xiahoudun","gz_zhangliao","gz_xuzhu","gz_guojia","gz_zhenji","gz_xiahouyuan","gz_zhanghe","gz_xuhuang","gz_caoren","gz_dianwei","gz_xunyu","gz_caopi","gz_yuejin","gz_liubei","gz_guanyu","gz_zhangfei","gz_zhugeliang","gz_zhaoyun","gz_machao","gz_huangyueying","gz_huangzhong","gz_weiyan","gz_pangtong","gz_sp_zhugeliang","gz_liushan","gz_menghuo","gz_zhurong","gz_ganfuren","gz_sunquan","gz_ganning","gz_lvmeng","gz_huanggai","gz_zhouyu","gz_daqiao","gz_luxun","gz_sunshangxiang","gz_sunjian","gz_xiaoqiao","gz_taishici","gz_zhoutai","gz_re_lusu","gz_zhangzhang","gz_dingfeng","gz_huatuo","gz_lvbu","gz_diaochan","gz_re_yuanshao","gz_yanwen","gz_jiaxu","gz_pangde","gz_zhangjiao","gz_caiwenji","gz_mateng","gz_kongrong","gz_jiling","gz_tianfeng","gz_panfeng","gz_zoushi",],
+			 guozhan_zhen:["gz_dengai","gz_caohong","gz_jiangfei","gz_jiangwei","gz_xusheng","gz_jiangqing","gz_hetaihou","gz_yuji"],
+			 guozhan_shi:[,"gz_re_lidian","gz_zangba","gz_madai","gz_mifuren","gz_sunce","gz_chendong","gz_sp_dongzhuo","gz_zhangren"],
+			 guozhan_bian:["gz_liqueguosi","gz_zuoci","gz_bianfuren","gz_xunyou","gz_lingtong","gz_lvfan","gz_masu","gz_shamoke",],
+			 guozhan_quan:["gz_cuimao","gz_yujin","gz_wangping","gz_fazheng","gz_wuguotai","gz_lukang","gz_yuanshu","gz_zhangxiu"],
+			 guozhan_jun:["gz_jun_caocao","gz_jun_sunquan","gz_jun_liubei","gz_jun_zhangjiao"],
+			 guozhan_others:["gz_lingcao","gz_lifeng","gz_beimihu"],
+		 }
+		},
 		characterPack:{
 			mode_guozhan:{
 				gz_shibing1wei:['male','wei',0,[],['unseen']],
@@ -313,7 +324,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_lingtong:['male','wu',4,['xuanlve','yongjin'],['gzskin']],
 				gz_lvfan:['male','wu',3,['xindiaodu','gzdiancai']],
 				gz_masu:['male','shu',3,['sanyao','gzzhiman'],['gzskin']],
-				gz_shamoke:['male','shu',4,['gzjili']],
+				gz_shamoke:['male','shu',4,['gzjili'],['gzskin']],
 				
 				gz_lingcao:['male','wu',4,['dujin']],
 				gz_lifeng:['male','shu',3,['tunchu','shuliang']],
@@ -7575,6 +7586,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzxiaoguo_info:'其他角色的结束阶段开始时，你可以弃置一张基本牌，令该角色选择一项：1.弃置一张装备牌；2.受到你对其造成的1点伤害。',
 			gzduanliang:'断粮',
 			gzduanliang_info:'你可以将一张黑色基本牌或黑色装备牌当【兵粮寸断】使用；你可以对距离为2的角色使用【兵粮寸断】',
+			
+			guozhan_default:"国战标准",
+			guozhan_zhen:"君临天下•阵",
+			guozhan_shi:"君临天下•势",
+			guozhan_bian:"君临天下•变",
+			guozhan_quan:"君临天下•权",
+			guozhan_jun:"君主武将",
+			guozhan_others:"其他",
 		},
 		junList:['liubei','zhangjiao','sunquan','caocao'],
 		guozhanPile:[

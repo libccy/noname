@@ -126,12 +126,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				// uiintro.add('<div class="text chat">屏蔽弱将：'+(lib.configOL.ban_weak?'开启':'关闭'));
 				// var last=uiintro.add('<div class="text chat">屏蔽强将：'+(lib.configOL.ban_strong?'开启':'关闭'));
 				if(lib.configOL.banned.length){
-					last=uiintro.add('<div class="text chat">禁用武将：'+get.translation(lib.configOL.banned));
+					uiintro.add('<div class="text chat">禁用武将：'+get.translation(lib.configOL.banned));
 				}
 				if(lib.configOL.bannedcards.length){
-					last=uiintro.add('<div class="text chat">禁用卡牌：'+get.translation(lib.configOL.bannedcards));
+					uiintro.add('<div class="text chat">禁用卡牌：'+get.translation(lib.configOL.bannedcards));
 				}
-				last.style.paddingBottom='8px';
+				uiintro.style.paddingBottom='8px';
 			},
 			getVideoName:function(){
 				var str=get.translation(game.me.name);
