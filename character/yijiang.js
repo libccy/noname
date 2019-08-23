@@ -4,6 +4,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'yijiang',
 		connect:true,
 		connectBanned:['qinmi'],
+		characterSort:{
+			yijiang:{
+				yijiang_2011:['caozhi','re_yujin','zhangchunhua','xin_fazheng','xin_masu','xin_xushu','xusheng','lingtong','wuguotai','chengong','gaoshun'],
+				yijiang_2012:['wangyi','xunyou','zhonghui','madai','liaohua','guanzhang','bulianshi','handang','chengpu','liubiao','old_huaxiong'],
+				yijiang_2013:['manchong','guohuai','caochong','guanping','liufeng','jianyong','yufan','panzhangmazhong','zhuran','xin_liru','fuhuanghou'],
+				yijiang_2014:['hanhaoshihuan','chenqun','caozhen','zhangsong','wuyi','zhoucang','zhuhuan','guyong','sunluban','yj_jushou','caifuren'],
+				yijiang_2015:['caoxiu','caorui','zhongyao','xiahoushi','liuchen','zhangyi','zhuzhi','quancong','sunxiu','gongsunyuan','guotufengji'],
+				yijiang_2016:['guohuanghou','sunziliufang','huanghao','liyan','sundeng','cenhun','zhangrang','liuyu'],
+				yijiang_2017:['xinxianying','jikang','wuxian','qinmi','xuezong','xushi','caiyong','caojie',],
+			},
+		},
 		character:{
 			guohuai:['male','wei',4,['jingce']],
 			zhangchunhua:['female','wei',3,['jueqing','shangshi']],
@@ -714,13 +725,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'player',
 				check:function(event,player){
 					if(get.attitude(player,event.player)>=0) return true;
-					if(player.hasSkill('funan_jiexun')&&player.storage.funan_jiexun==event.player) return true;
+					if(player.hasSkill('funan_jiexun')) return true;
 					if(event.cards.length>1) return true;
 					return get.value(event.cards[0])>get.value(event.respondTo[1]);
 				},
 				content:function(){
 					'step 0'
-					if(!player.hasSkill('funan_jiexun')||player.storage.funan_jiexun!=trigger.player){
+					if(!player.hasSkill('funan_jiexun')){
 						trigger.player.gain(trigger.respondTo[1],'gain2');
 						trigger.player.addTempSkill('funan_use');
 						if(!trigger.player.storage.funan_use){
@@ -733,19 +744,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					jiexun:{
-						mark:'character',
+						mark:true,
 						intro:{
-							content:'你发动“复难”时，无须令$获得你使用的牌'
+							content:'你发动“复难”时，无须令其他角色获得你使用的牌'
 						},
-						trigger:{global:'dieAfter'},
-						silent:true,
-						filter:function(event,player){
-							return player.storage.funan_jiexun==event.player;
-						},
-						onremove:true,
-						content:function(){
-							player.removeSkill('funan_jiexun');
-						}
 					},
 					use:{
 						onremove:true,
@@ -812,7 +814,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					if(!event.target.countCards('he')){
 						player.removeSkill('jiexun');
-						player.storage.funan_jiexun=event.target;
 						player.addSkill('funan_jiexun');
 					}
 				}
@@ -2419,10 +2420,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			taoluan:{
 				enable:'chooseToUse',
 				filter:function(event,player){
-					return !player.hasSkill('taoluan3')&&player.countCards('he')>0&&!_status.dying.length;
+					return event.type!='wuxie'&&!player.hasSkill('taoluan3')&&player.countCards('he')>0&&!_status.dying.length;
 				},
 				init:function(player){
-					player.storage.taoluan=[];
+					if(!player.storage.taoluan) player.storage.taoluan=[];
 				},
 				chooseButton:{
 					dialog:function(event,player){
@@ -2517,7 +2518,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					prompt:function(links,player){
-						return '选择'+(get.translation(links[0][3])||'')+get.translation(links[0][2])+'的目标';
+						return '将一张牌当做'+(get.translation(links[0][3])||'')+get.translation(links[0][2])+'使用';
 					}
 				},
 				ai:{
@@ -2539,7 +2540,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					threaten:1.9,
 				},
-				group:['taoluan2','taoluan4']
+				group:['taoluan2','taoluan4','taoluan5']
 			},
 			taoluan2:{
 				trigger:{player:['useCardAfter','respondAfter']},
@@ -2611,24 +2612,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			taoluan5:{
-				/*enable:'chooseToUse',
+				audio:'taoluan',
+				enable:'chooseToUse',
+				prompt:'将一张牌当做无懈可击使用',
 				filter:function(event,player){
-					return event.type=='dying'&&!player.storage.taoluan.contains('tao');
+					return !player.storage.taoluan.contains('wuxie');
 				},
 				onuse:function(result,player){
-					player.storage.taoluan.add('tao');
+					player.storage.taoluan.add('wuxie');
 				},
 				filterCard:true,
 				position:'he',
 				selectCard:1,
-				viewAs:{name:'tao'},
-				ai:{
-					skillTagFilter:function(player){
-						return !player.storage.taoluan.contains('tao');
-					},
-					threaten:1.5,
-					save:true,
-				}*/
+				viewAs:{name:'wuxie'},
 			},
 			taoluan_backup:{},
 			jishe:{
@@ -10138,6 +10134,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhichi_info:'锁定技，你的回合外，你每受到一次伤害，任何【杀】或普通锦囊牌均对你无效，直到该回合结束。',
 			zhichi2_info:'智迟已发动',
 			pojun_info:'你每使用【杀】造成一次伤害，可令受到该伤害的角色多摸X张牌，X为该角色当前的体力值(X最多为5)，然后该角色将其武将牌翻面。',
+			
+			yijiang_2011:'一将成名2011',
+			yijiang_2012:'一将成名2012',
+			yijiang_2013:'一将成名2013',
+			yijiang_2014:'一将成名2014',
+			yijiang_2015:'一将成名2015',
+			yijiang_2016:'原创设计2016',
+			yijiang_2017:'原创设计2017',
 		},
 	};
 });

@@ -2,6 +2,13 @@
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'old',
+		characterSort:{
+			old:{
+				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_chenqun","old_zhuhuan","old_zhuzhi"],
+				old_yijiang:["masu","xushu","fazheng","liru","yujin","xin_yujin","old_zhonghui","old_xusheng","old_zhuran","old_lingtong","old_madai","old_caoxiu","old_wangyi","old_caozhen","old_quancong"],
+				old_sp:["old_lingju","old_maliang","old_machao","zhangliang"],
+			},
+		},
 		character:{
 			yuji:['male','qun',3,['old_guhuo'],['forbidai']],
 			zhangjiao:['male','qun',3,['leiji','guidao','huangtian'],['zhu']],
@@ -836,6 +843,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldqianxi_info:'当你使用【杀】对距离为1的目标角色造成伤害时，你可以进行一次判定，若判定结果不为红桃，你防止此伤害，令其减1点体力上限',
 			oldxuanfeng:'旋风',
 			oldxuanfeng_info:'每当你失去一次装备区里的牌时，你可以执行下列两项中的一项：1.视为对任意一名其他角色使用一张【杀】（此【杀】不计入每回合的使用限制）；2.对与你距离1以内的一名其他角色造成一点伤害',
+			
+			old_shenhua:'神话再临',
+			old_yijiang:'一将成名',
+			old_sp:'SP',
 		}
 	};
 });

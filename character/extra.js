@@ -836,16 +836,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wushen:{
 				mod:{
 					cardEnabled:function(card,player){
-						if(_status.event.skill!='wushen'&&card.name!='sha'&&get.suit(card)=='heart') return false;
+						if(_status.event.skill==undefined&&card.name!='sha'&&get.suit(card)=='heart') return false;
 					},
 					cardUsable:function(card,player){
-						if(_status.event.skill!='wushen'&&card.name!='sha'&&get.suit(card)=='heart') return false;
+						if(_status.event.skill==undefined&&card.name!='sha'&&get.suit(card)=='heart') return false;
 					},
 					cardRespondable:function(card,player){
-						if(_status.event.skill!='wushen'&&card.name!='sha'&&get.suit(card)=='heart') return false;
+						if(_status.event.skill==undefined&&card.name!='sha'&&get.suit(card)=='heart') return false;
 					},
 					cardSavable:function(card,player){
-						if(_status.event.skill!='wushen'&&card.name!='sha'&&get.suit(card)=='heart') return false;
+						if(_status.event.skill==undefined&&card.name!='sha'&&get.suit(card)=='heart') return false;
 					},
 					targetInRange:function(card){
 						if(get.suit(card)=='heart'||_status.event.skill=='wushen') return true;
@@ -2416,26 +2416,64 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 						},
 					},
-					'drlt_jieying':{
-						audio:2,
+					drlt_jieying_mark:{
+						init:function(player){
+							game.log(player,'获得了“营”标记');
+						},
+						onremove:function(player){
+							game.log(player,'失去了“营”标记');
+						},
+						mark:true,
 						marktext:"营",
 						intro:{
 							content:function(storage){
 								return '已获得“营”标记';
 							},
 						},
+						mod:{
+							cardUsable:function (card,player,num){
+								if(game.hasPlayer(function(current){
+									return current.hasSkill('drlt_jieying');
+								})&&card.name=='sha') return num+1;
+							},
+							maxHandcard:function (player,num){
+								if(game.hasPlayer(function(current){
+									return current.hasSkill('drlt_jieying');
+								})) return num+1;
+							},
+						},
+						audio:'drlt_jieying',
+						trigger:{
+							player:'phaseDrawBegin'
+						},
+						forced:true,
+						filter:function(event,player){
+							return game.hasPlayer(function(current){
+								return current.hasSkill('drlt_jieying');
+							});
+						},
+						content:function(){
+							trigger.num++;
+						},
+					},
+					'drlt_jieying':{
+						audio:2,
+						locked:false,
 						group:["drlt_jieying_1","drlt_jieying_2","drlt_jieying_3"],
 						subSkill:{
 							'1':{
 								audio:'drlt_jieying',
 								trigger:{
-									global:'gameStart'
+									player:'phaseBegin'
 								},
 								forced:true,
+								filter:function(event,player){
+									return !game.hasPlayer(function(current){
+										return current.hasSkill('drlt_jieying_mark');
+									});
+								},
 								content:function(){
-									player.storage.drlt_jieying=player;
-									player.markSkill('drlt_jieying');
-									game.log(player,'获得了“营”标记');
+									player.addSkill('drlt_jieying_mark');
 								},
 							},
 							'2':{
@@ -2444,6 +2482,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									player:"phaseEnd",
 								},
 								direct:true,
+								filter:function(event,player){
+									return player.hasSkill('drlt_jieying_mark');
+								},
 								content:function(){
 									'step 0'
 									player.chooseTarget(get.prompt('drlt_jieying'),function(card,player,target){
@@ -2463,62 +2504,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(result.bool){
 										var target=result.targets[0];
 										player.line(target);
-										player.logSkill('drlt_jieying');
-										player.storage.drlt_jieying=target;
-										target.storage.drlt_jieying2=player;
-										player.unmarkSkill('drlt_jieying');
-										game.log(player,'失去了“营”标记');
-										target.markSkill('drlt_jieying');
-										game.log(target,'获得了“营”标记');
+										player.logSkill('drlt_jieying',target);
+										target.addSkill('drlt_jieying_mark');
 									};
 								},
 							},
 							'3':{
 								audio:'drlt_jieying',
 								trigger:{
-									global:['phaseAfter','dieAfter']
+									global:'phaseAfter',
 								},
 								forced:true,
 								filter:function(event,player){
-									return player.storage.drlt_jieying==event.player&&player!=event.player;
+									return player!=event.player&&event.player.hasSkill('drlt_jieying_mark')&&event.player.isAlive();
 								},
 								logTarget:'player',
-								content:function(){		
-									if(trigger.player.isAlive()){
-										if(trigger.player.countCards('h')>0){
-											trigger.player.give(trigger.player.getCards('h'),player);
-										}
-										delete trigger.player.storage.drlt_jieying2;
-										trigger.player.unmarkSkill('drlt_jieying');
-										game.log(trigger.player,'失去了“营”标记');
+								content:function(){
+									if(trigger.player.countCards('h')>0){
+										trigger.player.give(trigger.player.getCards('h'),player);
 									}
-									player.storage.drlt_jieying=player;
-									player.markSkill('drlt_jieying');
-									game.log(player,'获得了“营”标记');
+									trigger.player.removeSkill('drlt_jieying_mark');
 								},
 							},
-						},
-						global:'g_drlt_jieying',
-					},
-					'g_drlt_jieying':{
-						mod:{
-							cardUsable:function (card,player,num){
-								if((player.storage.drlt_jieying==player||(player.storage.drlt_jieying2&&player.storage.drlt_jieying2.isAlive()&&player.storage.drlt_jieying2.storage.drlt_jieying==player))&&card.name=='sha') return num+1;
-							},
-							maxHandcard:function (player,num){
-								if(player.storage.drlt_jieying==player||(player.storage.drlt_jieying2&&player.storage.drlt_jieying2.isAlive()&&player.storage.drlt_jieying2.storage.drlt_jieying==player)) return num+1;
-							},
-						},
-						audio:'drlt_jieying',
-						trigger:{
-							player:'phaseDrawBegin'
-						},
-						forced:true,
-						filter:function(event,player){
-							return player.storage.drlt_jieying==player||(player.storage.drlt_jieying2&&player.storage.drlt_jieying2.isAlive()&&player.storage.drlt_jieying2.storage.drlt_jieying==player);
-						},
-						content:function(){
-							trigger.num++;
 						},
 					},
 		},
@@ -2542,7 +2549,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"drlt_poxi":"魄袭",
 			"drlt_poxi_info":"出牌阶段限一次，你可以观看一名其他角色的手牌，然后你可以弃置你与其手牌中的四张花色不同的牌。若如此做，根据此次弃置你的牌的数量执行以下效果：1.没有，扣减一点体力上限；2.一张，立即结束出牌阶段且本回合手牌上限-1；三张，恢复一点体力；四张，摸四张牌",
 			"drlt_jieying":"劫营",
-			"drlt_jieying_info":"游戏开始时，你获得一个“营”标记。结束阶段，你可以将“营”标记置于一名角色的武将牌旁；有“营”标记的角色摸牌阶段多摸一张牌、出牌阶段可多使用一张【杀】、手牌上限+1。有“营”标记的其他角色的回合结束后，你获得其所有手牌并收回“营”标记。",
+			"drlt_jieying_info":"回合开始时，若没有角色有“营”标记，你获得1个“营”标记；结束阶段，你可以将你的“营”交给一名角色；有“营”标记的角色摸牌阶段多摸一张牌，其于出牌阶段使用【杀】的次数上限+1，其手牌上限+1。有“营”的其他角色回合结束后，其移去“营”标记，然后你获得其所有手牌。",
+			drlt_jieying_mark:"劫营",
 			"drlt_duorui1":"失效技能",
 			"drlt_duorui1_bg":"锐",
 			"drlt_duorui":"夺锐",

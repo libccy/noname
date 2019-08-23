@@ -4,6 +4,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'shenhua',
 		connect:true,
 		connectBanned:['zuoci'],
+		characterSort:{
+			shenhua:{
+				shenhua_feng:['caoren','xiahouyuan','huangzhong','weiyan','xiaoqiao','zhoutai','sp_zhangjiao','re_yuji'],
+				shenhua_huo:['dianwei','xunyu','pangtong','sp_zhugeliang','taishici','yanwen','re_yuanshao','pangde'],
+				shenhua_lin:['caopi','xuhuang','menghuo','zhurong','re_lusu','sunjian','dongzhuo','jiaxu'],
+				shenhua_shan:['dengai','zhanghe','liushan','jiangwei','zhangzhang','sunce','caiwenji','zuoci'],
+				shenhua_yin:['wangji','kuailiangkuaiyue','yanyan','wangping','sunliang','luji','xuyou','yl_luzhi'],
+				shenhua_lei:['haozhao','guanqiujian','chendao','zhugezhan','lukang','zhoufei','zhangxiu','yl_yuanshu'],
+			},
+		},
 		character:{
 			xiahouyuan:['male','wei',4,['xinshensu']],
 			caoren:['male','wei',4,['xinjushou','xinjiewei']],
@@ -1924,7 +1934,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 4'
 					if(event.toequip){
-						player.useCard(event.toequip,player).nopopup=true;
+						player.useCard(event.toequip,player).set('animate',false).nopopup=true;
 					}
 				},
 				ai:{
@@ -6694,6 +6704,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huangtian_info:'主公技，其他群势力角色的出牌阶段限一次，其可以交给你一张【闪】或【闪电】。',
 			guhuo_info:'每名角色的回合限一次，你可以扣置一张手牌当一张基本牌或普通锦囊牌使用或打出。其他角色依次选择是否质疑。一旦有其他角色质疑则翻开此牌：若为假则此牌作废，若为真，则质疑角色获得技能“缠怨”（锁定技，你不能质疑于吉，只要你的体力值为1，你失去你的武将技能）',
 			fenji_info:'每当一名角色的手牌于回合外被其他角色弃置或获得时，你可以失去1点体力，然后令该角色摸两张牌。',
+			
+			shenhua_feng:'神话再临•风',
+			shenhua_huo:'神话再临•火',
+			shenhua_lin:'神话再临•林',
+			shenhua_shan:'神话再临•山',
+			shenhua_yin:'神话再临•阴',
+			shenhua_lei:'神话再临•雷',
 		},
 	};
 });

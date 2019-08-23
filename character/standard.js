@@ -3,6 +3,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'standard',
 		connect:true,
+		characterSort:{
+			standard:{
+				standard_2008:["caocao","simayi","xiahoudun","zhangliao","xuzhu","guojia","zhenji","liubei","guanyu","zhangfei","zhugeliang","zhaoyun","machao","huangyueying","sunquan","ganning","lvmeng","huanggai","zhouyu","daqiao","luxun","sunshangxiang","huatuo","lvbu","diaochan",],
+				standard_2013:["huaxiong","re_yuanshu"],
+				standard_2019:["gongsunzan","caozhang","xf_yiji"],
+			},
+		},
 		character:{
 			caocao:['male','wei',4,['hujia','jianxiong'],['zhu']],
 			simayi:['male','wei',3,['fankui','guicai']],
@@ -1712,7 +1719,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['re_lvmeng','sp_lvmeng'],
 				trigger:{player:'phaseDiscardBefore'},
 				frequent:function(event,player){
-					return !player.needsToDiscard();
+					return player.needsToDiscard();
 				},
 				filter:function(event,player){
 					return player.countUsed('sha')==0;
@@ -2554,6 +2561,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yaowu_info:'锁定技，当任意一名角色使用红色【杀】对你造成伤害时，该角色回复1点体力或摸一张牌。',
 			"new_jiangchi":"将驰",
 			"new_jiangchi_info":"摸牌阶段结束时，你可以选择一项：1、摸一张牌，若如此做，你本回合内不能使用或打出【杀】。 2、弃置一张牌，若如此做，出牌阶段你使用【杀】无距离限制且你可以额外使用一张【杀】，直到回合结束。",
+			
+			standard_2008:"2008版标准包",
+			standard_2013:"2013版标准包",
+			standard_2019:"2019版标准包",
 		},
 	};
 });

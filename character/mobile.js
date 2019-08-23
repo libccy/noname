@@ -4,6 +4,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'mobile',
 		connectBanned:['miheng'],
 		connect:true,
+		characterSort:{
+			mobile:{
+				mobile_default:["miheng","taoqian","liuzan","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong"],
+				mobile_fire:["re_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","re_pangtong","xin_yuanshao"],
+				mobile_others:["re_jikang","old_bulianshi","old_caochun","old_yuanshu"],
+			},
+		},
 		character:{
 			re_jikang:["male","wei",3,["new_qingxian","new_juexiang"]],
 			old_bulianshi:['female','wu',3,['anxu','zhuiyi']],
@@ -36,6 +43,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_jikang:"新嵇康",
 			old_bulianshi:'新步练师',
 			old_caochun:'旧曹纯',
+			mobile_default:'常规',
+			mobile_fire:'界限突破•火',
+			mobile_others:'其他',
 		}
 	};
 });

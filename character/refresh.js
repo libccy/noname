@@ -1206,7 +1206,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					cardDiscardable:function(card,player,name){
 						if(name=='phaseDiscard'&&player.storage.reluoshen&&player.storage.reluoshen.contains(card)){
-							return true;
+							return false;
 						}
 					},
 				},
@@ -2945,6 +2945,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.player.isAlive()&&event.source.isAlive()&&event.source!=event.player;
 				},
 				check:function(event,player){
+					if(player.isPhaseUsing()) return true;
 					if(event.player==player) return get.attitude(player,event.source)>-3;
 					return get.attitude(player,event.player)>-3;
 				},
@@ -2954,9 +2955,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					game.asyncDraw([trigger.player,trigger.source],trigger.num);
+					event.count=trigger.num;
 					"step 1"
+					game.asyncDraw([trigger.player,trigger.source]);
+					event.count--;
+					"step 2"
 					game.delay();
+					"step 3"
+					if(event.count){
+						player.chooseBool(get.prompt2('wangxi',lib.skill.wangxi.logTarget(trigger,player)))
+					}
+					else event.finish();
+					"step 4"
+					if(result.bool){
+						player.logSkill('wangxi',lib.skill.wangxi.logTarget(trigger,player));
+						event.goto(1);
+					}
 				},
 				ai:{
 					maixie:true,
