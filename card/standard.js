@@ -943,18 +943,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					else{
 						if(result.bool){
 							if(event.turn==target){
-							    if(result.cards) event.targetCards.addArray(result.cards);
-							    event.turn=player;
+								if(result.cards) event.targetCards.addArray(result.cards);
+								event.turn=player;
 							}
 							else{
-							    if(result.cards) event.playerCards.addArray(result.cards);
-							    event.turn=target;
+								if(result.cards) event.playerCards.addArray(result.cards);
+								event.turn=target;
 							}
 							event.goto(1);
 						}
 						else{
 							if(event.turn==target){
-							    target.damage(event.baseDamage+event.extraDamage);
+								target.damage(event.baseDamage+event.extraDamage);
 							}
 							else{
 								player.damage(target,event.baseDamage+event.extraDamage);
@@ -1418,7 +1418,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return event.card&&event.card.name=='sha'&&event.notLink()&&event.player.getCards('he').length>0;
 				},
 				check:function(event,player){
-				    var target=event.player;
+					var target=event.player;
 						var eff=get.damageEffect(target,player,player);
 						if(get.attitude(player,target)>0){
 							if(eff>=0) return false;
@@ -1443,7 +1443,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						trigger.cancel();
 					"step 1"
 					if(trigger.player.countDiscardableCards(player,'he')){
-					    player.line(trigger.player);
+						player.line(trigger.player);
 						player.discardPlayerCard('he',trigger.player,true);
 					}
 					"step 2"

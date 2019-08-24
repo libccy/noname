@@ -1956,8 +1956,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					wuqi:{
 						mod:{
 							cardUsable:function(card,player,num){
-					if(player.getEquip(1)&&card.name=='sha') return num+1;
-				},
+								if(player.getEquip(1)&&card.name=='sha') return num+1;
+							},
 						},
 						sub:true,
 					},
@@ -1966,12 +1966,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player:"damageBegin",
 						},
 						forced:true,
-						filter:function (event,player){				 
-				return player.getEquip(2)&&event.num>1; 
-			},
-						content:function (){							 
-				trigger.num=1; 
-			},
+						filter:function (event,player){
+							return player.getEquip(2)&&event.num>1; 
+						},
+						content:function (){
+							trigger.num=1; 
+						},
 						sub:true,
 					},
 					zuoji:{
@@ -1979,12 +1979,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player:"phaseDrawBegin",
 						},
 						forced:true,
-						filter:function (event,player){				 
-				return (player.getEquip(3)||player.getEquip(4)); 
-			},
+						filter:function (event,player){
+							return (player.getEquip(3)||player.getEquip(4)); 
+						},
 						content:function(){
-				trigger.num++;
-			},
+							trigger.num++;
+						},
 						sub:true,
 					},
 					baowu:{
@@ -1993,12 +1993,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						filter:function (event,player){
-				return player.getEquip(5);
-			},
+							return player.getEquip(5);
+						},
 						content:function (){
-				trigger.cancel();
-				game.log(player,'跳过了判定阶段');
-			},
+							trigger.cancel();
+							game.log(player,'跳过了判定阶段');
+						},
 						sub:true,
 					},
 				},
@@ -2009,55 +2009,55 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				direct:true,
 				content:function(){
-		"step 0"
-		player.chooseTarget(get.prompt('shufazijinguan'),function(card,player,target){
-			return player!=target;
-		}).ai=function(target){
-			return get.damageEffect(target,player,player);
-		}
-		"step 1"
-		if(result.bool){
-			player.line(result.targets,'white');
-			result.targets[0].damage();
-		}
-	},
+					"step 0"
+					player.chooseTarget(get.prompt('shufazijinguan'),function(card,player,target){
+						return player!=target;
+					}).ai=function(target){
+						return get.damageEffect(target,player,player);
+					}
+					"step 1"
+					if(result.bool){
+						player.line(result.targets,'white');
+						result.targets[0].damage();
+					}
+				},
 			},
 			"linglongshimandai_skill":{
 				trigger:{
 					global:["useCard"],
 				},
 				filter:function(event,player){
-		if(event.targets&&event.targets.length>1) return false;
-		var evt=event.getParent();
-		if(evt.player&&evt.player.hasSkillTag('unequip',false,{
-			name:evt.card?evt.card.name:null,
-			target:player,
-			card:evt.card
-		})) return false;
-		return event.targets.contains(player)&&event.player!=player;
-	},
-				audio:"ext:新虎牢关:true",
+					if(event.targets&&event.targets.length>1) return false;
+					var evt=event.getParent();
+					if(evt.player&&evt.player.hasSkillTag('unequip',false,{
+						name:evt.card?evt.card.name:null,
+						target:player,
+						card:evt.card
+					})) return false;
+					return event.targets.contains(player)&&event.player!=player;
+				},
+				audio:true,
 				check:function(event,player){
-		if(get.attitude(player,event.player)>2) return false;
-		return true;
-	},
+					if(get.attitude(player,event.player)>2) return false;
+					return true;
+				},
 				content:function(){
-		"step 0"
-		player.judge('linglongshimandai',function(card){return (get.suit(card)=='heart')?1.5:-0.5});
-		"step 1"
-		if(result.judge>0){
-			trigger.cancel();
-		}
-	},
+					"step 0"
+					player.judge('linglongshimandai',function(card){return (get.suit(card)=='heart')?1.5:-0.5});
+					"step 1"
+					if(result.judge>0){
+						trigger.cancel();
+					}
+				},
 				ai:{
 					effect:{
 						target:function(card,player,target,effect){
-				if(player.hasSkillTag('unequip',false,{
-					name:card?card.name:null,
-					target:player,
-					card:card
-				})) return;
-			},
+							if(player.hasSkillTag('unequip',false,{
+								name:card?card.name:null,
+								target:player,
+								card:card
+							})) return;
+						},
 					},
 				},
 			},
@@ -2066,29 +2066,29 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player:"damageBefore",
 				},
 				filter:function(event,player){
-		if(event.source&&event.source.hasSkillTag('unequip',false,{
-			name:event.card?event.card.name:null,
-			target:player,
-			card:event.card
-		})) return;
-		if(event.nature) return true;
-	},
+					if(event.source&&event.source.hasSkillTag('unequip',false,{
+						name:event.card?event.card.name:null,
+						target:player,
+						card:event.card
+					})) return;
+					if(event.nature) return true;
+				},
 				forced:true,
 				content:function(){
-		trigger.cancel();
-	},
+					trigger.cancel();
+				},
 				ai:{
 					nofire:true,
 					nothunder:true,
 					effect:{
 						target:function(card,player,target,current){
-				if(player.hasSkillTag('unequip',false,{
-					name:card?card.name:null,
-					target:player,
-					card:card
-				})) return;
-				if(get.tag(card,'natureDamage')) return 'zerotarget';
-			},
+							if(player.hasSkillTag('unequip',false,{
+								name:card?card.name:null,
+								target:player,
+								card:card
+							})) return;
+							if(get.tag(card,'natureDamage')) return 'zerotarget';
+						},
 					},
 				},
 			},
@@ -2097,41 +2097,41 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					source:"damageAfter",
 				},
 				filter:function(event,player){
-		return event.card&&event.card.name=='sha';
-	},
+					return event.card&&event.card.name=='sha';
+				},
 				check:function(event,player){
-		return true;
-	},
+					return true;
+				},
 				content:function(){
-		'step 0'
-		player.line(trigger.player,'white');
-		if(!trigger.player.countCards('he')){
-			event.goto(1);
-		}else{
-			event.goto(2);
-		}
-		'step 1'
-		player.draw();
-		event.finish();
-		'step 2'
-		player.chooseControl('摸一张牌','弃置其一张牌',function(event,player){ 
-			if(get.attitude(player,trigger.player)>2) return '摸一张牌';
-			return '弃置其一张牌'; 
-		}); 
-		'step 3'
-		if(result.control=='摸一张牌'){ 
-			player.draw();
-			event.finish();
-		} 
-		else{ 
-			player.discardPlayerCard(trigger.player,'he',true); 
-			event.finish();
-		}   
-	},
+					'step 0'
+					player.line(trigger.player,'white');
+					if(!trigger.player.countCards('he')){
+						event.goto(1);
+					}else{
+						event.goto(2);
+					}
+					'step 1'
+					player.draw();
+					event.finish();
+					'step 2'
+					player.chooseControl('摸一张牌','弃置其一张牌',function(event,player){ 
+						if(get.attitude(player,trigger.player)>2) return '摸一张牌';
+						return '弃置其一张牌'; 
+					}); 
+					'step 3'
+					if(result.control=='摸一张牌'){ 
+						player.draw();
+						event.finish();
+					} 
+					else{ 
+						player.discardPlayerCard(trigger.player,'he',true); 
+						event.finish();
+					}   
+				},
 			},
 			
 			boss_yaoshou:{
-			 mod:{
+				mod:{
 					globalFrom:function(from,to,distance){
 						return distance-2;
 					},
@@ -2152,17 +2152,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				global:'boss_shedu',
 				mod:{
 					cardEnabled:function (card,player){
-			if(_status.event.skill!='boss_duqu_sha'&&get.owner(card)!=undefined&&card.name=='tao') return false;
-		},
+						if(_status.event.skill!='boss_duqu_sha'&&get.owner(card)!=undefined&&card.name=='tao') return false;
+					},
 					cardUsable:function (card,player){
-			if(_status.event.skill!='boss_duqu_sha'&&get.owner(card)!=undefined&&card.name=='tao') return false;
-		},
+						if(_status.event.skill!='boss_duqu_sha'&&get.owner(card)!=undefined&&card.name=='tao') return false;
+					},
 					cardRespondable:function (card,player){
-			if(_status.event.skill!='boss_duqu_sha'&&get.owner(card)!=undefined&&card.name=='tao') return false;
-		},
+						if(_status.event.skill!='boss_duqu_sha'&&get.owner(card)!=undefined&&card.name=='tao') return false;
+					},
 					cardSavable:function (card,player){
-			if(_status.event.skill!='boss_duqu_sha'&&get.owner(card)!=undefined&&card.name=='tao') return false;
-		},
+						if(_status.event.skill!='boss_duqu_sha'&&get.owner(card)!=undefined&&card.name=='tao') return false;
+					},
 				},
 				group:["boss_duqu_sha"],
 				subSkill:{
@@ -2175,61 +2175,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							name:"sha",
 						},
 						viewAsFilter:function (player){
-				if(!player.countCards('h','tao')) return false;
-			},
+							if(!player.countCards('h','tao')) return false;
+						},
 						prompt:"将一张桃当杀使用或打出",
 						check:function (){return 1},
 						ai:{
-							effect:{
-								target:function (card,player,target,current){
-						if(get.tag(card,'respondSha')&&current<0) return 0.6
-					},
-							},
 							respondSha:true,
 							skillTagFilter:function (player){
-					if(!player.countCards('h','tao')) return false;
-				},
+								if(!player.countCards('h','tao')) return false;
+							},
 							order:function (){
-					return get.order({name:'sha'})-0.1;
-				},
-							useful:-1,
-							value:-1,
-							basic:{
-								useful:[5,1],
-								value:[5,1],
-							},
-							result:{
-								target:function (player,target){
-						if(player.hasSkill('jiu')&&!target.getEquip('baiyin')){
-							if(get.attitude(player,target)>0){
-								return -6;
-							}
-							else{
-								return -3;
-							}
-						}
-						return -1.5;
-					},
-							},
-							tag:{
-								respond:1,
-								respondShan:1,
-								damage:function (card){
-						if(card.nature=='poison') return;
-						return 1;
-					},
-								natureDamage:function (card){
-						if(card.nature) return 1;
-					},
-								fireDamage:function (card,nature){
-						if(card.nature=='fire') return 1;
-					},
-								thunderDamage:function (card,nature){
-						if(card.nature=='thunder') return 1;
-					},
-								poisonDamage:function (card,nature){
-						if(card.nature=='poison') return 1;
-					},
+								return get.order({name:'sha'})-0.1;
 							},
 						},
 						sub:true,
@@ -2260,20 +2216,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			boss_jiushou:{
-			  mod:{
-			  maxHandcard:function(player,num){
+				mod:{
+					maxHandcard:function(player,num){
 						return num-player.hp+9;
-				 	},
 					},
-					trigger:{player:['phaseUseBegin','phaseAfter','phaseDrawBegin']},
-					forced:true,
-					filter:function(event,player){
-						return event.name=='phaseDraw'||player.countCards('h')<9;
-					},
-					content:function(){
-						if(trigger.name=='phaseDraw') trigger.cancel();
-						else player.draw(9-player.countCards('h'));
-					},
+				},
+				trigger:{player:['phaseUseBegin','phaseAfter','phaseDrawBegin']},
+				forced:true,
+				filter:function(event,player){
+					return event.name=='phaseDraw'||player.countCards('h')<9;
+				},
+				content:function(){
+					if(trigger.name=='phaseDraw') trigger.cancel();
+					else player.draw(9-player.countCards('h'));
+				},
 			},
 			boss_echou_switch:{
 				unique:true,
@@ -2336,13 +2292,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.storage.boss_juyuan=player.hp;
 				},
 				mod:{
-		selectTarget:function (card,player,range){
-			if(card.name!='sha') return;
-			if(range[1]==-1) return;
-			if(player.hp>=player.storage.boss_juyuan) return;
-			range[1]+=2;
-		},
-	},
+					selectTarget:function (card,player,range){
+						if(card.name!='sha') return;
+						if(range[1]==-1) return;
+						if(player.hp>=player.storage.boss_juyuan) return;
+						range[1]+=2;
+					},
+				},
 			},
 			boss_xushi_switch:{
 				unique:true,
@@ -2379,8 +2335,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					if(trigger.name=='phaseUse'){
-						 player.turnOver();
-						 event.finish();
+						player.turnOver();
+						event.finish();
 					}
 					else{
 						event.list=game.filterPlayer(function(current){
@@ -2418,43 +2374,43 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			boss_honglianx:{
 				mod:{
-		ignoredHandcard:function (card,player){
-			if(get.color(card)=='red'){
-				return true;
-			}
-		},
-		cardDiscardable:function (card,player,name){
-			if(name=='phaseDiscard'&&get.color(card)=='red') return false;
-		},
-	},
-	forced:true,
-	trigger:{player:'phaseBefore'},
-	content:function(){
-		'step 0'
-		event.num1=3;
-		event.num2=[0,1,2,3].randomGet();
-		event.togain=[];
-		while(event.togain.length<event.num2){
-			var card=get.cardPile(function(card){
-				return get.color(card)=='red';
-			});
-			if(card) event.togain.push(card);
-			else break;
-		}
-		event.num1-=event.togain.length;
-		if(event.togain.length) player.gain(event.togain,'draw');
-		if(event.num1==0) event.finish();
-		else{
-			event.list=game.filterPlayer(function(current){
-				return current!=player;
-			}).randomGets(event.num1).sortBySeat();
-			player.line(event.list,'fire');
-		}
-		'step 1'
+					ignoredHandcard:function (card,player){
+						if(get.color(card)=='red'){
+							return true;
+						}
+					},
+					cardDiscardable:function (card,player,name){
+						if(name=='phaseDiscard'&&get.color(card)=='red') return false;
+					},
+				},
+				forced:true,
+				trigger:{player:'phaseBefore'},
+				content:function(){
+					'step 0'
+					event.num1=3;
+					event.num2=[0,1,2,3].randomGet();
+					event.togain=[];
+					while(event.togain.length<event.num2){
+						var card=get.cardPile(function(card){
+							return get.color(card)=='red';
+						});
+						if(card) event.togain.push(card);
+						else break;
+					}
+					event.num1-=event.togain.length;
+					if(event.togain.length) player.gain(event.togain,'draw');
+					if(event.num1==0) event.finish();
+					else{
+						event.list=game.filterPlayer(function(current){
+							return current!=player;
+						}).randomGets(event.num1).sortBySeat();
+						player.line(event.list,'fire');
+					}
+					'step 1'
 					var target=event.list.shift();
 					target.damage('fire');
 					if(event.list.length) event.redo();
-	},
+				},
 			},
 			boss_yanyu_switch:{
 				unique:true,
@@ -2522,7 +2478,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					var list=game.filterPlayer(function(current){
-						 return current!=player&&current.countCards('hej');
+						return current!=player&&current.countCards('hej');
 					});
 					if(list.length){
 						var target=list.randomGet();
@@ -2575,23 +2531,23 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					cardUsable:function (card,player){
-			var sc=_status.currentPhase;
+						var sc=_status.currentPhase;
 						if(sc&&sc!=player&&sc.isPhaseUsing()&&sc.hasSkill('boss_sipu')&&!sc.hasSkill('boss_sipu_switch')&&sc.countUsed()<3){
 							return false;
 						}
-		},
-		cardRespondable:function (card,player){
-		   var sc=_status.currentPhase;
+					},
+					cardRespondable:function (card,player){
+						var sc=_status.currentPhase;
 						if(sc&&sc!=player&&sc.isPhaseUsing()&&sc.hasSkill('boss_sipu')&&!sc.hasSkill('boss_sipu_switch')&&sc.countUsed()<3){
 							return false;
 						}
-		},
-		cardSavable:function (card,player){
-			var sc=_status.currentPhase;
+					},
+					cardSavable:function (card,player){
+						var sc=_status.currentPhase;
 						if(sc&&sc!=player&&sc.isPhaseUsing()&&sc.hasSkill('boss_sipu')&&!sc.hasSkill('boss_sipu_switch')&&sc.countUsed()<3){
 							return false;
 						}
-		},
+					},
 				},
 			},
 			/*----分界线----*/

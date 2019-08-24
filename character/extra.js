@@ -47,26 +47,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					source.markSkill('new_wuhun_mark');
 				},
 				contentx:function (){
-							"step 0"
-							var num=0;
-							for(var i=0;i<game.players.length;i++){
-								var current=game.players[i];
-								if(current!=player&&current.storage.new_wuhun_mark&&current.storage.new_wuhun_mark>num){
-									num=current.storage.new_wuhun_mark;
-								}
-							}
-							player.chooseTarget(true,'请选择【武魂】的目标',function(card,player,target){
-								return target!=player&&target.storage.new_wuhun_mark==num;
-							}).set('ai',function(target){
-								return -get.attitude(_status.event.player,target);
-							}).set('forceDie',true);
-							"step 1"
-							if(result.bool&&result.targets&&result.targets.length){
-							var target=result.targets[0];
-							event.target=target;
-					player.logSkill('new_wuhun_die',target);
-				 player.line(target,{color:[255, 255, 0]});
-					game.delay(2);
+					"step 0"
+					var num=0;
+					for(var i=0;i<game.players.length;i++){
+						var current=game.players[i];
+						if(current!=player&&current.storage.new_wuhun_mark&&current.storage.new_wuhun_mark>num){
+							num=current.storage.new_wuhun_mark;
+						}
+					}
+					player.chooseTarget(true,'请选择【武魂】的目标',function(card,player,target){
+						return target!=player&&target.storage.new_wuhun_mark==num;
+					}).set('ai',function(target){
+						return -get.attitude(_status.event.player,target);
+					}).set('forceDie',true);
+					"step 1"
+					if(result.bool&&result.targets&&result.targets.length){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('new_wuhun_die',target);
+						player.line(target,{color:[255, 255, 0]});
+						game.delay(2);
 					}
 					"step 2"
 					target.judge(function(card){
@@ -94,10 +94,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function (){
 							"step 0"
-								var next=game.createEvent('new_wuhun',null,trigger.parent);
-								next.forceDie=true;
-								next.player=player;
-								next.setContent(lib.skill.new_wuhun.contentx);
+							var next=game.createEvent('new_wuhun',null,trigger.parent);
+							next.forceDie=true;
+							next.player=player;
+							next.setContent(lib.skill.new_wuhun.contentx);
 						},
 						sub:true,
 					},
@@ -248,7 +248,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.delay(0.5);
 					if(event.targets.length) event.goto(2);
 					"step 5"
-						player.turnOver();
+					player.turnOver();
 				},
 				ai:{
 					combo:'baonu',
@@ -870,33 +870,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			wuhun:{
 				trigger:{
-				player:"damageEnd",
-							  },
-							//   alter:true,
-					   filter:function (event,player){
-					   if(event.source==undefined) return false						   
-					   if(!get.is.altered('wuhun')) return false	
-					   return true;
-							  },
-						  forced:true,
-							content:function (){
-					   if(!trigger.source.storage.wuhun_mark){
-					  trigger.source.storage.wuhun_mark=0;
-										  }				 
-			  trigger.source.storage.wuhun_mark+=trigger.num;
-					  trigger.source.syncStorage('wuhun_mark');
-					  trigger.source.markSkill('wuhun_mark');
-							   },
-					   global:["wuhun_mark"],
-					  subSkill:{
-						mark:{
+					player:"damageEnd",
+				},
+				//alter:true,
+				filter:function (event,player){
+					if(event.source==undefined) return false						   
+					if(!get.is.altered('wuhun')) return false	
+					return true;
+				},
+				forced:true,
+				content:function (){
+					if(!trigger.source.storage.wuhun_mark){
+						trigger.source.storage.wuhun_mark=0;
+					}				 
+					trigger.source.storage.wuhun_mark+=trigger.num;
+					trigger.source.syncStorage('wuhun_mark');
+					trigger.source.markSkill('wuhun_mark');
+				},
+				global:["wuhun_mark"],
+				subSkill:{
+					mark:{
 						marktext:"魇",
-						  intro:{
+						intro:{
 							content:"mark",
-								  },
-							sub:true,
-								},
-						  },
+						},
+						sub:true,
+					},
+				},
 		 		group:["wuhun2","wuhun4","wuhun5"],
 			},
 			wuhun2:{
@@ -907,7 +907,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				filter:function (event,player){
 					for(var i=0;i<game.players.length;i++){
-					if(game.players[i].storage.wuhun_mark) return true;
+						if(game.players[i].storage.wuhun_mark) return true;
 					}
 					return false;
 				},
@@ -917,8 +917,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(player==target) return false;
 						if(!target.storage.wuhun_mark) return false;
 							for(var i=0;i<game.players.length;i++){
-							if(game.players[i].storage.wuhun_mark>target.storage.wuhun_mark){
-							return false;
+								if(game.players[i].storage.wuhun_mark>target.storage.wuhun_mark){
+								return false;
 							}
 						}
 						return true;
@@ -1851,683 +1851,677 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					expose:0.4,
 				}
 			},
-			
 			"nzry_longnu":{
-						mark:true,
-						locked:true,
-						marktext:'龙',
-						intro:{
-							content:function(storage,player,skill){
-								if(player.storage.nzry_longnu==true) return '锁定技，出牌阶段开始时，你减1点体力上限并摸一张牌，然后本回合你的锦囊牌均视为雷杀且无使用次数限制';
-								return '锁定技，出牌阶段开始时，你流失一点体力并摸一张牌，然后本回合你的红色手牌均视为火杀且无距离限制';
-							},
-						},
-						audio:2,
-						trigger:{
-							player:'phaseUseBegin'
-						},
-						forced:true,
-						content:function(){
-							if(player.storage.nzry_longnu==true){
-								player.storage.nzry_longnu=false;
-								player.loseMaxHp();
-								player.draw();
-								player.addTempSkill('nzry_longnu_2',{player:'phaseAfter'});
-							}else{
-								player.storage.nzry_longnu=true;
-								player.loseHp();
-								player.draw();
-								player.addTempSkill('nzry_longnu_1',{player:'phaseAfter'});
-							};
-						},
-						subSkill:{
-							'1':{
-								mod:{
-									cardEnabled:function(card,player){
-										if(_status.event.skill!='nzry_longnu_1'&&(card.name!='sha'||card.nature!='fire')&&get.color(card)=='red') return false;
-									},
-									cardUsable:function(card,player){
-										if(_status.event.skill!='nzry_longnu_1'&&(card.name!='sha'||card.nature!='fire')&&get.color(card)=='red') return false;
-									},
-									cardRespondable:function(card,player){
-										if(_status.event.skill!='nzry_longnu_1'&&(card.name!='sha'||card.nature!='fire')&&get.color(card)=='red') return false;
-									},
-									cardSavable:function(card,player){
-										if(_status.event.skill!='nzry_longnu_1'&&(card.name!='sha'||card.nature!='fire')&&get.color(card)=='red') return false;
-									},
-									targetInRange:function(card){
-										if((card.name=='sha'&&card.nature=='fire')||_status.event.skill=='nzry_longnu_1') return true;
-									},
-								},
-								prompt:'本回合你的红色手牌均视为火杀且无距离限制',
-								enable:['chooseToUse','chooseToRespond'],
-								filterCard:{color:'red'},
-								viewAs:{name:'sha',nature:'fire'},
-								check:function(){return 1},
-								ai:{
-									effect:{
-										target:function(card,player,target,current){
-											if(get.tag(card,'respondSha')&&current<0) return 0.6
-										}
-									},
-									respondSha:true,
-									order:4,
-									useful:-1,
-									value:-1
-								},
-							},
-							'2':{
-								prompt:'本回合你的锦囊牌均视为雷杀且无使用次数限制',
-								mod:{
-									cardEnabled:function(card,player){
-										if(_status.event.skill!='nzry_longnu_2'&&get.type(card,'trick')=='trick') return false;
-									},
-									cardUsable:function(card,player){
-										if(_status.event.skill!='nzry_longnu_2'&&get.type(card,'trick')=='trick') return false;
-									},
-									cardRespondable:function(card,player){
-										if(_status.event.skill!='nzry_longnu_2'&&get.type(card,'trick')=='trick') return false;
-									},
-									cardSavable:function(card,player){
-										if(_status.event.skill!='nzry_longnu_2'&&get.type(card,'trick')=='trick') return false;
-									},
-									cardUsable:function(card,player){
-										if(card.name=='sha'&&card.nature=='thunder') return Infinity;
-									},
-								},
-								enable:['chooseToUse','chooseToRespond'],
-								filterCard:function(card){
-									return get.type(card,'trick')=='trick';
-								},
-								viewAs:{name:'sha',nature:'thunder'},
-								check:function(){return 1},
-								ai:{
-									effect:{
-										target:function(card,player,target,current){
-											if(get.tag(card,'respondSha')&&current<0) return 0.6
-										}
-									},
-									respondSha:true,
-									order:4,
-									useful:-1,
-									value:-1
-								},
-							},
-						},
+				mark:true,
+				locked:true,
+				marktext:'龙',
+				intro:{
+					content:function(storage,player,skill){
+						if(player.storage.nzry_longnu==true) return '锁定技，出牌阶段开始时，你减1点体力上限并摸一张牌，然后本回合你的锦囊牌均视为雷杀且无使用次数限制';
+						return '锁定技，出牌阶段开始时，你流失一点体力并摸一张牌，然后本回合你的红色手牌均视为火杀且无距离限制';
 					},
-					"nzry_jieying":{
-					audio:2,
-					locked:true,
-					global:"g_nzry_jieying",
+				},
+				audio:2,
+				trigger:{
+					player:'phaseUseBegin'
+				},
+				forced:true,
+				content:function(){
+					if(player.storage.nzry_longnu==true){
+						player.storage.nzry_longnu=false;
+						player.loseMaxHp();
+						player.draw();
+						player.addTempSkill('nzry_longnu_2',{player:'phaseAfter'});
+					}else{
+						player.storage.nzry_longnu=true;
+						player.loseHp();
+						player.draw();
+						player.addTempSkill('nzry_longnu_1',{player:'phaseAfter'});
+					};
+				},
+				subSkill:{
+					'1':{
+						mod:{
+							cardEnabled:function(card,player){
+								if(_status.event.skill!='nzry_longnu_1'&&(card.name!='sha'||card.nature!='fire')&&get.color(card)=='red') return false;
+							},
+							cardUsable:function(card,player){
+								if(_status.event.skill!='nzry_longnu_1'&&(card.name!='sha'||card.nature!='fire')&&get.color(card)=='red') return false;
+							},
+							cardRespondable:function(card,player){
+								if(_status.event.skill!='nzry_longnu_1'&&(card.name!='sha'||card.nature!='fire')&&get.color(card)=='red') return false;
+							},
+							cardSavable:function(card,player){
+								if(_status.event.skill!='nzry_longnu_1'&&(card.name!='sha'||card.nature!='fire')&&get.color(card)=='red') return false;
+							},
+							targetInRange:function(card){
+								if((card.name=='sha'&&card.nature=='fire')||_status.event.skill=='nzry_longnu_1') return true;
+							},
+						},
+						prompt:'本回合你的红色手牌均视为火杀且无距离限制',
+						enable:['chooseToUse','chooseToRespond'],
+						filterCard:{color:'red'},
+						viewAs:{name:'sha',nature:'fire'},
+						check:function(){return 1},
 						ai:{
 							effect:{
-								target:function(card){
-									if(card.name=='tiesuo') return 'zeroplayertarget';
-								},
+								target:function(card,player,target,current){
+									if(get.tag(card,'respondSha')&&current<0) return 0.6
+								}
 							},
-						},
-						group:["nzry_jieying_1","nzry_jieying_2"],
-						subSkill:{
-							'1':{
-								audio:2,
-								trigger:{
-									player:'linkAfter',
-									global:'gameDrawAfter',
-								},
-								forced:true,
-								filter:function (event,player){
-									return !player.isLinked();
-								},
-								content:function(){
-									player.link(true);
-								},	
-							},
-							'2':{
-								audio:2,
-								trigger:{
-									player:'phaseEnd',
-								},
-								direct:true,
-								filter:function(event,player){
-									return game.hasPlayer(function(current){
-										return current!=player&&!current.isLinked();
-									});
-								},
-								content:function(){
-									"step 0"
-									player.chooseTarget(true,'请选择【结营】的目标',function(card,player,target){
-										return target!=player&&!target.isLinked();
-									}).ai=function(target){
-										return 1+Math.random();
-									};
-									"step 1"
-									if(result.bool){
-										player.line(result.targets);
-										player.logSkill('nzry_jieying');
-										result.targets[0].link(true);
-									}else{
-										event.finish();
-									};
-								},
-							},
+							respondSha:true,
+							order:4,
+							useful:-1,
+							value:-1
 						},
 					},
-					"g_nzry_jieying":{
+					'2':{
+						prompt:'本回合你的锦囊牌均视为雷杀且无使用次数限制',
 						mod:{
-							maxHandcard:function (player,num){
-								if(game.countPlayer(function(current){return current.hasSkill('nzry_jieying')})>0&&player.isLinked()) return num+2;
+							cardEnabled:function(card,player){
+								if(_status.event.skill!='nzry_longnu_2'&&get.type(card,'trick')=='trick') return false;
+							},
+							cardUsable:function(card,player){
+								if(_status.event.skill!='nzry_longnu_2'&&get.type(card,'trick')=='trick') return false;
+							},
+							cardRespondable:function(card,player){
+								if(_status.event.skill!='nzry_longnu_2'&&get.type(card,'trick')=='trick') return false;
+							},
+							cardSavable:function(card,player){
+								if(_status.event.skill!='nzry_longnu_2'&&get.type(card,'trick')=='trick') return false;
+							},
+							cardUsable:function(card,player){
+								if(card.name=='sha'&&card.nature=='thunder') return Infinity;
 							},
 						},
+						enable:['chooseToUse','chooseToRespond'],
+						filterCard:function(card){
+							return get.type(card,'trick')=='trick';
+						},
+						viewAs:{name:'sha',nature:'thunder'},
+						check:function(){return 1},
+						ai:{
+							effect:{
+								target:function(card,player,target,current){
+									if(get.tag(card,'respondSha')&&current<0) return 0.6
+								}
+							},
+							respondSha:true,
+							order:4,
+							useful:-1,
+							value:-1
+						},
 					},
-					"nzry_junlve":{
+				},
+			},
+			"nzry_jieying":{
+				audio:2,
+				locked:true,
+				global:"g_nzry_jieying",
+				ai:{
+					effect:{
+						target:function(card){
+							if(card.name=='tiesuo') return 'zeroplayertarget';
+						},
+					},
+				},
+				group:["nzry_jieying_1","nzry_jieying_2"],
+				subSkill:{
+					'1':{
 						audio:2,
-						init:function(player){
-							if(!player.storage.nzry_junlve) player.storage.nzry_junlve=0;
-						},
-						marktext:"军",
-						intro:{
-							content:'当前有#个“军略”标记',
-						},
-						mark:true,
 						trigger:{
-							player:"damageAfter",
-							source:"damageAfter",
+							player:'linkAfter',
+							global:'gameDrawAfter',
 						},
 						forced:true,
-						content:function(){
-							if(player==trigger.source){
-								player.storage.nzry_junlve+=trigger.num;
-								game.log(player,'获得了',trigger.num,'个“军略”标记');
-							}
-							if(player==trigger.player){
-								player.storage.nzry_junlve+=trigger.num;
-								game.log(player,'获得了',trigger.num,'个“军略”标记');
-							}
-							player.syncStorage('nzry_junlve');
+						filter:function (event,player){
+							return !player.isLinked();
 						},
+						content:function(){
+							player.link(true);
+						},	
 					},
-					"nzry_cuike":{
+					'2':{
 						audio:2,
 						trigger:{
-							player:"phaseUseBegin",
+							player:'phaseEnd',
 						},
 						direct:true,
-						content:function(){
-							'step 0'
-							if(player.storage.nzry_junlve%2==1){
-								player.chooseTarget('是否发动【摧克】来对一名角色造成一点伤害？').ai=function(target){
-									return -get.attitude(player,target);
-								};
-							}else if(player.storage.nzry_junlve%2==0){
-								player.chooseTarget('是否发动【摧克】来横置一名角色并弃置其区域内的一张牌？').ai=function(target){
-									return -get.attitude(player,target);
-								};
-							}else{
-								event.finish();
-							};
-							'step 1'
-							if(result.bool){
-								player.line(result.targets);
-								player.logSkill('nzry_cuike');
-								if(player.storage.nzry_junlve%2==1){
-									result.targets[0].damage();
-								}else{
-									result.targets[0].link(true);
-									player.discardPlayerCard(result.targets[0],1,'hej');
-								};
-							};
-							'step 2'
-							if(player.storage.nzry_junlve>7){
-								player.chooseBool().set('ai',function(){
-									return true;
-								}).set('prompt','是否弃置所有“军略”标记并对所有其他角色造成一点伤害？');
-							}else{
-								event.finish();
-							};
-							'step 3'
-							if(result.bool){
-								player.line(game.players);
-								player.logSkill('nzry_cuike');
-								player.storage.nzry_junlve=0;
-								player.syncStorage('nzry_junlve');
-								game.log(player,'移去了所有“军略”标记');
-								for(var i=0;i<game.players.length;i++){
-									if(game.players[i]!=player) game.players[i].damage();
-								};
-							};
-						},
-					},
-					"nzry_dinghuo":{
-						audio:2,
-						limited:true,
-						init:function (player){
-							player.storage.nzry_dinghuo=false;
-						},
-						intro:{
-							content:"limited",
-						},
-						unique:true,
-						mark:true,
-						skillAnimation:true,
-						enable:'phaseUse',
-						filter:function (event,player){
-							return !player.storage.nzry_dinghuo&&player.storage.nzry_junlve>0;
-						},
-						check:function (event,player){
-							var num=game.countPlayer(function(current){return get.attitude(player,current)<0&&current.isLinked()});
-							return player.storage.nzry_junlve>=num&&num==game.countPlayer(function(current){return get.attitude(player,current)<0});
-						},
-						filterTarget:function(card,player,target){
-							return target.isLinked();
-						},
-						selectTarget:function(){
-							return [1,_status.event.player.storage.nzry_junlve];
-						},
-						multiline:true,
-						multitarget:true,
-						content:function (){
-							'step 0'
-							player.awakenSkill('nzry_dinghuo');
-							player.storage.nzry_dinghuo=true;
-							/*player.chooseTarget([0,player.storage.nzry_junlve],'请选择【绽火】的目标',function(card,player,target){
-								return target.isLinked();
-							}).ai=function(target){
-								return -get.attitude(player,target);
-							};*/
-							'step 1'
-							player.storage.nzry_junlve=0;
-							player.syncStorage('nzry_junlve');
-							game.log(player,'移去了所有“军略”标记');
-							for(var i=0;i<targets.length;i++){
-								targets[i].discard(targets[i].getCards('e'));
-							}
-							player.chooseTarget(true,'对一名目标角色造成1点火焰伤害',function(card,player,target){
-								return targets.contains(target);
-							}).ai=function(){return 1};
-							'step 2'
-							if(result.bool){
-								result.targets[0].damage('fire','nocard');
-							}
-						},
-						ai:{
-							order:1,
-							result:{
-								target:function(player,target){
-									if(target.hasSkillTag('nofire')) return 0;
-									if(lib.config.mode=='versus') return -1;
-									if(player.hasUnknown()) return 0;
-									return get.damageEffect(target,player)-target.countCards('e');
-								}
-							}
-						}
-					},
-					
-					"drlt_duorui":{
-						audio:2,
-						init:function(player){
-							player.storage.drlt_duorui=[];
-						},
-						trigger:{
-							source:'damageAfter'
-						},
-						filter:function(event,player){
-						if(player.storage.drlt_duorui.length) return false;
-							return player!=event.player&&event.player.isAlive()&&_status.currentPhase==player;
-						},
-						check:function(event,player){
-							if(player.isDisabled(5)) return false;
-							var skills=event.player.skills.slice(0);
-							for(var i=0;i<skills.length;i++){
-							 var info=get.info(skills[i])
-								if(info!=undefined&&!info.charlotte&&(!info.unique||info.gainable)) return true;
-							}
-						},
-						content:function(){
-							'step 0'
-							event.skills=[];
-							var skills=trigger.player.skills.slice(0);
-							for(var i=0;i<skills.length;i++){
-								var info=get.info(skills[i])
-								if(info!=undefined&&!info.charlotte&&(!info.unique||info.gainable)) event.skills.push(skills[i]);
-							};
-							if(player.countDisabled()<5){
-								player.chooseToDisable().ai=function(event,player,list){
-									if(list.contains('equip5')) return 'equip5';
-									return list.randomGet();
-								};
-							}
-							'step 1'
-							if(event.skills.length>0){
-								player.chooseControl(event.skills).set('prompt','请选择要获得的技能').set('ai',function(){return event.skills.randomGet()});
-							}
-							else event.finish();
-							'step 2'
-							player.addTempSkill(result.control,{player:'dieAfter'});
-							player.popup(result.control,'thunder');
-							player.storage.drlt_duorui=[result.control];
-							player.storage.drlt_duorui_player=trigger.player;
-							trigger.player.storage.drlt_duorui=[result.control];
-							trigger.player.addTempSkill('drlt_duorui1',{player:'phaseAfter'});
-							game.log(player,'获得了技能','#g【'+get.translation(result.control)+'】')
-						},
-						group:['duorui_clear'],
-					},
-					"duorui_clear":{
-						trigger:{global:['phaseAfter','dieAfter'],},
-						filter:function(event,player){
-							if(!player.storage.drlt_duorui_player||!player.storage.drlt_duorui) return false;
-							return player.storage.drlt_duorui_player==event.player&&player.storage.drlt_duorui.length;
-						},
-						silent:true,
-						forced:true,
-						popup:false,
-						content:function(){
-							player.removeSkill(player.storage.drlt_duorui[0]);
-							delete player.storage.drlt_duorui_player;
-							player.storage.drlt_duorui=[];
-						},
-					},
-					"drlt_duorui1":{
-						init:function(player,skill){
-							player.disableSkill(skill,player.storage.drlt_duorui);
-						},
-						onremove:function(player,skill){
-							"step 0"
-							player.enableSkill(skill);
-							"step 1"
-							delete player.storage.drlt_duorui;
-						},
-						locked:true,
-						mark:true,
-						intro:{
-							content:function(storage,player,skill){
-								var list=[];
-								for(var i in player.disabledSkills){
-									if(player.disabledSkills[i].contains(skill)) list.push(i);
-								};
-								if(list.length){
-									var str='失效技能：';
-									for(var i=0;i<list.length;i++){
-										if(lib.translate[list[i]+'_info']) str+=get.translation(list[i])+'、';
-									};
-									return str.slice(0,str.length-1);
-								};
-							},
-						},
-					},
-					"drlt_zhiti":{
-					audio:2,
-					locked:true,
-						group:["drlt_zhiti_1","drlt_zhiti_2","drlt_zhiti_3","drlt_zhiti_4","drlt_zhiti_5"],
-						subSkill:{
-							'1':{
-								audio:"drlt_zhiti",
-								trigger:{
-									global:'juedouAfter'
-								},
-								forced:true,
-								filter:function(event,player){
-									return event.targets&&event.targets.contains(player)&&event.turn!=player&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
-								},
-								content:function(){
-									player.chooseToEnable();
-								},
-							},
-							'2':{
-								audio:"drlt_zhiti",
-								trigger:{
-									player:'juedouAfter',
-								},
-								forced:true,
-								filter:function(event,player){
-									return event.turn!=player&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
-								},
-								content:function(){
-									player.chooseToEnable();
-								},
-							},
-							'3':{
-								audio:"drlt_zhiti",
-								trigger:{
-									player:'chooseToCompareAfter'
-								},
-								forced:true,
-								filter:function(event,player){
-									return event.result.bool==true&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
-								},
-								content:function(){
-									'step 0'
-									player.chooseToEnable();
-								},
-							},
-							'4':{
-								audio:"drlt_zhiti",
-								trigger:{
-									global:'chooseToCompareAfter'
-								},
-								forced:true,
-								filter:function(event,player){
-									return (event.targets!=undefined&&event.targets.contains(player)||event.target==player)&&event.result.bool==false&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
-								},
-								content:function(){
-									player.chooseToEnable();
-								},
-							},
-							'5':{
-								audio:"drlt_zhiti",
-								trigger:{
-									player:['damageEnd']
-								},
-								forced:true,
-								filter:function(event,player){
-									return player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
-								},
-								content:function(){
-									player.chooseToEnable();
-								},
-							},
-						},
-					},
-					"_drlt_zhiti":{
-						mod:{
-							maxHandcard:function (player,num){
-								if(player.maxHp>player.hp&&game.countPlayer(function(current){return current!=player&&current.hasSkill('drlt_zhiti')&&get.distance(current,player,'attack')<=1})) return num-1;
-							},
-						},
-					},
-					'drlt_poxi':{
-						audio:2,
-						enable:'phaseUse',
-						usable:1,
-						filterTarget:function(card,player,target){
-							//return target!=player&&target.countCards('h')>0;
-							return target!=player;
-						},
-						content:function(){
-							'step 0'
-							event.list1=[];
-							event.list2=[];
-							if(target.countCards('h')>0){
-								var chooseButton=player.chooseButton(4,'hidden',['你的手牌',player.getCards('h'),get.translation(target.name)+'的手牌',target.getCards('h'),'hidden']);
-							}else{
-								var chooseButton=player.chooseButton(4,'hidden',['你的手牌',player.getCards('h'),'hidden']);
-							}
-							chooseButton.set('ai',function(button){
-								//if(button.link.name=='du') return 1;
-								return 0;
-							});
-							chooseButton.filterButton=function(button){
-								for(var i=0;i<ui.selected.buttons.length;i++){
-									if(get.suit(button.link)==get.suit(ui.selected.buttons[i].link)) return false;
-								};
-								return true;
-							};
-							'step 1'
-							if(result.bool){
-								var list=result.links;
-								for(var i=0;i<list.length;i++){
-									if(get.owner(list[i])==player){
-										event.list1.push(list[i]);
-									}else{
-										event.list2.push(list[i]);
-									};
-								};
-								if(event.list1.length&&event.list2.length){
-									target.discard(event.list2).delay=false;
-									player.discard(event.list1).delay=false;
-									game.delay();
-								}
-								else{
-									target.discard(event.list2);
-									player.discard(event.list1);
-								}
-							};
-							'step 2'
-							if(event.list1.length+event.list2.length==4){
-								if(event.list1.length==0) player.loseMaxHp();
-								if(event.list1.length==1){
-									var evt=_status.event;
-									for(var i=0;i<10;i++){
-										if(evt&&evt.getParent)evt=evt.getParent();
-										if(evt.name=='phaseUse'){
-										evt.skipped=true;
-											break;
-										};
-									};
-									player.addTempSkill('drlt_poxi1',{player:'phaseAfter'});
-								};
-								if(event.list1.length==3) player.recover();
-								if(event.list1.length==4) player.draw(4);
-							};
-						},
-						ai:{
-							order:13,
-							result:{
-								target:function(target,player){
-									return -1;
-								},
-							},
-						},
-					},
-					'drlt_poxi1':{
-						mod:{
-							maxHandcard:function (player,num){
-								return num-1;
-							},
-						},
-					},
-					drlt_jieying_mark:{
-						init:function(player){
-							game.log(player,'获得了“营”标记');
-						},
-						onremove:function(player){
-							game.log(player,'失去了“营”标记');
-						},
-						mark:true,
-						marktext:"营",
-						intro:{
-							content:function(storage){
-								return '已获得“营”标记';
-							},
-						},
-						mod:{
-							cardUsable:function (card,player,num){
-								if(game.hasPlayer(function(current){
-									return current.hasSkill('drlt_jieying');
-								})&&card.name=='sha') return num+1;
-							},
-							maxHandcard:function (player,num){
-								if(game.hasPlayer(function(current){
-									return current.hasSkill('drlt_jieying');
-								})) return num+1;
-							},
-						},
-						audio:'drlt_jieying',
-						trigger:{
-							player:'phaseDrawBegin'
-						},
-						forced:true,
 						filter:function(event,player){
 							return game.hasPlayer(function(current){
-								return current.hasSkill('drlt_jieying');
+								return current!=player&&!current.isLinked();
 							});
 						},
 						content:function(){
-							trigger.num++;
+							"step 0"
+							player.chooseTarget(true,'请选择【结营】的目标',function(card,player,target){
+								return target!=player&&!target.isLinked();
+							}).ai=function(target){
+								return 1+Math.random();
+							};
+							"step 1"
+							if(result.bool){
+								player.line(result.targets);
+								player.logSkill('nzry_jieying');
+								result.targets[0].link(true);
+							}else{
+								event.finish();
+							};
 						},
 					},
-					'drlt_jieying':{
-						audio:2,
-						locked:false,
-						group:["drlt_jieying_1","drlt_jieying_2","drlt_jieying_3"],
-						subSkill:{
-							'1':{
-								audio:'drlt_jieying',
-								trigger:{
-									player:'phaseBegin'
-								},
-								forced:true,
-								filter:function(event,player){
-									return !game.hasPlayer(function(current){
-										return current.hasSkill('drlt_jieying_mark');
-									});
-								},
-								content:function(){
-									player.addSkill('drlt_jieying_mark');
-								},
-							},
-							'2':{
-								audio:'drlt_jieying',
-								trigger:{
-									player:"phaseEnd",
-								},
-								direct:true,
-								filter:function(event,player){
-									return player.hasSkill('drlt_jieying_mark');
-								},
-								content:function(){
-									'step 0'
-									player.chooseTarget(get.prompt('drlt_jieying'),function(card,player,target){
-										return target!=player;
-									}).ai=function(target){
-										if(get.attitude(player,target)>0)
-										return 0.1;
-										if(get.attitude(player,target)<1&&(target.isTurnedOver()||target.countCards('h')<1))
-										return 0.2;
-											if(get.attitude(player,target)<1&&target.countCards('h')>0&&target.countCards('j',{name:'lebu'})>0)
-										return target.countCards('h')*0.8+target.getHandcardLimit()*0.7+2;
-										if(get.attitude(player,target)<1&&target.countCards('h')>0)
-										return target.countCards('h')*0.8+target.getHandcardLimit()*0.7;
-										return 1;
-									};
-									'step 1'
-									if(result.bool){
-										var target=result.targets[0];
-										player.line(target);
-										player.logSkill('drlt_jieying',target);
-										target.addSkill('drlt_jieying_mark');
-									};
-								},
-							},
-							'3':{
-								audio:'drlt_jieying',
-								trigger:{
-									global:'phaseAfter',
-								},
-								forced:true,
-								filter:function(event,player){
-									return player!=event.player&&event.player.hasSkill('drlt_jieying_mark')&&event.player.isAlive();
-								},
-								logTarget:'player',
-								content:function(){
-									if(trigger.player.countCards('h')>0){
-										trigger.player.give(trigger.player.getCards('h'),player);
-									}
-									trigger.player.removeSkill('drlt_jieying_mark');
-								},
-							},
+				},
+			},
+			"g_nzry_jieying":{
+				mod:{
+					maxHandcard:function (player,num){
+						if(game.countPlayer(function(current){return current.hasSkill('nzry_jieying')})>0&&player.isLinked()) return num+2;
+					},
+				},
+			},
+			"nzry_junlve":{
+				audio:2,
+				init:function(player){
+					if(!player.storage.nzry_junlve) player.storage.nzry_junlve=0;
+				},
+				marktext:"军",
+				intro:{
+					content:'当前有#个“军略”标记',
+				},
+				mark:true,
+				trigger:{
+					player:"damageAfter",
+					source:"damageAfter",
+				},
+				forced:true,
+				content:function(){
+					if(player==trigger.source){
+						player.storage.nzry_junlve+=trigger.num;
+						game.log(player,'获得了',trigger.num,'个“军略”标记');
+					}
+					if(player==trigger.player){
+						player.storage.nzry_junlve+=trigger.num;
+						game.log(player,'获得了',trigger.num,'个“军略”标记');
+					}
+					player.syncStorage('nzry_junlve');
+				},
+			},
+			"nzry_cuike":{
+				audio:2,
+				trigger:{
+					player:"phaseUseBegin",
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					if(player.storage.nzry_junlve%2==1){
+						player.chooseTarget('是否发动【摧克】来对一名角色造成一点伤害？').ai=function(target){
+							return -get.attitude(player,target);
+						};
+					}else if(player.storage.nzry_junlve%2==0){
+						player.chooseTarget('是否发动【摧克】来横置一名角色并弃置其区域内的一张牌？').ai=function(target){
+							return -get.attitude(player,target);
+						};
+					}else{
+						event.finish();
+					};
+					'step 1'
+					if(result.bool){
+						player.line(result.targets);
+						player.logSkill('nzry_cuike');
+						if(player.storage.nzry_junlve%2==1){
+							result.targets[0].damage();
+						}else{
+							result.targets[0].link(true);
+							player.discardPlayerCard(result.targets[0],1,'hej');
+						};
+					};
+					'step 2'
+					if(player.storage.nzry_junlve>7){
+						player.chooseBool().set('ai',function(){
+							return true;
+						}).set('prompt','是否弃置所有“军略”标记并对所有其他角色造成一点伤害？');
+					}else{
+						event.finish();
+					};
+					'step 3'
+					if(result.bool){
+						player.line(game.players);
+						player.logSkill('nzry_cuike');
+						player.storage.nzry_junlve=0;
+						player.syncStorage('nzry_junlve');
+						game.log(player,'移去了所有“军略”标记');
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i]!=player) game.players[i].damage();
+						};
+					};
+				},
+			},
+			"nzry_dinghuo":{
+				audio:2,
+				limited:true,
+				init:function (player){
+					player.storage.nzry_dinghuo=false;
+				},
+				intro:{
+					content:"limited",
+				},
+				unique:true,
+				mark:true,
+				skillAnimation:true,
+				enable:'phaseUse',
+				filter:function (event,player){
+					return !player.storage.nzry_dinghuo&&player.storage.nzry_junlve>0;
+				},
+				check:function (event,player){
+					var num=game.countPlayer(function(current){return get.attitude(player,current)<0&&current.isLinked()});
+					return player.storage.nzry_junlve>=num&&num==game.countPlayer(function(current){return get.attitude(player,current)<0});
+				},
+				filterTarget:function(card,player,target){
+					return target.isLinked();
+				},
+				selectTarget:function(){
+					return [1,_status.event.player.storage.nzry_junlve];
+				},
+				multiline:true,
+				multitarget:true,
+				content:function (){
+					'step 0'
+					player.awakenSkill('nzry_dinghuo');
+					player.storage.nzry_dinghuo=true;
+					'step 1'
+					player.storage.nzry_junlve=0;
+					player.syncStorage('nzry_junlve');
+					game.log(player,'移去了所有“军略”标记');
+					for(var i=0;i<targets.length;i++){
+						targets[i].discard(targets[i].getCards('e'));
+					}
+					player.chooseTarget(true,'对一名目标角色造成1点火焰伤害',function(card,player,target){
+						return targets.contains(target);
+					}).ai=function(){return 1};
+					'step 2'
+					if(result.bool){
+						result.targets[0].damage('fire','nocard');
+					}
+				},
+				ai:{
+					order:1,
+					result:{
+						target:function(player,target){
+							if(target.hasSkillTag('nofire')) return 0;
+							if(lib.config.mode=='versus') return -1;
+							if(player.hasUnknown()) return 0;
+							return get.damageEffect(target,player)-target.countCards('e');
+						}
+					}
+				}
+			},
+			
+			"drlt_duorui":{
+				audio:2,
+				init:function(player){
+					player.storage.drlt_duorui=[];
+				},
+				trigger:{
+					source:'damageAfter'
+				},
+				filter:function(event,player){
+				if(player.storage.drlt_duorui.length) return false;
+					return player!=event.player&&event.player.isAlive()&&_status.currentPhase==player;
+				},
+				check:function(event,player){
+					if(player.isDisabled(5)) return false;
+					var skills=event.player.skills.slice(0);
+					for(var i=0;i<skills.length;i++){
+					 var info=get.info(skills[i])
+						if(info!=undefined&&!info.charlotte&&(!info.unique||info.gainable)) return true;
+					}
+				},
+				content:function(){
+					'step 0'
+					event.skills=[];
+					var skills=trigger.player.skills.slice(0);
+					for(var i=0;i<skills.length;i++){
+						var info=get.info(skills[i])
+						if(info!=undefined&&!info.charlotte&&(!info.unique||info.gainable)) event.skills.push(skills[i]);
+					};
+					if(player.countDisabled()<5){
+						player.chooseToDisable().ai=function(event,player,list){
+							if(list.contains('equip5')) return 'equip5';
+							return list.randomGet();
+						};
+					}
+					'step 1'
+					if(event.skills.length>0){
+						player.chooseControl(event.skills).set('prompt','请选择要获得的技能').set('ai',function(){return event.skills.randomGet()});
+					}
+					else event.finish();
+					'step 2'
+					player.addTempSkill(result.control,{player:'dieAfter'});
+					player.popup(result.control,'thunder');
+					player.storage.drlt_duorui=[result.control];
+					player.storage.drlt_duorui_player=trigger.player;
+					trigger.player.storage.drlt_duorui=[result.control];
+					trigger.player.addTempSkill('drlt_duorui1',{player:'phaseAfter'});
+					game.log(player,'获得了技能','#g【'+get.translation(result.control)+'】')
+				},
+				group:['duorui_clear'],
+			},
+			"duorui_clear":{
+				trigger:{global:['phaseAfter','dieAfter'],},
+				filter:function(event,player){
+					if(!player.storage.drlt_duorui_player||!player.storage.drlt_duorui) return false;
+					return player.storage.drlt_duorui_player==event.player&&player.storage.drlt_duorui.length;
+				},
+				silent:true,
+				forced:true,
+				popup:false,
+				content:function(){
+					player.removeSkill(player.storage.drlt_duorui[0]);
+					delete player.storage.drlt_duorui_player;
+					player.storage.drlt_duorui=[];
+				},
+			},
+			"drlt_duorui1":{
+				init:function(player,skill){
+					player.disableSkill(skill,player.storage.drlt_duorui);
+				},
+				onremove:function(player,skill){
+					"step 0"
+					player.enableSkill(skill);
+					"step 1"
+					delete player.storage.drlt_duorui;
+				},
+				locked:true,
+				mark:true,
+				intro:{
+					content:function(storage,player,skill){
+						var list=[];
+						for(var i in player.disabledSkills){
+							if(player.disabledSkills[i].contains(skill)) list.push(i);
+						};
+						if(list.length){
+							var str='失效技能：';
+							for(var i=0;i<list.length;i++){
+								if(lib.translate[list[i]+'_info']) str+=get.translation(list[i])+'、';
+							};
+							return str.slice(0,str.length-1);
+						};
+					},
+				},
+			},
+			"drlt_zhiti":{
+			audio:2,
+			locked:true,
+				group:["drlt_zhiti_1","drlt_zhiti_2","drlt_zhiti_3","drlt_zhiti_4","drlt_zhiti_5"],
+				subSkill:{
+					'1':{
+						audio:"drlt_zhiti",
+						trigger:{
+							global:'juedouAfter'
+						},
+						forced:true,
+						filter:function(event,player){
+							return event.targets&&event.targets.contains(player)&&event.turn!=player&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
+						},
+						content:function(){
+							player.chooseToEnable();
 						},
 					},
+					'2':{
+						audio:"drlt_zhiti",
+						trigger:{
+							player:'juedouAfter',
+						},
+						forced:true,
+						filter:function(event,player){
+							return event.turn!=player&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
+						},
+						content:function(){
+							player.chooseToEnable();
+						},
+					},
+					'3':{
+						audio:"drlt_zhiti",
+						trigger:{
+							player:'chooseToCompareAfter'
+						},
+						forced:true,
+						filter:function(event,player){
+							return event.result.bool==true&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
+						},
+						content:function(){
+							'step 0'
+							player.chooseToEnable();
+						},
+					},
+					'4':{
+						audio:"drlt_zhiti",
+						trigger:{
+							global:'chooseToCompareAfter'
+						},
+						forced:true,
+						filter:function(event,player){
+							return (event.targets!=undefined&&event.targets.contains(player)||event.target==player)&&event.result.bool==false&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
+						},
+						content:function(){
+							player.chooseToEnable();
+						},
+					},
+					'5':{
+						audio:"drlt_zhiti",
+						trigger:{
+							player:['damageEnd']
+						},
+						forced:true,
+						filter:function(event,player){
+							return player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
+						},
+						content:function(){
+							player.chooseToEnable();
+						},
+					},
+				},
+			},
+			"_drlt_zhiti":{
+				mod:{
+					maxHandcard:function (player,num){
+						if(player.maxHp>player.hp&&game.countPlayer(function(current){return current!=player&&current.hasSkill('drlt_zhiti')&&get.distance(current,player,'attack')<=1})) return num-1;
+					},
+				},
+			},
+			'drlt_poxi':{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filterTarget:function(card,player,target){
+					//return target!=player&&target.countCards('h')>0;
+					return target!=player;
+				},
+				content:function(){
+					'step 0'
+					event.list1=[];
+					event.list2=[];
+					if(target.countCards('h')>0){
+						var chooseButton=player.chooseButton(4,'hidden',['你的手牌',player.getCards('h'),get.translation(target.name)+'的手牌',target.getCards('h'),'hidden']);
+					}else{
+						var chooseButton=player.chooseButton(4,'hidden',['你的手牌',player.getCards('h'),'hidden']);
+					}
+					chooseButton.set('ai',function(button){
+						//if(button.link.name=='du') return 1;
+						return 0;
+					});
+					chooseButton.filterButton=function(button){
+						for(var i=0;i<ui.selected.buttons.length;i++){
+							if(get.suit(button.link)==get.suit(ui.selected.buttons[i].link)) return false;
+						};
+						return true;
+					};
+					'step 1'
+					if(result.bool){
+						var list=result.links;
+						for(var i=0;i<list.length;i++){
+							if(get.owner(list[i])==player){
+								event.list1.push(list[i]);
+							}else{
+								event.list2.push(list[i]);
+							};
+						};
+						if(event.list1.length&&event.list2.length){
+							target.discard(event.list2).delay=false;
+							player.discard(event.list1).delay=false;
+							game.delay();
+						}
+						else{
+							target.discard(event.list2);
+							player.discard(event.list1);
+						}
+					};
+					'step 2'
+					if(event.list1.length+event.list2.length==4){
+						if(event.list1.length==0) player.loseMaxHp();
+						if(event.list1.length==1){
+							var evt=_status.event;
+							for(var i=0;i<10;i++){
+								if(evt&&evt.getParent)evt=evt.getParent();
+								if(evt.name=='phaseUse'){
+								evt.skipped=true;
+									break;
+								};
+							};
+							player.addTempSkill('drlt_poxi1',{player:'phaseAfter'});
+						};
+						if(event.list1.length==3) player.recover();
+						if(event.list1.length==4) player.draw(4);
+					};
+				},
+				ai:{
+					order:13,
+					result:{
+						target:function(target,player){
+							return -1;
+						},
+					},
+				},
+			},
+			'drlt_poxi1':{
+				mod:{
+					maxHandcard:function (player,num){
+						return num-1;
+					},
+				},
+			},
+			drlt_jieying_mark:{
+				init:function(player){
+					game.log(player,'获得了“营”标记');
+				},
+				onremove:function(player){
+					game.log(player,'失去了“营”标记');
+				},
+				mark:true,
+				marktext:"营",
+				intro:{
+					content:function(storage){
+						return '已获得“营”标记';
+					},
+				},
+				mod:{
+					cardUsable:function (card,player,num){
+						if(game.hasPlayer(function(current){
+							return current.hasSkill('drlt_jieying');
+						})&&card.name=='sha') return num+1;
+					},
+					maxHandcard:function (player,num){
+						if(game.hasPlayer(function(current){
+							return current.hasSkill('drlt_jieying');
+						})) return num+1;
+					},
+				},
+				audio:'drlt_jieying',
+				trigger:{
+					player:'phaseDrawBegin'
+				},
+				forced:true,
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return current.hasSkill('drlt_jieying');
+					});
+				},
+				content:function(){
+					trigger.num++;
+				},
+			},
+			'drlt_jieying':{
+				audio:2,
+				locked:false,
+				group:["drlt_jieying_1","drlt_jieying_2","drlt_jieying_3"],
+				subSkill:{
+					'1':{
+						audio:'drlt_jieying',
+						trigger:{
+							player:'phaseBegin'
+						},
+						forced:true,
+						filter:function(event,player){
+							return !game.hasPlayer(function(current){
+								return current.hasSkill('drlt_jieying_mark');
+							});
+						},
+						content:function(){
+							player.addSkill('drlt_jieying_mark');
+						},
+					},
+					'2':{
+						audio:'drlt_jieying',
+						trigger:{
+							player:"phaseEnd",
+						},
+						direct:true,
+						filter:function(event,player){
+							return player.hasSkill('drlt_jieying_mark');
+						},
+						content:function(){
+							'step 0'
+							player.chooseTarget(get.prompt('drlt_jieying'),function(card,player,target){
+								return target!=player;
+							}).ai=function(target){
+								if(get.attitude(player,target)>0)
+								return 0.1;
+								if(get.attitude(player,target)<1&&(target.isTurnedOver()||target.countCards('h')<1))
+								return 0.2;
+									if(get.attitude(player,target)<1&&target.countCards('h')>0&&target.countCards('j',{name:'lebu'})>0)
+								return target.countCards('h')*0.8+target.getHandcardLimit()*0.7+2;
+								if(get.attitude(player,target)<1&&target.countCards('h')>0)
+								return target.countCards('h')*0.8+target.getHandcardLimit()*0.7;
+								return 1;
+							};
+							'step 1'
+							if(result.bool){
+								var target=result.targets[0];
+								player.line(target);
+								player.logSkill('drlt_jieying',target);
+								target.addSkill('drlt_jieying_mark');
+							};
+						},
+					},
+					'3':{
+						audio:'drlt_jieying',
+						trigger:{
+							global:'phaseAfter',
+						},
+						forced:true,
+						filter:function(event,player){
+							return player!=event.player&&event.player.hasSkill('drlt_jieying_mark')&&event.player.isAlive();
+						},
+						logTarget:'player',
+						content:function(){
+							if(trigger.player.countCards('h')>0){
+								trigger.player.give(trigger.player.getCards('h'),player);
+							}
+							trigger.player.removeSkill('drlt_jieying_mark');
+						},
+					},
+				},
+			},
 		},
 		translate:{
 			"shen_luxun":"神陆逊",

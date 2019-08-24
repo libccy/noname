@@ -29,9 +29,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuyao:"刘繇（yáo，一读yóu）（156年－197年），字正礼。东莱牟平（今山东牟平）人。东汉末年宗室、大臣，汉末群雄之一，齐悼惠王刘肥之后，太尉刘宠之侄。<br>刘繇最初被推举为孝廉，授郎中。任下邑县长时，因拒郡守请托而弃官。后被征辟为司空掾属，除授侍御史，因战乱而不到任，避居淮浦。兴平元年（194年），被任命为扬州刺史。他先后与袁术、孙策交战，一度被朝廷加授为扬州牧、振武将军，但最终还是败归丹徒。此后，刘繇又击破反叛的笮融，旋即病逝，年四十二。",
 			liuyan:"刘焉（？－194年），字君郎（《华阳国志》又作君朗）。江夏郡竟陵县（今湖北省天门市）人。东汉末年宗室、军阀，汉末群雄之一，西汉鲁恭王刘余之后。<br>刘焉初以汉朝宗室身份，拜为中郎，历任雒阳令、冀州刺史、南阳太守、宗正、太常等官。因益州刺史郄俭在益州大肆聚敛，贪婪成风，加上当时天下大乱。刘焉欲取得一安身立命之所，割据一方，于是向朝廷求为益州牧，封阳城侯，前往益州整饬吏治。郄俭为黄巾军所杀，刘焉进入益州，派张鲁盘踞汉中，张鲁截断交通，斩杀汉使，从此益州与中央道路不通。刘焉进一步对内打击地方豪强，巩固自身势力，益州因而处于半独立的状态。兴平元年（194年），刘焉因背疮迸发而逝世，其子刘璋继领益州牧。",
 		},
-		characterTitle:{
-	   		//lijue:"体力上限：6",
-		},
+		characterTitle:{},
 		perfectPair:{
 			lijue:['guosi','jiaxu'],
 			zhangji:['zhangxiu','drlt_zhangxiu','zoushi'],
@@ -682,7 +680,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						else{
 							ui.cardPile.appendChild(cards[i]);
-						}			  
+						}
 					}
 					game.updateRoundNumber();
 					game.log(player,'把',get.cnNumber(cards.length),'张牌放在了牌堆里');
@@ -1076,7 +1074,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.card=result[0];
 					if(event.card&&get.owner(event.card)==player&&(event.ablers.length>1||event.ablers[0]!=player)){
 						player.chooseTarget('是否将'+get.translation(event.card)+'交给其他角色？',function(card,player,target){
-						   return event.ablers.contains(target)&&target!=player;
+							return event.ablers.contains(target)&&target!=player;
 						}).ai=function(){
 							return false;
 						};
@@ -1356,7 +1354,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					content:"mark",
 				},
 				filter:function(event,player){
-				   return player.storage.xinfu_xionghuo>0;
+					return player.storage.xinfu_xionghuo>0;
 				},
 				filterTarget:function (card,player,target){
 					if(target.storage.xionghuo!=undefined&&target.storage.xionghuo>0) return false;
@@ -2200,20 +2198,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var attitude=get.attitude(player,trigger.player);
 						if(attitude==0||(resulth==0&&results==0)) return '取消';
 						if(attitude>0){
-							 if(results>0){
-								 if(resulth>results) return '红桃5';
-								 return '黑桃5';
-							 }
-							 else if(resulth>0) return '红桃5';
-							 return '取消';
+							if(results>0){
+								if(resulth>results) return '红桃5';
+								return '黑桃5';
+							}
+							else if(resulth>0) return '红桃5';
+							return '取消';
 						}
 						else{
 							if(results<0){
-								 if(resulth<results) return '红桃5';
-								 return '黑桃5';
-							 }
-							 else if(resulth<0) return '红桃5';
-							 return '取消';
+								if(resulth<results) return '红桃5';
+								return '黑桃5';
+							}
+							else if(resulth<0) return '红桃5';
+							return '取消';
 						}
 					}).set('judging',trigger.player.judging[0]);
 					"step 1"
@@ -2967,7 +2965,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function (card,player,target,current){
 							if(get.type(card)=='equip'&&player==target&&player==_status.currentPhase) return [1,3];
-						 },
+						},
 					},
 				},
 			},
@@ -3020,7 +3018,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function (card,player,target,current){
 							if(get.type(card)=='equip'&&player==target&&player==_status.currentPhase&&get.subtype(card)=='equip1') return [1,3];
-						 },
+						},
 					},
 				},
 				audio:2,
@@ -4367,7 +4365,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							else{
 								if(!event.ingame){
-								   if(target.getEquip(2)) return true;
+									if(target.getEquip(2)) return true;
 									return false;
 								}
 								return target.countCards('e')>0;
@@ -4631,7 +4629,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function (event,player){
 				if(!player.storage.yizan&&player.countCards('he')<2) return false;
 					if(event.filterCard({name:'sha'},player,event)||
-					   event.filterCard({name:'jiu'},player,event)||
+						event.filterCard({name:'jiu'},player,event)||
 						event.filterCard({name:'tao'},player,event)){
 						return player.hasCard(function(card){
 							return get.type(card)=='basic';
@@ -4911,10 +4909,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						'将'+get.cnNumber(event.num)+'张牌交给一名其他角色',
 						'弃置'+get.cnNumber(event.num)+'张牌',
 					]).set('ai',function(){
-					   if(game.hasPlayer(function(current){
-						   return current!=player&&get.attitude(player,current)>2;
-					   })) return 0;
-					   return 1;
+						if(game.hasPlayer(function(current){
+							return current!=player&&get.attitude(player,current)>2;
+						})) return 0;
+						return 1;
 					});
 					'step 3'
 					if(result.index==0){
@@ -5123,7 +5121,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.storage.xinfu_zhaoxin.remove(event.card);
 						player.$give(event.card,trigger.player);
-				  trigger.player.gain(event.card,'fromStorage');
+						trigger.player.gain(event.card,'fromStorage');
 						if(player.storage.xinfu_zhaoxin.length) player.markSkill('xinfu_zhaoxin');
 						else player.unmarkSkill('xinfu_zhaoxin');
 						player.chooseBool('是否对'+get.translation(trigger.player)+'造成一点伤害？').ai=function(){

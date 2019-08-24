@@ -738,11 +738,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			liulongcanjia:{
-			    mod:{
-			        targetEnabled:function(card,player,target){
-			            if(['equip3','equip4'].contains(get.subtype(card))) return false;
-			        },
-			    },
+				mod:{
+					targetEnabled:function(card,player,target){
+						if(['equip3','equip4'].contains(get.subtype(card))) return false;
+					},
+				},
 			},
 			minguangkai_cancel:{
 				trigger:{target:'useCardToBefore'},

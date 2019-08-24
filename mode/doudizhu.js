@@ -224,9 +224,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.init(lib.config.test_game);
 					}
 					if(get.config('choose_group')&&player.group=='shen'){
-						    var list=lib.group.slice(0);
-						    list.remove('shen');
-						    if(list.length) player.group=list.randomGet();
+							var list=lib.group.slice(0);
+							list.remove('shen');
+							if(list.length) player.group=list.randomGet();
 						}
 						player.node.name.dataset.nature=get.groupnature(player.group);
 				}
@@ -549,7 +549,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var chooseGroup=false;
 					if(event.chosen.length){
 						if(lib.character[event.chosen[0]][1]=='shen'){
-						    chooseGroup=true;
+							chooseGroup=true;
 						}
 					}
 					else if(event.modchosen){
@@ -560,13 +560,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.choosed=[result.buttons[0].link,result.buttons[1].link];
 						game.addRecentCharacter(result.buttons[0].link,result.buttons[1].link);
 						if(lib.character[event.choosed[0]][1]=='shen'){
-						    chooseGroup=true;
+							chooseGroup=true;
 						}
 					}
 					else{
 						event.choosed=[result.buttons[0].link];
 						if(lib.character[event.choosed[0]][1]=='shen'){
-						    chooseGroup=true;
+							chooseGroup=true;
 						}
 						game.addRecentCharacter(result.buttons[0].link);
 					}
