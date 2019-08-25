@@ -6232,7 +6232,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.storage._mingzhi3=true;
 					var name=player.name1;
-					if(!player.isUnseen(0)||name.indexOf('gz_')!=0||!lib.junList.contains(name.slice(3))||!lib.character['gz_jun'+name.slice(3)]) event.finish();
+					if(!player.isUnseen(0)||name.indexOf('gz_')!=0||!lib.junList.contains(name.slice(3))||!lib.character['gz_jun_'+name.slice(3)]) event.finish();
 					else{
 						player.chooseBool("是否将主武将牌替换为君主武将？").ai=function(){return true};
 					}
