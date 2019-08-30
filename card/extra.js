@@ -489,8 +489,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			tengjia2:{
 				trigger:{player:'damageBegin'},
-				filter:function(event){
-					if(event.nature=='fire') return true;
+				filter:function(event,player){
+					if(event.nature!='fire') return false;
+					if(event.source&&event.source.hasSkillTag('unequip',false,{
+						name:event.card?event.card.name:null,
+						target:player,
+						card:event.card
+					})) return false;
+					return true;
 				},
 				audio:true,
 				forced:true,
