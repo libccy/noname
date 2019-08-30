@@ -780,9 +780,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				init:function(){
 					var map={};
 					var map3=[];
-					var list1=['司','夏','诸'];
-					var list2=['马','侯','葛'];
-					var exclude=['界','新','大'];
+					var list1=['司','夏','诸','皇'];
+					var list2=['马','侯','葛','甫'];
+					var exclude=['界','新','大','旧','☆','神'];
 					for(var i in lib.character){
 						if(lib.filter.characterDisabled(i)) continue;
 						var surname=lib.translate[i];

@@ -2467,7 +2467,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function (){
 					"step 0"
-					player.chooseTarget(get.prompt('yinghun'),function(card,player,target){
+					player.chooseTarget(get.prompt2('gzyinghun'),function(card,player,target){
 						return player!=target;
 					}).set('ai',function(target){
 						var player=_status.event.player;
@@ -2635,7 +2635,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function (){
 					"step 0"
-					player.chooseTarget(get.prompt('new_jieming'),function(card,player,target){
+					player.chooseTarget(get.prompt('new_jieming'),'令一名角色将手牌补至X张（X为其体力上限且至多为5）',function(card,player,target){
 						return target.countCards('h')<Math.min(target.maxHp,5);
 					}).set('ai',function(target){
 						var att=get.attitude(_status.event.player,target);
@@ -2687,7 +2687,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function (){
 					"step 0"
-					player.chooseTarget(get.prompt('new_fangzhu'),function(card,player,target){
+					player.chooseTarget(get.prompt2('new_fangzhu'),function(card,player,target){
 						return player!=target
 					}).ai=function(target){
 						if(target.hasSkillTag('noturn')) return 0;
@@ -2712,7 +2712,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var player=_status.event.player;
 							if(player.isTurnedOver()) return -1;
 							return (player.hp*player.hp)-get.value(card);
-						}).set('dialog',['弃置一张手牌并失去一点体力；或选择不弃置，将武将牌翻面并摸牌。']);
+						}).set('prompt','弃置一张手牌并失去一点体力；或选择不弃置，将武将牌翻面并摸'+(player.maxHp-player.hp)+'张牌。');
 					}
 					else event.finish();
 					"step 2"
@@ -3739,7 +3739,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseTarget(get.prompt('xuanlve'),function(card,player,target){
+					player.chooseTarget(get.prompt('xuanlve'),'弃置一名其他角色的一张牌',function(card,player,target){
 						return target!=player&&target.countDiscardableCards(player,'he');
 					}).set('ai',function(target){
 						return -get.attitude(_status.event.player,target);
@@ -5253,7 +5253,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						ai2:function(target){
 							return get.attitude(_status.event.player,target)-3;
 						},
-						prompt:get.prompt('yuanhu')
+						prompt:get.prompt2('huyuan')
 					});
 					"step 1"
 					if(result.bool){
@@ -5598,7 +5598,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					player.chooseControl('点数+3','点数-3','cancel2').set('prompt',get.prompt('yingyang')).set('ai',function(){
+					player.chooseControl('点数+3','点数-3','cancel2').set('prompt',get.prompt3('yingyang')).set('ai',function(){
 						if(_status.event.small) return 1;
 						else return 0;
 					}).set('small',trigger.small);
@@ -6042,7 +6042,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(get.damageEffect(trigger.player,player,player)<=0){
 						nono=true;
 					}
-					var next=player.chooseToDiscard(get.prompt('gzxiaoguo',trigger.player),{type:'basic'});
+					var next=player.chooseToDiscard(get.prompt2('gzxiaoguo',trigger.player),{type:'basic'});
 					next.set('ai',function(card){
 						if(_status.event.nono) return 0;
 						return 8-get.useful(card);
@@ -7682,8 +7682,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				changeVice:function(){
 					'step 0'
-					if(!player.hasViceCharacter()) event.finish();
-					else{
+					//if(!player.hasViceCharacter()) event.finish();
+					//else{
 						var group=lib.character[player.name1][1];
 						_status.characterlist.randomSort();
 						event.tochange=[]
@@ -7695,11 +7695,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						else{
 							player.chooseButton(true,['选择要变更的武将牌',[event.tochange,'character']]);
 						}
-					}
+					//}
 					'step 1'
 					var name=result.links[0];
 					_status.characterlist.remove(name);
-					_status.characterlist.add(player.name2);
+					if(player.hasViceCharacter()) _status.characterlist.add(player.name2);
 					game.log(player,'将副将变更为','#g'+get.translation(name));
 					player.viceChanged=true;
 					if(player.isUnseen(1)){
@@ -7755,7 +7755,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				mayChangeVice:function(repeat){
 					if(!_status.changedSkills) _status.changedSkills=[];
 					var skill=_status.event.name;
-					if(this.hasViceCharacter()&&(repeat||!_status.changedSkills.contains(skill))){
+					if(repeat||!_status.changedSkills.contains(skill)){
 						var next=game.createEvent('mayChangeVice');
 						next.setContent('mayChangeVice');
 						next.player=this;

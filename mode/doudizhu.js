@@ -691,6 +691,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								lib.playerOL[i].init(result[i][0],result[i][1]);
 							}
 						}
+						game.zhu=zhu;
 						zhu.maxHp++;
 						zhu.hp++;
 						zhu.update();
