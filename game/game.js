@@ -9475,6 +9475,68 @@
 		},
 		element:{
 			content:{
+				chooseToPSS:function(){
+					'step 0'
+					game.log(player,'对',target,'发起了石头剪刀布');
+					if(_status.connectMode){
+						player.chooseButtonOL([
+							[player,['石头剪刀布：请选择一种手势',[[['','','pss_paper'],['','','pss_scissor'],['','','pss_stone']],'vcard']],true],
+							[target,['石头剪刀布：请选择一种手势',[[['','','pss_paper'],['','','pss_scissor'],['','','pss_stone']],'vcard']],true]
+						],function(){},function(){return 1+Math.random()}).set('switchToAuto',function(){
+							_status.event.result='ai';
+						}).set('processAI',function(){
+							var buttons=_status.event.dialog.buttons;
+							return {
+								bool:true,
+								links:[buttons.randomGet().link],
+							}
+						});
+					}
+					'step 1'
+					if(_status.connectMode){
+						event.mes=result[player.playerid].links[0][2];
+						event.tes=result[target.playerid].links[0][2];
+						event.goto(4);
+					}
+					else{
+						player.chooseButton(['石头剪刀布：请选择一种手势',[[['','','pss_paper'],['','','pss_scissor'],['','','pss_stone']],'vcard']],true).ai=function(){return 1+Math.random()};
+					}
+					'step 2'
+					event.mes=result.links[0][2];
+					target.chooseButton(['石头剪刀布：请选择一种手势',[[['','','pss_paper'],['','','pss_scissor'],['','','pss_stone']],'vcard']],true).ai=function(){return 1+Math.random()};
+					'step 3'
+					event.tes=result.links[0][2];
+					'step 4'
+					player.chat(get.translation(event.mes));
+					game.log(player,'选择的手势为','#g'+get.translation(event.mes));
+					target.chat(get.translation(event.tes));
+					game.log(player,'选择的手势为','#g'+get.translation(event.tes));
+					game.delay();
+					'step 5'
+					var mes=event.mes.slice(4);
+					var tes=event.tes.slice(4);
+					if(mes==tes){
+						player.popup('平','metal');
+						target.popup('平','metal');
+						game.log('石头剪刀布的结果为','#g平局');
+						event.result={tie:true};
+					}
+					else{
+						if({paper:'stone',scissor:'paper',stone:'scissor'}[mes]==tes){
+							player.popup('胜','wood');
+							target.popup('负','fire');
+							game.log(player,'#g胜');
+							event.result={bool:true};
+						}
+						else{
+							target.popup('胜','wood');
+							player.popup('负','fire');
+							game.log(target,'#g胜');
+							event.result={bool:false};
+						}
+					}
+					game.delay(2);
+				},
 				cardsDiscard:function(){
 					for(var i=0;i<cards.length;i++){
 						cards[i].discard();
@@ -11187,8 +11249,16 @@
 					};
 					"step 2"
 					var cards=[];
+					if(result[0].skill&&lib.skill[result[0].skill]&&lib.skill[result[0].skill].onCompare){
+						player.logSkill(result[0].skill);
+						result[0].cards=lib.skill[result[0].skill].onCompare(player)
+					};
 					player.lose(result[0].cards,ui.special);
 					for(var i=1;i<result.length;i++){
+						if(result[i].skill&&lib.skill[result[i].skill]&&lib.skill[result[i].skill].onCompare){
+							event.list[i].logSkill(result[i].skill);
+							result[i].cards=lib.skill[result[i].skill].onCompare(event.list[i]);
+						}
 						event.list[i].lose(result[i].cards,ui.special);
 						cards.push(result[i].cards[0]);
 					}
@@ -11316,6 +11386,10 @@
 					}
 					"step 2"
 					if(event.localPlayer){
+						if(result.skill&&lib.skill[result.skill]&&lib.skill[result.skill].onCompare){
+							result.cards=lib.skill[result.skill].onCompare(player);
+							player.logSkill(result.skill);
+						}
 						event.card1=result.cards[0];
 					}
 					if(event.localTarget){
@@ -11323,6 +11397,10 @@
 					}
 					"step 3"
 					if(event.localTarget){
+						if(result.skill&&lib.skill[result.skill]&&lib.skill[result.skill].onCompare){
+							target.logSkill(result.skill);
+							result.cards=lib.skill[result.skill].onCompare(target);
+						}
 						event.card2=result.cards[0];
 					}
 					if(!event.resultOL&&event.ol){
@@ -11330,8 +11408,20 @@
 					}
 					"step 4"
 					try{
-						if(!event.card1) event.card1=event.resultOL[player.playerid].cards[0];
-						if(!event.card2) event.card2=event.resultOL[target.playerid].cards[0];
+						if(!event.card1){
+							if(event.resultOL[player.playerid].skill&&lib.skill[event.resultOL[player.playerid].skill]&&lib.skill[event.resultOL[player.playerid].skill].onCompare){
+								player.logSkill(event.resultOL[player.playerid].skill);
+								event.resultOL[player.playerid].cards=lib.skill[event.resultOL[player.playerid].skill].onCompare(player);
+							}
+							event.card1=event.resultOL[player.playerid].cards[0]
+						};
+						if(!event.card2){
+							if(event.resultOL[target.playerid].skill&&lib.skill[event.resultOL[target.playerid].skill]&&lib.skill[event.resultOL[target.playerid].skill].onCompare){
+								target.logSkill(event.resultOL[target.playerid].skill);
+								event.resultOL[target.playerid].cards=lib.skill[target.resultOL[target.playerid].skill].onCompare(player);
+							}
+							event.card2=event.resultOL[target.playerid].cards[0];
+						}
 						if(!event.card1||!event.card2){
 							throw('err');
 						}
@@ -14564,6 +14654,13 @@
 			},
 			player:{
 				//新函数
+				chooseToPSS:function(target){
+					var next=game.createEvent('chooseToPSS');
+					next.player=this;
+					next.target=target;
+					next.setContent('chooseToPSS');
+					return next;
+				},
 				chooseToEnable:function(){
         var next=game.createEvent('chooseToEnable');
         next.player=this;
@@ -16324,6 +16421,10 @@
 						next.targets=target;
 						if(check) next.ai=check;
 						else next.ai=function(card){
+							if(typeof card=='string'&&lib.skill[card]){
+								var ais=lib.skill[card].check||function(){return 0};
+								return ais();
+							}
 							var addi=(get.value(card)>=8&&get.type(card)!='equip')?-10:0;
 							if(card.name=='du') addi+=5;
 							var source=_status.event.source;
@@ -16339,6 +16440,10 @@
 						next.target=target;
 						if(check) next.ai=check;
 						else next.ai=function(card){
+							if(typeof card=='string'&&lib.skill[card]){
+								var ais=lib.skill[card].check||function(){return 0};
+								return ais();
+							}
 							var player=get.owner(card);
 							var event=_status.event.getParent();
 							var to=(player==event.player?event.target:event.player);
@@ -18687,6 +18792,7 @@
 						}
 						this._hookTrigger.add(skill);
 					}
+					if(_status.event&&_status.event.addTrigger) _status.event.addTrigger(skill,this);
 					return this;
 				},
 				addSkillLog:function(skill){
@@ -18715,7 +18821,6 @@
 							this.awakenSkill(skill);
 							return;
 						}
-						if(_status.event&&_status.event.addTrigger) _status.event.addTrigger(skill,this);
 						if(info.init2&&!_status.video){
 							info.init2(this,skill);
 						}
@@ -21973,8 +22078,15 @@
 							if(info.filterCard!=undefined){
 								this.filterCard=function(card,player,event){
 									if(!info.ignoreMod&&player){
-										var mod=game.checkMod(card,player,'unchanged','cardEnabled',player);
-										if(mod!='unchanged') return mod;
+										if(!event) event=_status.event;
+										if(event.name=='chooseToUse'){
+											var mod=game.checkMod(card,player,'unchanged','cardEnabled',player);
+											if(mod!='unchanged') return mod;
+										}
+										if(event.name=='chooseToRespond'){
+											var mod=game.checkMod(card,player,'unchanged','cardRespondable',player);
+											if(mod!='unchanged') return mod;
+										}
 									}
 									return get.filter(info.filterCard)(card,player,event);
 								};
@@ -28945,7 +29057,8 @@
 				var dialog=event.dialog;
 				range=get.select(event.selectButton);
 				var selectableButtons=false;
-				if(range[0]!=range[1]||range[0]>1) auto=false;
+				if(event.forceAuto&&ui.selected.buttons.length==range[1]) auto=true;
+				else if(range[0]!=range[1]||range[0]>1) auto=false;
 				for(i=0;i<dialog.buttons.length;i++){
 					if(dialog.buttons[i].classList.contains('unselectable')) continue;
 					if(event.filterButton(dialog.buttons[i],player)&&lib.filter.buttonIncluded(dialog.buttons[i])){
