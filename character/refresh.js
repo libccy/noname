@@ -195,7 +195,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					event.count=trigger.num;
 					"step 1"
-					player.chooseTarget(get.prompt('rejieming')).set('ai',function(target){
+					player.chooseTarget(get.prompt('rejieming'),'令一名角色摸两张牌。然后若其手牌数少于体力上限，你摸一张牌').set('ai',function(target){
 						var att=get.attitude(_status.event.player,target);
 						if(att>2){
 							if((target.maxHp-target.countCards('h'))>2) return 2*att;
@@ -390,7 +390,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function (){
 					'step 0'
-					player.gainPlayerCard(get.prompt('new_liyu',trigger.player),trigger.player,'he','visibleMove').set('ai',function(card){
+					player.gainPlayerCard(get.prompt2('new_liyu',trigger.player),trigger.player,'he','visibleMove').set('ai',function(card){
 						var player=_status.event.player;
 						var evt=_status.event.target;
 						if(get.type(card)=='equip'){
@@ -418,7 +418,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.player.chooseTarget(true,function(card,player,target){
 							var evt=_status.event.getParent();
 							return evt.player.canUse({name:'juedou'},target)&&target!=_status.event.player;
-						},get.prompt('liyu')).set('ai',function(target){
+						},'请选择一名角色，视为'+get.translation(player)+'对其使用【决斗】').set('ai',function(target){
 							var evt=_status.event.getParent();
 							return get.effect(target,{name:'juedou'},evt.player,_status.event.player)-2;
 						});
@@ -446,7 +446,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function (){
 					"step 0"
-					player.chooseTarget(get.prompt('new_retuxi'),[1,trigger.num],function(card,player,target){
+					player.chooseTarget(get.prompt('new_retuxi'),'获得至多'+get.translation(trigger.num)+'名角色的各一张手牌，然后少摸等量的牌',[1,trigger.num],function(card,player,target){
 						return target.countCards('h')>0&&player!=target;
 					},function(target){
 						var att=get.attitude(_status.event.player,target);
@@ -1339,13 +1339,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.list.length){
 						var current=event.list.shift();
 						event.current=current;
-						player.chooseBool(get.prompt('rejiuyuan',current)).set('choice',get.attitude(player,current)>0);
+						player.chooseBool(get.prompt2('rejiuyuan',current)).set('choice',get.attitude(player,current)>0);
 					}
 					else{
 						event.finish();
 					}
 					'step 2'
 					if(result.bool){
+						trigger.cancel();
 						player.logSkill('rejiuyuan',event.current);
 						event.current.recover();
 						player.draw();

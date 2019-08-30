@@ -37,7 +37,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			old_machao:['male','qun',4,['zhuiji','cihuai']],
 			old_zhugezhan:["male","shu",3,["old_zuilun","old_fuyin"]],
-			zhangliang:["male","qun",3,["old_jijun","old_fangtong"]],
+			zhangliang:["male","qun",4,["old_jijun","old_fangtong"]],
 		},
 		characterFilter:{
 			old_lingju:function(mode){

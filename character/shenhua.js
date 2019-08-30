@@ -134,7 +134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"guanqiujian":"毌丘俭，字仲恭，河东闻喜（今山西闻喜县）人。三国时期曹魏后期的重要将领。继承父毌丘兴爵位高阳乡侯，任平原侯文学。魏明帝即位后，上疏劝魏明帝停止加建皇宫的工程，升为荆州刺史。景初二年（238年）从司马懿攻灭公孙渊；正始五年（244年）至正始六年（245年）两次率兵征讨高句丽，攻破丸都，几亡其国，刻石纪功而还；253年击退吴国诸葛恪的大举进犯，战功累累。司马师废帝，毌丘俭感昔日魏明帝之恩，为曹魏政权做拼死一搏，于正元二年（255年）发动兵变，即后人所谓“淮南三叛”（王淩、毌丘俭、诸葛诞）之一，惜准备不足，兵败身亡。",
 			"haozhao":"郝昭（生卒年不详），字伯道，太原人，中国东汉末年至曹魏初年著名将领。郝昭少年从军，屡立战功，逐渐晋升为杂号将军，后受曹真的推荐镇守陈仓（在小说三国演义中是司马懿推荐），防御蜀汉。太和二年（228年），诸葛亮率军北伐，为郝昭所阻，劝降不成，昼夜相攻二十余日后被迫退军。魏明帝因此封其为关内侯。不久因染疾而病死。",
 			"zhugezhan":"诸葛瞻，字思远，琅邪阳都（今山东沂南县）人。三国时期蜀汉大臣，蜀汉丞相诸葛亮之子。邓艾伐蜀时，他与长子诸葛尚及蜀将张遵、李球、黄崇等人防御绵竹（今四川德阳），因不听黄崇速占险要的建议而坐失良机，后来出城与邓艾决战，在交战时阵亡，绵竹也随后失守。",
-			"zhoufei":"周妃（210年？—？），一说本名周彻 [1-2]  。周瑜独女，生母无载，疑为汉末美女小乔，因嫁孙登为太子妃，故称周妃。周瑜英年早逝，其遗孤都得到孙权厚遇，除却她本人在黄武四年（225年）嫁予太子外，兄长周循亦娶孙权长女孙鲁班为妻。",
+			"zhoufei":"周妃（210年？—？），一说本名周彻。周瑜独女，生母无载，疑为汉末美女小乔，因嫁孙登为太子妃，故称周妃。周瑜英年早逝，其遗孤都得到孙权厚遇，除却她本人在黄武四年（225年）嫁予太子外，兄长周循亦娶孙权长女孙鲁班为妻。",
 			"lukang":"陆抗，字幼节，吴郡吴县（今江苏苏州）人。三国时期吴国名将，丞相陆逊次子。陆抗袭父爵为江陵侯，为建武校尉，领其父众五千人。后迁立节中郎将、镇军将军等。孙皓为帝，任镇军大将军、都督西陵、信陵、夷道、乐乡、公安诸军事，驻乐乡（今湖北江陵西南）。凤凰元年（272年），击退晋将羊祜进攻，并攻杀叛将西陵督步阐。后拜大司马、荆州牧，卒于官，终年49岁。与陆逊皆是吴国的中流砥柱，并称“逊抗 ”，被誉为吴国最后的名将。",
 			"zhangxiu":"张绣，武威祖厉（今甘肃靖远）人。骠骑将军张济的从子。东汉末年割据宛城的军阀，汉末群雄之一。初随张济征伐，张济死后与刘表联合。后降曹操，因曹操调戏其嫂而突袭曹操，复与刘表连和。官渡之战前夕，听从贾诩的建议再次投降曹操，参加官渡之战，官至破羌将军，封宣威侯。在北征乌桓（207年）途中去世（一说为曹丕逼死），谥定侯。",
 			"chendao":"陈到，字叔至，生卒年不详，豫州汝南（今河南驻马店平舆县）人。三国时期蜀汉将领，刘备帐下白毦兵统领，名位常亚于赵云，以忠勇著称。蜀汉建兴年间，任征西将军、永安都督，封亭侯。在任期间去世。",
@@ -274,7 +274,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
-					player.chooseTarget(get.prompt('drlt_zhenggu'),function(card,player,target){
+					player.chooseTarget(get.prompt2('drlt_zhenggu'),function(card,player,target){
 						return target!=player;
 					}).ai=function(target){
 						var player=_status.event.player;
@@ -626,6 +626,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"drlt_weidi":{
 				audio:2,
+				forceaudio:true,
 				unique:true,
 				zhuSkill:true,
 				trigger:{
@@ -795,7 +796,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							return att-3;
 						},
-						prompt:get.prompt('drlt_congjian'),
+						prompt:get.prompt2('drlt_congjian'),
 					});
 					'step 1'
 					if(result.bool){
@@ -952,7 +953,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function (){
 					'step 0'
-					player.chooseCard(get.prompt('kongsheng'),'he',[1,player.countCards('he')]).set('ai',function(card){
+					player.chooseCard(get.prompt2('kongsheng'),'he',[1,player.countCards('he')]).set('ai',function(card){
 						if(card.name=='shan'||card.name=='du') return 1;
 						return 5-get.value(card);
 					});
@@ -1230,7 +1231,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function (){
 					'step 0'
-					player.chooseTarget(get.prompt('nzry_yili'),function(card,player,target){
+					player.chooseTarget(get.prompt('nzry_yili'),"移去一个【橘】或失去1点体力，然后令一名其他角色获得一个【橘】",function(card,player,target){
 						return target!=player
 					}).ai=function(target){
 						var player=_status.event.player;
@@ -1301,11 +1302,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					event.str1='令至多'+trigger.num+'名角色摸一张牌';
 					event.str2='对任意名体力值之和为'+trigger.num+'的角色造成一点伤害';
-					player.chooseControl().set('ai',function(){
+					player.chooseControl('cancel2').set('ai',function(){
 						if(game.countPlayer(function(current){return get.attitude(player,current)<0&&current.hp==trigger.num})>0&&trigger.num<=3) return 1;
 						return 0;
 					}).set('choiceList',[event.str1,event.str2]).set('prompt','是否发动【溃诛】？');
 					'step 1'
+					if(result.control=='cancel2') event.finish();
 					event.control=[event.str1,event.str2][result.index];
 					'step 2'
 					var str='请选择【溃诛】的目标';
@@ -1402,7 +1404,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							'step 0'
-							player.chooseTarget(get.prompt2('nzry_zhizheng'),function(card,player,target){
+							player.chooseTarget(get.prompt('nzry_zhizheng'),"弃置一名攻击范围内不包含你的角色的一张牌",function(card,player,target){
 								return get.distance(target,player,'attack')>1&&target.countDiscardableCards(player,'he');
 							}).ai=function(target){
 								return -get.attitude(player,target);
@@ -1426,6 +1428,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nzry_lijun2:{},
 			"nzry_lijun1":{
 				audio:2,
+				forceaudio:true,
 				trigger:{
 					player:'useCardAfter'
 				},
@@ -1447,7 +1450,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					player.chooseTarget(get.prompt('nzry_lijun'),function(card,player,target){
+					var list=game.filterPlayer(function(target){
+						return player!=target&&target.hasZhuSkill('nzry_lijun',player);
+					});
+					player.chooseTarget(get.prompt('nzry_lijun'),'将'+get.translation(trigger.cards)+'交给'+get.translation(list)+(list.length>1?'中的一人':''),function(card,player,target){
 						return player!=target&&target.hasZhuSkill('nzry_lijun',player);
 					}).ai=function(target){
 					return get.attitude(_status.event.player,target);
@@ -1742,7 +1748,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						direct:true,
 						content:function(){
 							"step 0"
-							player.chooseTarget(get.prompt('nzry_zhenliang')).ai=function(target){
+							player.chooseTarget(get.prompt('nzry_zhenliang'),'令一名角色摸一张牌').ai=function(target){
 								return get.attitude(player,target)
 							};
 							"step 1"
@@ -1769,7 +1775,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
-					player.chooseTarget(get.prompt('nzry_jianxiang'),function(card,player,target){
+					player.chooseTarget(get.prompt('nzry_jianxiang'),'令场上手牌数最少的一名角色摸一张牌',function(card,player,target){
 						return target.isMinHandcard();
 					}).ai=function(target){
 						return get.attitude(player,target)
@@ -2439,7 +2445,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					event.num=trigger.num;
 					'step 1'
-					player.chooseDrawRecover(get.prompt('xinkuanggu')).set('logSkill','xinkuanggu');
+					player.chooseDrawRecover(get.prompt('xinkuanggu'),'摸一张牌或回复1点体力').set('logSkill','xinkuanggu');
 					'step 2'
 					if(result.control!='cancel2'){
 						event.num--;
@@ -2596,7 +2602,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					var fang=player.hp>=2&&player.countCards('h')<=player.hp+1;
-					player.chooseTarget(get.prompt('fangquan'),function(card,player,target){
+					player.chooseTarget(get.prompt2('fangquan'),function(card,player,target){
 						return target!=player;
 					}).set('ai',function(target){
 						if(!_status.event.fang) return -1;
@@ -3293,7 +3299,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					var next=player.chooseToDiscard('he',get.prompt('beige'));
+					var next=player.chooseToDiscard('he',get.prompt2('beige',trigger.player));
 					var check=lib.skill.beige.checkx(trigger,player);
 					next.set('ai',function(card){
 						if(_status.event.goon) return 8-get.value(card);
@@ -3899,7 +3905,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
-					player.chooseTarget(get.prompt('fangzhu'),function(card,player,target){
+					player.chooseTarget(get.prompt('fangzhu'),'令一名其他角色将武将牌翻面并摸'+get.cnNumber(player.maxHp-player.hp)+'张牌',function(card,player,target){
 						return player!=target
 					}).ai=function(target){
 						if(target.hasSkillTag('noturn')) return 0;
@@ -3981,7 +3987,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.list.length){
 						var current=event.list.shift();
 						event.current=current;
-						player.chooseBool(get.prompt('songwei',current)).set('choice',get.attitude(player,current)>0);
+						player.chooseBool('是否发动【颂威】，令'+get.translation(current)+'摸一张牌？').set('choice',get.attitude(player,current)>0);
 					}
 					else{
 						event.finish();
@@ -4215,7 +4221,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
-					player.chooseTarget(get.prompt('yinghun'),function(card,player,target){
+					player.chooseTarget(get.prompt2('yinghun'),function(card,player,target){
 						return player!=target;
 					}).set('ai',function(target){
 						var player=_status.event.player;
@@ -4292,7 +4298,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
-					player.chooseTarget(get.prompt('yinghun'),function(card,player,target){
+					player.chooseTarget(get.prompt2('gzyinghun'),function(card,player,target){
 						return player!=target;
 					}).set('ai',function(target){
 						var player=_status.event.player;
@@ -4904,7 +4910,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
-					player.chooseTarget(get.prompt('jieming'),[1,trigger.num],function(card,player,target){
+					player.chooseTarget(get.prompt2('jieming'),[1,trigger.num],function(card,player,target){
 						return target.countCards('h')<Math.min(target.maxHp,5);
 					}).set('ai',function(target){
 						var att=get.attitude(_status.event.player,target);
@@ -5321,7 +5327,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0";
-					player.chooseTarget(get.prompt('releiji')).ai=function(target){
+					player.chooseTarget(get.prompt2('releiji')).ai=function(target){
 						if(target.hasSkill('hongyan')) return 0;
 						return get.damageEffect(target,_status.event.player,_status.event.player,'thunder');
 					};
@@ -5394,12 +5400,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shensu1:{
 				audio:2,
 				audioname:['xiahouba'],
-				trigger:{player:'phaseBegin'},
+				trigger:{player:'phaseJudgeBefore'},
 				direct:true,
 				content:function(){
 					"step 0"
 					var check= player.countCards('h')>2;
-					player.chooseTarget(get.prompt('shensu'),function(card,player,target){
+					player.chooseTarget(get.prompt("shensu"),"跳过判定阶段和摸牌阶段，视为对一名其他角色使用一张【杀】",function(card,player,target){
 						if(player==target) return false;
 						return player.canUse({name:'sha'},target,false);
 					}).set('check',check).set('ai',function(target){
@@ -5410,7 +5416,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.logSkill('shensu1',result.targets);
 						player.useCard({name:'sha'},result.targets[0],false);
-						player.skip('phaseJudge');
+						trigger.cancel();
 						player.skip('phaseDraw');
 					}
 				}
@@ -5428,6 +5434,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var check=player.needsToDiscard();
 					player.chooseCardTarget({
 						prompt:get.prompt('shensu'),
+						prompt2:"弃置一张装备牌并跳过出牌阶段，视为对一名其他角色使用一张【杀】",
 						filterCard:function(card,player){
 							return get.type(card)=='equip'&&lib.filter.cardDiscardable(card,player)
 						},
@@ -5463,7 +5470,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					var check=player.needsToDiscard()||player.isTurnedOver();
-					player.chooseTarget(get.prompt('shensu'),function(card,player,target){
+					player.chooseTarget(get.prompt('shensu'),"跳过弃牌阶段并将武将牌翻面，视为对一名其他角色使用一张【杀】",function(card,player,target){
 						if(player==target) return false;
 						return player.canUse({name:'sha'},target,false);
 					}).set('check',check).set('ai',function(target){
@@ -5579,7 +5586,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							return att/2+da;
 						},
-						prompt:get.prompt('tianxiang')
+						prompt:get.prompt2('tianxiang')
 					});
 					"step 1"
 					if(result.bool){
@@ -5803,7 +5810,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							return att/2+da;
 						},
-						prompt:get.prompt('tianxiang')
+						prompt:get.prompt2('xintianxiang')
 					});
 					"step 1"
 					if(result.bool){
@@ -6121,7 +6128,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0";
-					player.chooseTarget(get.prompt('leiji')).ai=function(target){
+					player.chooseTarget(get.prompt2('leiji')).ai=function(target){
 						if(target.hasSkill('hongyan')) return 0;
 						return get.damageEffect(target,_status.event.player,_status.event.player,'thunder');
 					};
