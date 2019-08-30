@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'1.9.92.1',
+	'1.9.92.2',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/music_danji.mp3',
@@ -2200,6 +2200,11 @@ window.noname_asset_list=[
 	'image/card/zixin.png',
 	'image/card/ziyangdan.png',
 	'image/card/zong.png',
+
+	'image/character/shenpei.jpg',
+	'image/character/re_menghuo.jpg',
+	'image/character/re_zhurong.jpg',
+
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
 	'image/character/beimihu.jpg',
