@@ -9475,13 +9475,13 @@
 		},
 		element:{
 			content:{
-				chooseToPSS:function(){
+				chooseToDuiben:function(){
 					'step 0'
-					game.log(player,'对',target,'发起了石头剪刀布');
+					game.log(player,'对',target,'发起了','#y对策');
 					if(_status.connectMode){
 						player.chooseButtonOL([
-							[player,['石头剪刀布：请选择一种手势',[[['','','pss_paper'],['','','pss_scissor'],['','','pss_stone']],'vcard']],true],
-							[target,['石头剪刀布：请选择一种手势',[[['','','pss_paper'],['','','pss_scissor'],['','','pss_stone']],'vcard']],true]
+							[player,['对策：请选择一种防御对策',[[['','','db_def2'],['','','db_def1']],'vcard']],true],
+							[target,['对策：请选择一种进攻之策',[[['','','db_atk1'],['','','db_atk2']],'vcard']],true]
 						],function(){},function(){return 1+Math.random()}).set('switchToAuto',function(){
 							_status.event.result='ai';
 						}).set('processAI',function(){
@@ -9499,23 +9499,105 @@
 						event.goto(4);
 					}
 					else{
-						player.chooseButton(['石头剪刀布：请选择一种手势',[[['','','pss_paper'],['','','pss_scissor'],['','','pss_stone']],'vcard']],true).ai=function(){return 1+Math.random()};
+						player.chooseButton(['对策：请选择一种防御对策',[[['','','db_def2'],['','','db_def1']],'vcard']],true).ai=function(){return 1+Math.random()};
 					}
 					'step 2'
 					event.mes=result.links[0][2];
-					target.chooseButton(['石头剪刀布：请选择一种手势',[[['','','pss_paper'],['','','pss_scissor'],['','','pss_stone']],'vcard']],true).ai=function(){return 1+Math.random()};
+					target.chooseButton(['对策：请选择一种进攻之策',[[['','','db_atk1'],['','','db_atk2']],'vcard']],true).ai=function(){return 1+Math.random()};
 					'step 3'
 					event.tes=result.links[0][2];
 					'step 4'
-					player.chat(get.translation(event.mes));
+					game.broadcast(function(){
+						ui.arena.classList.add('thrownhighlight');
+					});
+					ui.arena.classList.add('thrownhighlight');
+					game.addVideo('thrownhighlight1');
+					target.$compare(game.createCard(event.tes,'',''),player,game.createCard(event.mes,'',''));
+					game.log(target,'选择的进攻之策为','#g'+get.translation(event.tes));
+					game.log(player,'选择的防御对策为','#g'+get.translation(event.mes));
+					game.delay(0,1500);
+					'step 5'
+					var mes=event.mes.slice(6);
+					var tes=event.tes.slice(6);
+					var str;
+					if(mes==tes){
+						str=get.translation(player)+'对策成功';
+						player.popup('胜','wood');
+						target.popup('负','fire');
+						game.log(player,'#g胜');
+						event.result={bool:true};
+					}
+					else{
+						str=get.translation(player)+'对策失败';
+						target.popup('胜','wood');
+						player.popup('负','fire');
+						game.log(target,'#g胜');
+						event.result={bool:false};
+					}
+					game.broadcastAll(function(str){
+						var dialog=ui.create.dialog(str);
+						dialog.classList.add('center');
+						setTimeout(function(){
+							dialog.close();
+						},1000);
+					},str);
+					game.delay(2);
+					'step 6'
+					game.broadcastAll(function(){
+						ui.arena.classList.remove('thrownhighlight');
+					});
+					game.addVideo('thrownhighlight2');
+					if(event.clear!==false){
+						game.broadcastAll(ui.clear);
+					}
+				},
+				chooseToPSS:function(){
+					'step 0'
+					game.log(player,'对',target,'发起了石头剪刀布');
+					if(_status.connectMode){
+						player.chooseButtonOL([
+							[player,['石头剪刀布：请选择一种手势',[[['','','pss_stone'],['','','pss_scissor'],['','','pss_paper']],'vcard']],true],
+							[target,['石头剪刀布：请选择一种手势',[[['','','pss_stone'],['','','pss_scissor'],['','','pss_paper']],'vcard']],true]
+						],function(){},function(){return 1+Math.random()}).set('switchToAuto',function(){
+							_status.event.result='ai';
+						}).set('processAI',function(){
+							var buttons=_status.event.dialog.buttons;
+							return {
+								bool:true,
+								links:[buttons.randomGet().link],
+							}
+						});
+					}
+					'step 1'
+					if(_status.connectMode){
+						event.mes=result[player.playerid].links[0][2];
+						event.tes=result[target.playerid].links[0][2];
+						event.goto(4);
+					}
+					else{
+						player.chooseButton(['石头剪刀布：请选择一种手势',[[['','','pss_stone'],['','','pss_scissor'],['','','pss_paper']],'vcard']],true).ai=function(){return 1+Math.random()};
+					}
+					'step 2'
+					event.mes=result.links[0][2];
+					target.chooseButton(['石头剪刀布：请选择一种手势',[[['','','pss_stone'],['','','pss_scissor'],['','','pss_paper']],'vcard']],true).ai=function(){return 1+Math.random()};
+					'step 3'
+					event.tes=result.links[0][2];
+					'step 4'
+					game.broadcast(function(){
+						ui.arena.classList.add('thrownhighlight');
+					});
+					ui.arena.classList.add('thrownhighlight');
+					game.addVideo('thrownhighlight1');
+					player.$compare(game.createCard(event.mes,'',''),target,game.createCard(event.tes,'',''));
 					game.log(player,'选择的手势为','#g'+get.translation(event.mes));
-					target.chat(get.translation(event.tes));
-					game.log(player,'选择的手势为','#g'+get.translation(event.tes));
-					game.delay();
+					game.log(target,'选择的手势为','#g'+get.translation(event.tes));
+					game.delay(0,1500);
 					'step 5'
 					var mes=event.mes.slice(4);
 					var tes=event.tes.slice(4);
+					var str;
 					if(mes==tes){
+						str='二人平局';
 						player.popup('平','metal');
 						target.popup('平','metal');
 						game.log('石头剪刀布的结果为','#g平局');
@@ -9523,19 +9605,36 @@
 					}
 					else{
 						if({paper:'stone',scissor:'paper',stone:'scissor'}[mes]==tes){
+							str=get.translation(player)+'胜利';
 							player.popup('胜','wood');
 							target.popup('负','fire');
 							game.log(player,'#g胜');
 							event.result={bool:true};
 						}
 						else{
+							str=get.translation(target)+'胜利';
 							target.popup('胜','wood');
 							player.popup('负','fire');
 							game.log(target,'#g胜');
 							event.result={bool:false};
 						}
 					}
+					game.broadcastAll(function(str){
+						var dialog=ui.create.dialog(str);
+						dialog.classList.add('center');
+						setTimeout(function(){
+							dialog.close();
+						},1000);
+					},str);
 					game.delay(2);
+					'step 6'
+					game.broadcastAll(function(){
+						ui.arena.classList.remove('thrownhighlight');
+					});
+					game.addVideo('thrownhighlight2');
+					if(event.clear!==false){
+						game.broadcastAll(ui.clear);
+					}
 				},
 				cardsDiscard:function(){
 					for(var i=0;i<cards.length;i++){
@@ -14654,6 +14753,13 @@
 			},
 			player:{
 				//新函数
+				chooseToDuiben:function(target){
+					var next=game.createEvent('chooseToDuiben');
+					next.player=this;
+					next.target=target;
+					next.setContent('chooseToDuiben');
+					return next;
+				},
 				chooseToPSS:function(target){
 					var next=game.createEvent('chooseToPSS');
 					next.player=this;
@@ -43839,7 +43945,7 @@
 				}
 				if(event.skill){
 					event.result.skill=event.skill;
-					event.result.card=get.info(event.skill).viewAs;
+					event.result.card=get.copy(get.info(event.skill).viewAs);
 					if(event.result.cards.length==1&&event.result.card){
 						event.result.card.suit=event.result.cards[0].suit;
 						event.result.card.number=event.result.cards[0].number;
