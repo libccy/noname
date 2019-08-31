@@ -46,14 +46,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		card:{
 			pss_paper:{
 				type:'pss',
+				fullskin:true,
 				derivation:'shenpei',
 			},
 			pss_scissor:{
 				type:'pss',
+				fullskin:true,
 				derivation:'shenpei',
 			},
 			pss_stone:{
 				type:'pss',
+				fullskin:true,
+				derivation:'shenpei',
+			},
+			db_atk1:{
+				type:'db_atk',
+				fullimage:true,
+				derivation:'shenpei',
+			},
+			db_atk2:{
+				type:'db_atk',
+				fullimage:true,
+				derivation:'shenpei',
+			},
+			db_def1:{
+				type:'db_def',
+				fullimage:true,
+				derivation:'shenpei',
+			},
+			db_def2:{
+				type:'db_def',
+				fullimage:true,
 				derivation:'shenpei',
 			},
 		},
@@ -95,7 +118,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.storage.rezaiqi>0;
 				},
 				trigger:{
-					player:'phaseDiscardBegin'
+					player:'phaseDiscardEnd'
 				},
 				content:function(){
 					'step 0'
@@ -147,7 +170,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(evt&&evt.name=='useCard'&&evt.card&&['equip','delay'].contains(get.type(evt.card))) return false;
 					var cards=event.cards;
 					for(var i=0;i<cards.length;i++){
-						if(get.suit(cards[i])=='heart'&&get.position(cards[i])=='d') return true;
+						if(get.color(cards[i])=='red'&&get.position(cards[i])=='d') return true;
 					}
 					return false;
 				},
@@ -156,12 +179,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						var cards=trigger.cards;
 						for(var i=0;i<cards.length;i++){
-						if(get.suit(cards[i])=='heart'&&get.position(cards[i])=='d') player.storage.rezaiqi++;
+						if(get.color(cards[i])=='red'&&get.position(cards[i])=='d') player.storage.rezaiqi++;
 						}
 					}
 				},
 			},
 			shouye:{
+				audio:2,
 				group:'shouye_after',
 				trigger:{global:"useCard"},
 				filter:function(event,player){
@@ -176,12 +200,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.line(trigger.player,'green');
-					player.chooseToPSS(trigger.player);
+					player.chooseToDuiben(trigger.player);
 					'step 1'
-					if(result.tie){
-						event.goto(0);
-					}
-					else if(result.bool){
+					if(result.bool){
 						trigger.excluded.add(player);
 						trigger.shouyeer=player;
 					}
@@ -215,6 +236,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			liezhi:{
+				audio:2,
 				group:'liezhi_damage',
 				trigger:{player:'phaseBegin'},
 				direct:true,
@@ -481,14 +503,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pss_scissor_info:'石头剪刀布时的一种手势。克制布，但被石头克制。',
 			pss_stone_info:'石头剪刀布时的一种手势。克制剪刀，但被布克制。',
 			
+			db_atk:'进攻对策',
+			db_atk1:'全军出击',
+			db_atk2:'分兵围城',
+			
+			db_def:'防御对策',
+			db_def1:'奇袭粮道',
+			db_def2:'开城诱敌',
+			
 			shouye:'守邺',
-			shouye_info:'每回合限一次。当其他角色使用牌指定你为唯一目标时，你可以与其进行石头剪刀布（若出现平局则重来）。若你赢，则此牌对你无效，且你于此牌结算完成后获得其对应的所有实体牌。',
+			shouye_info:'每回合限一次。当其他角色使用牌指定你为唯一目标时，你可以与其进行【对策】。若你赢，则此牌对你无效，且你于此牌结算完成后获得其对应的所有实体牌。',
 			liezhi:'烈直',
 			liezhi_info:'准备阶段，你可以依次弃置至多两名角色区域内的各一张牌。若你受到过伤害，则〖烈直〗于你的下个回合无效。',
 			relieren:'烈刃',
 			relieren_info:'当你使用【杀】指定目标时，你可以和目标角色进行拼点。若你赢，你获得其一张牌。若你没赢，你获得对方的拼点牌，其获得你的拼点牌。',
 			rezaiqi:'再起',
-			rezaiqi_info:'弃牌阶段开始时，你可以令至多X名角色选择一项：1.摸一张牌，2.令你回复1点体力（X为本回合进入弃牌堆的红桃牌数）',
+			rezaiqi_info:'弃牌阶段结束时，你可以令至多X名角色选择一项：1.摸一张牌，2.令你回复1点体力（X为本回合进入弃牌堆的红色牌数）',
 			
 			xinzhanyi:'战意',
 			xinzhanyi_info:'出牌阶段限一次，你可以弃置一张牌并失去1点体力，然后根据你弃置的牌获得以下效果直到回合结束：基本牌，你可以将一张基本牌当作杀、酒或桃使用，且你本回合第一次以此法使用的牌的回复值/伤害值+1；锦囊牌，摸三张牌且你使用的牌不能被【无懈可击】响应；装备牌，你使用【杀】指定目标角色后，其弃置两张牌，然后你获得其中的一张。',
