@@ -1,0 +1,28 @@
+{
+  "name": "noname",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "options": "^0.0.6",
+    "ws": "^1.0.1",
+    "ultron": "^1.0.2"
+  },
+  "devDependencies": {
+    "lite-server": "^2.5.4"
+  },
+  "scripts": {
+    "start": "lite-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/libccy/noname.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/libccy/noname/issues"
+  },
+  "homepage": "http://noname.pub"
+}
