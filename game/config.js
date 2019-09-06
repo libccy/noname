@@ -14,7 +14,7 @@ window.config={
 	forbiddouble:['zhugedan','swd_kangnalishi','dongzhuo','wutugu','hs_siwangzhiyi','hs_ronghejuren','hs_shanlingjuren'],
 	forbidthreecard:['qiankunbiao','shenhuofeiya','gw_ciguhanshuang','gw_birinongwu','gw_qinpendayu','gw_poxiao'],
 	all:{
-		sgscharacters:['standard','shenhua','xinghuoliaoyuan','refresh','yijiang','sp','extra','old','mobile'],
+		sgscharacters:['standard','shenhua','xinghuoliaoyuan','refresh','yijiang','sp','extra','old','mobile','tw'],
 		sgscards:['standard','extra','sp','guozhan'],
 		sgsmodes:['identity','guozhan','versus','doudizhu','brawl','connect'],
 		stockmode:['identity','guozhan','versus','boss','doudizhu','chess','stone','connect','brawl','tafang'],

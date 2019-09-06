@@ -10,6 +10,7 @@ window.noname_package={
 		mobile:'移动版',
 		old:'怀旧',
 		diy:'DIY',
+		tw:'外服武将',
 		yxs:'英雄杀',
 		hearth:'炉石传说',
 		gwent:'昆特牌',
@@ -75,6 +76,7 @@ window.noname_package={
 	},
 	background:{
 		ol_bg:'龙纹',
+		xinsha_bg:'新杀',
 		zhulin_bg:'竹林',
 		shengshi_bg:'盛世',
 		taoyuan_bg:'桃园',

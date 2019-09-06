@@ -45,6 +45,11 @@
 		ondb:[],
 		ondb2:[],
 		chatHistory:[],
+		emotionList:{
+			shibing_emotion:15,
+			guojia_emotion:20,
+			zhenji_emotion:20,
+		},
 		arenaReady:[],
 		onfree:[],
 		inpile:[],
@@ -9411,6 +9416,12 @@
 			qun:'群',
 			shen:'神',
 			western:'西',
+			wei2:'魏国',
+			shu2:'蜀国',
+			wu2:'吴国',
+			qun2:'群雄',
+			shen2:'神将',
+			western2:'西方',
 			male:'男',
 			female:'女',
 			mad:'混乱',
@@ -9458,6 +9469,10 @@
 			fengyin:'封印',
 			baiban:'白板',
 			_disableJudge:"判定区",
+			
+			guojia_emotion:'郭嘉表情',
+			zhenji_emotion:'甄姬表情',
+			shibing_emotion:'士兵表情',
 
 			pause:'暂停',
 			config:'选项',
@@ -13656,7 +13671,7 @@
 							lib.skill[event.skill].onrespond(event,player);
 						}
 					}
-					else if(lib.config.show_card_prompt&&!lib.config.hide_card_prompt_basic){
+					else if(!event.nopopup&&lib.config.show_card_prompt&&!lib.config.hide_card_prompt_basic){
 						player.popup(card.name,'wood');
 					}
 					if(cardaudio&&event.getParent(3).name=='useCard'){
@@ -15354,6 +15369,7 @@
 					},this.playerid,str);
 				},
 				say:function(str){
+					str=str.replace(/##assetURL##/g,lib.assetURL);
 					var dialog=ui.create.dialog('hidden');
 					dialog.classList.add('static');
 					dialog.add('<div class="text" style="word-break:break-all;display:inline">'+str+'</div>');
@@ -42237,6 +42253,72 @@
 					list.scrollTop=list.scrollHeight;
 				};
 				uiintro._heightfixed=true;
+				var emotionTitle=ui.create.div('.text.center','聊天表情');
+				emotionTitle.style.width='calc(100%)';
+				uiintro.add(emotionTitle);
+				var list1=ui.create.div('');
+				if(get.is.phoneLayout()){
+					list1.style.height='100px';
+				}
+				else{
+					list1.style.height='150px';
+				}
+				list1.style.overflow='scroll';
+				uiintro.add(list1);
+				uiintro.style.height=uiintro.content.offsetHeight+'px';
+				var list2=ui.create.div('');
+				if(get.is.phoneLayout()){
+					list2.style.height='100px';
+				}
+				else{
+					list2.style.height='150px';
+				}
+				list2.style.overflow='scroll';
+				uiintro.add(list2);
+				uiintro.style.height=uiintro.content.offsetHeight+'px';
+				for(var i in lib.emotionList){
+					var emotionPack=ui.create.div('.card.fullskin','<img src="'+lib.assetURL+'image/emotion/'+i+'/1.gif" width="50" height="50">',function(){
+						emotionTitle.innerHTML=get.translation(this.pack);
+						for(var j=1;j<=lib.emotionList[this.pack];j++){
+							var emotionButton=ui.create.div('.card.fullskin','<img src="'+lib.assetURL+'image/emotion/'+this.pack+'/'+j+'.gif" width="50" height="50">',function(){
+								var player=game.me;
+								var str='<img src="##assetURL##image/emotion/'+this.pack+'/'+this.emotionID+'.gif" width="50" height="50">';
+								if(!player){
+									if(game.connectPlayers){
+										if(game.online){
+											for(var i=0;i<game.connectPlayers.length;i++){
+												if(game.connectPlayers[i].playerid==game.onlineID){
+													player=game.connectPlayers[i];break;
+												}
+											}
+										}
+										else{
+											player=game.connectPlayers[0];
+										}
+									}
+								}
+								if(!player) return;
+								if(game.online){
+									game.send('chat',game.onlineID,str);
+								}
+								else{
+									lib.element.player.chat.call(player,str);
+								}
+							});
+							emotionButton.emotionID=j;
+							emotionButton.pack=this.pack;
+							emotionButton.style.height='50px';
+							emotionButton.style.width='50px';
+							list2.appendChild(emotionButton);
+						}
+						list1.delete();
+						uiintro.add(list2);
+					});
+					emotionPack.pack=i;
+					emotionPack.style.height='50px';
+					emotionPack.style.width='50px';
+					list1.appendChild(emotionPack);
+				}
 				return uiintro;
 			},
 			volumn:function(){
@@ -46487,6 +46569,9 @@
 			if(str2.indexOf('SP')==0){
 				str2=str2.slice(2);
 			}
+			else if(str2.indexOf('TW')==0){
+				str2=str2.slice(2);
+			}
 			else if(str2.indexOf('JSP')==0){
 				str2=str2.slice(3);
 			}
@@ -46513,6 +46598,9 @@
 			if(str2.indexOf('SP')==0){
 				str2=str2.slice(2);
 			}
+			else if(str2.indexOf('TW')==0){
+				str2=str2.slice(2);
+			}
 			else if(str2.indexOf('JSP')==0){
 				str2=str2.slice(3);
 			}
@@ -46528,6 +46616,9 @@
 			var str2=lib.translate[str];
 			if(!str2) return '';
 			if(str2.indexOf('SP')==0){
+				str2=str2.slice(2);
+			}
+			else if(str2.indexOf('TW')==0){
 				str2=str2.slice(2);
 			}
 			else if(str2.indexOf('JSP')==0){
