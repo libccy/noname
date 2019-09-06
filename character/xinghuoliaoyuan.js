@@ -162,7 +162,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						var card=target.getCards('hej').randomGet();
 						target.$giveAuto(card,player);
-						player.gain(card);
+						player.gain(card,target);
 					}
 				},
 				ai:{
@@ -274,7 +274,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.index==0){
 						var card=target.getCards('hej').randomGet();
 						target.$giveAuto(card,player);
-						player.gain(card);
+						player.gain(card,target);
 						target.addTempSkill('tanbei_effect2','phaseAfter');
 					}
 					else{
@@ -1322,7 +1322,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(card2) list.push(card2);
 							if(list.length>0){
 								trigger.player.$giveAuto(list,player);
-								player.gain(list);
+								player.gain(list,trigger.player);
 							}
 							game.delay();
 						},
@@ -1882,8 +1882,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player==target&&get.subtype(card)=='equip2'){
 								if(get.equipValue(card)<=8) return 0;
 							}
-							if(target.getEquip(2)) return;
-							if(target.storage.lose_pos_equip&&target.storage.lose_pos_equip.contains('equip2')) return;
+							if(!target.isEmpty(2)) return;
 							if(get.tag(card,'natureDamage')) return 'zerotarget';
 							if(get.type(card)=='trick'&&get.tag(card,'damage')){
 								return 'zeroplayertarget';
@@ -2782,7 +2781,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					if(result.bool&&result.cards&&result.cards.length){
 						event.current.$giveAuto(result.cards,player);
-						player.gain(result.cards);
+						player.gain(result.cards,event.current);
 					}
 					event.current=event.current.next;
 					if(event.current!=player) event.goto(1);

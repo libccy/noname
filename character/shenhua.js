@@ -6198,14 +6198,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('judging',trigger.player.judging[0]);
 					"step 1"
 					if(result.bool){
-						player.respond(result.cards,'highlight');
+						player.respond(result.cards,'highlight','guidao');
 					}
 					else{
 						event.finish();
 					}
 					"step 2"
 					if(result.bool){
-						player.logSkill('guidao');
 						player.$gain2(trigger.player.judging[0]);
 						player.gain(trigger.player.judging[0]);
 						trigger.player.judging[0]=result.cards[0];

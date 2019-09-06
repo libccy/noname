@@ -1763,14 +1763,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('judging',trigger.player.judging[0]);
 					"step 1"
 					if(result.bool){
-						player.respond(result.cards,'highlight');
+						player.respond(result.cards,'reguicai','highlight');
 					}
 					else{
 						event.finish();
 					}
 					"step 2"
 					if(result.bool){
-						player.logSkill('reguicai');
 						if(trigger.player.judging[0].clone){
 							trigger.player.judging[0].clone.classList.remove('thrownhighlight');
 							game.broadcast(function(card){
