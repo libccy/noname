@@ -4749,7 +4749,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(event.targets.length){
 						var current=event.targets.shift();
-						current.damage('thunder');
+						current.damage();
 						player.line(current,'thunder');
 						event.redo();
 					}

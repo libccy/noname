@@ -217,7 +217,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				guozhan_bian:["gz_liqueguosi","gz_zuoci","gz_bianfuren","gz_xunyou","gz_lingtong","gz_lvfan","gz_masu","gz_shamoke",],
 				guozhan_quan:["gz_cuimao","gz_yujin","gz_wangping","gz_fazheng","gz_wuguotai","gz_lukang","gz_yuanshu","gz_zhangxiu"],
 				guozhan_jun:["gz_jun_caocao","gz_jun_sunquan","gz_jun_liubei","gz_jun_zhangjiao"],
-				guozhan_others:["gz_lingcao","gz_lifeng","gz_beimihu"],
+				guozhan_others:["gz_lingcao","gz_lifeng","gz_beimihu","gz_jianggan"],
 			}
 		},
 		characterPack:{
@@ -329,6 +329,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_lingcao:['male','wu',4,['dujin']],
 				gz_lifeng:['male','shu',3,['tunchu','shuliang']],
 				gz_beimihu:["female","qun",3,["hmkguishu","hmkyuanyu"]],
+				gz_jianggan:["male","wei",3,["weicheng","daoshu"]],
 				
 				gz_cuimao:['male','wei',3,['gzzhengbi','gzfengying'],[]],
 				gz_yujin:['male','wei',4,['gzjieyue'],['gzskin']],
@@ -5609,18 +5610,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							game.log(player,'拼点牌点数+3');
 							if(player==trigger.player){
 								trigger.num1+=3;
+								if(trigger.num1>13) trigger.num1=13;
 							}
 							else{
 								trigger.num2+=3;
+								if(trigger.num2>13) trigger.num2=13;
 							}
 						}
 						else{
 							game.log(player,'拼点牌点数-3');
 							if(player==trigger.player){
 								trigger.num1-=3;
+								if(trigger.num1<1) trigger.num1=1;
 							}
 							else{
 								trigger.num2-=3;
+								if(trigger.num2<1) trigger.num2=1;
 							}
 						}
 					}
@@ -7064,10 +7069,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		translate:{
 			ye:'野',
 			ye2:'野心家',
-			wei2:'魏国',
-			shu2:'蜀国',
-			wu2:'吴国',
-			qun2:'群雄',
+			
 			bumingzhi:'不明置',
 			mingzhizhujiang:'明置主将',
 			mingzhifujiang:'明置副将',
@@ -7322,7 +7324,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			baoling:'暴凌',
 			baoling_info:'主将技，锁定技，出牌阶段结束时，若你有副将，则你移除副将，然后加3点体力上限，回复3点体力，并获得“崩坏”',
 			yingyang:'鹰扬',
-			yingyang_info:'当你拼点的牌亮出后，你可以令此牌的点数+3或-3',
+			yingyang_info:'当你拼点的牌亮出后，你可以令此牌的点数+3或-3（至多为K，至少为1）',
 			hunshang:'魂殇',
 			hunshang_info:'副将技，此武将牌减少半个阴阳鱼；准备阶段，若你的体力值不大于1，则你本回合获得“英姿”和“英魂”',
 			gzguixiu:'闺秀',
@@ -7509,7 +7511,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 			['spade',1,'xietianzi',null,['lianheng']],
 			['spade',2,'minguangkai'],
-			['spade',3,'huoshaolianying','fire'],
+			['spade',3,'huoshaolianying','fire',['lianheng']],
 			['spade',4,'sha'],
 			['spade',5,'qinglong'],
 			['spade',6,'jiu',null,['lianheng']],
@@ -8233,18 +8235,24 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				isMajor:function(){
+					if(this.identity=='ye'){
+						return this.getEquip('yuxi')!=undefined||this.hasSkill('gzyongsi')&&!game.hasPlayer(function(current){
+							return current.getEquip('yuxi');
+						});
+					}
 					if(!lib.group.contains(this.identity)) return false;
 					var list=[];
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].getEquip('yuxi')||game.players[i].hasSkill('gzyongsi')&&!game.hasPlayer(function(current){
 								return current.getEquip('yuxi');
 							})){
-							if(game.players[i].identity!='ye'&&game.players[i].identity!='unknown'){
+							if(game.players[i].identity!='unknown'){
 								list.add(game.players[i].identity);
 							}
 						}
 					}
 					if(list.length){
+						if(list.contains('ye')) return false;
 						return list.contains(this.identity);
 					}
 					var max=0;
