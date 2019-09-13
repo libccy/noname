@@ -4020,13 +4020,49 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.lose(trigger.cards,ui.special);
 					player.line(trigger.targets,trigger.card.nature);
 					trigger.line=false;
+					trigger.animate=false;
 					event.prompt=get.translation(player)+'声明了'+get.translation(trigger.card.name)+'，是否质疑？';
 					event.guessers=game.filterPlayer(function(current){
 						return current!=player&&!current.hasSkill('chanyuan');
 					});
 					event.guessers.sort(lib.sort.seat);
+					
+					game.broadcastAll(function(card){
+					_status.guhuoNode=card.copy('thrown');
+					if(lib.config.cardback_style!='default'){
+						_status.guhuoNode.style.transitionProperty='none';
+						ui.refresh(_status.guhuoNode);
+						_status.guhuoNode.classList.add('infohidden');
+						ui.refresh(_status.guhuoNode);
+						_status.guhuoNode.style.transitionProperty='';
+					}
+					else{
+						_status.guhuoNode.classList.add('infohidden');
+					}
+					_status.guhuoNode.style.transform='perspective(600px) rotateY(180deg) translateX(0)';
+					player.$throwordered2(_status.guhuoNode);
+					},trigger.cards[0]);
+
+					
+					event.onEnd01=function(){
+						_status.guhuoNode.removeEventListener('webkitTransitionEnd',event.onEnd01);
+							_status.guhuoNode.style.transition='all ease-in 0.3s';
+							_status.guhuoNode.style.transform='perspective(600px) rotateY(270deg) translateX(52px)';
+							var onEnd=function(){
+								_status.guhuoNode.classList.remove('infohidden');
+								_status.guhuoNode.style.transition='all 0s';
+								ui.refresh(_status.guhuoNode);
+								_status.guhuoNode.style.transform='perspective(600px) rotateY(-90deg) translateX(52px)';
+								ui.refresh(_status.guhuoNode);
+								_status.guhuoNode.style.transition='';
+								ui.refresh(_status.guhuoNode);
+								_status.guhuoNode.style.transform='';
+								_status.guhuoNode.removeEventListener('webkitTransitionEnd',onEnd);
+							}
+							_status.guhuoNode.listenTransition(onEnd);
+					};
 					'step 1'
-					if(event.guessers.length==0) event.finish();
+					if(event.guessers.length==0) event.goto(3);
 					else{
 						event.guessers[0].chooseControl('质疑','不质疑').set('prompt',event.prompt).set('ai',function(){
 							if(get.attitude(event.guessers[0],player)>0) return '不质疑';
@@ -4036,7 +4072,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(!result.control) result.control='不质疑';
 					event.guessers[0].chat(result.control);
-					game.delay();
+					game.delay(1);
 					if(result.control=='不质疑'){
 						game.log(event.guessers[0],'#g不质疑');
 						event.guessers.remove(event.guessers[0]);
@@ -4045,6 +4081,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.log(event.guessers[0],'#y质疑');
 					}
 					'step 3'
+					game.broadcastAll(function(onEnd){
+					_status.guhuoNode.listenTransition(onEnd);
+					},event.onEnd01);
+					'step 4'
+					game.delay(3.2);
+					'step 5'
+					if(!event.guessers.length) event.finish();
+					'step 6'
 					if(trigger.card.name==trigger.cards[0].name){
 						event.guessers[0].popup('质疑错误','fire');
 						event.guessers[0].addSkill('chanyuan');
@@ -4054,8 +4098,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.guessers[0].popup('质疑正确','wood');
 						game.log(player,'使用的',trigger.card,'作废了');
 						game.cardsDiscard(trigger.cards);
+						game.broadcastAll(ui.clear);
 						trigger.cancel();
 					}
+					game.delay();
 				},
 			},
 			chanyuan:{
@@ -4148,9 +4194,45 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return current!=player&&!current.hasSkill('chanyuan');
 						});
 						event.guessers.sort(lib.sort.seat);
+						
+						
+					game.broadcastAll(function(card){
+					_status.guhuoNode=card.copy('thrown');
+					if(lib.config.cardback_style!='default'){
+						_status.guhuoNode.style.transitionProperty='none';
+						ui.refresh(_status.guhuoNode);
+						_status.guhuoNode.classList.add('infohidden');
+						ui.refresh(_status.guhuoNode);
+						_status.guhuoNode.style.transitionProperty='';
+					}
+					else{
+						_status.guhuoNode.classList.add('infohidden');
+					}
+					_status.guhuoNode.style.transform='perspective(600px) rotateY(180deg) translateX(0)';
+					player.$throwordered2(_status.guhuoNode);
+					},result.cards[0]);
+
+					
+					event.onEnd01=function(){
+						_status.guhuoNode.removeEventListener('webkitTransitionEnd',event.onEnd01);
+							_status.guhuoNode.style.transition='all ease-in 0.3s';
+							_status.guhuoNode.style.transform='perspective(600px) rotateY(270deg) translateX(52px)';
+							var onEnd=function(){
+								_status.guhuoNode.classList.remove('infohidden');
+								_status.guhuoNode.style.transition='all 0s';
+								ui.refresh(_status.guhuoNode);
+								_status.guhuoNode.style.transform='perspective(600px) rotateY(-90deg) translateX(52px)';
+								ui.refresh(_status.guhuoNode);
+								_status.guhuoNode.style.transition='';
+								ui.refresh(_status.guhuoNode);
+								_status.guhuoNode.style.transform='';
+								_status.guhuoNode.removeEventListener('webkitTransitionEnd',onEnd);
+							}
+							_status.guhuoNode.listenTransition(onEnd);
+					};
 					}else event.finish();
 					"step 2"
-					if(event.guessers.length==0) event.goto(5);
+					if(event.guessers.length==0) event.goto(4);
 					else{
 						event.guessers[0].chooseControl('质疑','不质疑').set('prompt',event.prompt).set('ai',function(){
 							if(get.attitude(event.guessers[0],player)>0) return '不质疑';
@@ -4169,6 +4251,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.log(event.guessers[0],'#y质疑');
 					}
 					"step 4"
+					game.broadcastAll(function(onEnd){
+					_status.guhuoNode.listenTransition(onEnd);
+					},event.onEnd01);
+					"step 5"
+					game.delay(3.2);
+					if(!event.guessers.length) event.goto(7);
+					"step 6"
 					if(event.name==event.card.name){
 						event.guessers[0].popup('质疑错误','fire');
 						event.guessers[0].addSkill('chanyuan');
@@ -4180,10 +4269,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.cardsDiscard(event.card);
 						event.finish();
 					}
-					"step 5"
+					"step 7"
 					trigger.untrigger();
 					trigger.responded=true;
-					trigger.result={bool:true,card:{name:event.name},cards:[event.card]};
+					trigger.result={bool:true,card:{name:event.name},cards:[event.card],noanimate:true};
 				},
 				ai:{
 					order:4,

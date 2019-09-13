@@ -1,24 +1,21 @@
 window.noname_update={
-	version:'1.9.92.3',
-	update:'1.9.92.2.1',
+	version:'1.9.92.4',
+	update:'1.9.92.3',
 	changeLog:[
-		'聊天表情（by 极光）',
-		'蒋干，手杀台服武将，一将成名TW',
-		'新杀background',
+		'十殿阎罗强势来袭',
 		'BUG修复',
 	],
 	files:[
-		'character/refresh.js',
+		'card/extra.js',
+		'character/extra.js',
 		'character/shenhua.js',
 		'character/sp.js',
-		'character/standard.js',
-		'character/tw.js',
 		'character/xinghuoliaoyian.js',
+		'character/yijiang.js',
+		'mode/boss.js',
 		'mode/guozhan.js',
+		'mode/identity.js',
 		'mode/versus.js',
-		'game/config.js',
 		'game/game.js',
-		'game/package.js',
-		'game/source.js',
 	]
 };

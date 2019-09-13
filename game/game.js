@@ -11184,6 +11184,7 @@
 							info.prerespond(event.result,player);
 						}
 						var next=player.respond(event.result.cards,event.result.card,event.animate,event.result.skill,event.source);
+						if(event.result.noanimate) next.animate=false;
 						if(event.parent.card&&event.parent.type=='card'){
 							next.set('respondTo',[event.parent.player,event.parent.card]);
 						}
@@ -13234,11 +13235,26 @@
 						next.type='precard';
 					}
 					"step 2"
+					var info=get.info(card);
+					if(num==0&&targets.length>1){
+						if(!info.multitarget){
+							if(!event.fixedSeat){
+								targets.sortBySeat(player);
+							}
+							for(var i=0;i<targets.length;i++){
+								targets[i].animate('target');
+							}
+						}
+						else{
+							for(var i=0;i<targets.length;i++){
+								targets[i].animate('target');
+							}
+						}
+					}
 					if(targets[num]&&targets[num].isDead()) return;
 					if(targets[num]&&targets[num].isOut()) return;
 					if(targets[num]&&targets[num].removed) return;
 					if(targets[num]&&event.excluded.contains(targets[num])) return;
-					var info=get.info(card);
 					if(targets.length==0&&!info.notarget) return;
 					var next=game.createEvent(card.name);
 					next.setContent(info.content);
@@ -13258,21 +13274,6 @@
 					}
 					if(info.targetDelay===false){
 						event.targetDelay=false;
-					}
-					if(num==0&&next.targets.length>1){
-						if(!info.multitarget){
-							if(!event.fixedSeat){
-								targets.sortBySeat(player);
-							}
-							for(var i=0;i<targets.length;i++){
-								targets[i].animate('target');
-							}
-						}
-						else{
-							for(var i=0;i<targets.length;i++){
-								targets[i].animate('target');
-							}
-						}
 					}
 					next.target=targets[num];
 					if(next.target&&!info.multitarget){
@@ -14438,17 +14439,22 @@
 					if(event.animate!==false){
 						player.$die(source);
 					}
-					if(player.dieAfter) player.dieAfter(source);
-					event.trigger('die');
 					"step 1"
+					if(player.dieAfter) player.dieAfter(source);
+					"step 2"
+					event.trigger('die');
+					"step 3"
 					if(player.isDead()){
 						event.cards=player.getCards('hej');
 						if(event.cards.length){
+							player.lose(event.cards).forceDie=true;
 							player.$throw(event.cards,1000);
 							game.log(player,'弃置了',event.cards,event.logvid);
-							game.cardsDiscard(event.cards);
 						}
 					}
+					"step 4"
+					if(player.dieAfter2) player.dieAfter2(source);
+					"step 5"
 					if(typeof _status.coin=='number'&&source&&!_status.auto){
 						if(source==game.me||source.isUnderControl()){
 							_status.coin+=10;
@@ -42178,10 +42184,10 @@
 
 				var list=ui.create.div('.caption');
 				if(get.is.phoneLayout()){
-					list.style.maxHeight='250px';
+					list.style.maxHeight='150px';
 				}
 				else{
-					list.style.maxHeight='350px';
+					list.style.maxHeight='250px';
 				}
 				list.style.overflow='scroll';
 				lib.setScroll(list);
@@ -46655,10 +46661,13 @@
 			var i,j;
 			if(typeof obj=='string'){
 				if(obj.length<=3){
+					var bool=true;
 					for(i=0;i<obj.length;i++){
-						if(/h|e|j/.test(obj[i])==false) return;
+						if(/h|e|j/.test(obj[i])==false){
+							bool=false;break;
+						}
 					}
-					return 'position';
+					if(bool) return 'position';
 				}
 				if(lib.nature.contains(obj)) return 'nature';
 			}

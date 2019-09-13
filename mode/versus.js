@@ -3184,17 +3184,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			replacePlayerOL:function(player){
-				var next=game.createEvent('replacePlayer');
+				var next=game.createEvent('replacePlayer',false,_status.event.getParent());
 				next.source=player;
 				next.setContent('replacePlayerOL');
 			},
 			replacePlayer:function(player){
-				var next=game.createEvent('replacePlayer');
+				var next=game.createEvent('replacePlayer',false,_status.event.getParent());
 				next.source=player;
 				next.setContent('replacePlayer');
 			},
 			replacePlayerTwo:function(player,character){
-				var next=game.createEvent('replacePlayerTwo');
+				var next=game.createEvent('replacePlayerTwo',false,_status.event.getParent());
 				next.source=player;
 				next.character=character;
 				next.setContent('replacePlayerTwo');

@@ -660,14 +660,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					};
 					"step 1"
 					if(result.bool){
-						player.respond(result.cards,'highlight');
+						player.respond(result.cards,'highlight','jilue_guicai');
 					}
 					else{
 						event.finish();
 					}
 					"step 2"
 					if(result.bool){
-						player.logSkill('jilue_guicai');
+						//player.logSkill('jilue_guicai');
 						player.storage.renjie--;
 						player.updateMarks();
 						if(trigger.player.judging[0].clone){
@@ -1828,7 +1828,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.dialog.close();
 					var card=event.card;
 					if(result.control=='gongxin_top'){
-						target.lose(card);
+						target.lose(card,ui.special);
 						player.showCards(card,'置于牌堆顶');
 					}
 					else{

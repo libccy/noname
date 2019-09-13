@@ -1584,7 +1584,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							player.storage.nzry_shicai.push(get.type(trigger.card,'trick'));
-							if(trigger.name=='useCard'&&['equip','delay'].contains(get.type(trigger.card))) trigger.cancel();
 							for(var i=0;i<trigger.cards.length;i++){
 								if(get.position(trigger.cards[i])=='d'){
 									ui.cardPile.insertBefore(trigger.cards[i],ui.cardPile.firstChild);
@@ -1593,6 +1592,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							};
 							player.draw();
+							if(event.triggername=='useCard'&&['equip','delay'].contains(get.type(trigger.card))){
+								trigger.cancel();
+								game.broadcastAll(ui.clear);
+							}
 						},	
 					},
 					"3":{

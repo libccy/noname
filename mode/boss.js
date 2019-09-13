@@ -944,19 +944,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		},
 		characterPack:{
 			mode_boss:{
-				boss_hundun:['male','shen',25,['boss_xiongshou','boss_wuzang','boss_xiangde','boss_yinzei','boss_yinzei_switch'],['qun','boss','bossallowed'],'qun'],
-				boss_qiongqi:['male','shen','20/25',['boss_xiongshou','boss_zhue','boss_futai','boss_yandu','boss_yandu_switch'],['qun','boss','bossallowed'],'qun'],
-				boss_taotie:['male','shen',20,['boss_xiongshou','boss_tanyu','boss_cangmu','boss_jicai','boss_jicai_switch'],['qun','boss','bossallowed'],'qun'],
-				boss_taowu:['male','shen',25,['boss_xiongshou','boss_minwan','boss_nitai','boss_luanchang','boss_luanchang_switch'],['qun','boss','bossallowed'],'qun'],
-				boss_zhuyin:['male','shen',4,['boss_xiongshou'],['qun','hiddenboss','bossallowed'],'qun'],
+				boss_hundun:['male','qun',25,['boss_xiongshou','boss_wuzang','boss_xiangde','boss_yinzei','boss_yinzei_switch'],['qun','boss','bossallowed'],'qun'],
+				boss_qiongqi:['male','qun','20/25',['boss_xiongshou','boss_zhue','boss_futai','boss_yandu','boss_yandu_switch'],['qun','boss','bossallowed'],'qun'],
+				boss_taotie:['male','qun',20,['boss_xiongshou','boss_tanyu','boss_cangmu','boss_jicai','boss_jicai_switch'],['qun','boss','bossallowed'],'qun'],
+				boss_taowu:['male','qun',25,['boss_xiongshou','boss_minwan','boss_nitai','boss_luanchang','boss_luanchang_switch'],['qun','boss','bossallowed'],'qun'],
+				boss_zhuyin:['male','qun',4,['boss_xiongshou'],['qun','hiddenboss','bossallowed'],'qun'],
 				
-				boss_xiangliu:['male','shen',25,['boss_yaoshou','boss_duqu','boss_jiushou','boss_echou','boss_echou_switch'],['qun','boss','bossallowed'],'qun'],
-				boss_zhuyan:['male','shen','25/30',['boss_yaoshou','boss_bingxian','boss_juyuan','boss_xushi','boss_xushi_switch'],['qun','boss','bossallowed'],'qun'],
-				boss_bifang:['male','shen',25,['boss_yaoshou','boss_zhaohuo','boss_honglianx','boss_yanyu','boss_yanyu_switch'],['qun','boss','bossallowed'],'qun'],
-				boss_yingzhao:['male','shen',25,['boss_yaoshou','boss_fengdong','boss_xunyou','boss_sipu','boss_sipu_switch'],['qun','boss','bossallowed'],'qun'],
+				boss_xiangliu:['male','qun',25,['boss_yaoshou','boss_duqu','boss_jiushou','boss_echou','boss_echou_switch'],['qun','boss','bossallowed'],'qun'],
+				boss_zhuyan:['male','qun','25/30',['boss_yaoshou','boss_bingxian','boss_juyuan','boss_xushi','boss_xushi_switch'],['qun','boss','bossallowed'],'qun'],
+				boss_bifang:['male','qun',25,['boss_yaoshou','boss_zhaohuo','boss_honglianx','boss_yanyu','boss_yanyu_switch'],['qun','boss','bossallowed'],'qun'],
+				boss_yingzhao:['male','qun',25,['boss_yaoshou','boss_fengdong','boss_xunyou','boss_sipu','boss_sipu_switch'],['qun','boss','bossallowed'],'qun'],
 
 				boss_qingmushilian:['male','',0,['boss_qingmu','boss_qingmu_intro1','boss_qingmu_intro2','boss_qingmu_intro3'],['boss'],'wu'],
-				boss_qinglong:['male','shen',4,['boss_shenyi','releiji','boss_qingmu2'],['wu','hiddenboss','bossallowed']],
+				boss_qinglong:['male','qun',4,['boss_shenyi','releiji','boss_qingmu2'],['wu','hiddenboss','bossallowed']],
 				boss_mushengoumang:['male','shen',5,['boss_shenyi','boss_buchun','boss_qingmu3'],['wu','hiddenboss','bossallowed']],
 				boss_shujing:['female','shen',2,['boss_cuidu'],['wu','hiddenboss','bossallowed']],
 				boss_taihao:['male','shen',6,['boss_shenyi','boss_shenen','boss_qingyi'],['wu','hiddenboss','bossallowed']],
@@ -996,6 +996,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				boss_mo:['female','shen',5,['boss_guimei','enyuan','boss_beiming','boss_bianshen2'],['shu','hiddenboss','bossallowed']],
 				boss_wang:['male','shen',5,['boss_guimei','boss_luolei','huilei','boss_bianshen2'],['shu','hiddenboss','bossallowed']],
 				boss_liang:['female','shen',5,['boss_guimei','boss_guihuo','boss_minbao','boss_bianshen2'],['shu','hiddenboss','bossallowed']],
+				
+				boss_qinguangwang:['male','qun',3,['boss_panguan','boss_juhun','boss_wangxiang','boss_xhuanren'],['shu','boss','bossallowed'],'shu'],
+				boss_chujiangwang:['male','qun',4,['weimu','refankui','boss_bingfeng'],['shu','hiddenboss','bossallowed']],
+				boss_songdiwang:['male','qun',4,['boss_heisheng','boss_shengfu','enyuan'],['shu','hiddenboss','bossallowed']],
+				boss_wuguanwang:['male','qun',4,['boss_zhiwang','boss_gongzheng','boss_xuechi'],['shu','hiddenboss','bossallowed']],
+				boss_yanluowang:['male','qun',4,['boss_tiemian','boss_zhadao','boss_zhuxin'],['shu','hiddenboss','bossallowed']],
+				boss_bianchengwang:['male','qun',4,['boss_leizhou','boss_leifu','boss_leizhu'],['shu','hiddenboss','bossallowed']],
+				boss_taishanwang:['male','qun',4,['boss_fudu','boss_kujiu','boss_renao'],['shu','hiddenboss','bossallowed']],
+				boss_dushiwang:['male','qun',4,['boss_remen','boss_zhifen','boss_huoxing'],['shu','hiddenboss','bossallowed']],
+				boss_pingdengwang:['male','qun',4,['boss_suozu','boss_abi','boss_pingdeng'],['shu','hiddenboss','bossallowed']],
+				boss_zhuanlunwang:['male','qun',6,['boss_modao','boss_lunhui','boss_wangsheng','boss_fanshi'],['shu','hiddenboss','bossallowed']],
 
 				boss_lvbu1:['male','shen',8,['mashu','wushuang','boss_baonu','boss_jingjia','boss_aozhan'],['qun','boss','bossallowed'],'wei'],
 				boss_lvbu2:['male','shen',6,['mashu','wushuang','xiuluo','shenwei','shenji'],['qun','hiddenboss','bossallowed'],'qun'],
@@ -1810,6 +1821,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			boss_qinguangwang:{
+				chongzheng:0,
+				checkResult:function(player){
+					if(player==game.boss&&(!_status.shidianyanluo_level||_status.shidianyanluo_level<3)){
+						return false;
+					}
+				},
+				init:function(){
+					_status.additionalReward=function(){
+						return 500;
+					}
+				}
+			},
 			boss_nianshou:{
 				chongzheng:0,
 				init:function(){
@@ -1946,6 +1970,420 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			boss_panguan:{
+				mod:{
+					targetEnabled:function(card){
+						if(get.type(card)=='delay') return false;
+					},
+				},
+			},
+			boss_juhun:{
+				trigger:{player:'phaseEnd'},
+				forced:true,
+				content:function(){
+					var list=game.filterPlayer(function(current){
+						return current!=player;
+					});
+					if(list.length){
+						var target=list.randomGet();
+						player.line(target);
+						target[['turnOver','link'].randomGet()]();
+					}
+				},
+			},
+			boss_wangxiang:{
+				trigger:{player:'dieBegin'},
+				forced:true,
+				content:function(){
+					game.countPlayer(function(current){
+						if(current!=player&&current.countCards('e')){
+							player.line(current);
+							current.discard(current.getCards('e'));
+						};
+					});
+				},
+			},
+			boss_xhuanren:{
+				nobracket:true,
+				global:'boss_xhuanren2'
+			},
+			boss_xhuanren2:{
+			trigger:{player:'dieBegin'},
+				forced:true,
+				priority:-10,
+				fixed:true,
+				globalFixed:true,
+				charlotte:true,
+				silent:true,
+				popup:false,
+				filter:function(event,player){
+					if(lib.config.mode!='boss') return false;
+					return player==game.boss;
+				},
+				content:function(){
+					var next=game.createEvent('shidianyanluo_huanren',false,trigger.getParent());
+					next.player=player;
+					next.forceDie=true;
+					next.setContent(lib.skill.boss_xhuanren2.contentx);
+				},
+				contentx:function(){
+					'step 0'
+					game.delay();
+					if(!_status.shidianyanluo_level) _status.shidianyanluo_level=0;
+					var list=[
+					['boss_chujiangwang','boss_songdiwang','boss_wuguanwang','boss_yanluowang'],
+					['boss_bianchengwang','boss_taishanwang','boss_dushiwang','boss_pingdengwang'],
+					['boss_zhuanlunwang'],
+					][_status.shidianyanluo_level];
+					if(list.length==1) event._result={control:list[0]};
+					else player.chooseControl(list).set('prompt','请选择下一个出战的角色').set('forceDie',true).ai=function(){
+						return list.randomGet();
+					};
+					'step 1'
+					_status.shidianyanluo_level++;
+					game.changeBoss(result.control);
+				}
+			},
+			boss_bingfeng:{
+				trigger:{player:'dieBegin'},
+				forced:true,
+				filter:function(event){
+					return event.source&&!event.source.isTurnedOver();
+				},
+				logTarget:'source',
+				content:function(){
+					trigger.source.turnOver();
+				}
+			},
+			boss_heisheng:{
+				trigger:{player:'dieBegin'},
+				forced:true,
+				content:function(){
+					player.line(game.players.slice(0));
+					game.countPlayer(function(current){
+						if(current!=player) current.link();
+					});
+				},
+			},
+			boss_shengfu:{
+				trigger:{player:'phaseEnd'},
+				forced:true,
+				popup:false,
+				content:function(){
+					var list=[];
+					game.countPlayer(function(current){
+						if(current==player) return;
+						var es=current.getCards('e',{subtype:['equip3','equip4','equip6']})
+						if(es.length) list.push([current,es]);
+					});
+					if(list.length){
+						player.logSkill('boss_heisheng');
+						var current=list.randomGet();
+						player.line(current[0]);
+						current[0].discard(current[1].randomGet());
+					}
+				},
+			},
+			boss_zhiwang:{
+				derivation:'boss_zhiwang_planetarian',
+				trigger:{global:'gainEnd'},
+				filter:function(event,player){
+					return event.player!=player&&!(event.getParent().name=='draw'&&event.getParent(2).name=='phaseDraw')&&event.player.countCards('h');
+				},
+				forced:true,
+				logTarget:'player',
+				content:function(){
+					var evt=trigger.getParent('boss_zhiwang');
+					if(evt&&evt.name=='boss_zhiwang'){
+						trigger.player.uninit();
+						trigger.player.init('sunce');
+					}
+					var hs=trigger.player.getCards('h');
+					if(hs.length){
+						trigger.player.discard(hs.randomGet());
+					}
+				},
+				subSkill:{planetarian:{}},
+			},
+			boss_gongzheng:{
+				trigger:{player:'phaseBegin'},
+				forced:true,
+				filter:function(event,player){
+					return player.countCards('j')>0;
+				},
+				content:function(){
+					player.discard(player.getCards('j').randomGet())
+				},
+			},
+			boss_xuechi:{
+				trigger:{player:'phaseEnd'},
+				forced:true,
+				content:function(){
+					var list=game.players.slice(0);
+					list.remove(player);
+					var target=list.randomGet();
+					player.line(target);
+					target.loseHp(2);
+				},
+			},
+			boss_tiemian:{
+				inherit:'renwang_skill',
+				filter:function(event,player){
+					if(!player.isEmpty(2)) return false;
+					return lib.skill.renwang_skill.filter.apply(this,arguments);
+				},
+			},
+			boss_zhadao:{
+				inherit:'qingang_skill',
+			},
+			boss_zhuxin:{
+				trigger:{player:'dieBegin'},
+				forced:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget('【诛心】：请选择一名角色，令其受到2点伤害。',function(card,player,target){
+						return target!=player&&!game.hasPlayer(function(current){
+							return current!=player&&current!=target&&current.hp<target.hp;
+						})
+					}).ai=function(target){
+						return -get.attitude(_status.event.player,target);
+					};
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target);
+						target.damage(2);
+					}
+				},
+			},
+			boss_leizhou:{
+				trigger:{player:'phaseBegin'},
+				forced:true,
+				content:function(){
+					var list=game.players.slice(0);
+					list.remove(player);
+					if(list.length){
+						var target=list.randomGet();
+						player.line(target);
+						target.damage('thunder');
+					}
+				}
+			},
+			boss_leifu:{
+				trigger:{player:'phaseAfter'},
+				forced:true,
+				content:function(){
+					var list=game.players.slice(0);
+					list.remove(player);
+					if(list.length){
+						var target=list.randomGet();
+						player.line(target);
+						target.link();
+					}
+				}
+			},
+			boss_leizhu:{
+				trigger:{player:'dieBegin'},
+				forced:true,
+				content:function(){
+					var list=game.players.slice(0);
+					list.remove(player);
+					if(list.length){
+						list.sort(lib.sort.seat);
+						player.line(list);
+						for(var i=0;i<list.length;i++){
+							list[i].damage('thunder');
+						}
+					}
+				}
+			},
+			boss_fudu:{
+				trigger:{global:'useCard'},
+				forced:true,
+				filter:function(event,player){
+					return event.card.name=='tao'&&event.player!=player&&game.players.length>2;
+				},
+				content:function(){
+					var list=game.players.slice(0);
+					list.remove(player);
+					list.remove(trigger.player);
+					var target=list.randomGet();
+					player.line(target);
+					target.loseHp();
+				},
+			},
+			boss_kujiu:{
+				trigger:{global:'phaseBegin'},
+				forced:true,
+				filter:function(event,player){
+					return event.player!=player;
+				},
+				logTarget:'player',
+				content:function(){
+					'step 0'
+					trigger.player.loseHp();
+					'step 1'
+					trigger.player.useCard({name:'jiu'},trigger.player);
+				},
+			},
+			boss_renao:{
+				trigger:{player:'dieBegin'},
+				forced:true,
+				content:function(){
+					var list=game.players.slice(0);
+					list.remove(player);
+					if(list.length){
+						var target=list.randomGet();
+						player.line(target);
+						target.damage(3,'fire');
+					}
+				}
+			},
+			boss_remen:{
+				inherit:'boss_manjia',
+			},
+			boss_zhifen:{
+				trigger:{player:'phaseBegin'},
+				forced:true,
+				content:function(){
+					'step 0'
+					var list=game.players.slice(0);
+					list.remove(player);
+					if(list.length){
+						var target=list.randomGet();
+						player.line(target);
+						event.target=target;
+						if(target.countGainableCards(player,'h')) player.gainPlayerCard(target,'h',true);
+					}
+					else event.finish();
+					'step 1'
+					target.damage('fire');
+				}
+			},
+			
+			boss_huoxing:{
+				trigger:{player:'dieBegin'},
+				forced:true,
+				content:function(){
+					var list=game.players.slice(0);
+					list.remove(player);
+					if(list.length){
+						list.sort(lib.sort.seat);
+						player.line(list);
+						for(var i=0;i<list.length;i++){
+							list[i].damage('fire');
+						}
+					}
+				}
+			},
+			boss_suozu:{
+				trigger:{player:'phaseBegin'},
+				forced:true,
+				content:function(){
+					var list=game.players.slice(0);
+					list.remove(player);
+					if(list.length){
+						list.sort(lib.sort.seat);
+						player.line(list);
+						for(var i=0;i<list.length;i++){
+							list[i].link();
+						}
+					}
+				}
+			},
+			boss_abi:{
+				trigger:{player:'damageEnd'},
+				forced:true,
+				filter:function(event){
+					return event.source!=undefined;
+				},
+				logTarget:'source',
+				content:function(){
+					trigger.source.damage().nature=lib.linked.randomGet();
+				},
+			},
+			boss_pingdeng:{
+				trigger:{player:'dieBegin'},
+				forced:true,
+				content:function(){
+					'step 0'
+					var list=game.filterPlayer(function(current){
+						return current!=player&&!game.hasPlayer(function(current2){
+							return current2.hp>current.hp;
+						});
+					});
+					if(list.length){
+						var target=list.randomGet()
+						player.line(target);
+						target.damage(2).nature=lib.linked.randomGet();
+					}
+					else event.finish();
+					'step 1'
+					var list=game.filterPlayer(function(current){
+						return current!=player&&!game.hasPlayer(function(current2){
+							return current2.hp>current.hp;
+						});
+					});
+					if(list.length){
+						var target=list.randomGet();
+						player.line(target);
+						target.damage().nature=lib.linked.randomGet();
+					}
+				},
+			},
+			boss_lunhui:{
+				trigger:{player:'phaseBegin'},
+				forced:true,
+				filter:function(event,player){
+					return player.hp<=2&&game.hasPlayer(function(current){
+						return current!=player&&current.hp>2;
+					});
+				},
+				content:function(){
+					var list=game.filterPlayer(function(current){
+						return current!=player&&current.hp>2;
+					});
+					if(list.length){
+						var target=list.randomGet();
+						player.line(target);
+						var hp1=player.hp;
+						var hp2=target.hp;
+						player.hp=Math.min(player.maxHp,hp2);
+						target.hp=Math.min(target.maxHp,hp1);
+						player.update();
+						target.update();
+						game.log(player,'和',target,'交换了体力值')
+					}
+				},
+			},
+			boss_wangsheng:{
+				trigger:{player:'phaseUseBegin'},
+				forced:true,
+				content:function(){
+					var name=['nanman','wanjian'].randomGet();
+					player.useCard({name:name},game.filterPlayer(function(current){
+						return player.canUse({name:name},current)
+					}),'noai');
+				},
+			},
+			boss_fanshi:{
+				trigger:{player:'damageEnd'},
+				forced:true,
+				content:function(){
+					if(player.hasSkill('boss_fanshi_terra')){
+						var list=game.players.slice(0);
+						list.remove(player);
+						if(list.length){
+							var target=list.randomGet();
+							player.line(target);
+							target.damage();
+						}
+					}
+					else player.addTempSkill('boss_fanshi_terra');
+				},
+			},
+			boss_fanshi_terra:{charlotte:true},
+			
 			"boss_jingjia":{},
 			"boss_aozhan":{
 				forced:true,
@@ -7908,6 +8346,77 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"hongmianbaihuapao_info":"锁定技，防止你受到的属性伤害。",
 			"linglongshimandai":"玲珑狮蛮带",
 			"linglongshimandai_info":"当其他角色使用牌指定你为唯一目标后，你可以进行一次判定，若判定结果为红桃，则此牌对你无效。",
+			
+			boss_qinguangwang:'秦广王',
+			boss_panguan:'判官',
+			boss_panguan_info:'	锁定技，你不能成为延时类锦囊的目标。',
+			boss_juhun:'拘魂',
+			boss_juhun_info:'锁定技，结束阶段，你令随机一名其他角色的武将牌翻面或横置。',
+			boss_wangxiang:'望乡',
+			boss_wangxiang_info:'锁定技，当你死亡时，你令所有其他角色弃置其装备区内的所有牌。',
+			boss_chujiangwang:'楚江王',
+			boss_bingfeng:'冰封',
+			boss_bingfeng_info:'锁定技，你死亡时，若杀死你的角色武将牌是正面朝上， 你令其翻面。',
+			boss_songdiwang:'宋帝王',
+			boss_heisheng:'黑绳',
+			boss_heisheng_info:'锁定技，你死亡时，横置所有场上角色。',
+			boss_shengfu:'绳缚',
+			boss_shengfu_info:'锁定技，你的回合结束时，随机弃置一张场上其他角色的坐骑牌。',
+			boss_wuguanwang:'五官王',
+			boss_zhiwang:'治妄',
+			boss_zhiwang_info:'锁定技，当其他角色于摸牌阶段外获得牌时，你随机弃置其一张手牌。',
+			boss_zhiwang_planetarian:'注意事项',
+			boss_zhiwang_planetarian_info:'若触发【治妄】的角色因【治妄】触发的其他的技能（如【伤逝】【连营】等）继续获得了牌，则该角色将其武将牌变更为孙策。',
+			boss_gongzheng:'公正',
+			boss_gongzheng_info:'锁定技，准备阶段，若你判定区有牌，你随机弃置一张你判定区的牌。',
+			boss_xuechi:'血池',
+			boss_xuechi_info:'锁定技，你的回合结束时，令随机一名其他角色失去2点体力。',
+			boss_yanluowang:'阎罗王',
+			boss_tiemian:'铁面',
+			boss_tiemian_info:'锁定技，你的防具区没有牌时，视为你装备【仁王盾】。',
+			boss_zhadao:'铡刀',
+			boss_zhadao_info:'锁定技，你使用【杀】指定目标后，你令目标角色防具无效。',
+			boss_zhuxin:'诛心',
+			boss_zhuxin_info:'锁定技，你死亡时，你令场上血量最少的一名其他角色受到2点伤害。',
+			boss_bianchengwang:'卞城王',
+			boss_leizhou:'雷咒',
+			boss_leizhou_info:'锁定技，准备阶段，你对随机一名其他角色造成1点雷属性伤害',
+			boss_leifu:'雷缚',
+			boss_leifu_info:'锁定技，你的回合结束时，随机横置一名其他角色。',
+			boss_leizhu:'雷诛',
+			boss_leizhu_info:'锁定技，你死亡时，对所有其他角色造成依次造成1点雷属性伤害。',
+			boss_taishanwang:'泰山王',
+			boss_fudu:'服毒',
+			boss_fudu_info:'锁定技，其他角色使用【桃】时，你令随机另一名其他角色失去1点体力。',
+			boss_kujiu:'苦酒',
+			boss_kujiu_info:'锁定技，其他角色准备阶段，你令其失去1点体力，然后该角色视为使用一张【酒】。',
+			boss_renao:'热恼',
+			boss_renao_info:'锁定技，你死亡时，你令随机一名其他角色受到3点火属性伤害。',
+			boss_dushiwang:'都市王',
+			boss_remen:'热闷',
+			boss_remen_info:'锁定技，若你的装备区内没有防具牌，则【南蛮入侵】、【万箭齐发】和普通【杀】对你无效。',
+			boss_zhifen:'炙焚',
+			boss_zhifen_info:'锁定技，准备阶段，你随机选择一名其他角色，获得其1张手牌（没有则不获得），并对其造成1点火属性伤害。',
+			boss_huoxing:'火刑',
+			boss_huoxing_info:'锁定技，你死亡时，你对所有其他角色造成1点火属性伤害。',
+			boss_pingdengwang:'平等王',
+			boss_suozu:'锁足',
+			boss_suozu_info:'锁定技，准备阶段，你令所有其他角色横置。',
+			boss_abi:'阿鼻',
+			boss_abi_info:'锁定技，锁定技，你受到伤害时，你对伤害来源造成伤害的角色造成1点随机属性伤害（雷或火随机）。',
+			boss_pingdeng:'平等',
+			boss_pingdeng_info:'锁定技，你死亡时，你对体力最多的一名其他角色造成2点随机属性伤害（属性随机），然后再对一名体力最多的其他角色造成1点随机属性伤害（属性随机）。',
+			boss_zhuanlunwang:'转轮王',
+			boss_lunhui:'轮回',
+			boss_lunhui_info:'锁定技，准备阶段，若你的体力小于等于2，则你与场上除你以外体力最高且大于2的角色交换体力值。',
+			boss_wangsheng:'往生',
+			boss_wangsheng_info:'锁定技，你的出牌阶段开始时，视为你随机使用一张【南蛮入侵】或【万箭齐发】。',
+			boss_fanshi:'反噬',
+			boss_fanshi_info:'锁定技，每个回合你受到第一次伤害后，若再次受到伤害，则对随机一名其他角色造成1点伤害。',
+			
+			boss_xhuanren:'关卡说明',
+			boss_xhuanren_info:'',
+			boss_xhuanren_info_boss:'第一关：挑战秦广王。<br>第二关：挑战楚江王，宋帝王，五官王，阎罗王中的一个。<br>第三关：挑战卞城王，泰山王，都市王，平等王中的一个。<br>第四关：挑战转轮王。',
 
 			mode_boss_card_config:'挑战卡牌',
 			mode_boss_character_config:'挑战武将',

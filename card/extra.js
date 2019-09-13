@@ -223,6 +223,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:true,
 				filterTarget:true,
 				selectTarget:[1,2],
+				complexTarget:true,
 				content:function(){
 					target.link();
 				},

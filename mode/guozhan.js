@@ -1235,7 +1235,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var choices=[];
 					if(game.hasPlayer(function(current){return current.isUnseen()})) choices.push('选择一名未确定势力的角色');
 					if(game.hasPlayer(function(current){return current!=player&&!current.isUnseen()})&&player.countCards('h',{type:'basic'})) choices.push('交给一名已确定势力角色一张基本牌');
-					player.chooseControl(choices,ui.create.dialog('征辟</br></br><div class="center text">选择一项</div>','hidden')).set('ai',function(){
+					player.chooseControl(choices).set('ai',function(){
 						if(choices.length>1){
 							var player=_status.event.player;
 							if(!game.hasPlayer(function(current){
@@ -1252,7 +1252,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return 1;
 						}
 						return 0;
-					});
+					}).set('prompt','征辟</br></br><div class="center text">选择一项</div>');
 					'step 1'
 					if(result.control=='选择一名未确定势力的角色') player.chooseTarget('征辟</br></br><div class="center text">选择一名未确定势力角色，你对其使用牌没有次数和距离限制直到回合结束</div>',function(card,player,target){
 						return target!=player&&target.identity=='unknown'
@@ -1284,13 +1284,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var choices=[];
 					if(target.countCards('he',{type:['trick','delay','equip']})) choices.push('一张非基本牌');
 					if(target.countCards('h',{type:'basic'})>1) choices.push('两张基本牌');
-					if(choices.length) target.chooseControl(choices,ui.create.dialog('征辟</br></br><div class="center text">交给'+get.translation(player)+'</div>')).set('ai',function(event,player){
+					if(choices.length) target.chooseControl(choices).set('ai',function(event,player){
 						if(choices.length>1){
 							if(player.countCards('he',{type:['trick','delay','equip']},function(card){return get.value(card)<7})) return 0;
 							return 1;
 						}
 						return 0;
-					});
+					}).set('prompt','征辟</br></br><div class="center text">交给'+get.translation(player)+'</div>');
 					else{
 						if(target.countCards('h')){
 							var cards=target.getCards('h');
@@ -5599,7 +5599,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					player.chooseControl('点数+3','点数-3','cancel2').set('prompt',get.prompt3('yingyang')).set('ai',function(){
+					player.chooseControl('点数+3','点数-3','cancel2').set('prompt',get.prompt2('yingyang')).set('ai',function(){
 						if(_status.event.small) return 1;
 						else return 0;
 					}).set('small',trigger.small);
@@ -7599,13 +7599,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 					chooseJunlingControl:function(){
 						'step 0'
-						var dialog=ui.create.dialog('hidden');
+						var dialog=[];
 						var str1=source==player?'（你）':'';
 						var str2=event.targets?'（被指定的角色为'+get.translation(event.targets)+'）':'';
 						if(!event.prompt) dialog.add(get.translation(event.source)+str1+'选择的军令'+str2+'为');
 						else{
 							dialog.add(event.prompt);
-							dialog.addText(get.translation(event.source)+str1+'选择的军令'+str2+'为');
+							dialog.add(get.translation(event.source)+str1+'选择的军令'+str2+'为');
 						}
 						dialog.add([[event.junling],'vcard']);
 						var controls=[];
@@ -7827,16 +7827,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						this.node.identity.classList.add('guessing');
 					}
 				},
-				dieAfter:function(source){
-					this.showCharacter(2);
-					if(source&&source.identity!='unknown'){
+				dieAfter2:function(source){
+					if(source.shijun){
+					source.discard(source.getCards('he'));
+					delete source.shijun;
+					}
+					else if(source&&source.identity!='unknown'){
 						if(source.identity=='ye') source.draw(3);
 						else if(this.identity=='ye') source.draw(1);
 						else if(this.identity!=source.identity) source.draw(get.population(this.identity)+1);
 						else source.discard(source.getCards('he'));
 					}
-					
+				},
+				dieAfter:function(source){
+					this.showCharacter(2);
 					if(get.is.jun(this.name1)){
+						if(source&&source.identity==this.identity) source.shijun=true;
 						var yelist=[];
 						for(var i=0;i<game.players.length;i++){
 							if(game.players[i].identity==this.identity){

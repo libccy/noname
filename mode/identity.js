@@ -1555,6 +1555,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						this.node.dieidentity.style.transform='';
 					}
 				},
+				dieAfter2:function(source){
+					if(this.identity=='fan'&&source) source.draw(3);
+					else if(this.identity=='mingzhong'&&source){
+						if(source.identity=='zhu'){
+							source.discard(source.getCards('he'));
+						}
+						else{
+							source.draw(3);
+						}
+					}
+					else if(this.identity=='zhong'&&source&&source.identity=='zhu'&&source.isZhu){
+						source.discard(source.getCards('he'));
+					}
+				},
 				dieAfter:function(source){
 					if(!this.identityShown){
 						game.broadcastAll(function(player,identity,identity2){
@@ -1581,18 +1595,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						get.population('zhong')+get.population('fan')==0){
 							game.broadcastAll(game.showIdentity);
 						}
-					}
-					if(this.identity=='fan'&&source) source.draw(3);
-					else if(this.identity=='mingzhong'&&source){
-						if(source.identity=='zhu'){
-							source.discard(source.getCards('he'));
-						}
-						else{
-							source.draw(3);
-						}
-					}
-					else if(this.identity=='zhong'&&source&&source.identity=='zhu'&&source.isZhu){
-						source.discard(source.getCards('he'));
 					}
 					if(game.zhu&&game.zhu.storage.enhance_zhu&&get.population('fan')<3){
 						game.zhu.removeSkill(game.zhu.storage.enhance_zhu);

@@ -12050,7 +12050,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kongrong:'孔融',
 			fuwan:'伏完',
 			sp_pangde:'SP庞德',
-			sp_sunshangxiang:'孙尚香',
+			sp_sunshangxiang:'SP孙尚香',
 			zhugedan:'诸葛诞',
 			sp_machao:'SP马超',
 			sp_jiangwei:'SP姜维',

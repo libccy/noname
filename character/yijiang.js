@@ -7247,6 +7247,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						trigger.player.addTempSkill('zishou2');
 					}
+					else{
+						trigger.player.storage.zhuikong_distance=player;
+						trigger.player.addTempSkill('zhuikong_distance');
+					}
+				},
+				subSkill:{
+					distance:{
+						sub:true,
+						onremove:true,
+						mod:{
+							globalFrom:function(from,to,distance){
+								if(from.storage.zhuikong_distance==to) return -Infinity;
+							},
+						},
+					},
 				},
 			},
 			qiuyuan:{
@@ -10086,7 +10101,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			quanji_info:'每当你受到1点伤害后，你可以可摸一张牌，然后将一张手牌置于武将牌上，称为“权”；你的手牌上限+X（X为“权”的数量）。',
 			xianzhou_info:'限定技。出牌阶段，你可以将装备区里的所有牌交给一名其他角色，然后该角色选择一项：令你回复X点体力;或对其攻击范围内的X名角色各造成1点伤害(X为你以此法交给该角色的牌的数量)。',
 			qieting_info:'一名其他角色的结束阶段，若其未于此回合内使用过指定另一名角色为目标的牌，你可以选择一项：将其装备区里的一张牌移动至你装备区里的相应位置（可替换原装备）；或摸一张牌。',
-			zhuikong_info:'一名其他角色的准备阶段，若你已受伤，你可以与该角色拼点，若你赢，该角色本回合使用的牌不能指定除该角色外的角色为目标',
+			zhuikong_info:'一名其他角色的准备阶段，若你已受伤，你可以与该角色拼点，若你赢，该角色本回合使用的牌不能指定除该角色外的角色为目标。若你没赢，其本回合至你的距离视为1。',
 			qiuyuan_info:'当你成为【杀】的目标时，你可以令另一名其他角色选择一项：①、交给你一张【闪】；②、成为此【杀】的额外目标。',
 			gongji_info:'出牌阶段，你可以弃置一张牌，令你的攻击范围无限，直到回合结束，然后若你以此法弃置的牌为装备牌，你可以弃置一名其他角色的一张牌。每回合限一次。',
 			zhuiyi_info:'你死亡时，可以令一名其他角色（杀死你的角色除外）摸三张牌，然后令其回复1点体力。',
