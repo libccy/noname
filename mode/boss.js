@@ -1829,6 +1829,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				init:function(){
+					_status.shidianyanluo_level=0;
 					_status.additionalReward=function(){
 						return 500;
 					}
@@ -1992,8 +1993,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			boss_wangxiang:{
-				trigger:{player:'dieBegin'},
+				trigger:{player:'die'},
 				forced:true,
+				forceDie:true,
 				content:function(){
 					game.countPlayer(function(current){
 						if(current!=player&&current.countCards('e')){
@@ -2018,6 +2020,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				filter:function(event,player){
 					if(lib.config.mode!='boss') return false;
+					if(_status.shidianyanluo_level==undefined) return false;
 					return player==game.boss;
 				},
 				content:function(){
@@ -2029,7 +2032,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				contentx:function(){
 					'step 0'
 					game.delay();
-					if(!_status.shidianyanluo_level) _status.shidianyanluo_level=0;
+					'step 1'
 					var list=[
 					['boss_chujiangwang','boss_songdiwang','boss_wuguanwang','boss_yanluowang'],
 					['boss_bianchengwang','boss_taishanwang','boss_dushiwang','boss_pingdengwang'],
@@ -2039,13 +2042,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else player.chooseControl(list).set('prompt','请选择下一个出战的角色').set('forceDie',true).ai=function(){
 						return list.randomGet();
 					};
-					'step 1'
+					'step 2'
 					_status.shidianyanluo_level++;
 					game.changeBoss(result.control);
 				}
 			},
 			boss_bingfeng:{
-				trigger:{player:'dieBegin'},
+				trigger:{player:'die'},
+				forceDie:true,
 				forced:true,
 				filter:function(event){
 					return event.source&&!event.source.isTurnedOver();
@@ -2056,7 +2060,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			boss_heisheng:{
-				trigger:{player:'dieBegin'},
+				trigger:{player:'die'},
+				forceDie:true,
 				forced:true,
 				content:function(){
 					player.line(game.players.slice(0));
@@ -2137,7 +2142,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				inherit:'qingang_skill',
 			},
 			boss_zhuxin:{
-				trigger:{player:'dieBegin'},
+				trigger:{player:'die'},
+				forceDie:true,
 				forced:true,
 				content:function(){
 					'step 0'
@@ -2183,7 +2189,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			boss_leizhu:{
-				trigger:{player:'dieBegin'},
+				trigger:{player:'die'},
+				forceDie:true,
 				forced:true,
 				content:function(){
 					var list=game.players.slice(0);
@@ -2227,7 +2234,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			boss_renao:{
-				trigger:{player:'dieBegin'},
+				trigger:{player:'die'},
+				forceDie:true,
 				forced:true,
 				content:function(){
 					var list=game.players.slice(0);
@@ -2262,7 +2270,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			
 			boss_huoxing:{
-				trigger:{player:'dieBegin'},
+				trigger:{player:'die'},
+				forceDie:true,
 				forced:true,
 				content:function(){
 					var list=game.players.slice(0);
@@ -2303,7 +2312,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			boss_pingdeng:{
-				trigger:{player:'dieBegin'},
+				trigger:{player:'die'},
+				forceDie:true,
 				forced:true,
 				content:function(){
 					'step 0'

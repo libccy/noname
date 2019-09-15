@@ -1362,7 +1362,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				skillAnimation:'epic',
-				animationColor:'water',
+				animationColor:'gray',
 				ai:{
 					order:0.1,
 					result:{
@@ -2419,6 +2419,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			"baka_hunshang":{
 				skillAnimation:true,
+				animationColor:'wood',
 				audio:"hunshang",
 				derivation:["reyingzi","gzyinghun"],
 				viceSkill:true,
@@ -3672,6 +3673,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				limited:true,
 				skillAnimation:true,
+				animationColor:'wood',
 				enable:'phaseUse',
 				content:function(){
 					'step 0'
@@ -5436,6 +5438,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				forceunique:true,
 				filterTarget:true,
 				skillAnimation:true,
+				animationColor:'orange',
 				content:function(){
 					'step 0'
 					if(player.checkMainSkill('gzcunsi',false)){
@@ -5656,8 +5659,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			gzduanchang:{
 				audio:'duanchang',
-				trigger:{player:'dieBegin'},
+				trigger:{player:'die'},
 				forced:true,
+				forceDie:true,
 				filter:function(event,player){
 					return event.source&&event.source.isIn()&&event.source!=player&&
 					(event.source.hasMainCharacter()||event.source.hasViceCharacter());
@@ -5673,7 +5677,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						player.chooseControl('主将','副将',function(){
 							return Math.random()<0.5?'主将':'副将';
-						}).set('prompt','令'+get.translation(trigger.source)+'失去一张武将牌的所有技能');
+						}).set('prompt','令'+get.translation(trigger.source)+'失去一张武将牌的所有技能').set('forceDie',true);
 					}
 					'step 1'
 					var skills;
@@ -6138,6 +6142,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			_mingzhi2:{
 				trigger:{player:'triggerHidden'},
 				forced:true,
+				forceDie:true,
 				popup:false,
 				priority:10,
 				content:function(){
@@ -7828,7 +7833,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				dieAfter2:function(source){
-					if(source.shijun){
+					if(source&&source.shijun){
 					source.discard(source.getCards('he'));
 					delete source.shijun;
 					}
