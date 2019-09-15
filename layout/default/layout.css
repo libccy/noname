@@ -2261,6 +2261,12 @@ div:not(.handcards)>.card>.info>span,
 #window>.damage.fullscreenavatar[data-nature='fire']>div:first-child>div{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 20px, rgba(0, 0, 0,0.3) 0 0 40px, rgba(232, 53, 53, 1) 0 0 80px;
 }
+#window>.damage.fullscreenavatar[data-nature='orange']>div:first-child>div{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 20px, rgba(0, 0, 0,0.3) 0 0 40px, rgba(255, 120, 0, 1) 0 0 80px;
+}
+#window>.damage.fullscreenavatar[data-nature='gray']>div:first-child>div{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 20px, rgba(0, 0, 0,0.3) 0 0 40px, rgba(213, 194, 179, 1) 0 0 80px;
+}
 #window>.damage.fullscreenavatar>.text{
 	display: table;
 }
@@ -3699,10 +3705,28 @@ span[data-nature='firemm'] {
 		rgba(232, 53, 53,1) 0 0 2px,black 0 0 1px;
 }
 
-.player .identity[data-color="mingzhong"] {
-	text-shadow: black 0 0 1px,rgba(255, 120, 0,1) 0 0 2px,rgba(255, 120, 0,1) 0 0 5px,rgba(255, 120, 0,1) 0 0 10px,
-		rgba(255, 120, 0,1) 0 0 10px
+.player .identity[data-color="mingzhong"],
+div[data-nature='orange'],
+span[data-nature='orange'] {
+	text-shadow: rgba(255, 120, 0,1) 0 0 2px,rgba(255, 120, 0,1) 0 0 5px,rgba(255, 120, 0,1) 0 0 10px,
+		rgba(255, 120, 0,1) 0 0 10px,rgba(255, 120, 0,1) 0 0 20px,rgba(255, 120, 0,1) 0 0 20px,black 0 0 1px;
 }
+div[data-nature='orangem'],
+span[data-nature='orangem'] {
+	text-shadow: rgba(255, 120, 0,1) 0 0 2px,rgba(255, 120, 0,1) 0 0 5px,rgba(255, 120, 0,1) 0 0 5px,
+		rgba(255, 120, 0,1) 0 0 5px,black 0 0 1px;
+}
+div[data-nature='orangemm'],
+span[data-nature='orangemm'] {
+	text-shadow: rgba(255, 120, 0,1) 0 0 2px,rgba(255, 120, 0,1) 0 0 2px,rgba(255, 120, 0,1) 0 0 2px,
+		rgba(255, 120, 0,1) 0 0 2px,black 0 0 1px;
+}
+div[data-nature='firemx'],
+span[data-nature='firemx'] {
+	text-shadow: black 0 0 1px,rgba(255, 120, 0,0.2) 0 0 2px,rgba(255, 120, 0,1) 0 0 2px,rgba(255, 120, 0,1) 0 0 5px,
+		rgba(255, 120, 0,1) 0 0 5px,black 0 0 1px;
+}
+
 .player .identity[data-color="zhong"],
 .player .identity[data-color="qun"],
 .player .identity[data-color="neutral"],
@@ -3805,6 +3829,27 @@ div[data-nature='soilmx'],
 span[data-nature='soilmx'] {
 	text-shadow: rgba(0,0,0,0.4) 0 0 1px,rgba(128, 59, 2,1) 0 0 2px,rgba(128, 59, 2,1) 0 0 2px,rgba(128, 59, 2,1) 0 0 5px,
 		rgba(128, 59, 2,1) 0 0 5px,black 0 0 1px;
+}
+
+div[data-nature='gray'],
+span[data-nature='gray'] {
+	text-shadow: rgba(213, 194, 179,1) 0 0 2px,rgba(213, 194, 179,1) 0 0 5px,rgba(213, 194, 179,1) 0 0 10px,
+		rgba(213, 194, 179,1) 0 0 10px,rgba(213, 194, 179,1) 0 0 20px,rgba(213, 194, 179,1) 0 0 20px,black 0 0 1px;
+}
+div[data-nature='graym'],
+span[data-nature='graym'] {
+	text-shadow: rgba(213, 194, 179,1) 0 0 2px,rgba(213, 194, 179,1) 0 0 5px,rgba(213, 194, 179,1) 0 0 5px,
+		rgba(213, 194, 179,1) 0 0 5px,black 0 0 1px;
+}
+div[data-nature='graymm'],
+span[data-nature='graymm'] {
+	text-shadow: rgba(213, 194, 179,1) 0 0 2px,rgba(213, 194, 179,1) 0 0 2px,rgba(213, 194, 179,1) 0 0 2px,
+		rgba(213, 194, 179,1) 0 0 2px,black 0 0 1px;
+}
+div[data-nature='graymx'],
+span[data-nature='graymx'] {
+	text-shadow: black 0 0 1px,rgba(213, 194, 179,0.2) 0 0 2px,rgba(213, 194, 179,1) 0 0 2px,rgba(213, 194, 179,1) 0 0 5px,
+		rgba(213, 194, 179,1) 0 0 5px,black 0 0 1px;
 }
 
 .player .identity[data-color="unknownx"],
