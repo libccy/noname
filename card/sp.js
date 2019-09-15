@@ -240,6 +240,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				onEquip:function(){
 					player.markSkill('muniu_skill6');
 				},
+				forceDie:true,
 				onLose:function(){
 					player.unmarkSkill('muniu_skill6');
 					if((event.getParent(2)&&event.getParent(2).name!='swapEquip')&&event.parent.type!='equip'&&card&&card.cards&&card.cards.length){
