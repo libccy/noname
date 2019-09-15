@@ -346,6 +346,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:"xinfu_fangtong",
 				forced:true,
 				skillAnimation:true,
+				animationColor:'metal',
 				filter:function (event,player){
 					return (player.storage.old_jijun&&player.storage.old_jijun.length>35);
 				},

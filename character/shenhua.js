@@ -177,6 +177,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"drlt_hongju":{
 				skillAnimation:true,
+				animationColor:'thunder',
 				audio:2,
 				trigger:{
 					player:'phaseBegin',
@@ -535,6 +536,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"drlt_poshi":{
 				audio:2,
 				skillAnimation:true,
+				animationColor:'wood',
 				trigger:{
 					player:'phaseBegin',
 				},
@@ -673,6 +675,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				mark:true,
 				skillAnimation:true,
+				animationColor:'gray',
 				limited:true,
 				init:function(player){
 					player.storage.drlt_xiongluan=false;
@@ -2238,7 +2241,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lianhuan4:{
 				mod:{
 		selectTarget:function(card,player,range){
-			if(card.name=='tiesuo'&&player.hasSkill('xinlianhuan')&&range[1]<3) range[1]=3;
+			if(card.name=='tiesuo'&&player.hasSkill('xinlianhuan')&&range[1]<3&&range[1]!=-1) range[1]=3;
 		},
 	},
 			},
@@ -2355,8 +2358,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:'limited'
 				},
-				skillAnimation:'legend',
-				animationColor:'metal',
+				skillAnimation:true,
+				animationColor:'orange',
 				content:function(){
 					'step 0'
 					var shas=player.getCards('h','sha');
@@ -2448,7 +2451,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					event.num=trigger.num;
 					'step 1'
-					player.chooseDrawRecover(get.prompt('xinkuanggu'),'摸一张牌或回复1点体力').set('logSkill','xinkuanggu');
+					player.chooseDrawRecover(get.prompt('xinkuanggu')).set('logSkill','xinkuanggu').set('prompt2','摸一张牌或回复1点体力');
 					'step 2'
 					if(result.control!='cancel2'){
 						event.num--;
@@ -2527,6 +2530,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zhiji:{
 				skillAnimation:true,
+				animationColor:'fire',
 				audio:2,
 				unique:true,
 				juexingji:true,
@@ -2654,6 +2658,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			ruoyu:{
 				skillAnimation:true,
+				animationColor:'fire',
 				audio:2,
 				unique:true,
 				juexingji:true,
@@ -2944,6 +2949,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zaoxian:{
 				skillAnimation:true,
+				animationColor:'thunder',
 				audio:2,
 				unique:true,
 				juexingji:true,
@@ -3029,6 +3035,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			hunzi:{
 				skillAnimation:true,
+				animationColor:'wood',
 				audio:2,
 				juexingji:true,
 				derivation:['reyingzi','gzyinghun'],
@@ -3332,8 +3339,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			duanchang:{
 				audio:4,
 				forbid:['boss'],
-				trigger:{player:'dieBegin'},
+				trigger:{player:'die'},
 				forced:true,
+				forceDie:true,
 				filter:function(event){
 					return event.source&&event.source.isIn();
 				},
@@ -4770,7 +4778,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationStr:'涅盘',
 				limited:true,
-				animationColor:'fire',
+				animationColor:'orange',
 				init:function(player){
 					player.storage.oldniepan=false;
 				},

@@ -1017,7 +1017,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					on:{}
 				}
 			},
-			guanxing:{
+			guanxing_oldnew:{
 				audio:2,
 				audioname:['jiangwei'],
 				trigger:{player:'phaseBegin'},
@@ -1109,7 +1109,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			guanxing_fail:{},
-			guanxing_old:{
+			guanxing:{
 				audio:2,
 				audioname:['jiangwei'],
 				trigger:{player:'phaseBegin'},

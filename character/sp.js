@@ -750,17 +750,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yechou:{
 				audio:2,
 				trigger:{
-					player:"dieBegin",
+					player:"die",
 				},
 				direct:true,
+				forceDie:true,
 				skillAnimation:true,
+				animationColor:'wood',
 				content:function (){
-					var next=game.createEvent('yechou',null,trigger.parent);
-					next.forceDie=true;
-					next.player=player;
-					next.setContent(lib.skill.yechou.contentx);
-				},
-				contentx:function (){
 					"step 0"
 					player.chooseTarget(get.prompt2('yechou'),function(card,player,target){
 						return player!=target&&target.maxHp-target.hp>1
@@ -1582,7 +1578,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				skillAnimation:'epic',
-				animationColor:'water',
+				animationColor:'gray',
 				ai:{
 					order:0.1,
 					result:{
@@ -2266,7 +2262,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseBegin'},
 				forced:true,
 				skillAnimation:true,
-				animationColor:'epic',
+				animationColor:'thunder',
 				filter:function(event,player){
 					return player.hasSkill('guju')&&player.storage.guju>=7;
 				},
@@ -3231,6 +3227,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{player:'mouchengAwaken'},
 						forced:true,
 						skillAnimation:true,
+						animationColor:'gray',
 						content:function(){
 							player.awakenSkill('moucheng');
 							player.removeSkill('wylianji');
@@ -4556,6 +4553,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				limited:true,
 				skillAnimation:true,
+				animationColor:'orange',
 				forceunique:true,
 				filter:function(event,player){
 					return player.storage.fanghun2>0;
@@ -4721,6 +4719,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.storage.yjixi>=3;
 				},
 				skillAnimation:true,
+				animationColor:'gray',
 				unique:true,
 				juexingji:true,
 				content:function(){
@@ -5135,6 +5134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shichou:{
 				audio:1,
 				skillAnimation:true,
+				animationColor:'orange',
 				unique:true,
 				limited:true,
 				enable:'phaseUse',
@@ -7813,6 +7813,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			danji:{
 				skillAnimation:true,
+				animationColor:'water',
 				trigger:{player:'phaseBegin'},
 				forced:true,
 				unique:true,
@@ -8079,6 +8080,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					content:'limited'
 				},
 				skillAnimation:'epic',
+				animationColor:'fire',
+				unique:true,
+				limited:true,
 				audio:2,
 				mark:true,
 				filter:function(event,player){
@@ -8919,6 +8923,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			fengliang:{
 				skillAnimation:true,
+				animationColor:'thunder',
 				unique:true,
 				juexingji:true,
 				audio:2,
@@ -9178,6 +9183,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zuixiang:{
 				skillAnimation:true,
+				animationColor:'gray',
 				audio:true,
 				unique:true,
 				mark:true,
@@ -10288,6 +10294,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			cunsi:{
 				skillAnimation:true,
+				animationColor:'orange',
 				audio:2,
 				unique:true,
 				enable:'phaseUse',
@@ -10649,6 +10656,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xiongyi:{
 				skillAnimation:true,
+				animationColor:'gray',
 				unique:true,
 				enable:'phaseUse',
 				audio:2,
@@ -10795,9 +10803,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			wuji:{
 				skillAnimation:true,
+				animationColor:'orange',
 				audio:2,
 				trigger:{player:'phaseEnd'},
 				forced:true,
+				unique:true,
+				juexingji:true,
 				filter:function(event,player){
 					return player.getStat('damage')>=3&&!player.storage.wuji;
 				},
@@ -11834,6 +11845,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			juyi:{
 				skillAnimation:true,
+				animationColor:'thunder',
 				audio:true,
 				derivation:['benghuai','weizhong'],
 				trigger:{player:'phaseBegin'},
@@ -11938,6 +11950,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			suiren:{
 				trigger:{player:'phaseBegin'},
 				skillAnimation:true,
+				animationColor:'gray',
 				filter:function(event,player){
 					return !player.storage.suiren;
 				},

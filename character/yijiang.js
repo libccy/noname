@@ -264,47 +264,42 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_juexiang":{
 				audio:"qingxian_jilie",
 				trigger:{
-					player:"dieBegin",
+					player:"die",
 				},
 				forced:true,
-				popup:false,
+				forceDie:true,
 				skillAnimation:true,
+				animationColor:'water',
 				derivation:["new_canyun"],
 				content:function (){
 					"step 0"
+					if(trigger.source){
+						trigger.source.discard(trigger.source.getCards('e'));
+						trigger.source.loseHp();
+					}
+					"step 1"
 					player.chooseTarget('【绝响】：是否令一名其他角色获得技能〖残韵〗？',function(card,player,target){
 						return target!=player;
 					}).set('ai',function(target){
 						var att=get.attitude(_status.event.player,target);
 						if(target.countCards('ej',{suit:'club'})) att=att*2;
 						return 10+att;
-					});
-					"step 1"
-					var next=game.createEvent('new_juexiang',null,trigger.parent);
-					next.player=trigger.source;
-					next.playerx=player;
-					if(result.bool) next.target=result.targets[0];
-					next.setContent(lib.skill.new_juexiang.contentx);
-				},
-				contentx:function (){
-					"step 0"
-					if(player||target)event.playerx.logSkill('new_juexiang');
-					if(player){
-						player.discard(player.getCards('e'));
-						player.loseHp();
-					}
-					if(target){
-					event.playerx.line(target,'thunder');
-					target.addSkill('new_canyun');
-					target.discardPlayerCard('是否弃置自己区域内的一张梅花牌，获得技能〖绝响〗？',target,'hej').set('ai',function(card){
+					}).set('forceDie',true);
+					"step 2"
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.line(target,'thunder');
+						target.addSkill('new_canyun');
+						target.discardPlayerCard('是否弃置自己区域内的一张梅花牌，获得技能〖绝响〗？',target,'hej').set('ai',function(card){
 							if(get.position(card)=='j') return 100+get.value(card);
 							return 100-get.value(card);
 						}).set('visible',true).set('filterButton',function(card){
 							return get.suit(card.link)=='club';
 						});
 					}
-					else event.finish()
-					"step 1"
+					else event.finish();
+					"step 3"
 					if(result.bool) target.addSkill('new_juexiang');
 				},
 			},
@@ -1120,15 +1115,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			juexiang:{
 				audio:2,
-				trigger:{player:'dieBegin'},
+				trigger:{player:'die'},
 				direct:true,
+				forceDie:true,
 				skillAnimation:true,
 				animationColor:'thunder',
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt2('juexiang'),function(card,player,target){
 						return target!=player;
-					}).set('ai',function(target){
+					}).set('forceDie',true).set('ai',function(target){
 						return get.attitude(_status.event.player,target)/Math.sqrt(target.hp+1);
 					});
 					'step 1'
@@ -1681,6 +1677,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:'player',
 				skillAnimation:true,
+				animationColor:'wood',
 				content:function(){
 					'step 0'
 					var list=[];
@@ -3453,7 +3450,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinfencheng:{
 				skillAnimation:'epic',
-				animationColor:'fire',
+				animationColor:'gray',
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
@@ -5637,6 +5634,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			taoxi4:{},
 			xingshuai:{
 				skillAnimation:true,
+				animationColor:'thunder',
 				audio:2,
 				trigger:{player:'dying'},
 				priority:6,
@@ -6101,7 +6099,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fuhun3:{},
 			fencheng:{
 				skillAnimation:'epic',
-				animationColor:'fire',
+				animationColor:'gray',
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
@@ -6269,6 +6267,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jiefan:{
 				skillAnimation:true,
+				animationColor:'wood',
 				audio:2,
 				unique:true,
 				limited:true,
@@ -6338,6 +6337,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			fuli:{
 				skillAnimation:true,
+				animationColor:'soil',
 				audio:2,
 				unique:true,
 				limited:true,
@@ -7011,6 +7011,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zili:{
 				skillAnimation:true,
+				animationColor:'thunder',
 				audio:3,
 				unique:true,
 				juexingji:true,
@@ -7074,6 +7075,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xianzhou:{
 				skillAnimation:true,
+				animationColor:'gray',
 				audio:2,
 				unique:true,
 				limited:true,
@@ -7376,17 +7378,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zhuiyi:{
 				audio:2,
-				trigger:{player:'dieBegin'},
+				trigger:{player:'die'},
 				direct:true,
 				skillAnimation:true,
+				animationColor:'wood',
+				forceDie:true,
 				content:function(){
-					var next=game.createEvent('zhuiyi',null,trigger.parent);
-					next.forceDie=true;
-					next.player=player;
-					if(trigger.source) next.source=trigger.source;
-					next.setContent(lib.skill.zhuiyi.contentx);
-				},
-				contentx:function(){
 					"step 0"
 					player.chooseTarget(get.prompt2('zhuiyi'),function(card,player,target){
 						return player!=target&&_status.event.source!=target;
@@ -8656,11 +8653,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			huilei:{
 				audio:2,
-				trigger:{player:'dieBegin'},
+				trigger:{player:'die'},
 				forced:true,
+				forceDie:true,
 				filter:function(event){
 					return event.source!=undefined;
 				},
+				logTarget:'source',
+				skillAnimation:true,
+				animationColor:'thunder',
 				content:function(){
 					trigger.source.discard(trigger.source.getCards('he'));
 				},

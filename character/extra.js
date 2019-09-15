@@ -46,7 +46,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					source.storage.new_wuhun_mark+=trigger.num;
 					source.markSkill('new_wuhun_mark');
 				},
-				contentx:function (){
+				subSkill:{
+					die:{
+						audio:"wuhun2",
+						skillAnimation:true,
+						animationColor:'soil',
+						trigger:{
+							player:"die",
+						},
+						forced:true,
+						forceDie:true,
+						popup:false,
+						filter:function (event,player){
+							return game.hasPlayer(function(current){
+								return current!=player&&current.storage.new_wuhun_mark!=undefined;
+							});
+						},
+				content:function (){
 					"step 0"
 					var num=0;
 					for(var i=0;i<game.players.length;i++){
@@ -78,27 +94,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						lib.element.player.die.apply(target,[]);
 					}
 				},
-				subSkill:{
-					die:{
-						audio:"wuhun2",
-						skillAnimation:true,
-						trigger:{
-							player:"dieBegin",
-						},
-						forced:true,
-						popup:false,
-						filter:function (event,player){
-							return game.hasPlayer(function(current){
-								return current!=player&&current.storage.new_wuhun_mark!=undefined;
-							});
-						},
-						content:function (){
-							"step 0"
-							var next=game.createEvent('new_wuhun',null,trigger.parent);
-							next.forceDie=true;
-							next.player=player;
-							next.setContent(lib.skill.new_wuhun.contentx);
-						},
 						sub:true,
 					},
 					mark:{
@@ -619,6 +614,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			sbaiyin:{
 				skillAnimation:'epic',
+				animationColor:'thunder',
 				trigger:{player:'phaseBegin'},
 				forced:true,
 				unique:true,
@@ -1361,7 +1357,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				enable:'phaseUse',
 				audio:3,
-				animationColor:'fire',
+				animationColor:'metal',
 				skillAnimation:'legend',
 				filterTarget:function(card,player,target){
 					var length=ui.selected.cards.length;
@@ -2108,6 +2104,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				mark:true,
 				skillAnimation:true,
+				animationColor:'metal',
 				enable:'phaseUse',
 				filter:function (event,player){
 					return !player.storage.nzry_dinghuo&&player.storage.nzry_junlve>0;

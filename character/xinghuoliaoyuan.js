@@ -180,6 +180,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"xinfu_tunjun":{
 				skillAnimation:true,
+				animationColor:'metal',
 				limited:true,
 				unique:true,
 				enable:"phaseUse",
@@ -1774,6 +1775,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:"phaseUse",
 				audio:3,
 				skillAnimation:true,
+				animationColor:'gray',
 				prompt:"限定技，出牌阶段，你可以对一至三名角色造成至多共3点火焰伤害（你可以任意分配每名目标角色受到的伤害点数），若你将对一名角色分配2点或更多的火焰伤害，你须先弃置四张不同花色的手牌再失去3点体力。",
 				filter:function (event,player){
 					return player.hasSkill('smh_lianhuan');
@@ -2022,6 +2024,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				direct:true,
 				skillAnimation:true,
+				animationColor:'fire',
 				content:function (){
 					"step 0"
 					trigger.source.chooseBool('【许身】：是否将自己的一张武将牌替换为“关索”？').set('ai',function(){
@@ -2542,6 +2545,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.xinfu_songsang=false;
 				},
 				skillAnimation:true,
+				animationColor:'wood',
 				audio:2,
 				derivation:"xinfu_zhanji",
 				trigger:{
@@ -2753,6 +2757,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.storage.xinfu_qiai==false;
 				},
 				skillAnimation:true,
+				animationColor:'gray',
 				trigger:{
 					player:"dying",
 				},
@@ -2805,6 +2810,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.storage.xinfu_denglou==false;
 				},
 				skillAnimation:true,
+				animationColor:'gray',
 				marktext:"登",
 				mark:true,
 				intro:{
@@ -3066,6 +3072,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('he')&&player.storage.xinfu_jijun.length;
 				},
 				direct:true,
+				skillAnimation:true,
+				animationColor:'metal',
 				content:function (){
 					'step 0'
 					var info=['是否发动【方统】？'];
@@ -3253,6 +3261,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('e')>0;
 				},
 				skillAnimation:true,
+				animationColor:'thunder',
 				position:"e",
 				filterCard:true,
 				selectCard:[1,Infinity],
@@ -4829,6 +4838,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				delay:1.2,
 				skillAnimation:true,
+				animationColor:'orange',
 				filter:function (event,player){
 					if(player.storage.xinfu_longyuan) return false;
 					return player.storage.yizan_use>2;
