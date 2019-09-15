@@ -10212,6 +10212,7 @@
 				arrangeTrigger:function(){
 					'step 0'
 					event.filter1=function(info){
+						if(info[1].isDead()&&!lib.skill[info[0]].forceDie) return false;
 						return lib.filter.filterTrigger(trigger,info[1],event.triggername,info[0]);
 					}
 					event.filter2=function(info2){
@@ -10256,7 +10257,7 @@
 					for(var i=0;i<event.choice.length;i++){
 						controls.push(event.choice[i][0]);
 					}
-					event.current.chooseControl(controls).set('prompt','选择下一个触发的技能');
+					event.current.chooseControl(controls).set('prompt','选择下一个触发的技能').set('forceDie',true);
 					'step 3'
 					if(result.control){
 						for(var i=0;i<event.list.length;i++){
@@ -10485,6 +10486,7 @@
 					next.triggername=event.triggername;
 					next.setContent(info.content);
 					next.skillHidden=event.skillHidden;
+					if(info.forceDie) next.forceDie=true;
 					if(info.popup!=false&&!info.direct){
 						if(info.popup){
 							player.popup(info.popup);
@@ -14031,7 +14033,7 @@
 					}
 					"step 2"
 					var info=get.info(cards[num]);
-					if(info.loseDelay!=false){
+					if(info.loseDelay!=false&&(player.isAlive()||info.forceDie)){
 						player.popup(cards[num].name);
 						game.delayx();
 					}
@@ -14039,6 +14041,7 @@
 						for(var i=0;i<info.onLose.length;i++){
 							var next=game.createEvent('lose_'+cards[num].name);
 							next.setContent(info.onLose[i]);
+							if(info.forceDie) next.forceDie=true;
 							next.player=player;
 							next.card=cards[num];
 						}
@@ -14047,6 +14050,7 @@
 						var next=game.createEvent('lose_'+cards[num].name);
 						next.setContent(info.onLose);
 						next.player=player;
+						if(info.forceDie) next.forceDie=true;
 						next.card=cards[num];
 					}
 					event.num++;
@@ -14368,7 +14372,7 @@
 							player.removeSkill(skills[i]);
 						}
 					}
-					player.removeEquipTrigger();
+					// player.removeEquipTrigger();
 					
 					// for(var i in lib.skill.globalmap){
 					//     if(lib.skill.globalmap[i].contains(player)){
@@ -14379,7 +14383,7 @@
 					//     }
 					// }
 
-					game.broadcastAll(function(player,cards){
+					game.broadcastAll(function(player){
 						player.classList.add('dead');
 						// player.classList.remove('linked');
 						player.classList.remove('turnedover');
@@ -14394,13 +14398,6 @@
 						game.dead.push(player);
 						_status.dying.remove(player);
 
-						
-						if(game.online&&player==game.me&&!_status.over&&!game.controlOver&&!ui.exit){
-							if(lib.mode[lib.configOL.mode].config.dierestart){
-								ui.create.exit();
-							}
-						}
-
 						if(lib.config.background_speak){
 							if(lib.character[player.name]&&lib.character[player.name][4].contains('die_audio')){
 								game.playAudio('die',player.name);
@@ -14412,8 +14409,35 @@
 								});
 							}
 						}
-					},player,event.cards);
+					},player);
 
+					game.addVideo('diex',player);
+					if(event.animate!==false){
+						player.$die(source);
+					}
+					"step 1"
+					if(player.dieAfter) player.dieAfter(source);
+					"step 2"
+					event.trigger('die');
+					"step 3"
+					if(player.isDead()){
+						event.cards=player.getCards('hej');
+						if(event.cards.length){
+							player.lose(event.cards).forceDie=true;
+							player.$throw(event.cards,1000);
+							game.log(player,'弃置了',event.cards,event.logvid);
+						}
+					}
+					"step 4"
+					if(player.dieAfter2) player.dieAfter2(source);
+					"step 5"
+					game.broadcastAll(function(player){
+						if(game.online&&player==game.me&&!_status.over&&!game.controlOver&&!ui.exit){
+							if(lib.mode[lib.configOL.mode].config.dierestart){
+								ui.create.exit();
+							}
+						}
+					},player);
 					if(!_status.connectMode&&player==game.me&&!_status.over&&!game.controlOver){
 						ui.control.show();
 						if(get.config('revive')&&lib.mode[lib.config.mode].config.revive&&!ui.revive){
@@ -14435,26 +14459,7 @@
 						}
 						if(ui.wuxie) ui.wuxie.hide();
 					}
-					game.addVideo('diex',player);
-					if(event.animate!==false){
-						player.$die(source);
-					}
-					"step 1"
-					if(player.dieAfter) player.dieAfter(source);
-					"step 2"
-					event.trigger('die');
-					"step 3"
-					if(player.isDead()){
-						event.cards=player.getCards('hej');
-						if(event.cards.length){
-							player.lose(event.cards).forceDie=true;
-							player.$throw(event.cards,1000);
-							game.log(player,'弃置了',event.cards,event.logvid);
-						}
-					}
-					"step 4"
-					if(player.dieAfter2) player.dieAfter2(source);
-					"step 5"
+					
 					if(typeof _status.coin=='number'&&source&&!_status.auto){
 						if(source==game.me||source.isUnderControl()){
 							_status.coin+=10;
@@ -22458,7 +22463,7 @@
 								}
 							}
 						}
-						player=player.next;
+						player=player.nextSeat;
 						if(!player||player===start){
 							break;
 						}
@@ -23098,7 +23103,7 @@
 				var card=get.card(),player=get.player();
 				if(card==undefined) return;
 				var range;
-				var select=get.info(card).selectTarget;
+				var select=get.copy(get.info(card).selectTarget);
 				if(select==undefined){
 					if(get.info(card).filterTarget==undefined) return[0,0];
 					range=[1,1];
@@ -27937,11 +27942,13 @@
 			}
 		},
 		createTrigger:function(name,skill,player,event){
-			if(player.isOut()||player.isDead()||player.removed) return;
+			if(player.isOut()||player.removed) return;
+			if(player.isDead()&&!lib.skill[skill].forceDie) return;
 			var next=game.createEvent('trigger',false);
 			next.skill=skill;
 			next.player=player;
 			next.triggername=name;
+			next.forceDie=true;
 			next._trigger=event;
 			next.setContent('createTrigger');
 		},
@@ -41317,9 +41324,10 @@
 					}
 				}
 				lib.inpile.sort(lib.sort.card);
-				game.broadcastAll(function(num){
+				game.broadcastAll(function(num,pile){
 					if(ui.cardPileNumber) ui.cardPileNumber.innerHTML='0轮 剩余牌: '+num;
-				},ui.cardPile.childNodes.length);
+					lib.inpile=pile;
+				},ui.cardPile.childNodes.length,lib.inpile);
 			},
 		},
 		click:{

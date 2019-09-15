@@ -1,21 +1,24 @@
 window.noname_update={
-	version:'1.9.92.4',
-	update:'1.9.92.3',
+	version:'1.9.92.4.1',
+	update:'1.9.92.4',
 	changeLog:[
-		'十殿阎罗强势来袭',
+		'武将技能和装备技能支持在死亡后结算',
 		'BUG修复',
 	],
 	files:[
-		'card/extra.js',
+		'card/sp.js',
 		'character/extra.js',
+		'character/old.js',
+		'character/refresh.js',
 		'character/shenhua.js',
 		'character/sp.js',
+		'character/standard.js',
 		'character/xinghuoliaoyian.js',
 		'character/yijiang.js',
-		'mode/boss.js',
 		'mode/guozhan.js',
-		'mode/identity.js',
-		'mode/versus.js',
+		'mode/boss.js',
 		'game/game.js',
+		'game/source.js',
+		'layout/default/layout.css',
 	]
 };
