@@ -366,7 +366,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					equipValue:function(card,player){
 						if(!game.hasPlayer(function(current){
-							return player.canUse('sha',current)&&get.effect(current,{name:'sha'},player,player)<0;
+							return player.canUse('sha',current)&&get.effect(current,{name:'sha'},player,player)>0;
 						})){
 							return 1;
 						}
