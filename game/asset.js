@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'1.9.92.4',
+	'1.9.93',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/music_danji.mp3',
@@ -1879,6 +1879,7 @@ window.noname_asset_list=[
 	'image/background/wangshi_bg.jpg',
 	'image/background/xiongxin_bg.jpg',
 	'image/background/zhanyun_bg.jpg',
+	'image/background/xinsha_bg.jpg',
 
 	'image/card/db_atk1.jpg',
 	'image/card/db_atk2.jpg',
@@ -2217,6 +2218,14 @@ window.noname_asset_list=[
 	'image/character/shenpei.jpg',
 	'image/character/re_menghuo.jpg',
 	'image/character/re_zhurong.jpg',
+	'image/character/diy_wenyang.jpg',
+	'image/character/jsp_caoren.jpg',
+	'image/character/old_caoren.jpg',
+	'image/character/old_guanzhang.jpg',
+	'image/character/old_huatuo.jpg',
+	'image/character/old_zhangfei.jpg',
+	'image/character/old_zhoutai.jpg',
+	'image/character/wenyang.jpg',
 
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
@@ -3155,18 +3164,6 @@ window.noname_asset_list=[
 	'image/mode/boss/card/xuwangzhimian.jpg',
 	'image/mode/boss/card/yihuajiemu.png',
 	'image/mode/boss/card/qicaishenlu.jpg',
-	
-	'image/mode/boss/character/boss_bianchengwang.jpg',
-	'image/mode/boss/character/boss_chujiangwang.jpg',
-	'image/mode/boss/character/boss_dushiwang.jpg',
-	'image/mode/boss/character/boss_pingdengwang.jpg',
-	'image/mode/boss/character/boss_qinguangwang.jpg',
-	'image/mode/boss/character/boss_songdiwang.jpg',
-	'image/mode/boss/character/boss_taishanwang.jpg',
-	'image/mode/boss/character/boss_wuguanwang.jpg',
-	'image/mode/boss/character/boss_yanluowang.jpg',
-	'image/mode/boss/character/boss_zhuanlunwang.jpg',
-	
 	'image/mode/boss/character/boss_xiangliu.jpg',
 	'image/mode/boss/character/boss_zhuyan.jpg',
 	'image/mode/boss/character/boss_bifang.jpg',

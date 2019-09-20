@@ -1,24 +1,26 @@
 window.noname_update={
-	version:'1.9.92.4.1',
-	update:'1.9.92.4',
+	version:'1.9.93',
+	update:'1.9.92.4.1',
 	changeLog:[
-		'武将技能和装备技能支持在死亡后结算',
+		'useSkill和useCard事件默认支持死后继续结算',
+		'新武将文鸯，部分旧武将加入怀旧',
 		'BUG修复',
 	],
 	files:[
+		'card/extra.js',
 		'card/sp.js',
+		'card/standard.js',
+		'character/diy.js',
 		'character/extra.js',
 		'character/old.js',
 		'character/refresh.js',
 		'character/shenhua.js',
 		'character/sp.js',
-		'character/standard.js',
+		//'character/standard.js',
 		'character/xinghuoliaoyuan.js',
-		'character/yijiang.js',
+		//'character/yijiang.js',
 		'mode/guozhan.js',
 		'mode/boss.js',
 		'game/game.js',
-		'game/source.js',
-		'layout/default/layout.css',
 	]
 };
