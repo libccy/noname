@@ -275,7 +275,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_sunjian:['male','wu',5,['gzyinghun']],
 				gz_xiaoqiao:['female','wu',3,['retianxiang','hongyan'],['gzskin']],
 				gz_taishici:['male','wu',4,['tianyi']],
-				gz_zhoutai:['male','wu',4,['new_buqu','new_fenji']],
+				gz_zhoutai:['male','wu',4,['buqu','new_fenji']],
 				gz_re_lusu:['male','wu',3,['haoshi','dimeng']],
 				gz_zhangzhang:['male','wu',3,['zhijian','guzheng']],
 				gz_dingfeng:['male','wu',4,['fenxun','duanbing'],['gzskin']],
@@ -2964,42 +2964,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					threaten:1.6,
-				},
-			},
-			"new_buqu":{
-				audio:"buqu",
-				trigger:{
-					player:"dieBefore",
-				},
-				forced:true,
-				filter:function (event,player){return player.maxHp>0&&player.hp<=0},
-				content:function (){
-					"step 0"
-					event.card=get.cards()[0];
-					if(player.storage.new_buqu==undefined) player.storage.new_buqu=[];
-					player.storage.new_buqu.push(event.card);
-					player.syncStorage('new_buqu');
-					player.showCards(player.storage.new_buqu,'不屈')
-					player.markSkill('new_buqu');
-					"step 1"
-					for(var i=0;i<player.storage.new_buqu.length-1;i++){
-						if(get.number(event.card)&&get.number(event.card)==get.number(player.storage.new_buqu[i])) return;
-					}
-					trigger.cancel();
-					if(player.hp<=0){
-						player.hp=1;
-						player.update();
-					}
-				},
-				intro:{
-					content:"cards",
-					onunmark:function (storage,player){
-						if(storage&&storage.length){
-							player.$throw(storage);
-							game.cardsDiscard(storage);
-							delete player.storage.new_buqu;
-						}
-					},
 				},
 			},
 			"_mingzhisuodingji":{
@@ -7237,8 +7201,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"hmkyuanyu_info":"锁定技，当你受到伤害时，若伤害来源与你的座次不相邻，防止此伤害。",
 			hmkguishu:"鬼术",
 			"hmkguishu_info":"出牌阶段，你可以将一张黑桃手牌当作【知己知彼】或【远交近攻】使用。若你本回合内已经发动过了“鬼术”，则你必须选择与上次不同的选项。",
-			"new_buqu":"不屈",
-			"new_buqu_info":"锁定技，在你死亡前，若你的体力值不大于0，亮出牌堆顶的一张牌并置于你的武将牌上，若此牌的点数与你武将牌上已有的牌点数均不同，则你回复至1体力。",
 			"_mingzhisuodingji":"亮将",
 			"_mingzhisuodingji_info":"出牌阶段，你可以明置拥有“锁定技”的武将牌。",
 

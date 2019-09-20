@@ -1006,7 +1006,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				boss_taishanwang:['male','qun',4,['boss_fudu','boss_kujiu','boss_renao'],['shu','hiddenboss','bossallowed']],
 				boss_dushiwang:['male','qun',4,['boss_remen','boss_zhifen','boss_huoxing'],['shu','hiddenboss','bossallowed']],
 				boss_pingdengwang:['male','qun',4,['boss_suozu','boss_abi','boss_pingdeng'],['shu','hiddenboss','bossallowed']],
-				boss_zhuanlunwang:['male','qun',6,['boss_modao','boss_lunhui','boss_wangsheng','boss_fanshi'],['shu','hiddenboss','bossallowed']],
+				boss_zhuanlunwang:['male','qun',6,['boss_modao','boss_lunhui','boss_wangsheng','boss_zlfanshi'],['shu','hiddenboss','bossallowed']],
 
 				boss_lvbu1:['male','shen',8,['mashu','wushuang','boss_baonu','boss_jingjia','boss_aozhan'],['qun','boss','bossallowed'],'wei'],
 				boss_lvbu2:['male','shen',6,['mashu','wushuang','xiuluo','shenwei','shenji'],['qun','hiddenboss','bossallowed'],'qun'],
@@ -2376,11 +2376,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}),'noai');
 				},
 			},
-			boss_fanshi:{
+			boss_zlfanshi:{
 				trigger:{player:'damageEnd'},
 				forced:true,
 				content:function(){
-					if(player.hasSkill('boss_fanshi_terra')){
+					if(player.hasSkill('boss_zlfanshi_terra')){
 						var list=game.players.slice(0);
 						list.remove(player);
 						if(list.length){
@@ -2389,10 +2389,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							target.damage();
 						}
 					}
-					else player.addTempSkill('boss_fanshi_terra');
+					else player.addTempSkill('boss_zlfanshi_terra');
 				},
 			},
-			boss_fanshi_terra:{charlotte:true},
+			boss_zlfanshi_terra:{charlotte:true},
 			
 			"boss_jingjia":{},
 			"boss_aozhan":{
@@ -8421,8 +8421,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_lunhui_info:'锁定技，准备阶段，若你的体力小于等于2，则你与场上除你以外体力最高且大于2的角色交换体力值。',
 			boss_wangsheng:'往生',
 			boss_wangsheng_info:'锁定技，你的出牌阶段开始时，视为你随机使用一张【南蛮入侵】或【万箭齐发】。',
-			boss_fanshi:'反噬',
-			boss_fanshi_info:'锁定技，每个回合你受到第一次伤害后，若再次受到伤害，则对随机一名其他角色造成1点伤害。',
+			boss_zlfanshi:'反噬',
+			boss_zlfanshi_info:'锁定技，每个回合你受到第一次伤害后，若再次受到伤害，则对随机一名其他角色造成1点伤害。',
 			
 			boss_xhuanren:'关卡说明',
 			boss_xhuanren_info:'',
