@@ -367,7 +367,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.targets){
 						player.line(result.targets,'green');
 						result.targets[0].gain(event.card,'gain2');
-						if(!event.same) player.chooseToDiscard(true);
+						if(!event.same) player.chooseToDiscard(true,'he');
 					}
 				},
 				ai:{

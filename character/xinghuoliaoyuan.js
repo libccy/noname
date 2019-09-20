@@ -612,10 +612,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{
 					player:["damageEnd","phaseEnd"],
 				},
-				frequent:true,
+				direct:true,
 				content:function (){
 					'step 0'
-					event.cards=get.cards(3);
+					player.chooseControl('一张','两张','三张','cancel2').set('prompt',get.prompt2('xinfu_zhenxing')).set('',function(){return 0});
+					'step 1'
+					if(result.control=='cancel2') event.finish();
+					else{
+						player.logSkill('xinfu_zhenxing');
+						event.num={一张:1,两张:2,三张:3}[result.control];
+					};
+					'step 2'
+					event.cards=get.cards(num);
 					player.chooseButton(['【镇行】：请选择要获得的牌',event.cards]).set('filterButton',function(button){
 						for(var i=0;i<event.cards.length;i++){
 							if(button.link!=event.cards[i]&&get.suit(event.cards[i])==get.suit(button.link)) return false;
@@ -624,7 +632,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('ai',function(button){
 						return get.value(button.link);
 					});
-					'step 1'
+					'step 3'
 					var tothrow=[];
 					for(var i=event.cards.length-1;i>=0;i--){
 						if(result.bool&&result.links.contains(event.cards[i])){
@@ -2230,7 +2238,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.line(trigger.player);
 						player.popup(result.control);
 						game.log(player,'将判定结果改为了','#y'+result.control);
-						trigger.player.addTempSkill(result.control=='黑桃5'?'zhenyi_spade_black':'zhenyi_spade_red','judgeAfter')
+						trigger.fixedResult={
+							suit:result.control=='黑桃5'?'spade':'heart',
+							color:result.control=='黑桃5'?'black':'red',
+							number:5,
+						};
 					}
 					else{
 						event.finish();
@@ -4535,6 +4547,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 				},
+				trigger:{
+					player:['phaseBegin','phaseEnd'],
+				},
+				forced:true,
+				audio:2,
+				group:'xinfu_pdgyingshi2',
+				priority:Infinity,
+				content:function(){
+					event.getParent('arrangeTrigger').list=[];
+					game.log(player,'跳过了',event.triggername=='phaseBegin'?'准备阶段':'结束阶段');
+				},
+			},
+			xinfu_pdgyingshi2:{
+				popup:false,
 				trigger:{
 					player:"phaseJudgeBefore",
 				},

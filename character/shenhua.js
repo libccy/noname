@@ -5268,17 +5268,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jiewei:{
 				trigger:{player:'turnOverEnd'},
-				direct:true,
+				//direct:true,
+				frequent:true,
 				audio:2,
 				content:function(){
 					'step 0'
+					player.draw();
 					player.chooseToUse(function(card){
 						if(!lib.filter.cardEnabled(card,_status.event.player,_status.event)){
 							return false;
 						}
 						var type=get.type(card,'trick');
 						return type=='trick'||type=='equip';
-					},'是否使用一张锦囊牌或装备牌？').set('logSkill','jiewei');
+					},'是否使用一张锦囊牌或装备牌？');
 					'step 1'
 					if(result.bool){
 						var type=get.type(result.card||result.cards[0]);
@@ -5502,6 +5504,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseEnd'},
 				content:function(){
 					player.draw(3);
+					player.turnOver();
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(card.name=='guiyoujie') return [0,1];
+						}
+					}
+				},
+			},
+			moon_jushou:{
+				audio:'jushou',
+				trigger:{player:'phaseEnd'},
+				content:function(){
+					player.draw();
 					player.turnOver();
 				},
 				ai:{
@@ -6088,7 +6105,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					maxHandcard:function(player,num){
-						if(player.storage.buqu&&player.storage.buqu.length) return num-player.hp+player.storage.buqu.length;
+						if(get.mode()!='guozhan'&&player.storage.buqu&&player.storage.buqu.length) return num-player.hp+player.storage.buqu.length;
 					},
 				},
 				ai:{save:true},
@@ -6684,6 +6701,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shensu2:'神速',
 			shensu4:'神速',
 			jushou:'据守',
+			moon_jushou:'据守',
 			liegong:'烈弓',
 			kuanggu:'狂骨',
 			tianxiang:'天香',
@@ -6706,16 +6724,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gzbuqu_info:'当你扣减1点体力时，若你的体力值为0，你可以将牌堆顶的一张牌置于你的武将牌上：若此牌的点数与你武将牌上的其他牌均不同，你不会死亡；若你的武将牌上有点数相同的牌，你进入濒死状态',
 			xinkuanggu_info:'当你对距离1以内的一名角色造成1点伤害后，你可以回复1点体力或摸一张牌。',
 			xinliegong_info:'你使用【杀】可以选择你距离不大于此【杀】点数的角色为目标；当你使用【杀】指定一个目标后，你可以根据下列条件执行相应的效果：1.其手牌数小于等于你的手牌数，此【杀】不可被【闪】响应，2.其体力值大于等于你的体力值，此【杀】伤害+1。',
-			jiewei_info:'当你的武将牌翻面后，你可以使用一张锦囊牌或装备牌。若如此做，此牌结算后，你可以弃置场上一张同类型的牌',
+			jiewei_info:'当你的武将牌翻面后，你可以摸一张牌。然后你可以使用一张锦囊牌或装备牌，并可以在此牌结算后弃置场上一张同类型的牌',
 			releiji_info:'当你使用或打出一张【闪】时，你可令一名其他角色进行一次判定：若结果为梅花，其受到一点雷电伤害，然后你回复一点体力；若结果为黑桃，其受到两点雷电伤害。',
 			tiangong_info:'锁定技，你防止即将受到的雷电伤害。每当你造成雷电伤害时，你摸一张牌。',
 			shensu_info:'你可以跳过判定阶段和摸牌阶段，或跳过出牌阶段并弃置一张装备牌。若如此做，则你可以视为对任意一名角色使用一张无距离限制的【杀】',
 			jushou_info:'结束阶段，你可以摸3张牌，并将武将牌翻面。',
+			moon_jushou_info:'结束阶段，你可以摸一张牌，并将武将牌翻面。',
 			liegong_info:'当你使用【杀】时，若目标的手牌数大于等于你的体力值，或小于等于你的攻击范围，你可令此【杀】不能被闪避。',
 			kuanggu_info:'锁定技，当你造成一点伤害后，若受伤角色与你的距离不大于1，你回复一点体力。',
 			tianxiang_info:'当你即将受到伤害时，你可以弃置一张♥手牌，将伤害转移给一名其他角色，然后该角色摸X张牌（X为其已损失的体力值）。',
 			hongyan_info:'锁定技，你区域内的黑桃牌和黑桃判定牌均视为红桃。',
 			buqu_info:'锁定技，当你处于濒死状态时，你亮出牌堆顶的一张牌并置于你的武将牌上，称之为“创”。若此牌的点数与你武将牌上已有的“创”点数均不同，则你回复至1体力。若点数相同，则将此牌置入弃牌堆。只要你的武将牌上有“创”，你的手牌上限便与“创”的数量相等。',
+			buqu_info_guozhan:'锁定技，当你处于濒死状态时，你亮出牌堆顶的一张牌并置于你的武将牌上，称之为“创”。若此牌的点数与你武将牌上已有的“创”点数均不同，则你回复至1体力。若点数相同，则将此牌置入弃牌堆。',
 			leiji_info:'当你使用或打出一张【闪】时，你可令任意一名角色进行一次判定。若结果为黑桃，其受到两点雷电伤害',
 			guidao_info:'一名角色的判定牌生效前，你可以打出一张黑色牌替换之。',
 			huangtian_info:'主公技，其他群势力角色的出牌阶段限一次，其可以交给你一张【闪】或【闪电】。',

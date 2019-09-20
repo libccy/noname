@@ -1355,6 +1355,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yeyan:{
 				unique:true,
+				forceDie:true,
 				enable:'phaseUse',
 				audio:3,
 				animationColor:'metal',
@@ -1405,7 +1406,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return targets.contains(target)
 						}).set('ai',function(target){
 							return 1;
-						});
+						}).set('forceDie',true);
 					}
 					"step 3"
 					if(event.num<targets.length){
@@ -1419,7 +1420,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 4"
 					player.chooseControl("2点","3点").set('prompt','请选择伤害点数').set('ai',function(){
 						return "3点";
-					});
+					}).forceDie=true;
 					"step 5"
 					targets[0].damage('fire',result.control=="2点"?2:3,'nocard'); 
 				},
