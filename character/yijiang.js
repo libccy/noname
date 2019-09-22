@@ -438,13 +438,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result.cards&&result.cards.length){
 						event.num=0;
+						event.num2=result.cards.length;
 						for(var i=0;i<result.cards.length;i++){
 							if(get.type(result.cards[i])!='equip'){
 								event.num++;
 							}
 						}
 						if(event.num>0){
-							var prompt='弃置'+get.cnNumber(event.num)+'张牌，或令'+get.translation(event.target)+'摸等量的牌';
+							var prompt='弃置'+get.cnNumber(event.num)+'张牌，或令'+get.translation(event.target)+'摸'+get.cnNumber(event.num2)+'张牌';
 							player.chooseToDiscard(event.num,prompt,'he').ai=function(card){
 								return 5-get.value(card);
 							}
@@ -454,7 +455,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 3'
 					if(!result.bool){
-						event.target.draw(event.num);
+						event.target.draw(event.num2);
 					}
 				},
 			},
@@ -598,8 +599,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.equip=get.cardPile(function(card){
 						return get.type(card)=='equip'&&!target.isDisabled(get.subtype(card));
 					});
-					if(target.isMinEquip()){
-						target.useCard(event.equip||game.createCard(get.inpilefull('equip').randomGet()),target).set('animate',false).set('nopopup',true);
+					if(target.isMinEquip()&&event.equip){
+						target.chooseUseTarget(event.equip,'noanimate','nopopup',true);
 						event.e=true;
 					}
 					'step 1'
@@ -609,8 +610,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!event.hp&&player.isMinHp()&&player.isDamaged()){
 						player.recover();
 					}
-					if(!event.e&&player.isMinEquip()){
-						player.useCard(event.equip||game.createCard(get.inpilefull('equip').randomGet()),player).set('animate',false).set('nopopup',true);
+					if(!event.e&&player.isMinEquip()&&event.equip){
+						player.chooseUseTarget(event.equip,'noanimate','nopopup',true);
 					}
 				},
 				ai:{
@@ -1079,7 +1080,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.type(card)=='equip'&&!target.isDisabled(get.subtype(card));
 						});
 						if(event.card){
-							target.useCard(event.card,target).set('delay',true).set('animate',false).set('nopopup',true);
+							target.chooseUseTarget(event.card,'noanimate','nopopup',true);
 							event.goto(3);
 						}
 						else{
@@ -1158,7 +1159,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return get.type(card)=='equip';
 							});
 							if(card){
-								trigger.source.useCard(card,trigger.source).set('delay',true).set('animate',false).set('nopopup',true);
+								trigger.source.chooseUseTarget(card,'noanimate','nopopup',true);
 							}
 						},
 						ai:{
@@ -1190,7 +1191,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return get.type(card)=='equip';
 								});
 								if(card){
-									target.useCard(card,target).set('delay',true).set('animate',false).set('nopopup',true);
+									target.chooseUseTarget(card,true,'noanimate','nopopup',true);
 								}
 							}
 						}
@@ -3392,11 +3393,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				content:function(){
 					'step 0'
-					var card=target.getCards('h').randomGet();
-					player.gain(card,target);
-					target.$giveAuto(card,player);
+					player.gainPlayerCard(target,'h',true);
 					'step 1'
-					var name=get.translation(target.name);
+					var name=get.translation(target);
 					player.chooseControl(function(){
 						return Math.random()<0.5?'选项一':'选项二';
 					}).set('prompt','督粮').set('choiceList',['令'+name+'观看牌堆顶的两张牌，然后获得其中的基本牌','令'+name+'于下个摸牌阶段额外摸一张牌']);
@@ -7758,7 +7757,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var card=result[0];
 					if(get.type(card)=='equip'){
 						if(!event.target.isDisabled(get.subtype(card))){
-							event.target.useCard(card,event.target).set('animate',false).set('nopopup',true);
+							event.target.chooseUseTarget(card,true,'noanimate','nopopup');
 							game.delay();
 						}
 						event.bool=true;

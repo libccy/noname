@@ -211,7 +211,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.num>0) event.goto(1);
 					"step 3"
 					for (var i=0;i<event.toequip.length;i++){
-						target.useCard(event.toequip[i],target).set('animate',false).set('nopopup',true);
+						target.chooseUseTarget(event.toequip[i],true).set('animate',false).set('nopopup',true);
 					}
 				},
 				ai:{
@@ -455,76 +455,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.directindex=result.index;
 					}
 					if(event.directindex==1){
-						event.insert(lib.skill.xinfu_tunan.content_sha,{
-							player:target,
-							targets:game.filterPlayer(),
-							cards:cards,
-						});
+						target.chooseUseTarget({name:'sha'},cards,true)
 					}
 					else{
-						event.insert(lib.skill.xinfu_tunan.content_use,{
-							player:target,
-							card:card,
-							targets:game.filterPlayer()
-						});
-					}
-				},
-				"content_sha":function (){
-					'step 0'
-					var select=get.select(get.info({name:'sha'}).selectTarget);
-					if(select[1]==-1){
-						for(var i=0;i<targets.length;i++){
-							if(!player.canUse({name:'sha'},targets[i])){
-								targets.splice(i--,1);
-							}
-						}
-						if(targets.length){
-							player.useCard({name:'sha'},cards,targets);
-							event.finish();
-						}
-					}
-					else{
-						player.chooseTarget(select,'选择杀的目标',true,function(cardx,player,target){
-							var card={name:'sha'};
-							return _status.event.targets.contains(target)&&player.canUse(card,target,false);
-						}).set('ai',function(target){
-							var card={name:'sha'};
-							var player=_status.event.player;
-							return get.effect(target,card,player,player);
-						}).set('targets',targets).set('card',card);
-					}
-					'step 1'
-					if(result.bool){
-						player.useCard({name:'sha'},cards,result.targets);
-					}
-				},
-				"content_use":function (){
-					'step 0'
-					var select=get.select(get.info(card).selectTarget);
-					if(select[1]==-1){
-						for(var i=0;i<targets.length;i++){
-							if(!player.canUse(card,targets[i],false)){
-								targets.splice(i--,1);
-							}
-						}
-						if(targets.length){
-							player.useCard(card,targets);
-						}
-						event.finish();
-					}
-					else{
-						player.chooseTarget(select,'选择'+get.translation(card)+'的目标',true,function(cardx,player,target){
-							var card=_status.event.card;
-							return _status.event.targets.contains(target)&&player.canUse(card,target,false);
-						}).set('ai',function(target){
-							var card=_status.event.card;
-							var player=_status.event.player;
-							return get.effect(target,card,player,player);
-						}).set('targets',targets).set('card',card);
-					}
-					'step 1'
-					if(result.bool){
-						player.useCard(card,result.targets);
+						target.chooseUseTarget(card,true);
 					}
 				},
 				ai:{
@@ -2828,34 +2762,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:"limited",
 				},
-				"content_use":function (){
-					'step 0'
-					var select=get.select(get.info(card).selectTarget);
-					if(select[1]==-1){
-						for(var i=0;i<targets.length;i++){
-							if(!player.canUse(card,targets[i])){
-								targets.splice(i--,1);
-							}
-						}
-						if(targets.length){
-							player.useCard(card,targets);
-						}
-					}
-					else{
-						player.chooseTarget(select,'选择'+get.translation(card)+'的目标',true,function(cardx,player,target){
-							var card=_status.event.card;
-							return _status.event.targets.contains(target)&&player.canUse(card,target);
-						}).set('ai',function(target){
-							var card=_status.event.card;
-							var player=_status.event.player;
-							return get.effect(target,card,player,player);
-						}).set('targets',targets).set('card',card);
-					}
-					'step 1'
-					if(result.bool){
-						player.useCard(card,result.targets);
-					}
-				},
 				content:function (){
 					"step 0"
 					player.awakenSkill('xinfu_denglou');
@@ -2876,13 +2782,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return player.canUse(event.cards[0],current);
 						});
 						if(bool){
-							event.insert(lib.skill.xinfu_denglou.content_use,{
-								player:player,
-								card:event.cards[0],
-								targets:game.filterPlayer(function(current){
-									return true;
-								})
-							});
+							player.chooseUseTarget(event.cards[i],true,false);
 						}
 						else event.discards.push(event.cards[0]);
 						event.cards.remove(event.cards[0]);
@@ -2933,18 +2833,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				direct:true,
 				content:function (){
-					"step 0"
-					player.chooseTarget(get.prompt('xinfu_qinguo'),'视为对一名其他角色使用一张【杀】',function(card,player,target){
-						if(player==target) return false;
-						return player.canUse({name:'sha'},target);
-					}).set('ai',function(target){
-						return get.effect(target,{name:'sha'},_status.event.player);
-					});
-					"step 1"
-					if(result.bool){
-						player.logSkill('xinfu_qinguo',result.targets);
-						player.useCard({name:'sha'},result.targets[0],false);
-					}
+					player.chooseUseTarget({name:'sha'},get.prompt('xinfu_qinguo'),'视为使用一张【杀】',false).logSkill='xinfu_qinguo';
 				},
 			},
 			"qinguo_lose":{
@@ -5843,7 +5732,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_pingcai":"评才",
 			"xinfu_pingcai_info":"出牌阶段限一次，你可以挑选一个宝物并擦拭掉其上面的灰尘。然后，你可以根据宝物类型执行对应的效果。<br>【卧龙】：对1名角色造成1点火焰伤害。若场上有存活的诸葛亮(火)，则改为对至多2名角色各造成1点火焰伤害。<br>【凤雏】：横置至多3名角色。若场上有存活的庞统(火)，则改为横置至多4名角色。<br>【水镜】：将1名角色装备区内的防具移动到另1角色对应区域。若场上有存活的司马徽，则改为将1名角色装备区内的1件装备移动到另1角色对应区域。<br>【玄剑】：令1名角色摸一张牌并回复1点体力。若场上有存活的徐庶(将/界)，则改为令1名角色摸一张牌并回复1点体力，然后你摸一张牌。",
 			"xinfu_pdgyingshi":"隐世",
-			"xinfu_pdgyingshi_info":"锁定技，你始终跳过判定阶段。你不能被选择为延时锦囊牌的目标。",
+			"xinfu_pdgyingshi_info":"锁定技，你始终跳过准备阶段，判定阶段，结束阶段。你不能被选择为延时锦囊牌的目标。",
 			"pcaudio_wolong_card":"卧龙",
 			"pcaudio_wolong_card_info":"",
 			"pcaudio_fengchu_card":"凤雏",

@@ -194,9 +194,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.storage.twqijia.push(get.subtype(cards[0]));
-					player.useCard({name:'sha'},target);
-					'step 1'
-					player.getStat().card.sha--;
+					player.useCard({name:'sha'},target,false);
 				},
 				subSkill:{
 					alka:{

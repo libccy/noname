@@ -1974,22 +1974,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					if(bool){
-						player.chooseTarget('是否视为使用一张【杀】？',function(card,player,target){
-							return player.canUse({name:'sha'},target);
-						}).ai=function(target){
-							var player=_status.event.player;
-							return get.effect(target,{name:'sha'},player,player);
-						};
+						player.chooseUseTarget({name:'sha'},'是否视为使用一张【杀】？',false);
 					}
-					else event.finish();
-					'step 3'
-					if(result.bool&&result.targets){
-						player.useCard({name:'sha'},result.targets);
-					}
-					else event.finish();
-					'step 4'
-					player.getStat().card.sha--;
-				},
+				}
 			},
 			//OL马超
 			ol_shichou:{
@@ -2939,40 +2926,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						event.target.give(result.cards,player);
 						if(player.storage.choulve){
-							var card=player.storage.choulve;
-							var select=get.select(get.info(card).selectTarget);
-							var targets=game.filterPlayer();
-							if(select[1]==-1){
-								for(var i=0;i<targets.length;i++){
-									if(!player.canUse(card,targets[i])){
-										targets.splice(i--,1);
-									}
-								}
-								if(targets.length){
-									player.useCard(card,targets);
-								}
-							}
-							else{
-								player.chooseTarget(select,'选择【'+get.translation(card)+'】的目标',true,function(cardx,player,target){
-									var card=_status.event.card;
-									return _status.event.targets.contains(target)&&player.canUse(card,target);
-								}).set('ai',function(target){
-									var card=_status.event.card;
-									var player=_status.event.player;
-									return get.effect(target,card,player,player);
-								}).set('targets',targets).set('card',card);
-							}
+							player.chooseUseTarget(player.storage.choulve,true,false);
 						}
-						else event.finish();
 					}
-					else event.finish();
-					'step 3'
-					if(result.bool){
-						player.useCard(player.storage.choulve,result.targets);
-					}
-					else event.finish();
-					'step 4'
-					player.getStat().card[player.storage.choulve.name]--;
 				},
 				group:'choulve_damage',
 				subSkill:{
@@ -3060,7 +3016,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					if(result.bool){
-						player.useCard({name:'wuzhong'},player);
+						player.chooseUseTarget({name:'wuzhong'},true);
 					}
 					else{
 						event.target.useCard({name:'guohe'},player);
@@ -3378,7 +3334,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return;
 					}
 					target.$draw(equip1);
-					target.useCard(equip1,target).set('animate',false).nopopup=true;
+					target.chooseUseTarget(equip1,'noanimate','nopopup');
 					game.delay();
 					'step 2'
 					var card=cards[0];
@@ -5314,18 +5270,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					if(useCard){
-						player.chooseTarget('是否视为使用一张杀？',function(card,player,target){
-							return lib.filter.targetEnabled({name:'sha'},player,target);
-						}).set('ai',function(target){
-							return get.effect(target,{name:'sha'},_status.event.player);
-						});
-					}
-					else{
-						event.finish();
-					}
-					'step 3'
-					if(result.bool){
-						player.useCard({name:'sha'},result.targets,false);
+						player.chooseUseTarget({name:'sha'},false,'是否视为使用一张【杀】？','nodistance');
 					}
 				},
 				ai:{
@@ -5692,17 +5637,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseBegin'},
 				direct:true,
 				content:function(){
-					"step 0"
-					player.chooseTarget(get.prompt('yingjian'),'视为使用一张没有距离限制的【杀】',function(card,player,target){
-						return lib.filter.targetEnabled({name:'sha'},player,target);
-					}).set('ai',function(target){
-						return get.effect(target,{name:'sha'},_status.event.player);
-					});
-					"step 1"
-					if(result.bool){
-						player.logSkill('yingjian');
-						player.useCard({name:'sha'},result.targets,false);
-					}
+					player.chooseUseTarget('###是否发动【影箭】？###视为使用一张没有距离限制的【杀】',{name:'sha'},false,'nodistance').logSkill='yingjian';
 				},
 				ai:{
 					threaten:function(player,target){
@@ -7031,16 +6966,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else{
-						player.chooseTarget('选择一个出杀目标',function(card,player,target){
-							return lib.filter.targetEnabled({name:'sha'},player,target);
-						},true).set('ai',function(target){
-							return get.effect(target,{name:'sha'},_status.event.player);
-						});
-						event.sha=true;
-					}
-					'step 2'
-					if(event.sha&&result.targets&&result.targets.length){
-						player.useCard({name:'sha'},result.targets);
+						player.chooseUseTarget({name:'sha'},true,false,'nodistance');
 					}
 				}
 			},
