@@ -1065,17 +1065,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				content:function(){
-					'step 0'
-					player.chooseTarget('玉玺：选择知己知彼的目标',function(card,player,target){
-						return player.canUse({name:'zhibi'},target);
-					},true).set('ai',function(target){
-						var player=_status.event.player;
-						return get.effect(target,{name:'zhibi'},player,player);
-					});
-					'step 1'
-					if(result.bool){
-						player.useCard({name:'zhibi'},result.targets);
-					}
+					player.chooseUseTarget('玉玺：选择知己知彼的目标',{name:'zhibi'});
 				}
 			},
 			xietianzi:{
