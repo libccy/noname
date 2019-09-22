@@ -9490,6 +9490,77 @@
 		},
 		element:{
 			content:{
+				chooseUseTarget:function(){
+					'step 0'
+					if(cards){
+						card=get.copy(card);
+						card.cards=cards.slice(0);
+						event.card=card;
+					}
+					if(!lib.filter.cardEnabled(card,player)){
+						event.finish();
+						return;
+					}
+					var info=get.info(card);
+					var select=get.select(info.selectTarget);
+					if(select[1]==-1||info.notarget){
+						if(select[1]==-1){
+							for(var i=0;i<targets.length;i++){
+								if(!player.canUse(card,targets[i],false)){
+									targets.splice(i--,1);
+								}
+							}
+							if(targets.length){
+								event.targets2=targets;
+							}
+							else event.finish();
+						}
+						else event.targets2=[];
+						if(!event.forced){
+							player.chooseBool('是否'+(event.targets2.length?'对':'')+get.translation(event.targets2)+'使用'+get.translation(card)+'?');
+						}
+						else event._result={bool:true};
+					}
+					else{
+						var next=player.chooseTarget();
+						next._get_card=card;
+						next.filterTarget=function(card,player,target){
+							if(!_status.event.targets.contains(target)) return false;
+							return lib.filter[_status.event.nodistance?'targetEnabled':'filterTarget'].apply(this,arguments);
+						};
+						next.set('ai',event.ai||get.effect);
+						if(typeof info.selectTarget=='function'){
+							next.selectTarget=info.selectTarget;
+						}
+						else{
+							next.selectTarget=get.select(info.selectTarget);
+						}
+						if(event.nodistance) next.nodistance=true;
+						if(event.forced) next.forced=true;
+						next.targets=targets;
+						next.prompt=event.prompt||('选择'+get.translation(card)+'的目标');
+					if(event.prompt2) next.prompt2=event.prompt2;
+					}
+					'step 1'
+					if(result.bool){
+						event._result={
+							bool:true,
+							targets:event.targets2||result.targets,
+						};
+						if(event.logSkill){
+							if(typeof event.logSkill=='string'){
+								player.logSkill(event.logSkill);
+							}
+							else if(Array.isArray(event.logSkill)){
+								player.logSkill.apply(player,event.logSkill);
+							}
+						}
+						var next=player.useCard(card,event.targets2||result.targets,cards);
+						if(event.nopopup) next.nopopup=true;
+						if(event.animate===false) next.animate=false;
+						if(event.addCount===false) next.addCount=false;
+					}
+				},
 				chooseToDuiben:function(){
 					'step 0'
 					game.log(player,'对',target,'发起了','#y对策');
@@ -16779,73 +16850,53 @@
 					next._args=Array.from(arguments);
 					return next;
 				},
-				chooseUseTarget:function(card,prompt,includecard){
-					// not online-ready
-					if(typeof card=='string'){
-						card={name:card};
-					}
-					var discard=function(){
-						if(get.itemtype(card)=='card'&&card.discard){
-							card.discard();
+				chooseUseTarget:function(){
+					var next=game.createEvent('chooseUseTarget');
+					next.player=this;
+					for(var i=0;i<arguments.length;i++){
+						if(get.itemtype(arguments[i])=='cards'){
+							next.cards=arguments[i];
 						}
-					};
-					var name=card.name;
-					var info=lib.card[name];
-					if(!info.enable){
-						discard();
-						return false;
-					}
-					var player=this;
-					if(get.select(info.selectTarget)[1]==-1){
-						var targets=game.filterPlayer(function(current){
-							return lib.filter.filterTarget(card,player,current);
-						});
-						if(targets.length){
-							targets.sort(lib.sort.seat);
-							var next=player.useCard(card,targets);
-							if(includecard===false){
-								next.addCount=false;
+						else if(get.itemtype(arguments[i])=='card'){
+							next.card=arguments[i];
+						}
+						else if(typeof arguments[i]=='object'&&arguments[i].name){
+							next.card=arguments[i];
+						}
+						else if(typeof arguments[i]=='string'){
+							if(arguments[i]=='nopopup'){
+								next.nopopup=true;
 							}
-							return next;
+							else if(arguments[i]=='noanimate'){
+								next.animate=false;
+							}
+							else if(arguments[i]=='nodistance'){
+								next.nodistance=true;
+							}
+							else get.evtprompt(next,arguments[i]);
 						}
-					}
-					else if(info.notarget){
-						var next=player.useCard(card);
-						if(includecard===false){
+						else if(arguments[i]===true){
+							next.forced=true;
+						}
+						else if(arguments[i]===false){
 							next.addCount=false;
 						}
-						return next;
 					}
-					else if(game.hasPlayer(function(current){
-						return player.canUse(card,current);
-					})){
-						var next=player.chooseTarget(prompt||'选择'+get.translation(card)+'的目标');
-						next._get_card=card;
-						next.filterTarget=lib.filter.filterTarget;
-						next.ai=get.effect;
-						if(typeof info.selectTarget=='function'){
-							next.selectTarget=info.selectTarget;
+					if(!next.targets) next.targets=game.players.slice(0);
+					if(next.cards==undefined){
+						if(get.itemtype(next.card)=='card'){
+							next.cards=[next.card];
 						}
-						else{
-							next.selectTarget=get.select(info.selectTarget);
-						}
-						next.forced=true;
-						next.onresult=function(result){
-							if(result.bool){
-								if(info.multitarget&&result.targets.length<get.select(info.selectTarget)[0]){
-									discard();
-									return false;
-								}
-								var next=player.useCard(card,result.targets);
-								if(includecard===false){
-									next.addCount=false;
-								}
-								return next;
-							}
+						else next.cards=[];
+					}
+					else if(next.card==undefined){
+						if(next.cards){
+							next.card=next.cards[0];
 						}
 					}
-					discard();
-					return false;
+					next.setContent('chooseUseTarget');
+					return next;
+					// Online-Ready! Enjoy It!
 				},
 				chooseTarget:function(){
 					var next=game.createEvent('chooseTarget');
