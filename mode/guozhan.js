@@ -925,17 +925,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							});
 						},
 						content:function(){
-							'step 0'
-							player.chooseTarget('玉玺（庸肆）</br></br><div class="center text">选择【知己知彼】的目标</div>',function(card,player,target){
-								return player.canUse({name:'zhibi'},target);
-							},true).set('ai',function(target){
-								var player=_status.event.player;
-								return get.effect(target,{name:'zhibi'},player,player);
-							});
-							'step 1'
-							if(result.bool){
-								player.useCard({name:'zhibi'},result.targets);
-							}
+							player.chooseUseTarget('玉玺（庸肆）：选择知己知彼的目标',{name:'zhibi'});
 						},
 						audio:['yongsi',2]
 					},
