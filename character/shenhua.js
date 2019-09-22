@@ -993,7 +993,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.list=[];
 					for(var i=0;i<player.storage.kongsheng2.length;i++){
 						if(get.type(player.storage.kongsheng2[i])=='equip'&&player.canUse(player.storage.kongsheng2[i],player)){
-							player.useCard(player.storage.kongsheng2[i],player);
+							player.chooseUseTarget(player.storage.kongsheng2[i],true,'nopopup','noanimate');
 							event.list.push(player.storage.kongsheng2[i]);
 						};
 					};
@@ -1932,21 +1932,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result.bool&&result.cards.length){
 						if(get.type(result.cards[0])=='equip'&&!player.isDisabled(get.subtype(result.cards[0]))){
-							player.$give(result.cards,player);
-							player.lose(result.cards,ui.special);
-							event.toequip=result.cards[0];
+							player.chooseUseTarget(result.cards[0],true,'nopopup');
 						}
 						else{
 							player.discard(result.cards[0]);
 						}
-					}
-					'step 3'
-					if(event.toequip){
-						game.delay();
-					}
-					'step 4'
-					if(event.toequip){
-						player.useCard(event.toequip,player).set('animate',false).nopopup=true;
 					}
 				},
 				ai:{
@@ -4519,7 +4509,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.awakenSkill('luanwu');
 					event.current=player.next;
+					event.currented=[];
 					"step 1"
+					event.currented.push(event.current);
 					event.current.animate('target');
 					event.current.chooseToUse('乱武：使用一张杀或流失一点体力',{name:'sha'},function(card,player,target){
 						if(player==target) return false;
@@ -4534,8 +4526,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					"step 2"
 					if(result.bool==false) event.current.loseHp();
-					if(event.current.next!=player){
-						event.current=event.current.next;
+					event.current=event.current.next;
+					if(event.current!=player&&!event.currented.contains(event.current)){
 						game.delay(0.5);
 						event.goto(1);
 					}

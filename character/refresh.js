@@ -1613,19 +1613,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.storage.rerende+=cards.length;
 						if(player.storage.rerende>=2){
 							var list=[];
-							if(lib.filter.cardUsable({name:'sha'},player,event.getParent('chooseToUse'))){
-								if(game.hasPlayer(function(current){
-									return player.canUse('sha',current);
-								})){
-									list.push(['基本','','sha']);
-									list.push(['基本','','sha','fire']);
-									list.push(['基本','','sha','thunder']);
-								}
+							if(lib.filter.cardUsable({name:'sha'},player,event.getParent('chooseToUse'))&&game.hasPlayer(function(current){
+								return player.canUse('sha',current);
+							})){
+								list.push(['基本','','sha']);
+								list.push(['基本','','sha','fire']);
+								list.push(['基本','','sha','thunder']);
 							}
-							if(player.canUse('tao',player,true,true)){
+							if(lib.filter.cardUsable({name:'tao'},player,event.getParent('chooseToUse'))&&game.hasPlayer(function(current){
+								return player.canUse('tao',current);
+							})){
 								list.push(['基本','','tao']);
 							}
-							if(player.canUse('jiu',player,true,true)){
+							if(lib.filter.cardUsable({name:'jiu'},player,event.getParent('chooseToUse'))&&game.hasPlayer(function(current){
+								return player.canUse('jiu',current);
+							})){
 								list.push(['基本','','jiu']);
 							}
 							if(list.length){
@@ -1669,26 +1671,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result&&result.bool&&result.links[0]){
 						var card={name:result.links[0][2],nature:result.links[0][3]};
-						if(card.name=='sha'){
-							event.fakecard=card;
-							player.chooseTarget(function(card,player,target){
-								return player.canUse(_status.event.fakecard,target,true,true);
-							},true,'选择出杀目标').set('ai',function(target){
-								var player=_status.event.player;
-								return get.effect(target,_status.event.fakecard,player,player);
-							}).set('fakecard',card);
-						}
-						else{
-							player.useCard(card,player);
-							event.finish();
-						}
-					}
-					else{
-						event.finish();
-					}
-					'step 2'
-					if(result.bool&&result.targets&&result.targets.length){
-						player.useCard(event.fakecard,result.targets);
+						player.chooseUseTarget(card,true);
 					}
 				},
 				ai:{

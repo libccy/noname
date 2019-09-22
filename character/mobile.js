@@ -9,7 +9,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mobile_default:["miheng","taoqian","liuzan","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei"],
 				mobile_fire:["re_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","re_pangtong","xin_yuanshao"],
 				mobile_forest:['re_zhurong','re_menghuo'],
-				mobile_others:["re_jikang","old_bulianshi","old_caochun","old_yuanshu"],
+				mobile_others:["re_jikang","old_bulianshi","old_yuanshu"],
 			},
 		},
 		character:{
@@ -33,7 +33,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_yanwen:["male","qun",4,["reshuangxiong"],[]],
 			re_pangtong:['male','shu',3,['xinlianhuan','niepan'],[]],
 			xin_yuanshao:['male','qun',4,['reluanji','xueyi'],['zhu']],
-			old_caochun:['male','wei',4,['shanjia']],
 			old_yuanshu:['male','qun',4,['xinyongsi','yjixi']],
 			
 			shenpei:["male","qun","2/3",["shouye","liezhi"],[]],
@@ -484,8 +483,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		translate:{
-			re_jikang:"新嵇康",
-			old_bulianshi:'新步练师',
+			re_jikang:"手杀嵇康",
+			old_bulianshi:'手杀步练师',
 			old_caochun:'旧曹纯',
 			shenpei:'审配',
 			re_zhurong:'界祝融',

@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_zhoutai","old_caoren"],
 				old_refresh:["old_zhangfei","old_huatuo"],
 				old_yijiang:["masu","xushu","fazheng","liru","yujin","xin_yujin","old_zhonghui","old_xusheng","old_zhuran","old_lingtong","old_madai","old_caoxiu","old_wangyi","old_caozhen","old_quancong","old_chenqun","old_zhuhuan","old_zhuzhi","old_guanzhang"],
-				old_sp:["old_lingju","old_maliang","old_machao","zhangliang","jsp_caoren"],
+				old_sp:["old_caochun","old_lingju","old_maliang","old_machao","zhangliang","jsp_caoren"],
 			},
 		},
 		character:{
@@ -18,6 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_zhangfei:['male','shu',4,['paoxiao','retishen']],
 			old_huatuo:['male','qun',3,['jijiu','chulao']],
 			jsp_caoren:['male','wei',4,['kuiwei','yanzheng']],
+			old_caochun:['male','wei',4,['shanjia']],
 			masu:['male','shu',3,['xinzhan','huilei']],
 			xushu:['male','shu',3,['wuyan','jujian']],
 			fazheng:['male','shu',3,['enyuan','xuanhuo']],

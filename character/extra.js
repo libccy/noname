@@ -155,16 +155,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var card=cards.randomGet();
 								player.gain(card);
 								target.$giveAuto(card,player);
-								game.delay(0.3);
 								break;
 							}
 						}
 						event.num++;
-						event.redo();
 					}
 					"step 4"
-					player.turnOver();
+					game.delay(0.7);
+					if(num<event.targets.length) event.goto(3);
 					"step 5"
+					player.turnOver();
+					"step 6"
 					event.count--;
 					if(event.count){
 						player.chooseBool(get.prompt2('new_guixin')).ai=function(){
@@ -174,7 +175,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						event.finish();
 					}
-					"step 6"
+					"step 7"
 					if(event.count&&result.bool){
 						player.logSkill('new_guixin');
 						event.goto(1);
@@ -1251,7 +1252,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.unmarkSkill('qixing');
 					}
 					game.addVideo('storage',player,['qixing',get.cardsInfo(player.storage.qixing),'cards']);
-					player.discard(result.links);
+					game.cardsDiscard(result.links);
 				},
 				group:'dawu3'
 			},
@@ -1286,11 +1287,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].hasSkill('dawu2')){
 							game.players[i].removeSkill('dawu2');
-							game.players[i].popup('dawu2');
+							//game.players[i].popup('dawu2');
 						}
 						if(game.players[i].hasSkill('kuangfeng2')){
 							game.players[i].removeSkill('kuangfeng2');
-							game.players[i].popup('kuangfeng2');
+							//game.players[i].popup('kuangfeng2');
 						}
 					}
 				}
@@ -1328,7 +1329,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.unmarkSkill('qixing');
 					}
 					game.addVideo('storage',player,['qixing',get.cardsInfo(player.storage.qixing),'cards']);
-					player.discard(result.links);
+					game.cardsDiscard(result.links);
+					game.log(player,'将',result.links,'置入了弃牌堆')
 				},
 			},
 			kuangfeng2:{
