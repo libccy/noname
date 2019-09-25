@@ -1720,7 +1720,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				filter:function(event,player){
 					if(player.hasSkill('wengua3')) return false;
-					return player.countCards('h')&&game.hasPlayer(function(current){
+					return player.countCards('he')&&game.hasPlayer(function(current){
 						return current.hasSkill('wengua');
 					});
 				},
@@ -3578,6 +3578,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.showCards(cards);
 					'step 1'
+					cards[0].fix();
 					ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
 					game.updateRoundNumber();
 					'step 2'

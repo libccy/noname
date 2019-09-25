@@ -355,6 +355,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
+					event.forceDie=true;
 					if(typeof event.count!='number'){
 						// event.count=trigger.cards.length-1;
 						event.count=1;

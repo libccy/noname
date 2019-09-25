@@ -2674,7 +2674,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'damageEnd'},
 				forced:true,
 				filter:function(event,player){
-					return event.player!=player&&event.player.hasSkill('zongkui_mark');
+					return event.player!=player&&event.player.isAlive()&&event.player.hasSkill('zongkui_mark');
 				},
 				content:function(){
 					'step 0'
@@ -3148,9 +3148,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					content:'当你受到伤害后，$受到等量的伤害，当你回复体力后，$回复等量的体力'
 				},
 				nopop:true,
-				trigger:{player:['damageAfter','recoverAfter']},
+				trigger:{player:['damageEnd','recoverEnd']},
 				forced:true,
 				popup:false,
+				priority:15,
 				filter:function(event,player){
 					if(!(player.storage.xianfu2&&player.storage.xianfu2.isIn()&&event.num>0)) return false;
 					if(event.name=='damage') return true;
@@ -3629,7 +3630,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addTempSkill('weikui2');
 					}
 					else{
-						player.discardPlayerCard(target,'visible',true);
+						player.discardPlayerCard(target,'visible',true,'h');
 					}
 				},
 				ai:{
@@ -5836,10 +5837,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				notemp:true,
 				filter:function(event,player){
-					return player.countCards('h')>0;
+					return player.countCards('he')>0;
 				},
 				init:function(player){
-					player.storage.tuifeng=[];
+					if(!player.storage.tuifeng) player.storage.tuifeng=[];
 				},
 				content:function(){
 					'step 0'

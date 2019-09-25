@@ -573,6 +573,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.gain(event.cards[i],'gain2');
 						}
 						else{
+							event.cards[i].fix();
 							ui.cardPile.insertBefore(event.cards[i],ui.cardPile.childNodes[0]);
 						}
 					}
@@ -609,6 +610,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function (){
 					return -1;
 				},
+				delay:0,
 				content:function (){
 					'step 0'
 					player.$throw(cards.length);
@@ -617,6 +619,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num1=game.players.length;
 					var num2=ui.cardPile.childElementCount;
 					for(var i=0;i<event.cards.length;i++){
+						event.cards[i].fix();
 						var num3=num1*(i+1)-1;
 						if(num3<num2){
 							ui.cardPile.insertBefore(cards[i],ui.cardPile.childNodes[num3]);
@@ -2782,7 +2785,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return player.canUse(event.cards[0],current);
 						});
 						if(bool){
-							player.chooseUseTarget(event.cards[i],true,false);
+							player.chooseUseTarget(event.cards[0],true,false);
 						}
 						else event.discards.push(event.cards[0]);
 						event.cards.remove(event.cards[0]);
@@ -4015,7 +4018,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			chanyuan:{
-				charlotte:true,
+				//charlotte:true,
 				trigger:{
 					player:["phaseBefore","changeHp"],
 				},

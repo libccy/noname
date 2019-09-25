@@ -1586,15 +1586,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return event.card.name!='lebu'&&event.card.name!='bingliang';
 						},
 						content:function(){
+							"step 0"
 							player.storage.nzry_shicai.push(get.type(trigger.card,'trick'));
 							for(var i=0;i<trigger.cards.length;i++){
 								if(get.position(trigger.cards[i])=='d'){
+									trigger.cards[i].fix();
 									ui.cardPile.insertBefore(trigger.cards[i],ui.cardPile.firstChild);
-									game.updateRoundNumber();
 									game.log(player,'将',trigger.cards[i],'置于牌堆顶');
 								}
 							};
+							game.updateRoundNumber();
 							player.draw();
+							"step 1"
 							if(event.triggername=='useCard'&&['equip','delay'].contains(get.type(trigger.card))){
 								trigger.cancel();
 								game.broadcastAll(ui.clear);
@@ -3332,6 +3335,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'die'},
 				forced:true,
 				forceDie:true,
+				skillAnimation:true,
+				animationColor:'gray',
 				filter:function(event){
 					return event.source&&event.source.isIn();
 				},

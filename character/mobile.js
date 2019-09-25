@@ -96,8 +96,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.chooseToCompare(trigger.target);
 					"step 1"
-					if(result.bool&&trigger.target.countGainableCards(player,'he')){
-						player.gainPlayerCard(trigger.target,true,'he');
+					if(result.bool){
+						if(trigger.target.countGainableCards(player,'he')) player.gainPlayerCard(trigger.target,true,'he');
 					}
 					else{
 						var card1=result.player;
@@ -262,11 +262,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.current=targets.shift();
 					player.discardPlayerCard(event.current,'hej',true)
 					if(targets.length) event.redo();
-					'step 3'
-					if(player.storage.liezhi){
-						trigger.liezhi=true;
-						player.addSkill('liezhi_disable');
-					}
 				},
 				subSkill:{
 					disable:{
@@ -276,7 +271,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						silent:true,
 						popup:false,
 						charlotte:true,
-						filter:function(event){return !event.liezhi},
+						//filter:function(event){return !event.liezhi},
 						content:function(){player.removeSkill('liezhi_disable')},
 					},
 					damage:{
@@ -284,7 +279,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						silent:true,
 						popup:false,
-						content:function(){player.storage.liezhi=true}
+						content:function(){player.addSkill('liezhi_disable')}
 					},
 				},
 			},
