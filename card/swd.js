@@ -1441,7 +1441,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					target.changeHujia(2);
 					target.turnOver();
 					'step 1'
-					target.addTempSkill('hslingjian_jinjilengdong',{player:'turnOverAfter'});
+					if(target.isTurnedOver()) target.addTempSkill('hslingjian_jinjilengdong',{player:'turnOverAfter'});
 				},
 				ai:{
 					order:2,
