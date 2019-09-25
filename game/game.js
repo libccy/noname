@@ -9492,7 +9492,7 @@
 			content:{
 				chooseUseTarget:function(){
 					'step 0'
-					if(cards){
+					if(cards&&get.itemtype(card)!='card'){
 						card=get.copy(card);
 						card.cards=cards.slice(0);
 						event.card=card;
@@ -16873,6 +16873,9 @@
 							else if(arguments[i]=='nodistance'){
 								next.nodistance=true;
 							}
+							else if(lib.card[arguments[i]]&&!next.card){
+								next.card={name:arguments[i]};
+							}
 							else get.evtprompt(next,arguments[i]);
 						}
 						else if(arguments[i]===true){
@@ -19383,7 +19386,7 @@
 						exclude.push(arguments[i]);
 					}
 					for(i=0;i<this.skills.length;i++){
-						if(!all&&lib.skill[this.skills[i]].temp) continue;
+						if(!all&&(lib.skill[this.skills[i]].temp||lib.skill[this.skills[i]].charlotte)) continue;
 						if(!exclude.contains(this.skills[i])){
 							list.push(this.skills[i]);
 						}
