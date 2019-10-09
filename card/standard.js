@@ -256,6 +256,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							// if(player==target&&player.hp<=0) return 2;
+							if(player.hasSkillTag('nokeep')) return 2;
 							var nd=player.needsToDiscard();
 							var keep=false;
 							if(nd<=0){
@@ -366,7 +367,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					equipValue:function(card,player){
 						if(!game.hasPlayer(function(current){
-							return player.canUse('sha',current)&&get.effect(current,{name:'sha'},player,player)>0;
+							return player.canUse('sha',current)&&get.distance(player,current)==1&&get.effect(current,{name:'sha'},player,player)>0;
 						})){
 							return 1;
 						}
@@ -662,39 +663,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:true,
 				selectTarget:-1,
 				cardcolor:'red',
-				//reverseOrder:true,
+				reverseOrder:true,
 				filterTarget:function(card,player,target){
 					//return target.hp<target.maxHp;
 					return true;
 				},
-				contentBefore:function(){
-					"step 0"
-					game.delay();
-					"step 1"
-					if(get.is.versus()){
-						player.chooseControl('顺时针','逆时针',function(event,player){
-							if(player.next.side==player.side) return '逆时针';
-							return '顺时针';
-						}).set('prompt','选择'+get.translation(card)+'的结算方向');
-					}
-					else{
-						event.goto(3);
-					}
-					"step 2"
-					if(result&&result.control=='顺时针'){
-						var evt=event.getParent();
-						evt.fixedSeat=true;
-						evt.targets.sortBySeat();
-						evt.targets.reverse();
-						if(evt.targets[evt.targets.length-1]==player){
-							evt.targets.unshift(evt.targets.pop());
-						}
-					}
-					"step 3"
-					var evt=event.getParent();
-					for(var i=0;i<evt.targets.length;i++){
-						if(evt.targets[i].isHealthy()) evt.excluded.push(evt.targets[i]);
-					}
+				ignoreTarget:function(card,player,target){
+					return target.isHealthy();
 				},
 				content:function(){
 					target.recover();
@@ -1202,6 +1177,24 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					expose:0.2
 				},
 				notarget:true,
+				contentBefore:function(){
+					'step 0'
+					if(get.mode()=='guozhan'&&get.itemtype(card)=='card'&&card.hasTag('guo')){
+						var trigger=event.getParent(2);
+						if(trigger.triggername!='phaseJudge'&&!trigger.statecard&&trigger.target.identity!='ye'&&trigger.target.identity!='unknown'){
+							player.chooseControl('对单体使用','对势力使用').set('prompt','请选择'+get.translation(card)+'的使用方式').set('ai',function(){
+								return '对势力使用'
+							});
+						}
+						else event.finish();
+					}
+					else event.finish();
+					'step 1'
+					if(result.control=='对势力使用'){
+						player.chat('对势力使用');
+						event.getParent(2).guowuxie=true;
+					}
+				},
 				content:function(){
 					event.result='wuxied';
 					if(player.isOnline()){
@@ -1694,7 +1687,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.responded) return false;
 					if(!event.filterCard({name:'shan'})) return false;
-					if(!lib.filter.cardRespondable({name:'sha'},player,event)) return false;
+					if(!lib.filter.cardRespondable({name:'shan'},player,event)) return false;
 					var evt=event.getParent();
 					if(evt.player&&evt.player.hasSkillTag('unequip',false,{
 						name:evt.card?evt.card.name:null,
@@ -1862,7 +1855,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							id:id,
 							id2:id2
 						});
-						if(!isJudge){
+						if(event.stateplayer&&event.statecard) next.set('respondTo',[event.stateplayer,event.statecard]);
+						else if(!isJudge){
 							next.set('respondTo',[source,card]);
 						}
 						if(game.online){
@@ -1881,7 +1875,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 							else{
 								trigger.cancel();
-								if(get.mode()=='guozhan'&&get.itemtype(event.statecard)=='card'&&event.statecard.hasTag('guo')){
+								if(event.guowuxie==true){
 									if(trigger.target.identity!='ye'&&trigger.target.identity!='unknown'){
 										trigger.getParent().excluded.addArray(game.filterPlayer(function(current){
 											return current.identity==trigger.target.identity;
@@ -1897,10 +1891,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(event.triggername=='phaseJudge'){
 							if(game.checkMod(trigger.card,player,current,'unchanged','wuxieJudgeEnabled',current)==false) return false;
 							if(game.checkMod(trigger.card,player,current,'unchanged','wuxieJudgeRespondable',player)==false) return false;
+							if(event.stateplayer&&event.statecard&&(game.checkMod(event.statecard,event.stateplayer,player,current,'unchanged','wuxieRespondable',event.stateplayer)==false)) return false;
 						}
 						else{
 							if(game.checkMod(trigger.card,player,trigger.target,current,'unchanged','wuxieEnabled',current)==false) return false;
 							if(game.checkMod(trigger.card,player,trigger.target,current,'unchanged','wuxieRespondable',player)==false) return false;
+							if(event.stateplayer&&event.statecard&&(game.checkMod(event.statecard,event.stateplayer,trigger.player,current,'unchanged','wuxieRespondable',event.stateplayer)==false)) return false;
 						}
 						return current.hasWuxie();
 					});
@@ -2007,13 +2003,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 9'
 					if(event.wuxieresult){
 						if(result=='wuxied'){
-							if(!event.statecard){
-								if(event.wuxieresult2&&event.wuxieresult2.used){
-									event.statecard=event.wuxieresult2.used;
-								}
-								else{
-									event.statecard=true;
-								}
+							if(!event.stateplayer&&event.wuxieresult)event.stateplayer=event.wuxieresult;
+							if(event.wuxieresult2&&event.wuxieresult2.used){
+								event.statecard=event.wuxieresult2.used;
+							}
+							else{
+								event.statecard=true;
 							}
 							event.state=!event.state;
 						}

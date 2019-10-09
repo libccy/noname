@@ -304,6 +304,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						var evt=event.getParent();
 						if(evt&&evt.targets&&evt.targets.contains(player)){
 							evt.fixedSeat=true;
+							evt.targets.sortBySeat();
 							evt.targets.remove(player);
 							evt.targets.push(player);
 						}
@@ -366,6 +367,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'trick',
 				enable:true,
 				mode:['guozhan'],
+				global:['g_chiling1','g_chiling2','g_chiling3'],
 				filterTarget:function(card,player,target){
 					return target.isUnseen();
 				},
@@ -1089,7 +1091,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-			_chiling1:{
+			g_chiling1:{
 				mode:['guozhan'],
 				trigger:{player:'discardAfter'},
 				filter:function(event,player){
@@ -1118,7 +1120,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-			_chiling2:{
+			g_chiling2:{
 				mode:['guozhan'],
 				trigger:{player:'judgeAfter'},
 				forced:true,
@@ -1133,7 +1135,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.popup('敕令');
 				}
 			},
-			_chiling3:{
+			g_chiling3:{
 				mode:['guozhan'],
 				trigger:{player:'phaseAfter'},
 				forced:true,

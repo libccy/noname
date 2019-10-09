@@ -152,7 +152,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				audio:2,
 				trigger:{
-					source:'damageAfter',
+					source:'damageSource',
 				},
 				filter:function(event,player){
 					return event.player!=player&&event.player.countCards('h')>player.countCards('h');
@@ -662,7 +662,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						player.line(result.targets);
 						player.$give(event.cards[0],result.targets[0]);
-						result.targets[0].gain(event.cards[0],player);
+						result.targets[0].gain(event.cards[0]);
 						event.gived.add(result.targets[0]);
 					};
 					event.cards.remove(event.cards[0]);
@@ -805,9 +805,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						event.target=result.targets[0];
 						player.line(event.target);
-						player.logSkill('drlt_congjian')
-						player.$give(result.cards[0],event.target);
-						event.target.gain(result.cards[0],player);
+						player.logSkill('drlt_congjian');
+						event.target.gain(result.cards[0],player,'give');
 						var num=1;
 						if(get.type(result.cards[0])=='equip') num=2;
 						player.draw(num);
@@ -1004,9 +1003,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					player.gain(player.storage.kongsheng2,'gain2','fromStorage');
 					'step 3'
-					for(var i=0;i<player.storage.kongsheng2.length;i++){
-						player.storage.kongsheng2.remove(player.storage.kongsheng2[i]);
-					};
+					delete player.storage.kongsheng2;
 					player.removeSkill('kongsheng2');
 				},
 			},
@@ -1153,7 +1150,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						};
 						player.line(event.target);
 						if(event.control=='令一名手牌数大于你的角色交给你一张牌'){
-							event.target.chooseCard(1,'h',true).set('ai',function(card){
+							event.target.chooseCard(1,'he',true).set('ai',function(card){
 								return 6-get.value(card);
 							});
 						}else{
@@ -1165,8 +1162,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					};
 					'step 3'
 					if(result.bool){
-						event.target.$giveAuto(result.cards,player);
-						player.gain(result.cards,event.target);
+						player.gain(result.cards,event.target,'giveAuto');
 					};
 				},
 				ai:{
@@ -1885,8 +1881,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							});
 							"step 1"
 							if(result.bool){
-								player.$give(result.cards.length,trigger.source);
-								trigger.source.gain(result.cards);
+								trigger.source.gain(result.cards,player,'give');
 								trigger.source.storage.nzry_shenshi1=result.cards[0];
 								trigger.source.storage.nzry_shenshi2=player;
 								trigger.source.addSkill('nzry_shenshi1');
@@ -2312,7 +2307,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					damage:{
-						trigger:{source:'damageEnd'},
+						trigger:{source:'damage'},
 						forced:true,
 						silent:true,
 						popup:false,
@@ -2434,7 +2429,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xinkuanggu:{
-				trigger:{source:'damageEnd'},
+				trigger:{source:'damageSource'},
 				filter:function(event,player){
 					return get.distance(player,event.player)<=1&&event.num>0;
 				},
@@ -2900,7 +2895,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					dist:{
 						mod:{
 							globalFrom:function(from,to,distance){
-								if(from.storage.tuntian) return distance-from.storage.tuntian.length;
+								if(from.storage.tuntian){
+									var num=distance-from.storage.tuntian.length;
+									if(_status.event.skill=='jixi_backup'||_status.event.skill=='gzjixi') num++;
+									return num;
+								}
 							}
 						}
 					}
@@ -3118,9 +3117,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('preserve','lose');
 					"step 2"
 					if(result.bool==false){
-						target.gain([result.player,result.target]);
-						target.$gain2([result.player,result.target]);
+						var list=[];
+						if(get.position(result.player)=='d') list.push(result.player);
+						if(get.position(result.target)=='d') list.push(result.target);
+						if(!list.length) event.finish();
+						else{
+							event.list=list;
+							target.chooseBool('是否获得'+get.translation(list)+'？').ai=function(){
+								return get.value(list)>0;
+							};
+						}
 					}
+					else event.finish();
+					"step 3"
+					if(result.bool) target.gain(event.list,'gain2');
 				},
 				ai:{
 					basic:{
@@ -3865,7 +3875,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lieren:{
 				audio:2,
 				audioname:['boss_lvbu3'],
-				trigger:{source:'damageEnd'},
+				trigger:{source:'damageSource'},
 				filter:function(event,player){
 					if(event._notrigger.contains(event.player)) return false;
 					return (event.card&&event.card.name=='sha'&&
@@ -3897,12 +3907,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					event.togain=trigger.player.getCards('he');
-					event.shown=trigger.player.getCards('e');
-					var num=event.togain.length-event.shown.length;
-					player.gain(event.togain);
-					if(num) trigger.player.$give(num,player);
-					if(event.shown.length) trigger.player.$give(event.shown,player);
-					game.delay();
+					player.gain(event.togain,trigger.player,'giveAuto');
 				},
 			},
 			fangzhu:{
@@ -4115,8 +4120,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					"step 1"
 					if(result.targets&&result.targets[0]){
-						result.targets[0].gain(result.cards,player);
-						player.$give(result.cards.length,result.targets[0]);
+						result.targets[0].gain(result.cards,player,'giveAuto');
 					}
 				}
 			},
@@ -4455,7 +4459,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			baonue2:{
 				audio:2,
 				forceaudio:true,
-				trigger:{source:'damageEnd'},
+				trigger:{source:'damageSource'},
 				filter:function(event,player){
 					if(player.group!='qun') return false;
 					return game.hasPlayer(function(target){
@@ -5549,7 +5553,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			kuanggu:{
 				audio:2,
-				trigger:{source:'damageEnd'},
+				trigger:{source:'damageSource'},
 				forced:true,
 				filter:function(event,player){
 					return get.distance(player,event.player)<=1&&player.isDamaged();
@@ -6105,7 +6109,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.mode()!='guozhan'&&player.storage.buqu&&player.storage.buqu.length) return num-player.hp+player.storage.buqu.length;
 					},
 				},
-				ai:{save:true},
+				ai:{
+					save:true,
+					skillTagFilter:function(player){
+						if(player.storage.niepan) return false;
+						if(player.hp>0) return false;
+						},
+					},
 				intro:{
 					content:'cards',
 					onunmark:function(storage,player){
@@ -6386,6 +6396,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				type:"equip",
 				subtype:"equip5",
 			},
+			disable_judge:{},
 		},
 		translate:{
 			"feichu_equip1":"已废除",
@@ -6403,6 +6414,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"feichu_equip3_bg":"废",
 			"feichu_equip4_bg":"废",
 			"feichu_equip5_bg":"废",
+			disable_judge:'已废除',
+			disable_judge_info:'判定区已废除',
+			disable_judge_bg:'废',
 			
 			re_yuanshao:'袁绍',
 			re_lusu:'鲁肃',

@@ -1786,8 +1786,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.choice=result.control;
 					target.popup(event.choice);
 					event.card=player.getCards('h').randomGet();
-					target.gain(event.card,player);
-					player.$give(event.card,target);
+					target.gain(event.card,player,'give');
 					game.delay();
 					"step 2"
 					if(get.suit(event.card)+'2'!=event.choice) target.damage('nocard');

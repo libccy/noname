@@ -600,7 +600,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(trigger.cards[i].name=='du'&&trigger.cards[i].original!='j') num++;
 					}
 					player.popup('毒','wood');
-					player.loseHp(num);
+					player.loseHp(num).type='du';
 				},
 			},
 			caomu_skill:{

@@ -344,9 +344,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.control!='cancel2'){
 						player.logSkill('twyanqin');
 						var group=result.control.slice(0,3);
-						player.group=group;
-						player.node.name.dataset.nature=get.groupnature(group);
-						game.log(player,'将势力变为了','#y'+get.translation(group+2));
+						player.changeGroup(group);
 					}
 				},
 			},
@@ -504,10 +502,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.control!='cancel2'){
 						if(!event.renshe) player.logSkill('chijie');
-						var group=result.control;
-						player.group=group;
-						player.node.name.dataset.nature=get.groupnature(group);
-						game.log(player,'将势力变为了','#y'+get.translation(group));
+						player.changeGroup(result.control);
 					}
 				},
 			},

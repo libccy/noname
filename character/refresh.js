@@ -30,7 +30,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_huangyueying:['female','shu',3,['rejizhi','reqicai']],
 			re_sunquan:['male','wu',4,['rezhiheng','rejiuyuan'],['zhu']],
 			re_sunshangxiang:['female','wu',3,['xiaoji','rejieyin']],
-			re_zhenji:['female','wei',3,['reluoshen','qingguo']],
+			re_zhenji:['female','wei',3,['reluoshen','reqingguo']],
 			re_zhugeliang:['male','shu',3,['reguanxing','kongcheng']],
 			re_huaxiong:["male","qun",6,["new_reyaowu"]],
 		},
@@ -39,6 +39,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_lidian:'字曼成，曹操麾下将领。李典深明大义，不与人争功，崇尚学习与高贵儒雅，尊重博学之士，在军中被称为长者。李典有长者之风，官至破虏将军，三十六岁去世。魏文帝曹丕继位后追谥号为愍侯。',
 		},
 		skill:{
+			reqingguo:{
+				audio:2,
+				enable:['chooseToRespond'],
+				filterCard:function(card){
+					return get.color(card)=='black';
+				},
+				position:'he',
+				viewAs:{name:'shan'},
+				viewAsFilter:function(player){
+					if(!player.countCards('he',{color:'black'})) return false;
+				},
+				prompt:'将一张黑色牌当闪打出',
+				check:function(){return 1},
+				ai:{
+					respondShan:true,
+					skillTagFilter:function(player){
+						if(!player.countCards('he',{color:'black'})) return false;
+					},
+					effect:{
+						target:function(card,player,target,current){
+							if(get.tag(card,'respondShan')&&current<0) return 0.6
+						}
+					}
+				}
+			},
 			reqiangxi:{
 				subSkill:{
 					off:{
@@ -381,7 +406,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_liyu":{
 				audio:"liyu",
 				trigger:{
-					source:"damageEnd",
+					source:"damageSource",
 				},
 				filter:function (event,player){
 					if(event._notrigger.contains(event.player)) return false;
@@ -509,9 +534,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					"step 3"
 					if(result.bool){
-						player.$giveAuto(result.cards,result.targets[0]);
 						player.line(result.targets,'green');
-						result.targets[0].gain(result.cards);
+						result.targets[0].gain(result.cards,player,'giveAuto');
 						event.given+=result.cards.length;
 						if(event.given<2){
 							event.temp=result.targets[0];
@@ -584,11 +608,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{
 					player:"phaseDrawBegin",
 				},
+				forced:true,
+				locked:false,
 				content:function (){
 					"step 0"
-					event.cards=get.cards(3);
+					var cards=get.cards(3);
+					event.cards=cards;
 					player.showCards(event.cards,'裸衣');
-					player.chooseBool("是否放弃摸牌？").ai=function(event,player){
+					var cardsx=[];
+					for(var i=0;i<cards.length;i++){
+						if(get.type(cards[i])=='basic'||cards[i].name=='juedou'||
+							(get.type(cards[i])=='equip'&&get.subtype(cards[i])!='equip1')){
+							cardsx.push(cards[i]);
+						}
+					}
+					player.chooseBool("是否放弃摸牌，改为获得"+get.translation(cardsx)+"？").ai=function(event,player){
 						var num=3
 						for(var i=0;i<event.cards.length;i++){
 							if(get.type(event.cards[i])!='basic'&&event.cards[i].name!='juedou'&&
@@ -596,7 +630,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								num--;
 							}
 						}
-						return num>1
+						return num>=trigger.num;
 					};
 					"step 1"
 					if(result.bool){
@@ -726,8 +760,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					else{
-						target.$give(event.card2,player);
-						player.gain(event.card2);
+						player.gain(event.card2,target,'give');
 						if(target.hp<target.maxHp){
 							player.chooseBool('是否让目标回复一点体力？').ai=function(event,player){
 								return get.recoverEffect(target,player,player)>0;
@@ -924,8 +957,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						player.storage.new_qingjian++;
 						player.logSkill('new_qingjian',target);
-						target.gain(cards,player);
-						player.$give(cards,target);
+						target.gain(cards,player,'give');
 						_status.currentPhase.addTempSkill('qingjian_add');
 						_status.currentPhase.storage.qingjian_add=type.length;
 					}
@@ -1495,7 +1527,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(type=='trick'||type=='delay') return true;
 					},
 					canBeDiscarded:function(card){
-						if(get.position(card)=='e') return false;
+						if(get.position(card)=='e'&&['equip2','equip5'].contains(get.subtype(card))) return false;
 					},
 				},
 			},
@@ -1723,7 +1755,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			liyu:{
 				audio:2,
-				trigger:{source:'damageEnd'},
+				trigger:{source:'damageSource'},
 				forced:true,
 				filter:function(event,player){
 					if(event._notrigger.contains(event.player)) return false;
@@ -2673,7 +2705,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			qiaomeng:{
 				audio:2,
-				trigger:{source:'damageEnd'},
+				trigger:{source:'damageSource'},
 				direct:true,
 				filter:function(event){
 					if(event._notrigger.contains(event.player)) return false;
@@ -2791,7 +2823,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				unique:true,
 				juexingji:true,
-				trigger:{source:'damageAfter'},
+				trigger:{source:'damageSource'},
 				forced:true,
 				derivation:'jianyan',
 				filter:function(event,player){
@@ -3009,7 +3041,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			wangxi:{
 				audio:2,
-				trigger:{player:'damageEnd',source:'damageEnd'},
+				trigger:{player:'damageEnd',source:'damageSource'},
 				filter:function(event){
 					if(event._notrigger.contains(event.player)) return false;
 					return event.num&&event.source&&event.player&&
@@ -3098,7 +3130,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rejieming:"节命",
 			"rejieming_info":"当你受到1点伤害后，你可以令一名角色摸两张牌。然后若其手牌数小于体力上限，则你摸一张牌。",
 			reshuangxiong:"双雄",
-			"reshuangxiong_info":"摸牌阶段，你可以放弃摸牌。若如此做，你展示牌堆顶的两张牌并选择获得其中的一张。然后，你本回合内可以将与此牌颜色不同的一张手牌当做【决斗】使用。",
+			"reshuangxiong_info":"摸牌阶段，你可以放弃摸牌。若如此做，你展示牌堆顶的两张牌并选择获得其中的一张。然后，你本回合内可以将与此牌颜色不同的一张手牌当做【决斗】使用。当你受到以此法使用的【决斗】的伤害时，你获得对方于此决斗中打出的所有【杀】",
 			"reshuangxiong2":"双雄",
 			"reshuangxiong2_info":"",
 
@@ -3113,7 +3145,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rejizhi:'集智',
 			rejizhi_info:'当你使用非延时锦囊牌时，你可以摸一张牌。若此牌为基本牌，则你可以弃置之，然后令本回合手牌上限+1。',
 			reqicai:'奇才',
-			reqicai_info:'锁定技，你使用锦囊牌无距离限制，你装备区内的牌不能被其他角色弃置',
+			reqicai_info:'锁定技，你使用锦囊牌无距离限制，你装备区内的防具牌和宝物牌不能被其他角色弃置',
 			rezhiheng:'制衡',
 			rezhiheng_info:'出牌阶段限一次，你可以弃置任意张牌并摸等量的牌，若你在发动“制衡”时弃置了所有手牌，则你多摸一张牌',
 			rejiuyuan:'救援',
@@ -3151,6 +3183,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_reqingnang_info":"出牌阶段，你可以弃置一张手牌，令一名本回合内未成为过〖青囊〗的目标的角色回复一点体力。若你弃置的是黑色牌，则你本回合内不能再发动〖青囊〗。",
 			"new_reyaowu":"耀武",
 			"new_reyaowu_info":"锁定技，当任意一名角色使用【杀】对你造成伤害时，若此杀为红色，该角色回复1点体力或摸一张牌。若为黑色，则你摸一张牌。",
+			reqingguo:'倾国',
+			reqingguo_info:'你可以将一张黑色牌当做【闪】使用或打出。',
 			
 			qinxue:'勤学',
 			retuxi:'突袭',

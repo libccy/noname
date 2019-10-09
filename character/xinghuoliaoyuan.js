@@ -61,6 +61,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool&&result.targets&&result.targets.length){
 						player.logSkill('xinfu_langxi',result.targets);
 						var num=[1,2,0].randomGet();
+						if(get.isLuckyStar()) num=2;
 						player.line(result.targets[0],'green');
 						result.targets[0].damage(num);
 					}
@@ -161,8 +162,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						var card=target.getCards('hej').randomGet();
-						target.$giveAuto(card,player);
-						player.gain(card,target);
+						player.gain(card,target,'giveAuto');
 					}
 				},
 				ai:{
@@ -274,8 +274,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.index==0){
 						var card=target.getCards('hej').randomGet();
-						target.$giveAuto(card,player);
-						player.gain(card,target);
+						player.gain(card,target,'giveAuto');
 						target.addTempSkill('tanbei_effect2','phaseAfter');
 					}
 					else{
@@ -1184,12 +1183,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					event.togain=trigger.player.getCards('he');
-					event.shown=trigger.player.getCards('e');
-					var num=event.togain.length-event.shown.length;
-					player.gain(event.togain);
-					if(num) trigger.player.$give(num,player);
-					if(event.shown.length) trigger.player.$give(event.shown,player);
-					game.delay();
+					player.gain(event.togain,trigger.player,'giveAuto');
 				},
 			},
 			"xinfu_fujian":{
@@ -1267,8 +1261,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(card1) list.push(card1);
 							if(card2) list.push(card2);
 							if(list.length>0){
-								trigger.player.$giveAuto(list,player);
-								player.gain(list,trigger.player);
+								player.gain(list,trigger.player,'giveAuto');
 							}
 							game.delay();
 						},
@@ -2280,6 +2273,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.delay();
 						player.logSkill('xinfu_zhennan',result.targets);
 						var num=[1,2,3,1,1,2].randomGet();
+						if(get.isLuckyStar()) num=3;
 						player.line(result.targets[0],'fire');
 						result.targets[0].damage(num);
 					}
@@ -2734,8 +2728,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					"step 2"
 					if(result.bool&&result.cards&&result.cards.length){
-						event.current.$giveAuto(result.cards,player);
-						player.gain(result.cards,event.current);
+						player.gain(result.cards,event.current,'giveAuto');
 					}
 					event.current=event.current.next;
 					if(event.current!=player) event.goto(1);
@@ -4787,6 +4780,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:["xinfu_jingxie2"],
 				position:"he",
 				enable:"phaseUse",
+				filter:function(event,player){
+					var he=player.getCards('he');
+					for(var i=0;i<he.length;i++){
+						if(["bagua","baiyin","lanyinjia","renwang","tengjia","zhuge"].contains(he[i].name)) return true;
+					}
+					return false;
+				},
 				filterCard:function (card){
 					return ["bagua","baiyin","lanyinjia","renwang","tengjia","zhuge"].contains(card.name);
 				},
@@ -4851,7 +4851,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				content:function (){
 					'step 0'
-					player.throwDice();
+					if(get.isLuckyStar()){
+						event.num=6;
+						player.throwDice(6);
+					}
+					else player.throwDice();
 					'step 1'
 					event.cards=get.cards(event.num);
 					player.showCards(event.cards);

@@ -153,15 +153,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var cards=target.getCards(range[i]);
 							if(cards.length){
 								var card=cards.randomGet();
-								player.gain(card);
-								target.$giveAuto(card,player);
+								player.gain(card,target,'giveAuto');
 								break;
 							}
 						}
 						event.num++;
 					}
 					"step 4"
-					game.delay(0.7);
 					if(num<event.targets.length) event.goto(3);
 					"step 5"
 					player.turnOver();
@@ -452,14 +450,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.markSkill('baonu');
 					player.syncStorage('baonu');
 				},
-				trigger:{source:'damageEnd',player:'damageEnd'},
+				trigger:{source:'damageSource',player:'damageEnd'},
 				forced:true,
 				filter:function(event){
 					return event.num>0; 
 				},
 				content:function(){
-					if(player==trigger.player) player.storage.baonu+=trigger.num;
-					if(player==trigger.source) player.storage.baonu+=trigger.num;
+					player.storage.baonu+=trigger.num;
 					player.markSkill('baonu');
 					player.syncStorage('baonu');
 				},
@@ -2030,18 +2027,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				trigger:{
 					player:"damageAfter",
-					source:"damageAfter",
+					source:"damageSource",
 				},
 				forced:true,
 				content:function(){
-					if(player==trigger.source){
-						player.storage.nzry_junlve+=trigger.num;
-						game.log(player,'获得了',trigger.num,'个“军略”标记');
-					}
-					if(player==trigger.player){
-						player.storage.nzry_junlve+=trigger.num;
-						game.log(player,'获得了',trigger.num,'个“军略”标记');
-					}
+					player.storage.nzry_junlve+=trigger.num;
+					game.log(player,'获得了',trigger.num,'个“军略”标记');
 					player.syncStorage('nzry_junlve');
 				},
 			},
@@ -2163,7 +2154,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.drlt_duorui=[];
 				},
 				trigger:{
-					source:'damageAfter'
+					source:'damageSource'
 				},
 				filter:function(event,player){
 				if(player.storage.drlt_duorui.length) return false;
@@ -2450,6 +2441,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					trigger.num++;
 				},
+				ai:{nokeep:true},
 			},
 			'drlt_jieying':{
 				audio:2,

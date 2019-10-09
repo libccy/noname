@@ -750,20 +750,23 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				logAi:function(targets,card){},
 				showIdentity:function(){
-					this.node.identity.classList.remove('guessing');
-					this.identityShown=true;
-					this.ai.shown=1;
-					this.setIdentity();
-					if(this.identity=='zhu'){
-						this.isZhu=true;
-					}
-					if(_status.clickingidentity){
-						for(var i=0;i<_status.clickingidentity[1].length;i++){
-							_status.clickingidentity[1][i].delete();
-							_status.clickingidentity[1][i].style.transform='';
+					game.broadcastAll(function(player,identity){
+						player.identity=identity;
+						player.node.identity.classList.remove('guessing');
+						player.identityShown=true;
+						player.ai.shown=1;
+						player.setIdentity();
+						if(player.identity=='zhu'){
+							player.isZhu=true;
 						}
-						delete _status.clickingidentity;
-					}
+						if(_status.clickingidentity){
+							for(var i=0;i<_status.clickingidentity[1].length;i++){
+								_status.clickingidentity[1][i].delete();
+								_status.clickingidentity[1][i].style.transform='';
+							}
+							delete _status.clickingidentity;
+						}
+					},this,this.identity);
 				}
 			}
 		},

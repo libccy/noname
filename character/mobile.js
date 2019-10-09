@@ -9,7 +9,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mobile_default:["miheng","taoqian","liuzan","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei"],
 				mobile_fire:["re_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","re_pangtong","xin_yuanshao"],
 				mobile_forest:['re_zhurong','re_menghuo'],
-				mobile_others:["re_jikang","old_bulianshi","old_yuanshu"],
+				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun"],
 			},
 		},
 		character:{
@@ -38,6 +38,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shenpei:["male","qun","2/3",["shouye","liezhi"],[]],
 			re_zhurong:['female','shu',4,['juxiang','relieren']],
 			re_menghuo:['male','shu',4,['huoshou','rezaiqi']],
+			re_wangyun:['male','qun',3,['relianji','remoucheng']],
 		},
 		characterIntro:{
 			shenpei:'审配（？－204年），字正南，魏郡阴安（今河北清丰北）人。为人正直， 袁绍领冀州，审配被委以腹心之任，并总幕府。河北平定，袁绍以审配、逢纪统军事，审配恃其强盛，力主与曹操决战。曾率领弓弩手大破曹军于官渡。官渡战败，审配二子被俘，反因此受谮见疑，幸得逢纪力保。袁绍病死，审配等矫诏立袁尚为嗣，导致兄弟相争，被曹操各个击破。曹操围邺，审配死守数月，终城破被擒，拒不投降，慷慨受死。',
@@ -81,6 +82,139 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		skill:{
+			relianji:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return game.players.length>1;
+				},
+				filterTarget:lib.filter.notMe,
+				targetprompt:['打人','被打'],
+				selectTarget:2,
+				multitarget:true,
+				content:function(){
+					'step 0'
+					game.delay(0.5);
+					if(targets[0].isDisabled(1)) event.goto(2);
+					'step 1'
+					var target=targets[0];
+					var equip1=get.cardPile2(function(card){
+						return get.subtype(card)=='equip1';
+					});
+					if(!equip1){
+						player.popup('连计失败');
+						game.log('牌堆中无装备');
+						event.finish();
+						return;
+					}
+					target.$draw(equip1);
+					target.chooseUseTarget(equip1,'noanimate','nopopup');
+					'step 2'
+					targets[0].useCard({name:['nanman','wanjian','huogong','juedou','sha'].randomGet()},targets[1],'noai').animate=false;
+					game.delay(0.5);
+				},
+				ai:{
+					order:8,
+					result:{
+						target:function(player,target){
+							if(ui.selected.targets.length==0){
+								return 1;
+							}
+							else{
+								return -1;
+							}
+						}
+					},
+					expose:0.4,
+					threaten:3,
+				},
+				group:'relianji_count',
+				subSkill:{
+					count:{
+						sub:true,
+						forced:true,
+						popup:false,
+						silent:true,
+						trigger:{global:'damageEnd'},
+						filter:function(event,player){
+							var evt=event.getParent(3);
+							return evt&&evt.name=='relianji'&&evt.player==player;
+						},
+						content:function(){
+							if(!player.storage.relianji) player.storage.relianji=0;
+							player.storage.relianji++;
+							if(player.storage.relianji>2){
+								event.trigger('remoucheng_awaken');
+							}
+						},
+					},
+				},
+			},
+			remoucheng:{
+				derivation:'rejingong',
+				trigger:{
+					player:'remoucheng_awaken'
+				},
+				forced:true,
+				juexingji:true,
+				skillAnimation:true,
+				animationColor:'thunder',
+				content:function(){
+					player.awakenSkill('remoucheng');
+					player.removeSkill('relianji');
+					player.addSkill('rejingong');
+					player.gainMaxHp();
+					player.recover();
+				},
+			},
+			rejingong:{
+				enable:'phaseUse',
+				delay:0,
+				usable:1,
+				content:function(){
+					'step 0'
+					var list=get.inpile('trick','trick').randomGets(2);
+					if(Math.random()<0.5){
+						list.push('wy_meirenji');
+					}
+					else{
+						list.push('wy_xiaolicangdao');
+					}
+					for(var i=0;i<list.length;i++){
+						list[i]=['锦囊','',list[i]];
+					}
+					player.chooseButton(['矜功',[list,'vcard']]).set('filterButton',function(button,player){
+						return game.hasPlayer(function(current){
+							return player.canUse(button.link[2],current,true,false);
+						});
+					}).set('ai',function(button){
+						var player=_status.event.player;
+						var name=button.link[2];
+						if(game.hasPlayer(function(current){
+							return player.canUse(name,current)&&get.effect(current,{name:name},player,player)>0;
+						})){
+							if(name=='wy_meirenji'||name=='wy_xiaolicangdao') return Math.random()+0.5;
+							return Math.random();
+						}
+						return 0;
+					});
+					'step 1'
+					if(result.bool){
+						player.chooseUseTarget(result.links[0][2],true);
+						player.addTempSkill('jingong2');
+					}
+				},
+				ai:{
+					order:2,
+					result:{
+						player:function(player){
+							if((player.hp<=2||player.needsToDiscard())&&!player.getStat('damage')) return 0;
+							return 1;
+						}
+					}
+				}
+			},
 			relieren:{
 				audio:'lieren',
 				audioname:['boss_lvbu3'],
@@ -484,6 +618,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shenpei:'审配',
 			re_zhurong:'界祝融',
 			re_menghuo:'界孟获',
+			re_wangyun:'手杀王允',
+			relianji:'连计',
+			relianji_info:'出牌阶段限一次，你可以选择两名其他角色。第一名角色随机使用牌堆中的一张武器牌，然后这名角色视为对另一名角色随机使用一张下列的牌名的牌：【决斗】、【火攻】、【南蛮入侵】、【万箭齐发】或普【杀】。然后若此牌造成伤害，你获得X枚“连计”标记（X为此次扣减的体力值点数）。',
+			remoucheng:'谋逞',
+			remoucheng_info:'觉醒技，当一名角色造成伤害后，若你拥有的“连计”标记数大于2，你加1点体力上限，回复1点体力，失去“连计”，获得“矜功”。',
+			rejingong:'矜功',
+			rejingong_info:'每回合可以用三个随机锦囊中的一个，三个锦囊中有一个是专属锦囊，本回合未造成伤害会失去1点体力。',
 			mobile_default:'常规',
 			mobile_fire:'界限突破•火',
 			mobile_forest:'界限突破•林',

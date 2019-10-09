@@ -884,11 +884,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				audio:true,
 				check:function(event,player){
-					var att=get.attitude(player,event.target);
-					if(event.target.hasSkillTag('nofire')){
-						return att>0;
-					}
-					return att<=0;
+					var eff1=get.effect(event.target,event.card,player,player);
+					var eff2=get.effect(event.target,{name:'sha',nature:'fire',suit:get.suit(event.card),number:get.number(event,card)},player,player);
+					return eff2>eff1;
 				},
 				content:function(){
 					trigger.card.nature='fire';
