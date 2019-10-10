@@ -6112,7 +6112,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					save:true,
 					skillTagFilter:function(player){
-						if(player.storage.niepan) return false;
 						if(player.hp>0) return false;
 						},
 					},

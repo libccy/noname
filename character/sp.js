@@ -574,13 +574,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=player.hp-player.countCards('h');
 					if(num>0) player.draw(num);
 					else player.recover(-num);
-					'step 1'
-					if(player==trigger.source&&player==trigger.player&&lib.skill.xinlvli.filter(trigger,player)){
-						player.chooseBool(get.prompt2('xinlvli'));
-					}
-					else event.finish();
-					'step 2'
-					if(result.bool) event.goto(0);
 				},
 				group:'lvli3',
 			},
