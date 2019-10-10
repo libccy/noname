@@ -9856,6 +9856,7 @@
 					//player.markSkill('_disableJudge');
 					'step 1'
 					game.broadcastAll(function(player,card){
+						player.storage._disableJudge=true;
 						card.fix();
 						card.classList.add('feichu');
 						card.style.transform='';
@@ -10899,7 +10900,7 @@
 				},
 				phaseJudge:function(){
 					"step 0"
-					if(player.node.judges.childElementCount){
+					if(!player.storage._disableJudge&&player.node.judges.childElementCount){
 						event.card=player.node.judges.firstChild;
 						if(event.card.classList.contains('removing')){
 							event.card.remove();
