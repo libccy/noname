@@ -109,9 +109,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return;
 					}
 					target.$draw(equip1);
-					target.chooseUseTarget(equip1,'noanimate','nopopup');
+					target.chooseUseTarget(equip1,'noanimate','nopopup',true);
 					'step 2'
-					targets[0].useCard({name:['nanman','wanjian','huogong','juedou','sha'].randomGet()},targets[1],'noai').animate=false;
+					var list=['nanman','wanjian','huogong','juedou','sha'];
+					var list2=game.players.slice(0);
+					list2.remove(player);
+					for(var i=0;i<list.length;i++){
+						if(!targets[0].canUse(list[i],targets[1])) list.splice(i--,1);
+					}
+					if(!list.length) return;
+					var name=list.randomGet();
+					if(name=='nanman'||name=='wanjian'){
+						for(var i=0;i<list2.length;i++){
+							if(!targets[0].canUse(name,list2[i])) list2.splice(i--,1);
+						}
+					}
+					else list2=targets[1];
+					targets[0].useCard({name:name},list2,'noai');
 					game.delay(0.5);
 				},
 				ai:{
@@ -174,7 +188,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				content:function(){
 					'step 0'
-					var list=get.inpile('trick','trick').randomGets(2);
+					var list=get.inpile('trick').randomGets(2);
 					if(Math.random()<0.5){
 						list.push('wy_meirenji');
 					}

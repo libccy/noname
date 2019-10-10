@@ -3321,7 +3321,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return;
 					}
 					target.$draw(equip1);
-					target.chooseUseTarget(equip1,'noanimate','nopopup');
+					target.chooseUseTarget(true,equip1,'noanimate','nopopup');
 					game.delay();
 					'step 2'
 					var card=cards[0];
@@ -3520,7 +3520,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				content:function(){
 					'step 0'
-					var list=get.inpile('trick','trick').randomGets(2);
+					var list=get.inpile('trick').randomGets(2);
 					if(Math.random()<0.5){
 						list.push('wy_meirenji');
 					}
