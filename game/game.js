@@ -15378,7 +15378,17 @@
 					for(var i=1;i<6;i++){
 						if(this.isDisabled(i)) this.$enableEquip('equip'+i);
 					}
-					
+					if(this.storage._disableJudge){
+						game.broadcastAll(function(player){
+							player.storage._disableJudge=false;
+							for(var i=0;i<player.node.judges.childNodes.length;i++){
+								if(player.node.judges.childNodes[i].name=='disable_judge'){
+									player.node.judges.removeChild(player.node.judges.childNodes[i]);
+									break;
+								}
+							}
+						},this);
+					}
 					this.node.avatar.hide();
 					this.node.count.hide();
 					if(this.node.wuxing){

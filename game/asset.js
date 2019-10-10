@@ -2238,6 +2238,7 @@ window.noname_asset_list=[
 	'image/character/key_yuri.jpg',
 	'image/character/key_kyousuke.jpg',
 	'image/character/key_lucia.jpg',
+	'image/character/re_yujin.jpg',
 
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
