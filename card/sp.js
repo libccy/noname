@@ -5,6 +5,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		card:{
 			jinchan:{
+				audio:true,
 				fullskin:true,
 				type:'trick',
 				notarget:true,
@@ -39,6 +40,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			qijia:{
+				audio:true,
 				fullskin:true,
 				type:'trick',
 				enable:true,
@@ -134,6 +136,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			fulei:{
+				audio:true,
 				fullskin:true,
 				type:'delay',
 				cardnature:'thunder',
@@ -182,6 +185,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			qibaodao:{
+				audio:true,
 				fullskin:true,
 				type:'equip',
 				subtype:'equip1',
@@ -202,6 +206,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			zhungangshuo:{
+				audio:true,
 				fullskin:true,
 				type:'equip',
 				subtype:'equip1',
@@ -221,6 +226,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			yinyueqiang:{
+				audio:true,
 				fullskin:true,
 				type:'equip',
 				subtype:'equip1',
@@ -259,6 +265,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				selectTarget:-1
 			},
 			shengdong:{
+				audio:true,
 				fullskin:true,
 				enable:function(){
 					return game.countPlayer()>2;
@@ -339,6 +346,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zengbin:{
+				audio:true,
 				fullskin:true,
 				enable:true,
 				type:'trick',
@@ -382,6 +390,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			caomu:{
+				audio:true,
 				fullskin:true,
 				enable:true,
 				type:'delay',

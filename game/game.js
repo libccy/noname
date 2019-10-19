@@ -4620,9 +4620,10 @@
 						item:{
 							disabled:'不启用',
 							online:'Online',
+							rewrite:'Rewrite',
 							chaoming:'潮鸣',
 						},
-						init:'chaoming',
+						init:'rewrite',
 						onclick:function(item){
 							game.saveConfig('aozhan_bgm',item,this._link.config.mode);
 							if(_status._aozhan==true) game.playBackgroundMusic();
@@ -13177,8 +13178,9 @@
 										game.playAudio('card',sex,card.name+'_'+card.nature);
 									}
 									else{
-										if(typeof audioinfo=='string'&&audioinfo.indexOf('ext:')==0){
-											game.playAudio('..','extension',audioinfo.slice(4),card.name+'_'+sex);
+										if(typeof audioinfo=='string'){
+											if(audioinfo.indexOf('ext:')==0) game.playAudio('..','extension',audioinfo.slice(4),card.name+'_'+sex);
+											else game.playAudio('card',sex,audioinfo);
 										}
 										else{
 											game.playAudio('card',sex,card.name);
@@ -14888,6 +14890,9 @@
 			},
 			player:{
 				//新函数
+				getDamagedHp:function(){
+					return this.maxHp-Math.max(0,this.hp);
+				},
 				changeGroup:function(group,log){
 					game.broadcastAll(function(player,group){
 						player.group=group;
@@ -19585,7 +19590,7 @@
 					return (range);
 				},
 				getHandcardLimit:function(){
-					return Math.max(0,game.checkMod(this,this.hp,'maxHandcard',this));
+					return Math.max(0,game.checkMod(this,Math.max(0,this.hp),'maxHandcard',this));
 				},
 				getEnemies:function(func){
 					var player=this;
@@ -45657,6 +45662,7 @@
 						_status.maxShuffle--;
 					}
 					game.shuffleNumber++;
+					if(_status.event.trigger) _status.event.trigger('washCard');
 					var cards=[],i;
 					for(var i=0;i<lib.onwash.length;i++){
 						if(lib.onwash[i]()=='remove'){
@@ -46707,6 +46713,9 @@
 			else if(str2.indexOf('TW')==0){
 				str2=str2.slice(2);
 			}
+			else if(str2.indexOf('OL')==0){
+				str2=str2.slice(2);
+			}
 			else if(str2.indexOf('JSP')==0){
 				str2=str2.slice(3);
 			}
@@ -46736,6 +46745,9 @@
 			else if(str2.indexOf('TW')==0){
 				str2=str2.slice(2);
 			}
+			else if(str2.indexOf('OL')==0){
+				str2=str2.slice(2);
+			}
 			else if(str2.indexOf('JSP')==0){
 				str2=str2.slice(3);
 			}
@@ -46754,6 +46766,9 @@
 				str2=str2.slice(2);
 			}
 			else if(str2.indexOf('TW')==0){
+				str2=str2.slice(2);
+			}
+			else if(str2.indexOf('OL')==0){
 				str2=str2.slice(2);
 			}
 			else if(str2.indexOf('JSP')==0){

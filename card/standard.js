@@ -367,12 +367,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					equipValue:function(card,player){
 						if(!game.hasPlayer(function(current){
-							return player.canUse('sha',current)&&get.distance(player,current)==1&&get.effect(current,{name:'sha'},player,player)>0;
+							return player.canUse('sha',current)&&get.distance(player,current)<=1&&get.effect(current,{name:'sha'},player,player)>0;
 						})){
 							return 1;
 						}
 						if(player.hasSha()&&_status.currentPhase==player){
-							if(player.getEquip('zhuge')||player.getCardUsable('sha')==0){
+							if(player.getEquip('zhuge')&&player.countUsed('sha')||player.getCardUsable('sha')==0){
 								return 10;
 							}
 						}
@@ -1410,6 +1410,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filter:function(event){
 					return event.card&&event.card.name=='sha'&&event.notLink()&&event.player.getCards('he').length>0;
 				},
+				priority:1,
 				check:function(event,player){
 					var target=event.player;
 						var eff=get.damageEffect(target,player,player);
@@ -1419,7 +1420,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 						if(eff<=0) return true;
 						if(target.hp==1) return false;
-						if(player.hasSkill('jiu')||player.hasSkill('tianxianjiu')||
+						if(event.num>1||player.hasSkill('tianxianjiu')||
 						player.hasSkill('luoyi2')||player.hasSkill('reluoyi2')) return false;
 						if(target.countCards('he')<2) return -1;
 						var num=0;

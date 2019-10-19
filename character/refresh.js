@@ -122,7 +122,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					nature:"fire",
 				},
 				viewAsFilter:function (player){
-					if(!player.countCards('h',{color:'red'})) return false;
+					if(!player.countCards('he',{color:'red'})) return false;
 				},
 				prompt:"将一张红色牌当火攻使用",
 				check:function (card){
@@ -1533,6 +1533,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			rejizhi:{
 				audio:'jizhi',
+				locked:false,
 				trigger:{player:'useCard'},
 				frequent:true,
 				filter:function(event){
@@ -2091,7 +2092,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					maxHandcard:function(player,num){
-						if(player.hp<player.maxHp) return num+player.maxHp-player.hp;
+						if(player.hp<player.maxHp) return num+player.getDamagedHp();
 					}
 				}
 			},

@@ -5,6 +5,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		card:{
 			liulongcanjia:{
+				audio:true,
 				mode:['guozhan'],
 				fullskin:true,
 				type:'equip',
@@ -36,6 +37,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			minguangkai:{
+				audio:true,
 				mode:['guozhan'],
 				fullskin:true,
 				type:'equip',
@@ -49,6 +51,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			dinglanyemingzhu:{
+				audio:true,
 				mode:['guozhan'],
 				fullskin:true,
 				type:'equip',
@@ -75,6 +78,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			feilongduofeng:{
+				audio:true,
 				mode:['guozhan'],
 				fullskin:true,
 				type:'equip',
@@ -101,6 +105,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			taipingyaoshu:{
+				audio:true,
 				mode:['guozhan'],
 				fullskin:true,
 				type:'equip',
@@ -132,6 +137,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			yuxi:{
+				audio:true,
 				mode:['guozhan'],
 				fullskin:true,
 				type:'equip',
@@ -142,6 +148,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xietianzi:{
+				audio:true,
 				fullskin:true,
 				type:'trick',
 				enable:function(card,player,event){
@@ -177,6 +184,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			shuiyanqijunx:{
+				audio:'shuiyanqijun',
 				fullskin:true,
 				type:'trick',
 				filterTarget:function(card,player,target){
@@ -227,6 +235,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			lulitongxin:{
 				fullskin:true,
+				audio:true,
 				type:'trick',
 				enable:function(card,player){
 					return game.hasPlayer(function(current){
@@ -275,6 +284,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			lianjunshengyan:{
 				fullskin:true,
+				audio:true,
 				type:'trick',
 				enable:function(card,player){
 					if(get.mode()=='guozhan') return !player.isUnseen();
@@ -364,6 +374,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			chiling:{
 				fullskin:true,
+				audio:true,
 				type:'trick',
 				enable:true,
 				mode:['guozhan'],
@@ -436,6 +447,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			diaohulishan:{
 				fullskin:true,
+				audio:true,
 				type:'trick',
 				enable:true,
 				global:'g_diaohulishan',
@@ -484,6 +496,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			huoshaolianying:{
 				fullskin:true,
+				audio:true,
 				type:'trick',
 				filterTarget:function(card,player,target){
 					if(get.mode()=='guozhan'){

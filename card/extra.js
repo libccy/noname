@@ -718,6 +718,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					if(!trigger.baseDamage) trigger.baseDamage=1;
 					trigger.baseDamage+=player.storage.jiu;
+					trigger.jiu=true;
 					game.broadcastAll(function(player){
 						player.removeSkill('jiu');
 					},player);

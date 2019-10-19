@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connectBanned:['diy_tianyu','diy_yangyi','diy_lukang','ns_huamulan','ns_yuji','ns_duangui','ns_liuzhang'],
 		character:{
 			diy_wenyang:['male','wei','4/6',['lvli','choujue']],
-			key_lucia:['female','qun','1/3',['lucia_duqu','lucia_zhenren']],
+			key_lucia:['female','qun','1/2',['lucia_duqu','lucia_zhenren']],
 			key_kyousuke:['male','qun',4,['nk_shekong','key_huanjie']],
 			key_yuri:['female','qun',3,['yuri_xingdong','key_huanjie','yuri_wangxi'],['zhu']],
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
@@ -225,6 +225,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('yuri_wangxi',trigger.player);
 						player.awakenSkill('yuri_wangxi');
 						game.broadcastAll(function(source){
+							if(source.node.dieidentity){
+								source.node.dieidentity.innerHTML='忠臣';
+							}
 							source.revive(2,false);
 							source.identity='zhong';
 							source.setIdentity();

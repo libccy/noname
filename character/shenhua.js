@@ -622,7 +622,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			'drlt_yongsi1':{
 				mod:{
 					maxHandcard:function (player,num){
-						return num+player.maxHp-2*player.hp;
+						return num+player.maxHp-2*Math.max(0,player.hp);
 					},
 				},
 			},
@@ -2361,21 +2361,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						num=1
 					}
+					var map={};
+					var list=[];
+					for(var i=1;i<=player.hp;i++){
+						var cn=get.cnNumber(i,true);
+						map[cn]=i;
+						list.push(cn);
+					}
+					event.map=map;
 					player.awakenSkill('qimou');
 					player.storage.qimou=true;
-					player.chooseControl('一','二','三','四','五','六',function(){
+					player.chooseControl(list,function(){
 						return get.cnNumber(_status.event.goon,true);
 					}).set('prompt','失去任意点体力').set('goon',num);
 					'step 1'
-					var num;
-					switch(result.control){
-						case '一':num=1;break;
-						case '二':num=2;break;
-						case '三':num=3;break;
-						case '四':num=4;break;
-						case '五':num=5;break;
-						case '六':num=6;break;
-					}
+					var num=event.map[result.control]||1;
 					player.storage.qimou2=num;
 					player.loseHp(num);
 					player.addTempSkill('qimou2');
@@ -3794,10 +3794,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.hp<player.maxHp;
 				},
 				check:function(event,player){
-					if(player.maxHp-player.hp<2){
+					if(player.getDamagedHp()<2){
 						return false;
 					}
-					else if(player.maxHp-player.hp==2){
+					else if(player.getDamagedHp()==2){
 						return player.countCards('h')>=2;
 					}
 					return true;
@@ -3805,7 +3805,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					trigger.cancel();
-					event.cards=get.cards(player.maxHp-player.hp);
+					event.cards=get.cards(player.getDamagedHp());
 					player.showCards(event.cards);
 					"step 1"
 					var num=0;
@@ -3916,7 +3916,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
-					player.chooseTarget(get.prompt('fangzhu'),'令一名其他角色将武将牌翻面并摸'+get.cnNumber(player.maxHp-player.hp)+'张牌',function(card,player,target){
+					player.chooseTarget(get.prompt('fangzhu'),'令一名其他角色将武将牌翻面并摸'+get.cnNumber(player.getDamagedHp())+'张牌',function(card,player,target){
 						return player!=target
 					}).ai=function(target){
 						if(target.hasSkillTag('noturn')) return 0;
@@ -3924,19 +3924,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.attitude(_status.event.player,target)==0) return 0;
 						if(get.attitude(_status.event.player,target)>0){
 							if(target.classList.contains('turnedover')) return 1000-target.countCards('h');
-							if(player.maxHp-player.hp<3) return -1;
+							if(player.getDamagedHp()<3) return -1;
 							return 100-target.countCards('h');
 						}
 						else{
 							if(target.classList.contains('turnedover')) return -1;
-							if(player.maxHp-player.hp>=3) return -1;
+							if(player.getDamagedHp()>=3) return -1;
 							return 1+target.countCards('h');
 						}
 					}
 					"step 1"
 					if(result.bool){
 						player.logSkill('fangzhu',result.targets);
-						result.targets[0].draw(player.maxHp-player.hp);
+						result.targets[0].draw(player.getDamagedHp());
 						result.targets[0].turnOver();
 					}
 				},
@@ -4303,7 +4303,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['sunce'],
 				trigger:{player:'phaseBegin'},
 				filter:function(event,player){
-					return player.hp<player.maxHp;
+					return player.getDamagedHp()>0;
 				},
 				direct:true,
 				content:function(){
@@ -4312,20 +4312,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return player!=target;
 					}).set('ai',function(target){
 						var player=_status.event.player;
-						if(player.maxHp-player.hp==1&&target.countCards('he')==0){
+						if(player.getDamagedHp()==1&&target.countCards('he')==0){
 							return 0;
 						}
 						if(get.attitude(_status.event.player,target)>0){
 							return 10+get.attitude(_status.event.player,target);
 						}
-						if(player.maxHp-player.hp==1){
+						if(player.getDamagedHp()==1){
 							return -1;
 						}
 						return 1;
 					});
 					"step 1"
 					if(result.bool){
-						event.num=player.maxHp-player.hp;
+						event.num=player.getDamagedHp();
 						player.logSkill(event.name,result.targets);
 						event.target=result.targets[0];
 						if(event.num==1){
@@ -4436,7 +4436,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(player.hp==player.maxHp) return 'baonue_hp';
 						if(player.hp<player.maxHp-1||player.hp<=2) return 'baonue_maxHp';
 						return 'baonue_hp';
-					});
+					}).set('prompt','崩坏：失去1点体力或减1点体力上限');
 					"step 1"
 					if(result.control=='baonue_hp'){
 						player.loseHp();
@@ -5650,8 +5650,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				audio:false,
 				vanish:true,
+				charlotte:true,
 				content:function(){
-					if(player.hp<player.maxHp) player.draw(player.maxHp-player.hp);
+					if(player.getDamagedHp()) player.draw(player.getDamagedHp());
 					player.removeSkill('tianxiang2');
 					player.popup('tianxiang');
 				}
@@ -5781,7 +5782,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				vanish:true,
 				content:function(){
 					if(player.isDamaged()){
-						player.draw(player.maxHp-player.hp);
+						player.draw(player.getDamagedHp());
 					}
 					player.removeSkill('retianxiang2');
 				},
@@ -6005,10 +6006,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					player.nodying=true;
-					if(player.hp<0){
-						player.hp=0;
-						player.update();
-					}
 				},
 				subSkill:{
 					recover:{
@@ -6020,18 +6017,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						popup:false,
 						content:function(){
 							'step 0'
-							if(player.hp>=player.storage.gzbuqu.length){
-								player.hp-=player.storage.gzbuqu.length-1;
-								player.update();
-								while(player.storage.gzbuqu.length){
-									player.storage.gzbuqu.shift().discard();
-								}
-								player.unmarkSkill('gzbuqu');
-								delete player.nodying;
-								event.finish();
-							}
-							else{
-								player.chooseCardButton('移去'+get.cnNumber(player.hp)+'张不屈牌',true,player.hp,player.storage.gzbuqu).set('ai',function(button){
+							event.count=trigger.num;
+							'step 1'
+							event.count--;
+							if((player.hp+player.storage.gzbuqu.length)>1){
+								player.chooseCardButton('移去一张不屈牌',true,player.storage.gzbuqu).set('ai',function(button){
 									var buttons=get.selectableButtons();
 									for(var i=0;i<buttons.length;i++){
 										if(buttons[i]!=button&&
@@ -6042,31 +6032,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									}
 									return 0;
 								});
-								player.hp=0;
-								player.update();
 							}
-							'step 1'
+							'step 2'
 							for(var i=0;i<result.links.length;i++){
 								result.links[i].discard();
 								player.storage.gzbuqu.remove(result.links[i]);
 							}
 							player.$throw(result.links);
 							game.log(player,'移去了不屈牌',result.links);
+							if(event.count) event.goto(1);
+							'step 3'
 							lib.skill.gzbuqu.process(player);
 						}
 					}
 				},
 				content:function(){
 					'step 0'
-					var num=-player.hp;
-					if(!player.storage.gzbuqu.length){
-						num++;
-					}
+					var num=(-trigger.num-Math.max(player.hp-trigger.num,1)+1)
 					player.storage.gzbuqu.addArray(get.cards(num));
 					event.trigger("addCardToStorage");
 					player.showCards(get.translation(player)+'的不屈牌',player.storage.gzbuqu);
-					player.hp=0;
-					player.update();
 					'step 1'
 					lib.skill.gzbuqu.process(player);
 				},

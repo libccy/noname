@@ -1050,7 +1050,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(get.prompt2('xinfu_lingren'),function(card,player,target){
 						return trigger.targets.contains(target);
 					}).set('ai',function(target){
-						return -get.attitude(_status.event.player,target);
+						return 2-get.attitude(_status.event.player,target);
 					});
 					'step 1'
 					if(result.bool){
@@ -1966,7 +1966,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function (){
 					"step 0"
 					trigger.source.chooseBool('【许身】：是否将自己的一张武将牌替换为“关索”？').set('ai',function(){
-						return true;
+						return false;
 					});
 					"step 1"
 					if(result.bool){
@@ -3618,12 +3618,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					switch(result.control){
 						case '递增':{
 							player.logSkill('xinfu_guanchao');
-							player.addTempSkill('xinfu_guanchao_dizeng');
+							player.addTempSkill('xinfu_guanchao_dizeng','phaseUseEnd');
 							break;
 						}
 						case '递减':{
 							player.logSkill('xinfu_guanchao');
-							player.addTempSkill('xinfu_guanchao_dijian');
+							player.addTempSkill('xinfu_guanchao_dijian','phaseUseEnd');
 							break;
 						}
 						case '取消':{
@@ -5199,7 +5199,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				content:function (){
+					"step 0"
+					event.count=1;
+					if(trigger.name=='discard'){
+						event.count=0;
+						for(var i=0;i<trigger.cards.length;i++){
+							if(get.color(trigger.cards[i])=='red'&&trigger.cards[i].original!='j') event.count++;
+						}
+					}
+					"step 1"
 					player.draw();
+					event.count--;
+					"step 2"
+					if(event.count){
+						if(lib.config.autoskilllist.contains('mingzhe')) player.chooseBool(get.prompt2('mingzhe'));
+						else event._result={bool:true};
+					}
+					else event.finish();
+					"step 3"
+					if(result.bool){
+						player.logSkill('qc_mingzhe');
+						event.goto(1);
+					}
 				},
 				ai:{
 					threaten:0.7,

@@ -232,9 +232,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_shibing2qun:['female','qun',0,[],['unseen']],
 
 				gz_caocao:['male','wei',4,['jianxiong']],
-				gz_simayi:['male','wei',3,['fankui','guicai']],
+				gz_simayi:['male','wei',3,['fankui','reguicai']],
 				gz_xiahoudun:['male','wei',4,['ganglie']],
-				gz_zhangliao:['male','wei',4,['tuxi']],
+				gz_zhangliao:['male','wei',4,['retuxi']],
 				gz_xuzhu:['male','wei',4,['luoyi']],
 				gz_guojia:['male','wei',3,['tiandu','new_yiji'],['gzskin']],
 				gz_zhenji:['female','wei',3,['luoshen','qingguo'],['gzskin']],
@@ -2687,12 +2687,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(get.attitude(_status.event.player,target)==0) return 0;
 						if(get.attitude(_status.event.player,target)>0){
 							if(target.classList.contains('turnedover')) return 1000-target.countCards('h');
-							if(player.maxHp-player.hp<3) return -1;
+							if(player.getDamagedHp()<3) return -1;
 							return 100-target.countCards('h');
 						}
 						else{
 							if(target.classList.contains('turnedover')) return -1;
-							if(player.maxHp-player.hp>=3) return -1;
+							if(player.getDamagedHp()>=3) return -1;
 							return 1+target.countCards('h');
 						}
 					}
@@ -2704,7 +2704,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var player=_status.event.player;
 							if(player.isTurnedOver()) return -1;
 							return (player.hp*player.hp)-get.value(card);
-						}).set('prompt','弃置一张手牌并失去一点体力；或选择不弃置，将武将牌翻面并摸'+(player.maxHp-player.hp)+'张牌。');
+						}).set('prompt','弃置一张手牌并失去一点体力；或选择不弃置，将武将牌翻面并摸'+(player.getDamagedHp())+'张牌。');
 					}
 					else event.finish();
 					"step 2"
@@ -2712,7 +2712,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.target.loseHp();
 					}
 					else{
-						event.target.draw(player.maxHp-player.hp);
+						event.target.draw(player.getDamagedHp());
 						event.target.turnOver();
 					}
 				},
@@ -2850,6 +2850,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			hmkyuanyu:{
+				audio:'zongkui',
 				trigger:{
 					player:"damageBegin",
 				},
@@ -2877,6 +2878,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			hmkguishu:{
+				audio:'bmcanshi',
 				group:["hmkguishu_reset"],
 				subSkill:{
 					reset:{
@@ -2925,6 +2927,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 					backup:function (links,player){
 						return {
+							audio:'bmcanshi',
 							filterCard:function (card,player){
 								return get.suit(card)=='spade';
 							},
@@ -3998,7 +4001,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzqice:{
 				enable:'phaseUse',
 				usable:1,
-				audio:"qice",
+				audio:"qice_backup",
 				filter:function(event,player){
 					return player.countCards('h')>0
 				},
@@ -4107,7 +4110,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 								return lib.filter.filterTarget(card,player,target);
 							},
-							audio:2,
+							audio:'qice_backup',
 							popname:true,
 							viewAs:{name:links[0][2]},
 							ai1:function(){
@@ -8122,7 +8125,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(name2.indexOf('gz_shibing')==0) return false;
 					if(lib.character[name1][1]!=lib.character[name2][1]) return false;
 					if(get.is.jun(this.name1)) return true;
-					var list=['re','diy','sp','jsp','shen','jg','xin','old','gz'];
+					var list=['re','diy','sp','jsp','shen','jg','xin','old','gz','ol'];
 					for(var i=0;i<list.length;i++){
 						if(name1.indexOf(list[i]+'_')==0){
 							name1=name1.slice(list[i].length+1);
