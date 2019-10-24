@@ -234,7 +234,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_caocao:['male','wei',4,['jianxiong']],
 				gz_simayi:['male','wei',3,['fankui','reguicai']],
 				gz_xiahoudun:['male','wei',4,['ganglie']],
-				gz_zhangliao:['male','wei',4,['retuxi']],
+				gz_zhangliao:['male','wei',4,['new_retuxi']],
 				gz_xuzhu:['male','wei',4,['luoyi']],
 				gz_guojia:['male','wei',3,['tiandu','new_yiji'],['gzskin']],
 				gz_zhenji:['female','wei',3,['luoshen','qingguo'],['gzskin']],
