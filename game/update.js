@@ -1,6 +1,6 @@
 window.noname_update={
-	version:'1.9.94.1.1',
-	update:'1.9.94.1',
+	version:'1.9.94.1.2',
+	update:'1.9.94.1.1',
 	changeLog:[
 		'BUG修复',
 	],
@@ -22,7 +22,7 @@ window.noname_update={
 		//'character/xinghuoliaoyuan.js',
 		'character/yijiang.js',
 		//'mode/doudizhu.js',
-		'mode/guozhan.js',
+		//'mode/guozhan.js',
 		//'mode/boss.js',
 		//'game/game.js',
 	]
