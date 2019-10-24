@@ -9497,6 +9497,9 @@
 		},
 		element:{
 			content:{
+				emptyEvent:function(){
+					event.trigger(event.name);
+				},
 				chooseUseTarget:function(){
 					'step 0'
 					if(cards&&get.itemtype(card)!='card'){
@@ -13243,6 +13246,11 @@
 						event.oncard(event.card,event.player);
 					}
 					event.excluded=[];
+					event.directHit=[];
+					event.trigger('useCard1');
+					"step 1"
+					event.trigger('useCard2');
+					"step 2"
 					event.trigger('useCard');
 					event._oncancel=function(){
 						game.broadcastAll(function(id){
@@ -13310,7 +13318,7 @@
 							}
 						}
 					}
-					"step 1"
+					"step 3"
 					var info=get.info(card);
 					if(info.contentBefore){
 						var next=game.createEvent(card.name+'ContentBefore');
@@ -13332,23 +13340,97 @@
 						next.type='precard';
 						if(event.forceDie) next.forceDie=true;
 					}
-					"step 2"
-					var info=get.info(card);
-					if(num==0&&targets.length>1){
-						if(!info.multitarget){
-							if(!event.fixedSeat){
-								targets.sortBySeat(player);
+					"step 4"
+					event.sortTarget=function(animate){
+						var info=get.info(card);
+						if(num==0&&targets.length>1){
+							if(!info.multitarget){
+								if(!event.fixedSeat){
+									targets.sortBySeat(player);
+								}
+								if(animate)	for(var i=0;i<targets.length;i++){
+									targets[i].animate('target');
+								}
 							}
-							for(var i=0;i<targets.length;i++){
-								targets[i].animate('target');
-							}
-						}
-						else{
-							for(var i=0;i<targets.length;i++){
-								targets[i].animate('target');
+						else if(animate){
+								for(var i=0;i<targets.length;i++){
+									targets[i].animate('target');
+								}
 							}
 						}
 					}
+					event.sortTarget();
+					event.getTriggerTarget=function(list1,list2){
+						for(var i=0;i<list1.length;i++){
+							if(!list2.contains(list1[i])) return list1[i];
+						}
+						return null;
+					}
+					"step 5"
+					if(!event.triggeredTargets1) event.triggeredTargets1=[];
+					var target=event.getTriggerTarget(targets,event.triggeredTargets1);
+					if(target){
+						event.triggeredTargets1.push(target);
+						var next=game.createEvent('useCardToPlayer',false);
+						next.setContent('emptyEvent');
+						next.targets=targets;
+						next.target=target;
+						next.card=card;
+						next.cards=cards;
+						next.player=player;
+						if(event.forceDie) next.forceDie=true;
+						event.redo();
+					}
+					"step 6"
+					if(!event.triggeredTargets2) event.triggeredTargets2=[];
+					var target=event.getTriggerTarget(targets,event.triggeredTargets2);
+					if(target){
+						event.triggeredTargets2.push(target);
+						var next=game.createEvent('useCardToTarget',false);
+						next.setContent('emptyEvent');
+						next.targets=targets;
+						next.target=target;
+						next.card=card;
+						next.cards=cards;
+						next.player=player;
+						if(event.forceDie) next.forceDie=true;
+						event.redo();
+					}
+					"step 7"
+					if(!event.triggeredTargets3) event.triggeredTargets3=[];
+					var target=event.getTriggerTarget(targets,event.triggeredTargets3);
+					if(target){
+						event.triggeredTargets3.push(target);
+						var next=game.createEvent('useCardToPlayered',false);
+						next.setContent('emptyEvent');
+						next.targets=targets;
+						next.target=target;
+						next.card=card;
+						next.cards=cards;
+						next.player=player;
+						if(event.forceDie) next.forceDie=true;
+						event.redo();
+					}
+					"step 8"
+					if(!event.triggeredTargets4) event.triggeredTargets4=[];
+					var target=event.getTriggerTarget(targets,event.triggeredTargets4);
+					if(target){
+						event.triggeredTargets4.push(target);
+						var next=game.createEvent('useCardToTargeted',false);
+						next.setContent('emptyEvent');
+						next.targets=targets;
+						next.target=target;
+						next.card=card;
+						next.cards=cards;
+						next.player=player;
+						if(event.forceDie) next.forceDie=true;
+						event.redo();
+					}
+					"step 9"
+					if(num==0&&targets.length>1){
+						event.sortTarget(true);
+					}
+					var info=get.info(card);
 					if(targets[num]&&targets[num].isDead()) return;
 					if(targets[num]&&targets[num].isOut()) return;
 					if(targets[num]&&targets[num].removed) return;
@@ -13376,6 +13458,7 @@
 						event.targetDelay=false;
 					}
 					next.target=targets[num];
+					if(next.target&&event.directHit.contains(next.target)) next.directHit=true;
 					if(next.target&&!info.multitarget){
 						if(num==0&&targets.length>1){
 							// var ttt=next.target;
@@ -13401,12 +13484,12 @@
 							game.delayx(0.5);
 						}
 					}
-					"step 3"
+					"step 10"
 					if(!get.info(event.card).multitarget&&num<targets.length-1&&!event.cancelled){
 						event.num++;
-						event.goto(2);
+						event.goto(9);
 					}
-					"step 4"
+					"step 11"
 					if(get.info(card).contentAfter){
 						var next=game.createEvent(card.name+'ContentAfter');
 						next.setContent(get.info(card).contentAfter);
@@ -13418,7 +13501,7 @@
 						next.type='postcard';
 						if(event.forceDie) next.forceDie=true;
 					}
-					"step 5"
+					"step 12"
 					if(event.postAi){
 						event.player.logAi(event.targets,event.card);
 					}
@@ -13432,7 +13515,7 @@
 					else{
 						event.finish();
 					}
-					"step 6"
+					"step 13"
 					event._oncancel();
 				},
 				useSkill:function(){
@@ -15554,7 +15637,8 @@
 					setTimeout(function(){
 						dialog.delete();
 					},2000);
-					var info=[get.translation(this.name)||this.nickname,str];
+					var name=get.translation(this.name);
+					var info=[name?(name+'['+this.nickname+']'):this.nickname,str];
 					lib.chatHistory.push(info);
 					if(_status.addChatEntry){
 						if(_status.addChatEntry._origin.parentNode){
@@ -22468,7 +22552,7 @@
 					if(!lib.hookmap[name]&&!lib.config.compatiblemode) return;
 					if(!game.players||!game.players.length) return;
 					var event=this;
-					var start=event.player||game.me||game.players[0];
+					var start=event.source||event.player||game.me||game.players[0];
 					if(!game.players.contains(start)){
 						start=game.findNext(start);
 					}

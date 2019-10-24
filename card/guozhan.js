@@ -156,8 +156,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(player.hasSkill('xietianzi')) return false;
 					if(_status.currentPhase!=player) return false;
 					var evt=event||_status.event;
-					var evt2=evt.getParent('chooseToUse');
-					return evt.type=='phase'||evt2.type=='phase';
+					if(evt.name!='chooseToUse') evt=evt.getParent('chooseToUse');
+					return evt.type=='phase';
 				},
 				filterTarget:function(card,player,target){
 					return player==target;
@@ -376,7 +376,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				audio:true,
 				type:'trick',
-				enable:true,
+				enable:function(){
+					return game.hasPlayer(function(current){
+						return current.isUnseen();
+					});
+				},
 				mode:['guozhan'],
 				global:['g_chiling1','g_chiling2','g_chiling3'],
 				filterTarget:function(card,player,target){
@@ -760,9 +764,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			minguangkai_cancel:{
-				trigger:{target:'useCardToBefore'},
+				trigger:{target:'useCardToTarget'},
 				forced:true,
-				priority:15,
 				check:function(event,player){
 					return get.effect(event.target,event.card,event.player,player)<0;
 				},
@@ -861,14 +864,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			feilongduofeng:{
-				trigger:{player:'shaBegin'},
-				priority:7,
+				trigger:{player:'useCardToPlayered'},
 				logTarget:'target',
 				check:function(event,player){
 					return get.attitude(player,event.target)<=0;
 				},
 				filter:function(event,player){
-					return event.target.countCards('he');
+					return event.card.name=='sha'&&event.target.countCards('he');
 				},
 				content:function(){
 					trigger.target.chooseToDiscard('he',true);

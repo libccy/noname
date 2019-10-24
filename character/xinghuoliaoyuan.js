@@ -1036,10 +1036,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				audio:2,
 				trigger:{
-					player:"useCard",
+					player:"useCardToPlayered",
 				},
 				direct:true,
 				filter:function (event,player){
+					if(event.getParent().triggeredTargets3.length>1) return false;
 					if(!player.isPhaseUsing()) return false;
 					if(!['basic','trick'].contains(get.type(event.card))) return false;
 					if(get.tag(event.card,'damage')) return true;
@@ -2253,11 +2254,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_zhennan":{
 				audio:2,
 				trigger:{
-					global:"useCard",
+					target:"useCardToTargeted",
 				},
 				filter:function (event,player){
-					if(event.card.name!='nanman') return false;
-					return event.targets.contains(player);
+					return event.card.name=='nanman';
 				},
 				direct:true,
 				content:function (){
@@ -2861,11 +2861,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				audio:2,
 				trigger:{
-					player:"useCard",
+					player:"useCardToPlayered",
 				},
 				frequent:true,
 				filter:function (event,player){
 					if(player!=_status.currentPhase) return false;
+					if(event.getParent().triggeredTargets>1) return false;
 					if(get.type(event.card)=='equip'&&get.subtype(event.card)!='equip1') return false;
 					if(event.targets.contains(player)) return true;
 					return false;
@@ -3778,11 +3779,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_tushe":{
 				audio:2,
 				trigger:{
-					player:"useCard",
+					player:"useCardToPlayered",
 				},
 				frequent:true,
 				filter:function (event,player){
 					if(get.type(event.card)=='equip') return false;
+					if(event.getParent().triggeredTargets>1) return false;
 					return event.targets.length>0&&!player.countCards('h',{type:'basic',});
 				},
 				content:function (){

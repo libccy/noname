@@ -1,7 +1,8 @@
 window.noname_update={
-	version:'1.9.94',
-	update:'1.9.93.3.2',
+	version:'1.9.94.1',
+	update:'1.9.94',
 	changeLog:[
+		'管辂，葛玄',
 		'BUG修复',
 	],
 	files:[
@@ -10,7 +11,7 @@ window.noname_update={
 		'card/standard.js',
 		//'card/swd.js',
 		'card/guozhan.js',
-		'character/diy.js',
+		//'character/diy.js',
 		'character/extra.js',
 		'character/mobile.js',
 		'character/old.js',
@@ -18,7 +19,7 @@ window.noname_update={
 		'character/shenhua.js',
 		'character/sp.js',
 		//'character/tw.js',
-		//'character/standard.js',
+		'character/standard.js',
 		'character/xinghuoliaoyuan.js',
 		'character/yijiang.js',
 		//'mode/doudizhu.js',

@@ -481,10 +481,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			zhungangshuo:{
-				trigger:{player:'shaBegin'},
+				trigger:{player:'useCardToPlayered'},
 				logTarget:'target',
 				filter:function(event,player){
-					return event.player.countCards('h')||player.countCards('h');
+					return event.card.name=='sha'&&(event.player.countCards('h')||player.countCards('h'));
 				},
 				check:function(event,player){
 					var target=event.target;

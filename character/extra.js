@@ -143,7 +143,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.range={
 						手牌区:['h','e','j'],
 						装备区:['e','h','j'],
-						判定区:['j','e','h'],
+						判定区:['j','h','e'],
 					}[result.control||'手牌区'];
 					"step 3"
 					if(num<event.targets.length){

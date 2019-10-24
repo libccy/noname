@@ -2057,10 +2057,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				audio:"kongcheng",
 				trigger:{
-					target:"useCardToBefore",
+					target:"useCardToTarget",
 				},
 				forced:true,
-				priority:15,
 				check:function (event,player){
 					return get.effect(event.target,event.card,event.player,player)<0;
 				},
@@ -2068,7 +2067,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return player.countCards('h')==0&&(event.card.name=='sha'||event.card.name=='juedou');
 				},
 				content:function (){
-					trigger.cancel();
+					trigger.getParent().targets.remove(player);
 				},
 				ai:{
 					effect:{
@@ -2788,10 +2787,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"new_tieji":{
 				audio:"retieji",
 				trigger:{
-					player:"shaBegin",
+					player:"useCardToPlayered",
 				},
 				check:function (event,player){
 					return get.attitude(player,event.target)<0;
+				},
+				filter:function(event){
+					return event.card.name=='sha';
 				},
 				logTarget:"target",
 				content:function (){
@@ -2845,7 +2847,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}).set('num',num).set('suit',suit);
 					"step 4"
 					if(!result.bool){
-						trigger.directHit=true;
+						trigger.getParent().directHit.add(trigger.target);
 					}
 				},
 			},
@@ -3414,7 +3416,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					use:{
-						trigger:{global:'useCardToBefore'},
+						trigger:{global:'useCardToTarget'},
 						filter:function(event,player){
 							if(!['basic','trick'].contains(get.type(event.card,'trick'))) return false;
 							return event.target&&player.sameIdentityAs(event.target)&&event.targets.length==1&&player.storage.qianhuan.length;
@@ -3464,7 +3466,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								game.cardsDiscard(card);
 								player.$throw(card);
 								player.logSkill('qianhuan',trigger.player);
-								trigger.cancel();
+								trigger.getParent().targets.remove(trigger.target);
 							}
 						}
 					}
@@ -5130,9 +5132,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			yicheng:{
-				trigger:{global:'shaBegin'},
+				trigger:{global:'useCardToTargeted'},
 				filter:function(event,player){
-					return event.target.isFriendOf(player);
+					return event.card.name=='sha'&&event.target.isFriendOf(player);
 				},
 				logTarget:'target',
 				content:function(){
@@ -5356,9 +5358,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			fengshi_sha:{
 				audio:'fengshi',
-				trigger:{player:'shaBegin'},
+				trigger:{player:'useCardToPlayered'},
 				filter:function(event,player){
-					if(game.countPlayer()<4) return false;
+					if(event.card.name!='sha'&&game.countPlayer()<4) return false;
 					return player.siege(event.target)&&game.hasPlayer(function(current){
 						return current.hasSkill('fengshi')&&current.siege(event.target);
 					})&&event.target.countCards('e');
@@ -5685,7 +5687,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			gzweimu:{
 				audio:'weimu',
-				trigger:{target:'useCardToBefore',player:'addJudgeBefore'},
+				trigger:{target:'useCardToTarget',player:'addJudgeBefore'},
 				forced:true,
 				priority:15,
 				check:function(event,player){
@@ -5695,12 +5697,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return get.type(event.card,'trick')=='trick'&&get.color(event.card)=='black';
 				},
 				content:function(){
-					trigger.cancel();
 					if(trigger.name=='addJudge'){
+						trigger.cancel();
 						for(var i=0;i<trigger.cards.length;i++){
 							trigger.cards[i].discard();
 						}
 					}
+					else trigger.getParent().targets.remove(player);
 				},
 				ai:{
 					effect:{
@@ -5712,7 +5715,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			gzqianxun:{
 				audio:'reqianxun',
-				trigger:{target:'useCardToBefore',player:'addJudgeBefore'},
+				trigger:{target:'useCardToTarget',player:'addJudgeBefore'},
 				forced:true,
 				priority:15,
 				check:function(event,player){
@@ -5722,12 +5725,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return event.card.name=='shunshou'||event.card.name=='lebu';
 				},
 				content:function(){
-					trigger.cancel();
 					if(trigger.name=='addJudge'){
+						trigger.cancel();
 						for(var i=0;i<trigger.cards.length;i++){
 							trigger.cards[i].discard();
 						}
 					}
+					else trigger.getParent().targets.remove(player);
 				},
 				ai:{
 					effect:{
@@ -5739,7 +5743,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			gzkongcheng:{
 				audio:'kongcheng',
-				trigger:{target:'useCardToBefore'},
+				trigger:{target:'useCardToTarget'},
 				forced:true,
 				priority:15,
 				check:function(event,player){
@@ -5749,7 +5753,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return player.countCards('h')==0&&(event.card.name=='sha'||event.card.name=='juedou');
 				},
 				content:function(){
-					trigger.cancel();
+					trigger.getParent().targets.remove(player);
 				},
 				ai:{
 					effect:{
@@ -7344,8 +7348,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			duoshi_info:'出牌阶段限四次，你可以将一张红色手牌当【以逸待劳】使用。',
 			gzxiaoguo:'骁果',
 			gzxiaoguo_info:'其他角色的结束阶段开始时，你可以弃置一张基本牌，令该角色选择一项：1.弃置一张装备牌；2.受到你对其造成的1点伤害。',
-			gzduanliang:'断粮',
-			gzduanliang_info:'你可以将一张黑色基本牌或黑色装备牌当【兵粮寸断】使用；你可以对距离为2的角色使用【兵粮寸断】',
 			
 			guozhan_default:"国战标准",
 			guozhan_zhen:"君临天下•阵",
@@ -7445,6 +7447,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			['heart',1,'wanjian'],
 			['heart',2,'shan'],
 			['heart',2,'huogong','fire'],
+			['heart',3,'wugu'],
 			['heart',3,'taipingyaoshu'],
 			['heart',3,'huogong','fire'],
 			['heart',4,'tao'],

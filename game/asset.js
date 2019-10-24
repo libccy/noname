@@ -2279,7 +2279,17 @@ window.noname_asset_list=[
 	'image/character/ol_yujin.jpg',
 	'image/character/ol_zhangrang.jpg',
 	'image/character/ol_zhuran.jpg',
-
+	'image/character/ol_liuyu.jpg','
+	'image/character/ol_wuyi.jpg',
+	'image/character/guanlu.jpg',
+	'image/character/gexuan.jpg',
+	'image/character/re_huangzhong.jpg',
+	'image/character/re_pangde.jpg',
+	'image/character/re_weiyan.jpg',
+	'image/character/re_xiahouyuan.jpg',
+	'image/character/re_xiaoqiao.jpg',
+	'image/character/re_xuhuang.jpg',
+	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
 	'image/character/beimihu.jpg',

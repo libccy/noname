@@ -645,7 +645,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				silent:true,
 				popup:false,
-				onremove:true,
 				content:function(){
 					trigger.xinzhanyi=true;
 					player.storage.xinzhanyi_basic1=true;
@@ -665,6 +664,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinzhanyi_basic:{
 				group:['xinzhanyi_basic1','xinzhanyi_basic2'],
+				onremove:function(p,s){
+					delete p.storage[s+1];
+				},
 				enable:"chooseToUse",
 				filter:function (event,player){
 					if(event.filterCard({name:'sha'},player,event)||
@@ -759,10 +761,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinzhanyi_equip:{
 				audio:'zhanyi',
-				trigger:{player:'shaBegin'},
+				trigger:{player:'useCardToPlayered'},
 				forced:true,
 				filter:function(event,player){
-					return event.target.countCards('he')>0;
+					return event.card.name=='sha'&&event.target.countCards('he')>0;
 				},
 				check:function(event,player){
 					return get.attitude(player,event.target)<0;

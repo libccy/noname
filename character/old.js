@@ -4,18 +4,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'old',
 		characterSort:{
 			old:{
-				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_zhoutai","old_caoren"],
+				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_zhoutai","old_caoren","xiahouyuan","xiaoqiao","huangzhong","weiyan","xuhuang","pangde"],
 				old_refresh:["old_zhangfei","old_huatuo"],
 				old_yijiang1:["masu","xushu","fazheng","yujin","xin_yujin","old_xusheng","old_lingtong","ol_yujin"],
 				old_yijiang2:["old_madai","old_zhonghui","old_wangyi","old_guanzhang","ol_liaohua"],
 				old_yijiang3:["liru","old_zhuran","ol_zhuran","ol_manchong","ol_guohuai"],
-				old_yijiang4:["old_caozhen","old_chenqun","old_zhuhuan"],
+				old_yijiang4:["old_caozhen","old_chenqun","old_zhuhuan","ol_wuyi"],
 				old_yijiang5:["old_caoxiu","old_quancong","old_zhuzhi"],
-				old_yijiang67:["ol_xinxianying","ol_zhangrang"],
+				old_yijiang67:["ol_xinxianying","ol_zhangrang","ol_liuyu"],
 				old_sp:["old_caochun","old_lingju","old_maliang","old_machao","zhangliang","jsp_caoren","ol_guansuo"],
 			},
 		},
 		character:{
+			xuhuang:['male','wei',4,['gzduanliang']],
+			pangde:['male','qun',4,['mashu','mengjin']],
+			xiahouyuan:['male','wei',4,['shensu']],
+			huangzhong:['male','shu',4,['liegong']],
+			weiyan:['male','shu',4,['kuanggu']],
+			xiaoqiao:['female','wu',3,['tianxiang','hongyan']],
 			yuji:['male','qun',3,['old_guhuo'],['forbidai']],
 			zhangjiao:['male','qun',3,['leiji','guidao','huangtian'],['zhu']],
 			old_zhoutai:['male','wu',4,['gzbuqu']],
@@ -59,6 +65,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_guansuo:['male','shu',4,['zhengnan','xiefang']],
 			ol_manchong:['male','wei',3,['yuce','junxing']],
 			ol_guohuai:['male','wei',4,['jingce']],
+			ol_wuyi:['male','shu',4,['benxi']],
+			ol_liuyu:['male','qun',2,['zongzuo','zhige']],
 		},
 		characterFilter:{
 			old_lingju:function(mode){
@@ -865,6 +873,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_guansuo:'OL关索',
 			ol_manchong:'OL满宠',
 			ol_guohuai:'OL郭淮',
+			ol_wuyi:'OL吴懿',
+			ol_liuyu:'OL刘虞',
 
 			old_fuhun:'父魂',
 			old_fuhun_info:'摸牌阶段开始时，你可以放弃摸牌，改为从牌堆顶亮出两张牌并获得之，若亮出的牌颜色不同，你获得技能“武圣”、“咆哮”，直到回合结束。',

@@ -1436,39 +1436,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rejiuyuan2:{
 				audio:'jiuyuan',
 				forceaudio:true,
-				trigger:{player:'taoBegin'},
+				trigger:{player:'useCardToPlayer'},
 				filter:function(event,player){
+					if(event.card.name!='tao') return false;
 					if(player.group!='wu') return false;
 					if(event.target!=player) return false;
 					return game.hasPlayer(function(target){
-						return player!=target&&target.isDamaged()&&target.hp<player.hp&&target.hasZhuSkill('rejiuyuan',player);
+						return player!=target&&!event.targets.contains(target)&&target.isDamaged()&&target.hp<player.hp&&target.hasZhuSkill('rejiuyuan',player);
 					});
 				},
 				direct:true,
 				content:function(){
 					'step 0'
-					var list=game.filterPlayer(function(target){
-						return player!=target&&target.isDamaged()&&target.hp<player.hp&&target.hasZhuSkill('rejiuyuan',player);
-					});
-					list.sortBySeat();
-					event.list=list;
+					player.chooseTarget(get.prompt2('rejiuyuan'),function(card,player,target){
+						return player!=target&&!_status.event.targets.contains(target)&&target.isDamaged()&&target.hp<player.hp&&target.hasZhuSkill('rejiuyuan',player);
+					}).set('ai',function(target){
+						return get.attitude(_status.event.player,target);
+					}).set('targets',trigger.targets);
 					'step 1'
-					if(event.list.length){
-						var current=event.list.shift();
-						event.current=current;
-						player.chooseBool(get.prompt2('rejiuyuan',current)).set('choice',get.attitude(player,current)>0);
-					}
-					else{
-						event.finish();
-					}
-					'step 2'
 					if(result.bool){
-						trigger.cancel();
-						player.logSkill('rejiuyuan',event.current);
-						event.current.recover();
+						var target=result.targets[0];
+						player.logSkill('rejiuyuan2',target);
+						trigger.getParent().targets.remove(player);
+						trigger.getParent().targets.push(target);
 						player.draw();
 					}
-					event.goto(1);
 				}
 			},
 			rezhiheng:{
@@ -2653,9 +2645,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			retieji:{
 				audio:2,
 				audioname:['boss_lvbu3'],
-				trigger:{player:'shaBegin'},
+				trigger:{player:'useCardToPlayered'},
 				check:function(event,player){
 					return get.attitude(player,event.target)<0;
+				},
+				filter:function(event,player){
+					return event.card.name=='sha';
 				},
 				logTarget:'target',
 				content:function(){
@@ -2678,7 +2673,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('num',num).set('suit',suit);
 					"step 2"
 					if(!result.bool){
-						trigger.directHit=true;
+						trigger.getParent().directHit.add(trigger.target);
 					}
 				}
 			},
@@ -2935,9 +2930,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				mark:true,
 				limited:true,
-				trigger:{global:'useCard'},
+				trigger:{global:'useCardToPlayered'},
 				priority:5,
 				filter:function(event,player){
+					if(event.getParent().triggeredTargets3.length>1) return false;
 					if(get.type(event.card)!='trick') return false;
 					if(get.info(event.card).multitarget) return false;
 					if(event.targets.length<2) return false;
@@ -2952,7 +2948,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.chooseTarget(get.prompt('fenwei'),
 						[1,trigger.targets.length],function(card,player,target){
-						var evt=_status.event.getTrigger();
+						var evt=_status.event.getTrigger().getParent();
 						return evt.targets.contains(target)&&!evt.excluded.contains(target);
 					}).set('ai',function(target){
 						var trigger=_status.event.getTrigger();
@@ -2966,7 +2962,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.awakenSkill('fenwei');
 						player.logSkill('fenwei',result.targets);
 						player.storage.fenwei=true;
-						trigger.excluded.addArray(result.targets);
+						trigger.getParent.excluded.addArray(result.targets);
 						game.delay();
 					}
 				},

@@ -807,7 +807,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(card.name=='nanman'||card.name=='wanjian') return 'zerotarget';
 							if(card.name=='sha'){
 								var equip1=player.getEquip(1);
-								if(equip1&&equip1.name=='zhuque') return 2;
+								if(equip1&&equip1.name=='zhuque') return 1.9;
 								if(equip1&&equip1.name=='qinggang') return 1;
 								if(!card.nature) return 'zerotarget';
 							}
@@ -835,7 +835,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target,current){
 							if(card.name=='sha'){
-								if(card.nature=='fire'||player.hasSkill('zhuque_skill')) return 2;
+								if(card.nature=='fire') return 2;
+								if(player.hasSkill('zhuque_skill')) return 1.9;
 							}
 							if(get.tag(card,'fireDamage')&&current<0) return 2;
 						}
@@ -878,16 +879,22 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zhuque_skill:{
-				trigger:{player:'useCardToBefore'},
+				trigger:{player:'useCard1'},
 				priority:7,
 				filter:function(event,player){
 					if(event.card.name=='sha'&&!event.card.nature) return true;
 				},
 				audio:true,
 				check:function(event,player){
-					var eff1=get.effect(event.target,event.card,player,player);
-					var eff2=get.effect(event.target,{name:'sha',nature:'fire',suit:get.suit(event.card),number:get.number(event.card)},player,player);
-					return eff2>eff1;
+					var eff=0;
+					for(var i=0;i<event.targets.length;i++){
+						var target=event.targets[i];
+						var eff1=get.effect(target,event.card,player,player);
+						var eff2=get.effect(target,{name:'sha',nature:'fire',suit:get.suit(event.card),number:get.number(event.card)},player,player);
+						eff+=eff2;
+						eff-=eff1;
+					}
+					return eff>0;
 				},
 				content:function(){
 					trigger.card.nature='fire';

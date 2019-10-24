@@ -1426,9 +1426,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			tieji:{
 				audio:2,
-				trigger:{player:'shaBegin'},
+				trigger:{player:'useCardToPlayered'},
 				check:function(event,player){
 					return get.attitude(player,event.target)<=0;
+				},
+				filter:function(event,player){
+					return event.card.name=='sha';
 				},
 				logTarget:'target',
 				content:function(){
@@ -1444,7 +1447,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					"step 1"
 					if(result.bool){
-						trigger.directHit=true;
+						trigger.getParent().directHit.add(trigger.target);
 					}
 				}
 			},
@@ -1829,10 +1832,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuli:{
 				audio:2,
 				audioname:['re_daqiao','daxiaoqiao'],
-				trigger:{target:'shaBefore'},
+				trigger:{target:'useCardToTarget'},
 				direct:true,
-				priority:5,
 				filter:function(event,player){
+					if(event.card.name!='sha') return false;
 					if(player.countCards('he')==0) return false;
 					return game.hasPlayer(function(current){
 						return get.distance(player,current,'attack')<=1&&current!=event.player&&
@@ -1846,6 +1849,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filterCard:lib.filter.cardDiscardable,
 						filterTarget:function(card,player,target){
 							var trigger=_status.event.getTrigger();
+							if(trigger.targets.contains(target)) return false;
 							if(get.distance(player,target,'attack')<=1&&
 								target!=trigger.player){
 								if(player.canUse(trigger.card,target)) return true;
@@ -1875,24 +1879,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					"step 1"
 					if(result.bool){
-						player.discard(result.cards);
 						var target=result.targets[0];
 						player.logSkill(event.name,target);
-						trigger.target=target;
+						player.discard(result.cards);
 						var evt=trigger.getParent();
-						if(evt&&evt.targets&&evt.num){
-							trigger.targets[evt.num]=target;
-							evt.targets[evt.num]=target;
-						}
+						evt.targets.remove(player);
+						evt.targets.push(target);
 					}
-					else{
-						event.finish();
-					}
-					"step 2"
-					trigger.untrigger();
-					trigger.trigger('useCardToBefore');
-					trigger.trigger('shaBefore');
-					game.delay();
 				},
 				ai:{
 					effect:{

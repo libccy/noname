@@ -6,20 +6,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connectBanned:['zuoci'],
 		characterSort:{
 			shenhua:{
-				shenhua_feng:['caoren','xiahouyuan','huangzhong','weiyan','xiaoqiao','zhoutai','sp_zhangjiao','re_yuji'],
-				shenhua_huo:['dianwei','xunyu','pangtong','sp_zhugeliang','taishici','yanwen','re_yuanshao','pangde'],
-				shenhua_lin:['caopi','xuhuang','menghuo','zhurong','re_lusu','sunjian','dongzhuo','jiaxu'],
+				shenhua_feng:['caoren','re_xiahouyuan','re_huangzhong','re_weiyan','re_xiaoqiao','zhoutai','sp_zhangjiao','re_yuji'],
+				shenhua_huo:['dianwei','xunyu','pangtong','sp_zhugeliang','taishici','yanwen','re_yuanshao','re_pangde'],
+				shenhua_lin:['caopi','re_xuhuang','menghuo','zhurong','re_lusu','sunjian','dongzhuo','jiaxu'],
 				shenhua_shan:['dengai','zhanghe','liushan','jiangwei','zhangzhang','sunce','caiwenji','zuoci'],
 				shenhua_yin:['wangji','kuailiangkuaiyue','yanyan','wangping','sunliang','luji','xuyou','yl_luzhi'],
 				shenhua_lei:['haozhao','guanqiujian','chendao','zhugezhan','lukang','zhoufei','zhangxiu','yl_yuanshu'],
 			},
 		},
 		character:{
-			xiahouyuan:['male','wei',4,['xinshensu']],
+			re_xiahouyuan:['male','wei',4,['xinshensu']],
 			caoren:['male','wei',4,['xinjushou','xinjiewei']],
-			huangzhong:['male','shu',4,['xinliegong']],
-			weiyan:['male','shu',4,['xinkuanggu','qimou']],
-			xiaoqiao:['female','wu',3,['retianxiang','hongyan']],
+			re_huangzhong:['male','shu',4,['xinliegong']],
+			re_weiyan:['male','shu',4,['xinkuanggu','qimou']],
+			re_xiaoqiao:['female','wu',3,['retianxiang','hongyan']],
 			zhoutai:['male','wu',4,['buqu','fenji']],
 			sp_zhangjiao:['male','qun',3,['releiji','guidao','huangtian'],['zhu']],
 			re_yuji:["male","qun",3,["xinfu_guhuo"],["forbidai"]],
@@ -33,12 +33,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			taishici:['male','wu',4,['tianyi']],
 			yanwen:['male','qun',4,['shuangxiong']],
 			re_yuanshao:['male','qun',4,['luanji','xueyi'],['zhu']],
-			pangde:['male','qun',4,['mashu','jianchu']],
+			re_pangde:['male','qun',4,['mashu','jianchu']],
 
 			menghuo:['male','shu',4,['huoshou','zaiqi']],
 			zhurong:['female','shu',4,['juxiang','lieren']],
 			caopi:['male','wei',3,['xingshang','fangzhu','songwei'],['zhu']],
-			xuhuang:['male','wei',4,['duanliang','jiezi']],
+			re_xuhuang:['male','wei',4,['duanliang','jiezi']],
 			re_lusu:['male','wu',3,['haoshi','dimeng']],
 			sunjian:['male','wu',4,['gzyinghun']],
 			dongzhuo:['male','qun',8,['jiuchi','roulin','benghuai','baonue'],['zhu']],
@@ -422,17 +422,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_fuyin":{
 				usable:1,
 				trigger:{
-					target:"useCardToBefore",
+					target:"useCardToTargeted",
 				},
 				forced:true,
-				priority:6,
 				audio:2,
 				filter:function (event,player){
 					if(event.player.countCards('h')<player.countCards('h')) return false;
 					if(event.card.name=='sha'||event.card.name=='juedou') return true;
 				},
 				content:function (){
-					trigger.cancel();
+					trigger.getParent().excluded.add(player);
 				},
 			},
 			
@@ -771,11 +770,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"drlt_congjian":{
 				audio:2,
 				trigger:{
-					global:"useCard",
+					target:"useCardToTargeted",
 				},
 				direct:true,
 				filter:function (event,player){
-					return event.targets&&get.type(event.card)=='trick'&&event.targets.contains(player)&&event.targets.length>1&&player.countCards('he')>0;
+					return get.type(event.card)=='trick'&&event.targets.length>1&&player.countCards('he')>0;
 				},
 				content:function(){
 					'step 0'
@@ -1030,37 +1029,43 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'1':{
 						audio:2,
 						trigger:{
-							global:'shaBegin'
+							target:'useCardToTargeted'
 						},
+						prompt2:'当你成为其他角色【杀】的目标后，你可以与其各摸一张牌，然后其本回合内不能再对你使用牌。',
 						filter:function (event,player){
-							return event.targets&&event.targets.contains(player)&&(player.storage.nzry_juzhan1==false||player.storage.nzry_juzhan1==undefined);
+							return event.card.name=='sha'&&(player.storage.nzry_juzhan1==false||player.storage.nzry_juzhan1==undefined);
 						},
+						logTarget:'player',
 						content:function(){
 							game.asyncDraw([player,trigger.player]);
 							trigger.player.storage.nzry_juzhan=true;
 							player.storage.nzry_juzhan1=true;
+							player.addTempSkill('nzry_juzhanx');
 						},
 					},
 					'2':{
 						audio:2,
 						trigger:{
-							player:'shaBegin'
+							player:'useCardToPlayered'
 						},
+						prompt2:'当你使用【杀】指定一名角色为目标后，你可以获得其一张牌，然后你本回合内不能再对其使用牌',
 						filter:function (event,player){
-							return player.storage.nzry_juzhan1==true;
+							return event.card.name=='sha'&&event.player.countGainableCards(player,'he')>0&&player.storage.nzry_juzhan1==true;
 						},
 						check:function (event,player){
 							return event.player.countCards('he')>0&&event.targets&&event.targets.length==1;
 						},
+						logTarget:'target',
 						content:function(){
 							player.gainPlayerCard(trigger.targets[0],'he',true);
 							player.storage.nzry_juzhan1=false;
+							trigger.target.addTempSkill('nzry_juzhanx');
 							trigger.target.storage.nzry_juzhan2=true;
 						},
 					},
 				},
 			},
-			"_nzry_juzhan":{
+			"nzry_juzhanx":{
 				mod:{
 					targetEnabled:function(card,player,target){
 						if(target.storage.nzry_juzhan2==true) return false;
@@ -1772,10 +1777,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			'nzry_jianxiang':{
 				audio:2,
 				trigger:{
-					global:'useCard',
+					target:'useCardToTargeted',
 				},
 				filter:function (event,player){
-					return event.player!=player&&event.targets&&event.targets.contains(player);
+					return event.player!=player;
 				},
 				direct:true,
 				content:function(){
@@ -1787,12 +1792,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					};
 					"step 1"
 					if(result.bool){
-						player.line(result.targets);
-						player.logSkill('nzry_jianxiang');
+						player.logSkill('nzry_jianxiang',result.targets);
 						result.targets[0].draw();
-					}else{
-						event.finish();
-					};
+					}
 				},
 			},
 			"nzry_shenshi":{
@@ -1988,12 +1990,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jianchu:{
 				audio:2,
-				trigger:{player:'shaBegin'},
-				filter:function(event){
-					return event.target.countCards('he')>0;
+				trigger:{player:'useCardToPlayered'},
+				filter:function(event,player){
+					return event.card.name=='sha'&&event.target.countDiscardableCards(player,'he')>0;
 				},
 				direct:true,
-				priority:8,
 				content:function(){
 					'step 0'
 					player.discardPlayerCard(trigger.target,get.prompt('jianchu',trigger.target)).set('ai',function(button){
@@ -2004,7 +2005,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool&&result.links&&result.links.length){
 						if(get.type(result.links[0])=='equip'){
-							trigger.directHit=true;
+							trigger.getParent().directHit.add(trigger.target);
 						}
 						else if(trigger.cards){
 							trigger.target.gain(trigger.cards,'gain2','log');
@@ -2544,7 +2545,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xiangle:{
 				audio:2,
-				trigger:{target:'useCardToBefore'},
+				trigger:{target:'useCardToTargeted'},
 				forced:true,
 				filter:function(event,player){
 					return event.card.name=='sha';
@@ -2562,7 +2563,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('eff',eff);
 					"step 1"
 					if(result.bool==false){
-						trigger.cancel();
+						trigger.getParent().excluded.add(player);
 					}
 				},
 				ai:{
@@ -4693,7 +4694,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 5-get.useful(card);
 				},
 				content:function(){
+					'step 0'
 					player.draw();
+					'step 1'
+					game.cardsDiscard(cards);
 				},
 				discard:false,
 				prompt:'将一张梅花牌置入弃牌堆并摸一张牌',
@@ -6587,7 +6591,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhurong:'祝融',
 			menghuo:'孟获',
 			caopi:'曹丕',
-			xuhuang:'徐晃',
+			re_xuhuang:'徐晃',
 			lusu:'旧鲁肃',
 			sunjian:'孙坚',
 			dongzhuo:'董卓',
@@ -6646,7 +6650,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			taishici:'太史慈',
 			yanwen:'颜良文丑',
 			yuanshao:'旧袁绍',
-			pangde:'庞德',
+			re_pangde:'庞德',
 			huoji:'火计',
 			bazhen:'八阵',
 			kanpo:'看破',
@@ -6682,12 +6686,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xueyi_info:'主公技，锁定技，场上每有一名其他群雄角色存活，你的手牌上限便+2。',
 			mengjin_info:'当你使用的【杀】被【闪】抵消时，你可以弃置目标角色的一张牌。',
 
-			xiahouyuan:'夏侯渊',
+			re_xiahouyuan:'夏侯渊',
+			re_huangzhong:'黄忠',
+			re_weiyan:'魏延',
+			re_xiaoqiao:'小乔',
+			
+			gz_xiahouyuan:'夏侯渊',
+			gz_huangzhong:'黄忠',
+			gz_weiyan:'魏延',
+			gz_xiaoqiao:'小乔',
+			gz_xuhuang:'徐晃',
+			gz_pangde:'庞德',
+			
+			xuhuang:'旧徐晃',
+			pangde:'旧庞德',
+			xiahouyuan:'旧夏侯渊',
 			caoren:'曹仁',
-			huangzhong:'黄忠',
+			huangzhong:'旧黄忠',
 			sp_zhangjiao:'张角',
-			weiyan:'魏延',
-			xiaoqiao:'小乔',
+			weiyan:'旧魏延',
+			xiaoqiao:'旧小乔',
 			zhoutai:'周泰',
 			zhangjiao:'旧张角',
 			yuji:'于吉',
@@ -6736,6 +6754,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huangtian_info:'主公技，其他群势力角色的出牌阶段限一次，其可以交给你一张【闪】或【闪电】。',
 			guhuo_info:'每名角色的回合限一次，你可以扣置一张手牌当一张基本牌或普通锦囊牌使用或打出。其他角色依次选择是否质疑。一旦有其他角色质疑则翻开此牌：若为假则此牌作废，若为真，则质疑角色获得技能“缠怨”（锁定技，你不能质疑于吉，只要你的体力值为1，你失去你的武将技能）',
 			fenji_info:'每当一名角色的手牌于回合外被其他角色弃置或获得时，你可以失去1点体力，然后令该角色摸两张牌。',
+			
+			gzduanliang:'断粮',
+			gzduanliang_info:'你可以将一张黑色基本牌或黑色装备牌当【兵粮寸断】使用；你可以对距离为2的角色使用【兵粮寸断】',
 			
 			shenhua_feng:'神话再临•风',
 			shenhua_huo:'神话再临•火',

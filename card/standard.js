@@ -1489,11 +1489,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			cixiong_skill:{
-				trigger:{player:'shaBegin'},
-				priority:7,
+				trigger:{player:'useCardToPlayered'},
 				audio:true,
 				logTarget:'target',
 				filter:function(event,player){
+					if(event.card.name!='sha') return false;
 					if(player.sex=='male'&&event.target.sex=='female') return true;
 					if(player.sex=='female'&&event.target.sex=='male') return true;
 					return false;
