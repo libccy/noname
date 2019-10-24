@@ -196,7 +196,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'danshou',
 				trigger:{
 					global:['phaseEnd','phaseBefore'],
-					player:'useCardToTargeted',
+					target:'useCardToTargeted',
 				},
 				forced:true,
 				popup:false,
@@ -6291,7 +6291,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zuoding:{
 				trigger:{global:'useCardToPlayered'},
 				filter:function(event,player){
-					if(event.getParent().triggeredTargets.length>1) return false;
+					if(event.getParent().triggeredTargets3.length>1) return false;
 					return !player.hasSkill('zuoding2')&&get.suit(event.card)=='spade'&&
 						_status.currentPhase==event.player&&event.targets&&event.targets.length&&
 						event.player!=player;
@@ -8605,16 +8605,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('xinxuanhuo',result.targets);
 						event.target=result.targets[0];
 						event.target.draw(2);
-						player.chooseTarget('选择出杀的目标',true,function(card,player,target){
-							return _status.event.target.canUse('sha',target)&&player!=target;
-						}).set('ai',function(target){
-							return get.effect(target,{name:'sha'},_status.event.target,_status.event.player);
-						}).set('target',event.target);
 					}
 					else{
 						event.finish();
 					}
 					"step 2"
+					if(game.hasPlayer(function(current){
+						return target.canUse('sha',current);
+					})) player.chooseTarget('选择出杀的目标',true,function(card,player,target){
+						return _status.event.target.canUse('sha',target);
+					}).set('ai',function(target){
+						return get.effect(target,{name:'sha'},_status.event.target,_status.event.player);
+					}).set('target',event.target);
+					"step 3"
 					if(result.bool&&result.targets.length){
 						game.log(player,'指定的出杀目标为',result.targets);
 						event.target.line(result.targets);
@@ -8623,7 +8626,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						event.bool=true;
 					}
-					"step 3"
+					"step 4"
 					if(event.bool||result.bool==false){
 						player.gainPlayerCard('he',event.target,Math.min(2,event.target.countCards('he')),true);
 					}
