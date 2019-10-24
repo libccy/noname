@@ -237,7 +237,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!result.cards||!result.cards.length){
 							player.logSkill('xindanshou',trigger.player);
 						}
-						if(event.triggername=='useCard'){
+						if(event.triggername=='useCardToTargeted'){
 							player.draw(player.storage.xindanshou);
 							player.addTempSkill('xindanshou_as');
 						}
