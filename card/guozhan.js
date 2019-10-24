@@ -775,7 +775,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				content:function(){
-					trigger.cancel();
+					trigger.getParent().targets.remove(player);
 				},
 				ai:{
 					effect:{
