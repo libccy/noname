@@ -485,7 +485,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						else if(ph==th){
 							player.storage.xinyaoming.push('等于');
-							target.chooseToDiscard('弃置一到两张牌，然后摸等量的牌',true,[1,2]).ai=lib.skill.zhiheng.check;
+							target.chooseToDiscard('he','弃置一到两张牌，然后摸等量的牌',true,[1,2]).ai=lib.skill.zhiheng.check;
 						}
 						else{
 							player.storage.xinyaoming.push('小于');
