@@ -2279,7 +2279,7 @@ window.noname_asset_list=[
 	'image/character/ol_yujin.jpg',
 	'image/character/ol_zhangrang.jpg',
 	'image/character/ol_zhuran.jpg',
-	'image/character/ol_liuyu.jpg','
+	'image/character/ol_liuyu.jpg',
 	'image/character/ol_wuyi.jpg',
 	'image/character/guanlu.jpg',
 	'image/character/gexuan.jpg',
