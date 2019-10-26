@@ -1033,10 +1033,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					var skills=['tuxi','qiaobian','gzxiaoguo','gzjieyue','new_duanliang'];
+					var skills=['new_retuxi','qiaobian','gzxiaoguo','gzjieyue','new_duanliang'];
 					game.countPlayer(function(current){
 							if(current==player) return;
-							if(current.hasSkill('tuxi')) skills.remove('tuxi');
+							if(current.hasSkill('new_retuxi')) skills.remove('new_retuxi');
 							if(current.hasSkill('qiaobian')) skills.remove('qiaobian');
 							if(current.hasSkill('gzxiaoguo')) skills.remove('gzxiaoguo');
 							if(current.hasSkill('gzjieyue')) skills.remove('gzjieyue');
