@@ -12749,7 +12749,7 @@
 						player.line(target,'green');
 					}
 					if(!event.chooseonly){
-						var next=target.discard(event.cards);
+						var next=target.discard(event.cards,'notBySelf');
 						if(event.delay===false){
 							next.set('delay',false);
 						}
@@ -12895,7 +12895,7 @@
 						player.line(target,'green');
 					}
 					if(!event.chooseonly){
-						var next=player.gain(event.cards,target,event.visibleMove?'give':'giveAuto');
+						var next=player.gain(event.cards,target,event.visibleMove?'give':'giveAuto','bySelf');
 						if(event.delay===false){
 							next.set('delay',false);
 						}
@@ -13972,11 +13972,11 @@
 					var card=event.cardlist[num];
 					if(card&&event.cards.contains(card)){
 						if(current==game.me||current.isOnline()||(player==game.me&&!event.delayed)){
-							player.gain(card,current);
+							player.gain(card,current,'bySelf');
 							event.delayed=true;
 						}
 						else{
-							player.gain(card,current).set('delay',false);
+							player.gain(card,current,'bySelf').set('delay',false);
 						}
 					}
 					event.num++;
@@ -16997,6 +16997,12 @@
 						else if(get.itemtype(arguments[i])=='card'){
 							next.card=arguments[i];
 						}
+						else if(get.itemtype(arguments[i])=='players'){
+							next.targets=arguments[i];
+						}
+						else if(get.itemtype(arguments[i])=='player'){
+							next.targets=[arguments[i]];
+						}
 						else if(typeof arguments[i]=='object'&&arguments[i].name){
 							next.card=arguments[i];
 						}
@@ -17672,7 +17678,7 @@
 					}
 					var cards=this.getCards(position).randomGets(num);
 					if(cards.length){
-						var next=this.discard(cards);
+						var next=this.discard(cards,'notBySelf');
 						if(typeof delay=='boolean'){
 							next.delay=delay;
 						}
@@ -17701,7 +17707,7 @@
 							if(line){
 								this.line(target,'green');
 							}
-							this.gain(cards,target,'log');
+							this.gain(cards,target,'log','bySelf');
 							target.$giveAuto(cards,this);
 						}
 						return cards;
@@ -17727,6 +17733,9 @@
 						}
 						else if(get.objtype(arguments[i])=='div'){
 							next.position=arguments[i];
+						}
+						else if(arguments[i]=='notBySelf'){
+							next.notBySelf=true;
 						}
 					}
 					if(next.cards==undefined) _status.event.next.remove(next);
@@ -17845,6 +17854,9 @@
 						}
 						else if(arguments[i]=='fromStorage'){
 							next.fromStorage=true;
+						}
+						else if(arguments[i]=='bySelf'){
+							next.bySelf=true;
 						}
 						else if(typeof arguments[i]=='string'){
 							next.animate=arguments[i];
