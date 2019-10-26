@@ -2289,6 +2289,8 @@ window.noname_asset_list=[
 	'image/character/re_xiahouyuan.jpg',
 	'image/character/re_xiaoqiao.jpg',
 	'image/character/re_xuhuang.jpg',
+	'image/character/key_haruko.jpg',
+
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
