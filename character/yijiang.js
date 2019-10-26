@@ -1967,7 +1967,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			qingxian:{
 				audio:2,
-				group:['qingxian_jilie','qingxian_rouhe'],
+				group:['qingxian_jilie','qingxian_rouhe','qingxian_dying'],
 				ai:{
 					threaten:0.8,
 					maixie:true,
@@ -1982,12 +1982,51 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				subSkill:{
+					dying:{
+						audio:'qingxian',
+						trigger:{global:'dyingAfter'},
+						filter:function(event,player){
+							return player.storage.qingxian&&player.storage.qingxian>0&&!_status.dying.length;
+						},
+						direct:true,
+						content:function(){
+							'step 0'
+							player.storage.qingxian--;
+							player.chooseTarget(get.prompt('qingxian'),function(card,player,target){
+								return target!=player;
+							}).set('ai',function(target){
+								var att=get.attitude(_status.event.player,target);
+								if(target.isHealthy()&&att>0) return 0;
+								if(target.hp==1&&att!=0){
+									if(att>0) return 9;
+									else return 10;
+								}
+								else{
+									return Math.sqrt(Math.abs(att));
+								}
+							}).set('prompt2','当你回复体力后，你可以令一名其他角色执行一项：失去1点体力，随机使用一张装备牌；回复1点体力，弃置一张装备牌。若其以此法使用或弃置的牌为梅花，你回复1点体力');
+							'step 1'
+							if(result.bool){
+								var target=result.targets[0];
+								player.logSkill('qingxian',target);
+								event.insert(lib.skill.qingxian.content_choose,{target:target,player:player});
+							}
+							'step 2'
+							if(lib.skill.qingxian_dying.filter(trigger,player)) event.goto(0);
+						}
+					},
 					rouhe:{
 						audio:'qingxian',
 						trigger:{player:'recoverEnd'},
 						direct:true,
 						content:function(){
 							'step 0'
+							if(_status.dying.length){
+								if(!player.storage.qingxian) player.storage.qingxian=0;
+								player.storage.qingxian++;
+								event.finish();
+								return;
+							}
 							player.chooseTarget(get.prompt('qingxian'),function(card,player,target){
 								return target!=player;
 							}).set('ai',function(target){
@@ -2148,10 +2187,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{
 							content:'info'
 						},
-						trigger:{player:'recoverEnd'},
+						trigger:{
+							player:'recoverEnd',
+							global:'dyingAfter',
+						},
 						direct:true,
 						content:function(){
 							'step 0'
+							if(_status.dying.length){
+								if(event.triggername=='recoverEnd'){
+									if(!player.storage.juexiang_lie) player.storage.juexiang_lie=0;
+									player.storage.juexiang_lie++;
+								}
+								event.finish();
+								return;
+							}
+							if(event.triggername=='dyingAfter'){
+								if(!player.storage.juexiang_lie){
+									event.finish();
+									return;
+								};
+								player.storage.juexiang_lie--;
+							}
 							player.chooseTarget(get.prompt2('juexiang_lie'),function(card,player,target){
 								return target!=player;
 							}).set('ai',function(target){
@@ -2169,6 +2226,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									target.chooseUseTarget(card,true,'noanimate','nopopup',true);
 								}
 							}
+							if(event.triggername=='dyingAfter'&&player.storage.juexiang_lie>0) event.goto(0);
 						}
 					},
 					rou:{
@@ -4830,15 +4888,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xianzhen2:{
 				mod:{
-					targetInRange:function(card,player,target,now){
-						if(player.storage.xianzhen==target) return true;
+					targetInRange:function(card,player,target){
+						if(target==player.storage.xianzhen) return true;
 					},
 					cardUsable:function(card,player,num){
-						if(card.name=='sha') return Infinity;
+						if(card.name=='sha'&&typeof num=='number') return num+100;
+					},
+					playerEnabled:function(card,player,target){
+						if(card.name=='sha'&&player.storage.xianzhen!=target&&!ui.selected.targets.contains(player.storage.xianzhen)){
+							var num=player.getCardUsable(card)-100;
+							if(num<=0) return false;
+						}
 					}
 				},
 				ai:{
-					unequip:true
+					unequip:true,
+					skillTagFilter:function(player,tag,arg){
+						if(arg.target!=player.storage.xianzhen) return false;
+					},
 				}
 			},
 			xianzhen3:{
@@ -8797,6 +8864,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:'player',
 				check:function(event,player){
+					if(event.getParent().excluded.contains(player)) return false;
 					if(get.attitude(player,event.player)>0){
 						return false;
 					}
@@ -10852,7 +10920,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jieyue4:'节钺',
 			jieyue_info:'结束阶段开始时，你可以弃置一张手牌，然后令一名其他角色选择一项：将一张牌置于你的武将牌上；或令你弃置其一张牌。你武将牌上有牌时，你可以将红色手牌当【闪】、黑色的手牌当【无懈可击】使用或打出。准备阶段开始时，你获得你武将牌上的牌。',
 			xianzhen:'陷阵',
-			xianzhen_info:'出牌阶段，你可以与一名角色拼点。若你赢，你获得以下技能直到回合结束：无视与该角色的距离；无视防具且可使用任意数量的【杀】。若你没赢，你不能使用【杀】直到回合结束。每回合限一次',
+			xianzhen_info:'出牌阶段，你可以与一名角色拼点。若你赢，你获得以下效果直到回合结束：无视与该角色的距离；无视该角色的防具且可对其使用任意数量的【杀】。若你没赢，你不能使用【杀】直到回合结束。每回合限一次',
 			jinjiu:'禁酒',
 			jinjiu_info:'锁定技，你的【酒】均视为【杀】',
 			chunlao:'醇醪',

@@ -162,7 +162,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						var card=target.getCards('hej').randomGet();
-						player.gain(card,target,'giveAuto');
+						player.gain(card,target,'giveAuto','bySelf');
 					}
 				},
 				ai:{
@@ -274,7 +274,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.index==0){
 						var card=target.getCards('hej').randomGet();
-						player.gain(card,target,'giveAuto');
+						player.gain(card,target,'giveAuto','bySelf');
 						target.addTempSkill('tanbei_effect2','phaseAfter');
 					}
 					else{
@@ -1262,7 +1262,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(card1) list.push(card1);
 							if(card2) list.push(card2);
 							if(list.length>0){
-								player.gain(list,trigger.player,'giveAuto');
+								player.gain(list,trigger.player,'giveAuto','bySelf');
 							}
 							game.delay();
 						},
@@ -2866,7 +2866,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				filter:function (event,player){
 					if(player!=_status.currentPhase) return false;
-					if(event.getParent().triggeredTargets>1) return false;
+					if(event.getParent().triggeredTargets3.length>1) return false;
 					if(get.type(event.card)=='equip'&&get.subtype(event.card)!='equip1') return false;
 					if(event.targets.contains(player)) return true;
 					return false;
@@ -3784,7 +3784,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				filter:function (event,player){
 					if(get.type(event.card)=='equip') return false;
-					if(event.getParent().triggeredTargets>1) return false;
+					if(event.getParent().triggeredTargets3>1) return false;
 					return event.targets.length>0&&!player.countCards('h',{type:'basic',});
 				},
 				content:function (){

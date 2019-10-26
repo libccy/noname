@@ -429,6 +429,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function (event,player){
 					if(event.player.countCards('h')<player.countCards('h')) return false;
 					if(event.card.name=='sha'||event.card.name=='juedou') return true;
+					return false;
 				},
 				content:function (){
 					trigger.getParent().excluded.add(player);
@@ -2288,9 +2289,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return event.skill=='reluanji';
 						},
 						content:function(){
+							player.storage.reluanji2=trigger.card;
 							if(!player.storage.reluanji){
 								player.storage.reluanji=[];
-								player.storage.reluanji2=trigger.card;
 							}
 							for(var i=0;i<trigger.cards.length;i++){
 								player.storage.reluanji.add(get.suit(trigger.cards[i]));
@@ -2329,6 +2330,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							player.draw(trigger.targets.length);
+							delete player.storage.reluanji2;
 						},
 					},
 				}
@@ -6118,28 +6120,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fenji:{
 				audio:2,
 				trigger:{
-					global:"loseAfter",
+					global:["gainAfter","discardAfter"],
 				},
 				filter:function (event){
-					if(_status.currentPhase!=event.player){
-						if(event.getParent(2).name=='discardPlayerCard'||event.getParent().name=='gainMultiple'||event.getParent().name=='gain'||event.getParent().name=='gainPlayerCard'){
-							for(var i=0;i<event.cards.length;i++){
-								if(event.cards[i].original=='h') return true;
-							}
-						}
+					var player=event[event.name=='gain'?'source':'player'];
+					if(!player||_status.currentPhase==player||player.isDead()) return false;
+					if(event[event.name=='gain'?'bySelf':'notBySelf']!=true) return false;
+					for(var i=0;i<event.cards.length;i++){
+						if(event.cards[i].original=='h') return true;
 					}
 					return false;
 				},
 				check:function(event,player){
-					return get.attitude(player,event.player)>2;
+					return get.attitude(player,event[event.name=='gain'?'source':'player'])>2;
 				},
-				logTarget:'player',
+				logTarget:function(event){
+					return event[event.name=='gain'?'source':'player'];
+				},
 				content:function(){
 					"step 0"
-					player.line(trigger.player,'green');
 					player.loseHp();
 					"step 1"
-					trigger.player.draw(2);
+					trigger[trigger.name=='gain'?'source':'player'].draw(2);
 				},
 			},
 			leiji:{

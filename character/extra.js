@@ -153,7 +153,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var cards=target.getCards(range[i]);
 							if(cards.length){
 								var card=cards.randomGet();
-								player.gain(card,target,'giveAuto');
+								player.gain(card,target,'giveAuto','bySelf');
 								break;
 							}
 						}

@@ -1086,7 +1086,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			weicheng:{
 				audio:2,
 				trigger:{global:'gainEnd'},
-				forced:true,
+				//forced:true,
 				frequent:true,
 				filter:function(event,player){
 					if(event.source==player&&event.player!=player&&player.hp>player.countCards('h')){
@@ -4216,7 +4216,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'fengshi',
 				trigger:{player:'useCardToPlayered'},
 				filter:function(event,player){
-					return event.target.countCards('e');
+					return event.card.name=='sha'&&event.target.countCards('e');
 				},
 				logTarget:'target',
 				check:function(event,player){
@@ -10398,6 +10398,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			moukui:{
 				trigger:{player:'useCardToPlayered'},
 				direct:true,
+				filter:function(event,player){
+					return event.card.name=='sha';
+				},
 				audio:2,
 				content:function(){
 					"step 0"
