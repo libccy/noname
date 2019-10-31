@@ -703,15 +703,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				reverseOrder:true,
 				content:function(){
 					"step 0"
-					var next=target.chooseToRespond({name:'sha'});
-					next.set('ai',function(card){
-						var evt=_status.event.getParent();
-						if(get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
-						if(evt.player.hasSkillTag('notricksource')) return 0;
-						if(evt.target.hasSkillTag('notrick')) return 0;
-						return 11-get.value(card);
-					});
-					next.autochoose=lib.filter.autoRespondSha;
+					if(event.directHit) event._result={bool:false};
+					else{
+						var next=target.chooseToRespond({name:'sha'});
+						next.set('ai',function(card){
+							var evt=_status.event.getParent();
+							if(get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
+							if(evt.player.hasSkillTag('notricksource')) return 0;
+							if(evt.target.hasSkillTag('notrick')) return 0;
+							return 11-get.value(card);
+						});
+						next.autochoose=lib.filter.autoRespondSha;
+					}
 					"step 1"
 					if(result.bool==false){
 						target.damage();
@@ -761,18 +764,21 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					var next=target.chooseToRespond({name:'shan'});
-					next.set('ai',function(card){
-						var evt=_status.event.getParent();
-						if(get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
-						if(evt.player.hasSkillTag('notricksource')) return 0;
-						if(evt.target.hasSkillTag('notrick')) return 0;
-						if(evt.target.hasSkillTag('noShan')){
-							return -1;
-						}
+					if(event.directHit) event._result={bool:false};
+					else{
+						var next=target.chooseToRespond({name:'shan'});
+						next.set('ai',function(card){
+							var evt=_status.event.getParent();
+							if(get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
+							if(evt.player.hasSkillTag('notricksource')) return 0;
+							if(evt.target.hasSkillTag('notrick')) return 0;
+							if(evt.target.hasSkillTag('noShan')){
+								return -1;
+							}
 						return 11-get.value(card);
-					});
-					next.autochoose=lib.filter.autoRespondShan;
+						});
+						next.autochoose=lib.filter.autoRespondShan;
+					}
 					"step 1"
 					if(result.bool==false){
 						target.damage();
@@ -1196,7 +1202,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				content:function(){
-					event.result='wuxied';
+					var evt=event.getParent();
+					event.result={
+						wuxied:true,
+						directHit:evt.directHit||[],
+						nowuxie:evt.nowuxie,
+					};
 					if(player.isOnline()){
 						player.send(function(player){
 							if(ui.tempnowuxie&&!player.hasWuxie()){
@@ -1733,6 +1744,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.card.storage&&event.card.storage.nowuxie) return false;
 					if(event.name!='phaseJudge'){
+						if(event.getParent().nowuxie) return false;
 						var info=get.info(event.card);
 						if(!event.target){
 							if(info.wuxieable) return true;
@@ -1889,12 +1901,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					};
 					'step 1'
 					var list=game.filterPlayer(function(current){
+						if(event.nowuxie) return false;
+						if(event.directHit&&event.directHit.contains(current)) return false;
 						if(event.triggername=='phaseJudge'){
 							if(game.checkMod(trigger.card,player,current,'unchanged','wuxieJudgeEnabled',current)==false) return false;
 							if(game.checkMod(trigger.card,player,current,'unchanged','wuxieJudgeRespondable',player)==false) return false;
 							if(event.stateplayer&&event.statecard&&(game.checkMod(event.statecard,event.stateplayer,player,current,'unchanged','wuxieRespondable',event.stateplayer)==false)) return false;
 						}
 						else{
+							if(!event.statecard&&trigger.getParent().directHit.contains(current)) return false;
 							if(game.checkMod(trigger.card,player,trigger.target,current,'unchanged','wuxieEnabled',current)==false) return false;
 							if(game.checkMod(trigger.card,player,trigger.target,current,'unchanged','wuxieRespondable',player)==false) return false;
 							if(event.stateplayer&&event.statecard&&(game.checkMod(event.statecard,event.stateplayer,trigger.player,current,'unchanged','wuxieRespondable',event.stateplayer)==false)) return false;
@@ -2003,7 +2018,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					'step 9'
 					if(event.wuxieresult){
-						if(result=='wuxied'){
+						if(result.wuxied){
+							event.nowuxie=result.nowuxie;
+							event.directHit=result.directHit;
 							if(!event.stateplayer&&event.wuxieresult)event.stateplayer=event.wuxieresult;
 							if(event.wuxieresult2&&event.wuxieresult2.used){
 								event.statecard=event.wuxieresult2.used;

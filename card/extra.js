@@ -578,7 +578,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						trigger.untrigger();
 						trigger.responded=true;
-						trigger.result={bool:true,card:result.links[0]};
+						trigger.result={bool:true,card:result.links[0],cards:result.links.slice(0)};
 						var muniu=player.getEquip(5);
 						muniu.cards.remove(result.links[0]);
 						lib.skill.muniu_skill.sync(muniu);
