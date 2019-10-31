@@ -9302,7 +9302,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.classList.contains('turnedover');
 				},
 				content:function(){
-					trigger=true;
+					trigger.jiushi=true;
 				}
 			},
 			jiushi3:{
