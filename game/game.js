@@ -13319,28 +13319,6 @@
 						}
 					}
 					"step 3"
-					var info=get.info(card);
-					if(info.contentBefore){
-						var next=game.createEvent(card.name+'ContentBefore');
-						next.setContent(info.contentBefore);
-						next.targets=targets;
-						next.card=card;
-						next.cards=cards;
-						next.player=player;
-						next.type='precard';
-						if(event.forceDie) next.forceDie=true;
-					}
-					else if(info.reverseOrder&&get.is.versus()&&targets.length>1){
-						var next=game.createEvent(card.name+'ContentBefore');
-						next.setContent('reverseOrder');
-						next.targets=targets;
-						next.card=card;
-						next.cards=cards;
-						next.player=player;
-						next.type='precard';
-						if(event.forceDie) next.forceDie=true;
-					}
-					"step 4"
 					event.sortTarget=function(animate){
 						var info=get.info(card);
 						if(num==0&&targets.length>1){
@@ -13361,12 +13339,13 @@
 					}
 					event.sortTarget();
 					event.getTriggerTarget=function(list1,list2){
-						for(var i=0;i<list1.length;i++){
-							if(!list2.contains(list1[i])) return list1[i];
+						var listx=list1.slice(0).sortBySeat();
+						for(var i=0;i<listx.length;i++){
+							if(!list2.contains(listx[i])) return list1[i];
 						}
 						return null;
 					}
-					"step 5"
+					"step 4"
 					if(!event.triggeredTargets1) event.triggeredTargets1=[];
 					var target=event.getTriggerTarget(targets,event.triggeredTargets1);
 					if(target){
@@ -13381,7 +13360,7 @@
 						if(event.forceDie) next.forceDie=true;
 						event.redo();
 					}
-					"step 6"
+					"step 5"
 					if(!event.triggeredTargets2) event.triggeredTargets2=[];
 					var target=event.getTriggerTarget(targets,event.triggeredTargets2);
 					if(target){
@@ -13396,7 +13375,7 @@
 						if(event.forceDie) next.forceDie=true;
 						event.redo();
 					}
-					"step 7"
+					"step 6"
 					if(!event.triggeredTargets3) event.triggeredTargets3=[];
 					var target=event.getTriggerTarget(targets,event.triggeredTargets3);
 					if(target){
@@ -13411,7 +13390,7 @@
 						if(event.forceDie) next.forceDie=true;
 						event.redo();
 					}
-					"step 8"
+					"step 7"
 					if(!event.triggeredTargets4) event.triggeredTargets4=[];
 					var target=event.getTriggerTarget(targets,event.triggeredTargets4);
 					if(target){
@@ -13425,6 +13404,28 @@
 						next.player=player;
 						if(event.forceDie) next.forceDie=true;
 						event.redo();
+					}
+					"step 8"
+					var info=get.info(card);
+					if(info.contentBefore){
+						var next=game.createEvent(card.name+'ContentBefore');
+						next.setContent(info.contentBefore);
+						next.targets=targets;
+						next.card=card;
+						next.cards=cards;
+						next.player=player;
+						next.type='precard';
+						if(event.forceDie) next.forceDie=true;
+					}
+					else if(info.reverseOrder&&get.is.versus()&&targets.length>1){
+						var next=game.createEvent(card.name+'ContentBefore');
+						next.setContent('reverseOrder');
+						next.targets=targets;
+						next.card=card;
+						next.cards=cards;
+						next.player=player;
+						next.type='precard';
+						if(event.forceDie) next.forceDie=true;
 					}
 					"step 9"
 					if(num==0&&targets.length>1){
@@ -13889,7 +13890,8 @@
 						game.log(player,'打出了',card);
 					}
 					for(var i=0;i<cards.length;i++){
-						player.lose(cards[i]);
+						if(get.owner(cards[i])==player) player.lose(cards[i]);
+						else cards[i].discard();
 						if(event.animate!=false) player.$throw(cards[i]);
 						if(event.highlight){
 							cards[i].clone.classList.add('thrownhighlight');
@@ -14874,6 +14876,7 @@
 					"step 1"
 					event.result={
 						card:player.judging[0],
+						name:player.judging[0].name,
 						number:get.number(player.judging[0]),
 						suit:get.suit(player.judging[0]),
 						color:get.color(player.judging[0]),
@@ -17523,6 +17526,9 @@
 						else if(typeof arguments[i]=='string'){
 							if(arguments[i]=='noai'){
 								next.noai=true;
+							}
+							else if(arguments[i]=='nowuxie'){
+								next.nowuxie=true;
 							}
 							else{
 								next.skill=arguments[i];
