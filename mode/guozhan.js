@@ -209,6 +209,84 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				derivation:'guozhan',
 			},
 		},
+		aozhanRank:{
+			'8':[],
+			'7':[],
+			'6':[],
+			'5':[
+				'gz_lukang','gz_caoren','gz_lvfan',
+				'gz_machao','gz_ganfuren','gz_madai',
+				'gz_jiling','gz_pangde',
+			],
+			'4':[
+				'gz_re_lidian','gz_yuejin','gz_huangzhong',
+				'gz_menghuo','gz_sunshangxiang','gz_lvmeng',
+				'gz_lvbu',
+			],
+			'3':[
+				'gz_simayi','gz_luxun','gz_wuguotai',
+				'gz_caiwenji',
+			],
+			'2':[
+				'gz_re_lusu','gz_zhangzhang',
+			],
+			'1':[
+				'gz_caocao','gz_guojia','gz_xiahoudun',
+				'gz_xunyu','gz_caopi','gz_liubei',
+				'gz_fazheng','gz_dongzhuo','gz_yuji',
+				'gz_liqueguosi','gz_huanggai',
+			],
+		},
+		guozhanRank:{
+			'8':[
+				'gz_xunyou','gz_re_lidian','gz_caopi',
+				'gz_shamoke','gz_lifeng','gz_wangping',
+				'gz_xiaoqiao','gz_zhoutai','gz_lvfan',
+				'gz_beimihu','gz_mateng','gz_jiaxu',
+			],
+			'7':[
+				'gz_zhanghe','gz_jianggan','gz_simayi',
+				'gz_weiyan','gz_huangyueying','gz_zhugeliang',
+				'gz_lingtong','gz_sunshangxiang','gz_sunce',
+				'gz_re_yuanshao','gz_yuanshu','gz_hetaihou',
+			],
+			'6':[
+				'gz_zhenji','gz_guojia','gz_yujin',
+				'gz_jiangwei','gz_zhangfei','gz_sp_zhugeliang',
+				'gz_zhouyu','gz_lingcao','gz_daqiao',
+				'gz_yuji','gz_caiwenji','gz_diaochan',
+			],
+			'5':[
+				'gz_zhangliao','gz_caocao','gz_xuhuang',
+				'gz_liushan','gz_pangtong','gz_zhaoyun',
+				'gz_re_lusu','gz_sunquan','gz_ganning',
+				'gz_zhangxiu','gz_liqueguosi','gz_huatuo',
+			],
+			'4':[
+				'gz_dianwei','gz_dengai','gz_xunyu',
+				'gz_madai','gz_liubei','gz_mifuren',
+				'gz_wuguotai','gz_luxun','gz_taishici',
+				'gz_zhangjiao','gz_zuoci','gz_pangde',
+			],
+			'3':[
+				'gz_xiahoudun','gz_yuejin','gz_caoren',
+				'gz_machao','gz_masu','gz_fazheng',
+				'gz_zhangzhang','gz_lvmeng','gz_huanggai',
+				'gz_jiling','gz_lvbu','gz_dongzhuo',
+			],
+			'2':[
+				'gz_cuimao','gz_xiahouyuan','gz_caohong',
+				'gz_zhurong','gz_zhurong','gz_jiangfei',
+				'gz_xusheng','gz_dingfeng','gz_sunjian',
+				'gz_zhangren','gz_kongrong','gz_yanwen',
+			],
+			'1':[
+				'gz_zangba','gz_bianfuren','gz_xuzhu',
+				'gz_menghuo','gz_ganfuren','gz_guanyu',
+				'gz_lukang','gz_jiangqing','gz_chendong',
+				'gz_zoushi','gz_panfeng','gz_tianfeng',
+			],
+		},
 		characterSort:{
 			mode_guozhan:{
 				guozhan_default:["gz_caocao","gz_simayi","gz_xiahoudun","gz_zhangliao","gz_xuzhu","gz_guojia","gz_zhenji","gz_xiahouyuan","gz_zhanghe","gz_xuhuang","gz_caoren","gz_dianwei","gz_xunyu","gz_caopi","gz_yuejin","gz_liubei","gz_guanyu","gz_zhangfei","gz_zhugeliang","gz_zhaoyun","gz_machao","gz_huangyueying","gz_huangzhong","gz_weiyan","gz_pangtong","gz_sp_zhugeliang","gz_liushan","gz_menghuo","gz_zhurong","gz_ganfuren","gz_sunquan","gz_ganning","gz_lvmeng","gz_huanggai","gz_zhouyu","gz_daqiao","gz_luxun","gz_sunshangxiang","gz_sunjian","gz_xiaoqiao","gz_taishici","gz_zhoutai","gz_re_lusu","gz_zhangzhang","gz_dingfeng","gz_huatuo","gz_lvbu","gz_diaochan","gz_re_yuanshao","gz_yanwen","gz_jiaxu","gz_pangde","gz_zhangjiao","gz_caiwenji","gz_mateng","gz_kongrong","gz_jiling","gz_tianfeng","gz_panfeng","gz_zoushi",],
@@ -1023,8 +1101,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				global:'g_jianan',
 			},
 			g_jianan:{
-				trigger:{player:'phaseBegin'},
-				filter:function(event,player){
+				trigger:{player:['phaseBegin','phaseBefore','dieBegin']},
+				filter:function(event,player,name){
+					if(name!='phaseBegin') return get.is.jun(player)&&player.identity=='wei';
+					return this.filter2.apply(this,arguments);
+				},
+				filter2:function(event,player){
 					if(!get.zhu(player,'jianan')) return false;
 					if(!player.countCards('he')) return false;
 					if(get.is.jun(player)&&player.isUnseen(1)) return false;
@@ -1033,6 +1115,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
+					if(event.triggername!='phaseBegin'){
+						event.trigger('jiananUpdate');
+						event.finish();
+						return;
+					}
 					var skills=['new_retuxi','qiaobian','gzxiaoguo','gzjieyue','new_duanliang'];
 					game.countPlayer(function(current){
 							if(current==player) return;
@@ -1046,11 +1133,28 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						event.skills=skills;
 						var next=player.chooseToDiscard();
-						next.prompt='是否弃置一张牌并发动【五子良将纛】？'
-						next.prompt2=get.translation('wuziliangjiangdao_info');
+						var str='';
+						for(var i=0;i<skills.length;i++){
+							str+='、【';
+							str+=get.translation(skills[i]);
+							str+='】';
+						}
+						next.prompt='是否发动【五子良将纛】？'
+						next.prompt2=get.translation('弃置一张牌并暗置一张武将牌，获得以下技能中的一个直到下回合开始：'+str.slice(1));
 						next.logSkill='g_jianan';
 						next.skills=skills;
 						next.ai=function(card){
+							var skills=_status.event.skills;
+							var player=_status.event.player;
+							var rank=0;
+							if(skills.contains('new_retuxi')&&game.countPlayer(function(current){
+								return get.attitude(player,current)<0&&current.countGainableCards(player,'h')
+							})>1) rank=4;
+							if(skills.contains('gzjieyue')&&player.countCards('h',function(card){
+								return get.value(card)<7;
+							})>1) rank=5;
+							if(skills.contains('qiaobian')&&player.countCards('h')>4) rank=6;
+							if((get.guozhanRank(player.name1)<rank&&!player.isUnseen(0))||(get.guozhanRank(player.name2)<rank&&!player.isUnseen(1))) return rank+1-get.value(card);
 							return -1;
 						};
 					}
@@ -1063,7 +1167,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(!list.length) event.finish();
 						else if(list.length<2) event._result={control:list[0]};
 						else{
-							player.chooseControl(list).prompt="请选择暗置一张武将牌";
+							player.chooseControl(list).set('ai',function(){
+								return get.guozhanRank(player.name1)<get.guozhanRank(player.name2)?'主将':'副将';
+							}).prompt="请选择暗置一张武将牌";
 						}
 					}
 					'step 2'
@@ -1071,12 +1177,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						var num=result.control=='主将'?0:1;
 						player.hideCharacter(num);
-						player.chooseControl(event.skills).prompt="选择获得其中的一个技能直到下回合开始";
+						player.chooseControl(event.skills).set('ai',function(){
+							var skills=event.skills;
+							if(skills.contains('qiaobian')&&player.countCards('h')>3) return 'qiaobian';
+							if(skills.contains('gzjieyue')&&player.countCards('h',function(card){
+								return get.value(card)<7;
+							})) return 'gzjieyue';
+							if(skills.contains('new_retuxi')) return 'new_retuxi';
+							return skills.randomGet();
+						}).prompt="选择获得其中的一个技能直到下回合开始";
 					}
 					'step 3'
 					var link=result.control;
-					player.addTempSkill(link,{player:"phaseBefore"});
-					player.addTempSkill("jianan_eff",{player:"phaseBefore"});
+					player.addTempSkill(link,"jiananUpdate");
+					player.addTempSkill("jianan_eff","jiananUpdate");
 					game.log(player,"获得了技能","#g【"+get.translation(result.control)+"】");
 				},
 			},
@@ -4069,8 +4183,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var shunshou=false;
 						var guohe=false;
 						var juedou=false;
+						var huoshao=false;
 						for(var i=0;i<players.length;i++){
 							if(!players[i].isOut()){
+								if(player.canUse('huoshaolianying',players[i])&&get.attitude(player,players[i])<0&&get.effect(players[i],{name:'huoshaolianying'})>0) huoshao=true;
 								if(players[i].hp==1&&get.damageEffect(players[i],player,player)>0&&!players[i].hasSha()){
 									juedou=true;
 								}
@@ -4082,10 +4198,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 							}
 						}
+						if(huoshao&&button.link[2]=='huoshaolianying') return 3.5;
 						if(juedou&&button.link[2]=='juedou') return 3;
 						if(guohe&&button.link[2]=='guohe') return 2;
 						if(shunshou&&button.link[2]=='shunshou') return 1.5;
-						if(button.link[2]=='wuzhong') return 1;
+						if(button.link[2]=='wuzhong'||button.link[2]=='yuanjiao') return 1;
 						return 0;
 					},
 					backup:function(links,player){
@@ -4134,7 +4251,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							for(var i=0;i<cards.length;i++){
 								num+=Math.max(0,get.value(cards[i],player,'raw'));
 							}
-							return 12-num;
+							return 16-num;
 						}
 					},
 					threaten:1.6,
@@ -6582,7 +6699,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<list.length-1;i++){
 						for(var j=i+1;j<list.length;j++){
 							if(lib.character[list[i]][1]==lib.character[list[j]][1]){
-								player.init(list[i],list[j],false);
+								var mainx=list[i];
+								var vicex=list[j];
+								if(get.guozhanReverse(mainx,vicex)){
+									mainx=list[j];
+									vicex=list[i];
+								}
+								player.init(mainx,vicex,false);
 								if(back){
 									list.remove(player.name);
 									list.remove(player.name2);
@@ -6925,9 +7048,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<buttons.length-1;i++){
 							for(var j=i+1;j<buttons.length;j++){
 								if(lib.character[buttons[i].link][1]==lib.character[buttons[j].link][1]){
+									var list=[buttons[i].link,buttons[j].link];
+									if(get.guozhanReverse(list[0],list[1])) list.reverse();
 									return {
 										bool:true,
-										links:[buttons[i].link,buttons[j].link]
+										links:list,
 									}
 								}
 							}
@@ -7042,78 +7167,78 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			tongshimingzhi:'同时明置',
 			mode_guozhan_character_config:'国战武将',
 			_zhenfazhaohuan:'阵法召唤',
-			_zhenfazhaohuan_info:'由拥有阵法技的角色发起，满足此阵法技条件的未确定势力角色均可按逆时针顺序一次明置其一张武将牌(响应阵法召唤)，以发挥阵法技的效果',
+			_zhenfazhaohuan_info:'由拥有阵法技的角色发起，满足此阵法技条件的未确定势力角色均可按逆时针顺序依次明置其一张武将牌(响应阵法召唤)，以发挥阵法技的效果',
 			
 			
-					junling:'军令',
-					junling1:'军令一',
-					junling1_bg:'令',
-					junling1_info:'若被执行，执行者对发起者指定的一名角色造成一点伤害。',
-					junling2:'军令二',
-					junling2_bg:'令',
-					junling2_info:'若被执行，执行者摸一张牌，然后依次交给发起者两张牌。',
-					junling3:'军令三',
-					junling3_bg:'令',
-					junling3_info:'若被执行，执行者失去一点体力。',
-					junling4:'军令四',
-					junling4_bg:'令',
-					junling4_info:'若被执行，直到回合结束，执行者不能使用或打出手牌。',
-					junling4_eff:'军令四',
-					junling5:'军令五',
-					junling5_bg:'令',
-					junling5_info:'若被执行，执行者将武将牌叠置，且不能回复体力直到回合结束。',
-					junling5_eff:'军令五',
-					junling6:'军令六',
-					junling6_bg:'令',
-					junling6_info:'若被执行，执行者选择一张手牌和一张装备区内牌（若有），然后弃置其余的牌。',
+			junling:'军令',
+			junling1:'军令一',
+			junling1_bg:'令',
+			junling1_info:'若被执行，执行者对发起者指定的一名角色造成一点伤害。',
+			junling2:'军令二',
+			junling2_bg:'令',
+			junling2_info:'若被执行，执行者摸一张牌，然后依次交给发起者两张牌。',
+			junling3:'军令三',
+			junling3_bg:'令',
+			junling3_info:'若被执行，执行者失去一点体力。',
+			junling4:'军令四',
+			junling4_bg:'令',
+			junling4_info:'若被执行，直到回合结束，执行者不能使用或打出手牌且非锁定技全部失效。',
+			junling4_eff:'军令四',
+			junling5:'军令五',
+			junling5_bg:'令',
+			junling5_info:'若被执行，执行者将武将牌叠置，且不能回复体力直到回合结束。',
+			junling5_eff:'军令五',
+			junling6:'军令六',
+			junling6_bg:'令',
+			junling6_info:'若被执行，执行者选择一张手牌和一张装备区内牌（若有），然后弃置其余的牌。',
 					
-					gz_cuimao:'崔琰毛玠',
-					gzzhengbi:'征辟',
-					gzzhengbi_info:'出牌阶段开始时，你可以选择一项：选择一名未确定势力的角色，你对其使用的牌无距离限制且不计入使用次数，直到其明置武将牌或回合结束；或将一张基本牌交给一名有明置武将牌的角色，然后其交给你一张非基本牌或两张基本牌。',
-					gzfengying:'奉迎',
-					gzfengying_info:'限定技，你可以将所有手牌当【挟天子以令诸侯】使用（无视大势力限制），然后所有与你势力相同的角色将手牌补至体力上限。',
-					gz_yujin:'于禁',
-					gzjieyue:'节钺',
-					gzjieyue_info:'准备阶段开始时，你可以将一张手牌交给一名非魏势力角色，然后选择一个“军令”，然后令其选择一项：执行该军令，然后你摸一张牌；或令你于此回合摸牌阶段摸牌时，额外摸三张牌。',
-					gz_wangping:'王平',
-					jianglue:'将略',
-					jianglue_info:'限定技，出牌阶段，你可以选择一个“军令”，然后与你势力相同的其他角色可以执行该军令（未确定势力角色可以在此时明置一张武将牌）。你与每名执行该军令的角色增加一点体力上限，然后回复一点体力，然后你摸X张牌（X为以此法回复了体力的角色数）。',
-					gz_fazheng:'法正',
-					gzxuanhuo:'眩惑',
-					gzxuanhuo_info:'与你势力相同的其他角色的出牌阶段限一次，该角色可以交给你一张牌并弃置一张牌，然后获得以下一项场上没有的技能直到回合结束：“武圣”、“咆哮”、“龙胆”、“铁骑”、“烈弓”、“狂骨”。',
-					gzenyuan:'恩怨',
-					gzenyuan_info:'锁定技，当其他角色对你使用【桃】时，该角色摸一张牌；当你受到伤害后，伤害来源须交给你一张手牌或失去1点体力。',
-					gzbuyi:'补益',
-					gzbuyi_info:'每名角色的回合限一次，当一名与你势力相同的角色脱离濒死状态后，你可以选择一个“军令”，令伤害来源选择一项：执行该军令，或令该脱离濒死状态的角色回复一点体力。',
-					gz_lukang:'陆抗',
-					keshou:'恪守',
-					keshou_info:'当你受到伤害时，你可以弃置两张颜色相同的牌。若如此做，此伤害-1，然后若没有与你势力相同的其他角色，你进行一次判定，若结果为红色，你摸一张牌。',
-					zhuwei:'筑围',
-					zhuwei_info:'当你的判定牌生效后，若此牌为【杀】或【决斗】，你可以获得之，然后你可令当前回合角色本回合可额外使用一张【杀】，且手牌上限+1。',
-					gz_yuanshu:'袁术',
-					gzweidi:'伪帝',
-					gzweidi_info:'出牌阶段限一次，你可以指定本回合从牌堆获得过牌的角色，然后选择一个“军令”，令其选择一项：执行该军令；或令你获得其所有手牌，然后交给其等量的牌。',
-					gzyongsi:'庸肆',
-					gzyongsi_info:'锁定技，若场上没有【玉玺】，视为你装备之；当你成为【知己知彼】的目标时，你展示你的所有手牌。',
-					//gzyongsi_eff1:'玉玺',
-					//gzyongsi_eff2:'玉玺',
-					gz_zhangxiu:'张绣',
-					gzfudi:'附敌',
-					gzfudi_info:'当你受到伤害后，你可以交给伤害来源一张手牌。若如此做，你对其势力中的体力值最大且不小于你的一名角色造成一点伤害。',
-					congjian:'从谏',
-					congjian_info:'锁定技，你于回合外造成的伤害，于回合内受到的伤害+1。',
-					gz_jun_caocao:'君曹操',
-					jianan:'建安',
-					jianan_info:'君主技，只要此武将处于明置状态，你便拥有“五子良将纛”。',
-					g_jianan:'五子良将纛',
-					wuziliangjiangdao:'五子良将纛',
-					wuziliangjiangdao_ab:'将纛',
-					wuziliangjiangdao_bg:'纛',
-					wuziliangjiangdao_info:'魏势力角色的准备阶段开始时，其可以弃置一张牌。若如此做，其选择一张暗置的武将牌（若没有，则选择一张暗置），然后获得下列技能中的一项（其他角色已有的技能无法选择）且不能明置选择的武将牌直到其的下个回合开始：“突袭”，“巧变”，“骁果”，“节钺”，“断粮”。',
-					huibian:'挥鞭',
-					huibian_info:'出牌阶段限一次，你可以选择一名魏势力角色和另一名已受伤的魏势力角色。若如此做，你对前者造成一点伤害，然后其摸两张牌，然后后者回复一点体力。',
-					gzzongyu:'总御',
-					gzzongyu_info:'当【六龙骖驾】进入其他角色的装备区后，你可以用你装备区内所有坐骑牌（至少一张）与【六龙骖驾】交换位置。锁定技，当你使用一张坐骑牌后，若场上或弃牌堆中有【六龙骖驾】，则将【六龙骖驾】置入你的装备区。',
+			gz_cuimao:'崔琰毛玠',
+			gzzhengbi:'征辟',
+			gzzhengbi_info:'出牌阶段开始时，你可以选择一项：选择一名未确定势力的角色，你对其使用的牌无距离限制且不计入使用次数，直到其明置武将牌或回合结束；或将一张基本牌交给一名有明置武将牌的角色，然后其交给你一张非基本牌或两张基本牌。',
+			gzfengying:'奉迎',
+			gzfengying_info:'限定技，你可以将所有手牌当【挟天子以令诸侯】使用（无视大势力限制），然后所有与你势力相同的角色将手牌补至体力上限。',
+			gz_yujin:'于禁',
+			gzjieyue:'节钺',
+			gzjieyue_info:'准备阶段开始时，你可以将一张手牌交给一名非魏势力角色，然后选择一个“军令”，然后令其选择一项：执行该军令，然后你摸一张牌；或令你于此回合摸牌阶段摸牌时，额外摸三张牌。',
+			gz_wangping:'王平',
+		jianglue:'将略',
+			jianglue_info:'限定技，出牌阶段，你可以选择一个“军令”，然后与你势力相同的其他角色可以执行该军令（未确定势力角色可以在此时明置一张武将牌）。你与每名执行该军令的角色增加一点体力上限，然后回复一点体力，然后你摸X张牌（X为以此法回复了体力的角色数）。',
+			gz_fazheng:'法正',
+			gzxuanhuo:'眩惑',
+			gzxuanhuo_info:'与你势力相同的其他角色的出牌阶段限一次，该角色可以交给你一张牌并弃置一张牌，然后获得以下一项场上没有的技能直到回合结束：“武圣”、“咆哮”、“龙胆”、“铁骑”、“烈弓”、“狂骨”。',
+			gzenyuan:'恩怨',
+			gzenyuan_info:'锁定技，当其他角色对你使用【桃】时，该角色摸一张牌；当你受到伤害后，伤害来源须交给你一张手牌或失去1点体力。',
+			gzbuyi:'补益',
+			gzbuyi_info:'每名角色的回合限一次，当一名与你势力相同的角色脱离濒死状态后，你可以选择一个“军令”，令伤害来源选择一项：执行该军令，或令该脱离濒死状态的角色回复一点体力。',
+			gz_lukang:'陆抗',
+			keshou:'恪守',
+			keshou_info:'当你受到伤害时，你可以弃置两张颜色相同的牌。若如此做，此伤害-1，然后若没有与你势力相同的其他角色，你进行一次判定，若结果为红色，你摸一张牌。',
+			zhuwei:'筑围',
+			zhuwei_info:'当你的判定牌生效后，若此牌为【杀】或【决斗】，你可以获得之，然后你可令当前回合角色本回合可额外使用一张【杀】，且手牌上限+1。',
+			gz_yuanshu:'袁术',
+			gzweidi:'伪帝',
+			gzweidi_info:'出牌阶段限一次，你可以指定本回合从牌堆获得过牌的角色，然后选择一个“军令”，令其选择一项：执行该军令；或令你获得其所有手牌，然后交给其等量的牌。',
+			gzyongsi:'庸肆',
+			gzyongsi_info:'锁定技，若场上没有【玉玺】，视为你装备之；当你成为【知己知彼】的目标时，你展示你的所有手牌。',
+			//gzyongsi_eff1:'玉玺',
+			//gzyongsi_eff2:'玉玺',
+			gz_zhangxiu:'张绣',
+			gzfudi:'附敌',
+			gzfudi_info:'当你受到伤害后，你可以交给伤害来源一张手牌。若如此做，你对其势力中的体力值最大且不小于你的一名角色造成一点伤害。',
+			congjian:'从谏',
+			congjian_info:'锁定技，你于回合外造成的伤害，于回合内受到的伤害+1。',
+			gz_jun_caocao:'君曹操',
+			jianan:'建安',
+			jianan_info:'君主技，只要此武将处于明置状态，你便拥有“五子良将纛”。',
+			g_jianan:'五子良将纛',
+			wuziliangjiangdao:'五子良将纛',
+			wuziliangjiangdao_ab:'将纛',
+			wuziliangjiangdao_bg:'纛',
+			wuziliangjiangdao_info:'魏势力角色的准备阶段开始时，其可以弃置一张牌。若如此做，其选择一张暗置的武将牌（若没有，则选择一张暗置），然后获得下列技能中的一项（其他角色已有的技能无法选择）且不能明置选择的武将牌直到你的下个回合开始：“突袭”，“巧变”，“骁果”，“节钺”，“断粮”。',
+			huibian:'挥鞭',
+			huibian_info:'出牌阶段限一次，你可以选择一名魏势力角色和另一名已受伤的魏势力角色。若如此做，你对前者造成一点伤害，然后其摸两张牌，然后后者回复一点体力。',
+			gzzongyu:'总御',
+			gzzongyu_info:'当【六龙骖驾】进入其他角色的装备区后，你可以用你装备区内所有坐骑牌（至少一张）与【六龙骖驾】交换位置。锁定技，当你使用一张坐骑牌后，若场上或弃牌堆中有【六龙骖驾】，则将【六龙骖驾】置入你的装备区。',
 					
 			xindiaodu:"调度",
 			"xindiaodu_info":"当与你势力相同的角色使用装备牌时，该角色可以摸一张牌；出牌阶段开始时，你可以获得与你势力相同的一名其他角色装备区里的一张牌，然后你可以将此牌交给另一名与你势力相同的其他角色。",
@@ -7188,9 +7313,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"new_jieming_info":"当你受到伤害后，你可以令一名角色将手牌摸至X张（X为其体力上限且最多为5）。",
 			"new_fangzhu":"放逐",
 			"new_fangzhu_info":"当你受到伤害后，你可以令一名其他角色选择一项：摸X张牌并将武将牌叠置（X为你已损失的体力值）；弃置一张牌并失去1点体力。",
-			"fengyin_main":"铁骑[主将]",
+			"fengyin_main":"封印[主将]",
 			"fengyin_main_info":"",
-			"fengyin_vice":"铁骑[副将]",
+			"fengyin_vice":"封印[副将]",
 			"fengyin_vice_info":"",
 			"new_tieji":"铁骑",
 			"new_tieji_info":"当你使用【杀】指定一个目标后，你可以令其本回合一张明置的武将牌的非锁定技失效，然后你进行判定，除非该角色弃置与结果花色相同的一张牌，否则不能使用【闪】。",
@@ -7600,7 +7725,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							case 'junling2':player.draw();event.num=1;break;
 							case 'junling3':player.loseHp();break;
-							case 'junling4':player.addTempSkill('junling4_eff');break;
+							case 'junling4':player.addTempSkill('junling4_eff');player.addTempSkill('fengyin_vice');player.addTempSkill('fengyin_main');break;
 							case 'junling5':player.turnOver();player.addTempSkill('junling5_eff');break;
 						}
 						'step 1'
@@ -7658,7 +7783,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						if(!event.tochange.length) event.finish();
 						else{
-							player.chooseButton(true,['选择要变更的武将牌',[event.tochange,'character']]);
+							player.chooseButton(true,['选择要变更的武将牌',[event.tochange,'character']]).ai=function(button){
+								return get.guozhanRank(button.link);
+							};
 						}
 					//}
 					'step 1'
@@ -7676,7 +7803,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				mayChangeVice:function(){
 					'step 0'
 					player.chooseBool('是否变更副将？').set('ai',function(){
-						return get.rank(_status.event.player.name2,true)<=5;
+						var name=player.name2;
+						var skills=lib.character[name][3].slice(0);
+						for(var i=0;i<skills.length;i++){
+							if(lib.skill[skills[i]].limited&&player.awakenedSkills.contains(skills[i])) return true;
+						}
+						return get.guozhanRank(name)<=3;
 					});
 					'step 1'
 					if(result.bool){
@@ -8305,6 +8437,25 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		get:{
+			guozhanReverse:function(name1,name2){
+				if(['gz_xunyou','gz_lvfan'].contains(name2)) return true;
+				if(name2=='gz_dengai') return lib.character[name1][2]%2==1;
+				if(['gz_sunce','gz_jiangwei'].contains(name1)) return name2=='gz_zhoutai'||lib.character[name2][2]%2==1;
+				return false;
+			},
+			guozhanRank:function(name){
+				if(name.indexOf('gz_shibing')==0) return -1;
+				if(name.indexOf('gz_jun_')==0) return 7;
+				if(_status._aozhan){
+					for(var i in lib.aozhanRank){
+						if(lib.aozhanRank[i].contains(name)) return parseInt(i);
+					}
+				}
+				for(var i in lib.guozhanRank){
+					if(lib.guozhanRank[i].contains(name)) return parseInt(i);
+				}
+				return 0;
+			},
 			junlingEffect:function(source,junling,performer,targets,viewer){
 						var att1=get.attitude(viewer,source),att2=get.attitude(viewer,performer);
 						var eff1=0,eff2=0;
