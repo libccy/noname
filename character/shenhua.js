@@ -814,67 +814,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"drlt_wanglie":{
-				group:["drlt_wangliex"],
-				audio:2,
-				trigger:{
-					player:"phaseUseBefore",
-				},
-				forced:true,
-				popup:false,
-				content:function(){
-					player.storage.drlt_wanglie=true;
-					player.markSkillCharacter('drlt_wanglie',player,'往烈','回合内使用的第一张牌无距离限制');
-				},
-			},
-			'drlt_wangliex':{
 				mod:{
 					targetInRange:function (card,player,target,now){
-						if(player.storage.drlt_wanglie==true) return true;
+						if(!player.countUsed()) return true;
 					},
 				},
 				audio:2,
 				trigger:{
-					player:"useCardBegin",
+					player:"useCard",
 				},
 				filter:function (event,player){
-					return player.hasSkill('drlt_wanglie')&&_status.currentPhase==player;
+					return _status.currentPhase==player;
 				},
-				forced:true,
-				popup:false,
+				check:function(trigger,player){
+					if(player.countCards('h')<=player.hp+1&&((get.type(trigger.card)=='trick'&&game.countPlayer(function(current){return get.attitude(current,player)<=0&&current.countCards('h',{name:'wuxie'})})>0)||trigger.card.name=='sha')) return true;
+					return false;
+				},
 				content:function(){
-					'step 0'
-					if(player.storage.drlt_wanglie==true){
-						delete player.storage.drlt_wanglie;
-						player.unmarkSkill('drlt_wanglie');
-					};
-					player.chooseBool().set('ai',function(){
-						if(player.countCards('h')<=player.hp+1&&((get.type(trigger.card)=='trick'&&game.countPlayer(function(current){return get.attitude(current,player)<=0&&current.countCards('h',{name:'wuxie'})})>0)||trigger.card.name=='sha')) return true;
-						return false;
-					}).set('prompt','是否令此牌不能被响应');
-					'step 1'
-					if(result.bool){
-						player.logSkill('drlt_wanglie');
-						player.storage.drlt_wanglie1=trigger.card.name;
-						player.addTempSkill('drlt_wanglie1',{player:'useCardAfter'});
-						player.addTempSkill('drlt_wanglie2',{player:'phaseAfter'});
-					};
-				},
-			},
-			"drlt_wanglie1":{
-				mod:{
-					wuxieRespondable:function(card,player,target,current){
-						if(player!=current&&player.storage.drlt_wanglie1==card.name) return false;
-					},
-				},
-				ai:{
-					norespond:true,
-					skillTagFilter:function(player,tag,arg){
-						if(tag=='norespond'&&Array.isArray(arg)){
-							var evt=arg[2].getParent();
-							if(evt.type=='card'&&evt.name==player.storage.drlt_wanglie1) return true;
-						};
-						return false;
-					},
+					trigger.nowuxie=true;
+					trigger.directHit.addArray(game.players);
+					player.addTempSkill('drlt_wanglie2');
 				},
 			},
 			"drlt_wanglie2":{
@@ -1039,7 +998,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						logTarget:'player',
 						content:function(){
 							game.asyncDraw([player,trigger.player]);
-							trigger.player.storage.nzry_juzhan=true;
+							trigger.player.addTempSkill('nzry_juzhany');
 							player.storage.nzry_juzhan1=true;
 							player.addTempSkill('nzry_juzhanx');
 						},
@@ -1061,7 +1020,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.gainPlayerCard(trigger.targets[0],'he',true);
 							player.storage.nzry_juzhan1=false;
 							trigger.target.addTempSkill('nzry_juzhanx');
-							trigger.target.storage.nzry_juzhan2=true;
+							player.addTempSkill('nzry_juzhany');
 						},
 					},
 				},
@@ -1069,22 +1028,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_juzhanx":{
 				mod:{
 					targetEnabled:function(card,player,target){
-						if(target.storage.nzry_juzhan2==true) return false;
+						if(player.hasSkill('nzry_juzhany')) return false;
 					},
 				},
-				trigger:{							
-					global:'phaseAfter'
-				},
-				filter:function (event,player){
-					return player.storage.nzry_juzhan==true||player.storage.nzry_juzhan2==true;
-				},
-				forced:true,
-				popup:false,
-				content:function(){
-					if(player.storage.nzry_juzhan==true) delete player.storage.nzry_juzhan;
-					if(player.storage.nzry_juzhan2==true) delete player.storage.nzry_juzhan2;
-				},
 			},
+			nzry_juzhany:{},
 			"nzry_feijun":{
 				init:function (player){
 					player.storage.nzry_feijun=[];

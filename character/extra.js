@@ -105,6 +105,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						sub:true,
 					},
 				},
+				ai:{
+					threaten:0.01,
+				},
 			},
 			"new_guixin":{
 				audio:"guixin",

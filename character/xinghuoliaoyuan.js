@@ -4953,21 +4953,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"xinfu_jiyuan":{
 				trigger:{
-					global:["gainEnd","dying"],
+					global:"dying",
+					source:"gainEnd",
 				},
 				priority:6,
 				audio:2,
 				filter:function (event,player){
 					if(event.name=='dying') return true;
-					if(['gainPlayerCard','gainMultiple'].contains(event.parent.name)) return false;
-					return event.source==player&&event.player!=player;
+					return event.bySelf!=true;
 				},
 				check:function (event,player){
 					return get.attitude(player,event.player)>0;
 				},
 				logTarget:"player",
 				content:function (){
-					player.line(trigger.player);
 					trigger.player.draw();
 				},
 			},

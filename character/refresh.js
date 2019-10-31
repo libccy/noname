@@ -2792,13 +2792,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				onremove:true,
-				trigger:{player:'shaBegin'},
+				trigger:{player:'useCard'},
 				forced:true,
 				filter:function(event,player){
-					return event.card&&get.color(event.card)=='red';
+					return event.card&&event.card.name=='sha'&&get.color(event.card)=='red';
 				},
 				content:function(){
-					trigger.directHit=true;
+					trigger.directHit.addArray(game.players);
 				}
 			},
 			zhuhai:{
@@ -2962,7 +2962,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.awakenSkill('fenwei');
 						player.logSkill('fenwei',result.targets);
 						player.storage.fenwei=true;
-						trigger.getParent.excluded.addArray(result.targets);
+						trigger.getParent().excluded.addArray(result.targets);
 						game.delay();
 					}
 				},

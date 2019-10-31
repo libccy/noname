@@ -2291,7 +2291,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectTarget:2,
 				multitarget:true,
 				content:function(){
-					targets[1].useCard({name:'juedou'},targets[0],'noai').animate=false;
+					targets[1].useCard({name:'juedou'},'nowuxie',targets[0],'noai').animate=false;
 					game.delay(0.5);
 				},
 				ai:{
@@ -2544,7 +2544,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qingnang_info:'出牌阶段限一次，你可以弃置一张手牌并令一名角色回复一点体力。',
 			jijiu_info:'你的回合外，你可以将一张红色牌当做【桃】使用。',
 			wushuang_info:'锁定技，你使用的【杀】或【决斗】需要两张【闪】或【杀】响应。',
-			lijian_info:'出牌阶段限一次，你可以弃置一张牌，视为一名男性角色对另一名男性角色使用一张【决斗】。',
+			lijian_info:'出牌阶段限一次，你可以弃置一张牌，视为一名男性角色对另一名男性角色使用一张【决斗】（不可被【无懈可击】响应）。',
 			biyue_info:'结束阶段，你可以摸一张牌。',
 			xinbiyue_info:'结束阶段，你可以摸一张牌',
 			xinbiyue_info_alter:'结束阶段，你可以摸一张牌，如果你没有手牌，改为摸2张牌',
