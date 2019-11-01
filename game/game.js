@@ -13341,7 +13341,7 @@
 					event.getTriggerTarget=function(list1,list2){
 						var listx=list1.slice(0).sortBySeat();
 						for(var i=0;i<listx.length;i++){
-							if(!list2.contains(listx[i])) return list1[i];
+							if(!list2.contains(listx[i])) return listx[i];
 						}
 						return null;
 					}

@@ -127,7 +127,7 @@ window.config={
 	sort:'type_sort',
 
 	cards:['standard','ex','extra','sp','classic','basic'],
-	characters:['standard','shenhua','sp','yijiang'],
+	characters:['standard','shenhua','sp','yijiang','refresh','xinghuoliaoyuan','mobile','extra'],
 	connect_characters:[],
 	connect_cards:[],
 	plays:[],
@@ -183,6 +183,7 @@ window.config={
 	forbid:[
 		['huashen'],
 		['xinmanjuan'],
+		['reluanji','jueqing'],
 		['lianying','rende'],
 		['lianying','anxian'],
 		['lianying','yinguo'],

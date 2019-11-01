@@ -76,7 +76,6 @@ window.noname_package={
 	},
 	background:{
 		ol_bg:'龙纹',
-		xinsha_bg:'新杀',
 		zhulin_bg:'竹林',
 		shengshi_bg:'盛世',
 		taoyuan_bg:'桃园',
@@ -91,6 +90,7 @@ window.noname_package={
 		sanying_bg:'三英',
 		wangshi_bg:'往事',
 		xiongxin_bg:'雄心',
+		planetarian_bg:'星梦',
 		kyoani_bg:'京都',
 		key_bg:'键社',
 	},
