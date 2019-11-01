@@ -5446,8 +5446,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 3"
 					if(event.sha){
 						event.target.chooseToUse('是否使用一张杀？',{name:'sha'}).set('filterTarget',function(card,player,target){
-							return target!=_status.event.source&&get.distance(_status.event.source,target,'attack')<=1&&player.canUse('sha',target,false);
-						}).set('source',player);
+							return target!=_status.event.sourcex&&get.distance(_status.event.sourcex,target,'attack')<=1&&player.canUse('sha',target,false);
+						}).set('sourcex',player);
 					}
 				}
 			},
@@ -6238,9 +6238,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var next=event.current.chooseToRespond('是否替'+get.translation(player)+'打出一张杀？',{name:'sha'});
 						next.set('ai',function(){
 							var event=_status.event;
-							return (get.attitude(event.player,event.source)-2);
+							return (get.attitude(event.player,event.sourcex)-2);
 						});
-						next.set('source',player);
+						next.set('sourcex',player);
 						next.set('jijiang',true);
 						next.autochoose=lib.filter.autoRespondSha;
 					}
@@ -8203,7 +8203,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return player.isEmpty(get.subtype(card));
 					},'e')){
 						next=player.chooseControl('移动装备','draw_card','cancel2',function(event,player){
-							var source=_status.event.source;
+							var source=_status.event.sourcex;
 							var att=get.attitude(player,source);
 							if(source.hasSkillTag('noe')){
 								if(att>0){
@@ -8216,7 +8216,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							return 'draw_card';
-						}).set('source',trigger.player);
+						}).set('sourcex',trigger.player);
 					}
 					else{
 						next=player.chooseControl('draw_card','cancel2',function(){
@@ -8325,8 +8325,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.target=target;
 						target.chooseCard({name:'shan'},'交给'+get.translation(player)+
 						'一张闪，或成为此杀的额外目标').set('ai',function(card){
-							return get.attitude(target,_status.event.source)>=0?1:-1;
-						}).set('source',player);
+							return get.attitude(target,_status.event.sourcex)>=0?1:-1;
+						}).set('sourcex',player);
 						game.delay();
 					}
 					else{
@@ -8423,7 +8423,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					player.chooseTarget(get.prompt2('zhuiyi'),function(card,player,target){
-						return player!=target&&_status.event.source!=target;
+						return player!=target&&_status.event.sourcex!=target;
 					}).set('forceDie',true).set('ai',function(target){
 						var num=get.attitude(_status.event.player,target);
 						if(num>0){
@@ -8435,7 +8435,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						return num;
-					}).set('source',trigger.source);
+					}).set('sourcex',trigger.source);
 					"step 1"
 					if(result.bool){
 						var target=result.targets[0];
@@ -9854,10 +9854,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var source=target;
 					event.card=result.links[0];
 					player.chooseTarget('选择一个目标送出'+get.translation(event.card),function(card,player,target){
-						return target!=_status.event.source&&target!=player;
+						return target!=_status.event.sourcex&&target!=player;
 					}).set('ai',function(target){
 						return get.attitude(_status.event.player,target);
-					}).set('source',target);
+					}).set('sourcex',target);
 					"step 3"
 					if(result.bool){
 						result.targets[0].gain(card,player,'give');
