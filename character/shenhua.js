@@ -2217,7 +2217,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					basic:{
-						order:10
+						order:8.9
 					}
 				},
 				group:['reluanji_count','reluanji_reset','reluanji_respond','reluanji_damage','reluanji_draw'],
@@ -2416,17 +2416,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					if(event.target.countCards('h')<=player.countCards('h')) return true;
-					if(event.target.hp<=player.hp) return true;
+					if(event.target.hp>=player.hp) return true;
 					return false;
 				},
 				content:function(){
 					if(trigger.target.countCards('h')<=player.countCards('h')) trigger.directHit=true;
+					
 					if(trigger.target.hp>=player.hp){
 						if(typeof trigger.extraDamage!='number'){
 							trigger.extraDamage=0;
 						}
 						trigger.extraDamage++;
-					};
+					}
 				},
 				ai:{
 					threaten:0.5
@@ -5183,7 +5184,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					basic:{
-						order:10
+						order:8.5
 					}
 				}
 			},

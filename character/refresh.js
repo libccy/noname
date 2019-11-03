@@ -40,7 +40,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			reqingguo:{
-				audio:2,
+				audio:'qingguo',
 				enable:['chooseToRespond'],
 				filterCard:function(card){
 					return get.color(card)=='black';

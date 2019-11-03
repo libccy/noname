@@ -594,6 +594,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:'lianhua',
 						sub:true,
 						trigger:{player:'phaseBegin'},
+						filter:function(event,player){
+							return player.storage.lianhua&&player.storage.lianhua.red+player.storage.lianhua.black>0;
+						},
 						forced:true,
 						content:function(){
 							var cards=[];
@@ -3488,7 +3491,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 0;
 				},
 				filterCard:function(card){
-					return card.name=='sha'||(get.type(card,'trick')=='trick'&&get.color(card)=='black'&&!get.info(card).multitarget)&&get.info(card).enable;
+					return get.name(card)=='sha'||(get.type(card,'trick')=='trick'&&get.color(card)=='black'&&!get.info(card).multitarget)&&get.info(card).enable;
 				},
 				filterTarget:function(card,player,target){
 					return target!=player&&!target.isMin()&&
@@ -10164,23 +10167,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.target.gain(result.cards,player,'give');
 					game.delay();
 					event.card=result.cards[0];
-					if(get.type(event.card)!='equip'||trigger.target.isDisabled(get.subtype(event.card))) event.finish();
 					"step 2"
-					if(!trigger.target.isMin()){
-						trigger.target.chooseBool('是否装备'+get.translation(event.card)+'？').set('ai',function(){
-							var current=_status.event.player.getCards('e',{subtype:get.subtype(_status.event.card)});
-							if(current&&current.length){
-								return get.equipValue(event.card)>get.equipValue(current[0]);
-							}
-							return true;
-						}).set('card',event.card);
-					}
-					else{
-						event.finish();
-					}
-					"step 3"
-					if(result.bool){
-						trigger.target.useCard(event.card,trigger.target).nopopup=true;
+					if(trigger.target.getCards('h').contains(card)&&get.type(card)=='equip'){
+						trigger.target.chooseUseTarget(card);
 					}
 				},
 				ai:{
@@ -13171,7 +13160,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fengliang:'逢亮',
 			fengliang_info:'觉醒技，当你进入濒死状态时，你减１点体力上限并将体力值回复至２点，然后获得技能挑衅，将困奋改为非锁定技',
 			cihuai:'刺槐',
-			cihuai_info:'出牌阶段开始时，若你手牌中没有杀，你可以展示你的手牌，视为对一名角色使用一张杀',
+			cihuai_info:'出牌阶段开始时，若你的手牌中没有【杀】，则你可以展示你的手牌，并视为对一名角色使用一张【杀】。',
 			gongao_info:'锁定技，每当一名角色死亡后，你增加一点体力上限，回复一点体力。',
 			juyi:'举义',
 			juyi_info:'觉醒技，准备阶段开始时，若你已受伤且体力上限大于存活角色数，你须将手牌摸至体力上限，然后获得技能“崩坏”和“威重”。',

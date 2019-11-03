@@ -141,23 +141,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		skill:{
 			haruko_haofang:{
 				mod:{
-					cardEnabled:function(card,player){
-						if(_status.event.skill==undefined&&get.type(card)=='delay') return false;
+					cardname:function(card,player,name){
+						if(lib.card[card.name].type=='delay') return 'wuzhong';
 					},
-					cardRespondable:function(card,player){
-						if(_status.event.skill==undefined&&get.type(card)=='delay') return false;
-					},
-					cardSavable:function(card,player){
-						if(_status.event.skill==undefined&&get.type(card)=='delay') return false;
-					},
-				},
-				audio:2,
-				enable:'chooseToUse',
-				filterCard:{type:'delay'},
-				viewAs:{name:'wuzhong'},
-				check:function(){return 1},
-				viewAsFilter:function(haruko){
-					return haruko.countCards('h',{type:'delay'})>0;
 				},
 			},
 			haruko_zhuishi:{
@@ -5124,7 +5110,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_yangyi:'杨仪',
 			ns_liuzhang:'刘璋',
 			ns_xinnanhua:'南华老仙',
-			
 			
 			key_lucia:'此花露西娅',
 			key_kyousuke:'棗恭介',

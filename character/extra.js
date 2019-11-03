@@ -604,10 +604,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			renjie2:{
 				audio:true,
-				trigger:{player:'phaseDiscardEnd'},
+				trigger:{player:'discardAfter'},
 				forced:true,
 				filter:function(event){
-					return event.cards&&event.cards.length>0;
+					var evt=event.getParent('phaseDiscard');
+					return evt&&evt.name=='phaseDiscard'
 				},
 				content:function(){
 					player.storage.renjie+=trigger.cards.length;
@@ -833,27 +834,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			wushen:{
 				mod:{
-					cardEnabled:function(card,player){
-						if(_status.event.skill==undefined&&card.name!='sha'&&get.suit(card)=='heart') return false;
+					cardname:function(card,player,name){
+						if(get.suit(card)=='heart') return 'sha';
 					},
-					cardUsable:function(card,player){
-						if(_status.event.skill==undefined&&card.name!='sha'&&get.suit(card)=='heart') return false;
-					},
-					cardRespondable:function(card,player){
-						if(_status.event.skill==undefined&&card.name!='sha'&&get.suit(card)=='heart') return false;
-					},
-					cardSavable:function(card,player){
-						if(_status.event.skill==undefined&&card.name!='sha'&&get.suit(card)=='heart') return false;
+					cardnature:function(card,player,name){
+						if(get.suit(card)=='heart') return null;
 					},
 					targetInRange:function(card){
-						if(get.suit(card)=='heart'||_status.event.skill=='wushen') return true;
+						if(get.suit(card)=='heart') return true;
 					}
 				},
 				audio:2,
-				enable:['chooseToUse','chooseToRespond'],
-				filterCard:{suit:'heart'},
-				viewAs:{name:'sha'},
-				check:function(){return 1},
 				ai:{
 					effect:{
 						target:function(card,player,target,current){
@@ -1883,27 +1874,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					'1':{
 						mod:{
-							cardEnabled:function(card,player){
-								if(_status.event.skill!='nzry_longnu_1'&&(card.name!='sha'||card.nature!='fire')&&get.color(card)=='red') return false;
+							cardname:function(card,player){
+								if(get.color(card)=='red') return 'sha';
 							},
-							cardUsable:function(card,player){
-								if(_status.event.skill!='nzry_longnu_1'&&(card.name!='sha'||card.nature!='fire')&&get.color(card)=='red') return false;
-							},
-							cardRespondable:function(card,player){
-								if(_status.event.skill!='nzry_longnu_1'&&(card.name!='sha'||card.nature!='fire')&&get.color(card)=='red') return false;
-							},
-							cardSavable:function(card,player){
-								if(_status.event.skill!='nzry_longnu_1'&&(card.name!='sha'||card.nature!='fire')&&get.color(card)=='red') return false;
+							cardnature:function(card,player){
+								if(get.color(card)=='red') return 'fire';
 							},
 							targetInRange:function(card){
-								if((card.name=='sha'&&card.nature=='fire')||_status.event.skill=='nzry_longnu_1') return true;
+								if(get.color(card)=='red') return true;
 							},
 						},
-						prompt:'本回合你的红色手牌均视为火杀且无距离限制',
-						enable:['chooseToUse','chooseToRespond'],
-						filterCard:{color:'red'},
-						viewAs:{name:'sha',nature:'fire'},
-						check:function(){return 1},
 						ai:{
 							effect:{
 								target:function(card,player,target,current){
@@ -1911,36 +1891,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							},
 							respondSha:true,
-							order:4,
-							useful:-1,
-							value:-1
 						},
 					},
 					'2':{
 						prompt:'本回合你的锦囊牌均视为雷杀且无使用次数限制',
 						mod:{
-							cardEnabled:function(card,player){
-								if(_status.event.skill!='nzry_longnu_2'&&get.type(card,'trick')=='trick') return false;
+							cardname:function(card,player){
+								if(['trick','delay'].contains(lib.card[card.name].type)) return 'sha';
 							},
-							cardUsable:function(card,player){
-								if(_status.event.skill!='nzry_longnu_2'&&get.type(card,'trick')=='trick') return false;
-							},
-							cardRespondable:function(card,player){
-								if(_status.event.skill!='nzry_longnu_2'&&get.type(card,'trick')=='trick') return false;
-							},
-							cardSavable:function(card,player){
-								if(_status.event.skill!='nzry_longnu_2'&&get.type(card,'trick')=='trick') return false;
+							cardnature:function(card,player){
+								if(['trick','delay'].contains(lib.card[card.name].type)) return 'thunder';
 							},
 							cardUsable:function(card,player){
 								if(card.name=='sha'&&card.nature=='thunder') return Infinity;
 							},
 						},
-						enable:['chooseToUse','chooseToRespond'],
-						filterCard:function(card){
-							return get.type(card,'trick')=='trick';
-						},
-						viewAs:{name:'sha',nature:'thunder'},
-						check:function(){return 1},
 						ai:{
 							effect:{
 								target:function(card,player,target,current){
@@ -1948,9 +1913,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							},
 							respondSha:true,
-							order:4,
-							useful:-1,
-							value:-1
 						},
 					},
 				},

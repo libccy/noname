@@ -59,7 +59,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_guanzhang:['male','shu',4,['old_fuhun']],
 			ol_xinxianying:['female','wei',3,['caishi','zhongjian']],
 			ol_zhangrang:['male','qun',3,['taoluan']],
-			ol_yujin:['male','wei',4,['zhenjun']],
+			ol_yujin:['male','wei',4,['rezhenjun']],
 			ol_zhuran:['male','wu',4,['danshou']],
 			ol_liaohua:['male','shu',4,['dangxian','fuli']],
 			ol_guansuo:['male','shu',4,['zhengnan','xiefang']],
