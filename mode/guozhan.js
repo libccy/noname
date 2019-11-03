@@ -3157,17 +3157,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			aozhan:{
 				mod:{
-					cardEnabled:function (card,player){
-						if(_status.event.skill==undefined&&get.owner(card)!=undefined&&card.name=='tao') return false;
+					targetEnabled:function(card){
+						if(card.name=='tao'&&get.itemtype(card)=='card') return false;
 					},
-					cardUsable:function (card,player){
-						if(_status.event.skill==undefined&&get.owner(card)!=undefined&&card.name=='tao') return false;
-					},
-					cardRespondable:function (card,player){
-						if(_status.event.skill==undefined&&get.owner(card)!=undefined&&card.name=='tao') return false;
-					},
-					cardSavable:function (card,player){
-						if(_status.event.skill==undefined&&get.owner(card)!=undefined&&card.name=='tao') return false;
+					cardSavable:function(card){
+						if(card.name=='tao'&&get.itemtype(card)=='card') return false;
 					},
 				},
 				group:["aozhan_sha","aozhan_shan"],
@@ -7485,7 +7479,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		junList:['liubei','zhangjiao','sunquan','caocao'],
 		guozhanPile:[
 			['spade',1,'juedou'],
-			['spade',1,'shandian','thunder'],
+			['spade',1,'shandian'],
 			['spade',2,'feilongduofeng'],
 			['spade',2,'bagua'],
 			['spade',2,'hanbing'],
@@ -7515,7 +7509,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			['club',1,'juedou'],
 			['club',1,'baiyin'],
 			['club',2,'sha'],
-			['club',2,'tengjia','fire'],
+			['club',2,'tengjia'],
 			['club',2,'renwang'],
 			['club',3,'sha'],
 			['club',3,'zhibi'],
@@ -7571,10 +7565,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			['heart',1,'taoyuan'],
 			['heart',1,'wanjian'],
 			['heart',2,'shan'],
-			['heart',2,'huogong','fire'],
+			['heart',2,'huogong'],
 			['heart',3,'wugu'],
 			['heart',3,'taipingyaoshu'],
-			['heart',3,'huogong','fire'],
+			['heart',3,'huogong'],
 			['heart',4,'tao'],
 			['heart',4,'sha','fire'],
 			['heart',5,'qilin'],
@@ -7599,7 +7593,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 			['spade',1,'xietianzi',null,['lianheng']],
 			['spade',2,'minguangkai'],
-			['spade',3,'huoshaolianying','fire',['lianheng']],
+			['spade',3,'huoshaolianying',null,['lianheng']],
 			['spade',4,'sha'],
 			['spade',5,'qinglong'],
 			['spade',6,'jiu',null,['lianheng']],
@@ -7622,7 +7616,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			['heart',9,'tao'],
 			['heart',10,'sha'],
 			['heart',11,'sha'],
-			['heart',12,'huoshaolianying','fire',['lianheng']],
+			['heart',12,'huoshaolianying',null,['lianheng']],
 			['heart',13,'shuiyanqijunx'],
 
 			['club',1,'yuxi'],
@@ -7635,7 +7629,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			['club',8,'sha'],
 			['club',9,'jiu'],
 			['club',10,'lulitongxin'],
-			['club',11,'huoshaolianying','fire',['lianheng']],
+			['club',11,'huoshaolianying',null,['lianheng']],
 			['club',12,'shuiyanqijunx'],
 			['club',13,'wuxie',null,['guo']],
 
@@ -7767,7 +7761,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.$removeCharacter(event.num);
 				},
 				doubleDraw:function(){
-					game.log(player,'获得了【阴阳鱼】标记');
+					game.log(player,'获得了','#g【阴阳鱼】','标记');
 					player.addSkill('yinyang_skill');
 				},
 				changeVice:function(){
@@ -7818,7 +7812,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				zhulian:function(){
 					player.popup('珠联璧合');
-					game.log(player,'获得了【珠联璧合】标记');
+					game.log(player,'获得了','#g【珠联璧合】','标记');
 					player.addSkill('zhulianbihe_skill');
 				},
 			},
@@ -8224,7 +8218,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							else{
 								this.addSkill('xianqu_skill');
-								game.log(this,'获得了【先驱】标记');
+								game.log(this,'获得了','#g【先驱】','标记');
 							}
 							_status.initshown=true;
 						}
