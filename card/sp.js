@@ -591,14 +591,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			g_du:{
-				trigger:{player:['useCardAfter','respondAfter','discardAfter']},
+				trigger:{player:'loseEnd'},
 				popup:false,
 				forced:true,
 				filter:function(event,player){
+					if(!event.visible) return false;
 					if(player.hasSkillTag('nodu')) return false;
 					if(event.cards){
 						for(var i=0;i<event.cards.length;i++){
-							if(event.cards[i].name=='du'&&event.cards[i].original!='j') return true;
+							if(event.cards[i].name=='du'&&event.cards[i].original=='h') return true;
 						}
 					}
 					return false;
@@ -606,9 +607,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var num=0;
 					for(var i=0;i<trigger.cards.length;i++){
-						if(trigger.cards[i].name=='du'&&trigger.cards[i].original!='j') num++;
+						if(trigger.cards[i].name=='du'&&trigger.cards[i].original=='h') num++;
 					}
-					player.popup('毒','wood');
+					if(trigger.getParent().name!='useCard'||trigger.getParent().card.name!='du') player.popup('毒','wood');
 					player.loseHp(num).type='du';
 				},
 			},
@@ -652,7 +653,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			yinyueqiang:'银月枪',
 			yinyueqiang_info:'你的回合外，每当你使用或打出了一张黑色手牌（若为使用则在它结算之前），你可以立即对你攻击范围内的任意一名角色使用一张【杀】',
 			du:'毒',
-			du_info:'当你因使用、打出或弃置而失去此牌时，你失去一点体力',
+			du_info:'当此牌正面朝上离开你的手牌区时，你失去一点体力',
 			shengdong:'声东击西',
 			shengdong_info:'出牌阶段，对一名其他角色使用。你交给目标角色一张手牌，若如此做，其将两张牌交给另一名由你选择的其他角色（不足则全给，存活角色不超过2时可重铸）',
 			zengbin:'增兵减灶',

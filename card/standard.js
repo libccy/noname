@@ -2266,10 +2266,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			["spade",6,'lebu'],
 			["club",6,'lebu'],
 			["heart",6,'lebu'],
-			["spade",1,'shandian','thunder'],
+			["spade",1,'shandian'],
 			["spade",2,'hanbing'],
 			["club",2,'renwang'],
-			["heart",12,'shandian','thunder'],
+			["heart",12,'shandian'],
 			["diamond",12,'wuxie'],
 		],
 	};
