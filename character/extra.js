@@ -1414,7 +1414,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 4"
 					player.chooseControl("2点","3点").set('prompt','请选择伤害点数').set('ai',function(){
 						return "3点";
-					}).forceDie=true;
+					}).set('forceDie',true);
 					"step 5"
 					targets[0].damage('fire',result.control=="2点"?2:3,'nocard'); 
 				},

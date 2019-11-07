@@ -35,7 +35,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_yuanshao:['male','qun',4,['luanji','xueyi'],['zhu']],
 			re_pangde:['male','qun',4,['mashu','jianchu']],
 
-			menghuo:['male','shu',4,['huoshou','zaiqi']],
+			menghuo:['male','shu',4,['huoshou','zaiqixx']],
 			zhurong:['female','shu',4,['juxiang','lieren']],
 			caopi:['male','wei',3,['xingshang','fangzhu','songwei'],['zhu']],
 			re_xuhuang:['male','wei',4,['duanliang','jiezi']],
@@ -3739,6 +3739,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.source=player;
 				}
 			},
+			zaiqixx:{
+				audio:'zaiqi',
+				inherit:'zaiqi',
+			},
 			zaiqi:{
 				audio:2,
 				trigger:{player:'phaseDrawBefore'},
@@ -3757,7 +3761,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					trigger.cancel();
-					event.cards=get.cards(player.getDamagedHp());
+					event.cards=get.cards(player.getDamagedHp()+(event.name=='zaiqi'?0:1));
 					player.showCards(event.cards);
 					"step 1"
 					var num=0;
@@ -6551,6 +6555,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huoshou1:'祸首',
 			huoshou2:'祸首',
 			zaiqi:'再起',
+			zaiqixx:'再起',
 			juxiang:'巨象',
 			juxiang1:'巨象',
 			juxiang2:'巨象',
@@ -6577,6 +6582,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jiezi_info:'锁定技，其他角色跳过摸牌阶段后，你摸一张牌。',
 			huoshou_info:'锁定技，【南蛮入侵】对你无效；你视为所有【南蛮入侵】的伤害来源。',
 			zaiqi_info:'摸牌阶段，若你已受伤，则你可以改为展示牌堆顶的X张牌（X为你已损失的体力值），并回复X点体力（X为其中♥牌的数目）。然后你将这些♥牌置入弃牌堆，并获得其余的牌。',
+			zaiqixx_info:'摸牌阶段，若你已受伤，则你可以改为展示牌堆顶的X张牌（X为你已损失的体力值+1），并回复X点体力（X为其中♥牌的数目）。然后你将这些♥牌置入弃牌堆，并获得其余的牌。',
 			juxiang_info:'锁定技，【南蛮入侵】对你无效。其他角色使用的【南蛮入侵】结算后进入弃牌堆时，你获得之。',
 			lieren_info:'当你使用【杀】造成伤害后，可与受到该伤害的角色进行拼点；若你赢，你获得对方的一张牌。',
 			xingshang_info:'当有角色死亡后，你可以获得该角色的所有牌。',

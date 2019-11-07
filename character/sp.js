@@ -14,10 +14,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_star:["sp_xiahoushi","jsp_zhaoyun","huangjinleishi","sp_pangtong","sp_daqiao","sp_ganning","sp_xiahoudun","sp_lvmeng","sp_zhangfei","sp_liubei"],
 				sp_guozhan:["shamoke","ganfuren","yuejin","hetaihou","dingfeng","panfeng","jianggan"],
 				sp_guozhan2:["mifuren","mateng","tianfeng","chendong","sp_dongzhuo","jiangfei","jiangqing","kongrong","bianfuren","liqueguosi","lvfan","cuimao","jiling","zangba","zhangren","zoushi"],
+				sp_single:["hejin","hansui","niujin"],
 				sp_others:["hanba"],
 			},
 		},
 		character:{
+			hejin:['male','qun',4,['mouzhu','yanhuo']],
+			hansui:['male','qun',4,['mashu','niluan']],
+			niujin:['male','wei',4,['cuorui','liewei']],
+			
 			guanlu:['male','wei',3,['tuiyan','busuan','mingjie']],
 			gexuan:['male','wu',3,['lianhua','zhafu']],
 			wenyang:['male','wei',5,['xinlvli','choujue']],
@@ -157,6 +162,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			hejin:'何进（？~189年），字遂高，南阳郡宛县（今河南南阳市宛城区）人。东汉时期外戚大臣，灵思皇后之兄。初以妹妹有宠，拜为郎中，出任虎贲中郎将、颍川太守，迁侍中、将作大匠、河南尹。黄巾起义时，拜为大将军，总镇京师，发现并镇压马元义的密谋，封为慎侯。为张大威望，在京师讲武结营，置西园八校尉。汉灵帝驾崩后，粉碎了中常侍蹇硕拥立皇子刘协的图谋，听从袁绍之言，博征智谋之士，内借元舅之资，外据辅政之权，独揽朝中大权。中平六年（189），不纳陈琳和曹操劝谏，阴结军阀董卓，联合袁绍谋诛宦竖。事情败露后，为中常侍张让等人损害，其后代是魏晋高门士族南阳何氏。',
+			hansui:'韩遂（？－215年），字文约。凉州金城郡人。东汉末年军阀、将领，汉末群雄之一。原名韩约，后改名遂。韩遂最初闻名于西州，被羌胡叛军劫持并推举为首领，以诛宦官为名举兵造反，聚众十万，先后败皇甫嵩、张温、董卓、孙坚等名将，使得天下骚动。后受朝廷招安，拥兵割据一方长达三十余年。韩遂曾与马腾结为异姓兄弟，后二人关系破裂。袁绍、曹操相争之际，马腾、韩遂被钟繇说服，依附于曹操。马腾入京后，留其子马超统领部队。马超推举韩遂为都督起兵反叛曹操，为曹操所败，韩遂逃奔凉州，后又为夏侯渊所败，病死（一说被杀），享年七十余岁。',
+			niujin:'牛金（生卒年不详），初为曹仁部曲将，周瑜军数万人来攻，前锋数千人始至，曹仁登城望，乃募得三百人，遣牛金迎战。但对方兵力较多，牛金遂被围困。曹仁亲自杀入阵中救出牛金。司马懿使牛金轻骑饵诱蜀军，刚交战诸葛亮就退兵，追至祁山。蜀将马岱入寇，司马懿遣将军牛金击退，斩千余级。公孙渊反，司马懿帅牛金、胡遵等步骑四万发自洛阳，后平定辽东。牛金官至后将军。',
 			guanlu:"管辂（209年－256年），字公明，平原（今山东德州平原县）人。三国时期曹魏术士。年八九岁，便喜仰观星辰。成人后，精通《周易》，善于卜筮、相术，习鸟语，相传每言辄中，出神入化。体性宽大，常以德报怨。正元初，为少府丞。北宋时被追封为平原子。管辂是历史上著名的术士，被后世奉为卜卦观相的祖师。",
 			gexuan:"葛玄（164年-244年），汉族，吴丹阳郡句容县都乡吉阳里人（今句容市），祖籍山东琅琊，三国著名高道，道教灵宝派祖师。字孝先，号仙翁，被尊称为“葛天师”。道教尊为葛仙翁，又称太极仙翁，与张道陵、许逊、萨守坚共为四大天师。为汉下邳僮侯葛艾后裔，祖葛矩，安平太守，黄门郎；从祖葛弥，豫章第五郡太守。父葛焉，字德儒，州主簿，山阴令，散骑常侍，大尚书。随左慈学道，得《太清丹经》、《黄帝九鼎神丹经》、《金液丹经》等道经。曾采药海山，吴嘉禾二年（233年），在閤皂山修道建庵，筑坛立炉，修炼九转金丹。喜好遨游山川，去过括苍山、南岳山、罗浮山。编撰《灵宝经诰》，精研上清、灵宝等道家真经，并嘱弟子世世箓传。",
 			wenyang:"文俶（238年—291年），一作文淑，字次骞，小名阿鸯，世称文鸯，谯郡（今安徽亳州市）人。魏末晋初名将，曹魏扬州刺史文钦之子。骁勇善战，依附大将军曹爽，效忠于王室。司马师废黜皇帝曹芳后，随父联合毌丘俭于淮南起兵勤王。兵败之后，向南投奔吴国。诸葛诞发动淮南叛乱，奉命率军驰援。双方发生内讧，父亲为诸葛诞所害，遂降于司马昭，封关内侯。西晋建立后，任平虏护军。咸宁三年（277年），拜平西将军、都督凉秦雍州三州军事，大破鲜卑首领秃发树机能，名震天下，迁使持节、护东夷校尉、监辽东军事。八王之乱中，为诸葛诞外孙、东安王司马繇所诬杀，惨遭灭族，时年五十四岁。",
@@ -560,6 +568,123 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//新1v1
+			yanhuo:{
+				trigger:{player:'die'},
+				forceDie:true,
+				filter:function(event,player){
+					return player.countCards('he')>0;
+				},
+				direct:true,
+				skillAnimation:true,
+				animationColor:'thunder',
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('yanhuo'),function(card,player,target){
+						return target!=player&&target.countDiscardableCards(player,'he')>0
+					}).set('forceDie',true).ai=function(target){
+						return -target.countCards('he')*get.attitude(player,target);
+					};
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('yanhuo',target);
+						event.count=player.countCards('he');
+					}
+					else event.finish()
+					'step 2'
+					if(target.countDiscardableCards(player,'he')){
+						player.line(target);
+						player.discardPlayerCard(target,'he',true).set('forceDie',true);
+						event.count--;
+						if(event.count) event.redo();
+					}
+				},
+			},
+			mouzhu:{
+				enable:'phaseUse',
+				usable:1,
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countCards('he')>0;
+				},
+				content:function(){
+					'step 0'
+					target.chooseCard('he','交给'+get.translation(player)+'一张牌',true);
+					'step 1'
+					player.gain(result.cards,target,'giveAuto');
+					'step 2'
+					if(player.countCards('h')<=target.countCards('h')){
+						event.finish();
+						return;
+					}
+					var list=[];
+					if(target.canUse('sha',player,false)) list.push('sha');
+					if(target.canUse('juedou',player,false)) list.push('juedou');
+					if(!list.length) event.finish();
+					else if(list.length==1) event._result={control:list[0]};
+					else target.chooseControl(list).set('prompt','对'+get.translation(player)+'使用一张【杀】或【决斗】。');
+					'step 3'
+					target.useCard({name:result.control},player);
+				},
+			},
+			niluan:{
+				audio:2,
+				trigger:{global:'phaseEnd'},
+				filter:function(event,player){
+					return event.player!=player&&(event.player.hp>player.hp||event.player.countUsed('sha'))
+				},
+				direct:true,
+				content:function(){
+					var next=player.chooseToUse();
+					next.logSkill='niluan';
+					next.set('openskilldialog',get.prompt2('niluan'));
+					next.set('norestore',true);
+					next.set('_backupevent','niluanx');
+					next.backup('niluanx');
+				},
+			},
+			niluanx:{
+				viewAs:{name:'sha'},
+				filterCard:{color:'black'},
+				position:'he',
+			},
+			cuorui:{
+				audio:2,
+				trigger:{global:'gameDrawAfter'},
+				forced:true,
+				filter:function(event,player){
+					return player.maxHp>0&&!get.is.single();
+				},
+				content:function(){
+					player.draw(Math.min(5,player.maxHp),false);
+				},
+				group:'cuorui_nojudge',
+				subSkill:{
+					nojudge:{
+						trigger:{
+							player:'phaseJudgeBefore',
+						},
+						forced:true,
+						filter:function(event,player){
+							return !player.storage.cuorui&&(get.is.single()||player.countCards('j'));
+						},
+						content:function(){
+							player.storage.cuorui=true;
+							trigger.cancel();
+							game.log(player,'跳过了','#g判定阶段');
+						},
+					},
+				},
+			},
+			liewei:{
+				audio:2,
+				trigger:{source:'dieAfter'},
+				frequent:true,
+				content:function(){
+					player.draw(3);
+				},
+			},
 			//管辂和葛玄
 			lianhua:{
 				audio:2,
@@ -1134,8 +1259,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								event.finish();
 							}
 							else player.chooseCard('h',true,function(card){
-								return get.suit(card)!=suit2
-							},'交给'+get.translation(target)+'一张不为'+get.translation(suit2)+'花色的牌');
+								return get.suit(card)!=_status.event.suit2
+							},'交给'+get.translation(target)+'一张不为'+get.translation(suit2)+'花色的牌').set('suit2',suit2);
 						}
 					}
 					else event.finish();
@@ -1681,7 +1806,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseControl(['basic','trick','equip']).set('ai',function(){
 						if(!trigger.target.countCards('h','sha')&&trigger.target.countCards('h','shan')) return 'trick';
 						return 'basic';
-					}).prompt='请选择一种牌的类别';
+					}).set('prompt','请选择一种牌的类别');
 					'step 1'
 					trigger.target.chooseCard('he','交给'+get.translation(player)+'一张'+get.translation(result.control)+'牌，否则此【杀】不可被闪避。',function(card){
 						return get.type(card,'trick')==result.control;
@@ -2975,7 +3100,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							player.$throw(list);
-							player.lose(list,ui.discardPile);
+							player.lose(list,ui.discardPile,'visible');
 							game.log(player,'将',list,'置入弃牌堆');
 						}
 					},
@@ -7670,7 +7795,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				lose:false,
 				prepare:'give',
 				content:function(){
-					player.lose(cards,ui.special,'toStorage');
+					player.lose(cards,ui.special,'toStorage','visible');
 					if(target.hasSkill('yanxiao2')&&target.storage.yanxiao2){
 						target.storage.yanxiao2.push(cards[0]);
 						target.syncStorage('yanxiao2');
@@ -9586,7 +9711,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					player.lose(trigger.cards,ui.discardPile);
+					player.lose(trigger.cards,ui.discardPile,'visible');
 					player.$throw(trigger.cards,1000);
 					game.log(player,'将',trigger.cards,'置入了弃牌堆')
 					"step 1"
@@ -12637,7 +12762,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_wenyang:'文鸯',
 			guanlu:'管辂',
 			gexuan:'葛玄',
+			hejin:'何进',
+			hansui:'韩遂',
+			niujin:'牛金',
 			
+			mouzhu:'谋诛',
+			mouzhu_info:'出牌阶段限一次，你可以令一名有牌的其他角色交给你一张牌。然后若你的手牌数大于其，其选择视为对你使用一张【杀】或【决斗】。',
+			yanhuo:'延祸',
+			yanhuo_info:'当你死亡时，你可以依次弃置一名其他角色的X张牌。（X为你的牌数）',
+			niluan:'逆乱',
+			niluan_info:'其他角色的结束阶段开始时，若其本回合内使用过【杀】或其体力值大于你，则你可以将一张黑色牌当做【杀】使用。',
+			cuorui:'挫锐',
+			cuorui_info:'锁定技，游戏开始时，你摸X张牌（X为你的体力上限）。锁定技，限定技，判定阶段开始前，若你的判定区有牌，你跳过此阶段。',
+			cuorui_info_single:'锁定技，你的起始手牌数改为X+2（X为你剩余的备选武将数）。你跳过登场后的第一个判定阶段。',
+			liewei:'裂围',
+			liewei_info:'当你杀死一名角色后，你可以摸三张牌。',
 			tuiyan:'推演',
 			tuiyan_info:'出牌阶段开始时，你可以观看牌堆顶的两张牌。',
 			busuan:'卜算',
@@ -13241,6 +13380,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_guozhan:"国战",
 			sp_guozhan2:"国战移植",
 			sp_others:"其他",
+			sp_single:'新1v1',
 		},
 	};
 });

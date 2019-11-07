@@ -1459,7 +1459,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function (){
 					'step 0'
 					if(targets[0].hasSkill('smh_huoji')&&targets[0].hasSkill('smh_lianhuan')){
-						player.chooseControl('龙印','凤印').prompt='请选择要移动的印';
+						player.chooseControl('龙印','凤印').set('prompt','请选择要移动的印');
 					}
 					else{
 						if(targets[0].hasSkill('smh_huoji')) event._result={control:'龙印'};
@@ -2658,11 +2658,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var namelist=[];
 					var namedlist=[];
 					for(var i=0;i<event.cards.length;i++){
-						if(!namelist.contains(event.cards[i].name)) namelist.push(event.cards[i].name);
+						namelist.add(get.name(event.cards[i]));
 					}
 					var hs=player.getCards('h');
 					for(var j=0;j<hs.length;j++){
-						if(namelist.contains(hs[j].name)&&!event.cards.contains(hs[j])) return true;
+						if(namelist.contains(get.name(hs[j]))&&!event.cards.contains(hs[j])) return true;
 					}
 					return false;
 				},
@@ -2673,17 +2673,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var nameddlist=[];
 					var namedddlist=[];
 					for(var i=0;i<trigger.cards.length;i++){
-						if(!namelist.contains(trigger.cards[i].name)) namelist.push(trigger.cards[i].name);
+						namelist.add(get.name(trigger.cards[i]));
 					}
 					var hs=player.getCards('h');
 					for(var j=0;j<hs.length;j++){
-						if(namelist.contains(hs[j].name)&&!trigger.cards.contains(hs[j])){
+						if(namelist.contains(get.name(hs[j]))&&!trigger.cards.contains(hs[j])){
 							namedlist.push(hs[j]);
-							if(!namedddlist.contains(hs[j].name)) namedddlist.push(hs[j].name);
+							namedddlist.add(get.name(hs[j]));
 						}
 					}
 					for(var k=0;k<trigger.cards.length;k++){
-						if(namedddlist.contains(trigger.cards[k].name)) nameddlist.push(trigger.cards[k]);
+						if(namedddlist.contains(get.name(trigger.cards[k]))) nameddlist.push(trigger.cards[k]);
 					}
 					var showlist=namedlist.concat(nameddlist);
 					player.showCards(showlist);

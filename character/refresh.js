@@ -410,14 +410,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function (event,player){
 					if(event._notrigger.contains(event.player)) return false;
-					return event.card&&event.card.name=='sha'&&event.player.isAlive()&&event.player.countGainableCards(player,'he')>0;
+					return event.card&&event.card.name=='sha'&&event.player.isAlive()&&event.player.countGainableCards(player,'hej')>0;
 				},
 				direct:true,
 				content:function (){
 					'step 0'
-					player.gainPlayerCard(get.prompt2('new_liyu',trigger.player),trigger.player,'he','visibleMove').set('ai',function(card){
+					player.gainPlayerCard(get.prompt2('new_liyu',trigger.player),trigger.player,'hej','visibleMove').set('ai',function(card){
 						var player=_status.event.player;
 						var evt=_status.event.target;
+						if(get.attitude(player,evt)>0&&get.position(card)=='j') return 4+get.value(card);
 						if(get.type(card)=='equip'){
 							if(get.attitude(player,evt)>0&&game.hasPlayer(function(current){
 								return (player.canUse({name:'juedou'},current)&&current!=evt.target&&get.effect(current,{name:'juedou'},player,player)>2);

@@ -4659,14 +4659,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
 					game.updateRoundNumber();
 					'step 2'
-					target.chooseToDiscard('he',true).prompt='请弃置一张锦囊牌，或依次弃置两张非锦囊牌。';
+					target.chooseToDiscard('he',true).set('prompt','请弃置一张锦囊牌，或依次弃置两张非锦囊牌。');
 					'step 3'
 					if((!result.cards||get.type(result.cards[0],'trick')!='trick')&&target.countCards('he',function(card){
 						return get.type(card,'trick')!='trick';
 					})){
 						target.chooseToDiscard('he',true,function(card){
 							return get.type(card,'trick')!='trick';
-						}).prompt='请弃置第二张非锦囊牌';
+						}).set('prompt','请弃置第二张非锦囊牌');
 					}
 				},
 				ai:{
