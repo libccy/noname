@@ -188,7 +188,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				filterTarget:function(card,player,target){
-					return target!=player&&target.countCards('e')>0;
+					if(!get.is.single()&&!target.countCards('e')) return false;
+					return target!=player;
 				},
 				enable:true,
 				content:function(){
@@ -196,7 +197,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(!target.countCards('e',function(card){
 						return lib.filter.cardDiscardable(card,target);
 					})){
-						target.damage('thunder');
+						var next=target.damage();
+						if(!get.is.single()) next.nature='thunder';
 						event.finish();
 						return;
 					}
@@ -214,7 +216,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target.discard(target.getCards('e'));
 					}
 					else{
-						target.damage('thunder');
+						var next=target.damage();
+						if(!get.is.single()) next.nature='thunder'
 					}
 				},
 				ai:{
@@ -228,7 +231,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target){
-							return -target.countCards('e');
+							return -1-target.countCards('e');
 						}
 					}
 				}

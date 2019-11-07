@@ -992,11 +992,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				filterTarget:function(card,player,target){
 					if(player==target) return false;
-					return target.countGainableCards(player,'hej')>0;
+					return target.countGainableCards(player,get.is.single()?'he':'hej')>0;
 				},
 				content:function(){
-					if(target.countGainableCards(player,'hej')){
-						player.gainPlayerCard('hej',target,true);
+					var position=get.is.single()?'he':'hej';
+					if(target.countGainableCards(player,position)){
+						player.gainPlayerCard(position,target,true);
 					}
 				},
 				ai:{
@@ -1060,12 +1061,27 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				filterTarget:function(card,player,target){
 					if(player==target) return false;
-					return target.countDiscardableCards(player,'hej');
+					return target.countDiscardableCards(player,get.is.single()?'he':'hej');
 				},
 				content:function(){
-					if(target.countDiscardableCards(player,'hej')){
+					'step 0'
+					if(!get.is.single()&&target.countDiscardableCards(player,'hej')){
 						player.discardPlayerCard('hej',target,true);
+						event.finish();
 					}
+					else{
+						var bool1=target.countDiscardableCards(player,'h');
+						var bool2=target.countDiscardableCards(player,'e');
+						if(bool1&&bool2){
+							player.chooseControl('手牌区','装备区').set('ai',function(){
+								return Math.random()<0.5?1:0;
+							}).set('prompt','弃置'+(get.translation(target))+'装备区的一张牌，或观看其手牌并弃置其中的一张牌。');
+						}
+						else event._result={control:bool1?'手牌区':'装备区'};
+					}
+					'step 1'
+					var pos=result.control=='手牌区'?'h':'e';
+					player.discardPlayerCard(target,pos,true,'visible');
 				},
 				ai:{
 					basic:{
