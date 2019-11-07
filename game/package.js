@@ -50,6 +50,7 @@ window.noname_package={
 		stone:'炉石',
 		brawl:'乱斗',
 		doudizhu:'斗地主',
+		single:'单挑',
 	},
 	submode:{
 		identity:{
@@ -72,7 +73,10 @@ window.noname_package={
 			combat:'战棋模式',
 			three:'战棋统率',
 			leader:'战棋君主'
-		}
+		},
+		single:{
+			normal:'新1v1',
+		},
 	},
 	background:{
 		ol_bg:'龙纹',

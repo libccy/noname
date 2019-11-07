@@ -64,6 +64,7 @@ window.noname_source_list=[
 	'mode/guozhan.js',
 	'mode/identity.js',
 	'mode/tafang.js',
+	'mode/single.js',
 	'mode/stone.js',
 	'mode/brawl.js',
 	'mode/versus.js',
