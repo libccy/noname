@@ -23,7 +23,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					lib.character[i]=lib.characterPack.mode_versus[i];
 				}
 				delete lib.character.sp_liuqi;
-				delete lib.character.sp_tangzi;
+				delete lib.character.xf_tangzi;
 				lib.cardPack.mode_versus=['zong','xionghuangjiu','tongzhougongji','lizhengshangyou'];
 				lib.translate.mode_versus_character_config='四国武将';
 			}

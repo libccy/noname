@@ -6346,7 +6346,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(config.inline){
 						var next=target.getNext();
 						var previous=target.getPrevious();
-						return (next==player||previous==player||next.inline(player)||previous.inline(player))
+						return (next==player||previous==player||next&&next.inline(player)||previous&&previous.inline(player))
 					}
 					else if(config.siege){
 						return (target==player.getNext().getNext()||target==player.getPrevious().getPrevious());
