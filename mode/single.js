@@ -724,6 +724,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			xiaoxi:{
+				audio:2,
+				audioname:['machao','hansui','pangde'],
 				trigger:{
 					player:'enterGame',
 					global:'gameDrawAfter',
@@ -763,7 +765,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			wanrong:{
-				audio:'liuli',
+				audio:2,
 				trigger:{target:'useCardToTargeted'},
 				frequent:true,
 				filter:function(event,player){
@@ -809,6 +811,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			huwei:{
+				audio:2,
 				trigger:{
 					player:'enterGame',
 					global:'gameDrawAfter',
@@ -835,6 +838,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			suzi:{
+				audio:2,
 				trigger:{global:'loseAfter'},
 				filter:function(event,player){
 					if(event.getParent().name!='die') return false;
@@ -861,7 +865,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				animationColor:'orange',
 				content:function(){
 					var cards=player.getCards('e');
-					player.storage.cangji_yozuru=cards;
+					player.cangji_yozuru=cards;
 					player.lose(cards,ui.special);
 					player.addSkill('cangji_yozuru');
 				},
@@ -869,22 +873,24 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					yozuru:{
 						sub:true,
 						charlotte:true,
+						superCharlotte:true,
 						trigger:{player:'enterGame'},
 						forced:true,
 						popup:false,
-						onremove:true,
+						//onremove:true,
 						content:function(){
-							var cards=player.storage.cangji2.slice(0);
+							var cards=player.cangji_yozuru.slice(0);
 							for(var i=0;i<cards.length;i++){
 								player.equip(cards[i]);
 							}
 							player.removeSkill('cangji_yozuru');
+							delete player.cangji_yozuru;
 						},
 					},
 				},
 			},
 			sgrenwang:{
-				audio:'rende',
+				audio:2,
 				trigger:{target:'useCardToTargeted'},
 				direct:true,
 				filter:function(event,player){
@@ -938,6 +944,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(!player.countCards('e')) return false;
 				},
 				prompt:'将一张装备区中的牌当闪打出',
+				position:'e',
 				check:function(){return 1},
 				ai:{
 					respondShan:true,
@@ -952,6 +959,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			pianyi:{
+				audio:2,
 				trigger:{player:'enterGame'},
 				forced:true,
 				filter:function(event,player){
@@ -969,6 +977,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			yinli:{
+				audio:2,
 				trigger:{global:'loseEnd'},
 				filter:function(event,player){
 					if(event.player==player||event.player!=_status.currentPhase||event.getParent().name=='useCard') return false;
@@ -987,6 +996,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			shenju:{
+				audio:2,
 				mod:{
 					maxHandcard:function(player,num){
 						if(player.enemy&&player.enemy.hp) return num+player.enemy.hp;
@@ -994,6 +1004,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			botu:{
+				audio:2,
 				group:'botu_kanade',
 				trigger:{player:'phaseAfter'},
 				frequent:true,
