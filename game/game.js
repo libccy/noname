@@ -15540,7 +15540,7 @@
 					ui.updatem(this);
 
 					this.skipList=[];
-					this.skills=[];
+					this.skills=this.skills.contains('cangji_yozuru')?['cangji_yozuru']:[];
 					this.initedSkills=[];
 					this.additionalSkills={};
 					this.disabledSkills={};
@@ -19578,6 +19578,7 @@
 						exclude.push(arguments[i]);
 					}
 					for(i=0;i<this.skills.length;i++){
+						if(lib.skill[this.skills[i]].superCharlotte) continue;
 						if(!all&&(lib.skill[this.skills[i]].temp||lib.skill[this.skills[i]].charlotte)) continue;
 						if(!exclude.contains(this.skills[i])){
 							list.push(this.skills[i]);
