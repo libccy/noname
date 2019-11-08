@@ -570,6 +570,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		skill:{
 			//新1v1
 			yanhuo:{
+				audio:2,
 				trigger:{player:'die'},
 				forceDie:true,
 				filter:function(event,player){
@@ -603,6 +604,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			mouzhu:{
+				audio:2,
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
@@ -648,6 +650,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				viewAs:{name:'sha'},
 				filterCard:{color:'black'},
 				position:'he',
+				check:function(card){return 5-get.value(card)},
 			},
 			cuorui:{
 				audio:2,
@@ -666,6 +669,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player:'phaseJudgeBefore',
 						},
 						forced:true,
+						audio:'cuorui',
 						filter:function(event,player){
 							return !player.storage.cuorui&&(get.is.single()||player.countCards('j'));
 						},
@@ -719,9 +723,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:'lianhua',
 						sub:true,
 						trigger:{player:'phaseBegin'},
-						filter:function(event,player){
-							return player.storage.lianhua&&player.storage.lianhua.red+player.storage.lianhua.black>0;
-						},
+						//filter:function(event,player){
+						//	return player.storage.lianhua&&player.storage.lianhua.red+player.storage.lianhua.black>0;
+						//},
 						forced:true,
 						content:function(){
 							var cards=[];

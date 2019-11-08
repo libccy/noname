@@ -4960,7 +4960,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				filter:function (event,player){
 					if(event.name=='dying') return true;
-					return event.bySelf!=true;
+					return event.player!=player&&event.bySelf!=true;
 				},
 				check:function (event,player){
 					return get.attitude(player,event.player)>0;

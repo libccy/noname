@@ -2957,10 +2957,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jiang:{
 				audio:2,
 				audioname:['sp_lvmeng'],
-				trigger:{global:['useCard']},
+				trigger:{
+					player:'useCardToPlayered',
+					target:'useCardToTargeted',
+				},
 				filter:function(event,player){
 					if(!(event.card.name=='juedou'||(event.card.name=='sha'&&get.color(event.card)=='red'))) return false;
-					return player==event.player||event.targets.contains(player);
+					return player==event.target||event.getParent().triggeredTargets3.length==1;
 				},
 				frequent:true,
 				content:function(){
@@ -4317,15 +4320,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 0.5;
 					},
 					maixie:true,
-					effect:{
-						target:function(card,player,target){
-							if(target.maxHp<=3) return;
-							if(get.tag(card,'damage')){
-								if(target.hp==target.maxHp) return [0,1];
-							}
-							if(get.tag(card,'recover')&&player.hp>=player.maxHp-1) return [0,0];
-						}
-					}
 				}
 			},
 			jiuchi:{
