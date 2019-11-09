@@ -2,6 +2,7 @@ window.noname_update={
 	version:'1.9.95.1',
 	update:'1.9.95.0.1',
 	changeLog:[
+		'那个男人(by 诗笺)',
 		'点将单挑模式',
 		'BUG修复',
 	],
