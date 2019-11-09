@@ -29,7 +29,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_zhugeliang:['male','shu',3,['huoji','bazhen','kanpo']],
 			pangtong:['male','shu',3,['lianhuan','oldniepan']],
 			xunyu:['male','wei',3,['quhu','jieming']],
-			dianwei:['male','wei',4,['qiangxi']],
+			dianwei:['male','wei',4,['qiangxix']],
 			taishici:['male','wu',4,['tianyi']],
 			yanwen:['male','qun',4,['shuangxiong']],
 			re_yuanshao:['male','qun',4,['luanji','xueyi'],['zhu']],
@@ -4919,6 +4919,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				}
 			},
+			qiangxix:{
+				inherit:'reqiangxi',
+				usable:2,
+				filterTarget:function (card,player,target){
+					if(player==target) return false;
+					if(target.hasSkill('reqiangxi_off')) return false;
+					return true;
+				},
+			},
 			qiangxi:{
 				audio:2,
 				enable:'phaseUse',
@@ -6614,6 +6623,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldniepan:'涅槃',
 			quhu:'驱虎',
 			jieming:'节命',
+			qiangxix:'强袭',
 			qiangxi:'强袭',
 			tianyi:'天义',
 			shuangxiong:'双雄',
@@ -6631,6 +6641,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			quhu_info:'出牌阶段限一次，你可以与一名体力值大于你的角色拼点，若你赢，则该角色对其攻击范围内另一名由你指定的角色造成1点伤害。若你没赢，该角色对你造成一点伤害。',
 			jieming_info:'当你受到1点伤害后，你可令一名角色将手牌摸至X张（X为其体力上限且至多为5）。',
 			qiangxi_info:'出牌阶段限一次，你可以失去一点体力或弃置一张武器牌，然后对你攻击范围内的一名其他角色造成一点伤害。',
+			qiangxix_info:'出牌阶段限两次，你可以失去一点体力或弃置一张武器牌，然后一名本阶段内未成为过〖强袭〗的目标的其他角色造成一点伤害。',
 			tianyi_info:'出牌阶段限一次，你可以和一名其他角色拼点。若你赢，你获得以下技能效果直到回合结束：你使用【杀】没有距离限制；可额外使用一张【杀】；使用【杀】时可额外指定一个目标。若你没赢，你不能使用【杀】直到回合结束。',
 			shuangxiong_info:'摸牌阶段，你可以改为进行一次判定：你获得此判定牌，且于此回合的出牌阶段，你可以将任意一张与此判定牌不同颜色的手牌当做【决斗】使用。',
 			luanji_info:'出牌阶段，你可以将任意两张相同花色的手牌当做【万箭齐发】使用。',

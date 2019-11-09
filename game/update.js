@@ -1,7 +1,8 @@
 window.noname_update={
-	version:'1.9.95.0.1',
-	update:'1.9.95',
+	version:'1.9.95.1',
+	update:'1.9.95.0.1',
 	changeLog:[
+		'点将单挑模式',
 		'BUG修复',
 	],
 	files:[
@@ -19,13 +20,13 @@ window.noname_update={
 		'character/sp.js',
 		//'character/tw.js',
 		//'character/standard.js',
-		'character/xinghuoliaoyuan.js',
+		//'character/xinghuoliaoyuan.js',
 		//'character/yijiang.js',
 		//'mode/doudizhu.js',
 		//'mode/guozhan.js',
 		'mode/single.js',
 		//'mode/versus.js',
-		//'mode/boss.js',
+		'mode/boss.js',
 		'game/game.js',
 		//'game/config.js',
 		//'game/package.js',

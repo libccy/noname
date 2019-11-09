@@ -197,6 +197,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			game.addVideo('init',null,info);
 
 			game.gameDraw(game.zhu,function(player){
+				if(_status.mode=='dianjiang') return 4;
 				if(player.hasSkill('cuorui')){
 					player.logSkill('cuorui');
 					return 2+_status.characterChoice[player.identity].length;
@@ -276,19 +277,58 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			checkOnlineResult:function(player){
 				return player.isAlive();
 			},
-			chooseCharacter:function(){
+			chooseCharacterDianjiang:function(){
 				var next=game.createEvent('chooseCharacter',false);
 				next.showConfig=true;
-				next.addPlayer=function(player){
-					var list=lib.config.mode_config.identity.identity[game.players.length-3].slice(0);
-					var list2=lib.config.mode_config.identity.identity[game.players.length-2].slice(0);
-					for(var i=0;i<list.length;i++) list2.remove(list[i]);
-					player.identity=list2[0];
-					player.setIdentity('cai');
-				};
-				next.removePlayer=function(){
-					return game.players.randomGet(game.me,game.zhu);
-				};
+				next.setContent(function(){
+					"step 0"
+					ui.arena.classList.add('choose-character');
+					lib.init.onfree();
+					"step 1"
+					game.me.chooseControl('先手','后手').prompt='请选择自己的行动顺序';
+					"step 2"
+					var map=result.control=='先手'?['zhu','fan']:['fan','zhu'];
+					game.me.identity=map[0];
+					game.me.next.identity=map[1];
+					game.me.showIdentity();
+					game.me.next.showIdentity();
+					"step 3"
+					event.flipassign=true;
+					event.videoId=lib.status.videoId++;
+					var list=[];
+					for(var i in lib.character){
+						if(lib.filter.characterDisabled(i)) continue;
+						list.push(i);
+					}
+					_status.characterList=list;
+					var filter=function(name){
+						return !_status.characterList.contains(name);
+					};
+					var dialog=ui.create.characterDialog('heightset',filter,'expandall').open();
+					dialog.videoId=event.videoId;
+						
+					game.me.chooseButton(true).set('ai',function(button){
+						return Math.random();
+					}).set('dialog',event.videoId);
+					"step 4"
+					game.me.init(result.links[0]);
+					game.me.chooseButton(true).set('ai',function(button){
+						return Math.random();
+					}).set('dialog',event.videoId);
+					"step 5"
+					game.me.next.init(result.links[0]);
+					setTimeout(function(){
+						ui.arena.classList.remove('choose-character');
+					},500);
+				});
+			},
+			chooseCharacter:function(){
+				if(_status.mode=='dianjiang'){
+					game.chooseCharacterDianjiang();
+					return;
+				}
+				var next=game.createEvent('chooseCharacter',false);
+				next.showConfig=true;
 				next.setContent(function(){
 					"step 0"
 					ui.arena.classList.add('choose-character');
@@ -456,7 +496,70 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},500);
 				});
 			},
+			chooseCharacterDianjiangOL:function(){
+				var next=game.createEvent('chooseCharacter',false);
+				next.showConfig=true;
+				next.setContent(function(){
+					"step 0"
+					var map=Math.random()<0.5?['zhu','fan']:['fan','zhu'];
+					game.me.identity=map[0];
+					game.me.next.identity=map[1];
+					game.me.showIdentity();
+					game.me.next.showIdentity();
+					"step 1"
+					//event.flipassign=true;
+					event.videoId=lib.status.videoId++;
+					var list=[];
+					var libCharacter={};
+					for(var i=0;i<lib.configOL.characterPack.length;i++){
+						var pack=lib.characterPack[lib.configOL.characterPack[i]];
+						for(var j in pack){
+							if(j=='zuoci'||j=='miheng') continue;
+							if(lib.character[j]) libCharacter[j]=pack[j];
+						}
+					}
+					for(i in libCharacter){
+						if(lib.filter.characterDisabled(i,libCharacter)) continue;
+						list.push(i);
+					}
+					game.broadcastAll(function(list,id){
+						_status.characterList=list;
+						var filter=function(name){
+							return !_status.characterList.contains(name);
+						};
+						var dialog=ui.create.characterDialog('heightset',filter,'expandall').open();
+						dialog.videoId=id;
+						ui.arena.classList.add('choose-character');
+					},list,event.videoId);
+					game.zhu.chooseButton(true).set('ai',function(button){
+						return Math.random();
+					}).set('dialog',event.videoId);
+					"step 2"
+					game.broadcastAll(function(player,character,id){
+						player.init(character);
+					},game.zhu,result.links[0]);
+					game.fan.chooseButton(true).set('ai',function(button){
+						return Math.random();
+					}).set('dialog',event.videoId);
+					"step 3"
+					game.broadcastAll('closeDialog',event.videoId);
+					game.broadcastAll(function(player,character,id){
+						var dialog=get.idDialog(id);
+						if(dialog){
+							dialog.close();
+						}
+						player.init(character);
+						setTimeout(function(){
+							ui.arena.classList.remove('choose-character');
+						},500);
+					},game.fan,result.links[0],event.videoId);
+				});
+			},
 			chooseCharacterOL:function(){
+				if(_status.mode=='dianjiang'){
+					game.chooseCharacterDianjiangOL();
+					return;
+				}
 				var next=game.createEvent('chooseCharacter',false);
 				next.setContent(function(){
 					"step 0"
@@ -655,9 +758,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			player:{
 				hasZhuSkill:function(){return false;},
 				dieAfter:function(){
-					if(_status.characterChoice[this.identity].length<=3) game.checkResult();
+					if(_status.mode!='normal'||_status.characterChoice[this.identity].length<=3) game.checkResult();
 				},
 				dieAfter2:function(){
+					if(_status.mode!='normal') return;
 					var next=game.createEvent('replacePlayerSingle',false,_status.event.getParent());
 					next.player=this;
 					next.forceDie=true;

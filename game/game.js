@@ -5477,6 +5477,7 @@
 						init:'normal',
 						item:{
 							normal:'新1v1',
+							dianjiang:'点将单挑',
 						},
 						restart:true,
 						frequent:true,
@@ -5489,6 +5490,7 @@
 						init:'normal',
 						item:{
 							normal:'新1v1',
+							dianjiang:'点将单挑',
 						},
 						restart:true,
 						frequent:true,
@@ -14138,7 +14140,15 @@
 						},get.delayx(gain2t,gain2t));
 					}
 					else if(event.source&&(event.animate=='give'||event.animate=='giveAuto')){
-						event.source['$'+event.animate](cards,player);
+						if(event.animate=='give') event.source['$'+event.animate](cards,player);
+						else{
+							var givemap={hs:[],ots:[]};
+							for(var i=0;i<cards.length;i++){
+								givemap[cards[i].original=='h'?'hs':'ots'].push(cards[i]);
+							}
+							if(givemap.hs.length) event.source.$giveAuto(givemap.hs,player);
+							if(givemap.ots.length) event.source.$give(givemap.ots,player);
+						}
 						game.pause();
 						setTimeout(function(){
 							addv();

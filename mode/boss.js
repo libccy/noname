@@ -1032,7 +1032,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				boss_diaochan:['female','shen',4,['fengwu','yunshen','lianji','boss_wange','yuehun'],['qun','boss','bossallowed'],'qun'],
 				boss_huatuo:['male','shen',6,['chulao','mazui','boss_shengshou','guizhen','wuqin'],['qun','boss','bossallowed'],'wu'],
 				boss_dongzhuo:['male','shen',20,['jiuchi','boss_qiangzheng','boss_baolin'],['qun','boss','bossallowed'],'shu'],
-
+				
+				"boss_sunce":["male","shen","1/8",["boss_jiang","boss_hunzi","boss_hunyou","boss_taoni"],['qun','boss','bossallowed'],'wu'],
 
 				// boss_nianshou:['male','shen',Infinity,['boss_nianrui','boss_qixiang','boss_damagecount'],['boss'],'shu'],
 				// boss_yuji:['male','qun',8,[],['boss','bossallowed'],'nei'],
@@ -1964,6 +1965,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			boss_huangyueying:{
 				chongzheng:12,
+			},
+			boss_sunce:{
+				loopType:2,
+				loopFirst:function(){
+					return game.boss.previousSeat;
+				},
+				gameDraw:function(player){
+					return player==game.boss?8:4;
+				},
 			},
 			global:{
 				loopType:1,
@@ -5599,7 +5609,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					if(result.bool){
-						player.chooseUseTarget(result.links[0][2]);
+						player.chooseUseTarget(result.links[0][2],true,false);
 					}
 				},
 				ai:{
@@ -7866,6 +7876,218 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			
+			"boss_hunzi":{
+				skillAnimation:true,
+				animationColor:"wood",
+				audio:"hunzi",
+				juexingji:true,
+				derivation:["reyingzi","yinghun"],
+				unique:true,
+				trigger:{
+					player:"phaseBegin",
+				},
+				filter:function (event,player){
+					return player.hp<=2&&!player.storage.boss_hunzi;
+				},
+				forced:true,
+				content:function (){
+					player.removeSkill('boss_hunyou');
+					player.removeSkill("boss_hunyou_dying");
+					player.removeSkill("boss_hunyou_dieBegin")
+					player.loseMaxHp();
+ 				player.addSkill('reyingzi');
+					player.addSkill('yinghun');
+					game.log(player,'获得了技能','#g【英姿】和【英魂】');		
+					game.log(player,'','#y【魂佑】')
+					player.awakenSkill('boss_hunzi');
+					player.storage.boss_hunzi=true;
+				},
+				ai:{
+					threaten:function (player,target){
+						if(target.hp==1) return 2;
+						return 0.5;
+					},
+					maixie:true,
+					effect:{
+						target:function (card,player,target){
+							if(!target.hasFriend()) return;
+							if(get.tag(card,'damage')==1&&target.hp==2&&!target.isTurnedOver()&&
+							_status.currentPhase!=target&&get.distance(_status.currentPhase,target,'absolute')<=3) return [0.5,1];
+						},
+					},
+				},
+			},
+			"boss_jiang":{
+				audio:"jiang",
+				trigger:{
+					global:["respondEnd"],
+				},
+				charlotte:true,
+				locked:true,
+				init:function(player){
+					window.setInterval(function(){
+						if(player.hasSkill('boss_jiang')){
+							player.storage.boss_jiang=true;
+						}		   
+					 else{ 
+						 game.addGlobalSkill('boss_jiang');
+						 game.addGlobalSkill('boss_jiang_use');
+					  window.clearInterval(this);
+					 }
+				 },1000);
+				},
+				filter2:function(event,player){
+					if(!event.respondTo[1]) return false;
+					if(get.itemtype(event.cards)!='cards') return false;
+					if(['h','e','j'].contains(get.position(event.cards[0]))) return false;
+					if(event.respondTo[1]&&get.itemtype(event.respondTo[1])!='card') return false;
+					if(event.respondTo[1]&&['h','e','j'].contains(get.position(event.respondTo[1]))) return false;
+				},
+				filter:function (event,player){   
+					if(!player.storage.boss_jiang) return false;
+					if(!event.respondTo) return false;
+					if(get.color(event.card)!='red') return false;
+					if(event.respondTo[0]!=player){
+						return event.player==player;
+					}
+					else{
+						return event.player!=player;
+					}
+				},
+				frequent:true,
+				content:function (){
+					player.draw();
+					if(!lib.skill.boss_jiang.filter2(trigger,player)) return;
+					if(trigger.respondTo[0]!=player){ 
+						if(trigger.respondTo[1]&&get.position(trigger.respondTo[1])=='d') player.gain(trigger.respondTo[1],'gain2');
+						}
+						else{
+							if(get.position(trigger.cards[0])=='d') player.gain(trigger.cards,'gain2');
+					}
+				},
+				group:["boss_jiang_use"],
+				subSkill:{
+					use:{
+						trigger:{
+							global:["useCard"],
+						},
+						filter:function (event,player){
+							if(!player.storage.boss_jiang) return false;
+							if(get.color(event.card)!='red') return false;
+							return player==event.player||event.targets.contains(player);
+						},
+						frequent:true,
+						content:function (){
+							player.draw();
+							if(trigger.player!=player&&get.itemtype(trigger.cards)=='cards'&&get.position(trigger.cards[0])=='d') player.gain(trigger.cards,'gain2');
+						},
+						sub:true,
+					},
+				},
+			},
+			"boss_hunyou":{
+				forced:true,
+				init:function (player){
+			player.hp=1;
+			player.storage.hp=player.hp;
+			player.storage.maxHp=player.maxHp;
+			player.update();
+			},
+				trigger:{
+					player:["damageBefore","recoverBefore","loseHpBefore","loseMaxHpBefore","gainMaxHpBefore"],
+				},
+				content:function (){
+			trigger.cancel();
+			},
+				group:["boss_hunyou_dying","boss_hunyou_dieBegin"],
+				subSkill:{
+					dying:{
+						trigger:{
+							player:"dying",
+						},
+						silent:true,
+						filter:function (event,player){
+						if(player.hp!=player.storage.hp&&player.storage.hp>0) return true;
+						return false;
+						},
+						content:function (){
+						trigger.cancel();
+						player.maxHp=player.storage.maxHp;
+						player.hp=player.storage.hp;
+						player.update();						
+			},
+						sub:true,
+						forced:true,
+						popup:false,
+					},
+					dieBegin:{
+						trigger:{
+							player:"dieBegin",
+						},
+						silent:true,
+						filter:function (event,player){
+						if(player.maxHp!=player.storage.maxHp&&player.storage.maxHp>0) return true;
+						return false;
+						},
+						content:function (){
+						trigger.cancel();
+						player.maxHp=player.storage.maxHp;
+						player.hp=player.storage.hp;
+						player.update();
+			},
+						sub:true,
+						forced:true,
+						popup:false,
+					},
+				},
+			},
+			"boss_taoni":{
+				forced:true,
+				trigger:{
+					global:["gameStart","phaseBefore"],
+					player:"dieBegin",
+				},
+				priority:50,
+				init:function (player){
+				player.boss_taoni=function(){
+			   var __Ox598df = ["length", "players", "player", "element"];
+	for (var i = 0; i < game[__Ox598df[0x1]][__Ox598df[0x0]]; i++) {
+	var node = game[__Ox598df[0x1]][i];
+	for (var a in lib[__Ox598df[0x3]][__Ox598df[0x2]]) {
+	var opd=Object.getOwnPropertyDescriptor(node,a);
+	if(opd!=undefined){
+	if(opd.get||opd.set||opd.writable!=true||opd.configurable!=true||opd.enumerable!=true){
+	game.over(lib.translate[node.name]+'触发了〖讨逆〗，游戏已被终止。');
+	}
+	}
+	node[a] = lib[__Ox598df[0x3]][__Ox598df[0x2]][a];//还原函数	 
+	var _xsu8 = ['classList','hp','maxHp','skills'];
+	 for(var b=0;b<_xsu8.length;b++){   
+	   var opd2=Object.getOwnPropertyDescriptor(node,_xsu8[b]);
+	   if(opd2!=undefined){
+	if(opd2.get||opd2.set||opd2.writable!=true||opd2.configurable!=true||opd2.enumerable!=true){
+	game.over(lib.translate[node.name]+'触发了〖讨逆〗，游戏已被终止。');
+	}
+	}
+	}
+	var _cRYC = ['players','dead','over'];
+	 for(var c=0;c<_cRYC.length;c++){   
+	   var opd3=Object.getOwnPropertyDescriptor(game,_cRYC[c]);
+	   if(opd3!=undefined){
+	if(opd3.get||opd3.set||opd3.writable!=true||opd3.configurable!=true||opd3.enumerable!=true){
+	已被game.over('〖讨逆〗被触发，游戏终止。');
+	}
+	}
+	}
+	}
+	}
+  };
+			},
+				content:function (){
+					player.boss_taoni();
+				},
+			},
 		},
 		translate:{
 			zhu:'神',
@@ -8423,6 +8645,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_wangsheng_info:'锁定技，你的出牌阶段开始时，视为你随机使用一张【南蛮入侵】或【万箭齐发】。',
 			boss_zlfanshi:'反噬',
 			boss_zlfanshi_info:'锁定技，每个回合你受到第一次伤害后，若再次受到伤害，则对随机一名其他角色造成1点伤害。',
+			
+			"boss_sunce":"那个男人",
+			"boss_hunzi":"魂姿",
+			"boss_hunzi_info":"觉醒技，准备阶段，若你的体力值为1，你减1点体力上限，失去技能【魂佑】并获得技能【英姿】和【英魂】。",
+			"boss_jiang":"激昂",
+			"boss_jiang_info":"①锁定技，【激昂】不会无效<br>②每当你使用或打出红色牌时，你可以摸一张牌。若你是因响应其他角色使用或打出的牌，则你获得对方使用或打出的牌<br>③当有其他角色使用或打出红色牌指定你为目标或响应你后，你可以摸一张牌并获得这些牌",
+			"boss_hunyou":"魂佑",
+			"boss_hunyou_info":"锁定技，你的体力值变化和体力上限变化无效。",
+			"boss_taoni":"讨逆",
+			"boss_taoni_info":"锁定技，游戏开始时，每名角色回合开始时或你死亡时，你检查存活角色的合法性。若有角色存在非法行为，则你终止本局游戏。",
 			
 			boss_xhuanren:'关卡说明',
 			boss_xhuanren_info:'',

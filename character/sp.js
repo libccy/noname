@@ -807,6 +807,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var cards=get.cards(2);
 					event.cards=cards;
+					game.log(player,'观看了牌堆顶的'+get.cnNumber(cards.length)+'张牌');
 					player.chooseControl('ok').set('dialog',['卜卦',cards]);
 					'step 1'
 					while(cards.length){
@@ -829,7 +830,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					player.chooseButton(['选择至多两种牌',[list,'vcard']],true,[1,2]).set('ai',function(button){
 						var target=_status.event.getParent('busuan').target;
-						return get.attitude(_status.event.player,target)*get.useful({name:button.link[2]});
+						return get.attitude(_status.event.player,target)*get.useful({name:button.link[2]})+0.1;
 					});
 					'step 1'
 					target.storage.busuan_angelbeats=result.links.slice(0);
@@ -847,6 +848,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			busuan_angelbeats:{
+				mark:true,
+				intro:{
+					mark:function(dialog,content,player){
+						if(content&&content.length) dialog.add([content,'vcard']);
+					},
+				},
 				trigger:{player:'drawBefore'},
 				forced:true,
 				filter:function(event,player){
@@ -854,19 +861,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				onremove:true,
 				content:function(){
-					trigger.cancel();
 					'step 0'
 					var list=player.storage['busuan_angelbeats'];
 					var cards=[];
-					for(var i=0;i<list.length;i++){
+					for(var i=0;i<Math.min(trigger.num,list.length);i++){
 						var card=get.cardPile(function(cardx){
 							return !cards.contains(cardx)&&cardx.name==list[Math.min(i,list.length-1)][2];
 						});
-						if(card) cards.push(card);
+						if(card){
+							player.storage.busuan_angelbeats.splice(i--,1);
+							trigger.num--;
+							cards.push(card);
+						}
 					}
-					if(cards.length) player.gain(cards,'draw');
+					if(cards.length){
+						player.gain(cards,'gain2','log');
+					}
 					'step 1'
-					player.removeSkill('busuan_angelbeats');
+					if(!trigger.num) trigger.cancel();
+					if(!player.storage.busuan_angelbeats.length) player.removeSkill('busuan_angelbeats');
 				},
 			},
 			mingjie:{
