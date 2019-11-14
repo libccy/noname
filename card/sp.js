@@ -541,7 +541,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				filter:function(event,player){
 					if(event.player==player) return false;
-					if(event.getParent().directHitcontains(player)) return false;
+					if(event.getParent().directHit.contains(player)) return false;
 					var num=player.countCards('h','jinchan');
 					return num&&num==player.countCards('h');
 				},

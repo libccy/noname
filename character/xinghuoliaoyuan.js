@@ -4443,10 +4443,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var evt=event.getParent('arrangeTrigger');
 					if(evt&&evt.map){
-						for(var i in evt.map){
-							evt.map[i].list=[];
-						}
-						evt.list=[];
+						evt.map=[];
+						evt.doing.list=[];
 					}
 					game.log(player,'跳过了',event.triggername=='phaseBegin'?'准备阶段':'结束阶段');
 				},

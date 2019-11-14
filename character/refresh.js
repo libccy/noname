@@ -2811,7 +2811,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.chooseToUse({name:'sha'},'诛害：是否对'+get.translation(trigger.player)+'使用一张杀？').set('logSkill','zhuhai').set('complexSelect',true).set('filterTarget',function(card,player,target){
 						if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
-						return lib.filter.filterTarget.apply(this,arguments);
+						return lib.filter.targetEnabled.apply(this,arguments);
 					}).set('sourcex',trigger.player);
 				}
 			},
