@@ -415,7 +415,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function (){
 					'step 0'
-					player.gainPlayerCard(get.prompt2('new_liyu',trigger.player),trigger.player,'hej','visibleMove').set('ai',function(card){
+					player.gainPlayerCard(get.prompt('new_liyu',trigger.player),trigger.player,'hej','visibleMove').set('ai',function(card){
 						var player=_status.event.player;
 						var evt=_status.event.target;
 						if(get.attitude(player,evt)>0&&get.position(card)=='j') return 4+get.value(card);
