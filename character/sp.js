@@ -458,7 +458,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				cardimage:"baiyin",
 				type:"equip",
 				subtype:"equip2",
-				onLoseFilter:function(card,player){
+				filterLose:function(card,player){
 					if(player.hasSkillTag('unequip2')) return false;
 					return true;
 				},

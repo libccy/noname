@@ -129,7 +129,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						equipValue:6
 					}
 				},
-				onLoseFilter:function(card,player){
+				filterLose:function(card,player){
 				if(player.hasSkillTag('unequip2')) return false;
 				return true;
 				},
