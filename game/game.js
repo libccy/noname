@@ -22768,18 +22768,20 @@
 					var evt=this._triggering;
 					if(all){
 						if(evt&&evt.map){
-							for(var i in evt.map){
+							for(var i=0;i<evt.map.length;i++){
 								evt.map[i].list=[];
 							}
 							evt.list=[];
+							if(evt.doing) evt.doing.list=[];
 						};
 						this._triggered=5;
 					}
 					else{
 						if(player){
 							this._notrigger.add(player);
-							if(evt&&evt.map){
-								evt.map[player.playerid].list=[];
+							if(!evt||!evt.map) return;
+							for(var i=0;i<evt.map.length;i++){
+								if(evt.map[i].player==player) evt.map[i].list=[];
 							}
 						}
 					}
