@@ -466,13 +466,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"phaseDrawBegin",
 				},
 				direct:true,
-				priority:-10,
+				//priority:-10,
 				filter:function (event){
 					return event.num>0;
 				},
 				content:function (){
 					"step 0"
-					player.chooseTarget(get.prompt('new_retuxi'),'获得至多'+get.translation(trigger.num)+'名角色的各一张手牌，然后少摸等量的牌',[1,trigger.num],function(card,player,target){
+					var num=get.copy(trigger.num);
+					if(get.mode()=='guozhan'&&num>2) num=2;
+					player.chooseTarget(get.prompt('new_retuxi'),'获得至多'+get.translation(num)+'名角色的各一张手牌，然后少摸等量的牌',[1,num],function(card,player,target){
 						return target.countCards('h')>0&&player!=target;
 					},function(target){
 						var att=get.attitude(_status.event.player,target);
@@ -792,7 +794,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"new_yijue2":{
 				trigger:{
-					player:"damageBegin",
+					player:"damageBegin1",
 				},
 				filter:function (event){
 					return event.source&&event.source.hasSkill('new_yijue')&&event.card&&event.card.name=='sha'&&get.suit(event.card)=='heart'&&event.notLink();
@@ -1030,15 +1032,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"new_reyaowu":{
 				trigger:{
-					player:"damage",
+					player:"damageBegin3",
 				},
 				priority:1,
 				audio:"yaowu",
 				filter:function (event){
-					if(event.card&&(event.card.name=='sha')){
-						if(['red','black'].contains(get.color(event.card))) return true;
-					}
-					return false;
+					return event.card&&event.card.name=='sha';
 				},
 				forced:true,
 				check:function (event){
@@ -1047,7 +1046,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				content:function (){
-					if(get.color(trigger.cards)=='black') player.draw();
+					if(get.color(trigger.card)!='red') player.draw();
 					else trigger.source.chooseDrawRecover(true);
 				},
 				ai:{
@@ -1936,7 +1935,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			reluoyi2:{
-				trigger:{source:'damageBegin'},
+				trigger:{source:'damageBegin1'},
 				filter:function(event){
 					return event.card&&(event.card.name=='sha'||event.card.name=='juedou')&&event.notLink();
 				},
@@ -2810,8 +2809,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					lib.filter.targetEnabled({name:'sha'},player,event.player)&&player.hasSha();
 				},
 				content:function(){
-					player.chooseToUse({name:'sha'},'诛害：是否对'+get.translation(trigger.player)+'使用一张杀？',
-						trigger.player,-1).set('logSkill','zhuhai');
+					player.chooseToUse({name:'sha'},'诛害：是否对'+get.translation(trigger.player)+'使用一张杀？').set('logSkill','zhuhai').set('complexSelect',true).set('filterTarget',function(card,player,target){
+						if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
+						return lib.filter.filterTarget.apply(this,arguments);
+					}).set('sourcex',trigger.player);
 				}
 			},
 			qianxin:{
@@ -3014,13 +3015,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xunxun:{
 				audio:2,
 				trigger:{player:'phaseDrawBefore'},
-				check:function(event,player){
-					return !player.hasSkill('reyiji2');
-				},
+				//check:function(event,player){
+				//	return !player.hasSkill('reyiji2');
+				//},
 				content:function(){
 					"step 0"
 					event.cards=get.cards(4);
-					player.chooseCardButton(event.cards,2,'选择两张牌置于牌堆顶').set('ai',ai.get.buttonValue);
+					player.chooseCardButton(event.cards,2,'选择两张牌置于牌堆顶',true).set('ai',ai.get.buttonValue);
 					"step 1"
 					if(result.bool){
 						var choice=[];
@@ -3154,7 +3155,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_liyu":"利驭",
 			"new_liyu_info":"当你使用【杀】对一名其他角色造成伤害后，你可以获得其一张牌。若此牌不为装备牌，则其摸一张牌。若此牌为装备牌，则视为你对其选择的另一名角色使用一张【决斗】。",
 			"new_retuxi":"突袭",
-			"new_retuxi_info":"摸牌阶段摸牌时，你可以少摸任意张牌，然后选择等量的角色的各一张手牌。",
+			"new_retuxi_info":"摸牌阶段摸牌时，你可以少摸任意张牌，然后获得等量的角色的各一张手牌。",
+			"new_retuxi_info_guozhan":"摸牌阶段摸牌时，你可以少摸至多两张牌，然后获得等量的角色的各一张手牌。",
 			"new_reyiji":"遗计",
 			"new_reyiji_info":"每当你受到1点伤害后，你可以摸两张牌，然后可以将至多两张手牌交给其他角色。",
 			"new_rejianxiong":"奸雄",
@@ -3180,7 +3182,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_reqingnang":"青囊",
 			"new_reqingnang_info":"出牌阶段，你可以弃置一张手牌，令一名本回合内未成为过〖青囊〗的目标的角色回复一点体力。若你弃置的是黑色牌，则你本回合内不能再发动〖青囊〗。",
 			"new_reyaowu":"耀武",
-			"new_reyaowu_info":"锁定技，当任意一名角色使用【杀】对你造成伤害时，若此杀为红色，该角色回复1点体力或摸一张牌。若为黑色，则你摸一张牌。",
+			"new_reyaowu_info":"锁定技，当一名角色使用【杀】对你造成伤害时，若此杀为红色，该角色回复1点体力或摸一张牌。否则则你摸一张牌。",
 			reqingguo:'倾国',
 			reqingguo_info:'你可以将一张黑色牌当做【闪】使用或打出。',
 			

@@ -442,6 +442,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			lanyinjia:{
+				equipSkill:true,
 				enable:['chooseToRespond'],
 				filterCard:true,
 				viewAs:{name:'shan'},
@@ -468,7 +469,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			lanyinjia2:{
-				trigger:{player:'damageEnd'},
+				equipSkill:true,
+				trigger:{player:'damageBegin4'},
 				forced:true,
 				filter:function(event,player){
 					return event.card&&event.card.name=='sha'&&player.getEquip('lanyinjia');
@@ -481,6 +483,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			zhungangshuo:{
+				equipSkill:true,
 				trigger:{player:'useCardToPlayered'},
 				logTarget:'target',
 				filter:function(event,player){
@@ -507,7 +510,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			qibaodao:{
-				trigger:{source:'damageBegin'},
+				equipSkill:true,
+				trigger:{source:'damageBegin1'},
 				forced:true,
 				filter:function(event){
 					return event.card&&event.card.name=='sha'&&event.player.isHealthy();
@@ -531,11 +535,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			g_jinchan:{
+				cardSkill:true,
 				trigger:{target:'useCardToBefore'},
 				forced:true,
 				popup:false,
 				filter:function(event,player){
 					if(event.player==player) return false;
+					if(event.getParent().directHitcontains(player)) return false;
 					var num=player.countCards('h','jinchan');
 					return num&&num==player.countCards('h');
 				},
@@ -569,6 +575,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			yinyueqiang:{
+				equipSkill:true,
 				trigger:{player:['useCard','respondAfter']},
 				direct:true,
 				filter:function(event,player){
@@ -591,6 +598,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			g_du:{
+				cardSkill:true,
 				trigger:{player:'loseEnd'},
 				popup:false,
 				forced:true,
@@ -614,6 +622,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			caomu_skill:{
+				cardSkill:true,
 				unique:true,
 				trigger:{player:'phaseDrawBegin'},
 				silent:true,

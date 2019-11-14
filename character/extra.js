@@ -1249,7 +1249,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'dawu3'
 			},
 			dawu2:{
-				trigger:{player:'damageBefore'},
+				trigger:{player:'damageBegin4'},
 				filter:function(event){
 					if(event.nature!='thunder') return true;
 					return false;
@@ -1326,14 +1326,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			kuangfeng2:{
-				trigger:{player:'damageBegin'},
+				trigger:{player:'damageBegin3'},
 				filter:function(event){
 					if(event.nature=='fire') return true;
 					return false;
 				},
 				mark:true,
 				intro:{
-					content:'已获得大雾标记'
+					content:'已获得狂风标记'
 				},
 				forced:true,
 				content:function(){

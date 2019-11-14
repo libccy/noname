@@ -340,7 +340,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			luoyi2:{
-				trigger:{source:'damageBegin'},
+				trigger:{source:'damageBegin1'},
 				filter:function(event){
 					return event.card&&(event.card.name=='sha'||event.card.name=='juedou')&&event.notLink();
 				},

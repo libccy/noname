@@ -1154,7 +1154,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"tachibana_effect":{
 				audio:'nzry_huaiju',
 				trigger:{
-					global:['damageBefore','phaseDrawBegin'],
+					global:['damageBegin4','phaseDrawBegin'],
 				},
 				forced:true,
 				filter:function(event,player){
@@ -2443,7 +2443,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					target.chooseToUse({name:'sha'},player,-1,'挑衅：对'+get.translation(player)+'使用一张杀，或令其弃置你的一张牌').set('targetRequired',true);
+					target.chooseToUse({name:'sha'},'挑衅：对'+get.translation(player)+'使用一张杀，或令其弃置你的一张牌').set('targetRequired',true).set('complexSelect',true).set('filterTarget',function(card,player,target){
+						if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
+						return lib.filter.filterTarget.apply(this,arguments);
+					}).set('sourcex',player);
 					"step 1"
 					if(result.bool==false&&target.countCards('he')>0){
 						player.discardPlayerCard(target,'he',true);
@@ -5225,6 +5228,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(event,player){
 					return get.attitude(player,event.target)<0;
 				},
+				logTarget:'target',
 				content:function(){
 					player.discardPlayerCard('he',trigger.target,true);
 				}
@@ -5527,7 +5531,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tianxiang:{
 				audio:2,
 				audioname:['daxiaoqiao'],
-				trigger:{player:'damageBefore'},
+				trigger:{player:'damageBegin3'},
 				direct:true,
 				filter:function(event,player){
 					return player.countCards('h',{suit:'heart'})>0&&event.num>0;
@@ -5622,7 +5626,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			retianxiang:{
 				audio:'tianxiang',
 				audioname:['daxiaoqiao'],
-				trigger:{player:'damageBefore'},
+				trigger:{player:'damageBegin4'},
 				direct:true,
 				filter:function(event,player){
 					return player.countCards('he',{suit:'heart'})>0&&event.num>0;

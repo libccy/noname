@@ -816,7 +816,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				audio:['buyi',2],
 			},
 			keshou:{
-				trigger:{player:'damageBegin'},
+				trigger:{player:'damageBegin3'},
 				direct:true,
 				filter:function(event,player){
 					return event.num>0;
@@ -1078,12 +1078,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			congjian:{
-				trigger:{global:'damageBefore'},
+				trigger:{
+					player:'damageBegin3',
+					source:'damageBegin1',
+				},
 				forced:true,
-				filter:function(event,player){
+				filter:function(event,player,name){
 					if(event.num<=0) return false;
-					if(event.source&&event.source==player&&_status.currentPhase!=player&&event.notLink()) return true;
-					if(event.player&&event.player==player&&_status.currentPhase==player) return true;
+					if(name=='damageBegin1'&&_status.currentPhase!=player&&event.notLink()) return true;
+					if(name=='damageBegin3'&&_status.currentPhase==player) return true;
+					return false;
 				},
 				check:function(event,player){
 					return _status.currentPhase!=player;
@@ -2968,7 +2972,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			hmkyuanyu:{
 				audio:'zongkui',
 				trigger:{
-					player:"damageBegin",
+					player:"damageBegin4",
 				},
 				forced:true,
 				filter:function (event,player){
@@ -3257,10 +3261,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"xianqu_skill":{
+				ruleSkill:true,
 				enable:"phaseUse",
-				filter:function (event,player){
-					return player.countCards('h')<4;
-				},
+				//filter:function (event,player){
+					//return player.countCards('h')<4;
+				//},
 				usable:1,
 				mark:true,
 				intro:{
@@ -3268,7 +3273,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:function (){
 					"step 0"
-					player.draw(4-player.countCards('h'));
+					var num=4-player.countCards('h');
+					if(num) player.draw(num);
 					player.chooseTarget('是否观看一名其他角色的一张暗置武将牌？',function(card,player,target){
 						return target!=player&&target.isUnseen(2);
 					}).set('ai',function(target){
@@ -3315,11 +3321,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:1,
 					result:{
-						player:2,
+						player:function(player){
+							if(4-player.countCards('h')<2) return 0;
+							return 1;
+						},
 					},
 				},
 			},
 			"zhulianbihe_skill":{
+				ruleSkill:true,
 				group:["zhulianbihe_skill_draw","zhulianbihe_skill_tao"],
 				mark:true,
 				intro:{
@@ -3327,6 +3337,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"yinyang_skill":{
+				ruleSkill:true,
 				group:["yinyang_skill_draw","yinyang_skill_add"],
 				mark:true,
 				intro:{
@@ -3334,6 +3345,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"zhulianbihe_skill_draw":{
+				ruleSkill:true,
 				enable:"phaseUse",
 				usable:1,
 				content:function (){
@@ -3368,6 +3380,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"zhulianbihe_skill_tao":{
+				ruleSkill:true,
 				enable:"chooseToUse",
 				viewAs:{
 					name:"tao",
@@ -3383,6 +3396,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"yinyang_skill_draw":{
+				ruleSkill:true,
 				enable:"phaseUse",
 				usable:1,
 				content:function (){
@@ -3405,6 +3419,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"yinyang_skill_add":{
+				ruleSkill:true,
 				trigger:{
 					player:"phaseDiscardBefore",
 				},
@@ -5463,12 +5478,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			fengshi:{
-				audio:2,
+				audio:'zfengshi',
 				zhenfa:'siege',
 				global:'fengshi_sha'
 			},
 			fengshi_sha:{
-				audio:'fengshi',
+				audio:'zfengshi',
 				trigger:{player:'useCardToPlayered'},
 				filter:function(event,player){
 					if(event.card.name!='sha'&&game.countPlayer()<4) return false;
@@ -5622,7 +5637,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			gzmingshi:{
 				audio:'mingshi',
-				trigger:{player:'damageBegin'},
+				trigger:{player:'damageBegin3'},
 				forced:true,
 				filter:function(event,player){
 					return event.num>0&&event.source&&event.source.isUnseen(2);

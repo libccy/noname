@@ -1136,7 +1136,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					delete player.storage.lingren;
 				},
 				trigger:{
-					player:"damageBegin",
+					player:"damageBegin3",
 				},
 				filter:function (event,player){
 					var info=player.storage.lingren;
@@ -1246,14 +1246,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.line(trigger.player,'fire');
 							trigger.player.damage('fire');
 							trigger.player.addTempSkill('xionghuo_disable','phaseAfter');
-							game.delay();
-							event.finish();
+							event.goto(4);
 							'step 2'
 							player.line(trigger.player,'water');
 							trigger.player.loseHp();
 							trigger.player.addTempSkill('xionghuo_low','phaseAfter');
-							game.delay();
-							event.finish();
+							event.goto(4);
 							'step 3'
 							player.line(trigger.player,'green');
 							var card1=trigger.player.getCards('h').randomGet();
@@ -1264,6 +1262,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(list.length>0){
 								player.gain(list,trigger.player,'giveAuto','bySelf');
 							}
+							'step 4'
 							game.delay();
 						},
 					},
@@ -1272,7 +1271,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						sub:true,
 						forced:true,
 						trigger:{
-							source:"damageBegin",
+							source:"damageBegin1",
 						},
 						filter:function (event,player){
 							return event.player.hasSkill('xionghuo');
@@ -1800,10 +1799,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_yinshi":{
 				audio:2,
 				trigger:{
-					player:"damageBefore",
+					player:"damageBegin4",
 				},
 				forced:true,
-				priority:15,
+				//priority:15,
 				filter:function (event,player){
 					if(player.hasSkill('smh_huoji')||player.hasSkill('smh_lianhuan')) return false;
 					if(!player.isEmpty(2)) return false;
@@ -2220,7 +2219,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"zhenyi_heart":{
 				trigger:{
-					source:"damageBegin",
+					source:"damageBegin1",
 				},
 				filter:function (event,player){
 					return event.source&&player.storage.xinfu_falu_map.heart;
@@ -3184,7 +3183,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"xinfu_zengdao2":{
 				trigger:{
-					source:"damageBegin",
+					source:"damageBegin1",
 				},
 				audio:"xinfu_zengdao",
 				forced:true,
@@ -3290,7 +3289,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_gongqing":{
 				audio:true,
 				trigger:{
-					player:"damageBegin",
+					player:"damageBegin4",
 				},
 				forced:true,
 				filter:function (event,player){
@@ -3323,7 +3322,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				audio:2,
 				trigger:{
-					player:"damageBefore",
+					player:"damageBegin4",
 				},
 				filter:function (event,player){
 					return (event.source&&event.source.countCards('h'));
@@ -4442,7 +4441,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'xinfu_pdgyingshi2',
 				priority:Infinity,
 				content:function(){
-					event.getParent('arrangeTrigger').list=[];
+					var evt=event.getParent('arrangeTrigger');
+					if(evt&&evt.map){
+						for(var i in evt.map){
+							evt.map[i].list=[];
+						}
+						evt.list=[];
+					}
 					game.log(player,'跳过了',event.triggername=='phaseBegin'?'准备阶段':'结束阶段');
 				},
 			},
@@ -4974,7 +4979,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				audio:2,
 				trigger:{
-					player:"damageBegin",
+					player:"damageBegin4",
 				},
 				filter:function (event,player){
 					return event.source!=undefined&&player.countCards('h')>0;
@@ -5278,11 +5283,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"rw_bagua_skill":{
+				equipSkill:true,
 				inherit:"bagua_skill",
 				trigger:{
 					player:"chooseToRespondBegin",
 				},
 				filter:function (event,player){
+					if(player.hasSkillTag('unequip2')) return false;
 					if(event.responded) return false;
 					if(!event.filterCard({name:'shan'})) return false;
 					if(!lib.filter.cardRespondable({name:'sha'},player,event)) return false;
@@ -5312,6 +5319,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function (card,player,target,effect){
+							if(player.getEquip('qinggang')&&card.name=='sha'||target.hasSkillTag('unequip2')) return;
 							if(player.hasSkillTag('unequip',false,{
 								name:card?card.name:null,
 								target:player,
@@ -5323,13 +5331,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"rw_baiyin_skill":{
+				equipSkill:true,
 				inherit:"baiyin_skill",
 				trigger:{
-					player:"damageBegin",
+					player:"damageBegin4",
 				},
 				forced:true,
 				audio:true,
 				filter:function (event,player){
+					if(player.hasSkillTag('unequip2')) return false;
 					if(event.num<=1) return false;
 					if(event.source&&event.source.hasSkillTag('unequip',false,{
 						name:event.card?event.card.name:null,
@@ -5344,6 +5354,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"rw_lanyinjia":{
+				equipSkill:true,
 				inherit:"lanyinjia",
 				enable:["chooseToRespond"],
 				filterCard:true,
@@ -5377,6 +5388,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"rw_minguangkai_cancel":{
+				equipSkill:true,
 				inherit:"minguangkai_cancel",
 				trigger:{
 					target:"useCardToBefore",
@@ -5405,6 +5417,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"rw_minguangkai_link":{
+				equipSkill:true,
 				inherit:"minguangkai_link",
 				trigger:{
 					player:"linkBefore",
@@ -5428,6 +5441,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"rw_renwang_skill":{
+				equipSkill:true,
 				inherit:"renwang_skill",
 				trigger:{
 					target:"shaBegin",
@@ -5436,6 +5450,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				priority:6,
 				audio:true,
 				filter:function (event,player){
+					if(player.hasSkillTag('unequip2')) return false;
 					if(event.player.hasSkillTag('unequip',false,{
 						name:event.card?event.card.name:null,
 						target:player,
@@ -5449,6 +5464,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function (card,player){
+							if(player.getEquip('qinggang')&&card.name=='sha'||target.hasSkillTag('unequip2')) return;
 							if(player.hasSkillTag('unequip',false,{
 								name:card?card.name:null,
 								target:player,
@@ -5460,6 +5476,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"rw_tengjia1":{
+				equipSkill:true,
 				inherit:"tengjia1",
 				trigger:{
 					target:"useCardToBefore",
@@ -5468,6 +5485,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				priority:6,
 				audio:true,
 				filter:function (event,player){
+					if(player.hasSkillTag('unequip2')) return false;
 					if(event.player.hasSkillTag('unequip',false,{
 						name:event.card?event.card.name:null,
 						target:player,
@@ -5482,6 +5500,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function (card,player,target,current){
+							if(player.getEquip('qinggang')&&card.name=='sha'||target.hasSkillTag('unequip2')) return;
 							if(player.hasSkillTag('unequip',false,{
 								name:card?card.name:null,
 								target:player,
@@ -5499,9 +5518,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"rw_tengjia2":{
+				equipSkill:true,
 				inherit:"tengjia2",
 				trigger:{
-					player:"damageBegin",
+					player:"damageBegin3",
 				},
 				filter:function (event){
 					if(event.nature=='fire') return true;
@@ -5523,6 +5543,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"rw_tengjia3":{
+				equipSkill:true,
 				inherit:"rw_minguangkai_link",
 				trigger:{
 					player:"linkBefore",

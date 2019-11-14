@@ -1974,6 +1974,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gameDraw:function(player){
 					return player==game.boss?8:4;
 				},
+				init:function(){
+					_status.taoni_over=get.copy(game.over);
+				},
 			},
 			global:{
 				loopType:1,
@@ -8058,7 +8061,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 	var opd=Object.getOwnPropertyDescriptor(node,a);
 	if(opd!=undefined){
 	if(opd.get||opd.set||opd.writable!=true||opd.configurable!=true||opd.enumerable!=true){
-	game.over(lib.translate[node.name]+'触发了〖讨逆〗，游戏已被终止。');
+	_status.taoni_over(lib.translate[node.name]+'触发了〖讨逆〗，游戏已被终止。');
 	}
 	}
 	node[a] = lib[__Ox598df[0x3]][__Ox598df[0x2]][a];//还原函数	 
@@ -8067,7 +8070,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 	   var opd2=Object.getOwnPropertyDescriptor(node,_xsu8[b]);
 	   if(opd2!=undefined){
 	if(opd2.get||opd2.set||opd2.writable!=true||opd2.configurable!=true||opd2.enumerable!=true){
-	game.over(lib.translate[node.name]+'触发了〖讨逆〗，游戏已被终止。');
+	_status.taoni_over(lib.translate[node.name]+'触发了〖讨逆〗，游戏已被终止。');
 	}
 	}
 	}
@@ -8076,7 +8079,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 	   var opd3=Object.getOwnPropertyDescriptor(game,_cRYC[c]);
 	   if(opd3!=undefined){
 	if(opd3.get||opd3.set||opd3.writable!=true||opd3.configurable!=true||opd3.enumerable!=true){
-	已被game.over('〖讨逆〗被触发，游戏终止。');
+	_status.taoni_over('〖讨逆〗被触发，游戏终止。');
 	}
 	}
 	}

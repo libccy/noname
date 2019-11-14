@@ -1157,7 +1157,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						target.chooseToUse('对'+get.translation(event.addedTarget)+'使用一张杀，或令'+get.translation(player)+'获得你的武器牌',
-							{name:'sha'},event.addedTarget,-1).set('targetRequired',true);
+							{name:'sha'}).set('targetRequired',true).set('complexSelect',true).set('filterTarget',function(card,player,target){
+						if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
+						return lib.filter.filterTarget.apply(this,arguments);
+					}).set('sourcex',event.addedTarget);
 					}
 					"step 1"
 					if(event.directfalse||result.bool==false){
@@ -1394,6 +1397,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			qinglong_guozhan:{
+				equipSkill:true,
 				trigger:{player:'useCard'},
 				forced:true,
 				filter:function(event,player){
@@ -1408,6 +1412,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			qinglong_guozhan_mingzhi:{
+				equipSkill:true,
 				vanish:true,
 				silent:true,
 				onremove:true,
@@ -1431,7 +1436,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			hanbing_skill:{
-				trigger:{source:'damageBefore'},
+				equipSkill:true,
+				trigger:{source:'damageBegin2'},
 				//direct:true,
 				audio:true,
 				filter:function(event){
@@ -1475,11 +1481,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			renwang_skill:{
+				equipSkill:true,
 				trigger:{target:'shaBegin'},
 				forced:true,
 				priority:6,
 				audio:true,
 				filter:function(event,player){
+					if(player.hasSkillTag('unequip2')) return false;
 					if(event.player.hasSkillTag('unequip',false,{
 						name:event.card?event.card.name:null,
 						target:player,
@@ -1492,7 +1500,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					effect:{
-						target:function(card,player){
+						target:function(card,player,target){
+							if(player.getEquip('qinggang')&&card.name=='sha'||target.hasSkillTag('unequip2')) return;
 							if(player.hasSkillTag('unequip',false,{
 								name:card?card.name:null,
 								target:player,
@@ -1504,6 +1513,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zhuge_skill:{
+				equipSkill:true,
 				mod:{
 					cardUsable:function(card,player,num){
 						if(card.name=='sha'){
@@ -1516,6 +1526,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			cixiong_skill:{
+				equipSkill:true,
 				trigger:{player:'useCardToPlayered'},
 				audio:true,
 				logTarget:'target',
@@ -1536,15 +1547,54 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			qinggang_skill:{
-				ai:{
+				equipSkill:true,
+				audio:true,
+				trigger:{
+					player:'useCardToPlayered',
+				},
+				filter:function(event){
+					return event.card.name=='sha';
+				},
+				forced:true,
+				logTarget:'target',
+				content:function(){
+					trigger.target.addTempSkill('qinggang2');
+					trigger.target.storage.qinggang2.add(trigger.card);
+				},
+				/*ai:{
 					unequip:true,
 					skillTagFilter:function(player,tag,arg){
 						if(arg&&arg.name=='sha') return true;
 						return false;
 					}
-				}
+				}*/
+			},
+			qinggang2:{
+				firstDo:true,
+				ai:{unequip2:true},
+				init:function(player,skill){
+					if(!player.storage[skill]) player.storage[skill]=[];
+				},
+				onremove:true,
+				trigger:{
+					player:['damage','damageCancelled','damageZero'],
+					target:['shaMiss','useCardToExcluded'],
+				},
+				charlotte:true,
+				filter:function(event,player){
+					return player.storage.qinggang2&&event.card&&player.storage.qinggang2.contains(event.card);
+				},
+				silent:true,
+				forced:true,
+				popup:false,
+				priority:12,
+				content:function(){
+						player.storage.qinggang2.remove(trigger.card);
+						if(!player.storage.qinggang2.length) player.removeSkill('qinggang2');
+				},
 			},
 			qinglong_skill:{
+				equipSkill:true,
 				trigger:{player:'shaMiss'},
 				direct:true,
 				filter:function(event,player){
@@ -1568,6 +1618,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zhangba_skill:{
+				equipSkill:true,
 				enable:['chooseToUse','chooseToRespond'],
 				filterCard:true,
 				selectCard:2,
@@ -1590,6 +1641,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			guanshi_skill:{
+				equipSkill:true,
 				trigger:{player:'shaMiss'},
 				direct:true,
 				audio:true,
@@ -1623,6 +1675,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			fangtian_skill:{
+				equipSkill:true,
 				mod:{
 					selectTarget:function(card,player,range){
 						if(card.name!='sha') return;
@@ -1638,7 +1691,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			fangtian_guozhan:{
-				trigger:{player:'useCard'},
+				equipSkill:true,
+				trigger:{player:'useCard1'},
 				silent:true,
 				filter:function(event,player){
 					if(get.mode()!='guozhan') return false;
@@ -1687,7 +1741,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			qilin_skill:{
-				trigger:{source:'damageBegin'},
+				equipSkill:true,
+				trigger:{source:'damageBegin2'},
 				filter:function(event,player){
 					return event.card&&event.card.name=='sha'&&event.notLink()&&event.player.getCards('e',{subtype:['equip3','equip4','equip6']}).length>0
 				},
@@ -1711,11 +1766,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			bagua_skill:{
+				equipSkill:true,
 				trigger:{player:'chooseToRespondBegin'},
 				filter:function(event,player){
 					if(event.responded) return false;
 					if(!event.filterCard({name:'shan'})) return false;
 					if(!lib.filter.cardRespondable({name:'shan'},player,event)) return false;
+					if(player.hasSkillTag('unequip2')) return false;
 					var evt=event.getParent();
 					if(evt.player&&evt.player.hasSkillTag('unequip',false,{
 						name:evt.card?evt.card.name:null,
@@ -1742,6 +1799,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target,effect){
+							if(player.getEquip('qinggang')&&card.name=='sha'||target.hasSkillTag('unequip2')) return;
 							if(player.hasSkillTag('unequip',false,{
 								name:card?card.name:null,
 								target:player,

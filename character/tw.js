@@ -72,7 +72,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twbaimei:{
 				audio:2,
 				trigger:{
-					player:"damageBefore",
+					player:"damageBegin4",
 				},
 				forced:true,
 				priority:15,
@@ -350,7 +350,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			twbaobian:{
 				audio:2,
-				trigger:{source:'damageBefore'},
+				trigger:{source:'damageBegin2'},
 				filter:function(event,player){
 					var card=event.card;
 					if(!card||(card.name!='sha'&&card.name!='juedou')) return false;

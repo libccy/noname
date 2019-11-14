@@ -129,6 +129,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						equipValue:6
 					}
 				},
+				onLoseFilter:function(card,player){
+				if(player.hasSkillTag('unequip2')) return false;
+				return true;
+				},
 				onLose:function(){
 					'step 0'
 					player.draw(2);
@@ -760,6 +764,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			liulongcanjia:{
+				equipSkill:true,
 				mod:{
 					targetEnabled:function(card,player,target){
 						if(['equip3','equip4'].contains(get.subtype(card))) return false;
@@ -767,6 +772,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			minguangkai_cancel:{
+				equipSkill:true,
 				trigger:{target:'useCardToTarget'},
 				forced:true,
 				check:function(event,player){
@@ -791,6 +797,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			minguangkai_link:{
+				equipSkill:true,
 				trigger:{player:'linkBefore'},
 				forced:true,
 				priority:20,
@@ -811,6 +818,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			dinglanyemingzhu_skill:{
+				equipSkill:true,
 				inherit:'zhiheng',
 				filter:function(event,player){
 					return !player.hasSkill('gzzhiheng',true);
@@ -867,6 +875,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			feilongduofeng:{
+				equipSkill:true,
 				trigger:{player:'useCardToPlayered'},
 				logTarget:'target',
 				check:function(event,player){
@@ -880,6 +889,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			feilongduofeng2:{
+				equipSkill:true,
 				trigger:{source:'dieAfter'},
 				filter:function(event,player){
 					if(event.reason&&event.reason.card&&event.reason.card.name=='sha'){
@@ -1005,6 +1015,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			feilongduofeng3:{
+				equipSkill:true,
 				trigger:{source:'dying'},
 				filter:function(event,player){
 					var evt=event.getParent('damage');
@@ -1019,6 +1030,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			taipingyaoshu:{
+				equipSkill:true,
 				mod:{
 					maxHandcard:function(player,num){
 						if(player.hasSkill('huangjintianbingfu')){
@@ -1029,8 +1041,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						});
 					}
 				},
-				trigger:{player:'damageBefore'},
+				trigger:{player:'damageBegin4'},
 				filter:function(event,player){
+					if(player.hasSkillTag('unequip2')) return false;
 					if(event.source&&event.source.hasSkillTag('unequip',false,{
 						name:event.card?event.card.name:null,
 						target:player,
@@ -1047,6 +1060,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					nothunder:true,
 					effect:{
 						target:function(card,player,target,current){
+							if(card.name=='sha'&&player.getEquip('qinggang')||target.hasSkillTag('unequip2')) return;
 							if(player.hasSkillTag('unequip',false,{
 								name:card?card.name:null,
 								target:player,
@@ -1062,6 +1076,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			g_taipingyaoshu:{},
 			yuxi_skill:{
+				equipSkill:true,
 				trigger:{player:'phaseDrawBegin'},
 				forced:true,
 				filter:function(event,player){
@@ -1076,6 +1091,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				group:'yuxi_skill2'
 			},
 			yuxi_skill2:{
+				equipSkill:true,
 				trigger:{player:'phaseUseBegin'},
 				forced:true,
 				filter:function(event,player){
@@ -1242,9 +1258,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			huxinjing:{
-				trigger:{player:'damageBefore'},
+				equipSkill:true,
+				trigger:{player:'damageBegin4'},
 				// forced:true,
 				filter:function(event,player){
+					if(player.hasSkillTag('unequip2')) return false;
 					if(event.source&&event.source.hasSkillTag('unequip',false,{
 						name:event.card?event.card.name:null,
 						target:player,
@@ -1261,6 +1279,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			huxinjing2:{
+				equipSkill:true,
 				trigger:{player:['damageEnd','damageZero']},
 				priority:10,
 				forced:true,
@@ -1273,8 +1292,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.removeSkill('huxinjing2');
 				}
 			},
-			wuliu_skill:{},
+			wuliu_skill:{
+				equipSkill:true,
+			},
 			g_wuliu_skill:{
+				equipSkill:true,
 				mod:{
 					attackFrom:function(from,to,distance){
 						return distance-game.countPlayer(function(current){
@@ -1287,8 +1309,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			sanjian_skill:{
+				equipSkill:true,
 				audio:true,
-				trigger:{source:'damageAfter'},
+				trigger:{source:'damageSource'},
 				direct:true,
 				filter:function(event,player){
 					if(event.player.isDead()) return false;

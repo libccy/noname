@@ -5478,6 +5478,7 @@
 						item:{
 							normal:'新1v1',
 							dianjiang:'点将单挑',
+							changban:'血战长坂坡',
 						},
 						restart:true,
 						frequent:true,
@@ -5491,6 +5492,7 @@
 						item:{
 							normal:'新1v1',
 							dianjiang:'点将单挑',
+							changban:'血战长坂坡',
 						},
 						restart:true,
 						frequent:true,
@@ -10368,123 +10370,73 @@
 					event.filter3=function(info,info2){
 						return event.filter2(info2)&&event.filter1(info2)&&info2[1]==info[1]&&info[2]==info2[2]&&info[1].hasSkill(info2[0],true);
 					}
-					event.num=0;
-					event.used=[];
 					'step 1'
-					var bool=false;
-					var list=event.list;
-					for(var i=0;i<list.length;i++){
-						if(event.filter1(list[i])){
-							bool=true;
-							event.num=i;
-							break;
-						}
+					if(event.list.length){
+						var info=event.list.shift();
+						game.createTrigger(event.triggername,info[0],info[1],trigger);
+						event.redo();
 					}
-					if(!bool){
+					'step 2'
+					if(!event.map.length){
 						if(trigger._triggering==this){
 							delete trigger._triggering;
 						}
 						event.finish();
 						return;
-					}
-					event.choice=[];
-					if(event.num<list.length-1&&event.filter2(list[event.num])){
-						var current=list[event.num];
-						event.choice.push(current);
-						for(var i=event.num+1;i<list.length;i++){
-							if(event.filter3(current,list[i])) event.choice.push(list[i]);
+					};
+					event.doing=event.map.shift();
+					'step 3'
+					event.num=0;
+					var bool=false;
+					var list=event.doing.list;
+					for(var i=0;i<list.length;i++){
+						if(event.filter1(list[i])){
+							event.num=i;
+							bool=true;
+							break;
 						}
 					}
-					if(event.choice.length<2) event.goto(4);
-					'step 2'
+					if(!bool){event.goto(2);return;}
+					var priority=list[event.num][2];
+					for(var i=0;i<event.num;i++){
+						if(event.doing.list[i][2]>priority){
+							event.doing.list.splice(i--,1);
+							event.num--;
+						}
+					}
+					event.choice=[];
+					if(event.num<event.doing.list.length-1&&event.filter2(event.doing.list[event.num])){
+						var current=event.doing.list[event.num];
+						event.choice.push(current);
+						for(var i=event.num+1;i<event.doing.list.length;i++){
+							if(event.filter3(current,event.doing.list[i])) event.choice.push(event.doing.list[i]);
+						}
+					}
+					if(event.choice.length<2) event.goto(6);
+					'step 4'
 					var controls=[];
 					event.current=event.choice[0][1]
 					for(var i=0;i<event.choice.length;i++){
 						controls.push(event.choice[i][0]);
 					}
 					event.current.chooseControl(controls).set('prompt','选择下一个触发的技能').set('forceDie',true);
-					'step 3'
-					if(result.control){
-						for(var i=0;i<event.list.length;i++){
-							if(event.list[i][0]==result.control&&event.list[i][1]==event.current){
-								event.num=i;break;
-							}
-						}
-					}
-					'step 4'
-					var info=event.list[event.num];
-					if(info){
-						event.used.push(info);
-						event.list.splice(event.num,1);
-						game.createTrigger(event.triggername,info[0],info[1],trigger);
-					}
 					'step 5'
-					event.goto(1);
-					/*'step 0'
-					var list=event.list;
-					if(!list.length){
-						if(trigger._triggering==this){
-							delete trigger._triggering;
-						}
-						event.finish();
-						return;
-					}
-					event.choice=[];
-					event.num=0;
-					var filter=function(i){
-						if(list[i][1]==list[0][1]&&list[i][1].hasSkill(list[i][0],true)){
-							var info=get.info(list[i][0]);
-							if(info.forced||info.popup===false){
-								return false;
-							}
-							return true;
-						}
-						return false;
-					}
-					var filter2=function(info){
-						return lib.filter.filterTrigger(trigger,info[1],event.triggername,info[0]);
-					}
-					if(filter(0)){
-						event.choice.push(list[0]);
-						for(var i=1;i<list.length;i++){
-							if(filter(i)){
-								event.choice.push(list[i]);
-							}
-						}
-					}
-					if(event.choice.length>1){
-						for(var i=0;i<event.choice.length;i++){
-							if(!filter2(event.choice[i])){
-								event.choice.splice(i--,1);
-								if(event.choice.length<=1) break;
-							}
-						}
-					}
-					if(event.choice.length<=1){
-						event.goto(3);
-					}
-					'step 1'
-					var controls=[];
-					event.current=event.choice[0][1]
-					for(var i=0;i<event.choice.length;i++){
-						controls.push(event.choice[i][0]);
-					}
-					event.current.chooseControl(controls).set('prompt','选择下一个触发的技能');
-					'step 2'
 					if(result.control){
-						for(var i=0;i<event.list.length;i++){
-							if(event.list[i][0]==result.control&&event.list[i][1]==event.current){
+						for(var i=0;i<event.doing.list.length;i++){
+							if(event.doing.list[i][0]==result.control&&event.doing.list[i][1]==event.current){
 								event.num=i;break;
 							}
 						}
 					}
-					'step 3'
-					var info=event.list[event.num];
+					'step 6'
+					var info=event.doing.list[event.num];
 					if(info){
-						event.list.splice(event.num,1);
+						event.doing.list2.push(info);
+						event.doing.list.splice(event.num,1);
 						game.createTrigger(event.triggername,info[0],info[1],trigger);
 					}
-					event.goto(0);*/
+					'step 7'
+					event.goto(event.doing.list.length?3:2);
 				},
 				createTrigger:function(){
 					"step 0"
@@ -13466,9 +13418,19 @@
 					if(targets[num]&&targets[num].isDead()) return;
 					if(targets[num]&&targets[num].isOut()) return;
 					if(targets[num]&&targets[num].removed) return;
-					if(targets[num]&&event.excluded.contains(targets[num])) return;
 					if(targets[num]&&info.ignoreTarget&&info.ignoreTarget(card,player,targets[num])) return;
 					if(targets.length==0&&!info.notarget) return;
+					if(targets[num]&&event.excluded.contains(targets[num])){
+					var next=game.createEvent('useCardToExcluded',false);
+						next.setContent('emptyEvent');
+						next.targets=targets;
+						next.target=targets[num];
+						next.num=num;
+						next.card=card;
+						next.cards=cards;
+						next.player=player;
+						return;
+					};
 					var next=game.createEvent(card.name);
 					next.setContent(info.content);
 					next.targets=targets;
@@ -14289,7 +14251,34 @@
 				damage:function(){
 					"step 0"
 					event.forceDie=true;
-					if(num<0) num=0;
+					if(num<=0){
+						event.trigger('damageZero');
+						event.finish();
+						event._triggered=null;
+					}
+					else event.trigger('damageBegin1');
+					"step 1"
+					if(num<=0){
+						event.trigger('damageZero');
+						event.finish();
+						event._triggered=null;
+					}
+					else event.trigger('damageBegin2');
+					"step 2"
+					if(num<=0){
+						event.trigger('damageZero');
+						event.finish();
+						event._triggered=null;
+					}
+					else event.trigger('damageBegin3');
+					"step 3"
+					if(num<=0){
+						event.trigger('damageZero');
+						event.finish();
+						event._triggered=null;
+					}
+					else event.trigger('damageBegin4');
+					"step 4"
 					if(num>0&&player.hujia&&!player.hasSkillTag('nohujia')){
 						if(num>=player.hujia){
 							event.hujia=player.hujia;
@@ -14303,7 +14292,7 @@
 						player.changeHujia(-event.hujia).type='damage';
 					}
 					event.num=num;
-					"step 1"
+					"step 5"
 					if(lib.config.background_audio){
 						game.playAudio('effect','damage'+(num>1?'2':''));
 					}
@@ -14361,7 +14350,7 @@
 							event.trigger('damage');
 						}
 					}
-					"step 2"
+					"step 6"
 					if(player.hp<=0&&player.isAlive()){
 						game.delayx();
 						player.dying(event);
@@ -14406,7 +14395,7 @@
 							}
 						}
 					}
-					"step 3"
+					"step 7"
 					if(!event.notrigger) event.trigger('damageSource');
 				},
 				recover:function(){
@@ -14459,62 +14448,18 @@
 				loseMaxHp:function(){
 					"step 0"
 					game.log(player,'减少了'+get.cnNumber(num)+'点体力上限');
-					if(!event.forced&&typeof player.singleHp==='boolean'){
-						if(num%2==1){
-							if(player.singleHp){
-								player.singleHp=false;
-								player.maxHp-=(num-1)/2;
-							}
-							else{
-								player.singleHp=true;
-								player.maxHp-=(num+1)/2;
-								event.changed=true;
-							}
-						}
-						else{
-							player.maxHp-=num/2;
-						}
-					}
-					else{
-						player.maxHp-=num;
-					}
+					player.maxHp-=num;
 					player.update();
 					"step 1"
 					if(player.maxHp<=0){
 						player.die();
 					}
-					"step 2"
-					if(!event.forced&&event.changed&&!player.isUnseen(2)){
-						player.doubleDraw();
-					}
 				},
 				gainMaxHp:function(){
 					"step 0"
 					game.log(player,'增加了'+get.cnNumber(num)+'点体力上限');
-					if(!event.forced&&typeof player.singleHp==='boolean'){
-						if(num%2==1){
-							if(player.singleHp){
-								player.singleHp=false;
-								player.maxHp+=(num+1)/2;
-							}
-							else{
-								player.singleHp=true;
-								player.maxHp+=(num-1)/2;
-								event.changed=true;
-							}
-						}
-						else{
-							player.maxHp+=num/2;
-						}
-					}
-					else{
-						player.maxHp+=num;
-					}
+					player.maxHp+=num;
 					player.update();
-					"step 1"
-					if(!event.forced&&event.changed&&!player.isUnseen(2)){
-						player.doubleDraw();
-					}
 				},
 				changeHp:function(){
 					player.hp+=num;
@@ -14537,6 +14482,7 @@
 				},
 				dying:function(){
 					"step 0"
+					event.forceDie=true;
 					if(player.isDying()||player.hp>0){
 						event.finish();
 						return;
@@ -14546,8 +14492,31 @@
 						_status.dying=list;
 					},_status.dying);
 					event.trigger('dying');
-					game.log(player,'濒死')
+					game.log(player,'濒死');
 					"step 1"
+					if(player.hp>0){
+						_status.dying.remove(player);
+						game.broadcast(function(list){
+							_status.dying=list;
+						},_status.dying);
+						event.finish();
+					}
+					else{
+						var next=game.createEvent('_save');
+						var start=false;
+						var starts=[_status.currentPhase,event.source,event.player,game.me,game.players[0]];
+						for(var i=0;i<starts.length;i++){
+							if(get.itemtype(starts[i])=='player'){
+								start=starts[i];break;
+							}
+						}
+						next.player=start;
+						next._trigger=event;
+						next.triggername='_save';
+						next.forceDie=true;
+						next.setContent(lib.skill._save.content);
+					}
+					"step 2"
 					_status.dying.remove(player);
 					game.broadcast(function(list){
 						_status.dying=list;
@@ -15253,7 +15222,7 @@
 						var hp2=get.infoHp(info2[2]);
 						var maxHp2=get.infoMaxHp(info2[2]);
 						var double_hp;
-						if(_status.connectMode){
+						if(_status.connectMode||get.mode()=='single'){
 							double_hp='pingjun';
 						}
 						else{
@@ -18068,6 +18037,7 @@
 					return next;
 				},
 				doubleDraw:function(){
+					if(get.is.changban()) return;
 					var next=game.createEvent('doubleDraw');
 					next.player=this;
 					next.setContent('doubleDraw');
@@ -22561,7 +22531,7 @@
 				addTrigger:function(skill,player){
 					if(!player) return;
 					var evt=this.getParent('arrangeTrigger');
-					if(!evt||evt.name!='arrangeTrigger'||!evt.list) return;
+					if(!evt||evt.name!='arrangeTrigger'||!evt.map) return;
 					if(typeof skill=='string') skill=[skill];
 					game.expandSkills(skill);
 					var filter=function(content){
@@ -22570,6 +22540,14 @@
 					};
 					var trigger=evt._trigger;
 					var triggername=evt.triggername;
+					var map=false;
+					if(evt.doing&&evt.doing.player==player) map=evt.doing;
+					else{
+						for(var i=0;i<evt.map.length;i++){
+							if(evt.map[i].player==player){map=evt.map[i];break;}
+						}
+					}
+					if(!map) return;
 					var func=function(skillx){
 						var info=lib.skill[skillx];
 						var bool=false;
@@ -22585,17 +22563,20 @@
 						if(!lib.translate[skillx]||skillx.indexOf('_')==0||info.popup===false||info.silent){
  							priority++;
 						}
+						if(info.equipSkill) num-=25;
+						if(info.cardSkill) num-=50;
+						if(info.ruleSkill) num-=75;
 						var toadd=[skillx,player,priority];
-						if(evt.used){
-							for(var i=0;i<evt.used.length;i++){
-								if(evt.used[i][0]==toadd[0]&&evt.used[i][1]==toadd[1]) return;
+						if(map.list2){
+							for(var i=0;i<map.list2.length;i++){
+								if(map.list2[i][0]==toadd[0]&&map.list2[i][1]==toadd[1]) return;
 							}
 						};
-						for(var i=0;i<evt.list.length;i++){
-							if(evt.list[i][0]==toadd[0]&&evt.list[i][1]==toadd[1]) return;
+						for(var i=0;i<map.list.length;i++){
+							if(map.list[i][0]==toadd[0]&&map.list[i][1]==toadd[1]) return;
 						}
-						evt.list.add(toadd);
-						evt.list.sort(function(a,b){
+						map.list.add(toadd);
+						map.list.sort(function(a,b){
 							return b[2]-a[2];
 						});
 					}
@@ -22619,7 +22600,7 @@
 					if(!game.players||!game.players.length) return;
 					var event=this;
 					var start=false;
-					var starts=[event.source,event.player,game.me,game.players[0]];
+					var starts=[_status.currentPhase,event.source,event.player,game.me,game.players[0]];
 					for(var i=0;i<starts.length;i++){
 						if(get.itemtype(starts[i])=='player'){
 							start=starts[i];break;
@@ -22630,8 +22611,11 @@
 						start=game.findNext(start);
 					}
 					var list=[];
+					var mapx=[];
+					var allbool=false;
 					var roles=['player','source','target'];
 					var listAdded;
+					var mapxx;
 					var addList=function(skill,player){
 						if(listAdded[skill]) return;
 						if(player.forbiddenSkills[skill]) return;
@@ -22645,13 +22629,33 @@
 						if(!lib.translate[skill]||skill.indexOf('_')==0||info.popup===false||info.silent){
 							num++;
 						}
-						list.push([skill,player,num]);
+						if(info.equipSkill) num-=30;
+						if(info.ruleSkill) num-=30;
+						if(info.firstDo){
+							list.push([skill,player,num]);
+							list.sort(function(a,b){
+								return b[2]-a[2];
+							});
+							allbool=true;
+							return;
+						}
+						mapxx.list.push([skill,player,num]);
+						mapxx.list.sort(function(a,b){
+							return b[2]-a[2];
+						});
+						allbool=true;
 					};
 					var totalPopulation=game.players.length+game.dead.length+1;
-					var player=start;
+					var player=start;;
 					var globalskill='global_'+name;
 					var map=_status.connectMode?lib.playerOL:game.playerMap;
 					for(var iwhile=0;iwhile<totalPopulation;iwhile++){
+						var id=player.playerid;
+						var mapxx={
+							player:player,
+							list:[],
+							list2:[],
+						};
 						listAdded={};
 						for(var j in player.tempSkills){
 							var expire=player.tempSkills[j];
@@ -22742,18 +22746,18 @@
 								}
 							}
 						}
+						mapx.push(mapxx);
 						player=player.nextSeat;
 						if(!player||player===start){
 							break;
 						}
 					}
-					list.sort(function(a,b){
-						return b[2]-a[2];
-					});
-					if(list.length){
+					
+					if(allbool){
 						var next=game.createEvent('arrangeTrigger',false,event);
 						next.setContent('arrangeTrigger');
 						next.list=list;
+						next.map=mapx;
 						next._trigger=event;
 						next.triggername=name;
 						//next.starter=start;
@@ -22763,16 +22767,19 @@
 				untrigger:function(all,player){
 					var evt=this._triggering;
 					if(all){
-						if(evt&&evt.list) evt.list.length=0;
+						if(evt&&evt.map){
+							for(var i in evt.map){
+								evt.map[i].list=[];
+							}
+							evt.list=[];
+						};
 						this._triggered=5;
 					}
 					else{
 						if(player){
 							this._notrigger.add(player);
-						}
-						if(evt&&evt.list){
-							for(var i=0;i<evt.list.length;i++){
-								if(evt.list[i][1]==player) evt.list.splice(i--,1);
+							if(evt&&evt.map){
+								evt.map[player.playerid].list=[];
 							}
 						}
 					}
@@ -23935,14 +23942,15 @@
 				}
 			},
 			_save:{
-				trigger:{source:'dying',player:'dying'},
+				trigger:{source:'dying2',player:'dying2'},
 				priority:5,
 				forced:true,
 				popup:false,
 				filter:function(event,player){
-					if(!event.player.isDying()) return false;
-					if(event.source&&event.source.isIn()&&event.source!=player) return false;
-					return true;
+					//if(!event.player.isDying()) return false;
+					//if(event.source&&event.source.isIn()&&event.source!=player) return false;
+					//return true;
+					return false;
 				},
 				content:function(){
 					"step 0"
@@ -45752,6 +45760,9 @@
 			},
 			versus:function(){
 				return !_status.connectMode&&get.mode()=='versus'&&_status.mode=='three';
+			},
+			changban:function(){
+				return get.mode()=='single'&&_status.mode=='changban';
 			},
 			single:function(){
 				return get.mode()=='single'&&_status.mode=='normal';

@@ -8,7 +8,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				old_refresh:["old_zhangfei","old_huatuo"],
 				old_yijiang1:["masu","xushu","fazheng","yujin","xin_yujin","old_xusheng","old_lingtong","ol_yujin"],
 				old_yijiang2:["old_madai","old_zhonghui","old_wangyi","old_guanzhang","ol_liaohua"],
-				old_yijiang3:["liru","old_zhuran","ol_zhuran","ol_manchong","ol_guohuai"],
+				old_yijiang3:["liru","old_zhuran","ol_zhuran","ol_manchong","ol_guohuai","old_fuhuanghou","old_caochong"],
 				old_yijiang4:["old_caozhen","old_chenqun","old_zhuhuan","ol_wuyi"],
 				old_yijiang5:["old_caoxiu","old_quancong","old_zhuzhi"],
 				old_yijiang67:["ol_xinxianying","ol_zhangrang","ol_liuyu"],
@@ -16,6 +16,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			old_fuhuanghou:['female','qun',3,['oldzhuikong','oldqiuyuan']],
+			old_caochong:['male','wei',3,['oldrenxin','oldchengxiang']],
 			xuhuang:['male','wei',4,['gzduanliang']],
 			pangde:['male','qun',4,['mashu','mengjin']],
 			xiahouyuan:['male','wei',4,['shensu']],
@@ -747,7 +749,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			oldqianxi:{
-				trigger:{source:'damageBefore'},
+				trigger:{source:'damageBegin2'},
 				check:function(event,player){
 					var att=get.attitude(player,event.player);
 					if(event.player.hp==event.player.maxHp) return att<0;
@@ -875,6 +877,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_guohuai:'OL郭淮',
 			ol_wuyi:'OL吴懿',
 			ol_liuyu:'OL刘虞',
+			old_fuhuanghou:'旧伏皇后',
+			old_caochong:'旧曹冲',
 
 			old_fuhun:'父魂',
 			old_fuhun_info:'摸牌阶段开始时，你可以放弃摸牌，改为从牌堆顶亮出两张牌并获得之，若亮出的牌颜色不同，你获得技能“武圣”、“咆哮”，直到回合结束。',

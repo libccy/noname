@@ -315,7 +315,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				effect:function(){
 					if(result.bool==false){
-						player.skip('phaseDraw');
+						if(get.is.changban()) player.addTempSkill('bingliang_changban');
+						else player.skip('phaseDraw');
 					}
 				},
 				ai:{
@@ -399,6 +400,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.recover();
 				},
 				filterLose:function(card,player){
+					if(player.hasSkillTag('unequip2')) return false;
 					return player.hp<player.maxHp;
 				},
 				skills:['baiyin_skill'],
@@ -419,7 +421,26 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			bingliang_changban:{
+				cardSkill:true,
+				unique:true,
+				trigger:{player:'phaseDrawBegin'},
+				silent:true,
+				content:function(){
+					trigger.num--;
+				},
+				group:'bingliang_changban2'
+			},
+			bingliang_changban2:{
+				cardSkill:true,
+				trigger:{player:'phaseDrawAfter'},
+				silent:true,
+				content:function(){
+					if(player.enemy) player.enemy.draw();
+				}
+			},
 			muniu_skill:{
+				equipSkill:true,
 				enable:'phaseUse',
 				usable:1,
 				filterCard:true,
@@ -758,8 +779,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			guding_skill:{
+				equipSkill:true,
 				audio:true,
-				trigger:{source:'damageBegin'},
+				trigger:{source:'damageBegin1'},
 				filter:function(event){
 					if(event.parent.name=='_lianhuan'||event.parent.name=='_lianhuan2') return false;
 					if(event.card&&event.card.name=='sha'){
@@ -780,11 +802,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			tengjia1:{
+				equipSkill:true,
 				trigger:{target:['useCardToBefore']},
 				forced:true,
 				priority:6,
 				audio:true,
 				filter:function(event,player){
+					if(player.hasSkillTag('unequip2')) return false;
 					if(event.player.hasSkillTag('unequip',false,{
 						name:event.card?event.card.name:null,
 						target:player,
@@ -799,6 +823,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target,current){
+							if(target.hasSkillTag('unequip2')) return;
 							if(player.hasSkillTag('unequip',false,{
 								name:card?card.name:null,
 								target:player,
@@ -816,9 +841,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			tengjia2:{
-				trigger:{player:'damageBegin'},
+				equipSkill:true,
+				trigger:{player:'damageBegin3'},
 				filter:function(event,player){
 					if(event.nature!='fire') return false;
+					if(player.hasSkillTag('unequip2')) return false;
 					if(event.source&&event.source.hasSkillTag('unequip',false,{
 						name:event.card?event.card.name:null,
 						target:player,
@@ -844,10 +871,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			tengjia3:{
+				equipSkill:true,
 				audio:'tengjia1',
 				trigger:{target:'shaBegin'},
 				forced:true,
 				filter:function(event,player){
+					if(player.hasSkillTag('unequip2')) return false;
 					if(event.player.hasSkillTag('unequip',false,{
 						name:event.card?event.card.name:null,
 						target:player,
@@ -861,11 +890,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			baiyin_skill:{
-				trigger:{player:'damageBegin'},
+				equipSkill:true,
+				trigger:{player:'damageBegin4'},
 				forced:true,
 				audio:true,
 				filter:function(event,player){
 					if(event.num<=1) return false;
+					if(player.hasSkillTag('unequip2')) return false;
 					if(event.source&&event.source.hasSkillTag('unequip',false,{
 						name:event.card?event.card.name:null,
 						target:player,
@@ -879,6 +910,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zhuque_skill:{
+				equipSkill:true,
 				trigger:{player:'useCard1'},
 				priority:7,
 				filter:function(event,player){
