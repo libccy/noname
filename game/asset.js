@@ -4,6 +4,7 @@ window.noname_asset_list=[
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
 	'audio/background/music_danji.mp3',
+	'audio/background/music_phliosophy.mp3',
 	'audio/background/music_default.mp3',
 	'audio/background/music_diaochan.mp3',
 	'audio/background/music_shezhan.mp3',

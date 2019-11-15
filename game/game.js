@@ -24128,11 +24128,11 @@
 				forced:true,
 				popup:false,
 				logv:false,
-				priority:-5,
+				forceDie:true,
+				//priority:-5,
 				content:function(){
 					"step 0"
-					event.forceDie=true;
-					player.link();
+					player[player.isAlive()?'link':'removeLink']();
 					event.logvid=trigger.getLogv();
 					if(!trigger.notLink()) event.finish();
 					"step 1"
@@ -24156,6 +24156,7 @@
 			_lianhuan2:{
 				trigger:{global:'damageAfter'},
 				filter:function(event,player){
+					return false;
 					return (event.nature&&lib.linked.contains(event.nature)&&event.player.isLinked()&&
 						event.player.classList.contains('dead')&&player.isLinked());
 				},
@@ -24192,6 +24193,7 @@
 				forced:true,
 				popup:false,
 				filter:function(event,player){
+					return false;
 					return event.player.classList.contains('dead');
 				},
 				content:function(){
@@ -24199,12 +24201,15 @@
 				}
 			},
 			_lianhuan4:{
-				trigger:{global:'dieAfter'},
+				trigger:{player:'dieAfter'},
 				priority:-10,
 				forced:true,
 				popup:false,
+				forceDie:true,
 				filter:function(event,player){
-					return event.player.classList.contains('dead')&&event.getParent(2).name!='damage';
+					if(!player.isLinked()) return false;
+					var evt=event.getParent(2);
+					return evt.name!='damage'||!event.nature||!lib.linked.contains(event.nature);
 				},
 				content:function(){
 					trigger.player.removeLink();

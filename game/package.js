@@ -100,6 +100,7 @@ window.noname_package={
 		xinsha_bg:'新杀',
 	},
 	music:{
+		music_phliosophy:'罚抄',
 		music_diaochan:'貂蝉',
 		music_shezhan:'舌战',
 		music_danji:'单骑',
