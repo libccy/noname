@@ -3353,8 +3353,18 @@
 						else{
 							map.import_music.hide();
 						}
+						map.clear_background_music[get.is.object(lib.config.customBackgroundMusic)?'show':'hide']();
+						ui.background_music_setting=map.background_music;
+						map.background_music._link.config.updatex.call(map.background_music,[]);
 					},
 					background_music:{
+						updatex:function(){
+							this.lastChild.innerHTML=this._link.config.item[lib.config.background_music];
+							var menu=this._link.menu;
+							for(var i=0;i<menu.childElementCount;i++){
+								if(!['music_off','music_custom','music_random'].concat(lib.config.all.background_music).contains(menu.childNodes[i]._link)) menu.childNodes[i].delete();
+							}
+						},
 						name:'背景音乐',
 						init:true,
 						item:{
@@ -3419,7 +3429,28 @@
 							game.saveConfig('volumn_background',parseInt(volume));
 							ui.backgroundMusic.volume=volume/8;
 						}
-					}
+					},
+					clear_background_music:{
+						name:'清除自定义背景音乐',
+						clear:true,
+						onclick:function(){
+							if(confirm('是否清除已导入的所有自定义背景音乐？（该操作不可撤销！）')){
+								for(var i in lib.config.customBackgroundMusic){
+									lib.config.all.background_music.remove(i);
+									if(i.indexOf('cdv_')==0){
+										game.removeFile('audio/background/'+i+'.mp3');
+									}
+									else{
+										game.deleteDB('audio',i);
+									}
+								}
+								lib.config.customBackgroundMusic=null;
+								game.saveConfig('customBackgroundMusic',null);
+								game.saveConfig('background_music','music_off');
+								if(!_status._aozhan) game.playBackgroundMusic();
+							}
+						},
+					},
 				}
 			},
 			skill:{
@@ -6809,6 +6840,12 @@
 						for(i in pack.music){
 							lib.config.all.background_music.push(i);
 							lib.configMenu.audio.config.background_music.item[i]=pack.music[i];
+						}
+						if(lib.config.customBackgroundMusic){
+							for(i in lib.config.customBackgroundMusic){
+								lib.config.all.background_music.push(i);
+								lib.configMenu.audio.config.background_music.item[i]=lib.config.customBackgroundMusic[i];
+							}
 						}
 						lib.configMenu.audio.config.background_music.item.music_random='随机';
 						lib.configMenu.audio.config.background_music.item.music_off='关闭';
@@ -14587,7 +14624,7 @@
 
 					game.broadcastAll(function(player){
 						player.classList.add('dead');
-						// player.classList.remove('linked');
+						player.removeLink();
 						player.classList.remove('turnedover');
 						player.classList.remove('out');
 						player.node.count.innerHTML='0';
@@ -24123,7 +24160,7 @@
 			_lianhuan:{
 				trigger:{player:'damageAfter'},
 				filter:function(event,player){
-					return (event.nature&&lib.linked.contains(event.nature)&&event.player.isLinked());
+					return event.lianhuanable==true;
 				},
 				forced:true,
 				popup:false,
@@ -24132,9 +24169,7 @@
 				//priority:-5,
 				content:function(){
 					"step 0"
-					player[player.isAlive()?'link':'removeLink']();
 					event.logvid=trigger.getLogv();
-					if(!trigger.notLink()) event.finish();
 					"step 1"
 					event.targets=game.filterPlayer(function(current){
 						return current!=event.player&&current.isLinked();
@@ -24201,18 +24236,18 @@
 				}
 			},
 			_lianhuan4:{
-				trigger:{player:'dieAfter'},
+				trigger:{player:'changeHp'},
 				priority:-10,
 				forced:true,
 				popup:false,
 				forceDie:true,
 				filter:function(event,player){
-					if(!player.isLinked()) return false;
-					var evt=event.getParent(2);
-					return evt.name!='damage'||!event.nature||!lib.linked.contains(event.nature);
+					var evt=event.getParent();
+					return evt&&evt.name=='damage'&&evt.nature&&lib.linked.contains(evt.nature)&&player.isLinked();
 				},
 				content:function(){
-					trigger.player.removeLink();
+					player.link();
+					if(trigger.getParent().notLink()) trigger.getParent().lianhuanable=true;
 				}
 			}
 		},
@@ -33671,10 +33706,46 @@
 								}
 								else if(j=='import_music'){
 									cfgnode.querySelector('button').onclick=function(){
+										if(_status.music_importing) return;
+										_status.music_importing=true;
 										var fileToLoad=this.previousSibling.files[0];
 										if(fileToLoad){
-											game.saveConfig('background_music_src',fileToLoad.path);
-											game.playBackgroundMusic();
+											if(!lib.config.customBackgroundMusic) lib.config.customBackgroundMusic={};
+											var name=fileToLoad.name;
+											if(name.indexOf('.')!=-1){
+												name=name.slice(0,name.indexOf('.'));
+											}
+											var link=(game.writeFile?'cdv_':'custom_')+name;
+											if(lib.config.customBackgroundMusic[link]){
+												for(var i=1;i<1000;i++){
+													if(!lib.config.customBackgroundMusic[link+'_'+i]){
+														link=link+'_'+i;break;
+													}
+												}
+											}
+											var callback=function(){
+												var nodexx=ui.background_music_setting;
+												var nodeyy=nodexx._link.menu;
+												var nodezz=nodexx._link.config;
+												var musicname=lib.device=='android'?prompt('请给这首音乐起个名字'):false;
+												lib.config.customBackgroundMusic[link]=musicname?musicname:link.slice(link.indexOf('_')+1);
+												lib.config.background_music=link;
+												lib.config.all.background_music.add(link);
+												game.saveConfig('background_music',link);
+												game.saveConfig('customBackgroundMusic',lib.config.customBackgroundMusic);
+												nodezz.item[link]=lib.config.customBackgroundMusic[link];
+												var textMenu=ui.create.div('',lib.config.customBackgroundMusic[link],nodeyy,clickMenuItem);
+												textMenu._link=link;
+												nodezz.updatex.call(nodexx,[]);
+												_status.music_importing=false;
+												if(!_status._aozhan) game.playBackgroundMusic();
+											};
+											if(game.writeFile){
+												game.writeFile(fileToLoad,'audio/background',link+'.mp3',callback);
+											}
+											else{
+												game.putDB('audio',link,fileToLoad,callback);
+											}
 										}
 									}
 								}
