@@ -1517,7 +1517,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				mod:{
 					cardUsable:function(card,player,num){
 						if(card.name=='sha'){
-							if(get.is.versus()){
+							if(get.is.versus()||get.is.changban()){
 								return num+3;
 							}
 							return Infinity;
