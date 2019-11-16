@@ -1837,14 +1837,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					global:"damageEnd",
 				},
 				filter:function (event,player){
-					return event.player.isLinked()&&event.player.isAlive()&&event.notLink()&&event.nature;
+					return event.lianhuanable==true&&event.player.isAlive();
 				},
 				frequent:true,
 				content:function (){
 					"step 0"
 					event.cards=get.cards(game.countPlayer(function(current){
 						return current.isLinked();
-					}));
+					})+1);
 					"step 1"
 					if(event.cards.length>1){
 						player.chooseCardButton('【称好】：请选择要分配的牌',true,event.cards,[1,event.cards.length]).set('ai',function(button){
@@ -5290,7 +5290,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.hasSkillTag('unequip2')) return false;
 					if(event.responded) return false;
 					if(!event.filterCard({name:'shan'})) return false;
-					if(!lib.filter.cardRespondable({name:'sha'},player,event)) return false;
+					if(!lib.filter.cardRespondable({name:'shan'},player,event)) return false;
 					var evt=event.getParent();
 					if(evt.player&&evt.player.hasSkillTag('unequip',false,{
 						name:evt.card?evt.card.name:null,

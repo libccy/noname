@@ -274,7 +274,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.xinbenxi=0;
 				},
 				filter:function(trigger,player){
-					return _status.currentPhase==player&&trigger.targets&&trigger.targets.length==1&&!game.hasPlayer(function(current){
+					return _status.currentPhase==player&&trigger.targets&&trigger.targets.length==1&&(get.name(trigger.card)=='sha'||get.type(trigger.card)=='trick')&&!game.hasPlayer(function(current){
 						return get.distance(player,current)>1;
 					});
 				},
@@ -430,6 +430,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						sub:true,
 						trigger:{player:['phaseAfter','useCardAfter','useCard']},
 						silent:true,
+						filter:function(event,player){
+							return player==_status.currentPhase;
+						},
 						content:function(){
 							if(trigger.name=='phase'){
 								player.storage.xinbenxi=0;
@@ -5764,7 +5767,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.discard(cards);
 					event.num=cards.length;
 					'step 3'
-					player.chooseTarget([1,event.num],function(card,player,target){
+					player.chooseTarget('请选择至多'+get.cnNumber(event.num)+'名有牌的其他角色，获得这些角色的各一张手牌。',[1,event.num],function(card,player,target){
 						return target!=player&&target.countCards('he')>0;
 					}).set('ai',function(target){
 						return -get.attitude(_status.event.player,target)+0.5;
@@ -11089,7 +11092,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			benxi:'奔袭',
 			benxi_info:'锁定技，你的回合内，你每使用一次牌后，你的进攻距离+1直到回合结束；你的回合内，若你与所有角色的距离均为1，你无视其他角色的防具，且你使用的【杀】可额外指定一个目标',
 			xinbenxi:'奔袭',
-			xinbenxi_info:'锁定技，当你于回合内使用牌时，你本回合计算与其他角色的距离-1。你的回合内若你至场上所有其他角色的距离均不大于1，则当你使用牌选择唯一目标后，你选择至多两项：1.为此牌多指定一个目标；2.令此牌无视防具；3.令此牌不可被响应；4.你因此牌造成伤害时摸一张牌。',
+			xinbenxi_info:'锁定技，当你于回合内使用牌时，你本回合计算与其他角色的距离-1。你的回合内，若你至场上所有其他角色的距离均不大于1，则当你使用【杀】或普通锦囊牌选择唯一目标后，你选择至多两项：1.为此牌多指定一个目标；2.令此牌无视防具；3.令此牌不可被响应；4.你因此牌造成伤害时摸一张牌。',
 			sidi:'司敌',
 			sidi2:'司敌',
 			sidi3:'司敌',

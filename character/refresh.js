@@ -441,6 +441,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.finish();
 						}
 					else{
+						if(!game.hasPlayer(function(current){
+							return current!=player&&current!=trigger.player&&player.canUse('juedou',current);
+						})){
+							event.finish();
+							return;
+						}
 						trigger.player.chooseTarget(true,function(card,player,target){
 							var evt=_status.event.getParent();
 							return evt.player.canUse({name:'juedou'},target)&&target!=_status.event.player;
