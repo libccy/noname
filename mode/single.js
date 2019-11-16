@@ -197,7 +197,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				game.broadcastAll(function(){
 					_status.mode='changban';
 					lib.translate.bingliang_info='目标角色判定阶段进行判定：若判定结果不为梅花，则跳过该角色的摸牌阶段。';
+					lib.translate.zhuge_info='锁定技，出牌阶段，你使用杀的次数上限+3';
 				});
+				for(var i=0;i<lib.card.list.length;i++){
+					var card=lib.card.list[i];
+					if(card[2]=='muniu'||card[2]=='shandian'||card[2]=='tengjia'&&card[0]=='club'||
+					card[2]=='wuxie'&&card[0]=='diamond'&&card[1]==12) lib.card.list.splice(i--,1);
+				}
 			}
 			if(_status.connectMode){
 				lib.configOL.number=2;
@@ -1176,7 +1182,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseBool('是否更换手牌？').ai=function(){return Math.random()<0.5};
+					player.chooseBool('是否更换手牌？').ai=function(){
+						var hs=player.getCards('h');
+						return get.value(hs,'raw')<6*hs;
+					};
 					'step 1'
 					if(result.bool){
 						var hs=player.getCards('h');
@@ -1251,6 +1260,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			botu_info:'回合结束时，若你本回合使用的牌包含四种花色，则你可以进行一个额外回合。',
 		},
 		help:{
+		'血战长坂':'<div style="margin:10px">游戏规则</div><ul style="margin-top:0"><li>选将阶段<br>双方在游戏开始时由系统随机分配身份。分配到先手身份的玩家优先出牌，分配到后手身份的玩家优先选将。<br>双方各自随机获得3名暗置武将，同时从将池中随机选出6名明置武将，由后手玩家开始，按照一次1张-2张-2张-1张的顺序，轮流选择获得明置武将。之后双方各从自己的6名武将中选择2名分别作为主将和副将进行游戏。<li>胜利条件<br>对方死亡。'+
+			'<li>双将规则<br>双将主将决定角色的性别和势力，体力上限为主副将体力上限的平均值，向下取整。体力上限为3的角色可在游戏开始后更换一次起始手牌。<li>牌堆<br>牌堆中移除【木牛流马】【闪电】，♣花色的【藤甲】和【无懈可击 ♦️Q】️</ul>',
 		}
 	};
 });
