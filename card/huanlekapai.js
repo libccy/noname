@@ -118,8 +118,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
         return get.distance(player,target)>1;
     },
                 content:function (){
-        "step 0"
-        game.playSu('shoulijian');
+        "step 0"        
         if(!target.countCards('he',{type:'equip'})){
             target.damage();
             event.finish();
@@ -310,8 +309,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
         return get.distance(player,target)>1;
     },
                 content:function (){
-        "step 0"
-        game.playSu('shoulijian');
+        "step 0"        
         if(!target.countCards('he',{type:'equip'})){
             target.damage();
             event.finish();
