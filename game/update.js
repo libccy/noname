@@ -1,9 +1,9 @@
 window.noname_update={
-	version:'1.9.95.3.1',
-	update:'1.9.95.3',
+	version:'1.9.95.3.2',
+	update:'1.9.95.3.1',
 	changeLog:[
 		'欢乐卡牌',
-		//'铁索BUG修复',
+		'修复BUG',
 	],
 	files:[
 		//'card/extra.js',
