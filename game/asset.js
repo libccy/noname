@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'1.9.95.1',
+	'1.9.95.2',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -12,6 +12,11 @@ window.noname_asset_list=[
 	'audio/background/music_jilve.mp3',
 	'audio/card/default.mp3',
 	
+	'audio/card/female/jiuwei.mp3',
+	'audio/card/female/kuwu.mp3',
+	'audio/card/female/monkey.mp3',
+	'audio/card/female/shoulijian.mp3',
+	'audio/card/female/xuelunyang.mp3',
 	'audio/card/female/caomu.mp3',
 	'audio/card/female/chiling.mp3',
 	'audio/card/female/diaohulishan.mp3',
@@ -76,6 +81,11 @@ window.noname_asset_list=[
 	'audio/card/female/yuanjiao.mp3',
 	'audio/card/female/zhibi.mp3',
 	
+	'audio/card/male/jiuwei.mp3',
+	'audio/card/male/kuwu.mp3',
+	'audio/card/male/monkey.mp3',
+	'audio/card/male/shoulijian.mp3',
+	'audio/card/male/xuelunyang.mp3',
 	'audio/card/male/caomu.mp3',
 	'audio/card/male/chiling.mp3',
 	'audio/card/male/diaohulishan.mp3',
@@ -1957,6 +1967,13 @@ window.noname_asset_list=[
 	'image/card/pss_paper.png',
 	'image/card/pss_scissor.png',
 	'image/card/pss_stone.png',
+	
+	'image/card/jiuwei.png',
+	'image/card/kuwu.png',
+	'image/card/mianju.png',
+	'image/card/monkey.png',
+	'image/card/shoulijian.png',
+	'image/card/xuelunyang.png',
 
 	'image/card/bagua.png',
 	'image/card/baihupifeng.png',
