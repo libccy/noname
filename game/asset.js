@@ -416,6 +416,11 @@ window.noname_asset_list=[
 	'audio/effect/tie.mp3',
 	'audio/effect/win.mp3',
 	
+	'audio/skill/jiuwei.mp3',
+	'audio/skill/kuwu.mp3',
+	'audio/skill/monkey.mp3',
+	'audio/skill/shoulijian.mp3',
+	'audio/skill/xuelunyang.mp3',
 	'audio/skill/gzjili1.mp3',
 	'audio/skill/gzjili2.mp3',
 	'audio/skill/spjiedao1.mp3',
