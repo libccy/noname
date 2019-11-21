@@ -1,6 +1,6 @@
 window.noname_update={
-	version:'1.9.95.3.2',
-	update:'1.9.95.3.1',
+	version:'1.9.95.3.3',
+	update:'1.9.95.3.2',
 	changeLog:[
 		'欢乐卡牌',
 		'修复BUG',
