@@ -390,7 +390,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"old_fangtong":{
 				trigger:{
-					player:"phaseEnd",
+					player:"phaseJieshuBegin",
 				},
 				audio:"xinfu_fangtong",
 				forced:true,
@@ -692,7 +692,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			oldmiji:{
-				trigger:{player:['phaseBegin','phaseEnd']},
+				trigger:{player:['phaseZhunbeiBegin','phaseJieshuBegin']},
 				filter:function(event,player){
 					return player.isDamaged();
 				},

@@ -1040,7 +1040,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{
 					player:"damageBegin3",
 				},
-				priority:1,
+				//priority:1,
 				audio:"yaowu",
 				filter:function (event){
 					return event.card&&event.card.name=='sha';
@@ -1072,10 +1072,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reguanxing:{
 				audio:'guanxing',
 				audioname:['jiangwei'],
-				trigger:{player:['phaseBegin','phaseEnd']},
+				trigger:{player:['phaseZhunbeiBegin','phaseJieshuBegin']},
 				frequent:true,
 				filter:function(event,player,name){
-					if(name=='phaseEnd'){
+					if(name=='phaseJieshuBegin'){
 						return player.hasSkill('reguanxing_on');
 					}
 					return true;
@@ -1126,7 +1126,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(i=0;i<bottom.length;i++){
 							ui.cardPile.appendChild(bottom[i]);
 						}
-						if(event.triggername=='phaseBegin'&&top.length==0){
+						if(event.triggername=='phaseZhunbeiBegin'&&top.length==0){
 							player.addTempSkill('reguanxing_on');
 						}
 						player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(bottom.length)+'下');
@@ -1178,7 +1178,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 											event.dialog.buttons[i].classList.contains('target')==false)
 										ui.cardPile.appendChild(event.dialog.buttons[i].link);
 									}
-									if(event.triggername=='phaseBegin'&&event.top.length==0){
+									if(event.triggername=='phaseZhunbeiBegin'&&event.top.length==0){
 										player.addTempSkill('reguanxing_on');
 									}
 									player.popup(get.cnNumber(event.top.length)+'上'+get.cnNumber(event.cards.length-event.top.length)+'下');
@@ -1264,7 +1264,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								ui.cardPile.appendChild(event.cards[i]);
 							}
 						}
-						if(event.triggername=='phaseBegin'&&top.length==0){
+						if(event.triggername=='phaseZhunbeiBegin'&&top.length==0){
 							player.addTempSkill('reguanxing_on');
 						}
 						player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(event.cards.length-top.length)+'下');
@@ -1280,7 +1280,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reluoshen:{
 				audio:'luoshen',
 				locked:false,
-				trigger:{player:'phaseBegin'},
+				trigger:{player:'phaseZhunbeiBegin'},
 				frequent:true,
 				content:function(){
 					"step 0"
@@ -1585,7 +1585,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			rebiyue:{
 				audio:'biyue',
-				trigger:{player:'phaseEnd'},
+				trigger:{player:'phaseJieshuBegin'},
 				frequent:true,
 				content:function(){
 					var num=1;
@@ -2005,7 +2005,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				juexingji:true,
 				derivation:'gongxin',
-				trigger:{player:'phaseBegin'},
+				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				filter:function(event,player){
 					if(player.storage.qinxue) return false;
@@ -2257,7 +2257,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'soil',
 				limited:true,
-				trigger:{player:'phaseBegin'},
+				trigger:{player:'phaseZhunbeiBegin'},
 				init:function(player){
 					player.storage.retishen=false;
 				},
@@ -2291,7 +2291,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['retishen2']
 			},
 			retishen2:{
-				trigger:{player:'phaseEnd'},
+				trigger:{player:'phaseJieshuBegin'},
 				priority:-10,
 				silent:true,
 				content:function(){
@@ -2808,7 +2808,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zhuhai:{
-				trigger:{global:'phaseEnd'},
+				trigger:{global:'phaseJieshuBegin'},
 				direct:true,
 				filter:function(event,player){
 					return event.player.isAlive()&&event.player.getStat('damage')&&
@@ -2939,7 +2939,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				limited:true,
 				trigger:{global:'useCardToPlayered'},
-				priority:5,
+				//priority:5,
 				filter:function(event,player){
 					if(event.getParent().triggeredTargets3.length>1) return false;
 					if(get.type(event.card)!='trick') return false;

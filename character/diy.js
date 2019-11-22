@@ -10,6 +10,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_kyousuke:['male','qun',4,['nk_shekong','key_huanjie']],
 			key_yuri:['female','qun',3,['yuri_xingdong','key_huanjie','yuri_wangxi'],['zhu']],
 			key_haruko:['female','qun',4,['haruko_haofang','haruko_zhuishi']],
+			key_kagari:['female','shen',3,['kagari_zongsi']],
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
 			diy_feishi:['male','shu',3,['shuaiyan','moshou']],
@@ -86,7 +87,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy:{
 				diy_tieba:["diy_wenyang","ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari"],
 			},
 		},
 		characterIntro:{
@@ -100,6 +101,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
+			key_kagari:'#bRewrite',
 			key_lucia:'#bRewrite',
 			key_kyousuke:'#bLittle Busters!',
 			key_yuri:'#rAngel Beats!',
@@ -139,6 +141,118 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuji:['zuoci']
 		},
 		skill:{
+			kagari_zongsi:{
+				enable:'phaseUse',
+				usable:1,
+				content:function(){
+					'step 0'
+					var controls=[];
+					if(ui.cardPile.hasChildNodes()) controls.push('选择牌堆中的一张牌');
+					if(ui.discardPile.hasChildNodes()) controls.push('选择弃牌堆中的一张牌');
+					if(game.hasPlayer(function(current){
+						return current.countCards('hej')>0;
+					})) controls.push('选择一名角色区域内的一张牌');
+					if(!controls.length){event.finish();return;}
+					event.controls=controls;
+					var next=player.chooseControl();
+					next.set('choiceList',controls)
+					next.set('prompt','请选择要移动的卡牌的来源');
+					'step 1'
+					result.control=event.controls[result.index];
+					var list=['弃牌堆','牌堆','角色'];
+					for(var i=0;i<list.length;i++){
+						if(result.control.indexOf(list[i])!=-1){event.index=i;break;}
+					}
+					if(event.index==2){
+						player.chooseTarget('请选择要移动的卡牌的来源',true,function(card,kagari,target){
+							return target.countCards('hej')>0;
+						});
+					}
+					else{
+						var source=ui[event.index==0?'discardPile':'cardPile'].childNodes;
+						var list=[];
+						for(var i=0;i<source.length;i++) list.push(source[i]);
+						player.chooseButton(['请选择要移动的卡牌',list],true);
+					}
+					'step 2'
+					if(event.index==2){
+						player.line(result.targets[0]);
+						event.target1=result.targets[0];
+						player.choosePlayerCard(result.targets[0],true,'hej').set('visible',true);
+					}
+					else{
+						event.card=result.links[0];
+					}
+					'step 3'
+					if(event.index==2) event.card=result.cards[0];
+					var controls=[
+						'将这张牌移动到牌堆的顶部或者底部',
+						'将这张牌移动到弃牌堆的顶部或者底部',
+						'将这张牌移动到一名角色对应的区域里',
+					];
+					event.controls=controls;
+					var next=player.chooseControl();
+					next.set('prompt','要对'+get.translation(card)+'做什么呢？');
+					next.set('choiceList',controls);
+					'step 4'
+					result.control=event.controls[result.index];
+					var list=['弃牌堆','牌堆','角色'];
+					for(var i=0;i<list.length;i++){
+						if(result.control.indexOf(list[i])!=-1){event.index2=i;break;}
+					}
+					if(event.index2==2){
+						player.chooseTarget('要将'+get.translation(card)+'移动到哪一名角色的对应区域呢',true);
+					}
+					else{
+						player.chooseControl('顶部','底部').set('prompt','把'+get.translation(card)+'移动到'+(event.index2==0?'弃':'')+'牌堆的...');
+					}
+					'step 5'
+					if(event.index2!=2){
+						if(event.target1) event.target1.lose(card,ui.special);
+						else card.goto(ui.special);
+						event.way=result.control;
+					}
+					else{
+						event.target2=result.targets[0];
+						var list=['手牌区'];
+						if(lib.card[card.name].type=='equip'&&event.target2.isEmpty(lib.card[card.name].subtype)) list.push('装备区');
+						if(lib.card[card.name].type=='delay'&&!event.target2.storage._disableJudge&&!event.target2.hasJudge(card.name)) list.push('判定区');
+						if(list.length==1) event._result={control:list[0]};
+						else{
+							player.chooseControl(list).set('prompt','把'+get.translation(card)+'移动到'+get.translation(event.target2)+'的...');
+						}
+					}
+					'step 6'
+					if(event.index2!=2){
+						card.fix();
+						var node=ui[event.index==0?'discardPile':'cardPile'];
+						if(event.way=='底部') node.appendChild(card);
+						else node.insertBefore(card,node.firstChild);
+						game.updateRoundNumber();
+						event.finish();
+					}
+					else{
+						if(result.control=='手牌区'){
+							var next=event.target2.gain(card);
+							if(event.target1){
+								next.source=event.target1;
+								next.animate='giveAuto';
+							}
+							else next.animate='draw';
+						}
+						else if(result.control=='装备区'){
+							if(event.target1) event.target1.$give(card,event.target2);
+							event.target2.equip(card);
+						}
+						else{
+							if(event.target1) event.target1.$give(card,event.target2);
+							event.target2.addJudge(card);
+						}
+					}
+					'step 7'
+					game.updateRoundNumber();
+				},
+			},
 			haruko_haofang:{
 				mod:{
 					cardname:function(card,player,name){
@@ -5115,6 +5229,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_kyousuke:'棗恭介',
 			key_yuri:'仲村ゆり',
 			key_haruko:'神尾晴子',
+			key_kagari:'篝',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -5131,6 +5246,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			haruko_haofang_info:'锁定技，你不能使用非转化的延时锦囊牌。你可以将一张延时锦囊牌当做【无中生有】使用。',
 			haruko_zhuishi:'追逝',
 			haruko_zhuishi_info:'一名角色的判定阶段开始时，若其判定区内有牌，则你可以失去1点体力，然后获得其判定区内的所有牌。',
+			kagari_zongsi:'纵丝',
+			kagari_zongsi_info:'出牌阶段限一次，你可以选择一张不在游戏外的牌，然后将其置于牌堆/弃牌堆的顶部/底部或一名角色的对应区域内。',
+			
 			ns_chuanshu:'传术',
 			ns_chuanshu_info:'<span class=yellowtext>限定技</span> 当一名其他角色进入濒死状态时，你可以令其选择获得技能【雷击】或【鬼道】，其回复体力至1并摸两张牌。当该被【传术】的角色造成或受到一次伤害后，你摸一张牌。其阵亡后，你重置技能【传术】',
 			ns_xiandao1:'仙道',

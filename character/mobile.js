@@ -399,14 +399,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			relieren:{
 				audio:'lieren',
 				audioname:['boss_lvbu3'],
-				trigger:{player:'shaBegin'},
+				trigger:{player:'useCardToTargeted'},
 				filter:function(event,player){
-					return player.canCompare(event.target);
+					return event.card.name=='sha'&&player.canCompare(event.target);
 				},
 				check:function(event,player){
 					return get.attitude(player,event.target)<0;
 				},
-				priority:5,
+				//priority:5,
 				content:function(){
 					"step 0"
 					player.chooseToCompare(trigger.target);
@@ -552,7 +552,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liezhi:{
 				audio:2,
 				group:'liezhi_damage',
-				trigger:{player:'phaseBegin'},
+				trigger:{player:'phaseZhunbeiBegin'},
 				direct:true,
 				filter:function(event,player){
 					return !player.hasSkill('liezhi_disable');
@@ -845,7 +845,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liezhi:'烈直',
 			liezhi_info:'准备阶段，你可以依次弃置至多两名角色区域内的各一张牌。若你受到过伤害，则〖烈直〗于你的下个回合无效。',
 			relieren:'烈刃',
-			relieren_info:'当你使用【杀】指定目标时，你可以和目标角色进行拼点。若你赢，你获得其一张牌。若你没赢，你获得对方的拼点牌，其获得你的拼点牌。',
+			relieren_info:'当你使用【杀】指定目标后，你可以和目标角色进行拼点。若你赢，你获得其一张牌。若你没赢，你获得对方的拼点牌，其获得你的拼点牌。',
 			rezaiqi:'再起',
 			rezaiqi_info:'弃牌阶段结束时，你可以令至多X名角色选择一项：1.摸一张牌，2.令你回复1点体力（X为本回合进入弃牌堆的红色牌数）',
 			
