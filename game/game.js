@@ -6834,7 +6834,7 @@
 					}
 					if(pack.music){
 						if(lib.device||typeof window.require=='function'){
-							lib.configMenu.audio.config.background_music.item.music_custom='自定';
+							lib.configMenu.audio.config.background_music.item.music_custom='自定义音乐';
 						}
 						lib.config.all.background_music=['music_default'];
 						for(i in pack.music){
@@ -6847,7 +6847,7 @@
 								lib.configMenu.audio.config.background_music.item[i]=lib.config.customBackgroundMusic[i];
 							}
 						}
-						lib.configMenu.audio.config.background_music.item.music_random='随机';
+						lib.configMenu.audio.config.background_music.item.music_random='随机播放';
 						lib.configMenu.audio.config.background_music.item.music_off='关闭';
 					}
 					if(pack.theme){
@@ -9816,6 +9816,12 @@
 						cards[i].discard();
 					}
 				},
+				cardsGotoSpecial:function(){
+					for(var i=0;i<cards.length;i++){
+						cards[i].goto(ui.special);
+					}
+					if(event.notrigger!==true) event.trigger('addCardToStorage');
+				},
 				chooseToEnable:function(){
 					'step 0'
 					var list=[];
@@ -10897,8 +10903,10 @@
 				},
 				phase:function(){
 					"step 0"
-					player.phaseJudge();
+					player.phaseZhunbei();
 					"step 1"
+					player.phaseJudge();
+					"step 2"
 					player.phaseDraw();
 					if(!player.noPhaseDelay){
 						if(player==game.me){
@@ -10908,9 +10916,9 @@
 							game.delayx();
 						}
 					}
-					"step 2"
-					player.phaseUse();
 					"step 3"
+					player.phaseUse();
+					"step 4"
 					game.broadcastAll(function(){
 						if(ui.tempnowuxie){
 							ui.tempnowuxie.close();
@@ -10921,6 +10929,8 @@
 					if(!player.noPhaseDelay) game.delayx();
 					delete player.using;
 					delete player._noSkill;
+					"step 5"
+					player.phaseJieshu();
 				},
 				phaseJudge:function(){
 					"step 0"
@@ -13157,11 +13167,13 @@
 					}
 					if(!get.info(card,false).noForceDie) event.forceDie=true;
 					var next=player.lose(cards,'visible').set('type','use');
+					var directDiscard=[];
 					for(var i=0;i<cards.length;i++){
 						if(!next.cards.contains(cards[i])){
-							cards[i].discard();
+							directDiscard.push(cards[i]);
 						}
 					}
+					if(directDiscard.length) game.cardsDiscard(directDiscard);
 					player.using=cards;
 					var cardaudio=true;
 					if(event.skill){
@@ -13267,6 +13279,8 @@
 					}
 					event.excluded=[];
 					event.directHit=[];
+					event.customArgs={default:{}};
+					event.baseDamage=get.info(card,false).baseDamage||1;
 					event.trigger('useCard1');
 					"step 1"
 					event.trigger('useCard2');
@@ -13479,6 +13493,7 @@
 					next.skill=event.skill;
 					next.multitarget=info.multitarget;
 					next.preResult=event.preResult;
+					next.baseDamage=event.baseDamage;
 					if(event.forceDie) next.forceDie=true;
 					if(event.addedTargets){
 						next.addedTargets=event.addedTargets;
@@ -13489,6 +13504,11 @@
 						event.targetDelay=false;
 					}
 					next.target=targets[num];
+					if(next.target&&event.customArgs[next.target.playerid]){
+						var customArgs=event.customArgs[next.target.playerid];
+						for(var i in customArgs) next[i]=customArgs[i];
+					}
+					for(var i in event.customArgs.default) next[i]=event.customArgs.default[i];
 					if(next.target&&event.directHit.contains(next.target)) next.directHit=true;
 					if(next.target&&!info.multitarget){
 						if(num==0&&targets.length>1){
@@ -13570,6 +13590,8 @@
 							else{
 								var losecard=player.lose(cards,ui.special);
 								if(info.visible) losecard.visible=true;
+								if(info.loseTo) losecard.position=ui[info.loseTo];
+								if(losecard.position==ui.special&&info.toStorage) losecard.toStorage=true;
 							}
 						}
 						if(!info.prepare&&info.viewAs){
@@ -14961,9 +14983,18 @@
 					game.addVideo('judge2',null,event.videoId);
 					ui.arena.classList.remove('thrownhighlight');
 					game.log(player,'的判定结果为',event.result.card);
-					if(!get.owner(event.result.card)){
-						if(event.position==ui.discardPile) game.cardsDiscard(event.result.card);
-						else event.position.appendChild(event.result.card);
+					if(event.callback){
+						var next=game.createEvent('judgeCallback',false);
+						next.player=player;
+						next.card=event.result.card;
+						next.judgeResult=get.copy(event.result);
+						next.setContent(event.callback);
+					}
+					else{
+						if(!get.owner(event.result.card)){
+							if(event.position==ui.discardPile) game.cardsDiscard(event.result.card);
+							else event.position.appendChild(event.result.card);
+						}
 					}
 				},
 				turnOver:function(){
@@ -16624,6 +16655,12 @@
 					}
 					return next;
 				},
+				phaseZhunbei:function(){
+					var next=game.createEvent('phaseZhunbei');
+					next.player=this;
+					next.setContent('emptyEvent');
+					return next;
+				},
 				phaseJudge:function(){
 					var next=game.createEvent('phaseJudge');
 					next.player=this;
@@ -16647,6 +16684,12 @@
 					var next=game.createEvent('phaseDiscard');
 					next.player=this;
 					next.setContent('phaseDiscard');
+					return next;
+				},
+				phaseJieshu:function(){
+					var next=game.createEvent('phaseJieshu');
+					next.player=this;
+					next.setContent('emptyEvent');
 					return next;
 				},
 				chooseToUse:function(use){
@@ -17929,28 +17972,8 @@
 					return next;
 				},
 				give:function(cards,target,visible){
-					var shown=[],hidden=[];
-					if(get.itemtype(cards)=='card'){
-						cards=[cards];
-					}
-					if(visible){
-						shown.addArray(cards);
-					}
-					else{
-						var hs=this.getCards('h');
-						for(var i=0;i<cards.length;i++){
-							if(hs.contains(cards[i])){
-								hidden.push(cards[i]);
-							}
-							else{
-								shown.push(cards[i]);
-							}
-						}
-					}
-					if(shown.length) this.$give(shown,target);
-					if(hidden.length) this.$giveAuto(hidden,target);
 					var next=target.gain(cards,this);
-					if(visible) next.visible=true;
+					next.animate=visible?'give':'giveAuto';
 				},
 				lose:function(){
 					var next=game.createEvent('lose');
@@ -24099,6 +24122,7 @@
 				},
 				prepare:function(cards,player){
 					player.$throw(cards,1000);
+					game.log(player,'将',cards,'置入了弃牌堆');
 				},
 				check:function(card){
 					// if(get.type(card)=='stonecharacter'&&_status.event.player.countCards('h',{type:'stonecharacter'})<=1){
@@ -24107,6 +24131,7 @@
 					return 1;
 				},
 				discard:false,
+				loseTo:'discardPile',
 				delay:0.5,
 				content:function(){
 					"step 0"
@@ -24145,8 +24170,6 @@
 					else{
 						player.draw();
 					}
-					"step 1"
-					game.cardsDiscard(cards);
 				},
 				ai:{
 					basic:{
@@ -25197,6 +25220,15 @@
 			var next=game.createEvent('cardsDiscard');
 			next.cards=type=='cards'?cards:[cards];
 			next.setContent('cardsDiscard');
+			return next;
+		},
+		cardsGotoSpecial:function(cards,bool){
+			var type=get.itemtype(cards);
+			if(type!='cards'&&type!='card') return;
+			var next=game.createEvent('cardsDiscard');
+			next.cards=type=='cards'?cards:[cards];
+			if(bool===false) next.notrigger=true;
+			next.setContent('cardsGotoSpecial');
 			return next;
 		},
 		online:false,
@@ -33717,6 +33749,7 @@
 											}
 											var link=(game.writeFile?'cdv_':'custom_')+name;
 											if(lib.config.customBackgroundMusic[link]){
+												if(!confirm('已经存在文件名称相同的背景音乐，是否仍然要继续导入？')){_status.music_importing=false;return};
 												for(var i=1;i<1000;i++){
 													if(!lib.config.customBackgroundMusic[link+'_'+i]){
 														link=link+'_'+i;break;
@@ -37135,7 +37168,7 @@
 								editnode.classList.add('disabled');
 								delnode.innerHTML='取消';
 								delete delnode.button;
-								container.code='skill={\n    \n}\n\n\/*\n示例：\nskill={\n    trigger:{player:"phaseEnd"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+								container.code='skill={\n    \n}\n\n\/*\n示例：\nskill={\n    trigger:{player:"phaseJieshuBegin"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 								if(page.fromchar=='add'){
 									page.fromchar=true;
 								}
@@ -37236,7 +37269,7 @@
 							};
 							var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
 							var editor=ui.create.div(editorpage);
-							container.code='skill={\n    \n}\n\n\/*\n示例：\nskill={\n    trigger:{player:"phaseEnd"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+							container.code='skill={\n    \n}\n\n\/*\n示例：\nskill={\n    trigger:{player:"phaseJieshuBegin"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 
 							var citebutton=document.createElement('button');
 							citebutton.innerHTML='引用代码';
