@@ -75,14 +75,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(typeof event.shanRequired!='number'||!event.shanRequired||event.shanRequired<0){
 						event.shanRequired=1;
 					}
-					var evt=event.getParent('useCard')
-					if(evt&&(typeof evt.baseDamage=='number'&&evt.baseDamage>0)){
-					   event.baseDamage=evt.baseDamage;
-					}
-					else event.baseDamage=1;
-					if(typeof event.extraDamage!='number'){
-						event.extraDamage=0;
-					}
+					if(typeof event.baseDamage!='number') event.baseDamage=1;
+					if(typeof event.extraDamage!='number') event.extraDamage=0;
 					"step 1"
 					if(event.directHit){
 						event._result={bool:false};
@@ -703,6 +697,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				reverseOrder:true,
 				content:function(){
 					"step 0"
+					if(typeof event.baseDamage!='number') event.baseDamage=1;
 					if(event.directHit) event._result={bool:false};
 					else{
 						var next=target.chooseToRespond({name:'sha'});
@@ -717,7 +712,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 1"
 					if(result.bool==false){
-						target.damage();
+						target.damage(event.baseDamage);
 					}
 				},
 				ai:{
@@ -764,6 +759,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
+					if(typeof event.baseDamage!='number') event.baseDamage=1;
 					if(event.directHit) event._result={bool:false};
 					else{
 						var next=target.chooseToRespond({name:'shan'});
@@ -781,7 +777,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 1"
 					if(result.bool==false){
-						target.damage();
+						target.damage(event.baseDamage);
 					}
 				},
 				ai:{
@@ -868,30 +864,34 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					if(event.turn==undefined) event.turn=target;
-					var evt=event.getParent('useCard')
-					if(evt&&(typeof evt.baseDamage=='number'&&evt.baseDamage>0)){
-					   event.baseDamage=evt.baseDamage;
-					}
-					else event.baseDamage=1;
+					if(typeof event.baseDamage!='number') event.baseDamage=1;
 					if(typeof event.extraDamage!='number'){
 						event.extraDamage=0;
+						if(!event.shaReq) event.shaReq={};
+						if(typeof event.shaReq[player.playerid]!='number') event.shaReq[player.playerid]=1;
+						if(typeof event.shaReq[target.playerid]!='number') event.shaReq[target.playerid]=1;
 					}
 					event.playerCards=[];
 					event.targetCards=[];
 					"step 1"
 					event.trigger('juedou');
+					event.shaRequired=event.shaReq[event.turn.playerid];
 					"step 2"
 					if(event.directHit){
 						event._result={bool:false};
 					}
 					else{
 						var next=event.turn.chooseToRespond({name:'sha'});
+						if(event.shaRequired>1){
+							next.set('prompt2','共需打出'+event.shaRequired+'张杀')
+						}
 						next.set('ai',function(card){
 							var event=_status.event;
 							var player=event.splayer;
 							var target=event.starget;
 							if(player.hasSkillTag('notricksource')) return 0;
 							if(target.hasSkillTag('notrick')) return 0;
+							if(event.shaRequired>1&&player.countCards('h','sha')<event.shaRequired) return 0;
 							if(event.player==target){
 								if(player.hasSkill('naman')) return -1;
 								if(get.attitude(target,player)<0||event.player.hp<=1){
@@ -909,6 +909,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						});
 						next.set('splayer',player);
 						next.set('starget',target);
+						next.set('shaRequired',event.shaRequired);
 						next.autochoose=lib.filter.autoRespondSha;
 						if(event.turn==target){
 							next.source=player;
@@ -923,15 +924,23 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						if(result.bool){
+							event.shaRequired--;
 							if(event.turn==target){
 								if(result.cards) event.targetCards.addArray(result.cards);
-								event.turn=player;
+								if(event.shaRequired>0) event.goto(2);
+								else{
+									event.turn=player;
+									event.goto(1);
+								}
 							}
 							else{
 								if(result.cards) event.playerCards.addArray(result.cards);
-								event.turn=target;
+								if(event.shaRequired>0) event.goto(2);
+								else{
+									event.turn=target;
+									event.goto(1);
+								}
 							}
-							event.goto(1);
 						}
 						else{
 							if(event.turn==target){
@@ -1443,7 +1452,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filter:function(event){
 					return event.card&&event.card.name=='sha'&&event.notLink()&&event.player.getCards('he').length>0;
 				},
-				priority:1,
+				//priority:1,
 				check:function(event,player){
 					var target=event.player;
 						var eff=get.damageEffect(target,player,player);
@@ -1848,7 +1857,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					event._global_waiting=true;
 					event.tempnowuxie=(trigger.targets&&trigger.targets.length>1&&!trigger.multitarget);
 					event.filterCard=function(card,player){
-						if(card.name!='wuxie') return false;
+						if(get.name(card)!='wuxie') return false;
 						return lib.filter.cardEnabled(card,player,'forceEnable');
 					};
 					event.send=function(player,state,isJudge,card,source,target,targets,id,id2,tempnowuxie,skillState){
@@ -1881,7 +1890,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 						var next=player.chooseToUse({
 							filterCard:function(card,player){
-								if(card.name!='wuxie') return false;
+								if(get.name(card)!='wuxie') return false;
 								return lib.filter.cardEnabled(card,player,'forceEnable');
 							},
 							prompt:str,

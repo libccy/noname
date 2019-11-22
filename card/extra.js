@@ -457,6 +457,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				discard:false,
 				lose:true,
+				toStorage:true,
 				sync:function(muniu){
 					if(game.online){
 						return;
@@ -503,7 +504,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					game.broadcast(function(muniu,cards){
 						muniu.cards=cards;
 					},muniu,muniu.cards);
-					event.trigger("addCardToStorage");
 					var players=game.filterPlayer(function(current){
 						if(!current.getEquip(5)&&current!=player&&!current.isTurnedOver()&&
 							get.attitude(player,current)>=3&&get.attitude(current,player)>=3){
@@ -904,7 +904,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					})) return false;
 					return true;
 				},
-				priority:-10,
+				//priority:-10,
 				content:function(){
 					trigger.num=1;
 				}
@@ -912,7 +912,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			zhuque_skill:{
 				equipSkill:true,
 				trigger:{player:'useCard1'},
-				priority:7,
+				//priority:7,
 				filter:function(event,player){
 					if(event.card.name=='sha'&&!event.card.nature) return true;
 				},

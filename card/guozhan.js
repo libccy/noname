@@ -1021,7 +1021,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					var evt=event.getParent('damage');
 					return evt&&evt.card&&evt.card.name=='sha'&&event.player.countGainableCards(player,'h')>0;
 				},
-				priority:7,
+				//priority:7,
 				check:function(event,player){
 					return get.attitude(player,event.player)<0;
 				},
@@ -1281,7 +1281,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			huxinjing2:{
 				equipSkill:true,
 				trigger:{player:['damageEnd','damageZero']},
-				priority:10,
+				//priority:10,
 				forced:true,
 				popup:false,
 				content:function(){
