@@ -585,7 +585,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.update();
 						}
 					}
-					else if(player.identity=='zhong'&&Math.random()<0.5){
+					else if(player.identity=='zhong'&&(Math.random()<0.5||game.zhu.name=='sunliang')){
 						var choice=0;
 						for(var i=0;i<list.length;i++){
 							if(lib.character[list[i]][1]==game.zhu.group){
@@ -620,7 +620,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(get.config('choose_group')&&player.group=='shen'){
 						    var list=lib.group.slice(0);
 						    list.remove('shen');
-						    if(list.length) player.group=list.randomGet();
+						    if(list.length) player.group=function(){
+						     if(_status.mode!='zhong'&&game.zhu&&game.zhu.group){
+						      if(['liubei','re_liubei','caocao','re_caocao','sunquan','re_sunquan','zhangjiao','sp_zhangjiao','caopi','re_caopi','liuchen','caorui','sunliang','sunxiu'].contains(game.zhu.name)) return game.zhu.group;
+						      if(game.zhu.name=='sunhao'&&player.identity=='zhong') return 'wu';
+						      if(game.zhu.name=='yl_yuanshu'){
+						       if(player.identity=='zhong') list.remove('qun');
+						       else return 'qun';
+						      }
+						      if(['sunhao','xin_yuanshao','re_yuanshao'].contains(game.zhu.name)){
+						       if(player.identity!='zhong') list.remove(game.zhu.group);
+						       else return game.zhu.group;
+						      }
+						     }
+						     return list.randomGet();
+						    }();
 						}
 						player.node.name.dataset.nature=get.groupnature(player.group);
 				}

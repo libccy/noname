@@ -2465,8 +2465,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"shufazijinguan_skill":{
+				equipSkill:true,
 				trigger:{
-					player:"phaseBegin",
+					player:"phaseZhunbeiBegin",
 				},
 				direct:true,
 				content:function(){
@@ -2484,30 +2485,31 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"linglongshimandai_skill":{
+				equipSkill:true,
 				trigger:{
-					global:["useCard"],
+					target:"useCardToTargeted",
 				},
 				filter:function(event,player){
-					if(event.targets&&event.targets.length>1) return false;
+					if(event.targets&&event.targets.length>1||event.player==player) return false;
+					if(player.hasSkillTag('unequip2')) return false;
 					var evt=event.getParent();
 					if(evt.player&&evt.player.hasSkillTag('unequip',false,{
 						name:evt.card?evt.card.name:null,
 						target:player,
 						card:evt.card
 					})) return false;
-					return event.targets.contains(player)&&event.player!=player;
+					return true;
 				},
 				audio:true,
 				check:function(event,player){
-					if(get.attitude(player,event.player)>2) return false;
-					return true;
+					return get.effect(player,event.card,event.player,player)<=0;
 				},
 				content:function(){
 					"step 0"
 					player.judge('linglongshimandai',function(card){return (get.suit(card)=='heart')?1.5:-0.5});
 					"step 1"
 					if(result.judge>0){
-						trigger.cancel();
+						trigger.getParent().excluded.add(player);
 					}
 				},
 				ai:{
@@ -2523,8 +2525,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"hongmianbaihuapao_skill":{
+				equipSkill:true,
 				trigger:{
-					player:"damageBefore",
+					player:"damageBegin4",
 				},
 				filter:function(event,player){
 					if(event.source&&event.source.hasSkillTag('unequip',false,{
@@ -2554,14 +2557,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"wushuangfangtianji_skill":{
+				equipSkill:true,
 				trigger:{
-					source:"damageAfter",
+					source:"damageSource",
 				},
 				filter:function(event,player){
 					return event.card&&event.card.name=='sha';
-				},
-				check:function(event,player){
-					return true;
 				},
 				content:function(){
 					'step 0'
@@ -3741,6 +3742,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xuwangzhimian:{
+				equipSkill:true,
 				trigger:{player:'phaseDrawBegin'},
 				forced:true,
 				content:function(){
@@ -3753,6 +3755,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xiuluolianyuji2:{
+				equipSkill:true,
 				vanish:true,
 				trigger:{player:'damageEnd'},
 				forced:true,
@@ -3770,7 +3773,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						range[1]=Infinity;
 					}
 				},
-				trigger:{source:'damageBegin'},
+				trigger:{source:'damageBegin1'},
 				forced:true,
 				filter:function(event){
 					return event.card&&event.card.name=='sha';
@@ -3781,9 +3784,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			juechenjinge:{
+				equipSkill:true,
 				global:'juechenjinge2'
 			},
 			juechenjinge2:{
+				equipSkill:true,
 				mod:{
 					globalTo:function(from,to,distance){
 						return distance+game.countPlayer(function(current){
@@ -3795,13 +3800,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			chiyanzhenhunqin:{
-				trigger:{source:'damageBefore'},
+				equipSkill:true,
+				trigger:{source:'damageBegin1'},
 				forced:true,
 				content:function(){
 					trigger.nature='fire';
 				}
 			},
 			chixueqingfeng:{
+				equipSkill:true,
 				trigger:{player:'shaBegin'},
 				forced:true,
 				content:function(){
@@ -3816,6 +3823,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			chixueqingfeng2:{
+				equipSkill:true,
 				mod:{
 					cardEnabled:function(){
 						return false;
@@ -3832,9 +3840,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			qimenbagua:{
+				equipSkill:true,
 				trigger:{target:'shaBefore'},
 				forced:true,
 				filter:function(event,player){
+					if(player.hasSkillTag('unequip2')) return false;
 					if(event.player.hasSkillTag('unequip',false,{
 						name:event.card?event.card.name:null,
 						target:player,
@@ -3859,6 +3869,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			guilongzhanyuedao:{
+				equipSkill:true,
 				trigger:{player:'shaBegin'},
 				forced:true,
 				filter:function(event,player){
@@ -3869,8 +3880,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			guofengyupao:{
+				equipSkill:true,
 				mod:{
 					targetEnabled:function(card,player,target,now){
+					if(player.hasSkillTag('unequip2')) return false;
 						if(player!=target){
 							if(get.type(card)=='trick') return false;
 						}
@@ -3878,13 +3891,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			longfenghemingjian:{
+				equipSkill:true,
 				inherit:'cixiong_skill',
 				filter:function(event,player){
 					return lib.linked.contains(event.card.nature);
 				},
 			},
 			qicaishenlu:{
-				trigger:{source:'damageBegin'},
+				trigger:{source:'damageBegin1'},
 				forced:true,
 				filter:function(event,player){
 					return lib.linked.contains(event.nature);
