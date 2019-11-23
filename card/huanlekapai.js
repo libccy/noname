@@ -480,7 +480,7 @@ audio:true,
                 return false;
             }
         }).set('ai',function(target){
-            if(get.attitude(_status.event.player,target)>0) return Math.randomGet();
+            if(get.attitude(_status.event.player,target)>0) return Math.random();
             return get.attitude(_status.event.player,target)<=0;
         });
         'step 1'
