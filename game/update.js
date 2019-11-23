@@ -1,12 +1,12 @@
 window.noname_update={
-	version:'1.9.95.5.',
-	update:'1.9.95.5',
+	version:'1.9.95.5.6',
+	update:'1.9.95.5.',
 	changeLog:[
 		'修复BUG',
 	],
 	files:[
 		//'card/extra.js',
-		//'card/huanlekapai.js',
+		'card/huanlekapai.js',
 		//'card/sp.js',
 		//'card/standard.js',
 		//'card/swd.js',
@@ -32,6 +32,6 @@ window.noname_update={
 		//'game/config.js',
 		//'game/package.js',
 		//'game/asset.js',
-		//'game/source.js',
+		'game/source.js',
 	]
 };
