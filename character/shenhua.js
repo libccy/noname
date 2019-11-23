@@ -3516,9 +3516,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			huashen2:{
 				audio:2,
-				trigger:{player:['phaseZhunbeiBeginStart','phaseAfter','huashenStart']},
+				trigger:{player:['phaseBeginStart','phaseAfter','huashenStart']},
 				filter:function(event,player,name){
-					if(name=='phaseZhunbeiBeginStart'&&game.phaseNumber==1) return false;
+					if(name=='phaseBeginStart'&&game.phaseNumber==1) return false;
 					return true;
 				},
 				//priority:50,
