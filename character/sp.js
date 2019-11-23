@@ -3303,7 +3303,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return !player.getEquip('ly_piliche');
 				},
 				content:function(){
-					if(trigger.name=='phase'){
+					if(trigger.name=='phaseZhunbei'){
 						player.useCard(game.createCard('ly_piliche','diamond',1),player);
 					}
 					else{
@@ -11568,19 +11568,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huxiao:{
 				trigger:{source:'damageSource'},
 				//silent:true,
+				forced:true,
 				filter:function(event,player){
 					if(event._notrigger.contains(event.player)) return false;
 					return event.nature=='fire';
 				},
 				content:function(){
-					if(!player.storage.huxiao){
-						player.storage.huxiao=[];
+					if(!player.storage.huxiao3){
+						player.storage.huxiao3=[];
 					}
-					player.storage.huxiao.add(trigger.player);
+					player.storage.huxiao3.add(trigger.player);
 					trigger.player.draw();
 					player.addTempSkill('huxiao3');
 				},
-				group:['huxiao_clear'],
+				//group:['huxiao_clear'],
 				subSkill:{
 					clear:{
 						trigger:{source:'damageSource'},
@@ -11603,7 +11604,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(typeof num=='number') return num+100;
 					},
 					playerEnabled:function(card,player,target){
-						if(!player.storage.huxiao3||!player.storage.huxiao3.contains(target)){
+						var bool=false;
+						if(player.storage.huxiao3&&ui.selected.targets.length){
+							for(var i=0;i<player.storage.huxiao3.length;i++){
+								if(ui.selected.targets.contains(player.storage.huxiao3[i])){bool=true;break}
+							}
+						}
+						if(!bool&&(!player.storage.huxiao3||!player.storage.huxiao3.contains(target))){
 							var num=player.getCardUsable(card)-100;
 							if(num<=0) return false;
 						}

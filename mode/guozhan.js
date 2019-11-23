@@ -5462,7 +5462,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				global:'niaoxiang_sha'
 			},
 			niaoxiang_sha:{
-				trigger:{player:'useCardToTargeted'},
+				trigger:{player:'useCardToPlayered'},
 				filter:function(event,player){
 					if(event.card.name!='sha') return false;
 					if(game.countPlayer()<4) return false;

@@ -9,7 +9,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mobile_default:["miheng","taoqian","liuzan","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei"],
 				mobile_fire:["re_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","re_pangtong","xin_yuanshao"],
 				mobile_forest:['re_zhurong','re_menghuo','re_dongzhuo','re_sunjian','re_caopi'],
-				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun"],
+				mobile_mountain:['re_dengai','re_jiangwei','re_caiwenji'],
+				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang"],
 			},
 		},
 		character:{
@@ -42,6 +43,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_dongzhuo:['male','qun',8,['rejiuchi','roulin','benghuai','baonue'],['zhu']],
 			re_sunjian:['male','wu',4,['gzyinghun','repolu']],
 			re_caopi:['male','wei',3,['rexingshang','refangzhu','songwei'],['zhu']],
+			
+			re_dengai:['male','wei',4,['retuntian','zaoxian']],
+			re_jiangwei:['male','shu',4,['retiaoxin','zhiji']],
+			re_caiwenji:['female','qun',3,['rebeige','duanchang']],
+			re_baosanniang:['female','shu',3,['meiyong','rexushen','rezhennan']],
 		},
 		characterIntro:{
 			shenpei:'审配（？－204年），字正南，魏郡阴安（今河北清丰北）人。为人正直， 袁绍领冀州，审配被委以腹心之任，并总幕府。河北平定，袁绍以审配、逢纪统军事，审配恃其强盛，力主与曹操决战。曾率领弓弩手大破曹军于官渡。官渡战败，审配二子被俘，反因此受谮见疑，幸得逢纪力保。袁绍病死，审配等矫诏立袁尚为嗣，导致兄弟相争，被曹操各个击破。曹操围邺，审配死守数月，终城破被擒，拒不投降，慷慨受死。',
@@ -85,6 +91,268 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		skill:{
+			rexushen:{
+				derivation:['new_rewusheng','xindangxian'],
+				audio:'xinfu_xushen',
+				limited:true,
+				enable:'phaseUse',
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return current.sex=='male';
+					})
+				},
+				skillAnimation:true,
+				animationColor:'fire',
+				content:function(){
+					player.addSkill('rexushen2');
+					player.awakenSkill('rexushen');
+					player.loseHp(game.countPlayer(function(current){
+						return current.sex=='male';
+					}));
+				},
+			},
+			rexushen2:{
+				charlotte:true,
+				subSkill:{
+					count:{
+						trigger:{
+							player:"recoverBegin",
+						},
+						forced:true,
+						silent:true,
+						popup:false,
+						filter:function (event,player){
+							if(!event.source) return false;
+							if(!player.isDying()) return false;
+							var evt=event.getParent('dying').getParent(2);
+							return evt.name=='rexushen'&&evt.player==player;
+						},
+						content:function (){
+							trigger.rexushen=true;
+						},
+						sub:true,
+					},
+				},
+				group:["rexushen2_count"],
+				trigger:{
+					player:"recoverAfter",
+				},
+				filter:function (event,player){
+					if(player.isDying()) return false;
+					return event.rexushen==true;
+				},
+				direct:true,
+				silent:true,
+				popup:false,
+				content:function (){
+					'step 0'
+					player.removeSkill('rexushen2');
+					player.chooseBool('是否令'+get.translation(trigger.source)+'获得技能〖武圣〗和〖当先〗').ai=function(){
+						return get.attitude(player,trigger.source)>0;
+					};
+					'step 1'
+					if(result.bool){
+						player.line(trigger.source,'fire');
+						trigger.source.addSkillLog('new_rewusheng');
+						trigger.source.addSkillLog('xindangxian');
+					}
+				},
+			},
+			rezhennan:{
+				audio:'xinfu_zhennan',
+				trigger:{target:'useCardToTargeted'},
+				filter:function(event,player){
+					return event.player!=player&&event.targets&&event.targets.length&&event.targets.length>event.player.hp;
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					var next=player.chooseToDiscard(get.prompt('rezhennan',trigger.player),'弃置一张牌并对其造成1点伤害','he');
+					next.set('logSkill',['rezhennan',trigger.player]);
+					next.set('ai',function(card){
+						var player=_status.event.player;
+						var target=_status.event.getTrigger().player;
+						if(get.damageEffect(target,player,player)>0) return 7-get.value(card);
+						return -1;
+					});
+					'step 1'
+					if(result.bool) trigger.player.damage();
+				},
+			},
+			meiyong:{
+				inherit:'xinfu_wuniang',
+				audio:'xinfu_wuniang',
+				content:function (){
+					'step 0'
+					player.chooseTarget(get.prompt('meiyong'),'获得一名其他角色的一张牌，然后摸一张牌。',function(card,player,target){
+						if(player==target) return false;
+						return target.countGainableCards(player,'he')>0;
+					}).set('ai',function(target){
+						return 10-get.attitude(_status.event.player,target);
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('xinfu_wuniang',target);
+						player.gainPlayerCard(target,'he',true);
+					}
+					else event.finish();
+					'step 2'
+					target.draw();
+				},
+			},
+			retuntian:{
+				audio:'tuntian',
+				audioname:['gz_dengai'],
+				trigger:{player:'loseEnd'},
+				frequent:true,
+				filter:function(event,player){
+					if(player==_status.currentPhase) return false;
+					for(var i=0;i<event.cards.length;i++){
+						if(event.cards[i].original&&event.cards[i].original!='j') return true;
+					}
+					return false;
+				},
+				content:function(){
+					player.judge(function(card){
+						return 1;
+					}).callback=lib.skill.retuntian.callback;
+				},
+				callback:function(){
+					'step 0'
+						if(event.judgeResult.suit=='heart'){
+							player.gain(card,'gain2');
+							event.finish();
+						}
+						else if(get.mode()=='guozhan'){
+							player.chooseBool('是否将'+get.translation(card)+'作为【田】置于武将牌上？').ai=function(){
+								return true;
+							};
+						}
+						else event.directbool=true;
+						'step 1'
+						if(!result.bool&&!event.directbool){
+							game.cardsDiscard(card);
+							return;
+						};
+						event.node=event.judgeResult.node;
+						//event.trigger("addCardToStorage");
+						//event.card.fix();
+						player.storage.tuntian.push(event.card);
+						//event.card.goto(ui.special);
+						game.cardsGotoSpecial(card);
+						event.node.moveDelete(player);
+						game.broadcast(function(cardid,player){
+							var node=lib.cardOL[cardid];
+							if(node){
+								node.moveDelete(player);
+							}
+						},event.node.cardid,player);
+						game.addVideo('gain2',player,get.cardsInfo([event.node]));
+						player.markSkill('tuntian');
+						game.addVideo('storage',player,['tuntian',get.cardsInfo(player.storage.tuntian),'cards']);
+				},
+				init:function(player){
+					if(!player.storage.tuntian) player.storage.tuntian=[];
+				},
+				group:'tuntian_dist',
+				locked:false,
+				ai:{
+					effect:{
+						target:function(){
+							return lib.skill.tuntian.ai.effect.target.apply(this,arguments);
+						}
+					},
+					threaten:function(player,target){
+						if(target.countCards('h')==0) return 2;
+						return 0.5;
+					},
+					nodiscard:true,
+					nolose:true
+				}
+			},
+			retiaoxin:{
+				audio:'tiaoxin',
+				audioname:['sp_jiangwei','xiahouba'],
+				enable:'phaseUse',
+				usable:1,
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countCards('he');
+				},
+				content:function(){
+					"step 0"
+					target.chooseToUse({name:'sha'},'挑衅：对'+get.translation(player)+'使用一张杀，或令其弃置你的一张牌').set('targetRequired',true).set('complexSelect',true).set('filterTarget',function(card,player,target){
+						if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
+						return lib.filter.filterTarget.apply(this,arguments);
+					}).set('sourcex',player);
+					"step 1"
+					if(result.bool==false&&target.countCards('he')>0){
+						player.discardPlayerCard(target,'he',true);
+					}
+					else{
+						event.finish();
+					}
+				},
+				ai:{
+					order:4,
+					expose:0.2,
+					result:{
+						target:-1,
+						player:function(player,target){
+							if(!target.canUse('sha',player)) return 0;
+							if(target.countCards('h')==0) return 0;
+							if(target.countCards('h')==1) return -0.1;
+							if(player.hp<=2) return -2;
+							if(player.countCards('h','shan')==0) return -1;
+							return -0.5;
+						}
+					},
+					threaten:1.1
+				}
+			},
+			rebeige:{
+				audio:'beige',
+				trigger:{global:'damageEnd'},
+				filter:function(event,player){
+					return (event.card&&event.card.name=='sha'&&event.source&&
+						event.player.classList.contains('dead')==false&&player.countCards('he'));
+				},
+				direct:true,
+				checkx:function(event,player){
+					var att1=get.attitude(player,event.player);
+					var att2=get.attitude(player,event.source);
+					return att1>0&&att2<=0;
+				},
+				content:function(){
+					"step 0"
+					var next=player.chooseToDiscard('he',get.prompt2('rebeige',trigger.player));
+					var check=lib.skill.beige.checkx(trigger,player);
+					next.set('ai',function(card){
+						if(_status.event.goon) return 8-get.value(card);
+						return 0;
+					});
+					next.set('logSkill','beige');
+					next.set('goon',check);
+					"step 1"
+					if(result.bool){
+						trigger.player.judge();
+					}
+					else{
+						event.finish();
+					}
+					"step 2"
+					switch(get.suit(result.card)){
+						case 'heart':trigger.player.recover(trigger.num);break;
+						case 'diamond':trigger.player.draw(3);break;
+						case 'club':trigger.source.chooseToDiscard('he',2,true);break;
+						case 'spade':trigger.source.turnOver();break;
+					}
+				},
+				ai:{
+					expose:0.3
+				}
+			},
 			rexingshang:{
 				audio:'xingshang',
 				trigger:{global:'die'},
@@ -822,6 +1090,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mobile_default:'常规',
 			mobile_fire:'界限突破•火',
 			mobile_forest:'界限突破•林',
+			mobile_mountain:'界限突破•山',
 			mobile_others:'其他',
 			
 			pss:'手势',
@@ -854,6 +1123,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinzhanyi_basic_backup:'战意',
 			xinzhanyi_basic:'战意',
 			xinzhanyi_equip:'战意',
+			
+			re_dengai:'界邓艾',
+			re_jiangwei:'界姜维',
+			re_caiwenji:'界蔡文姬',
+			re_baosanniang:'手杀鲍三娘',
+			retuntian:'屯田',
+			retiaoxin:'挑衅',
+			rebeige:'悲歌',
+			retuntian_info:'当你于回合外失去牌时，你可以进行一次判定。若判定结果不为♥，你获得此牌。否则你将此牌置于你的武将牌上，称之为【田】。锁定技，你计算与其他角色的距离时-X（X为你武将牌上【田】的数目）',
+			retiaoxin_info:'出牌阶段限一次，你可以指定一名有牌的其他角色，该角色需对你使用一张【杀】，否则你弃置其一张牌。',
+			rebeige_info:'当有角色受到【杀】造成的伤害后，你可以弃一张牌，并令其进行一次判定，若判定结果为：♥该角色回复X点体力(X为伤害点数)；♦︎该角色摸三张牌；♣伤害来源弃两张牌；♠伤害来源将其武将牌翻面',
+			meiyong:'妹勇',
+			meiyong_info:'当你使用或打出【杀】时，你可以获得一名其他角色的一张牌，然后其摸一张牌。',
+			rexushen:'许身',
+			rexushen_info:'限定技，出牌阶段，你可以失去X点体力（X为场上男性角色的数量）。若你以此法进入了濒死状态，则当你因一名角色而脱离此濒死状态后，你可以令其获得技能〖武圣〗和〖当先〗。',
+			rezhennan:'镇南',
+			rezhennan_info:'当你成为其他角色使用的牌的目标后，若此牌的目标数大于该角色的体力值，则你可以弃置一张牌并对其造成1点伤害。',
 		}
 	};
 });

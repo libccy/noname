@@ -1146,7 +1146,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return game.hasPlayer(function(current){
 						if(current.getEquip(1)){
 							return game.hasPlayer(function(current2){
-								return lib.filter.targetInRange({name:'sha'},current,current2);
+								return lib.filter.filterTarget({name:'sha'},current,current2);
 							})
 						}
 					});
@@ -1156,12 +1156,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return (player!=target&&target.getCards('e',{subtype:'equip1'}).length);
 					}
 					else{
-						return lib.filter.targetInRange({name:'sha'},ui.selected.targets[0],target);
+						return lib.filter.filterTarget({name:'sha'},ui.selected.targets[0],target);
 					}
 				},
 				content:function(){
 					"step 0"
-					if(!target.hasSha()){
+					if(!target.hasSha()&&!_status.connectMode){
 						event.directfalse=true;
 					}
 					else{
@@ -1720,6 +1720,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					playerEnabled:function(card,player,target){
 						if(card.name!='sha') return;
 						if(get.mode()!='guozhan') return;
+						var cardx=get.card();
+						if(!cardx||cardx.name!='sha') return;
 						if(!ui.selected.targets.length) return;
 						if(target.identity=='ye'||target.identity=='unknown') return;
 						var targets=ui.selected.targets.slice(0);

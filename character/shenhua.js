@@ -1977,7 +1977,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger.getParent().directHit.add(trigger.target);
 						}
 						else if(trigger.cards){
-							trigger.target.gain(trigger.cards,'gain2','log');
+							var list=[];
+							for(var i=0;i<trigger.cards.length;i++){
+								if(get.position(trigger.cards[i])=='d') list.push(trigger.cards[i]);
+							}
+							if(list.length) trigger.target.gain(list,'gain2','log');
 						}
 					}
 				}
@@ -2575,22 +2579,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					var fang=player.hp>=2&&player.countCards('h')<=player.hp+1;
-					player.chooseTarget(get.prompt2('fangquan'),function(card,player,target){
-						return target!=player;
-					}).set('ai',function(target){
-						if(!_status.event.fang) return -1;
-						if(target.hasJudge('lebu')) return -1;
-						if(get.attitude(player,target)>4){
-							return get.threaten(target)/Math.sqrt(target.hp+1)/Math.sqrt(target.countCards('h')+1);
-						}
-						return 0;
+					player.chooseBool(get.prompt2('fangquan')).set('ai',function(){
+						if(!_status.event.fang) return false;
+						return game.hasPlayer(function(target){
+							if(target.hasJudge('lebu')) return false;
+							if(get.attitude(player,target)>4){
+								return (get.threaten(target)/Math.sqrt(target.hp+1)/Math.sqrt(target.countCards('h')+1)>0);
+							}
+							return false;
+						});
 					}).set('fang',fang);
 					"step 1"
 					if(result.bool){
-						player.logSkill('fangquan',result.targets);
+						player.logSkill('fangquan');
 						trigger.cancel();
 						player.addSkill('fangquan2');
-						player.storage.fangquan=result.targets[0];
+						//player.storage.fangquan=result.targets[0];
 					}
 				}
 			},
@@ -2602,14 +2606,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//priority:-50,
 				content:function(){
 					"step 0"
-					player.chooseToDiscard(true);
+					player.chooseToDiscard('是否弃置一张牌并令一名其他角色进行一个额外回合？').set('logSkill','fangquan').ai=function(card){
+						return 20-get.value(card);
+					};
 					"step 1"
-					var target=player.storage.fangquan;
+					if(result.bool){
+						player.chooseTarget(true,'请选择进行额外回合的目标角色',lib.filter.notMe).ai=function(target){
+							if(target.hasJudge('lebu')) return -1;
+							if(get.attitude(player,target)>4){
+								return get.threaten(target)/Math.sqrt(target.hp+1)/Math.sqrt(target.countCards('h')+1);
+							}
+							return -1;
+						};
+					}
+					else event.finish();
+					"step 2"
+					var target=result.targets[0];
+					player.line(target,'fire');
 					target.markSkillCharacter('fangquan',player,'放权','进行一个额外回合');
 					target.insertPhase();
 					target.addSkill('fangquan3');
 					player.removeSkill('fangquan2');
-					delete player.storage.fangquan;
+					//delete player.storage.fangquan;
 				}
 			},
 			fangquan3:{

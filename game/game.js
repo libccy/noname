@@ -13504,11 +13504,11 @@
 						event.targetDelay=false;
 					}
 					next.target=targets[num];
+					for(var i in event.customArgs.default) next[i]=event.customArgs.default[i];
 					if(next.target&&event.customArgs[next.target.playerid]){
 						var customArgs=event.customArgs[next.target.playerid];
 						for(var i in customArgs) next[i]=customArgs[i];
 					}
-					for(var i in event.customArgs.default) next[i]=event.customArgs.default[i];
 					if(next.target&&event.directHit.contains(next.target)) next.directHit=true;
 					if(next.target&&!info.multitarget){
 						if(num==0&&targets.length>1){
@@ -19232,7 +19232,7 @@
 				addSkillLog:function(skill){
 					this.addSkill(skill);
 					this.popup(skill);
-					game.log(this,'获得了技能','【'+get.translation(skill)+'】');
+					game.log(this,'获得了技能','#g【'+get.translation(skill)+'】');
 				},
 				addSkill:function(skill,checkConflict,nobroadcast){
 					if(Array.isArray(skill)){
