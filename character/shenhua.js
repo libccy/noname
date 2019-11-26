@@ -2582,7 +2582,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseBool(get.prompt2('fangquan')).set('ai',function(){
 						if(!_status.event.fang) return false;
 						return game.hasPlayer(function(target){
-							if(target.hasJudge('lebu')) return false;
+							if(target.hasJudge('lebu')||target==player) return false;
 							if(get.attitude(player,target)>4){
 								return (get.threaten(target)/Math.sqrt(target.hp+1)/Math.sqrt(target.countCards('h')+1)>0);
 							}
