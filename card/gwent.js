@@ -1255,7 +1255,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return true;
 					};
 					'step 1'
-					player.chooseUseTarget(game.createCard(result.links[0][2],get.suit(card),get.number(card)));
+					player.chooseUseTarget(true,game.createCard(result.links[0][2],get.suit(card),get.number(card)));
 				},
 				ai:{
 					value:7,
