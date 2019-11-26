@@ -977,6 +977,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					eff1:{
 						sub:true,
+						equipSkill:true,
 						trigger:{global:'phaseDrawBegin'},
 						//priority:8,
 						forced:true,
@@ -994,6 +995,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'phaseUseBegin'},
 						//priority:8,
 						forced:true,
+						equipSkill:true,
 						filter:function(event,player){
 							if(event.player!=player) return false;
 							return game.hasPlayer(function(current){
