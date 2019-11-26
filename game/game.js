@@ -9215,7 +9215,7 @@
 					else if(Array.isArray(arguments[i])){
 						targets=arguments[i];
 					}
-					else if(typeof arguments[i]=='object'){
+					else if(typeof arguments[i]=='object'&&arguments[i]){
 						card=arguments[i];
 					}
 					else if(typeof arguments[i]=='string'){
@@ -13128,9 +13128,10 @@
 								if(get.position(button.link)=='j') return -10;
 								return get.equipValue(button.link);
 							}
-						},targets[0]).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
+						},targets[0]).set('nojudge',event.nojudge||false).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
 							var targets1=_status.event.targets1;
 							if(get.position(button.link)=='j'){
+								if(_status.event.nojudge) return false;
 								return !targets1.storage._disableJudge&&!targets1.hasJudge(button.link);
 							}
 							else{
@@ -16705,7 +16706,7 @@
 							if(typeof arguments[i]=='number'||get.itemtype(arguments[i])=='select'){
 								next.selectTarget=arguments[i];
 							}
-							else if(typeof arguments[i]=='object'||typeof arguments[i]=='function'){
+							else if((typeof arguments[i]=='object'&&arguments[i])||typeof arguments[i]=='function'){
 								if(get.itemtype(arguments[i])=='player'||next.filterCard){
 									next.filterTarget=arguments[i];
 								}
@@ -17097,7 +17098,7 @@
 						else if(get.itemtype(arguments[i])=='player'){
 							next.targets=[arguments[i]];
 						}
-						else if(typeof arguments[i]=='object'&&arguments[i].name){
+						else if(get.is.object(arguments[i])&&arguments[i].name){
 							next.card=arguments[i];
 						}
 						else if(typeof arguments[i]=='string'){
@@ -17612,7 +17613,7 @@
 						else if(get.itemtype(arguments[i])=='card'){
 							next.card=arguments[i];
 						}
-						else if(typeof arguments[i]=='object'&&arguments[i].name){
+						else if(typeof arguments[i]=='object'&&arguments[i]&&arguments[i].name){
 							next.card=arguments[i];
 						}
 						else if(typeof arguments[i]=='string'){
@@ -17748,7 +17749,7 @@
 						else if(arguments[i]=='bottom'){
 							next.bottom=true;
 						}
-						else if(typeof arguments[i]=='object'&&arguments[i].drawDeck!=undefined){
+						else if(typeof arguments[i]=='object'&&arguments[i]&&arguments[i].drawDeck!=undefined){
 							next.drawDeck=arguments[i].drawDeck;
 						}
 					}
@@ -17853,7 +17854,7 @@
 						else if(get.itemtype(arguments[i])=='player'){
 							next.source=arguments[i];
 						}
-						else if(typeof arguments[i]=='object'&&arguments[i].name){
+						else if(typeof arguments[i]=='object'&&arguments[i]&&arguments[i].name){
 							next.card=arguments[i];
 						}
 						else if(typeof arguments[i]=='boolean') next.animate=arguments[i];
@@ -18035,7 +18036,7 @@
 						else if(get.itemtype(arguments[i])=='player'){
 							next.source=arguments[i];
 						}
-						else if(typeof arguments[i]=='object'&&arguments[i].name){
+						else if(typeof arguments[i]=='object'&&arguments[i]&&arguments[i].name){
 							next.card=arguments[i];
 						}
 						else if(arguments[i]=='nocard'){
@@ -18075,7 +18076,7 @@
 						else if(get.itemtype(arguments[i])=='player'){
 							next.source=arguments[i];
 						}
-						else if(typeof arguments[i]=='object'&&arguments[i].name){
+						else if(typeof arguments[i]=='object'&&arguments[i]&&arguments[i].name){
 							next.card=arguments[i];
 						}
 						else if(typeof arguments[i]=='number'){
@@ -31356,7 +31357,7 @@
 						str+=get.translation(arguments[i]);
 					}
 				}
-				else if(itemtype=='cards'||itemtype=='card'||(typeof arguments[i]=='object'&&arguments[i].name)){
+				else if(itemtype=='cards'||itemtype=='card'||(typeof arguments[i]=='object'&&arguments[i]&&arguments[i].name)){
 					if(lib.config.log_highlight){
 						str+='<span class="yellowtext">'+get.translation(arguments[i])+'</span>';
 					}
