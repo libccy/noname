@@ -1393,10 +1393,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(targets.length==1) event.goto(4);
 					else{
 						player.chooseTarget('请选择受到2点伤害的角色',true,function(card,player,target){
-							return targets.contains(target)
+							return _status.event.targets.contains(target)
 						}).set('ai',function(target){
 							return 1;
-						}).set('forceDie',true);
+						}).set('forceDie',true).set('targets',targets);
 					}
 					"step 3"
 					if(event.num<targets.length){

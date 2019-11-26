@@ -952,8 +952,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.chooseToUse({
 							prompt:'是否使用'+get.translation(card)+'？',
 							filterCard:function(cardx,player,target){
-								return cardx==card;
+								return cardx==_status.event.cardx;
 							},
+							cardx:card,
 						});
 					}
 				},
@@ -1019,8 +1020,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.card=result[0];
 					if(event.card&&get.owner(event.card)==player&&(event.ablers.length>1||event.ablers[0]!=player)){
 						player.chooseTarget('是否将'+get.translation(event.card)+'交给其他角色？',function(card,player,target){
-							return event.ablers.contains(target)&&target!=player;
-						}).ai=function(){
+							return _status.event.ablers.contains(target)&&target!=player;
+						}).set('ablers',event.ablers).ai=function(){
 							return false;
 						};
 					}
@@ -1049,10 +1050,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function (){
 					'step 0'
 					player.chooseTarget(get.prompt2('xinfu_lingren'),function(card,player,target){
-						return trigger.targets.contains(target);
+						return _status.event.targets.contains(target);
 					}).set('ai',function(target){
 						return 2-get.attitude(_status.event.player,target);
-					});
+					}).set('targets',trigger.targets);
 					'step 1'
 					if(result.bool){
 						player.logSkill('xinfu_lingren',result.targets);
@@ -1174,18 +1175,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"lingren_xingshang":{
 				audio:1,
-				unique:true,
-				gainable:true,
-				trigger:{global:'die'},
-				//priority:5,
-				filter:function(event){
-					return event.player.countCards('he')>0;
-				},
-				content:function(){
-					"step 0"
-					event.togain=trigger.player.getCards('he');
-					player.gain(event.togain,trigger.player,'giveAuto');
-				},
+				inherit:'rexingshang',
 			},
 			"xinfu_fujian":{
 				audio:2,
@@ -1762,10 +1752,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(targets.length==1) event.goto(4);
 					else{
 						player.chooseTarget('请选择受到2点伤害的角色',true,function(card,player,target){
-							return targets.contains(target)
+							return _status.event.targets.contains(target)
 						}).set('ai',function(target){
 							return 1;
-						});
+						}).set('targets',targets).set('forceDie',true);
 					}
 					"step 3"
 					if(event.num<targets.length){
@@ -1779,7 +1769,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 4"
 					player.chooseControl("2点","3点").set('prompt','请选择伤害点数').set('ai',function(){
 						return "3点";
-					});
+					}).set('forceDie',true);
 					"step 5"
 					targets[0].damage('fire',result.control=="2点"?2:3,'nocard'); 
 				},
@@ -2717,7 +2707,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.xinfu_qiai=true;
 					event.current=player.next;
 					"step 1"
-					event.current.chooseCard('交给'+get.translation(player)+'一张牌','he',true).set('ai',function(card){
+					if(!event.current.countCards('he')) event.goto(3);
+					else event.current.chooseCard('交给'+get.translation(player)+'一张牌','he',true).set('ai',function(card){
 						var evt=_status.event.getParent();
 						if(get.attitude(_status.event.player,evt.player)>2){
 							if(card.name=='jiu') return 120;
@@ -2729,6 +2720,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool&&result.cards&&result.cards.length){
 						player.gain(result.cards,event.current,'giveAuto');
 					}
+					"step 3"
 					event.current=event.current.next;
 					if(event.current!=player) event.goto(1);
 				},
@@ -3815,7 +3807,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.hasJudge('lebu')) return false;
 					return player.countCards('he',{suit:'diamond'})>0;
 				},
-				prepare:"throw",
+				viewAs:{name:'lebu'},
+				//prepare:"throw",
 				position:"he",
 				filterCard:{
 					suit:"diamond",
@@ -3842,11 +3835,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(card.name=='tao') return 10;
 					return 9-get.value(card);
 				},
-				content:function (){
-					var next=player.useCard({name:'lebu'},target,cards);
-					next.animate=false;
-					next.audio=false;
-					player.recover();
+				onuse:function (links,player){
+					var next=game.createEvent('limu_recover',false,_status.event.getParent());
+					next.player=player;
+					next.setContent(function(){player.recover()});
 				},
 				ai:{
 					result:{
@@ -4280,7 +4272,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					prompt+='移动到另一名角色的装备区中';
 					var next=player.chooseTarget(2,function(card,player,target){
 						if(ui.selected.targets.length){
-							if(!event.ingame){
+							if(!_status.event.ingame){
 								return target.isEmpty(2)?true:false;
 							}
 							var from=ui.selected.targets[0];
@@ -4301,6 +4293,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return target.countCards('e')>0;
 							}
 						});
+						next.set('ingame',event.ingame)
 						next.set('ai',function(target){
 							var player=_status.event.player;
 							var att=get.attitude(player,target);
@@ -4912,12 +4905,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:"phaseUse",
 				usable:1,
 				audio:2,
-				filter:function(){
-					return ui.cardPile.hasChildNodes();
-				},
+				//filter:function(){
+					//return ui.cardPile.hasChildNodes();
+				//},
 				content:function (){
 					'step 0'
-					event.card=ui.cardPile.lastChild;
+					//event.card=ui.cardPile.lastChild;
+					event.card=get.bottomCards()[0];
 					var content=['牌堆底的一张牌',[event.card]];
 					game.log(player,'观看了牌堆底的一张牌');
 					player.chooseControl('ok').set('dialog',content);
@@ -4939,8 +4933,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.target=result.targets[0];
 						player.line(event.target,'green');
 						player.give(event.card,event.target);
-						game.updateRoundNumber();
 					}
+					else ui.cardPile.appendChild(event.card);
+					game.updateRoundNumber();
 				},
 				ai:{
 					order:7.2,
@@ -4987,8 +4982,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						suits.add(get.suit(cards[i]));
 					}
 					trigger.source.chooseCard('he','交给'+get.translation(player)+'一张满足条件的牌，否则防止此伤害。',function(card){
-						return !suits.contains(get.suit(card));
-					}).ai=function(card){
+						return !_status.event.suits.contains(get.suit(card));
+					}).set('suits',suits).ai=function(card){
 						var player=_status.event.player;
 						var target=_status.event.getParent('xinfu_daigong').player;
 						if(get.damageEffect(target,player,player)>0) return 6.5-get.value(card);
@@ -5618,7 +5613,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_lianpian_info":"出牌阶段限三次。当你对一名角色连续使用牌时，你可以摸一张牌，然后可以将一张牌交给该角色。",
 			
 			"xinfu_lingren":"凌人",
-			"xinfu_lingren_info":"每回合限一次。当你于出牌阶段使用带有“伤害”这一标签的基本牌或普通锦囊牌指定目标后，你可以猜测其中的一个目标的手牌中是否有基本牌，锦囊牌或装备牌。若你猜中的项目数：≥1，此牌对该角色的伤害+1；≥2，你摸两张牌；≥3，你获得技能〖奸雄〗(新界)和〖行殇〗直到下回合开始。",
+			"xinfu_lingren_info":"每回合限一次。当你于出牌阶段使用带有“伤害”这一标签的基本牌或普通锦囊牌指定目标后，你可以猜测其中的一个目标的手牌中是否有基本牌，锦囊牌或装备牌。若你猜中的项目数：≥1，此牌对该角色的伤害+1；≥2，你摸两张牌；≥3，你获得技能〖奸雄〗和〖行殇〗直到下回合开始。",
 			"lingren_adddamage":"凌人",
 			"lingren_adddamage_info":"",
 			"lingren_jianxiong":"奸雄",

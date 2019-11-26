@@ -658,7 +658,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xindangxian:{
-				trigger:{player:'phaseZhunbeiBegin'},
+				trigger:{player:'phaseBegin'},
 				forced:true,
 				audio:'dangxian',
 				audioname:['guansuo'],
@@ -1499,6 +1499,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fenli:{
 				audio:2,
 				group:['fenli_draw','fenli_use','fenli_discard'],
+				subfrequent:['discard'],
 				subSkill:{
 					draw:{
 						audio:'fenli',
@@ -1539,6 +1540,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:'fenli',
 						trigger:{player:'phaseDiscardBefore'},
 						prompt:'是否发动【奋励】跳过弃牌阶段？',
+						frequent:true,
 						filter:function(event,player){
 							return player.isMaxEquip()&&player.countCards('e');
 						},
@@ -1556,7 +1558,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['pingkou_init','pingkou_count'],
 				subSkill:{
 					init:{
-						trigger:{player:'phaseZhunbeiBegin'},
+						trigger:{player:'phaseBefore'},
 						silent:true,
 						content:function(){
 							player.storage.pingkou=0;
@@ -1564,10 +1566,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					count:{
 						trigger:{player:[
+							'phaseZhunbeiCancelled','phaseZhunbeiSkipped',
 							'phaseJudgeCancelled','phaseJudgeSkipped',
 							'phaseDrawCancelled','phaseDrawSkipped',
 							'phaseUseCancelled','phaseUseSkipped',
-							'phaseDiscardCancelled','phaseDiscardSkipped'
+							'phaseDiscardCancelled','phaseDiscardSkipped',
+							'phaseJieshuCancelled','phaseJieshuCancelled'
 						]},
 						silent:true,
 						content:function(){
@@ -1576,7 +1580,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-				trigger:{player:'phaseJieshuBegin'},
+				trigger:{player:'phaseEnd'},
 				direct:true,
 				filter:function(event,player){
 					return player.storage.pingkou>0;
@@ -4502,6 +4506,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						target.addSkill('duliang2');
+						target.storage.duliang2++;
 						event.finish();
 					}
 					'step 3'
@@ -4519,15 +4524,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			duliang2:{
-				trigger:{player:'phaseDrawBegin'},
+				trigger:{player:'phaseDrawBefore'},
 				forced:true,
 				mark:true,
 				audio:false,
+				onremove:true,
+				charlotte:true,
+				init:function(player,skill){
+					if(!player.storage[skill]) player.storage[skill]=0;
+				},
 				intro:{
-					content:'下个摸牌阶段额外摸一张牌'
+					content:'下个摸牌阶段额外摸#张牌'
 				},
 				content:function(){
-					trigger.num++;
+					trigger.num+=player.storage.duliang2;
 					player.removeSkill('duliang2');
 				}
 			},
@@ -5551,7 +5561,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			dangxian:{
-				trigger:{player:'phaseZhunbeiBegin'},
+				trigger:{player:'phaseBegin'},
 				forced:true,
 				audio:2,
 				audioname:['guansuo'],
@@ -6846,6 +6856,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.$give(cards.length,target);
 					target.gain(cards,player);
 					target.addTempSkill('mingjian2',{player:'phaseAfter'});
+					target.storage.mingjian2++;
 				},
 				ai:{
 					order:1,
@@ -6862,16 +6873,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			mingjian2:{
+				charlotte:true,
 				mark:true,
 				intro:{
-					content:'手牌上限+1，出杀次数+1'
+					content:'手牌上限+#，出杀次数+#'
 				},
+				init:function(player,skill){
+					if(!player.storage[skill]) player.storage[skill]=0;
+				},
+				onremove:true,
 				mod:{
 					maxHandcard:function(player,num){
-						return num+1;
+						return num+player.storage.mingjian2;
 					},
 					cardUsable:function(card,player,num){
-						if(card.name=='sha') return num+1;
+						if(card.name=='sha') return num+player.storage.mingjian2;
 					}
 				},
 			},
@@ -7047,7 +7063,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xinpojun2:{
-				trigger:{global:'phaseJieshuBegin'},
+				trigger:{global:'phaseEnd'},
 				forced:true,
 				audio:false,
 				mark:true,
@@ -8279,7 +8295,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				global:'qieting2',
 				globalSilent:true,
-				trigger:{global:'phaseJieshuBegin'},
+				trigger:{global:'phaseEnd'},
 				filter:function(event,player){
 					return event.player!=player&&!event.player.tempSkills.qieting3&&event.player.isAlive();
 				},

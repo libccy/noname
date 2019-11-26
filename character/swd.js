@@ -258,7 +258,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 2"
 					if(result.bool){
-						player.chooseUseTarget(game.createCard(result.links[0][2]));
+						player.chooseUseTarget(true,game.createCard(result.links[0][2]));
 					}
 					event.num--;
 					if(event.num>0){

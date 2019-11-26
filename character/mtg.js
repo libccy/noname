@@ -205,7 +205,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						trigger.cancel();
-						player.chooseUseTarget(trigger.card);
+						player.chooseUseTarget(true,trigger.card);
 					}
 				}
 			},

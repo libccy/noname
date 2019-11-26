@@ -110,6 +110,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return current.sex=='male';
 					}));
 				},
+				ai:{
+					order:10,
+					result:{
+						player:function(player){
+							if(player.hp!=game.countPlayer(function(current){
+								return current.sex=='male';
+							})) return 0;
+							return game.hasPlayer(function(current){
+								return get.attitude(player,current)>4&&current.countCards('h','tao')
+							})?1:0;
+						},
+					},
+				},
 			},
 			rexushen2:{
 				charlotte:true,
@@ -1134,7 +1147,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			retuntian_info:'当你于回合外失去牌时，你可以进行一次判定。若判定结果为♥，你获得此判定牌。否则你将此牌置于你的武将牌上，称之为【田】。锁定技，你计算与其他角色的距离时-X（X为你武将牌上【田】的数目）',
 			retiaoxin_info:'出牌阶段限一次，你可以指定一名有牌的其他角色，该角色需对你使用一张【杀】，否则你弃置其一张牌。',
 			rebeige_info:'当有角色受到【杀】造成的伤害后，你可以弃一张牌，并令其进行一次判定，若判定结果为：♥该角色回复X点体力(X为伤害点数)；♦︎该角色摸三张牌；♣伤害来源弃两张牌；♠伤害来源将其武将牌翻面',
-			meiyong:'妹勇',
+			meiyong:'姝勇',
 			meiyong_info:'当你使用或打出【杀】时，你可以获得一名其他角色的一张牌，然后其摸一张牌。',
 			rexushen:'许身',
 			rexushen_info:'限定技，出牌阶段，你可以失去X点体力（X为场上男性角色的数量）。若你以此法进入了濒死状态，则当你因一名角色而脱离此濒死状态后，你可以令其获得技能〖武圣〗和〖当先〗。',

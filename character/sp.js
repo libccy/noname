@@ -3113,7 +3113,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					discard2:{
-						trigger:{global:'phaseAfter'},
+						trigger:{global:'phaseEnd'},
 						audio:"zishu",
 						forced:true,
 						filter:function(event,player){
@@ -7466,7 +7466,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:'cards'
 				},
-				trigger:{global:'phaseAfter'},
+				trigger:{global:'phaseEnd'},
 				forced:true,
 				content:function(){
 					player.gain(player.storage.zhenwei2,'gain2');
@@ -9586,7 +9586,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				juexingji:true,
 				audio:2,
-				derivation:'tiaoxin',
+				derivation:'retiaoxin',
 				trigger:{player:'dying'},
 				//priority:10,
 				forced:true,
@@ -9601,7 +9601,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.recover(2-player.hp);
 					}
 					"step 2"
-					player.addSkill('tiaoxin');
+					player.addSkill('retiaoxin');
 					player.storage.kunfen=true;
 					player.awakenSkill('fengliang');
 				},
@@ -10145,7 +10145,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zhoufu3:{
-				trigger:{global:'phaseJieshuBegin'},
+				trigger:{global:'phaseEnd'},
 				silent:true,
 				content:function(){
 					if(player.storage.zhoufu3.isIn()){
@@ -10742,7 +10742,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			qiluan2:{
 				audio:2,
-				trigger:{global:'phaseAfter'},
+				trigger:{global:'phaseEnd'},
 				frequent:true,
 				filter:function(event,player){
 					return player.storage.qiluan?true:false;
@@ -12050,12 +12050,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					if(player.storage.bifa[1].isAlive()&&player.countCards('h')){
-						player.chooseCard(get.translation(player.storage.bifa[1])+
-							'的笔伐牌为'+get.translation(player.storage.bifa[0]),function(card){
+						player.chooseCard(get.translation(player.storage.bifa[1])+'的笔伐牌为：',function(card){
 							return get.type(card,'trick')==_status.event.type;
 						}).set('ai',function(card){
 							return 8-get.value(card);
-						}).set('type',get.type(player.storage.bifa[0],'trick'));
+						}).set('type',get.type(player.storage.bifa[0],'trick')).set('promptx',[[player.storage.bifa[0]],'请交给其一张与此牌类别相同的手牌，否则失去1点体力' ]);
 					}
 					else{
 						event.directfalse=true;
@@ -12063,8 +12062,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool&&!event.directfalse){
 						player.storage.bifa[1].gain(result.cards,player);
-						player.$give(result.cards,player.storage.bifa[1]);
-						player.gain(player.storage.bifa[0],'draw2','log','fromStorage');
+						player.$giveAuto(result.cards,player.storage.bifa[1]);
+						player.gain(player.storage.bifa[0],'draw','log','fromStorage');
 					}
 					else{
 						game.cardsDiscard(player.storage.bifa[0]);
@@ -12115,10 +12114,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							if(target.countCards('h')<target.hp){
-								if(target.countCards('h')<=2) return 1;
+								return 1;
 							}
 							else if(target.countCards('h')>target.hp){
-								if(target.countCards('h')<=3) return -1;
+								return -1;
 							}
 						}
 					}
@@ -12130,13 +12129,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				popup:false,
 				unique:true,
-				derivation:['tiaoxin','new_repaoxiao','xinshensu'],
+				derivation:['retiaoxin','new_repaoxiao','xinshensu'],
 				content:function(){
 					player.removeAdditionalSkill('baobian');
 					var list=[];
 					if(player.hp<=3){
-						if(trigger.num!=undefined&&trigger.num<0) player.logSkill('baobian');
-						list.push('tiaoxin');
+						if(trigger.num!=undefined&&trigger.num<0&&player.hp-trigger.num>1) player.logSkill('baobian');
+						list.push('retiaoxin');
 					}
 					if(player.hp<=2){
 						list.push('new_repaoxiao');

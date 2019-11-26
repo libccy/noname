@@ -100,7 +100,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return _status.event.player.hasUseTarget(button.link[2]);
 					});
 					'step 1'
-					player.chooseUseTarget(result.links[0][2]);
+					player.chooseUseTarget(true,result.links[0][2]);
 				},
 				ai:{
 					order:5,
@@ -137,7 +137,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return _status.event.player.hasUseTarget(button.link[2]);
 					});
 					'step 1'
-					player.chooseUseTarget(result.links[0][2]);
+					player.chooseUseTarget(true,result.links[0][2]);
 				},
 				ai:{
 					order:5,
@@ -163,7 +163,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return _status.event.player.hasUseTarget(button.link[2]);
 					});
 					'step 1'
-					player.chooseUseTarget(result.links[0][2]);
+					player.chooseUseTarget(true,result.links[0][2]);
 				},
 				ai:{
 					order:5,
@@ -198,7 +198,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return _status.event.player.hasUseTarget(button.link[2]);
 					});
 					'step 1'
-					player.chooseUseTarget(result.links[0][2]);
+					player.chooseUseTarget(true,result.links[0][2]);
 				},
 				ai:{
 					order:5,
@@ -1333,7 +1333,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					if(result.bool){
-						player.chooseUseTarget(result.links[0][2]);
+						player.chooseUseTarget(true,result.links[0][2]);
 					}
 				},
 				ai:{

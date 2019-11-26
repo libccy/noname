@@ -299,7 +299,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"drlt_zhenggu2":{
 				audio:2,
 				trigger:{
-					player:"phaseAfter",
+					player:"phaseEnd",
 				},
 				forced:true,
 				popup:false,
@@ -1434,7 +1434,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(!result.bool) event.finish();
 					else{
-						player.addTempSkill('nzry_lijun2');
+						player.addTempSkill('nzry_lijun2','phaseUseEnd');
 						var zhu=result.targets[0];
 						player.logSkill('nzry_lijun1',zhu);
 						var list=[];
@@ -2599,7 +2599,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			fangquan2:{
-				trigger:{player:'phaseAfter'},
+				trigger:{player:'phaseEnd'},
 				forced:true,
 				popup:false,
 				audio:false,
@@ -3506,7 +3506,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'gameStart',player:['enterGame','damageBefore']},
 				forced:true,
 				popup:false,
-				priority:10,
+				//priority:10,
 				filter:function(event,player){
 					return !player.storage.huasheninited;
 				},
@@ -3516,9 +3516,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			huashen2:{
 				audio:2,
-				trigger:{player:['phaseBeginStart','phaseAfter','huashenStart']},
+				trigger:{player:['phaseBegin','phaseEnd','huashenStart']},
 				filter:function(event,player,name){
-					if(name=='phaseBeginStart'&&game.phaseNumber==1) return false;
+					if(name=='phaseBegin'&&game.phaseNumber==1) return false;
 					return true;
 				},
 				//priority:50,
@@ -4638,6 +4638,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			bazhen:{
 				audio:2,
+				equipSkill:true,
 				inherit:'bagua_skill',
 				filter:function(event,player){
 					if(!lib.skill.bagua_skill.filter(event,player)) return false;

@@ -273,7 +273,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.delayx(1.5);
 					'step 2'
 					if(event.touse.length){
-						player.chooseUseTarget(event.touse.shift(),null,false);
+						player.chooseUseTarget(true,event.touse.shift(),null,false);
 						event.redo();
 					}
 					'step 3'
@@ -378,12 +378,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.logSkill('gwhuanshuang');
 						event.cardname=result.links[0][2];
-						player.chooseUseTarget(event.cardname);
+						player.chooseUseTarget(true,event.cardname);
 						player.addTempSkill('gwhuanshuang_disable');
 					}
 					'step 2'
 					if(event.cardname&&player.hasUseTarget(event.cardname)){
-						player.chooseUseTarget(event.cardname);
+						player.chooseUseTarget(true,event.cardname);
 					}
 				},
 				ai:{
@@ -4389,7 +4389,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					if(event.list.length){
-						player.chooseUseTarget(event.list.shift());
+						player.chooseUseTarget(true,event.list.shift());
 						event.redo();
 					}
 				},

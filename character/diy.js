@@ -840,7 +840,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					if(result.bool){
-						player.chooseUseTarget(cards[0],event.hidden?'选择此牌的目标':null);
+						player.chooseUseTarget(true,cards[0],event.hidden?'选择此牌的目标':null);
 					}
 					else{
 						var evt=_status.event.getParent('phaseUse');
