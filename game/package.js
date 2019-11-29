@@ -80,8 +80,9 @@ window.noname_package={
 		},
 	},
 	background:{
-		ol_bg:'龙纹',
 		planetarian_bg:'星梦',
+		ol_bg:'龙纹',
+		heaven_bg:'红烧',
 		kyoani_bg:'京都',
 		key_bg:'键社',
 		zhulin_bg:'竹林',
