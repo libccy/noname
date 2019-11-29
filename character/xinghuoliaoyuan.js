@@ -810,7 +810,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function (){
 					"step 0"
 					event.cards=get.cards(4);
-					player.chooseCardButton(true.event.cards,2,'选择两张牌置于牌堆顶').set('ai',ai.get.buttonValue);
+					player.chooseCardButton(true,event.cards,2,'选择两张牌置于牌堆顶').set('ai',ai.get.buttonValue);
 					"step 1"
 					if(result.bool){
 						var choice=[];
@@ -2297,13 +2297,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					delete player.storage.xinfu_yanyu2;
 				},
 				trigger:{
-					global:["loseEnd","cardsDiscardEnd"],
+					global:["loseEnd","cardsDiscardEnd","useCardAfter","respondAfter"],
 				},
 				direct:true,
 				filter:function (event,player){
 					if(player.storage.xinfu_yanyu2>=3) return false;
 					var evt=event.getParent();
-					if(evt&&evt.name=='useCard'&&evt.card&&['equip','delay'].contains(get.type(evt.card))) return false;
+					if(evt&&evt.name=='useCard') return false;
 					var type=player.storage.xinfu_yanyu;
 					var cards=event.cards;
 					for(var i=0;i<cards.length;i++){
@@ -5262,7 +5262,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return true;
 						},
 						content:function (){
-							player.storage.xinfu_shangjian+=trigger.cards.length;
+							for(var i=0;i<trigger.cards.length;i++){
+								if(trigger.cards[i].original&&trigger.cards[i].original!='j') player.storage.xinfu_shangjian++;
+							}
 						},
 						sub:true,
 						forced:true,
@@ -5617,11 +5619,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"lingren_adddamage":"凌人",
 			"lingren_adddamage_info":"",
 			"lingren_jianxiong":"奸雄",
-			"lingren_jianxiong_info":"每当你受到伤害后，你可以获得对你造成伤害的牌并摸一张牌。",
+			"lingren_jianxiong_info":"当你受到伤害后，你可以获得对你造成伤害的牌并摸一张牌。",
 			"lingren_xingshang":"行殇",
-			"lingren_xingshang_info":"你可以立即获得死亡角色的所有牌。",
+			"lingren_xingshang_info":"当有角色死亡后，你可以选择一项：1.回复一点体力。2.获得该角色的所有牌。",
 			"xinfu_fujian":"伏间",
-			"xinfu_fujian_info":"锁定技，结束阶段，你观看随机一名角色的随机X张手牌。(X为场上手牌最少的角色的手牌数)",
+			"xinfu_fujian_info":"锁定技，结束阶段，你观看一名随机的其他角色的随机X张手牌。(X为场上手牌最少的角色的手牌数)",
 			"xinfu_xionghuo":"凶镬",
 			"xinfu_xionghuo_info":"游戏开始时，你获得3个“暴戾”标记。出牌阶段，你可以交给一名其他角色一个“暴戾”标记，你对有此标记的角色造成的伤害+1，且其出牌阶段开始时，移去“暴戾”并随机执行一项：1.受到1点火焰伤害且本回合不能对你使用【杀】；2.流失1点体力且本回合手牌上限-1；3.你随机获得其一张手牌和一张装备区里的牌。",
 			xionghuo:"凶镬",

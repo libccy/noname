@@ -1155,7 +1155,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					player.chooseCard('选择任意张手牌与“星”交换',[1,Math.min(player.countCards('h'),player.storage.qixing.length)]).ai=function(card){
+					player.chooseCard('选择任意张手牌与“星”交换',[1,Math.min(player.countCards('h'),player.storage.qixing.length)]).set('promptx',[player.storage.qixing]).ai=function(card){
 						var val=get.value(card);
 						if(val<0) return 10;
 						if(player.skipList.contains('phaseUse')){
@@ -1721,33 +1721,56 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					trigger.cancel();
-					"step 1"
 					event.cards=get.cards(5);
-					if(event.isMine()==false){
-						event.dialog=ui.create.dialog('涉猎',event.cards);
-						game.delay(2);
-					}
-					"step 2"
-					if(event.dialog) event.dialog.close();
-					var dialog=ui.create.dialog('涉猎',event.cards);
-					player.chooseButton([0,5],dialog,true).set('ai',function(button){
-						return get.value(button.link);
-					}).filterButton=function(button){
+					event.videoId=lib.status.videoId++;
+					game.broadcastAll(function(player,id,cards){
+						var str;
+						if(player==game.me&&!_status.auto){
+							str='涉猎：获取花色各不相同的牌';
+						}
+						else{
+							str='涉猎';
+						}
+						var dialog=ui.create.dialog(str,cards);
+						dialog.videoId=id;
+					},player,event.videoId,event.cards);
+					event.time=get.utc();
+					game.addVideo('showCards',player,['涉猎',get.cardsInfo(event.cards)]);
+					game.addVideo('delay',null,2);
+					"step 1"
+					var next=player.chooseButton([0,5],true);
+					next.set('dialog',event.videoId);
+					next.set('filterButton',function(button){
 						for(var i=0;i<ui.selected.buttons.length;i++){
-							if(get.suit(button.link)==get.suit(ui.selected.buttons[i].link)) return false;
+							if(get.suit(ui.selected.buttons[i].link)==get.suit(button.link)) return false;
 						}
 						return true;
+					});
+					next.set('ai',function(button){
+						return get.value(button.link,_status.event.player);
+					});
+					"step 2"
+					if(result.bool&&result.links){
+						var cards2=[];
+						for(var i=0;i<result.links.length;i++){
+							cards2.push(result.links[i]);
+							cards.remove(result.links[i]);
+						}
+						game.cardsDiscard(cards);
+						event.cards2=cards2;
+					}
+					else{
+						event.finish();
+					}
+					var time=1000-(get.utc()-event.time);
+					if(time>0){
+						game.delay(0,time);
 					}
 					"step 3"
-					var cards2=[];
-					for(var i=0;i<result.buttons.length;i++){
-						cards2.push(result.buttons[i].link);
-						cards.remove(result.buttons[i].link);
-					}
-					player.gain(cards2,'log');
-					if(cards2.length) player.$gain2(cards2);
-					game.cardsDiscard(cards);
-					game.delay(2);
+					game.broadcastAll('closeDialog',event.videoId);
+					var cards2=event.cards2;
+					player.gain(cards2,'log','gain2');
+					game.delay();
 				},
 				ai:{
 					threaten:1.2
@@ -2304,12 +2327,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						//if(button.link.name=='du') return 1;
 						return 0;
 					});
-					chooseButton.filterButton=function(button){
+					chooseButton.set('filterButton',function(button){
 						for(var i=0;i<ui.selected.buttons.length;i++){
 							if(get.suit(button.link)==get.suit(ui.selected.buttons[i].link)) return false;
 						};
 						return true;
-					};
+					});
 					'step 1'
 					if(result.bool){
 						var list=result.links;
@@ -2436,7 +2459,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							'step 0'
-							player.chooseTarget(get.prompt('drlt_jieying'),function(card,player,target){
+							player.chooseTarget(get.prompt('drlt_jieying'),"将“营”交给一名角色；其摸牌阶段多摸一张牌，出牌阶段使用【杀】的次数上限+1且手牌上限+1。该角色回合结束后，其移去“营”标记，然后你获得其所有手牌。",function(card,player,target){
 								return target!=player;
 							}).ai=function(target){
 								if(get.attitude(player,target)>0)
@@ -2577,13 +2600,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dawu2:'大雾',
 			dawu3:'大雾',
 			// dawu2_info:'已获得大雾标记',
-			dawu_info:'结束阶段，你可以弃掉X枚“星”指定X名角色：直到你的下回合开始，防止他们受到的除雷电伤害外的一切伤害。',
+			dawu_info:'结束阶段，你可以弃置X枚“星”并指定X名角色：直到你的下回合开始，防止这些角色受到的除雷电伤害外的伤害。',
 			kuangfeng:'狂风',
 			kuangfeng2:'狂风',
 			kuangfeng2_bg:'风',
 			// kuangfeng2_info:'已获得狂风标记',
 			kuangfeng3:'狂风',
-			kuangfeng_info:'结束阶段，你可以弃掉1枚“星”指定一名角色：直到你的下回合开始，该角色每次受到的火焰伤害+1。',
+			kuangfeng_info:'结束阶段，你可以弃置1枚“星”并指定一名角色：直到你的下回合开始，该角色每次受到的火焰伤害+1。',
 			baonu:'狂暴',
 			baonu_bg:'暴',
 			baonu_info:'锁定技，游戏开始时，你获得两枚“暴怒”标记，；锁定技，每当你造成/受到1点伤害后，你获得1枚“暴怒”标记。',
@@ -2594,13 +2617,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wumou:'无谋',
 			wumou_info:'锁定技，每当你使用非延时类锦囊牌选择目标后，你选择一项：1.弃1枚“暴怒”标记；2.失去1点体力。',
 			ol_wuqian:'无前',
-			ol_wuqian_info:'出牌阶段，你可以弃2枚“暴怒”标记并选择一名其他角色，你视为拥有技能“无双”并令其防具无效，直到回合结束。',
+			ol_wuqian_info:'出牌阶段，你可以弃2枚“暴怒”标记并选择一名其他角色，你视为拥有技能〖无双〗并令其防具无效直到回合结束。',
 			ol_shenfen:'神愤',
-			ol_shenfen_info:'出牌阶段，你可以弃6枚“暴怒”标记并选择所有其他角色，然后这些角色先各弃置其装备区里的牌，再各弃置四张手牌，然后受到来自你的1点伤害。最后你将你的武将牌翻面。每阶段限一次。',
+			ol_shenfen_info:'出牌阶段限一次，你可以弃6枚“暴怒”标记并选择所有其他角色，对其各造成1点伤害。然后这些角色先各弃置其装备区里的牌，再各弃置四张手牌。最后你将你的武将牌翻面。',
 			"new_wuhun":"武魂",
 			"new_wuhun_info":"锁定技，当你受到伤害后，伤害来源获得X个“梦魇”标记（X为伤害点数）。锁定技，当你死亡时，你选择一名“梦魇”标记数量最多的其他角色。你的死亡流程结算完成后，该角色进行一次判定：若判定结果不为【桃】或【桃园结义】，则该角色立刻死亡。",
 			"new_guixin":"归心",
-			"new_guixin_info":"当你受到1点伤害后，你可以随机获得每名其他角色区域里的一张牌，然后你翻面",
+			"new_guixin_info":"当你受到1点伤害后，你可以随机获得每名其他角色区域里的一张牌，然后你翻面。",
 		},
 	};
 });

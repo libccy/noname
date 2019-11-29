@@ -4379,12 +4379,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 1'
 					if(result.bool){
-						target.$give(result.cards,player);
+						target.$give(result.cards.length,player);
 						target.lose(result.cards,ui.special,'toStorage');
-						player.storage.kuangbi_draw=result.cards;
-						player.storage.kuangbi_draw_source=target;
-						player.syncStorage('kuangbi_draw');
+						if(!player.storage.kuangbi_draw) player.storage.kuangbi_draw=[];
+						player.storage.kuangbi_draw.push([result.cards,target]);
 						player.addSkill('kuangbi_draw');
+						player.syncStorage('kuangbi_draw');
+						player.updateMarks('kuangbi_draw');
 					}
 				},
 				ai:{
@@ -4404,21 +4405,43 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{player:'phaseZhunbeiBegin'},
 						forced:true,
 						mark:true,
+						charlotte:true,
+						audio:'kuangbi',
 						intro:{
-							content:'cards'
+							markcount:function(content){
+								var cards=[];
+								for(var i=0;i<content.length;i++){
+									cards.addArray(content[i][0]);
+								}
+								return cards.length;
+							},
+							mark:function(dialog,content,player){
+								if(content&&content.length){
+									var cards=[];
+									for(var i=0;i<content.length;i++){
+										cards.addArray(content[i][0]);
+									}
+									if(player==game.me||player.isUnderControl()){
+										dialog.addText('共有'+get.cnNumber(cards.length)+'张牌');
+									}
+									else{
+										dialog.addAuto(cards);
+									}
+								}
+							},
 						},
 						content:function(){
-							var cards=player.storage.kuangbi_draw;
-							if(cards){
-								player.gain(cards,'gain2','fromStorage');
-								var target=player.storage.kuangbi_draw_source;
+							var storage=player.storage.kuangbi_draw;
+							if(storage.length){
+								var next=storage.shift();
+								player.gain(next[0],'gain2','fromStorage');
+								var target=next[1];
 								if(target&&target.isAlive()){
-									target.draw(cards.length);
+									target.draw(next[0].length);
 								}
+								event.redo();
 							}
-							delete player.storage.kuangbi_draw;
-							delete player.storage.kuangbi_draw_source;
-							player.removeSkill('kuangbi_draw');
+							else player.removeSkill('kuangbi_draw');
 						}
 					}
 				}
@@ -4506,6 +4529,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						target.addSkill('duliang2');
+						target.updateMarks('duliang2');
 						target.storage.duliang2++;
 						event.finish();
 					}
@@ -6857,6 +6881,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.gain(cards,player);
 					target.addTempSkill('mingjian2',{player:'phaseAfter'});
 					target.storage.mingjian2++;
+					target.updateMarks('mingjian2');
 				},
 				ai:{
 					order:1,
@@ -10239,9 +10264,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 3"
 					game.broadcastAll('closeDialog',event.videoId);
 					var cards2=event.cards2;
-					player.gain(cards2,'log');
-					player.$draw(cards2);
-					game.delay();
+					player.gain(cards2,'log','gain2');
 				},
 				ai:{
 					maixie:true,

@@ -2051,7 +2051,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return _status.currentPhase!=player;
 						},
 						content:function(){
-							player.storage.diancai+=trigger.cards.length;
+							for(var i=0;i<trigger.cards.length;i++){
+								if(trigger.cards[i].original&&trigger.cards[i].original!='j') player.storage.diancai++;
+							}
 						}
 					}
 				}
@@ -4055,12 +4057,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				filter:function(event,player){
 					if(event.player.hp<=player.hp) return false;
-					if(event.targets.length>1) return false;
+					//if(event.targets.length>1) return false;
 					var hs=player.getCards('h');
 					var names=['sha','shan','tao','jiu','du'];
 					for(var i=0;i<hs.length;i++){
 						names.remove(hs[i].name);
 					}
+					if(!names.length) return false;
 					for(var i=0;i<ui.cardPile.childElementCount;i++){
 						if(names.contains(ui.cardPile.childNodes[i].name)){
 							return true;
@@ -5210,6 +5213,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
+					if(player.storage.fanghun) player.draw(player.storage.fanghun);
 					event.num=player.storage.fanghun2;
 					var list;
 					if(_status.connectMode){
@@ -5251,7 +5255,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:'mark'
 				},
-				trigger:{source:'damageSource'},
+				trigger:{
+					source:'damageSource',
+					player:'damageEnd',
+				},
 				forced:true,
 				filter:function(event){
 					return event.card&&event.card.name=='sha';
@@ -9651,6 +9658,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseControl('basic','trick','equip','cancel2',function(){
 						var source=_status.event.source;
 						if(get.attitude(_status.event.player,source)>0) return 'cancel2';
+						if(!source.storage.jilei2||!source.storage.jilei2.contains('basic')) return 'basic';
 						if(_status.currentPhase!=source) return 'trick';
 						if(lib.filter.cardUsable({name:'sha'},source)&&source.countCards('h')>=2) return 'basic';
 						return 'trick';
@@ -9659,8 +9667,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.control!='cancel2'){
 						player.logSkill('jilei',trigger.source);
 						player.popup(get.translation(result.control)+'牌');
-						trigger.source.storage.jilei2=result.control;
-						trigger.source.addTempSkill('jilei2');
+						trigger.source.addTempSkill('jilei2',{player:'phaseBegin'});
+						trigger.source.storage.jilei2.add(result.control);
+						trigger.source.updateMarks('jilei2');
 					}
 				},
 				ai:{
@@ -9675,33 +9684,36 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return '不能使用、打出或弃置'+get.translation(storage)+'牌';
 					}
 				},
+				init:function(player,skill){
+					if(!player.storage[skill]) player.storage[skill]=[];
+				},
 				mark:true,
 				onremove:true,
 				mod:{
 					cardDiscardable:function(card,player){
-						if(player.storage.jilei2==get.type(card,'trick')) return false;
+						if(player.storage.jilei2.contains(get.type(card,'trick'))) return false;
 					},
 					cardEnabled:function(card,player){
-						if(player.storage.jilei2==get.type(card,'trick')) return false;
+						if(player.storage.jilei2.contains(get.type(card,'trick'))) return false;
 					},
 					cardUsable:function(card,player){
-						if(player.storage.jilei2==get.type(card,'trick')) return false;
+						if(player.storage.jilei2.contains(get.type(card,'trick'))) return false;
 					},
 					cardRespondable:function(card,player){
-						if(player.storage.jilei2==get.type(card,'trick')) return false;
+						if(player.storage.jilei2.contains(get.type(card,'trick'))) return false;
 					},
 					cardSavable:function(card,player){
-						if(player.storage.jilei2==get.type(card,'trick')) return false;
+						if(player.storage.jilei2.contains(get.type(card,'trick'))) return false;
 					},
 				},
 			},
 			danlao:{
 				audio:2,
 				filter:function(event,player){
-					return event.player!=player&&get.type(event.card)=='trick'&&event.targets&&event.targets.length>1;
+					return (event.card.name=='sha'||get.type(event.card)=='trick')&&event.targets&&event.targets.length>1;
 				},
 				check:function(event,player){
-					return get.tag(event.card,'multineg')||get.effect(player,event.card,event.player,player)<=0;
+					return event.getParent().excluded.contains(player)||get.tag(event.card,'multineg')||get.effect(player,event.card,event.player,player)<=0;
 				},
 				trigger:{target:'useCardToTargeted'},
 				content:function(){
@@ -13026,9 +13038,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			duanbing:'短兵',
 			duanbing_info:'你使用【杀】可以多选择一名距离为1的角色为目标',
 			fanghun:'芳魂',
-			fanghun_info:'当你使用【杀】造成伤害后，你获得1个“梅影”标记；你可以移去1个“梅影”标记来发动“龙胆”并摸一张牌',
+			fanghun_info:'当你使用【杀】造成伤害或受到【杀】的伤害后，你获得1个“梅影”标记；你可以移去1个“梅影”标记来发动“龙胆”并摸一张牌。',
 			fuhan:'扶汉',
-			fuhan_info:'限定技，回合开始时，你可以移去所有“梅影”标记，随机观看五名未登场的蜀势力角色，将武将牌替换为其中一名角色，并将体力上限数调整为本局游戏中移去“梅影”标记的数量（至多为游戏开始时的角色数），然后若你是体力值最低的角色，你回复1点体力',
+			fuhan_info:'限定技，回合开始时，你可以移去所有“梅影”标记并摸等量的牌，随机观看五名未登场的蜀势力角色，将武将牌替换为其中一名角色，并将体力上限数调整为本局游戏中移去“梅影”标记的数量（至多为游戏开始时的角色数），然后若你是体力值最低的角色，你回复1点体力',
 			yjixi:'觊玺',
 			yjixi_info:'觉醒技，结束阶段，若你连续三回合没有失去过体力，则你增加1点体力上限并回复1点体力，然后选择一项：获得技能“妄尊”或摸两张牌并获得当前主公的主公技',
 			xinyongsi:'庸肆',
@@ -13302,9 +13314,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fenyin_info:'你的回合内，当你使用牌时，若此牌与你于此回合内使用的上一张牌颜色不同，则你可以摸一张牌。',
 			fuji_info:'当一名角色造成雷电伤害时，你可以令其进行一次判定，若结果为黑色，此伤害+1；若结果为红色，该角色获得此牌。',
 			fulu_info:'你可以将【杀】当雷【杀】使用。',
-			jilei_info:'每当你受到有来源的伤害时，你可以选择一种牌的类别，令伤害来源不能使用、打出或弃置其此类别的手牌，直到回合结束',
+			jilei_info:'当你受到有来源的伤害后，你可以声明一种牌的类别。若如此做，你令伤害来源不能使用、打出或弃置其此类别的手牌，直到其下个。回合开始。',
 			danlao:'啖酪',
-			danlao_info:'当你成为一张指定了多个目标的锦囊牌的目标时，你可以取消之，并摸一张牌。',
+			danlao_info:'当你成为一张指定了多个目标的【杀】或普通锦囊牌的目标时，你可以摸一张牌并令此牌对你无效。',
 			gongao:'功獒',
 			zhuiji:'追击',
 			chouhai:'仇海',
