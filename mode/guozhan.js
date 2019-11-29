@@ -3646,7 +3646,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return _status.currentPhase!=player;
 						},
 						content:function(){
-							player.storage.gzdiancai+=trigger.cards.length;
+							for(var i=0;i<trigger.cards.length;i++){
+								if(trigger.cards[i].original&&trigger.cards[i].original!='j') player.storage.gzdiancai++;
+							}
 						}
 					}
 				}

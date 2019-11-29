@@ -1388,7 +1388,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						list=event.list.randomGets(8);
 					}
 					else{
-						list=list2.concat(list3.randomGets(3));
+						list=list2.concat(list3.randomGets(5));
 					}
 					var next=game.zhu.chooseButton(true);
 					next.set('selectButton',(lib.configOL.double_character?2:1));
@@ -1433,12 +1433,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						num=Math.floor(event.list.length/(game.players.length-1));
+						if(num>5){
+							num=5;
+						}
 						num2=event.list.length-num*(game.players.length-1);
 						if(lib.configOL.double_nei){
 							num2=Math.floor(num2/2);
-						}
-						if(num>5){
-							num=5;
 						}
 						if(num2>2){
 							num2=2;
