@@ -783,6 +783,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			zhafu:{
+				audio:2,
 				enable:'phaseUse',
 				limited:true,
 				skillAnimation:true,
@@ -820,6 +821,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			
 			tuiyan:{
+				audio:2,
 				trigger:{player:'phaseUseBegin'},
 				frequent:true,
 				content:function(){
@@ -836,6 +838,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			busuan:{
+				audio:2,
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:lib.filter.notMe,
@@ -902,6 +905,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			mingjie:{
+				audio:1,
 				trigger:{player:'phaseJieshuBegin'},
 				check:function(){
 					return ui.cardPile.hasChildNodes()&&get.color(ui.cardPile.firstChild)!='black';
