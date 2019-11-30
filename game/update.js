@@ -2,7 +2,7 @@ window.noname_update={
 	version:'1.9.95.8.1',
 	update:'1.9.95.8',
 	changeLog:[
-		//'庆祝《星之梦》发售15周年！',
+		'新增管辂、葛玄配音（若曾下载过群里的配音文件建议先删了再更新，因为已稍调整了一下音量）',
 		'欢乐卡牌写轮眼写法调整、漩涡面具、DIY王允、段珪的部分技能小调整',
 	],
 	files:[
@@ -22,7 +22,7 @@ window.noname_update={
 		//'character/old.js',
 		//'character/refresh.js',
 		//'character/shenhua.js',
-		//'character/sp.js',
+		'character/sp.js',
 		//'character/tw.js',
 		//'character/standard.js',
 		//'character/swd.js',
