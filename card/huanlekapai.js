@@ -376,6 +376,9 @@ trigger:{
         player:"turnOverBefore",
     },
     forced:true,
+    filter:function (event,player){
+       return !player.isTurnedOver();
+    },
     content:function (){
         trigger.cancel();
     },
@@ -412,7 +415,7 @@ audio:true,
     },
     priority:2018,
     direct:true,
-    createDialog:function (player,target,onlylist){
+   /* createDialog:function (player,target,onlylist){
         var names=[];
         var list=[];
         if(target.name&&!target.isUnseen(0)) names.add(target.name);
@@ -457,9 +460,9 @@ audio:true,
         }
         dialog.add(ui.create.div('.placeholder'));
         return dialog;
-    },
+    },*/
     content:function (){
-        'step 0'
+       /* 'step 0'
         player.chooseTarget(get.prompt2('xuelunyang'),function(card,player,target){
             var names=[];
             if(target.name&&!target.isUnseen(0)) names.add(target.name);
@@ -515,6 +518,34 @@ audio:true,
         player.addTempSkill(result);
         player.popup(result);
         game.log(player,'获得了','【'+get.translation(result)+'】');
+	*/
+	'step 0'
+        player.chooseTarget(get.prompt2('xuelunyang'),function(card,player,target){
+            return player!=target;
+        }).set('ai',function(target){
+            if(get.attitude(_status.event.player,target)>0) return Math.random();
+            return get.attitude(_status.event.player,target)<=0;
+        });
+        'step 1'
+        if(result.bool){
+            event.target=result.targets[0];
+            player.logSkill('xuelunyang',event.target);
+        }
+        else{
+            event.finish();
+        }
+        'step 2'
+        player.chooseSkill(event.target,function(info,skill){
+		    				return player.isAlive();
+					});     					
+      'step 3'
+    			if(result.bool){
+			    			var skill=result.skill;		    		
+		     			        player.addTempSkill(skill);
+		    				player.popup(skill);
+		   				//player.markSkillCharacter('xuelunyang',event.target.name,get.skillTranslation(skill,player),get.skillInfoTranslation(skill));
+		   				game.log(player,'获得了','【'+get.translation(skill)+'】');
+					}      
     },
 },
 
@@ -541,7 +572,7 @@ trigger:{
 			"monkey":"猴子",
             "monkey_info":"猴子偷桃：当场上有其他角色使用【桃】时，你可以弃掉【猴子】，阻止【桃】的结算并将其收为手牌",
             "mianju":"漩涡面具",
-            "mianju_info":"<font color=#f00>锁定技</font> 你的武将牌不能被翻面",
+            "mianju_info":"<font color=#f00>锁定技</font> 若你的武将牌正面向上，你的武将牌不能被翻面",
             "shoulijian":"手里剑",
             "shoulijian_info":"出牌阶段，对一名距离1以外的角色使用，令其弃置一张装备牌或受到一点伤害",
             "kuwu":"苦无",
