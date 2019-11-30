@@ -1655,9 +1655,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(Math.abs(targets[0].hp-targets[1].hp)==1){
 						player.loseHp();
 					}
-					else{
-						player.die();
-					}
+					//else{
+						//player.die();
+					//}
 				},
 				ai:{
 					order:10,
@@ -3738,7 +3738,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:"phaseUse",
 				usable:1,
 				filterTarget:function (card,player,target){
-					return target!=player;
+					return target!=player&&!target.hasSkill('liangji_1');
 				},
 				content:function (){
 					'step 0'
@@ -5299,7 +5299,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nsjianning:'奸佞',
 			nsjianning_info:'出牌阶段限一次，如果你的身份为内奸，你可以与一名手牌数比你少的角色交换手牌，并对其造成一点伤害',
 			nschangshi:'常仕',
-			nschangshi_info:'出牌阶段限一次，如果你的身份为反贼，你可以指定两名其他角色互换体力；如果两名角色体力之差等于1，你失去一点体力，否则你立即死亡',
+			nschangshi_info:'出牌阶段限一次，如果你的身份为反贼，你可以指定两名其他角色互换体力；如果两名角色体力之差等于1，你失去一点体力',
 			nsbaquan:'霸权',
 			nsbaquan_info:'回合结束时，你可以弃置所有手牌，并获得相应点数的护甲，你的新一回合开始时清除所有护甲',
 			nsbugua:'卜卦',
@@ -5382,7 +5382,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yiesheng:'回雪',
 			yiesheng_info:'出牌阶段，你可以弃置任意数量的黑色手牌，然后摸等量的牌。',
 			liangji:'环计',
-			liangji_info:'出牌阶段限一次，你可以选择一名其他角色并将一张手牌置于其武将牌上。目标角色于摸牌阶段开始时，获得此牌。若其为男性角色，则获得技能【无双】，若其为女性角色，则获得技能【离间】，直到回合结束。',
+			liangji_info:'出牌阶段限一次，你可以选择一名武将牌上没以此法获得牌的其他角色并将一张手牌置于其武将牌上。目标角色于摸牌阶段开始时，获得此牌。若其为男性角色，则获得技能【无双】，若其为女性角色，则获得技能【离间】，直到回合结束。',
 			chengmou:'逞谋',
 			chengmou_info:'摸牌阶段开始时，若你有“功”牌，你获得之并跳过摸牌阶段，若你所获得的“功”牌多于两张，你须失去一点体力。',
 			jugong:'居功',
