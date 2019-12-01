@@ -413,9 +413,12 @@ audio:true,
     trigger:{
         player:"phaseBegin",
     },
+    filter:function (event,player){
+       return player.isAlive();
+    },
     priority:2018,
     direct:true,
-   /* createDialog:function (player,target,onlylist){
+     createDialog:function (player,target,onlylist){
         var names=[];
         var list=[];
         if(target.name&&!target.isUnseen(0)) names.add(target.name);
@@ -460,9 +463,9 @@ audio:true,
         }
         dialog.add(ui.create.div('.placeholder'));
         return dialog;
-    },*/
+    },
     content:function (){
-       /* 'step 0'
+       'step 0'
         player.chooseTarget(get.prompt2('xuelunyang'),function(card,player,target){
             var names=[];
             if(target.name&&!target.isUnseen(0)) names.add(target.name);
@@ -518,10 +521,10 @@ audio:true,
         player.addTempSkill(result);
         player.popup(result);
         game.log(player,'获得了','【'+get.translation(result)+'】');
-	*/
-	'step 0'
+	
+      /*	'step 0'
         player.chooseTarget(get.prompt2('xuelunyang'),function(card,player,target){
-            return player!=target;
+            return target!=player;
         }).set('ai',function(target){
             if(get.attitude(_status.event.player,target)>0) return Math.random();
             return get.attitude(_status.event.player,target)<=0;
@@ -545,7 +548,7 @@ audio:true,
 		    				player.popup(skill);
 		   				//player.markSkillCharacter('xuelunyang',event.target.name,get.skillTranslation(skill,player),get.skillInfoTranslation(skill));
 		   				game.log(player,'获得了','【'+get.translation(skill)+'】');
-					}      
+					}      */
     },
 },
 
