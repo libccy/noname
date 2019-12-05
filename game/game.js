@@ -6451,6 +6451,13 @@
 						return this.childNodes[row].childNodes[col];
 					}
 				};
+				Array.prototype.filterInD=function(){
+					var list=[];
+					for(var i=0;i<this.length;i++){
+						if(get.position(this[i])=='d') list.push(this[i]);
+					}
+					return list;
+				};
 				Array.prototype.find=function(item){
 					return this.indexOf(item);
 				};
@@ -11045,6 +11052,7 @@
 				},
 				chooseToUse:function(){
 					"step 0"
+					if(event.responded) return;
 					if(game.modeSwapPlayer&&!_status.auto&&player.isUnderControl()&&!lib.filter.wuxieSwap(event)){
 						game.modeSwapPlayer(player);
 					}
@@ -20160,7 +20168,7 @@
 						if(mode!='identity'){
 							if(player&&this.side!=player.side) return false;
 						}
-						if(this.isZhu) return true;
+						if(this.isZhu==true) return true;
 						for(var i in this.storage){
 							if(i.indexOf('zhuSkill_')==0&&this.storage[i].contains(skill)) return true;
 						}
@@ -22514,15 +22522,8 @@
 							if(info.filterCard!=undefined){
 								this.filterCard=function(card,player,event){
 									if(!info.ignoreMod&&player){
-										if(!event) event=_status.event;
-										if(event.name=='chooseToUse'){
-											var mod=game.checkMod(card,player,'unchanged','cardEnabled',player);
-											if(mod!='unchanged') return mod;
-										}
-										if(event.name=='chooseToRespond'){
-											var mod=game.checkMod(card,player,'unchanged','cardRespondable',player);
-											if(mod!='unchanged') return mod;
-										}
+										var mod=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+										if(mod!='unchanged') return mod;
 									}
 									return get.filter(info.filterCard)(card,player,event);
 								};
@@ -23300,6 +23301,8 @@
 			cardEnabled:function(card,player,event){
 				card=get.autoViewAs(card,null,player);
 				if(player==undefined) player=_status.event.player;
+				var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+				if(mod2!='unchanged') return mod2;
 				if(event==='forceEnable'){
 					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player);
 					if(mod!='unchanged') return mod;
@@ -23324,6 +23327,8 @@
 					}
 				}
 				if(player==undefined) player=_status.event.player;
+				var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+				if(mod2!='unchanged') return mod2;
 				var mod=game.checkMod(card,player,'unchanged','cardRespondable',player);
 				if(mod!='unchanged') return mod;
 				return true;
@@ -24038,6 +24043,8 @@
 						player.chooseToUse({
 							filterCard:function(card,player,event){
 								event=event||_status.event;
+								var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+								if(mod2!='unchanged') return mod2;
 								var mod=game.checkMod(card,player,'unchanged','cardSavable',player);
 								if(mod!='unchanged') return mod;
 								var savable=get.info(card).savable;
