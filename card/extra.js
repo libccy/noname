@@ -565,6 +565,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			muniu_skill3:{
 				trigger:{player:'chooseToRespondBegin'},
+				cardSkill:true,
 				filter:function(event,player){
 					if(event.responded) return false;
 					var muniu=player.getEquip(5);
@@ -635,7 +636,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return true;
 					},
 					check:function(button){
-						if(button.link.name=='du') return -2;
+						if(button.link.name=='du') return 2;
 						var player=_status.event.player;
 						if(button.link.name=='xingjiegoutong'&&player.countCards('h')>1) return -2;
 						if(get.select(get.info(button.link).selectTarget)[1]==-1){
@@ -921,12 +922,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					var eff=0;
 					for(var i=0;i<event.targets.length;i++){
 						var target=event.targets[i];
-						var eff1=get.effect(target,event.card,player,player);
-						var eff2=get.effect(target,{name:'sha',nature:'fire',suit:get.suit(event.card),number:get.number(event.card)},player,player);
+						var eff1=get.damageEffect(target,player,player);
+						var eff2=get.damageEffect(target,player,player,'fire');
 						eff+=eff2;
 						eff-=eff1;
 					}
-					return eff>0;
+					return eff>=0;
 				},
 				content:function(){
 					trigger.card.nature='fire';

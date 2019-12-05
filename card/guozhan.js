@@ -1146,9 +1146,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					if(cards.length){
-						for(var i=0;i<cards.length;i++){
-							cards[i].remove();
-						}
+						game.cardsGotoSpecial(cards);
+						game.log(cards,'已被移出游戏');
 						_status.chiling=true;
 						player.popup('敕令');
 					}
@@ -1160,12 +1159,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				popup:false,
 				filter:function(event,player){
-					if(event.result.card.parentNode.id!='discardPile') return false;
+					if(get.position(event.result.card)!='d') return false;
 					return event.result.card.name=='chiling';
 				},
 				content:function(){
 					_status.chiling=true;
-					trigger.result.card.remove();
+					game.cardsGotoSpecial(trigger.result.card);
+					game.log(trigger.result.card,'已被移出游戏');
 					player.popup('敕令');
 				}
 			},
@@ -1175,7 +1175,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				popup:false,
 				filter:function(){
-					return _status.chiling;
+					return _status.chiling==true;
 				},
 				content:function(){
 					'step 0'
@@ -1227,7 +1227,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			g_diaohulishan:{},
 			diaohulishan:{
-				trigger:{player:['damageBefore','loseHpBefore','recoverBefore']},
+				trigger:{player:['damageBegin3','loseHpBefore','recoverBefore']},
 				forced:true,
 				popup:false,
 				content:function(){

@@ -443,7 +443,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		skill:{
 			lanyinjia:{
 				equipSkill:true,
-				enable:['chooseToRespond'],
+				enable:['chooseToUse','chooseToRespond'],
 				filterCard:true,
 				viewAs:{name:'shan'},
 				viewAsFilter:function(player){

@@ -78,36 +78,56 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(typeof event.baseDamage!='number') event.baseDamage=1;
 					if(typeof event.extraDamage!='number') event.extraDamage=0;
 					"step 1"
-					if(event.directHit){
+					if(event.directHit||(!target.hasShan()&&!_status.connectMode)){
 						event._result={bool:false};
 					}
 					else if(event.skipShan){
-						event._result={bool:true};
+						event._result={result:'shaned'};
 					}
 					else{
-						var next=target.chooseToRespond({name:'shan'});
+						var next=target.chooseToUse('请使用一张闪响应杀');
+						next.set('filterCard',function(card,player){
+							if(get.name(card)!='shan') return false;
+							return lib.filter.cardEnabled(card,player,'forceEnable');
+						});
 						if(event.shanRequired>1){
-							next.set('prompt2','（共需打出'+event.shanRequired+'张闪）');
+							next.set('prompt2','（共需使用'+event.shanRequired+'张闪）');
 						}
-						next.set('ai',function(card){
+						next.set('ai1',function(card){
 							var target=_status.event.player;
 							var evt=_status.event.getParent();
+							var bool=true;
 							if(_status.event.shanRequired>1&&target.countCards('h','shan')<_status.event.shanRequired){
-								return -1
+								bool=false;
 							}
-							if(target.hasSkillTag('useShan')){
-								return 11-get.value(card);
+							else if(target.hasSkillTag('useShan')){
+								bool=true;
 							}
-							if(target.hasSkillTag('noShan')){
-								return -1;
+							else if(target.hasSkillTag('noShan')){
+								bool=false;
 							}
-							if(get.damageEffect(target,evt.player,target,evt.card.nature)>=0) return -1;
-							return 11-get.value(card);
+							else if(get.damageEffect(target,evt.player,target,evt.card.nature)>=0) bool=false;
+							if(bool){
+								if(typeof card=='string'){
+									var info=get.info(card);
+									if(info.ai&&info.ai.order){
+										if(typeof info.ai.order=='number'){
+											return info.ai.order;
+										}
+										else if(typeof info.ai.order=='function'){
+											return info.ai.order();
+										}
+									}
+								}
+								return 3;
+							}
+							return 0;
 						}).set('shanRequired',event.shanRequired);
-						next.autochoose=lib.filter.autoRespondShan;
+						next.set('respondTo',[player,card]);
+						//next.autochoose=lib.filter.autoRespondShan;
 					}
 					"step 2"
-					if(result.bool==false){
+					if(result.result!='shaned'){
 						event.trigger('shaHit');
 					}
 					else{
@@ -212,11 +232,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'basic',
 				cardcolor:'red',
+				notarget:true,
+				content:function(){
+					event.result='shaned';
+				},
 				ai:{
 					basic:{
 						useful:[7,2],
-						value:[7,2]
-					}
+						value:[7,2],
+					},
+					result:{player:1},
+					expose:0.2
 				}
 			},
 			tao:{
@@ -1778,11 +1804,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			bagua_skill:{
 				equipSkill:true,
-				trigger:{player:'chooseToRespondBegin'},
+				trigger:{player:['chooseToRespondBegin','chooseToUseBegin']},
 				filter:function(event,player){
 					if(event.responded) return false;
 					if(!event.filterCard({name:'shan'})) return false;
-					if(!lib.filter.cardRespondable({name:'shan'},player,event)) return false;
+					if(event.name=='chooseToRespond'&&!lib.filter.cardRespondable({name:'shan'},player,event)) return false;
 					if(player.hasSkillTag('unequip2')) return false;
 					var evt=event.getParent();
 					if(evt.player&&evt.player.hasSkillTag('unequip',false,{
