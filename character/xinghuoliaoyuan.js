@@ -454,10 +454,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.directindex=result.index;
 					}
 					if(event.directindex==1){
-						target.chooseUseTarget({name:'sha'},cards,true)
+						target.chooseUseTarget({name:'sha'},cards,true,false)
 					}
 					else{
-						target.chooseUseTarget(card,true);
+						target.chooseUseTarget(card,true,false,'nodistance');
 					}
 				},
 				ai:{
@@ -1124,8 +1124,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					if(event.num>1) player.draw(2);
 					if(event.num>2){
-						player.addTempSkill('lingren_jianxiong',{player:'phaseBefore'});
-						player.addTempSkill('lingren_xingshang',{player:'phaseBefore'});
+						player.addTempSkill('lingren_jianxiong',{player:'phaseBegin'});
+						player.addTempSkill('lingren_xingshang',{player:'phaseBegin'});
 					}
 				},
 				ai:{
@@ -2303,7 +2303,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function (event,player){
 					if(player.storage.xinfu_yanyu2>=3) return false;
 					var evt=event.getParent();
-					if(evt&&evt.name=='useCard') return false;
+					if(evt&&(evt.name=='useCard'||evt.name=='respond')) return false;
 					var type=player.storage.xinfu_yanyu;
 					var cards=event.cards;
 					for(var i=0;i<cards.length;i++){
@@ -3854,7 +3854,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function (event,player){
 					if(player.hasSkill('guhuo_phase'))return false;
 					if(!player.countCards('h')) return false;
-					var list=['sha','tao','jiu','taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman'];
+					var list=['sha','shan','tao','jiu','taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman'];
 					if(get.mode()=='guozhan'){
 						list=list.concat(['xietianzi','shuiyanqijunx','lulitongxin','lianjunshengyan','chiling','diaohulishan','yuanjiao','huoshaolianying']);
 					}
@@ -3897,7 +3897,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return '将一张手牌做当'+get.translation(links[0][2])+'使用';
 					},
 				},
-				ai:{save:true},
+				ai:{
+					save:true,
+					respondShan:true,
+					skillTagFilter:function(player){
+						if(player.hasSkill('guhuo_phase')) return false;
+					},
+				},
 			},
 			"guhuo_guess":{
 				audio:2,
@@ -4674,7 +4680,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"yizan_respond_shan":{
 				complexCard:true,
 				audio:2,
-				enable:["chooseToRespond"],
+				enable:["chooseToUse","chooseToRespond"],
 				filterCard:function (card,player,target){
 					if(player.storage.yizan) return get.type(card)=='basic';
 						else if(ui.selected.cards.length){
@@ -4703,7 +4709,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				prompt:function (){
 					var player=_status.event.player;
 					var str=!player.storage.yizan?'两张牌(其中至少应有一张基本牌)':'一张基本牌';
-					return '将'+str+'当做闪打出';
+					return '将'+str+'当做闪使用或打出';
 				},
 				check:function (card){
 					if(!ui.selected.cards.length&&get.type(card)=='basic') return 6;
@@ -4758,7 +4764,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				popup:false,
 				trigger:{
-					player:["respond","useCard"],
+					player:["respond","useCard1"],
 				},
 				filter:function (event,player){
 					if(event.skill!='yizan_respond_sha'&&event.skill!='yizan_respond_shan'&&event.skill!='yizan_use_backup') return false;
@@ -5273,29 +5279,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"rw_bagua_skill":{
-				equipSkill:true,
 				inherit:"bagua_skill",
-				trigger:{
-					player:"chooseToRespondBegin",
-				},
-				filter:function (event,player){
-					if(player.hasSkillTag('unequip2')) return false;
-					if(event.responded) return false;
-					if(!event.filterCard({name:'shan'})) return false;
-					if(!lib.filter.cardRespondable({name:'shan'},player,event)) return false;
-					var evt=event.getParent();
-					if(evt.player&&evt.player.hasSkillTag('unequip',false,{
-						name:evt.card?evt.card.name:null,
-						target:player,
-						card:evt.card
-					})) return false;
-					return true;
-				},
 				audio:"bagua_skill",
-				check:function (event,player){
-					if(get.damageEffect(player,event.player,player)>=0) return false;
-					return true;
-				},
 				content:function (){
 					"step 0"
 					player.judge('rewrite_bagua',function(card){return (get.suit(card)!='spade')?1.5:-0.5});
@@ -5305,19 +5290,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.responded=true;
 						trigger.result={bool:true,card:{name:'shan'}}
 					}
-				},
-				ai:{
-					effect:{
-						target:function (card,player,target,effect){
-							if(player.getEquip('qinggang')&&card.name=='sha'||target.hasSkillTag('unequip2')) return;
-							if(player.hasSkillTag('unequip',false,{
-								name:card?card.name:null,
-								target:player,
-								card:card
-							})) return;
-							if(get.tag(card,'respondShan')) return 0.5;
-						},
-					},
 				},
 			},
 			"rw_baiyin_skill":{
@@ -5346,7 +5318,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"rw_lanyinjia":{
 				equipSkill:true,
 				inherit:"lanyinjia",
-				enable:["chooseToRespond"],
+				enable:["chooseToRespond","chooseToUse"],
 				filterCard:true,
 				viewAs:{
 					name:"shan",
@@ -5354,7 +5326,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				viewAsFilter:function (player){
 					if(!player.countCards('h')) return false;
 				},
-				prompt:"将一张手牌当闪打出",
+				prompt:"将一张手牌当闪使用或打出",
 				check:function (card){
 					return 6-get.value(card);
 				},

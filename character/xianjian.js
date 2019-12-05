@@ -2360,7 +2360,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zhangmu:{
-				trigger:{player:'chooseToRespondBegin'},
+				trigger:{player:['chooseToRespondBegin','chooseToUseBegin']},
 				filter:function(event,player){
 					if(event.responded) return false;
 					if(!event.filterCard({name:'shan'})) return false;
@@ -2756,7 +2756,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			feixu:{
-				trigger:{global:'respond'},
+				trigger:{global:['useCard','respond']},
 				filter:function(event,player){
 					return event.card&&event.card.name=='shan';
 				},

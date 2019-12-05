@@ -1111,18 +1111,50 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					player.gain(get.cards(7))._triggered=null;
+					player.storage.qixing=game.cardsGotoSpecial(get.cards(7)).cards;
+					player.markSkill('qixing');
+					game.addVideo('storage',player,['qixing',get.cardsInfo(player.storage.qixing),'cards']);
 					"step 1"
-					if(player==game.me){
-						game.addVideo('delay',null);
-					}
-					player.chooseCard('选择七张牌作为星',7,true).ai=function(card){
-						return get.value(card);
+					player.chooseCard('选择任意张手牌与“星”交换',[1,Math.min(player.countCards('h'),player.storage.qixing.length)]).set('promptx',[player.storage.qixing]).ai=function(card){
+						var val=get.value(card);
+						if(val<0) return 10;
+						if(player.skipList.contains('phaseUse')){
+							return val;
+						}
+						return -val;
 					};
 					"step 2"
-					player.lose(result.cards,ui.special,'toStorage');
-					player.storage.qixing=result.cards;
-					game.addVideo('storage',player,['qixing',get.cardsInfo(player.storage.qixing),'cards']);
+					if(result.bool){
+						player.logSkill('qixing');
+						player.lose(result.cards,ui.special,'toStorage');
+						player.storage.qixing=player.storage.qixing.concat(result.cards);
+						player.syncStorage('qixing');
+						event.num=result.cards.length;
+					}
+					else{
+						event.finish();
+					}
+					"step 3"
+					player.chooseCardButton(player.storage.qixing,'选择'+event.num+'张牌作为手牌',event.num,true).ai=function(button){
+						var val=get.value(button.link);
+						if(val<0) return -10;
+						if(player.skipList.contains('phaseUse')){
+							return -val;
+						}
+						return val;
+					}
+					if(player==game.me&&!event.isMine()){
+						game.delay(0.5);
+					}
+					"step 4"
+					player.gain(result.links,'fromStorage');
+					for(var i=0;i<result.links.length;i++){
+						player.storage.qixing.remove(result.links[i]);
+					}
+					player.syncStorage('qixing');
+					if(player==game.me&&_status.auto){
+						game.delay(0.5);
+					}
 				},
 				mark:true,
 				intro:{
@@ -1532,7 +1564,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:true,
 				enable:['chooseToUse','chooseToRespond'],
 				prompt:function(){
-					return '将'+get.cnNumber(Math.max(1,_status.event.player.hp))+'张梅花牌当作闪打出';
+					return '将'+get.cnNumber(Math.max(1,_status.event.player.hp))+'张梅花牌当作闪使用或打出';
 				},
 				position:'he',
 				check:function(card,event){
@@ -1686,7 +1718,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'longhun4',
 				enable:['chooseToUse','chooseToRespond'],
 				prompt:function(){
-					return '将至多两张梅花牌当作闪打出';
+					return '将至多两张梅花牌当作闪使用或打出';
 				},
 				position:'he',
 				check:function(card,event){
@@ -2594,7 +2626,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qixing_bg:'星',
 			qixing2:'七星',
 			qixing3:'七星',
-			qixing_info:'游戏开始前，共发你11张牌，选4张作为手牌，其余的面朝下置于一旁（移出游戏），称之为“星”。每当你于摸牌阶段摸牌后，可用任意数量的手牌等量交换这些“星”。',
+			qixing_info:'游戏开始时，你将牌堆顶的七张牌置于你的武将牌上，称之为“星”。然后/摸牌阶段结束后，你可用任意数量的手牌等量交换这些“星”。',
 			dawu:'大雾',
 			dawu2_bg:'雾',
 			dawu2:'大雾',

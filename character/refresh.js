@@ -41,7 +41,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		skill:{
 			reqingguo:{
 				audio:'qingguo',
-				enable:['chooseToRespond'],
+				enable:['chooseToRespond','chooseToUse'],
 				filterCard:function(card){
 					return get.color(card)=='black';
 				},
@@ -813,21 +813,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mark:true,
 				mod:{
-					cardEnabled:function (){
-						return false;
-					},
-					cardUsable:function (){
-						return false;
-					},
-					cardRespondable:function (){
-						return false;
-					},
-					cardSavable:function (){
-						return false;
+					cardEnabled2:function (card){
+						if(get.position(card)=='h') return false;
 					},
 				},
 				intro:{
-					content:"不能使用或打出卡牌",
+					content:"不能使用或打出手牌",
 				},
 			},
 			"new_repaoxiao":{

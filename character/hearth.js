@@ -6996,7 +6996,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			qiaodong:{
-				enable:['chooseToRespond'],
+				enable:['chooseToUse','chooseToRespond'],
 				filterCard:{type:'equip'},
 				filter:function(event,player){
 					return player.countCards('he',{type:'equip'})>0;

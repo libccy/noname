@@ -55,7 +55,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_zhuhuan:['male','wu',4,['youdi']],
 			old_zhuzhi:['male','wu',4,['anguo']],
 			
-			old_machao:['male','qun',4,['zhuiji','cihuai']],
+			old_machao:['male','qun',4,['zhuiji','oldcihuai']],
 			old_zhugezhan:["male","shu",3,["old_zuilun","old_fuyin"]],
 			zhangliang:["male","qun",4,["old_jijun","old_fangtong"]],
 			old_guanzhang:['male','shu',4,['old_fuhun']],
@@ -142,7 +142,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return '将一张手牌当'+get.translation(links[0][2])+'使用';
 					},
 				},
-				ai:{save:true},
+				ai:{save:true,respondShan:true},
 			},
 			"old_guhuo_guess":{
 				audio:'guhuo_guess',
@@ -164,7 +164,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.line=false;
 					event.prompt=get.translation(player)+'声明了'+get.translation(trigger.card.name)+'，是否质疑？';
 					event.guessers=game.filterPlayer(function(current){
-						return current!=player;
+						return current!=player&&current.hp>0;
 					});
 					event.guessers.sort(lib.sort.seat);
 					event.ally=[];
@@ -517,7 +517,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'chooseToRespondBegin'},
 				filter:function(event,player){
 					if(event.responded) return false;
-					if(!event.filterCard({name:'shan'},player,event)&&!!event.filterCard({name:'sha'},player,event)) return false;
+					if(!event.filterCard({name:'shan'},player,event)&&!event.filterCard({name:'sha'},player,event)) return false;
 					if(player.hasSkill('zhenshan2')) return false;
 					var nh=player.countCards('h');
 					return game.hasPlayer(function(current){
@@ -562,7 +562,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return event.filterCard({name:'sha'},player,event)||
 						event.filterCard({name:'jiu'},player,event)||
-						event.filterCard({name:'tao'},player,event);
+						event.filterCard({name:'tao'},player,event)||
+						event.filterCard({name:'shan'},player,event);
 				},
 				chooseButton:{
 					dialog:function(event,player){
@@ -578,6 +579,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(event.filterCard({name:'jiu'},player,event)){
 							list.push(['基本','','jiu']);
 						}
+						if(event.filterCard({name:'shan'},player,event)){
+							list.push(['基本','','shan']);
+						}
 						return ui.create.dialog('振赡',[list,'vcard'],'hidden');
 					},
 					check:function(button){
@@ -592,7 +596,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								else if(card.nature=='fire') return 2.92;
 								else return 2.9;
 							}
-							else if(card.name=='tao'){
+							else if(card.name=='tao'||card.name=='shan'){
 								return 4;
 							}
 						}
@@ -639,7 +643,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							else{
-								if(event.filterCard({name:'tao'},player,event)){
+								if(event.filterCard({name:'tao'},player,event)||event.filterCard({name:'shan'},player,event)){
 									return 4;
 								}
 								if(event.filterCard({name:'sha'},player,event)){

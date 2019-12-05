@@ -95,7 +95,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['re_caocao'],
 				unique:true,
 				zhuSkill:true,
-				trigger:{player:'chooseToRespondBegin'},
+				trigger:{player:['chooseToRespondBegin','chooseToUse']},
 				filter:function(event,player){
 					if(event.responded) return false;
 					if(player.storage.hujiaing) return false;
@@ -457,7 +457,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.judge(function(card){
 						if(get.color(card)=='black') return 1.5;
 						return -1.5;
-					},ui.special);
+					});
 					"step 1"
 					if(result.judge>0){
 						event.cards.push(result.card);
@@ -470,13 +470,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						for(var i=0;i<event.cards.length;i++){
-							if(get.position(event.cards[i])!='s'){
+							if(get.position(event.cards[i])!='d'){
 								event.cards.splice(i,1);i--;
 							}
 						}
-						player.gain(event.cards);
 						if(event.cards.length){
-							player.$draw(event.cards);
+							player.gain(event.cards,'gain2');
 						}
 						event.finish();
 					}
@@ -485,9 +484,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.goto(0);
 					}
 					else{
-						player.gain(event.cards);
 						if(event.cards.length){
-							player.$draw(event.cards);
+							player.gain(event.cards,'gain2');
 						}
 					}
 				}
@@ -555,7 +553,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			qingguo:{
 				audio:2,
-				enable:['chooseToRespond'],
+				enable:['chooseToRespond','chooseToUse'],
 				filterCard:function(card){
 					return get.color(card)=='black';
 				},
@@ -563,7 +561,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				viewAsFilter:function(player){
 					if(!player.countCards('h',{color:'black'})) return false;
 				},
-				prompt:'将一张黑色手牌当闪打出',
+				prompt:'将一张黑色手牌当闪使用或打出',
 				check:function(){return 1},
 				ai:{
 					respondShan:true,
@@ -1378,10 +1376,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					shan:{
 						audio:'longdan_sha',
 						audioname:['re_zhaoyun'],
-						enable:['chooseToRespond'],
+						enable:['chooseToRespond','chooseToUse'],
 						filterCard:{name:'sha'},
 						viewAs:{name:'shan'},
-						prompt:'将一张杀当闪打出',
+						prompt:'将一张杀当闪使用或打出',
 						check:function(){return 1},
 						viewAsFilter:function(player){
 							if(!player.countCards('h','sha')) return false;

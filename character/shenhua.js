@@ -200,7 +200,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(num>player.countCards('h')) num=player.countCards('h');
 					player.chooseCard('h',[1,num],'请选择需要替换“荣”的手牌').set('ai',function(card){
 						return 5-get.value(card);
-					}).set('promptx',[player.storage.drlt_zhengrong]);
+					});
 					'step 1'
 					if(result.bool){
 						event.cards=result.cards;
@@ -763,16 +763,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			'drlt_xiongluan2':{
 				mod:{
-					cardEnabled:function(card,player){
-						if(get.position(card)=='h') return false;
-					},
-					cardUsable:function(card,player){
-						if(get.position(card)=='h')	return false;
-					},
-					cardRespondable:function(card,player){
-						if(get.position(card)=='h') return false;
-					},
-					cardSavable:function(card,player){
+					cardEnabled2:function(card,player){
 						if(get.position(card)=='h') return false;
 					},
 				},
@@ -1486,7 +1477,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						player.storage.nzry_chenglve1=result.cards;
-						player.syncStorage('nzry_chenglve1');
 						player.addTempSkill('nzry_chenglve1',{player:'phaseAfter'});
 					};
 				},
@@ -1543,21 +1533,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:2,
 						prompt2:"当你使用牌指定目标时，若此牌与你本回合使用的牌类型均不同（包括装备牌），则你可以将此牌置于牌堆顶，然后摸一张牌",
 						trigger:{
-							player:['useCardAfter','respondAfter'],
-							target:'useCardToTargeted',
+							player:['useCard','useCardAfter'],				
 						},
 						filter:function (event,player,name){
-							if(name=='useCardToTargeted'&&(event.player!=player||get.type(event.card)!='equip')) return false;
+							if(name=='useCard'&&!['equip','delay'].contains(get.type(event.card))) return false;
 							if(name=='useCardAfter'&&['equip','delay'].contains(get.type(event.card))) return false;
-							return ((event.name=='respond'&&event.card.name=='shan'&&event.parent.parent.name=='sha')||event.name=='useCardToTargeted'||event.name=='useCard')&&event.cards.length>0&&player.storage.nzry_shicai!=undefined&&!player.storage.nzry_shicai.contains(get.type(event.card,'trick'));
+							return event.cards.filterInD().length>0&&player.storage.nzry_shicai!=undefined&&!player.storage.nzry_shicai.contains(get.type(event.card,'trick'));
 						},
 						check:function (event,player){
 							if(get.type(event.card)=='equip'){
 								return get.equipResult(player,player,event.card.name)<=0;
 							}
-							return true;
+							return event.card.name!='lebu'&&event.card.name!='bingliang';
 						},
 						content:function(){
+							"step 0"
 							player.storage.nzry_shicai.push(get.type(trigger.card,'trick'));
 							for(var i=0;i<trigger.cards.length;i++){
 								if(get.position(trigger.cards[i])=='d'){
@@ -1568,8 +1558,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							};
 							game.updateRoundNumber();
 							player.draw();
-							if(event.triggername=='useCardToTargeted'){
-								trigger.getParent().excluded.push(player);
+							"step 1"
+							if(event.triggername=='useCard'&&['equip','delay'].contains(get.type(trigger.card))){
+								trigger.cancel();
+								game.broadcastAll(ui.clear);
 							}
 						},	
 					},
@@ -1834,7 +1826,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'2':{
 						audio:2,
 						trigger:{
-							player:'damageEnd',
+							player:'damageAfter',
 						},
 						filter:function (event,player){
 							return player.countCards('he')>0&&event.source&&event.source!=player&&player.storage.nzry_shenshi==true;
@@ -5353,7 +5345,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			releiji:{
 				audio:2,
 				audioname:['boss_qinglong'],
-				trigger:{player:'respond'},
+				trigger:{player:['useCard','respond']},
 				filter:function(event,player){
 					return event.card.name=='shan';
 				},
@@ -6163,7 +6155,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			leiji:{
 				audio:2,
-				trigger:{player:'respond'},
+				trigger:{player:['useCard','respond']},
 				filter:function(event,player){
 					return event.card.name=='shan';
 				},
