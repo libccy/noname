@@ -1082,13 +1082,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			sgqingguo:{
 				audio:'qingguo',
-				enable:['chooseToRespond'],
+				enable:['chooseToRespond','chooseToUse'],
 				filterCard:true,
 				viewAs:{name:'shan'},
 				viewAsFilter:function(player){
 					if(!player.countCards('e')) return false;
 				},
-				prompt:'将一张装备区中的牌当闪打出',
+				prompt:'将一张装备区中的牌当闪使用或打出',
 				position:'e',
 				check:function(){return 1},
 				ai:{

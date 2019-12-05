@@ -2613,44 +2613,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				global:'boss_shedu',
 				mod:{
-					cardEnabled:function (card,player){
-						if(_status.event.skill!='boss_duqu_sha'&&get.owner(card)!=undefined&&card.name=='tao') return false;
-					},
-					cardUsable:function (card,player){
-						if(_status.event.skill!='boss_duqu_sha'&&get.owner(card)!=undefined&&card.name=='tao') return false;
-					},
-					cardRespondable:function (card,player){
-						if(_status.event.skill!='boss_duqu_sha'&&get.owner(card)!=undefined&&card.name=='tao') return false;
-					},
-					cardSavable:function (card,player){
-						if(_status.event.skill!='boss_duqu_sha'&&get.owner(card)!=undefined&&card.name=='tao') return false;
-					},
-				},
-				group:["boss_duqu_sha"],
-				subSkill:{
-					sha:{
-						enable:["chooseToUse","chooseToRespond"],
-						filterCard:{
-							name:"tao",
-						},
-						viewAs:{
-							name:"sha",
-						},
-						viewAsFilter:function (player){
-							if(!player.countCards('h','tao')) return false;
-						},
-						prompt:"将一张桃当杀使用或打出",
-						check:function (){return 1},
-						ai:{
-							respondSha:true,
-							skillTagFilter:function (player){
-								if(!player.countCards('h','tao')) return false;
-							},
-							order:function (){
-								return get.order({name:'sha'})-0.1;
-							},
-						},
-						sub:true,
+					cardname:function (card,player){
+						if(card.name=='tao') return 'sha';
 					},
 				},
 			},
@@ -5875,7 +5839,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			yunshen:{
-				trigger:{player:'respond'},
+				trigger:{player:['respond','useCard']},
 				filter:function(event,player){
 					return event.card.name=='shan';
 				},
@@ -5928,7 +5892,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			lingbo:{
 				audio:2,
-				trigger:{player:'respond'},
+				trigger:{player:['respond','useCard']},
 				filter:function(event,player){
 					return event.card.name=='shan';
 				},
@@ -6831,7 +6795,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			boss_leiji:{
 				audio:2,
-				trigger:{player:'respond'},
+				trigger:{player:['respond','useCard']},
 				filter:function(event,player){
 					return event.card.name=='shan';
 				},
