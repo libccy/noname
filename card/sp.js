@@ -449,7 +449,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				viewAsFilter:function(player){
 					if(!player.countCards('h')) return false;
 				},
-				prompt:'将一张手牌当闪打出',
+				prompt:'将一张手牌当闪使用或打出',
 				check:function(card){
 					return 6-get.value(card);
 				},
