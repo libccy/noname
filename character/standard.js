@@ -95,12 +95,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['re_caocao'],
 				unique:true,
 				zhuSkill:true,
-				trigger:{player:['chooseToRespondBegin','chooseToUse']},
+				trigger:{player:['chooseToRespondBegin','chooseToUseBefore']},
 				filter:function(event,player){
 					if(event.responded) return false;
 					if(player.storage.hujiaing) return false;
 					if(!player.hasZhuSkill('hujia')) return false;
-					if(event.filterCard({name:'shan'})==false) return false;
+					if(!event.filterCard({name:'shan'},player,event)) return false;
 					return game.hasPlayer(function(current){
 						return current!=player&&current.group=='wei';
 					});

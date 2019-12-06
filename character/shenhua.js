@@ -564,6 +564,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"drlt_huairou":{
 				audio:2,
 				enable:"phaseUse",
+				position:'he',
 				filter:function (event,player){
 					return player.countCards('he',{type:'equip'})>0;
 				},

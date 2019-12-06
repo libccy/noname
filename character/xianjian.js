@@ -2363,7 +2363,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['chooseToRespondBegin','chooseToUseBegin']},
 				filter:function(event,player){
 					if(event.responded) return false;
-					if(!event.filterCard({name:'shan'})) return false;
+					if(!event.filterCard({name:'shan'},player,event)) return false;
 					return player.countCards('h','shan')>0;
 				},
 				direct:true,

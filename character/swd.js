@@ -1361,7 +1361,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filter:function(event,player){
 							if(!player.isLinked()) return false;
 							if(event.responded) return false;
-							if(!event.filterCard({name:'shan'})) return false;
+							if(!event.filterCard({name:'shan'},player,event)) return false;
 							return true;
 						},
 						check:function(event,player){
