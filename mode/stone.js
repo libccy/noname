@@ -9108,57 +9108,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			stonesha:{
 				unique:true,
-				enable:['chooseToUse','chooseToRespond'],
-				filterCard:{type:'equip'},
-				viewAs:{name:'sha'},
-				nopop:true,
-				check:function(){return 1},
-				filter:function(event,player){
-					return player.countCards('h',{type:'equip'})>0;
-				},
-				viewAsFilter:function(player){
-					return player.countCards('h',{type:'equip'})>0;
-				},
-				ai:{
-					skillTagFilter:function(player){
-						return player.countCards('h',{type:'equip'})>0;
+				mod:{
+					cardname:function(card){
+						if(lib.card[card.name].type=='equip') return 'sha';
 					},
-					respondSha:true,
-					order:4,
-					useful:-1,
-					value:-1
-				}
+				},
 			},
 			stoneshan:{
 				unique:true,
-				enable:['chooseToRespond'],
-				viewAs:{name:'shan'},
-				filterCard:{type:['stonecharacter','stonecard']},
 				mod:{
-					cardEnabled:function(card){
-						if(get.type(card)=='stonecard') return false;
-					},
-					cardSavable:function(card){
-						if(get.type(card)=='stonecard') return false;
+					cardname:function(card){
+						if(lib.card[card.name].type.indexOf('stone')==0) return 'shan';
 					},
 				},
-				nopop:true,
-				check:function(){return 1},
-				filter:function(event,player){
-					return player.countCards('h',{type:['stonecharacter','stonecard']})>0;
-				},
-				viewAsFilter:function(player){
-					return player.countCards('h',{type:['stonecharacter','stonecard']})>0;
-				},
-				ai:{
-					skillTagFilter:function(player){
-						return player.countCards('h',{type:['stonecharacter','stonecard']})>0;
-					},
-					respondShan:true,
-					order:4,
-					useful:-1,
-					value:-1
-				}
 			},
 			stonedraw:{
 				trigger:{player:'phaseDrawBegin'},
