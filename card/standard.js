@@ -242,7 +242,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						value:[7,2],
 					},
 					result:{player:1},
-					expose:0.2
+					//expose:0.2
 				}
 			},
 			tao:{
@@ -1807,7 +1807,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['chooseToRespondBegin','chooseToUseBegin']},
 				filter:function(event,player){
 					if(event.responded) return false;
-					if(!event.filterCard({name:'shan'})) return false;
+					if(!event.filterCard({name:'shan'},player,event)) return false;
 					if(event.name=='chooseToRespond'&&!lib.filter.cardRespondable({name:'shan'},player,event)) return false;
 					if(player.hasSkillTag('unequip2')) return false;
 					var evt=event.getParent();
@@ -1820,7 +1820,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				audio:true,
 				check:function(event,player){
-					if(get.damageEffect(player,event.player,player)>=0) return false;
+					var source=event.getParent().player;
+					if(get.damageEffect(player,source,player)>0) return false;
 					return true;
 				},
 				content:function(){
