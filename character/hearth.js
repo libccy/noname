@@ -7720,6 +7720,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					respondShan:true,
 					effect:{
 						target:function(card){
 							if(get.tag(card,'respondShan')) return 0.4;

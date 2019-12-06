@@ -1377,6 +1377,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger.result={bool:true,card:{name:'shan'}}
 						},
 						ai:{
+							respondShan:true,
 							target:function(card,player,target,current){
 								if(!player.isLinked()&&current<0) return 1.5;
 								if(!target.hasFriend()) return;
@@ -2361,7 +2362,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(num==0) return false;
 					return num%2==1;
 				},
-				prompt:'将一张手牌当作杀打出',
+				prompt:'将一张手牌当作杀使用或打出',
 				check:function(card){return 6-get.value(card)}
 			},
 			yaotong2:{

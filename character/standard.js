@@ -95,7 +95,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['re_caocao'],
 				unique:true,
 				zhuSkill:true,
-				trigger:{player:['chooseToRespondBegin','chooseToUseBefore']},
+				trigger:{player:['chooseToRespondBefore','chooseToUseBefore']},
 				filter:function(event,player){
 					if(event.responded) return false;
 					if(player.storage.hujiaing) return false;
@@ -134,7 +134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.hujiaing=false;
 					if(result.bool){
 						event.finish();
-						trigger.result=result;
+						trigger.result={bool:true,card:{name:'shan'}};
 						trigger.responded=true;
 						trigger.animate=false;
 						if(typeof event.current.ai.shown=='number'&&event.current.ai.shown<0.95){
@@ -146,6 +146,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.current=event.current.next;
 						event.goto(0);
 					}
+				},
+				ai:{
+					respondShan:true,
+					skillTagFilter:function(player){
+						if(player.storage.hujiaing) return false;
+						if(!player.hasZhuSkill('hujia')) return false;
+						return game.hasPlayer(function(current){
+							return current!=player&&current.group=='wei';
+						});
+					},
 				},
 			},
 			jianxiong:{
@@ -787,8 +797,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						event.finish();
-						if(result.cards&&result.cards.length==1&&result.cards[0].name=='sha'){
-							player.useCard(result.cards[0],target).animate=false;
+						if(result.cards&&result.cards.length){
+							player.useCard({name:'sha'},result.cards,target).animate=false;
 						}
 						else{
 							player.useCard({name:'sha'},target).animate=false;
@@ -804,6 +814,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					respondSha:true,
+					skillTagFilter:function(player){
+						if(!player.hasZhuSkill('jijiang')) return false;
+						return game.hasPlayer(function(current){
+							return current!=player&&current.group=='shu';
+						});
+					},
 					result:{
 						target:function(player,target){
 							if(player.hasSkill('jijiang3')) return 0;
@@ -2503,7 +2520,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinguanxing_info:'准备阶段，你可以观看牌堆顶的x张牌，并将其以任意顺序置于牌堆项或牌堆底，x为存活角色个数且不超过5',
 			xinguanxing_info_alter:'准备阶段，你可以观看牌堆顶的5张牌（存活角色小于4时改为3张），并将其以任意顺序置于牌堆项或牌堆底，如果你把观星的牌都放在牌堆底，你可以在结束阶段再进行1次观星',
 			kongcheng_info:'锁定技，当你没有手牌时，你不能成为【杀】或【决斗】的目标。',
-			longdan_info:'你可以将【杀】当做【闪】，或将【闪】当做【闪】使用或打出',
+			longdan_info:'你可以将【杀】当做【闪】，或将【闪】当做【杀】使用或打出',
 			mashu_info:'锁定技，你计算与其他角色的距离时-1。',
 			mashu2_info:'锁定技，你计算与其他角色的距离时-1。',
 			feiying_info:'锁定技，其他角色计算与你的距离时+1',

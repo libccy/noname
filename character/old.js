@@ -142,7 +142,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return '将一张手牌当'+get.translation(links[0][2])+'使用';
 					},
 				},
-				ai:{save:true,respondShan:true},
+				ai:{save:true,respondShan:true,respondSha:true},
 			},
 			"old_guhuo_guess":{
 				audio:'guhuo_guess',
@@ -655,6 +655,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					save:true,
 					respondSha:true,
+					respondShan:true,
 					skillTagFilter:function(player,tag,arg){
 						if(player.hasSkill('zhenshan2')) return false;
 						var nh=player.countCards('h');

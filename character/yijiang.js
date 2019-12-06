@@ -5692,7 +5692,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(!_status.currentPhase) return false;
 					if(event.responded) return false;
-					if(!event.filterCard({name:'shan'})) return false;
+					if(!event.filterCard({name:'shan'},player,event)) return false;
 					if(event.name!='chooseToUse'&&!lib.filter.cardRespondable({name:'shan'},player,event)) return false;
 					return true;
 				},
@@ -5749,6 +5749,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					respondShan:true,
 					effect:{
 						target:function(card,player,target,current){
 							if(get.tag(card,'respondShan')&&current<0){
@@ -6458,6 +6459,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					respondSha:true,
 					result:{
 						target:function(player,target){
 							if(player.hasSkill('jijiang3')) return 0;
@@ -6625,6 +6627,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					save:true,
 					respondSha:true,
+					respondShan:true,
 					skillTagFilter:function(player,tag,arg){
 						if(player.hasCard(function(card){
 							return get.color(card)=='black'&&get.type(card)!='basic';
@@ -6633,6 +6636,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(tag=='respondSha'){
 								if(arg!='use') return false;
 								if(player.storage.huomo.sha) return false;
+							}
+							else if(tag=='respondShan'){
+								if(player.storage.huomo.shan) return false;
 							}
 							else{
 								if(player.storage.huomo.tao&&player.storage.huomo.jiu) return false;

@@ -11923,6 +11923,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:11,
 					respondShan:true,
+					respondSha:true,
 					save:true,
 					result:{
 						player:function(player){

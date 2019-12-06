@@ -2388,6 +2388,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					respondShan:true,
 					effect:{
 						target:function(card,player,target,effect){
 							if(get.tag(card,'respondShan')&&effect<0){
@@ -3716,7 +3717,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var max=Math.min(ui.cardPile.childNodes.length,lib.skill.longxi.max);
 					for(var i=0;i<max;i++){
 						var card=ui.cardPile.childNodes[i];
-						if(trigger.filterCard(card,player)){
+						if(trigger.filterCard(card,player,trigger)){
 							cards.push(card);
 						}
 					}
@@ -3727,6 +3728,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					respondSha:true,
+					respondShan:true,
 					effect:{
 						target:function(card,player,target,effect){
 							if(get.tag(card,'respondShan')) return 0.7;
