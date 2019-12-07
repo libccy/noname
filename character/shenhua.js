@@ -439,6 +439,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			"drlt_qianjie":{
 				group:["drlt_qianjie_1","drlt_qianjie_2","drlt_qianjie_3"],
+				locked:true,
 				subSkill:{
 					'1':{
 						audio:2,
@@ -6077,6 +6078,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			buqu:{
 				audio:2,
+				audioname:['key_yuri'],
 				trigger:{player:'chooseToUseBefore'},
 				forced:true,
 				filter:function(event,player){return event.type=='dying'&&player.isDying()&&event.dying==player},

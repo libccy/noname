@@ -260,6 +260,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				if(enhance_zhu){
 					var skill;
 					switch(game.zhu.name){
+						case 'key_yuri':skill='buqu';break;
 						case 'liubei':skill='jizhen';break;
 						case 'dongzhuo':skill='hengzheng';break;
 						case 'sunquan':skill='batu';break;
@@ -622,7 +623,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						    list.remove('shen');
 						    if(list.length) player.group=function(){
 						     if(_status.mode!='zhong'&&game.zhu&&game.zhu.group){
-						      if(['liubei','re_liubei','caocao','re_caocao','sunquan','re_sunquan','zhangjiao','sp_zhangjiao','caopi','re_caopi','liuchen','caorui','sunliang','sunxiu'].contains(game.zhu.name)) return game.zhu.group;
+						      if(['re_zhangjiao','liubei','re_liubei','caocao','re_caocao','sunquan','re_sunquan','zhangjiao','sp_zhangjiao','caopi','re_caopi','liuchen','caorui','sunliang','sunxiu'].contains(game.zhu.name)) return game.zhu.group;
 						      if(game.zhu.name=='sunhao'&&player.identity=='zhong') return 'wu';
 						      if(game.zhu.name=='yl_yuanshu'){
 						       if(player.identity=='zhong') list.remove('qun');

@@ -78,7 +78,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(typeof event.baseDamage!='number') event.baseDamage=1;
 					if(typeof event.extraDamage!='number') event.extraDamage=0;
 					"step 1"
-					if(event.directHit||(!target.hasShan()&&!_status.connectMode)){
+					if(event.directHit||(!_status.connectMode&&lib.config.skip_shan&&!target.hasShan())){
 						event._result={bool:false};
 					}
 					else if(event.skipShan){
@@ -1820,8 +1820,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				audio:true,
 				check:function(event,player){
-					var source=event.getParent().player;
-					if(get.damageEffect(player,source,player)>0) return false;
+					if(event&&(event.ai||event.ai1)){
+						var ai=event.ai||event.ai1;
+						var tmp=_status.event;
+						_status.event=event;
+						var result=ai({name:'shan'},_status.event.player,event);
+						_status.event=tmp;
+						return result>0;
+					}
 					return true;
 				},
 				content:function(){

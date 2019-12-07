@@ -33,12 +33,153 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhenji:['female','wei',3,['reluoshen','reqingguo']],
 			re_zhugeliang:['male','shu',3,['reguanxing','kongcheng']],
 			re_huaxiong:["male","qun",6,["new_reyaowu"]],
+			
+			re_zhangjiao:['male','qun',3,['xinleiji','xinguidao','huangtian'],['zhu']],
 		},
 		characterIntro:{
 			re_gongsunzan:'群雄之一。出身贵族，因母地位卑贱，只当了郡中小吏。他貌美，声音洪亮，机智善辩。后随卢植于缑氏山中读书，粗通经传。',
 			re_lidian:'字曼成，曹操麾下将领。李典深明大义，不与人争功，崇尚学习与高贵儒雅，尊重博学之士，在军中被称为长者。李典有长者之风，官至破虏将军，三十六岁去世。魏文帝曹丕继位后追谥号为愍侯。',
 		},
 		skill:{
+			xinleiji:{
+				group:'xinleiji_misa',
+				audio:'releiji',
+				audioname:['boss_qinglong'],
+				trigger:{player:['useCard','respond']},
+				filter:function(event,player){
+					return event.card.name=='shan'||event.card.name=='shandian';
+				},
+				judgeCheck:function(card,bool){
+					var suit=get.suit(card);
+					if(suit=='spade'){
+						if(bool&&card.number>1&&card.number<10) return 5;
+						return 4;
+					}
+					if(suit=='club') return 2;
+					return 0;
+				},
+				content:function(){
+					player.judge(lib.skill.xinleiji.judgeCheck);
+				},
+				ai:{
+					useShan:true,
+					effect:{
+						target:function(card,player,target,current){
+							if(get.tag(card,'respondShan')){
+								var hastarget=game.hasPlayer(function(current){
+									return get.attitude(target,current)<0;
+								});
+								var be=target.countCards('e',{color:'black'});
+								if(target.countCards('h','shan')&&be){
+									if(!target.hasSkill('xinguidao')) return 0;
+									return [0,hastarget?target.countCards('he')/2:0];
+								}
+								if(target.countCards('h','shan')&&target.countCards('h')>2){
+									if(!target.hasSkill('xinguidao')) return 0;
+									return [0,hastarget?target.countCards('h')/4:0];
+								}
+								if(target.countCards('h')>3||(be&&target.countCards('h')>=2)){
+									return [0,0];
+								}
+								if(target.countCards('h')==0){
+									return [1.5,0];
+								}
+								if(target.countCards('h')==1&&!be){
+									return [1.2,0];
+								}
+								if(!target.hasSkill('xinguidao')) return [1,0.05];
+								return [1,Math.min(0.5,(target.countCards('h')+be)/4)];
+							}
+						}
+					}
+				}
+			},
+			xinleiji_misa:{
+				audio:'releiji',
+				trigger:{player:'judgeAfter'},
+				forced:true,
+				locked:false,
+				filter:function(event,player){
+					return ['spade','club'].contains(event.result.suit);
+				},
+				content:function(){
+					'step 0'
+					event.num=1+['club','spade'].indexOf(trigger.result.suit);
+					if(event.num==1) player.recover();
+					player.chooseTarget(true,'雷击：对一名角色造成'+event.num+'点雷电伤害。').ai=function(target){
+						var player=_status.event.player;
+						return get.damageEffect(target,player,player,'thunder');
+					};
+					'step 1'
+					if(result.bool&&result.targets&&result.targets.length){
+						player.line(result.targets,'thunder');
+						result.targets[0].damage(event.num,'thunder');
+					}
+				},
+			},
+			xinguidao:{
+				audio:2,
+				trigger:{global:'judge'},
+				filter:function(event,player){
+					return player.countCards('he',{color:'black'})>0;
+				},
+				direct:true,
+				content:function(){
+					"step 0"
+					player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
+					get.translation(trigger.player.judging[0])+'，'+get.prompt('xinguidao'),'he',function(card){
+						return get.color(card)=='black';
+					}).set('ai',function(card){
+						var trigger=_status.event.getTrigger();
+						var player=_status.event.player;
+						var judging=_status.event.judging;
+						var result=trigger.judge(card)-trigger.judge(judging);
+						var attitude=get.attitude(player,trigger.player);
+						if(attitude==0||result==0){
+							if(trigger.player!=player) return 0;
+							if(game.hasPlayer(function(current){
+								return get.attitude(player,current)<0;
+							})){
+								var checkx=lib.skill.xinleiji.judgeCheck(card,true)-lib.skill.xinleiji.judgeCheck(judging);
+								if(checkx>0) return checkx;
+							}
+							return 0;
+						};
+						if(attitude>0){
+							return result;
+						}
+						else{
+							return -result;
+						}
+					}).set('judging',trigger.player.judging[0]);
+					"step 1"
+					if(result.bool){
+						player.respond(result.cards,'highlight','xinguidao');
+					}
+					else{
+						event.finish();
+					}
+					"step 2"
+					if(result.bool){
+						player.$gain2(trigger.player.judging[0]);
+						player.gain(trigger.player.judging[0]);
+						var card=result.cards[0];
+						if(get.suit(card)=='spade'&&card.number>1&&card.number<10) player.draw('nodelay');
+						trigger.player.judging[0]=result.cards[0];
+						if(!get.owner(result.cards[0],'judge')){
+							trigger.position.appendChild(result.cards[0]);
+						}
+						game.log(trigger.player,'的判定牌改为',result.cards[0]);
+					}
+					"step 3"
+					game.delay(2);
+				},
+				ai:{
+					tag:{
+						rejudge:1
+					}
+				}
+			},
 			reqingguo:{
 				audio:'qingguo',
 				enable:['chooseToRespond','chooseToUse'],
@@ -3116,7 +3257,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"re_yanwen":"界颜良文丑",
 			re_pangtong:"界庞统",
 			xin_yuanshao:"界袁绍",
+			re_zhangjiao:'界张角',
 			
+			xinleiji:'雷击',
+			xinguidao:'鬼道',
+			xinleiji_info:'当你使用或打出【闪】或【闪电】时，你可以进行判定。当你的判定牌生效后，若结果为：黑桃，你对一名角色造成2点雷电伤害；梅花：你回复1点体力并对一名其他角色造成1点雷电伤害。',
+			xinguidao_info:'一名角色的判定牌生效前，你可以打出一张黑色牌作为判定牌并获得原判定牌。若你以此法打出的牌为黑桃2-9，则你摸一张牌。',
 			reqiangxi:"强袭",
 			"reqiangxi_info":"出牌阶段对每名其他角色限一次，你可以选择一项：1. 失去一点体力并对你攻击范围内的一名其他角色造成一点伤害；2. 弃置一张武器牌并对你攻击范围内的一名其他角色造成一点伤害。",
 			rehuoji:"火计",

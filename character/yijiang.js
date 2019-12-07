@@ -5095,7 +5095,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				audio:2,
 				filter:function(event,player){
-					return player.countCards('h','sha')>0&&!player.storage.chunlao.length;
+					return player.countCards('h')>0&&(_status.connectMode||player.countCards('h','sha')>0)&&!player.storage.chunlao.length;
 				},
 				init:function(player){
 					player.storage.chunlao=[];
@@ -5105,7 +5105,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseCard([1,player.countCards('h','sha')],get.prompt('chunlao'),{name:'sha'}).set('ai',function(){
+					player.chooseCard([1,Math.max(1,player.countCards('h','sha'))],get.prompt('chunlao'),{name:'sha'}).set('ai',function(){
 						return 1;
 					});
 					'step 1'

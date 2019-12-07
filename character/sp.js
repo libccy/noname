@@ -5,11 +5,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			sp:{
-				sp_default:["caoying","simahui","baosanniang","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","liuxie","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","fuwan","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","lingju","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","guansuo","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","wenyang","guanlu","gexuan","xinpi"],
+				sp_default:["caoying","simahui","baosanniang","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","liuxie","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","fuwan","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","lingju","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","guansuo","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","wenyang","guanlu","gexuan"],
 				sp_whlw:["xurong","lijue","zhangji","fanchou","guosi"],
 				sp_zlzy:["zhangqiying","lvkai","zhanggong","weiwenzhugezhi","beimihu"],
 				sp_longzhou:["xf_tangzi","xf_huangquan","xf_sufei","sp_liuqi"],
 				sp_zizouqi:["mangyachang","xugong","zhangchangpu"],
+				sp_sbfm:["lisu","xinpi"],
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_star:["sp_xiahoushi","jsp_zhaoyun","huangjinleishi","sp_pangtong","sp_daqiao","sp_ganning","sp_xiahoudun","sp_lvmeng","sp_zhangfei","sp_liubei"],
 				sp_guozhan:["shamoke","ganfuren","yuejin","hetaihou","dingfeng","panfeng","jianggan"],
@@ -20,6 +21,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		character:{
 			xinpi:['male','wei',3,['xpchijie','yinju'],['unseen']],
+			lisu:['male','qun',2,['lslixun','lskuizhu']],
+			
 			hejin:['male','qun',4,['mouzhu','yanhuo']],
 			hansui:['male','qun',4,['mashu','niluan']],
 			niujin:['male','wei',4,['cuorui','liewei']],
@@ -574,7 +577,110 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
-			//辛毗
+			//上兵伐谋
+			//伊籍在标包 不会移动
+			lslixun:{
+				audio:2,
+				forced:true,
+				trigger:{player:'damageBegin4'},
+				init:function(player,skill){
+					if(!player.storage[skill]) player.storage[skill]=0;
+				},
+				marktext:'珠',
+				intro:{
+					content:'共有#个“珠”',
+				},
+				content:function(){
+					trigger.cancel();
+					player.storage.lslixun+=trigger.num;
+					player.markSkill('lslixun');
+				},
+				group:'lslixun_fate',
+			},
+			lslixun_fate:{
+				audio:'lslixun',
+				trigger:{player:'phaseUseBegin'},
+				forced:true,
+				filter:function(event,player){
+					return player.storage.lslixun&&player.storage.lslixun>0;
+				},
+				content:function(){
+					'step 0'
+					event.forceDie=true;
+					_status.lslixun=player.storage.lslixun;
+					player.judge(function(card){
+						if(get.number(card)<_status.lslixun) return -_status.lslixun;
+						return 1;
+					});
+					'step 1'
+					delete _status.lslixun;
+					if(!result.bool){
+						player.chooseToDiscard(true,'h',player.storage.lslixun).ai=lib.skill.qiangxi.check;
+					}
+					else event.finish();
+					'step 2'
+					var num=player.storage.lslixun;
+					if(result.cards&&result.cards.length) num-=result.cards.length;
+					if(num) player.loseHp(num);
+				},
+			},
+			lskuizhu:{
+				audio:2,
+				trigger:{player:'phaseUseEnd'},
+				direct:true,
+				filter:function(event,player){
+					return player.isMaxHp(true)==false;
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('lskuizhu'),function(card,player,target){
+						return target!=player&&target.isMaxHp();
+					}).ai=function(){return -1};
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('lskuizhu',target);
+						player.drawTo(Math.min(5,target.countCards('h')));
+					}
+					else event.finish();
+					'step 2'
+					if(!player.countCards('h')){
+						event.finish();
+						return;
+					}
+					target.viewHandcards(player);
+					'step 3'
+					if(!target.countCards('h')){
+						event.finish();
+						return;
+					}
+					target.chooseToDiscard(true,'h',[1,player.countCards('h')],'弃置至多'+get.cnNumber(player.countCards('h'))+'张手牌，并获得'+get.translation(player)+'等量的手牌').ai=lib.skill.zhiheng.check;
+					'step 4'
+					if(result.bool&&result.cards&&result.cards.length&&player.countGainableCards(target,'h')>0){
+						target.gainPlayerCard(player,'h',true,result.cards.length)
+					}
+					'step 5'
+					if(result.bool&&result.cards&&result.cards.length>1){
+						var bool=player.storage.lslixun>0!==true;
+						player.chooseTarget(bool,'令'+get.translation(target)+'对其攻击范围内的一名角色造成1点伤害'+(bool?'':'，或点「取消」移去一个“珠”'),function(card,player,target){
+							var source=_status.event.source;
+							return target!=source&&get.distance(source,target,'attack')<=1;
+						}).set('source',target).set('ai',function(target){
+							return get.damageEffect(target,_status.event.source,_status.event.player);
+						});
+					}
+					else event.finish();
+					'step 6'
+					if(result.bool&&result.targets&&result.targets.length){
+						result.targets[0].damage(target);
+					}
+					else{
+						player.storage.lslixun--;
+						player[player.storage.lslixun?'markSkill':'unmarkSkill']('lslixun');
+					}
+				},
+			},
 			xpchijie:{
 				audio:2,
 				trigger:{
@@ -2863,6 +2969,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						prompt:'视为使用一张闪',
 						ai:{
 							order:function(){
+								var player=_status.event.player;
 								if(player.hasSkill('qingzhong_give')) return 2.95;
 								return 3.15;
 							},
@@ -7356,6 +7463,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				ai:{
+					respondShan:true,
 					effect:{
 						target:function(card,player,target){
 							if(player==target&&get.subtype(card)=='equip2'){
@@ -13021,6 +13129,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hansui:'韩遂',
 			niujin:'牛金',
 			xinpi:'辛毗',
+			lisu:'李肃',
+			lslixun:'利熏',
+			lslixun_fate:'利熏',
+			lslixun_info:'锁定技，当你受到伤害时，你防止此伤害，然后获得等同于伤害值的“珠”标记。出牌阶段开始时，你进行一次判定，若结果点数小于“珠”的数量，你弃置等同于“珠”数量的手牌（若弃牌的牌数不够，则失去剩余数量的体力值）。',
+			lskuizhu:'馈珠',
+			lskuizhu_info:'出牌阶段结束时，你可以选择体力值全场最多的一名其他角色，将手牌摸至与该角色相同（最多摸至五张），然后该角色观看你的手牌，弃置任意张手牌并从观看的牌中获得等量的牌。若其获得的牌大于一张，则你选择一项：移去一个“珠”；或令其对其攻击范围内的一名角色造成1点伤害。',
 			
 			xpchijie:'持节',
 			xpchijie_info:'每回合限一次，当你成为其他角色使用牌的目标后，你可以获得如下效果：当此牌对其他角色造成伤害时，若此牌已对你造成过伤害，则你获得此牌；当此牌使用结算完成时，你可以获得此牌对应的所有实体牌。',
@@ -13643,6 +13757,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_zlzy:"逐鹿中原",
 			sp_longzhou:"同舟共济",
 			sp_zizouqi:"自走棋",
+			sp_sbfm:'上兵伐谋',
 			sp_zhongdan:"忠胆英杰",
 			sp_star:"☆SP系列",
 			sp_guozhan:"国战",

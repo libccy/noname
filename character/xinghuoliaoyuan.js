@@ -3509,7 +3509,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					"step 2"
-					if(get.color(result.links[0])!='black') player.draw();
+					if(get.color(result.links[0])!='black') player.draw('nodelay');
 					if(result.links[0].name!='sha'&&event.target.countCards('he')){
 						player.gainPlayerCard('he',event.target,true);
 					}
