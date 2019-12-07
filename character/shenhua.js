@@ -1218,8 +1218,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					};
 					'step 2'
-					player.line(event.target,'green');
-					player.logSkill('nzry_huaiju');
+					//player.line(event.target,'green');
+					player.logSkill('nzry_yili',target);
 					if(result.index==1){
 						player.storage.nzry_huaiju--;
 						player.syncStorage('nzry_huaiju');
