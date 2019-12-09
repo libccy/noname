@@ -837,7 +837,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xintaoluan:{
 				enable:'chooseToUse',
 				filter:function(event,player){
-					return event.type!='wuxie'&&!player.hasSkill('xintaoluan3')&&player.countCards('he')>0&&!_status.dying.length;
+					return event.type!='wuxie'&&event.type!='respondShan'&&!player.hasSkill('xintaoluan3')&&player.countCards('he')>0&&!_status.dying.length;
 				},
 				init:function(player){
 					if(!player.storage.xintaoluan) player.storage.xintaoluan=[];
@@ -862,7 +862,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return ui.create.dialog('滔乱',[list,'vcard']);
 					},
 					filter:function(button,player){
-						return lib.filter.filterCard({name:button.link[2]},player,_status.event.getParent());
+						return _status.event.getParent().filterCard({name:button.link[2]},player,_status.event.getParent());
 					},
 					check:function(button){
 						var player=_status.event.player;
@@ -3509,7 +3509,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'chooseToUse',
 				filter:function(event,player){
-					return event.type!='wuxie'&&!player.hasSkill('taoluan3')&&player.countCards('he')>0&&!_status.dying.length;
+					return event.type!='wuxie'&&event.type!='respondShan'&&!player.hasSkill('taoluan3')&&player.countCards('he')>0&&!_status.dying.length;
 				},
 				init:function(player){
 					if(!player.storage.taoluan) player.storage.taoluan=[];
@@ -3534,7 +3534,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return ui.create.dialog('滔乱',[list,'vcard']);
 					},
 					filter:function(button,player){
-						return lib.filter.filterCard({name:button.link[2]},player,_status.event.getParent());
+						return _status.event.getParent().filterCard({name:button.link[2]},player,_status.event.getParent());
 					},
 					check:function(button){
 						var player=_status.event.player;
@@ -10182,7 +10182,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.broadcastAll(function(player,id,cards){
 						var str;
 						if(player==game.me&&!_status.auto){
-							str='称象：选择任意张点数不大于13的牌';
+							str='称象：选择任意张点数不大于1'+(event.name=='chengxiang'?3:2)+'的牌';
 						}
 						else{
 							str='称象';

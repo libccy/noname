@@ -3467,7 +3467,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				setup:function(player,gain){
 					for(var i in lib.character){
-						if(lib.filter.characterDisabled2(i)) continue;
+						if(lib.filter.characterDisabled2(i)||lib.filter.characterDisabled(i)) continue;
 						var add=false;
 						for(var j=0;j<lib.character[i][3].length;j++){
 							var info=lib.skill[lib.character[i][3][j]];
@@ -4612,7 +4612,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			huoji:{
 				audio:2,
-				enable:'chooseToUse',
+				enable:'phaseUse',
 				filterCard:function(card){
 					return get.color(card)=='red';
 				},
@@ -4626,7 +4626,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.countCards('h')>player.hp){
 						return 6-get.value(card);
 					}
-					return 4-get.value(card)
+					return 3-get.value(card)
 				}
 			},
 			bazhen:{

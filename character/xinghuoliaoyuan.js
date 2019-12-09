@@ -3774,7 +3774,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				filter:function (event,player){
 					if(get.type(event.card)=='equip') return false;
-					if(event.getParent().triggeredTargets3>1) return false;
+					if(event.getParent().triggeredTargets3.length>1) return false;
 					return event.targets.length>0&&!player.countCards('h',{type:'basic',});
 				},
 				content:function (){
@@ -4004,6 +4004,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.cardsDiscard(trigger.cards);
 						game.broadcastAll(ui.clear);
 						trigger.cancel();
+						if(trigger.name=='useCard'&&trigger.parent) trigger.parent.goto(0);
 					}
 					game.delay();
 				},

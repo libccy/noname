@@ -99,7 +99,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:"chooseToUse",
 				filter:function (event,player){
 					if(!player.countCards('h')) return false;
-					var list=['sha','tao','jiu','taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman'];
+					var list=['sha','tao','shan','jiu','taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman'];
 					if(get.mode()=='guozhan'){
 						list=list.concat(['xietianzi','shuiyanqijunx','lulitongxin','lianjunshengyan','chiling','diaohulishan','yuanjiao','huoshaolianying']);
 					}
@@ -208,9 +208,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.cardsDiscard(trigger.cards);
 							trigger.cancel();
 							game.asyncDraw(event.betray);
-							game.delay();
+							if(trigger.name=='useCard'&&trigger.parent) trigger.parent.goto(0);
 						}
 					}
+					'step 4'
+					game.delay();
 				},
 			},
 			"old_guhuo_respond":{

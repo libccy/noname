@@ -41,6 +41,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_lidian:'字曼成，曹操麾下将领。李典深明大义，不与人争功，崇尚学习与高贵儒雅，尊重博学之士，在军中被称为长者。李典有长者之风，官至破虏将军，三十六岁去世。魏文帝曹丕继位后追谥号为愍侯。',
 		},
 		skill:{
+			botu:{
+				audio:2,
+				group:'botu_kanade',
+				trigger:{player:'phaseAfter'},
+				frequent:true,
+				filter:function(event,player){
+					return player.storage.botu&&player.storage.botu.length>=4;
+				},
+				content:function(){
+					player.insertPhase();
+				},
+				subSkill:{
+					kanade:{
+						trigger:{player:['useCard','phaseBefore']},
+						silent:true,
+						content:function(){
+							if(trigger.name=='phase') player.storage.botu=[];
+							else{
+								var suit=get.suit(trigger.card);
+								if(suit) player.storage.botu.add(suit);
+							}
+						},
+					},
+				},
+			},
 			xinleiji:{
 				group:'xinleiji_misa',
 				audio:'releiji',
@@ -3400,7 +3425,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qinxue_info:'觉醒技，准备阶段开始时，若你的手牌数比体力值多3（人数不少于7时改为2）或更多，你须减一点体力上限并获得技能【攻心】',
 			retuxi_info:'摸牌阶段摸牌时，你可以少摸任意张牌，然后选择等量的手牌数大于或等于你的其他角色，获得这些角色的各一张手牌。',
 			reluoyi_info:'你可以跳过摸牌阶段，然后展示牌堆顶的三张牌，获得其中的基本牌、武器牌和【决斗】，若如此做，直到你的下回合开始，你为伤害来源的【杀】或【决斗】造成的伤害+1。',
-			reganglie_info:'每当你受到1点伤害后，可进行一次判定，若结果为红色，你对伤害来源造成1点伤害，若结果为黑色，你弃置其一张牌。'
+			reganglie_info:'每当你受到1点伤害后，可进行一次判定，若结果为红色，你对伤害来源造成1点伤害，若结果为黑色，你弃置其一张牌。',
+			botu:'博图',
+			botu_info:'回合结束时，若你本回合使用的牌包含四种花色，则你可以进行一个额外回合。',
 		},
 	};
 });
