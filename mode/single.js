@@ -1148,31 +1148,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-			botu:{
-				audio:2,
-				group:'botu_kanade',
-				trigger:{player:'phaseAfter'},
-				frequent:true,
-				filter:function(event,player){
-					return player.storage.botu&&player.storage.botu.length>=4;
-				},
-				content:function(){
-					player.insertPhase();
-				},
-				subSkill:{
-					kanade:{
-						trigger:{player:['useCard','phaseBefore']},
-						silent:true,
-						content:function(){
-							if(trigger.name=='phase') player.storage.botu=[];
-							else{
-								var suit=get.suit(trigger.card);
-								if(suit) player.storage.botu.add(suit);
-							}
-						},
-					},
-				},
-			},
+			
 			_changeHandcard:{
 				trigger:{global:'gameDrawAfter'},
 				silent:true,
@@ -1256,8 +1232,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			yinli_info:'其他角色的装备牌于其回合内进入弃牌堆后，你可以获得之。',
 			shenju:'慎拒',
 			shenju_info:'锁定技，你的手牌上限+X（X为你对手的体力值）。',
-			botu:'博图',
-			botu_info:'回合结束时，若你本回合使用的牌包含四种花色，则你可以进行一个额外回合。',
 		},
 		help:{
 		'血战长坂':'<div style="margin:10px">游戏规则</div><ul style="margin-top:0"><li>选将阶段<br>双方在游戏开始时由系统随机分配身份。分配到先手身份的玩家优先出牌，分配到后手身份的玩家优先选将。<br>双方各自随机获得3名暗置武将，同时从将池中随机选出6名明置武将，由后手玩家开始，按照一次1张-2张-2张-1张的顺序，轮流选择获得明置武将。之后双方各从自己的6名武将中选择2名分别作为主将和副将进行游戏。<li>胜利条件<br>对方死亡。'+
