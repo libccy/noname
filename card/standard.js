@@ -86,6 +86,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						var next=target.chooseToUse('请使用一张闪响应杀');
+						next.set('type','respondShan');
 						next.set('filterCard',function(card,player){
 							if(get.name(card)!='shan') return false;
 							return lib.filter.cardEnabled(card,player,'forceEnable');
@@ -127,7 +128,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						//next.autochoose=lib.filter.autoRespondShan;
 					}
 					"step 2"
-					if(result.result!='shaned'){
+					if(!result||!result.result||result.result!='shaned'){
 						event.trigger('shaHit');
 					}
 					else{
@@ -1187,7 +1188,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					if(!target.hasSha()&&!_status.connectMode){
+					if(!_status.connectMode&&lib.config.skip_shan&&!target.hasSha()){
 						event.directfalse=true;
 					}
 					else{
