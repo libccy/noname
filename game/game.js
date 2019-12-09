@@ -10955,6 +10955,10 @@
 							delete event.card;
 							event.redo();
 						}
+						else if(event.card.classList.contains('feichu')){
+							event.finish();
+							return;
+						}
 						else{
 							player.lose(event.card,'visible');
 							player.$phaseJudge(event.card);
