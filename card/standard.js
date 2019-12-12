@@ -98,7 +98,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var target=_status.event.player;
 							var evt=_status.event.getParent();
 							var bool=true;
-							if(_status.event.shanRequired>1&&target.countCards('h','shan')<_status.event.shanRequired){
+							if(_status.event.shanRequired>1&&!get.is.object(card)&&target.countCards('h','shan')<_status.event.shanRequired){
 								bool=false;
 							}
 							else if(target.hasSkillTag('useShan')){
@@ -128,7 +128,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						//next.autochoose=lib.filter.autoRespondShan;
 					}
 					"step 2"
-					if(!result||!result.result||result.result!='shaned'){
+					if(!result||!result.bool||!result.result||result.result!='shaned'){
 						event.trigger('shaHit');
 					}
 					else{
@@ -142,7 +142,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					"step 3"
-					if((!result||!result.result||result.result!='shaned')&&!event.unhurt){
+					if((!result||!result.bool||!result.result||result.result!='shaned')&&!event.unhurt){
 						target.damage(get.nature(event.card),event.baseDamage+event.extraDamage);
 						event.result={bool:true}
 						event.trigger('shaDamage');
@@ -1707,6 +1707,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						trigger.untrigger();
 						trigger.trigger('shaHit');
 						trigger._result.bool=false;
+						trigger._result.result=null;
 					}
 				}
 			},
