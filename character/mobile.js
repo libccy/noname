@@ -386,7 +386,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					"step 1"
 					if(result.control!='cancel2'){
-						player.logSkill('rexingshang');
+						player.logSkill(event.name,trigger.player);
 						if(result.control=='获得牌'){
 							event.togain=trigger.player.getCards('he');
 							player.gain(event.togain,trigger.player,'giveAuto');

@@ -239,7 +239,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.card=result.cards[0];
 						event.prompt=get.translation(player)+'声明了'+get.translation(event.name)+'，是否质疑？';
 						event.guessers=game.filterPlayer(function(current){
-							return current!=player;
+							return current!=player&&current.hp>0;
 						});
 						event.guessers.sort(lib.sort.seat);
 						event.ally=[];

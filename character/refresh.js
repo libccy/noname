@@ -2,6 +2,12 @@
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'refresh',
+		characterSort:{
+			refresh:{
+    refresh_standard:["re_caocao","re_simayi","re_guojia","re_lidian","re_zhangliao","re_xuzhu","re_xiahoudun","re_zhangfei","re_zhaoyun","re_guanyu","re_machao","re_xushu","re_zhouyu","re_lvmeng","re_ganning","re_luxun","re_daqiao","re_huanggai","re_lvbu","re_gongsunzan","re_huatuo","re_liubei","re_diaochan","re_huangyueying","re_sunquan","re_sunshangxiang","re_zhenji","re_zhugeliang","re_huaxiong"],
+    refresh_ol:["re_zhangjiao","xin_yuji","re_zuoci"],
+   },
+		},
 		connect:true,
 		character:{
 			re_caocao:['male','wei',4,['hujia','new_rejianxiong'],['zhu']],
@@ -35,12 +41,587 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_huaxiong:["male","qun",6,["new_reyaowu"]],
 			
 			re_zhangjiao:['male','qun',3,['xinleiji','xinguidao','huangtian'],['zhu']],
+			xin_yuji:['male','qun',3,['reguhuo']],
+			re_zuoci:['male','qun',3,['rehuashen','rexinsheng']],
 		},
 		characterIntro:{
 			re_gongsunzan:'群雄之一。出身贵族，因母地位卑贱，只当了郡中小吏。他貌美，声音洪亮，机智善辩。后随卢植于缑氏山中读书，粗通经传。',
 			re_lidian:'字曼成，曹操麾下将领。李典深明大义，不与人争功，崇尚学习与高贵儒雅，尊重博学之士，在军中被称为长者。李典有长者之风，官至破虏将军，三十六岁去世。魏文帝曹丕继位后追谥号为愍侯。',
 		},
+		characterFilter:{
+			re_zuoci:function(mode){
+				return mode=='identity'||mode=='single';
+			}
+		},
 		skill:{
+			rehuashen:{
+				mode:['identity','single'],
+				audio:'huashen1',
+				unique:true,
+				direct:true,
+				content:function(){
+					"step 0"
+					event.videoId=lib.status.videoId++;
+					var cards=player.storage.rehuashen.character.slice(0);
+					if(player.isOnline2()){
+						player.send(function(cards,id){
+							var dialog=ui.create.dialog('是否发动【化身】？',[cards,'character']);
+							dialog.videoId=id;
+						},cards,event.videoId);
+					}
+					event.dialog=ui.create.dialog(get.prompt('rehuashen'),[cards,'character']);
+					event.dialog.videoId=event.videoId;
+					if(!event.isMine()){
+						event.dialog.style.display='none';
+					}
+					if(event.triggername=='rehuashen') event._result={control:'更换技能'};
+					else player.chooseControl('弃置化身','更换技能','cancel2');
+					"step 1"
+					event.control=result.control;
+					if(event.control=='cancel2'){
+						if(player.isOnline2()){
+							player.send('closeDialog',event.videoId);
+						}
+						event.dialog.close();
+						event.finish();return;
+					}
+					if(!event.logged){player.logSkill('rehuashen');event.logged=true}
+					var next=player.chooseButton(true).set('dialog',event.videoId);
+					if(event.control=='弃置化身'){
+						next.set('selectButton',[1,2]);
+						next.set('filterButton',function(button){
+							return button.link!=_status.event.current;
+						});
+						next.set('current',player.storage.rehuashen.current);
+					}
+					var prompt=event.control=='弃置化身'?'选择弃置至多两张化身':'选择要切换的化身';
+					var func=function(id,prompt){
+						var dialog=get.idDialog(id);
+						if(dialog){
+							dialog.content.childNodes[0].innerHTML=prompt;
+						}
+					}
+					if(player.isOnline2()){
+						player.send(func,event.videoId,prompt);
+					}
+					else if(event.isMine()){
+						func(event.videoId,prompt);
+					}
+					"step 2"
+					if(result.bool&&event.control!='弃置化身'){
+						event.card=result.links[0];
+						var func=function(card,id){
+							var dialog=get.idDialog(id);
+							if(dialog){
+								for(var i=0;i<dialog.buttons.length;i++){
+									if(dialog.buttons[i].link==card){
+										dialog.buttons[i].classList.add('selectedx');
+									}
+									else{
+										dialog.buttons[i].classList.add('unselectable');
+									}
+								}
+							}
+						}
+						if(player.isOnline2()){
+							player.send(func,event.card,event.videoId);
+						}
+						else if(event.isMine()){
+							func(event.card,event.videoId);
+						}
+						var list=player.storage.rehuashen.map[event.card].slice(0);
+						list.push('返回');
+						player.chooseControl(list);
+					}
+					else{
+						lib.skill.rehuashen.removeHuashen(player,result.links.slice(0));
+						lib.skill.rehuashen.addHuashens(player,result.links.length);
+					}
+					"step 3"
+					if(result.control=='返回'){
+						var func=function(id){
+							var dialog=get.idDialog(id);
+							if(dialog){
+								for(var i=0;i<dialog.buttons.length;i++){
+									dialog.buttons[i].classList.remove('selectedx');
+									dialog.buttons[i].classList.remove('unselectable');
+								}
+							}
+						}
+						if(player.isOnline2()){
+							player.send(func,event.videoId);
+						}
+						else if(event.isMine()){
+							func(event.videoId);
+						}
+						event._result={control:'更换化身'};
+						event.goto(1);
+						return;
+					}
+					if(player.isOnline2()){
+						player.send('closeDialog',event.videoId);
+					}
+					event.dialog.close();
+					if(event.control=='弃置化身') return;
+					if(player.storage.rehuashen.current!=event.card){
+						player.storage.rehuashen.current=event.card;
+						game.broadcastAll(function(character,player){
+							player.sex=lib.character[character][0];
+							player.group=lib.character[character][1];
+							player.node.name.dataset.nature=get.groupnature(player.group);
+						},event.card,player);
+					}
+					var link=result.control;
+					player.storage.rehuashen.current2=link;
+					if(!player.additionalSkills.rehuashen||!player.additionalSkills.rehuashen.contains(link)){
+						player.addAdditionalSkill('rehuashen',link);
+						player.flashAvatar('rehuashen',event.card);
+						game.log(player,'获得技能','#g【'+get.translation(link)+'】');
+						player.popup(link);
+						player.syncStorage('rehuashen');
+						player.updateMarks('rehuashen');
+					}
+				},
+				init:function(player,skill){
+					if(!player.storage[skill]) player.storage[skill]={
+						character:[],
+						map:{},
+					}
+				},
+				group:'rehuashen_init',
+				trigger:{
+					player:['phaseBegin','phaseEnd','rehuashen'],
+				},
+				filter:function(event,player,name){
+					if(name=='phaseBegin'&&game.phaseNumber==1) return false;
+					return player.storage.rehuashen&&player.storage.rehuashen.character.length>0;
+				},
+				addHuashen:function(player){
+					if(!player.storage.rehuashen) return;
+					_status.characterlist.randomSort();
+					var bool=false;
+					for(var i=0;i<_status.characterlist.length;i++){
+						var name=_status.characterlist[i];
+						if(name.indexOf('zuoci')!=-1||name.indexOf('key')==0) continue;
+						var skills=lib.character[name][3];
+						for(var j=0;j<skills.length;j++){
+							var info=lib.skill[skills[j]];
+							if(info.charlotte||(info.unique&&!info.gainable)||info.juexingji||info.limited||info.zhuSkill) skills.splice(j--,1);
+						}
+						if(skills.length){
+							player.storage.rehuashen.character.push(name);
+							player.storage.rehuashen.map[name]=skills;
+							_status.characterlist.remove(name);
+							return name;
+						}
+					}
+				},
+				addHuashens:function(player,num){
+					var list=[];
+					for(var i=0;i<num;i++){
+						var name=lib.skill.rehuashen.addHuashen(player);
+						if(name) list.push(name);
+					}
+					if(list.length){
+						game.log(player,'获得了',get.cnNumber(list.length)+'张','#g化身')
+						lib.skill.rehuashen.drawCharacter(player,list);
+					}
+				},
+				removeHuashen:function(player,links){
+					player.storage.rehuashen.character.removeArray(links);
+					_status.characterlist.addArray(links);
+					game.log(player,'移去了',get.cnNumber(links.length)+'张','#g化身')
+				},
+				drawCharacter:function(player,list){
+					game.broadcastAll(function(player,list){
+						if(player.isUnderControl(true)){
+							var cards=[];
+							for(var i=0;i<list.length;i++){
+								var cardname='huashen_card_'+list[i];
+								lib.card[cardname]={
+									fullimage:true,
+									image:'character:'+list[i]
+								}
+								lib.translate[cardname]=lib.translate[list[i]];
+								cards.push(game.createCard(cardname,'',''));
+							}
+							player.$draw(cards,'nobroadcast');
+						}
+					},player,list);
+				},
+				intro:{
+					onunmark:function(storage,player){
+						_status.characterlist.addArray(storage.character);
+						storage.character=[];
+					},
+					mark:function(dialog,storage,player){
+						if(storage&&storage.current) dialog.addSmall([[storage.current],'character']);
+						if(storage&&storage.current2) dialog.addText('【'+get.translation(storage.current2)+
+								'】'+lib.translate[storage.current2+'_info']);
+						if(storage&&storage.character.length){
+							if(player.isUnderControl(true)){
+								dialog.addSmall([storage.character,'character']);
+							}
+							else{
+								dialog.addText('共有'+get.cnNumber(storage.character.length)+'张“化身”');
+							}
+						}
+						else{
+							return '没有化身';
+						}
+					},
+					content:function(storage,player){
+							return '共有'+get.cnNumber(storage.character.length)+'张“化身”'
+					},
+					markcount:function(storage,player){
+						if(storage&&storage.character) return storage.character.length;
+						return 0;
+					},
+				},
+			},
+			rehuashen_init:{
+				trigger:{
+					global:'gameDrawAfter',
+					player:'enterGame',
+				},
+				forced:true,
+				popup:false,
+				content:function(){
+					lib.skill.rehuashen.addHuashens(player,3);
+					player.syncStorage('rehuashen');
+					player.markSkill('rehuashen');
+					var next=game.createEvent('rehuashen');
+					next.player=player;
+					next._trigger=trigger;
+					next.triggername='rehuashen';
+					next.setContent(lib.skill.rehuashen.content);
+				},
+			},
+			rexinsheng:{
+				mode:['identity','single'],
+				unique:true,
+				audio:'xinsheng',
+				trigger:{player:'damageEnd'},
+				frequent:true,
+				content:function(){
+					lib.skill.rehuashen.addHuashens(player,trigger.num);
+					player.syncStorage('rehuashen');
+					player.updateMarks('rehuashen');
+				},
+			},
+			"reguhuo":{
+				group:["reguhuo_guess","reguhuo_respond","reguhuo_wuxie"],
+				derivation:'rechanyuan',
+				enable:"chooseToUse",
+				filter:function (event,player){
+					if(!player.countCards('h')||player.hasSkill('reguhuo_phase')) return false;
+					var list=['sha','tao','shan','jiu','taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman'];
+					if(get.mode()=='guozhan'){
+						list=list.concat(['xietianzi','shuiyanqijunx','lulitongxin','lianjunshengyan','chiling','diaohulishan','yuanjiao','huoshaolianying']);
+					}
+					for(var i=0;i<list.length;i++){
+						if(event.filterCard({name:list[i]},player)) return true;
+					}
+					return false;
+				},
+				chooseButton:{
+					dialog:function (){
+						var list=[];
+						for(var i=0;i<lib.inpile.length;i++){
+							var name=lib.inpile[i];
+							if(name=='wuxie') continue;
+							if(name=='sha'){
+								list.push(['基本','','sha']);
+								list.push(['基本','','sha','fire']);
+								list.push(['基本','','sha','thunder']);
+							}
+							else if(get.type(name)=='trick') list.push(['锦囊','',name]);
+							else if(get.type(name)=='basic') list.push(['基本','',name]);
+						}
+						return ui.create.dialog('蛊惑',[list,'vcard']);
+					},
+					filter:function (button,player){
+						var evt=_status.event.getParent();
+						if(evt&&evt.filterCard){
+							return evt.filterCard({name:button.link[2]},player,evt);
+						}
+						return true;
+					},
+					backup:function (links,player){
+						return {
+							filterCard:true,
+							selectCard:1,
+							viewAs:{name:links[0][2],nature:links[0][3]},
+						}
+					},
+					prompt:function (links,player){
+						return '将一张手牌当'+get.translation(links[0][2])+'使用';
+					},
+				},
+				ai:{
+					save:true,
+					respondShan:true,
+					respondSha:true,
+					skillTagFilter:function(player){
+						if(!player.countCards('h')||player.hasSkill('reguhuo_phase')) return false;
+					},
+				},
+			},
+			"reguhuo_guess":{
+				audio:'guhuo_guess',
+				trigger:{
+					player:"useCardBefore",
+				},
+				filter:function (event,player){
+					return event.skill=="reguhuo_backup"||event.skill=="reguhuo_wuxie";
+				},
+				forced:true,
+				direct:true,
+				priority:15,
+				content:function (){
+					'step 0'
+					player.logSkill('reguhuo_guess');
+					player.addTempSkill('reguhuo_phase');
+					player.popup(trigger.card.name,'metal');
+					player.lose(trigger.cards,ui.special);
+					player.line(trigger.targets,trigger.card.nature);
+					trigger.line=false;
+					event.prompt=get.translation(player)+'声明了'+get.translation(trigger.card.name)+'，是否质疑？';
+					event.guessers=game.filterPlayer(function(current){
+						return current!=player&&!current.hasSkill('rechanyuan');
+					});
+					event.guessers.sort(lib.sort.seat);
+					event.ally=[];
+					event.betray=[];
+					'step 1'
+					if(event.guessers.length==0) event.goto(3);
+					else{
+						event.guessers[0].chooseControl('质疑','不质疑').set('prompt',event.prompt).set('ai',function(){
+							if(get.attitude(event.guessers[0],player)>0) return '不质疑';
+							return Math.random()<0.5?'不质疑':'质疑';
+						});
+					}
+					'step 2'
+					if(!result.control) result.control='不质疑';
+					event.guessers[0].chat(result.control);
+					game.delay();
+					if(result.control=='不质疑'){
+						game.log(event.guessers[0],'#g不质疑');
+						event.ally.push(event.guessers[0]);
+					}else{
+						game.log(event.guessers[0],'#y质疑');
+						event.betray.push(event.guessers[0]);
+					}
+					event.guessers.remove(event.guessers[0]);
+					if(event.guessers.length) event.goto(1);
+					'step 3'
+					player.showCards(trigger.cards);
+					if(event.betray.length){
+						if(trigger.card.name==trigger.cards[0].name){
+							event.fake=false;
+						}
+						else{
+							event.fake=true;
+							game.log(player,'使用的','#y'+get.translation(trigger.card.name),'作废了');
+							game.cardsDiscard(trigger.cards);
+							trigger.cancel();
+							game.asyncDraw(event.betray);
+							if(trigger.name=='useCard'&&trigger.parent) trigger.parent.goto(0);
+						}
+					}
+					else event.finish();
+					'step 4'
+					if(event.fake){
+						game.delay();
+						event.finish();
+					}
+					'step 5'
+					var target=event.betray.shift();
+					event.target=target;
+					target.chooseToDiscard('弃置一张牌或失去一点体力','he').ai=lib.skill.qiangxi.check;
+					'step 6'
+					if(!result.bool) target.loseHp();
+					'step 7'
+					target.addSkill('rechanyuan');
+					if(event.betray.length) event.goto(5);
+				},
+			},
+			"reguhuo_respond":{
+				trigger:{
+					player:"chooseToRespondBegin",
+				},
+				filter:function (event,player){
+					if(event.responded) return false;
+					if(!event.filterCard({name:'shan'})&&!event.filterCard({name:'sha'})) return false;
+					if(!player.countCards('h')||player.hasSkill('reguhuo_phase')) return false;
+					return true;
+				},
+				direct:true,
+				content:function (){
+					'step 0'
+					if(trigger.filterCard({name:'shan'})&&lib.filter.cardRespondable({name:'shan'},player,trigger)) event.name='shan';
+					else event.name='sha';
+					player.chooseCard('是否发动【蛊惑】，将一张手牌当做'+get.translation(event.name)+'打出？');
+					'step 1'
+					if(result.bool){
+						player.logSkill('reguhuo_guess');
+						player.addTempSkill('reguhuo_phase');
+						player.popup(event.name,'metal');
+						player.lose(result.cards,ui.special);
+						event.card=result.cards[0];
+						event.prompt=get.translation(player)+'声明了'+get.translation(event.name)+'，是否质疑？';
+						event.guessers=game.filterPlayer(function(current){
+							return current!=player&&!current.hasSkill('rechanyuan');
+						});
+						event.guessers.sort(lib.sort.seat);
+						event.ally=[];
+						event.betray=[];
+					}
+					else event.finish();
+					'step 2'
+					if(event.guessers.length==0) event.goto(4);
+					else{
+						event.guessers[0].chooseControl('质疑','不质疑').set('prompt',event.prompt).set('ai',function(){
+							if(get.attitude(event.guessers[0],player)>0) return '不质疑';
+							return Math.random()<0.5?'不质疑':'质疑';
+						});
+					}
+					'step 3'
+					if(!result.control) result.control='不质疑';
+					event.guessers[0].chat(result.control);
+					game.delay();
+					if(result.control=='不质疑'){
+						game.log(event.guessers[0],'#g不质疑');
+						event.ally.push(event.guessers[0]);
+					}else{
+						game.log(event.guessers[0],'#y质疑');
+						event.betray.push(event.guessers[0]);
+					}
+					event.guessers.remove(event.guessers[0]);
+					if(event.guessers.length) event.goto(2);
+					'step 4'
+					var bool=true;
+					player.showCards(event.card);
+					if(event.betray.length){
+						if(event.name==event.card.name){
+							event.fake=false;
+						}
+						else{
+							event.fake=true;
+							game.log(player,'打出的','#y'+get.translation(event.name),'作废了');
+							game.cardsDiscard(event.card);
+							bool=false;
+							game.asyncDraw(event.betray);
+						}
+					}
+					else event.finish();
+					if(bool){
+						trigger.untrigger();
+						trigger.responded=true;
+						trigger.result={bool:true,card:{name:event.name},cards:[event.card]};
+					}
+					'step 5'
+					if(event.fake){
+						game.delay();
+						event.finish();
+					}
+					'step 6'
+					var target=event.betray.shift();
+					event.target=target;
+					target.chooseToDiscard('弃置一张牌或失去一点体力','he').ai=lib.skill.qiangxi.check;
+					'step 7'
+					if(!result.bool) target.loseHp();
+					'step 8'
+					if(target.isAlive()) target.addSkill('rechanyuan');
+					if(event.betray.length) event.goto(6);
+				},
+				ai:{
+					order:4,
+					useful:-1,
+					value:-1,
+				},
+			},
+			"reguhuo_wuxie":{
+				log:false,
+				silent:true,
+				popup:false,
+				enable:"chooseToUse",
+				filterCard:true,
+				viewAsFilter:function (player){
+					return !player.hasSkill('reguhuo_phase')&&player.countCards('h')>0;
+				},
+				viewAs:{
+					name:"wuxie",
+				},
+				check:function(card){
+					if(card.name=='wuxie') return 1000;
+					return 0;
+				},
+				prompt:"将一张手牌当无懈可击使用",
+				threaten:1.2,
+			},
+			reguhuo_phase:{},
+			rechanyuan:{
+				//charlotte:true,
+				firstDo:true,
+				trigger:{
+					player:["phaseBefore","changeHp"],
+				},
+				priority:99,
+				forced:true,
+				popup:false,
+				unique:true,
+				content:function (){
+					if(player.hp<=1){
+						var skills=player.getSkills(true,false);
+						for(var i=0;i<skills.length;i++){
+							var info=get.info(skills[i]);
+							if(skills[i]=='chanyuan'||skills[i]=='rechanyuan'||info.charlotte){
+								skills.splice(i--,1);
+							}
+						}
+						player.disableSkill('rechanyuan',skills);
+					}
+					else player.enableSkill('rechanyuan');
+				},
+				mark:true,
+				intro:{
+					content:function (storage,player,skill){
+						var str='<li>锁定技，你不能质疑于吉，只要你的体力值不大于1，你的其他技能便全部失效。';
+						var list=[];
+						for(var i in player.disabledSkills){
+							if(player.disabledSkills[i].contains(skill)){
+								list.push(i)
+							}
+						}
+						if(list.length){
+							str+='<br><li>失效技能：';
+							for(var i=0;i<list.length;i++){
+								if(lib.translate[list[i]+'_info']){
+									str+=get.translation(list[i])+'、';
+								}
+							}
+							return str.slice(0,str.length-1);
+						}else return str;
+					},
+				},
+				init:function (player,skill){
+					if(player.hp<=1){
+						var skills=player.getSkills(true,false);
+						for(var i=0;i<skills.length;i++){
+							var info=get.info(skills[i]);
+							if(skills[i]=='chanyuan'||skills[i]=='rechanyuan'||info.charlotte){
+								skills.splice(i--,1);
+							}
+						}
+						player.disableSkill(skill,skills);
+					}
+				},
+				onremove:function (player,skill){
+					player.enableSkill(skill);
+				},
+				locked:true,
+			},
 			botu:{
 				audio:2,
 				group:'botu_kanade',
@@ -1594,7 +2175,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			rejiuyuan:{
-				global:'rejiuyuan2'
+				global:'rejiuyuan2',
+				zhuSkill:true,
 			},
 			rejiuyuan2:{
 				audio:'jiuyuan',
@@ -3286,7 +3868,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			xinleiji:'雷击',
 			xinguidao:'鬼道',
-			xinleiji_info:'当你使用或打出【闪】或【闪电】时，你可以进行判定。当你的判定牌生效后，若结果为：黑桃，你对一名角色造成2点雷电伤害；梅花：你回复1点体力并对一名其他角色造成1点雷电伤害。',
+			xinleiji_info:'①当你使用或打出【闪】或【闪电】时，你可以进行判定。<br>②当你的判定牌生效后，若结果为：黑桃，你对一名角色造成2点雷电伤害；梅花：你回复1点体力并对一名其他角色造成1点雷电伤害。',
 			xinguidao_info:'一名角色的判定牌生效前，你可以打出一张黑色牌作为判定牌并获得原判定牌。若你以此法打出的牌为黑桃2-9，则你摸一张牌。',
 			reqiangxi:"强袭",
 			"reqiangxi_info":"出牌阶段对每名其他角色限一次，你可以选择一项：1. 失去一点体力并对你攻击范围内的一名其他角色造成一点伤害；2. 弃置一张武器牌并对你攻击范围内的一名其他角色造成一点伤害。",
@@ -3428,6 +4010,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reganglie_info:'每当你受到1点伤害后，可进行一次判定，若结果为红色，你对伤害来源造成1点伤害，若结果为黑色，你弃置其一张牌。',
 			botu:'博图',
 			botu_info:'回合结束时，若你本回合使用的牌包含四种花色，则你可以进行一个额外回合。',
+			
+			xin_yuji:'界于吉',
+			re_zuoci:'界左慈',
+			"reguhuo":"蛊惑",
+			"reguhuo_info":"每名角色的回合限一次，你可以扣置一张手牌当一张基本牌或普通锦囊牌使用或打出。其他角色依次选择是否质疑。然后，你展示此牌。若有质疑的角色：若此牌为假，则此牌作废，且所有质疑者各摸一张牌；为真，则所有质疑角色须弃置一张牌或失去1点体力，并获得技能〖缠怨〗。",
+			"reguhuo_guess":"蛊惑",
+			"reguhuo_guess_info":"",
+			rechanyuan:"缠怨",
+			"rechanyuan_info":"锁定技，你不能质疑于吉，只要你的体力值不大于1，你失去你的武将技能。",
+			"reguhuo_respond":"蛊惑",
+			"reguhuo_respond_info":"",
+			"reguhuo_wuxie":"蛊惑",
+			"reguhuo_wuxie_info":"",
+			"reguhuo_phase":"蛊惑",
+			"reguhuo_phase_info":"",
+			rehuashen:'化身',
+			rehuashen_info:'游戏开始后，你随机获得三张未加入游戏的武将牌，选一张置于你面前并声明该武将牌的一项技能，你拥有该技能且同时将性别和势力属性变成与该武将相同直到该化身被替换。你的每个准备阶段和结束后，你可以选择一项：①弃置至多两张未展示的化身牌并重新获得等量化身牌；②更换所展示的化身牌或技能。（你不可声明限定技、觉醒技或主公技）。',
+			rexinsheng:'新生',
+			rexinsheng_info:'当你受到1点伤害后，你可以获得一张新的化身牌。',
+			refresh_standard:'界限突破·标',
+			refresh_ol:'界限突破OL',
 		},
 	};
 });

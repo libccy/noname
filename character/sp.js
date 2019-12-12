@@ -10,7 +10,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_zlzy:["zhangqiying","lvkai","zhanggong","weiwenzhugezhi","beimihu"],
 				sp_longzhou:["xf_tangzi","xf_huangquan","xf_sufei","sp_liuqi"],
 				sp_zizouqi:["mangyachang","xugong","zhangchangpu"],
-				sp_sbfm:["lisu","xinpi"],
+				sp_sbfm:["lisu","xinpi","zhangwen"],
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_star:["sp_xiahoushi","jsp_zhaoyun","huangjinleishi","sp_pangtong","sp_daqiao","sp_ganning","sp_xiahoudun","sp_lvmeng","sp_zhangfei","sp_liubei"],
 				sp_guozhan:["shamoke","ganfuren","yuejin","hetaihou","dingfeng","panfeng","jianggan"],
@@ -22,6 +22,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		character:{
 			xinpi:['male','wei',3,['xpchijie','yinju'],['unseen']],
 			lisu:['male','qun',2,['lslixun','lskuizhu']],
+			zhangwen:['male','wu',3,['songshu','sibian']],
 			
 			hejin:['male','qun',4,['mouzhu','yanhuo']],
 			hansui:['male','qun',4,['mashu','niluan']],
@@ -166,6 +167,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			zhangwen:'张温（193年—230年），字惠恕，吴郡吴县（今江苏苏州）人。少修节操，容貌奇伟。孙权召拜议郎、选曹尚书，徙太子太傅。黄武三年（224），以辅义中郎将身份出使蜀汉，孙权原先害怕诸葛亮会有意留难张温，但张温不担心。在呈上蜀汉朝廷的文书刻意称颂蜀汉，以表明和解的诚意，重建两国关系。他在蜀汉表现出色，得蜀汉朝廷重视。回东吴后不久，被调进豫章的军队，事业上再无进展。孙权一方面介怀他出使蜀汉时称颂蜀汉，又嫌他声名太盛，恐怕张温不会尽忠地由他任用。当时正好碰上暨艳事件，暨艳是张温引荐的臣子，但他滥用职权，升迁评定等只看自己喜恶。事件被揭发后暨艳及同党徐彪都自杀。孙权见此，于是以张温与暨艳、徐彪等人多有来往而下罪张温，后更将张温发还到家乡吴郡。将军骆统曾上书为张温辩解，但孙权不理会。六年后，张温病逝。',
+			lisu:'李肃（？－192年），五原（治今内蒙古包头西北）人。永汉三年四月，司徒王允、尚书仆射士孙瑞、卓将吕布共谋诛卓。是时，天子有疾新愈，大会未央殿。布使同郡骑都尉肃等、将亲兵十馀人，伪著卫士服守掖门。布怀诏书。卓至，肃等格卓。卓惊呼布所在。布曰“有诏”，遂杀卓，夷三族。后卓女婿中郎将牛辅典兵别屯陕，分遣校尉李傕、郭汜、张济略陈留、颍川诸县。卓死，吕布使李肃至陕，欲以诏命诛辅。辅等逆与肃战，肃败走弘农，布诛肃。',
 			xinpi:'辛毗（生卒年不详），字佐治，颍川阳翟人。三国时期曹魏大臣。原居陇西（郡治在今甘肃临洮县），东汉光武帝建武年间，其先人东迁。当初，辛毗跟随其兄事袁绍。曹操任司空时，征召辛毗，他不受命。官渡战后，辛毗事袁绍的儿子袁谭。公元204年，曹操攻下邺城，上表推荐辛毗任议郎，后为丞相长史。公元220年，曹丕即皇帝位，以辛毗为侍中，赐爵关内侯，后赐广平亭侯。魏明帝即位，封辛毗颍乡侯，食邑三百户，后为卫尉。公元234年，诸葛亮屯兵渭南，司马懿上表魏明帝。魏明帝任辛毗为大将军军师，加使持节号。诸葛亮病逝后，辛毗返回，仍任卫尉。不久，逝世，谥肃侯。',
 			hejin:'何进（？~189年），字遂高，南阳郡宛县（今河南南阳市宛城区）人。东汉时期外戚大臣，灵思皇后之兄。初以妹妹有宠，拜为郎中，出任虎贲中郎将、颍川太守，迁侍中、将作大匠、河南尹。黄巾起义时，拜为大将军，总镇京师，发现并镇压马元义的密谋，封为慎侯。为张大威望，在京师讲武结营，置西园八校尉。汉灵帝驾崩后，粉碎了中常侍蹇硕拥立皇子刘协的图谋，听从袁绍之言，博征智谋之士，内借元舅之资，外据辅政之权，独揽朝中大权。中平六年（189），不纳陈琳和曹操劝谏，阴结军阀董卓，联合袁绍谋诛宦竖。事情败露后，为中常侍张让等人损害，其后代是魏晋高门士族南阳何氏。',
 			hansui:'韩遂（？－215年），字文约。凉州金城郡人。东汉末年军阀、将领，汉末群雄之一。原名韩约，后改名遂。韩遂最初闻名于西州，被羌胡叛军劫持并推举为首领，以诛宦官为名举兵造反，聚众十万，先后败皇甫嵩、张温、董卓、孙坚等名将，使得天下骚动。后受朝廷招安，拥兵割据一方长达三十余年。韩遂曾与马腾结为异姓兄弟，后二人关系破裂。袁绍、曹操相争之际，马腾、韩遂被钟繇说服，依附于曹操。马腾入京后，留其子马超统领部队。马超推举韩遂为都督起兵反叛曹操，为曹操所败，韩遂逃奔凉州，后又为夏侯渊所败，病死（一说被杀），享年七十余岁。',
@@ -579,6 +582,61 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		skill:{
 			//上兵伐谋
 			//伊籍在标包 不会移动
+			songshu:{
+				audio:2,
+				enable:'phaseUse',
+				filter:function(event,player){
+					return !player.hasSkill('songshu_reflectionblue')&&player.countCards('h')>0;
+				},
+				filterTarget:function(card,player,target){
+					return target!=player&&player.canCompare(target);
+				},
+				content:function(){
+					'step 0'
+					player.chooseToCompare(target).set('small',get.attitude(player,target)>0);
+					'step 1'
+					if(!result.bool){
+						target.draw(2);
+						player.addTempSkill('songshu_reflectionblue');
+					}
+				},
+			},
+			songshu_reflectionblue:{
+				//不愧是你 马场老贼
+			},
+			sibian:{
+				audio:2,
+				trigger:{player:'phaseDrawBefore'},
+				content:function(){
+					'step 0'
+					trigger.cancel();
+					event.cards=get.cards(4);
+					player.showCards(event.cards);
+					'step 1'
+					cards.sort(function(a,b){
+						return b.number-a.number;
+					});
+					var gains=[];
+					var mx=[cards[0].number,cards[3].number];
+					for(var i=0;i<cards.length;i++){
+						if(mx.contains(cards[i].number)) gains.addArray(cards.splice(i--,1));
+					}
+					player.gain(gains,'gain2');
+					if(cards.length!=2||Math.abs(gains[0].number-gains[1].number)>=game.players.length) event._result={bool:false};
+					else player.chooseTarget('是否令一名手牌数最少的角色获得'+get.translation(cards),function(card,player,target){
+						return target.isMinHandcard();
+					}).ai=function(target){
+						return get.attitude(_status.event.player,target);
+					}
+					'step 2'
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target);
+						target.gain(cards,'gain2');
+					}
+					else if(cards.length) game.cardsDiscard(cards);
+				},
+			},
 			lslixun:{
 				audio:2,
 				forced:true,
@@ -7048,14 +7106,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						game.delay(2);
-						if(trigger.name=='respond'){
-							if(trigger.parent.result){
-								trigger.parent.result.bool=false;
-							}
-						}
-						else{
-							trigger.cancel();
-						}
+						trigger.cancel();
 					}
 					else{
 						event.finish();
@@ -12142,6 +12193,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					backup:function(links,player){
 						return {
+							audio:'aocai',
 							filterCard:function(){return false},
 							selectCard:-1,
 							viewAs:links[0],
@@ -13253,12 +13305,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			niujin:'牛金',
 			xinpi:'辛毗',
 			lisu:'李肃',
+			zhangwen:'张温',
+			
+			songshu:'颂蜀',
+			songshu_info:'出牌阶段，你可以和其他角色拼点。若你没赢，其摸两张牌，且你本阶段内不能再发动〖思辨〗',
+			sibian:'思辨',
+			sibian_info:'摸牌阶段，你可以放弃摸牌，改为亮出牌堆顶的四张牌，然后获得其中所有点数最大与点数最小的牌。若获得的牌是两张且点数之差小于存活人数，则你可以将剩余的牌交给手牌数最少的角色。',
 			lslixun:'利熏',
 			lslixun_fate:'利熏',
 			lslixun_info:'锁定技，当你受到伤害时，你防止此伤害，然后获得等同于伤害值的“珠”标记。出牌阶段开始时，你进行一次判定，若结果点数小于“珠”的数量，你弃置等同于“珠”数量的手牌（若弃牌的牌数不够，则失去剩余数量的体力值）。',
 			lskuizhu:'馈珠',
 			lskuizhu_info:'出牌阶段结束时，你可以选择体力值全场最多的一名其他角色，将手牌摸至与该角色相同（最多摸至五张），然后该角色观看你的手牌，弃置任意张手牌并从观看的牌中获得等量的牌。若其获得的牌大于一张，则你选择一项：移去一个“珠”；或令其对其攻击范围内的一名角色造成1点伤害。',
-			
 			xpchijie:'持节',
 			xpchijie_info:'每回合限一次，当你成为其他角色使用牌的目标后，你可以获得如下效果：当此牌对其他角色造成伤害时，若此牌已对你造成过伤害，则你防止此伤害；当此牌使用结算完成时，你可以获得此牌对应的所有实体牌。',
 			xpchijie3:'持节',

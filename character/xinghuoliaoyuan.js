@@ -4011,6 +4011,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			chanyuan:{
 				//charlotte:true,
+				firstDo:true,
 				trigger:{
 					player:["phaseBefore","changeHp"],
 				},
@@ -4023,7 +4024,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var skills=player.getSkills(true,false);
 						for(var i=0;i<skills.length;i++){
 							var info=get.info(skills[i]);
-							if(skills[i]=='chanyuan'||info.charlotte){
+							if(skills[i]=='chanyuan'||skills[i]=='rechanyuan'||info.charlotte){
 								skills.splice(i--,1);
 							}
 						}
@@ -4057,7 +4058,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var skills=player.getSkills(true,false);
 						for(var i=0;i<skills.length;i++){
 							var info=get.info(skills[i]);
-							if(skills[i]=='chanyuan'||info.charlotte){
+							if(skills[i]=='chanyuan'||skills[i]=='rechanyuan'||info.charlotte){
 								skills.splice(i--,1);
 							}
 						}
