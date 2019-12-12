@@ -844,7 +844,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return target!=player&&target.countDiscardableCards(player,'hej')>0;
 					}).ai=function(target){
 						var player=_status.event.player;
-						return get.effect(player,{name:'guohe'},target,player);
+						return get.effect(target,{name:'guohe'},player,player);
 					};
 					'step 1'
 					if(result.bool){
