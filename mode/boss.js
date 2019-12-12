@@ -2152,7 +2152,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			boss_zhadao:{
-				inherit:'qingang_skill',
+				inherit:'qinggang_skill',
 			},
 			boss_zhuxin:{
 				trigger:{player:'die'},

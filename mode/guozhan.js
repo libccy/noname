@@ -4433,7 +4433,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								lib.translate[cardname]=lib.translate[list[i]];
 								cards.push(game.createCard(cardname,'',''));
 							}
-							player.$draw(cards);
+							player.$draw(cards,'nobroadcast');
 						}
 					},player,list);
 				},
