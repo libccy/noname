@@ -178,21 +178,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				game.broadcastAll(function(singleTranslate,characterSingle){
 					_status.mode='normal';
 					for(var j in singleTranslate) lib.translate[j]=singleTranslate[j];
-					_status.characterList=[];
+					_status.characterlist=[];
 					for(var i in characterSingle){
 						lib.character[i]=characterSingle[i];
 						if(!lib.character[i][4]){
 							lib.character[i][4]=[];
 						}
-						_status.characterList.push(i);
+						_status.characterlist.push(i);
 					}
 				},lib.singleTranslate,lib.characterSingle);
 			}
 			else if(_status.mode=='changban'){
-				_status.characterList=[];
+				_status.characterlist=[];
 				for(var i=0;i<lib.changbanCharacter.length;i++){
 					var name=lib.changbanCharacter[i];
-					if(lib.character[name]&&!lib.filter.characterDisabled(name)) _status.characterList.push(name);
+					if(lib.character[name]&&!lib.filter.characterDisabled(name)) _status.characterlist.push(name);
 				}
 				game.broadcastAll(function(){
 					_status.mode='changban';
@@ -340,9 +340,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(lib.filter.characterDisabled(i)) continue;
 						list.push(i);
 					}
-					_status.characterList=list;
+					_status.characterlist=list;
 					var filter=function(name){
-						return !_status.characterList.contains(name);
+						return !_status.characterlist.contains(name);
 					};
 					var dialog=ui.create.characterDialog('heightset',filter,'expandall').open();
 					dialog.videoId=event.videoId;
@@ -383,9 +383,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					"step 1"
 					_status.characterChoice={
-						zhu:_status.characterList.randomRemove(3),
-						fan:_status.characterList.randomRemove(3),
-						all:_status.characterList.randomRemove(6),
+						zhu:_status.characterlist.randomRemove(3),
+						fan:_status.characterlist.randomRemove(3),
+						all:_status.characterlist.randomRemove(6),
 					};
 					event.videoIdx=lib.status.videoId++;
 					game.broadcastAll(function(id,list){
@@ -564,9 +564,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						list.push(i);
 					}
 					game.broadcastAll(function(list,id){
-						_status.characterList=list;
+						_status.characterlist=list;
 						var filter=function(name){
-							return !_status.characterList.contains(name);
+							return !_status.characterlist.contains(name);
 						};
 						var dialog=ui.create.characterDialog('heightset',filter,'expandall').open();
 						dialog.videoId=id;
@@ -616,9 +616,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					"step 1"
 					_status.characterChoice={
-						zhu:_status.characterList.randomRemove(3),
-						fan:_status.characterList.randomRemove(3),
-						all:_status.characterList.randomRemove(6),
+						zhu:_status.characterlist.randomRemove(3),
+						fan:_status.characterlist.randomRemove(3),
+						all:_status.characterlist.randomRemove(6),
 					};
 					event.videoIdx=lib.status.videoId++;
 					game.broadcastAll(function(id,list){
