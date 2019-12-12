@@ -142,7 +142,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					"step 3"
-					if(result.bool==false&&!event.unhurt){
+					if((!result||!result.result||result.result!='shaned')&&!event.unhurt){
 						target.damage(get.nature(event.card),event.baseDamage+event.extraDamage);
 						event.result={bool:true}
 						event.trigger('shaDamage');
@@ -2237,8 +2237,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			hanbing_skill_info:'当你使用杀造成伤害时，你可以防止此伤害，改为依次弃置目标两张牌',
 			renwang_info:'黑色的杀对你无效',
 			renwang_skill_info:'黑色的杀对你无效',
-			sha_info:'出牌阶段，对攻击范围内的一名角色使用，令其打出一张【闪】或受到一点伤害。',
-			shan_info:'闪避一张杀',
+			sha_info:'出牌阶段，对攻击范围内的一名角色使用，令其使用一张【闪】或受到一点伤害。',
+			shan_info:'抵消一张【杀】',
 			tao_info:'出牌阶段，对自己使用，回复一点体力。',
 			bagua_info:'每当你需要使用或打出一张【闪】时，你可以进行一次判定，若判定结果为红色，视为你使用或打出了一张【闪】。',
 			bagua_skill_info:'每当你需要使用或打出一张【闪】时，你可以进行一次判定，若判定结果为红色，视为你使用或打出了一张【闪】。',
