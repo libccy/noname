@@ -1,5 +1,5 @@
 window.config={
-	forbidai:['ns_liuzhang'],
+	forbidai:['ns_liuzhang','xin_yuji'],
 	forbidai_user:[],
 	forbidall:[],
 	forbidstone:['zhugedan','pal_xuanxiao','hs_malfurion','lusu','chenlin','hs_siwangzhiyi',
@@ -182,7 +182,10 @@ window.config={
 	customforbid:[],
 	forbid:[
 		['huashen'],
+		['rehuashen'],
 		['xinmanjuan'],
+		['xinleiji','fuji'],
+		['xinleiji','xinfu_jijun'],
 		['reluanji','jueqing'],
 		['lianying','rende'],
 		['lianying','anxian'],

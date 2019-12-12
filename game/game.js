@@ -10212,7 +10212,7 @@
 					target.addJudge(card,cards);
 				},
 				equipCard:function(){
-					target.equip(card);
+					target.equip(cards[0]);
 				},
 				gameDraw:function(){
 					"step 0"
@@ -14580,7 +14580,7 @@
 						},_status.dying);
 						event.finish();
 					}
-					else{
+					else if(!event.skipTao){
 						var next=game.createEvent('_save');
 						var start=false;
 						var starts=[_status.currentPhase,event.source,event.player,game.me,game.players[0]];
@@ -46103,10 +46103,10 @@
 				}
 			}
 			else{
-				if(card.name!=get.name(card)||card.nature!=get.nature(card)){
+				if(card.name!=get.name(card)||card.nature!=get.nature(card)||card.suit!=get.suit(card)){
 					var next={
 						name:get.name(card),
-						suit:card.suit,
+						suit:get.suit(card),
 						number:card.number,
 						nature:get.nature(card),
 					};

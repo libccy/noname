@@ -2326,6 +2326,8 @@ window.noname_asset_list=[
 	'image/character/niujin.jpg',
 	'image/character/lisu.jpg',
 	'image/character/re_zhangjiao.jpg',
+	'image/character/zhangwen.jpg',
+	'image/character/re_zuoci.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
