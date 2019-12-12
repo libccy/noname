@@ -9470,7 +9470,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['mozhi2','mozhi3']
 			},
 			mozhix:{
-				filterCard:true,
+				filterCard:function(card){
+					return get.itemtype(card)=='card';
+				},
 				selectCard:1,
 				popname:true,
 			},
@@ -13317,7 +13319,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lskuizhu:'馈珠',
 			lskuizhu_info:'出牌阶段结束时，你可以选择体力值全场最多的一名其他角色，将手牌摸至与该角色相同（最多摸至五张），然后该角色观看你的手牌，弃置任意张手牌并从观看的牌中获得等量的牌。若其获得的牌大于一张，则你选择一项：移去一个“珠”；或令其对其攻击范围内的一名角色造成1点伤害。',
 			xpchijie:'持节',
-			xpchijie_info:'每回合限一次，当你成为其他角色使用牌的目标后，你可以获得如下效果：当此牌对其他角色造成伤害时，若此牌已对你造成过伤害，则你防止此伤害；当此牌使用结算完成时，你可以获得此牌对应的所有实体牌。',
+			xpchijie_info:'每回合限一次，当你成为其他角色使用牌的目标后，你可以获得如下效果：当此牌对其他角色造成伤害时，若此牌已对你造成过伤害，则你防止此伤害；当此牌使用结算完成时，若此牌未对你造成伤害，则你可以获得此牌对应的所有实体牌。',
 			xpchijie3:'持节',
 			yinju:'引裾',
 			yinju_info:'限定技，出牌阶段，你可以选择一名其他角色。若如此做，当你对此角色使用牌时，你摸一张牌；当你即将对其造成伤害时，防止此伤害，然后其回复等量的体力。',
