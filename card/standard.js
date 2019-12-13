@@ -1713,6 +1713,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			fangtian_skill:{
 				equipSkill:true,
+				audio:true,
 				mod:{
 					selectTarget:function(card,player,range){
 						if(card.name!='sha') return;
@@ -1729,48 +1730,58 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			fangtian_guozhan:{
 				equipSkill:true,
-				trigger:{player:'useCard1'},
-				silent:true,
+				trigger:{player:'useCard2'},
 				filter:function(event,player){
 					if(get.mode()!='guozhan') return false;
-					return event.card.name=='sha'&&event.targets&&event.targets.length>1;
-				},
-				content:function(){
-					player.addTempSkill('fangtian_guozhan_trigger');
-				},
-				mod:{
-					selectTarget:function(card,player,range){
-						if(card.name!='sha') return;
-						if(get.mode()!='guozhan') return;
-						if(range[1]==-1) return;
-						range[1]=Infinity;
-					},
-					playerEnabled:function(card,player,target){
-						if(card.name!='sha') return;
-						if(get.mode()!='guozhan') return;
-						var cardx=get.card();
-						if(!cardx||cardx.name!='sha') return;
-						if(!ui.selected.targets.length) return;
-						if(target.identity=='ye'||target.identity=='unknown') return;
-						var targets=ui.selected.targets.slice(0);
-						for(var i=0;i<targets.length;i++){
-							if(target!=targets[i]&&target.identity==targets[i].identity){
-								return false;
-							}
+					if(event.card.name!='sha') return false;
+					return game.hasPlayer(function(target){
+						if(event.targets.contains(target)) return false;
+						if(!lib.filter.filterTarget(event.card,player,target)) return false;
+						if(target.identity=='ye'||target.identity=='unknown') return true;
+						for(var i=0;i<event.targets.length;i++){
+							if(target.identity==event.targets[i].identity) return false;
 						}
+						return true;
+					});
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('fangtian'),[1,Infinity],function(card,player,target){
+						var cardx=_status.event.cardx;
+						if(!lib.filter.filterTarget(cardx,player,target)) return false;
+						var targets=_status.event.targets.slice(0).concat(ui.selected.targets);
+						if(targets.contains(target)) return false;
+						if(target.identity=='ye'||target.identity=='unknown') return true;
+						for(var i=0;i<targets.length;i++){
+							if(target.identity==targets[i].identity) return false;
+						}
+						return true;
+					}).set('cardx',trigger.card).set('targets',trigger.targets).set('ai',function(target){
+						var player=_status.event.player;
+						return get.effect(target,_status.event.cardx,player,player)
+					});
+					'step 1'
+					if(result.bool){
+						player.logSkill('fangtian_skill',result.targets);
+						if(!player.storage.fangtian_guozhan_trigger) player.storage.fangtian_guozhan_trigger=[];
+						player.storage.fangtian_guozhan_trigger.add(trigger.card);
+						trigger.targets.addArray(result.targets);
+						player.addTempSkill('fangtian_guozhan_trigger');
 					}
-				}
+				},
 			},
 			fangtian_guozhan_trigger:{
 				trigger:{player:'shaMiss'},
 				silent:true,
 				onremove:true,
 				content:function(){
-					trigger.getParent().excluded.addArray(trigger.getParent().targets);
-				}
+					if(player.storage[event.name].contains(trigger.card)) trigger.getParent().excluded.addArray(trigger.getParent().targets);
+				},
+				group:'fangtian_guozhan_remove',
 			},
 			fangtian_guozhan_remove:{
-				trigger:{player:'useCardAfter'},
+				trigger:{player:['useCardAfter','useCardCancelled']},
 				silent:true,
 				filter:function(event,player){
 					return player.storage.fangtian_guozhan_trigger&&player.storage.fangtian_guozhan_trigger.contains(event.card);
@@ -2234,40 +2245,40 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			renwang_bg:'盾',
 			hanbing_skill:'寒冰剑',
 			renwang_skill:'仁王盾',
-			hanbing_info:'当你使用杀造成伤害时，你可以防止此伤害，改为依次弃置目标两张牌',
-			hanbing_skill_info:'当你使用杀造成伤害时，你可以防止此伤害，改为依次弃置目标两张牌',
-			renwang_info:'黑色的杀对你无效',
-			renwang_skill_info:'黑色的杀对你无效',
-			sha_info:'出牌阶段，对攻击范围内的一名角色使用，令其使用一张【闪】或受到一点伤害。',
+			hanbing_info:'当你使用杀造成伤害时，你可以防止此伤害，改为依次弃置目标角色的两张牌。',
+			hanbing_skill_info:'当你使用杀造成伤害时，你可以防止此伤害，改为依次弃置目标角色的两张牌。',
+			renwang_info:'锁定技，黑色的杀对你无效',
+			renwang_skill_info:'锁定技，黑色的杀对你无效',
+			sha_info:'出牌阶段，对攻击范围内的一名角色使用，令其使用一张【闪】，否则受到一点伤害。',
 			shan_info:'抵消一张【杀】',
 			tao_info:'出牌阶段，对自己使用，回复一点体力。',
-			bagua_info:'每当你需要使用或打出一张【闪】时，你可以进行一次判定，若判定结果为红色，视为你使用或打出了一张【闪】。',
-			bagua_skill_info:'每当你需要使用或打出一张【闪】时，你可以进行一次判定，若判定结果为红色，视为你使用或打出了一张【闪】。',
-			jueying_info:'你的防御距离+1',
-			dilu_info:'你的防御距离+1',
-			zhuahuang_info:'你的防御距离+1',
-			chitu_info:'你的进攻距离+1',
-			dawan_info:'你的进攻距离+1',
-			zixin_info:'你的进攻距离+1',
-			zhuge_skill_info:'你于出牌阶段内使用【杀】无次数限制。',
-			zhuge_info:'你于出牌阶段内使用【杀】无次数限制。',
-			cixiong_skill_info:'每当你使用【杀】指定一名异性的目标角色后，你可以令其选择一项：1.弃置一张手牌；2.令你摸一张牌。',
-			cixiong_info:'每当你使用【杀】指定一名异性的目标角色后，你可以令其选择一项：1.弃置一张手牌；2.令你摸一张牌。',
-			qinggang_skill_info:'每当你使用【杀】指定一名目标角色后，你无视其防具。',
-			qinggang_info:'每当你使用【杀】指定一名目标角色后，你无视其防具。',
-			qinglong_skill_info:'每当你使用的【杀】被目标角色使用的【闪】抵消时，你可以对其使用一张【杀】（无距离限制）。',
-			qinglong_guozhan_info:'锁定技，当你使用【杀】指定目标时，所有目标角色不能明置武将牌直到此【杀】结算完毕为止。',
-			qinglong_info:'每当你使用的【杀】被目标角色使用的【闪】抵消时，你可以对其使用一张【杀】（无距离限制）。',
-			qinglong_info_guozhan:'锁定技，当你使用【杀】指定目标时，所有目标角色不能明置武将牌直到此【杀】结算完毕为止。',
+			bagua_info:'当你需要使用或打出一张【闪】时，你可以进行一次判定，若判定结果为红色，视为你使用或打出了一张【闪】。',
+			bagua_skill_info:'当你需要使用或打出一张【闪】时，你可以进行一次判定，若判定结果为红色，视为你使用或打出了一张【闪】。',
+			jueying_info:'锁定技，其他角色计算与你的距离+1。',
+			dilu_info:'锁定技，其他角色计算与你的距离+1。',
+			zhuahuang_info:'锁定技，其他角色计算与你的距离+1。',
+			chitu_info:'锁定技，你计算与其他角色的距离-1。',
+			dawan_info:'锁定技，你计算与其他角色的距离-1。',
+			zixin_info:'锁定技，你计算与其他角色的距离-1。',
+			zhuge_skill_info:'锁定技，你于出牌阶段内使用【杀】无次数限制。',
+			zhuge_info:'锁定技，你于出牌阶段内使用【杀】无次数限制。',
+			cixiong_skill_info:'当你使用【杀】指定一名异性的目标角色后，你可以令其选择一项：1.弃置一张手牌；2.令你摸一张牌。',
+			cixiong_info:'当你使用【杀】指定一名异性的目标角色后，你可以令其选择一项：1.弃置一张手牌；2.令你摸一张牌。',
+			qinggang_skill_info:'锁定技，当你使用【杀】指定一名目标角色后，你令其防具技能无效直到此【杀】被抵消或造成伤害。',
+			qinggang_info:'锁定技，当你使用【杀】指定一名目标角色后，你令其防具技能无效直到此【杀】被抵消或造成伤害。',
+			qinglong_skill_info:'当你使用的【杀】被目标角色使用的【闪】抵消时，你可以对其使用一张【杀】（无距离限制）。',
+			qinglong_guozhan_info:'锁定技，当你使用【杀】指定目标后，所有目标角色不能明置武将牌直到此【杀】结算完毕为止。',
+			qinglong_info:'当你使用的【杀】被目标角色使用的【闪】抵消时，你可以对其使用一张【杀】（无距离限制）。',
+			qinglong_info_guozhan:'锁定技，当你使用【杀】指定目标后，所有目标角色不能明置武将牌直到此【杀】结算完毕为止。',
 			zhangba_skill_info:'你可以将两张手牌当【杀】使用或打出。',
 			zhangba_info:'你可以将两张手牌当【杀】使用或打出。',
-			guanshi_skill_info:'每当你使用的【杀】被目标角色使用的【闪】抵消时，你可以弃置两张牌，令此【杀】依然对其造成伤害。',
-			guanshi_info:'每当你使用的【杀】被目标角色使用的【闪】抵消时，你可以弃置两张牌，令此【杀】依然对其造成伤害。',
+			guanshi_skill_info:'当你使用的【杀】被目标角色使用的【闪】抵消时，你可以弃置两张牌，令此【杀】依然对其造成伤害。',
+			guanshi_info:'当你使用的【杀】被目标角色使用的【闪】抵消时，你可以弃置两张牌，令此【杀】依然对其造成伤害。',
 			fangtian_skill_info:'你使用的【杀】若是你最后的手牌，你可以额外选择至多两个目标。',
 			fangtian_info:'你使用的【杀】若是你最后的手牌，你可以额外选择至多两个目标。',
 			fangtian_info_guozhan:'你使用【杀】可以指定任意名角色为目标（不能包含势力相同的角色），若任意一名目标角色使用【闪】抵消了此【杀】，则此【杀】对剩余的目标角色无效。',
-			qilin_skill_info:'每当你使用【杀】对目标角色造成伤害时，你可以弃置其装备区里的一张坐骑牌。',
-			qilin_info:'每当你使用【杀】对目标角色造成伤害时，你可以弃置其装备区里的一张坐骑牌。',
+			qilin_skill_info:'当你使用【杀】对目标角色造成伤害时，你可以弃置其装备区里的一张坐骑牌。',
+			qilin_info:'当你使用【杀】对目标角色造成伤害时，你可以弃置其装备区里的一张坐骑牌。',
 			wugu_info:'出牌阶段，对所有角色使用。（选择目标后）你从牌堆顶亮出等同于目标数量的牌，每名目标角色获得这些牌中（剩余的）的任意一张。',
 			taoyuan_info:'出牌阶段，对所有角色使用。每名目标角色回复1点体力。',
 			nanman_info:'出牌阶段，对所有其他角色使用。每名目标角色需打出一张【杀】，否则受到1点伤害。',

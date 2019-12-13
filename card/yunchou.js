@@ -859,7 +859,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{target:'shaBefore'},
 				direct:true,
 				filter:function(event,player){
-					return player.hasCard('youdishenru');
+					return !event.getParent().directHit.contains(player)&&player.hasCard('youdishenru');
 				},
 				content:function(){
 					event.youdiinfo={
@@ -867,7 +867,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						evt:trigger
 					};
 					player.chooseToUse(function(card,player){
-						if(card.name!='youdishenru') return false;
+						if(get.name(card)!='youdishenru') return false;
 						return lib.filter.cardEnabled(card,player,'forceEnable');
 					},'是否使用诱敌深入？').set('source',trigger.player);
 				}
