@@ -184,7 +184,7 @@ window.config={
 		['huashen'],
 		['rehuashen'],
 		['xinmanjuan'],
-		['xinleiji','fuji'],
+		//['xinleiji','fuji'],
 		['xinleiji','xinfu_jijun'],
 		['reluanji','jueqing'],
 		['lianying','rende'],

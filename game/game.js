@@ -9053,8 +9053,8 @@
 			},
 			c:function(){
 				(function(){
-					var a=0,b=0,c=0,d=0,e=0;
-					var sa=0,sb=0,sc=0,sd=0,sf=0;
+					var a=0,b=0,c=0,d=0,e=0,f=0;
+					var sa=0,sb=0,sc=0,sd=0,se=0,sf=0;
 					for(var i in lib.character){
 						switch(lib.character[i][1]){
 							case 'wei':a++;if(lib.config.banned.contains(i)) sa++;break;
@@ -9062,6 +9062,7 @@
 							case 'wu':c++;if(lib.config.banned.contains(i)) sc++;break;
 							case 'qun':d++;if(lib.config.banned.contains(i)) sd++;break;
 							case 'western':e++;if(lib.config.banned.contains(i)) se++;break;
+							case 'key':f++;if(lib.config.banned.contains(i)) sf++;break;
 						}
 					}
 					console.log('魏：'+(a-sa)+'/'+a);
@@ -9069,7 +9070,8 @@
 					console.log('吴：'+(c-sc)+'/'+c);
 					console.log('群：'+(d-sd)+'/'+d);
 					console.log('西：'+(e-se)+'/'+e);
-					console.log('已启用：'+((a+b+c+d+e)-(sa+sb+sc+sd+sc))+'/'+(a+b+c+d+e));
+					console.log('键：'+(f-sf)+'/'+f);
+					console.log('已启用：'+((a+b+c+d+e+f)-(sa+sb+sc+sd+se+sf))+'/'+(a+b+c+d+e+f));
 				}());
 				(function(){
 					var a=0,b=0,c=0,d=0;
@@ -9506,12 +9508,14 @@
 			qun:'群',
 			shen:'神',
 			western:'西',
+			key:'键',
 			wei2:'魏国',
 			shu2:'蜀国',
 			wu2:'吴国',
 			qun2:'群雄',
 			shen2:'神将',
 			western2:'西方',
+			key2:'KEY',
 			male:'男',
 			female:'女',
 			mad:'混乱',
@@ -9529,6 +9533,7 @@
 			qunColor:"#f6f6f6",
 			shenColor:"#ffe14c",
 			westernColor:"#ffe14c",
+			keyColor:"#ffc9b1fd",
 			basic:'基本',
 			equip:'装备',
 			trick:'锦囊',
@@ -20337,7 +20342,7 @@
 				},
 				mayHaveShan:function(){
 					return this.hasShan();
-					// modify: later
+					// modify: After AngelBeats! -2nd Beat-
 				},
 				hasCard:function(name,position){
 					if(typeof name=='function'){
@@ -23244,7 +23249,11 @@
 						}
 					}
 				}
+				var fullskills=game.expandSkills(player.getSkills().concat(lib.skill.global));
 				var info=get.info(skill);
+				if(info.noHidden&&!fullskills.contains(skill)){
+					return false;
+				}
 				if(info.filter&&!info.filter(event,player,name)){
 					return false;
 				}
@@ -23550,14 +23559,15 @@
 		sort:{
 			character:function(a,b){
 				var groupSort=function(name){
-					if(!lib.character[name]) return 4;
+					if(!lib.character[name]) return 6;
 					if(lib.character[name][1]=='shen') return -1;
 					if(lib.character[name][1]=='wei') return 0;
 					if(lib.character[name][1]=='shu') return 1;
 					if(lib.character[name][1]=='wu') return 2;
 					if(lib.character[name][1]=='qun') return 3;
-					if(lib.character[name][1]=='western') return 4;
-					return 5;
+					if(lib.character[name][1]=='key') return 4;
+					if(lib.character[name][1]=='western') return 5;
+					return 6;
 				}
 				var del=groupSort(a)-groupSort(b);
 				if(del!=0) return del;
@@ -25259,6 +25269,7 @@
 			wu:'wood',
 			qun:'metal',
 			western:'thunder',
+			key:'key',
 		},
 	};
 	var game={
@@ -34556,7 +34567,8 @@
 							if(info[name][1]=='wu') return 2;
 							if(info[name][1]=='qun') return 3;
 							if(info[name][1]=='western') return 4;
-							return 5;
+							if(info[name][1]=='key') return 5;
+							return 6;
 						}
 						list.sort(function(a,b){
 							var del=groupSort(a)-groupSort(b);
@@ -36215,6 +36227,7 @@
 								['qun','群'],
 								['shen','神'],
 								['western','西'],
+								['key','键'],
 							],null,ui.create.div('.indent','势力：',newCharacter));
 							var options=ui.create.div('.add_skill.options','<span>主公<input type="checkbox" name="zhu"></span><span>BOSS<input type="checkbox" name="boss"></span><span>AI禁选<input type="checkbox" name="forbidai"></span><br>',newCharacter);
 							var addSkill=ui.create.div('.add_skill','添加技能<br>',newCharacter);
@@ -39522,7 +39535,7 @@
 				},true);
 			},
 			groupControl:function(dialog){
-				return ui.create.control('wei','shu','wu','qun','western',function(link,node){
+				return ui.create.control('wei','shu','wu','qun','western','key',function(link,node){
 					if(link=='全部'){
 						dialog.currentcapt='';
 						dialog.currentgroup='';
@@ -39952,17 +39965,18 @@
 					var groups=['wei','shu','wu','qun'];
 					var bool1=false;
 					var bool2=false;
+					var bool3=(get.mode()=='guozhan'&&_status.forceKey!=true&&get.config('onlyguozhan'));
 					for(var i in lib.character){
 						if(lib.character[i][1]=='shen'){
 							bool1=true;
 						}
-						if(get.mode()=='guozhan'||lib.character[i][1]=='western'){
+						if(bool3||lib.character[i][1]=='key'){
 							bool2=true;
 						}
 						if(bool1&&bool2) break;
 					}
 					if(bool1) groups.add('shen');
-					if(bool2&&get.mode()!='guozhan') groups.add('western');
+					if(bool2&&!bool3) groups.add('key');
 					var natures=['water','soil','wood','metal'];
 					var span=document.createElement('span');
 					newlined.appendChild(span);
@@ -49100,7 +49114,7 @@
 			}
 		},
 		groups:function(){
-			return ['wei','shu','wu','qun','western'];
+			return ['wei','shu','wu','qun','western','key'];
 		},
 		types:function(){
 			var types=[];
