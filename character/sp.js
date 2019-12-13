@@ -20,7 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			xinpi:['male','wei',3,['xpchijie','yinju'],['unseen']],
+			xinpi:['male','wei',3,['xpchijie','yinju']],
 			lisu:['male','qun',2,['lslixun','lskuizhu']],
 			zhangwen:['male','wu',3,['songshu','sibian']],
 			

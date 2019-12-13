@@ -4632,6 +4632,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			bazhen:{
 				audio:2,
 				equipSkill:true,
+				noHidden:true,
 				inherit:'bagua_skill',
 				filter:function(event,player){
 					if(!lib.skill.bagua_skill.filter(event,player)) return false;
