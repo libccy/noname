@@ -978,11 +978,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					eff1:{
 						sub:true,
 						equipSkill:true,
+						noHidden:true,
 						trigger:{global:'phaseDrawBegin'},
 						//priority:8,
 						forced:true,
 						filter:function(event,player){
-							if(event.player!=player||event.num<=0) return false;
+							if(event.player!=player||event.num<=0||player.isDisabled(5)) return false;
 							return !game.hasPlayer(function(current){
 								return current.getEquip('yuxi');
 							})
@@ -995,9 +996,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'phaseUseBegin'},
 						//priority:8,
 						forced:true,
+						noHidden:true,
 						equipSkill:true,
 						filter:function(event,player){
-							if(event.player!=player) return false;
+							if(event.player!=player||player.isDisabled(5)) return false;
 							return game.hasPlayer(function(current){
 								return player.canUse('zhibi',current);
 							})&&!game.hasPlayer(function(current){
@@ -1011,7 +1013,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 					eff3:{
 						sub:true,
-						trigger:{global:'useCardToBegin'},
+						trigger:{global:'useCardToTargeted'},
 						//priority:16,
 						forced:true,
 						filter:function(event,player){
