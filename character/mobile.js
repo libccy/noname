@@ -246,7 +246,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else event.directbool=true;
 						'step 1'
 						if(!result.bool&&!event.directbool){
-							game.cardsDiscard(card);
+							//game.cardsDiscard(card);
 							return;
 						};
 						event.node=event.judgeResult.node;
@@ -765,7 +765,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(evt&&evt.name=='useCard'&&evt.card&&['equip','delay'].contains(get.type(evt.card))) return false;
 					var cards=event.cards;
 					for(var i=0;i<cards.length;i++){
-						if(get.color(cards[i])=='red'&&get.position(cards[i])=='d') return true;
+						if(get.color(cards[i])=='red'&&get.position(cards[i],true)=='d') return true;
 					}
 					return false;
 				},
@@ -774,7 +774,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						var cards=trigger.cards;
 						for(var i=0;i<cards.length;i++){
-						if(get.color(cards[i])=='red'&&get.position(cards[i])=='d') player.storage.rezaiqi++;
+						if(get.color(cards[i])=='red'&&get.position(cards[i],true)=='d') player.storage.rezaiqi++;
 						}
 					}
 				},

@@ -655,7 +655,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					};
 					"step 1"
 					if(result.bool){
-						player.respond(result.cards,'highlight','jilue_guicai');
+						player.respond(result.cards,'highlight','jilue_guicai','noOrdering');
 					}
 					else{
 						event.finish();
@@ -671,7 +671,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						game.cardsDiscard(trigger.player.judging[0]);
 						trigger.player.judging[0]=result.cards[0];
-						trigger.position.appendChild(result.cards[0]);
+						trigger.orderingCards.addArray(result.cards);
 						game.log(trigger.player,'的判定牌改为',result.cards[0]);
 						game.delay(2);
 					}
@@ -1284,6 +1284,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mark:true,
 				forced:true,
+				charlotte:true,
 				content:function(){
 					trigger.cancel();
 				},

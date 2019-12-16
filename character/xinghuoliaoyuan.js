@@ -1157,7 +1157,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function (){
 					"step 0"
-					if(get.itemtype(trigger.cards)=='cards'&&get.position(trigger.cards[0])=='d'){
+					if(get.itemtype(trigger.cards)=='cards'&&get.position(trigger.cards[0],true)=='o'){
 						player.gain(trigger.cards,"gain2");
 					}
 					player.draw("nodelay");
@@ -1353,7 +1353,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				//priority:7,
 				content:function (){
-					if(trigger.parent.name=='damage'&&get.itemtype(trigger.parent.cards)=='cards'&&get.position(trigger.parent.cards[0])=='d'){
+					if(trigger.parent.name=='damage'&&get.itemtype(trigger.parent.cards)=='cards'&&get.position(trigger.parent.cards[0],true)=='o'){
 						player.gain(trigger.parent.cards,"gain2");
 					}
 					player.storage.xinfu_xionghuo++;
@@ -1969,6 +1969,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					"step 2"
 					trigger.source.reinit(result.control,'guansuo');
+					if(_status.characterlist){
+						_status.characterlist.add(result.control);
+						_status.characterlist.remove('guansuo');
+					}
 					player.recover();
 					player.addSkill('xinfu_zhennan');
 				},
@@ -2297,7 +2301,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					delete player.storage.xinfu_yanyu2;
 				},
 				trigger:{
-					global:["loseEnd","cardsDiscardEnd","useCardAfter","respondAfter"],
+					global:["loseEnd","cardsDiscardEnd"],
 				},
 				direct:true,
 				filter:function (event,player){
@@ -2307,7 +2311,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var type=player.storage.xinfu_yanyu;
 					var cards=event.cards;
 					for(var i=0;i<cards.length;i++){
-						if(get.type(cards[i],'trick')==type&&get.position(cards[i])=='d') return true;
+						if(get.type(cards[i],'trick')==type&&get.position(cards[i],true)=='d') return true;
 					}
 					return false;
 				},
@@ -2318,7 +2322,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var type=player.storage.xinfu_yanyu;
 					var cards=trigger.cards;
 					for(var i=0;i<cards.length;i++){
-						if(get.type(cards[i],'trick')==type&&get.position(cards[i])=='d') event.cards.push(cards[i]);
+						if(get.type(cards[i],'trick')==type&&get.position(cards[i],true)=='d') event.cards.push(cards[i]);
 					}
 					'step 1'
 					if(player.storage.xinfu_yanyu2>=3) event.finish();

@@ -760,7 +760,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('judging',trigger.player.judging[0]);
 					"step 1"
 					if(result.bool){
-						player.respond(result.cards,'highlight','xinguidao');
+						player.respond(result.cards,'highlight','xinguidao','noOrdering');
 					}
 					else{
 						event.finish();
@@ -772,9 +772,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var card=result.cards[0];
 						if(get.suit(card)=='spade'&&card.number>1&&card.number<10) player.draw('nodelay');
 						trigger.player.judging[0]=result.cards[0];
-						if(!get.owner(result.cards[0],'judge')){
-							trigger.position.appendChild(result.cards[0]);
-						}
+						trigger.orderingCards.addArray(result.cards);
 						game.log(trigger.player,'的判定牌改为',result.cards[0]);
 					}
 					"step 3"
@@ -1343,7 +1341,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function (){
 					"step 0"
-					if(get.itemtype(trigger.cards)=='cards'&&get.position(trigger.cards[0])=='d'){
+					if(get.itemtype(trigger.cards)=='cards'&&get.position(trigger.cards[0],true)=='o'){
 						player.gain(trigger.cards,"gain2");
 					}
 					player.draw('nodelay');
@@ -2026,7 +2024,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.judge(function(card){
 						if(get.color(card)=='black') return 1.5;
 						return -1.5;
-					},ui.special);
+					});
 					"step 1"
 					if(result.judge>0){
 						event.cards.push(result.card);
@@ -2039,7 +2037,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						for(var i=0;i<event.cards.length;i++){
-							if(get.position(event.cards[i])!='s'){
+							if(get.position(event.cards[i])!='d'){
 								event.cards.splice(i,1);i--;
 							}
 						}
@@ -2601,7 +2599,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('judging',trigger.player.judging[0]);
 					"step 1"
 					if(result.bool){
-						player.respond(result.cards,'reguicai','highlight');
+						player.respond(result.cards,'reguicai','highlight','noOrdering');
 					}
 					else{
 						event.finish();
@@ -2619,9 +2617,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						game.cardsDiscard(trigger.player.judging[0]);
 						trigger.player.judging[0]=result.cards[0];
-						if(!get.owner(result.cards[0],'judge')){
-							trigger.position.appendChild(result.cards[0]);
-						}
+						trigger.orderingCards.addArray(result.cards);
 						game.log(trigger.player,'的判定牌改为',result.cards[0]);
 						game.delay(2);
 					}
@@ -3141,7 +3137,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'damageEnd'},
 				filter:function(event,player){
-					return get.itemtype(event.cards)=='cards'&&get.position(event.cards[0])=='d';
+					return get.itemtype(event.cards)=='cards'&&get.position(event.cards[0],true)=='o';
 				},
 				content:function(){
 					player.gain(trigger.cards);
@@ -3165,7 +3161,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
-					if(get.itemtype(trigger.cards)=='cards'&&get.position(trigger.cards[0])=='d'){
+					if(get.itemtype(trigger.cards)=='cards'&&get.position(trigger.cards[0],true)=='o'){
 						player.chooseControl('rejianxiong_mopai','rejianxiong_napai','cancel2').set('prompt',get.prompt('rejianxiong')).ai=function(){
 							var trigger=_status.event.getTrigger();
 							if(trigger.cards.length==1&&trigger.cards[0].name=='sha') return 0;

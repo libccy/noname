@@ -611,6 +611,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					trigger.cancel();
 					event.cards=get.cards(4);
+					game.cardsGotoOrdering(event.cards);
 					player.showCards(event.cards);
 					'step 1'
 					cards.sort(function(a,b){
@@ -634,7 +635,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.line(target);
 						target.gain(cards,'gain2');
 					}
-					else if(cards.length) game.cardsDiscard(cards);
 				},
 			},
 			lslixun:{
@@ -788,7 +788,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var cards=[];
 						var cs=trigger.cards;
 						for(var i=0;i<cs.length;i++){
-							if(get.position(cs[i])=='d') cards.push(cs[i]);
+							if(get.position(cs[i],true)=='o') cards.push(cs[i]);
 						}
 						if(cards.length){
 							player.logSkill('xpchijie3');
@@ -1648,7 +1648,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"biaozhao2":{
 				trigger:{
-					global:["loseEnd","cardsDiscardEnd","useCardAfter","respondAfter"],
+					global:["loseEnd","cardsDiscardEnd"],
 				},
 				audio:"biaozhao",
 				filter:function (event,player){
@@ -1658,7 +1658,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var suit=get.suit(player.storage.biaozhao[0]);
 					var num=get.number(player.storage.biaozhao[0]);
 					for(var i=0;i<event.cards.length;i++){
-						if(get.position(event.cards[i])=='d'&&get.suit(event.cards[i])==suit
+						if(get.position(event.cards[i],true)=='d'&&get.suit(event.cards[i])==suit
 						&&get.number(event.cards[i])==num) return true;
 					}
 					return false;
@@ -2068,7 +2068,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('judging',trigger.player.judging[0]);
 					"step 1"
 					if(result.bool){
-						player.respond(result.cards,'highlight','huanshi_three');
+						player.respond(result.cards,'highlight','huanshi_three','noOrdering');
 					}
 					else{
 						event.finish();
@@ -2086,9 +2086,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						game.cardsDiscard(trigger.player.judging[0]);
 						trigger.player.judging[0]=result.cards[0];
-						if(!get.owner(result.cards[0],'judge')){
-							trigger.position.appendChild(result.cards[0]);
-						}
+						trigger.orderingCards.addArray(result.cards);
 						game.log(trigger.player,'的判定牌改为',result.cards[0]);
 						game.delay(2);
 					}
@@ -3674,7 +3672,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai1:function(card){
 							var player=_status.event.player;
 							var cardname=_status.event.cardname;
-							if(_status.event.du) return -get.value(card);
+							if(_status.event.du) return -get.value(card,player,'raw');
 							else if(_status.event.shuimeng){
 								if(cardname=='wuzhong'){
 									if(player.needsToDiscard(2-ui.selected.cards.length)){
@@ -3732,7 +3730,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 0;
 						},
 						du:player.hasCard(function(card){
-							return get.value(card)<0;
+							return get.value(card,player,'raw')<0;
 						}),
 						shuimeng:trigger.getParent(2).name=='shuimeng',
 						nh:nh,
@@ -5591,7 +5589,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.storage.fanghun) player.draw(player.storage.fanghun);
 					event.num=player.storage.fanghun2;
 					var list;
-					if(_status.connectMode){
+					if(_status.characterlist){
+						list=[];
+						for(var i=0;i<_status.characterlist.length;i++){
+							var name=_status.characterlist[i];
+							if(lib.character[name][1]=='shu') list.push(name);
+						}
+					}
+					else if(_status.connectMode){
 						list=get.charactersOL(function(i){
 							return lib.character[i][1]!='shu';
 						});
@@ -5619,6 +5624,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.num=Math.min(event.num,game.players.length+game.dead.length);
 					}
 					player.reinit('zhaoxiang',result.links[0],event.num);
+					if(_status.characterlist){
+						_status.characterlist.add('zhaoxiang');
+						_status.characterlist.remove(result.links[0]);
+					}
 				}
 			},
 			fanghun:{
@@ -6459,6 +6468,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['gainEnd','loseEnd']},
 				direct:true,
 				filter:function(event,player){
+					if(event.name=='lose'&&event.type=='gain'&&event.getParent().player==player) return false;
 					return event.cards&&event.cards.length>1;
 				},
 				content:function(){
@@ -9675,7 +9685,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging[0].clone]));
 						}
 						trigger.player.judging[0]=card;
-						trigger.position.appendChild(card);
+						trigger.orderingCards.addArray(result.links);
 						game.log(player,'的判定牌改为',card);
 						game.delay(2);
 					}
@@ -9845,7 +9855,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				callback:function(){
 					var evt=event.getParent(2);
 					if(event.judgeResult.color=='black'){
-						game.cardsDiscard(card);
+						//game.cardsDiscard(card);
 						evt._trigger.num++;
 					}
 					else{
@@ -10418,7 +10428,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.player==player) return false;
 					if(event.cards){
 						for(var i=0;i<event.cards.length;i++){
-							if(get.position(event.cards[i])=='d') return true;
+							if(get.position(event.cards[i],true)=='o') return true;
 						}
 					}
 					return false;
@@ -10427,7 +10437,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var cards=trigger.cards.slice(0);
 					for(var i=0;i<cards.length;i++){
-						if(get.position(cards[i])!='d'){
+						if(get.position(cards[i],true)!='o'){
 							cards.splice(i--,1);
 						}
 					}
@@ -10857,7 +10867,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'recoverAfter'},
 				direct:true,
 				filter:function(event,player){
-					return _status.currentPhase==event.player;
+					return event.player.isPhaseUsing();
 				},
 				content:function(){
 					'step 0'
@@ -11017,7 +11027,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(att>2) return att/Math.sqrt(1+target.countCards('h'));
 								return att/Math.sqrt(1+target.countCards('h'))/5;
 							}
-						}).set('enemy',get.value(event.togive[0])<0);
+						}).set('enemy',get.value(event.togive[0],player,'raw')<0);
 					}
 					else{
 						//game.cardsDiscard(event.cards);
@@ -11400,7 +11410,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yongjue:{
 				audio:2,
-				trigger:{global:'useCardEnd'},
+				trigger:{global:'useCardAfter'},
 				usable:1,
 				filter:function(event,player){
 					if(event.card.name!='sha') return false;
@@ -11408,7 +11418,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.targets.contains(player)) return false;
 					if(event.cards){
 						for(var i=0;i<event.cards.length;i++){
-							if(get.position(event.cards[i])=='d') return true;
+							if(get.position(event.cards[i],true)=='o') return true;
 						}
 					}
 					return false;
@@ -11417,7 +11427,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var cards=trigger.cards.slice(0);
 					for(var i=0;i<cards.length;i++){
-						if(get.position(cards[i])!='d'){
+						if(get.position(cards[i],true)!='o'){
 							cards.splice(i--,1);
 						}
 					}
@@ -12336,9 +12346,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						game.cardsDiscard(trigger.player.judging[0]);
 						trigger.player.judging[0]=event.card;
-						if(!get.owner(event.card,'judge')){
-							trigger.position.appendChild(event.card);
-						}
+						trigger.orderingCards.add(event.card);
 						game.log(trigger.player,'的判定牌改为',event.card);
 						game.delay(2);
 					}
@@ -13310,7 +13318,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangwen:'张温',
 			
 			songshu:'颂蜀',
-			songshu_info:'出牌阶段，你可以和其他角色拼点。若你没赢，其摸两张牌，且你本阶段内不能再发动〖思辨〗',
+			songshu_info:'出牌阶段，你可以和其他角色拼点。若你没赢，其摸两张牌，且你本阶段内不能再发动〖颂蜀〗',
 			sibian:'思辨',
 			sibian_info:'摸牌阶段，你可以放弃摸牌，改为亮出牌堆顶的四张牌，然后获得其中所有点数最大与点数最小的牌。若获得的牌是两张且点数之差小于存活人数，则你可以将剩余的牌交给手牌数最少的角色。',
 			lslixun:'利熏',
