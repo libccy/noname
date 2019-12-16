@@ -9846,16 +9846,15 @@
 					for(var i=0;i<cards.length;i++){
 						cards[i].goto(ui.ordering);
 					}
-					if(!event.noOrdering){
-					 var evt=event.getParent();
-						if(!evt.orderingCards){
-							evt.orderingCards=[];
-							var next=game.createEvent('orderingDiscard',false,evt.getParent());
-							next.relatedEvent=evt;
-							next.setContent('orderingDiscard');
-						}
-						evt.orderingCards.addArray(cards);
+				 var evt=event.getParent();
+					if(!evt.orderingCards) evt.orderingCards=[];
+					if(!event.noOrdering&&!event.cardsOrdered){
+						event.cardsOrdered=true;
+						var next=game.createEvent('orderingDiscard',false,evt.getParent());
+						next.relatedEvent=evt;
+						next.setContent('orderingDiscard');
 					}
+					if(!event.noOrdering) evt.orderingCards.addArray(cards);
 				},
 				cardsGotoSpecial:function(){
 					for(var i=0;i<cards.length;i++){
@@ -9934,8 +9933,8 @@
 					target.discard(todis2);
 					"step 1"
 					event.cards=[player.getCards('e'),target.getCards('e')];
-					player.lose(event.cards[0],ui.special,'visible');
-					target.lose(event.cards[1],ui.special,'visible');
+					player.lose(event.cards[0],ui.ordering,'visible');
+					target.lose(event.cards[1],ui.ordering,'visible');
 					if(event.cards[0].length) player.$give(event.cards[0],target);
 					if(event.cards[1].length) target.$give(event.cards[1],player);
 					"step 2"
@@ -11382,6 +11381,7 @@
 						if(event.parent.card&&event.parent.type=='card'){
 							next.set('respondTo',[event.parent.player,event.parent.card]);
 						}
+						if(event.noOrdering) next.noOrdering=true;
 					}
 					if(event.dialog&&event.dialog.close) event.dialog.close();
 				},
@@ -13987,7 +13987,10 @@
 						var next=player.lose(cards2,ui.ordering,'visible');
 						if(event.noOrdering) next.noOrdering=true;
 						cards2.removeArray(next.cards);
-						if(cards2.length) game.cardsGotoOrdering(cards);
+						if(cards2.length){
+							var next2=game.cardsGotoOrdering(cards2);
+							if(event.noOrdering) next2.noOrdering=true;
+						}
 					}
 					for(var i=0;i<cards.length;i++){
 						if(event.animate!=false) player.$throw(cards[i]);
@@ -14020,7 +14023,7 @@
 					target.$giveAuto(event.cards2,player);
 					'step 1'
 					event.cards=event.cards1;
-					var next=player.lose(event.cards,ui.special).set('type','gain');
+					var next=player.lose(event.cards,ui.ordering);
 					if(player==game.me){
 						event.delayed=true;
 					}
@@ -14029,7 +14032,7 @@
 					}
 					'step 1'
 					event.cards=event.cards2;
-					var next=target.lose(event.cards,ui.special).set('type','gain');
+					var next=target.lose(event.cards,ui.ordering);
 					if(target==game.me){
 						event.delayed=true;
 					}
@@ -14039,8 +14042,8 @@
 					'step 2'
 					if(!event.delayed) game.delay();
 					'step 3'
-					player.gain(event.cards2,target);
-					target.gain(event.cards1,player);
+					player.gain(event.cards2);
+					target.gain(event.cards1);
 				},
 				gainMultiple:function(){
 					'step 0'
@@ -14307,15 +14310,16 @@
 					player.update();
 					game.addVideo('loseAfter',player);
 					event.num=0;
-					if(event.position==ui.ordering&&!event.noOrdering){
+					if(event.position==ui.ordering){
 						var evt=event.getParent();
-						if(!evt.orderingCards){
-							evt.orderingCards=[];
+						if(!evt.orderingCards)	evt.orderingCards=[];
+						if(!event.noOrdering&&!event.cardsOrdered){
+							event.cardsOrdered=true;
 							var next=game.createEvent('orderingDiscard',false,evt.getParent());
 							next.relatedEvent=evt;
 							next.setContent('orderingDiscard');
 						}
-						evt.orderingCards.addArray(cards);
+						if(!event.noOrdering) evt.orderingCards.addArray(cards);
 					}
 					"step 1"
 					if(num<cards.length){
