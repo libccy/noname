@@ -2310,7 +2310,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						sub:true,
 						audio:"reyajiao",
 						trigger:{
-							player:"respond",
+							player:"useCard",
 						},
 						//priority:1,
 						filter:function (event,player){
@@ -2320,10 +2320,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						content:function (){
 							"step 0"
 							player.chooseTarget("是否发动【龙胆】令一名其他角色回复1点体力？",function(card,player,target){
-								return target!=trigger.source&&target!=player&&target.isDamaged();
+								return target!=_status.event.source&&target!=player&&target.isDamaged();
 							}).set('ai',function(target){
 								return get.attitude(_status.event.player,target);
-							});
+							}).set('source',trigger.getParent(2).player);
 							"step 1"
 							if(result.bool&&result.targets&&result.targets.length){
 								player.line(result.targets[0],'green');
@@ -2344,10 +2344,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						content:function (){
 							"step 0"
 							player.chooseTarget("是否发动【龙胆】对一名其他角色造成1点伤害？",function(card,player,target){
-								return target!=trigger.target&&target!=player;
+								return target!=_status.event.target&&target!=player;
 							}).set('ai',function(target){
 								return -get.attitude(_status.event.player,target);
-							});
+							}).set('target',trigger.target);
 							"step 1"
 							if(result.bool&&result.targets&&result.targets.length){
 								player.line(result.targets[0],'green');
@@ -2675,7 +2675,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:function (){
 					"step 0"
-					event.cards=get.cards(2);
+					event.cards=game.cardsGotoOrdering(get.cards(2)).cards;
 					"step 1"
 					if(event.cards.length>1){
 						player.chooseCardButton('将“遗计”牌分配给任意角色',true,event.cards,[1,event.cards.length]).set('ai',function(button){
@@ -2825,7 +2825,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.target.chooseToDiscard('he').set('ai',function(card){
 							var player=_status.event.player;
 							if(player.isTurnedOver()) return -1;
-							return (player.hp*player.hp)-get.value(card);
+							return (player.hp*player.hp)-Math.max(1,get.value(card));
 						}).set('prompt','弃置一张手牌并失去一点体力；或选择不弃置，将武将牌翻面并摸'+(player.getDamagedHp())+'张牌。');
 					}
 					else event.finish();
@@ -5579,7 +5579,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.gzyongjue==player){
 						for(var i=0;i<event.cards.length;i++){
-							if(get.position(event.cards[i])=='d'){
+							if(get.position(event.cards[i],true)=='o'){
 								return true;
 							}
 						}
@@ -5593,7 +5593,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var cards=[];
 					for(var i=0;i<trigger.cards.length;i++){
-						if(get.position(trigger.cards[i])=='d'){
+						if(get.position(trigger.cards[i],true)=='o'){
 							cards.push(trigger.cards[i]);
 						}
 					}
@@ -5800,6 +5800,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<skills.length;i++){
 						list.add(skills[i]);
 						var info=lib.skill[skills[i]];
+						if(info.charlotte){list.splice(i--);continue};
 						if(typeof info.derivation=='string'){
 							list.add(info.derivation);
 						}
@@ -5807,7 +5808,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							list.addArray(info.derivation);
 						}
 					}
-					trigger.source.disableSkill('gzduanchang_disable',list);
+					trigger.source.removeSkill(list);
 					trigger.source.syncSkills();
 					player.line(trigger.source,'green');
 				},
