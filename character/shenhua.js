@@ -1551,7 +1551,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							target:'useCardToTargeted',				
 						},
 						filter:function (event,player,name){
-							if(!event.nzry_shicai) return false;
+							if(!event.nzry_shicai&&!event.getParent().nzry_shicai) return false;
 							if(name=='useCardToTargeted'&&('equip'!=get.type(event.card)||event.player!=player)) return false;
 							if(name=='useCardAfter'&&['equip','delay'].contains(get.type(event.card))) return false;
 							return event.cards.filterInD().length>0;
@@ -3237,7 +3237,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:["guzheng_count"],
 				subSkill:{
 					count:{
-						trigger:{global:['dloseEnd','cardsDiscardAfter']},
+						trigger:{global:['loseEnd','cardsDiscardAfter']},
 						forced:true,
 						silent:true,
 						popup:false,

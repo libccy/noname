@@ -6356,6 +6356,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 						next.set('sourcex',player);
 						next.set('jijiang',true);
+						next.noOrdering=true;
 						next.autochoose=lib.filter.autoRespondSha;
 					}
 					else{
@@ -6434,6 +6435,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						next.set('source',player);
 						next.set('target',target);
 						next.set('jijiang',true);
+						next.noOrdering=true;
 						next.autochoose=lib.filter.autoRespondSha;
 					}
 					else{
