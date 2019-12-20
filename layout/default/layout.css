@@ -2261,6 +2261,9 @@ div:not(.handcards)>.card>.info>span,
 #window>.damage.fullscreenavatar[data-nature='fire']>div:first-child>div{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 20px, rgba(0, 0, 0,0.3) 0 0 40px, rgba(232, 53, 53, 1) 0 0 80px;
 }
+#window>.damage.fullscreenavatar[data-nature='fire']>div:first-child>div{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 20px, rgba(0, 0, 0,0.3) 0 0 40px, rgba(203, 177, 255, 1) 0 0 80px;
+}
 #window>.damage.fullscreenavatar[data-nature='orange']>div:first-child>div{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 20px, rgba(0, 0, 0,0.3) 0 0 40px, rgba(255, 120, 0, 1) 0 0 80px;
 }
@@ -3745,6 +3748,23 @@ div[data-nature='metalmm'],
 span[data-nature='metalmm'] {
 	text-shadow: black 0 0 1px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 2px,
 		rgba(255, 203, 0,1) 0 0 2px,black 0 0 1px;
+}
+
+.player .identity[data-color="key"],
+div[data-nature='key'],
+span[data-nature='key'] {
+	text-shadow: rgba(203, 177, 255,1) 0 0 2px,rgba(203, 177, 255,1) 0 0 5px,rgba(203, 177, 255,1) 0 0 10px,
+		rgba(203, 177, 255,1) 0 0 10px,rgba(203, 177, 255,1) 0 0 20px,rgba(203, 177, 255,1) 0 0 20px,black 0 0 1px;
+}
+div[data-nature='keym'],
+span[data-nature='keym'] {
+	text-shadow: rgba(203, 177, 255,1) 0 0 2px,rgba(203, 177, 255,1) 0 0 5px,rgba(203, 177, 255,1) 0 0 5px,
+		rgba(203, 177, 255,1) 0 0 5px,black 0 0 1px;
+}
+div[data-nature='keymm'],
+span[data-nature='keymm'] {
+	text-shadow: rgba(203, 177, 255,1) 0 0 2px,rgba(203, 177, 255,1) 0 0 2px,rgba(203, 177, 255,1) 0 0 2px,
+		rgba(203, 177, 255,1) 0 0 2px,black 0 0 1px;
 }
 
 .player .identity[data-color="nei"],

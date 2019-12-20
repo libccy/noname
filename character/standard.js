@@ -698,7 +698,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.responded) return false;
 					if(player.storage.jijianging) return false;
 					if(!player.hasZhuSkill('jijiang')) return false;
-					if(event.filterCard({name:'sha'},player,event)==false) return false;
+					if(!event.filterCard({name:'sha'},player,event)) return false;
 					return game.hasPlayer(function(current){
 						return current!=player&&current.group=='shu';
 					});

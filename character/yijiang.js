@@ -3489,18 +3489,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				mod:{
-					cardEnabled:function(card,player){
+					cardEnabled2:function(card,player){
 						if(get.color(card)==player.storage.xinsidi2) return false;
 					},
-					cardUsable:function(card,player){
-						if(get.color(card)==player.storage.xinsidi2) return false;
-					},
-					cardRespondable:function(card,player){
-						if(get.color(card)==player.storage.xinsidi2) return false;
-					},
-					cardSavable:function(card,player){
-						if(get.color(card)==player.storage.xinsidi2) return false;
-					}
 				},
 				intro:{
 					content:'不能使用或打出$的牌'
@@ -6313,7 +6304,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.responded) return false;
 					if(!player.hasZhuSkill('qinwang')) return false;
 					if(!player.countCards('he')) return false;
-					if(event.filterCard({name:'sha'},player,event)==false) return false;
+					if(!event.filterCard({name:'sha'},player,event)) return false;
 					return game.hasPlayer(function(current){
 						return current!=player&&current.group=='shu';
 					});
@@ -6424,8 +6415,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else if(event.current.group=='shu'){
 						var next=event.current.chooseToRespond('是否替'+get.translation(player)+'对'+get.translation(target)+'使用一张杀',
-						function(card){
-							var evt=_status.event.source;
+						function(card,player,event){
+							var evt=event||_status.event;
 							return card.name=='sha'||evt.source.canUse(card,evt.target);
 						});
 						next.set('ai',function(card){

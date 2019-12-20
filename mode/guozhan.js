@@ -747,14 +747,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function (event,player){
 					return game.hasPlayer(function(current){
-						return current!=player&&current.isFriendOf(player)&&current.countGainableCards(player,'e')>0;
+						return current.isFriendOf(player)&&current.countGainableCards(player,'e')>0;
 					});
 				},
 				direct:true,
 				content:function (){
 					'step 0'
 					player.chooseTarget(get.prompt2('xindiaodu'),function(card,player,current){
-						return current!=player&&current.isFriendOf(player)&&current.countGainableCards(player,'e')>0;
+						return current.isFriendOf(player)&&current.countGainableCards(player,'e')>0;
 					}).ai=function(target){
 						var num=1;
 						if(target.hasSkill('gzxiaoji')) num+=2.5;
@@ -774,8 +774,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						event.card=result.cards[0];
 						player.chooseTarget('是否将'+get.translation(event.card)+'交给一名其他角色？',function(card,player,current){
-							return current!=player&&current!=event.target1&&current.isFriendOf(player);
-						});
+							return current!=player&&current!=_status.event.target1&&current.isFriendOf(player);
+						}).set('target1',event.target1);
 					}
 					else event.finish();
 					'step 3'
@@ -4298,10 +4298,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					trigger.player.addTempSkill('gzyuejian_num');
 				},
 				logTarget:'player',
-				check:function(event,player){
-					return event.player.needsToDiscard()&&event.player.isDamaged();
-				},
-				frequent:true,
+				forced:true,
 				group:['gzyuejian_count','gzyuejian_clear'],
 				subSkill:{
 					num:{
@@ -4869,7 +4866,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				forceunique:true,
 				enable:'phaseUse',
-				filterCard:{color:'red'},
+				filterCard:function(card){
+					return get.name(card)!='taipingyaoshu'&&get.color(card)=='red';
+				},
 				position:'he',
 				check:function(card){
 					return 6-get.value(card);
@@ -5268,6 +5267,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			yicheng:{
+				audio:2,
 				trigger:{global:'useCardToTargeted'},
 				filter:function(event,player){
 					return event.card.name=='sha'&&event.target.isFriendOf(player);
@@ -5641,7 +5641,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.removeCharacter(1);
 					'step 1'
-					player.awakenSkill('baoling');
+					player.removeSkill('baoling');
 					player.gainMaxHp(3,true);
 					'step 2'
 					player.recover(3);
@@ -7140,7 +7140,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			zhuwei_info:'当你的判定牌生效后，若此牌为【杀】或【决斗】，你可以获得之，然后你可令当前回合角色本回合可额外使用一张【杀】，且手牌上限+1。',
 			gz_yuanshu:'袁术',
 			gzweidi:'伪帝',
-			gzweidi_info:'出牌阶段限一次，你可以指定本回合从牌堆获得过牌的角色，然后选择一个“军令”，令其选择一项：执行该军令；或令你获得其所有手牌，然后交给其等量的牌。',
+			gzweidi_info:'出牌阶段限一次，你可以指定一名本回合从牌堆获得过牌的其他角色，然后选择一个“军令”，令其选择一项：执行该军令；或令你获得其所有手牌，然后交给其等量的牌。',
 			gzyongsi:'庸肆',
 			gzyongsi_info:'锁定技，若场上没有【玉玺】，视为你装备之；当你成为【知己知彼】的目标时，你展示你的所有手牌。',
 			//gzyongsi_eff1:'玉玺',
@@ -7164,7 +7164,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzzongyu_info:'当【六龙骖驾】进入其他角色的装备区后，你可以用你装备区内所有坐骑牌（至少一张）与【六龙骖驾】交换位置。锁定技，当你使用一张坐骑牌后，若场上或弃牌堆中有【六龙骖驾】，则将【六龙骖驾】置入你的装备区。',
 					
 			xindiaodu:"调度",
-			"xindiaodu_info":"当与你势力相同的角色使用装备牌时，该角色可以摸一张牌；出牌阶段开始时，你可以获得与你势力相同的一名其他角色装备区里的一张牌，然后你可以将此牌交给另一名与你势力相同的其他角色。",
+			"xindiaodu_info":"当与你势力相同的角色使用装备牌时，该角色可以摸一张牌；出牌阶段开始时，你可以获得与你势力相同的一名角色装备区里的一张牌，然后你可以将此牌交给另一名与你势力相同的其他角色。",
 			yigui:"役鬼",
 			"yigui_info":"当你第一次明置此武将牌时，你将剩余武将牌堆的两张牌扣置于游戏外，称为“魂”；你可以将一张“魂”亮出并置入剩余武将牌堆，视为你使用一张本回合你未以此法使用过的基本牌或普通锦囊牌，且目标须为与此“魂”势力相同或未确定势力的角色。 ",
 			"yigui_init":"役鬼",
@@ -7199,7 +7199,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"new_duanliang":"断粮",
 			"new_duanliang_info":"出牌阶段，你可以将一张黑色基本牌或黑色装备牌当做一张【兵粮寸断】使用。你使用【兵粮寸断】没有距离限制。若你对距离超过2的角色发动了“断粮”，则本回合不能再发动“断粮”。",
 			"new_shushen":"淑慎",
-			"new_shushen_info":"当你回复1点体力时，你可令一名其他角色摸一张牌。",
+			"new_shushen_info":"当你回复1点体力后，你可令一名其他角色摸一张牌。",
 			"new_fenji":"奋激",
 			"new_fenji_info":"一名角色的结束阶段，若其没有手牌，则你可以令其摸两张牌，然后你失去1点体力。",
 			"new_luanji":"乱击",
@@ -7282,7 +7282,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzqice_backup:'奇策',
 			gzqice_info:'出牌阶段限一次，你可以将所有手牌当任意一张普通锦囊牌使用，你不能以此法使用目标数超过X的牌（X为你的手牌数），然后你可以变更副将。',
 			gzyuejian:'约俭',
-			gzyuejian_info:'与你势力相同角色的弃牌阶段开始时，若其本回合未使用指定过其他势力的角色为目标，则该角色本回合手牌上限等同于其体力上限',
+			gzyuejian_info:'锁定技，与你势力相同角色的弃牌阶段开始时，若其本回合未使用指定过其他势力的角色为目标，则该角色本回合手牌上限等同于其体力上限',
 			gzxiongsuan:'凶算',
 			gzxiongsuan_info:'限定技，出牌阶段，你可以弃置一张手牌并选择与你势力相同的一名角色，对其造成1点伤害，然后你摸三张牌。若该角色有已发动的限定技，则你选择其中一个限定技，此回合结束后视为该限定技未发动过。',
 			gzhuashen:'化身',
@@ -7308,7 +7308,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			hongfa_respond:'天兵',
 			hongfa_info:'君主技，锁定技，当此武将牌明置时，你获得“黄巾天兵符”；准备阶段开始时，若没有“天兵”，你将牌堆顶的X张牌置于“黄巾天兵符”上，称为“天兵”（X为群势力角色的数量）',
 			wendao:'问道',
-			wendao_info:'出牌阶段限一次，你可以弃置一张红色牌，获得弃牌堆里或场上的一张【太平要术】',
+			wendao_info:'出牌阶段限一次，你可以弃置一张不为【太平要术】的红色牌，获得弃牌堆里或场上的一张【太平要术】',
 			huangjintianbingfu:'黄巾天兵符',
 			huangjintianbingfu_ab:'兵符',
 			huangjintianbingfu_bg:'符',
@@ -7334,7 +7334,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzsuishi:'随势',
 			gzsuishi_info:'锁定技，当其他角色进入濒死状态时，若伤害来源与你势力相同，你摸一张牌；当其他角色死亡时，若其与你势力相同，你失去1点体力',
 			baoling:'暴凌',
-			baoling_info:'主将技，锁定技，出牌阶段结束时，若你有副将，则你移除副将，然后加3点体力上限，回复3点体力，并获得“崩坏”',
+			baoling_info:'主将技，锁定技，出牌阶段结束时，若你有副将，则你移除副将，然后加3点体力上限，回复3点体力，失去技能〖暴凌〗并获得〖崩坏〗',
 			yingyang:'鹰扬',
 			yingyang_info:'当你拼点的牌亮出后，你可以令此牌的点数+3或-3（至多为K，至少为1）',
 			hunshang:'魂殇',

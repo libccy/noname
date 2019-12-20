@@ -4680,18 +4680,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(get.color(card)=='red'&&player!=target) return false;
 					}
 				},
-				global:'boss_fentian2'
+				group:'boss_fentian2',
 			},
 			boss_fentian2:{
-				mod:{
-					cardRespondable:function(card,player){
-						var evt=_status.event.parent;
-						if(evt.player&&evt.player.hasSkill('boss_fentian')&&
-							player!=evt.player&&evt.card&&get.color(evt.card)=='red'){
-							return false;
-						}
-					}
-				}
+				trigger:{player:'useCard'},
+				forced:true,
+				filter:function(event,player){
+					return get.color(event.card)=='red';
+				},
+				content:function(){
+					trigger.directHit.addArray(game.players);
+					trigger.directHit.remove(player);
+				},
 			},
 			boss_xingxia:{
 				enable:'phaseUse',
@@ -8269,6 +8269,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_shenen_info:'锁定技，所有己方角色使用牌无距离限制；所有敌方角色摸牌阶段多摸一张牌且手牌上限+1',
 			boss_fentian:'焚天',
 			boss_fentian_info:'锁定技，你造成的伤害视为火焰伤害；你使用红色牌无距离和次数限制，且不可被其他角色使用【闪】或【无懈可击】响应',
+			boss_fentian2:'焚天',
 			boss_xingxia:'行夏',
 			boss_xingxia_info:'每两轮限一次，出牌阶段，你可以对焰灵造成2点火焰伤害，然后令每名敌方角色选择一项：1.弃置一张红色牌；2.你对其造成1点火焰伤害',
 			boss_huihuo:'回火',

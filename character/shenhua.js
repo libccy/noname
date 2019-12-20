@@ -5577,7 +5577,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			liegong:{
 				audio:2,
-				trigger:{player:'useCardToTargeted'},
+				trigger:{player:'useCardToPlayered'},
 				check:function(event,player){
 					return get.attitude(player,event.target)<=0;
 				},

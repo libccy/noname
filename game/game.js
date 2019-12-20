@@ -44694,7 +44694,10 @@
 				var nameskin=name;
 				var nameskin2=name;
 				var gzbool=false;
-				if(nameskin.indexOf('gz_')==0){
+				if(nameskin.indexOf('gz_shibing')==0){
+					nameskin=nameskin.slice(3,11);
+				}
+				else if(nameskin.indexOf('gz_')==0){
 					nameskin=nameskin.slice(3);
 					gzbool=true;
 				}
@@ -48491,7 +48494,10 @@
 							var nameskin=(avatar2?node.name2:node.name);
 							var nameskin2=nameskin;
 							var gzbool=false;
-							if(nameskin.indexOf('gz_')==0){
+							if(nameskin.indexOf('gz_shibing')==0){
+								nameskin=nameskin.slice(3,11);
+							}
+							else if(nameskin.indexOf('gz_')==0){
 								nameskin=nameskin.slice(3);
 								gzbool=true;
 							}
@@ -48552,7 +48558,10 @@
 							var nameskin=(avatar2?node.name2:node.name);
 							var nameskin2=nameskin;
 							var gzbool=false;
-							if(nameskin.indexOf('gz_')==0){
+							if(nameskin.indexOf('gz_shibing')==0){
+								nameskin=nameskin.slice(3,11);
+							}
+							else if(nameskin.indexOf('gz_')==0){
 								nameskin=nameskin.slice(3);
 								gzbool=true;
 							}
@@ -48984,7 +48993,10 @@
 						var nameskin=node.link;
 						var nameskin2=nameskin;
 						var gzbool=false;
-						if(nameskin.indexOf('gz_')==0){
+						if(nameskin.indexOf('gz_shibing')==0){
+							nameskin=nameskin.slice(3,11);
+						}
+						else if(nameskin.indexOf('gz_')==0){
 							nameskin=nameskin.slice(3);
 							gzbool=true;
 						}
