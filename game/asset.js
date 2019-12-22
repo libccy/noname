@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'1.9.96.3',
+	'1.9.96.6',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -459,6 +459,10 @@ window.noname_asset_list=[
 	'audio/skill/xiaoxi_pangde2.mp3',
 	'audio/skill/xiechan1.mp3',
 	'audio/skill/xiechan2.mp3',
+	'audio/skill/pytianjiang1.mp3',
+	'audio/skill/pytianjiang2.mp3',
+	'audio/skill/pyzhuren1.mp3',
+	'audio/skill/pyzhuren2.mp3',
 	
 	'audio/skill/anguo1.mp3',
 	'audio/skill/anguo2.mp3',
@@ -2329,6 +2333,7 @@ window.noname_asset_list=[
 	'image/character/zhangwen.jpg',
 	'image/character/re_zuoci.jpg',
 	'image/character/xinpi.jpg',
+	'image/character/puyuan.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
@@ -3965,5 +3970,8 @@ window.noname_skin_list={
 	zhugeliang:5,
 	zhuran:1,
 	zhurong:3,
-	zuoci:4
+	zuoci:4,
+	
+	shibing1:6,
+	shibing2:6,
 };

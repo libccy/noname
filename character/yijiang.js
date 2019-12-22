@@ -4163,7 +4163,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								choice='taoyuan';
 							}
 							else{
-								choice=Math.random()<0.5?'wuzhong':'shunshou';
+								choice=Math.random()<0.5?'guohe':'shunshou';
 							}
 						}
 					}
@@ -7954,7 +7954,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dingpin3:{
 				trigger:{player:'useCard'},
 				silent:true,
-				content:function(){player.storage.dingpin.add(get.type(trigger.card,'trick'))},
+				content:function(){if(player.storage.dingpin)player.storage.dingpin.add(get.type(trigger.card,'trick'))},
 			},
 			dingpin4:{
 				trigger:{player:'phaseUseBefore'},

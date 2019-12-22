@@ -689,6 +689,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return player.countCards('e')>0;
 				},
+				check:function(){return 1},
 				filterCard:true,
 				filterTarget:function(event,player,target){
 					return target!=player&&!target.isDisabled(get.subtype(ui.selected.cards[0]));
@@ -698,6 +699,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					target.equip(cards[0]);
 				},
+				ai:{
+					order:11,
+					result:{
+						target:function(player,target){
+							if(ui.selected.cards.length){
+								var card=ui.selected.cards[0];
+								if(target.getEquip(card)||target.countCards('h',{subtype:get.subtype(card)})) return 0;
+								return get.effect(target,card,player,target);
+							}
+							return 0;
+						},
+					},
+				},
 			},
 			pyzhuren:{
 				audio:2,
@@ -705,6 +719,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				filterCard:true,
 				selectCard:1,
+				check:function(card){
+					var player=_status.event.player;
+					var name='pyzhuren_'+(card[card.name=='shandian'?'name':'suit']);
+					if(!lib.card[name]||_status.pyzhuren&&_status.pyzhuren[name]){
+						if(!player.countCards('h','sha')) return 4-get.value(card);
+						return 0;
+					}
+					return 2+card.number/2-get.value(card);
+				},
 				content:function(){
 					if(!_status.pyzhuren) _status.pyzhuren={};
 					var rand=get.number(cards[0])/13;
@@ -722,6 +745,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						_status.pyzhuren[name]=true;
 						player.gain(game.createCard(name,cards[0].name=='shandian'?'spade':cards[0].suit,1),'gain2')
 					}
+				},
+				ai:{
+					order:10,
+					result:{
+						player:1,
+					},
 				},
 				group:'pyzhuren_destroy',
 			},
@@ -898,7 +927,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			songshu_reflectionblue:{
-				//不愧是你 马场老贼
 			},
 			sibian:{
 				audio:2,
@@ -1918,7 +1946,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			biaozhao:{
 				audio:2,
-				group:["biaozhao2","biaozhao3"],
 				intro:{
 					content:"cards",
 				},
@@ -1936,6 +1963,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					if(result.bool){
+						player.addSkill('biaozhao2');
+						player.addSkill('biaozhao3');
 						player.logSkill('biaozhao');
 						player.lose(result.cards,ui.special,'toStorage');
 						player.storage.biaozhao=result.cards;
@@ -1947,6 +1976,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{
 					global:["loseEnd","cardsDiscardEnd"],
 				},
+				charlotte:true,
+				forced:true,
 				audio:"biaozhao",
 				filter:function (event,player){
 					if(!player.storage.biaozhao) return false;
@@ -1982,6 +2013,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"phaseZhunbeiBegin",
 				},
 				forced:true,
+				charlotte:true,
 				audio:"biaozhao",
 				filter:function (event,player){
 					return player.storage.biaozhao!=undefined;
@@ -3974,35 +4006,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							else if(_status.event.shuimeng){
 								if(cardname=='wuzhong'){
 									if(player.needsToDiscard(2-ui.selected.cards.length)){
-										return 10-get.value(card);
+										return 10-get.value(card,player,'raw');
 									}
 								}
 								else if(cardname=='guohe'){
 									if(player.needsToDiscard(-1-ui.selected.cards.length)){
-										return 10-get.value(card);
+										return 10-get.value(card,player,'raw');
 									}
 								}
 								return 0;
 							}
 							else if(cardname=='lebu'){
 								if(player.needsToDiscard(1-ui.selected.cards.length)){
-									return 8-get.value(card);
+									return 8-get.value(card,player,'raw');
 								}
 								else{
 									if(!ui.selected.cards.length){
-										return 6-get.value(card);
+										return 6-get.value(card,player,'raw');
 									}
 									return 0;
 								}
 							}
 							else if(cardname=='shunshou'){
-								if(_status.event.nh<=2) return get.value(card);
+								if(_status.event.nh<=2) return get.value(card,player,'raw');
 							}
 							else if(cardname=='huogong'){
-								if(player.hp==1) return get.value(card);
+								if(player.hp==1) return get.value(card,player,'raw');
 							}
 							if(ui.selected.cards.length) return 0;
-							return 7-get.value(card);
+							return 7-get.value(card,player,'raw');
 						},
 						ai2:function(target){
 							var att=get.attitude(_status.event.player,target);
@@ -8596,7 +8628,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					target:{
 						audio:"anxian",
-						trigger:{target:'shaBefore'},
+						trigger:{target:'useCardToTargeted'},
 						direct:true,
 						filter:function(event,player){
 							return player.countCards('h');
@@ -8617,7 +8649,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							"step 1"
 							if(result.bool){
 								trigger.player.draw();
-								trigger.cancel();
+								trigger.getParent().excluded.push(player);
 							}
 						},
 					}
@@ -12051,6 +12083,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			junbing2:{
 				audio:'junbing',
+				forceaudio:true,
 				trigger:{player:'phaseJieshuBegin'},
 				filter:function(event,player){
 					if(player.countCards('h')>1) return false;

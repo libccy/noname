@@ -5534,7 +5534,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return player.canUse({name:'sha'},target,false);
 					}).set('check',check).set('ai',function(target){
 						if(!_status.event.check) return 0;
-						return get.effect(target,{name:'sha'},_status.event.player);
+						return get.effect(target,{name:'sha'},_status.event.player,_status.event.player);
 					});
 					"step 1"
 					if(result.bool){

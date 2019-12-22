@@ -5500,7 +5500,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				audio:'zfengshi',
 				trigger:{player:'useCardToPlayered'},
 				filter:function(event,player){
-					if(event.card.name!='sha'&&game.countPlayer()<4) return false;
+					if(event.card.name!='sha'||game.countPlayer()<4) return false;
 					return player.siege(event.target)&&game.hasPlayer(function(current){
 						return current.hasSkill('fengshi')&&current.siege(event.target);
 					})&&event.target.countCards('e');

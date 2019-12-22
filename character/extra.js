@@ -2510,6 +2510,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var target=result.targets[0];
 								player.line(target);
 								player.logSkill('drlt_jieying',target);
+								player.removeSkill('drlt_jieying_mark');
 								target.addSkill('drlt_jieying_mark');
 							};
 						},

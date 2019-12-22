@@ -584,17 +584,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:["qianxin_effect"],
 				enable:"phaseUse",
 				usable:1,
-				filter:function (event,player){
-					var num1=game.players.length-1;
-					var num2=ui.cardPile.childElementCount;
-					if(num1>num2) return false;
-					if(!player.storage.xinfu_qianxin) return true;
-					for(var i=0;i<num2;i++){
-						if(player.storage.xinfu_qianxin.contains(ui.cardPile.childNodes[i])){
-							return false;
+				onChooseToUse:function(event){
+					if(!game.online){
+						var num1=game.players.length-1;
+						var player=event.player;
+						var num2=ui.cardPile.childElementCount;
+						var num3=num2;
+						if(num1>num2) num3=0;
+						else if(!player.storage.xinfu_qianxin){}
+						else{
+							for(var i=0;i<num2;i++){
+								if(player.storage.xinfu_qianxin.contains(ui.cardPile.childNodes[i])){
+									num3=0;break;
+								}
+							}
 						}
+						event.set('qianxinNum',num3);
 					}
-					return true;
+				},
+				filter:function (event,player){
+					return event.qianxinNum&&event.qianxinNum>0;
 				},
 				filterTarget:function (card,player,target){
 					return target!=player;
@@ -602,7 +611,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:true,
 				selectCard:function (){
 					var num1=game.players.length-1;
-					var num2=ui.cardPile.childElementCount;
+					var num2=_status.event.qianxinNum;
 					return [1,Math.floor(num2/num1)];
 				},
 				discard:false,
@@ -695,8 +704,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'令'+get.translation(event.source)+'将手牌摸至四张',
 							'令自己本回合的手牌上限-2'
 						]).set('ai',function(){
-							var list=[0,1];
-							return list.randomGet();
+							var player=_status.event.player;
+							var source=_status.event.getParent().player;
+							if(get.attitude(player,source)>0) return 0;
+							if(player.hp-player.countCards('h')>1) return 1;
+							return [0,1].randomGet();
 						})
 					}
 					'step 1'
@@ -1568,7 +1580,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:"phaseUse",
 				filter:function (event,player){
 					if(player.hasSkill('lianhuan')||player.hasSkill('xinlianhuan')) return false;
-					if(player.getStat().skill.smh_lianhuan+player.getStat().skill.smh_lianhuan1>=3) return false;
+					if((player.getStat().skill.smh_lianhuan||0)+(player.getStat().skill.smh_lianhuan1||0)>=3) return false;
 					return player.countCards('h',{suit:'club'})>0;
 				},
 				filterCard:function (card){
@@ -1670,7 +1682,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:"phaseUse",
 				filter:function (event,player){
 					if(player.hasSkill('lianhuan')||player.hasSkill('xinlianhuan')) return false;
-					if(player.getStat().skill.smh_lianhuan+player.getStat().skill.smh_lianhuan1>=3) return false;
+					if((player.getStat().skill.smh_lianhuan||0)+(player.getStat().skill.smh_lianhuan1||0)>=3) return false;
 					return player.countCards('h',{suit:'club'})>0;
 				},
 				filterCard:function (card){
