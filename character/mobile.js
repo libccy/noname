@@ -107,6 +107,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(get.color(card)=='red'&&game.hasPlayer(function(current){
 						return current!=player&&current.isDamaged()&&get.attitude(player,current)>2;
 					})) return 2;
+					if(get.nature(card)) return 1.5;
 					return 1;
 				},
 				prepare:'give',
@@ -117,9 +118,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.recover();
 					'step 1'
 					var num=1;
-					if(get.color(cards[0])=='black') num++;
+					if(get.nature(cards[0])) num++;
 					target.draw(num);
-					if(num==1) target.recover();
+					if(get.color(cards[0])=='red') target.recover();
 				},
 				ai:{
 					order:1,
@@ -130,7 +131,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						target:function(player,target){
 							if(ui.selected.cards.length){
-								var num=2;
+								var num=1;
+								if(get.nature(ui.selected.cards[0])) num++;
 								if(target.hasSkillTag('nogain')) num=0;
 								if(get.color(ui.selected.cards[0])=='red') return num+2
 								else return num+1;
@@ -1291,7 +1293,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			renshi:'仁释',
 			renshi_info:'锁定技，当你受到【杀】的伤害时，若你已受伤，则你防止此伤害并获得此【杀】对应的所有实体牌，然后减1点体力上限。',
 			wuyuan:'武缘',
-			wuyuan_info:'出牌阶段限一次，你可将一张【杀】交给一名其他角色，然后你回复1点体力。若此【杀】为：红色，其摸一张牌并回复1点体力；黑色，其摸两张牌。',
+			wuyuan_info:'出牌阶段限一次，你可将一张【杀】交给一名其他角色，然后你回复1点体力，其摸一张牌。若此【杀】为：红色【杀】，其回复1点体力；属性【杀】，其改为摸两张牌。',
 		}
 	};
 });

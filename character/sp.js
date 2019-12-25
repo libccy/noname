@@ -21,7 +21,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			puyuan:['male','shu',3,['pytianjiang','pyzhuren']],
+			puyuan:['male','shu',4,['pytianjiang','pyzhuren']],
 			xinpi:['male','wei',3,['xpchijie','yinju']],
 			lisu:['male','qun',2,['lslixun','lskuizhu']],
 			zhangwen:['male','wu',3,['songshu','sibian']],
