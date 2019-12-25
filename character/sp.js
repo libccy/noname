@@ -21,7 +21,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			puyuan:['male','shu',3,['pytianjiang','pyzhuren'],['unseen']],
+			puyuan:['male','shu',3,['pytianjiang','pyzhuren']],
 			xinpi:['male','wei',3,['xpchijie','yinju']],
 			lisu:['male','qun',2,['lslixun','lskuizhu']],
 			zhangwen:['male','wu',3,['songshu','sibian']],
@@ -997,7 +997,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					delete _status.lslixun;
 					if(!result.bool){
-						player.chooseToDiscard(true,'h',player.storage.lslixun).ai=lib.skill.qiangxi.check;
+						player.chooseToDiscard([1,player.storage.lslixun],'h').ai=lib.skill.qiangxi.check;
 					}
 					else event.finish();
 					'step 2'
@@ -3778,6 +3778,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCardAfter'},
 				direct:true,
+				onremove:function(player,skill){
+					delete player.storage[skill];
+				},
 				filter:function(event,player){
 					if(_status.currentPhase!=player) return false;
 					if(player.storage.yingyuan&&player.storage.yingyuan.contains(event.card.name)){
@@ -8631,7 +8634,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{target:'useCardToTargeted'},
 						direct:true,
 						filter:function(event,player){
-							return player.countCards('h');
+							return event.card.name=='sha'&&player.countCards('h');
 						},
 						content:function(){
 							"step 0"
@@ -14303,7 +14306,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_longzhou:"同舟共济",
 			sp_zizouqi:"自走棋",
 			sp_sbfm:'上兵伐谋',
-			sp_shengun:'未命名分组',
+			sp_shengun:'三国奇人传',
 			sp_zhongdan:"忠胆英杰",
 			sp_star:"☆SP系列",
 			sp_guozhan:"国战",

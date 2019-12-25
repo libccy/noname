@@ -6,10 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			mobile:{
-				mobile_default:["miheng","taoqian","liuzan","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei"],
-				mobile_fire:["re_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","re_pangtong","xin_yuanshao"],
-				mobile_forest:['re_zhurong','re_menghuo','re_dongzhuo','re_sunjian','re_caopi'],
-				mobile_mountain:['re_dengai','re_jiangwei','re_caiwenji'],
+				mobile_default:["miheng","taoqian","liuzan","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding"],
 				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang"],
 			},
 		},
@@ -28,29 +25,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			simazhao:["male","wei",3,["xinfu_daigong","xinfu_zhaoxin"],[]],
 			wangyuanji:["female","wei",3,["xinfu_qianchong","xinfu_shangjian"],[]],
 			pangdegong:["male","qun",3,["xinfu_pingcai","xinfu_pdgyingshi"],[]],
-			re_sp_zhugeliang:["male","shu",3,["rehuoji","rekanpo","bazhen"],[]],
-			re_xunyu:["male","wei",3,["quhu","rejieming"],[]],
-			re_dianwei:["male","wei",4,["reqiangxi"],[]],
-			re_yanwen:["male","qun",4,["reshuangxiong"],[]],
-			re_pangtong:['male','shu',3,['xinlianhuan','niepan'],[]],
-			xin_yuanshao:['male','qun',4,['reluanji','xueyi'],['zhu']],
 			old_yuanshu:['male','qun',4,['xinyongsi','yjixi']],
 			
 			shenpei:["male","qun","2/3",["shouye","liezhi"],[]],
-			re_zhurong:['female','shu',4,['juxiang','relieren']],
-			re_menghuo:['male','shu',4,['huoshou','rezaiqi']],
 			re_wangyun:['male','qun',3,['relianji','remoucheng']],
-			re_dongzhuo:['male','qun',8,['rejiuchi','roulin','benghuai','baonue'],['zhu']],
-			re_sunjian:['male','wu',4,['gzyinghun','repolu']],
-			re_caopi:['male','wei',3,['rexingshang','refangzhu','songwei'],['zhu']],
 			
-			re_dengai:['male','wei',4,['retuntian','zaoxian']],
-			re_jiangwei:['male','shu',4,['retiaoxin','zhiji']],
-			re_caiwenji:['female','qun',3,['rebeige','duanchang']],
 			re_baosanniang:['female','shu',3,['meiyong','rexushen','rezhennan']],
+			
+			hujinding:['female','shu','2/6',['renshi','wuyuan','huaizi']],
 		},
 		characterIntro:{
 			shenpei:'审配（？－204年），字正南，魏郡阴安（今河北清丰北）人。为人正直， 袁绍领冀州，审配被委以腹心之任，并总幕府。河北平定，袁绍以审配、逢纪统军事，审配恃其强盛，力主与曹操决战。曾率领弓弩手大破曹军于官渡。官渡战败，审配二子被俘，反因此受谮见疑，幸得逢纪力保。袁绍病死，审配等矫诏立袁尚为嗣，导致兄弟相争，被曹操各个击破。曹操围邺，审配死守数月，终城破被擒，拒不投降，慷慨受死。',
+			hujinding:'胡金定，女，传说中关羽之妻。关索之母，配偶关羽，出处《花关索传》和元代《三国志评话》民间传说人物。',
 		},
 		card:{
 			pss_paper:{
@@ -91,6 +77,146 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		skill:{
+			renshi:{
+				audio:2,
+				trigger:{player:'damageBegin4'},
+				forced:true,
+				filter:function(event,player){
+					return player.isDamaged()&&event.getParent().name=='sha';
+				},
+				content:function(){
+					'step 0'
+					trigger.cancel();
+					var cards=trigger.cards.filterInD();
+					if(cards.length) player.gain(cards,'gain2');
+					'step 1'
+					player.loseMaxHp();
+				},
+			},
+			wuyuan:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.countCards('h','sha')>0;
+				},
+				filterCard:{name:'sha'},
+				filterTarget:lib.filter.notMe,
+				check:function(card){
+					var player=_status.event.player;
+					if(get.color(card)=='red'&&game.hasPlayer(function(current){
+						return current!=player&&current.isDamaged()&&get.attitude(player,current)>2;
+					})) return 2;
+					return 1;
+				},
+				prepare:'give',
+				discard:false,
+				content:function(){
+					'step 0'
+					target.gain(cards,player);
+					player.recover();
+					'step 1'
+					var num=1;
+					if(get.color(cards[0])=='black') num++;
+					target.draw(num);
+					if(num==1) target.recover();
+				},
+				ai:{
+					order:1,
+					result:{
+						player:function(player,target){
+							if(player.isDamaged()) return 1;
+							return 0;
+						},
+						target:function(player,target){
+							if(ui.selected.cards.length){
+								var num=2;
+								if(target.hasSkillTag('nogain')) num=0;
+								if(get.color(ui.selected.cards[0])=='red') return num+2
+								else return num+1;
+							}
+							return 1;
+						},
+					},
+				},
+			},
+			huaizi:{
+				mod:{
+					maxHandcard:function(player,num){
+						return num+player.getDamagedHp();
+					},
+				},
+				audio:2,
+				trigger:{player:'phaseDiscardBegin'},
+				forced:true,
+				firstDo:true,
+				filter:function(event,player){
+					return player.isDamaged()&&player.countCards('h')>player.hp;
+				},
+				content:function(){},
+			},
+			refangquan:{
+				audio:2,
+				trigger:{player:'phaseUseBefore'},
+				filter:function(event,player){
+					return player.countCards('h')>0&&!player.hasSkill('fangquan3');
+				},
+				direct:true,
+				content:function(){
+					"step 0"
+					var fang=player.hp>=2&&player.countCards('h')<=player.hp+1;
+					player.chooseBool(get.prompt2('refangquan')).set('ai',function(){
+						if(!_status.event.fang) return false;
+						return game.hasPlayer(function(target){
+							if(target.hasJudge('lebu')||target==player) return false;
+							if(get.attitude(player,target)>4){
+								return (get.threaten(target)/Math.sqrt(target.hp+1)/Math.sqrt(target.countCards('h')+1)>0);
+							}
+							return false;
+						});
+					}).set('fang',fang);
+					"step 1"
+					if(result.bool){
+						player.logSkill('refangquan');
+						trigger.cancel();
+						player.addSkill('fangquan2');
+						player.addTempSkill('refangquan2');
+						//player.storage.fangquan=result.targets[0];
+					}
+				}
+			},
+			refangquan2:{
+				mod:{
+					maxHandcard:function(player,num){
+						return num+player.getDamagedHp();
+					},
+				},
+			},
+			rehunzi:{
+				inherit:'hunzi',
+				filter:function(event,player){
+					return player.hp<=2&&!player.storage.rehunzi;
+				},
+			},
+			rezhijian:{
+				inherit:'zhijian',
+				group:['rezhijian_use'],
+				subfrequent:['use'],
+				subSkill:{
+					use:{
+						audio:'rezhijian',
+						trigger:{player:'useCard'},
+						frequent:true,
+						filter:function(event,player){
+							return get.type(event.card)=='equip';
+						},
+						prompt:'是否发动【直谏】摸一张牌？',
+						content:function(){
+							player.draw('nodelay');
+						},
+					},
+				},
+			},
 			rexushen:{
 				derivation:['new_rewusheng','xindangxian'],
 				audio:'xinfu_xushen',
@@ -1101,9 +1227,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rejingong:'矜功',
 			rejingong_info:'每回合可以用三个随机锦囊中的一个，三个锦囊中有一个是专属锦囊，本回合未造成伤害会失去1点体力。',
 			mobile_default:'常规',
-			mobile_fire:'界限突破•火',
-			mobile_forest:'界限突破•林',
-			mobile_mountain:'界限突破•山',
 			mobile_others:'其他',
 			
 			pss:'手势',
@@ -1153,6 +1276,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rexushen_info:'限定技，出牌阶段，你可以失去X点体力（X为场上男性角色的数量）。若你以此法进入了濒死状态，则当你因一名角色而脱离此濒死状态后，你可以令其获得技能〖武圣〗和〖当先〗。',
 			rezhennan:'镇南',
 			rezhennan_info:'当你成为其他角色使用的牌的目标后，若此牌的目标数大于该角色的体力值，则你可以弃置一张牌并对其造成1点伤害。',
+			
+			hujinding:'胡金定',
+			re_liushan:'界刘禅',
+			re_sunben:'界孙策',
+			re_zhangzhang:'界张昭张纮',
+			rehunzi:'魂姿',
+			rehunzi_info:'觉醒技，准备阶段，若你的体力值不大于2，你减1点体力上限，并获得技能〖英姿〗和〖英魂〗。',
+			zhijian_info:'出牌阶段，你可以将手牌中的一张装备牌置于一名其他角色装备区里（不得替换原装备），然后摸一张牌。当你使用装备牌时，你可以摸一张牌。',
+			refangquan:'放权',
+			refangquan_info:'你可跳过你的出牌阶段，若如此做，你本回合的手牌上限+X（X为你已损失的体力值），且回合结束时，你可以弃置一张手牌并令一名其他角色进行一个额外的回合。',
+			huaizi:'怀子',
+			huaizi_info:'锁定技，你的手牌上限+X（X为你已损失的体力值）',
+			renshi:'仁释',
+			renshi_info:'锁定技，当你受到【杀】的伤害时，若你已受伤，则你防止此伤害并获得此【杀】对应的所有实体牌，然后减1点体力上限。',
+			wuyuan:'武缘',
+			wuyuan_info:'出牌阶段限一次，你可将一张【杀】交给一名其他角色，然后你回复1点体力。若此【杀】为：红色，其摸一张牌并回复1点体力；黑色，其摸两张牌。',
 		}
 	};
 });

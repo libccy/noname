@@ -1484,7 +1484,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return get.attitude(player,target)<0?-999:-3;
 							}
 							else{
-								return target.countCards('h');
+								return target.countCards('h')+1;
 							}
 						},
 					},

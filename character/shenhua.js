@@ -6,21 +6,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connectBanned:['zuoci'],
 		characterSort:{
 			shenhua:{
-				shenhua_feng:['caoren','re_xiahouyuan','re_huangzhong','re_weiyan','re_xiaoqiao','zhoutai','sp_zhangjiao','re_yuji'],
-				shenhua_huo:['dianwei','xunyu','pangtong','sp_zhugeliang','taishici','yanwen','re_yuanshao','re_pangde'],
-				shenhua_lin:['caopi','re_xuhuang','menghuo','zhurong','re_lusu','sunjian','dongzhuo','jiaxu'],
+				shenhua_feng:["sp_zhangjiao","re_yuji","old_zhoutai","old_caoren","xiahouyuan","xiaoqiao","huangzhong","weiyan"],
+				shenhua_huo:['dianwei','xunyu','pangtong','sp_zhugeliang','taishici','yanwen','re_yuanshao','pangde'],
+				shenhua_lin:['caopi','xuhuang','menghuo','zhurong','re_lusu','sunjian','dongzhuo','jiaxu'],
 				shenhua_shan:['dengai','zhanghe','liushan','jiangwei','zhangzhang','sunce','caiwenji','zuoci'],
 				shenhua_yin:['wangji','kuailiangkuaiyue','yanyan','wangping','sunliang','luji','xuyou','yl_luzhi'],
 				shenhua_lei:['haozhao','guanqiujian','chendao','zhugezhan','lukang','zhoufei','zhangxiu','yl_yuanshu'],
 			},
 		},
 		character:{
-			re_xiahouyuan:['male','wei',4,['xinshensu']],
-			caoren:['male','wei',4,['xinjushou','xinjiewei']],
-			re_huangzhong:['male','shu',4,['xinliegong']],
-			re_weiyan:['male','shu',4,['xinkuanggu','qimou']],
-			re_xiaoqiao:['female','wu',3,['retianxiang','hongyan']],
-			zhoutai:['male','wu',4,['buqu','fenji']],
+			old_zhoutai:['male','wu',4,['gzbuqu']],
+			old_caoren:['male','wei',4,['moon_jushou','jiewei']],
+			xuhuang:['male','wei',4,['gzduanliang']],
+			pangde:['male','qun',4,['mashu','mengjin']],
+			xiahouyuan:['male','wei',4,['shensu']],
+			huangzhong:['male','shu',4,['liegong']],
+			weiyan:['male','shu',4,['kuanggu']],
+			xiaoqiao:['female','wu',3,['tianxiang','hongyan']],
 			sp_zhangjiao:['male','qun',3,['releiji','guidao','huangtian'],['zhu']],
 			re_yuji:["male","qun",3,["xinfu_guhuo"],["forbidai"]],
 			// yuji:['male','qun',3,['guhuo']],
@@ -33,12 +35,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			taishici:['male','wu',4,['tianyi']],
 			yanwen:['male','qun',4,['shuangxiong']],
 			re_yuanshao:['male','qun',4,['luanji','xueyi'],['zhu']],
-			re_pangde:['male','qun',4,['mashu','jianchu']],
 
 			menghuo:['male','shu',4,['huoshou','zaiqixx']],
 			zhurong:['female','shu',4,['juxiang','lieren']],
 			caopi:['male','wei',3,['xingshang','fangzhu','songwei'],['zhu']],
-			re_xuhuang:['male','wei',4,['duanliang','jiezi']],
 			re_lusu:['male','wu',3,['haoshi','dimeng']],
 			sunjian:['male','wu',4,['gzyinghun']],
 			dongzhuo:['male','qun',8,['jiuchi','roulin','benghuai','baonue'],['zhu']],
@@ -2532,6 +2532,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xiangle:{
 				audio:2,
+				audioname:['re_liushan'],
 				trigger:{target:'useCardToTargeted'},
 				forced:true,
 				filter:function(event,player){
@@ -2650,6 +2651,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'fire',
 				audio:2,
+				audioname:['re_liushan'],
 				unique:true,
 				juexingji:true,
 				zhuSkill:true,
@@ -2663,9 +2665,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.isMinHp();
 				},
 				content:function(){
+					'step 0'
 					player.storage.ruoyu=true;
-					player.maxHp++;
-					player.update();
+					player.gainMaxHp();
+					'step 1'
 					player.recover();
 					if(player.hasSkill('ruoyu')){
 						player.addSkill('jijiang');
@@ -3033,7 +3036,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jiang:{
 				audio:2,
-				audioname:['sp_lvmeng'],
+				audioname:['sp_lvmeng','re_sunben'],
 				trigger:{
 					player:'useCardToPlayered',
 					target:'useCardToTargeted',
@@ -3066,7 +3069,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				trigger:{player:'phaseZhunbeiBegin'},
 				filter:function(event,player){
-					return player.hp==1&&!player.storage.hunzi;
+					return player.hp<=1&&!player.storage.hunzi;
 				},
 				forced:true,
 				//priority:3,
@@ -3075,8 +3078,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkill('reyingzi');
 					player.addSkill('gzyinghun');
 					game.log(player,'获得了技能','#g【英姿】和【英魂】')
-					player.awakenSkill('hunzi');
-					player.storage.hunzi=true;
+					player.awakenSkill(event.name);
+					player.storage[event.name]=true;
 				},
 				ai:{
 					threaten:function(player,target){
@@ -3125,7 +3128,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				content:function(){
 					"step 0"
-					if(target.storage.hunzi){
+					if(target.storage.hunzi||target.storage.rehunzi){
 						target.chooseControl('拒绝','不拒绝').set('prompt','是否拒绝制霸拼点？').set('choice',get.attitude(target,player)<=0);
 					}
 					else{
@@ -3232,6 +3235,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			guzheng:{
 				audio:2,
+				audioname:['re_zhangzhang'],
 				// unique:true,
 				// gainable:true,
 				group:["guzheng_count"],
@@ -4618,7 +4622,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mod:{
 					cardSavable:function(card,player){
 						if(!_status.currentPhase) return;
-						if(_status.currentPhase.hasSkill('wansha')&&_status.currentPhase!=player){
+						if(_status.currentPhase.isAlive()&&_status.currentPhase.hasSkill('wansha')&&_status.currentPhase!=player){
+							if(card.name=='tao'&&!player.isDying()) return false;
+						}
+					},
+					cardEnabled:function(card,player){
+						if(!_status.currentPhase) return;
+						if(_status.currentPhase.isAlive()&&_status.currentPhase.hasSkill('wansha')&&_status.currentPhase!=player){
 							if(card.name=='tao'&&!player.isDying()) return false;
 						}
 					}
@@ -4693,7 +4703,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				viewAs:{name:'wuxie'},
 				prompt:'将一张黑色手牌当无懈可击使用',
-				check:function(card){return 8-get.value(card)},
+				check:function(card){
+					var tri=_status.event.getTrigger();
+					if(tri&&tri.card&&tri.card.name=='chiling') return -1;
+					return 8-get.value(card)
+				},
 				threaten:1.2
 			},
 			lianhuan:{
@@ -6734,10 +6748,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xueyi_info:'主公技，锁定技，场上每有一名其他群雄角色存活，你的手牌上限便+2。',
 			mengjin_info:'当你使用的【杀】被【闪】抵消时，你可以弃置目标角色的一张牌。',
 
-			re_xiahouyuan:'夏侯渊',
-			re_huangzhong:'黄忠',
-			re_weiyan:'魏延',
-			re_xiaoqiao:'小乔',
+			re_xiahouyuan:'界夏侯渊',
+			re_huangzhong:'界黄忠',
+			re_weiyan:'界魏延',
+			re_xiaoqiao:'界小乔',
 			
 			gz_xiahouyuan:'夏侯渊',
 			gz_huangzhong:'黄忠',
@@ -6745,17 +6759,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gz_xiaoqiao:'小乔',
 			gz_xuhuang:'徐晃',
 			gz_pangde:'庞德',
+			gz_caoren:'曹仁',
+			gz_zhoutai:'周泰',
 			
-			xuhuang:'旧徐晃',
-			pangde:'旧庞德',
-			xiahouyuan:'旧夏侯渊',
-			caoren:'曹仁',
-			huangzhong:'旧黄忠',
+			old_zhoutai:'周泰',
+			old_caoren:'曹仁',
+			xuhuang:'徐晃',
+			pangde:'庞德',
+			xiahouyuan:'夏侯渊',
+			caoren:'界曹仁',
+			huangzhong:'黄忠',
 			sp_zhangjiao:'张角',
-			weiyan:'旧魏延',
-			xiaoqiao:'旧小乔',
-			zhoutai:'周泰',
-			zhangjiao:'旧张角',
+			weiyan:'魏延',
+			xiaoqiao:'小乔',
+			zhoutai:'界周泰',
+			zhangjiao:'张角',
 			yuji:'于吉',
 			shensu:'神速',
 			shensu1:'神速',
