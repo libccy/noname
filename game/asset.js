@@ -2334,6 +2334,10 @@ window.noname_asset_list=[
 	'image/character/re_zuoci.jpg',
 	'image/character/xinpi.jpg',
 	'image/character/puyuan.jpg',
+	'image/character/re_sunben.jpg',
+	'image/character/re_zhangzhang.jpg',
+	'image/character/re_liushan.jpg',
+	'image/character/hujinding.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
