@@ -82,7 +82,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						event._result={bool:false};
 					}
 					else if(event.skipShan){
-						event._result={result:'shaned'};
+						event._result={bool:true,result:'shaned'};
 					}
 					else{
 						var next=target.chooseToUse('请使用一张闪响应杀');
