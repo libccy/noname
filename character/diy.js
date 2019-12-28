@@ -10,6 +10,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_kyousuke:['male','key',4,['nk_shekong','key_huanjie']],
 			key_yuri:['female','key',3,['yuri_xingdong','key_huanjie','yuri_wangxi'],['zhu']],
 			key_haruko:['female','key',4,['haruko_haofang','haruko_zhuishi']],
+			key_umi:['female','key',3,['umi_chaofan','umi_lunhui','umi_qihuan']],
+			key_umi2:['female','key',3,[],['unseen']],
 			key_kagari:['female','shen',3,['kagari_zongsi']],
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
@@ -87,7 +89,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy:{
 				diy_tieba:["diy_wenyang","ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi"],
 			},
 		},
 		characterIntro:{
@@ -101,6 +103,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
+			key_umi:'#bSummer Pockets',
 			key_kagari:'#bRewrite',
 			key_lucia:'#bRewrite',
 			key_kyousuke:'#bLittle Busters!',
@@ -141,6 +144,143 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuji:['zuoci']
 		},
 		skill:{
+			umi_chaofan:{
+				enable:'phaseUse',
+				usable:1,
+				selectCard:2,
+				complexCard:true,
+				filter:function(summer,umi){
+					return umi.countCards('h')>1;
+				},
+				check:function(ingredient){
+					return 7-get.value(ingredient);
+				},
+				filterCard:function(ingredient){
+					if(ui.selected.cards.length) return get.suit(ingredient)!=get.suit(ui.selected.cards[0]);
+					return true;
+				},
+				line:{color:[251, 193, 217]},
+				filterTarget:lib.filter.notMe,
+				content:function(){
+					'step 0'
+					player.draw();
+					'step 1'
+					if(player.hp>2) target.recover();
+					else if(player.hp==2) target.draw(2);
+					else target.damage('fire','nosource');
+				},
+				ai:{
+					order:2,
+					result:{
+						target:function(umi,takahara){
+							if(umi.hp>2&&takahara.isDamaged()) return 2.2;
+							if(umi.hp==2&&!takahara.hasSkillTag('nogain')) return 2;
+							if(umi.hp<2) return get.damageEffect(takahara,umi,umi,'fire');
+						},
+					},
+				},
+			},
+			umi_lunhui:{
+				trigger:{global:'phaseAfter'},
+				filter:function(summer,umi){
+					return summer.player!=umi&&umi.countCards('h')<umi.hp;
+				},
+				line:{color:[251, 193, 217]},
+				logTarget:'player',
+				charlotte:true,
+				content:function(){
+					'step 0'
+					player.loseHp();
+					'step 1'
+					player.insertPhase();
+					player.storage.umi_shiroha=trigger.player;
+					player.addTempSkill('umi_shiroha');
+				},
+			},
+			umi_shiroha:{
+				mark:'character',
+				intro:{
+					content:'到$的距离视为1',
+				},
+				onremove:true,
+				charlotte:true,
+				mod:{
+					globalFrom:function(umi,shiroha){
+						if(umi.storage.umi_shiroha==shiroha) return -Infinity;
+					},
+				},
+			},
+			umi_qihuan:{
+				enable:'chooseToUse',
+				filter:function(summer,umi){
+					return summer.type=='dying'&&umi.isDying();
+				},
+				limited:true,
+				skillAnimation:true,
+				charlotte:true,
+				animationColor:'key',
+				content:function(){
+					'step 0'
+					player.reinit('key_umi','key_umi2');
+					player.recover(game.countGroup()||1);
+					if(!game.dead.length) event.finish();
+					'step 1'
+					var chara=[];
+					var skills=[];
+					for(var i=0;i<game.dead.length;i++){
+						var name=game.dead[i].name;
+						var name2=game.dead[i].name2;
+						var skill=[];
+						if(name&&lib.character[name]) skill.addArray(lib.character[name][3]);
+						if(name2&&lib.character[name2]) skill.addArray(lib.character[name2][3]);
+						if(skill.length){
+							chara.push(game.dead[i]);
+							skills.push(skill);
+						}
+					}
+					if(!chara.length) event.finish();
+					event.chara=chara;
+					event.skills=skills;
+					event.chosen=[];
+					'step 2'
+					var next=player.chooseButton(['是否获得一名已死亡角色的一个技能？',[event.chara,'player']]);
+					next.set('chara',event.chara);
+					next.set('skills',event.skills);
+					next.set('chosen',event.chosen);
+					next.set('filterButton',function(button){
+						var evt=_status.event;
+						if(!evt.chosen.length) return true;
+						var skills=evt.skills[evt.chara.indexOf(button.link)];
+						if(skills.length==1&&skills[0]==evt.chosen[0]) return false;
+						return true;
+					});
+					next.set('ai',function(){return Math.random()});
+					'step 3'
+					if(!result.bool) event.finish();
+					else{
+						event.temp=result.links[0];
+						var list=event.skills[event.chara.indexOf(result.links[0])];
+						result.links[0].line(player,{color:[251, 193, 217]})
+						list.removeArray(event.chosen);
+						player.chooseControl(list).set('prompt','选择获得一个技能');
+					}
+					'step 4'
+					player.addSkill(result.control,get.groupnature(event.temp.group)||'key');
+					player.addSkill(result.control);
+					event.chosen.push(result.control);
+					if(event.chosen.length<2) event.goto(2);
+				},
+				ai:{
+					order:10,
+					save:true,
+					skillTagFilter:function(player){
+						return player.isDying();
+					},
+					result:{
+						player:1,
+					},
+				},
+			},
 			kagari_zongsi:{
 				enable:'phaseUse',
 				usable:1,
@@ -157,6 +297,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var next=player.chooseControl();
 					next.set('choiceList',controls)
 					next.set('prompt','请选择要移动的卡牌的来源');
+					next.ai=function(){return 0};
 					'step 1'
 					result.control=event.controls[result.index];
 					var list=['弃牌堆','牌堆','角色'];
@@ -172,7 +313,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var source=ui[event.index==0?'discardPile':'cardPile'].childNodes;
 						var list=[];
 						for(var i=0;i<source.length;i++) list.push(source[i]);
-						player.chooseButton(['请选择要移动的卡牌',list],true);
+						player.chooseButton(['请选择要移动的卡牌',list],true).ai=get.buttonValue;
 					}
 					'step 2'
 					if(event.index==2){
@@ -194,6 +335,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var next=player.chooseControl();
 					next.set('prompt','要对'+get.translation(card)+'做什么呢？');
 					next.set('choiceList',controls);
+					next.ai=function(){return 2};
 					'step 4'
 					result.control=event.controls[result.index];
 					var list=['弃牌堆','牌堆','角色'];
@@ -201,7 +343,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(result.control.indexOf(list[i])!=-1){event.index2=i;break;}
 					}
 					if(event.index2==2){
-						player.chooseTarget('要将'+get.translation(card)+'移动到哪一名角色的对应区域呢',true);
+						player.chooseTarget('要将'+get.translation(card)+'移动到哪一名角色的对应区域呢',true).ai=function(target){
+							return target==_status.event.player?1:0;
+						};
 					}
 					else{
 						player.chooseControl('顶部','底部').set('prompt','把'+get.translation(card)+'移动到'+(event.index2==0?'弃':'')+'牌堆的...');
@@ -219,7 +363,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(lib.card[card.name].type=='delay'&&!event.target2.storage._disableJudge&&!event.target2.hasJudge(card.name)) list.push('判定区');
 						if(list.length==1) event._result={control:list[0]};
 						else{
-							player.chooseControl(list).set('prompt','把'+get.translation(card)+'移动到'+get.translation(event.target2)+'的...');
+							player.chooseControl(list).set('prompt','把'+get.translation(card)+'移动到'+get.translation(event.target2)+'的...').ai=function(){return 0};
 						}
 					}
 					'step 6'
@@ -251,6 +395,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 7'
 					game.updateRoundNumber();
+				},
+				ai:{
+					order:10,
+					result:{player:1},
 				},
 			},
 			haruko_haofang:{
@@ -5230,6 +5378,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_yuri:'仲村ゆり',
 			key_haruko:'神尾晴子',
 			key_kagari:'篝',
+			key_umi:'加藤うみ',
+			key_umi2:'鹰原羽未',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -5248,6 +5398,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			haruko_zhuishi_info:'一名角色的判定阶段开始时，若其判定区内有牌，则你可以失去1点体力，然后获得其判定区内的所有牌。',
 			kagari_zongsi:'纵丝',
 			kagari_zongsi_info:'出牌阶段限一次，你可以选择一张不在游戏外的牌，然后将其置于牌堆/弃牌堆的顶部/底部或一名角色的对应区域内。',
+			umi_chaofan:'炒饭',
+			umi_chaofan_info:'出牌阶段限一次，你可以弃置两张花色不同的手牌并选择一名其他角色。你摸一张牌，若你的体力值：大于2，目标角色回复1点体力；等于2，目标角色摸两张牌；小于2，目标角色受到1点无来源且对应渠道为这两张牌的火焰伤害。',
+			umi_lunhui:'轮回',
+			umi_lunhui_info:'一名其他角色的回合结束时，若你的手牌数小于体力值，则你可以失去1点体力。若如此做，你进行一个额外回合，且你于此回合内计算与此角色的距离视为1。',
+			umi_shiroha:'轮回 - 延时效果',
+			umi_qihuan:'七幻',
+			umi_qihuan_info:'限定技，当你处于濒死状态时，你可以移去此武将牌。若如此做，你回复X点体力（X为场上势力数）。然后，你可获得场上已死亡角色武将牌上的至多两个技能。',
 			
 			ns_chuanshu:'传术',
 			ns_chuanshu_info:'<span class=yellowtext>限定技</span> 当一名其他角色进入濒死状态时，你可以令其选择获得技能【雷击】或【鬼道】，其回复体力至1并摸两张牌。当该被【传术】的角色造成或受到一次伤害后，你摸一张牌。其阵亡后，你重置技能【传术】',

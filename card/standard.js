@@ -511,7 +511,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'trick',
 				enable:true,
 				cardcolor:'red',
-				selectTarget:-1,
+				selectTarget:[1,-1],
 				filterTarget:true,
 				contentBefore:function(){
 					"step 0"
@@ -682,7 +682,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				enable:true,
-				selectTarget:-1,
+				selectTarget:[1,-1],
 				cardcolor:'red',
 				reverseOrder:true,
 				filterTarget:function(card,player,target){
@@ -717,7 +717,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				enable:true,
-				selectTarget:-1,
+				selectTarget:[1,-1],
 				filterTarget:function(card,player,target){
 					return target!=player;
 				},
@@ -779,7 +779,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				enable:true,
-				selectTarget:-1,
+				selectTarget:[1,-1],
 				reverseOrder:true,
 				filterTarget:function(card,player,target){
 					return target!=player;
@@ -980,6 +980,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					wuxie:function(target,card,player,viewer){
+						if(player==game.me&&get.attitude(viewer,player)>0){
+							return 0;
+						}
+					},
 					basic:{
 						order:5,
 						useful:1,
@@ -1849,7 +1854,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.judge>0){
 						trigger.untrigger();
-						trigger.responded=true;
+						trigger.set('responded',true);
 						trigger.result={bool:true,card:{name:'shan'}}
 					}
 				},
@@ -1869,7 +1874,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			_wuxie:{
-				trigger:{player:['useCardToBefore','phaseJudge']},
+				trigger:{player:['useCardToBegin','phaseJudge']},
 				priority:5,
 				popup:false,
 				forced:true,

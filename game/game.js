@@ -13649,7 +13649,8 @@
 					}
 					if(info.line!=false&&targets.length){
 						var config={};
-						if(info.line=='fire'){
+						if(get.is.object(info.line)) config=info.line;
+						else if(info.line=='fire'){
 							config.color='fire';
 						}
 						else if(info.line=='thunder'){
@@ -47248,7 +47249,7 @@
 
 				if(obj.length==2){
 					if(typeof obj[0]=='number'&&typeof obj[1]=='number'){
-						if(obj[0]<=obj[1]) return 'select';
+						if(obj[0]<=obj[1]||obj[1]==-1) return 'select';
 					}
 				}
 
@@ -49460,6 +49461,7 @@
 			var result1=result.player,result2=result.target;
 			if(typeof result1=='function') result1=result1(player,target,card);
 			if(typeof result2=='function') result2=result2(player,target,card);
+			
 			if(typeof result1!='number') result1=0;
 			if(typeof result2!='number') result2=0;
 			var temp1,temp2,temp3,temp01=0,temp02=0,threaten=1;

@@ -541,7 +541,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				enable:true,
-				selectTarget:-1,
+				selectTarget:[1,-1],
 				modTarget:true,
 				content:function(){
 					target.damage('fire');
@@ -688,7 +688,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				selectTarget:function(){
-					if(get.mode()=='guozhan') return -1;
+					if(get.mode()=='guozhan') return [1,-1];
 					return [1,3];
 				},
 				content:function(){

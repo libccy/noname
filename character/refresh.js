@@ -89,7 +89,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		skill:{
 			rehuashen:{
 				mode:['identity','single'],
-				audio:'huashen1',
+				audio:2,
 				unique:true,
 				direct:true,
 				content:function(){
@@ -333,7 +333,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rexinsheng:{
 				mode:['identity','single'],
 				unique:true,
-				audio:'xinsheng',
+				audio:2,
 				trigger:{player:'damageEnd'},
 				frequent:true,
 				content:function(){
@@ -853,7 +853,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						sub:true,
 					},
 				},
-				audio:"qiangxi",
+				audio:2,
 				enable:"phaseUse",
 				filterCard:function (card){
 					return get.subtype(card)=='equip1';
@@ -895,7 +895,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			rehuoji:{
 				position:"he",
-				audio:"huoji",
+				audio:2,
 				enable:"chooseToUse",
 				filterCard:function (card){
 					return get.color(card)=='red';
@@ -967,7 +967,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			rekanpo:{
-				audio:"kanpo",
+				audio:2,
 				position:"he",
 				enable:"chooseToUse",
 				filterCard:function (card){
@@ -994,7 +994,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			rejieming:{
-				audio:"jieming",
+				audio:2,
 				trigger:{
 					player:"damageEnd",
 				},
@@ -1815,7 +1815,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"damageBegin3",
 				},
 				//priority:1,
-				audio:"yaowu",
+				audio:2,
 				filter:function (event){
 					return event.card&&event.card.name=='sha';
 				},

@@ -874,7 +874,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			tengjia3:{
 				equipSkill:true,
 				audio:'tengjia1',
-				trigger:{target:'shaBegin'},
+				trigger:{target:'shaBefore'},
 				forced:true,
 				filter:function(event,player){
 					if(player.hasSkillTag('unequip2')) return false;

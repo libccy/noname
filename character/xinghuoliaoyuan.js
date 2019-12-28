@@ -5305,7 +5305,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.judge>0){
 						trigger.untrigger();
-						trigger.responded=true;
+						trigger.set('responded',true);
 						trigger.result={bool:true,card:{name:'shan'}}
 					}
 				},

@@ -344,8 +344,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			retuntian:{
-				audio:'tuntian',
-				audioname:['gz_dengai'],
+				audio:2,
 				trigger:{player:'loseEnd'},
 				frequent:true,
 				filter:function(event,player){
@@ -415,7 +414,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			retiaoxin:{
 				audio:'tiaoxin',
-				audioname:['sp_jiangwei','xiahouba'],
+				audioname:['sp_jiangwei','xiahouba','re_jiangwei'],
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
@@ -453,7 +452,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			rebeige:{
-				audio:'beige',
+				audio:2,
 				trigger:{global:'damageEnd'},
 				filter:function(event,player){
 					return (event.card&&event.card.name=='sha'&&event.source&&
@@ -495,7 +494,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			rexingshang:{
-				audio:'xingshang',
+				audio:2,
 				trigger:{global:'die'},
 				filter:function(event,player){
 					return player.isDamaged()||event.player.countCards('he')>0;
@@ -524,7 +523,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			refangzhu:{
-				audio:"fangzhu",
+				audio:2,
 				trigger:{
 					player:"damageEnd",
 				},
@@ -598,7 +597,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			repolu:{
-				audio:2,
+				audio:1,
 				trigger:{
 					source:'dieAfter',
 					player:'die',
@@ -654,7 +653,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			relianji:{
-				audio:2,
+				audio:'wylianji',
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
@@ -747,6 +746,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'remoucheng_awaken'
 				},
 				forced:true,
+				audio:'moucheng',
 				juexingji:true,
 				skillAnimation:true,
 				animationColor:'thunder',
@@ -759,6 +759,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			rejingong:{
+				audio:'jingong',
 				enable:'phaseUse',
 				delay:0,
 				usable:1,
@@ -806,7 +807,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			relieren:{
-				audio:'lieren',
+				audio:2,
 				audioname:['boss_lvbu3'],
 				trigger:{player:'useCardToTargeted'},
 				filter:function(event,player){
@@ -835,7 +836,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				init:function(player,skill){
 					player.storage[skill]=0;
 				},
-				audio:'zaiqi',
+				audio:2,
 				direct:true,
 				filter:function(event,player){
 					return player.storage.rezaiqi>0;
