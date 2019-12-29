@@ -2242,6 +2242,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 3"
 					if(result.control=="手动分配"){
 						event.map=[cards,[],[]];
+						_status.noclearcountdown=true;
 						event.goto(8);
 					}
 					else if(!_status.connectMode){
@@ -2335,6 +2336,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								target.send('closeDialog',event.videoId);
 							}
 							event.dialog.close();
+							delete _status.noclearcountdown;
+							if(!_status.noclearcountdown){
+								game.stopCountChoose();
+							}
 							event.togain=[event.map[1],event.map[2],event.map[0]];
 							target.showCards(event.togain[0],get.translation(target)+'分出的第一份牌');
 							event.goto(5);
@@ -2375,6 +2380,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							target.send('closeDialog',event.videoId);
 						}
 						event.dialog.close();
+						delete _status.noclearcountdown;
+						if(!_status.noclearcountdown){
+							game.stopCountChoose();
+						}
 						game.cardsDiscard(cards);
 						player.addTempSkill('yanjiao2');
 						event.finish();
@@ -3811,6 +3820,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					mark:{
+						charlotte:true,
+						locked:true,
 						mark:true,
 						intro:{
 							content:'已获得“傀”标记'

@@ -6417,7 +6417,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var next=event.current.chooseToRespond('是否替'+get.translation(player)+'对'+get.translation(target)+'使用一张杀',
 						function(card,player,event){
 							var evt=event||_status.event;
-							return card.name=='sha'||evt.source.canUse(card,evt.target);
+							return card.name=='sha'&&evt.source.canUse(card,evt.target);
 						});
 						next.set('ai',function(card){
 							var event=_status.event;

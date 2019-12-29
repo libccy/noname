@@ -94,6 +94,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
+					_status.noclearcountdown=true;
 					event.videoId=lib.status.videoId++;
 					var cards=player.storage.rehuashen.character.slice(0);
 					if(player.isOnline2()){
@@ -114,6 +115,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.control=='cancel2'){
 						if(player.isOnline2()){
 							player.send('closeDialog',event.videoId);
+						}
+						delete _status.noclearcountdown;
+						if(!_status.noclearcountdown){
+							game.stopCountChoose();
 						}
 						event.dialog.close();
 						event.finish();return;
@@ -195,6 +200,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.send('closeDialog',event.videoId);
 					}
 					event.dialog.close();
+					delete _status.noclearcountdown;
+					if(!_status.noclearcountdown){
+						game.stopCountChoose();
+					}
 					if(event.control=='弃置化身') return;
 					if(player.storage.rehuashen.current!=event.card){
 						player.storage.rehuashen.current=event.card;

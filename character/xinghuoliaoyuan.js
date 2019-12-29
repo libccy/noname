@@ -4793,9 +4793,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.markSkill('yizan_use');
 				},
 			},
+			xinfu_jingxie:{audio:2},
 			"xinfu_jingxie1":{
 				group:["xinfu_jingxie2"],
 				position:"he",
+				audio:'xinfu_jingxie',
 				enable:"phaseUse",
 				filter:function(event,player){
 					var he=player.getCards('he');
@@ -4829,7 +4831,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"xinfu_jingxie2":{
 				prompt:"出牌阶段，你可以展示一张未强化过的【诸葛连弩】或标准包/军争包/SP包中的防具牌，然后对其进行强化。当你处于濒死状态时，你可以重铸一张防具牌，将体力回复至1点。",
-				audio:2,
+				audio:'xinfu_jingxie',
 				enable:"chooseToUse",
 				filterCard:function (card){
 					return get.subtype(card)=='equip2';
