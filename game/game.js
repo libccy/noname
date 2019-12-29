@@ -22603,12 +22603,19 @@
 							if(info.filterTarget!=undefined) this.filterTarget=get.filter(info.filterTarget);
 							if(info.selectTarget!=undefined) this.selectTarget=info.selectTarget;
 							if(info.filterCard!=undefined){
+								if(info.ignoreMod) this.ignoreMod=true;
+								this.filterCard2=get.filter(info.filterCard);
 								this.filterCard=function(card,player,event){
-									if(!info.ignoreMod&&player){
+									var evt=event||_status.event;
+									if(!evt.ignoreMod&&player){
 										var mod=game.checkMod(card,player,'unchanged','cardEnabled2',player);
 										if(mod!='unchanged') return mod;
+										if(evt._backup&&evt._backup.filterCard){
+											var cardx=get.autoViewAs(lib.skill[evt.skill].viewAs,ui.selected.cards.concat([card]));
+											if(!get.filter(evt._backup.filterCard)(cardx,player,evt)) return false;
+										};
 									}
-									return get.filter(info.filterCard)(card,player,event);
+									return get.filter(evt.filterCard2).apply(this,arguments);
 								};
 							}
 							if(info.selectCard!=undefined) this.selectCard=info.selectCard;
@@ -22663,6 +22670,8 @@
 						this._skillChoice=this._backup._skillChoice;
 					}
 					delete this.skill;
+					delete this.ignoreMod;
+					delete this.filterCard2;
 				},
 				isMine:function(){
 					return (this.player&&this.player==game.me&&!_status.auto&&!this.player.isMad());
@@ -23455,9 +23464,15 @@
 				return (_status.event._aiexclude.contains(card)==false);
 			},
 			filterCard:function(card,player,event){
-				if(get.info(card).toself&&!lib.filter.targetEnabled(card,player,player)) return false;
+				var info=get.info(card);
+				//if(info.toself&&!lib.filter.targetEnabled(card,player,player)) return false;
+				var filterTarget=(event&&event.filterTarget)?event.filterTarget:lib.filter.filterTarget;
 				return (lib.filter.cardEnabled(card,player,event)&&
-					lib.filter.cardUsable(card,player,event));
+					lib.filter.cardUsable(card,player,event)&&
+					(info.notarget||game.hasPlayer(function(current){
+						return filterTarget(card,player,current);
+					}))
+					);
 			},
 			targetEnabled:function(card,player,target){
 				if(!card) return false;
@@ -23876,7 +23891,7 @@
 				init:function(player,skill){
 					var skills=player.getSkills(true,false);
 					for(var i=0;i<skills.length;i++){
-						if(get.is.locked(skills[i])){
+						if(get.is.locked(skills[i])||lib.skill[skills[i]].charlotte){
 							skills.splice(i--,1);
 						}
 					}
@@ -23908,40 +23923,40 @@
 				}
 			},
 			baiban:{
-                init:function (player,skill){
-        var skills=player.getSkills(true,false);
-        for(var i=0;i<skills.length;i++){
-           if(get.skills[i]){
-                skills.splice(i--,1);                                 
-           } 
-        }
-        player.disableSkill(skill,skills);
-    },
-                onremove:function (player,skill){
-        player.enableSkill(skill);
-    },
-                mark:true,
-                locked:true,
-                intro:{
-                    content:function (storage,player,skill){
-            var list=[];
-            for(var i in player.disabledSkills){
-                if(player.disabledSkills[i].contains(skill)){
-                    list.push(i)
-                }
-            }
-            if(list.length){
-                var str='失效技能：';
-                for(var i=0;i<list.length;i++){
-                    if(lib.translate[list[i]+'_info']){
-                        str+=get.translation(list[i])+'、';
-                    }
-                }
-                return str.slice(0,str.length-1);
-            }
-        },
-                },
-            },
+				init:function (player,skill){
+					var skills=player.getSkills(true,false);
+					for(var i=0;i<skills.length;i++){
+						if(get.skills[i]||lib.skill[skills[i]].charlotte){
+							skills.splice(i--,1);
+						}
+					}
+					player.disableSkill(skill,skills);
+				},
+				onremove:function (player,skill){
+					player.enableSkill(skill);
+				},
+				mark:true,
+				locked:true,
+				intro:{
+					content:function (storage,player,skill){
+						var list=[];
+						for(var i in player.disabledSkills){
+							if(player.disabledSkills[i].contains(skill)){
+								list.push(i)
+							}
+						}
+						if(list.length){
+							var str='失效技能：';
+							for(var i=0;i<list.length;i++){
+								if(lib.translate[list[i]+'_info']){
+									str+=get.translation(list[i])+'、';
+								}
+							}
+							return str.slice(0,str.length-1);
+						}
+					},
+				},
+			},
 			qianxing:{
 				mark:true,
 				nopop:true,
@@ -29910,7 +29925,7 @@
 						else if(typeof info.enable=='string') enable=(info.enable==event.name);
 						if(enable){
 							if(info.filter&&!info.filter(event,player)) enable=false;
-							if(info.viewAs&&event.filterCard&&!event.filterCard(info.viewAs,player)) enable=false;
+							if(info.viewAs&&event.filterCard&&!event.filterCard(info.viewAs,player,event)) enable=false;
 							if(info.viewAs&&info.viewAsFilter&&info.viewAsFilter(player)==false) enable=false;
 							if(info.usable&&get.skillCount(skills2[i])>=info.usable) enable=false;
 							if(info.chooseButton&&_status.event.noButton) enable=false;
