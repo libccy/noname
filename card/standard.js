@@ -511,7 +511,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'trick',
 				enable:true,
 				cardcolor:'red',
-				selectTarget:[1,-1],
+				selectTarget:-1,
 				filterTarget:true,
 				contentBefore:function(){
 					"step 0"
@@ -682,7 +682,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				enable:true,
-				selectTarget:[1,-1],
+				selectTarget:-1,
 				cardcolor:'red',
 				reverseOrder:true,
 				filterTarget:function(card,player,target){
@@ -717,7 +717,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				enable:true,
-				selectTarget:[1,-1],
+				selectTarget:-1,
 				filterTarget:function(card,player,target){
 					return target!=player;
 				},
@@ -779,7 +779,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				enable:true,
-				selectTarget:[1,-1],
+				selectTarget:-1,
 				reverseOrder:true,
 				filterTarget:function(card,player,target){
 					return target!=player;
