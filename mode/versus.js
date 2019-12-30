@@ -3920,7 +3920,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_jizhen:'激阵',
 			boss_jizhen_info:'锁定技，结束阶段，你令所有已受伤的己方角色摸一张牌',
 			boss_huodi:'惑敌',
-			boss_huodi_info:'结束阶段，若有武将牌背面朝上的己方角色，你可以令一名敌方角色将其身份牌翻面',
+			boss_huodi_info:'结束阶段，若有武将牌背面朝上的己方角色，你可以令一名敌方角色将其武将牌翻面',
 			boss_jueji:'绝汲',
 			boss_jueji_info:'敌方角色摸牌阶段，若其已受伤，你可以令其少摸一张牌',
 			boss_chuanyun:'穿云',
