@@ -23466,13 +23466,14 @@
 			filterCard:function(card,player,event){
 				var info=get.info(card);
 				//if(info.toself&&!lib.filter.targetEnabled(card,player,player)) return false;
+				if(player==undefined) player=_status.event.player;
 				var filterTarget=(event&&event.filterTarget)?event.filterTarget:lib.filter.filterTarget;
 				return (lib.filter.cardEnabled(card,player,event)&&
 					lib.filter.cardUsable(card,player,event)&&
-					(info.notarget||game.hasPlayer(function(current){
+					(info.notarget||!player||game.hasPlayer(function(current){
 						return filterTarget(card,player,current);
 					}))
-					);
+				);
 			},
 			targetEnabled:function(card,player,target){
 				if(!card) return false;
@@ -23754,6 +23755,7 @@
 				}
 			},
 			autoswap:{
+				firstDo:true,
 				trigger:{player:['playercontrol','chooseToUseBegin','chooseToRespondBegin','chooseToDiscardBegin','chooseToCompareBegin',
 				'chooseButtonBegin','chooseCardBegin','chooseTargetBegin','chooseCardTargetBegin','chooseControlBegin',
 				'chooseBoolBegin','choosePlayerCardBegin','discardPlayerCardBegin','gainPlayerCardBegin']},
