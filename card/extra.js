@@ -216,7 +216,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var nh=player.countCards('h');
 							if(nh<=player.hp&&nh<=4&&_status.event.name=='chooseToUse'){
 								if(typeof _status.event.filterCard=='function'&&
-									_status.event.filterCard({name:'huogong'})){
+									_status.event.filterCard({name:'huogong'},player,_status.event)){
 									return -10;
 								}
 								if(_status.event.skill){
@@ -232,7 +232,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(player.countCards('h')<=1) return 0;
 							if(target==player){
 								if(typeof _status.event.filterCard=='function'&&
-									_status.event.filterCard({name:'huogong'})){
+									_status.event.filterCard({name:'huogong'},player,_status.event)){
 									return -1.5;
 								}
 								if(_status.event.skill){
@@ -620,7 +620,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(!muniu.cards) return false;
 					lib.skill.muniu_skill.sync(muniu);
 					for(var i=0;i<muniu.cards.length;i++){
-						if(event.filterCard(muniu.cards[i],player)) return true;
+						if(event.filterCard(muniu.cards[i],player,event)) return true;
 					}
 					return false;
 				},
@@ -659,6 +659,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					backup:function(links,player){
 						return {
+							prompt:'选择'+get.translation(links)+'的目标',
 							filterCard:function(){return false},
 							selectCard:-1,
 							viewAs:links[0],
@@ -672,9 +673,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					},
-					prompt:function(links,player){
-						return '选择'+get.translation(links)+'的目标';
-					}
 				},
 				ai:{
 					order:4,
