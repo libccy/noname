@@ -3834,13 +3834,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huoshou2:{
 				audio:"huoshou1",
 				audioname:['re_menghuo'],
-				trigger:{global:'damageBefore'},
+				trigger:{global:'useCard'},
 				forced:true,
 				filter:function(event,player){
-					return (event.card&&event.card.name=='nanman');
+					return (event.card&&event.card.name=='nanman'&&event.player!=player);
 				},
 				content:function(){
-					trigger.source=player;
+					trigger.customArgs.default.customSource=player;
 				}
 			},
 			zaiqixx:{
@@ -5263,7 +5263,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				prompt:function(){
 					var player=_status.event.player;
-					var str='将一张'+(player.storage.shuangxiong2=='red'?'红':'黑')+'色手牌当做【决斗】使用';
+					var str='将一张'+(player.storage.shuangxiong!='red'?'红':'黑')+'色手牌当做【决斗】使用';
 					return str;
 				},
 				viewAs:{name:'juedou'},
