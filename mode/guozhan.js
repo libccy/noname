@@ -979,7 +979,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						sub:true,
 						equipSkill:true,
 						noHidden:true,
-						trigger:{global:'phaseDrawBegin'},
+						trigger:{global:'phaseDrawBegin2'},
 						//priority:8,
 						forced:true,
 						filter:function(event,player){
@@ -1589,7 +1589,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					eff:{
 						sub:true,
-						trigger:{global:'phaseDrawBegin'},
+						trigger:{global:'phaseDrawBegin2'},
 						filter:function(event,player){
 							if(event.player!=player) return false;
 							return event.num>0;
@@ -2163,7 +2163,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 					got:{
 						trigger:{
-							player:"phaseDrawBegin",
+							player:"phaseDrawBegin1",
 						},
 						filter:function (event,player){
 							return player.storage.new_kongcheng.length>0;
@@ -2292,9 +2292,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				//priority:2,
 				audio:"botu",
 				filter:function (event,player){
-					if(player.storage.keji_suit&&player.storage.keji_suit.length>3) return true;
-					if(player.storage.keji_type&&player.storage.keji_type.length>2) return true;
-					return false;
+					var history=player.getHistory('useCard');
+					var suits=[];
+					var types=[];
+					for(var i=0;i<history.length;i++){
+						var suit=get.suit(history[i].card);
+						if(suit) suits.add(suit);
+						types.add(get.type(history[i].card))
+					}
+					return suits.length>=4||types.length>=3;
 				},
 				check:function(event,player){
 					return player.canMoveCard(true);
@@ -2654,7 +2660,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				audio:"reyingzi",
 				audioname:["sunce"],
 				trigger:{
-					player:"phaseDrawBegin",
+					player:"phaseDrawBegin2",
 				},
 				frequent:true,
 				content:function (){
@@ -4276,21 +4282,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			gzyuejian:{
 				trigger:{global:'phaseDiscardBegin'},
-				init:function(player){
-					player.storage.gzyuejian={};
-				},
 				audio:'yuejian',
 				filter:function(event,player){
 					if(player.sameIdentityAs(event.player)){
-						var targets=player.storage.gzyuejian[event.player.playerid];
-						if(targets){
-							for(var i=0;i<targets.length;i++){
-								if(event.player.differentIdentityFrom(targets[i],player==event.player)){
-									return false;
-								}
+						return event.player.getHistory('useCard',function(evt){
+							if(evt.targets){
+								var targets=evt.targets.slice(0);
+								while(targets.contains(event.player)) targets.remove(event.player);
+								return targets.length!=0;
 							}
-						}
-						return true;
+							return false;
+						})==0;
 					}
 					return false;
 				},
@@ -4299,7 +4301,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:'player',
 				forced:true,
-				group:['gzyuejian_count','gzyuejian_clear'],
 				subSkill:{
 					num:{
 						mod:{
@@ -4308,32 +4309,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					},
-					count:{
-						trigger:{global:'useCard'},
-						filter:function(event,player){
-							if(event.player.identity!='unknown'&&!player.sameIdentityAs(event.player)){
-								return false;
-							}
-							return _status.currentPhase==event.player;
-						},
-						silent:true,
-						content:function(){
-							if(!player.storage.gzyuejian[trigger.player.playerid]){
-								player.storage.gzyuejian[trigger.player.playerid]=[];
-							}
-							player.storage.gzyuejian[trigger.player.playerid].addArray(trigger.targets);
-						}
-					},
-					clear:{
-						trigger:{global:'phaseAfter'},
-						silent:true,
-						filter:function(event,player){
-							return player.storage.gzyuejian[event.player.playerid]?true:false;
-						},
-						content:function(){
-							delete player.storage.gzyuejian[trigger.player.playerid];
-						}
-					}
 				}
 			},
 			gzxinsheng:{
@@ -4934,7 +4909,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			wuxin:{
 				// unique:true,
-				trigger:{player:'phaseDrawBegin'},
+				trigger:{player:'phaseDrawBegin1'},
 				// frequent:'check',
 				// check:function(event,player){
 				// 	var num=get.population('qun');
@@ -5577,7 +5552,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				audio:'yongjue',
 				trigger:{global:'useCardAfter'},
 				filter:function(event,player){
-					if(event.gzyongjue==player){
+					if(event==event.player.getHistory('useCard')[0]&&event.card.name=='sha'&&_status.currentPhase==event.player&&event.player.isFriendOf(player)){
 						for(var i=0;i<event.cards.length;i++){
 							if(get.position(event.cards[i],true)=='o'){
 								return true;
@@ -5599,20 +5574,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					trigger.player.gain(cards,'gain2');
 				},
-				subSkill:{
-					count:{
-						trigger:{global:'useCard'},
-						filter:function(event,player){
-							return event.card.name=='sha'&&event.cards.length&&
-								event.player.isFriendOf(player)&&event.player.countUsed()==1;
-						},
-						silent:true,
-						content:function(){
-							trigger.gzyongjue=player;
-						}
-					}
-				},
-				group:'gzyongjue_count',
 				global:'gzyongjue_ai'
 			},
 			gzyongjue_ai:{
