@@ -444,18 +444,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				marktext:'暴',
 				unique:true,
-				init:function(player){
-					player.storage.baonu=2;
-					player.markSkill('baonu');
-					player.syncStorage('baonu');
+				init:function(player,skill){
+					if(!player.storage[skill]) player.storage[skill]=0;
 				},
-				trigger:{source:'damageSource',player:'damageEnd'},
+				trigger:{
+					source:'damageSource',
+					player:['damageEnd','enterGame'],
+					global:'gameDrawAfter',
+				},
 				forced:true,
 				filter:function(event){
-					return event.num>0; 
+					return event.name!='damage'||event.num>0; 
 				},
 				content:function(){
-					player.storage.baonu+=trigger.num;
+					player.storage.baonu+=trigger.name=='damage'?trigger.num:2;
 					player.markSkill('baonu');
 					player.syncStorage('baonu');
 				},
@@ -1587,14 +1589,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				audio:true,
-				trigger:{player:'phaseDrawBegin'},
+				trigger:{player:'phaseDrawBegin2'},
 				//priority:-5,
 				filter:function(event,player){
 					return player.hp<player.maxHp;
 				},
 				forced:true,
 				content:function(){
-					trigger.num+=(player.maxHp-player.hp);
+					trigger.num+=(player.getDamagedHp());
 				}
 			},
 			xinlonghun:{
@@ -1750,7 +1752,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			shelie:{
 				audio:2,
-				trigger:{player:'phaseDrawBefore'},
+				trigger:{player:'phaseDrawBegin1'},
 				content:function(){
 					"step 0"
 					trigger.cancel();
@@ -2448,7 +2450,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				audio:'drlt_jieying',
 				trigger:{
-					player:'phaseDrawBegin'
+					player:'phaseDrawBegin2'
 				},
 				forced:true,
 				filter:function(event,player){

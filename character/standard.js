@@ -298,7 +298,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			tuxi:{
 				audio:2,
-				trigger:{player:'phaseDrawBefore'},
+				trigger:{player:'phaseDrawBegin1'},
 				direct:true,
 				content:function(){
 					"step 0"
@@ -319,7 +319,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.logSkill('tuxi',result.targets);
 						player.gainMultiple(result.targets);
-						trigger.cancel();
+						trigger.cancel(null,null,'notrigger');
 					}
 					else{
 						event.finish();
@@ -334,7 +334,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			luoyi:{
 				audio:2,
-				trigger:{player:'phaseDrawBegin'},
+				trigger:{player:'phaseDrawBegin2'},
 				check:function(event,player){
 					if(player.countCards('h')<3) return false;
 					if(!player.hasSha()) return false;
@@ -1738,7 +1738,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.needsToDiscard();
 				},
 				filter:function(event,player){
-					return player.countUsed('sha')==0;
+					if(player.getHistory('skipped').contains('phaseUse')) return true;
+					var history=player.getHistory('useCard');
+					for(var i=0;i<history.length;i++){
+						if(history[i].card.name=='sha'&&history[i].isPhaseUsing()) return false;
+					}
+					return true;
 				},
 				content:function(){
 					trigger.cancel();
@@ -1770,7 +1775,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yingzi:{
 				audio:2,
 				audioname:['sp_lvmeng'],
-				trigger:{player:'phaseDrawBegin'},
+				trigger:{player:'phaseDrawBegin2'},
 				frequent:true,
 				content:function(){
 					trigger.num++;

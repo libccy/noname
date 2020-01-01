@@ -601,7 +601,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'1':{
 						audio:["yongsi1",2],
 						trigger:{
-							player:'phaseDrawBegin'
+							player:'phaseDrawBegin2'
 						},
 						forced:true,
 						content:function(){
@@ -1518,79 +1518,60 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"nzry_shicai":{
 				audio:"nzry_shicai_2",
-				group:["nzry_shicai_1","nzry_shicai_2","nzry_shicai_3"],
 				ai:{
+					reverseOrder:true,
+					skillTagFilter:function(player){
+						if(player.getHistory('useCard').length) return false;
+					},
 					effect:{
 						target:function(card,player,target){
-							if(get.type(card)=='equip'&&(!player.storage.nzry_shicai||!player.storage.nzry_shicai.contains('equip'))&&get.equipResult(player,target,card.name)<=0) return [1,3];
+							if(get.type(card)=='equip'&&(!player.getHistory('useCard').length)&&get.equipResult(player,target,card.name)<=0) return [1,3];
 						},
 					},
 					threaten:2.4,
 				},
 				subSkill:{
-					"1":{
-						trigger:{
-							global:'phaseBefore',
-							player:'useCard1',
-						},
-						forced:true,
-						popup:false,
-						content:function(){
-							if(!player.storage.nzry_shicai||event.triggername=='phaseBefore') player.storage.nzry_shicai=[];
-							if(event.triggername=='useCard1'&&!player.storage.nzry_shicai.contains(get.type(trigger.card))){
-								trigger.nzry_shicai=true;
-								player.storage.nzry_shicai.push(get.type(trigger.card));
-							}
-						},	
-					},
 					"2":{
 						audio:2,
-						prompt2:"当你使用牌指定目标时，若此牌与你本回合使用的牌类型均不同（包括装备牌），则你可以将此牌置于牌堆顶，然后摸一张牌",
-						trigger:{
-							player:['useCardAfter'],
-							target:'useCardToTargeted',				
-						},
-						filter:function (event,player,name){
-							if(!event.nzry_shicai&&!event.getParent().nzry_shicai) return false;
-							if(name=='useCardToTargeted'&&('equip'!=get.type(event.card)||event.player!=player)) return false;
-							if(name=='useCardAfter'&&['equip','delay'].contains(get.type(event.card))) return false;
-							return event.cards.filterInD().length>0;
-						},
-						check:function (event,player){
-							if(get.type(event.card)=='equip'){
-								return get.equipResult(player,player,event.card.name)<=0;
-							}
-							return true;
-						},
-						content:function(){
-							"step 0"
-							//player.storage.nzry_shicai.push(get.type(trigger.card,'trick'));
-							for(var i=0;i<trigger.cards.length;i++){
-								if(get.position(trigger.cards[i],true)=='o'){
-									trigger.cards[i].fix();
-									ui.cardPile.insertBefore(trigger.cards[i],ui.cardPile.firstChild);
-									game.log(player,'将',trigger.cards[i],'置于牌堆顶');
-								}
-							};
-							game.updateRoundNumber();
-							player.draw();
-							"step 1"
-							if(event.triggername=='useCardToTargeted'){
-								trigger.getParent().excluded.push(player);
-							}
-						},	
-					},
-					"3":{
-						trigger:{
-							global:'phaseAfter'
-						},
-						forced:true,
-						popup:false,
-						content:function(){
-							delete player.storage.nzry_shicai;
-						},	
 					},
 				},
+				trigger:{
+					player:['useCardAfter'],
+					target:'useCardToTargeted',				
+				},
+				filter:function (event,player,name){
+					if(name=='useCardToTargeted'&&('equip'!=get.type(event.card)||event.player!=player)) return false;
+					if(name=='useCardAfter'&&['equip','delay'].contains(get.type(event.card))) return false;
+					if(event.cards.filterInD().length<=0) return false;
+					var history=player.getHistory('useCard');
+					for(var i=0;i<history.length;i++){
+						if(history[i]!=event&&get.type(history[i].card)==get.type(event.card)) return false;
+					}
+					return true;
+				},
+				check:function (event,player){						
+					if(get.type(event.card)=='equip'){
+						return get.equipResult(player,player,event.card.name)<=0;
+					}
+					return true;
+				},
+				content:function(){
+					"step 0"
+					//player.storage.nzry_shicai.push(get.type(trigger.card,'trick'));
+					for(var i=0;i<trigger.cards.length;i++){
+						if(get.position(trigger.cards[i],true)=='o'){
+							trigger.cards[i].fix();
+							ui.cardPile.insertBefore(trigger.cards[i],ui.cardPile.firstChild);
+							game.log(player,'将',trigger.cards[i],'置于牌堆顶');
+						}
+					};
+					game.updateRoundNumber();
+					player.draw();
+					"step 1"
+					if(event.triggername=='useCardToTargeted'){
+						trigger.getParent().excluded.push(player);
+						}
+				},	
 			},
 			"nzry_cunmu":{
 				audio:2,
@@ -3849,7 +3830,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zaiqi:{
 				audio:2,
-				trigger:{player:'phaseDrawBefore'},
+				trigger:{player:'phaseDrawBegin1'},
 				filter:function(event,player){
 					return player.hp<player.maxHp;
 				},
@@ -3864,20 +3845,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					trigger.cancel();
+					trigger.cancel(null,null,'notrigger');
 					event.cards=get.cards(player.getDamagedHp()+(event.name=='zaiqi'?0:1));
+					game.cardsGotoOrdering(event.cards);
 					player.showCards(event.cards);
 					"step 1"
 					var num=0;
-					var cards2=[];
 					for(var i=0;i<event.cards.length;i++){
 						if(get.suit(event.cards[i])=='heart'){
 							num++;
-							cards2.push(event.cards[i]);
 							event.cards.splice(i--,1);
 						}
 					}
-					game.cardsDiscard(cards2);
 					if(num){
 						player.recover(num);
 					}
@@ -4137,7 +4116,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			haoshi:{
 				audio:2,
-				trigger:{player:'phaseDrawBegin'},
+				trigger:{player:'phaseDrawBegin2'},
 				threaten:1.4,
 				check:function(event,player){
 					if(player.countCards('h')<=1) return true;
@@ -5240,7 +5219,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shuangxiong:{
 				audio:true,
 				audioname:['re_yanwen'],
-				trigger:{player:'phaseDrawBefore'},
+				trigger:{player:'phaseDrawBegin1'},
 				check:function(event,player){
 					if(player.countCards('h')>player.hp) return true;
 					if(player.countCards('h')>3) return true;
@@ -5254,7 +5233,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.$gain2(result.card);
 					player.addTempSkill('shuangxiong2');
 					player.storage.shuangxiong=get.color(result.card);
-					trigger.cancel();
+					trigger.cancel(null,null,'notrigger');
 				}
 			},
 			shuangxiong2:{

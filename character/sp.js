@@ -948,7 +948,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard2'},
 				direct:true,
 				filter:function(event,player){
-					if(player.countUsed()>=1) return false;
+					if(player.countUsed(null,true)>1) return false;
 					if(event.card.name!='sha'&&get.type(event.card)!='trick') return false;
 					var info=get.info(event.card);
 					if(info.allowMultiple==false) return false;
@@ -1050,10 +1050,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			sibian:{
 				audio:2,
-				trigger:{player:'phaseDrawBefore'},
+				trigger:{player:'phaseDrawBegin1'},
 				content:function(){
 					'step 0'
-					trigger.cancel();
+					trigger.cancel(null,null,'notrigger');
 					event.cards=get.cards(4);
 					game.cardsGotoOrdering(event.cards);
 					player.showCards(event.cards);
@@ -2644,28 +2644,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			gzjili:{
-				subSkill:{
-					count:{
-						trigger:{player:['useCard','respond']},
-						silent:true,
-						priority:1,
-						content:function(){
-							player.storage.gzjili++;
-						}
-					},
-					init:{
-						trigger:{global:'phaseBefore'},
-						silent:true,
-						content:function(){
-							player.storage.gzjili=0;
-						}
-					}
-				},
-				group:['gzjili_count','gzjili_init'],
 				trigger:{player:['useCard','respond']},
 				frequent:true,
 				filter:function(event,player){
-					return player.storage.gzjili==player.getAttackRange();
+					return player.getHistory('useCard').length+player.getHistory('respond').length==player.getAttackRange();
 				},
 				audio:2,
 				content:function(){
@@ -3572,46 +3554,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			sptunjiang:{
 				audio:2,
-				trigger:{player:'phaseUseBegin'},
-				silent:true,
-				locked:false,
-				subfrequent:['end'],
-				content:function(){
-					player.addTempSkill('sptunjiang_count');
-					player.addTempSkill('sptunjiang_end');
+				trigger:{player:'phaseJieshuBegin'},
+				frequent:true,
+				filter:function(event,player){
+					if(player.getHistory('skipped').contains('phaseUse')) return false;
+					return player.getHistory('useCard',function(evt){
+						if(evt.targets&&evt.targets.length&&evt.isPhaseUsing()){
+							var targets=evt.targets.slice(0);
+							while(targets.contains(player)) targets.remove(player);
+							return targets.length>0;
+						}
+						return false;
+					}).length==0;
 				},
-				subSkill:{
-					count:{
-						trigger:{player:'useCardAfter'},
-						silent:true,
-						filter:function(event,player){
-							if(event.targets){
-								for(var i=0;i<event.targets.length;i++){
-									if(event.targets[i]!=player){
-										return true;
-									}
-								}
-							}
-							return false;
-						},
-						content:function(){
-							player.addTempSkill('sptunjiang_used');
-						}
-					},
-					used:{},
-					end:{
-						audio:'sptunjiang',
-						trigger:{player:'phaseJieshuBegin'},
-						frequent:true,
-						prompt2:'结束阶段，若你未跳过本回合的出牌阶段，且你于本回合出牌阶段内未使用牌指定过其他角色为目标，则你可以摸X张牌（X为全场势力数）。',
-						filter:function(event,player){
-							return !player.hasSkill('sptunjiang_used');
-						},
-						content:function(){
-							player.draw(game.countGroup());
-						}
-					}
-				}
+				content:function(){
+					player.draw(game.countGroup());
+				},
 			},
 			bingzhao:{
 				audio:2,
@@ -6286,10 +6244,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinyongsi1:{
 				audio:'yongsi1',
-				trigger:{player:'phaseDrawBegin'},
+				trigger:{player:'phaseDrawBegin1'},
 				forced:true,
 				content:function(){
-					trigger.num+=game.countGroup()-2;
+					player.draw(game.countGroup());
+					trigger.cancel(null,null,'notrigger');
 				}
 			},
 			xinyongsi2:{
@@ -6731,7 +6690,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zhaolie:{
-				trigger:{player:'phaseDrawBegin'},
+				trigger:{player:'phaseDrawBegin1'},
 				direct:true,
 				content:function(){
 					'step 0'
@@ -8448,7 +8407,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yawang:{
 				audio:2,
-				trigger:{player:'phaseDrawBefore'},
+				trigger:{player:'phaseDrawBegin1'},
 				forced:true,
 				check:function(event,player){
 					var num=game.countPlayer(function(target){
@@ -8462,7 +8421,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return num>=3;
 				},
 				content:function(){
-					trigger.cancel();
+					trigger.cancel(null,null,'notrigger');
 					var num=game.countPlayer(function(target){
 						return target.hp==player.hp;
 					});
@@ -9371,7 +9330,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			tunchu:{
 				audio:2,
-				trigger:{player:'phaseDrawBegin'},
+				trigger:{player:'phaseDrawBegin2'},
 				check:function(event,player){
 					return player.countCards('h')-player.countCards('h',{type:'equip'})<=player.hp;
 				},
@@ -9740,43 +9699,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				//usable:3,
 				filter:function(event,player){
-					if(!event.cards||event.cards.length!=1) return false;
-					if(_status.currentPhase!=player) return false;
-					if(!player.storage.fenyin) return false;
-					return get.color(player.storage.fenyin)!=get.color(event.cards[0]);
+					var evt=player.getLastUsed(1);
+					if(!evt) return false;
+					var color1=get.color(evt.card);
+					var color2=get.color(event.card);
+					return color1&&color2&&color1!='none'&&color2!='none'&&color1!=color2;
 				},
 				content:function(){
 					player.draw();
 				},
-				intro:{
-					content:'card'
-				},
-				group:['fenyin2','fenyin3']
-			},
-			fenyin3:{
-				trigger:{player:'useCard'},
-				priority:-1,
-				silent:true,
-				filter:function(event,player){
-					if(!event.cards||event.cards.length!=1) return false;
-					if(_status.currentPhase!=player) return false;
-					return true;
-				},
-				content:function(){
-					player.storage.fenyin=trigger.cards[0];
-				}
-			},
-			fenyin2:{
-				trigger:{player:'phaseBefore'},
-				silent:true,
-				priority:10,
-				content:function(){
-					player.storage.fenyin=null;
-				}
 			},
 			dujin:{
 				audio:2,
-				trigger:{player:'phaseDrawBegin'},
+				trigger:{player:'phaseDrawBegin2'},
 				frequent:true,
 				content:function(){
 					trigger.num+=1+Math.floor(player.countCards('e')/2);
@@ -9905,21 +9840,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			mozhi:{
 				audio:2,
-				intro:{
-					content:'cards'
-				},
-				init:function(player){
-					player.storage.mozhi=[];
-				},
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
 				filter:function(event,player){
-					return player.storage.mozhi.length>0&&player.countCards('h')>0;
+					return player.getHistory('useCard',function(evt){
+						return evt.isPhaseUsing()&&['basic','trick'].contains(get.type(evt.card));
+					}).length>0&&player.countCards('h')>0;
 				},
 				content:function(){
-					if(player.storage.mozhi.length&&player.countCards('h')){
-						var card=player.storage.mozhi.shift();
-						card={name:card.name,nature:card.nature,suit:card.suit,number:card.number};
+					"step 0"
+					event.history=player.getHistory('useCard',function(evt){
+						return evt.isPhaseUsing()&&['basic','trick'].contains(get.type(evt.card));
+					})
+					"step 1"
+					if(event.history.length&&player.countCards('h')){
+						var card=event.history.shift().card;
+						card={name:card.name,nature:card.nature};
 						if(lib.filter.cardEnabled(card)){
 							if(game.hasPlayer(function(current){
 								return player.canUse(card,current);
@@ -9938,10 +9874,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								next.backup('mozhix');
 							}
 						}
-						event.redo();
 					}
+					"step 2"
+					if(result.bool) event.goto(1);
 				},
-				group:['mozhi2','mozhi3']
 			},
 			mozhix:{
 				filterCard:function(card){
@@ -9949,28 +9885,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				selectCard:1,
 				popname:true,
-			},
-			mozhi2:{
-				trigger:{player:'phaseAfter'},
-				silent:true,
-				content:function(){
-					player.storage.mozhi.length=0;
-					player.unmarkSkill('mozhi');
-				}
-			},
-			mozhi3:{
-				trigger:{player:'useCard'},
-				silent:true,
-				filter:function(event,player){
-					if(_status.currentPhase!=player) return false;
-					if(event.parent.parent.name!='phaseUse') return false;
-					var type=get.type(event.card);
-					return player.storage.mozhi.length<2&&(type=='basic'||type=='trick');
-				},
-				content:function(){
-					player.storage.mozhi.add(trigger.card);
-					if(player.hasSkill('mozhi')) player.markSkill('mozhi');
-				}
 			},
 			chenqing2:{},
 			ranshang:{
@@ -10208,7 +10122,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fengpo3:{},
 			biluan:{
 				audio:2,
-				trigger:{player:'phaseDrawBefore'},
+				trigger:{player:'phaseDrawBegin1'},
 				mark:true,
 				unique:true,
 				intro:{
@@ -10267,7 +10181,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.biluan+=ng.length;
 					player.markSkill('biluan');
 					game.addVideo('storage',player,['biluan',player.storage.biluan]);
-					trigger.cancel();
+					trigger.cancel(null,null,'notrigger');
 				},
 				mod:{
 					globalTo:function(from,to,distance){
@@ -10345,7 +10259,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			canshi:{
 				audio:2,
-				trigger:{player:'phaseDrawBefore'},
+				trigger:{player:'phaseDrawBegin1'},
 				check:function(event,player){
 					var num=game.countPlayer(function(current){
 						if(player.hasZhuSkill('guiming')&&current.group=='wu') return true;
@@ -10361,7 +10275,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return '残蚀：是否改为摸'+get.cnNumber(num)+'张牌？';
 				},
 				content:function(){
-					trigger.cancel();
+					trigger.cancel(null,null,'notrigger');
 					var num=game.countPlayer(function(current){
 						if(player.hasZhuSkill('guiming')&&current.group=='wu'&&current!=player) return true;
 						return current.isDamaged();
@@ -11826,7 +11740,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			hengzheng:{
 				audio:2,
-				trigger:{player:'phaseDrawBefore'},
+				trigger:{player:'phaseDrawBegin1'},
 				filter:function(event,player){
 					return player.hp==1||player.countCards('h')==0;
 				},
@@ -11848,7 +11762,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					targets.sort(lib.sort.seat);
 					event.targets=targets;
 					event.num=0;
-					trigger.cancel();
+					trigger.cancel(null,null,'notrigger');
 					player.line(targets,'green');
 					"step 1"
 					if(num<event.targets.length){
@@ -12694,7 +12608,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			hongyuan:{
-				trigger:{player:'phaseDrawBegin'},
+				trigger:{player:'phaseDrawBegin2'},
 				direct:true,
 				audio:2,
 				content:function(){
@@ -12965,7 +12879,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yongsi1:{
 				audio:2,
-				trigger:{player:'phaseDrawBegin'},
+				trigger:{player:'phaseDrawBegin2'},
 				forced:true,
 				content:function(){
 					trigger.num+=game.countGroup();

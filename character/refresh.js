@@ -666,27 +666,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			botu:{
 				audio:2,
-				group:'botu_kanade',
 				trigger:{player:'phaseAfter'},
 				frequent:true,
 				filter:function(event,player){
-					return player.storage.botu&&player.storage.botu.length>=4;
+					var history=player.getHistory('useCard');
+					var suits=[];
+					for(var i=0;i<history.length;i++){
+						var suit=get.suit(history[i].card);
+						if(suit) suits.add(suit);
+					}
+					return suits.length==4;
 				},
 				content:function(){
 					player.insertPhase();
-				},
-				subSkill:{
-					kanade:{
-						trigger:{player:['useCard','phaseBefore']},
-						silent:true,
-						content:function(){
-							if(trigger.name=='phase') player.storage.botu=[];
-							else{
-								var suit=get.suit(trigger.card);
-								if(suit) player.storage.botu.add(suit);
-							}
-						},
-					},
 				},
 			},
 			xinleiji:{
@@ -1064,7 +1056,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			reshuangxiong:{
 				trigger:{
-					player:"phaseDrawBefore",
+					player:"phaseDrawBegin1",
 				},
 				group:"reshuangxiong2",
 				audio:"shuangxiong",
@@ -1075,7 +1067,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function (){
 					"step 0"
-					trigger.cancel();
+					trigger.cancel(null,null,'notrigger');
 					event.cards=get.cards(2);
 					event.videoId=lib.status.videoId++;
 					game.broadcastAll(function(player,id,cards){
@@ -1261,7 +1253,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_retuxi":{
 				audio:"retuxi",
 				trigger:{
-					player:"phaseDrawBegin",
+					player:"phaseDrawBegin2",
 				},
 				direct:true,
 				//priority:-10,
@@ -1407,13 +1399,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_reluoyi":{
 				audio:"reluoyi",
 				trigger:{
-					player:"phaseDrawBegin",
+					player:"phaseDrawBegin1",
 				},
 				forced:true,
 				locked:false,
 				content:function (){
 					"step 0"
 					var cards=get.cards(3);
+					game.cardsGotoOrdering(cards);
 					event.cards=cards;
 					player.showCards(event.cards,'裸衣');
 					var cardsx=[];
@@ -1444,11 +1437,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					player.gain(cards,'gain2');
-					game.cardsDiscard(cards2);
+					//game.cardsDiscard(cards2);
 					player.addTempSkill('reluoyi2',{player:'phaseBefore'});
-					trigger.cancel();
+					trigger.cancel(null,null,'notrigger');
 					}
-					else game.cardsDiscard(cards);
+					//else game.cardsDiscard(cards);
 				},
 			},
 			"new_rewusheng":{
@@ -1789,7 +1782,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:"qingnang",
 				enable:"phaseUse",
 				filterCard:true,
-				check:function (card,event,player){
+				check:function (card){
+					var player=_status.event.player;
 					if(game.countPlayer(function(current){
 						return (get.recoverEffect(current,player,player)>0&&get.attitude(player,current)>2);
 					})>1&&get.color(card)=='black'&&player.countCards('h',{color:'red'})>0) return 3-get.value(card);
@@ -2589,7 +2583,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},*/
 			retuxi:{
 				audio:2,
-				trigger:{player:'phaseDrawBefore'},
+				trigger:{player:'phaseDrawBegin2'},
 				direct:true,
 				filter:function(event){
 					return event.num>0;
@@ -2699,7 +2693,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			reluoyi:{
 				audio:2,
-				trigger:{player:'phaseDrawBegin'},
+				trigger:{player:'phaseDrawBegin1'},
 				check:function(event,player){
 					if(player.countCards('h','sha')) return true;
 					return Math.random()<0.5;
@@ -2707,7 +2701,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					player.addTempSkill('reluoyi2',{player:'phaseBefore'});
-					trigger.cancel();
+					trigger.cancel(null,null,'notrigger');
 					"step 1"
 					event.cards=get.cards(3);
 					player.showCards(event.cards,'裸衣');
@@ -2862,7 +2856,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reyingzi:{
 				audio:2,
 				audioname:['heqi','sunce'],
-				trigger:{player:'phaseDrawBegin'},
+				trigger:{player:'phaseDrawBegin2'},
 				forced:true,
 				content:function(){
 					trigger.num++;
@@ -3802,7 +3796,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xunxun:{
 				audio:2,
-				trigger:{player:'phaseDrawBefore'},
+				trigger:{player:'phaseDrawBegin1'},
 				//check:function(event,player){
 				//	return !player.hasSkill('reyiji2');
 				//},
