@@ -739,7 +739,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 1"
 					if(result.bool==false){
-						target.damage(event.baseDamage);
+						target.damage(event.baseDamage,event.customSource||player);
 					}
 				},
 				ai:{
