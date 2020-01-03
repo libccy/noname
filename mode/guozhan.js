@@ -3622,11 +3622,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			gzdiancai:{
-				group:['gzdiancai_count','gzdiancai_init'],
-				audio:2,
+				audio:'diancai',
 				trigger:{global:'phaseUseEnd'},
 				filter:function(event,player){
-					return _status.currentPhase!=player&&player.storage.gzdiancai>=player.hp;
+					if(_status.currentPhase==player) return false;
+					var num=0;
+					player.getHistory('lose',function(evt){
+						if(evt.cards2&&evt.getParent('phaseUse')==event) num+=evt.cards2.length;
+					});
+					return num>=player.hp;
 				},
 				content:function(){
 					'step 0'
@@ -3637,30 +3641,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					player.mayChangeVice();
 				},
-				subSkill:{
-					init:{
-						trigger:{global:'phaseUseBegin'},
-						filter:function(event,player){
-							return _status.currentPhase!=player;
-						},
-						silent:true,
-						content:function(){
-							player.storage.gzdiancai=0;
-						}
-					},
-					count:{
-						trigger:{player:'loseEnd'},
-						silent:true,
-						filter:function(event,player){
-							return _status.currentPhase!=player;
-						},
-						content:function(){
-							for(var i=0;i<trigger.cards.length;i++){
-								if(trigger.cards[i].original&&trigger.cards[i].original!='j') player.storage.gzdiancai++;
-							}
-						}
-					}
-				}
 			},
 			/*diaodu:{
 				enable:'phaseUse',
