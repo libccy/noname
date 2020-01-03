@@ -1544,10 +1544,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(name=='useCardAfter'&&['equip','delay'].contains(get.type(event.card))) return false;
 					if(event.cards.filterInD().length<=0) return false;
 					var history=player.getHistory('useCard');
+					var evt=name=='useCardAfter'?event:event.getParent();
 					for(var i=0;i<history.length;i++){
-						if(history[i]!=event&&get.type(history[i].card)==get.type(event.card)) return false;
+						if(history[i]!=evt&&get.type(history[i].card)==get.type(event.card)) return false;
+						else if(history[i]==evt) return true;
 					}
-					return true;
+					return false;
 				},
 				check:function (event,player){						
 					if(get.type(event.card)=='equip'){

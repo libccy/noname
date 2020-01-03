@@ -80,7 +80,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{
 			re_zuoci:function(mode){
-				return mode=='identity'||mode=='single';
+				return mode=='identity'||mode=='single'||mode=='doudizhu';
 			}
 		},
 		perfectPair:{
@@ -88,7 +88,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			rehuashen:{
-				mode:['identity','single'],
+				mode:['identity','single','doudizhu'],
 				audio:2,
 				unique:true,
 				direct:true,
@@ -340,7 +340,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			rexinsheng:{
-				mode:['identity','single'],
+				mode:['identity','single','doudizhu'],
 				unique:true,
 				audio:2,
 				trigger:{player:'damageEnd'},

@@ -3773,7 +3773,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(!player.countCards('he')) return false;
 					if(!event.source||event.source==player||!event.source.isIn()) return false;
-					if(player.storage.huisheng.contains(event.source)) return false;
+					if(player.storage.huisheng&&player.storage.huisheng.contains(event.source)) return false;
 					return true;
 				},
 				init:function(player){
@@ -3842,6 +3842,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var card=result.links[0];
 						trigger.source.gain(card,player,'giveAuto');
 						trigger.cancel();
+						if(!player.storage.huisheng) player.storage.huisheng=[];
 						player.storage.huisheng.push(trigger.source);
 					}
 					else{
@@ -3961,6 +3962,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
+					player.storage.jiyu.push(target);
 					var spade=true;
 					if(player.isTurnedOver()||get.attitude(target,player)>0||target.hp<=2){
 						spade=false;
@@ -3980,12 +3982,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return -get.value(card);
 					}).set('spade',spade);
 					'step 1'
+					if(!result.cards||!result.cards.length) return;
 					var card=result.cards[0];
 					if(get.suit(card)=='spade'){
 						player.turnOver();
 						target.loseHp();
 					}
-					player.storage.jiyu.push(target);
 					player.storage.jiyu2.add(get.suit(card));
 				},
 				ai:{
@@ -4005,7 +4007,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			jiyu2:{
-				trigger:{player:['phaseUseBegin','phaseAfter']},
+				trigger:{player:['phaseUseBegin','phaseUseAfter']},
 				silent:true,
 				content:function(){
 					player.storage.jiyu=[];

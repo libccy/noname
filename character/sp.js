@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			sp:{
-				sp_default:["caoying","simahui","baosanniang","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","liuxie","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","fuwan","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","lingju","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","guansuo","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","wenyang"],
+				sp_default:["caoying","simahui","baosanniang","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","liuxie","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","fuwan","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","lingju","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","guansuo","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","wenyang","xujing"],
 				sp_whlw:["xurong","lijue","zhangji","fanchou","guosi"],
 				sp_zlzy:["zhangqiying","lvkai","zhanggong","weiwenzhugezhi","beimihu"],
 				sp_longzhou:["xf_tangzi","xf_huangquan","xf_sufei","sp_liuqi"],
@@ -21,6 +21,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			xujing:['male','shu',3,['yuxu','xjshijian'],['unseen']],
 			xushao:['male','qun',3,['pingjian'],['unseen']],
 			puyuan:['male','shu',4,['pytianjiang','pyzhuren']],
 			xinpi:['male','wei',3,['xpchijie','yinju']],
@@ -170,6 +171,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			xujing:'许靖（？—222年），字文休。汝南郡平舆县（今河南省平舆县）人。汉末至三国蜀汉时期重臣、名士、评论家。许靖因与从弟许邵俱以品评人物而闻名于世。后被刘翊推举为孝廉，任尚书郎。曾先后投奔孔伷、陈祎、许贡、王朗等人，于孙策攻王朗前与家属俱避难交州，受到交趾太守士燮礼待。其后受益州牧刘璋邀请，相继为巴郡、广汉、蜀郡太守。于刘备包围成都时欲越墙叛逃，为刘璋所获。刘备定蜀后欲将其弃用，在法正的建议下方以其为左将军长史。建安二十三年（218年），刘备称汉中王，任命许靖为汉中王傅。章武元年（221年），刘备称帝，任命许靖为司徒，位列三公。章武二年（222年），去世。有文集二卷。',
+			xushao:'许劭（shào）（150年—195年），字子将。汝南平舆（今河南平舆县射桥镇）人。东汉末年著名人物评论家。据说他每月都要对当时人物进行一次品评，人称为“月旦评”。曾任汝南郡功曹，后南渡投靠扬州刺史刘繇。刘繇被孙策击败后，许劭随其逃往豫章郡，并在豫章去世。',
 			puyuan:'蒲元是三国时蜀汉杰出的工匠。为诸葛亮造刀三千口，并且制作木牛流马。后来姜维为他写过两部传记《蒲元传》《蒲元别传》。',
 			zhangwen:'张温（193年—230年），字惠恕，吴郡吴县（今江苏苏州）人。少修节操，容貌奇伟。孙权召拜议郎、选曹尚书，徙太子太傅。黄武三年（224），以辅义中郎将身份出使蜀汉，孙权原先害怕诸葛亮会有意留难张温，但张温不担心。在呈上蜀汉朝廷的文书刻意称颂蜀汉，以表明和解的诚意，重建两国关系。他在蜀汉表现出色，得蜀汉朝廷重视。回东吴后不久，被调进豫章的军队，事业上再无进展。孙权一方面介怀他出使蜀汉时称颂蜀汉，又嫌他声名太盛，恐怕张温不会尽忠地由他任用。当时正好碰上暨艳事件，暨艳是张温引荐的臣子，但他滥用职权，升迁评定等只看自己喜恶。事件被揭发后暨艳及同党徐彪都自杀。孙权见此，于是以张温与暨艳、徐彪等人多有来往而下罪张温，后更将张温发还到家乡吴郡。将军骆统曾上书为张温辩解，但孙权不理会。六年后，张温病逝。',
 			lisu:'李肃（？－192年），五原（治今内蒙古包头西北）人。永汉三年四月，司徒王允、尚书仆射士孙瑞、卓将吕布共谋诛卓。是时，天子有疾新愈，大会未央殿。布使同郡骑都尉肃等、将亲兵十馀人，伪著卫士服守掖门。布怀诏书。卓至，肃等格卓。卓惊呼布所在。布曰“有诏”，遂杀卓，夷三族。后卓女婿中郎将牛辅典兵别屯陕，分遣校尉李傕、郭汜、张济略陈留、颍川诸县。卓死，吕布使李肃至陕，欲以诏命诛辅。辅等逆与肃战，肃败走弘农，布诛肃。',
@@ -325,7 +328,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		card:{
 			pyzhuren_heart:{
 				fullskin:true,
-				//derivation:'puyuan',
+				derivation:'puyuan',
 				type:'equip',
 				subtype:'equip1',
 				distance:{attackFrom:-2},
@@ -338,7 +341,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			pyzhuren_diamond:{
 				fullskin:true,
-				//derivation:'puyuan',
+				derivation:'puyuan',
 				type:'equip',
 				subtype:'equip1',
 				distance:{attackFrom:-1},
@@ -351,7 +354,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			pyzhuren_club:{
 				fullskin:true,
-				//derivation:'puyuan',
+				derivation:'puyuan',
 				type:'equip',
 				subtype:'equip1',
 				distance:{attackFrom:-1},
@@ -364,7 +367,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			pyzhuren_spade:{
 				fullskin:true,
-				//derivation:'puyuan',
+				derivation:'puyuan',
 				type:'equip',
 				subtype:'equip1',
 				skills:['pyzhuren_spade'],
@@ -376,7 +379,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			pyzhuren_shandian:{
 				fullskin:true,
-				//derivation:'puyuan',
+				derivation:'puyuan',
 				type:'equip',
 				subtype:'equip1',
 				distance:{attackFrom:-3},
@@ -648,7 +651,63 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
-			//许邵
+			//许邵许靖
+			yuxu:{
+				audio:2,
+				trigger:{player:'useCard'},
+				filter:function(event,player){
+					return event.isPhaseUsing(player);
+				},
+				content:function(){
+					trigger.yuxu=true;
+					player.addTempSkill('yuxu2');
+					player.draw();
+				},
+			},
+			yuxu2:{
+				trigger:{player:'useCard'},
+				direct:true,
+				charlotte:true,
+				locked:true,
+				filter:function(event,player){
+					var	evt=event.getParent('phaseUse');
+					if(!evt||evt.player!=player) return false;
+					var history=player.getHistory('useCard',function(evtt){
+						return evtt.getParent('phaseUse')==evt;
+					});
+					var index=history.indexOf(event);
+					if(index<1) return false;
+					return history[index-1].yuxu==true&&player.countCards('he')>0;
+				},
+				content:function(){
+					player.chooseToDiscard('he',true);
+				},
+			},
+			xjshijian:{
+				audio:2,
+				trigger:{global:'useCardAfter'},
+				direct:true,
+				filter:function(event,player){
+					if(event.player==player) return false;
+					var evt=event.getParent('phaseUse');
+					if(!evt||evt.player!=event.player) return false;
+					return event.player.getHistory('useCard',function(evtt){
+						return evtt.getParent('phaseUse')==evt;
+					}).indexOf(event)==1&&player.countCards('he')>0;
+				},
+				content:function(){
+					'step 0'
+					var next=player.chooseToDiscard('he',get.prompt('xjshijian',trigger.player),'弃置一张牌并令其获得技能〖誉虚〗至回合结束');
+					next.set('logSkill',['xjshijian',trigger.player]);
+					next.set('check',get.attitude(player,trigger.player)>0&&trigger.player.countCards('h')>2);
+					next.ai=function(card){
+						if(_status.event.check) return 5-get.value(card);
+						return -1;
+					};
+					'step 1'
+					if(result.bool) trigger.player.addTempSkill('yuxu');
+				},
+			},
 			pingjian:{
 				mode:['identity','single','guozhan'],
 				audio:2,
@@ -1216,8 +1275,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xpchijie2:{
 				charlotte:true,
 				trigger:{
-					global:'useCardAfter',
-					player:'damage',
+					global:['useCardAfter','damage'],
 				},
 				onremove:true,
 				forced:true,
@@ -1227,8 +1285,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.card==player.storage.xpchijie2;
 				},
 				content:function(){
-					if(trigger.name=='damage') player.addTempSkill('xpchijie3');
-					else if(!player.hasSkill('xpchijie3')){
+					if(trigger.name=='damage') player.addTempSkill(player==trigger.player?'xpchijie3':'xpchijie4');
+					else if(!player.hasSkill('xpchijie4')&&!player.hasSkill('xpchijie3')){
 						var cards=[];
 						var cs=trigger.cards;
 						for(var i=0;i<cs.length;i++){
@@ -1255,6 +1313,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.cancel();
 				},
 			},
+			xpchijie4:{},
 			yinju:{
 				audio:2,
 				enable:'phaseUse',
@@ -2734,11 +2793,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			diancai:{
-				group:['diancai_count','diancai_init'],
 				audio:2,
 				trigger:{global:'phaseUseEnd'},
 				filter:function(event,player){
-					return _status.currentPhase!=player&&player.storage.diancai>=player.hp;
+					if(_status.currentPhase==player) return false;
+					var num=0;
+					player.getHistory('lose',function(evt){
+						if(evt.cards2&&evt.getParent('phaseUse')==event) num+=evt.cards2.length;
+					});
+					return num>=player.hp;
 				},
 				content:function(){
 					'step 0'
@@ -2747,30 +2810,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.draw(num);
 					}
 				},
-				subSkill:{
-					init:{
-						trigger:{global:'phaseUseBegin'},
-						filter:function(event,player){
-							return _status.currentPhase!=player;
-						},
-						silent:true,
-						content:function(){
-							player.storage.diancai=0;
-						}
-					},
-					count:{
-						trigger:{player:'loseEnd'},
-						silent:true,
-						filter:function(event,player){
-							return _status.currentPhase!=player;
-						},
-						content:function(){
-							for(var i=0;i<trigger.cards.length;i++){
-								if(trigger.cards[i].original&&trigger.cards[i].original!='j') player.storage.diancai++;
-							}
-						}
-					}
-				}
 			},
 			diaodu:{
 				audio:2,
@@ -9849,11 +9888,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
+					event.count=2;
 					event.history=player.getHistory('useCard',function(evt){
 						return evt.isPhaseUsing()&&['basic','trick'].contains(get.type(evt.card));
 					})
 					"step 1"
-					if(event.history.length&&player.countCards('h')){
+					event._result={};
+					if(event.count&&event.history.length&&player.countCards('h')){
+						event.count--;
 						var card=event.history.shift().card;
 						card={name:card.name,nature:card.nature};
 						if(lib.filter.cardEnabled(card)){
@@ -9876,7 +9918,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					"step 2"
-					if(result.bool) event.goto(1);
+					if(result&&result.bool) event.goto(1);
 				},
 			},
 			mozhix:{
@@ -13697,7 +13739,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangwen:'张温',
 			puyuan:'蒲元',
 			xushao:'许邵',
+			xujing:'许靖',
 			
+			yuxu:'誉虚',
+			yuxu_info:'当你于出牌阶段内使用牌时，你可以摸一张牌。若如此做，当你于出牌阶段内使用下一张牌时，你弃置一张牌。',
+			yuxu2:'誉虚(弃牌)',
+			xjshijian:'实荐',
+			xjshijian_info:'一名其他角色于其回合内使用的第二张牌结算完成后，你可弃置一张牌并令其获得技能〖誉虚〗直到回合结束。',
 			pingjian:'评荐',
 			pingjian_info:'结束阶段开始时/当你受到伤害后/出牌阶段限一次，你可以弃置一张牌。若如此做，系统随机从剩余武将牌堆中检索出三张拥有发动时机为结束阶段开始时/当你受到伤害后/出牌阶段限一次的技能的武将牌。然后你可以发动这些技能中的一个。每个技能只能选择一次。',
 			pingjian_use:'评荐',
@@ -13729,7 +13777,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lskuizhu:'馈珠',
 			lskuizhu_info:'出牌阶段结束时，你可以选择体力值全场最多的一名其他角色，将手牌摸至与该角色相同（最多摸至五张），然后该角色观看你的手牌，弃置任意张手牌并从观看的牌中获得等量的牌。若其获得的牌大于一张，则你选择一项：移去一个“珠”；或令其对其攻击范围内的一名角色造成1点伤害。',
 			xpchijie:'持节',
-			xpchijie_info:'每回合限一次，当你成为其他角色使用牌的目标后，你可以获得如下效果：当此牌对其他角色造成伤害时，若此牌已对你造成过伤害，则你防止此伤害；当此牌使用结算完成时，若此牌未对你造成伤害，则你可以获得此牌对应的所有实体牌。',
+			xpchijie_info:'每回合限一次，当你成为其他角色使用牌的目标后，你可以获得如下效果：当此牌对其他角色造成伤害时，若此牌已对你造成过伤害，则你防止此伤害；当此牌使用结算完成时，若此牌未造成过伤害，则你可以获得此牌对应的所有实体牌。',
 			xpchijie3:'持节',
 			yinju:'引裾',
 			yinju_info:'限定技，出牌阶段，你可以选择一名其他角色。若如此做，当你对此角色使用牌时，你摸一张牌；当你即将对其造成伤害时，防止此伤害，然后其回复等量的体力。',

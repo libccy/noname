@@ -5143,55 +5143,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"xinfu_shangjian":{
-				group:["xinfu_shangjian_count","xinfu_shangjian_init"],
 				trigger:{
 					global:"phaseJieshuBegin",
 				},
 				audio:2,
 				filter:function (event,player){
-					return player.storage.xinfu_shangjian<=player.hp&&player.storage.xinfu_shangjian>0;
+					var num=0;
+					player.getHistory('lose',function(evt){
+						if(evt.cards2) num+=evt.cards2.length;
+					});
+					return num>0&&num<=player.hp
 				},
 				frequent:true,
 				content:function (){
 					'step 0'
-					var num=player.storage.xinfu_shangjian;
+					var num=0;
+					player.getHistory('lose',function(evt){
+						if(evt.cards2) num+=evt.cards2.length;
+					});
 					if(num>0){
 						player.draw(num);
 					}
-				},
-				subSkill:{
-					init:{
-						trigger:{
-							global:"phaseBefore",
-						},
-						filter:function (event,player){
-							return true;
-						},
-						silent:true,
-						content:function (){
-							player.storage.xinfu_shangjian=0;
-						},
-						sub:true,
-						forced:true,
-						popup:false,
-					},
-					count:{
-						trigger:{
-							player:"loseEnd",
-						},
-						silent:true,
-						filter:function (event,player){
-							return true;
-						},
-						content:function (){
-							for(var i=0;i<trigger.cards.length;i++){
-								if(trigger.cards[i].original&&trigger.cards[i].original!='j') player.storage.xinfu_shangjian++;
-							}
-						},
-						sub:true,
-						forced:true,
-						popup:false,
-					},
 				},
 			},
 			"rw_bagua_skill":{
@@ -5549,7 +5521,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"qc_mingzhe":"明哲",
 			"qc_mingzhe_info":"",
 			"xinfu_shangjian":"尚俭",
-			"xinfu_shangjian_info":"一名角色的结束阶段开始时，若你于此阶段失去了x张或更少的牌，则你可以摸等量的牌。（x为你的体力值）。",
+			"xinfu_shangjian_info":"一名角色的结束阶段开始时，若你于此回合内失去了x张或更少的牌，则你可以摸等量的牌。（x为你的体力值）。",
 			"rw_bagua_skill":"先天八卦阵",
 			"rw_bagua_skill_info":"每当你需要使用或打出一张【闪】时，你可以进行一次判定，若判定结果不为黑桃，视为你使用或打出了一张【闪】。",
 			"rw_baiyin_skill":"玉照狮子盔",
