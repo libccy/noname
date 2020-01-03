@@ -10048,7 +10048,7 @@
 					player.ai.tempIgnore=[];
 					player.stat.push({card:{},skill:{}});
 					game.countPlayer(function(current){
-						current.actionHistory.push({useCard:[],respond:[],skipped:[]});
+						current.actionHistory.push({useCard:[],respond:[],skipped:[],lose:[],gain:[]});
 					});
 					if(ui.land&&ui.land.player==player){
 						game.addVideo('destroyLand');
@@ -14124,6 +14124,7 @@
 						event.finish();
 						return;
 					}
+					player.getHistory('gain').push(event);
 					//if(event.source&&event.delay!==false) game.delayx();
 					"step 2"
 					if(player.getStat().gain==undefined){
@@ -14314,6 +14315,8 @@
 						_status.cardPileNum=num;
 					},player,cards,ui.cardPile.childNodes.length);
 					game.addVideo('lose',player,[get.cardsInfo(hs),get.cardsInfo(es),get.cardsInfo(js)]);
+					event.cards2=hs.concat(es);
+					player.getHistory('lose').push(event);
 					player.update();
 					game.addVideo('loseAfter',player);
 					event.num=0;
@@ -41672,7 +41675,7 @@
 				node.damagepopups=[];
 				node.judging=[];
 				node.stat=[{card:{},skill:{}}];
-				node.actionHistory=[{useCard:[],respond:[],skipped:[]}];
+				node.actionHistory=[{useCard:[],respond:[],skipped:[],lose:[],gain:[]}];
 				node.tempSkills={};
 				node.storage={};
 				node.marks={};
