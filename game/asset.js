@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'1.9.96.8.1',
+	'1.9.96.9',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -2058,10 +2058,10 @@ window.noname_asset_list=[
 	'image/card/pss_paper.png',
 	'image/card/pss_scissor.png',
 	'image/card/pss_stone.png',
-	'image/card/pyzhuren_spade.jpg',
-	'image/card/pyzhuren_heart.jpg',
-	'image/card/pyzhuren_club.jpg',
-	'image/card/pyzhuren_diamond.jpg',
+	'image/card/pyzhuren_spade.png',
+	'image/card/pyzhuren_heart.png',
+	'image/card/pyzhuren_club.png',
+	'image/card/pyzhuren_diamond.png',
 	'image/card/pyzhuren_shandian.jpg',
 
 	'image/card/bagua.png',
