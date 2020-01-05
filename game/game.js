@@ -9472,6 +9472,8 @@
 			'default':"默认",
 			special:'特殊',
 			zhenfa:'阵法',
+			aozhan:"鏖战",
+			"aozhan_info":"",
 			mode_derivation_card_config:'衍生',
 			mode_banned_card_config:'禁卡',
 			mode_favourite_character_config:'收藏',
@@ -10048,7 +10050,7 @@
 					player.ai.tempIgnore=[];
 					player.stat.push({card:{},skill:{}});
 					game.countPlayer(function(current){
-						current.actionHistory.push({useCard:[],respond:[],skipped:[],lose:[],gain:[]});
+						current.actionHistory.push({useCard:[],respond:[],skipped:[],lose:[],gain:[],sourceDamage:[],damage:[]});
 					});
 					if(ui.land&&ui.land.player==player){
 						game.addVideo('destroyLand');
@@ -10290,6 +10292,10 @@
 						return;
 					}
 					_status.imchoosing=true;
+					event.switchToAuto=function(){
+						_status.event.bool=false;
+						game.resume();
+					}
 					game.pause();
 					"step 3"
 					_status.imchoosing=false;
@@ -10306,8 +10312,8 @@
 						event.goto(2);
 					}
 					else{
-						event.dialog.close();
-						ui.confirm.close();
+						if(event.dialog) event.dialog.close();
+						if(ui.confirm) ui.confirm.close();
 						event.finish();
 					}
 				},
@@ -14442,6 +14448,7 @@
 						player.stat[player.stat.length-1].damaged+=num;
 					}
 					if(source){
+						source.getHistory('sourceDamage').push(event);
 						if(source.stat[source.stat.length-1].damage==undefined){
 							source.stat[source.stat.length-1].damage=num;
 						}
@@ -14449,6 +14456,7 @@
 							source.stat[source.stat.length-1].damage+=num;
 						}
 					}
+					player.getHistory('damage').push(event);
 					if(event.notrigger){
 						player.changeHp(-num,false)._triggered=null;
 					}
@@ -23763,6 +23771,75 @@
 			}
 		},
 		skill:{
+			aozhan:{
+				charlotte:true,
+				mod:{
+					targetEnabled:function(card){
+						if(card.name=='tao'&&get.itemtype(card)=='card') return false;
+					},
+					cardSavable:function(card){
+						if(card.name=='tao'&&get.itemtype(card)=='card') return false;
+					},
+				},
+				group:["aozhan_sha","aozhan_shan"],
+				subSkill:{
+					sha:{
+						enable:["chooseToUse","chooseToRespond"],
+						filterCard:{
+							name:"tao",
+						},
+						viewAs:{
+							name:"sha",
+						},
+						viewAsFilter:function (player){
+							if(!player.countCards('h','tao')) return false;
+						},
+						prompt:"将一张桃当杀使用或打出",
+						check:function (){return 1},
+						ai:{
+							effect:{
+								target:function (card,player,target,current){
+									if(get.tag(card,'respondSha')&&current<0) return 0.6
+								},
+							},
+							respondSha:true,
+							skillTagFilter:function (player){
+								if(!player.countCards('h','tao')) return false;
+							},
+							order:function (){
+								return get.order({name:'sha'})-0.1;
+							},
+						},
+						sub:true,
+					},
+					shan:{
+						enable:["chooseToRespond","chooseToUse"],
+						filterCard:{
+							name:"tao",
+						},
+						viewAs:{
+							name:"shan",
+						},
+						prompt:"将一张桃当闪打出",
+						check:function (){return 1},
+						viewAsFilter:function (player){
+							if(!player.countCards('h','tao')) return false;
+						},
+						ai:{
+							respondShan:true,
+							skillTagFilter:function (player){
+								if(!player.countCards('h','tao')) return false;
+							},
+							effect:{
+								target:function (card,player,target,current){
+									if(get.tag(card,'respondShan')&&current<0) return 0.6
+								},
+							},
+						},
+						sub:true,
+					},
+				},
+			},
 			global:[],
 			globalmap:{},
 			storage:{},
@@ -24181,7 +24258,7 @@
 						return;
 					}
 					event.acted.push(player);
-					var str=get.translation(trigger.player.name)+'濒死，是否帮助？';
+					var str=get.translation(trigger.player)+'濒死，是否帮助？';
 					var str2='当前体力：'+trigger.player.hp;
 					if(lib.config.tao_enemy&&event.dying.side!=player.side&&lib.config.mode!='identity'&&lib.config.mode!='guozhan'&&!event.dying.hasSkillTag('revertsave')){
 						event._result={bool:false}
@@ -26069,7 +26146,7 @@
 			if(lib.config.background_music=='music_off'){
 				ui.backgroundMusic.src='';
 			}
-			else if(get.mode()=='guozhan'&&_status._aozhan==true&&lib.config.mode_config.guozhan.aozhan_bgm!='disabled'){
+			else if(_status._aozhan==true&&lib.config.mode_config.guozhan.aozhan_bgm!='disabled'){
 				var aozhan=lib.config.mode_config.guozhan.aozhan_bgm;
 				ui.backgroundMusic.src=lib.assetURL+'audio/background/aozhan_'+aozhan+'.mp3';
 			}
@@ -41675,7 +41752,7 @@
 				node.damagepopups=[];
 				node.judging=[];
 				node.stat=[{card:{},skill:{}}];
-				node.actionHistory=[{useCard:[],respond:[],skipped:[],lose:[],gain:[]}];
+				node.actionHistory=[{useCard:[],respond:[],skipped:[],lose:[],gain:[],sourceDamage:[],damage:[]}];
 				node.tempSkills={};
 				node.storage={};
 				node.marks={};
@@ -47681,7 +47758,8 @@
 			// 	replace(/主公技/g,'<span class="firetext">主公技</span>');
 		},
 		translation:function(str,arg){
-			if(str&&typeof str=='object'&&str.name){
+			if(str&&typeof str=='object'&&(str.name||str._tempTranslate)){
+				if(str._tempTranslate) return str._tempTranslate;
 				var str2;
 				if(arg=='viewAs'&&str.viewAs){
 					str2=get.translation(str.viewAs);
