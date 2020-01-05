@@ -2062,7 +2062,7 @@ window.noname_asset_list=[
 	'image/card/pyzhuren_heart.png',
 	'image/card/pyzhuren_club.png',
 	'image/card/pyzhuren_diamond.png',
-	'image/card/pyzhuren_shandian.jpg',
+	'image/card/pyzhuren_shandian.png',
 
 	'image/card/bagua.png',
 	'image/card/baihupifeng.png',
