@@ -294,9 +294,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 			_status.videoInited=true;
 			game.addVideo('init',null,info);
+			"step 6"
 
-			game.gameDraw(game.zhong||game.zhu||_status.firstAct||game.me);
-			game.phaseLoop(game.zhong||game.zhu||_status.firstAct||game.me);
+			game.gameDraw(_status.firstAct2||game.zhong||game.zhu||_status.firstAct||game.me);
+			game.phaseLoop(_status.firstAct2||game.zhong||game.zhu||_status.firstAct||game.me);
 		},
 		game:{
 			getState:function(){
@@ -936,7 +937,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 
-					if(!game.zhu) game.zhu=game.me;
+					if(!game.zhu)	game.zhu=game.me;
 					else{
 						game.zhu.setIdentity();
 						game.zhu.identityShown=true;

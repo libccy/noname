@@ -142,9 +142,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			else{
 				player=game.players[Math.floor(Math.random()*game.players.length)];
 			}
+			event.playerx=player;
 			event.trigger('gameStart');
 
-			game.gameDraw(player);
+			"step 3"
+			game.gameDraw(event.playerx);
 			game.broadcastAll(function(player){
 				for(var i=0;i<game.players.length;i++){
 					game.players[i].name='unknown'+get.distance(player,game.players[i],'absolute');
@@ -153,7 +155,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					// 	lib.translate[game.players[i].name]+='（你）';
 					// }
 				}
-			},player);
+			},event.playerx);
 
 			var players=get.players(lib.sort.position);
 			var info=[];
@@ -175,7 +177,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.players[i].ai.shown=0;
 				}
 			}
-			game.phaseLoop(player);
+			game.phaseLoop(event.playerx);
 		},
 		card:{
 			junling1:{
@@ -3170,74 +3172,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.viewCharacter(target,1);
 				},
 			},
-			aozhan:{
-				mod:{
-					targetEnabled:function(card){
-						if(card.name=='tao'&&get.itemtype(card)=='card') return false;
-					},
-					cardSavable:function(card){
-						if(card.name=='tao'&&get.itemtype(card)=='card') return false;
-					},
-				},
-				group:["aozhan_sha","aozhan_shan"],
-				subSkill:{
-					sha:{
-						enable:["chooseToUse","chooseToRespond"],
-						filterCard:{
-							name:"tao",
-						},
-						viewAs:{
-							name:"sha",
-						},
-						viewAsFilter:function (player){
-							if(!player.countCards('h','tao')) return false;
-						},
-						prompt:"将一张桃当杀使用或打出",
-						check:function (){return 1},
-						ai:{
-							effect:{
-								target:function (card,player,target,current){
-									if(get.tag(card,'respondSha')&&current<0) return 0.6
-								},
-							},
-							respondSha:true,
-							skillTagFilter:function (player){
-								if(!player.countCards('h','tao')) return false;
-							},
-							order:function (){
-								return get.order({name:'sha'})-0.1;
-							},
-						},
-						sub:true,
-					},
-					shan:{
-						enable:["chooseToRespond","chooseToUse"],
-						filterCard:{
-							name:"tao",
-						},
-						viewAs:{
-							name:"shan",
-						},
-						prompt:"将一张桃当闪打出",
-						check:function (){return 1},
-						viewAsFilter:function (player){
-							if(!player.countCards('h','tao')) return false;
-						},
-						ai:{
-							respondShan:true,
-							skillTagFilter:function (player){
-								if(!player.countCards('h','tao')) return false;
-							},
-							effect:{
-								target:function (card,player,target,current){
-									if(get.tag(card,'respondShan')&&current<0) return 0.6
-								},
-							},
-						},
-						sub:true,
-					},
-				},
-			},
 			_aozhan_judge:{
 				trigger:{
 					player:"phaseBefore",
@@ -3266,6 +3200,28 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					ui.aozhan=ui.create.div('.touchinfo.left',ui.window);
 					ui.aozhan.innerHTML='鏖战模式';
 					if(ui.time3) ui.time3.style.display='none';
+					ui.aozhanInfo=ui.create.system('鏖战模式',null,true);
+					lib.setPopped(ui.aozhanInfo,function(){
+						var uiintro=ui.create.dialog('hidden');
+						uiintro.add('鏖战模式');
+						var list=[
+							'当游戏中仅剩四名或更少角色时（七人以下游戏时改为三名或更少），若此时全场没有超过一名势力相同的角色，则从一个新的回合开始，游戏进入鏖战模式直至游戏结束。',
+							'在鏖战模式下，任何角色均不是非转化的【桃】的合法目标。【桃】可以被当做【杀】或【闪】使用或打出。',
+							'进入鏖战模式后，即使之后有两名或者更多势力相同的角色出现，仍然不会取消鏖战模式。'
+						];
+						var intro='<ul style="text-align:left;margin-top:0;width:450px">';
+						for(var i=0;i<list.length;i++){
+							intro+='<li>'+list[i];
+						}
+						intro+='</ul>'
+						uiintro.add('<div class="text center">'+intro+'</div>');
+						var ul=uiintro.querySelector('ul');
+						if(ul){
+							ul.style.width='180px';
+						}
+						uiintro.add(ui.create.div('.placeholder'));
+						return uiintro;
+					},250);
 					game.playBackgroundMusic();
 					});
 					game.countPlayer(function(current){current.addSkill('aozhan')});
@@ -7132,8 +7088,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"yinyang_skill_add_info":"",
 			"yinyang_add":"阴阳鱼",
 			"yinyang_add_info":"",
-			aozhan:"鏖战",
-			"aozhan_info":"◇锁定技，你的【桃】只能当做【杀】或【闪】使用或打出，不能用来回复体力。",
 			
 			"new_jushou":"据守",
 			"new_jushou_info":"结束阶段，你可以摸X张牌（X为亮明势力数），然后弃置一张手牌，若以此法弃置的是装备牌，则改为你使用之。若X大于2，则你将武将牌叠置。",
@@ -7881,6 +7835,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						this.maxHp--;
 					}
+					this.update();
 				},
 				hideCharacter:function(num,log){
 					if(this.isUnseen(2)){
