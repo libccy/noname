@@ -2099,28 +2099,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{
 					source:"damageBegin1",
 				},
-				usable:1,
-				direct:true,
-				popup:false,
-				content:function (){
-					'step 0'
-					event.num=player.getDamagedHp();
-					if(event.num>0) player.chooseBool(get.prompt2('spjiedao',trigger.player)).ai=function(){
+				filter:function(event,player){
+					return player.isDamaged()&&!player.getHistory('sourceDamage').length;
+				},
+				logTarget:'player',
+				check:function(trigger,player){
 						if(get.attitude(player,trigger.player)>=-1) return false;
 						return !trigger.player.getEquip('baiyin')&&!trigger.player.getEquip('rewrite_baiyin');
-					};
-					'step 1'
-					if(result.bool){
-						player.logSkill('spjiedao',trigger.player);
-						trigger.num+=num;
-						var next=game.createEvent('spjiedao_after',null,trigger.getParent());
-						next.player=player;
-						next.target=trigger.player;
-						next.num=num;
-						next.setContent(function(){
-							if(target.isAlive()) player.chooseToDiscard(num,true);
-						});
-					}
+				},
+				content:function (){
+					var num=player.getDamagedHp();
+					trigger.num+=num;
+					var next=game.createEvent('spjiedao_after',null,trigger.getParent());
+					next.player=player;
+					next.target=trigger.player;
+					next.num=num;
+					next.setContent(function(){
+						if(target.isAlive()) player.chooseToDiscard(num,true);
+					});
 				},
 			},
 			biaozhao:{

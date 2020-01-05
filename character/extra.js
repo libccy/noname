@@ -2068,26 +2068,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.chooseTarget('是否发动【摧克】来对一名角色造成一点伤害？').ai=function(target){
 							return -get.attitude(player,target);
 						};
-					}else if(player.storage.nzry_junlve%2==0){
+					}
+					else{
 						player.chooseTarget('是否发动【摧克】来横置一名角色并弃置其区域内的一张牌？').ai=function(target){
 							return -get.attitude(player,target);
 						};
-					}else{
-						event.finish();
-					};
+					}
 					'step 1'
 					if(result.bool){
 						player.line(result.targets);
 						player.logSkill('nzry_cuike');
 						if(player.storage.nzry_junlve%2==1){
 							result.targets[0].damage();
-						}else{
+						}
+						else{
 							result.targets[0].link(true);
 							player.discardPlayerCard(result.targets[0],1,'hej');
 						};
 					};
 					'step 2'
-					if(player.storage.nzry_junlve>7){
+					if(player.storage.nzry_junlve&&player.storage.nzry_junlve>7){
 						player.chooseBool().set('ai',function(){
 							return true;
 						}).set('prompt','是否弃置所有“军略”标记并对所有其他角色造成一点伤害？');

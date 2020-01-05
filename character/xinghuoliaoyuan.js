@@ -323,6 +323,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinfu_sidaox:{
 				audio:'xinfu_sidao',
+				filterCard:function(card){
+					return get.itemtype(card)=='card';
+				},
 				position:"h",
 				viewAs:{
 					name:"shunshou",

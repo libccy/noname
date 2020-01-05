@@ -333,7 +333,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					];
 					event.controls=controls;
 					var next=player.chooseControl();
-					next.set('prompt','要对'+get.translation(card)+'做什么呢？');
+					next.set('prompt','要对'+get.translation(event.card)+'做什么呢？');
 					next.set('choiceList',controls);
 					next.ai=function(){return 2};
 					'step 4'
