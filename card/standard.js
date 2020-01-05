@@ -594,7 +594,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<dialog.buttons.length;i++){
 						if(dialog.buttons[i].link==card){
 							button=dialog.buttons[i];
-							button.querySelector('.info').innerHTML=get.translation(target.name);
+							button.querySelector('.info').innerHTML=get.translation(target);
 							dialog.buttons.remove(button);
 							break;
 						}
@@ -615,7 +615,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 									}
 								}
 							}
-						},card,dialog.videoId,get.translation(target.name),capt);
+						},card,dialog.videoId,get.translation(target),capt);
 					}
 					dialog.content.firstChild.innerHTML=capt;
 					game.addVideo('dialogCapt',null,[dialog.videoId,dialog.content.firstChild.innerHTML]);
