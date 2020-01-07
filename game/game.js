@@ -23521,13 +23521,23 @@
 				var info=get.info(card);
 				//if(info.toself&&!lib.filter.targetEnabled(card,player,player)) return false;
 				if(player==undefined) player=_status.event.player;
+				if(!lib.filter.cardEnabled(card,player,event)||!lib.filter.cardUsable(card,player,event)) return false;
+				if(info.notarget) return true;
+				var range;
+				var select=get.copy(info.selectTarget);
+				if(select==undefined){
+					if(info.filterTarget==undefined) return true;
+					range=[1,1];
+				}
+				else if(typeof select=='number') range=[select,select];
+				else if(get.itemtype(select)=='select') range=select;
+				else if(typeof select=='function') range=select(card,player);
+				game.checkMod(card,player,range,'selectTarget',player);
+				if(!range||range[1]!=-1) return true;
 				var filterTarget=(event&&event.filterTarget)?event.filterTarget:lib.filter.filterTarget;
-				return (lib.filter.cardEnabled(card,player,event)&&
-					lib.filter.cardUsable(card,player,event)&&
-					(info.notarget||!player||game.hasPlayer(function(current){
-						return filterTarget(card,player,current);
-					}))
-				);
+				return game.hasPlayer(function(current){
+					return filterTarget(card,player,current);
+				});
 			},
 			targetEnabled:function(card,player,target){
 				if(!card) return false;
@@ -26046,6 +26056,10 @@
 				(!lib.skill.global.contains(skill)||lib.skill[skill].forceaudio)){
 				var audioname=skill;
 				var audioinfo=info.audio;
+				if(typeof audioinfo=='string'&&lib.skill[audioinfo]){
+					audioname=audioinfo;
+					audioinfo=lib.skill[audioname].audio;
+				}
 				if(typeof audioinfo=='string'){
 					if(audioinfo.indexOf('ext:')==0){
 						audioinfo=audioinfo.split(':');
@@ -26061,12 +26075,6 @@
 							}
 						}
 						return;
-					}
-					else{
-						audioname=audioinfo;
-						if(lib.skill[audioinfo]){
-							audioinfo=lib.skill[audioinfo].audio;
-						}
 					}
 				}
 				else if(Array.isArray(audioinfo)){
