@@ -221,7 +221,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<game.players.length;i++){
 							var history=game.players[i].getHistory('useCard');
 							for(var j=0;j<history.length;j++){
-								if(history[j].targets&&history[j].targets.contains(player)) num++;
+								if(['basic','trick'].contains(get.type(history[j].card))&&history[j].targets&&history[j].targets.contains(player)) num++;
 							}
 						}
 						event.num=num;
@@ -4383,12 +4383,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									for(var i=0;i<content.length;i++){
 										cards.addArray(content[i][0]);
 									}
-									if(player==game.me||player.isUnderControl()){
-										dialog.addText('共有'+get.cnNumber(cards.length)+'张牌');
-									}
-									else{
-										dialog.addAuto(cards);
-									}
+									dialog.addText('共有'+get.cnNumber(cards.length)+'张牌');
 								}
 							},
 						},

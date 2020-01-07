@@ -573,7 +573,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.type(card)=='equip';
 				},
 				check:function (card){
-					if(player.isDisabled(get.subtype(card))) return 5;
+					if(_status.event.player.isDisabled(get.subtype(card))) return 5;
 					return 3-get.value(card);
 				},
 				content:function (){

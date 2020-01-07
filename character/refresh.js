@@ -2159,14 +2159,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				lose:false,
 				content:function(){
 					'step 0'
-					if(get.position(cards[0])=='e'){
+					if(get.position(cards[0])=='e') event._result={index:0};
+					else if(get.type(cards[0])!='equip'||!target.isEmpty(get.subtype(cards[0]))) event._result={index:1};
+					else player.chooseControl().set('choiceList',[
+						'将'+get.translation(cards[0])+'置入'+get.translation(target)+'的装备区',
+						'弃置'+get.translation(cards[0]),
+					]).ai=function(){return 1};
+					'step 1'
+					if(result.index==0){
 						player.$give(cards,target);
 						target.equip(cards[0]);
 					}
 					else{
 						player.discard(cards);
 					}
-					'step 1'
+					'step 2'
 					if(player.hp>target.hp){
 						player.draw();
 						if(target.isDamaged()) target.recover();
