@@ -39,7 +39,7 @@ window.noname_update={
 		'mode/guozhan.js',
 		//'mode/single.js',
 		//'mode/stone.js',
-		'mode/brawl.js'
+		'mode/brawl.js',
 		'mode/versus.js',
 		//'mode/boss.js',
 		'game/game.js',
