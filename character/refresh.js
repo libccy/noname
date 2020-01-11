@@ -27,7 +27,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_machao:['male','shu',4,['mashu','retieji']],
 			re_xushu:['male','shu',4,['zhuhai','qianxin']],
 			re_zhouyu:['male','wu',3,['reyingzi','refanjian']],
-			re_lvmeng:['male','wu',4,['keji','qinxue']],
+			re_lvmeng:['male','wu',4,['keji','qinxue','botu']],
 			re_ganning:['male','wu',4,['qixi','fenwei']],
 			re_luxun:['male','wu',3,['reqianxun','relianying']],
 			re_daqiao:['female','wu',3,['reguose','liuli']],

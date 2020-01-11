@@ -4860,7 +4860,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!player.countCards('h','jiu')) return false;
 					},
 					respondSha:true,
-				}
+				},
+				audio:2,
+				trigger:{player:['useCard1','respond']},
+				firstDo:true,
+				forced:true,
+				filter:function(event,player){
+					return event.card.name=='sha'&&!event.skill&&
+					event.cards.length==1&&event.cards[0].name=='jiu';
+				},
+				content:function(){},
 			},
 			xinxianzhen:{
 				audio:'xianzhen',
@@ -6014,7 +6023,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(player.hp!=1) return false;
 					},
 					respondSha:true,
-				}
+				},
+				audio:2,
+				trigger:{player:['useCard1','respond']},
+				firstDo:true,
+				forced:true,
+				filter:function(event,player){
+					return event.card.name=='sha'&&!event.skill&&
+					event.cards.length==1&&event.cards[0].name=='shan';
+				},
+				content:function(){},
 			},
 			wurong:{
 				enable:'phaseUse',

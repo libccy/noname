@@ -28,9 +28,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//shen_ganning:"体力上限：6",
 		},
 		skill:{
+			wuhun21:{audio:true},
+			wuhun22:{
+				audio:true,
+				skillAnimation:true,
+				animationColor:'soil',
+			},
+			wuhun23:{
+				audio:true,
+				skillAnimation:true,
+				animationColor:'soil',
+			},
 			"new_wuhun":{
-				audio:"wuhun2",
-				group:["new_wuhun_mark","new_wuhun_die"],
+				audio:"wuhun21",
+				group:["new_wuhun_mark","new_wuhun_die","wuhun22","wuhun23"],
 				trigger:{
 					player:"damageEnd",
 				},
@@ -48,7 +59,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					die:{
-						audio:"wuhun2",
+						//audio:"wuhun2",
 						skillAnimation:true,
 						animationColor:'soil',
 						trigger:{
@@ -56,44 +67,44 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						forceDie:true,
-						popup:false,
+						direct:true,
 						filter:function (event,player){
 							return game.hasPlayer(function(current){
 								return current!=player&&current.storage.new_wuhun_mark!=undefined;
 							});
 						},
-				content:function (){
-					"step 0"
-					var num=0;
-					for(var i=0;i<game.players.length;i++){
-						var current=game.players[i];
-						if(current!=player&&current.storage.new_wuhun_mark&&current.storage.new_wuhun_mark>num){
-							num=current.storage.new_wuhun_mark;
-						}
-					}
-					player.chooseTarget(true,'请选择【武魂】的目标',function(card,player,target){
-						return target!=player&&target.storage.new_wuhun_mark==num;
-					}).set('ai',function(target){
-						return -get.attitude(_status.event.player,target);
-					}).set('forceDie',true);
-					"step 1"
-					if(result.bool&&result.targets&&result.targets.length){
-						var target=result.targets[0];
-						event.target=target;
-						player.logSkill('new_wuhun_die',target);
-						player.line(target,{color:[255, 255, 0]});
-						game.delay(2);
-					}
-					"step 2"
-					target.judge(function(card){
-						if(['tao','taoyuan'].contains(card.name)) return 10;
-						return -10;
-					});
-					"step 3"
-					if(!result.bool){
-						lib.element.player.die.apply(target,[]);
-					}
-				},
+						content:function (){
+							"step 0"
+							var num=0;
+							for(var i=0;i<game.players.length;i++){
+								var current=game.players[i];
+								if(current!=player&&current.storage.new_wuhun_mark&&current.storage.new_wuhun_mark>num){
+									num=current.storage.new_wuhun_mark;
+								}
+							}
+							player.chooseTarget(true,'请选择【武魂】的目标',function(card,player,target){
+								return target!=player&&target.storage.new_wuhun_mark==num;
+							}).set('ai',function(target){
+								return -get.attitude(_status.event.player,target);
+							}).set('forceDie',true);
+							"step 1"
+							if(result.bool&&result.targets&&result.targets.length){
+								var target=result.targets[0];
+								event.target=target;
+								player.logSkill(Math.random()<0.5?'wuhun22':'wuhun23',target);
+								player.line(target,{color:[255, 255, 0]});
+								game.delay(2);
+							}
+							"step 2"
+							target.judge(function(card){
+								if(['tao','taoyuan'].contains(card.name)) return 10;
+								return -10;
+							});
+							"step 3"
+							if(!result.bool){
+								lib.element.player.die.apply(target,[]);
+							}
+						},
 						sub:true,
 					},
 					mark:{
@@ -843,6 +854,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				audio:2,
+				trigger:{player:['useCard1','respond']},
+				firstDo:true,
+				forced:true,
+				filter:function(event,player){
+					return event.card.name=='sha'&&!event.skill&&
+					event.cards.length==1&&get.suit(event.cards[0])=='heart';
+				},
+				content:function(){},
 				ai:{
 					effect:{
 						target:function(card,player,target,current){
@@ -861,7 +880,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				//alter:true,
 				filter:function (event,player){
-					if(event.source==undefined) return false						   
+					if(event.source==undefined) return false;
 					if(!get.is.altered('wuhun')) return false	
 					return true;
 				},
@@ -2593,6 +2612,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wushen:'武神',
 			wushen_info:'锁定技，你的红桃手牌视为杀；锁定技，你使用红桃杀时无距离限制。',
 			wuhun:'武魂',
+			wuhun21:'武魂',
+			wuhun22:'武魂',
+			wuhun23:'武魂',
 			wuhun2:'武魂',
 			wuhun3:'武魂',		
 			wuhun_info_alter:'锁定技，当你受到1点伤害后，你令伤害来源获得1枚“梦魇”标记；当你死亡时，你令拥有最多“梦魇”标记的一名其他角色判定，若结果不为【桃】或【桃园结义】，则该角色死亡。',

@@ -1401,7 +1401,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nzry_lijun2:{},
 			"nzry_lijun1":{
 				audio:2,
-				forceaudio:true,
+				//forceaudio:true,
 				trigger:{
 					player:'useCardAfter'
 				},
@@ -1436,7 +1436,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						player.addTempSkill('nzry_lijun2','phaseUseEnd');
 						var zhu=result.targets[0];
-						player.logSkill('nzry_lijun1',zhu);
+						player.line(zhu,'green');
+						zhu.logSkill('nzry_lijun1');
 						var list=[];
 						for(var i=0;i<trigger.cards.length;i++){
 							if(get.position(trigger.cards[i],true)=='o'){
@@ -4015,7 +4016,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			songwei:{
 				unique:true,
-				global:'songwei2',
+				group:'songwei2',
 				audio:"songwei2",
 				zhuSkill:true,
 			},
@@ -4023,37 +4024,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				audioname:['re_caopi'],
 				forceaudio:true,
-				trigger:{player:'judgeEnd'},
+				trigger:{global:'judgeEnd'},
 				filter:function(event,player){
-					if(player.group!='wei') return false;
-					if(get.color(event.result.card)!='black') return false;
-					return game.hasPlayer(function(target){
-						return player!=target&&target.hasZhuSkill('songwei',player);
-					});
+					if(event.player==player||event.player.group!='wei') return false;
+					if(event.result.color!='black') return false;
+					return player.hasZhuSkill('songwei',event.player);
 				},
 				direct:true,
 				content:function(){
 					'step 0'
-					var list=game.filterPlayer(function(current){
-						return current!=player&&current.hasZhuSkill('songwei',player);
-					});
-					list.sortBySeat();
-					event.list=list;
+					trigger.player.chooseBool('是否发动【颂威】，令'+get.translation(player)+'摸一张牌？').set('choice',get.attitude(trigger.player,player)>0);
 					'step 1'
-					if(event.list.length){
-						var current=event.list.shift();
-						event.current=current;
-						player.chooseBool('是否发动【颂威】，令'+get.translation(current)+'摸一张牌？').set('choice',get.attitude(player,current)>0);
-					}
-					else{
-						event.finish();
-					}
-					'step 2'
 					if(result.bool){
-						player.logSkill('songwei',event.current);
-						event.current.draw();
+						player.logSkill('songwei2');
+						trigger.player.line(player,'green');
+						player.draw();
 					}
-					event.goto(1);
 				}
 			},
 			jiezi:{
@@ -4494,54 +4480,39 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			baonue:{
 				unique:true,
-				global:'baonue2',
+				group:'baonue2',
 				audio:'baonue2',
 				zhuSkill:true,
 			},
 			baonue2:{
 				audio:2,
 				audioname:['re_dongzhuo'],
-				forceaudio:true,
-				trigger:{source:'damageSource'},
+				//forceaudio:true,
+				trigger:{global:'damageSource'},
 				filter:function(event,player){
-					if(player.group!='qun') return false;
-					return game.hasPlayer(function(target){
-						return player!=target&&target.hp<target.maxHp&&target.hasZhuSkill('baonue',player);
-					});
+					if(player==event.source||event.player.group!='qun') return false;
+					return player.hasZhuSkill('baonue',event.player);
 				},
 				direct:true,
 				content:function(){
 					'step 0'
-					var list=game.filterPlayer(function(target){
-						return player!=target&&target.hp<target.maxHp&&target.hasZhuSkill('baonue',player);
-					});
-					list.sortBySeat();
-					event.list=list;
+					trigger.player.chooseBool(get.prompt('baonue',player)).set('choice',get.attitude(trigger.player,player)>0);
 					'step 1'
-					if(event.list.length){
-						var current=event.list.shift();
-						event.current=current;
-						player.chooseBool(get.prompt('baonue',current)).set('choice',get.attitude(player,current)>0);
-					}
-					else{
-						event.finish();
-					}
-					'step 2'
 					if(result.bool){
-						player.logSkill('baonue',event.current);
-						player.judge(function(card){
+						player.logSkill('baonue');
+						trigger.player.line(player,'green')
+						trigger.player.judge(function(card){
 							if(get.suit(card)=='spade') return 4;
 							return 0;
 						});
 					}
 					else{
-						event.goto(1);
+						event.finish();
 					}
 					'step 3'
 					if(result.suit=='spade'){
-						event.current.recover();
+						player.recover();
 					}
-					event.goto(1);
 				}
 			},
 			luanwu:{
@@ -6395,16 +6366,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huangtian:{
 				unique:true,
 				audio:'huangtian2',
+				audioname:['zhangjiao','re_zhangjiao'],
 				global:'huangtian2',
 				zhuSkill:true,
 			},
 			huangtian2:{
 				audio:2,
-				audioname:['zhangjiao'],
 				enable:'phaseUse',
 				discard:false,
 				line:true,
-				prepare:'give',
+				direct:true,
+				prepare:function(cards,player,targets){
+					targets[0].logSkill('huangtian');
+					player.$give(cards,targets[0]);
+				},
 				prompt:function(){
 					var player=_status.event.player;
 					var list=game.filterPlayer(function(target){
@@ -6418,19 +6393,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.group!='qun') return false;
 					if(player.countCards('h','shan')+player.countCards('h','shandian')==0) return 0;
 					return game.hasPlayer(function(target){
-						return target!=player&&target.hasZhuSkill('huangtian',player);
+						return target!=player&&target.hasZhuSkill('huangtian',player)&&!target.hasSkill('huangtian3');
 					});
 				},
 				filterCard:function(card){
 					return (card.name=='shan'||card.name=='shandian')
 				},
+				log:false,
+				visible:true,
 				filterTarget:function(card,player,target){
-					return target!=player&&target.hasZhuSkill('huangtian',player);
+					return target!=player&&target.hasZhuSkill('huangtian',player)&&!target.hasSkill('huangtian3');
 				},
-				usable:1,
-				forceaudio:true,
+				//usable:1,
+				//forceaudio:true,
 				content:function(){
 					target.gain(cards,player);
+					target.addTempSkill('huangtian3','phaseUseEnd');
 				},
 				ai:{
 					expose:0.3,
@@ -6439,7 +6417,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:5
 					}
 				}
-			}
+			},
+			huangtian3:{},
 		},
 		//废除装备栏时显示的卡牌
 		card:{

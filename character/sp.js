@@ -7149,8 +7149,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					if(target==player) return false;
 					if(ui.selected.targets.length){
-						return !ui.selected.targets[0].hasSkillTag('noCompareSource')&&target.countCards('h')
-						&&!target.hasSkillTag('noCompareTarget')&&target.distanceTo(ui.selected.targets[0])<=1;
+						return ui.selected.targets[0]!=target&&!ui.selected.targets[0].hasSkillTag('noCompareSource')&&target.countCards('h')
+						&&!target.hasSkillTag('noCompareTarget');
 					}
 					return true;
 				},
@@ -7204,7 +7204,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				unique:true,
 				limited:true,
-				trigger:{player:'damageEnd'},
+				trigger:{player:'phaseZhunbeiBegin'},
 				animationColor:'thunder',
 				skillAnimation:'legend',
 				filter:function(event,player){
@@ -7246,6 +7246,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('yongdi',result.targets);
 						var target=result.targets[0];
 						target.gainMaxHp(true);
+						target.recover();
 						var mode=get.mode();
 						if(mode=='identity'||(mode=='versus'&&_status.mode=='four')){
 							if(target.name&&lib.character[target.name]){
@@ -9633,8 +9634,53 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('fenxin_old');
 				}
 			},
+			xisheng:{
+				enable:'chooseToUse',
+				usable:1,
+				viewAs:{name:'tao'},
+				viewAsFilter:function(player){
+					return player!=_status.currentPhase&&player.countCards('he')>1;
+				},
+				selectCard:2,
+				filterCard:true,
+				position:'he',
+				ai:{
+					save:true,
+					skillTagFilter:function(){
+						return lib.skill.xisheng.viewAsFilter.apply(this,arguments)
+					},
+				},
+			},
+			shulv:{
+				inherit:'zhiheng',
+				prompt:'弃置一张牌并摸一张牌',
+				selectCard:1,
+				filter:function(event,player){
+					return player.countCards('h')>player.hp;
+				},
+			},
 			qingyi:{
-				group:['qingyi1','qingyi2']
+				audio:'qingyi1',
+				trigger:{player:'phaseJudgeBefore'},
+				direct:true,
+				content:function(){
+					"step 0"
+					var check= player.countCards('h')>2;
+					player.chooseTarget(get.prompt("qingyi"),"跳过判定阶段和摸牌阶段，视为对一名其他角色使用一张【杀】",function(card,player,target){
+						if(player==target) return false;
+						return player.canUse({name:'sha'},target,false);
+					}).set('check',check).set('ai',function(target){
+						if(!_status.event.check) return 0;
+						return get.effect(target,{name:'sha'},_status.event.player);
+					});
+					"step 1"
+					if(result.bool){
+						player.logSkill('qingyi',result.targets);
+						player.useCard({name:'sha'},result.targets[0],false);
+						trigger.cancel();
+						player.skip('phaseDraw');
+					}
+				},
 			},
 			qingyi1:{
 				audio:true,
@@ -14058,9 +14104,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhenlue:'缜略',
 			zhenlue_info:'锁定技，你使用的普通锦囊牌不能被无懈可击响应；你不能成为其他角色的延时类锦囊的目标',
 			jianshu:'间书',
-			jianshu_info:'限定技，出牌阶段，你可以将一张黑色手牌交给一名其他角色，并选择一名攻击范围内含有其的另一名其他角色，然后令这两名角色拼点，赢的角色弃置两张牌，没赢的角色失去一点体力',
+			jianshu_info:'限定技，出牌阶段，你可以将一张黑色手牌交给一名其他角色，并选择另一名其他角色，然后令这两名角色拼点，赢的角色弃置两张牌，没赢的角色失去一点体力',
 			yongdi:'拥嫡',
-			yongdi_info:'限定技，当你受到伤害后，你可令一名其他男性角色增加一点体力上限，然后若该角色的武将牌上有主公技且其不为主公，其获得此主公技',
+			yongdi_info:'限定技，准备阶段开始时，你可令一名其他男性角色增加一点体力上限并回复1点体力，然后若该角色的武将牌上有主公技且其不为主公，其获得此主公技',
 			gushe:'鼓舌',
 			gushe_bg:'舌',
 			gushe_info:'出牌阶段限一次，你可以用一张手牌与至多三名角色同时拼点，然后依次结算拼点结果，没赢的角色选择一项：1.弃置一张牌；2.令你摸一张牌。若你没赢，你获得一个“饶舌”标记（你有7个饶舌标记时，你死亡）',
@@ -14171,7 +14217,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qingyi:'轻逸',
 			qingyi1:'轻逸',
 			qingyi2:'轻逸',
-			qingyi_info:'你可以跳过摸牌阶段，或跳过出牌阶段并弃置一张装备牌，若如此则视为对任意一名使用一张【杀】',
+			qingyi_info:'你可以跳过判定阶段和摸牌阶段，视为对任意一名角色使用一张【杀】。',
+			shulv:'熟虑',
+			shulv_info:'出牌阶段限一次，若你的手牌数大于体力值，则你可以弃置一张牌并摸一张牌。',
+			xisheng:'牺牲',
+			xisheng_info:'每名其他角色的回合限一次，你可以将两张牌当做【桃】使用。',
 			dujin:'独进',
 			dujin_info:'摸牌阶段，你可以额外摸X+1张牌（X为你装备区里牌数的一半且向下取整）',
 			yuhua:'羽化',

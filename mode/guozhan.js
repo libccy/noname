@@ -2446,7 +2446,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function (event,player){
 					if(_status.currentPhase!=player) return false;
-					return event.card.name=='sha'&&(get.cardCount({name:'sha'},player)==2);
+					if(event.card.name!='sha') return false;
+					var history=player.getHistory('useCard',function(evt){
+						return evt.card.name=='sha';
+					});
+					return history&&history.indexOf(event)==1;
 				},
 				forced:true,
 				content:function (){

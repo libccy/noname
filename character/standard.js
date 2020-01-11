@@ -876,13 +876,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			paoxiao:{
 				audio:2,
+				firstDo:true,
 				audioname:['re_zhangfei','guanzhang','xiahouba'],
-				trigger:{player:'useCard'},
+				trigger:{player:'useCard1'},
 				forced:true,
 				filter:function(event,player){
-					return event.card.name=='sha'&&player.getStat().card.sha>1&&event.getParent().type=='phase';
+					return !event.audioed&&event.card.name=='sha'&&player.countUsed('sha',true)>1&&event.getParent().type=='phase';
 				},
-				content:function(){},
+				content:function(){
+					trigger.audioed=true;
+				},
 				mod:{
 					cardUsable:function(card,player,num){
 						if(card.name=='sha') return Infinity;
@@ -1650,12 +1653,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.player==player) return false;
 					if(!player.hasZhuSkill('jiuyuan')) return false;
-					if(player.hp>0) return false;
 					if(event.player.group!='wu') return false;
 					return true;
 				},
 				content:function(){
-					player.recover();
+					trigger.baseDamage++;
 				}
 			},
 			xinjiuyuan:{

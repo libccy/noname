@@ -126,16 +126,21 @@
 						name:'屏幕常亮',
 						init:false,
 						unfrequent:true,
-						intro:'防止屏幕自动关闭',
+						intro:'防止屏幕自动关闭<br>注：旧版本通过NoSleep.js实现的屏幕常亮可能会影响外置音频的音量',
 						onclick:function(bool){
 							game.saveConfig('keep_awake',bool);
-							if(window.plugins&&window.plugins.insomnia){
-								if(bool){
-									window.plugins.insomnia.keepAwake();
+							if(bool){
+								if(window.plugins&&window.plugins.insomnia) window.plugins.insomnia.keepAwake();
+								else if(window.noSleep){
+									document.addEventListener(lib.config.touchscreen?'touchend':'click', function enableNoSleepX() {
+										document.removeEventListener(lib.config.touchscreen?'touchend':'click', enableNoSleepX, false);
+										window.noSleep.enable();
+									}, false);
 								}
-								else{
-									window.plugins.insomnia.allowSleepAgain();
-								}
+							}
+							else{
+								if(window.plugins&&window.plugins.insomnia) window.plugins.insomnia.allowSleepAgain();
+								else if(window.noSleep) window.noSleep.disable();
 							}
 						}
 					},
@@ -40943,8 +40948,18 @@
 				if(lib.config.show_statusbar_ios=='overlay'){
 					document.body.classList.add('statusbar');
 				}
-				if(lib.config.keep_awake&&window.plugins&&window.plugins.insomnia){
-					window.plugins.insomnia.keepAwake();
+				if(lib.config.keep_awake){
+					if(window.plugins&&window.plugins.insomnia) window.plugins.insomnia.keepAwake();
+					else{
+						lib.init.js(lib.assetURL+'game','NoSleep',function(){
+						var noSleep = new NoSleep();
+						document.addEventListener(lib.config.touchscreen?'touchend':'click', function enableNoSleep() {
+								document.removeEventListener(lib.config.touchscreen?'touchend':'click', enableNoSleep, false);
+								noSleep.enable();
+								window.noSleep=noSleep;
+							}, false);
+						});
+					}
 				}
 
 				lib.init.cssstyles();
