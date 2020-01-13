@@ -1122,7 +1122,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guanxing_fail:{},
 			guanxing:{
 				audio:2,
-				audioname:['jiangwei'],
+				audioname:['jiangwei','re_jiangwei','re_zhugeliang'],
 				trigger:{player:'phaseZhunbeiBegin'},
 				frequent:true,
 				content:function(){
@@ -1338,6 +1338,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'loseEnd'},
 				forced:true,
+				firstDo:true,
+				audioname:['re_zhugeliang'],
 				filter:function(event,player){
 					if(player.countCards('h')) return false;
 					for(var i=0;i<event.cards.length;i++){
@@ -1974,7 +1976,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xiaoji:{
 				audio:2,
-				audioname:['sp_sunshangxiang'],
+				audioname:['sp_sunshangxiang','re_sunshangxiang'],
 				trigger:{player:'loseEnd'},
 				frequent:true,
 				filter:function(event,player){
@@ -2289,6 +2291,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			lijian:{
 				audio:2,
+				audioname:['re_diaochan'],
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){

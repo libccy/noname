@@ -943,6 +943,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return false;
 				},
+				forceDie:true,
 				content:function(){
 					if(!_status.pyzhuren) _status.pyzhuren={};
 					var list=[];
@@ -4828,7 +4829,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
 				filter:function(event,player){
-					if(!player.countCards('h',function(card){
+					if(!player.countCards('he',function(card){
 						return get.type(card)!='basic';
 					})){
 						return false;
@@ -4846,13 +4847,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 1'
 					if(result.bool){
-						var cards=player.getCards('h',function(card){
+						var cards=player.getCards('he',function(card){
 							return get.type(card)!='basic';
 						});
 						var target=result.targets[0];
 						var types=[];
 						for(var i=0;i<cards.length;i++){
-							types.add(get.type(cards[i]));
+							types.add(get.type(cards[i],'trick'));
 						}
 						player.logSkill('yirang',target);
 						target.gain(cards,player,'give');
@@ -6835,6 +6836,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yingjian:{
 				trigger:{player:'phaseZhunbeiBegin'},
 				direct:true,
+				audio:'qingyi',
 				content:function(){
 					player.chooseUseTarget('###是否发动【影箭】？###视为使用一张没有距离限制的【杀】',{name:'sha'},false,'nodistance').logSkill='yingjian';
 				},
@@ -9659,8 +9661,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('h')>player.hp;
 				},
 			},
+			xiandeng:{
+				mod:{
+					cardUsable:function(card,player,num){
+						if(card.name=='sha') return num+1;
+					},
+					targetInRange:function(card,player){
+						if(card.name=='sha'&&player.countUsed('sha',true)==0) return true;
+					},
+				},
+			},
 			qingyi:{
-				audio:'qingyi1',
+				audio:2,
 				trigger:{player:'phaseJudgeBefore'},
 				direct:true,
 				content:function(){
@@ -14218,6 +14230,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qingyi1:'轻逸',
 			qingyi2:'轻逸',
 			qingyi_info:'你可以跳过判定阶段和摸牌阶段，视为对任意一名角色使用一张【杀】。',
+			xiandeng:'先登',
+			xiandeng_info:'锁定技，出牌阶段，你使用的第一张【杀】不计入次数且无距离限制。',
 			shulv:'熟虑',
 			shulv_info:'出牌阶段限一次，若你的手牌数大于体力值，则你可以弃置一张牌并摸一张牌。',
 			xisheng:'牺牲',

@@ -339,10 +339,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.setContent(lib.skill.rehuashen.content);
 				},
 			},
+			rexingsheng:{audio:2},
 			rexinsheng:{
 				mode:['identity','single','doudizhu'],
 				unique:true,
-				audio:2,
+				audio:'rexingsheng',
 				trigger:{player:'damageEnd'},
 				frequent:true,
 				content:function(){
@@ -352,6 +353,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"reguhuo":{
+				audio:2,
 				group:["reguhuo_guess","reguhuo_respond","reguhuo_wuxie"],
 				derivation:'rechanyuan',
 				enable:"chooseToUse",
@@ -410,7 +412,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"reguhuo_guess":{
-				audio:'guhuo_guess',
+				audio:'reguhuo',
 				trigger:{
 					player:"useCardBefore",
 				},
@@ -824,7 +826,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			reqingguo:{
-				audio:'qingguo',
+				audio:2,
 				enable:['chooseToRespond','chooseToUse'],
 				filterCard:function(card){
 					return get.color(card)=='black';
@@ -1848,7 +1850,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			reguanxing:{
 				audio:'guanxing',
-				audioname:['jiangwei','re_jiangwei'],
+				audioname:['jiangwei','re_jiangwei','re_zhugeliang'],
 				trigger:{player:['phaseZhunbeiBegin','phaseJieshuBegin']},
 				frequent:true,
 				filter:function(event,player,name){
@@ -2055,7 +2057,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			reluoshen:{
-				audio:'luoshen',
+				audio:2,
 				locked:false,
 				trigger:{player:'phaseZhunbeiBegin'},
 				frequent:true,
@@ -2121,7 +2123,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			rejieyin:{
-				audio:'jieyin',
+				audio:2,
 				enable:'phaseUse',
 				filterCard:true,
 				usable:1,
@@ -2222,6 +2224,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			rejiuyuan:{
 				global:'rejiuyuan2',
+				audio:2,
 				zhuSkill:true,
 			},
 			rejiuyuan2:{
@@ -2247,7 +2250,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
-						player.logSkill('rejiuyuan2',target);
+						target.logSkill('rejiuyuan');
+						player.line('rejiuyuan2',target,'green');
 						trigger.getParent().targets.remove(player);
 						trigger.getParent().targets.push(target);
 						player.draw();
@@ -2255,7 +2259,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			rezhiheng:{
-				audio:'zhiheng',
+				audio:2,
 				enable:'phaseUse',
 				usable:1,
 				position:'he',
@@ -2315,7 +2319,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			rejizhi:{
-				audio:'jizhi',
+				audio:2,
 				locked:false,
 				trigger:{player:'useCard'},
 				frequent:true,
@@ -2369,7 +2373,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			rebiyue:{
-				audio:'biyue',
+				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
 				frequent:true,
 				content:function(){

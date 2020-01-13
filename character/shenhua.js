@@ -4490,18 +4490,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//forceaudio:true,
 				trigger:{global:'damageSource'},
 				filter:function(event,player){
-					if(player==event.source||event.player.group!='qun') return false;
+					if(player==event.source||event.source.group!='qun') return false;
 					return player.hasZhuSkill('baonue',event.player);
 				},
 				direct:true,
 				content:function(){
 					'step 0'
-					trigger.player.chooseBool(get.prompt('baonue',player)).set('choice',get.attitude(trigger.player,player)>0);
+					trigger.source.chooseBool(get.prompt('baonue',player)).set('choice',get.attitude(trigger.source,player)>0);
 					'step 1'
 					if(result.bool){
 						player.logSkill('baonue');
-						trigger.player.line(player,'green')
-						trigger.player.judge(function(card){
+						trigger.source.line(player,'green')
+						trigger.source.judge(function(card){
 							if(get.suit(card)=='spade') return 4;
 							return 0;
 						});
@@ -4509,7 +4509,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						event.finish();
 					}
-					'step 3'
+					'step 2'
 					if(result.suit=='spade'){
 						player.recover();
 					}

@@ -13,6 +13,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_umi:['female','key',3,['umi_chaofan','umi_lunhui','umi_qihuan']],
 			key_umi2:['female','key',3,[],['unseen']],
 			key_kagari:['female','shen',3,['kagari_zongsi']],
+			key_rei:['male','key',4,['xiandeng','shulv','xisheng']],
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
 			diy_feishi:['male','shu',3,['shuaiyan','moshou']],
@@ -89,7 +90,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy:{
 				diy_tieba:["diy_wenyang","ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei"],
 			},
 		},
 		characterIntro:{
@@ -104,6 +105,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterTitle:{
 			key_umi:'#bSummer Pockets',
+			key_rei:'#gHarmonia',
 			key_kagari:'#bRewrite',
 			key_lucia:'#bRewrite',
 			key_kyousuke:'#bLittle Busters!',
@@ -5380,6 +5382,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_kagari:'篝',
 			key_umi:'加藤うみ',
 			key_umi2:'鹰原羽未',
+			key_rei:'零',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -5517,7 +5520,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nsshuangxiong_info:'当你使用[决斗]或被使用[决斗]时，你可以将武将牌翻面',
 			nsshuangxiong_append:'背面武将：文丑，2体力，你可以将一张牌当[杀]打出',
 			nsguanyong:'冠勇',
-			nsguanyong_info:'你可以将一张牌当[杀]打出',
+			nsguanyong_info:'你可以将一张手牌当[杀]打出',
 			nsjihui:'急恚',
 			nsjihui_info:'锁定技，每当一名角色一次弃置了三张或更多的牌，你获得一个额外回合；你的额外回合内，你使用牌只能指定你与上一回合角色为目标',
 			nsmouyun:'谋运',
