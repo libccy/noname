@@ -18023,7 +18023,7 @@
 						game.addVideo('directequip',this,get.cardsInfo(cards));
 					}
 				},
-				directgain:function(cards){
+				directgain:function(cards,broadcast){
 					var hs=this.getCards('h');
 					for(var i=0;i<cards.length;i++){
 						if(hs.contains(cards[i])){
@@ -18048,7 +18048,7 @@
 						game.addVideo('directgain',this,get.cardsInfo(cards));
 						this.update();
 					}
-					game.broadcast(function(player,cards){
+					if(broadcast!==false) game.broadcast(function(player,cards){
 						player.directgain(cards);
 					},this,cards);
 					return this;
@@ -41225,6 +41225,21 @@
 				// if(!lib.config.show_cardpile||_status.connectMode){
 				// 	ui.cardPileButton.style.display='none';
 				// }
+				
+				ui.sortCard=ui.create.system('整理手牌',function(){
+					var hs=game.me.getCards('h');
+					if(!hs.length) return;
+					game.addVideo('lose',game.me,[get.cardsInfo(hs),[],[]]);
+					for(var i=0;i<hs.length;i++){
+						hs[i].goto(ui.special);
+					}
+					hs.sort(function(b,a){
+						if(a.name!=b.name) return lib.sort.card(a.name,b.name);
+						else if(a.suit!=b.suit) return lib.suit.indexOf(a)-lib.suit.indexOf(b);
+						else return a.number-b.number;
+					});
+					game.me.directgain(hs,false);
+				});
 				ui.playerids=ui.create.system('显示身份',function(){
 					if(game.showIdentity){
 						game.showIdentity();
