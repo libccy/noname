@@ -1206,7 +1206,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(event.directfalse||result.bool==false){
 						var cards=target.getCards('e',{subtype:'equip1'});
-						if(cards.length) player.gain(cards.target,'give');
+						if(cards.length) player.gain(cards,target,'give');
 					}
 				},
 				ai:{
