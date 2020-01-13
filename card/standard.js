@@ -1205,8 +1205,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 1"
 					if(event.directfalse||result.bool==false){
-						player.gain(targets[0].getCards('e',{subtype:'equip1'}),targets[0]);
-						targets[0].$give(targets[0].getCards('e',{subtype:'equip1'}),player);
+						var cards=target.getCards('e',{subtype:'equip1'});
+						if(cards.length) player.gain(cards.target,'give');
 					}
 				},
 				ai:{
@@ -1650,7 +1650,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				filter:function(event,player){
 					if(get.mode()=='guozhan') return false;
-					return player.canUse('sha',event.target)&&player.hasSha();
+					return player.canUse('sha',event.target,false)&&player.hasSha();
 				},
 				content:function(){
 					"step 0"
