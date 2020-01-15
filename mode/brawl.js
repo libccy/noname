@@ -440,6 +440,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						'cuorui','xinmanjuan','xinfu_jianjie','jianjie_faq','new_meibu','xinfu_xingzhao','jici',
 						'xianfu','fenyong','xuehen','yingbin','midao','yishe','yinbing','juedi',
 						'bushi','xinfu_dianhua','xinfu_falu','xinfu_zhenyi','lskuizhu','pingjian','xjshijian','fentian','zhiri','xindan',
+						'xinzhengnan','xinfu_xiaode',
 					];
 					var characters=[];
 					for(var name in lib.character){
@@ -521,7 +522,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								hhzz_shiona:['female','key',1,['hhzz_huilei']],
 								hhzz_kanade:['female','key',2,['hhzz_youlian']],
 								hhzz_takaramono1:['male','qun',5,['hhzz_jubao','hhzz_huizhen']],
-								hhzz_takaramono2:['male','qun',5,['hhzz_jubao','hhzz_zhencang']],
+								hhzz_takaramono2:['male','qun',3,['hhzz_jubao','hhzz_zhencang']],
 							},
 							skill:{
 								_lingli_damage:{
@@ -529,27 +530,35 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									forced:true,
 									popup:false,
 									filter:function(event,player){
-										return event.player==_status.toKill;
+										return event.player==player._toKill;
 									},
 									content:function(){
+										game.log(player,'对击杀目标造成了伤害');
 										player.changeLingli(1);
 									},
 								},
 								_lingli:{
 								 mark:true,
+								 marktext:'灵',
+								 popup:'聚灵',
 								 intro:{
-								 	content:'共有#点灵力',
+								 	name:'灵力',
+								 	content:'当前灵力点数：# / 5',
 								 },
 								 trigger:{
 								 	player:'phaseBeginStart',
 								 },
-								 popup:false,
-								 forced:true,
+								 prompt:'是否消耗2点灵力获得一个技能？',
 								 filter:function(event,player){
 								 	return player.storage._lingli>1;
 								 },
+								 check:function(event,player){
+								 	return player.skillH.length<3;
+								 },
 								 content:function(){
 								 	'step 0'
+								 	player.changeLingli(-2);
+								 	'step 1'
 								 	event.skills=lib.huanhuazhizhan.skills;
 								 	var skills=event.skills;
 								 	skills.randomSort();
@@ -559,18 +568,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								 		if(list.length==3) break;
 								 	}
 								 	if(!list.length){event.finish();return;}
+								 	if(player.storage._lingli>0)	list.push('刷新');
 								 	event.list=list;
-								 	player.chooseBool('是否消耗2点灵力值获得一个技能？').ai=function(){
-								 		return player.skillH.length<3;
-								 	};
-								 	'step 1'
-								 	if(!result.bool){event.finish();return;}
-								 	player.changeLingli(-2);
 								 	var dialog=game.getSkillDialog(event.list,'选择获得一个技能');
 								 	player.chooseControl(event.list).set('ai',function(){
 								 		return 0;
 								 	}).dialog=dialog;
 								 	'step 2'
+							 		if(result.control=='刷新'){
+							 			player.changeLingli(-1);
+							 			event.goto(1);
+							 			return;
+							 		}
 							 		event.skill=result.control;
 							 		if(player.skillH.length==3){
 									 	event.lose=true;
@@ -615,9 +624,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									forced:true,
 									popup:false,
 									filter:function(event,player){
-										return event.card.name=='tao'&&player==_status.toSave;
+										return event.card.name=='tao'&&player==event.player._toSave;
 									},
 									content:function(){
+										game.log(trigger.player,'帮助了保护目标');
 										trigger.player.changeLingli(1);
 									},
 								},
@@ -631,13 +641,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									},
 									content:function(){
 										'step 0'
-										if(_status._aozhan&&!player.getStat('damage')) player.loseHp();
-										if(trigger._lastDead==undefined) event.finish();
+										if(_status._aozhan&&!player.getStat('damage')){
+											player.loseHp();
+											game.log(player,'本回合内未造成伤害，触发死战模式惩罚');
+										}
+										if(trigger._lastDead==undefined) event.goto(2);
 										'step 1'
 										var type=get.rand(1,8);
 										event.type=type;
-										player.playerfocus(1200);
-										player.$fullscreenpop('乾坤八卦·'+['离','坎','乾','震','兑','艮','巽','坤'][type-1],get.groupnature(player.group,'raw'));
+										trigger._lastDead.playerfocus(1200);
+										player.$fullscreenpop('乾坤八卦·'+['离','坎','乾','震','兑','艮','巽','坤'][type-1],get.groupnature(trigger._lastDead.group,'raw'));
 										game.delay(1.5);
 										'step 2'
 										var type=event.type;
@@ -705,17 +718,45 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 												trigger._lastDead.revive(null,false);
 												trigger._lastDead.uninit();
 												trigger._lastDead.init(['hhzz_shiona','hhzz_kanade','hhzz_takaramono1','hhzz_takaramono2'].randomGet());
-												trigger._lastDead.skillH=[];
+												trigger._lastDead.skillH=lib.character[trigger._lastDead.name][3].slice(0);
+												trigger._lastDead.addSkill('hhzz_nocard');
 												break;
 											}
 										}
+										'step 3'
+										if(game.playerx().length<=4&&!_status._aozhan){
+											game.countPlayer(function(current){
+												delete current._toKill;
+												delete current._toSave;
+											});
+											ui.huanhuazhizhan.innerHTML='死战模式';
+											_status._aozhan=true;
+											game.playBackgroundMusic();
+											trigger._lastDead.$fullscreenpop('死战模式',get.groupnature(trigger._lastDead.group,'raw')||'fire');
+										}
+										else game.randomMission();
 									},
 								},
-								hhzz_huilei:{
+								hhzz_noCard:{
 									mod:{
 										cardEnabled:function(){return false},
 										cardSavable:function(){return false},
 										cardRespondable:function(){return false},
+									},
+								},
+								hhzz_huilei:{
+									trigger:{player:'die'},
+									forced:true,
+									forceDie:true,
+									skillAnimation:true,
+									logTarget:'source',
+									filter:function(event,player){
+										return event.source!=undefined;
+									},
+									content:function(){
+										var source=trigger.source;
+										var cards=source.getCards('he');
+										if(cards.length) source.discard(cards);
 									},
 									ai:{
 										effect:{
@@ -726,10 +767,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									}
 								},
 								hhzz_youlian:{
-									mod:{
-										cardEnabled:function(){return false},
-										cardSavable:function(){return false},
-										cardRespondable:function(){return false},
+									trigger:{player:'die'},
+									forced:true,
+									forceDie:true,
+									skillAnimation:true,
+									logTarget:'source',
+									filter:function(event,player){
+										return event.source!=undefined;
+									},
+									content:function(){
+										var source=trigger.source;
+										var cards=source.getCards('he');
+										if(cards.length) source.discard(cards);
+										var skills=source.skillH;
+										if(skills.length) source.removeSkillH(skills.randomGet());
 									},
 									ai:{
 										effect:{
@@ -740,17 +791,37 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									}
 								},
 								hhzz_zhencang:{
-									mod:{
-										cardEnabled:function(){return false},
-										cardSavable:function(){return false},
-										cardRespondable:function(){return false},
+									trigger:{player:'die'},
+									forced:true,
+									filter:function(event,player){
+										return event.source!=undefined;
+									},
+									forceDie:true,
+									logTarget:'source',
+									content:function(){
+										var source=trigger.source;
 									},
 								},
 								hhzz_huizhen:{
-									mod:{
-										cardEnabled:function(){return false},
-										cardSavable:function(){return false},
-										cardRespondable:function(){return false},
+									trigger:{player:'die'},
+									forced:true,
+									forceDie:true,
+									logTarget:'source',
+									filter:function(event,player){
+										return event.source!=undefined;
+									},
+									content:function(){
+										var source=trigger.source;
+										source.draw(3);
+										if(source.skillH.length==3) source.removeSkillH(source.skillH.randomGet());
+										var skills=lib.huanhuazhizhan.skills;
+										skills.randomSort();
+										for(var i=0;i<skills.length;i++){
+											if(!source.skillH.contains(skills[i])){
+												source.addSkillH(skills[i]);
+												break;
+											}
+										}
 									},
 								},
 								hhzz_jubao:{
@@ -764,7 +835,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										var cards=player.getCards('he');
 										cards.randomSort();
 										cards=cards.slice(0,trigger.num);
-										trigger.source.gain('giveAuto',cards,player);
+										trigger.source.gain('give',cards,player);
 									},
 									ai:{
 										effect:{
@@ -776,8 +847,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								},
 							},
 							translate:{
-								_lingli:'灵力',
-								_lingli_draw:'灵力摸牌',
+								_lingli:'聚灵',
+								_lingli_bg:'灵',
+								_lingli_draw:'聚灵',
 								hhzz_huilei:'挥泪',
 								hhzz_youlian:'犹怜',
 								hhzz_zhencang:'珍藏',
@@ -796,12 +868,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								hhzz_fudichouxin:'釜底抽薪',
 								hhzz_toulianghuanzhu_info:'出牌阶段，对一名角色使用，随机更换其一个技能。可重铸。',
 								hhzz_fudichouxin_info:'出牌阶段，对一名角色使用，随机弃置其一个技能。',
+								nei:' ',
+								nei2:' ',
+								刷新_info:'消耗1点灵力值，刷新上述技能',
 							},
 						},
 						get:{
 							rawAttitude:function(from,to){
-								if(from==to) return 10;
-								if(to==_status.toKill) return -12;
+								if(from==to||to==from._toSave) return 10;
+								if(to==from._toKill) return -30;
 								return -10;
 							}
 						},
@@ -839,58 +914,29 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								if(game.playerx().length==1) game.over(game.me.isAlive());
 							},
 							$dieAfter:function(){},
+							hasUnknown:function(){return false},
+							isUnknown:function(){return false},
+							getEnemies:function(){
+								var list=game.playerx();
+								list.remove(this);
+								return list;
+							},
 							dieAfter2:function(source){
-								if(source){
-									switch(this.name){
-										case 'hhzz_kanade':
-											var cards=source.getCards('he');
-											if(cards.length) source.discard(cards);
-											var skills=source.skillH;
-											if(skills.length) source.removeSkillH(skills.randomGet());
-											break;
-										case 'hhzz_shiona':
-											var cards=source.getCards('he');
-											if(cards.length) source.discard(cards);
-											break;
-										case 'hhzz_takaramono2':
-											source.draw();
-											if(source.skillH.length==1) source.removeSkillH(source.skillH.randomGet());
-											var skills=lib.huanhuazhizhan.skills;
-											skills.randomSort();
-											for(var i=0;i<skills.length;i++){
-												if(!source.skillH.contains(skills[i])){
-													source.addSkillH(skills[i]);
-													break;
-												}
-											}
-											break;
-										case 'hhzz_takaramono1':
-											source.draw(3);
-											if(source.skillH.length==1) source.removeSkillH(source.skillH.randomGet());
-											var skills=lib.huanhuazhizhan.skills;
-											skills.randomSort();
-											for(var i=0;i<skills.length;i++){
-												if(!source.skillH.contains(skills[i])){
-													source.addSkillH(skills[i]);
-													break;
-												}
-											}
-											break;
-										default:
-											source.draw();
-											source.changeLingli(this==_status.toKill?3:1);
-											break;
-									}
+								if(source&&this.name.indexOf('hhzz_')!=0){
+									if(source._toKill==this) game.log(source,'击杀目标成功');
+									source.draw();
+									source.changeLingli(this==source._toKill?3:1);
 								}
-								if(game.players.length<=4&&!_status._aozhan){
-									delete _status.toKill;
-									delete _status.toSave;
-									ui.huanhuazhizhan.innerHTML='死战模式';
-									_status._aozhan=true;
-									game.playBackgroundMusic();
-									this.$fullscreenpop('死战模式',get.groupnature(this.group,'raw')||'fire');
+								if(!_status._aozhan){
+									var that=this;
+									game.countPlayer(function(current){
+										if(current._toSave==that){
+											game.log(current,'保护失败');
+											var cards=current.getCards('he');
+											if(cards.length) current.discard(cards.randomGets(4));
+										}
+									});
 								}
-								else game.randomMission();
 							},
 							logAi:function(){},
 							hasZhuSkill:function(){return false},
@@ -898,6 +944,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								if(typeof num!='number') num=1;
 								if(typeof this.storage._lingli!='number') this.storage._lingli=0;
 								if(num>0){
+									num=Math.min(num,5-this.storage._lingli);
+									if(num<1) return;
 									game.log(this,'获得了','#y'+get.cnNumber(num)+'点','灵力');
 								}
 								else{
@@ -918,14 +966,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							},
 							randomMission:function(){
 								if(_status._aozhan) return;
-								var list=game.playerx().randomSort();
-								_status.toKill=list[0];
-								_status.toSave=list[1];
 								if(!ui.huanhuazhizhan){
 									ui.huanhuazhizhan=ui.create.div('.touchinfo.left',ui.window);
 									if(ui.time3) ui.time3.style.display='none';
 								}
-								ui.huanhuazhizhan.innerHTML='击杀'+get.translation(list[0])+'，保护'+get.translation(list[1]);
+								var players=game.playerx();
+								for(var i=0;i<players.length;i++){
+									var player=players[i];
+									var list=players.slice(0).randomSort();
+									list.remove(player);
+									player._toKill=list[0];
+									player._toSave=list[1];
+								}
+								ui.huanhuazhizhan.innerHTML='击杀'+get.translation(game.me._toKill)+'，保护'+get.translation(game.me._toSave);
 							},
 							getSkillDialog:function(skills,prompt){
 								var dialog=ui.create.dialog('hidden','forcebutton');
@@ -947,7 +1000,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									while(true){
 										current.skillH=[];
 										current._hSeat=i;
-										current.ai.shown=1;
+										current.identity='nei';
 										current.setNickname(get.cnNumber(i,true)+'号位');
 										for(var ii in lib.huanhuazhizhan.eltp) current[ii]=lib.huanhuazhizhan.eltp[ii];
 										current=current.next;
