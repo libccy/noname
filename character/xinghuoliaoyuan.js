@@ -71,7 +71,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				audio:2,
 				trigger:{
-					player:"useCardAfter",
+					player:"useCardEnd",
 				},
 				check:function (event,player){
 					return 18-get.value(event.card)-player.maxHp*2;
@@ -2758,7 +2758,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:["qinguo_use","qinguo_lose"],
 				audio:2,
 				trigger:{
-					player:"useCardAfter",
+					player:"useCardEnd",
 				},
 				filter:function (event,player){
 					return get.type(event.card)=='equip';
@@ -5514,7 +5514,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_daigong":"怠攻",
 			"xinfu_daigong_info":"每回合限一次。当你受到伤害时，你可以展示所有手牌，然后令伤害来源选择一项：交给你一张与你所有手牌花色均不相同的一张牌，或防止此伤害。",
 			"xinfu_zhaoxin":"昭心",
-			"xinfu_zhaoxin_info":"出牌阶段限一次，你可以将任意张手牌置于武将牌上，称之为「望」（你至多拥有三张「望」）。你攻击范围内的一名其他角色的摸牌阶段结束后，其可以获得一张由你选择的「望」，然后你可以对其造成1点伤害。",
+			"xinfu_zhaoxin_info":"出牌阶段限一次，你可以将任意张手牌置于武将牌上并摸等量的牌，称之为「望」（你至多拥有三张「望」）。你攻击范围内的一名其他角色的摸牌阶段结束后，其可以获得一张由你选择的「望」，然后你可以对其造成1点伤害。",
 			"zhaoxin_give":"昭心",
 			"zhaoxin_give_info":"",
 			"xinfu_qianchong":"谦冲",

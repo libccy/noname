@@ -1975,7 +1975,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 3"
 					if(event.card){
 						player.logSkill('jianzheng',trigger.player);
-						player.lose(result.cards,ui.special);
+						player.lose(event.card,ui.special);
 						game.broadcastAll(function(player){
 							var cardx=ui.create.card();
 							cardx.classList.add('infohidden');
@@ -10228,7 +10228,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				check:function(event,player){
 					if(get.attitude(player,event.player)<0) return false;
-					if(player.countCards('h',{name:['tao','jiu']})+target.hp<0) return false;
+					if(player.countCards('h',{name:['tao','jiu']})+event.player.hp<0) return false;
 					return true;
 				},
 				content:function(){

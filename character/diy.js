@@ -14,6 +14,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_umi2:['female','key',3,[],['unseen']],
 			key_kagari:['female','shen',3,['kagari_zongsi']],
 			key_rei:['male','key',4,['xiandeng','shulv','xisheng']],
+			key_komari:['female','key',3,['komari_tiankou','komari_xueshang']],
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
 			diy_feishi:['male','shu',3,['shuaiyan','moshou']],
@@ -104,6 +105,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
+			key_komari:'#bLittle Busters!',
 			key_umi:'#bSummer Pockets',
 			key_rei:'#gHarmonia',
 			key_kagari:'#bRewrite',
@@ -146,6 +148,97 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuji:['zuoci']
 		},
 		skill:{
+			komari_tiankou:{
+				trigger:{
+					player:'useCard2',
+					target:'useCardToTarget',
+				},
+				forced:true,
+				filter:function(event,player,name){
+					if(name=='useCardToTarget'&&player==event.player) return false;
+					if(get.color(event.card)!='red') return false;
+					if(get.tag(event.card,'damage')) return false;
+					return ['basic','trick'].contains(get.type(event.card));
+				},
+				content:function(){
+					'step 0'
+					var info=get.info(trigger.card);
+					var bool=true;
+					if(info.multitarget||info.allowMultiple===false) bool=false;
+					else{
+						var list=game.filterPlayer(function(current){
+							return !trigger.targets.contains(current)&&lib.filter.targetEnabled2(trigger.card,trigger.player,current);
+						})
+						if(!list.length) bool=false;
+					}
+					if(bool) player.chooseTarget('甜口：为'+get.translation(trigger.card)+'增加一个额外目标，或点【取消】摸一张牌。',function(candy,komari,rin){
+						return _status.event.rin_chan.contains(rin);
+					}).set('rin_chan',list).set('ai',function(target){
+						var evt=_status.event;
+						return get.effect(target,evt.candy,evt.source,evt.player);
+					}).set('candy',trigger.card).set('',trigger.player);
+					else event._result={bool:false};
+					'step 1'
+					if(result.bool){
+						var rin=result.targets[0];
+						trigger.targets.push(rin);
+						player.line(rin,{color:[255, 224,172]});
+					}
+					else player.draw();
+				},
+			},
+			komari_xueshang:{
+				trigger:{global:'die'},
+				forced:true,
+				skillAnimation:true,
+				filter:function(event,player){
+					return player.hp>0;
+				},
+				animationColor:'metal',
+				content:function(){
+					'step 0'
+					player.addSkill('riki_xueshang');
+					var map={};
+					var list=[];
+					for(var i=1;i<=player.hp;i++){
+						var cn=get.cnNumber(i,true);
+						map[cn]=i;
+						list.push(cn);
+					}
+					event.map=map;
+					player.chooseControl(list,function(){
+						return '一';
+					}).set('prompt','血殇：请选择自己受到的伤害的点数');
+					'step 1'
+					var num=event.map[result.control]||1;
+					event.num=num>1?2:1;
+					event.list=game.filterPlayer(function(current){
+						return current!=player;
+					}).sortBySeat();
+					player.damage(num);
+					player.line(event.list,{color:[255, 224,172]});
+					'step 2'
+					if(!player.hasSkill(event.name)) return;
+					else{
+						event.list.shift().damage(num);
+						if(event.list.length) event.redo();
+					}
+				},
+			},
+			riki_xueshang:{
+				trigger:{global:'dying'},
+				forced:true,
+				popup:false,
+				charlotte:true,
+				filter:function(event,player){
+					return event.getParent(2).name=='komari_xueshang'&&event.getParent(2).player==player;
+				},
+				content:function(){
+					player.removeSkill('komari_xueshang');
+					player.gainMaxHp(true);
+					player.recover();
+				},
+			},
 			umi_chaofan:{
 				enable:'phaseUse',
 				usable:1,
@@ -5383,6 +5476,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_umi:'加藤うみ',
 			key_umi2:'鹰原羽未',
 			key_rei:'零',
+			key_komari:'神北小毬',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -5408,6 +5502,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			umi_shiroha:'轮回 - 延时效果',
 			umi_qihuan:'七幻',
 			umi_qihuan_info:'限定技，当你处于濒死状态时，你可以移去此武将牌。若如此做，你回复X点体力（X为场上势力数）。然后，你可获得场上已死亡角色武将牌上的至多两个技能。',
+			komari_tiankou:'甜口',
+			komari_tiankou_info:'锁定技，当你使用红色的非伤害性基本牌/锦囊牌选择目标时，或成为其他角色使用的这些牌的目标时，你选择一项：1.摸一张牌；2.为此牌增加一个目标',
+			komari_xueshang:'血殇',
+			komari_xueshang_info:'锁定技，蓄力技，当有角色死亡时，你对自己造成<span class=yellowtext>1</span>点伤害，然后对所有其他角色依次造成<span class=firetext>1</span>点伤害。当有角色因此法进入濒死状态时，你加1点体力上限并回复1点体力，然后失去此技能并终止此技能的所有后续结算。',
 			
 			ns_chuanshu:'传术',
 			ns_chuanshu_info:'<span class=yellowtext>限定技</span> 当一名其他角色进入濒死状态时，你可以令其选择获得技能【雷击】或【鬼道】，其回复体力至1并摸两张牌。当该被【传术】的角色造成或受到一次伤害后，你摸一张牌。其阵亡后，你重置技能【传术】',

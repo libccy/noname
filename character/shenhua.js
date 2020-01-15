@@ -4496,7 +4496,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					trigger.source.chooseBool(get.prompt('baonue',player)).set('choice',get.attitude(trigger.source,player)>0);
+					trigger.source.chooseBool('是否对'+get.translation(player)+'发动【暴虐】？').set('choice',get.attitude(trigger.source,player)>0);
 					'step 1'
 					if(result.bool){
 						player.logSkill('baonue');

@@ -12,10 +12,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				old_yijiang4:["old_caozhen","old_chenqun","old_zhuhuan","ol_wuyi"],
 				old_yijiang5:["old_caoxiu","old_quancong","old_zhuzhi"],
 				old_yijiang67:["ol_xinxianying","ol_zhangrang","ol_liuyu"],
-				old_sp:["old_caochun","old_lingju","old_maliang","old_machao","zhangliang","jsp_caoren","ol_guansuo"],
+				old_sp:["old_caochun","old_lingju","old_maliang","old_machao","zhangliang","jsp_caoren","ol_guansuo","old_zhangxingcai"],
 			},
 		},
 		character:{
+			old_zhangxingcai:['female','shu',3,['oldshenxian','qiangwu']],
 			old_fuhuanghou:['female','qun',3,['oldzhuikong','oldqiuyuan']],
 			old_caochong:['male','wei',3,['oldrenxin','oldchengxiang']],
 			yuji:['male','qun',3,['old_guhuo'],['forbidai']],
@@ -68,6 +69,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			oldshenxian:{
+				audio:'shenxian',
+				inherit:'shenxian',
+			},
 			old_fuhun:{
 				audio:'fuhun',
 				trigger:{player:'phaseDrawBefore'},
@@ -841,6 +846,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		translate:{
+			old_zhangxingcai:'旧张星彩',
 			old_yuanshu:'手杀袁术',
 			old_xusheng:'旧徐盛',
 			old_lingtong:'旧凌统',

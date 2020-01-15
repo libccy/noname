@@ -439,17 +439,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			lianpo:{
 				audio:true,
-				trigger:{source:'dieAfter'},
-				forced:true,
+				trigger:{player:'phaseAfter'},
+				frequent:true,
 				filter:function(event,player){
-					return !player.hasSkill('lianpo2');
+					return player.getStat('kill')>0;
 				},
 				content:function(){
-					player.addTempSkill('lianpo2');
 					player.insertPhase();
 				}
 			},
-			lianpo2:{},
 			baonu:{
 				audio:2,
 				mark:true,
@@ -2636,7 +2634,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jilue_zhiheng:'制衡',
 			jilue_jizhi:'集智',
 			lianpo:'连破',
-			lianpo2:'连破',
 			lianpo_info:'若你在一回合内杀死了至少一名角色，此回合结束后，你可以进行一个额外的回合。',
 			guixin:'归心',
 			qinyin:'琴音',
