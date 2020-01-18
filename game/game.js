@@ -3231,6 +3231,20 @@
 							}
 						}
 					},
+					show_sortcard:{
+						name:'显示整理手牌按钮',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_sortcard',bool);
+							if(lib.config.show_sortcard){
+								ui.sortCard.style.display='';
+							}
+							else{
+								ui.sortCard.style.display='none';
+							}
+						}
+					},
 					show_pause:{
 						name:'显示暂停按钮',
 						init:true,
@@ -4561,6 +4575,8 @@
 						name:'鏖战模式',
 						init:true,
 						intro:'若开启此选项，则将在游戏中引入“鏖战模式”的规则：<br>当游戏中仅剩四名或更少角色时（七人以下游戏时改为三名或更少），若此时全场没有超过一名势力相同的角色，则从一个新的回合开始，游戏进入鏖战模式直至游戏结束。<br>◇在鏖战模式下，【桃】只能当做【杀】或【闪】使用或打出，不能用来回复体力。<br>注：进入鏖战模式后，即使之后有两名或者更多势力相同的角色出现，仍然不会取消鏖战模式。',
+						frequent:true,
+						restart:true,
 					},
 					connect_viewnext:{
 						name:'观看下家副将',
@@ -4650,6 +4666,8 @@
 					aozhan:{
 						name:'鏖战模式',
 						init:true,
+						frequent:true,
+						restart:true,
 						intro:'若开启此选项，则将在游戏中引入“鏖战模式”的规则：<br>当游戏中仅剩四名或更少角色时（七人以下游戏时改为三名或更少），若此时全场没有超过一名势力相同的角色，则从一个新的回合开始，游戏进入鏖战模式直至游戏结束。<br>◇在鏖战模式下，【桃】只能当做【杀】或【闪】使用或打出，不能用来回复体力。<br>注：进入鏖战模式后，即使之后有两名或者更多势力相同的角色出现，仍然不会取消鏖战模式。',
 					},
 					viewnext:{
@@ -4680,6 +4698,16 @@
 					guozhanpile:{
 						name:'使用国战牌堆',
 						init:true,
+						frequent:true,
+						restart:true,
+					},
+					changeViceType:{
+						name:'副将变更方式',
+						init:'default',
+						item:{
+							default:'发现式',
+							online:'随机式',
+						},
 						frequent:true,
 						restart:true,
 					},
@@ -10054,9 +10082,9 @@
 						}
 					}
 					player.ai.tempIgnore=[];
-					player.stat.push({card:{},skill:{}});
 					game.countPlayer(function(current){
 						current.actionHistory.push({useCard:[],respond:[],skipped:[],lose:[],gain:[],sourceDamage:[],damage:[]});
+						current.stat.push({card:{},skill:{}});
 					});
 					if(ui.land&&ui.land.player==player){
 						game.addVideo('destroyLand');
@@ -41241,6 +41269,9 @@
 					});
 					game.me.directgain(hs,false);
 				});
+				if(!lib.config.show_sortcard){
+					ui.sortCard.style.display='none';
+				}
 				ui.playerids=ui.create.system('显示身份',function(){
 					if(game.showIdentity){
 						game.showIdentity();
