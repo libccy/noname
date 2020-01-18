@@ -44,7 +44,7 @@ window.noname_update={
 		//'game/NoSleep.js',
 		//'game/config.js',
 		'game/package.js',
-		//'game/asset.js',
+		'game/asset.js',
 		//'game/source.js',
 	]
 };
