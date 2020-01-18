@@ -87,6 +87,8 @@ window.noname_package={
 		key_bg:'键社',
 		zhulin_bg:'竹林',
 		shengshi_bg:'盛世',
+		noname_bg:'璀璨',
+		wuming_bg:'无名',
 		taoyuan_bg:'桃园',
 		zhanhuo_bg:'战火',
 		huangtian_bg:'黄天',
