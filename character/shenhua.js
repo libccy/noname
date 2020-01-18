@@ -1437,7 +1437,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addTempSkill('nzry_lijun2','phaseUseEnd');
 						var zhu=result.targets[0];
 						player.line(zhu,'green');
-						zhu.logSkill('nzry_lijun1');
+						zhu.logSkill('nzry_lijun');
 						var list=[];
 						for(var i=0;i<trigger.cards.length;i++){
 							if(get.position(trigger.cards[i],true)=='o'){
@@ -6290,6 +6290,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.delay(2);
 				},
 				ai:{
+					rejudge:true,
 					tag:{
 						rejudge:1
 					}

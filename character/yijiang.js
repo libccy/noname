@@ -4691,7 +4691,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.attitude(player,event.player)<0;
 				},
 				filter:function(event,player){
-					return event.card&&event.card.name=='sha'&&player.getEquip(1);
+					return event.getParent().name=='sha'&&player.getEquip(1);
 				},
 				content:function(){
 					'step 0'

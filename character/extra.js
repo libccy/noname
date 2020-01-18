@@ -625,6 +625,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbaiyin:{
 				skillAnimation:'epic',
 				animationColor:'thunder',
+				juexingji:true,
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				unique:true,
@@ -688,6 +689,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					rejudge:true,
 					tag:{
 						rejudge:1,
 					}

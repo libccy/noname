@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			sp:{
-				sp_default:["caoying","simahui","baosanniang","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","liuxie","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","fuwan","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","lingju","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","guansuo","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","wenyang","xujing"],
+				sp_default:["caoying","simahui","baosanniang","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","liuxie","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","fuwan","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","lingju","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","guansuo","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","wenyang","xujing","huaman"],
 				sp_whlw:["xurong","lijue","zhangji","fanchou","guosi"],
 				sp_zlzy:["zhangqiying","lvkai","zhanggong","weiwenzhugezhi","beimihu"],
 				sp_longzhou:["xf_tangzi","xf_huangquan","xf_sufei","sp_liuqi"],
@@ -21,6 +21,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			huaman:['male','shu',3,['hmmanyi','mansi','souying'],['unseen']],
 			xujing:['male','shu',3,['yuxu','xjshijian']],
 			xushao:['male','qun',3,['pingjian'],['unseen']],
 			puyuan:['male','shu',4,['pytianjiang','pyzhuren']],
@@ -171,6 +172,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			huaman:'花鬘，古典戏曲《龙凤巾》（一名《化外奇缘》）中的人物，身份为三国时期南蛮王孟获与祝融夫人的女儿，关索的夫人之一。在关于关三小姐·关银屏的民间传说中，其名字为“花中秀”，与关索其他几位夫人鲍三娘、王桃、王悦都被关索之姐关银屏编入自己的女兵营中。花鬘在《三国志》，《三国演义》均未有提及，只是戏曲中的虚构人物。其形象并非一般君主家中闺秀，而是与其母祝融相似，是一个可以披甲上阵，善于刀枪作战的女武将。戏曲中在诸葛亮平定南蛮时，花鬘曾与关索作战，失败被俘，两人互生爱意，南蛮王孟获降服后二人成婚。近些年，花鬘接连在各类三国题材的游戏中登场，更广被人知晓。',
 			xujing:'许靖（？—222年），字文休。汝南郡平舆县（今河南省平舆县）人。汉末至三国蜀汉时期重臣、名士、评论家。许靖因与从弟许邵俱以品评人物而闻名于世。后被刘翊推举为孝廉，任尚书郎。曾先后投奔孔伷、陈祎、许贡、王朗等人，于孙策攻王朗前与家属俱避难交州，受到交趾太守士燮礼待。其后受益州牧刘璋邀请，相继为巴郡、广汉、蜀郡太守。于刘备包围成都时欲越墙叛逃，为刘璋所获。刘备定蜀后欲将其弃用，在法正的建议下方以其为左将军长史。建安二十三年（218年），刘备称汉中王，任命许靖为汉中王傅。章武元年（221年），刘备称帝，任命许靖为司徒，位列三公。章武二年（222年），去世。有文集二卷。',
 			xushao:'许劭（shào）（150年—195年），字子将。汝南平舆（今河南平舆县射桥镇）人。东汉末年著名人物评论家。据说他每月都要对当时人物进行一次品评，人称为“月旦评”。曾任汝南郡功曹，后南渡投靠扬州刺史刘繇。刘繇被孙策击败后，许劭随其逃往豫章郡，并在豫章去世。',
 			puyuan:'蒲元是三国时蜀汉杰出的工匠。为诸葛亮造刀三千口，并且制作木牛流马。后来姜维为他写过两部传记《蒲元传》《蒲元别传》。',
@@ -651,11 +653,92 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//花鬘
+			hmmanyi:{
+				trigger:{target:'useCardToBefore'},
+				forced:true,
+				audio:2,
+				filter:function(event,player){
+					return event.card.name=='nanman';
+				},
+				content:function(){
+					trigger.cancel();
+				},
+			},
+			mansi:{
+				audio:2,
+				trigger:{global:'useCardAfter'},
+				filter:function(event,player){
+					return event.card.name=='nanman'&&game.countPlayer(function(current){
+						return current.getHistory('damage',function(evt){
+							return evt.getParent(2)==event;
+						}).length>0;
+					})>0;
+				},
+				frequent:true,
+				content:function(){
+				 player.draw(game.countPlayer(function(current){
+						return current.getHistory('damage',function(evt){
+							return evt.getParent(2)==trigger;
+						}).length>0;
+					}));
+				},
+			},
+			souying:{
+				audio:2,
+				trigger:{
+					player:'damageBegin3',
+					source:'damageBegin1',
+				},
+				direct:true,
+				filter:function(event,player,name){
+					if(!player.countCards('h')||player.hasSkill('souying2')) return false;
+					if(name=='damageBegin1'){
+						if(event.player.sex!='male') return false;
+						return event.player.getHistory('damage',function(evt){
+							return evt.source==player;
+						}).length==1;
+					}
+					else{
+						if(!event.source||event.source.sex!='male') return false;
+						return player.getHistory('damage',function(evt){
+							return evt.source==event.source;
+						}).length==1;
+					}
+				},
+				content:function(){
+					'step 0'
+					var next=player.chooseToDiscard();
+					if(event.triggername=='damageBegin1'){
+						event.target=trigger.player;
+						next.set('goon',get.attitude(player,event.target)<0&&!event.target.getEquip('baiyin')),
+						next.set('prompt2','弃置一张手牌，令对其造成的伤害+1');
+					}
+					else{
+						event.target=trigger.source;
+						next.set('goon',true);
+						next.set('prompt2','弃置一张手牌，令即将受到的伤害-1');
+					}
+					next.set('prompt',get.prompt('souying',event.target));
+					next.set('ai',function(card){
+						if(_status.event.goon) return 6-get.value(card);
+						return -1;
+					});
+					next.set('logSkill',['souying',event.target]);
+					'step 1'
+					if(result.bool){
+						player.addTempSkill('souying2');
+						trigger.num+=(event.triggername=='damageBegin1'?1:-1);
+					}
+				},
+			},
+			souying2:{},
 			//许邵许靖
 			yuxu:{
 				audio:2,
 				trigger:{player:'useCardEnd'},
 				filter:function(event,player){
+					if(event!=player.getLastUsed()) return false;
 					var	evt=event.getParent('phaseUse');
 					if(!evt||evt.player!=player) return false;
 					var history=player.getHistory('useCard',function(evtt){
@@ -677,6 +760,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				charlotte:true,
 				locked:true,
 				filter:function(event,player){
+					if(event!=player.getLastUsed()) return false;
 					var	evt=event.getParent('phaseUse');
 					if(!evt||evt.player!=player) return false;
 					var history=player.getHistory('useCard',function(evtt){
@@ -2621,6 +2705,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					rejudge:true,
 					tag:{
 						rejudge:1,
 					},
@@ -10183,6 +10268,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					rejudge:true,
 					tag:{
 						rejudge:0.6
 					}
@@ -12799,6 +12885,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					rejudge:true,
 					tag:{
 						rejudge:1,
 					}
@@ -13766,7 +13853,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			puyuan:'蒲元',
 			xushao:'许邵',
 			xujing:'许靖',
+			huaman:'花鬘',
 			
+			hmmanyi:'蛮裔',
+			hmmanyi_info:'锁定技，【南蛮入侵】对你无效。',
+			mansi:'蛮嗣',
+			mansi_info:'一名角色使用的【南蛮入侵】结算完成后，你可以摸X张牌（X为受到过此牌伤害的角色数）。',
+			souying:'薮影',
+			souying_info:'每回合限一次',
 			yuxu:'誉虚',
 			yuxu_info:'当你于出牌阶段内使用牌时，你可以摸一张牌。若如此做，当你于出牌阶段内使用下一张牌时，你弃置一张牌。',
 			yuxu2:'誉虚(弃牌)',
@@ -14397,6 +14491,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shengxi_info:'若你于出牌阶段未造成伤害，你可在弃牌阶段开始时摸两张牌。',
 			hengzheng_info:'摸牌阶段开始时，若你的体力值为1或你没有手牌，你可以改为获得每名其他角色区域里的一张牌。',
 			cunsi_info:'限定技，出牌阶段，你可以将所有手牌交给一名男性角色，令该角色获得技能【勇决】，然后将武将牌翻面',
+			yongjue_info:'每当其他角色于回合内使用一张杀，若目标不是你，你可以获得之，每回合限一次',
 			guixiu_info:'每当你成为杀的目标，若你的手牌数小于体力值，可以摸一张牌',
 			fenming_info:'结束阶段开始时，若你处于连环状态，你可以弃置处于连环状态的每名角色的一张牌。',
 			duanxie_info:'出牌阶段限一次，你可以令一名其他角色横置武将牌，若如此做，你横置武将牌。',
