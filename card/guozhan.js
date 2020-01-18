@@ -1077,7 +1077,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			g_taipingyaoshu:{},
 			yuxi_skill:{
 				equipSkill:true,
-				trigger:{player:'phaseDrawBegin2'},
+				trigger:{player:'phaseDrawBegin'},
 				forced:true,
 				filter:function(event,player){
 					return !player.isUnseen();
@@ -1127,10 +1127,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			g_chiling1:{
 				mode:['guozhan'],
-				trigger:{player:'discardAfter'},
+				trigger:{
+					player:'loseEnd',
+					global:'cardsDiscardEnd',
+				},
 				filter:function(event,player){
+					var evt=event.getParent().relatedEvent;
+					if(evt&&evt.name=='useCard') return false;
 					for(var i=0;i<event.cards.length;i++){
-						if(event.cards[i].name=='chiling'&&get.position(event.cards[i])=='d'){
+						if(event.cards[i].name=='chiling'&&get.position(event.cards[i],true)=='d'){
 							return true;
 						}
 					}
@@ -1153,22 +1158,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-			g_chiling2:{
-				mode:['guozhan'],
-				trigger:{player:'judgeAfter'},
-				forced:true,
-				popup:false,
-				filter:function(event,player){
-					if(get.position(event.result.card)!='d') return false;
-					return event.result.card.name=='chiling';
-				},
-				content:function(){
-					_status.chiling=true;
-					game.cardsGotoSpecial(trigger.result.card);
-					game.log(trigger.result.card,'已被移出游戏');
-					player.popup('敕令');
-				}
-			},
+			g_chiling2:{},
 			g_chiling3:{
 				mode:['guozhan'],
 				trigger:{player:'phaseAfter'},

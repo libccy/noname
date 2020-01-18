@@ -7,6 +7,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			jinchan:{
 				audio:true,
 				fullskin:true,
+				wuxieable:true,
 				type:'trick',
 				notarget:true,
 				global:['g_jinchan','g_jinchan2'],
