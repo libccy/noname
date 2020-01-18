@@ -43,7 +43,7 @@ window.noname_update={
 		'game/game.js',
 		//'game/NoSleep.js',
 		//'game/config.js',
-		//'game/package.js',
+		'game/package.js',
 		//'game/asset.js',
 		//'game/source.js',
 	]
