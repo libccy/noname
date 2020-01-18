@@ -1077,7 +1077,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			g_taipingyaoshu:{},
 			yuxi_skill:{
 				equipSkill:true,
-				trigger:{player:'phaseDrawBegin'},
+				trigger:{player:'phaseDrawBegin2'},
 				forced:true,
 				filter:function(event,player){
 					return !player.isUnseen();
