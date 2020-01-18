@@ -441,6 +441,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						'xianfu','fenyong','xuehen','yingbin','midao','yishe','yinbing','juedi',
 						'bushi','xinfu_dianhua','xinfu_falu','xinfu_zhenyi','lskuizhu','pingjian','xjshijian','fentian','zhiri','xindan',
 						'xinzhengnan','xinfu_xiaode',
+						'komari_xueshang',
 					];
 					var characters=[];
 					for(var name in lib.character){

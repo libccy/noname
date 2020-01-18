@@ -456,7 +456,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var list=[
 							'sha','tao','jiu',
 							'taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman',
-							'xietianzi','shuiyanqijunx','lulitongxin','lianjunshengyan','chiling','diaohulishan','yuanjiao','huoshaolianying'
+							'xietianzi','shuiyanqijunx','lulitongxin','lianjunshengyan','chiling','diaohulishan','yuanjiao','huoshaolianying','zhibi'
 						];
 						var list2=[];
 						for(var i=0;i<list.length;i++){
@@ -4103,7 +4103,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					dialog:function(){
 						var list=[
 							'taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman',
-							'xietianzi','shuiyanqijunx','lulitongxin','lianjunshengyan','chiling','diaohulishan','yuanjiao','huoshaolianying'
+							'xietianzi','shuiyanqijunx','lulitongxin','lianjunshengyan','chiling','diaohulishan','yuanjiao','huoshaolianying','zhibi',
 						];
 						for(var i=0;i<list.length;i++){
 							list[i]=['锦囊','',list[i]];
@@ -5429,7 +5429,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				audio:'guixiu',
 				trigger:{player:['showCharacterAfter','removeCharacterBefore']},
 				filter:function(event,player){
-					if(event.name=='removeCharacter') return event.toRemove=='gz_mifuren'&&player.isDamaged();
+					if(event.name=='removeCharacter'||event.name=='changeVice') return event.toRemove=='gz_mifuren'&&player.isDamaged();
 					return event.toShow.contains('gz_mifuren');
 				},
 				content:function(){
@@ -7591,28 +7591,59 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.log(player,'获得了','#g【阴阳鱼】','标记');
 					player.addSkill('yinyang_skill');
 				},
+				changeViceOnline:function(){
+					'step 0'
+					var group=lib.character[player.name1][1];
+					_status.characterlist.randomSort();
+					var name=false;
+					for(var i=0;i<_status.characterlist.length;i++){
+						if(lib.character[_status.characterlist[i]][1]==group){name=_status.characterlist[i];break;}
+					}
+					if(!name){event.finish();return;}
+					_status.characterlist.remove(name);
+					if(player.hasViceCharacter()){
+							event.change=true;
+						_status.characterlist.add(player.name2);
+					}
+					event.toRemove=player.name2;
+					event.toChange=name;
+					if(event.change) event.trigger('removeCharacterBefore');
+					'step 1'
+					var name=event.toChange;
+					game.log(player,'将副将变更为','#g'+get.translation(name));
+					player.viceChanged=true;
+					if(player.isUnseen(1)){
+						player.showCharacter(1,false);
+					}
+					player.reinit(player.name2,name,false);
+				},
 				changeVice:function(){
 					'step 0'
-					//if(!player.hasViceCharacter()) event.finish();
-					//else{
-						var group=lib.character[player.name1][1];
-						_status.characterlist.randomSort();
-						event.tochange=[]
-						for(var i=0;i<_status.characterlist.length;i++){
-							if(lib.character[_status.characterlist[i]][1]==group) event.tochange.push(_status.characterlist[i]);
-							if(event.tochange.length==3) break;
-						}
-						if(!event.tochange.length) event.finish();
-						else{
-							player.chooseButton(true,['选择要变更的武将牌',[event.tochange,'character']]).ai=function(button){
-								return get.guozhanRank(button.link);
-							};
-						}
-					//}
+					var group=lib.character[player.name1][1];
+					_status.characterlist.randomSort();
+					event.tochange=[]
+					for(var i=0;i<_status.characterlist.length;i++){
+						if(lib.character[_status.characterlist[i]][1]==group) event.tochange.push(_status.characterlist[i]);
+						if(event.tochange.length==3) break;
+					}
+					if(!event.tochange.length) event.finish();
+					else{
+						player.chooseButton(true,['选择要变更的武将牌',[event.tochange,'character']]).ai=function(button){
+							return get.guozhanRank(button.link);
+						};
+					}
 					'step 1'
 					var name=result.links[0];
 					_status.characterlist.remove(name);
-					if(player.hasViceCharacter()) _status.characterlist.add(player.name2);
+					if(player.hasViceCharacter()){
+						event.change=true;
+						_status.characterlist.add(player.name2);
+					}
+					event.toRemove=player.name2;
+					event.toChange=name;
+					if(event.change) event.trigger('removeCharacterBefore');
+					'step 2'
+					var name=event.toChange;
 					game.log(player,'将副将变更为','#g'+get.translation(name));
 					player.viceChanged=true;
 					if(player.isUnseen(1)){
@@ -7678,7 +7709,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						next.setContent('mayChangeVice');
 						next.player=this;
 						next.skill=skill;
-						if(repeat) next.repeat=true;
+						if(repeat||(!_status.connectMode&&get.config('changeViceType')=='online')) next.repeat=true;
 						return next;
 					}
 				},
@@ -7907,7 +7938,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				changeVice:function(){
 					var next=game.createEvent('changeVice');
 					next.player=this;
-					next.setContent('changeVice');
+					next.setContent((!_status.connectMode&&get.config('changeViceType')=='online')?'changeViceOnline':'changeVice');
 					return next;
 				},
 				hasMainCharacter:function(){
