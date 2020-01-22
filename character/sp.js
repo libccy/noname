@@ -21,7 +21,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			huaman:['male','shu',3,['hmmanyi','mansi','souying','zhanyuan']],
+			huaman:['female','shu',3,['hmmanyi','mansi','souying','zhanyuan']],
 			xujing:['male','shu',3,['yuxu','xjshijian']],
 			xushao:['male','qun',3,['pingjian'],['unseen']],
 			puyuan:['male','shu',4,['pytianjiang','pyzhuren']],
