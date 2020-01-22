@@ -6456,9 +6456,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'useCardToPlayered'},
 				filter:function(event,player){
 					if(event.getParent().triggeredTargets3.length>1) return false;
-					return !player.hasSkill('zuoding2')&&get.suit(event.card)=='spade'&&
+					return get.suit(event.card)=='spade'&&
 						_status.currentPhase==event.player&&event.targets&&event.targets.length&&
-						event.player!=player;
+						event.player!=player&&!game.hasPlayer(function(current){
+							return current.getHistory('damage').length>0;
+						});
 				},
 				direct:true,
 				content:function(){
@@ -6477,7 +6479,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					expose:0.2
 				},
-				group:'zuoding3'
+				//group:'zuoding3'
 			},
 			zuoding2:{},
 			zuoding3:{
@@ -7773,10 +7775,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xiantu:{
-				unique:true,
-				audio:2,
-				gainable:true,
-				forceunique:true,
+				//unique:true,
+				audio:'xiantu1',
+				group:'xiantu2',
+				//gainable:true,
+				//forceunique:true,
 				trigger:{global:'phaseUseBegin'},
 				filter:function(event,player){
 					return event.player!=player;
@@ -7802,24 +7805,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					"step 2"
 					trigger.player.gain(result.cards,player,'giveAuto');
-					trigger.player.addSkill('xiantu2');
-					trigger.player.storage.xiantu=player;
+					trigger.player.addSkill('xiantu4');
+					trigger.player.storage.xiantu4.push(player);
 				},
 				ai:{
 					threaten:1.1,
 					expose:0.3
 				}
 			},
-			xiantu2:{
+			xiantu1:{audio:true},
+			xiantu2:{audio:true},
+			xiantu4:{
 				trigger:{player:'phaseUseEnd'},
 				forced:true,
 				audio:false,
+				onremove:true,
+				init:function(player,skill){
+					if(!player.storage[skill]) player.storage[skill]=[];
+				},
+				charlotte:true,
 				content:function(){
-					if(player.storage.xiantu){
-						player.storage.xiantu.loseHp();
-						delete player.storage.xiantu;
+					while(player.storage.xiantu4.length){
+						var current=player.storage.xiantu4.shift();
+						if(current.isDead()) continue;
+						current.logSkill('xiantu2');
+						current.loseHp();
 					}
-					player.removeSkill('xiantu2');
+					player.removeSkill('xiantu4');
 				},
 				group:'xiantu3'
 			},
@@ -7828,8 +7840,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				audio:false,
 				content:function(){
-					delete player.storage.xiantu;
-					player.removeSkill('xiantu2');
+					player.removeSkill('xiantu4');
 				}
 			},
 			qiangzhi:{

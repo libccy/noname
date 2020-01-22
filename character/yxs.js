@@ -1956,7 +1956,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.player==player) return false;
 					if(event.player.sex!='male') return false;
-					if(event.result.card.parentNode.id!='discardPile') return false;
+					if(get.position(event.result.card)!='o') return false;
 					return (get.color(event.result.card)=='red');
 				},
 				content:function(){

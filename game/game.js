@@ -13474,6 +13474,9 @@
 						next.card=card;
 						next.cards=cards;
 						next.player=player;
+						next.excluded=event.excluded;
+						next.directHit=event.directHit;
+						next.customArgs=event.customArgs;
 						if(event.forceDie) next.forceDie=true;
 						event.redo();
 					}
@@ -13489,6 +13492,9 @@
 						next.card=card;
 						next.cards=cards;
 						next.player=player;
+						next.excluded=event.excluded;
+						next.directHit=event.directHit;
+						next.customArgs=event.customArgs;
 						if(event.forceDie) next.forceDie=true;
 						event.redo();
 					}
@@ -13504,6 +13510,9 @@
 						next.card=card;
 						next.cards=cards;
 						next.player=player;
+						next.excluded=event.excluded;
+						next.directHit=event.directHit;
+						next.customArgs=event.customArgs;
 						if(event.forceDie) next.forceDie=true;
 						event.redo();
 					}
@@ -13519,6 +13528,9 @@
 						next.card=card;
 						next.cards=cards;
 						next.player=player;
+						next.excluded=event.excluded;
+						next.directHit=event.directHit;
+						next.customArgs=event.customArgs;
 						if(event.forceDie) next.forceDie=true;
 						event.redo();
 					}
@@ -16113,6 +16125,44 @@
 					}
 					this.updateMarks();
 					return this;
+				},
+				removeMark:function(i,num,log){
+					if(typeof num!='number'||!num) num=1;
+					if(typeof this.storage[i]!='number'||!this.storage[i]) return;
+					if(num>this.storage[i]) num=this.storage[i];
+					this.storage[i]-=num;
+					if(log!==false){
+						var str=false;
+						var info=get.info(i);
+						if(info&&info.intro&&(info.intro.name||info.intro.name2)) str=info.intro.name2||info.intro.name;
+						else str=lib.translate[i];
+						if(str) game.log(this,'移去了',get.cnNumber(num),'个','#g【'+str+'】');
+					}
+					this.syncStorage(i);
+					this[this.storage[i]?'updateMark':'unmarkSkill'](i);
+				},
+				addMark:function(i,num,log){
+					if(typeof num!='number'||!num) num=1;
+					if(typeof this.storage[i]!='number') this.storage[i]=0;
+					this.storage[i]+=num;
+					if(log!==false){
+						var str=false;
+						var info=get.info(i);
+						if(info&&info.intro&&(info.intro.name||info.intro.name2)) str=info.intro.name2||info.intro.name;
+						else str=lib.translate[i];
+						if(str) game.log(this,'获得了',get.cnNumber(num),'个','#g【'+str+'】');
+					}
+					this.syncStorage(i);
+					this.updateMark(i);
+				},
+				countMark:function(i){
+					if(this.storage[i]==undefined) return 0;
+					if(typeof this.storage[i]=='number') return this.storage[i];
+					if(Array.isArray(this.storage[i])) return this.storage[i].length;
+					return 0;
+				},
+				hasMark:function(i){
+					return this.countMark(i)>0;
 				},
 				updateMark:function(i,storage){
 					if(!this.marks[i]){
@@ -26047,7 +26097,7 @@
 				else if(typeof arguments[i]=='function'){
 					onerror=arguments[i]
 				}
-				if(_status.video) break;
+				if(_status.video&&arguments[1]!='video') break;
 			}
 			if(_status.skillaudio.contains(str)) return;
 			_status.skillaudio.add(str);
@@ -26704,6 +26754,23 @@
 			game.loop();
 		},
 		videoContent:{
+			jiuNode:function(player,bool){
+				//Powered by 升麻
+				if(bool){
+					if(!player.node.jiu&&lib.config.jiu_effect){
+						player.node.jiu=ui.create.div('.playerjiu',player.node.avatar);
+						player.node.jiu2=ui.create.div('.playerjiu',player.node.avatar2);
+					}
+				}
+				else{
+					if(player.node.jiu){
+						player.node.jiu.delete();
+						player.node.jiu2.delete();
+						delete player.node.jiu;
+						delete player.node.jiu2;
+					}
+				}
+			},
 			init:function(players){
 				if(game.chess) return;
 				if(lib.config.mode=='versus'){

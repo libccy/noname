@@ -69,6 +69,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else{
+						game.addVideo('jiuNode',player,true);
 						if(cards&&cards.length){
 							card=cards[0];
 						}
@@ -739,6 +740,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(!trigger.baseDamage) trigger.baseDamage=1;
 					trigger.baseDamage+=player.storage.jiu;
 					trigger.jiu=true;
+					game.addVideo('jiuNode',player,false);
 					game.broadcastAll(function(player){
 						player.removeSkill('jiu');
 					},player);
@@ -775,6 +777,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					game.broadcastAll(function(player){
 						player.removeSkill('jiu');
 					},player);
+					game.addVideo('jiuNode',player,false);
 				},
 			},
 			guding_skill:{

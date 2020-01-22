@@ -447,18 +447,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					if(!result.control) result.control='不质疑';
-					event.guessers[0].chat(result.control);
-					game.delay();
+					//event.guessers[0].chat(result.control);
+					//game.delay();
 					if(result.control=='不质疑'){
-						game.log(event.guessers[0],'#g不质疑');
+						//game.log(event.guessers[0],'#g不质疑');
 						event.ally.push(event.guessers[0]);
 					}else{
-						game.log(event.guessers[0],'#y质疑');
+						//game.log(event.guessers[0],'#y质疑');
 						event.betray.push(event.guessers[0]);
 					}
 					event.guessers.remove(event.guessers[0]);
 					if(event.guessers.length) event.goto(1);
 					'step 3'
+					for(var i=0;i<event.ally.length;i++) event.ally[i].chat('不质疑');
+					for(var i=0;i<event.betray.length;i++) event.betray[i].chat('质疑');
+					game.delay(1.5);
+					'step 4'
 					player.showCards(trigger.cards);
 					if(event.betray.length){
 						if(trigger.card.name==trigger.cards[0].name){
@@ -474,20 +478,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else event.finish();
-					'step 4'
+					'step 5'
 					if(event.fake){
 						game.delay();
 						event.finish();
 					}
-					'step 5'
+					'step 6'
 					var target=event.betray.shift();
 					event.target=target;
 					target.chooseToDiscard('弃置一张牌或失去一点体力','he').ai=lib.skill.qiangxi.check;
-					'step 6'
-					if(!result.bool) target.loseHp();
 					'step 7'
+					if(!result.bool) target.loseHp();
+					'step 8'
 					target.addSkill('rechanyuan');
-					if(event.betray.length) event.goto(5);
+					if(event.betray.length) event.goto(6);
 				},
 			},
 			"reguhuo_respond":{
@@ -532,18 +536,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 3'
 					if(!result.control) result.control='不质疑';
-					event.guessers[0].chat(result.control);
-					game.delay();
+					//event.guessers[0].chat(result.control);
+					//game.delay();
 					if(result.control=='不质疑'){
-						game.log(event.guessers[0],'#g不质疑');
+						//game.log(event.guessers[0],'#g不质疑');
 						event.ally.push(event.guessers[0]);
 					}else{
-						game.log(event.guessers[0],'#y质疑');
+						//game.log(event.guessers[0],'#y质疑');
 						event.betray.push(event.guessers[0]);
 					}
 					event.guessers.remove(event.guessers[0]);
 					if(event.guessers.length) event.goto(2);
 					'step 4'
+					for(var i=0;i<event.ally.length;i++) event.ally[i].chat('不质疑');
+					for(var i=0;i<event.betray.length;i++) event.betray[i].chat('质疑');
+					game.delay(1.5);
+					'step 5'
 					var bool=true;
 					player.showCards(event.card);
 					if(event.betray.length){
@@ -564,20 +572,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.responded=true;
 						trigger.result={bool:true,card:{name:event.name},cards:[event.card]};
 					}
-					'step 5'
+					'step 6'
 					if(event.fake){
 						game.delay();
 						event.finish();
 					}
-					'step 6'
+					'step 7'
 					var target=event.betray.shift();
 					event.target=target;
 					target.chooseToDiscard('弃置一张牌或失去一点体力','he').ai=lib.skill.qiangxi.check;
-					'step 7'
-					if(!result.bool) target.loseHp();
 					'step 8'
+					if(!result.bool) target.loseHp();
+					'step 9'
 					if(target.isAlive()) target.addSkill('rechanyuan');
-					if(event.betray.length) event.goto(6);
+					if(event.betray.length) event.goto(7);
 				},
 				ai:{
 					order:4,
@@ -2058,13 +2066,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				content:function(){
 					"step 0"
+					if(!player.storage.reluoshen) player.storage.reluoshen=[];
 					if(event.cards==undefined) event.cards=[];
 					var next=player.judge(function(card){
 						if(get.color(card)=='black') return 1.5;
 						return -1.5;
 					});
 					if(get.mode()!='guozhan'&&!player.hasSkillTag('rejudge')) next.set('callback',function(){
-						if(event.judgeResult.color=='black'&&get.position(card,true)=='o') player.gain(card,'gain2');
+						if(event.judgeResult.color=='black'&&get.position(card,true)=='o'){
+							player.storage.reluoshen.push(card);
+							player.gain(card,'gain2');
+						}
 					});
 					else next.set('callback',function(){
 						if(event.judgeResult.color=='black') event.getParent().orderingCards.remove(card);
@@ -2072,7 +2084,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.judge>0){
 						event.cards.push(result.card);
-						if(lib.config.autoskilllist.contains('luoshen')){
+						if(lib.config.autoskilllist.contains('reluoshen')){
 							player.chooseBool('是否再次发动【洛神】？');
 						}
 						else{
@@ -2086,7 +2098,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						player.gain(event.cards,'gain2');
-						player.storage.reluoshen=event.cards.slice(0);
+						player.storage.reluoshen.addArray(event.cards);
 						event.finish();
 					}
 					"step 2"
@@ -2094,6 +2106,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.goto(0);
 					}
 					else{
+						for(var i=0;i<event.cards.length;i++){
+							if(get.position(event.cards[i],true)!='o'){
+								event.cards.splice(i,1);i--;
+							}
+						}
 						if(event.cards.length){
 							player.gain(event.cards,'gain2');
 							player.storage.reluoshen=event.cards.slice(0);

@@ -21,7 +21,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			huaman:['male','shu',3,['hmmanyi','mansi','souying'],['unseen']],
+			huaman:['male','shu',3,['hmmanyi','mansi','souying','zhanyuan']],
 			xujing:['male','shu',3,['yuxu','xjshijian']],
 			xushao:['male','qun',3,['pingjian'],['unseen']],
 			puyuan:['male','shu',4,['pytianjiang','pyzhuren']],
@@ -503,22 +503,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"wolong_card":{
 				type:"takaramono",
 				fullskin:true,
-				derivation:"pangdegong",
+				//derivation:"pangdegong",
 			},
 			"fengchu_card":{
 				type:"takaramono",
 				fullskin:true,
-				derivation:"pangdegong",
+				//derivation:"pangdegong",
 			},
 			"xuanjian_card":{
 				fullskin:true,
 				type:"takaramono",
-				derivation:"pangdegong",
+				//derivation:"pangdegong",
 			},
 			"shuijing_card":{
 				fullskin:true,
 				type:"takaramono",
-				derivation:"pangdegong",
+				//derivation:"pangdegong",
 			},
 			"rewrite_bagua":{
 				derivation:"majun",
@@ -677,12 +677,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				frequent:true,
 				content:function(){
-				 player.draw(game.countPlayer(function(current){
+				 var num=game.countPlayer(function(current){
 						return current.getHistory('damage',function(evt){
 							return evt.getParent(2)==trigger;
 						}).length>0;
-					}));
+					});
+				 player.draw(num);
+				 player.addMark('mansi',num,false);
 				},
+				intro:{content:'已因此技能获得了#张牌'},
 			},
 			souying:{
 				audio:2,
@@ -733,6 +736,66 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			souying2:{},
+			zhanyuan:{
+				unique:true,
+				audio:2,
+				derivation:'hmxili',
+				skillAnimation:true,
+				animationColor:'soil',
+				juexingji:true,
+				forced:true,
+				filter:function(event,player){
+					return player.countMark('mansi')>7;
+				},
+				trigger:{player:'phaseZhunbeiBegin'},
+				content:function(){
+					'step 0'
+					player.awakenSkill('zhanyuan');
+					player.gainMaxHp();
+					'step 1'
+					player.chooseTarget('是否失去〖蛮嗣〗，令一名其他男性角色和自己一同获得技能〖系力〗？',function(card,player,target){
+						return target!=player&&target.sex=='male';
+					}).ai=function(target){
+						return 5-get.attitude(_status.event.player,target);
+					};
+					'step 2'
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target,'fire');
+						player.addSkill('hmxili');
+						target.addSkill('hmxili');
+						player.removeSkill('mansi');
+					}
+				},
+			},
+			hmxili:{
+				trigger:{global:'useCardToPlayered'},
+				direct:true,
+				audio:2,
+				filter:function(event,player){
+					return event.player!=player&&event.card.name=='sha'&&event.player.isPhaseUsing()&&event.player.hasSkill('hmxili')&&player.countCards('h')>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseToDiscard('是否弃置一张手牌，令'+get.translation(trigger.card)+'对'+get.translation(trigger.target)+'的伤害+1？','h').set('logSkill',['hmxili',trigger.target]).set('goon',function(){
+						var target=trigger.target;
+						if(get.attitude(player,target)>=0) return false;
+						if(target.getEquip('baiyin')||target.mayHaveShan()) return false;
+						return true;
+					}()).ai=function(card){
+						if(_status.event.goon) return 5-get.value(card);
+						return -1;
+					};
+					'step 1'
+					if(result.bool){
+						var id=trigger.target.playerid;
+						var map=trigger.customArgs;
+						if(!map[id]) map[id]={};
+						if(!map[id].extraDamage) map[id].extraDamage=0;
+						map[id].extraDamage++;
+					}
+				},
+			},
 			//许邵许靖
 			yuxu:{
 				audio:2,
@@ -1236,17 +1299,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				forced:true,
 				trigger:{player:'damageBegin4'},
-				init:function(player,skill){
-					if(!player.storage[skill]) player.storage[skill]=0;
-				},
 				marktext:'珠',
 				intro:{
+					name2:'珠',
 					content:'共有#个“珠”',
 				},
 				content:function(){
 					trigger.cancel();
-					player.storage.lslixun+=trigger.num;
-					player.markSkill('lslixun');
+					player.addMark('lslixun',trigger.num);
 				},
 				group:'lslixun_fate',
 			},
@@ -1255,12 +1315,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseUseBegin'},
 				forced:true,
 				filter:function(event,player){
-					return player.storage.lslixun&&player.storage.lslixun>0;
+					return player.countMark('lslixun')>0;
 				},
 				content:function(){
 					'step 0'
 					event.forceDie=true;
-					_status.lslixun=player.storage.lslixun;
+					_status.lslixun=player.countMark('lslixun');
 					player.judge(function(card){
 						if(get.number(card)<_status.lslixun) return -_status.lslixun;
 						return 1;
@@ -1268,11 +1328,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					delete _status.lslixun;
 					if(!result.bool){
-						player.chooseToDiscard([1,player.storage.lslixun],'h').ai=lib.skill.qiangxi.check;
+						player.chooseToDiscard([1,player.countMark('lslixun')],'h').ai=lib.skill.qiangxi.check;
 					}
 					else event.finish();
 					'step 2'
-					var num=player.storage.lslixun;
+					var num=player.countMark('lslixun');
 					if(result.cards&&result.cards.length) num-=result.cards.length;
 					if(num) player.loseHp(num);
 				},
@@ -1329,8 +1389,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						result.targets[0].damage(target);
 					}
 					else{
-						player.storage.lslixun--;
-						player[player.storage.lslixun?'markSkill':'unmarkSkill']('lslixun');
+						player.removeMark('lslixun',1);
 					}
 				},
 			},
@@ -3770,8 +3829,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.recover();
 					var list=game.filterPlayer();
 					for(var i=0;i<list.length;i++){
-						if(list[i]!=player&&!list[i].hasSkill('zongkui_mark')){
-							list[i].addSkill('zongkui_mark');
+						if(list[i]!=player&&!list[i].hasMark('zongkui_mark')){
+							list[i].addMark('zongkui_mark',1);
 							player.line(list[i],'green');
 						}
 					}
@@ -3794,7 +3853,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(info.type=='equip') return false;
 							if(info.type=='delay') return false;
 							return game.hasPlayer(function(current){
-								if(!current.hasSkill('zongkui_mark')) return false;
+								if(!current.hasMark('zongkui_mark')) return false;
 								return !event.targets.contains(current)&&lib.filter.targetEnabled2(event.card,player,current);
 							});
 						},
@@ -3802,7 +3861,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							'step 0'
 							player.chooseTarget(get.prompt2('bmcanshi'),[1,Infinity],function(card,player,target){
-								if(!target.hasSkill('zongkui_mark')) return false;
+								if(!target.hasMark('zongkui_mark')) return false;
 								var trigger=_status.event.getTrigger();
 								return !trigger.targets.contains(target)&&lib.filter.targetEnabled2(trigger.card,player,target);
 							}).set('ai',function(target){
@@ -3814,7 +3873,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!event.isMine()&&!_status.connectMode) game.delayx();
 								event.targets=result.targets.slice(0);
 								for(var i=0;i<event.targets.length;i++){
-									event.targets[i].removeSkill('zongkui_mark');
+									event.targets[i].removeMark('zongkui_mark',1);
 								}
 							}
 							else{
@@ -3836,12 +3895,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						logTarget:'player',
 						filter:function(event,player){
 							if(!event.targets||event.targets.length!=1) return false;
-							return event.player.hasSkill('zongkui_mark');
+							return event.player.hasMark('zongkui_mark');
 						},
 						content:function(){
 							trigger.getParent().excluded.add(player);
 							game.delay();
-							trigger.player.removeSkill('zongkui_mark');
+							trigger.player.removeMark('zongkui_mark');
 						}
 					}
 				}
@@ -3857,7 +3916,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'damageEnd'},
 				forced:true,
 				filter:function(event,player){
-					return event.player!=player&&event.player.isAlive()&&event.player.hasSkill('zongkui_mark');
+					return event.player!=player&&event.player.isAlive()&&event.player.hasMark('zongkui_mark');
 				},
 				content:function(){
 					'step 0'
@@ -3884,20 +3943,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zongkui:{
-				trigger:{player:'phaseZhunbeiBegin',global:'roundStart'},
+				trigger:{player:'phaseBefore',global:'roundStart'},
 				direct:true,
 				audio:2,
 				filter:function(event,player){
 					return game.hasPlayer(function(current){
 						if(event.name=='roundStart'&&!current.isMinHp()) return false;
-						return current!=player&&!current.hasSkill('zongkui_mark');
+						return current!=player&&!current.hasMark('zongkui_mark');
 					});
 				},
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt2('zongkui'),function(card,player,target){
 						if(_status.event.round&&!target.isMinHp()) return false;
-						return target!=player&&!target.hasSkill('zongkui_mark');
+						return target!=player&&!target.hasMark('zongkui_mark');
 					}).set('ai',function(target){
 						var num=target.isMinHp()?0.5:(1+Math.random());
 						if(get.attitude(_status.event.player,target)<0){
@@ -3909,16 +3968,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						player.logSkill('zongkui',target);
-						target.addSkill('zongkui_mark');
+						target.addMark('zongkui_mark',1);
 					}
 				},
 				subSkill:{
 					mark:{
-						charlotte:true,
-						locked:true,
-						mark:true,
+						marktext:'傀',
 						intro:{
-							content:'已获得“傀”标记'
+							name2:'傀',
+							content:'mark'
 						}
 					}
 				},
@@ -7393,9 +7451,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.chooseToCompare(targets).callback=lib.skill.gushe.callback;
 				},
-				init:function(player){
-					player.storage.gushe=0;
-				},
 				intro:{
 					name:'饶舌',
 					content:'mark'
@@ -7404,11 +7459,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				callback:function(){
 					'step 0'
 					if(event.num1<=event.num2){
-						target.chat(lib.skill.gushe.chat[player.storage.gushe]);
+						target.chat(lib.skill.gushe.chat[player.countMark('gushe')]);
 						game.delay();
-						player.storage.gushe++;
-						player.markSkill('gushe');
-						if(player.storage.gushe>=7){
+						player.addMark('gushe',1);
+						if(player.countMark('gushe')>=7){
 							player.die();
 						}
 					}
@@ -7460,11 +7514,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'compare'},
 				filter:function(event,player){
-					return event.getParent().name=='gushe'&&!event.iwhile&&event.num1<=player.storage.gushe;
+					return event.getParent().name=='gushe'&&!event.iwhile&&event.num1<=player.countMark('gushe');
 				},
 				content:function(){
-					if(trigger.num1<player.storage.gushe){
-						trigger.num1+=player.storage.gushe;
+					if(trigger.num1<player.countMark('gushe')){
+						trigger.num1+=player.countMark('gushe');
 					}
 					else{
 						player.getStat().skill.gushe--;
@@ -10092,24 +10146,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return event.nature=='fire';
 				},
-				init:function(player){
-					player.storage.ranshang=0;
-				},
 				forced:true,
 				check:function(){
 					return false;
 				},
 				content:function(){
-					if(player.storage.ranshang){
-						player.storage.ranshang+=trigger.num;
-					}
-					else{
-						player.storage.ranshang=trigger.num;
-					}
-					player.markSkill('ranshang');
-					game.addVideo('storage',player,['ranshang',player.storage.ranshang]);
+					player.addMark('ranshang',trigger.num);
 				},
 				intro:{
+					name2:'燃',
 					content:'mark'
 				},
 				ai:{
@@ -10129,10 +10174,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseJieshuBegin'},
 				forced:true,
 				filter:function(event,player){
-					return player.storage.ranshang>0;
+					return player.countMark('ranshang')>0;
 				},
 				content:function(){
-					player.loseHp(player.storage.ranshang);
+					player.loseHp(player.countMark('ranshang'));
 				}
 			},
 			hanyong:{
@@ -13860,7 +13905,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mansi:'蛮嗣',
 			mansi_info:'一名角色使用的【南蛮入侵】结算完成后，你可以摸X张牌（X为受到过此牌伤害的角色数）。',
 			souying:'薮影',
-			souying_info:'每回合限一次',
+			souying_info:'每回合限一次，当你对一名男性角色造成伤害（或一名男性角色对你造成伤害时）若此伤害是你对其（或其对你）本回合内造成的第二次伤害，你可以弃置一张手牌令此伤害+1或（-1）。',
+			zhanyuan:'战缘',
+			zhanyuan_info:'觉醒技，准备阶段，若你已因蛮嗣累计获得超过7张牌，你加一点体力上限，并可以选择一名男性角色，你与其获得技能〖系力〗，然后你失去技能〖蛮嗣〗',
+			hmxili:'系力',
+			hmxili_info:'你的回合外，当其他拥有〖系力〗技能的角色在其回合内使用【杀】指定目标后，你可以弃置一张手牌，令此【杀】伤害+1。',
 			yuxu:'誉虚',
 			yuxu_info:'当你于出牌阶段内使用牌时，你可以摸一张牌。若如此做，当你于出牌阶段内使用下一张牌时，你弃置一张牌。',
 			yuxu2:'誉虚(弃牌)',

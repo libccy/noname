@@ -611,12 +611,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										player.changeLingli(-1);
 										player.draw();
 									},
-								},
-								ai:{
-									order:10,
-									result:{
-										player:function(player){
-											return (player.storage._lingli-2*(3-player.skillH.length))>0?1:0;
+									ai:{
+										order:10,
+										result:{
+											player:function(player){
+												return (player.storage._lingli-2*(3-player.skillH.length))>0?1:0;
+											},
 										},
 									},
 								},
@@ -720,7 +720,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 												trigger._lastDead.uninit();
 												trigger._lastDead.init(['hhzz_shiona','hhzz_kanade','hhzz_takaramono1','hhzz_takaramono2'].randomGet());
 												trigger._lastDead.skillH=lib.character[trigger._lastDead.name][3].slice(0);
-												trigger._lastDead.addSkill('hhzz_nocard');
+												trigger._lastDead.addSkill('hhzz_noCard');
 												break;
 											}
 										}

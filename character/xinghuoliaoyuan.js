@@ -1129,24 +1129,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:["xinfu_xionghuo_damage","xinfu_xionghuo_begin","xinfu_xionghuo_init"],
 				subSkill:{
 					begin:{
-						silent:true,
-						popup:false,
-						sub:true,
+						audio:'xinfu_xionghuo',
+						logTarget:'player',
+						line:false,
 						forced:true,
 						trigger:{
 							global:"phaseUseBegin",
 						},
 						filter:function (event,player){
-							return event.player.hasSkill('xionghuo')&&event.player!=player;
+							return event.player.countMark('xionghuo')>0&&event.player!=player;
 						},
 						content:function (){
 							'step 0'
-							player.logSkill("xinfu_xionghuo");
-							if(trigger.player.storage.xionghuo>1) trigger.player.storage.xionghuo--;
-							else{
-								delete trigger.player.storage.xionghuo;
-								trigger.player.removeSkill('xionghuo');
-							}
+							trigger.player.removeMark('xionghuo',1);
 							var list=[1,2,3];
 							var num=list.randomGet();
 							event.goto(num);
@@ -1182,7 +1177,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							source:"damageBegin1",
 						},
 						filter:function (event,player){
-							return event.player.hasSkill('xionghuo');
+							return event.player.countMark('xionghuo')>0;
 						},
 						content:function (){
 							trigger.num++;
@@ -1196,45 +1191,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						locked:false,
 						content:function(){
-							player.storage.xinfu_xionghuo+=3;
-							player.markSkill("xinfu_xionghuo");
+							player.addMark("xionghuo",3);
 						},
 					},
 				},
 				audio:2,
 				enable:"phaseUse",
-				usable:null,
-				init:function (player){
-					if(player.storage.xinfu_xionghuo==undefined) player.storage.xinfu_xionghuo=0;
-				},
-				//mark:true,
-				marktext:"戾",
-				intro:{
-					content:"mark",
-				},
 				filter:function(event,player){
-					return player.storage.xinfu_xionghuo>0;
+					return player.countMark('xionghuo')>0;
 				},
 				filterTarget:function (card,player,target){
-					if(target.storage.xionghuo!=undefined&&target.storage.xionghuo>0) return false;
-					return player!=target&&player.storage.xinfu_xionghuo>0;
+					if(target.hasMark('xionghuo')) return false;
+					return player!=target>0;
 				},
 				content:function (){
-					if(target.storage.xionghuo==undefined||target.storage.xionghuo==0){
-						target.addSkill('xionghuo');
-						target.storage.xionghuo=0;
-					}
-					target.storage.xionghuo++;
-					player.storage.xinfu_xionghuo--;
-					target.syncStorage('xionghuo');
-					player.syncStorage('xinfu_xionghuo');
-					if(player.storage.xinfu_xionghuo==0) player.unmarkSkill('xinfu_xionghuo');
+					player.removeMark('xionghuo',1);
+					target.addMark('xionghuo',1);
 				},
 				ai:{
 					order:11,
 					result:{
 						target:function (player,target){
-							return Math.min(-(1+player.storage.xinfu_xionghuo-target.hp),0);
+							var mark=player.countMark('xionghuo');
+							if(mark>2) return -1;
+							return Math.min(-(1+mark-target.hp),0);
 						},
 					},
 					threaten:1.1,
@@ -1244,6 +1224,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				marktext:"戾",
 				mark:true,
 				intro:{
+					name:'暴戾',
 					content:"mark",
 				},
 				locked:true,
@@ -1286,10 +1267,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(trigger.parent.name=='damage'&&get.itemtype(trigger.parent.cards)=='cards'&&get.position(trigger.parent.cards[0],true)=='o'){
 						player.gain(trigger.parent.cards,"gain2");
 					}
-					if(!player.storage.xinfu_xionghuo) player.storage.xinfu_xionghuo=0;
-					player.storage.xinfu_xionghuo++;
-					player.markSkill('xinfu_xionghuo');
-					player.syncStorage('xinfu_xionghuo');
+					player.addMark('xionghuo',1);
 				},
 			},
 			"xinfu_jianjie":{
@@ -1914,27 +1892,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			
 			"xinfu_falu":{
-				init:function (player,skill){
-					if(player.storage[skill]==undefined) player.storage[skill]=0;
-					if(player.storage[skill+'_map']==undefined) player.storage[skill+'_map']={
-						spade:false,heart:false,diamond:false,club:false,
-					};
-				},
-				//mark:true,
-				intro:{
-					content:function (content,player){
-						var storage=player.storage.xinfu_falu_map;
-						var str='紫薇：';
-						str+=storage.spade?1:0;
-						str+='、玉清：';
-						str+=storage.heart?1:0;
-						str+='、后土：';
-						str+=storage.club?1:0;
-						str+='、勾陈：';
-						str+=storage.diamond?1:0;
-						str+='、合计：';
-						str+=content;
-						return str;
+				subSkill:{
+					spade:{
+						marktext:'♠︎️',
+						intro:{
+							name:'紫薇',
+							content:'mark',
+						},
+					},
+					heart:{
+						marktext:'♥︎️',
+						intro:{
+							name:'玉清',
+							content:'mark',
+						},
+					},
+					club:{
+						marktext:'♣︎️',
+						intro:{
+							name:'后土',
+							content:'mark',
+						},
+					},
+					diamond:{
+						marktext:'♦︎',
+						intro:{
+							name:'勾陈',
+							content:'mark',
+						},
 					},
 				},
 				forced:true,
@@ -1946,28 +1931,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function (event,player){
 					if(event.name!='discard') return true;
 					for(var i=0;i<event.cards.length;i++){
-						if(!player.storage.xinfu_falu_map[get.suit(event.cards[i])]) return true;
+						if(!player.hasMark('xinfu_falu_'+get.suit(event.cards[i]))) return true;
 					}
 					return false;
 				},
 				content:function (){
 					if(trigger.name!='discard'){
-						player.storage[event.name]=4;
-						player.storage[event.name+'_map']={
-							spade:true,heart:true,diamond:true,club:true,
-						};
-						player.markSkill('xinfu_falu');
+						for(var i=0;i<lib.suit.length;i++){
+							if(!player.hasMark('xinfu_falu_'+lib.suit[i])) player.addMark('xinfu_falu_'+lib.suit[i]);
+						}
 						return;
 					}
 					for(var i=0;i<trigger.cards.length;i++){
-						player.storage.xinfu_falu_map[get.suit(trigger.cards[i])]=true;
+						var suit=get.suit(trigger.cards[i]);
+						if(!player.hasMark('xinfu_falu_'+suit)) player.addMark('xinfu_falu_'+suit);
 					}
-					var num=0;
-					for(var i in player.storage.xinfu_falu_map){
-						if(player.storage.xinfu_falu_map[i]==true) num++;
-					}
-					player.storage.xinfu_falu=num;
-					player.markSkill('xinfu_falu');
 				},
 			},
 			"xinfu_dianhua":{
@@ -1977,11 +1955,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				audio:2,
 				filter:function (event,player){
-					return player.storage.xinfu_falu&&player.storage.xinfu_falu>0;
+					for(var i=0;i<lib.suit.length;i++){
+						if(player.hasMark('xinfu_falu_'+lib.suit[i])) return true;
+					}
+					return false;
 				},
 				content:function (){
 					'step 0'
-					var num=player.storage.xinfu_falu;
+					var num=0;
+					for(var i=0;i<lib.suit.length;i++){
+						if(player.hasMark('xinfu_falu_'+lib.suit[i])) num++;
+					}
 					player.chooseCardButton(num,true,get.cards(num),'【点化】：按顺将卡牌置于牌堆顶（先选择的在上）').set('ai',function(button){
 						return get.value(button.link);
 					});
@@ -2002,18 +1986,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				filter:function (event,player){
 					if(!event.nature) return false;
-					return player.storage.xinfu_falu_map.diamond;
+					return player.hasMark('xinfu_falu_diamond');
 				},
 				prompt2:'弃置“勾陈”标记，从牌堆中获得每种类型的牌各一张。',
 				content:function (){
 					'step 0'
-					player.storage.xinfu_falu_map.diamond=false;
-					var num=0;
-					for(var i in player.storage.xinfu_falu_map){
-						if(player.storage.xinfu_falu_map[i]==true) num++;
-					}
-					player.storage.xinfu_falu=num;
-					player[num?'markSkill':'unmarkSkill']('xinfu_falu');
+					player.removeMark('xinfu_falu_diamond');
 					event.num=0;
 					event.togain=[];
 					'step 1'
@@ -2035,30 +2013,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"zhenyi_spade":{
-				subSkill:{
-					red:{
-						mod:{
-							suit:function (card,suit){
-								return 'heart';
-							},
-						},
-						sub:true,
-					},
-					black:{
-						mod:{
-							suit:function (card,suit){
-								return 'spade';
-							},
-						},
-						sub:true,
-					},
-				},
 				trigger:{
 					global:"judge",
 				},
 				direct:true,
 				filter:function (event,player){
-					return player.storage.xinfu_falu_map.spade==true;
+					return player.hasMark('xinfu_falu_spade');
 				},
 				content:function (){
 					"step 0"
@@ -2092,15 +2052,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('judging',trigger.player.judging[0]);
 					"step 1"
 					if(['黑桃5','红桃5'].contains(result.control)){
-						player.storage.xinfu_falu_map.spade=false;
-						var num=0;
-						for(var i in player.storage.xinfu_falu_map){
-							if(player.storage.xinfu_falu_map[i]==true) num++;
-						}
-						player.storage.xinfu_falu=num;
-						player[num?'markSkill':'unmarkSkill']('xinfu_falu');
+						player.removeMark('xinfu_falu_spade');
 						player.logSkill('xinfu_zhenyi',trigger.player);
-						player.line(trigger.player);
+						//player.line(trigger.player);
 						player.popup(result.control);
 						game.log(player,'将判定结果改为了','#y'+result.control);
 						trigger.fixedResult={
@@ -2125,7 +2079,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:"chooseToUse",
 				filter:function (event,player){
 					if(!player.isDying()) return false;
-					return player.storage.xinfu_falu_map.club;
+					return player.hasMark('xinfu_falu_club');
 				},
 				filterCard:true,
 				position:"h",
@@ -2135,14 +2089,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				prompt:"弃置“后土”标记将一张手牌当桃使用",
 				check:function (card){return 15-get.value(card)},
 				precontent:function (){
-					player.logSkill('xinfu_zhenyi');
-					player.storage.xinfu_falu_map.club=false;
-					var num=0;
-					for(var i in player.storage.xinfu_falu_map){
-						if(player.storage.xinfu_falu_map[i]==true) num++;
-					}
-					player.storage.xinfu_falu=num;
-					player[num?'markSkill':'unmarkSkill']('xinfu_falu');
+					player.hasMark('xinfu_falu_club');
 				},
 				ai:{
 					skillTagFilter:function (player){
@@ -2158,7 +2105,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					source:"damageBegin1",
 				},
 				filter:function (event,player){
-					return event.source&&player.storage.xinfu_falu_map.heart;
+					return player.hasMark('xinfu_falu_heart');
 				},
 				check:function (event,player){
 					return false;
@@ -2169,13 +2116,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:"player",
 				content:function (){
 						"step 0"
-						player.storage.xinfu_falu_map.heart=false;
-						var num=0;
-						for(var i in player.storage.xinfu_falu_map){
-							if(player.storage.xinfu_falu_map[i]==true) num++;
-						}
-						player.storage.xinfu_falu=num;
-						player[num?'markSkill':'unmarkSkill']('xinfu_falu');
+						player.removeMark('xinfu_falu_heart')
 						player.judge(function(card){
 							if(get.color(card)=='black') return 4;
 							return -1;

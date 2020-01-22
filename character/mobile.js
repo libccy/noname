@@ -42,37 +42,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pss_paper:{
 				type:'pss',
 				fullskin:true,
-				derivation:'shenpei',
+				//derivation:'shenpei',
 			},
 			pss_scissor:{
 				type:'pss',
 				fullskin:true,
-				derivation:'shenpei',
+				//derivation:'shenpei',
 			},
 			pss_stone:{
 				type:'pss',
 				fullskin:true,
-				derivation:'shenpei',
+				//derivation:'shenpei',
 			},
 			db_atk1:{
 				type:'db_atk',
 				fullimage:true,
-				derivation:'shenpei',
+				//derivation:'shenpei',
 			},
 			db_atk2:{
 				type:'db_atk',
 				fullimage:true,
-				derivation:'shenpei',
+				//derivation:'shenpei',
 			},
 			db_def1:{
 				type:'db_def',
 				fullimage:true,
-				derivation:'shenpei',
+				//derivation:'shenpei',
 			},
 			db_def2:{
 				type:'db_def',
 				fullimage:true,
-				derivation:'shenpei',
+				//derivation:'shenpei',
 			},
 		},
 		characterFilter:{},
@@ -199,6 +199,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return player.hp<=2&&!player.storage.rehunzi;
 				},
+				ai:{
+					threaten:function(player,target){
+						if(target.hp<=2) return 2;
+						return 0.5;
+					},
+					maixie:true,
+					effect:{
+						target:function(card,player,target){
+							if(!target.hasFriend()) return;
+							if(get.tag(card,'damage')==1&&target.hp==3&&!target.isTurnedOver()&&
+							_status.currentPhase!=target&&get.distance(_status.currentPhase,target,'absolute')<=3) return [0.5,1];
+						}
+					}
+				}
 			},
 			rezhijian:{
 				inherit:'zhijian',

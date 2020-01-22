@@ -50,12 +50,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.source!=undefined;
 				},
 				content:function (){
-					var source=trigger.source
-					if(!source.storage.new_wuhun_mark){
-						source.storage.new_wuhun_mark=0;
-					}
-					source.storage.new_wuhun_mark+=trigger.num;
-					source.markSkill('new_wuhun_mark');
+				trigger.source.addMark('new_wuhun_mark',trigger.num);
 				},
 				subSkill:{
 					die:{
@@ -70,7 +65,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						direct:true,
 						filter:function (event,player){
 							return game.hasPlayer(function(current){
-								return current!=player&&current.storage.new_wuhun_mark!=undefined;
+								return current!=player&&current.hasMark('new_wuhun_mark');
 							});
 						},
 						content:function (){
@@ -78,15 +73,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var num=0;
 							for(var i=0;i<game.players.length;i++){
 								var current=game.players[i];
-								if(current!=player&&current.storage.new_wuhun_mark&&current.storage.new_wuhun_mark>num){
-									num=current.storage.new_wuhun_mark;
+								if(current!=player&&current.countMark('new_wuhun_mark')>num){
+									num=current.countMark('new_wuhun_mark');
 								}
 							}
 							player.chooseTarget(true,'请选择【武魂】的目标',function(card,player,target){
-								return target!=player&&target.storage.new_wuhun_mark==num;
+								return target!=player&&target.countMark('new_wuhun_mark')==_status.event.num;
 							}).set('ai',function(target){
 								return -get.attitude(_status.event.player,target);
-							}).set('forceDie',true);
+							}).set('forceDie',true).set('num',num);
 							"step 1"
 							if(result.bool&&result.targets&&result.targets.length){
 								var target=result.targets[0];
@@ -225,16 +220,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.storage.baonu>=6;
+					return player.countMark('baonu')>=6;
 				},
 				usable:1,
 				skillAnimation:true,
 				animationColor:'metal',
 				content:function(){
 					"step 0"
-					player.storage.baonu-=6;
-					player.syncStorage('baonu');
-					player.updateMarks('baonu');
+					player.removeMark('baonu',6);
 					event.targets=game.filterPlayer();
 					event.targets.remove(player);
 					event.targets.sort(lib.sort.seat);
@@ -277,15 +270,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				derivation:'wushuang',
 				filter:function(event,player){
-					return player.storage.baonu>=2;
+					return player.countMark('baonu')>=2;
 				},
 				filterTarget:function(card,player,target){
 					return target!=player&&!target.hasSkill('ol_wuqian_targeted');
 				},
 				content:function(){
-					player.storage.baonu-=2;
-					player.syncStorage('baonu');
-					player.updateMarks('baonu');
+					player.removeMark('baonu',2);
 					player.addTempSkill('wushuang');
 					player.storage.ol_wuqian_target=target;
 					player.addTempSkill('ol_wuqian_target');
@@ -320,7 +311,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					if(player.storage.baonu>0){
+					if(player.hasMark('baonu')){
 						player.chooseControlList([
 							'移去一枚【暴怒】标记',
 							'失去一点体力'
@@ -336,9 +327,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					if(result.index==0){
-						player.storage.baonu--;
-						player.syncStorage('baonu');
-						player.updateMarks('baonu');
+						player.removeMark('baonu',1);
 					}
 					else{
 						player.loseHp();
@@ -450,12 +439,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			baonu:{
 				audio:2,
-				mark:true,
 				marktext:'暴',
 				unique:true,
-				init:function(player,skill){
-					if(!player.storage[skill]) player.storage[skill]=0;
-				},
 				trigger:{
 					source:'damageSource',
 					player:['damageEnd','enterGame'],
@@ -466,15 +451,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.name!='damage'||event.num>0; 
 				},
 				content:function(){
-					player.storage.baonu+=trigger.name=='damage'?trigger.num:2;
-					player.markSkill('baonu');
-					player.syncStorage('baonu');
+					player.addMark('baonu',trigger.name=='damage'?trigger.num:2);
 				},
 				intro:{
+					name:'暴怒',
 					content:'mark'
 				},
 				ai:{
-					combo:'shenfen',
+					combo:'ol_shenfen',
 					maixie:true,
 					maixie_hp:true
 				}
@@ -564,19 +548,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				group:'renjie2',
 				notemp:true,
-				mark:true,
+				//mark:true,
 				filter:function(event){
 					return event.num>0;
 				},
-				init:function(player){
-					player.storage.renjie=0;
-					game.addVideo('storage',player,['renjie',player.storage.renjie]);
-				},
 				content:function(){
-					player.storage.renjie+=trigger.num;
-					game.addVideo('storage',player,['renjie',player.storage.renjie]);
+					player.addMark('renjie',trigger.num);
 				},
 				intro:{
+					name2:'忍',
 					content:'mark'
 				},
 				ai:{
@@ -618,8 +598,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return evt&&evt.name=='phaseDiscard'
 				},
 				content:function(){
-					player.storage.renjie+=trigger.cards.length;
-					game.addVideo('storage',player,['renjie',player.storage.renjie]);
+					player.addMark('renjie',trigger.cards.length);
 				}
 			},
 			sbaiyin:{
@@ -631,7 +610,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				audio:true,
 				filter:function(event,player){
-					return player.storage.renjie>=4;
+					return player.countMark('renjie')>=4;
 				},
 				content:function(){
 					player.loseMaxHp();
@@ -648,7 +627,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'judge'},
 				direct:true,
 				filter:function(event,player){
-					return player.countCards('h')>0&&player.storage.renjie>0;
+					return player.countCards('he')>0&&player.hasMark('renjie');
 				},
 				content:function(){
 					"step 0"
@@ -674,9 +653,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 2"
 					if(result.bool){
-						//player.logSkill('jilue_guicai');
-						player.storage.renjie--;
-						player.updateMarks();
+						player.removeMark('renjie',1);
 						if(trigger.player.judging[0].clone){
 							trigger.player.judging[0].clone.delete();
 							game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging[0].clone]));
@@ -701,7 +678,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				//priority:-1,
 				filter:function(event,player){
-					return player.storage.renjie>0;
+					return player.hasMark('renjie');
 				},
 				content:function(){
 					"step 0"
@@ -721,8 +698,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 1"
 					if(result.bool){
-						player.storage.renjie--;
-						player.updateMarks();
+						player.removeMark('renjie',1);
 						player.logSkill('jilue_fangzhu',result.targets);
 						result.targets[0].draw(player.maxHp-player.hp);
 						result.targets[0].turnOver();
@@ -734,11 +710,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
-					return player.storage.renjie>0;
+					return player.hasMark('renjie');
 				},
 				content:function(){
-					player.storage.renjie--;
-					player.updateMarks();
+					player.removeMark('renjie',1);
 					player.addTempSkill('wansha');
 				}
 			},
@@ -747,7 +722,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
-					return player.storage.renjie>0;
+					return player.hasMark('renjie');
 				},
 				position:'he',
 				filterCard:true,
@@ -764,8 +739,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.storage.renjie--;
-					player.updateMarks();
+					player.removeMark('renjie',1);
 					event.num=player.hasSkill('rezhiheng_delay')?1:0;
 					'step 1'
 					player.draw(event.num+cards.length);
@@ -793,15 +767,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:true,
 				trigger:{player:'useCard'},
 				filter:function(event,player){
-					return (get.type(event.card)=='trick'&&event.cards[0]&&event.cards[0]==event.card)&&player.storage.renjie>0;
+					return (get.type(event.card)=='trick'&&event.cards[0]&&event.cards[0]==event.card)&&player.hasMark('renjie');
 				},
 				init:function(player){
 					player.storage.jilue_jizhi=0;
 				},
 				content:function(){
 					'step 0'
-					player.storage.renjie--;
-					player.updateMarks();
+					player.removeMark('renjie',1);
 					player.draw();
 					'step 1'
 					event.card=result[0];
@@ -2056,23 +2029,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"nzry_junlve":{
 				audio:2,
-				init:function(player){
-					if(!player.storage.nzry_junlve) player.storage.nzry_junlve=0;
-				},
-				marktext:"军",
+				//marktext:"军",
 				intro:{
-					content:'当前有#个“军略”标记',
+					content:'当前有#个标记',
 				},
-				mark:true,
+				//mark:true,
 				trigger:{
 					player:"damageAfter",
 					source:"damageSource",
 				},
 				forced:true,
 				content:function(){
-					player.storage.nzry_junlve+=trigger.num;
-					game.log(player,'获得了',trigger.num,'个“军略”标记');
-					player.syncStorage('nzry_junlve');
+					player.addMark('nzry_junlve',trigger.num);
 				},
 			},
 			"nzry_cuike":{
@@ -2083,30 +2051,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					if(player.storage.nzry_junlve%2==1){
-						player.chooseTarget('是否发动【摧克】来对一名角色造成一点伤害？').ai=function(target){
+					if(player.countMark('nzry_junlve')%2==1){
+						player.chooseTarget('是否发动【摧克】，对一名角色造成一点伤害？').ai=function(target){
 							return -get.attitude(player,target);
 						};
 					}
 					else{
-						player.chooseTarget('是否发动【摧克】来横置一名角色并弃置其区域内的一张牌？').ai=function(target){
+						player.chooseTarget('是否发动【摧克】，横置一名角色并弃置其区域内的一张牌？').ai=function(target){
 							return -get.attitude(player,target);
 						};
 					}
 					'step 1'
 					if(result.bool){
-						player.line(result.targets);
-						player.logSkill('nzry_cuike');
-						if(player.storage.nzry_junlve%2==1){
+						player.logSkill('nzry_cuike',result.targets);
+						if(player.countMark('nzry_junlve')%2==1){
 							result.targets[0].damage();
 						}
 						else{
 							result.targets[0].link(true);
-							player.discardPlayerCard(result.targets[0],1,'hej');
+							player.discardPlayerCard(result.targets[0],1,'hej',true);
 						};
 					};
 					'step 2'
-					if(player.storage.nzry_junlve&&player.storage.nzry_junlve>7){
+					if(player.countMark('nzry_junlve')>7){
 						player.chooseBool().set('ai',function(){
 							return true;
 						}).set('prompt','是否弃置所有“军略”标记并对所有其他角色造成一点伤害？');
@@ -2115,13 +2082,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					};
 					'step 3'
 					if(result.bool){
-						player.line(game.players);
-						player.logSkill('nzry_cuike');
-						player.storage.nzry_junlve=0;
-						player.syncStorage('nzry_junlve');
-						game.log(player,'移去了所有“军略”标记');
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i]!=player) game.players[i].damage();
+						var players=game.players.slice(0).sortBySeat();
+						player.line(players);
+						player.removeMark('nzry_junlve',player.countMark('nzry_junlve'));
+						for(var i=0;i<players.length;i++){
+							if(players[i]!=player) players[i].damage();
 						};
 					};
 				},
@@ -2141,7 +2106,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				animationColor:'metal',
 				enable:'phaseUse',
 				filter:function (event,player){
-					return !player.storage.nzry_dinghuo&&player.storage.nzry_junlve>0;
+					return !player.storage.nzry_dinghuo&&player.countMark('nzry_junlve')>0;
 				},
 				check:function (event,player){
 					var num=game.countPlayer(function(current){return get.attitude(player,current)<0&&current.isLinked()});
@@ -2151,7 +2116,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return target.isLinked();
 				},
 				selectTarget:function(){
-					return [1,_status.event.player.storage.nzry_junlve];
+					return [1,_status.event.player.countMark('nzry_junlve')];
 				},
 				multiline:true,
 				multitarget:true,
@@ -2160,9 +2125,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('nzry_dinghuo');
 					player.storage.nzry_dinghuo=true;
 					'step 1'
-					player.storage.nzry_junlve=0;
-					player.syncStorage('nzry_junlve');
-					game.log(player,'移去了所有“军略”标记');
+						player.removeMark('nzry_junlve',player.countMark('nzry_junlve'));
 					for(var i=0;i<targets.length;i++){
 						targets[i].discard(targets[i].getCards('e'));
 					}
@@ -2442,27 +2405,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			drlt_jieying_mark:{
-				init:function(player){
-					game.log(player,'获得了“营”标记');
-				},
-				onremove:function(player){
-					game.log(player,'失去了“营”标记');
-				},
-				mark:true,
 				marktext:"营",
 				intro:{
-					content:function(storage){
-						return '已获得“营”标记';
-					},
+					name:'营',
+					content:'mark',
 				},
 				mod:{
 					cardUsable:function (card,player,num){
-						if(game.hasPlayer(function(current){
+						if(player.hasMark('drlt_jieying_mark')&&game.hasPlayer(function(current){
 							return current.hasSkill('drlt_jieying');
 						})&&card.name=='sha') return num+1;
 					},
 					maxHandcard:function (player,num){
-						if(game.hasPlayer(function(current){
+						if(player.hasMark('drlt_jieying_mark')&&game.hasPlayer(function(current){
 							return current.hasSkill('drlt_jieying');
 						})) return num+1;
 					},
@@ -2473,18 +2428,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				filter:function(event,player){
-					return game.hasPlayer(function(current){
+					return player.hasMark('drlt_jieying_mark')&&game.hasPlayer(function(current){
 						return current.hasSkill('drlt_jieying');
 					});
 				},
 				content:function(){
 					trigger.num++;
 				},
-				ai:{nokeep:true},
+				ai:{
+					nokeep:true,
+					skillTagFilter:function(player){
+						return player.hasMark('drlt_jieying_mark');
+					},
+				},
 			},
 			'drlt_jieying':{
 				audio:2,
 				locked:false,
+				global:'drlt_jieying_mark',
 				group:["drlt_jieying_1","drlt_jieying_2","drlt_jieying_3"],
 				subSkill:{
 					'1':{
@@ -2495,11 +2456,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						filter:function(event,player){
 							return !game.hasPlayer(function(current){
-								return current.hasSkill('drlt_jieying_mark');
+								return current.hasMark('drlt_jieying_mark');
 							});
 						},
 						content:function(){
-							player.addSkill('drlt_jieying_mark');
+							player.addMark('drlt_jieying_mark',1);
 						},
 					},
 					'2':{
@@ -2509,7 +2470,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						direct:true,
 						filter:function(event,player){
-							return player.hasSkill('drlt_jieying_mark');
+							return player.hasMark('drlt_jieying_mark');
 						},
 						content:function(){
 							'step 0'
@@ -2531,26 +2492,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var target=result.targets[0];
 								player.line(target);
 								player.logSkill('drlt_jieying',target);
-								player.removeSkill('drlt_jieying_mark');
-								target.addSkill('drlt_jieying_mark');
+								player.removeMark('drlt_jieying_mark',1);
+								target.addMark('drlt_jieying_mark',1);
 							};
 						},
 					},
 					'3':{
 						audio:'drlt_jieying',
 						trigger:{
-							global:'phaseAfter',
+							global:'phaseEnd',
 						},
 						forced:true,
 						filter:function(event,player){
-							return player!=event.player&&event.player.hasSkill('drlt_jieying_mark')&&event.player.isAlive();
+							return player!=event.player&&event.player.hasMark('drlt_jieying_mark')&&event.player.isAlive();
 						},
 						logTarget:'player',
 						content:function(){
 							if(trigger.player.countCards('h')>0){
 								trigger.player.give(trigger.player.getCards('h'),player);
 							}
-							trigger.player.removeSkill('drlt_jieying_mark');
+							trigger.player.removeMark('drlt_jieying_mark',1);
 						},
 					},
 				},
