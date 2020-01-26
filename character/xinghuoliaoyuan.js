@@ -1410,6 +1410,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				viewAsFilter:function (player){
 					if(player.hasSkill('huoji')) return false;
+					if(!game.hasPlayer(function(current){
+						return current.hasSkill('xinfu_jianjie');
+					})) return false;
 					if(!player.countCards('h',{color:'red'})) return false;
 				},
 				prompt:"将一张红色牌当火攻使用",
@@ -1420,56 +1423,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return 4-get.value(card)
 				},
-				ai:{
-					basic:{
-						order:4,
-						value:[3,1],
-						useful:1,
-					},
-					wuxie:function (target,card,player,current,state){
-						if(get.attitude(current,player)>=0&&state>0) return false;
-					},
-					result:{
-						player:function (player){
-							var nh=player.countCards('h');
-							if(nh<=player.hp&&nh<=4&&_status.event.name=='chooseToUse'){
-								if(typeof _status.event.filterCard=='function'&&
-									_status.event.filterCard({name:'huogong'})){
-									return -10;
-								}
-								if(_status.event.skill){
-									var viewAs=get.info(_status.event.skill).viewAs;
-									if(viewAs=='huogong') return -10;
-									if(viewAs&&viewAs.name=='huogong') return -10;
-								}
-							}
-							return 0;
-						},
-						target:function (player,target){
-							if(target.hasSkill('huogong2')||target.countCards('h')==0) return 0;
-							if(player.countCards('h')<=1) return 0;
-							if(target==player){
-								if(typeof _status.event.filterCard=='function'&&
-									_status.event.filterCard({name:'huogong'})){
-									return -1.5;
-								}
-								if(_status.event.skill){
-									var viewAs=get.info(_status.event.skill).viewAs;
-									if(viewAs=='huogong') return -1.5;
-									if(viewAs&&viewAs.name=='huogong') return -1.5;
-								}
-								return 0;
-							}
-							return -1.5;
-						},
-					},
-					tag:{
-						damage:1,
-						fireDamage:1,
-						natureDamage:1,
-						norepeat:1,
-					},
-				},
 			},
 			"smh_lianhuan":{
 				audio:2,
@@ -1477,6 +1430,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:"phaseUse",
 				filter:function (event,player){
 					if(player.hasSkill('lianhuan')||player.hasSkill('xinlianhuan')) return false;
+					if(!game.hasPlayer(function(current){
+						return current.hasSkill('xinfu_jianjie');
+					})) return false;
 					if((player.getStat().skill.smh_lianhuan||0)+(player.getStat().skill.smh_lianhuan1||0)>=3) return false;
 					return player.countCards('h',{suit:'club'})>0;
 				},
@@ -1495,41 +1451,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					content:"<li>出牌阶段限三次，你可以将你的任意一张梅花手牌当作【铁索连环】使用或重铸。",
 				},
 				group:["smh_lianhuan1"],
-				ai:{
-					wuxie:function (){
-						if(Math.random()<0.5) return 0;
-					},
-					basic:{
-						useful:4,
-						value:4,
-						order:7,
-					},
-					result:{
-						target:function (player,target){
-							if(target.isLinked()){
-								if(target.hasSkillTag('link')) return 0;
-								var f=target.hasSkillTag('nofire');
-								var t=target.hasSkillTag('nothunder');
-								if(f&&t) return 0;
-								if(f||t) return 0.5;
-								return 2;
-							}
-							if(get.attitude(player,target)>=0) return -0.9;
-							if(ui.selected.targets.length) return -0.9;
-							if(game.hasPlayer(function(current){
-								return get.attitude(player,current)<=-1&&current!=target&&!current.isLinked();
-							})){
-								return -0.9;
-							}
-							return 0;
-						},
-					},
-					tag:{
-						multitarget:1,
-						multineg:1,
-						norepeat:1,
-					},
-				},
 			},
 			"xinfu_jianjie2":{
 				trigger:{
@@ -1579,6 +1500,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:"phaseUse",
 				filter:function (event,player){
 					if(player.hasSkill('lianhuan')||player.hasSkill('xinlianhuan')) return false;
+					if(!game.hasPlayer(function(current){
+						return current.hasSkill('xinfu_jianjie');
+					})) return false;
 					if((player.getStat().skill.smh_lianhuan||0)+(player.getStat().skill.smh_lianhuan1||0)>=3) return false;
 					return player.countCards('h',{suit:'club'})>0;
 				},
@@ -1615,6 +1539,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				animationColor:'gray',
 				prompt:"限定技，出牌阶段，你可以对一至三名角色造成至多共3点火焰伤害（你可以任意分配每名目标角色受到的伤害点数），若你将对一名角色分配2点或更多的火焰伤害，你须先弃置四张不同花色的手牌再失去3点体力。",
 				filter:function (event,player){
+					if(!game.hasPlayer(function(current){
+						return current.hasSkill('xinfu_jianjie');
+					})) return false;
 					return player.hasSkill('smh_lianhuan');
 				},
 				filterTarget:function (card,player,target){
@@ -1774,7 +1701,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							else{
 								return att/100;
 							}
-						}).set('enemy',get.value(event.togive[0])<0);
+						}).set('enemy',get.value(event.togive[0],player,'raw')<0);
 					}
 					"step 3"
 					if(result.targets.length){
@@ -2089,12 +2016,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				prompt:"弃置“后土”标记将一张手牌当桃使用",
 				check:function (card){return 15-get.value(card)},
 				precontent:function (){
-					player.hasMark('xinfu_falu_club');
+					player.removeMark('xinfu_falu_club');
 				},
 				ai:{
 					skillTagFilter:function (player){
 						if(!player.isDying()) return false;
-						return player.storage.xinfu_falu_map.club;
+						return player.hasMark('xinfu_falu_club');
 					},
 					save:true,
 					respondTao:true,
@@ -3583,10 +3510,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.addTempSkill('xinfu_kannan_phase');
 						if(!target.hasSkill('kannan_eff')){
 							target.addSkill('kannan_eff');
-						}else{
+						}
+						else{
 							if(!target.storage.kannan_eff) player.storage.kannan_eff=0;
-							target.storage.kannan_eff++;
-							target.markSkill('kannan_eff');
+							//target.storage.kannan_eff++;
+							//target.markSkill('kannan_eff');
 						}
 						target.storage.kannan_eff++;
 						target.markSkill('kannan_eff');
@@ -3606,10 +3534,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				content:function (){
-				"step 0"
 					if(!trigger.baseDamage) trigger.baseDamage=1;
 					trigger.baseDamage+=player.storage.kannan_eff;
-					"step 1"
 					player.removeSkill('kannan_eff');
 				},
 				init:function (player){

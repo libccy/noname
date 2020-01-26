@@ -726,7 +726,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										}
 										'step 3'
 										if(game.playerx().length<=4&&!_status._aozhan){
-											game.countPlayer(function(current){
+											game.countPlayer2(function(current){
 												delete current._toKill;
 												delete current._toSave;
 											});
@@ -801,6 +801,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									logTarget:'source',
 									content:function(){
 										var source=trigger.source;
+										source.draw();
+										if(source.skillH.length==3) source.removeSkillH(source.skillH.randomGet());
+										var skills=lib.huanhuazhizhan.skills;
+										skills.randomSort();
+										for(var i=0;i<skills.length;i++){
+											if(!source.skillH.contains(skills[i])){
+												source.addSkillH(skills[i]);
+												break;
+											}
+										}
 									},
 								},
 								hhzz_huizhen:{
@@ -1021,11 +1031,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									}
 									game.me.addSkillH(result.control);
 									game.countPlayer(function(current){
-										current.storage._lingli=0;
 										if(!current.name){
 											current.init(_status.characterlist.randomRemove(1)[0]);
 											current.addSkillH(['xiandeng','shulv','xisheng'].randomGet());
 										}
+										current.storage._lingli=0;
+										current.markSkill('_lingli');
 									});
 									game.showIdentity(true);
 									'step 3'

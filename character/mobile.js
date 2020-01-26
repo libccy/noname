@@ -148,8 +148,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return num+player.getDamagedHp();
 					},
 				},
-				audio:2,
-				trigger:{player:'phaseDiscardBegin'},
+				//audio:2,
+				//trigger:{player:'phaseDiscardBegin'},
 				forced:true,
 				firstDo:true,
 				filter:function(event,player){

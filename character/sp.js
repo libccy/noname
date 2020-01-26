@@ -669,7 +669,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'useCardAfter'},
 				filter:function(event,player){
-					return event.card.name=='nanman'&&game.countPlayer(function(current){
+					return event.card.name=='nanman'&&game.countPlayer2(function(current){
 						return current.getHistory('damage',function(evt){
 							return evt.getParent(2)==event;
 						}).length>0;
@@ -677,7 +677,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				frequent:true,
 				content:function(){
-				 var num=game.countPlayer(function(current){
+				 var num=game.countPlayer2(function(current){
 						return current.getHistory('damage',function(evt){
 							return evt.getParent(2)==trigger;
 						}).length>0;
@@ -9949,6 +9949,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				//usable:3,
 				filter:function(event,player){
+					if(_status.currentPhase!=player) return false;
 					var evt=player.getLastUsed(1);
 					if(!evt) return false;
 					var color1=get.color(evt.card);
@@ -10336,17 +10337,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseControl('draw_card','加伤害','cancel2').set('prompt',get.prompt2('fengpo'));
 					'step 1'
 					if(result.control&&result.control!='cancel2'){
-						player.logSkill('fengpo');
+						player.logSkill('fengpo',trigger.target);
 						var nd=trigger.target.countCards('h',{suit:'diamond'});
 						if(result.control=='draw_card'){
 							player.draw(nd);
 						}
 						else{
 							var trigger2=trigger.getParent();
-							if(typeof trigger2.extraDamage!='number'){
-							trigger2.extraDamage=0;
+							if(typeof trigger2.baseDamage!='number'){
+							trigger2.baseDamage=0;
 						}
-						trigger2.extraDamage+=nd;
+						trigger2.baseDamage+=nd;
 						}
 					}
 				}

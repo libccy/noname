@@ -688,14 +688,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jijiang:{
 				audio:'jijiang1',
-				audioname:['liushan','re_liubei'],
+				audioname:['liushan','re_liubei','re_liushan'],
 				unique:true,
 				group:['jijiang1','jijiang2'],
 				zhuSkill:true,
 			},
 			jijiang1:{
 				audio:2,
-				audioname:['liushan','re_liubei'],
+				audioname:['liushan','re_liubei','re_liushan'],
 				trigger:{player:'chooseToRespondBegin'},
 				check:function(event){
 					if(event.jijiang) return false;
@@ -753,8 +753,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jijiang2:{
 				audio:'jijiang1',
-				audioname:['liushan','re_liubei'],
+				audioname:['liushan','re_liubei','re_liushan'],
 				enable:'chooseToUse',
+				prompt:'选择一名目标角色。若有其他蜀势力角色打出【杀】响应，则视为你对其使用此【杀】。',
 				filter:function(event,player){
 					if(event.filterCard&&!event.filterCard({name:'sha'},player,event)) return false;
 					if(!player.hasZhuSkill('jijiang')) return false;

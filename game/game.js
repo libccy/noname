@@ -10082,7 +10082,7 @@
 						}
 					}
 					player.ai.tempIgnore=[];
-					game.countPlayer(function(current){
+					game.countPlayer2(function(current){
 						current.actionHistory.push({useCard:[],respond:[],skipped:[],lose:[],gain:[],sourceDamage:[],damage:[]});
 						current.stat.push({card:{},skill:{}});
 					});
@@ -26097,7 +26097,7 @@
 				else if(typeof arguments[i]=='function'){
 					onerror=arguments[i]
 				}
-				if(_status.video&&arguments[1]!='video') break;
+				if(_status.video) break;
 			}
 			if(_status.skillaudio.contains(str)) return;
 			_status.skillaudio.add(str);
@@ -32582,6 +32582,14 @@
 			}
 			return false;
 		},
+		hasPlayer2:function(func){
+			var players=game.players.slice(0).concat(game.dead);
+			for(var i=0;i<players.length;i++){
+				if(players[i].isOut()) continue;
+				if(func(players[i])) return true;
+			}
+			return false;
+		},
 		countPlayer:function(func){
 			var num=0;
 			if(typeof func!='function'){
@@ -32590,6 +32598,24 @@
 			for(var i=0;i<game.players.length;i++){
 				if(game.players[i].isOut()) continue;
 				var result=func(game.players[i]);
+				if(typeof result=='number'){
+					num+=result;
+				}
+				else if(result){
+					num++;
+				}
+			}
+			return num;
+		},
+		countPlayer2:function(func){
+			var num=0;
+			if(typeof func!='function'){
+				func=lib.filter.all;
+			}
+			var players=game.players.slice(0).concat(game.dead);
+			for(var i=0;i<players.length;i++){
+				if(players[i].isOut()) continue;
+				var result=func(players[i]);
 				if(typeof result=='number'){
 					num+=result;
 				}
@@ -32614,11 +32640,37 @@
 			}
 			return list;
 		},
+		filterPlayer2:function(func,list){
+			if(!Array.isArray(list)){
+				list=[];
+			}
+			if(typeof func!='function'){
+				func=lib.filter.all;
+			}
+			var players=game.players.slice(0).concat(game.dead);
+			for(var i=0;i<game.players.length;i++){
+				if(players[i].isOut()) continue;
+				if(func(players[i])){
+					list.add(players[i]);
+				}
+			}
+			return list;
+		},
 		findPlayer:function(func){
 			for(var i=0;i<game.players.length;i++){
 				if(game.players[i].isOut()) continue;
 				if(func(game.players[i])){
 					return game.players[i];
+				}
+			}
+			return null;
+		},
+		findPlayer2:function(func){
+			var players=game.players.slice(0).concat(game.dead);
+			for(var i=0;i<players.length;i++){
+				if(players[i].isOut()) continue;
+				if(func(players[i])){
+					return players[i];
 				}
 			}
 			return null;

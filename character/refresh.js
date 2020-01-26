@@ -1853,7 +1853,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			reguanxing:{
 				audio:'guanxing',
-				audioname:['jiangwei','re_jiangwei','re_zhugeliang'],
+				audioname:['jiangwei','re_jiangwei','re_zhugeliang','gexuan'],
 				trigger:{player:['phaseZhunbeiBegin','phaseJieshuBegin']},
 				frequent:true,
 				filter:function(event,player,name){
@@ -2885,7 +2885,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			reyingzi:{
 				audio:2,
-				audioname:['heqi','sunce'],
+				audioname:['heqi','sunce','gexuan','re_sunben'],
 				trigger:{player:'phaseDrawBegin2'},
 				forced:true,
 				content:function(){

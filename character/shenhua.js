@@ -2595,7 +2595,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//priority:-50,
 				content:function(){
 					"step 0"
-					player.chooseToDiscard('是否弃置一张牌并令一名其他角色进行一个额外回合？').set('logSkill','fangquan').ai=function(card){
+					player.chooseToDiscard('是否弃置一张牌并令一名其他角色进行一个额外回合？').set('logSkill',player.name=='re_liushan'?'refangquan':'fangquan').ai=function(card){
 						return 20-get.value(card);
 					};
 					"step 1"
@@ -3045,7 +3045,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			hunzi:{
-				audioname:['re_sunben'],
+				//audioname:['re_sunben'],
 				skillAnimation:true,
 				animationColor:'wood',
 				audio:2,
@@ -3084,13 +3084,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhiba:{
 				unique:true,
 				global:'zhiba2',
+				audioname:['re_sunben'],
 				audio:'zhiba2',
 				zhuSkill:true,
 			},
 			zhiba2:{
 				audio:2,
 				audioname:['re_sunben'],
-				forceaudio:true,
+				//forceaudio:true,
 				enable:'phaseUse',
 				prompt:function(){
 					var player=_status.event.player;
@@ -3110,6 +3111,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filterTarget:function(card,player,target){
 					return target.hasZhuSkill('zhiba',player)&&player.canCompare(target);
+				},
+				direct:true,
+				prepare:function(cards,player,targets){
+					targets[0].logSkill('zhiba');
 				},
 				usable:1,
 				content:function(){

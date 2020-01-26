@@ -2523,15 +2523,26 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(get.suit(card)=='spade') return 8-get.value(card);
 					return 5-get.value(card);
 				},
+				contentBefore:function(){
+					var evt=event.getParent();
+					evt.draw=[];
+					if(get.suit(cards[0])=='spade') evt.draw.push(player);
+				},
 				content:function (){
 					"step 0"
-					if(num==0&&get.suit(cards[0])=='spade') player.draw();
-					player.choosePlayerCard(targets[num],'he',true);
+					player.discardPlayerCard(target,'he',true);
 					"step 1"
 					if(result.bool){
-						if(result.links.length) targets[num].discard(result.links[0]);
-						if(get.suit(result.links[0])=='spade') targets[num].draw();
+						if(get.suit(result.cards[0])=='spade') event.getParent().draw.push(target);
 					}
+				},
+				contentAfter:function(){
+					'step 0'
+					var list=event.getParent().draw;
+					if(!list.length) event.finish();
+					else game.asyncDraw(list);
+					'step 1'
+					game.delay();
 				},
 				ai:{
 					result:{

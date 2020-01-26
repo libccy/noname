@@ -218,12 +218,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						var num=0;
-						for(var i=0;i<game.players.length;i++){
-							var history=game.players[i].getHistory('useCard');
+						game.countPlayer2(function(current){
+							var history=current.getHistory('useCard');
 							for(var j=0;j<history.length;j++){
 								if(['basic','trick'].contains(get.type(history[j].card))&&history[j].targets&&history[j].targets.contains(player)) num++;
 							}
-						}
+						});
 						event.num=num;
 						player.chooseBool(get.prompt('xindanshou')+'（可摸'+get.cnNumber(num)+'张牌）',get.translation('xindanshou_info'));
 					}
@@ -6458,9 +6458,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.getParent().triggeredTargets3.length>1) return false;
 					return get.suit(event.card)=='spade'&&
 						_status.currentPhase==event.player&&event.targets&&event.targets.length&&
-						event.player!=player&&!game.hasPlayer(function(current){
+						event.player!=player&&game.countPlayer2(function(current){
 							return current.getHistory('damage').length>0;
-						});
+						})==0;
 				},
 				direct:true,
 				content:function(){
@@ -8890,6 +8890,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zhiyan:{
 				audio:2,
+				audioname:['gexuan'],
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
 				content:function(){

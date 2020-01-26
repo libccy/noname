@@ -561,7 +561,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.delay();
 				},
 				ai:{
-					order:7,
+					order:12,
 					result:{
 						target:function(player,target){
 							var card=ui.selected.cards[0];
@@ -573,12 +573,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								game.countPlayer(function(current){
 									if(current!=player&&target.canUse(card,current)) eff+=get.effect(current,card,target,target)>0
 								});
-								return eff;
+								if(eff>0||get.value(card)<3) return eff;
+								return 0;
 							}
 							else if(game.hasPlayer(function(current){
 								return current!=player&&target.canUse(card,current)&&get.effect(current,card,target,target)>0
 							})) return 1.5;
-							else return -1;
+							else if(get.value(card)<3) return -1;
+							return 0;
 						},
 					},
 				},
@@ -4349,7 +4351,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.player==player) return false;
 					if(_status.currentPhase==event.player) return false;
 					if(event.cards.length!=1) return false;
-					return get.type(event.cards[0])=='equip'&&get.position(event.cards[0])=='h';
+					return get.type(event.cards[0])=='equip'&&get.position(event.cards[0])=='h'&&event.player.hasUseTarget(event.cards[0]);
 				},
 				logTarget:'player',
 				check:function(event,player){
@@ -4399,7 +4401,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.player.$give(1,player);
 					}
 					else{
-						trigger.player.useCard(trigger.cards,trigger.player);
+						trigger.player.chooseUseTarget(trigger.cards[0],true);
 					}
 				}
 			},

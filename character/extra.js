@@ -227,12 +227,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				animationColor:'metal',
 				content:function(){
 					"step 0"
+					event.delay=false;
 					player.removeMark('baonu',6);
 					event.targets=game.filterPlayer();
 					event.targets.remove(player);
 					event.targets.sort(lib.sort.seat);
 					player.line(event.targets,'green');
 					event.targets2=event.targets.slice(0);
+					event.targets3=event.targets.slice(0);
 					"step 1"
 					if(event.targets2.length){
 						event.targets2.shift().damage('nocard');
@@ -244,11 +246,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.current.discard(event.current.getCards('e')).delay=false;
 					}
 					"step 3"
-					event.current.chooseToDiscard('h',true,4).delay=false;
-					"step 4"
 					game.delay(0.5);
 					if(event.targets.length) event.goto(2);
+					"step 4"
+					if(event.targets3.length){
+						event.targets3.shift().chooseToDiscard(4,'h',true).delay=false;
+					}
 					"step 5"
+					game.delay(0.5);
+					if(event.targets3.length) event.goto(4);
+					"step 6"
 					player.turnOver();
 				},
 				ai:{
@@ -1805,7 +1812,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			gongxin:{
 				audio:2,
-				audioname:['re_lvmeng'],
+				audioname:['re_lvmeng','gexuan'],
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
@@ -2337,12 +2344,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.list2=[];
 					if(target.countCards('h')>0){
 						var chooseButton=player.chooseButton(4,'hidden',['你的手牌',player.getCards('h'),get.translation(target.name)+'的手牌',target.getCards('h'),'hidden']);
-					}else{
+					}
+					else{
 						var chooseButton=player.chooseButton(4,'hidden',['你的手牌',player.getCards('h'),'hidden']);
 					}
+					chooseButton.set('target',target);
 					chooseButton.set('ai',function(button){
-						//if(button.link.name=='du') return 1;
-						return 0;
+						var player=_status.event.player;
+						var target=_status.event.target;
+						var ps=[];
+						var ts=[];
+						for(var i=0;i<ui.selected.buttons.length;i++){
+							var card=ui.selected.buttons[i].link;
+							if(target.getCards('h').contains(card)) ts.push(card);
+							else ps.push(card);
+						}
+						var card=button.link;
+						var owner=get.owner(card);
+						var val=get.value(card)||1;
+						if(owner==target){
+							if(ts.length>1) return 0;
+							if(ts.length==0||player.hp>3) return val;
+							return 2*val;
+						}
+						return 7-val;
 					});
 					chooseButton.set('filterButton',function(button){
 						for(var i=0;i<ui.selected.buttons.length;i++){
@@ -2522,29 +2547,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_junlve":"军略",
 			"nzry_junlve_info":"锁定技，当你受到或造成伤害后，你获得X个“军略”标记(X为伤害点数)",
 			"nzry_cuike":"摧克",
-			"nzry_cuike_info":"出牌阶段开始时，若“军略”标记的数量为奇数，你可以对一名角色造成一点伤害;若“军略”标记的数量为偶数，你可以横置一名角色并弃置其区域内的一张牌。若“军略”标记的数量超过7个，你可以移去全部“军略”标记并对所有其他角色造成一点伤害",
+			"nzry_cuike_info":"出牌阶段开始时，若“军略”标记的数量为奇数，你可以对一名角色造成一点伤害；若“军略”标记的数量为偶数，你可以横置一名角色并弃置其区域内的一张牌。然后，若“军略”标记的数量超过7个，你可以移去全部“军略”标记并对所有其他角色造成一点伤害",
 			"nzry_dinghuo":"绽火",
-			"nzry_dinghuo_info":"限定技，出牌阶段，你可以移去全部“军略”标记，令至多等量的已横置角色弃置所有装备区内的牌。然后，你对其中一名角色造成1点火焰伤害",
+			"nzry_dinghuo_info":"限定技，出牌阶段，你可以移去全部“军略”标记，令至多等量的已横置角色弃置所有装备区内的牌。然后，你对其中一名角色造成1点火焰伤害。",
 			"shen_liubei":"神刘备",
 			"nzry_longnu":"龙怒",
-			"nzry_longnu_info":"转换技，锁定技，①出牌阶段开始时，你流失1点体力并摸一张牌，然后本回合你的红色手牌均视为火杀且无距离限制。②出牌阶段开始时，你减1点体力上限并摸一张牌，然后本回合你的锦囊牌均视为雷杀且无使用次数限制",
+			"nzry_longnu_info":"转换技，锁定技，①出牌阶段开始时，你失去1点体力并摸一张牌，然后本回合内你的红色手牌均视为火【杀】且无距离限制。②出牌阶段开始时，你减1点体力上限并摸一张牌，然后本回合你的锦囊牌均视为雷【杀】且无使用次数限制。",
 			"nzry_jieying":"结营",
-			"nzry_jieying_info":"锁定技，你始终处于横置状态;已横置的角色手牌上限+2;结束阶段，你横置一名其他角色",
+			"nzry_jieying_info":"锁定技，游戏开始时或当你的武将牌重置时，你横置；所有已横置的角色手牌上限+2；结束阶段，你横置一名其他角色。",
 			
 			"shen_ganning":"神甘宁",
 			"shen_zhangliao":"神张辽",
 			
 			"drlt_poxi":"魄袭",
-			"drlt_poxi_info":"出牌阶段限一次，你可以观看一名其他角色的手牌，然后你可以弃置你与其手牌中的四张花色不同的牌。若如此做，根据此次弃置你的牌的数量执行以下效果：1.没有，扣减一点体力上限；2.一张，立即结束出牌阶段且本回合手牌上限-1；三张，恢复一点体力；四张，摸四张牌",
+			"drlt_poxi_info":"出牌阶段限一次，你可以观看一名其他角色的手牌，然后你可以弃置你与其手牌中的四张花色不同的牌。若如此做，根据此次弃置你的牌的数量执行以下效果：零张，扣减一点体力上限；一张，你结束出牌阶段且本回合手牌上限-1；三张，你回复一点体力；四张，你摸四张牌",
 			"drlt_jieying":"劫营",
-			"drlt_jieying_info":"回合开始时，若没有角色有“营”标记，你获得1个“营”标记；结束阶段，你可以将你的“营”交给一名角色；有“营”标记的角色摸牌阶段多摸一张牌，其于出牌阶段使用【杀】的次数上限+1，其手牌上限+1。有“营”的其他角色回合结束后，其移去“营”标记，然后你获得其所有手牌。",
+			"drlt_jieying_info":"回合开始时，若场上没有拥有“营”标记的角色，你获得1个“营”标记；结束阶段，你可以将你的一个“营”标记交给一名角色；有“营”标记的角色摸牌阶段多摸一张牌，出牌阶段使用【杀】的次数上限+1，手牌上限+1。有“营”的其他角色回合结束时，其移去“营”标记，然后你获得其所有手牌。",
 			drlt_jieying_mark:"劫营",
 			"drlt_duorui1":"失效技能",
 			"drlt_duorui1_bg":"锐",
 			"drlt_duorui":"夺锐",
-			"drlt_duorui_info":"当你于出牌阶段内对一名其他角色造成伤害后，你可以废除你装备区内的一个装备栏（若已全部废除则可以跳过此步骤），然后获得其的一个技能直到其的下回合结束或其死亡(觉醒技，限定技，主公技等特殊技能除外)。若如此做，该角色该技能失效且你不能再发动〖夺锐〗直到你失去此技能。",
+			"drlt_duorui_info":"当你于出牌阶段内对一名其他角色造成伤害后，你可以废除你装备区内的一个装备栏（若已全部废除则可以跳过此步骤），然后获得该角色的一个技能直到其的下回合结束或其死亡(觉醒技，限定技，主公技等特殊技能除外)。若如此做，该角色该技能失效且你不能再发动〖夺锐〗直到你失去以此法获得的技能。",
 			"drlt_zhiti":"止啼",
-			"drlt_zhiti_info":"锁定技，你范围内已受伤的其他角色手牌上限-1；当你拼点或【决斗】胜利，或受到伤害后，你恢复一个装备栏",
+			"drlt_zhiti_info":"锁定技，你攻击范围内已受伤的其他角色手牌上限-1；当你拼点或【决斗】胜利，或受到伤害后，你恢复一个装备栏",
 			
 			shen_zhaoyun:'神赵云',
 			shen_guanyu:'神关羽',
@@ -2555,13 +2580,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_zhouyu:'神周瑜',
 			shen_lvbu:'神吕布',
 			xinjuejing:'绝境',
-			xinjuejing_info:'锁定技，你的手牌上限+2；当你进入或脱离濒死状态时，你摸一张牌',
+			xinjuejing_info:'锁定技，你的手牌上限+2；当你进入或脱离濒死状态时，你摸一张牌。',
 			xinlonghun:'龙魂',
 			xinlonghun1:'龙魂♥︎',
 			xinlonghun2:'龙魂♦︎',
 			xinlonghun3:'龙魂♠︎',
 			xinlonghun4:'龙魂♣︎',
-			xinlonghun_info:'你可以将同花色的X张牌按下列规则使用或打出：红桃当【桃】，方块当具火焰伤害的【杀】，梅花当【闪】，黑桃当【无懈可击】。若你以此法使用了两张红色牌，则此牌回复值或伤害值+1。若你以此法使用了两张黑色牌，则你弃置当前回合角色一张牌',
+			xinlonghun_info:'你可以将同花色的一至两张牌按下列规则使用或打出：红桃当【桃】，方块当火【杀】，梅花当【闪】，黑桃当普【无懈可击】。若你以此法使用了两张红色牌，则此牌回复值或伤害值+1。若你以此法使用了两张黑色牌，则你弃置当前回合角色一张牌。',
 			longhun:'龙魂',
 			longhun1:'龙魂♥︎',
 			longhun2:'龙魂♦︎',
@@ -2571,7 +2596,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			longhun_info:'你可以将同花色的X张牌按下列规则使用或打出：红桃当【桃】，方块当具火焰伤害的【杀】，梅花当【闪】，黑桃当【无懈可击】（X为你当前的体力值且至少为1）',
 			juejing_info:'锁定技，摸牌阶段，你摸牌的数量改为你已损失的体力值+2；你的手牌上限+2。',
 			wushen:'武神',
-			wushen_info:'锁定技，你的红桃手牌视为杀；锁定技，你使用红桃杀时无距离限制。',
+			wushen_info:'锁定技，你的红桃手牌和判定牌均视为【杀】；锁定技，你使用红桃【杀】无距离限制。',
 			wuhun:'武魂',
 			wuhun21:'武魂',
 			wuhun22:'武魂',
@@ -2586,26 +2611,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gongxin_top:'牌堆顶',
 			renjie:'忍戒',
 			renjie2:'忍戒',
-			renjie_info:'锁定技，每当你受到一次伤害后，你获得等同于你受到的伤害数量的“忍”标记；锁定技，每当你于弃牌阶段内因你的弃置而失去手牌时，你获得等同于你失去的手牌数量的“忍”标记。',
+			renjie_info:'锁定技，当你受到1点伤害后，你获得一枚“忍”标记；锁定技，当你于弃牌阶段内弃置牌后，你获得等同于失去的牌数量的“忍”标记。',
 			sbaiyin:'拜印',
-			sbaiyin_info:'觉醒技，准备阶段开始时，若你拥有的“忍”标记枚数不小于4，你减1点体力上限，然后获得“极略”',
+			sbaiyin_info:'觉醒技，准备阶段开始时，若你的“忍”标记数不小于4，你减1点体力上限，然后获得〖极略〗',
 			jilue:'极略',
-			jilue_info:'每当一名角色的判定牌生效前，若你有牌，你可以弃1枚“忍”标记发动“鬼才”(界)；每当你受到伤害后，你可以弃1枚“忍”标记，发动“放逐”；每当你使用锦囊牌时，你可以弃1枚“忍”标记，发动“集智”(界)；出牌阶段限一次，若你有牌，你可以弃1枚“忍”标记，发动“制衡”(界)；出牌阶段，你可以弃1枚“忍”标记，执行“完杀”的效果，直到回合结束。',
+			jilue_info:'当一名角色的判定牌生效前，你可以弃1枚“忍”标记并发动〖鬼才〗；每当你受到伤害后，你可以弃1枚“忍”标记并发动〖放逐〗；当你使用普通锦囊牌时，你可以弃1枚“忍”标记并发动〖集智〗；出牌阶段限一次，你可以弃1枚“忍”标记并发动〖制衡〗；出牌阶段，你可以弃1枚“忍”标记并获得〖完杀〗直到回合结束。',
 			jilue_guicai:'鬼才',
 			jilue_fangzhu:'放逐',
 			jilue_wansha:'完杀',
 			jilue_zhiheng:'制衡',
 			jilue_jizhi:'集智',
 			lianpo:'连破',
-			lianpo_info:'若你在一回合内杀死了至少一名角色，此回合结束后，你可以进行一个额外的回合。',
+			lianpo_info:'一名角色的回合结束时，若你本回合内杀死过角色，则你可以进行一个额外的回合。',
 			guixin:'归心',
 			qinyin:'琴音',
 			yeyan:'业炎',
-			shelie_info:'摸牌阶段，你可以改为从牌堆顶亮出五张牌，你获得不同花色的牌各一张',
-			gongxin_info:'出牌阶段，你可以观看一名其他角色的手牌，并可以展示其中一张红桃牌，然后将其弃置或置于牌堆顶，每阶段限一次。',
+			shelie_info:'摸牌阶段，你可以改为从牌堆顶亮出五张牌，然后选择获得不同花色的牌各一张。',
+			gongxin_info:'出牌阶段限一次，你可以观看一名其他角色的手牌，并可以展示其中一张红桃牌，然后将其弃置或置于牌堆顶。',
 			guixin_info:'当你受到1点伤害后，你可以获得每名其他角色区域里的一张牌，然后你翻面',
 			guixin_info_alter:'当你受到1点伤害后，你可以随机获得每名其他角色区域里的一张牌，然后你翻面',
-			qinyin_info:'弃牌阶段结束时，若你于此阶段内弃置过你的至少两张手牌，则你可以选择一项：1. 所有角色各回复1点体力；2. 所有角色各失去1点体力。',
+			qinyin_info:'弃牌阶段结束时，若你于此阶段内弃置过两张或更多的牌，则你可以选择一项：1. 令所有角色各回复1点体力；2. 令所有角色各失去1点体力。',
 			// qinyin_info:'每当你于弃牌阶段内因你的弃置而失去第X张手牌时（X至少为2），你可以选择一项：1.令所有角色各回复1点体力；2.令所有角色各失去1点体力。每阶段限一次。',
 			yeyan_info:'限定技，出牌阶段，你可以对一至三名角色造成至多共3点火焰伤害（你可以任意分配每名目标角色受到的伤害点数），若你将对一名角色分配2点或更多的火焰伤害，你须先弃置四张不同花色的手牌再失去3点体力。',
 			qixing:'七星',
@@ -2618,30 +2643,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dawu2:'大雾',
 			dawu3:'大雾',
 			// dawu2_info:'已获得大雾标记',
-			dawu_info:'结束阶段，你可以弃置X枚“星”并指定X名角色：直到你的下回合开始，防止这些角色受到的除雷电伤害外的伤害。',
+			dawu_info:'结束阶段，你可以弃置X张“星”并指定等量的角色：直到你的下回合开始，当这些角色受到非雷电伤害时，防止此伤害。',
 			kuangfeng:'狂风',
 			kuangfeng2:'狂风',
 			kuangfeng2_bg:'风',
 			// kuangfeng2_info:'已获得狂风标记',
 			kuangfeng3:'狂风',
-			kuangfeng_info:'结束阶段，你可以弃置1枚“星”并指定一名角色：直到你的下回合开始，该角色每次受到的火焰伤害+1。',
+			kuangfeng_info:'结束阶段，你可以弃置1张“星”并指定一名角色：直到你的下回合开始，该角色受到火焰伤害时，此伤害+1。',
 			baonu:'狂暴',
 			baonu_bg:'暴',
-			baonu_info:'锁定技，游戏开始时，你获得两枚“暴怒”标记，；锁定技，每当你造成/受到1点伤害后，你获得1枚“暴怒”标记。',
+			baonu_info:'锁定技，游戏开始时，你获得两枚“暴怒”标记；锁定技，当你造成/受到1点伤害后，你获得1枚“暴怒”标记。',
 			shenfen:'神愤',
 			shenfen_info:'限定技，出牌阶段，你可以弃置6枚暴怒标记，对场上所有其他角色造成一点伤害，然后令其弃置4张牌',
 			wuqian:'无前',
 			wuqian_info:'出牌阶段，你可以弃置两枚暴怒标记并获得技能【无双】直到回合结束',
 			wumou:'无谋',
-			wumou_info:'锁定技，每当你使用非延时类锦囊牌选择目标后，你选择一项：1.弃1枚“暴怒”标记；2.失去1点体力。',
+			wumou_info:'锁定技，当你使用普通锦囊牌时，你选择一项：1.弃置1枚“暴怒”标记；2.失去1点体力。',
 			ol_wuqian:'无前',
-			ol_wuqian_info:'出牌阶段，你可以弃2枚“暴怒”标记并选择一名其他角色，你视为拥有技能〖无双〗并令其防具无效直到回合结束。',
+			ol_wuqian_info:'出牌阶段，你可以弃置2枚“暴怒”标记并选择一名本回合内未选择过的其他角色，你获得技能〖无双〗并令其防具无效直到回合结束。',
 			ol_shenfen:'神愤',
-			ol_shenfen_info:'出牌阶段限一次，你可以弃6枚“暴怒”标记并选择所有其他角色，对其各造成1点伤害。然后这些角色先各弃置其装备区里的牌，再各弃置四张手牌。最后你将你的武将牌翻面。',
+			ol_shenfen_info:'出牌阶段限一次，你可以弃置6枚“暴怒”标记并选择所有其他角色，对这些角色各造成1点伤害。然后这些角色先各弃置其装备区里的牌，再各弃置四张手牌。最后你将你的武将牌翻面。',
 			"new_wuhun":"武魂",
-			"new_wuhun_info":"锁定技，当你受到伤害后，伤害来源获得X个“梦魇”标记（X为伤害点数）。锁定技，当你死亡时，你选择一名“梦魇”标记数量最多的其他角色。你的死亡流程结算完成后，该角色进行一次判定：若判定结果不为【桃】或【桃园结义】，则该角色立刻死亡。",
+			"new_wuhun_info":"锁定技，当你受到伤害后，伤害来源获得X个“梦魇”标记（X为伤害点数）。锁定技，当你死亡时，你选择一名“梦魇”标记数量最多的其他角色。该角色进行判定：若判定结果不为【桃】或【桃园结义】，则该角色死亡。",
 			"new_guixin":"归心",
-			"new_guixin_info":"当你受到1点伤害后，你可以随机获得每名其他角色区域里的一张牌，然后你翻面。",
+			"new_guixin_info":"当你受到1点伤害后，你可以按照你选择的区域优先度随机获得每名其他角色区域里的一张牌，然后你翻面。",
 		},
 	};
 });
