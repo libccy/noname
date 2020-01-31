@@ -2300,7 +2300,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addSkill('biaozhao2');
 						player.addSkill('biaozhao3');
 						player.logSkill('biaozhao');
-						player.lose(result.cards,ui.special,'toStorage');
+						player.lose(result.cards,ui.special,'toStorage','visible');
+						player.$give(result.cards,player,false);
 						player.storage.biaozhao=result.cards;
 						player.markSkill('biaozhao');
 					}
@@ -10345,7 +10346,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else{
 							var trigger2=trigger.getParent();
 							if(typeof trigger2.baseDamage!='number'){
-							trigger2.baseDamage=0;
+							trigger2.baseDamage=1;
 						}
 						trigger2.baseDamage+=nd;
 						}

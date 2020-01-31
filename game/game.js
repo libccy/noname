@@ -22878,6 +22878,8 @@
 				},
 				trigger:function(name){
 					if(_status.video) return;
+					if((this.name==='gain'||this.name==='lose')&&!_status.gameDrawed) return;
+					if(name==='gameDrawEnd') _status.gameDrawed=true;
 					if(name==='gameStart'){
 						if(_status.brawl&&_status.brawl.gameStart){
 							_status.brawl.gameStart();

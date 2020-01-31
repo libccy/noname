@@ -4896,6 +4896,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					skillTagFilter:function(player,tag,arg){
 						if(arg.target!=player.storage.xinxianzhen) return false;
 					},
+					effect:{
+						player:function(card,player,target){
+							if(target==player.storage.xinxianzhen&&['sha','guohe','shunshou','huogong','juedou'].contains(card.name)){
+								if(game.hasPlayer(function(current){
+									return current!=target&&player.canUse(card,current)&&get.effect(current,card,player,player)>0;
+								})){
+									return [1,1];
+								}
+							}
+						}
+					}
 				},
 				trigger:{player:'useCard2'},
 				filter:function(event,player){

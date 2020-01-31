@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'1.9.97.4',
+	'1.9.97.5',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -2102,6 +2102,7 @@ window.noname_asset_list=[
 	'image/background/kyoani_bg.jpg',
 	'image/background/planetarian_bg.jpg',
 	'image/background/ol_bg.jpg',
+	'image/background/heaven_bg.jpg',
 	'image/background/noname_bg.jpg',
 	'image/background/wuming_bg.jpg',
 	'image/background/september_bg.jpg',
@@ -2473,6 +2474,7 @@ window.noname_asset_list=[
 	'image/character/key_yuri.jpg',
 	'image/character/key_kyousuke.jpg',
 	'image/character/key_lucia.jpg',
+	'image/character/key_kagari.jpg',
 	'image/character/re_yujin.jpg',
 	'image/character/re_caopi.jpg',
 	'image/character/re_dongzhuo.jpg',

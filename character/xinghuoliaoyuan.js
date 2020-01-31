@@ -608,8 +608,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					dis:{
 						mod:{
 							maxHandcard:function (player,num){
-					return num-2;
-				},
+								return num-2;
+							},
 						},
 						sub:true,
 					},
@@ -639,7 +639,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'令自己本回合的手牌上限-2'
 						]).set('ai',function(){
 							var player=_status.event.player;
-							var source=_status.event.getParent().player;
+							var source=_status.event.getParent().source;
 							if(get.attitude(player,source)>0) return 0;
 							if(player.hp-player.countCards('h')>1) return 1;
 							return [0,1].randomGet();

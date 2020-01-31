@@ -1393,7 +1393,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.delay(0.5)
 					'step 1'
 					var card=event.chosen;
-					player.lose(card,ui.special);
+					player.lose(card,ui.discardPile);
 					player.$throw(card,1000);
 					game.delay(0.5);
 					game.log(player,'重铸了',card);

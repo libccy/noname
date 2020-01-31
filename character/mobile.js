@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			mobile:{
 				mobile_default:["miheng","taoqian","liuzan","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding"],
-				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang"],
+				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong"],
 			},
 		},
 		character:{
@@ -33,6 +33,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_baosanniang:['female','shu',3,['meiyong','rexushen','rezhennan']],
 			
 			hujinding:['female','shu','2/6',['renshi','wuyuan','huaizi']],
+			
+			re_zhanggong:['male','wei',3,['reqianxin','xinfu_zhenxing']],
+			re_xugong:['male','wu',3,['rebiaozhao','yechou']],
+			re_weiwenzhugezhi:['male','wu',4,['refuhai']],
 		},
 		characterIntro:{
 			shenpei:'审配（？－204年），字正南，魏郡阴安（今河北清丰北）人。为人正直， 袁绍领冀州，审配被委以腹心之任，并总幕府。河北平定，袁绍以审配、逢纪统军事，审配恃其强盛，力主与曹操决战。曾率领弓弩手大破曹军于官渡。官渡战败，审配二子被俘，反因此受谮见疑，幸得逢纪力保。袁绍病死，审配等矫诏立袁尚为嗣，导致兄弟相争，被曹操各个击破。曹操围邺，审配死守数月，终城破被擒，拒不投降，慷慨受死。',
@@ -77,6 +81,225 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		skill:{
+			refuhai:{
+				audio:'xinfu_fuhai',
+				enable:'phaseUse',
+				usable:1,
+				filterCard:true,
+				check:function(card){
+					if(game.players.length<3) return 0;
+					return 5-get.value(card);
+				},
+				content:function(){
+					'step 0'
+					event.current=player.next;
+					event.upper=[];
+					event.lower=[];
+					event.acted=[];
+					event.num=0;
+					event.stopped=false;
+					'step 1'
+					event.acted.push(event.current);
+					event.current.chooseControl('潮起','潮落').set('prompt','潮鸣起乎？潮鸣落乎？').ai=function(){
+						return Math.random()<0.5?0:1;
+					};
+					'step 2'
+					if(!event.chosen) event.chosen=result.control;
+					if(event.chosen!=result.control) event.stopped=true;
+					if(!event.stopped) event.num++;
+					if(result.control=='潮起'){
+						event.upper.push(event.current)
+					}
+					else event.lower.push(event.current);
+					event.current=event.current.next;
+					if(event.current!=player&&!event.acted.contains(event.current)) event.goto(1);
+					'step 3'
+					for(var i=0;i<event.acted.length;i++){
+						var bool=event.upper.contains(event.acted[i]);
+						game.log(event.acted[i],'选择了',bool?'#g潮起':'#y潮落');
+						event.acted[i].popup(bool?'潮起':'潮落',bool?'wood':'orange');
+					}
+					game.delay(1);
+					'step 4'
+					if(num>1) player.draw(num);
+				},
+				ai:{
+					order:1,
+					result:{player:1},
+				},
+			},
+			rebiaozhao:{
+				audio:'biaozhao',
+				intro:{
+					content:"cards",
+				},
+				trigger:{
+					player:"phaseJieshuBegin",
+				},
+				direct:true,
+				filter:function (event,player){
+					return player.countCards('he')>0&&!player.storage.rebiaozhao;
+				},
+				content:function (){
+					'step 0'
+					player.chooseCard('he',get.prompt2('rebiaozhao')).ai=function(card){
+						return 6-get.value(card);
+					}
+					'step 1'
+					if(result.bool){
+						player.addSkill('rebiaozhao2');
+						player.addSkill('rebiaozhao3');
+						player.logSkill('rebiaozhao');
+						player.$give(result.cards,player,false);
+						player.lose(result.cards,ui.special,'toStorage','visible');
+						player.storage.rebiaozhao=result.cards;
+						player.markSkill('rebiaozhao');
+					}
+				},
+			},
+			"rebiaozhao2":{
+				trigger:{
+					global:["loseEnd","cardsDiscardEnd"],
+				},
+				charlotte:true,
+				forced:true,
+				audio:"biaozhao",
+				filter:function (event,player){
+					if(!player.storage.rebiaozhao) return false;
+					var num=get.number(player.storage.rebiaozhao[0]);
+					for(var i=0;i<event.cards.length;i++){
+						if(get.position(event.cards[i],true)=='d'&&get.number(event.cards[i])==num) return true;
+					}
+					return false;
+				},
+				content:function (){
+					"step 0"
+					var card=player.storage.rebiaozhao[0];
+					delete player.storage.rebiaozhao;
+					player.$throw(card);
+					game.cardsDiscard(card);
+					"step 1"
+					player.unmarkSkill('rebiaozhao');
+					player.loseHp();
+				},
+			},
+			"rebiaozhao3":{
+				trigger:{
+					player:"phaseZhunbeiBegin",
+				},
+				forced:true,
+				charlotte:true,
+				audio:"biaozhao",
+				filter:function (event,player){
+					return player.storage.rebiaozhao!=undefined;
+				},
+				content:function (){
+					"step 0"
+					var card=player.storage.rebiaozhao[0];
+					delete player.storage.rebiaozhao;
+					player.unmarkSkill('rebiaozhao');
+					game.cardsDiscard(card);
+					player.chooseTarget('令一名角色摸三张牌并回复1点体力',true).ai=function(target){
+						var num=2;
+						if(target.isDamaged()) num++;
+						return num*get.attitude(_status.event.player,target);
+					};
+					"step 1"
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target,'green');
+						target.draw(3);
+						target.recover();
+					}
+				},
+			},
+			reqianxin:{
+				audio:'xinfu_qianxin',
+				enable:'phaseUse',
+				usable:1,
+				filterCard:true,
+				selectCard:function(){
+					return [1,Math.min(2,game.players.length-1)];
+				},
+				check:function(card){
+					return 6-get.value(card);
+				},
+				discard:false,
+				lose:false,
+				delay:0,
+				content:function(){
+					var targets=game.filterPlayer(function(current){
+						return current!=player;
+					}).randomGets(cards.length);
+					for(var i=0;i<targets.length;i++){
+						var target=targets[i];
+						target.addSkill('reqianxin2');
+						target.storage.reqianxin2.push([cards[i],player]);
+						player.$give(1,target);
+						target.gain(cards[i],player);
+					}
+				},
+				ai:{
+					order:1,
+					result:{
+						player:1,
+					},
+				},
+			},
+			reqianxin2:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				forced:true,
+				popup:false,
+				charlotte:true,
+				init:function(player,skill){
+					if(!player.storage[skill]) player.storage[skill]=[];
+				},
+				onremove:true,
+				filter:function(event,player){
+					var list=player.storage.reqianxin2;
+					if(Array.isArray(list)){
+						var hs=player.getCards('h');
+						for(var i=0;i<list.length;i++){
+							if(hs.contains(list[i][0])&&list[i][1].isIn()) return true;
+						}
+					}
+					return false;
+				},
+				content:function(){
+					'step 0'
+					var current=player.storage.reqianxin2.shift();
+					event.source=current[1];
+					if(!event.source.isIn()||!player.getCards('h').contains(current[0])) event.goto(3);
+					'step 1'
+					source.logSkill('reqianxin',player);
+					player.chooseControl().set('choiceList',[
+						'令'+get.translation(source)+'摸两张牌',
+						'令自己本回合的手牌上限-2',
+					]).set('prompt',get.translation(source)+'发动了【遣信】，请选择一项').set('source',source).set('ai',function(){
+						var player=_status.event.player;
+						if(get.attitude(player,_status.event.source)>0) return 0;
+						if(player.maxHp-player.countCards('h')>1) return 1;
+						return Math.random()>0.5?0:1;
+					});
+					'step 2'
+					if(result.index==0) source.draw(2);
+					else{
+						player.addTempSkill('reqianxin3')
+						player.addMark('reqianxin3',2,false)
+					}
+					'step 3'
+					if(player.storage.reqianxin2.length) event.goto(0);
+					else player.removeSkill('reqianxin2');
+				},
+			},
+			reqianxin3:{
+				onremove:true,
+				mod:{
+					maxHandcard:function(player,num){
+						return num-player.countMark('reqianxin3');
+					},
+				},
+			},
 			renshi:{
 				audio:2,
 				trigger:{player:'damageBegin4'},
@@ -1309,6 +1532,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			renshi_info:'锁定技，当你受到【杀】的伤害时，若你已受伤，则你防止此伤害并获得此【杀】对应的所有实体牌，然后减1点体力上限。',
 			wuyuan:'武缘',
 			wuyuan_info:'出牌阶段限一次，你可将一张【杀】交给一名其他角色，然后你回复1点体力，其摸一张牌。若此【杀】为：红色【杀】，其回复1点体力；属性【杀】，其改为摸两张牌。',
+			
+			re_weiwenzhugezhi:'手杀卫温诸葛直',
+			re_xugong:'手杀许贡',
+			re_zhanggong:'手杀张恭',
+			reqianxin:'遣信',
+			reqianxin_info:'出牌阶段限一次，你可将至多两张手牌随机交给等量的其他角色，称为「信」。这些角色的准备阶段开始时，若其手牌中有「信」，则其选择一项：令你摸两张牌，本回合手牌上限-2。',
+			rebiaozhao:"表召",
+			"rebiaozhao_info":"结束阶段，你可以将一张牌置于武将牌上，称为「表」。当有一张与「表」点数相同的牌进入弃牌堆时，你将「表」置入弃牌堆并失去1点体力。准备阶段，若你的武将牌上有「表」，则你移去「表」并选择一名角色，该角色回复1点体力并摸三张牌。",
+			"rebiaozhao2":"表召",
+			"rebiaozhao2_info":"",
+			"rebiaozhao3":"表召",
+			"rebiaozhao3_info":"",
+			refuhai:'浮海',
+			refuhai_info:'出牌阶段限一次，你可弃置一张手牌，令其他角色同时在「潮起」和「潮落」中选择一项，并依次展示这些角色的选项。若从你下家开始选择了相同选项的角色数目大于1，则你摸X张牌（X为连续相同结果的数量）。',
 		}
 	};
 });
