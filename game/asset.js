@@ -2527,6 +2527,9 @@ window.noname_asset_list=[
 	'image/character/old_fuhuanghou.jpg',
 	'image/character/old_caochong.jpg',
 	'image/character/huaman.jpg',
+	'image/character/re_zhanggong.jpg',
+	'image/character/re_weiwenzhugezhi.jpg',
+	'image/character/re_xugong.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
