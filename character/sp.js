@@ -13224,7 +13224,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.removeAdditionalSkill('baobian');
 					var list=[];
 					if(player.hp<=3){
-						if(trigger.num!=undefined&&trigger.num<0&&player.hp-trigger.num>1) player.logSkill('baobian');
+						//if(trigger.num!=undefined&&trigger.num<0&&player.hp-trigger.num>1) player.logSkill('baobian');
 						list.push('retiaoxin');
 					}
 					if(player.hp<=2){
