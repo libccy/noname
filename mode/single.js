@@ -555,7 +555,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<lib.configOL.characterPack.length;i++){
 						var pack=lib.characterPack[lib.configOL.characterPack[i]];
 						for(var j in pack){
-							if(j=='zuoci'||j=='miheng') continue;
+							if(j=='zuoci') continue;
 							if(lib.character[j]) libCharacter[j]=pack[j];
 						}
 					}
@@ -578,6 +578,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					game.broadcastAll(function(player,character,id){
 						player.init(character);
+						if(player==game.me) game.addRecentCharacter(character);
 					},game.zhu,result.links[0]);
 					game.fan.chooseButton(true).set('ai',function(button){
 						return Math.random();
@@ -590,6 +591,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							dialog.close();
 						}
 						player.init(character);
+						if(player==game.me) game.addRecentCharacter(character);
 						setTimeout(function(){
 							ui.arena.classList.remove('choose-character');
 						},500);

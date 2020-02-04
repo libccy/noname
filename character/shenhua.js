@@ -3870,7 +3870,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			juxiang:{
-				unique:true,
+				//unique:true,
 				locked:true,
 				audio:"juxiang1",
 				audioname:['re_zhurong'],
@@ -4948,7 +4948,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
-					player.chooseTarget(get.prompt2('jieming'),[1,trigger.num],function(card,player,target){
+					event.count=trigger.num;
+					"step 1"
+					event.count--;
+					player.chooseTarget(get.prompt2('jieming'),function(card,player,target){
 						return target.countCards('h')<Math.min(target.maxHp,5);
 					}).set('ai',function(target){
 						var att=get.attitude(_status.event.player,target);
@@ -4957,12 +4960,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						return att/3;
 					});
-					"step 1"
+					"step 2"
 					if(result.bool){
 						player.logSkill('jieming',result.targets);
 						for(var i=0;i<result.targets.length;i++){
-							result.targets[i].draw(Math.min(5,result.targets[i].maxHp)-result.targets[i].countCards('h'));
+							result.targets[i].drawTo(Math.min(5,result.targets[i].maxHp));
 						}
+						if(event.count) event.goto(1);
 					}
 				},
 				ai:{
@@ -6641,7 +6645,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhurong:'祝融',
 			menghuo:'孟获',
 			caopi:'曹丕',
-			re_xuhuang:'徐晃',
+			re_xuhuang:'界徐晃',
 			lusu:'旧鲁肃',
 			sunjian:'孙坚',
 			dongzhuo:'董卓',
@@ -6702,7 +6706,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			taishici:'太史慈',
 			yanwen:'颜良文丑',
 			yuanshao:'旧袁绍',
-			re_pangde:'庞德',
+			re_pangde:'界庞德',
 			huoji:'火计',
 			bazhen:'八阵',
 			kanpo:'看破',

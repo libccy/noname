@@ -9703,6 +9703,8 @@
 						if(event.nopopup) next.nopopup=true;
 						if(event.animate===false) next.animate=false;
 						if(event.addCount===false) next.addCount=false;
+						if(event.noTargetDelay) next.targetDelay=false;
+						if(event.nodelayx) next.delayx=false;
 					}
 				},
 				chooseToDuiben:function(){
@@ -10618,9 +10620,6 @@
 							event._result={bool:true};
 							event._direct=true;
 						}
-						else if(checkFrequent(info)&&!lib.config.autoskilllist.contains(event.skill)){
-							event._result={bool:true};
-						}
 						else if(info.direct){
 							event._result={bool:true};
 							event._direct=true;
@@ -10630,6 +10629,9 @@
 							event._direct=true;
 						}
 						else{
+							if(checkFrequent(info)){
+								event.frequentSkill=true;
+							}
 							var str;
 							var check=info.check;
 							if(info.prompt) str=info.prompt;
@@ -10646,6 +10648,7 @@
 							}
 							if(typeof str=='function'){str=str(trigger,player)}
 							var next=player.chooseBool(str);
+							if(event.frequentSkill) next.set('frequentSkill',event.skill);
 							next.set('forceDie',true);
 							next.ai=function(){
 								return !check||check(trigger,player);
@@ -12520,6 +12523,10 @@
 				chooseBool:function(){
 					"step 0"
 					if(event.isMine()){
+						if(event.frequentSkill&&!lib.config.autoskilllist.contains(event.frequentSkill)){
+							ui.click.ok();
+							return;
+						}
 						ui.create.confirm('oc');
 						if(event.createDialog&&!event.dialog){
 							if(Array.isArray(event.createDialog)){
@@ -15702,7 +15709,10 @@
 					this.node.hp.innerHTML='';
 					this.node.count.innerHTML='0';
 					if(this.name2){
+						delete this.singleHp;
 						this.node.avatar2.hide();
+						this.node.name2.innerHTML='';
+						this.classList.remove('fullskin2')
 						delete this.name2;
 						this.node.count.classList.remove('p2');
 					}
@@ -17285,6 +17295,12 @@
 							}
 							else if(arguments[i]=='nodistance'){
 								next.nodistance=true;
+							}
+							else if(arguments[i]=='noTargetDelay'){
+								next.noTargetDelay=true;
+							}
+							else if(arguments[i]=='nodelayx'){
+								next.nodelayx=true;
 							}
 							else if(lib.card[arguments[i]]&&!next.card){
 								next.card={name:arguments[i]};
@@ -25916,7 +25932,13 @@
 			if(_status.connectMode&&!_status.countDown){
 				ui.timer.show();
 				var num;
-				if(_status.connectMode){
+				//这么一大行都是为了祢衡
+				if(_status.event&&_status.event.name=='chooseToUse'&&_status.event.type=='phase'&&
+					_status.event.player&&_status.event.player.forceCountChoose&&
+					typeof _status.event.player.forceCountChoose.phaseUse=='number'){
+					num=_status.event.player.forceCountChoose.phaseUse;
+				}
+				else if(_status.connectMode){
 					num=lib.configOL.choose_timeout;
 				}
 				else{
@@ -25941,12 +25963,16 @@
 			else if(_status.event.player.forceCountChoose&&_status.event.isMine()&&!_status.countDown){
 				var info=_status.event.player.forceCountChoose;
 				var num;
-				if(typeof info[_status.event.name]=='number'){
+				if(_status.event.name=='chooseToUse'&&_status.event.type=='phase'&&typeof info.phaseUse=='number'){
+					num=info.phaseUse;
+				}
+				else if(typeof info[_status.event.name]=='number'){
 					num=info[_status.event.name]
 				}
-				else{
+				else if(info.default){
 					num=info.default;
 				}
+				else return;
 				var finish=function(){
 					if(_status.event.endButton){
 						if(_status.event.skill){
@@ -45196,6 +45222,7 @@
 					intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+get.translation(this.link)+'</span>'+get.skillInfoTranslation(this.link);
 					var info=get.info(this.link);
 					var skill=this.link;
+					var playername=this.linkname;
 					var skillnode=this;
 					if(info.derivation){
 						var derivation=info.derivation;
@@ -45270,12 +45297,15 @@
 							audioinfo=audioinfo[1];
 						}
 						if(typeof audioinfo=='number'){
+							if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
 							game.playAudio('skill',audioname+getIndex(audioinfo));
 						}
 						else if(audioinfo){
+							if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
 							game.playAudio('skill',audioname);
 						}
 						else if(true&&info.audio!==false){
+							if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
 							game.playSkillAudio(audioname,getIndex(2));
 						}
 					}
@@ -45290,6 +45320,7 @@
 					}
 					var current=ui.create.div('.menubutton.large',skills,clickSkill,skilltrans);
 					current.link=list[i];
+					current.linkname=name;
 					if(!initskill){
 						initskill=true;
 						clickSkill.call(current,'init');

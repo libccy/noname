@@ -390,8 +390,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					event.cards=get.cards(2*trigger.num);
+					event.count=trigger.num;
 					"step 1"
+					event.count--;
+					event.cards=get.cards(2);
+					"step 2"
 					if(event.cards.length>1){
 						player.chooseCardButton('将“遗计”牌分配给任意角色',true,event.cards,[1,event.cards.length]).set('ai',function(button){
 							if(ui.selected.buttons.length==0) return 1;
@@ -402,9 +405,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event._result={links:event.cards.slice(0),bool:true};
 					}
 					else{
-						event.finish();
+						event.goto(5);
 					}
-					"step 2"
+					"step 3"
 					if(result.bool){
 						for(var i=0;i<result.links.length;i++){
 							event.cards.remove(result.links[i]);
@@ -421,13 +424,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							else{
 								return att/100;
 							}
-						}).set('enemy',get.value(event.togive[0])<0);
+						}).set('enemy',get.value(event.togive[0],player,'raw')<0);
 					}
-					"step 3"
+					"step 4"
 					if(result.targets.length){
 						result.targets[0].gain(event.togive,'draw');
 						player.line(result.targets[0],'green');
 						game.log(result.targets[0],'获得了'+get.cnNumber(event.togive.length)+'张牌');
+						event.goto(2);
+					}
+					"step 5"
+					if(event.count>0) player.chooseBool(get.prompt2(event.name)).set('frequentSkill',event.name);
+					else event.finish();
+					"step 6"
+					if(result.bool){
+						player.logSkill(event.name);
 						event.goto(1);
 					}
 				},
@@ -1333,6 +1344,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				group:'kongcheng1',
+				audio:'kongcheng1',
+				audioname:['re_zhugeliang'],
 				ai:{
 					noh:true,
 					skillTagFilter:function(player,tag){
@@ -1634,6 +1647,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zhiheng:{
 				audio:2,
+				audioname:['gz_jun_sunquan'],
 				enable:'phaseUse',
 				usable:1,
 				position:'he',
@@ -2431,7 +2445,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		translate:{
 			caocao:'曹操',
 			hujia:'护驾',
-			hujia_info:'主公技，当你需要使用或打出一张【闪】时，你可以令其他魏势力角色选择是否打出一张【闪】。若有角色相应，则你视为使用或打出了一张【闪】。',
+			hujia_info:'主公技，当你需要使用或打出一张【闪】时，你可以令其他魏势力角色选择是否打出一张【闪】。若有角色响应，则你视为使用或打出了一张【闪】。',
 			jianxiong:'奸雄',
 			jianxiong_info:'当你受到伤害后，你可以获得对你造成伤害的牌。',
 

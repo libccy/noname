@@ -4341,7 +4341,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 1'
 					if(result.bool){
-						target.$give(result.cards.length,player);
+						target.$give(result.cards.length,player,false);
 						target.lose(result.cards,ui.special,'toStorage');
 						if(!player.storage.kuangbi_draw) player.storage.kuangbi_draw=[];
 						player.storage.kuangbi_draw.push([result.cards,target]);
@@ -4783,7 +4783,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					if(result.bool&&result.cards&&result.cards.length){
-						event.target.$give(result.cards,player);
+						event.target.$give(result.cards,player,false);
 						player.storage.jieyue2=result.cards[0];
 						event.target.lose(result.cards[0],ui.special,'toStorage');
 						player.syncStorage('jieyue2');
@@ -5095,7 +5095,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.syncStorage('chunlao');
 						player.markSkill('chunlao');
 						player.lose(result.cards,ui.special,'toStorage');
-						player.$give(result.cards,player);
+						player.$give(result.cards,player,false);
 					}
 				},
 				ai:{
@@ -8336,7 +8336,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					if(result&&result.links&&result.links.length){
 						game.delay(2);
-						trigger.player.$give(result.links[0],player);
+						trigger.player.$give(result.links[0],player,false);
 						player.equip(result.links[0]);
 						player.addExpose(0.2);
 					}
@@ -10390,7 +10390,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.markSkill('xiansi');
 						player.syncStorage('xiansi');
 						event.current.lose(result.links,ui.special,'toStorage');
-						event.current.$give(result.links,player);
+						event.current.$give(result.links,player,false);
 						event.goto(2);
 					}
 				},
@@ -10643,7 +10643,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.logSkill('zzhenggong',trigger.source);
 						player.equip(result.links[0]);
-						trigger.source.$give(result.links[0],player);
+						trigger.source.$give(result.links[0],player,false);
 					}
 				},
 				ai:{
@@ -10827,7 +10827,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.addVideo('storage',player,['zyexin',get.cardsInfo(player.storage.zyexin),'cards']);
 						game.delay();
 						if(get.type(event.card)=='equip'){
-							player.$give(event.card,result.targets[0]);
+							player.$give(event.card,result.targets[0],false);
 							result.targets[0].equip(event.card);
 						}
 						else if(get.type(event.card)=='delay'){

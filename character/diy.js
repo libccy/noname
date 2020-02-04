@@ -12,7 +12,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_haruko:['female','key',4,['haruko_haofang','haruko_zhuishi']],
 			key_umi:['female','key',3,['umi_chaofan','umi_lunhui','umi_qihuan']],
 			key_umi2:['female','key',3,[],['unseen']],
-			key_kagari:['female','shen',3,['kagari_zongsi']],
+			key_kagari:['female','shen',3,['kagari_zongsi'],['key']],
 			key_rei:['male','key',4,['xiandeng','shulv','xisheng']],
 			key_komari:['female','key',3,['komari_tiankou','komari_xueshang']],
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
@@ -4305,8 +4305,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				discard:false,
 				prompt:'将一张装备牌置入弃牌堆并摸一张牌',
 				delay:0.5,
+				loseTo:'discardPile',
 				prepare:function(cards,player){
 					player.$throw(cards,1000);
+					game.log(player,'将',cards,'置入了弃牌堆');
 				},
 				ai:{
 					basic:{

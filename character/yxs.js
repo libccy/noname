@@ -1968,9 +1968,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filterCard:true,
-				filterTarget:function(card,player,target){
-					return player!=target;
-				},
+				filterTarget:true,
 				check:function(card){
 					return 8-get.value(card);
 				},

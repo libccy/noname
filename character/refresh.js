@@ -77,6 +77,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterIntro:{
 			re_gongsunzan:'群雄之一。出身贵族，因母地位卑贱，只当了郡中小吏。他貌美，声音洪亮，机智善辩。后随卢植于缑氏山中读书，粗通经传。',
 			re_lidian:'字曼成，曹操麾下将领。李典深明大义，不与人争功，崇尚学习与高贵儒雅，尊重博学之士，在军中被称为长者。李典有长者之风，官至破虏将军，三十六岁去世。魏文帝曹丕继位后追谥号为愍侯。',
+			sunben:' ',
 		},
 		characterFilter:{
 			re_zuoci:function(mode){
@@ -1350,13 +1351,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else if(event.count<trigger.num){
 							delete event.temp;
 							event.count++;
-							event.goto(1);
+							player.chooseBool(get.prompt2(event.name)).set('frequentSkill',event.name);
 						}
+						else event.finish();
 					}
 					else if(event.count<trigger.num){
 						delete event.temp;
-						event.num=1;
 						event.count++;
+						player.chooseBool(get.prompt2(event.name)).set('frequentSkill',event.name);
+					}
+					else event.finish();
+					"step 4"
+					if(result.bool){
+						player.logSkill(event.name);
 						event.goto(1);
 					}
 				},
@@ -2187,7 +2194,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					]).ai=function(){return 1};
 					'step 1'
 					if(result.index==0){
-						player.$give(cards,target);
+						player.$give(cards,target,false);
 						target.equip(cards[0]);
 					}
 					else{
@@ -2405,6 +2412,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rerende:{
 				audio:2,
 				group:['rerende1'],
+				audioname:['gz_jun_liubei'],
 				enable:'phaseUse',
 				filterCard:true,
 				selectCard:[1,Infinity],
@@ -2707,7 +2715,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return (event.source&&event.source.countGainableCards(player,'he')&&event.num>0&&event.source!=player);
 				},
 				content:function(){
-					player.gainPlayerCard([1,trigger.num],get.prompt('fankui',trigger.source),trigger.source,get.buttonValue,'he').set('logSkill',['refankui',trigger.source]);
+					"step 0"
+					event.count=trigger.num;
+					"step 1"
+					event.count--;
+					player.gainPlayerCard(get.prompt('refankui',trigger.source),trigger.source,get.buttonValue,'he').set('logSkill',['refankui',trigger.source]);
+					"step 2"
+					if(result.bool&&event.count>0&&event.source.countGainableCards(player,'he')>0) event.goto(1);
 				},
 				ai:{
 					maixie_defend:true,
@@ -2868,8 +2882,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.storage.qingjian++;
 						player.logSkill('qingjian',result.targets);
-						result.targets[0].gain(result.cards,player);
-						player.$give(result.cards.length,result.targets[0]);
+						result.targets[0].gain(result.cards,player,'give');
 						for(var i=0;i<result.cards.length;i++){
 							event.cards.remove(result.cards[i]);
 						}
@@ -3310,7 +3323,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							result.targets[0].addSkill('reyiji2');
 							result.targets[0].storage.reyiji2=result.cards;
 						}
-						player.$give(result.cards.length,result.targets[0]);
+						player.$give(result.cards.length,result.targets[0],false);
 						player.line(result.targets,'green');
 						game.addVideo('storage',result.targets[0],['reyiji2',get.cardsInfo(result.targets[0].storage.reyiji2),'cards']);
 						if(num==1){
