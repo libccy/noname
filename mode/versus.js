@@ -3861,8 +3861,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			wenji:'问计',
 			wenji2:'问计',
 			wenji_info:'队友的出牌阶段开始时，你可令其交给你一张手牌，若此牌为锦囊牌，则非队友角色计算与你的距离+1直到你的下个回合开始',
-			qunjiang:'屯江',
-			qunjiang_info:'结束阶段开始时，若你于本回合的出牌阶段使用过至少两张牌且未造成过伤害，你可以选择一项：1.你摸两张牌；2.队友摸两张牌',
+			tunjiang:'屯江',
+			tunjiang_info:'结束阶段开始时，若你于本回合的出牌阶段使用过至少两张牌且未造成过伤害，你可以选择一项：1.你摸两张牌；2.队友摸两张牌',
 			xingzhao:'兴棹',
 			xingzhao2:'兴棹',
 			xingzhao3:'兴棹',
@@ -4132,6 +4132,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				temp:true,
 				vanish:true,
 				onremove:function(player){
+					game.addVideo('jiuNode',player,false);
 					if(player.node.jiu){
 						player.node.jiu.delete();
 						player.node.jiu2.delete();
@@ -5294,8 +5295,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								target.addSkill('xionghuangjiu');
 							}
 							else{
+								if(!target.storage.jiu) target.storage.jiu=0;
+								target.storage.jiu++;
 								target.addSkill('jiu');
 							}
+							game.addVideo('jiuNode',target,true);
 							if(!target.node.jiu&&lib.config.jiu_effect){
 								target.node.jiu=ui.create.div('.playerjiu',target.node.avatar);
 								target.node.jiu2=ui.create.div('.playerjiu',target.node.avatar2);

@@ -441,7 +441,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						'xianfu','fenyong','xuehen','yingbin','midao','yishe','yinbing','juedi',
 						'bushi','xinfu_dianhua','xinfu_falu','xinfu_zhenyi','lskuizhu','pingjian','xjshijian','fentian','zhiri','xindan',
 						'xinzhengnan','xinfu_xiaode',
-						'komari_xueshang',
+						'komari_xueshang','qiaosi_map',
 					];
 					var characters=[];
 					for(var name in lib.character){
@@ -535,7 +535,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									},
 									content:function(){
 										game.log(player,'对击杀目标造成了伤害');
-										player.changeLingli(1);
+										player.changeLingli(trigger.num);
 									},
 								},
 								_lingli:{
@@ -644,6 +644,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										'step 0'
 										if(_status._aozhan&&!player.getStat('damage')){
 											player.loseHp();
+											player.changeLingli(1);
 											game.log(player,'本回合内未造成伤害，触发死战模式惩罚');
 										}
 										if(trigger._lastDead==undefined) event.goto(2);
@@ -935,8 +936,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							dieAfter2:function(source){
 								if(source&&this.name.indexOf('hhzz_')!=0){
 									if(source._toKill==this) game.log(source,'击杀目标成功');
-									source.draw();
-									source.changeLingli(this==source._toKill?3:1);
+									source.draw(this==source._toKill?2:1);
+									source.changeLingli(this==source._toKill?3:2);
 								}
 								if(!_status._aozhan){
 									var that=this;

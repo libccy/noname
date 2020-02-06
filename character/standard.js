@@ -1765,7 +1765,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					if(player.getHistory('skipped').contains('phaseUse')) return true;
-					var history=player.getHistory('useCard');
+					var history=player.getHistory('useCard').concat(player.getHistory('respond'));
 					for(var i=0;i<history.length;i++){
 						if(history[i].card.name=='sha'&&history[i].isPhaseUsing()) return false;
 					}
@@ -2575,7 +2575,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinjiuyuan_info:'主公技，锁定技，濒死阶段，吴势力角色对你使用的[桃]额外回复一点体力',
 			xinjiuyuan_info_alter:'主公技，其他吴国角色对自己使用【桃】时，如果他的体力值大于你，他可以选择让你回复1点体力，然后他摸1张牌',
 			qixi_info:'你可以将一张黑色牌当做【过河拆桥】使用',
-			keji_info:'若你于出牌阶段内没有过使用【杀】，则你可以跳过弃牌阶段。',
+			keji_info:'弃牌阶段开始时，若你于本回合的出牌阶段内没有过使用活打出过【杀】，则你可以跳过此阶段。',
 			kurou_info:'出牌阶段，你可以失去一点体力，然后摸两张牌。',
 			yingzi_info:'摸牌阶段，你可以多摸一张牌。',
 			fanjian_info:'出牌阶段限一次，你可以令一名角色选择一种花色并展示你的一张手牌，若选择的花色与展示的不同，该角色受到来自你的一点伤害。然后该角色获得展示的牌。',

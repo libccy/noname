@@ -10506,11 +10506,18 @@
 					}
 					'step 2'
 					if(!event.map.length){
-						if(trigger._triggering==this){
-							delete trigger._triggering;
+						if(event.list2.length){
+							var info=event.list2.shift();
+							game.createTrigger(event.triggername,info[0],info[1],trigger);
+							event.redo();
 						}
-						event.finish();
-						return;
+						else{
+							if(trigger._triggering==this){
+								delete trigger._triggering;
+							}
+							event.finish();
+							return;
+						}
 					};
 					event.doing=event.map.shift();
 					'step 3'
@@ -22921,6 +22928,7 @@
 						start=game.findNext(start);
 					}
 					var list=[];
+					var list2=[];
 					var mapx=[];
 					var allbool=false;
 					var roles=['player','source','target'];
@@ -22944,6 +22952,14 @@
 						if(info.firstDo){
 							list.push([skill,player,num]);
 							list.sort(function(a,b){
+								return b[2]-a[2];
+							});
+							allbool=true;
+							return;
+						}
+						else if(info.lastDo){
+							list2.push([skill,player,num]);
+							list2.sort(function(a,b){
 								return b[2]-a[2];
 							});
 							allbool=true;
@@ -23067,6 +23083,7 @@
 						var next=game.createEvent('arrangeTrigger',false,event);
 						next.setContent('arrangeTrigger');
 						next.list=list;
+						next.list2=list2;
 						next.map=mapx;
 						next._trigger=event;
 						next.triggername=name;
@@ -24254,6 +24271,7 @@
 			counttrigger:{
 				trigger:{global:'phaseAfter'},
 				silent:true,
+				charlotte:true,
 				priority:-100,
 				content:function(){
 					player.removeSkill('counttrigger');
@@ -24264,6 +24282,7 @@
 				trigger:{player:'recoverBefore'},
 				forced:true,
 				priority:100,
+				firstDo:true,
 				popup:false,
 				filter:function(event,player){
 					return player.hp>=player.maxHp;
@@ -24277,6 +24296,7 @@
 				forced:true,
 				priority:100,
 				popup:false,
+				firstDo:true,
 				content:function(){
 					// for(var i=0;i<game.players.length;i++){
 					// 	game.players[i].in();
@@ -24310,6 +24330,7 @@
 				forced:true,
 				popup:false,
 				priority:-100,
+				lastDo:true,
 				filter:function(event){
 					return !event._cleared&&event.card.name!='wuxie';
 				},
@@ -24325,6 +24346,7 @@
 				forced:true,
 				popup:false,
 				priority:-100,
+				lastDo:true,
 				filter:function(event){
 					return ui.todiscard[event.discardid]?true:false;
 				},

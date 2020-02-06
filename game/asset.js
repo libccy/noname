@@ -2169,6 +2169,12 @@ window.noname_asset_list=[
 	'image/card/pyzhuren_club.png',
 	'image/card/pyzhuren_diamond.png',
 	'image/card/pyzhuren_shandian.png',
+	'image/card/monkey.png',
+	'image/card/xuelunyan.png',
+	'image/card/kuwu.png',
+	'image/card/jiuwei.png',
+	'image/card/mianju.png',
+	'image/card/shoulijian.png',
 
 	'image/card/bagua.png',
 	'image/card/baihupifeng.png',
@@ -2567,6 +2573,8 @@ window.noname_asset_list=[
 	'image/character/re_zhanggong.jpg',
 	'image/character/re_weiwenzhugezhi.jpg',
 	'image/character/re_xugong.jpg',
+	'image/character/yuantanyuanshang.jpg',
+	'image/character/old_majun.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',

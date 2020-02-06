@@ -21,7 +21,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhuling:['male','wei',4,['xinzhanyi']],
 			liuye:['male','wei',3,['polu','choulve']],
 			zhaotongzhaoguang:["male","shu",4,["yizan_use","xinfu_longyuan"],[]],
-			majun:["male","wei",3,["xinfu_jingxie1","xinfu_qiaosi"],[]],
+			majun:["male","wei",3,["xinfu_jingxie1","qiaosi"],[]],
 			simazhao:["male","wei",3,["xinfu_daigong","xinfu_zhaoxin"],[]],
 			wangyuanji:["female","wei",3,["xinfu_qianchong","xinfu_shangjian"],[]],
 			pangdegong:["male","qun",3,["xinfu_pingcai","xinfu_pdgyingshi"],[]],
@@ -81,6 +81,222 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		skill:{
+			
+			//表演测试
+			qiaosi_map:{charlotte:true},
+			qiaosi:{
+				audio:'xinfu_qiaosi',
+				derivation:'qiaosi_map',
+				enable:'phaseUse',
+				usable:1,
+				content:function(){
+					"step 0"
+					if(player.isUnderControl()){
+						game.modeSwapPlayer(player);
+					}
+					var switchToAuto=function(){
+						_status.imchoosing=false;
+						event._result={
+							bool:true,
+							links:['qiaosi_c1','qiaosi_c2','qiaosi_c3','qiaosi_c4','qiaosi_c5','qiaosi_c6'].randomGets(3),
+						};
+						if(event.dialog) event.dialog.close();
+						if(event.control) event.control.close();
+					};
+					var chooseButton=function(player){
+						var event=_status.event;
+						player=player||event.player;
+						event.status={
+							qiaosi_c1:0,
+							qiaosi_c2:0,
+							qiaosi_c3:0,
+							qiaosi_c4:0,
+							qiaosi_c5:0,
+							qiaosi_c6:0,
+						}
+						event.map={
+							qiaosi_c1:[10,15],
+							qiaosi_c2:[20,35],
+							qiaosi_c3:[40,60],
+							qiaosi_c4:[40,60],
+							qiaosi_c5:[20,35],
+							qiaosi_c6:[10,15],
+						}
+						event.finishedx=[];
+						event.str='请开始你的表演<br>qiaosi_c1% qiaosi_c2% qiaosi_c3% qiaosi_c4% qiaosi_c5% qiaosi_c6%';
+						event.dialog=ui.create.dialog(event.str);
+						for(var i in event.status){
+							event.dialog.content.childNodes[0].innerHTML=event.dialog.content.childNodes[0].innerHTML.replace(i,event.status[i]);
+						}
+						for(var i=0;i<event.dialog.buttons.length;i++){
+							event.dialog.buttons[i].classList.add('pointerdiv');
+						}
+						event.switchToAuto=function(){
+							event._result={
+								bool:true,
+								links:event.finishedx.slice(0),
+							};
+							event.dialog.close();
+							event.control.close();
+							game.resume();
+							_status.imchoosing=false;
+						},
+						event.control=ui.create.control('qiaosi_c1','qiaosi_c2','qiaosi_c3','qiaosi_c4','qiaosi_c5','qiaosi_c6',function(link){
+							var event=_status.event;
+							if(event.finishedx.contains(link)) return;
+							event.status[link]+=get.rand.apply(get,event.map[link]);
+							if(event.status[link]>=100){
+								event.status[link]=100;
+								var str=event.str.slice(0);
+								for(var i in event.status){
+									str=str.replace(i,event.status[i]);
+								}
+								event.dialog.content.childNodes[0].innerHTML=str;
+								event.finishedx.push(link);
+								if(event.finishedx.length>=3){
+									event._result={
+										bool:true,
+										links:event.finishedx.slice(0),
+									};
+									event.dialog.close();
+									event.control.close();
+									game.resume();
+									_status.imchoosing=false;
+								}
+							}
+							else{
+								var str=event.str.slice(0);
+								for(var i in event.status){
+									str=str.replace(i,event.status[i]);
+								}
+								event.dialog.content.childNodes[0].innerHTML=str;
+							}
+						});
+						for(var i=0;i<event.dialog.buttons.length;i++){
+							event.dialog.buttons[i].classList.add('selectable');
+						}
+						game.pause();
+						game.countChoose();
+					};
+					event.switchToAuto=switchToAuto;
+
+					if(event.isMine()){
+						chooseButton();
+					}
+					else if(event.isOnline()){
+						event.player.send(chooseButton,event.player);
+						event.player.wait();
+						game.pause();
+					}
+					else{
+						event.switchToAuto();
+					}
+					"step 1"
+					var map=event.result||result;
+					game.print(map);
+					if(!map||!map.bool||!map.links){
+						game.log(player,'表演失败');
+						event.finish();
+						return;
+					}
+					var list=map.links;
+					if(!list.length){
+						game.log(player,'表演失败');
+						event.finish();
+						return;
+					}
+					var cards=[];
+					var list2=[];
+					if(list.contains('qiaosi_c1')){
+						list2.push('trick');
+						list2.push('trick');
+					}
+					if(list.contains('qiaosi_c2')){
+						if(list.contains('qiaosi_c1')) list2.push(['sha','jiu']);
+						else list2.push(Math.random()<0.66?'equip':['sha','jiu']);
+					}
+					if(list.contains('qiaosi_c3')){
+						list2.push([Math.random()<0.66?'sha':'jiu'])
+					}
+					if(list.contains('qiaosi_c4')){
+						list2.push([Math.random()<0.66?'shan':'tao'])
+					}
+					if(list.contains('qiaosi_c5')){
+						if(list.contains('qiaosi_c6')) list2.push(['shan','tao']);
+						else list2.push(Math.random()<0.66?'trick':['shan','tao']);
+					}
+					if(list.contains('qiaosi_c6')){
+						list2.push('equip');
+						list2.push('equip');
+					}
+					while(list2.length){
+						var filter=list2.shift();
+						var card=get.cardPile(function(x){
+							if(cards.contains(x)) return false;
+							if(typeof filter=='string'&&get.type(x,'trick')==filter) return true;
+							if(typeof filter=='object'&&filter.contains(x.name)) return true;
+						});
+						if(card) cards.push(card);
+						else{
+							var card=get.cardPile(function(x){
+								return !cards.contains(card);
+							});
+							if(card) cards.push(card);
+						}
+					}
+					if(cards.length){
+						event.cards=cards;
+						event.num=cards.length;
+						player.showCards(cards);
+					}
+					else event.finish();
+					"step 2"
+					player.gain(event.cards,'gain2');
+					player.chooseControl().set('choiceList',[
+						'将'+get.cnNumber(event.num)+'张牌交给一名其他角色',
+						'弃置'+get.cnNumber(event.num)+'张牌',
+					]).set('ai',function(){
+						if(game.hasPlayer(function(current){
+							return current!=player&&get.attitude(player,current)>2;
+						})) return 0;
+						return 1;
+					});
+					"step 3"
+					if(result.index==0){
+						player.chooseCardTarget({
+							position:'he',
+							filterCard:true,
+							selectCard:event.num,
+							filterTarget:function(card,player,target){
+								return player!=target;
+							},
+							ai1:function(card){
+								return 1;
+							},
+							ai2:function(target){
+								var att=get.attitude(_status.event.player,target);
+								return att;
+							},
+							prompt:'选择'+get.cnNumber(event.num)+'张牌，交给一名其他角色。',
+							forced:true,
+						});
+					}
+					else{
+						player.chooseToDiscard(event.num,true,'he');
+						event.finish();
+					}
+					"step 4"
+					if(result.bool){
+						var target=result.targets[0];
+						player.give(result.cards,target);
+					}
+				},
+				ai:{
+					order:10,
+					result:{player:1},
+					threaten:3.2,
+				}
+			},
 			refuhai:{
 				audio:'xinfu_fuhai',
 				enable:'phaseUse',
@@ -1546,6 +1762,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"rebiaozhao3_info":"",
 			refuhai:'浮海',
 			refuhai_info:'出牌阶段限一次，你可弃置一张手牌，令其他角色同时在「潮起」和「潮落」中选择一项，并依次展示这些角色的选项。若从你下家开始选择了相同选项的角色数目大于1，则你摸X张牌（X为连续相同结果的数量）。',
+			qiaosi:'巧思',
+			qiaosi_info:'出牌阶段限一次，你可以表演「水转百戏图」并根据表演结果获得相应的牌。然后，你选择一项：1.弃置X张牌。2.将X张牌交给一名其他角色。（X为你以此法获得的牌数）',
+			qiaosi_map:'水转百戏图',
+			qiaosi_map_info:'也没啥特别的，对着那六个写着「人偶」的按钮使劲按就行了',
+			qiaosi_c1:'人偶 ',
+			qiaosi_c2:'人偶 ',
+			qiaosi_c3:'人偶 ',
+			qiaosi_c4:'人偶 ',
+			qiaosi_c5:'人偶 ',
+			qiaosi_c6:'人偶',
 		}
 	};
 });

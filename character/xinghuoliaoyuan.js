@@ -1167,11 +1167,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 1'
 							player.line(trigger.player,'fire');
 							trigger.player.damage('fire');
+							if(!trigger.player.storage.xionghuo_disable) trigger.player.storage.xionghuo_disable=[];
+							trigger.player.storage.xionghuo_disable.push(player);
 							trigger.player.addTempSkill('xionghuo_disable','phaseAfter');
 							event.goto(4);
 							'step 2'
 							player.line(trigger.player,'water');
 							trigger.player.loseHp();
+							trigger.player.addMark('xionghuo_low',1,false);
 							trigger.player.addTempSkill('xionghuo_low','phaseAfter');
 							event.goto(4);
 							'step 3'
@@ -1251,25 +1254,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xionghuo_disable":{
 				mod:{
 					playerEnabled:function (card,player,target){
-						if(target.hasSkill('xinfu_xionghuo')&&card.name=='sha') return false;
+						if(card.name=='sha'&&(player.storage.xionghuo_disable&&player.storage.xionghuo_disable.contains(target))) return false;
 					},
 				},
+				onremove:true,
+				charlotte:true,
 				mark:true,
 				marktext:"禁",
 				intro:{
-					content:"本回合内不能对“徐荣”使用“杀”。",
+					content:"本回合内不能对$使用【杀】",
 				},
 			},
 			"xionghuo_low":{
 				mod:{
 					maxHandcard:function (player,num){
-						return num-1;
+						return num-player.countMark('xionghuo_low');
 					},
 				},
 				marktext:"减",
 				mark:true,
+				onremove:true,
+				charlotte:true,
 				intro:{
-					content:"本回合内手牌上限-1。",
+					content:"本回合内手牌上限-#",
 				},
 			},
 			"xinfu_shajue":{
@@ -4728,7 +4735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 					}
 					else{
-						player.chooseToDiscard(event.num,true);
+						player.chooseToDiscard(event.num,true,'he');
 						event.finish();
 					}
 					'step 4'
@@ -5308,9 +5315,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_xiaode":"孝德",
 			"xinfu_xiaode_info":"每当有其他角色阵亡后，你可以声明该武将牌的一项技能。若如此做，你获得此技能且不能再发动〖孝德〗直到你的回合结束。(你不能声明觉醒技或主公技)",
 			
-			"sp_taishici":"太史慈",
+			"sp_taishici":"SP太史慈",
 			wangcan:"王粲",
-			"re_jsp_pangtong":"庞统",
+			"re_jsp_pangtong":"SP庞统",
 			lvdai:"吕岱",
 			"re_zhangliang":"张梁",
 			lvqian:"吕虔",

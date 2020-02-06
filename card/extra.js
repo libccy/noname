@@ -69,7 +69,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else{
-						game.addVideo('jiuNode',player,true);
+						game.addVideo('jiuNode',target,true);
 						if(cards&&cards.length){
 							card=cards[0];
 						}
@@ -731,11 +731,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			huogong2:{},
 			jiu:{
-				trigger:{player:'useCard'},
+				trigger:{player:'useCard1'},
 				filter:function(event){
 					return event.card&&event.card.name=='sha';
 				},
 				forced:true,
+				charlotte:true,
+				firstDo:true,
 				content:function(){
 					if(!trigger.baseDamage) trigger.baseDamage=1;
 					trigger.baseDamage+=player.storage.jiu;
@@ -766,6 +768,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			jiu2:{
 				trigger:{player:'useCardAfter',global:'phaseAfter'},
 				priority:2,
+				firstDo:true,
+				charlotte:true,
 				filter:function(event){
 					if(event.name=='useCard') return (event.card&&(event.card.name=='sha'));
 					return true;
