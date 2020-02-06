@@ -2170,7 +2170,7 @@ window.noname_asset_list=[
 	'image/card/pyzhuren_diamond.png',
 	'image/card/pyzhuren_shandian.png',
 	'image/card/monkey.png',
-	'image/card/xuelunyan.png',
+	'image/card/xuelunyang.png',
 	'image/card/kuwu.png',
 	'image/card/jiuwei.png',
 	'image/card/mianju.png',
