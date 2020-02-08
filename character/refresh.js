@@ -1150,7 +1150,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				filter:function (event,player){
 					var evt=event.getParent();
-					return (evt&&evt.name=='juedou'&&evt[player==evt.player?'targetCards':'playerCards'])>0;
+					return (evt&&evt.name=='juedou'&&evt[player==evt.player?'targetCards':'playerCards'].length)>0;
 				},
 				content:function (){
 					"step 0"
