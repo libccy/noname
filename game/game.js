@@ -9699,7 +9699,7 @@
 							}
 						}
 						var next=player.useCard(card,event.targets2||result.targets);
-						if(cards) next.cards=cards;
+						if(cards) next.cards=cards.slice(0);
 						if(event.nopopup) next.nopopup=true;
 						if(event.animate===false) next.animate=false;
 						if(event.addCount===false) next.addCount=false;
@@ -17279,7 +17279,7 @@
 					next.player=this;
 					for(var i=0;i<arguments.length;i++){
 						if(get.itemtype(arguments[i])=='cards'){
-							next.cards=arguments[i];
+							next.cards=arguments[i].slice(0);
 						}
 						else if(get.itemtype(arguments[i])=='card'){
 							next.card=arguments[i];
@@ -17673,7 +17673,7 @@
 						next.str=str;
 					}
 					if(get.itemtype(cards)=='card') next.cards=[cards];
-					else if(get.itemtype(cards)=='cards') next.cards=cards;
+					else if(get.itemtype(cards)=='cards') next.cards=cards.slice(0);
 					else _status.event.next.remove(next);
 					next.setContent('showCards');
 					next._args=Array.from(arguments);
@@ -17683,7 +17683,7 @@
 					var next=game.createEvent('viewCards');
 					next.player=this;
 					next.str=str;
-					next.cards=cards;
+					next.cards=cards.slice(0);
 					next.setContent('viewCards');
 					next._args=Array.from(arguments);
 					return next;
@@ -17800,7 +17800,7 @@
 					next.num=0;
 					for(var i=0;i<arguments.length;i++){
 						if(get.itemtype(arguments[i])=='cards'){
-							next.cards=arguments[i];
+							next.cards=arguments[i].slice(0);
 						}
 						else if(get.itemtype(arguments[i])=='players'){
 							next.targets=arguments[i];
@@ -17886,7 +17886,7 @@
 					next.num=0;
 					for(var i=0;i<arguments.length;i++){
 						if(get.itemtype(arguments[i])=='cards'){
-							next.cards=arguments[i];
+							next.cards=arguments[i].slice(0);
 						}
 						else if(get.itemtype(arguments[i])=='players'){
 							next.targets=arguments[i];
@@ -18049,7 +18049,7 @@
 							next.source=arguments[i];
 						}
 						else if(get.itemtype(arguments[i])=='cards'){
-							next.cards=arguments[i];
+							next.cards=arguments[i].slice(0);
 						}
 						else if(get.itemtype(arguments[i])=='card'){
 							next.cards=[arguments[i]];
@@ -18073,7 +18073,7 @@
 					next.player=this;
 					for(var i=0;i<arguments.length;i++){
 						if(get.itemtype(arguments[i])=='cards'){
-							next.cards=arguments[i];
+							next.cards=arguments[i].slice(0);
 						}
 						else if(get.itemtype(arguments[i])=='card'){
 							next.card=arguments[i];
@@ -18171,7 +18171,7 @@
 							next.source=arguments[i];
 						}
 						else if(get.itemtype(arguments[i])=='cards'){
-							next.cards=arguments[i];
+							next.cards=arguments[i].slice(0);
 						}
 						else if(get.itemtype(arguments[i])=='card'){
 							next.cards=[arguments[i]];
@@ -18253,7 +18253,7 @@
 					var event=_status.event;
 					for(var i=0;i<arguments.length;i++){
 						if(get.itemtype(arguments[i])=='cards'){
-							next.cards=arguments[i];
+							next.cards=arguments[i].slice(0);
 						}
 						else if(get.itemtype(arguments[i])=='card'){
 							next.card=arguments[i];
@@ -18296,7 +18296,7 @@
 					var event=_status.event;
 					for(var i=0;i<arguments.length;i++){
 						if(get.itemtype(arguments[i])=='cards'){
-							next.cards=arguments[i];
+							next.cards=arguments[i].slice(0);
 						}
 						else if(get.itemtype(arguments[i])=='card'){
 							next.card=arguments[i];
@@ -25590,7 +25590,7 @@
 			var type=get.itemtype(cards);
 			if(type!='cards'&&type!='card') return;
 			var next=game.createEvent('cardsDiscard');
-			next.cards=type=='cards'?cards:[cards];
+			next.cards=type=='cards'?cards.slice(0):[cards];
 			next.setContent('cardsDiscard');
 			return next;
 		},
@@ -25598,7 +25598,7 @@
 			var type=get.itemtype(cards);
 			if(type!='cards'&&type!='card') return;
 			var next=game.createEvent('cardsGotoOrdering');
-			next.cards=type=='cards'?cards:[cards];
+			next.cards=type=='cards'?cards.slice(0):[cards];
 			next.setContent('cardsGotoOrdering');
 			return next;
 		},
@@ -25606,7 +25606,7 @@
 			var type=get.itemtype(cards);
 			if(type!='cards'&&type!='card') return;
 			var next=game.createEvent('cardsDiscard');
-			next.cards=type=='cards'?cards:[cards];
+			next.cards=type=='cards'?cards.slice(0):[cards];
 			if(bool===false) next.notrigger=true;
 			next.setContent('cardsGotoSpecial');
 			return next;

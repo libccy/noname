@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'1.9.97.6',
+	'1.9.97.7.1',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -2501,7 +2501,13 @@ window.noname_asset_list=[
 	'image/card/zixin.png',
 	'image/card/ziyangdan.png',
 	'image/card/zong.png',
-
+	
+	'image/card/qiaosi_card1.jpg',
+	'image/card/qiaosi_card2.jpg',
+	'image/card/qiaosi_card3.jpg',
+	'image/card/qiaosi_card4.jpg',
+	'image/card/qiaosi_card5.jpg',
+	'image/card/qiaosi_card6.jpg',
 	'image/character/shenpei.jpg',
 	'image/character/re_menghuo.jpg',
 	'image/character/re_zhurong.jpg',

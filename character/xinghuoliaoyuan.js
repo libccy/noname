@@ -2755,10 +2755,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).callback=lib.skill.xinfu_jijun.callback;
 				},
 				init:function (player){
-					player.storage.xinfu_jijun=[];
+					if(!player.storage.xinfu_jijun) player.storage.xinfu_jijun=[];
 				},
 				intro:{
 					content:'cards',
+					onunmark:function(storage,player){
+						if(storage&&storage.length){
+							player.$throw(storage,1000);
+							game.cardsDiscard(storage);
+							game.log(storage,'被置入了弃牌堆');
+						 storage.length=0;
+						}
+					},
 					mark:function (dialog,content,player){
 						if(content&&content.length){
 							dialog.addAuto(content);
@@ -3029,7 +3037,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function (){
 					player.awakenSkill('xinfu_zengdao');
 					player.$give(cards,target,false);
-					target.storage.xinfu_zengdao2=cards;
+					target.storage.xinfu_zengdao2=cards.slice(0);
 					target.addSkill('xinfu_zengdao2');
 				},
 				ai:{
@@ -3049,6 +3057,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				audio:"xinfu_zengdao",
 				forced:true,
+				charlotte:true,
 				content:function (){
 					'step 0'
 					player.chooseCardButton('将一张“刀”置入弃牌堆',player.storage.xinfu_zengdao2,true);
@@ -3070,6 +3079,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				marktext:"刀",
 				intro:{
 					content:"cards",
+					onunmark:function(storage,player){
+						if(storage&&storage.length){
+							player.$throw(storage,1000);
+							game.cardsDiscard(storage);
+							game.log(storage,'被置入了弃牌堆');
+						 storage.length=0;
+						}
+					},
 				},
 			},
 			"xinfu_guanwei":{
@@ -3259,6 +3276,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				intro:{
 					content:"cards",
+					onunmark:function(storage,player){
+						if(storage&&storage.length){
+							player.$throw(storage,1000);
+							game.cardsDiscard(storage);
+							game.log(storage,'被置入了弃牌堆');
+						 storage.length=0;
+						}
+					},
 				},
 			},
 			"yingshi_die":{
@@ -3275,8 +3300,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.logSkill('xinfu_yingshi');
 					trigger.player.$give(trigger.player.storage.yingshi_heart,player);
 					player.gain(trigger.player.storage.yingshi_heart);
-					trigger.player.removeSkill('yingshi_heart');
 					delete trigger.player.storage.yingshi_heart;
+					trigger.player.removeSkill('yingshi_heart');
 				},
 			},
 			"xinfu_duanfa":{
@@ -4851,6 +4876,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:["zhaoxin_give"],
 				intro:{
 					content:"cards",
+					onunmark:function(storage,player){
+						if(storage&&storage.length){
+							player.$throw(storage,1000);
+							game.cardsDiscard(storage);
+							game.log(storage,'被置入了弃牌堆');
+						 storage.length=0;
+						}
+					},
 				},
 				enable:"phaseUse",
 				usable:1,

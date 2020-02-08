@@ -2191,6 +2191,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				intro:{
+					onunmark:function(storage,player){
+						if(storage&&storage.length){
+							player.$throw(storage,1000);
+							game.cardsDiscard(storage);
+							game.log(storage,'被置入了弃牌堆');
+							storage.length=0;
+						}
+					},
 					mark:function (dialog,content,player){
 						if(content&&content.length){
 							if(player==game.me||player.isUnderControl()){
@@ -3447,10 +3455,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			qianhuan:{
 				group:['qianhuan_add','qianhuan_use'],
 				init:function(player){
-					player.storage.qianhuan=[];
+					if(!player.storage.qianhuan) player.storage.qianhuan=[];
 				},
 				intro:{
-					content:'cards'
+					content:'cards',
+					onunmark:function(storage,player){
+						if(storage&&storage.length){
+							player.$throw(storage,1000);
+							game.cardsDiscard(storage);
+							game.log(storage,'被置入了弃牌堆');
+							storage.length=0;
+						}
+					},
 				},
 				ai:{
 					threaten:1.8
@@ -3899,7 +3915,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				global:['jiahe_put','jiahe_skill'],
 				init:function(player){
-					player.storage.yuanjiangfenghuotu=[];
+					if(!player.storage.yuanjiangfenghuotu) player.storage.yuanjiangfenghuotu=[];
 				},
 				ai:{
 					threaten:2
@@ -4056,6 +4072,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				intro:{
 					content:'cards',
+					onunmark:function(storage,player){
+						if(storage&&storage.length){
+							player.$throw(storage,1000);
+							game.cardsDiscard(storage);
+							game.log(storage,'被置入了弃牌堆');
+							storage.length=0;
+						}
+					},
 					mark:function(dialog,content,player){
 						if(content&&content.length){
 							dialog.addSmall(content);
@@ -4836,6 +4860,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				intro:{
 					content:'cards',
+					onunmark:function(storage,player){
+						if(storage&&storage.length){
+							player.$throw(storage,1000);
+							game.cardsDiscard(storage);
+							game.log(storage,'被置入了弃牌堆');
+							storage.length=0;
+						}
+					},
 					mark:function(dialog,content,player){
 						if(content&&content.length){
 							dialog.addSmall(content);

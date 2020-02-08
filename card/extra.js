@@ -184,6 +184,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					game.addVideo('cardDialog',null,[get.translation(target)+'展示的手牌',get.cardsInfo(result.cards),event.videoId]);
 					event.card2=result.cards[0];
 					game.log(target,'展示了',event.card2);
+					event._result={};
 					player.chooseToDiscard({suit:get.suit(event.card2)},function(card){
 						var evt=_status.event.getParent();
 						if(get.damageEffect(evt.target,evt.player,evt.player,'fire')>0){

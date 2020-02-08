@@ -91,17 +91,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				content:function(){
 					"step 0"
+					event.videoId=lib.status.videoId++;
 					if(player.isUnderControl()){
 						game.modeSwapPlayer(player);
 					}
 					var switchToAuto=function(){
-						_status.imchoosing=false;
-						event._result={
-							bool:true,
-							links:['qiaosi_c1','qiaosi_c2','qiaosi_c3','qiaosi_c4','qiaosi_c5','qiaosi_c6'].randomGets(3),
-						};
-						if(event.dialog) event.dialog.close();
-						if(event.control) event.control.close();
+						game.pause();
+						game.countChoose();
+						setTimeout(function(){
+							_status.imchoosing=false;
+							event._result={
+								bool:true,
+								links:['qiaosi_c1','qiaosi_c2','qiaosi_c3','qiaosi_c4','qiaosi_c5','qiaosi_c6'].randomGets(3),
+							};
+							if(event.dialog) event.dialog.close();
+							if(event.control) event.control.close();
+							game.resume();
+						},5000);
+					};
+					var createDialog=function(player,id){
+						if(player==game.me) return;
+						var str=get.translation(player)+'正在表演...<br>';
+						for(var i=1;i<7;i++){
+							str+=get.translation('qiaosi_c'+i);
+							if(i%3!=0) str+='     ';
+							if(i==3) str+='<br>';
+						}
+						ui.create.dialog(str,'forcebutton').videoId=id;
 					};
 					var chooseButton=function(player){
 						var event=_status.event;
@@ -123,8 +139,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							qiaosi_c6:[10,15],
 						}
 						event.finishedx=[];
-						event.str='请开始你的表演<br>qiaosi_c1% qiaosi_c2% qiaosi_c3% qiaosi_c4% qiaosi_c5% qiaosi_c6%';
-						event.dialog=ui.create.dialog(event.str);
+						event.str='请开始你的表演<br><img src="'+lib.assetURL+'image/card/qiaosi_card1.png" width="60" height="60">qiaosi_c1% <img src="'+lib.assetURL+'image/card/qiaosi_card2.png" width="60" height="60">qiaosi_c2% <img src="'+lib.assetURL+'image/card/qiaosi_card3.png" width="60" height="60">qiaosi_c3%<br><img src="'+lib.assetURL+'image/card/qiaosi_card4.png" width="60" height="60">qiaosi_c4%<img src="'+lib.assetURL+'image/card/qiaosi_card5.png" width="60" height="60">qiaosi_c5% <img src="'+lib.assetURL+'image/card/qiaosi_card6.png" width="60" height="60">qiaosi_c6%';
+						event.dialog=ui.create.dialog(event.str,'forcebutton','hidden');
+						event.dialog.addText('<li>点击下方的按钮，可以增加按钮对应的角色的「表演完成度」。对于不同的角色，点击时增加的完成度不同，最终获得的牌也不同。一次表演最多只能完成3名角色的进度。',false);
+						event.dialog.open();
 						for(var i in event.status){
 							event.dialog.content.childNodes[0].innerHTML=event.dialog.content.childNodes[0].innerHTML.replace(i,event.status[i]);
 						}
@@ -178,8 +196,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.pause();
 						game.countChoose();
 					};
-					event.switchToAuto=switchToAuto;
-
+					//event.switchToAuto=switchToAuto;
+					game.broadcastAll(createDialog,player,event.videoId);
 					if(event.isMine()){
 						chooseButton();
 					}
@@ -189,11 +207,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.pause();
 					}
 					else{
-						event.switchToAuto();
+						switchToAuto();
 					}
 					"step 1"
+					game.broadcastAll('closeDialog',event.videoId);
 					var map=event.result||result;
-					game.print(map);
+					//game.print(map);
 					if(!map||!map.bool||!map.links){
 						game.log(player,'表演失败');
 						event.finish();
@@ -935,7 +954,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					"step 2"
-					switch(get.suit(result.card)){
+					switch(result.suit){
 						case 'heart':trigger.player.recover(trigger.num);break;
 						case 'diamond':trigger.player.draw(3);break;
 						case 'club':trigger.source.chooseToDiscard('he',2,true);break;
@@ -1763,15 +1782,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			refuhai:'浮海',
 			refuhai_info:'出牌阶段限一次，你可弃置一张手牌，令其他角色同时在「潮起」和「潮落」中选择一项，并依次展示这些角色的选项。若从你下家开始选择了相同选项的角色数目大于1，则你摸X张牌（X为连续相同结果的数量）。',
 			qiaosi:'巧思',
-			qiaosi_info:'出牌阶段限一次，你可以表演「水转百戏图」并根据表演结果获得相应的牌。然后，你选择一项：1.弃置X张牌。2.将X张牌交给一名其他角色。（X为你以此法获得的牌数）',
-			qiaosi_map:'水转百戏图',
-			qiaosi_map_info:'也没啥特别的，对着那六个写着「人偶」的按钮使劲按就行了',
-			qiaosi_c1:'人偶 ',
-			qiaosi_c2:'人偶 ',
-			qiaosi_c3:'人偶 ',
-			qiaosi_c4:'人偶 ',
-			qiaosi_c5:'人偶 ',
-			qiaosi_c6:'人偶',
+			qiaosi_info:'出牌阶段限一次，你可以表演「大键角色图」并根据表演结果获得相应的牌。然后，你选择一项：1.弃置X张牌。2.将X张牌交给一名其他角色。（X为你以此法获得的牌数）',
+			qiaosi_map:'大键角色图',
+			qiaosi_map_info:'<br><li>星野 梦美：锦囊牌*2<br><li>能美 库特莉亚芙卡：装备牌/【杀】/【酒】*1<br><li>友利 奈绪：【杀】/【酒】*1<br><li>神尾 观铃：【闪】/【桃】*1<br><li>伊吹 风子：锦囊牌/【闪】/【桃】*1<br><li>仲村 ゆり：装备牌*2<br><li>Illustration: うら;Twitter:@ura530',
+			qiaosi_c1:'<img src="'+lib.assetURL+'image/card/qiaosi_card1.png" width="60" height="60"> ',
+			//星野 梦美
+			qiaosi_c2:'<img src="'+lib.assetURL+'image/card/qiaosi_card2.png" width="60" height="60"> ',
+			//能美 库特莉亚芙卡
+			qiaosi_c3:'<img src="'+lib.assetURL+'image/card/qiaosi_card3.png" width="60" height="60"> ',
+			//友利 奈绪
+			qiaosi_c4:'<img src="'+lib.assetURL+'image/card/qiaosi_card4.png" width="60" height="60"> ',
+			//神尾 观铃
+			qiaosi_c5:'<img src="'+lib.assetURL+'image/card/qiaosi_card5.png" width="60" height="60"> ',
+			//伊吹 风子
+			qiaosi_c6:'<img src="'+lib.assetURL+'image/card/qiaosi_card6.png" width="60" height="60"> ',
+			//仲村 ゆり
 		}
 	};
 });

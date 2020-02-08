@@ -221,7 +221,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.countPlayer2(function(current){
 							var history=current.getHistory('useCard');
 							for(var j=0;j<history.length;j++){
-								if(['basic','trick'].contains(get.type(history[j].card))&&history[j].targets&&history[j].targets.contains(player)) num++;
+								if(['basic','trick'].contains(get.type(history[j].card,'trick'))&&history[j].targets&&history[j].targets.contains(player)) num++;
 							}
 						});
 						event.num=num;
@@ -2354,10 +2354,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.suit(event.card)=='spade';
 				},
 				init:function(player){
-					player.storage.bizhuan=[];
+					if(!player.storage.bizhuan) player.storage.bizhuan=[];
 				},
 				intro:{
-					content:'cards'
+					content:'cards',
+					onunmark:function(storage,player){
+						if(storage&&storage.length){
+							player.$throw(storage,1000);
+							game.cardsDiscard(storage);
+							game.log(storage,'被置入了弃牌堆');
+						 storage.length=0;
+						}
+					},
 				},
 				frequent:true,
 				content:function(){
@@ -2563,10 +2571,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			shouxi:{
 				audio:2,
-				trigger:{target:'shaBefore'},
+				trigger:{target:'useCardToTargeted'},
 				direct:true,
 				init:function(player){
 					if(!player.storage.shouxi) player.storage.shouxi=[];
+				},
+				filter:function(event,player){
+					return event.card.name=='sha';
 				},
 				content:function(){
 					'step 0'
@@ -2584,27 +2595,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.logSkill('shouxi');
 						var name=result.links[0][2];
-						var card=game.createCard(name,get.type(name),'');
+						event.vcard=result.links;
 						event.cardname=name;
 						player.storage.shouxi.add(name);
-						player.showCards(get.translation(player)+'声明了'+get.translation(name),card);
 					}
 					else{
 						event.finish();
 					}
 					'step 2'
 					var name=event.cardname;
-					trigger.player.chooseToDiscard('守玺：弃置一张'+get.translation(name)+'，否则杀对'+get.translation(player)+'无效',function(card){
+					trigger.player.chooseToDiscard(function(card){
 						return card.name==_status.event.cardname;
 					}).set('ai',function(card){
 						if(_status.event.att<0){
 							return 10-get.value(card);
 						}
 						return 0;
-					}).set('att',get.attitude(trigger.player,player)).set('cardname',name);
+					}).set('att',get.attitude(trigger.player,player)).set('cardname',name).set('dialog',['守玺：请弃置一张【'+get.translation(name)+'】，否则此【杀】对'+get.translation(player)+'无效',[event.vcard,'vcard']]);
 					'step 3'
 					if(result.bool==false){
-						trigger.cancel();
+						trigger.excluded.push(player);
 					}
 					else{
 						trigger.player.gainPlayerCard(player);
@@ -4370,6 +4380,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						audio:'kuangbi',
 						intro:{
+							onunmark:function(storage,player){
+								var cards=[];
+								while(storage.length){
+									cards.addArray(storage.shift()[0]);
+								}
+								if(cards.length){
+									game.cardsDiscard(cards);
+									player.$throw(cards,1000);
+									game.log(cards,'被置入了弃牌堆');
+								}
+							},
 							markcount:function(content){
 								var cards=[];
 								for(var i=0;i<content.length;i++){
@@ -5078,10 +5099,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('h')>0&&(_status.connectMode||player.countCards('h','sha')>0)&&!player.storage.chunlao.length;
 				},
 				init:function(player){
-					player.storage.chunlao=[];
+					if(!player.storage.chunlao) player.storage.chunlao=[];
 				},
 				intro:{
 					content:'cards',
+					onunmark:function(storage,player){
+						if(storage&&storage.length){
+							player.$throw(storage,1000);
+							game.cardsDiscard(storage);
+							game.log(storage,'被置入了弃牌堆');
+						 storage.length=0;
+						}
+					},
 				},
 				content:function(){
 					'step 0'
@@ -7022,7 +7051,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger.target.storage.xinpojun2=trigger.target.storage.xinpojun2.concat(result.links);
 						}
 						else{
-							trigger.target.storage.xinpojun2=result.links;
+							trigger.target.storage.xinpojun2=result.links.slice(0);
 						}
 						game.addVideo('storage',trigger.target,['xinpojun2',get.cardsInfo(trigger.target.storage.xinpojun2),'cards']);
 						trigger.target.addSkill('xinpojun2');
@@ -7039,7 +7068,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:false,
 				mark:true,
 				intro:{
-					content:'cardCount'
+					content:'cardCount',
+					onunmark:function(storage,player){
+						if(storage&&storage.length){
+							player.$throw(storage,1000);
+							game.cardsDiscard(storage);
+							game.log(storage,'被置入了弃牌堆');
+						 storage.length=0;
+						}
+					},
 				},
 				content:function(){
 					if(player.storage.xinpojun2){
@@ -7048,7 +7085,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					player.removeSkill('xinpojun2');
 				},
-				group:'xinpojun3'
+				//group:'xinpojun3'
 			},
 			xinpojun3:{
 				trigger:{player:'dieBegin'},
@@ -8085,7 +8122,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				locked:false,
 				notemp:true,
 				init:function(player){
-					player.storage.quanji=[];
+					if(!player.storage.quanji) player.storage.quanji=[];
 				},
 				filter:function(event){
 					return event.num>0;
@@ -8110,7 +8147,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				intro:{
-					content:'cards'
+					content:'cards',
+					onunmark:function(storage,player){
+						if(storage&&storage.length){
+							player.$throw(storage,1000);
+							game.cardsDiscard(storage);
+							game.log(storage,'被置入了弃牌堆');
+						 storage.length=0;
+						}
+					},
 				},
 				mod:{
 					maxHandcard:function(player,num){
@@ -10398,11 +10443,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					content:'cards',
 					onunmark:function(storage,player){
 						if(storage&&storage.length){
+							player.$throw(storage,1000);
 							game.cardsDiscard(storage);
-							player.$throw(storage);
-							player.storage.xiansi.length=0;
+							game.log(storage,'被置入了弃牌堆');
+						 storage.length=0;
 						}
-					}
+					},
 				},
 				ai:{
 					threaten:2
@@ -10709,17 +10755,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageEnd',source:'damageSource'},
 				frequent:true,
 				init:function(player){
-					player.storage.zyexin=[];
+					if(!player.storage.zyexin) player.storage.zyexin=[];
 				},
 				intro:{
-					content:'cards'
+					content:'cards',
+					onunmark:function(storage,player){
+						if(storage&&storage.length){
+							player.$throw(storage,1000);
+							game.cardsDiscard(storage);
+							game.log(storage,'被置入了弃牌堆');
+						 storage.length=0;
+						}
+					},
 				},
 				content:function(){
-					var card=get.cards()[0];
+					var card=game.cardsGotoSpecial(get.cards()).cards[0];
 					player.storage.zyexin.push(card);
 					player.$draw(card);
 					player.markSkill('zyexin');
-					event.trigger("addCardToStorage");
 					game.addVideo('storage',player,['zyexin',get.cardsInfo(player.storage.zyexin),'cards']);
 				},
 				group:'zyexin2'
@@ -11339,7 +11392,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zongshi_info:'锁定技，你的手牌上限+X（X为场上现存势力数）。',
 			danshou_info:'出牌阶段，你可以选择你攻击范围内的一名其他角色，然后弃置X张牌（X为此前你于此阶段你发动“胆守”的次数+1）。若X：为1，你弃置该角色的一张牌；为2，令该角色交给你一张牌；为3，你对该角色造成1点伤害；不小于4，你与该角色各摸两张牌。',
 			olddanshou_info:'当你造成伤害后，你可以摸一张牌。若如此做，终止一切结算，当前回合结束。',
-			xindanshou_info:'①每回合限一次，当你成为基本牌或锦囊牌的目标时，你可以摸X张牌（X为你本回合内成为过基本牌或锦囊牌的目标的次数）。②一名其他角色的结束阶段，若你本回合内没有发动过〖胆守①〗，则你可以弃置X张牌并对其造成1点伤害（X为其手牌数）。',
+			xindanshou_info:'①每回合限一次，当你成为基本牌或锦囊牌的目标后，你可以摸X张牌（X为你本回合内成为过基本牌或锦囊牌的目标的次数）。②一名其他角色的结束阶段，若你本回合内没有发动过〖胆守①〗，则你可以弃置X张牌并对其造成1点伤害（X为其手牌数，无牌则不弃）。',
 			yizhong_info:'锁定技，当你的防具栏为空时，黑色的杀对你无效',
 			xinzhan_info:'出牌阶段限一次，你可以观看牌堆顶的3张牌，然后展示其中任意数量♥的牌并获得之。',
 			huilei_info:'锁定技，当你死亡时，杀死你的角色弃置所有的牌。',

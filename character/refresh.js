@@ -5,7 +5,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			refresh:{
     refresh_standard:["re_caocao","re_simayi","re_guojia","re_lidian","re_zhangliao","re_xuzhu","re_xiahoudun","re_zhangfei","re_zhaoyun","re_guanyu","re_machao","re_xushu","re_zhouyu","re_lvmeng","re_ganning","re_luxun","re_daqiao","re_huanggai","re_lvbu","re_gongsunzan","re_huatuo","re_liubei","re_diaochan","re_huangyueying","re_sunquan","re_sunshangxiang","re_zhenji","re_zhugeliang","re_huaxiong"],
-    
     refresh_feng:['caoren','re_xiahouyuan','re_huangzhong','re_weiyan','re_xiaoqiao','zhoutai','re_zhangjiao','xin_yuji'],
 				refresh_huo:["re_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","re_pangtong","xin_yuanshao","re_pangde"],
 				refresh_lin:['re_zhurong','re_menghuo','re_dongzhuo','re_sunjian','re_caopi','re_xuhuang'],
@@ -80,16 +79,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunben:' ',
 		},
 		characterFilter:{
-			re_zuoci:function(mode){
-				return mode=='identity'||mode=='single'||mode=='doudizhu';
-			}
+			//re_zuoci:function(mode){
+			//	return mode=='identity'||mode=='single'||mode=='doudizhu';
+			//}
 		},
 		perfectPair:{
 			sunben:['zhouyu','taishici','daqiao'],
 		},
 		skill:{
 			rehuashen:{
-				mode:['identity','single','doudizhu'],
+				//mode:['identity','single','doudizhu'],
 				audio:2,
 				unique:true,
 				direct:true,
@@ -241,6 +240,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				addHuashen:function(player){
 					if(!player.storage.rehuashen) return;
+					if(!_status.characterlist){
+						var list=[];
+						for(var i in lib.character){
+							if(lib.filter.characterDisabled2(i)||lib.filter.characterDisabled(i)) continue;
+							list.push(i);
+						}
+						game.countPlayer(function(current){
+							list.remove(current.name);
+							list.remove(current.name1);
+							list.remove(current.name2);
+						});
+						_status.characterlist=list;
+					}
 					_status.characterlist.randomSort();
 					var bool=false;
 					for(var i=0;i<_status.characterlist.length;i++){
@@ -342,7 +354,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			rexingsheng:{audio:2},
 			rexinsheng:{
-				mode:['identity','single','doudizhu'],
+				//mode:['identity','single','doudizhu'],
 				unique:true,
 				audio:'rexingsheng',
 				trigger:{player:'damageEnd'},
@@ -1135,27 +1147,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{
 					player:"damageEnd",
 				},
-				forced:true,
-				silent:true,
-				popup:false,
+				direct:true,
 				filter:function (event,player){
-					return event.parent.skill=='shuangxiong2'&&event.parent.targetCards.length>0;
+					var evt=event.getParent();
+					return (evt&&evt.name=='juedou'&&evt[player==evt.player?'targetCards':'playerCards'])>0;
 				},
 				content:function (){
 					"step 0"
-					var cards=trigger.parent.targetCards.slice(0);
+					var evt=trigger.getParent();
+					var cards=evt[player==evt.player?'targetCards':'playerCards'].slice(0);
 					for(var i=0;i<cards.length;i++){
 						if(get.position(cards[i])!='d') cards.remove(cards[i--]);
 					}
 					if(!cards.length) event.finish();
 					else{
 						event.cards=cards;
-						player.chooseBool('是否获得'+get.translation(event.cards)+'?').ai=function(){
+						player.chooseBool('是否发动【双雄】，获得'+get.translation(event.cards)+'?').ai=function(){
 							return true;
 						};
 					}
 					"step 1"
-					if(result.bool) player.gain(cards,'gain2');
+					if(result.bool){
+						player.logSkill('reshuangxiong');
+						player.gain(cards,'gain2');
+					}
 				},
 			},
 			
@@ -2974,7 +2989,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			reqianxun:{
 				init:function(player){
-					player.storage.reqianxun2=[];
+					if(!player.storage.reqianxun2) player.storage.reqianxun2=[];
 				},
 				audio:2,
 				trigger:{target:'useCardToBegin',player:'judgeBefore'},
@@ -3021,14 +3036,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				audio:false,
 				content:function(){
-					player.gain(player.storage.reqianxun2,'fromStorage');
+					player.gain(player.storage.reqianxun2,'fromStorage','draw');
+					player.storage.reqianxun2.length=0;
 					player.removeSkill('reqianxun2');
-					player.storage.reqianxun2=[];
 					game.addVideo('storage',player,['reqianxun2',get.cardsInfo(player.storage.reqianxun2),'cards']);
 				},
 				mark:true,
 				intro:{
-					content:'cardCount'
+					content:'cardCount',
+					onunmark:function(storage,player){
+						if(storage&&storage.length){
+							player.$throw(storage,1000);
+							game.cardsDiscard(storage);
+							game.log(storage,'被置入了弃牌堆');
+							player.storage.reqianxun2.length=0;
+						}
+					},
 				}
 			},
 			relianying:{
@@ -3953,33 +3976,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reqiangxi:"强袭",
 			"reqiangxi_info":"出牌阶段对每名其他角色限一次，你可以选择一项：1. 失去一点体力并对你攻击范围内的一名其他角色造成一点伤害；2. 弃置一张武器牌并对你攻击范围内的一名其他角色造成一点伤害。",
 			rehuoji:"火计",
-			"rehuoji_info":"出牌阶段，你可以将你的任意一张♥或♦牌当作【火攻】使用。",
+			"rehuoji_info":"出牌阶段，你可一张红色牌当作【火攻】使用。",
 			rekanpo:"看破",
-			"rekanpo_info":"你可以将你的任意一张♠或♣牌当作【无懈可击】使用。",
+			"rekanpo_info":"你可以将一张黑色牌当作【无懈可击】使用。",
 			rejieming:"节命",
 			"rejieming_info":"当你受到1点伤害后，你可以令一名角色摸两张牌。然后若其手牌数小于体力上限，则你摸一张牌。",
 			reshuangxiong:"双雄",
-			"reshuangxiong_info":"摸牌阶段，你可以放弃摸牌。若如此做，你展示牌堆顶的两张牌并选择获得其中的一张。然后，你本回合内可以将与此牌颜色不同的一张手牌当做【决斗】使用。当你受到以此法使用的【决斗】的伤害时，你获得对方于此决斗中打出的所有【杀】",
+			"reshuangxiong_info":"摸牌阶段，你可以放弃摸牌。若如此做，你展示牌堆顶的两张牌并选择获得其中的一张。然后，你本回合内可以将与此牌颜色不同的一张手牌当做【决斗】使用。当你受到【决斗】造成的伤害时，你可以获得对方于此决斗中打出的所有【杀】",
 			"reshuangxiong2":"双雄",
 			"reshuangxiong2_info":"",
 
 			reguanxing:'观星',
-			reguanxing_info:'准备阶段，你可以观看牌堆顶的5张牌（存活角色小于4时改为3张），并将其以任意顺序置于牌堆项或牌堆底，若你将“观星”的牌都放在了牌堆底，则你可以在结束阶段再次发动“观星”',
+			reguanxing_info:'准备阶段，你可以观看牌堆顶的5张牌（存活角色小于4时改为3张），并将其以任意顺序置于牌堆项或牌堆底，若你将〖观星〗的牌都放在了牌堆底，则你可以在结束阶段再次发动〖观星〗。',
 			reluoshen:'洛神',
-			reluoshen_info:'准备阶段，你可以进行一次判定，若结果为黑色则获得此判定牌，且可重复此流程直到出现红色的判定结果。你通过〖洛神〗获得的牌，不计入当前回合的手牌上限',
-			reluoshen_info_guozhan:'准备阶段，你可以进行一次判定，若为黑色则可以继续判定，直到出现红色。然后你获得所有黑色的判定牌。你通过〖洛神〗获得的牌，不计入当前回合的手牌上限',
+			reluoshen_info:'准备阶段，你可以进行判定，若结果为黑色则获得此判定牌，且可重复此流程直到出现红色的判定结果。你通过〖洛神〗获得的牌，不计入当前回合的手牌上限',
+			reluoshen_info_guozhan:'准备阶段，你可以进行判定，若为黑色则可以继续判定，直到出现红色。然后你获得所有黑色的判定牌。你通过〖洛神〗获得的牌，不计入当前回合的手牌上限。（结果为黑色的判定牌于此过程中不会进入弃牌堆）',
 			rejieyin:'结姻',
-			rejieyin_info:'出牌阶段限一次，你可以选择一名男性角色并弃置一张手牌或将装备区内的一张装备牌置于其装备区，你与其体力较高的角色摸一张牌，体力值较低的角色回复1点体力',
+			rejieyin_info:'出牌阶段限一次，你可以选择一名男性角色并弃置一张手牌或将装备区内的一张装备牌置于其装备区，你与其体力较高的角色摸一张牌，体力值较低的角色回复1点体力。',
 			rebiyue:'闭月',
-			rebiyue_info:'结束阶段，你可以摸一张牌，若你没有手牌，则改为摸两张牌',
+			rebiyue_info:'结束阶段，你可以摸一张牌，若你没有手牌，则改为摸两张牌。',
 			rejizhi:'集智',
 			rejizhi_info:'当你使用非延时锦囊牌时，你可以摸一张牌。若此牌为基本牌，则你可以弃置之，然后令本回合手牌上限+1。',
 			reqicai:'奇才',
-			reqicai_info:'锁定技，你使用锦囊牌无距离限制，你装备区内的防具牌和宝物牌不能被其他角色弃置',
+			reqicai_info:'锁定技，你使用锦囊牌无距离限制，你装备区内的防具牌和宝物牌不能被其他角色弃置。',
 			rezhiheng:'制衡',
-			rezhiheng_info:'出牌阶段限一次，你可以弃置任意张牌并摸等量的牌，若你在发动“制衡”时弃置了所有手牌，则你多摸一张牌',
+			rezhiheng_info:'出牌阶段限一次，你可以弃置任意张牌并摸等量的牌，若你在发动〖制衡〗时弃置了所有手牌，则你多摸一张牌。',
 			rejiuyuan:'救援',
-			rejiuyuan_info:'主公技，其他吴国角色对自己使用【桃】时，若其体力值大于你，则	其可以选择令你回复1点体力，然后其摸1张牌',
+			rejiuyuan_info:'主公技，其他吴势力角色对自己使用【桃】时，若其体力值大于你，则其可以选择令你回复1点体力，然后其摸1张牌。',
 
 			"new_yajiao":"涯角",
 			"new_yajiao_info":"每当你于回合外使用或打出牌时，你可以亮出牌堆顶的一张牌，并将其交给一名角色。若此牌与你此次使用或打出的牌类别不同，则你弃置一张牌。",
@@ -3989,11 +4012,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_retuxi_info":"摸牌阶段摸牌时，你可以少摸任意张牌，然后获得等量的角色的各一张手牌。",
 			"new_retuxi_info_guozhan":"摸牌阶段摸牌时，你可以少摸至多两张牌，然后获得等量的角色的各一张手牌。",
 			"new_reyiji":"遗计",
-			"new_reyiji_info":"每当你受到1点伤害后，你可以摸两张牌，然后可以将至多两张手牌交给其他角色。",
+			"new_reyiji_info":"当你受到1点伤害后，你可以摸两张牌，然后可以将至多两张手牌交给其他角色。",
 			"new_rejianxiong":"奸雄",
-			"new_rejianxiong_info":"每当你受到伤害后，你可以获得对你造成伤害的牌并摸一张牌。",
+			"new_rejianxiong_info":"当你受到伤害后，你可以获得对你造成伤害的牌并摸一张牌。",
 			"new_reluoyi":"裸衣",
-			"new_reluoyi_info":"你可以展示牌堆顶的三张牌。然后，你可以放弃摸牌。若如此做，你获得其中的基本牌、武器牌和【决斗】，若如此做，直到你的下回合开始，你为伤害来源的【杀】或【决斗】造成的伤害+1。否则，你弃置这些牌。",
+			"new_reluoyi_info":"摸牌阶段开始时，你展示牌堆顶的三张牌。然后，你可以放弃摸牌。若如此做，你获得其中的基本牌、武器牌和【决斗】，且直到你的下回合开始，你使用的【杀】或【决斗】造成伤害时，此伤害+1。否则，你将这些牌置入弃牌堆。",
 			"new_rewusheng":"武圣",
 			"new_rewusheng_info":"你可以将一张红色牌当做【杀】使用或打出。你使用的方片杀没有距离限制。",
 			"new_yijue":"义绝",
@@ -4007,7 +4030,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_tishen2":"替身",
 			"new_tishen2_info":"",
 			"new_qingjian":"清俭",
-			"new_qingjian_info":"每当你于摸牌阶段外获得牌时，你可以展示任意张牌并交给一名其他角色。然后，当前回合角色本回合的手牌上限+X（X为你给出的牌中包含的类别数）。每回合限一次。",
+			"new_qingjian_info":"当你于摸牌阶段外获得牌时，你可以展示任意张牌并交给一名其他角色。然后，当前回合角色本回合的手牌上限+X（X为你给出的牌中包含的类别数）。每回合限一次。",
 			"qingjian_add":"清俭",
 			"qingjian_add_info":"",
 			"new_reqingnang":"青囊",
