@@ -15,6 +15,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_kagari:['female','shen',3,['kagari_zongsi'],['key']],
 			key_rei:['male','key',4,['xiandeng','shulv','xisheng']],
 			key_komari:['female','key',3,['komari_tiankou','komari_xueshang']],
+			key_yukine:['female','key',3,['yukine_wenzhou']],
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
 			diy_feishi:['male','shu',3,['shuaiyan','moshou']],
@@ -91,7 +92,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy:{
 				diy_tieba:["diy_wenyang","ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine"],
 			},
 		},
 		characterIntro:{
@@ -105,6 +106,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
+			key_yukine:'#gClannad',
 			key_komari:'#bLittle Busters!',
 			key_umi:'#bSummer Pockets',
 			key_rei:'#gHarmonia',
@@ -148,6 +150,82 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuji:['zuoci']
 		},
 		skill:{
+			yukine_wenzhou:{
+				trigger:{global:'phaseUseBegin'},
+				direct:true,
+				filter:function(event,player){
+					return event.player.countCards('he')>0;
+				},
+				content:function(){
+					"step 0"
+					event.forceDie=true;
+					var ask=trigger.player.chooseCard('he',get.prompt('yukine_wenzhou'));
+					if(player==trigger.player){
+						ask.set('prompt2','选择一张牌，然后从牌堆中获得一张与此牌类型相同的牌。本回合内使用与此牌类型相同的牌时不可被其他角色响应。');
+					}
+					else ask.set('prompt2','将一张牌交给'+get.translation(player)+'然后其可以选择：交给你一张牌；或令你从牌堆中获得一张与此牌类型相同的牌，且你本回合内使用与此牌类型相同的牌时不可被响应。');
+					ask.set('ai',function(card){
+						if(get.attitude(_status.event.player,_status.event.getParent().player)>0) return 10-get.value(card);
+						return -1;
+					});
+					"step 1"
+					if(result.bool){
+						player.logSkill('yukine_wenzhou',trigger.player);
+						event.type=get.type(result.cards[0],'trick');
+						if(trigger.player!=player) trigger.player.give(result.cards,player,'giveAuto');
+					}
+					else event.finish();
+					"step 2"
+					if(player==trigger.player||player.countCards('he')==0){
+						event._result={index:1};
+					}
+					else{
+						player.chooseControl().set('choiceList',[
+							'将一张牌交给'+get.translation(trigger.player),
+							'令'+get.translation(trigger.player)+'从牌堆中获得一张'+get.translation(event.type)+'牌，且其本回合内使用与此牌名称相同的牌时不可被响应',
+						]).set('forceDie',true).set('ai',function(){
+							if(get.attitude(_status.event.player,_status.event.getTrigger().player)>0) return 1;
+							return 0;
+						});
+					}
+					"step 3"
+					if(result.index==1){
+						var magic=get.cardPile2(function(card){
+							return get.type(card,'trick')==event.type;
+						});
+						if(magic){
+							trigger.player.addTempSkill('yukine_magic','phaseUseEnd');
+							trigger.player.storage.yukine_magic.add(magic.name);
+							trigger.player.gain(magic,'draw');
+						}
+						event.finish();
+					}
+					else player.chooseCard('he',true,'选择要交给'+get.translation(trigger.player)+'的牌').set('ai',function(card){
+						return -get.value(card,_status.event.getTrigger().player);
+					});
+					"step 4"
+					if(result.bool) player.give(result.cards,trigger.player,'giveAuto');
+				},
+			},
+			yukine_magic:{
+				trigger:{player:'useCard'},
+				forced:true,
+				popup:false,
+				charlotte:true,
+				filter:function(event,player){
+					return player.storage.yukine_magic&&player.storage.yukine_magic.contains(event.card.name);
+				},
+				content:function(){
+					trigger.directHit.addArray(game.filterPlayer(function(current){
+						if(player!=current) return true;
+						return !player.hasSkill('yukine_wenzhou');
+					}));
+				},
+				onremove:true,
+				init:function(player,skill){
+					if(!player.storage[skill]) player.storage[skill]=[];
+				},
+			},
 			komari_tiankou:{
 				trigger:{
 					player:'useCard2',
@@ -287,6 +365,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.loseHp();
 					'step 1'
+					player.draw(2);
 					player.insertPhase();
 					player.storage.umi_shiroha=trigger.player;
 					player.addTempSkill('umi_shiroha');
@@ -338,30 +417,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.skills=skills;
 					event.chosen=[];
 					'step 2'
-					var next=player.chooseButton(['是否获得一名已死亡角色的一个技能？',[event.chara,'player']]);
+					var next=player.chooseTarget('是否获得一名已死亡角色的一个技能？');
 					next.set('chara',event.chara);
 					next.set('skills',event.skills);
 					next.set('chosen',event.chosen);
-					next.set('filterButton',function(button){
+					next.set('filterTarget',function(card,player,target){
+						if(target.isAlive()) return false;
 						var evt=_status.event;
 						if(!evt.chosen.length) return true;
-						var skills=evt.skills[evt.chara.indexOf(button.link)];
+						var skills=evt.skills[evt.chara.indexOf(target)];
 						if(skills.length==1&&skills[0]==evt.chosen[0]) return false;
 						return true;
 					});
+					next.set('deadTarget',true);
 					next.set('ai',function(){return Math.random()});
 					'step 3'
 					if(!result.bool) event.finish();
 					else{
-						event.temp=result.links[0];
-						var list=event.skills[event.chara.indexOf(result.links[0])];
-						result.links[0].line(player,{color:[251, 193, 217]})
+						event.temp=result.targets[0];
+						var list=event.skills[event.chara.indexOf(result.targets[0])];
+						result.targets[0].line(player,{color:[251, 193, 217]})
 						list.removeArray(event.chosen);
 						player.chooseControl(list).set('prompt','选择获得一个技能');
 					}
 					'step 4'
 					player.addSkill(result.control,get.groupnature(event.temp.group)||'key');
 					player.addSkill(result.control);
+					var info=get.info(result.control);
+					if(info.zhuSkill){
+						if(!player.storage.zhuSkill_umi_qihuan) player.storage.zhuSkill_umi_qihuan=[];
+						player.storage.zhuSkill_umi_qihuan.push(result.control);
+					}
 					event.chosen.push(result.control);
 					if(event.chosen.length<2) event.goto(2);
 				},
@@ -5481,6 +5567,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_umi2:'鹰原羽未',
 			key_rei:'零',
 			key_komari:'神北小毬',
+			key_yukine:'宫泽有纪宁',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -5502,7 +5589,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			umi_chaofan:'炒饭',
 			umi_chaofan_info:'出牌阶段限一次，你可以弃置两张花色不同的手牌并选择一名其他角色。你摸一张牌，若你的体力值：大于2，目标角色回复1点体力；等于2，目标角色摸两张牌；小于2，目标角色受到1点无来源且对应渠道为这两张牌的火焰伤害。',
 			umi_lunhui:'轮回',
-			umi_lunhui_info:'一名其他角色的回合结束时，若你的手牌数小于体力值，则你可以失去1点体力。若如此做，你进行一个额外回合，且你于此回合内计算与此角色的距离视为1。',
+			umi_lunhui_info:'一名其他角色的回合结束时，若你的手牌数小于体力值，则你可以失去1点体力。若如此做，你摸两张牌并进行一个额外回合，且你于此回合内计算与此角色的距离视为1。',
 			umi_shiroha:'轮回 - 延时效果',
 			umi_qihuan:'七幻',
 			umi_qihuan_info:'限定技，当你处于濒死状态时，你可以移去此武将牌。若如此做，你回复X点体力（X为场上势力数）。然后，你可获得场上已死亡角色武将牌上的至多两个技能。',
@@ -5510,6 +5597,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			komari_tiankou_info:'锁定技，当你使用红色的非伤害性基本牌/锦囊牌选择目标时，或成为其他角色使用的这些牌的目标时，你选择一项：1.摸一张牌；2.为此牌增加一个目标',
 			komari_xueshang:'血殇',
 			komari_xueshang_info:'锁定技，蓄力技，当有角色死亡时，你对自己造成<span class=yellowtext>1</span>点伤害，然后对所有其他角色依次造成<span class=firetext>1</span>点伤害。当有角色因此法进入濒死状态时，你加1点体力上限并回复1点体力，然后失去此技能并终止此技能的所有后续结算。',
+			yukine_wenzhou:'问咒',
+			yukine_wenzhou_info:'一名角色的出牌阶段开始时，其可以交给你一张牌。若如此做，你选择一项：交给其一张牌，或令其从牌堆中获得一张与此牌类型相同的牌，且其于此阶段内使用与此牌牌名相同的牌时无法被响应。',
 			
 			ns_chuanshu:'传术',
 			ns_chuanshu_info:'<span class=yellowtext>限定技</span> 当一名其他角色进入濒死状态时，你可以令其选择获得技能【雷击】或【鬼道】，其回复体力至1并摸两张牌。当该被【传术】的角色造成或受到一次伤害后，你摸一张牌。其阵亡后，你重置技能【传术】',

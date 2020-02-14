@@ -1110,6 +1110,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:{
 					cardPile:function(list){
+						lib.config.bannedcards.remove('du');
+						if(game.bannedcards) game.bannedcards.remove('du');
 						var num=Math.ceil(list.length/10);
 						while(num--){
 							list.push([['heart','diamond','club','spade'].randomGet(),Math.ceil(Math.random()*13),'du']);
@@ -1681,10 +1683,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			// shenrudihou:{
-			//     name:'深入敌后',
-			//     mode:'versus',
-			//     submode:'1v1',
-			//     intro:'选将阶段选择武将和对战阶段选择上场的武将都由对手替你选择，而且你不知道对手为你选择了什么武将'
+			//	 name:'深入敌后',
+			//	 mode:'versus',
+			//	 submode:'1v1',
+			//	 intro:'选将阶段选择武将和对战阶段选择上场的武将都由对手替你选择，而且你不知道对手为你选择了什么武将'
 			// },
 			tongjiangmoshi:{
 				name:'同将模式',
@@ -1777,23 +1779,199 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			// baiyudujiang:{
-			//     name:'白衣渡江',
-			//     mode:'versus',
-			//     submode:'2v2',
-			//     intro:[
-			//         '玩家在选将时可从6-8张的武将牌里选择两张武将牌，一张面向大家可见（加入游戏），另一张是隐藏面孔（暗置）',
-			//         '选择的两张武将牌需满足以下至少两个条件：1.性别相同；2.体力上限相同；3.技能数量相同',
-			//         '每名玩家在其回合开始或回合结束时，可以选择将自己的武将牌弃置，然后使用暗置的武将牌进行剩余的游戏'
-			//     ],
-			//     content:{
-			//         submode:'two',
-			//         chooseCharacterNum:2,
-			//         chooseCharacterAfter:function(){
-			//
-			//         }
-			//     }
-			// }
+			baiyidujiang:{
+				name:'白衣渡江',
+				mode:'versus',
+				submode:'2v2',
+				showcase:function(init){
+					var node=this;
+					var player1,player2;
+					if(init){
+						player1=ui.create.player(null,true).init('lvmeng');
+						player2=ui.create.player(null,true).init('guanyu');
+						player1.node.marks.remove();
+						player1.node.hp.remove();
+						player2.node.marks.remove();
+						player2.node.hp.remove();
+						player1.style.left='20px';
+						player1.style.top='20px';
+						player1.style.transform='scale(0.9)';
+						player1.node.count.innerHTML='2';
+						player1.node.count.dataset.condition='mid';
+						player2.style.left='auto';
+						player2.style.right='20px';
+						player2.style.top='20px';
+						player2.style.transform='scale(0.9)';
+						player2.node.count.innerHTML='2';
+						player2.node.count.dataset.condition='mid';
+						this.appendChild(player1);
+						this.appendChild(player2);
+						this.player1=player1;
+						this.player2=player2;
+					}
+					else{
+						player1=this.player1;
+						player2=this.player2;
+					}
+					var rect1=player1.getBoundingClientRect();
+					var rect2=player2.getBoundingClientRect();
+					var left1=rect1.left+rect1.width/2-ui.arena.offsetLeft;
+					var left2=rect2.left+rect2.width/2-ui.arena.offsetLeft;
+					var top1=rect1.top+rect1.height/2-ui.arena.offsetTop;
+					var top2=rect2.top+rect2.height/2-ui.arena.offsetTop;
+					var func=function(){
+						//game.linexy([left1,top1,left2,top2]);
+						setTimeout(function(){
+							player1.reinit(player1.name,'re_lvmeng');
+							player2.reinit(player2.name,'re_guanyu');
+							//game.linexy([left2,top2,left1,top1],'green');
+						},1500);
+						setTimeout(function(){
+							player1.reinit(player1.name,'sp_lvmeng');
+							player2.reinit(player2.name,'jsp_guanyu');
+							//game.linexy([left1,top1,left2,top2],'thunder');
+						},3000);
+						setTimeout(function(){
+							player1.reinit(player1.name,'shen_lvmeng');
+							player2.reinit(player2.name,'shen_guanyu');
+							//game.linexy([left2,top2,left1,top1],'fire');
+						},4500);
+						setTimeout(function(){
+							player1.reinit(player1.name,'lvmeng');
+							player2.reinit(player2.name,'guanyu');
+						},6000);
+					};
+					node.showcaseinterval=setInterval(func,6000);
+					func();
+				},
+				intro:[
+					'玩家在选将时可从8张武将牌里选择两张武将牌，一张面向大家可见（加入游戏），另一张是隐藏面孔（暗置）',
+					'选择的两张武将牌需满足以下至少两个条件：1.性别相同；2.体力上限相同；3.技能数量相同',
+					'每名玩家在其回合开始或回合结束时，可以选择将自己的武将牌弃置，然后使用暗置的武将牌进行剩余的游戏'
+				],
+				content:{
+					submode:'two',
+					chooseCharacterBefore:function(){
+   			lib.skill._changeCharacter={
+   				trigger:{player:['phaseBefore','phaseAfter']},
+   				forced:true,
+   				silent:true,
+   				popup:false,
+   				filter:function(event,player){
+   					return player._backupCharacter!=undefined;
+   				},
+   				content:function(){
+   					"step 0"
+   					player.chooseControl('确定','取消').set('dialog',['是否替换自己的武将牌？',[[player._backupCharacter],'character']]).set('ai',function(){
+   						return Math.random()<0.15?'确定':'取消';
+   					});
+   					"step 1"
+   					if(result.control=='确定'){
+   						game.log(player,'将',player.name,'替换为了',player._backupCharacter);
+   						player.reinit(player.name,player._backupCharacter);
+   						player.changeGroup(lib.character[player._backupCharacter][1],false);
+   						delete player._backupCharacter;
+   					}
+   				},
+   			},
+   			game.addGlobalSkill('_changeCharacter');
+   			game.chooseCharacterTwo=function(){
+   				var next=game.createEvent('chooseCharacter',false);
+   				next.setContent(function(){
+   					'step 0'
+   					ui.arena.classList.add('choose-character');
+   					for(var i in lib.skill){
+   						if(lib.skill[i].changeSeat){
+   							lib.skill[i]={};
+   							if(lib.translate[i+'_info']){
+   								lib.translate[i+'_info']='此模式下不可用';
+   							}
+   						}
+   					}
+   					var bool=Math.random()<0.5;
+   					var bool2=Math.random()<0.5;
+   					var ref=game.players[0];
+   
+   					ref.side=bool;
+   					ref.next.side=bool2;
+   					ref.next.next.side=!bool;
+   					ref.previous.side=!bool2;
+   
+   					var firstChoose=game.players.randomGet();
+   					if(firstChoose.next.side==firstChoose.side){
+   						firstChoose=firstChoose.next;
+   					}
+   					_status.firstAct=firstChoose;
+   					for(var i=0;i<4;i++){
+   						firstChoose.node.name.innerHTML=get.verticalStr(get.cnNumber(i+1,true)+'号位');
+   						firstChoose=firstChoose.next;
+   					}
+   
+   					for(var i=0;i<game.players.length;i++){
+   						if(game.players[i].side==game.me.side){
+   							game.players[i].node.identity.firstChild.innerHTML='友';
+   						}
+   						else{
+   							game.players[i].node.identity.firstChild.innerHTML='敌';
+   						}
+   						game.players[i].node.identity.dataset.color=game.players[i].side+'zhu';
+   					}
+   					var list=[];
+   					for(i in lib.character){
+   						if(!lib.filter.characterDisabled(i)){
+   							list.push(i);
+   						}
+   					}
+   					var choose=[];
+   					_status.characterlist=list;
+   					event.filterChoice=function(name1,name2){
+   						var info1=lib.character[name1];
+   						var info2=lib.character[name2];
+   						if(!info1||!info2) return;
+   						return info1[0]==info2[0]||get.infoMaxHp(info1[2])==get.infoMaxHp(info2[2])||info1[3].length==info2[3].length;
+   					};
+   					var list2=list.randomGets(8);
+   					var next=game.me.chooseButton(2,true,['请选择您的武将牌',[list2,'character']]);
+   					next.set('onfree',true);
+   					next.set('filterButton',function(button){
+   						if(!ui.selected.buttons.length){
+   							for(var i=0;i<list2.length;i++){
+   								if(list2[i]!=button.link&&event.filterChoice(button.link,list2[i])) return true;
+   							}
+   							return false;
+   						}
+   						return event.filterChoice(button.link,ui.selected.buttons[0].link)
+   					});
+   					'step 1'
+   					game.me.init(result.links[0]);
+   					game.me._backupCharacter=result.links[1];
+   					_status.characterlist.removeArray(result.links);
+   					var list=_status.characterlist;
+   					for(var i=0;i<game.players.length;i++){
+   						if(game.players[i]!=game.me){
+   							list.randomSort();
+   							var bool=false;
+   							for(var k=0;k<list.length;k++){
+   								for(var j=i+1;j<list.length;j++){
+   									if(event.filterChoice(list[k],list[j])){
+   										bool=true;
+   										game.players[i].init(list[k]);
+   										game.players[i]._backupCharacter=list[j];
+   										break;
+   									}
+   								}
+   								if(bool) break;
+   							}
+   						}
+   					}
+   					setTimeout(function(){
+   						ui.arena.classList.remove('choose-character');
+   					},500);
+   				});
+   			};
+					}
+				}
+			},
 			scene:{
 				name:'创建场景',
 				content:{
@@ -2178,7 +2356,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(line6_d.childElementCount) capt_d.style.display='block';
 						},style);
 						// var editCode=ui.create.node('button','编辑代码',line1,function(){
-						//     console.log(1);
+						//	 console.log(1);
 						// },style);
 						var saveButton=ui.create.node('button','保存场景',line1,function(){
 							if(!scenename.value){

@@ -140,6 +140,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 			// game.delay();
 			"step 2"
+			if(!_status.connectMode&&_status.brawl&&_status.brawl.chooseCharacterBefore){
+				_status.brawl.chooseCharacterBefore();
+			}
 			if(_status.connectMode){
 				if(lib.configOL.versus_mode=='1v1'){
 					game.randomMapOL('hidden');
@@ -267,9 +270,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 			else{
 				game.chooseCharacter();
-			}
-			if(!_status.connectMode&&_status.brawl&&_status.brawl.chooseCharacterBefore){
-				_status.brawl.chooseCharacterBefore();
 			}
 			"step 3"
 			var players=get.players(lib.sort.position);

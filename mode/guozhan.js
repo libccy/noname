@@ -2141,7 +2141,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player:"gainEnd",
 						},
 						filter:function (event,player){
-							return event.source&&event.source!=player&&event.cards.length==player.countCards('h')&&player!=_status.currentPhase;
+							return event.source&&event.source!=player&&!event.bySelf&&event.cards.length==player.countCards('h')&&player!=_status.currentPhase;
 						},
 						content:function (){
 							player.storage.new_kongcheng=player.storage.new_kongcheng.concat(player.getCards('h'));
@@ -3768,13 +3768,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xuanlve:{
-				trigger:{player:'loseEnd'},
+				trigger:{player:'loseAfter'},
 				direct:true,
 				filter:function(event,player){
-					for(var i=0;i<event.cards.length;i++){
-						if(event.cards[i].original=='e') return true;
-					}
-					return false;
+					return event.es&&event.es.length>0;
 				},
 				content:function(){
 					'step 0'
@@ -4151,33 +4148,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return lib.filter.filterCard(card,player,_status.event.getParent());
 					},
 					check:function(button){
-						if(['chiling','xietianzi','lianjunshengyan'].contains(button.link[2])) return 0;
-						var player=_status.event.player;
-						var players=game.filterPlayer();
-						var shunshou=false;
-						var guohe=false;
-						var juedou=false;
-						var huoshao=false;
-						for(var i=0;i<players.length;i++){
-							if(!players[i].isOut()){
-								if(player.canUse('huoshaolianying',players[i])&&get.attitude(player,players[i])<0&&get.effect(players[i],{name:'huoshaolianying'})>0) huoshao=true;
-								if(players[i].hp==1&&get.damageEffect(players[i],player,player)>0&&!players[i].hasSha()){
-									juedou=true;
-								}
-								if(player.canUse('shunshou',players[i])&&get.attitude(player,players[i])<-1){
-									shunshou=true;
-								}
-								if(players[i].countCards('j')&&get.attitude(player,players[i])>2){
-									guohe=true;
-								}
-							}
-						}
-						if(huoshao&&button.link[2]=='huoshaolianying') return 3.5;
-						if(juedou&&button.link[2]=='juedou') return 3;
-						if(guohe&&button.link[2]=='guohe') return 2;
-						if(shunshou&&button.link[2]=='shunshou') return 1.5;
-						if(button.link[2]=='wuzhong'||button.link[2]=='yuanjiao') return 1;
-						return 0;
+						if(['chiling','xietianzi','tiesuo','lulitongxin','diaohulishan','jiedao'].contains(button.link[2])) return 0;
+						return _status.event.player.getUseValue(button.link[2]);
 					},
 					backup:function(links,player){
 						return {

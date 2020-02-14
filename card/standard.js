@@ -163,12 +163,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target){
-							if(player.hasSkill('jiu')&&!target.getEquip('baiyin')){
+							if(player.hasSkill('jiu')&&!target.hasSkillTag('filterDamage',null,{
+								player:player,
+								card:{name:'sha'},
+							})){
 								if(get.attitude(player,target)>0){
-									return -6;
+									return -7;
 								}
 								else{
-									return -3;
+									return -4;
 								}
 							}
 							return -1.5;
@@ -234,8 +237,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'basic',
 				cardcolor:'red',
 				notarget:true,
+				nodelay:true,
 				content:function(){
 					event.result='shaned';
+					event.getParent().delayx=false;
+					game.delay(0.5);
 				},
 				ai:{
 					basic:{
@@ -1441,39 +1447,36 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				equipSkill:true,
 				trigger:{player:'useCard'},
 				forced:true,
+				audio:'qinglong_skill',
 				filter:function(event,player){
 					return get.mode()=='guozhan'&&event.card.name=='sha';
 				},
 				content:function(){
-					var players=trigger.targets;
-					for(var i=0;i<players.length;i++){
-						players[i].addTempSkill('qinglong_guozhan_mingzhi');
-						players[i].storage.qinglong_guozhan_mingzhi.add(trigger.card);
-					}
+					if(!_status.qinglong_guozhan) _status.qinglong_guozhan=[];
+					_status.qinglong_guozhan=[];
+					_status.qinglong_guozhan.add(trigger);
+					game.countPlayer2(function(current){
+						current.addTempSkill('qinglong_guozhan_mingzhi');
+					});
+					var next=game.createEvent('qinglong_guozhan');
+					event.next.remove(next);
+					trigger.after.add(next);
+					next.setContent(function(){
+						_status.qinglong_guozhan.remove(event.parent);
+					});
 				}
 			},
 			qinglong_guozhan_mingzhi:{
-				equipSkill:true,
-				vanish:true,
-				silent:true,
-				onremove:true,
-				trigger:{global:'useCardAfter'},
-				filter:function(event,player){
-					return player.storage.qinglong_guozhan_mingzhi.contains(event.card);
-				},
-				init:function(player){
-					if(!player.storage.qinglong_guozhan_mingzhi){
-						player.storage.qinglong_guozhan_mingzhi=[];
-					}
-				},
-				content:function(){
-					player.storage.qinglong_guozhan_mingzhi.remove(trigger.card);
-					if(!player.storage.qinglong_guozhan_mingzhi.length){
-						player.removeSkill('qinglong_guozhan_mingzhi');
-					}
-				},
 				ai:{
-					nomingzhi:true
+					nomingzhi:true,
+					skillTagFilter:function(player){
+						if(_status.qinglong_guozhan){
+							for(var i=0;i<_status.qinglong_guozhan.length;i++){
+								if(_status.qinglong_guozhan[i].targets.contains(player)) return true;
+							}
+						}
+						return false;
+					},
 				}
 			},
 			hanbing_skill:{
@@ -1487,28 +1490,28 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				//priority:1,
 				check:function(event,player){
 					var target=event.player;
-						var eff=get.damageEffect(target,player,player);
-						if(get.attitude(player,target)>0){
-							if(eff>=0) return false;
-							return true;
-						}
-						if(eff<=0) return true;
-						if(target.hp==1) return false;
-						if(event.num>1||player.hasSkill('tianxianjiu')||
+					var eff=get.damageEffect(target,player,player);
+					if(get.attitude(player,target)>0){
+						if(eff>=0) return false;
+						return true;
+					}
+					if(eff<=0) return true;
+					if(target.hp==1) return false;
+					if(event.num>1||player.hasSkill('tianxianjiu')||
 						player.hasSkill('luoyi2')||player.hasSkill('reluoyi2')) return false;
-						if(target.countCards('he')<2) return -1;
-						var num=0;
-						var cards=target.getCards('he');
-						for(var i=0;i<cards.length;i++){
-							if(get.value(cards[i])>6) num++;
-						}
-						if(num>=2) return true;
-						return false;
-					},
-					logTarget:"player",
+					if(target.countCards('he')<2) return false;
+					var num=0;
+					var cards=target.getCards('he');
+					for(var i=0;i<cards.length;i++){
+						if(get.value(cards[i])>6) num++;
+					}
+					if(num>=2) return true;
+					return false;
+				},
+				logTarget:"player",
 				content:function(){
 					"step 0"
-						trigger.cancel();
+					trigger.cancel();
 					"step 1"
 					if(trigger.player.countDiscardableCards(player,'he')){
 						player.line(trigger.player);
@@ -1516,7 +1519,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 2"
 					if(trigger.player.countDiscardableCards(player,'he')){
-					player.line(trigger.player);
+						player.line(trigger.player);
 						player.discardPlayerCard('he',trigger.player,true);
 					}
 				}
@@ -1542,8 +1545,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target){
-							if(player.getEquip('qinggang')&&card.name=='sha'||target.hasSkillTag('unequip2')) return;
+							if(target.hasSkillTag('unequip2')) return;
 							if(player.hasSkillTag('unequip',false,{
+								name:card?card.name:null,
+								target:player,
+								card:card
+							})||player.hasSkillTag('unequip_ai',false,{
 								name:card?card.name:null,
 								target:player,
 								card:card
@@ -1612,13 +1619,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					trigger.target.addTempSkill('qinggang2');
 					trigger.target.storage.qinggang2.add(trigger.card);
 				},
-				/*ai:{
-					unequip:true,
+				ai:{
+					unequip_ai:true,
 					skillTagFilter:function(player,tag,arg){
 						if(arg&&arg.name=='sha') return true;
 						return false;
 					}
-				}*/
+				}
 			},
 			qinggang2:{
 				firstDo:true,
@@ -1855,6 +1862,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['chooseToRespondBegin','chooseToUseBegin']},
 				filter:function(event,player){
 					if(event.responded) return false;
+					if(event.bagua_skill) return false;
 					if(!event.filterCard({name:'shan'},player,event)) return false;
 					if(event.name=='chooseToRespond'&&!lib.filter.cardRespondable({name:'shan'},player,event)) return false;
 					if(player.hasSkillTag('unequip2')) return false;
@@ -1880,6 +1888,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
+					event.bagua_skill=true;
 					player.judge('bagua',function(card){return (get.color(card)=='red')?1.5:-0.5});
 					"step 1"
 					if(result.judge>0){
@@ -1892,8 +1901,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					respondShan:true,
 					effect:{
 						target:function(card,player,target,effect){
-							if(player.getEquip('qinggang')&&card.name=='sha'||target.hasSkillTag('unequip2')) return;
+							if(target.hasSkillTag('unequip2')) return;
 							if(player.hasSkillTag('unequip',false,{
+								name:card?card.name:null,
+								target:player,
+								card:card
+							})||player.hasSkillTag('unequip_ai',false,{
 								name:card?card.name:null,
 								target:player,
 								card:card
@@ -2249,6 +2262,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			cixiong_skill:'雌雄双股剑',
 			qinggang_skill:'青釭剑',
 			qinglong_skill:'青龙偃月刀',
+			qinglong_guozhan:'青龙偃月刀',
 			zhangba_skill:'丈八蛇矛',
 			guanshi_skill:'贯石斧',
 			fangtian_skill:'方天画戟',

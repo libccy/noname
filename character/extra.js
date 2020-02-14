@@ -435,7 +435,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			lianpo:{
 				audio:true,
-				trigger:{player:'phaseAfter'},
+				trigger:{global:'phaseAfter'},
 				frequent:true,
 				filter:function(event,player){
 					return player.getStat('kill')>0;
@@ -598,14 +598,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			renjie2:{
 				audio:true,
-				trigger:{player:'discardAfter'},
+				trigger:{player:'loseAfter'},
 				forced:true,
 				filter:function(event){
+					if(event.type!='discard'||!event.cards2) return false;
 					var evt=event.getParent('phaseDiscard');
 					return evt&&evt.name=='phaseDiscard'
 				},
 				content:function(){
-					player.addMark('renjie',trigger.cards.length);
+					player.addMark('renjie',trigger.cards2.length);
 				}
 			},
 			sbaiyin:{
@@ -638,7 +639,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					player.chooseCard('是否弃置一枚“忍”，并发动【鬼才】？','he').ai=function(card){
+					player.chooseCard('是否弃置一枚“忍”，并发动〖鬼才〗？','he',function(card){
+  				var player=_status.event.player;
+  				var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+  				if(mod2!='unchanged') return mod2;
+  				var mod=game.checkMod(card,player,'unchanged','cardRespondable',player);
+  				if(mod!='unchanged') return mod;
+  				return true;
+					}).ai=function(card){
 						var trigger=_status.event.parent._trigger;
 						var player=_status.event.player;
 						var result=trigger.judge(card)-trigger.judge(trigger.player.judging[0]);

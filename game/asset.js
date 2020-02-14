@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'1.9.97.7.1',
+	'1.9.97.8',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -2258,6 +2258,8 @@ window.noname_asset_list=[
 	'audio/skill/zhangwu2.mp3',
 	'audio/skill/zhiheng_gz_jun_sunquan1.mp3',
 	'audio/skill/zhiheng_gz_jun_sunquan2.mp3',
+	'audio/skill/reluanji1.mp3',
+	'audio/skill/reluanji2.mp3',
 	
 	'font/huangcao.ttf',
 	'font/shousha.ttf',
@@ -2712,6 +2714,7 @@ window.noname_asset_list=[
 	'image/character/re_xugong.jpg',
 	'image/character/yuantanyuanshang.jpg',
 	'image/character/old_majun.jpg',
+	'image/character/key_yukine.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',

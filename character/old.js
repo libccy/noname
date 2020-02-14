@@ -781,13 +781,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			oldxuanfeng:{
 				audio:'xuanfeng',
-				trigger:{player:'loseEnd'},
+				trigger:{player:'loseAfter'},
 				direct:true,
 				filter:function(event,player){
-					for(var i=0;i<event.cards.length;i++){
-						if(event.cards[i].original=='e') return true;
-					}
-					return false;
+					return event.es&&event.es.length>0;
 				},
 				content:function(){
 					"step 0"

@@ -142,7 +142,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								if(game.hasPlayer(function(current){
 									return (get.attitude(target,current)<0&&
 										target.canUse(card,current,true,true)&&
-										!current.getEquip('baiyin')&&
+										!current.hasSkillTag('filterDamage',null,{
+											player:player,
+											card:card,
+										})&&
 										get.effect(current,card,target)>0);
 								})){
 									return 1;
@@ -835,12 +838,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								name:card?card.name:null,
 								target:player,
 								card:card
+							})||player.hasSkillTag('unequip_ai',false,{
+								name:card?card.name:null,
+								target:player,
+								card:card
 							})) return;
 							if(card.name=='nanman'||card.name=='wanjian') return 'zerotarget';
 							if(card.name=='sha'){
 								var equip1=player.getEquip(1);
 								if(equip1&&equip1.name=='zhuque') return 1.9;
-								if(equip1&&equip1.name=='qinggang') return 1;
 								if(!card.nature) return 'zerotarget';
 							}
 						}
@@ -914,7 +920,26 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				//priority:-10,
 				content:function(){
 					trigger.num=1;
-				}
+				},
+				ai:{
+					filterDamage:true,
+					skillTagFilter:function(player,tag,arg){
+						if(player.hasSkillTag('unequip2')) return false;
+						if(arg&&arg.player){
+							if(arg.player.hasSkillTag('unequip',false,{
+								name:arg.card?arg.card.name:null,
+								target:player,
+								card:arg.card,
+							})) return false;
+							if(arg.player.hasSkillTag('unequip_ai',false,{
+								name:arg.card?arg.card.name:null,
+								target:player,
+								card:arg.card,
+							})) return false;
+							if(arg.player.hasSkillTag('jueqing',false,player)) return false;
+						}
+					},
+				},
 			},
 			zhuque_skill:{
 				equipSkill:true,

@@ -210,7 +210,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
-					get.translation(trigger.player.judging[0])+'，'+get.prompt('guicai'),'h').set('ai',function(card){
+					get.translation(trigger.player.judging[0])+'，'+get.prompt('guicai'),'h',function(card){
+  				var player=_status.event.player;
+  				var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+  				if(mod2!='unchanged') return mod2;
+  				var mod=game.checkMod(card,player,'unchanged','cardRespondable',player);
+  				if(mod!='unchanged') return mod;
+  				return true;
+					}).set('ai',function(card){
 						var trigger=_status.event.getTrigger();
 						var player=_status.event.player;
 						var judging=_status.event.judging;
@@ -1969,14 +1976,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			lianying:{
 				audio:2,
-				trigger:{player:'loseEnd'},
+				trigger:{player:'loseAfter'},
 				frequent:true,
 				filter:function(event,player){
 					if(player.countCards('h')) return false;
-					for(var i=0;i<event.cards.length;i++){
-						if(event.cards[i].original=='h') return true;
-					}
-					return false;
+					return event.hs&&event.hs.length>0;
 				},
 				content:function(){
 					player.draw();
@@ -1999,20 +2003,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiaoji:{
 				audio:2,
 				audioname:['sp_sunshangxiang','re_sunshangxiang'],
-				trigger:{player:'loseEnd'},
+				trigger:{player:'loseAfter'},
 				frequent:true,
 				filter:function(event,player){
-					for(var i=0;i<event.cards.length;i++){
-						if(event.cards[i].original=='e') return true;
-					}
-					return false;
+					return event.es&&event.es.length>0;
 				},
 				content:function(){
-					var num=0;
-					for(var i=0;i<trigger.cards.length;i++){
-						if(trigger.cards[i].original=='e') num+=2;
+					"step 0"
+					event.count=trigger.es.length;
+					"step 1"
+					event.count--;
+					player.draw(2);
+					"step 2"
+					if(event.count>0){
+						player.chooseBool(get.prompt2('xiaoji')).set('frequentSkill','xiaoji').ai=lib.filter.all;
 					}
-					player.draw(num);
+					"step 3"
+					if(result.bool){
+						player.logSkill('xiaoji');
+						event.goto(1);
+					}
 				},
 				ai:{
 					noe:true,

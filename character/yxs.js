@@ -466,10 +466,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zbudao:{
 				trigger:{player:'phaseDrawBegin'},
-				check:function(event,player){
-					if(player.hasFriend()) return true;
-					return false;
-				},
+				//check:function(event,player){
+				//	if(player.hasFriend()) return true;
+				//	return false;
+				//},
 				content:function(){
 					trigger.num++;
 					player.addTempSkill('zbudao2','phaseDrawAfter');
@@ -508,8 +508,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							return att-4;
 						},
-						forced:true,
-						prompt:'请选择要送人的卡牌'
+						//forced:true,
+						prompt:'将获得的一张牌交给一名其他角色，或点取消'
 					});
 					"step 1"
 					if(result.bool){
@@ -1951,17 +1951,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			fengyan:{
-				trigger:{global:'judgeAfter'},
+				trigger:{global:'cardsDiscardAfter'},
 				frequent:true,
 				filter:function(event,player){
-					if(event.player==player) return false;
-					if(event.player.sex!='male') return false;
-					if(get.position(event.result.card)!='o') return false;
-					return (get.color(event.result.card)=='red');
+					var evt=event.getParent().relatedEvent;
+					if(!evt||evt.name!='judge') return;
+					if(evt.player.sex!='male') return false;
+					if(get.position(event.cards[0],true)!='d') return false;
+					return (get.color(event.cards[0])=='red');
 				},
 				content:function(){
-					player.gain(trigger.result.card);
-					player.$gain2(trigger.result.card);
+					player.gain(trigger.cards,'gain2');
 				}
 			},
 			fengyi:{
@@ -3106,7 +3106,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nichang2:'霓裳',
 			nichang_info:'摸牌时，你可以选择不摸牌，并在结束阶段展示手牌，每少一种花色摸一张牌',
 			fengyan:'丰艳',
-			fengyan_info:'你可以获得其他男性角色的红色判定牌',
+			fengyan_info:'你可以获得其他男性角色的红色判定牌。',
 			zhulu:'逐鹿',
 			zhulu_info:'回合外，当有普通锦囊牌结算完毕后，你可以立即弃掉一张相同花色手牌或装备区的牌，获得这张锦囊牌。',
 			jieyong:'节用',
