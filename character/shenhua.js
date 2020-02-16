@@ -3323,7 +3323,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			beige:{
-				audio:4,
+				audio:2,
+				audioname:['re_caiwenji'],
 				trigger:{global:'damageEnd'},
 				filter:function(event,player){
 					return (event.card&&event.card.name=='sha'&&event.source&&
@@ -4006,6 +4007,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			songwei:{
 				unique:true,
 				group:'songwei2',
+				audioname:['re_caopi'],
 				audio:"songwei2",
 				zhuSkill:true,
 			},
@@ -4043,12 +4045,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			gzduanliang:{
+				audio:'duanliang1',
+				audioname:['re_xuhuang'],
 				group:['duanliang1','duanliang2'],
 				ai:{
 					threaten:1.2
 				}
 			},
 			duanliang:{
+				audio:'duanliang1',
+				audioname:['re_xuhuang'],
 				group:['duanliang1','duanliang3'],
 				ai:{
 					threaten:1.2
@@ -4245,7 +4251,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yinghun:{
 				audio:2,
-				audioname:['sunce','re_sunben'],
+				audioname:['re_sunjian','sunce','re_sunben'],
 				trigger:{player:'phaseZhunbeiBegin'},
 				filter:function(event,player){
 					return player.hp<player.maxHp;
@@ -4470,6 +4476,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			baonue:{
 				unique:true,
 				group:'baonue2',
+				audioname:['re_dongzhuo'],
 				audio:'baonue2',
 				zhuSkill:true,
 			},
@@ -4682,6 +4689,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				threaten:1.2
 			},
 			lianhuan:{
+				audio:'lianhuan1',
 				group:['lianhuan1','lianhuan2']
 			},
 			lianhuan1:{
@@ -4996,6 +5004,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			qiangxix:{
 				inherit:'reqiangxi',
+				audioname:['boss_lvbu3'],
+				audio:'qiangxi',
 				usable:2,
 				filterTarget:function (card,player,target){
 					if(player==target) return false;
@@ -6244,6 +6254,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			guidao:{
 				audio:2,
+				audioname:['sp_zhangjiao'],
 				trigger:{global:'judge'},
 				filter:function(event,player){
 					return player.countCards('he',{color:'black'})>0;

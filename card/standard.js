@@ -392,6 +392,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'equip',
 				subtype:'equip1',
 				ai:{
+					order:function(){
+						return get.order({name:'sha'})-0.1;
+					},
 					equipValue:function(card,player){
 						if(!game.hasPlayer(function(current){
 							return player.canUse('sha',current)&&get.distance(player,current)<=1&&get.effect(current,{name:'sha'},player,player)>0;
@@ -1799,7 +1802,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(target.identity==targets[i].identity) return false;
 						}
 						return true;
-					}).set('cardx',trigger.card).set('targets',trigger.targets).set('ai',function(target){
+					}).set('promptbar','none').set('cardx',trigger.card).set('targets',trigger.targets).set('ai',function(target){
 						var player=_status.event.player;
 						return get.effect(target,_status.event.cardx,player,player)
 					});

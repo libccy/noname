@@ -2350,7 +2350,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				filter:function(event,player){
 					if(event.source==player&&event.player!=player&&player.hp>player.countCards('h')){
-						return event.relatedLose&&event.relatedLose.hs&&event.relatedLose.length>0;
+						return event.relatedLose&&event.relatedLose.hs&&event.relatedLose.hs.length>0;
 					}
 					return false;
 				},

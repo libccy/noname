@@ -2265,13 +2265,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			wushuang:{
-				audio:'wushuang1',
+				audio:2,
+				audioname:['re_lvbu','shen_lvbu'],
 				forced:true,
 				locked:true,
 				group:['wushuang1','wushuang2']
 			},
 			wushuang1:{
-				audio:2,
+				audio:'wushuang',
 				audioname:['re_lvbu','shen_lvbu'],
 				trigger:{player:'useCardToPlayered'},
 				forced:true,
@@ -2293,7 +2294,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			wushuang2:{
-				audio:2,
+				audio:'wushuang',
 				audioname:['re_lvbu','shen_lvbu'],
 				trigger:{player:'useCardToPlayered',target:'useCardToTargeted'},
 				forced:true,

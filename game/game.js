@@ -11074,8 +11074,11 @@
 				},
 				phaseJudge:function(){
 					"step 0"
-					if(!player.storage._disableJudge&&player.node.judges.childElementCount){
-						event.card=player.node.judges.firstChild;
+					event.cards=player.getCards('j');
+					if(!event.cards.length) event.finish();
+					"step 1"
+					if(cards.length&&player.getCards('j').contains(cards[0])){
+						event.card=cards.shift();
 						if(event.card.classList.contains('removing')){
 							event.card.remove();
 							delete event.card;
@@ -11103,9 +11106,9 @@
 						}
 					}
 					else event.finish();
-					"step 1"
-					if(!event.cancelled&&!event.nojudge) player.judge(event.card).set('type','phase');
 					"step 2"
+					if(!event.cancelled&&!event.nojudge) player.judge(event.card).set('type','phase');
+					"step 3"
 					var name=event.card.viewAs||event.card.name;
 					if(event.cancelled&&!event.direct){
 						if(lib.card[name].cancel){
@@ -11123,7 +11126,7 @@
 						next.player=player;
 					}
 					ui.clear();
-					event.goto(0);
+					event.goto(1);
 				},
 				phaseDraw:function(){
 					"step 0"
@@ -13532,6 +13535,7 @@
 					if(target){
 						event.triggeredTargets1.push(target);
 						var next=game.createEvent('useCardToPlayer',false);
+						if(event.triggeredTargets1.length==1) next.isFirstTarget=true;
 						next.setContent('emptyEvent');
 						next.targets=targets;
 						next.target=target;
@@ -13550,6 +13554,7 @@
 					if(target){
 						event.triggeredTargets2.push(target);
 						var next=game.createEvent('useCardToTarget',false);
+						if(event.triggeredTargets2.length==1) next.isFirstTarget=true;
 						next.setContent('emptyEvent');
 						next.targets=targets;
 						next.target=target;
@@ -13568,6 +13573,7 @@
 					if(target){
 						event.triggeredTargets3.push(target);
 						var next=game.createEvent('useCardToPlayered',false);
+						if(event.triggeredTargets3.length==1) next.isFirstTarget=true;
 						next.setContent('emptyEvent');
 						next.targets=targets;
 						next.target=target;
@@ -13586,6 +13592,7 @@
 					if(target){
 						event.triggeredTargets4.push(target);
 						var next=game.createEvent('useCardToTargeted',false);
+						if(event.triggeredTargets4.length==1) next.isFirstTarget=true;
 						next.setContent('emptyEvent');
 						next.targets=targets;
 						next.target=target;
@@ -15681,7 +15688,7 @@
 							if(typeof maxHp!='number'){
 								maxHp=get.infoMaxHp(info2[2]);
 							}
-							num=maxHp-info1[2];
+							num=maxHp-get.infoMaxHp(info1[2]);
 						}
 						if(typeof this.singleHp=='boolean'){
 							if(num%2!=0){
@@ -18649,13 +18656,15 @@
 					if(!card.expired){
 						var target=this.next;
 						var name=card.viewAs||card.name;
+						var bool=false;
 						for(var iwhile=0;iwhile<20;iwhile++){
-							if(target==this||target.canAddJudge(card)){
-								break;
+							if(target.canAddJudge(card)){
+								bool=true;break;
 							}
 							target=target.next;
 						}
-						if(target==this){
+						if(!bool){
+							game.log(card,'进入了弃牌堆');
 							game.cardsDiscard(card);
 						}
 						else{
@@ -38218,7 +38227,7 @@
 						importExtension.style.textAlign='left';
 						ui.create.div('','<input type="file" accept="application/zip" style="width:153px"><button>确定</button>',importExtension);
 
-						var extensionURL=lib.updateURL.replace(/noname/,'noname-extension')+'/master/';
+						var extensionURL=lib.updateURL.replace(/noname/g,'noname-extension')+'/master/';
 
 						var reloadnode=ui.create.div('.config.toggle.pointerdiv','重新启动',page,game.reload);
 						reloadnode.style.display='none';

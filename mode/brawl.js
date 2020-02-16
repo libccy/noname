@@ -1779,6 +1779,324 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			jiazuzhizheng:{
+				name:'家族之争',
+				mode:'versus',
+				submode:'2v2',
+				intro:'势力相同的武将组合一队，获得专属势力技能',
+				showcase:function(init){
+					var node=this;
+					var getList=function(){
+						var list=[
+						['liubei','guanyu','zhangfei'],
+						['caocao','guojia','xunyu'],
+						['sunquan','zhangzhang','zhouyu'],
+						['re_yuanshao','guotufengji','yj_jushou']
+						];
+						if(_status.forceKey) list.push(['key_yuri','key_kyousuke','key_umi'])
+						list.randomSort();
+						var list2=[];
+						for(var i=0;i<list.length;i++){
+							list2=list2.concat(list[i]);
+						}
+						node.list=list2;
+					};
+					var func=function(){
+						if(!node.list.length){
+							getList();
+						}
+						var card=ui.create.player(null,true);
+						card.init(node.list.shift());
+						card.node.marks.remove();
+						card.node.count.remove();
+						card.node.hp.remove();
+						node.nodes.push(card);
+						card.style.position='absolute';
+						var rand1=Math.round(Math.random()*100);
+						var rand2=Math.round(Math.random()*100);
+						var rand3=Math.round(Math.random()*40)-20;
+						card.style.left='calc('+rand1+'% - '+(rand1*1.5)+'px)';
+						card.style.top='calc('+rand2+'% - '+(rand2*1.8)+'px)';
+						card.style.transform='scale(1.2) rotate('+rand3+'deg)';
+						card.style.opacity=0;
+						ui.refresh(card);
+						node.appendChild(card);
+						ui.refresh(card);
+						card.style.transform='scale(0.9) rotate('+rand3+'deg)';
+						card.style.opacity=1;
+						if(node.nodes.length>4){
+							setTimeout(function(){
+								while(node.nodes.length>3){
+									node.nodes.shift().delete();
+								}
+							},500);
+						}
+					};
+					node.list=[];
+					if(init){
+						node.nodes=[];
+						for(var i=0;i<3;i++){
+							func();
+						}
+					}
+					node.showcaseinterval=setInterval(func,1000);
+				},
+				init:function(){},
+				content:{
+					submode:'two',
+					chooseCharacterFixed:true,
+ 				chooseCharacterBefore:function(){
+ 					var map={
+ 						wei:[],
+ 						shu:[],
+ 						wu:[],
+ 						qun:[],
+ 						key:[],
+ 					};
+ 					var map3=[];
+ 					var banned=['zuoci','re_zuoci','tw_xiahouba'];
+ 					for(var i in lib.character){
+ 						if(lib.filter.characterDisabled2(i)||lib.filter.characterDisabled(i)||banned.contains(i)) continue;
+ 						var group=lib.character[i][1];
+ 						if(group&&map[group]) map[group].push(i);
+ 					}
+ 					for(var i in map){
+ 						if(map[i].length<8||(i=='key'&&!_status.forceKey)){
+ 							delete map[i];
+ 						}
+ 						else{
+ 							map3.push(i);
+ 						}
+ 					}
+ 					_status.brawl.map=map;
+ 					_status.brawl.map3=map3;
+ 					var skill={
+ 						_jiazu_wei:{
+ 							trigger:{player:'phaseBegin'},
+ 							direct:true,
+ 							popup:'魏业',
+ 							prompt2:'回合开始时，你可以弃置一张牌并指定一名敌方角色，该角色须弃置一张牌，否则你摸一张牌。',
+ 							filter:function(event,player){
+ 								return player.group=='wei'&&player.countCards('he')>0;
+ 							},
+ 							content:function(){
+ 								'step 0'
+ 								player.chooseCardTarget({
+ 									prompt:get.prompt2(event.name),
+ 									filterCard:lib.filter.cardDiscardable,
+ 									filterTarget:function(card,player,target){
+ 										return player.side!=target.side;
+ 									},
+ 									position:'he',
+ 									ai1:function(card){
+ 										return 6-get.value(card);
+ 									},
+ 									ai2:function(target){
+ 										return 1/(1+target.countCards('he'));
+ 									},
+ 								});
+ 								'step 1'
+ 								if(result.bool){
+ 									player.logSkill(event.name,result.targets);
+ 									player.discard(result.cards);
+ 									result.targets[0].chooseToDiscard('弃置一张牌，或令'+get.translation(player)+'摸一张牌','he').ai=lib.skill.zhiheng.check;
+ 								}
+ 								else event.finish();
+ 								'step 2'
+ 								if(!result.bool) player.draw();
+ 							},
+ 						},
+ 						_jiazu_shu:{
+ 							popup:'蜀义',
+ 							prompt2:'你使用【杀】上限+1；出牌阶段结束时，若你于此阶段使用【杀】次数不少于2，摸一张牌。',
+ 							mod:{
+ 								cardUsable:function(card,player,num){
+ 									if(card.name=='sha'&&player.group=='shu') return num+1;
+ 								},
+ 							},
+ 							trigger:{player:'phaseUseEnd'},
+ 							forced:true,
+ 							filter:function(event,player){
+ 								return player.group=='shu'&&player.getHistory('useCard',function(evt){
+ 									return evt.card&&evt.card.name=='sha'&&evt.getParent('phaseUse')==event;
+ 								}).length>1;
+ 							},
+ 							content:function(){player.draw()},
+ 						},
+ 						_jiazu_wu:{
+ 							trigger:{player:'phaseEnd'},
+ 							forced:true,
+ 							popup:'吴耀',
+ 							prompt2:'回合结束时，若你的手牌数不等于你的体力值，则你摸一张牌。',
+ 							filter:function(event,player){
+ 								return player.group=='wu'&&player.countCards('h')!=player.hp;
+ 							},
+ 							content:function(){player.draw()},
+ 						},
+ 						_jiazu_qun:{
+ 							popup:'群心',
+ 							prompt2:'锁定技，弃牌阶段开始时，若你的手牌数比体力值多2或更多，你本回合手牌上限+1；若你已损失体力值大于1，你手牌上限+1',
+ 							trigger:{player:'phaseDiscardBegin'},
+ 							forced:true,
+ 							filter:function(event,player){
+ 								return player.group=='qun'&&(player.isDamaged()||player.countCards('h')-player.hp>1);
+ 							},
+ 							content:function(){
+ 								var num=0;
+ 								if(player.isDamaged()) num++;
+ 								if(player.countCards('h')-player.hp>1) num++;
+ 								player.addMark('qunxin_temp',num,false);
+ 								player.addTempSkill('qunxin_temp','phaseDiscardEnd');
+ 							},
+ 						},
+ 						_jiazu_key:{
+ 							enable:'phaseUse',
+ 							usable:1,
+ 							popup:'键魂',
+ 							filter:function(event,player){
+ 								return player.group=='key';
+ 							},
+ 							prompt2:'出牌阶段限一次，你可以摸一张牌并获得1点护甲。若如此做，你于当前回合结束时失去1点体力。',
+ 							content:function(){
+ 								"step 0"
+ 								player.draw();
+ 								"step 1"
+ 								player.changeHujia(1);
+ 								"step 2"
+ 								var evt=event.getParent('phase');
+ 								if(evt&&evt.after){
+ 									var next=player.loseHp();
+ 									event.next.remove(next);
+ 									evt.after.push(next);
+ 								}
+ 							},
+ 							ai:{
+ 								order:10,
+ 								result:{
+ 									player:function(player){
+ 										return player.hp-1;
+ 									},
+ 								},
+ 							},
+ 						},
+ 						qunxin_temp:{
+ 							noGlobal:true,
+ 							onremove:true,
+ 							mod:{
+ 								maxHandcard:function(player,num){
+ 									return num+player.countMark('qunxin_temp');
+ 								},
+ 							},
+ 						},
+ 						_jiazu_awaken_wei:{
+ 							popup:'许昌',
+ 							intro:{
+ 								content:'锁定技，当你受到伤害后，你摸一张牌。',
+ 							},
+ 							trigger:{player:'damageEnd'},
+ 							forced:true,
+ 							filter:function(event,player){
+ 								return player._jiazuAwaken&&player.group=='wei';
+ 							},
+ 							content:function(){player.draw()},
+ 						},
+ 						_jiazu_awaken_shu:{
+ 							popup:'成都',
+ 							intro:{
+ 								content:'锁定技，当你使用【杀】造成伤害后，你摸一张牌。',
+ 							},
+ 							trigger:{source:'damageEnd'},
+ 							forced:true,
+ 							filter:function(event,player){
+ 								return player._jiazuAwaken&&player.group=='shu'&&event.card&&event.card.name=='sha';
+ 							},
+ 							content:function(){player.draw()},
+ 						},
+ 						_jiazu_awaken_wu:{
+ 							popup:'武昌',
+ 							intro:{
+ 								content:'锁定技，当你使用装备牌时，你摸一张牌。',
+ 							},
+ 							trigger:{player:'useCard'},
+ 							forced:true,
+ 							filter:function(event,player){
+ 								return player._jiazuAwaken&&player.group=='wu'&&get.type(event.card)=='equip';
+ 							},
+ 							content:function(){player.draw()},
+ 						},
+ 						_jiazu_awaken_qun:{
+ 							popup:'邺城',
+ 							intro:{
+ 								content:'锁定技，当你使用锦囊牌指定其他角色为目标后，你摸一张牌。',
+ 							},
+ 							trigger:{player:'useCardToPlayered'},
+ 							forced:true,
+ 							filter:function(event,player){
+ 								if(!player._jiazuAwaken||player.group!='qun'||!event.isFirstTarget||get.type(event.card,'trick')!='trick') return false;
+ 								for(var i=0;i<event.targets.length;i++){
+ 									if(event.targets[i]!=player) return true;
+ 								}
+ 								return false;
+ 							},
+ 							content:function(){player.draw()},
+ 						},
+ 						_jiazu_awaken_key:{
+ 							popup:'光坂',
+ 							intro:{
+ 								content:'锁定技，当你回复/失去体力后，你摸一张牌。',
+ 							},
+ 							trigger:{player:['loseHpEnd','recoverEnd']},
+ 							forced:true,
+ 							filter:function(event,player){
+ 								return player._jiazuAwaken&&player.group=='key';
+ 							},
+ 							content:function(){
+ 								player.draw();
+ 							},
+ 						},
+ 						_jiazu_awaken:{
+ 							trigger:{global:'die'},
+ 							forced:true,
+ 							filter:function(event,player){
+ 								return !player._jiazuAwaken&&event.player.side==player.side;
+ 							},
+ 							content:function(){
+ 								player._jiazuAwaken=true;
+ 								var name='_jiazu_awaken_'+player.group;
+ 								if(lib.skill[name]) player.markSkill(name);
+ 							},
+ 						},
+ 					};
+ 					for(var i in skill){
+ 						lib.skill[i]=skill[i];
+ 						if(skill[i].popup) lib.translate[i]=skill[i].popup;
+ 						if(skill[i].prompt2) lib.translate[i+'_info']=skill[i].prompt2;
+ 						if(!skill[i].noGlobal) game.addGlobalSkill(i);
+ 					}
+					},
+					chooseCharacter:function(list,player){
+						if(player.side==game.me.side){
+							if(_status.brawl.mylist){
+								return _status.brawl.mylist.randomGets(player==game.me?5:3);
+							}
+						}
+						else{
+							if(_status.brawl.enemylist){
+								return _status.brawl.enemylist.randomGets(player==game.me?5:3);
+							}
+						}
+						var surname=_status.brawl.map3.randomRemove();
+						var list=_status.brawl.map[surname];
+						if(player==game.me){
+							_status.brawl.mylist=list;
+						}
+						else{
+							_status.brawl.enemylist=list;
+						}
+						return list.randomRemove(player==game.me?5:3);
+					}
+				}
+			},
 			baiyidujiang:{
 				name:'白衣渡江',
 				mode:'versus',

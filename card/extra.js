@@ -805,8 +805,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					effect:{
-						target:function(card,player,target,current){
-							if(card.name=='sha'&&target.countCards('h')==0) return [1,-2];
+						player:function(card,player,target,current){
+							if(card.name=='sha'&&target.countCards('h')==0&&!target.hasSkillTag('filterDamage',null,{
+								player:player,
+								card:card,
+							})) return [1,0,1,-3];
 						}
 					}
 				}

@@ -924,7 +924,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			rebeige:{
-				audio:2,
+				audio:'beige',
+				audioname:['re_caiwenji'],
 				trigger:{global:'damageEnd'},
 				filter:function(event,player){
 					return (event.card&&event.card.name=='sha'&&event.source&&
@@ -1100,6 +1101,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			rejiuchi:{
 				group:['jiuchi'],
+				audioname:['re_dongzhuo'],
 				trigger:{source:'damage'},
 				forced:true,
 				popup:false,

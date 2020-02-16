@@ -331,7 +331,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					name:"shunshou",
 				},
 				filterTarget:function (card,player,target){
-					return lib.filter.filterTarget.apply(this,arguments);
+					return _status.event.targets&&_status.event.targets.contains(target)&&lib.filter.filterTarget.apply(this,arguments);
 				},
 				prompt:"将一张手牌当顺手牵羊使用",
 				check:function (card){return 7-get.value(card)},
@@ -4650,10 +4650,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 1;
 				},
 				position:"he",
+				discard:false,
+				loseTo:'discardPile',
+				prepare:function(cards,player){
+					player.$throw(cards,1000);
+					game.log(player,'将',cards,'置入了弃牌堆')
+				},
 				content:function (){
 					'step 0'
 					player.draw();
-					player.recover(1-player.hp);
+					'step 1'
+					var num=1-player.hp;
+					if(num) player.recover(num);
 				},
 				ai:{
 					order:0.5,
@@ -4889,9 +4897,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseCardButton(get.prompt('xinfu_zhaoxin',trigger.player),player.storage.xinfu_zhaoxin,function(button){
 						return true;
 					}).set('ai',function(button){
-						var player=_status.event.player;
-						if(get.attitude(player,_status.currentPhase)>0) return get.value(button.link);
-						return 6-get.value(button.link);
+						return 1+Math.random();
 					});
 					'step 1'
 					if(result.bool){

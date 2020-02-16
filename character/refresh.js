@@ -13,7 +13,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		connect:true,
 		character:{
-			re_caocao:['male','wei',4,['hujia','new_rejianxiong'],['zhu']],
+			re_caocao:['male','wei',4,['new_rejianxiong','hujia'],['zhu']],
 			re_simayi:['male','wei',3,['refankui','reguicai']],
 			re_guojia:['male','wei',3,['tiandu','new_reyiji']],
 			re_lidian:['male','wei',3,['xunxun','wangxi']],
@@ -246,10 +246,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(lib.filter.characterDisabled2(i)||lib.filter.characterDisabled(i)) continue;
 							list.push(i);
 						}
-						game.countPlayer(function(current){
+						game.countPlayer2(function(current){
 							list.remove(current.name);
 							list.remove(current.name1);
 							list.remove(current.name2);
+							if(current.storage.rehuashen&&current.storage.rehuashen.character) list.removeArray(current.rehuashen.character)
 						});
 						_status.characterlist=list;
 					}
@@ -257,7 +258,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var bool=false;
 					for(var i=0;i<_status.characterlist.length;i++){
 						var name=_status.characterlist[i];
-						if(name.indexOf('zuoci')!=-1||name.indexOf('key')==0) continue;
+						if(name.indexOf('zuoci')!=-1||name.indexOf('key')==0||player.storage.rehuashen.character.contains(name)) continue;
 						var skills=lib.character[name][3];
 						for(var j=0;j<skills.length;j++){
 							var info=lib.skill[skills[j]];
@@ -1092,6 +1093,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				group:"reshuangxiong2",
 				audio:"shuangxiong",
+				audioname:['re_yanwen'],
 				check:function (event,player){
 					if(player.countCards('h')>player.hp) return true;
 					if(player.countCards('h')>3) return true;
@@ -2750,7 +2752,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.count--;
 					player.gainPlayerCard(get.prompt('refankui',trigger.source),trigger.source,get.buttonValue,'he').set('logSkill',['refankui',trigger.source]);
 					"step 2"
-					if(result.bool&&event.count>0&&event.source.countGainableCards(player,'he')>0) event.goto(1);
+					if(result.bool&&event.count>0&&trigger.source.countGainableCards(player,'he')>0) event.goto(1);
 				},
 				ai:{
 					maixie_defend:true,
@@ -3089,6 +3091,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('relianying',result.targets);
 						game.asyncDraw(result.targets);
 					}
+					else event.finish();
+					"step 2"
+					game.delay();
 				},
 				ai:{
 					threaten:0.8,

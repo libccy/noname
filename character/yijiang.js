@@ -1866,7 +1866,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						silent:true,
 						content:function(){
-							game.log(player,'拼点牌点数视为','#y13');
+							game.log(player,'拼点牌点数视为','#yK');
 							if(player==trigger.player){
 								trigger.num1=13;
 							}
@@ -2711,33 +2711,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'player',
 				skillAnimation:true,
 				animationColor:'wood',
+				onWash:function(){
+					_status.event.getParent('fuzhu').washed=false;
+					return 'remove';
+				},
 				content:function(){
 					'step 0'
-					var list=[];
-					for(var i=0;i<ui.cardPile.childElementCount;i++){
-						if(ui.cardPile.childNodes[i].name=='sha'){
-							list.push(ui.cardPile.childNodes[i]);
-							ui.cardPile.childNodes[i].remove();
-							i--;
-						}
-					}
-					event.list=list;
-					event.num=0;
+					event.washed=false;
+					lib.onwash.push(lib.skill.fuzhu.onWash);
 					event.total=game.players.length+game.dead.length;
 					'step 1'
-					if(event.list.length&&event.num<event.total&&trigger.player.isAlive()){
-						event.num++;
-						player.useCard(event.list.shift(),trigger.player);
-						event.redo();
+					event.total--;
+					var card=get.cardPile2(function(card){
+						return card.name=='sha'&&player.canUse(card,trigger.player,false);
+					});
+					if(card){
+						card.remove();
+						game.updateRoundNumber();
+						player.useCard(card,trigger.player,false);
 					}
 					'step 2'
+					if(event.total>0&&!event.washed&&ui.cardPile.childElementCount<=player.hp*10&&trigger.player.isAlive()) event.goto(1);
+					'step 3'
+					lib.onwash.remove(lib.skill.fuzhu.onWash);
 					var cards=get.cards(ui.cardPile.childElementCount+1);
 					for(var i=0;i<cards.length;i++){
 						ui.cardPile.insertBefore(cards[i],ui.cardPile.childNodes[get.rand(ui.cardPile.childElementCount)]);
 					}
-					for(var i=0;i<event.list.length;i++){
-						ui.cardPile.insertBefore(event.list[i],ui.cardPile.childNodes[get.rand(ui.cardPile.childElementCount)]);
-					}
+					game.updateRoundNumber();
 				},
 				ai:{
 					threaten:1.5
