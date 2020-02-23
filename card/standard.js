@@ -1891,7 +1891,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					event.bagua_skill=true;
+					trigger.bagua_skill=true;
 					player.judge('bagua',function(card){return (get.color(card)=='red')?1.5:-0.5});
 					"step 1"
 					if(result.judge>0){
@@ -2196,7 +2196,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(event.wuxieresult){
 						var next=event.wuxieresult.useResult(event.wuxieresult2);
 						if(event.triggername!='phaseJudge'){
-							next.respondTo=[trigger.player,trigger.card];
+							if(event.stateplayer&&event.statecard) next.respondTo=[event.stateplayer,event.statecard];
+							else next.respondTo=[trigger.player,trigger.card];
 						}
 					}
 					'step 9'
@@ -2204,7 +2205,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(result.wuxied){
 							event.nowuxie=result.nowuxie;
 							event.directHit=result.directHit;
-							if(!event.stateplayer&&event.wuxieresult)event.stateplayer=event.wuxieresult;
+							event.stateplayer=event.wuxieresult;
 							if(event.wuxieresult2&&event.wuxieresult2.used){
 								event.statecard=event.wuxieresult2.used;
 							}
@@ -2212,8 +2213,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								event.statecard=true;
 							}
 							event.state=!event.state;
+							event.goto(1);
 						}
-						event.goto(1);
+						else event.settle();
 					}
 					else if(event.list.length){
 						event.goto(2);

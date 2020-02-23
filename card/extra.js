@@ -965,8 +965,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					trigger.card.nature='fire';
-					player.addSkill('zhuque_skill2');
-					player.storage.zhuque_skill=trigger.card;
+					if(get.itemtype(trigger.card)=='card'){
+						var next=game.createEvent('zhuque_clear');
+						next.card=trigger.card;
+						event.next.remove(next);
+						trigger.after.push(next);
+						next.setContent(function(){
+							delete card.nature;
+						});
+					}
 				}
 			},
 			zhuque_skill2:{

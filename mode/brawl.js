@@ -611,6 +611,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										player.changeLingli(-1);
 										player.draw();
 									},
+									delay:0,
 									ai:{
 										order:10,
 										result:{

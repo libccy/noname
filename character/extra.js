@@ -628,7 +628,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jilue:{
 				unique:true,
-				group:['jilue_guicai','jilue_fangzhu','jilue_wansha','jilue_zhiheng','jilue_jizhi','rezhiheng_draw','jilue_jizhi_clear']
+				group:['jilue_guicai','jilue_fangzhu','jilue_wansha','jilue_zhiheng','jilue_jizhi','jilue_jizhi_clear']
 			},
 			jilue_guicai:{
 				audio:true,
@@ -740,7 +740,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.hasMark('renjie');
 				},
 				position:'he',
-				filterCard:true,
+				filterCard:lib.filter.cardDiscardable,
+				discard:false,
+				lose:false,
+				delay:0,
 				selectCard:[1,Infinity],
 				prompt:'弃置一枚“忍”，然后弃置任意张牌并摸等量的牌。若弃置了所有的手牌，则可以多摸一张牌。',
 				check:function(card){
@@ -755,7 +758,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.removeMark('renjie',1);
-					event.num=player.hasSkill('rezhiheng_delay')?1:0;
+					player.discard(cards);
+					event.num=1;
+					var hs=player.getCards('h');
+					if(!hs.length) event.num=0;
+					for(var i=0;i<hs.length;i++){
+						if(!cards.contains(hs[i])){
+							event.num=0;break;
+						}
+					}
 					'step 1'
 					player.draw(event.num+cards.length);
 				},

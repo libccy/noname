@@ -2810,7 +2810,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				forced:true,
-				trigger:{player:'phaseBefore'},
+				trigger:{player:'phaseBegin'},
 				content:function(){
 					'step 0'
 					event.num1=3;
@@ -2818,7 +2818,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.togain=[];
 					while(event.togain.length<event.num2){
 						var card=get.cardPile(function(card){
-							return get.color(card)=='red';
+							return !event.togain.contains(card)&&get.color(card)=='red';
 						});
 						if(card) event.togain.push(card);
 						else break;
@@ -8496,7 +8496,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 			tinqin:'听琴',
 			boss_guihan:'归汉',
-			boss_guihan_info:'限定技，濒死阶段，你可以将体力回复至体力上限，摸4张牌，令所有敌人的技能恢复，并获得技能【听琴】、【蕙质】',
+			boss_guihan_info:'限定技，濒死阶段，你可以将体力回复至体力上限，摸4张牌，令所有敌人的技能恢复，失去技能【悲歌】和【胡笳】，并获得技能【听琴】、【蕙质】',
 			boss_huixin:'蕙质',
 			boss_huixin_info:'每当你于回合外失去牌，可以进行一次判定，若为黑色，当前回合角色失去一点体力，否则你回复一点体力并摸一张牌',
 			boss_hujia:'胡笳',

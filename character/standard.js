@@ -1750,7 +1750,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			qixi:{
 				audio:2,
-				audioname:['ganning','re_ganning'],
+				audioname:['re_ganning'],
 				enable:'chooseToUse',
 				filterCard:function(card){
 					return get.color(card)=='black';
@@ -1783,7 +1783,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			kurou:{
-				audio:4,
+				audio:2,
 				enable:'phaseUse',
 				prompt:'失去一点体力并摸两张牌',
 				content:function(){
@@ -1973,6 +1973,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(card.name=='shunshou'||card.name=='lebu') return false;
 					}
 				},
+				audio:2,
 			},
 			lianying:{
 				audio:2,

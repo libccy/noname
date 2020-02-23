@@ -248,7 +248,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			twxiaolian:{
-				inherit:'twtijin',
+				audio:2,
+				trigger:{global:'useCard'},
+				logTarget:'player',
 				filter:function(event,player){
 					return event.card&&event.card.name=='sha'&&event.player!=player&&
 					event.targets.length==1&&event.targets[0]!=player;
@@ -303,7 +305,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			twtijin:{	
+			twtijin:{
 				audio:2,
 				trigger:{global:'useCard'},
 				filter:function(event,player){

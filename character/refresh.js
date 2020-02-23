@@ -8,7 +8,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
     refresh_feng:['caoren','re_xiahouyuan','re_huangzhong','re_weiyan','re_xiaoqiao','zhoutai','re_zhangjiao','xin_yuji'],
 				refresh_huo:["re_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","re_pangtong","xin_yuanshao","re_pangde"],
 				refresh_lin:['re_zhurong','re_menghuo','re_dongzhuo','re_sunjian','re_caopi','re_xuhuang'],
-				refresh_shan:['re_dengai','re_jiangwei','re_caiwenji','re_sunben','re_liushan','re_zhangzhang','re_zuoci'],
+				refresh_shan:['re_dengai','re_jiangwei','re_caiwenji','re_liushan','re_zhangzhang','re_zuoci','re_sunce'],
    },
 		},
 		connect:true,
@@ -60,7 +60,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_dianwei:["male","wei",4,["reqiangxi"],[]],
 			re_yanwen:["male","qun",4,["reshuangxiong"],[]],
 			re_pangtong:['male','shu',3,['xinlianhuan','niepan'],[]],
-			xin_yuanshao:['male','qun',4,['reluanji','xueyi'],['zhu']],
+			xin_yuanshao:['male','qun',4,['olluanji','olxueyi'],['zhu']],
 			re_zhurong:['female','shu',4,['juxiang','relieren']],
 			re_menghuo:['male','shu',4,['huoshou','rezaiqi']],
 			re_dongzhuo:['male','qun',8,['rejiuchi','roulin','benghuai','baonue'],['zhu']],
@@ -69,9 +69,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_dengai:['male','wei',4,['retuntian','zaoxian']],
 			re_jiangwei:['male','shu',4,['retiaoxin','zhiji']],
 			re_caiwenji:['female','qun',3,['rebeige','duanchang']],
-			re_liushan:['male','shu',3,['xiangle','refangquan','ruoyu'],['zhu']],
-			re_sunben:['male','wu',4,['jiang','rehunzi','zhiba'],['zhu']],
+			re_liushan:['male','shu',3,['xiangle','olfangquan','olruoyu'],['zhu']],
 			re_zhangzhang:['male','wu',3,['rezhijian','guzheng']],
+			
+			re_sunce:['male','wu',4,['jiang','olhunzi','olzhiba'],['zhu']],
 		},
 		characterIntro:{
 			re_gongsunzan:'群雄之一。出身贵族，因母地位卑贱，只当了郡中小吏。他貌美，声音洪亮，机智善辩。后随卢植于缑氏山中读书，粗通经传。',
@@ -87,6 +88,370 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunben:['zhouyu','taishici','daqiao'],
 		},
 		skill:{
+			sishu:{
+				trigger:{player:'phaseUseBegin'},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('sishu')).ai=function(target){
+						var att=get.attitude(_status.event.player,target);
+						if(target.countMark('sishu2')%2==1) return -att;
+						return att;
+					}
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('sishu',target)
+						target.addSkill('sishu2');
+						target.addMark('sishu2',1,false);
+					}
+				},
+			},
+			sishu2:{
+				charlotte:true,
+				marktext:'思',
+				intro:{
+					name:'思蜀',
+					content:'本局游戏内计算【乐不思蜀】的效果时反转#次',
+				},
+				mod:{
+					judge:function(player,result){
+						if(_status.event.card&&_status.event.card.name=='lebu'&&player.countMark('sishu2')%2==1){
+							if(result.bool==false){
+								result.bool=true;
+							}
+							else{
+								result.bool=false;
+							}
+						}
+					}
+				},
+			},
+			olruoyu:{
+				skillAnimation:true,
+				animationColor:'fire',
+				audio:2,
+				unique:true,
+				juexingji:true,
+				zhuSkill:true,
+				keepSkill:true,
+				derivation:['jijiang','sishu'],
+				trigger:{player:'phaseZhunbeiBegin'},
+				forced:true,
+				filter:function(event,player){
+					if(!player.hasZhuSkill('olruoyu')) return false;
+					if(player.storage.olruoyu) return false;
+					return player.isMinHp();
+				},
+				content:function(){
+					'step 0'
+					player.storage.olruoyu=true;
+					player.gainMaxHp();
+					'step 1'
+					player.recover();
+					game.log(player,'获得了技能','#g【思蜀】','和','#g【激将】');
+					player.addSkill('sishu');
+					if(player.hasSkill('olruoyu')){
+						player.addSkill('jijiang');
+					}
+					else{
+						player.addAdditionalSkill('olruoyu','jijiang');
+					}
+					if(!player.isZhu){
+						player.storage.zhuSkill_olruoyu=['jijiang'];
+					}
+					else{
+						event.trigger('zhuUpdate');
+					}
+					player.awakenSkill('olruoyu');
+				}
+			},
+			olfangquan:{
+				audio:'refangquan',
+				trigger:{player:'phaseUseBefore'},
+				filter:function(event,player){
+					return player.countCards('h')>0&&!player.hasSkill('olfangquan3');
+				},
+				direct:true,
+				content:function(){
+					"step 0"
+					var fang=player.countMark('olfangquan2')==0&&player.hp>=2&&player.countCards('h')<=player.hp+1;
+					player.chooseBool(get.prompt2('olfangquan')).set('ai',function(){
+						if(!_status.event.fang) return false;
+						return game.hasPlayer(function(target){
+							if(target.hasJudge('lebu')||target==player) return false;
+							if(get.attitude(player,target)>4){
+								return (get.threaten(target)/Math.sqrt(target.hp+1)/Math.sqrt(target.countCards('h')+1)>0);
+							}
+							return false;
+						});
+					}).set('fang',fang);
+					"step 1"
+					if(result.bool){
+						player.logSkill('olfangquan');
+						trigger.cancel();
+						player.addSkill('olfangquan2');
+						player.addMark('olfangquan2',1,false);
+					}
+				}
+			},
+			olfangquan2:{
+				trigger:{player:'phaseDiscardBegin'},
+				forced:true,
+				popup:false,
+				audio:false,
+				onremove:true,
+				content:function(){
+					"step 0"
+					event.count=player.countMark(event.name);
+					"step 1"
+					event.count--;
+					player.chooseToDiscard('是否弃置一张牌并令一名其他角色进行一个额外回合？').set('logSkill','olfangquan').ai=function(card){
+						return 20-get.value(card);
+					};
+					"step 2"
+					if(result.bool){
+						player.chooseTarget(true,'请选择进行额外回合的目标角色',lib.filter.notMe).ai=function(target){
+							if(target.hasJudge('lebu')) return -1;
+							if(get.attitude(player,target)>4){
+								return get.threaten(target)/Math.sqrt(target.hp+1)/Math.sqrt(target.countCards('h')+1);
+							}
+							return -1;
+						};
+					}
+					else event.finish();
+					"step 3"
+					var target=result.targets[0];
+					player.line(target,'fire');
+					target.markSkillCharacter('olfangquan',player,'放权','进行一个额外回合');
+					target.insertPhase();
+					target.addSkill('olfangquan3');
+					if(event.count>0) event.goto(1);
+				}
+			},
+			olfangquan3:{
+				trigger:{player:['phaseAfter','phaseCancelled']},
+				forced:true,
+				popup:false,
+				audio:false,
+				content:function(){
+					player.unmarkSkill('olfangquan');
+					player.removeSkill('olfangquan3');
+				}
+			},
+			olluanji:{
+				inherit:'luanji',
+				audio:'luanji',
+				line:false,
+				group:'olluanji_remove',
+				check:function(card){
+					return 7-get.value(card);
+				},
+			},
+			olluanji_remove:{
+				trigger:{player:'useCard2'},
+				direct:true,
+				filter:function(event,player){
+					return event.card.name=='wanjian'&&event.targets.length>0;
+				},
+				line:false,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('olluanji'),'为'+get.translation(trigger.card)+'减少一个目标',function(card,player,target){
+						return _status.event.targets.contains(target)
+					}).set('targets',trigger.targets).set('ai',function(target){
+						var player=_status.event.player;
+						return -get.effect(target,_status.event.getTrigger().card,player,player)
+					});
+					'step 1'
+					if(result.bool){
+						player.logSkill('olluanji',result.targets);
+						trigger.targets.remove(result.targets[0]);
+					}
+				},
+			},
+			olxueyi:{
+				audio:'xueyi',
+				trigger:{global:'phaseBefore'},
+				forced:true,
+				zhuSkill:true,
+				unique:true,
+				filter:function(event,player){
+					return !player.storage.olxueyi_inited&&player.hasZhuSkill('olxueyi');
+				},
+				content:function(){
+					player.storage.olxueyi_inited=true;
+					var num=game.countPlayer(function(current){
+						return	current.group=='qun';
+					})
+					if(num) player.addMark('olxueyi',num)
+				},
+				marktext:'裔',
+				intro:{
+					name2:'裔',
+					content:'mark',
+				},
+				mod:{
+					maxHandcard:function(player,num){
+						if(player.hasZhuSkill('olxueyi')) return num+2*player.countMark('olxueyi');
+					},
+				},
+				group:'olxueyi_draw',
+			},
+			olxueyi_draw:{
+				audio:'xueyi',
+				trigger:{player:'phaseBegin'},
+				prompt2:'弃置一枚「裔」标记，然后摸一张牌',
+				check:function(event,player){
+					return !player.hasJudge('lebu')&&player.getUseValue('wanjian')>0;
+				},
+				filter:function(event,player){
+					return player.hasZhuSkill('olxueyi')&&player.hasMark('olxueyi');
+				},
+				content:function(){
+					player.removeMark('olxueyi',1);
+					player.draw();
+				},
+			},
+			olhunzi:{
+				audio:'hunzi',
+				inherit:'hunzi',
+				content:function(){
+					player.loseMaxHp();
+					player.recover();
+					player.addSkill('reyingzi');
+					player.addSkill('gzyinghun');
+					game.log(player,'获得了技能','#g【英姿】','和','#g【英魂】');
+					player.awakenSkill(event.name);
+					player.storage[event.name]=true;
+				}
+			},
+			olzhiba:{
+				audio:'zhiba',
+				unique:true,
+				zhuSkill:true,
+				global:'olzhiba2',
+			},
+			olzhiba2:{
+				ai:{
+					order:1,
+					result:{
+						target:function(player,target){
+							if(player.hasZhuSkill('olzhiba')&&!player.hasSkill('olzhiba3')&&target.group=='wu'){
+								if(player.countCards('h',function(card){
+ 								var val=get.value(card);
+ 								if(val<0) return true;
+ 								if(val<=5){
+ 									return card.number>=12;
+ 								}
+ 								if(val<=6){
+ 									return card.number>=13;
+ 								}
+ 								return false;
+ 							})>0) return -1;
+ 							return 0;
+							}
+							else{
+								if(player.countCards('h','du')&&get.attitude(player,target)<0) return -1;
+ 							if(player.countCards('h')<=player.hp) return 0;
+ 							var maxnum=0;
+ 							var cards2=target.getCards('h');
+ 							for(var i=0;i<cards2.length;i++){
+ 								if(cards2[i].number>maxnum){
+ 									maxnum=cards2[i].number;
+ 								}
+ 							}
+ 							if(maxnum>10) maxnum=10;
+ 							if(maxnum<5&&cards2.length>1) maxnum=5;
+ 							var cards=player.getCards('h');
+ 							for(var i=0;i<cards.length;i++){
+ 								if(cards[i].number<maxnum) return 1;
+ 							}
+ 							return 0;
+							}
+						},
+					},
+				},
+				enable:'phaseUse',
+				usable:1,
+				prompt:'请选择〖制霸〗的目标',
+				filter:function(event,player){
+					if(player.hasZhuSkill('olzhiba')&&!player.hasSkill('olzhiba3')&&game.hasPlayer(function(current){
+						return current!=player&&current.group=='wu'&&player.canCompare(current);
+					})) return true;
+					return (player.group=='wu'&&game.hasPlayer(function(current){
+						return current!=player&&current.hasZhuSkill('olzhiba',player)&&!current.hasSkill('olzhiba3')&&player.canCompare(current);
+					}));
+				},
+				filterTarget:function(card,player,target){
+					if(player.hasZhuSkill('olzhiba')&&!player.hasSkill('olzhiba3')&&target.group=='wu'&&player.canCompare(target)) return true;
+					return player.group=='wu'&&target.hasZhuSkill('olzhiba',player)&&!target.hasSkill('olzhiba3')&&player.canCompare(target);
+				},
+				prepare:function(cards,player,targets){
+					if(player.hasZhuSkill('olzhiba')) player.logSkill('olzhiba')
+					if(targets[0].hasZhuSkill('olzhiba',player)) targets[0].logSkill('olzhiba');
+				},
+				direct:true,
+				contentBefore:function(){
+					'step 0'
+					var list=[];
+					if(player.hasZhuSkill('olzhiba')&&targets[0].group=='wu'&&!player.hasSkill('olzhiba3')) list.push(player);
+					if(player.group=='wu'&&targets[0].hasZhuSkill('olzhiba')&&!targets[0].hasSkill('olzhiba3')) list.push(targets[0]);
+					if(list.length==1){
+						event.target=list[0];
+						event.goto(2);
+					}
+					else player.chooseTarget(true,'请选择获得所有拼点牌的角色',function(card,player,target){
+						return _status.event.list.contains(target);
+					}).set('list',list);
+					'step 1'
+					event.target=result.targets[0];
+					'step 2'
+					target.addTempSkill('olzhiba3','phaseUseEnd')
+					if(target==targets[0]){
+						target.chooseBool('是否接受来自'+get.translation(player)+'的拼点请求？').set('choice',(get.attitude(target,player)>0||target.countCards('h',function(card){
+							var val=get.value(card);
+							if(val<0) return true;
+							if(val<=5){
+								return card.number>=12;
+							}
+							if(val<=6){
+								return card.number>=13;
+							}
+							return false;
+						})>0)).set('ai',function(){return _status.event.choice});
+					}
+					else event._result={bool:true};
+					'step 3'
+					if(result.bool) event.getParent().zhiba_target=target;
+					else{
+						game.log(target,'拒绝了',player,'的拼点请求');
+						target.chat('拒绝');
+					}
+				},
+				content:function(){
+					'step 0'
+					event.source=event.getParent().zhiba_target;
+					if(!event.source){
+						event.finish();
+					}
+					'step 1'
+					player.chooseToCompare(target).set('small',target==source&&get.attitude(player,target)>0);
+					'step 2'
+					if(player==source&&result.bool||target==source&&!result.bool){
+						event.cards=[result.player,result.target].filterInD('d');
+						if(!event.cards.length) event.finish();
+						else source.chooseControl('ok','cancel2').set('dialog',['是否获得拼点牌？',event.cards]).set('ai',function(){
+							if(get.value(event.cards,source,'raw')<=0) return false;
+							return true;
+						});
+					}
+					else event.finish();
+					'step 3'
+					if(result.control!='cancel2') source.gain(event.cards,'gain2','log');
+				},
+			},
+			olzhiba3:{},
 			rehuashen:{
 				//mode:['identity','single','doudizhu'],
 				audio:2,
@@ -235,7 +600,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:['phaseBegin','phaseEnd','rehuashen'],
 				},
 				filter:function(event,player,name){
-					if(name=='phaseBegin'&&game.phaseNumber==1) return false;
+					//if(name=='phaseBegin'&&game.phaseNumber==1) return false;
 					return player.storage.rehuashen&&player.storage.rehuashen.character.length>0;
 				},
 				addHuashen:function(player){
@@ -250,7 +615,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							list.remove(current.name);
 							list.remove(current.name1);
 							list.remove(current.name2);
-							if(current.storage.rehuashen&&current.storage.rehuashen.character) list.removeArray(current.rehuashen.character)
+							if(current.storage.rehuashen&&current.storage.rehuashen.character) list.removeArray(current.storage.rehuashen.character)
 						});
 						_status.characterlist=list;
 					}
@@ -2312,7 +2677,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				position:'he',
-				filterCard:true,
+				filterCard:lib.filter.cardDiscardable,
+				discard:false,
+				lose:false,
+				delay:0,
 				selectCard:[1,Infinity],
 				check:function(card){
 					var player=_status.event.player;
@@ -2325,11 +2693,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					event.num=player.hasSkill('rezhiheng_delay')?1:0;
+					player.discard(cards);
+					event.num=1;
+					var hs=player.getCards('h');
+					if(!hs.length) event.num=0;
+					for(var i=0;i<hs.length;i++){
+						if(!cards.contains(hs[i])){
+							event.num=0;break;
+						}
+					}
 					'step 1'
 					player.draw(event.num+cards.length);
 				},
-				group:'rezhiheng_draw',
+				//group:'rezhiheng_draw',
 				subSkill:{
 					draw:{
 						trigger:{player:'loseEnd'},
@@ -3981,7 +4357,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_pangtong:"界庞统",
 			xin_yuanshao:"界袁绍",
 			re_zhangjiao:'界张角',
+			re_sunce:'界孙策',
 			
+			olfangquan:'放权',
+			olfangquan_info:'出牌阶段开始前，你可以跳过此阶段。若如此做，弃牌阶段开始时，你可以弃置一张手牌，令一名其他角色进行一个额外回合。',
+			olruoyu:'若愚',
+			olruoyu_info:'主公技，觉醒技，准备阶段，若你的体力值为全场最少，则你加1点体力上限并回复1点体力，然后获得技能〖思蜀〗和〖激将〗。',
+			sishu:'思蜀',
+			sishu_info:'出牌阶段开始时，你可以选择一名角色。该角色本回合内【乐不思蜀】的判定效果反转。',
+			olluanji:'乱击',
+			olluanji_info:'你可以将两张花色相同的手牌当做【万箭齐发】使用。当你使用【万箭齐发】选择目标后，你可以为此牌减少一个目标。',
+			olluanji_remove:'乱击',
+			olxueyi:'血裔',
+			olxueyi_info:'锁定技，游戏开始时，你获得X个“裔”标记。回合开始时，你可以移去一个“裔”标记，然后摸一张牌。你每有一个“裔”标记，手牌上限便+2。（X为场上群势力角色的数目）',
+			olxueyi_draw:'血裔',
+			olhunzi:'魂姿',
+			olhunzi_info:'觉醒技，准备阶段，若你的体力上限为1，你减1点体力上限并回复1点体力，然后获得技能〖英姿〗和〖英魂〗。',
+			olzhiba:'制霸',
+			olzhiba_info:'主公技，其他吴势力的角色的出牌阶段限一次，其可以与你拼点（你可拒绝此拼点）。若其没赢，你可以获得两张拼点牌。你的出牌阶段限一次，你可以和一名吴势力角色拼点，若你赢，你获得两张拼点牌。',
+			olzhiba2:'制霸',
 			xinleiji:'雷击',
 			xinguidao:'鬼道',
 			xinleiji_info:'①当你使用或打出【闪】或【闪电】时，你可以进行判定。<br>②当你不因〖暴虐〗或〖助祭〗而进行的判定的判定牌生效后，若结果为：黑桃，你可对一名其他角色造成2点雷电伤害；梅花：你回复1点体力并可对一名其他其他角色造成1点雷电伤害。',

@@ -42,7 +42,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'equip',
 				subtype:'equip2',
-				cardimage:'suolianjia',
 				skills:['minguangkai_cancel','minguangkai_link'],
 				ai:{
 					basic:{
@@ -708,7 +707,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target:function(player,target){
 							var hs=target.getCards('h');
 							if(hs.length<=1){
-								if(target==player&&hs[0].name=='yiyi'){
+								if(target==player&&(hs.length==0||hs[0].name=='yiyi')){
 									return 0;
 								}
 								return 0.3;

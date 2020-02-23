@@ -307,10 +307,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(firstChoose.next.side==firstChoose.side){
 						firstChoose=firstChoose.next;
 					}
-					game.gameDraw(firstChoose);
-					if(lib.configOL.replace_handcard){
-						game.replaceHandcards(firstChoose.previous);
-					}
+					game.gameDraw(firstChoose,function(player){
+						if(lib.configOL.replace_handcard&&player==firstChoose.previousSeat){
+							return 5;
+						}
+						return 4;
+					});
 					game.phaseLoop(firstChoose);
 				}
 				else if(_status.mode=='4v4'){
@@ -330,10 +332,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					_status.first_less=true;
 					_status.first_less_forced=true;
 					var firstChoose=_status.firstAct;
-					game.gameDraw(firstChoose);
-					if(get.config('replace_handcard_two')){
-						game.replaceHandcards(firstChoose.previous);
-					}
+					game.gameDraw(firstChoose,function(player){
+						if(player==_status.firstAct.previousSeat&&get.config('replace_handcard_two')){
+							return 5;
+						}
+						return 4;
+					});
 					game.phaseLoop(firstChoose);
 				}
 				else if(_status.mode=='endless'){
@@ -5792,6 +5796,179 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					return this;
 				},
+				dieAfter2:function(source){
+				if(_status.connectMode){
+						if(_status.mode=='1v1'||_status.mode=='3v3') return;
+						else if(_status.mode=='2v2'){
+							var friend;
+							for(var i=0;i<game.players.length;i++){
+								if(game.players[i].side==this.side){
+									friend=game.players[i];break;
+								}
+							}
+							if(friend){
+								var next=game.createEvent('versusDraw');
+								next.setContent(function(){
+									'step 0'
+									player.chooseBool('是否摸一张牌？');
+									'step 1'
+									if(result.bool){
+										player.draw();
+									}
+								});
+								next.player=friend;
+							}
+						}
+						else if(_status.mode=='4v4'){
+							if(this.identity=='zhu') return;
+							else{
+								if(source){
+									if(source.side==this.side){
+										if(source.identity=='zhu'){
+											source.discard(source.getCards('he'));
+										}
+									}
+									else{
+										var num1=0,num2=1;
+										for(var i=0;i<game.players.length;i++){
+											if(game.players[i].side==source.side){
+												num1++;
+											}
+											else{
+												num2++;
+											}
+										}
+										source.draw(2+Math.max(0,num2-num1));
+									}
+								}
+							}
+							return;
+						}
+					}
+					else{
+						if(_status.mode=='four'){
+							if(this.identity=='zhu') return;
+							else{
+								if(source){
+									if(source.side==this.side){
+										if(source.identity=='zhu'){
+											source.discard(source.getCards('he'));
+										}
+									}
+									else{
+										var num1=0,num2=1;
+										for(var i=0;i<game.players.length;i++){
+											if(game.players[i].side==source.side){
+												num1++;
+											}
+											else{
+												num2++;
+											}
+										}
+										source.draw(2+Math.max(0,num2-num1));
+									}
+								}
+							}
+							return;
+						}
+						else if(_status.mode=='two'){
+							var friend;
+							for(var i=0;i<game.players.length;i++){
+								if(game.players[i].side==this.side){
+									friend=game.players[i];break;
+								}
+							}
+							if(_status.replacetwo){
+								if(this.replacetwo){
+									if(source){
+										if(source.side==this.side){
+											var he=source.getCards('he');
+											if(he.length){
+												source.discard(he);
+											}
+										}
+										else{
+											source.draw(3);
+										}
+									}
+								}
+								else if(friend&&friend.replacetwo){
+									if(source){
+										if(source.side==this.side){
+											var he=source.getCards('he');
+											if(he.length){
+												source.discard(he);
+											}
+										}
+										else{
+											source.draw(3);
+										}
+									}
+								}
+							}
+							else{
+								if(friend){
+									var next=game.createEvent('versusDraw');
+									next.setContent(function(){
+										'step 0'
+										player.chooseBool('是否摸一张牌？');
+										'step 1'
+										if(result.bool){
+											player.draw();
+										}
+									});
+									next.player=friend;
+								}
+							}
+							return;
+						}
+						else if(_status.mode=='siguo') return;
+						else if(_status.mode=='jiange') return;
+						else if(_status.mode=='three'){
+							if(this.identity=='zhu') return;
+							else{
+								game.friend.remove(this);
+								game.enemy.remove(this);
+								if(source){
+									source.draw(2);
+								}
+							}
+							return;
+						}
+
+						var list=(this.side==game.me.side)?_status.friend:_status.enemy;
+						if((list.length==0&&lib.storage.noreplace_end)||
+						(lib.storage.zhu&&lib.storage.main_zhu&&this.identity=='zhu'&&game.players.length>2)){
+							return;
+						}
+						else if(game.friend.length==1&&this==game.friend[0]&&_status.friend.length==0){
+							return;
+						}
+						else if(game.enemy.length==1&&this==game.enemy[0]&&_status.enemy.length==0){
+							return;
+						}
+						else{
+							if(source){
+								if(source.side!=this.side){
+									if(lib.storage.versus_reward){
+										source.draw(lib.storage.versus_reward);
+									}
+								}
+								else{
+									if(lib.storage.versus_punish=='弃牌'){
+										source.discard(source.getCards('he'));
+									}
+									else if(lib.storage.versus_punish=='摸牌'&&lib.storage.versus_reward){
+										source.draw(lib.storage.versus_reward);
+									}
+								}
+							}
+							else{
+								game.delay();
+							}
+						}
+					}
+				},
 				dieAfter:function(source){
 					if(_status.connectMode){
 						if(_status.mode=='1v1'||_status.mode=='3v3'){
@@ -5829,19 +6006,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									friend=game.players[i];break;
 								}
 							}
-							if(friend){
-								var next=game.createEvent('versusDraw');
-								next.setContent(function(){
-									'step 0'
-									player.chooseBool('是否摸一张牌？');
-									'step 1'
-									if(result.bool){
-										player.draw();
-									}
-								});
-								next.player=friend;
-							}
-							else{
+							if(!friend){
 								game.over(this.side!=game.me.side);
 							}
 						}
@@ -5850,25 +6015,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								game.over(this.side!=game.me.side);
 							}
 							else{
-								if(source){
-									if(source.side==this.side){
-										if(source.identity=='zhu'){
-											source.discard(source.getCards('he'));
-										}
-									}
-									else{
-										var num1=0,num2=1;
-										for(var i=0;i<game.players.length;i++){
-											if(game.players[i].side==source.side){
-												num1++;
-											}
-											else{
-												num2++;
-											}
-										}
-										source.draw(2+Math.max(0,num2-num1));
-									}
-								}
 								var side1=[],side2=[];
 								for(var i=0;i<game.players.length;i++){
 									if(game.players[i].side){
@@ -5894,25 +6040,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								game.over(this.side!=game.me.side);
 							}
 							else{
-								if(source){
-									if(source.side==this.side){
-										if(source.identity=='zhu'){
-											source.discard(source.getCards('he'));
-										}
-									}
-									else{
-										var num1=0,num2=1;
-										for(var i=0;i<game.players.length;i++){
-											if(game.players[i].side==source.side){
-												num1++;
-											}
-											else{
-												num2++;
-											}
-										}
-										source.draw(2+Math.max(0,num2-num1));
-									}
-								}
 								var side1=[],side2=[];
 								for(var i=0;i<game.players.length;i++){
 									if(game.players[i].side){
@@ -5944,32 +6071,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							if(_status.replacetwo){
 								if(this.replacetwo){
-									if(source){
-										if(source.side==this.side){
-											var he=source.getCards('he');
-											if(he.length){
-												source.discard(he);
-											}
-										}
-										else{
-											source.draw(3);
-										}
-									}
 									game.replacePlayerTwo(this,this.replacetwo);
 									delete this.replacetwo;
 								}
 								else if(friend&&friend.replacetwo){
-									if(source){
-										if(source.side==this.side){
-											var he=source.getCards('he');
-											if(he.length){
-												source.discard(he);
-											}
-										}
-										else{
-											source.draw(3);
-										}
-									}
 									game.replacePlayerTwo(this,friend.replacetwo);
 									delete friend.replacetwo;
 								}
@@ -5978,19 +6083,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							else{
-								if(friend){
-									var next=game.createEvent('versusDraw');
-									next.setContent(function(){
-										'step 0'
-										player.chooseBool('是否摸一张牌？');
-										'step 1'
-										if(result.bool){
-											player.draw();
-										}
-									});
-									next.player=friend;
-								}
-								else{
+								if(!friend){
 									game.over(this.side!=game.me.side);
 								}
 							}
@@ -6080,9 +6173,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 								game.friend.remove(this);
 								game.enemy.remove(this);
-								if(source){
-									source.draw(2);
-								}
 							}
 							return;
 						}
@@ -6112,24 +6202,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							game.over(true);
 						}
 						else{
-							if(source){
-								if(source.side!=this.side){
-									if(lib.storage.versus_reward){
-										source.draw(lib.storage.versus_reward);
-									}
-								}
-								else{
-									if(lib.storage.versus_punish=='弃牌'){
-										source.discard(source.getCards('he'));
-									}
-									else if(lib.storage.versus_punish=='摸牌'&&lib.storage.versus_reward){
-										source.draw(lib.storage.versus_reward);
-									}
-								}
-							}
-							else{
-								game.delay();
-							}
 							game.replacePlayer(this);
 						}
 					}

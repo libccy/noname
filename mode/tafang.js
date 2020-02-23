@@ -5,6 +5,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		canvasUpdates2:[],
 		start:function(){
 			"step 0"
+			_status.gameDrawed=true;
 			lib.init.css(lib.assetURL+'layout/mode','chess');
 			lib.init.css(lib.assetURL+'layout/mode','tafang');
 			game.loadMode('chess');

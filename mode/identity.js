@@ -295,8 +295,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			_status.videoInited=true;
 			game.addVideo('init',null,info);
 			"step 6"
-
 			game.gameDraw(_status.firstAct2||game.zhong||game.zhu||_status.firstAct||game.me);
+			if(_status.connectMode&&lib.configOL.change_card) game.replaceHandcards(game.players.slice(0));
+			"step 7"
 			game.phaseLoop(_status.firstAct2||game.zhong||game.zhu||_status.firstAct||game.me);
 		},
 		game:{
@@ -625,13 +626,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							list.remove('shen');
 							if(list.length) player.group=function(){
 							 if(_status.mode!='zhong'&&game.zhu&&game.zhu.group){
-							  if(['re_zhangjiao','liubei','re_liubei','caocao','re_caocao','sunquan','re_sunquan','zhangjiao','sp_zhangjiao','caopi','re_caopi','liuchen','caorui','sunliang','sunxiu','sunce','re_sunben'].contains(game.zhu.name)) return game.zhu.group;
+							  if(['re_zhangjiao','liubei','re_liubei','caocao','re_caocao','sunquan','re_sunquan','zhangjiao','sp_zhangjiao','caopi','re_caopi','liuchen','caorui','sunliang','sunxiu','sunce','re_sunben','old_liushan','old_yuanshao'].contains(game.zhu.name)) return game.zhu.group;
 							  if(game.zhu.name=='sunhao'&&player.identity=='zhong') return 'wu';
 							  if(game.zhu.name=='yl_yuanshu'){
 							   if(player.identity=='zhong') list.remove('qun');
 							   else return 'qun';
 							  }
-							  if(['sunhao','xin_yuanshao','re_yuanshao'].contains(game.zhu.name)){
+							  if(['sunhao','xin_yuanshao','re_yuanshao','re_sunce'].contains(game.zhu.name)){
 							   if(player.identity!='zhong') list.remove(game.zhu.group);
 							   else return game.zhu.group;
 							  }

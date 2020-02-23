@@ -4,7 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'old',
 		characterSort:{
 			old:{
-				old_shenhua:["yuji","zhangjiao","old_zhugezhan"],
+				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_guanqiujian"],
 				old_refresh:["old_zhangfei","old_huatuo"],
 				old_yijiang1:["masu","xushu","fazheng","yujin","xin_yujin","old_xusheng","old_lingtong","ol_yujin"],
 				old_yijiang2:["old_madai","old_zhonghui","old_wangyi","old_guanzhang","ol_liaohua"],
@@ -12,11 +12,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				old_yijiang4:["old_caozhen","old_chenqun","old_zhuhuan","ol_wuyi"],
 				old_yijiang5:["old_caoxiu","old_quancong","old_zhuzhi"],
 				old_yijiang67:["ol_xinxianying","ol_zhangrang","ol_liuyu"],
-				old_sp:["old_lingju","old_maliang","old_machao","zhangliang","jsp_caoren","ol_guansuo","old_zhangxingcai"],
+				old_sp:["old_lingju","old_maliang","old_machao","zhangliang","jsp_caoren","ol_guansuo","old_zhangxingcai","old_huangfusong"],
 				old_mobile:["old_caochun","old_majun"],
 			},
 		},
 		character:{
+			old_huangfusong:['male','qun',4,['fenyue']],
 			old_majun:["male","wei",3,["xinfu_jingxie1","xinfu_qiaosi"],[]],
 			old_zhangxingcai:['female','shu',3,['oldshenxian','qiangwu']],
 			old_fuhuanghou:['female','qun',3,['oldzhuikong','oldqiuyuan']],
@@ -64,6 +65,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_guohuai:['male','wei',4,['jingce']],
 			ol_wuyi:['male','shu',4,['benxi']],
 			ol_liuyu:['male','qun',2,['zongzuo','zhige']],
+			old_guanqiujian:["male","wei",4,["drlt_zhenrong","drlt_hongju"],[]],
 		},
 		characterFilter:{
 			old_lingju:function(mode){
@@ -882,6 +884,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_liuyu:'OL刘虞',
 			old_fuhuanghou:'旧伏皇后',
 			old_caochong:'旧曹冲',
+			old_guanqiujian:'旧毌丘俭',
+			old_huangfusong:'旧皇甫嵩',
 
 			old_fuhun:'父魂',
 			old_fuhun_info:'摸牌阶段开始时，你可以放弃摸牌，改为从牌堆顶亮出两张牌并获得之，若亮出的牌颜色不同，你获得技能“武圣”、“咆哮”，直到回合结束。',

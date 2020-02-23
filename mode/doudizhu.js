@@ -78,6 +78,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			game.addVideo('init',null,info);
 
 			game.gameDraw(game.zhu||_status.firstAct||game.me);
+			if(_status.connectMode&&lib.configOL.change_card) game.replaceHandcards(game.players.slice(0));
 			game.phaseLoop(game.zhu||_status.firstAct||game.me);
 		},
 		game:{
@@ -805,7 +806,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			_bahu:{
-				trigger:{player:'phaseBegin'},
+				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				filter:function(event,player){
 					return player==game.zhu;

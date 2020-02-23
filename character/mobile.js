@@ -7,7 +7,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			mobile:{
 				mobile_default:["miheng","taoqian","liuzan","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding"],
-				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong"],
+				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","old_yuanshao","old_liushan"],
+				mobile_sunben:["re_sunben"],
 			},
 		},
 		character:{
@@ -37,6 +38,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhanggong:['male','wei',3,['reqianxin','xinfu_zhenxing']],
 			re_xugong:['male','wu',3,['rebiaozhao','yechou']],
 			re_weiwenzhugezhi:['male','wu',4,['refuhai']],
+			
+			old_yuanshao:['male','qun',4,['reluanji','xueyi'],['zhu']],
+			old_liushan:['male','shu',3,['xiangle','refangquan','ruoyu'],['zhu']],
+			re_sunben:['male','wu',4,['jiang','rehunzi','zhiba'],['zhu']],
 		},
 		characterIntro:{
 			shenpei:'审配（？－204年），字正南，魏郡阴安（今河北清丰北）人。为人正直， 袁绍领冀州，审配被委以腹心之任，并总幕府。河北平定，袁绍以审配、逢纪统军事，审配恃其强盛，力主与曹操决战。曾率领弓弩手大破曹军于官渡。官渡战败，审配二子被俘，反因此受谮见疑，幸得逢纪力保。袁绍病死，审配等矫诏立袁尚为嗣，导致兄弟相争，被曹操各个击破。曹操围邺，审配死守数月，终城破被擒，拒不投降，慷慨受死。',
@@ -114,7 +119,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var str=get.translation(player)+'正在表演...<br>';
 						for(var i=1;i<7;i++){
 							str+=get.translation('qiaosi_c'+i);
-							if(i%3!=0) str+='     ';
+							if(i%3!=0) str+='　　';
 							if(i==3) str+='<br>';
 						}
 						ui.create.dialog(str,'forcebutton').videoId=id;
@@ -624,7 +629,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
-					var fang=player.hp>=2&&player.countCards('h')<=player.hp+1;
+					var fang=player.countMark('fangquan2')==0&&player.hp>=2&&player.countCards('h')<=player.hp+1;
 					player.chooseBool(get.prompt2('refangquan')).set('ai',function(){
 						if(!_status.event.fang) return false;
 						return game.hasPlayer(function(target){
@@ -639,7 +644,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.logSkill('refangquan');
 						trigger.cancel();
-						player.addSkill('fangquan2');
+						player.addTempSkill('fangquan2','phaseAfter');
+						player.addMark('fangquan2',1,false);
 						player.addTempSkill('refangquan2');
 						//player.storage.fangquan=result.targets[0];
 					}
@@ -807,7 +813,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						event.target=target;
-						player.logSkill('xinfu_wuniang',target);
+						player.logSkill('meiyong',target);
 						player.gainPlayerCard(target,'he',true);
 					}
 					else event.finish();
@@ -1679,6 +1685,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		translate:{
+			old_liushan:'手杀刘禅',
+			old_yuanshao:'手杀袁绍',
 			re_jikang:"手杀嵇康",
 			old_bulianshi:'手杀步练师',
 			old_caochun:'旧曹纯',
@@ -1756,7 +1764,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			hujinding:'胡金定',
 			re_liushan:'界刘禅',
-			re_sunben:'界孙策',
+			re_sunben:'界孙笨',
 			re_zhangzhang:'界张昭张纮',
 			rehunzi:'魂姿',
 			rehunzi_info:'觉醒技，准备阶段，若你的体力值不大于2，你减1点体力上限，并获得技能〖英姿〗和〖英魂〗。',
@@ -1799,6 +1807,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//伊吹 风子
 			qiaosi_c6:'<img src="'+lib.assetURL+'image/card/qiaosi_card6.png" width="60" height="60"> ',
 			//仲村 ゆり
+			mobile_sunben:'那个男人',
+			//孙笨
 		}
 	};
 });

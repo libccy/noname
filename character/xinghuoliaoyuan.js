@@ -3133,9 +3133,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function (event,player,name){
 					if(!event.source) return false;
 					var range=event.source.getAttackRange();
-					if(range==3) return false;
-					if(range<3) return name='damageBegin4'&&event.num>1;
-					return name='damageBegin3';
+					if(name=='damageBegin3') return range>3;
+					return event.num>1&&range<3;
 				},
 				//priority:-9.5,
 				content:function (){
@@ -3669,8 +3668,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				viewAs:{name:'lebu'},
 				//prepare:"throw",
 				position:"he",
-				filterCard:{
-					suit:"diamond",
+				filterCard:function(card,player,event){
+					return get.suit(card)=='diamond'&&player.canAddJudge({name:'lebu',cards:[card]});
 				},
 				selectTarget:-1,
 				filterTarget:function (card,player,target){

@@ -6,6 +6,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		hiddenCharacters:[],
 		start:function(){
 			"step 0"
+			_status.gameDrawed=true;
 			_status.mode=get.config('chess_mode');
 			if(lib.config.player_border=='normal'&&(lib.config.layout=='long'||lib.config.layout=='long2')){
 				ui.arena.classList.add('lslim_player');

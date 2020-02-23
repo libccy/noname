@@ -20,6 +20,7 @@
 		dying:[],
 		globalHistory:[{
 			cardMove:[],
+			custom:[],
 		}],
 	};
 	var lib={
@@ -1336,7 +1337,7 @@
 							// music:'音乐',
 							official:'原版',
 							// new:'新版',
-							// feicheng:'废城',
+							feicheng:'废城',
 							liusha:'流沙',
 							ol:'手杀',
 							custom:'自定',
@@ -4147,6 +4148,12 @@
 						frequent:true,
 						restart:true,
 					},
+					connect_change_card:{
+						name:'启用手气卡',
+						init:false,
+						frequent:true,
+						restart:true,
+					},
 					connect_special_identity:{
 						name:'特殊身份',
 						init:false,
@@ -4633,6 +4640,12 @@
 						restart:true,
 						intro:'若开启此选项，玩家的第一个回合开始时，若其主武将牌有对应的君主武将牌，则其可以将此武将牌替换为对应的君主武将牌，然后重新调整体力上限。若玩家的体力上限因此增大，则玩家回复等量的体力。'
 					},
+					connect_change_card:{
+						name:'启用手气卡',
+						init:false,
+						frequent:true,
+						restart:true,
+					},
 					// connect_ban_weak:{
 					// 	name:'屏蔽弱将',
 					// 	init:false,
@@ -4940,10 +4953,10 @@
 						frequent:true
 					},
 					connect_replace_handcard:{
-						name:'末位可换牌',
+						name:'四号位保护',
 						init:true,
 						frequent:true,
-						intro:'最后行动的角色可在开局时重铸一次手牌'
+						intro:'最后行动的角色起始手牌数+1'
 					},
 					connect_choice_num:{
 						name:'侯选武将数',
@@ -5210,10 +5223,10 @@
 						frequent:true,
 					},
 					replace_handcard_two:{
-						name:'末位可换牌',
+						name:'四号位保护',
 						init:true,
 						frequent:true,
-						intro:'最后行动的角色可在开局时重铸一次手牌'
+						intro:'最后行动的角色起始手牌+1'
 					},
 					replace_character_two:{
 						name:'替补模式',
@@ -5402,6 +5415,12 @@
 					update:function(config,map){},
 					connect_double_character:{
 						name:'双将模式',
+						init:false,
+						frequent:true,
+						restart:true,
+					},
+					connect_change_card:{
+						name:'启用手气卡',
 						init:false,
 						frequent:true,
 						restart:true,
@@ -10129,9 +10148,10 @@
 					player.ai.tempIgnore=[];
 					_status.globalHistory.push({
    			cardMove:[],
+   			custom:[],
    		});
 					game.countPlayer2(function(current){
-						current.actionHistory.push({useCard:[],respond:[],skipped:[],lose:[],gain:[],sourceDamage:[],damage:[]});
+						current.actionHistory.push({useCard:[],respond:[],skipped:[],lose:[],gain:[],sourceDamage:[],damage:[],custom:[]});
 						current.stat.push({card:{},skill:{}});
 					});
 					if(ui.land&&ui.land.player==player){
@@ -10322,10 +10342,10 @@
 					}
 				},
 				addJudgeCard:function(){
-					target.addJudge(card,cards);
+					if(lib.filter.judge(card,player,target)&&cards.length&&get.position(cards[0],true)=='o') target.addJudge(card,cards);
 				},
 				equipCard:function(){
-					target.equip(cards[0]);
+					if(cards.length&&get.position(cards[0],true)=='o') target.equip(cards[0]);
 				},
 				gameDraw:function(){
 					"step 0"
@@ -10538,11 +10558,11 @@
 					}
 					event.filter2=function(info2){
 						var info=lib.skill[info2[0]];
-						if(!lib.translate[info2[0]]||info2[0].indexOf('_')==0||info.popup===false||info.silent) return false;
+						if(!lib.translate[info2[0]]||info.popup===false||info.silent) return false;
 						return true;
 					}
 					event.filter3=function(info,info2){
-						return event.filter2(info2)&&event.filter1(info2)&&info2[1]==info[1]&&info[2]==info2[2]&&info[1].hasSkill(info2[0],true);
+						return event.filter2(info2)&&event.filter1(info2)&&info2[1]==info[1]&&info[2]==info2[2]&&(lib.skill.global.contains(info2[0])||info[1].hasSkill(info2[0],true));
 					}
 					'step 1'
 					if(event.list.length){
@@ -11013,6 +11033,7 @@
 						if(result&&result.bool){
 							var hs=player.getCards('h')
 							game.broadcastAll(function(player,hs){
+								game.addVideo('lose',player,[get.cardsInfo(hs),[],[]]);
 								for(var i=0;i<hs.length;i++){
 									hs[i].discard(false);
 								}
@@ -13469,7 +13490,7 @@
 							}
 						},event.id);
 					};
-					if(get.type(card)!='equip'){
+					if(true){
 						var str='';
 						if(targets.length){
 							str+='对<span class="bluetext">'+(targets[0]==player?'自己':get.translation(targets[0]));
@@ -13528,6 +13549,18 @@
 							if(!list2.contains(listx[i])) return listx[i];
 						}
 						return null;
+					}
+					var info=get.info(card,false);
+					if(!info.nodelay&&event.animate!=false){
+						if(event.delayx!==false){
+							if(event.waitingForTransition){
+								_status.waitingForTransition=event.waitingForTransition;
+								game.pause();
+							}
+							else{
+								game.delayx();
+							}
+						}
 					}
 					"step 4"
 					if(!event.triggeredTargets1) event.triggeredTargets1=[];
@@ -13685,19 +13718,8 @@
 							next.target.animate('target');
 						}
 					}
-					if(!info.nodelay&&(event.animate!=false||num>0)){
-						if(num==0){
-							if(event.delayx!==false){
-								if(event.waitingForTransition){
-									_status.waitingForTransition=event.waitingForTransition;
-									game.pause();
-								}
-								else{
-									game.delayx();
-								}
-							}
-						}
-						else if(event.targetDelay!==false){
+					if(!info.nodelay&&num>0){
+						if(event.targetDelay!==false){
 							game.delayx(0.5);
 						}
 					}
@@ -14765,6 +14787,10 @@
 					event.forceDie=true;
 					if(_status.roundStart==player){
 						_status.roundStart=player.next||player.getNext()||game.players[0];
+					}
+					if(ui.land&&ui.land.player==player){
+						game.addVideo('destroyLand');
+						ui.land.destroy();
 					}
 					var unseen=false;
 					if(player.classList.contains('unseen')){
@@ -22914,58 +22940,61 @@
 				},
 				addTrigger:function(skill,player){
 					if(!player) return;
-					var evt=this.getParent('arrangeTrigger');
-					if(!evt||evt.name!='arrangeTrigger'||!evt.map) return;
-					if(typeof skill=='string') skill=[skill];
-					game.expandSkills(skill);
-					var filter=function(content){
-						if(typeof content=='string') return content==triggername;
-						return content.contains(triggername);
-					};
-					var trigger=evt._trigger;
-					var triggername=evt.triggername;
-					var map=false;
-					if(evt.doing&&evt.doing.player==player) map=evt.doing;
-					else{
-						for(var i=0;i<evt.map.length;i++){
-							if(evt.map[i].player==player){map=evt.map[i];break;}
-						}
-					}
-					if(!map) return;
-					var func=function(skillx){
-						var info=lib.skill[skillx];
-						var bool=false;
-						for(var i in info.trigger){
-							if(i!='global'&&trigger[i]!=player) continue;
-							if(filter(info.trigger[i])){bool=true;break}
-						}
-						if(!bool) return;
- 						var priority=0;
-						if(info.priority){
-							priority=info.priority*100;
-						}
-						if(!lib.translate[skillx]||skillx.indexOf('_')==0||info.popup===false||info.silent){
- 							priority++;
-						}
-						if(info.equipSkill) num-=25;
-						if(info.cardSkill) num-=50;
-						if(info.ruleSkill) num-=75;
-						var toadd=[skillx,player,priority];
-						if(map.list2){
-							for(var i=0;i<map.list2.length;i++){
-								if(map.list2[i][0]==toadd[0]&&map.list2[i][1]==toadd[1]) return;
-							}
-						};
-						for(var i=0;i<map.list.length;i++){
-							if(map.list[i][0]==toadd[0]&&map.list[i][1]==toadd[1]) return;
-						}
-						map.list.add(toadd);
-						map.list.sort(function(a,b){
-							return b[2]-a[2];
-						});
-					}
-					for(var j=0;j<skill.length;j++){
-						func(skill[j]);
+					var evt=this;
+					while(true){
+ 					var evt=evt.getParent('arrangeTrigger');
+ 					if(!evt||evt.name!='arrangeTrigger'||!evt.map) return;
+ 					if(typeof skill=='string') skill=[skill];
+ 					game.expandSkills(skill);
+ 					var filter=function(content){
+ 						if(typeof content=='string') return content==triggername;
+ 						return content.contains(triggername);
+ 					};
+ 					var trigger=evt._trigger;
+ 					var triggername=evt.triggername;
+ 					var map=false;
+ 					if(evt.doing&&evt.doing.player==player) map=evt.doing;
+ 					else{
+ 						for(var i=0;i<evt.map.length;i++){
+ 							if(evt.map[i].player==player){map=evt.map[i];break;}
+ 						}
+ 					}
+ 					if(!map) return;
+ 					var func=function(skillx){
+ 						var info=lib.skill[skillx];
+ 						var bool=false;
+ 						for(var i in info.trigger){
+ 							if(i!='global'&&trigger[i]!=player) continue;
+ 							if(filter(info.trigger[i])){bool=true;break}
+ 						}
+ 						if(!bool) return;
+  						var priority=0;
+ 						if(info.priority){
+ 							priority=info.priority*100;
+ 						}
+ 						if(info.silent){
+  						priority++;
+ 						}
+ 						if(info.equipSkill) num-=25;
+ 						if(info.cardSkill) num-=50;
+ 						if(info.ruleSkill) num-=75;
+ 						var toadd=[skillx,player,priority];
+ 						if(map.list2){
+ 							for(var i=0;i<map.list2.length;i++){
+ 								if(map.list2[i][0]==toadd[0]&&map.list2[i][1]==toadd[1]) return;
+ 							}
+ 						};
+ 						for(var i=0;i<map.list.length;i++){
+ 							if(map.list[i][0]==toadd[0]&&map.list[i][1]==toadd[1]) return;
+ 						}
+ 						map.list.add(toadd);
+ 						map.list.sort(function(a,b){
+ 							return b[2]-a[2];
+ 						});
+ 					}
+ 					for(var j=0;j<skill.length;j++){
+ 						func(skill[j]);
+ 					}
 					}
 				},
 				trigger:function(name){
@@ -23013,7 +23042,7 @@
 						if(info.priority){
 							num=info.priority*100;
 						}
-						if(!lib.translate[skill]||skill.indexOf('_')==0||info.popup===false||info.silent){
+						if(info.silent){
 							num++;
 						}
 						if(info.equipSkill) num-=30;
@@ -23666,7 +23695,7 @@
 				event=event||_status.event;
 				if(event.name!='chooseToRespond') return true;
 				var source=event.getParent().player;
-				if(source!=player){
+				if(source&&source!=player){
 					if(source.hasSkillTag('norespond',false,[card,player,event],true)){
 						return false;
 					}
@@ -38408,6 +38437,12 @@
 												},linknode).link=list[i].forum;
 											}
 										}
+										else if(list[i].forum){
+											var linknode=ui.create.div('.text',node);
+											ui.create.node('span.hrefnode','参与讨论',function(){
+												game.open(this.link);
+											},linknode).link=list[i].forum;
+										}
 										download.listen(downloadExtension);
 										if(lib.config.extensions.contains(list[i].name)){
 											download.classList.remove('active');
@@ -42083,7 +42118,7 @@
 				node.damagepopups=[];
 				node.judging=[];
 				node.stat=[{card:{},skill:{}}];
-				node.actionHistory=[{useCard:[],respond:[],skipped:[],lose:[],gain:[],sourceDamage:[],damage:[]}];
+				node.actionHistory=[{useCard:[],respond:[],skipped:[],lose:[],gain:[],sourceDamage:[],damage:[],custom:[]}];
 				node.tempSkills={};
 				node.storage={};
 				node.marks={};
@@ -47797,13 +47832,15 @@
 		},
 		suit:function(card){
 			if(get.itemtype(card)=='cards'){
-				var suit=get.suit(card[0])
-				for(var i=1;i<card.length;i++){
-					if(get.suit(card[i])!=suit) return 'none';
-				}
-				return suit;
+				if(card.length==1) return get.suit(card[0]);
+				return 'none';
+				//var suit=get.suit(card[0])
+				//for(var i=1;i<card.length;i++){
+				//	if(get.suit(card[i])!=suit) return 'none';
+				//}
+				//return suit;
 			}
-			else if(get.itemtype(card.cards)=='cards'&&card.name!='muniu'){
+			else if(get.itemtype(card.cards)=='cards'&&!lib.suit.contains(card.suit)){
 				return get.suit(card.cards);
 			}
 			else{
