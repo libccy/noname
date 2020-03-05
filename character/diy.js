@@ -5,6 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		connectBanned:['diy_tianyu','diy_yangyi','diy_lukang','ns_huamulan','ns_yuji','ns_duangui','ns_liuzhang'],
 		character:{
+			ns_zhangwei:['female','wei',3,['nsqiyue','nsxuezhu']],
 			diy_wenyang:['male','wei','4/6',['lvli','choujue']],
 			key_lucia:['female','key','1/2',['lucia_duqu','lucia_zhenren']],
 			key_kyousuke:['male','key',4,['nk_shekong','key_huanjie']],
@@ -90,12 +91,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterSort:{
 			diy:{
-				diy_tieba:["diy_wenyang","ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua"],
+				diy_tieba:["diy_wenyang","ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_zhangwei"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
 				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine"],
 			},
 		},
 		characterIntro:{
+			ns_zhangwei:'血骑教习·张葳，三国杀集换式卡牌游戏《阵面对决》中的帝畿系列卡牌。游卡桌游官方原创的三国时期女性角色。',
 			diy_feishi:'字公举，生卒年不详，益州犍为郡南安县（今四川省乐山市）人。刘璋占据益州时，以费诗为绵竹县县令。刘备进攻刘璋夺取益州，费诗举城而降，后受拜督军从事，转任牂牁郡太守，再为州前部司马。',
 			//diy_liuyan:'字元海，新兴（今山西忻州北）人，匈奴族，匈奴首领冒顿单于之后[1]  ，南匈奴单于于夫罗之孙，左贤王刘豹之子，母呼延氏，十六国时期前赵政权开国皇帝，304年－310年在位。',
 			diy_lukang:'字幼节，吴郡吴县（今江苏苏州）人。三国时期吴国名将，丞相陆逊次子。',
@@ -150,6 +152,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuji:['zuoci']
 		},
 		skill:{
+			nsqiyue:{
+				trigger:{global:['turnOverEnd','linkEnd','showCharacterEnd','hideCharacterEnd','removeCharacterEnd']},
+				forced:true,
+				content:function(){player.draw()},
+			},
+			nsxuezhu:{
+				trigger:{player:'damageEnd',source:'damageSource'},
+				filter:function(event,player){return event.player.isAlive()},
+				content:function(){trigger.player.draw(2);trigger.player.turnOver();},
+			},
 			yukine_wenzhou:{
 				trigger:{global:'phaseUseBegin'},
 				direct:true,
@@ -4029,7 +4041,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				filter:function(event){
 					var type=get.type(event.card,'trick');
-					return (type=='trick'||type=='equip')&&event.cards[0]&&event.cards[0]==event.card;
+					return (type=='trick'||type=='equip')&&event.card.isCard;
 				},
 				content:function(){
 					"step 0"
@@ -5600,6 +5612,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yukine_wenzhou:'问咒',
 			yukine_wenzhou_info:'一名角色的出牌阶段开始时，其可以交给你一张牌。若如此做，你选择一项：交给其一张牌，或令其从牌堆中获得一张与此牌类型相同的牌，且其于此阶段内使用与此牌牌名相同的牌时无法被响应。',
 			
+			ns_zhangwei:'张葳',
+			nsqiyue:'骑钺',
+			nsqiyue_info:'锁定技，当有角色的武将牌状态改变后，你摸一张牌。',
+			nsxuezhu:'血逐',
+			nsxuezhu_info:'当你受到伤害或造成伤害后，你可以令受到伤害的角色摸两张牌并翻面。',
 			ns_chuanshu:'传术',
 			ns_chuanshu_info:'<span class=yellowtext>限定技</span> 当一名其他角色进入濒死状态时，你可以令其选择获得技能【雷击】或【鬼道】，其回复体力至1并摸两张牌。当该被【传术】的角色造成或受到一次伤害后，你摸一张牌。其阵亡后，你重置技能【传术】',
 			ns_xiandao1:'仙道',

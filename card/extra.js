@@ -19,12 +19,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						player.$throw(card.cards,1000);
 						player.popup('muniu');
 						game.log(card,'掉落了',card.cards);
-						while(card.cards.length){
-							var card2=card.cards.shift();
-							if(card2.parentNode.id=='special'){
-								card2.discard();
-							}
-						}
+						game.cardsDiscard(card.cards);
+						card.cards.length=0;
 					}
 				},
 				clearLose:true,
@@ -62,7 +58,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target==player;
 				},
 				content:function(){
-					if(target.isDying()){
+					if(target.isDying()||event.getParent(2).type=='dying'){
 						target.recover();
 						if(_status.currentPhase==target){
 							target.getStat().card.jiu--;

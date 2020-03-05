@@ -3,7 +3,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'tw',
 		connect:false,
-		characterSort:{},
+		characterSort:{
+			tw:{
+				tw_mobile:['tw_beimihu','nashime'],
+				tw_yijiang:['tw_caoang','tw_caohong','tw_zumao','tw_dingfeng','tw_maliang','tw_xiahouba'],
+				tw_english:['kaisa'],
+			},
+		},
 		character:{
 			tw_beimihu:['female','qun',3,['zongkui','guju','baijia','bingzhao'],['zhu']],
 			nashime:['male','qun',3,['chijie','waishi','renshe']],
@@ -249,15 +255,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			twxiaolian:{
 				audio:2,
-				trigger:{global:'useCard'},
+				trigger:{global:'useCardToPlayer'},
 				logTarget:'player',
 				filter:function(event,player){
 					return event.card&&event.card.name=='sha'&&event.player!=player&&
 					event.targets.length==1&&event.targets[0]!=player;
 				},
 				content:function(){
-					trigger.twxiaolian=trigger.targets[0];
-					trigger.targets=[player];
+					trigger.getParent().twxiaolian=trigger.targets[0];
+					trigger.targets.length=0;
+					trigger.targets.push(player);
 				},
 				group:'twxiaolian_damage',
 				subSkill:{
@@ -271,6 +278,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						marktext:'马',
 						intro:{
 							content:'cards',
+							onunmark:'throw',
 						},
 						mod:{
 							globalTo:function(from,to,distance){
@@ -307,10 +315,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			twtijin:{
 				audio:2,
-				trigger:{global:'useCard'},
+				trigger:{global:'useCardToPlayer'},
 				filter:function(event,player){
-					return event.card&&event.card.name=='sha'&&event.player!=player&&
-					event.targets.length==1&&event.targets[0]!=player&&get.distance(event.player,player,'attack')<=1;
+					return event.card&&event.card.name=='sha'&&event.player!=player&&event.target!=player&&
+					event.targets.length==1&&event.player.inRange(player)<=1;
 				},
 				logTarget:'player',
 				check:function(event,player){
@@ -318,8 +326,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					trigger.targets=[player];
-					var next=game.createEvent('twtijin_discard',null,trigger.getParent());
+					trigger.targets.length=0;
+					trigger.targets.push(player);
+					var next=game.createEvent('twtijin_discard',null,trigger.getParent(2));
 					next.player=player;
 					next.target=trigger.player;
 					next.setContent(function(){
@@ -377,6 +386,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			renshe:{
+				audio:2,
 				trigger:{player:'damageEnd'},
 				direct:true,
 				content:function(){
@@ -421,6 +431,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			waishi:{
+				audio:2,
 				group:'waishi_afterstory',
 				subSkill:{
 					afterstory:{
@@ -436,12 +447,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.storage.waishi>0;
+					return typeof player.storage.waishi!='number'||player.storage.waishi>0;
 				},
 				filterTarget:function(card,player,target){
 					return target!=player&&target.countCards('h')>=ui.selected.cards.length;
 				},
 				filterCard:true,
+				position:'he',
 				check:function(card){
 					if(!game.hasPlayer(function(current){
 						return current!=_status.event.player&&current.countCards('h')>ui.selected.cards.length;
@@ -457,9 +469,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				delay:0,
 				content:function(){
 					'step 0'
+					if(typeof player.storage.waishi!='number') player.storage.waishi=1;
 					player.storage.waishi--;
 					player.lose(cards,ui.special);
-					player.gainPlayerCard(target,true,'h',cards.length).chooseonly=true;
+					player.choosePlayerCard(target,true,'h',cards.length).chooseonly=true;
 					'step 1'
 					event.cards2=result.cards;
 					target.lose(event.cards2,ui.special);
@@ -483,6 +496,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			chijie:{
+				audio:true,
 				forbid:['guozhan'],
 				trigger:{global:'gameDrawAfter'},
 				direct:true,
@@ -545,6 +559,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			waishi_info:' 出牌阶段限一次，你可以用至多X张牌交换一名其他角色等量的手牌（X为现存势力数），然后若其与你势力相同或手牌多于你，你摸一张牌。',
 			renshe:'忍涉',
 			renshe_info:'当你受到伤害后，你可以选择一项：将势力改为现存的另一个势力；或可以额外发动一次“外使”直到你的下个出牌阶段结束；或与另一名其他角色各摸一张牌。',
+			tw_mobile:'移动版',
+			tw_yijiang:'一将成名TW',
+			tw_english:'英文版',
 		}
 	};
 });

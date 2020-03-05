@@ -230,7 +230,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					tag:{
 						damage:1,
 						thunderDamage:1,
-						natureDamage:1
+						natureDamage:1,
+						loseCard:1,
 					},
 					result:{
 						target:function(player,target){
@@ -620,7 +621,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(target.isUnseen(0)) controls.push('主将');
 					if(target.isUnseen(1)) controls.push('副将');
 					if(controls.length>1){
-						player.chooseControl(controls);
+						player.chooseControl(controls).set('ai',function(){return 1});
 					}
 					if(controls.length==0) event.finish();
 					"step 1"

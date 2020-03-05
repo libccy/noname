@@ -1121,7 +1121,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				filter2:function(event,player){
 					if(!get.zhu(player,'jianan')) return false;
 					if(!player.countCards('he')) return false;
-					if(get.is.jun(player)&&player.isUnseen(1)) return false;
 					return !player.isUnseen();
 				},
 				direct:true,
@@ -1144,15 +1143,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(!skills.length) event.finish();
 					else{
 						event.skills=skills;
-						var next=player.chooseToDiscard();
+						var next=player.chooseToDiscard('he');
 						var str='';
 						for(var i=0;i<skills.length;i++){
 							str+='、【';
 							str+=get.translation(skills[i]);
 							str+='】';
 						}
-						next.prompt='是否发动【五子良将纛】？'
-						next.prompt2=get.translation('弃置一张牌并暗置一张武将牌，获得以下技能中的一个直到下回合开始：'+str.slice(1));
+						next.set('prompt','是否发动【五子良将纛】？')
+						next.set('prompt2',get.translation('弃置一张牌并暗置一张武将牌，获得以下技能中的一个直到下回合开始：'+str.slice(1)));
 						next.logSkill='g_jianan';
 						next.skills=skills;
 						next.ai=function(card){
@@ -1176,7 +1175,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var list=["主将","副将"];
 						if(player.isUnseen(0)||get.is.jun(player)) list.remove("主将");
 						if(player.isUnseen(1)) list.remove("副将");
-						if(!list.length) event.finish();
+						if(!list.length) event.goto(3);
 						else if(list.length<2) event._result={control:list[0]};
 						else{
 							player.chooseControl(list).set('ai',function(){
@@ -1189,17 +1188,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						var num=result.control=='主将'?0:1;
 						player.hideCharacter(num);
-						player.chooseControl(event.skills).set('ai',function(){
-							var skills=event.skills;
-							if(skills.contains('qiaobian')&&player.countCards('h')>3) return 'qiaobian';
-							if(skills.contains('gzjieyue')&&player.countCards('h',function(card){
-								return get.value(card)<7;
-							})) return 'gzjieyue';
-							if(skills.contains('new_retuxi')) return 'new_retuxi';
-							return skills.randomGet();
-						}).prompt="选择获得其中的一个技能直到下回合开始";
 					}
 					'step 3'
+					player.chooseControl(event.skills).set('ai',function(){
+						var skills=event.skills;
+						if(skills.contains('qiaobian')&&player.countCards('h')>3) return 'qiaobian';
+						if(skills.contains('gzjieyue')&&player.countCards('h',function(card){
+							return get.value(card)<7;
+						})) return 'gzjieyue';
+						if(skills.contains('new_retuxi')) return 'new_retuxi';
+						return skills.randomGet();
+					}).set("prompt","选择获得其中的一个技能直到君主的回合开始");
+					'step 4'
 					var link=result.control;
 					player.addTempSkill(link,"jiananUpdate");
 					player.addTempSkill("jianan_eff","jiananUpdate");
@@ -7006,7 +7006,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			tongshimingzhi:'同时明置',
 			mode_guozhan_character_config:'国战武将',
 			_zhenfazhaohuan:'阵法召唤',
-			_zhenfazhaohuan_info:'由拥有阵法技的角色发起，满足此阵法技条件的未确定势力角色均可按逆时针顺序依次明置其一张武将牌(响应阵法召唤)，以发挥阵法技的效果',
+			_zhenfazhaohuan_info:'由拥有阵法技的角色发起，满足此阵法技条件的未确定势力角色均可按逆时针顺序依次明置其一张武将牌(响应阵法召唤)，以发挥阵法技的效果。',
 			
 			
 			junling:'军令',
@@ -7038,35 +7038,35 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzfengying_info:'限定技，你可以将所有手牌当【挟天子以令诸侯】使用（无视大势力限制），然后所有与你势力相同的角色将手牌补至体力上限。',
 			gz_yujin:'于禁',
 			gzjieyue:'节钺',
-			gzjieyue_info:'准备阶段开始时，你可以将一张手牌交给一名非魏势力角色，然后选择一个“军令”，然后令其选择一项：执行该军令，然后你摸一张牌；或令你于此回合摸牌阶段摸牌时，额外摸三张牌。',
+			gzjieyue_info:'准备阶段开始时，你可以将一张手牌交给一名非魏势力角色，然后选择一个“军令”并令其选择一项：执行该军令，然后你摸一张牌；或令你于此回合摸牌阶段额外摸三张牌。',
 			gz_wangping:'王平',
 
 		jianglue:'将略',
-			jianglue_info:'限定技，出牌阶段，你可以选择一个“军令”，然后与你势力相同的其他角色可以执行该军令（未确定势力角色可以在此时明置一张武将牌）。你与每名执行该军令的角色增加一点体力上限，然后回复一点体力，然后你摸X张牌（X为以此法回复了体力的角色数）。',
+			jianglue_info:'限定技，出牌阶段，你可以选择一个“军令”，然后与你势力相同的其他角色可以执行该军令（未确定势力角色可以在此时明置一张武将牌）。你与所有执行该军令的角色增加一点体力上限，然后回复一点体力，然后你摸X张牌（X为以此法回复了体力的角色数）。',
 			gz_fazheng:'法正',
 			gzxuanhuo:'眩惑',
-			gzxuanhuo_info:'与你势力相同的其他角色的出牌阶段限一次，该角色可以交给你一张牌并弃置一张牌，然后获得以下一项场上没有的技能直到回合结束：“武圣”、“咆哮”、“龙胆”、“铁骑”、“烈弓”、“狂骨”。',
+			gzxuanhuo_info:'与你势力相同的其他角色的出牌阶段限一次，该角色可以交给你一张牌并弃置一张牌，然后获得以下一项场上没有的技能直到回合结束：〖武圣〗、〖咆哮〗、〖龙胆〗、〖铁骑〗、〖烈弓〗、〖狂骨〗。',
 			gzenyuan:'恩怨',
 			gzenyuan_info:'锁定技，当其他角色对你使用【桃】时，该角色摸一张牌；当你受到伤害后，伤害来源须交给你一张手牌或失去1点体力。',
 			gzbuyi:'补益',
-			gzbuyi_info:'每名角色的回合限一次，当一名与你势力相同的角色脱离濒死状态后，你可以选择一个“军令”，令伤害来源选择一项：执行该军令，或令该脱离濒死状态的角色回复一点体力。',
+			gzbuyi_info:'每回合限一次，当一名与你势力相同的角色脱离濒死状态后，你可以选择一个“军令”，令伤害来源选择一项：执行该军令，或令该脱离濒死状态的角色回复一点体力。',
 			gz_lukang:'陆抗',
 			keshou:'恪守',
-			keshou_info:'当你受到伤害时，你可以弃置两张颜色相同的牌。若如此做，此伤害-1，然后若没有与你势力相同的其他角色，你进行一次判定，若结果为红色，你摸一张牌。',
+			keshou_info:'当你受到伤害时，你可以弃置两张颜色相同的牌。若如此做，此伤害-1。然后若场上没有与你势力相同的其他角色，则你进行判定，若结果为红色，你摸一张牌。',
 			zhuwei:'筑围',
-			zhuwei_info:'当你的判定牌生效后，若此牌为【杀】或【决斗】，你可以获得之，然后你可令当前回合角色本回合可额外使用一张【杀】，且手牌上限+1。',
+			zhuwei_info:'当你的判定牌生效后，若此牌为【杀】或【决斗】，你可以获得之。然后，你可令当前回合角色本回合内使用【杀】的次数上限和手牌上限+1。',
 			gz_yuanshu:'袁术',
 			gzweidi:'伪帝',
-			gzweidi_info:'出牌阶段限一次，你可以指定一名本回合从牌堆获得过牌的其他角色，然后选择一个“军令”，令其选择一项：执行该军令；或令你获得其所有手牌，然后交给其等量的牌。',
+			gzweidi_info:'出牌阶段限一次，你可以指定一名本回合从牌堆获得过牌的其他角色并选择一个“军令”，令其选择一项：执行该军令；或令你获得其所有手牌，然后交给其等量的牌。',
 			gzyongsi:'庸肆',
-			gzyongsi_info:'锁定技，若场上没有【玉玺】，视为你装备之；当你成为【知己知彼】的目标时，你展示你的所有手牌。',
+			gzyongsi_info:'锁定技，若场上没有【玉玺】，则视为你装备了【玉玺】；当你成为【知己知彼】的目标时，你展示你的所有手牌。',
 			//gzyongsi_eff1:'玉玺',
 			//gzyongsi_eff2:'玉玺',
 			gz_zhangxiu:'张绣',
 			gzfudi:'附敌',
-			gzfudi_info:'当你受到伤害后，你可以交给伤害来源一张手牌。若如此做，你对其势力中的体力值最大且不小于你的一名角色造成一点伤害。',
+			gzfudi_info:'当你受到伤害后，你可以交给伤害来源一张手牌。若如此做，你对其势力中体力值最大且不小于你的一名角色造成一点伤害。',
 			congjian:'从谏',
-			congjian_info:'锁定技，你于回合外造成的伤害，于回合内受到的伤害+1。',
+			congjian_info:'锁定技，当你于回合外造成伤害，或于回合内受到伤害时，此伤害+1。',
 			gz_jun_caocao:'君曹操',
 			jianan:'建安',
 			jianan_info:'君主技，只要此武将处于明置状态，你便拥有“五子良将纛”。',
@@ -7074,22 +7074,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			wuziliangjiangdao:'五子良将纛',
 			wuziliangjiangdao_ab:'将纛',
 			wuziliangjiangdao_bg:'纛',
-			wuziliangjiangdao_info:'魏势力角色的准备阶段开始时，其可以弃置一张牌。若如此做，其选择一张暗置的武将牌（若没有，则选择一张暗置），然后获得下列技能中的一项（其他角色已有的技能无法选择）且不能明置选择的武将牌直到你的下个回合开始：“突袭”，“巧变”，“骁果”，“节钺”，“断粮”。',
+			wuziliangjiangdao_info:'魏势力角色的准备阶段开始时，其可以弃置一张牌。若如此做，其选择一张暗置的武将牌（若没有，则选择一张暗置），然后获得下列技能中的一项（其他角色已有的技能无法选择）且不能明置选择的武将牌直到你的下个回合开始：〖突袭〗，〖巧变〗，〖骁果〗，〖节钺〗，〖断粮〗。',
 			huibian:'挥鞭',
 			huibian_info:'出牌阶段限一次，你可以选择一名魏势力角色和另一名已受伤的魏势力角色。若如此做，你对前者造成一点伤害，然后其摸两张牌，然后后者回复一点体力。',
 			gzzongyu:'总御',
-			gzzongyu_info:'当【六龙骖驾】进入其他角色的装备区后，你可以用你装备区内所有坐骑牌（至少一张）与【六龙骖驾】交换位置。锁定技，当你使用一张坐骑牌后，若场上或弃牌堆中有【六龙骖驾】，则将【六龙骖驾】置入你的装备区。',
+			gzzongyu_info:'当【六龙骖驾】进入其他角色的装备区后，你可以将你装备区内所有坐骑牌（至少一张）与【六龙骖驾】交换位置。锁定技，当你使用坐骑牌后，若场上或弃牌堆中有【六龙骖驾】，则将【六龙骖驾】置入你的装备区。',
 					
 			xindiaodu:"调度",
-			"xindiaodu_info":"当与你势力相同的角色使用装备牌时，该角色可以摸一张牌；出牌阶段开始时，你可以获得与你势力相同的一名角色装备区里的一张牌，然后你可以将此牌交给另一名与你势力相同的其他角色。",
+			"xindiaodu_info":"当与你势力相同的角色使用装备牌时，其可以摸一张牌；出牌阶段开始时，你可以获得与你势力相同的一名角色装备区内的一张牌，然后你可以将此牌交给另一名与你势力相同的其他角色。",
 			yigui:"役鬼",
-			"yigui_info":"当你第一次明置此武将牌时，你将剩余武将牌堆的两张牌扣置于游戏外，称为“魂”；你可以将一张“魂”亮出并置入剩余武将牌堆，视为你使用一张本回合你未以此法使用过的基本牌或普通锦囊牌，且目标须为与此“魂”势力相同或未确定势力的角色。 ",
+			"yigui_info":"当首次明置此武将牌时，你将剩余武将牌堆的两张牌扣置于游戏外，称为“魂”；你可以展示一张“魂”并将其置入剩余武将牌堆，视为使用了一张本回合内未以此法使用过的基本牌或普通锦囊牌（此牌目标须为与此“魂”势力相同或未确定势力的角色）。 ",
 			"yigui_init":"役鬼",
 			"yigui_init_info":"",
 			"yigui_refrain":"役鬼",
 			"yigui_refrain_info":"",
 			jihun:"汲魂",
-			jihun_info:"当你受到伤害后，或与你势力不同的角色进入濒死状态被救回后，你可以将剩余武将牌堆的一张牌当“魂”扣置于游戏外。",
+			jihun_info:"当你受到伤害后，或与你势力不同的角色脱离濒死状态后，你可以将剩余武将牌堆的一张牌当做“魂”扣置于游戏外。",
 			
 			
 			"xianqu_skill":"先驱",
@@ -7110,43 +7110,43 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"yinyang_add_info":"",
 			
 			"new_jushou":"据守",
-			"new_jushou_info":"结束阶段，你可以摸X张牌（X为亮明势力数），然后弃置一张手牌，若以此法弃置的是装备牌，则改为你使用之。若X大于2，则你将武将牌叠置。",
+			"new_jushou_info":"结束阶段，你可以摸X张牌（X为亮明势力数），然后弃置一张手牌。若以此法弃置的牌为装备牌，则改为使用此牌。若X大于2，则你将武将牌叠置。",
 			"new_duanliang":"断粮",
-			"new_duanliang_info":"出牌阶段，你可以将一张黑色基本牌或黑色装备牌当做一张【兵粮寸断】使用。你使用【兵粮寸断】没有距离限制。若你对距离超过2的角色发动了“断粮”，则本回合不能再发动“断粮”。",
+			"new_duanliang_info":"出牌阶段，你可以将一张黑色基本牌或黑色装备牌当做【兵粮寸断】使用。你使用【兵粮寸断】没有距离限制。若你对距离超过2的角色发动了〖断粮〗，则本回合不能再发动〖断粮〗。",
 			"new_shushen":"淑慎",
 			"new_shushen_info":"当你回复1点体力后，你可令一名其他角色摸一张牌。",
 			"new_fenji":"奋激",
-			"new_fenji_info":"一名角色的结束阶段，若其没有手牌，则你可以令其摸两张牌，然后你失去1点体力。",
+			"new_fenji_info":"一名角色的结束阶段开始时，若其没有手牌，你可以令其摸两张牌，然后你失去1点体力。",
 			"new_luanji":"乱击",
-			"new_luanji_info":"你可以将两张与你本回合以此法转化的花色均不相同的手牌当【万箭齐发】使用，然后当一名与你势力相同的角色因响应此牌而打出【闪】时，该角色摸一张牌",
+			"new_luanji_info":"你可以将两张与你本回合以此法转化的花色均不相同的手牌当【万箭齐发】使用。当一名与你势力相同的角色因响应此牌而打出【闪】时，该角色摸一张牌。",
 			"new_qingcheng":"倾城",
-			"new_qingcheng_info":"出牌阶段，你可以弃置一张黑色牌并选择一名武将牌均明置的其他角色，然后你暗置其一张武将牌。若此牌为装备牌，则你可以再选择一名角色并重复同样的操作。",
+			"new_qingcheng_info":"出牌阶段，你可以弃置一张黑色牌并选择一名武将牌均明置的其他角色，然后你暗置其一张武将牌。若你以此法弃置的牌为装备牌，则你可以暗置另一名武将牌均明置的角色的一张武将牌。",
 			"new_kongcheng":"空城",
-			"new_kongcheng_info":"锁定技，若你没有手牌，1.当你成为【杀】或【决斗】的目标时，取消之；2.你的回合外，其他角色交给你的牌置于你的武将牌上，摸牌阶段你获得武将牌上的牌。",
+			"new_kongcheng_info":"锁定技，若你没有手牌，1.当你成为【杀】或【决斗】的目标时，取消之；2.你的回合外，其他角色交给你牌后，你将这些牌置于你的武将牌上。摸牌阶段开始时，你获得武将牌上的这些牌。",
 			"new_keji":"克己",
-			"new_keji_info":"锁定技，若你没有在出牌阶段内使用过颜色不同的牌，则你本回合手牌上限+4。",
+			"new_keji_info":"锁定技，若你没有在出牌阶段内使用过颜色不同的牌，则你本回合的手牌上限+4。",
 			"keji_add":"克己",
 			"keji_add_info":"",
 			"new_mouduan":"谋断",
 			"new_mouduan_info":"结束阶段，若你于本回合内使用过四种花色或三种类别的牌，则你可以移动场上的一张牌。",
 			"new_longdan":"龙胆",
-			"new_longdan_info":"你可以将【杀】当【闪】，【闪】当【杀】使用或打出。你发动龙胆时：若你的杀被【闪】抵消，则你可以对另一名角色造成1点伤害；若你的【闪】抵消了【杀】，则你可以令一名其他角色回复1点体力。（不能是【杀】的使用者）",
+			"new_longdan_info":"你可以将【杀】当【闪】，【闪】当【杀】使用或打出。当你发动〖龙胆〗使用的【杀】被【闪】抵消时，你可以对另一名角色造成1点伤害；当你发动〖龙胆〗使用的【闪】抵消了【杀】时，你可以令一名其他角色回复1点体力（不能是【杀】的使用者）。",
 			"new_paoxiao":"咆哮",
-			"new_paoxiao_info":"锁定技，你使用【杀】无数量限制；你在一回合内使用第二张【杀】时，摸一张牌。",
+			"new_paoxiao_info":"锁定技，你使用【杀】无数量限制；当你于一回合内使用第二张【杀】时，摸一张牌。",
 			"new_kurou":"苦肉",
-			"new_kurou_info":"出牌阶段限一次，你可以弃置一张牌，然后失去1点体力并摸三张牌，本回合你可以多使用一张【杀】。",
+			"new_kurou_info":"出牌阶段限一次，你可以弃置一张牌，然后失去1点体力并摸三张牌，本回合使用【杀】的次数上限+1。",
 			"kurou_effect":"苦肉",
 			"kurou_effect_info":"",
 			"new_chuli":"除疠",
-			"new_chuli_info":"出牌阶段限一次，若你有牌，你可以选择至多三名势力各不相同或未确定势力的其他角色，你弃置你和这些角色的各一张牌。然后以此法弃置黑桃牌的角色各摸一张牌。",
+			"new_chuli_info":"出牌阶段限一次，若你有牌，你可以选择至多三名势力各不相同或未确定势力的其他角色，你弃置你和这些角色的各一张牌。然后所有以此法弃置过黑桃牌的角色各摸一张牌。",
 			"baka_hunshang":"魂殇",
-			"baka_hunshang_info":"副将技，此武将牌减少半个阴阳鱼；准备阶段，若你的体力值不大于1，则你本回合获得“英姿”和“英魂”",
+			"baka_hunshang_info":"副将技，此武将牌减少半个阴阳鱼；准备阶段，若你的体力值不大于1，则你获得〖英姿〗和〖英魂〗直到回合结束。",
 			"baka_yinghun":"英魂",
 			"baka_yinghun_info":"准备阶段开始时，若你已受伤，你可令一名其他角色执行一项：摸X张牌，然后弃置一张牌；或摸一张牌，然后弃置X张牌（X为你已损失的体力值）",
 			"baka_yingzi":"英姿",
-			"baka_yingzi_info":"锁定技，摸牌阶段摸牌时，你额外摸一张牌；你的手牌上限不会因体力值的减少而减少。",
+			"baka_yingzi_info":"锁定技，摸牌阶段摸，你多摸一张牌；你的手牌上限+X（X为你已损失的体力值）。",
 			"new_yiji":"遗计",
-			"new_yiji_info":"当你受到伤害后，你可以观看牌堆顶的两张牌，并将其交给任意角色",
+			"new_yiji_info":"当你受到伤害后，你可以观看牌堆顶的两张牌，并将其交给任意角色。",
 			"new_jieming":"节命",
 			"new_jieming_info":"当你受到伤害后，你可以令一名角色将手牌摸至X张（X为其体力上限且最多为5）。",
 			"new_fangzhu":"放逐",
@@ -7156,7 +7156,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"fengyin_vice":"封印[副将]",
 			"fengyin_vice_info":"",
 			"new_tieji":"铁骑",
-			"new_tieji_info":"当你使用【杀】指定一个目标后，你可以令其本回合一张明置的武将牌的非锁定技失效，然后你进行判定，除非该角色弃置与结果花色相同的一张牌，否则不能使用【闪】。",
+			"new_tieji_info":"当你使用【杀】指定目标后，你可以令其一张明置的武将牌上的非锁定技于本回合内失效，然后你进行判定，除非该角色弃置与结果花色相同的一张牌，否则其不能使用【闪】响应此【杀】。",
 			hmkyuanyu:"远域",
 			"hmkyuanyu_info":"锁定技，当你受到伤害时，若伤害来源与你的座次不相邻，防止此伤害。",
 			hmkguishu:"鬼术",
@@ -7183,21 +7183,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			qianhuan_bg:'幻',
 			qianhuan_info:'当与你势力相同的一名角色受到伤害后，你可以将一张与你武将牌上花色均不同的牌置于你的武将牌上。当一名与你势力相同的角色成为基本牌或锦囊牌的唯一目标时，你可以移去一张“千幻”牌，取消之。',
 			gzzhiman:'制蛮',
-			gzzhiman_info:'当你对其他角色造成伤害时，你可以防止此伤害。若如此做，你获得其装备区或判定区里的一张牌。然后若该角色与你势力相同，则该角色可以变更其副将。',
+			gzzhiman_info:'当你对其他角色造成伤害时，你可以防止此伤害。若如此做，你获得其装备区或判定区里的一张牌。然后若该角色与你势力相同，该角色可以变更副将。',
 			
 			gzdiancai:'典财',
 			gzdiancai_info:'其他角色的出牌阶段结束时，若你于此阶段失去了x张或更多的牌，则你可以将手牌摸至体力上限。若如此做，你可以变更副将（x为你的体力值）。',
 			xuanlve:'旋略',
 			xuanlve_info:'当你失去装备区里的牌后，你可以弃置一名其他角色的一张牌。',
 			yongjin:'勇进',
-			yongjin_info:'限定技，出牌阶段，你可以移动场上的至多三张装备牌。',
+			yongjin_info:'限定技，出牌阶段，你可以依次移动场上的至多三张装备牌。',
 			lianzi:'敛资',
-			lianzi_info:'出牌阶段限一次，你可以弃置一张手牌，然后亮出牌堆顶X张牌（X为吴势力角色装备区里的牌和“烽火”的总和），获得其中所有与你弃置牌类别相同的牌，将其余的牌置入弃牌堆，若一次获得的牌超过三张，则你失去技能“敛资”并获得技能“制衡”。',
+			lianzi_info:'出牌阶段限一次，你可以弃置一张手牌，然后亮出牌堆顶X张牌（X为吴势力角色装备区里的牌和“烽火”的总和），获得其中所有与你弃置牌类别相同的牌，将其余的牌置入弃牌堆，若你以此法一次获得了三张或更多的牌，则你失去技能〖敛资〗并获得技能〖制衡〗。',
 			gzqice:'奇策',
 			gzqice_backup:'奇策',
-			gzqice_info:'出牌阶段限一次，你可以将所有手牌当任意一张普通锦囊牌使用，你不能以此法使用目标数超过X的牌（X为你的手牌数），然后你可以变更副将。',
+			gzqice_info:'出牌阶段限一次，你可以将所有手牌当做任意一张普通锦囊牌使用（此牌的目标数不能超过你的手牌数）。然后，你可以变更副将。',
 			gzyuejian:'约俭',
-			gzyuejian_info:'锁定技，与你势力相同角色的弃牌阶段开始时，若其本回合未使用指定过其他势力的角色为目标，则该角色本回合手牌上限等同于其体力上限',
+			gzyuejian_info:'锁定技，与你势力相同角色的弃牌阶段开始时，若其本回合未使用牌指定过其他势力的角色为目标，则该角色本回合手牌上限+X（X为其已损失的体力值）。',
 			gzxiongsuan:'凶算',
 			gzxiongsuan_info:'限定技，出牌阶段，你可以弃置一张手牌并选择与你势力相同的一名角色，对其造成1点伤害，然后你摸三张牌。若该角色有已发动的限定技，则你选择其中一个限定技，此回合结束后视为该限定技未发动过。',
 			gzhuashen:'化身',
@@ -7206,14 +7206,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzxinsheng_info:'当你受到伤害后，你可以从剩余武将牌堆中扣置一张牌加入到“化身”牌中。',
 
 			jubao:'聚宝',
-			jubao_info:'锁定技，你装备区里的宝物牌不能被其他角色获得，结束阶段开始时，若场上或弃牌堆有【定澜夜明珠】，则你摸一张牌，然后获得装备区里有【定澜夜明珠】角色的一张牌。',
+			jubao_info:'锁定技，你装备区里的宝物牌不能被其他角色获得。结束阶段开始时，若场上或弃牌堆有【定澜夜明珠】，则你摸一张牌，然后获得装备区里有【定澜夜明珠】角色的一张牌。',
 			jiahe:'嘉禾',
 			jiahe_info:'君主技，只要此武将牌处于明置状态，你便拥有“缘江烽火图”。',
 			jiahe_put:'烽火',
 			jiahe_put_info:'出牌阶段限一次，你可以将一张装备牌置于“缘江烽火图”上，称之为“烽火”。',
 			jiahe_skill:'缘江烽火图',
 			yuanjiangfenghuotu:'缘江烽火图',
-			yuanjiangfenghuotu_info:'每名吴势力角色的出牌阶段限一次，该角色可以将一张装备牌置于“缘江烽火图”上，称之为“烽火”。<br>根据“烽火”的数量，所有吴势力角色可于其准备阶段开始时选择并获得其中一个技能直到回合结束：一张以上~英姿；两张以上~好施；三张以上~涉猎；四张以上~度势；五张以上~可额外选择一项。<br>锁定技，当你受到【杀】或锦囊牌造成的伤害后，你将一张“烽火”置入弃牌堆。',
+			yuanjiangfenghuotu_info:'每名吴势力角色的出牌阶段限一次，该角色可以将一张装备牌置于“缘江烽火图”上，称之为“烽火”。<br>根据“烽火”的数量，所有吴势力角色可于其准备阶段开始时选择并获得其中一个技能直到回合结束：一张以上：〖英姿〗；两张以上：〖好施〗；三张以上：〖涉猎〗；四张以上：〖度势〗；五张以上：可额外选择一项。<br>锁定技，当你受到【杀】或锦囊牌造成的伤害后，你将一张“烽火”置入弃牌堆。',
 			yuanjiangfenghuotu_ab:'江图',
 			yuanjiangfenghuotu_bg:'图',
 			wuxin:'悟心',
@@ -7221,66 +7221,66 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			hongfa:'弘法',
 			hongfa_use:'天兵',
 			hongfa_respond:'天兵',
-			hongfa_info:'君主技，锁定技，当此武将牌明置时，你获得“黄巾天兵符”；准备阶段开始时，若没有“天兵”，你将牌堆顶的X张牌置于“黄巾天兵符”上，称为“天兵”（X为群势力角色的数量）',
+			hongfa_info:'君主技，锁定技，此武将牌明置时，你获得“黄巾天兵符”；准备阶段开始时，若没有“天兵”，你将牌堆顶的X张牌置于“黄巾天兵符”上，称为“天兵”（X为群势力角色的数量）',
 			wendao:'问道',
-			wendao_info:'出牌阶段限一次，你可以弃置一张不为【太平要术】的红色牌，获得弃牌堆里或场上的一张【太平要术】',
+			wendao_info:'出牌阶段限一次，你可以弃置一张不为【太平要术】的红色牌，然后获得弃牌堆或场上的一张【太平要术】。',
 			huangjintianbingfu:'黄巾天兵符',
 			huangjintianbingfu_ab:'兵符',
 			huangjintianbingfu_bg:'符',
-			huangjintianbingfu_info:'锁定技 ：当你计算群势力角色数时，每一张“天兵”均可视为一名群势力角色。<br>每当你失去体力时，你可改为将一张“天兵”置入弃牌堆。<br>与你势力相同的角色可将一张“天兵”当【杀】使用或打出。',
+			huangjintianbingfu_info:'锁定技 ：当你计算群势力角色数时，每一张“天兵”均可视为一名群势力角色。<br>当你失去体力时，你可改为将一张“天兵”置入弃牌堆。<br>与你势力相同的角色可将一张“天兵”当作【杀】使用或打出。',
 			wuhujiangdaqi:'五虎将大旗',
 			wuhujiangdaqi_ab:'将旗',
 			wuhujiangdaqi_bg:'旗',
-			wuhujiangdaqi_info:'存活的蜀势力角色的技能按以下规则改动：<br><strong>武圣</strong>：将“红色牌”改为“任意牌”<br><strong>咆哮</strong>：增加描述“你使用的【杀】无视其他角色的防具”<br><strong>龙胆</strong>：增加描述“你每发动一次‘龙胆’便摸一张牌”<br><strong>烈弓</strong>：增加描述“你的攻击范围+1”<br><strong>铁骑</strong>：将“一张明置的武将牌”改为“所有明置的武将牌”',
+			wuhujiangdaqi_info:'存活的蜀势力角色的技能按以下规则改动：<br><strong>武圣</strong>：将“红色牌”改为“任意牌”<br><strong>咆哮</strong>：增加描述“你使用的【杀】无视其他角色的防具”<br><strong>龙胆</strong>：增加描述“你发动〖龙胆〗使用或打出牌时摸一张牌”<br><strong>烈弓</strong>：增加描述“你的攻击范围+1”<br><strong>铁骑</strong>：将“一张明置的武将牌”改为“所有明置的武将牌”',
 			zhangwu:'章武',
 			zhangwu_info:'锁定技。当【飞龙夺凤】进入弃牌堆或其他角色的装备区时，你获得之。当你失去【飞龙夺风】时，展示之，然后将此牌置于牌堆底并摸两张牌',
 			shouyue:'授钺',
-			shouyue_info:'君主技。只要此武将牌处于明置状态，你便拥有“五虎将大旗”',
+			shouyue_info:'君主技。只要此武将牌处于明置状态，你便拥有“五虎将大旗”。',
 			jizhao:'激诏',
 			jizhao_bg:'诏',
-			jizhao_info:'限定技。当你处于濒死状态时，你可以将手牌补至体力上限，体力回复至2点，失去技能“授钺”并获得技能“仁德”',
+			jizhao_info:'限定技。当你处于濒死状态时，你可以将手牌补至体力上限，体力回复至2点，失去技能〖授钺〗并获得技能〖仁德〗。',
 			gzshoucheng:'守成',
-			gzshoucheng_info:'当与你势力相同的一名角色于其回合外失去最后手牌时，你可以令其摸一张牌',
+			gzshoucheng_info:'当与你势力相同的一名角色于其回合外失去手牌时，若其没有手牌，则你可以令其摸一张牌。',
 			gzmingshi:'名士',
-			gzmingshi_info:'锁定技，当你受到伤害时，若伤害来源有暗置的武将牌，此伤害-1',
+			gzmingshi_info:'锁定技，当你受到伤害时，若伤害来源有暗置的武将牌，此伤害-1。',
 			fengshi:'锋矢',
 			fengshi_sha:'锋矢',
-			fengshi_info:'阵法技，在同一个围攻关系中，若你是围攻角色，则你或另一名围攻角色使用【杀】指定被围攻角色为目标后，可令该角色弃置装备区里的一张牌',
+			fengshi_info:'阵法技，在一个围攻关系中，若你是围攻角色，则你或另一名围攻角色使用【杀】指定被围攻角色为目标后，可令该角色弃置装备区内的一张牌。',
 			gzsuishi:'随势',
-			gzsuishi_info:'锁定技，当其他角色进入濒死状态时，若伤害来源与你势力相同，你摸一张牌；当其他角色死亡时，若其与你势力相同，你失去1点体力',
+			gzsuishi_info:'锁定技，其他角色进入濒死状态时，若伤害来源与你势力相同，你摸一张牌；其他角色死亡时，若其与你势力相同，你失去1点体力。',
 			baoling:'暴凌',
 			baoling_info:'主将技，锁定技，出牌阶段结束时，若你有副将，则你移除副将，然后加3点体力上限，回复3点体力，失去技能〖暴凌〗并获得〖崩坏〗',
 			yingyang:'鹰扬',
-			yingyang_info:'当你拼点的牌亮出后，你可以令此牌的点数+3或-3（至多为K，至少为1）',
+			yingyang_info:'当你的拼点牌亮出后，你可以令此牌的点数+3或-3（至多为K，至少为1）。',
 			hunshang:'魂殇',
 			hunshang_info:'副将技，此武将牌减少半个阴阳鱼；准备阶段，若你的体力值不大于1，则你本回合获得“英姿”和“英魂”',
 			gzguixiu:'闺秀',
-			gzguixiu_info:'当你明置此武将牌时，你可以摸两张牌；当你移除此武将牌时，你可以回复1点体力',
+			gzguixiu_info:'当你明置此武将牌时，你可以摸两张牌；当你移除此武将牌时，你可以回复1点体力。',
 			gzcunsi:'存嗣',
-			gzcunsi_info:'出牌阶段，你可以移除此武将牌并选择一名角色，然后其获得技能“勇决”，若你没有获得“勇决”，则获得“勇决”的角色摸两张牌',
+			gzcunsi_info:'出牌阶段，你可以移除此武将牌并选择一名角色，然后其获得技能〖勇决〗，若你选择的目标角色不是自己，则其摸两张牌。',
 			gzyongjue:'勇决',
-			gzyongjue_info:'若与你势力相同的一名角色于其回合内使用的第一张牌为【杀】，则该角色可以在此【杀】结算完成后获得之',
+			gzyongjue_info:'与你势力相同的一名角色于其回合内使用【杀】结算完成后，若此牌是其本回合内使用的第一张牌，则其可以获得此牌对应的所有实体牌。',
 			gzqianxi:'潜袭',
 			gzqianxi_info:'准备阶段开始时，你可以进行判定，然后你选择距离为1的一名角色，直到回合结束，该角色不能使用或打出与结果颜色相同的手牌',
 			gzshangyi:'尚义',
-			gzshangyi_info:'出牌阶段限一次，你可以令一名其他角色观看你的手牌。若如此做，你选择一项：1.观看其手牌并可以弃置其中的一张黑色牌；2.观看其所有暗置的武将牌',
+			gzshangyi_info:'出牌阶段限一次，你可以令一名其他角色观看你的手牌。若如此做，你选择一项：1.观看其手牌并可以弃置其中的一张黑色牌；2.观看其所有暗置的武将牌。',
 			niaoxiang:'鸟翔',
 			niaoxiang_sha:'鸟翔',
-			niaoxiang_info:'阵法技，在同一个围攻关系中，若你是围攻角色，则你或另一名围攻角色使用【杀】指定被围攻角色为目标后，你令该角色需依次使用两张【闪】才能抵消',
+			niaoxiang_info:'阵法技，在同一个围攻关系中，若你是围攻角色，则你或另一名围攻角色使用【杀】指定被围攻角色为目标后，该角色需依次使用两张【闪】才能抵消。',
 			yicheng:'疑城',
-			yicheng_info:'当与你势力相同的一名角色成为【杀】的目标后，你可以令该角色摸一张牌然后弃置一张牌',
+			yicheng_info:'当与你势力相同的一名角色成为【杀】的目标后，你可以令该角色摸一张牌，然后弃置一张牌。',
 			yizhi:'遗志',
-			yizhi_info:'副将技，此武将牌上单独的阴阳鱼个数-1。若你的主将拥有技能“观星”，则将其描述中的X改为5；若你的主将没有技能“观星”，则你拥有技能“观星”',
+			yizhi_info:'副将技，此武将牌减少半个阴阳鱼。若你的主将拥有技能〖观星〗，则将其描述中的X改为5；若你的主将没有技能〖观星〗，则你视为拥有技能〖观星〗。',
 			tianfu:'天覆',
-			tianfu_info:'主将技，阵法技，若当前回合角色与你处于同一队列，你拥有技能“看破”',
+			tianfu_info:'主将技，阵法技，若当前回合角色与你处于同一队列，则你视为拥有技能〖看破〗。',
 			ziliang:'资粮',
-			ziliang_info:'副将技，当与你势力相同的一名角色受到伤害后，你可以将一张“田”交给该角色',
+			ziliang_info:'副将技，当与你势力相同的一名角色受到伤害后，你可以将一张“田”交给该角色 ',
 			gzjixi:'急袭',
-			gzjixi_info:'主将技，此武将牌减少半个阴阳鱼；你可以将一张“田”当【顺手牵羊】使用',
+			gzjixi_info:'主将技，此武将牌减少半个阴阳鱼。你可以将一张“田”当作【顺手牵羊】使用。',
 			huyuan:'护援',
-			huyuan_info:'结束阶段开始时，你可以将一张装备牌置入一名角色的装备区，然后你可以弃置该角色距离为1的一名角色的一张牌',
+			huyuan_info:'结束阶段开始时，你可以将一张装备牌置入一名角色的装备区，然后你可以弃置该角色距离为1的一名角色的一张牌。',
 			heyi:'鹤翼',
-			heyi_info:'阵法技，与你处于同一队列的其他角色防御距离+1',
+			heyi_info:'阵法技，与你处于同一队列的其他角色视为拥有技能【飞影】。',
 			gz_shibing1wei:'魏兵',
 			gz_shibing2wei:'魏兵',
 			gz_shibing1shu:'蜀兵',
@@ -7290,29 +7290,29 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gz_shibing1qun:'群兵',
 			gz_shibing2qun:'群兵',
 			gzduanchang:'断肠',
-			gzduanchang_info:'锁定技，当你死亡时，你令杀死你的角色失去一张武将牌的所有技能',
+			gzduanchang_info:'锁定技，当你死亡时，你令杀死你的角色失去一张武将牌上的所有技能。',
 			gzweimu:'帷幕',
-			gzweimu_info:'锁定技，当你成为黑色锦囊牌的目标时，则取消之',
+			gzweimu_info:'锁定技，当你成为黑色锦囊牌的目标时，取消之。',
 			gzqianxun:'谦逊',
-			gzqianxun_info:'锁定技，当你成为顺手牵羊或乐不思蜀的目标时，则取消之',
+			gzqianxun_info:'锁定技，当你成为【顺手牵羊】或【乐不思蜀】的目标时，取消之。',
 			gzkongcheng:'空城',
 			gzkongcheng_info:'锁定技，当你成为【杀】或【决斗】的目标时，若你没有手牌，则取消之',
 			gzxiaoji:'枭姬',
-			gzxiaoji_info:'当你失去装备区里的牌后，你可以摸两张牌',
+			gzxiaoji_info:'当你失去装备区里的牌后，你可以摸两张牌。',
 			gzrende:'仁德',
 			gzrende_info:'出牌阶段，你可以将任意张手牌交给其他角色，然后若你于此阶段内给出第三张“仁德”牌时，你回复1点体力',
 			gzzhiheng:'制衡',
-			gzzhiheng_info:'出牌阶段限一次，你可以弃置至多X张牌（X为你的体力上限），然后摸等量的牌',
+			gzzhiheng_info:'出牌阶段限一次，你可以弃置至多X张牌（X为你的体力上限），然后摸等量的牌。',
 			duoshi:'度势',
-			duoshi_info:'出牌阶段限四次，你可以将一张红色手牌当【以逸待劳】使用。',
+			duoshi_info:'出牌阶段限四次，你可以将一张红色手牌当做【以逸待劳】使用。',
 			gzxiaoguo:'骁果',
 			gzxiaoguo_info:'其他角色的结束阶段开始时，你可以弃置一张基本牌，令该角色选择一项：1.弃置一张装备牌；2.受到你对其造成的1点伤害。',
 			
 			guozhan_default:"国战标准",
-			guozhan_zhen:"君临天下•阵",
-			guozhan_shi:"君临天下•势",
-			guozhan_bian:"君临天下•变",
-			guozhan_quan:"君临天下•权",
+			guozhan_zhen:"君临天下·阵",
+			guozhan_shi:"君临天下·势",
+			guozhan_bian:"君临天下·变",
+			guozhan_quan:"君临天下·权",
 			guozhan_jun:"君主武将",
 			guozhan_others:"其他",
 		},
@@ -7833,6 +7833,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					next.target=target;
 					next.num=num;
 					next.setContent(function(){
+						if(!player.storage.zhibi){
+							player.storage.zhibi=[];
+						}
+						player.storage.zhibi.add(target);
 						var content,str=get.translation(target)+'的';
 						if(event.num==0||!target.isUnseen(1)){
 							content=[str+'主将',[[target.name1],'character']];

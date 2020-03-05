@@ -31,7 +31,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			}
 			// for(var i in lib.cardPack.mode_boss){
-			// 	lib.card[i]=lib.cardPack.mode_boss[i];
+			//		lib.card[i]=lib.cardPack.mode_boss[i];
 			// }
 			for(var i in lib.skill){
 				if(lib.skill[i].changeSeat){
@@ -57,14 +57,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 			// var bosslistlinks={};
 			// var toggleBoss=function(bool){
-			// 	game.saveConfig(this._link.config._name,bool,true);
-			// 	var node=bosslistlinks[this._link.config._name];
-			// 	if(bool){
-			// 		node.style.display='';
-			// 	}
-			// 	else{
-			// 		node.style.display='none';
-			// 	}
+			//		game.saveConfig(this._link.config._name,bool,true);
+			//		var node=bosslistlinks[this._link.config._name];
+			//		if(bool){
+			//			node.style.display='';
+			//		}
+			//		else{
+			//			node.style.display='none';
+			//		}
 			// };
 			var onpause=function(){
 				ui.window.classList.add('bosspaused');
@@ -85,13 +85,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				if(info[4].contains('boss')){
 					// var cfg=i+'_bossconfig';
 					// if(get.config(cfg)==undefined){
-					// 	game.saveConfig(cfg,true,true);
+					//		game.saveConfig(cfg,true,true);
 					// }
 					// lib.translate[cfg+'_config']=lib.translate[i];
 					// lib.mode.boss.config[cfg]={
-					// 	name:get.translation(i),
-					// 	onclick:toggleBoss,
-					// 	init:true,
+					//		name:get.translation(i),
+					//		onclick:toggleBoss,
+					//		init:true,
 					// }
 					var player=ui.create.player(bosslist).init(i);
 					if(lib.characterPack.mode_boss[i]&&get.config(i+'_boss_config')==false){
@@ -123,7 +123,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 
 					// if(!get.config(cfg)){
-					// 	player.style.display='none';
+					//		player.style.display='none';
 					// }
 				}
 			}
@@ -1281,9 +1281,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					next.custom.replace.target=event.customreplacetarget;
 					next.selectButton=[3,3];
 					// next.custom.add.button=function(){
-					// 	if(ui.cheat2&&ui.cheat2.backup) return;
-					// 	_status.event.dialog.content.childNodes[1].innerHTML=
-					// 	ui.selected.buttons.length+'/3';
+					//		if(ui.cheat2&&ui.cheat2.backup) return;
+					//		_status.event.dialog.content.childNodes[1].innerHTML=
+					//		ui.selected.buttons.length+'/3';
 					// };
 					event.changeDialog=function(){
 						if(ui.cheat2&&ui.cheat2.dialog==_status.event.dialog){
@@ -3855,7 +3855,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(player!=target){
 							if(player.hasSkillTag('unequip',false,{
 								name:card?card.name:null,
-					 		target:player,
+								target:player,
 								card:card
 							})){}
 							else if(get.type(card)=='trick') return false;
@@ -5313,11 +5313,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					// if(player.storage.xiongcai2<1){
-					// 	player.storage.xiongcai2++;
-					// 	event.finish();
+					//		player.storage.xiongcai2++;
+					//		event.finish();
 					// }
 					// else{
-					// 	player.storage.xiongcai2=0;
+					//		player.storage.xiongcai2=0;
 					// }
 					'step 1'
 					player.logSkill('xiongcai');
@@ -5566,8 +5566,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					list.trick.sort(lib.sort.name);
 					var dialog=ui.create.dialog('风起',[list.trick,'vcard']);
 					// for(var i in list){
-					// 	dialog.addText(get.translation(i)+'牌');
-					// 	dialog.add([list[i],'vcard']);
+					//		dialog.addText(get.translation(i)+'牌');
+					//		dialog.add([list[i],'vcard']);
 					// }
 					var rand1=Math.random()<1/3;
 					var rand2=Math.random()<0.5;
@@ -7482,7 +7482,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(get.prompt('tashui'),function(card,player,target){
 						return player!=target;
 					}).ai=function(target){
-						if(target.isTurnedOver()) return -1;
+						//	if(target.isTurnedOver()) return -1;
+						var player=_status.event.player;
+						if(get.attitude(_status.event.player,target)==0) return 0;
+						if(get.attitude(_status.event.player,target)>0){
+							if(target.classList.contains('turnedover')) return 3;
+							if(target.hasSkillTag('noturn')) return 1;
+							return -1;
+						}
+						else{
+							if(target.hasSkillTag('noturn')) return 0;
+							if(target.classList.contains('turnedover')) return -1;
+							return 5-target.getDamagedHp();
+						}
 						return 1;
 					}
 					"step 1"
@@ -7886,7 +7898,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.removeSkill("boss_hunyou_dying");
 					player.removeSkill("boss_hunyou_dieBegin")
 					player.loseMaxHp();
- 				player.addSkill('reyingzi');
+					player.addSkill('reyingzi');
 					player.addSkill('yinghun');
 					game.log(player,'获得了技能','#g【英姿】和【英魂】');		
 					game.log(player,'','#y【魂佑】')

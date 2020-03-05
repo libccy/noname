@@ -524,8 +524,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filterTarget:true,
 				contentBefore:function(){
 					"step 0"
-					game.delay();
-					"step 1"
 					if(get.is.versus()){
 						player.chooseControl('顺时针','逆时针',function(event,player){
 							if(player.next.side==player.side) return '逆时针';
@@ -533,9 +531,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}).set('prompt','选择'+get.translation(card)+'的结算方向');
 					}
 					else{
-						event.goto(3);
+						event.goto(2);
 					}
-					"step 2"
+					"step 1"
 					if(result&&result.control=='顺时针'){
 						var evt=event.getParent();
 						evt.fixedSeat=true;
@@ -545,16 +543,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							evt.targets.unshift(evt.targets.pop());
 						}
 					}
-					"step 3"
+					"step 2"
 					ui.clear();
 					var num;
-					if(event.getParent().stocktargets){
-						num=event.getParent().stocktargets.length;
+					if(event.targets){
+						num=event.targets.length;
 					}
 					else{
 						num=game.countPlayer();
 					}
 					var cards=get.cards(num);
+					game.cardsGotoOrdering(cards).relatedEvent=event.getParent();
 					var dialog=ui.create.dialog('五谷丰登',cards,true);
 					_status.dieClose.push(dialog);
 					dialog.videoId=lib.status.videoId++;
@@ -643,10 +642,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 									event.remained.push(dialog.buttons[i].link);
 								}
 								event.trigger('wuguRemained');
-								for(var i=0;i<event.remained.length;i++){
-									var current=event.remained[i];
-									if(!get.owner(current)) current.discard();
-								}
 							}
 							break;
 						}
@@ -1202,7 +1197,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					if(!_status.connectMode&&lib.config.skip_shan&&!target.hasSha()){
+					if(event.directHit||(!_status.connectMode&&lib.config.skip_shan&&!target.hasSha())){
 						event.directfalse=true;
 					}
 					else{
@@ -1210,7 +1205,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							{name:'sha'}).set('targetRequired',true).set('complexSelect',true).set('filterTarget',function(card,player,target){
 						if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
 						return lib.filter.filterTarget.apply(this,arguments);
-					}).set('sourcex',event.addedTarget);
+					}).set('sourcex',event.addedTarget).set('addCount',false).set('respondTo',[player,card]);
 					}
 					"step 1"
 					if(event.directfalse||result.bool==false){
@@ -1254,7 +1249,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				notarget:true,
 				contentBefore:function(){
 					'step 0'
-					if(get.mode()=='guozhan'&&get.itemtype(card)=='card'&&card.hasTag('guo')){
+					if(get.mode()=='guozhan'&&get.cardtag(card,'guo')){
 						var trigger=event.getParent(2);
 						if(trigger.triggername!='phaseJudge'&&!trigger.statecard&&trigger.target.identity!='ye'&&trigger.target.identity!='unknown'){
 							player.chooseControl('对单体使用','对势力使用').set('prompt','请选择'+get.translation(card)+'的使用方式').set('ai',function(){
@@ -1897,7 +1892,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(result.judge>0){
 						trigger.untrigger();
 						trigger.set('responded',true);
-						trigger.result={bool:true,card:{name:'shan'}}
+						trigger.result={bool:true,card:{name:'shan',isCard:true}}
 					}
 				},
 				ai:{
@@ -2195,9 +2190,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 8'
 					if(event.wuxieresult){
 						var next=event.wuxieresult.useResult(event.wuxieresult2);
-						if(event.triggername!='phaseJudge'){
-							if(event.stateplayer&&event.statecard) next.respondTo=[event.stateplayer,event.statecard];
-							else next.respondTo=[trigger.player,trigger.card];
+						if(event.stateplayer&&event.statecard) next.respondTo=[event.stateplayer,event.statecard];
+						else if(event.triggername!='phaseJudge'){
+							next.respondTo=[trigger.player,trigger.card];
 						}
 					}
 					'step 9'

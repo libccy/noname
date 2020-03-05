@@ -3709,6 +3709,10 @@ span[data-nature='firemm'] {
 }
 
 .player .identity[data-color="mingzhong"],
+.player .identity[data-color="rZhu"],
+.player .identity[data-color="rZhong"],
+.player .identity[data-color="rNei"],
+.player .identity[data-color="cai2"],
 div[data-nature='orange'],
 span[data-nature='orange'] {
 	text-shadow: rgba(255, 120, 0,1) 0 0 2px,rgba(255, 120, 0,1) 0 0 5px,rgba(255, 120, 0,1) 0 0 10px,
@@ -3769,6 +3773,8 @@ span[data-nature='keymm'] {
 
 .player .identity[data-color="nei"],
 .player .identity[data-color="ye"],
+.player .identity[data-color="rYe"],
+.player .identity[data-color="bYe"],
 div[data-nature='thunder'],
 span[data-nature='thunder'] {
 	text-shadow: rgba(100, 74, 139,1) 0 0 2px,rgba(100, 74, 139,1) 0 0 5px,rgba(100, 74, 139,1) 0 0 10px,
@@ -3804,6 +3810,9 @@ span[data-nature='woodmm'] {
 }
 
 .player .identity[data-color="cai"],
+.player .identity[data-color="bZhu"],
+.player .identity[data-color="bZhong"],
+.player .identity[data-color="bNei"],
 .player .identity[data-color="wei"],
 .player .identity[data-color="falsezhu"],
 .player .identity[data-color="friend"],

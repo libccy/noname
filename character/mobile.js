@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			mobile:{
 				mobile_default:["miheng","taoqian","liuzan","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding"],
-				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","old_yuanshao","old_liushan"],
+				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","xin_yuanshao","re_liushan"],
 				mobile_sunben:["re_sunben"],
 			},
 		},
@@ -39,8 +39,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_xugong:['male','wu',3,['rebiaozhao','yechou']],
 			re_weiwenzhugezhi:['male','wu',4,['refuhai']],
 			
-			old_yuanshao:['male','qun',4,['reluanji','xueyi'],['zhu']],
-			old_liushan:['male','shu',3,['xiangle','refangquan','ruoyu'],['zhu']],
+			xin_yuanshao:['male','qun',4,['reluanji','xueyi'],['zhu']],
+			re_liushan:['male','shu',3,['xiangle','refangquan','ruoyu'],['zhu']],
 			re_sunben:['male','wu',4,['jiang','rehunzi','zhiba'],['zhu']],
 		},
 		characterIntro:{
@@ -1180,7 +1180,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else list2=targets[1];
-					targets[0].useCard({name:name},list2,'noai');
+					targets[0].useCard({name:name,isCard:true},list2,'noai');
 					game.delay(0.5);
 				},
 				ai:{
@@ -1685,8 +1685,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		translate:{
-			old_liushan:'手杀刘禅',
-			old_yuanshao:'手杀袁绍',
 			re_jikang:"手杀嵇康",
 			old_bulianshi:'手杀步练师',
 			old_caochun:'旧曹纯',
@@ -1763,7 +1761,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rezhennan_info:'当你成为其他角色使用的牌的目标后，若此牌的目标数大于该角色的体力值，则你可以弃置一张牌并对其造成1点伤害。',
 			
 			hujinding:'胡金定',
-			re_liushan:'界刘禅',
+			re_liushan:'手杀刘禅',
 			re_sunben:'界孙笨',
 			re_zhangzhang:'界张昭张纮',
 			rehunzi:'魂姿',

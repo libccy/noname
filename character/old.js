@@ -12,11 +12,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				old_yijiang4:["old_caozhen","old_chenqun","old_zhuhuan","ol_wuyi"],
 				old_yijiang5:["old_caoxiu","old_quancong","old_zhuzhi"],
 				old_yijiang67:["ol_xinxianying","ol_zhangrang","ol_liuyu"],
-				old_sp:["old_lingju","old_maliang","old_machao","zhangliang","jsp_caoren","ol_guansuo","old_zhangxingcai","old_huangfusong"],
+				old_sp:["old_lingju","old_maliang","old_machao","zhangliang","jsp_caoren","ol_guansuo","old_zhangxingcai","old_huangfusong","ol_maliang"],
 				old_mobile:["old_caochun","old_majun"],
 			},
 		},
 		character:{
+			ol_maliang:['male','shu',3,['zishu','yingyuan']],
 			old_huangfusong:['male','qun',4,['fenyue']],
 			old_majun:["male","wei",3,["xinfu_jingxie1","xinfu_qiaosi"],[]],
 			old_zhangxingcai:['female','shu',3,['oldshenxian','qiangwu']],
@@ -539,11 +540,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						trigger.untrigger();
 						trigger.responded=true;
-						if(trigger.filterCard({name:'shan'})){
-							trigger.result={bool:true,card:{name:'shan'}}
+						if(trigger.filterCard({name:'shan',isCard:true})){
+							trigger.result={bool:true,card:{name:'shan',isCard:true}}
 						}
 						else{
-							trigger.result={bool:true,card:{name:'sha'}}
+							trigger.result={bool:true,card:{name:'sha',isCard:true}}
 						}
 						player.logSkill('zhenshan',result.targets);
 						player.addTempSkill('zhenshan2');
@@ -608,7 +609,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					backup:function(links,player){
 						return {
 							filterCard:function(){return false},
-							viewAs:{name:links[0][2],nature:links[0][3]},
+							viewAs:{name:links[0][2],nature:links[0][3],isCard:true},
 							selectCard:-1,
 							popname:true,
 							log:false,
@@ -685,16 +686,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.judge(player.judging[0])<0;
 				},
 				content:function(){
+					"step 0"
 					var card=get.cards()[0];
+					event.card=card;
+					game.cardsGotoOrdering(card).relatedEvent=trigger;
+					"step 1"
 					player.$throw(card);
 					card.clone.classList.add('thrownhighlight');
 					if(trigger.player.judging[0].clone){
 						trigger.player.judging[0].clone.classList.remove('thrownhighlight');
 						game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging[0].clone]));
 					}
-					trigger.player.judging[0].discard();
+					game.cardsDiscard(trigger.player.judging[0]);
 					trigger.player.judging[0]=card;
-					trigger.position.appendChild(card);
 					game.log(trigger.player,'的判定牌改为',card);
 					game.delay(2);
 				},
@@ -817,7 +821,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.finish();
 						}
 						else{
-							player.useCard({name:'sha'},target,false).animate=false;
+							player.useCard({name:'sha',isCard:true},target,false).animate=false;
 							game.delay();
 							event.finish();
 						}
@@ -828,7 +832,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					var target=event.target;
 					if(result.control=='出杀'){
-						player.useCard({name:'sha'},target,false).animate=false;
+						player.useCard({name:'sha',isCard:true},target,false).animate=false;
 						game.delay();
 					}
 					else{
@@ -886,6 +890,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_caochong:'旧曹冲',
 			old_guanqiujian:'旧毌丘俭',
 			old_huangfusong:'旧皇甫嵩',
+			ol_maliang:'旧马良',
 
 			old_fuhun:'父魂',
 			old_fuhun_info:'摸牌阶段开始时，你可以放弃摸牌，改为从牌堆顶亮出两张牌并获得之，若亮出的牌颜色不同，你获得技能“武圣”、“咆哮”，直到回合结束。',

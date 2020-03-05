@@ -51,7 +51,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function (){
 					"step 0"
-					player.chooseTarget(get.prompt('xinfu_langxi'),'对一名其他角色造成0-2点随机伤害',function(card,player,target){
+					player.chooseTarget(get.prompt('xinfu_langxi'),'对一名体力值不大于你的其他角色造成0-2点随机伤害',function(card,player,target){
 						return target.hp<=player.hp&&target!=player;
 					}).set('ai',function(target){
 						var player=_status.event.player;
@@ -387,7 +387,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.directindex=result.index;
 					}
 					if(event.directindex==1){
-						target.chooseUseTarget({name:'sha'},cards,true,false)
+						target.chooseUseTarget({name:'sha'},cards,true,false).viewAs=true;
 					}
 					else{
 						target.chooseUseTarget(card,true,false,'nodistance');
@@ -1146,7 +1146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function (){
 							'step 0'
-							trigger.player.removeMark('xionghuo',1);
+							trigger.player.removeMark('xionghuo',trigger.player.countMark('xionghuo'));
 							var list=[1,2,3];
 							var num=list.randomGet();
 							event.goto(num);
@@ -1749,7 +1749,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.line(target,'fire');
 						event.draws=game.filterPlayer(function(current){
 							if(current==target) return true;
-							return current.name=='guansuo'||current.name2=='guansuo';
+							return ['guansuo','old_guansuo'].contains(current.name)||['guansuo','old_guansuo'].contains(current.name2);
 						});
 						player.gainPlayerCard(target,'he',true);
 					}
@@ -3647,7 +3647,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_limu":{
 				mod:{
 					targetInRange:function (card,player,target){
-						if(player.countCards('j')&&get.distance(player,target,'attack')<=1){
+						if(player.countCards('j')&&target.inRange(player)){
 							return true;
 						}
 					},
@@ -4069,7 +4069,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				"wolong_card":function (){
 					'step 0'
 					var ingame=game.hasPlayer(function(current){
-						return current.name=='sp_zhugeliang'||current.name2=='sp_zhugeliang';
+						return ['sp_zhugeliang','re_zhugeliang'].contains(current.name)||['sp_zhugeliang','re_zhugeliang'].contains(current.name2);
 					})?true:false;
 					var prompt='请选择';
 					prompt+=ingame?'至多两名':'一名';
@@ -4090,7 +4090,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				"fengchu_card":function (){
 					'step 0'
 					var ingame=game.hasPlayer(function(current){
-						return current.name=='pangtong'||current.name2=='pangtong';
+						return ['re_pangtong','pangtong'].contains(current.name)||['re_pangtong','pangtong'].contains(current.name2);
 					})?true:false;
 					var prompt='请选择';
 					prompt+=ingame?'至多四名':'至多三名';
@@ -4111,7 +4111,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				"xuanjian_card":function (){
 					'step 0'
 					event.ingame=game.hasPlayer(function(current){
-						return current.name=='xin_xushu'||current.name2=='xin_xushu'||current.name=='re_xushu'||current.name2=='re_xushu';
+						return ['re_xushu','xin_xushu','xushu'].contains(current.name)||['re_xushu','xin_xushu','xushu'].contains(current.name2);
 					})?true:false;
 					var prompt='请选择一名角色，令其回复一点体力并摸一张牌';
 					prompt+=event.ingame?'，然后你摸一张牌。':'。';
@@ -4888,7 +4888,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function (event,player){
 					if(!player.storage.xinfu_zhaoxin.length) return false;
-					return get.distance(player,event.player,'attack')<=1
+					return player.inRange(event.player);
 				},
 				direct:true,
 				content:function (){
@@ -5216,25 +5216,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_tunan":"图南",
 			"xinfu_tunan_info":"出牌阶段限一次，你可以展示牌堆顶的一张牌并选择一名其他角色，然后该角色选择一项：使用此牌（无距离限制）；或将此牌当普通【杀】使用。",
 			"xinfu_bijing":"闭境",
-			"xinfu_bijing_info":"结束阶段，你可以展示一张手牌并标记为“闭境”。若你于回合外失去“闭境”牌，则当前回合角色的弃牌阶段开始时其需弃置两张牌。你的准备阶段，弃置手牌中的“闭境”牌。",
+			"xinfu_bijing_info":"结束阶段，你可以展示一张手牌并标记为“闭境”。若你于回合外失去“闭境”牌，则当前回合角色的弃牌阶段开始时，其需弃置两张牌。你的准备阶段，弃置手牌中的“闭境”牌。",
 			"xinfu_zhenxing":"镇行",
 			"xinfu_zhenxing_info":"结束阶段开始时或当你受到伤害后，你可以观看牌堆顶的至多三张牌，然后你获得其中与其余牌花色均不相同的一张牌。",
 			"xinfu_qianxin":"遣信",
-			"xinfu_qianxin_info":"出牌阶段限一次，若牌堆中没有“信”，你可以选择一名角色并将任意张手牌放置于牌堆中X倍数的位置（X为存活人数），称为“信”。该角色的弃牌阶段开始时，若其本回合内获得过“信”，其选择一项：令你将手牌摸至四张；本回合手牌上限-2。",
+			"xinfu_qianxin_info":"出牌阶段限一次，若牌堆中没有“信”，你可以选择一名角色并将任意张手牌放置于牌堆中X倍数的位置（X为存活人数），称为“信”。该角色的弃牌阶段开始时，若其手牌区内有于本回合内获得过的“信”，其选择一项：令你将手牌摸至四张；本回合手牌上限-2。",
 			"qianxin_effect":"遣信",
 			"qianxin_effect_info":"",
 			"xinfu_qianxin2":"遣信",
 			"xinfu_qianxin2_info":"",
 			
 			"xinfu_fuhai":"浮海",
-			"xinfu_fuhai_info":"出牌阶段对每名角色限一次，你可以展示一张手牌并选择上家或下家。该角色展示一张手牌，若你的牌点数大于等于他的牌点数，你弃置你展示的牌，然后继续对其上家或下家重复此流程；你的牌点数小于该角色牌的点数，则该角色弃置其展示的牌，然后你与其各摸X张牌（X为你此回合内发动此技能选择的角色数），且你此阶段内不能再发动“浮海”。",
+			"xinfu_fuhai_info":"出牌阶段每个方向限一次，你可以展示一张手牌并选择上家或下家。该角色展示一张手牌，若你展示的牌点数大于等于其展示的牌点数，你弃置你展示的牌，然后继续对其上家或下家重复此流程；若你展示的牌点数小于该展示角色牌的点数，则该角色弃置其展示的牌，然后你与其各摸X张牌（X为你此回合内发动此技能选择的角色数），且你此阶段内不能再发动〖浮海〗。",
 			"fuhai_clear":"浮海",
 			"fuhai_clear_info":"",
 			
 			"xz_xunxun":"恂恂",
 			"xz_xunxun_info":"摸牌阶段，你可以观看牌堆顶的四张牌，然后将其中的两张牌置于牌堆顶，并将其余的牌以任意顺序置于牌堆底。",
 			"xinfu_xingzhao":"兴棹",
-			"xinfu_xingzhao_info":"锁定技，若场上的已受伤角色合计为：1个以上，你视为拥有技能〖恂恂〗；2个以上，当你使用装备牌时，摸一张牌；3个以上，你跳过弃牌阶段。",
+			"xinfu_xingzhao_info":"锁定技，若场上的已受伤角色合计为：1个以上，你视为拥有技能〖恂恂〗；2个以上，当你使用装备牌时，摸一张牌；3个以上，弃牌阶段开始时，你跳过此阶段。",
 			"xinfu_xingzhao2":"兴棹",
 			"xinfu_xingzhao2_info":"",
 			"xinfu_dianhu":"点虎",
@@ -5242,12 +5242,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_dianhu2":"点虎",
 			"xinfu_dianhu2_info":"",
 			"xinfu_jianji":"谏计",
-			"xinfu_jianji_info":"出牌阶段限一次，你可以令一名其他角色摸一张牌。然后，该角色可以使用此牌。",
+			"xinfu_jianji_info":"出牌阶段限一次，你可以令一名其他角色摸一张牌。然后该角色可以使用此牌。",
 			"xinfu_lianpian":"联翩",
 			"xinfu_lianpian_info":"出牌阶段限三次。当你对一名角色连续使用牌时，你可以摸一张牌，然后可以将一张牌交给该角色。",
 			
 			"xinfu_lingren":"凌人",
-			"xinfu_lingren_info":"每回合限一次。当你于出牌阶段使用带有“伤害”这一标签的基本牌或普通锦囊牌指定目标后，你可以猜测其中的一个目标的手牌中是否有基本牌，锦囊牌或装备牌。若你猜中的项目数：≥1，此牌对该角色的伤害+1；≥2，你摸两张牌；≥3，你获得技能〖奸雄〗和〖行殇〗直到下回合开始。",
+			"xinfu_lingren_info":"每回合限一次。当你于出牌阶段使用带有「伤害」这一标签的基本牌或普通锦囊牌指定目标后，你可以猜测其中的一个目标的手牌中是否有基本牌，锦囊牌或装备牌。若你猜中的项目数：≥1，此牌对该角色的伤害+1；≥2，你摸两张牌；≥3，你获得技能〖奸雄〗和〖行殇〗直到下回合开始。",
 			"lingren_adddamage":"凌人",
 			"lingren_adddamage_info":"",
 			"lingren_jianxiong":"奸雄",
@@ -5255,9 +5255,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"lingren_xingshang":"行殇",
 			"lingren_xingshang_info":"当有角色死亡后，你可以选择一项：1.回复一点体力。2.获得该角色的所有牌。",
 			"xinfu_fujian":"伏间",
-			"xinfu_fujian_info":"锁定技，结束阶段，你观看一名随机的其他角色的随机X张手牌。(X为场上手牌最少的角色的手牌数)",
+			"xinfu_fujian_info":"锁定技，结束阶段开始时，你观看一名随机的其他角色的随机X张手牌。(X为场上手牌最少的角色的手牌数)",
 			"xinfu_xionghuo":"凶镬",
-			"xinfu_xionghuo_info":"游戏开始时，你获得3个“暴戾”标记。出牌阶段，你可以交给一名其他角色一个“暴戾”标记，你对有此标记的角色造成的伤害+1，且其出牌阶段开始时，移去“暴戾”并随机执行一项：1.受到1点火焰伤害且本回合不能对你使用【杀】；2.流失1点体力且本回合手牌上限-1；3.你随机获得其一张手牌和一张装备区里的牌。",
+			"xinfu_xionghuo_info":"游戏开始时，你获得3个“暴戾”标记。出牌阶段，你可以交给一名其他角色一个“暴戾”标记，你对有“暴戾”标记的角色造成伤害时，此伤害+1。有“暴戾”的其他角色的出牌阶段开始时，其移去所有“暴戾”标记并随机执行一项：1.受到1点火焰伤害且本回合不能对你使用【杀】；2.失去1点体力且本回合手牌上限-1；3.你随机获得其一张手牌和一张装备区的牌。",
 			xionghuo:"凶镬",
 			"xionghuo_info":"",
 			"xionghuo_disable":"凶镬",
@@ -5265,7 +5265,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xionghuo_low":"凶镬",
 			"xionghuo_low_info":"",
 			"xinfu_shajue":"杀绝",
-			"xinfu_shajue_info":"锁定技，其他角色进入濒死状态时，若其需要超过一张【桃】或【酒】救回，则你获得一个“暴戾”标记，并获得使其进入濒死状态的牌。",
+			"xinfu_shajue_info":"锁定技，其他角色进入濒死状态时，若其体力值小于0，则你获得一个“暴戾”标记，并获得使其进入濒死状态的牌。",
 			"xinfu_jianjie":"荐杰",
 			"xinfu_jianjie_info":"你的第一个准备阶段，你令两名其他角色分别获得龙印与凤印；出牌阶段限一次（你的第一个回合除外），或当拥有龙印、凤印的角色死亡时，你可以转移龙印、凤印。",
 			"xinfu_jianjie1":"荐杰",
@@ -5281,23 +5281,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"smh_yeyan":"业炎",
 			"smh_yeyan_info":"",
 			"xinfu_yinshi":"隐士",
-			"xinfu_yinshi_info":"锁定技，若你没有龙印、凤印且没装备防具，防止你受到的属性伤害和锦囊牌造成的伤害。",
+			"xinfu_yinshi_info":"锁定技，若你没有龙印、凤印且装备区的防具栏为空，则当你受到的属性伤害火锦囊牌造成的伤害时，防止此伤害。",
 			"xinfu_chenghao":"称好",
-			"xinfu_chenghao_info":"当一名角色受到属性伤害后，若其存活且处于“连环状态”且是伤害传导的起点，你可以观看牌堆顶的X张牌并分配给任意角色（X为横置的角色数量且包含该角色）。",
+			"xinfu_chenghao_info":"当一名角色受到属性伤害后，若其存活且其武将牌横置且是伤害传导的起点，则你可以观看牌堆顶的X张牌并分配给任意角色。（X为横置的角色数量且包含该角色）",
 			"jianjie_faq":"关于龙凤印",
-			"jianjie_faq_info":"龙印效果：获得“火计”。凤印效果：获得“连环”。（均一回合限使用三次） 龙凤印齐全：获得“业炎”，“业炎”发动后移除龙凤印。",
+			"jianjie_faq_info":"龙印效果：视为拥有〖火计〗。凤印效果：视为拥有〖连环〗。（均一回合限使用三次） 龙凤印齐全：视为拥有〖业炎〗，〖业炎〗发动后移除龙凤印。",
 			"xinfu_wuniang":"武娘",
-			"xinfu_wuniang_info":"当你使用或打出〖杀〗时，你可以获得一名其他角色的一张牌。若如此做，该角色和场上所有的“关索”各摸一张牌。",
+			"xinfu_wuniang_info":"当你使用或打出【杀】时，你可以获得一名其他角色的一张牌。若如此做，该角色和场上所有的“关索”各摸一张牌。",
 			"xinfu_xushen":"许身",
 			"xinfu_xushen_info":"限定技，当一名男性角色使用【桃】令你脱离濒死状态时，若场上没有“关索”，则其可以将自己的一张武将牌变更为“关索”。然后你回复一点体力，并获得技能〖镇南〗。",
 			"xinfu_zhennan":"镇南",
 			"xinfu_zhennan_info":"当你成为【南蛮入侵】的目标时，你可以对一名其他角色造成1-3点随机伤害。",
 			"xinfu_falu":"法箓",
-			"xinfu_falu_info":"锁定技，游戏开始时，你获得“紫薇”，“后土”，“玉清”，“勾陈”标记各一个。当你的牌因弃置而进入弃牌堆后，根据这些牌的花色，你获得对应的标记：黑桃，你获得1枚“紫薇”；梅花，你获得1枚“后土”；红桃，你获得1枚“玉清”；方块，你获得1枚“勾陈”。（每种标记限拥有1个）",
+			"xinfu_falu_info":"锁定技，游戏开始时，你获得「紫薇」「后土」「玉清」「勾陈」标记各一个。当你的牌因弃置而进入弃牌堆后，根据这些牌的花色，你获得对应的标记：黑桃，你获得1枚「紫薇」；梅花，你获得1枚「后土」；红桃，你获得1枚「玉清」；方块，你获得1枚「勾陈」。（每种标记限拥有1个）",
 			"xinfu_dianhua":"点化",
-			"xinfu_dianhua_info":"准备阶段或结束阶段，你可以观看牌堆顶的X张牌（X为你的标记数）。若如此做，你将这些牌以任意顺序放回牌堆顶。",
+			"xinfu_dianhua_info":"准备阶段或结束阶段，你可以观看牌堆顶的X张牌（X为你的「紫薇」「后土」「玉清」「勾陈」标记数的总和）。若如此做，你将这些牌以任意顺序放回牌堆顶。",
 			"xinfu_zhenyi":"真仪",
-			"xinfu_zhenyi_info":"你可以在以下时机弃置相应的标记来发动以下效果：当一张判定牌生效前，你可以弃置“紫微”，然后将判定结果改为黑桃5或红桃5；当你处于濒死状态时，你可以弃置“后土”，然后将你的一张手牌当【桃】使用；当你造成伤害时，你可以弃置“玉清”，然后你进行一次判定。若结果为黑色，此伤害+1；当你受到属性伤害后，你可以弃置“勾陈”，然后你从牌堆中随机获得三种类型的牌各一张。",
+			"xinfu_zhenyi_info":"你可以在以下时机弃置相应的标记来发动以下效果：一名角色的判定牌生效前，你可以弃置一枚「紫薇」，然后将判定结果改为黑桃5或红桃5；当你处于濒死状态时，你可以弃置一枚「后土」，然后将你的一张手牌当【桃】使用；当你造成伤害时，你可以弃置一枚「玉清」，然后你进行一次判定。若结果为黑色，此伤害+1；当你受到属性伤害后，你可以弃置一张「勾陈」，然后你从牌堆中随机获得三种类型的牌各一张。",
 			"zhenyi_spade":"真仪",
 			"zhenyi_spade_info":"",
 			"zhenyi_club":"真仪",
@@ -5305,11 +5305,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"zhenyi_heart":"真仪",
 			"zhenyi_heart_info":"",
 			"xinfu_yanyu":"燕语",
-			"xinfu_yanyu_info":"任意一名角色的出牌阶段开始时，你可以弃置一张牌。若如此做，则该出牌阶段内，每当与你弃置的牌类别相同的其他牌进入弃牌堆时，你可令任意一名角色获得此牌。每阶段以此法获得的牌不能超过三张。",
+			"xinfu_yanyu_info":"一名角色的出牌阶段开始时，你可以弃置一张牌。若如此做，则该出牌阶段内，当有与你弃置的牌类别相同的其他牌进入弃牌堆时，你可令任意一名角色获得此牌。每阶段以此法获得的牌不能超过三张。",
 			"xinfu_yanyu2":"燕语",
 			"xinfu_yanyu2_info":"",
 			"xinfu_xiaode":"孝德",
-			"xinfu_xiaode_info":"每当有其他角色阵亡后，你可以声明该武将牌的一项技能。若如此做，你获得此技能且不能再发动〖孝德〗直到你的回合结束。(你不能声明觉醒技或主公技)",
+			"xinfu_xiaode_info":"其他角色死亡后，你可以声明该角色武将牌上的一个不为主公技或觉醒技的技能。若如此做，你获得此技能且不能再发动〖孝德〗直到你的回合结束。",
 			
 			"sp_taishici":"SP太史慈",
 			wangcan:"王粲",
@@ -5324,13 +5324,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuyao:"刘繇",
 			liuyan:"刘焉",
 			"xinfu_guolun":"过论",
-			"xinfu_guolun_info":"出牌阶段限一次，你可以展示一名其他角色的手牌，然后展示你的一张牌。你与其交换这两张牌，然后展示的牌点数更小的角色摸一张牌。",
+			"xinfu_guolun_info":"出牌阶段限一次，你可以展示一名其他角色的手牌，然后展示你的一张牌。你与其交换这两张牌，然后展示的牌点数较小的角色摸一张牌。",
 			"xinfu_zhanji":"展骥",
-			"xinfu_zhanji_info":"锁定技，你的出牌阶段内，当你因摸牌且不是因为此技能效果获得牌时，你额外摸一张牌。",
+			"xinfu_zhanji_info":"锁定技，你的出牌阶段内，当你因摸牌且不是因为此技能效果而获得牌时，你额外摸一张牌。",
 			"xinfu_songsang":"送丧",
-			"xinfu_songsang_info":"限定技，当场上有角色死亡时，你可以回复一点体力（若你未受伤，则改为加一点体力上限）；然后获得技能〖展骥〗。",
+			"xinfu_songsang_info":"限定技，其他角色死亡时，你可以回复一点体力（若你未受伤，则改为加一点体力上限）；然后获得技能〖展骥〗。",
 			"xinfu_jixu":"击虚",
-			"xinfu_jixu_info":"出牌阶段限一次，若你有手牌，你可以令任意数量的体力值相等的其他角色猜测你的手牌中是否有【杀】。然后，你摸X张牌（X为猜错的角色数）。若你有【杀】，则你本回合内使用【杀】时，所有这些角色均成为【杀】的目标；若你没有【杀】，则你弃置所有这些角色的各一张牌。若X为零，你结束出牌阶段。",
+			"xinfu_jixu_info":"出牌阶段限一次，若你有手牌，你可以令任意名体力值相等的其他角色猜测你的手牌中是否有【杀】。然后，你摸X张牌（X为猜错的角色数）。若你有【杀】，则你本回合内使用【杀】时，所有这些角色均成为【杀】的目标；若你没有【杀】，则你弃置所有这些角色的各一张牌。若X为零，你结束出牌阶段。",
 			"jixu_sha":"击虚",
 			"jixu_sha_info":"",
 			"xinfu_sanwen":"散文",
@@ -5342,11 +5342,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"qinguo_use":"勤国",
 			"qinguo_use_info":"",
 			"xinfu_qinguo":"勤国",
-			"xinfu_qinguo_info":"当你使用的装备牌结算完成后，你可以视为使用了一张【杀】；当你因使用或失去装备牌导致装备区内牌的数量发生变化后，若你装备区内牌的数量等于你的体力值，则你回复1点体力。",
+			"xinfu_qinguo_info":"当你使用的装备牌结算完成时，你可以视为使用一张【杀】；当你因使用或失去装备牌导致装备区内牌的数量发生变化后，若你装备区内牌的数量等于你的体力值，则你回复1点体力。",
 			"qinguo_lose":"勤国",
 			"qinguo_lose_info":"",
 			"xinfu_jijun":"集军",
-			"xinfu_jijun_info":"当你于回合内使用非装备牌或武器牌指定了自己为目标时，你可以进行一次判定。然后，你将判定牌置于自己的武将牌上，称之为「方」。",
+			"xinfu_jijun_info":"当你于回合内使用非装备牌或武器牌指定目标后，若你是此牌的目标，你可以进行一次判定。然后，你将判定牌置于自己的武将牌上，称之为「方」。",
 			"xinfu_fangtong":"方统",
 			"xinfu_fangtong_info":"结束阶段，你可以弃置总点数之和为36的一张牌与任意张「方」，并对一名其他角色造成3点雷电伤害。",
 			"xinfu_weilu":"威虏",
@@ -5356,15 +5356,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"weilu_effect2":"威虏",
 			"weilu_effect2_info":"",
 			"xinfu_zengdao":"赠刀",
-			"xinfu_zengdao_info":"限定技，出牌阶段，你可以将装备牌内的任意张牌置于一名其他角色的武将牌旁，称之为「刀」。该角色造成伤害时，其须移去一张「刀」，使此伤害+1。",
+			"xinfu_zengdao_info":"限定技，出牌阶段，你可以将装备牌内的任意张牌置于一名其他角色的武将牌旁，称之为「刀」。该角色造成伤害时，其须移去一张「刀」，然后此伤害+1。",
 			"xinfu_zengdao2":"赠刀",
 			"xinfu_zengdao2_info":"",
 			"xinfu_guanwei":"观微",
-			"xinfu_guanwei_info":"每回合限一次。一名角色的出牌阶段结束时，若其于出牌阶段内使用过的牌的数目>1且花色皆相同，则你可以弃置一张牌，令其摸两张牌并进行一个额外的出牌阶段。",
+			"xinfu_guanwei_info":"每回合限一次。一名角色的出牌阶段结束时，若其于出牌阶段内使用过两张以上的牌且花色均相同，则你可以弃置一张牌，令其摸两张牌并进行一个额外的出牌阶段。",
 			"xinfu_gongqing":"公清",
 			"xinfu_gongqing_info":"锁定技。当你受到伤害时，若伤害来源的攻击范围：<3，则你令此伤害的数值减为1。>3，你令此伤害+1。",
 			"xinfu_andong":"安东",
-			"xinfu_andong_info":"当你受到伤害时，若伤害来源有手牌，则你可以令伤害来源选择一项：1.令你观看其的手牌并获得其中的所有红桃牌；2.防止此伤害，然后其本回合内的红桃手牌不计入手牌上限。",
+			"xinfu_andong_info":"当你受到伤害时，你可以令伤害来源选择一项：1.令你观看其的手牌并获得其中的所有红桃牌；2.防止此伤害，然后其本回合内的红桃手牌不计入手牌上限。",
 			"xinfu_yingshi":"应势",
 			"xinfu_yingshi_info":"出牌阶段开始时，若场上的所有角色均没有「酬」，则你可以将所有的红桃牌置于一名其他角色的武将牌旁，称之为「酬」。有「酬」的角色受到「杀」的伤害/死亡时，伤害来源/你获得其中的一张/所有的「酬」。",
 			"yingshi_heart":"应势",
@@ -5372,28 +5372,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"yingshi_die":"应势",
 			"yingshi_die_info":"",
 			"xinfu_duanfa":"断发",
-			"xinfu_duanfa_info":"出牌阶段，你可以弃置任意张黑色牌，然后摸等量的牌。(每回合内限X张，X为你的体力上限。)",
+			"xinfu_duanfa_info":"出牌阶段，你可以弃置任意张黑色牌，然后摸等量的牌。（每回合内限X张，X为你的体力上限）",
 			"xinfu_youdi":"诱敌",
 			"xinfu_youdi_info":"结束阶段开始时，你可以令一名其他角色弃置你的一张手牌，若此牌：不为黑色，你摸一张牌。不为【杀】，你获得该角色的一张牌。",
 			"xinfu_guanchao":"观潮",
-			"xinfu_guanchao_info":"出牌阶段开始时，你可以选择一项直到回合结束：1.当你使用牌时，若你此阶段使用过的所有牌的点数为递增，你摸一张牌；2.当你使用牌时，若你此阶段使用过的所有牌的点数为递减，你摸一张牌。",
+			"xinfu_guanchao_info":"出牌阶段开始时，你可以选择获得一项效果直到回合结束：1.当你使用牌时，若你此阶段使用过的所有牌的点数为递增，你摸一张牌；2.当你使用牌时，若你此阶段使用过的所有牌的点数为递减，你摸一张牌。",
 			"xinfu_xunxian":"逊贤",
-			"xinfu_xunxian_info":"每名其他角色的回合限一次，当你使用或打出的牌结算完成，即将置入弃牌堆时，你可以将之交给一名手牌比你多的角色。",
+			"xinfu_xunxian_info":"每名其他角色的回合限一次，当你使用或打出的牌结算完成后，你可以将其对应的所有实体牌交给一名手牌数大于你的角色。",
 			"xinfu_kannan":"戡难",
 			"xinfu_kannan_info":"出牌阶段限X次，你可以与一名本回合内未成为过〖戡难〗目标的角色拼点。若你赢，你使用的下一张【杀】的伤害值基数+1，且你本回合内不能再发动〖戡难〗。若你没赢，其使用的下一张【杀】的伤害值基数+1。（X为你的体力值）。",
 			"kannan_eff":"戡难",
 			"kannan_eff_info":"",
 			"xinfu_tushe":"图射",
-			"xinfu_tushe_info":"当你使用非装备牌指定目标时，若你没有基本牌，则你可以摸X张牌。（X为此牌指定的目标数）",
+			"xinfu_tushe_info":"当你使用非装备牌指定目标后，若你没有基本牌，则你可以摸X张牌。（X为此牌指定的目标数）",
 			"xinfu_limu":"立牧",
-			"xinfu_limu_info":"出牌阶段限一次，将一张方片花色牌当做【乐不思蜀】对自己使用，然后回复1点体力。只要你的判定区内有牌，你对攻击范围内的其他角色使用牌便没有次数和距离限制。",
+			"xinfu_limu_info":"出牌阶段限一次，你可以将一张♦牌当做【乐不思蜀】对自己使用，然后回复1点体力。只要你的判定区内有牌，你对攻击范围内的其他角色使用牌便没有次数和距离限制。",
 			
 			"xinfu_guhuo":"蛊惑",
-			"xinfu_guhuo_info":"每名角色的回合限一次，你可以扣置一张手牌当一张基本牌或普通锦囊牌使用或打出。其他角色依次选择是否质疑。一旦有其他角色质疑则翻开此牌：若为假则此牌作废，若为真，则质疑角色获得技能〖缠怨〗。",
+			"xinfu_guhuo_info":"每名角色的回合限一次，你可以扣置一张手牌当做一张基本牌或普通锦囊牌使用或打出。其他角色依次选择是否质疑。一旦有其他角色质疑则翻开此牌：若为假则此牌作废，若为真，则质疑角色获得技能〖缠怨〗。",
 			"guhuo_guess":"蛊惑",
 			"guhuo_guess_info":"",
 			chanyuan:"缠怨",
-			"chanyuan_info":"锁定技，你不能质疑于吉，只要你的体力值为1，你失去你的武将技能。",
+			"chanyuan_info":"锁定技，你不能质疑于吉，当你的体力值为1时，你的其他技能失效。",
 			"guhuo_respond":"蛊惑",
 			"guhuo_respond_info":"",
 			"guhuo_wuxie":"蛊惑",
@@ -5402,7 +5402,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"guhuo_phase_info":"",
 			
 			"xinfu_pingcai":"评才",
-			"xinfu_pingcai_info":"出牌阶段限一次，你可以挑选一个宝物并擦拭掉其上面的灰尘。然后，你可以根据宝物类型执行对应的效果。<br>【卧龙】：对1名角色造成1点火焰伤害。若场上有存活的诸葛亮(火)，则改为对至多2名角色各造成1点火焰伤害。<br>【凤雏】：横置至多3名角色。若场上有存活的庞统(火)，则改为横置至多4名角色。<br>【水镜】：将1名角色装备区内的防具移动到另1角色对应区域。若场上有存活的司马徽，则改为将1名角色装备区内的1件装备移动到另1角色对应区域。<br>【玄剑】：令1名角色摸一张牌并回复1点体力。若场上有存活的徐庶(将/界)，则改为令1名角色摸一张牌并回复1点体力，然后你摸一张牌。",
+			"xinfu_pingcai_info":"出牌阶段限一次，你可以挑选一个宝物并擦拭掉其上面的灰尘。然后，你可以根据宝物类型执行对应的效果。",
 			"xinfu_pdgyingshi":"隐世",
 			"xinfu_pdgyingshi_info":"锁定技，你始终跳过准备阶段，判定阶段，结束阶段。你不能被选择为延时锦囊牌的目标。",
 			"pcaudio_wolong_card":"卧龙",
@@ -5416,7 +5416,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"yizan_respond_sha":"翊赞",
 			"yizan_respond_sha_info":"",
 			"yizan_use":"翊赞",
-			"yizan_use_info":"你可以将两张牌(其中至少应有一张基本牌)当做任意基本牌使用或打出。",
+			"yizan_use_info":"你可以将两张牌（其中至少一张为基本牌）当做任意基本牌使用或打出。",
 			"yizan_respond_shan":"翊赞",
 			"yizan_respond_shan_info":"",
 			"xinfu_longyuan":"龙渊",
@@ -5424,15 +5424,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"yizan_count":"翊赞",
 			"yizan_count_info":"",
 			"xinfu_jingxie1":"精械",
-			"xinfu_jingxie1_info":"出牌阶段，你可以展示一张未强化过的【诸葛连弩】或标准包/军争包/SP包中的防具牌，然后对其进行强化。当你处于濒死状态时，你可以重铸一张防具牌，将体力回复至1点。",
+			"xinfu_jingxie1_info":"出牌阶段，你可以展示一张未强化过的【诸葛连弩】或标准包/军争包/SP包中的防具牌，然后对其进行强化。当你处于濒死状态时，你可以重铸一张防具牌，然后将体力回复至1点。",
 			"xinfu_jingxie2":"精械",
 			"xinfu_jingxie2_info":"",
 			"xinfu_qiaosi":"巧思",
-			"xinfu_qiaosi_info":"出牌阶段限一次，你可以投掷一枚六面骰子，展示牌堆顶的X张牌并获得之。然后，你选择一项：1.交给一名其他角色X张牌。2.弃置X张牌。(X为骰子的点数)",
+			"xinfu_qiaosi_info":"出牌阶段限一次，你可以投掷一枚六面骰子，展示牌堆顶的X张牌并获得之。然后，你选择一项：1.交给一名其他角色X张牌。2.弃置X张牌。（X为骰子的点数）",
 			"xinfu_jijie":"机捷",
 			"xinfu_jijie_info":"出牌阶段限一次。你可以观看牌堆底的一张牌，然后将其交给一名角色。",
 			"xinfu_jiyuan":"急援",
-			"xinfu_jiyuan_info":"当一名角色进入濒死状态时，或者你交给一名其他角色牌时，你可以令其摸一张牌。",
+			"xinfu_jiyuan_info":"当一名角色进入濒死状态时，或你交给一名其他角色牌时，你可以令其摸一张牌。",
 			"xinfu_daigong":"怠攻",
 			"xinfu_daigong_info":"每回合限一次。当你受到伤害时，你可以展示所有手牌，然后令伤害来源选择一项：交给你一张与你所有手牌花色均不相同的一张牌，或防止此伤害。",
 			"xinfu_zhaoxin":"昭心",
@@ -5446,11 +5446,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"qc_mingzhe":"明哲",
 			"qc_mingzhe_info":"",
 			"xinfu_shangjian":"尚俭",
-			"xinfu_shangjian_info":"一名角色的结束阶段开始时，若你于此回合内失去了x张或更少的牌，则你可以摸等量的牌。（x为你的体力值）。",
+			"xinfu_shangjian_info":"一名角色的结束阶段开始时，若你于此回合内失去了X张或更少的牌，则你可以摸等量的牌。（X为你的体力值）",
 			"rw_bagua_skill":"先天八卦阵",
-			"rw_bagua_skill_info":"每当你需要使用或打出一张【闪】时，你可以进行一次判定，若判定结果不为黑桃，视为你使用或打出了一张【闪】。",
+			"rw_bagua_skill_info":"当你需要使用或打出一张【闪】时，你可以进行判定，若判定结果不为黑桃，视为你使用或打出了一张【闪】。",
 			"rw_baiyin_skill":"玉照狮子盔",
-			"rw_baiyin_skill_info":"锁定技，你每次受到伤害时，最多承受1点伤害（防止多余的伤害）；当你失去装备区里的【玉照狮子盔】时，你回复1点体力并摸两张牌。",
+			"rw_baiyin_skill_info":"锁定技，当你受到大于1的伤害时，你将伤害值改为1；当你失去装备区里的【玉照狮子盔】时，你回复1点体力并摸两张牌。",
 			"rw_lanyinjia":"精银甲",
 			"rw_lanyinjia_info":"你可以将一张手牌当做【闪】使用或打出。锁定技，【精银甲】不会无效。",
 			"rw_minguangkai_cancel":"耀光铠",
@@ -5458,37 +5458,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"rw_minguangkai_link":"耀光铠",
 			"rw_minguangkai_link_info":"锁定技，当你成为【火烧连营】、【火攻】或火【杀】的目标时，或即将被横置时，取消之。",
 			"rw_renwang_skill":"仁王金刚盾",
-			"rw_renwang_skill_info":"有花色且不为方片的杀对你无效。",
+			"rw_renwang_skill_info":"黑色【杀】和红桃【杀】对你无效。",
 			"rw_tengjia1":"桐油百炼甲",
-			"rw_tengjia1_info":"锁定技，【南蛮入侵】、【万箭齐发】和普通【杀】对你无效。你每次受到火焰伤害时，该伤害+1。你不会被横置。",
+			"rw_tengjia1_info":"锁定技，【南蛮入侵】、【万箭齐发】和普【杀】对你无效。当你受到火焰伤害时，此伤害+1。当你即将被横置时，取消之。",
 			"rw_tengjia2":"桐油百炼甲",
-			"rw_tengjia2_info":"锁定技，【南蛮入侵】、【万箭齐发】和普通【杀】对你无效。你每次受到火焰伤害时，该伤害+1。你不会被横置。",
+			"rw_tengjia2_info":"锁定技，【南蛮入侵】、【万箭齐发】和普【杀】对你无效。当你受到火焰伤害时，此伤害+1。当你即将被横置时，取消之。",
 			"rw_tengjia3":"桐油百炼甲",
-			"rw_tengjia3_info":"锁定技，【南蛮入侵】、【万箭齐发】和普通【杀】对你无效。你每次受到火焰伤害时，该伤害+1。你不会被横置。",
+			"rw_tengjia3_info":"锁定技，【南蛮入侵】、【万箭齐发】和普【杀】对你无效。当你受到火焰伤害时，此伤害+1。当你即将被横置时，取消之。",
 			"rw_tengjia4":"桐油百炼甲",
 			"rewrite_bagua":"先天八卦阵",
-			"rewrite_bagua_info":"每当你需要使用或打出一张【闪】时，你可以进行一次判定，若判定结果不为黑桃，视为你使用或打出了一张【闪】。",
+			"rewrite_bagua_info":"当你需要使用或打出一张【闪】时，你可以进行判定，若判定结果不为黑桃，视为你使用或打出了一张【闪】。",
 			"rewrite_baiyin":"玉照狮子盔",
-			"rewrite_baiyin_info":"锁定技，你每次受到伤害时，最多承受1点伤害（防止多余的伤害）；当你失去装备区里的【玉照狮子盔】时，你回复1点体力并摸两张牌。",
+			"rewrite_baiyin_info":"锁定技，当你受到大于1的伤害时，你将伤害值改为1；当你失去装备区里的【玉照狮子盔】时，你回复1点体力并摸两张牌。",
 			"rewrite_lanyinjia":"精银甲",
 			"rewrite_lanyinjia_info":"你可以将一张手牌当做【闪】使用或打出。锁定技，【精银甲】不会无效。",
 			"rewrite_minguangkai":"耀光铠",
 			"rewrite_minguangkai_info":"锁定技，当你成为【火烧连营】、【火攻】或火【杀】的目标时，或即将被横置时，取消之。",
 			"rewrite_renwang":"仁王金刚盾",
-			"rewrite_renwang_info":"有花色且不为方片的杀对你无效。",
+			"rewrite_renwang_info":"黑色【杀】和红桃【杀】对你无效。",
 			"rewrite_tengjia":"桐油百炼甲",
-			"rewrite_tengjia_info":"锁定技，【南蛮入侵】、【万箭齐发】和普通【杀】对你无效。你每次受到火焰伤害时，该伤害+1。你不会被横置。",
+			"rewrite_tengjia_info":"锁定技，【南蛮入侵】、【万箭齐发】和普【杀】对你无效。当你受到火焰伤害时，此伤害+1。当你即将被横置时，取消之。",
 			"rewrite_zhuge":"元戎精械弩",
 			"rewrite_zhuge_info":"你于出牌阶段内使用【杀】无次数限制。",
 			takaramono:"宝物",
 			"wolong_card":"卧龙",
-			"wolong_card_info":"对1名角色造成1点火焰伤害。若场上有存活的诸葛亮(火)，则改为对至多2名角色各造成1点火焰伤害。",
+			"wolong_card_info":"对一名角色造成1点火焰伤害。若场上有存活的诸葛亮(火)，则改为对至多两名角色各造成两点火焰伤害。",
 			"fengchu_card":"凤雏",
-			"fengchu_card_info":"横置至多3名角色。若场上有存活的庞统(火)，则改为横置至多4名角色。",
+			"fengchu_card_info":"横置至多三名角色。若场上有存活的庞统(火)，则改为横置至多四名角色。",
 			"xuanjian_card":"玄剑",
-			"xuanjian_card_info":"令1名角色摸一张牌并回复1点体力。若场上有存活的徐庶(将/界)，则改为令1名角色摸一张牌并回复1点体力，然后你摸一张牌。",
+			"xuanjian_card_info":"令一名角色摸一张牌并回复1点体力。若场上有存活的徐庶(将/界)，则改为令一名角色摸一张牌并回复1点体力，然后你摸一张牌。",
 			"shuijing_card":"水镜",
-			"shuijing_card_info":"将1名角色装备区内的防具移动到另1角色对应区域。若场上有存活的司马徽，则改为将1名角色装备区内的1件装备移动到另1角色对应区域。",
+			"shuijing_card_info":"将一名角色装备区内的防具牌移动到另一名角色对应区域。若场上有存活的司马徽，则改为将1名角色装备区内的1件装备移动到另1角色对应区域。",
 		},
 	};
 });

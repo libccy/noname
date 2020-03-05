@@ -134,7 +134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.hujiaing=false;
 					if(result.bool){
 						event.finish();
-						trigger.result={bool:true,card:{name:'shan'}};
+						trigger.result={bool:true,card:{name:'shan',isCard:true}};
 						trigger.responded=true;
 						trigger.animate=false;
 						if(typeof event.current.ai.shown=='number'&&event.current.ai.shown<0.95){
@@ -610,12 +610,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			rende:{
 				audio:2,
-				group:['rende1'],
 				enable:'phaseUse',
 				filterCard:true,
 				selectCard:[1,Infinity],
 				discard:false,
-				prepare:'give2',
+				lose:false,
+				delay:0,
 				filterTarget:function(card,player,target){
 					return player!=target;
 				},
@@ -624,7 +624,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(ui.selected.cards.length&&ui.selected.cards[0].name=='du') return 0;
 					if(!ui.selected.cards.length&&card.name=='du') return 20;
 					var player=get.owner(card);
-					if(player.hp==player.maxHp||player.storage.rende<0||player.countCards('h')<=1){
+					var num=0;
+					var evt2=_status.event.getParent();
+					var num=0;
+					player.getHistory('lose',function(evt){
+						if(evt.getParent().skill=='rende'&&evt.getParent(3)==evt2) num+=evt.cards.length;
+					});
+					if(player.hp==player.maxHp||num>1||player.countCards('h')<=1){
 						if(ui.selected.cards.length){
 							return -1;
 						}
@@ -645,17 +651,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 10-get.value(card);
 				},
 				content:function(){
-					target.gain(cards,player);
-					if(typeof player.storage.rende!='number'){
-						player.storage.rende=0;
-					}
-					if(player.storage.rende>=0){
-						player.storage.rende+=cards.length;
-						if(player.storage.rende>=2){
-							player.recover();
-							player.storage.rende=-1;
-						}
-					}
+					target.gain(cards,player,'giveAuto');
+					var evt2=event.getParent(3);
+					var num=0;
+					player.getHistory('lose',function(evt){
+						if(evt.getParent(2).name=='rende'&&evt.getParent(5)==evt2) num+=evt.cards.length;
+					});
+					if(num<2&&num+cards.length>1) player.recover();
 				},
 				ai:{
 					order:function(skill,player){
@@ -706,14 +708,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jijiang:{
 				audio:'jijiang1',
-				audioname:['liushan','re_liubei','re_liushan'],
+				audioname:['liushan','re_liubei','re_liushan','ol_liushan'],
 				unique:true,
 				group:['jijiang1','jijiang2'],
 				zhuSkill:true,
 			},
 			jijiang1:{
 				audio:2,
-				audioname:['liushan','re_liubei','re_liushan'],
+				audioname:['liushan','re_liubei','re_liushan','ol_liushan'],
 				trigger:{player:'chooseToRespondBegin'},
 				check:function(event){
 					if(event.jijiang) return false;
@@ -771,7 +773,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jijiang2:{
 				audio:'jijiang1',
-				audioname:['liushan','re_liubei','re_liushan'],
+				audioname:['liushan','re_liubei','re_liushan','ol_liushan'],
 				enable:'chooseToUse',
 				prompt:'选择一名目标角色。若有其他蜀势力角色打出【杀】响应，则视为你对其使用此【杀】。',
 				filter:function(event,player){
@@ -824,10 +826,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						event.finish();
 						if(result.cards&&result.cards.length){
-							player.useCard({name:'sha'},result.cards,target).animate=false;
+							player.useCard({name:'sha',isCard:true},result.cards,target).animate=false;
 						}
 						else{
-							player.useCard({name:'sha'},target).animate=false;
+							player.useCard({name:'sha',isCard:true},target).animate=false;
 						}
 						if(typeof event.current.ai.shown=='number'&&event.current.ai.shown<0.95){
 							event.current.ai.shown+=0.3;
@@ -1505,7 +1507,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard'},
 				frequent:true,
 				filter:function(event){
-					return (get.type(event.card)=='trick'&&(!event.cards.length||event.cards[0]&&event.cards[0]==event.card));
+					return (get.type(event.card)=='trick'&&event.card.isCard);
 				},
 				content:function(){
 					player.draw();
@@ -1891,7 +1893,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.card.name!='sha') return false;
 					if(player.countCards('he')==0) return false;
 					return game.hasPlayer(function(current){
-						return get.distance(player,current,'attack')<=1&&current!=event.player&&
+						return player.inRange(current)&&current!=event.player&&
 							current!=player&&lib.filter.targetEnabled(event.card,event.player,current);
 					});
 				},
@@ -1903,7 +1905,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filterTarget:function(card,player,target){
 							var trigger=_status.event.getTrigger();
 							if(trigger.targets.contains(target)) return false;
-							if(get.distance(player,target,'attack')<=1&&
+							if(player.inRange(target)&&
 								target!=trigger.player){
 								if(player.canUse(trigger.card,target)) return true;
 							}
@@ -2030,7 +2032,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					reverseEquip:true,
 					effect:{
 						target:function(card,player,target,current){
-							if(get.type(card)=='equip') return [1,3];
+							if(get.type(card)=='equip'&&!get.cardtag(card,'gifts')) return [1,3];
 						}
 					}
 				}
@@ -2348,7 +2350,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectTarget:2,
 				multitarget:true,
 				content:function(){
-					targets[1].useCard({name:'juedou'},'nowuxie',targets[0],'noai').animate=false;
+					targets[1].useCard({name:'juedou',isCard:true},'nowuxie',targets[0],'noai').animate=false;
 					game.delay(0.5);
 				},
 				ai:{
@@ -2572,7 +2574,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tieji_info:'当你使用【杀】指定目标时，你可以进行判定。若结果为红色，则此【杀】不可被闪避。',
 			jizhi_info:'当你使用一张非转化的普通锦囊牌时，你可以摸一张牌。',
 			xinjizhi:'集智',
-			xinjizhi_info:'每当你使用一张非转化的普通锦囊牌，可以摸一张牌',
+			xinjizhi_info:'当你使用非转化的普通锦囊牌时，你可以摸一张牌。',
 			xinjizhi_info_alter:'每当你使用一张非转化的锦囊牌，可以摸一张牌，如果摸到的是基本牌，你可以弃置这张牌，然后本回合手牌上限+1',
 			xinqicai:'奇才',
 			xinqicai_info:'锁定技，你使用锦囊牌无距离限制。',
