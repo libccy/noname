@@ -1680,6 +1680,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				selectCard:2,
 				position:'h',
 				viewAs:{name:'sha'},
+				complexCard:true,
 				filter:function(event,player){
 					return player.countCards('h')>=2;
 				},
@@ -2018,7 +2019,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 									if(eff>=0) return 0;
 									return state*get.attitude(_status.event.player,source);
 								}
-								else{
+								else if(target){
 									var triggerevent=_status.event.getTrigger();
 									if(triggerevent&&triggerevent.parent&&
 										triggerevent.parent.postAi&&
@@ -2039,6 +2040,21 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 									}
 									if(Math.abs(get.attitude(_status.event.player,target))<3) return 0;
 									return -get.effect(target,card,source,_status.event.player)*state;
+								}
+								else{
+									var triggerevent=_status.event.getTrigger();
+									if(triggerevent&&triggerevent.parent&&
+										triggerevent.parent.postAi&&
+										triggerevent.player.isUnknown(_status.event.player)){
+										return 0;
+									}
+									var info=get.info(card);
+									if(info.ai&&info.ai.wuxie){
+										var aiii=info.ai.wuxie(target,card,source,_status.event.player,state);
+										if(typeof aiii=='number') return aiii;
+									}
+									if(Math.abs(get.attitude(_status.event.player,source))<3) return 0;
+									return -get.attitude(_status.event.player,source)
 								}
 							},
 							source:target,

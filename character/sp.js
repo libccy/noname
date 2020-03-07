@@ -1946,7 +1946,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var cards=get.cards(2);
 					event.cards=cards;
 					game.log(player,'观看了牌堆顶的'+get.cnNumber(cards.length)+'张牌');
-					player.chooseControl('ok').set('dialog',['卜卦',cards]);
+					player.chooseControl('ok').set('dialog',['推演',cards]);
 					'step 1'
 					while(cards.length){
 						ui.cardPile.insertBefore(cards.pop(),ui.cardPile.firstChild);
@@ -4130,7 +4130,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return event.player.hasMark('zongkui_mark');
 						},
 						content:function(){
-							trigger.getParent().excluded.add(player);
+							trigger.targets.remove(player);
 							game.delay();
 							trigger.player.removeMark('zongkui_mark');
 						}
@@ -4782,7 +4782,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				discard:false,
 				lose:true,
-				delay:0,
+				delay:false,
 				content:function(){
 					'step 0'
 					player.showCards(get.translation(player)+'对'+get.translation(target)+'发动了【连计】',cards);
@@ -4997,7 +4997,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return card.name=='sha'||get.type(card)=='equip';
 					});
 				},
-				delay:0,
+				delay:false,
 				usable:1,
 				content:function(){
 					'step 0'
@@ -6240,7 +6240,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				popup:false,
 				filter:function(event,player){
-					return event.card==player.storage.fuman3&&player.storage.fuman2.isIn();
+					return event.cards.contains(player.storage.fuman3)&&player.storage.fuman2.isIn();
 				},
 				mark:true,
 				intro:{
@@ -7613,7 +7613,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:{color:'black'},
 				mark:true,
 				discard:false,
-				delay:0,
+				delay:false,
 				check:function(card){
 					if(_status.event.player.hp==1) return 8-get.value(card);
 					return 6-get.value(card);

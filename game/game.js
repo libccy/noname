@@ -31907,11 +31907,9 @@
 						if(method=='raw') return equipValue;
 						return equipValue-value;
 					}
-					if(!card.ai.result.target) card.ai.result.target=(function(name){
-						return (function(player,target){
-							return get.equipResult(player,target,name);
-						});
-					}(i));
+					if(!card.ai.result.keepAI) card.ai.result.target=function(player,target,card){
+						return get.equipResult(player,target,card.name);
+					};
 				}
 				else if(card.type=='delay'){
 					if(card.enable==undefined) card.enable=true;
@@ -39056,12 +39054,12 @@
 													}
 													else{
 														if(updates[i].indexOf('image/character')==0){
-															if(updates[i].indexOf('jun_')!=16&&!skipcharacter.contains(updates[i].slice(16,updates[i].lastIndexOf('.')))){
+															if(updates[i].indexOf('jun_')!=16&&updates[i].indexOf('gz_')!=16&&!skipcharacter.contains(updates[i].slice(16,updates[i].lastIndexOf('.')))){
 																updates.splice(i--,1);
 															}
 														}
 														else if(updates[i].indexOf('image/card')==0){
-															if(!skipcard.contains(updates[i].slice(11,updates[i].lastIndexOf('.')))){
+															if(updates[i].indexOf('qiaosi_card')!=11&&!skipcard.contains(updates[i].slice(11,updates[i].lastIndexOf('.')))){
 																updates.splice(i--,1);
 															}
 														}

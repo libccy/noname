@@ -2287,7 +2287,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{target:'useCardToBegin'},
 				forced:true,
 				filter:function(event,player){
-					return get.type(event.card,'trick')=='trick'&&event.player==player&&event.cards[0]&&event.cards[0]==event.card;
+					return player==event.player&&get.type(event.card,'trick')=='trick'&&event.card.isCard;
 				},
 				content:function(){
 					'step 0'
@@ -5222,7 +5222,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						usable:3,
 						filter:function(event,player){
 							if(_status.currentPhase!=player) return false;
-							return (get.type(event.card)=='trick'&&event.cards[0]&&event.cards[0]==event.card);
+							return (get.type(event.card)=='trick'&&event.card.isCard);
 						},
 						content:function(){
 							player.draw();
@@ -5265,7 +5265,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						frequent:true,
 						filter:function(event,player){
 							if(_status.currentPhase!=player) return false;
-							return (get.type(event.card)=='trick'&&event.cards[0]&&event.cards[0]==event.card);
+							return (get.type(event.card)=='trick'&&event.card.isCard);
 						},
 						content:function(){
 							player.draw();
@@ -6204,7 +6204,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard'},
 				direct:true,
 				filter:function(event){
-					return get.type(event.card,'trick')=='trick'&&event.cards[0]&&event.cards[0]==event.card;
+					return get.type(event.card,'trick')=='trick'&&event.card.isCard;
 				},
 				content:function(){
 					"step 0"

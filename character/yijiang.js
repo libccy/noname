@@ -2809,7 +2809,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				direct:true,
-				delay:0,
+				delay:false,
 				filterCard:true,
 				discard:false,
 				lose:false,
@@ -3135,9 +3135,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(!player.countCards('h')) return false;
 					if(player.getStat('skill').zhongjian&&!player.hasSkill('zhongjian2')) return false;
-					return game.hasPlayer(function(current){
-						return current!=player&&current.countCards('h')>current.hp;
-					});
+					return true;
 				},
 				filterCard:true,
 				check:function(){
@@ -3146,7 +3144,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				discard:false,
 				lose:false,
 				filterTarget:function(card,player,target){
-					return target!=player;
+					return target!=player&&target.countCards('h')>0;
 				},
 				content:function(){
 					'step 0'
@@ -3459,7 +3457,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							if(player.storage.xinsidi4.isAlive()&&!player.getHistory('useCard',function(evt){
 								return evt.card.name=='sha';
-							})){
+							}).length&&player.storage.xinsidi4.canUse({name:'sha',isCard:true},player,false)){
 								player.storage.xinsidi4.logSkill('xinsidi',player);
 								player.storage.xinsidi4.useCard({name:'sha',isCard:true},player);
 							}
@@ -4007,7 +4005,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:true,
 				discard:false,
 				lose:false,
-				delay:0,
+				delay:false,
 				content:function(){
 					'step 0'
 					player.showCards(cards);
@@ -5149,7 +5147,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return target==_status.event.dying;
 				},
 				direct:true,
-				delay:0,
+				delay:false,
 				selectTarget:-1,
 				content:function(){
 					"step 0"
@@ -5298,14 +5296,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseJudgeBegin'},
 				direct:true,
 				filter:function(event,player){
-					return event.player!=player&&event.player.countCards('j')>0&&player.inRange(event.player)<=1;
+					return event.player!=player&&event.player.countCards('j')>0&&player.inRange(event.player);
 				},
 				content:function(){
 					'step 0'
 					var att=get.attitude(player,trigger.player);
 					var nh=trigger.player.countCards('h');
-					var eff=get.effect(trigger.player,{name:'sha'},player,player);
-					if(!player.canUse({name:'sha'},trigger.player)) eff=0;
+					var eff=get.effect(trigger.player,{name:'sha',isCard:true},player,player);
+					if(!player.canUse({name:'sha',isCard:true},trigger.player)) eff=0;
 					player.discardPlayerCard(get.prompt('yonglve',trigger.player),trigger.player,'j').set('ai',function(button){
 						var name=button.link.viewAs||button.link.name;
 						var att=_status.event.att;
@@ -5781,7 +5779,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
-				delay:0,
+				delay:false,
 				filter:function(event,player){
 					return player.countCards('h',{color:'red'})&&player.countCards('h',{color:'black'});
 				},
@@ -8238,7 +8236,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							filterCard:function(){return false},
 							selectCard:-1,
 							card:links[0],
-							delay:0,
+							delay:false,
 							content:lib.skill.paiyi.contentx,
 							ai:{
 								order:10,
@@ -10527,7 +10525,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forceaudio:true,
 				direct:true,
 				prompt:'弃置一名有【逆】的角色的两张【逆】，然后视为对包含其在内的角色使用【杀】。',
-				delay:0,
+				delay:false,
 				log:false,
 				precontent:function(){
 					"step 0"

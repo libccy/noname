@@ -117,7 +117,7 @@ window.noname_package={
 		xiaozhuan:'小篆',
 		xinwei:'新魏',
 		huangcao:'黄草',
-		yuanli:'隶书',
+		yuanli:'楷体',
 		xingkai:'行楷',
 		shousha:'手杀',
 	},

@@ -1902,7 +1902,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				usable:1,
 				filter:function(event,player){
-					if(event.cards.length.length==1&&event.cards[0]==event.card){
+					if(event.card.isCard){
 						return !player.hasSkill('jielue2')&&get.type(event.card)=='basic'&&!event.card.storage.jielue;
 					}
 					return false;

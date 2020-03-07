@@ -275,7 +275,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							filterTarget:function(card,player,target){
 								return target.countDiscardableCards(player,'ej')>0;
 							},
-							delay:0,
+							delay:false,
 							audio:'drlt_zhengrong',
 							content:lib.skill.qingce.contentx,
 							ai:{
@@ -3240,7 +3240,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return {
 							filterCard:function(){return false},
 							selectCard:-1,
-							viewAs:{name:'shunshou'},
+							viewAs:{name:'shunshou',cards:links},
 							cards:links,
 							onuse:function(result,player){
 								result.cards=lib.skill[result.skill].cards;
@@ -3258,7 +3258,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					prompt:function(links,player){
-						return '选择急袭的目标';
+						return '请选择【顺手牵羊】的目标';
 					}
 				},
 				ai:{
@@ -6406,9 +6406,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						evt=event.getParent();
 					}
 					var player=evt[event.name=='gain'?'source':'player'];
-					if(!player||_status.currentPhase==player||player.isDead()) return false;
+					if(!player||player.isDead()) return false;
 					if(evt[event.name=='gain'?'bySelf':'notBySelf']!=true) return false;
-					if(evt.name=='lose') return evt.hs.length>0;
+					if(event.name=='lose') return event.hs.length>0;
 					return event.relatedLose&&event.relatedLose.hs&&event.relatedLose.hs.length>0;
 				},
 				check:function(event,player){
@@ -7066,7 +7066,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guidao_info:'一名角色的判定牌生效前，你可以打出一张黑色牌替换之。',
 			huangtian_info:'主公技，其他群势力角色的出牌阶段限一次，其可以交给你一张【闪】或【闪电】。',
 			guhuo_info:'每名角色的回合限一次，你可以扣置一张手牌当一张基本牌或普通锦囊牌使用或打出。其他角色依次选择是否质疑。一旦有其他角色质疑则翻开此牌：若为假则此牌作废，若为真，则质疑角色获得技能“缠怨”（锁定技，你不能质疑于吉，只要你的体力值为1，你失去你的武将技能）',
-			fenji_info:'每当一名角色的手牌于回合外被其他角色弃置或获得时，你可以失去1点体力，然后令该角色摸两张牌。',
+			fenji_info:'当一名角色的手牌被其他角色弃置或获得后，你可以失去1点体力，然后令该角色摸两张牌。',
 			
 			gzduanliang:'断粮',
 			gzduanliang_info:'你可以将一张黑色基本牌或黑色装备牌当【兵粮寸断】使用；你可以对距离为2的角色使用【兵粮寸断】',

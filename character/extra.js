@@ -355,7 +355,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseDiscardEnd'},
 				direct:true,
 				filter:function(event,player){
-					return event.cards&&event.cards.length>1
+					var cards=[];
+					player.getHistory('lose',function(evt){
+						if(evt.type=='discard'&&evt.getParent('phaseDiscard')==event) cards.addArray(evt.cards2);
+					});
+					return cards.length>1;
 				},
 				content:function(){
 					"step 0"
@@ -743,7 +747,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:lib.filter.cardDiscardable,
 				discard:false,
 				lose:false,
-				delay:0,
+				delay:false,
 				selectCard:[1,Infinity],
 				prompt:'弃置一枚“忍”，然后弃置任意张牌并摸等量的牌。若弃置了所有的手牌，则可以多摸一张牌。',
 				check:function(card){
@@ -793,7 +797,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:true,
 				trigger:{player:'useCard'},
 				filter:function(event,player){
-					return (get.type(event.card,'trick')=='trick'&&event.card.isCard);
+					return (get.type(event.card,'trick')=='trick'&&event.card.isCard&&player.hasMark('renjie'));
 				},
 				init:function(player){
 					player.storage.jilue_jizhi=0;
