@@ -538,7 +538,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function (){
 					return -1;
 				},
-				delay:0,
+				delay:false,
 				content:function (){
 					'step 0'
 					player.$throw(cards.length);
@@ -3317,7 +3317,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function (card){
 					return 6-get.value(card)
 				},
-				delay:0,
+				delay:false,
 				content:function (){
 					player.draw(cards.length);
 					player.storage.xinfu_duanfa+=cards.length;
@@ -3656,6 +3656,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return Infinity;
 						}
 					},
+					aiValue:function(player,card,num){
+						if(card.name=='zhangba') return 15;
+						if(player.getEquip('zhangba')&&player.countCards('h')>1&&['shan','tao'].contains(card.name)) return 0;
+					},
 				},
 				locked:false,
 				audio:2,
@@ -3675,19 +3679,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterTarget:function (card,player,target){
 					return player==target;
 				},
-				check:function (card){
+				check:function(card){
 					var player=_status.event.player;
-					if(player.countCards('h','sha')<2){
-					if(player.countCards('h',function(cardx){
-						return cardx.name=='shan'&&get.suit(cardx)=='heart';
-					})>0) return 0;
-					if(player.countCards('h',function(cardx){
-						return cardx.name=='shan'&&get.suit(cardx)=='diamond';
-					})>0) return 0;
-					var damaged=player.maxHp-player.hp-1;
-					if(player.countCards('h',function(cardx){
-						return cardx.name=='tao'&&get.suit(cardx)=='diamond';
-					})>damaged) return 0;
+					if(!player.getEquip('zhangba')&&player.countCards('h','sha')<2){
+ 					if(player.countCards('h',function(cardx){
+ 						return cardx!=card&&cardx.name=='shan';
+ 					})>0) return 0;
+ 					var damaged=player.maxHp-player.hp-1;
+ 					var ts=player.countCards('h',function(cardx){
+ 						return cardx!=card&&cardx.name=='tao';
+ 					});
+ 					if(ts>0&&ts>damaged) return 0;
 					}
 					if(card.name=='shan') return 15;
 					if(card.name=='tao') return 10;
@@ -3702,7 +3704,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:1,
 					},
-					order:9,
+					order:12,
 				},
 			},
 			"xinfu_guhuo":{
@@ -4862,7 +4864,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				discard:false,
 				//lose:false,
-				delay:0,
+				delay:false,
 				content:function (){
 					'step 0'
 					//player.lose(cards,ui.special,'toStorage')
@@ -5449,8 +5451,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_shangjian_info":"一名角色的结束阶段开始时，若你于此回合内失去了X张或更少的牌，则你可以摸等量的牌。（X为你的体力值）",
 			"rw_bagua_skill":"先天八卦阵",
 			"rw_bagua_skill_info":"当你需要使用或打出一张【闪】时，你可以进行判定，若判定结果不为黑桃，视为你使用或打出了一张【闪】。",
-			"rw_baiyin_skill":"玉照狮子盔",
-			"rw_baiyin_skill_info":"锁定技，当你受到大于1的伤害时，你将伤害值改为1；当你失去装备区里的【玉照狮子盔】时，你回复1点体力并摸两张牌。",
+			"rw_baiyin_skill":"照月狮子盔",
+			"rw_baiyin_skill_info":"锁定技，当你受到大于1的伤害时，你将伤害值改为1；当你失去装备区里的【照月狮子盔】时，你回复1点体力并摸两张牌。",
 			"rw_lanyinjia":"精银甲",
 			"rw_lanyinjia_info":"你可以将一张手牌当做【闪】使用或打出。锁定技，【精银甲】不会无效。",
 			"rw_minguangkai_cancel":"耀光铠",
@@ -5459,24 +5461,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"rw_minguangkai_link_info":"锁定技，当你成为【火烧连营】、【火攻】或火【杀】的目标时，或即将被横置时，取消之。",
 			"rw_renwang_skill":"仁王金刚盾",
 			"rw_renwang_skill_info":"黑色【杀】和红桃【杀】对你无效。",
-			"rw_tengjia1":"桐油百炼甲",
+			"rw_tengjia1":"桐油百韧甲",
 			"rw_tengjia1_info":"锁定技，【南蛮入侵】、【万箭齐发】和普【杀】对你无效。当你受到火焰伤害时，此伤害+1。当你即将被横置时，取消之。",
-			"rw_tengjia2":"桐油百炼甲",
+			"rw_tengjia2":"桐油百韧甲",
 			"rw_tengjia2_info":"锁定技，【南蛮入侵】、【万箭齐发】和普【杀】对你无效。当你受到火焰伤害时，此伤害+1。当你即将被横置时，取消之。",
-			"rw_tengjia3":"桐油百炼甲",
+			"rw_tengjia3":"桐油百韧甲",
 			"rw_tengjia3_info":"锁定技，【南蛮入侵】、【万箭齐发】和普【杀】对你无效。当你受到火焰伤害时，此伤害+1。当你即将被横置时，取消之。",
-			"rw_tengjia4":"桐油百炼甲",
+			"rw_tengjia4":"桐油百韧甲",
 			"rewrite_bagua":"先天八卦阵",
 			"rewrite_bagua_info":"当你需要使用或打出一张【闪】时，你可以进行判定，若判定结果不为黑桃，视为你使用或打出了一张【闪】。",
-			"rewrite_baiyin":"玉照狮子盔",
-			"rewrite_baiyin_info":"锁定技，当你受到大于1的伤害时，你将伤害值改为1；当你失去装备区里的【玉照狮子盔】时，你回复1点体力并摸两张牌。",
+			"rewrite_baiyin":"照月狮子盔",
+			"rewrite_baiyin_info":"锁定技，当你受到大于1的伤害时，你将伤害值改为1；当你失去装备区里的【照月狮子盔】时，你回复1点体力并摸两张牌。",
 			"rewrite_lanyinjia":"精银甲",
 			"rewrite_lanyinjia_info":"你可以将一张手牌当做【闪】使用或打出。锁定技，【精银甲】不会无效。",
 			"rewrite_minguangkai":"耀光铠",
 			"rewrite_minguangkai_info":"锁定技，当你成为【火烧连营】、【火攻】或火【杀】的目标时，或即将被横置时，取消之。",
 			"rewrite_renwang":"仁王金刚盾",
 			"rewrite_renwang_info":"黑色【杀】和红桃【杀】对你无效。",
-			"rewrite_tengjia":"桐油百炼甲",
+			"rewrite_tengjia":"桐油百韧甲",
 			"rewrite_tengjia_info":"锁定技，【南蛮入侵】、【万箭齐发】和普【杀】对你无效。当你受到火焰伤害时，此伤害+1。当你即将被横置时，取消之。",
 			"rewrite_zhuge":"元戎精械弩",
 			"rewrite_zhuge_info":"你于出牌阶段内使用【杀】无次数限制。",

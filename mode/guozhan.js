@@ -313,8 +313,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_shibing2qun:['female','qun',0,[],['unseen']],
 
 				gz_caocao:['male','wei',4,['jianxiong']],
-				gz_simayi:['male','wei',3,['fankui','reguicai']],
-				gz_xiahoudun:['male','wei',4,['ganglie']],
+				gz_simayi:['male','wei',3,['fankui','guicai']],
+				gz_xiahoudun:['male','wei',4,['reganglie']],
 				gz_zhangliao:['male','wei',4,['new_retuxi']],
 				gz_xuzhu:['male','wei',4,['luoyi']],
 				gz_guojia:['male','wei',3,['tiandu','new_yiji'],['gzskin']],
@@ -2134,21 +2134,74 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				init:function (player){
 					if(player.storage.new_kongcheng==undefined) player.storage.new_kongcheng=[];
 				},
+				fixedGain:function(){
+					'step 0'
+					if(cards){
+						var owner=event.source||get.owner(cards[0]);
+						if(owner){
+							var next=owner.lose(cards,ui.special,'toStorage').set('type','gain').set('forceDie',true);
+							if(event.animate=='give'||event.visible==true) next.visible=true;
+							event.relatedLose=next;
+						}
+						player.storage.new_kongcheng.addArray(cards);
+						player.markSkill('new_kongcheng');
+					}
+					else{
+						event.finish();
+					}
+					'step 1'
+					if(event.animate=='draw'){
+						player.$draw(cards.length);
+						game.pause();
+						setTimeout(function(){
+							game.resume();
+						},get.delayx(500,500));
+					}
+					else if(event.animate=='gain'){
+						player.$gain(cards);
+						game.pause();
+						setTimeout(function(){
+							game.resume();
+						},get.delayx(700,700));
+					}
+					else if(event.animate=='gain2'||event.animate=='draw2'){
+						var gain2t=300;
+						if(player.$gain2(cards)&&player==game.me){
+							gain2t=500;
+						}
+						game.pause();
+						setTimeout(function(){
+							game.resume();
+						},get.delayx(gain2t,gain2t));
+					}
+					else if(event.source&&(event.animate=='give'||event.animate=='giveAuto')){
+						if(event.animate=='give') event.source['$'+event.animate](cards,player);
+						else{
+							var givemap={hs:[],ots:[]};
+							for(var i=0;i<cards.length;i++){
+								givemap[cards[i].original=='h'?'hs':'ots'].push(cards[i]);
+							}
+							if(givemap.hs.length) event.source.$giveAuto(givemap.hs,player);
+							if(givemap.ots.length) event.source.$give(givemap.ots,player);
+						}
+						game.pause();
+						setTimeout(function(){
+							game.resume();
+						},get.delayx(500,500));
+					}
+				},
 				group:["new_kongcheng_gain","new_kongcheng_got"],
 				subSkill:{
 					gain:{
 						audio:"kongcheng",
 						trigger:{
-							player:"gainEnd",
+							player:"gainBegin",
 						},
 						filter:function (event,player){
-							return event.source&&event.source!=player&&!event.bySelf&&event.cards.length==player.countCards('h')&&player!=_status.currentPhase;
+							return event.source&&event.source!=player&&player!=_status.currentPhase&&!event.bySelf&&player.countCards('h')==0;
 						},
 						content:function (){
-							player.storage.new_kongcheng=player.storage.new_kongcheng.concat(player.getCards('h'));
-							player.markSkill('new_kongcheng');
-							game.addVideo('storage',player,['new_kongcheng',get.cardsInfo(player.storage.new_kongcheng),'cards']);
-							player.lose(player.getCards('h'),ui.special,'toStorage'); 
+							trigger.setContent(lib.skill.new_kongcheng.fixedGain);
 						},
 						sub:true,
 						forced:true,
@@ -3985,7 +4038,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					//event.trigger('addCardToStorage');
 				},
 				ai:{
-					order:1,
+					order:10,
 					result:{
 						player:1
 					}

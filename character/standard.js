@@ -205,12 +205,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'judge'},
 				direct:true,
 				filter:function(event,player){
-					return player.countCards('h')>0;
+					return player.countCards(get.mode()=='guozhan'?'he':'h')>0;
 				},
 				content:function(){
 					"step 0"
 					player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
-					get.translation(trigger.player.judging[0])+'，'+get.prompt('guicai'),'h',function(card){
+					get.translation(trigger.player.judging[0])+'，'+get.prompt('guicai'),get.mode()=='guozhan'?'he':'h',function(card){
   				var player=_status.event.player;
   				var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
   				if(mod2!='unchanged') return mod2;
@@ -2468,6 +2468,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fankui_info:'当你受到伤害后，你可以获得伤害来源的一张牌。',
 			guicai:'鬼才',
 			guicai_info:'一名角色的判定牌生效前，你可以打出一张手牌代替之。',
+			guicai_info_guozhan:'一名角色的判定牌生效前，你可以打出一张牌代替之。',
 
 			xiahoudun:'夏侯惇',
 			zhangliao:'张辽',

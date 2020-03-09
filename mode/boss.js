@@ -1945,6 +1945,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					next.cards=equiplist;
 					next.setContent(function(){
 						'step 0'
+						if(!cards.length){
+							event.finish();return;
+						}
 						player.logSkill('boss_jingjia');
 						event.num=1.5;
 						'step 1'

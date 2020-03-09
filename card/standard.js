@@ -1688,7 +1688,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				prompt:'将两张手牌当杀使用或打出',
 				check:function(card){
 					if(card.name=='sha') return 0;
-					return 6-get.useful(card)
+					return 5-get.value(card)
 				},
 				ai:{
 					respondSha:true,

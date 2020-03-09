@@ -5909,7 +5909,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					"step 2"
-					trigger.trigger('damageBefore');
+					trigger.trigger('damageBegin3');
 				},
 				ai:{
 					maixie_defend:true,

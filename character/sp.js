@@ -4594,8 +4594,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:6,
 				content:function(){
 					'step 0'
-					player.chooseTarget('选择【先辅】的目标',lib.translate.xianfu_info,true,function(card,player,target){
-						return target!=player&&!target.hasSkill('xianfu2');
+					player.chooseTarget('请选择【先辅】的目标',lib.translate.xianfu_info,true,function(card,player,target){
+						return target!=player&&(!player.storage.xianfu2||!player.storage.xianfu2.contains(target));
 					}).set('ai',function(target){
 						var att=get.attitude(_status.event.player,target);
 						if(att>0) return att+1;
@@ -4605,52 +4605,63 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
-						//player.line(target,'green');
-						//game.log(target,'成为了','【先辅】','的目标');
-						target.storage.xianfu2=player;
-						target.addSkill('xianfu2');
+						if(!player.storage.xianfu2) player.storage.xianfu2=[];
+						player.storage.xianfu2.push(target);
+						player.addSkill('xianfu2');
 					}
 				}
 			},
-			xianfu2:{
-				//mark:'character',
+			xianfu_mark:{
 				marktext:'辅',
 				intro:{
+					name:'先辅',
 					content:'当你受到伤害后，$受到等量的伤害，当你回复体力后，$回复等量的体力'
 				},
-				nopop:true,
+			},
+			xianfu2:{
+				audio:'xianfu',
 				charlotte:true,
-				trigger:{player:['damageEnd','recoverEnd']},
+				trigger:{global:['damageEnd','recoverEnd']},
 				forced:true,
-				popup:false,
-				//priority:15,
 				filter:function(event,player){
-					if(!(player.storage.xianfu2&&player.storage.xianfu2.isIn()&&event.num>0)) return false;
+					if(event.player.isDead()||!player.storage.xianfu2||!player.storage.xianfu2.contains(event.player)||event.num<=0) return false;
 					if(event.name=='damage') return true;
-					return player.storage.xianfu2.isDamaged();
+					return player.isDamaged();
 				},
+				logTarget:'player',
 				content:function(){
 					'step 0'
+					var target=trigger.player;
+					if(!target.storage.xianfu_mark) target.storage.xianfu_mark=[];
+					target.storage.xianfu_mark.add(player);
+					target.storage.xianfu_mark.sortBySeat();
+					target.markSkill('xianfu_mark');
 					game.delayx();
 					'step 1'
-					player.markSkill('xianfu2');
-					var target=player.storage.xianfu2;
-					player.line(target,'green');
-					target.logSkill('xianfu');
-					target[trigger.name](trigger.num,'nosource');
-					game.delay();
+					player[trigger.name](trigger.num,'nosource');
+				},
+				onremove:function(player){
+					if(!player.storage.xianfu2) return;
+					game.countPlayer(function(current){
+						if(player.storage.xianfu2.contains(current)&&current.storage.xianfu_mark){
+							current.storage.xianfu_mark.remove(player);
+							if(!current.storage.xianfu_mark.length) current.unmarkSkill('xianfu_mark');
+							else current.markSkill('xianfu_mark');
+						}
+					});
+					delete player.storage.xianfu2;
 				},
 				group:'xianfu3',
-				onremove:true,
 			},
 			xianfu3:{
-				trigger:{global:'dieAfter'},
+				trigger:{global:'dieBegin'},
 				silent:true,
 				filter:function(event,player){
-					return event.player==player.storage.xianfu2;
+					return event.player==player||player.storage.xianfu2&&player.storage.xianfu2.contains(player);
 				},
 				content:function(){
-					player.removeSkill('xianfu2');
+					if(player==event.player) lib.skill.xianfu2.onremove(player);
+					else player.storage.xianfu2.remove(event.player);
 				}
 			},
 			chouce:{
@@ -4679,16 +4690,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						var next=player.chooseTarget('令一名角色摸一张牌');
-						var xianfu=game.findPlayer(function(current){
-							return current.hasSkill('xianfu2')&&current.storage.xianfu2==player;
-						});
-						if(xianfu){
-							next.set('prompt2','（若目标为'+get.translation(xianfu)+'则改为摸两张牌）');
+						if(player.storage.xianfu2&&player.storage.xianfu2.length){
+							next.set('prompt2','（若目标为'+get.translation(player.storage.xianfu2)+'则改为摸两张牌）');
 						}
 						next.set('ai',function(target){
 							var player=_status.event.player;
 							var att=get.attitude(player,target)/Math.sqrt(1+target.countCards('h'));
-							if(target.storage.xianfu2==player) return att*2;
+							if(player.storage.xianfu2&&player.storage.xianfu2.contains(target)) return att*2;
 							return att;
 						})
 					}
@@ -4700,8 +4708,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.discardPlayerCard(target,'hej',true);
 						}
 						else{
-							if(target.hasSkill('xianfu2')&&target.storage.xianfu2==player){
-								target.markSkill('xianfu2');
+							if(player.storage.xianfu2&&player.storage.xianfu2.contains(target)){
+								if(!target.storage.xianfu_mark) target.storage.xianfu_mark=[];
+								target.storage.xianfu_mark.add(player);
+								target.storage.xianfu_mark.sortBySeat();
 								target.draw(2);
 							}
 							else{
@@ -10284,6 +10294,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			fenyin:{
+				locked:false,
+				mod:{
+					aiOrder:function(player,card,num){
+						if(typeof card=='object'&&player==_status.currentPhase){
+							var evt=player.getLastUsed();
+							if(evt&&evt.card&&get.color(evt.card)!='none'&&get.color(card)!='none'&&get.color(evt.card)!=get.color(card)){
+								return num+10;
+							}
+						}
+					},
+				},
 				audio:2,
 				trigger:{player:'useCard'},
 				frequent:true,
@@ -10298,6 +10319,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.draw();
+				},
+				ai:{
+					threaten:3,
 				},
 			},
 			dujin:{
@@ -10678,13 +10702,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					if(!['sha','juedou'].contains(event.card.name)) return false;
-					if(player.hasSkill('fengpo3')) return false;
-					return player.isPhaseUsing()&&event.target&&event.targets&&event.targets.length==1;
+					var evt2=event.getParent('phaseUse');
+					if(evt2.player!=player) return false;
+					return player.getHistory('useCard',function(evt){
+						return ['sha','juedou'].contains(evt.card.name)&&evt.getParent('phaseUse')==2;
+					}).indexOf(event)==0;
 				},
 				direct:true,
 				content:function(){
 					'step 0'
-					player.addTempSkill('fengpo3');
 					player.chooseControl('draw_card','加伤害','cancel2').set('prompt',get.prompt2('fengpo'));
 					'step 1'
 					if(result.control&&result.control!='cancel2'){

@@ -1827,15 +1827,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					event.cards=cardsx;
-					player.chooseBool("是否放弃摸牌"+(cardsx.length?("，改为获得"+get.translation(cardsx)):"")+"？").ai=function(event,player){
-						var num=3
-						for(var i=0;i<event.cards.length;i++){
-							if(get.type(event.cards[i])!='basic'&&event.cards[i].name!='juedou'&&
-								(get.type(event.cards[i])!='equip'||get.subtype(event.cards[i])!='equip1')){
-								num--;
-							}
-						}
-						return num>=trigger.num;
+					player.chooseBool("是否放弃摸牌"+(cardsx.length?("，改为获得"+get.translation(cardsx)):"")+"？").ai=function(){
+						var num=3;
+						return cardsx.length>=trigger.num;
 					};
 					"step 1"
 					if(result.bool){
@@ -2573,7 +2567,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				discard:false,
-				delay:0,
+				delay:false,
 				lose:false,
 				content:function(){
 					'step 0'
@@ -2682,7 +2676,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:lib.filter.cardDiscardable,
 				discard:false,
 				lose:false,
-				delay:0,
+				delay:false,
 				selectCard:[1,Infinity],
 				check:function(card){
 					var player=_status.event.player;
@@ -2819,7 +2813,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectCard:[1,Infinity],
 				discard:false,
 				lose:false,
-				delay:0,
+				delay:false,
 				filterTarget:function(card,player,target){
 					if(player.storage.rerende2&&player.storage.rerende2.contains(target)) return false;
 					return player!=target;
@@ -4085,7 +4079,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
-				delay:0,
+				delay:false,
 				filter:function(event,player){
 					return game.hasPlayer(function(current){
 						return current.sex=='male';

@@ -14357,7 +14357,7 @@
 						else{
 							var givemap={hs:[],ots:[]};
 							for(var i=0;i<cards.length;i++){
-								givemap[cards[i].original=='h'?'hs':'ots'].push(cards[i]);
+								givemap[event.relatedLose&&event.relatedLose.hs&&event.relatedLose.hs.contains(cards[i])?'hs':'ots'].push(cards[i]);
 							}
 							if(givemap.hs.length) event.source.$giveAuto(givemap.hs,player);
 							if(givemap.ots.length) event.source.$give(givemap.ots,player);
@@ -23100,16 +23100,16 @@
  							if(filter(info.trigger[i])){bool=true;break}
  						}
  						if(!bool) return;
-  						var priority=0;
+  					var priority=0;
  						if(info.priority){
  							priority=info.priority*100;
  						}
  						if(info.silent){
   						priority++;
  						}
- 						if(info.equipSkill) num-=25;
- 						if(info.cardSkill) num-=50;
- 						if(info.ruleSkill) num-=75;
+ 						if(info.equipSkill) priority-=25;
+ 						if(info.cardSkill) priority-=50;
+ 						if(info.ruleSkill) priority-=75;
  						var toadd=[skillx,player,priority];
  						if(map.list2){
  							for(var i=0;i<map.list2.length;i++){
@@ -46828,7 +46828,7 @@
 						name:info.autoViewAs,
 						suit:card.suit,
 						number:card.number,
-						nature:card.nature
+						nature:card.nature,
 					};
 				}
 			}
@@ -46841,6 +46841,7 @@
 						nature:get.nature(card),
 						isCard:true,
 						cardid:card.cardid,
+						wunature:card.wunature,
 					};
 					if(get.itemtype(cards)=='cards'&&!card.cards) next.cards=cards.slice(0);
 					else next.cards=[card];
@@ -47280,7 +47281,7 @@
 					case 'dianjiang':return '点将单挑';
 				}
 			}
-			else if(config.mode=='identity'){
+			else if(config.mode=='identity'&&config.identity_mode!='normal'){
 				switch(config.identity_mode){
 					case 'purple':return '三对三对二';
 					case 'zhong':return '忠胆英杰';
@@ -49997,6 +49998,7 @@
 			return 10-get.useful(card);
 		},
 		value:function(card,player,method){
+			var result=0;
 			var value;
 			if(Array.isArray(card)){
 				value=0;
@@ -50011,7 +50013,6 @@
 			var aii=get.info(card).ai;
 			if(aii&&aii.value) value=aii.value;
 			else if(aii&&aii.basic) value=aii.basic.value;
-			if(value==undefined) return 0;
 			if(player==undefined||get.itemtype(player)!='player') player=_status.event.player;
 			var geti=function(){
 				var num=0,i;
@@ -50022,16 +50023,17 @@
 				return cards.length;
 			};
 			if(typeof value=='function'){
-				return value(card,player,geti(),method);
+				result=value(card,player,geti(),method);
 			}
-			if(typeof value=='number') return value;
+			if(typeof value=='number') result=value;
 			if(Array.isArray(value)){
-				if(method=='raw') return value[0];
+				if(method=='raw') result=value[0];
 				var num=geti();
-				if(num<value.length) return value[num];
-				return value[value.length-1];
+				if(num<value.length) result=value[num];
+				else result=value[value.length-1];
 			}
-			return 0;
+			result=game.checkMod(player,card,result,'aiValue',player);
+			return result;
 		},
 		equipResult:function(player,target,name){
 			var card=get.card();
@@ -50135,7 +50137,7 @@
 				if(event.skill&&skillinfo.viewAs==undefined) card=_status.event.skill;
 				else{
 					card=get.card();
-					if(skillinfo&&card===skillinfo.viewAs){
+					if(skillinfo&&skillinfo.viewAs&&card.name===skillinfo.viewAs.name){
 						eventskill=event.skill;
 					}
 				}
