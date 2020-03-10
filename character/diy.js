@@ -814,7 +814,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				lucia_duqu:{
 					mod:{
 						cardSavable:function(card,player){
-							if(card.name=='du'&&!player.hasSkill('lucia_duqu_terra')) return true;
+							if(player.isDying()&&card.name=='du'&&!player.hasSkill('lucia_duqu_terra')) return true;
 						},
 					},
 					trigger:{
@@ -850,7 +850,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							another.gain(game.createCard('du'),'gain2');
 						}
 					},
-					ai:{usedu:true,save:true},
+					ai:{
+						usedu:true,
+						save:true,
+						skillTagFilter:function(player,tag){
+							if(tag=='save'&&(!player.isDying()||player.hasSkill('lucia_duqu_terra'))) return false;
+						},
+					},
 					subSkill:{terra:{sub:true}}
 				},
 				lucia_zhenren:{

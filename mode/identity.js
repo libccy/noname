@@ -554,12 +554,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							_status.winner=winner;
 							_status.loser=loser;
 						},winner,loser);
-						if(loser.length==game.players.length) game.over('游戏平局');
+						if(loser.length==game.players.length){
+							game.showIdentity();
+							game.over('游戏平局');
+						}
 						else if(winner2.contains(game.me)){
+							game.showIdentity();
 							if(loser2.contains(game.me)) game.over(false);
 							else game.over(true);
 						}
-						else game.over(false);
+						else{
+							game.showIdentity();
+							game.over(false);
+						}
 					}
 					return;
 				}

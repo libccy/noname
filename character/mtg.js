@@ -183,7 +183,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				priority:5.5,
 				round:1,
 				filter:function(event,player){
-					if(get.type(event.card)=='trick'&&event.cards.length==1&&event.cards[0]==event.card){
+					if(get.type(event.card)=='trick'&&event.card.isCard){
 						if(event.player==player) return false;
 						if(!player.countCards('he',{suit:get.suit(event.card)})) return false;
 						return true;

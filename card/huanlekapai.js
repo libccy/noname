@@ -18,6 +18,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			"mianju":{
 				audio:true,
+				fullskin:true,
 				type:"equip",
 				subtype:"equip2",
 				skills:["mianju"],

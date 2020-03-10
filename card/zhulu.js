@@ -321,6 +321,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						equipValue:5,
 					},
 					result:{
+						keepAI:true,
 						target:function(player,target){
 							var card=target.getCards('e');
 							var val=get.value(card);
@@ -367,6 +368,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						equipValue:5,
 					},
 					result:{
+						keepAI:true,
 						target:function(player,target){
 							var val=2.5;
 							var card=target.getEquip(2);
@@ -394,6 +396,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						equipValue:5,
 					},
 					result:{
+						keepAI:true,
 						target:function(player,target){
 							var val=2.5;
 							var card=target.getEquip(2);
@@ -421,6 +424,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						equipValue:5,
 					},
 					result:{
+						keepAI:true,
 						target:function(player,target){
 							var val=2;
 							var card=target.getEquip(2);
@@ -469,6 +473,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						equipValue:5,
 					},
 					result:{
+						keepAI:true,
 						target:function(player,target){
 							if(target.sex=='male'){
 								var val=0;
@@ -560,6 +565,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						equipValue:5,
 					},
 					result:{
+						keepAI:true,
 						target:function(player,target){
 							return -1-target.countCards('h');
 						},
