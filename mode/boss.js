@@ -474,6 +474,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		card:{
 			"wushuangfangtianji":{
 				type:"equip",
+				modeimage:'boss',
 				subtype:"equip1",
 				distance:{
 					attackFrom:-3,
@@ -481,205 +482,47 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				ai:{
 					basic:{
 						equipValue:2.5,
-						order:function(card,player){
-				if(player&&player.hasSkillTag('reverseEquip')){
-					return 8.5-get.equipValue(card,player)/20;
-				}
-				else{
-					return 8+get.equipValue(card,player)/20;
-				}
-			},
-						useful:2,
-						value:function(card,player){
-				var value=0;
-				var info=get.info(card);
-				var current=player.getEquip(info.subtype);
-				if(current&&card!=current){
-					value=get.value(current,player);
-				}
-				var equipValue=info.ai.equipValue;
-				if(equipValue==undefined){
-					equipValue=info.ai.basic.equipValue;
-				}
-				if(typeof equipValue=='function') return equipValue(card,player)-value;
-				if(typeof equipValue!='number') equipValue=0;
-				return equipValue-value;
-			},
-					},
-					result:{
-						target:function(player,target){
-				return get.equipResult(player,target,name);
-			},
 					},
 				},
 				skills:["wushuangfangtianji_skill"],
-				enable:true,
-				selectTarget:-1,
-				filterTarget:function(card,player,target){
-		return target==player;
-	},
-				modTarget:true,
-				allowMultiple:false,
-				content:function(){
-		target.equip(card);
-	},
-				toself:true,
-				fullimage:true,
+				fullskin:true,
 			},
 			"shufazijinguan":{
 				type:"equip",
 				subtype:"equip5",
+				modeimage:'boss',
 				ai:{
 					basic:{
 						equipValue:9,
-						order:function (card,player){
-				if(player&&player.hasSkillTag('reverseEquip')){
-					return 8.5-get.equipValue(card,player)/20;
-				}
-				else{
-					return 8+get.equipValue(card,player)/20;
-				}
-			},
-						useful:2,
-						value:function (card,player){
-				var value=0;
-				var info=get.info(card);
-				var current=player.getEquip(info.subtype);
-				if(current&&card!=current){
-					value=get.value(current,player);
-				}
-				var equipValue=info.ai.equipValue;
-				if(equipValue==undefined){
-					equipValue=info.ai.basic.equipValue;
-				}
-				if(typeof equipValue=='function') return equipValue(card,player)-value;
-				if(typeof equipValue!='number') equipValue=0;
-				return equipValue-value;
-			},
-					},
-					result:{
-						target:function(player,target){
-				return get.equipResult(player,target,name);
-			},
 					},
 				},
 				skills:["shufazijinguan_skill"],
-				enable:true,
-				selectTarget:-1,
-				filterTarget:function (card,player,target){
-		return target==player;
-	},
-				modTarget:true,
-				allowMultiple:false,
-				content:function (){
-		target.equip(card);
-	},
-				toself:true,
-				fullimage:true,
+				fullskin:true,
 			},
 			"hongmianbaihuapao":{
 				type:"equip",
 				subtype:"equip2",
+				modeimage:'boss',
 				ai:{
 					basic:{
 						equipValue:7,
-						order:function(card,player){
-				if(player&&player.hasSkillTag('reverseEquip')){
-					return 8.5-get.equipValue(card,player)/20;
-				}
-				else{
-					return 8+get.equipValue(card,player)/20;
-				}
-			},
-						useful:2,
-						value:function(card,player){
-				var value=0;
-				var info=get.info(card);
-				var current=player.getEquip(info.subtype);
-				if(current&&card!=current){
-					value=get.value(current,player);
-				}
-				var equipValue=info.ai.equipValue;
-				if(equipValue==undefined){
-					equipValue=info.ai.basic.equipValue;
-				}
-				if(typeof equipValue=='function') return equipValue(card,player)-value;
-				if(typeof equipValue!='number') equipValue=0;
-				return equipValue-value;
-			},
-					},
-					result:{
-						target:function(player,target){
-				return get.equipResult(player,target,name);
-			},
 					},
 				},
 				skills:["hongmianbaihuapao_skill"],
-				enable:true,
-				selectTarget:-1,
-				filterTarget:function(card,player,target){
-		return target==player;
-	},
-				modTarget:true,
-				allowMultiple:false,
-				content:function(){
-		target.equip(card);
-	},
-				toself:true,
-				fullimage:true,
+				fullskin:true,
 			},
 			"linglongshimandai":{
 				type:"equip",
 				subtype:"equip2",
+				modeimage:'boss',
 				ai:{
 					basic:{
 						equipValue:7.5,
-						order:function(card,player){
-				if(player&&player.hasSkillTag('reverseEquip')){
-					return 8.5-get.equipValue(card,player)/20;
-				}
-				else{
-					return 8+get.equipValue(card,player)/20;
-				}
-			},
-						useful:2,
-						value:function(card,player){
-				var value=0;
-				var info=get.info(card);
-				var current=player.getEquip(info.subtype);
-				if(current&&card!=current){
-					value=get.value(current,player);
-				}
-				var equipValue=info.ai.equipValue;
-				if(equipValue==undefined){
-					equipValue=info.ai.basic.equipValue;
-				}
-				if(typeof equipValue=='function') return equipValue(card,player)-value;
-				if(typeof equipValue!='number') equipValue=0;
-				return equipValue-value;
-			},
-					},
-					result:{
-						target:function(player,target){
-				return get.equipResult(player,target,name);
-			},
 					},
 				},
 				skills:["linglongshimandai_skill"],
-				enable:true,
-				selectTarget:-1,
-				filterTarget:function(card,player,target){
-		return target==player;
-	},
-				modTarget:true,
-				allowMultiple:false,
-				content:function(){
-		target.equip(card);
-	},
-				toself:true,
-				fullimage:true,
+				fullskin:true,
 			},
-			
 			sadouchengbing:{
 				fullskin:true,
 				type:'trick',
@@ -782,7 +625,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			guilongzhanyuedao:{
 				type:'equip',
-				fullimage:true,
+				fullskin:true,
+				modeimage:'boss',
 				subtype:'equip1',
 				distance:{attackFrom:-2},
 				skills:['guilongzhanyuedao'],
@@ -795,7 +639,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			guofengyupao:{
 				type:'equip',
-				fullimage:true,
+				fullskin:true,
+				modeimage:'boss',
 				subtype:'equip2',
 				nomod:true,
 				nopower:true,
@@ -807,7 +652,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			qimenbagua:{
 				type:'equip',
-				fullimage:true,
+				fullskin:true,
+				modeimage:'boss',
 				subtype:'equip2',
 				skills:['qimenbagua'],
 				nomod:true,
@@ -819,7 +665,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			chixueqingfeng:{
 				type:'equip',
-				fullimage:true,
+				fullskin:true,
+				modeimage:'boss',
 				subtype:'equip1',
 				distance:{attackFrom:-1},
 				skills:['chixueqingfeng'],
@@ -832,8 +679,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			chiyanzhenhunqin:{
 				type:'equip',
-				fullimage:true,
+				fullskin:true,
 				subtype:'equip1',
+				modeimage:'boss',
 				distance:{attackFrom:-3},
 				skills:['chiyanzhenhunqin'],
 				nomod:true,
@@ -845,7 +693,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			juechenjinge:{
 				type:'equip',
-				fullimage:true,
+				fullskin:true,
+				modeimage:'boss',
 				subtype:'equip3',
 				skills:['juechenjinge'],
 				nomod:true,
@@ -857,8 +706,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			xiuluolianyuji:{
 				type:'equip',
-				fullimage:true,
+				fullskin:true,
 				subtype:'equip1',
+				modeimage:'boss',
 				distance:{attackFrom:-3},
 				skills:['xiuluolianyuji'],
 				nomod:true,
@@ -870,8 +720,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			xuwangzhimian:{
 				type:'equip',
-				fullimage:true,
+				fullskin:true,
 				subtype:'equip5',
+				modeimage:'boss',
 				skills:['xuwangzhimian'],
 				nomod:true,
 				nopower:true,
@@ -883,7 +734,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			longfenghemingjian:{
 				type:'equip',
 				fullskin:true,
-				cardimage:'feilongduofeng',
+				modeimage:'boss',
 				subtype:'equip1',
 				distance:{attackFrom:-2},
 				skills:['longfenghemingjian'],
@@ -895,7 +746,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			qicaishenlu:{
-				fullimage:true,
+				fullskin:true,
+				modeimage:'boss',
 				type:'equip',
 				subtype:'equip4',
 				distance:{globalFrom:-1},

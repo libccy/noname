@@ -1588,6 +1588,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				logTarget:'target',
 				check:function(event,player){
 					if(get.attitude(player,event.target)>0) return true;
+					var target=event.target;
 					return target.countCards('h')==0||!target.hasSkillTag('noh');
 				},
 				filter:function(event,player){

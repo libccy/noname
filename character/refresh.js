@@ -15,7 +15,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		character:{
 			re_xusheng:['male','wu',4,['repojun']],
-			re_wuguotai:['male','wu',3,['reganlu','buyi']],
+			re_wuguotai:['female','wu',3,['reganlu','buyi']],
 			re_gaoshun:['male','qun',4,['rexianzhen','rejinjiu']],
 			re_caocao:['male','wei',4,['new_rejianxiong','hujia'],['zhu']],
 			re_simayi:['male','wei',3,['refankui','reguicai']],
@@ -299,8 +299,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.storage.repojun2&&player.storage.repojun2.length>0;
 				},
 				content:function(){
-					player.removeSkill('repojun2');
 					game.log(player,'收回了'+get.cnNumber(player.gain(player.storage.repojun2,'draw','fromStorage').cards.length)+'张〖破军〗牌');
+					player.storage.repojun2.length=0;
+					player.removeSkill('repojun2');
 				},
 				intro:{
 					onunmark:'throw',

@@ -4834,6 +4834,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				forceunique:true,
 				enable:'phaseUse',
+				usable:1,
 				filterCard:function(card){
 					return get.name(card)!='taipingyaoshu'&&get.color(card)=='red';
 				},
