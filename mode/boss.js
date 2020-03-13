@@ -7408,7 +7408,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				filter:function(event){
 					var type=get.type(event.card,'trick');
-					return type!='basic'&&event.cards[0]&&event.cards[0]==event.card;
+					return type!='basic'&&event.card.isCard;
 				},
 				content:function(){
 					var cards=get.cards();

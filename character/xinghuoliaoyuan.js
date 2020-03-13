@@ -955,6 +955,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.give(event.card,result.targets[0],true);
 					}
 				},
+				locked:false,
+				mod:{
+					aiOrder:function(player,card,num){
+						if(player.isPhaseUsing()&&(!player.storage.counttrigger||!player.storage.counttrigger.xinfu_lianpian||!player.storage.counttrigger.xinfu_lianpian<3)){
+							var evt=player.getLastUsed();
+							if(evt&&evt.targets&&evt.targets.length&&evt.isPhaseUsing()&&game.hasPlayer(function(current){
+								return evt.targets.contains(current)&&player.canUse(card,current)&&get.effect(current,card,player,player)>0;
+							})){
+								return num+10;
+							}
+						}
+					},
+				},
+				ai:{
+					effect:{
+						player:function(card,player,target){
+							var evt=player.getLastUsed();
+							if(evt&&evt.targets.contains(target)&&(!player.storage.counttrigger||!player.storage.counttrigger.xinfu_lianpian||!player.storage.counttrigger.xinfu_lianpian<3)&&player.isPhaseUsing()) return [1.5,0];
+						}
+					},
+				},
 			},
 			"xinfu_lingren":{
 				usable:1,
@@ -4890,7 +4911,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function (event,player){
 					if(!player.storage.xinfu_zhaoxin.length) return false;
-					return player.inRange(event.player);
+					return player==event.player||player.inRange(event.player);
 				},
 				direct:true,
 				content:function (){
@@ -5438,7 +5459,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_daigong":"怠攻",
 			"xinfu_daigong_info":"每回合限一次。当你受到伤害时，你可以展示所有手牌，然后令伤害来源选择一项：交给你一张与你所有手牌花色均不相同的一张牌，或防止此伤害。",
 			"xinfu_zhaoxin":"昭心",
-			"xinfu_zhaoxin_info":"出牌阶段限一次，你可以将任意张手牌置于武将牌上并摸等量的牌，称之为「望」（你至多拥有三张「望」）。你攻击范围内的一名其他角色的摸牌阶段结束后，其可以获得一张由你选择的「望」，然后你可以对其造成1点伤害。",
+			"xinfu_zhaoxin_info":"出牌阶段限一次，你可以将任意张手牌置于武将牌上并摸等量的牌，称之为「望」（你至多拥有三张「望」）。你或你攻击范围内的一名其他角色的摸牌阶段结束后，其可以获得一张由你选择的「望」，然后你可以对其造成1点伤害。",
 			"zhaoxin_give":"昭心",
 			"zhaoxin_give_info":"",
 			"xinfu_qianchong":"谦冲",

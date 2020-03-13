@@ -1586,6 +1586,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCardToPlayered'},
 				audio:true,
 				logTarget:'target',
+				check:function(event,player){
+					if(get.attitude(player,event.target)>0) return true;
+					return target.countCards('h')==0||!target.hasSkillTag('noh');
+				},
 				filter:function(event,player){
 					if(event.card.name!='sha') return false;
 					if(player.sex=='male'&&event.target.sex=='female') return true;

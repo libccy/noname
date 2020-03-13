@@ -1622,7 +1622,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseDrawBegin2'},
 				//priority:-5,
 				filter:function(event,player){
-					return player.hp<player.maxHp;
+					return !event.numFixed&&player.hp<player.maxHp;
 				},
 				forced:true,
 				content:function(){
@@ -1783,9 +1783,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shelie:{
 				audio:2,
 				trigger:{player:'phaseDrawBegin1'},
+				filter:function(event,player){
+					return !event.numFixed;
+				},
 				content:function(){
 					"step 0"
-					trigger.cancel();
+					trigger.changeToZero();
 					event.cards=get.cards(5);
 					event.videoId=lib.status.videoId++;
 					game.broadcastAll(function(player,id,cards){

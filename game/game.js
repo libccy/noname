@@ -58,6 +58,10 @@
 			guojia_emotion:20,
 			zhenji_emotion:20,
 		},
+		animate:{
+			skill:{},
+			card:{},
+		},
 		arenaReady:[],
 		onfree:[],
 		inpile:[],
@@ -2562,6 +2566,39 @@
 								else{
 									game.me.classList.add('linked');
 									game.me.classList.remove('linked2');
+								}
+							}
+						}
+					},
+					cardtempname:{
+						name:'视为卡牌名称显示',
+						intro:'显示强制视为类卡牌（如武魂）等名称的显示方式',
+						init:'default',
+						unfrequent:true,
+						item:{
+							default:'纵向',
+							horizon:'横向',
+							off:'禁用',
+						},
+						onclick:function(item){
+							game.saveConfig('cardtempname',item);
+							if(!game.me||!game.me.getCards) return;
+							var hs=game.me.getCards('h');
+							for(var i=0;i<hs.length;i++){
+								if(hs[i]._tempName){
+									switch(item){
+										case 'default':
+											var node=hs[i]._tempName;
+											node.innerHTML=get.verticalStr(node.tempname);
+											break;
+										case 'horizon':
+											var node=hs[i]._tempName;
+											node.innerHTML=node.tempname;
+											break;
+										default:
+											hs[i]._tempName.delete();
+											delete hs[i]._tempName;
+									}
 								}
 							}
 						}
@@ -9763,7 +9800,10 @@
 							if(targets.length){
 								event.targets2=targets;
 							}
-							else event.finish();
+							else{
+								event.finish();
+								return;
+							}
 						}
 						else event.targets2=[];
 						if(!event.forced){
@@ -9788,12 +9828,7 @@
 							return lib.filter[_status.event.nodistance?'targetEnabled':'filterTarget'].apply(this,arguments);
 						});
 						next.set('ai',event.ai||get.effect);
-						if(typeof info.selectTarget=='function'){
-							next.set('selectTarget',info.selectTarget);
-						}
-						else{
-							next.set('selectTarget',get.select(info.selectTarget));
-						}
+						next.set('selectTarget',event.selectTarget||lib.filter.selectTarget);
 						if(event.nodistance) next.set('nodistance',true);
 						if(event.forced) next.set('forced',true);
 						next.set('targets',targets);
@@ -10094,8 +10129,8 @@
 					event.cards=[player.getCards('e'),target.getCards('e')];
 					player.lose(event.cards[0],ui.ordering,'visible');
 					target.lose(event.cards[1],ui.ordering,'visible');
-					if(event.cards[0].length) player.$give(event.cards[0],target);
-					if(event.cards[1].length) target.$give(event.cards[1],player);
+					if(event.cards[0].length) player.$give(event.cards[0],target,false);
+					if(event.cards[1].length) target.$give(event.cards[1],player,false);
 					"step 2"
 					for(var i=0;i<event.cards[1].length;i++){
 						player.equip(event.cards[1][i]);
@@ -13416,21 +13451,17 @@
 							player.logSkill(event.skill);
 						}
 						if(get.info(event.skill).popname){
-							player.popup({name:event.card.name,nature:event.card.nature},'metal');
+							player.tryCardAnimate(card,event.card.name,'metal',true);
 						}
 					}
-					else if(lib.config.show_card_prompt){
-						if(get.type(event.card)=='equip'&&lib.config.hide_card_prompt_equip);
-						else if(get.type(event.card)=='basic'&&lib.config.hide_card_prompt_basic);
-						else if(!event.nopopup){
-							if(lib.translate[event.card.name+'_pop']){
-								player.popup(lib.translate[event.card.name+'_pop'],'metal');
-							}
-							else{
-								player.popup(event.card.name,'metal');
-							}
+					else if(!event.nopopup){
+						if(lib.translate[event.card.name+'_pop']){
+							player.tryCardAnimate(card,lib.translate[event.card.name+'_pop'],'metal');
 						}
-					}
+						else{
+							player.tryCardAnimate(card,event.card.name,'metal');
+						}
+					}	
 					if(event.audio===false){
 						cardaudio=false;
 					}
@@ -13890,21 +13921,7 @@
 					if(!info.direct){
 						game.log(player,str,'【'+get.skillTranslation(skill,player)+'】');
 						if(info.logv!==false) game.logv(player,skill,targets);
-						if(lib.config.skill_animation_type!='off'&&lib.skill[skill]&&lib.skill[skill].skillAnimation){
-							if(lib.config.skill_animation_type=='default'){
-								checkShow=checkShow||'main';
-							}
-							else{
-								checkShow=false;
-							}
-							if(lib.skill[skill].textAnimation){
-								checkShow=false;
-							}
-							player.$skill(lib.skill[skill].animationStr||lib.translate[skill],lib.skill[skill].skillAnimation,lib.skill[skill].animationColor,checkShow);
-						}
-						else{
-							player.popup(get.skillTranslation(skill,player));
-						}
+						player.trySkillAnimate(skill,skill,checkShow);
 					}
 					if(event.addCount!=false){
 						if(player.stat[player.stat.length-1].skill[skill]==undefined){
@@ -14121,9 +14138,7 @@
 							lib.skill[event.skill].onrespond(event,player);
 						}
 					}
-					else if(!event.nopopup&&lib.config.show_card_prompt&&!lib.config.hide_card_prompt_basic){
-						player.popup(card.name,'wood');
-					}
+					else if(!event.nopopup) player.tryCardAnimate(card,card.name,'wood');
 					if(cardaudio&&event.getParent(3).name=='useCard'){
 						game.broadcastAll(function(player,card){
 							if(lib.config.background_audio){
@@ -15323,6 +15338,44 @@
 			},
 			player:{
 				//新函数
+				trySkillAnimate:function(name,popname,checkShow){
+					if(!game.online&&lib.config.skill_animation_type!='off'&&lib.skill[name]&&lib.skill[name].skillAnimation){
+						if(lib.config.skill_animation_type=='default'){
+							checkShow=checkShow||'main';
+						}
+						else{
+							checkShow=false;
+						}
+						if(lib.skill[name].textAnimation){
+							checkShow=false;
+						}
+						this.$skill(lib.skill[name].animationStr||lib.translate[name],lib.skill[name].skillAnimation,lib.skill[name].animationColor,checkShow);
+						return;
+					}
+					var player=this;
+					game.broadcast(function(player,name,popname){
+ 					player.trySkillAnimate(name,popname);
+ 				},player,name,popname);
+					if(lib.animate.skill[name]) lib.animate.skill[name].apply(this,arguments);
+					else{
+ 					if(popname!=name) this.popup(name,'water',false);
+ 					else this.popup(get.skillTranslation(name,this),'water',false);
+					}
+				},
+				tryCardAnimate:function(card,name,nature,popname){
+					var player=this;
+					game.broadcast(function(player,card,name,nature,popname){
+ 					player.tryCardAnimate(card,name,nature,popname);
+ 				},player,card,name,nature,popname);
+					if(lib.animate.card[card.name]) lib.animate.card[card.name].apply(this,arguments);
+					else {
+						if(!lib.config.show_card_prompt) return;
+						if(get.type(card)=='equip'&&lib.config.hide_card_prompt_equip) return;
+						if(get.type(card)=='basic'&&lib.config.hide_card_prompt_basic) return;
+						if(popname) player.popup({name:card.name,nature:card.nature},nature,false);
+						else player.popup(name,nature,false);
+					}
+				},
 				hasUsableCard:function(name){
 					var player=this;
 					if(player.countCards('h',name)) return true;
@@ -18981,26 +19034,14 @@
 				logSkill:function(name,targets,nature,logv){
 					if(get.itemtype(targets)=='player') targets=[targets];
 					var nopop=false;
+					var popname=name;
 					if(Array.isArray(name)){
-						this.popup(name[1]);
+						popname=name[1];
 						name=name[0];
-						nopop=true;
 					}
 					var checkShow=this.checkShow(name);
 					if(lib.translate[name]){
-						if(lib.config.skill_animation_type!='off'&&lib.skill[name]&&lib.skill[name].skillAnimation){
-							if(lib.config.skill_animation_type=='default'){
-								checkShow=checkShow||'main';
-							}
-							else{
-								checkShow=false;
-							}
-							if(lib.skill[name].textAnimation){
-								checkShow=false;
-							}
-							this.$skill(lib.skill[name].animationStr||lib.translate[name],lib.skill[name].skillAnimation,lib.skill[name].animationColor,checkShow);
-						}
-						else if(!nopop) this.popup(get.skillTranslation(name,this));
+						this.trySkillAnimate(name,popname,checkShow);
 						if(typeof targets=='object'&&targets.length){
 							var str='对<span class="bluetext">'+(targets[0]==this?'自己':get.translation(targets[0]));
 							for(var i=1;i<targets.length;i++){
@@ -19096,10 +19137,10 @@
 						node.classList.add(className);
 					}
 				},
-				popup:function(name,className){
+				popup:function(name,className,nobroadcast){
 					var name2=get.translation(name);
 					if(!name2) return;
-					this.$damagepop(name2,className||'water',true);
+					this.$damagepop(name2,className||'water',true,nobroadcast);
 				},
 				popup_old:function(name,className){
 					var name2=get.translation(name);
@@ -22140,10 +22181,10 @@
 						node.style.transform='scale(1.5)'
 					},avatar?1600:1000);
 				},
-				$damagepop:function(num,nature,font){
+				$damagepop:function(num,nature,font,nobroadcast){
 					if(typeof num=='number'||typeof num=='string'){
 						game.addVideo('damagepop',this,[num,nature,font]);
-						game.broadcast(function(player,num,nature,font){
+						if(!nobroadcast) game.broadcast(function(player,num,nature,font){
 							player.$damagepop(num,nature,font);
 						},this,num,nature,font);
 						var node=ui.create.div('.damage');
@@ -22822,6 +22863,10 @@
 				}
 			},
 			event:{
+				changeToZero:function(){
+					this.num=0;
+					this.numFixed=true;
+				},
 				finish:function(){
 					this.finished=true;
 				},
@@ -23096,7 +23141,6 @@
  						var info=lib.skill[skillx];
  						var bool=false;
  						for(var i in info.trigger){
- 							if(i!='global'&&trigger[i]!=player) continue;
  							if(filter(info.trigger[i])){bool=true;break}
  						}
  						if(!bool) return;
@@ -23245,21 +23289,19 @@
 									if(info&&info.trigger){
 										var trigger=info.trigger;
 										var add=false;
-										if(player===event.player&&trigger.player){
+										if(trigger.player){
 											if(typeof trigger.player==='string'){
 												if(trigger.player===name) add=true;
 											}
 											else if(trigger.player.contains(name)) add=true;
 										}
-										if((player===event.target||
-											(event.multitarget&&event.targets&&event.targets.contains(player)))&&
-											trigger.target){
+										if(trigger.target){
 											if(typeof trigger.target==='string'){
 												if(trigger.target===name) add=true;
 											}
 											else if(trigger.target.contains(name)) add=true;
 										}
-										if(player===event.source&&trigger.source){
+										if(trigger.source){
 											if(typeof trigger.source==='string'){
 												if(trigger.source===name) add=true;
 											}
@@ -23280,18 +23322,16 @@
 						}
 						else{
 							for(var i=0;i<roles.length;i++){
-								if(event[roles[i]]===player){
-									var triggername=player.playerid+'_'+roles[i]+'_'+name;
-									if(lib.hook[triggername]){
-										for(var j=0;j<lib.hook[triggername].length;j++){
-											addList(lib.hook[triggername][j],player);
-										}
+								var triggername=player.playerid+'_'+roles[i]+'_'+name;
+								if(lib.hook[triggername]){
+									for(var j=0;j<lib.hook[triggername].length;j++){
+										addList(lib.hook[triggername][j],player);
 									}
-									triggername=roles[i]+'_'+name;
-									if(lib.hook.globalskill[triggername]){
-										for(var j=0;j<lib.hook.globalskill[triggername].length;j++){
-											addList(lib.hook.globalskill[triggername][j],player);
-										}
+								}
+								triggername=roles[i]+'_'+name;
+								if(lib.hook.globalskill[triggername]){
+									for(var j=0;j<lib.hook.globalskill[triggername].length;j++){
+										addList(lib.hook.globalskill[triggername][j],player);
 									}
 								}
 							}
@@ -23710,6 +23750,19 @@
 				if(info.noHidden&&!fullskills.contains(skill)){
 					return false;
 				}
+				if(!info.trigger) return false;
+				var bool=false;
+				var has=function(obj){
+					if(typeof obj=='string') return obj==name;
+					else if(obj.contains(name)) return true;
+					return false;
+				}
+				for(var i in info.trigger){
+					if((i=='global'||player==event[i])&&has(info.trigger[i])){
+						bool=true;break;
+					}
+				}
+				if(!bool) return false;
 				if(info.filter&&!info.filter(event,player,name)){
 					return false;
 				}
@@ -23960,7 +24013,7 @@
 						var range2=player.getAttackRange();
 						if(range2<=0) return false;
 						var distance=get.distance(player,target)+extra;
-						if(outrange[i]>distance-range2) return false;
+						if(outrange[i]>distance-range2+1) return false;
 					}
 					else{
 						var distance=get.distance(player,target,i)+extra;
@@ -30300,6 +30353,21 @@
 					var selectableCards=false;
 					if(range[0]!=range[1]||range[0]>1) auto=false;
 					for(i=0;i<cards.length;i++){
+						if(lib.config.cardtempname!='off'){
+ 						var cardname=get.name(cards[i]);
+ 						if(cards[i].name!=cardname){
+ 							if(!cards[i]._tempName) cards[i]._tempName=ui.create.div('.tempname',cards[i]);
+ 							var tempname=get.translation(cardname);
+ 							cards[i]._tempName.dataset.nature='fire';
+ 							if(cardname=='sha'){
+ 								var nature=get.nature(cards[i]);
+ 								if(nature) tempname=get.translation(nature)+tempname;
+ 								if(nature=='thunder') cards[i]._tempName.dataset.nature='thunder';
+ 							}
+ 							cards[i]._tempName.innerHTML=lib.config.cardtempname=='default'?get.verticalStr(tempname):tempname;
+ 							cards[i]._tempName.tempname=tempname;
+ 						}
+						}
 						var nochess=true;
 						if(!lib.filter.cardAiIncluded(cards[i])){
 							nochess=false;
@@ -30633,6 +30701,10 @@
 				for(j=0;j<cards.length;j++){
 					cards[j].classList.remove('selected');
 					cards[j].classList.remove('selectable');
+					if(cards[j]._tempName){
+						cards[j]._tempName.delete();
+						delete cards[j]._tempName;
+					}
 					cards[j].updateTransform();
 				}
 				ui.selected.cards.length=0;
@@ -36891,15 +36963,11 @@
 								['female','女'],
 								['none','无'],
 							],null,ui.create.div('.indent','性别：',newCharacter));
-							var groups=ui.create.selectlist([
-								['wei','魏'],
-								['shu','蜀'],
-								['wu','吴'],
-								['qun','群'],
-								['shen','神'],
-								['western','西'],
-								['key','键'],
-							],null,ui.create.div('.indent','势力：',newCharacter));
+							var grouplist=[];
+							for(var i=0;i<lib.group.length;i++){
+								grouplist.push([lib.group[i],get.translation(lib.group[i])]);
+							};
+							var groups=ui.create.selectlist(grouplist,null,ui.create.div('.indent','势力：',newCharacter));
 							var options=ui.create.div('.add_skill.options','<span>主公<input type="checkbox" name="zhu"></span><span>BOSS<input type="checkbox" name="boss"></span><span>AI禁选<input type="checkbox" name="forbidai"></span><br>',newCharacter);
 							var addSkill=ui.create.div('.add_skill','添加技能<br>',newCharacter);
 							var list=[];
@@ -49816,7 +49884,7 @@
 					uiintro.add('<div class="text center">'+get.translation(node.skill,'skill')+'</div>');
 					uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+get.translation(node.skill,'info')+'</div>');
 				}
-				if(node.targets&&node.targets.length){
+				if(node.targets&&get.itemtype(node.targets)=='players'){
 					uiintro.add('<div class="text center">目标</div>');
 					uiintro.addSmall(node.targets);
 				}

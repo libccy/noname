@@ -331,7 +331,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xuanzhen:{
-				trigger:{global:'useCard'},
+				trigger:{global:'useCard1'},
 				round:1,
 				filter:function(event,player){
 					if(event.targets.length!=1) return false;
@@ -391,9 +391,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.card=card;
 						game.log(player,'将',trigger.card,'变为',card);
 						// if(!event.isMine()) game.delayx();
-						trigger.untrigger();
-						trigger.card=card;
+						trigger.card=get.autoViewAs(card);
 						trigger.cards=[card];
+						game.cardsGotoOrdering(card).relatedEvent=trigger;
 					}
 					else{
 						event.finish();
@@ -407,8 +407,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.line(trigger.player,'green');
 					}
 					game.delayx(0.5);
-					'step 3'
-					trigger.trigger('useCard');
 				},
 				ai:{
 					threaten:function(player,target){

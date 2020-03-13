@@ -2,7 +2,7 @@
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'tw',
-		connect:false,
+		connect:true,
 		characterSort:{
 			tw:{
 				tw_mobile:['tw_beimihu','nashime'],
@@ -26,7 +26,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		card:{
 		},
-		characterFilter:{},
+		characterFilter:{
+			nashime:function(mode){
+				return mode!='guozhan';
+			},
+			tw_xiahouba:function(mode){
+				return mode!='guozhan';
+			},
+		},
 		skill:{
 			twrangyi:{
 				audio:2,
@@ -392,7 +399,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var choiceList=['令一名其他角色与你各摸一张牌','令自己下个出牌阶段可以多发动一次【外使】'];
-					if(lib.skill.chijie.filter({},player)) choiceList.push('将自己的势力变更为场上存在的一个其他势力');
+					if(lib.skill.chijie.filter&&lib.skill.chijie.filter({},player)) choiceList.push('将自己的势力变更为场上存在的一个其他势力');
 					player.chooseControl('cancel2').set('prompt',get.prompt('renshe')).set('choiceList',choiceList).set('ai',function(){
 						if(game.hasPlayer(function(current){
 							return get.attitude(player,current)>0||current.hasSkillTag('nogain');

@@ -308,6 +308,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseDrawBegin1'},
 				direct:true,
+				filter:function(event,player){
+					return !event.numFixed;
+				},
 				content:function(){
 					"step 0"
 					var check;
@@ -327,7 +330,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.logSkill('tuxi',result.targets);
 						player.gainMultiple(result.targets);
-						trigger.cancel(null,null,'notrigger');
+						trigger.changeToZero();
 					}
 					else{
 						event.finish();
@@ -349,6 +352,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return game.hasPlayer(function(current){
 						return get.attitude(player,current)<0&&player.canUse('sha',current);
 					});
+				},
+				filter:function(event,player){
+					return !event.numFixed&&event.num>0;
 				},
 				content:function(){
 					player.addTempSkill('luoyi2','phaseJieshuBegin');
@@ -1812,6 +1818,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['sp_lvmeng'],
 				trigger:{player:'phaseDrawBegin2'},
 				frequent:true,
+				filter:function(event,player){
+					return !event.numFixed;
+				},
 				content:function(){
 					trigger.num++;
 				},

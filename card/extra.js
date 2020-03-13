@@ -118,7 +118,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								if(player.getActCount()+1>=player.actcount) return 0;
 							}
 							var shas=player.getCards('h','sha');
-							if(shas.length>1&&player.getCardUsable('sha')>1){
+							if(shas.length>1&&(player.getCardUsable('sha')>1||player.countCards('h','zhuge'))){
 								return 0;
 							}
 							var card;
@@ -742,6 +742,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(!trigger.baseDamage) trigger.baseDamage=1;
 					trigger.baseDamage+=player.storage.jiu;
 					trigger.jiu=true;
+					trigger.jiu_add=player.storage.jiu;
 					game.addVideo('jiuNode',player,false);
 					game.broadcastAll(function(player){
 						player.removeSkill('jiu');

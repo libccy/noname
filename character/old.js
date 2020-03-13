@@ -80,10 +80,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			old_fuhun:{
 				audio:'fuhun',
-				trigger:{player:'phaseDrawBefore'},
+				trigger:{player:'phaseDrawBegin1'},
+				filter:function(event,player){
+					return !event.numFixed;
+				},
 				content:function(){
 					'step 0'
-					trigger.cancel();
+					trigger.changeToZero();
 					'step 1'
 					var cards=get.cards(2);
 					event.cards=cards;

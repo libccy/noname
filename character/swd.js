@@ -2754,9 +2754,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						trigger.target=player;
-						trigger.untrigger();
-						trigger.trigger('useCardToBefore');
-						trigger.trigger('shaBefore');
 						player.addSkill('hzhenwei2');
 						game.delay();
 					}

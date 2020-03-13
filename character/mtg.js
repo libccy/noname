@@ -158,9 +158,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							trigger.target=player.storage.mhuanyi_target[0];
-							trigger.untrigger();
-							trigger.trigger('useCardToBefore');
-							trigger.trigger(trigger.card.name+'Before');
 							player.removeSkill('mhuanyi_target');
 						}
 					},

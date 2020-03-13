@@ -4035,8 +4035,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.logSkill('nsdufu',result.targets);
 						trigger.source=result.targets[0];
-						trigger.untrigger();
-						trigger.trigger('damageBefore');
 					}
 				}
 			},
