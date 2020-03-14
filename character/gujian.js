@@ -1006,7 +1006,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filter:function(event,player){
 							if(get.is.converted(event)) return false;
 							if(!player.countCards('he')) return false;
-							if(event.card.zhenying_link) return true;
+							if(event.cards[0]&&event.cards[0].zhenying_link) return true;
 							return false;
 						},
 						popup:false,

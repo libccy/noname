@@ -7,11 +7,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			mobile:{
 				mobile_default:["miheng","taoqian","liuzan","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui"],
-				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","xin_yuanshao","re_liushan"],
+				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","xin_yuanshao","re_liushan","xin_xiahoudun"],
 				mobile_sunben:["re_sunben"],
 			},
 		},
 		character:{
+			xin_xiahoudun:['male','wei',4,['reganglie','xinqingjian']],
 			zhangyì:['male','shu',4,['zhiyi']],
 			jiakui:['male','wei',3,['zhongzuo','wanlan']],
 			re_jikang:["male","wei",3,["new_qingxian","new_juexiang"]],
@@ -90,6 +91,71 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		skill:{
+			xinqingjian:{
+				audio:'qingjian',
+				trigger:{player:'gainEnd'},
+				direct:true,
+				usable:1,
+				filter:function(event,player){
+					return event.getParent('phaseDraw').player!=player&&player.countCards('he')>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseCard(get.prompt2('xinqingjian'),'he',[1,player.countCards('he')]).ai=function(){return -1};
+					'step 1'
+					if(result.bool){
+						player.addSkill('xinqingjian2');
+						player.storage.xinqingjian2.addArray(result.cards);
+						game.log(player,'将'+get.cnNumber(player.lose(result.cards,ui.special,'toStorage').cards.length)+'张牌置于其武将牌上');
+						player.markSkill('xinqingjian2');
+					}
+					else player.storage.counttrigger.xinqingjian--;
+				},
+			},
+			xinqingjian2:{
+				audio:'xinqingjian',
+				charlotte:true,
+				trigger:{global:'phaseEnd'},
+				forced:true,
+				filter:function(event,player){
+					return player.storage.xinqingjian2&&player.storage.xinqingjian2.length>0;
+				},
+				init:function(player){
+					if(!player.storage.xinqingjian2) player.storage.xinqingjian2=[];
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(true,lib.filter.notMe).set('createDialog',['清俭：选择一名角色获得这些牌'+(player.storage.xinqingjian2.length>1?'，然后摸一张牌':''),player.storage.xinqingjian2]);
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target,'thunder');
+						if(target.gain(player.storage.xinqingjian2,player,'giveAuto','fromStorage').cards.length>1) player.draw();
+						player.storage.xinqingjian2.length=0;
+						player.removeSkill('xinqingjian2');
+					}
+				},
+				intro:{
+					onunmark:'throw',mark:function(dialog,content,player){
+						if(content&&content.length){
+							if(player==game.me||player.isUnderControl()){
+								dialog.addAuto(content);
+							}
+							else{
+								return '共有'+get.cnNumber(content.length)+'张牌';
+							}
+						}
+					},
+					content:function(content,player){
+						if(content&&content.length){
+							if(player==game.me||player.isUnderControl()){
+								return get.translation(content);
+							}
+							return '共有'+get.cnNumber(content.length)+'张牌';
+						}
+					}
+				},
+			},
 			zhongzuo:{
 				audio:2,
 				trigger:{global:'phaseEnd'},
@@ -121,7 +187,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				limited:true,
 				unique:true,
 				filter:function(event,player){
-					return event.player.hp<=0&&player.countCards('h')>0;
+					return event.player.hp<=0;
 				},
 				skillAnimation:true,
 				animationColor:'thunder',
@@ -129,7 +195,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.awakenSkill('wanlan');
-					player.discard(player.getCards('h'));
+					var hs=player.getCards('h')
+					if(hs.length) player.discard(hs);
 					'step 1'
 					var num=1-trigger.player.hp;
 					if(num) trigger.player.recover(num);
@@ -1784,6 +1851,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		translate:{
+			xin_xiahoudun:'手杀夏侯惇',
+			xinqingjian:'清俭',
+			xinqingjian2:'清俭',
+			xinqingjian_info:'每回合限一次。当你不因摸牌阶段的额定摸牌而获得牌时，你可以将任意张牌扣置于武将牌上。回合结束时，你将这些牌交给一名其他角色。若这些牌的数量大于1，你摸一张牌。',
 			zhangyì:'张翼',
 			jiakui:'贾逵',
 			zhiyi:'执义',

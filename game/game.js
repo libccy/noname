@@ -11940,7 +11940,7 @@
 						if(!event.card2){
 							if(event.resultOL[target.playerid].skill&&lib.skill[event.resultOL[target.playerid].skill]&&lib.skill[event.resultOL[target.playerid].skill].onCompare){
 								target.logSkill(event.resultOL[target.playerid].skill);
-								event.resultOL[target.playerid].cards=lib.skill[target.resultOL[target.playerid].skill].onCompare(player);
+								event.resultOL[target.playerid].cards=lib.skill[event.resultOL[target.playerid].skill].onCompare(player);
 							}
 							event.card2=event.resultOL[target.playerid].cards[0];
 						}
@@ -11950,6 +11950,7 @@
 					}
 					catch(e){
 						console.log(e);
+						game.print(e);
 						event.finish();
 						return;
 					}
@@ -12432,7 +12433,10 @@
 					if(event.isMine()){
 						game.check();
 						game.pause();
-						if(event.prompt!=false){
+						if(event.createDialog&&!event.dialog&&Array.isArray(event.createDialog)){
+ 						event.dialog=ui.create.dialog.apply(this,event.createDialog);
+ 					}
+						else if(event.prompt!=false){
 							var str;
 							if(typeof event.prompt=='string') str=event.prompt;
 							else{
@@ -22184,7 +22188,7 @@
 				$damagepop:function(num,nature,font,nobroadcast){
 					if(typeof num=='number'||typeof num=='string'){
 						game.addVideo('damagepop',this,[num,nature,font]);
-						if(!nobroadcast) game.broadcast(function(player,num,nature,font){
+						if(nobroadcast!==false) game.broadcast(function(player,num,nature,font){
 							player.$damagepop(num,nature,font);
 						},this,num,nature,font);
 						var node=ui.create.div('.damage');
@@ -26020,7 +26024,7 @@
 		checkFileList:function(updates,proceed){
 			var n=updates.length;
 			if(!n){
-				proceed();
+				proceed(n);
 			}
 			for(var i=0;i<updates.length;i++){
 				if(lib.node&&lib.node.fs){
@@ -26049,18 +26053,20 @@
 					}(updates[i])));
 				}
 				else{
-					resolveLocalFileSystemURL(lib.assetURL+updates[i],function(entry){
-						n--;
-						updates.remove(entry.toURL().slice(lib.assetURL.length));
-						if(n==0){
-							proceed();
-						}
-					},function(){
-						n--;
-						if(n==0){
-							proceed();
-						}
-					});
+					resolveLocalFileSystemURL(lib.assetURL+updates[i],(function(name){
+ 					return function(entry){
+ 						n--;
+ 						updates.remove(name);
+ 						if(n==0){
+ 							proceed();
+ 						}
+ 					}
+					}(updates[i])),function(){
+ 					n--;
+ 					if(n==0){
+ 						proceed();
+ 					}
+ 				});
 				}
 			}
 		},
@@ -39165,6 +39171,7 @@
 
 									var proceed=function(){
 										if(updates.length==0){
+											game.print(updates);
 											game.saveConfig('asset_version',asset_version);
 											alert('素材已是最新');
 											button2.disabled=false;
@@ -39751,7 +39758,7 @@
 						node.link=page;
 						page.classList.add('menu-sym');
 						menuUpdates.push(function(){
-							if(false){
+							if(_status.connectMode){
 								node.classList.add('off');
 								if(node.classList.contains('active')){
 									node.classList.remove('active');

@@ -3931,8 +3931,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			jubao:{
 				mod:{
-					canBeGained:function(card){
-						if(get.position(card)=='e'&&get.subtype(card)=='equip5') return false;
+					canBeGained:function(card,source,player){
+						if(source!=player&&get.position(card)=='e'&&get.subtype(card)=='equip5') return false;
 					}
 				},
 				trigger:{player:'phaseJieshuBegin'},

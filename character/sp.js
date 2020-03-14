@@ -1607,7 +1607,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'useCardAfter'},
 				audio:'xpchijie',
 				filter:function(event,player){
-					return event.targets.contains(player)&&!player.hasSkill('xpchijie4')&&event.cards.filterInD().length>0&&!game.hasPlayer2(function(current){
+					return event.player!=player&&event.targets.contains(player)&&!player.hasSkill('xpchijie4')&&event.cards.filterInD().length>0&&!game.hasPlayer2(function(current){
 						return current.getHistory('damage',function(evt){
 							return evt.card==event.card;
 						}).length>0;
@@ -3374,6 +3374,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//新服曹笨
 			xinshanjia:{
 				group:["xinshanjia_count"],
+				locked:false,
+				mod:{
+					aiValue:function(player,card,num){
+						if((player.storage.xinshanjia||0)<3&&get.position(card)=='e') return num/1.5;
+					},
+				},
 				subSkill:{
 					count:{
 						forced:true,
@@ -4690,6 +4696,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!target.storage.xianfu_mark) target.storage.xianfu_mark=[];
 								target.storage.xianfu_mark.add(player);
 								target.storage.xianfu_mark.sortBySeat();
+								target.markSkill('xianfu_mark');
 								target.draw(2);
 							}
 							else{
@@ -9857,7 +9864,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('h')-player.countCards('h',{type:'equip'})<=player.hp;
 				},
 				filter:function(event,player){
-					if(!event.numFixed||player.storage.tunchu&&player.storage.tunchu.length) return false;
+					if(event.numFixed||player.storage.tunchu&&player.storage.tunchu.length) return false;
 					return true;
 				},
 				content:function(){
@@ -10692,12 +10699,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'useCardToPlayered',
 				},
 				filter:function(event,player){
-					if(!['sha','juedou'].contains(event.card.name)) return false;
+					if(event.targets.length!=1||!['sha','juedou'].contains(event.card.name)) return false;
 					var evt2=event.getParent('phaseUse');
 					if(evt2.player!=player) return false;
 					return player.getHistory('useCard',function(evt){
 						return ['sha','juedou'].contains(evt.card.name)&&evt.getParent('phaseUse')==evt2;
-					}).indexOf(event)==0;
+					}).indexOf(event.getParent())==0;
 				},
 				direct:true,
 				content:function(){
