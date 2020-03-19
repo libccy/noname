@@ -2424,7 +2424,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var nofour=!player.hasFriend();
 					if(player.storage.bizhuan.length==4){
 						var suits=['club','spade','heart','diamond'];
-						var list=player.getCards('h').concat(player.storage.bizhuan);
+						var list=player.getCards('he').concat(player.storage.bizhuan);
 						for(var i=0;i<list.length;i++){
 							suits.remove(get.suit(list[i]));
 							if(suits.length==0){
@@ -2440,7 +2440,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							suits2.remove(get.suit(player.storage.bizhuan[i]));
 						}
 					}
-					player.chooseCard('选择任意张手牌与“书”交换',[1,Math.min(player.countCards('h'),player.storage.bizhuan.length)]).set('ai',function(card){
+					player.chooseCard('选择任意张牌与“书”交换',[1,Math.min(player.countCards('he'),player.storage.bizhuan.length)],'he').set('ai',function(card){
 						var val=get.value(card);
 						if(_status.event.four&&!_status.event.nofour){
 							var suits=_status.event.suits2.slice(0);
@@ -3374,7 +3374,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.preserve) return false;
 					if(player==event.player){
-						if(event.card1.number>event.card2.number){
+						if(event.num1>event.num2){
 							return !get.owner(event.card2);
 						}
 						else{
@@ -3382,7 +3382,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else{
-						if(event.card1.number<event.card2.number){
+						if(event.num1<event.num1){
 							return !get.owner(event.card1);
 						}
 						else{
@@ -3392,7 +3392,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				check:function(event,player){
 					if(player==event.player){
-						if(event.card1.number>event.card2.number){
+						if(event.num1>event.num2){
 							return event.card2.name!='du';
 						}
 						else{
@@ -3400,7 +3400,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else{
-						if(event.card1.number<event.card2.number){
+						if(event.num1<event.num2){
 							return event.card1.name!='du';
 						}
 						else{
@@ -3410,19 +3410,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					if(player==trigger.player){
-						if(trigger.card1.number>trigger.card2.number){
-							player.gain(trigger.card2,'gain2');
+						if(trigger.num1>trigger.num2){
+							player.gain(trigger.card2,'gain2','log');
 						}
 						else{
-							player.gain(trigger.card1,'gain2');
+							player.gain(trigger.card1,'gain2','log');
 						}
 					}
 					else{
-						if(trigger.card1.number<trigger.card2.number){
-							player.gain(trigger.card1,'gain2');
+						if(trigger.num1<trigger.num2){
+							player.gain(trigger.card1,'gain2','log');
 						}
 						else{
-							player.gain(trigger.card2,'gain2');
+							player.gain(trigger.card2,'gain2','log');
 						}
 					}
 				}

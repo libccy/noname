@@ -609,7 +609,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					var capt=get.translation(target)+'选择了'+get.translation(button.link);
 					if(card){
-						target.gain(card);
+						target.gain(card,'visible');
 						target.$gain2(card);
 						game.broadcast(function(card,id,name,capt){
 							var dialog=get.idDialog(id);
@@ -701,7 +701,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					basic:{
-						order:1,
+						order:function(){
+							return get.order({name:'tao'})+0.1;
+						},
 						useful:[3,1],
 						value:0
 					},

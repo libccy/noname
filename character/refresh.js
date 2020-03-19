@@ -4,13 +4,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'refresh',
 		characterSort:{
 			refresh:{
-    refresh_standard:["re_caocao","re_simayi","re_guojia","re_lidian","re_zhangliao","re_xuzhu","re_xiahoudun","re_zhangfei","re_zhaoyun","re_guanyu","re_machao","re_xushu","re_zhouyu","re_lvmeng","re_ganning","re_luxun","re_daqiao","re_huanggai","re_lvbu","re_gongsunzan","re_huatuo","re_liubei","re_diaochan","re_huangyueying","re_sunquan","re_sunshangxiang","re_zhenji","re_zhugeliang","re_huaxiong"],
-    refresh_feng:['caoren','re_xiahouyuan','re_huangzhong','re_weiyan','re_xiaoqiao','zhoutai','re_zhangjiao','xin_yuji'],
+				refresh_standard:["re_caocao","re_simayi","re_guojia","re_lidian","re_zhangliao","re_xuzhu","re_xiahoudun","re_zhangfei","re_zhaoyun","re_guanyu","re_machao","re_xushu","re_zhouyu","re_lvmeng","re_ganning","re_luxun","re_daqiao","re_huanggai","re_lvbu","re_gongsunzan","re_huatuo","re_liubei","re_diaochan","re_huangyueying","re_sunquan","re_sunshangxiang","re_zhenji","re_zhugeliang","re_huaxiong"],
+				refresh_feng:['caoren','re_xiahouyuan','re_huangzhong','re_weiyan','re_xiaoqiao','zhoutai','re_zhangjiao','xin_yuji'],
 				refresh_huo:["re_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","re_pangtong","ol_yuanshao","re_pangde"],
 				refresh_lin:['re_zhurong','re_menghuo','re_dongzhuo','re_sunjian','re_caopi','re_xuhuang'],
 				refresh_shan:['re_dengai','re_jiangwei','re_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce'],
 				refresh_yijiang:['re_xusheng','re_wuguotai','re_gaoshun'],
-   },
+		 },
 		},
 		connect:true,
 		character:{
@@ -1447,13 +1447,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
 					get.translation(trigger.player.judging[0])+'，'+get.prompt('xinguidao'),'he',function(card){
-  				if(get.color(card)!='black') return false;
-  				var player=_status.event.player;
-  				var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
-  				if(mod2!='unchanged') return mod2;
-  				var mod=game.checkMod(card,player,'unchanged','cardRespondable',player);
-  				if(mod!='unchanged') return mod;
-  				return true;
+						if(get.color(card)!='black') return false;
+						var player=_status.event.player;
+						var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+						if(mod2!='unchanged') return mod2;
+						var mod=game.checkMod(card,player,'unchanged','cardRespondable',player);
+						if(mod!='unchanged') return mod;
+						return true;
 					}).set('ai',function(card){
 						var trigger=_status.event.getTrigger();
 						var player=_status.event.player;
@@ -1836,18 +1836,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_yajiao":{
 				audio:"reyajiao",
 				trigger:{
-					player:["respond","useCard"],
+					player:"loseEnd",
 				},
 				frequent:true,
 				filter:function (event,player){
-					return player!=_status.currentPhase&&get.itemtype(event.cards)=='cards';
+					return player!=_status.currentPhase&&event.hs&&event.hs.length>0&&['useCard','respond'].contains(event.getParent().name);
 				},
 				content:function (){
 					"step 0"
 					event.card=get.cards();
 					player.showCards(event.card);
 					event.same=false;
-					if(get.type(event.card[0],'trick')==get.type(trigger.card,'trick')) event.same=true;
+					if(get.type(event.card[0],'trick')==get.type(trigger.getParent().card,'trick')) event.same=true;
 					player.chooseTarget('选择获得此牌的角色',true).set('ai',function(target){
 						var att=get.attitude(_status.event.player,target);
 						if(_status.event.du){
@@ -2238,7 +2238,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					else{
-						player.gain(event.card2,target,'give');
+						player.gain(event.card2,target,'give','bySelf');
 						if(target.hp<target.maxHp){
 							player.chooseBool('是否让目标回复一点体力？').ai=function(event,player){
 								return get.recoverEffect(target,player,player)>0;
@@ -3032,7 +3032,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard'},
 				frequent:true,
 				filter:function(event){
-					return (get.type(event.card,'trick')=='trick'&&event.card.isCard);
+					return (get.type(event.card)=='trick'&&event.card.isCard);
 				},
 				init:function(player){
 					player.storage.rejizhi=0;
@@ -3354,12 +3354,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
 					get.translation(trigger.player.judging[0])+'，'+get.prompt('reguicai'),'he',function(card){
-  				var player=_status.event.player;
-  				var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
-  				if(mod2!='unchanged') return mod2;
-  				var mod=game.checkMod(card,player,'unchanged','cardRespondable',player);
-  				if(mod!='unchanged') return mod;
-  				return true;
+						var player=_status.event.player;
+						var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+						if(mod2!='unchanged') return mod2;
+						var mod=game.checkMod(card,player,'unchanged','cardRespondable',player);
+						if(mod!='unchanged') return mod;
+						return true;
 					}).set('ai',function(card){
 						var trigger=_status.event.getTrigger();
 						var player=_status.event.player;
@@ -4487,15 +4487,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.chooseTarget(get.prompt('fenwei'),
 						[1,trigger.targets.length],function(card,player,target){
-						var evt=_status.event.getTrigger().getParent();
-						return evt.targets.contains(target)&&!evt.excluded.contains(target);
+						return _status.event.contains(target);
 					}).set('ai',function(target){
 						var trigger=_status.event.getTrigger();
-						if(game.phaseNumber>game.players.length*2&&trigger.targets.length>=game.players.length-1){
+						if(game.phaseNumber>game.players.length*2&&trigger.targets.length>=game.players.length-1&&!trigger.excluded.contains(target)){
 							return -get.effect(target,trigger.card,trigger.player,_status.event.player);
 						}
 						return -1;
-					});
+					}).set('targets',trigger.targets);
 					"step 1"
 					if(result.bool){
 						player.awakenSkill('fenwei');

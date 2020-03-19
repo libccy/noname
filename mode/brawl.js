@@ -1057,18 +1057,50 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									setTimeout(function(){	
 										ui.arena.classList.remove('choose-character');
 									},500);
+									_status.videoInited=true;
+									game.addVideo('arrangeLib',null,{
+										card:{
+											hhzz_toulianghuanzhu:{
+												cardimage:"toulianghuanzhu",
+											},
+											hhzz_fudichouxin:{
+												cardimage:"fudichouxin",
+											},
+										},
+										character:{
+											hhzz_shiona:['female','key',1,['hhzz_huilei']],
+											hhzz_kanade:['female','key',2,['hhzz_youlian']],
+											hhzz_takaramono1:['male','qun',5,['hhzz_jubao','hhzz_huizhen']],
+											hhzz_takaramono2:['male','qun',3,['hhzz_jubao','hhzz_zhencang']],
+										},
+										translate:{
+											nei:' ',
+											nei2:' ',
+											hhzz_shiona:'汐奈',
+											hhzz_kanade:'立华奏',
+											hhzz_takaramono1:'坚实宝箱',
+											hhzz_takaramono2:'普通宝箱',
+   								hhzz_toulianghuanzhu:'偷梁换柱',
+   								hhzz_fudichouxin:'釜底抽薪',
+   								hhzz_toulianghuanzhu_info:'出牌阶段，对一名角色使用，随机更换其一个技能。可重铸。',
+   								hhzz_fudichouxin_info:'出牌阶段，对一名角色使用，随机弃置其一个技能。',
+										},
+									});
 								});
 							},
 						},
 					};
-					for(var i in pack.pack){
-						for(var j in pack.pack[i]) lib[i][j]=pack.pack[i][j];
+					var func=function(pack){
+ 					for(var i in pack.pack){
+ 						for(var j in pack.pack[i]) lib[i][j]=pack.pack[i][j];
+ 					}
+ 					for(var i in pack.eltc) lib.element.content[i]=pack.eltc[i];
+ 					for(var i in pack.eltp) lib.element.player[i]=pack.eltp[i];
+ 					for(var i in pack.game) game[i]=pack.game[i];
+ 					for(var i in pack.get) get[i]=pack.get[i];
+ 					lib.huanhuazhizhan=pack;
 					}
-					for(var i in pack.eltc) lib.element.content[i]=pack.eltc[i];
-					for(var i in pack.eltp) lib.element.player[i]=pack.eltp[i];
-					for(var i in pack.game) game[i]=pack.game[i];
-					for(var i in pack.get) get[i]=pack.get[i];
-					lib.huanhuazhizhan=pack;
+					func(pack);
 					},
 				},
 			},

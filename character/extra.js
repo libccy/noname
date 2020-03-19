@@ -2498,7 +2498,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				filter:function(event,player){
-					return player.hasMark('drlt_jieying_mark')&&game.hasPlayer(function(current){
+					return !event.numFixed&&player.hasMark('drlt_jieying_mark')&&game.hasPlayer(function(current){
 						return current.hasSkill('drlt_jieying');
 					});
 				},

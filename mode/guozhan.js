@@ -18,7 +18,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 			for(var i in lib.character){
 				if(lib.character[i][1]=='shen'){
-					if(lib.character[i][4]&&lib.group.contains(lib.character[i][4][0])){
+					if(lib.character[i][4]&&(lib.group.contains(lib.character[i][4][0])||lib.character[i][4][0]=='key')){
 						lib.character[i][1]=lib.character[i][4][0];
 					}
 					else{

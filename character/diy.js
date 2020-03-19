@@ -17,6 +17,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_rei:['male','key',4,['xiandeng','shulv','xisheng']],
 			key_komari:['female','key',3,['komari_tiankou','komari_xueshang']],
 			key_yukine:['female','key',3,['yukine_wenzhou']],
+			key_yusa:['female','key',3,['yusa_yanyi','yusa_misa','dualside'],['dualside:key_misa']],
+			key_misa:['female','key',3,['misa_yehuo','misa_yusa','dualside'],['unseen']],
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
 			diy_feishi:['male','shu',3,['shuaiyan','moshou']],
@@ -93,7 +95,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy:{
 				diy_tieba:["diy_wenyang","ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_zhangwei"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa"],
 			},
 		},
 		characterIntro:{
@@ -108,6 +110,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
+			key_yusa:'#bCharlotte',
+			key_misa:'#rCharlotte',
 			key_yukine:'#gClannad',
 			key_komari:'#bLittle Busters!',
 			key_umi:'#bSummer Pockets',
@@ -152,6 +156,119 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuji:['zuoci']
 		},
 		skill:{
+			yusa_yanyi:{
+				enable:'phaseUse',
+				usable:1,
+				filterTarget:function(card,player,target){
+					return get.distance(player,target)<=player.hp;
+				},
+				selectTarget:function(){
+					return [1,Math.max(_status.event.player.getAttackRange())];
+				},
+				line:'thunder',
+				content:function(){
+					'step 0'
+					if(target.isHealthy()){
+						player.draw();
+						event.finish();
+					}
+					else{
+						var name=get.translation(player);
+						target.chooseControl().set('choiceList',[
+							'令'+name+'摸一张牌',
+							'回复1点体力，然后交给'+name+'一张牌',
+						]).set('ai',function(){
+							return 1;
+						});
+					}
+					'step 1'
+					if(result.index==0){
+						player.draw();
+						event.finish();
+					}
+					else{
+						target.recover();
+					}
+					'step 2'
+					if(target!=player&&target.countCards('he')>0){
+						target.chooseCard('交给'+get.translation(player)+'一张牌','he',true);
+					}
+					else event.finish();
+					'step 3'
+					target.give(result.cards,player,'giveAuto');
+				},
+				ai:{
+					result:{
+						player:function(player,target){
+							return target.isHealthy()?1:0;
+						},
+						target:function(player,target){
+							if(target.isHealthy()) return 0;
+							return get.recoverEffect(target,player,target);
+						},
+					},
+				},
+			},
+			yusa_misa:{
+				charlotte:true,
+				trigger:{player:'useSkillAfter'},
+				filter:function(event,player){
+					return event.skill=='yusa_yanyi'&&!player.storage.dualside_over&&Array.isArray(player.storage.dualside);
+				},
+				content:function(){
+					player.turnOver();
+				},
+			},
+			misa_yusa:{
+				charlotte:true,
+				trigger:{player:'misa_yehuoAfter'},
+				filter:function(event,player){
+					return event.bool===true&&!player.storage.dualside_over&&Array.isArray(player.storage.dualside);
+				},
+				content:function(){
+					player.turnOver();
+				},
+			},
+			misa_yehuo:{
+				charlotte:true,
+				trigger:{global:'phaseDrawBegin1'},
+				direct:true,
+				locked:true,
+				line:{color:[236,137,52]},
+				filter:function(event,player){
+					var target=event.player;
+					return player.inRange(target)&&player.countCards('he')>=get.distance(player,target);
+				},
+				content:function(){
+					'step 0'
+					var next=player.chooseToDiscard('he',get.distance(player,trigger.player)||1,get.prompt2('misa_yehuo',trigger.player));
+					next.set('logSkill',['misa_yehuo',trigger.player,'fire']);
+					next.set('ai',function(card){
+						var val=_status.event.val;
+						for(var i=0;i<ui.selected.cards.length;i++){
+							val-=get.value(ui.selected.cards[i]);
+						}
+						return val-get.value(card);
+					});
+					next.set('val',-2*get.attitude(player,trigger.player))
+					'step 1'
+					if(result.bool){
+						event.bool=true;
+						if(trigger.numFixed) event._result={index:0};
+						else{
+							var name=get.translation(trigger.player);
+							player.chooseControl().set('choiceList',[
+								'对'+name+'造成一点火属性伤害',
+								'令'+name+'此出牌阶段的额定摸牌数改为0'
+							]);
+						}
+					}
+					else event.finish();
+					'step 2'
+					if(result.index==0) trigger.player.damage('fire');
+					else trigger.changeToZero();
+				},
+			},
 			nsqiyue:{
 				trigger:{global:['turnOverEnd','linkEnd','showCharacterEnd','hideCharacterEnd','removeCharacterEnd']},
 				forced:true,
@@ -5584,6 +5701,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_rei:'零',
 			key_komari:'神北小毬',
 			key_yukine:'宫泽有纪宁',
+			key_yusa:'西森柚咲',
+			key_misa:'黑羽美砂',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -5615,6 +5734,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			komari_xueshang_info:'锁定技，蓄力技，当有角色死亡时，你对自己造成<span class=yellowtext>1</span>点伤害，然后对所有其他角色依次造成<span class=firetext>1</span>点伤害。当有角色因此法进入濒死状态时，你加1点体力上限并回复1点体力，然后失去此技能并终止此技能的所有后续结算。',
 			yukine_wenzhou:'问咒',
 			yukine_wenzhou_info:'一名角色的出牌阶段开始时，其可以交给你一张牌。若如此做，你选择一项：交给其一张牌，或令其从牌堆中获得一张与此牌类型相同的牌，且其于此阶段内使用与此牌牌名相同的牌时无法被响应。',
+			yusa_yanyi:'演艺',
+			yusa_yanyi_info:'出牌阶段限一次，你可以指定至多X名与你距离不大于你的体力值的角色。这些角色选择一项：①令你摸一张牌。②回复1点体力，然后交给你一张牌。（X为你的攻击范围且至少为1）',
+			misa_yehuo:'业火',
+			misa_yehuo_info:'一名角色的摸牌阶段开始时，若其在你的攻击范围内，你可以弃置X张牌并选择一项：①对其造成1点火属性伤害。②令其于此摸牌阶段放弃摸牌。（X为你与其的的距离）',
+			yusa_misa:'通灵',
+			yusa_misa_info:'当你发动的〖演艺〗结算完成之后，你可以将武将牌翻面。',
+			misa_yusa:'归魂',
+			misa_yusa_info:'当你发动的〖业火〗结算完成后，你可以将武将牌翻面。',
 			
 			ns_zhangwei:'张葳',
 			nsqiyue:'骑钺',

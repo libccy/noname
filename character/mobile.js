@@ -246,7 +246,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.draw();
 					}
 					else{
-						var next=player.chooseUseTarget({name:trigger.card.name,nature:trigger.card.nature},false);
+						var next=player.chooseUseTarget({name:trigger.card.name,nature:trigger.card.nature},false,true);
 						_status.event.next.remove(next);
 						event.evt.after.push(next);
 						next.logSkill='zhiyi';
@@ -1455,7 +1455,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			relieren:{
 				audio:2,
 				audioname:['boss_lvbu3'],
-				trigger:{player:'useCardToTargeted'},
+				trigger:{player:'useCardToPlayered'},
 				filter:function(event,player){
 					return event.card.name=='sha'&&player.canCompare(event.target);
 				},

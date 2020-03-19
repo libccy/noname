@@ -2577,22 +2577,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				filter:function(event,player){
 					return _status.currentPhase!=player&&event.player!=player&&get.type(event.card)=='trick'&&
-						get.position(event.card)=='d'&&!player.hasSkill('zhulu2')&&
-						get.itemtype(event.card)=='card'&&player.countCards('he',{suit:get.suit(event.card)})>0;
+						event.cards.filterInD().length>0&&!player.hasSkill('zhulu2')&&
+						player.countCards('he',{suit:get.suit(event.card)})>0;
 				},
 				content:function(){
 					"step 0"
 					var val=get.value(trigger.card);
 					var suit=get.suit(trigger.card);
 					var next=player.chooseToDiscard('he','逐鹿：是否弃置一张'+get.translation(suit)+
-						'牌并获得'+get.translation(trigger.card)+'？',{suit:suit});
+						'牌并获得'+get.translation(trigger.cards.filterInD())+'？',{suit:suit});
 					next.ai=function(card){
 						return val-get.value(card);
 					};
 					next.logSkill='zhulu';
 					"step 1"
 					if(result.bool){
-						player.gain(trigger.card,'gain2');
+						player.gain(trigger.cards.filterInD(),'log','gain2');
 						player.addTempSkill('zhulu2');
 					}
 				},
