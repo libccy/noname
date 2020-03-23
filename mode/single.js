@@ -344,7 +344,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var filter=function(name){
 						return !_status.characterlist.contains(name);
 					};
-					var dialog=ui.create.characterDialog('heightset',filter,'expandall').open();
+					var dialog=ui.create.characterDialog('heightset',filter).open();
 					dialog.videoId=event.videoId;
 						
 					game.me.chooseButton(true).set('ai',function(button){
@@ -568,7 +568,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var filter=function(name){
 							return !_status.characterlist.contains(name);
 						};
-						var dialog=ui.create.characterDialog('heightset',filter,'expandall').open();
+						var dialog=ui.create.characterDialog('heightset',filter).open();
 						dialog.videoId=id;
 						ui.arena.classList.add('choose-character');
 					},list,event.videoId);

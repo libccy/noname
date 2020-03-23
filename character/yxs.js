@@ -2532,20 +2532,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCardAfter'},
 				direct:true,
 				filter:function(event,player){
-					if(get.position(event.card)!='d') return false;
+					if(event.cards.filterInD().length==0) return false;
 					if(player.hasSkill('jieyong2')) return false;
 					return player.countCards('he',{color:'black'})>0;
 				},
 				content:function(){
 					"step 0"
-					var next=player.chooseToDiscard('he','是否弃置一张黑色牌并收回'+get.translation(trigger.card)+'？',{color:'black'});
+					var next=player.chooseToDiscard('he','是否弃置一张黑色牌并收回'+get.translation(trigger.cards.filterInD())+'？',{color:'black'});
 					next.ai=function(card){
 						return get.value(trigger.card)-get.value(card);
 					}
 					next.logSkill='jieyong';
 					"step 1"
 					if(result.bool){
-						player.gain(trigger.card,'gain2');
+						player.gain(trigger.cards.filterInD(),'gain2','log');
 						player.addTempSkill('jieyong2',['phaseAfter','phaseBegin']);
 					}
 				},
@@ -3111,7 +3111,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhulu_info:'回合外，当有普通锦囊牌结算完毕后，你可以立即弃掉一张相同花色手牌或装备区的牌，获得这张锦囊牌。',
 			jieyong:'节用',
 			jieyong2:'节用',
-			jieyong_info:'你使用的卡牌进入弃牌堆后，你可以弃置一张黑色牌并重新获得之（每回合限一次）',
+			jieyong_info:'你使用的卡牌结算完成后，你可以弃置一张黑色牌并重新获得之。（每回合限一次）',
 			shangtong:'尚同',
 			shangtong_info:'每当你令其他角色恢复1点血量或掉1点血量时，你可以摸1张牌（摸牌上限为4）',
 			feiming:'非命',

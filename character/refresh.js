@@ -234,6 +234,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					trigger.num-=trigger.getParent(2).jiu_add;
 				},
+				ai:{
+					filterDamage:true,
+					skillTagFilter:function(player,tag,arg){
+						return arg&&arg.jiu==true;
+					},
+				},
 			},
 			repojun:{
 				audio:2,
@@ -3032,7 +3038,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard'},
 				frequent:true,
 				filter:function(event){
-					return (get.type(event.card)=='trick'&&event.card.isCard);
+					return (get.type(event.card,'trick')=='trick'&&event.card.isCard);
 				},
 				init:function(player){
 					player.storage.rejizhi=0;
@@ -4487,7 +4493,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.chooseTarget(get.prompt('fenwei'),
 						[1,trigger.targets.length],function(card,player,target){
-						return _status.event.contains(target);
+						return _status.event.targets.contains(target);
 					}).set('ai',function(target){
 						var trigger=_status.event.getTrigger();
 						if(game.phaseNumber>game.players.length*2&&trigger.targets.length>=game.players.length-1&&!trigger.excluded.contains(target)){

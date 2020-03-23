@@ -3804,7 +3804,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							};
 							for(var i=0;i<friends.length;i++){
 								for(var j=1;j<=5;j++){
-									if(friends[i].canEquip(j)){
+									if(friends[i].isEmpty(j)){
 										vacancies['equip'+j]++;
 									}
 								}
@@ -3816,7 +3816,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								var es=sources[i].getCards('e');
 								for(var j=0;j<es.length;j++){
 									var type=get.subtype(es[j]);
-									if(vacancies[type]){
+									if(vacancies[type]&&get.value(es[j])>0){
 										num++;
 										if(num>=3){
 											return 1;

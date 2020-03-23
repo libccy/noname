@@ -2470,6 +2470,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						break;
 					case 'nei':
 						if(identity2=='zhu'&&game.players.length==2) return -10;
+						if(identity2!='zhu'&&game.players.length==3) return -8;
 						var strategy=get.aiStrategy();
 						if(strategy==4){
 							if(from==to) return 10;

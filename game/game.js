@@ -32,7 +32,7 @@
 		},
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
 		mirrorURL:'https://nakamurayuri.coding.net/p/noname/d/noname/git/raw',
-		hallURL:'noname.pub',
+		hallURL:'noname.mobi',
 		assetURL:'',
 		changeLog:[],
 		updates:[],
@@ -995,7 +995,7 @@
 										editbg.call(node.lastChild);
 									}
 								}
-							}).inputNode.accept='image/jpeg';
+							}).inputNode.accept='image/*';
 							var editbg=function(){
 								this.classList.toggle('active');
 								var page=this.parentNode.parentNode;
@@ -1255,7 +1255,7 @@
 										});
 									});
 								}
-							}).inputNode.accept='image/jpeg,image/png';
+							}).inputNode.accept='image*';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
 									game.deleteDB('image','card_style');
@@ -1379,14 +1379,14 @@
 										});
 									});
 								}
-							}).inputNode.accept='image/jpeg,image/png';
+							}).inputNode.accept='image/*';
 							ui.create.filediv('.menubutton.deletebutton.addbutton','添加翻转图片',node,function(file){
 								if(file){
 									game.putDB('image','cardback_style2',file,function(){
 										node.classList.add('hideadd');
 									});
 								}
-							}).inputNode.accept='image/jpeg,image/png';
+							}).inputNode.accept='image/*';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
 									game.deleteDB('image','cardback_style');
@@ -1530,7 +1530,7 @@
 										});
 									});
 								}
-							}).inputNode.accept='image/jpeg,image/png';
+							}).inputNode.accept='image/*';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
 									game.deleteDB('image','hp_style1');
@@ -1709,7 +1709,7 @@
 										});
 									});
 								}
-							}).inputNode.accept='image/jpeg,image/png';
+							}).inputNode.accept='image/*';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
 									game.deleteDB('image','player_style');
@@ -1834,7 +1834,7 @@
 										});
 									});
 								}
-							}).inputNode.accept='image/jpeg,image/png';
+							}).inputNode.accept='image/*';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
 									game.deleteDB('image','border_style');
@@ -2024,7 +2024,7 @@
 										});
 									});
 								}
-							}).inputNode.accept='image/jpeg,image/png';
+							}).inputNode.accept='image/*';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
 									game.deleteDB('image','menu_style');
@@ -2143,7 +2143,7 @@
 										});
 									});
 								}
-							}).inputNode.accept='image/jpeg,image/png';
+							}).inputNode.accept='image/*';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
 									game.deleteDB('image','control_style');
@@ -13345,17 +13345,17 @@
 							if(att>0){
 								if(!_status.event.nojudge&&target.countCards('j')) return 10;
 								if(target.countCards('e',function(card){
-									return get.value(card)<0&&game.hasPlayer(function(current){
-										return get.attitude(player,current)<0&&current.isEmpty(get.subtype(card))
+									return get.value(card,target)<0&&game.hasPlayer(function(current){
+										return current!=target&&get.attitude(player,current)<0&&current.isEmpty(get.subtype(card))
 									});
 								})>0) return 9;
 							}
 							else if(att<0){
 								if(game.hasPlayer(function(current){
-									if(get.attitude(player,current)>0){
+									if(current!=target&&get.attitude(player,current)>0){
 										var es=target.getCards('e');
 										for(var i=0;i<es.length;i++){
-											if(get.value(es[i])>0&&current.isEmpty(get.subtype(es[i]))) return true;
+											if(get.value(es[i],target)>0&&current.isEmpty(get.subtype(es[i]))) return true;
 										}
 									}
 								})){
@@ -13368,8 +13368,8 @@
 						var i;
 						var att2=get.attitude(player,ui.selected.targets[0]);
 						for(i=0;i<es.length;i++){
-							if(sgnatt!=0&&att2!=0&get.sgn(get.value(es[i]))==sgnatt*att&&target.isEmpty(get.subtype(es[i]))){
-								break;
+							if(sgnatt!=0&&att2!=0&get.sgn(get.value(es[i]))==sgnatt&&target.isEmpty(get.subtype(es[i]))){
+								return Math.abs(att);
 							}
 						}
 						if(i==es.length){
@@ -14967,6 +14967,9 @@
 					game.addVideo('diex',player);
 					if(event.animate!==false){
 						player.$die(source);
+					}
+					if(player.hp!=0){
+						player.changeHp(0-player.hp,false).forceDie=true;
 					}
 					"step 1"
 					if(player.dieAfter) player.dieAfter(source);
@@ -25102,6 +25105,15 @@
 					}
 				},
 				chat:function(id,str){
+					var that=this;
+					if(!this.id||(!lib.playerOL[this.id]&&(!game.connectPlayers||!function(){
+						for(var i=0;i<game.connectPlayers.length;i++){
+							if(game.connectPlayers[i].playerid==that.id){
+								return true;
+							}
+						}
+						return false;
+					}()))) return;
 					var player;
 					if(lib.playerOL[id]){
 						player=lib.playerOL[id];
@@ -25545,6 +25557,7 @@
 						_status.over=true;
 					}
 					if(observe){
+						game.observe=true;
 						game.onlineID=null;
 						game.roomId=null;
 					}
@@ -26426,6 +26439,7 @@
 			_status.ip=ip;
 		},
 		send:function(){
+			if(game.observe&&arguments[0]!='reinited') return;
 			if(game.ws){
 				var args=Array.from(arguments);
 				if(typeof args[0]=='function'){
@@ -36954,7 +36968,7 @@
 
 							var input=document.createElement('input');
 							input.type='file';
-							input.accept='image/jpeg';
+							input.accept='image/*';
 							input.className='fileinput';
 							input.onchange=function(){
 								var fileToLoad=input.files[0];
@@ -37439,7 +37453,7 @@
 
 							var input=document.createElement('input');
 							input.type='file';
-							input.accept='image/jpeg,image/png';
+							input.accept='image/*';
 							input.className='fileinput';
 							input.onchange=function(){
 								var fileToLoad=input.files[0];
@@ -39407,7 +39421,7 @@
 						var span6_br=ui.create.node('br');
 						li2.lastChild.appendChild(span6_br);
 
-						var span5=ui.create.div('','图片素材（精简，35MB）');
+						var span5=ui.create.div('','图片素材（精简，126MB）');
 						span5.style.fontSize='small';
 						span5.style.lineHeight='16px';
 						var span5_check=document.createElement('input');
@@ -39421,7 +39435,7 @@
 						}
 						var span2_br=ui.create.node('br');
 
-						var span4=ui.create.div('','字体素材（16MB）');
+						var span4=ui.create.div('','字体素材（48MB）');
 						span4.style.fontSize='small';
 						span4.style.lineHeight='16px';
 						li2.lastChild.appendChild(span4);
@@ -39438,7 +39452,7 @@
 						var span3_br=ui.create.node('br');
 						li2.lastChild.appendChild(span3_br);
 
-						var span3=ui.create.div('','音效素材（36MB）');
+						var span3=ui.create.div('','音效素材（125MB）');
 						span3.style.fontSize='small';
 						span3.style.lineHeight='16px';
 						li2.lastChild.appendChild(span3);
@@ -39455,7 +39469,7 @@
 						var span4_br=ui.create.node('br');
 						li2.lastChild.appendChild(span4_br);
 
-						var span2=ui.create.div('','皮肤素材（23MB）');
+						var span2=ui.create.div('','皮肤素材（351MB）');
 						span2.style.fontSize='small';
 						span2.style.lineHeight='16px';
 						li2.lastChild.appendChild(span2);
@@ -39477,7 +39491,7 @@
 						li2.lastChild.appendChild(span5_check);
 						li2.lastChild.appendChild(span2_br);
 
-						var span6=ui.create.div('','图片素材（完整，96MB）');
+						var span6=ui.create.div('','图片素材（完整，203MB）');
 						span6.style.fontSize='small';
 						span6.style.lineHeight='16px';
 						li2.lastChild.appendChild(span6);
@@ -39863,12 +39877,14 @@
 								}
 							}
 							else{
-								try{
-									var result=eval(text2.value);
-									game.print(result);
-								}
-								catch(e){
-									game.print(e);
+								if(!game.observe&&!game.online){
+ 								try{
+ 									var result=eval(text2.value);
+ 									game.print(result);
+ 								}
+ 								catch(e){
+ 									game.print(e);
+ 								}
 								}
 								text2.value='';
 							}
@@ -42009,7 +42025,7 @@
 							}
 							else{
 								var func=function(){
-									if(confirm('是否下载图片和字体素材？（约40MB）')){
+									if(confirm('是否下载图片和字体素材？（约175MB）')){
 										if(!ui.arena.classList.contains('menupaused')){
 											ui.click.configMenu();
 											ui.click.menuTab('其它');
@@ -43494,11 +43510,15 @@
 				uiintro.style.height=uiintro.content.offsetHeight+'px';
 				list.scrollTop=list.scrollHeight;
 
-				var node=uiintro.add('<input type="text" value="">');
+				if(!_status.chatValue) _status.chatValue='';
+				var node=uiintro.add('<input type="text" value="'+_status.chatValue+'">');
 				node.style.paddingTop=0;
 				node.style.marginBottom='16px';
 				input=node.firstChild;
 				input.style.width='calc(100% - 20px)';
+				input.onchange=function(){
+					_status.chatValue=input.value;
+				}
 				input.onkeydown=function(e){
 					if(e.keyCode==13&&input.value){
 						var player=game.me;
@@ -43525,6 +43545,7 @@
 							lib.element.player.chat.call(player,str);
 						}
 						input.value='';
+						_status.chatValue='';
 					}
 					e.stopPropagation();
 				}

@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'1.9.98.4',
+	'1.9.98.4.1',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -2359,6 +2359,15 @@ window.noname_asset_list=[
 	'audio/skill/zhongzuo1.mp3',
 	'audio/skill/zhongzuo2.mp3',
 	'audio/skill/buyi_re_wuguotai1.mp3',
+    'audio/skill/busuan1.mp3',
+	'audio/skill/busuan2.mp3',
+	'audio/skill/gxlianhua1.mp3',
+	'audio/skill/gxlianhua2.mp3',
+	'audio/skill/mingjie1.mp3',
+	'audio/skill/tuiyan1.mp3',
+	'audio/skill/tuiyan2.mp3',
+	'audio/skill/zhafu1.mp3',
+	'audio/skill/zhafu2.mp3',
 	
 	'font/huangcao.ttf',
 	'font/shousha.ttf',

@@ -461,7 +461,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{
 					player:"phaseJieshuBegin",
 				},
-				group:["drlt_zhenggu2"],
 				direct:true,
 				content:function(){
 					"step 0"
@@ -476,57 +475,48 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						var target=result.targets[0];
-						player.line(target,'thunder');
 						player.logSkill('drlt_zhenggu',target);
-						target.addSkill('drlt_zhenggu2');
-						player.storage.drlt_zhenggu1=target;
-						target.storage.drlt_zhenggu=player;
-					}else{
-						event.finish();
-					};
+						player.addSkill("drlt_zhenggu2");
+						target.addSkill("drlt_zhenggu_mark");
+						target.storage.drlt_zhenggu_mark.push(player);
+						target.markSkill("drlt_zhenggu_mark");
+						lib.skill.drlt_zhenggu.sync(player,target);
+					}
+				},
+				sync:function(player,target){
+					var num=player.countCards('h');
+					var num2=target.countCards('h');
+					if(num<num2){
+						target.chooseToDiscard(num2-num,true,'h');
+					}
+					else target.drawTo(Math.min(5,num));
 				},
 			},
 			"drlt_zhenggu2":{
-				audio:2,
+				audio:"drlt_zhenggu",
 				trigger:{
-					player:"phaseEnd",
+					global:"phaseEnd",
 				},
 				forced:true,
-				popup:false,
+				charlotte:true,
+				logTarget:"player",
 				filter:function(event,player){
-					return player.storage.drlt_zhenggu!=undefined||player.storage.drlt_zhenggu1!=undefined;
+					return event.player.storage.drlt_zhenggu_mark&&event.player.storage.drlt_zhenggu_mark.contains(player);
 				},
 				content:function(){
-					if(player.storage.drlt_zhenggu!=undefined){
-						player.removeSkill("drlt_zhenggu2");
-						var pl=player.storage.drlt_zhenggu;
-						if(pl.isAlive()){
-						var num=Math.min(5,pl.countCards('h'));
-						var num1=0;
-						if(num-player.countCards('h')>0) num1=num-player.countCards('h');
-						if(num-player.countCards('h')<0) num1=num-player.countCards('h');
-						if(num1!=0){
-							pl.line(player,'thunder');
-							pl.logSkill('drlt_zhenggu',player);
-						}
-						if(num1<0) player.chooseToDiscard('h',-num1,true);
-						if(num1>0) player.draw(num1);
-						}
-						delete player.storage.drlt_zhenggu;
-					};
-					if(player.storage.drlt_zhenggu1!=undefined){
-						var pl=player.storage.drlt_zhenggu1;
-						if(pl.isAlive()){
-						var num=pl.countCards('h');
-						var num1=0;
-						var num2=Math.min(5,player.countCards('h'));
-						if(num2-num>0) num1=num2-num;
-						if(num2-num<0) num1=num2-num;
-						if(num1<0) pl.chooseToDiscard('h',-num1,true);
-						if(num1>0) pl.draw(num1);
-						}
-						delete player.storage.drlt_zhenggu1;
-					};
+					trigger.player.storage.drlt_zhenggu_mark.remove(player);
+					if(trigger.player.storage.drlt_zhenggu_mark.length==0) trigger.player.unmarkSkill('drlt_zhenggu_mark');
+					lib.skill.drlt_zhenggu.sync(player,trigger.player);
+				},
+			},
+			drlt_zhenggu_mark:{
+				init:function(player,skill){
+					if(!player.storage[skill]) player.storage[skill]=[];
+				},
+				marktext:'镇',
+				intro:{
+					name:'镇骨',
+					content:'已成为$〖镇骨〗的目标',
 				},
 			},
 			"xinfu_zuilun":{
@@ -995,7 +985,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						selectCard:1,
 						position:'he',
 						filterTarget:function(card,player,target){
-							return player!=target&&trigger.targets.contains(target);
+							return player!=target&&_status.event.targets.contains(target);
 						},
 						ai1:function(card){
 							if(card.name=='du') return 20;
@@ -1011,6 +1001,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return att-3;
 						},
 						prompt:get.prompt2('drlt_congjian'),
+						targets:trigger.targets,
 					});
 					'step 1'
 					if(result.bool){
@@ -5124,7 +5115,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						})){
 							player.chooseTarget(function(card,player,target){
 								var source=_status.event.source;
-								return target!=source&&source.inRange(target)<=1;
+								return target!=source&&source.inRange(target);
 							},true).set('ai',function(target){
 								return get.damageEffect(target,_status.event.source,player);
 							}).set('source',target);
@@ -6803,6 +6794,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"drlt_huairou":"怀柔",
 			"drlt_huairou_info":"出牌阶段，你可以重铸装备牌",
 			"drlt_zhenggu":"镇骨",
+			drlt_zhenggu2:"镇骨",
 			"drlt_zhenggu_info":"结束阶段，你可以选择一名其他角色，你的回合结束后和该角色的下个回合结束时，其将手牌摸至或弃至X张。（X为你的手牌数且至多为5）",
 			"drlt_zhenrong":"徵荣",
 			"drlt_zhenrong_info":"当你对其他角色造成伤害后，若其手牌比你多，你可以将其一张牌置于你的武将牌上，称为“荣”",

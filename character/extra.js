@@ -797,7 +797,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:true,
 				trigger:{player:'useCard'},
 				filter:function(event,player){
-					return (get.type(event.card,'trick')=='trick'&&event.card.isCard&&player.hasMark('renjie'));
+					return (get.type(event.card)=='trick'&&event.card.isCard&&player.hasMark('renjie'));
 				},
 				init:function(player){
 					player.storage.jilue_jizhi=0;
@@ -2431,14 +2431,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							};
 						};
 						if(event.list1.length&&event.list2.length){
-							target.discard(event.list2).delay=false;
 							player.discard(event.list1).delay=false;
-							game.delay();
-						}
-						else{
 							target.discard(event.list2);
-							player.discard(event.list1);
 						}
+						else if(event.list2.length){
+							target.discard(event.list2);
+						}
+						else player.discard(event.list1);
 					};
 					'step 2'
 					if(event.list1.length+event.list2.length==4){

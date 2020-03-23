@@ -643,6 +643,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					save:true,
+					skillTagFilter:function(player){
+						return player.hp<=0&&player.storage.xinfuli!=true;
+					},
 					result:{
 						player:10
 					},
@@ -2407,7 +2410,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					maxHandcard:function(player,num){
-						return num+player.storage.bizhuan.length;
+						if(player.storage.bizhuan&&player.storage.bizhuan.length) return num+player.storage.bizhuan.length;
 					}
 				}
 			},
@@ -7542,6 +7545,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					save:true,
+					skillTagFilter:function(player){
+						return player.hp<=0&&player.storage.fuli!=true;
+					},
 					result:{
 						player:10
 					},

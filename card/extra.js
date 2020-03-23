@@ -141,6 +141,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 										!current.hasSkillTag('filterDamage',null,{
 											player:player,
 											card:card,
+											jiu:true,
 										})&&
 										get.effect(current,card,target)>0);
 								})){

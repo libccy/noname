@@ -74,27 +74,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"useCardEnd",
 				},
 				check:function (event,player){
-					return 18-get.value(event.card)-player.maxHp*2;
+					return get.value(event.card)-player.maxHp*2-18>0;
 				},
 				filter:function (event,player){
-					if(!player.isPhaseUsing()) return false;
-					if(event.cards){
-						if(get.type(event.card)!='trick') return false;
-						for(var i=0;i<event.cards.length;i++){
-							if(event.cards[i].isInPile()) return true;
-						}
-					}
-					return false;
+					return player.isPhaseUsing()&&event.cards.filterInD().length>0;
 				},
 				content:function (){
-					var list=[];
-					for(var i=0;i<trigger.cards.length;i++){
-						if(trigger.cards[i].isInPile()){
-							list.push(trigger.cards[i]);
-						}
-					}
-					player.gain(list,'gain2');
 					player.loseMaxHp();
+					player.gain(trigger.cards.filterInD(),'gain2','log');
 				},
 			},
 			"xinfu_xingluan":{
@@ -3668,7 +3655,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_limu":{
 				mod:{
 					targetInRange:function (card,player,target){
-						if(player.countCards('j')&&target.inRange(player)){
+						if(player.countCards('j')&&player.inRange(target)){
 							return true;
 						}
 					},

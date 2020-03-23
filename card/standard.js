@@ -162,10 +162,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 3;
 					},
 					result:{
-						target:function(player,target){
+						target:function(player,target,card){
 							if(player.hasSkill('jiu')&&!target.hasSkillTag('filterDamage',null,{
 								player:player,
-								card:{name:'sha'},
+								card:card,
+								jiu:true,
 							})){
 								if(get.attitude(player,target)>0){
 									return -7;
