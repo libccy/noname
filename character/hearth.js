@@ -8464,7 +8464,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					target.chooseCard('h',true,'重铸一张手牌');
 					'step 1'
-					if(result.bool){
+					if(result.bool&&result.cards.length){
 						target.$throw(result.cards);
 						target.lose(result.cards,ui.discardPile);
 						var type=get.type(result.cards[0],'trick');

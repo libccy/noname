@@ -1050,6 +1050,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<list.length;i++){
 							var info=lib.skill[list[i]];
 							if(!info) continue;
+							if(info.shaRelated) return true;
 							if(info.trigger){
 								for(var j in info.trigger){
 									if(j=='player'||j=='global'){

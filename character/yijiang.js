@@ -1865,6 +1865,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zhuandui:{
+				shaRelated:true,
 				audio:2,
 				group:['zhuandui_respond','zhuandui_use'],
 				subSkill:{
@@ -5634,6 +5635,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			longyin:{
+				shaRelated:true,
 				trigger:{global:'useCard'},
 				direct:true,
 				filter:function(event,player){
@@ -5935,7 +5937,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					var num2=0,players=game.filterPlayer();
 					for(var i=0;i<players.length;i++){
-						if(target.inRange(players[i])<=1){
+						if(target.inRange(players[i])){
 							num2++;
 						}
 					}
@@ -7064,6 +7066,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xinpojun:{
+				shaRelated:true,
 				trigger:{player:'useCardToPlayered'},
 				direct:true,
 				filter:function(event,player){

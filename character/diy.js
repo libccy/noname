@@ -1656,6 +1656,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var check=function(list){
 						for(var i=0;i<list.length;i++){
 							var info=lib.skill[list[i]];
+							if(info&&info.shaRelated) return true;
 							if(info&&info.trigger){
 								for(var j in info.trigger){
 									var cond=info.trigger[j];
@@ -1671,7 +1672,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(j=='source'||j=='global'){
 										if(cond.indexOf('damageBefore')!=-1) return true;
 										if(cond.indexOf('damageBegin')!=-1) return true;
+										if(cond.indexOf('damageBegin1')!=-1) return true;
+										if(cond.indexOf('damageBegin2')!=-1) return true;
 										if(cond.indexOf('damageEnd')!=-1) return true;
+										if(cond.indexOf('damageSource')!=-1) return true;
 										if(cond.indexOf('damageAfter')!=-1) return true;
 									}
 								}

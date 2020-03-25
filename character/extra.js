@@ -797,7 +797,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:true,
 				trigger:{player:'useCard'},
 				filter:function(event,player){
-					return (get.type(event.card)=='trick'&&event.card.isCard&&player.hasMark('renjie'));
+					return (get.type(event.card,'trick')=='trick'&&event.card.isCard&&player.hasMark('renjie'));
 				},
 				init:function(player){
 					player.storage.jilue_jizhi=0;
@@ -1838,7 +1838,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.broadcastAll('closeDialog',event.videoId);
 					var cards2=event.cards2;
 					player.gain(cards2,'log','gain2');
-					game.delay();
 				},
 				ai:{
 					threaten:1.2

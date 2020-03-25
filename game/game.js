@@ -44811,7 +44811,7 @@
 						ui.control.show();
 						game.resume2();
 					}
-					else if(_status.event.isMine()&&!dialogtouched){
+					else if((_status.event.isMine()||_status.event.forceMine)&&!dialogtouched){
 						if(_status.event.custom.replace.window){
 							_status.event.custom.replace.window();
 						}
@@ -50268,7 +50268,7 @@
 			}
 			return result;
 		},
-		effect:function(target,card,player,player2){
+		effect:function(target,card,player,player2,isLink){
 			var event=_status.event;
 			var eventskill=null;
 			if(player==undefined) player=_status.event.player;
@@ -50284,8 +50284,8 @@
 			}
 			var result=get.result(card,eventskill);
 			var result1=result.player,result2=result.target;
-			if(typeof result1=='function') result1=result1(player,target,card);
-			if(typeof result2=='function') result2=result2(player,target,card);
+			if(typeof result1=='function') result1=result1(player,target,card,isLink);
+			if(typeof result2=='function') result2=result2(player,target,card,isLink);
 			
 			if(typeof result1!='number') result1=0;
 			if(typeof result2!='number') result2=0;
@@ -50425,10 +50425,17 @@
 			}
 			if(zeroplayer) result1=0;
 			if(zerotarget) result2=0;
+			var final=0;
 			if(player2){
-				return (result1*get.attitude(player2,player)+(target?result2*get.attitude(player2,target):0));
+				final=(result1*get.attitude(player2,player)+(target?result2*get.attitude(player2,target):0));
 			}
-			return (result1*get.attitude(player,player)+(target?result2*get.attitude(player,target):0));
+			else final=(result1*get.attitude(player,player)+(target?result2*get.attitude(player,target):0));
+			if(!isLink&&get.tag(card,'natureDamage')&&target.isLinked()&&!zerotarget){
+				game.countPlayer(function(current){
+					if(current!=target&&current.isLinked) final+=get.effect(current,card,player,player2,true);
+				})
+			}
+			return final;
 		},
 		damageEffect:function(target,player,viewer,nature){
 			if(!player){

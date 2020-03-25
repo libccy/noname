@@ -157,13 +157,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						useful:[5,1],
 						value:[5,1],
 					},
-					order:function(){
+					order:function(item){
 						if(_status.event.player.hasSkillTag('presha',true,null,true)) return 10;
+						if(lib.linked.contains(get.nature(item))) return 3.1;
 						return 3;
 					},
 					result:{
-						target:function(player,target,card){
-							if(player.hasSkill('jiu')&&!target.hasSkillTag('filterDamage',null,{
+						target:function(player,target,card,isLink){
+							if(!isLink&&player.hasSkill('jiu')&&!target.hasSkillTag('filterDamage',null,{
 								player:player,
 								card:card,
 								jiu:true,

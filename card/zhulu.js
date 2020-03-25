@@ -265,7 +265,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target){
-							if(get.value(target.getCards('e'),target)<=0||target.hasSkillTag('noe')) return 1;
+							var e5=target.getEquip(5);
+							if(e5&&e5.name=='muniu'&&e5.cards&&e5.cards.length>1) return -1;
+							if(target.countCards('e',function(card){
+								return get.value(card)<=0;
+							})||target.hasSkillTag('noe')) return 1;
 							return 0;
 						},
 					},
@@ -466,7 +470,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:9.5,
 					equipValue:function(card,player){
-						if(get.position(card)=='e') return player.sex=='male'?(4/(1+player.countCards('he'))):0;
+						if(get.position(card)=='e'){
+							if(player.sex!='male') return 0;
+							var num=player.countCards('he',function(cardx){
+								return cardx!=card;
+							});
+							if(num==0) return 0;
+							return 4/num;
+						}
 						return 1;
 					},
 					basic:{
@@ -479,7 +490,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								var val=0;
 								var card=target.getEquip(2);
 								if(card) val=get.value(card);
-								return -1-val;
+								var num=target.countCards('he',function(cardx){
+									return cardx!=card
+								});
+								if(num>0) val+=4/num;
+								return -val;
 							}
 							return 0;
 						},
@@ -567,7 +582,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						keepAI:true,
 						target:function(player,target){
-							return -1-target.countCards('h');
+							return -0.5-2*target.countCards('h');
 						},
 					},
 				}

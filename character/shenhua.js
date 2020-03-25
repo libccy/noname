@@ -593,7 +593,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"xinfu_fuyin":{
-				usable:1,
 				trigger:{
 					target:"useCardToTargeted",
 				},
@@ -601,15 +600,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				filter:function (event,player){
 					if(event.player.countCards('h')<player.countCards('h')) return false;
-					if(event.card.name=='sha'||event.card.name=='juedou') return true;
-					return false;
+					if(event.card.name!='sha'&&event.card.name!='juedou') return true;
+					return !game.hasPlayer2(function(current){
+						return current.getHistory('useCard',function(evt){
+							return evt!=event.getParent()&&evt.card&&['sha','juedou'].contains(evt.card.name)&&evt.targets.contains(player);
+						}).length>0;
+					});
 				},
 				content:function (){
 					trigger.getParent().excluded.add(player);
 				},
 			},
-			
-			
 			"drlt_qianjie":{
 				group:["drlt_qianjie_1","drlt_qianjie_2","drlt_qianjie_3"],
 				locked:true,
@@ -2171,6 +2172,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			jianchu:{
+				shaRelated:true,
 				audio:2,
 				audioname:['re_pangde'],
 				trigger:{player:'useCardToPlayered'},
@@ -2658,6 +2660,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xinliegong:{
+				shaRelated:true,
 				mod:{
 					targetInRange:function(card,player,target){
 						if(card.name=='sha'&&card.number){
@@ -3276,6 +3279,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			jiang:{
+				shaRelated:true,
 				audio:2,
 				audioname:['sp_lvmeng','re_sunben','re_sunce'],
 				trigger:{
@@ -4136,6 +4140,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			lieren:{
+				shaRelated:true,
 				audio:2,
 				audioname:['boss_lvbu3'],
 				trigger:{source:'damageSource'},
@@ -5541,6 +5546,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				zhuSkill:true,
 			},
 			mengjin:{
+				shaRelated:true,
 				audio:2,
 				trigger:{player:'shaMiss'},
 				//priority:-1,
@@ -5821,6 +5827,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			liegong:{
+				shaRelated:true,
 				audio:2,
 				audioname:['re_huangzhong'],
 				trigger:{player:'useCardToPlayered'},
@@ -6661,6 +6668,366 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			huangtian3:{},
+			"xinfu_guhuo":{
+				derivation:["chanyuan"],
+				group:["guhuo_guess","guhuo_respond","guhuo_wuxie"],
+				enable:"chooseToUse",
+				filter:function (event,player){
+					if(player.hasSkill('guhuo_phase'))return false;
+					if(!player.countCards('h')) return false;
+					var list=['sha','shan','tao','jiu','taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman'];
+					if(get.mode()=='guozhan'){
+						list=list.concat(['xietianzi','shuiyanqijunx','lulitongxin','lianjunshengyan','chiling','diaohulishan','yuanjiao','huoshaolianying']);
+					}
+					for(var i=0;i<list.length;i++){
+						if(event.filterCard({name:list[i]},player)) return true;
+					}
+					return false;
+				},
+				chooseButton:{
+					dialog:function (){
+						var list=[];
+						for(var i=0;i<lib.inpile.length;i++){
+							var name=lib.inpile[i];
+							if(name=='wuxie') continue;
+							if(name=='sha'){
+								list.push(['基本','','sha']);
+								list.push(['基本','','sha','fire']);
+								list.push(['基本','','sha','thunder']);
+							}
+							else if(get.type(name)=='trick') list.push(['锦囊','',name]);
+							else if(get.type(name)=='basic') list.push(['基本','',name]);
+						}
+						return ui.create.dialog('蛊惑',[list,'vcard']);
+					},
+					filter:function (button,player){
+						var evt=_status.event.getParent();
+						if(evt&&evt.filterCard){
+							return evt.filterCard({name:button.link[2]},player,evt);
+						}
+						return true;
+					},
+					backup:function (links,player){
+						return {
+							filterCard:true,
+							selectCard:1,
+							viewAs:{name:links[0][2],nature:links[0][3]},
+						}
+					},
+					prompt:function (links,player){
+						return '将一张手牌做当'+get.translation(links[0][2])+'使用';
+					},
+				},
+				ai:{
+					save:true,
+					respondShan:true,
+					skillTagFilter:function(player){
+						if(player.hasSkill('guhuo_phase')) return false;
+					},
+				},
+			},
+			"guhuo_guess":{
+				audio:2,
+				trigger:{
+					player:"useCardBefore",
+				},
+				filter:function (event,player){
+					return event.skill=="xinfu_guhuo_backup"||event.skill=="guhuo_wuxie";
+				},
+				forced:true,
+				direct:true,
+				priority:15,
+				content:function (){
+					'step 0'
+					player.logSkill('guhuo_guess');
+					player.addTempSkill('guhuo_phase');
+					player.popup(trigger.card.name,'metal');
+					player.lose(trigger.cards,ui.special);
+					player.line(trigger.targets,trigger.card.nature);
+					trigger.line=false;
+					trigger.animate=false;
+					event.prompt=get.translation(player)+'声明了'+get.translation(trigger.card.name)+'，是否质疑？';
+					event.guessers=game.filterPlayer(function(current){
+						return current!=player&&!current.hasSkill('chanyuan');
+					});
+					event.guessers.sort(lib.sort.seat);
+					
+					game.broadcastAll(function(card){
+					_status.guhuoNode=card.copy('thrown');
+					if(lib.config.cardback_style!='default'){
+						_status.guhuoNode.style.transitionProperty='none';
+						ui.refresh(_status.guhuoNode);
+						_status.guhuoNode.classList.add('infohidden');
+						ui.refresh(_status.guhuoNode);
+						_status.guhuoNode.style.transitionProperty='';
+					}
+					else{
+						_status.guhuoNode.classList.add('infohidden');
+					}
+					_status.guhuoNode.style.transform='perspective(600px) rotateY(180deg) translateX(0)';
+					player.$throwordered2(_status.guhuoNode);
+					},trigger.cards[0]);
+
+					
+					event.onEnd01=function(){
+						_status.guhuoNode.removeEventListener('webkitTransitionEnd',event.onEnd01);
+							_status.guhuoNode.style.transition='all ease-in 0.3s';
+							_status.guhuoNode.style.transform='perspective(600px) rotateY(270deg) translateX(52px)';
+							var onEnd=function(){
+								_status.guhuoNode.classList.remove('infohidden');
+								_status.guhuoNode.style.transition='all 0s';
+								ui.refresh(_status.guhuoNode);
+								_status.guhuoNode.style.transform='perspective(600px) rotateY(-90deg) translateX(52px)';
+								ui.refresh(_status.guhuoNode);
+								_status.guhuoNode.style.transition='';
+								ui.refresh(_status.guhuoNode);
+								_status.guhuoNode.style.transform='';
+								_status.guhuoNode.removeEventListener('webkitTransitionEnd',onEnd);
+							}
+							_status.guhuoNode.listenTransition(onEnd);
+					};
+					'step 1'
+					if(event.guessers.length==0) event.goto(3);
+					else{
+						event.guessers[0].chooseControl('质疑','不质疑').set('prompt',event.prompt).set('ai',function(){
+							if(get.attitude(event.guessers[0],player)>0) return '不质疑';
+							return Math.random()<0.5?'不质疑':'质疑';
+						});
+					}
+					'step 2'
+					if(!result.control) result.control='不质疑';
+					event.guessers[0].chat(result.control);
+					game.delay(1);
+					if(result.control=='不质疑'){
+						game.log(event.guessers[0],'#g不质疑');
+						event.guessers.remove(event.guessers[0]);
+						event.goto(1);
+					}else{
+						game.log(event.guessers[0],'#y质疑');
+					}
+					'step 3'
+					game.broadcastAll(function(onEnd){
+					_status.guhuoNode.listenTransition(onEnd);
+					},event.onEnd01);
+					'step 4'
+					game.delay(3.2);
+					'step 5'
+					if(!event.guessers.length) event.finish();
+					'step 6'
+					if(trigger.card.name==trigger.cards[0].name){
+						event.guessers[0].popup('质疑错误','fire');
+						event.guessers[0].addSkill('chanyuan');
+						game.log(event.guessers[0],'获得了技能','#g【缠怨】');
+					}
+					else{
+						event.guessers[0].popup('质疑正确','wood');
+						game.log(player,'使用的',trigger.card,'作废了');
+						game.cardsDiscard(trigger.cards);
+						game.broadcastAll(ui.clear);
+						trigger.cancel();
+						if(trigger.name=='useCard'&&trigger.parent) trigger.parent.goto(0);
+					}
+					game.delay();
+				},
+			},
+			chanyuan:{
+				//charlotte:true,
+				firstDo:true,
+				trigger:{
+					player:["phaseBefore","changeHp"],
+				},
+				priority:99,
+				forced:true,
+				popup:false,
+				unique:true,
+				content:function (){
+					if(player.hp==1){
+						var skills=player.getSkills(true,false);
+						for(var i=0;i<skills.length;i++){
+							var info=get.info(skills[i]);
+							if(skills[i]=='chanyuan'||skills[i]=='rechanyuan'||info.charlotte){
+								skills.splice(i--,1);
+							}
+						}
+						player.disableSkill('chanyuan',skills);
+					}
+					else player.enableSkill('chanyuan');
+				},
+				mark:true,
+				intro:{
+					content:function (storage,player,skill){
+						var str='<li>锁定技，你不能质疑于吉，只要你的体力值为1，你的其他技能便全部失效。';
+						var list=[];
+						for(var i in player.disabledSkills){
+							if(player.disabledSkills[i].contains(skill)){
+								list.push(i)
+							}
+						}
+						if(list.length){
+							str+='<br><li>失效技能：';
+							for(var i=0;i<list.length;i++){
+								if(lib.translate[list[i]+'_info']){
+									str+=get.translation(list[i])+'、';
+								}
+							}
+							return str.slice(0,str.length-1);
+						}else return str;
+					},
+				},
+				init:function (player,skill){
+					if(player.hp==1){
+						var skills=player.getSkills(true,false);
+						for(var i=0;i<skills.length;i++){
+							var info=get.info(skills[i]);
+							if(skills[i]=='chanyuan'||skills[i]=='rechanyuan'||info.charlotte){
+								skills.splice(i--,1);
+							}
+						}
+						player.disableSkill(skill,skills);
+					}
+				},
+				onremove:function (player,skill){
+					player.enableSkill(skill);
+				},
+				locked:true,
+			},
+			"guhuo_respond":{
+				trigger:{
+					player:"chooseToRespondBegin",
+				},
+				filter:function (event,player){
+					if(player.hasSkill('guhuo_phase'))return false;
+					if(event.responded) return false;
+					if(!event.filterCard({name:'shan'})&&!event.filterCard({name:'sha'})) return false;
+					if(!lib.filter.cardRespondable({name:'shan'},player,event)&&!lib.filter.cardRespondable({name:'sha'},player,event)) return false;
+					if(!player.countCards('h')) return false;
+					return true;
+				},
+				direct:true,
+				content:function (){
+					"step 0"
+					if(trigger.filterCard({name:'shan'})&&lib.filter.cardRespondable({name:'shan'},player,trigger)) event.name='shan';
+					else event.name='sha';
+					player.chooseCard('是否发动【蛊惑】，将一张手牌当做'+get.translation(event.name)+'打出？');
+					"step 1"
+					if(result.bool){
+						player.addTempSkill('guhuo_phase');
+						player.logSkill('guhuo_guess');
+						player.popup(event.name,'metal');
+						event.card=result.cards[0];
+						player.lose(event.card,ui.special);
+						event.prompt=get.translation(player)+'声明了'+get.translation(event.name)+'，是否质疑？';
+						event.guessers=game.filterPlayer(function(current){
+							return current!=player&&!current.hasSkill('chanyuan');
+						});
+						event.guessers.sort(lib.sort.seat);
+						
+						
+					game.broadcastAll(function(card){
+					_status.guhuoNode=card.copy('thrown');
+					if(lib.config.cardback_style!='default'){
+						_status.guhuoNode.style.transitionProperty='none';
+						ui.refresh(_status.guhuoNode);
+						_status.guhuoNode.classList.add('infohidden');
+						ui.refresh(_status.guhuoNode);
+						_status.guhuoNode.style.transitionProperty='';
+					}
+					else{
+						_status.guhuoNode.classList.add('infohidden');
+					}
+					_status.guhuoNode.style.transform='perspective(600px) rotateY(180deg) translateX(0)';
+					player.$throwordered2(_status.guhuoNode);
+					},result.cards[0]);
+
+					
+					event.onEnd01=function(){
+						_status.guhuoNode.removeEventListener('webkitTransitionEnd',event.onEnd01);
+							_status.guhuoNode.style.transition='all ease-in 0.3s';
+							_status.guhuoNode.style.transform='perspective(600px) rotateY(270deg) translateX(52px)';
+							var onEnd=function(){
+								_status.guhuoNode.classList.remove('infohidden');
+								_status.guhuoNode.style.transition='all 0s';
+								ui.refresh(_status.guhuoNode);
+								_status.guhuoNode.style.transform='perspective(600px) rotateY(-90deg) translateX(52px)';
+								ui.refresh(_status.guhuoNode);
+								_status.guhuoNode.style.transition='';
+								ui.refresh(_status.guhuoNode);
+								_status.guhuoNode.style.transform='';
+								_status.guhuoNode.removeEventListener('webkitTransitionEnd',onEnd);
+							}
+							_status.guhuoNode.listenTransition(onEnd);
+					};
+					}else event.finish();
+					"step 2"
+					if(event.guessers.length==0) event.goto(4);
+					else{
+						event.guessers[0].chooseControl('质疑','不质疑').set('prompt',event.prompt).set('ai',function(){
+							if(get.attitude(event.guessers[0],player)>0) return '不质疑';
+							return Math.random()<0.5?'不质疑':'质疑';
+						});
+					}
+					"step 3"
+					if(!result.control) result.control='不质疑';
+					event.guessers[0].chat(result.control);
+					game.delay();
+					if(result.control=='不质疑'){
+						game.log(event.guessers[0],'#g不质疑');
+						event.guessers.remove(event.guessers[0]);
+						event.goto(2);
+					}else{
+						game.log(event.guessers[0],'#y质疑');
+					}
+					"step 4"
+					game.broadcastAll(function(onEnd){
+					_status.guhuoNode.listenTransition(onEnd);
+					},event.onEnd01);
+					"step 5"
+					game.delay(3.2);
+					if(!event.guessers.length) event.goto(7);
+					"step 6"
+					if(event.name==event.card.name){
+						event.guessers[0].popup('质疑错误','fire');
+						event.guessers[0].addSkill('chanyuan');
+						game.log(event.guessers[0],'获得了技能','#g【缠怨】');
+					}
+					else{
+						event.guessers[0].popup('质疑正确','wood');
+						game.log(player,'打出的','#y'+get.translation(event.name),'作废了');
+						game.cardsDiscard(event.card);
+						event.finish();
+					}
+					"step 7"
+					trigger.untrigger();
+					trigger.responded=true;
+					trigger.result={bool:true,card:{name:event.name},cards:[event.card],noanimate:true};
+				},
+				ai:{
+					order:4,
+					useful:-1,
+					value:-1,
+				},
+			},
+			"guhuo_wuxie":{
+				log:false,
+				silent:true,
+				popup:false,
+				enable:"chooseToUse",
+				filterCard:true,
+				viewAsFilter:function (player){
+					if(player.hasSkill('guhuo_phase'))return false;
+					return player.countCards('h')>0;
+				},
+				viewAs:{
+					name:"wuxie",
+				},
+				check:function(card){
+					if(card.name=='wuxie') return 1000;
+					return 0;
+				},
+				prompt:"将一张手牌当无懈可击使用",
+				threaten:1.2,
+			},
+			"guhuo_phase":{},
 		},
 		//废除装备栏时显示的卡牌
 		card:{
@@ -6746,7 +7113,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_kuizhu":"溃诛",
 			"nzry_kuizhu_info":"弃牌阶段结束后，你可以选择一项：令至多X名角色各摸一张牌，或对任意名体力值之和为X的角色造成一点伤害，若不少于2名角色，你须受到一点伤害。（X为你此阶段弃置的牌数）",
 			"nzry_zhizheng":"掣政",
-			"nzry_zhizheng_info":"锁定技，你的出牌阶段内，攻击范围内不包含你的其他角色不能成为你使用牌的目标。出牌阶段结束时，若你本阶段内使用的牌数小于这些角色数，你可以弃置其中一名角色一张牌",
+			"nzry_zhizheng_info":"锁定技，你的出牌阶段内，攻击范围内不包含你的其他角色不能成为你使用牌的目标。出牌阶段结束时，若你本阶段内使用的牌数小于这些角色的数量，则你弃置其中一名角色的一张牌。",
 			"nzry_lijun1":"立军",
 			"nzry_lijun":"立军",
 			"nzry_lijun_info":"主公技，其他吴势力角色的回合限一次，其使用的【杀】结算后，可以将此【杀】交给你，然后你可以令其摸一张牌",
@@ -7075,6 +7442,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			gzduanliang:'断粮',
 			gzduanliang_info:'你可以将一张黑色基本牌或黑色装备牌当【兵粮寸断】使用；你可以对距离为2的角色使用【兵粮寸断】',
+			"xinfu_guhuo":"蛊惑",
+			"xinfu_guhuo_info":"每名角色的回合限一次，你可以扣置一张手牌当做一张基本牌或普通锦囊牌使用或打出。其他角色依次选择是否质疑。一旦有其他角色质疑则翻开此牌：若为假则此牌作废，若为真，则质疑角色获得技能〖缠怨〗。",
+			"guhuo_guess":"蛊惑",
+			"guhuo_guess_info":"",
+			chanyuan:"缠怨",
+			"chanyuan_info":"锁定技，你不能质疑于吉，当你的体力值为1时，你的其他技能失效。",
+			"guhuo_respond":"蛊惑",
+			"guhuo_respond_info":"",
+			"guhuo_wuxie":"蛊惑",
+			"guhuo_wuxie_info":"",
+			"guhuo_phase":"蛊惑",
+			"guhuo_phase_info":"",
 			
 			shenhua_feng:'神话再临·风',
 			shenhua_huo:'神话再临·火',

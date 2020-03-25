@@ -1482,6 +1482,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			tieji:{
 				audio:2,
+				shaRelated:true,
 				trigger:{player:'useCardToPlayered'},
 				check:function(event,player){
 					return get.attitude(player,event.target)<=0;
@@ -2277,6 +2278,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			wushuang:{
+				shaRelated:true,
 				audio:2,
 				audioname:['re_lvbu','shen_lvbu'],
 				forced:true,
@@ -2464,6 +2466,68 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
+			"xinfu_jijie":{
+				enable:"phaseUse",
+				usable:1,
+				audio:2,
+				//filter:function(){
+					//return ui.cardPile.hasChildNodes();
+				//},
+				content:function (){
+					'step 0'
+					//event.card=ui.cardPile.lastChild;
+					event.card=get.bottomCards()[0];
+					var content=['牌堆底的一张牌',[event.card]];
+					game.log(player,'观看了牌堆底的一张牌');
+					player.chooseControl('ok').set('dialog',content);
+					'step 1'
+					player.chooseTarget('选择获得此牌的角色').set('ai',function(target){
+							var att=get.attitude(_status.event.player,target);
+							if(_status.event.du){
+								if(target.hasSkillTag('nodu')) return 0.5;
+								return -att;
+							}
+						if(att>0){
+								if(_status.event.player!=target) att+=2;
+								return att+Math.max(0,5-target.countCards('h'));
+							}
+							return att;
+					}).set('du',event.card.name=='du').set('same',event.same);
+					'step 2'
+					if(result.bool){
+						event.target=result.targets[0];
+						player.line(event.target,'green');
+						player.give(event.card,event.target);
+					}
+					else ui.cardPile.appendChild(event.card);
+					game.updateRoundNumber();
+				},
+				ai:{
+					order:7.2,
+					result:{
+						player:1,
+					},
+				},
+			},
+			"xinfu_jiyuan":{
+				trigger:{
+					global:"dying",
+					source:"gainAfter",
+				},
+				//priority:6,
+				audio:2,
+				filter:function (event,player){
+					if(event.name=='dying') return true;
+					return event.player!=player&&event.bySelf!=true;
+				},
+				check:function (event,player){
+					return get.attitude(player,event.player)>0;
+				},
+				logTarget:"player",
+				content:function (){
+					trigger.player.draw();
+				},
+			},
 		},
 		translate:{
 			caocao:'曹操',
@@ -2624,6 +2688,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yaowu_info:'锁定技，当任意一名角色使用红色【杀】对你造成伤害时，该角色回复1点体力或摸一张牌。',
 			"new_jiangchi":"将驰",
 			"new_jiangchi_info":"摸牌阶段结束时，你可以选择一项：1、摸一张牌，若如此做，你本回合内不能使用或打出【杀】。 2、弃置一张牌，若如此做，出牌阶段你使用【杀】无距离限制且你可以额外使用一张【杀】，直到回合结束。",
+			"xinfu_jijie":"机捷",
+			"xinfu_jijie_info":"出牌阶段限一次。你可以观看牌堆底的一张牌，然后将其交给一名角色。",
+			"xinfu_jiyuan":"急援",
+			"xinfu_jiyuan_info":"当一名角色进入濒死状态时，或你交给一名其他角色牌时，你可以令其摸一张牌。",
 			
 			standard_2008:"2008版标准包",
 			standard_2013:"2013版标准包",
