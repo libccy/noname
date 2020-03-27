@@ -13044,7 +13044,8 @@
 						player.line(target,'green');
 					}
 					if(!event.chooseonly){
-						var next=target.discard(event.cards,'notBySelf');
+						var next=target.discard(event.cards);
+						if(player!=target) next.notBySelf=true;
 						event.done=next;
 						if(event.delay===false){
 							next.set('delay',false);
@@ -17932,9 +17933,9 @@
 							for(var i=0;i<es.length;i++){
 								if(game.hasPlayer(function(current2){
 									if(withatt){
-										if(get.sgn(get.value(es[i]))!=-att) return false;
+										if(get.sgn(get.value(es[i],current))!=-att) return false;
 										var att2=get.sgn(get.attitude(player,current2));
-										if(att2!=-att) return false;
+										if(att2!=get.sgn(get.value(es[i],current2))) return false;
 									}
 									return current!=current2&&!current2.isMin()&&current2.isEmpty(get.subtype(es[i]));
 								})){
@@ -50432,7 +50433,7 @@
 			else final=(result1*get.attitude(player,player)+(target?result2*get.attitude(player,target):0));
 			if(!isLink&&get.tag(card,'natureDamage')&&target.isLinked()&&!zerotarget){
 				game.countPlayer(function(current){
-					if(current!=target&&current.isLinked) final+=get.effect(current,card,player,player2,true);
+					if(current!=target&&current.isLinked()) final+=get.effect(current,card,player,player2,true);
 				})
 			}
 			return final;

@@ -1439,6 +1439,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					aiValue:function(player,card,num){
 						if(card.name=='zhangba') return 15;
 						if(player.getEquip('zhangba')&&player.countCards('h')>1&&['shan','tao'].contains(card.name)) return 0;
+						if(card.name=='shan'||card.name=='tao') return num/2;
 					},
 				},
 				locked:false,

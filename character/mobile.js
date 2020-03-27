@@ -141,9 +141,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.hasSkillTag('unequip2')) return false;
 					return true;
 				},
-				onLose:function (){
-					player.recover();
-					player.draw(2);
+				loseDelay:false,
+				onLose:function(){
+					player.logSkill('rw_baiyin_skill');
+					var next=game.createEvent('rw_baiyin_recover');
+					event.next.remove(next);
+					event.getParent().after.push(next);
+					next.player=player;
+					next.setContent(function(){
+						player.draw(2);
+						player.recover();
+					});
 				},
 				skills:["rw_baiyin_skill"],
 				tag:{
@@ -247,11 +255,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						valueswap:1,
 					},
 				},
-				skills:["zhuge_skill"],
+				skills:["rw_zhuge_skill"],
 			},
 		},
 		characterFilter:{},
 		skill:{
+			rw_zhuge_skill:{
+				equipSkill:true,
+				audio:true,
+				firstDo:true,
+				trigger:{player:'useCard1'},
+				forced:true,
+				filter:function(event,player){
+					return !event.audioed&&event.card.name=='sha'&&player.countUsed('sha',true)>1&&event.getParent().type=='phase';
+				},
+				content:function(){
+					trigger.audioed=true;
+				},
+				mod:{
+					cardUsable:function(card,player,num){
+						if(card.name=='sha'){
+							return Infinity;
+						}
+					}
+				},
+			},
 			xinqingjian:{
 				audio:'qingjian',
 				trigger:{player:'gainEnd'},
@@ -344,7 +372,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wanlan:{
 				audio:2,
 				trigger:{global:'dying'},
-				check:function(){return false},
+				check:function(event,player){
+					if(get.attitude(player,event.player)<4) return false;
+					if(player.countCards('h',function(card){
+						var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+						if(mod2!='unchanged') return mod2;
+						var mod=game.checkMod(card,player,'unchanged','cardSavable',player);
+						if(mod!='unchanged') return mod;
+						var savable=get.info(card).savable;
+						if(typeof savable=='function') savable=savable(card,player,event.player);
+						return savable;
+					})>=1-event.player.hp) return false;
+					if(event.player==player||event.player==get.zhu(player)) return true;
+					if(_status.currentPhase&&get.damageEffect(_status.currentPhase,player,player)<0) return false;
+					return !player.hasUnknown();
+				},
 				limited:true,
 				unique:true,
 				filter:function(event,player){
@@ -1053,7 +1095,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'xinfu_wuniang',
 				content:function (){
 					'step 0'
-					player.chooseTarget(get.prompt('meiyong'),'获得一名其他角色的一张牌，然后摸一张牌。',function(card,player,target){
+					player.chooseTarget(get.prompt('meiyong'),'获得一名其他角色的一张牌，然后其摸一张牌。',function(card,player,target){
 						if(player==target) return false;
 						return target.countGainableCards(player,'he')>0;
 					}).set('ai',function(target){
@@ -1228,12 +1270,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shouye:{
 				audio:2,
 				group:'shouye_after',
-				trigger:{global:"useCard"},
+				trigger:{global:"useCardToTargeted"},
 				filter:function(event,player){
-					return event.player!=player&&event.targets&&
-					event.targets[0]==player&&event.targets.length==1;
+					return event.player!=player&&event.targets.length==1;
 				},
 				check:function(event,player){
+					if(event.player==game.me||event.player.isOnline()) return get.attitude(player,event.player)<0;
 					return get.effect(player,event.card,event.player,player)<0;
 				},
 				usable:1,
@@ -1245,7 +1287,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						trigger.excluded.add(player);
-						trigger.shouyeer=player;
+						trigger.getParent().shouyeer=player;
 					}
 				},
 				subSkill:{
@@ -1266,12 +1308,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							var list=[];
-								for(var i=0;i<trigger.cards.length;i++){
-									if(trigger.cards[i].isInPile()){
-										list.push(trigger.cards[i]);
-									}
+							for(var i=0;i<trigger.cards.length;i++){
+								if(trigger.cards[i].isInPile()){
+									list.push(trigger.cards[i]);
 								}
-								player.gain(list,'gain2');
+							}
+							player.gain(list,'gain2','log');
 						},
 					},
 				},
@@ -2512,11 +2554,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function (event,player){
 					if(event.type=='dying'){
 						if(player!=event.dying) return false;
-						return true;
+						return player.countCards('he',function(card){
+							return get.subtype(card)=='equip2';
+						})>0;
 					}
-					return player.countCards('he',function(card){
-						return get.subtype(card)=='equip2';
-					})>0;
+					return false;
 				},
 				check:function(){
 					return 1;
@@ -3177,7 +3219,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"rewrite_tengjia":"桐油百韧甲",
 			"rewrite_tengjia_info":"锁定技，【南蛮入侵】、【万箭齐发】和普【杀】对你无效。当你受到火焰伤害时，此伤害+1。当你即将被横置时，取消之。",
 			"rewrite_zhuge":"元戎精械弩",
-			"rewrite_zhuge_info":"你于出牌阶段内使用【杀】无次数限制。",
+			"rewrite_zhuge_info":"锁定技，你于出牌阶段内使用【杀】无次数限制。",
+			rw_zhuge_skill:'诸葛连弩',
+			rw_zhuge_skill_info:'锁定技，你于出牌阶段内使用【杀】无次数限制。',
 			takaramono:"宝物",
 			"wolong_card":"卧龙",
 			"wolong_card_info":"对一名角色造成1点火焰伤害。若场上有存活的诸葛亮(火)，则改为对至多两名角色各造成两点火焰伤害。",

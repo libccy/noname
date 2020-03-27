@@ -1022,6 +1022,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return evt&&evt.card&&evt.card.name=='sha'&&event.player.countGainableCards(player,'h')>0;
 				},
 				//priority:7,
+				logTarget:'player',
+				prompt2:'获得该角色的一张手牌',
 				check:function(event,player){
 					return get.attitude(player,event.player)<0;
 				},

@@ -401,12 +401,20 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'equip',
 				subtype:'equip2',
+				loseDelay:false,
 				onLose:function(){
-					player.recover();
+					if(player.isDamaged()) player.logSkill('baiyin_skill');
+					var next=game.createEvent('baiyin_recover');
+					event.next.remove(next);
+					event.getParent().after.push(next);
+					next.player=player;
+					next.setContent(function(){
+						player.recover();
+					});
 				},
 				filterLose:function(card,player){
 					if(player.hasSkillTag('unequip2')) return false;
-					return player.hp<player.maxHp;
+					return true;
 				},
 				skills:['baiyin_skill'],
 				tag:{

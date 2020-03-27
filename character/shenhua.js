@@ -600,7 +600,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				filter:function (event,player){
 					if(event.player.countCards('h')<player.countCards('h')) return false;
-					if(event.card.name!='sha'&&event.card.name!='juedou') return true;
+					if(event.card.name!='sha'&&event.card.name!='juedou') return false;
 					return !game.hasPlayer2(function(current){
 						return current.getHistory('useCard',function(evt){
 							return evt!=event.getParent()&&evt.card&&['sha','juedou'].contains(evt.card.name)&&evt.targets.contains(player);

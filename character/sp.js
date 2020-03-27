@@ -648,6 +648,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					target.turnOver();
+					player.addTempSkill('spfuluan2');
 				},
 				ai:{
 					order:1,
@@ -6530,12 +6531,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(mode!='chess'&&mode!='tafang'&&mode!='stone'){
 						event.num=Math.min(event.num,game.players.length+game.dead.length);
 					}
-					player.reinit('zhaoxiang',result.links[0],event.num);
+					player.reinit('zhaoxiang',result.links[0],false);
 					if(_status.characterlist){
 						_status.characterlist.add('zhaoxiang');
 						_status.characterlist.remove(result.links[0]);
 					}
 					'step 2'
+					var num=event.num-player.maxHp;
+					if(num>0) player.gainMaxHp(num);
+					else player.loseMaxHp(-num);
 					player.recover();
 				}
 			},
@@ -14130,7 +14134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:"phaseUse",
 				usable:1,
 				filterTarget:function (card,player,target){
-					return player!=target&&target.countCards('e')<player.countCards('e')&&target.countCards('hej');
+					return player!=target&&target.countCards('e')<player.countCards('e');
 				},
 				content:function (){
 					"step 0"
@@ -14168,8 +14172,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function (player,target){
 							var numj=target.countCards('j');
 							var numhe=target.countCards('he');
-							if(numhe==0) return 6;
-							return -6+(numj+1)/numhe;
+							if(numhe==0) return numj>0?6:-6;
+							return -6-(numj+1)/numhe;
 						},
 					},
 					threaten:1.1,
@@ -14256,7 +14260,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function (){
 					"step 0"
-					if(!target.countCards('hej')){
+					if(target.countCards('hej')==0){
 						event._result={index:1};
 					}
 					else{
@@ -14298,7 +14302,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(player.hasSkill('xinfu_sidaoy')||!player.countCards('h')) return false;
 					if(!event.targets||!event.targets.length||!event.isPhaseUsing(player)) return false;
-					var evt=player.getLastUsed(1);
+					var history=player.getHistory('useCard');
+					var index=history.indexOf(event)-1;
+					if(index<0) return false;
+					var evt=history[index];
 					if(!evt||!evt.targets||!evt.targets.length||!evt.isPhaseUsing(player)) return false;
 					for(var i=0;i<event.targets.length;i++){
 						if(evt.targets.contains(event.targets[i])&&lib.filter.filterTarget({name:'shunshou'},player,event.targets[i])) return true;
@@ -17196,7 +17203,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tianming_info:'当你成为【杀】的目标时，你可以弃置两张牌（不足则全弃，无牌则不弃），然后摸两张牌；若此时全场体力值最多的角色仅有一名且不是你，该角色也可以如此做。',
 			mizhao_info:'出牌阶段限一次，你可以将所有手牌交给一名其他角色。若如此做，你令该角色与你指定的另一名有手牌的角色拼点，视为拼点赢的角色对没赢的角色使用一张【杀】。',
 			yuanhu_info:'结束阶段开始时，你可以将一张装备牌置于一名角色的装备区里，然后根据此装备牌的类型执行以下对应效果。武器牌：弃置该角色距离1以内的一名角色区域中的一张牌；防具牌：该角色摸一张牌；坐骑牌：该角色回复1点体力。',
-			lihun_info:'出牌阶段限一次，你可以弃置一张牌并选择一名其他男性角色。若如此做，你将武将牌翻面并获得其一张手牌。出牌阶段结束时，你交给其X张牌。（X为该角色的体力值）',
+			lihun_info:'出牌阶段限一次，你可以弃置一张牌并选择一名其他男性角色。若如此做，你将武将牌翻面并获得其所有手牌。出牌阶段结束时，你交给其X张牌。（X为该角色的体力值）',
 			chongzhen_info:'当你发动〖龙胆〗使用或打出一张牌时，你可以获得对方的一张手牌。',
 			bifa_info:'结束阶段开始时，你可以将一张手牌移出游戏并指定一名其他角色。该角色的准备阶段开始时，其观看你移出游戏的牌并选择一项：交给你一张与此牌类型相同的手牌并获得此牌；或将此牌置入弃牌堆，然后失去1点体力。',
 			songci_info:'出牌阶段，你可以选择一项：令一名手牌数小于其体力值的角色摸两张牌；或令一名手牌数大于其体力值的角色弃置两张牌。每局游戏每名角色限一次。',
