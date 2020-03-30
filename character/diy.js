@@ -19,6 +19,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_yukine:['female','key',3,['yukine_wenzhou']],
 			key_yusa:['female','key',3,['yusa_yanyi','yusa_misa','dualside'],['dualside:key_misa']],
 			key_misa:['female','key',3,['misa_yehuo','misa_yusa','dualside'],['unseen']],
+			key_masato:['male','key','4/8',['masato_baoquan']],
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
 			diy_feishi:['male','shu',3,['shuaiyan','moshou']],
@@ -95,7 +96,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy:{
 				diy_tieba:["diy_wenyang","ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_zhangwei"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato"],
 			},
 		},
 		characterIntro:{
@@ -110,6 +111,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
+			key_masato:'#bLittle Busters!',
 			key_yusa:'#bCharlotte',
 			key_misa:'#rCharlotte',
 			key_yukine:'#gClannad',
@@ -156,6 +158,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuji:['zuoci']
 		},
 		skill:{
+			masato_baoquan:{
+				trigger:{source:'damageBefore'},
+				forced:true,
+				content:function(){
+					'step 0'
+					player.chooseControl('防止伤害','增加伤害').set('prompt','暴拳：防止即将对'+get.translation(trigger.player)+'造成的伤害，或失去1点体力上限并令此伤害+2').set('choice',get.attitude(player,trigger.player)>=0?0:1).set('ai',function(){return _status.event.choice});
+					'step 1'
+					if(result.control=='增加伤害'){
+						player.loseMaxHp();
+						trigger.num+=2;
+					}
+					else trigger.cancel();
+				},
+			},
 			yusa_yanyi:{
 				enable:'phaseUse',
 				usable:1,
@@ -804,6 +820,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'dieAfter'},
 				direct:true,
 				limited:true,
+				mark:false,
+				init:function(player){
+					if(player.hasZhuSkill('yuri_wangxi')){
+						player.markSkill('yuri_wangxi');
+						player.storage.yuri_wangxi=false;
+					}
+				},
 				zhuSkill:true,
 				unique:true,
 				skillAnimation:true,
@@ -5707,6 +5730,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_yukine:'宫泽有纪宁',
 			key_yusa:'西森柚咲',
 			key_misa:'黑羽美砂',
+			key_masato:'井之原真人',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -5746,6 +5770,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yusa_misa_info:'当你发动的〖演艺〗结算完成之后，你可以将武将牌翻面。',
 			misa_yusa:'归魂',
 			misa_yusa_info:'当你发动的〖业火〗结算完成后，你可以将武将牌翻面。',
+			masato_baoquan:'暴拳',
+			masato_baoquan_info:'锁定技，当你即将造成伤害时，你选择一项：1.令此伤害+2并减1点体力上限。2.防止此伤害。',
 			
 			ns_zhangwei:'张葳',
 			nsqiyue:'骑钺',

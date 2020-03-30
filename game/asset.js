@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'1.9.98.4.2',
+	'1.9.98.4.4',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -8,7 +8,7 @@ window.noname_asset_list=[
 	'audio/background/music_diaochan.mp3',
 	'audio/background/music_shezhan.mp3',
 	'audio/background/music_jifeng.mp3',
-	'audio/background/music_philosophy.mp3',
+	'audio/background/music_phliosophy.mp3',
 	'audio/background/music_jilve.mp3',
 	'audio/card/default.mp3',
 	
@@ -2423,6 +2423,11 @@ window.noname_asset_list=[
 	'image/card/rewrite_renwang.png',
 	'image/card/rewrite_tengjia.png',
 	'image/card/rewrite_zhuge.png',
+	'image/card/group_wei.png',
+	'image/card/group_shu.png',
+	'image/card/group_wu.png',
+	'image/card/group_qun.png',
+	'image/card/group_key.png',
 
 	'image/card/bagua.png',
 	'image/card/baihupifeng.png',
@@ -2862,6 +2867,8 @@ window.noname_asset_list=[
 	'image/character/sp_wangyuanji.jpg',
 	'image/character/sp_xinxianying.jpg',
 	'image/character/key_misa.jpg',
+	'image/character/key_masato.jpg',
+	'image/character/ol_xiahouyuan.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',

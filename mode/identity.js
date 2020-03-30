@@ -2,6 +2,23 @@
 game.import('mode',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'identity',
+		card:{
+			group_wei:{
+				fullskin:true,
+			},
+			group_shu:{
+				fullskin:true,
+			},
+			group_wu:{
+				fullskin:true,
+			},
+			group_qun:{
+				fullskin:true,
+			},
+			group_key:{
+				fullskin:true,
+			},
+		},
 		start:function(){
 			"step 0"
 			if(!lib.config.new_tutorial){
@@ -1857,7 +1874,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							zhu.update();
 						}
 					},game.zhu,game.zhu.name,game.zhu.name2,game.players.length>4);
-
+					
+					if(game.zhu.group=='shen'){
+						var list=['wei','shu','wu','qun','key'];
+						for(var i=0;i<list.length;i++){
+							if(!lib.group.contains(list[i])) list[i].splice(i--,1);
+							else list[i]=['','','group_'+list[i]];
+						}
+						game.zhu.chooseButton(['请选择神武将的势力',[list,'vcard']],true).set('ai',function(){
+							return Math.random();
+						});
+					}
+					else event.goto(3);
+					"step 2"
+					var name=result.links[0][2].slice(6);
+					game.zhu.changeGroup(name);
+					"step 3"
 					var list=[];
 					var selectButton=(lib.configOL.double_character?2:1);
 
@@ -1901,7 +1933,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.me.chooseButtonOL(list,function(player,result){
 						if(game.online||player==game.me) player.init(result.links[0],result.links[1]);
 					});
-					"step 2"
+					"step 4"
+					var shen=[];
 					for(var i in result){
 						if(result[i]&&result[i].links){
 							for(var j=0;j<result[i].links.length;j++){
@@ -1916,25 +1949,57 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						else{
 							result[i]=result[i].links
 						}
-						if(!lib.playerOL[i].name){
-							lib.playerOL[i].init(result[i][0],result[i][1]);
-						}
+						if(lib.character[result[i][0]]&&lib.character[result[i][0]][1]=='shen') shen.push(lib.playerOL[i]);
 					}
+					event.result2=result;
+					if(shen.length){
+						var list=['wei','shu','wu','qun','key'];
+						for(var i=0;i<list.length;i++){
+							if(!lib.group.contains(list[i])) list[i].splice(i--,1);
+							list[i]=['','','group_'+list[i]];
+						}
+						for(var i=0;i<shen.length;i++){
+							shen[i]=[shen[i],['请选择神武将的势力',[list,'vcard']],1,true];
+						}
+						game.me.chooseButtonOL(shen,function(player,result){
+							if(player==game.me) player.changeGroup(result.links[0][2].slice(6),false,false);
+						}).set('switchToAuto',function(){
+ 						_status.event.result='ai';
+ 					}).set('processAI',function(){
+ 						var buttons=_status.event.dialog.buttons;
+ 						return {
+ 							bool:true,
+ 							links:buttons.randomGets(1),
+ 						}
+ 					});
+					}
+					"step 5"
+					if(!result) result={};
+					var result2=event.result2;
+					game.broadcast(function(result,result2){
+						for(var i in result){
+							if(!lib.playerOL[i].name){
+								lib.playerOL[i].init(result[i][0],result[i][1]);
+							}
+							if(result2[i]&&result2[i].links) lib.playerOL[i].changeGroup(result2[i].links[0][2].slice(6),false,false);
+						}
+						setTimeout(function(){
+							ui.arena.classList.remove('choose-character');
+						},500);
+					},result2,result);
+					
+					for(var i in result2){
+						if(!lib.playerOL[i].name){
+							lib.playerOL[i].init(result2[i][0],result2[i][1]);
+						}
+						if(result[i]&&result[i].links) lib.playerOL[i].changeGroup(result[i].links[0][2].slice(6),false,false);
+					}
+					
 					if(event.special_identity){
 						for(var i in event.special_identity){
 							game.zhu.addSkill(i);
 						}
 					}
-					game.broadcast(function(result){
-						for(var i in result){
-							if(!lib.playerOL[i].name){
-								lib.playerOL[i].init(result[i][0],result[i][1]);
-							}
-						}
-						setTimeout(function(){
-							ui.arena.classList.remove('choose-character');
-						},500);
-					},result);
 					for(var i=0;i<game.players.length;i++){
 						_status.characterlist.remove(game.players[i].name);
 						_status.characterlist.remove(game.players[i].name2);
@@ -1946,6 +2011,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		translate:{
+			group_wei:"魏势力",
+			group_shu:"蜀势力",
+			group_wu:"吴势力",
+			group_qun:"群势力",
+			group_key:"键势力",
+			group_wei_bg:"魏",
+			group_shu_bg:"蜀",
+			group_wu_bg:"吴",
+			group_qun_bg:"群",
+			group_key_bg:"键",
 			zhu:"主",
 			zhong:"忠",
 			mingzhong:"忠",

@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			refresh:{
 				refresh_standard:["re_caocao","re_simayi","re_guojia","re_lidian","re_zhangliao","re_xuzhu","re_xiahoudun","re_zhangfei","re_zhaoyun","re_guanyu","re_machao","re_xushu","re_zhouyu","re_lvmeng","re_ganning","re_luxun","re_daqiao","re_huanggai","re_lvbu","re_gongsunzan","re_huatuo","re_liubei","re_diaochan","re_huangyueying","re_sunquan","re_sunshangxiang","re_zhenji","re_zhugeliang","re_huaxiong"],
-				refresh_feng:['caoren','re_xiahouyuan','re_huangzhong','re_weiyan','re_xiaoqiao','zhoutai','re_zhangjiao','xin_yuji'],
+				refresh_feng:['caoren','ol_xiahouyuan','re_huangzhong','re_weiyan','re_xiaoqiao','zhoutai','re_zhangjiao','xin_yuji'],
 				refresh_huo:["re_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","re_pangtong","ol_yuanshao","re_pangde"],
 				refresh_lin:['re_zhurong','re_menghuo','re_dongzhuo','re_sunjian','re_caopi','re_xuhuang'],
 				refresh_shan:['re_dengai','re_jiangwei','re_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce'],
@@ -51,7 +51,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_yuji:['male','qun',3,['reguhuo']],
 			re_zuoci:['male','qun',3,['rehuashen','rexinsheng']],
 			
-			re_xiahouyuan:['male','wei',4,['xinshensu']],
+			ol_xiahouyuan:['male','wei',4,['xinshensu','shebian']],
 			caoren:['male','wei',4,['xinjushou','xinjiewei']],
 			re_huangzhong:['male','shu',4,['xinliegong']],
 			re_weiyan:['male','shu',4,['xinkuanggu','qimou']],
@@ -59,7 +59,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhoutai:['male','wu',4,['buqu','fenji']],
 			re_pangde:['male','qun',4,['mashu','jianchu']],
 			re_xuhuang:['male','wei',4,['duanliang','jiezi']],
-			re_sp_zhugeliang:["male","shu",3,["rehuoji","rekanpo","bazhen"],[]],
+			re_sp_zhugeliang:["male","shu",3,["bazhen","rehuoji","rekanpo","cangzhuo"],[]],
 			re_xunyu:["male","wei",3,["quhu","rejieming"],[]],
 			re_dianwei:["male","wei",4,["reqiangxi"],[]],
 			re_yanwen:["male","qun",4,["reshuangxiong"],[]],
@@ -92,6 +92,42 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunben:['zhouyu','taishici','daqiao'],
 		},
 		skill:{
+			cangzhuo:{
+				trigger:{player:'phaseDiscardBegin'},
+				frequent:true,
+				filter:function(event,player){
+					return player.getHistory('useCard',function(card){
+						return get.type(card.card,'trick')=='trick';
+					}).length==0;
+				},
+				content:function(){
+					player.addTempSkill('cangzhuo2');
+				},
+			},
+			cangzhuo2:{
+				mod:{
+					ignoredHandcard:function(card,player){
+						if(get.type(card,'trick')=='trick'){
+							return true;
+						}
+					},
+					cardDiscardable:function(card,player,name){
+						if(name=='phaseDiscard'&&get.type(card,'trick')=='trick') return false;
+					}
+				},
+			},
+			shebian:{
+				trigger:{player:'turnOverEnd'},
+				check:function(event,player){
+					return player.canMoveCard(true,true);
+				},
+				filter:function(event,player){
+					return player.canMoveCard(null,true);
+				},
+				content:function(){
+					player.moveCard().nojudge=true;
+				},
+			},
 			rexianzhen:{
 				audio:2,
 				enable:'phaseUse',
@@ -5407,6 +5443,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rejinjiu_info:'锁定技，你的【酒】均视为【杀】。其他角色不能于你的回合内使用【酒】。当你受到酒【杀】的伤害时，你令此伤害-X（X为影响过此【杀】的伤害值的【酒】的数量）',
 			rejinjiu2:'禁酒',
 			rejinjiu3:'禁酒',
+			ol_xiahouyuan:'界夏侯渊',
+			shebian:'设变',
+			shebian_info:'当你的武将牌翻面后，你可以移动场上的一张牌。',
+			cangzhuo:'藏拙',
+			cangzhuo_info:'弃牌阶段开始时，若你本回合内没有使用过装备牌，则你的锦囊牌不计入手牌上限。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

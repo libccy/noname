@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connectBanned:['zuoci'],
 		characterSort:{
 			shenhua:{
-				shenhua_feng:["sp_zhangjiao","re_yuji","old_zhoutai","old_caoren","xiahouyuan","xiaoqiao","huangzhong","weiyan"],
+				shenhua_feng:["sp_zhangjiao","re_yuji","old_zhoutai","old_caoren","re_xiahouyuan","xiaoqiao","huangzhong","weiyan"],
 				shenhua_huo:['dianwei','xunyu','pangtong','sp_zhugeliang','taishici','yanwen','re_yuanshao','pangde'],
 				shenhua_lin:['caopi','xuhuang','menghuo','zhurong','re_lusu','sunjian','dongzhuo','jiaxu'],
 				shenhua_shan:['dengai','zhanghe','liushan','jiangwei','zhangzhang','sunce','caiwenji','zuoci'],
@@ -19,7 +19,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_caoren:['male','wei',4,['moon_jushou','jiewei']],
 			xuhuang:['male','wei',4,['gzduanliang']],
 			pangde:['male','qun',4,['mashu','mengjin']],
-			xiahouyuan:['male','wei',4,['shensu']],
+			re_xiahouyuan:['male','wei',4,['xinshensu']],
 			huangzhong:['male','shu',4,['liegong']],
 			weiyan:['male','shu',4,['kuanggu']],
 			xiaoqiao:['female','wu',3,['tianxiang','hongyan']],
@@ -5699,17 +5699,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			shensu:{
 				audio:'shensu1',
-				audioname:['xiahouba','re_xiahouyuan'],
+				audioname:['xiahouba','re_xiahouyuan','ol_xiahouyuan'],
 				group:['shensu1','shensu2']
 			},
 			xinshensu:{
 				audio:'shensu1',
-				audioname:['xiahouba','re_xiahouyuan'],
+				audioname:['xiahouba','re_xiahouyuan','ol_xiahouyuan'],
 				group:['shensu1','shensu2','shensu4']
 			},
 			shensu1:{
 				audio:2,
-				audioname:['xiahouba','re_xiahouyuan'],
+				audioname:['xiahouba','re_xiahouyuan','ol_xiahouyuan'],
 				trigger:{player:'phaseJudgeBefore'},
 				direct:true,
 				content:function(){
@@ -5733,7 +5733,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			shensu2:{
 				audio:'shensu1',
-				audioname:['xiahouba','re_xiahouyuan'],
+				audioname:['xiahouba','re_xiahouyuan','ol_xiahouyuan'],
 				trigger:{player:'phaseUseBefore'},
 				direct:true,
 				filter:function(event,player){
@@ -5774,12 +5774,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			shensu4:{
 				audio:'shensu1',
-				audioname:['xiahouba','re_xiahouyuan'],
+				audioname:['xiahouba','re_xiahouyuan','ol_xiahouyuan'],
 				trigger:{player:'phaseDiscardBefore'},
 				direct:true,
 				content:function(){
 					"step 0"
-					var check=player.needsToDiscard()||player.isTurnedOver();
+					var check=player.needsToDiscard()||player.isTurnedOver()||(player.hasSkill('shebian')&&player.canMoveCard(true,true));
 					player.chooseTarget(get.prompt('shensu'),"跳过弃牌阶段并将武将牌翻面，视为对一名其他角色使用一张【杀】",function(card,player,target){
 						if(player==target) return false;
 						return player.canUse({name:'sha'},target,false);
@@ -7367,7 +7367,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xueyi_info:'主公技，锁定技，场上每有一名其他群雄角色存活，你的手牌上限便+2。',
 			mengjin_info:'当你使用的【杀】被【闪】抵消时，你可以弃置目标角色的一张牌。',
 
-			re_xiahouyuan:'界夏侯渊',
+			re_xiahouyuan:'夏侯渊',
 			re_huangzhong:'界黄忠',
 			re_weiyan:'界魏延',
 			re_xiaoqiao:'界小乔',
@@ -7385,7 +7385,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_caoren:'曹仁',
 			xuhuang:'徐晃',
 			pangde:'庞德',
-			xiahouyuan:'夏侯渊',
+			xiahouyuan:'旧夏侯渊',
 			caoren:'界曹仁',
 			huangzhong:'黄忠',
 			sp_zhangjiao:'张角',

@@ -6822,7 +6822,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				unique:true,
 				limited:true,
-				mark:null,
+				mark:false,
 				content:function(){
 					'step 0'
 					player.storage.xingshuai=true;
@@ -6895,10 +6895,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							if(target.hasSkillTag('nogain')) return 0;
-							if(player.countCards('h')==1&&player.countCards('h','du')) return -1;
-							if(player.hp<=2&&player.countCards('h','shan')) return 0;
-							if(target.countCards('h')+player.countCards('h')>target.hp+2) return 0;
-							if(get.attitude(player,target)>3) return 1;
+							if(player.countCards('h')==player.countCards('h','du')) return -1;
+							if(target.hasJudge('lebu')) return 0;
+							if(get.attitude(player,target)>3){
+ 							var basis=get.threaten(target);
+ 							if(player==get.zhu(player)&&player.hp<=2&&player.countCards('h','shan')&&!game.hasPlayer(function(current){
+ 								return get.attitude(current,player)>3&&current.countCards('h','tao')>0;
+ 							})) return 0;
+ 							if(target.countCards('h')+player.countCards('h')>target.hp+2) return basis*0.8;
+ 							return basis;
+							}
 							return 0;
 						}
 					}

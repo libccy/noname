@@ -3159,6 +3159,28 @@
 							}
 						}
 					},
+					transparent_dialog:{
+						name:'堆叠对话框虚化',
+						init:false,
+						intro:'当具有static属性的对话框堆叠（如五谷丰登对话框中提示无懈可击）时，将后方的对话框变为半透明',
+						onclick:function(bool){
+							game.saveConfig('transparent_dialog',bool);
+							if(bool){
+								for(var i=0;i<ui.dialogs.length;i++){
+									if(ui.dialogs[i]!=ui.dialog&&ui.dialogs[i].static){
+										ui.dialogs[i].unfocus();
+									}
+								}
+							}
+							else{
+								for(var i=0;i<ui.dialogs.length;i++){
+									if(ui.dialogs[i]!=ui.dialog&&ui.dialogs[i].static){
+										ui.dialogs[i].refocus();
+									}
+								}
+							}
+						}
+					},
 					mark_identity_style:{
 						name:'标记身份操作',
 						intro:'设置单击身份按钮时的操作',
@@ -6412,7 +6434,7 @@
 					return this;
 				};
 				HTMLDivElement.prototype.unfocus=function(){
-					this.classList.add('transparent');
+					if(lib.config.transparent_dialog) this.classList.add('transparent');
 					return this;
 				};
 				HTMLDivElement.prototype.refocus=function(){
@@ -13312,7 +13334,7 @@
 				},
 				moveCard:function(){
 					'step 0'
-					if(!player.canMoveCard()){
+					if(!player.canMoveCard(null,event.nojudge)){
 						event.finish();
 						return;
 					}
@@ -15424,11 +15446,16 @@
 				getDamagedHp:function(){
 					return this.maxHp-Math.max(0,this.hp);
 				},
-				changeGroup:function(group,log){
-					game.broadcastAll(function(player,group){
-						player.group=group;
-						player.node.name.dataset.nature=get.groupnature(group);
-					},this,group);
+				changeGroup:function(group,log,broadcast){
+					var player=this;
+					if(broadcast!==false){
+						game.broadcast(function(player,group){
+							player.group=group;
+							player.node.name.dataset.nature=get.groupnature(group);
+						},player,group);
+					}
+					player.group=group;
+					player.node.name.dataset.nature=get.groupnature(group);
 					if(log!==false) game.log(this,'将势力变为了','#y'+get.translation(group+2));
 				},
 				chooseToDuiben:function(target){
@@ -17924,7 +17951,7 @@
 						return false;
 					}
 				},
-				canMoveCard:function(withatt){
+				canMoveCard:function(withatt,nojudge){
 					var player=this;
 					return game.hasPlayer(function(current){
 						var att=get.sgn(get.attitude(player,current));
@@ -17943,7 +17970,7 @@
 								}
 							}
 						}
-						if(!withatt||att>0){
+						if(!nojudge&&(!withatt||att>0)){
 							var js=current.getCards('j');
 							for(var i=0;i<js.length;i++){
 								if(game.hasPlayer(function(current2){

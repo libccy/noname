@@ -4,7 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'old',
 		characterSort:{
 			old:{
-				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_guanqiujian"],
+				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_guanqiujian","xiahouyuan"],
 				old_refresh:["old_zhangfei","old_huatuo"],
 				old_yijiang1:["masu","xushu","fazheng","yujin","xin_yujin","old_xusheng","old_lingtong","ol_yujin"],
 				old_yijiang2:["old_madai","old_zhonghui","old_wangyi","old_guanzhang","ol_liaohua"],
@@ -17,6 +17,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			xiahouyuan:['male','wei',4,['shensu']],
 			ol_maliang:['male','shu',3,['zishu','yingyuan']],
 			old_huangfusong:['male','qun',4,['fenyue']],
 			old_majun:["male","wei",3,["xinfu_jingxie1","xinfu_qiaosi"],[]],
@@ -797,7 +798,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					player.chooseTarget(get.prompt('xuanfeng'),function(card,player,target){
+					player.chooseTarget(get.prompt('oldxuanfeng'),function(card,player,target){
 						if(target==player) return false;
 						return get.distance(player,target)<=1||player.canUse('sha',target,false);
 					}).set('ai',function(target){
@@ -810,7 +811,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					"step 1"
 					if(result.bool){
-						player.logSkill('xuanfeng',result.targets);
+						player.logSkill('oldxuanfeng',result.targets);
 						var target=result.targets[0];
 						var distance=get.distance(player,target);
 						if(distance<=1&&player.canUse('sha',target,false)){

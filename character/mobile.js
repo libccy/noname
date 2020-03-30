@@ -694,11 +694,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'xinfu_fuhai',
 				enable:'phaseUse',
 				usable:1,
-				filterCard:true,
-				check:function(card){
-					if(game.players.length<3) return 0;
-					return 5-get.value(card);
-				},
 				content:function(){
 					'step 0'
 					event.current=player.next;
@@ -733,7 +728,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(num>1) player.draw(num);
 				},
 				ai:{
-					order:1,
+					order:10,
 					result:{player:1},
 				},
 			},
@@ -1066,6 +1061,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.line(trigger.source,'fire');
 						trigger.source.addSkillLog('new_rewusheng');
 						trigger.source.addSkillLog('xindangxian');
+						trigger.source.storage.xinfuli=true;
 					}
 				},
 			},
@@ -1270,7 +1266,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shouye:{
 				audio:2,
 				group:'shouye_after',
-				trigger:{global:"useCardToTargeted"},
+				trigger:{target:"useCardToTargeted"},
 				filter:function(event,player){
 					return event.player!=player&&event.targets.length==1;
 				},
@@ -3314,7 +3310,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			meiyong:'姝勇',
 			meiyong_info:'当你使用或打出【杀】时，你可以获得一名其他角色的一张牌，然后其摸一张牌。',
 			rexushen:'许身',
-			rexushen_info:'限定技，出牌阶段，你可以失去X点体力（X为场上男性角色的数量）。若你以此法进入了濒死状态，则当你因一名角色而脱离此濒死状态后，你可以令其获得技能〖武圣〗和〖当先〗。',
+			rexushen_info:'限定技，出牌阶段，你可以失去X点体力（X为场上男性角色的数量）。若你以此法进入了濒死状态，则当你因一名角色而脱离此濒死状态后，你可以令其获得技能〖武圣〗和〖当先〗（其以此法获得的〖当先〗结算时视为其发动过〖伏枥〗）。',
 			rezhennan:'镇南',
 			rezhennan_info:'当你成为其他角色使用的牌的目标后，若此牌的目标数大于该角色的体力值，则你可以弃置一张牌并对其造成1点伤害。',
 			
@@ -3338,7 +3334,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"rebiaozhao3":"表召",
 			"rebiaozhao3_info":"",
 			refuhai:'浮海',
-			refuhai_info:'出牌阶段限一次，你可弃置一张手牌，令其他角色同时在「潮起」和「潮落」中选择一项，并依次展示这些角色的选项。若从你下家开始选择了相同选项的角色数目大于1，则你摸X张牌（X为连续相同结果的数量）。',
+			refuhai_info:'出牌阶段限一次，你可令其他角色同时在「潮起」和「潮落」中选择一项，并依次展示这些角色的选项。若从你下家开始选择了相同选项的角色数目大于1，则你摸X张牌（X为连续相同结果的数量）。',
 			qiaosi:'巧思',
 			qiaosi_info:'出牌阶段限一次，你可以表演「大键角色图」并根据表演结果获得相应的牌。然后，你选择一项：1.弃置X张牌。2.将X张牌交给一名其他角色。（X为你以此法获得的牌数）',
 			qiaosi_map:'大键角色图',

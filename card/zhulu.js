@@ -268,7 +268,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var e5=target.getEquip(5);
 							if(e5&&e5.name=='muniu'&&e5.cards&&e5.cards.length>1) return -1;
 							if(target.countCards('e',function(card){
-								return get.value(card)<=0;
+								return get.value(card,target)<=0;
 							})||target.hasSkillTag('noe')) return 1;
 							return 0;
 						},

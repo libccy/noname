@@ -607,7 +607,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event){
 					if(event.type!='discard'||!event.cards2) return false;
 					var evt=event.getParent('phaseDiscard');
-					return evt&&evt.name=='phaseDiscard'
+					return evt&&evt.name=='phaseDiscard'&&evt.player==player;
 				},
 				content:function(){
 					player.addMark('renjie',trigger.cards2.length);

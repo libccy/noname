@@ -1871,6 +1871,7 @@ div:not(.handcards)>.card>.info>span,
 .skill {
 	left: 0 !important;
 	width: 70px !important;
+	white-space: nowrap;
 }
 .skill>.card {
 	transform: scale(0.56);
@@ -4310,6 +4311,13 @@ div[data-decoration="bronze"]::after{
 .card .wunature {
 	top: 74px;
 	right: 6px;
+}
+.card .tempname {
+	top: 6px;
+	left: 6px;
+	font-size: 22px;
+	color: white !important;
+	pointer-events: none;
 }
 /*.card.equip1 .wunature,
 .card.equip3 .wunature,

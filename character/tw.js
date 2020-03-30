@@ -263,10 +263,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twxiaolian:{
 				audio:2,
 				trigger:{global:'useCardToPlayer'},
-				logTarget:'player',
+				logTarget:'target',
 				filter:function(event,player){
 					return event.card&&event.card.name=='sha'&&event.player!=player&&
 					event.targets.length==1&&event.targets[0]!=player;
+				},
+				check:function(event,player){
+					return get.effect(event.targets[0],event.card,event.player,player)<=get.effect(player,event.card,event.player,player);
 				},
 				content:function(){
 					trigger.getParent().twxiaolian=trigger.targets[0];
@@ -289,7 +292,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						mod:{
 							globalTo:function(from,to,distance){
-								if(from!=to) return distance+to.storage.twxiaolian_distance.length;
+								if(from!=to&&to.storage.twxiaolian_distance) return distance+to.storage.twxiaolian_distance.length;
 							},
 						},
 					},
@@ -304,7 +307,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 0'
 							var target=trigger.getParent(2).twxiaolian;
 							event.target=target;
-							player.chooseCard('是否将一张牌当做【马】置于'+get.translation(target)+'的武将牌旁？','he').ai=function(target){
+							player.chooseCard('是否将一张牌当做【马】置于'+get.translation(target)+'的武将牌旁？','he').ai=function(card){
 								if(get.attitude(_status.event.player,_status.event.getParent('twxiaolian_damage').target)>2) return 7-get.value(card);
 								return 0;
 							};
@@ -327,9 +330,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.card&&event.card.name=='sha'&&event.player!=player&&event.target!=player&&
 					event.targets.length==1&&event.player.inRange(player)<=1;
 				},
-				logTarget:'player',
+				logTarget:'target',
 				check:function(event,player){
-					return get.effect(event.targets[0],{name:'sha'},event.player,player)<=get.effect(player,{name:'sha'},event.player,player);
+					return get.effect(event.targets[0],event.card,event.player,player)<=get.effect(player,event.card,event.player,player);
 				},
 				content:function(){
 					'step 0'
