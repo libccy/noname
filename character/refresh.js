@@ -84,9 +84,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunben:' ',
 		},
 		characterFilter:{
-			//re_zuoci:function(mode){
-			//	return mode=='identity'||mode=='single'||mode=='doudizhu';
-			//}
+			re_zuoci:function(mode){
+				return mode!='guozhan';
+			}
 		},
 		perfectPair:{
 			sunben:['zhouyu','taishici','daqiao'],
@@ -287,7 +287,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					var next=player.choosePlayerCard(trigger.target,'he',[1,Math.min(trigger.target.hp,trigger.target.countCards('he'))],get.prompt('xinpojun',trigger.target));
+					var next=player.choosePlayerCard(trigger.target,'he',[1,Math.min(trigger.target.hp,trigger.target.countCards('he'))],get.prompt('repojun',trigger.target));
 					next.set('ai',function(button){
 						if(!_status.event.goon) return 0;
 						var val=get.value(button.link);
@@ -5436,7 +5436,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			repojun:'破军',
 			repojun2:'破军',
 			repojun3:'破军',
-			repojun_info:'当你于使用【杀】指定目标后，你可以将其的至多X张牌置于其武将牌上，然后其于当前回合结束时获得这些牌。当你因执行【杀】的效果而对一名角色造成伤害时，若该角色的手牌数和装备区内的牌数均不大于你，则此伤害+1。',
+			repojun_info:'当你使用【杀】指定目标后，你可以将其的至多X张牌置于其武将牌上（X为其体力值），然后其于当前回合结束时获得这些牌。当你因执行【杀】的效果而对一名角色造成伤害时，若该角色的手牌数和装备区内的牌数均不大于你，则此伤害+1。',
 			rexianzhen:'陷阵',
 			rexianzhen_info:'出牌阶段限一次，你可以和一名其他角色拼点。若你赢，你本回合内对其使用牌没有次数和距离限制。若你没赢，你本回合内不能使用【杀】。若你以此法失去的拼点牌为【杀】，则你的【杀】不计入本回合的手牌上限。',
 			rejinjiu:'禁酒',
@@ -5447,7 +5447,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shebian:'设变',
 			shebian_info:'当你的武将牌翻面后，你可以移动场上的一张牌。',
 			cangzhuo:'藏拙',
-			cangzhuo_info:'弃牌阶段开始时，若你本回合内没有使用过装备牌，则你的锦囊牌不计入手牌上限。',
+			cangzhuo_info:'弃牌阶段开始时，若你本回合内没有使用过锦囊牌，则你的锦囊牌不计入手牌上限。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

@@ -555,7 +555,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var nature=links[1][3]||null;
 						var character=links[0];
 						var group=lib.character[character][1];
-						var evt=_status.event;
 						var next={
 							character:character,
 							group:group,
@@ -570,6 +569,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							viewAs:{
 								name:name,
 								nature:nature,
+								isCard:true,
 							},
 							filterTarget:function(card,player,target){
 							var xx=lib.skill.yigui_backup;
@@ -585,7 +585,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							//if(evt.type=='dying') return target==evt.dying;
-							if(xx.filterTargetx) return xx.filterTargetx(card,player,target);
+							if(evt._backup&&evt._backup.filterTarget) return evt._backup.filterTarget(card,player,target);
 							return lib.filter.filterTarget(card,player,target);
 							},
 							onuse:function(result,player){
@@ -600,7 +600,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								player.storage.yigui.used.add(result.card.name);
 							},
 						};
-						if(evt.filterTarget) next.filterTargetx=get.filter(evt.filterTarget);
 						return next;
 					},
 					prompt:function(links,player){
@@ -6364,6 +6363,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var player=lib.playerOL[i];
 					state[i]={
 						identity:player.identity,
+						group:player.group,
 						shown:player.ai.shown,
 					};
 				}
@@ -6374,6 +6374,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var player=lib.playerOL[i];
 					if(player){
 						player.identity=state[i].identity;
+						player.group=state[i].group;
 						player.ai.shown=state[i].shown;
 					}
 				}
@@ -6735,7 +6736,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									}
 								}
 							}
-							if(ui.selected.buttons.length==0) return true;
+							if(ui.selected.buttons.length==0){
+								for(var i=0;i<ui.dialog.buttons.length;i++){
+									if(ui.dialog.buttons[i]!=button&&lib.character[button.link][1]==lib.character[ui.dialog.buttons[i].link][1]){
+										return true;
+									}
+								}
+								return false;
+							};
 							return (lib.character[button.link][1]==lib.character[ui.selected.buttons[0].link][1]);
 						};
 						next.switchToAuto=function(){
@@ -6934,7 +6942,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 							}
 						}
-						if(ui.selected.buttons.length==0) return true;
+						if(ui.selected.buttons.length==0){
+							for(var i=0;i<ui.dialog.buttons.length;i++){
+								if(ui.dialog.buttons[i]!=button&&lib.character[button.link][1]==lib.character[ui.dialog.buttons[i].link][1]){
+									return true;
+								}
+							}
+							return false;
+						};
 						if(!lib.character[button.link]) return false;
 						return (lib.character[button.link][1]==lib.character[ui.selected.buttons[0].link][1]);
 					};
@@ -8118,8 +8133,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						this.classList.remove('unseen2');
 						break;
 					}
-					game.broadcast(function(player,name,sex,num,identity){
+					game.broadcast(function(player,name,sex,num,identity,group){
 						player.identityShown=true;
+						player.group=group;
 						player.name=name;
 						player.sex=sex;
 						player.node.identity.classList.remove('guessing');
@@ -8138,7 +8154,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							delete _status.clickingidentity;
 						}
-					},this,this.name,this.sex,num,this.identity);
+					},this,this.name,this.sex,num,this.identity,this.group);
 					this.identityShown=true;
 					for(var i=0;i<skills.length;i++){
 						this.hiddenSkills.remove(skills[i]);

@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			sp:{
-				sp_default:["caoying","simahui","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","liuxie","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","fuwan","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","lingju","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","wenyang","xujing","yuantanyuanshang"],
+				sp_default:["caoying","simahui","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","liuxie","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","fuwan","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","lingju","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","wenyang","xujing","yuantanyuanshang","wangshuang"],
 				sp_guansuo:['guansuo','baosanniang','huaman'],
 				sp_whlw:["xurong","lijue","zhangji","fanchou","guosi"],
 				sp_zlzy:["zhangqiying","lvkai","zhanggong","weiwenzhugezhi","beimihu"],
@@ -23,6 +23,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			//wangshuang:['male','wei',5,['spzhuilie']],
 			sp_gongsunzan:['male','qun',4,['spyicong','sptuji']],
 			sp_simazhao:['male','wei',3,['spzhaoxin','splanggu']],
 			sp_wangyuanji:['female','wei',3,['spfuluan','spshude']],
@@ -179,6 +180,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			wangshuang:'王双（？-228年），三国时期曹魏将领。蜀汉建兴六年（228年）冬，诸葛亮出散关，攻陈仓，后粮尽而退。王双率领骑兵追击蜀军，但在与蜀军的交战中被击败，王双也被蜀军所斩。在《三国演义》中，王双字子全，是陇西郡狄道县（今甘肃临洮县）人，有万夫不当之勇。在诸葛亮北伐期间，被魏延所斩。',
 			yuantanyuanshang:'袁谭、袁尚分别是袁绍的长子和第三子。袁绍坐拥青州、冀州、幽州、并州，本是北方最强诸侯，却于官渡大败，惭恨而终。虽然袁绍生前偏爱小儿子袁尚，却并未在继承人上有明确表态，这也导致本应以嫡长子身份继承的袁谭因郭图、审配伪立遗令未能如愿。曹操击败袁绍后，进而渡过黄河追击袁家残余势力，袁谭告急，但袁尚仅给他少量兵力。曹操得郭嘉之计退兵坐观其变，恰使两人此前的种种矛盾彻底爆发，袁谭不敌便引狼入室，派辛毗作为使者向曹操求援，让袁尚不得不北逃投奔乌桓。但袁谭也在之后背叛曹操兵败被杀。没多久，乌桓也被平定，袁熙、袁尚二人投奔公孙康后被斩首送还曹操。',
 			huaman:'花鬘，古典戏曲《龙凤巾》（一名《化外奇缘》）中的人物，身份为三国时期南蛮王孟获与祝融夫人的女儿，关索的夫人之一。在关于关三小姐·关银屏的民间传说中，其名字为“花中秀”，与关索其他几位夫人鲍三娘、王桃、王悦都被关索之姐关银屏编入自己的女兵营中。花鬘在《三国志》，《三国演义》均未有提及，只是戏曲中的虚构人物。其形象并非一般君主家中闺秀，而是与其母祝融相似，是一个可以披甲上阵，善于刀枪作战的女武将。戏曲中在诸葛亮平定南蛮时，花鬘曾与关索作战，失败被俘，两人互生爱意，南蛮王孟获降服后二人成婚。近些年，花鬘接连在各类三国题材的游戏中登场，更广被人知晓。',
 			xujing:'许靖（？—222年），字文休。汝南郡平舆县（今河南省平舆县）人。汉末至三国蜀汉时期重臣、名士、评论家。许靖因与从弟许邵俱以品评人物而闻名于世。后被刘翊推举为孝廉，任尚书郎。曾先后投奔孔伷、陈祎、许贡、王朗等人，于孙策攻王朗前与家属俱避难交州，受到交趾太守士燮礼待。其后受益州牧刘璋邀请，相继为巴郡、广汉、蜀郡太守。于刘备包围成都时欲越墙叛逃，为刘璋所获。刘备定蜀后欲将其弃用，在法正的建议下方以其为左将军长史。建安二十三年（218年），刘备称汉中王，任命许靖为汉中王傅。章武元年（221年），刘备称帝，任命许靖为司徒，位列三公。章武二年（222年），去世。有文集二卷。',
@@ -501,6 +503,55 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//王双
+			spzhuilie:{
+				mod:{
+					targetInRange:function(card){
+						if(card.name=='sha') return true;
+					},
+				},
+				trigger:{player:'useCardToTargeted'},
+				filter:function(event,player){
+					return event.card&&event.card.name=='sha'&&!player.inRange(event.target);
+				},
+				forced:true,
+				logTarget:'target',
+				content:function(){
+					'step 0'
+					player.judge(function(card){
+						var type=get.type(card,'trick');
+						switch(type){
+							case 'equip': return 4;
+							case 'trick': return -4;
+							default: return 0;
+						}
+					});
+					'step 1'
+					if(trigger.getParent().addCount!==false){
+						trigger.getParent().addCount=false;
+						var stat=player.getStat();
+						if(stat&&stat.card&&stat.card.sha) stat.card.sha--;
+					}
+					if(result.bool===true){
+						var map=trigger.customArgs;
+						var id=trigger.target.playerid;
+						if(!map[id]) map[id]={};
+						map[id].baseDamage=trigger.target.hp;
+					}
+					else if(result.bool===false) player.loseHp();
+				},
+			},
+			spzhuilie2:{
+				onremove:true,
+				intro:{
+					content:'使用【杀】的次数上限+#',
+				},
+				mod:{
+					cardUsable:function(card,player,num){
+					 if(card.name=='sha') return num+player.countMark('spzhuilie2');
+					},
+				},
+			},
 			//桌游志贴纸
 			spyinzhi:{
 				trigger:{player:'damageEnd'},
@@ -2400,6 +2451,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return ui.create.dialog(event.lvli6?get.prompt('lvli'):'膂力',[list,'vcard']);
 					},
 					filter:function(button,player){
+						var evt=_status.event.getParent();
+						if(evt&&typeof evt.filterCard=='function') return evt.filterCard({name:button.link[2]},player,evt);
 						return lib.filter.filterCard({name:button.link[2]},player,_status.event.getParent());
 					},
 					check:function(button){
@@ -9876,11 +9929,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCard'},
 				filter:function(event,player){
-					return event.card&&event.card.name=='sha'&&event.cards&&
+					return event.card&&event.card.name=='sha'&&event.addCount!==false&&event.cards&&
 						event.cards.length==1&&get.type(event.cards[0],'trick')=='trick';
 				},
 				forced:true,
 				content:function(){
+					Itrigger.addCount=false;
 					if(player.stat[player.stat.length-1].card.sha>0){
 						player.stat[player.stat.length-1].card.sha--;
 					}
@@ -12087,13 +12141,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard1'},
 				filter:function(event,player){
 					if(_status.currentPhase==player&&event.card.name=='sha'&&
-					event.card.number>player.storage.qiangwu) return true;
+					event.card.number>player.storage.qiangwu&&event.addCount!==false) return true;
 					return false;
 				},
 				forced:true,
 				popup:false,
 				firstDo:true,
 				content:function(){
+					trigger.addCount=false;
 					if(player.stat[player.stat.length-1].card.sha>0){
 						player.stat[player.stat.length-1].card.sha--;
 					}
@@ -15471,11 +15526,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				marktext:"龙",
 				intro:{
 					name:"龙印",
-					content:"<li>出牌阶段限三次，你可以将你的任意一张♥或♦手牌当【火攻】使用。<br><li>若你同时拥有「凤印」，则你视为拥有技能〖业炎〗。（发动〖业炎〗后，弃置龙印和凤印）",
+					content:"<li>出牌阶段限三次，你可以将一张红色牌当【火攻】使用。<br><li>若你同时拥有「凤印」，则你视为拥有技能〖业炎〗。（发动〖业炎〗后，弃置龙印和凤印）",
 				},
 				usable:3,
 				audio:2,
 				enable:"chooseToUse",
+				position:"he",
 				filterCard:function (card){
 					return get.color(card)=='red';
 				},
@@ -15488,7 +15544,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!game.hasPlayer(function(current){
 						return current.hasSkill('xinfu_jianjie');
 					})) return false;
-					if(!player.countCards('h',{color:'red'})) return false;
+					if(!player.countCards('he',{color:'red'})) return false;
 				},
 				prompt:"将一张红色牌当火攻使用",
 				check:function (card){
@@ -16415,7 +16471,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"smh_yeyan":"业炎",
 			"smh_yeyan_info":"",
 			"xinfu_yinshi":"隐士",
-			"xinfu_yinshi_info":"锁定技，若你没有龙印、凤印且装备区的防具栏为空，则当你受到的属性伤害火锦囊牌造成的伤害时，防止此伤害。",
+			"xinfu_yinshi_info":"锁定技，若你没有龙印、凤印且防具栏为空，则当你受到属性伤害或锦囊牌造成的伤害时，防止此伤害。",
 			"xinfu_chenghao":"称好",
 			"xinfu_chenghao_info":"当一名角色受到属性伤害后，若其存活且其武将牌横置且是伤害传导的起点，则你可以观看牌堆顶的X张牌并分配给任意角色。（X为横置的角色数量且包含该角色）",
 			"jianjie_faq":"关于龙凤印",
@@ -17277,6 +17333,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spmingjian_info:'一名角色的回合开始时，你可以选择一项：①弃置一张牌，然后其跳过本回合的判定阶段。②将一张手牌置于其武将牌上，然后其本回合内进行判定时不触发「判定结果生效前」的时机，且其回合结束时将此牌置入弃牌堆。',
 			spyinzhi:'隐智',
 			spyinzhi_info:'当你受到1点伤害后，你可以展示牌堆顶的两张牌。若其中有黑桃牌，则你可以进行至多X次「令一名角色获得伤害来源的一张手牌」的步骤，然后获得其余的牌。（X为其中黑桃牌的数量）',
+			wangshuang:'王双',
+			spzhuilie:'追猎',
+			spzhuilie2:'追猎',
+			spzhuilie_info:'锁定技，你使用【杀】无距离限制；当你使用【杀】指定目标后，若其不在你的攻击范围内，此【杀】不计入使用次数限制且你判定。若判定结果为：装备牌，此【杀】的伤害基数改为X（X为其体力值）；锦囊牌，你失去1点体力。',
 			
 			sp_default:"常规",
 			sp_whlw:"文和乱武",

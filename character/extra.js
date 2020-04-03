@@ -604,7 +604,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:true,
 				trigger:{player:'loseAfter'},
 				forced:true,
-				filter:function(event){
+				filter:function(event,player){
 					if(event.type!='discard'||!event.cards2) return false;
 					var evt=event.getParent('phaseDiscard');
 					return evt&&evt.name=='phaseDiscard'&&evt.player==player;

@@ -425,7 +425,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				init:function(){},
 				content:{
 					chooseCharacterBefore:function(){
-					
+					game.identityVideoName='幻化之战';
 					var skills=[];
 					var banned=[
 						'xinfu_guhuo','reguhuo','jixi','duanchang','huashen','xinsheng','rehuashen','rexinsheng',
@@ -1059,6 +1059,31 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									},500);
 									_status.videoInited=true;
 									game.addVideo('arrangeLib',null,{
+   							skill:{
+   								_lingli_damage:{},
+   								_lingli:{
+   								 mark:true,
+   								 marktext:'灵',
+   								 popup:'聚灵',
+   								 intro:{
+   								 	name:'灵力',
+   								 	content:'当前灵力点数：# / 5',
+   								 },
+   								},
+   								_lingli_round:{},
+   								_lingli_draw:{},
+   								_lingli_save:{},
+   								hhzz_noCard:{},
+   								hhzz_huilei:{
+   									skillAnimation:true,
+   								},
+   								hhzz_youlian:{
+   									skillAnimation:true,
+   								},
+   								hhzz_zhencang:{},
+   								hhzz_huizhen:{},
+   								hhzz_jubao:{},
+   							},
 										card:{
 											hhzz_toulianghuanzhu:{
 												cardimage:"toulianghuanzhu",
@@ -1074,6 +1099,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 											hhzz_takaramono2:['male','qun',3,['hhzz_jubao','hhzz_zhencang']],
 										},
 										translate:{
+											_lingli:'聚灵',
+											_lingli_bg:'灵',
+											_lingli_draw:'聚灵',
+											hhzz_huilei:'挥泪',
+											hhzz_youlian:'犹怜',
+											hhzz_zhencang:'珍藏',
+											hhzz_huizhen:'汇珍',
+											hhzz_jubao:'聚宝',
+											hhzz_huilei_info:'锁定技，杀死你的角色弃置所有的牌。',
+											hhzz_youlian_info:'锁定技，杀死你的角色弃置所有牌并随机失去一个技能。',
+											hhzz_zhencang_info:'锁定技，杀死你的角色摸一张牌并随机获得一个技能(已满则先随机移除一个)。',
+											hhzz_huizhen_info:'锁定技，杀死你的角色摸三张牌并随机获得一个技能(已满则先随机移除一个)。',
+											hhzz_jubao_info:'锁定技，当你受到伤害的点数确定时，伤害来源随机获得你区域内的X张牌（X为伤害点数）。',
 											nei:' ',
 											nei2:' ',
 											hhzz_shiona:'汐奈',
@@ -1143,6 +1181,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:{
 					cardPile:function(list){
+						game.identityVideoName='毒战三国杀';
 						lib.config.bannedcards.remove('du');
 						if(game.bannedcards) game.bannedcards.remove('du');
 						var num=Math.ceil(list.length/10);
@@ -1292,6 +1331,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:{
 					cardPile:function(list){
+						game.identityVideoName='导师月英';
 						var list2=[];
 						for(var i=0;i<list.length;i++){
 							list2.push(list[i]);
@@ -1384,6 +1424,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},700);
 				},
 				init:function(){
+					game.identityVideoName='唯我独尊';
 					lib.skill.weiwoduzun={
 						mark:true,
 						intro:{
@@ -1557,6 +1598,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					submode:'two',
 					chooseCharacterFixed:true,
 					chooseCharacter:function(list,player){
+						game.versusVideoName='同姓之争';
 						if(player.side==game.me.side){
 							if(_status.brawl.mylist){
 								return _status.brawl.mylist.randomGets(2);
@@ -1686,6 +1728,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return list;
 					},
 					gameStart:function(){
+						game.identityVideoName='铜雀夺袍';
 						for(var i=0;i<game.players.length;i++){
 							game.players[i].$equip(game.createCard('qilin'));
 							game.players[i].$equip(game.createCard('zhuahuang'));
@@ -1773,6 +1816,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:{
 					gameStart:function(){
+						game.identityVideoName='同将模式';
 						var target=(_status.mode=='zhong')?game.zhong:game.zhu;
 						if(get.config('double_character')){
 							target.init(game.me.name,game.me.name2);
@@ -1879,6 +1923,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					submode:'two',
 					chooseCharacterFixed:true,
  				chooseCharacterBefore:function(){
+ 					game.versusVideoName='家族之争';
  					var map={
  						wei:[],
  						shu:[],
@@ -2100,12 +2145,75 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
  							},
  						},
  					};
+ 					var translate={};
  					for(var i in skill){
  						lib.skill[i]=skill[i];
- 						if(skill[i].popup) lib.translate[i]=skill[i].popup;
- 						if(skill[i].prompt2) lib.translate[i+'_info']=skill[i].prompt2;
+ 						if(skill[i].popup){
+ 							lib.translate[i]=skill[i].popup;
+ 							translate[i]=skill[i].popup;
+ 						}
+ 						if(skill[i].prompt2){
+ 							lib.translate[i+'_info']=skill[i].prompt2;
+ 							translate[i+'_info']=skill[i].prompt2;
+ 						}
  						if(!skill[i].noGlobal) game.addGlobalSkill(i);
- 					}
+ 					};
+ 					game.addVideo('arrangeLib',null,{
+ 						skill:{
+  						_jiazu_wei:{
+  							popup:'魏业',
+  							prompt2:'回合开始时，你可以弃置一张牌并指定一名敌方角色，该角色须弃置一张牌，否则你摸一张牌。',
+  						},
+  						_jiazu_shu:{
+  							popup:'蜀义',
+  							prompt2:'你使用【杀】上限+1；出牌阶段结束时，若你于此阶段使用【杀】次数不少于2，摸一张牌。',
+  						},
+  						_jiazu_wu:{
+  							popup:'吴耀',
+  							prompt2:'回合结束时，若你的手牌数不等于你的体力值，则你摸一张牌。',
+  						},
+  						_jiazu_qun:{
+  							popup:'群心',
+  							prompt2:'锁定技，弃牌阶段开始时，若你的手牌数比体力值多2或更多，你本回合手牌上限+1；若你已损失体力值大于1，你手牌上限+1',
+  						},
+  						_jiazu_key:{
+  							popup:'键魂',
+  							prompt2:'出牌阶段限一次，你可以摸一张牌并获得1点护甲。若如此做，你于当前回合结束时失去1点体力。',
+  						},
+  						_jiazu_awaken_wei:{
+  							popup:'许昌',
+  							intro:{
+  								content:'锁定技，当你受到伤害后，你摸一张牌。',
+  							},
+  						},
+  						_jiazu_awaken_shu:{
+  							popup:'成都',
+  							intro:{
+  								content:'锁定技，当你使用【杀】造成伤害后，你摸一张牌。',
+  							},
+  						},
+  						_jiazu_awaken_wu:{
+  							popup:'武昌',
+  							intro:{
+  								content:'锁定技，当你使用装备牌时，你摸一张牌。',
+  							},
+  						},
+  						_jiazu_awaken_qun:{
+  							popup:'邺城',
+  							intro:{
+  								content:'锁定技，当你使用锦囊牌指定其他角色为目标后，你摸一张牌。',
+  							},
+  						},
+  						_jiazu_awaken_key:{
+  							popup:'光坂',
+  							intro:{
+  								content:'锁定技，当你回复/失去体力后，你摸一张牌。',
+  							},
+  						},
+  						_jiazu_awaken:{},
+ 						},
+ 						translate:translate,
+ 					});
 					},
 					chooseCharacter:function(list,player){
 						if(player.side==game.me.side){
@@ -2201,6 +2309,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:{
 					submode:'two',
 					chooseCharacterBefore:function(){
+   			game.versusVideoName='白衣渡江';
    			lib.skill._changeCharacter={
    				trigger:{player:['phaseBefore','phaseAfter']},
    				forced:true,

@@ -13579,7 +13579,7 @@
 					event.customArgs={default:{}};
 					event.baseDamage=get.info(card,false).baseDamage||1;
 					player.actionHistory[player.actionHistory.length-1].useCard.push(event);
-					if(event.addCount!=false){
+					if(event.addCount!==false){
 						if(player.stat[player.stat.length-1].card[card.name]==undefined){
 							player.stat[player.stat.length-1].card[card.name]=1;
 						}
@@ -15433,12 +15433,77 @@
 						}
 					}
 				},
-				inRange:function(target){
-					var player=this;
-					if(player==target||player.hasSkill('undist')||target.hasSkill('undist')) return false;
-					var range2=player.getAttackRange();
-					var distance=get.distance(player,target);
-					return distance<=range2;
+				inRange:function(to){
+					var from=this;
+					if(from==to||from.hasSkill('undist')||to.hasSkill('undist')) return false;
+					if(!game.players.contains(from)&&!game.dead.contains(from)) return false;
+  			if(!game.players.contains(to)&&!game.dead.contains(to)) return false;
+  			var mod1=game.checkMod(from,to,'unchanged','inRange',from);
+  			if(mod1!='unchanged') return mod1;
+  			var mod2=game.checkMod(from,to,'unchanged','inRangeOf',to);
+  			if(mod2!='unchanged') return mod2;
+  			if(from.getAttackRange()<1) return false;
+  			var player=from,m,n=1,i;
+  			var fxy,txy;
+  			if(game.chess){
+  				fxy=from.getXY();
+  				txy=to.getXY();
+  				n=Math.abs(fxy[0]-txy[0])+Math.abs(fxy[1]-txy[1]);
+  			}
+  			else if(to.isMin(true)||from.isMin(true)){}
+  			else{
+  				var length=game.players.length;
+  				var totalPopulation=game.players.length+game.dead.length+1;
+  				for(var iwhile=0;iwhile<totalPopulation;iwhile++){
+  					if(player.nextSeat!=to){
+  						player=player.nextSeat;
+  						if(player.isAlive()&&!player.isOut()&&!player.hasSkill('undist')&&!player.isMin(true)) n++;
+  					}
+  					else{
+  						break;
+  					}
+  				}
+  				for(i=0;i<game.players.length;i++){
+  					if(game.players[i].isOut()||game.players[i].hasSkill('undist')||game.players[i].isMin(true)) length--;
+  				}
+  				if(from.isDead()) length++;
+  				if(to.isDead()) length++;
+  				n=Math.min(n,length-n);
+  			}
+  
+  			n=game.checkMod(from,to,n,'globalFrom',from);
+  			n=game.checkMod(from,to,n,'globalTo',to);
+  			m=n;
+  			m=game.checkMod(from,to,m,'attackFrom',from);
+  			m=game.checkMod(from,to,m,'attackTo',to);
+  			var equips1=from.getCards('e',function(card){
+  				return !ui.selected.cards||!ui.selected.cards.contains(card);
+  			}),equips2=to.getCards('e',function(card){
+  				return !ui.selected.cards||!ui.selected.cards.contains(card);
+  			});
+  			for(i=0;i<equips1.length;i++){
+  				var info=get.info(equips1[i]).distance;
+  				if(!info) continue;
+  				if(info.globalFrom){
+  					m+=info.globalFrom;
+  					n+=info.globalFrom;
+  				}
+  				if(info.attackFrom){
+  					m+=info.attackFrom;
+  				}
+  			}
+  			for(i=0;i<equips2.length;i++){
+  				var info=get.info(equips2[i]).distance;
+  				if(!info) continue;
+  				if(info.globalTo){
+  					m+=info.globalTo;
+  					n+=info.globalTo;
+  				}
+  				if(info.attaclTo){
+  					m+=info.attaclTo;
+  				}
+  			}
+  			return m<=1;
 				},
 				inRangeOf:function(source){
 					return source.inRange(this);
@@ -24047,6 +24112,7 @@
 				
 				for(var i in range){
 					if(i=='attack'){
+						if(player.inRange(target)) return true;
 						var range2=player.getAttackRange();
 						if(range2<=0) return false;
 						var distance=get.distance(player,target)+extra;
@@ -28535,7 +28601,17 @@
 		},
 		addVideo:function(type,player,content){
 			if(_status.video||game.online) return;
-			if(!_status.videoInited) return;
+			if(!_status.videoInited){
+				if(type=='arrangeLib'){
+ 				lib.video.push({
+ 					type:type,
+ 					player:player,
+ 					content:content,
+ 					delay:0
+ 				});
+ 			}
+ 			return;
+			}
 			if(type=='storage'&&player&&player.updateMarks){
 				player.updateMarks();
 			}
@@ -47532,6 +47608,13 @@
 			}
 			var mode=get.mode();
 			if(mode=='identity'){
+				if(_status.mode=='purple'){
+					if(!player) return null;
+					var zhu=game[player.identity.slice(0,1)+'Zhu'];
+					if(!zhu) return null;
+					if(skill&&!zhu.hasSkill(skill)) return null;
+					return zhu;
+				}
 				if(skill&&!game.zhu.hasSkill(skill)) return null;
 				if(game.zhu.isZhu) return game.zhu;
 			}

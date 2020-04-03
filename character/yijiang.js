@@ -4194,7 +4194,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectCard:-1,
 				popname:true,
 				filterTarget:function(card,player,target){
-					if(player==target) return false;
+					var info=get.info(player.storage.jiaozhao_card);
+					if((!info.singleCard||!ui.selected.targets.length)&&player==target) return false;
 					return lib.filter.filterTarget(player.storage.jiaozhao_card,player,target);
 				},
 				check:function(card){
@@ -5548,7 +5549,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 2"
 					player.chooseToUse('是否对'+get.translation(trigger.target)+'再使用一张杀？',
-						{name:'sha'},trigger.target,-1);
+						{name:'sha'},trigger.target,-1).set('addCount',false);
 				}
 			},
 			xinzhongyong:{
@@ -5608,7 +5609,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.useSha){
 						event.target.chooseToUse('是否使用一张杀？',{name:'sha'}).set('filterTarget',function(card,player,target){
 							return target!=_status.event.sourcex&&_status.event.sourcex.inRange(target)&&lib.filter.targetEnabled.apply(this,arguments);
-						}).set('sourcex',player);
+						}).set('sourcex',player).set('addCount',false);
 					}
 				}
 			},
@@ -5964,13 +5965,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zhaofu2:{
 				mod:{
-					attackTo:function(from,to,distance){
+					inRangeOf:function(from,to){
 						if(from.group!='wu') return;
 						var players=game.filterPlayer();
 						for(var i=0;i<players.length;i++){
 							if(from!=players[i]&&to!=players[i]&&
 								players[i].hasZhuSkill('zhaofu',from)){
-								if(get.distance(players[i],to)<=1) return distance-100;
+								if(get.distance(players[i],to)<=1) return true;
 							}
 						}
 					}
@@ -9669,7 +9670,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						num=1;
 					}
 					if(num<=2&&!target.countCards('he')) return false;
-					return player.inRange(target)<=1;
+					return player.inRange(target);
 				},
 				content:function(){
 					'step 0'
@@ -10582,7 +10583,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					var targets=game.filterPlayer(function(current){
 						if(event.result.targets.contains(current)&&current.storage.xiansi){
-							return current.storage.xiansi.length>1&&player.canUse('sha',current,true,true);
+							return current.storage.xiansi.length>1;
 						}
 						return false;
 					});
@@ -10595,7 +10596,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return _status.event.list.contains(target);
 						}).set('list',targets).set('ai',function(target){
 							var player=_status.event.player;
-							return get.effect(target,{name:'sha'},player,player);
+							return get.attitude(player,target);
 						});
 					}
 					else{

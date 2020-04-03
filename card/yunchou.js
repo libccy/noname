@@ -430,7 +430,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					event.source.storage.youdishenru=player;
 					event.source.addSkill('youdishenru');
 					'step 1'
-					var next=event.source.chooseToUse({name:'sha'},player,-1,'对'+get.translation(player)+'使用一张杀，或受到一点伤害');
+					var next=event.source.chooseToUse({name:'sha'},player,-1,'对'+get.translation(player)+'使用一张杀，或受到一点伤害').set('addCount',false);
 					next.ai2=function(){
 						return 1;
 					};

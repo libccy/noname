@@ -461,10 +461,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				if(game.me.name2){
 					str+='/'+get.translation(game.me.name2);
 				}
+				var str2;
+				if(game.identityVideoName) str2=game.identityVideoName;
+				else{
+					switch(_status.mode){
+						case 'purple':str2='3v3v2 - '+(game.me.identity.indexOf('r')==0?'暖色':'冷色')+lib.translate[game.me.identity+'2'];break;
+						case 'zhong':str2='忠胆英杰 - '+lib.translate[game.me.identity+'2'];break;
+						default:str2=get.cnNumber(get.playerNumber())+'人'+
+						get.translation(lib.config.mode)+' - '+lib.translate[game.me.identity+'2']
+					}
+				}
 				var name=[
 					str,
-					get.cnNumber(get.playerNumber())+'人'+
-						get.translation(lib.config.mode)+' - '+lib.translate[game.me.identity+'2']
+					str2,
 				];
 				return name;
 			},
@@ -609,7 +618,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.zhong.identity='zhong';
 				}
 				game.showIdentity();
-				if(game.me.identity=='zhu'||game.me.identity=='zhong'){
+				if(game.me.identity=='zhu'||game.me.identity=='zhong'||game.me.identity=='mingzhong'){
 					if(game.zhu.classList.contains('dead')){
 						game.over(false);
 					}
@@ -642,7 +651,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(_status.winner.contains(player)) return true;
 				}
 				if(game.zhu.isAlive()){
-					return (player.identity=='zhu'||player.identity=='zhong');
+					return (player.identity=='zhu'||player.identity=='zhong'||player.identity=='mingzhong');
 				}
 				else if(game.players.length==1&&game.players[0].identity=='nei'){
 					return player.isAlive();

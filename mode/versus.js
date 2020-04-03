@@ -544,14 +544,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					str+='/'+get.translation(game.me.name2);
 				}
 				var str2;
-				switch(_status.mode){
-					case 'two':str2='欢乐成双';break;
-					case 'endless':str2='无尽模式';break;
-					case 'three':str2='统率三军';break;
-					case 'siguo':str2='同舟共济';break;
-					case 'jiange':str2='守卫剑阁';break;
-					case 'four':str2='对决 - 4v4';break;
-					default:str2='对决 - '+lib.storage.number+'v'+lib.storage.number
+				if(game.versusVideoName) str2=game.versusVideoName;
+				else{
+ 				switch(_status.mode){
+ 					case 'two':str2='欢乐成双';break;
+ 					case 'endless':str2='无尽模式';break;
+ 					case 'three':str2='统率三军';break;
+ 					case 'siguo':str2='同舟共济';break;
+ 					case 'jiange':str2='守卫剑阁';break;
+ 					case 'four':str2='对决 - 4v4';break;
+ 					default:str2='对决 - '+lib.storage.number+'v'+lib.storage.number
+ 				}
 				}
 				return [str,str2];
 			},

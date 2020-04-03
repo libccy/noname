@@ -214,6 +214,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.give(result.cards,player,'giveAuto');
 				},
 				ai:{
+					order:10,
 					result:{
 						player:function(player,target){
 							return target.isHealthy()?1:0;
