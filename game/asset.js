@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'1.9.98.4.4',
+	'My Song Special Ver',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -550,7 +550,7 @@ window.noname_asset_list=[
 	'audio/die/zhangyì.mp3',
 	'audio/die/jiakui.mp3',
 	'audio/die/ol_sp_zhugeliang.mp3',
-	'audio/die/ol_xiahouyuan.mp3'
+	'audio/die/ol_xiahouyuan.mp3',
 
 	'audio/skill/anguo1.mp3',
 	'audio/skill/anguo2.mp3',
