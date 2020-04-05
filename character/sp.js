@@ -1269,7 +1269,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget('是否失去〖蛮嗣〗，令一名其他男性角色和自己一同获得技能〖系力〗？',function(card,player,target){
 						return target!=player&&target.sex=='male';
 					}).ai=function(target){
-						return 5-get.attitude(_status.event.player,target);
+						return get.attitude(_status.event.player,target)-5;
 					};
 					'step 2'
 					if(result.bool){
@@ -2398,7 +2398,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.loseHp();
 							event.finish();
 						}
-						else if(event.count<3) player.chooseBool('是否继续发动【命戒】？').ai=lib.skill.mingjie.check;
+						else if(event.count<3) player.chooseBool('是否继续发动【命戒】？').ai=function(){
+							if(event.count==2) return Math.random()<0.5;
+							return lib.skill.mingjie.check();
+						};
 					}
 					else event.finish();
 					'step 3'
@@ -9934,7 +9937,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				content:function(){
-					Itrigger.addCount=false;
+					trigger.addCount=false;
 					if(player.stat[player.stat.length-1].card.sha>0){
 						player.stat[player.stat.length-1].card.sha--;
 					}
@@ -16993,9 +16996,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			luanzhan:'乱战',
 			luanzhan_info:'你使用【杀】或黑色普通锦囊牌可以额外选择X名角色为目标；当你使用【杀】或黑色普通锦囊牌指定目标后，若此牌的目标角色数小于X，则X减至0。（X为你于本局游戏内造成过伤害的次数）',
 			zhengnan:'征南',
-			zhengnan_info:'当其他角色死亡后，你可以摸三张牌。若如此做，你获得下列技能中的任意一个：〖武圣〗、 〖当先〗和〖制蛮〗（你以此法获得的〖当先〗结算时视为已发动过〖伏枥〗）。',
+			zhengnan_info:'当其他角色死亡后，你可以摸三张牌。若如此做，你获得下列技能中的任意一个：〖武圣〗、 〖当先〗和〖制蛮〗。',
 			xinzhengnan:'征南',
-			xinzhengnan_info:'当其他角色死亡后，你可以摸三张牌，或者获得下列技能中的任意一个：〖武圣〗、 〖当先〗和〖制蛮〗',
+			xinzhengnan_info:'当其他角色死亡后，你可以摸三张牌，或者获得下列技能中的任意一个：〖武圣〗、 〖当先〗和〖制蛮〗（你以此法获得的〖当先〗结算时视为已发动过〖伏枥〗）。',
 			xiefang:'撷芳',
 			xiefang_info:'锁定技，你计算与其他角色的距离时-X。（X为女性角色数）',
 			qizhi:'奇制',

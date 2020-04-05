@@ -6363,7 +6363,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var player=lib.playerOL[i];
 					state[i]={
 						identity:player.identity,
-						group:player.group,
+						//group:player.group,
 						shown:player.ai.shown,
 					};
 				}
@@ -6374,7 +6374,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var player=lib.playerOL[i];
 					if(player){
 						player.identity=state[i].identity;
-						player.group=state[i].group;
+						//player.group=state[i].group;
 						player.ai.shown=state[i].shown;
 					}
 				}

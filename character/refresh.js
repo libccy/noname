@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			refresh:{
 				refresh_standard:["re_caocao","re_simayi","re_guojia","re_lidian","re_zhangliao","re_xuzhu","re_xiahoudun","re_zhangfei","re_zhaoyun","re_guanyu","re_machao","re_xushu","re_zhouyu","re_lvmeng","re_ganning","re_luxun","re_daqiao","re_huanggai","re_lvbu","re_gongsunzan","re_huatuo","re_liubei","re_diaochan","re_huangyueying","re_sunquan","re_sunshangxiang","re_zhenji","re_zhugeliang","re_huaxiong"],
 				refresh_feng:['caoren','ol_xiahouyuan','re_huangzhong','re_weiyan','re_xiaoqiao','zhoutai','re_zhangjiao','xin_yuji'],
-				refresh_huo:["re_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","re_pangtong","ol_yuanshao","re_pangde"],
+				refresh_huo:["ol_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","re_pangtong","ol_yuanshao","re_pangde"],
 				refresh_lin:['re_zhurong','re_menghuo','re_dongzhuo','re_sunjian','re_caopi','re_xuhuang'],
 				refresh_shan:['re_dengai','re_jiangwei','re_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce'],
 				refresh_yijiang:['re_xusheng','re_wuguotai','re_gaoshun'],
@@ -59,7 +59,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhoutai:['male','wu',4,['buqu','fenji']],
 			re_pangde:['male','qun',4,['mashu','jianchu']],
 			re_xuhuang:['male','wei',4,['duanliang','jiezi']],
-			re_sp_zhugeliang:["male","shu",3,["bazhen","rehuoji","rekanpo","cangzhuo"],[]],
+			ol_sp_zhugeliang:["male","shu",3,["bazhen","rehuoji","rekanpo","cangzhuo"],[]],
 			re_xunyu:["male","wei",3,["quhu","rejieming"],[]],
 			re_dianwei:["male","wei",4,["reqiangxi"],[]],
 			re_yanwen:["male","qun",4,["reshuangxiong"],[]],
@@ -95,6 +95,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			cangzhuo:{
 				trigger:{player:'phaseDiscardBegin'},
 				frequent:true,
+				audio:2,
 				filter:function(event,player){
 					return player.getHistory('useCard',function(card){
 						return get.type(card.card,'trick')=='trick';
@@ -1622,6 +1623,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rehuoji:{
 				position:"he",
 				audio:2,
+				audioname:['ol_sp_zhugeliang'],
 				enable:"chooseToUse",
 				filterCard:function (card){
 					return get.color(card)=='red';
@@ -1694,6 +1696,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			rekanpo:{
 				audio:2,
+				audioname:['ol_sp_zhugeliang'],
 				position:"he",
 				enable:"chooseToUse",
 				filterCard:function (card){
@@ -5201,7 +5204,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhenji:'界甄姬',
 			re_huaxiong:"界华雄",
 			
-			"re_sp_zhugeliang":"界卧龙",
+			"ol_sp_zhugeliang":"界卧龙",
 			"re_xunyu":"界荀彧",
 			"re_dianwei":"界典韦",
 			"re_yanwen":"界颜良文丑",

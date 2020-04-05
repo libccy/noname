@@ -10164,22 +10164,21 @@
 					}
 				},
 				disableEquip:function(){
-					//event.trigger('disableEquip');
 					if(!player.isDisabled(event.pos)){
-						player.storage.disableEquip.add(event.pos);
-						//player.markSkill('_disableEquip');
-						player.syncStorage('_disableEquip');
-						if(player.getEquip(event.pos)) player.discard(player.getEquip(event.pos)).delay=false;
+						var cards=player.getCards('e',function(card){
+							var subtype=get.subtype(card);
+							if(subtype==event.pos) return true;
+							if(subtype=='equip6'&&['equip3','equip4'].contains(event.pos)) return true;
+							return false;
+						});
+						if(cards.length) player.discard(cards).delay=false;
 						game.log(player,'废除了',get.translation(event.pos),'栏');
 						player.$disableEquip(event.pos);
 					}
 				},
 				enableEquip:function(){
-					//event.trigger('enableEquip');
 					if(player.isDisabled(event.pos)){
-						player.storage.disableEquip.remove(event.pos);
 						player.syncStorage('_disableEquip');
-						//if(player.storage.disableEquip.length==0) player.unmarkSkill('_disableEquip');
 						game.log(player,'恢复了',get.translation(event.pos),'栏');
 						player.$enableEquip(event.pos);
 					};
@@ -10193,26 +10192,14 @@
 					//player.markSkill('_disableJudge');
 					'step 1'
 					game.broadcastAll(function(player,card){
-						player.storage._disableJudge=true;
-						card.fix();
-						card.classList.add('feichu');
-						card.style.transform='';
-						card.classList.add('drawinghidden');
-						player.node.judges.insertBefore(card,player.node.judges.firstChild);
-						ui.updatej(player);
-					},player,game.createCard('disable_judge','',''));
+						player.$disableJudge();
+					},player);
 				},
 				enableJudge:function(){
 					if(!player.storage._disableJudge) return;
 					game.log(player,'恢复了判定区');
 					game.broadcastAll(function(player){
-					player.storage._disableJudge=false;
-						for(var i=0;i<player.node.judges.childNodes.length;i++){
-							if(player.node.judges.childNodes[i].name=='disable_judge'){
-								player.node.judges.removeChild(player.node.judges.childNodes[i]);
-								break;
-							}
-						}
+						player.$enableJudge();
 					},player);
 				},
 				/*----分界线----*/
@@ -13366,7 +13353,7 @@
 						var sgnatt=get.sgn(att);
 						if(ui.selected.targets.length==0){
 							if(att>0){
-								if(!_status.event.nojudge&&target.countCards('j')) return 10;
+								if(!_status.event.nojudge&&target.countCards('j')) return 14;
 								if(target.countCards('e',function(card){
 									return get.value(card,target)<0&&game.hasPlayer(function(current){
 										return current!=target&&get.attitude(player,current)<0&&current.isEmpty(get.subtype(card))
@@ -13378,7 +13365,7 @@
 									if(current!=target&&get.attitude(player,current)>0){
 										var es=target.getCards('e');
 										for(var i=0;i<es.length;i++){
-											if(get.value(es[i],target)>0&&current.isEmpty(get.subtype(es[i]))) return true;
+											if(get.value(es[i],target)>0&&current.isEmpty(get.subtype(es[i]))&&get.value(es[i],current)>0) return true;
 										}
 									}
 								})){
@@ -15584,14 +15571,18 @@
 					game.broadcast(function(player,skill){
 						player.$disableEquip(skill);
 					},this,skill);
+					var player=this;
+					if(!player.storage.disableEquip) player.storage.disableEquip=[];
+					player.storage.disableEquip.add(skill);
+					player.storage.disableEquip.sort();
 					var pos={equip1:'武器栏',equip2:'防具栏',equip3:'+1马栏',equip4:'-1马栏',equip5:'宝物栏'}[skill];
+					if(!pos) return;
 					var card=game.createCard('feichu_'+skill,pos,'');
 					card.fix();
 					card.style.transform='';
 					card.classList.remove('drawinghidden');
 					card.classList.add('feichu');
 					delete card._transform;
-					var player=this;
 					var equipNum=get.equipNum(card);
 					var equipped=false;
 					for(var i=0;i<player.node.equips.childNodes.length;i++){
@@ -15623,6 +15614,7 @@
 						player.$enableEquip(skill);
 					},this,skill);
 					var player=this;
+					if(player.storage.disableEquip) player.storage.disableEquip.remove(skill);
 					for(var i=0;i<player.node.equips.childNodes.length;i++){
 						if(player.node.equips.childNodes[i].name=='feichu_'+skill){
 							player.node.equips.removeChild(player.node.equips.childNodes[i]);
@@ -15645,6 +15637,27 @@
 						if(this.getEquip(6)) return false;
 					}
 					return !this.isDisabled(num)&&!this.getEquip(num);
+				},
+				$disableJudge:function(){
+					var player=this;
+					var card=game.createCard('disable_judge','','');
+					player.storage._disableJudge=true;
+					card.fix();
+					card.classList.add('feichu');
+					card.style.transform='';
+					card.classList.add('drawinghidden');
+					player.node.judges.insertBefore(card,player.node.judges.firstChild);
+					ui.updatej(player);
+				},
+				$enableJudge:function(){
+					var player=this;
+					player.storage._disableJudge=false;
+					for(var i=0;i<player.node.judges.childNodes.length;i++){
+						if(player.node.judges.childNodes[i].name=='disable_judge'){
+							player.node.judges.removeChild(player.node.judges.childNodes[i]);
+							break;
+						}
+					}
 				},
 				disableJudge:function(){
 					var next=game.createEvent('disableJudge');
@@ -16229,12 +16242,15 @@
 						maxHp:this.maxHp,
 						nickname:this.nickname,
 						sex:this.sex,
+						group:this.group,
 						name:this.name,
 						name1:this.name1,
 						name2:this.name2,
 						handcards:this.getCards('h'),
 						equips:this.getCards('e'),
 						judges:this.getCards('j'),
+						disableJudge:this.storage._disableJudge,
+						disableEquip:this.storage.disableEquip,
 						views:[],
 						position:parseInt(this.dataset.position),
 						hujia:this.hujia,
@@ -25764,6 +25780,7 @@
 							}
 							player.playerid=i;
 							player.nickname=info.nickname;
+							player.changeGroup(info.group,false,false);
 							player.identity=info.identity;
 							player.identityShown=info.identityShown;
 							player.hp=info.hp;
@@ -25790,6 +25807,14 @@
 							}
 							if(info.turnedover){
 								player.classList.add('turnedover');
+							}
+							if(info.disableJudge){
+								player.$disableJudge();
+							}
+							if(Array.isArray(info.disableEquip)){
+								for(var ii=0;ii<info.disableEquip.length;ii++){
+									player.$disableEquip(info.disableEquip[ii]);
+								}
 							}
 
 							player.directgain(info.handcards);
@@ -32154,7 +32179,7 @@
 			}
 			for(i=0;i<skills.length;i++){
 				info=get.info(skills[i]);
-				if(info.mod&&info.mod[name]){
+				if(info&&info.mod&&info.mod[name]){
 					var result=info.mod[name].apply(this,arg);
 					if(typeof arg[arg.length-1]!='object'&&result!=undefined) arg[arg.length-1]=result;
 				}

@@ -863,7 +863,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_zhuran:'旧朱然',
 			old_madai:'旧马岱',
 			old_caoxiu:'旧曹休',
-			old_huaxiong:'华雄',
 			old_wangyi:'旧王异',
 			old_caozhen:'旧曹真',
 			old_quancong:'旧全琮',

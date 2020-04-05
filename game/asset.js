@@ -549,6 +549,8 @@ window.noname_asset_list=[
 	'audio/die/re_xusheng.mp3',
 	'audio/die/zhangyì.mp3',
 	'audio/die/jiakui.mp3',
+	'audio/die/ol_sp_zhugeliang.mp3',
+	'audio/die/ol_xiahouyuan.mp3'
 
 	'audio/skill/anguo1.mp3',
 	'audio/skill/anguo2.mp3',
@@ -2369,6 +2371,18 @@ window.noname_asset_list=[
 	'audio/skill/tuiyan2.mp3',
 	'audio/skill/zhafu1.mp3',
 	'audio/skill/zhafu2.mp3',
+	'audio/skill/bazhen_ol_sp_zhugeliang1.mp3',
+	'audio/skill/bazhen_ol_sp_zhugeliang2.mp3',
+	'audio/skill/cangzhuo1.mp3',
+	'audio/skill/cangzhuo2.mp3',
+	'audio/skill/rehuoji_ol_sp_zhugeliang1.mp3',
+	'audio/skill/rehuoji_ol_sp_zhugeliang2.mp3',
+	'audio/skill/rekanpo_ol_sp_zhugeliang1.mp3',
+	'audio/skill/rekanpo_ol_sp_zhugeliang2.mp3',
+	'audio/skill/shebian1.mp3',
+	'audio/skill/shebian2.mp3',
+	'audio/skill/shensu1_ol_xiahouyuan1.mp3',
+	'audio/skill/shensu1_ol_xiahouyuan2.mp3',
 	
 	'font/huangcao.ttf',
 	'font/shousha.ttf',
@@ -2869,6 +2883,9 @@ window.noname_asset_list=[
 	'image/character/key_misa.jpg',
 	'image/character/key_masato.jpg',
 	'image/character/ol_xiahouyuan.jpg',
+	'image/character/key_iwasawa.jpg',
+	'image/character/key_kengo.jpg',
+	'image/character/ol_sp_zhugeliang.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',

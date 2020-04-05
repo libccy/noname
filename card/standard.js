@@ -704,7 +704,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					basic:{
 						order:function(){
-							return get.order({name:'tao'})+0.1;
+							return 11;
 						},
 						useful:[3,1],
 						value:0

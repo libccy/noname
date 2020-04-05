@@ -20,6 +20,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_yusa:['female','key',3,['yusa_yanyi','yusa_misa','dualside'],['dualside:key_misa']],
 			key_misa:['female','key',3,['misa_yehuo','misa_yusa','dualside'],['unseen']],
 			key_masato:['male','key','4/8',['masato_baoquan']],
+			key_iwasawa:['female','key',3,['iwasawa_yinhang','iwasawa_mysong']],
+			key_kengo:['male','key',4,['kengo_weishang','kengo_guidui']],
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
 			diy_feishi:['male','shu',3,['shuaiyan','moshou']],
@@ -96,7 +98,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy:{
 				diy_tieba:["diy_wenyang","ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_zhangwei"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa"],
 			},
 		},
 		characterIntro:{
@@ -111,6 +113,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
+			key_kengo:'#bLittle Busters!',
+			key_iwasawa:'#rAngel Beats!',
 			key_masato:'#bLittle Busters!',
 			key_yusa:'#bCharlotte',
 			key_misa:'#rCharlotte',
@@ -158,6 +162,174 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuji:['zuoci']
 		},
 		skill:{
+			kengo_weishang:{
+				locked:false,
+				mod:{
+					cardUsable:function(card,player,num){
+						if(card.name=='sha'&&player.isDisabled(1)) return num+1;
+					},
+					globalFrom:function(from,to,distance){
+						if(from.isDisabled(4)) return distance-1;
+					},
+					globalTo:function(from,to,distance){
+						if(to.isDisabled(3)) return distance+1;
+					},
+				},
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					var list=['equip1','equip2','equip3','equip4','equip5'];
+					for(var i=0;i<list.length;i++){
+						if(!player.isDisabled(list[i])&&(!player.storage.kengo_guidui2||!player.storage.kengo_guidui2.contains(list[i]))) return true;
+					}
+					return false;
+				},
+				content:function(){
+					'step 0'
+					var list=['equip1','equip2','equip3','equip4','equip5'];
+					for(var i=0;i<list.length;i++){
+						if(player.isDisabled(list[i])||player.storage.kengo_guidui2&&player.storage.kengo_guidui2.contains(list[i])) list.splice(i--,1);
+					}
+					player.chooseControl(list).set('prompt','请选择废除一个装备栏').ai=function(){
+						if(list.contains('equip1')&&player.isEmpty('equip1')&&player.countCards('h',function(card){
+							return card.name=='sha'&&player.getUseValue(card)>0
+						})) return 'equip1';
+						if(list.contains('equip3')&&player.isEmpty('equip3')) return 'equip3';
+						if(list.contains('equip4')&&player.isEmpty('equip4')) return 'equip4';
+						if(list.contains('equip5')&&player.isEmpty('equip5')) return 'equip5';
+						if(list.contains('equip2')&&player.isEmpty('equip2')) return 'equip2';
+						return list.randomGet();
+					};
+					'step 1'
+					player.disableEquip(result.control);
+					player.draw(2);
+				},
+				group:['kengo_weishang_sha','kengo_weishang_shan'],
+				ai:{
+					order:10,
+					result:{player:1},
+				},
+			},
+			kengo_weishang_sha:{
+				trigger:{player:'useCardToPlayered'},
+				forced:true,
+				filter:function(event,player){
+					return event.card.name=='sha'&&player.isDisabled(1)&&event.target.countCards('he')>0;
+				},
+				logTarget:'target',
+				content:function(){
+					trigger.target.chooseToDiscard('he',true);
+				},
+			},
+			kengo_weishang_shan:{
+				enable:['chooseToUse','chooseToRespond'],
+				viewAs:{name:'shan'},
+				filterCard:true,
+				position:'he',
+				prompt:'将一张牌当做闪使用或打出',
+				viewAsFilter:function(player){
+					return player.isDisabled(2)&&player.countCards('he')>0;
+				},
+				check:function(card){
+					return 1/Math.max(0.1,get.value(card));
+				},
+				ai:{
+					respondShan:true,
+					skillTagFilter:function(player){
+						return player.isDisabled(2)&&player.countCards('he')>0;
+					},
+				},
+			},
+			kengo_guidui:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				forced:true,
+				filter:function(event,player){
+					return player.countDisabled()>0;
+				},
+				content:function(){
+					var list=['equip1','equip2','equip3','equip4','equip5'];
+					for(var i=0;i<list.length;i++){
+						if(!player.isDisabled(list[i])) list.splice(i--,1);
+						else player.enableEquip(list[i]);
+					}
+					player.storage.kengo_guidui2=list;
+					player.addTempSkill('kengo_guidui2');
+				},
+			},
+			kengo_guidui2:{onremove:true},
+			iwasawa_yinhang:{
+				trigger:{player:'changeHp'},
+				locked:true,
+				direct:true,
+				line:{color:[235, 96, 138]},
+				content:function(){
+					'step 0'
+					event.count=Math.abs(trigger.num);
+					'step 1'
+					event.count--;
+					player.chooseTarget([1,2],get.prompt('iwasawa_yinhang'),'令至多两名角色各摸一张牌').set('ai',function(target){
+						return get.attitude(_status.event.player,target);
+					});
+					'step 2'
+					if(result.bool){
+						var targets=result.targets;
+						targets.sortBySeat();
+						player.logSkill('iwasawa_yinhang',targets,lib.skill.iwasawa_yinhang.line);
+						game.asyncDraw(targets);
+					}
+					else event.finish();
+					'step 3'
+					game.delay();
+					if(event.count>0) event.goto(1);
+				},
+			},
+			iwasawa_mysong:{
+				trigger:{player:['phaseBeginStart','phaseAfter','dyingBefore']},
+				forced:true,
+				filter:function(event,player){
+					return event.name=='dying'||player.hp<1;
+				},
+				content:function(){
+					if(trigger.name=='dying') trigger.cancel();
+					else if(event.triggername=='phaseBeginStart') player.addTempSkill('iwasawa_fenyin');
+					else player.die();
+				},
+				nobracket:true,
+				derivation:'iwasawa_fenyin',
+			},
+			iwasawa_fenyin:{
+				mod:{
+					aiOrder:function(player,card,num){
+						if(typeof card=='object'&&player==_status.currentPhase){
+							var evt=player.getLastUsed();
+							if(evt&&evt.card&&get.color(evt.card)!='none'&&get.color(card)!='none'&&get.color(evt.card)!=get.color(card)){
+								return num+10;
+							}
+						}
+					},
+				},
+				audio:2,
+				trigger:{player:'useCard'},
+				frequent:true,
+				//usable:3,
+				filter:function(event,player){
+					if(_status.currentPhase!=player) return false;
+					var evt=player.getLastUsed(1);
+					if(!evt) return false;
+					var color1=get.color(evt.card);
+					var color2=get.color(event.card);
+					return color1&&color2&&color1!='none'&&color2!='none'&&color1!=color2;
+				},
+				content:function(){
+					player.draw();
+				},
+				ai:{
+					threaten:function(player,target){
+						if(target.hp<1) return 3;
+						return 1;
+					},
+				},
+			},
 			masato_baoquan:{
 				trigger:{source:'damageBefore'},
 				forced:true,
@@ -5732,6 +5904,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_yusa:'西森柚咲',
 			key_misa:'黑羽美砂',
 			key_masato:'井之原真人',
+			key_iwasawa:'岩泽雅美',
+			key_kengo:'宫泽谦吾',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -5773,6 +5947,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			misa_yusa_info:'当你发动的〖业火〗结算完成后，你可以将武将牌翻面。',
 			masato_baoquan:'暴拳',
 			masato_baoquan_info:'锁定技，当你即将造成伤害时，你选择一项：1.令此伤害+2并减1点体力上限。2.防止此伤害。',
+			iwasawa_yinhang:'引吭',
+			iwasawa_yinhang_info:'锁定技，当你的体力值变化1点时，你可以令至多两名角色摸一张牌。',
+			iwasawa_mysong:'My Song',
+			iwasawa_mysong_info:'锁定技，当你即将进行濒死结算时，取消之。回合开始时，若你的体力值小于1，则你获得技能〖奋音〗直到回合结束。回合结束时，若你的体力值小于1，你死亡。',
+			iwasawa_fenyin:'奋音',
+			iwasawa_fenyin_info:'你的回合内，当你使用牌时，若此牌与你于此回合内使用的上一张牌的颜色不同，则你可以摸一张牌。',
+			kengo_weishang:'伪伤',
+			key_weishang_sha:'伪伤',
+			key_weishang_shan:'伪伤',
+			kengo_weishang_info:'出牌阶段限一次，你可以废除一个装备栏并摸两张牌。若你的武器栏已废除，则你使用【杀】的次数上限+1，且当你使用【杀】指定目标后，目标角色弃置一张牌；若你的防具栏已废除，则你可以将一张牌当做【闪】使用或打出；若你的攻击/防御坐骑栏已废除，则你至其他角色的距离-1/其他角色至你的距离-1。',
+			kengo_guidui:'归队',
+			kengo_guidui_info:'锁定技，准备阶段，若你有已废除的装备栏，则你恢复这些装备栏，且本回合内发动【伪伤】时不能废除这些装备栏。',
 			
 			ns_zhangwei:'张葳',
 			nsqiyue:'骑钺',

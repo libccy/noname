@@ -4884,7 +4884,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			bazhen:{
 				audio:2,
-				audioname:['re_sp_zhugeliang'],
+				audioname:['re_sp_zhugeliang','ol_sp_zhugeliang'],
 				equipSkill:true,
 				noHidden:true,
 				inherit:'bagua_skill',
@@ -6264,10 +6264,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				//priority:-15,
 				intro:{
-					content:'cards'
+					content:'cards',
 				},
 				group:'gzbuqu_recover',
-				locked:true,
+				//locked:true,
 				frequent:true,
 				ondisable:true,
 				onremove:function(player){

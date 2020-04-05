@@ -7,11 +7,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			mobile:{
 				mobile_default:["miheng","taoqian","liuzan","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui"],
-				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","xin_yuanshao","re_liushan","xin_xiahoudun"],
+				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","xin_yuanshao","re_liushan","xin_xiahoudun","re_sp_zhugeliang"],
 				mobile_sunben:["re_sunben"],
 			},
 		},
 		character:{
+			re_sp_zhugeliang:["male","shu",3,["bazhen","rehuoji","rekanpo"],[]],
 			xin_xiahoudun:['male','wei',4,['reganglie','xinqingjian']],
 			zhangyì:['male','shu',4,['zhiyi']],
 			jiakui:['male','wei',3,['zhongzuo','wanlan']],
@@ -476,7 +477,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							_status.imchoosing=false;
 							event._result={
 								bool:true,
-								links:['qiaosi_c1','qiaosi_c2','qiaosi_c3','qiaosi_c4','qiaosi_c5','qiaosi_c6'].randomGets(3),
+								links:['qiaosi_c1','qiaosi_c6'].concat(['qiaosi_c2','qiaosi_c3','qiaosi_c4','qiaosi_c5'].randomGets(1)),
 							};
 							if(event.dialog) event.dialog.close();
 							if(event.control) event.control.close();
@@ -918,6 +919,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(cards.length) player.gain(cards,'gain2');
 					'step 1'
 					player.loseMaxHp();
+				},
+				ai:{
+					filterDamage:true,
+					skillTagFilter:function(player,tag,arg){
+						if(arg&&arg.card&&arg.card.name=='sha') return true;
+						return false;
+					},
 				},
 			},
 			wuyuan:{
@@ -3141,6 +3149,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		translate:{
+			"re_sp_zhugeliang":"手杀卧龙",
 			ly_piliche:'霹雳车',
 			ly_piliche_info:'当你对其他角色造成伤害后，若造成伤害的牌不为延时锦囊牌，你可以弃置其装备区里的防具牌与+1坐骑牌；当你失去此装备时，销毁之。',
 			polu:'破橹',

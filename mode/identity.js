@@ -203,7 +203,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			delete _status.new_tutorial;
 			if(_status.connectMode){
 				game.waitForPlayer(function(){
-					if(lib.configOL.identity_mode=='zhong'){
+					if(lib.configOL.identity_mode=='zhong'||lib.configOL.identity_mode=='purple'){
 						lib.configOL.number=8;
 					}
 				});
@@ -345,6 +345,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						state[i].special_identity=player.special_identity;
 					}
 					state[i].shown=player.ai.shown;
+					//state[i].group=player.group;
 				}
 				return state;
 			},
@@ -371,6 +372,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							game.zhong=player;
 						}
 						player.ai.shown=state[i].shown;
+						//player.group=state[i].group;
+						//player.node.name.dataset.nature=get.groupnature(player.group);
 					}
 				}
 			},
@@ -703,6 +706,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					var map={};
 					var map_zhu={};
+					event.mapNum={};
 					var list=[];
 					var libCharacter={};
 					for(var i=0;i<lib.configOL.characterPack.length;i++){
@@ -714,6 +718,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					for(var i in libCharacter){
 						if(lib.filter.characterDisabled(i,libCharacter)) continue;
+						if(i.indexOf('lingju')!=-1) continue;
 						var group=lib.character[i][1];
 						if(group=='shen') continue;
 						if(!map[group]){
@@ -733,6 +738,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							delete map[i];
 							list.remove(i);
 						}
+						else event.mapNum[i]=map[i].length>15?5:3;
 					}
 					list.sort(function(a,b){
 						return lib.group.indexOf(a)-lib.group.indexOf(b);
@@ -773,7 +779,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					});
 					"step 5"
 					for(var i in result){
-						if(result[i]=='ai'){
+						if(result[i]=='ai'||!result[i]||!result[i].links){
 							result[i]=event.map[i].randomGet();
 						}
 						else{
@@ -803,7 +809,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(true){
 							var group=event[players[i].identity.slice(0,1)+'Zhu'];
 							var str='选择角色';
-							var list2=event.map[group].randomGets(5);
+							var list2=event.map[group].randomRemove(event.mapNum[group]);
 							event.map[players[i].playerid]=list2;
 							list.push([players[i],[str,[list2,'character']],true]);
 						}
@@ -815,7 +821,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					});
 					"step 6"
 					for(var i in result){
-						if(result[i]=='ai'){
+						if(result[i]=='ai'||!result[i]||!result[i].links){
 							result[i]=event.map[i].randomGet();
 						}
 						else{
@@ -885,6 +891,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var list=[];
 					for(var i in lib.character){
 						if(lib.filter.characterDisabled(i)) continue;
+						if(i.indexOf('lingju')!=-1) continue;
 						var group=lib.character[i][1];
 						if(group=='shen') continue;
 						if(!map[group]){

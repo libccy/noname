@@ -2713,7 +2713,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var dialog=ui.create.dialog('惠民',cards,true);
 						_status.dieClose.push(dialog);
 						dialog.videoId=lib.status.videoId++;
-						event.preResult=dialog.videoId;
+						event.dialogID=dialog.videoId;
 						game.addVideo('cardDialog',null,['惠民',get.cardsInfo(cards),dialog.videoId]);
 						game.broadcast(function(cards,id){
 							var dialog=ui.create.dialog('惠民',cards,true);
@@ -2732,7 +2732,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var next=event.current.chooseButton(true,function(button){
 							return get.value(button.link,_status.event.player);
 						});
-						next.set('dialog',event.preResult);
+						next.set('dialog',event.dialogID);
 						next.set('closeDialog',false);
 						next.set('dialogdisplay',true);
 						next.set('cardFilter',event.togain.slice(0));
@@ -2742,7 +2742,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						for(var i=0;i<ui.dialogs.length;i++){
-							if(ui.dialogs[i].videoId==event.preResult){
+							if(ui.dialogs[i].videoId==event.dialogID){
 								var dialog=ui.dialogs[i];
 								dialog.close();
 								_status.dieClose.remove(dialog);
@@ -2758,8 +2758,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								dialog.close();
 								_status.dieClose.remove(dialog);
 							}
-						},event.preResult);
-						game.addVideo('cardDialog',null,event.preResult);
+						},event.dialogID);
+						game.addVideo('cardDialog',null,event.dialogID);
 						event.finish();
 					}
 					'step 6'
@@ -11003,6 +11003,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		translate:{
+			old_huaxiong:'华雄',
 			yufan:'虞翻',
 			wangyi:'王异',
 			xushu:'旧徐庶',
