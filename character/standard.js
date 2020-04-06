@@ -1175,7 +1175,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(event.dialog) event.dialog.close();
 						if(event.control) event.control.close();
 						var top=[];
-						var judges=player.node.judges.childNodes;
+						var judges=player.getCards('j');
 						var stopped=false;
 						if(!player.hasWuxie()){
 							for(var i=0;i<judges.length;i++){

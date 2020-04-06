@@ -2600,7 +2600,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(event.dialog) event.dialog.close();
 						if(event.control) event.control.close();
 						var top=[];
-						var judges=player.node.judges.childNodes;
+						var judges=player.getCards('j');
 						var stopped=false;
 						if(!player.hasWuxie()){
 							for(var i=0;i<judges.length;i++){
@@ -5448,7 +5448,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rejinjiu3:'禁酒',
 			ol_xiahouyuan:'界夏侯渊',
 			shebian:'设变',
-			shebian_info:'当你的武将牌翻面后，你可以移动场上的一张牌。',
+			shebian_info:'当你的武将牌翻面后，你可以移动场上的一张装备牌。',
 			cangzhuo:'藏拙',
 			cangzhuo_info:'弃牌阶段开始时，若你本回合内没有使用过锦囊牌，则你的锦囊牌不计入手牌上限。',
 			

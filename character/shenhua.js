@@ -6390,10 +6390,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					save:true,
+					mingzhi:true,
 					skillTagFilter:function(player){
 						if(player.hp>0) return false;
-						},
 					},
+				},
 				intro:{
 					content:'cards',
 					onunmark:function(storage,player){

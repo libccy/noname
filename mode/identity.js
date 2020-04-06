@@ -2733,7 +2733,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:'准备阶段开始时，可以观看牌堆顶的三张牌，然后将这些牌以任意顺序置于牌堆顶或牌堆底'
 				},
-				trigger:{player:'phaseBegin'},
+				trigger:{player:'phaseZhunbeiBegin'},
 				silent:true,
 				content:function(){
 					"step 0"
@@ -2748,7 +2748,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(event.dialog) event.dialog.close();
 						if(event.control) event.control.close();
 						var top=[];
-						var judges=player.node.judges.childNodes;
+						var judges=player.getCards('j');
 						var stopped=false;
 						if(!player.countCards('h','wuxie')){
 							for(var i=0;i<judges.length;i++){

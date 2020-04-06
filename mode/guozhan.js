@@ -457,7 +457,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var list=[
 							'sha','tao','jiu',
 							'taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman',
-							'xietianzi','shuiyanqijunx','lulitongxin','lianjunshengyan','chiling','diaohulishan','yuanjiao','huoshaolianying','zhibi'
+							'xietianzi','shuiyanqijunx','lulitongxin','lianjunshengyan','chiling','diaohulishan','yuanjiao','huoshaolianying','zhibi','yiyi'
 						];
 						var list2=[];
 						for(var i=0;i<list.length;i++){
@@ -2609,7 +2609,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'wood',
 				audio:"hunshang",
-				derivation:["reyingzi","gzyinghun"],
+				derivation:["baka_yingzi","baka_yinghun"],
 				viceSkill:true,
 				init:function (player){
 					if(player.checkViceSkill('baka_hunshang')&&!player.viceChanged){
@@ -4176,7 +4176,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					dialog:function(){
 						var list=[
 							'taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman',
-							'xietianzi','shuiyanqijunx','lulitongxin','lianjunshengyan','chiling','diaohulishan','yuanjiao','huoshaolianying','zhibi',
+							'xietianzi','shuiyanqijunx','lulitongxin','lianjunshengyan','chiling','diaohulishan','yuanjiao','huoshaolianying','zhibi','yiyi',
 						];
 						for(var i=0;i<list.length;i++){
 							list[i]=['锦囊','',list[i]];
@@ -4736,7 +4736,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return {
 							filterCard:function(){return false},
 							selectCard:-1,
-							viewAs:{name:'sha'},
+							viewAs:{name:'sha',cards:links},
 							cards:links,
 							onuse:function(result,player){
 								result.cards=lib.skill[result.skill].cards;
@@ -8508,7 +8508,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				var toidentity=to.identity;
 				if(toidentity=='unknown'){
 					toidentity=lib.character[to.name1][1];
-					if(get.population(toidentity)>=get.population()-2){
+					if(!to.wontYe()){
 						toidentity='ye';
 					}
 				}

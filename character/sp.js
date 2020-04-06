@@ -1164,10 +1164,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			//花鬘
+			manyi:{audio:2},
 			hmmanyi:{
 				trigger:{target:'useCardToBefore'},
 				forced:true,
-				audio:2,
+				audio:'manyi',
 				filter:function(event,player){
 					return event.card.name=='nanman';
 				},
@@ -8352,7 +8353,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					list.push('cancel2');
 					if(list.length){
 						player.chooseControl(list).set('prompt',get.prompt2('xinzhengnan')).set('ai',function(){
-							if(list.contains('new_rewusheng')) return 1;
+							if(list.contains('xindangxian')) return 'xindangxian';
 							return 0;
 						});
 					}

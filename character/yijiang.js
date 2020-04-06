@@ -3482,12 +3482,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						popup:false,
 						audio:false,
 						content:function(){
+							"step 0"
 							if(player.storage.xinsidi4.isAlive()&&!player.getHistory('useCard',function(evt){
 								return evt.card.name=='sha';
 							}).length&&player.storage.xinsidi4.canUse({name:'sha',isCard:true},player,false)){
 								player.storage.xinsidi4.logSkill('xinsidi',player);
 								player.storage.xinsidi4.useCard({name:'sha',isCard:true},player);
 							}
+							"step 1"
 							delete player.storage.xinsidi2;
 							delete player.storage.xinsidi3;
 							delete player.storage.xinsidi4;

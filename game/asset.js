@@ -2383,6 +2383,10 @@ window.noname_asset_list=[
 	'audio/skill/shebian2.mp3',
 	'audio/skill/shensu1_ol_xiahouyuan1.mp3',
 	'audio/skill/shensu1_ol_xiahouyuan2.mp3',
+	'audio/skill/jianshu1.mp3',
+	'audio/skill/jianshu2.mp3',
+	'audio/skill/yongdi1.mp3',
+	'audio/skill/yongdi2.mp3',
 	
 	'font/huangcao.ttf',
 	'font/shousha.ttf',

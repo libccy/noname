@@ -20958,7 +20958,7 @@
 					}
 					var range=get.subtype(name);
 					if(this.isDisabled(range)) return false;
-					if(['equip3','equip4'].contains(range)&&!this.isEmpty(6)) return false;
+					if(['equip3','equip4'].contains(range)&&!this.isDisabled(6)) return false;
 					if(!replace&&!this.isEmpty(range)) return false;
 					return true;
 				},
