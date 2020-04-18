@@ -271,8 +271,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				chongzhu:true,
 				ai:{
-					wuxie:function(){
+					wuxie:function(target,card,player,viewer){
 						if(_status.event.getRand()<0.5) return 0;
+						if(player==game.me&&get.attitude(viewer,player)>0){
+							return 0;
+						}
 					},
 					basic:{
 						useful:4,

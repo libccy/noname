@@ -916,7 +916,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:13,
 					result:{
 						target:function(player,target){
-							var hs=player.countCards('h',{name:['sha','juedou']});
+							if(target.getEquip('bagua')||target.getEquip('rewrite_bagua')) return 0;
+							var hs=player.countCards('h',function(card){
+								return ['sha','juedou'].contains(card.name)&&get.effect(target,card,player,player)!=0;
+							});
 							var ts=target.hp;
 							if(hs>=ts&&ts>1) return -1;
 							return 0;
@@ -2994,6 +2997,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 2"
 					if(result.bool){
+						result.targets.sortBySeat();
 						player.line(result.targets,'green');
 						event.targets=result.targets;
 						if(!event.targets.length) event.finish();

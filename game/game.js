@@ -1490,6 +1490,8 @@
 							glass:'勾玉',
 							round:'国战',
 							ol:'手杀',
+							xinglass:'双鱼',
+							xinround:'OL',
 							custom:'自定',
 						},
 						visualBar:function(node,item,create,switcher){
@@ -10226,6 +10228,7 @@
 					_status.currentPhase=player;
 					_status.discarded=[];
 					game.phaseNumber++;
+					player.phaseNumber++;
 					game.syncState();
 					game.addVideo('phaseChange',player);
 					if(game.phaseNumber==1&&lib.configOL.observe){
@@ -13353,7 +13356,11 @@
 						var sgnatt=get.sgn(att);
 						if(ui.selected.targets.length==0){
 							if(att>0){
-								if(!_status.event.nojudge&&target.countCards('j')) return 14;
+								if(!_status.event.nojudge&&target.countCards('j',function(card){
+									return game.hasPlayer(function(current){
+										return !current.hasJudge(card);
+									})
+								})) return 14;
 								if(target.countCards('e',function(card){
 									return get.value(card,target)<0&&game.hasPlayer(function(current){
 										return current!=target&&get.attitude(player,current)<0&&current.isEmpty(get.subtype(card))
@@ -13376,13 +13383,18 @@
 						}
 						var es=ui.selected.targets[0].getCards('e');
 						var i;
-						var att2=get.attitude(player,ui.selected.targets[0]);
+						var att2=get.sgn(get.attitude(player,ui.selected.targets[0]));
 						for(i=0;i<es.length;i++){
-							if(sgnatt!=0&&att2!=0&get.sgn(get.value(es[i]))==sgnatt&&target.isEmpty(get.subtype(es[i]))){
+							if(sgnatt!=0&&att2!=0&&
+								get.sgn(get.value(es[i],ui.selected.targets[0]))==-att2&&
+								get.sgn(get.value(es[i],target))==sgnatt&&
+								target.isEmpty(get.subtype(es[i]))){
 								return Math.abs(att);
 							}
 						}
-						if(i==es.length){
+						if(i==es.length&&(_status.event.nojudge||!ui.selected.targets[0].countCards('j',function(card){
+							return !target.hasJudge(card);
+						}))){
 							return 0;
 						}
 						return -att*get.attitude(player,ui.selected.targets[0]);
@@ -13409,7 +13421,9 @@
 							var targets0=_status.event.targets0;
 							var targets1=_status.event.targets1;
 							if(get.attitude(player,targets0)>get.attitude(player,targets1)){
-								return (get.position(button.link)=='j'||get.value(button.link)<0)?10:0;
+								if(get.position(button.link)=='j') return 12;
+								if(get.value(button.link,targets0)<0) return 10;
+								return 0;
 							}
 							else{
 								if(get.position(button.link)=='j') return -10;
@@ -13677,6 +13691,7 @@
 						}
 					}
 					"step 4"
+					if(event.all_excluded) return;
 					if(!event.triggeredTargets1) event.triggeredTargets1=[];
 					var target=event.getTriggerTarget(targets,event.triggeredTargets1);
 					if(target){
@@ -13696,6 +13711,7 @@
 						event.redo();
 					}
 					"step 5"
+					if(event.all_excluded) return;
 					if(!event.triggeredTargets2) event.triggeredTargets2=[];
 					var target=event.getTriggerTarget(targets,event.triggeredTargets2);
 					if(target){
@@ -13715,6 +13731,7 @@
 						event.redo();
 					}
 					"step 6"
+					if(event.all_excluded) return;
 					if(!event.triggeredTargets3) event.triggeredTargets3=[];
 					var target=event.getTriggerTarget(targets,event.triggeredTargets3);
 					if(target){
@@ -13734,6 +13751,7 @@
 						event.redo();
 					}
 					"step 7"
+					if(event.all_excluded) return;
 					if(!event.triggeredTargets4) event.triggeredTargets4=[];
 					var target=event.getTriggerTarget(targets,event.triggeredTargets4);
 					if(target){
@@ -13775,6 +13793,7 @@
 						if(event.forceDie) next.forceDie=true;
 					}
 					"step 9"
+					if(event.all_excluded) return;
 					if(num==0&&targets.length>1){
 						event.sortTarget(true);
 					}
@@ -13838,6 +13857,7 @@
 						}
 					}
 					"step 10"
+					if(event.all_excluded) return;
 					if(!get.info(event.card,false).multitarget&&num<targets.length-1&&!event.cancelled){
 						event.num++;
 						event.goto(9);
@@ -16068,6 +16088,7 @@
 					this.hiddenSkills=[];
 					this.awakenedSkills=[];
 					this.forbiddenSkills={};
+					this.phaseNumber=0;
 					this.stat=[{card:{},skill:{}}];
 					this.tempSkills={};
 					this.storage={};
@@ -16261,6 +16282,7 @@
 						dead:this.isDead(),
 						linked:this.isLinked(),
 						turnedover:this.isTurnedOver(),
+						phaseNumber:this.phaseNumber,
 					}
 					for(var i=0;i<state.judges.length;i++){
 						state.views[i]=state.judges[i].viewAs;
@@ -20958,7 +20980,7 @@
 					}
 					var range=get.subtype(name);
 					if(this.isDisabled(range)) return false;
-					if(['equip3','equip4'].contains(range)&&!this.isDisabled(6)) return false;
+					if(['equip3','equip4'].contains(range)&&(!this.isDisabled(6)||this.getEquip(6))) return false;
 					if(!replace&&!this.isEmpty(range)) return false;
 					return true;
 				},
@@ -23526,7 +23548,7 @@
 						if(item.indexOf('###')==0){
 							var items=item.slice(3).split('###');
 							this.add(items[0],noclick,zoom);
-							this.addText(items[1],noclick,zoom);
+							this.addText(items[1],items[1].length<=20,zoom);
 						}
 						else if(noclick){
 							var strstr=item;
@@ -25788,6 +25810,7 @@
 							player.hujia=info.hujia;
 							player.sex=info.sex;
 							player.side=info.side;
+							player.phaseNumber=info.phaseNumber,
 							player.setNickname();
 							if(info.dead){
 								player.classList.add('dead');
@@ -28670,7 +28693,7 @@
 			}
 		},
 		prompt:function(){
-			var str,forced,callback,noinput=false;
+			var str,forced,callback,noinput=false,str2='';
 			for(var i=0;i<arguments.length;i++){
 				if(arguments[i]=='alert'){
 					forced=true;
@@ -28678,7 +28701,12 @@
 					noinput=true;
 				}
 				else if(typeof arguments[i]=='string'){
-					str=arguments[i];
+					if(arguments[i].indexOf('###')==0){
+						var list=arguments[i].slice(3).split('###');
+						str=list[0];
+						str2=list[1];
+					}
+					else str=arguments[i];
 				}
 				else if(typeof arguments[i]=='boolean'){
 					forced=arguments[i];
@@ -28690,14 +28718,14 @@
 			if(!callback){
 				return;
 			}
-			try{
-				if(noinput){
-					throw('e');
-				}
-				var result=prompt(str);
-				callback(result);
-			}
-			catch(e){
+			//try{
+			//	if(noinput){
+			//		throw('e');
+			//	}
+			//	var result=prompt(str);
+			//	callback(result);
+			//}
+			//catch(e){
 				var promptContainer=ui.create.div('.popup-container',ui.window,function(){
 					if(this.clicked){
 						this.clicked=false;
@@ -28712,6 +28740,7 @@
 				});
 				var strnode=ui.create.div('',str||'',dialog);
 				var input=ui.create.node('input',ui.create.div(dialog));
+				input.value=str2;
 				if(noinput){
 					input.style.display='none';
 				}
@@ -28757,7 +28786,7 @@
 					}
 					input.focus();
 				}
-			}
+			//}
 		},
 		alert:function(str){
 			game.prompt(str,'alert');
@@ -34732,18 +34761,21 @@
 												var nodexx=ui.background_music_setting;
 												var nodeyy=nodexx._link.menu;
 												var nodezz=nodexx._link.config;
-												var musicname=lib.device=='android'?prompt('请给这首音乐起个名字'):false;
-												lib.config.customBackgroundMusic[link]=musicname?musicname:link.slice(link.indexOf('_')+1);
-												lib.config.background_music=link;
-												lib.config.all.background_music.add(link);
-												game.saveConfig('background_music',link);
-												game.saveConfig('customBackgroundMusic',lib.config.customBackgroundMusic);
-												nodezz.item[link]=lib.config.customBackgroundMusic[link];
-												var textMenu=ui.create.div('',lib.config.customBackgroundMusic[link],nodeyy,clickMenuItem);
-												textMenu._link=link;
-												nodezz.updatex.call(nodexx,[]);
-												_status.music_importing=false;
-												if(!_status._aozhan) game.playBackgroundMusic();
+												var musicname=link.slice(link.indexOf('_')+1);
+												game.prompt('###请输入音乐的名称###'+musicname,true,function(str){
+ 												if(str) musicname=str;
+ 												lib.config.customBackgroundMusic[link]=musicname;
+ 												lib.config.background_music=link;
+ 												lib.config.all.background_music.add(link);
+ 												game.saveConfig('background_music',link);
+ 												game.saveConfig('customBackgroundMusic',lib.config.customBackgroundMusic);
+ 												nodezz.item[link]=lib.config.customBackgroundMusic[link];
+ 												var textMenu=ui.create.div('',lib.config.customBackgroundMusic[link],nodeyy,clickMenuItem);
+ 												textMenu._link=link;
+ 												nodezz.updatex.call(nodexx,[]);
+ 												_status.music_importing=false;
+ 												if(!_status._aozhan) game.playBackgroundMusic();
+												});
 											};
 											if(game.writeFile){
 												game.writeFile(fileToLoad,'audio/background',link+'.mp3',callback);
@@ -42493,6 +42525,7 @@
 				}
 				node.node.action=ui.create.div('.action',node.node.avatar);
 
+				node.phaseNumber=0;
 				node.skipList=[];
 				node.skills=[];
 				node.initedSkills=[];

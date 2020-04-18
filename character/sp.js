@@ -23,7 +23,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			//wangshuang:['male','wei',5,['spzhuilie']],
+			wangshuang:['male','wei',5,['spzhuilie'],['unseen']],
 			sp_gongsunzan:['male','qun',4,['spyicong','sptuji']],
 			sp_simazhao:['male','wei',3,['spzhaoxin','splanggu']],
 			sp_wangyuanji:['female','wei',3,['spfuluan','spshude']],
@@ -3361,9 +3361,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.line(trigger.target,{color:[220, 90, 139]});
 					player.chooseControl(['basic','trick','equip']).set('ai',function(){
-						if(!trigger.target.countCards('h','sha')&&trigger.target.countCards('h','shan')) return 'trick';
+						var player=_status.event.target;
+						if(!player.countCards('h','sha')&&player.countCards('h','shan')) return 'trick';
 						return 'basic';
-					}).set('prompt','请选择一种牌的类别');
+					}).set('prompt','请选择一种牌的类别').set('target',trigger.target);
 					'step 1'
 					trigger.target.chooseCard('he','交给'+get.translation(player)+'一张'+get.translation(result.control)+'牌，否则此【杀】不可被闪避。',function(card){
 						return get.type(card,'trick')==result.control;
@@ -4631,7 +4632,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						filter:function(event,player){
 							if(_status.currentPhase!=player){
-								var he=player.getCards('he');
+								var he=player.getCards('h');
 								var bool=false;
 								player.getHistory('gain',function(evt){
 									if(!bool&&evt&&evt.cards){
@@ -8132,14 +8133,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							}
 						}
-						game.delay(2);
-						trigger.cancel();
+						trigger.targets.length=0;
+						trigger.all_excluded=true;
 					}
-					else{
-						event.finish();
-					}
-					"step 2"
-					game.broadcastAll(ui.clear);
 				},
 				ai:{
 					threaten:1.8,
@@ -8672,7 +8668,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					maxHandcard:function(player,num){
-						if(player.getEquip(3)||player.getEquip(4)) return;
+						if(player.getEquip(3)||player.getEquip(4)||player.getEquip(6)) return;
 						return num+1;
 					},
 					targetInRange:function(card,player,target,now){
@@ -11211,7 +11207,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var suits=['club','spade','heart','diamond']
 					for(var i=0;i<trigger.cards2.length;i++){
 						if(get.position(trigger.cards2[i],true)=='d'){
-							cards.push(trigger.cards2[i],true);
+							cards.push(trigger.cards2[i]);
 							suits.remove(get.suit(trigger.cards2[i]));
 						}
 					}
@@ -13825,6 +13821,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								thisTarget.draw();event.finish();
 								return;
 							}
+							case 'equip5':{
+								event.finish();
+								return;
+							}
 							default:{
 								thisTarget.recover();
 								event.finish();
@@ -15024,9 +15024,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				filter:function (event,player){
 					if(!event.targets||!event.targets.length||
-					event.getParent().triggeredTargets3.length>1||!event.isPhaseUsing()) return false;
+					event.getParent().triggeredTargets3.length>1||!event.isPhaseUsing(player)) return false;
 					var evt=player.getLastUsed(1);
-					if(!evt||!evt.targets||!evt.targets.length||!evt.isPhaseUsing()) return false;
+					if(!evt||!evt.targets||!evt.targets.length||!evt.isPhaseUsing(player)) return false;
 					for(var i=0;i<event.targets.length;i++){
 						if(evt.targets.contains(event.targets[i])) return true;
 					}
@@ -15059,7 +15059,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					aiOrder:function(player,card,num){
 						if(player.isPhaseUsing()&&(!player.storage.counttrigger||!player.storage.counttrigger.xinfu_lianpian||!player.storage.counttrigger.xinfu_lianpian<3)){
 							var evt=player.getLastUsed();
-							if(evt&&evt.targets&&evt.targets.length&&evt.isPhaseUsing()&&game.hasPlayer(function(current){
+							if(evt&&evt.targets&&evt.targets.length&&evt.isPhaseUsing(player)&&game.hasPlayer(function(current){
 								return evt.targets.contains(current)&&player.canUse(card,current)&&get.effect(current,card,player,player)>0;
 							})){
 								return num+10;
@@ -15071,7 +15071,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						player:function(card,player,target){
 							var evt=player.getLastUsed();
-							if(evt&&evt.targets.contains(target)&&(!player.storage.counttrigger||!player.storage.counttrigger.xinfu_lianpian||!player.storage.counttrigger.xinfu_lianpian<3)&&player.isPhaseUsing()) return [1.5,0];
+							if(evt&&evt.targets.contains(target)&&(!player.storage.counttrigger||!player.storage.counttrigger.xinfu_lianpian||!player.storage.counttrigger.xinfu_lianpian<3)&&player.isPhaseUsing(player)) return [1.5,0];
 						}
 					},
 				},
@@ -15407,16 +15407,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_jianjie":{
 				derivation:["jianjie_faq"],
 				group:["xinfu_jianjie1","xinfu_jianjie2"],
-				subSkill:{
-					phase:{
-						charlotte:true,
-						sub:true,
-					},
-					off:{
-						charlotte:true,
-						sub:true,
-					},
-				},
 				audio:3,
 				trigger:{
 					player:"phaseZhunbeiBegin",
@@ -15424,15 +15414,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				direct:true,
 				filter:function (event,player){
-					if(player.hasSkill('xinfu_jianjie_off')) return false;
+					if(player.phaseNumber>1) return false;
 					return !game.hasPlayer(function(current){
 						return current.hasSkill('smh_huoji')||current.hasSkill('smh_lianhuan');
 					});
 				},
 				content:function (){
 					"step 0"
-					player.addTempSkill('xinfu_jianjie_phase');
-					player.addSkill('xinfu_jianjie_off');
 					player.chooseTarget('请将「龙印」交给一名角色',true,function(card,player,target){
 						return target!=player;
 					}).set('ai',function(target){
@@ -15473,10 +15461,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:"phaseUse",
 				usable:1,
 				filter:function (event,player){
+					if(player.phaseNumber==1) return false;
 					if(!game.hasPlayer(function(current){
 						return current.hasSkill('smh_huoji')||current.hasSkill('smh_lianhuan');
 					})) return false;
-					return !player.hasSkill('xinfu_jianjie_phase');
+					return true;
 				},
 				filterTarget:function (card,player,target){
 					if(ui.selected.targets.length==1){
@@ -16986,7 +16975,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jici_info:'当你因发动〖鼓舌〗而扣置的拼点牌亮出后，若点数小于X，你可令点数+X；若点数等于X，你可令你本回合发动〖鼓舌〗的次数上限+1。（X为你“饶舌”标记的数量）',
 			shefu:'设伏',
 			shefu_bg:'伏',
-			shefu_info:'结束阶段开始时，你可以将一张手牌移出游戏，称为「伏兵」。然后为「伏兵」记录一个基本牌或锦囊牌的名称（须与其他「伏兵」记录的名称均不同）。你的回合外，当有其他角色使用与你记录的「伏兵」牌名相同的牌时，你可以令此牌无效，然后移去该「伏兵」',
+			shefu_info:'结束阶段开始时，你可以将一张手牌移出游戏，称为「伏兵」。然后为「伏兵」记录一个基本牌或锦囊牌的名称（须与其他「伏兵」记录的名称均不同）。你的回合外，当有其他角色使用与你记录的「伏兵」牌名相同的牌时，你可以取消此牌的所有目标，然后移去该「伏兵」',
 			benyu:'贲育',
 			benyu2:'贲育',
 			benyu_info:'当你受到伤害后，若你的手牌数不大于伤害来源的手牌数，你可以将手牌摸至与伤害来源手牌数相同（至多摸至5张）；否则你可以弃置大于伤害来源手牌数的手牌，然后对其造成1点伤害。',
@@ -17291,7 +17280,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shushen_info:'当你回复1点体力时，你可以令一名其他角色选择回复1点体力或摸两张牌。',
 			wuji_info:'觉醒技，结束阶段开始时，若你于此回合内造成过3点或更多伤害，你加1点体力上限并回复1点体力，失去〖虎啸〗，然后从场上、牌堆或弃牌堆中获得【青龙偃月刀】',
 			xueji_info:'出牌阶段限一次，你可以弃置一张红色牌，然后选择至多X名角色，横置这些角色并对其中一名角色造成1点火焰伤害。（X为你已损失的体力值且至少为1）',
-			huxiao_info:'锁定技，当你造成火属性伤害时，该角色摸一张牌。然后，你于此回合内对其使用牌没有次数和距离限制。',
+			huxiao_info:'锁定技，当你造成火属性伤害时，该角色摸一张牌。然后，你于此回合内对其使用牌没有次数限制。',
 			aocai_info:'当你于回合外需要使用或打出一张基本牌时，你可以观看牌堆顶的两张牌。若你观看的牌中有此牌，你可以使用打出之。',
 			hongyuan_info:'摸牌阶段，你可以少摸一张牌并指定至多两名其他角色。若如此做，这些角色各摸一张牌。',
 			hongyuan_info_combat:'摸牌阶段，你可以少摸一张牌。若如此做，其他友方角色各摸一张牌。',

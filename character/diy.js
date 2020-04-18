@@ -3602,7 +3602,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.hasShan()&&player.hp>=event.player.hp;
 				},
 				filter:function(event,player){
-					return player!=event.player&&event.result.length>0;
+					return player!=event.player&&Array.isArray(event.result)&&event.result.length>0;
 				},
 				logTarget:'player',
 				content:function(){

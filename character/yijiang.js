@@ -8311,9 +8311,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					player.syncStorage('quanji');
 					game.delayx();
-					"step 2"
+					"step 1"
 					target.draw(2);
-					"step 3"
+					"step 2"
 					if(target.countCards('h')>player.countCards('h')){
 						target.damage();
 					}
@@ -8599,13 +8599,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function(card,player,target){
 							if(card.name!='sha') return;
 							var players=game.filterPlayer();
-							for(var i=0;i<players.length;i++){
-								var target2=players[i];
-								if(player!=target2&&target!=target2&&player.canUse(card,target2,false)&&
-									get.effect(target2,{name:'shacopy',nature:card.nature,suit:card.suit},player,target)<0){
-									if(target.hp==target.maxHp) return [0,1];
-									return [0,0];
-								}
+ 						if(get.attitude(player,target)<=0){
+ 							for(var i=0;i<players.length;i++){
+ 								var target2=players[i];
+ 								if(player!=target2&&target!=target2&&player.canUse(card,target2,false)&&
+ 									get.effect(target2,{name:'shacopy',nature:card.nature,suit:card.suit},player,target)>0&&
+ 									get.effect(target2,{name:'shacopy',nature:card.nature,suit:card.suit},player,player)<0){
+ 									if(target.hp==target.maxHp) return 0.3;
+ 									return 0.6;
+ 								}
+ 							}
+							}
+							else{
+								for(var i=0;i<players.length;i++){
+ 								var target2=players[i];
+ 								if(player!=target2&&target!=target2&&player.canUse(card,target2,false)&&
+ 									get.effect(target2,{name:'shacopy',nature:card.nature,suit:card.suit},player,player)>0){
+ 									if(player.canUse(card,target2)) return;
+ 									if(target.hp==target.maxHp) return [0,1];
+ 									return [0,0];
+ 								}
+ 							}
 							}
 						}
 					}
@@ -9826,7 +9840,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xuanfeng:{
 				audio:2,
-				audioname:['boss_lvbu3'],
+				audioname:['boss_lvbu3','re_heqi'],
 				trigger:{player:['loseAfter','phaseDiscardEnd']},
 				direct:true,
 				filter:function(event,player){

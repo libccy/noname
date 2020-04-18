@@ -80,6 +80,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			game.gameDraw(game.zhu||_status.firstAct||game.me);
 			if(_status.connectMode&&lib.configOL.change_card) game.replaceHandcards(game.players.slice(0));
 			game.phaseLoop(game.zhu||_status.firstAct||game.me);
+			game.zhu.showGiveup();
 		},
 		game:{
 			addRecord:function(bool){
@@ -830,6 +831,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.chooseDrawRecover(2);
+					player.showGiveup();
 				},
 			},
 		},

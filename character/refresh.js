@@ -9,11 +9,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_huo:["ol_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","re_pangtong","ol_yuanshao","re_pangde"],
 				refresh_lin:['re_zhurong','re_menghuo','re_dongzhuo','re_sunjian','re_caopi','re_xuhuang'],
 				refresh_shan:['re_dengai','re_jiangwei','re_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce'],
-				refresh_yijiang:['re_xusheng','re_wuguotai','re_gaoshun'],
+				refresh_yijiang:['re_xusheng','re_wuguotai','re_gaoshun','re_zhangyi'],
 		 },
 		},
 		connect:true,
 		character:{
+			re_zhangyi:['male','shu',4,['rewurong','shizhi']],
 			re_xusheng:['male','wu',4,['repojun']],
 			re_wuguotai:['female','wu',3,['reganlu','buyi']],
 			re_gaoshun:['male','qun',4,['rexianzhen','rejinjiu']],
@@ -92,6 +93,168 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunben:['zhouyu','taishici','daqiao'],
 		},
 		skill:{
+			rewurong:{
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.countCards('h')>0;
+				},
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countCards('h')>0;
+				},
+				content:function(){
+					"step 0"
+					if(target.countCards('h')==0||player.countCards('h')==0){
+						event.finish();
+						return;
+					}
+					"step 1"
+					var sendback=function(){
+						if(_status.event!=event){
+							return function(){
+								event.resultOL=_status.event.resultOL;
+							};
+						}
+					};
+					if(player.isOnline()){
+						player.wait(sendback);
+						event.ol=true;
+						player.send(function(){
+							game.me.chooseCard(true).set('glow_result',true).ai=function(){
+								return Math.random();
+							};
+							game.resume();
+						});
+					}
+					else{
+						event.localPlayer=true;
+						player.chooseCard(true).set('glow_result',true).ai=function(){
+							return Math.random();
+						};
+					}
+					if(target.isOnline()){
+						target.wait(sendback);
+						event.ol=true;
+						target.send(function(){
+							var rand=Math.random()<0.4;
+							game.me.chooseCard(true).set('glow_result',true).ai=function(card){
+								if(rand) return card.name=='shan'?1:0;
+								return card.name=='shan'?0:1;
+							};
+							game.resume();
+						});
+					}
+					else{
+						event.localTarget=true;
+					}
+					"step 2"
+					if(event.localPlayer){
+						event.card1=result.cards[0];
+					}
+					if(event.localTarget){
+						var rand=Math.random()<0.4;
+						target.chooseCard(true).set('glow_result',true).ai=function(card){
+							if(rand) return card.name=='shan'?1:0;
+							return card.name=='shan'?0:1;
+						};
+					}
+					"step 3"
+					if(event.localTarget){
+						event.card2=result.cards[0];
+					}
+					if(!event.resultOL&&event.ol){
+						game.pause();
+					}
+					"step 4"
+					try{
+						if(!event.card1) event.card1=event.resultOL[player.playerid].cards[0];
+						if(!event.card2) event.card2=event.resultOL[target.playerid].cards[0];
+						if(!event.card1||!event.card2){
+							throw('err');
+						}
+					}
+					catch(e){
+						console.log(e);
+						event.finish();
+						return;
+					}
+					if(event.card2.number>=10||event.card2.number<=4){
+						if(target.countCards('h')>2){
+							event.addToAI=true;
+						}
+					}
+					game.broadcastAll(function(card1,card2){
+						card1.classList.remove('glow');
+						card2.classList.remove('glow');
+					},event.card1,event.card2);
+					"step 5"
+					game.broadcastAll(function(){
+						ui.arena.classList.add('thrownhighlight');
+					});
+					game.addVideo('thrownhighlight1');
+					player.$compare(event.card1,target,event.card2);
+					game.delay(4);
+					"step 6"
+					game.log(player,'展示了',event.card1);
+					game.log(target,'展示了',event.card2);
+					var name1=get.name(event.card1);
+					var name2=get.name(event.card2);
+					if(name1=='sha'&&name2!='shan'){
+						//player.discard(event.card1).set('animate',false);
+						target.$gain2(event.card2);
+						var clone=event.card1.clone;
+						if(clone){
+							clone.style.transition='all 0.5s';
+							clone.style.transform='scale(1.2)';
+							clone.delete();
+							game.addVideo('deletenode',player,get.cardsInfo([clone]));
+						}
+						game.broadcast(function(card){
+							var clone=card.clone;
+							if(clone){
+								clone.style.transition='all 0.5s';
+								clone.style.transform='scale(1.2)';
+								clone.delete();
+							}
+						},event.card1);
+						target.damage('nocard');
+					}
+					else if(name1!='sha'&&name2=='shan'){
+						//player.discard(event.card1).set('animate',false);
+						target.$gain2(event.card2);
+						var clone=event.card1.clone;
+						if(clone){
+							clone.style.transition='all 0.5s';
+							clone.style.transform='scale(1.2)';
+							clone.delete();
+							game.addVideo('deletenode',player,get.cardsInfo([clone]));
+						}
+						game.broadcast(function(card){
+							var clone=card.clone;
+							if(clone){
+								clone.style.transition='all 0.5s';
+								clone.style.transform='scale(1.2)';
+								clone.delete();
+							}
+						},event.card1);
+						player.gainPlayerCard(target,true,'he');
+					}
+					else{
+						player.$gain2(event.card1);
+						target.$gain2(event.card2);
+					}
+					game.broadcastAll(function(){
+						ui.arena.classList.remove('thrownhighlight');
+					});
+					game.addVideo('thrownhighlight2');
+				},
+				ai:{
+					order:6,
+					result:{
+						target:-1,
+					}
+				}
+			},
 			cangzhuo:{
 				trigger:{player:'phaseDiscardBegin'},
 				frequent:true,
@@ -3643,7 +3806,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			reyingzi:{
 				audio:2,
-				audioname:['heqi','sunce','gexuan','re_sunben','re_sunce'],
+				audioname:['heqi','sunce','gexuan','re_sunben','re_sunce','re_heqi'],
 				trigger:{player:'phaseDrawBegin2'},
 				forced:true,
 				filter:function(event,player){
@@ -5435,7 +5598,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_gaoshun:'界高顺',
 			re_xusheng:'界徐盛',
 			reganlu:'甘露',
-			reganlu_info:'出牌阶段限一次，你可以选择装备区牌数之差不小于X的两名角色或包含你在内的两名角色，然后交换这两名角色装备区内的牌。',
+			reganlu_info:'出牌阶段限一次，你可以选择装备区牌数之差的绝对值不小于X的两名角色或包含你在内的两名角色，然后交换这两名角色装备区内的牌。（X为你已损失的体力值）',
 			repojun:'破军',
 			repojun2:'破军',
 			repojun3:'破军',
@@ -5451,6 +5614,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shebian_info:'当你的武将牌翻面后，你可以移动场上的一张装备牌。',
 			cangzhuo:'藏拙',
 			cangzhuo_info:'弃牌阶段开始时，若你本回合内没有使用过锦囊牌，则你的锦囊牌不计入手牌上限。',
+			re_zhangyi:'界张嶷',
+			rewurong:'怃戎',
+			rewurong_info:'出牌阶段限一次，你可以令一名其他角色与你同时展示一张手牌：若你展示的是【杀】且该角色展示的不是【闪】，则你对其造成1点伤害；若你展示的不是【杀】且该角色展示的是【闪】，则你获得其一张牌',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

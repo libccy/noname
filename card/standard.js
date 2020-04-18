@@ -526,6 +526,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filterTarget:true,
 				contentBefore:function(){
 					"step 0"
+					if(!targets.length){
+						event.finish();
+						return;
+					}
 					if(get.is.versus()){
 						player.chooseControl('顺时针','逆时针',function(event,player){
 							if(player.next.side==player.side) return '逆时针';
@@ -1218,6 +1222,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					wuxie:function(target,card,player,viewer){
+						if(player==game.me&&get.attitude(viewer,player)>0){
+							return 0;
+						}
+					},
 					basic:{
 						order:8,
 						value:2,

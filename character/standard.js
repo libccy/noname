@@ -1759,7 +1759,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			qixi:{
 				audio:2,
-				audioname:['re_ganning'],
+				audioname:['re_ganning','re_heqi'],
 				enable:'chooseToUse',
 				filterCard:function(card){
 					return get.color(card)=='black';

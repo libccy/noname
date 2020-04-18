@@ -2278,60 +2278,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			"new_keji":{
 				audio:"keji",
-				group:["new_keji_count","new_keji_reset","new_keji_judge"],
-				subSkill:{
-					reset:{
-						trigger:{
-							player:"phaseAfter",
-						},
-						priority:1,
-						silent:true,
-						content:function (){
-							player.storage.keji_type=[];
-							player.storage.keji_color=[];
-							player.storage.keji_suit=[];
-						},
-						sub:true,
-						forced:true,
-						popup:false,
-					},
-					count:{
-						trigger:{
-							player:"useCard",
-						},
-						silent:true,
-						content:function (){
-							if(!player.storage.keji_type){
-								player.storage.keji_type=[];
-							}
-							if(!player.storage.keji_color){
-								player.storage.keji_color=[];
-							}
-							if(!player.storage.keji_suit){
-								player.storage.keji_suit=[];
-							}
-							player.storage.keji_type.add(get.type(trigger.card));
-							player.storage.keji_color.add(get.color(trigger.card));
-							player.storage.keji_suit.add(get.suit(trigger.card));
-						},
-						sub:true,
-						forced:true,
-						popup:false,
-					},
-					judge:{
-						audio:"keji",
-						forced:true,
-						trigger:{
-							player:"phaseDiscardBefore",
-						},
-						filter:function (event,player){
-							return !player.storage.keji_color||player.storage.keji_color.length<2;
-						},
-						content:function (){
-							player.addTempSkill('keji_add','phaseAfter');
-						},
-						sub:true,
-					},
+				forced:true,
+				trigger:{
+					player:"phaseDiscardBegin",
+				},
+				filter:function (event,player){
+					var list=[];
+					player.getHistory('useCard',function(evt){
+						if(evt.isPhaseUsing(player)){
+							var color=get.color(evt.card);
+							if(color!='nocolor') list.add(color);
+						}
+					});
+					return list.length<=1;
+				},
+				content:function (){
+					player.addTempSkill('keji_add','phaseAfter');
 				},
 			},
 			"keji_add":{
@@ -6230,6 +6192,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.reinit(from,to,4);
 						if(lib.skill[to]) game.trySkillAudio(to,player);
 						player.showCharacter(0);
+						var yelist=[];
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i].identity=='ye'&&game.players[i]._group==player.group){
+								yelist.push(game.players[i]);
+							}
+						}
+						game.broadcastAll(function(list,group){
+							for(var i=0;i<list.length;i++){
+								list[i].identity=group;
+								list[i].setIdentity();
+							}
+						},yelist,player.group);
 					}
 					else event.finish();
 					'step 2'
@@ -8076,18 +8050,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						this.group=lib.character[this.name1][1];
 						if(get.is.jun(this.name1)&&this.isAlive()){
 							this.identity=this.group;
-							var yelist=[];
-							for(var i=0;i<game.players.length;i++){
-								if(game.players[i].identity=='ye'&&game.players[i]._group==this.group){
-									yelist.push(game.players[i]);
-								}
-							}
-							game.broadcastAll(function(list,group){
-								for(var i=0;i<list.length;i++){
-									list[i].identity=group;
-									list[i].setIdentity();
-								}
-							},yelist,this.group);
 						}
 						else if(this.wontYe()){
 							this.identity=this.group;
