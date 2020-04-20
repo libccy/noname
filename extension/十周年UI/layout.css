@@ -1,0 +1,566 @@
+@import 'dialog.css';
+@import 'card.css';
+
+html {
+    background: rgb(60, 60, 60);
+}
+
+body>.background {
+    animation: anime-opacity 1s ease-in-out;
+}
+
+@keyframes anime-opacity {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+#decadeUI-animate-window,
+#decadeUI-animate-arena {
+	display: block;
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 888;
+	pointer-events: none;
+}
+
+#arena {
+	left: 2%;
+	right: 2%;
+	top: 10%;
+	bottom: 1%;
+	width: auto;
+	height: auto;
+	/* pointer-events: none; */
+	transition-property: opacity;
+}
+
+#arena.phone {
+    top: 2%;
+}
+
+#window.leftbar #arena:not(.chess) {
+	width: auto;
+	left: calc(2% + 50px);
+}
+
+#window.rightbar #arena:not(.chess) {
+	width: auto;
+	right: calc(2% + 50px);
+}
+
+/* #arena>div { */
+	/* pointer-events: auto; */
+/* } */
+
+#arena:not(.chess).decadeUI>#mebg {
+    display: none;
+}
+
+#arena.decadeUI:not(.single-handcard):not(.chess)>#autonode {
+	display: flex !important;
+    align-items: center;
+    justify-content: center;
+    left: -2% !important;
+	right: -2% !important;
+	bottom: -2% !important;
+    width: auto !important;
+	height: calc(2% + 180px);
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+}
+
+#autonode>div {
+	position: static;
+	text-shadow: 0 0 20px red;
+}
+
+#window > #time {
+	left: 50px;
+	right: 50px;
+	color: rgb(250, 250, 200);
+	font-family: xinwei;
+	text-shadow: 0 0 1px black, 0 0 1px black, 0 0 1px black, 0 0 1px black;
+}
+
+.hand-zone, .hand-back {
+    width: 100%;
+    height: 150px;
+    bottom: 1%;
+	transition: none;
+}
+
+.discard-zone {
+	width: 100%;
+    height: 10%;
+}
+
+.hand-zone>.fakeme.avatar {
+    left: -128px;
+    top: auto;
+    right: auto;
+    bottom: 0;
+	width: 120px;
+	height: 120px;
+	border-radius: 0;
+	background-size: cover;
+}
+
+.hand-cards {
+	width: 100%;
+	height: 100%;
+	transition: none !important;
+}
+
+.hand-cards>.handcards {
+	padding: 0px;
+	width: 100%;
+	height: 100%;
+	transition: none;
+}
+
+.hand-cards>.handcards>.card {
+	margin: 0px;
+	width: 108px;
+    height: 150px;
+	position: absolute;
+	transition-property: transform, opacity, left, top;
+}
+
+.hand-cards>.handcards>.card.selected {
+    boder-radius: 2px;
+    /*transition-timing-function: linear;*/
+}
+
+.hand-cards>.handcards>.card.selectable {
+    boder-radius: 2px;
+	cursor: pointer;
+}
+
+.hand-cards>.handcards>.card::before {
+    opacity: 0;
+    border-radius: inherit !important;
+    box-shadow: 0px -1px 2px yellow, 0px -1px 5px yellow, 0px 0px 15px yellow;
+    transition: opacity 0.5s;
+}
+
+.hand-cards>.handcards>.card.selected::before {
+    opacity: 1;
+}
+
+.hand-cards>.handcards>.card::after,
+.hand-cards>.handcards>.card.selected::after,
+.hand-cards>.handcards>.card.selectable::after {
+    display: none;
+}
+
+.hand-special {
+	left: auto;
+    right: calc(-1% + 3px);
+    bottom: calc(1% + 150px);
+	width: auto;
+    height: 75px;
+    min-width: 150px;
+    box-shadow: 0 0 6px rgb(200, 150, 80) inset;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.hand-special>.cards {
+	display: flex;
+	flex-direction: row-reverse;
+	position: relative;
+    left: 0;
+    top: 0;
+    width: auto;
+    height: auto;
+    zoom: 0.5;
+}
+
+.hand-special>.cards>.card {
+	margin-top: 0;
+    margin-left: 0;
+    margin-right: 0;
+	transform: none !important;
+}
+
+.hand-special>.cards>.card::after { 
+    border-radius: inherit !important;
+    box-shadow: 0px -1px 2px yellow, 0px -1px 5px yellow, 0px 0px 15px yellow;
+    transition: opacity 0.5s;
+}
+
+
+#arena>.card, 
+#arena.oblongcard:not(.chess)>.card,
+#arena.oblongcard:not(.chess) .handcards>.card {
+	width: 108px;
+    height: 150px;
+}
+
+.button.card {
+	width: 108px;
+    height: 150px;
+	background-size: 100% 100%;
+}
+
+
+.card,
+#window:not(*[data-radius_size='']) .card {
+    border-radius: 2px;
+}
+
+.card,
+.card.decade-card {
+	width: 108px;
+    height: 150px;
+	box-shadow: 0 1px 4px black;
+	border-radius: 2px;
+	background-repeat: no-repeat !important;
+	background-size: 100% 100% !important;
+	-moz-background-size: 100% 100% !important;
+}
+
+.mobile-phone .card {
+   box-shadow: 0 1px 2px black;
+}
+
+/* .card.decade-card:not(*:empty) { */
+	/* background: none; */
+/* } */
+
+/* .card.decade-card.infohidden { */
+	/* background-image: url('../../theme/style/cardback/image/liusha2.png') !important; */
+/* } */
+
+.card>.name,
+.card.fullskin>.name,
+.card.fullskin>.name.long,
+.dialog .buttons>.card>.name.long {
+	top: auto;
+	bottom: 5px;
+	line-height: 16px;
+	color: black;
+	font-size: 16px;
+	font-weight: bold;
+	font-family: shousha;
+	text-shadow: 0 0 1px white, 0 0 3px white;
+	border: 1px solid black;
+	border-radius: 2px;
+}
+
+.card.decade-card:not(*[data-card-type='basic'])>.name {
+    bottom: 20px;
+}
+
+#arena[data-card-Secondary-name-visible='off'] .card>.name {
+    display: none;
+}
+
+.card>.background,
+.card.button>.background {
+	top: auto;
+	bottom: 8%;
+	font-size: 80px;
+	line-height: 80px;
+	padding-top: 0;
+}    
+
+.card.mark>.background {
+	line-height: 100%;
+}
+
+.card>.top-name {
+    left: 14px;
+    top: 10px;
+    width: calc(100% - 15px);
+	color: black;
+	font-size: 20px;
+	font-family: shousha;
+	text-align: center;
+}
+
+.card.decade-card>.top-name {
+    display: none;
+}
+
+.card.decade-card>.image {
+	display: none;
+	visibility: hidden !important;
+}
+
+.card>.tempname {
+	position: absolute;
+	left: 4px;
+    top: calc(50% - 12px);
+    right: 4px;
+    width: auto;
+	height: 24px;
+    color: #181818 !important;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: shousha;
+    line-height: 24px;
+    text-align: center;
+    text-shadow: none;
+	white-space: normal;
+    background: rgba(228, 207, 166, 0.8);
+    border-radius: 2px;
+    border: 1px solid black;
+	pointer-events: none
+}
+
+.card>.tempname[data-nature='fire'] {
+	color: red !important;
+	text-shadow: 0 0 4px #FFF, 0 -5px 4px #ff3, 2px -10px 6px #fd3, -2px -15px 10px #f80, 2px -25px 20px #f20 !important;
+}
+
+.card>.tempname[data-nature='thunder'] {
+	text-shadow: 0 0 5px white, 0 0 10px white !important;
+}
+
+.card>.tempname[data-nature='thunder']::before {
+	content:'';
+	display: block;
+    position: absolute;
+	left: calc(50% - 50px);
+	top: calc(50% - 30px);
+	width: 100px;
+  	height: 60px;
+	text-shadow: 0 0 10px white !important;
+  	background: linear-gradient(to bottom, white, blue 15%, white 30%, blue 50%, white 70%, blue 85%, white);;
+  	clip-path: polygon(100% 0, 20% 50%, 37% 60%, 0 100%, 80% 50%, 63% 40%);
+  	-webkit-clip-path: polygon(100% 0, 20% 50%, 37% 60%, 0 100%, 80% 50%, 63% 40%);
+	transform: scale(0.8);
+}
+
+.card>.tempname>div {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.card>.tempname:empty,
+.card>.tempname>br {
+	display: none;
+}
+
+.card>.image,
+#arena:not(.chess)>.card>.image,
+#arena:not(.chess) .handcards>.card>.image,
+#arena.oblongcard:not(.chess)>.card>.image,
+#arena.oblongcard:not(.chess) .handcards>.card>.image{
+    position: absolute;
+    width: 108px;
+    height: 108px;
+    left:  0;
+    top: auto;
+    right: 0;
+    bottom: 8%;
+    background-position-x: 0;
+}
+
+
+.card>.suit-num {
+	font-size: 25px;
+    color: black;
+    text-align: center;
+	top: 10px;
+    left: 5px;
+	width: 25px;
+	height: auto;
+	line-height: 20px;
+	text-shadow: 0 0 3px #ffffff, 0 0 8px #ffffff;
+    letter-spacing: -1px;
+    transform-origin: 0 0;
+}
+
+.mobile-phone .card>.suit-num>span:last-child {
+    font-size: 1rem;
+}
+
+.card[data-suit='heart']>.suit-num,
+.card[data-suit='diamond']>.suit-num {
+	color: red;
+}
+
+.buttons .card.button>.info {
+    left: 4px;
+    top: calc(50% - 12px);
+    right: 4px;
+    width: auto;
+    color: #181818;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: shousha;
+    line-height: 24px;
+    text-align: center;
+    text-shadow: none;
+	white-space: normal;
+    background: rgba(228, 207, 166, 0.8);
+    border-radius: 2px;
+    border: 1px solid black;
+	z-index: 2;
+}
+
+.buttons .card.button>.info:empty {
+	display: none;
+}
+
+.card>.range {
+    right: 5px;
+    bottom: 5px;
+	line-height: 14px;
+	color: black;
+	font-size: 14px;
+	font-weight: bold;
+	font-family: shousha;
+	text-shadow: 0 0 1px white, 0 0 3px white;
+	border: 1px solid black;
+	border-radius: 2px;
+}
+
+.card>.range:empty {
+    display: none;
+}
+
+
+.card>.used-info {
+    opacity: 0;
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    font-size: 18px;
+	width: 100%;
+	height: 33%;
+	display: flex;
+	align-items: center;
+	align-content: center;
+	justify-content: center;
+	font-family: 'STHeiti', 'SimHei', 'Microsoft JhengHei', 'Microsoft YaHei', 'WenQuanYi Micro Hei', Helvetica,Arial, sans-serif !important;
+}
+
+
+.card.thrown:not(.drawingcard):not(.movingcard)>.used-info {
+	opacity: 1;
+}
+
+.card>.card-mask {
+	opacity: 0;
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.4);
+	border-radius: inherit;
+	transition: none;
+}
+
+.card.invalided>.card-mask,
+#arena.selecting:not(.video) .handcards>.card:not(.selectable)>.card-mask,
+#arena.thrownhighlight>.card.thrown:not(.thrownhighlight):not(.drawingcard),
+#arena.thrownhighlight>.card.thrown:not(.thrownhighlight):not(.drawingcard)>.card-mask {
+	opacity: 1;
+}
+
+
+.transition-none {
+	transition: none !important;
+}
+
+/*牌堆牌数 游戏时间*/
+.touchinfo {
+	top: 1%;
+	color: rgb(250, 250, 200);
+	font-family: xinwei;
+	text-shadow: rgb(51,51,51) 1px 0 0, rgb(51,51,51) 0 1px 0, rgb(51,51,51) -1px 0 0, rgb(51,51,51) 0 -1px 0;
+	background: 0 0 1px black, 0 0 1px black, 0 0 1px black, 0 0 1px black;
+}
+
+.touchinfo.left {
+	left: 2%;
+}
+
+.touchinfo.right {
+	right: 2%;
+}
+
+#window.leftbar>.touchinfo.left {
+	left: calc(2% + 50px);
+}
+
+#window.rightbar>.touchinfo.right {
+	right: calc(2% + 50px);
+}
+
+
+#arena.decadeUI>.dialog.nobutton {
+    position: absolute;
+    left: 20%;
+    top: auto !important;
+    right: 20%;
+    bottom: 27% !important;
+    width: auto;
+    background: none;
+    transition-duration: 0.3s;
+}
+
+#arena.decadeUI.phone>.dialog.nobutton {
+    bottom: 25% !important;
+}
+
+#arena.decadeUI>.dialog.nobutton>.skill-info {
+	left: 0;
+    bottom: 74px;
+    width: 100%;
+    color: rgb(250, 250, 200);
+    font-family: shousha;
+    text-shadow: 0 0 1px black, 0 0 1px black, 0 0 1px black, 0 0 1px black;
+    background: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.2) 10%, rgba(0,0,0,0.2) 90%, transparent 100%);
+    pointer-events: none;
+}
+
+#arena.decadeUI>.dialog.nobutton>.content-container>.content>.caption {
+    border: none;
+	bottom: 0;
+    height: auto;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    color: rgb(250, 250, 200);
+    background: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.2) 10%, rgba(0,0,0,0.2) 90%, transparent 100%);
+    font-family: shousha;
+    text-shadow: rgb(51,51,51) 1px 0 0, rgb(51,51,51) 0 1px 0, rgb(51,51,51) -1px 0 0, rgb(51,51,51) 0 -1px 0;
+}
+
+#arena.decadeUI>.dialog.nobutton>.bar.bottom {
+    display: none;
+}
+
+#arena.decadeUI:not(.chess):not(.choose-character):not(.game-over) #control {
+    transition: all 0.3s;
+	position: absolute;
+    top: auto;
+    bottom: calc(27% + 28px);
+}
+
+#arena.decadeUI.phone:not(.chess):not(.choose-character):not(.game-over) #control,
+#arena.decadeUI.oblongcard.phone:not(.chess):not(.choose-character):not(.game-over) #control {
+	transition: all 0.1s;
+	position: absolute;
+    top: auto;
+    bottom: calc(25% + 34px);
+}
+
+/*暂停记录栏*/
+.pausedbg>#sidebar {
+    width: auto;
+}
+

@@ -1,0 +1,270 @@
+
+.effect-dialog {
+	display: block:
+	position: absolute;
+	left: 20%;
+    top: 10%;
+    right: 20%;
+    bottom: 30%;
+    width: auto;
+    height: auto;
+	border-width: 46px 59px 28px 59px;
+    border-style: solid;
+    border-color: transparent;
+    border-image-source: url('image/decoration/dialog.webp');
+    border-image-slice:  46 59 28 59 fill;
+    pointer-events: none;
+    z-index: 4;
+	animation: player-died 0.5s linear forwards;
+	-webkit-animation: open 0.4s;
+}
+
+.effect-dialog>.character {
+	width: 120px;
+	height: 180px;
+	background: rgba(0,0,0,0.4);
+    box-shadow: 0px -1px 5px black, 0px 3px 15px black;
+	border-radius: 8px;
+}
+
+.effect-dialog>.character.player1 {
+	left: 1%;
+	top: calc(50% - 90px);
+	
+}
+
+.effect-dialog>.character.player2 {
+	right: 1%;
+	top: calc(50% - 90px);
+}
+
+.effect-dialog>.character>.back {
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 100%;
+	background-size: cover;
+    background-position: top;
+    background-repeat: no-repeat;
+	border-radius: 8px;
+}
+
+#arena[data-outcrop-skin='on'].decadeUI>.effect-dialog>.character>.back {
+	height: 192px !important;
+	clip-path: url(#solo-clip);
+    -webkit-clip-path: url(#solo-clip);
+}
+
+
+.effect-dialog>.content {
+	left: calc(1% + 124px);
+    right: calc(1% + 124px);
+    width: auto;
+    height: 100%;
+}
+
+.effect-dialog>.content>.buttons {
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+}
+
+.effect-dialog>.content>.buttons .card {
+	display: block !important;
+	position: absolute;
+	width: 108px;
+    height: 150px;
+	margin-top: 0;
+    margin-left: 0;
+    margin-right: 0;
+	border-radius: 0 !important;
+	box-shadow: none !important;
+}
+
+.effect-dialog>.content>.buttons>.card:not(.infohidden) {
+	background: rgb(141,125,103);
+    box-shadow: 1px 1px 4px rgb(66,66,66) inset !important;
+}
+
+.effect-dialog>.content>.buttons>.card.player1 {
+	left: 4px;
+    top: calc(50% - 75px);
+}
+
+.effect-dialog>.content>.buttons>.card.player2 {
+	right: 4px;
+    top: calc(50% - 75px);
+}
+
+.effect-dialog>.content>.buttons>.name {
+	top: calc(50% + 80px);
+	width: 108px;
+	height: auto;
+	color: red;
+	font-weight: bold;
+	font-size: 20px;
+	text-align: center;
+	text-shadow: none;
+	box-shadow: none !important;
+}
+
+.effect-dialog>.content>.buttons>.name.player1 {
+	left: 0;
+	
+}
+
+.effect-dialog>.content>.buttons>.name.player2 {
+	right: 0;
+}
+
+.effect-dialog>.content>.buttons>.vs {
+	top: calc(50% - 35px);
+    left: calc(50% - 35px);
+    width: 70px;
+    height: 70px;
+    background: url('image/decoration/vs.webp');
+}
+    
+
+.confirm-box {
+	display: block;
+    position: absolute;
+    left: 12%;
+    top: 10%;
+    right: 12%;
+    /* bottom: 25%; */
+    width: auto;
+    height: auto;
+	min-height: 100px;
+    border-width: 46px 59px 28px 59px;
+    border-style: solid;
+    border-color: transparent;
+    border-image-source: url('image/decoration/dialog.webp');
+    border-image-slice: 46 61 28 59 fill;
+    pointer-events: auto;
+    z-index: 5;
+    animation: player-died 0.5s linear forwards;
+    -webkit-animation: open 0.4s;
+}
+
+.confirm-box>.caption {
+	position: absolute;
+	left: auto;
+    top: -45px;
+    padding-top: 0;
+    width: 100%;
+    height: 36px;
+    line-height: 36px;
+    font-size: 20px;
+    font-family: shousha;
+    color: rgb(255,255,200);
+    text-align: center;
+	pointer-events: auto;
+}
+
+.confirm-box>.tip {
+	position: relative;
+    display: block;
+    width: 100%;
+    height: auto;
+    line-height: 24px;
+    color: rgb(50,25,0);
+    font-size: 20px;
+    font-family: shousha;
+    text-align: center;
+    text-shadow: none;
+	pointer-events: auto;
+}
+
+.confirm-box.guan-xing>.button.ok {
+	position: relative;
+	cursor: pointer;
+    left: calc(50% - 66px);
+    bottom: -2px;
+    width: 60px;
+    height: 30px;
+    line-height: 30px;
+    color: rgb(40,30,20);
+    font-size: 30px;
+    font-family: shousha;
+    text-align: center;
+    text-shadow: none;
+	white-space: nowrap;
+    background: rgb(150,150,100);
+    border-width: 6px 36px 6px 36px;
+    border-style: solid;
+    border-color: transparent;
+    border-image-source: url('image/decoration/button.webp');
+    border-image-slice: 6 36 6 36 fill;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.confirm-box.guan-xing.ok-disable>.button.ok {
+	cursor: default;
+	filter: grayscale(1);
+	-webkit-filter: grayscale(1);
+}
+
+.confirm-box.guan-xing:not(.ok-disable)>.button.ok:hover {
+	color: white;
+}
+
+
+
+.confirm-box.guan-xing>.content {
+	position: relative;
+	width: 100%;
+    height: 80%;
+    background: linear-gradient(rgb(145,125,106), rgb(145,125,106) 149px, rgb(224,197,161) 150px, rgb(224,197,161) 159px, rgb(145,125,106) 160px, rgb(145,125,106));
+}
+    
+.confirm-box.guan-xing>.content>.card {
+	cursor: pointer;
+	position: absolute;
+	margin: 0;
+	left: 35px;
+}
+
+.confirm-box.guan-xing>.content>.header {
+	display: flex;
+    align-items: center;
+    justify-content: center;
+	display: -webkit-flex;
+    -webkit-align-items: center;
+    -webkit-justify-content: center;
+    position: absolute;
+    left: 0;
+    margin: 0;
+    width: 30px;
+    height: 150px;
+    color: rgb(50,25,0);
+    font-size: 22px;
+    font-weight: bold;
+    font-family: shousha;
+    text-align: center;
+    text-shadow: none;
+    background: rgb(194,164,131);
+}
+
+.confirm-box.guan-xing>.content>.header:last-of-type {
+	bottom: 0;
+}
+
+.confirm-box.guan-xing>.content>.card.selected::after {
+	opacity: 0;
+}
+
+.confirm-box.guan-xing>.content>.card.selected>.card-mask {
+	display: block !important;
+	opacity: 1;
+}
+
+
+
+
+
+
+

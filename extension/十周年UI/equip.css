@@ -1,0 +1,322 @@
+
+.equips-zone {
+    left: auto;
+    top: auto;
+    right: -1%;
+    bottom: 1%;
+    min-height: 150px;
+    min-width: 156px;
+}
+
+.equips-zone>.equips-back{
+	position: absolute;
+	display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    width: 100%;
+	height: 100%;
+    flex-direction: column;
+}
+
+.equips-zone>.equips {
+	left: 0px;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.equips-zone>.equips-back>div {
+	left: 3px;
+	right: 3px;
+	height: 27px;
+    width: calc(100% - 6px);
+	position: absolute;
+	box-shadow: 0 0 6px rgb(200, 150, 80) inset;
+	background: rgba(0, 0, 0, 0.4);
+}
+
+.equips-zone>.equips-back>div:first-child {
+	opacity: 0;
+}
+
+.equips-zone>.equips>div{
+	left: 3px;
+	right: 3px;
+	height: 27px;
+    width: calc(100% - 6px);
+	position: absolute;
+	box-shadow: none;
+	border-radius: 0px;
+	background: none !important;
+	display: flex;
+	align-items: center;
+	align-content: center;
+	justify-content: center;
+}
+
+.equips-zone>.equips>div::before {
+	background:
+		linear-gradient(180deg, rgb(250, 230, 150) 2px, transparent 2px, transparent calc(100% - 2px), rgb(250, 230, 150) 2px),
+		linear-gradient(090deg, rgb(250, 230, 150) 2px, transparent 2px, transparent calc(100% - 2px), rgb(250, 230, 150) 2px);
+	opacity: 1;
+	border-radius: 0px;
+	box-shadow: none;
+	z-index: auto;
+}
+
+
+.equips-zone>.equips>div::after {
+	background: 
+		linear-gradient(to left, yellow, yellow) left top no-repeat, 
+		linear-gradient(to bottom, yellow, yellow) left top no-repeat, 
+		linear-gradient(to left, yellow, yellow) right top no-repeat,
+		linear-gradient(to bottom, yellow, yellow) right top no-repeat, 
+		linear-gradient(to left, yellow, yellow) left bottom no-repeat,
+		linear-gradient(to bottom, yellow, yellow) left bottom no-repeat,
+		linear-gradient(to left, yellow, yellow) right bottom no-repeat,
+		linear-gradient(to left, yellow, yellow) right bottom no-repeat !important;
+	background-size: 2px 8px, 10px 2px, 2px 8px, 10px 2px !important;
+	opacity: 1;
+	border-radius: 0px;
+	box-shadow: none;
+	z-index: auto;
+}
+
+.equips-zone>.equips>div.selected {
+	box-shadow: 0 0 10px yellow;
+}
+
+.equips-zone>.equips>div.selectable {
+	cursor: pointer;
+	transform: translateX(-10px);
+}
+
+.mobile-phone .equips-zone>.equips>div.selected {
+    box-shadow: 0 0 2px yellow, 0 0 4px yellow, 0 0 8px yellow;
+}
+
+.equips-zone .equips>div[data-card-subype='equip5'] .equips-zone>.equips-back>div.equip0 {
+	opacity: 1;
+}
+
+.equips-zone>.equips>.card {
+    top: -30px;
+}
+
+.equips-zone>.equips-back>div.equip0,
+.equips-zone>.equips>div.equip5{
+	top: 3px;
+}
+
+.equips-zone>.equips-back>div.equip1,
+.equips-zone>.equips>div.equip1{
+	top: 33px;
+}
+
+.equips-zone>.equips-back>div.equip2,
+.equips-zone>.equips>div.equip2{
+	top: 63px;
+}
+
+.equips-zone>.equips-back>div.equip3,
+.equips-zone>.equips>div.equip3,
+.equips-zone>.equips>div.equip6 {
+	top: 93px;
+}
+
+.equips-zone>.equips-back>div.equip4,
+.equips-zone>.equips>div.equip4{
+	top: 123px;
+}
+
+.equips-zone>.equips>.card>div {
+	text-shadow: none;
+	position: absolute;
+}
+
+.equips-zone>.equips>.card>.name2 {
+	display: flex;
+	align-items: center;
+	align-content: center;
+	justify-content: center;
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	position: static;
+	width: calc(100% - 4px);
+	height: calc(100% - 4px);
+	background-color: rgb(228, 207, 166);
+	border: 1px solid rgb(90, 50, 33);
+	border-radius: 0px;
+	box-sizing: border-box;
+	font-weight: bold;
+	font-family: "shousha" !important;
+	pointer-events: none;
+	z-index: 1;
+}
+
+.equips-zone>.equips>.card[data-suit='heart']>.name2,
+.equips-zone>.equips>.card[data-suit='diamond']>.name2 {
+	color: #8B0000;
+}
+
+.equips-zone>.equips>.card[data-suit='spade']>.name2,
+.equips-zone>.equips>.card[data-suit='club']>.name2 {
+	color: #181818;
+}
+
+.equips-zone>.equips>.card.feichu>.name2 {
+	background-color: rgb(57, 48, 33);
+	color: white;
+	font-weight: normal;
+}
+
+.equips-zone>.equips>.card>.image {
+	display: block;
+	left: 3px;
+    top: 3px;
+    bottom: 3px;
+	width: 21px;
+    height: calc(100% - 6px);
+    position: absolute;
+	visibility: visible !important;
+	z-index: 2;
+}
+
+.equips-zone>.equips>.card:not(.fullskin)>.image {
+	display: block !important;
+}
+
+
+/*其他玩家装备栏*/
+.player>.equips, 
+#arena>.player:not(.minskin)>.equips {
+    left: 10%;
+    right: 16%;
+    width: auto;
+    height: 80px;
+    bottom: 3%;
+	box-shadow: none;
+	background: none;
+	background-image: none;
+	border-radius: 0px;
+	pointer-events: none;
+	z-index: 88;
+	transform: none;
+    transform-origin: center;
+}
+
+.player>.equips>div,
+.player>.equips>.card {
+	position: absolute;
+}
+
+.player>.equips>.card {
+    top: -16px;
+}
+
+.player>.equips>div.equip1 {
+    top: 16px;
+}
+
+.player>.equips>div.equip2 {
+    top: 32px;
+}
+
+.player>.equips>div.equip3,
+.player>.equips>div.equip6 {
+    top: 48px;
+}
+
+.player>.equips>div.equip4 {
+    top: auto;
+    bottom: 0;
+}
+
+.player>.equips>div.equip5 {
+    top: 0;
+}
+
+
+#arena.decadeUI:not(.long).mobile:not(.oldlayout) .player.unseen:not([data-position="0"]) .equips:not(*:empty),
+#arena.decadeUI:not(.long):not(.mobile):not(.oldlayout) .player.unseen .equips:not(*:empty),
+#arena.decadeUI.long.mobile:not(.oldlayout) .player.unseen2:not([data-position="0"]) .equips:not(*:empty),
+#arena.decadeUI.long:not(.mobile):not(.oldlayout) .player.unseen2 .equips:not(*:empty){
+	background: none;
+	border-radius: 0;
+	overflow: hidden;
+	box-shadow: none;
+}
+
+.player>.equips>.card,
+.player.unseen>.equips>.card,
+.player.unseen2>.equips>.card {
+	display: flex;
+	align-items: center;
+	align-content: center;
+	justify-content: center;
+	background: rgba(228, 207, 166, 0.8) !important;
+	border: 1px solid rgb(95, 55, 45);
+	border-image: none !important;
+	box-sizing: border-box;
+	border-radius: 1px;
+	width: 100%;
+	height: 16px;
+	text-shadow: none;
+}
+
+#arena.decadeUI:not(.long).mobile:not(.oldlayout) .player.unseen:not([data-position="0"]) .equips:not(*:empty)>.card,
+#arena.decadeUI:not(.long):not(.mobile):not(.oldlayout) .player.unseen .equips:not(*:empty)>.card:not(.selected),
+#arena.decadeUI.long.mobile:not(.oldlayout) .player.unseen2:not([data-position="0"]) .equips:not(*:empty)>.card,
+#arena.decadeUI.long:not(.mobile):not(.oldlayout) .player.unseen2 .equips:not(*:empty)>.card:not(.selected){
+	background: rgba(228, 207, 166, 0.8) !important;
+}
+
+
+.player:not(.selectable)>.equips>.card,
+.player:not(.selectable)>.equips>.card>div {
+    pointer-events: auto;
+}
+
+.player>.equips>.card>div {
+	position: static;
+}
+
+.player>.equips>.card>.name2 {
+	position: absolute;
+    left: 0;
+    top: 0;
+    display: flex;
+	align-items: center;
+    align-content: center;
+    justify-content: center;
+	width: 100%;
+	height: 100%;
+	line-height: 13px;
+	color: #181818;
+	font-size: 13px;
+	font-weight: bold;
+	font-family: shousha, xinwei, xinkai !important;
+	text-shadow: none;
+	text-align: center;
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	pointer-events: none;
+}
+
+.player>.equips>.card>.name2>span[data-suit='heart'],
+.player>.equips>.card>.name2>span[data-suit='diamond'] {
+	color: #8B0000;
+}
