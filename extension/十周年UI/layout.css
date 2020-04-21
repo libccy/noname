@@ -505,7 +505,7 @@ body>.background {
     left: 20%;
     top: auto !important;
     right: 20%;
-    bottom: 27% !important;
+    bottom: 210px !important;
     width: auto;
     background: none;
     transition-duration: 0.3s;
@@ -548,7 +548,7 @@ body>.background {
     transition: all 0.3s;
 	position: absolute;
     top: auto;
-    bottom: calc(27% + 28px);
+    bottom: 160px;
 }
 
 #arena.decadeUI.phone:not(.chess):not(.choose-character):not(.game-over) #control,
