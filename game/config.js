@@ -11,7 +11,7 @@ window.config={
 	],
 	forbidchess:['hetaihou','swd_kangnalishi'],
 	forbidboss:['caiwenji','gjqt_aruan','pal_xuanxiao','swd_hupo'],
-	forbiddouble:['zhugedan','swd_kangnalishi','dongzhuo','wutugu','hs_siwangzhiyi','hs_ronghejuren','hs_shanlingjuren'],
+	forbiddouble:['miheng','swd_kangnalishi','wutugu','hs_siwangzhiyi','hs_ronghejuren','hs_shanlingjuren'],
 	forbidthreecard:['qiankunbiao','shenhuofeiya','gw_ciguhanshuang','gw_birinongwu','gw_qinpendayu','gw_poxiao'],
 	all:{
 		sgscharacters:['standard','shenhua','xinghuoliaoyuan','refresh','yijiang','sp','extra','old','mobile','tw'],
@@ -161,6 +161,8 @@ window.config={
 				['zhu','zhong','nei','fan','fan','fan'],
 				['zhu','zhong','zhong','nei','fan','fan','fan'],
 				['zhu','zhong','zhong','nei','fan','fan','fan','fan'],
+				['zhu','zhong','zhong','zhong','nei','fan','fan','fan','fan'],
+				['zhu','zhong','zhong','zhong','nei','fan','fan','fan','fan','fan'],
 			],
 			choice:{
 				zhu:3,

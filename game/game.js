@@ -4196,7 +4196,9 @@
 							'5':'五人',
 							'6':'六人',
 							'7':'七人',
-							'8':'八人'
+							'8':'八人',
+                            '9':'九人',
+                            '10':'十人'
 						},
 						frequent:true,
 						restart:true,
@@ -4371,7 +4373,9 @@
 							'5':'五人',
 							'6':'六人',
 							'7':'七人',
-							'8':'八人'
+							'8':'八人',
+                            '9':'九人',
+                            '10':'十人'
 						},
 						frequent:true,
 						restart:true,
@@ -15781,12 +15785,7 @@
 						var hp2=get.infoHp(info2[2]);
 						var maxHp2=get.infoMaxHp(info2[2]);
 						var double_hp;
-						if(_status.connectMode||get.mode()=='single'){
-							double_hp='pingjun';
-						}
-						else{
-							double_hp=get.config('double_hp');
-						}
+                        double_hp=get.config('double_hp');
 						switch(double_hp){
 							case 'pingjun':{
 								this.maxHp=Math.floor((maxHp1+maxHp2)/2);
@@ -42565,7 +42564,7 @@
 			},
 			connectPlayers:function(ip){
 				game.connectPlayers=[];
-				for(var i=0;i<8;i++){
+				for(var i=0;i<10;i++){
 					var player=ui.create.player(ui.window);
 					player.dataset.position=i;
 					player.classList.add('connect');

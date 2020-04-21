@@ -357,6 +357,59 @@
 }
 /*--------位置(n人)------*/
 
+/*--------位置(10人)------*/
+[data-number='10']>.player[data-position='1']{top:calc(200% / 3 - 160px);left:calc(100% - 150px);}
+[data-number='10']>.player[data-position='2']{top:calc(100% / 3 - 170px);left:calc(100% - 150px);}
+[data-number='10']>.player[data-position='3']{top:0;left:calc(80% - 75px);}
+[data-number='10']>.player[data-position='4']{top:0;left:calc(65% - 75px);}
+[data-number='10']>.player[data-position='5']{top:0;left:calc(50% - 75px);}
+[data-number='10']>.player[data-position='6']{top:0;left:calc(35% - 75px);}
+[data-number='10']>.player[data-position='7']{top:0;left:calc(20% - 75px);}
+[data-number='10']>.player[data-position='8']{top:calc(100% / 3 - 170px);left:0;}
+[data-number='10']>.player[data-position='9']{top:calc(200% / 3 - 160px);left:0;}
+[data-number='10']>.card[data-position='1']{top:calc(200% / 3 - 122px);left:calc(100% - 127px);}
+[data-number='10']>.card[data-position='2']{top:calc(100% / 3 - 132px);left:calc(100% - 127px);}
+[data-number='10']>.card[data-position='3']{top:38px;left:calc(75% - 89.5px);}
+[data-number='10']>.card[data-position='4']{top:38px;left:calc(50% - 52px);}
+[data-number='10']>.card[data-position='5']{top:38px;left:calc(25% - 14.5px);}
+[data-number='10']>.card[data-position='6']{top:38px;left:calc(25% - 14.5px);}
+[data-number='10']>.card[data-position='7']{top:38px;left:calc(25% - 14.5px);}
+[data-number='10']>.card[data-position='8']{top:calc(100% / 3 - 132px);left:23px;}
+[data-number='10']>.card[data-position='9']{top:calc(200% / 3 - 122px);left:23px;}
+[data-number='10']>.popup[data-position='1']{top:calc(200% / 3 - 150px);left:calc(100% - 186px);}
+[data-number='10']>.popup[data-position='2']{top:calc(100% / 3 - 160px);left:calc(100% - 186px);}
+[data-number='10']>.popup[data-position='3']{top:190px;left:calc(75% + 10.5px);}
+[data-number='10']>.popup[data-position='4']{top:190px;left:calc(50% - 61px);}
+[data-number='10']>.popup[data-position='5']{top:190px;left:calc(25% - 37.5px);}
+[data-number='10']>.popup[data-position='6']{top:190px;left:calc(25% - 37.5px);}
+[data-number='10']>.popup[data-position='7']{top:190px;left:calc(25% - 37.5px);}
+[data-number='10']>.popup[data-position='8']{top:calc(100% / 3 - 160px);left:160px;}
+[data-number='10']>.popup[data-position='9']{top:calc(200% / 3 - 150px);left:160px;}
+/*--------位置(9人)------*/
+[data-number='9']>.player[data-position='1']{top:calc(200% / 3 - 160px);left:calc(100% - 150px);}
+[data-number='9']>.player[data-position='2']{top:calc(100% / 3 - 170px);left:calc(100% - 150px);}
+[data-number='9']>.player[data-position='3']{top:0;left:calc(74% - 75px);}
+[data-number='9']>.player[data-position='4']{top:0;left:calc(58% - 75px);}
+[data-number='9']>.player[data-position='5']{top:0;left:calc(42% - 75px);}
+[data-number='9']>.player[data-position='6']{top:0;left:calc(26% - 75px);}
+[data-number='9']>.player[data-position='7']{top:calc(100% / 3 - 170px);left:0;}
+[data-number='9']>.player[data-position='8']{top:calc(200% / 3 - 160px);left:0;}
+[data-number='9']>.card[data-position='1']{top:calc(200% / 3 - 122px);left:calc(100% - 127px);}
+[data-number='9']>.card[data-position='2']{top:calc(100% / 3 - 132px);left:calc(100% - 127px);}
+[data-number='9']>.card[data-position='3']{top:38px;left:calc(75% - 89.5px);}
+[data-number='9']>.card[data-position='4']{top:38px;left:calc(50% - 52px);}
+[data-number='9']>.card[data-position='5']{top:38px;left:calc(25% - 14.5px);}
+[data-number='9']>.card[data-position='6']{top:38px;left:calc(25% - 14.5px);}
+[data-number='9']>.card[data-position='7']{top:calc(100% / 3 - 132px);left:23px;}
+[data-number='9']>.card[data-position='8']{top:calc(200% / 3 - 122px);left:23px;}
+[data-number='9']>.popup[data-position='1']{top:calc(200% / 3 - 150px);left:calc(100% - 186px);}
+[data-number='9']>.popup[data-position='2']{top:calc(100% / 3 - 160px);left:calc(100% - 186px);}
+[data-number='9']>.popup[data-position='3']{top:190px;left:calc(75% + 10.5px);}
+[data-number='9']>.popup[data-position='4']{top:190px;left:calc(50% - 61px);}
+[data-number='9']>.popup[data-position='5']{top:190px;left:calc(25% - 37.5px);}
+[data-number='9']>.popup[data-position='6']{top:190px;left:calc(25% - 37.5px);}
+[data-number='9']>.popup[data-position='7']{top:calc(100% / 3 - 160px);left:160px;}
+[data-number='9']>.popup[data-position='8']{top:calc(200% / 3 - 150px);left:160px;}
 /*--------位置(8人)------*/
 [data-number='8']>.player[data-position='1']{top:calc(200% / 3 - 160px);left:calc(100% - 150px);}
 [data-number='8']>.player[data-position='2']{top:calc(100% / 3 - 170px);left:calc(100% - 150px);}
@@ -451,14 +504,16 @@
 /*--------位置(1人)------*/
 .player[data-position='0']{top:calc(100% - 170px);left:calc(50% - 75px);}
 /*--------位置(联机)------*/
-#window>.player.connect[data-position='0']{left:calc(200% / 7 - 1200px / 7);top:calc(300% / 7 - 160px + 5px);}
-#window>.player.connect[data-position='1']{left:calc(300% / 7 - 750px / 7);top:calc(300% / 7 - 160px + 5px);}
-#window>.player.connect[data-position='2']{left:calc(400% / 7 - 300px / 7);top:calc(300% / 7 - 160px + 5px);}
-#window>.player.connect[data-position='3']{left:calc(500% / 7 + 150px / 7);top:calc(300% / 7 - 160px + 5px);}
-#window>.player.connect[data-position='4']{left:calc(200% / 7 - 1200px / 7);top:calc(400% / 7 - 40px + 5px);}
-#window>.player.connect[data-position='5']{left:calc(300% / 7 - 750px / 7);top:calc(400% / 7 - 40px + 5px);}
-#window>.player.connect[data-position='6']{left:calc(400% / 7 - 300px / 7);top:calc(400% / 7 - 40px + 5px);}
-#window>.player.connect[data-position='7']{left:calc(500% / 7 + 150px / 7);top:calc(400% / 7 - 40px + 5px);}
+#window>.player.connect[data-position='0']{left:calc(200% / 9 - 1200px / 9);top:calc(300% / 7 - 160px + 5px);}
+#window>.player.connect[data-position='1']{left:calc(300% / 9 - 750px / 9);top:calc(300% / 7 - 160px + 5px);}
+#window>.player.connect[data-position='2']{left:calc(400% / 9 - 300px / 9);top:calc(300% / 7 - 160px + 5px);}
+#window>.player.connect[data-position='3']{left:calc(500% / 9 + 150px / 9);top:calc(300% / 7 - 160px + 5px);}
+#window>.player.connect[data-position='4']{left:calc(600% / 9 + 600px / 9);top:calc(300% / 7 - 160px + 5px);}
+#window>.player.connect[data-position='5']{left:calc(200% / 9 - 1200px / 9);top:calc(400% / 7 - 40px + 5px);}
+#window>.player.connect[data-position='6']{left:calc(300% / 9 - 750px / 9);top:calc(400% / 7 - 40px + 5px);}
+#window>.player.connect[data-position='7']{left:calc(400% / 9 - 300px / 9);top:calc(400% / 7 - 40px + 5px);}
+#window>.player.connect[data-position='8']{left:calc(500% / 9 + 150px / 9);top:calc(400% / 7 - 40px + 5px);}
+#window>.player.connect[data-position='9']{left:calc(600% / 9 + 600px / 9);top:calc(400% / 7 - 40px + 5px);}
 
 #window>.player.connect[data-position='c0']{left:calc(50% - 255px);top:calc(50% - 90px)}
 #window>.player.connect[data-position='c1']{left:calc(50% - 75px);top:calc(50% - 90px)}
