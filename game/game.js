@@ -4419,6 +4419,7 @@
 						item:{
 							hejiansan:'和减三',
 							pingjun:'平均值',
+							zuidashangxianzuixiaotili:'最大上限最小体力',
 							zuidazhi:'最大值',
 							zuixiaozhi:'最小值',
 							zonghe:'相加',
@@ -15806,6 +15807,11 @@
 							case 'zonghe':{
 								this.maxHp=maxHp1+maxHp2;
 								this.hp=hp1+hp2;
+								break;
+							}
+							case 'zuidashangxianzuixiaotili':{
+								this.maxHp=Math.max(maxHp1,maxHp2);
+								this.hp=Math.min(hp1,hp2);
 								break;
 							}
 							default:{
