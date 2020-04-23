@@ -80,12 +80,12 @@
 /*8人座, 3 player in center*/
 #arena[data-layout='nova'][data-number='8']>.player[data-position='1'] {
     left: auto;
-    top: 45%;
+    top: 40%;
     right: 0;
 }
 #arena[data-layout='nova'][data-number='8']>.player[data-position='2'] {
     left: auto;
-    top: 18%;
+    top: 10%;
     right: 0;
 }
 #arena[data-layout='nova'][data-number='8']>.player[data-position='3'] {
@@ -103,22 +103,22 @@
 }
 #arena[data-layout='nova'][data-number='8']>.player[data-position='6'] {
     left: 0;
-    top: 18%;
+    top: 10%;
 }
 #arena[data-layout='nova'][data-number='8']>.player[data-position='7'] {
     left: 0;
-    top: 45%;
+    top: 40%;
 }
 
 /*7人座, 2 player in center*/
 #arena[data-layout='nova'][data-number='7']>.player[data-position='1'] {
     left: auto;
-    top: 45%;
+    top: 40%;
     right: 0;
 }
 #arena[data-layout='nova'][data-number='7']>.player[data-position='2'] {
     left: auto;
-    top: 18%;
+    top: 10%;
     right: 0;
 }
 #arena[data-layout='nova'][data-number='7']>.player[data-position='3'] {
@@ -132,35 +132,35 @@
 }
 #arena[data-layout='nova'][data-number='7']>.player[data-position='5'] {
     left: 0;
-    top: 18%;
+    top: 10%;
 }
 #arena[data-layout='nova'][data-number='7']>.player[data-position='6'] {
     left: 0;
-    top: 45%;
+    top: 40%;
 }
 
-/*6人座, 1 player in center*/
+/*6人座, 3 player in center*/
 #arena[data-layout='nova'][data-number='6']>.player[data-position='1'] {
     left: auto;
-    top: 45%;
+    top: 18%;
     right: 0;
 }
 #arena[data-layout='nova'][data-number='6']>.player[data-position='2'] {
     left: auto;
-    top: 18%;
-    right: 0;
+    top: 0;
+    right: calc(30% - 60px);
 }
 #arena[data-layout='nova'][data-number='6']>.player[data-position='3'] {
     left: calc(50% - 60px);
     top: 0;
 }
 #arena[data-layout='nova'][data-number='6']>.player[data-position='4'] {
-    left: 0;
-    top: 18%;
+    left: calc(30% - 60px);
+    top: 0;
 }
 #arena[data-layout='nova'][data-number='6']>.player[data-position='5'] {
     left: 0;
-    top: 45%;
+    top: 18%;
 }
 
 
@@ -219,12 +219,12 @@
 /*10人座, 5 player in center*/
 #arena[data-layout='nova'][data-number='10']>.player[data-position='1'] {
     left: auto;
-    top: 45%;
+    top: 40%;
     right: 0;
 }
 #arena[data-layout='nova'][data-number='10']>.player[data-position='2'] {
     left: auto;
-    top: 18%;
+    top: 10%;
     right: 0;
 }
 #arena[data-layout='nova'][data-number='10']>.player[data-position='3'] {
@@ -251,22 +251,22 @@
 }
 #arena[data-layout='nova'][data-number='10']>.player[data-position='8'] {
     left: 0;
-    top: 18%;
+    top: 10%;
 }
 #arena[data-layout='nova'][data-number='10']>.player[data-position='9'] {
     left: 0;
-    top: 45%;
+    top: 40%;
 }
 
 /*9人座, 4 player in center*/
 #arena[data-layout='nova'][data-number='9']>.player[data-position='1'] {
     left: auto;
-    top: 45%;
+    top: 40%;
     right: 0;
 }
 #arena[data-layout='nova'][data-number='9']>.player[data-position='2'] {
     left: auto;
-    top: 18%;
+    top: 10%;
     right: 0;
 }
 #arena[data-layout='nova'][data-number='9']>.player[data-position='3'] {
@@ -289,9 +289,9 @@
 }
 #arena[data-layout='nova'][data-number='9']>.player[data-position='7'] {
     left: 0;
-    top: 18%;
+    top: 10%;
 }
 #arena[data-layout='nova'][data-number='9']>.player[data-position='8'] {
     left: 0;
-    top: 45%;
+    top: 40%;
 }
