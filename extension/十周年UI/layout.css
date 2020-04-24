@@ -564,3 +564,41 @@ body>.background {
     width: auto;
 }
 
+/*西村规*/
+/*long2/layout.css*/
+.dialog{
+    bottom:210px;
+}
+
+/*--------位置(10人)------*/
+#arena[data-layout='long2'][data-number='10']>.player[data-position='1']{top:calc(30% - 128px);left:calc(100% - 120px);}
+#arena[data-layout='long2'][data-number='10']>.player[data-position='2']{top:calc(8% - 34px);left:calc(87.5% - 105px);}
+#arena[data-layout='long2'][data-number='10']>.player[data-position='3']{top:0;left:calc(75% - 90px);}
+#arena[data-layout='long2'][data-number='10']>.player[data-position='4']{top:0;left:calc(62.5% - 75px);}
+#arena[data-layout='long2'][data-number='10']>.player[data-position='5']{top:0;left:calc(50% - 60px);}
+#arena[data-layout='long2'][data-number='10']>.player[data-position='6']{top:0;left:calc(37.5% - 45px);}
+#arena[data-layout='long2'][data-number='10']>.player[data-position='7']{top:0;left:calc(25% - 30px);}
+#arena[data-layout='long2'][data-number='10']>.player[data-position='8']{top:calc(8% - 34px);left:calc(12.5% - 15px);}
+#arena[data-layout='long2'][data-number='10']>.player[data-position='9']{top:calc(30% - 128px);left:0;}
+/*--------位置(9人)------*/
+#arena[data-layout='long2'][data-number='9']>.player[data-position='1']{top:calc(30% - 128px);left:calc(100% - 120px);}
+#arena[data-layout='long2'][data-number='9']>.player[data-position='2']{top:calc(8% - 34px);left:calc(85.8% - 102.6px);}
+#arena[data-layout='long2'][data-number='9']>.player[data-position='3']{top:0;left:calc(71.5% - 85.5px);}
+#arena[data-layout='long2'][data-number='9']>.player[data-position='4']{top:0;left:calc(57.2% - 68.4px);}
+#arena[data-layout='long2'][data-number='9']>.player[data-position='5']{top:0;left:calc(42.9% - 51.3px);}
+#arena[data-layout='long2'][data-number='9']>.player[data-position='6']{top:0;left:calc(28.6% - 34.2px);}
+#arena[data-layout='long2'][data-number='9']>.player[data-position='7']{top:calc(8% - 34px);left:calc(14.3% - 17.1px);}
+#arena[data-layout='long2'][data-number='9']>.player[data-position='8']{top:calc(30% - 128px);left:0;}
+
+/*layout/newlayout/global.css*/
+/*--------位置(联机)------*/
+#window>.player.connect[data-position='0']{left:calc(200% / 9 - 1200px / 9);top:calc(300% / 7 - 160px + 5px);}
+#window>.player.connect[data-position='1']{left:calc(300% / 9 - 750px / 9);top:calc(300% / 7 - 160px + 5px);}
+#window>.player.connect[data-position='2']{left:calc(400% / 9 - 300px / 9);top:calc(300% / 7 - 160px + 5px);}
+#window>.player.connect[data-position='3']{left:calc(500% / 9 + 150px / 9);top:calc(300% / 7 - 160px + 5px);}
+#window>.player.connect[data-position='4']{left:calc(600% / 9 + 600px / 9);top:calc(300% / 7 - 160px + 5px);}
+#window>.player.connect[data-position='5']{left:calc(200% / 9 - 1200px / 9);top:calc(400% / 7 - 40px + 5px);}
+#window>.player.connect[data-position='6']{left:calc(300% / 9 - 750px / 9);top:calc(400% / 7 - 40px + 5px);}
+#window>.player.connect[data-position='7']{left:calc(400% / 9 - 300px / 9);top:calc(400% / 7 - 40px + 5px);}
+#window>.player.connect[data-position='8']{left:calc(500% / 9 + 150px / 9);top:calc(400% / 7 - 40px + 5px);}
+#window>.player.connect[data-position='9']{left:calc(600% / 9 + 600px / 9);top:calc(400% / 7 - 40px + 5px);}
