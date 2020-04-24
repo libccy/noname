@@ -109,11 +109,212 @@ content:function(config, pack){
 			var createPlayerFunction = ui.create.player;
 			var createMenuFunction = ui.create.menu;
 			var createCardFunction = ui.create.card;
+			ui.create.connectPlayers = function(ip){
+                                               				game.connectPlayers=[];
+                                               				for(var i=0;i<10;i++){
+                                               					var player=ui.create.player(ui.window);
+                                               					player.dataset.position=i;
+                                               					player.classList.add('connect');
+                                               					game.connectPlayers.push(player);
+                                               					if(i>=lib.configOL.number){
+                                               						player.classList.add('unselectable2');
+                                               					}
+                                               				}
+
+                                               				var bar=ui.create.div(ui.window);
+                                               				bar.style.height='20px';
+                                               				bar.style.width='80%';
+                                               				bar.style.left='10%';
+                                               				bar.style.top='calc(200% / 7 - 120px + 5px)';
+                                               				bar.style.textAlign='center';
+                                               				var ipbar=ui.create.div('.shadowed',ip,bar);
+                                               				ipbar.style.padding='4px';
+                                               				ipbar.style.borderRadius='2px';
+                                               				ipbar.style.position='relative';
+
+                                               				var button=ui.create.div('.menubutton.large.highlight.connectbutton.pointerdiv',game.online?'退出联机':'开始游戏',ui.window,function(){
+                                               					if(button.clicked) return;
+                                               					if(game.online){
+                                               						if(game.onlinezhu){
+                                               							game.send('startGame');
+                                               						}
+                                               						else{
+                                               							game.saveConfig('tmp_owner_roomId');
+                                               							game.saveConfig('tmp_user_roomId');
+                                               							game.saveConfig('reconnect_info');
+                                               							game.reload();
+                                               						}
+                                               					}
+                                               					else{
+                                               						game.resume();
+                                               					}
+                                               					button.delete();
+                                               					bar.delete();
+                                               					delete ui.connectStartButton;
+                                               					delete ui.connectStartBar;
+                                               					button.clicked=true;
+                                               				});
+
+                                               				ui.connectStartButton=button;
+                                               				ui.connectStartBar=bar;
+                                               			};
 			var initCssstylesFunction = lib.init.cssstyles;
 			var initLayoutFunction = lib.init.layout;
 			var cardInitFunction = lib.element.card.init;
 			var cardCopyFunction = lib.element.card.copy;
-			var playerInitFunction = lib.element.player.init;
+			var playerInitFunction = function(character,character2,skill){
+                                     					if(typeof character=='string'&&!lib.character[character]){
+                                     						lib.character[character]=get.character(character);
+                                     					}
+                                     					if(typeof character2=='string'&&!lib.character[character2]){
+                                     						lib.character[character2]=get.character(character2);
+                                     					}
+                                     					if(!lib.character[character]) return;
+                                     					if(get.is.jun(character2)){
+                                     						var tmp=character;
+                                     						character=character2;
+                                     						character2=tmp;
+                                     					}
+                                     					if(character2==false){
+                                     						skill=false;
+                                     						character2=null;
+                                     					}
+                                     					var info=lib.character[character];
+                                     					if(!info){
+                                     						info=['','',1,[],[]];
+                                     					}
+                                     					if(!info[4]){
+                                     						info[4]=[];
+                                     					}
+                                     					var skills=info[3];
+                                     					this.clearSkills(true);
+                                     					this.classList.add('fullskin');
+                                     					if(!game.minskin&&get.is.newLayout()&&!info[4].contains('minskin')){
+                                     						this.classList.remove('minskin');
+                                     						this.node.avatar.setBackground(character,'character');
+                                     					}
+                                     					else{
+                                     						this.node.avatar.setBackground(character,'character');
+                                     						if(info[4].contains('minskin')){
+                                     							this.classList.add('minskin');
+                                     						}
+                                     						else if(game.minskin){
+                                     							this.classList.add('minskin');
+                                     						}
+                                     						else{
+                                     							this.classList.remove('minskin');
+                                     						}
+                                     					}
+
+                                     					var hp1=get.infoHp(info[2]);
+                                     					var maxHp1=get.infoMaxHp(info[2]);
+
+                                     					this.node.avatar.show();
+                                     					this.node.count.show();
+                                     					this.node.equips.show();
+                                     					this.name=character;
+                                     					this.sex=info[0];
+                                     					this.group=info[1];
+                                     					this.hp=hp1;
+                                     					this.maxHp=maxHp1;
+                                     					this.hujia=0;
+                                     					this.node.intro.innerHTML=lib.config.intro;
+                                     					this.node.name.dataset.nature=get.groupnature(this.group);
+                                     					lib.setIntro(this);
+                                     					// var name=get.translation(character);
+                                     					this.node.name.innerHTML=get.slimName(character);
+                                     					if(this.classList.contains('minskin')&&this.node.name.querySelectorAll('br').length>=4){
+                                     						this.node.name.classList.add('long');
+                                     					}
+                                     					// if(!lib.config.show_name){
+                                     					// 	this.node.name.style.display='none';
+                                     					// }
+                                     					// for(var i=0;i<name.length;i++){
+                                     					// 	if(name[i]!='s'&&name[i]!='p')
+                                     					// 	this.node.name.innerHTML+=name[i]+'<br/>';
+                                     					// }
+                                     					if(character2&&lib.character[character2]){
+                                     						var info2=lib.character[character2];
+                                     						if(!info2){
+                                     							info2=['','',1,[],[]];
+                                     						}
+                                     						if(!info2[4]){
+                                     							info2[4]=[];
+                                     						}
+                                     						this.classList.add('fullskin2');
+                                     						this.node.avatar2.setBackground(character2,'character');
+
+                                     						this.node.avatar2.show();
+                                     						this.name2=character2;
+                                     						var hp2=get.infoHp(info2[2]);
+                                     						var maxHp2=get.infoMaxHp(info2[2]);
+                                     						var double_hp;
+                                                            double_hp=get.config('double_hp');
+                                     						switch(double_hp){
+                                     							case 'pingjun':{
+                                     								this.maxHp=Math.floor((maxHp1+maxHp2)/2);
+                                     								this.hp=Math.floor((hp1+hp2)/2);
+                                     								this.singleHp=((maxHp1+maxHp2)%2===1);
+                                     								break;
+                                     							}
+                                     							case 'zuidazhi':{
+                                     								this.maxHp=Math.max(maxHp1,maxHp2);
+                                     								this.hp=Math.max(hp1,hp2);
+                                     								break;
+                                     							}
+                                     							case 'zuixiaozhi':{
+                                     								this.maxHp=Math.min(maxHp1,maxHp2);
+                                     								this.hp=Math.min(hp1,hp2);
+                                     								break;
+                                     							}
+                                     							case 'zonghe':{
+                                     								this.maxHp=maxHp1+maxHp2;
+                                     								this.hp=hp1+hp2;
+                                     								break;
+                                     							}
+                                     							case 'zuidashangxianzuixiaotili':{
+                                     								this.maxHp=Math.max(maxHp1,maxHp2);
+                                     								this.hp=Math.min(hp1,hp2);
+                                     								break;
+                                     							}
+                                     							default:{
+                                     								this.maxHp=maxHp1+maxHp2-3;
+                                     								this.hp=hp1+hp2-3;
+                                     							};
+                                     						}
+                                     						this.node.count.classList.add('p2');
+                                     						skills=skills.concat(info2[3]);
+
+                                     						// var name=get.translation(character2);
+                                     						this.node.name2.innerHTML=get.slimName(character2);
+                                     						// this.node.name2.dataset.nature=get.groupnature(info2[1]);
+                                     						// if(!lib.config.show_name){
+                                     						// 	this.node.name2.style.display='none';
+                                     						// }
+                                     						// for(var i=0;i<name.length;i++){
+                                     						// 	this.node.name2.innerHTML+=name[i]+'<br/>';
+                                     						// }
+                                     					}
+                                     					if(skill!=false){
+                                     						for(var i=0;i<skills.length;i++){
+                                     							this.addSkill(skills[i]);
+                                     						}
+                                     						this.checkConflict();
+                                     					}
+                                     					lib.group.add(this.group);
+                                     					if(this.inits){
+                                     						for(var i=0;i<lib.element.player.inits.length;i++){
+                                     							lib.element.player.inits[i](this);
+                                     						}
+                                     					}
+                                     					if(this._inits){
+                                     						for(var i=0;i<this._inits.length;i++){
+                                     							this._inits[i](this);
+                                     						}
+                                     					}
+                                     					this.update();
+                                     					return this;
+                                     				};
 			var playerUninitFunction = lib.element.player.uninit;
 			var playerAddSkillFunction = lib.element.player.addSkill;
 			var playerRemoveSkillFunction = lib.element.player.removeSkill;
@@ -1260,7 +1461,7 @@ content:function(config, pack){
 
 				return card;
 			};
-			
+
 			ui.create.cards = function(){
 				var retval = base.ui.create.cards.apply(this, arguments);
 				game.updateRoundNumber();
