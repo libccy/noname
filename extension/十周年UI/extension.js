@@ -5,7 +5,19 @@ content:function(config, pack){
 	var extension = lib.extensionMenu['extension_' + extensionName];
 	var extensionPath = lib.assetURL + 'extension/' + extensionName + '/';
     if (!(extension && extension.enable && extension.enable.init)) return;
-    
+
+    lib.config.forbiddouble=['miheng','swd_kangnalishi','wutugu','hs_siwangzhiyi','hs_ronghejuren','hs_shanlingjuren'];
+    lib.config.mode_config.identity.identity[7]=['zhu','zhong','zhong','zhong','nei','fan','fan','fan','fan'];
+    lib.config.mode_config.identity.identity[8]=['zhu','zhong','zhong','zhong','nei','fan','fan','fan','fan','fan'];
+
+    lib.mode.identity.connect.connect_player_number.item["9"] = "九人";
+    lib.mode.identity.connect.connect_player_number.item["10"] = "十人";
+
+    lib.mode.identity.config.player_number.item["9"] = "九人";
+    lib.mode.identity.config.player_number.item["10"] = "十人";
+
+    lib.mode.identity.config.double_hp.item["zuidashangxianzuixiaotili"] = "最大上限最小体力";
+
 	switch(lib.config.layout){
         case 'long2':
         case 'nova':

@@ -161,7 +161,7 @@
 }
 .dialog{
 	height:calc(100% - 370px);
-    bottom:210px;
+    bottom:170px;
 }
 #arena.choose-character>.dialog .placeholder+.placeholder{
     display: none;
