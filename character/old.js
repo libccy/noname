@@ -750,20 +750,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				}
 			},
-			shiyong:{
-				audio:2,
-				trigger:{player:'damageEnd'},
-				forced:true,
-				check:function(){
-					return false;
-				},
-				filter:function(event,player){
-					return event.card&&event.card.name=='sha'&&(get.color(event.card)=='red'||event.getParent(2).jiu==true);
-				},
-				content:function(){
-					player.loseMaxHp();
-				}
-			},
 			oldqianxi:{
 				trigger:{source:'damageBegin2'},
 				check:function(event,player){
@@ -922,8 +908,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldzhenlie_info:'在你的判定牌生效前，你可以亮出牌堆顶的一张牌代替之',
 			oldmiji:'秘计',
 			oldmiji_info:'准备/结束阶段开始时，若你已受伤，你可以判定，若判定结果为黑色，你观看牌堆顶的X张牌（X为你已损失的体力值），然后将这些牌交给一名角色',
-			shiyong:'恃勇',
-			shiyong_info:'锁定技，当你受到一次红色【杀】或【酒】【杀】造成的伤害后，须减1点体力上限',
 			oldqianxi:'潜袭',
 			oldqianxi_info:'当你使用【杀】对距离为1的目标角色造成伤害时，你可以进行一次判定，若判定结果不为红桃，你防止此伤害，令其减1点体力上限',
 			oldxuanfeng:'旋风',

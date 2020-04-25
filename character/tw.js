@@ -262,7 +262,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			twxiaolian:{
 				audio:2,
-				trigger:{global:'useCardToPlayer'},
+				trigger:{global:'useCardToTarget'},
 				logTarget:'target',
 				filter:function(event,player){
 					return event.card&&event.card.name=='sha'&&event.player!=player&&
@@ -274,6 +274,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					trigger.getParent().twxiaolian=trigger.targets[0];
 					trigger.targets.length=0;
+						trigger.getParent().triggeredTargets2.length=0;
 					trigger.targets.push(player);
 				},
 				group:'twxiaolian_damage',
@@ -337,6 +338,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					trigger.targets.length=0;
+					trigger.getParent().triggeredTargets1.length=0;
 					trigger.targets.push(player);
 					var next=game.createEvent('twtijin_discard',null,trigger.getParent(2));
 					next.player=player;

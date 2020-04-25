@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		character:{
 			hs_jaina:['female','wei',3,['huopu','aoshu','bingjia']],
 			hs_lrexxar:['male','shu',4,['yushou']],
-			hs_wuther:['male','qun',4,['fengxian','jieming']],
+			hs_wuther:['male','qun',4,['fengxian','rejieming']],
 			hs_jgarrosh:['male','shu',4,['zhanhou','qiangxi']],
 			hs_malfurion:['male','wu',4,['jihuo']],
 			hs_guldan:['male','wei',3,['moxie','fuhua','hongxi']],

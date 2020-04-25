@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			refresh:{
 				refresh_standard:["re_caocao","re_simayi","re_guojia","re_lidian","re_zhangliao","re_xuzhu","re_xiahoudun","re_zhangfei","re_zhaoyun","re_guanyu","re_machao","re_xushu","re_zhouyu","re_lvmeng","re_ganning","re_luxun","re_daqiao","re_huanggai","re_lvbu","re_gongsunzan","re_huatuo","re_liubei","re_diaochan","re_huangyueying","re_sunquan","re_sunshangxiang","re_zhenji","re_zhugeliang","re_huaxiong"],
 				refresh_feng:['caoren','ol_xiahouyuan','re_huangzhong','re_weiyan','re_xiaoqiao','zhoutai','re_zhangjiao','xin_yuji'],
-				refresh_huo:["ol_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","re_pangtong","ol_yuanshao","re_pangde"],
+				refresh_huo:["ol_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","ol_pangtong","ol_yuanshao","re_pangde"],
 				refresh_lin:['re_zhurong','re_menghuo','re_dongzhuo','re_sunjian','re_caopi','re_xuhuang'],
 				refresh_shan:['re_dengai','re_jiangwei','re_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce'],
 				refresh_yijiang:['re_xusheng','re_wuguotai','re_gaoshun','re_zhangyi'],
@@ -14,6 +14,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		connect:true,
 		character:{
+			ol_pangtong:['male','shu',3,['xinlianhuan','olniepan'],[]],
 			re_zhangyi:['male','shu',4,['rewurong','shizhi']],
 			re_xusheng:['male','wu',4,['repojun']],
 			re_wuguotai:['female','wu',3,['reganlu','buyi']],
@@ -64,7 +65,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_xunyu:["male","wei",3,["quhu","rejieming"],[]],
 			re_dianwei:["male","wei",4,["reqiangxi"],[]],
 			re_yanwen:["male","qun",4,["reshuangxiong"],[]],
-			re_pangtong:['male','shu',3,['xinlianhuan','niepan'],[]],
 			ol_yuanshao:['male','qun',4,['olluanji','olxueyi'],['zhu']],
 			re_zhurong:['female','shu',4,['juxiang','relieren']],
 			re_menghuo:['male','shu',4,['huoshou','rezaiqi']],
@@ -93,6 +93,70 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunben:['zhouyu','taishici','daqiao'],
 		},
 		skill:{
+			olniepan:{
+				audio:2,
+				unique:true,
+				enable:'chooseToUse',
+				mark:true,
+				skillAnimation:true,
+				animationStr:'涅盘',
+				limited:true,
+				animationColor:'orange',
+				init:function(player){
+					player.storage.olniepan=false;
+				},
+				filter:function(event,player){
+					if(player.storage.olniepan) return false;
+					if(event.type=='dying'){
+						if(player!=event.dying) return false;
+						return true;
+					}
+					return false;
+				},
+				content:function(){
+					'step 0'
+					player.awakenSkill('olniepan');
+					player.storage.olniepan=true;
+					player.discard(player.getCards('hej'));
+					'step 1'
+					player.link(false);
+					'step 2'
+					player.turnOver(false);
+					'step 3'
+					player.draw(3);
+					'step 4'
+					if(player.hp<3){
+						player.recover(3-player.hp);
+					}
+					'step 5'
+					player.chooseControl('bazhen','rehuoji','rekanpo').set('prompt','选择获得一个技能').ai=function(){
+						return ['rehuoji','bazhen'].randomGet();
+					};
+					'step 6'
+					player.addSkillLog(result.control);
+				},
+				ai:{
+					order:1,
+					skillTagFilter:function(player){
+						if(player.storage.olniepan) return false;
+						if(player.hp>0) return false;
+					},
+					save:true,
+					result:{
+						player:function(player){
+							if(player.hp<=0) return 10;
+							if(player.hp<=2&&player.countCards('he')<=1) return 10;
+							return 0;
+						}
+					},
+					threaten:function(player,target){
+						if(!target.storage.olniepan) return 0.6;
+					}
+				},
+				intro:{
+					content:'limited'
+				}
+			},
 			rewurong:{
 				enable:'phaseUse',
 				usable:1,
@@ -1786,7 +1850,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rehuoji:{
 				position:"he",
 				audio:2,
-				audioname:['ol_sp_zhugeliang'],
+				audioname:['ol_sp_zhugeliang','ol_pangtong'],
 				enable:"chooseToUse",
 				filterCard:function (card){
 					return get.color(card)=='red';
@@ -1806,60 +1870,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return 4-get.value(card)
 				},
-				ai:{
-					basic:{
-						order:4,
-						value:[3,1],
-						useful:1,
-					},
-					wuxie:function (target,card,player,current,state){
-						if(get.attitude(current,player)>=0&&state>0) return false;
-					},
-					result:{
-						player:function (player){
-							var nh=player.countCards('h');
-							if(nh<=player.hp&&nh<=4&&_status.event.name=='chooseToUse'){
-								if(typeof _status.event.filterCard=='function'&&
-									_status.event.filterCard({name:'huogong'})){
-									return -10;
-								}
-								if(_status.event.skill){
-									var viewAs=get.info(_status.event.skill).viewAs;
-									if(viewAs=='huogong') return -10;
-									if(viewAs&&viewAs.name=='huogong') return -10;
-								}
-							}
-							return 0;
-						},
-						target:function (player,target){
-							if(target.hasSkill('huogong2')||target.countCards('h')==0) return 0;
-							if(player.countCards('h')<=1) return 0;
-							if(target==player){
-								if(typeof _status.event.filterCard=='function'&&
-									_status.event.filterCard({name:'huogong'})){
-									return -1.5;
-								}
-								if(_status.event.skill){
-									var viewAs=get.info(_status.event.skill).viewAs;
-									if(viewAs=='huogong') return -1.5;
-									if(viewAs&&viewAs.name=='huogong') return -1.5;
-								}
-								return 0;
-							}
-							return -1.5;
-						},
-					},
-					tag:{
-						damage:1,
-						fireDamage:1,
-						natureDamage:1,
-						norepeat:1,
-					},
-				},
 			},
 			rekanpo:{
 				audio:2,
-				audioname:['ol_sp_zhugeliang'],
+				audioname:['ol_sp_zhugeliang','ol_pangtong'],
 				position:"he",
 				enable:"chooseToUse",
 				filterCard:function (card){
@@ -1873,17 +1887,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				prompt:"将一张黑色手牌当无懈可击使用",
 				check:function (card){return 8-get.value(card)},
-				threaten:1.2,
-				ai:{
-					basic:{
-						useful:[6,4],
-						value:[6,4],
-					},
-					result:{
-						player:1,
-					},
-					expose:0.2,
-				},
 			},
 			rejieming:{
 				audio:2,
@@ -5115,7 +5118,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var player=_status.event.player;
 							if(player.isTurnedOver()||_status.event.getTrigger().player.getDamagedHp()>2) return -1;
 							return (player.hp*player.hp)-get.value(card);
-						}).set('prompt','弃置'+get.cnNumber(player.getDamagedHp())+'张手牌并失去一点体力；或选择不弃置，将武将牌翻面并摸'+get.cnNumber(player.getDamagedHp())+'张牌。');
+						}).set('prompt','弃置'+get.cnNumber(player.getDamagedHp())+'张牌并失去一点体力；或选择不弃置，将武将牌翻面并摸'+get.cnNumber(player.getDamagedHp())+'张牌。');
 					}
 					else event.finish();
 					"step 2"
@@ -5371,7 +5374,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"re_xunyu":"界荀彧",
 			"re_dianwei":"界典韦",
 			"re_yanwen":"界颜良文丑",
-			re_pangtong:"界庞统",
 			xin_yuanshao:"手杀袁绍",
 			re_zhangjiao:'界张角',
 			re_sunce:'界孙策',
@@ -5617,6 +5619,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhangyi:'界张嶷',
 			rewurong:'怃戎',
 			rewurong_info:'出牌阶段限一次，你可以令一名其他角色与你同时展示一张手牌：若你展示的是【杀】且该角色展示的不是【闪】，则你对其造成1点伤害；若你展示的不是【杀】且该角色展示的是【闪】，则你获得其一张牌',
+			ol_pangtong:'界庞统',
+			olniepan:'涅槃',
+			olniepan_info:'限定技，当你处于濒死状态时，你可以弃置你区域内的所有牌并复原你的武将牌，然后摸三张牌并将体力回复至3点。然后你选择获得以下技能中的一个：〖八阵〗/〖火计〗/〖看破〗',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

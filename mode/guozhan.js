@@ -440,10 +440,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if((!event.filterCard({name:'tao'},player,event)||storage.used.contains('tao'))&&
 						(!event.filterCard({name:'jiu'},player,event)||storage.used.contains('jiu'))) return false;
 						var target=event.dying;
-						if(target.group=='unknown') return true;
+						if(target.identity=='unknown'||target.identity=='ye') return true;
 						for(var i=0;i<storage.character.length;i++){
 							var group=lib.character[storage.character[i]][1];
-							if(target.group==group) return true;
+							if(target.identity==group) return true;
 						}
 						return false;
 					}
@@ -490,7 +490,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(!['tao','juedou','guohe','shunshou','wuzhong','xietianzi','yuanjiao','taoyuan','wugu','wanjian','nanman','huoshaolianying'].contains(name)) return 0;
 							if(['taoyuan','wugu','wanjian','nanman','huoshaolianying'].contains(name)){
 								var list=game.filterPlayer(function(current){
-									return (current.group=='unknown'||current.group==group)&&player.canUse({name:name},current);
+									return (current.identity=='unknown'||current.identity=='ye'||current.identity==group)&&player.canUse({name:name},current);
 								});
 								var num=0;
 								for(var i=0;i<list.length;i++){
@@ -507,8 +507,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(!ui.selected.buttons.length){
 							if(typeof button.link!='string') return false;
 							if(evt.type=='dying'){
-								if(evt.dying.group=='unknown') return true;
-								return evt.dying.group==lib.character[button.link][1];
+								if(evt.dying.identity=='unknown'||evt.dying.identity=='ye') return true;
+								return evt.dying.identity==lib.character[button.link][1];
 							}
 							return true;
 						}
@@ -535,7 +535,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									var targets=[list[i]];
 									info.changeTarget(player,targets);
 									for(var j=0;j<targets.length;j++){
-										if(targets[j].group!='unknown'&&targets[j].group!=group){
+										if(targets[j].identity!='unknown'&&targets[j].identity!='ye'&&targets[j].identity!=group){
 											giveup=true;
 											break;
 										}
@@ -546,7 +546,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								return false;
 							}
 							else return game.hasPlayer(function(current){
-								return evt.filterTarget(card,player,current)&&(current.group=='unknown'||current.group==group);
+								return evt.filterTarget(card,player,current)&&(current.identity=='unknown'||current.identity=='ye'||current.identity==group);
 							});
 						}
 					},
@@ -576,12 +576,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var evt=_status.event;
 							var group=xx.group;
 							var info=get.info(card);
-							if((!(info.singleCard&&ui.selected.targets.length))&&target.group!='unknown'&&target.group!=group) return false;
+							if((!(info.singleCard&&ui.selected.targets.length))&&target.identity!='unknown'&&target.identity!='ye'&&target.identity!=group) return false;
 							if(info.changeTarget){
 								var targets=[target];
 								info.changeTarget(player,targets);
 								for(var i=0;i<targets.length;i++){
-									if(targets[i].group!='unknown'&&targets[i].group!=group) return false;
+									if(targets[i].identity!='unknown'&&targets[i].identity!='ye'&&targets[i].identity!=group) return false;
 								}
 							}
 							//if(evt.type=='dying') return target==evt.dying;
@@ -609,7 +609,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return '移除「'+get.translation(character)+'」并视为使用'+(get.translation(nature)||'')+get.translation(name);
 					},
 				},
-				group:["yigui_init","yigui_refrain"],
+				group:["yigui_init","yigui_refrain","yigui_shan","yigui_wuxie"],
 				ai:{
 					save:true,
 					order:function(){
@@ -676,6 +676,130 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				content:function(){
 					player.storage.yigui.used=[];
+				},
+			},
+			yigui_shan:{
+				enable:"chooseToUse",
+				filter:function (event,player){
+					if(event.type!='respondShan') return false;
+					var storage=player.storage.yigui;
+					if(!storage||!storage.character.length||storage.used.contains('shan')) return false;
+					return event.filterCard({name:'shan'},player,event);
+				},
+				chooseButton:{
+					dialog:function (event,player){
+						var dialog=ui.create.dialog('役鬼','hidden');
+						dialog.add([player.storage.yigui.character,'character']);
+						return dialog;
+					},
+					check:function(button){
+						return 1/(1+game.countPlayer(function(current){
+							return current.identity==button.link;
+						}));
+					},
+					backup:function(links,player){
+						var character=links[0];
+						var next={
+							character:character,
+							filterCard:function(){
+								return false;
+							},
+							selectCard:-1,
+							complexCard:true,
+							check:function(){return 1},
+							popname:true,
+							audio:"huashen1",
+							viewAs:{
+								name:'shan',
+								isCard:true,
+							},
+							onuse:function(result,player){
+								player.logSkill('yigui');
+								var character=lib.skill.yigui_shan_backup.character;
+								player.flashAvatar('yigui',character);
+								player.storage.yigui.character.remove(character);
+								_status.characterlist.add(character);
+								game.log(player,'从「魂」中移除了','#g'+get.translation(character));
+								player.syncStorage('yigui');
+								player.updateMarks('yigui');
+								player.storage.yigui.used.add(result.card.name);
+							},
+						};
+						return next;
+					},
+				},
+				ai:{
+					respondShan:true,
+					skillTagFilter:function(player){
+						var storage=player.storage.yigui;
+						if(!storage||!storage.character.length||storage.used.contains('shan')) return false;
+					},
+					order:0.1,
+					result:{
+						player:1,
+					},
+				},
+			},
+			yigui_wuxie:{
+				hiddenCard:function(player,name){
+					var storage=player.storage.yigui;
+					if(!storage||!storage.character.length||storage.used.contains('wuxie')) return false;
+					return name=='wuxie';
+				},
+				enable:"chooseToUse",
+				filter:function (event,player){
+					if(event.type!='wuxie') return false;
+					var storage=player.storage.yigui;
+					if(!storage||!storage.character.length||storage.used.contains('wuxie')) return false;
+					return event.filterCard({name:'wuxie'},player,event);
+				},
+				chooseButton:{
+					dialog:function (event,player){
+						var dialog=ui.create.dialog('役鬼','hidden');
+						dialog.add([player.storage.yigui.character,'character']);
+						return dialog;
+					},
+					check:function(button){
+						return 1/(1+game.countPlayer(function(current){
+							return current.identity==button.link;
+						}));
+					},
+					backup:function(links,player){
+						var character=links[0];
+						var next={
+							character:character,
+							filterCard:function(){
+								return false;
+							},
+							selectCard:-1,
+							complexCard:true,
+							check:function(){return 1},
+							popname:true,
+							audio:"huashen1",
+							viewAs:{
+								name:'wuxie',
+								isCard:true,
+							},
+							onuse:function(result,player){
+								player.logSkill('yigui');
+								var character=lib.skill.yigui_wuxie_backup.character;
+								player.flashAvatar('yigui',character);
+								player.storage.yigui.character.remove(character);
+								_status.characterlist.add(character);
+								game.log(player,'从「魂」中移除了','#g'+get.translation(character));
+								player.syncStorage('yigui');
+								player.updateMarks('yigui');
+								player.storage.yigui.used.add(result.card.name);
+							},
+						};
+						return next;
+					},
+				},
+				ai:{
+					order:0.1,
+					result:{
+						player:1,
+					},
 				},
 			},
 			jihun:{
@@ -1053,7 +1177,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						trigger.source.gain(result.cards,player,'giveAuto');
 						if(event.players.length==1) event.target=event.players[0];
 						else if(event.players.length) player.chooseTarget('附敌</br></br><div class="center text">对'+get.translation(event.players)+'中的一名角色造成一点伤害</div>',function(card,player,target){
-							return target.isFriendOf(trigger.source)&&target.hp>=player.hp
+							return target.isFriendOf(_status.event.getTrigger().source)&&target.hp>=player.hp&&!game.hasPlayer(function(current){
+								return current.isFriendOf(target)&&current.hp>target.hp;
+							})
 						},true).set('ai',function(target){return get.damageEffect(target,player,player)});
 						else event.finish();
 					}
@@ -2864,7 +2990,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var player=_status.event.player;
 							if(player.isTurnedOver()) return -1;
 							return (player.hp*player.hp)-Math.max(1,get.value(card));
-						}).set('prompt','弃置一张手牌并失去一点体力；或选择不弃置，将武将牌翻面并摸'+(player.getDamagedHp())+'张牌。');
+						}).set('prompt','弃置一张牌并失去一点体力；或选择不弃置，将武将牌翻面并摸'+(player.getDamagedHp())+'张牌。');
 					}
 					else event.finish();
 					"step 2"
@@ -7137,11 +7263,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			xindiaodu:"调度",
 			"xindiaodu_info":"当与你势力相同的角色使用装备牌时，其可以摸一张牌；出牌阶段开始时，你可以获得与你势力相同的一名角色装备区内的一张牌，然后你可以将此牌交给另一名与你势力相同的其他角色。",
 			yigui:"役鬼",
-			"yigui_info":"当首次明置此武将牌时，你将剩余武将牌堆的两张牌扣置于游戏外，称为“魂”；你可以展示一张“魂”并将其置入剩余武将牌堆，视为使用了一张本回合内未以此法使用过的基本牌或普通锦囊牌（此牌目标须为与此“魂”势力相同或未确定势力的角色）。 ",
+			"yigui_info":"当你首次明置此武将牌时，你将剩余武将牌堆的两张牌扣置于游戏外，称为“魂”；你可以展示一张“魂”并将其置入剩余武将牌堆，视为使用了一张本回合内未以此法使用过的基本牌或普通锦囊牌。（若此牌需指定目标，则目标须为未确定势力的角色或野心家或与此“魂”势力相同的角色）",
 			"yigui_init":"役鬼",
 			"yigui_init_info":"",
 			"yigui_refrain":"役鬼",
 			"yigui_refrain_info":"",
+			yigui_shan:'役鬼',
+			yigui_wuxie:'役鬼',
 			jihun:"汲魂",
 			jihun_info:"当你受到伤害后，或与你势力不同的角色脱离濒死状态后，你可以将剩余武将牌堆的一张牌当做“魂”扣置于游戏外。",
 			

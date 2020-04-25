@@ -294,7 +294,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					prompt:function(links,player){
-						return '选择弃置一手张牌，获得'+get.translation(links[0])+'并弃置一名角色装备区或判定区内的一张牌';
+						return '选择弃置一张手牌，获得'+get.translation(links[0])+'并弃置一名角色装备区或判定区内的一张牌';
 					},
 				},
 				contentx:function(){
@@ -2418,15 +2418,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinlianhuan:{
 				audio:2,
+				audioname:['ol_pangtong'],
 				group:['lianhuan3','lianhuan5','lianhuan4'],
 			},
 			lianhuan5:{
 				inherit:'lianhuan2',
+				audioname:['ol_pangtong'],
 				audio:['xinlianhuan',2],
 			},
 			lianhuan3:{
 				audio:['xinlianhuan',1],
-				audioname:['xinlianhuan'],
+				audioname:['ol_pangtong'],
 				enable:'chooseToUse',
 				filter:function(event,player){
 					return player.countCards('h',{suit:'club'})>0;
@@ -2438,10 +2440,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			lianhuan4:{
 				mod:{
-		selectTarget:function(card,player,range){
-			if(card.name=='tiesuo'&&player.hasSkill('xinlianhuan')&&range[1]<3&&range[1]!=-1) range[1]=3;
-		},
-	},
+					selectTarget:function(card,player,range){
+						if(card.name=='tiesuo'&&range[1]!=-1) range[1]++;
+					},
+				},
 			},
 			reluanji:{
 				audio:2,
@@ -4888,7 +4890,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			bazhen:{
 				audio:2,
-				audioname:['re_sp_zhugeliang','ol_sp_zhugeliang'],
+				audioname:['re_sp_zhugeliang','ol_sp_zhugeliang','ol_pangtong'],
 				equipSkill:true,
 				noHidden:true,
 				inherit:'bagua_skill',
@@ -7355,7 +7357,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			luanji:'乱击',
 			xueyi:'血裔',
 			mengjin:'猛进',
-			xinlianhuan_info:' 你可以将一张♣手牌当【铁索连环】使用或重铸。你使用的【铁索连环】可以指定至多3个目标。',
+			xinlianhuan_info:' 你可以将一张♣手牌当【铁索连环】使用或重铸。你使用【铁索连环】选择目标的上限数+1。',
 			huoji_info:'出牌阶段，你可以将你的任意一张红色手牌当作【火攻】使用。',
 			bazhen_info:'锁定技，若你的防具栏内没有牌且没有被废除，则你视为装备着【八卦阵】。',
 			kanpo_info:'你可以将你的任意一张黑色手牌当做【无懈可击】使用。',

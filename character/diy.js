@@ -22,6 +22,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_masato:['male','key','4/8',['masato_baoquan']],
 			key_iwasawa:['female','key',3,['iwasawa_yinhang','iwasawa_mysong']],
 			key_kengo:['male','key',4,['kengo_weishang','kengo_guidui']],
+			key_yoshino:['male','key',4,['yoshino_jueyi']],
+			key_yui:['female','key',3,['yui_jiang','yui_lieyin','yui_takaramono']],
+			key_tsumugi:['female','key',3,['tsumugi_mugyu','tsumugi_huilang']],
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
 			diy_feishi:['male','shu',3,['shuaiyan','moshou']],
@@ -98,7 +101,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy:{
 				diy_tieba:["diy_wenyang","ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_zhangwei"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi"],
 			},
 		},
 		characterIntro:{
@@ -113,6 +116,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
+			key_tsumugi:'#bSummer Pockets',
+			key_yui:'#rAngel Beats!',
+			key_yoshino:'#bRewrite',
 			key_kengo:'#bLittle Busters!',
 			key_iwasawa:'#rAngel Beats!',
 			key_masato:'#bLittle Busters!',
@@ -162,6 +168,248 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuji:['zuoci']
 		},
 		skill:{
+			tsumugi_mugyu:{
+				audio:5,
+				trigger:{target:'useCardToTargeted'},
+				frequent:true,
+				filter:function(event,player){
+					return player.countCards('h')<player.maxHp;
+				},
+				content:function(){
+					player.draw();
+				},
+			},
+			tsumugi_huilang:{
+				trigger:{player:'phaseEnd'},
+				line:{color:[253, 198, 116]},
+				direct:true,
+				filter:function(event,player){
+					return player.countCards('he')>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseCard('he',[1,player.countCards('he')],get.prompt2('tsumugi_huilang')).set('ai',function(card){
+						if(get.position(card)!='h') return -1;
+						if(!['shan','wuxie','caochuan'].contains(get.name(card))) return 9;
+						return 5-get.value(card);
+					});
+					'step 1'
+					if(result.bool){
+						var cards=result.cards;
+						player.logSkill('tsumugi_huilang');
+						player.addSkill('tsumugi_huilang2');
+						player.storage.tsumugi_huilang2.addArray(cards);
+						player.lose(cards,ui.special);
+						player.markSkill('tsumugi_huilang2');
+					}
+				},
+			},
+			tsumugi_huilang2:{
+				charlotte:true,
+				init:function(player,skill){
+					if(!player.storage[skill]) player.storage[skill]=[];
+				},
+				marktext:'隐',
+				intro:{content:'cardCount'},
+				trigger:{player:'phaseBegin'},
+				forced:true,
+				filter:function(event,player){
+					return player.storage.tsumugi_huilang2.length>0;
+				},
+				content:function(){
+					'step 0'
+					var cards=player.storage.tsumugi_huilang2;
+					event.num=cards.length;
+					player.gain(cards,'draw');
+					game.log(player,'获得了'+get.cnNumber(cards.length)+'张牌');
+					cards.length=0;
+					player.unmarkSkill('tsumugi_huilang2');
+					'step 1'
+					player.chooseTarget([1,num],'是否令至多'+get.cnNumber(num)+'名角色各摸一张牌？').set('ai',function(target){
+						return get.attitude(_status.event.player,target);
+					});
+					'step 2'
+					if(result.bool){
+						var targets=result.targets;
+						player.line(targets,lib.skill.tsumugi_huilang.line);
+						targets.sortBySeat();
+						game.asyncDraw(targets);
+					}
+					else event.finish();
+					'step 3'
+					game.delay();
+				},
+			},
+			yui_jiang:{
+				shaRelated:true,
+				audio:2,
+				audioname:['sp_lvmeng','re_sunben','re_sunce'],
+				trigger:{
+					player:'useCardToPlayered',
+					target:'useCardToTargeted',
+				},
+				filter:function(event,player){
+					if(!(event.card.name=='juedou'||(event.card.name=='sha'&&get.color(event.card)=='red'))) return false;
+					return player==event.target||event.getParent().triggeredTargets3.length==1;
+				},
+				frequent:true,
+				content:function(){
+					player.draw();
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(card.name=='sha'&&get.color(card)=='red') return [1,0.6];
+						},
+						player:function(card,player,target){
+							if(card.name=='sha'&&get.color(card)=='red') return [1,1];
+						}
+					}
+				}
+			},
+			yui_lieyin:{
+				trigger:{player:'phaseUseBegin'},
+				direct:true,
+				locked:true,
+				content:function(){
+					'step 0'
+					var list=[];
+					if(player._ichiban_no_takaramono) list.push('cancel2');
+					player.chooseControl.apply(player,list).set('choiceList',[
+						'令此阶段内的所有红色牌视为【杀】',
+						'令此阶段内的所有【杀】视为【决斗】'
+					]).set('prompt',player._ichiban_no_takaramono?get.prompt('yui_lieyin'):'烈音：请选择一项').set('ai',function(){
+						var player=_status.event.player;
+						var shas=player.countCards('h','sha')
+						if(shas>0){
+							if(game.hasPlayer(function(current){
+								return get.attitude(player,current)<0&&player.canUse('juedou',current)&&!current.hasSha()&&get.effect(current,{name:'juedou'},player,player)>0;
+							})) return 1;
+							if(player._ichiban_no_takaramono) return 'cancel2';
+						}
+						if(player.countCards('h',function(card){
+							return get.color(card)=='red'&&card.name!='sha'&&player.hasValueTarget(card);
+						})==0) return 0;
+						if(player._ichiban_no_takaramono) return 'cancel2';
+						return 1;
+					});
+					'step 1'
+					if(result.control!='cancel2'){
+						player.logSkill('yui_lieyin');
+						player.addTempSkill('yui_lieyin'+result.index,'phaseUseEnd')
+					}
+				},
+			},
+			yui_lieyin0:{
+				mod:{
+					cardname:function(card){
+						if(get.color(card)=='red') return 'sha';
+					},
+				},
+			},
+			yui_lieyin1:{
+				mod:{
+					cardname:function(card){
+						if(card.name=='sha') return 'juedou';
+					},
+				},
+			},
+			yui_takaramono:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				forced:true,
+				unique:true,
+				juexingji:true,
+				skillAnimation:true,
+				animationColor:'key',
+				filter:function(event,player){
+					var num=0;
+					if(player.hp<=1) num++;
+					if(game.dead.length>0) num++;
+					if(num!=1) return num>1;
+					var draw=0;
+					player.getAllHistory('gain',function(evt){
+						if(evt.getParent(2).name=='yui_jiang') draw+=evt.cards.length;
+					});
+					return draw>=3;
+				},
+				content:function(){
+					player.awakenSkill('yui_takaramono');
+					player.addSkill('yui_yinhang');
+					player._ichiban_no_takaramono=true;
+					player.gainMaxHp();
+					player.recover();
+				},
+				derivation:'yui_yinhang',
+			},
+			yui_yinhang:{
+				trigger:{player:'changeHp'},
+				locked:true,
+				direct:true,
+				line:{color:[253, 153, 182]},
+				content:function(){
+					'step 0'
+					event.count=Math.abs(trigger.num);
+					'step 1'
+					event.count--;
+					player.chooseTarget([1,2],get.prompt('yui_yinhang'),'令至多两名角色各摸一张牌').set('ai',function(target){
+						return get.attitude(_status.event.player,target);
+					});
+					'step 2'
+					if(result.bool){
+						var targets=result.targets;
+						targets.sortBySeat();
+						player.logSkill('yui_yinhang',targets,lib.skill.yui_yinhang.line);
+						game.asyncDraw(targets);
+					}
+					else event.finish();
+					'step 3'
+					game.delay();
+					if(event.count>0) event.goto(1);
+				},
+			},
+			yoshino_jueyi:{
+				trigger:{player:'phaseUseBegin'},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(lib.filter.notMe,get.prompt2('yoshino_jueyi')).set('ai',function(){
+						var player=_status.event.player;
+						var att=get.attitude(player,target);
+						if(att<0) return 0;
+						if(att==0) return 0.1;
+						var eff=0;
+						var hs=player.getCards('h');
+						for(var i=0;i<hs.length;i++){
+							if(player.canUse(hs[i],target)){
+								var eff2=get.effect(target,hs[i],player,player);
+								if(eff2>0) eff+=eff2;
+							}
+						}
+						return -att/(1+eff);
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('yoshino_jueyi',target);
+						player.draw();
+					}
+					else event.finish();
+					'step 2'
+					player.chooseToPSS(target);
+					'step 3'
+					if(result.tie) event.goto(2);
+					else if(result.bool) target.damage();
+					else target.addTempSkill('yoshino_fail','phaseUseEnd');
+				},
+			},
+			yoshino_fail:{
+				mod:{
+					targetEnabled:function(card,player,target){
+						if(player==_status.currentPhase) return false;
+					},
+				},
+			},
 			kengo_weishang:{
 				locked:false,
 				mod:{
@@ -507,6 +755,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 					}
 					"step 3"
+					event.index=result.index;
 					if(result.index==1){
 						var magic=get.cardPile2(function(card){
 							return get.type(card,'trick')==event.type;
@@ -516,13 +765,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger.player.storage.yukine_magic.add(magic.name);
 							trigger.player.gain(magic,'draw');
 						}
-						event.finish();
+						else event.finish();
 					}
 					else player.chooseCard('he',true,'选择要交给'+get.translation(trigger.player)+'的牌').set('ai',function(card){
 						return -get.value(card,_status.event.getTrigger().player);
 					});
 					"step 4"
-					if(result.bool) player.give(result.cards,trigger.player,'giveAuto');
+					if(event.index==1) game.updateRoundNumber();
+					else if(result.bool) player.give(result.cards,trigger.player,'giveAuto');
 				},
 			},
 			yukine_magic:{
@@ -5906,6 +6156,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_masato:'井之原真人',
 			key_iwasawa:'岩泽雅美',
 			key_kengo:'宫泽谦吾',
+			key_yoshino:'吉野晴彦',
+			key_yui:'ユイ',
+			key_tsumugi:'紬文德斯',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -5919,7 +6172,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuri_wangxi:'忘隙',
 			yuri_wangxi_info:'主公技，限定技，当有角色因你发动的【行动】而死亡后，若其身份不为【明忠】，则其可以将身份改为忠臣并重新加入游戏，然后将势力改为与你相同，将体力值回复至2点并摸一张牌。',
 			haruko_haofang:'豪放',
-			haruko_haofang_info:'锁定技，你不能使用非转化的延时锦囊牌。你可以将一张延时锦囊牌当做【无中生有】使用。',
+			haruko_haofang_info:'锁定技，你的延时锦囊牌视为【无中生有】。',
 			haruko_zhuishi:'追逝',
 			haruko_zhuishi_info:'一名角色的判定阶段开始时，若其判定区内有牌，则你可以失去1点体力，然后获得其判定区内的所有牌。',
 			kagari_zongsi:'纵丝',
@@ -5937,6 +6190,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			komari_xueshang_info:'锁定技，蓄力技，当有角色死亡时，你对自己造成<span class=yellowtext>1</span>点伤害，然后对所有其他角色依次造成<span class=firetext>1</span>点伤害。当有角色因此法进入濒死状态时，你加1点体力上限并回复1点体力，然后失去此技能并终止此技能的所有后续结算。',
 			yukine_wenzhou:'问咒',
 			yukine_wenzhou_info:'一名角色的出牌阶段开始时，其可以交给你一张牌。若如此做，你选择一项：交给其一张牌，或令其从牌堆中获得一张与此牌类型相同的牌，且其于此阶段内使用与此牌牌名相同的牌时无法被响应。',
+			//如果对自己发动【问咒】，则自己可以响应这些牌。但其他角色发动【问咒】时，该角色自己并不能响应
 			yusa_yanyi:'演艺',
 			yusa_yanyi_info:'出牌阶段限一次，你可以指定至多X名与你距离不大于你的体力值的角色。这些角色选择一项：①令你摸一张牌。②回复1点体力，然后交给你一张牌。（X为你的攻击范围且至少为1）',
 			misa_yehuo:'业火',
@@ -5959,6 +6213,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kengo_weishang_info:'出牌阶段限一次，你可以废除一个装备栏并摸两张牌。若你的武器栏已废除，则你使用【杀】的次数上限+1，且当你使用【杀】指定目标后，目标角色弃置一张牌；若你的防具栏已废除，则你可以将一张牌当做【闪】使用或打出；若你的攻击/防御坐骑栏已废除，则你至其他角色的距离-1/其他角色至你的距离-1。',
 			kengo_guidui:'归队',
 			kengo_guidui_info:'锁定技，准备阶段，若你有已废除的装备栏，则你恢复这些装备栏，且本回合内发动【伪伤】时不能废除这些装备栏。',
+			yoshino_jueyi:'决义',
+			yoshino_jueyi_info:'出牌阶段开始时，你可以选择一名其他角色。你摸一张牌并与其猜拳（平局则重来）。若你赢，你对其造成1点伤害。若你没赢，你本阶段内使用牌时不能指定其为目标。',
+			yui_jiang:'激昂',
+			yui_jiang_info:'每当你使用（指定目标后）或被使用（成为目标后）一张【决斗】或红色的【杀】时，你可以摸一张牌。',
+			yui_lieyin:'烈音',
+			yui_lieyin_info:'锁定技，出牌阶段开始时，你选择一项：①本阶段内的红色牌均视为【杀】；②本阶段内的【杀】均视为【决斗】。',
+			yui_takaramono:'珍宝',
+			yui_takaramono_info:'觉醒技，准备阶段，若你满足以下条件中的至少两个：①体力值不大于1；②场上有已死亡的角色；③已因〖激昂〗累计获得过至少三张牌；则你获得技能〖引吭〗，将〖烈音〗描述中的「你选择」改为「你可选择」，然后加1点体力上限并回复1点体力。',
+			//ユイ/孙笨双将组合时，孙笨的【激昂】不计入【珍宝】的次数统计
+			yui_yinhang:'引吭',
+			yui_yinhang_info:'锁定技，当你的体力值变化1点时，你可以令至多两名角色摸一张牌。',
+			tsumugi_mugyu:'姆啾',
+			tsumugi_mugyu_info:'当你成为牌的目标后，若你的手牌数小于体力上限，则你可以摸一张牌。',
+			tsumugi_huilang:'回廊',
+			tsumugi_huilang2:'回廊',
+			tsumugi_huilang_info:'回合结束时，不可以将任意张牌扣置于武将牌下（均称为「隐」）。回合开始时，你获得所有「隐」，然后可令等量的角色各摸一张牌。',
+			//〖回廊〗涉及的所有卡牌移动的结算不会触发〖良姻〗
 			
 			ns_zhangwei:'张葳',
 			nsqiyue:'骑钺',

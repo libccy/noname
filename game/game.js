@@ -6660,6 +6660,13 @@
 						return this.childNodes[row].childNodes[col];
 					}
 				};
+				Array.prototype.numOf=function(item){
+					var num=0;
+					for(var i=0;i<this.length;i++){
+						if(this[i]==item) num++;
+					}
+					return num;
+				};
 				Array.prototype.filterInD=function(pos){
 					if(!pos) pos='o';
 					var list=[];
@@ -13605,19 +13612,6 @@
 							}
 						}
 					}
-					event.trigger('useCard1');
-					"step 1"
-					event.trigger('useCard2');
-					"step 2"
-					event.trigger('useCard');
-					event._oncancel=function(){
-						game.broadcastAll(function(id){
-							if(ui.tempnowuxie&&ui.tempnowuxie._origin==id){
-								ui.tempnowuxie.close();
-								delete ui.tempnowuxie;
-							}
-						},event.id);
-					};
 					if(true){
 						var str='';
 						if(targets.length){
@@ -13651,6 +13645,19 @@
 							game.logv(player,[card,cards],targets);
 						}
 					}
+					event.trigger('useCard1');
+					"step 1"
+					event.trigger('useCard2');
+					"step 2"
+					event.trigger('useCard');
+					event._oncancel=function(){
+						game.broadcastAll(function(id){
+							if(ui.tempnowuxie&&ui.tempnowuxie._origin==id){
+								ui.tempnowuxie.close();
+								delete ui.tempnowuxie;
+							}
+						},event.id);
+					};
 					"step 3"
 					event.sortTarget=function(animate){
 						var info=get.info(card,false);
@@ -13674,7 +13681,7 @@
 					event.getTriggerTarget=function(list1,list2){
 						var listx=list1.slice(0).sortBySeat();
 						for(var i=0;i<listx.length;i++){
-							if(!list2.contains(listx[i])) return listx[i];
+							if(list2.numOf(listx[i])<listx.numOf(listx[i])) return listx[i];
 						}
 						return null;
 					}
@@ -14626,6 +14633,7 @@
 				damage:function(){
 					"step 0"
 					event.forceDie=true;
+					if(event.source&&event.source.isDead()) delete event.source;
 					if(num<=0){
 						event.trigger('damageZero');
 						event.finish();
@@ -14633,6 +14641,7 @@
 					}
 					else event.trigger('damageBegin1');
 					"step 1"
+					if(event.source&&event.source.isDead()) delete event.source;
 					if(num<=0){
 						event.trigger('damageZero');
 						event.finish();
@@ -14640,6 +14649,7 @@
 					}
 					else event.trigger('damageBegin2');
 					"step 2"
+					if(event.source&&event.source.isDead()) delete event.source;
 					if(num<=0){
 						event.trigger('damageZero');
 						event.finish();
@@ -14647,6 +14657,7 @@
 					}
 					else event.trigger('damageBegin3');
 					"step 3"
+					if(event.source&&event.source.isDead()) delete event.source;
 					if(num<=0){
 						event.trigger('damageZero');
 						event.finish();
@@ -14654,6 +14665,7 @@
 					}
 					else event.trigger('damageBegin4');
 					"step 4"
+					if(event.source&&event.source.isDead()) delete event.source;
 					if(num>0&&player.hujia&&!player.hasSkillTag('nohujia')){
 						if(num>=player.hujia){
 							event.hujia=player.hujia;
@@ -14668,6 +14680,7 @@
 					}
 					event.num=num;
 					"step 5"
+					if(event.source&&event.source.isDead()) delete event.source;
 					if(lib.config.background_audio){
 						game.playAudio('effect','damage'+(num>1?'2':''));
 					}
@@ -14728,6 +14741,7 @@
 						}
 					}
 					"step 6"
+					if(event.source&&event.source.isDead()) delete event.source;
 					if(player.hp<=0&&player.isAlive()){
 						game.delayx();
 						player.dying(event);
@@ -14773,6 +14787,7 @@
 						}
 					}
 					"step 7"
+					if(event.source&&event.source.isDead()) delete event.source;
 					if(!event.notrigger) event.trigger('damageSource');
 				},
 				recover:function(){
@@ -18642,6 +18657,7 @@
 					if(next.card==undefined&&!nocard) next.card=event.card;
 					if(next.cards==undefined&&!nocard) next.cards=event.cards;
 					if(next.source==undefined&&!nosource) next.source=event.player;
+					if(next.source&&next.source.isDead()) delete next.source;
 					if(next.num==undefined) next.num=1;
 					if(next.nature=='poison') delete next._triggered;
 					next.setContent('damage');
@@ -20296,6 +20312,25 @@
 						}
 						return history;
 					}
+				},
+				getAllHistory:function(key,filter){
+					var list=[];
+					var all=this.actionHistory;
+					for(var j=0;j<all.length;j++){
+ 					if(!key||!all[j][key]){
+ 						list.push(all[j]);
+ 					}
+ 					else{
+  					if(!filter) list.addArray(all[j][key]);
+  					else{
+  						var history=all[j][key].slice(0);
+  						for(var i=0;i<history.length;i++){
+  							if(filter(history[i])) list.push(history[i]);
+  						}
+  					}
+ 					}
+					}
+					return list;
 				},
 				getLastUsed:function(num){
 					if(typeof num!='number') num=0;

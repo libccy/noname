@@ -7,11 +7,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			mobile:{
 				mobile_default:["miheng","taoqian","liuzan","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng"],
-				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","xin_yuanshao","re_liushan","xin_xiahoudun","re_sp_zhugeliang","re_heqi"],
+				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","xin_yuanshao","re_liushan","xin_xiahoudun","re_sp_zhugeliang","re_heqi","re_guanqiujian","re_pangtong"],
 				mobile_sunben:["re_sunben"],
 			},
 		},
 		character:{
+			re_pangtong:['male','shu',3,['xinlianhuan','niepan'],[]],
+			re_guanqiujian:['male','wei',4,['rezhengrong','rehongju']],
 			chendeng:['male','qun',3,['zhouxuan','fengji']],
 			re_heqi:['male','wu',4,['reqizhou','reshanxi']],
 			yangbiao:['male','qun',3,['zhaohan','rangjie','yizheng']],
@@ -266,6 +268,193 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		skill:{
+			rezhengrong:{
+				trigger:{player:'useCardAfter'},
+				direct:true,
+				audio:'drlt_zhenrong',
+				filter:function(event,player){
+					if(!event.targets) return false;
+					if(!event.isPhaseUsing(player)) return false;
+					var bool=false;
+					for(var i=0;i<event.targets.length;i++){
+						if(event.targets[i]!=player){bool=true;break}
+					}
+					if(!bool) return false;
+					return player.getAllHistory('useCard',function(evt){
+						if(!evt.isPhaseUsing(player)) return false;
+						for(var i=0;i<evt.targets.length;i++){
+							if(evt.targets[i]!=player) return true;
+						}
+						return false;
+					}).indexOf(event)%2==1;
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('rezhengrong'),'将一名其他角色的随机一张牌置于你的武将牌上，成为「荣」',function(card,player,target){
+						return target!=player&&target.countCards('he')>0;
+					}).set('ai',function(target){
+						return (1-get.attitude(_status.event.player,target))/target.countCards('he');
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=result.targets[0];
+						player.logSkill('rezhengrong',target);
+						var card=target.getCards('he').randomGet();
+						game.log(player,'选择了',card);
+						target.$give(card,player,false);
+						target.lose(card,ui.special,'toStorage');
+						if(!player.storage.rezhengrong) player.storage.rezhengrong=[];
+						player.storage.rezhengrong.push(card);
+						player.markSkill('rezhengrong');
+						game.delayx();
+					}
+				},
+				marktext:'荣',
+				intro:{
+					content:'cards',
+					onunmark:'throw',
+				},
+			},
+			rehongju:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				audio:'drlt_hongju',
+				forced:true,
+				unique:true,
+				juexingji:true,
+				skillAnimation:true,
+				animationColor:'thunder',
+				derivation:'reqingce',
+				filter:function(event,player){
+					return player.storage.rezhengrong&&player.storage.rezhengrong.length>=3&&game.dead.length>0;
+				},
+				content:function(){
+					'step 0'
+					player.awakenSkill('rehongju');
+					player.draw(player.storage.rezhengrong.length);
+					'step 1'
+					if(player.countCards('h')==0) event.goto(3);
+					else{
+						var dialog=['请选择要交换的手牌和「荣」，或点「取消」','<div class="text center">「征荣」牌</div>',player.storage.rezhengrong,'<div class="text center">手牌区</div>',player.getCards('h')];
+						var next=player.chooseButton(dialog);
+						next.set('filterButton',function(button){
+							var ss=_status.event.player.storage.rezhengrong;
+							var hs=_status.event.player.getCards('h');
+							var sn=0;
+							var hn=0;
+							var ub=ui.selected.buttons;
+							for(var i=0;i<ub.length;i++){
+								if(ss.contains(ub[i].link)) sn++;
+								else hn++;
+							}
+							return !(sn>=hs.length&&ss.contains(button.link)||hn>=ss.length&&hs.contains(button.link));
+						});
+						next.set('selectButton',function(){
+							if(ui.selected.buttons.length==0) return 2;
+							var ss=_status.event.player.storage.rezhengrong;
+							var hs=_status.event.player.getCards('h');
+							var sn=0;
+							var hn=0;
+							var ub=ui.selected.buttons;
+							for(var i=0;i<ub.length;i++){
+								if(ss.contains(ub[i].link)) sn++;
+								else hn++;
+							}
+							if(sn!=hn) return 2*Math.max(sn,hn);
+							else{
+								if(sn==ss.length||hn==hs.length||sn==hs.length||hn==ss.length) return ub.length;
+								return [ub.length,ub.length+1];
+							}
+						});
+						next.set('ai',function(){return -1});
+					}
+					'step 2'
+					if(result.bool){
+						var gains=[];
+						var pushs=[];
+						for(var i=0;i<result.links.length;i++){
+							var card=result.links[i];
+							if(player.storage.rezhengrong.contains(card)) gains.push(card);
+							else pushs.push(card);
+						}
+						player.lose(pushs,ui.special,'toStorage');
+						game.log(player,'将',pushs,'放在了武将牌上');
+						player.gain(gains,'gain2','log','fromStorage');
+						player.storage.rezhengrong.addArray(pushs);
+						player.storage.rezhengrong.removeArray(gains);
+						player.markSkill('rezhengrong');
+					}
+					'step 3'
+					player.addSkill('reqingce');
+					game.log(player,'获得了技能','#g【清侧】');
+					player.loseMaxHp();
+				},
+			},
+			reqingce:{
+				enable:'phaseUse',
+				audio:'drlt_qingce',
+				filter:function(event,player){
+					return player.storage.rezhengrong&&player.storage.rezhengrong.length>0;
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						return ui.create.dialog('请选择要移去的「荣」',player.storage.rezhengrong,'hidden');
+					},
+					backup:function(links,player){
+						return {
+							card:links[0],
+							filterCard:function(){return false},
+							selectCard:-1,
+							filterTarget:function(card,player,target){
+								return target.countDiscardableCards(player,'ej')>0;
+							},
+							delay:false,
+							audio:'drlt_qingce',
+							content:lib.skill.reqingce.contentx,
+							ai:{
+								result:{
+									target:function(player,target){
+										var att=get.attitude(player,target);
+										if(att>0&&(target.countCards('j')>0||target.countCards('e',function(card){
+											return get.value(card,target)<0;
+										}))) return 2;
+										if(att<0&&target.countCards('e')>0&&!target.hasSkillTag('noe')) return -1;
+										return 0;
+									},
+								},
+							},
+						}
+					},
+					prompt:function(links,player){
+						return '弃置一名角色装备区或判定区内的一张牌';
+					},
+				},
+				contentx:function(){
+					'step 0'
+					var card=lib.skill.reqingce_backup.card;
+					player.$throw(card);
+					game.cardsDiscard(card);
+					player.storage.rezhengrong.remove(card);
+					player[player.storage.rezhengrong.length>0?'markSkill':'unmarkSkill']('rezhengrong');
+					'step 1'
+					if(target.countDiscardableCards(player,'ej')>0){
+						player.discardPlayerCard('ej',true,target);
+					}
+				},
+				ai:{
+					order:8,
+					result:{
+						player:function(player){
+							if(game.hasPlayer(function(current){
+								var att=get.attitude(player,current);
+								if((att>0&&current.countCards('j')>0)||(att<0&&current.countCards('e')>0)) return true;
+								return false;
+							})) return 1;
+							return 0;
+						},
+					},
+				},
+			},
 			fengji:{
 				audio:2,
 				trigger:{player:'phaseBegin'},
@@ -668,6 +857,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var ts=target.getCards('h').sort(function(a,b){
 								return b.number-a.number;
 							});
+							if(!hs.length||!ts.length) return 0;
 							if(hs[0].number>ts[0].number) return -1;
 							return 0;
 						},
@@ -3801,7 +3991,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhouxuan2:'周旋',
 			zhouxuan_info:'结束阶段，你可以弃置一张牌并指定一名角色，然后选择一个基本牌的名称或非基本牌的类型。其使用或打出下一张牌时，若此牌的名称或类型和你选择的相同，则你观看牌堆顶的三张牌，然后将这些牌分配给任意角色。',
 			fengji:'丰积',
-			fengji_info:'锁定技，回合结束时，你记录你的手牌数。回合开始时，若你的手牌数不小于你记录的手牌数，则你摸两张牌且本回合手牌上限+X。（X为你的体力值）',
+			fengji_info:'锁定技，回合结束时，你记录你的手牌数。回合开始时，若你的手牌数不小于你记录的手牌数，则你摸两张牌且本回合手牌上限+X。（X为你已损失的体力值）',
+			re_guanqiujian:'手杀毌丘俭',
+			rezhengrong:'征荣',
+			rehongju:'鸿举',
+			reqingce:'清侧',
+			reqingce_backup:'清侧',
+			rezhengrong_info:'当你于出牌阶段使用的指定了其他角色为目标的牌结算完成后，若此牌是你本局游戏内于出牌阶段使用的指定了其他角色为目标的第偶数张牌，则你可以将一名其他角色角色的随机一张牌置于你的武将牌上，称为「荣」。',
+			rehongju_info:'觉醒技，准备阶段，若你武将牌上「荣」的数量不小于3且有角色死亡，则你摸等同于「荣」数量的牌。然后可以用任意数量的手牌交换等量的「荣」。你减1点体力上限并获得技能〖清侧〗。',
+			reqingce_info:'出牌阶段，你可以将一张「荣」置入弃牌堆，然后弃置场上的一张牌。',
+			re_pangtong:"手杀庞统",
 		}
 	};
 });

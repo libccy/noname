@@ -192,6 +192,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fazheng:['liubei'],
 		},
 		skill:{
+			shiyong:{
+				audio:2,
+				trigger:{player:'damageEnd'},
+				forced:true,
+				check:function(){
+					return false;
+				},
+				filter:function(event,player){
+					return event.card&&event.card.name=='sha'&&(get.color(event.card)=='red'||event.getParent(2).jiu==true);
+				},
+				content:function(){
+					player.loseMaxHp();
+				}
+			},
 			xindanshou:{
 				audio:'danshou',
 				trigger:{
@@ -2003,7 +2017,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool&&result.cards){
 						event.card=result.cards[0];
-						trigger.getParent().targets=[];
+						trigger.targets.length=0;
+						trigger.getParent().triggeredTargets2.length=0;
 					}
 					else{
 						event.finish();
@@ -4162,6 +4177,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.broadcastAll(function(name){
 						lib.skill.jiaozhao2.viewAs=fakecard;
 					},fakecard);
+					var next=game.createEvent('jiaozhao3');
+					event.next.remove(next);
+					event.getParent(3).after.push(next);
+					next.player=player;
+					next.setContent(lib.skill.jiaozhao3.content);
 				},
 				ai:{
 					order:9,
@@ -4179,7 +4199,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-				group:['jiaozhao2','jiaozhao3']
+				group:['jiaozhao2']
 			},
 			jiaozhao2:{
 				enable:'phaseUse',
@@ -4188,7 +4208,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!player.storage.jiaozhao) return false;
 					var name=player.storage.jiaozhao_card.name;
 					if(name=='tao'||name=='shan'||name=='wuzhong'||name=='jiu') return false;
-					return player.getCards('h').contains(player.storage.jiaozhao);
+					return player.getCards('h').contains(player.storage.jiaozhao)&&game.checkMod(player.storage.jiaozhao,player,'unchanged','cardEnabled2',player)!==false;
 				},
 				filterCard:function(card,player){
 					return card==player.storage.jiaozhao;
@@ -6275,7 +6295,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:true,
 				selectCard:-1,
 				filter:function(event,player){
-					if(player.storage.zhanjue>=2) return false;
+					if(player.getStat().skill.zhanjue_draw&&player.getStat().skill.zhanjue_draw>=2) return false;
 					var hs=player.getCards('h');
 					if(!hs.length) return false;
 					for(var i=0;i<hs.length;i++){
@@ -6285,7 +6305,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				viewAs:{name:'juedou'},
-				group:['zhanjue2','zhanjue3','zhanjue4'],
+				group:['zhanjue4'],
 				ai:{
 					damage:true,
 					order:1,
@@ -6329,20 +6349,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.skill=='zhanjue';
 				},
 				content:function(){
-					var num=1;
-					if(player.hasSkill('zhanjue5')) num++;
+					"step 0"
+					var stat=player.getStat().skill;
+					if(!stat.zhanjue_draw) stat.zhanjue_draw=0;
+					stat.zhanjue_draw++;
+					player.draw('nodelay');
 					var list=game.filterPlayer(function(current){
-						var bool=(current==player||current.hasSkill('zhanjue5'));
-						if(bool) current.removeSkill('zhanjue5');
-						return bool;
+						if(current.getHistory('damage',function(evt){
+							return evt.card==trigger.card;
+						}).length>0){
+							if(current==player){
+								stat.zhanjue_draw++;
+							}
+							return true;
+						}
+						return false;
 					});
-					if(typeof player.storage.zhanjue!='number'){
-						player.storage.zhanjue=0;
+					if(list.length){
+						list.sortBySeat();
+						game.asyncDraw(list);
 					}
-					player.storage.zhanjue+=num;
-					game.asyncDraw(list,function(current){
-						return current==player?num:1;
-					});
+					"step 1"
+					game.delay();
 				}
 			},
 			zhanjue5:{},
@@ -6578,8 +6606,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			huomo_count2:{
-				trigger:{player:['useCard']},
+				trigger:{player:['useCard1']},
 				silent:true,
+				firstDo:true,
 				filter:function(event){
 					return get.type(event.card)=='basic';
 				},
@@ -6641,6 +6670,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					backup:function(links,player){
 						return {
+							check:function(card){
+								return 1/Math.max(0.1,get.value(card));
+							},
 							filterCard:function(card){
 								return get.type(card)!='basic'&&get.color(card)=='black';
 							},
@@ -6657,7 +6689,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								game.log(player,'将',card,'置于牌堆顶');
 								event.result.card={name:event.result.card.name,nature:event.result.card.nature};
 								event.result.cards=[];
-								player.lose(card,ui.special);
+								player.lose(card,ui.special,'visible');
 								'step 1'
 								game.delay();
 								'step 2'
@@ -8547,6 +8579,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.gain(result.cards,event.target,'give');
 						if(get.name(result.cards[0])!='shan'){
 							trigger.getParent().targets.push(event.target);
+							trigger.getParent().triggeredTargets2.push(event.target);
 							game.log(event.target,'成为了额外目标');
 						}
 						game.delay();
@@ -8590,6 +8623,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						trigger.getParent().targets.push(event.target);
+						trigger.getParent().triggeredTargets2.push(event.target);
 						game.log(event.target,'成为了额外目标');
 					}
 				},
@@ -10666,23 +10700,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageEnd'},
 				forced:true,
 				audio:2,
+				check:function(event,player){
+				 return player.getHistory('damage',function(evt){
+						return evt!=event
+					}).length==0;
+				},
 				content:function(){
-					if(player.hasSkill('shibei_damaged')){
+					if(player.getHistory('damage',function(evt){
+						return evt!=trigger
+					}).length>0){
 						player.loseHp();
 					}
 					else{
 						player.recover();
 					}
 				},
-				group:'shibei_mark',
 				subSkill:{
-					mark:{
-						trigger:{player:'damageAfter'},
-						silent:true,
-						content:function(){
-							player.addTempSkill('shibei_damaged');
-						}
-					},
 					damaged:{},
 					ai:{}
 				},
@@ -10697,7 +10730,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(target.hasSkill('shibei_ai')) return;
 							if(_status.event.getParent('useCard',true)||_status.event.getParent('_wuxie',true)) return;
 							if(get.tag(card,'damage')){
-								if(target.hasSkill('shibei_damaged')){
+								if(target.getHistory('damage',function(evt){
+									return evt!=trigger
+								}).length>0){
 									return [1,-2];
 								}
 								else{
@@ -11529,6 +11564,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhichi_info:'锁定技，当你于回合外受到伤害后，所有【杀】或普通锦囊牌对你无效直到回合结束。',
 			zhichi2_info:'智迟已发动',
 			pojun_info:'当你使用【杀】造成伤害后，你可以令受到该伤害的角色摸X张牌（X为该角色当前的体力值且最多为5），然后该角色将其武将牌翻面。',
+			shiyong:'恃勇',
+			shiyong_info:'锁定技，当你受到一次红色【杀】或【酒】【杀】造成的伤害后，须减1点体力上限',
 			
 			yijiang_2011:'一将成名2011',
 			yijiang_2012:'一将成名2012',

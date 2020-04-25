@@ -652,26 +652,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return true;
 					},
 					check:function(button){
-						if(button.link.name=='du') return 2;
+						if(button.link.name=='du') return 10;
 						var player=_status.event.player;
-						if(button.link.name=='xingjiegoutong'&&player.countCards('h')>1) return -2;
-						if(get.select(get.info(button.link).selectTarget)[1]==-1){
-							if(get.type(button.link)=='delay') return -1;
-							if(get.type(button.link)=='equip'){
-								var current=player.getCards('e',{subtype:get.subtype(button.link)})[0];
-								if(current&&get.equipValue(current)>=get.equipValue(button.link)) return -1;
-								return 1;
-							}
-							if(get.tag(button.link,'multitarget')) return -1;
-							if(button.link.name=='huoshaolianying') return -1;
-						}
-						if(button.link.name=='jiu'){
-							if(get.effect(player,{name:'jiu'},player)>0){
-								return 1;
-							}
-							return -1;
-						}
-						return 1;
+						if(player.getUseValue(button.link)>0) return get.order(button.link);
+						return -1;
 					},
 					backup:function(links,player){
 						return {
@@ -691,7 +675,21 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				ai:{
-					order:4,
+					order:function(item,player){
+						var event=_status.event;
+						if(event.type!='phase') return 4;
+						if(!player) return -1;
+						var muniu=player.getEquip('muniu');
+						if(!muniu||!muniu.cards) return -1;
+						var order=0;
+						for(var i=0;i<muniu.cards.length;i++){
+							if(player.getUseValue(muniu.cards[i])>0){
+								var order2=get.order(muniu.cards[i]);
+								if(order2>order) order=order2
+							}
+						}
+						return order+0.1;
+					},
 					result:{
 						player:function(player){
 							if(_status.event.dying) return get.attitude(player,_status.event.dying);

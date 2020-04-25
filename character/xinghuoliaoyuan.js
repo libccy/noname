@@ -1177,6 +1177,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						audio:"xinfu_guanchao",
 						forced:true,
+						mod:{
+							aiOrder:function(player,card,num){
+								if(typeof card.number!='number') return;
+								var history=player.getHistory('useCard',function(evt){
+ 								return evt.isPhaseUsing();
+ 							});
+ 							if(history.length==0) return num+10*(14-card.number);
+ 							var num=get.number(history[0].card);
+ 							if(!num) return;
+ 							for(var i=1;i<history.length;i++){
+ 								var num2=get.number(history[i].card);
+ 								if(!num2||num2<=num) return;
+ 								num=num2;
+ 							}
+ 							if(card.number>num) return num+10*(14-card.number);
+							},
+						},
 						filter:function (event,player){
 							var history=player.getHistory('useCard',function(evt){
 								return evt.isPhaseUsing();
@@ -1213,6 +1230,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						audio:"xinfu_guanchao",
 						forced:true,
+						mod:{
+							aiOrder:function(player,card,num){
+								if(typeof card.number!='number') return;
+								var history=player.getHistory('useCard',function(evt){
+ 								return evt.isPhaseUsing();
+ 							});
+ 							if(history.length==0) return num+10*card.number;
+ 							var num=get.number(history[0].card);
+ 							if(!num) return;
+ 							for(var i=1;i<history.length;i++){
+ 								var num2=get.number(history[i].card);
+ 								if(!num2||num2>=num) return;
+ 								num=num2;
+ 							}
+ 							if(card.number<num) return num+10*card.number;
+							},
+						},
 						filter:function (event,player){
 							var history=player.getHistory('useCard',function(evt){
 								return evt.isPhaseUsing();
