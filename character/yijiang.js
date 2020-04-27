@@ -4473,8 +4473,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!player.storage.fulin){
 								player.storage.fulin=[];
 							}
-							for(var i=0;i<trigger.cards.length;i++){
-								player.storage.fulin.add(trigger.cards[i]);
+							if(trigger.cards){
+                                for(var i=0;i<trigger.cards.length;i++){
+                                    player.storage.fulin.add(trigger.cards[i]);
+                                }
 							}
 						}
 					}
