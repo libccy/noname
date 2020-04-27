@@ -4474,9 +4474,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.storage.fulin=[];
 							}
 							if(trigger.cards){
-                                for(var i=0;i<trigger.cards.length;i++){
-                                    player.storage.fulin.add(trigger.cards[i]);
-                                }
+								for(var i=0;i<trigger.cards.length;i++){
+									player.storage.fulin.add(trigger.cards[i]);
+								}
 							}
 						}
 					}
