@@ -302,7 +302,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.storage.enhance_zhu=skill;
 					},game.zhu,skill);
 				}
-                game.addGlobalSkill('woshixiaonei');
 			}
 			game.syncState();
 			event.trigger('gameStart');
@@ -315,6 +314,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					name2:players[i].name2,
 					identity:players[i].identity
 				});
+				if(players[i].identity=='nei'){
+				    players[i].hiddenSkills.add('woshixiaonei');
+				}
 			}
 			_status.videoInited=true;
 			game.addVideo('init',null,info);
@@ -2731,19 +2733,26 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			woshixiaonei:{
+				unique:true,
+				mark:false,
 				limited:true,
-				check:function (){return -1},
+				audio:'guixin',
 				enable:'chooseToUse',
+				init:function(player){
+					player.storage.woshixiaonei=false;
+				},
 				filter:function(event,player){
-					return player.identity=='nei';
+					if(player.storage.woshixiaonei) return false;
+					return true;
 				},
 				skillAnimation:'legend',
 				animationColor:'thunder',
 				filterTarget:function(card,player,target){
-					return target==game.me;
+					return target==player;
 				},
 				content:function(){
 					'step 0'
+					player.storage.woshixiaonei=true;
                     player.chooseControlList(true,function(event,player){
                         return 0;
                     },
@@ -2762,8 +2771,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
                         game.broadcastAll(function(player){
                             player.showIdentity();
                         },player);
-                        game.removeGlobalSkill('woshixiaonei');
+                        event.parent.parent.parent.redo();
                     }
+				},
+				ai:{
+					order:10,
+					result:{
+						player:function(player){
+							return 1;
+						},
+					},
 				},
 			},
 			identity_junshi:{

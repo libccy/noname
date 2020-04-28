@@ -21,19 +21,26 @@ content:function(config, pack){
     lib.translate['woshixiaonei']='我是小内';
     lib.translate['woshixiaonei_info']='村规小内限定技，先选择自己，然后2选1：1）回复一点体力，摸2张牌，增加一点体力上限；2）回复一点体力，摸3张牌';
     lib.skill['woshixiaonei']={
+                              				unique:true,
+                              				mark:false,
                               				limited:true,
-                              				check:function (){return -1},
+                              				audio:'guixin',
                               				enable:'chooseToUse',
+                              				init:function(player){
+                              					player.storage.woshixiaonei=false;
+                              				},
                               				filter:function(event,player){
-                              					return player.identity=='nei';
+                              					if(player.storage.woshixiaonei) return false;
+                              					return true;
                               				},
                               				skillAnimation:'legend',
                               				animationColor:'thunder',
                               				filterTarget:function(card,player,target){
-                              					return target==game.me;
+                              					return target==player;
                               				},
                               				content:function(){
                               					'step 0'
+                              					player.storage.woshixiaonei=true;
                                                   player.chooseControlList(true,function(event,player){
                                                       return 0;
                                                   },
@@ -52,11 +59,18 @@ content:function(config, pack){
                                                       game.broadcastAll(function(player){
                                                           player.showIdentity();
                                                       },player);
-                                                      game.removeGlobalSkill('woshixiaonei');
+                                                      event.parent.parent.parent.redo();
                                                   }
                               				},
-                              			}
-    game.addGlobalSkill('woshixiaonei');
+                              				ai:{
+                              					order:10,
+                              					result:{
+                              						player:function(player){
+                              							return 1;
+                              						},
+                              					},
+                              				},
+                              			};
 
 	switch(lib.config.layout){
         case 'long2':
@@ -325,6 +339,10 @@ content:function(config, pack){
                                      						}
                                      						this.node.count.classList.add('p2');
                                      						skills=skills.concat(info2[3]);
+
+                                                            if(this.identity=='nei'){
+                                                                this.hiddenSkills.add('woshixiaonei');
+                                                            }
 
                                      						// var name=get.translation(character2);
                                      						this.node.name2.innerHTML=get.slimName(character2);
