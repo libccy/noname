@@ -314,7 +314,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					name2:players[i].name2,
 					identity:players[i].identity
 				});
-				if(players[i].identity=='nei'){
+				if(players[i].identity=='nei'&&players.length>4){
 				    players[i].hiddenSkills.add('woshixiaonei');
 				}
 			}

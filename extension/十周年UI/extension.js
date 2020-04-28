@@ -340,7 +340,7 @@ content:function(config, pack){
                                      						this.node.count.classList.add('p2');
                                      						skills=skills.concat(info2[3]);
 
-                                                            if(this.identity=='nei'){
+                                                            if(this.identity=='nei'&&game.players.length>4){
                                                                 this.hiddenSkills.add('woshixiaonei');
                                                             }
 
