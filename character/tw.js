@@ -129,7 +129,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					if(target.isDamaged()&&target.hp<=player.hp){
 						player.chooseBool('是否令'+get.translation(target)+'回复1点体力？').ai=function(){
-							return get.recoverEffect(target,player,player);
+							return get.recoverEffect(target,player,player)&&get.attitude(target,player)>0;
 						};
 					}
 					'step 4'
@@ -139,7 +139,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:8,
 					result:{
 						target:function(player,target){
-							var eff=(target.isDamaged()&&target.hp<=player.hp)?get.recoverEffect(target,player,player):0;
+							var eff=(target.isDamaged()&&get.attitude(target,player)>0)?get.recoverEffect(target,player,player):0;
 							if(eff<=0&&!player.countGainableCards(target,'e')) return -1;
 							return eff;
 						},

@@ -628,6 +628,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.loseMaxHp();
 					player.addSkill('jilue');
 					player.awakenSkill('sbaiyin');
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target,current){
+							if (player.hasSkill('renjie2')&&!player.hasSkill('jilue')&&card.name!='wuzhong'){
+								return 'zeroplayertarget';
+							}
+						},
+						player:function(card,player,target,current){
+							if (player.hasSkill('renjie2')&&!player.hasSkill('jilue')&&card.name!='wuzhong'){
+								return 'zeroplayertarget';
+							}
+						}
+					}
 				}
 			},
 			jilue:{
@@ -1974,6 +1988,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							effect:{
 								target:function(card,player,target,current){
 									if(get.tag(card,'respondSha')&&current<0) return 0.6
+									var type=get.type(card);
+									if (player.getCards('h').length-player.getHandcardLimit()<=0){
+										if(type=='trick'||type=='delay') return 'zeroplayertarget';
+									}
+								},
+								player:function(card,player,target,current){
+									var type=get.type(card);
+									if (player.getCards('h').length-player.getHandcardLimit()<=0){
+										if(type=='trick'||type=='delay') return 'zeroplayertarget';
+									}
 								}
 							},
 							respondSha:true,

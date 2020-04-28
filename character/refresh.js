@@ -3749,6 +3749,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.loseMaxHp();
 					player.addSkill('gongxin');
 					player.awakenSkill('qinxue');
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target,current){
+							if (player.hasSkill('keji')&&!player.hasSkill('gongxin')&&card.name!='wuzhong'){
+								return 'zeroplayertarget';
+							}
+						},
+						player:function(card,player,target,current){
+							if (player.hasSkill('keji')&&!player.hasSkill('gongxin')&&card.name!='wuzhong'){
+								return 'zeroplayertarget';
+							}
+						}
+					}
 				}
 			},
 			qingjian:{
