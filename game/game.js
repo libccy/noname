@@ -15812,6 +15812,9 @@
 							case 'zuidashangxianzuixiaotili':{
 								this.maxHp=Math.max(maxHp1,maxHp2);
 								this.hp=Math.min(hp1,hp2);
+								if(this.maxHp>4){
+								    this.hp+=this.maxHp-4;
+								}
 								break;
 							}
 							default:{

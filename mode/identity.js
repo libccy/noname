@@ -302,6 +302,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.storage.enhance_zhu=skill;
 					},game.zhu,skill);
 				}
+                game.addGlobalSkill('woshixiaonei');
 			}
 			game.syncState();
 			event.trigger('gameStart');
@@ -2083,6 +2084,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			sheshen:'舍身',
 			sheshen_info:'锁定技，主公处于濒死状态即将死亡时，令主公+1体力上限，回复体力至X点（X为你的体力值数），获得你的所有牌，然后你死亡',
 			yexinbilu:'野心毕露',
+			woshixiaonei:'我是小内',
+			woshixiaonei_info:'村规小内限定技，先选择自己，然后2选1：1）回复一点体力，摸2张牌，增加一点体力上限；2）回复一点体力，摸3张牌',
 		},
 		element:{
 			player:{
@@ -2725,6 +2728,42 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							})
 						},
 					},
+				},
+			},
+			woshixiaonei:{
+				limited:true,
+				check:function (){return -1},
+				enable:'chooseToUse',
+				filter:function(event,player){
+					return player.identity=='nei';
+				},
+				skillAnimation:'legend',
+				animationColor:'thunder',
+				filterTarget:function(card,player,target){
+					return target==game.me;
+				},
+				content:function(){
+					'step 0'
+                    player.chooseControlList(true,function(event,player){
+                        return 0;
+                    },
+                    ['回复一点体力，摸2张牌，增加一点体力上限','回复一点体力，摸3张牌']);
+
+					'step 1'
+                    if(result.index==0 || result.index==1){
+                        if(result.index==0){
+                            player.gainMaxHp();
+                            player.draw(2);
+                        }
+                        else if(result.index==1){
+                            player.draw(3);
+                        }
+                        player.recover();
+                        game.broadcastAll(function(player){
+                            player.showIdentity();
+                        },player);
+                        game.removeGlobalSkill('woshixiaonei');
+                    }
 				},
 			},
 			identity_junshi:{

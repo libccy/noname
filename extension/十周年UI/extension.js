@@ -18,6 +18,46 @@ content:function(config, pack){
 
     lib.mode.identity.config.double_hp.item["zuidashangxianzuixiaotili"] = "最大上限最小体力";
 
+    lib.translate['woshixiaonei']='我是小内';
+    lib.translate['woshixiaonei_info']='村规小内限定技，先选择自己，然后2选1：1）回复一点体力，摸2张牌，增加一点体力上限；2）回复一点体力，摸3张牌';
+    lib.skill['woshixiaonei']={
+                              				limited:true,
+                              				check:function (){return -1},
+                              				enable:'chooseToUse',
+                              				filter:function(event,player){
+                              					return player.identity=='nei';
+                              				},
+                              				skillAnimation:'legend',
+                              				animationColor:'thunder',
+                              				filterTarget:function(card,player,target){
+                              					return target==game.me;
+                              				},
+                              				content:function(){
+                              					'step 0'
+                                                  player.chooseControlList(true,function(event,player){
+                                                      return 0;
+                                                  },
+                                                  ['回复一点体力，摸2张牌，增加一点体力上限','回复一点体力，摸3张牌']);
+
+                              					'step 1'
+                                                  if(result.index==0 || result.index==1){
+                                                      if(result.index==0){
+                                                          player.gainMaxHp();
+                                                          player.draw(2);
+                                                      }
+                                                      else if(result.index==1){
+                                                          player.draw(3);
+                                                      }
+                                                      player.recover();
+                                                      game.broadcastAll(function(player){
+                                                          player.showIdentity();
+                                                      },player);
+                                                      game.removeGlobalSkill('woshixiaonei');
+                                                  }
+                              				},
+                              			}
+    game.addGlobalSkill('woshixiaonei');
+
 	switch(lib.config.layout){
         case 'long2':
         case 'nova':
@@ -26,9 +66,7 @@ content:function(config, pack){
             alert('十周年UI提醒您，请更换<手杀>、<新版>布局以获得良好体验（在选项-外观-布局）。');
             break;
     }
-	
-	
-	
+
 	console.time(extensionName);
 	window.decadeUI = {
 		init:function(){
@@ -275,6 +313,9 @@ content:function(config, pack){
                                      							case 'zuidashangxianzuixiaotili':{
                                      								this.maxHp=Math.max(maxHp1,maxHp2);
                                      								this.hp=Math.min(hp1,hp2);
+                                                                    if(this.maxHp>4){
+                                                                        this.hp+=this.maxHp-4;
+                                                                    }
                                      								break;
                                      							}
                                      							default:{
