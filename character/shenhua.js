@@ -465,13 +465,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					player.chooseTarget(get.prompt2('drlt_zhenggu'),function(card,player,target){
+						//if(target.storage.drlt_zhenggu_mark&&target.storage.drlt_zhenggu_mark.contains(player)) return false;
 						return target!=player;
-					}).ai=function(target){
+					}).set('ai',function(target){
 						var player=_status.event.player;
+						//if(target.storage.drlt_zhenggu_mark&&target.storage.drlt_zhenggu_mark.contains(player)) return 0;
 						var num=(Math.min(5,player.countCards('h'))-target.countCards('h'));
 						var att=get.attitude(player,target);
 						return num*att;
-					};
+					});
 					"step 1"
 					if(result.bool){
 						var target=result.targets[0];
@@ -504,7 +506,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.player.storage.drlt_zhenggu_mark&&event.player.storage.drlt_zhenggu_mark.contains(player);
 				},
 				content:function(){
-					trigger.player.storage.drlt_zhenggu_mark.remove(player);
+					while(trigger.player.storage.drlt_zhenggu_mark.contains(player)){
+						trigger.player.storage.drlt_zhenggu_mark.remove(player);
+					}
 					if(trigger.player.storage.drlt_zhenggu_mark.length==0) trigger.player.unmarkSkill('drlt_zhenggu_mark');
 					lib.skill.drlt_zhenggu.sync(player,trigger.player);
 				},
@@ -2195,7 +2199,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('logSkill',['jianchu',trigger.target]).set('att',get.attitude(player,trigger.target)<=0);
 					'step 1'
 					if(result.bool&&result.links&&result.links.length){
-						if(get.type(result.links[0])=='equip'){
+						if(get.type(result.links[0],null,result.links[0].original=='h'?player:false)=='equip'){
 							trigger.getParent().directHit.add(trigger.target);
 						}
 						else if(trigger.cards){
