@@ -16140,13 +16140,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:1,
 					result:{
-						target:0,
-						/*target:function (player,target){
+						target:function (player,target){
 							if(target.hasSkillTag('nofire')) return 0;
 							if(lib.config.mode=='versus') return -1;
 							if(player.hasUnknown()) return 0;
 							return get.damageEffect(target,player);
-						},*/
+						},
 					},
 				},
 			},
