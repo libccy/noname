@@ -25,8 +25,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_yoshino:['male','key',4,['yoshino_jueyi']],
 			key_yui:['female','key',3,['yui_jiang','yui_lieyin','yui_takaramono']],
 			key_tsumugi:['female','key',3,['tsumugi_mugyu','tsumugi_huilang']],
-			key_saya:['female','key',3,['saya_shouji','saya_powei']],
-			key_harukakanata:['female','key',3,['haruka_shuangche']],
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
 			diy_feishi:['male','shu',3,['shuaiyan','moshou']],
@@ -103,7 +101,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy:{
 				diy_tieba:["diy_wenyang","ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_zhangwei"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi"],
 			},
 		},
 		characterIntro:{
@@ -118,8 +116,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
-			key_saya:'#bLittle Busters!',
-			key_harukakanata:'#bLittle Busters!',
 			key_tsumugi:'#bSummer Pockets',
 			key_yui:'#rAngel Beats!',
 			key_yoshino:'#bRewrite',
@@ -172,233 +168,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuji:['zuoci']
 		},
 		skill:{
-			saya_powei:{
-				trigger:{player:'phaseAfter'},
-				direct:true,
-				locked:true,
-				limited:true,
-				unique:true,
-				skillAnimation:true,
-				animationColor:'metal',
-				filter:function(event,player){
-					return event.type!='saya_powei'&&game.hasPlayer(function(current){
-						return current.hp>player.hp;
-					});
-				},
-				content:function(){
-					'step 0'
-					player.chooseTarget(get.prompt2('saya_powei'),function(card,saya,kyousuke){
-						return kyousuke.hp>saya.hp;
-					});
-					'step 1'
-					if(result.bool){
-						var target=result.targets[0];
-						player.logSkill('saya_powei',target);
-						player.awakenSkill('saya_powei');
-						game.delay(3);
-						var next=game.createEvent('saya_powei_loop',false,trigger);
-						next.playertrue=player;
-						next.playerfalse=target;
-						next.setContent(lib.skill.saya_powei.content2);
-					}
-				},
-				content2:function(){
-					'step 0'
-					event.count=0;
-					event.stat=true;
-					event.current=event['player'+event.stat];
-					game.countPlayer2(function(current){
-						if(current!=event.playertrue&&current!=event.playerfalse) current.addSkill('saya_nodis');
-					});
-					event.playertrue.addSkill('saya_judge');
-					'step 1'
-					event.count++;
-					event.current.phase().set('type','saya_powei');
-					'step 2'
-					if(event.count==9||event.playertrue.isDead()||event.playerfalse.isDead()){
-						game.countPlayer2(function(current){
-							current.removeSkill('saya_nodis');
-							current.removeSkill('saya_judge');
-						});
-					}
-					else{
-						event.stat=!event.stat;
-						event.current=event['player'+event.stat];
-						event.goto(1);
-					}
-				}
-			},
-			saya_nodis:{
-				group:'undist',
-				mark:true,
-				intro:{content:'不计入距离和座次的计算'},
-			},
-			saya_judge:{
-				trigger:{player:'phaseBegin'},
-				forced:true,
-				popup:false,
-				filter:function(event,player){
-					return event.type=='saya_powei'&&player==event.getParent().playertrue;
-				},
-				content:function(){
-					'step 0'
-					player.judge(function(card){
-						return get.color(card)=='red'?5:0;
-					});
-					'step 1'
-					if(result.bool){
-						player.line(trigger.getParent().playerfalse);
-						trigger.getParent().playerfalse.damage();
-					}
-				},
-			},
-			saya_shouji:{
-				trigger:{player:'useCardAfter'},
-				filter:function(event,player){
-					return !player.getStat('skill').saya_shouji&&event.cards.filterInD().length>0;
-				},
-				direct:true,
-				content:function(){
-					'step 0'
-					var goon=function(){
-						var num=0;
-						var cards=trigger.cards.filterInD();
-						for(var i=0;i<cards.length;i++){
-							num+=player.getUseValue(cards[i]);
-						}
-						return player.countCards('h',function(card){
-							return (card.name!='sha'||!player.countUsed('sha'))&&player.getUseValue(card)>num;
-						})==0;
-					}();
-					player.chooseTarget(get.prompt2('saya_shouji'),lib.filter.notMe).set('ai',function(target){
-						if(!_status.event.goon) return 0;
-						var player=_status.event.player;
-						var cards=_status.event.getTrigger().cards.filterInD();
-						var att=get.attitude(player,target);
-						var num=0;
-						for(var i=0;i<cards.length;i++){
-							num+=target.getUseValue(cards[i]);
-						}
-						return Math.max(num,0.1)*att;
-					}).set('goon',goon);
-					'step 1'
-					if(result.bool){
-						player.getStat('skill').saya_shouji=1;
-						event.cards=trigger.cards.filterInD();
-						var target=result.targets[0];
-						event.target=target;
-						player.logSkill('saya_shouji',target);
-						target.gain(event.cards,'gain2','log');
-					}
-					else event.finish();
-					'step 2'
-					target.chooseToUse({
-						cards:cards,
-						filterCard:function(card){
-							if(!_status.event.cards.contains(card)) return false;
-							return lib.filter.filterCard.apply(this,arguments);
-						},
-						prompt:'是否使用得到的牌中的一张？',
-					});
-					'step 3'
-					if(result.bool) player.draw();
-				},
-			},
-			haruka_shuangche:{
-				audio:2,
-				enable:'phaseUse',
-				filter:function(event,player){
-					return player.countCards('he')>0&&!player.hasSkill('haruka_kanata');
-				},
-				chooseButton:{
-					dialog:function(event,player){
-					var list=[];
-						for(var i=0;i<lib.inpile.length;i++){
-							var name=lib.inpile[i];
-							if(name=='sha'){
-								list.push(['基本','','sha']);
-								list.push(['基本','','sha','fire']);
-								list.push(['基本','','sha','thunder']);
-							}
-							else if(get.type(name)=='trick') list.push(['锦囊','',name]);
-							else if(get.type(name)=='basic') list.push(['基本','',name]);
-						}
-						return ui.create.dialog('双掣',[list,'vcard']);
-					},
-					filter:function(button,player){
-						return _status.event.getParent().filterCard({name:button.link[2]},player,_status.event.getParent());
-					},
-					check:function(button){
-						var player=_status.event.player;
-						if(player.countCards('h',button.link[2])>0) return 0;
-						if(button.link[2]=='wugu') return 0;
-						var effect=player.getUseValue(button.link[2]);
-						if(effect>0) return effect;
-						return 0;
-					},
-					backup:function(links,player){
-						return {
-							filterCard:true,
-							audio:'haruka_shuangche',
-							selectCard:-1,
-							filterCard:function(){return false},
-							popname:true,
-							check:function(card){
-								return 6-get.value(card);
-							},
-							position:'he',
-							viewAs:{name:links[0][2],nature:links[0][3],isCard:true},
-						}
-					},
-					prompt:function(links,player){
-						return '请选择'+(get.translation(links[0][3])||'')+get.translation(links[0][2])+'的目标';
-					}
-				},
-				ai:{
-					order:4,
-					result:{
-						player:function(player){
-							var cards=player.getCards('he').sort(function(a,b){
-								return get.value(a)-get.value(b);
-							});
-							var num=(player.getStat('skill').haruka_shuangche||0);
-							if(cards.length>num){
-								var val=0;
-								for(var i=0;i<cards.length;i++){
-									val+=get.value(cards[i]);
-								}
-								return 12-val;
-							}
-							return 0;
-						}
-					},
-				},
-				group:'kanata_shuangche',
-			},
-			kanata_shuangche:{
-				trigger:{player:'useCardAfter'},
-				forced:true,
-				filter:function(event,player){
-					return event.skill=='haruka_shuangche_backup';
-				},
-				content:function(){
-					'step 0'
-					var num=player.getStat('skill').haruka_shuangche||1;
-					player.chooseToDiscard('###双掣：请选择一项###选择弃置'+get.cnNumber(num)+'张牌，或失去1点体力且令〖双掣〗失效至回合结束',num,'he').set('ai',function(card){
-						var total=12;
-						for(var i=0;i<ui.selected.cards.length;i++){
-							total-=get.value(ui.selected.cards[i]);
-						}
-						return total-get.value(card);
-					});
-					'step 1'
-					if(!result.bool){
-						player.addTempSkill('haruka_kanata');
-						player.loseHp();
-					}
-				},
-			},
-			haruka_kanata:{},
 			tsumugi_mugyu:{
 				audio:5,
 				trigger:{target:'useCardToTargeted'},
@@ -603,11 +372,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					player.chooseTarget(lib.filter.notMe,get.prompt2('yoshino_jueyi')).set('ai',function(target){
+					player.chooseTarget(lib.filter.notMe,get.prompt2('yoshino_jueyi')).set('ai',function(){
 						var player=_status.event.player;
-						if(get.damageEffect(target,player,player)<0) return 0;
 						var att=get.attitude(player,target);
-						if(att>0) return 0;
+						if(att<0) return 0;
 						if(att==0) return 0.1;
 						var eff=0;
 						var hs=player.getCards('h');
@@ -1406,7 +1174,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			yuri_xingdong:{
-				group:'yuri_xingdong_gain',
 				subSkill:{
 					mark:{
 						mark:true,
@@ -1415,23 +1182,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							content:'跳过下个回合的判定阶段和摸牌阶段',
 						},
 					},
-					gain:{
-						trigger:{player:'phaseUseBegin'},
-						forced:true,
-						content:function(){
-							'step 0'
-							var card=get.cardPile(function(card){
-								return card.name=='sha'||get.type(card)=='trick';
-							});
-							if(card) player.gain(card,'gain2','log');
-							'step 1'
-							game.updateRoundNumber();
-						},
-					},
 				},
 				enable:'phaseUse',
 				usable:1,
-				locked:true,
 				filter:function(event,player){
 					return player.countCards('h',lib.skill.yuri_xingdong.filterCard);
 				},
@@ -6406,8 +6159,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_yoshino:'吉野晴彦',
 			key_yui:'ユイ',
 			key_tsumugi:'紬文德斯',
-			key_saya:'朱鹭户沙耶',
-			key_harukakanata:'三枝二木',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -6417,7 +6168,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_huanjie:'幻界',
 			key_huanjie_info:'锁定技，当你进行判定或摸牌时，你改为从牌堆的另一端获取相应的牌。',
 			yuri_xingdong:'行动',
-			yuri_xingdong_info:'锁定技，出牌阶段开始时，你获得一张【杀】或普通锦囊牌。出牌阶段限一次，你可以将一张【杀】或普通锦囊牌交给一名其他角色，然后该角色选择一项：对除你以外的角色使用此牌并在此牌结算完成后和你各摸一张牌；或跳过下回合的判定阶段和摸牌阶段。',
+			yuri_xingdong_info:'出牌阶段限一次，你可以将一张【杀】或普通锦囊牌交给一名其他角色，然后该角色选择一项：对除你以外的角色使用此牌并在此牌结算完成后和你各摸一张牌；或跳过下回合的判定阶段和摸牌阶段。',
 			yuri_wangxi:'忘隙',
 			yuri_wangxi_info:'主公技，限定技，当有角色因你发动的【行动】而死亡后，若其身份不为【明忠】，则其可以将身份改为忠臣并重新加入游戏，然后将势力改为与你相同，将体力值回复至2点并摸一张牌。',
 			haruko_haofang:'豪放',
@@ -6479,17 +6230,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tsumugi_huilang2:'回廊',
 			tsumugi_huilang_info:'回合结束时，不可以将任意张牌扣置于武将牌下（均称为「隐」）。回合开始时，你获得所有「隐」，然后可令等量的角色各摸一张牌。',
 			//〖回廊〗涉及的所有卡牌移动的结算不会触发〖良姻〗
-			haruka_shuangche:'双掣',
-			kanata_shuangche:'双掣',
-			haruka_shuangche_backup:'双掣',
-			haruka_shuangche_info:'出牌阶段，你可以将一张牌当做任意基本牌或锦囊牌使用。此牌结算完成后，你选择一项：1.弃置X张牌。2.失去1点体力且本回合内不能再发动〖双掣〗。',
-			saya_shouji:'授计',
-			saya_shouji_info:'每回合限一次，当你使用的牌结算完成后，你可以将此牌对应的所有实体牌交给一名其他角色。其可以使用这些牌中的一张，若如此做，你摸一张牌。',
-			saya_powei:'破围',
-			saya_powei_info:'限定技，回合结束后，你可以选择一名体力值大于你的其他角色。你与其交替进行额外回合，直到你与其中的一名角色死亡或进行到九个回合。你于回合开始时进行判定，若结果为红色，则你对其造成1点伤害。此过程中其他角色不计入距离和座次计算。',
-			saya_judge:'破围',
-			saya_nodis:'破围',
-			//〖破围〗不会因为〖铁骑〗无效
 			
 			ns_zhangwei:'张葳',
 			nsqiyue:'骑钺',

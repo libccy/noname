@@ -2004,7 +2004,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.loseHp();
-					switch(get.type(cards[0],'trick',cards[0].original=='h'?player:false)){
+					switch(get.type(cards[0],'trick')){
 						case 'basic':player.addTempSkill('xinzhanyi_basic');break;
 						case 'equip':player.addTempSkill('xinzhanyi_equip');break;
 						case 'trick':player.addTempSkill('xinzhanyi_trick');player.draw(3);break;

@@ -370,7 +370,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.chooseToCompare(target);
 					"step 1"
-					if(result.player&&get.name(result.player.name,player)=='sha') player.addTempSkill('rexianzhen4');
+					if(result.player&&(result.player.name=='sha'||player.hasSkill('rejinjiu')&&result.player.name=='jiu')) player.addTempSkill('rexianzhen4');
 					if(result.bool){
 						player.storage[event.name]=target;
 						player.addTempSkill(event.name+2);
@@ -2634,7 +2634,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var cards=result.cards;
 						var type=[];
 						for(var i=0;i<cards.length;i++){
-							type.add(get.type(cards[i],'trick',cards[i].original=='h'?player:false));
+							if(!type.contains(get.type(cards[i],'trick'))) type.push(get.type(cards[i],'trick'));
 						}
 						player.storage.new_qingjian++;
 						player.logSkill('new_qingjian',target);
@@ -2975,7 +2975,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.judge>0){
 						event.cards.push(result.card);
-						player.chooseBool('是否再次发动【洛神】？').set('frequentSkill','reluoshen');
+						if(lib.config.autoskilllist.contains('reluoshen')){
+							player.chooseBool('是否再次发动【洛神】？');
+						}
+						else{
+							event._result={bool:true};
+						}
 					}
 					else{
 						for(var i=0;i<event.cards.length;i++){
@@ -2983,10 +2988,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								event.cards.splice(i,1);i--;
 							}
 						}
-						if(event.cards.length){
-							player.gain(event.cards,'gain2');
-							player.storage.reluoshen.addArray(event.cards);
-						}
+						player.gain(event.cards,'gain2');
+						player.storage.reluoshen.addArray(event.cards);
 						event.finish();
 					}
 					"step 2"

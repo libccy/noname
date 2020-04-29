@@ -861,10 +861,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wushen:{
 				mod:{
 					cardname:function(card,player,name){
-						if(get.suit(card)=='heart') return 'sha';
+						if(get.position(card)=='h'&&get.suit(card)=='heart') return 'sha';
 					},
 					cardnature:function(card,player){
-						if(get.suit(card)=='heart') return false;
+						if(get.position(card)=='h'&&get.suit(card)=='heart') return false;
 					},
 					targetInRange:function(card){
 						if(get.suit(card)=='heart') return true;

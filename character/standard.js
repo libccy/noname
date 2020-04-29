@@ -500,7 +500,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.judge>0){
 						event.cards.push(result.card);
-						player.chooseBool('是否再次发动【洛神】？').set('frequentSkill','luoshen');
+						if(lib.config.autoskilllist.contains('luoshen')){
+							player.chooseBool('是否再次发动【洛神】？');
+						}
+						else{
+							event._result={bool:true};
+						}
 					}
 					else{
 						for(var i=0;i<event.cards.length;i++){

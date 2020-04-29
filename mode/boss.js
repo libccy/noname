@@ -2637,10 +2637,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
  			player:['damageBegin4','phaseZhunbeiBegin'],
  			},
  			filter:function(event,player,name){
- 				if(name=='damageBegin4'){return event.num&&event.num>1;}
- 				return game.hasPlayer(function(target){
-    		return player!=target&&get.distance(player,target)<=1;
-   		});
+ 			if(name=='damageBegin4'){return event.num&&event.num>1;}
+ 			return true;
  			},
  			content:function(){
   			var name=event.triggername;
@@ -2649,7 +2647,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
   			}
   			else{
    			game.countPlayer(function(target){
-    			if(player!=target&&get.distance(player,target)<=1){
+    			if(player!=target&&get.distance(target,player)<=1){
     		 	target.damage(1,player,'fire');
     			}
    			});
@@ -9328,7 +9326,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			//地藏王:
 			"boss_dizangwang":"地藏王",
 			"boss_bufo":"不佛",
-			"boss_bufo_info":"锁定技，你的回合开始时，你对所有距离为1的其他角色造成1点火焰伤害；你受到大于等于2的伤害时，令此伤害-1。",
+			"boss_bufo_info":"锁定技，你的回合开始时，你对所有至你距离为1的其他角色造成1点火焰伤害；你受到大于等于2的伤害时，令此伤害-1。",
 			"boss_wuliang":"无量",
 			"boss_wuliang_info":"锁定技，你登场时额外摸3张牌；结束阶段开始时，你摸两张牌；你的回合开始时，若你当前体力小于3，则回复至3。",
 			"boss_dayuan":"大愿",
