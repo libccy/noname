@@ -11203,7 +11203,7 @@
 					});
 					player.phaseDiscard()
 					if(!player.noPhaseDelay) game.delayx();
-					delete player.using;
+					//delete player.using;
 					delete player._noSkill;
 					"step 5"
 					player.phaseJieshu();
@@ -11310,7 +11310,7 @@
 							delete ui.tempnowuxie;
 						}
 					});
-					delete player.using;
+					//delete player.using;
 				},
 				phaseDiscard:function(){
 					"step 0"
@@ -13483,7 +13483,7 @@
 						}
 					}
 					if(directDiscard.length) game.cardsGotoOrdering(directDiscard);
-					player.using=cards;
+					//player.using=cards;
 					var cardaudio=true;
 					if(event.skill){
 						if(lib.skill[event.skill].audio){
@@ -13888,7 +13888,7 @@
 					if(event._result){
 						event.result=event._result;
 					}
-					delete player.using;
+					//delete player.using;
 					if(document.getElementsByClassName('thrown').length){
 						if(event.delayx!==false) game.delayx();
 					}
@@ -24183,6 +24183,7 @@
 				var outrange=info.outrange;
 				if(range==undefined&&outrange==undefined) return true;
 				
+				if(player.hasSkill('undist')||target.hasSkill('undist')) return false;
 				for(var i in range){
 					if(i=='attack'){
 						if(player.inRange(target)) return true;
@@ -32195,6 +32196,7 @@
 						if(card.ai.basic.equipValue==undefined) card.ai.basic.equipValue=1;
 					}
 					if(card.ai.basic.value==undefined) card.ai.basic.value=function(card,player,index,method){
+						if(player.isDisabled(get.subtype(card))) return 0.1;
 						var value=0;
 						var info=get.info(card);
 						var current=player.getEquip(info.subtype);
@@ -45527,8 +45529,8 @@
 					event.result.skill=event.skill;
 					event.result.card=get.copy(get.info(event.skill).viewAs);
 					if(event.result.cards.length==1&&event.result.card){
-						event.result.card.suit=event.result.cards[0].suit;
-						event.result.card.number=event.result.cards[0].number;
+						event.result.card.suit=get.suit(event.result.cards[0]);
+						event.result.card.number=get.number(event.result.cards[0]);
 					}
 					if(event.skillDialog&&get.objtype(event.skillDialog)=='div'){
 						event.skillDialog.close();
@@ -48272,16 +48274,16 @@
 			if(Object.prototype.toString.call(obj) === '[object HTMLTableCellElement]') return 'td';
 			if(Object.prototype.toString.call(obj) === '[object HTMLBodyElement]') return 'td';
 		},
-		type:function(obj,method){
+		type:function(obj,method,player){
 			if(typeof obj=='string') obj={name:obj};
 			if(typeof obj!='object') return;
-			var name=get.name(obj);
+			var name=get.name(obj,player);
 			if(!lib.card[name]) return;
 			if(method=='trick'&&lib.card[name].type=='delay') return 'trick';
 			return lib.card[name].type;
 		},
-		type2:function(card){
-			return get.type(card,'trick');
+		type2:function(card,player){
+			return get.type(card,'trick',player);
 		},
 		subtype:function(obj){
 			if(typeof obj=='string') obj={name:obj};
@@ -48290,22 +48292,22 @@
 			return lib.card[obj.name].subtype;
 		},
 		equiptype:function(card){
-			var subtype=get.subtype(card);
+			var subtype=get.subtype(card,player);
 			if(subtype.indexOf('equip')==0) return parseInt(subtype[5]);
 			return 0;
 		},
-		name:function(card,mod){
-			if(mod!==false&&!['e','j'].contains(get.position(card))){
-				var owner=get.owner(card);
+		name:function(card,player){
+			if(get.itemtype(player)=='player'||(player!==false&&get.position(card)=='h')){
+				var owner=player||get.owner(card);
 				if(owner){
 					return game.checkMod(card,owner,card.name,'cardname',owner);
 				}
 			}
 			return card.name;
 		},
-		suit:function(card){
+		suit:function(card,player){
 			if(get.itemtype(card)=='cards'){
-				if(card.length==1) return get.suit(card[0]);
+				if(card.length==1) return get.suit(card[0],player);
 				return 'none';
 				//var suit=get.suit(card[0])
 				//for(var i=1;i<card.length;i++){
@@ -48314,38 +48316,39 @@
 				//return suit;
 			}
 			else if(get.itemtype(card.cards)=='cards'&&!lib.suit.contains(card.suit)){
-				return get.suit(card.cards);
+				return get.suit(card.cards,player);
 			}
 			else{
-				var owner=get.owner(card);
+				var owner=player||get.owner(card);
 				if(owner){
 					return game.checkMod(card,card.suit,'suit',owner);
 				}
 				return card.suit;
 			}
 		},
-		color:function(card){
+		color:function(card,player){
 			if(get.itemtype(card)=='cards'){
-				var color=get.color(card[0])
+				var color=get.color(card[0],player)
 				for(var i=1;i<card.length;i++){
-					if(get.color(card[i])!=color) return 'none';
+					if(get.color(card[i],player)!=color) return 'none';
 				}
 				return color;
 			}
-			else if(get.itemtype(card.cards)=='cards'&&card.name!='muniu'){
-				return get.color(card.cards);
+			else if(get.itemtype(card.cards)=='cards'&&!lib.suit.contains(card.suit)){
+				return get.color(card.cards,player);
 			}
 			else{
-				if(get.suit(card)=='spade'||get.suit(card)=='club') return 'black';
-				if(get.suit(card)=='heart'||get.suit(card)=='diamond') return 'red';
+				if(get.suit(card,player)=='spade'||get.suit(card,player)=='club') return 'black';
+				if(get.suit(card,player)=='heart'||get.suit(card,player)=='diamond') return 'red';
 				return 'none';
 			}
 		},
-		number:function(card){
+		number:function(card,player){
+			//啥时候狗卡出相关技能我再完善
 			return card.number;
 		},
-		nature:function(card,mod){
-			if(mod!==false&&!['e','j'].contains(get.position(card))){
+		nature:function(card,player){
+			if(get.itemtype(player)=='player'||player!==false){
 				var owner=get.owner(card);
 				if(owner){
 					return game.checkMod(card,owner,card.nature,'cardnature',owner);
@@ -48489,13 +48492,13 @@
 			if(method=='attack') return m;
 			return n;
 		},
-		info:function(item,mod){
+		info:function(item,player){
 			if(typeof item=='string'){
 				return lib.skill[item];
 			}
 			if(typeof item=='object'){
 				var name=item.name;
-				if(mod!==false) name=get.name(item);
+				if(player!==false) name=get.name(item,player);
 				return lib.card[name];
 			}
 		},
@@ -48932,9 +48935,9 @@
 				if(game.players[i].getCards('hej').contains(card)) return game.players[i];
 				if(game.players[i].judging[0]==card&&method!='judge') return game.players[i];
 			}
-			for(var i=0;i<game.players.length;i++){
-				if(game.players[i].using&&game.players[i].using.contains(card)) return game.players[i];
-			}
+			//for(var i=0;i<game.players.length;i++){
+			//	if(game.players[i].using&&game.players[i].using.contains(card)) return game.players[i];
+			//}
 		},
 		noSelected:function(){
 			return (ui.selected.buttons.length+ui.selected.cards.length+ui.selected.targets.length==0)
