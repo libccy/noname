@@ -631,18 +631,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					effect:{
-						target:function(card,player,target,current){
-							if (player.hasSkill('renjie2')&&!player.hasSkill('jilue')&&card.name!='wuzhong'){
-								return 'zeroplayertarget';
-							}
-						},
 						player:function(card,player,target,current){
 							if (player.hasSkill('renjie2')&&!player.hasSkill('jilue')&&card.name!='wuzhong'){
 								return 'zeroplayertarget';
 							}
 						}
 					}
-				}
+				},
 			},
 			jilue:{
 				unique:true,
@@ -1987,20 +1982,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai:{
 							effect:{
 								target:function(card,player,target,current){
-									if(get.tag(card,'respondSha')&&current<0) return 0.6
-									var type=get.type(card);
-									if (player.getCards('h').length-player.getHandcardLimit()<=0){
-										if(type=='trick'||type=='delay') return 'zeroplayertarget';
-									}
+									if(get.tag(card,'respondSha')&&current<0) return 0.6;
 								},
 								player:function(card,player,target,current){
 									var type=get.type(card);
 									if (player.getCards('h').length-player.getHandcardLimit()<=0){
 										if(type=='trick'||type=='delay') return 'zeroplayertarget';
 									}
-								}
+								},
 							},
 							respondSha:true,
+							order:0,
+							useful:-1,
+							value:-1
 						},
 					},
 					'2':{
@@ -2023,6 +2017,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							},
 							respondSha:true,
+							order:0,
+							useful:-1,
+							value:-1
 						},
 					},
 				},
@@ -2070,6 +2067,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.chooseTarget(true,'请选择【结营】的目标',function(card,player,target){
 								return target!=player&&!target.isLinked();
 							}).ai=function(target){
+								if(get.attitude(player,target)<0) return 2;
 								return 1+Math.random();
 							};
 							"step 1"

@@ -290,8 +290,29 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								var t=target.hasSkillTag('nothunder');
 								if(f&&t) return 0;
 								if(f||t) return 0.5;
+								//SP刘协:皇恩
+								if (game.players.length>2){
+									var list=target.getEnemies();
+									var has_sphuangen_enemy=false;
+									for (var i=0;i<list.length;i++){
+										if (list[i].hasSkill('sphuangen')&&list[i].hp>1) has_sphuangen_enemy=true; break;
+									}
+									if (has_sphuangen_enemy) return 0;
+								}
+								//--------------------------
 								return 2;
 							}
+							//SP刘协:皇恩
+							if (game.players.length>2){
+								if (target.hasSkill('sphuangen')&&target.hp>0) return 0;
+								var list=target.getFriends(true);
+								var has_sphuangen_friend=false;
+								for (var i=0;i<list.length;i++){
+									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) has_sphuangen_friend=true; break;
+								}
+								if (has_sphuangen_friend) return 0;
+							}
+							//--------------------------
 							if(get.attitude(player,target)>=0) return -0.9;
 							if(ui.selected.targets.length) return -0.9;
 							if(game.hasPlayer(function(current){

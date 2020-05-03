@@ -678,6 +678,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(player.hasUnknown(2)){
 								return 0;
 							}
+							//SP刘协:皇恩
+							if (game.players.length>2){
+								var list=target.getEnemies();
+								var has_sphuangen_enemy=false;
+								for (var i=0;i<list.length;i++){
+									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) has_sphuangen_enemy=true; break;
+								}
+								if (has_sphuangen_enemy) return 0;
+							}
+							//--------------------------
 							return 2-2*get.distance(player,target,'absolute')/game.countPlayer();
 						}
 					},
@@ -715,6 +725,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target){
+							//SP刘协:皇恩
+							if (game.players.length>2){
+								var list=target.getEnemies();
+								var has_sphuangen_enemy=false;
+								for (var i=0;i<list.length;i++){
+									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) has_sphuangen_enemy=true; break;
+								}
+								if (has_sphuangen_enemy) return 0;
+							}
+							//--------------------------
 							return (target.hp<target.maxHp)?2:0;
 						}
 					},
@@ -768,6 +788,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							if(player.hasUnknown(2)&&get.mode()!='guozhan') return 0;
+							//SP刘协:皇恩
+							if (game.players.length>2){
+								if (target.hasSkill('sphuangen')&&target.hp>0) return 0;
+								var list=target.getFriends(true);
+								var has_sphuangen_friend=false;
+								for (var i=0;i<list.length;i++){
+									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) has_sphuangen_friend=true; break;
+								}
+								if (has_sphuangen_friend) return 0;
+							}
+							//--------------------------
 							var nh=target.countCards('h');
 							if(get.mode()=='identity'){
 								if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
@@ -833,6 +864,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							if(player.hasUnknown(2)&&get.mode()!='guozhan') return 0;
+							//SP刘协:皇恩
+							if (game.players.length>2){
+								if (target.hasSkill('sphuangen')&&target.hp>0) return 0;
+								var list=target.getFriends(true);
+								var has_sphuangen_friend=false;
+								for (var i=0;i<list.length;i++){
+									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) has_sphuangen_friend=true; break;
+								}
+								if (has_sphuangen_friend) return 0;
+							}
+							//--------------------------
 							var nh=target.countCards('h');
 							if(get.mode()=='identity'){
 								if(target.isZhu&&nh<=2&&target.hp<=1) return -100;

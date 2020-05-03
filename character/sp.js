@@ -1267,7 +1267,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			sphuangen:{
-			trigger:{global:'useCardToPlayered'},
+				trigger:{global:'useCardToPlayered'},
 				filter:function(event,player){
 					if(!event.isFirstTarget) return false;
 					if(get.type(event.card)!='trick') return false;
@@ -1290,7 +1290,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.excluded.addArray(result.targets);
 						player.draw();
 					}
-				},
+				},ai:{
+					threaten:1.5
+				}
 			},
 			spyicong:{
 				trigger:{player:'phaseDiscardEnd'},
