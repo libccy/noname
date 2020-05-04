@@ -1528,11 +1528,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.loseMaxHp();
 				},
 				ai:{
-					filterDamage:true,
-					skillTagFilter:function(player,tag,arg){
-						if(arg&&arg.card&&arg.card.name=='sha') return true;
-						return false;
-					},
+					effect:{
+						target:function(card,player,target,current){
+							if(card.name=='sha'&&target.isDamaged()) return 'zeroplayertarget';
+						}
+					}
 				},
 			},
 			wuyuan:{

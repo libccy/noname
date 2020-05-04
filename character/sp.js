@@ -1290,7 +1290,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.excluded.addArray(result.targets);
 						player.draw();
 					}
-				},ai:{
+				},
+				ai:{
 					threaten:1.5
 				}
 			},
@@ -1578,6 +1579,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					trigger.cancel();
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target,current){
+							if(card.name=='nanman') return 'zeroplayertarget';
+						}
+					}
 				},
 			},
 			mansi:{

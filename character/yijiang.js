@@ -1781,7 +1781,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(get.attitude(player,event.player)>=0) return true;
 					if(player.hasSkill('funan_jiexun')) return true;
 					if(event.cards.length>1) return true;
-					return get.value(event.cards[0])>get.value(event.respondTo[1]);
+					return event.cards.length>0&&event.respondTo.length>1&&get.value(event.cards[0])>get.value(event.respondTo[1]);
 				},
 				content:function(){
 					'step 0'

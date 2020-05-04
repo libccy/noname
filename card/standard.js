@@ -681,11 +681,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							//SP刘协:皇恩
 							if (game.players.length>2){
 								var list=target.getEnemies();
-								var has_sphuangen_enemy=false;
 								for (var i=0;i<list.length;i++){
-									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) has_sphuangen_enemy=true; break;
+									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) return 0;
 								}
-								if (has_sphuangen_enemy) return 0;
 							}
 							//--------------------------
 							return 2-2*get.distance(player,target,'absolute')/game.countPlayer();
@@ -728,11 +726,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							//SP刘协:皇恩
 							if (game.players.length>2){
 								var list=target.getEnemies();
-								var has_sphuangen_enemy=false;
 								for (var i=0;i<list.length;i++){
-									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) has_sphuangen_enemy=true; break;
+									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) return 0;
 								}
-								if (has_sphuangen_enemy) return 0;
 							}
 							//--------------------------
 							return (target.hp<target.maxHp)?2:0;
@@ -792,11 +788,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if (game.players.length>2){
 								if (target.hasSkill('sphuangen')&&target.hp>0) return 0;
 								var list=target.getFriends(true);
-								var has_sphuangen_friend=false;
 								for (var i=0;i<list.length;i++){
-									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) has_sphuangen_friend=true; break;
+									//花鬘:蛮嗣
+									if (list[i].hasSkill('mansi')) return 0;;
+									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) return 0;
 								}
-								if (has_sphuangen_friend) return 0;
 							}
 							//--------------------------
 							var nh=target.countCards('h');
@@ -868,11 +864,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if (game.players.length>2){
 								if (target.hasSkill('sphuangen')&&target.hp>0) return 0;
 								var list=target.getFriends(true);
-								var has_sphuangen_friend=false;
 								for (var i=0;i<list.length;i++){
-									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) has_sphuangen_friend=true; break;
+									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) return 0;
 								}
-								if (has_sphuangen_friend) return 0;
 							}
 							//--------------------------
 							var nh=target.countCards('h');

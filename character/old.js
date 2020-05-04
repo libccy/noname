@@ -367,6 +367,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if((card.name=='juedou'||card.name=='sha'||card.name=='huogong')&&player!=target&&player.countCards('h')>=target.countCards('h')&&target.isEmpty(2)) return false;
 					},
 				},
+				ai:{
+					effect:{
+						player:function(card,player,target,current){
+							if(player.isEmpty(2)&&get.type(card)=='equip'&&get.subtype(card)=='equip2') return 'zeroplayertarget';
+						}
+					}
+				},
 			},
 			"old_jijun":{
 				marktext:"方",
