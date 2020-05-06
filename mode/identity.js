@@ -2505,7 +2505,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					case 'zhu':
 						switch(identity2){
 							case 'zhu': return 10;
-							case 'zhong':case 'mingzhong': return 6;
+							case 'zhong':
+								if (get.population('zhong')==0&&get.population('fan')==1) return -0.5;
+								return 6;
+							case 'mingzhong': return 6;
 							case 'nei':
 								if(game.players.length==2) return -10;
 								if(to.identity=='zhong') return 0;

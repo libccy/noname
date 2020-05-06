@@ -20533,11 +20533,9 @@
 							}
 						}
 						else{
-						var zhong_num=get.population('zhong');
  						switch(player.identity){
  							case 'zhu':case 'zhong':case 'mingzhong':targets=game.filterPlayer(function(target){
  								if(func&&!func(target)) return false;
-								if (player.identity=='zhu'&&zhong_num==0) return false;
  								return ['zhu','zhong','mingzhong'].contains(target.identity);
  							});break;
  							case 'nei':targets=[];break;
