@@ -710,6 +710,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					})>0;
 				},
 				content:function(){
+					if(player!=game.me&&!player.isUnderControl()&&!player.isOnline()) game.delayx();
 					player.chooseToDiscard(true,'he',function(card){
 						return card!=_status.event.card;
 					}).set('card',player.getEquip('wufengjian'));

@@ -11629,7 +11629,9 @@
 					if(event.autochoose()){
 						event.result={
 							bool:true,
-							cards:player.getCards(event.position)
+							autochoose:true,
+							cards:player.getCards(event.position),
+							rawcards:player.getCards(event.position),
 						}
 						for(var i=0;i<event.result.cards.length;i++){
 							if(!lib.filter.cardDiscardable(event.result.cards[i],player,event)){
@@ -14948,28 +14950,7 @@
 						game.log(player,'阵亡')
 					}
 					
-					if(!game.reserveDead){
-						for(var mark in player.marks){
-							player.unmarkSkill(mark);
-						}
-						while(player.node.marks.childNodes.length>1){
-							player.node.marks.lastChild.remove();
-						}
-						game.broadcast(function(player){
-							while(player.node.marks.childNodes.length>1){
-								player.node.marks.lastChild.remove();
-							}
-						},player);
-					}
-					for(var i in player.tempSkills){
-						player.removeSkill(i);
-					}
-					var skills=player.getSkills();
-					for(var i=0;i<skills.length;i++){
-						if(lib.skill[skills[i]].temp){
-							player.removeSkill(skills[i]);
-						}
-					}
+					
 					// player.removeEquipTrigger();
 					
 					// for(var i in lib.skill.globalmap){
@@ -15022,6 +15003,33 @@
 					event.trigger('die');
 					"step 3"
 					if(player.isDead()){
+						if(!game.reserveDead){
+ 						for(var mark in player.marks){
+ 							player.unmarkSkill(mark);
+ 						}
+ 						while(player.node.marks.childNodes.length>1){
+ 							player.node.marks.lastChild.remove();
+ 						}
+ 						game.broadcast(function(player){
+ 							while(player.node.marks.childNodes.length>1){
+ 								player.node.marks.lastChild.remove();
+ 							}
+ 						},player);
+ 					}
+ 					for(var i in player.tempSkills){
+ 						player.removeSkill(i);
+ 					}
+ 					var skills=player.getSkills();
+ 					for(var i=0;i<skills.length;i++){
+ 						if(lib.skill[skills[i]].temp){
+ 							player.removeSkill(skills[i]);
+ 						}
+ 					}
+ 					if(_status.characterlist){
+ 						if(lib.character[player.name]) _status.characterlist.add(player.name);
+ 						if(lib.character[player.name1]) _status.characterlist.add(player.name1);
+ 						if(lib.character[player.name2]) _status.characterlist.add(player.name2);
+ 					}
 						event.cards=player.getCards('hej');
 						if(event.cards.length){
 							player.lose(event.cards,'visible').forceDie=true;
@@ -15660,7 +15668,7 @@
 				},
 				isDisabled:function(arg){
 					if(typeof arg=='number') arg='equip'+arg;
-					if(arg=='equip6'&&this.storage.disableEquip&&(this.storage.disableEquip.contains('equip3')||this.storage.disableEquip.contains('equip3'))) return true;
+					if(arg=='equip6'&&this.storage.disableEquip&&(this.storage.disableEquip.contains('equip3')||this.storage.disableEquip.contains('equip4'))) return true;
 					if(this.storage.disableEquip&&this.storage.disableEquip.contains(arg)) return true;
 					return false;
 				},
@@ -19379,6 +19387,32 @@
 						delete this.node.timer;
 					}
 				},
+				markAuto:function(name,info){
+					if(Array.isArray(info)){
+						if(!Array.isArray(this.storage[name])) this.storage[name]=[];
+						this.storage[name].addArray(info);
+						this.markSkill(name);
+					}
+					else{
+ 					var storage=this.storage[name];
+ 					if(Array.isArray(storage)){
+ 						this[storage.length>0?'markSkill':'unmarkSkill'](name);
+ 					}
+ 					else if(typeof storage=='number'){
+ 						this[storage.length>0?'markSkill':'unmarkSkill'](name);
+ 					}
+					}
+				},
+				unmarkAuto:function(name,info){
+ 				var storage=this.storage[name]
+					if(Array.isArray(info)&&Array.isArray(storage)){
+						storage.removeArray(info.slice(0));
+						this.markAuto(name);
+					}
+				},
+				getStorage:function(name){
+					return this.storage[name]||[];
+				},
 				markSkill:function(name,info,card){
 					if(info===true){
 						this.syncStorage(name);
@@ -21015,7 +21049,7 @@
 					}
 					var range=get.subtype(name);
 					if(this.isDisabled(range)) return false;
-					if(['equip3','equip4'].contains(range)&&(!this.isDisabled(6)||this.getEquip(6))) return false;
+					if(['equip3','equip4'].contains(range)&&this.getEquip(6)) return false;
 					if(!replace&&!this.isEmpty(range)) return false;
 					return true;
 				},
@@ -48115,6 +48149,7 @@
 			return num.toString();
 		},
 		rawName:function(str){
+			if(lib.translate[str+'_ab']) return lib.translate[str+'_ab'];
 			var str2=lib.translate[str];
 			if(!str2) return '';
 			if(str2.indexOf('SP')==0){
@@ -48147,6 +48182,7 @@
 			return str2;
 		},
 		rawName2:function(str){
+			if(lib.translate[str+'_ab']) return lib.translate[str+'_ab'];
 			var str2=lib.translate[str];
 			if(!str2) return '';
 			if(str2.indexOf('SP')==0){
@@ -48171,6 +48207,7 @@
 		},
 		slimName:function(str){
 			var str2=lib.translate[str];
+			if(lib.translate[str+'_ab']) str2=lib.translate[str+'_ab'];
 			if(!str2) return '';
 			if(str2.indexOf('SP')==0){
 				str2=str2.slice(2);

@@ -71,7 +71,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.cardp=result.cards;
 					}
 					'step 2'
-					player.give(event.cardp,target);
+					player.$giveAuto(event.cardp,target);
+					target.gain(event.cardp,player);
 					target.give(event.cardt,player);
 					'step 3'
 					var nump=event.cardp[0].number;
@@ -84,6 +85,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					threaten:1.5,
 					order:8,
 					result:{
 						player:function (player,target){
@@ -243,7 +245,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					expose:0.4,
-					threaten:3,
 				},
 			},
 			"jixu_sha":{
@@ -361,9 +362,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 3"
 					event.current=event.current.next;
 					if(event.current!=player) event.goto(1);
-				},
-				ai:{
-					threaten:1.4,
 				},
 			},
 			"xinfu_denglou":{
@@ -700,6 +698,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					"maixie_defend":true,
+					threaten:0.7,
 					effect:{
 						target:function (card,player,target){
 							if(player.hasSkillTag('jueqing',false,target)) return [1,-1];
@@ -903,6 +902,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					trigger.player.phaseUse();
 				},
+				ai:{
+					expose:0.5,
+				},
 			},
 			"xinfu_gongqing":{
 				audio:true,
@@ -937,13 +939,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						sub:true,
 						mod:{
 							ignoredHandcard:function (card,player){
-					if(get.suit(card)=='heart'){
-						return true;
-					}
-				},
+   					if(get.suit(card)=='heart'){
+   						return true;
+   					}
+   				},
 							cardDiscardable:function (card,player,name){
-					if(name=='phaseDiscard'&&get.suit(card)=='heart') return false;
-				},
+   					if(name=='phaseDiscard'&&get.suit(card)=='heart') return false;
+   				},
 						},
 					},
 				},
@@ -1160,7 +1162,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					expose:0.2,
+					expose:0.3,
 					threaten:1.4,
 				},
 			},
@@ -1341,6 +1343,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('xinfu_xunxian',result.targets[0]);
 						result.targets[0].gain(list,'gain2');
 					}
+				},
+				ai:{
+					expose:0.3,
 				},
 			},
 			"xinfu_kannan":{

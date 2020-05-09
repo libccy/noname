@@ -19,8 +19,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guohuai:['male','wei',4,['xinjingce']],
 			zhangchunhua:['female','wei',3,['jueqing','shangshi']],
 			caozhi:['male','wei',3,['luoying','jiushi']],
-			caochong:['male','wei',3,['renxin','chengxiang']],
-			xunyou:['male','wei',3,['zhiyu','qice']],
+			caochong:['male','wei',3,['chengxiang','renxin']],
+			xunyou:['male','wei',3,['qice','zhiyu']],
 			xin_xushu:['male','shu',3,['xinwuyan','xinjujian']],
 			xin_masu:['male','shu',3,['sanyao','zhiman']],
 			xin_fazheng:['male','shu',3,['xinenyuan','xinxuanhuo'],['die_audio']],
@@ -28,13 +28,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xusheng:['male','wu',4,['xinpojun']],
 			wuguotai:['female','wu',3,['ganlu','buyi']],
 			lingtong:['male','wu',4,['xuanfeng']],
-			liubiao:['male','qun',3,['zongshi','zishou']],
+			liubiao:['male','qun',3,['zishou','zongshi']],
 			wangyi:['female','wei',3,['zhenlie','miji']],
 			yufan:['male','wu',3,['zhiyan','zongxuan']],
 			chengong:['male','qun',3,['mingce','zhichi']],
 			bulianshi:['female','wu',3,['old_anxu','zhuiyi']],
 			handang:['male','wu',4,['gongji','jiefan']],
-			fuhuanghou:['female','qun',3,['zhuikong','qiuyuan']],
+			fuhuanghou:['female','qun',3,['qiuyuan','zhuikong']],
 			zhonghui:['male','wei',4,['quanji','zili']],
 			jianyong:['male','shu',3,['qiaoshui','jyzongshi']],
 			madai:['male','shu',4,['mashu','qianxi']],
@@ -50,7 +50,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhuhuan:['male','wu',4,['fenli','pingkou']],
 			xiahoushi:['female','shu',3,['qiaoshi','yanyu']],
 
-			panzhangmazhong:['male','wu',4,['anjian','duodao']],
+			panzhangmazhong:['male','wu',4,['duodao','anjian']],
 			zhoucang:['male','shu',4,['xinzhongyong']],
 			guanping:['male','shu',4,['longyin']],
 			liaohua:['male','shu',4,['xindangxian','xinfuli']],
@@ -1824,14 +1824,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jiexun:{
 				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
-				// filter:function(event,player){
-				// 	return game.hasPlayer(function(current){
-				// 		return current.countCards('ej',{suit:'diamond'});
-				// 	});
-				// },
-				init:function(player){
-					player.storage.jiexun=0;
-				},
 				onremove:true,
 				direct:true,
 				content:function(){
@@ -1839,7 +1831,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num1=game.countPlayer(function(current){
 						return current.countCards('ej',{suit:'diamond'});
 					});
-					var num2=player.storage.jiexun;
+					var num2=player.countMark('jiexun');
 					event.num1=num1;
 					event.num2=num2;
 					var str='令目标摸'+get.cnNumber(num1)+'张牌';
@@ -1859,7 +1851,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(event.num1){
 							target.draw(event.num1);
 						}
-						player.storage.jiexun++;
+						player.addMark('jiexun',1,false);
 					}
 					else{
 						event.finish();
@@ -1872,7 +1864,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					'step 3'
-					if(!event.target.countCards('he')){
+					if(result.bool&&result.autochoose&&result.cards.length==result.rawcards.length){
 						player.removeSkill('jiexun');
 						player.addSkill('funan_jiexun');
 					}
@@ -10561,6 +10553,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					"step 1"
 					if(result.bool){
+						result.targets.sortBySeat();
 						player.logSkill('xiansi',result.targets);
 						event.targets=result.targets;
 					}
