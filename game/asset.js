@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.98.7',
+	'v1.9.98.7.1',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -1457,8 +1457,6 @@ window.noname_asset_list=[
 	'audio/skill/qiaoshui2.mp3',
 	'audio/skill/qice_backup1.mp3',
 	'audio/skill/qice_backup2.mp3',
-	'audio/skill/qice1.mp3',
-	'audio/skill/qice2.mp3',
 	'audio/skill/qieting1.mp3',
 	'audio/skill/qieting2.mp3',
 	'audio/skill/qilin_skill.mp3',
@@ -2958,7 +2956,11 @@ window.noname_asset_list=[
 	'image/character/key_saya.jpg',
 	'image/character/sp_shenpei.jpg',
 	'image/character/sp_zhanghe.jpg',
-	'image/character/xunchen.jpg',
+	'image/character/xunchen.jpg','image/character/key_inari.jpg',
+	'image/character/key_shiina.jpg',
+	'image/character/ns_chendao.jpg',
+	'image/character/ol_zhangliao.jpg',
+	'image/character/sunshao.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',

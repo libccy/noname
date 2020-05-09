@@ -3,6 +3,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'extra',
 		connect:true,
+		characterSort:{
+			extra:{
+				extra_feng:['shen_guanyu','shen_lvmeng'],
+				extra_huo:['shen_zhugeliang','shen_zhouyu'],
+				extra_lin:['shen_caocao','shen_lvbu'],
+				extra_shan:['shen_zhaoyun','shen_simayi'],
+				extra_yin:['shen_liubei','shen_luxun'],
+				extra_lei:['shen_ganning','shen_zhangliao'],
+				extra_ol:['ol_zhangliao'],
+			},
+		},
 		character:{
 			shen_guanyu:['male','shen',5,['new_wuhun','wushen'],['shu']],
 			shen_zhaoyun:['male','shen',2,['xinjuejing','xinlonghun'],['shu']],
@@ -17,6 +28,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"shen_luxun":["male","shen",4,["nzry_junlve","nzry_cuike","nzry_dinghuo"],["wu"]],
 			"shen_zhangliao":["male","shen",4,["drlt_duorui","drlt_zhiti"],["wei"]],
 			"shen_ganning":["male","shen","3/6",["drlt_poxi","drlt_jieying"],["wu"]],
+			ol_zhangliao:['male','shen',4,['olduorui','olzhiti'],['wei']],
 		},
 		characterIntro:{
 			shen_guanyu:'关羽，字云长。曾水淹七军、擒于禁、斩庞德、威震华夏，吓得曹操差点迁都躲避，但是东吴偷袭荆州，关羽兵败被害。后传说吕蒙因关羽之魂索命而死。',
@@ -28,6 +40,146 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//shen_ganning:"体力上限：6",
 		},
 		skill:{
+			olzhiti:{
+				audio:'drlt_zhiti',
+				global:'olzhiti2',
+				mod:{
+					maxHandcard:function(player,num){
+						if(game.hasPlayer(function(current){
+							return current.isDamaged();
+						})) return num+1;
+					},
+				},
+				trigger:{player:['phaseDrawBegin2','phaseEnd']},
+				forced:true,
+				filter:function(event,player){
+					var num=event.name=='phase'?5:3;
+					if(num==3?event.numFixed:!game.hasPlayer(function(current){
+						return current.countDisabled()<5;
+					})) return false;
+					return game.countPlayer(function(current){
+						return current.isDamaged();
+					})>=num;
+				},
+				direct:true,
+				content:function(){
+					if(trigger.name=='phaseDraw'){
+						player.logSkill('olzhiti');
+						trigger.num++;
+					}
+					else{
+						var list=game.filterPlayer(function(current){
+							return current.countDisabled()<5;
+						});
+						if(get.isLuckyStar()){
+							for(var i=0;i<list.length;i++){
+								if(list.length>1&&player.getFriends.contains(list[i])) list.splice(i--,1);
+							}
+						}
+						var target=list.randomGet();
+						player.logSkill('olzhiti',target);
+						list.length=0;
+						for(var i=1;i<6;i++){
+							if(!target.isDisabled(i)) list.push(i);
+						}
+						target.disableEquip(list.randomGet());
+					}
+				},
+			},
+			olzhiti2:{
+				mod:{
+					maxHandcard:function(player,num){
+						if(player.isDamaged()) return num-game.countPlayer(function(current){
+							return current.hasSkill('olzhiti')&&current.inRange(player);
+						})
+					},
+				},
+			},
+			olduorui:{
+				audio:'drlt_duorui',
+				trigger:{
+					source:'damageSource'
+				},
+				filter:function(event,player){
+					if(!player.isPhaseUsing()||event.player.isDead()) return false;
+					for(var i in event.player.disabledSkills){
+						if(event.player.disabledSkills[i].contains('olduorui2')) return false;
+					}
+					var list=[];
+					var listm=[];
+					var listv=[];
+					if(event.player.name1!=undefined) listm=lib.character[event.player.name1][3];
+					else listm=lib.character[event.player.name][3];
+					if(event.player.name2!=undefined) listv=lib.character[event.player.name2][3];
+					listm=listm.concat(listv);
+					var func=function(skill){
+						var info=get.info(skill);
+						if(!info||info.charlotte) return false;
+						return true;
+					};
+					for(var i=0;i<listm.length;i++){
+						if(func(listm[i])) list.add(listm[i]);
+					}
+					return list.length>0;
+				},
+				check:function(event,player){
+					if(get.attitude(player,event.player)>=0) return false;
+					if(event.getParent('phaseUse').skipped) return true;
+					var nd=player.needsToDiscard();
+					return player.countCards('h',function(card){
+						return (nd?true:get.tag(card,'damage'))&&player.getUseValue(card)>0;
+					})==0;
+				},
+				logTarget:'player',
+				content:function(){
+					'step 0'
+					var list=[];
+					var listm=[];
+					var listv=[];
+					if(trigger.player.name1!=undefined) listm=lib.character[trigger.player.name1][3];
+					else listm=lib.character[trigger.player.name][3];
+					if(trigger.player.name2!=undefined) listv=lib.character[trigger.player.name2][3];
+					listm=listm.concat(listv);
+					var func=function(skill){
+						var info=get.info(skill);
+						if(!info||info.charlotte) return false;
+						return true;
+					};
+					for(var i=0;i<listm.length;i++){
+						if(func(listm[i])) list.add(listm[i]);
+					}
+					event.skills=list;
+					player.chooseControl(list).set('prompt','选择'+get.translation(trigger.player)+'武将牌上的一个技能并令其失效');
+					'step 1'
+					trigger.player.disableSkill('olduorui2',result.control);
+					trigger.player.addTempSkill('olduorui2',{player:'phaseAfter'});
+					game.log(player,'选择了',trigger.player,'的技能','#g【'+get.translation(result.control)+'】');
+					event.getParent('phaseUse').skipped=true;
+				},
+			},
+			olduorui2:{
+				onremove:function(player,skill){
+					player.enableSkill(skill);
+				},
+				locked:true,
+				mark:true,
+				charlotte:true,
+				intro:{
+					content:function(storage,player,skill){
+						var list=[];
+						for(var i in player.disabledSkills){
+							if(player.disabledSkills[i].contains(skill)) list.push(i);
+						};
+						if(list.length){
+							var str='失效技能：';
+							for(var i=0;i<list.length;i++){
+								if(lib.translate[list[i]+'_info']) str+=get.translation(list[i])+'、';
+							};
+							return str.slice(0,str.length-1);
+						};
+					},
+				},
+			},
 			wuhun21:{audio:true},
 			wuhun22:{
 				audio:true,
@@ -2291,13 +2443,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.disableSkill(skill,player.storage.drlt_duorui);
 				},
 				onremove:function(player,skill){
-					"step 0"
 					player.enableSkill(skill);
-					"step 1"
-					delete player.storage.drlt_duorui;
 				},
 				locked:true,
 				mark:true,
+				charlotte:true,
 				intro:{
 					content:function(storage,player,skill){
 						var list=[];
@@ -2732,6 +2882,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_wuhun_info":"锁定技，当你受到伤害后，伤害来源获得X个“梦魇”标记（X为伤害点数）。锁定技，当你死亡时，你选择一名“梦魇”标记数量最多的其他角色。该角色进行判定：若判定结果不为【桃】或【桃园结义】，则该角色死亡。",
 			"new_guixin":"归心",
 			"new_guixin_info":"当你受到1点伤害后，你可以按照你选择的区域优先度随机获得每名其他角色区域里的一张牌，然后你翻面。",
+			ol_zhangliao:'OL神张辽',
+			olduorui:'夺锐',
+			olduorui2:'夺锐',
+			olduorui_info:'当你于出牌阶段内对一名角色造成伤害后，你可以选择该角色武将牌上的一个技能。若如此做，你结束出牌阶段，且你令此技能于其下个回合结束之前无效。',
+			olzhiti:'止啼',
+			olzhiti_info:'锁定技，你攻击范围内已受伤角色的手牌上限-1。若场上已受伤的角色数：不小于1，你的手牌上限+1；不小于3，你于摸牌阶段开始时令额定摸牌数+1；不小于5，回合结束时，你随机废除一名角色的一个随机装备栏。',
+			extra_feng:'神话再临·风',
+			extra_huo:'神话再临·火',
+			extra_lin:'神话再临·林',
+			extra_shan:'神话再临·山',
+			extra_yin:'神话再临·阴',
+			extra_lei:'神话再临·雷',
+			extra_ol:'神话再临OL',
 		},
 	};
 });

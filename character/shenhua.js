@@ -1665,18 +1665,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				marktext:'成',
 				intro:{
 					content:function(storage,player,skill){
-						if(player.storage.nzry_chenglve==true) return '出牌阶段限一次，你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制';
-						return '出牌阶段限一次，你可以摸一张牌，然后弃置两张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制';
+						var str=player.storage.nzry_chenglve?'出牌阶段限一次，你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制':'出牌阶段限一次，你可以摸一张牌，然后弃置两张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制';
+						if(player.storage.nzry_chenglve1){
+							str+='<br><li>当前花色：';
+							str+=get.translation(player.storage.nzry_chenglve1);
+						}
+						return str;
 					},
 				},
 				enable:"phaseUse",
 				usable:1,
 				audio:2,
-				//filter:function(event,player){
-				//	var num=1;
-				//	if(player.storage.nzry_chenglve==true) num=0;
-				//	return player.countCards('h')>=num;
-				//},
 				content:function(){
 					'step 0'
 					if(player.storage.nzry_chenglve==true){
@@ -1690,9 +1689,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					};
 					'step 1'
 					if(result.bool){
-						player.storage.nzry_chenglve1=result.cards;
-						player.syncStorage('nzry_chenglve1');
-						player.addTempSkill('nzry_chenglve1',{player:'phaseAfter'});
+						player.storage.nzry_chenglve1=[];
+						for(var i=0;i<result.cards.length;i++){
+							player.storage.nzry_chenglve1.add(get.suit(result.cards[i],player));
+						}
+						player.markSkill('nzry_chenglve');
+						player.addTempSkill('nzry_chenglve1');
 					};
 				},
 				ai:{
@@ -1710,16 +1712,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					cardUsable:function(card,player){
 						var cards=player.storage.nzry_chenglve1;
 						for(var i=0;i<cards.length;i++){
-							if(get.suit(cards[i])==get.suit(card)) return Infinity;
+							if(cards[i]==get.suit(card)) return Infinity;
 						};
 					},
 					targetInRange:function(card,player){
 						var cards=player.storage.nzry_chenglve1;
 						for(var i=0;i<cards.length;i++){
-							if(get.suit(cards[i])==get.suit(card)) return true;
+							if(cards[i]==get.suit(card)) return true;
 						};
 					}
 				},
+				onremove:true,
 			},
 			"nzry_shicai":{
 				audio:"nzry_shicai_2",
@@ -1899,6 +1902,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:2,
 						enable:'phaseUse',
 						usable:1,
+						delay:false,
 						filter:function(event,player){
 							return game.hasPlayer(function(current){
 								return current!=player&&
