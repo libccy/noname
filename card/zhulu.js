@@ -81,7 +81,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					var equips=[];
 					for(var i=0;i<event.dialog.buttons.length;i++){
 						var card=event.dialog.buttons[i].link;
-						if(!player.isDisabled(get.subtype(card))) equips.push(card);
+						if(!target.isDisabled(get.subtype(card))) equips.push(card);
 					}
 					if(equips.length>1){
 						var next=target.chooseButton(true,function(button){

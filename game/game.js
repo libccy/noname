@@ -7636,7 +7636,7 @@
 						}
 					};
 					game.removeFile=function(filename,callback){
-						lib.node.fs.unlink(__dirname+'/'+filename);
+						lib.node.fs.unlink(__dirname+'/'+filename,callback||function(){});
 					};
 					game.getFileList=function(dir,callback){
 						var files=[],folders=[];
@@ -9752,7 +9752,7 @@
 			qunColor:"#f6f6f6",
 			shenColor:"#ffe14c",
 			westernColor:"#ffe14c",
-			keyColor:"#ffc9b1fd",
+			keyColor:"#c9b1fd",
 			basic:'基本',
 			equip:'装备',
 			trick:'锦囊',
@@ -14857,6 +14857,7 @@
 				},
 				changeHp:function(){
 					player.hp+=num;
+					if(isNaN(player.hp)) player.hp=0;
 					if(player.hp>player.maxHp) player.hp=player.maxHp;
 					player.update();
 					if(event.popup!==false){
@@ -15032,9 +15033,8 @@
  					}
 						event.cards=player.getCards('hej');
 						if(event.cards.length){
-							player.lose(event.cards,'visible').forceDie=true;
-							player.$throw(event.cards,1000);
-							game.log(player,'弃置了',event.cards,event.logvid);
+							player.discard(event.cards).forceDie=true;
+							//player.$throw(event.cards,1000);
 						}
 					}
 					"step 4"
@@ -17690,7 +17690,7 @@
 								next.nodelayx=true;
 							}
 							else if(lib.card[arguments[i]]&&!next.card){
-								next.card={name:arguments[i]};
+								next.card={name:arguments[i],isCard:true};
 							}
 							else get.evtprompt(next,arguments[i]);
 						}
@@ -22413,8 +22413,10 @@
 							node.classList.add('normal-font');
 						}
 						if(typeof num=='number'&&num>0){
-							num='+'+num;
+							if(num==Infinity) num='+∞'
+							else num='+'+num;
 						}
+						else if(num==-Infinity) num='-∞';
 						node.innerHTML=num;
 						this.damagepopups.push(node);
 						node.dataset.nature=nature||'soil';
@@ -30814,6 +30816,7 @@
 						else if(info.enable=='phaseUse') enable=(event.type=='phase');
 						else if(typeof info.enable=='string') enable=(info.enable==event.name);
 						if(enable){
+							if(info.noHidden&&!game.expandSkills(player.getSkills()).contains(skills2[i])) enable=false;
 							if(info.filter&&!info.filter(event,player)) enable=false;
 							if(info.viewAs&&event.filterCard&&!event.filterCard(info.viewAs,player,event)) enable=false;
 							if(info.viewAs&&info.viewAsFilter&&info.viewAsFilter(player)==false) enable=false;
@@ -42464,14 +42467,17 @@
 							}
 						}
 						else{
-							if(typeof infoitem[2]=='string'||infoitem[2]>14){
+							var hp=get.infoHp(infoitem[2]);
+							var maxHp=get.infoMaxHp(infoitem[2]);
+							if(maxHp>14){
 								if(typeof infoitem[2]=='string') node.node.hp.innerHTML=infoitem[2];
 								else node.node.hp.innerHTML=get.numStr(infoitem[2]);
 								node.node.hp.classList.add('text');
 							}
 							else{
-								for(var i=0;i<infoitem[2];i++){
-									ui.create.div('',node.node.hp);
+								for(var i=0;i<maxHp;i++){
+									var next=ui.create.div('',node.node.hp);
+									if(i>=hp) next.classList.add('exclude');
 								}
 							}
 						}

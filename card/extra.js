@@ -58,8 +58,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target==player;
 				},
 				content:function(){
+					if(typeof event.baseDamage!='number') event.baseDamage=1;
 					if(target.isDying()||event.getParent(2).type=='dying'){
-						target.recover();
+						target.recover(event.baseDamage);
 						if(_status.currentPhase==target){
 							target.getStat().card.jiu--;
 						}
@@ -70,7 +71,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							card=cards[0];
 						}
 						if(!target.storage.jiu) target.storage.jiu=0;
-						target.storage.jiu++;
+						target.storage.jiu+=event.baseDamage;
 						game.broadcastAll(function(target,card,gain2){
 							target.addSkill('jiu');
 							if(!target.node.jiu&&lib.config.jiu_effect){
