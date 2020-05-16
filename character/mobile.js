@@ -2026,24 +2026,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				popup:false,
 				content:function(){
-					trigger.xinzhanyi=true;
+					if(!trigger.baseDamage) trigger.baseDamage=1;
+					trigger.baseDamage++;
 					player.storage.xinzhanyi_basic1=true;
 				},
 			},
-			xinzhanyi_basic2:{
-				trigger:{source:['damageBegin','recoverBegin']},
-				forced:true,
-				silent:true,
-				popup:false,
-				filter:function(event){
-					return event.getParent(2).xinzhanyi==true;
-				},
-				content:function(){
-					trigger.num++
-				},
-			},
 			xinzhanyi_basic:{
-				group:['xinzhanyi_basic1','xinzhanyi_basic2'],
+				group:['xinzhanyi_basic1'],
 				onremove:function(p,s){
 					delete p.storage[s+1];
 				},

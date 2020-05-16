@@ -16,7 +16,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_star:["sp_xiahoushi","jsp_zhaoyun","huangjinleishi","sp_pangtong","sp_daqiao","sp_ganning","sp_xiahoudun","sp_lvmeng","sp_zhangfei","sp_liubei"],
 				sp_sticker:['sp_gongsunzan','sp_simazhao','sp_wangyuanji','sp_xinxianying','sp_liuxie'],
-				sp_guozhan:["shamoke","ganfuren","yuejin","hetaihou","dingfeng","panfeng","jianggan"],
+				sp_guozhan:["shamoke","ganfuren","yuejin","hetaihou","dingfeng","re_panfeng","jianggan"],
 				sp_guozhan2:["mifuren","mateng","tianfeng","chendong","sp_dongzhuo","jiangfei","jiangqing","kongrong","bianfuren","liqueguosi","lvfan","cuimao","jiling","zangba","zhangren","zoushi"],
 				sp_guandu:["sp_zhanghe","xunchen","sp_shenpei","gaolan"],
 				sp_single:["hejin","hansui","niujin"],
@@ -24,12 +24,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			re_panfeng:['male','qun',4,['xinkuangfu']],
 			gaolan:['male','qun',4,['xiying']],
 			sp_shenpei:['male','qun',3,['gangzhi','beizhan']],
 			xunchen:['male','qun',3,['fenglve','mouzhi']],
 			sp_zhanghe:['male','qun',4,['yuanlve']],
 			sunshao:['male','wu',3,['bizheng','yidian']],
-			wangshuang:['male','wei',5,['spzhuilie'],['unseen']],
+			wangshuang:['male','wei',8,['spzhuilie']],
 			sp_gongsunzan:['male','qun',4,['spyicong','sptuji']],
 			sp_simazhao:['male','wei',3,['spzhaoxin','splanggu']],
 			sp_wangyuanji:['female','wei',3,['spfuluan','spshude']],
@@ -160,7 +161,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hetaihou:['female','qun',3,['zhendu','qiluan']],
 			kongrong:['male','qun',3,['lirang','mingshi']],
 			dingfeng:['male','wu',4,['fenxun','duanbing']],
-			panfeng:['male','qun',4,['kuangfu']],
 			bianfuren:['female','wei',3,['wanwei','yuejian']],
 			shamoke:['male','shu',4,['gzjili']],
 			liqueguosi:['male','qun',4,['xiongsuan']],
@@ -512,6 +512,60 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//新潘凤
+			xinkuangfu:{
+				enable:'phaseUse',
+				usable:1,
+				filterTarget:function(card,player,target){
+					if(player==target) return player.countCards('e',function(card){
+						return lib.filter.cardDiscardable(card,player);
+					})>0;
+					return target.countDiscardableCards(player,'e')>0;
+				},
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return current.countCards('e')>0;
+					});
+				},
+				content:function(){
+					'step 0'
+					if(player==target) player.chooseToDiscard('e',true);
+					else player.discardPlayerCard(target,'e',true);
+					'step 1'
+					player.chooseUseTarget('sha',true,false,'nodistance');
+					'step 2'
+					var bool=game.hasPlayer2(function(current){
+						return current.getHistory('damage',function(evt){
+							return evt.getParent(4)==event;
+						}).length>0
+					});
+					if(player==target&&bool) player.draw(2);
+					else if(player!=target&&!bool) player.chooseToDiscard('h',2,true);
+				},
+				ai:{
+					order:function(){
+						return get.order({name:'sha'})+0.3;
+					},
+					result:{
+						target:function(player,target){
+							var att=get.attitude(player,target);
+							var max=0;
+							var min=1;
+							target.countCards('e',function(card){
+								var val=get.value(card);
+								if(val>max) max=val;
+								if(val<min) min=val;
+							});
+							if(att>0&&min<=0) return target.hasSkillTag('noe')?3:1;
+							if(att<0&&max>0){
+								if(target.hasSkillTag('noe')) return max>6?(-max/3):0;
+								return -max;
+							}
+							return 0;
+						},
+					},
+				},
+			},
 			//官渡之战
 			xiying:{
 				trigger:{player:'phaseUseBegin'},
@@ -932,7 +986,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.judge(function(card){
-						var type=get.type(card,'trick');
+						var type=get.subtype(card);
+						return ['equip1','equip4','equip3','equip6'].contains(type)?6: -6;
 						switch(type){
 							case 'equip': return 4;
 							case 'trick': return -4;
@@ -13760,7 +13815,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.type!='discard') return false;
 					if(event.cards2){
 						for(var i=0;i<event.cards2.length;i++){
-							if(get.color(event.cards2[i],event.hs.contains(event.cards2[i])?player:false)=='red') return true;
+							if(get.color(event.cards2[i],player)=='red') return true;
 						}
 					}
 					return false;
@@ -13771,7 +13826,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(trigger.name=='lose'){
 						event.count=0;
 						for(var i=0;i<trigger.cards2.length;i++){
-							if(get.color(trigger.cards2[i],trigger.hs.contains(trigger.cards2[i])?player:false)=='red') event.count++;
+							if(get.color(trigger.cards2[i],player)=='red') event.count++;
 						}
 					}
 					"step 1"
@@ -17016,7 +17071,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhuling:'朱灵',
 			sunluyu:'孙鲁育',
 			hanba:'旱魃',
-			panfeng:'潘凤',
+			panfeng:'旧潘凤',
 			zumao:'祖茂',
 			daxiaoqiao:'大小乔',
 			sp_daqiao:'☆SP大乔',
@@ -17786,7 +17841,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wangshuang:'王双',
 			spzhuilie:'追猎',
 			spzhuilie2:'追猎',
-			spzhuilie_info:'锁定技，你使用【杀】无距离限制；当你使用【杀】指定目标后，若其不在你的攻击范围内，此【杀】不计入使用次数限制且你判定。若判定结果为：装备牌，此【杀】的伤害基数改为X（X为其体力值）；锦囊牌，你失去1点体力。',
+			spzhuilie_info:'锁定技，你使用【杀】无距离限制；当你使用【杀】指定目标后，若其不在你的攻击范围内，此【杀】不计入使用次数限制且你判定。若判定结果为武器牌或坐骑牌，此【杀】的伤害基数改为X（X为其体力值）。否则你失去1点体力。',
 			sunshao:'孙邵',
 			bizheng:'弼政',
 			bizheng_info:'摸牌阶段结束时，你可以令一名其他角色摸两张牌。然后，若你的手牌数大于体力上限，你弃置两张牌。若其的手牌数大于体力上限，其弃置两张牌。',
@@ -17812,6 +17867,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiying:'袭营',
 			xiying2:'袭营',
 			xiying_info:'出牌阶段开始时，你可以弃置一张牌，然后令所有其他角色依次选择一项：弃置一张牌，或本回合内不能使用或打出牌。',
+			re_panfeng:'潘凤',
+			xinkuangfu:'狂斧',
+			xinkuangfu_info:'出牌阶段限一次，你可选择：1，弃置装备区里的一张牌，你使用无对应实体牌的普【杀】。若此【杀】造成伤害，你摸两张牌。2，弃置一名其他角色装备区里的一张牌，你使用无对应实体牌的普【杀】。若此【杀】未造成伤害，你弃置两张牌。',
 			
 			sp_default:"常规",
 			sp_whlw:"文和乱武",

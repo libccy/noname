@@ -9446,7 +9446,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//unique:true,
 				//gainable:true,
 				group:['luoying_discard','luoying_judge'],
-				subfrequent:['discard','judge'],
+				subfrequent:['judge'],
 				subSkill:{
 					discard:{
 						audio:2,
@@ -9455,40 +9455,39 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(event.type!='discard') return false;
 							if(event.player==player) return false;
 							for(var i=0;i<event.cards2.length;i++){
-								if(get.suit(event.cards2[i],event.hs.contains(event.cards2[i])?event.player:false)=='club'&&get.position(event.cards2[i],true)=='d'){
+								if(get.suit(event.cards2[i],event.player)=='club'&&get.position(event.cards2[i],true)=='d'){
 									return true;
 								}
 							}
 							return false;
 						},
-						frequent:'check',
-						check:function(event,player){
-							for(var i=0;i<event.cards2.length;i++){
-								if(get.suit(event.cards2[i],event.hs.contains(event.cards2[i])?event.player:false)=='club'&&get.position(event.cards2[i],true)=='d'){
-									if(event.cards2[i].name=='du') return false;
-								}
-							}
-							return true;
-						},
+						direct:true,
+						//frequent:'check',
 						content:function(){
 							"step 0"
 							if(trigger.delay==false) game.delay();
 							"step 1"
 							var cards=[];
 							for(var i=0;i<trigger.cards2.length;i++){
-								if(get.suit(trigger.cards2[i],trigger.hs.contains(trigger.cards2[i])?trigger.player:false)=='club'&&get.position(trigger.cards2[i],true)=='d'){
+								if(get.suit(trigger.cards2[i],trigger.player)=='club'&&get.position(trigger.cards2[i],true)=='d'){
 									cards.push(trigger.cards2[i]);
 								}
 							}
 							if(cards.length){
-								player.gain(cards,'log','gain2');
+								player.chooseButton(['落英：选择要获得的牌',cards],[1,cards.length]).ai=get.buttonValue;
+							}
+							"step 2"
+							if(result.bool){
+								player.logSkill(event.name);
+								player.gain(result.links,'gain2','log');
 							}
 						},
 					},
 					judge:{
 						audio:2,
 						trigger:{global:'cardsDiscardAfter'},
-						frequent:'check',
+						//frequent:'check',
+						direct:true,
 						check:function(event,player){
 							return event.cards[0].name!='du';
 						},
@@ -9500,7 +9499,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return (get.suit(event.cards[0])=='club');
 						},
 						content:function(){
-							player.gain(trigger.cards,'gain2','log');
+							"step 0"
+							player.chooseButton(['落英：选择要获得的牌',trigger.cards],[1,trigger.cards.length]).ai=get.buttonValue;
+							"step 1"
+							if(result.bool){
+								player.logSkill(event.name);
+								player.gain(result.links,'gain2','log');
+							}
 						}
 					}
 				}
@@ -9597,8 +9602,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			jiushi2:{
-				trigger:{player:'damage'},
+				trigger:{player:'damageBegin3'},
 				silent:true,
+				firstDo:true,
 				filter:function(event,player){
 					return player.classList.contains('turnedover');
 				},

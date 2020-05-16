@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connectBanned:['zuoci'],
 		characterSort:{
 			shenhua:{
-				shenhua_feng:["sp_zhangjiao","re_yuji","old_zhoutai","old_caoren","re_xiahouyuan","xiaoqiao","huangzhong","weiyan"],
+				shenhua_feng:["sp_zhangjiao","re_yuji","old_zhoutai","old_caoren","re_xiahouyuan","re_xiaoqiao","huangzhong","re_weiyan"],
 				shenhua_huo:['dianwei','xunyu','pangtong','sp_zhugeliang','taishici','yanwen','re_yuanshao','pangde'],
 				shenhua_lin:['caopi','xuhuang','menghuo','zhurong','re_lusu','sunjian','dongzhuo','jiaxu'],
 				shenhua_shan:['dengai','zhanghe','liushan','jiangwei','zhangzhang','sunce','caiwenji','zuoci'],
@@ -21,8 +21,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pangde:['male','qun',4,['mashu','mengjin']],
 			re_xiahouyuan:['male','wei',4,['xinshensu']],
 			huangzhong:['male','shu',4,['liegong']],
-			weiyan:['male','shu',4,['kuanggu']],
-			xiaoqiao:['female','wu',3,['tianxiang','hongyan']],
+			re_weiyan:['male','shu',4,['xinkuanggu','qimou']],
+			re_xiaoqiao:['female','wu',3,['retianxiang','hongyan']],
 			sp_zhangjiao:['male','qun',3,['releiji','guidao','huangtian'],['zhu']],
 			re_yuji:["male","qun",3,["xinfu_guhuo"],["forbidai"]],
 			// yuji:['male','qun',3,['guhuo']],
@@ -7384,8 +7384,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			re_xiahouyuan:'夏侯渊',
 			re_huangzhong:'界黄忠',
-			re_weiyan:'界魏延',
-			re_xiaoqiao:'界小乔',
+			re_weiyan:'魏延',
+			re_xiaoqiao:'小乔',
 			
 			gz_xiahouyuan:'夏侯渊',
 			gz_huangzhong:'黄忠',
@@ -7404,8 +7404,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caoren:'界曹仁',
 			huangzhong:'黄忠',
 			sp_zhangjiao:'张角',
-			weiyan:'魏延',
-			xiaoqiao:'小乔',
+			weiyan:'旧魏延',
+			xiaoqiao:'旧小乔',
 			zhoutai:'界周泰',
 			zhangjiao:'张角',
 			yuji:'于吉',

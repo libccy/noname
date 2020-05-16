@@ -127,7 +127,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.getParent('phaseUse').skipped) return true;
 					var nd=player.needsToDiscard();
 					return player.countCards('h',function(card){
-						return (nd?true:get.tag(card,'damage'))&&player.getUseValue(card)>0;
+						return player.getUseValue(card,null,true)>0&&(nd?true:get.tag(card,'damage')>0);
 					})==0;
 				},
 				logTarget:'player',

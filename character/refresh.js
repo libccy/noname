@@ -5,15 +5,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			refresh:{
 				refresh_standard:["re_caocao","re_simayi","re_guojia","re_lidian","re_zhangliao","re_xuzhu","re_xiahoudun","re_zhangfei","re_zhaoyun","re_guanyu","re_machao","re_xushu","re_zhouyu","re_lvmeng","re_ganning","re_luxun","re_daqiao","re_huanggai","re_lvbu","re_gongsunzan","re_huatuo","re_liubei","re_diaochan","re_huangyueying","re_sunquan","re_sunshangxiang","re_zhenji","re_zhugeliang","re_huaxiong"],
-				refresh_feng:['caoren','ol_xiahouyuan','re_huangzhong','re_weiyan','re_xiaoqiao','zhoutai','re_zhangjiao','xin_yuji'],
+				refresh_feng:['caoren','ol_xiahouyuan','re_huangzhong','ol_weiyan','ol_xiaoqiao','zhoutai','re_zhangjiao','xin_yuji'],
 				refresh_huo:["ol_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","ol_pangtong","ol_yuanshao","re_pangde"],
 				refresh_lin:['re_zhurong','re_menghuo','re_dongzhuo','re_sunjian','re_caopi','re_xuhuang'],
 				refresh_shan:['re_dengai','re_jiangwei','re_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce'],
-				refresh_yijiang:['re_xusheng','re_wuguotai','re_gaoshun','re_zhangyi'],
+				refresh_yijiang:['re_xusheng','re_wuguotai','re_gaoshun','re_zhangyi','re_caozhi'],
 		 },
 		},
 		connect:true,
 		character:{
+			re_caozhi:['male','wei',3,['reluoying','rejiushi','chengzhang']],
 			ol_pangtong:['male','shu',3,['xinlianhuan','olniepan'],[]],
 			re_zhangyi:['male','shu',4,['rewurong','shizhi']],
 			re_xusheng:['male','wu',4,['repojun']],
@@ -56,8 +57,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_xiahouyuan:['male','wei',4,['xinshensu','shebian']],
 			caoren:['male','wei',4,['xinjushou','xinjiewei']],
 			re_huangzhong:['male','shu',4,['xinliegong']],
-			re_weiyan:['male','shu',4,['xinkuanggu','qimou']],
-			re_xiaoqiao:['female','wu',3,['retianxiang','hongyan']],
+			ol_weiyan:['male','shu',4,['xinkuanggu','reqimou']],
+			ol_xiaoqiao:['female','wu',3,['retianxiang','rehongyan']],
 			zhoutai:['male','wu',4,['buqu','fenji']],
 			re_pangde:['male','qun',4,['mashu','jianchu']],
 			re_xuhuang:['male','wei',4,['duanliang','jiezi']],
@@ -93,6 +94,368 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunben:['zhouyu','taishici','daqiao'],
 		},
 		skill:{
+			reluoying:{
+				audio:2,
+				group:['reluoying_discard','reluoying_judge'],
+				subfrequent:['judge'],
+				subSkill:{
+					discard:{
+						audio:'reluoying',
+						trigger:{global:'loseAfter'},
+						filter:function(event,player){
+							if(event.type!='discard') return false;
+							if(event.player==player) return false;
+							for(var i=0;i<event.cards2.length;i++){
+								if(get.suit(event.cards2[i],event.player)=='club'&&get.position(event.cards2[i],true)=='d'){
+									return true;
+								}
+							}
+							return false;
+						},
+						direct:true,
+						content:function(){
+							"step 0"
+							if(trigger.delay==false) game.delay();
+							"step 1"
+							var cards=[];
+							for(var i=0;i<trigger.cards2.length;i++){
+								if(get.suit(trigger.cards2[i],trigger.player)=='club'&&get.position(trigger.cards2[i],true)=='d'){
+									cards.push(trigger.cards2[i]);
+								}
+							}
+							if(cards.length){
+								player.chooseButton(['落英：选择要获得的牌',cards],[1,cards.length]).ai=get.buttonValue;
+							}
+							"step 2"
+							if(result.bool){
+								player.logSkill(event.name);
+								player.gain(result.links,'gain2','log');
+							}
+						},
+					},
+					judge:{
+						audio:'reluoying',
+						trigger:{global:'cardsDiscardAfter'},
+						direct:true,
+						check:function(event,player){
+							return event.cards[0].name!='du';
+						},
+						filter:function(event,player){
+							var evt=event.getParent().relatedEvent;
+							if(!evt||evt.name!='judge') return;
+							if(evt.player==player) return false;
+							if(get.position(event.cards[0],true)!='d') return false;
+							return (get.suit(event.cards[0])=='club');
+						},
+						content:function(){
+							"step 0"
+							player.chooseButton(['落英：选择要获得的牌',trigger.cards],[1,trigger.cards.length]).ai=get.buttonValue;
+							"step 1"
+							if(result.bool){
+								player.logSkill(event.name);
+								player.gain(result.links,'gain2','log');
+							}
+						}
+					}
+				}
+			},
+			jiushi:{
+				audio:'jiushi1',
+				group:['jiushi1','jiushi2','jiushi3'],
+			},
+			chengzhang:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				derivation:'rejiushi_mark',
+				forced:true,
+				unique:true,
+				juexingji:true,
+				skillAnimation:true,
+				animationColor:'water',
+				filter:function(event,player){
+					var num=0;
+					player.getAllHistory('sourceDamage',function(evt){
+						num+=evt.num;
+					});
+					if(num>=7) return true;
+					player.getAllHistory('damage',function(evt){
+						num+=evt.num;
+					});
+					return num>7;
+				},
+				content:function(){
+					player.markSkill('rejiushi_mark');
+					player.awakenSkill('chengzhang');
+					player.storage.chengzhang=true;
+					player.recover();
+					player.draw();
+				},
+			},
+			rejiushi:{
+				audio:2,
+				group:['rejiushi1','rejiushi2','rejiushi3','rejiushi_gain'],
+				subfrequent:['gain'],
+				subSkill:{
+  			gain:{
+  				audio:'rejiushi',
+  				trigger:{player:'turnOverAfter'},
+  				frequent:true,
+  				filter:function(event,player){
+  					return player.storage.chengzhang==true;
+  				},
+  				content:function(){
+  					var card=get.cardPile2(function(card){
+  						return get.type2(card)=='trick';
+  					});
+  					if(card) player.gain(card,'gain2','log');
+  				},
+  			},
+				},
+			},
+			rejiushi1:{
+				audio:'rejiushi',
+				enable:'chooseToUse',
+				filter:function(event,player){
+					if(player.classList.contains('turnedover')) return false;
+					if(event.parent.name=='phaseUse'){
+						return lib.filter.filterCard({name:'jiu'},player,event);
+					}
+					if(event.type!='dying') return false;
+					if(player!=event.dying) return false;
+					return true;
+				},
+				content:function(){
+					if(_status.event.getParent(2).type=='dying'){
+						event.dying=player;
+						event.type='dying';
+					}
+					player.turnOver();
+					player.useCard({name:'jiu',isCard:true},player);
+				},
+				ai:{
+					save:true,
+					skillTagFilter:function(player){
+						return player.hp<=0&&!player.isTurnedOver();
+					},
+					order:5,
+					result:{
+						player:function(player){
+							if(_status.event.parent.name=='phaseUse'){
+								if(player.countCards('h','jiu')>0) return 0;
+								if(player.getEquip('zhuge')&&player.countCards('h','sha')>1) return 0;
+								if(!player.countCards('h','sha')) return 0;
+								var targets=[];
+								var target;
+								var players=game.filterPlayer();
+								for(var i=0;i<players.length;i++){
+									if(get.attitude(player,players[i])<0){
+										if(player.canUse('sha',players[i],true,true)){
+											targets.push(players[i]);
+										}
+									}
+								}
+								if(targets.length){
+									target=targets[0];
+								}
+								else{
+									return 0;
+								}
+								var num=get.effect(target,{name:'sha'},player,player);
+								for(var i=1;i<targets.length;i++){
+									var num2=get.effect(targets[i],{name:'sha'},player,player);
+									if(num2>num){
+										target=targets[i];
+										num=num2;
+									}
+								}
+								if(num<=0) return 0;
+								var e2=target.getEquip(2);
+								if(e2){
+									if(e2.name=='tengjia'){
+										if(!player.countCards('h',{name:'sha',nature:'fire'})&&!player.getEquip('zhuque')) return 0;
+									}
+									if(e2.name=='renwang'){
+										if(!player.countCards('h',{name:'sha',color:'red'})) return 0;
+									}
+									if(e2.name=='baiyin') return 0;
+								}
+								if(player.getEquip('guanshi')&&player.countCards('he')>2) return 1;
+								return target.countCards('h')>3?0:1;
+							}
+							if(player==_status.event.dying||player.isTurnedOver()) return 3;
+						}
+					},
+					effect:{
+						target:function(card,player,target){
+							if(card.name=='guiyoujie') return [0,0.5];
+							if(target.isTurnedOver()){
+								if(get.tag(card,'damage')){
+									if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
+									if(target.hp==1) return;
+									return [1,target.countCards('h')/2];
+								}
+							}
+						}
+					}
+				},
+			},
+			rejiushi2:{
+				trigger:{player:'damageBegin3'},
+				silent:true,
+				firstDo:true,
+				filter:function(event,player){
+					return player.classList.contains('turnedover');
+				},
+				content:function(){
+					trigger.rejiushi=true;
+				}
+			},
+			rejiushi3:{
+				audio:'rejiushi',
+				trigger:{player:'damageEnd'},
+				check:function(event,player){
+					return player.isTurnedOver();
+				},
+				filter:function(event,player){
+					if(event.rejiushi){
+						return true;
+					}
+					return false;
+				},
+				content:function(){
+					delete trigger.rejiushi;
+					player.turnOver();
+					if(!player.storage.chengzhang){
+						var card=get.cardPile2(function(card){
+							return get.type2(card)=='trick';
+						});
+						if(card) player.gain(card,'gain2','log');
+					}
+				}
+			},
+			rejiushi_mark:{
+				mark:true,
+				marktext:'改',
+				intro:{
+					content:'当你需要使用【酒】时，若你的武将牌正面向上，你可以翻面，视为使用一张【酒】。当你受到伤害后，若你的武将牌背面向上，你可以翻面。当你翻面时，你获得牌堆中的一张随机锦囊。',
+				},
+			},
+			rehongyan:{
+				mod:{
+					suit:function(card,suit){
+						if(suit=='spade') return 'heart';
+					}
+				},
+				trigger:{player:'loseEnd'},
+				filter:function(event,player){
+					if(player==_status.currentPhase) return false;
+					for(var i=0;i<event.cards2.length;i++){
+						if(get.suit(event.cards2[i],player)=='heart') return true;
+					}
+					return false;
+				},
+				frequent:true,
+				content:function(){
+					player.draw();
+				},
+			},
+			reqimou:{
+				unique:true,
+				limited:true,
+				audio:2,
+				enable:'phaseUse',
+				filter:function(event,player){
+					return !player.storage.reqimou;
+				},
+				init:function(player){
+					player.storage.reqimou=false;
+				},
+				mark:true,
+				intro:{
+					content:'limited'
+				},
+				skillAnimation:true,
+				animationColor:'orange',
+				content:function(){
+					'step 0'
+					var shas=player.getCards('h','sha');
+					var num;
+					if(player.hp>=4&&shas.length>=3){
+						num=3;
+					}
+					else if(player.hp>=3&&shas.length>=2){
+						num=2;
+					}
+					else{
+						num=1
+					}
+					var map={};
+					var list=[];
+					for(var i=1;i<=player.hp;i++){
+						var cn=get.cnNumber(i,true);
+						map[cn]=i;
+						list.push(cn);
+					}
+					event.map=map;
+					player.awakenSkill('reqimou');
+					player.storage.reqimou=true;
+					player.chooseControl(list,function(){
+						return get.cnNumber(_status.event.goon,true);
+					}).set('prompt','失去任意点体力').set('goon',num);
+					'step 1'
+					var num=event.map[result.control]||1;
+					player.storage.reqimou2=num;
+					player.loseHp(num);
+					player.draw(num);
+					player.addTempSkill('reqimou2');
+				},
+				ai:{
+					order:2,
+					result:{
+						player:function(player){
+							if(player.hp==1) return 0;
+							var shas=player.getCards('h','sha');
+							if(!shas.length) return 0;
+							var card=shas[0];
+							if(!lib.filter.cardEnabled(card,player)) return 0;
+							if(lib.filter.cardUsable(card,player)) return 0;
+							var mindist;
+							if(player.hp>=4&&shas.length>=3){
+								mindist=4;
+							}
+							else if(player.hp>=3&&shas.length>=2){
+								mindist=3;
+							}
+							else{
+								mindist=2;
+							}
+							if(game.hasPlayer(function(current){
+								return (current.hp<=mindist-1&&
+									get.distance(player,current,'attack')<=mindist&&
+									player.canUse(card,current,false)&&
+									get.effect(current,card,player,player)>0);
+							})){
+								return 1;
+							}
+							return 0;
+						}
+					}
+				}
+			},
+			reqimou2:{
+				onremove:true,
+				mod:{
+					cardUsable:function(card,player,num){
+						if(typeof player.storage.reqimou2=='number'&&card.name=='sha'){
+							return num+player.storage.reqimou2;
+						}
+					},
+					globalFrom:function(from,to,distance){
+						if(typeof from.storage.reqimou2=='number'){
+							return distance-from.storage.reqimou2;
+						}
+					}
+				}
+			},
 			olniepan:{
 				audio:2,
 				unique:true,
@@ -5619,6 +5982,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_pangtong:'界庞统',
 			olniepan:'涅槃',
 			olniepan_info:'限定技，当你处于濒死状态时，你可以弃置你区域内的所有牌并复原你的武将牌，然后摸三张牌并将体力回复至3点。然后你选择获得以下技能中的一个：〖八阵〗/〖火计〗/〖看破〗',
+			ol_weiyan:'界魏延',
+			reqimou:'奇谋',
+			reqimou_info:'限定技，出牌阶段，你可以失去任意点体力并摸等量的牌，然后直到回合结束，你计算与其他角色的距离时-X，且你可以多使用X张【杀】（X为你失去的体力值）',
+			ol_xiaoqiao:'界小乔',
+			rehongyan:'红颜',
+			rehongyan_info:'锁定技，你区域内的黑桃牌和黑桃判定牌均视为红桃。当你于回合外失去红桃牌后，你摸一张牌。',
+			re_caozhi:'界曹植',
+			reluoying:'落英',
+			reluoying_discard:'落英',
+			reluoying_judge:'落英',
+			reluoying_info:'当其他角色的梅花牌因弃置或判定而进入弃牌堆时，你可以获得之。',
+			rejiushi:'酒诗',
+			rejiushi_info:'当你需要使用【酒】时，若你的武将牌正面向上，你可以翻面，视为使用一张【酒】。当你受到伤害后，若你的武将牌背面向上，你可以翻面并获得牌堆中的一张随机锦囊。',
+			rejiushi1:'酒诗',
+			rejiushi3:'酒诗',
+			rejiushi_mark:'酒诗·改',
+			rejiushi_mark_info:'当你需要使用【酒】时，若你的武将牌正面向上，你可以翻面，视为使用一张【酒】。当你受到伤害后，若你的武将牌背面向上，你可以翻面。当你翻面时，你获得牌堆中的一张随机锦囊。',
+			chengzhang:'成章',
+			chengzhang_info:'觉醒技，准备阶段开始时，若你造成伤害与受到伤害值之和累计7点或以上，则你回复1点体力并摸1张牌，然后改写〖酒诗〗。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',
