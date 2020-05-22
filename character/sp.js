@@ -16268,21 +16268,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				//priority:15,
-				filter:function (event,player){
+				filter:function(event,player){
 					if(player.hasSkill('smh_huoji')||player.hasSkill('smh_lianhuan')) return false;
 					if(!player.isEmpty(2)) return false;
 					if(event.nature) return true;
 					return get.type(event.card,'trick')=='trick';
 				},
-				content:function (){
+				content:function(){
 					trigger.cancel();
 				},
 				ai:{
 					notrick:true,
 					nofire:true,
 					nothunder:true,
+					skillTagFilter:function(player,tag){
+						if(tag=='notrick'||tag=='nofire'||tag=='nothunder'){
+							if(player.hasSkill('smh_huoji')||player.hasSkill('smh_lianhuan')) return false;
+							if(!player.isEmpty(2)) return false;
+						}
+					},
 					effect:{
-						target:function (card,player,target,current){
+						target:function(card,player,target,current){
 							if(target.hasSkill('smh_huoji')||target.hasSkill('smh_lianhuan')) return;
 							if(player==target&&get.subtype(card)=='equip2'){
 								if(get.equipValue(card)<=8) return 0;
