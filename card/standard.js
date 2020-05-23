@@ -1200,8 +1200,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var es=target.getCards('e');
 							var noe=(es.length==0||target.hasSkillTag('noe'));
 							var noe2=(es.length==1&&es[0].name=='baiyin'&&target.isDamaged());
+							var noe3 = false;
+							var bad_equip_num=0;
+							for (var i=0;i<es.length;i++){
+								if (get.equipValue(es[i])<=0) bad_equip_num+=1;
+							}
+							if (bad_equip_num==es.length) noe3 = true;
 							var noh=(nh==0||target.hasSkillTag('noh'));
-							if(noh&&(noe||noe2)) return 0;
+							if(noh&&(noe||noe2||noe3)) return 0;
 							if(att<=0&&!target.countCards('he')) return 1.5;
 							return -1.5;
 						},
