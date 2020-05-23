@@ -11,7 +11,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				extra_shan:['shen_zhaoyun','shen_simayi'],
 				extra_yin:['shen_liubei','shen_luxun'],
 				extra_lei:['shen_ganning','shen_zhangliao'],
-				extra_ol:['ol_zhangliao'],
+				extra_ol:['ol_zhangliao','shen_caopi','shen_zhenji'],
 			},
 		},
 		character:{
@@ -29,6 +29,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"shen_zhangliao":["male","shen",4,["drlt_duorui","drlt_zhiti"],["wei"]],
 			"shen_ganning":["male","shen","3/6",["drlt_poxi","drlt_jieying"],["wu"]],
 			ol_zhangliao:['male','shen',4,['olduorui','olzhiti'],['wei']],
+			shen_caopi:['male','shen',6,['chuyuan','dengji'],['wei']],
+			shen_zhenji:['female','shen',4,['shenfu','qixian'],['wei']],
 		},
 		characterIntro:{
 			shen_guanyu:'关羽，字云长。曾水淹七军、擒于禁、斩庞德、威震华夏，吓得曹操差点迁都躲避，但是东吴偷袭荆州，关羽兵败被害。后传说吕蒙因关羽之魂索命而死。',
@@ -40,6 +42,151 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//shen_ganning:"体力上限：6",
 		},
 		skill:{
+			shenfu:{
+				audio:2,
+				trigger:{player:'phaseEnd'},
+				direct:true,
+				content:function(){
+					'step 0'
+					event.logged=false;
+					event.targets=[];
+					event.goto(player.countCards('h')%2==1?1:4);
+					'step 1'
+					player.chooseTarget(get.prompt('shenfu'),'对一名其他角色造成1点雷属性伤害',lib.filter.notMe).set('ai',function(target){
+						var player=_status.event.player;
+						return get.damageEffect(target,player,player,'thunder')*(target.hp==1?2:1);
+					});
+					'step 2'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						if(!event.logged){
+							event.logged=true;
+							player.logSkill('shenfu',target,'thunder');
+						}
+						else player.line(target,'thunder');
+						target.damage('thunder');
+					}
+					else event.finish();
+					'step 3'
+					if(target.isDead()) event.goto(1);
+					else event.finish();
+					'step 4'
+					player.chooseTarget(get.prompt('shenfu'),'令一名角色摸一张牌或弃置其一张手牌',function(card,player,target){
+						return !_status.event.getParent().targets.contains(target);
+					}).set('ai',function(target){
+						var att=get.attitude(_status.event.player,target);
+						var delta=target.hp-target.countCards('h');
+						if(Math.abs(delta)==1&&get.sgn(delta)==get.sgn(att)) return 3*Math.abs(att);
+						if(att>0||target.countCards('h')>0) return Math.abs(att);
+						return 0;
+					});
+					'step 5'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						if(!event.logged){
+							event.logged=true;
+							player.logSkill('shenfu',target);
+						}
+						else player.line(target,'green');
+						targets.push(target);
+						if(!target.countCards('h')) event._result={bool:false};
+						else player.discardPlayerCard(target,'h','弃置'+get.translation(target)+'一张手牌，或点【取消】令其摸一张牌。');
+					}
+					else event.finish();
+					'step 6'
+					if(!result.bool) target.draw();
+					'step 7'
+					if(target.hp==target.countCards('h')) event.goto(4);
+				},
+			},
+			qixian:{
+				mod:{
+					maxHandcardFinal:function(player,num){
+						return num-player.hp+7;
+					},
+				},
+			},
+			chuyuan:{
+				audio:2,
+				trigger:{global:'damageEnd'},
+				filter:function(event,player){
+					return event.player.isAlive();
+				},
+				logTarget:'player',
+				content:function(){
+					'step 0'
+					trigger.player.draw();
+					'step 1'
+					if(!trigger.player.countCards('h')) event.finish();
+					else trigger.player.chooseCard('h',true,'选择一张牌置于'+get.translation(player)+'的武将牌上作为「储」');
+					'step 2'
+					trigger.player.lose(result.cards,ui.special,'visible','toStorage');
+					trigger.player.$give(result.cards,player,false);
+					game.log(trigger.player,'选择了',result.cards);
+					player.markAuto('chuyuan',result.cards);
+				},
+				mod:{
+					maxHandcard:function(player,num){
+						return num+player.getStorage('chuyuan').length;
+					},
+				},
+				intro:{
+					content:'cards',
+					onunmark:'throw',
+				},
+			},
+			dengji:{
+				audio:2,
+				derivation:['tianxing','new_rejianxiong','rerende','rezhiheng','olluanji','olfangquan'],
+				trigger:{player:'phaseZhunbeiBegin'},
+				forced:true,
+				unique:true,
+				juexingji:true,
+				skillAnimation:true,
+				animationColor:'water',
+				filter:function(event,player){
+					return player.getStorage('chuyuan').length>=3;
+				},
+				content:function(){
+					player.awakenSkill(event.name);
+					player.addSkill('tianxing');
+					player.addSkill('new_rejianxiong');
+					player.loseMaxHp();
+					player.gain(player.storage.chuyuan,'gain2','fromStorage');
+					player.unmarkAuto('chuyuan',player.storage.chuyuan);
+				},
+			},
+			tianxing:{
+				audio:2,
+				trigger:{player:'phaseZhunbeiBegin'},
+				forced:true,
+				unique:true,
+				juexingji:true,
+				skillAnimation:true,
+				animationColor:'thunder',
+				filter:function(event,player){
+					return player.getStorage('chuyuan').length>=3;
+				},
+				content:function(){
+					'step 0'
+					player.awakenSkill(event.name);
+					player.loseMaxHp();
+					player.gain(player.storage.chuyuan,'gain2','fromStorage');
+					player.unmarkAuto('chuyuan',player.storage.chuyuan);
+					player.removeSkill('chuyuan');
+					player.chooseControl('rerende','rezhiheng','olluanji','olfangquan').set('prompt','选择获得一个技能').set('ai',function(){
+						var player=_status.event.player;
+						if(!player.hasSkill('luanji')&&!player.hasSkill('olluanji')&&player.getUseValue({name:'wanjian'})>4) return 'olluanji';
+						if(!player.hasSkill('rezhiheng')) return 'rezhiheng';
+						if(!player.hasSkill('rerende')) return 'rerende';
+						return 'olfangquan';
+					});
+					'step 1'
+					player.addSkillLog(result.control);
+				},
+			},
 			olzhiti:{
 				audio:'drlt_zhiti',
 				global:'olzhiti2',
@@ -2888,6 +3035,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olduorui_info:'当你于出牌阶段内对一名角色造成伤害后，你可以选择该角色武将牌上的一个技能。若如此做，你结束出牌阶段，且你令此技能于其下个回合结束之前无效。',
 			olzhiti:'止啼',
 			olzhiti_info:'锁定技，你攻击范围内已受伤角色的手牌上限-1。若场上已受伤的角色数：不小于1，你的手牌上限+1；不小于3，你于摸牌阶段开始时令额定摸牌数+1；不小于5，回合结束时，你随机废除一名角色的一个随机装备栏。',
+			shen_caopi:'神曹丕',
+			chuyuan:'储元',
+			chuyuan_info:'一名角色受到伤害后，你可以令其摸一张牌。然后其将一张手牌置于你的武将牌上，称为「储」。你的手牌上限+X（X为你武将牌上的「储」数）。',
+			dengji:'登极',
+			dengji_info:'觉醒技，准备阶段，若你武将牌上的「储」数不小于3，则你减1点体力上限并获得所有「储」，然后获得技能〖天行〗和〖奸雄〗',
+			tianxing:'天行',
+			tianxing_info:'觉醒技，准备阶段，若你武将牌上的「储」数不小于3，则你减1点体力上限并获得所有「储」，然后失去技能〖储元〗，选择获得以下技能中的一个：〖仁德〗/〖制衡〗/〖乱击〗/〖放权〗',
+			shen_zhenji:'神甄姬',
+			shenfu:'神赋',
+			shenfu_info:'回合结束时，若你的手牌数为：奇数，你可对一名其他角色造成1点伤害。若其死亡，你可重复此流程。偶数，你可选择一名本回合内未选择过的角色，你令其摸一张牌或弃置其一张手牌。若其手牌数等于体力值，你可重复此流程。',
+			qixian:'七弦',
+			qixian_info:'锁定技，你的手牌上限视为7。',
+			
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',
 			extra_lin:'神话再临·林',

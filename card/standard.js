@@ -78,7 +78,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(typeof event.baseDamage!='number') event.baseDamage=1;
 					if(typeof event.extraDamage!='number') event.extraDamage=0;
 					"step 1"
-					if(event.directHit||(!_status.connectMode&&lib.config.skip_shan&&!target.hasShan())){
+					if(event.directHit||event.directHit2||(!_status.connectMode&&lib.config.skip_shan&&!target.hasShan())){
 						event._result={bool:false};
 					}
 					else if(event.skipShan){
@@ -109,18 +109,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 							else if(get.damageEffect(target,evt.player,target,evt.card.nature)>=0) bool=false;
 							if(bool){
-								if(typeof card=='string'){
-									var info=get.info(card);
-									if(info.ai&&info.ai.order){
-										if(typeof info.ai.order=='number'){
-											return info.ai.order;
-										}
-										else if(typeof info.ai.order=='function'){
-											return info.ai.order();
-										}
-									}
-								}
-								return 3;
+								return get.order(card);
 							}
 							return 0;
 						}).set('shanRequired',event.shanRequired);
@@ -246,6 +235,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					game.delay(0.5);
 				},
 				ai:{
+					order:3,
 					basic:{
 						useful:[7,2],
 						value:[7,2],

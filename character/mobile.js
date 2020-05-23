@@ -6,12 +6,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			mobile:{
-				mobile_default:["miheng","taoqian","liuzan","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng"],
-				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","xin_yuanshao","re_liushan","xin_xiahoudun","re_sp_zhugeliang","re_heqi","re_guanqiujian","re_pangtong"],
+				mobile_default:["miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi"],
+				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","xin_yuanshao","re_liushan","xin_xiahoudun","re_sp_zhugeliang","re_heqi","re_guanqiujian","re_pangtong","old_liuzan"],
 				mobile_sunben:["re_sunben"],
 			},
 		},
 		character:{
+			yangyi:['male','shu',3,['duoduan','gongsun']],
+			dongcheng:['male','qun',4,['chengzhao']],
 			re_pangtong:['male','shu',3,['xinlianhuan','niepan'],[]],
 			re_guanqiujian:['male','wei',4,['rezhengrong','rehongju']],
 			chendeng:['male','qun',3,['zhouxuan','fengji']],
@@ -25,7 +27,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_bulianshi:['female','wu',3,['anxu','zhuiyi']],
 			miheng:['male','qun',3,['kuangcai','shejian']],
 			taoqian:['male','qun',3,['zhaohuo','yixiang','yirang']],
-			liuzan:['male','wu',4,['fenyin']],lingcao:['male','wu',4,['dujin']],
+			old_liuzan:['male','wu',4,['fenyin']],lingcao:['male','wu',4,['dujin']],
 			sunru:['female','wu',3,['yingjian','shixin']],
 			lifeng:['male','shu',3,['tunchu','shuliang']],
 			zhuling:['male','wei',4,['xinzhanyi']],
@@ -53,6 +55,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_sunben:['male','wu',4,['jiang','rehunzi','zhiba'],['zhu']],
 		},
 		characterIntro:{
+			yangyi:'杨仪（？－235年），字威公，襄阳（今湖北襄阳）人，三国时期蜀汉官员。最初为荆州刺史傅群的主簿，后投奔关羽，任为功曹。关羽遣其至成都，大受刘备赞赏，擢为尚书。因与尚书令刘巴不和，调为弘农太守。建兴三年（225年）任丞相参军，此后一直跟随诸葛亮战斗。亮卒，他部署安全退军。诸葛亮在生前定蒋琬继己任，杨仪仅拜中军师。建兴十三年（235年），因多出怨言，被削职流放至汉嘉郡。但杨仪仍不自省，又上书诽谤，言辞激烈，最后下狱，自杀身亡。',
+			dongcheng:'董承（？~200年），字号不详，冀州河间人（今河北献县）人。东汉末年外戚大臣，汉灵帝母亲董太后侄子，汉献帝嫔妃董贵人之父。初从西凉军，为董卓女婿牛辅部曲。护卫汉献帝刘协从长安东归洛阳，拜为卫将军，受封列侯。建安四年（199年），拜车骑将军。自称领受汉献帝衣带诏，联合刘备、种辑、吴子兰、王子服、吴硕等人密谋诛杀曹操。五年正月，图谋泄露，董承诸人及董贵人全部遇害。',
 			chendeng:'陈登（163—201），字元龙，下邳淮浦（今江苏涟水西）人。东汉末年将领、官员。沛相陈珪之子。为人爽朗，性格沈静，智谋过人，少年时有扶世济民之志，并且博览群书，学识渊博。二十五岁时，举孝廉，任东阳县长。虽然年轻，但他能够体察民情，抚弱育孤，深得百姓敬重。后来，徐州牧陶谦提拔他为典农校尉，主管一州农业生产。他亲自考察徐州的土壤状况，开发水利，发展农田灌溉，使汉末迭遭破坏的徐州农业得到一定程度的恢复，百姓们安居乐业，“秔稻丰积”。建安初奉使赴许，向曹操献灭吕布之策，被授广陵太守。以灭吕布有功，加伏波将军。又迁东城太守。年三十九卒。其子陈肃，魏文帝时追陈登之功，为郎中。',
 			yangbiao:'杨彪（142年－225年），字文先。弘农郡华阴县（今陕西华阴）人。东汉末年名臣，太尉杨赐之子、名士杨修之父。杨彪少年时受家学熏陶，初举孝廉、茂才。其后征拜为议郎，参与续写《东观汉记》。任京兆尹时，揭发黄门令王甫的贪赃行为，使其被定罪诛杀。累任侍中、五官中郎将、卫尉等职。汉献帝时，遍历三公（司空、司徒、太尉）之职。权臣董卓意图迁都时，他据理力争。献帝东迁时，杨彪尽节护主。曹操挟献帝定都许县后，将杨彪下狱，获释后又任太常。他见汉室衰微，便诈称脚疾，不理世事。曹魏建立后，拒绝出任太尉，改光禄大夫，待以客礼。黄初六年（225年），杨彪去世，年八十四。其著作现仅存《答曹公书》一篇。',
 			zhangyì:'张翼（？－264年），字伯恭，益州犍为郡武阳县人。三国时期蜀汉将领。历任梓潼、广汉、蜀郡三郡太守，出任庲降都督，后随诸葛亮和姜维北伐，官至左车骑将军，领冀州刺史。初封关内侯，进爵都亭侯。蜀汉灭亡后，魏将钟会密谋造反，成都大乱，张翼亦为乱兵所杀。张翼是蜀汉第三任庲降都督，由于执法严厉，不得南夷欢心。在北伐上，张翼认为国小民疲，不应滥用武力，是蜀汉朝廷当时极少敢当朝和姜维争辩北伐问题的大臣。',
@@ -268,6 +272,225 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		skill:{
+			gongsun:{
+				audio:2,
+				trigger:{player:'phaseUseBegin'},
+				direct:true,
+				filter:function(event,player){
+					return player.countCards('he')>1;
+				},
+				content:function(){
+					'step 0'
+					player.chooseCardTarget({
+						prompt:get.prompt2('gongsun'),
+						selectCard:2,
+						filterCard:lib.filter.cardDiscardable,
+						filterTarget:lib.filter.notMe,
+						position:'he',
+						ai1:function(){return -1},
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('gongsun',target);
+						player.discard(result.cards);
+						player.addTempSkill('gongsun_shadow',{player:['phaseBegin','die']});
+						var list=[];
+						for(var i=0;i<lib.inpile.length;i++){
+							var name=lib.inpile[i];
+							if(get.type(name)=='trick') list.push(['锦囊','',name]);
+							else if(get.type(name)=='basic') list.push(['基本','',name]);
+						}
+						player.chooseButton(['请选择一个牌名',[list,'vcard'],true]);
+					}
+					else event.finish();
+					'step 2'
+					player.storage.gongsun_shadow.push([target,result.links[0][2]]);
+					player.popup(result.links[0][2],'soil');
+					game.log(player,'选择了',''+get.translation(result.links[0][2]));
+					player.markSkill('gongsun_shadow');
+				},
+			},
+			gongsun_shadow:{
+				global:'gongsun_shadow2',
+				init:function(player,skill){
+					if(!player.storage[skill]) player.storage[skill]=[];
+				},
+				marktext:'损',
+				onremove:true,
+				intro:{
+					content:function(shadow){
+						var str='';
+						for(var i=0;i<shadow.length;i++){
+							if(i>0) str+='<br>'
+							str+=get.translation(shadow[i][0]);
+							str+='：';
+							str+=get.translation(shadow[i][1]);
+						}
+						return str;
+					},
+				},
+				mod:{
+					cardEnabled:function(card,player){
+						var list=player.storage.gongsun_shadow;
+						for(var i=0;i<list.length;i++){
+							if(list[i][1]==card.name) return false;
+						}
+					},
+					cardRespondable:function(card,player){
+						var list=player.storage.gongsun_shadow;
+						for(var i=0;i<list.length;i++){
+							if(list[i][1]==card.name) return false;
+						}
+					},
+					cardSavable:function(card,player){
+						var list=player.storage.gongsun_shadow;
+						for(var i=0;i<list.length;i++){
+							if(list[i][1]==card.name) return false;
+						}
+					},
+					cardDiscardable:function(card,player){
+						var list=player.storage.gongsun_shadow;
+						for(var i=0;i<list.length;i++){
+							if(list[i][1]==card.name) return false;
+						}
+					},
+				},
+			},
+			gongsun_shadow2:{
+				mod:{
+					cardEnabled:function(card,player){
+						if(game.hasPlayer(function(current){
+ 						var list=current.storage.gongsun_shadow;
+ 						if(!list) return false;
+ 						for(var i=0;i<list.length;i++){
+ 							if(list[i][0]==player&&list[i][1]==card.name) return true;
+ 						}
+ 						return false;
+						})) return false;
+					},
+					cardSavable:function(card,player){
+						if(game.hasPlayer(function(current){
+ 						var list=current.storage.gongsun_shadow;
+ 						if(!list) return false;
+ 						for(var i=0;i<list.length;i++){
+ 							if(list[i][0]==player&&list[i][1]==card.name) return true;
+ 						}
+ 						return false;
+						})) return false;
+					},
+					cardRespondable:function(card,player){
+						if(game.hasPlayer(function(current){
+ 						var list=current.storage.gongsun_shadow;
+ 						if(!list) return false;
+ 						for(var i=0;i<list.length;i++){
+ 							if(list[i][0]==player&&list[i][1]==card.name) return true;
+ 						}
+ 						return false;
+						})) return false;
+					},
+					cardDiscardable:function(card,player){
+						if(game.hasPlayer(function(current){
+ 						var list=current.storage.gongsun_shadow;
+ 						if(!list) return false;
+ 						for(var i=0;i<list.length;i++){
+ 							if(list[i][0]==player&&list[i][1]==card.name) return true;
+ 						}
+ 						return false;
+						})) return false;
+					},
+				},
+			},
+			duoduan:{
+				audio:2,
+				trigger:{target:'useCardToTargeted'},
+				direct:true,
+				filter:function(event,player){
+					return event.card.name=='sha'&&player.countCards('he')>0&&!player.hasSkill('duoduan_im');
+				},
+				content:function(){
+					'step 0'
+					player.chooseCard('he',get.prompt2('duoduan')).set('ai',function(card){
+						if(_status.event.goon) return 8-get.value(card);
+						return 0;
+					}).set('goon',function(){
+						if(get.attitude(trigger.player,player)>0) return true;
+						if(!player.hasShan()) return true;
+						return event.getRand()<0.5;
+					}());
+					'step 1'
+					if(result.bool){
+						player.addTempSkill('duoduan_im');
+						var card=result.cards[0];
+						player.logSkill('duoduan',trigger.player);
+						player.lose(card,ui.discardPile,'visible');
+						player.$throw(card,1000);
+						game.log(player,'将',card,'置入弃牌堆');
+						player.draw();
+					}
+					else event.finish();
+					'step 2'
+					trigger.player.chooseToDiscard('弃置一张牌令'+get.translation(player)+'不能闪避此【杀】，或点「取消」摸两张牌并令此【杀】对其无效').set('ai',function(card){
+						if(_status.event.goon) return 6-get.value(card);
+						return 0;
+					}).set('goon',get.attitude(trigger.player,player)<0);
+					'step 3'
+					if(result.bool){
+						trigger.directHit.add(player);
+					}
+					else{
+						trigger.player.draw(2);
+						trigger.excluded.add(player);
+					}
+				},
+			},
+			duoduan_im:{
+				//'im' refers to 'Iwasawa Masami' in 'Angel Beats!'
+				//Although she disappeared in the Episode 3 of the anime, but her route in the game is really worth to play.
+			},
+			chengzhao:{
+				audio:2,
+				trigger:{global:'phaseJieshuBegin'},
+				filter:function(event,player){
+					var num=0;
+					player.getHistory('gain',function(evt){
+						num+=evt.cards.length;
+					});
+					if(num<2) return false;
+					return player.countCards('h')>0&&game.hasPlayer(function(current){
+						return player!=current&&player.canCompare(current);
+					});
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('chengzhao'),function(card,player,target){
+						return player.canCompare(target);
+					}).set('ai',function(target){
+						return -get.attitude(_status.event.player,target)/target.countCards('h');
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('chengzhao',target);
+						player.chooseToCompare(target);
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						var card={name:'sha',isCard:true};
+						if(player.canUse(card,target,false)) player.useCard(card,target,false).card.chengzhao=true;
+					}
+				},
+				ai:{
+					unequip:true,
+					skillTagFilter:function(player,tag,arg){
+						if(!arg||!arg.card||arg.card.chengzhao!=true) return false;
+					},
+				},
+			},
 			rezhengrong:{
 				trigger:{player:'useCardAfter'},
 				direct:true,
@@ -481,8 +704,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			fengji3:{
 				mod:{
-					maxHandcard:function(player,num){
-						return num+player.getDamagedHp();
+					maxHandcardBase:function(player,num){
+						return player.maxHp;
 					},
 				},
 			},
@@ -702,7 +925,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['equipEnd','loseEnd']},
 				forced:true,
 				popup:false,
-				derivation:['reyingzi','qixi','xuanfeng'],
+				derivation:['reyingzi','qixi','rexuanfeng'],
 				filter:function(event,player){
 					if(player.equiping) return false;
 					var suits=[];
@@ -732,7 +955,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					switch(suits.length){
 						case 1:player.addAdditionalSkill(skill,['reyingzi']);break;
 						case 2:player.addAdditionalSkill(skill,['reyingzi','qixi']);break;
-						case 3:player.addAdditionalSkill(skill,['reyingzi','qixi','xuanfeng']);break;
+						case 3:player.addAdditionalSkill(skill,['reyingzi','qixi','rexuanfeng']);break;
 					}
 				},
 				ai:{
@@ -1586,8 +1809,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			huaizi:{
 				mod:{
-					maxHandcard:function(player,num){
-						return num+player.getDamagedHp();
+					maxHandcardBase:function(player,num){
+						return player.maxHp;
 					},
 				},
 				//audio:2,
@@ -1881,7 +2104,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shouye:{
 				audio:2,
 				group:'shouye_after',
-				trigger:{target:"useCardToTargeted"},
+				trigger:{target:"useCardToTarget"},
 				filter:function(event,player){
 					return event.player!=player&&event.targets.length==1;
 				},
@@ -1897,7 +2120,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseToDuiben(trigger.player);
 					'step 1'
 					if(result.bool){
-						trigger.excluded.add(player);
+						trigger.targets.remove(player);
+						trigger.getParent().triggeredTargets2.remove(player);
 						trigger.getParent().shouyeer=player;
 					}
 				},
@@ -3904,7 +4128,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			db_def2:'开城诱敌',
 			
 			shouye:'守邺',
-			shouye_info:'每回合限一次。当其他角色使用牌指定你为唯一目标时，你可以与其进行【对策】。若你赢，则此牌对你无效，且你于此牌结算完成后获得其对应的所有实体牌。',
+			shouye_info:'每回合限一次。当其他角色使用牌指定你为唯一目标时，你可以与其进行【对策】。若你赢，则你取消此牌的目标，且你于此牌结算完成后获得其对应的所有实体牌。',
 			liezhi:'烈直',
 			liezhi_info:'准备阶段，你可以依次弃置至多两名角色区域内的各一张牌。若你受到过伤害，则〖烈直〗于你的下个回合无效。',
 			
@@ -3923,7 +4147,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			hujinding:'胡金定',
 			huaizi:'怀子',
-			huaizi_info:'锁定技，你的手牌上限+X（X为你已损失的体力值）',
+			huaizi_info:'锁定技，你的手牌上限为你的体力上限。',
 			renshi:'仁释',
 			renshi_info:'锁定技，当你受到【杀】的伤害时，若你已受伤，则你防止此伤害并获得此【杀】对应的所有实体牌，然后减1点体力上限。',
 			wuyuan:'武缘',
@@ -3980,7 +4204,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhouxuan2:'周旋',
 			zhouxuan_info:'结束阶段，你可以弃置一张牌并指定一名角色，然后选择一个基本牌的名称或非基本牌的类型。其使用或打出下一张牌时，若此牌的名称或类型和你选择的相同，则你观看牌堆顶的三张牌，然后将这些牌分配给任意角色。',
 			fengji:'丰积',
-			fengji_info:'锁定技，回合结束时，你记录你的手牌数。回合开始时，若你的手牌数不小于你记录的手牌数，则你摸两张牌且本回合手牌上限+X。（X为你已损失的体力值）',
+			fengji_info:'锁定技，回合结束时，你记录你的手牌数。回合开始时，若你的手牌数不小于你记录的手牌数，则你摸两张牌且本回合手牌上限为体力上限。',
 			re_guanqiujian:'手杀毌丘俭',
 			rezhengrong:'征荣',
 			rehongju:'鸿举',
@@ -3990,6 +4214,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rehongju_info:'觉醒技，准备阶段，若你武将牌上「荣」的数量不小于3且有角色死亡，则你摸等同于「荣」数量的牌。然后可以用任意数量的手牌交换等量的「荣」。你减1点体力上限并获得技能〖清侧〗。',
 			reqingce_info:'出牌阶段，你可以将一张「荣」置入弃牌堆，然后弃置场上的一张牌。',
 			re_pangtong:"手杀庞统",
+			dongcheng:'董承',
+			chengzhao:'承诏',
+			chengzhao_info:'一名角色的结束阶段，若你于本回合内获得了两张以上的牌，则你可以与一名其他角色拼点。若你赢，你视为对其使用一张无视防具的【杀】。',
+			yangyi:'杨仪',
+			duoduan:'度断',
+			duoduan_info:'每回合限一次，当你成为【杀】的目标后，你可以重铸一张牌。若如此做，此【杀】的使用者选择一项：摸两张牌令此【杀】无效，或弃置一张牌并令你不能闪避此【杀】。',
+			gongsun:'共损',
+			gongsun_info:'出牌阶段开始时，你可以弃置两张牌并指定一名其他角色。你选择一个基本牌或普通锦囊牌的牌名。直到你的下回合开始或你死亡，你与其不能使用或打出或弃置此名称的牌。',
+			gongsun_shadow:'共损',
 		}
 	};
 });

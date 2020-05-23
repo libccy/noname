@@ -1873,6 +1873,10 @@ div:not(.handcards)>.card>.info>span,
 	width: 70px !important;
 	white-space: nowrap;
 }
+.skilln {
+	left: 0 !important;
+	width: 70px !important;
+}
 .skill>.card {
 	transform: scale(0.56);
 	transform-origin: top left;

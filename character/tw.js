@@ -329,7 +329,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'useCardToPlayer'},
 				filter:function(event,player){
 					return event.card&&event.card.name=='sha'&&event.player!=player&&event.target!=player&&
-					event.targets.length==1&&event.player.inRange(player)<=1;
+					event.targets.length==1&&event.player.inRange(player);
 				},
 				logTarget:'target',
 				check:function(event,player){
