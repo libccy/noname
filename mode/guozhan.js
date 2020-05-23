@@ -2811,8 +2811,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			"baka_yingzi":{
 				mod:{
-					maxHandcard:function (player,num){
-						if(!player.hasSkill('reyingzi')&&player.hp<player.maxHp) return num+player.maxHp-player.hp;
+					maxHandcardBase:function (player,num){
+						return player.maxHp;
 					},
 				},
 				audio:"reyingzi",
@@ -4380,8 +4380,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					num:{
 						mod:{
-							maxHandcard:function(player,num){
-								return num+player.maxHp-player.hp;
+							maxHandcardBase:function(player,num){
+								return player.maxHp;
 							}
 						}
 					},

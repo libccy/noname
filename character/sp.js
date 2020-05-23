@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			sp:{
-				sp_default:["caoying","simahui","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","liuxie","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","fuwan","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","lingju","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","wenyang","xujing","yuantanyuanshang","wangshuang","sunshao"],
+				sp_default:["caoying","simahui","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","liuxie","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","fuwan","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","lingju","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","wenyang","xujing","yuantanyuanshang","wangshuang","sunshao","liuzan"],
 				sp_guansuo:['guansuo','baosanniang','huaman'],
 				sp_whlw:["xurong","lijue","zhangji","fanchou","guosi"],
 				sp_zlzy:["zhangqiying","lvkai","zhanggong","weiwenzhugezhi","beimihu"],
@@ -24,6 +24,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			liuzan:['male','wu',4,['refenyin','liji']],
 			re_panfeng:['male','qun',4,['xinkuangfu']],
 			gaolan:['male','qun',4,['xiying']],
 			sp_shenpei:['male','qun',3,['gangzhi','beizhan']],
@@ -512,6 +513,101 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//新岩泽(划掉)留赞
+			refenyin:{
+				audio:'fenyin',
+				trigger:{global:['loseAfter','cardsDiscardAfter']},
+				forced:true,
+				filter:function(event,player){
+					if(player!=_status.currentPhase) return false;
+					if(event.name=='lose'&&event.position!=ui.discardPile) return false;
+					var list=[];
+					var num=event.cards.length;
+					for(var i=0;i<event.cards.length;i++){
+						var card=event.cards[i];
+						list.add(get.suit(card,(event.cards2&&event.cards2.contains(card))?event.player:false));
+					}
+					game.getGlobalHistory('cardMove',function(evt){
+						if(evt==event||(evt.name!='lose'&&evt.name!='cardsDiscard')) return false;
+						if(evt.name=='lose'&&evt.position!=ui.discardPile) return false;
+						num+=evt.cards.length;
+						for(var i=0;i<evt.cards.length;i++){
+							var card=evt.cards[i];
+							list.remove(get.suit(card,(evt.cards2&&evt.cards2.contains(card))?evt.player:false));
+						}
+					},event);
+					player.storage.refenyin_mark2=num;
+					return list.length>0;
+				},
+				content:function(){
+					var list=[];
+					var list2=[];
+					for(var i=0;i<trigger.cards.length;i++){
+						var card=trigger.cards[i];
+						var suit=get.suit(card,(trigger.cards2&&trigger.cards2.contains(card))?trigger.player:false);
+						list.add(suit);
+						list2.add(suit);
+					}
+					game.getGlobalHistory('cardMove',function(evt){
+						if(evt==trigger||(evt.name!='lose'&&evt.name!='cardsDiscard')) return false;
+						if(evt.name=='lose'&&evt.position!=ui.discardPile) return false;
+						for(var i=0;i<evt.cards.length;i++){
+							var card=evt.cards[i];
+							var suit=get.suit(card,(evt.cards2&&evt.cards2.contains(card))?evt.player:false);
+							list.remove(suit);
+							list2.add(suit);
+						}
+					},trigger);
+					list2.sort();
+					player.draw(list.length);
+					player.storage.refenyin_mark=list2;
+					player.addTempSkill('refenyin_mark');
+					player.markSkill('refenyin_mark');
+				},
+				subSkill:{
+					mark:{
+						onremove:function(player){
+							delete player.storage.refenyin_mark;
+							delete player.storage.refenyin_mark2;
+						},
+						intro:{
+							content:function(s,p){
+								var str='本回合已经进入过弃牌堆的卡牌的花色：';
+								for(var i=0;i<s.length;i++){
+									str+=get.translation(s[i]);
+								}
+								str+='<br>本回合进入过弃牌堆的牌数：'
+								str+=p.storage.refenyin_mark2;
+								return str;
+							},
+						},
+					},
+				},
+			},
+			liji:{
+				enable:'phaseUse',
+				filter:function(event,player){
+					return (player.getStat().skill.liji||0)<(event.liji_num||0);
+				},
+				onChooseToUse:function(event){
+					var num=0;
+					game.getGlobalHistory('cardMove',function(evt){
+						if(evt.name=='cardsDiscard'||(evt.name=='lose'&&evt.position==ui.discardPile)) num+=evt.cards.length;
+					});
+					event.set('liji_num',Math.floor(num/(game.players.length>4?8:4)));
+				},
+				filterCard:true,
+				position:'he',
+				check:function(card){
+					var val=get.value(card);
+					if(!_status.event.player.getStorage('fenyin_mark').contains(get.suit(card))) return 12-val;
+					return 8-val;
+				},
+				filterTarget:lib.filter.notMe,
+				content:function(){
+					target.damage('nocard');
+				},
+			},
 			//新潘凤
 			xinkuangfu:{
 				enable:'phaseUse',
@@ -4393,11 +4489,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				direct:true,
 				filter:function(event,player){
-					return event.card&&event.card.name=='sha'&&player.isDamaged();
+					return event.card&&event.card.name=='sha';//&&player.isDamaged();
 				},
 				content:function(){
 					'step 0'
-					var num=player.getDamagedHp();
+					var num=Math.max(1,player.getDamagedHp());
 					player.chooseTarget('是否发动【誓仇】，令至多'+num+'名其他角色也成为此【杀】的目标？',[1,num],function(card,player,target){
 						return target!=player&&!trigger.targets.contains(target)&&player.canUse({name:'sha'},target);
 					}).ai=function(target){
@@ -4863,7 +4959,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return event.card.name==player.storage.spwenji_respond;
 						},
 						content:function(){
-							trigger.directHit.addArray(game.players);
+							trigger.directHit.addArray(game.filterPlayer(function(current){
+								return current!=player;
+							}));
 						},
 					}
 				}
@@ -7893,7 +7991,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						num=1;
 					}
-					if(player.getStat().skill.dingpan>=num) return false;
+					if((player.getStat().skill.dingpan||0)>=num) return false;
 					return true;
 				},
 				filterTarget:function(card,player,target){
@@ -13175,6 +13273,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectTarget:function(){
 					return [1,ui.selected.cards.length];
 				},
+				complexSelect:true,
 				check:function(card){
 					if(get.color(card)=='black') return -1;
 					return 9-get.value(card);
@@ -17288,7 +17387,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_luoyan_liuli":"流离",
 			"new_luoyan_liuli_info":"",
 			ol_shichou:"誓仇",
-			ol_shichou_info:"当你使用【杀】时，你可以令至多X名角色也成为此【杀】的目标。（X为你已损失的体力值）",
+			ol_shichou_info:"当你使用【杀】时，你可以令至多X名角色也成为此【杀】的目标。（X为你已损失的体力值且至少为1）",
 			"zhenwei_three":"镇卫",
 			"zhenwei_three_info":"锁定技，敌方角色至己方其他角色的距离+1。",
 			"huanshi_three":"缓释",
@@ -17870,6 +17969,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_panfeng:'潘凤',
 			xinkuangfu:'狂斧',
 			xinkuangfu_info:'出牌阶段限一次，你可选择：1，弃置装备区里的一张牌，你使用无对应实体牌的普【杀】。若此【杀】造成伤害，你摸两张牌。2，弃置一名其他角色装备区里的一张牌，你使用无对应实体牌的普【杀】。若此【杀】未造成伤害，你弃置两张牌。',
+			old_liuzan:'手杀留赞',
+			refenyin:'奋音',
+			refenyin_info:'锁定技，你的回合内，当一张牌进入弃牌堆后，若本回合内没有过与此牌花色相同的卡牌进入过弃牌堆，则你摸一张牌。',
+			liji:'力激',
+			liji_info:'出牌阶段限X次，你可以弃置一张牌并对一名其他角色造成1点伤害。（X为本回合内进入过弃牌堆的卡牌数除以8，若场上人数小于5则改为除以4，向下取整）',
 			
 			sp_default:"常规",
 			sp_whlw:"文和乱武",

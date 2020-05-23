@@ -165,7 +165,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						event.target=result.targets[0];
 						player.logSkill('zhengrong',target);
-						player.choosePlayerCard(target,'he').ai=get.buttonValue;
+						player.choosePlayerCard(target,'he',true).ai=get.buttonValue;
 					}
 					else event.finish();
 					'step 2'
@@ -5878,7 +5878,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			tianxiang:{
 				audio:2,
-				audioname:['daxiaoqiao','re_xiaoqiao'],
+				audioname:['daxiaoqiao','re_xiaoqiao','ol_xiaoqiao'],
 				trigger:{player:'damageBegin3'},
 				direct:true,
 				filter:function(event,player){
@@ -5967,7 +5967,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			retianxiang:{
 				audio:'tianxiang',
-				audioname:['daxiaoqiao','re_xiaoqiao'],
+				audioname:['daxiaoqiao','re_xiaoqiao','ol_xiaoqiao'],
 				trigger:{player:'damageBegin4'},
 				direct:true,
 				filter:function(event,player){
@@ -6398,8 +6398,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				mod:{
-					maxHandcard:function(player,num){
-						if(get.mode()!='guozhan'&&player.storage.buqu&&player.storage.buqu.length) return num-player.hp+player.storage.buqu.length;
+					maxHandcardBase:function(player,num){
+						if(get.mode()!='guozhan'&&player.storage.buqu&&player.storage.buqu.length) return player.storage.buqu.length;
 					},
 				},
 				ai:{

@@ -11225,7 +11225,7 @@
 							return;
 						}
 						else{
-							player.lose(event.card,'visible');
+							player.lose(event.card,'visible',ui.ordering);
 							player.$phaseJudge(event.card);
 							event.cancelled=false;
 							event.trigger('phaseJudge');
@@ -14558,6 +14558,7 @@
 					game.addVideo('lose',player,[get.cardsInfo(hs),get.cardsInfo(es),get.cardsInfo(js)]);
 					event.cards2=hs.concat(es);
 					player.getHistory('lose').push(event);
+					game.getGlobalHistory().cardMove.push(event);
 					player.update();
 					game.addVideo('loseAfter',player);
 					event.num=0;
@@ -20336,18 +20337,19 @@
 						}
 					}
 				},
-				getHistory:function(key,filter){
+				getHistory:function(key,filter,last){
 					if(!key) return this.actionHistory[this.actionHistory.length-1];
 					if(!filter) return this.actionHistory[this.actionHistory.length-1][key];
 					else{
 						var history=this.getHistory(key).slice(0);
+						if(last) history=history.slice(0,history.indexOf(last)+1);
 						for(var i=0;i<history.length;i++){
 							if(!filter(history[i])) history.splice(i--,1);
 						}
 						return history;
 					}
 				},
-				getAllHistory:function(key,filter){
+				getAllHistory:function(key,filter,last){
 					var list=[];
 					var all=this.actionHistory;
 					for(var j=0;j<all.length;j++){
@@ -20358,6 +20360,7 @@
   					if(!filter) list.addArray(all[j][key]);
   					else{
   						var history=all[j][key].slice(0);
+								if(last) history=history.slice(0,history.indexOf(last)+1);
   						for(var i=0;i<history.length;i++){
   							if(filter(history[i])) list.push(history[i]);
   						}
@@ -20466,7 +20469,11 @@
 					return (range);
 				},
 				getHandcardLimit:function(){
-					return Math.max(0,game.checkMod(this,Math.max(0,this.hp),'maxHandcard',this));
+					var num=Math.max(this.hp,0);
+					num=game.checkMod(this,num,'maxHandcardBase',this);
+					num=game.checkMod(this,num,'maxHandcard',this);
+					num=game.checkMod(this,num,'maxHandcardFinal',this);
+					return Math.max(0,num);
 				},
 				getEnemies:function(func){
 					var player=this;
@@ -40111,6 +40118,10 @@
 									text2.value='';
 								}
 							}
+							else if(text2.value.indexOf('无天使')!=-1&&(text2.value.indexOf('无神佛')!=-1||text2.value.indexOf('无神')!=-1&&text2.value.indexOf('无佛')!=-1)){
+								game.print('Welcome to Shinda Sekai Sensen!');
+								text2.value='';
+							}
 							else{
 								if(!game.observe&&!game.online){
  								try{
@@ -49402,7 +49413,7 @@
 							}
 						}
 						else if(lib.skill[skills[i]].nobracket){
-							uiintro.add('<div><div class="skill">'+get.translation(skills[i])+'</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
+							uiintro.add('<div><div class="skilln">'+get.translation(skills[i])+'</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
 						}
 						else{
 							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
@@ -50020,7 +50031,7 @@
 						if(lib.translate[skills[i]+'_info']){
 							translation=lib.translate[skills[i]+'_ab']||get.translation(skills[i]).slice(0,2);
 							if(lib.skill[skills[i]]&&lib.skill[skills[i]].nobracket){
-								uiintro.add('<div><div class="skill">'+get.translation(skills[i])+'</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
+								uiintro.add('<div><div class="skilln">'+get.translation(skills[i])+'</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
 							}
 							else{
 								uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');

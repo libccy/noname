@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			yijiang:{
 				yijiang_2011:['caozhi','re_yujin','zhangchunhua','xin_fazheng','xin_masu','xin_xushu','xusheng','lingtong','wuguotai','chengong','gaoshun'],
-				yijiang_2012:['wangyi','xunyou','zhonghui','madai','liaohua','guanzhang','bulianshi','handang','chengpu','liubiao','old_huaxiong'],
+				yijiang_2012:['wangyi','xunyou','zhonghui','madai','liaohua','guanzhang','bulianshi','handang','chengpu','liubiao','old_huaxiong','caozhang'],
 				yijiang_2013:['manchong','guohuai','caochong','guanping','liufeng','jianyong','yufan','panzhangmazhong','zhuran','xin_liru','fuhuanghou'],
 				yijiang_2014:['hanhaoshihuan','chenqun','caozhen','zhangsong','wuyi','zhoucang','zhuhuan','guyong','sunluban','yj_jushou','caifuren'],
 				yijiang_2015:['caoxiu','caorui','zhongyao','xiahoushi','liuchen','zhangyi','zhuzhi','quancong','sunxiu','gongsunyuan','guotufengji'],
@@ -16,7 +16,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			guohuai:['male','wei',4,['xinjingce']],
+			caozhang:['male','wei',4,['jiangchi']],
+			guohuai:['male','wei',4,['jingce']],
 			zhangchunhua:['female','wei',3,['jueqing','shangshi']],
 			caozhi:['male','wei',3,['luoying','jiushi']],
 			caochong:['male','wei',3,['chengxiang','renxin']],
@@ -24,7 +25,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_xushu:['male','shu',3,['xinwuyan','xinjujian']],
 			xin_masu:['male','shu',3,['sanyao','zhiman']],
 			xin_fazheng:['male','shu',3,['xinenyuan','xinxuanhuo'],['die_audio']],
-			zhuran:['male','wu',4,['xindanshou']],
+			zhuran:['male','wu',4,['danshou']],
 			xusheng:['male','wu',4,['xinpojun']],
 			wuguotai:['female','wu',3,['ganlu','buyi']],
 			lingtong:['male','wu',4,['xuanfeng']],
@@ -53,11 +54,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			panzhangmazhong:['male','wu',4,['duodao','anjian']],
 			zhoucang:['male','shu',4,['xinzhongyong']],
 			guanping:['male','shu',4,['longyin']],
-			liaohua:['male','shu',4,['xindangxian','xinfuli']],
+			liaohua:['male','shu',4,['dangxian','fuli']],
 			chengpu:['male','wu',4,['lihuo','chunlao']],
 			gaoshun:['male','qun',4,['xinxianzhen','jinjiu']],
 			caozhen:['male','wei',4,['xinsidi']],
-			wuyi:['male','shu',4,['xinbenxi']],
+			wuyi:['male','shu',4,['benxi']],
 			hanhaoshihuan:['male','wei',4,['shenduan','yonglve']],
 
 			caorui:['male','wei',3,['huituo','mingjian','xingshuai'],['zhu']],
@@ -67,7 +68,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangyi:['male','shu',4,['wurong','shizhi']],
 			sunxiu:['male','wu',3,['yanzhu','xingxue','zhaofu'],['zhu']],
 			zhuzhi:['male','wu',4,['xinanguo']],
-			quancong:['male','wu',4,['xinyaoming']],
+			quancong:['male','wu',4,['yaoming']],
 			gongsunyuan:['male','qun',4,['huaiyi']],
 			guotufengji:['male','qun',3,['jigong','shifei']],
 
@@ -306,7 +307,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var list=[
 							'为XXX多指定一个目标',
 							'令XXX无视防具',
-							'令XXX不可被响应',
+							'令XXX不可被抵消',
 							'当XXX造成伤害时摸一张牌',
 						];
 						var choiceList=ui.create.dialog('【奔袭】：请选择一至两项','forcebutton');
@@ -392,7 +393,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						function(trigger,player,event){
 							player.storage.xinbenxi_directHit.add(trigger.card);
-							trigger.directHit.addArray(game.players);
+							trigger.nowuxie=true;
+							trigger.customArgs.default.directHit2=true;
 						},
 						function(trigger,player,event){
 							player.storage.xinbenxi_damage.add(trigger.card);
@@ -411,7 +413,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					unequip:true,
-					norespond:true,
+					//norespond:true,
 					skillTagFilter:function(player,tag,arg){
 						if(tag=='unequip'){
 							if(arg&&player.storage.xinbenxi_unequip.contains(arg.card)) return true;
@@ -5734,9 +5736,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jigong2:{
 				mod:{
-					maxHandcard:function(player,num){
+					maxHandcardBase:function(player,num){
 						var damage=player.getStat().damage;
-						if(typeof damage=='number') return num-player.hp+damage;
+						if(typeof damage=='number') return damage;
 						return 0;
 					}
 				}
@@ -9474,7 +9476,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							if(cards.length){
-								player.chooseButton(['落英：选择要获得的牌',cards],[1,cards.length]).ai=get.buttonValue;
+								player.chooseButton(['落英：选择要获得的牌',cards],[1,cards.length]).set('ai',function(button){
+									return get.value(button.link,player,'raw');
+								});
 							}
 							"step 2"
 							if(result.bool){
@@ -9500,7 +9504,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							"step 0"
-							player.chooseButton(['落英：选择要获得的牌',trigger.cards],[1,trigger.cards.length]).ai=get.buttonValue;
+							player.chooseButton(['落英：选择要获得的牌',trigger.cards],[1,trigger.cards.length]).set('ai',function(button){
+								return get.value(button.link,player,'raw');
+							});
 							"step 1"
 							if(result.bool){
 								player.logSkill(event.name);
@@ -11287,7 +11293,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			benxi:'奔袭',
 			benxi_info:'锁定技，你的回合内，你每使用一次牌后，你的进攻距离+1直到回合结束；你的回合内，若你与所有角色的距离均为1，你无视其他角色的防具，且你使用的【杀】可额外指定一个目标',
 			xinbenxi:'奔袭',
-			xinbenxi_info:'锁定技，当你于回合内使用牌时，你本回合计算与其他角色的距离-1。你的回合内，若你至场上所有其他角色的距离均不大于1，则当你使用【杀】或普通锦囊牌选择唯一目标后，你选择至多两项：1.为此牌多指定一个目标；2.令此牌无视防具；3.令此牌不可被响应；4.你因此牌造成伤害时摸一张牌。',
+			xinbenxi_info:'锁定技，当你于回合内使用牌时，你本回合计算与其他角色的距离-1。你的回合内，若你至场上所有其他角色的距离均不大于1，则当你使用【杀】或普通锦囊牌选择唯一目标后，你选择至多两项：1.为此牌多指定一个目标；2.令此牌无视防具；3.令此牌不可被抵消；4.你因此牌造成伤害时摸一张牌。',
 			sidi:'司敌',
 			sidi2:'司敌',
 			sidi3:'司敌',
