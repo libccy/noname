@@ -232,6 +232,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								}
 								return 0.3;
 							}
+							if (target==player){
+								var cards=target.getCards('he');
+								var du_count=0;
+								for (var i=0;i<cards.length;i++){
+									if (cards[i].name=='du') du_count+=1;
+								}
+								if (cards.length<=1+du_count) return 0;
+							}
 							return Math.sqrt(target.countCards('he'));
 						},
 					},
@@ -295,6 +303,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				ai:{
+					wuxie:function(target,card,player,current,state){
+						if ((get.attitude(current,player)>0&&state<0)||(get.attitude(current,player)<0&&state>0)){
+							return 1;
+						}
+					},
 					basic:{
 						useful:[6,4],
 						value:[6,4],

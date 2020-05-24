@@ -246,8 +246,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				toself:true,
 				ai:{
-					value:-5,
-					useful:6,
+					//value:-5,
+					value:function(card,player,i){
+						if(player.hp<=1) return 10;
+						return -5;
+					},
+					//useful:6,
+					useful:function(card,i){
+						if(_status.event.player.hp<=1) return 10;
+						return 6;
+					},
 					result:{
 						player:function(player,target){
 							if(player.hasSkillTag('usedu')) return 5;

@@ -275,7 +275,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							// if(player==target&&player.hp<=0) return 2;
-							if(player.hasSkillTag('nokeep')) return 2;
+							//if(player.hasSkillTag('nokeep')) return 2;
+							if(player.hasMark('drlt_jieying_mark')) return 2;
 							var nd=player.needsToDiscard();
 							var keep=false;
 							if(nd<=0){
