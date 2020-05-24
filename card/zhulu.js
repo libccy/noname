@@ -445,6 +445,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target:function(player,target){
 							var val=2;
 							var card=target.getEquip(2);
+							if(card&&(card.name=='baiyin'&&target.isDamaged())) return 'zerotarget';
 							if(card) val+=get.value(card);
 							return -val;
 						},
@@ -502,7 +503,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(target.sex=='male'){
 								var val=0;
 								var card=target.getEquip(2);
-								if(card) val=get.value(card);
+								if(card&&(card.name!='baiyin'&&target.isDamaged())) val=get.value(card);
 								var num=target.countCards('he',function(cardx){
 									return cardx!=card
 								});
@@ -710,7 +711,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					})) return false;
 					return true;
 				},
-				content:function(){trigger.num++},
+				content:function(){
+					trigger.num++;
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target,current){
+							if(get.type(card)=='trick'&&get.tag(card,'damage')){
+								return 2;
+							}
+						}
+					}
+				}
 			},
 			wufengjian_skill:{
 				trigger:{player:'useCard'},
