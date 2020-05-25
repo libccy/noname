@@ -4379,12 +4379,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:1,
 					result:{
 						target:function(player,target){
-							if(get.attitude(player,target)>0){
-								return Math.sqrt(target.countCards('he'));
+							if(get.attitude(player,target)>0&&target.countCards('h')>2&&target.hp>2){
+								return 2+Math.sqrt(target.countCards('he'));
+							}
+							else if(get.attitude(player,target)<0){
+								return -Math.sqrt(target.countCards('he'));
 							}
 							return 0;
 						},
-						player:1
+						//player:1
 					}
 				},
 				subSkill:{

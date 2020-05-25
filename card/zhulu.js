@@ -388,7 +388,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						keepAI:true,
 						target:function(player,target){
 							var val=2.5;
-							var card=target.getEquip(2);
+							var card=target.getEquip(1);
+							if(card&&get.equipValue(card)<=0) return 'zerotarget';
 							if(card) val+=get.value(card);
 							return -val;
 						},
@@ -416,7 +417,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						keepAI:true,
 						target:function(player,target){
 							var val=2.5;
-							var card=target.getEquip(2);
+							var card=target.getEquip(1);
+							if(card&&get.equipValue(card)<=0) return 'zerotarget';
 							if(card) val+=get.value(card);
 							return -val;
 						},

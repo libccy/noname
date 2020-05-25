@@ -248,12 +248,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					//value:-5,
 					value:function(card,player,i){
-						if(player.hp<=1) return 10;
+						if(player.hp<=1&&_status.currentPhase==player&&_status.event.getParent('phaseUse').name=='phaseUse'){
+							return 10;
+						}
 						return -5;
 					},
 					//useful:6,
 					useful:function(card,i){
-						if(_status.event.player.hp<=1) return 10;
+						var player=_status.event.player
+						if(player.hp<=1&&_status.currentPhase==player&&_status.event.getParent('phaseDiscard').name=='phaseDiscard'){
+							return 10;
+						}
 						return 6;
 					},
 					result:{
