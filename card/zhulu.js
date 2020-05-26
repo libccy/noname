@@ -304,9 +304,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					wuxie:function(target,card,player,current,state){
-						if ((get.attitude(current,player)>0&&state<0)||(get.attitude(current,player)<0&&state>0)){
-							return 1;
-						}
+						return -state*get.attitude(player,current);
 					},
 					basic:{
 						useful:[6,4],
