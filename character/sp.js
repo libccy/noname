@@ -12181,7 +12181,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zhoufu2:{
-				trigger:{player:'judgeBegin'},
+				trigger:{player:'judgeBefore'},
 				forced:true,
 				//priority:10,
 				mark:'card',

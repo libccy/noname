@@ -2251,6 +2251,9 @@ div:not(.handcards)>.card>.info>span,
 #window>.damage.fullscreenavatar[data-nature='thunder']:not(.noshadow)>div:first-child>div{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 10px, rgba(0, 0, 0,0.3) 0 0 30px, rgba(100, 74, 139,1) 0 0 60px;
 }
+#window>.damage.fullscreenavatar[data-nature='kami']:not(.noshadow)>div:first-child>div{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 10px, rgba(0, 0, 0,0.3) 0 0 30px, rgba(90, 118, 99,1) 0 0 60px;
+}
 #window>.damage.fullscreenavatar[data-nature='metal']>div:first-child>div{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 10px, rgba(255, 0, 0,0.1) 0 0 30px, rgba(255, 203, 0,0.6) 0 0 80px;
 }
@@ -3449,6 +3452,9 @@ div:not(.handcards)>.card>.info>span,
 .thunder {
 	color: rgba(0,80,255,0.3);
 }
+.kami {
+	color: rgba(90,118,99,0.3);
+}
 .poison {
 	color: rgba(30, 133, 51,0.4);
 }
@@ -3796,6 +3802,23 @@ span[data-nature='thundermm'] {
 		rgba(100, 74, 139,1) 0 0 2px,black 0 0 1px;
 }
 
+.player .identity[data-color="kami"],
+div[data-nature='kami'],
+span[data-nature='kami'] {
+	text-shadow: rgba(90, 118, 99,1) 0 0 2px,rgba(90, 118, 99,1) 0 0 5px,rgba(90, 118, 99,1) 0 0 10px,
+		rgba(90, 118, 99,1) 0 0 10px,rgba(90, 118, 99,1) 0 0 20px,rgba(90, 118, 99,1) 0 0 20px,black 0 0 1px;
+}
+div[data-nature='kamim'],
+span[data-nature='kamim'] {
+	text-shadow: rgba(90, 118, 99,1) 0 0 2px,rgba(90, 118, 99,1) 0 0 5px,rgba(90, 118, 99,1) 0 0 5px,
+		rgba(90, 118, 99,1) 0 0 5px,black 0 0 1px;
+}
+div[data-nature='kamimm'],
+span[data-nature='kamimm'] {
+	text-shadow: rgba(90, 118, 99,1) 0 0 2px,rgba(90, 118, 99,1) 0 0 2px,rgba(90, 118, 99,1) 0 0 2px,
+		rgba(90, 118, 99,1) 0 0 2px,black 0 0 1px;
+}
+
 .player .identity[data-color="fan"],
 .player .identity[data-color="wu"],
 div[data-nature='wood'],
@@ -4051,6 +4074,10 @@ div[data-decoration="bronze"]::after{
 	color: #152E63;
 	border: 1px solid #152E63;
 }
+.card.fullskin.kami>.name {
+	color: #1F3C38;
+	border: 1px solid #1F3C38;
+}
 .card.fullskin.fire>.name {
 	color: #631515;
 	border: 1px solid #631515;
@@ -4226,6 +4253,9 @@ div[data-decoration="bronze"]::after{
 .thundertext,
 .controlthundertext {
 	color: rgb(117,186,255);
+}
+.kamitext {
+	color: rgb(90,118,99);
 }
 .whitetext .thundertext {
 	color: white;

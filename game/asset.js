@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.99.1',
+	'v1.9.99.2',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -567,6 +567,7 @@ window.noname_asset_list=[
 	'audio/die/shen_zhenji.mp3',
 	'audio/die/yangyi.mp3',
 	'audio/die/yujin_yujin.mp3',
+	'audio/die/ol_weiyan.mp3',
 	
 	'audio/skill/anguo1.mp3',
 	'audio/skill/anguo2.mp3',
@@ -2487,7 +2488,10 @@ window.noname_asset_list=[
 	'audio/skill/tianxing1.mp3',
 	'audio/skill/tianxing2.mp3',
 	'audio/skill/xuanfeng_re_lingtong1.mp3',
-	'audio/skill/xuanfeng_re_lingtong2.mp3',
+	'audio/skill/xuanfeng_re_lingtong2.mp3','audio/skill/kuanggu_ol_weiyan1.mp3',
+	'audio/skill/kuanggu_ol_weiyan2.mp3',
+	'audio/skill/reqimou1.mp3',
+	'audio/skill/reqimou2.mp3',
 	
 	'font/huangcao.ttf',
 	'font/shousha.ttf',
@@ -3035,7 +3039,9 @@ window.noname_asset_list=[
 	'image/character/shen_caopi.jpg',
 	'image/character/shen_zhenji.jpg',
 	'image/character/yangyi.jpg',
-	'image/character/yujin_yujin.jpg',
+	'image/character/yujin_yujin.jpg',	'image/character/key_hinata.jpg',
+	'image/character/key_hisako.jpg',
+	'image/character/key_noda.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
@@ -3975,7 +3981,11 @@ window.noname_asset_list=[
 	'image/mode/boss/card/yihuajiemu.png',
 	'image/mode/boss/card/qicaishenlu.png',
 	'image/mode/boss/card/longfenghemingjian.png',
-	'image/mode/boss/card/boss_mengpohuihun.png',
+	'image/mode/boss/card/boss_mengpohuihun.png','image/mode/boss/card/gubuzifeng.png',
+	'image/mode/boss/card/jinwuluorigong.png',
+	'image/mode/boss/card/lingsheji.png',
+	'image/mode/boss/card/shanrangzhaoshu.png',
+	'image/mode/boss/card/xingtianpojunfu.png',
 	
 	'image/mode/boss/character/boss_bianchengwang.jpg',
 	'image/mode/boss/character/boss_chujiangwang.jpg',

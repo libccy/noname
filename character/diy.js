@@ -38,6 +38,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_doruji:['female','key',16,['doruji_feiqu']],
 			key_yuiko:['female','key',3,['yuiko_fenglun','yuiko_dilve']],
 			key_riki:['female','key',3,['riki_spwenji','riki_nvzhuang','riki_mengzhong']],
+			key_hisako:['female','key',3,['hisako_yinbao','hisako_zhuanyun']],
+			key_hinata:['male','key',4,['hinata_qiulve','hinata_ehou']],
+			key_noda:['male','key',4,['noda_fengcheng','noda_xunxin']],
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
 			diy_feishi:['male','shu',3,['shuaiyan','moshou']],
@@ -117,7 +120,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy:{
 				diy_tieba:["diy_wenyang","ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_zhangwei"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda"],
 				diy_yongjian:["ns_chendao","yj_caoang"],
 			},
 		},
@@ -133,6 +136,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
+			key_noda:'#rAngel Beats!',
+			key_hinata:'#rAngel Beats!',
+			key_hisako:'#rAngel Beats!',
+			key_doruji:'#bLittle Busters!',
 			key_riki:'#bLittle Busters!',
 			key_yuiko:'#bLittle Busters!',
 			key_akane:'#bRewrite',
@@ -194,6 +201,167 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuji:['zuoci']
 		},
 		skill:{
+			noda_fengcheng:{
+				trigger:{
+					player:"gainAfter",
+				},
+				forced:true,
+				filter:function(event,player){
+					return get.itemtype(event.source)=='player'&&event.bySelf!=true;
+				},
+				check:function(event,player){
+					return get.attitude(player,event.source)>0;
+				},
+				logTarget:"source",
+				content:function(){
+					trigger.source.draw();
+				},
+			},
+			noda_xunxin:{
+				enable:'phaseUse',
+				viewAs:{name:'juedou'},
+				filter:function(event,player){
+					return (player.getStat('skill').noda_xunxin||0)<player.hp;
+				},
+				filterTarget:function(event,player,target){
+					if(target.hp<player.hp) return false;
+					return lib.filter.filterTarget.apply(this,arguments);
+				},
+				selectCard:-1,
+				filterCard:function(){return false},
+				group:'noda_xunxin2',
+			},
+			noda_xunxin2:{
+				trigger:{player:'juedouAfter'},
+				popup:false,
+				forced:true,
+				filter:function(event,player){
+					if(event.target.isDead()) return false;
+					return event.turn&&event.turn.countCards('he')>0;
+				},
+				content:function(){
+					'step 0'
+					event.giver=trigger.turn;
+					event.gainner=event.giver==player?trigger.target:player;
+					event.giver.chooseCard('he',true,'交给'+get.translation(event.gainner)+'一张牌');
+					'step 1'
+					event.gainner.gain(result.cards,event.giver,'giveAuto');
+				},
+			},
+			hinata_qiulve:{
+				enable:['chooseToUse','chooseToRespond'],
+				viewAsFilter:function(player){
+					return player.countCards('he',function(card){
+						return get.type(card)!='basic';
+					})>0;
+				},
+				viewAs:{name:'sha'},
+				filterCard:function(card,player){
+					return get.type(card)!='basic';
+				},
+				locked:false,
+				position:'he',
+				check:function(card){
+					var val=get.value(card);
+					if(val>=6) return 0;
+					if(get.color(card)=='black') return 12-val;
+					return 6-val;
+				},
+				mod:{
+					targetInRange:function(card,player,target){
+						if(_status.event.skill=='hinata_qiulve') return true;
+					},
+				},
+				group:'hinata_qiulve_clear',
+				ai:{
+					respondSha:true,
+					skillTagFilter:function(player){
+ 					return player.countCards('he',function(card){
+ 						return get.type(card)!='basic';
+ 					})>0;
+ 				},
+				},
+			},
+			hinata_qiulve_clear:{
+				trigger:{player:'useCard1'},
+				firstDo:true,
+				silent:true,
+				filter:function(event,player){
+					return event.skill=='hinata_qiulve';
+				},
+				content:function(){
+					if(get.color(trigger.card)=='red') trigger.directHit.addArray(game.players);
+					else if(trigger.addCount!==false){
+						trigger.addCount=false;
+						var stat=player.getStat().card;
+						if(stat.sha) stat.sha--;
+					}
+				},
+			},
+			hinata_ehou:{
+				trigger:{global:'useCardAfter'},
+				direct:true,
+				filter:function(event,player){
+					return player!=event.player&&event.targets&&event.targets.contains(player)&&(_status.connectMode||player.hasSha());
+				},
+				content:function(){
+					'step 0'
+					player.chooseToUse({
+						logSkill:'hinata_ehou',
+						preTarget:trigger.player,
+						prompt:'是否发动【扼喉】，对'+get.translation(trigger.player)+'使用一张【杀】？',
+						filterCard:function(card,player){
+							return get.name(card)=='sha'&&lib.filter.filterCard.apply(this,arguments);
+						},
+						filterTarget:function(card,player,target){
+							return target==_status.event.preTarget&&lib.filter.filterTarget.apply(this,arguments);
+						},
+						addCount:false,
+					});
+					'step 1'
+					if(result.bool&&player.getHistory('sourceDamage',function(evt){
+						return evt.getParent(4)==event;
+					}).length) player.draw();
+				},
+			},
+			hisako_yinbao:{
+				trigger:{player:['damageEnd','recoverAfter']},
+				content:function(){
+					'step 0'
+					player.judge(function(card){
+						return get.suit(card)=='spade'?2:-2;
+					});
+					'step 1'
+					if(result.bool){
+						player.chooseTarget(lib.filter.notMe,true,'选择一名其他角色，对其造成1点雷属性伤害');
+					}
+					else event.finish();
+					'step 2'
+					var target=result.targets[0];
+					player.line(target,'thunder');
+					target.damage();
+				},
+			},
+			hisako_zhuanyun:{
+				trigger:{player:'judgeBegin'},
+				forced:true,
+				silent:true,
+				filter:function(event,player){
+					return !event.directresult;
+				},
+				content:function(){
+					var tempcard=false,temp=-Infinity;
+					for(var i=0;i<ui.cardPile.childElementCount;i++){
+						var card=ui.cardPile.childNodes[i];
+						var temp2=trigger.judge(card);
+						if(temp2>temp){
+							tempcard=card;
+							temp=temp2;
+						}
+					}
+					if(tempcard) trigger.directresult=tempcard;
+				},
+			},
 			riki_spwenji:{
 				audio:2,
 				trigger:{player:'phaseUseBegin'},
@@ -2543,7 +2711,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					forced:true,
 					silent:true,
 					popup:false,
-					priority:-1,
+					lastDo:true,
 					filter:function(event){
 						return event.name=='draw'||!event.directresult;
 					},
@@ -2588,10 +2756,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else{
 							var another=trigger[trigger.source==player?'player':'source'];
 							player.line(another,{color:[220, 90, 139]});
-							var card=game.createCard('du');
+							var card=game.createCard2('du');
 							player.$gain2(card);
 							player.gain(card);
-							another.gain(game.createCard('du'),'gain2');
+							another.gain(game.createCard2('du'),'gain2');
 						}
 					},
 					ai:{
@@ -7414,6 +7582,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_doruji:'多鲁基',
 			key_yuiko:'来谷唯湖',
 			key_riki:'直枝理树'/*+'子'*/,
+			key_hisako:'久子',
+			key_hinata:'日向秀树',
+			key_noda:'野田',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -7513,7 +7684,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shiina_feiyan:'飞燕',
 			shiina_feiyan_info:'一名其他角色的回合开始时，若其在你的攻击范围内，则你可以将一张「轻」置于弃牌堆，然后视为对其使用一张【杀】。若此【杀】未造成伤害，你摸一张牌。你于此【杀】的结算流程中视为拥有技能【铁骑】。',
 			shiina_retieji:'铁骑',
-			//你不能对稻荷发动【飞燕】
+			//你不能对稻荷和多鲁基发动【飞燕】
 			sunohara_chengshuang:'成双',
 			sunohara_chengshuang_phase:'成双',
 			sunohara_chengshuang_info:'锁定技，游戏开始时，你选择你的性别。回合开始时，你可以切换你的性别。',
@@ -7552,6 +7723,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			riki_mengzhong_info:'觉醒技，准备阶段，若你已因〖问计〗获得了三张或更多的牌，则你加1点体力上限并回复1点体力，失去〖问计〗并获得〖重振〗。',
 			riki_chongzhen:'重振',
 			riki_chongzhen_info:'出牌阶段开始时，你可以与一名角色拼点。若你赢，你获得该角色手牌区，装备区，判定区的各一张牌；若你没赢，你于此阶段内使用牌时不能指定其他角色为目标。',
+			hisako_yinbao:'音爆',
+			hisako_yinbao_info:'当你受到伤害/回复体力后，你可以判定。若结果为♠，则你对一名其他角色造成1点雷属性伤害。',
+			hisako_zhuanyun:'转运',
+			hisako_zhuanyun_info:'锁定技，你的判定会朝向对你有利的方向倾斜。',
+			hinata_qiulve:'球略',
+			hinata_qiulve_info:'你可以将一张非基本牌当做【杀】使用或打出（无距离限制）。你以此法使用的红色【杀】不可被响应，黑色【杀】不计入使用次数限制。',
+			hinata_ehou:'扼喉',
+			hinata_ehou_info:'其他角色对你使用的牌结算完成后，你可对其使用一张【杀】。若此【杀】造成伤害，则你摸一张牌。',
+			noda_fengcheng:'奉承',
+			noda_fengcheng_info:'锁定技，其他角色交给你牌后，其摸一张牌。',
+			noda_xunxin:'寻衅',
+			noda_xunxin2:'寻衅',
+			noda_xunxin_info:'出牌阶段限X次，你可以视为对一名体力值不小于你的角色使用【决斗】。若如此做，此【决斗】结算完成后，没赢的角色交给赢的角色一张牌。',
 			
 			yj_caoang:'SP曹昂',
 			yjxuepin:'血拼',

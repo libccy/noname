@@ -63,7 +63,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			sha:{
 				audio:true,
 				fullskin:true,
-				nature:['thunder','fire'],
+				nature:['thunder','fire','kami'],
 				type:'basic',
 				enable:true,
 				usable:1,
