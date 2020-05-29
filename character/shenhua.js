@@ -2657,7 +2657,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				direct:true,
 				audio:'kuanggu',
-				audioname:['re_weiyan'],
+				audioname:['re_weiyan','ol_weiyan'],
 				content:function(){
 					'step 0'
 					event.num=trigger.num;
@@ -5867,7 +5867,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			kuanggu:{
 				audio:2,
-				audioname:['re_weiyan'],
+				audioname:['re_weiyan','ol_weiyan'],
 				trigger:{source:'damageSource'},
 				forced:true,
 				filter:function(event,player){

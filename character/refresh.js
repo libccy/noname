@@ -731,7 +731,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{player:'loseEnd'},
 				filter:function(event,player){
-					if(player==_status.currentPhase) return false;
+					if(player==_status.currentPhase||!event.visible||player.hp>=player.countCards('h')) return false;
 					for(var i=0;i<event.cards2.length;i++){
 						if(get.suit(event.cards2[i],player)=='heart') return true;
 					}
@@ -3031,6 +3031,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"new_rejianxiong":{
 				audio:"rejianxiong",
+				audioname:['shen_caopi'],
 				trigger:{
 					player:"damageEnd",
 				},
@@ -4894,6 +4895,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			rejianxiong:{
 				audio:2,
+				audioname:['shen_caopi'],
 				trigger:{player:'damageEnd'},
 				filter:function(event,player){
 					return get.itemtype(event.cards)=='cards'&&get.position(event.cards[0],true)=='o';
@@ -6383,7 +6385,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reqimou_info:'限定技，出牌阶段，你可以失去任意点体力并摸等量的牌，然后直到回合结束，你计算与其他角色的距离时-X，且你可以多使用X张【杀】（X为你失去的体力值）',
 			ol_xiaoqiao:'界小乔',
 			rehongyan:'红颜',
-			rehongyan_info:'锁定技，你区域内的黑桃牌和黑桃判定牌均视为红桃。当你于回合外失去红桃牌后，你摸一张牌。',
+			rehongyan_info:'锁定技，你区域内的黑桃牌和黑桃判定牌均视为红桃。当你于回合外正面朝上失去红桃牌后，若你的手牌数小于体力值，你摸一张牌。',
 			re_caozhi:'界曹植',
 			reluoying:'落英',
 			reluoying_discard:'落英',

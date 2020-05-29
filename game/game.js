@@ -9721,6 +9721,7 @@
 			fire:"火",
 			thunder:"雷",
 			poison:"毒",
+			kami:'神',
 			wei:'魏',
 			shu:'蜀',
 			wu:'吴',
@@ -9732,7 +9733,7 @@
 			shu2:'蜀国',
 			wu2:'吴国',
 			qun2:'群雄',
-			shen2:'神将',
+			shen2:'神明',
 			western2:'西方',
 			key2:'KEY',
 			male:'男',
@@ -9778,6 +9779,7 @@
 			_chongzhu:'重铸',
 			_lianhuan:'连环',
 			_lianhuan2:'连环',
+			_kamisha:'神杀',
 			qianxing:'潜行',
 			mianyi:'免疫',
 			fengyin:'封印',
@@ -14682,6 +14684,11 @@
 						player.changeHujia(-event.hujia).type='damage';
 					}
 					event.num=num;
+					if(num<=0){
+						event.trigger('damageZero');
+						event.finish();
+						event._triggered=null;
+					}
 					"step 5"
 					if(event.source&&event.source.isDead()) delete event.source;
 					if(lib.config.background_audio){
@@ -14847,7 +14854,7 @@
 					player.update();
 					"step 1"
 					if(player.maxHp<=0){
-						player.die();
+						player.die(event);
 					}
 				},
 				gainMaxHp:function(){
@@ -16448,7 +16455,7 @@
 						while(this.maxHp>hp.childNodes.length){
 							ui.create.div(hp);
 						}
-						while(this.maxHp<hp.childNodes.length){
+						while(Math.max(0,this.maxHp)<hp.childNodes.length){
 							hp.removeChild(hp.lastChild);
 						}
 						for(var i=0;i<this.maxHp;i++){
@@ -21105,7 +21112,7 @@
 						this.$draw(cards);
 					}
 					else{
-						this.draw(cards.length);
+						this.$draw(cards.length);
 					}
 				},
 				$draw:function(num,init,config){
@@ -22602,6 +22609,10 @@
 							card[2]='sha';
 							card[3]='thunder';
 						}
+						if(card[2]=='kamisha'){
+							card[2]='sha';
+							card[3]='kami';
+						}
 					}
 					else if(typeof card=='object'){
 						card=[card.suit,card.number,card.name,card.nature];
@@ -22839,6 +22850,10 @@
 						else if(card[3]=='thunder'){
 							name='雷'+name;
 							this.node.image.classList.add('thunder');
+						}
+						else if(card[3]=='kami'){
+							name='神'+name;
+							this.node.image.classList.add('kami');
 						}
 					}
 					for(var i=0;i<name.length;i++){
@@ -24438,6 +24453,29 @@
 			}
 		},
 		skill:{
+			_kamisha:{
+				trigger:{source:'damageBegin2'},
+				//forced:true,
+				popup:false,
+				prompt:function(event,player){
+					return '是否防止即将对'+get.translation(event.player)+'造成的伤害，改为令其减少'+get.cnNumber(event.num)+'点体力上限？';
+				},
+				filter:function(event,player){
+					return event.nature=='kami'&&event.num>0;
+				},
+				ruleSkill:true,
+				check:function(event,player){
+					var att=get.attitude(player,event.player);
+					if(event.player.hp==event.player.maxHp) return att<0;
+					if(event.player.hp==event.player.maxHp-1&&
+						(event.player.maxHp<=3||event.player.hasSkillTag('maixie'))) return att<0;
+					return att>0;
+				},
+				content:function(){
+					trigger.cancel();
+					trigger.player.loseMaxHp(trigger.num).source=player;
+				},
+			},
 			aozhan:{
 				charlotte:true,
 				mod:{
@@ -24649,36 +24687,36 @@
 				},
 			},
 			"_disableEquip":{
-						marktext:"废",
-						intro:{
-							content:function(storage,player,skill){
-								var str='';
-								for(var i=0;i<player.storage.disableEquip.length;i++){
-									str+='、'+get.translation(player.storage.disableEquip[i])+'栏';
-								};
-								str=str.slice(1,str.length)
-								str='已经废除了'+str;
-								return str;
-							},
-						},
-						mod:{
-							targetEnabled:function(card,player,target){
-								if(target.isDisabled(get.subtype(card))) return false;
-							},
-						},
-						trigger:{
-							player:['disableEquipBefore','enableEquipBefore','enterGame'],
-							global:'gameStart',
-						},
-						forced:true,
-						popup:false,
-						filter:function(event,player){
-							return player.storage.disableEquip==undefined;
-						},
-						content:function(){
-							player.storage.disableEquip=[];
-						},
+				marktext:"废",
+				intro:{
+					content:function(storage,player,skill){
+						var str='';
+						for(var i=0;i<player.storage.disableEquip.length;i++){
+							str+='、'+get.translation(player.storage.disableEquip[i])+'栏';
+						};
+						str=str.slice(1,str.length)
+						str='已经废除了'+str;
+						return str;
 					},
+				},
+				mod:{
+					targetEnabled:function(card,player,target){
+						if(target.isDisabled(get.subtype(card))) return false;
+					},
+				},
+				trigger:{
+					player:['disableEquipBefore','enableEquipBefore','enterGame'],
+					global:'gameStart',
+				},
+				forced:true,
+				popup:false,
+				filter:function(event,player){
+					return player.storage.disableEquip==undefined;
+				},
+				content:function(){
+					player.storage.disableEquip=[];
+				},
+			},
 			fengyin:{
 				init:function(player,skill){
 					var skills=player.getSkills(true,false);
@@ -24693,6 +24731,7 @@
 					player.enableSkill(skill);
 				},
 				locked:true,
+				charlotte:true,
 				mark:true,
 				intro:{
 					content:function(storage,player,skill){
@@ -26130,8 +26169,8 @@
 		},
 		suit:['club','spade','diamond','heart'],
 		group:['wei','shu','wu','qun','shen'],
-		nature:['fire','thunder','poison'],
-		linked:['fire','thunder'],
+		nature:['fire','thunder','poison','kami'],
+		linked:['fire','thunder','kami'],
 		groupnature:{
 			shen:'thunder',
 			wei:'water',
@@ -29704,6 +29743,11 @@
 			}
 			card.storage.vanish=true;
 			return card.init([suit,number,name,nature]);
+		},
+		createCard2:function(){
+			var card=game.createCard.apply(this,arguments);
+			delete card.storage.vanish;
+			return card;
 		},
 		forceOver:function(bool,callback){
 			_status.event.next.length=0;
@@ -48677,6 +48721,9 @@
 					}
 					else if(str.nature=='thunder'){
 						str2='雷'+str2;
+					}
+					else if(str.nature=='kami'){
+						str2='神'+str2;
 					}
 				}
 				if(get.itemtype(str)=='card'||str.isCard){
