@@ -41,6 +41,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_hisako:['female','key',3,['hisako_yinbao','hisako_zhuanyun']],
 			key_hinata:['male','key',4,['hinata_qiulve','hinata_ehou']],
 			key_noda:['male','key',4,['noda_fengcheng','noda_xunxin']],
+			key_tomoya:['male','key',4,['tomoya_shangxian','tomoya_wangjin']],
+			key_nagisa:['female','key',3,['nagisa_tiandu','nagisa_fuxin']],
+			key_ayato:['male','key',3,['ayato_jianshen','ayato_zonghuan']],
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
 			diy_feishi:['male','shu',3,['shuaiyan','moshou']],
@@ -106,6 +109,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_xinnanhua:['male','qun',3,['ns_xiandao','ns_xiuzheng','ns_chuanshu'],[]],
 		},
 		characterFilter:{
+			key_tomoya:function(mode){
+				return mode!='chess'&&mode!='tafang'&&mode!='stone';
+			},
 			key_sunohara:function(mode){
 				return mode!='guozhan';
 			},
@@ -120,7 +126,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy:{
 				diy_tieba:["diy_wenyang","ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_zhangwei"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato"],
 				diy_yongjian:["ns_chendao","yj_caoang"],
 			},
 		},
@@ -136,6 +142,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
+			key_ayato:'#rAngel Beats!',
+			key_nagisa:'#gClannad',
+			key_tomoya:'#gClannad',
 			key_noda:'#rAngel Beats!',
 			key_hinata:'#rAngel Beats!',
 			key_hisako:'#rAngel Beats!',
@@ -201,6 +210,246 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuji:['zuoci']
 		},
 		skill:{
+			ayato_jianshen:{
+				mod:{
+					cardnature:function(card,player){
+						if(get.name(card)=='sha') return 'kami';
+					},
+				},
+				ai:{threaten:3},
+			},
+			ayato_zonghuan:{
+				enable:'phaseUse',
+				usable:1,
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countCards('h')>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseButton(['请选择'+get.translation(target)+'的一张手牌',target.getCards('h')],true).set('ai',get.buttonValue);
+					'step 1'
+					if(result.bool){
+						var card=result.links[0];
+						event.card=card;
+						if(!lib.filter.cardEnabled(card,target)) event._result={bool:false};
+						else{
+							var targets=game.players.slice(0);
+							var info=get.info(card);
+  					var range;
+  					if(!info.notarget){
+    				var select=get.copy(info.selectTarget);
+    				if(select==undefined){
+    					range=[1,1];
+    				}
+    				else if(typeof select=='number') range=[select,select];
+    				else if(get.itemtype(select)=='select') range=select;
+    				else if(typeof select=='function') range=select(card,player);
+    				game.checkMod(card,target,range,'selectTarget',target);
+   				}
+  					if(info.notarget||range[1]==-1){
+  						if(range[1]==-1){
+  							for(var i=0;i<targets.length;i++){
+  								if(!target.canUse(card,targets[i])){
+  									targets.splice(i--,1);
+  								}
+  							}
+  							if(targets.length){
+  								event.targets2=targets;
+  							}
+  							else{
+  								event.finish();
+  								return;
+  							}
+  						}
+  						else event.targets2=[];
+ 							var next=player.chooseBool();
+ 							next.set('prompt',event.prompt||('是否令'+get.translation(target)+(event.targets2.length?'对':'')+get.translation(event.targets2)+'使用'+get.translation(card)+'?'));
+ 							next.set('prompt2','或点「取消」，令其将此牌置入弃牌堆');
+ 							next.ai=function(){
+ 								var eff=0;
+ 								for(var i=0;i<event.targets2.length;i++){
+ 									eff+=get.effect(event.targets2[i],card,target,player);
+ 								}
+ 								return eff>0;
+ 							};
+  					}
+  					else{
+  						var next=player.chooseTarget();
+  						next.set('_get_card',card);
+  						next.set('source',target);
+  						next.set('filterTarget',function(card,player,target){
+  							return lib.filter.filterTarget(_status.event._get_card,_status.event.source,target);
+  						});
+  						next.set('ai',function(target){
+  							var evt=_status.event;
+  							return get.effect(target,evt._get_card,evt.source,evt.player)
+  						});
+  						next.set('selectTarget',function(){
+   						var card=get.card(),player=_status.event.source;
+     				if(card==undefined) return;
+     				var range;
+     				var select=get.copy(get.info(card).selectTarget);
+     				if(select==undefined){
+     					if(get.info(card).filterTarget==undefined) return[0,0];
+     					range=[1,1];
+     				}
+     				else if(typeof select=='number') range=[select,select];
+     				else if(get.itemtype(select)=='select') range=select;
+     				else if(typeof select=='function') range=select(card,player);
+     				game.checkMod(card,player,range,'selectTarget',player);
+     				return range;
+  						});
+  						next.set('prompt',event.prompt||('选择'+get.translation(target)+'使用'+get.translation(card)+'的目标'));
+  						next.set('prompt2','或点「取消」令其将此牌置入弃牌堆');
+  					}
+						}
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						target.useCard(card,event.targets2||result.targets,false,'noai');
+						player.draw();
+					}
+					else{
+						target.lose(card,ui.discardPile);
+						target.$throw(card);
+						game.log(target,'将',card,'置入了弃牌堆');
+					}
+				},
+				ai:{order:10,result:{target:-1}},
+			},
+			nagisa_tiandu:{
+				trigger:{player:'judgeEnd'},
+				frequent:function(event){
+					if(event.result.card.name=='du') return false;
+					return true;
+				},
+				check:function(event){
+					if(event.result.card.name=='du') return false;
+					return true;
+				},
+				filter:function(event,player){
+					return get.position(event.result.card,true)=='o';
+				},
+				content:function(){
+					player.gain(trigger.result.card,'gain2');
+				}
+			},
+			nagisa_fuxin:{
+				trigger:{
+					global:["gainAfter","loseAfter","damageEnd"],
+				},
+				filter:function (event){
+					var evt=event;
+					if(event.name=='lose'){
+						if(event.type!='discard') return false;
+						evt=event.getParent();
+					}
+					var player=evt[event.name=='gain'?'source':'player'];
+					if(!player||player==_status.currentPhase||player.isDead()) return false;
+					if(event.name=='damage') return true;
+					if(evt[event.name=='gain'?'bySelf':'notBySelf']!=true) return false;
+					if(event.name=='lose') return event.hs.length>0;
+					return event.relatedLose&&event.relatedLose.hs&&event.relatedLose.hs.length>0;
+				},
+				check:function(event,player){
+					return get.attitude(player,event[event.name=='gain'?'source':'player'])>0&&get.attitude(player,_status.currentPhase)<=0;
+				},
+				logTarget:function(event){
+					return event[event.name=='gain'?'source':'player'];
+				},
+				content:function(){
+					"step 0"
+					event.target=trigger[trigger.name=='gain'?'source':'player'];
+					event.target.judge();
+					"step 1"
+					if(result.color=='red') target.draw();
+					else if(_status.currentPhase&&_status.currentPhase.countCards('he')) _status.currentPhase.chooseToDiscard('he',true);
+				},
+				ai:{expose:0.2},
+			},
+			tomoya_shangxian:{
+				trigger:{player:'phaseUseBegin'},
+				mark:true,
+				intro:{
+					content:function(s){
+						return '计算与其他角色的距离时始终从'+(s?'逆':'顺')+'时针计算'
+					},
+				},
+				content:function(){
+					player.draw();
+					player.storage.tomoya_shangxian=!player.storage.tomoya_shangxian;
+				},
+				ai:{
+					left_hand:true,
+					right_hand:true,
+					skillTagFilter:function(player,tag){
+						return (player.storage.tomoya_shangxian==true)==(tag=='left_hand');
+					},
+				},
+			},
+			tomoya_wangjin:{
+				trigger:{global:'phaseJieshuBegin'},
+				filter:function(event,player){
+					return player!=event.player&&!player.hasSkill('tomoya_wangjin_'+player.inRange(event.player));
+				},
+				logTarget:'player',
+				check:function(event,player){
+					var target=event.player;
+					var bool=player.inRange(target);
+					if(!bool){
+						if(target.hp>player.hp) return get.effect(target,{name:'sha',isCard:true},player,player)>0;
+						var temp=target;
+						while(true){
+							temp=temp.getNext();
+							if(temp==target||temp==_status.roundStart) return true;
+							if(temp==player) continue;
+							if(temp.hp>player.hp&&!player.inRange(temp)&&get.effect(temp,{name:'sha',isCard:true},player,player)>0) return false;
+						}
+					}
+					if(get.attitude(player,target)<2) return false;
+					if(target.hp<player.hp&&!target.hasSkillTag('nogain')) return true;
+					var temp=target;
+					while(true){
+						temp=temp.getNext();
+						if(temp==target||temp==_status.roundStart) return true;
+						if(temp==player) continue;
+						if(temp.hp<player.hp&&player.inRange(temp)&&get.attitude(player,target)>=2&&!temp.hasSkillTag('nogain')) return false;
+					}
+				},
+				content:function(){
+					'step 0'
+					event.bool=player.inRange(trigger.player);
+					player.addTempSkill('tomoya_wangjin_'+event.bool,{global:'roundStart'});
+					if(event.bool){
+						trigger.player.draw();
+					}
+					else player.draw(2);
+					'step 1'
+					if(event.bool){
+						if(trigger.player.hp<player.hp) player.draw();
+						else event.finish();
+					}
+					else{
+						if(player.countDiscardableCards(trigger.player,'h')>0) trigger.player.discardPlayerCard(player,'h',true);
+						else event.finish();
+					}
+					'step 2'
+					if(event.bool){
+						player.chooseCard('h','是否交给'+get.translation(trigger.player)+'一张牌？');
+					}
+					else{
+						event.finish();
+						if(player.hp>=trigger.player.hp) return;
+						var card={name:'sha',isCard:true};
+						if(player.canUse(card,trigger.player,false)) player.useCard(card,trigger.player,false);
+					}
+					'step 3'
+					if(result.bool) trigger.player.gain(result.cards,player,'giveAuto')
+				},
+				subSkill:{true:{},false:{}},
+				ai:{expose:0.2},
+			},
 			noda_fengcheng:{
 				trigger:{
 					player:"gainAfter",
@@ -338,6 +587,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 2'
 					var target=result.targets[0];
+					player.addExpose(0.2);
 					player.line(target,'thunder');
 					target.damage();
 				},
@@ -397,6 +647,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.target.give(result.cards,player,true);
 					}
 				},
+				ai:{expose:0.2},
 				subSkill:{
 					respond:{
 						onremove:true,
@@ -484,6 +735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addTempSkill('zishou2','phaseEnd');
 					}
 				},
+				ai:{expose:0.2},
 			},
 			yuiko_fenglun:{
 				enable:'phaseUse',
@@ -2490,6 +2742,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(lib.card[card.name].type=='delay') return 'wuzhong';
 					},
 				},
+				trigger:{player:'drawBefore'},
+				forced:true,
+				filter:function(event,player){
+					return event.getParent().name=='wuzhong';
+				},
+				content:function(){trigger.num+=2},
 			},
 			haruko_zhuishi:{
 				trigger:{global:'phaseJudgeBegin'},
@@ -2497,14 +2755,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return misuzu.player.countCards('j')>0;
 				},
 				check:function(event,player){
-					return player.hp>1&&get.attitude(player,event.player)>1;
+					return get.attitude(player,event.player)>1;
 				},
 				logTarget:'player',
 				content:function(){
 					'step 0'
-					player.loseHp();
-					'step 1'
 					player.gain(trigger.player.getCards('j'),trigger.player,'give');
+					'step 1'
+					if(player.hp>1) player.loseHp();
 				},
 			},
 			yuri_xingdong:{
@@ -7585,6 +7843,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_hisako:'久子',
 			key_hinata:'日向秀树',
 			key_noda:'野田',
+			key_tomoya:'冈崎朋也',
+			key_nagisa:'古河渚',
+			key_ayato:'直井文人',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -7598,9 +7859,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuri_wangxi:'忘隙',
 			yuri_wangxi_info:'主公技，限定技，当有角色因你发动的【行动】而死亡后，若其身份不为【明忠】，则其可以将身份改为忠臣并重新加入游戏，然后将势力改为与你相同，将体力值回复至2点并摸一张牌。',
 			haruko_haofang:'豪放',
-			haruko_haofang_info:'锁定技，你的延时锦囊牌视为【无中生有】。',
+			haruko_haofang_info:'锁定技，你的延时锦囊牌视为【无中生有】。当你因执行【无中生有】的效果而摸牌时，你令摸牌数+2。',
 			haruko_zhuishi:'追逝',
-			haruko_zhuishi_info:'一名角色的判定阶段开始时，若其判定区内有牌，则你可以失去1点体力，然后获得其判定区内的所有牌。',
+			haruko_zhuishi_info:'一名角色的判定阶段开始时，若其判定区内有牌，则你可以获得其判定区内的所有牌。若你的体力值大于1，你失去1点体力。',
 			kagari_zongsi:'纵丝',
 			kagari_zongsi_info:'出牌阶段限一次，你可以选择一张不在游戏外的牌，然后将其置于牌堆/弃牌堆的顶部/底部或一名角色的对应区域内。',
 			umi_chaofan:'炒饭',
@@ -7735,7 +7996,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			noda_fengcheng_info:'锁定技，其他角色交给你牌后，其摸一张牌。',
 			noda_xunxin:'寻衅',
 			noda_xunxin2:'寻衅',
-			noda_xunxin_info:'出牌阶段限X次，你可以视为对一名体力值不小于你的角色使用【决斗】。若如此做，此【决斗】结算完成后，没赢的角色交给赢的角色一张牌。',
+			noda_xunxin_info:'出牌阶段限X次，你可以视为对一名体力值不小于你的角色使用【决斗】。若如此做，此【决斗】结算完成后，没赢的角色交给赢的角色一张牌。（X为你的体力值）',
+			tomoya_shangxian:'伤弦',
+			tomoya_shangxian_info:'锁定技，你计算与其他角色的距离时始终从逆时针方向计算。出牌阶段开始时，你可摸一张牌，并改变此方向。',
+			tomoya_wangjin:'往今',
+			tomoya_wangjin_info:'每项每轮各限一次。一名其他角色的回合结束时，若其：在你的攻击范围内，你可令其摸一张牌。若其的体力值小于你，则你摸一张牌，并可交给其一张牌。不在你的攻击范围内，则你摸两张牌，并令其弃置你的一张手牌。若其的体力值大于你，则你视为对其使用一张【杀】（无距离限制）。',
+			nagisa_tiandu:'天妒',
+			nagisa_tiandu_info:'当你的判定牌生效后，你可以获得此牌。',
+			nagisa_fuxin:'抚心',
+			nagisa_fuxin_info:'当一名角色于回合外受到伤害，或其手牌被其他角色弃置或获得后，你可以令其判定。若结果为：红色，其摸一张牌。黑色，当前回合角色弃置一张牌。',
+			ayato_jianshen:'僭神',
+			ayato_jianshen_info:'锁定技，你手牌中的【杀】均视为神属性。',
+			ayato_zonghuan:'纵幻',
+			ayato_zonghuan_info:'出牌阶段限一次，你可以观看一名其他角色的手牌，然后选择一项：将其中的一张牌置入弃牌堆，或以该角色的视角使用其中的一张，然后摸一张牌。',
+			
 			
 			yj_caoang:'SP曹昂',
 			yjxuepin:'血拼',

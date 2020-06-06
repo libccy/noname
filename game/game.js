@@ -9822,11 +9822,21 @@
 						return;
 					}
 					var info=get.info(card);
-					var select=get.select(info.selectTarget);
-					if(select[1]==-1||info.notarget){
-						if(select[1]==-1){
+					var range;
+					if(!info.notarget){
+  				var select=get.copy(info.selectTarget);
+  				if(select==undefined){
+  					range=[1,1];
+  				}
+  				else if(typeof select=='number') range=[select,select];
+  				else if(get.itemtype(select)=='select') range=select;
+  				else if(typeof select=='function') range=select(card,player);
+  				game.checkMod(card,player,range,'selectTarget',player);
+ 				}
+					if(info.notarget||range[1]==-1){
+						if(range[1]==-1){
 							for(var i=0;i<targets.length;i++){
-								if(!player.canUse(card,targets[i],false)){
+								if(!player.canUse(card,targets[i],event.nodistance?false:null)){
 									targets.splice(i--,1);
 								}
 							}
@@ -13369,7 +13379,7 @@
 							if(att>0){
 								if(!_status.event.nojudge&&target.countCards('j',function(card){
 									return game.hasPlayer(function(current){
-										return !current.hasJudge(card);
+										return !current.hasJudge(card)&&get.attitude(player,current)<0;
 									})
 								})) return 14;
 								if(target.countCards('e',function(card){
@@ -13431,7 +13441,7 @@
 							var player=_status.event.player;
 							var targets0=_status.event.targets0;
 							var targets1=_status.event.targets1;
-							if(get.attitude(player,targets0)>get.attitude(player,targets1)){
+							if(get.attitude(player,targets0)>0&&get.attitude(player,targets1)<0){
 								if(get.position(button.link)=='j') return 12;
 								if(get.value(button.link,targets0)<0) return 10;
 								return 0;
@@ -15506,7 +15516,10 @@
   				}
   				if(from.isDead()) length++;
   				if(to.isDead()) length++;
-  				n=Math.min(n,length-n);
+  				var left=from.hasSkillTag('left_hand');
+  				var right=from.hasSkillTag('right_hand');
+  				if(left===right) n=Math.min(n,length-n);
+  				else if(left==true) n=length-n;
   			}
   
   			n=game.checkMod(from,to,n,'globalFrom',from);
@@ -18110,7 +18123,7 @@
 								if(game.hasPlayer(function(current2){
 									if(withatt){
 										var att2=get.attitude(player,current2);
-										if(att2>0) return false;
+										if(att2>=0) return false;
 									}
 									return current!=current2&&!current2.storage._disableJudge&&!current2.hasJudge(js[i]);
 								})){
@@ -30677,14 +30690,15 @@
 					for(i=0;i<cards.length;i++){
 						if(lib.config.cardtempname!='off'){
  						var cardname=get.name(cards[i]);
- 						if(cards[i].name!=cardname){
+ 						var cardnature=get.nature(cards[i]);
+ 						if(cards[i].name!=cardname||((cardnature||cards[i].nature)&&cards[i].nature!=cardnature)){
  							if(!cards[i]._tempName) cards[i]._tempName=ui.create.div('.tempname',cards[i]);
  							var tempname=get.translation(cardname);
  							cards[i]._tempName.dataset.nature='fire';
  							if(cardname=='sha'){
- 								var nature=get.nature(cards[i]);
- 								if(nature) tempname=get.translation(nature)+tempname;
- 								if(nature=='thunder') cards[i]._tempName.dataset.nature='thunder';
+ 								if(cardnature) tempname=get.translation(cardnature)+tempname;
+ 								if(cardnature=='thunder') cards[i]._tempName.dataset.nature='thunder';
+ 								if(cardnature=='kami') cards[i]._tempName.dataset.nature='kami';
  							}
  							cards[i]._tempName.innerHTML=lib.config.cardtempname=='default'?get.verticalStr(tempname):tempname;
  							cards[i]._tempName.tempname=tempname;
@@ -48551,7 +48565,10 @@
 				if(method=='absolute') return n;
 				if(from.isDead()) length++;
 				if(to.isDead()) length++;
-				n=Math.min(n,length-n);
+				var left=from.hasSkillTag('left_hand');
+				var right=from.hasSkillTag('right_hand');
+				if(left===right) n=Math.min(n,length-n);
+				else if(left==true) n=length-n;
 				if(method=='raw'||method=='pure') return n;
 			}
 
@@ -48922,10 +48939,12 @@
 		},
 		selectableTargets:function(sort){
 			var selectable=[];
-			for(var i=0;i<game.players.length;i++){
-				if(game.players[i].classList.contains('selectable')&&
-					game.players[i].classList.contains('selected')==false){
-					selectable.push(game.players[i]);
+			var players=game.players.slice(0);
+			if(_status.event.deadTarget) players.addArray(game.dead);
+			for(var i=0;i<players.length;i++){
+				if(players[i].classList.contains('selectable')&&
+					players[i].classList.contains('selected')==false){
+					selectable.push(players[i]);
 				}
 			}
 			selectable.randomSort();

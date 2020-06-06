@@ -6915,10 +6915,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:true,
 				selectCard:-1,
 				discard:false,
-				lose:true,
+				lose:false,
+				delay:false,
 				content:function(){
-					player.$give(cards.length,target);
-					target.gain(cards,player);
+					target.gain(cards,player,'giveAuto');
 					target.addTempSkill('mingjian2',{player:'phaseAfter'});
 					target.storage.mingjian2++;
 					target.updateMarks('mingjian2');
@@ -8897,8 +8897,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectTarget:2,
 				multitarget:true,
 				discard:false,
+				lose:false,
 				targetprompt:['得到牌','出杀目标'],
-				prepare:'give',
 				filterTarget:function(card,player,target){
 					if(ui.selected.targets.length==0){
 						return player!=target;
@@ -8907,9 +8907,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return ui.selected.targets[0].inRange(target);
 					}
 				},
+				delay:false,
 				content:function(){
 					"step 0"
-					targets[0].gain(cards,player);
+					targets[0].gain(cards,player,'give');
 					"step 1"
 					if(!lib.filter.filterTarget({name:'sha',isCard:true},targets[0],targets[1])) event._result={control:'draw_card'};
 					else targets[0].chooseControl('draw_card','出杀',function(){
@@ -9528,12 +9529,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'chooseToUse',
 				filter:function(event,player){
 					if(player.classList.contains('turnedover')) return false;
-					if(event.parent.name=='phaseUse'){
-						return lib.filter.filterCard({name:'jiu'},player,event);
-					}
-					if(event.type!='dying') return false;
-					if(player!=event.dying) return false;
-					return true;
+					return event.filterCard({name:'jiu',isCard:true},player,event);
 				},
 				content:function(){
 					if(_status.event.getParent(2).type=='dying'){
@@ -9627,6 +9623,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(event,player){
 					return player.isTurnedOver();
 				},
+				prompt:'是否发动【酒诗】，将武将牌翻面？',
 				filter:function(event,player){
 					if(event.jiushi){
 						return true;
@@ -10154,7 +10151,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				discard:false,
-				prepare:'give2',
+				lose:false,
+				delay:0,
 				filter:function(event,player){
 					return player.countCards('he',{suit:'heart'});
 				},
@@ -10176,7 +10174,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					target.gain(cards,player);
+					target.gain(cards,player,'give');
 					// game.delay();
 					"step 1"
 					player.gainPlayerCard(target,'he',true);

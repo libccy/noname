@@ -1100,6 +1100,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					var choose=[];
 					event.list=list;
+					_status.characterlist=list;
 
 					var addSetting=function(dialog){
 						dialog.add('选择座位').classList.add('add-setting');
@@ -1322,6 +1323,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 							}
 						}
+					}
+					for(var i=0;i<game.players.length;i++){
+						_status.characterlist.remove(game.players[i].name);
+						_status.characterlist.remove(game.players[i].replacetwo);
 					}
 					setTimeout(function(){
 						ui.arena.classList.remove('choose-character');
@@ -2791,6 +2796,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var list=get.charactersOL();
 					var choose=[];
 					event.list=list;
+					_status.characterlist=list;
 					for(var i=0;i<game.players.length;i++){
 						choose.push([game.players[i],['选择角色',[list.randomRemove(7),'character']],true]);
 					}
@@ -2805,6 +2811,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						else{
 							result[i]=result[i].links[0];
 						}
+						_status.characterlist.remove(result[i]);
 						if(!lib.playerOL[i].name){
 							lib.playerOL[i].init(result[i]);
 						}

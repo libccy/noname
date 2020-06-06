@@ -1280,7 +1280,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.draw();
 					}
 					else{
-						var next=player.chooseUseTarget({name:trigger.card.name,nature:trigger.card.nature},false,true);
+						var next=player.chooseUseTarget({name:trigger.card.name,nature:trigger.card.nature,isCard:true},false,true);
 						_status.event.next.remove(next);
 						event.evt.after.push(next);
 						next.logSkill='zhiyi';
@@ -1775,11 +1775,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(get.nature(card)) return 1.5;
 					return 1;
 				},
-				prepare:'give',
 				discard:false,
 				content:function(){
 					'step 0'
-					target.gain(cards,player);
+					target.gain(cards,player,'giveAuto');
 					player.recover();
 					'step 1'
 					var num=1;

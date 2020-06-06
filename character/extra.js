@@ -299,9 +299,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('olzhiti',target);
 						var list=[];
 						for(var i=1;i<6;i++){
-							if(!target.isDisabled(i)) list.push(i);
+							if(!target.isDisabled(i)) list.add((i==3||i==4)?6:i);
 						}
-						target.disableEquip(list.randomGet());
+						var num=list.randomGet();
+						if(num!=6) target.disableEquip(num);
+						else{
+							target.disableEquip(3);
+							target.disableEquip(4);
+						}
 					}
 				},
 			},
