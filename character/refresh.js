@@ -542,10 +542,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			jiushi:{
-				audio:'jiushi1',
-				group:['jiushi1','jiushi2','jiushi3'],
-			},
 			chengzhang:{
 				trigger:{player:'phaseZhunbeiBegin'},
 				derivation:'rejiushi_mark',
@@ -585,6 +581,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
   				filter:function(event,player){
   					return player.storage.chengzhang==true;
   				},
+  				prompt:'是否发动【酒诗】，获得牌堆中的一张锦囊牌？',
   				content:function(){
   					var card=get.cardPile2(function(card){
   						return get.type2(card)=='trick';
@@ -599,12 +596,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'chooseToUse',
 				filter:function(event,player){
 					if(player.classList.contains('turnedover')) return false;
-					if(event.parent.name=='phaseUse'){
-						return lib.filter.filterCard({name:'jiu'},player,event);
-					}
-					if(event.type!='dying') return false;
-					if(player!=event.dying) return false;
-					return true;
+					return event.filterCard({name:'jiu',isCard:true},player,event);
 				},
 				content:function(){
 					if(_status.event.getParent(2).type=='dying'){
@@ -704,6 +696,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return false;
 				},
+				prompt:function(event,player){
+					var str='是否发动【酒诗】，将武将牌翻面';
+					if(!player.storage.chengzhang) str+='，并获得牌堆中的一张锦囊牌';
+					str+='？'
+					return str;
+				},
 				content:function(){
 					delete trigger.rejiushi;
 					player.turnOver();
@@ -731,7 +729,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{player:'loseEnd'},
 				filter:function(event,player){
-					if(player==_status.currentPhase||!event.visible||player.hp>=player.countCards('h')) return false;
+					if(player==_status.currentPhase||!event.visible||player.hp<=player.countCards('h')) return false;
 					for(var i=0;i<event.cards2.length;i++){
 						if(get.suit(event.cards2[i],player)=='heart') return true;
 					}
@@ -1910,10 +1908,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				addHuashen:function(player){
 					if(!player.storage.rehuashen) return;
 					if(!_status.characterlist){
-						var list=[];
-						for(var i in lib.character){
-							if(lib.filter.characterDisabled2(i)||lib.filter.characterDisabled(i)) continue;
-							list.push(i);
+						if(_status.connectMode) var list=get.charactersOL();
+						else{
+ 						var list=[];
+ 						for(var i in lib.character){
+ 							if(lib.filter.characterDisabled2(i)||lib.filter.characterDisabled(i)) continue;
+ 							list.push(i);
+ 						}
 						}
 						game.countPlayer2(function(current){
 							list.remove(current.name);
@@ -4590,11 +4591,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 8-get.value(card);
 				},
 				discard:false,
-				prepare:'give',
+				lose:false,
+				delay:false,
 				content:function(){
 					"step 0"
 					target.storage.refanjian=cards[0];
-					target.gain(cards[0],player);
+					target.gain(cards[0],player,'give');
 					"step 1"
 					target.chooseControl('refanjian_card','refanjian_hp').ai=function(event,player){
 						var cards=player.getCards('he',{suit:get.suit(player.storage.refanjian)});

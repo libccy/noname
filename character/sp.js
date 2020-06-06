@@ -590,6 +590,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return (player.getStat().skill.liji||0)<(event.liji_num||0);
 				},
 				onChooseToUse:function(event){
+					if(game.online) return
 					var num=0;
 					game.getGlobalHistory('cardMove',function(evt){
 						if(evt.name=='cardsDiscard'||(evt.name=='lose'&&evt.position==ui.discardPile)) num+=evt.cards.length;
@@ -612,6 +613,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinkuangfu:{
 				enable:'phaseUse',
 				usable:1,
+				delay:false,
 				filterTarget:function(card,player,target){
 					if(player==target) return player.countCards('e',function(card){
 						return lib.filter.cardDiscardable(card,player);
@@ -1965,9 +1967,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				initList:function(){
 					var list=[];
-					for(var i in lib.character){
-						if(lib.filter.characterDisabled2(i)||lib.filter.characterDisabled(i)) continue;
-						list.push(i);
+					if(_status.connectMode) var list=get.charactersOL();
+					else{
+						var list=[];
+						for(var i in lib.character){
+							if(lib.filter.characterDisabled2(i)||lib.filter.characterDisabled(i)) continue;
+							list.push(i);
+						}
 					}
 					game.countPlayer2(function(current){
 						list.remove(current.name);
@@ -6908,10 +6914,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('h','sha');
 				},
 				discard:false,
-				prepare:'give',
+				lose:false,
+				delay:false,
 				filterCard:{name:'sha'},
 				content:function(){
-					target.gain(cards,player);
+					target.gain(cards,player,'giveAuto');
 					target.storage.fuman3=cards[0];
 					target.storage.fuman2=player;
 					target.addTempSkill('fuman2',{player:'phaseAfter'});
@@ -7455,10 +7462,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 0;
 				},
 				discard:false,
-				prepare:'give',
+				lose:false,
+				delay:false,
 				content:function(){
 					'step 0'
-					target.gain(cards,player);
+					target.gain(cards,player,'giveAuto');
 					if(get.color(cards[0])=='black'){
 						target.chooseToDiscard(2,'he','弃置两张牌，或令'+get.translation(player)+'摸两张牌').set('ai',function(card){
 							if(_status.event.goon) return 7-get.value(card);
@@ -8098,7 +8106,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return ui.selected.cards.length+2;
 				},
 				discard:false,
-				prepare:'give',
+				lose:false,
+				delay:false,
 				filterTarget:function(card,player,target){
 					return player!=target;
 				},
@@ -8121,7 +8130,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 0;
 				},
 				content:function(){
-					target.gain(cards,player);
+					target.gain(cards,player,'giveAuto');
 					target.recover();
 				},
 				ai:{
@@ -13444,15 +13453,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
+					event.count=trigger.num;
+					"step 1"
 					player.chooseTarget(get.prompt('shushen'),'令一名其他角色选择摸两张牌或回复1点体力',function(card,player,target){
 						return target!=player;
 					}).set('ai',function(target){
 						return get.attitude(_status.event.player,target);
 					});
-					"step 1"
+					"step 2"
 					if(result.bool){
+						event.count--;
 						player.logSkill('shushen',result.targets);
 						result.targets[0].chooseDrawRecover(2,true);
+						if(event.count) event.goto(1);
 					}
 				},
 				ai:{
@@ -17171,6 +17184,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunluyu:'孙鲁育',
 			hanba:'旱魃',
 			panfeng:'旧潘凤',
+			gz_panfeng:'潘凤',
 			zumao:'祖茂',
 			daxiaoqiao:'大小乔',
 			sp_daqiao:'☆SP大乔',

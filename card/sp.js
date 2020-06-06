@@ -547,9 +547,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseToUse({name:'jinchan'},'是否对'+get.translation(trigger.card)+'使用【金蝉脱壳】？').set('ai1',function(card){
+					player.chooseToUse('是否对'+get.translation(trigger.card)+'使用【金蝉脱壳】？').set('ai1',function(card){
 						return _status.event.bool;
-					}).set('bool',-get.effect(player,trigger.card,trigger.player,player)).set('respondTo',[trigger.player,trigger.card]);
+					}).set('bool',-get.effect(player,trigger.card,trigger.player,player)).set('respondTo',[trigger.player,trigger.card]).set('filterCard',function(card,player){
+						if(get.name(card)!='jinchan') return false;
+						return lib.filter.cardEnabled(card,player,'forceEnable');
+					});
 					trigger.jinchan=true;
 					'step 1'
 					delete trigger.jinchan;

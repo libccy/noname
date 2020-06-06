@@ -1564,6 +1564,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var exclude=['界','新','大','旧','☆','神'];
 					for(var i in lib.character){
 						if(lib.filter.characterDisabled(i)) continue;
+						if(lib.character[i][1]=='key') continue;
 						var surname=lib.translate[i];
 						for(var j=0;j<surname.length;j++){
 							if(exclude.contains(surname[j])) continue;

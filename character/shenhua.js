@@ -2015,7 +2015,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						discard:false,
 						line:true,
-						prepare:'give',
+						lose:false,
+						delay:false,
 						position:'he',
 						filterCard:true,
 						filterTarget:function(card,player,target){
@@ -2029,7 +2030,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							'step 0'
 							player.storage.nzry_shenshi=true;
-							target.gain(cards,player);
+							target.gain(cards,player,'giveAuto');
 							target.damage('nocard');
 							'step 1'
 							if(!target.isAlive()){
@@ -6638,11 +6639,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				discard:false,
+				lose:false,
+				delay:false,
 				line:true,
 				direct:true,
 				prepare:function(cards,player,targets){
 					targets[0].logSkill('huangtian');
-					player.$give(cards,targets[0]);
 				},
 				prompt:function(){
 					var player=_status.event.player;
@@ -6671,7 +6673,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//usable:1,
 				//forceaudio:true,
 				content:function(){
-					target.gain(cards,player);
+					target.gain(cards,player,'giveAuto');
 					target.addTempSkill('huangtian3','phaseUseEnd');
 				},
 				ai:{
