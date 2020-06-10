@@ -22,6 +22,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.draw(2);
 				},
 				ai:{
+					wuxie:function(target,card,player,current,state){
+						return -state*get.attitude(player,current);
+					},
 					useful:function(){
 						var player=_status.event.player;
 						var nj=player.countCards('h','jinchan');
@@ -249,7 +252,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					//value:-5,
 					value:function(card,player,i){
 						if(player.hp<=1&&_status.currentPhase==player&&_status.event.getParent('phaseUse').name=='phaseUse'){
-							return 10;
+							return 11;
 						}
 						return -5;
 					},
@@ -257,7 +260,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					useful:function(card,i){
 						var player=_status.event.player
 						if(player.hp<=1&&_status.currentPhase==player&&_status.event.getParent('phaseDiscard').name=='phaseDiscard'){
-							return 10;
+							return 11;
 						}
 						return 6;
 					},

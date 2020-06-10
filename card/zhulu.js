@@ -340,6 +340,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target:function(player,target){
 							var card=target.getCards('e');
 							var val=get.value(card);
+							var baiyin_card=target.getEquip(2);
+							if(baiyin_card&&card.length==1&&(baiyin_card.name=='baiyin'&&target.isDamaged())) return 'zerotarget';
 							if(val>0) return -val;
 							return 0;
 						},
@@ -587,7 +589,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:9.5,
 					equipValue:function(card,player){
 						if(get.position(card)!='e') return 5;
-						if(_status.jinhe&&_status.jinhe[card.cardid]&&(_status.event.name=='discardPlayerCard'||_status.event.name=='chooseToDiscard')) return 2*player.countCards('h');
+						if(_status.jinhe&&_status.jinhe[card.cardid]&&(_status.event.name=='discardPlayerCard'||_status.event.name=='chooseToDiscard')) return 1+2*player.countCards('h');
 						return 0;
 					},
 					basic:{

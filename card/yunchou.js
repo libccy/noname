@@ -602,7 +602,20 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:9,
 					result:{
 						target:function(player,target){
-							if(target.countCards('e')) return -1;
+							//SP刘协:皇恩
+							if (game.players.length>2){
+								var list=target.getFriends(true);
+								for (var i=0;i<list.length;i++){
+									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) return 0;
+								}
+							}
+							//--------------------------
+							//if(target.countCards('e')) return -1;
+							var card=target.getCards('e');
+							var val=get.value(card);
+							var baiyin_card=target.getEquip(2);
+							if(baiyin_card&&(baiyin_card.name=='baiyin'&&target.isDamaged())) return 'zerotarget';
+							if(val>0) return -val;
 							return 0;
 						}
 					},
