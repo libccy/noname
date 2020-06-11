@@ -752,6 +752,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=4-target.countCards('h');
 					if(num) target.draw(num);
 				},
+				ai:{
+					order:2,
+					expose:0.3,
+					threaten:1.8,
+					result:{
+						target:function(player,target){
+							if(target.hasSkillTag('noturn')) return 0;
+							if(target.countCards('h')<3) return 0;
+							if(target.isTurnedOver()) return 2;
+							return -1/(target.countCards('h')+1);
+						}
+					}
+				}
 			},
 			xinzhige:{
 				enable:'phaseUse',

@@ -2426,6 +2426,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!target.hasSkill('xinguidao')) return [1,0.05];
 								return [1,Math.min(0.5,(target.countCards('h')+be)/4)];
 							}
+							if (get.type(card)=='delay'){
+								return 'zerotarget';
+							}
 						}
 					}
 				}

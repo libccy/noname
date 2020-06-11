@@ -1753,7 +1753,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target,current){
-							if(card.name=='sha'&&target.isDamaged()) return 'zeroplayertarget';
+							if(card.name=='sha'&&target.isDamaged()&&target.getFriends().length>0) return 'zeroplayertarget';
 						}
 					}
 				},
