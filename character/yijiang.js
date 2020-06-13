@@ -752,19 +752,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=4-target.countCards('h');
 					if(num) target.draw(num);
 				},
-				ai:{
-					order:2,
-					expose:0.3,
-					threaten:1.8,
-					result:{
-						target:function(player,target){
-							if(target.hasSkillTag('noturn')) return 0;
-							if(target.countCards('h')<3) return 0;
-							if(target.isTurnedOver()) return 2;
-							return -1/(target.countCards('h')+1);
-						}
-					}
-				}
 			},
 			xinzhige:{
 				enable:'phaseUse',
@@ -1792,12 +1779,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else return event.cards.filterInD('od').length>0;
 				},
 				logTarget:'player',
-				check:function(event,player){
-					if(get.attitude(player,event.player)>=0) return true;
-					if(player.hasSkill('funan_jiexun')) return true;
-					if(event.cards.length>1) return true;
-					return event.cards.length>0&&event.respondTo.length>1&&get.value(event.cards[0])>get.value(event.respondTo[1]);
-				},
 				content:function(){
 					'step 0'
 					if(!player.hasSkill('funan_jiexun')){
@@ -4392,15 +4373,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:1,
 					result:{
 						target:function(player,target){
-							if(get.attitude(player,target)>0&&target.countCards('h')>2&&target.hp>2){
-								return 2+Math.sqrt(target.countCards('he'));
-							}
-							else if(get.attitude(player,target)<0){
-								return -Math.sqrt(target.countCards('he'));
+							if(get.attitude(player,target)>0){
+								return Math.sqrt(target.countCards('he'));
 							}
 							return 0;
 						},
-						//player:1
+						player:1
 					}
 				},
 				subSkill:{
@@ -7298,7 +7276,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectCard:2,
 				position:'h',
 				audio:2,
-				derivation:['new_rewusheng','new_repaoxiao'],
+				derivation:['new_rewusheng','olpaoxiao'],
 				viewAs:{name:'sha'},
 				prompt:'将两张手牌当杀使用或打出',
 				check:function(card){
@@ -7313,7 +7291,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					respondSha:true,
 					order:function(item,player){
-						if(player.hasSkill('new_rewusheng')&&player.hasSkill('new_repaoxiao')){
+						if(player.hasSkill('new_rewusheng')&&player.hasSkill('olpaoxiao')){
 							return 1;
 						}
 						if(player.countCards('h')<4){
@@ -7333,7 +7311,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.addTempSkill('new_rewusheng');
-					player.addTempSkill('new_repaoxiao');
+					player.addTempSkill('olpaoxiao');
 					player.addTempSkill('fuhun3');
 				}
 			},

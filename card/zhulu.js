@@ -114,7 +114,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<dialog.buttons.length;i++){
 						if(dialog.buttons[i].link==card){
 							button=dialog.buttons[i];
-							button.querySelector('.info').innerHTML=get.translation(target);
+							button.querySelector('.info').innerHTML=function(target){
+ 							if(target._tempTranslate) return target._tempTranslate;
+ 							var name=target.name;
+ 							if(lib.translate[name+'_ab']) return lib.translate[name+'_ab'];
+ 							return get.translation(name);
+ 						}(target);
 							dialog.buttons.remove(button);
 							break;
 						}
@@ -135,7 +140,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 									}
 								}
 							}
-						},card,dialog.videoId,get.translation(target),capt);
+						},card,dialog.videoId,function(target){
+							if(target._tempTranslate) return target._tempTranslate;
+							var name=target.name;
+							if(lib.translate[name+'_ab']) return lib.translate[name+'_ab'];
+							return get.translation(name);
+						}(target),capt);
 					}
 					dialog.content.firstChild.innerHTML=capt;
 					game.addVideo('dialogCapt',null,[dialog.videoId,dialog.content.firstChild.innerHTML]);

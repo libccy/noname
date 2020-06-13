@@ -1093,7 +1093,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			["diamond",13,"hualiu"],
 			["club",1,"baiyin"],
 			["spade",2,"tengjia"],
-			["club",2,"tengjia",'fire'],
+			["club",2,"tengjia"],
 			["spade",1,"guding"],
 			["diamond",1,"zhuque"],
 
