@@ -223,13 +223,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				//range:{global:1},
 				content:function(){
-					target.$gain2(cards);
+					if(target==targets[0]&&cards.length) target.$gain2(cards);
 					target.storage.mapodoufu=card;
 					target.storage.mapodoufu_markcount=2;
 					target.addSkill('mapodoufu');
 				},
 				ai:{
-					order:2,
+					order:1,
 					value:5,
 					result:{
 						target:function(player,target){
@@ -1491,7 +1491,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			mapodoufu:{
 				mark:'card',
-				trigger:{player:'phaseEnd'},
+				trigger:{player:'phaseJieshuBegin'},
 				forced:true,
 				popup:false,
 				nopop:true,

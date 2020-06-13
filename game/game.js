@@ -15468,7 +15468,7 @@
 					game.expandSkills(skills);
 					for(var i=0;i<skills.length;i++){
 						var ifo=get.info(skills[i]);
-						if(ifo.viewAs&&ifo.viewAs.name==name){
+						if(ifo.viewAs&&typeof ifo.viewAs!='function'&&ifo.viewAs.name==name){
 							if(!ifo.viewAsFilter||ifo.viewAsFilter(player)){
 								return true;
 							}
@@ -21021,7 +21021,7 @@
 					game.expandSkills(skills);
 					for(var i=0;i<skills.length;i++){
 						var ifo=get.info(skills[i]);
-						if(ifo.viewAs&&ifo.viewAs.name=='wuxie'){
+						if(ifo.viewAs&&typeof ifo.viewAs!='function'&&ifo.viewAs.name=='wuxie'){
 							if(!ifo.viewAsFilter||ifo.viewAsFilter(this)){
 								return true;
 							}
@@ -23283,7 +23283,40 @@
 						var info=get.info(skill);
 						this.skill=skill;
 						this._aiexclude=[];
-						if(info.viewAs){
+						if(typeof info.viewAs=='function'){
+							if(info.filterButton!=undefined) this.filterButton=get.filter(info.filterButton);
+							if(info.selectButton!=undefined) this.selectButton=info.selectButton;
+							if(info.filterTarget!=undefined) this.filterTarget=get.filter(info.filterTarget);
+							if(info.selectTarget!=undefined) this.selectTarget=info.selectTarget;
+							if(info.filterCard!=undefined){
+								if(info.ignoreMod) this.ignoreMod=true;
+								this.filterCard2=get.filter(info.filterCard);
+								this.filterCard=function(card,player,event){
+									var evt=event||_status.event;
+									if(!evt.ignoreMod&&player){
+										var mod=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+										if(mod!='unchanged') return mod;
+										if(evt._backup&&evt._backup.filterCard){
+											var cardx2=lib.skill[evt.skill].viewAs(ui.selected.cards.concat([card]),player);
+											if(get.is.object(cardx2)){
+ 											var cardx=get.autoViewAs(cardx2,ui.selected.cards.concat([card]));
+ 											if(!get.filter(evt._backup.filterCard)(cardx,player,evt)) return false;
+ 										}
+										}
+									}
+									return get.filter(evt.filterCard2).apply(this,arguments);
+								};
+							}
+							if(info.selectCard!=undefined) this.selectCard=info.selectCard;
+							if(info.position!=undefined) this.position=info.position;
+							if(info.forced!=undefined) this.forced=info.forced;
+							if(info.complexSelect!=undefined) this.complexSelect=info.complexSelect;
+							if(info.complexCard!=undefined) this.complexCard=info.complexCard;
+							if(info.complexTarget!=undefined) this.complexTarget=info.complexTarget;
+							if(info.ai1!=undefined) this.ai1=info.ai1;
+							if(info.ai2!=undefined) this.ai2=info.ai2;
+						}
+						else if(info.viewAs){
 							if(info.filterButton!=undefined) this.filterButton=get.filter(info.filterButton);
 							if(info.selectButton!=undefined) this.selectButton=info.selectButton;
 							if(info.filterTarget!=undefined) this.filterTarget=get.filter(info.filterTarget);
@@ -30883,8 +30916,8 @@
 						if(enable){
 							if(info.noHidden&&!game.expandSkills(player.getSkills()).contains(skills2[i])) enable=false;
 							if(info.filter&&!info.filter(event,player)) enable=false;
-							if(info.viewAs&&event.filterCard&&!event.filterCard(info.viewAs,player,event)) enable=false;
-							if(info.viewAs&&info.viewAsFilter&&info.viewAsFilter(player)==false) enable=false;
+							if(info.viewAs&&typeof info.viewAs!='function'&&event.filterCard&&!event.filterCard(info.viewAs,player,event)) enable=false;
+							if(info.viewAs&&typeof info.viewAs!='function'&&info.viewAsFilter&&info.viewAsFilter(player)==false) enable=false;
 							if(info.usable&&get.skillCount(skills2[i])>=info.usable) enable=false;
 							if(info.chooseButton&&_status.event.noButton) enable=false;
 							if(info.round&&(info.round-(game.roundNumber-player.storage[skills2[i]+'_roundcount'])>0)) enable=false;
@@ -30950,7 +30983,7 @@
 				if(skillinfo&&skillinfo.multitarget&&!skillinfo.multiline){
 					_status.multitarget=true;
 				}
-				if((skillinfo&&skillinfo.viewAs)||!_status.event.skill){
+				if((skillinfo&&skillinfo.viewAs&&typeof skillinfo.viewAs!='function')||!_status.event.skill){
 					var cardinfo=get.info(get.card());
 					if(cardinfo&&cardinfo.multitarget&&!cardinfo.multiline){
 						_status.multitarget=true;
@@ -32100,7 +32133,7 @@
 				}
 				return;
 			}
-			if(info.viewAs){
+			if(info.viewAs&&typeof info.viewAs!='function'){
 				if(typeof info.viewAs=='string'){
 					info.viewAs={name:info.viewAs};
 				}
@@ -45636,7 +45669,8 @@
 				}
 				if(event.skill){
 					event.result.skill=event.skill;
-					event.result.card=get.copy(get.info(event.skill).viewAs);
+					if(typeof get.info(event.skill).viewAs=='function') event.result.card=get.info(event.skill).viewAs(event.result.cards,event.player);
+					else event.result.card=get.copy(get.info(event.skill).viewAs);
 					if(event.result.cards.length==1&&event.result.card){
 						event.result.card.suit=get.suit(event.result.cards[0]);
 						event.result.card.number=get.number(event.result.cards[0]);
@@ -47819,6 +47853,7 @@
 					if(skill&&!zhu.hasSkill(skill)) return null;
 					return zhu;
 				}
+				if(!game.zhu) return null;
 				if(skill&&!game.zhu.hasSkill(skill)) return null;
 				if(game.zhu.isZhu) return game.zhu;
 			}
@@ -48626,6 +48661,7 @@
 		card:function(original){
 			if(_status.event.skill){
 				var card=get.info(_status.event.skill).viewAs;
+				if(typeof card=='function') card=card(ui.selected.cards,_status.event.player);
 				if(card){
 					return get.autoViewAs(card,ui.selected.cards,_status.event.player);
 				}

@@ -173,7 +173,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangren:['male','qun',4,['chuanxin','zfengshi']],
 			zoushi:['female','qun',3,['zhuoshui','zqingcheng']],
 
-			wangyun:['male','qun',4,['wylianji','moucheng']],
+			wangyun:['male','qun',4,['xinlianji','xinmoucheng']],
 			sunqian:['male','shu',3,['qianya','shuimeng']],
 			xizhicai:['male','wei',3,['tiandu','xianfu','chouce']],
 			quyi:['male','qun',4,['fuqi','jiaozi']],
@@ -513,6 +513,168 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//新王允
+			xinlianji:{
+				enable:'phaseUse',
+				audio:'wylianji',
+				usable:1,
+				check:function(card){
+					return 5-get.value(card);
+				},
+				filterTarget:function(card,player,target){
+					if(ui.selected.targets.length) return true;
+					return target!=player;
+				},
+				filterCard:true,
+				selectTarget:2,
+				multitarget:true,
+				targetprompt:['打人','被打'],
+				content:function(){
+					'step 0'
+					player.addMark('xinlianji',1,false);
+					var card=get.cardPile2(function(card){
+						return get.subtype(card)=='equip1'&&targets[0].hasUseTarget(card);
+					});
+					if(card){
+						if(card.name=='qinggang'&&!lib.inpile.contains('qibaodao')){
+ 						card.remove();
+ 						card=game.createCard('qibaodao',card.suit,card.number);
+ 					}
+						targets[0].chooseUseTarget(card,true,'nopopup','noanimate');
+					}
+					else{
+						player.chat('没有装备牌了吗');
+						game.log('但是牌堆里已经没有装备牌了！');
+					}
+					'step 1'
+					game.updateRoundNumber();
+					targets[0].chooseToUse('对'+get.translation(targets[1])+'使用一张杀，或将装备区里的武器牌交给一名其他角色',
+							{name:'sha'}).set('targetRequired',true).set('complexSelect',true).set('filterTarget',function(card,player,target){
+						if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
+						return lib.filter.filterTarget.apply(this,arguments);
+					}).set('sourcex',targets[1]).set('addCount',false);
+					'step 2'
+					var card=targets[0].getEquip(1);
+					if(!result.bool&&card){
+						event.card=card;
+						targets[0].chooseTarget(true,'将'+get.translation(card)+'交给一名其他角色',lib.filter.notMe).set('ai',function(target){
+							var card=_status.event.getParent().card;
+							return (target.hasSkillTag('nogain')?0:get.attitude(_status.event.player,target))*Math.max(0.1,target.getUseValue(card));
+						});
+					}
+					else event.finish();
+					'step 3'
+					result.targets[0].gain(card,targets[0],'give');
+				},
+				ai:{
+					order:4,
+					result:{
+						target:function(player,target){
+							if(ui.selected.targets.length){
+								var pretarget=ui.selected.targets[0];
+								if(pretarget.hasSha()&&pretarget.canUse({name:'sha'},target)) return get.effect(target,{name:'sha'},pretarget,target);
+								return Math.random();
+							}
+							if(!target.getEquip(1)){
+								if(game.hasPlayer(function(current){
+									return current!=target&&!current.hasSkillTag('nogain')&&get.attitude(current,target)>0;
+								})) return 3;
+								return -3;
+							}
+							if(!game.hasPlayer(function(current){
+								return current!=target&&!current.hasSkillTag('nogain')&&get.attitude(current,target)>0;
+							})) return -6;
+							return 4-get.value(target.getEquip(1));
+						},
+					},
+				},
+			},
+			xinmoucheng:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				audio:'moucheng',
+				forced:true,
+				juexingji:true,
+				skillAnimation:true,
+				animationColor:'gray',
+				derivation:'xinjingong',
+				unique:true,
+				filter:function(event,player){
+					return player.countMark('xinlianji')>2;
+				},
+				content:function(){
+					player.awakenSkill('xinmoucheng');
+					player.addSkill('xinjingong');
+					player.removeSkill('xinlianji');
+				},
+			},
+			xinjingong:{
+				audio:'jingong',
+				enable:'phaseUse',
+				filter:function(event,player){
+					return player.countCards('he',function(card){
+						return card.name=='sha'||get.type(card)=='equip';
+					});
+				},
+				delay:false,
+				usable:1,
+				content:function(){
+					'step 0'
+					var list=get.inpile('trick').randomGets(2);
+					if(Math.random()<0.5){
+						list.push('wy_meirenji');
+					}
+					else{
+						list.push('wy_xiaolicangdao');
+					}
+					for(var i=0;i<list.length;i++){
+						list[i]=['锦囊','',list[i]];
+					}
+					player.chooseButton(['矜功',[list,'vcard']]).set('filterButton',function(button,player){
+						return game.hasPlayer(function(current){
+							return player.canUse(button.link[2],current,true,false);
+						});
+					}).set('ai',function(button){
+						var player=_status.event.player;
+						return player.getUseValue(button.link[2]);
+					});
+					'step 1'
+					if(result.bool){
+						var name=result.links[0][2];
+						event.fakecard={name:name};
+						player.chooseCardTarget({
+							filterCard:function(card){
+								return card.name=='sha'||get.type(card)=='equip';
+							},
+							position:'he',
+							filterTarget:lib.filter.filterTarget,
+							selectTarget:lib.filter.selectTarget,
+							ai1:function(card){
+								return 7-get.value(card);
+							},
+							ai2:function(target){
+								var card=_status.event.fakecard;
+								var player=_status.event.player;
+								return get.effect(target,card,player,player);
+							},
+							_get_card:event.fakecard,
+							prompt:'将一张装备牌或【杀】当作'+get.translation(name)+'使用'
+						}).set('fakecard',event.fakecard);
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if(result.bool){
+						player.useCard(event.fakecard,result.cards,result.targets);
+					}
+				},
+				ai:{
+					order:2,
+					result:{
+						player:1
+					}
+				}
+			},
 			//新岩泽(划掉)留赞
 			refenyin:{
 				audio:'fenyin',
@@ -5662,6 +5824,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			wylianji:{
 				enable:'phaseUse',
+				audio:2,
 				usable:1,
 				filter:function(event,player){
 					return player.hasCard(lib.skill.wylianji.filterCard);
@@ -5703,7 +5866,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					if(equip1.name=='qinggang'&&!lib.inpile.contains('qibaodao')){
 						equip1.remove();
-						equip1=game.createCard('qibaodao',equip1.suit,equip1.number);
+						equip1=game.createCard2('qibaodao',equip1.suit,equip1.number);
 					}
 					target.$draw(equip1);
 					target.chooseUseTarget(true,equip1,'noanimate','nopopup');
@@ -5896,6 +6059,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			jingong:{
+				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
 					return player.countCards('he',function(card){
@@ -13291,9 +13455,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					target.recover();
 					"step 1"
-					if(target==player){
+					if(target==targets[targets.length-1]){
 						for(var i=0;i<cards.length;i++){
-							if(get.color(cards[i],cards[i].original=='h'?player:false)=='black'){
+							if(get.color(cards[i],player)=='black'){
 								player.loseHp();
 								break;
 							}
@@ -14226,7 +14390,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						list.push('retiaoxin');
 					}
 					if(player.hp<=2){
-						list.push('new_repaoxiao');
+						list.push('olpaoxiao');
 					}
 					if(player.hp<=1){
 						list.push('xinshensu');
@@ -14235,7 +14399,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addAdditionalSkill('baobian',list);
 					}
 				},
-				derivation:['retiaoxin','new_repaoxiao','xinshensu'],
+				derivation:['retiaoxin','olpaoxiao','xinshensu'],
 				content:function(){
 					player.removeAdditionalSkill('baobian');
 					var list=[];
@@ -14244,7 +14408,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						list.push('retiaoxin');
 					}
 					if(player.hp<=2){
-						list.push('new_repaoxiao');
+						list.push('olpaoxiao');
 					}
 					if(player.hp<=1){
 						list.push('xinshensu');
@@ -17988,6 +18152,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			refenyin_info:'锁定技，你的回合内，当一张牌进入弃牌堆后，若本回合内没有过与此牌花色相同的卡牌进入过弃牌堆，则你摸一张牌。',
 			liji:'力激',
 			liji_info:'出牌阶段限X次，你可以弃置一张牌并对一名其他角色造成1点伤害。（X为本回合内进入过弃牌堆的卡牌数除以8，若场上人数小于5则改为除以4，向下取整）',
+			xinlianji:'连计',
+			xinlianji_info:'出牌阶段限一次，你可以弃置一张手牌，令其使用牌堆中的一张随机武器牌，然后选择一项：对你指定的一名角色使用【杀】，或将其装备区里的武器牌交给任意角色。',
+			xinmoucheng:'谋逞',
+			xinmoucheng_info:'觉醒技，准备阶段，若你已经发动了3次以上的〖连计〗，则你失去〖连计〗并获得〖矜功〗。',
+			xinjingong:'矜功',
+			xinjingong_info:'出牌阶段限一次，你可以将一张【杀】或装备牌当做三张随机锦囊牌中的一张使用。',
 			
 			sp_default:"常规",
 			sp_whlw:"文和乱武",
