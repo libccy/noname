@@ -221,7 +221,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				check:function(card){
-					return 7-get.value(card);
+					return 10-get.value(card);
 				},
 				ai:{
 					order:function(){
@@ -229,7 +229,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target){
-							return get.effect(target,{name:'sha'},player,player);
+							return get.attitude(player,target)<0&&-get.effect(target,{name:'sha'},player,player);
 						},
 					},
 				},

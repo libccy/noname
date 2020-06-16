@@ -1663,8 +1663,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(target.hasSkill('biantian2')) return 0;
 						var att=get.attitude(player,target);
 						if(att>=4){
-							if(target.hp==1&&target.maxHp>2) return att;
-							if(target.hp==2&&target.maxHp>3&&target.countCards('he')==0) return att*0.7;
+							if(target.hp==1&&target.countCards('h')<4) return att;
+							if(target.hp==2&&target.countCards('h')<4) return att*0.7;
 							return 0;
 						}
 						return -1;
