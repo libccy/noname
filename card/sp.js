@@ -251,7 +251,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					//value:-5,
 					value:function(card,player,i){
-						if(player.hp<=1&&_status.currentPhase==player&&_status.event.getParent('phaseUse').name=='phaseUse'){
+						if(player.hp<=1&&_status.currentPhase==player&&_status.event.getParent('phaseUse').name=='phaseUse'&&_status.event.name!='chooseButton'){
 							return 11;
 						}
 						return -5;
