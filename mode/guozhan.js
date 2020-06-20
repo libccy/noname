@@ -931,6 +931,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					choiceList.push('执行该军令');
 					choiceList.push('令'+get.translation(trigger.player)+(trigger.player==trigger.source?'（你）':'')+'回复一点体力');
 					trigger.source.chooseJunlingControl(player,result.junling,result.targets).set('prompt','补益').set('choiceList',choiceList).set('ai',function(){
+						if(get.recoverEffect(trigger.player,player,_status.event.player)>0) return 1;
 						return (get.attitude(trigger.source,trigger.player)<0&&get.junlingEffect(player,result.junling,trigger.source,result.targets,trigger.source)>=-2)?1:0;
 						return 0;
 					});
@@ -1102,11 +1103,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						sub:true,
 						equipSkill:true,
 						noHidden:true,
-						trigger:{global:'phaseDrawBegin2'},
+						trigger:{player:'phaseDrawBegin2'},
 						//priority:8,
 						forced:true,
 						filter:function(event,player){
-							if(event.player!=player||event.num<=0||player.isDisabled(5)) return false;
+							if(event.numFixed||player.isDisabled(5)) return false;
 							return !game.hasPlayer(function(current){
 								return current.getEquip('yuxi');
 							})
@@ -1116,13 +1117,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 					eff2:{
 						sub:true,
-						trigger:{global:'phaseUseBegin'},
+						trigger:{player:'phaseUseBegin'},
 						//priority:8,
 						forced:true,
 						noHidden:true,
 						equipSkill:true,
 						filter:function(event,player){
-							if(event.player!=player||player.isDisabled(5)) return false;
+							if(player.isDisabled(5)) return false;
 							return game.hasPlayer(function(current){
 								return player.canUse('zhibi',current);
 							})&&!game.hasPlayer(function(current){
@@ -1721,10 +1722,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					eff:{
 						sub:true,
-						trigger:{global:'phaseDrawBegin2'},
+						trigger:{player:'phaseDrawBegin2'},
 						filter:function(event,player){
-							if(event.player!=player) return false;
-							return event.num>0;
+							return !event.numFixed;
 						},
 						silent:true,
 						content:function(){
@@ -1858,17 +1858,24 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						position:'he',
 						filterCard:true,
 						selectCard:2,
-						complexSelect:true,
-						complexCard:true,
-						check:function(card,player,target){
-							if(get.position(card)=='h') return 8-get.value(card);
-							return 6-get.value(card);
+						check:function(card){
+							var player=_status.event.player;
+							if(player.hasSkill('new_paoxiao',true)||player.getEquip('zhuge')||game.hasPlayer(function(current){
+								return current.hasSkill('new_paoxiao');
+							})) return 0;
+							if(player.countCards('h',function(cardx){
+								return !ui.selected.cards.contains(cardx)&&cardx!=card&&cardx.name=='sha'&&player.hasUseTarget(cardx);
+							})<2) return 0;
+							if(get.position(card)=='h') return 6-get.value(card);
+							return 5-get.value(card);
 						},
 						filterTarget:function(card,player,target){return target!=player&&target.hasSkill('gzxuanhuo')&&target.isFriendOf(player)},
 						discard:false,
 						lose:false,
+						delay:false,
 						content:function(){
 							'step 0'
+							if(player!=game.me&&!player.isOnline()) cards.reverse();
 							target.gain(cards[0],player);
 							player.$giveAuto(cards[0],target);
 							player.discard(cards[1]);
@@ -1881,6 +1888,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							if(!list.length) event.finish();
 							else player.chooseControl(list).set('ai',function(){
+								if(list.contains('new_paoxiao')) return 'new_paoxiao';
 								return list.randomGet();
 							}).set('prompt','选择并获得一项技能直到回合结束');
 							'step 2'
@@ -1891,6 +1899,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},
 						forceaudio:true,
 						audio:['xuanhuo',2],
+						ai:{
+							order:8,
+							result:{target:1},
+						},
 					},
 					//used:{},
 				},
@@ -2821,6 +2833,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player:"phaseDrawBegin2",
 				},
 				frequent:true,
+				filter:function(event){return !event.numFixed},
 				content:function (){
 					trigger.num++;
 				},
@@ -5695,6 +5708,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				filter:function(event,player){
 					return player.hasViceCharacter();
+				},
+				check:function(event,player){
+					return player.hp<=1||get.guozhanRank(name)<=3;
 				},
 				content:function(){
 					'step 0'

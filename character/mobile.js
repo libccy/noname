@@ -6,12 +6,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			mobile:{
-				mobile_default:["miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi"],
-				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","xin_yuanshao","re_liushan","xin_xiahoudun","re_sp_zhugeliang","re_heqi","re_guanqiujian","re_pangtong","old_liuzan"],
+				mobile_default:["miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi"],
+				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","xin_yuanshao","re_liushan","xin_xiahoudun","re_sp_zhugeliang","re_heqi","re_guanqiujian","re_pangtong","old_liuzan","xin_chengpu"],
 				mobile_sunben:["re_sunben"],
 			},
 		},
 		character:{
+			dengzhi:['male','shu',3,['jimeng','shuaiyan']],
+			xin_chengpu:['male','wu',4,['relihuo','chunlao']],
 			yangyi:['male','shu',3,['duoduan','gongsun']],
 			dongcheng:['male','qun',4,['chengzhao']],
 			re_pangtong:['male','shu',3,['xinlianhuan','niepan'],[]],
@@ -55,6 +57,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_sunben:['male','wu',4,['jiang','rehunzi','zhiba'],['zhu']],
 		},
 		characterIntro:{
+			dengzhi:'邓芝（178年－251年），字伯苗。义阳郡新野县（今河南新野）人。东汉名将邓禹之后，三国时期蜀汉重臣。邓芝早年曾被预言能位至大将，后被刘备任为郫令，升迁为广汉太守。因任官公廉且有治绩，被征入朝为尚书。刘备逝世后，奉命出使吴国，成功修复两国关系，并深为吴大帝孙权所赏识。建兴六年（228年），丞相诸葛亮策划北伐，命邓芝与大将赵云佯攻郿城，以吸引魏国曹真军主力。建兴十二年（234年），迁前军师、前将军，领兖州刺史，封阳武亭侯，不久督领江州。延熙六年（243年），迁车骑将军，后授假节。又率军平定涪陵叛乱。延熙十四年（251年），邓芝病逝。邓芝性格正直、简单，不刻意修饰情绪。他为将二十多年，赏罚明断，体恤士卒。身上的衣食取自官府，从未经营过私产，妻儿甚至还有忍饥挨饿之时，死时家中也没有多余财物。',
 			yangyi:'杨仪（？－235年），字威公，襄阳（今湖北襄阳）人，三国时期蜀汉官员。最初为荆州刺史傅群的主簿，后投奔关羽，任为功曹。关羽遣其至成都，大受刘备赞赏，擢为尚书。因与尚书令刘巴不和，调为弘农太守。建兴三年（225年）任丞相参军，此后一直跟随诸葛亮战斗。亮卒，他部署安全退军。诸葛亮在生前定蒋琬继己任，杨仪仅拜中军师。建兴十三年（235年），因多出怨言，被削职流放至汉嘉郡。但杨仪仍不自省，又上书诽谤，言辞激烈，最后下狱，自杀身亡。',
 			dongcheng:'董承（？~200年），字号不详，冀州河间人（今河北献县）人。东汉末年外戚大臣，汉灵帝母亲董太后侄子，汉献帝嫔妃董贵人之父。初从西凉军，为董卓女婿牛辅部曲。护卫汉献帝刘协从长安东归洛阳，拜为卫将军，受封列侯。建安四年（199年），拜车骑将军。自称领受汉献帝衣带诏，联合刘备、种辑、吴子兰、王子服、吴硕等人密谋诛杀曹操。五年正月，图谋泄露，董承诸人及董贵人全部遇害。',
 			chendeng:'陈登（163—201），字元龙，下邳淮浦（今江苏涟水西）人。东汉末年将领、官员。沛相陈珪之子。为人爽朗，性格沈静，智谋过人，少年时有扶世济民之志，并且博览群书，学识渊博。二十五岁时，举孝廉，任东阳县长。虽然年轻，但他能够体察民情，抚弱育孤，深得百姓敬重。后来，徐州牧陶谦提拔他为典农校尉，主管一州农业生产。他亲自考察徐州的土壤状况，开发水利，发展农田灌溉，使汉末迭遭破坏的徐州农业得到一定程度的恢复，百姓们安居乐业，“秔稻丰积”。建安初奉使赴许，向曹操献灭吕布之策，被授广陵太守。以灭吕布有功，加伏波将军。又迁东城太守。年三十九卒。其子陈肃，魏文帝时追陈登之功，为郎中。',
@@ -272,6 +275,125 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		skill:{
+			jimeng:{
+				audio:2,
+				trigger:{player:'phaseUseBegin'},
+				direct:true,
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return current.countGainableCards(player,'he')>0;
+					})
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('jimeng'),function(card,player,target){
+						return target!=player&&target.countGainableCards(player,'he')>0;
+					}).set('ai',function(target){
+						var player=_status.event.player;
+						if(player.hp>1&&get.attitude(player,target)<2) return 0;
+						return get.effect(target,{name:'shunshou'},player,player);
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('jimeng',target);
+						player.gainPlayerCard(target,'he',true);
+					}
+					else event.finish();
+					'step 2'
+					var hs=player.getCards('he');
+					if(player.hp>0&&hs.length){
+						if(hs.length<=player.hp) event._result={bool:true,cards:hs};
+						else player.chooseCard(player.hp,true,'交给'+get.translation(target)+get.cnNumber(player.hp)+'张牌','he',true);
+					}
+					else event.finish();
+					'step 3'
+					target.gain(result.cards,player,'giveAuto');
+				},
+			},
+			shuaiyan:{
+				audio:2,
+				trigger:{player:'phaseDiscardBegin'},
+				filter:function(event,player){
+					return player.countCards('h')>1;
+				},
+				check:function(event,player){
+					return game.hasPlayer(function(current){
+						return current!=player&&current.countCards('he')&&lib.skill.shuaiyan.check2(current,player);
+					});
+				},
+				check2:function(target,player){
+					if(get.itemtype(player)!='player') player=_status.event.player;
+					return -get.attitude(player,target)/target.countCards('he');
+				},
+				content:function(){
+					'step 0'
+					player.showHandcards(get.translation(player)+'发动了【率言】');
+					'step 1'
+					var filter=function(card,player,target){
+						return player!=target&&target.countCards('he')>0;
+					};
+					if(game.hasPlayer(function(current){
+						return filter('我约等于白板',player,current);
+					})){
+						player.chooseTarget(true,filter,'选择一名其他角色，令其交给你一张牌').set('ai',lib.skill.shuaiyan.check2);
+					}
+					else event.finish();
+					'step 2'
+					var target=result.targets[0];
+					event.target=target;
+					player.line(target,'green');
+					target.chooseCard('he',true,'交给'+get.translation(player)+'一张牌');
+					'step 3'
+					player.gain(result.cards,target,'giveAuto')
+				},
+			},
+			relihuo:{
+				audio:2,
+				group:['relihuo_baigei','relihuo_damage'],
+				trigger:{player:'useCard1'},
+				filter:function(event,player){
+					if(event.card.name=='sha'&&!event.card.nature) return true;
+				},
+				check:function(event,player){
+					return false;
+				},
+				content:function(){
+					trigger.card.nature='fire';
+					trigger.relihuo=true;
+				},
+			},
+			relihuo_damage:{
+				trigger:{source:'damageBegin1'},
+				forced:true,
+				audio:'relihuo',
+				filter:function(event,player){
+					return event.getParent(2).relihuo==true;
+				},
+				content:function(){
+					trigger.num++;
+				},
+			},
+			relihuo_baigei:{
+				trigger:{player:'useCardAfter'},
+				forced:true,
+				audio:'relihuo',
+				filter:function(event,player){
+					var num=0;
+					player.getHistory('sourceDamage',function(evt){
+						if(evt.card==event.card) num+=evt.num;
+					});
+					return num>1;
+				},
+				content:function(){
+					var num=0;
+					player.getHistory('sourceDamage',function(evt){
+						if(evt.card==trigger.card) num+=evt.num;
+					});
+					player.loseHp(Math.floor(num/2));
+				},
+			},
 			gongsun:{
 				audio:2,
 				trigger:{player:'phaseUseBegin'},
@@ -4222,6 +4344,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gongsun:'共损',
 			gongsun_info:'出牌阶段开始时，你可以弃置两张牌并指定一名其他角色。你选择一个基本牌或普通锦囊牌的牌名。直到你的下回合开始或你死亡，你与其不能使用或打出或弃置此名称的牌。',
 			gongsun_shadow:'共损',
+			xin_chengpu:'手杀程普',
+			relihuo:'疠火',
+			relihuo_damage:'疠火',
+			relihuo_baigei:'疠火',
+			relihuo_info:'当你使用普【杀】时，你可以将此杀改为火属性。若如此做，当你因执行此【杀】的效果而对横置角色造成伤害时，此伤害+1；当你使用的火【杀】结算完成后，你失去X点体力（X为你因此【杀】造成的伤害总点数的一半且向下取整）',
+			dengzhi:'邓芝',
+			jimeng:'急盟',
+			jimeng_info:'出牌阶段开始时，你可以获得一名其他角色的一张牌，然后交给该角色X张牌（X为你当前体力值）。',
+			shuaiyan:'率言',
+			shuaiyan_info:'弃牌阶段开始时，若你的手牌数大于1，则你可以展示所有手牌，然后你令一名其他角色交给你一张牌。',
 		}
 	};
 });

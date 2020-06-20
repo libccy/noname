@@ -9,11 +9,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_huo:["ol_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","ol_pangtong","ol_yuanshao","re_pangde"],
 				refresh_lin:['re_zhurong','re_menghuo','re_dongzhuo','re_sunjian','re_caopi','re_xuhuang'],
 				refresh_shan:['re_dengai','re_jiangwei','re_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce'],
-				refresh_yijiang:['re_xusheng','re_wuguotai','re_gaoshun','re_zhangyi','re_caozhi','re_zhuran','re_wuyi','re_liaohua','re_guohuai','re_zhuran','re_chengpu','re_caozhang','re_quancong','yujin_yujin','re_lingtong'],
+				refresh_yijiang:['re_xusheng','re_wuguotai','re_gaoshun','re_zhangyi','re_caozhi','re_zhuran','re_wuyi','re_liaohua','re_guohuai','re_zhuran','re_chengpu','re_caozhang','re_quancong','yujin_yujin','re_lingtong','re_handang','re_zhonghui'],
 		 },
 		},
 		connect:true,
 		character:{
+			re_zhonghui:['male','wei',4,['requanji','zili']],
+			re_handang:['male','wu',4,['regongji','jiefan']],
 			re_lingtong:['male','wu',4,['rexuanfeng']],
 			yujin_yujin:['male','wei',4,['rejieyue']],
 			re_caozhang:['male','wei',4,['new_jiangchi']],
@@ -103,6 +105,129 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunben:['zhouyu','taishici','daqiao'],
 		},
 		skill:{
+			regongji:{
+				mod:{
+					attackFrom:function(player){
+						if(player.getEquip(3)||player.getEquip(4)||player.getEquip(6)) return -Infinity
+					},
+				},
+				enable:'phaseUse',
+				usable:1,
+				position:'he',
+				filter:function(event,player){
+					return player.countCards('he',function(card){
+						return lib.skill.regongji.filterCard(card,player);
+					})>0;
+				},
+				filterCard:function(card,player){
+					return get.type(card,player)!='basic';
+				},
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countDiscardableCards(player,'he')>0;
+				},
+				check:function(card){
+					return 4.5-get.value(card);
+				},
+				content:function(){
+					if(target.countDiscardableCards(player,'he')>0) player.discardPlayerCard(target,'he',true);
+				},
+				ai:{
+					order:5,
+					result:{
+						target:function(player,target){
+							var att=get.attitude(player,target);
+							var nh=target.countCards('h');
+							if(att>0){
+								if(target.getEquip('baiyin')&&target.isDamaged()&&
+									get.recoverEffect(target,player,player)>0){
+									if(target.hp==1&&!target.hujia) return 1.6;
+									if(target.hp==2) return 0.01;
+									return 0;
+								}
+							}
+							var es=target.getCards('e');
+							var noe=(es.length==0||target.hasSkillTag('noe'));
+							var noe2=(es.length==1&&es[0].name!='tengjia'&&get.value(es[0])<=0);
+							var noh=(nh==0||target.hasSkillTag('noh'));
+							if(noh&&(noe||noe2)) return 0;
+							if(att<=0&&!target.countCards('he')) return 1.5;
+							return -1.5;
+						},
+					},
+					tag:{
+						loseCard:1,
+						discard:1
+					},
+				},
+			},
+			requanji:{
+				audio:2,
+				trigger:{player:['damageEnd','phaseUseEnd']},
+				frequent:true,
+				locked:false,
+				notemp:true,
+				init:function(player){
+					if(!player.storage.quanji) player.storage.quanji=[];
+				},
+				filter:function(event,player){
+					if(event.name=='phaseUse') return player.countCards('h')>player.hp;
+					return event.num>0;
+				},
+				content:function(){
+					"step 0"
+					event.count=trigger.num||1;
+					"step 1"
+					event.count--;
+					player.draw();
+					"step 2"
+					if(player.countCards('he')){
+						player.chooseCard('将一张手牌置于武将牌上作为“权”',true);
+					}
+					else{
+						event.goto(4);
+					}
+					"step 3"
+					if(result.cards&&result.cards.length){
+						player.lose(result.cards,ui.special,'toStorage');
+						player.storage.quanji=player.storage.quanji.concat(result.cards);
+						player.syncStorage('quanji');
+						player.markSkill('quanji');
+						game.log(player,'将',result.cards,'置于武将牌上作为“权”');
+					}
+					"step 4"
+					if(event.count>0){
+						player.chooseBool(get.prompt2('requanji')).set('frequentSkill','requanji');
+					}
+					else event.finish();
+					"step 5"
+					if(result.bool){
+						player.logSkill('requanji');
+						event.goto(1);
+					}
+				},
+				mod:{
+					maxHandcard:function(player,num){
+						return num+player.storage.quanji.length;
+					}
+				},
+				ai:{
+					maixie:true,
+					maixie_hp:true,
+					threaten:0.8,
+					effect:{
+						target:function(card,player,target){
+							if(get.tag(card,'damage')){
+								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
+								if(!target.hasFriend()) return;
+								if(target.hp>=4) return [0.5,get.tag(card,'damage')*2];
+								if(!target.hasSkill('paiyi')&&target.hp>1) return [0.5,get.tag(card,'damage')*1.5];
+								if(target.hp==3) return [0.5,get.tag(card,'damage')*1.5];
+								if(target.hp==2) return [1,get.tag(card,'damage')*0.5];
+							}
+						}
+					}
+				}
+			},
 			ollongdan:{
 				audio:'longdan_sha',
 				audioname:['re_zhaoyun','sp_zhaoyun'],
@@ -1965,6 +2090,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(targets[0].hasZhuSkill('olzhiba',player)) targets[0].logSkill('olzhiba');
 				},
 				direct:true,
+				clearTime:true,
 				contentBefore:function(){
 					'step 0'
 					var list=[];
@@ -6699,9 +6825,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oltishen_info:'限定技，准备阶段，你可以将体力回复至上限，然后摸X张牌（X为你回复的体力值）。',
 			ollongdan:'龙胆',
 			ollongdan_info:'你可以将一张【杀】当做【闪】、【闪】当做【杀】、【酒】当做【桃】、【桃】当做【酒】使用或打出。',
-			ollongdan_jiu:'龙胆(酒)',
 			olyajiao:'涯角',
 			olyajiao_info:'当你于回合外因使用或打出而失去手牌后，你可以展示牌堆顶的一张牌。若这两张牌的类别相同，你可以将展示的牌交给一名角色；若类别不同，你可弃置攻击范围内包含你的角色区域里的一张牌。',
+			re_zhonghui:'界钟会',
+			re_handang:'界韩当',
+			requanji:'权计',
+			requanji_info:'出牌阶段结束时，若你的手牌数大于体力值，或当你受到1点伤害后，你可以摸一张牌，然后将一张手牌置于武将牌上，称为“权”；你的手牌上限+X（X为“权”的数量）。',
+			regongji:'弓骑',
+			regongji_info:'出牌阶段限一次，你可以弃置一张非基本牌，然后弃置一名其他角色的一张牌。锁定技，当你的装备区内有坐骑牌时，你的攻击范围无限。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

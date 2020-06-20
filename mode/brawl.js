@@ -1871,7 +1871,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						['sunquan','zhangzhang','zhouyu'],
 						['re_yuanshao','guotufengji','yj_jushou']
 						];
-						if(_status.forceKey) list.push(['key_yuri','key_kyousuke','key_umi'])
+						if(_status.forceKey) list.push(['key_yuri','key_yuzuru','sp_key_kanade'])
 						list.randomSort();
 						var list2=[];
 						for(var i=0;i<list.length;i++){
