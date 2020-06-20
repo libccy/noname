@@ -275,7 +275,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							// if(player==target&&player.hp<=0) return 2;
-							if(player.hasSkillTag('nokeep')) return 2;
+							//if(player.hasSkillTag('nokeep')) return 2;
+							if(player.hasMark('drlt_jieying_mark')) return 2;
 							var nd=player.needsToDiscard();
 							var keep=false;
 							if(nd<=0){
@@ -678,6 +679,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(player.hasUnknown(2)){
 								return 0;
 							}
+							//SP刘协:皇恩
+							if (game.players.length>2){
+								var list=target.getEnemies();
+								for (var i=0;i<list.length;i++){
+									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) return 0;
+								}
+							}
+							//--------------------------
 							return 2-2*get.distance(player,target,'absolute')/game.countPlayer();
 						}
 					},
@@ -715,6 +724,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target){
+							//SP刘协:皇恩
+							if (game.players.length>2){
+								var list=target.getEnemies();
+								for (var i=0;i<list.length;i++){
+									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) return 0;
+								}
+							}
+							//--------------------------
 							return (target.hp<target.maxHp)?2:0;
 						}
 					},
@@ -768,6 +785,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							if(player.hasUnknown(2)&&get.mode()!='guozhan') return 0;
+							//SP刘协:皇恩
+							if (game.players.length>2){
+								if (target.hasSkill('sphuangen')&&target.hp>0) return 0;
+								var list=target.getFriends(true);
+								for (var i=0;i<list.length;i++){
+									//花鬘:蛮嗣
+									if (list[i].hasSkill('mansi')) return 0;;
+									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) return 0;
+								}
+							}
+							//--------------------------
 							var nh=target.countCards('h');
 							if(get.mode()=='identity'){
 								if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
@@ -833,6 +861,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							if(player.hasUnknown(2)&&get.mode()!='guozhan') return 0;
+							//SP刘协:皇恩
+							if (game.players.length>2){
+								if (target.hasSkill('sphuangen')&&target.hp>0) return 0;
+								var list=target.getFriends(true);
+								for (var i=0;i<list.length;i++){
+									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) return 0;
+								}
+							}
+							//--------------------------
 							var nh=target.countCards('h');
 							if(get.mode()=='identity'){
 								if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
@@ -1166,8 +1203,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var es=target.getCards('e');
 							var noe=(es.length==0||target.hasSkillTag('noe'));
 							var noe2=(es.length==1&&es[0].name!='tengjia'&&get.value(es[0])<=0);
+							var noe3=(es.length==1&&es[0].name=='baiyin'&&target.isDamaged());
+							var noe4 = false;
+							var bad_equip_num=0;
+							for (var i=0;i<es.length;i++){
+								if (get.equipValue(es[i])<=0) bad_equip_num+=1;
+							}
+							if (bad_equip_num==es.length) noe3 = true;
 							var noh=(nh==0||target.hasSkillTag('noh'));
-							if(noh&&(noe||noe2)) return 0;
+							if(noh&&(noe||noe2||noe3||noe4)) return 0;
 							if(att<=0&&!target.countCards('he')) return 1.5;
 							return -1.5;
 						},
@@ -1235,9 +1279,21 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						useful:1,
 					},
 					result:{
-						target:-1.5,
-						player:function(player){
+						//target:-1.5,
+						target:function(player,target){
+							var target_weapon=target.getEquip(1);
+							if(target_weapon&&get.equipValue(target_weapon)<=0){
+								return 'zeroplayertarget';
+							}
+							return -1.5;
+						},
+						//player:function(player){
+						player:function(player,target){
 							if(player.getCards('he',{subtype:'equip1'}).length) return 0;
+							var target_weapon=target.getEquip(1);
+							if(target_weapon&&get.equipValue(target_weapon)<=0){
+								return 'zeroplayertarget';
+							}
 							return 1.5;
 						},
 					},
