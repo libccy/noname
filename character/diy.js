@@ -47,6 +47,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_ao:['female','key',3,['ao_xishi','ao_kuihun','ao_shixin']],
 			key_yuzuru:['male','key',5,['yuzuru_wuxin','yuzuru_deyi']],
 			sp_key_kanade:['female','key',3,['kanade_mapo','kanade_benzhan']],
+			key_mio:['female','key',3,['mio_tuifu','mio_tishen']],
+			key_midori:['female','key',3,['midori_nonghuan','midori_tishen']],
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
 			diy_feishi:['male','shu',3,['shuaiyan','moshou']],
@@ -129,7 +131,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy:{
 				diy_tieba:["diy_wenyang","ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_zhangwei"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori"],
 				diy_yongjian:["ns_chendao","yj_caoang"],
 			},
 		},
@@ -227,6 +229,132 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_iwasawa:['key_hisako'],
 		},
 		skill:{
+			yuzuru_bujin:{
+				global:'yuzuru_bujin2',
+				trigger:{global:'phaseDrawBegin'},
+				forced:true,
+				logTarget:'player',
+				filter:function(event,player){
+					return event.player!=player&&event.player.isFriendOf(player);
+				},
+				content:function(){trigger.num++},
+			},
+			yuzuru_bujin2:{
+				mod:{
+					globalFrom:function(from,to,num){
+						return num-game.countPlayer(function(current){
+							return current!=from&&current.isFriendOf(from)&&current.hasSkill('yuzuru_bujin');
+						});
+					},
+				},
+			},
+			mio_tuifu:{
+				trigger:{global:'damageBegin1'},
+				forced:true,
+				filter:function(event,player){
+					return event.source&&event.source.sex=='male'&&event.player.sex=='male';
+				},
+				content:function(){
+					player.draw();
+				},
+			},
+			mio_tishen:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				limited:true,
+				unique:true,
+				skillAnimation:true,
+				animationColor:'water',
+				filter:function(event,player){
+					return player.isDamaged();
+				},
+				check:function(event,player){
+					return player.hp<=1||player.getDamagedHp()>1;
+				},
+				content:function(){
+					player.awakenSkill(event.name);
+					var num=player.maxHp-player.hp;
+					player.recover(num);
+					player.draw(num);
+					if(_status.characterlist&&_status.characterlist.contains('key_midori')){
+						player.reinit('key_mio','key_midori',false);
+						_status.characterlist.remove('key_midori');
+						_status.characterlist.add('key_mio');
+					}
+				},
+			},
+			midori_nonghuan:{
+				enable:'phaseUse',
+				filter:function(event,player){
+					return (player.getStat('skill').midori_nonghuan||0)<player.hp;
+				},
+				filterTarget:function(card,player,target){
+					var stat=player.getStat('midori_nonghuan');
+					return target!=player&&(!stat||!stat.contains(target))&&target.countGainableCards(player,'hej')>0;
+				},
+				content:function(){
+					'step 0'
+					var stat=player.getStat();
+					if(!stat.midori_nonghuan) stat.midori_nonghuan=[];
+					stat.midori_nonghuan.push(target);
+					player.gainPlayerCard(target,'hej',true);
+					player.draw();
+					'step 1'
+					if(player.countCards('he')>0) player.chooseCard('he',true,'交给'+get.translation(target)+'一张牌');
+					else event.goto(3);
+					'step 2'
+					target.gain(result.cards,player,'giveAuto');
+					'step 3'
+					var history=game.getGlobalHistory('cardMove');
+					for(var i=0;i<history.length;i++){
+						if(history[i].getParent('midori_nonghuan')==event) history.splice(i--,1);
+					}
+					game.countPlayer2(function(current){
+						var history=current.getHistory('lose');
+						for(var i=0;i<history.length;i++){
+							if(history[i].getParent('midori_nonghuan')==event) history.splice(i--,1);
+						}
+						var history=current.getHistory('gain');
+						for(var i=0;i<history.length;i++){
+							if(history[i].getParent('midori_nonghuan')==event) history.splice(i--,1);
+						}
+					});
+				},
+				ai:{
+					order:9,
+					result:{
+						player:function(){
+							return lib.card.shunshou.ai.result.player.apply(this,arguments);
+						},
+						target:function(){
+							return lib.card.shunshou.ai.result.target.apply(this,arguments);
+						},
+					},
+				},
+			},
+			midori_tishen:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				limited:true,
+				unique:true,
+				skillAnimation:true,
+				animationColor:'water',
+				filter:function(event,player){
+					return player.isDamaged();
+				},
+				check:function(event,player){
+					return player.hp<=1||player.getDamagedHp()>1;
+				},
+				content:function(){
+					player.awakenSkill(event.name);
+					var num=player.maxHp-player.hp;
+					player.recover(num);
+					player.draw(num);
+					if(_status.characterlist&&_status.characterlist.contains('key_mio')){
+						player.reinit('key_midori','key_mio',false);
+						_status.characterlist.remove('key_mio');
+						_status.characterlist.add('key_midori');
+					}
+				},
+			},
 			kanade_mapo:{
 				derivation:'mapodoufu',
 				enable:'chooseToUse',
@@ -1293,6 +1421,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				discard:false,
 				line:true,
 				direct:true,
+				clearTime:true,
 				delay:false,
 				lose:false,
 				prepare:function(cards,player,targets){
@@ -8257,6 +8386,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_ao:'空门苍',
 			key_yuzuru:'音无结弦',
 			sp_key_kanade:'SP立华奏',
+			key_mio:'西园美鱼',
+			key_midori:'西园美鸟',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -8329,7 +8460,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tsumugi_mugyu_info:'当你成为牌的目标后，若你的手牌数小于体力上限，则你可以摸一张牌。',
 			tsumugi_huilang:'回廊',
 			tsumugi_huilang2:'回廊',
-			tsumugi_huilang_info:'回合结束时，不可以将任意张牌扣置于武将牌下（均称为「隐」）。回合开始时，你获得所有「隐」，然后可令等量的角色各摸一张牌。',
+			tsumugi_huilang_info:'回合结束时，你可以将任意张牌扣置于武将牌下（均称为「隐」）。回合开始时，你获得所有「隐」，然后可令等量的角色各摸一张牌。',
 			//〖回廊〗涉及的所有卡牌移动的结算不会触发〖良姻〗
 			haruka_shuangche:'双掣',
 			kanata_shuangche:'双掣',
@@ -8443,10 +8574,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuzuru_kunfen_rewrite_info:'锁定技，结束阶段，你摸两张牌。然后你可以将两张牌交给一名其他角色。',
 			yuzuru_quji_rewrite:'去疾·改',
 			yuzuru_quji_rewrite_info:'出牌阶段限一次，你可以弃置X张牌并选择至多等量已受伤的其他角色，这些角色各回复1点体力。（X为你已损失的体力值）',
+			yuzuru_bujin:'步进',
+			yuzuru_bujin_info:'锁定技，己方其他角色计算与其他角色的距离-1且摸牌阶段的额定摸牌数+1。',
 			kanade_mapo:'麻婆',
 			kanade_mapo_info:'你可以将一张♥牌当做【麻婆豆腐】使用。你使用的【麻婆豆腐】可以多指定一个目标。',
 			kanade_benzhan:'奔战',
 			kanade_benzhan_info:'当你使用或打出牌响应其他角色，或其他角色使用或打出牌响应你后，若此牌为：基本牌，你可令一名角色弃置两张牌或令一名角色摸两张牌；非基本牌，你可对一名角色造成1点伤害或令一名其他角色回复1点体力。',
+			mio_tuifu:'推腐',
+			mio_tuifu_info:'锁定技，当一名男性角色对一名男性角色造成伤害后，你摸一张牌。',
+			mio_tishen:'替身',
+			mio_tishen_info:'限定技，准备阶段，你可以将体力值回复至体力上限并摸等同于回复量的牌，然后将武将牌替换为【西园美鸟】。',
+			midori_nonghuan:'弄幻',
+			midori_nonghuan_info:'出牌阶段限X次（X为你的体力值），你可以获得一名本阶段内未选择过的其他角色的区域内的一张牌。你摸一张牌，然后将一张牌交给该角色。然后你清除此技能结算过程中所有卡牌移动事件的移动记录。',
+			//即技能结算完成后，所有涉及到的牌移动事件不会再被getHistory获取
+			midori_tishen:'替身',
+			midori_tishen_info:'限定技，准备阶段，你可以将体力值回复至体力上限并摸等同于回复量的牌，然后将武将牌替换为【西园美鱼】。',
 			
 			
 			yj_caoang:'SP曹昂',

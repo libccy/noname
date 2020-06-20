@@ -1066,7 +1066,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target){
-							if(get.attitude(player,target)<=0) return (target.countCards('he')>0)?-1.5:1.5;
+							if(get.attitude(player,target)<=0) return (target.countCards('he',function(card){
+								return get.value(card)>0;
+							})>0)?-1.5:1.5;
 							var js=target.getCards('j');
 							if(js.length){
 								var jj=js[0].viewAs?{name:js[0].viewAs}:js[0];
@@ -1163,7 +1165,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 							var es=target.getCards('e');
 							var noe=(es.length==0||target.hasSkillTag('noe'));
-							var noe2=(es.length==1&&es[0].name=='baiyin'&&target.isDamaged());
+							var noe2=(es.length==1&&es[0].name!='tengjia'&&get.value(es[0])<=0);
 							var noh=(nh==0||target.hasSkillTag('noh'));
 							if(noh&&(noe||noe2)) return 0;
 							if(att<=0&&!target.countCards('he')) return 1.5;

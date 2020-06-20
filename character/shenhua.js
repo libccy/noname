@@ -659,8 +659,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseToDisable(true).set('ai',function(event,player,list){
 						if(list.contains('equip2')) return 'equip2';
-						if(list.contains('equip1')&&player.countCards('h',{name:'sha'})>2) return 'equip1';
-						if(list.contains('equip5')&&player.countCards('h',{type:'trick'})>=1) return 'equip5';
+						if(list.contains('equip1')&&(player.countCards('h',function(card){
+							return get.name(card,player)=='sha'&&player.hasUseTarget(card);
+						})-player.getCardUsable('sha'))>1) return 'equip1';
+						if(list.contains('equip5')&&player.countCards('h',function(card){
+							return get.type2(card,player)=='trick'&&player.hasUseTarget(card);
+						})>1) return 'equip5';
 					});
 					'step 1'
 					if(result.control=='equip1'){
@@ -682,8 +686,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						player:function(player){
 							if(!player.isDisabled('equip2')) return 1;
-							if(!player.isDisabled('equip1')&&player.countCards('h',{name:'sha'})>2) return 1;
-							if(!player.isDisabled('equip5')&&player.countCards('h',{type:'trick'})>=1) return 1;
+							if(!player.isDisabled('equip1')&&(player.countCards('h',function(card){
+								return get.name(card,player)=='sha'&&player.hasUseTarget(card);
+							})-player.getCardUsable('sha'))>1) return 1;
+							if(!player.isDisabled('equip5')&&player.countCards('h',function(card){
+								return get.type2(card,player)=='trick'&&player.hasUseTarget(card);
+							})>1) return 1;
 							return -1;
 						},
 					},
@@ -3389,6 +3397,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return target.hasZhuSkill('zhiba',player)&&player.canCompare(target);
 				},
 				direct:true,
+				clearTime:true,
 				prepare:function(cards,player,targets){
 					targets[0].logSkill('zhiba');
 				},
@@ -4161,7 +4170,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageSource'},
 				filter:function(event,player){
 					if(event._notrigger.contains(event.player)) return false;
-					return (event.card&&event.card.name=='sha'&&
+					return (event.card&&event.card.name=='sha'&&event.getParent().name=='sha'&&
 						event.player.isAlive()&&
 						player.canCompare(event.player));
 				},
@@ -6643,6 +6652,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				delay:false,
 				line:true,
 				direct:true,
+				clearTime:true,
 				prepare:function(cards,player,targets){
 					targets[0].logSkill('huangtian');
 				},

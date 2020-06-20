@@ -1086,7 +1086,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseDrawBegin2'},
 				forced:true,
 				filter:function(event,player){
-					return !player.isUnseen();
+					return !player.isUnseen()&&!event.numFixed;
 				},
 				content:function(){
 					trigger.num++;

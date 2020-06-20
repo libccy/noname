@@ -10692,7 +10692,10 @@
 						return event.filter2(info2)&&event.filter1(info2)&&info2[1]==info[1]&&info[2]==info2[2]&&(lib.skill.global.contains(info2[0])||info[1].hasSkill(info2[0],true));
 					}
 					'step 1'
-					if(event.list.length){
+					if(trigger.filterStop&&trigger.filterStop()){
+						event.finish();
+					}
+					else if(event.list.length){
 						var info=event.list.shift();
 						game.createTrigger(event.triggername,info[0],info[1],trigger);
 						event.redo();
@@ -10764,7 +10767,10 @@
 						game.createTrigger(event.triggername,info[0],info[1],trigger);
 					}
 					'step 7'
-					event.goto(event.doing.list.length?3:2);
+					if(trigger.filterStop&&trigger.filterStop()){
+						event.finish();
+					}
+					else event.goto(event.doing.list.length?3:2);
 				},
 				createTrigger:function(){
 					"step 0"
@@ -14648,39 +14654,14 @@
 				damage:function(){
 					"step 0"
 					event.forceDie=true;
-					if(event.source&&event.source.isDead()) delete event.source;
-					if(num<=0){
-						event.trigger('damageZero');
-						event.finish();
-						event._triggered=null;
-					}
-					else event.trigger('damageBegin1');
+					event.trigger('damageBegin1');
 					"step 1"
-					if(event.source&&event.source.isDead()) delete event.source;
-					if(num<=0){
-						event.trigger('damageZero');
-						event.finish();
-						event._triggered=null;
-					}
-					else event.trigger('damageBegin2');
+					event.trigger('damageBegin2');
 					"step 2"
-					if(event.source&&event.source.isDead()) delete event.source;
-					if(num<=0){
-						event.trigger('damageZero');
-						event.finish();
-						event._triggered=null;
-					}
-					else event.trigger('damageBegin3');
+					event.trigger('damageBegin3');
 					"step 3"
-					if(event.source&&event.source.isDead()) delete event.source;
-					if(num<=0){
-						event.trigger('damageZero');
-						event.finish();
-						event._triggered=null;
-					}
-					else event.trigger('damageBegin4');
+					event.trigger('damageBegin4');
 					"step 4"
-					if(event.source&&event.source.isDead()) delete event.source;
 					if(num>0&&player.hujia&&!player.hasSkillTag('nohujia')){
 						if(num>=player.hujia){
 							event.hujia=player.hujia;
@@ -14700,7 +14681,6 @@
 						event._triggered=null;
 					}
 					"step 5"
-					if(event.source&&event.source.isDead()) delete event.source;
 					if(lib.config.background_audio){
 						game.playAudio('effect','damage'+(num>1?'2':''));
 					}
@@ -14761,7 +14741,6 @@
 						}
 					}
 					"step 6"
-					if(event.source&&event.source.isDead()) delete event.source;
 					if(player.hp<=0&&player.isAlive()){
 						game.delayx();
 						player.dying(event);
@@ -14807,7 +14786,6 @@
 						}
 					}
 					"step 7"
-					if(event.source&&event.source.isDead()) delete event.source;
 					if(!event.notrigger) event.trigger('damageSource');
 				},
 				recover:function(){
@@ -14907,6 +14885,7 @@
 					event.trigger('dying');
 					game.log(player,'濒死');
 					"step 1"
+					delete event.filterStop;
 					if(player.hp>0){
 						_status.dying.remove(player);
 						game.broadcast(function(list){
@@ -18169,7 +18148,7 @@
 						if(info.onuse){
 							info.onuse(result,this);
 						}
-						if(info.direct){
+						if(info.direct&&!info.clearTime){
 							_status.noclearcountdown=true;
 						}
 					}
@@ -18650,6 +18629,7 @@
 				},
 				damage:function(){
 					var next=game.createEvent('damage');
+					//next.forceDie=true;
 					next.player=this;
 					var nocard,nosource;
 					var event=_status.event;
@@ -18690,6 +18670,14 @@
 					if(next.num==undefined) next.num=1;
 					if(next.nature=='poison') delete next._triggered;
 					next.setContent('damage');
+					next.filterStop=function(){
+						if(this.source&&this.source.isDead()) delete this.source;
+						if(this.num<=0){
+							this.trigger('damageZero');
+							this._triggered=null;
+							return true;
+						}
+					};
 					return next;
 				},
 				recover:function(){
@@ -18891,6 +18879,9 @@
 					next.reason=reason;
 					if(reason&&reason.source) next.source=reason.source;
 					next.setContent('dying');
+					next.filterStop=function(){
+						return this.player.hp>0;
+					};
 					return next;
 				},
 				die:function(reason){

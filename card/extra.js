@@ -766,6 +766,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				vanish:true,
 				silent:true,
 				popup:false,
+				nopop:true,
 				onremove:function(player){
 					if(player.node.jiu){
 						player.node.jiu.delete();

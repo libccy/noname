@@ -100,6 +100,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			else if(_status.mode=='three'){
 				if(lib.character.wenpin) lib.character.wenpin[3]=['zhenwei_three'];
 				if(lib.character.zhugejin) lib.character.zhugejin[3]=['hongyuan','huanshi_three','mingzhe'];
+				if(lib.character.key_yuzuru){
+					lib.character.key_yuzuru[2]=4;
+					lib.character.key_yuzuru[3]=['yuzuru_bujin'];
+				}
 				if(!get.config('enable_all_cards')){
 					lib.translate.wuzhong_info+='若对方存活角色多于己方，则额外摸一张牌';
 					lib.translate.zhuge_info='锁定技，出牌阶段，你使用杀的次数上限+3';
