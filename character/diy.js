@@ -554,7 +554,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				complexSelect:true,
 				check:function(card){
-					if(!player._yuzuru_sss&&get.color(card)=='black') return -1;
+					if(!_status.event.player._yuzuru_sss&&get.color(card)=='black') return -1;
 					return 9-get.value(card);
 				},
 				line:{color:[194,117,92]},
