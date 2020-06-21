@@ -11753,7 +11753,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			recanshi:{
-				audio:2,
+				audio:'canshi',
 				trigger:{player:'phaseDrawBegin2'},
 				check:function(event,player){
 					if(player.skipList.contains('phaseUse')||!player.countCards('h',function(card){
@@ -11803,7 +11803,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			rechouhai:{
-				audio:2,
+				audio:'chouhai',
 				trigger:{player:'damageBegin3'},
 				forced:true,
 				check:function(){

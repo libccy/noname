@@ -12,6 +12,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			zhengxuan:['male','qun',3,['zhengjing']],
 			dengzhi:['male','shu',3,['jimeng','shuaiyan']],
 			xin_chengpu:['male','wu',4,['relihuo','chunlao']],
 			yangyi:['male','shu',3,['duoduan','gongsun']],
@@ -57,6 +58,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_sunben:['male','wu',4,['jiang','rehunzi','zhiba'],['zhu']],
 		},
 		characterIntro:{
+			zhengxuan:'郑玄（127年－200年），字康成。北海郡高密县（今山东省高密市）人。东汉末年儒家学者、经学大师。郑玄曾入太学攻《京氏易》、《公羊春秋》及《三统历》、《九章算术》，又从张恭祖学《古文尚书》、《周礼》和《左传》等，最后从马融学古文经。游学归里之后，复客耕东莱，聚徒授课，弟子达数千人，家贫好学，终为大儒。党锢之祸起，遭禁锢，杜门注疏，潜心著述。晚年守节不仕，却遭逼迫从军，最终病逝于元城，年七十四。郑玄治学以古文经学为主，兼采今文经学。他遍注儒家经典，以毕生精力整理古代文化遗产，使经学进入了一个“小统一时代”。著有《天文七政论》、《中侯》等书，共百万余言，世称“郑学”，为汉代经学的集大成者。唐贞观年间，列郑玄于二十二“先师”之列，配享孔庙。宋代时被追封为高密伯。后人建有郑公祠以纪念。',
 			dengzhi:'邓芝（178年－251年），字伯苗。义阳郡新野县（今河南新野）人。东汉名将邓禹之后，三国时期蜀汉重臣。邓芝早年曾被预言能位至大将，后被刘备任为郫令，升迁为广汉太守。因任官公廉且有治绩，被征入朝为尚书。刘备逝世后，奉命出使吴国，成功修复两国关系，并深为吴大帝孙权所赏识。建兴六年（228年），丞相诸葛亮策划北伐，命邓芝与大将赵云佯攻郿城，以吸引魏国曹真军主力。建兴十二年（234年），迁前军师、前将军，领兖州刺史，封阳武亭侯，不久督领江州。延熙六年（243年），迁车骑将军，后授假节。又率军平定涪陵叛乱。延熙十四年（251年），邓芝病逝。邓芝性格正直、简单，不刻意修饰情绪。他为将二十多年，赏罚明断，体恤士卒。身上的衣食取自官府，从未经营过私产，妻儿甚至还有忍饥挨饿之时，死时家中也没有多余财物。',
 			yangyi:'杨仪（？－235年），字威公，襄阳（今湖北襄阳）人，三国时期蜀汉官员。最初为荆州刺史傅群的主簿，后投奔关羽，任为功曹。关羽遣其至成都，大受刘备赞赏，擢为尚书。因与尚书令刘巴不和，调为弘农太守。建兴三年（225年）任丞相参军，此后一直跟随诸葛亮战斗。亮卒，他部署安全退军。诸葛亮在生前定蒋琬继己任，杨仪仅拜中军师。建兴十三年（235年），因多出怨言，被削职流放至汉嘉郡。但杨仪仍不自省，又上书诽谤，言辞激烈，最后下狱，自杀身亡。',
 			dongcheng:'董承（？~200年），字号不详，冀州河间人（今河北献县）人。东汉末年外戚大臣，汉灵帝母亲董太后侄子，汉献帝嫔妃董贵人之父。初从西凉军，为董卓女婿牛辅部曲。护卫汉献帝刘协从长安东归洛阳，拜为卫将军，受封列侯。建安四年（199年），拜车骑将军。自称领受汉献帝衣带诏，联合刘备、种辑、吴子兰、王子服、吴硕等人密谋诛杀曹操。五年正月，图谋泄露，董承诸人及董贵人全部遇害。',
@@ -275,6 +277,231 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		skill:{
+			//水 果 忍 者
+			zhengjing_guanju:{audio:true},
+			zhengjing:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return !player.hasSkill('zhengjing3');
+				},
+				content:function(){
+					"step 0"
+					//game.trySkillAudio('zhengjing_guanju',player);
+					if(_status.connectMode) event.time=lib.configOL.choose_timeout;
+					var cards=[];
+					var names=[];
+					while(true){
+						var card=get.cardPile(function(carde){
+							return carde.name!='du'&&!names.contains(carde.name);
+						});
+						if(card){
+							cards.push(card);
+							names.push(card.name);
+							if(cards.length==3&&Math.random()<0.25) break;
+							if(cards.length==4&&Math.random()<0.33) break;
+							if(cards.length==5&&Math.random()<0.5) break;
+							if(cards.length>=6) break;
+						}
+						else break;
+					};
+					event.cards=cards;
+					if(!cards.length){event.finish();return;};
+					names.push('du');
+					var names2=names.slice(0);
+					for(var i=0;i<4;i++){
+						names=names.concat(names2);
+					}
+					names.randomSort();
+					event.videoId=lib.status.videoId++;
+					if(player.isUnderControl()){
+						game.modeSwapPlayer(player);
+					}
+					var switchToAuto=function(){
+						names.remove('du');
+						game.pause();
+						game.countChoose();
+						setTimeout(function(){
+							_status.imchoosing=false;
+							event._result={
+								bool:true,
+								links:names.slice(0),
+							};
+							if(event.dialog) event.dialog.close();
+							if(event.control) event.control.close();
+							game.resume();
+						},5000);
+					};
+					var createDialog=function(player,id){
+						if(_status.connectMode) lib.configOL.choose_timeout='30';
+						if(player==game.me) return;
+						var str=get.translation(player)+'正在整理经书...<br>';
+						ui.create.dialog(str).videoId=id;
+					};
+					var chooseButton=function(list){
+						var event=_status.event;
+						event.settleed=false;
+						event.finishedx=[];
+						event.map={};
+						event.zhengjing=list;
+						event.zhengjing_nodes=[];
+						event.map=[];
+						event.dialog=ui.create.dialog('forcebutton','hidden');
+						event.dialog.textPrompt=event.dialog.addText('及时点击卡牌，但不要点到毒了！');
+						event.switchToAuto=function(){
+							event._result={
+								bool:true,
+								links:event.finishedx.slice(0),
+							};
+							event.dialog.close();
+							game.resume();
+							_status.imchoosing=false;
+						};
+						event.dialog.classList.add('fixed');
+						event.dialog.classList.add('scroll1');
+						event.dialog.classList.add('scroll2');
+						event.dialog.classList.add('fullwidth');
+						event.dialog.classList.add('fullheight');
+						event.dialog.classList.add('noupdate');
+						event.dialog.open();
+						event.settle=function(du){
+							if(event.settleed) return;
+							event.settleed=true;
+							if(du){
+								if(lib.config.background_speak) game.playAudio('skill','zhengjing_boom');
+								event.dialog.textPrompt.innerHTML='  <br>叫你别点毒你非得点 这下翻车了吧';
+							}
+							else {
+								if(lib.config.background_speak) game.playAudio('skill','zhengjing_finish');
+								event.dialog.textPrompt.innerHTML='  <br>整理经典结束！';
+							}
+							while(event.zhengjing_nodes.length){
+								event.zhengjing_nodes.shift().delete();
+							}
+							setTimeout(function(){
+							 event.switchToAuto();
+							},1000);
+						};
+						
+						var click=function(){
+							var name=this.name;
+							if(name=='du'){
+								event.zhengjing.length=0;
+								event.settle(true);
+							}
+							else{
+								if(lib.config.background_speak) game.playAudio('skill','zhengjing_click');
+								if(!event.map[name]) event.map[name]=0;
+								event.map[name]++;
+								if(event.map[name]>1) event.finishedx.add(name);
+							}
+							event.zhengjing_nodes.remove(this);
+							this.style.transition='all 0.5s';
+							this.style.transform='scale(1.2)';
+							this.delete();
+						};
+						var addNode=function(){
+							if(event.zhengjing.length){
+								var card=ui.create.card(ui.special,'noclick',true);
+								card.init(['','',event.zhengjing.shift()]);
+								card.addEventListener(lib.config.touchscreen?'touchend':'click',click);
+								event.zhengjing_nodes.push(card);
+								card.style.position='absolute';
+								var rand1=Math.round(Math.random()*100);
+								var rand2=Math.round(Math.random()*100);
+								var rand3=Math.round(Math.random()*40)-20;
+								card.style.left='calc('+rand1+'% - '+rand1+'px)';
+								card.style.top='calc('+rand2+'% - '+rand2+'px)';
+								card.style.transform='scale(0.8) rotate('+rand3+'deg)';
+								card.style.opacity=0;
+								event.dialog.appendChild(card);
+								ui.refresh(card);
+								card.style.opacity=1;
+								card.style.transform='scale(1) rotate('+rand3+'deg)';
+							}
+							if(event.zhengjing_nodes.length>(event.zhengjing.length>0?2:0)) event.zhengjing_nodes.shift().delete();
+							if(event.zhengjing.length||event.zhengjing_nodes.length) setTimeout(function(){
+								addNode();
+							},800);
+							else event.settle();
+						};
+						
+						game.pause();
+						game.countChoose();
+						addNode();
+					};
+					//event.switchToAuto=switchToAuto;
+					game.broadcastAll(createDialog,player,event.videoId);
+					if(event.isMine()){
+						chooseButton(names);
+					}
+					else if(event.isOnline()){
+						event.player.send(chooseButton,names);
+						event.player.wait();
+						game.pause();
+					}
+					else{
+						switchToAuto();
+					}
+					"step 1"
+					game.broadcastAll(function(id,time){
+						if(_status.connectMode) lib.configOL.choose_timeout=time;
+						var dialog=get.idDialog(id);
+						if(dialog){
+							dialog.close();
+						}
+					},event.videoId,event.time);
+					var result=event.result||result;
+					for(var i=0;i<cards.length;i++){
+						if(cards.length==1) break;
+						if(!result.links.contains(cards[i].name)) cards.splice(i--,1);
+					}
+					player.showCards(cards,get.translation(player)+'整理出了以下经典');
+					"step 2"
+					player.chooseTarget(true,'将整理出的经典置于一名角色的武将牌上').set('ai',function(target){
+						if(target.hasSkill('xinfu_pdgyingshi')) return 0;
+						var player=_status.event.player;
+						var cards=_status.event.getParent().cards;
+						var att=get.attitude(player,target);
+						if(cards.length==1) return -att;
+						if(player==target) att/=2;
+						if(target.hasSkill('pingkou')) att*=1.4;
+						att*=(1+target.countCards('j')/2);
+						return att;
+					});
+					"step 3"
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target,'thunder');
+						target.addSkill('zhengjing2');
+						target.markAuto('zhengjing2',cards);
+						game.cardsGotoSpecial(cards);
+						game.log(player,'将',cards,'置于了',target,'的武将牌上');
+					}
+				},
+				ai:{
+					order:10,
+					result:{player:1},
+					threaten:3.2,
+				}
+			},
+			//恁就是仲村由理？
+			zhengjing2:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				forced:true,
+				intro:{content:'cards'},
+				content:function(){
+					player.gain(player.storage.zhengjing2,'gain2','log','fromStorage');
+					delete player.storage.zhengjing2;
+					player.removeSkill('zhengjing2');
+					player.addTempSkill('zhengjing3');
+					player.skip('phaseJudge');
+					player.skip('phaseDraw');
+				},
+			},
+			zhengjing3:{},
+			//邓芝
 			jimeng:{
 				audio:2,
 				trigger:{player:'phaseUseBegin'},
@@ -4354,6 +4581,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jimeng_info:'出牌阶段开始时，你可以获得一名其他角色的一张牌，然后交给该角色X张牌（X为你当前体力值）。',
 			shuaiyan:'率言',
 			shuaiyan_info:'弃牌阶段开始时，若你的手牌数大于1，则你可以展示所有手牌，然后你令一名其他角色交给你一张牌。',
+			zhengxuan:'郑玄',
+			zhengjing:'整经',
+			zhengjing_info:'出牌阶段，你可以整理卡牌。然后，你将整理出的卡牌置于一名角色的武将牌上。该角色的准备阶段获得这些牌，跳过此回合的判定和摸牌阶段且本回合内不能发动【整经】。',
+			zhengjing2:'整经',
 		}
 	};
 });
