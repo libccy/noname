@@ -66,7 +66,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhongyao:['male','wei',3,['huomo','zuoding']],
 			liuchen:['male','shu',4,['zhanjue','qinwang'],['zhu']],
 			zhangyi:['male','shu',4,['wurong','shizhi']],
-			sunxiu:['male','wu',3,['yanzhu','xingxue','zhaofu'],['zhu']],
+			sunxiu:['male','wu',3,['reyanzhu','rexingxue','rezhaofu'],['zhu']],
 			zhuzhi:['male','wu',4,['xinanguo']],
 			quancong:['male','wu',4,['yaoming']],
 			gongsunyuan:['male','qun',4,['huaiyi']],
@@ -5967,6 +5967,122 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			reyanzhu:{
+				enable:'phaseUse',
+				audio:'yanzhu',
+				usable:1,
+				filterTarget:lib.filter.notMe,
+				content:function(){
+					'step 0'
+					if(!target.countCards('e')) event._result={bool:false};
+					else target.chooseCard('e','将一张装备区的牌交给'+get.translation(target)+'，或令下一次受到的伤害+1。');
+					'step 1'
+					if(result.bool) player.gain(result.cards,'giveAuto',target);
+					else{
+						target.addSkill('reyanzhu2');
+						target.addMark('reyanzhu2',1,false);
+					}
+				},
+				ai:{
+					order:10,
+					result:{
+						target:function(player,target){
+							if(target.countCards('e',function(card){
+								return card.name!='tengjia'&&get.value(card)<=0
+							})) return -0.5;
+							return -1.5;
+						},
+					},
+				},
+			},
+			reyanzhu2:{
+				trigger:{player:'damageBegin3'},
+				forced:true,
+				onremove:true,
+				content:function(){
+					trigger.num+=player.countMark('reyanzhu2');
+					game.log(player,'受到的伤害+'+player.countMark('reyanzhu2'));
+					player.removeSkill('reyanzhu2');
+				},
+				intro:{
+					content:'下次受到的伤害+#',
+				},
+			},
+			rexingxue:{
+				trigger:{player:'phaseJieshuBegin'},
+				direct:true,
+				audio:'xingxue',
+				filter:function(event,player){
+					return player.maxHp>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget([1,player.maxHp],get.prompt2('rexingxue')).set('ai',function(target){
+						var att=get.attitude(player,target);
+						if(target.countCards('h')==target.hp-1) att*=2;
+						return att;
+					});
+					'step 1'
+					if(result.bool){
+						event.targets=result.targets.sortBySeat();
+						player.logSkill('rexingxue',event.targets);
+						game.asyncDraw(result.targets);
+					}
+					else event.finish();
+					'step 2'
+					game.delay();
+					'step 3'
+					if(event.targets.length){
+						event.target=event.targets.shift();
+						if(event.target.isDead()) event.redo();
+					}
+					else event.finish();
+					'step 4'
+					if(target.isAlive()&&target.countCards('h')&&target.countCards('h')!=target.hp) target.chooseCard('he',true,'将一张牌置于牌堆顶');
+					else event.goto(3);
+					'step 5'
+					if(result&&result.cards){
+						event.card=result.cards[0];
+						target.lose(result.cards,ui.special);
+						game.log(target,'将',(get.position(event.card)=='h'?'一张牌':get.translation(event.card)),'置于牌堆顶');
+						game.broadcastAll(function(player){
+							var cardx=ui.create.card();
+							cardx.classList.add('infohidden');
+							cardx.classList.add('infoflip');
+							player.$throw(cardx,1000,'nobroadcast');
+						},target);
+					}
+					else{
+						event.card=null;
+					}
+					'step 6'
+					if(event.card){
+						event.card.fix();
+						ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
+						game.delay();
+					}
+					event.goto(3);
+				},
+			},
+			rezhaofu:{
+				unique:true,
+				global:'rezhaofu2',
+				zhuSkill:true
+			},
+			rezhaofu2:{
+				mod:{
+					inRangeOf:function(from,to){
+						if(from.group!='wu') return;
+						var players=game.filterPlayer();
+						for(var i=0;i<players.length;i++){
+							if(from!=players[i]&&to!=players[i]&&
+								players[i].hasZhuSkill('rezhaofu',from)){
+								if(players[i].inRange(to)) return true;
+							}
+						}
+					}
+				}
+			},
 			zhaofu:{
 				unique:true,
 				global:'zhaofu2',
@@ -8472,7 +8588,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								result:{
 									target:function(player,target){
    							if(player!=target) return 0;
-   							if(!player.hasSkill('requanji')&&player.countCards('h')+2<=player.hp+player.storage.quanji.length) return 1;
+   							if(player.hasSkill('requanji')||(player.countCards('h')+2<=player.hp+player.storage.quanji.length)) return 1;
    							return 0;
    						}
    					},
@@ -11485,6 +11601,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xingxue_info:'结束阶段开始时，你可以令至多X名角色依次摸一张牌并将一张牌置于牌堆顶（X为你的体力值，若你已失去技能〖宴诛〗，则将X改为你的体力上限）。',
 			zhaofu:'诏缚',
 			zhaofu_info:'主公技，锁定技，你距离为1的角色视为在其他吴势力角色的攻击范围内。',
+			reyanzhu:'宴诛',
+			reyanzhu2:'宴诛',
+			reyanzhu_info:'出牌阶段限一次，你可以令一名其他角色选择一项：交给你装备区里的一张牌，或令下一次受到的伤害+1。',
+			rexingxue:'兴学',
+			rexingxue_info:'结束阶段开始时，你可以令至多X名角色各摸一张牌。然后若有手牌数不等于体力值的目标角色，则这些角色各将一张牌置于牌堆顶。（X为你的体力上限）。',
+			rezhaofu:'诏缚',
+			rezhaofu_info:'主公技，锁定技，你攻击范围内的角色视为在其他吴势力角色的攻击范围内。',
 			wurong:'怃戎',
 			wurong_info:'出牌阶段限一次，你可以令一名其他角色与你同时展示一张手牌：若你展示的是【杀】且该角色展示的不是【闪】，则你弃置此【杀】并对其造成1点伤害；若你展示的不是【杀】且该角色展示的是【闪】，则你弃置你展示的牌并获得其一张牌',
 			shizhi:'矢志',

@@ -49,6 +49,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_key_kanade:['female','key',3,['kanade_mapo','kanade_benzhan']],
 			key_mio:['female','key',3,['mio_tuifu','mio_tishen']],
 			key_midori:['female','key',3,['midori_nonghuan','midori_tishen']],
+			key_kyoko:['female','key',3,['kyoko_juwu','kyoko_zhengyi']],
+			key_shizuru:['female','key',3,['shizuru_nianli','shizuru_benzhan']],
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
 			diy_feishi:['male','shu',3,['shuaiyan','moshou']],
@@ -131,7 +133,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy:{
 				diy_tieba:["diy_wenyang","ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_zhangwei"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru"],
 				diy_yongjian:["ns_chendao","yj_caoang"],
 			},
 		},
@@ -147,6 +149,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
+			key_shizuru:'#bRewrite',
+			key_kyoko:'#bSummer Pockets',
 			sp_key_kanade:'#rAngel Beats!',
 			key_yuzuru:'#rAngel Beats!',
 			key_tsumugi:'#bSummer Pockets',
@@ -227,8 +231,335 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_yuri:['key_kanade'],
 			key_hinata:['key_yui'],
 			key_iwasawa:['key_hisako'],
+			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			shizuru_nianli:{
+				enable:'chooseToUse',
+				prompt:'展示一张♦/♣/♥/♠手牌，然后视为使用一张雷杀/闪/桃/无懈可击',
+				viewAs:function(cards,player){
+					var name=false;
+					var nature=null;
+					switch(get.suit(cards[0],player)){
+						case 'club':name='shan';break;
+						case 'diamond':name='sha';nature='thunder';break;
+						case 'spade':name='wuxie';break;
+						case 'heart':name='tao';break;
+					}
+					if(name) return {name:name,nature:nature,isCard:true};
+					return null;
+				},
+				check:function(card){
+					var player=_status.event.player;
+					if(_status.event.type=='phase'){
+						var max=0;
+						var name2;
+						var list=['sha','tao'];
+						var map={sha:'diamond',tao:'heart'}
+						for(var i=0;i<list.length;i++){
+							var name=list[i];
+		 				if(player.countCards('h',function(card){
+		 					return get.suit(card,player)==map[name];
+		 				})>0&&player.getUseValue({name:name,nature:name=='sha'?'fire':null})>0){
+		 					var temp=get.order({name:name,nature:name=='sha'?'fire':null});
+		 					if(temp>max){
+		 						max=temp;
+		 						name2=map[name];
+		 					}
+		 				}
+		 			}
+		 			if(name2==get.suit(card,player)) return 1;
+		 			return 0;
+					}
+					return 1;
+				},
+				ignoreMod:true,
+				filterCard:function(card,player,event){
+					event=event||_status.event;
+					var filter=event._backup.filterCard;
+					var name=get.suit(card,player);
+					if(name=='club'&&filter({name:'shan'},player,event)) return true;
+					if(name=='diamond'&&filter({name:'sha',nature:'thunder'},player,event)) return true;
+					if(name=='spade'&&filter({name:'wuxie'},player,event)) return true;
+					if(name=='heart'&&filter({name:'tao'},player,event)) return true;
+					return false;
+				},
+				filter:function(event,player){
+					if(player.hasSkill('shizuru_nianli_round')) return false;
+					var filter=event.filterCard;
+					if(filter({name:'sha',nature:'thunder'},player,event)&&player.countCards('h',{suit:'diamond'})) return true;
+					if(filter({name:'shan'},player,event)&&player.countCards('h',{suit:'club'})) return true;
+					if(filter({name:'tao'},player,event)&&player.countCards('h',{suit:'heart'})) return true;
+					if(filter({name:'wuxie'},player,event)&&player.countCards('h',{suit:'spade'})) return true;
+					return false;
+				},
+				precontent:function(){
+					player.logSkill('shizuru_nianli');
+					player.addTempSkill('shizuru_nianli_round','roundStart');
+					player.showCards(get.translation(player)+'发动了【念力】',event.result.cards.slice(0));
+					event.result.card.cards=[];
+					event.result.cards=[];
+					delete event.result.skill;
+					delete event.result.card.suit;
+					delete event.result.card.number;
+					event.getParent().addCount=false;
+					event.getParent().shizuru_nianli=true;
+				},
+				ai:{
+					respondSha:true,
+					respondShan:true,
+					save:true,
+					skillTagFilter:function(player,tag){
+						if(player.hasSkill('shizuru_nianli_round')) return false;
+						var name;
+						switch(tag){
+							case 'respondSha':name='diamond';break;
+							case 'respondShan':name='club';break;
+							case 'save':name='heart';break;
+						}
+						if(!player.countCards('h',{suit:name})) return false;
+					},
+					order:function(item,player){
+						if(player&&_status.event.type=='phase'){
+							var max=0;
+							var list=['sha','tao'];
+							var map={sha:'diamond',tao:'heart'}
+							for(var i=0;i<list.length;i++){
+								var name=list[i];
+			 				if(player.countCards('h',function(card){
+		 						return get.suit(card,player)==map[name];
+		 					})>0&&player.getUseValue({name:name,nature:name=='sha'?'thunder':null})>0){
+			 					var temp=get.order({name:name,nature:name=='sha'?'thunder':null});
+			 					if(temp>max) max=temp;
+			 				}
+			 			}
+			 			max/=1.1;
+			 			return max;
+						}
+						return 2;
+					},
+				},
+				hiddenCard:function(player,name){
+					return name=='wuxie'&&player.countCards('h',{suit:'spade'})>0&&!player.hasSkill('shizuru_nianli_round');
+				},
+				group:'shizuru_nianli_clear',
+				subSkill:{
+					round:{
+						mark:true,
+						intro:{content:'本轮已发动'},
+					},
+					clear:{
+						trigger:{player:'useCardAfter'},
+						lastDo:true,
+						silent:true,
+						filter:function(event,player){
+							return event.getParent().shizuru_nianli==true;
+						},
+						content:function(){
+							player.getHistory('useCard').remove(trigger);
+						},
+					},
+				},
+			},
+			shizuru_benzhan:{
+				trigger:{global:['useCard','respond']},
+				direct:true,
+				filter:function(event,player){
+					return Array.isArray(event.respondTo)&&event.respondTo[0]!=event.player&&[event.respondTo[0],event.player].contains(player);
+				},
+				content:function(){
+					'step 0'
+					event.type=get.type(trigger.card)=='basic';
+					var prompt=event.type?'令一名角色摸两张牌或弃置两张牌':'令一名角色回复1点体力或对其造成1点伤害';
+					player.chooseTarget(get.prompt('shizuru_benzhan'),prompt).set('ai',function(target){
+						var player=_status.event.player;
+						if(_status.event.getParent().type){
+							var att=get.attitude(player,target);
+							if(target.hasSkillTag('nogain')) return -att;
+							if(target.countCards('he')==1&&att<0) att/=2;
+							return Math.abs(att)*(1+0.1*(Math.min(0,5-target.countCards('h'))))
+						}
+						return Math.max(get.recoverEffect(target,player,player),get.damageEffect(target,player,player))
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('shizuru_benzhan',target,'thunder');
+						var trans=get.translation(target);
+						var list;
+						if(event.type){
+							if(!target.countCards('h')) event._result={index:0};
+							else list=['令'+trans+'摸两张牌','令'+trans+'弃置两张牌'];
+						}
+						else{
+							if(target.isHealthy()) event._result={index:1};
+							else list=['令'+trans+'回复1点体力','对'+trans+'造成1点伤害'];
+						}
+						player.chooseControl().set('choiceList',list).set('choice',function(){
+							if(event.type) return (get.attitude(player,target)>0)?0:1;
+							return (get.recoverEffect(target,player,player)>get.damageEffect(target,player,player))?0:1;
+						}()).set('ai',function(){
+							return _status.event.choice;
+						});
+					}
+					else event.finish();
+					'step 2'
+					player.addExpose(0.2);
+					if(event.type){
+						if(result.index==0) target.draw(2);
+						else target.chooseToDiscard(2,'he',true);
+					}
+					else{
+						if(result.index==0) target.recover();
+						else target.damage();
+					}
+				},
+			},
+			kyoko_juwu:{
+				trigger:{global:['loseAfter','cardsDiscardAfter']},
+				direct:true,
+				filter:function(event,player){
+					return player!=event.player&&player!=_status.currentPhase&&event.cards&&event.cards.filter(function(card){
+						return get.position(card,true)=='d'&&get.type(card,false)=='equip';
+					}).length>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseButton([get.prompt('kyoko_juwu'),[1,Infinity],trigger.cards.filter(function(card){
+						return get.position(card,true)=='d'&&get.type(card,false)=='equip';
+					})]);
+					'step 1'
+					if(result.bool){
+						player.gain(result.links,'gain2','log');
+						player.logSkill('kyoko_juwu');
+					}
+				},
+			},
+			kyoko_zhengyi:{
+				group:['kyoko_jingce','kyoko_shelie','kyoko_zhiheng'],
+				count:function(player){
+					var list=[];
+					player.countCards('e',function(card){
+						list.add(get.suit(card,player));
+					});
+					return list.length;
+				},
+			},
+			kyoko_jingce:{
+				trigger:{player:['phaseUseEnd','phaseJieshuBegin']},
+				filter:function(event,player){
+					var num=lib.skill.kyoko_zhengyi.count(player);
+					if(!num||(event.name=='phaseUse')==(num>3)) return false;
+					return player.getHistory('useCard',function(evt){
+						return event.name!='phaseUse'||evt.getParent('phaseUse')==event;
+					}).length>=player.hp;
+				},
+				frequent:true,
+				content:function(){
+					player.draw(2);
+				},
+			},
+			kyoko_shelie:{
+				audio:2,
+				trigger:{player:'phaseDrawBegin1'},
+				filter:function(event,player){
+					return !event.numFixed&&lib.skill.kyoko_zhengyi.count(player)>1;
+				},
+				content:function(){
+					"step 0"
+					trigger.changeToZero();
+					event.cards=get.cards(5);
+					game.cardsGotoOrdering(event.cards);
+					event.videoId=lib.status.videoId++;
+					game.broadcastAll(function(player,id,cards){
+						var str;
+						if(player==game.me&&!_status.auto){
+							str='涉猎：获取花色各不相同的牌';
+						}
+						else{
+							str='涉猎';
+						}
+						var dialog=ui.create.dialog(str,cards);
+						dialog.videoId=id;
+					},player,event.videoId,event.cards);
+					event.time=get.utc();
+					game.addVideo('showCards',player,['涉猎',get.cardsInfo(event.cards)]);
+					game.addVideo('delay',null,2);
+					"step 1"
+					var next=player.chooseButton([0,5],true);
+					next.set('dialog',event.videoId);
+					next.set('filterButton',function(button){
+						for(var i=0;i<ui.selected.buttons.length;i++){
+							if(get.suit(ui.selected.buttons[i].link)==get.suit(button.link)) return false;
+						}
+						return true;
+					});
+					next.set('ai',function(button){
+						return get.value(button.link,_status.event.player);
+					});
+					"step 2"
+					if(result.bool&&result.links){
+						event.cards2=result.links;
+					}
+					else{
+						event.finish();
+					}
+					var time=1000-(get.utc()-event.time);
+					if(time>0){
+						game.delay(0,time);
+					}
+					"step 3"
+					game.broadcastAll('closeDialog',event.videoId);
+					var cards2=event.cards2;
+					player.gain(cards2,'log','gain2');
+				},
+			},
+			kyoko_zhiheng:{
+				enable:'phaseUse',
+				usable:1,
+				position:'he',
+				filter:function(event,player){
+					return lib.skill.kyoko_zhengyi.count(player)>2;
+				},
+				prompt:function(){
+					var str='弃置任意张牌并摸等量的牌';
+					if(lib.skill.kyoko_zhengyi.count(_status.event.player)>3) str+='，若弃置了所有手牌则多摸一张牌。';
+					return str;
+				},
+				filterCard:lib.filter.cardDiscardable,
+				discard:false,
+				lose:false,
+				delay:false,
+				selectCard:[1,Infinity],
+				check:function(card){
+					var player=_status.event.player;
+					if(get.position(card)=='h'){
+						return 8-get.value(card);
+					}
+					return 6-get.value(card)
+				},
+				content:function(){
+					'step 0'
+					player.discard(cards);
+					event.num=1;
+					var hs=player.getCards('h');
+					if(!hs.length||lib.skill.kyoko_zhengyi.count(player)<4) event.num=0;
+					else for(var i=0;i<hs.length;i++){
+						if(!cards.contains(hs[i])){
+							event.num=0;break;
+						}
+					}
+					'step 1'
+					player.draw(event.num+cards.length);
+				},
+				ai:{
+					order:1,
+					result:{
+						player:1
+					},
+				},
+			},
 			yuzuru_bujin:{
 				global:'yuzuru_bujin2',
 				trigger:{global:'phaseDrawBegin'},
@@ -3353,6 +3684,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.addTempSkill('yuri_xingdong_mark','phaseJudgeSkipped');
 						target.skip('phaseJudge');
 						target.skip('phaseDraw');
+						target.addTempSkill('zhengjing3',{player:'phaseAfter'});
 						event.finish();
 					}
 					'step 3'
@@ -3369,7 +3701,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(info.selectTarget==-1){
 								var eff=0;
 								game.countPlayer(function(current){
-									if(current!=player&&target.canUse(card,current)) eff+=get.effect(current,card,target,target)>0
+									if(current!=player&&target.canUse(card,current)) eff+=get.effect(current,card,target,target);
 								});
 								if(eff>0||get.value(card)<3) return eff;
 								return 0;
@@ -8388,6 +8720,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_key_kanade:'SP立华奏',
 			key_mio:'西园美鱼',
 			key_midori:'西园美鸟',
+			key_kyoko:'岬镜子',
+			key_shizuru:'中津静流',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -8398,6 +8732,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_huanjie_info:'锁定技，当你进行判定或摸牌时，你改为从牌堆的另一端获取相应的牌。',
 			yuri_xingdong:'行动',
 			yuri_xingdong_info:'锁定技，出牌阶段开始时，你获得一张【杀】或普通锦囊牌。出牌阶段限一次，你可以将一张【杀】或普通锦囊牌交给一名其他角色，然后该角色选择一项：对除你以外的角色使用此牌并在此牌结算完成后和你各摸一张牌；或跳过下回合的判定阶段和摸牌阶段。',
+			//目标角色跳过阶段的同时 该回合不能发动〖整经(郑玄)〗
 			yuri_wangxi:'忘隙',
 			yuri_wangxi_info:'主公技，限定技，当有角色因你发动的【行动】而死亡后，若其身份不为【明忠】，则其可以将身份改为忠臣并重新加入游戏，然后将势力改为与你相同，将体力值回复至2点并摸一张牌。',
 			haruko_haofang:'豪放',
@@ -8581,7 +8916,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kanade_benzhan:'奔战',
 			kanade_benzhan_info:'当你使用或打出牌响应其他角色，或其他角色使用或打出牌响应你后，若此牌为：基本牌，你可令一名角色弃置两张牌或令一名角色摸两张牌；非基本牌，你可对一名角色造成1点伤害或令一名其他角色回复1点体力。',
 			mio_tuifu:'推腐',
-			mio_tuifu_info:'锁定技，当一名男性角色对一名男性角色造成伤害后，你摸一张牌。',
+			mio_tuifu_info:'锁定技，当一名男性角色对一名男性角色造成伤害时，你摸一张牌。',
 			mio_tishen:'替身',
 			mio_tishen_info:'限定技，准备阶段，你可以将体力值回复至体力上限并摸等同于回复量的牌，然后将武将牌替换为【西园美鸟】。',
 			midori_nonghuan:'弄幻',
@@ -8589,6 +8924,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//即技能结算完成后，所有涉及到的牌移动事件不会再被getHistory获取
 			midori_tishen:'替身',
 			midori_tishen_info:'限定技，准备阶段，你可以将体力值回复至体力上限并摸等同于回复量的牌，然后将武将牌替换为【西园美鱼】。',
+			kyoko_juwu:'聚物',
+			kyoko_juwu_info:'你的回合外，当有装备牌进入弃牌堆后，若这些牌不是从你的区域移动的，则你可以获得这些牌。',
+			kyoko_zhengyi:'整遗',
+			kyoko_zhengyi_info:'锁定技，若你装备区的花色数：大于等于1，你视为拥有〖精策〗；大于等于2，你视为拥有〖涉猎〗：大于等于3，你视为拥有〖制衡〗；大于等于4，你将〖精策〗和〖制衡〗改为界限突破版本。',
+			kyoko_jingce:'精策',
+			kyoko_shelie:'涉猎',
+			kyoko_zhiheng:'制衡',
+			shizuru_nianli:'念力',
+			shizuru_nianli_info:'每轮限一次，你可以展示一张♦/♣/♥/♠手牌，然后视为使用一张雷【杀】/【闪】/【桃】/【无懈可击】。',
+			shizuru_benzhan:'奔战',
+			shizuru_benzhan_info:'当你使用或打出牌响应其他角色，或其他角色使用或打出牌响应你后，若此牌为：基本牌，你可令一名角色弃置两张牌或令一名角色摸两张牌；非基本牌，你可对一名角色造成1点伤害或令一名其他角色回复1点体力。',
 			
 			
 			yj_caoang:'SP曹昂',

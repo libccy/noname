@@ -1726,7 +1726,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						filter:function(event,player){
 							return !event.numFixed;
 						},
-						silent:true,
+						forced:true,
+						popup:false,
 						content:function(){
 							trigger.num+=3;
 						}
@@ -7990,11 +7991,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				dieAfter2:function(source){
 					if(source&&source.shijun){
-					source.discard(source.getCards('he'));
-					delete source.shijun;
+						source.discard(source.getCards('he'));
+						delete source.shijun;
 					}
 					else if(source&&source.identity!='unknown'){
 						if(source.identity=='ye') source.draw(3);
+						else if(source.shijun2){
+							source.draw(1+game.countPlayer(function(current){
+								return current.group==this.group
+							}));
+						}
 						else if(this.identity=='ye') source.draw(1);
 						else if(this.identity!=source.identity) source.draw(get.population(this.identity)+1);
 						else source.discard(source.getCards('he'));
@@ -8004,6 +8010,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					this.showCharacter(2);
 					if(get.is.jun(this.name1)){
 						if(source&&source.identity==this.identity) source.shijun=true;
+						else if(source&&source.identity!='ye') source.shijun2=true;
 						var yelist=[];
 						for(var i=0;i<game.players.length;i++){
 							if(game.players[i].identity==this.identity){

@@ -949,7 +949,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					maixie:true,
 					maixie_hp:true,
-					effect:{
+					/*effect:{
 						target:function(card,player,target){
 							if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
 							if(get.tag(card,'damage')){
@@ -973,7 +973,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return 'zeroplayertarget';
 							}
 						}
-					}
+					}*/
 				}
 			},
 			renjie2:{
@@ -2008,20 +2008,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			relonghun:{
 				audio:'longhun',
+				//技能发动时机
 				enable:['chooseToUse','chooseToRespond'],
+				//发动时提示的技能描述
 				prompt:'将♦牌当做杀，♥牌当做桃，♣牌当做闪，♠牌当做无懈可击使用或打出',
+				//动态的viewAs
 				viewAs:function(cards,player){
 					var name=false;
 					var nature=null;
+					//根据选择的卡牌的花色 判断要转化出的卡牌是闪还是火杀还是无懈还是桃
 					switch(get.suit(cards[0],player)){
 						case 'club':name='shan';break;
 						case 'diamond':name='sha';nature='fire';break;
 						case 'spade':name='wuxie';break;
 						case 'heart':name='tao';break;
 					}
+					//返回判断结果
 					if(name) return {name:name,nature:nature};
 					return null;
 				},
+				//AI选牌思路
 				check:function(card){
 					if(ui.selected.cards.length) return 0;
 					var player=_status.event.player;
@@ -2047,25 +2053,43 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return 1;
 				},
+				//选牌数量
 				selectCard:[1,2],
+				//确保选择第一张牌后 重新检测第二张牌的合法性 避免选择两张花色不同的牌
 				complexCard:true,
+				//选牌范围：手牌区和装备区
 				position:'he',
+				//选牌合法性判断
 				filterCard:function(card,player,event){
+					//如果已经选了一张牌 那么第二张牌和第一张花色相同即可
 					if(ui.selected.cards.length) return get.suit(card,player)==get.suit(ui.selected.cards[0],player);
 					event=event||_status.event;
+					//获取当前时机的卡牌选择限制
 					var filter=event._backup.filterCard;
+					//获取卡牌花色
 					var name=get.suit(card,player);
+					//如果这张牌是梅花并且当前时机能够使用/打出闪 那么这张牌可以选择
 					if(name=='club'&&filter({name:'shan',cards:[card]},player,event)) return true;
+					//如果这张牌是方片并且当前时机能够使用/打出火杀 那么这张牌可以选择
 					if(name=='diamond'&&filter({name:'sha',cards:[card],nature:'fire'},player,event)) return true;
+					//如果这张牌是黑桃并且当前时机能够使用/打出无懈 那么这张牌可以选择
 					if(name=='spade'&&filter({name:'wuxie',cards:[card]},player,event)) return true;
+					//如果这张牌是红桃并且当前时机能够使用/打出桃 那么这张牌可以选择
 					if(name=='heart'&&filter({name:'tao',cards:[card]},player,event)) return true;
+					//上述条件都不满足 那么就不能选择这张牌
 					return false;
 				},
+				//判断当前时机能否发动技能
 				filter:function(event,player){
+					//获取当前时机的卡牌选择限制
 					var filter=event.filterCard;
+					//如果当前时机能够使用/打出火杀并且角色有方片 那么可以发动技能
 					if(filter({name:'sha',nature:'fire'},player,event)&&player.countCards('he',{suit:'diamond'})) return true;
+					//如果当前时机能够使用/打出闪并且角色有梅花 那么可以发动技能
 					if(filter({name:'shan'},player,event)&&player.countCards('he',{suit:'club'})) return true;
+					//如果当前时机能够使用/打出桃并且角色有红桃 那么可以发动技能
 					if(filter({name:'tao'},player,event)&&player.countCards('he',{suit:'heart'})) return true;
+					//如果当前时机能够使用/打出无懈可击并且角色有黑桃 那么可以发动技能
 					if(filter({name:'wuxie'},player,event)&&player.countCards('he',{suit:'spade'})) return true;
 					return false;
 				},
@@ -2073,6 +2097,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					respondSha:true,
 					respondShan:true,
 					save:true,
+					//让系统知道角色“有杀”“有闪”“有桃”
 					skillTagFilter:function(player,tag){
 						var name;
 						switch(tag){
@@ -2082,6 +2107,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						if(!player.countCards('he',{suit:name})) return false;
 					},
+					//AI牌序
 					order:function(item,player){
 						if(player&&_status.event.type=='phase'){
 							var max=0;
@@ -2102,6 +2128,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 2;
 					},
 				},
+				//让系统知道玩家“有无懈”
 				hiddenCard:function(player,name){
 					return name=='wuxie'&&player.countCards('he',{suit:'spade'})>0;
 				},
@@ -2268,6 +2295,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					trigger.changeToZero();
 					event.cards=get.cards(5);
+					game.cardsGotoOrdering(event.cards);
 					event.videoId=lib.status.videoId++;
 					game.broadcastAll(function(player,id,cards){
 						var str;
@@ -2297,13 +2325,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					"step 2"
 					if(result.bool&&result.links){
-						var cards2=[];
-						for(var i=0;i<result.links.length;i++){
-							cards2.push(result.links[i]);
-							cards.remove(result.links[i]);
-						}
-						game.cardsDiscard(cards);
-						event.cards2=cards2;
+						event.cards2=result.links;
 					}
 					else{
 						event.finish();

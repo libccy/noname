@@ -2112,10 +2112,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					event.target=trigger.player;
 					var list=[];
-					if(player.countCards('he')>0) list.push('交给其一张牌');
+					if(player.countCards('he')>1) list.push('交给其一张牌');
 					if(trigger.player.countCards('he')>0) list.push('令其交给你一张牌');
 					event.list=list;
-					player.chooseControl('cancel2').set('choiceList',list).set('prompt',get.prompt('shanrangzhaoshu',trigger.player));
+					player.chooseControl('cancel2').set('choiceList',list).set('prompt',get.prompt('shanrangzhaoshu',trigger.player)).set('ai',function(){
+						if(get.attitude(_status.event.player,_status.event.getTrigger().player)<0) return _status.event.getParent().list.length-1;
+						return 'cancel2';
+					});
 					'step 1'
 					if(result.control=='cancel2'){
 						event.finish();return;
@@ -2126,7 +2129,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.target=player;
 					}
 					'step 2'
-					player.chooseCard('he',true);
+					player.chooseCard('he',true).set('filterCard',function(card,player){
+						if(player!=_status.event.getTrigger().player) return card!=player.getEquip('shanrangzhaoshu');
+						return true;
+					});
 					'step 3'
 					if(result.cards&&result.cards.length) target.gain(result.cards,player,'giveAuto');
 				},

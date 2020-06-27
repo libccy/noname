@@ -800,9 +800,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				equipSkill:true,
 				trigger:{player:'linkBefore'},
 				forced:true,
-				priority:20,
+				//priority:20,
 				filter:function(event,player){
-					return player.isMinor()&&!player.isLinked();
+					return !player.isMajor()&&!player.isLinked();
 				},
 				content:function(){
 					trigger.cancel();

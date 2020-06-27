@@ -6,12 +6,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			mobile:{
-				mobile_default:["miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi"],
-				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","xin_yuanshao","re_liushan","xin_xiahoudun","re_sp_zhugeliang","re_heqi","re_guanqiujian","re_pangtong","old_liuzan","xin_chengpu"],
+				mobile_default:["miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan"],
+				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","xin_yuanshao","re_liushan","xin_xiahoudun","re_sp_zhugeliang","re_heqi","re_guanqiujian","re_pangtong","old_liuzan","xin_chengpu","re_sunjian"],
 				mobile_sunben:["re_sunben"],
 			},
 		},
 		character:{
+			re_sunjian:['male','wu',4,['gzyinghun','repolu']],
 			zhengxuan:['male','qun',3,['zhengjing']],
 			dengzhi:['male','shu',3,['jimeng','shuaiyan']],
 			xin_chengpu:['male','wu',4,['relihuo','chunlao']],
@@ -299,9 +300,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(card){
 							cards.push(card);
 							names.push(card.name);
-							if(cards.length==3&&Math.random()<0.25) break;
-							if(cards.length==4&&Math.random()<0.33) break;
-							if(cards.length==5&&Math.random()<0.5) break;
+							if(cards.length==3&&Math.random()<0.33) break;
+							if(cards.length==4&&Math.random()<0.5) break;
+							if(cards.length==5) break;
 							if(cards.length>=6) break;
 						}
 						else break;
@@ -374,7 +375,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							else {
 								if(lib.config.background_speak) game.playAudio('skill','zhengjing_finish');
-								event.dialog.textPrompt.innerHTML='  <br>整理经典结束！';
+								event.dialog.textPrompt.innerHTML='  <br>整理经典结束！共整理出'+get.cnNumber(event.finishedx.length)+'份经典';
 							}
 							while(event.zhengjing_nodes.length){
 								event.zhengjing_nodes.shift().delete();
@@ -454,10 +455,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},event.videoId,event.time);
 					var result=event.result||result;
 					for(var i=0;i<cards.length;i++){
-						if(cards.length==1) break;
+						//if(cards.length==1) break;
 						if(!result.links.contains(cards[i].name)) cards.splice(i--,1);
 					}
-					player.showCards(cards,get.translation(player)+'整理出了以下经典');
+					if(cards.length) player.showCards(cards,get.translation(player)+'整理出了以下经典');
+					else{
+						game.log(player,'并没有整理出经典');
+						player.popup('杯具');
+						event.finish();
+					}
 					"step 2"
 					player.chooseTarget(true,'将整理出的经典置于一名角色的武将牌上').set('ai',function(target){
 						if(target.hasSkill('xinfu_pdgyingshi')) return 0;
@@ -607,6 +613,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				audio:'relihuo',
 				filter:function(event,player){
+					if(event.card.name!='sha'||event.card.nature!='fire') return false;
 					var num=0;
 					player.getHistory('sourceDamage',function(evt){
 						if(evt.card==event.card) num+=evt.num;
@@ -1473,6 +1480,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseCard(get.prompt2('xinqingjian'),'he',[1,player.countCards('he')]).ai=function(){return -1};
 					'step 1'
 					if(result.bool){
+						player.logSkill('xinqingjian');
 						player.addSkill('xinqingjian2');
 						player.storage.xinqingjian2.addArray(result.cards);
 						game.log(player,'将'+get.cnNumber(player.lose(result.cards,ui.special,'toStorage').cards.length)+'张牌置于其武将牌上');
@@ -1527,7 +1535,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zhongzuo:{
 				audio:2,
-				trigger:{global:'phaseEnd'},
+				trigger:{global:'phaseJieshuBegin'},
 				direct:true,
 				filter:function(event,player){
 					return player.getHistory('damage').length>0||player.getHistory('sourceDamage').length>0;
@@ -2089,13 +2097,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageBegin4'},
 				forced:true,
 				filter:function(event,player){
-					return player.isDamaged()&&event.getParent().name=='sha';
+					return player.isDamaged()&&event.card&&event.card.name=='sha';
 				},
 				content:function(){
 					'step 0'
 					trigger.cancel();
 					var cards=trigger.cards.filterInD();
-					if(cards.length) player.gain(cards,'gain2');
+					if(cards.length) player.gain(cards,'gain2','log');
 					'step 1'
 					player.loseMaxHp();
 				},
@@ -2822,7 +2830,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					global:"phaseDrawAfter",
 				},
 				filter:function (event,player){
-					if(!player.storage.xinfu_zhaoxin.length) return false;
+					if(!player.storage.xinfu_zhaoxin||player.storage.xinfu_zhaoxin.length) return false;
 					return player==event.player||player.inRange(event.player);
 				},
 				direct:true,
@@ -4442,7 +4450,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhiyi:'执义',
 			zhiyi_info:'锁定技，当你于一回合内使用或打出第一张基本牌时，你选择一项：1.摸一张牌。2.于此牌A（若此牌是因响应牌B而使用或打出的，则改为牌B）的使用或打出流程结算完成后，视为使用一张与此牌名称和属性相同的卡牌。',
 			zhongzuo:'忠佐',
-			zhongzuo_info:'一名角色的回合结束时，若你于此回合内造成或受到过伤害，则你可以令一名角色摸两张牌。若该角色已受伤，则你摸一张牌。',
+			zhongzuo_info:'一名角色的结束阶段开始时，若你于此回合内造成或受到过伤害，则你可以令一名角色摸两张牌。若该角色已受伤，则你摸一张牌。',
 			wanlan:'挽澜',
 			wanlan_info:'限定技，当一名角色进入濒死状态时，你可以弃置所有手牌并令其回复体力至1点，然后对当前回合角色造成1点伤害。',
 			re_jikang:"手杀嵇康",
