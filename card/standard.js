@@ -1104,7 +1104,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							if(get.attitude(player,target)<=0) return (target.countCards('he',function(card){
-								return get.value(card)>0;
+								return card.name=='tengjia'||get.value(card)>0;
 							})>0)?-1.5:1.5;
 							var js=target.getCards('j');
 							if(js.length){

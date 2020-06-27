@@ -3262,7 +3262,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['re_dengai','gz_dengai'],
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.storage.tuntian.length>0;
+					return player.storage.tuntian.length>0&&event.filterCard({name:'shunshou'},player,event);
 				},
 				chooseButton:{
 					dialog:function(event,player){

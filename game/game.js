@@ -14677,6 +14677,7 @@
 					event.num=num;
 					if(num<=0){
 						event.trigger('damageZero');
+						delete event.filterStop;
 						event.finish();
 						event._triggered=null;
 					}
@@ -18673,6 +18674,7 @@
 					next.filterStop=function(){
 						if(this.source&&this.source.isDead()) delete this.source;
 						if(this.num<=0){
+							delete this.filterStop;
 							this.trigger('damageZero');
 							this._triggered=null;
 							return true;
@@ -30905,7 +30907,7 @@
 						else if(info.enable=='phaseUse') enable=(event.type=='phase');
 						else if(typeof info.enable=='string') enable=(info.enable==event.name);
 						if(enable){
-							if(info.noHidden&&!game.expandSkills(player.getSkills()).contains(skills2[i])) enable=false;
+							if(!game.expandSkills(player.getSkills()).contains(skills2[i])&&(info.noHidden||player.hasSkillTag('nomingzhi',false,null,true))) enable=false;
 							if(info.filter&&!info.filter(event,player)) enable=false;
 							if(info.viewAs&&typeof info.viewAs!='function'&&event.filterCard&&!event.filterCard(info.viewAs,player,event)) enable=false;
 							if(info.viewAs&&typeof info.viewAs!='function'&&info.viewAsFilter&&info.viewAsFilter(player)==false) enable=false;

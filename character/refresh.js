@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_standard:["re_caocao","re_simayi","re_guojia","re_lidian","re_zhangliao","re_xuzhu","re_xiahoudun","re_zhangfei","re_zhaoyun","re_guanyu","re_machao","re_xushu","re_zhouyu","re_lvmeng","re_ganning","re_luxun","re_daqiao","re_huanggai","re_lvbu","re_gongsunzan","re_huatuo","re_liubei","re_diaochan","re_huangyueying","re_sunquan","re_sunshangxiang","re_zhenji","re_zhugeliang","re_huaxiong"],
 				refresh_feng:['caoren','ol_xiahouyuan','re_huangzhong','ol_weiyan','ol_xiaoqiao','zhoutai','re_zhangjiao','xin_yuji'],
 				refresh_huo:["ol_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","ol_pangtong","ol_yuanshao","re_pangde"],
-				refresh_lin:['re_zhurong','re_menghuo','re_dongzhuo','re_sunjian','re_caopi','re_xuhuang'],
+				refresh_lin:['re_zhurong','re_menghuo','re_dongzhuo','ol_sunjian','re_caopi','re_xuhuang'],
 				refresh_shan:['re_dengai','re_jiangwei','re_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce'],
 				refresh_yijiang:['re_xusheng','re_wuguotai','re_gaoshun','re_zhangyi','re_caozhi','re_zhuran','re_wuyi','re_liaohua','re_guohuai','re_zhuran','re_chengpu','re_caozhang','re_quancong','yujin_yujin','re_lingtong','re_handang','re_zhonghui'],
 		 },
@@ -81,7 +81,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhurong:['female','shu',4,['juxiang','relieren']],
 			re_menghuo:['male','shu',4,['huoshou','rezaiqi']],
 			re_dongzhuo:['male','qun',8,['rejiuchi','roulin','benghuai','baonue'],['zhu']],
-			re_sunjian:['male','wu',4,['gzyinghun','repolu']],
+			ol_sunjian:['male','wu',4,['gzyinghun','wulie']],
 			re_caopi:['male','wei',3,['rexingshang','refangzhu','songwei'],['zhu']],
 			re_dengai:['male','wei',4,['retuntian','zaoxian']],
 			re_jiangwei:['male','shu',4,['retiaoxin','zhiji']],
@@ -105,6 +105,44 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunben:['zhouyu','taishici','daqiao'],
 		},
 		skill:{
+			wulie:{
+				trigger:{player:'phaseJieshuBegin'},
+				direct:true,
+				limited:true,
+				skillAnimation:true,
+				animationColor:'wood',
+				unique:true,
+				filter:function(event,player){
+					return player.hp>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget([1,player.hp],get.prompt2('wulie'),lib.filter.notMe).set('ai',function(){return 0});
+					'step 1'
+					if(result.bool){
+						var targets=result.targets.sortBySeat();
+						player.logSkill('wulie',targets);
+						player.awakenSkill('wulie');
+						player.loseHp(targets.length);
+						while(targets.length){
+							targets[0].addSkill('wulie2');
+							targets.shift().addMark('wulie2');
+						}
+					}
+				},
+			},
+			wulie2:{
+				marktext:'烈',
+				intro:{name2:'烈',content:'mark'},
+				trigger:{player:'damageBegin3'},
+				forced:true,
+				content:function(){
+					var num=Math.min(trigger.num,player.countMark('wulie2'));
+					trigger.num-=num;
+					player.removeMark('wulie2',num);
+					if(!player.storage.wulie2) player.removeSkill('wulie2');
+				},
+			},
 			regongji:{
 				mod:{
 					attackFrom:function(player){
@@ -317,7 +355,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			olyajiao:{
-				audio:'yajiao',
+				audio:'reyajiao',
 				trigger:{player:'loseAfter'},
 				frequent:true,
 				filter:function(event,player){
@@ -465,7 +503,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'paoxiao',
 				audioname:['re_zhangfei','guanzhang','xiahouba'],
 				filter:function(event,player){
-					return player.countMark('olpaoxiao2')>0;
+					return event.card&&event.card.name=='sha'&&player.countMark('olpaoxiao2')>0;
 				},
 				onremove:true,
 				content:function(){
@@ -4329,10 +4367,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectCard:[1,Infinity],
 				check:function(card){
 					var player=_status.event.player;
-					if(get.position(card)=='h'&&!player.countCards('h',function(card){
+					if(get.position(card)=='h'&&!player.countCards('h','du')&&(player.hp>2||!player.countCards('h',function(card){
 						return get.value(card)>=8;
-					})){
-						return 8-get.value(card);
+					}))){
+						return 1;
 					}
 					return 6-get.value(card)
 				},
@@ -6725,7 +6763,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhurong:'界祝融',
 			re_menghuo:'界孟获',
 			re_dongzhuo:'界董卓',
-			re_sunjian:'界孙坚',
+			re_sunjian:'手杀孙坚',
 			re_caopi:'界曹丕',
 			rejiuchi:'酒池',
 			rejiuchi_info:'你可以将一张黑桃手牌当做【酒】使用。锁定技，当你于回合内使用带有【酒】效果的【杀】造成伤害时，你令你的【崩坏】失效直到回合结束。',
@@ -6833,6 +6871,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			requanji_info:'出牌阶段结束时，若你的手牌数大于体力值，或当你受到1点伤害后，你可以摸一张牌，然后将一张手牌置于武将牌上，称为“权”；你的手牌上限+X（X为“权”的数量）。',
 			regongji:'弓骑',
 			regongji_info:'出牌阶段限一次，你可以弃置一张非基本牌，然后弃置一名其他角色的一张牌。锁定技，当你的装备区内有坐骑牌时，你的攻击范围无限。',
+			ol_sunjian:'界孙坚',
+			wulie:'武烈',
+			wulie2:'武烈',
+			wulie_info:'限定技，结束阶段，你可以失去任意点体力并指定等量的角色。这些角色各获得一枚「烈」。有「烈」的角色受到1点伤害时，其移去一枚「烈」，然后令伤害-1。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',
