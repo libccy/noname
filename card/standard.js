@@ -153,7 +153,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target,card,isLink){
-							if(!isLink&&player.hasSkill('jiu')&&!target.hasSkillTag('filterDamage',null,{
+							if(!isLink&&player.hasSkill('jiu')){
+								if(!target.hasSkillTag('filterDamage',null,{
 								player:player,
 								card:card,
 								jiu:true,
@@ -164,6 +165,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								else{
 									return -4;
 								}
+							}
+								return -0.5;
 							}
 							return -1.5;
 						},
