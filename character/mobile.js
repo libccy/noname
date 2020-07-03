@@ -2957,7 +2957,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					global:"phaseDrawAfter",
 				},
 				filter:function (event,player){
-					if(!player.storage.xinfu_zhaoxin||player.storage.xinfu_zhaoxin.length) return false;
+					if(!player.storage.xinfu_zhaoxin||!player.storage.xinfu_zhaoxin.length) return false;
 					return player==event.player||player.inRange(event.player);
 				},
 				direct:true,
