@@ -13361,7 +13361,7 @@
 							var js=from.getCards('j');
 							for(var i=0;i<js.length;i++){
 								if(_status.event.nojudge) break;
-								if(!target.storage._disableJudge&&!target.hasJudge(js[i])) return true;
+								if(target.canAddJudge(js[i])) return true;
 							}
 							if(target.isMin()) return false;
 							var es=from.getCards('e');
@@ -13385,7 +13385,7 @@
 							if(att>0){
 								if(!_status.event.nojudge&&target.countCards('j',function(card){
 									return game.hasPlayer(function(current){
-										return !current.hasJudge(card)&&get.attitude(player,current)<0;
+										return current.canAddJudge(card)&&get.attitude(player,current)<0;
 									})
 								})) return 14;
 								if(target.countCards('e',function(card){
@@ -13420,7 +13420,7 @@
 							}
 						}
 						if(i==es.length&&(_status.event.nojudge||!ui.selected.targets[0].countCards('j',function(card){
-							return !target.hasJudge(card);
+							return target.canAddJudge(card);
 						}))){
 							return 0;
 						}
@@ -13432,6 +13432,7 @@
 					if(event.prompt2) next.set('prompt2',event.prompt2);
 					if(event.forced) next.set('forced',true);
 					'step 1'
+					event.result=result;
 					if(result.bool){
 						player.line2(result.targets,'green');
 						event.targets=result.targets;
@@ -13460,7 +13461,7 @@
 							var targets1=_status.event.targets1;
 							if(get.position(button.link)=='j'){
 								if(_status.event.nojudge) return false;
-								return !targets1.storage._disableJudge&&!targets1.hasJudge(button.link);
+								return targets1.canAddJudge(button.link);
 							}
 							else{
 								return targets1.isEmpty(get.subtype(button.link));
@@ -13483,8 +13484,9 @@
 							event.targets[1].addJudge(link);
 						}
 						event.targets[0].$give(link,event.targets[1])
+						event.result.card=link;
+						event.result.position=get.position(link);
 						game.delay();
-						event.result={bool:true};
 					}
 				},
 				useCard:function(){
@@ -18105,7 +18107,7 @@
 										var att2=get.attitude(player,current2);
 										if(att2>=0) return false;
 									}
-									return current!=current2&&!current2.storage._disableJudge&&!current2.hasJudge(js[i]);
+									return current!=current2&&current2.canAddJudge(js[i]);
 								})){
 									return true;
 								}
@@ -18995,6 +18997,7 @@
 					return next;
 				},
 				canAddJudge:function(card){
+					if(this.storage._disableJudge) return false;
 					var name;
 					if(typeof card=='string'){
 						name=card;
@@ -32324,7 +32327,7 @@
 						if(card.ai.basic.equipValue==undefined) card.ai.basic.equipValue=1;
 					}
 					if(card.ai.basic.value==undefined) card.ai.basic.value=function(card,player,index,method){
-						if(player.isDisabled(get.subtype(card))) return 0.1;
+						if(player.isDisabled(get.subtype(card))) return 0.01;
 						var value=0;
 						var info=get.info(card);
 						var current=player.getEquip(info.subtype);
@@ -32337,11 +32340,13 @@
 						}
 						if(typeof equipValue=='function'){
 							if(method=='raw') return equipValue(card,player);
-							return equipValue(card,player)-value;
+							if(method=='raw2') return equipValue(card,player)-value;
+							return Math.max(0.1,equipValue(card,player)-value);
 						}
 						if(typeof equipValue!='number') equipValue=0;
 						if(method=='raw') return equipValue;
-						return equipValue-value;
+						if(method=='raw2') return equipValue-value;
+						return Math.max(0.1,equipValue-value);
 					}
 					if(!card.ai.result.keepAI) card.ai.result.target=function(player,target,card){
 						return get.equipResult(player,target,card.name);
@@ -50560,7 +50565,7 @@
 				else return 0;
 			}
 			if(typeof value=='number') return value;
-			if(typeof value=='function') return value(card,player);
+			if(typeof value=='function') return value(card,player,null,'raw2');
 			return 0;
 		},
 		equipValueNumber:function(card){
@@ -50652,7 +50657,7 @@
 			for(var i=0;i<skills1.length;i++){
 				temp1=get.info(skills1[i]).ai;
 				if(temp1&&typeof temp1.effect=='object'&&typeof temp1.effect.player=='function'){
-					temp1=temp1.effect.player(card,player,target,result1);
+					temp1=temp1.effect.player(card,player,target,result1,isLink);
 				}
 				else temp1=undefined;
 				if(typeof temp1=='object'){
@@ -50687,10 +50692,10 @@
 					if(temp2&&temp2.threaten) temp3=temp2.threaten;
 					else temp3=undefined;
 					if(temp2&&typeof temp2.effect=='function'){
-						temp2=temp2.effect(card,player,target,result2);
+						temp2=temp2.effect(card,player,target,result2,isLink);
 					}
 					else if(temp2&&typeof temp2.effect=='object'&&typeof temp2.effect.target=='function'){
-						temp2=temp2.effect.target(card,player,target,result2);
+						temp2=temp2.effect.target(card,player,target,result2,isLink);
 					}
 					else temp2=undefined;
 					if(typeof temp2=='object'){

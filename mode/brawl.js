@@ -1506,7 +1506,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var getList=function(){
 						var list=[['guanyu','guanping','guansuo','guanyinping'],
 						['caocao','caopi','caozhi','caorui'],['liubei','liushan','liuchen'],
-						['xiahouyuan','xiahouba','xiahoushi'],['sunjian','sunquan','sunce'],
+						['re_xiahouyuan','xiahouba','xiahoushi'],['sunjian','sunquan','sunce'],
 						['sp_zhangjiao','zhangliang','zhangbao'],['zhugeliang','zhugeguo','zhugejin','zhugeke'],
 						['mateng','machao','madai','mayunlu']];
 						list.randomSort();
@@ -1567,6 +1567,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(lib.character[i][1]=='key') continue;
 						var surname=lib.translate[i];
 						for(var j=0;j<surname.length;j++){
+							if((surname[j]+surname[j+1])=='手杀'){j++;continue}
 							if(exclude.contains(surname[j])) continue;
 							if(!/[a-z]/i.test(surname[j])){
 								var index=list1.indexOf(surname[j]);

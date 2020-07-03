@@ -177,8 +177,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!player.storage.zhengrong) player.storage.zhengrong=[];
 						player.storage.zhengrong.push(card);
 						player.markSkill('zhengrong');
-						game.delayx();
 					}
+					'step 3'
+					game.delayx();
 				},
 				marktext:'荣',
 				intro:{
@@ -1587,13 +1588,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return (player.getHistory('useCard',function(evt){
 						return evt.getParent('phaseUse')==event;
 					}).length<game.countPlayer(function(current){return !current.inRange(player)}))&&game.hasPlayer(function(target){
-						return !target.inRange(player)&&target.countDiscardableCards(player,'he');
+						return target!=player&&!target.inRange(player)&&target.countDiscardableCards(player,'he');
 					});
 				},
 				content:function(){
 					'step 0'
 					player.chooseTarget("请选择〖掣政〗的目标","弃置一名攻击范围内不包含你的角色的一张牌",true,function(card,player,target){
-						return !target.inRange(player)&&target.countDiscardableCards(player,'he');
+						return target!=player&&!target.inRange(player)&&target.countDiscardableCards(player,'he');
 					}).ai=function(target){
 						return -get.attitude(player,target);
 					};
@@ -2671,7 +2672,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					event.num=trigger.num;
 					'step 1'
-					player.chooseDrawRecover(get.prompt('xinkuanggu')).set('logSkill','xinkuanggu').set('prompt2','摸一张牌或回复1点体力');
+					player.chooseDrawRecover(get.prompt(event.name)).set('logSkill',event.name).set('prompt2','摸一张牌或回复1点体力');
 					'step 2'
 					if(result.control!='cancel2'){
 						event.num--;
@@ -4511,7 +4512,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yinghun:{
 				audio:2,
-				audioname:['re_sunjian','sunce','re_sunben','re_sunce'],
+				audioname:['re_sunjian','sunce','re_sunben','re_sunce','ol_sunjian'],
 				trigger:{player:'phaseZhunbeiBegin'},
 				filter:function(event,player){
 					return player.hp<player.maxHp;
@@ -4588,7 +4589,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			gzyinghun:{
 				audio:'yinghun',
-				audioname:['re_sunjian','sunce','re_sunben','re_sunce'],
+				audioname:['re_sunjian','sunce','re_sunben','re_sunce','ol_sunjian'],
 				trigger:{player:'phaseZhunbeiBegin'},
 				filter:function(event,player){
 					return player.getDamagedHp()>0;

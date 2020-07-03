@@ -153,17 +153,20 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target,card,isLink){
-							if(!isLink&&player.hasSkill('jiu')&&!target.hasSkillTag('filterDamage',null,{
-								player:player,
-								card:card,
-								jiu:true,
-							})){
-								if(get.attitude(player,target)>0){
-									return -7;
+							if(!isLink&&player.hasSkill('jiu')){
+								if(!target.hasSkillTag('filterDamage',null,{
+									player:player,
+									card:card,
+									jiu:true,
+								})){
+ 								if(get.attitude(player,target)>0){
+ 									return -7;
+ 								}
+ 								else{
+ 									return -4;
+ 								}
 								}
-								else{
-									return -4;
-								}
+								return -0.5;
 							}
 							return -1.5;
 						},
@@ -1165,7 +1168,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 							var es=target.getCards('e');
 							var noe=(es.length==0||target.hasSkillTag('noe'));
-							var noe2=(es.length==1&&es[0].name!='tengjia'&&get.value(es[0])<=0);
+							var noe2=(es.filter(function(esx){
+							return esx.name=='tengjia'||get.value(esx)>0
+							}).length==0);
 							var noh=(nh==0||target.hasSkillTag('noh'));
 							if(noh&&(noe||noe2)) return 0;
 							if(att<=0&&!target.countCards('he')) return 1.5;
@@ -1665,8 +1670,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				priority:12,
 				content:function(){
-						player.storage.qinggang2.remove(trigger.card);
-						if(!player.storage.qinggang2.length) player.removeSkill('qinggang2');
+					player.storage.qinggang2.remove(trigger.card);
+					if(!player.storage.qinggang2.length) player.removeSkill('qinggang2');
 				},
 			},
 			qinglong_skill:{

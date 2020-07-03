@@ -59,7 +59,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_sunshangxiang:['female','wu',3,['xiaoji','rejieyin']],
 			re_zhenji:['female','wei',3,['reluoshen','reqingguo']],
 			re_zhugeliang:['male','shu',3,['reguanxing','kongcheng']],
-			re_huaxiong:["male","qun",6,["new_reyaowu"]],
+			re_huaxiong:["male","qun",6,["reyaowu"]],
 			
 			re_zhangjiao:['male','qun',3,['xinleiji','xinguidao','huangtian'],['zhu']],
 			xin_yuji:['male','qun',3,['reguhuo']],
@@ -137,9 +137,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageBegin3'},
 				forced:true,
 				content:function(){
-					var num=Math.min(trigger.num,player.countMark('wulie2'));
-					trigger.num-=num;
-					player.removeMark('wulie2',num);
+					trigger.cancel();
+					player.removeMark('wulie2',1);
 					if(!player.storage.wulie2) player.removeSkill('wulie2');
 				},
 			},
@@ -268,7 +267,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			ollongdan:{
 				audio:'longdan_sha',
-				audioname:['re_zhaoyun','sp_zhaoyun'],
+				audioname:['re_zhaoyun'],
 				enable:['chooseToUse','chooseToRespond'],
 				prompt:'将杀当做闪，或将闪当做杀，或将桃当做酒，或将酒当做桃使用或打出',
 				viewAs:function(cards,player){
@@ -3896,6 +3895,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					threaten:2,
 				},
 			},
+			reyaowu:{
+				trigger:{player:'damageBegin3'},
+				audio:'new_reyaowu',
+				forced:true,
+				filter:function(event){
+					return event.card&&(get.color(event.card)!='red'||event.source&&event.source.isAlive());
+				},
+				content:function(){
+					trigger[get.color(trigger.card)!='red'?'player':'source'].draw();
+				},
+			},
 			"new_reyaowu":{
 				trigger:{
 					player:"damageBegin3",
@@ -3903,7 +3913,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//priority:1,
 				audio:2,
 				filter:function (event){
-					return event.card&&event.card.name=='sha';
+					return event.card&&event.card.name=='sha'&&(get.color(event.card)!='red'||event.source&&event.source.isAlive());
 				},
 				forced:true,
 				check:function (event){
@@ -3918,11 +3928,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function (card,player,target,current){
-							if(card.name=='sha'&&(get.color(card)=='red')){
-								return [1,-2];
+							if(card.name=='sha'&&(get.color(card)=='red')&&get.attitude(player,target)<=0){
+								return [1,0.8,1,0];
 							}
 							if(card.name=='sha'&&(get.color(card)=='black')){
-								return [0,-0.6];
+								return [1,0.4];
 							}
 						},
 					},
@@ -6652,6 +6662,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_reqingnang_info":"出牌阶段，你可以弃置一张手牌，令一名本回合内未成为过〖青囊〗的目标的角色回复一点体力。若你弃置的是黑色牌，则你本回合内不能再发动〖青囊〗。",
 			"new_reyaowu":"耀武",
 			"new_reyaowu_info":"锁定技，当一名角色使用【杀】对你造成伤害时，若此杀为红色，该角色回复1点体力或摸一张牌。否则则你摸一张牌。",
+			reyaowu:'耀武',
+			reyaowu_info:'锁定技，当你受到牌造成的伤害时，若此牌为红色，则伤害来源摸一张牌；否则你摸一张牌。',
 			reqingguo:'倾国',
 			reqingguo_info:'你可以将一张黑色牌当做【闪】使用或打出。',
 			
@@ -6862,7 +6874,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_sunjian:'界孙坚',
 			wulie:'武烈',
 			wulie2:'武烈',
-			wulie_info:'限定技，结束阶段，你可以失去任意点体力并指定等量的角色。这些角色各获得一枚「烈」。有「烈」的角色受到1点伤害时，其移去一枚「烈」，然后令伤害-1。',
+			wulie_info:'限定技，结束阶段，你可以失去任意点体力并指定等量的角色。这些角色各获得一枚「烈」。有「烈」的角色受到伤害时，其移去一枚「烈」，然后防止此伤害。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',
