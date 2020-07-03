@@ -1291,7 +1291,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								return get.value(card)<7;
 							})>1) rank=5;
 							if(skills.contains('qiaobian')&&player.countCards('h')>4) rank=6;
-							if((get.guozhanRank(player.name1)<rank&&!player.isUnseen(0))||(get.guozhanRank(player.name2)<rank&&!player.isUnseen(1))) return rank+1-get.value(card);
+							if((get.guozhanRank(player.name1,player)<rank&&!player.isUnseen(0))||(get.guozhanRank(player.name2,player)<rank&&!player.isUnseen(1))) return rank+1-get.value(card);
 							return -1;
 						};
 					}
@@ -1305,7 +1305,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						else if(list.length<2) event._result={control:list[0]};
 						else{
 							player.chooseControl(list).set('ai',function(){
-								return get.guozhanRank(player.name1)<get.guozhanRank(player.name2)?'主将':'副将';
+								return get.guozhanRank(player.name1,player)<get.guozhanRank(player.name2,player)?'主将':'副将';
 							}).prompt="请选择暗置一张武将牌";
 						}
 					}
@@ -1828,7 +1828,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			gzxuanhuo:{
 				global:'gzxuanhuo_others',
-				derivation:['wusheng','new_paoxiao','new_longdan','new_tieji','liegong','xinkuanggu'],
+				derivation:['fz_wusheng','fz_new_paoxiao','fz_new_longdan','fz_new_tieji','fz_liegong','fz_xinkuanggu'],
 				ai:{
 					threaten:function(player,target){
 						if(game.hasPlayer(function(current){
@@ -1884,7 +1884,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var list=['wusheng','new_paoxiao','new_longdan','new_tieji','liegong','xinkuanggu'];
 							for(var i=0;i<list.length;i++){
 								if(game.hasPlayer(function(current){
-									return current.hasSkill(list[i]);
+									return current.hasSkill(list[i])||current.hasSkill('fz_'+list[i]);
 								})) list.remove(list[i--]);
 							}
 							if(!list.length) event.finish();
@@ -1894,7 +1894,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}).set('prompt','选择并获得一项技能直到回合结束');
 							'step 2'
 							player.popup(result.control);
-							player.addTempSkill(result.control);
+							player.addTempSkill('fz_'+result.control);
 							game.log(player,'获得了技能','#g【'+get.translation(result.control)+'】');
 							game.delay();
 						},
@@ -1908,6 +1908,154 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					//used:{},
 				},
 				audio:['xuanhuo',2],
+			},
+			fz_new_paoxiao:{
+				audio:true,
+				inherit:'new_paoxiao',
+			},
+			fz_new_tieji:{
+				audio:true,
+				inherit:'new_tieji',
+			},
+			fz_wusheng:{
+				audio:true,
+				inherit:'wusheng',
+			},
+			fz_liegong:{
+				audio:true,
+				inherit:'liegong',
+			},
+			fz_xinkuanggu:{
+				audio:true,
+				inherit:'xinkuanggu',
+			},
+			fz_new_longdan:{
+				audio:true,
+				group:["fz_new_longdan_sha","fz_new_longdan_shan","fz_new_longdan_draw","fz_new_longdan_shamiss","fz_new_longdan_shanafter"],
+				subSkill:{
+					shanafter:{
+						sub:true,
+						audio:"fz_new_longdan",
+						trigger:{
+							player:"useCard",
+						},
+						//priority:1,
+						filter:function (event,player){
+							return event.skill=='fz_new_longdan_shan'&&event.getParent(2).name=='sha';
+						},
+						direct:true,
+						content:function (){
+							"step 0"
+							player.chooseTarget("是否发动【龙胆】令一名其他角色回复1点体力？",function(card,player,target){
+								return target!=_status.event.source&&target!=player&&target.isDamaged();
+							}).set('ai',function(target){
+								return get.attitude(_status.event.player,target);
+							}).set('source',trigger.getParent(2).player);
+							"step 1"
+							if(result.bool&&result.targets&&result.targets.length){
+								player.line(result.targets[0],'green');
+								result.targets[0].recover();
+							}
+						},
+					},
+					shamiss:{
+						sub:true,
+						audio:"fz_new_longdan",
+						trigger:{
+							player:"shaMiss",
+						},
+						direct:true,
+						filter:function (event,player){
+							return event.skill=='fz_new_longdan_sha';
+						},
+						content:function (){
+							"step 0"
+							player.chooseTarget("是否发动【龙胆】对一名其他角色造成1点伤害？",function(card,player,target){
+								return target!=_status.event.target&&target!=player;
+							}).set('ai',function(target){
+								return -get.attitude(_status.event.player,target);
+							}).set('target',trigger.target);
+							"step 1"
+							if(result.bool&&result.targets&&result.targets.length){
+								player.line(result.targets[0],'green');
+								result.targets[0].damage();
+							}
+						},
+					},
+					draw:{
+						trigger:{
+							player:["useCard","respond"],
+						},
+						audio:"fz_new_longdan",
+						forced:true,
+						filter:function(event,player){
+							if(!get.zhu(player,'shouyue')) return false;
+							return event.skill=='fz_new_longdan_sha'||event.skill=='fz_new_longdan_shan';
+						},
+						content:function (){
+							player.draw();
+							//player.storage.fanghun2++;
+						},
+						sub:true,
+					},
+					sha:{
+						audio:"fz_new_longdan",
+						enable:["chooseToUse","chooseToRespond"],
+						filterCard:{
+							name:"shan",
+						},
+						viewAs:{
+							name:"sha",
+						},
+						viewAsFilter:function (player){
+							if(!player.countCards('h','shan')) return false;
+						},
+						prompt:"将一张闪当杀使用或打出",
+						check:function (){return 1},
+						ai:{
+							effect:{
+								target:function (card,player,target,current){
+									if(get.tag(card,'respondSha')&&current<0) return 0.6
+								},
+							},
+							respondSha:true,
+							skillTagFilter:function (player){
+								if(!player.countCards('h','shan')) return false;
+							},
+							order:function (){
+								return get.order({name:'sha'})+0.1;
+							},
+						},
+						sub:true,
+					},
+					shan:{
+						audio:"fz_new_longdan",
+						enable:['chooseToRespond','chooseToUse'],
+						filterCard:{
+							name:"sha",
+						},
+						viewAs:{
+							name:"shan",
+						},
+						prompt:"将一张杀当闪使用或打出",
+						check:function (){return 1},
+						viewAsFilter:function (player){
+							if(!player.countCards('h','sha')) return false;
+						},
+						ai:{
+							respondShan:true,
+							skillTagFilter:function (player){
+								if(!player.countCards('h','sha')) return false;
+							},
+							effect:{
+								target:function (card,player,target,current){
+									if(get.tag(card,'respondShan')&&current<0) return 0.6
+								},
+							},
+						},
+						sub:true,
+					},
+				},
 			},
 			gzenyuan:{
 				locked:true,
@@ -5711,7 +5859,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return player.hasViceCharacter();
 				},
 				check:function(event,player){
-					return player.hp<=1||get.guozhanRank(name)<=3;
+					return player.hp<=1||get.guozhanRank(player.name2,player)<=3;
 				},
 				content:function(){
 					'step 0'
@@ -5853,7 +6001,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.chooseControl('主将','副将',function(){
 							return _status.event.choice;
 						}).set('prompt','令'+get.translation(trigger.source)+'失去一张武将牌的所有技能').set('forceDie',true).set('choice',function(){
-						var rank=get.guozhanRank(trigger.source.name1)-get.guozhanRank(trigger.source.name2);
+						var rank=get.guozhanRank(trigger.source.name1,trigger.source)-get.guozhanRank(trigger.source.name2,trigger.source);
 						if(rank==0) rank=Math.random()>0.5?1:-1;
 						return (rank*get.attitude(player,trigger.source))>0?'副将':'主将';
 						}());
@@ -7330,6 +7478,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"new_mouduan_info":"结束阶段，若你于本回合内使用过四种花色或三种类别的牌，则你可以移动场上的一张牌。",
 			"new_longdan":"龙胆",
 			"new_longdan_info":"你可以将【杀】当【闪】，【闪】当【杀】使用或打出。当你发动〖龙胆〗使用的【杀】被【闪】抵消时，你可以对另一名角色造成1点伤害；当你发动〖龙胆〗使用的【闪】抵消了【杀】时，你可以令一名其他角色回复1点体力（不能是【杀】的使用者）。",
+			"fz_new_longdan":"龙胆",
+			"fz_new_longdan_info":"你可以将【杀】当【闪】，【闪】当【杀】使用或打出。当你发动〖龙胆〗使用的【杀】被【闪】抵消时，你可以对另一名角色造成1点伤害；当你发动〖龙胆〗使用的【闪】抵消了【杀】时，你可以令一名其他角色回复1点体力（不能是【杀】的使用者）。",
 			"new_paoxiao":"咆哮",
 			"new_paoxiao_info":"锁定技，你使用【杀】无数量限制；当你于一回合内使用第二张【杀】时，摸一张牌。",
 			"new_kurou":"苦肉",
@@ -7870,12 +8020,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				mayChangeVice:function(){
 					'step 0'
 					player.chooseBool('是否变更副将？').set('ai',function(){
-						var name=player.name2;
-						var skills=lib.character[name][3].slice(0);
-						for(var i=0;i<skills.length;i++){
-							if(lib.skill[skills[i]].limited&&player.awakenedSkills.contains(skills[i])) return true;
-						}
-						return get.guozhanRank(name)<=3;
+						var player=_status.event.player;
+						return get.guozhanRank(player.name2,player)<=3;
 					});
 					'step 1'
 					if(result.bool){
@@ -7990,6 +8136,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				dieAfter2:function(source){
+					var that=this;
 					if(source&&source.shijun){
 						source.discard(source.getCards('he'));
 						delete source.shijun;
@@ -7998,7 +8145,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(source.identity=='ye') source.draw(3);
 						else if(source.shijun2){
 							source.draw(1+game.countPlayer(function(current){
-								return current.group==this.group
+								return current.group==that.group
 							}));
 						}
 						else if(this.identity=='ye') source.draw(1);
@@ -8506,9 +8653,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				if(['gz_sunce','gz_jiangwei'].contains(name1)) return name2=='gz_zhoutai'||lib.character[name2][2]%2==1;
 				return false;
 			},
-			guozhanRank:function(name){
+			guozhanRank:function(name,player){
 				if(name.indexOf('gz_shibing')==0) return -1;
 				if(name.indexOf('gz_jun_')==0) return 7;
+				if(player){
+					var skills=lib.character[name][3].slice(0);
+					for(var i=0;i<skills.length;i++){
+						if(lib.skill[skills[i]].limited&&player.awakenedSkills.contains(skills[i])) return skills.length-1;
+					}
+				}
 				if(_status._aozhan){
 					for(var i in lib.aozhanRank){
 						if(lib.aozhanRank[i].contains(name)) return parseInt(i);

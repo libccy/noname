@@ -832,7 +832,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				direct:true,
 				filter:function(event,player){
-					return player.countCards('he')>0;
+					return player.countCards('h',function(card){
+						return _status.connectMode||get.type(card)!='basic';
+					})>0;
 				},
 				content:function(){
 					'step 0'
@@ -841,7 +843,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					list.sortBySeat();
 					event.targets=list;
-					player.chooseToDiscard(get.prompt2('xiying'),'he').set('logSkill',['xiying',list]).set('ai',function(card){
+					player.chooseToDiscard(get.prompt2('xiying'),'h',function(card){
+						return get.type(card)!='basic';
+					}).set('logSkill',['xiying',list]).set('ai',function(card){
 						return _status.event.val-get.value(card)
 					}).set('val',function(){
 						return 4*Math.sqrt(game.countPlayer(function(current){
@@ -876,11 +880,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			gangzhi:{
 				audio:2,
-				trigger:{player:'damageBefore'},
+				trigger:{
+					player:'damageBefore',
+					source:'damageBefore',
+				},
 				forced:true,
 				content:function(){
 					trigger.cancel();
-					player.loseHp(trigger.num);
+					trigger.player.loseHp(trigger.num);
 				},
 			},
 			beizhan:{
@@ -1018,7 +1025,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filterCard:true,
 				filterTarget:function(card,player,target){
-					//if(target.storage.mouzhi2&&target.storage.mouzhi2.contains(player)) return false;
+					if(target.storage.mouzhi2&&target.storage.mouzhi2.contains(player)) return false;
 					return target!=player;
 				},
 				delay:0,
@@ -3617,7 +3624,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.target=trigger.player;
 					next.num=num;
 					next.setContent(function(){
-						if(target.isAlive()) player.chooseToDiscard(num,true);
+						if(target.isAlive()) player.chooseToDiscard(num,true,'he');
 					});
 				},
 			},
@@ -6560,7 +6567,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'player',
 				check:function(event,player){
 					if(get.mode()=='guozhan'){
-						if(!event.player.isUnseen(1)&&get.guozhanRank(event.player.name2)<4) return false;
+						if(!event.player.isUnseen(1)&&get.guozhanRank(event.player.name2,event.player)<4) return false;
 					}
 					if(event.player.hasSkill('subplayer')) return false;
 					if(get.attitude(player,event.player)<0){
@@ -6574,7 +6581,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.cancel();
 					if(trigger.player.countCards('e')){
 						trigger.player.chooseControl(function(event,player){
-							if(get.mode()=='guozhan'&&get.guozhanRank(player.name2)<4) return 1;
+							if(get.mode()=='guozhan'&&get.guozhanRank(player.name2,player)<4) return 1;
 							if(player.hp==1) return 1;
 							if(player.hp==2&&player.countCards('e')>=2) return 1;
 							return 0;
@@ -7314,8 +7321,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					effect:{
-						player:function(card,player,target){
-							if(card.name=='sha'){
+						player:function(card,player,target,current,isLink){
+							if(!isLink&&card.name=='sha'){
 								if(player._duanbingtmp) return;
 								player._duanbingtmp=true;
 								if(get.effect(target,card,player,player)<=0){
@@ -8701,7 +8708,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					name:'饶舌',
 					content:'mark'
 				},
-				chat:['粗鄙之语','天地不容','谄谀之臣','皓首匹夫，苍髯老贼','二臣贼子','断脊之犬','我从未见过有如此厚顔无耻之人！'],
+				chat:['粗鄙之语','天地不容','谄谀之臣','皓首匹夫，苍髯老贼','二臣贼子','断脊之犬','我从未见过有如此厚颜无耻之人！'],
 				callback:function(){
 					'step 0'
 					if(event.num1<=event.num2){
@@ -9204,8 +9211,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!player.hasSkill('xindangxian')){
 						list.push('xindangxian');
 					}
-					if(!player.hasSkill('zhiman')){
-						list.push('zhiman');
+					if(!player.hasSkill('rezhiman')){
+						list.push('rezhiman');
 					}
 					if(list.length){
 						player.draw();
@@ -9233,6 +9240,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:'已因$发动过技能',
 				},
+				derivation:['new_rewusheng','xindangxian','rezhiman'],
 			},
 			zhengnan:{
 				audio:1,
@@ -9261,7 +9269,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					threaten:2.4
-				}
+				},
+				derivation:['wusheng','dangxian','zhiman'],
 			},
 			xiefang:{
 				mod:{
@@ -14721,6 +14730,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			chongzhen:{
 				group:['chongzhen1','chongzhen2'],
+				audio:'chongzhen1',
 				ai:{
 					combo:'ollongdan',
 					mingzhi:false,
@@ -18444,7 +18454,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mouzhi_info:'出牌阶段限一次，你可以将一张手牌交给一名角色，若如此做，当其于其下回合的出牌阶段内对一名角色造成伤害后，若是此阶段其第一次对该角色造成伤害，你摸一张牌。',
 			sp_shenpei:'SP审配',
 			gangzhi:'刚直',
-			gangzhi_info:'锁定技，当你即将受到伤害时，你防止此伤害，改为失去等量的体力。',
+			gangzhi_info:'锁定技，当你即将受到或造成伤害时，你防止此伤害，改为受到伤害的角色失去等量的体力。',
 			beizhan:'备战',
 			beizhan2:'备战',
 			beizhan_info:'结束阶段，你可以令一名角色将手牌摸至体力上限（至多为5）。其下个回合开始时，若其手牌数为全场最多，则其此回合内使用的牌不能指定其他角色为目标。',

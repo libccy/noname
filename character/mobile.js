@@ -7,11 +7,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			mobile:{
 				mobile_default:["miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan"],
+				mobile_yijiang:["yj_zhanghe","yj_zhangliao","yj_xuhuang","yj_ganning"],
 				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","xin_yuanshao","re_liushan","xin_xiahoudun","re_sp_zhugeliang","re_heqi","re_guanqiujian","re_pangtong","old_liuzan","xin_chengpu","re_sunjian"],
 				mobile_sunben:["re_sunben"],
 			},
 		},
 		character:{
+			yj_zhanghe:['male','qun',4,['zhilve']],
+			yj_xuhuang:['male','qun',4,['xhzhiyan']],
 			re_sunjian:['male','wu',4,['gzyinghun','repolu']],
 			zhengxuan:['male','qun',3,['zhengjing']],
 			dengzhi:['male','shu',3,['jimeng','shuaiyan']],
@@ -278,6 +281,130 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		skill:{
+			//一 将 成 名
+			zhilve:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				forced:true,
+				content:function(){
+					'step 0'
+					if(!player.canMoveCard()) event._result={index:1};
+					else player.chooseControl().set('choiceList',[
+						'移动场上的一张牌',
+						'本回合的摸牌阶段多摸一张牌且第一张杀无距离次数限制',
+					]).set('ai',function(){return 1});
+					'step 1'
+					if(result.index==1){
+						player.addTempSkill('zhilve_yingzi');
+						if(!player.getHistory('useCard',function(card){
+							return card.card.name=='sha';
+						}).length) player.addTempSkill('zhilve_xiandeng');
+						event.finish();
+					}
+					else player.moveCard(true);
+					'step 2'
+					if(result.position=='e') player.loseHp();
+					else player.addTempSkill('zhilve_dis');
+				},
+				subSkill:{
+					dis:{
+						mod:{
+							maxHandcard:function(player,num){
+								return num-1;
+							},
+						},
+					},
+					yingzi:{
+						trigger:{player:'phaseDrawBegin2'},
+						popup:false,
+						forced:true,
+						filter:function(event,player){
+							return !event.numFixed;
+						},
+						content:function(){trigger.num++},
+					},
+					xiandeng:{
+						mod:{
+							targetInRange:function(card,player){
+								if(card.name=='sha') return true;
+							},
+						},
+						trigger:{player:'useCard1'},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						filter:function(event,player){
+							return event.card.name=='sha';
+						},
+						content:function(){
+							player.removeSkill(event.name);
+							if(trigger.addCount!==false){
+								trigger.addCount=false;
+								var stat=player.getStat('card');
+								if(stat&&stat.sha) stat.sha--;
+							}
+						},
+					},
+				},
+			},
+			xhzhiyan:{
+				enable:'phaseUse',
+				filter:function(event,player){
+					return player.countCards('h')!=player.maxHp;
+				},
+				filterCard:true,
+				selectCard:function(){
+					var player=_status.event.player;
+					var num=Math.max(0,player.countCards('h')-player.maxHp);
+					return [num,num];
+				},
+				check:function(card){
+					var player=_status.event.player;
+					if(player.getUseValue(card)<=0&&game.hasPlayer(function(current){
+						return current!=player&&get.value(card,current)*get.attitude(player,current)>0;
+					})) return 1;
+					return 0;
+				},
+				content:function(){
+					'step 0'
+					if(!cards.length){
+						player.draw(player.maxHp-player.countCards('h'));
+						player.addTempSkill('zishou2');
+						event.finish();
+					}
+					else{
+						cards=cards.filterInD('d');
+						if(cards.length) player.chooseButton(['是否将其中的一张牌交给一名其他角色？',cards]).set('',function(button){
+							var player=_status.event.player;
+							if(game.hasPlayer(function(current){
+								return current!=player&&get.value(button.link,current)*get.attitude(player,current)>0;
+							})) return Math.abs(get.value(button.link));
+							return 0;
+						});
+						else event.finish();
+					}
+					'step 1'
+					if(result.bool){
+						event.card=result.links[0];
+						player.chooseTarget(true,lib.filter.notMe,'选择一名其他角色获得'+get.translation(event.card)).set('ai',function(target){
+							return get.value(_status.event.getParent().card,target)*get.attitude(_status.event.player,target);
+						});
+					}
+					else event.finish();
+					'step 2'
+					var target=result.targets[0];
+					player.line(target,'green');
+					target.gain(card,'gain2','log');
+				},
+				ai:{
+					order:function(obj,player){
+						if(player.countCards('h')>player.maxHp) return 10;
+						return 0.5;
+					},
+					result:{
+						player:1,
+					},
+				},
+			},
 			//水 果 忍 者
 			zhengjing_guanju:{audio:true},
 			zhengjing:{
@@ -2830,7 +2957,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					global:"phaseDrawAfter",
 				},
 				filter:function (event,player){
-					if(!player.storage.xinfu_zhaoxin||!player.storage.xinfu_zhaoxin.length) return false;
+					if(!player.storage.xinfu_zhaoxin||player.storage.xinfu_zhaoxin.length) return false;
 					return player==event.player||player.inRange(event.player);
 				},
 				direct:true,
@@ -4593,6 +4720,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhengjing:'整经',
 			zhengjing_info:'出牌阶段，你可以整理卡牌。然后，你将整理出的卡牌置于一名角色的武将牌上。该角色的准备阶段获得这些牌，跳过此回合的判定和摸牌阶段且本回合内不能发动【整经】。',
 			zhengjing2:'整经',
+			
+			mobile_yijiang:'武将设计征集大赛',
+			yj_zhanghe:'SP张郃',
+			yj_zhangliao:'SP张辽',
+			yj_xuhuang:'SP徐晃',
+			yj_ganning:'SP甘宁',
+			xhzhiyan:'治严',
+			xhzhiyan_info:'出牌阶段，若你的手牌数不等于体力上限，则你可以将手牌摸至/弃至手牌上限，然后本回合不能对其他角色使用牌/可以将弃置的一张牌交给一名其他角色。',
+			zhilve:'知略',
+			zhilve_info:'锁定技，准备阶段，你选择一项：1.移动场上装备区的一张牌并失去1点体力。2.移动场上判定区的一张牌并令本回合手牌上限-1。3.本回合摸牌阶段多摸一张牌且使用的第一张【杀】无距离限制且不计入次数限制。',
 		}
 	};
 });

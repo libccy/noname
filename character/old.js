@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			old:{
 				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_guanqiujian","xiahouyuan","weiyan","xiaoqiao"],
-				old_refresh:["old_zhangfei","old_huatuo","old_zhaoyun"],
+				old_refresh:["old_zhangfei","old_huatuo","old_zhaoyun","ol_huaxiong"],
 				old_yijiang1:["masu","xushu","fazheng","yujin","xin_yujin","old_xusheng","old_lingtong","ol_yujin"],
 				old_yijiang2:["old_madai","old_zhonghui","old_wangyi","old_guanzhang"],
 				old_yijiang3:["liru","old_zhuran","ol_manchong","old_fuhuanghou","old_caochong"],
@@ -17,6 +17,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			ol_huaxiong:["male","qun",6,["new_reyaowu"]],
 			old_wangyun:['male','qun',4,['wylianji','moucheng']],
 			panfeng:['male','qun',4,['kuangfu']],
 			xiaoqiao:['female','wu',3,['tianxiang','hongyan']],
@@ -889,6 +890,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_liuyu:'OL刘虞',
 			old_wangyun:'旧王允',
 			old_zhaoyun:'旧赵云',
+			ol_huaxiong:'旧华雄',
 
 			old_fuhun:'父魂',
 			old_fuhun_info:'摸牌阶段开始时，你可以放弃摸牌，改为从牌堆顶亮出两张牌并获得之，若亮出的牌颜色不同，你获得技能“武圣”、“咆哮”，直到回合结束。',

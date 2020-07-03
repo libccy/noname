@@ -51,6 +51,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_midori:['female','key',3,['midori_nonghuan','midori_tishen']],
 			key_kyoko:['female','key',3,['kyoko_juwu','kyoko_zhengyi']],
 			key_shizuru:['female','key',3,['shizuru_nianli','shizuru_benzhan']],
+			key_shiorimiyuki:['female','key',3,['shiorimiyuki_banyin','shiorimiyuki_tingxian']],
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
 			diy_feishi:['male','shu',3,['shuaiyan','moshou']],
@@ -133,7 +134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy:{
 				diy_tieba:["diy_wenyang","ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_zhangwei"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki"],
 				diy_yongjian:["ns_chendao","yj_caoang"],
 			},
 		},
@@ -149,6 +150,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
+			key_shiorimiyuki:'#rAngel Beats!',
 			key_shizuru:'#bRewrite',
 			key_kyoko:'#bSummer Pockets',
 			sp_key_kanade:'#rAngel Beats!',
@@ -234,6 +236,81 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			shiorimiyuki_banyin:{
+				trigger:{player:['damageEnd','recoverEnd']},
+				direct:true,
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return current!=player&&current.isDamaged();
+					})
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('shiorimiyuki_banyin'),'令一名其他角色回复1点体力',lib.filter.notMe).set('ai',function(target){
+						var player=_status.event.player;
+						return get.recoverEffect(target,player,player);
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('shiorimiyuki_banyin',target);
+						target.recover();
+					}
+				},
+			},
+			shiorimiyuki_tingxian:{
+				trigger:{player:'phaseUseBegin'},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseControl('一张','两张','三张','cancel2').set('prompt',get.prompt2('shiorimiyuki_tingxian')).set('ai',function(){
+						var player=_status.event.player;
+						var max=Math.min(player.hp+1,player.maxHp)
+						var min=Math.min(Math.max(max-2,max-player.hp),3);
+						if(min) return min-1;
+						return 3;
+					});
+					'step 1'
+					if(result.control=='cancel2'){event.finish();return;}
+					var num=1+result.index;
+					player.draw(num);
+					'step 2'
+					event.cards=result;
+					player.recover();
+					'step 3'
+					if(get.itemtype(cards)=='cards'){
+						trigger.shiorimiyuki_tingxian=cards;
+						player.addTempSkill('shiorimiyuki_tingxian2');
+					}
+				},
+			},
+			shiorimiyuki_tingxian2:{
+				trigger:{player:'phaseUseEnd'},
+				forced:true,
+				charlotte:true,
+				mod:{
+					aiOrder:function(player,card,num){
+						var cards=_status.event.getParent('phaseUse').shiorimiyuki_tingxian;
+						if(cards&&cards.contains(card)) return num+2;
+					},
+					aiValuetarget:function(player,card,num){
+						var cards=_status.event.getParent('phaseUse').shiorimiyuki_tingxian;
+						if(cards&&cards.contains(card)) return 0;
+					},
+				},
+				filter:function(event,player){
+					var hs=player.getCards('h');
+					return Array.isArray(event.shiorimiyuki_tingxian)&&event.shiorimiyuki_tingxian.filter(function(card){
+						return hs.contains(card);
+					}).length>0
+				},
+				content:function(){
+					var hs=player.getCards('h');
+					player.loseHp(trigger.shiorimiyuki_tingxian.filter(function(card){
+						return hs.contains(card);
+					}).length);
+				},
+			},
 			shizuru_nianli:{
 				enable:'chooseToUse',
 				prompt:'展示一张♦/♣/♥/♠手牌，然后视为使用一张雷杀/闪/桃/无懈可击',
@@ -426,9 +503,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseButton([get.prompt('kyoko_juwu'),[1,Infinity],trigger.cards.filter(function(card){
+					player.chooseButton([get.prompt('kyoko_juwu'),trigger.cards.filter(function(card){
 						return get.position(card,true)=='d'&&get.type(card,false)=='equip';
-					})]);
+					})],[1,Infinity]).set('ai',function(){return 1});
 					'step 1'
 					if(result.bool){
 						player.gain(result.links,'gain2','log');
@@ -8722,6 +8799,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_midori:'西园美鸟',
 			key_kyoko:'岬镜子',
 			key_shizuru:'中津静流',
+			key_shiorimiyuki:'关根诗织&入江美雪',
+			key_shiorimiyuki_ab:'关根入江',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -8932,9 +9011,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kyoko_shelie:'涉猎',
 			kyoko_zhiheng:'制衡',
 			shizuru_nianli:'念力',
-			shizuru_nianli_info:'每轮限一次，你可以展示一张♦/♣/♥/♠手牌，然后视为使用一张雷【杀】/【闪】/【桃】/【无懈可击】。',
+			shizuru_nianli_info:'每轮限一次，你可以展示一张♦/♣/♥/♠手牌，然后视为使用一张不计入次数限制和记录的雷【杀】/【闪】/【桃】/【无懈可击】。',
 			shizuru_benzhan:'奔战',
 			shizuru_benzhan_info:'当你使用或打出牌响应其他角色，或其他角色使用或打出牌响应你后，若此牌为：基本牌，你可令一名角色弃置两张牌或令一名角色摸两张牌；非基本牌，你可对一名角色造成1点伤害或令一名其他角色回复1点体力。',
+			shiorimiyuki_banyin:'伴音',
+			shiorimiyuki_banyin_info:'当你受到伤害或回复体力后，你可令一名其他角色回复1点体力。',
+			shiorimiyuki_tingxian:'铤险',
+			shiorimiyuki_tingxian_info:'出牌阶段开始时，你可以摸至多三张牌。若如此做，你回复1点体力，且此阶段结束时你失去X点体力。（X为你获得的牌中仍在手牌区的牌的数量）',
+			shiorimiyuki_tingxian2:'铤险',
 			
 			
 			yj_caoang:'SP曹昂',
