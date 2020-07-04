@@ -800,7 +800,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}).length>0
 					});
 					if(player==target&&bool) player.draw(2);
-					else if(player!=target&&!bool) player.chooseToDiscard('h',2,true);
+					else if(player!=target&&!bool) player.chooseToDiscard('he',2,true);
 				},
 				ai:{
 					order:function(){
@@ -13366,7 +13366,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.attitude(player,event.player)>0;
 				},
 				filter:function(event,player){
-					if(event.player.isDead()||event.player.countCards('h')) return false;
+					if(event.player==player||event.player.isDead()||event.player.countCards('h')) return false;
 					if(_status.currentPhase==event.player) return false;
 					return event.hs&&event.hs.length>0;
 				},
