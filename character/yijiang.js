@@ -8068,6 +8068,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return target.isMaxHp();
 				},
 				check:function(card){
+					var player=_status.event.player;
 					if(game.countPlayer(function(current){
 						return current.isMaxHp()&&get.effect(current,'sanyao',player,player)>0;
 					})<=ui.selected.cards.length) return 0;
