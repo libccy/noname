@@ -303,6 +303,53 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			ganglie_three:{
+				audio:'ganglie',
+				trigger:{player:'damageEnd'},
+				direct:true,
+				content:function(){
+					"step 0"
+					player.chooseTarget(get.prompt2('ganglie_three'),function(card,player,target){
+						return target.isEnemyOf(player);
+					}).set('ai',function(target){
+						return -get.attitude(_status.event.player,target)/(1+target.countCards('h'));
+					});
+					"step 1"
+					if(result.bool){
+						event.target=result.targets[0];
+						player.logSkill('ganglie_three',target);
+					}
+					else event.finish();
+					"step 2"
+					player.judge(function(card){
+						if(get.suit(card)=='heart') return -2;
+						return 2;
+					})
+					"step 3"
+					if(result.judge<2){
+						event.finish();return;
+					}
+					target.chooseToDiscard(2).set('ai',function(card){
+						if(card.name=='tao') return -10;
+						if(card.name=='jiu'&&_status.event.player.hp==1) return -10;
+						return get.unuseful(card)+2.5*(5-get.owner(card).hp);
+					});
+					"step 4"
+					if(result.bool==false){
+						target.damage();
+					}
+				},
+				ai:{
+					maixie_defend:true,
+					effect:{
+						target:function(card,player,target){
+							if(player.hasSkillTag('jueqing',false,target)) return [1,-1];
+							return 0.8;
+							// if(get.tag(card,'damage')&&get.damageEffect(target,player,player)>0) return [1,0,0,-1.5];
+						}
+					}
+				}
+			},
 			tuxi:{
 				audio:2,
 				trigger:{player:'phaseDrawBegin1'},
@@ -901,6 +948,36 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					respondSha:true,
 				}
+			},
+			zhongyi:{
+				audio:2,
+				enable:'phaseUse',
+				limited:true,
+				skillAnimation:true,
+				animationColor:'orange',
+				filterCard:true,
+				position:'he',
+				filter:function(event,player){
+					return player.countCards('he')>0;
+				},
+				toStorage:true,
+				discard:false,
+				content:function(){
+					player.awakenSkill('zhongyi');
+					player.addTempSkill('zhongyi2','roundStart');
+					player.markAuto('zhongyi2',cards);
+				},
+			},
+			zhongyi2:{
+				trigger:{global:'damageBegin1'},
+				forced:true,
+				popup:false,
+				logTarget:'source',
+				filter:function(event,player){
+					return event.getParent().name=='sha'&&event.source&&event.source.isFriendOf(player);
+				},
+				content:function(){trigger.num++},
+				intro:{content:'cards',onunmark:'throw'},
 			},
 			paoxiao:{
 				audio:2,
@@ -2331,6 +2408,38 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			zhanshen:{
+				audio:2,
+				trigger:{player:'phaseZhunbeiBegin'},
+				forced:true,
+				skillAnimation:true,
+				animationColor:'gray',
+				filter:function(event,player){
+					return player.isDamaged()&&game.dead.filter(function(target){
+						return target.isFriendOf(player);
+					}).length>0
+				},
+				content:function(){
+					player.awakenSkill('zhanshen');
+					var card=player.getEquip(1);
+					if(card) player.discard(card);
+					player.loseMaxHp();
+					player.addSkill('mashu');
+					player.addSkill('shenji');
+				},
+				derivation:['mashu','shenji'],
+			},
+			shenji:{
+				mod:{
+					selectTarget:function(card,player,range){
+						if(range[1]==-1) return;
+						if(card.name=='sha') range[1]+=2;
+					},
+					cardUsable:function(card,player,num){
+						if(card.name=='sha') return num+1;
+					}
+				},
+			},
 			lijian:{
 				audio:2,
 				audioname:['re_diaochan'],
@@ -2687,6 +2796,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_jijie_info":"出牌阶段限一次。你可以观看牌堆底的一张牌，然后将其交给一名角色。",
 			"xinfu_jiyuan":"急援",
 			"xinfu_jiyuan_info":"当一名角色进入濒死状态时，或你交给一名其他角色牌时，你可以令其摸一张牌。",
+			ganglie_three:'刚烈',
+			ganglie_three_info:'当你受到伤害后，你可令一名敌方角色判定。若结果不为♥，其弃置两张牌或受到来自你的1点伤害。',
+			zhongyi:'忠义',
+			zhongyi2:'忠义',
+			zhongyi_info:'限定技，出牌阶段，你可以将一张牌置于武将牌上。你的武将牌上有〖忠义〗牌时，己方角色使用【杀】造成的伤害+1。下轮游戏开始时，你将〖忠义〗牌置入弃牌堆。',
+			zhanshen:'战神',
+			zhanshen_info:'觉醒技，准备阶段，若场上有已死亡的其他己方角色且你已受伤，则你弃置装备区的武器牌，减1点体力上限，获得技能〖马术〗和〖神戟〗',
+			shenji:'神戟',
+			shenji_info:'锁定技，你使用【杀】指定的目标数上限+2，次数上限+1',
 			
 			standard_2008:"2008版标准包",
 			standard_2013:"2013版标准包",

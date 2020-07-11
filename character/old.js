@@ -4,7 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'old',
 		characterSort:{
 			old:{
-				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_guanqiujian","xiahouyuan","weiyan","xiaoqiao"],
+				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_guanqiujian","xiahouyuan","weiyan","xiaoqiao","pangde"],
 				old_refresh:["old_zhangfei","old_huatuo","old_zhaoyun","ol_huaxiong"],
 				old_yijiang1:["masu","xushu","fazheng","yujin","xin_yujin","old_xusheng","old_lingtong","ol_yujin"],
 				old_yijiang2:["old_madai","old_zhonghui","old_wangyi","old_guanzhang"],
@@ -17,6 +17,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			pangde:['male','qun',4,['mashu','mengjin']],
 			ol_huaxiong:["male","qun",6,["new_reyaowu"]],
 			old_wangyun:['male','qun',4,['wylianji','moucheng']],
 			panfeng:['male','qun',4,['kuangfu']],
@@ -64,7 +65,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangliang:["male","qun",4,["old_jijun","old_fangtong"]],
 			old_guanzhang:['male','shu',4,['old_fuhun']],
 			ol_xinxianying:['female','wei',3,['caishi','zhongjian']],
-			ol_zhangrang:['male','qun',3,['taoluan']],
+			ol_zhangrang:['male','qun',3,['xintaoluan']],
 			ol_yujin:['male','wei',4,['rezhenjun']],
 			ol_guansuo:['male','shu',4,['zhengnan','xiefang']],
 			ol_manchong:['male','wei',3,['yuce','junxing']],
@@ -875,7 +876,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_huatuo:'OL华佗',
 			jsp_caoren:'☆SP曹仁',
 			ol_xinxianying:'OL辛宪英',
-			ol_zhangrang:'OL张让',
+			ol_zhangrang:'旧张让',
 			ol_yujin:'镇军于禁',
 			ol_liaohua:'OL廖化',
 			ol_zhuran:'OL朱然',

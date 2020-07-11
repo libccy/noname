@@ -104,6 +104,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					lib.character.key_yuzuru[2]=4;
 					lib.character.key_yuzuru[3]=['yuzuru_bujin'];
 				}
+				if(lib.character.guanyu) lib.character.guanyu[3]=['wusheng','zhongyi'];
+				if(lib.character.lvbu) lib.character.lvbu[3]=['wushuang','zhanshen'];
+				if(lib.character.xiahoudun) lib.character.xiahoudun[3]=['ganglie_three'];
 				if(!get.config('enable_all_cards')){
 					lib.translate.wuzhong_info+='若对方存活角色多于己方，则额外摸一张牌';
 					lib.translate.zhuge_info='锁定技，出牌阶段，你使用杀的次数上限+3';
@@ -3805,21 +3808,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			["club",4,"bingliang"],
 		],
 		choiceThree:[
-			//'zhenji','zhugeliang','diaochan','liyan','xuezong','simalang','quyi','re_guojia',
-			'sunquan',
-			're_ganning','re_daqiao','re_zhangfei','re_machao','re_simayi','re_zhangliao','re_xuzhu',
-			're_lidian',
-			'jiangwei','sunce',
-			'dianwei','dengai','re_pangde',
-			'xusheng','chengong','xin_masu',
-			'madai','lingtong','yufan',
-			'wangji','yanyan','wangping',
-			'guyong','jushou','caifuren','zhoucang','liuchen',
-			'caiyong',
-			'zhugejin',
-			'sp_sunshangxiang','luzhi','sp_liuqi',
-			'mazhong','mayunlu','litong','wenpin',
-			'zhugeke','dingfeng',
+			're_caocao','re_simayi','xiahoudun','re_zhangliao','re_guojia','zhenji','re_xiahouyuan','xuhuang',
+			'wenpin','re_xuzhu','wangyi','dianwei','re_lidian','xunyou','dengai','wangji',
+			'zhongyao','yuejin','simalang','zhangchunhua','sp_caoren','luzhi','litong','re_liubei',
+			'guanyu','re_zhangfei','re_zhugeliang','re_zhaoyun','re_machao','huangyueying','jiangwei','xin_masu',
+			'liuchen','re_huangzhong','mizhu','madai','wangping','xin_fazheng','re_xushu','liyan',
+			'sp_sunshangxiang','zhoucang','yanyan','mazhong','mayunlu','sunquan','re_ganning','re_huanggai',
+			're_zhouyu','re_daqiao','sunshangxiang','sunjian','re_xiaoqiao','sunce','re_luxun','zhugejin',
+			'dingfeng','lingtong','guyong','xusheng','yufan','handang','panzhangmazhong','zhugeke',
+			'zumao','xuezong','re_huatuo','lvbu','diaochan','re_pangde','jiaxu','chengong',
+			're_gongsunzan','caifuren','gongsunyuan','yj_jushou','sp_liuqi','quyi','caiyong','key_yuzuru'
 		],
 		choiceFour:[
 			'sunquan','zhenji','re_diaochan','zhugeliang','sunshangxiang','re_huangyueying',

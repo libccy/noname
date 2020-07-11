@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			shenhua:{
 				shenhua_feng:["sp_zhangjiao","re_yuji","old_zhoutai","old_caoren","re_xiahouyuan","re_xiaoqiao","huangzhong","re_weiyan"],
-				shenhua_huo:['dianwei','xunyu','pangtong','sp_zhugeliang','taishici','yanwen','re_yuanshao','pangde'],
+				shenhua_huo:['dianwei','xunyu','pangtong','sp_zhugeliang','taishici','yanwen','re_yuanshao','re_pangde'],
 				shenhua_lin:['caopi','xuhuang','menghuo','zhurong','re_lusu','sunjian','dongzhuo','jiaxu'],
 				shenhua_shan:['dengai','zhanghe','liushan','jiangwei','zhangzhang','sunce','caiwenji','zuoci'],
 				shenhua_yin:['wangji','kuailiangkuaiyue','yanyan','wangping','sunliang','luji','xuyou','yl_luzhi'],
@@ -18,7 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_zhoutai:['male','wu',4,['gzbuqu']],
 			old_caoren:['male','wei',4,['moon_jushou','jiewei']],
 			xuhuang:['male','wei',4,['gzduanliang']],
-			pangde:['male','qun',4,['mashu','mengjin']],
+			re_pangde:['male','qun',4,['mashu','jianchu']],
 			re_xiahouyuan:['male','wei',4,['xinshensu']],
 			huangzhong:['male','shu',4,['liegong']],
 			re_weiyan:['male','shu',4,['xinkuanggu','qimou']],
@@ -5385,6 +5385,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinqiangxi3:{},
 			tianyi:{
 				audio:2,
+				audioname:['re_taishici'],
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
@@ -7357,7 +7358,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			taishici:'太史慈',
 			yanwen:'颜良文丑',
 			yuanshao:'旧袁绍',
-			re_pangde:'界庞德',
+			re_pangde:'庞德',
 			huoji:'火计',
 			bazhen:'八阵',
 			kanpo:'看破',
@@ -7413,7 +7414,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_zhoutai:'周泰',
 			old_caoren:'曹仁',
 			xuhuang:'徐晃',
-			pangde:'庞德',
+			pangde:'旧庞德',
 			xiahouyuan:'旧夏侯渊',
 			caoren:'界曹仁',
 			huangzhong:'黄忠',

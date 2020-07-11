@@ -427,8 +427,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(card){
 							cards.push(card);
 							names.push(card.name);
-							if(cards.length==3&&Math.random()<0.33) break;
-							if(cards.length==4&&Math.random()<0.5) break;
+							if(cards.length==3&&!get.isLuckyStar(player)&&Math.random()<0.33) break;
+							if(cards.length==4&&!get.isLuckyStar(player)&&Math.random()<0.5) break;
 							if(cards.length==5) break;
 							if(cards.length>=6) break;
 						}
@@ -1719,7 +1719,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=1-trigger.player.hp;
 					if(num) trigger.player.recover(num);
 					'step 2'
-					if(_status.currentPhase&&_status.currentPhase.isAlive()) _status.currentPhase.damage();
+					if(_status.currentPhase&&_status.currentPhase.isAlive()){
+						var next=_status.currentPhase.damage();
+						event.next.remove(next);
+						trigger.after.push(next);
+					}
 				},
 			},
 			zhiyi:{
@@ -3905,7 +3909,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				content:function (){
 					'step 0'
-					if(get.isLuckyStar()){
+					if(get.isLuckyStar(player)){
 						event.num=6;
 						player.throwDice(6);
 					}
