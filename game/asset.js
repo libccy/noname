@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.100.3',
+	'v1.9.100.4',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -574,6 +574,7 @@ window.noname_asset_list=[
 	'audio/die/xin_chengpu.mp3',
 	'audio/die/zhengxuan.mp3',
 	'audio/die/ol_sunjian.mp3',
+	'audio/die/re_taishici.mp3',
 	
 	'audio/skill/anguo1.mp3',
 	'audio/skill/anguo2.mp3',
@@ -2540,6 +2541,15 @@ window.noname_asset_list=[
 	'audio/skill/yidian2.mp3',
 	'audio/skill/yinghun_ol_sunjian1.mp3',
 	'audio/skill/yinghun_ol_sunjian2.mp3',
+	'audio/skill/hanzhan1.mp3',
+	'audio/skill/hanzhan2.mp3',
+	'audio/skill/pingjian1.mp3',
+	'audio/skill/tianyi_re_taishici1.mp3',
+	'audio/skill/tianyi_re_taishici2.mp3',
+	'audio/skill/zhanshen1.mp3',
+	'audio/skill/zhanshen2.mp3',
+	'audio/skill/zhongyi1.mp3',
+	'audio/skill/zhongyi2.mp3',
 	
 	'font/huangcao.ttf',
 	'font/shousha.ttf',
@@ -3115,6 +3125,11 @@ window.noname_asset_list=[
 	'image/character/ol_huaxiong.jpg',
 	'image/character/yj_xuhuang.jpg',
 	'image/character/yj_zhanghe.jpg',
+	'image/character/ol_pangde.jpg',
+	'image/character/re_masu.jpg',
+	'image/character/re_sunluban.jpg',
+	'image/character/re_taishici.jpg',
+	'image/character/xushao.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',

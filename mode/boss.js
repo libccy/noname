@@ -2598,7 +2598,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			boss_leifu:{
-				trigger:{player:'phaseAfter'},
+				trigger:{player:'phaseJieshuBegin'},
 				forced:true,
 				content:function(){
 					var list=game.players.slice(0);
@@ -3659,7 +3659,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			boss_shedu:{
-				trigger:{player:"phaseBefore"},
+				trigger:{player:"phaseBegin"},
 				mark:true,
 				intro:{content:'mark'},
 				forced:true,
@@ -3687,7 +3687,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return num-player.hp+9;
 					},
 				},
-				trigger:{player:['phaseUseBegin','phaseAfter','phaseDrawBegin']},
+				trigger:{player:['phaseUseBegin','phaseJieshuBegin','phaseDrawBegin']},
 				forced:true,
 				filter:function(event,player){
 					return event.name=='phaseDraw'||player.countCards('h')<9;
@@ -3738,9 +3738,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			boss_bingxian:{
-				trigger:{global:'phaseAfter'},
+				trigger:{global:'phaseJieshuBegin'},
 				filter:function(event,player){
-					return event.player!=player&&event.player.countUsed('sha')==0;
+					return event.player!=player&&event.player.countUsed('sha',true)==0;
 				},
 				forced:true,
 				content:function(){
@@ -3852,7 +3852,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				forced:true,
-				trigger:{player:'phaseBegin'},
+				trigger:{player:'phaseZhunbeiBegin'},
 				content:function(){
 					'step 0'
 					event.num1=3;
@@ -3909,7 +3909,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			boss_yanyu:{
 				forced:true,
-				trigger:{global:'phaseBefore'},
+				trigger:{global:'phaseBegin'},
 				filter:function(event,player){
 					return player!=event.player;
 				},
@@ -3931,7 +3931,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			boss_fengdong:{
-				trigger:{player:"phaseBefore"},
+				trigger:{player:"phaseBegin"},
 				forced:true,
 				content:function(){
 					game.countPlayer(function(current){
@@ -4532,7 +4532,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			boss_yandu:{
-				trigger:{global:'phaseAfter'},
+				trigger:{global:'phaseJieshuBegin'},
 				filter:function(event,player){
 					return event.player!=player&&!event.player.getStat('damage')&&event.player.countCards('he');
 				},
@@ -8669,20 +8669,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			shenji:{
-				unique:true,
-				mod:{
-					selectTarget:function(card,player,range){
-						if(range[1]==-1) return;
-						//if(player.getEquip(1)) return;
-						if(card.name=='sha') range[1]+=2;
-					},
-					cardUsable:function(card,player,num){
-						//if(player.getEquip(1)) return;
-						if(card.name=='sha') return num+1;
-					}
-				},
-			},
 			boss_baonuwash:{
 				trigger:{player:'phaseAfter'},
 				forced:true,
@@ -9602,8 +9588,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_baonu_info:'锁定技，当你的体力值降至4或更低时，你变身为暴怒战神或神鬼无前，并立即开始你的回合',
 			shenwei:'神威',
 			shenwei_info:'锁定技，摸牌阶段，你额外摸X张牌，你的手牌上限+X（X为场上其他角色的数目且至多为3）',
-			shenji:'神戟',
-			shenji_info:'锁定技，你使用【杀】指定的目标数上限+2，次数上限+1',
 			xiuluo:'修罗',
 			xiuluo_info:'准备阶段，你可以弃置一张牌，然后弃置你判定区内一张同花色的牌。你可以重复此流程。',
 			shenqu:'神躯',

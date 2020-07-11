@@ -6,15 +6,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			refresh:{
 				refresh_standard:["re_caocao","re_simayi","re_guojia","re_lidian","re_zhangliao","re_xuzhu","re_xiahoudun","re_zhangfei","re_zhaoyun","re_guanyu","re_machao","re_xushu","re_zhouyu","re_lvmeng","re_ganning","re_luxun","re_daqiao","re_huanggai","re_lvbu","re_gongsunzan","re_huatuo","re_liubei","re_diaochan","re_huangyueying","re_sunquan","re_sunshangxiang","re_zhenji","re_zhugeliang","re_huaxiong"],
 				refresh_feng:['caoren','ol_xiahouyuan','re_huangzhong','ol_weiyan','ol_xiaoqiao','zhoutai','re_zhangjiao','xin_yuji'],
-				refresh_huo:["ol_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","ol_pangtong","ol_yuanshao","re_pangde"],
+				refresh_huo:["ol_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","ol_pangtong","ol_yuanshao","ol_pangde","re_taishici"],
 				refresh_lin:['re_zhurong','re_menghuo','re_dongzhuo','ol_sunjian','re_caopi','re_xuhuang'],
 				refresh_shan:['re_dengai','re_jiangwei','re_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce'],
-				refresh_yijiang:['re_xusheng','re_wuguotai','re_gaoshun','re_zhangyi','re_caozhi','re_zhuran','re_wuyi','re_liaohua','re_guohuai','re_zhuran','re_chengpu','re_caozhang','re_quancong','yujin_yujin','re_lingtong','re_handang','re_zhonghui'],
+				refresh_yijiang:['re_xusheng','re_wuguotai','re_gaoshun','re_zhangyi','re_caozhi','re_zhuran','re_wuyi','re_liaohua','re_guohuai','re_zhuran','re_chengpu','re_caozhang','re_quancong','yujin_yujin','re_lingtong','re_handang','re_zhonghui','re_sunluban','re_masu'],
 		 },
 		},
 		connect:true,
 		character:{
-			re_zhonghui:['male','wei',4,['requanji','zili']],
+			re_taishici:['male','wu',4,['tianyi','hanzhan']],
+			re_masu:['male','shu',3,['resanyao','rezhiman']],
+			re_sunluban:['female','wu',3,['rechanhui','rejiaojin']],re_zhonghui:['male','wei',4,['requanji','zili']],
 			re_handang:['male','wu',4,['regongji','jiefan']],
 			re_lingtong:['male','wu',4,['rexuanfeng']],
 			yujin_yujin:['male','wei',4,['rejieyue']],
@@ -71,7 +73,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_weiyan:['male','shu',4,['xinkuanggu','reqimou']],
 			ol_xiaoqiao:['female','wu',3,['retianxiang','rehongyan']],
 			zhoutai:['male','wu',4,['buqu','fenji']],
-			re_pangde:['male','qun',4,['mashu','jianchu']],
+			ol_pangde:['male','qun',4,['mashu','rejianchu']],
 			re_xuhuang:['male','wei',4,['duanliang','jiezi']],
 			ol_sp_zhugeliang:["male","shu",3,["bazhen","rehuoji","rekanpo","cangzhuo"],[]],
 			re_xunyu:["male","wei",3,["quhu","rejieming"],[]],
@@ -105,6 +107,90 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunben:['zhouyu','taishici','daqiao'],
 		},
 		skill:{
+			hanzhan:{
+				audio:2,
+				trigger:{
+					global:'chooseToCompareBegin',
+				},
+				filter:function(event,player){
+					if(player==event.player) return true;
+					if(event.targets) return event.targets.contains(player);
+					return player==event.target;
+				},
+				logTarget:function(event,player){
+					if(player!=event.player) return event.player;
+					return event.targets||event.target;
+				},
+				check:function(trigger,player){
+					var num=0;
+					var targets=player==trigger.player?(trigger.targets?trigger.targets.slice(0):[trigger.target]):[trigger.player];
+					while(targets.length){
+						var target=targets.shift();
+						if(target.getCards('h').length>1) num-=get.attitude(player,target);
+					}
+					return num>0;
+				},
+				content:function(){
+					var targets=player==trigger.player?(trigger.targets?trigger.targets.slice(0):[trigger.target]):[trigger.player];
+					if(!trigger.fixedResult) trigger.fixedResult={};
+					while(targets.length){
+						var target=targets.shift();
+						var hs=target.getCards('h');
+						if(hs.length) trigger.fixedResult[target.playerid]=hs.randomGet();
+					}
+				},
+			},
+			rejianchu:{
+				shaRelated:true,
+				audio:2,
+				audioname:['re_pangde'],
+				trigger:{player:'useCardToPlayered'},
+				filter:function(event,player){
+					return event.card.name=='sha'&&event.target.countDiscardableCards(player,'he')>0;
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.discardPlayerCard(trigger.target,get.prompt('rejianchu',trigger.target)).set('ai',function(button){
+						if(!_status.event.att) return 0;
+						if(get.position(button.link)=='e'){
+							if(get.subtype(button.link)=='equip2')	return 2*get.value(button.link);
+							return get.value(button.link);
+						}
+						return 1;
+					}).set('logSkill',['rejianchu',trigger.target]).set('att',get.attitude(player,trigger.target)<=0);
+					'step 1'
+					if(result.bool&&result.links&&result.links.length){
+						if(get.type(result.links[0],null,result.links[0].original=='h'?player:false)!='basic'){
+							trigger.getParent().directHit.add(trigger.target);
+							player.addTempSkill('rejianchu2');
+							player.addMark('rejianchu2',1,false);
+						}
+						else if(trigger.cards){
+							var list=[];
+							for(var i=0;i<trigger.cards.length;i++){
+								if(get.position(trigger.cards[i],true)=='o') list.push(trigger.cards[i]);
+							}
+							if(list.length) trigger.target.gain(list,'gain2','log');
+						}
+					}
+				},
+				ai:{
+					unequip_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						if(arg&&arg.name=='sha'&&arg.target.getEquip(2)) return true;
+						return false;
+					}
+				},
+			},
+			rejianchu2:{
+				mod:{
+					cardUsable:function(card,player,num){
+						if(card.name=='sha') return num+player.countMark('rejianchu2');
+					},
+				},
+				onremove:true,
+			},
 			wulie:{
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
@@ -6875,6 +6961,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wulie:'武烈',
 			wulie2:'武烈',
 			wulie_info:'限定技，结束阶段，你可以失去任意点体力并指定等量的角色。这些角色各获得一枚「烈」。有「烈」的角色受到伤害时，其移去一枚「烈」，然后防止此伤害。',
+			re_sunluban:'界孙鲁班',
+			re_masu:'界马谡',
+			ol_pangde:'界庞德',
+			rejianchu:'鞬出',
+			rejianchu_info:'当你使用【杀】指定一名角色为目标后，你可以弃置其一张牌，若以此法弃置的牌不为基本牌，此【杀】不可被【闪】响应且你本回合使用【杀】的次数上限+1，为基本牌，该角色获得此【杀】',
+			re_taishici:'界太史慈',
+			hanzhan:'酣战',
+			hanzhan_info:'当你发起拼点时，或成为拼点的目标时，你可以令对方选择拼点牌的方式改为随机选择一张手牌。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

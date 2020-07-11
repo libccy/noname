@@ -466,7 +466,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var trans=get.translation(target);
 						var list;
 						if(event.type){
-							if(!target.countCards('h')) event._result={index:0};
+							if(!target.countCards('he')) event._result={index:0};
 							else list=['令'+trans+'摸两张牌','令'+trans+'弃置两张牌'];
 						}
 						else{
@@ -503,9 +503,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseButton([get.prompt('kyoko_juwu'),trigger.cards.filter(function(card){
+					var cards=trigger.cards.filter(function(card){
 						return get.position(card,true)=='d'&&get.type(card,false)=='equip';
-					})],[1,Infinity]).set('ai',function(){return 1});
+					});
+					player.chooseButton([get.prompt('kyoko_juwu'),cards],[1,cards.length]).set('ai',function(){return 1});
 					'step 1'
 					if(result.bool){
 						player.gain(result.links,'gain2','log');
@@ -813,7 +814,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var trans=get.translation(target);
 						var list;
 						if(event.type){
-							if(!target.countCards('h')) event._result={index:0};
+							if(!target.countCards('he')) event._result={index:0};
 							else list=['令'+trans+'摸两张牌','令'+trans+'弃置两张牌'];
 						}
 						else{
@@ -1555,6 +1556,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					if(tempcard) trigger.directresult=tempcard;
 				},
+				ai:{luckyStar:true},
 			},
 			riki_spwenji:{
 				audio:2,
@@ -2543,7 +2545,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.countCards('he')>0&&!player.hasSkill('haruka_kanata');
+					return !player.hasSkill('haruka_kanata');
 				},
 				chooseButton:{
 					dialog:function(event,player){
@@ -3822,14 +3824,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.logSkill('yuri_wangxi',trigger.player);
 						player.awakenSkill('yuri_wangxi');
-						game.broadcastAll(function(source){
+						var identity='zhong';
+						if(_status.mode=='purple'){
+							if(['rNei','bNei'].contains(player.identity)) identity=player.identity;
+							else if(['rZhu','rZhong','bNei'].contains(player.identity)) identity='rZhong';
+							else identity='bZhong';
+						}
+						game.broadcastAll(function(source,identity){
 							if(source.node.dieidentity){
-								source.node.dieidentity.innerHTML='忠臣';
+								source.node.dieidentity.innerHTML=get.translation(identity+2);
 							}
 							source.revive(2,false);
-							source.identity='zhong';
+							source.identity=identity;
 							source.setIdentity();
-						},trigger.player);
+						},trigger.player,identity);
 						trigger.player.changeGroup(player.group);
 						trigger.player.draw();
 						var evt=trigger.getParent('damage');

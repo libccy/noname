@@ -1216,8 +1216,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						event.directfalse=true;
 					}
 					else{
-						target.chooseToUse('对'+get.translation(event.addedTarget)+'使用一张杀，或令'+get.translation(player)+'获得你的武器牌',
-							{name:'sha'}).set('targetRequired',true).set('complexSelect',true).set('filterTarget',function(card,player,target){
+						target.chooseToUse('对'+get.translation(event.addedTarget)+'使用一张杀，或令'+get.translation(player)+'获得你的武器牌',function(card,player){
+							if(get.name(card)!='sha') return false;
+							return lib.filter.filterCard.apply(this,arguments);
+						}).set('targetRequired',true).set('complexSelect',true).set('filterTarget',function(card,player,target){
 						if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
 						return lib.filter.filterTarget.apply(this,arguments);
 					}).set('sourcex',event.addedTarget).set('addCount',false).set('respondTo',[player,card]);

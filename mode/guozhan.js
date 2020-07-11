@@ -6549,6 +6549,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(event.current._group==player.group&&event.current.wontYe()){
 							event.current.chooseControl('明置主将','明置副将','取消').set('prompt','是否响应'+get.translation(player)+'的阵法召唤？').ai=function(){return Math.floor(Math.random()*3)};
 						}
+						else event.goto(3);
 					}
 					else event.goto(3);
 					'step 2'
