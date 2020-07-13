@@ -880,6 +880,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}));
 								if(val>=14) return 0;
 							}
+							if (target.countCards('h','tao')>0) return 0;
 							return get.value(card);
 						});
 					}
