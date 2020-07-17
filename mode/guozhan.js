@@ -7151,7 +7151,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.players[i].identity='unknown';
 						game.players[i].node.name.show();
 						game.players[i].node.name2.show();
-						game.players[i]._group=lib.character[game.players[i].name1][1];
+						game.players[i]._group=lib.character[game.players[i].name2][1];
 						for(var j=0;j<game.players[i].hiddenSkills.length;j++){
 							game.players[i].addSkillTrigger(game.players[i].hiddenSkills[j],true);
 						}
@@ -7315,7 +7315,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							game.players[i].identity='unknown';
 							game.players[i].node.name.show();
 							game.players[i].node.name2.show();
-							game.players[i]._group=lib.character[game.players[i].name1][1];
+							game.players[i]._group=lib.character[game.players[i].name2][1];
 						}
 						setTimeout(function(){
 							ui.arena.classList.remove('choose-character');

@@ -52,9 +52,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.chooseToUse({
 						prompt:'请使用得到的一张牌，或者受到来自'+get.translation(player)+'的一点伤害',
 						filterCard:function(card,player,event){
-							if(!cards.contains(card)) return false;
+							var cards=_status.event.cards;
+							if(!cards||get.itemtype(card)!='card'||!cards.contains(card)) return false;
 							return lib.filter.filterCard(card,player,event);
 						},
+						cards:event.cards,
 					});
 					'step 2'
 					if(result.bool){

@@ -261,7 +261,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						rejudge:1,
 					}
 				}
-			},	
+			},
 			ganglie:{
 				audio:2,
 				trigger:{player:'damageEnd'},

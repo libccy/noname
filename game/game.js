@@ -57,6 +57,8 @@
 			shibing_emotion:15,
 			guojia_emotion:20,
 			zhenji_emotion:20,
+			xiaosha_emotion:20,
+			xiaotao_emotion:20,
 		},
 		animate:{
 			skill:{},
@@ -5062,6 +5064,7 @@
 							'2v2':'2v2',
 							'3v3':'3v3',
 							'4v4':'4v4',
+							'guandu':'官渡',
 						},
 						frequent:true
 					},
@@ -5197,6 +5200,7 @@
 							four:'对抗',
 							three:'统率',
 							two:'欢乐',
+							guandu:'官渡',
 							jiange:'剑阁',
 							siguo:'四国',
 							standard:'自由'
@@ -9789,6 +9793,8 @@
 			guojia_emotion:'郭嘉表情',
 			zhenji_emotion:'甄姬表情',
 			shibing_emotion:'士兵表情',
+			xiaosha_emotion:'小杀表情',
+			xiaotao_emotion:'小桃表情',
 
 			pause:'暂停',
 			config:'选项',
@@ -10097,7 +10103,7 @@
 				cardsGotoSpecial:function(){
 					game.getGlobalHistory().cardMove.push(event);
 					for(var i=0;i<cards.length;i++){
-						cards[i].goto(ui.special);
+						ui.special.appendChild(cards[i]);
 					}
 					if(event.notrigger!==true) event.trigger('addCardToStorage');
 				},
@@ -10280,7 +10286,16 @@
 					game.countPlayer2(function(current){
 						current.actionHistory.push({useCard:[],respond:[],skipped:[],lose:[],gain:[],sourceDamage:[],damage:[],custom:[]});
 						current.stat.push({card:{},skill:{}});
+						if(event.parent._roundStart){
+							current.getHistory().isRound=true;
+							current.getStat().isRound=true;
+						}
 					});
+					player.getHistory().isMe=true;
+					player.getStat().isMe=true;
+					if(event.parent._roundStart){
+						game.getGlobalHistory().isRound=true;
+					}
 					if(ui.land&&ui.land.player==player){
 						game.addVideo('destroyLand');
 						ui.land.destroy();
@@ -13703,18 +13718,18 @@
 						},event.id);
 					};
 					"step 3"
-					event.sortTarget=function(animate){
+					event.sortTarget=function(animate,sort){
 						var info=get.info(card,false);
 						if(num==0&&targets.length>1){
 							if(!info.multitarget){
-								if(!event.fixedSeat){
+								if(!event.fixedSeat&&!sort){
 									targets.sortBySeat(player);
 								}
 								if(animate)	for(var i=0;i<targets.length;i++){
 									targets[i].animate('target');
 								}
 							}
-						else if(animate){
+							else if(animate){
 								for(var i=0;i<targets.length;i++){
 									targets[i].animate('target');
 								}
@@ -13819,6 +13834,9 @@
 						next.directHit=event.directHit;
 						next.customArgs=event.customArgs;
 						if(event.forceDie) next.forceDie=true;
+						if(targets.length==event.triggeredTargets4.length){
+							event.sortTarget();
+						}
 						event.redo();
 					}
 					"step 8"
@@ -13845,10 +13863,10 @@
 					}
 					"step 9"
 					if(event.all_excluded) return;
-					if(num==0&&targets.length>1){
-						event.sortTarget(true);
-					}
 					var info=get.info(card,false);
+					if(num==0&&targets.length>1){
+						event.sortTarget(true,true);
+					}
 					if(targets[num]&&targets[num].isDead()) return;
 					if(targets[num]&&targets[num].isOut()) return;
 					if(targets[num]&&targets[num].removed) return;
@@ -19736,6 +19754,7 @@
  				else if(typeof select=='number') range=[select,select];
  				else if(get.itemtype(select)=='select') range=select;
  				else if(typeof select=='function') range=select(card,player);
+ 				if(info.singleCard) range=[1,1];
  				game.checkMod(card,player,range,'selectTarget',player);
  				if(!range) return 0;
 				
@@ -20932,7 +20951,7 @@
 				hasZhuSkill:function(skill,player){
 					if(!this.hasSkill(skill)) return false;
 					var mode=get.mode();
-					if(mode=='identity'||(mode=='versus'&&_status.mode=='four')){
+					if(mode=='identity'||(mode=='versus'&&(_status.mode=='four'||_status.mode=='guandu'))){
 						if(mode!='identity'){
 							if(player&&this.side!=player.side) return false;
 						}
@@ -24953,6 +24972,7 @@
 					if((player==_status.roundStart||_status.roundSkipped)&&!trigger.skill){
 						delete _status.roundSkipped;
 						game.roundNumber++;
+						trigger._roundStart=true;
 						game.updateRoundNumber();
 						for(var i=0;i<game.players.length;i++){
 							if(game.players[i].isOut()&&game.players[i].outCount>0){
@@ -25968,6 +25988,7 @@
 						}
 						ui.arena.setNumber(state.number);
 						_status.mode=state.mode;
+						lib.inpile=_state.inpile;
 						var pos=state.players[observe||game.onlineID].position;
 						for(var i in state.players){
 							var info=state.players[i];
@@ -32066,9 +32087,10 @@
 			});
 		},
 		updateRoundNumber:function(){
-			game.broadcastAll(function(num1,num2){
+			game.broadcastAll(function(num1,num2,top){
 				if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=num1+'轮 剩余牌: '+num2;
-			},game.roundNumber,ui.cardPile.childNodes.length);
+				_status.pileTop=top;
+			},game.roundNumber,ui.cardPile.childNodes.length,ui.cardPile.firstChild);
 		},
 		asyncDraw:function(players,num,drawDeck,bottom){
 			for(var i=0;i<players.length;i++){
@@ -42970,10 +42992,11 @@
 					}
 				}
 				lib.inpile.sort(lib.sort.card);
-				game.broadcastAll(function(num,pile){
+				game.broadcastAll(function(num,pile,top){
 					if(ui.cardPileNumber) ui.cardPileNumber.innerHTML='0轮 剩余牌: '+num;
 					lib.inpile=pile;
-				},ui.cardPile.childNodes.length,lib.inpile);
+					_status.pileTop=top;
+				},ui.cardPile.childNodes.length,lib.inpile,ui.cardPile.firstChild);
 			},
 		},
 		click:{
@@ -47325,6 +47348,7 @@
 						isCard:true,
 						cardid:card.cardid,
 						wunature:card.wunature,
+						storage:card.storage,
 					};
 					if(get.itemtype(cards)=='cards'&&!card.cards) next.cards=cards.slice(0);
 					else next.cards=[card];
@@ -47755,6 +47779,7 @@
 					case '2v2':return '欢乐成双';
 					case '3v3':return '血战到底';
 					case '4v4':return '四人对决';
+					case 'guandu':return '官渡之战';
 				}
 			}
 			else if(config.mode=='single'){
@@ -47827,7 +47852,8 @@
 				dying:_status.dying,
 				servermode:window.isNonameServer,
 				roomId:game.roomId,
-				over:_status.over
+				over:_status.over,
+				inpile:lib.inpile,
 			};
 			for(var i in lib.playerOL){
 				state.players[i]=lib.playerOL[i].getState();
@@ -47881,7 +47907,7 @@
 				if(skill&&!game.zhu.hasSkill(skill)) return null;
 				if(game.zhu.isZhu) return game.zhu;
 			}
-			else if(mode=='versus'&&_status.mode=='four'){
+			else if(mode=='versus'&&(_status.mode=='four'||_status.mode=='guandu')){
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].isZhu){
 						if(skill&&!(game.players[i].hasSkill(skill))) continue;
@@ -49461,7 +49487,7 @@
 					}
 				}
 				for(i=0;i<skills.length;i++){
-					if(lib.skill[skills[i]]&&lib.skill[skills[i]].nopop) continue;
+					if(lib.skill[skills[i]]&&(lib.skill[skills[i]].nopop||lib.skill[skills[i]].equipSkill)) continue;
 					if(lib.translate[skills[i]+'_info']){
 						translation=lib.translate[skills[i]+'_ab']||get.translation(skills[i]).slice(0,2);
 						if(node.forbiddenSkills[skills[i]]){

@@ -8163,20 +8163,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				selectCard:function(){
-					return [Math.max(1,ui.selected.targets.length),game.countPlayer(function(current){
-						return current.isMaxHp();
+					var player=_status.event.player;
+					return [Math.max(1,ui.selected.targets.length),game.countPlayer(function(target){
+						return target!=player&&!game.hasPlayer(function(current){
+							return current!=player&&current.hp>target.hp
+						});
 					})];
 				},
 				selectTarget:function(){
 					return ui.selected.cards.length;
 				},
 				filterTarget:function(card,player,target){
-					return target.isMaxHp();
+					return target!=player&&!game.hasPlayer(function(current){
+						return current!=player&&current.hp>target.hp
+					});
 				},
 				check:function(card){
 					var player=_status.event.player;
-					if(game.countPlayer(function(current){
-						return current.isMaxHp()&&get.effect(current,'sanyao',player,player)>0;
+					if(game.countPlayer(function(target){
+						return target!=player&&!game.hasPlayer(function(current){
+							return current!=player&&current.hp>target.hp
+						})&&get.effect(target,'sanyao',player,player)>0;
 					})<=ui.selected.cards.length) return 0;
 					return 7-get.value(card);
 				},
@@ -8759,7 +8766,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(get.prompt2('rechanhui'),function(card,player,target){
 						if(player==target) return false;
 						var trigger=_status.event;
-						return player.canUse(trigger.card,target)&&trigger.targets.contains(target)==false;
+						return player.canUse(trigger.card,target,false)&&trigger.targets.contains(target)==false;
 					}).set('ai',function(target){
 						var trigger=_status.event.getTrigger();
 						var player=_status.event.player;
@@ -12071,7 +12078,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chanhui:'谮毁',
 			chanhui_info:'出牌阶段限一次，当你使用【杀】或黑色普通锦囊牌指定唯一目标时，你可令可以成为此牌目标的另一名其他角色选择一项：交给你一张牌并成为此牌的使用者；或成为此牌的额外目标。',
 			rechanhui:'谮毁',
-			rechanhui_info:'出牌阶段，当你使用【杀】或黑色普通锦囊牌指定唯一目标时，你可令可以成为此牌目标的另一名其他角色选择一项：交给你一张牌并成为此牌的使用者；或成为此牌的额外目标且你本回合内不能再次发动〖谮毁〗。',
+			rechanhui_info:'出牌阶段，当你使用【杀】或黑色普通锦囊牌指定唯一目标时，你可令可以成为此牌目标（无距离限制）的另一名其他角色选择一项：交给你一张牌并成为此牌的使用者；或成为此牌的额外目标且你本回合内不能再次发动〖谮毁〗。',
 			jiaojin:'骄矜',
 			jiaojin_info:'当你受到男性角色造成的伤害时，你可以弃置一张装备牌，令此伤害-1。',
 			rejiaojin:'骄矜',
@@ -12192,7 +12199,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhiman_info:'当你对一名其他角色造成伤害时，你可以防止此伤害，然后获得其装备区或判定区的一张牌。',
 			sanyao_info:'出牌阶段限一次，你可以弃置一张牌并指定一名体力值最多(或之一)的角色，你对其造成1点伤害。',
 			rezhiman_info:'当你对一名其他角色造成伤害时，你可以防止此伤害，然后获得其区域内的一张牌。',
-			resanyao_info:'出牌阶段限一次，你可以弃置任意张牌并指定等量体力值最多(或之一)的角色。你对这些角色依次造成1点伤害。',
+			resanyao_info:'出牌阶段限一次，你可以弃置任意张牌并指定等量除你外体力值最多(或之一)的其他角色。你对这些角色依次造成1点伤害。',
 			paiyi_info:'出牌阶段限一次，你可以移去一张“权”并选择一名角色，令其摸两张牌，然后若其手牌数大于你，你对其造成1伤害。',
 			zili_info:'觉醒技，准备阶段开始时，若“权”的数量不小于3，你减1点体力上限，然后选择一项：1、回复1点体力；2、摸两张牌。然后你获得技能“排异”。',
 			quanji_info:'当你受到1点伤害后，你可以摸一张牌，然后将一张手牌置于武将牌上，称为“权”；你的手牌上限+X（X为“权”的数量）。',

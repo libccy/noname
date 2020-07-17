@@ -37,6 +37,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		start:function(){
 			"step 0"
 			_status.mode=get.config('versus_mode');
+			if(_status.connectMode&&lib.configOL.versus_mode=='guandu') _status.mode='guandu';
 			if(_status.brawl&&_status.brawl.submode){
 				_status.mode=_status.brawl.submode;
 			}
@@ -70,11 +71,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						case '1v1':lib.configOL.number=2;break;
 						case '2v2':lib.configOL.number=4;break;
 						case '3v3':lib.configOL.number=6;break;
-						case '4v4':lib.configOL.number=8;break;
+						case '4v4':case 'guandu':lib.configOL.number=8;break;
 					}
 				});
 			}
-			else if(_status.mode=='jiange'||_status.mode=='siguo'||_status.mode=='four'){
+			else if(_status.mode=='jiange'||_status.mode=='siguo'||_status.mode=='four'||_status.mode=='guandu'){
 				if(_status.mode=='four'&&!get.config('enable_all_cards_four')){
 					lib.card.list=lib.cardsFour;
 					game.fixedPile=true;
@@ -86,6 +87,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							case 'jiu':lib.card.list[i][2]='xionghuangjiu';break;
 							case 'wuzhong':lib.card.list[i][2]='tongzhougongji';break;
 							case 'wugu':case 'taoyuan':lib.card.list[i][2]='lizhengshangyou';break;
+						}
+					}
+				}
+				else if(_status.mode=='guandu'){
+					for(var i=0;i<lib.card.list.length;i++){
+						switch(lib.card.list[i][2]){
+							case 'wugu':lib.card.list[i][2]='tunliang';break;
+							case 'nanman':lib.card.list[i][2]='lulitongxin';break;
+							case 'taoyuan':case 'shandian':lib.card.list[i][2]='yuanjun';break;
+							case 'muniu':lib.card.list.splice(i--,1);break;
 						}
 					}
 				}
@@ -157,6 +168,38 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				else{
 					game.randomMapOL();
 				}
+			}
+			else if(_status.mode=='guandu'){
+				var list=[
+					['zhu','ezhu','ezhong','zhong','ezhong','zhong','zhong','ezhong'],
+					['zhu','ezhong','zhong','ezhu','ezhong','zhong','ezhong','zhong'],
+					['zhu','ezhong','zhong','ezhong','zhong','ezhong','zhong','ezhu'],
+					['zhu','ezhu','zhong','ezhong','zhong','ezhong','zhong','ezhong'],
+					['zhu','ezhong','zhong','ezhong','zhong','ezhu','zhong','ezhong'],
+				].randomGet();
+				
+				var side=true;
+				var num=Math.floor(Math.random()*8);
+				list=list.splice(8-num).concat(list);
+				_status.firstAct=game.players[num];
+				for(var i=0;i<8;i++){
+					if(list[i][0]=='e'){
+						game.players[i].side=side;
+						game.players[i].identity=list[i].slice(1);
+					}
+					else{
+						game.players[i].side=!side;
+						game.players[i].identity=list[i];
+					}
+					if(game.players[i].identity=='zhu'){
+						game[game.players[i].side+'Zhu']=game.players[i];
+						game.players[i].isZhu=true;
+					}
+					game.players[i].setIdentity(game.players[i].identity);
+					game.players[i].node.identity.dataset.color=get.translation(game.players[i].side+'Color');
+					game.players[i].getId();
+				}
+				game.chooseCharacterGuandu();
 			}
 			else if(_status.mode=='four'){
 				_status.fouralign=[0,1,2,3,4];
@@ -322,6 +365,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					});
 					game.phaseLoop(firstChoose);
 				}
+				else if(_status.mode=='guandu'){
+					game.gameDraw(_status.firstAct);
+					game.phaseLoop(_status.firstAct);
+				}
 				else if(_status.mode=='4v4'){
 					game.gameDraw(_status.firstAct,function(player){
 						if(player==_status.firstAct.previousSeat){
@@ -335,7 +382,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				event.finish();
 			}
 			else{
-				if(_status.mode=='two'){
+				if(_status.mode=='guandu'){
+					game.gameDraw(_status.firstAct,4);
+					game.phaseLoop(_status.firstAct);
+				}
+				else if(_status.mode=='two'){
 					_status.first_less=true;
 					_status.first_less_forced=true;
 					var firstChoose=_status.firstAct;
@@ -560,6 +611,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
  					case 'siguo':str2='同舟共济';break;
  					case 'jiange':str2='守卫剑阁';break;
  					case 'four':str2='对决 - 4v4';break;
+ 					case 'guandu':str2='官渡之战';break;
  					default:str2='对决 - '+lib.storage.number+'v'+lib.storage.number
  				}
 				}
@@ -2451,7 +2503,200 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					case '2v2':game.chooseCharacterOL2();break;
 					case '3v3':game.chooseCharacterOL3();break;
 					case '4v4':game.chooseCharacterOL4();break;
+					case 'guandu':game.chooseCharacterOLGuandu();break;
 				}
+			},
+			chooseCharacterOLGuandu:function(){
+				var next=game.createEvent('chooseCharacter',false);
+				next.setContent(function(){
+					"step 0"
+					var list=[
+ 					['zhu','ezhu','ezhong','zhong','ezhong','zhong','zhong','ezhong'],
+ 					['zhu','ezhong','zhong','ezhu','ezhong','zhong','ezhong','zhong'],
+ 					['zhu','ezhong','zhong','ezhong','zhong','ezhong','zhong','ezhu'],
+ 					['zhu','ezhu','zhong','ezhong','zhong','ezhong','zhong','ezhong'],
+ 					['zhu','ezhong','zhong','ezhong','zhong','ezhu','zhong','ezhong'],
+ 				].randomGet();
+				
+ 				var side=true;
+ 				var num=Math.floor(Math.random()*8);
+ 				list=list.splice(8-num).concat(list);
+ 				for(var i=0;i<8;i++){
+ 					if(list[i][0]=='e'){
+ 						game.players[i].side=side;
+ 						game.players[i].identity=list[i].slice(1);
+ 					}
+ 					else{
+ 						game.players[i].side=!side;
+ 						game.players[i].identity=list[i];
+ 					}
+ 					if(game.players[i].identity=='zhu'){
+ 						game[game.players[i].side+'Zhu']=game.players[i];
+ 						game.players[i].isZhu=true;
+ 					}
+ 					game.players[i].setIdentity(game.players[i].identity);
+ 					game.players[i].node.identity.dataset.color=get.translation(game.players[i].side+'Color');
+ 					game.players[i].getId();
+ 				}
+
+					var side=true;
+					var map={};
+					var num=Math.floor(Math.random()*8);
+					list=list.splice(8-num).concat(list);
+					for(var i=0;i<8;i++){
+						if(list[i][0]=='e'){
+							game.players[i].side=side;
+							game.players[i].identity=list[i].slice(1);
+						}
+						else{
+							game.players[i].side=!side;
+							game.players[i].identity=list[i];
+						}
+						map[game.players[i].playerid]=[game.players[i].side,game.players[i].identity];
+					}
+					var evt=['huoshaowuchao','liangcaokuifa','zhanyanliangzhuwenchou','shishengshibai'].randomGet();
+					game.addGlobalSkill(evt);
+					
+					var func=function(map,evt){
+						for(var i in map){
+							var player=lib.playerOL[i];
+							if(player){
+								player.side=map[i][0];
+								player.identity=map[i][1];
+								player.setIdentity();
+								player.node.identity.dataset.color=get.translation(player.side+'Color');
+								if(player.identity=='zhu'){
+									game[player.side+'Zhu']=player;
+									player.isZhu=true;
+								}
+							}
+						}
+ 					game.falseZhu.init('re_caocao');
+ 					game.trueZhu.init('ol_yuanshao');
+ 					game.trueZhu.hp++;
+ 					game.trueZhu.maxHp++;
+ 					game.falseZhu.hp++;
+ 					game.falseZhu.maxHp++;
+ 					game.trueZhu.update();
+ 					game.falseZhu.update();
+						ui.arena.classList.add('choose-character');
+						if(get.is.phoneLayout()){
+  					ui.guanduInfo=ui.create.div('.touchinfo.left',ui.window);
+  				}
+  				else{
+  					ui.guanduInfo=ui.create.div(ui.gameinfo);
+  				}
+  				ui.guanduInfo.innerHTML='当前事件：'+get.translation(evt);
+  				var dialog=ui.create.dialog('本局特殊事件：'+get.translation(evt));
+  				dialog.addText(get.translation(evt+'_info'),false);
+  				setTimeout(function(){
+  					dialog.close();
+  				},5000)
+					};
+					game.broadcastAll(func,map,evt);
+					_status.firstAct=game.falseZhu;
+					game.delay(0,5000);
+					"step 1"
+					event.falseList=['xunyu','xunyou','re_guojia','re_zhangliao','re_xuhuang','yujin_yujin','caohong','jsp_guanyu','liuye','litong','zangba','manchong','hanhaoshihuan','chengyu','caoren'].filter(function(name){
+						if(!Array.isArray(lib.character[name])) return false;
+						lib.character[name][1]='wei';
+						return true;
+					});
+					event.trueList=['xunchen','gaolan','sp_zhanghe','sp_xuyou','chenlin','re_liubei','yj_jushou','sp_shenpei','tianfeng','yuantanyuanshang','lvkuanglvxiang','xinpi','guotufengji','chunyuqiong'].filter(function(name){
+						if(!Array.isArray(lib.character[name])) return false;
+						lib.character[name][1]='qun';
+						return true;
+					});
+					game.broadcast(function(list1,list2){
+						while(list1.length){
+							lib.character[list1.shift()][1]='wei';
+						}
+						while(list2.length){
+							lib.character[list2.shift()][1]='qun';
+						}
+					},event.falseList,event.trueList);
+					event.map={};
+					var list=[];
+					game.countPlayer(function(current){
+						if(current.identity=='zhong'){
+							var choice=event[current.side+'List'].randomRemove(3);
+							event.map[current.playerid]=choice;
+							list.push([current,['请选择武将',[choice,'character']],true]);
+						}
+					});
+					game.me.chooseButtonOL(list,function(player,result){
+						if(game.online||player==game.me){
+							player.init(result.links[0]);
+						}
+					});
+					"step 2"
+					for(var i in result){
+						if(result[i]=='ai'){
+							result[i]=event.map[i].randomGet();
+						}
+						else result[i]=result[i].links[0];
+					}
+					game.broadcastAll(function(result){
+						for(var i in result){
+							lib.playerOL[i].init(result[i]);
+						}
+						setTimeout(function(){
+							ui.arena.classList.remove('choose-character');
+						},500);
+					},result);
+				});
+			},
+			chooseCharacterGuandu:function(){
+				var next=game.createEvent('chooseCharacter',false);
+				next.setContent(function(){
+					'step 0'
+					lib.init.onfree();
+					ui.arena.classList.add('choose-character');
+					game.falseZhu.init('re_caocao');
+					game.trueZhu.init('ol_yuanshao');
+					game.trueZhu.hp++;
+					game.trueZhu.maxHp++;
+					game.falseZhu.hp++;
+					game.falseZhu.maxHp++;
+					game.trueZhu.update();
+					game.falseZhu.update();
+					var evt=['huoshaowuchao','liangcaokuifa','zhanyanliangzhuwenchou','shishengshibai'].randomGet();
+					game.addGlobalSkill(evt);
+					game.broadcastAll(function(evt){
+						if(get.is.phoneLayout()){
+  					ui.guanduInfo=ui.create.div('.touchinfo.left',ui.window);
+  				}
+  				else{
+  					ui.guanduInfo=ui.create.div(ui.gameinfo);
+  				}
+  				ui.guanduInfo.innerHTML='当前事件：'+get.translation(evt);
+					},evt);
+					game.me.chooseControl('ok').set('prompt','###本局特殊事件：'+get.translation(evt)+'###'+get.translation(evt+'_info'));
+					'step 1'
+					event.falseList=['xunyu','xunyou','re_guojia','re_zhangliao','re_xuhuang','yujin_yujin','caohong','jsp_guanyu','liuye','litong','zangba','manchong','hanhaoshihuan','chengyu','caoren'].filter(function(name){
+						if(!Array.isArray(lib.character[name])) return false;
+						lib.character[name][1]='wei';
+						return true;
+					});
+					event.trueList=['xunchen','gaolan','sp_zhanghe','sp_xuyou','chenlin','re_liubei','yj_jushou','sp_shenpei','tianfeng','yuantanyuanshang','lvkuanglvxiang','xinpi','guotufengji','chunyuqiong'].filter(function(name){
+						if(!Array.isArray(lib.character[name])) return false;
+						lib.character[name][1]='qun';
+						return true;
+					});
+					'step 2'
+					if(game.me.identity!='zhu'){
+						event.choose_me=true;
+						game.me.chooseButton(['请选择你的武将牌',[event[game.me.side+'List'].randomRemove(3),'character']],true);
+					}
+					'step 3'
+					if(event.choose_me) game.me.init(result.links[0]);
+					game.countPlayer(function(current){
+						if(current!=game.me&&current.identity=='zhong') current.init(event[current.side+'List'].randomRemove(2)[0]);
+					});
+					setTimeout(function(){
+						ui.arena.classList.remove('choose-character');
+					},500);
+				});
 			},
 			chooseCharacterOL4:function(){
 				var next=game.createEvent('chooseCharacter',false);
@@ -3833,7 +4078,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			'panzhangmazhong','yufan','liufeng',
 			'yj_jushou','caifuren','guyong','zhoucang','sunluban',
 			'gongsunyuan','liuchen','xiahoushi','sunxiu',//'quancong',
-			'guotupangji',
+			'guotufengji',
 			'liyan',//'sundeng','cenhun','guohuanghou',
 			'caiyong','wuxian',//'xuecong',
 			'liuxie','yuejin','caoang','hetaihou','simalang','mayunlu','zhugejin','sp_machao','zhugeke','sp_caoren',
@@ -3975,8 +4220,100 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			tongzhougongji_info:'出牌阶段使用，选择一项：1.摸X张牌（X为你所在势力拥有的龙船至宝数）；2.你和队友各摸一张牌',
 			lizhengshangyou:'力争上游',
 			lizhengshangyou_info:'出牌阶段对所有角色使用，若目标角色的势力拥有龙船至宝，其回复1点体力，若目标角色的势力没有龙船至宝，其弃置一张牌',
+			tunliang:'屯粮',
+			tunliang_info:'出牌阶段，对至多三名角色使用。目标角色各摸一张牌。',
+			yuanjun:'援军',
+			yuanjun_info:'出牌阶段，对至多两名已受伤的角色使用。目标角色回复1点体力。',
+			huoshaowuchao:'火烧乌巢',
+			huoshaowuchao_info:'锁定技，本局游戏内造成的无属性伤害均视为火属性。',
+			liangcaokuifa:'粮草匮乏',
+			liangcaokuifa_info:'锁定技，所有角色摸牌阶段的额定摸牌数-1。当一名角色使用的牌结算完成后，若其因此牌造成了伤害，则其摸一张牌。',
+			zhanyanliangzhuwenchou:'斩颜良诛文丑',
+			zhanyanliangzhuwenchou_info:'锁定技，一名角色的回合开始时，其选择一项：视为使用一张不可被【无懈可击】响应的【决斗】，或失去1点体力。',
+			shishengshibai:'十胜十败',
+			shishengshibai_info:'锁定技，一名角色使用牌时，若此牌是整局游戏使用的第整十张牌且此牌不为延时锦囊牌或装备牌，则此牌所有目标角色再次成为此牌的目标角色。',
 		},
 		skill:{
+			huoshaowuchao:{
+				trigger:{global:'damageBefore'},
+				silent:true,
+				firstDo:true,
+				filter:function(event,player){
+					return !lib.linked.contains(event.nature);
+				},
+				content:function(){
+					trigger.nature='fire';
+				},
+			},
+			liangcaokuifa:{
+				trigger:{player:['useCardAfter','phaseDrawBegin']},
+				silent:true,
+				filter:function(event,player){
+					if(event.name=='phaseDraw') return true;
+					return player.getHistory('sourceDamage',function(evt){
+						return evt.card==event.card;
+					}).length>0;
+				},
+				content:function(){
+					if(trigger.name=='phaseDraw') trigger.num--;
+					else player.draw();
+				},
+			},
+			zhanyanliangzhuwenchou:{
+				trigger:{player:'phaseBegin'},
+				silent:true,
+				content:function(){
+					'step 0'
+					player.chooseUseTarget({
+						name:'juedou',
+						isCard:true,
+						storage:{nowuxie:true}
+					},
+					'选择一名角色，视为对其使用【决斗】','或点【取消】失去1点体力');
+					'step 1'
+					if(!result.bool) player.loseHp();
+				},
+			},
+			shishengshibai:{
+				mod:{
+					aiOrder:function(player,card,num){
+						if(_status.shishengshibai&&_status.shishengshibai%10==9){
+							if(['sha','tao','guohe','shunshou','tunliang','wuzhong','juedou','yuanjun'].contains(card.name)) return num+15;
+						}
+					},
+				},
+				trigger:{
+					player:['useCard1','useCardToTargeted'],
+				},
+				silent:true,
+				filter:function(event,player,name){
+					if(name=='useCard1') return true;
+					if(!event.parent.shishengshibai||event.targets.length!=event.parent.triggeredTargets4.length) return false;
+					if(!event.targets||!event.targets.length||['delay','equip'].contains(get.type(event.card))) return false;
+					return true;
+				},
+				content:function(){
+					if(event.triggername=='useCard1'){
+						if(!_status.shishengshibai) _status.shishengshibai=0;
+						_status.shishengshibai++;
+						game.broadcastAll(function(num){
+							if(ui.guanduInfo) ui.guanduInfo.innerHTML='当前事件：十胜十败（'+num+'）';
+						},_status.shishengshibai);
+						if(_status.shishengshibai%10==0) trigger.shishengshibai=true;
+					}
+					else{
+						trigger.getParent().targets=trigger.getParent().targets.concat(trigger.targets);
+						trigger.getParent().triggeredTargets4=trigger.getParent().triggeredTargets4.concat(trigger.targets);
+					}
+				},
+				ai:{
+					result:{
+						player:function(card,player,target){
+							if(_status.shishengshibai&&_status.shishengshibai%10==9&&card.name=='tiesuo') return 'zerotarget';
+						},
+					},
+				},
+			},
 			wenji:{
 				trigger:{global:'phaseUseBegin'},
 				filter:function(event,player){
@@ -5216,6 +5553,60 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		card:{
+			tunliang:{
+				audio:true,
+				fullskin:true,
+				type:'trick',
+				enable:true,
+				selectTarget:[1,3],
+				filterTarget:true,
+				content:function(){
+					target.draw();
+				},
+				ai:{
+					basic:{
+						order:7.2,
+						useful:4.5,
+						value:9.2
+					},
+					result:{
+						target:1,
+					},
+					tag:{
+						draw:1
+					}
+				}
+			},
+			yuanjun:{
+				fullskin:true,
+				type:'trick',
+				selectTarget:[1,2],
+				enable:true,
+				filterTarget:function(card,player,target){
+					return target!=player&&target.hp<target.maxHp;
+				},
+				content:function(){
+					target.recover();
+				},
+				ai:{
+					basic:{
+						order:function(card,player){
+							if(player.hasSkillTag('pretao')) return 5;
+							return 2;
+						},
+						useful:[6,4],
+						value:[6,4],
+					},
+					result:{
+						target:function(player,target){
+							return 2;
+						},
+					},
+					tag:{
+						recover:1,
+					}
+				}
+			},
 			zong:{
 				fullskin:true,
 				type:'basic',
@@ -5809,7 +6200,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return this;
 				},
 				dieAfter2:function(source){
-				if(_status.connectMode){
+					if(_status.connectMode&&_status.mode!='guandu'){
 						if(_status.mode=='1v1'||_status.mode=='3v3') return;
 						else if(_status.mode=='2v2'){
 							var friend;
@@ -5858,16 +6249,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else{
-						if(_status.mode=='four'){
+						if(_status.mode=='four'||_status.mode=='guandu'){
 							if(this.identity=='zhu') return;
 							else{
 								if(source){
 									if(source.side==this.side){
-										if(source.identity=='zhu'){
+										if(_status.mode=='guandu'||source.identity=='zhu'){
 											source.discard(source.getCards('he'));
 										}
 									}
 									else{
+										if(_status.mode=='guandu') return;
 										var num1=0,num2=1;
 										for(var i=0;i<game.players.length;i++){
 											if(game.players[i].side==source.side){
@@ -6022,11 +6414,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								game.over(this.side!=game.me.side);
 							}
 						}
-						else if(_status.mode=='4v4'){
+						else if(_status.mode=='4v4'||_status.mode=='guandu'){
 							if(this.identity=='zhu'){
 								game.over(this.side!=game.me.side);
 							}
 							else{
+								if(_status.mode=='guandu'&&source&&source.side!=this.side){
+									var hs=this.getCards('h');
+									if(hs.length) source.gain(hs,this,'giveAuto');
+								}
 								var side1=[],side2=[];
 								for(var i=0;i<game.players.length;i++){
 									if(game.players[i].side){
@@ -6047,11 +6443,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else{
-						if(_status.mode=='four'){
+						if(_status.mode=='four'||_status.mode=='guandu'){
 							if(this.identity=='zhu'){
 								game.over(this.side!=game.me.side);
 							}
 							else{
+								if(_status.mode=='guandu'&&source&&source.side!=this.side){
+									var hs=this.getCards('h');
+									if(hs.length) source.gain(hs,this,'giveAuto');
+								}
 								var side1=[],side2=[];
 								for(var i=0;i<game.players.length;i++){
 									if(game.players[i].side){
@@ -6225,10 +6625,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				if(from.side==to.side){
 					if(to.identity=='zhu'){
 						if(_status.connectMode){
-							if(_status.mode=='4v4') return 7;
+							if(_status.mode=='4v4'||_status.mode=='guandu') return 7;
 						}
 						else{
-							if(lib.storage.main_zhu||_status.mode=='four') return 7;
+							if(lib.storage.main_zhu||_status.mode=='four'||_status.mode=='guandu') return 7;
 						}
 					}
 					return 6;
@@ -6308,10 +6708,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						if(to.identity=='zhu'){
 							if(_status.connectMode){
-								if(_status.mode=='4v4') return -10;
+								if(_status.mode=='4v4'||_status.mode=='guandu') return -10;
 							}
 							else{
-								if(lib.storage.main_zhu||_status.mode=='four') return -10;
+								if(lib.storage.main_zhu||_status.mode=='four'||_status.mode=='guandu') return -10;
 							}
 						}
 						return -6;

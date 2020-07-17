@@ -245,21 +245,27 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				audio:true,
 				type:'trick',
 				enable:function(card,player){
+					if(get.mode()=='versus') return true;
 					return game.hasPlayer(function(current){
 						return current.isMajor();
 					});
 				},
-				mode:['guozhan'],
+				mode:['guozhan','versus'],
 				filterTarget:true,
 				chongzhu:true,
 				changeTarget:function(player,targets){
 					var target=targets[0];
 					game.filterPlayer(function(current){
+						if(get.mode()=='versus') return current.isFriendOf(target);
 						return current.isMajor()==target.isMajor()&&current!=target&&!current.hasSkill('diaohulishan');
 					},targets);
 				},
 				content:function(){
-					if(target.isLinked()){
+					if(get.mode()=='versus'){
+						if(target.isEnemyOf(player)) target.link(true);
+						else if(target.isLinked()) target.draw();
+					}
+					else if(target.isLinked()){
 						target.draw();
 					}
 					else{
@@ -275,6 +281,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						player:function(player,target){
+							if(get.mode()=='versus') return game.countPlayer(function(current){
+								if(target.isFriendOf(current)){
+									if(current.isFriendOf(player)&&current.isLinked()){
+										return get.attitude(player,target);
+									}
+									else if(current.isEnemyOf(player)&&!current.isLinked()){
+										return -get.attitude(player,target)*0.6;
+									}
+								}
+							});
 							return game.countPlayer(function(current){
 								if(target.isMajor()==current.isMajor()){
 									if(current.isLinked()){
@@ -1377,6 +1393,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			shuiyanqijunx_info:'出牌阶段，对一名装备区里有牌的其他角色使用。目标角色选择一项：1、弃置装备区里的所有牌；2、受到你造成的1点雷电伤害',
 			lulitongxin:'勠力同心',
 			lulitongxin_info:'出牌阶段，对所有大势力角色或所有小势力角色使用。若目标角色：不处于“连环状态”，其横置；处于“连环状态”，其摸一张牌',
+			lulitongxin_info_versus:'出牌阶段，对所有敌方角色或所有己方角色使用。若目标角色：为敌方角色且不处于“连环状态”，其横置；为己方角色且处于“连环状态”，其摸一张牌。',
 			lianjunshengyan:'联军盛宴',
 			lianjunshengyan_info:'出牌阶段，对你和你选择的除你的势力外的一个势力的所有角色。若目标角色：为你，你选择摸Y张牌并回复X-Y点体力（X为该势力的角色数，Y∈[0,X]）；不为你，其摸一张牌，然后重置。',
 			lianjunshengyan_info_boss:'出牌阶段，对场上所有角色使用。你摸X张牌（X为目存活角色数），其他角色依次选择回复1点体力或摸一张牌。',
