@@ -790,10 +790,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"drlt_yongsi":{
+				audio:2,
 				group:["drlt_yongsi_1","drlt_yongsi_2"],
 				subSkill:{
 					'1':{
-						audio:["yongsi1",2],
+						audio:"drlt_yongsi",
 						trigger:{
 							player:'phaseDrawBegin2'
 						},
@@ -806,7 +807,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					'2':{
-						audio:["yongsi2",2],
+						audio:"drlt_yongsi",
 						trigger:{
 							player:'phaseUseEnd'
 						},

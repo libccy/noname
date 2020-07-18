@@ -1527,7 +1527,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 1'
 					if(result.bool){
-						player.chooseTarget(lib.filter.notMe,true,'选择一名其他角色，对其造成1点雷属性伤害');
+						player.chooseTarget(lib.filter.notMe,true,'选择一名其他角色，对其造成1点雷属性伤害').set('',function(target){
+							var player=_status.event.player;
+							return get.damageEffect(target,player,player,'thunder');
+						});
 					}
 					else event.finish();
 					'step 2'
@@ -2532,7 +2535,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.chooseToUse({
 						cards:cards,
 						filterCard:function(card){
-							if(!_status.event.cards.contains(card)) return false;
+							if(get.itemtype(card)!='card'||!_status.event.cards||!_status.event.cards.contains(card)) return false;
 							return lib.filter.filterCard.apply(this,arguments);
 						},
 						prompt:'是否使用得到的牌中的一张？',
@@ -8887,7 +8890,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			haruka_shuangche:'双掣',
 			kanata_shuangche:'双掣',
 			haruka_shuangche_backup:'双掣',
-			haruka_shuangche_info:'出牌阶段，你可以视为使用任意基本牌或普通锦囊牌。此牌结算完成后，你选择一项：1.弃置X张牌。2.失去1点体力且本回合内不能再发动〖双掣〗。',
+			haruka_shuangche_info:'出牌阶段，你可以视为使用任意基本牌或普通锦囊牌。此牌结算完成后，你选择一项：1.弃置X张牌。2.失去1点体力且本回合内不能再发动〖双掣〗。（X为你于此回合内发动过〖双掣〗的次数）',
 			//你不能以此法使用【回魂】
 			saya_shouji:'授计',
 			saya_shouji_info:'每回合限一次，当你使用的牌结算完成后，你可以将此牌对应的所有实体牌交给一名其他角色。其可以使用这些牌中的一张，若如此做，你摸一张牌。',

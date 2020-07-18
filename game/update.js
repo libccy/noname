@@ -1,8 +1,10 @@
 window.noname_update={
-	version:'1.9.100.4',
-	update:'1.9.100.3.1',
+	version:'1.9.100.4.1',
+	update:'1.9.100.4',
 	changeLog:[
-		'きえええええええええ——！',
+		'官渡之战（对决->官渡）',
+		'邢道荣，新孙鲁育',
+		'bug修复',
 		
 	],
 	files:[

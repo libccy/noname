@@ -612,6 +612,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.cardsGotoSpecial(cards);
 						game.log(player,'将',cards,'置于了',target,'的武将牌上');
 					}
+					"step 4"
+					game.updateRoundNumber();
 				},
 				ai:{
 					order:10,

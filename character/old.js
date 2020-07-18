@@ -12,11 +12,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				old_yijiang4:["old_caozhen","old_chenqun","old_zhuhuan"],
 				old_yijiang5:["old_caoxiu","old_quancong","old_zhuzhi"],
 				old_yijiang67:["ol_xinxianying","ol_zhangrang","ol_liuyu"],
-				old_sp:["old_lingju","old_maliang","old_machao","zhangliang","jsp_caoren","ol_guansuo","old_zhangxingcai","old_huangfusong","ol_maliang","panfeng","old_wangyun"],
+				old_sp:["old_lingju","old_maliang","old_machao","zhangliang","jsp_caoren","ol_guansuo","old_zhangxingcai","old_huangfusong","ol_maliang","panfeng","old_wangyun","sunluyu"],
 				old_mobile:["old_caochun","old_majun"],
 			},
 		},
 		character:{
+			sunluyu:['female','wu',3,['new_meibu','new_mumu']],
 			pangde:['male','qun',4,['mashu','mengjin']],
 			ol_huaxiong:["male","qun",6,["new_reyaowu"]],
 			old_wangyun:['male','qun',4,['wylianji','moucheng']],

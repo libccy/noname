@@ -1736,22 +1736,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				filter:function(event,player){
 					if(get.mode()=='guozhan') return false;
-					return player.canUse('sha',event.target,false)&&player.hasSha();
+					return player.canUse('sha',event.target,false)&&(player.hasSha()||_status.connectMode&&player.countCards('h'));
 				},
 				content:function(){
 					"step 0"
-					if(player.hasSkill('jiu')){
-						game.broadcastAll(function(player){
-							player.removeSkill('jiu');
-						},player);
-						event.jiu=true;
-					}
-					player.chooseToUse(get.prompt('qinglong'),{name:'sha'},trigger.target,-1).set('addCount',false).logSkill='qinglong_skill';
-					"step 1"
-					if(result.bool);
-					else if(event.jiu){
-						player.addSkill('jiu');
-					}
+					player.chooseToUse(get.prompt('qinglong'),function(card,player,event){
+						if(get.name(card)!='sha') return false;
+						return lib.filter.filterCard.apply(this,arguments);
+					},trigger.target,-1).set('addCount',false).logSkill='qinglong_skill';
 				}
 			},
 			zhangba_skill:{
