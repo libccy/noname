@@ -2628,6 +2628,8 @@ window.noname_asset_list=[
 	'image/card/group_wu.png',
 	'image/card/group_qun.png',
 	'image/card/group_key.png',
+	'image/card/tunliang.png',
+	'image/card/yuanjun.png',
 
 	'image/card/bagua.png',
 	'image/card/baihupifeng.png',
@@ -3153,6 +3155,7 @@ window.noname_asset_list=[
 	'image/character/lvkuanglvxiang.jpg',
 	'image/character/re_sunluyu.jpg',
 	'image/character/sp_xuyou.jpg',
+	'image/character/xingdaorong.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
