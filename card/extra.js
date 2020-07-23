@@ -671,8 +671,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					check:function(button){
 						if(button.link.name=='du') return 10;
 						var player=_status.event.player;
-						if(player.getUseValue(button.link)>0) return get.order(button.link);
-						return -1;
+						//if(player.getUseValue(button.link)>0) return get.order(button.link);
+						//return -1;
+						return get.effect(player,button.link,player,player)>0?get.effect(player,button.link,player,player):-1;
 					},
 					backup:function(links,player){
 						return {
