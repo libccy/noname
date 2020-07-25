@@ -4911,6 +4911,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			bazhen:{
 				audio:2,
 				audioname:['re_sp_zhugeliang','ol_sp_zhugeliang','ol_pangtong'],
+				group:'bazhen_bagua',
+				locked:true,
+			},
+			bazhen_bagua:{
+				audio:'bazhen',
+				audioname:['re_sp_zhugeliang','ol_sp_zhugeliang','ol_pangtong'],
 				equipSkill:true,
 				noHidden:true,
 				inherit:'bagua_skill',

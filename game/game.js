@@ -10103,6 +10103,7 @@
 				cardsGotoSpecial:function(){
 					game.getGlobalHistory().cardMove.push(event);
 					for(var i=0;i<cards.length;i++){
+						cards[i].fix();
 						ui.special.appendChild(cards[i]);
 					}
 					if(event.notrigger!==true) event.trigger('addCardToStorage');
@@ -20406,6 +20407,25 @@
 						return history;
 					}
 				},
+				getLastHistory:function(key,filter,last){
+					var history=false;
+					for(var i=this.actionHistory.length-1;i>=0;i--){
+						if(this.actionHistory[i].isMe){
+							history=this.actionHistory[i];break;
+						}
+					}
+					if(!history) return null;
+					if(!key) return history;
+					if(!filter) return history[key];
+					else{
+						history=history.slice(0);
+						if(last) history=history.slice(0,history.indexOf(last)+1);
+						for(var i=0;i<history.length;i++){
+							if(!filter(history[i])) history.splice(i--,1);
+						}
+						return history;
+					}
+				},
 				getAllHistory:function(key,filter,last){
 					var list=[];
 					var all=this.actionHistory;
@@ -20435,6 +20455,17 @@
 				getStat:function(key){
 					if(!key) return this.stat[this.stat.length-1];
 					return this.stat[this.stat.length-1][key];
+				},
+				getLastStat:function(key){
+					var stat=false;
+					for(var i=this.stat.length-1;i>=0;i--){
+						if(this.stat[i].isMe){
+							stat=this.stat[i];break;
+						}
+					}
+					if(!stat) return null
+					if(!key) return stat;
+					return stat[key];
 				},
 				queue:function(time){
 					if(time==false){

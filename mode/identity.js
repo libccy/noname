@@ -1685,6 +1685,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					for(var i=0;i<game.players.length;i++){
 						_status.characterlist.remove(game.players[i].name);
+						_status.characterlist.remove(game.players[i].name1);
 						_status.characterlist.remove(game.players[i].name2);
 					}
 					"step 4"
@@ -2018,6 +2019,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					for(var i=0;i<game.players.length;i++){
 						_status.characterlist.remove(game.players[i].name);
+						_status.characterlist.remove(game.players[i].name1);
 						_status.characterlist.remove(game.players[i].name2);
 					}
 					setTimeout(function(){

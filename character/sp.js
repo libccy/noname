@@ -754,7 +754,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				audio:1,
-				logTarget:function(event){
+				logTarget:function(event,player){
 					if(event.name=='phaseDraw') return event.player;
 					return game.filterPlayer(function(current){
 						return current.isEnemyOf(player);
@@ -2641,6 +2641,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var name2=event.triggername;
 						for(var i=0;i<_status.characterlist.length;i++){
 							var name=_status.characterlist[i];
+							if(name.indexOf('zuoci')!=-1||name.indexOf('xushao')!=-1) continue;
 							var skills2=lib.character[name][3];
 							for(var j=0;j<skills2.length;j++){
 								if(player.storage.pingjian.contains(skills2[j])) continue;
@@ -2707,6 +2708,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						_status.characterlist.randomSort();
 						for(var i=0;i<_status.characterlist.length;i++){
 							var name=_status.characterlist[i];
+							if(name.indexOf('zuoci')!=-1||name.indexOf('xushao')!=-1) continue;
 							var skills2=lib.character[name][3];
 							for(var j=0;j<skills2.length;j++){
 								if(player.storage.pingjian.contains(skills2[j])) continue;
@@ -10208,24 +10210,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			linglong:{
 				audio:2,
-				inherit:'bagua_skill',
-				filter:function(event,player){
-					if(!lib.skill.bagua_skill.filter(event,player)) return false;
-					if(!player.isEmpty(2)) return false;
-					return true;
-				},
-				ai:{
-					respondShan:true,
-					effect:{
-						target:function(card,player,target){
-							if(player==target&&get.subtype(card)=='equip2'){
-								if(get.equipValue(card)<=7.5) return 0;
-							}
-							if(target.getEquip(2)) return;
-							return lib.skill.bagua_skill.ai.effect.target.apply(this,arguments);
-						}
-					}
-				},
+				group:'linglong_bagua',
 				mod:{
 					cardUsable:function(card,player,num){
 						if(card.name=='sha'&&!player.getEquip(1)) return num+1;
@@ -10248,6 +10233,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.position(card)=='e') return false;
 					},*/
 				}
+			},
+			linglong_bagua:{
+				audio:'linglong',
+				inherit:'bagua_skill',
+				filter:function(event,player){
+					if(!lib.skill.bagua_skill.filter(event,player)) return false;
+					if(!player.isEmpty(2)) return false;
+					return true;
+				},
+				ai:{
+					respondShan:true,
+					effect:{
+						target:function(card,player,target){
+							if(player==target&&get.subtype(card)=='equip2'){
+								if(get.equipValue(card)<=7.5) return 0;
+							}
+							if(target.getEquip(2)) return;
+							return lib.skill.bagua_skill.ai.effect.target.apply(this,arguments);
+						}
+					}
+				},
 			},
 			fenyong:{
 				audio:2,
@@ -11403,6 +11409,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.target.lose(result.links,ui.special,'toStorage');
 						player.storage.fentian=player.storage.fentian.concat(result.links);
 						player.syncStorage('fentian');
+						player.markSkill('fentian');
 					}
 					'step 3'
 					game.delayx();
@@ -19136,7 +19143,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gaolan:'高览',
 			xiying:'袭营',
 			xiying2:'袭营',
-			xiying_info:'出牌阶段开始时，你可以弃置一张牌，然后令所有其他角色依次选择一项：弃置一张牌，或本回合内不能使用或打出手牌。',
+			xiying_info:'出牌阶段开始时，你可以弃置一张非基本手牌，然后令所有其他角色依次选择一项：弃置一张牌，或本回合内不能使用或打出手牌。',
 			re_panfeng:'潘凤',
 			xinkuangfu:'狂斧',
 			xinkuangfu_info:'出牌阶段限一次，你可选择：1，弃置装备区里的一张牌，你使用无对应实体牌的普【杀】。若此【杀】造成伤害，你摸两张牌。2，弃置一名其他角色装备区里的一张牌，你使用无对应实体牌的普【杀】。若此【杀】未造成伤害，你弃置两张牌。',
