@@ -8629,13 +8629,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return target.hp<target.maxHp&&!target.tempSkills.dingpin2;
 				},
 				filterCard:function(card,player){
-					return !player.storage.dingpin.contains(get.type(card,'trick'));
+					return !player.storage.dingpin||!player.storage.dingpin.contains(get.type(card,'trick'));
 				},
 				check:function(card){
 					return 6-get.value(card);
 				},
 				content:function(){
 					"step 0"
+					if(!player.storage.dingpin) player.storage.dingpin=[];
 					player.storage.dingpin.push(get.type(cards[0],'trick'));
 					target.judge(function(card){
 						return get.color(card)=='black'?1:-1;
@@ -8664,10 +8665,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dingpin3:{
 				trigger:{player:'useCard'},
 				silent:true,
-				content:function(){if(player.storage.dingpin)player.storage.dingpin.add(get.type(trigger.card,'trick'))},
+				content:function(){
+					if(!player.storage.dingpin) player.storage.dingpin=[];
+					player.storage.dingpin.add(get.type(trigger.card,'trick'))
+				},
 			},
 			dingpin4:{
-				trigger:{player:'phaseUseBefore'},
+				trigger:{player:'phaseBefore'},
 				silent:true,
 				content:function(){player.storage.dingpin=[]},
 			},
@@ -10156,7 +10160,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							if(cards.length){
 								player.chooseButton(['落英：选择要获得的牌',cards],[1,cards.length]).set('ai',function(button){
-									return get.value(button.link,player,'raw');
+									return get.value(button.link,_status.event.player,'raw');
 								});
 							}
 							"step 2"
@@ -10171,9 +10175,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'cardsDiscardAfter'},
 						//frequent:'check',
 						direct:true,
-						check:function(event,player){
-							return event.cards[0].name!='du';
-						},
 						filter:function(event,player){
 							var evt=event.getParent().relatedEvent;
 							if(!evt||evt.name!='judge') return;
@@ -10184,7 +10185,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							"step 0"
 							player.chooseButton(['落英：选择要获得的牌',trigger.cards],[1,trigger.cards.length]).set('ai',function(button){
-								return get.value(button.link,player,'raw');
+								return get.value(button.link,_status.event.player,'raw');
 							});
 							"step 1"
 							if(result.bool){

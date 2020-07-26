@@ -1025,7 +1025,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							if(cards.length){
 								player.chooseButton(['落英：选择要获得的牌',cards],[1,cards.length]).set('ai',function(button){
-									return get.value(button.link,player,'raw');
+									return get.value(button.link,_status.event.player,'raw');
 								});
 							}
 							"step 2"
@@ -1039,9 +1039,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:'reluoying',
 						trigger:{global:'cardsDiscardAfter'},
 						direct:true,
-						check:function(event,player){
-							return event.cards[0].name!='du';
-						},
 						filter:function(event,player){
 							var evt=event.getParent().relatedEvent;
 							if(!evt||evt.name!='judge') return;
@@ -1052,7 +1049,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							"step 0"
 							player.chooseButton(['落英：选择要获得的牌',trigger.cards],[1,trigger.cards.length]).set('ai',function(button){
-								return get.value(button.link,player,'raw');
+								return get.value(button.link,_status.event.player,'raw');
 							});
 							"step 1"
 							if(result.bool){
@@ -2426,7 +2423,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					//if(name=='phaseBegin'&&game.phaseNumber==1) return false;
 					return player.storage.rehuashen&&player.storage.rehuashen.character.length>0;
 				},
-				banned:['lisu','sp_xiahoudun'],
+				banned:['lisu','sp_xiahoudun','xushao'],
 				addHuashen:function(player){
 					if(!player.storage.rehuashen) return;
 					if(!_status.characterlist){
@@ -4525,6 +4522,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			rejizhi:{
 				audio:2,
+				audioname:['lukang'],
 				locked:false,
 				trigger:{player:'useCard'},
 				frequent:true,
