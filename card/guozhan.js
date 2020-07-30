@@ -1168,7 +1168,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var cards=[];
 					for(var i=0;i<trigger.cards.length;i++){
-						if(trigger.cards[i].name=='chiling'&&get.position(trigger.cards[i])=='d'){
+						if(trigger.cards[i].name=='chiling'&&get.position(trigger.cards[i],true)=='d'){
 							cards.push(trigger.cards[i]);
 						}
 					}
@@ -1176,7 +1176,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						game.cardsGotoSpecial(cards);
 						game.log(cards,'已被移出游戏');
 						_status.chiling=true;
-						player.popup('敕令');
+						if(player&&player.popup) player.popup('敕令');
 					}
 				},
 			},

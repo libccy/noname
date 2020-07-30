@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.100.4.1',
+	'v1.9.100.5',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -579,6 +579,7 @@ window.noname_asset_list=[
 	'audio/die/sp_xuyou.mp3',
 	'audio/die/xingdaorong.mp3',
 	'audio/die/yl_yuanshu.mp3',
+	'audio/die/ol_pangde.mp3',
 	
 	'audio/skill/anguo1.mp3',
 	'audio/skill/anguo2.mp3',
@@ -2569,6 +2570,10 @@ window.noname_asset_list=[
 	'audio/skill/sushou2.mp3',
 	'audio/skill/xuxie1.mp3',
 	'audio/skill/xuxie2.mp3',
+	'audio/skill/rejianchu1.mp3',
+	'audio/skill/rejianchu2.mp3',
+	'audio/skill/rejizhi_lukang1.mp3',
+	'audio/skill/rejizhi_lukang2.mp3',
 	
 	'font/huangcao.ttf',
 	'font/shousha.ttf',
@@ -2630,6 +2635,7 @@ window.noname_asset_list=[
 	'image/card/group_key.png',
 	'image/card/tunliang.png',
 	'image/card/yuanjun.png',
+	'image/card/kamome_suitcase.png',
 
 	'image/card/bagua.png',
 	'image/card/baihupifeng.png',
@@ -3156,6 +3162,10 @@ window.noname_asset_list=[
 	'image/character/re_sunluyu.jpg',
 	'image/character/sp_xuyou.jpg',
 	'image/character/xingdaorong.jpg',
+	'image/character/key_kamome.jpg',
+	'image/character/key_kud.jpg',
+	'image/character/key_misuzu.jpg',
+	'image/character/key_nao.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',

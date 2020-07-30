@@ -2555,6 +2555,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			boss_tiemian:{
 				inherit:'renwang_skill',
+				priority:-0.3,
+				equipSkill:false,
 				filter:function(event,player){
 					if(!player.isEmpty(2)) return false;
 					return lib.skill.renwang_skill.filter.apply(this,arguments);
@@ -2562,6 +2564,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			boss_zhadao:{
 				inherit:'qinggang_skill',
+				equipSkill:false,
 			},
 			boss_zhuxin:{
 				trigger:{player:'die'},
