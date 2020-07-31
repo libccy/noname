@@ -1512,6 +1512,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
  					});
  					if(ts>0&&ts>damaged) return 0;
 					}
+					var has_sha_target = false;
+					for (var i=0;i<game.players.length;i++){
+						if (player.inRange(game.players[i])){
+							has_sha_target = true;
+							break;
+						}
+					}
+					if (!has_sha_target&&player.maxHp==player.hp) return 0;
 					if(card.name=='shan') return 15;
 					if(card.name=='tao') return 10;
 					return 9-get.value(card);

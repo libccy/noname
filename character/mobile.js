@@ -4394,7 +4394,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.chooseCard('he','是否交给'+get.translation(player)+'一张牌？',
 							player.storage.choulve?('若如此做，视为'+get.translation(player)+
 							'使用【'+get.translation(player.storage.choulve)+'】'):null).set('ai',function(card){
-							if(_status.event.goon) return 7-get.value(card);
+							if(_status.event.goon&&player.storage.choulve) return 7-get.value(card);
 							return 0;
 						}).set('goon',get.attitude(target,player)>1);
 						event.target=target;

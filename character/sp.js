@@ -4672,7 +4672,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var prompt='即将失去'+get.translation(trigger.result.cards)+'，是否发动【挽危】？';
 					var next=player.choosePlayerCard(player,prompt,trigger.position);
 					next.set('ai',function(button){
-						return 20-get.value(button.link);
+						//return 20-get.value(button.link);
+						return get.effect(player,button.link,player,player)<0?20-get.effect(player,button.link,player,player):20-get.value(button.link);
 					});
 					next.filterButton=trigger.filterButton;
 					next.selectButton=trigger.result.cards.length;
