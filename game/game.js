@@ -6013,6 +6013,11 @@
 						init:true,
 						frequent:true
 					},
+					liangjunduilei:{
+						name:'两军对垒',
+						init:true,
+						frequent:true
+					},
 					scene:{
 						name:'创建场景',
 						init:true,

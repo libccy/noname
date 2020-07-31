@@ -2431,6 +2431,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
    					setTimeout(function(){
    						ui.arena.classList.remove('choose-character');
    					},500);
+   					if(get.config('two_phaseswap')){
+   						game.addGlobalSkill('autoswap');
+   						if(lib.config.show_handcardbutton){
+   							ui.versushs=ui.create.system('手牌',null,true);
+   							lib.setPopped(ui.versushs,game.versusHoverHandcards,220);
+   						}
+   					}
    				});
    			};
 					}
@@ -2757,6 +2764,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
    					setTimeout(function(){
    						ui.arena.classList.remove('choose-character');
    					},500);
+   					if(get.config('two_phaseswap')){
+   						game.addGlobalSkill('autoswap');
+   						if(lib.config.show_handcardbutton){
+   							ui.versushs=ui.create.system('手牌',null,true);
+   							lib.setPopped(ui.versushs,game.versusHoverHandcards,220);
+   						}
+   					}
    				});
    			};
 					}
