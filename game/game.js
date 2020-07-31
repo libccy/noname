@@ -13437,7 +13437,7 @@
 									if(current!=target&&get.attitude(player,current)>0){
 										var es=target.getCards('e');
 										for(var i=0;i<es.length;i++){
-											if(get.value(es[i],target)>0&&current.isEmpty(get.subtype(es[i]))&&get.value(es[i],current)>0) return true;
+											if(get.value(es[i],target)>0&&current.isEmpty(get.subtype(es[i]))&&get.effect(current,es[i],player,current)>0) return true;
 										}
 									}
 								})){
@@ -13452,7 +13452,7 @@
 						for(i=0;i<es.length;i++){
 							if(sgnatt!=0&&att2!=0&&
 								get.sgn(get.value(es[i],ui.selected.targets[0]))==-att2&&
-								get.sgn(get.value(es[i],target))==sgnatt&&
+								get.sgn(get.effect(target,es[i],player,target))==sgnatt&&
 								target.isEmpty(get.subtype(es[i]))){
 								return Math.abs(att);
 							}
@@ -13488,12 +13488,12 @@
 							var targets1=_status.event.targets1;
 							if(get.attitude(player,targets0)>0&&get.attitude(player,targets1)<0){
 								if(get.position(button.link)=='j') return 12;
-								if(get.value(button.link,targets0)<0) return 10;
+								if(get.value(button.link,targets0)<0&&get.effect(targets1,button.link,player,targets1)>0) return 10;
 								return 0;
 							}
 							else{
 								if(get.position(button.link)=='j') return -10;
-								return get.equipValue(button.link);
+								return get.equipValue(button.link)*get.effect(targets1,button.link,player,targets1);
 							}
 						},targets[0]).set('nojudge',event.nojudge||false).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
 							var targets1=_status.event.targets1;
@@ -18132,7 +18132,7 @@
 									if(withatt){
 										if(get.sgn(get.value(es[i],current))!=-att) return false;
 										var att2=get.sgn(get.attitude(player,current2));
-										if(att2!=get.sgn(get.value(es[i],current2))) return false;
+										if(att2!=get.sgn(get.effect(current2,es[i],player,current2))) return false;
 									}
 									return current!=current2&&!current2.isMin()&&current2.isEmpty(get.subtype(es[i]));
 								})){
@@ -32446,7 +32446,7 @@
 			var skills=arguments[arguments.length-1];
 			if(skills.getSkills){
 				if(name!='cardname') skills=skills.getSkills();
-				else skills=skills.getSkills(true,false);
+				else skills=skills.getSkills(null,false);
 			}
 			skills=skills.concat(lib.skill.global);
 			game.expandSkills(skills);
@@ -40286,7 +40286,8 @@
 								}
 							}
 							else if(text2.value.indexOf('无天使')!=-1&&(text2.value.indexOf('无神佛')!=-1||text2.value.indexOf('无神')!=-1&&text2.value.indexOf('无佛')!=-1)){
-								game.print('Welcome to Shinda Sekai Sensen!');
+								game.print('密码正确！欢迎来到死后世界战线！');
+								_status.keyVerified=true;
 								text2.value='';
 							}
 							else{

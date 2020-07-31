@@ -653,6 +653,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return true;
 					},
 					check:function(button){
+						if(_status.event.getParent().type!='phase') return 1;
 						if(button.link.name=='du') return 10;
 						var player=_status.event.player;
 						if(player.getUseValue(button.link)>0) return get.order(button.link);
@@ -660,7 +661,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					backup:function(links,player){
 						return {
-							prompt:'选择'+get.translation(links)+'的目标',
 							filterCard:function(){return false},
 							selectCard:-1,
 							viewAs:links[0],
@@ -673,6 +673,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								player.updateMarks();
 							}
 						}
+					},
+					prompt:function(links){
+						return '选择'+get.translation(links)+'的目标';
 					},
 				},
 				ai:{

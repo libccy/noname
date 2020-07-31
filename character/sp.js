@@ -533,6 +533,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spshicai:{
 				audio:2,
 				enable:'phaseUse',
+				position:'he',
 				filter:function(event,player){
 					return !player.storage.spshicai2||!player.getCards('h').contains(player.storage.spshicai2);
 				},
@@ -800,7 +801,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 2'
 					if(player.countCards('h')&&game.hasPlayer(function(current){
-						return current!=target&&player.inRange(target);
+						return current!=target&&player.inRange(current);
 					})){
 						player.chooseCardTarget({
 							position:'h',
@@ -8594,6 +8595,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhanyi:{
 				enable:'phaseUse',
 				usable:1,
+				audio:2,
 				filterCard:true,
 				position:'he',
 				check:function(card){
@@ -10427,6 +10429,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zhenwei2:{
 				mark:true,
+				audio:false,
 				intro:{
 					content:'cards',
 					onunmark:function(storage,player){
@@ -13598,7 +13601,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							else{
 								player.draw(2);
-								player.storage.liangzhu=player;
+								if(!player.storage.liangzhu) player.storage.liangzhu=[];
+								player.storage.liangzhu.add(player);
 							}
 						}
 					}
@@ -17888,7 +17892,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"zhenyi_club":{
-				log:false,
+				audio:'xinfu_zhenyi',
 				enable:"chooseToUse",
 				filter:function (event,player){
 					if(!player.isDying()) return false;
@@ -17917,6 +17921,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{
 					source:"damageBegin1",
 				},
+				audio:'xinfu_zhenyi',
 				filter:function (event,player){
 					return player.hasMark('xinfu_falu_heart');
 				},
@@ -17933,17 +17938,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:"player",
 				content:function (){
-						"step 0"
-						player.removeMark('xinfu_falu_heart')
-						player.judge(function(card){
-							if(get.color(card)=='black') return 4;
-							return -1;
-						});
-						"step 1"
-						if(result.bool==true){
-							trigger.num++;
-						}
-					},
+					"step 0"
+					player.removeMark('xinfu_falu_heart')
+					player.judge(function(card){
+						if(get.color(card)=='black') return 4;
+						return -1;
+					});
+					"step 1"
+					if(result.bool==true){
+						trigger.num++;
+					}
+				},
 			},
 			"xinfu_zhennan":{
 				audio:2,
