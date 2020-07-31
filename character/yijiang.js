@@ -5767,6 +5767,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove:true,
 			},
 			zhongyong:{
+				audio:2,
 				trigger:{player:'shaMiss'},
 				direct:true,
 				filter:function(event,player){
@@ -5885,6 +5886,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			longyin:{
+				audio:2,
 				shaRelated:true,
 				trigger:{global:'useCard'},
 				direct:true,
@@ -5898,6 +5900,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.color(trigger.card)=='red'){
 							go=true;
 						}
+						else if(trigger.addCount===false) go=false;
 						else if(!trigger.player.hasSkill('paoxiao')&&
 							!trigger.player.hasSkill('tanlin3')&&
 							!trigger.player.hasSkill('zhaxiang2')&&
@@ -5939,7 +5942,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.set('go',go);
 					'step 1'
 					if(result.bool){
-						trigger.player.getStat().card.sha--;
+						if(trigger.addCount!==false){
+							trigger.addCount=false;
+							trigger.player.getStat().card.sha--;
+						}
 						if(get.color(trigger.card)=='red'){
 							player.draw();
 						}
@@ -10323,7 +10329,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseDrawBegin2'},
 				check:function(event,player){
-					return player.countCards('h')<=player.maxHp||player.skipList.contains('phaseUse');
+					return player.countCards('h')<=(player.hasSkill('zongshi')?player.maxHp:(player.hp-2))||player.skipList.contains('phaseUse');
 				},
 				filter:function(event,player){
 					return !event.numFixed;

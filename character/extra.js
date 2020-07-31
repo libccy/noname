@@ -2906,11 +2906,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					event.list1=[];
 					event.list2=[];
-					if(target.countCards('h')>0){
-						var chooseButton=player.chooseButton(4,'hidden',['你的手牌',player.getCards('h'),get.translation(target.name)+'的手牌',target.getCards('h'),'hidden']);
+					if(player.countCards('h')>0){
+						var chooseButton=player.chooseButton(4,['你的手牌',player.getCards('h'),get.translation(target.name)+'的手牌',target.getCards('h')]);
 					}
 					else{
-						var chooseButton=player.chooseButton(4,'hidden',['你的手牌',player.getCards('h'),'hidden']);
+						var chooseButton=player.chooseButton(4,[get.translation(target.name)+'的手牌',target.getCards('h')]);
 					}
 					chooseButton.set('target',target);
 					chooseButton.set('ai',function(button){

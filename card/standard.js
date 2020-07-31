@@ -2075,7 +2075,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 										if(typeof aiii=='number') return aiii;
 									}
 									if(Math.abs(get.attitude(_status.event.player,source))<3) return 0;
-									if(source.hasSkillTag('guanxing')&&(source!=player||!source.hasSkill('guanxing_fail'))) return 0;
+									if(source.hasSkillTag('nowuxie_judge')||source.hasSkillTag('guanxing')&&(source!=player||!source.hasSkill('guanxing_fail'))) return 0;
 									if(name!='lebu'&&name!='bingliang'){
 										if(source!=_status.event.player){
 											return 0;

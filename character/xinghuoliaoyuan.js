@@ -649,6 +649,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					});
+					next.set('complexSelect',true);
 					'step 1'
 					if(result.bool){
 						player.logSkill('xinfu_fangtong');
