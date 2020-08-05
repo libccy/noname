@@ -616,8 +616,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							for (var i=0;i<friend_list.length;i++){
 								var treasure=friend_list[i].getEquip(5)
 								if (friend_list[i].getCards('e').length==1&&treasure){
-									if (treasure.name=='muniu'&&treasure.cards.length>0) do_not_use=true;
-									if (friend_list[i].getCards('h').length>0&&_status.jinhe&&_status.jinhe[treasure.cardid]) do_not_use=true;
+									if (treasure.name=='muniu'&&treasure.cards.length>0){
+										do_not_use=true;
+										break;
+									}
+									if (friend_list[i].getCards('h').length>0&&_status.jinhe&&_status.jinhe[treasure.cardid]){
+										do_not_use=true;
+										break;
+									}
 								}
 							}
 							if (do_not_use) return 0;
