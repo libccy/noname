@@ -472,6 +472,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		card:{
+ 		niaobaidaowenha:{
+ 			type:'equip',
+ 			subtype:'equip5',
+ 			skills:['niaobaidaowenha_skill'],
+				modeimage:'boss',
+				ai:{
+					basic:{
+						equipValue:7.5,
+					},
+				},
+				fullskin:true,
+ 		},
  		goujiangdesidai:{
  			type:'equip',
  			subtype:'equip1',
@@ -1592,7 +1604,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return name;
 					}
 					else{
-						var arr=['shen_caocao','shen_simayi','shen_guanyu','shen_zhugeliang','shen_zhaoyun','shen_zhouyu','shen_lvmeng','shen_lvbu'];
+						var arr=['shen_caocao','shen_simayi','shen_guanyu','shen_zhugeliang','shen_zhaoyun','shen_zhouyu','shen_lvmeng','shen_lvbu','shen_liubei','shen_luxun','shen_ganning','ol_zhangliao','shen_zhenji','shen_caopi','key_kagari','key_shiki'];
 						arr.removeArray(list);
 						return arr.randomGet();
 					}
@@ -1641,7 +1653,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							game.check();
 						});
 						control.backup1=ui.create.div('.buttons');
-						control.backup2=ui.create.buttons(['shen_caocao','shen_simayi','shen_guanyu','shen_zhugeliang','shen_zhaoyun','shen_zhouyu','shen_lvmeng','shen_lvbu','shen_liubei','shen_luxun','shen_ganning','ol_zhangliao','shen_zhenji','shen_caopi'],'character',control.backup1);
+						control.backup2=ui.create.buttons(['shen_caocao','shen_simayi','shen_guanyu','shen_zhugeliang','shen_zhaoyun','shen_zhouyu','shen_lvmeng','shen_lvbu','shen_liubei','shen_luxun','shen_ganning','ol_zhangliao','shen_zhenji','shen_caopi','key_kagari','key_shiki'],'character',control.backup1);
 						return control;
 					}
 				},
@@ -1734,6 +1746,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							case 'key_kagari':{
 								game.players[i].equip(game.createCard2('goujiangdesidai','heart',1));
 								lib.inpile.add('goujiangdesidai');
+								break;
+							}
+							case 'key_shiki':{
+								game.players[i].equip(game.createCard2('niaobaidaowenha','diamond',13));
+								lib.inpile.add('niaobaidaowenha');
 								break;
 							}
 						}
@@ -2018,6 +2035,27 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			niaobaidaowenha_skill:{
+				trigger:{player:'loseMaxHpAfter'},
+				direct:true,
+				content:function(){
+					'step 0'
+					event.count=trigger.num;
+					'step 1'
+					event.count--;
+					player.chooseTarget(get.prompt2('niaobaidaowenha_skill'),lib.filter.notMe).set('ai',function(target){
+						return get.attitude(_status.event.player,target)/(target.maxHp||1)
+					});
+					'step 2'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('niaobaidaowenha_skill',target);
+						target.gainMaxHp();
+						target.recover();
+						if(event.count) event.goto(1);
+					}
+				},
+			},
 			goujiangdesidai_skill:{
 				inherit:'kagari_zongsi',
 				filter:function(event,player){
@@ -9767,6 +9805,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			goujiangdesidai:'篝酱的丝带',
 			goujiangdesidai_info:'锁定技，若你未拥有技能【纵丝】，则你视为拥有技能【纵丝】；若你拥有技能【纵丝】，则你将此技能改为「出牌阶段限两次」',
 			goujiangdesidai_skill:'纵丝',
+			niaobaidaowenha:'鸟白岛文蛤',
+			niaobaidaowenha_skill:'鸟白岛文蛤',
+			niaobaidaowenha_info:'当你减少1点体力上限后，你可令一名其他角色增加1点体力上限并回复1点体力。',
+			niaobaidaowenha_skill_info:'当你减少1点体力上限后，你可令一名其他角色增加1点体力上限并回复1点体力。',
 
 			mode_boss_card_config:'挑战卡牌',
 			mode_boss_character_config:'挑战武将',

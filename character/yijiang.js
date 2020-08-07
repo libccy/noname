@@ -23,7 +23,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caochong:['male','wei',3,['chengxiang','renxin']],
 			xunyou:['male','wei',3,['qice','zhiyu']],
 			xin_xushu:['male','shu',3,['xinwuyan','xinjujian']],
-			xin_masu:['male','shu',3,['sanyao','zhiman']],
+			xin_masu:['male','shu',3,['olsanyao','rezhiman']],
 			xin_fazheng:['male','shu',3,['xinenyuan','xinxuanhuo'],['die_audio']],
 			zhuran:['male','wu',4,['danshou']],
 			xusheng:['male','wu',4,['xinpojun']],
@@ -8080,14 +8080,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					if(result.bool&&result.targets.length){
 						result.targets[0].storage.qianxi2=event.color;
-						result.targets[0].addSkill('qianxi2');
+						result.targets[0].addTempSkill('qianxi2');
 						player.line(result.targets,'green');
 						game.addVideo('storage',result.targets[0],['qianxi2',event.color]);
 					}
 				},
 			},
 			qianxi2:{
-				trigger:{global:'phaseAfter'},
+				//trigger:{global:'phaseAfter'},
 				forced:true,
 				mark:true,
 				audio:false,
@@ -8124,6 +8124,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return false;
 				},
+				filter:function(event,player){
+				 return player!=event.player;
+				},
 				logTarget:'player',
 				content:function(){
 					if(trigger.player.countGainableCards(player,'ej')){
@@ -8138,6 +8141,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				filterTarget:function(card,player,target){
 					return target.isMaxHp();
+				},
+				filter:function(event,player){
+					return player.countCards('he')>0;
 				},
 				check:function(card){return 7-get.value(card);},
 				position:'he',
@@ -8160,6 +8166,90 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:7
 				}
 			},
+			olsanyao:{
+				enable:'phaseUse',
+				audio:'sanyao',
+				filter:function(event,player){
+					return player.countCards('he')>0&&(!player.hasSkill('olsanyao0')||!player.hasSkill('olsanyao1'));
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						var list=[
+							'选择手牌数最多的一名角色',
+							'选择体力值最大的一名角色',
+						];
+						var choiceList=ui.create.dialog('散谣：请选择一项','forcebutton','hidden');
+						for(var i=0;i<list.length;i++){
+							var str='<div class="popup text" style="width:calc(100% - 10px);display:inline-block">';
+							var bool=lib.skill.olsanyao.chooseButton.filter({link:i},player);
+							if(!bool) str+='<div style="opacity:0.5">';
+							str+=list[i];
+							if(!bool) str+='</div>';
+							str+='</div>';
+							var next=choiceList.add(str);
+							next.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
+							next.firstChild.link=i;
+							for(var j in lib.element.button){
+								next[j]=lib.element.button[i];
+							}
+							choiceList.buttons.add(next.firstChild);
+						}
+						return choiceList;
+					},
+					filter:function(button,player){
+						return !player.hasSkill('olsanyao'+button.link);
+					},
+					check:function(button){
+						var player=_status.event.player;
+						if(game.hasPlayer(function(current){
+							return current[button.link?'isMaxHp':'isMaxHandcard']()&&get.effect(current,'sanyao',player,player)>0
+						})) return 1+button.link;
+						return 0;
+					},
+					backup:function(links){
+						return {
+							audio:'sanyao',
+							filterTarget:[
+								function(card,player,target){
+									var num=target.countCards('h',function(card){
+										return !ui.selected.cards.contains(card);
+									});
+									return !game.hasPlayer(function(current){
+										return current!=target&&current.countCards('h',function(card){
+											return !ui.selected.cards.contains(card);
+										})>num;
+									});
+								},
+								function(card,player,target){
+									return target.isMaxHp();
+								}
+							][links[0]],
+							index:links[0],
+							filterCard:true,
+							check:function(card){
+								return 7-get.value(card);
+							},
+							position:'he',
+							content:function(){
+								player.addTempSkill('olsanyao'+lib.skill[event.name].index)
+								target.damage('nocard');
+							},
+							ai:lib.skill.sanyao.ai,
+						}
+					},
+					prompt:function(){
+						return '请选择【散谣】的目标'
+					},
+				},
+				ai:{
+					order:7,
+					result:{
+						player:1,
+					},
+				},
+			},
+			olsanyao0:{},
+			olsanyao1:{},
 			rezhiman:{
 				audio:'zhiman',
 				audioname:['guansuo'],
@@ -11187,7 +11277,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var next=player.chooseCard(get.prompt2('yuce'));
 					next.set('ai',function(card){
 						if(get.type(card)=='basic') return 1;
-						return get.value(card);
+						return Math.abs(get.value(card))+1;
 					});
 					"step 1"
 					if(result.bool){
@@ -12204,6 +12294,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			paiyi:'排异',
 			paiyi_backup:'排异',
 			sanyao:'散谣',
+			olsanyao:'散谣',
+			olsanyao_backup:'散谣',
 			zhiman:'制蛮',
 			resanyao:'散谣',
 			rezhiman:'制蛮',
@@ -12227,6 +12319,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qianxi_info:'准备阶段，你可以摸一张牌，并弃置一张牌，然后令一名距离为1的角色不能使用或打出与你弃置的牌颜色相同的手牌直到回合结束。',
 			zhiman_info:'当你对一名其他角色造成伤害时，你可以防止此伤害，然后获得其装备区或判定区的一张牌。',
 			sanyao_info:'出牌阶段限一次，你可以弃置一张牌并指定一名体力值最多(或之一)的角色，你对其造成1点伤害。',
+			olsanyao_info:'出牌阶段每项各限一次，你可以弃置一张牌并指定一名体力值或手牌数最多(或之一)的角色，并对其造成1点伤害。',
 			rezhiman_info:'当你对一名其他角色造成伤害时，你可以防止此伤害，然后获得其区域内的一张牌。',
 			resanyao_info:'出牌阶段限一次，你可以弃置任意张牌并指定等量除你外体力值最多(或之一)的其他角色。你对这些角色依次造成1点伤害。',
 			paiyi_info:'出牌阶段限一次，你可以移去一张“权”并选择一名角色，令其摸两张牌，然后若其手牌数大于你，你对其造成1伤害。',

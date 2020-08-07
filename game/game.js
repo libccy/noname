@@ -12915,7 +12915,7 @@
 							if(hs.length){
 								event.dialog.addText('手牌区');
 								hs.randomSort();
-								if(event.visible||target.isUnderControl(true)){
+								if(event.visible||target.isUnderControl(true)||player.hasSkillTag('viewHandcard',null,target,true)){
 									event.dialog.add(hs);
 									directh=false;
 								}
@@ -13033,7 +13033,7 @@
 							if(hs.length){
 								event.dialog.addText('手牌区');
 								hs.randomSort();
-								if(event.visible||target.isUnderControl(true)){
+								if(event.visible||target.isUnderControl(true)||player.hasSkillTag('viewHandcard',null,target,true)){
 									event.dialog.add(hs);
 									directh=false;
 								}
@@ -13178,7 +13178,7 @@
 							if(hs.length){
 								event.dialog.addText('手牌区');
 								hs.randomSort();
-								if(event.visible||target.isUnderControl(true)){
+								if(event.visible||target.isUnderControl(true)||player.hasSkillTag('viewHandcard',null,target,true)){
 									event.dialog.add(hs);
 									directh=false;
 								}
@@ -15471,7 +15471,7 @@
  				},player,name,popname);
 					if(lib.animate.skill[name]) lib.animate.skill[name].apply(this,arguments);
 					else{
- 					if(popname!=name) this.popup(name,'water',false);
+ 					if(popname!=name) this.popup(popname,'water',false);
  					else this.popup(get.skillTranslation(name,this),'water',false);
 					}
 				},
@@ -16585,7 +16585,7 @@
 						if(str) game.log(this,'移去了',get.cnNumber(num),'个','#g【'+str+'】');
 					}
 					this.syncStorage(i);
-					this[this.storage[i]?'updateMark':'unmarkSkill'](i);
+					this[this.storage[i]?'markSkill':'unmarkSkill'](i);
 				},
 				addMark:function(i,num,log){
 					if(typeof num!='number'||!num) num=1;
@@ -16599,7 +16599,7 @@
 						if(str) game.log(this,'获得了',get.cnNumber(num),'个','#g【'+str+'】');
 					}
 					this.syncStorage(i);
-					this.updateMark(i);
+					this.markSkill(i);
 				},
 				countMark:function(i){
 					if(this.storage[i]==undefined) return 0;
@@ -26024,7 +26024,7 @@
 						}
 						ui.arena.setNumber(state.number);
 						_status.mode=state.mode;
-						lib.inpile=_state.inpile;
+						lib.inpile=state.inpile;
 						var pos=state.players[observe||game.onlineID].position;
 						for(var i in state.players){
 							var info=state.players[i];
@@ -26921,6 +26921,10 @@
 			if((!info.direct||directaudio)&&lib.config.background_speak&&
 				(!lib.skill.global.contains(skill)||lib.skill[skill].forceaudio)){
 				var audioname=skill;
+				if(info.audioname2&&info.audioname2[player.name]){
+					audioname=info.audioname2[player.name];
+					info=lib.skill[audioname];
+				}
 				var audioinfo=info.audio;
 				if(typeof audioinfo=='string'&&lib.skill[audioinfo]){
 					audioname=audioinfo;
@@ -42057,11 +42061,11 @@
 							if(num2<10){
 								num2='0'+num2.toString();
 							}
-							var num3=num-num1*3600-num2*60;
+							var num3=num-num1*3600-parseInt(num2)*60;
 							if(num3<10){
 								num3='0'+num3.toString();
 							}
-							ui.time3.innerHTML=num+':'+num2+':'+num3;
+							ui.time3.innerHTML=num1+':'+num2+':'+num3;
 						}
 						else{
 							var num1=Math.floor(num/60);
@@ -46094,6 +46098,10 @@
 					}
 					if(lib.config.background_speak&&e!=='init'){
 						var audioname=this.link;
+  				if(info.audioname2&&info.audioname2[playername]){
+  					audioname=info.audioname2[playername];
+  					info=lib.skill[audioname];
+  				}
 						var audioinfo=info.audio;
 						var that=this;
 						var getIndex=function(i){
@@ -49499,7 +49507,7 @@
 					uiintro.addText(get.colorspan(lib.characterTitle[node.name]));
 				}
 
-				if(node.isUnderControl()){
+				if(node.isUnderControl()||(game.me&&game.me.hasSkillTag('viewHandcard',null,node,true))){
 					var hs=node.getCards('h');
 					if(hs.length){
 						uiintro.add('<div class="text center">手牌</div>');

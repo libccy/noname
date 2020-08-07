@@ -2550,7 +2550,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
    							re_huangzhong:['male','shu',4,['yingjian','weikui','gzyinghun'],[]],
    							re_xiahouyuan:['male','wei',4,['benxi','yaowu','dujin','juesi'],[]],
    							zhanghe:['male','wei',4,['kaikang','xingshang','zhiheng'],[]],
-   							xin_fazheng:['male','shu',4,['zhanji','nzry_chenglve','yiji'],[]],
+   							xin_fazheng:['male','shu',4,['xinfu_zhanji','nzry_chenglve','yiji'],[]],
    						},
    						translate:{
    							re_huangzhong:'定军黄忠',

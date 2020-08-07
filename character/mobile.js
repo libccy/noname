@@ -285,6 +285,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		skill:{
 			//一 将 成 名
 			zhilve:{
+				audio:2,
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				content:function(){
@@ -350,6 +351,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xhzhiyan:{
 				enable:'phaseUse',
+				audio:2,
 				filter:function(event,player){
 					return player.countCards('h')!=player.maxHp;
 				},
@@ -4462,6 +4464,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinzhilve:{
 				enable:'phaseUse',
+				audio:'zhilve',
 				usable:1,
 				chooseButton:{
 					dialog:function(event,player){
@@ -4473,9 +4476,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<list.length;i++){
 							var str='<div class="popup text" style="width:calc(100% - 10px);display:inline-block">';
 							var bool=lib.skill.xinzhilve.chooseButton.filter({link:i},player);
-							if(i==0&&!bool) str+='<div style="opacity:0.5">';
+							if(!bool) str+='<div style="opacity:0.5">';
 							str+=list[i];
-							if(i==0&&!bool) str+='</div>';
+							if(!bool) str+='</div>';
 							str+='</div>';
 							var next=choiceList.add(str);
 							next.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
@@ -4512,6 +4515,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			xinzhilve_move:{
+				audio:'zhilve',
 				filterCard:function(){return false},
 				selectCard:-1,
 				delay:false,
@@ -4664,6 +4668,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			xinzhilve_use:{
+				audio:'zhilve',
 				filterCard:function(){return false},
 				selectCard:-1,
 				filterTarget:function(card,player,target){
@@ -4695,6 +4700,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			xinxhzhiyan:{
+				audio:'xhzhiyan',
 				enable:'phaseUse',
 				filter:function(event,player){
 					return player.countCards('h')!=player.maxHp&&!player.hasSkill('xinxhzhiyan_'+(player.countCards('h')>player.maxHp));
@@ -4736,7 +4742,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 0.5;
 					},
 					result:{
-						player:1,
+						player:function(player,target){
+							if(player.countCards('h')<player.maxHp) return 1;
+							return 0;
+						},
+						target:function(player,target){
+							if(player.countCards('h')>player.maxHp) return 1;
+							return 0;
+						},
 					},
 				},
 			},
@@ -4825,6 +4838,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gnjinfan:{
 				trigger:{player:'phaseDiscardBegin'},
 				direct:true,
+				audio:2,
 				filter:function(event,player){
 					var list=[];
 					player.getStorage('gnjinfan').filter(function(card){
@@ -4911,7 +4925,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
  						bool:true,
  						card:result.links[0],
  						cards:result.links.slice(0),
- 						skill:'gnjinfan3',
+ 						skill:'gnjinfan',
 						}
 						player.unmarkAuto('gnjinfan',result.links);
 					}
@@ -4952,6 +4966,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					backup:function(links,player){
 						return {
+							audio:'gnjinfan',
 							filterCard:function(){return false},
 							selectCard:-1,
 							viewAs:links[0],
@@ -5043,6 +5058,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			gnsheque:{
+				audio:2,
 				trigger:{global:'phaseZhunbeiBegin'},
 				direct:true,
 				filter:function(event,player){
