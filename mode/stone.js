@@ -357,7 +357,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(ui.deckcontrol){
 						ui.deckcontrol.show();
 						setTimeout(function(){
-							ui.deckcontrol.style.transition='';
+							if(ui.deckcontrol) ui.deckcontrol.style.transition='';
 						},500);
 					}
 				};

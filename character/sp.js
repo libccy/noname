@@ -107,7 +107,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_sunshangxiang:['female','shu',3,['liangzhu','fanxiang']],
 			caoang:['male','wei',4,['kaikang']],
 			sp_caoren:['male','wei',4,['weikui','lizhan']],
-			zhangbao:['male','qun',3,['zhoufu','yingbin']],
+			zhangbao:['male','qun',3,['rezhoufu','reyingbing']],
 			huangjinleishi:['female','qun',3,['fulu','fuji']],
 			maliang:['male','shu',3,['zishu','xinyingyuan']],
 			sp_pangtong:['male','qun',3,['xinmanjuan','zuixiang']],
@@ -5575,7 +5575,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				filter:function(event,player){
-					return (event.card.name=='sha'||get.type(event.card,'trick')=='trick')&&player.countCards('h')>0;
+					return (event.card.name=='sha'||get.type(event.card)=='trick')&&player.countCards('h')>0;
 				},
 				content:function(){
 					player.chooseToDiscard('h',true);
@@ -8342,6 +8342,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.addSkill(event.list);
 							player.popup(event.list[0]);
 							player.storage.zhuSkill_yjixi=event.list;
+							game.broadcastAll(function(list){
+ 							game.expandSkills(list);
+ 							for(var i of list){
+ 								var info=lib.skill[i];
+ 								if(!info) continue;
+ 								if(!info.audioname2) info.audioname2={};
+ 								info.audioname2.old_yuanshu='weidi';
+ 							}
+ 						},list);
 						}
 					}
 				},
@@ -9219,6 +9228,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					player.addAdditionalSkill('weidi',list);
 					player.storage.zhuSkill_weidi=list;
+					game.broadcastAll(function(list){
+						game.expandSkills(list);
+						for(var i of list){
+							var info=lib.skill[i];
+							if(!info) continue;
+							if(!info.audioname2) info.audioname2={};
+							info.audioname2.yuanshu='weidi';
+						}
+					},list);
 				}
 			},
 			zhenlue:{
@@ -13298,6 +13316,105 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('fenxun',result.targets);
 					}
 				}
+			},
+			rezhoufu:{
+				audio:'zhoufu',
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.countCards('he')>0;
+				},
+				filterCard:true,
+				filterTarget:function(card,player,target){
+					return target!=player&&!target.getStorage('rezhoufu2').length;
+				},
+				check:function(card){
+					return 6-get.value(card)
+				},
+				position:'he',
+				discard:false,
+				toStorage:true,
+				prepare:'give',
+				content:function(){
+					if(!target.storage.rezhoufu2_markcount) target.storage.rezhoufu2_markcount=0;
+					target.markAuto('rezhoufu2',cards);
+				},
+				ai:{
+					order:1,
+					result:{
+						target:-1,
+					},
+				},
+				group:['rezhoufu_judge','rezhoufu_losehp'],
+				subSkill:{
+					judge:{
+						audio:'zhoufu',
+						trigger:{global:'judgeBefore'},
+						forced:true,
+						filter:function(event,player){
+							return !event.directresult&&event.player.getStorage('rezhoufu2').length;
+						},
+						logTarget:'player',
+						content:function(){
+							var cards=[trigger.player.getStorage('rezhoufu2')[0]];
+							trigger.directresult=cards[0];
+							trigger.player.unmarkAuto('rezhoufu2',cards);
+						},
+					},
+					losehp:{
+						audio:'zhoufu',
+						trigger:{global:'phaseEnd'},
+						forced:true,
+						filter:function(event,player){
+							return event.player.hasSkill('rezhoufu3')&&event.player.isAlive();
+						},
+						logTarget:'player',
+						content:function(){
+							trigger.player.loseHp();
+						},
+					},
+				},
+			},
+			rezhoufu2:{
+				intro:{
+					content:'cards',
+					onunmark:function(storage,player){
+						if(storage&&storage.length){
+							player.$throw(storage,1000);
+							game.cardsDiscard(storage);
+							game.log(storage,'被置入了弃牌堆');
+							storage.length==0;
+						}
+						player.addTempSkill('rezhoufu3');
+						delete player.storage.rezhoufu2_markcount;
+					},
+				},
+			},
+			rezhoufu3:{},
+			reyingbing:{
+				audio:'yingbin',
+				trigger:{global:'useCard'},
+				forced:true,
+				filter:function(event,player){
+					var cards=event.player.getStorage('rezhoufu2');
+					return cards.length&&get.color(cards[0])==get.color(event.card);
+				},
+				logTarget:'player',
+				content:function(){
+					'step 0'
+					player.draw();
+					'step 1'
+					trigger.player.storage.rezhoufu2_markcount++;
+					if(trigger.player.storage.rezhoufu2_markcount>=2){
+						var cards=trigger.player.getStorage('rezhoufu2');
+						trigger.player.$throw(cards);
+						game.delayx();
+						player.gain(cards,'gain2','log');
+						cards.length=0;
+						trigger.player.unmarkSkill('rezhoufu2');
+					}
+					else trigger.player.markSkill('rezhoufu2');
+				},
 			},
 			zhoufu:{
 				audio:2,
@@ -18964,6 +19081,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhoufu2:'咒缚',
 			zhoufu3:'咒缚',
 			yingbin:'影兵',
+			reyingbing:'影兵',
+			rezhoufu:'咒缚',
+			rezhoufu2:'咒缚',
 			fenxun:'奋迅',
 			fenxun2:'奋迅',
 			spmengjin:'猛进',
@@ -19035,6 +19155,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldxiemu_info:'当你成为其他角色使用的黑色牌的目标后，你可以弃置一张【杀】，然后摸两张牌。',
 			spmengjin_info:'当你使用【杀】指定目标后，你可以弃置目标角色的一张牌。',
 			fenxun_info:'出牌阶段限一次，你可以弃置一张牌并选择一名其他角色，你于本回合内至其的距离视为1。',
+			rezhoufu_info:'出牌阶段限一次，你可以用一张牌对一名其他角色施“咒”。当有“咒”的角色判定时，将“咒”作为判定牌；一名角色的回合结束时，你令本回合移除过“咒”的角色各失去1点体力',
+			reyingbing_info:'锁定技，有“咒”的角色使用与“咒”颜色相同的牌时，你摸一张牌；若这是你第二次因该“咒”摸牌，你获得该"咒"。',
 			yingbin_info:'锁定技，有“咒”的角色使用与“咒”花色相同的牌时，你摸一张牌；当你因同一名角色的同一张“咒”的效果摸第二张牌时，移去该“咒”。',
 			zhoufu_info:'出牌阶段限一次，你可以将一张手牌置于一名没有“咒”的其他角色的武将牌旁，称为“咒”。当有“咒”的角色判定时，其改为将“咒”作为判定牌；一名角色的回合结束时，若有角色于此回合因判定而移除过“咒”，则你令这些角色各失去1点体力。',
 			yanzheng_info:'若你的手牌数大于你的体力值，则你可以将你装备区内的牌当作【无懈可击】使用。',

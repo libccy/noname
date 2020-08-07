@@ -15,7 +15,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_haruko:['female','key',4,['haruko_haofang','haruko_zhuishi']],
 			key_umi:['female','key',3,['umi_chaofan','umi_lunhui','umi_qihuan']],
 			key_umi2:['female','key',3,[],['unseen']],
-			key_kagari:['female','shen',3,['kagari_zongsi'],['key']],
 			key_rei:['male','key',4,['xiandeng','shulv','xisheng']],
 			key_komari:['female','key',3,['komari_tiankou','komari_xueshang']],
 			key_yukine:['female','key',3,['yukine_wenzhou']],
@@ -52,6 +51,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_kyoko:['female','key',3,['kyoko_juwu','kyoko_zhengyi']],
 			key_shizuru:['female','key',3,['shizuru_nianli','shizuru_benzhan']],
 			key_shiorimiyuki:['female','key',3,['shiorimiyuki_banyin','shiorimiyuki_tingxian']],
+			key_miki:['female','key',3,['miki_shenqiang','miki_huanmeng','miki_zhiluo']],
 			
 			key_kud:['female','key',3,['kud_qiaoshou','kud_buhui']],
 			key_misuzu:['female','key',3,['misuzu_hengzhou','misuzu_nongyin','misuzu_zhongxing']],
@@ -146,7 +146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				"ns_huangchengyan","ns_sunchensunjun","ns_yuanxi","ns_caoshuang"],
 				diy_tieba:["diy_wenyang","ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_zhangwei"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_kagari","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki"],
 				diy_yongjian:["ns_chendao","yj_caoang"],
 			},
 		},
@@ -162,6 +162,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
+			key_miki:'#bSummer Pockets',
 			key_shiorimiyuki:'#rAngel Beats!',
 			key_shizuru:'#bRewrite',
 			key_kyoko:'#bSummer Pockets',
@@ -196,7 +197,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_komari:'#bLittle Busters!',
 			key_umi:'#bSummer Pockets',
 			key_rei:'#gHarmonia',
-			key_kagari:'#bRewrite',
 			key_lucia:'#bRewrite',
 			key_kyousuke:'#bLittle Busters!',
 			key_yuri:'#rAngel Beats!',
@@ -259,6 +259,39 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			miki_hydrogladiator:{
+				fullskin:true,
+				type:'equip',
+				subtype:'equip1',
+				derivation:'key_miki',
+				skills:['miki_hydrogladiator_skill'],
+				distance:{
+					attackFrom:-5,
+				},
+				ai:{
+					equipValue:function(card){
+						return 7;
+					},
+					basic:{
+						equipValue:7
+					},
+				},
+			},
+			miki_binoculars:{
+				fullskin:true,
+				type:'equip',
+				subtype:'equip5',
+				derivation:'key_miki',
+				skills:['miki_binoculars'],
+				ai:{
+					equipValue:function(card){
+						return 7;
+					},
+					basic:{
+						equipValue:7
+					},
+				},
+			},
 		},
 		perfectPair:{
 			yuji:['zuoci'],
@@ -276,6 +309,116 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			miki_shenqiang:{
+				trigger:{
+					global:'gameDrawAfter',
+					player:'enterGame',
+				},
+				forced:true,
+				content:function(){
+					player.equip(game.createCard2('miki_hydrogladiator','club',6));
+					player.equip(game.createCard2('miki_binoculars','diamond',6));
+				},
+				mod:{
+					canBeDiscarded:function(card){
+						if(get.position(card)=='e'&&['equip1','equip5'].contains(get.subtype(card))) return false;
+					},
+				},
+			},
+			miki_huanmeng:{
+				inherit:'kamome_huanmeng',
+			},
+			miki_zhiluo:{
+				trigger:{global:'phaseEnd'},
+				filter:function(event,player){
+					return !event.player.countCards('e')&&player.inRange(event.player);
+				},
+				direct:true,
+				locked:true,
+				content:function(){
+					'step 0'
+					if(!player.canUse('sha',trigger.player,false)) event._result={index:0};
+					else player.chooseControl().set('prompt','制裸：请选择一项').set('choiceList',[
+						'摸一张牌',
+						'视为对'+get.translation(trigger.player)+'使用一张【杀】',
+					]).set('ai',function(){
+						if(get.effect(_status.event.getTrigger().player,{name:'sha'},_status.event.player)>0) return 1;
+						return 0;
+					});
+					'step 1'
+					if(result.index==0){
+						player.logSkill('miki_zhiluo');
+						player.draw();
+					}
+					else player.useCard({name:'sha',isCard:true},trigger.player,'miki_zhiluo');
+				},
+			},
+			miki_hydrogladiator_skill:{
+				trigger:{
+					source:'damageSource',
+				},
+				direct:true,
+				locked:true,
+				popup:'海德洛',
+				filter:function(event,player){
+					return event.getParent().name=='sha'&&game.hasPlayer(function(current){
+						return (current==event.player||current!=player&&get.distance(current,event.player)<=1)&&current.countDiscardableCards(player,'he')>0;
+					});
+				},
+				content:function(){
+					'step 0'
+					var list=[];
+					var choiceList=[];
+					if(trigger.player.countDiscardableCards(player,'he')>0){
+						list.push(true);
+						choiceList.push('弃置'+get.translation(trigger.player)+'的两张牌');
+					}
+					if(game.hasPlayer(function(current){
+						return current!=player&&get.distance(current,trigger.player)<=1;
+					})){
+						list.push(false);
+						choiceList.push('弃置所有至'+get.translation(trigger.player)+'距离为1的角色的各一张牌');
+					}
+					event.list=list;
+					if(list.length==1) event._result={index:0};
+					else{
+						player.chooseControl().set('choiceList',choiceList).set('prompt','海德洛格拉迪尔特·改').set('ai',function(){
+							var player=_status.event.player;
+							var source=_status.event.getTrigger().player;
+							var num=game.countPlayer(function(current){
+								if(current!=player&&get.distance(current,source)<=1&&current.countDiscardableCards(player,'he')>0) return -get.sgn(get.attitude(player,current));
+							});
+							if(num>Math.min(2,source.countDiscardableCards(player,'he'))) return 1;
+							return 0;
+						});
+					}
+					'step 1'
+					if(event.list[result.index]){
+						player.logSkill(['miki_hydrogladiator_skill','海德洛'],trigger.player);
+						player.discardPlayerCard(trigger.player,'he',2,true);
+						event.finish();
+					}
+					else{
+						event.targets=game.filterPlayer(function(current){
+							return current!=player&&get.distance(current,trigger.player)<=1;
+						}).sortBySeat();
+						player.logSkill(['miki_hydrogladiator_skill','海德洛'],event.targets);
+					}
+					'step 2'
+					var target=targets.shift();
+					if(target.countDiscardableCards(player,'he')>0) player.discardPlayerCard(target,'he',true);
+					if(targets.length) event.redo();
+				},
+			},
+			miki_binoculars:{
+				locked:true,
+				ai:{
+ 				viewHandcard:true,
+ 				skillTagFilter:function(player,tag,arg){
+ 					if(player==arg) return false;
+ 				},
+				},
+			},
 			kud_qiaoshou:{
 				enable:'phaseUse',
 				usable:1,
@@ -601,7 +744,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					if(trigger.name=='lose') player.draw(2*trigger.es.length);
-					else player.equip(game.createCard('kamome_suitcase','spade',1));
+					else player.equip(game.createCard2('kamome_suitcase','spade',1));
 				},
 				ai:{
 					noe:true,
@@ -4375,126 +4518,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			kagari_zongsi:{
-				enable:'phaseUse',
-				usable:1,
-				content:function(){
-					'step 0'
-					var controls=[];
-					if(ui.cardPile.hasChildNodes()) controls.push('选择牌堆中的一张牌');
-					if(ui.discardPile.hasChildNodes()) controls.push('选择弃牌堆中的一张牌');
-					if(game.hasPlayer(function(current){
-						return current.countCards('hej')>0;
-					})) controls.push('选择一名角色区域内的一张牌');
-					if(!controls.length){event.finish();return;}
-					event.controls=controls;
-					var next=player.chooseControl();
-					next.set('choiceList',controls)
-					next.set('prompt','请选择要移动的卡牌的来源');
-					next.ai=function(){return 0};
-					'step 1'
-					result.control=event.controls[result.index];
-					var list=['弃牌堆','牌堆','角色'];
-					for(var i=0;i<list.length;i++){
-						if(result.control.indexOf(list[i])!=-1){event.index=i;break;}
-					}
-					if(event.index==2){
-						player.chooseTarget('请选择要移动的卡牌的来源',true,function(card,kagari,target){
-							return target.countCards('hej')>0;
-						});
-					}
-					else{
-						var source=ui[event.index==0?'discardPile':'cardPile'].childNodes;
-						var list=[];
-						for(var i=0;i<source.length;i++) list.push(source[i]);
-						player.chooseButton(['请选择要移动的卡牌',list],true).ai=get.buttonValue;
-					}
-					'step 2'
-					if(event.index==2){
-						player.line(result.targets[0]);
-						event.target1=result.targets[0];
-						player.choosePlayerCard(result.targets[0],true,'hej').set('visible',true);
-					}
-					else{
-						event.card=result.links[0];
-					}
-					'step 3'
-					if(event.index==2) event.card=result.cards[0];
-					var controls=[
-						'将这张牌移动到牌堆的顶部或者底部',
-						'将这张牌移动到弃牌堆的顶部或者底部',
-						'将这张牌移动到一名角色对应的区域里',
-					];
-					event.controls=controls;
-					var next=player.chooseControl();
-					next.set('prompt','要对'+get.translation(event.card)+'做什么呢？');
-					next.set('choiceList',controls);
-					next.ai=function(){return 2};
-					'step 4'
-					result.control=event.controls[result.index];
-					var list=['弃牌堆','牌堆','角色'];
-					for(var i=0;i<list.length;i++){
-						if(result.control.indexOf(list[i])!=-1){event.index2=i;break;}
-					}
-					if(event.index2==2){
-						player.chooseTarget('要将'+get.translation(card)+'移动到哪一名角色的对应区域呢',true).ai=function(target){
-							return target==_status.event.player?1:0;
-						};
-					}
-					else{
-						player.chooseControl('顶部','底部').set('prompt','把'+get.translation(card)+'移动到'+(event.index2==0?'弃':'')+'牌堆的...');
-					}
-					'step 5'
-					if(event.index2!=2){
-						if(event.target1) event.target1.lose(card,ui.special);
-						else card.goto(ui.special);
-						event.way=result.control;
-					}
-					else{
-						event.target2=result.targets[0];
-						var list=['手牌区'];
-						if(lib.card[card.name].type=='equip'&&event.target2.isEmpty(lib.card[card.name].subtype)) list.push('装备区');
-						if(lib.card[card.name].type=='delay'&&!event.target2.storage._disableJudge&&!event.target2.hasJudge(card.name)) list.push('判定区');
-						if(list.length==1) event._result={control:list[0]};
-						else{
-							player.chooseControl(list).set('prompt','把'+get.translation(card)+'移动到'+get.translation(event.target2)+'的...').ai=function(){return 0};
-						}
-					}
-					'step 6'
-					if(event.index2!=2){
-						card.fix();
-						var node=ui[event.index==0?'discardPile':'cardPile'];
-						if(event.way=='底部') node.appendChild(card);
-						else node.insertBefore(card,node.firstChild);
-						game.updateRoundNumber();
-						event.finish();
-					}
-					else{
-						if(result.control=='手牌区'){
-							var next=event.target2.gain(card);
-							if(event.target1){
-								next.source=event.target1;
-								next.animate='giveAuto';
-							}
-							else next.animate='draw';
-						}
-						else if(result.control=='装备区'){
-							if(event.target1) event.target1.$give(card,event.target2);
-							event.target2.equip(card);
-						}
-						else{
-							if(event.target1) event.target1.$give(card,event.target2);
-							event.target2.addJudge(card);
-						}
-					}
-					'step 7'
-					game.updateRoundNumber();
-				},
-				ai:{
-					order:10,
-					result:{player:1},
-				},
-			},
 			haruko_haofang:{
 				mod:{
 					cardname:function(card,player,name){
@@ -5192,6 +5215,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				juexingji:true,
 				skillAnimation:true,
+				animationColor:'thunder',
 				filter:function(event,player){
 					return player.getStorage('nsjiquan_mark').length>4;
 				},
@@ -10006,7 +10030,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_kyousuke:'枣恭介',
 			key_yuri:'仲村由理',
 			key_haruko:'神尾晴子',
-			key_kagari:'篝',
 			key_umi:'加藤うみ',
 			key_umi2:'鹰原羽未',
 			key_rei:'零',
@@ -10049,6 +10072,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_shizuru:'中津静流',
 			key_shiorimiyuki:'关根诗织&入江美雪',
 			key_shiorimiyuki_ab:'关根入江',
+			key_miki:'野村美希',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -10066,8 +10090,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			haruko_haofang_info:'锁定技，你的延时锦囊牌视为【无中生有】。当你因执行【无中生有】的效果而摸牌时，你令摸牌数+2。',
 			haruko_zhuishi:'追逝',
 			haruko_zhuishi_info:'一名角色的判定阶段开始时，若其判定区内有牌，则你可以获得其判定区内的所有牌。若你的体力值大于1，你失去1点体力。',
-			kagari_zongsi:'纵丝',
-			kagari_zongsi_info:'出牌阶段限一次，你可以选择一张不在游戏外的牌，然后将其置于牌堆/弃牌堆的顶部/底部或一名角色的对应区域内。',
 			umi_chaofan:'炒饭',
 			umi_chaofan_info:'出牌阶段限一次，你可以弃置两张花色不同的手牌并选择一名其他角色。你摸一张牌，若你的体力值：大于2，目标角色回复1点体力；等于2，目标角色摸两张牌；小于2，目标角色受到1点无来源且对应渠道为这两张牌的火焰伤害。',
 			umi_lunhui:'轮回',
@@ -10267,6 +10289,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shiorimiyuki_tingxian:'铤险',
 			shiorimiyuki_tingxian_info:'出牌阶段开始时，你可以摸至多三张牌。若如此做，你回复1点体力，且此阶段结束时你失去X点体力。（X为你获得的牌中仍在手牌区的牌的数量）',
 			shiorimiyuki_tingxian2:'铤险',
+			miki_shenqiang:'神枪',
+			miki_shenqiang_info:'锁定技，游戏开始时，你将一张【海德洛格拉迪尔特·改】和一张【望远镜】置入你的装备区。你装备区内的武器牌和宝物牌不能被其他角色弃置。',
+			miki_huanmeng:'幻梦',
+			miki_huanmeng_info:'准备阶段开始时，你可以观看牌堆顶的X+1张牌并可以按任意顺序置于牌堆顶或牌堆底。（X为你装备区内的牌数）',
+			miki_zhiluo:'治裸',
+			miki_zhiluo_info:'锁定技，一名其他角色的回合结束时，若其在你的攻击范围内且其装备区内没有牌，则你选择：①摸一张牌。②视为对其使用一张【杀】。',
+			miki_hydrogladiator:'海德洛',
+			miki_hydrogladiator_info:'全名为【海德洛格拉迪尔特·改】。锁定技，当你因执行【杀】的效果而对目标角色造成伤害后，你弃置所有至目标角色距离为1的其他角色的一张牌或弃置其两张牌。',
+			miki_hydrogladiator_skill:'海德洛格拉迪尔特·改',
+			miki_binoculars:'望远镜',
+			miki_binoculars_info:'锁定技，其他角色的手牌对你可见。',
 			
 			key_kud:'库特莉亚芙卡',
 			kud_qiaoshou:'巧手',
