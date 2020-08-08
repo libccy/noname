@@ -53,16 +53,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseTarget(get.prompt2('shiki_omusubi'),lib.filter.notMe).set('ai',function(target){
 						var player=_status.event.player;
-						if(player.isHealthy()) return 0;
-						if(player.hp<3&&getDamagedHp()<2) return 0;
-						var list=[];
-						if(lib.character[target.name]) list.addArray(lib.character[target.name][3]);
-						if(lib.character[target.name1]) list.addArray(lib.character[target.name1][3]);
-						if(lib.character[target.name2]) list.addArray(lib.character[target.name2][3]);
-						list=list.filter(function(i){
-							return !player.hasSkill(i);
-						});
-						if(!list.length) return 0;
+							if(player.isHealthy()) return 0;
+							if(player.hp<3&&player.getDamagedHp()<2) return 0;
+							var list=[];
+							if(lib.character[target.name]) list.addArray(lib.character[target.name][3]);
+							if(lib.character[target.name1]) list.addArray(lib.character[target.name1][3]);
+							if(lib.character[target.name2]) list.addArray(lib.character[target.name2][3]);
+							list=list.filter(function(i){
+								return !player.hasSkill(i);
+							});
+							if(!list.length) return 0;
 						return 1+Math.random();
 					});
 					'step 1'
