@@ -1398,17 +1398,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					value:[5,1],
 					useful:[3,1],
 					result:{
-						player:function(player,target){
-							return game.countPlayer(function(current){
-								if(current.hasSkill('gw_qinpendayu')) return 0;
-								if(current==target||(get.distance(target,current,'pure')==1)){
-									var num=-get.sgn(get.attitude(player,current));
-									if(current.needsToDiscard()) return num;
-									if(current.needsToDiscard(1)) return 0.7*num;
-									if(current.needsToDiscard(2)) return 0.4*num;
-									return 0.1*num;
-								}
-							});
+						target:function(player,current){
+							if(current.hasSkill('gw_qinpendayu')) return 0;
+							if(current.needsToDiscard()) return -1;
+							if(current.needsToDiscard(1)) return -0.7;
+							if(current.needsToDiscard(2)) return -0.4;
+							return -0.1;
 						}
 					},
 					order:1.2,
@@ -1434,13 +1429,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					value:[5,1],
 					useful:[3,1],
 					result:{
-						player:function(player,target){
-							return game.countPlayer(function(current){
-								if(current.hasSkill('gw_birinongwu')) return 0;
-								if(current==target||(get.distance(target,current,'pure')==1)){
-									return -get.sgn(get.attitude(player,current));
-								}
-							});
+						player:function(player,current){
+							if(current.hasSkill('gw_birinongwu')) return 0;
+							return -1;
 						}
 					},
 					order:1.2,
@@ -1467,12 +1458,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					useful:[3,1],
 					result:{
 						player:function(player,target){
-							return game.countPlayer(function(current){
-								if(current.hasSkill('gw_ciguhanshuang')) return 0;
-								if(current==target||(get.distance(target,current,'pure')==1)){
-									return -get.sgn(get.attitude(player,current));
-								}
-							});
+							if(current.hasSkill('gw_ciguhanshuang')) return 0;
+							return -1;
 						}
 					},
 					order:1.2,

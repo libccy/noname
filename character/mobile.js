@@ -4095,9 +4095,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						//audio:'kuangcai',
 						silent:true,
 						popup:false,
-						usable:5,
+						//usable:5,
 						filter:function(event,player){
-							if(!player.forceCountChoose){
+							if(!player.forceCountChoose||!player.forceCountChoose.phaseUse){
 								return false;
 							}
 							return true;
@@ -4129,7 +4129,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							//ui.auto.show();
 							player.removeSkill('kuangcai_use');
 							player.removeSkill('kuangcai_cancel');
-							if(player.storage.counttrigger) delete player.storage.counttrigger.kuangcai_use;
 						}
 					}
 				},
@@ -4779,7 +4778,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!['basic','trick'].contains(get.type(event.card))) return false;
 					return player.getHistory('useCard',function(ev){
 						return ev.getParent('phaseUse')==evt&&get.tag(ev.card,'damage')&&['basic','trick'].contains(get.type(ev.card));
-					}).indexOf(event)==0;
+					}).indexOf(event)==0&&game.hasPlayer(function(current){
+						return current!=player&&!current.storage.weifeng2&&event.targets.contains(current);
+					});
 				},
 				content:function(){
 					'step 0'
