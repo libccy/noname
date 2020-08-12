@@ -10448,6 +10448,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					player.draw();
+					var cards=Array.from(ui.ordering.childNodes);
+					while(cards.length){
+						cards.shift().discard();
+					}
 					"step 1"
 					var evt=_status.event.getParent('phase');
 					if(evt){

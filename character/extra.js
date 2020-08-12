@@ -3167,14 +3167,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					cardUsable:function (card,player,num){
-						if(player.hasMark('drlt_jieying_mark')&&game.hasPlayer(function(current){
+						if(player.hasMark('drlt_jieying_mark')&&card.name=='sha') return num+game.countPlayer(function(current){
 							return current.hasSkill('drlt_jieying');
-						})&&card.name=='sha') return num+1;
+						});
 					},
 					maxHandcard:function (player,num){
-						if(player.hasMark('drlt_jieying_mark')&&game.hasPlayer(function(current){
+						if(player.hasMark('drlt_jieying_mark')) return num+game.countPlayer(function(current){
 							return current.hasSkill('drlt_jieying');
-						})) return num+1;
+						});
 					},
 				},
 				audio:'drlt_jieying',
@@ -3188,12 +3188,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				content:function(){
-					trigger.num++;
+					trigger.num+=game.countPlayer(function(current){
+						return current.hasSkill('drlt_jieying');
+					});
 				},
 				ai:{
 					nokeep:true,
 					skillTagFilter:function(player){
-						return player.hasMark('drlt_jieying_mark');
+						if(!player.hasMark('drlt_jieying_mark')) return false;
 					},
 				},
 			},
@@ -3247,8 +3249,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var target=result.targets[0];
 								player.line(target);
 								player.logSkill('drlt_jieying',target);
-								player.removeMark('drlt_jieying_mark',1);
-								target.addMark('drlt_jieying_mark',1);
+								var mark=player.countMark('drlt_jieying_mark');
+								player.removeMark('drlt_jieying_mark',mark);
+								target.addMark('drlt_jieying_mark',mark);
 							};
 						},
 					},
@@ -3266,7 +3269,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(trigger.player.countCards('h')>0){
 								trigger.player.give(trigger.player.getCards('h'),player);
 							}
-							trigger.player.removeMark('drlt_jieying_mark',1);
+							trigger.player.removeMark('drlt_jieying_mark',trigger.player.countMark('drlt_jieying_mark'));
 						},
 					},
 				},

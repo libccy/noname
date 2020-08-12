@@ -280,27 +280,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 0;
 					},
 					result:{
-						player:function(player,target){
-							if(get.mode()=='versus') return game.countPlayer(function(current){
-								if(target.isFriendOf(current)){
-									if(current.isFriendOf(player)&&current.isLinked()){
-										return get.attitude(player,target);
-									}
-									else if(current.isEnemyOf(player)&&!current.isLinked()){
-										return -get.attitude(player,target)*0.6;
-									}
-								}
-							});
-							return game.countPlayer(function(current){
-								if(target.isMajor()==current.isMajor()){
-									if(current.isLinked()){
-										return get.attitude(player,target);
-									}
-									else{
-										return -get.attitude(player,target)*0.8;
-									}
-								}
-							});
+						target:function(player,target){
+							if(get.mode()=='versus'){
+								if(target.isFriendOf(player)) return target.isLinked()?1:0;
+								return target.isLinked()?0:-1;
+							}
+							return target.isLinked()?1:-1;
 						}
 					}
 				}
@@ -390,8 +375,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					value:4,
 					useful:2,
 					result:{
-						player:1.5,
-						target:1,
+						target:function(player,target){
+							if(player==target) return 2;
+							return 1;
+						},
 					},
 				},
 			},

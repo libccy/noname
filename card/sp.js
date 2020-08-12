@@ -694,7 +694,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		list:[
 			['spade',1,'caomu'],
 			['club',3,'caomu'],
-			['heart',12,'shengdong',],
+			['heart',12,'shengdong'],
 			['club',9,'shengdong'],
 			['spade',9,'shengdong'],
 			['diamond',4,'zengbin'],
@@ -712,7 +712,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			["club",13,'jinchan'],
 			["club",12,'qijia'],
 			["club",13,'qijia'],
-			["spade",1,'fulei','thunder'],
+			["spade",1,'fulei'],
 			["spade",6,'qibaodao'],
 			["spade",5,'zhungangshuo'],
 			["spade",2,'lanyinjia'],

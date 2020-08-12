@@ -20,7 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_guozhan2:["mifuren","mateng","tianfeng","chendong","sp_dongzhuo","jiangfei","jiangqing","kongrong","bianfuren","liqueguosi","lvfan","cuimao","jiling","zhangren","zoushi"],
 				sp_guandu:["sp_zhanghe","xunchen","sp_shenpei","gaolan","lvkuanglvxiang","chunyuqiong","sp_xuyou"],
 				sp_single:["hejin","hansui","niujin"],
-				sp_others:["hanba"],
+				sp_others:["hanba","caiyang"],
 			},
 		},
 		characterFilter:{
@@ -32,6 +32,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			caiyang:['male','qun',1,['yinka'],['forbidai','unseen']],
 			sp_xuyou:['male','qun',3,['spshicai','spfushi']],
 			chunyuqiong:['male','qun',5,['cangchu','sushou','liangying']],
 			lvkuanglvxiang:['male','qun',4,['liehou','qigong']],
@@ -199,6 +200,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			caiyang:'蔡阳（？－201年），又作蔡扬，东汉丞相曹操部下武将，汝南太守。于建安六年（201）奉曹操之命攻击与刘备联合的汝南贼龚都等人，兵败被刘备所杀。明代小说《三国演义》改编为“云长擂鼓斩蔡阳”。',
+			pujing:'湖北省当阳境内有一座山，名叫玉泉山。东汉建安末年，山上住着一个老和尚，法名普净，普净原来是沂水关镇国寺方丈，后因云游天下，来到此处，风这地方山明水秀，就于山中结草为庵，每天坐禅参道，身边只有一个小和尚，外出化一些斋饭，供养师父。在《三国演义》中，当关羽通过汜水关时，正是由于普净提醒，关羽才揭穿了卞喜的阴谋，并杀死了卞喜。关羽死后，其怨魂亦在普净的指点下醒悟，放下了心中的仇恨，专心致力于造福一方百姓。',
+			huban:'为《三国演义》所杜撰的人物，正史无记载，荥阳太守王植麾下从事、桓帝时议郎胡华之子。关羽过五关斩六将时其中一关就是王植所镇守，胡班奉命放火夜袭关公，因敬服公之气概，并得其父托公所带家书，班看毕，叹曰：“险些误杀忠良！”故将之放走。胡班到荆州来投降关公，公念其旧日相救之情，甚爱之；令随费诗入川，见汉中王受爵。费诗辞别关公，带了胡班，自回蜀中去了。',
 			chunyuqiong:'淳于琼（？－200年），字仲简，颍川（治今河南禹州）人。东汉时期官吏，于汉灵帝中平五年（188）被任命为西园八校尉之一的右校尉，与蹇硕、袁绍、鲍鸿、曹操、赵融、冯芳、夏牟同列。为袁绍大将，与张郃、高览等人齐名。在官渡之战时镇守乌巢，遭到曹操的偷袭而惨败，自己也被曹操处斩。',
 			lvkuanglvxiang:'吕旷（生卒年不详），与吕翔同是袁绍属下，袁绍去世后，为袁尚守东平，后来投降曹操，并被封为列侯。在《三国演义》中，在曹操准备往南准备攻击前，两人跟著大将曹仁和将军李典准备要攻击刘备。但吕旷被赵云刺下马身亡，而吕翔也死于张飞矛下，可以算是出师未捷身先死',
 			caobuxing:'曹不兴，亦名弗兴，三国时著名画家。孙吴吴兴（今浙江湖州）人，生卒年不详。他在黄武年间（222—229年）享有很大的声誉。被称为“佛画之祖”。与东晋顾恺之、南朝宋陆探微、南朝梁张僧繇并称“六朝四大家”。又与赵达的算术、严武的弈棋、皇象的草书等号称“吴中八绝”。曹不兴善画龙、虎、马及人物，有“落墨为蝇”等传奇故事，其佛画成就对后世影响很大，相传其所画龙头令谢赫叹服不已。画迹今已不存，据《贞观公私画史》载，作品有《青溪龙》、《赤盘龙》、《南海监牧进十种马图》、《夷事夷兽样》、《桃源图》等，惜早已散佚。 但之后的著名画家卫协直接师承其法。',
@@ -529,6 +533,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//蔡阳
+			yinka:{
+				trigger:{player:['drawBegin','judgeBegin']},
+				direct:true,
+				filter:function(){
+					return ui.cardPile.childNodes.length>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseButton(['印卡：请选择要置于牌堆'+(trigger.bottom?'底':'顶')+'的牌（先选择的在上）',Array.from(ui.cardPile.childNodes)],[1,trigger.num||1]);
+					'step 1'
+					if(result.bool){
+						while(result.links.length){
+							if(trigger.bottom){
+								var card=result.links.shift();
+								ui.cardPile.removeChild(card);
+								ui.cardPile.appendChild(card);
+							}
+							else{
+								var card=result.links.pop();
+								ui.cardPile.removeChild(card);
+								ui.cardPile.insertBefore(card,ui.cardPile.firstChild)
+							}
+						}
+					}
+				},
+				ai:{isLuckyStar:true},
+			},
 			//吕旷吕翔和淳于琼和官渡哔哔机
 			spshicai:{
 				audio:2,
@@ -16826,6 +16858,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{
 					global:"gameDrawAfter",
+					player:"enterGame",
 				},
 				forced:true,
 				filter:function (){
@@ -19326,6 +19359,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zezhu_info:'出牌阶段限一次，你可以获得双方主帅的各一张牌（若无牌则改为你摸一张牌），然后交给双方主帅各一张牌。',
 			chenggong:'逞功',
 			chenggong_info:'当有角色使用牌指定目标后，若此牌对目标数大于1，则你可令使用者摸一张牌。',
+			caiyang:'蔡阳',
+			yinka:'印卡',
 			
 			sp_default:"常规",
 			sp_whlw:"文和乱武",
