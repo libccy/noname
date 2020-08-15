@@ -2534,7 +2534,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								game.zhu.draw();
 							}],
 							['摸三张牌',function(){
-								game.zhu.recover();
+								game.zhu.draw(3);
 							}],
 							['将一张防具牌置入装备区并摸一张牌',function(){
 								var card=get.cardPile(function(card){
@@ -2585,8 +2585,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							['弃置所有手牌并于下一关获得【涅槃】(标)',function(){
 								var hs=game.zhu.getCards('h');
 								if(hs.length) game.zhu.discard(hs);
-								game.zhu.addTempSkill('oldniepan','dieBegin');
+								game.zhu.addSkill('oldniepan');
 								game.zhu.restoreSkill('oldniepan');
+								game.zhu._oldniepan=true;
 							}],
 							['获得两张锦囊牌',function(){
 								var list=[];
@@ -2649,6 +2650,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						],
 						replace_character:function(){
 							'step 0'
+							if(game.zhu._oldniepan){
+								game.zhu.removeSkill('oldniepan');
+								delete game.zhu._oldniepan;
+							}
 							_status.qianlidanji.completeNumber++;
 							if(!lib.config.qianlidanji_level||lib.config.qianlidanji_level<_status.qianlidanji.completeNumber){
 								lib.config.qianlidanji_level=_status.qianlidanji.completeNumber;
