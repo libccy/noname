@@ -2249,7 +2249,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function(card,player,target,current){
 							if(card.name=='sha'&&target.isDamaged()&&target.getFriends().length>0) return 'zeroplayertarget';
 						}
-					}
+					},
 				},
 			},
 			wuyuan:{
@@ -4369,13 +4369,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var str='令一名其他角色交给你一张牌';
-					if(player.storage.choulve){
-						str+='若其如此做，视为你使用【'+get.translation(player.storage.choulve)+'】';
+					var history=player.getAllHistory('damage',function(evt){
+						return evt.card&&evt.card.name&&lib.card[evt.card.name];
+					})
+					if(history.length) event.cardname=history[history.length-1].card.name;
+					if(event.cardname){
+						str+='若其如此做，视为你使用【'+get.translation(event.cardname)+'】';
 					}
 					var goon=true;
-					if(player.storage.choulve){
+					if(event.cardname){
 						goon=game.hasPlayer(function(current){
-							return player.canUse(player.storage.choulve,current)&&get.effect(current,player.storage.choulve,player,player)>0;
+							return player.canUse(event.cardname,current)&&get.effect(current,{name:event.cardname},player,player)>0;
 						});
 					}
 					player.chooseTarget(get.prompt('choulve'),str,function(card,player,target){
@@ -4393,9 +4397,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						player.logSkill('choulve',target);
 						target.chooseCard('he','是否交给'+get.translation(player)+'一张牌？',
-							player.storage.choulve?('若如此做，视为'+get.translation(player)+
-							'使用【'+get.translation(player.storage.choulve)+'】'):null).set('ai',function(card){
-							if(_status.event.goon&&player.storage.choulve) return 7-get.value(card);
+							event.cardname?('若如此做，视为'+get.translation(player)+
+							'使用【'+get.translation(event.cardname)+'】'):null).set('ai',function(card){
+							if(_status.event.goon) return 7-get.value(card);
 							return 0;
 						}).set('goon',get.attitude(target,player)>1);
 						event.target=target;
@@ -4406,23 +4410,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result.bool){
 						event.target.give(result.cards,player);
-						if(player.storage.choulve){
-							player.chooseUseTarget(player.storage.choulve,true,false);
+						if(event.cardname){
+							player.chooseUseTarget(event.cardname,true,false);
 						}
 					}
 				},
-				group:'choulve_damage',
-				subSkill:{
-					damage:{
-						trigger:{player:'damageEnd'},
-						silent:true,
-						content:function(){
-							if(trigger.card&&get.info(trigger.card).enable&&get.type(trigger.card)!='delay'){
-								player.storage.choulve={name:trigger.card.name};
-							}
-						}
-					}
-				}
 			},
 			polu:{
 				audio:2,
@@ -5063,7 +5055,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseZhunbeiBegin'},
 				direct:true,
 				filter:function(event,player){
-					return event.player.isAlive()&event.player.countCards('e')&&
+					return event.player.isAlive()&&event.player.countCards('e')>0&&
 					lib.filter.targetEnabled({name:'sha'},player,event.player)&&(player.hasSha()||_status.connectMode&&player.countCards('h')>0);
 				},
 				content:function(){
