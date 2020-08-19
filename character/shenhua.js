@@ -1442,7 +1442,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return target!=player
 					}).ai=function(target){
 						var player=_status.event.player;
-						if(player.storage.nzry_huaiju>2||player.hp>2) return get.attitude(player,target);
+						if((player.storage.nzry_huaiju>2||player.hp>2)&&(target.storage.nzry_huaiju==undefined||target.storage.nzry_huaiju<=0)) return get.attitude(player,target);
 						return -1;
 					};
 					'step 1'
