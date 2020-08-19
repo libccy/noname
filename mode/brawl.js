@@ -2934,6 +2934,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
    						character:{
    							pujing:['male','qun',1,[],[]],
    							huban:['male','qun',2,[],[]],
+   							caiyang:['male','qun',1,[],[]],
    						},
    						translate:{
    							pujing:'普净',

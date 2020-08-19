@@ -8179,9 +8179,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					check:function(button){
 						var player=_status.event.player;
-						if(game.hasPlayer(function(current){
-							return current[button.link?'isMaxHp':'isMaxHandcard']()&&get.effect(current,'sanyao',player,player)>0
-						})) return 1+button.link;
+						if(game.hasPlayer([
+							function(target){
+								var num=target.countCards('h');
+								return !game.hasPlayer(function(current){
+									return current!=target&&current.countCards('h')>num;
+								})&&get.effect(target,'sanyao',player,player)>0;
+							},
+							function(target){
+								var num=target.hp;
+								return !game.hasPlayer(function(current){
+									return current!=target&&current.hp>num;
+								})&&get.effect(target,'sanyao',player,player)>0;
+							},
+						][button.link])) return 1+button.link;
 						return 0;
 					},
 					backup:function(links){
@@ -8189,17 +8200,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							audio:'sanyao',
 							filterTarget:[
 								function(card,player,target){
-									var num=target.countCards('h',function(card){
-										return !ui.selected.cards.contains(card);
-									});
+									var num=target.countCards('h');
 									return !game.hasPlayer(function(current){
-										return current!=target&&current.countCards('h',function(card){
-											return !ui.selected.cards.contains(card);
-										})>num;
+										return current!=target&&current.countCards('h')>num;
 									});
 								},
 								function(card,player,target){
-									return target.isMaxHp();
+									return !game.hasPlayer(function(current){
+										return current!=target&&current.hp>target.hp;
+									});
 								}
 							][links[0]],
 							index:links[0],
@@ -8960,7 +8969,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.count--;
 					player.draw();
 					"step 2"
-					if(player.countCards('he')){
+					if(player.countCards('h')){
 						player.chooseCard('将一张手牌置于武将牌上作为“权”',true);
 					}
 					else{
@@ -12301,7 +12310,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qianxi_info:'准备阶段，你可以摸一张牌，并弃置一张牌，然后令一名距离为1的角色不能使用或打出与你弃置的牌颜色相同的手牌直到回合结束。',
 			zhiman_info:'当你对一名其他角色造成伤害时，你可以防止此伤害，然后获得其装备区或判定区的一张牌。',
 			sanyao_info:'出牌阶段限一次，你可以弃置一张牌并指定一名体力值最多(或之一)的角色，你对其造成1点伤害。',
-			olsanyao_info:'出牌阶段每项各限一次，你可以弃置一张牌并指定一名体力值或手牌数最多(或之一)的角色，并对其造成1点伤害。',
+			olsanyao_info:'出牌阶段每项各限一次，你可以弃置一张牌并指定一名体力值或手牌数最多(或之一)的其他角色，并对其造成1点伤害。',
 			rezhiman_info:'当你对一名其他角色造成伤害时，你可以防止此伤害，然后获得其区域内的一张牌。',
 			resanyao_info:'出牌阶段限一次，你可以弃置任意张牌并指定等量除你外体力值最多(或之一)的其他角色。你对这些角色依次造成1点伤害。',
 			paiyi_info:'出牌阶段限一次，你可以移去一张“权”并选择一名角色，令其摸两张牌，然后若其手牌数大于你，你对其造成1伤害。',

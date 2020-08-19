@@ -1722,12 +1722,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				audio:true,
 				filter:function(event,player){
-					return player.countCards('he')>2&&event.target.isAlive();
+					return player.countCards('he',function(card){
+						return card!=player.getEquip('guanshi');
+					})>=2&&event.target.isAlive();
 				},
 				content:function(){
 					"step 0"
 					var next=player.chooseToDiscard(get.prompt('guanshi'),2,'he',function(card){
-						return _status.event.player.getCards('e',{subtype:'equip1'}).contains(card)==false;
+						return _status.event.player.getEquip('guanshi')!=card;
 					});
 					next.logSkill='guanshi_skill';
 					next.set('ai',function(card){

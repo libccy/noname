@@ -4548,6 +4548,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			yuri_xingdong:{
+				audio:2,
 				group:'yuri_xingdong_gain',
 				subSkill:{
 					mark:{
@@ -5127,7 +5128,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					backup:function(links,player){
 						return {
 							filterCard:function(card,player){
-								return get.type(card,'trick')!='trick'&&player.canAddJudge({name:links[0][2],cards:[card]});
+								return get.itemtype(card)=='card'&&get.type(card,'trick')!='trick'&&player.canAddJudge({name:links[0][2],cards:[card]});
 							},
 							filterTarget:function(card,player,target){
 								return player==target;
@@ -10365,6 +10366,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nszhihuang_damage:'制皇',
 			nszhihuang_info:'每回合限一次，当主公使用牌时，你可以移去一张“威”，然后获得此牌。锁定技，若你的手牌数大于主公，则你使用牌造成的伤害+1。',
 			
+			diy_wenyang:'文鸯',
 			yj_caoang:'SP曹昂',
 			yjxuepin:'血拼',
 			yjxuepin_info:'出牌阶段限一次，你可以选择攻击范围内的一名角色并失去1点体力。你弃置其两张牌。若这两张牌类型相同，你回复1点体力。',

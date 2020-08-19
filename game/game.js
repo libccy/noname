@@ -19734,7 +19734,7 @@
 					}
 				},
 				canUse:function(card,target,distance,includecard){
-					if(typeof card=='string') card={name:card};
+					if(typeof card=='string') card={name:card,isCard:true};
 					var info=get.info(card);
 					if(info.multicheck&&!info.multicheck(card,this)) return false;
 					if(includecard!=false&&!lib.filter.cardEnabled(card,this)) return false;
@@ -19753,7 +19753,7 @@
 				},
 				getUseValue:function(card,distance,includecard){
 					if(typeof(card)=='string'){
-						card={name:card};
+						card={name:card,isCard:true};
 					}
 					var player=this;
 					var targets=game.filterPlayer();

@@ -6,6 +6,7 @@ window.noname_package={
 		xinghuoliaoyuan:'星火燎原',
 		yijiang:'一将成名',
 		sp:'SP',
+		sp2:'系列专属',
 		extra:'神将',		
 		mobile:'移动版',
 		old:'怀旧',

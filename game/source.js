@@ -25,6 +25,7 @@ window.noname_source_list=[
 	'character/refresh.js',
 	'character/shenhua.js',
 	'character/sp.js',
+	'character/sp2.js',
 	'character/standard.js',
 	'character/swd.js',
 	'character/tw.js',
