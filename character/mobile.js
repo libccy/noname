@@ -2,7 +2,7 @@
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'mobile',
-		connectBanned:['miheng'],
+		//connectBanned:['miheng'],
 		connect:true,
 		characterSort:{
 			mobile:{

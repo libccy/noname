@@ -249,7 +249,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				toself:true,
 				ai:{
-					//value:-5,
 					value:function(card,player,i){
 						if(player.hp<=1&&_status.currentPhase==player&&_status.event.getParent('phaseUse').name=='phaseUse'
 						&&_status.event.name!='chooseButton'&&_status.event.name!='chooseCard'){
@@ -257,7 +256,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 						return -5;
 					},
-					//useful:6,
 					useful:function(card,i){
 						var player=_status.event.player
 						if(player.hp<=1&&_status.currentPhase==player&&_status.event.getParent('phaseDiscard').name=='phaseDiscard'){

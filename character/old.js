@@ -2,6 +2,7 @@
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'old',
+		connect:true,
 		characterSort:{
 			old:{
 				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_guanqiujian","xiahouyuan","weiyan","xiaoqiao","pangde"],

@@ -2,6 +2,7 @@
 game.import('card',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'yunchou',
+		connect:true,
 		card:{
 			diaobingqianjiang:{
 				fullskin:true,
@@ -602,14 +603,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:9,
 					result:{
 						target:function(player,target){
-							//SP刘协:皇恩
 							if (game.players.length>2){
 								var list=target.getFriends(true);
 								for (var i=0;i<list.length;i++){
 									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) return 0;
 								}
 							}
-							//--------------------------
 							//if(target.countCards('e')) return -1;
 							var do_not_use=false;
 							var friend_list=player.getFriends(true);

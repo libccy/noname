@@ -2,6 +2,7 @@
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'sp2',
+		connect:true,
 		character:{
 			re_sunluyu:['female','wu',3,['remeibu','remumu']],
 			liuzan:['male','wu',4,['refenyin','liji']],

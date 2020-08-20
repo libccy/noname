@@ -292,24 +292,20 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								var t=target.hasSkillTag('nothunder');
 								if(f&&t) return 0;
 								if(f||t) return 0.5;
-								//SP刘协:皇恩
 								if (game.players.length>2){
 									var list=target.getEnemies();
 									for (var i=0;i<list.length;i++){
 										if (list[i].hasSkill('sphuangen')&&list[i].hp>1) return 0;
 									}
 								}
-								//--------------------------
 								return 2;
 							}
-							//SP刘协:皇恩
 							if (game.players.length>2){
 								var list=target.getFriends(true);
 								for (var i=0;i<list.length;i++){
 									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) return 0;
 								}
 							}
-							//--------------------------
 							if(get.attitude(player,target)>=0) return -0.9;
 							if(ui.selected.targets.length) return -0.9;
 							if(game.hasPlayer(function(current){
@@ -672,8 +668,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					check:function(button){
 						if(button.link.name=='du') return 10;
 						var player=_status.event.player;
-						//if(player.getUseValue(button.link)>0) return get.order(button.link);
-						//return -1;
 						return get.effect(player,button.link,player,player)>0?get.effect(player,button.link,player,player):-1;
 					},
 					backup:function(links,player){
