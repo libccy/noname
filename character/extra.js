@@ -47,6 +47,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			shiki_omusubi:{
+				audio:2,
 				trigger:{global:'roundStart'},
 				direct:true,
 				content:function(){

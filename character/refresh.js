@@ -303,7 +303,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.count--;
 					player.draw();
 					"step 2"
-					if(player.countCards('he')){
+					if(player.countCards('h')){
 						player.chooseCard('将一张手牌置于武将牌上作为“权”',true);
 					}
 					else{

@@ -591,7 +591,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			getVideoName:function(){
 				if(_status.mode=='three'){
-					var zhu=game.findPlayer(function(current){
+					var zhu=game.findPlayer2(function(current){
 						return current.side==game.me.side&&current.identity=='zhu';
 					});
 					var str=(game.me.side?'暖/':'冷/')+get.translation(zhu.previousSeat.name)+'/'+get.translation(zhu.name)+'/'+get.translation(zhu.nextSeat.name);
