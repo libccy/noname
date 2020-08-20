@@ -609,7 +609,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) return 0;
 								}
 							}
-							//if(target.countCards('e')) return -1;
 							var do_not_use=false;
 							var friend_list=player.getFriends(true);
 							for (var i=0;i<friend_list.length;i++){

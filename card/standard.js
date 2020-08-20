@@ -1276,7 +1276,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						useful:1,
 					},
 					result:{
-						//target:-1.5,
 						target:function(player,target){
 							var target_weapon=target.getEquip(1);
 							if(target_weapon&&get.equipValue(target_weapon)<=0){
@@ -1284,7 +1283,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 							return -1.5;
 						},
-						//player:function(player){
 						player:function(player,target){
 							if(player.getCards('he',{subtype:'equip1'}).length) return 0;
 							var target_weapon=target.getEquip(1);
