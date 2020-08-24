@@ -2,7 +2,10 @@
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'sp2',
+		connect:true,
 		character:{
+			//sp_zhangliao:['male','qun',4,['mubing','diaoling']],
+			sp_key_yuri:['female','qun',4,['mubing','diaoling'],['unseen']],
 			re_sunluyu:['female','wu',3,['remeibu','remumu']],
 			liuzan:['male','wu',4,['refenyin','liji']],
 			wenyang:['male','wei',5,['xinlvli','choujue']],
@@ -58,7 +61,104 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
-			
+			mubing:{
+				trigger:{player:'phaseUseBegin'},
+				direct:true,
+				filter:function(event,player){
+					return player.countCards('he')>0;
+				},
+				content:function(){
+					'step 0'
+					var num=player.storage.mubing2?3:2;
+					event.num=num+1;
+					player.chooseToDiscard(true,[1,num],'he',get.prompt('mubing'),'弃置至多'+get.cnNumber(num)+'张牌，然后展示牌堆顶的'+get.cnNumber(num+1)+'张牌').logSkill='mubing';
+					'step 1'
+					if(!result.bool){
+						event.finish();return;
+					}
+					var numx=0;
+					for(var i of result.cards){
+						numx+=get.number(i);
+					}
+					event.numx=numx;
+					event.cards=game.cardsGotoOrdering(get.cards(num)).cards;
+					event.videoId=lib.status.videoId++;
+					game.broadcastAll(function(player,id,cards,numx){
+						var str;
+						if(player==game.me&&!_status.auto){
+							str='募兵：选择任意张点数不大于'+numx+'的牌';
+						}
+						else{
+							str='募兵';
+						}
+						var dialog=ui.create.dialog(str,cards);
+						dialog.videoId=id;
+					},player,event.videoId,event.cards,numx);
+					event.time=get.utc();
+					game.addVideo('showCards',player,['募兵',get.cardsInfo(event.cards)]);
+					game.addVideo('delay',null,2);
+					'step 2'
+					var next=player.chooseButton([0,num]);
+					next.set('dialog',event.videoId);
+					next.set('filterButton',function(button){
+						var num=0
+						for(var i=0;i<ui.selected.buttons.length;i++){
+							num+=get.number(ui.selected.buttons[i].link);
+						}
+						return (num+get.number(button.link)<=_status.event.maxNum);
+					});
+					next.set('maxNum',event.numx);
+					next.set('ai',function(button){
+						return get.value(button.link,_status.event.player);
+					});
+					'step 3'
+					if(!result.bool) event.cards=[];
+					else event.cards=result.links;
+					var time=1000-(get.utc()-event.time);
+					if(time>0){
+						game.delay(0,time);
+					}
+					'step 4'
+					game.broadcastAll('closeDialog',event.videoId);
+					if(!cards.length){event.finish();return;}
+					if(player.storage.mubing2) player.chooseTarget('请选择一名角色获得'+get.translation(cards),true);
+					else event._result={bool:true,targets:[player]};
+					'step 5'
+					var target=result.targets[0];
+					player.line(target);
+					target.gain(cards,'log','gain2');
+				},
+			},
+			mubing_rewrite:{
+				mark:true,
+				intro:{
+					content:'出牌阶段开始时，你可以弃置至多三张牌，然后展示牌堆顶的四张牌，并可令一名角色获得任意张点数之和不大于你弃置的牌点数之和的牌。',
+				},
+			},
+			diaoling:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				forced:true,
+				juexingji:true,
+				skillAnimation:true,
+				animationColor:'metal',
+				filter:function(event,player){
+					var num=0;
+					player.getAllHistory('gain',function(evt){
+						var evt2=evt.getParent();
+						if(evt.name=='mubing'&&evt.player==player) num+=evt.cards.filter(function(card){
+							return card.name=='sha'||get.subtype(card,false)=='equip1'||(get.type2(card,false)=='trick'&&get.tag({name:card.name},'damage'));
+						}).length;
+					});
+					return num>=6;
+				},
+				content:function(){
+					player.awakenSkill('diaoling');
+					player.storage.mubing2=true;
+					player.markSkill('mubing_rewrite');
+					player.chooseDrawRecover(2,true);
+				},
+				derivation:'mubing_rewrite',
+			},
 			remeibu:{
 				audio:"meibu",
 				trigger:{
@@ -1045,11 +1145,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!map[id]) map[id]=[];
 						map[id].push(i);
 						if(get.color(i)!=event.color) continue;
-						map2[id]=true;
+						if(!map2[id]) map2[id]=[];
+						map2[id].push(i);
 					}
 					for(var i in map){
 						var source=(_status.connectMode?lib.playerOL:game.playerMap)[i];
-						if(map2[i]) player.gain(map[i],source,'bySelf','give');
+						if(map2[i]) player.gain(map2[i],source,'bySelf','give');
 						player.line(source);
 						game.log(player,'展示了',source,'的',map[i]);
 					}
@@ -2060,6 +2161,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						num+=player.storage.xingshen;
 						player.storage.xingshen=0;
 						player.unmarkSkill('xingshen');
+					}
+					if(player.storage.olxingshen){
+						num+=player.storage.olxingshen;
+						player.storage.olxingshen=0;
+						player.unmarkSkill('olxingshen');
 					}
 					event.cards=get.cards(num);
 					player.showCards(event.cards);
@@ -3165,8 +3271,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(['basic','trick'].contains(type)) list.push([type,'',name]);
 					}
 					player.chooseButton(['选择至多两种牌',[list,'vcard']],true,[1,2]).set('ai',function(button){
-						var target=_status.event.getParent('busuan').target;
-						return get.attitude(_status.event.player,target)*get.useful({name:button.link[2]})+0.1;
+						var target=_status.event.getParent().target;
+						var card={name:button.link[2]};
+						if(get.type(card)=='basic'||!target.hasUseTarget(card)) return false;
+						return get.attitude(_status.event.player,target)*(target.getUseValue(card)-0.1);
 					});
 					'step 1'
 					target.storage.busuan_angelbeats=result.links.slice(0);
@@ -4851,6 +4959,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rezhixi_info:'锁定技，当你使用【杀】或普通锦囊牌时，你弃置一张手牌。',
 			remumu:'穆穆',
 			remumu_info:'出牌阶段开始时，你可以选择一项：1.弃置一名其他角色装备区里的一张牌，然后你本回合可使用【杀】的次数+1；2.获得一名角色装备区里的一张防具牌，然后你本回合可使用【杀】的次数-1。',
+			sp_zhangliao:'SP张辽',
+			//这俩技能给SP仲村由理毫无违和感好吗！！！
+			sp_key_yuri:'SP仲村由理',
+			mubing:'募兵',
+			mubing_info:'出牌阶段开始时，你可以弃置至多两张牌，然后展示牌堆顶的三张牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。',
+			diaoling:'调令',
+			diaoling_info:'觉醒技，准备阶段，若你已经获得了6张或更多的【杀】或武器牌或伤害锦囊牌，则你回复1点体力或摸两张牌，然后修改【募兵】。',
+			mubing_rewrite:'募兵·改',
+			mubing_rewrite_info:'出牌阶段开始时，你可以弃置至多三张牌，然后展示牌堆顶的四张牌，并可令一名角色获得任意张点数之和不大于你弃置的牌点数之和的牌。',
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",

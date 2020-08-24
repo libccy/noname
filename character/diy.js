@@ -64,7 +64,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_caoshuang:['male','wei',4,['nsjiquan','nsfuwei']],
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
-			diy_feishi:['male','shu',3,['shuaiyan','moshou']],
+			diy_feishi:['male','shu',3,['nsshuaiyan','moshou']],
 			diy_liuyan:['male','shu',3,['juedao','geju']],
 			// diy_luxun:['male','wu',3,['shaoying','zonghuo']],
 			diy_yuji:['male','qun',3,['diyguhuo','diychanyuan']],
@@ -3357,6 +3357,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			saya_powei:{
+				audio:2,
 				trigger:{player:'phaseAfter'},
 				direct:true,
 				locked:true,
@@ -3445,6 +3446,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			saya_shouji:{
+				audio:2,
 				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
 					return !player.getStat('skill').saya_shouji&&event.cards.filterInD().length>0;
@@ -9744,7 +9746,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.player.identityShown=true;
 				}
 			},
-			shuaiyan:{
+			nsshuaiyan:{
 				trigger:{global:'recoverAfter'},
 				filter:function(event,player){
 					return event.player!=player&&_status.currentPhase!=player;
@@ -9982,7 +9984,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xicai:'惜才',
 			diyjianxiong:'奸雄',
 			diy_feishi:'费诗',
-			shuaiyan:'率言',
+			nsshuaiyan:'率言',
 			moshou:'墨守',
 			diy_hanlong:'韩龙',
 			diy_luxun:'陆伯言',
@@ -10595,7 +10597,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			geju_info:'准备阶段开始时，你可以摸X张牌（X为攻击范围内不含有你的势力数）。',
 			siji_info:'弃牌阶段结束后，你可以摸2X张牌（X为你于此阶段内弃置的【杀】的数量）。',
 			ciqiu_info:'锁定技，每当你使用【杀】对目标角色造成伤害时，若该角色未受伤，你令此伤害+1；若其因此进入濒死状态，你令其死亡，然后你失去“刺酋”。 ',
-			shuaiyan_info:'每当其他角色于你的回合外回复体力后，你可以令该角色选择一项：1.令你摸一张牌；2.令你弃置其一张牌。',
+			nsshuaiyan_info:'每当其他角色于你的回合外回复体力后，你可以令该角色选择一项：1.令你摸一张牌；2.令你弃置其一张牌。',
 			moshou_info:'锁定技，你不能成为乐不思蜀和兵粮寸断的目标。',
 			xicai_info:'你可以立即获得对你造成伤害的牌',
 			diyjianxiong_info:'锁定技，在身份局中，在你回合内死亡的角色均视为反贼，国战中，在你回合内死亡的角色若与你势力相同则随机改为另一个势力',

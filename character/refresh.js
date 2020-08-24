@@ -9,11 +9,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_huo:["ol_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","ol_pangtong","ol_yuanshao","ol_pangde","re_taishici"],
 				refresh_lin:['re_zhurong','re_menghuo','re_dongzhuo','ol_sunjian','re_caopi','re_xuhuang'],
 				refresh_shan:['re_dengai','re_jiangwei','re_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce'],
-				refresh_yijiang:['re_xusheng','re_wuguotai','re_gaoshun','re_zhangyi','re_caozhi','re_zhuran','re_wuyi','re_liaohua','re_guohuai','re_zhuran','re_chengpu','re_caozhang','re_quancong','yujin_yujin','re_lingtong','re_handang','re_zhonghui','re_sunluban','re_masu'],
+				refresh_yijiang:['re_wuguotai','re_gaoshun','re_zhangyi','re_caozhi','re_zhuran','re_wuyi','re_liaohua','re_guohuai','re_zhuran','re_chengpu','re_caozhang','re_quancong','yujin_yujin','re_lingtong','re_handang','re_zhonghui','re_sunluban','re_masu','re_jianyong','xin_xusheng'],
 		 },
 		},
 		connect:true,
 		character:{
+			xin_xusheng:['male','wu',4,['decadepojun']],
 			re_taishici:['male','wu',4,['tianyi','hanzhan']],
 			re_masu:['male','shu',3,['resanyao','rezhiman']],
 			re_sunluban:['female','wu',3,['rechanhui','rejiaojin']],re_zhonghui:['male','wei',4,['requanji','zili']],
@@ -30,7 +31,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_caozhi:['male','wei',3,['reluoying','rejiushi','chengzhang']],
 			ol_pangtong:['male','shu',3,['xinlianhuan','olniepan'],[]],
 			re_zhangyi:['male','shu',4,['rewurong','shizhi']],
-			re_xusheng:['male','wu',4,['repojun']],
 			re_wuguotai:['female','wu',3,['reganlu','buyi']],
 			re_gaoshun:['male','qun',4,['rexianzhen','rejinjiu']],
 			re_caocao:['male','wei',4,['new_rejianxiong','hujia'],['zhu']],
@@ -92,6 +92,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhangzhang:['male','wu',3,['rezhijian','guzheng']],
 			
 			re_sunce:['male','wu',4,['jiang','olhunzi','olzhiba'],['zhu']],
+			re_jianyong:['male','shu',3,['reqiaoshui','jyzongshi']],
 		},
 		characterIntro:{
 			re_gongsunzan:'群雄之一。出身贵族，因母地位卑贱，只当了郡中小吏。他貌美，声音洪亮，机智善辩。后随卢植于缑氏山中读书，粗通经传。',
@@ -107,6 +108,89 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunben:['zhouyu','taishici','daqiao'],
 		},
 		skill:{
+			decadepojun:{
+				shaRelated:true,
+				audio:2,
+				trigger:{player:'useCardToPlayered'},
+				direct:true,
+				filter:function(event,player){
+					return event.card.name=='sha'&&event.target.hp>0&&event.target.countCards('he')>0;
+				},
+				content:function(){
+					'step 0'
+					var next=player.choosePlayerCard(trigger.target,'he',[1,Math.min(trigger.target.hp,trigger.target.countCards('he'))],get.prompt('decadepojun',trigger.target));
+					next.set('ai',function(button){
+						if(!_status.event.goon) return 0;
+						var val=get.value(button.link);
+						if(button.link==_status.event.target.getEquip(2)) return 2*(val+3);
+						return val;
+					});
+					next.set('goon',get.attitude(player,trigger.target)<=0);
+					next.set('forceAuto',true);
+					'step 1'
+					if(result.bool){
+						event.cards=result.cards;
+						var target=trigger.target;
+						player.logSkill('decadepojun',trigger.target);
+						target.addSkill('decadepojun2');
+						target.markAuto('decadepojun2',result.cards);
+						target.lose(result.cards,ui.special,'toStorage');
+						game.log(target,'失去了'+get.cnNumber(result.cards.length)+'张牌');;
+					}
+					else event.finish();
+					'step 2'
+					var discard=false,draw=false;
+					for(var i of cards){
+						var type=get.type2(i);
+						if(type=='equip') discard=true;
+						if(type=='trick') draw=true;
+					}
+					if(discard){
+						event.equip=true;
+						player.chooseButton(['选择一张牌置入弃牌堆',cards],true).set('ai',function(button){
+							return get.value(button.link,_status.event.getTrigger().target);
+						});
+					}
+					if(draw)	event.draw=true;
+					'step 3'
+					if(event.equip&&result.links&&result.links.length){
+						trigger.target.unmarkAuto('decadepojun2',result.links);
+						trigger.target.$throw(result.links,1000);
+						game.log(player,'将',result.links,'置入了弃牌堆');
+						game.cardsDiscard(result.links);
+						if(!event.draw) game.delayx();
+					}
+					if(event.draw) player.draw();
+				},
+				ai:{
+					unequip_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						if(arg&&arg.name=='sha'&&arg.target.getEquip(2)) return true;
+						return false;
+					}
+				},
+			},
+			decadepojun2:{
+				init:function(player,skill){
+					if(!player.storage[skill]) player.storage[skill]=[];
+				},
+				trigger:{global:'phaseEnd'},
+				forced:true,
+				popup:false,
+				charlotte:true,
+				filter:function(event,player){
+					return player.storage.decadepojun2&&player.storage.decadepojun2.length>0;
+				},
+				content:function(){
+					game.log(player,'收回了'+get.cnNumber(player.gain(player.storage.decadepojun2,'draw','fromStorage').cards.length)+'张〖破军〗牌');
+					player.storage.decadepojun2.length=0;
+					player.removeSkill('decadepojun2');
+				},
+				intro:{
+					onunmark:'throw',
+					content:'cardCount',
+				},
+			},
 			hanzhan:{
 				audio:2,
 				trigger:{
@@ -6884,7 +6968,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			refangquan_info:'你可跳过你的出牌阶段，若如此做，你本回合的手牌上限为你的体力上限，且回合结束时，你可以弃置一张手牌并令一名其他角色进行一个额外的回合。',
 			re_wuguotai:'界吴国太',
 			re_gaoshun:'界高顺',
-			re_xusheng:'界徐盛',
 			reganlu:'甘露',
 			reganlu_info:'出牌阶段限一次，你可以选择装备区牌数之差的绝对值不小于X的两名角色或包含你在内的两名角色，然后交换这两名角色装备区内的牌。（X为你已损失的体力值）',
 			repojun:'破军',
@@ -6970,6 +7053,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_taishici:'界太史慈',
 			hanzhan:'酣战',
 			hanzhan_info:'当你发起拼点时，或成为拼点的目标时，你可以令对方选择拼点牌的方式改为随机选择一张手牌。',
+			re_jianyong:'界简雍',
+			xin_xusheng:'界徐盛',
+			decadepojun:'破军',
+			decadepojun2:'破军',
+			decadepojun_info:'当你使用【杀】指定目标后，你可以将其的至多X张牌置于其武将牌上。若这些牌中：有装备牌，你将这些牌中的一张置于弃牌堆；有锦囊牌，你摸一张牌。其于回合结束时获得其武将牌上的这些牌。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',
