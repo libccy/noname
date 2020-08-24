@@ -794,7 +794,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var nh=target.countCards('h');
 							if(get.mode()=='identity'){
 								if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
-								var zhu_punish_check=false;
 								var list=player.getFriends();
 								if (player.isZhu&&player.countCards('h')>2){
 									for (var i=0;i<list.length;i++){
@@ -873,7 +872,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var nh=target.countCards('h');
 							if(get.mode()=='identity'){
 								if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
-								var zhu_punish_check=false;
 								var list=player.getFriends();
 								if (player.isZhu&&player.countCards('h')>2){
 									for (var i=0;i<list.length;i++){
