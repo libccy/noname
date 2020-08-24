@@ -787,14 +787,20 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								if (target.hasSkill('sphuangen')&&target.hp>0) return 0;
 								var list=target.getFriends(true);
 								for (var i=0;i<list.length;i++){
-									if (list[i].hasSkill('mansi')) return 0;;
+									if (list[i].hasSkill('mansi')) return 0;
 									if (list[i].hasSkill('sphuangen')&&list[i].hp>1) return 0;
 								}
 							}
 							var nh=target.countCards('h');
 							if(get.mode()=='identity'){
 								if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
-								if(player.isZhu&&nh<=2&&target.hp<=1&&get.attitude(player,target)>0) return 'zerotarget';
+								var zhu_punish_check=false;
+								var list=player.getFriends();
+								if (player.isZhu&&player.countCards('h')>2){
+									for (var i=0;i<list.length;i++){
+										if (list[i].countCards('h')<=2&&list[i].hp<=1) return 0;
+									}
+								}
 							}
 							if(nh==0) return -2;
 							if(nh==1) return -1.7
@@ -867,7 +873,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var nh=target.countCards('h');
 							if(get.mode()=='identity'){
 								if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
-								if(player.isZhu&&nh<=2&&target.hp<=1&&get.attitude(player,target)>0) return 'zerotarget';
+								var zhu_punish_check=false;
+								var list=player.getFriends();
+								if (player.isZhu&&player.countCards('h')>2){
+									for (var i=0;i<list.length;i++){
+										if (list[i].countCards('h')<=2&&list[i].hp<=1) return 0;
+									}
+								}
 							}
 							if(nh==0) return -2;
 							if(nh==1) return -1.7
