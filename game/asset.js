@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.102',
+	'v1.9.102.1',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -588,6 +588,7 @@ window.noname_asset_list=[
 	'audio/die/leitong.mp3',
 	'audio/die/sp_sufei.mp3',
 	'audio/die/wulan.mp3',
+	'audio/die/key_saya.mp3',
 	
 	'audio/skill/anguo1.mp3',
 	'audio/skill/anguo2.mp3',
@@ -2604,6 +2605,10 @@ window.noname_asset_list=[
 	'audio/skill/yuri_xingdong2.mp3',
 	'audio/skill/zhengjian1.mp3',
 	'audio/skill/zhengjian2.mp3',
+	'audio/skill/saya_shouji1.mp3',
+	'audio/skill/saya_shouji2.mp3',
+	'audio/skill/saya_powei1.mp3',
+	'audio/skill/saya_powei2.mp3',
 	
 	'font/huangcao.ttf',
 	'font/shousha.ttf',
@@ -3212,6 +3217,10 @@ window.noname_asset_list=[
 	'image/character/old_jiakui.jpg',
 	'image/character/sp_sufei.jpg',
 	'image/character/wulan.jpg',
+	'image/character/ol_zhangchangpu.jpg',
+	'image/character/re_jianyong.jpg',
+	'image/character/sp_key_yuri.jpg',
+	'image/character/xin_xusheng.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',

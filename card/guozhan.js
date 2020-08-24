@@ -346,8 +346,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 							else{
 								var list=[];
-								for(var i=0;i<=Math.min(num,damaged);i++){
-									list.push('摸'+i+'回'+(num-i));
+								for(var i=Math.min(num,damaged);i>=0;i--){
+									list.push('摸'+(num-i)+'回'+i);
 								}
 								target.chooseControl(list).set('prompt','请分配自己的摸牌数和回复量').ai=function(){
 									if(player.hasSkill('diaohulishan')) return 0;

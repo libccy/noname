@@ -5529,7 +5529,24 @@
 			doudizhu:{
 				name:'斗地主',
 				connect:{
-					update:function(config,map){},
+					update:function(config,map){
+						if(config.connect_doudizhu_mode=='kaihei'){
+							map.connect_double_character.hide();
+						}
+						else{
+							map.connect_double_character.show();
+						}
+					},
+					connect_doudizhu_mode:{
+						name:'游戏模式',
+						init:'normal',
+						item:{
+							normal:'标准',
+							kaihei:'开黑',
+						},
+						restart:true,
+						frequent:true,
+					},
 					connect_double_character:{
 						name:'双将模式',
 						init:false,
@@ -5545,12 +5562,28 @@
 				},
 				config:{
 					update:function(config,map){
-						if(config.double_character){
+						if(config.doudizhu_mode=='kaihei'){
+							map.double_character.hide();
+						}
+						else{
+							map.double_character.show();
+						}
+						if(config.double_character&&config.doudizhu_mode!='kaihei'){
 							map.double_hp.show();
 						}
 						else{
 							map.double_hp.hide();
 						}
+					},
+					doudizhu_mode:{
+						name:'游戏模式',
+						init:'normal',
+						item:{
+							normal:'标准',
+							kaihei:'开黑',
+						},
+						restart:true,
+						frequent:true,
 					},
 					double_character:{
 						name:'双将模式',
@@ -47819,7 +47852,7 @@
 			}
 		},
 		modetrans:function(config,server){
-			if(config.mode=='doudizhu') return '欢乐斗地主';
+			if(config.mode=='doudizhu') return config.doudizhu_mode=='kaihei'?'开黑斗地主':'欢乐斗地主';
 			if(config.mode=='versus'){
 				switch(config.versus_mode){
 					case '1v1':return '单人对决';
@@ -51127,7 +51160,7 @@
 					}
 					targets=get.selectableTargets();
 					if(targets.length==0){
-						return ok;
+						return range[0]==0||ok;
 					}
 					targets2=targets.slice(0);
 					// targets.sort(function(a,b){

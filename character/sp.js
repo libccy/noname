@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			sp:{
-				sp_default:["caoying","simahui","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","liuxie","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","fuwan","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","lingju","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","xujing","yuantanyuanshang","sunshao","zhangling",'guansuo','baosanniang'],
+				sp_default:["caoying","simahui","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","liuxie","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","fuwan","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","lingju","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","xujing","yuantanyuanshang","sunshao","zhangling",'guansuo','baosanniang','ol_zhangchangpu'],
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_star:["sp_xiahoushi","jsp_zhaoyun","huangjinleishi","sp_pangtong","sp_daqiao","sp_ganning","sp_xiahoudun","sp_lvmeng","sp_zhangfei","sp_liubei"],
 				sp_sticker:['sp_gongsunzan','sp_simazhao','sp_wangyuanji','sp_xinxianying','sp_liuxie'],
@@ -17,6 +17,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		character:{
+			ol_zhangchangpu:['female','wei',3,['yanjiao','olxingshen']],
 			zhangling:['male','qun',4,['zlhuji','zlshoufu'],['unseen']],
 			caiyang:['male','qun',1,['yinka'],['forbidai','unseen']],
 			panfeng:['male','qun',4,['kuangfu']],
@@ -389,6 +390,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			olxingshen:{
+				trigger:{player:'damageEnd'},
+				frequent:true,
+				audio:'xingshen',
+				content:function(){
+					'step 0'
+					var next=player.draw();
+					if(get.isLuckyStar(player)||Math.random()<0.5) next.num=2;
+					player.storage.olxingshen=player.getDamagedHp();
+					player[player.storage.olxingshen?'markSkill':'unmarkSkill']('olxingshen');
+				},
+				intro:{
+					content:'下一次发动〖严教〗时多展示X张牌',
+				},
+			},
 			//张道陵
 			zlhuji:{
 				mod:{
@@ -9092,11 +9108,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.addVideo('storage',player,['biluan',player.storage.biluan]);
 				}
 			},
-			rebiluan:{
-				audio:'biluan',
-				trigger:{player:'phaseJieshuBegin'},
+			rebiluan2:{
 				mark:true,
-				//unique:true,
+				charlotte:true,
 				intro:{
 					content:function(storage){
 						if(storage>0){
@@ -9111,10 +9125,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				init:function(player){
-					if(typeof player.storage.rebiluan!='number') player.storage.rebiluan=0;
+					if(typeof player.storage.rebiluan2!='number') player.storage.rebiluan2=0;
 				},
+				mod:{
+					globalTo:function(from,to,distance){
+						if(typeof to.storage.rebiluan2=='number'){
+							return distance+to.storage.rebiluan2;
+						}
+					}
+				}
+			},
+			rebiluan:{
+				audio:'biluan',
+				trigger:{player:'phaseJieshuBegin'},
 				checkx:function(player){
-					var ng=Math.min(4,game.players.length);
+					var ng=game.countGroup();
 					if(ng<2) return false;
 					var nai=0;
 					for(var i=0;i<game.players.length;i++){
@@ -9141,20 +9166,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					"step 1"
 					if(result.bool){
- 					var ng=Math.min(4,game.players.length);
+ 					player.addSkill('rebiluan2');
+ 					var ng=game.countGroup();
  					player.$damagepop(ng,'unknownx');
- 					player.storage.rebiluan+=ng;
- 					player.markSkill('rebiluan');
- 					game.addVideo('storage',player,['rebiluan',player.storage.rebiluan]);
+ 					player.storage.rebiluan2+=ng;
+ 					player.markSkill('rebiluan2');
+ 					game.addVideo('storage',player,['rebiluan2',player.storage.rebiluan2]);
 					}
 				},
-				mod:{
-					globalTo:function(from,to,distance){
-						if(typeof to.storage.rebiluan=='number'){
-							return distance+to.storage.rebiluan;
-						}
-					}
-				}
 			},
 			relixia:{
 				audio:'lixia',
@@ -9165,19 +9184,87 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				content:function(){
 					'step 0'
-					player.chooseTarget(function(card,player,target){
-						return target==player||target==_status.event.source;
-					},true,'礼下：摸一张牌或令对方摸两张牌').set('ai',function(target){
-						return get.attitude(player,target);
-					}).set('source',trigger.player);
-					'step 1'
-					if(result.targets.length){
-						result.targets[0].draw(result.targets[0]==player?1:2);
-						player.line(result.targets[0],'green');
+					if(trigger.player.isDead()){
+						event._result={bool:true,links:[0]};
+						return;
 					}
-					player.storage.rebiluan--;
-					player.markSkill('rebiluan');
-					game.addVideo('storage',player,['rebiluan',player.storage.rebiluan]);
+					event.videoId=lib.status.videoId++;
+					var func=function(card,id,bool){
+						var list=[
+							'令自己摸一张牌',
+							'令XXX摸两张牌',
+							'令XXX回复1点体力',
+						];
+						var choiceList=ui.create.dialog('【礼下】：请选择一至两项','forcebutton');
+						choiceList.videoId=id;
+						for(var i=0;i<list.length;i++){
+							list[i]=list[i].replace(/XXX/g,card);
+							var str='<div class="popup text" style="width:calc(100% - 10px);display:inline-block">';
+							if(i==2&&!bool) str+='<div style="opacity:0.5">';
+							str+=list[i];
+							if(i==2&&!bool) str+='</div>';
+							str+='</div>';
+							var next=choiceList.add(str);
+							next.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
+							next.firstChild.link=i;
+							for(var j in lib.element.button){
+								next[j]=lib.element.button[i];
+							}
+							choiceList.buttons.add(next.firstChild);
+						}
+						return choiceList;
+					};
+					if(player.isOnline2()){
+						player.send(func,get.translation(trigger.player),event.videoId,trigger.player.isDamaged());
+					}
+					event.dialog=func(get.translation(trigger.player),event.videoId,trigger.player.isDamaged());
+					if(player!=game.me||_status.auto){
+						event.dialog.style.display='none';
+					}
+					var next=player.chooseButton(true,[1,2]);
+					next.set('dialog',event.videoId);
+					next.set('filterButton',function(button){
+						if(button.link==2){
+							return _status.event.bool1;
+						};
+						return true;
+					});
+					next.set('bool1',trigger.player.isDamaged());
+					next.set('ai',function(button){
+						var player=_status.event.player;
+						var event=_status.event.getTrigger();
+						if(button.link&&get.attitude(player,event.player)<=0) return 0;
+						return button.link*Math.random();
+					});
+					"step 1"
+					if(event.videoId!=undefined){
+ 					if(player.isOnline2()){
+ 						player.send('closeDialog',event.videoId);
+ 					}
+ 					event.dialog.close();
+					}
+					var map=[
+						function(trigger,player,event){
+							player.draw();
+						},
+						function(trigger,player,event){
+							if(!result.links.contains(2)) player.line(trigger.player);
+							trigger.player.draw(2);
+						},
+						function(trigger,player,event){
+							player.line(trigger.player);
+							trigger.player.recover();
+						}
+					];
+					result.links.sort();
+					for(var i=0;i<result.links.length;i++){
+						game.log(player,'选择了','#g【礼下】','的','#y选项'+get.cnNumber(result.links[i]+1,true));
+						map[result.links[i]](trigger,player,event);
+					}
+ 				player.addSkill('rebiluan2');
+					player.storage.rebiluan2-=result.links.length;
+					player.markSkill('rebiluan2');
+					game.addVideo('storage',player,['rebiluan2',player.storage.rebiluan2]);
 				}
 			},
 			fuji:{
@@ -14609,9 +14696,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lixia:'礼下',
 			lixia_info:'锁定技，其他角色的结束阶段开始时，若你不在其攻击范围内，你摸一张牌或令其摸一张牌。本局内其他角色计算与你的距离时-1。',
 			rebiluan:'避乱',
-			rebiluan_info:'结束阶段开始时，若有与你距离不大于1的其他角色，你可以弃置一张牌。若如此做，本局内其他角色计算与你的距离时+X。（X为场上人数且至多为4）',
+			rebiluan2:'避乱',
+			rebiluan_info:'结束阶段开始时，若有与你距离不大于1的其他角色，你可以弃置一张牌。若如此做，本局内其他角色计算与你的距离时+X。（X为场上势力数）',
 			relixia:'礼下',
-			relixia_info:'锁定技，其他角色的结束阶段开始时，若你不在其攻击范围内，你摸一张牌或令其摸两张牌。本局内其他角色计算与你的距离时-1。',
+			relixia_info:'锁定技，其他角色的结束阶段开始时，若你不在其攻击范围内，你选择一至两项：1.摸一张牌；2.其摸两张牌；3.其回复1点体力。本局内其他角色计算与你的距离时-X（X为你选择的选项数）。',
 			yishe:'义舍',
 			yishe_bg:'米',
 			yishe_info:'结束阶段开始时，若你的武将牌上没有「米」，则你可以摸两张牌。若如此做，你将两张牌置于武将牌上，称为「米」；当有「米」移至其他区域后，若你的武将牌上没有「米」，则你回复1点体力。',
@@ -14880,6 +14968,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zlshoufu:'授符',
 			zlshoufu2:'授符',
 			zlshoufu_info:'出牌阶段限一次，你可摸一张牌，然后将一张手牌置于一名没有【箓】的角色的武将牌上，称为【箓】；其不能使用和打出与【箓】同类型的牌。该角色受伤后，或于弃牌阶段弃置至少2张与【箓】同类型的牌后，将【箓】置入弃牌堆。',
+			ol_zhangchangpu:'OL张昌蒲',
+			olxingshen:'省身',
+			olxingshen_info:'当你受到伤害后，你可以随机摸两张牌。若如此做，你移去所有“省”并获得X个“省”，且下一次发动〖严教〗展示牌时移去所有“省”并多展示等量的牌。（X为你已损失的体力值）',
 			
 			sp_default:"常规",
 			sp_zhongdan:"忠胆英杰",

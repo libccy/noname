@@ -18,7 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			old_jiakui:['male','wei',3,['zhongzuo','wanlan']],
+			old_jiakui:['male','wei',3,['tongqu','xinwanlan']],
 			pangde:['male','qun',4,['mashu','mengjin']],
 			ol_huaxiong:["male","qun",6,["new_reyaowu"]],
 			old_wangyun:['male','qun',4,['wylianji','moucheng']],

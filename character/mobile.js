@@ -8,11 +8,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mobile:{
 				mobile_default:["miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei"],
 				mobile_yijiang:["yj_zhanghe","yj_zhangliao","yj_xuhuang","yj_ganning"],
-				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","xin_yuanshao","re_liushan","xin_xiahoudun","re_sp_zhugeliang","re_heqi","re_guanqiujian","re_pangtong","old_liuzan","xin_chengpu","re_sunjian"],
+				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","xin_yuanshao","re_liushan","xin_xiahoudun","re_sp_zhugeliang","re_heqi","re_guanqiujian","re_pangtong","old_liuzan","xin_chengpu","re_sunjian","re_xusheng"],
 				mobile_sunben:["re_sunben"],
 			},
 		},
 		character:{
+			re_xusheng:['male','wu',4,['repojun']],
 			sp_sufei:['male','qun',4,['zhengjian','gaoyuan']],
 			yj_zhangliao:['male','qun',4,['weifeng']],
 			yj_zhanghe:['male','qun',4,['xinzhilve']],
@@ -32,7 +33,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_sp_zhugeliang:["male","shu",3,["bazhen","rehuoji","rekanpo"],[]],
 			xin_xiahoudun:['male','wei',4,['reganglie','xinqingjian']],
 			zhangyì:['male','shu',4,['zhiyi']],
-			jiakui:['male','wei',3,['tongqu','xinwanlan']],
+			jiakui:['male','wei',3,['zhongzuo','wanlan']],
 			re_jikang:["male","wei",3,["new_qingxian","new_juexiang"]],
 			old_bulianshi:['female','wu',3,['anxu','zhuiyi']],
 			miheng:['male','qun',3,['kuangcai','shejian']],
@@ -338,7 +339,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tongqu2:{
 				trigger:{player:'phaseDrawEnd'},
 				forced:true,
-				silent:false,
+				silent:true,
 				filter:function(event,player){
 					var bool=game.hasPlayer(function(current){
 						return current!=player&&current.hasMark('tongqu');
@@ -402,7 +403,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'damageBegin4'},
 				filter:function(event,player){
 					return event.player.hp<=event.num&&player.countCards('he',function(card){
-						return get.type(card)!='basic';
+						return lib.filter.cardDiscardable(card,player)&&get.type(card)!='basic';
 					})>=1;
 				},
 				logTarget:'player',
@@ -416,13 +417,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var savable=get.info(card).savable;
 						if(typeof savable=='function') savable=savable(card,player,event.player);
 						return savable;
-					})>=1+trigger.num-event.player.hp) return false;
+					})>=1+event.num-event.player.hp) return false;
 					if(event.player==player||event.player==get.zhu(player)) return true;
 					return !player.hasUnknown();
 				},
 				content:function(){
 					player.discard(player.getCards('he',function(card){
-						return get.type(card)!='basic';
+						return lib.filter.cardDiscardable(card,player)&&get.type(card)!='basic';
 					}));
 					trigger.cancel();
 				},
@@ -5070,8 +5071,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:'当前“惧”标记名称：$',
 					onunmark:function(storage,player){
-						game.log(player,'移去了一个','#g【惧('+get.translation(storage)+')】','标记')
-						delete player.storage.weifeng2;
+						if(player.storage.weifeng2){
+ 						game.log(player,'移去了一个','#g【惧('+get.translation(player.storage.weifeng2)+')】','标记')
+ 						delete player.storage.weifeng2;
+						}
 					},
 				},
 				marktext:'惧',
@@ -5664,6 +5667,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tongqu_info:'游戏开始时，你获得一个“渠”。出牌阶段开始时，你可令一名没有“渠”的角色获得一个“渠”。有“渠”的角色摸牌阶段，其多摸一张牌，然后其将一张牌交给一名有“渠”的其他角色或弃置一张牌。有“渠”的角色受到伤害后，其弃置“渠”',
 			xinwanlan:'挽澜',
 			xinwanlan_info:'当有角色受到伤害时，若伤害点数大于其体力值，则你可以弃置所有非基本牌（至少两张）并防止此伤害。',
+			re_xusheng:'手杀徐盛',
 		}
 	};
 });

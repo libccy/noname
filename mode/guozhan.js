@@ -8145,6 +8145,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else if(source&&source.identity!='unknown'){
 						if(source.identity=='ye') source.draw(3);
 						else if(source.shijun2){
+							delete source.shijun2;
 							source.draw(1+game.countPlayer(function(current){
 								return current.group==that.group
 							}));
