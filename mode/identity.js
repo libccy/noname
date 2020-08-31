@@ -2491,10 +2491,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					identity2=to.ai.identity_mark;
 				}
 				if(from.identity!='nei'&&from!=to&&get.population('fan')==0&&identity2=='zhong'){
+					var defense_status=0;
+					for(var i=0;i<game.players.length;i++){
+						defense_status=Math.max(defense_status,game.players[i].hp+game.players[i].countCards('he'));
+					}
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].identity=='nei'&&
 						game.players[i].ai.identity_mark=='zhong'&&
-						game.players[i].ai.shown<1){
+						game.players[i].ai.shown<1&&
+						defense_status==game.players[i].hp+game.players[i].countCards('he')){
 							identity2='nei';break;
 						}
 					}
