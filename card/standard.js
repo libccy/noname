@@ -1108,6 +1108,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target){
+							if(get.attitude(player,target)<=0){
+								var nh=target.countCards('h');
+								var es=target.getCards('e');
+								var noh=(nh==0||target.hasSkillTag('noh'));
+								var noe=false;
+								var bad_equip_num=0;
+								for (var i=0;i<es.length;i++){
+									if (get.equipValue(es[i])<=0) bad_equip_num+=1;
+								}
+								if (bad_equip_num==es.length) noe=true;
+								if(noh&&noe) return 0;
+							}
 							if(get.attitude(player,target)<=0) return (target.countCards('he',function(card){
 								return card.name=='tengjia'||get.value(card)>0;
 							})>0)?-1.5:1.5;
@@ -1123,6 +1135,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							return -1.5;
 						},
 						player:function(player,target){
+							if(get.attitude(player,target)<=0){
+								var nh=target.countCards('h');
+								var es=target.getCards('e');
+								var noh=(nh==0||target.hasSkillTag('noh'));
+								var noe=false;
+								var bad_equip_num=0;
+								for (var i=0;i<es.length;i++){
+									if (get.equipValue(es[i])<=0) bad_equip_num+=1;
+								}
+								if (bad_equip_num==es.length) noe=true;
+								if(noh&&noe) return 0;
+							}
 							if(get.attitude(player,target)<0&&!target.countCards('he')){
 								return 0;
 							}
@@ -1209,14 +1233,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var noe=(es.length==0||target.hasSkillTag('noe'));
 							var noe2=(es.length==1&&es[0].name!='tengjia'&&get.value(es[0])<=0);
 							var noe3=(es.length==1&&es[0].name=='baiyin'&&target.isDamaged());
-							var noe4 = false;
 							var bad_equip_num=0;
 							for (var i=0;i<es.length;i++){
 								if (get.equipValue(es[i])<=0) bad_equip_num+=1;
 							}
-							if (bad_equip_num==es.length) noe3 = true;
+							if (bad_equip_num==es.length) noe=true;
 							var noh=(nh==0||target.hasSkillTag('noh'));
-							if(noh&&(noe||noe2||noe3||noe4)) return 0;
+							if(noh&&(noe||noe2||noe3)) return 0;
 							if(att<=0&&!target.countCards('he')) return 1.5;
 							return -1.5;
 						},

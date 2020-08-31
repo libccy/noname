@@ -285,6 +285,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target:function(player,target){
 							var e5=target.getEquip(5);
 							if(e5&&e5.name=='muniu'&&e5.cards&&e5.cards.length>1) return -1;
+							var e2=target.getEquip(2);
+							if(e2&&player.countCards('h','sha')>0&&(e2.name=='bagua'||(e2.name=='lanyinjia'&&target.countCards('h')>0))&&player.inRange(target)) return -1;
+							var e3=target.getEquip(3);
+							if(e3&&player.countCards('h','sha')>0&&get.distance(player,target)==2&&!player.inRange(target)) return -1;
+							if(target.countCards('he')>target.getHandcardLimit()&&target.hasJudge('lebu')) return -1;
 							if(target.countCards('e',function(card){
 								return get.value(card,target)<=0;
 							})||target.hasSkillTag('noe')) return 1;
