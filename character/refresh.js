@@ -1955,11 +1955,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var num=player.maxHp-player.hp;
 							var players=game.filterPlayer();
 							for(var i=0;i<players.length;i++){
+								var has_bad_equip=players[i].countCards('e',function(card){return get.equipValue(card)<=0;})>0;
 								if(get.attitude(player,players[i])>0) list1.push(players[i]);
-								else if(get.attitude(player,players[i])<0) list2.push(players[i]);
+								else if(get.attitude(player,players[i])<0&&!has_bad_equip) list2.push(players[i]);
 							}
 							list1.sort(function(a,b){
-								return a.countCards('e')-b.countCards('e');
+								if(a.countCards('e',function(card){return get.equipValue(card)<=0;})>0) return -1;
+								if(b.countCards('e',function(card){return get.equipValue(card)<=0;})>0) return -1;
+								return a.countCards('e',function(card){return get.equipValue(card)>0;})-b.countCards('e',function(card){return get.equipValue(card)>0;});
 							});
 							list2.sort(function(a,b){
 								return b.countCards('e')-a.countCards('e');

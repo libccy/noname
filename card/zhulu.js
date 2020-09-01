@@ -291,7 +291,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(e3&&player.countCards('h','sha')>0&&get.distance(player,target)==2&&!player.inRange(target)) return -1;
 							if(target.countCards('he')>target.getHandcardLimit()&&target.hasJudge('lebu')) return -1;
 							if(target.countCards('e',function(card){
-								return get.value(card,target)<=0;
+								return get.equipValue(card)<=0;
 							})||target.hasSkillTag('noe')) return 1;
 							return 0;
 						},
@@ -612,6 +612,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					basic:{
 						equipValue:5,
+						value:function(card,player,i){
+							if(_status.jinhe&&_status.jinhe[card.cardid]&&(_status.event.name=='discardPlayerCard'||_status.event.name=='chooseToDiscard'||_status.event.name=='chooseToUse')) return 1+2*player.countCards('h');
+							return 0;
+						},
 					},
 					result:{
 						keepAI:true,
@@ -704,6 +708,22 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					game.broadcastAll(ui.clear);
 				},
+				ai:{
+					basic:{
+						order:1,
+					},
+					result:{
+						player:function(player){
+							var cards=player.getCards('h')
+							var card_suits=[];
+							for(var i=0;i<cards.length;i++){
+								if(!card_suits.contains(get.suit(cards[i]))) card_suits.push(get.suit(cards[i]));
+							}
+							if(card_suits.length>=2) return 1;
+							return 0;
+						}
+					}
+				}
 			},
 			yexingyi_skill:{
 				equipSkill:true,

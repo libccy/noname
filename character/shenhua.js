@@ -2178,6 +2178,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							"step 0"
+							var check=false;
+							if(!player.canMoveCard(true)){
+								check=false;
+							}
+							else{
+								check=game.hasPlayer(function(current){
+									if (get.attitude(player,current)>0){
+										return (current.hasJudge('lebu')||current.hasJudge('bingliang')||current.hasJudge('caomu'))||current.countCards('e',function(card){return get.equipValue(card)<=0;})>0;
+									}
+									else if(get.attitude(player,current)<0){
+										return current.countCards('e',function(card){return get.equipValue(card)>0;})>0;
+									}
+								});
+							}
 							player.chooseToDiscard('he',get.prompt('xinjiewei'),'弃置一张牌并移动场上的一张牌',lib.filter.cardDiscardable).set('ai',function(card){
 								if(!_status.event.check) return 0;
 								return 7-get.value(card);
@@ -2969,7 +2983,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						var next=player.chooseToDiscard(get.prompt('qiaobian'),'弃置一张手牌并跳过判定阶段');
-						next.set('ai',get.unuseful2);
+						next.set('ai',function(button){
+							if(!player.hasJudge('lebu')&&!player.hasJudge('bingliang')&&!player.hasJudge('caomu')) return 0;
+							return get.unuseful2;
+						})
 						next.set('logSkill','qiaobian1');
 					}
 					"step 1"
@@ -3045,13 +3062,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
-					var check;
+					var check=false;
 					if(!player.canMoveCard(true)){
 						check=false;
 					}
 					else{
 						check=game.hasPlayer(function(current){
-							return get.attitude(player,current)>0&&current.countCards('j');
+							if (get.attitude(player,current)>0){
+								return (current.hasJudge('lebu')||current.hasJudge('bingliang')||current.hasJudge('caomu'))||current.countCards('e',function(card){return get.equipValue(card)<=0;})>0;
+							}
+							else if(get.attitude(player,current)<0){
+								return current.countCards('e',function(card){return get.equipValue(card)>0;})>0;
+							}
 						});
 						if(!check){
 							if(player.countCards('h')>player.hp+1){
@@ -3059,9 +3081,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							else if(player.countCards('h',{name:['wuzhong']})){
 								check=false;
-							}
-							else{
-								check=true;
 							}
 						}
 					}

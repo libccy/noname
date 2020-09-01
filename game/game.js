@@ -13465,12 +13465,12 @@
 						if(ui.selected.targets.length==0){
 							if(att>0){
 								if(!_status.event.nojudge&&target.countCards('j',function(card){
-									return game.hasPlayer(function(current){
+									return (card.name=='lebu'||card.name=='bingliang'||card.name=='caomu')&&game.hasPlayer(function(current){
 										return current.canAddJudge(card)&&get.attitude(player,current)<0;
 									})
 								})) return 14;
 								if(target.countCards('e',function(card){
-									return get.value(card,target)<0&&game.hasPlayer(function(current){
+									return get.equipValue(card)<=0&&game.hasPlayer(function(current){
 										return current!=target&&get.attitude(player,current)<0&&current.isEmpty(get.subtype(card))
 									});
 								})>0) return 9;
@@ -13480,7 +13480,7 @@
 									if(current!=target&&get.attitude(player,current)>0){
 										var es=target.getCards('e');
 										for(var i=0;i<es.length;i++){
-											if(get.value(es[i],target)>0&&current.isEmpty(get.subtype(es[i]))&&get.effect(current,es[i],player,current)>0) return true;
+											if(get.equipValue(es[i])>0&&current.isEmpty(get.subtype(es[i]))&&get.effect(current,es[i],player,current)>0) return true;
 										}
 									}
 								})){
@@ -13494,7 +13494,7 @@
 						var att2=get.sgn(get.attitude(player,ui.selected.targets[0]));
 						for(i=0;i<es.length;i++){
 							if(sgnatt!=0&&att2!=0&&
-								get.sgn(get.value(es[i],ui.selected.targets[0]))==-att2&&
+								get.sgn(get.equipValue(es[i]))==-att2&&
 								get.sgn(get.effect(target,es[i],player,target))==sgnatt&&
 								target.isEmpty(get.subtype(es[i]))){
 								return Math.abs(att);
@@ -13538,7 +13538,12 @@
 								if(get.position(button.link)=='j') return -10;
 								return get.equipValue(button.link)*get.effect(targets1,button.link,player,targets1);
 							}
-						},targets[0]).set('nojudge',event.nojudge||false).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
+						},targets[0]).set('ai',function(button){
+							var player=_status.event.player;
+							var targets0=_status.event.targets0;
+							var targets1=_status.event.targets1;
+							return get.position(button.link)=='e'?get.equipValue(button.link)*get.attitude(player,targets1):get.value(button.link,targets0);
+						}).set('nojudge',event.nojudge||false).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
 							var targets1=_status.event.targets1;
 							if(get.position(button.link)=='j'){
 								if(_status.event.nojudge) return false;
@@ -18182,7 +18187,7 @@
 							for(var i=0;i<es.length;i++){
 								if(game.hasPlayer(function(current2){
 									if(withatt){
-										if(get.sgn(get.value(es[i],current))!=-att) return false;
+										if(get.sgn(get.equipValue(es[i]))!=-att) return false;
 										var att2=get.sgn(get.attitude(player,current2));
 										if(att2!=get.sgn(get.effect(current2,es[i],player,current2))) return false;
 									}

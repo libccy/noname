@@ -371,6 +371,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					target.damage('nocard');
 				},
+				ai:{
+					order:1,
+					result:{
+						target:function(player,target){
+							return get.damageEffect(target,player);
+						},
+					},
+				}
 			},
 			//文鸯
 			xinlvli:{
