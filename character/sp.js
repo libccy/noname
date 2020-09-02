@@ -13267,10 +13267,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function (player,target){
 							if(ui.selected.targets.length==0){
-								return get.attitude(player,target)<0?-999:-3;
+								if(get.attitude(player,target)<0){
+									return -999;
+								}
+								else if(get.attitude(player,target)>0){
+									if(target.hasSkill('smh_huoji')&&target.hasSkill('smh_lianhuan')) return 0;
+									return target.countCards('h')>2?-3:999;
+								}
+								return -3;
 							}
 							else{
-								return target.countCards('h')+1;
+								return target.countCards('h')>2?999:target.countCards('h')+1;
 							}
 						},
 					},
@@ -13360,7 +13367,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(trigger.player.hasSkill('smh_huoji')){
 						player.chooseTarget('请将'+get.translation(trigger.player)+'的「龙印」交给一名角色',true).set('ai',function(target){
 							var player=_status.event.player;
-							return 10+get.attitude(player,target);
+							return 10+get.attitude(player,target)*target.countCards('h');
 						});
 					}else event.goto(2);
 					"step 2"
@@ -13374,7 +13381,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(trigger.player.hasSkill('smh_lianhuan')){
 						player.chooseTarget('请将'+get.translation(trigger.player)+'的「凤印」交给一名角色',true).set('ai',function(target){
 							var player=_status.event.player;
-							return 10+get.attitude(player,target);
+							return 10+get.attitude(player,target)*target.countCards('h');
 						});
 					}else event.finish();
 					"step 4"

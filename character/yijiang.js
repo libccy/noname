@@ -3314,13 +3314,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.isHealthy()){
 						event.type=0;
 						player.chooseBool(get.prompt('caishi'),'手牌上限+1，然后本回合你的牌不能对其他角色使用',function(event,player){
-							return player.skipList.contains('phaseUse')||!player.needsToDiscard(1);
+							return player.skipList.contains('phaseUse')||player.needsToDiscard()>0||player.getHandcardLimit()<=0;
 						});
 					}
 					else{
 						event.type=1;
 						player.chooseControlList(get.prompt('caishi'),'手牌上限+1，然后本回合你的牌不能对其他角色使用','回复1点体力，然后本回合你的牌不能对自己使用',function(){
-							return 1;
+							if(player.hp<=2){
+								if(player.countCards('h','tao')>=2) return;
+								return 1;
+							} else {
+								return (player.skipList.contains('phaseUse')||player.needsToDiscard()>0||player.getHandcardLimit()<=0)?0:1;
+							}
 						});
 					}
 					'step 1'

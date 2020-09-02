@@ -3235,14 +3235,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.chooseTarget(get.prompt('drlt_jieying'),"将“营”交给一名角色；其摸牌阶段多摸一张牌，出牌阶段使用【杀】的次数上限+1且手牌上限+1。该角色回合结束后，其移去“营”标记，然后你获得其所有手牌。",function(card,player,target){
 								return target!=player;
 							}).ai=function(target){
-								if(get.attitude(player,target)>0)
-								return 0.1;
-								if(get.attitude(player,target)<1&&(target.isTurnedOver()||target.countCards('h')<1))
-								return 0.2;
-									if(get.attitude(player,target)<1&&target.countCards('h')>0&&target.countCards('j',{name:'lebu'})>0)
-								return target.countCards('h')*0.8+target.getHandcardLimit()*0.7+2;
-								if(get.attitude(player,target)<1&&target.countCards('h')>0)
-								return target.countCards('h')*0.8+target.getHandcardLimit()*0.7;
+								if(target.isTurnedOver()||target.countCards('h')<3) return 0;
+								if(get.attitude(player,target)<1){
+									if(target.countCards('j',{name:'lebu'})>0) return target.countCards('h')*0.8+target.getHandcardLimit()*0.7+2;
+									if(target.countCards('h')>2) return target.countCards('h')*0.8+target.getHandcardLimit()*0.7;
+								}
 								return 1;
 							};
 							'step 1'

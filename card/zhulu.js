@@ -359,9 +359,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								val+=get.equipValue(card[i]);
 							}
 							var baiyin_card=target.getEquip(2);
-							if(baiyin_card&&card.length==1&&(baiyin_card.name=='baiyin'&&target.isDamaged())) return 'zerotarget';
-							if(val>0) return -val;
-							return 0;
+							if(baiyin_card&&card.length==1&&baiyin_card.name=='baiyin'&&target.isDamaged()) return 0;
+							return -val;
 						},
 					},
 				},
@@ -408,7 +407,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var val=2.5;
 							var card=target.getEquip(1);
 							if(card&&get.equipValue(card)<=0) return 'zerotarget';
-							if(card) val+=get.value(card);
+							if(card) val+=get.equipValue(card);
 							return -val;
 						},
 					},
@@ -437,7 +436,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var val=2.5;
 							var card=target.getEquip(1);
 							if(card&&get.equipValue(card)<=0) return 'zerotarget';
-							if(card) val+=get.value(card);
+							if(card) val+=get.equipValue(card);
 							return -val;
 						},
 					},
@@ -465,8 +464,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target:function(player,target){
 							var val=2;
 							var card=target.getEquip(2);
-							if(card&&(card.name=='baiyin'&&target.isDamaged())) return 'zerotarget';
-							if(card) val+=get.value(card);
+							if(card&&card.name=='baiyin'&&target.isDamaged()) return 0;
+							if(card) val+=get.equipValue(card);
 							return -val;
 						},
 					},
@@ -510,6 +509,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								return cardx!=card;
 							});
 							if(num==0) return 0;
+							if(player.countCards('e',function(cardx){return cardx!=card&&get.equipValue(cardx)<=0;})>0) return 0;
 							return 4/num;
 						}
 						return 1;
@@ -520,17 +520,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						keepAI:true,
 						target:function(player,target){
+							var val=0;
+							var card=target.getEquip(2);
+							if(card) val=get.equipValue(card);
+							if(card&&card.name=='baiyin'&&target.isDamaged()) val=0;
 							if(target.sex=='male'){
-								var val=0;
-								var card=target.getEquip(2);
-								if(card&&(card.name!='baiyin'&&target.isDamaged())) val=get.value(card);
 								var num=target.countCards('he',function(cardx){
-									return cardx!=card
+									return cardx!=card;
 								});
 								if(num>0) val+=4/num;
-								return -val;
+								if((target.countCards('e',function(card){return get.equipValue(card)<=0;})>0)&&val<=0) val=0;
 							}
-							return 0;
+							return -val;
 						},
 					},
 				}

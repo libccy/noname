@@ -795,9 +795,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(get.mode()=='identity'){
 								if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
 								var list=player.getFriends();
-								if (player.isZhu&&player.countCards('h')>2){
+								if(player.isZhu&&player.countCards('he')>2){
 									for (var i=0;i<list.length;i++){
-										if (list[i].countCards('h')<=2&&list[i].hp<=1) return 0;
+										if(list[i].hp<=1) return 0;
 									}
 								}
 							}
@@ -873,9 +873,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(get.mode()=='identity'){
 								if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
 								var list=player.getFriends();
-								if (player.isZhu&&player.countCards('h')>2){
+								if(player.isZhu&&player.countCards('he')>2){
 									for (var i=0;i<list.length;i++){
-										if (list[i].countCards('h')<=2&&list[i].hp<=1) return 0;
+										if(list[i].hp<=1) return 0;
 									}
 								}
 							}
