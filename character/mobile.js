@@ -121,7 +121,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subtype:'equip1',
 				distance:{attackFrom:-8},
 				skills:['ly_piliche'],
-				destroy:'polu'
+				destroy:'polu',
+				ai:{
+					basic:{
+						equipValue:0
+					}
+				},
 			},
 			"wolong_card":{
 				type:"takaramono",

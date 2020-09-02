@@ -631,7 +631,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								val+=get.equipValue(card[i]);
 							}
 							var baiyin_card=target.getEquip(2);
-							if(baiyin_card&&(baiyin_card.name=='baiyin'&&target.isDamaged())) return 'zerotarget';
+							if(baiyin_card&&baiyin_card.name=='baiyin'&&target.isDamaged()) return 0;
 							if(val>0) return -val;
 							return 0;
 						}
