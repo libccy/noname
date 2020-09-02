@@ -218,7 +218,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				skills:['zhungangshuo'],
 				distance:{attackFrom:-2},
 				ai:{
-					equipValue:4
+					basic:{
+						equipValue:4
+					}
 				},
 			},
 			lanyinjia:{
@@ -227,8 +229,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'equip2',
 				skills:['lanyinjia','lanyinjia2'],
 				ai:{
-					equipValue:6
-				}
+					basic:{
+						equipValue:6
+					}
+				},
 			},
 			yinyueqiang:{
 				audio:true,

@@ -287,6 +287,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(e5&&e5.name=='muniu'&&e5.cards&&e5.cards.length>1) return -1;
 							var e2=target.getEquip(2);
 							if(e2&&player.countCards('h','sha')>0&&(e2.name=='bagua'||(e2.name=='lanyinjia'&&target.countCards('h')>0))&&player.inRange(target)) return -1;
+							if(e2&&e2.name=='baiyin'&&target.isDamaged()) return 2;
 							var e3=target.getEquip(3);
 							if(e3&&player.countCards('h','sha')>0&&get.distance(player,target)==2&&!player.inRange(target)) return -1;
 							if(target.countCards('he')>target.getHandcardLimit()&&target.hasJudge('lebu')) return -1;
@@ -523,7 +524,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var val=0;
 							var card=target.getEquip(2);
 							if(card) val=get.equipValue(card);
-							if(card&&card.name=='baiyin'&&target.isDamaged()) val=0;
 							if(target.sex=='male'){
 								var num=target.countCards('he',function(cardx){
 									return cardx!=card;
@@ -531,6 +531,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								if(num>0) val+=4/num;
 								if((target.countCards('e',function(card){return get.equipValue(card)<=0;})>0)&&val<=0) val=0;
 							}
+							if(card&&card.name=='baiyin'&&target.isDamaged()) val=0;
 							return -val;
 						},
 					},
