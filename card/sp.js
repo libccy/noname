@@ -262,7 +262,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					useful:function(card,i){
 						var player=_status.event.player
-						if(player.hp<=1&&_status.currentPhase==player&&_status.event.getParent('phaseDiscard').name=='phaseDiscard'){
+						if(player.hp<=1&&_status.currentPhase==player&&_status.event.getParent('phaseDiscard').name=='phaseDiscard'&&player.countCards('h','tao')+player.countCards('h','jiu')<=0){
 							return 11;
 						}
 						return 6;

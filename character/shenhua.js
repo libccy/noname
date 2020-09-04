@@ -2183,12 +2183,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								check=false;
 							}
 							else{
-								check=game.hasPlayer(function(current){
-									if (get.attitude(player,current)>0){
-										return (current.hasJudge('lebu')||current.hasJudge('bingliang')||current.hasJudge('caomu'))||current.countCards('e',function(card){return get.equipValue(card)<=0;})>0;
+								//以下節錄game.js的moveCard函數下的target回傳部分
+								var check=game.hasPlayer(function(target){
+									var att=get.attitude(player,target);
+									var sgnatt=get.sgn(att);
+									if(att>0){
+										if(!_status.event.nojudge&&target.countCards('j',function(card){
+											return (card.name=='lebu'||card.name=='bingliang'||card.name=='caomu')&&game.hasPlayer(function(current){
+												return current.canAddJudge(card)&&get.attitude(player,current)<0;
+											})
+										})) return true;
+										if(target.countCards('e',function(card){
+											return get.equipValue(card)<=0&&game.hasPlayer(function(current){
+												return current!=target&&get.attitude(player,current)<0&&current.isEmpty(get.subtype(card))
+											});
+										})>0) return true;
 									}
-									else if(get.attitude(player,current)<0){
-										return current.countCards('e',function(card){return get.equipValue(card)>0;})>0;
+									else if(att<0){
+										if(game.hasPlayer(function(current){
+											if(current!=target&&get.attitude(player,current)>0){
+												var es=target.getCards('e');
+												for(var i=0;i<es.length;i++){
+													if(get.equipValue(es[i])>0&&current.isEmpty(get.subtype(es[i]))&&get.effect(current,es[i],player,current)>0) return true;
+												}
+											}
+										})){
+											return true;
+										}
 									}
 								});
 							}
@@ -3067,12 +3088,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						check=false;
 					}
 					else{
-						check=game.hasPlayer(function(current){
-							if (get.attitude(player,current)>0){
-								return (current.hasJudge('lebu')||current.hasJudge('bingliang')||current.hasJudge('caomu'))||current.countCards('e',function(card){return get.equipValue(card)<=0;})>0;
+						//以下節錄game.js的moveCard函數下的target回傳部分
+						var check=game.hasPlayer(function(target){
+							var att=get.attitude(player,target);
+							var sgnatt=get.sgn(att);
+							if(att>0){
+								if(!_status.event.nojudge&&target.countCards('j',function(card){
+									return (card.name=='lebu'||card.name=='bingliang'||card.name=='caomu')&&game.hasPlayer(function(current){
+										return current.canAddJudge(card)&&get.attitude(player,current)<0;
+									})
+								})) return true;
+								if(target.countCards('e',function(card){
+									return get.equipValue(card)<=0&&game.hasPlayer(function(current){
+										return current!=target&&get.attitude(player,current)<0&&current.isEmpty(get.subtype(card))
+									});
+								})>0) return true;
 							}
-							else if(get.attitude(player,current)<0){
-								return current.countCards('e',function(card){return get.equipValue(card)>0;})>0;
+							else if(att<0){
+								if(game.hasPlayer(function(current){
+									if(current!=target&&get.attitude(player,current)>0){
+										var es=target.getCards('e');
+										for(var i=0;i<es.length;i++){
+											if(get.equipValue(es[i])>0&&current.isEmpty(get.subtype(es[i]))&&get.effect(current,es[i],player,current)>0) return true;
+										}
+									}
+								})){
+									return true;
+								}
 							}
 						});
 						if(!check){
@@ -3110,7 +3152,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					var discard=player.countCards('h')>player.hp;
+					var discard=player.needsToDiscard()>0;
 					var next=player.chooseToDiscard(get.prompt('qiaobian4'),'弃置一张手牌并跳过弃牌阶段');
 					next.logSkill='qiaobian';
 					next.ai=function(card){

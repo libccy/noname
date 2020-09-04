@@ -13497,7 +13497,7 @@
 								get.sgn(get.equipValue(es[i]))==-att2&&
 								get.sgn(get.effect(target,es[i],player,target))==sgnatt&&
 								target.isEmpty(get.subtype(es[i]))){
-								return Math.abs(att);
+								return Math.abs(att*get.attitude(player,ui.selected.targets[0]));
 							}
 						}
 						if(i==es.length&&(_status.event.nojudge||!ui.selected.targets[0].countCards('j',function(card){
@@ -13525,24 +13525,21 @@
 					game.delay();
 					'step 3'
 					if(targets.length==2){
-						player.choosePlayerCard('ej',true,function(button){
+						player.choosePlayerCard('ej',true,targets[0]).set('ai',function(button){
 							var player=_status.event.player;
 							var targets0=_status.event.targets0;
 							var targets1=_status.event.targets1;
 							if(get.attitude(player,targets0)>0&&get.attitude(player,targets1)<0){
-								if(get.position(button.link)=='j') return 12;
-								if(get.value(button.link,targets0)<0&&get.effect(targets1,button.link,player,targets1)>0) return 10;
-								return 0;
+								if(get.position(button.link)=='j'&&(button.link.name=='lebu'||button.link.name=='bingliang'||button.link.name=='caomu')) return 12+get.value(button.link);
+								if(get.equipValue(button.link)<0) return 10;
+								return -10;
 							}
-							else{
+							else {
+								console.log(button.link.name);
 								if(get.position(button.link)=='j') return -10;
-								return get.equipValue(button.link)*get.effect(targets1,button.link,player,targets1);
+								if(get.equipValue(button.link)>0&&get.effect(targets1,button.link,player,targets1)>0) return 10+get.equipValue(button.link);
 							}
-						},targets[0]).set('ai',function(button){
-							var player=_status.event.player;
-							var targets0=_status.event.targets0;
-							var targets1=_status.event.targets1;
-							return get.position(button.link)=='e'?get.equipValue(button.link)*get.attitude(player,targets1):get.value(button.link,targets0);
+							return 0;
 						}).set('nojudge',event.nojudge||false).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
 							var targets1=_status.event.targets1;
 							if(get.position(button.link)=='j'){
