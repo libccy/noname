@@ -231,7 +231,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target){
-							return get.attitude(player,target)<0&&-get.effect(target,{name:'sha'},player,player);
+							if(get.attitude(player,target)<0&&get.effect(target,{name:'sha'},player,player)>0) return -1;
 						},
 					},
 				},
