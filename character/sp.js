@@ -9136,8 +9136,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'biluan',
 				trigger:{player:'phaseJieshuBegin'},
 				checkx:function(player){
-					var ng=game.countGroup();
-					if(ng<2) return false;
+					var ng=Math.min(4,game.countPlayer());
 					var nai=0;
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]!=player){
@@ -9164,7 +9163,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
  					player.addSkill('rebiluan2');
- 					var ng=game.countGroup();
+ 					var ng=Math.min(4,game.countPlayer());
  					player.$damagepop(ng,'unknownx');
  					player.storage.rebiluan2+=ng;
  					player.markSkill('rebiluan2');
@@ -14689,7 +14688,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lixia_info:'锁定技，其他角色的结束阶段开始时，若你不在其攻击范围内，你摸一张牌或令其摸一张牌。本局内其他角色计算与你的距离时-1。',
 			rebiluan:'避乱',
 			rebiluan2:'避乱',
-			rebiluan_info:'结束阶段开始时，若有与你距离不大于1的其他角色，你可以弃置一张牌。若如此做，本局内其他角色计算与你的距离时+X。（X为场上势力数）',
+			rebiluan_info:'结束阶段开始时，若有与你距离不大于1的其他角色，你可以弃置一张牌。若如此做，本局内其他角色计算与你的距离时+X。（X为场上角色数且至多为4）',
 			relixia:'礼下',
 			relixia_info:'锁定技，其他角色的结束阶段开始时，若你不在其攻击范围内，你选择一至两项：1.摸一张牌；2.其摸两张牌；3.其回复1点体力。本局内其他角色计算与你的距离时-X（X为你选择的选项数）。',
 			yishe:'义舍',

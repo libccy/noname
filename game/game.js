@@ -7177,6 +7177,16 @@
 						game.saveConfig('mousewheel',false);
 					}
 
+					var show_splash=lib.config.show_splash;
+					if(show_splash=='off'){
+						show_splash=false;
+					}
+					else if(show_splash=='init'){
+						if(localStorage.getItem('show_splash_off')){
+							show_splash=false;
+						}
+					}
+					localStorage.removeItem('show_splash_off');
 					var extensionlist=[];
 					if(!localStorage.getItem(lib.configprefix+'disable_extension')){
 						if(lib.config.extensions&&lib.config.extensions.length){
@@ -7204,14 +7214,16 @@
 								}
 								_status.evaluatingExtension=false;
 							}
-							else{
+							else if(lib.config.mode!='connect'||show_splash){
 								extensionlist.push(lib.config.extensions[i]);
 							}
 						}
 					}
 					else{
-						for(var i=0;i<lib.config.extensions.length;i++){
-							game.import('extension',{name:lib.config.extensions[i]});
+						if(lib.config.mode!='connect'||show_splash){
+							for(var i=0;i<lib.config.extensions.length;i++){
+								game.import('extension',{name:lib.config.extensions[i]});
+							}
 						}
 					}
 					var loadPack=function(){
@@ -7228,16 +7240,6 @@
 								}
 							}
 						};
-						var show_splash=lib.config.show_splash;
-						if(show_splash=='off'){
-							show_splash=false;
-						}
-						else if(show_splash=='init'){
-							if(localStorage.getItem('show_splash_off')){
-								show_splash=false;
-							}
-						}
-						localStorage.removeItem('show_splash_off');
 						if(localStorage.getItem(lib.configprefix+'playback')){
 							toLoad++;
 							lib.init.js(lib.assetURL+'mode',lib.config.mode,packLoaded,packLoaded);
@@ -7284,7 +7286,7 @@
 					var styleLoaded=function(){
 						styleToLoad--;
 						if(styleToLoad==0){
-							if(extensionlist.length){
+							if(extensionlist.length&&(lib.config.mode!='connect'||show_splash)){
 								var extToLoad=extensionlist.length;
 								var extLoaded=function(){
 									extToLoad--;
@@ -8561,26 +8563,29 @@
 						clickedNode=true;
 						lib.config.mode=this.link;
 						game.saveConfig('mode',this.link);
-						if(game.layout!='mobile'&&lib.layoutfixed.indexOf(lib.config.mode)!==-1){
-							game.layout='mobile';
-							ui.css.layout.href=lib.assetURL+'layout/'+game.layout+'/layout.css';
+						if(this.link=='connect') game.reload();
+						else{
+ 						if(game.layout!='mobile'&&lib.layoutfixed.indexOf(lib.config.mode)!==-1){
+ 							game.layout='mobile';
+ 							ui.css.layout.href=lib.assetURL+'layout/'+game.layout+'/layout.css';
+ 						}
+ 						else if(game.layout=='mobile'&&lib.config.layout!='mobile'&&lib.layoutfixed.indexOf(lib.config.mode)===-1){
+ 							game.layout=lib.config.layout;
+ 							if(game.layout=='default'){
+ 								ui.css.layout.href='';
+ 							}
+ 							else{
+ 								ui.css.layout.href=lib.assetURL+'layout/'+game.layout+'/layout.css';
+ 							}
+ 						}
+ 						splash.delete(1000);
+ 						delete window.inSplash;
+ 						window.resetGameTimeout=setTimeout(lib.init.reset,5000);
+ 
+ 						this.listenTransition(function(){
+ 							lib.init.js(lib.assetURL+'mode',lib.config.mode,proceed);
+ 						},500);
 						}
-						else if(game.layout=='mobile'&&lib.config.layout!='mobile'&&lib.layoutfixed.indexOf(lib.config.mode)===-1){
-							game.layout=lib.config.layout;
-							if(game.layout=='default'){
-								ui.css.layout.href='';
-							}
-							else{
-								ui.css.layout.href=lib.assetURL+'layout/'+game.layout+'/layout.css';
-							}
-						}
-						splash.delete(1000);
-						delete window.inSplash;
-						window.resetGameTimeout=setTimeout(lib.init.reset,5000);
-
-						this.listenTransition(function(){
-							lib.init.js(lib.assetURL+'mode',lib.config.mode,proceed);
-						},500);
 					}
 					var downNode=function(){
 						this.classList.add('glow');
@@ -20184,8 +20189,10 @@
 				removeEquipTrigger:function(card){
 					if(card){
 						var info=get.info(card);
+						var skills=this.getSkills(null,false);
 						if(info.skills){
 							for(var j=0;j<info.skills.length;j++){
+								if(skills.contains(info.skills[j])) continue;
 								this.removeSkillTrigger(info.skills[j]);
 							}
 						}
@@ -42900,6 +42907,14 @@
 						}
 					}
 					else{
+						for(var i of game.connectPlayers){
+							var num=0;
+							if(!i.nickname&&!i.classList.contains('unselectable2')) i++;
+						}
+						if(i>=lib.configOL.number-1){
+							alert('至少要有两名玩家才能开始游戏！');
+							return;
+						}
 						game.resume();
 					}
 					button.delete();

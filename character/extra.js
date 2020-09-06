@@ -1398,17 +1398,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					targetInRange:function(card){
 						if(get.suit(card)=='heart') return true;
+					},
+					cardUsable:function(card){
+						if(card.name=='sha'&&get.suit(card)=='heart') return Infinity;
 					}
 				},
 				audio:2,
-				trigger:{player:['useCard1','respond']},
-				firstDo:true,
+				trigger:{player:'useCard'},
 				forced:true,
 				filter:function(event,player){
-					return event.card.name=='sha'&&!event.skill&&
-					event.cards.length==1&&get.suit(event.cards[0])=='heart';
+					return event.card.name=='sha'&&get.suit(event.card)=='heart';
 				},
-				content:function(){},
+				content:function(){
+					trigger.directHit.addArray(game.players);
+				},
 				ai:{
 					effect:{
 						target:function(card,player,target,current){
@@ -3310,7 +3313,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			longhun_info:'你可以将同花色的X张牌按下列规则使用或打出：红桃当【桃】，方块当具火焰伤害的【杀】，梅花当【闪】，黑桃当【无懈可击】（X为你当前的体力值且至少为1）',
 			juejing_info:'锁定技，摸牌阶段，你摸牌的数量改为你已损失的体力值+2；你的手牌上限+2。',
 			wushen:'武神',
-			wushen_info:'锁定技，你的红桃手牌和判定牌均视为【杀】；锁定技，你使用红桃【杀】无距离限制。',
+			wushen_info:'锁定技，你的红桃手牌均视为【杀】；锁定技，你使用红桃【杀】无距离和次数限制且不可被响应。',
 			wuhun:'武魂',
 			wuhun21:'武魂',
 			wuhun22:'武魂',

@@ -633,6 +633,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player:'linkBegin'
 						},
 						forced:true,
+						filter:function(event,player){
+							return !player.isLinked();
+						},
 						content:function(){
 							trigger.cancel();
 						},
@@ -1588,7 +1591,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function (event,player){
 					return (player.getHistory('useCard',function(evt){
 						return evt.getParent('phaseUse')==event;
-					}).length<game.countPlayer(function(current){return !current.inRange(player)}))&&game.hasPlayer(function(target){
+					}).length<game.countPlayer(function(current){return current!=player&&!current.inRange(player)}))&&game.hasPlayer(function(target){
 						return target!=player&&!target.inRange(player)&&target.countDiscardableCards(player,'he');
 					});
 				},
@@ -1914,16 +1917,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						usable:1,
 						delay:false,
 						filter:function(event,player){
+							var storage=player.getStorage('nzry_mingren');
+							if(get.itemtype(storage)!='cards') return false;
+							var num=player.countCards('he',{color:get.color(player.storage.nzry_mingren[0])});
 							return game.hasPlayer(function(current){
 								return current!=player&&
 								player.inRange(current)&&
 								player.storage.nzry_mingren!=undefined&&
-								player.countCards('he',{color:get.color(player.storage.nzry_mingren[0])})>=Math.max(Math.abs(current.hp-player.hp),1);
+								num>=Math.max(Math.abs(current.hp-player.hp),1);
 							})&&player.storage.nzry_zhenliang!=true;
 						},
 						filterTarget:function(card,player,target){
-							return player.storage.nzry_mingren!=undefined&&
-							target!=player&&
+							return target!=player&&
 							player.inRange(target)&&
 							player.countCards('he',{color:get.color(player.storage.nzry_mingren[0])})>=Math.max(Math.abs(target.hp-player.hp),1);
 						},

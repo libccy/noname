@@ -9,11 +9,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_huo:["ol_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","ol_pangtong","ol_yuanshao","ol_pangde","re_taishici"],
 				refresh_lin:['re_zhurong','re_menghuo','re_dongzhuo','ol_sunjian','re_caopi','re_xuhuang'],
 				refresh_shan:['re_dengai','re_jiangwei','re_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce'],
-				refresh_yijiang:['re_wuguotai','re_gaoshun','re_zhangyi','re_caozhi','re_zhuran','re_wuyi','re_liaohua','re_guohuai','re_zhuran','re_chengpu','re_caozhang','re_quancong','yujin_yujin','re_lingtong','re_handang','re_zhonghui','re_sunluban','re_masu','re_jianyong','xin_xusheng'],
+				refresh_yijiang1:['re_wuguotai','re_gaoshun','re_caozhi','yujin_yujin','re_lingtong','re_masu','xin_xusheng','xin_fazheng'],
+				refresh_yijiang2:['old_madai','wangyi','guanzhang','re_handang','re_zhonghui','re_liaohua','re_chengpu','re_caozhang'],
+				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran'],
+				refresh_yijiang4:['re_sunluban','re_wuyi'],
+				refresh_yijiang5:['re_zhangyi','re_quancong'],
 		 },
 		},
 		connect:true,
 		character:{
+			xin_fazheng:['male','shu',3,['xinenyuan','xinxuanhuo'],['die_audio']],
+			wangyi:['female','wei',3,['zhenlie','miji']],
+			old_madai:['male','shu',4,['mashu','qianxi']],
+			guanzhang:['male','shu',4,['fuhun']],
 			xin_xusheng:['male','wu',4,['decadepojun']],
 			re_taishici:['male','wu',4,['tianyi','hanzhan']],
 			re_masu:['male','shu',3,['resanyao','rezhiman']],
@@ -6481,8 +6489,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						player.logSkill('refangzhu',result.targets);
-						event.target=result.targets[0]
-						event.target.chooseToDiscard('he',player.getDamagedHp()).set('ai',function(card){
+						event.target=result.targets[0];
+						if(player.isHealthy()) event._result={bool:false};
+						else event.target.chooseToDiscard('he',player.getDamagedHp()).set('ai',function(card){
 							var player=_status.event.player;
 							if(player.isTurnedOver()||_status.event.getTrigger().player.getDamagedHp()>2) return -1;
 							return (player.hp*player.hp)-get.value(card);
@@ -6494,7 +6503,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.target.loseHp();
 					}
 					else{
-						event.target.draw(player.getDamagedHp());
+						if(player.isDamaged()) event.target.draw(player.getDamagedHp());
 						event.target.turnOver();
 					}
 				},
@@ -7057,14 +7066,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_xusheng:'界徐盛',
 			decadepojun:'破军',
 			decadepojun2:'破军',
-			decadepojun_info:'当你使用【杀】指定目标后，你可以将其的至多X张牌置于其武将牌上。若这些牌中：有装备牌，你将这些牌中的一张置于弃牌堆；有锦囊牌，你摸一张牌。其于回合结束时获得其武将牌上的这些牌。',
+			decadepojun_info:'当你使用【杀】指定目标后，你可以将其的至多X张牌置于其武将牌上（X为其体力值）。若这些牌中：有装备牌，你将这些牌中的一张置于弃牌堆；有锦囊牌，你摸一张牌。其于回合结束时获得其武将牌上的这些牌。',
+			old_madai:'界马岱',
+			wangyi:'界王异',
+			guanzhang:'界关兴张苞',
+			xin_fazheng:'界法正',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',
 			refresh_huo:'界限突破·火',
 			refresh_lin:'界限突破·林',
 			refresh_shan:'界限突破·山',
-			refresh_yijiang:'界限突破·将',
+			refresh_yijiang1:'界限突破·将1',
+			refresh_yijiang2:'界限突破·将2',
+			refresh_yijiang3:'界限突破·将3',
+			refresh_yijiang4:'界限突破·将4',
+			refresh_yijiang5:'界限突破·将5',
 		},
 	};
 });

@@ -919,6 +919,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			wusheng:{
 				audio:2,
+				audioname2:{old_guanzhang:'old_fuhun'},
 				audioname:['re_guanyu','guanzhang','jsp_guanyu','guansuo'],
 				enable:['chooseToRespond','chooseToUse'],
 				filterCard:function(card,player){
@@ -982,6 +983,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			paoxiao:{
 				audio:2,
 				firstDo:true,
+				audioname2:{old_guanzhang:'old_fuhun'},
 				audioname:['re_zhangfei','guanzhang','xiahouba'],
 				trigger:{player:'useCard1'},
 				forced:true,

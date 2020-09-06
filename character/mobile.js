@@ -908,7 +908,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.gain(player.storage.zhengjing2,'gain2','log','fromStorage');
 					delete player.storage.zhengjing2;
 					player.removeSkill('zhengjing2');
-					player.addTempSkill('zhengjing3');
+					//player.addTempSkill('zhengjing3');
 					player.skip('phaseJudge');
 					player.skip('phaseDraw');
 				},
@@ -1942,7 +1942,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zhongzuo:{
 				audio:2,
-				trigger:{global:'phaseEnd'},
+				trigger:{global:'phaseJieshuBegin'},
 				direct:true,
 				filter:function(event,player){
 					return player.getHistory('damage').length>0||player.getHistory('sourceDamage').length>0;
@@ -5483,7 +5483,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhiyi:'执义',
 			zhiyi_info:'锁定技，当你于一回合内使用或打出第一张基本牌时，你选择一项：1.摸一张牌。2.于此牌A（若此牌是因响应牌B而使用或打出的，则改为牌B）的使用或打出流程结算完成后，视为使用一张与此牌名称和属性相同的卡牌。',
 			zhongzuo:'忠佐',
-			zhongzuo_info:'一名角色的回合结束时，若你于此回合内造成或受到过伤害，则你可以令一名角色摸两张牌。若该角色已受伤，则你摸一张牌。',
+			zhongzuo_info:'一名角色的结束阶段开始时，若你于此回合内造成或受到过伤害，则你可以令一名角色摸两张牌。若该角色已受伤，则你摸一张牌。',
 			wanlan:'挽澜',
 			wanlan_info:'限定技，当一名角色进入濒死状态时，你可以弃置所有手牌并令其回复体力至1点，然后对当前回合角色造成1点伤害。',
 			re_jikang:"手杀嵇康",
@@ -5624,7 +5624,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shuaiyan_info:'弃牌阶段开始时，若你的手牌数大于1，则你可以展示所有手牌，然后你令一名其他角色交给你一张牌。',
 			zhengxuan:'郑玄',
 			zhengjing:'整经',
-			zhengjing_info:'出牌阶段，你可以整理卡牌。然后，你将整理出的卡牌置于一名角色的武将牌上。该角色的准备阶段获得这些牌，跳过此回合的判定和摸牌阶段且本回合内不能发动【整经】。',
+			zhengjing_info:'出牌阶段，你可以整理卡牌。然后，你将整理出的卡牌置于一名角色的武将牌上。该角色的准备阶段获得这些牌，w且 跳过此回合的判定和摸牌阶段。',
 			zhengjing2:'整经',
 			
 			mobile_yijiang:'武将设计征集大赛',
