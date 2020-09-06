@@ -4684,7 +4684,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			roulin:{
 				audio:2,
-				audioname:['re_dongzhuo'],
+				audioname:['re_dongzhuo','ol_dongzhuo'],
 				trigger:{player:'useCardToPlayered',target:'useCardToTargeted'},
 				forced:true,
 				filter:function(event,player){
@@ -4711,14 +4711,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			benghuai:{
 				audio:2,
-				audioname:['zhugedan','re_dongzhuo'],
+				audioname:['zhugedan','re_dongzhuo','ol_dongzhuo'],
 				trigger:{player:'phaseJieshuBegin'},
 				forced:true,
 				check:function(){
 					return false;
 				},
 				filter:function(event,player){
-					return !player.isMinHp();
+					return !player.isMinHp()&&!player.hasSkill('rejiuchi_air')&&!player.hasSkill('oljiuchi_air');
 				},
 				content:function(){
 					"step 0"

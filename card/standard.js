@@ -276,7 +276,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						value:[8,6.5,5,4],
 					},
 					result:{
-						target:function(player,target){
+						target:2,
+						target_use:function(player,target){
 							// if(player==target&&player.hp<=0) return 2;
 							if(player.hasSkillTag('nokeep',true,null,true)) return 2;
 							var nd=player.needsToDiscard();

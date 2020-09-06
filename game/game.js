@@ -16285,7 +16285,25 @@
 					game.playerMap[this.playerid]=this;
 					return this;
 				},
+				emotion:function(pack,id){
+					var str='<img src="##assetURL##image/emotion/'+pack+'/'+id+'.gif" width="50" height="50">';
+					lib.element.player.say.call(this,str);
+					game.broadcast(function(id,str){
+						if(lib.playerOL[id]){
+							lib.playerOL[id].say(str);
+						}
+						else if(game.connectPlayers){
+							for(var i=0;i<game.connectPlayers.length;i++){
+								if(game.connectPlayers[i].playerid==id){
+									lib.element.player.say.call(game.connectPlayers[i],str);
+									return;
+								}
+							}
+						}
+					},this.playerid,str);
+				},
 				chat:function(str){
+					if(str&&str.indexOf('http')!=-1) return;
 					lib.element.player.say.call(this,str);
 					game.broadcast(function(id,str){
 						if(lib.playerOL[id]){
@@ -25523,6 +25541,29 @@
 							game.updateWaiting();
 						}
 					}
+				},
+				emotion:function(id,pack,emotion){
+					var that=this;
+					if(!this.id||(!lib.playerOL[this.id]&&(!game.connectPlayers||!function(){
+						for(var i=0;i<game.connectPlayers.length;i++){
+							if(game.connectPlayers[i].playerid==that.id){
+								return true;
+							}
+						}
+						return false;
+					}()))) return;
+					var player;
+					if(lib.playerOL[id]){
+						player=lib.playerOL[id];
+					}
+					else if(game.connectPlayers){
+						for(var i=0;i<game.connectPlayers.length;i++){
+							if(game.connectPlayers[i].playerid==id){
+								player=game.connectPlayers[i];break;
+							}
+						}
+					}
+					if(player) lib.element.player.emotion.apply(player,[pack,emotion]);
 				},
 				chat:function(id,str){
 					var that=this;
@@ -42907,11 +42948,11 @@
 						}
 					}
 					else{
+						var num=0;
 						for(var i of game.connectPlayers){
-							var num=0;
-							if(!i.nickname&&!i.classList.contains('unselectable2')) i++;
+							if(!i.nickname&&!i.classList.contains('unselectable2')) num++;
 						}
-						if(i>=lib.configOL.number-1){
+						if(num>=lib.configOL.number-1){
 							alert('至少要有两名玩家才能开始游戏！');
 							return;
 						}
@@ -44061,7 +44102,6 @@
 						for(var j=1;j<=lib.emotionList[this.pack];j++){
 							var emotionButton=ui.create.div('.card.fullskin','<img src="'+lib.assetURL+'image/emotion/'+this.pack+'/'+j+'.gif" width="50" height="50">',function(){
 								var player=game.me;
-								var str='<img src="##assetURL##image/emotion/'+this.pack+'/'+this.emotionID+'.gif" width="50" height="50">';
 								if(!player){
 									if(game.connectPlayers){
 										if(game.online){
@@ -44078,10 +44118,10 @@
 								}
 								if(!player) return;
 								if(game.online){
-									game.send('chat',game.onlineID,str);
+									game.send('emotion',game.onlineID,this.pack,this.emotionID);
 								}
 								else{
-									lib.element.player.chat.call(player,str);
+									lib.element.player.emotion.apply(player,[this.pack,this.emotionID]);
 								}
 							});
 							emotionButton.emotionID=j;
@@ -50800,7 +50840,153 @@
 				}
 				return eff;
 			}
-			return get.effect.apply(this,arguments);
+			var result=get.result(card,eventskill);
+			var result1=result.player_use||result.player,result2=result.target_use||result.target;
+			if(typeof result1=='function') result1=result1(player,target,card,isLink);
+			if(typeof result2=='function') result2=result2(player,target,card,isLink);
+			
+			if(typeof result1!='number') result1=0;
+			if(typeof result2!='number') result2=0;
+			var temp1,temp2,temp3,temp01=0,temp02=0,threaten=1;
+			var skills1=player.getSkills().concat(lib.skill.global);
+			game.expandSkills(skills1);
+			var zerotarget=false,zeroplayer=false;
+			for(var i=0;i<skills1.length;i++){
+				temp1=get.info(skills1[i]).ai;
+				if(temp1&&typeof temp1.effect=='object'&&typeof temp1.effect.player=='function'){
+					temp1=temp1.effect.player(card,player,target,result1,isLink);
+				}
+				else temp1=undefined;
+				if(typeof temp1=='object'){
+					if(temp1.length==2||temp1.length==4){
+						result1*=temp1[0];
+						temp01+=temp1[1];
+					}
+					if(temp1.length==4){
+						result2*=temp1[2];
+						temp02+=temp1[3];
+					}
+				}
+				else if(typeof temp1=='number'){
+					result1*=temp1;
+				}
+				else if(temp1=='zeroplayer'){
+					zeroplayer=true;
+				}
+				else if(temp1=='zerotarget'){
+					zerotarget=true;
+				}
+				else if(temp1=='zeroplayertarget'){
+					zeroplayer=true;
+					zerotarget=true;
+				}
+			}
+			if(target){
+				var skills2=target.getSkills().concat(lib.skill.global);
+				game.expandSkills(skills2);
+				for(var i=0;i<skills2.length;i++){
+					temp2=get.info(skills2[i]).ai;
+					if(temp2&&temp2.threaten) temp3=temp2.threaten;
+					else temp3=undefined;
+					if(temp2&&typeof temp2.effect=='function'){
+						if(!player.hasSkillTag('ignoreSkill',true,{
+  					card:card,
+  					target:target,
+  					skill:skills2[i],
+  					isLink:isLink,
+  				})) temp2=temp2.effect(card,player,target,result2,isLink);
+  				else temp2=undefined;
+					}
+					else if(temp2&&typeof temp2.effect=='object'&&typeof temp2.effect.target=='function'){
+						if(!player.hasSkillTag('ignoreSkill',true,{
+  					card:card,
+  					target:target,
+  					skill:skills2[i],
+  					isLink:isLink,
+  				})) temp2=temp2.effect.target(card,player,target,result2,isLink);
+  				else temp2=undefined;
+					}
+					else temp2=undefined;
+					if(typeof temp2=='object'){
+						if(temp2.length==2||temp2.length==4){
+							result2*=temp2[0];
+							temp02+=temp2[1];
+						}
+						if(temp2.length==4){
+							result1*=temp2[2];
+							temp01+=temp2[3];
+						}
+					}
+					else if(typeof temp2=='number'){
+						result2*=temp2;
+					}
+					else if(temp2=='zeroplayer'){
+						zeroplayer=true;
+					}
+					else if(temp2=='zerotarget'){
+						zerotarget=true;
+					}
+					else if(temp2=='zeroplayertarget'){
+						zeroplayer=true;
+						zerotarget=true;
+					}
+					if(typeof temp3=='function'&&temp3(player,target)!=undefined){
+						threaten*=temp3(player,target);
+					}
+					else if(typeof temp3=='object'){
+						if(typeof temp3.target=='number'){
+							threaten*=temp3;
+						}
+						else if(typeof temp3.target=='function'&&temp3(player,target)!=undefined){
+							threaten*=temp3(player,target);
+						}
+					}
+					else if(typeof temp3=='number'){
+						threaten*=temp3;
+					}
+				}
+				result2+=temp02;
+				result1+=temp01;
+				if(get.attitude(player,target)<0){
+					result2*=Math.sqrt(threaten);
+				}
+				else{
+					result2*=Math.sqrt(Math.sqrt(threaten));
+				}
+				if(target.hp==1) result2*=2.5;
+				if(target.hp==2) result2*=1.8;
+				if(target.countCards('h')==0){
+					if(get.tag(card,'respondSha')||get.tag(card,'respondShan')){
+						result2*=1.7;
+					}
+					else{
+						result2*=1.5;
+					}
+				}
+				if(target.countCards('h')==1) result2*=1.3;
+				if(target.countCards('h')==2) result2*=1.1;
+				if(target.countCards('h')>3) result2*=0.5;
+				if(target.hp==4) result2*=0.9;
+				if(target.hp==5) result2*=0.8;
+				if(target.hp>5) result2*=0.6;
+			}
+			else{
+				result2+=temp02;
+				result1+=temp01;
+			}
+			if(zeroplayer) result1=0;
+			if(zerotarget) result2=0;
+			var final=0;
+			if(player2){
+				final=(result1*get.attitude(player2,player)+(target?result2*get.attitude(player2,target):0));
+			}
+			else final=(result1*get.attitude(player,player)+(target?result2*get.attitude(player,target):0));
+			if(!isLink&&get.tag(card,'natureDamage')&&target.isLinked()&&!zerotarget){
+				game.countPlayer(function(current){
+					if(current!=target&&current.isLinked()) final+=get.effect(current,card,player,player2,true);
+				})
+			}
+			return final;
 		},
 		effect:function(target,card,player,player2,isLink){
 			var event=_status.event;
@@ -50865,10 +51051,22 @@
 					if(temp2&&temp2.threaten) temp3=temp2.threaten;
 					else temp3=undefined;
 					if(temp2&&typeof temp2.effect=='function'){
-						temp2=temp2.effect(card,player,target,result2,isLink);
+						if(!player.hasSkillTag('ignoreSkill',true,{
+  					card:card,
+  					target:target,
+  					skill:skills2[i],
+  					isLink:isLink,
+  				})) temp2=temp2.effect(card,player,target,result2,isLink);
+  				else temp2=undefined;
 					}
 					else if(temp2&&typeof temp2.effect=='object'&&typeof temp2.effect.target=='function'){
-						temp2=temp2.effect.target(card,player,target,result2,isLink);
+						if(!player.hasSkillTag('ignoreSkill',true,{
+  					card:card,
+  					target:target,
+  					skill:skills2[i],
+  					isLink:isLink,
+  				})) temp2=temp2.effect.target(card,player,target,result2,isLink);
+  				else temp2=undefined;
 					}
 					else temp2=undefined;
 					if(typeof temp2=='object'){

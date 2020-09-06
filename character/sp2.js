@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			caoxing:['male','qun',4,['cxliushi','zhanwan'],['unseen']],
 			re_maliang:['male','shu',3,['rexiemu','heli'],['unseen']],
 			ol_yujin:['male','wei',4,['rezhenjun']],
 			ol_xinxianying:['female','wei',3,['caishi','zhongjian']],
@@ -58,12 +59,69 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_zizouqi:["mangyachang","xugong","zhangchangpu"],
 				sp_sbfm:["lisu","xinpi","zhangwen"],
 				sp_shengun:["puyuan","guanlu","gexuan","xushao"],
-				sp_baigei:['re_panfeng','xingdaorong'],
+				sp_baigei:['re_panfeng','xingdaorong','caoxing'],
 				sp_guandu:["sp_zhanghe","xunchen","sp_shenpei","gaolan","lvkuanglvxiang","chunyuqiong","sp_xuyou"],
 				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','liuzan','re_sunluyu','caobuxing','ol_xinxianying','ol_yujin','re_maliang'],
 			}
 		},
 		skill:{
+			cxliushi:{
+				enable:'phaseUse',
+				filter:function(event,player){
+					return player.countCards('he',{suit:'heart'})>0;
+				},
+				filterCard:{suit:'heart'},
+				position:'he',
+				filterTarget:function(card,player,target){
+					return player.canUse('sha',target);
+				},
+				discard:false,
+				prepare:'throw',
+				content:function(){
+					"step 0"
+					cards[0].fix();
+					ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
+					game.updateRoundNumber();
+					player.useCard({name:'sha',isCard:true},false,targets);
+					"step 1"
+					if(target.getHistory('damage',function(evt){
+						var evt2=evt.getParent('useCard');
+						return evt.card==evt2.card&&evt2.getParent()==event;
+					}).length){
+						target.addSkill('cxliushi2');
+						target.addMark('cxliushi2',1,false);
+					}
+				},
+			},
+			cxliushi2:{
+				mod:{
+					maxHandcard:function(player,num){
+						return num-player.countMark('cxliushi2');
+					},
+				},
+				onremove:true,
+				intro:{
+					content:'手牌上限-#',
+				},
+			},
+			zhanwan:{
+				trigger:{global:'phaseDiscardEnd'},
+				forced:true,
+				filter:function(event,player){
+					return event.player.hasSkill('cxliushi2')&&event.player.getHistory('lose',function(evt){
+						if(evt.type=='discard'&&evt.getParent('phaseDiscard')==event) return true;
+					}).length>0;
+				},
+				logTarget:'player',
+				content:function(){
+					trigger.player.removeSkill('cxliushi2');
+					var num=0;
+					trigger.player.getHistory('lose',function(evt){
+						if(evt.type=='discard'&&evt.getParent('phaseDiscard')==trigger) num+=evt.cards2.length;
+					});
+					player.draw(num);
+				},
+			},
 			rexiemu:{
 				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
@@ -1474,7 +1532,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}).length>0
 					});
 					if(player==target&&bool) player.draw(2);
-					else if(player!=target&&!bool) player.chooseToDiscard('he',2,true);
+					else if(player!=target&&!bool) player.chooseToDiscard('h',2,true);
 				},
 				ai:{
 					order:function(){
@@ -4500,7 +4558,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						player.logSkill('xinfu_bijing');
-						player.showCards(result.cards);
+						//player.showCards(result.cards);
 						player.storage.xinfu_bijing=result.cards[0];
 					}
 				},
@@ -5186,7 +5244,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_tunan":"图南",
 			"xinfu_tunan_info":"出牌阶段限一次，你可以展示牌堆顶的一张牌并选择一名其他角色，然后该角色选择一项：使用此牌（无距离限制）；或将此牌当普通【杀】使用。",
 			"xinfu_bijing":"闭境",
-			"xinfu_bijing_info":"结束阶段，你可以展示一张手牌并标记为“闭境”。若你于回合外失去“闭境”牌，则当前回合角色的弃牌阶段开始时，其需弃置两张牌。你的准备阶段，弃置手牌中的“闭境”牌。",
+			"xinfu_bijing_info":"结束阶段，你可以选择一张手牌并标记为“闭境”。若你于回合外失去“闭境”牌，则当前回合角色的弃牌阶段开始时，其需弃置两张牌。你的准备阶段，弃置手牌中的“闭境”牌。",
 			"xinfu_zhenxing":"镇行",
 			"xinfu_zhenxing_info":"结束阶段开始时或当你受到伤害后，你可以观看牌堆顶的至多三张牌，然后你获得其中与其余牌花色均不相同的一张牌。",
 			"xinfu_qianxin":"遣信",
@@ -5357,7 +5415,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wlcuorui_info:'出牌阶段开始时，你可以弃置你或队友区域里的一张牌。若如此做，你选择一项：1.弃置对手装备区里至多两张与此牌颜色相同的牌；2.展示对手的共计两张手牌，然后获得其中与此牌颜色相同的牌。',
 			re_panfeng:'潘凤',
 			xinkuangfu:'狂斧',
-			xinkuangfu_info:'出牌阶段限一次，你可选择：1，弃置装备区里的一张牌，你使用无对应实体牌的普【杀】。若此【杀】造成伤害，你摸两张牌。2，弃置一名其他角色装备区里的一张牌，你使用无对应实体牌的普【杀】。若此【杀】未造成伤害，你弃置两张牌。',
+			xinkuangfu_info:'出牌阶段限一次，你可选择：1，弃置装备区里的一张牌，你使用无对应实体牌的普【杀】。若此【杀】造成伤害，你摸两张牌。2，弃置一名其他角色装备区里的一张牌，你使用无对应实体牌的普【杀】。若此【杀】未造成伤害，你弃置两张手牌。',
 			xingdaorong:'邢道荣',
 			xuxie:'虚猲',
 			xuxie_info:'出牌阶段开始时，你可以减1点体力上限并选择所有与你距离为1的角色，弃置这些角色的各一张牌或令这些角色各摸一张牌。出牌阶段结束时，若你的体力上限为全场最少，则你加1点体力上限。',
@@ -5423,7 +5481,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rexiemu_info:'结束阶段，若全场没有“协穆”标记，你可以选择一名角色获得“协穆”标记直到你的下回合开始。你或该角色在各自的回合外使用或打出手牌时，你与其各摸一张牌（每回合限一次）。',
 			heli:'贺励',
 			heli_info:'出牌阶段限一次，你可以选择手牌数比你少的一名其他角色。该角色展示所有手牌，然后每缺少一种类型的牌，便从牌堆中随机获得一张此类型的牌。',
-
+			caoxing:'曹性',
+			cxliushi:'流矢',
+			cxliushi2:'流矢',
+			cxliushi_info:'出牌阶段，你可以将一张红桃牌置于牌堆顶，视为对一名角色使用一张不计入次数的【杀】。若此【杀】造成伤害，该角色手牌上限永久-1。',
+			zhanwan:'斩腕',
+			zhanwan_info:'锁定技，受到【流矢】效果影响的角色若弃牌阶段有弃牌，你摸等量的牌，然后移除【流矢】的效果。',
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",
