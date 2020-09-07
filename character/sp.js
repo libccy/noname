@@ -17,6 +17,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		character:{
+			//caoshuang:['male','wei',4,['tuogu','shanzhuan']],
 			ol_zhangchangpu:['female','wei',3,['yanjiao','olxingshen']],
 			zhangling:['male','qun',4,['zlhuji','zlshoufu'],['unseen']],
 			caiyang:['male','qun',1,['yinka'],['forbidai','unseen']],
@@ -150,6 +151,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			caoshuang:'曹爽（？－249年2月9日），字昭伯，沛国谯县（今安徽亳州市）人。三国时期魏国权臣，大司马曹真长子。曹爽体态肥胖，凭借宗室身份，出入宫廷，交好太子曹叡。魏明帝即位，起家员外散骑侍郎，累迁城门校尉、散骑常侍，转武卫将军。太和五年（231年），袭封邵陵侯。景初三年（239年），魏明帝曹叡病危，拜大将军、假黄钺，与司马懿并为托孤大臣。少帝曹芳即位，加侍中，改封武安侯。势倾四海，声震天下。任用私人，专权乱政，侵吞公产。伐蜀失败，虚耗国力。起居逾制，软禁郭太后。正始十年，太傅司马懿发动高平陵政变，掌握魏国大权。曹爽失去大将军职务，以谋反之罪处死，夷灭三族。',
 			zhangling:'张道陵（34年2月22日—156年），字辅汉，原名陵，道教正一道实际创立者，汉朝东汉时期丰邑（今江苏徐州丰县）人。太上老君降临蜀地，“授以三天正法，命为天师”，张道陵整合当时的：黄老派、方仙道、文始派等先秦修道团体，创立道教称正一盟威之道。后世尊称为“老祖天师”、“正一真人”、“三天扶教大法师”、高明上帝、张天师。著作《老子想尔注》，弟子有3000多人，设立24治，奠基天师道。张道陵、葛玄、许逊、萨守坚合称四大天师。张道陵创建道教的背景：当时在巴蜀一带，原有巴人信奉原始巫教，大规模的淫祀而害民。而这些祀奉鬼妖（学名为：妖邪）的法教巫师聚众敛财，无恶不作。张天师携王长、赵升二位弟子和黄帝九鼎丹经，来到北邙山修行，平定了那些祸害百姓的巫妖之教。川渝一带流传的张天师以太上老君剑印符箓大破鬼兵的故事就是以此为原型的。',
 			caiyang:'蔡阳（？－201年），又作蔡扬，东汉丞相曹操部下武将，汝南太守。于建安六年（201）奉曹操之命攻击与刘备联合的汝南贼龚都等人，兵败被刘备所杀。明代小说《三国演义》改编为“云长擂鼓斩蔡阳”。',
 			pujing:'湖北省当阳境内有一座山，名叫玉泉山。东汉建安末年，山上住着一个老和尚，法名普净，普净原来是沂水关镇国寺方丈，后因云游天下，来到此处，风这地方山明水秀，就于山中结草为庵，每天坐禅参道，身边只有一个小和尚，外出化一些斋饭，供养师父。在《三国演义》中，当关羽通过汜水关时，正是由于普净提醒，关羽才揭穿了卞喜的阴谋，并杀死了卞喜。关羽死后，其怨魂亦在普净的指点下醒悟，放下了心中的仇恨，专心致力于造福一方百姓。',
@@ -398,8 +400,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var next=player.draw();
 					if(get.isLuckyStar(player)||Math.random()<0.5) next.num=2;
-					player.storage.olxingshen=player.getDamagedHp();
-					player[player.storage.olxingshen?'markSkill':'unmarkSkill']('olxingshen');
+					var num=player.countMark('olxingshen');
+					if(num<6) player.addMark('olxingshen',Math.max(6-num,player.getDamagedHp()),false)
 				},
 				intro:{
 					content:'下一次发动〖严教〗时多展示X张牌',
@@ -6643,7 +6645,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinzhengnan:{
 				audio:'zhengnan',
 				trigger:{global:'dying'},
-				forced:true,
+				frequent:true,
 				filter:function(event,player){
 					return !player.storage.xinzhengnan||!player.storage.xinzhengnan.contains(event.player);
 				},
@@ -9139,8 +9141,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'biluan',
 				trigger:{player:'phaseJieshuBegin'},
 				checkx:function(player){
-					var ng=game.countGroup();
-					if(ng<2) return false;
+					var ng=Math.min(4,game.countPlayer());
 					var nai=0;
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]!=player){
@@ -9167,7 +9168,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
  					player.addSkill('rebiluan2');
- 					var ng=game.countGroup();
+ 					var ng=Math.min(4,game.countPlayer());
  					player.$damagepop(ng,'unknownx');
  					player.storage.rebiluan2+=ng;
  					player.markSkill('rebiluan2');
@@ -14603,7 +14604,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhengnan:'征南',
 			zhengnan_info:'其他角色死亡后，你可以摸三张牌并获得下列技能中的任意一个：〖武圣〗、 〖当先〗和〖制蛮〗。',
 			xinzhengnan:'征南',
-			xinzhengnan_info:'锁定技，当一名角色进入濒死状态时，若你未因其发动过〖征南〗，则你回复1点体力并摸一张牌并获得下列技能中的任意一个：〖武圣〗、 〖当先〗和〖制蛮〗（若技能全部拥有则改为摸三张牌。你以此法获得的〖当先〗结算时视为已发动过〖伏枥〗）。',
+			xinzhengnan_info:'当一名角色进入濒死状态时，若你未因其发动过〖征南〗，则你回复1点体力并摸一张牌并获得下列技能中的任意一个：〖武圣〗、 〖当先〗和〖制蛮〗（若技能全部拥有则改为摸三张牌。你以此法获得的〖当先〗结算时视为已发动过〖伏枥〗）。',
 			xiefang:'撷芳',
 			xiefang_info:'锁定技，你计算与其他角色的距离时-X。（X为女性角色数）',
 			qizhi:'奇制',
@@ -14704,7 +14705,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lixia_info:'锁定技，其他角色的结束阶段开始时，若你不在其攻击范围内，你摸一张牌或令其摸一张牌。本局内其他角色计算与你的距离时-1。',
 			rebiluan:'避乱',
 			rebiluan2:'避乱',
-			rebiluan_info:'结束阶段开始时，若有与你距离不大于1的其他角色，你可以弃置一张牌。若如此做，本局内其他角色计算与你的距离时+X。（X为场上势力数）',
+			rebiluan_info:'结束阶段开始时，若有与你距离不大于1的其他角色，你可以弃置一张牌。若如此做，本局内其他角色计算与你的距离时+X。（X为场上角色数且至多为4）',
 			relixia:'礼下',
 			relixia_info:'锁定技，其他角色的结束阶段开始时，若你不在其攻击范围内，你选择一至两项：1.摸一张牌；2.其摸两张牌；3.其回复1点体力。本局内其他角色计算与你的距离时-X（X为你选择的选项数）。',
 			yishe:'义舍',
@@ -14977,7 +14978,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zlshoufu_info:'出牌阶段限一次，你可摸一张牌，然后将一张手牌置于一名没有【箓】的角色的武将牌上，称为【箓】；其不能使用和打出与【箓】同类型的牌。该角色受伤后，或于弃牌阶段弃置至少2张与【箓】同类型的牌后，将【箓】置入弃牌堆。',
 			ol_zhangchangpu:'OL张昌蒲',
 			olxingshen:'省身',
-			olxingshen_info:'当你受到伤害后，你可以随机摸两张牌。若如此做，你移去所有“省”并获得X个“省”，且下一次发动〖严教〗展示牌时移去所有“省”并多展示等量的牌。（X为你已损失的体力值）',
+			olxingshen_info:'当你受到伤害后，你可以随机摸两张牌。若如此做，你获得X个“省”，且下一次发动〖严教〗展示牌时移去所有“省”并多展示等量的牌。（X为你已损失的体力值，且你至多拥有6个“省”）',
+			caoshuang:'曹爽',
+			tuogu:'托孤',
+			tuogu_info:'限定技，一名角色死亡时，你可以令其选择其武将牌上的一个技能（主公技，限定技，觉醒技等特殊技能除外），然后你获得其选择的技能。',
+			shanzhuan:'擅专',
+			shanzhuan_info:'当你对其他角色造成伤害后，你可以将其判定区的一张牌置于其的判定区。若此牌不为延时锦囊牌且此牌为：红色，此牌视为【乐不思蜀】；黑色，此牌视为【兵粮寸断】。',
 			
 			sp_default:"常规",
 			sp_zhongdan:"忠胆英杰",

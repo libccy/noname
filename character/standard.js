@@ -919,6 +919,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			wusheng:{
 				audio:2,
+				audioname2:{old_guanzhang:'old_fuhun'},
 				audioname:['re_guanyu','guanzhang','jsp_guanyu','guansuo'],
 				enable:['chooseToRespond','chooseToUse'],
 				filterCard:function(card,player){
@@ -982,6 +983,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			paoxiao:{
 				audio:2,
 				firstDo:true,
+				audioname2:{old_guanzhang:'old_fuhun'},
 				audioname:['re_zhangfei','guanzhang','xiahouba'],
 				trigger:{player:'useCard1'},
 				forced:true,
@@ -2556,7 +2558,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return '摸牌';
 						}
 						return 'cancel2';
-					}).set('prompt',get.prompt('new_jiangchi')).set('prompt2',get.translation('new_jiangchi_info'));
+					}).set('prompt',get.prompt2('new_jiangchi'));
 					"step 1"
 					if(result.control=='弃牌'){
 						player.chooseToDiscard(true,'he');
@@ -2565,9 +2567,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else if(result.control=='摸牌'){
 						player.draw();
-						player.addTempSkill('jiangchi3','phaseUseEnd');
+						player.addTempSkill('new_jiangchi3','phaseEnd');
 						player.logSkill('new_jiangchi');
 					}
+				},
+			},
+			new_jiangchi3:{
+				mod:{
+					cardEnabled:function(card){
+						if(card.name=='sha') return false;
+					},
+					cardRespondable:function(card){
+						if(card.name=='sha') return false;
+					},
+					ignoredHandcard:function(card,player){
+						if(get.name(card)=='sha'){
+							return true;
+						}
+					},
+					cardDiscardable:function(card,player,name){
+						if(name=='phaseDiscard'&&get.name(card)=='sha'){
+							return false;
+						}
+					},
 				},
 			},
 			"xinfu_jijie":{
@@ -2791,7 +2813,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yaowu:'耀武',
 			yaowu_info:'锁定技，一名角色使用红色【杀】对你造成伤害时，该角色回复1点体力或摸一张牌。',
 			"new_jiangchi":"将驰",
-			"new_jiangchi_info":"摸牌阶段结束时，你可以选择一项：1、摸一张牌，若如此做，你本回合内不能使用或打出【杀】。 2、弃置一张牌，若如此做，出牌阶段你使用【杀】无距离限制且你可以额外使用一张【杀】，直到回合结束。",
+			"new_jiangchi_info":"摸牌阶段结束时，你可以选择一项：1、摸一张牌，若如此做，你本回合内不能使用或打出【杀】且【杀】不计入手牌上限。 2、弃置一张牌，若如此做，出牌阶段你使用【杀】无距离限制且你可以额外使用一张【杀】，直到回合结束。",
 			"xinfu_jijie":"机捷",
 			"xinfu_jijie_info":"出牌阶段限一次。你可以观看牌堆底的一张牌，然后将其交给一名角色。",
 			"xinfu_jiyuan":"急援",

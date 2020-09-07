@@ -1207,7 +1207,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 				stone_fennuxiaoji:['male','qun',1,['stone_fennuxiaoji1'],['minskin','stone'],[1,2]],
 				stone_juxingchanchu:['male','qun',2,['stone_juxingchanchu1'],['minskin','stone'],[2,1]],
-				stone_wuyi:['male','qun',1,['jijiu'],['minskin','stone'],[2,2]],
+				stone_wuyi:['male','qun',1,['jijiu'],['minskin','stone','die_audio'],[2,2]],
 				stone_langren:['male','qun',1,['stone_qianxing'],['minskin','stone'],[1,2]],
 				stone_shishigui:['male','qun',2,['stone_shishigui1'],['minskin','stone'],[2,1]],
 

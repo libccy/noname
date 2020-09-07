@@ -8,11 +8,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mobile:{
 				mobile_default:["miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei"],
 				mobile_yijiang:["yj_zhanghe","yj_zhangliao","yj_xuhuang","yj_ganning"],
-				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","xin_yuanshao","re_liushan","xin_xiahoudun","re_sp_zhugeliang","re_heqi","re_guanqiujian","re_pangtong","old_liuzan","xin_chengpu","re_sunjian","re_xusheng"],
+				mobile_others:["re_jikang","old_bulianshi","old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","xin_yuanshao","re_liushan","xin_xiahoudun","re_sp_zhugeliang","re_heqi","re_guanqiujian","re_pangtong","old_liuzan","xin_chengpu","re_sunjian","re_xusheng","re_dongzhuo"],
 				mobile_sunben:["re_sunben"],
 			},
 		},
 		character:{
+			re_dongzhuo:['male','qun',8,['rejiuchi','roulin','benghuai','baonue'],['zhu']],
 			re_xusheng:['male','wu',4,['repojun']],
 			sp_sufei:['male','qun',4,['zhengjian','gaoyuan']],
 			yj_zhangliao:['male','qun',4,['weifeng']],
@@ -290,6 +291,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		skill:{
+			rejiuchi:{
+				group:['jiuchi'],
+				audioname:['re_dongzhuo'],
+				trigger:{source:'damage'},
+				forced:true,
+				popup:false,
+				locked:false,
+				audio:'jiuchi',
+				filter:function(event,player){
+					return event.card&&event.card.name=='sha'&&event.getParent(2).jiu==true&&!player.hasSkill('rejiuchi_air');
+				},
+				content:function(){
+					player.logSkill('jiuchi');
+					player.addTempSkill('rejiuchi_air');
+				},
+				subSkill:{
+					air:{},
+				},
+			},
 			//苏飞，新贾逵
 			tongqu:{
 				audio:'zhongzuo',
@@ -913,7 +933,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.gain(player.storage.zhengjing2,'gain2','log','fromStorage');
 					delete player.storage.zhengjing2;
 					player.removeSkill('zhengjing2');
-					player.addTempSkill('zhengjing3');
+					//player.addTempSkill('zhengjing3');
 					player.skip('phaseJudge');
 					player.skip('phaseDraw');
 				},
@@ -1479,72 +1499,66 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zhouxuan:{
 				audio:2,
-				trigger:{player:'phaseJieshuBegin'},
-				direct:true,
+				enable:'phaseUse',
+				usable:1,
 				filter:function(event,player){
 					return player.countCards('he')>0;
 				},
+				filterCard:true,
+				filterTarget:lib.filter.notMe,
+				check:function(card){
+					return 6-get.value(card);
+				},
 				content:function(){
 					'step 0'
-					player.chooseCardTarget({
-						prompt:get.prompt2('zhouxuan'),
-						filterCard:lib.filter.cardDiscardable,
-						filterTarget:lib.filter.notMe,
-						position:'he',
-						ai1:function(card){
-							return 6-get.value(card);
-						},
-						ai2:function(target){
-							var player=_status.event.player;
+					player.addSkill('zhouxuan2');
+					target.addTempSkill('zhouxuan_ai',{player:'phaseUseAfter'});
+					player.storage.zhouxuan2={};
+					player.storage.zhouxuan2.player=target;
+					var list=[];
+					var basic=[];
+					for(var i=0;i<lib.inpile.length;i++){
+						var name=lib.inpile[i];
+						var type=get.type(name,'trick');
+						if(type=='basic'){
+							list.push(name);
+							basic.push(name);
+						}
+						else list.add(type);
+					}
+					event.basic=basic;
+					player.chooseControl(list).set('prompt','请选择一种基本牌的名称或非基本牌的类别').set('ai',function(){
+						var player=_status.event.player;
+						var target=player.storage.zhouxuan2.player;
+						var cards=target.getCards('h',function(card){
+							return target.hasUseTarget(card);
+						});
+						var map={};
+						for(var i=0;i<cards.length;i++){
+							var type=get.type(cards[i],'trick');
+							map[type=='basic'?get.name(cards[i]):type]=true;
+						}
+						if(map.equip) return 'equip';
+						if(map.trick) return 'trick';
+						if(map.sha) return 'sha';
+						if(map.tao) return 'tao';
+						return 0;
+					});
+					'step 1'
+					player.storage.zhouxuan2.card=result.control;
+					if(event.basic.contains(result.control)) player.storage.zhouxuan2.isbasic=true;
+					player.markSkill('zhouxuan2');
+				},
+				ai:{
+					order:1,
+					result:{
+						player:function(player,target){
 							if(get.attitude(player,target)>0) return Math.max(1,target.hp)*target.countCards('h',function(card){
 								return target.getUseValue(card)>0;
 							});
 							return 0;
 						},
-					});
-					'step 1'
-					if(result.bool){
-						player.logSkill('zhouxuan',result.targets[0]);
-						player.discard(result.cards);
-						player.addSkill('zhouxuan2');
-						result.targets[0].addTempSkill('zhouxuan_ai',{player:'phaseUseAfter'});
-						player.storage.zhouxuan2={};
-						player.storage.zhouxuan2.player=result.targets[0];
-						var list=[];
-						var basic=[];
-						for(var i=0;i<lib.inpile.length;i++){
-							var name=lib.inpile[i];
-							var type=get.type(name,'trick');
-							if(type=='basic'){
-								list.push(name);
-								basic.push(name);
-							}
-							else list.add(type);
-						}
-						event.basic=basic;
-						player.chooseControl(list).set('prompt','请选择一种基本牌的名称或非基本牌的类别').set('ai',function(){
-							var player=_status.event.player;
-							var target=player.storage.zhouxuan2.player;
-							var cards=target.getCards('h',function(card){
-								return target.hasUseTarget(card);
-							});
-							var map={};
-							for(var i=0;i<cards.length;i++){
-								var type=get.type(cards[i],'trick');
-								map[type=='basic'?get.name(cards[i]):type]=true;
-							}
-							if(map.equip) return 'equip';
-							if(map.trick) return 'trick';
-							if(map.sha) return 'sha';
-							if(map.tao) return 'tao';
-							return 0;
-						});
-					}
-					else event.finish();
-					'step 2'
-					player.storage.zhouxuan2.card=result.control;
-					if(event.basic.contains(result.control)) player.storage.zhouxuan2.isbasic=true;
-					player.markSkill('zhouxuan2');
+					},
 				},
 			},
 			zhouxuan_ai:{
@@ -1947,7 +1961,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zhongzuo:{
 				audio:2,
-				trigger:{global:'phaseEnd'},
+				trigger:{global:'phaseJieshuBegin'},
 				direct:true,
 				filter:function(event,player){
 					return player.getHistory('damage').length>0||player.getHistory('sourceDamage').length>0;
@@ -5145,6 +5159,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('ai',function(card){
 						var player=_status.event.player;
 						if(player.hasUseTarget(card)&&!player.hasValueTarget(card)) return 0;
+						if(['sha','shan','wuxie','caochuan'].contains(card.name)) return 2+Math.random();
 						return 1+Math.random();
 					}).set('complexCard',true);
 					'step 1'
@@ -5289,14 +5304,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				filter:function(event,player){
 					var evt=event.getParent();
-					return evt&&evt.player==player&&evt.skill&&evt.skill.indexOf('gnjinfan')==0;
+					return evt&&evt.player==player&&player!=_status.currentPhase&&evt.skill&&evt.skill.indexOf('gnjinfan')==0;
 				},
 				content:function(){
-					var suit=get.suit(trigger.cards[0]);
+					'step 0'
+					event.cards=trigger.cards.slice(0);
+					'step 1'
+					var suit=get.suit(cards[0]);
+					cards.shift();
 					var card=get.cardPile2(function(cardx){
 						return get.suit(cardx)==suit;
 					});
 					if(card) player.gain(card,'gain2','log');
+					if(cards.length) event.redo();
+					'step 2'
+					game.delayx();
 				},
 			},
 			gnjinfan7:{
@@ -5488,7 +5510,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhiyi:'执义',
 			zhiyi_info:'锁定技，当你于一回合内使用或打出第一张基本牌时，你选择一项：1.摸一张牌。2.于此牌A（若此牌是因响应牌B而使用或打出的，则改为牌B）的使用或打出流程结算完成后，视为使用一张与此牌名称和属性相同的卡牌。',
 			zhongzuo:'忠佐',
-			zhongzuo_info:'一名角色的回合结束时，若你于此回合内造成或受到过伤害，则你可以令一名角色摸两张牌。若该角色已受伤，则你摸一张牌。',
+			zhongzuo_info:'一名角色的结束阶段开始时，若你于此回合内造成或受到过伤害，则你可以令一名角色摸两张牌。若该角色已受伤，则你摸一张牌。',
 			wanlan:'挽澜',
 			wanlan_info:'限定技，当一名角色进入濒死状态时，你可以弃置所有手牌并令其回复体力至1点，然后对当前回合角色造成1点伤害。',
 			re_jikang:"手杀嵇康",
@@ -5596,7 +5618,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chendeng:'陈登',
 			zhouxuan:'周旋',
 			zhouxuan2:'周旋',
-			zhouxuan_info:'结束阶段，你可以弃置一张牌并指定一名角色，然后选择一个基本牌的名称或非基本牌的类型。其使用或打出下一张牌时，若此牌的名称或类型和你选择的相同，则你观看牌堆顶的三张牌，然后将这些牌分配给任意角色。',
+			zhouxuan_info:'出牌阶段限一次，你可以弃置一张牌并指定一名角色，然后选择一个基本牌的名称或非基本牌的类型。其使用或打出下一张牌时，若此牌的名称或类型和你选择的相同，则你观看牌堆顶的三张牌，然后将这些牌分配给任意角色。',
 			fengji:'丰积',
 			fengji_info:'锁定技，回合结束时，你记录你的手牌数。回合开始时，若你的手牌数不小于你记录的手牌数，则你摸两张牌且本回合手牌上限为体力上限。',
 			re_guanqiujian:'手杀毌丘俭',
@@ -5629,7 +5651,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shuaiyan_info:'弃牌阶段开始时，若你的手牌数大于1，则你可以展示所有手牌，然后你令一名其他角色交给你一张牌。',
 			zhengxuan:'郑玄',
 			zhengjing:'整经',
-			zhengjing_info:'出牌阶段，你可以整理卡牌。然后，你将整理出的卡牌置于一名角色的武将牌上。该角色的准备阶段获得这些牌，跳过此回合的判定和摸牌阶段且本回合内不能发动【整经】。',
+			zhengjing_info:'出牌阶段，你可以整理卡牌。然后，你将整理出的卡牌置于一名角色的武将牌上。该角色的准备阶段获得这些牌，w且 跳过此回合的判定和摸牌阶段。',
 			zhengjing2:'整经',
 			
 			mobile_yijiang:'武将设计征集大赛',
@@ -5658,7 +5680,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gnjinfan6:'锦帆',
 			gnjinfan7:'锦帆',
 			gnjinfan4_backup:'锦帆',
-			gnjinfan_info:'弃牌阶段开始时，你可将任意张手牌置于武将牌上，称为“铃”（每种花色的“铃”限一张）。当你需要使用或打出一张手牌时，你可以使用或打出一张“铃”。当有“铃”移动到处理区后，你从牌堆中获得与此次移动到第一张“铃”花色相同的一张牌。',
+			gnjinfan_info:'弃牌阶段开始时，你可将任意张手牌置于武将牌上，称为“铃”（每种花色的“铃”限一张）。当你需要使用或打出一张手牌时，你可以使用或打出一张“铃”。你的回合外，当有“铃”移动到处理区后，你从牌堆中获得与此次移动到第一张“铃”花色相同的一张牌。',
 			gnsheque:'射却',
 			gnsheque_info:'一名其他角色的准备阶段开始时，若其装备区内有牌，则你可以对其使用一张【杀】（无距离关系的限制且无视防具）。',
 			sp_sufei:'SP苏飞',
@@ -5673,6 +5695,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinwanlan:'挽澜',
 			xinwanlan_info:'当有角色受到伤害时，若伤害点数大于其体力值，则你可以弃置所有非基本牌（至少两张）并防止此伤害。',
 			re_xusheng:'手杀徐盛',
+			re_dongzhuo:'手杀董卓',
+			rejiuchi:'酒池',
+			rejiuchi_info:'你可以将一张黑桃手牌当做【酒】使用。锁定技，当你于回合内使用带有【酒】效果的【杀】造成伤害时，你令你的【崩坏】失效直到回合结束。',
 		}
 	};
 });

@@ -3240,6 +3240,25 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
    						},
    					},
    				},
+   				{
+   					name:'Day Game',
+   					place:[false,true,true,false],
+   					character:['key_yuzuru','sp_key_kanade','key_ayato','key_hinata'],
+   					lib:{
+   						character:{
+   							key_yuzuru:['male','key',4,['hinata_qiulve','kurou']],
+   							sp_key_kanade:['female','key',3,['hinata_qiulve','benxi'],[]],
+   							key_ayato:['male','key',3,['hinata_qiulve','retieji']],
+   							key_hinata:['female','key',4,['hinata_qiulve','hinata_ehou']],
+   						},
+   						translate:{
+   							key_yuzuru:'新秀球王',
+   							sp_key_kanade:'学生会长',
+   							key_ayato:'副会长',
+   							key_hinata:'球队领袖',
+   						},
+   					},
+   				},
    			]
    			game.liangjunduilei=list;
    			game.chooseCharacterTwo=function(){
