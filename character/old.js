@@ -7,12 +7,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old:{
 				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_guanqiujian","xiahouyuan","weiyan","xiaoqiao","pangde"],
 				old_refresh:["old_zhangfei","old_huatuo","old_zhaoyun","ol_huaxiong"],
-				old_yijiang1:["masu","xushu","fazheng","yujin","xin_yujin","old_xusheng","old_lingtong","ol_yujin"],
-				old_yijiang2:["old_madai","old_zhonghui","old_wangyi","old_guanzhang"],
+				old_yijiang1:["masu","xushu","yujin","xin_yujin","old_xusheng","old_lingtong"],
+				old_yijiang2:["old_zhonghui"],
 				old_yijiang3:["liru","old_zhuran","ol_manchong","old_fuhuanghou","old_caochong"],
 				old_yijiang4:["old_caozhen","old_chenqun","old_zhuhuan"],
 				old_yijiang5:["old_caoxiu","old_quancong","old_zhuzhi"],
-				old_yijiang67:["ol_xinxianying","ol_zhangrang","ol_liuyu"],
+				old_yijiang67:["ol_zhangrang","ol_liuyu"],
 				old_sp:["old_lingju","old_maliang","old_machao","zhangliang","jsp_caoren","ol_guansuo","old_zhangxingcai","old_huangfusong","ol_maliang","old_wangyun"],
 				old_mobile:["old_caochun","old_majun","old_jiakui"],
 			},
@@ -40,7 +40,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_caochun:['male','wei',4,['shanjia']],
 			masu:['male','shu',3,['xinzhan','huilei']],
 			xushu:['male','shu',3,['wuyan','jujian']],
-			fazheng:['male','shu',3,['enyuan','xuanhuo']],
 			liru:['male','qun',3,['juece','mieji','fencheng']],
 			yujin:['male','wei',4,['yizhong']],
 			xin_yujin:['male','wei',4,['jieyue']],
@@ -50,9 +49,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_xusheng:['male','wu',4,['pojun']],
 			old_zhuran:['male','wu',4,['olddanshou']],
 			old_lingtong:['male','wu',4,['oldxuanfeng']],
-			old_madai:['male','shu',4,['mashu','oldqianxi']],
 			old_caoxiu:['male','wei',4,['taoxi']],
-			old_wangyi:['female','wei',3,['oldzhenlie','oldmiji']],
 			old_caozhen:['male','wei',4,['sidi']],
 			old_quancong:['male','wu',4,['zhenshan']],
 			old_lingju:['female','qun',3,['jieyuan','fenxin_old']],
@@ -64,10 +61,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_machao:['male','qun',4,['zhuiji','oldcihuai']],
 			old_zhugezhan:["male","shu",3,["old_zuilun","old_fuyin"]],
 			zhangliang:["male","qun",4,["old_jijun","old_fangtong"]],
-			old_guanzhang:['male','shu',4,['old_fuhun']],
-			ol_xinxianying:['female','wei',3,['caishi','zhongjian']],
 			ol_zhangrang:['male','qun',3,['xintaoluan']],
-			ol_yujin:['male','wei',4,['rezhenjun']],
 			ol_guansuo:['male','shu',4,['zhengnan','xiefang']],
 			ol_manchong:['male','wei',3,['yuce','junxing']],
 			ol_liuyu:['male','qun',2,['zongzuo','zhige']],
@@ -82,27 +76,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldshenxian:{
 				audio:'shenxian',
 				inherit:'shenxian',
-			},
-			old_fuhun:{
-				audio:'fuhun',
-				trigger:{player:'phaseDrawBegin1'},
-				filter:function(event,player){
-					return !event.numFixed;
-				},
-				content:function(){
-					'step 0'
-					trigger.changeToZero();
-					'step 1'
-					var cards=get.cards(2);
-					event.cards=cards;
-					player.showCards(cards);
-					'step 2'
-					player.gain(cards,'gain2');
-					if(get.color(cards[0])!=get.color(cards[1])){
-						player.addTempSkill('wusheng');
-						player.addTempSkill('paoxiao');
-					}
-				},
 			},
 			"old_guhuo":{
 				group:["old_guhuo_guess","old_guhuo_respond","old_guhuo_wuxie"],
@@ -694,98 +667,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			oldzhenlie:{
-				audio:'zhenlie',
-				trigger:{player:'judge'},
-				check:function(event,player){
-					return event.judge(player.judging[0])<0;
-				},
-				content:function(){
-					"step 0"
-					var card=get.cards()[0];
-					event.card=card;
-					game.cardsGotoOrdering(card).relatedEvent=trigger;
-					"step 1"
-					player.$throw(card);
-					card.clone.classList.add('thrownhighlight');
-					if(trigger.player.judging[0].clone){
-						trigger.player.judging[0].clone.classList.remove('thrownhighlight');
-						game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging[0].clone]));
-					}
-					game.cardsDiscard(trigger.player.judging[0]);
-					trigger.player.judging[0]=card;
-					game.log(trigger.player,'的判定牌改为',card);
-					game.delay(2);
-				},
-			},
-			oldmiji:{
-				trigger:{player:['phaseZhunbeiBegin','phaseJieshuBegin']},
-				filter:function(event,player){
-					return player.isDamaged();
-				},
-				content:function(){
-					'step 0'
-					player.judge(function(card){
-						return get.color(card)=='black'?1:-1;
-					});
-					'step 1'
-					if(result.bool&&player.maxHp>player.hp){
-						var cards=get.cards(player.maxHp-player.hp);
-						event.cards=cards;
-						var dialog=ui.create.dialog('选择获得卡牌的目标',cards,'hidden');
-						dialog.classList.add('noselect');
-						player.chooseTarget(true,dialog).ai=function(target){
-							return get.attitude(player,target)/Math.sqrt(1+target.countCards('h'));
-						}
-					}
-					else{
-						event.finish();
-					}
-					'step 2'
-					player.line(result.targets);
-					result.targets[0].gain(event.cards,'draw');
-				},
-				ai:{
-					effect:{
-						target:function(card,player,target){
-							if(get.tag(card,'recover')&&target.hp==target.maxHp-1) return [0,0];
-							if(target.hasFriend()){
-								if((get.tag(card,'damage')==1||get.tag(card,'loseHp'))&&target.hp==target.maxHp) return [0,1];
-							}
-						}
-					},
-					threaten:function(player,target){
-						if(target.hp==1) return 3;
-						if(target.hp==2) return 2;
-						return 1;
-					},
-				}
-			},
-			oldqianxi:{
-				trigger:{source:'damageBegin2'},
-				check:function(event,player){
-					var att=get.attitude(player,event.player);
-					if(event.player.hp==event.player.maxHp) return att<0;
-					if(event.player.hp==event.player.maxHp-1&&
-						(event.player.maxHp<=3||event.player.hasSkillTag('maixie'))) return att<0;
-					return att>0;
-				},
-				filter:function(event,player){
-					return event.card&&event.card.name=='sha'&&get.distance(player,event.player)<=1;
-				},
-				logTarget:'player',
-				content:function(){
-					'step 0'
-					player.judge(function(card){
-						return get.suit(card)!='heart'?1:-1;
-					});
-					'step 1'
-					if(result.bool){
-						trigger.cancel();
-						trigger.player.loseMaxHp(true);
-					}
-				}
-			},
 			oldxuanfeng:{
 				audio:'xuanfeng',
 				trigger:{player:'loseAfter'},
@@ -859,9 +740,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_xusheng:'旧徐盛',
 			old_lingtong:'旧凌统',
 			old_zhuran:'旧朱然',
-			old_madai:'旧马岱',
 			old_caoxiu:'旧曹休',
-			old_wangyi:'旧王异',
 			old_caozhen:'旧曹真',
 			old_quancong:'旧全琮',
 			old_lingju:'旧灵雎',
@@ -873,13 +752,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_zhugezhan:"旧诸葛瞻",
 			zhangliang:'SP张梁',
 			yuji:'旧于吉',
-			old_guanzhang:'旧关兴张苞',
 			old_zhangfei:'OL张飞',
 			old_huatuo:'OL华佗',
 			jsp_caoren:'☆SP曹仁',
-			ol_xinxianying:'OL辛宪英',
 			ol_zhangrang:'旧张让',
-			ol_yujin:'镇军于禁',
 			ol_liaohua:'OL廖化',
 			ol_zhuran:'OL朱然',
 			ol_guansuo:'OL关索',
@@ -895,8 +771,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_zhaoyun:'旧赵云',
 			ol_huaxiong:'旧华雄',
 
-			old_fuhun:'父魂',
-			old_fuhun_info:'摸牌阶段开始时，你可以放弃摸牌，改为从牌堆顶亮出两张牌并获得之，若亮出的牌颜色不同，你获得技能“武圣”、“咆哮”，直到回合结束。',
 			"old_guhuo":"蛊惑",
 			"old_guhuo_info":"你可以说出任何一种基本牌或普通锦囊牌，并正面朝下使用或打出一张手牌。体力值不为0的其他角色依次选择是否质疑。若无角色质疑，则该牌按你所述之牌结算。若有角色质疑则亮出验明：若为真，质疑者各失去1点体力；若为假，质疑者各摸一张牌。无论真假，弃置被质疑的牌。仅当被质疑的牌为红桃花色且为真时，该牌仍然可以进行结算。",
 			"old_guhuo_guess":"蛊惑",
@@ -918,12 +792,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhenshan_use_backup:'振赡',
 			zhenshan_info:'每名角色的回合限一次，每当你需要使用或打出一张基本牌时，你可以与一名手牌数少于你的角色交换手牌。若如此做，视为你使用或打出了此牌',
 			zhenshan_use_info:'每名角色的回合限一次，每当你需要使用或打出一张基本牌时，你可以与一名手牌数少于你的角色交换手牌。若如此做，视为你使用或打出了此牌',
-			oldzhenlie:'贞烈',
-			oldzhenlie_info:'在你的判定牌生效前，你可以亮出牌堆顶的一张牌代替之',
-			oldmiji:'秘计',
-			oldmiji_info:'准备/结束阶段开始时，若你已受伤，你可以判定，若判定结果为黑色，你观看牌堆顶的X张牌（X为你已损失的体力值），然后将这些牌交给一名角色',
-			oldqianxi:'潜袭',
-			oldqianxi_info:'当你使用【杀】对距离为1的目标角色造成伤害时，你可以进行一次判定，若判定结果不为红桃，你防止此伤害，令其减1点体力上限',
 			oldxuanfeng:'旋风',
 			oldxuanfeng_info:'每当你失去一次装备区里的牌时，你可以执行下列两项中的一项：1.视为对任意一名其他角色使用一张【杀】（此【杀】不计入每回合的使用限制）；2.对与你距离1以内的一名其他角色造成一点伤害',
 			
