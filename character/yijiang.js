@@ -4527,7 +4527,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							return 0;
 						},
-						player:1
 					}
 				},
 				subSkill:{
