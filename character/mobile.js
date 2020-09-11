@@ -5165,7 +5165,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.log(player,'将',result.cards,'放到了武将牌上');
 					}
 				},
-				group:['gnjinfan3','gnjinfan4','gnjinfan6','gnjinfan7'],
+				group:['gnjinfan3','gnjinfan4','gnjinfan6','gnjinfan7','gnjinfan8'],
 				marktext:'铃',
 				intro:{
 					content:'cards',
@@ -5348,6 +5348,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return false;
 					},
 				}
+			},
+			gnjinfan8:{
+				audio:'gnjinfan',
+				trigger:{player:'phaseBegin'},
+				forced:true,
+				filter:function(event,player){
+					return player.getStorage('gnjinfan').length>0;
+				},
+				content:function(){
+					var cards=player.getStorage('gnjinfan');
+					player.gain('gain2','log',cards,'fromStorage');
+					cards.length=0;
+					player.unmarkSkill('gnjinfan');
+				},
 			},
 			gnsheque:{
 				audio:2,
@@ -5674,8 +5688,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gnjinfan4:'锦帆',
 			gnjinfan6:'锦帆',
 			gnjinfan7:'锦帆',
+			gnjinfan8:'锦帆',
 			gnjinfan4_backup:'锦帆',
-			gnjinfan_info:'弃牌阶段开始时，你可将任意张手牌置于武将牌上，称为“铃”（每种花色的“铃”限一张）。当你需要使用或打出一张手牌时，你可以使用或打出一张“铃”。你的回合外，当有“铃”移动到处理区后，你从牌堆中获得与此次移动到第一张“铃”花色相同的一张牌。',
+			gnjinfan_info:'弃牌阶段开始时，你可将任意张手牌置于武将牌上，称为“铃”（每种花色的“铃”限一张）。当你需要使用或打出一张手牌时，你可以使用或打出一张“铃”。你的回合外，当有“铃”移动到处理区后，你从牌堆中获得与“铃”花色相同的一张牌。回合开始时，你获得所有“铃”。',
 			gnsheque:'射却',
 			gnsheque_info:'一名其他角色的准备阶段开始时，若其装备区内有牌，则你可以对其使用一张【杀】（无距离关系的限制且无视防具）。',
 			sp_sufei:'SP苏飞',

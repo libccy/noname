@@ -2422,12 +2422,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				if(_status.mode=='purple'){
 					var real=get.realAttitude(from,to);
-					if(from==to||to.identityShown||(_status.yeconfirm&&['rYe','bYe'].contains(to.identity)&&['rYe','bYe'].contains(to.identity))) return real*1.1;
+					if(from==to||to.identityShown||from.storage.zhibi&&from.storage.zhibi.contains(to)||(_status.yeconfirm&&['rYe','bYe'].contains(to.identity)&&['rYe','bYe'].contains(to.identity))) return real*1.1;
 					return ((to.ai.shown+0.1)*real+(from.identity.slice(0,1)==to.identity.slice(0,1)?3:-3)*(1-to.ai.shown))
 				}
 				var difficulty=0;
 				if(to==game.me) difficulty=2-get.difficulty();
-				if(from==to||to.identityShown||(from.storage.dongcha==to)){
+				if(from==to||to.identityShown||(from.storage.dongcha==to)||to.identityShown||from.storage.zhibi&&from.storage.zhibi.contains(to)){
 					return get.realAttitude(from,to)+difficulty*1.5;
 				}
 				else{
