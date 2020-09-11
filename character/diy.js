@@ -55,6 +55,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_miki:['female','key',3,['miki_shenqiang','miki_huanmeng','miki_zhiluo']],
 			key_shiori:['female','key','2/3',['shiori_huijuan']],
 			key_kaori:['female','key','3/4',['kaori_siyuan']],
+			key_akiko:['female','key',3,['akiko_dongcha']],
 			
 			key_kud:['female','key',3,['kud_qiaoshou','kud_buhui']],
 			key_misuzu:['female','key',3,['misuzu_hengzhou','misuzu_nongyin','misuzu_zhongxing']],
@@ -149,7 +150,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				"ns_huangchengyan","ns_sunchensunjun","ns_yuanxi","ns_caoshuang"],
 				diy_tieba:["diy_wenyang","ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_zhangwei"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko"],
 				diy_yongjian:["ns_chendao","yj_caoang"],
 			},
 		},
@@ -165,6 +166,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
+			key_akiko:'#bKanon',
 			key_kaori:'#bKanon',
 			key_shiori:'#bKanon',
 			key_miki:'#bSummer Pockets',
@@ -315,6 +317,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			akiko_dongcha:{
+				trigger:{global:'gameDrawAfter'},
+				forced:true,
+				filter:function(event,player){
+					return get.mode()=='identity';
+				},
+				content:function(){
+					var func=function(){
+						game.countPlayer(function(current){
+							current.setIdentity();
+						});
+					};
+					if(player==game.me) func();
+					else if(player.isOnline()) player.send(func);
+					if(!player.storage.zhibi) player.storage.zhibi=[];
+					player.storage.zhibi.addArray(game.players);
+				},
+				ai:{
+ 				viewHandcard:true,
+ 				skillTagFilter:function(player,tag,arg){
+ 					if(player==arg) return false;
+ 				},
+				},
+			},
 			kaori_siyuan:{
 				enable:'phaseUse',
 				filter:function(event,player){
@@ -10204,6 +10230,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_miki:'野村美希',
 			key_shiori:'美坂栞',
 			key_kaori:'美坂香里',
+			key_akiko:'水濑秋子',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -10436,6 +10463,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shiori_huijuan_info:'锁定技，其他角色的结束阶段开始时，你可以视为使用一张该角色本回合出牌阶段内使用过的基本牌或普通锦囊牌。准备阶段开始时，若你自上个回合起以此法使用的牌数不小于X，则你选择一项：①弃置装备区或判定区内的一张牌。②跳过本回合的出牌阶段。（X为场上玩家数的一半且至少为2）',
 			kaori_siyuan:'思愿',
 			kaori_siyuan_info:'出牌阶段，你可以将一张装备牌或延时锦囊牌置于一名其他角色的装备区内，然后可以视为使用一张基本牌或普通锦囊牌。',
+			akiko_dongcha:'洞察',
+			akiko_dongcha_info_identity:'锁定技，其他角色的手牌对你可见。游戏开始时，你令其他角色的身份牌对你可见。',
+			akiko_dongcha_info:'锁定技，其他角色的手牌对你可见。',
 			
 			key_kud:'库特莉亚芙卡',
 			kud_qiaoshou:'巧手',
@@ -10726,7 +10756,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diychanyuan_info:'锁定技，杀死你的角色失去一点体力上限',
 			zonghuo_info:'你可弃置一张牌将你即将造成的伤害变为火焰伤害',
 			shaoying_info:'每当你造成一次火焰伤害，可指定距离受伤害角色1以内的另一名角色，并展示牌堆顶的一张牌，若此牌为红色，该角色受到一点火焰伤害',
-			juedao_info:'出牌阶段，你可以弃置一张手牌，横置你的武将牌；锁定技，若你处于连环状态，你进攻距离-1、防御距离+1。',
+			juedao_info:'出牌阶段，你可以弃置一张手牌，横置你的武将牌；锁定技，若你的武将牌横置，则你计算至其他角色的距离和其他角色计算至你的距离均+1。',
 			geju_info:'准备阶段开始时，你可以摸X张牌（X为攻击范围内不含有你的势力数）。',
 			siji_info:'弃牌阶段结束后，你可以摸2X张牌（X为你于此阶段内弃置的【杀】的数量）。',
 			ciqiu_info:'锁定技，每当你使用【杀】对目标角色造成伤害时，若该角色未受伤，你令此伤害+1；若其因此进入濒死状态，你令其死亡，然后你失去“刺酋”。 ',

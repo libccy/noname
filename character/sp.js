@@ -401,7 +401,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var next=player.draw();
 					if(get.isLuckyStar(player)||Math.random()<0.5) next.num=2;
 					var num=player.countMark('olxingshen');
-					if(num<6) player.addMark('olxingshen',Math.max(6-num,player.getDamagedHp()),false)
+					if(num<6) player.addMark('olxingshen',Math.min(6-num,player.getDamagedHp()),false)
 				},
 				intro:{
 					content:'下一次发动〖严教〗时多展示X张牌',
@@ -12676,16 +12676,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				derivation:['benghuai','weizhong'],
 				trigger:{player:'phaseZhunbeiBegin'},
 				filter:function(event,player){
-					return player.maxHp>game.players.length&&player.hp<player.maxHp&&!player.storage.juyi;
+					return player.maxHp>game.players.length&&!player.storage.juyi;
 				},
 				forced:true,
 				unique:true,
 				juexingji:true,
 				content:function(){
-					var num=player.maxHp-player.countCards('h');
-					if(num>0){
-						player.draw(num);
-					}
+					player.draw(player.maxHp);
 					player.addSkill('benghuai');
 					player.addSkill('weizhong');
 					player.storage.juyi=true;
@@ -12697,7 +12694,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['gainMaxHpEnd','loseMaxHpEnd']},
 				forced:true,
 				content:function(){
-					player.draw();
+					player.draw(player.isMinHandcard()?2:1);
 				}
 			},
 			chixin:{
@@ -14857,9 +14854,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			cihuai_info:'出牌阶段开始时，若你的手牌中没有【杀】，则你可以展示你的手牌，视为对一名角色使用一张【杀】。',
 			gongao_info:'锁定技，当一名角色死亡后，你增加一点体力上限，回复一点体力。',
 			juyi:'举义',
-			juyi_info:'觉醒技，准备阶段开始时，若你已受伤且体力上限大于存活角色数，你须将手牌摸至体力上限，然后获得技能〖崩坏〗和〖威重〗。',
+			juyi_info:'觉醒技，准备阶段开始时，若你的体力上限大于存活角色数，你摸等同于体力上限张数的牌，然后获得技能〖崩坏〗和〖威重〗。',
 			weizhong:'威重',
-			weizhong_info:'锁定技，当你的体力上限增加或减少时，你摸一张牌。',
+			weizhong_info:'锁定技，当你的体力上限增加或减少时，你摸一张牌。若你的手牌数为全场最少，则你改为摸两张牌。',
 			taichen_info:'出牌阶段限一次，你可以失去1点体力，视为对一名角色使用一张【杀】。（不计入出牌阶段的使用次数限制）',
 			manjuan_info:'其他角色的牌因弃置而进入弃牌堆后，你可以弃置一张花色与之不同的牌，然后获得此牌。',
 			xinmanjuan:'漫卷',
@@ -14978,7 +14975,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zlshoufu_info:'出牌阶段限一次，你可摸一张牌，然后将一张手牌置于一名没有【箓】的角色的武将牌上，称为【箓】；其不能使用和打出与【箓】同类型的牌。该角色受伤后，或于弃牌阶段弃置至少2张与【箓】同类型的牌后，将【箓】置入弃牌堆。',
 			ol_zhangchangpu:'OL张昌蒲',
 			olxingshen:'省身',
-			olxingshen_info:'当你受到伤害后，你可以随机摸两张牌。若如此做，你获得X个“省”，且下一次发动〖严教〗展示牌时移去所有“省”并多展示等量的牌。（X为你已损失的体力值，且你至多拥有6个“省”）',
+			olxingshen_info:'当你受到伤害后，你可以随机摸至多两张牌。若如此做，你获得X个“省”，且下一次发动〖严教〗展示牌时移去所有“省”并多展示等量的牌。（X为你已损失的体力值，且你至多拥有6个“省”）',
 			caoshuang:'曹爽',
 			tuogu:'托孤',
 			tuogu_info:'限定技，一名角色死亡时，你可以令其选择其武将牌上的一个技能（主公技，限定技，觉醒技等特殊技能除外），然后你获得其选择的技能。',
