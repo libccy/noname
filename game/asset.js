@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.103.3',
+	'v1.9.103.4',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -5078,5 +5078,6 @@ window.noname_skin_list={
 	key_yui:2,
 	key_yuri:3,
 	key_yuzuru:2,
-	sp_key_kanade:6,
+	sp_key_kanade:1,
+	key_kamome:1,
 };

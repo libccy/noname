@@ -206,9 +206,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var cards=[];
 					for(var i of lib.inpile) list.add(get.type2(i));
 					for(var i of list){
-						if(!target.countCards('h',{type:i})){
+						if(!target.countCards('h',function(card){
+							return get.type2(card,target)==i;
+						})){
 							var card=get.cardPile2(function(card){
-								return get.type(card,false)==i;
+								return get.type2(card,false)==i;
 							});
 							if(card) cards.push(card);
 						}

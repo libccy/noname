@@ -6309,9 +6309,9 @@
 			else{
 				dialog.style.left=(e.clientX/game.documentZoom-dialog.offsetWidth-10)+'px';
 			}
-			var idealtop=e.clientY/game.documentZoom-dialog.offsetHeight/2;
-			if(idealtop<10){
-				idealtop=10;
+			var idealtop=(e.clientY||0)/game.documentZoom-dialog.offsetHeight/2;
+			if(typeof idealtop!='number'||isNaN(idealtop)||idealtop<=5){
+				idealtop=5;
 			}
 			else if(idealtop+dialog.offsetHeight+10>ui.window.offsetHeight){
 				idealtop=ui.window.offsetHeight-10-dialog.offsetHeight;
@@ -9888,7 +9888,7 @@
   				game.checkMod(card,player,range,'selectTarget',player);
  				}
 					if(info.notarget||range[1]==-1){
-						if(range[1]==-1){
+						if(!info.notarget&&range[1]==-1){
 							for(var i=0;i<targets.length;i++){
 								if(!player.canUse(card,targets[i],event.nodistance?false:null)){
 									targets.splice(i--,1);
@@ -16867,7 +16867,7 @@
 					if(!unique){
 						for(var i=0;i<list.length;i++){
 							var info=lib.skill[list[i]];
-							if(!info||info.unique||info.temp||info.sub){
+							if(!info||info.unique||info.temp||info.sub||info.charlotte){
 								list.splice(i--,1);
 							}
 						}
@@ -25197,7 +25197,7 @@
 								}
 								return 1;
 							},
-							ai2:get.effect,
+							ai2:get.effect_use,
 							type:'dying',
 							targetRequired:true,
 							dying:event.dying
