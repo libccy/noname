@@ -18,7 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		connect:true,
 		character:{
-			re_liubiao:['male','qun',3,['rezishou','zongshi'],['unseen']],
+			//re_liubiao:['male','qun',3,['rezishou','zongshi'],['unseen']],
 			xin_fazheng:['male','shu',3,['xinenyuan','xinxuanhuo'],['die_audio']],
 			wangyi:['female','wei',3,['zhenlie','miji']],
 			old_madai:['male','shu',4,['mashu','qianxi']],
@@ -26,7 +26,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_xusheng:['male','wu',4,['decadepojun']],
 			re_taishici:['male','wu',4,['tianyi','hanzhan']],
 			re_masu:['male','shu',3,['resanyao','rezhiman']],
-			re_sunluban:['female','wu',3,['rechanhui','rejiaojin']],re_zhonghui:['male','wei',4,['requanji','zili']],
+			re_sunluban:['female','wu',3,['rechanhui','rejiaojin']],
+			re_zhonghui:['male','wei',4,['requanji','zili']],
 			re_handang:['male','wu',4,['regongji','jiefan']],
 			re_lingtong:['male','wu',4,['rexuanfeng']],
 			yujin_yujin:['male','wei',4,['rejieyue']],
@@ -157,7 +158,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'zishou',
 				trigger:{player:'phaseDrawBegin2'},
 				check:function(event,player){
-					return player.countCards('h')<=(player.hasSkill('zongshi')?player.maxHp:(player.hp-2))||player.skipList.contains('phaseUse');
+					return player.countCards('h')<=(player.hasSkill('zongshi')?player.maxHp:(player.hp-2))||player.skipList.contains('phaseUse')||!player.countCards('h',function(card){
+						return get.tag(card,'damage')&&player.hasUseTarget(card);
+					});
 				},
 				filter:function(event,player){
 					return !event.numFixed;
@@ -206,7 +209,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						if(game.hasPlayer(function(current){
 							return filterTarget(null,player,current)
-						})) player.chooseTarget(filterTarget,'是否将一名其他角色装备区内的一张牌移动到自己的装备区？');
+						})) player.chooseTarget(filterTarget,'是否将一名其他角色装备区内的一张牌移动到自己的装备区？').set('ai',function(target){
+							var player=_status.event.player;
+							var att=get.attitude(player,target);
+							if(att>0&&!target.hasSkillTag('noe')) return 0;
+							var num=0;
+							target.countCards('e',function(card){
+								if(player.isEmpty(get.subtype(card))){
+									var eff=get.effect(player,card,player,player);
+									if(eff>num) num=eff;
+								}
+							});
+							if(num<=0) return 0;
+							if(att<0) return num*-att;
+							return 1/num;
+						});
 						else event.finish();
 					}
 					'step 1'
@@ -6535,7 +6552,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(_status.event.goon) return 8-get.value(card);
 						return 0;
 					});
-					next.set('logSkill','beige');
+					next.set('logSkill','rebeige');
 					next.set('goon',check);
 					"step 1"
 					if(result.bool){
@@ -7212,7 +7229,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_liubiao:'界刘表',
 			rezishou:'自守',
 			rezishou2:'自守',
-			rezishou_info:'摸牌阶段，你可以多摸X张牌，然后本回合你对其他角色造成伤害时，防止此伤害。结束阶段，若你本回合没有使用牌指定其他角色为目标，你可以将场上一张装备牌移动到自己的装备区。（X为场上势力数）',
+			rezishou_info:'摸牌阶段，你可以多摸X张牌。若如此做，本回合你对其他角色造成伤害时，防止此伤害，且结束阶段，若你本回合没有使用牌指定其他角色为目标，则你可以将场上的一张装备牌移动到自己的装备区。（X为场上势力数）',
 			ol_dongzhuo:'界董卓',
 			olbaonue:'暴虐',
 			olbaonue_info:'主公技，其他群雄角色造成1点伤害后，其可进行判定，若为♠，你回复1点体力并获得判定牌。',
