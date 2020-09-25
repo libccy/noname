@@ -5530,7 +5530,7 @@
 				name:'斗地主',
 				connect:{
 					update:function(config,map){
-						if(config.connect_doudizhu_mode=='kaihei'){
+						if(config.connect_doudizhu_mode=='kaihei'||config.connect_doudizhu_mode=='huanle'){
 							map.connect_double_character.hide();
 						}
 						else{
@@ -5541,8 +5541,9 @@
 						name:'游戏模式',
 						init:'normal',
 						item:{
-							normal:'标准',
+							normal:'休闲',
 							kaihei:'开黑',
+							huanle:'欢乐',
 						},
 						restart:true,
 						frequent:true,
@@ -5562,13 +5563,13 @@
 				},
 				config:{
 					update:function(config,map){
-						if(config.doudizhu_mode=='kaihei'){
+						if(config.doudizhu_mode=='kaihei'||config.doudizhu_mode=='huanle'){
 							map.double_character.hide();
 						}
 						else{
 							map.double_character.show();
 						}
-						if(config.double_character&&config.doudizhu_mode!='kaihei'){
+						if(config.double_character&&config.doudizhu_mode!='kaihei'&&config.doudizhu_mode!='huanle'){
 							map.double_hp.show();
 						}
 						else{
@@ -5579,8 +5580,9 @@
 						name:'游戏模式',
 						init:'normal',
 						item:{
-							normal:'标准',
+							normal:'休闲',
 							kaihei:'开黑',
+							huanle:'欢乐',
 						},
 						restart:true,
 						frequent:true,
@@ -16304,7 +16306,7 @@
 					},this.playerid,str);
 				},
 				chat:function(str){
-					if(str&&str.indexOf('http')!=-1) return;
+					if(get.is.banWords(str)) return;
 					lib.element.player.say.call(this,str);
 					game.broadcast(function(id,str){
 						if(lib.playerOL[id]){
@@ -24217,7 +24219,7 @@
 				if(lib.config.forbidai.contains(i)) return true;
 				if(lib.characterFilter[i]&&!lib.characterFilter[i](get.mode())) return true;
 				if(_status.connectMode){
-					if(lib.configOL.banned.contains(i)) return true;
+					if(lib.configOL.banned.contains(i)||lib.connectBanned.contains(i)) return true;
 					var double_character=false;
 					if(lib.configOL.mode=='guozhan'){
 						double_character=true;
@@ -25759,7 +25761,9 @@
 							ui.connectClients=ui.create.div('.forceopaque.menubutton.large.connectevents.pointerdiv.left','在线',ui.window,ui.click.connectClients);
 							ui.connectClientsCount=ui.create.div('.forceopaque.menubutton.icon.connectevents.highlight.left','1',ui.window);
 							if(events.length){
-								ui.connectEventsCount.innerHTML=events.length;
+								ui.connectEventsCount.innerHTML=events.filter(function(evt){
+									return evt.creator==game.onlineKey||!get.is.banWords(evt.content)
+								}).length;
 								ui.connectEventsCount.show();
 							}
 						}
@@ -25880,8 +25884,11 @@
 				updateevents:function(events){
 					if(events&&ui.connectEvents){
 						ui.connectEvents.info=events;
-						if(events.length){
-							ui.connectEventsCount.innerHTML=events.length;
+						var num=events.filter(function(evt){
+							return evt.creator==game.onlineKey||!get.is.banWords(evt.content)
+						}).length;
+						if(num){
+							ui.connectEventsCount.innerHTML=num;
 							ui.connectEventsCount.show();
 						}
 						else{
@@ -42050,6 +42057,7 @@
 						});
 					}
 				}
+				lib.init.js(lib.assetURL+'game','keyWords',function(){});
 				lib.updateURL=lib.updateURLS[lib.config.update_link]||lib.updateURLS.coding;
 
 				lib.init.cssstyles();
@@ -43266,6 +43274,77 @@
 								alert('创建失败，时间已过');
 								return;
 							}
+							if(get.is.banWords(button.input.value)){
+								var eventnode=ui.create.div('.menubutton.videotext.onlineevent.pointerdiv',function(){
+ 								var that=this;
+ 								setTimeout(function(){
+ 									if(that.classList.contains('active')){
+ 										if(confirm('确定要离开'+that.info.content+'？')){
+ 											that.classList.remove('active');
+ 										}
+ 									}
+ 									else{
+ 										if(confirm('确定要加入'+that.info.content+'？')){
+ 											that.classList.add('active');
+ 										}
+ 									}
+ 								});
+ 							},uiintro.content,3);
+ 							var fakeinfo={
+ 								utc:utc,
+ 								day:parseInt(daysselect.value),
+ 								hour:parseInt(hoursselect.value),
+ 								nickname:lib.config.connect_nickname,
+ 								avatar:lib.config.connect_avatar,
+ 								content:button.input.value,
+ 								create:game.onlineKey,
+ 								members:[game.onlineKey],
+ 							};
+ 							eventnode.info=fakeinfo;
+ 							ui.create.div('.title',fakeinfo.content,eventnode);
+ 							var str;
+ 							if(fakeinfo.day<currentDay){
+ 								str='下周';
+ 							}
+ 							else{
+ 								str='周';
+ 							}
+ 							if(fakeinfo.day==7){
+ 								str+='日'
+ 							}
+ 							else{
+ 								str+=get.cnNumber(fakeinfo.day,true);
+ 							}
+ 							str+=' ';
+ 							var hour=fakeinfo.hour;
+ 							if(hour<=12){
+ 								if(hour<=5){
+ 									str+='凌晨';
+ 								}
+ 								else if(hour<12){
+ 									str+='上午';
+ 								}
+ 								else{
+ 									str+='中午';
+ 								}
+ 								str+=fakeinfo.hour+'点';
+ 							}
+ 							else{
+ 								if(hour<=17){
+ 									str+='下午';
+ 								}
+ 								else{
+ 									str+='晚上';
+ 								}
+ 								str+=(fakeinfo.hour-12)+'点';
+ 							}
+ 							ui.create.div('','已有'+(fakeinfo.members.length)+'人加入',eventnode);
+ 							ui.create.div('','时间：'+str,eventnode);
+ 							if(fakeinfo.members.contains(game.onlineKey)){
+ 								eventnode.classList.add('active');
+ 							}
+								return;
+							}
 							game.send('server','events',{
 								utc:utc,
 								day:parseInt(daysselect.value),
@@ -43278,6 +43357,7 @@
 
 						var num=0;
 						for(var i=0;i<button.info.length;i++){
+							if(button.info[i].creator!=game.onlineKey&&get.is.banWords(button.info[i].content)) continue;
 							if(button.info[i].creator==game.onlineKey&&button.info[i].members.contains(game.onlineKey)){
 								num++;
 							}
@@ -44058,14 +44138,21 @@
 							}
 						}
 						if(!player) return;
-						if(game.online){
-							game.send('chat',game.onlineID,str);
+						if(get.is.banWords(input.value)){
+							player.say(input.value);
+							input.value='';
+							_status.chatValue='';
 						}
 						else{
-							lib.element.player.chat.call(player,str);
+ 						if(game.online){
+ 							game.send('chat',game.onlineID,str);
+ 						}
+ 						else{
+ 							lib.element.player.chat.call(player,str);
+ 						}
+ 						input.value='';
+ 						_status.chatValue='';
 						}
-						input.value='';
-						_status.chatValue='';
 					}
 					e.stopPropagation();
 				}
@@ -47202,6 +47289,12 @@
 			return 0;
 		},
 		is:{
+			banWords:function(str){
+				for(var i of window.bannedKeyWords){
+					if(str.indexOf(i)!=-1) return true;
+				}
+				return false;
+			},
 			converted:function(event){
 				return !(event.card&&event.card.isCard);
 			},
@@ -47908,7 +48001,13 @@
 			}
 		},
 		modetrans:function(config,server){
-			if(config.mode=='doudizhu') return config.doudizhu_mode=='kaihei'?'开黑斗地主':'欢乐斗地主';
+			if(config.mode=='doudizhu'){
+				switch(config.doudizhu_mode){
+					case 'kaihei':return '开黑斗地主';
+					case 'huanle':return '欢乐斗地主';
+					default:return '休闲斗地主';
+				}
+			}
 			if(config.mode=='versus'){
 				switch(config.versus_mode){
 					case '1v1':return '单人对决';

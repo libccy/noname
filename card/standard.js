@@ -951,10 +951,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(typeof event.baseDamage!='number') event.baseDamage=1;
 					if(typeof event.extraDamage!='number'){
 						event.extraDamage=0;
-						if(!event.shaReq) event.shaReq={};
-						if(typeof event.shaReq[player.playerid]!='number') event.shaReq[player.playerid]=1;
-						if(typeof event.shaReq[target.playerid]!='number') event.shaReq[target.playerid]=1;
 					}
+					if(!event.shaReq) event.shaReq={};
+					if(typeof event.shaReq[player.playerid]!='number') event.shaReq[player.playerid]=1;
+					if(typeof event.shaReq[target.playerid]!='number') event.shaReq[target.playerid]=1;
 					event.playerCards=[];
 					event.targetCards=[];
 					"step 1"

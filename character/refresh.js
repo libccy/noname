@@ -4,21 +4,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'refresh',
 		characterSort:{
 			refresh:{
-				refresh_standard:["re_caocao","re_simayi","re_guojia","re_lidian","re_zhangliao","re_xuzhu","re_xiahoudun","re_zhangfei","re_zhaoyun","re_guanyu","re_machao","re_xushu","re_zhouyu","re_lvmeng","re_ganning","re_luxun","re_daqiao","re_huanggai","re_lvbu","re_gongsunzan","re_huatuo","re_liubei","re_diaochan","re_huangyueying","re_sunquan","re_sunshangxiang","re_zhenji","re_zhugeliang","re_huaxiong"],
+				refresh_standard:["re_caocao","re_simayi","re_guojia","re_lidian","re_zhangliao","re_xuzhu","re_xiahoudun","re_zhangfei","re_zhaoyun","re_guanyu","re_machao","re_xushu","re_zhouyu","re_lvmeng","re_ganning","re_luxun","re_daqiao","re_huanggai","re_lvbu","re_huatuo","re_liubei","re_diaochan","re_huangyueying","re_sunquan","re_sunshangxiang","re_zhenji","re_zhugeliang","re_huaxiong"],
 				refresh_feng:['caoren','ol_xiahouyuan','re_huangzhong','ol_weiyan','ol_xiaoqiao','zhoutai','re_zhangjiao','xin_yuji'],
 				refresh_huo:["ol_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","ol_pangtong","ol_yuanshao","ol_pangde","re_taishici"],
 				refresh_lin:['re_zhurong','re_menghuo','ol_sunjian','re_caopi','re_xuhuang','ol_dongzhuo'],
 				refresh_shan:['re_dengai','re_jiangwei','re_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce'],
 				refresh_yijiang1:['re_wuguotai','re_gaoshun','re_caozhi','yujin_yujin','re_lingtong','re_masu','xin_xusheng','xin_fazheng'],
-				refresh_yijiang2:['old_madai','wangyi','guanzhang','re_handang','re_zhonghui','re_liaohua','re_chengpu','re_caozhang','re_liubiao'],
-				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran'],
-				refresh_yijiang4:['re_sunluban','re_wuyi'],
+				refresh_yijiang2:['old_madai','wangyi','guanzhang','re_handang','re_zhonghui','re_liaohua','re_chengpu','re_caozhang','re_liubiao','re_bulianshi','xin_gongsunzan'],
+				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong'],
+				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan'],
 				refresh_yijiang5:['re_zhangyi','re_quancong'],
 		 },
 		},
 		connect:true,
 		character:{
-			//re_liubiao:['male','qun',3,['rezishou','zongshi'],['unseen']],
+			xin_gongsunzan:['male','qun',4,['xinyicong','qiaomeng']],
+			re_bulianshi:['female','wu',3,['reanxu','zhuiyi']],
+			re_hanhaoshihuan:['male','wei',4,['reshenduan','reyonglve']],
+			re_panzhangmazhong:['male','wu',4,['reduodao','reanjian']],
+			re_liubiao:['male','qun',3,['zishou','rezongshi']],
 			xin_fazheng:['male','shu',3,['xinenyuan','xinxuanhuo'],['die_audio']],
 			wangyi:['female','wei',3,['zhenlie','miji']],
 			old_madai:['male','shu',4,['mashu','qianxi']],
@@ -62,7 +66,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_daqiao:['female','wu',3,['reguose','liuli']],
 			re_huanggai:['male','wu',4,['rekurou','zhaxiang']],
 			re_lvbu:['male','qun',5,['wushuang','new_liyu']],
-			re_gongsunzan:['male','qun',4,['qiaomeng','reyicong']],
 			re_huatuo:['male','qun',3,['jijiu','new_reqingnang']],
 			re_liubei:['male','shu',4,['rerende','jijiang'],['zhu']],
 			re_diaochan:['female','qun',3,['lijian','rebiyue']],
@@ -118,6 +121,109 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunben:['zhouyu','taishici','daqiao'],
 		},
 		skill:{
+			xinyicong:{
+				mod:{
+					globalFrom:function(from,to,current){
+						return current-Math.max(0,from.hp-1);
+					},
+					globalTo:function(from,to,current){
+						return current+Math.max(0,to.getDamagedHp()-1);
+					},
+				},
+				ai:{
+					threaten:0.8
+				}
+			},
+			reanxu:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return game.countPlayer()>2&&game.hasPlayer(function(current){
+						return current!=player&&current.countCards('he');
+					});
+				},
+				selectTarget:2,
+				filterTarget:function(card,player,target){
+					if(target==player) return false;
+					if(!ui.selected.targets.length) return target.countCards('he')>0;
+					return target!=ui.selected.targets[0]&&ui.selected.targets[0].countGainableCards(target,'he')>0;
+				},
+				multitarget:true,
+				targetprompt:['被拿牌','得到牌'],
+				content:function(){
+					'step 0'
+					targets[1].gainPlayerCard(targets[0],'he',true);
+					'step 1'
+					if(targets[0].getHistory('lose',function(evt){
+						return evt.getParent(3)==event&&!evt.es.length;
+					}).length) player.draw();
+					'step 2'
+					if(targets[0].isIn()&&targets[1].isIn()&&
+						targets[0].countCards('h')!=targets[1].countCards('h')){
+						event.target=targets[targets[0].countCards('h')>targets[1].countCards('h')?1:0];
+						player.chooseBool('是否令'+get.translation(event.target)+'摸一张牌？').set('ai',function(){
+							var evt=_status.event.getParent();
+							return get.attitude(evt.player,evt.target)>0;
+						})
+					}
+					else event.finish();
+					'step 3'
+					if(result.bool) target.draw();
+				},
+				ai:{
+					expose:0.2,
+					threaten:2,
+					order:9,
+					result:{
+						player:function(player,target){
+							if(ui.selected.targets.length) return 0.01;
+							return target.countCards('e')?0:0.5;
+						},
+						target:function(player,target){
+							if(ui.selected.targets.length){
+ 							player=target;
+ 							target=ui.selected.targets[0];
+ 							if(get.attitude(player,target)>1){
+ 								return 0;
+ 							}
+ 							return target.countCards('h')-player.countCards('h')>(target.countCards('e')?2:1)?2:1;
+							}
+							else{
+								if(get.attitude(player,target)<=0) return (target.countCards('he',function(card){
+ 								return card.name=='tengjia'||get.value(card)>0;
+ 							})>0)?-1.5:1.5;
+ 							return (target.countCards('he',function(card){
+ 								return card.name!='tengjia'&&get.value(card)<=0;
+ 							})>0)?1.5:-1.5
+							}
+						},
+					},
+				},
+			},
+			rezongshi:{
+				audio:2,
+				mod:{
+					maxHandcard:function(player,num){
+						return num+game.countGroup();
+					},
+				},
+				trigger:{player:'phaseZhunbeiBegin'},
+				forced:true,
+				filter:function(event,player){
+					return player.countCards('h')>player.hp;
+				},
+				content:function(){
+					player.addTempSkill('rezongshi_paoxiao');
+				},
+			},
+			rezongshi_paoxiao:{
+				mod:{
+					cardUsable:function(card,player,num){
+						if(card.name=='sha') return Infinity;
+					},
+				},
+			},
 			olbaonue:{
 				audio:2,
 				unique:true,
@@ -156,6 +262,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			rezishou:{
 				audio:'zishou',
+				audioname:['re_liubiao'],
 				trigger:{player:'phaseDrawBegin2'},
 				check:function(event,player){
 					return player.countCards('h')<=(player.hasSkill('zongshi')?player.maxHp:(player.hp-2))||player.skipList.contains('phaseUse')||!player.countCards('h',function(card){
@@ -423,6 +530,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			wulie:{
 				trigger:{player:'phaseJieshuBegin'},
+				audio:2,
 				direct:true,
 				limited:true,
 				skillAnimation:true,
@@ -6729,8 +6837,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(card.name=='jiu') return Infinity;
 					},
 				},
-				audio:'jiuchi',
-				audioname:['ol_dongzhuo'],
+				audio:2,
 				enable:'chooseToUse',
 				filterCard:function(card){
 					return get.suit(card)=='spade';
@@ -6904,7 +7011,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_lvbu:'界吕布',
 			re_xushu:'界徐庶',
 			re_huanggai:'界黄盖',
-			re_gongsunzan:'界公孙瓒',
 			re_daqiao:'界大乔',
 			re_ganning:'界甘宁',
 			re_huatuo:'界华佗',
@@ -7246,9 +7352,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rezishou:'自守',
 			rezishou2:'自守',
 			rezishou_info:'摸牌阶段，你可以多摸X张牌。若如此做，本回合你对其他角色造成伤害时，防止此伤害，且结束阶段，若你本回合没有使用牌指定其他角色为目标，则你可以将场上的一张装备牌移动到自己的装备区。（X为场上势力数）',
+			rezongshi:'宗室',
+			rezongshi_info:'锁定技，你的手牌上限+X（X为势力数）。准备阶段，若你的手牌数大于体力值，则你本回合内使用【杀】无次数限制。',
 			ol_dongzhuo:'界董卓',
 			olbaonue:'暴虐',
 			olbaonue_info:'主公技，其他群雄角色造成1点伤害后，其可进行判定，若为♠，你回复1点体力并获得判定牌。',
+			re_panzhangmazhong:'界潘璋马忠',
+			re_hanhaoshihuan:'界韩浩史涣',
+			re_bulianshi:'界步练师',
+			reanxu:'安恤',
+			reanxu_info:'出牌阶段限一次，你可以选择两名其他角色，令其中一名角色获得另一名角色的一张牌。若以此法移动的牌不来自装备区，则你摸一张牌。然后你可以令二者中手牌数较少的一名角色摸一张牌。',
+			xin_gongsunzan:'界公孙瓒',
+			xinyicong:'义从',
+			xinyicong_info:'锁定技，你计算与其他角色的距离时-X，其他角色计算与你的距离时+Y。（X为你的体力值-1，Y为你的已损失体力值-1）',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

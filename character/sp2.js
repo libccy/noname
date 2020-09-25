@@ -369,13 +369,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 1"
 					var map=event.result||result;
-					if(result.bool){
+					if(map.bool){
 						player.logSkill('moying');
 						player.addTempSkill('moying2');
 						var cards=[];
 						for(var i=0;i<ui.cardPile.childNodes.length;i++){
 							var card=ui.cardPile.childNodes[i];
-							if(get.suit(card)==result.suit&&get.number(card)==result.number) cards.push(card);
+							if(get.suit(card)==map.suit&&get.number(card)==map.number) cards.push(card);
 						}
 						if(cards.length) player.gain(cards,'gain2','log');
 					}
@@ -1283,65 +1283,69 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			mansi:{
 				audio:2,
-				trigger:{global:'useCardAfter'},
+				group:'mansi_viewas',
+				trigger:{global:'damageEnd'},
 				filter:function(event,player){
-					return event.card.name=='nanman'&&game.countPlayer2(function(current){
-						return current.getHistory('damage',function(evt){
-							return evt.getParent(2)==event;
-						}).length>0;
-					})>0;
+					return event.card&&event.card.name=='nanman';
 				},
 				frequent:true,
 				content:function(){
-				 var num=game.countPlayer2(function(current){
-						return current.getHistory('damage',function(evt){
-							return evt.getParent(2)==trigger;
-						}).length>0;
-					});
-				 player.draw(num);
-				 player.addMark('mansi',num,false);
+				 player.draw();
+				 player.addMark('mansi',1,false);
 				},
 				intro:{content:'已因此技能获得了#张牌'},
+			},
+			mansi_viewas:{
+				audio:'mansi',
+				enable:'phaseUse',
+				usable:1,
+				filterCard:true,
+				selectCard:-1,
+				filter:function(event,player){
+					var hs=player.getCards('h');
+					if(!hs.length) return false;
+					for(var i=0;i<hs.length;i++){
+						var mod2=game.checkMod(hs[i],player,'unchanged','cardEnabled2',player);
+					if(mod2===false) return false;
+					}
+					return true;
+				},
+				viewAs:{name:'nanman'},
 			},
 			souying:{
 				audio:2,
 				trigger:{
-					player:'damageBegin3',
-					source:'damageBegin1',
+					player:'useCardToPlayered',
+					target:'useCardToTargeted',
 				},
 				direct:true,
 				filter:function(event,player,name){
-					if(!player.countCards('h')||player.hasSkill('souying2')) return false;
-					if(name=='damageBegin1'){
-						if(event.player.sex!='male') return false;
-						return event.player.getHistory('damage',function(evt){
-							return evt.source==player;
-						}).length==1;
+					if(!player.countCards('he')||player.hasSkill('souying2')) return false;
+					if(!event.targets||event.targets.length!=1||event.player==event.target) return false;
+					if(name=='useCardToPlayered'){
+						var target=event.target;
+						return player.getHistory('useCard',function(evt){
+							return evt.targets&&evt.targets.length==1&&evt.targets[0]==target;
+						}).indexOf(event.getParent())>0;
 					}
 					else{
-						if(!event.source||event.source.sex!='male') return false;
-						return player.getHistory('damage',function(evt){
-							return evt.source==event.source;
-						}).length==1;
+						var source=event.player;
+						return source.getHistory('useCard',function(evt){
+							return evt.targets&&event.targets.length==1&&evt.targets[0]==player;
+						}).indexOf(event.getParent())>0;
 					}
 				},
 				content:function(){
 					'step 0'
-					var next=player.chooseToDiscard();
-					if(event.triggername=='damageBegin1'){
+					var next=player.chooseToDiscard('he');
+					if(event.triggername=='useCardToTargeted'){
 						event.target=trigger.player;
-						next.set('goon',get.attitude(player,event.target)<0&&!event.target.hasSkillTag('filterDamage',null,{
-							player:player,
-							card:trigger.card,
-						})),
-						next.set('prompt2','弃置一张手牌，令对其造成的伤害+1');
 					}
 					else{
-						event.target=trigger.source;
-						next.set('goon',true);
-						next.set('prompt2','弃置一张手牌，令即将受到的伤害-1');
+						event.target=trigger.cards[0];
 					}
 					next.set('prompt',get.prompt('souying',event.target));
+					next.set('prompt2','弃置一张牌，并获得'+get.translation(trigger.cards.filterInD()))
 					next.set('ai',function(card){
 						if(_status.event.goon) return 6-get.value(card);
 						return -1;
@@ -1350,7 +1354,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						player.addTempSkill('souying2');
-						trigger.num+=(event.triggername=='damageBegin1'?1:-1);
+						player.gain(trigger.cards.filterInD());
 					}
 				},
 				ai:{
@@ -1378,7 +1382,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget('是否失去〖蛮嗣〗，令一名其他男性角色和自己一同获得技能〖系力〗？',function(card,player,target){
 						return target!=player&&target.sex=='male';
 					}).ai=function(target){
-						return get.attitude(_status.event.player,target)-5;
+						return get.attitude(_status.event.player,target);
 					};
 					'step 2'
 					if(result.bool){
@@ -1391,36 +1395,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			hmxili:{
-				trigger:{global:'useCardToPlayered'},
+				trigger:{global:'damageBegin1'},
 				direct:true,
 				audio:2,
 				filter:function(event,player){
-					return event.player!=player&&event.card.name=='sha'&&event.player.isPhaseUsing()&&event.player.hasSkill('hmxili')&&player.countCards('h')>0;
+					return event.source&&event.source!=player&&event.source==_status.currentPhase&&event.source.hasSkill('hmxili')&&player.countCards('he')>0&&!player.hasSkill('hmxili2');
 				},
 				content:function(){
 					'step 0'
-					player.chooseToDiscard('是否弃置一张手牌，令'+get.translation(trigger.card)+'对'+get.translation(trigger.target)+'的伤害+1？','h').set('logSkill',['hmxili',trigger.target]).set('goon',function(){
-						var target=trigger.target;
-						if(get.attitude(player,target)>=0) return false;
-						if(trigger.target.hasSkillTag('filterDamage',null,{
-						player:trigger.player,
-						card:trigger.card,
-					})||target.mayHaveShan()) return false;
-						return true;
-					}()).ai=function(card){
-						if(_status.event.goon) return 5-get.value(card);
-						return -1;
+					player.chooseToDiscard('是否弃置一张牌，令'+get.translation(trigger.source)+'对'+get.translation(trigger.player)+'的伤害+1，且你与其各摸两张牌？','he').set('logSkill',['hmxili',trigger.target]).ai=function(card){
+						return 9-get.value(card);
 					};
 					'step 1'
 					if(result.bool){
-						var id=trigger.target.playerid;
-						var map=trigger.customArgs;
-						if(!map[id]) map[id]={};
-						if(!map[id].extraDamage) map[id].extraDamage=0;
-						map[id].extraDamage++;
+						game.asyncDraw([trigger.source,player],2);
+						trigger.num++;
+						player.addTempSkill('hmxili2');
 					}
+					else event.finish();
+					'step 2'
+					game.delayx();
 				},
 			},
+			hmxili2:{},
 			//说出吾名吓汝一跳
 			xuxie:{
 				audio:2,
@@ -5440,14 +5437,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huaman:'花鬘',
 			hmmanyi:'蛮裔',
 			hmmanyi_info:'锁定技，【南蛮入侵】对你无效。',
+			mansi_viewas:'蛮嗣',
 			mansi:'蛮嗣',
-			mansi_info:'一名角色使用的【南蛮入侵】结算完成后，你可以摸X张牌（X为受到过此牌伤害的角色数）。',
+			mansi_info:'出牌阶段限一次，你可以将所有手牌【南蛮入侵】使用；当有角色受到【南蛮入侵】的伤害后，你摸一张牌。',
 			souying:'薮影',
-			souying_info:'每回合限一次，当你对一名男性角色造成伤害（或一名男性角色对你造成伤害时），若此伤害是你对其（或其对你）本回合内造成的第二次伤害，你可以弃置一张手牌令此伤害+1或（-1）。',
+			souying_info:'每回合限一次，当你对其他角色（或其他角色对你）使用牌指定唯一目标后，若此牌不是本回合你对其（或其对你）使用的第一张牌，你可以弃置一张牌将此牌收回手牌（或令此牌对你无效）。',
 			zhanyuan:'战缘',
 			zhanyuan_info:'觉醒技，准备阶段，若你已因蛮嗣累计获得超过7张牌，你加一点体力上限，并可以选择一名男性角色，你与其获得技能〖系力〗，然后你失去技能〖蛮嗣〗',
 			hmxili:'系力',
-			hmxili_info:'你的回合外，当其他拥有〖系力〗技能的角色在其回合内使用【杀】指定目标后，你可以弃置一张手牌，令此【杀】伤害+1。',
+			hmxili_info:'每回合限一次，你的回合外，当其他拥有【系力】技能的角色在其回合内对没有【系力】技能的角色造成伤害时，你可以弃置一张牌，令此伤害+1，然后你与其各摸两张牌。',
 			wangshuang:'王双',
 			spzhuilie:'追猎',
 			spzhuilie2:'追猎',
