@@ -862,18 +862,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
-			xiaoxi:{
-				audio:2,
-				audioname:['machao','hansui','pangde'],
-				trigger:{
-					player:'enterGame',
-					global:'gameDrawAfter',
-				},
-				direct:true,
-				content:function(){
-					player.chooseUseTarget('sha',get.prompt('xiaoxi'),'视为使用一张【杀】').logSkill='xiaoxi';
-				},
-			},
 			manyi:{
 				audio:2,
 				trigger:{target:'useCardToBefore'},
@@ -1196,8 +1184,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			changban2:'血战长坂坡',
 			dianjiang2:'点将单挑',
 			
-			xiaoxi:'骁袭',
-			xiaoxi_info:'当你登场时，你可以视为使用一张【杀】。',
 			manyi:'蛮裔',
 			manyi_info:'锁定技，【南蛮入侵】对你无效。当你登场时，你可以视为使用一张【南蛮入侵】。',
 			wanrong:'婉容',

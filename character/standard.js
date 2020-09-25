@@ -2535,7 +2535,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			"new_jiangchi":{
-				audio:"jiangchi",
+				audio:2,
 				trigger:{
 					player:"phaseDrawEnd",
 				},

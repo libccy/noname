@@ -13,11 +13,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				old_yijiang5:["old_caoxiu","old_quancong","old_zhuzhi"],
 				old_yijiang67:["ol_zhangrang","ol_liuyu"],
 				old_sp:["old_lingju","old_maliang","old_machao","zhangliang","jsp_caoren","ol_guansuo","old_zhangxingcai","old_huangfusong","ol_maliang","old_wangyun"],
-				old_mobile:["old_caochun","old_majun","old_jiakui"],
+				old_mobile:["old_caochun","old_majun"],
 			},
 		},
 		character:{
-			old_jiakui:['male','wei',3,['tongqu','xinwanlan']],
 			pangde:['male','qun',4,['mashu','mengjin']],
 			ol_huaxiong:["male","qun",6,["new_reyaowu"]],
 			old_wangyun:['male','qun',4,['wylianji','moucheng']],
@@ -725,7 +724,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		translate:{
-			old_jiakui:'旧贾逵',
 			old_zhangxingcai:'旧张星彩',
 			old_majun:'骰子马钧',
 			old_yuanshu:'手杀袁术',

@@ -40,6 +40,7 @@ window.noname_source_list=[
 	'game/game.js',
 	'game/http.js',
 	'game/jszip.js',
+	'game/keyWords.js',
 	'game/NoSleep.js',
 	'game/package.js',
 	'game/phantom.js',
