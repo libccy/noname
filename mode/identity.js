@@ -2558,7 +2558,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							case 'zhu': return 10;
 							case 'zhong':case 'mingzhong': return 4;
 							case 'nei':
-								//if(get.population('fan')==0) return -2;
+								if(get.population('fan')==0){
+									return -(to.countCards('h')+to.countCards('e')*1.5+to.hp*2);
+								}
 								if(zhongmode&&to.ai.sizhong&&to.ai.shown<1) return 6;
 								return Math.min(3,-situation);
 							case 'fan': return -8;

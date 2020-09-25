@@ -13475,7 +13475,7 @@
 									})
 								})) return 14;
 								if(target.countCards('e',function(card){
-									return get.equipValue(card)<=0&&game.hasPlayer(function(current){
+									return get.equipValue(card)<0&&game.hasPlayer(function(current){
 										return current!=target&&get.attitude(player,current)<0&&current.isEmpty(get.subtype(card))
 									});
 								})>0) return 9;
@@ -13540,7 +13540,6 @@
 								return -10;
 							}
 							else {
-								console.log(button.link.name);
 								if(get.position(button.link)=='j') return -10;
 								if(get.equipValue(button.link)>0&&get.effect(targets1,button.link,player,targets1)>0) return 10+get.equipValue(button.link);
 							}
