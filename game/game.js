@@ -32,7 +32,7 @@
 		},
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
 		mirrorURL:'https://nakamurayuri.coding.net/p/noname/d/noname/git/raw',
-		hallURL:'noname.mobi',
+		hallURL:'47.99.105.222',
 		assetURL:'',
 		changeLog:[],
 		updates:[],
@@ -8565,7 +8565,10 @@
 						clickedNode=true;
 						lib.config.mode=this.link;
 						game.saveConfig('mode',this.link);
-						if(this.link=='connect') game.reload();
+						if(this.link=='connect'){
+							localStorage.setItem(lib.configprefix+'directstart',true);
+							game.reload();
+						}
 						else{
  						if(game.layout!='mobile'&&lib.layoutfixed.indexOf(lib.config.mode)!==-1){
  							game.layout='mobile';
@@ -25865,7 +25868,7 @@
 				updaterooms:function(list,clients){
 					if(ui.rooms){
 						ui.window.classList.add('more_room');
-						var list2=['re_caocao','re_liubei','sunquan','sp_zhangjiao','re_yuanshao','dongzhuo'];
+						var list2=['re_caocao','re_liubei','re_sunquan','re_zhangjiao','ol_yuanshao','ol_dongzhuo'];
 						for(var i=0;i<ui.rooms.length;i++){
 							ui.rooms[i].initRoom(list[i],list2[i]);
 						}
@@ -42058,6 +42061,7 @@
 					}
 				}
 				lib.init.js(lib.assetURL+'game','keyWords',function(){});
+				
 				lib.updateURL=lib.updateURLS[lib.config.update_link]||lib.updateURLS.coding;
 
 				lib.init.cssstyles();
@@ -43414,6 +43418,8 @@
 								}
 								str+=(button.info[i].hour-12)+'点';
 							}
+							ui.create.div('','创建者：'+(button.info[i].nickname),eventnode);
+							//ui.create.div('','创建者：'+(button.info[i].nickname)+'<br>ID：'+button.info[i].creator,eventnode);
 							ui.create.div('','已有'+(button.info[i].members.length)+'人加入',eventnode);
 							ui.create.div('','时间：'+str,eventnode);
 							if(button.info[i].members.contains(game.onlineKey)){

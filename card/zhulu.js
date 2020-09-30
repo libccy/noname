@@ -621,7 +621,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						keepAI:true,
-						target:function(player,target){
+						target:function(player,target,cardx){
+							if(_status.jinhe&&_status.jinhe[cardx.cardid]) return -0.5-2*target.countCards('h');
+							var card=target.getEquip(5);
+							if(!card) return 0;
+							return -get.value(card,target);
+						},
+						target_use:function(player,target){
 							return -0.5-2*target.countCards('h');
 						},
 					},

@@ -2115,7 +2115,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var pl=player.storage.nzry_shenshi2;
 					var card=player.storage.nzry_shenshi1;
-					if(player.getCards('hej').contains(card)&&4-pl.countCards('h')>0){
+					if(player.getCards('he').contains(card)&&4-pl.countCards('h')>0){
 						pl.draw(4-pl.countCards('h'));
 						pl.logSkill('nzry_shenshi');
 					};
@@ -6057,7 +6057,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageBegin4'},
 				direct:true,
 				filter:function(event,player){
-					return player.countCards('he',{suit:'heart'})>0&&event.num>0;
+					return player.countCards('h',{suit:'heart'})>0&&event.num>0;
 				},
 				content:function(){
 					"step 0"

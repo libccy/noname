@@ -1323,6 +1323,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!player.countCards('he')||player.hasSkill('souying2')) return false;
 					if(!event.targets||event.targets.length!=1||event.player==event.target) return false;
 					if(name=='useCardToPlayered'){
+						if(!event.cards.filterInD().length) return false;
 						var target=event.target;
 						return player.getHistory('useCard',function(evt){
 							return evt.targets&&evt.targets.length==1&&evt.targets[0]==target;
@@ -1338,23 +1339,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var next=player.chooseToDiscard('he');
+					var prompt;
 					if(event.triggername=='useCardToTargeted'){
 						event.target=trigger.player;
+						prompt='令'+get.translation(trigger.card)+'对你无效';
+						next.set('goon',-get.effect(player,trigger.card,trigger.player,player));
 					}
 					else{
-						event.target=trigger.cards[0];
+						event.target=trigger.targets[0];
+						prompt='弃置一张牌，并获得'+get.translation(trigger.cards.filterInD());
+						next.set('goon',get.value(trigger.cards.filterInD()));
 					}
 					next.set('prompt',get.prompt('souying',event.target));
-					next.set('prompt2','弃置一张牌，并获得'+get.translation(trigger.cards.filterInD()))
+					next.set('prompt2',prompt)
 					next.set('ai',function(card){
-						if(_status.event.goon) return 6-get.value(card);
-						return -1;
+						return _status.event.goon-get.value(card);
 					});
 					next.set('logSkill',['souying',event.target]);
 					'step 1'
 					if(result.bool){
 						player.addTempSkill('souying2');
-						player.gain(trigger.cards.filterInD());
+						if(event.triggername=='useCardToPlayered') player.gain(trigger.cards.filterInD());
+						else trigger.excluded.add(player);
 					}
 				},
 				ai:{
@@ -1378,6 +1384,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.awakenSkill('zhanyuan');
 					player.gainMaxHp();
+					player.recover();
 					'step 1'
 					player.chooseTarget('是否失去〖蛮嗣〗，令一名其他男性角色和自己一同获得技能〖系力〗？',function(card,player,target){
 						return target!=player&&target.sex=='male';
@@ -1399,11 +1406,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				audio:2,
 				filter:function(event,player){
-					return event.source&&event.source!=player&&event.source==_status.currentPhase&&event.source.hasSkill('hmxili')&&player.countCards('he')>0&&!player.hasSkill('hmxili2');
+					return event.source&&event.source!=player&&event.source==_status.currentPhase&&event.source.hasSkill('hmxili')&&!event.player.hasSkill('hmxili')&&player.countCards('he')>0&&!player.hasSkill('hmxili2');
 				},
 				content:function(){
 					'step 0'
-					player.chooseToDiscard('是否弃置一张牌，令'+get.translation(trigger.source)+'对'+get.translation(trigger.player)+'的伤害+1，且你与其各摸两张牌？','he').set('logSkill',['hmxili',trigger.target]).ai=function(card){
+					player.chooseToDiscard('是否弃置一张牌，令'+get.translation(trigger.source)+'对'+get.translation(trigger.player)+'的伤害+1，且你与其各摸两张牌？','he').set('logSkill',['hmxili',trigger.player]).ai=function(card){
 						return 9-get.value(card);
 					};
 					'step 1'
@@ -1521,6 +1528,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinkuangfu:{
 				enable:'phaseUse',
 				usable:1,
+				audio:2,
 				delay:false,
 				filterTarget:function(card,player,target){
 					if(player==target) return player.countCards('e',function(card){
@@ -5443,7 +5451,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			souying:'薮影',
 			souying_info:'每回合限一次，当你对其他角色（或其他角色对你）使用牌指定唯一目标后，若此牌不是本回合你对其（或其对你）使用的第一张牌，你可以弃置一张牌将此牌收回手牌（或令此牌对你无效）。',
 			zhanyuan:'战缘',
-			zhanyuan_info:'觉醒技，准备阶段，若你已因蛮嗣累计获得超过7张牌，你加一点体力上限，并可以选择一名男性角色，你与其获得技能〖系力〗，然后你失去技能〖蛮嗣〗',
+			zhanyuan_info:'觉醒技，准备阶段，若你已因蛮嗣累计获得超过7张牌，你加一点体力上限并回复1点体力，并可以选择一名男性角色，你与其获得技能〖系力〗，然后你失去技能〖蛮嗣〗',
 			hmxili:'系力',
 			hmxili_info:'每回合限一次，你的回合外，当其他拥有【系力】技能的角色在其回合内对没有【系力】技能的角色造成伤害时，你可以弃置一张牌，令此伤害+1，然后你与其各摸两张牌。',
 			wangshuang:'王双',

@@ -1,3 +1,5 @@
-百度网盘分流
+客户端下载戳这里：
 
-链接: https://pan.baidu.com/s/1HWOLb23RqjjplFLoGJy9-Q 提取码:wz47
+GitHub： https://github.com/libccy/noname/releases/tag/SSS
+
+Coding： https://nakamurayuri.coding.net/p/noname/d/noname/git/releases/SSS

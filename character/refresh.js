@@ -84,7 +84,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caoren:['male','wei',4,['xinjushou','xinjiewei']],
 			re_huangzhong:['male','shu',4,['xinliegong']],
 			ol_weiyan:['male','shu',4,['xinkuanggu','reqimou']],
-			ol_xiaoqiao:['female','wu',3,['retianxiang','rehongyan']],
+			ol_xiaoqiao:['female','wu',3,['oltianxiang','olhongyan','piaoling']],
 			zhoutai:['male','wu',4,['buqu','fenji']],
 			ol_pangde:['male','qun',4,['mashu','rejianchu']],
 			re_xuhuang:['male','wei',4,['duanliang','jiezi']],
@@ -121,6 +121,149 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunben:['zhouyu','taishici','daqiao'],
 		},
 		skill:{
+			oltianxiang:{
+				audio:'tianxiang',
+				audioname:['daxiaoqiao','re_xiaoqiao','ol_xiaoqiao'],
+				trigger:{player:'damageBegin4'},
+				direct:true,
+				filter:function(event,player){
+					return player.countCards('he',function(card){
+						if(_status.connectMode&&get.position(card)=='h') return true;
+						return get.suit(card,player)=='heart';
+					})>0&&event.num>0;
+				},
+				content:function(){
+					"step 0"
+					player.chooseCardTarget({
+						filterCard:function(card,player){
+							return get.suit(card)=='heart'&&lib.filter.cardDiscardable(card,player);
+						},
+						filterTarget:function(card,player,target){
+							return player!=target;
+						},
+						position:'he',
+						ai1:function(card){
+							return 10-get.value(card);
+						},
+						ai2:function(target){
+							var att=get.attitude(_status.event.player,target);
+							var trigger=_status.event.getTrigger();
+							var da=0;
+							if(_status.event.player.hp==1){
+								da=10;
+							}
+							var eff=get.damageEffect(target,trigger.source,target);
+							if(att==0) return 0.1+da;
+							if(eff>=0&&att>0){
+								return att+da;
+							}
+							if(att>0&&target.hp>1){
+								if(target.maxHp-target.hp>=3) return att*1.1+da;
+								if(target.maxHp-target.hp>=2) return att*0.9+da;
+							}
+							return -att+da;
+						},
+						prompt:get.prompt('oltianxiang'),
+						prompt2:lib.translate.oltianxiang_info
+					});
+					"step 1"
+					if(result.bool){
+						player.discard(result.cards);
+						var target=result.targets[0];
+						player.chooseControlList(true,function(event,player){
+							var target=_status.event.target;
+							var att=get.attitude(player,target);
+							if(target.hasSkillTag('maihp')) att=-att;
+							if(att>0){
+								return 0;
+							}
+							else{
+								return 1;
+							}
+						},
+							['令'+get.translation(target)+'受到伤害来源对其造成的1点伤害，然后摸X张牌（X为其已损失体力值且至多为5）',
+							'令'+get.translation(target)+'失去1点体力，然后获得'+get.translation(result.cards)]).set('target',target);
+						player.logSkill(event.name,target);
+						trigger.cancel();
+						event.target=target;
+						event.card=result.cards[0];
+					}
+					else{
+						event.finish();
+					}
+					"step 2"
+					if(typeof result.index=='number'){
+						event.index=result.index;
+						if(result.index){
+							event.related=event.target.loseHp();
+						}
+						else{
+							event.related=event.target.damage(trigger.source||'nosource','nocard');
+						}
+					}
+					else event.finish();
+					"step 3"
+					if(event.related.cancelled||target.isDead()) return;
+					if(event.index&&card.isInPile()) target.gain(card,'gain2');
+					else if(target.getDamagedHp()) target.draw(Math.min(5,target.getDamagedHp()));
+				},
+				ai:{
+					maixie_defend:true,
+					effect:{
+						target:function(card,player,target){
+							if(player.hasSkillTag('jueqing',false,target)) return;
+							if(get.tag(card,'damage')&&target.countCards('he')>1) return 0.7;
+						}
+					},
+				}
+			},
+			olhongyan:{
+				audio:'rehongyan',
+				mod:{
+					suit:function(card,suit){
+						if(suit=='spade') return 'heart';
+					},
+					maxHandcardBase:function(player,num){
+						if(player.countCards('e',function(card){
+							return get.suit(card,player)=='heart';
+						})) return player.maxHp;
+					},
+				},
+			},
+			piaoling:{
+				audio:2,
+				trigger:{player:'phaseJieshuBegin'},
+				frequent:true,
+				content:function(){
+					'step 0'
+					player.judge(function(card){
+						return get.suit(card)=='heart'?2:0;
+					});
+					'step 1'
+					event.card=result.card;
+					if(result.bool&&get.position(event.card,true)=='d'){
+						player.chooseTarget('令一名角色获得'+get.translation(event.card)+'，或点【取消】将其置于牌堆顶').set('ai',function(target){
+							var player=_status.event.player;
+							var att=get.attitude(player,target);
+							if(player==target) att/=2;
+							return att;
+						});
+					}
+					else event.finish();
+					'step 2'
+					if(result.targets&&result.targets.length){
+						var target=result.targets[0];
+						player.line(target,'green');
+						target.gain(card,'gain2','log');
+						if(player==target) player.chooseToDiscard('he',true);
+					}
+					else{
+						card.fix();
+						ui.cardPile.insertBefore(card,ui.cardPile.firstChild);
+						game.updateRoundNumber();
+					}
+				},
+			},
 			xinyicong:{
 				mod:{
 					globalFrom:function(from,to,current){
@@ -7365,6 +7508,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_gongsunzan:'界公孙瓒',
 			xinyicong:'义从',
 			xinyicong_info:'锁定技，你计算与其他角色的距离时-X，其他角色计算与你的距离时+Y。（X为你的体力值-1，Y为你的已损失体力值-1）',
+			oltianxiang:'天香',
+			oltianxiang_info:'当你受到伤害时，你可以弃置一张红桃手牌，防止此次伤害并选择一名其他角色，然后你选择一项：1.令其受到伤害来源对其造成的1点伤害，然后摸X张牌（X为其已损失体力值且至多为5）；2.令其失去1点体力，然后获得你弃置的牌。',
+			olhongyan:'红颜',
+			olhongyan_info:'锁定技，你的黑桃牌的花色视为红桃。若你的装备区内有红桃牌，则你的手牌上限基数视为体力上限。',
+			piaoling:'飘零',
+			piaoling_info:'结束阶段，你可以进行判定。若判定结果为红桃，则你选择一项：1.将此牌交给一名角色。若你交给了自己，则你弃置一张牌。2.将此牌置于牌堆顶。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

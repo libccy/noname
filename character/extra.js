@@ -18,6 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		character:{
 			key_kagari:['female','shen',3,['kagari_zongsi'],['key']],
 			key_shiki:['female','shen','3/5',['shiki_omusubi'],['key']],
+			//key_hina:['female','shen',3,[],['key']],
 			
 			shen_guanyu:['male','shen',5,['new_wuhun','wushen'],['shu']],
 			shen_zhaoyun:['male','shen',2,['xinjuejing','relonghun'],['shu']],
@@ -2187,7 +2188,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			relonghun:{
-				audio:'longhun',
+				audio:2,
 				//技能发动时机
 				enable:['chooseToUse','chooseToRespond'],
 				//发动时提示的技能描述
@@ -2458,7 +2459,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 2+num;
 					}
 				},
-				audio:'juejing',
+				audio:2,
 				trigger:{player:['dying','dyingAfter']},
 				forced:true,
 				content:function(){
@@ -3431,6 +3432,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_shiki:'神山识',
 			shiki_omusubi:'御结',
 			shiki_omusubi_info:'一轮游戏开始时，你可以减1点体力上限，然后将一名其他角色武将牌上的技能加入到你的武将牌上。',
+			//key_hina:'雏',
 			
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',
