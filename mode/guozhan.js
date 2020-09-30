@@ -1153,6 +1153,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzfudi:{
 				trigger:{global:'damageEnd'},
 				direct:true,
+				audio:2,
 				filter:function(event,player){return event.source&&event.source.isAlive()&&event.source!=player&&event.player==player&&player.countCards('h')&&event.num>0},
 				content:function(){
 					'step 0'
@@ -1212,6 +1213,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					source:'damageBegin1',
 				},
 				forced:true,
+				audio:'drlt_congjian',
 				filter:function(event,player,name){
 					if(event.num<=0) return false;
 					if(name=='damageBegin1'&&_status.currentPhase!=player&&event.notLink()) return true;
@@ -6068,9 +6070,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					if(trigger.name=='addJudge'){
 						trigger.cancel();
-						for(var i=0;i<trigger.cards.length;i++){
-							trigger.cards[i].discard();
-						}
 					}
 					else trigger.getParent().targets.remove(player);
 				},
@@ -6096,9 +6095,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					if(trigger.name=='addJudge'){
 						trigger.cancel();
-						for(var i=0;i<trigger.cards.length;i++){
-							trigger.cards[i].discard();
-						}
 					}
 					else trigger.getParent().targets.remove(player);
 				},

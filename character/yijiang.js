@@ -5637,7 +5637,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			reshenduan:{
-				audio:'shenduan',
+				audio:2,
 				trigger:{player:'loseAfter'},
 				filter:function(event,player){
 					if(event.type!='discard') return;
@@ -5715,6 +5715,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			reyonglve:{
+				audio:2,
 				trigger:{global:'phaseJudgeBegin'},
 				direct:true,
 				filter:function(event,player){
@@ -7640,7 +7641,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reanjian:{
 				trigger:{player:'useCardToPlayered'},
 				forced:true,
-				audio:'anjian',
+				audio:2,
 				filter:function(event,player){
 					return event.card.name=='sha'&&!event.target.inRange(player);
 				},
@@ -7713,7 +7714,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.card.name=='sha'&&(get.color(event.card)=='red'?event.player.getEquip(1):player.countCards('he')>0);
 				},
 				direct:true,
-				audio:'duodao',
+				audio:2,
 				content:function(){
 					'step 0'
 					var prompt='弃置一张牌'
