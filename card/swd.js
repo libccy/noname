@@ -494,6 +494,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:true,
 				type:'jiguan',
 				usable:1,
+				updateUsable:'phaseUse',
 				forceUsable:true,
 				wuxieable:true,
 				selectTarget:-1,

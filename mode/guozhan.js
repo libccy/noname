@@ -1157,40 +1157,43 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){return event.source&&event.source.isAlive()&&event.source!=player&&event.player==player&&player.countCards('h')&&event.num>0},
 				content:function(){
 					'step 0'
-					event.players=game.filterPlayer(function(current){
+					var players=game.filterPlayer(function(current){
 						return current.isFriendOf(trigger.source)&&current.hp>=player.hp&&!game.hasPlayer(function(current2){
-							return current2.hp>current.hp&&current2.isFriendOf(current);
+							return current2.hp>current.hp&&current2.isFriendOf(trigger.source);
 						})
 					});
-					var str=event.players.length?'，然后对'+get.translation(event.players)+(event.players.length==1?'':'中的一名角色')+'造成一点伤害':'';
 					var check=true;
-					if(!event.players.length) check=false;
+					if(!players.length) check=false;
 					else{
 						if(get.attitude(player,trigger.source)>=0) check=false;
-						else if(!player.countCards('h',function(card){return get.value(card)<9})) check=false;
 					}
-					player.chooseCard('附敌</br></br><div class="center text">交给'+get.translation(trigger.source)+'一张手牌'+str+'</div>').set('aicheck',check).set('ai',function(card){
+					player.chooseCard(get.prompt('gzfudi'),'交给其一张手牌，然后对其势力中体力值最大且不小于你的一名角色造成1点伤害').set('aicheck',check).set('ai',function(card){
 						if(!_status.event.aicheck) return 0;
 						return 9-get.value(card);
 					});
 					'step 1'
-					if(result.cards){
+					if(result.bool){
 						player.logSkill('gzfudi',trigger.source);
 						trigger.source.gain(result.cards,player,'giveAuto');
-						if(event.players.length==1) event.target=event.players[0];
-						else if(event.players.length) player.chooseTarget('附敌</br></br><div class="center text">对'+get.translation(event.players)+'中的一名角色造成一点伤害</div>',function(card,player,target){
-							return target.isFriendOf(_status.event.getTrigger().source)&&target.hp>=player.hp&&!game.hasPlayer(function(current){
-								return current.isFriendOf(target)&&current.hp>target.hp;
-							})
-						},true).set('ai',function(target){return get.damageEffect(target,player,player)});
-						else event.finish();
 					}
 					else event.finish();
 					'step 2'
-					var target=event.target||result.targets[0];
-					if(target){
-						player.line(target,'green');
-						target.damage(player);
+					var list=game.filterPlayer(function(current){
+						return current.hp>=player.hp&&current.isFriendOf(trigger.source)&&!game.hasPlayer(function(current2){
+							return current2.hp>current.hp&&current2.isFriendOf(trigger.source);
+						});
+					});
+					if(list.length){
+						if(list.length==1) event._result={bool:true,targets:list};
+						else player.chooseTarget(true,'对'+get.translation(trigger.source)+'势力中体力值最大的一名角色造成1点伤害',function(card,player,target){
+							return _status.event.list.contains(target);
+						}).set('list',list).set('ai',function(target){return get.damageEffect(target,player,player)});
+					}
+					else event.finish();
+					'step 3'
+					if(result.bool&&result.targets.length){
+						player.line(result.targets[0]);
+						result.targets[0].damage();
 					}
 				},
 				ai:{
@@ -1216,7 +1219,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				audio:'drlt_congjian',
 				filter:function(event,player,name){
 					if(event.num<=0) return false;
-					if(name=='damageBegin1'&&_status.currentPhase!=player&&event.notLink()) return true;
+					if(name=='damageBegin1'&&_status.currentPhase!=player) return true;
 					if(name=='damageBegin3'&&_status.currentPhase==player) return true;
 					return false;
 				},
@@ -1224,9 +1227,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return _status.currentPhase!=player;
 				},
 				content:function(){trigger.num++},
-				ai:{
-					//damageBones:true,
-				}
 			},
 			jianan:{
 				audio:2,

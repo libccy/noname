@@ -2440,6 +2440,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			ollianhuan:{
+				audio:'xinlianhuan',
+				audioname:['ol_pangtong'],
+				group:['ollianhuan3','ollianhuan5','lianhuan4'],
+			},
+			ollianhuan5:{
+				inherit:'lianhuan2',
+				audioname:['ol_pangtong'],
+				audio:['xinlianhuan',2],
+				position:'he',
+				filter:function(event,player){
+					return player.countCards('he',{suit:'club'})>0;
+				},
+			},
+			ollianhuan3:{
+				audio:['xinlianhuan',1],
+				audioname:['ol_pangtong'],
+				enable:'chooseToUse',
+				filter:function(event,player){
+					return player.countCards('he',{suit:'club'})>0;
+				},
+				filterCard:{suit:'club'},
+				viewAs:{name:'tiesuo'},
+				prompt:'将一张梅花牌当铁锁连环使用',
+				check:function(card){return 6-get.value(card)},
+				position:'he',
+			},
 			xinlianhuan:{
 				audio:2,
 				audioname:['ol_pangtong'],
@@ -5995,7 +6022,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageBegin4'},
 				direct:true,
 				filter:function(event,player){
-					return player.countCards('h',{suit:'heart'})>0&&event.num>0;
+					return player.countCards('h',function(card){
+						return _status.connectMode||get.suit(card,player)=='heart';
+					})>0&&event.num>0;
 				},
 				content:function(){
 					"step 0"
@@ -6006,7 +6035,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filterTarget:function(card,player,target){
 							return player!=target;
 						},
-						// position:'he',
 						ai1:function(card){
 							return 10-get.value(card);
 						},
@@ -7094,6 +7122,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			disable_judge:{},
 		},
+		dynamicTranslate:{
+			nzry_juzhan:function(player){
+				if(player.storage.nzry_juzhan1==true) return '转换技，阴：当你成为其他角色【杀】的目标后，你可以与其各摸一张牌，然后其本回合内不能再对你使用牌。<span class="bluetext">阳：当你使用【杀】指定一名角色为目标后，你可以获得其一张牌，然后你本回合内不能再对其使用牌。</span>';
+				return '转换技，<span class="bluetext">阴：当你成为其他角色【杀】的目标后，你可以与其各摸一张牌，然后其本回合内不能再对你使用牌。</span>阳：当你使用【杀】指定一名角色为目标后，你可以获得其一张牌，然后你本回合内不能再对其使用牌。';
+			},
+			nzry_zhenliang:function(player){
+				if(player.storage.nzry_zhenliang==true) return '转换技，阴：出牌阶段限一次，你可以选择一名攻击范围内的其他角色，然后弃置X张与“任”颜色相同的牌并对其造成一点伤害（X为你与其的体力差且至少为1）。<span class="bluetext">阳：你的回合外，当你使用或打出牌进入弃牌堆时，若此牌与“任”类型相同，则你可以令一名角色摸一张牌。</span>';
+				return '转换技，<span class="bluetext">阴：出牌阶段限一次，你可以选择一名攻击范围内的其他角色，然后弃置X张与“任”颜色相同的牌并对其造成一点伤害（X为你与其的体力差且至少为1）。</span>阳：你的回合外，当你使用或打出牌进入弃牌堆时，若此牌与“任”类型相同，则你可以令一名角色摸一张牌。';
+			},
+			nzry_chenglve:function(player){
+				if(player.storage.nzry_chenglve==true) return '转换技，出牌阶段限一次，阴：你可以摸一张牌，然后弃置两张手牌。<span class="bluetext">阳：你可以摸两张牌，然后弃置一张手牌。</span>若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制。';
+				return '转换技，出牌阶段限一次，<span class="bluetext">阴：你可以摸一张牌，然后弃置两张手牌。</span>阳：你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制。';
+			},
+			nzry_shenshi:function(player){
+				if(player.storage.nzry_shenshi==true) return '转换技，阴：出牌阶段限一次，你可以将一张牌交给一名手牌数最多的角色，然后对其造成一点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张。<span class="bluetext">阳：其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若该角色未失去此牌，你将手牌摸至四张。</span>';
+				return '转换技，<span class="bluetext">阴：出牌阶段限一次，你可以将一张牌交给一名手牌数最多的角色，然后对其造成一点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张。</span>阳：其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若该角色未失去此牌，你将手牌摸至四张。';
+			},
+		},
 		translate:{
 			"feichu_equip1":"已废除",
 			"feichu_equip1_info":"武器栏已废除",
@@ -7136,21 +7182,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhoufei:"周妃",
 			
 			"nzry_jianxiang":"荐降",
-			"nzry_jianxiang_info":"当你成为其他角色使用牌的目标时，你可令手牌数最少的一名角色摸一张牌",
+			"nzry_jianxiang_info":"当你成为其他角色使用牌的目标时，你可令手牌数最少的一名角色摸一张牌。",
 			"nzry_shenshi1":"审时",
 			"nzry_shenshi":"审时",
-			"nzry_shenshi_info":"转换技，①出牌阶段限一次，你可以将一张牌交给一名手牌数最多的角色，然后对其造成一点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张。②其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若该角色未失去此牌，你将手牌摸至四张",
+			"nzry_shenshi_info":"转换技，阴：出牌阶段限一次，你可以将一张牌交给一名手牌数最多的角色，然后对其造成一点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张。阳：其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若该角色未失去此牌，你将手牌摸至四张。",
 			"nzry_mingren":"明任",
-			"nzry_mingren_info":"游戏开始时，你摸一张牌，然后将你的一张手牌置于你的武将牌上，称为“任”。结束阶段，你可以用手牌替换“任”",
+			"nzry_mingren_info":"游戏开始时，你摸一张牌，然后将你的一张手牌置于你的武将牌上，称为“任”。结束阶段，你可以用手牌替换“任”。",
 			"nzry_zhenliang":"贞良",
-			"nzry_zhenliang_info":"转换技，①出牌阶段限一次，你可以选择一名攻击范围内的其他角色，然后弃置X张与“任”颜色相同的牌并对其造成一点伤害（X为你与其的体力差且至少为1）。②你的回合外，当你使用或打出牌进入弃牌堆时，若此牌与“任”类型相同，则你可以令一名角色摸一张牌",
+			"nzry_zhenliang_info":"转换技，阴：出牌阶段限一次，你可以选择一名攻击范围内的其他角色，然后弃置X张与“任”颜色相同的牌并对其造成一点伤害（X为你与其的体力差且至少为1）。阳：你的回合外，当你使用或打出牌进入弃牌堆时，若此牌与“任”类型相同，则你可以令一名角色摸一张牌。",
 			"nzry_chenglve1":"成略",
 			"nzry_chenglve":"成略",
-			"nzry_chenglve_info":"转换技，出牌阶段限一次，①你可以摸一张牌，然后弃置两张手牌。②你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制",
+			"nzry_chenglve_info":"转换技，出牌阶段限一次，阴：你可以摸一张牌，然后弃置两张手牌。阳：你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制。",
 			"nzry_shicai":"恃才",
-			"nzry_shicai_info":"当你使用牌时，若此牌与你本回合使用的牌类型均不同（包括装备牌），则你可以将此牌置于牌堆顶，然后摸一张牌",
+			"nzry_shicai_info":"当你使用牌时，若此牌与你本回合使用的牌类型均不同（包括装备牌），则你可以将此牌置于牌堆顶，然后摸一张牌。",
 			"nzry_cunmu":"寸目",
-			"nzry_cunmu_info":"锁定技，当你摸牌时，改为从牌堆底摸牌",
+			"nzry_cunmu_info":"锁定技，当你摸牌时，改为从牌堆底摸牌。",
 			"nzry_kuizhu":"溃诛",
 			"nzry_kuizhu_info":"弃牌阶段结束后，你可以选择一项：令至多X名角色各摸一张牌，或对任意名体力值之和为X的角色造成一点伤害，若不少于2名角色，你须受到一点伤害。（X为你此阶段弃置的牌数）",
 			"nzry_zhizheng":"掣政",
@@ -7171,7 +7217,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_binglve_info":"锁定技，当你发动“飞军”时，若目标与你之前指定的目标均不相同，则你摸两张牌",
 			"nzry_juzhan1":"拒战",
 			"nzry_juzhan":"拒战",
-			"nzry_juzhan_info":"转换技，①当你成为其他角色【杀】的目标后，你可以与其各摸一张牌，然后其本回合内不能再对你使用牌。②当你使用【杀】指定一名角色为目标后，你可以获得其一张牌，然后你本回合内不能再对其使用牌",
+			"nzry_juzhan_info":"转换技，阴：当你成为其他角色【杀】的目标后，你可以与其各摸一张牌，然后其本回合内不能再对你使用牌。阳：当你使用【杀】指定一名角色为目标后，你可以获得其一张牌，然后你本回合内不能再对其使用牌。",
 			
 			liangyin:"良姻",
 			"liangyin_info":"当有牌移至游戏外时，你可以令手牌数大于你的一名角色摸一张牌；当有牌从游戏外加入任意角色的手牌时，你可以令手牌数小于你的一名角色弃置一张牌",
@@ -7374,11 +7420,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			bazhen:'八阵',
 			kanpo:'看破',
 			xinlianhuan:'连环',
+			ollianhuan:'连环',
 			lianhuan:'连环',
 			lianhuan1:'连环',
 			lianhuan3:'连环',
 			lianhuan2:'连铸',
 			lianhuan5:'连铸',
+			ollianhuan3:'连环',
 			niepan:'涅槃',
 			oldniepan:'涅槃',
 			quhu:'驱虎',
@@ -7392,6 +7440,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xueyi:'血裔',
 			mengjin:'猛进',
 			xinlianhuan_info:' 你可以将一张♣手牌当【铁索连环】使用或重铸。你使用【铁索连环】选择目标的上限数+1。',
+			ollianhuan_info:' 你可以将一张♣牌当【铁索连环】使用或重铸。你使用【铁索连环】选择目标的上限数+1。',
 			huoji_info:'出牌阶段，你可以将你的任意一张红色手牌当作【火攻】使用。',
 			bazhen_info:'锁定技，若你的防具栏内没有牌且没有被废除，则你视为装备着【八卦阵】。',
 			kanpo_info:'你可以将你的任意一张黑色手牌当做【无懈可击】使用。',

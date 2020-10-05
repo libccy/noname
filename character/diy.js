@@ -2020,17 +2020,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						selectTarget:function(){
 							if(!ui.selected.cards.length) return [1,1];
-							return [0,1];
+							return [0,0];
 						},
 						selectCard:function(){
+							if(ui.selected.targets.length) return [0,0];
 							if(!ui.selected.cards.length) return [0,2];
 							return [2,2];
 						},
 						prompt:get.prompt2('yuzuru_wuxin'),
+						complexCard:true,
+						complexTarget:true,
 						ai1:function(card){
 							var player=_status.event.player;
 							if(player.hp>3) return 0;
-							return player.getDamagedHp()*2-get.value(card);
+							return (player.getDamagedHp()*2)-get.value(card);
 						},
 						ai2:function(target){
 							if(player.hp<4||target.hasSkillTag('nogain')) return 0;
@@ -2076,7 +2079,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				content:function(){
 					'step 0'
-					if(!player._yuzuru_sss) player.loseHp();
+					if(!player.storage._yuzuru_sss) player.loseHp();
 					player.draw(2);
 					'step 1'
 					if(player.countCards('he')<2) event.finish();
@@ -2126,7 +2129,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				complexSelect:true,
 				check:function(card){
-					if(!_status.event.player._yuzuru_sss&&get.color(card)=='black') return -1;
+					if(!_status.event.player.storage._yuzuru_sss&&get.color(card)=='black') return -1;
 					return 9-get.value(card);
 				},
 				line:{color:[194,117,92]},
@@ -2134,7 +2137,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					target.recover();
 					"step 1"
-					if(target==targets[targets.length-1]&&!player._yuzuru_sss){
+					if(target==targets[targets.length-1]&&!player.storage._yuzuru_sss){
 						for(var i=0;i<cards.length;i++){
 							if(get.color(cards[i],player)=='black'){
 								player.loseHp();
@@ -2161,7 +2164,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					trigger.cancel();
 					player.awakenSkill('yuzuru_wangsheng');
-					player._yuzuru_sss=true;
+					player.storage._yuzuru_sss=true;
 					if(player.countCards('he')>0){
 						player.chooseCardTarget({
 							selectCard:[1,Infinity],
@@ -3906,23 +3909,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var list=[];
-					if(player._ichiban_no_takaramono) list.push('cancel2');
+					if(player.storage._ichiban_no_takaramono) list.push('cancel2');
 					player.chooseControl.apply(player,list).set('choiceList',[
 						'令此阶段内的所有红色牌视为【杀】',
 						'令此阶段内的所有【杀】视为【决斗】'
-					]).set('prompt',player._ichiban_no_takaramono?get.prompt('yui_lieyin'):'烈音：请选择一项').set('ai',function(){
+					]).set('prompt',player.storage._ichiban_no_takaramono?get.prompt('yui_lieyin'):'烈音：请选择一项').set('ai',function(){
 						var player=_status.event.player;
 						var shas=player.countCards('h','sha')
 						if(shas>0){
 							if(game.hasPlayer(function(current){
 								return get.attitude(player,current)<0&&player.canUse('juedou',current)&&!current.hasSha()&&get.effect(current,{name:'juedou'},player,player)>0;
 							})) return 1;
-							if(player._ichiban_no_takaramono) return 'cancel2';
+							if(player.storage._ichiban_no_takaramono) return 'cancel2';
 						}
 						if(player.countCards('h',function(card){
 							return get.color(card)=='red'&&card.name!='sha'&&player.hasValueTarget(card);
 						})==0) return 0;
-						if(player._ichiban_no_takaramono) return 'cancel2';
+						if(player.storage._ichiban_no_takaramono) return 'cancel2';
 						return 1;
 					});
 					'step 1'
@@ -3967,7 +3970,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.awakenSkill('yui_takaramono');
 					player.addSkill('yui_yinhang');
-					player._ichiban_no_takaramono=true;
+					player.storage._ichiban_no_takaramono=true;
 					player.gainMaxHp();
 					player.recover();
 				},
@@ -10176,6 +10179,36 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				threaten:1.3
+			},
+		},
+		dynamicTranslate:{
+			nsjiquan:function(player){
+				if(player.storage.nsfuwei) return '锁定技，与你距离1以内的其他角色造成或受到伤害后，你将其区域内的一张牌置于你的武将牌上（称为“威”）。你使用【杀】的次数上限+X（X为“威”数）。';
+				return '与你距离1以内的其他角色造成或受到伤害后，你可以将其区域内的一张牌置于你的武将牌上（称为“威”）。你使用【杀】的次数上限+X（X为“威”数）。';
+			},
+			abyusa_jueqing:function(player){
+				if(player.hasSkill('abyusa_jueqing_1st')) return '锁定技，你即将造成的伤害均视为失去体力。';
+				return '当你对其他角色造成伤害时，你可以防止此伤害。若如此做，你令其失去2X点体力，修改〖绝情〗并对自己造成2X点伤害。';
+			},
+			tomoya_shangxian:function(player){
+				if(player.storage.tomoya_shangxian) return '锁定技，你计算与其他角色的距离时始终从顺时针方向计算。出牌阶段开始时，你可摸一张牌，并改变此方向。';
+				return '锁定技，你计算与其他角色的距离时始终从逆时针方向计算。出牌阶段开始时，你可摸一张牌，并改变此方向。';
+			},
+			yui_lieyin:function(player){
+				if(player.storage._ichiban_no_takaramono) return '锁定技，出牌阶段开始时，你可选择一项：①本阶段内的红色牌均视为【杀】；②本阶段内的【杀】均视为【决斗】。';
+				return '锁定技，出牌阶段开始时，你选择一项：①本阶段内的红色牌均视为【杀】；②本阶段内的【杀】均视为【决斗】。';
+			},
+			yuzuru_kunfen:function(player){
+				if(player.storage._yuzuru_sss) return '锁定技，结束阶段，你摸两张牌。然后你可以将两张牌交给一名其他角色。';
+				return '锁定技，结束阶段，你失去1点体力并摸两张牌。然后你可以将两张牌交给一名其他角色。';
+			},
+			yuzuru_quji:function(player){
+				if(player.storage._yuzuru_sss) return '出牌阶段限一次，你可以弃置X张牌并选择至多等量已受伤的其他角色，这些角色各回复1点体力。（X为你已损失的体力值）';
+				return '出牌阶段限一次，你可以弃置X张牌并选择至多等量已受伤的其他角色，这些角色各回复1点体力。若你以此法弃置了黑色牌，则你失去1点体力。（X为你已损失的体力值）';
+			},
+			kamome_jieban:function(player){
+				if(player.storage.kamome_jieban) return '转换技。每回合限一次，当你受到或造成伤害后，阴：你可将两张牌交给一名其他角色，然后其交给你一张牌。<span class="bluetext">阳：你可将一张牌交给一名其他角色，然后其交给你两张牌。</span>';
+				return '转换技。每回合限一次，当你受到或造成伤害后，<span class="bluetext">阴：你可将两张牌交给一名其他角色，然后其交给你一张牌。</span>阳：你可将一张牌交给一名其他角色，然后其交给你两张牌。';
 			},
 		},
 		translate:{

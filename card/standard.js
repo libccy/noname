@@ -67,6 +67,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'basic',
 				enable:true,
 				usable:1,
+				updateUsable:'phaseUse',
 				range:{attack:1},
 				selectTarget:1,
 				filterTarget:function(card,player,target){return player!=target},

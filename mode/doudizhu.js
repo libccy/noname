@@ -1205,7 +1205,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseJudgeBegin'},
 				direct:true,
 				filter:function(event,player){
-					return player==game.zhu&&player.countCards('j');
+					return player==game.zhu&&player.countCards('j')&&player.countCards('h')>1;
 				},
 				content:function(){
 					"step 0"

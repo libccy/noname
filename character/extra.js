@@ -983,7 +983,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			lianpo:{
-				audio:true,
+				audio:2,
 				trigger:{global:'phaseAfter'},
 				frequent:true,
 				filter:function(event,player){
@@ -1098,7 +1098,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			renjie:{
-				audio:true,
+				audio:'renjie2',
 				trigger:{player:'damageEnd'},
 				forced:true,
 				unique:true,
@@ -1146,7 +1146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			renjie2:{
-				audio:true,
+				audio:2,
 				trigger:{player:'loseAfter'},
 				forced:true,
 				filter:function(event,player){
@@ -1165,7 +1165,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				unique:true,
-				audio:true,
+				audio:2,
 				filter:function(event,player){
 					return player.countMark('renjie')>=4;
 				},
@@ -1180,7 +1180,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['jilue_guicai','jilue_fangzhu','jilue_wansha','jilue_zhiheng','jilue_jizhi','jilue_jizhi_clear']
 			},
 			jilue_guicai:{
-				audio:true,
+				audio:1,
 				trigger:{global:'judge'},
 				direct:true,
 				filter:function(event,player){
@@ -1237,7 +1237,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			jilue_fangzhu:{
-				audio:true,
+				audio:1,
 				trigger:{player:'damageEnd'},
 				direct:true,
 				//priority:-1,
@@ -1270,7 +1270,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			jilue_wansha:{
-				audio:true,
+				audio:'wansha',
+				audioname:['shen_simayi'],
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
@@ -1282,7 +1283,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			jilue_zhiheng:{
-				audio:true,
+				audio:1,
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
@@ -1339,7 +1340,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			jilue_jizhi:{
-				audio:true,
+				audio:1,
 				trigger:{player:'useCard'},
 				filter:function(event,player){
 					return (get.type(event.card,'trick')=='trick'&&event.card.isCard&&player.hasMark('renjie'));
@@ -1412,6 +1413,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					trigger.directHit.addArray(game.players);
+					if(trigger.addCount!==false){
+ 					trigger.addCount=false;
+ 					if(player.stat[player.stat.length-1].card.sha>0){
+ 						player.stat[player.stat.length-1].card.sha--;
+ 					}
+					}
 				},
 				ai:{
 					effect:{
@@ -2691,15 +2698,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'1':{
 						audio:2,
 						trigger:{
-							player:'linkAfter',
+							player:['linkBefore','enterGame'],
 							global:'gameDrawAfter',
 						},
 						forced:true,
-						filter:function (event,player){
-							return !player.isLinked();
+						filter:function(event,player){
+							return player.isLinked()==(event.name=='link');
 						},
 						content:function(){
-							player.link(true);
+							if(trigger.name!='link') player.link(true);
+							else trigger.cancel();
 						},	
 					},
 					'2':{
@@ -3258,6 +3266,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 		},
+		dynamicTranslate:{
+			nzry_longnu:function(player){
+				if(player.hasSkill('nzry_longnu_2')) return '转换技，锁定技，阴：出牌阶段开始时，你失去1点体力并摸一张牌，然后本回合内你的红色手牌均视为火【杀】且无距离限制。<span class="legendtext">阳：出牌阶段开始时，你减1点体力上限并摸一张牌，然后本回合你的锦囊牌均视为雷【杀】且无使用次数限制。</span>';
+				if(player.hasSkill('nzry_longnu_1')) return '转换技，锁定技，<span class="legendtext">阴：出牌阶段开始时，你失去1点体力并摸一张牌，然后本回合内你的红色手牌均视为火【杀】且无距离限制。</span>阳：出牌阶段开始时，你减1点体力上限并摸一张牌，然后本回合你的锦囊牌均视为雷【杀】且无使用次数限制。';
+				if(player.storage.nzry_longnu==true) return '转换技，锁定技，阴：出牌阶段开始时，你失去1点体力并摸一张牌，然后本回合内你的红色手牌均视为火【杀】且无距离限制。<span class="bluetext">阳：出牌阶段开始时，你减1点体力上限并摸一张牌，然后本回合你的锦囊牌均视为雷【杀】且无使用次数限制。</span>';
+				return '转换技，锁定技，<span class="bluetext">阴：出牌阶段开始时，你失去1点体力并摸一张牌，然后本回合内你的红色手牌均视为火【杀】且无距离限制。</span>阳：出牌阶段开始时，你减1点体力上限并摸一张牌，然后本回合你的锦囊牌均视为雷【杀】且无使用次数限制。';
+			},
+		},
 		translate:{
 			"shen_luxun":"神陆逊",
 			"nzry_junlve":"军略",
@@ -3268,7 +3284,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_dinghuo_info":"限定技，出牌阶段，你可以移去全部“军略”标记，令至多等量的已横置角色弃置所有装备区内的牌。然后，你对其中一名角色造成1点火焰伤害。",
 			"shen_liubei":"神刘备",
 			"nzry_longnu":"龙怒",
-			"nzry_longnu_info":"转换技，锁定技，①出牌阶段开始时，你失去1点体力并摸一张牌，然后本回合内你的红色手牌均视为火【杀】且无距离限制。②出牌阶段开始时，你减1点体力上限并摸一张牌，然后本回合你的锦囊牌均视为雷【杀】且无使用次数限制。",
+			"nzry_longnu_info":"转换技，锁定技，阴：出牌阶段开始时，你失去1点体力并摸一张牌，然后本回合内你的红色手牌均视为火【杀】且无距离限制。阳：出牌阶段开始时，你减1点体力上限并摸一张牌，然后本回合你的锦囊牌均视为雷【杀】且无使用次数限制。",
 			"nzry_jieying":"结营",
 			"nzry_jieying_info":"锁定技，游戏开始时或当你的武将牌重置时，你横置；所有已横置的角色手牌上限+2；结束阶段，你横置一名其他角色。",
 			

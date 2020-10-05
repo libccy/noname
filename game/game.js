@@ -45,6 +45,7 @@
 		characterPack:{},
 		characterFilter:{},
 		characterSort:{},
+		dynamicTranslate:{},
 		cardPack:{},
 		onresize:[],
 		onphase:[],
@@ -9876,7 +9877,8 @@
 						card.cards=cards.slice(0);
 						event.card=card;
 					}
-					if(!lib.filter.cardEnabled(card,player)){
+					if(!lib.filter.cardEnabled(card,player)||(event.addCount!==false&&!lib.filter.cardUsable(card,player))){
+						event.result={bool:false};
 						event.finish();
 						return;
 					}
@@ -9961,6 +9963,7 @@
 						if(event.noTargetDelay) next.targetDelay=false;
 						if(event.nodelayx) next.delayx=false;
 					}
+					else event.result={bool:false};
 				},
 				chooseToDuiben:function(){
 					'step 0'
@@ -10934,8 +10937,9 @@
 							else if(typeof info.prompt2=='string'){
 								next.set('prompt2',info.prompt2);
 							}
-							else if(info.prompt2!=false&&lib.translate[event.skill+'_info']){
-								next.set('prompt2',lib.translate[event.skill+'_info']);
+							else if(info.prompt2!=false){
+								if(lib.dynamicTranslate[event.skill]) next.set('prompt2',lib.dynamicTranslate[event.skill](player,event.skill));
+								else if(lib.translate[event.skill+'_info']) next.set('prompt2',lib.translate[event.skill+'_info']);
 							}
 							if(trigger.skillwarn){
 								if(next.prompt2){
@@ -11399,7 +11403,24 @@
 							delete ui.tempnowuxie;
 						}
 					});
-					//delete player.using;
+					"step 2"
+					var stat=player.getStat();
+					for(var i in stat.skill){
+						var bool=false;
+						var info=lib.skill[i];
+						if(!info) continue;
+						if(info.enable!=undefined){
+							if(typeof info.enable=='string'&&info.enable=='phaseUse') bool=true;
+							else if(typeof info.enable=='object'&&info.enable.contains('phaseUse')) bool=true;
+						}
+						if(bool) stat.skill[i]=0;
+					}
+					for(var i in stat.card){
+						var bool=false;
+						var info=lib.card[i];
+						if(!info) continue;
+						if(info.updateUsable=='phaseUse') stat.card[i]=0;
+					}
 				},
 				phaseDiscard:function(){
 					"step 0"
@@ -24331,11 +24352,14 @@
 			},
 			cardUsable:function(card,player,event){
 				card=get.autoViewAs(card,null,player);
-				if(player!=_status.event.player) return true;
-				event=event||_status.event;
-				if(event.getParent().name!='phaseUse') return true;
-				if(event.getParent().player!=player) return true;
-				var num=get.info(card).usable;
+				var info=get.info(card);
+				if(info.updateUsable=='phaseUse'){
+ 				event=event||_status.event;
+ 				if(player!=_status.event.player) return true;
+ 				if(event.getParent().name!='phaseUse') return true;
+ 				if(event.getParent().player!=player) return true;
+				}
+				var num=info.usable;
 				if(typeof num=='function') num=num(card,player);
 				num=game.checkMod(card,player,num,'cardUsable',player);
 				if(typeof num!='number') return true;
@@ -45916,6 +45940,9 @@
 					else if(info.promptfunc){
 						event.skillDialog=ui.create.dialog(str,'<div><div style="width:100%">'+info.promptfunc(event,event.player)+'</div></div>');
 					}
+					else if(lib.dynamicTranslate[skill]){
+						event.skillDialog=ui.create.dialog(str,'<div><div style="width:100%">'+lib.dynamicTranslate[skill](event.player,skill)+'</div></div>');
+					}
 					else if(lib.translate[skill+'_info']){
 						event.skillDialog=ui.create.dialog(str,'<div><div style="width:100%">'+lib.translate[skill+'_info']+'</div></div>');
 					}
@@ -49036,7 +49063,8 @@
 			}
 			return get.translation(str);
 		},
-		skillInfoTranslation:function(name){
+		skillInfoTranslation:function(name,player){
+			if(player&&lib.dynamicTranslate[name]) return lib.dynamicTranslate[name](player,name);
 			var str=lib.translate[name+'_info'];
 			if(!str) return '';
 			return str;
@@ -49738,15 +49766,15 @@
 							else{
 								forbidstr+='（双将禁用）<br>';
 							}
-							forbidstr+=get.skillInfoTranslation(skills[i])+'</div></div>'
+							forbidstr+=get.skillInfoTranslation(skills[i],node)+'</div></div>'
 							uiintro.add(forbidstr);
 						}
 						else if(!skills2.contains(skills[i])){
-							uiintro.add('<div style="opacity:0.5"><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
+							uiintro.add('<div style="opacity:0.5"><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i],node)+'</div></div>');
 						}
 						else if(lib.skill[skills[i]].temp||!node.skills.contains(skills[i])||lib.skill[skills[i]].thundertext){
 							if(lib.skill[skills[i]].frequent||lib.skill[skills[i]].subfrequent){
- 							uiintro.add('<div><div class="skill thundertext thunderauto">【'+translation+'】</div><div class="thundertext thunderauto">'+get.skillInfoTranslation(skills[i])+'<br><div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">自动发动</div></div></div>');
+ 							uiintro.add('<div><div class="skill thundertext thunderauto">【'+translation+'】</div><div class="thundertext thunderauto">'+get.skillInfoTranslation(skills[i],node)+'<br><div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">自动发动</div></div></div>');
  							var underlinenode=uiintro.content.lastChild.querySelector('.underlinenode');
  							if(lib.skill[skills[i]].frequent){
  								if(lib.config.autoskilllist.contains(skills[i])){
@@ -49767,11 +49795,11 @@
  							underlinenode.listen(ui.click.autoskill2);
 							}
 							else{
-								uiintro.add('<div><div class="skill thundertext thunderauto">【'+translation+'】</div><div class="thundertext thunderauto">'+get.skillInfoTranslation(skills[i])+'</div></div>');
+								uiintro.add('<div><div class="skill thundertext thunderauto">【'+translation+'】</div><div class="thundertext thunderauto">'+get.skillInfoTranslation(skills[i],node)+'</div></div>');
 							}
 						}
 						else if(lib.skill[skills[i]].frequent||lib.skill[skills[i]].subfrequent){
-							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'<br><div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">自动发动</div></div></div>');
+							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i],node)+'<br><div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">自动发动</div></div></div>');
 							var underlinenode=uiintro.content.lastChild.querySelector('.underlinenode');
 							if(lib.skill[skills[i]].frequent){
 								if(lib.config.autoskilllist.contains(skills[i])){
@@ -49792,7 +49820,7 @@
 							underlinenode.listen(ui.click.autoskill2);
 						}
 						else if(lib.skill[skills[i]].clickable&&node.isIn()&&node.isUnderControl(true)){
-							var intronode=uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'<br><div class="menubutton skillbutton" style="position:relative;margin-top:5px">点击发动</div></div></div>').querySelector('.skillbutton');
+							var intronode=uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i],node)+'<br><div class="menubutton skillbutton" style="position:relative;margin-top:5px">点击发动</div></div></div>').querySelector('.skillbutton');
 							if(!_status.gameStarted||(lib.skill[skills[i]].clickableFilter&&!lib.skill[skills[i]].clickableFilter(node))){
 								intronode.classList.add('disabled');
 								intronode.style.opacity=0.5;
@@ -49808,7 +49836,7 @@
 							uiintro.add('<div><div class="skilln">'+get.translation(skills[i])+'</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
 						}
 						else{
-							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
+							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i],node)+'</div></div>');
 						}
 						if(lib.translate[skills[i]+'_append']){
 							uiintro._place_text=uiintro.add('<div class="text">'+lib.translate[skills[i]+'_append']+'</div>')

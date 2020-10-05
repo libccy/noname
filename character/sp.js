@@ -571,6 +571,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:'player',
 				skillAnimation:true,
+				limited:true,
 				animationColor:'thunder',
 				content:function(){
 					'step 0'
@@ -601,7 +602,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				direct:true,
 				filter:function(event,player){
-					return player!=event.player&&event.player.countCards('he')&&!event.player.countCards('j');
+					return player!=event.player&&!event.player.storage._disableJudge&&event.player.countCards('he')&&!event.player.countCards('j');
 				},
 				content:function(){
 					'step 0'
@@ -615,8 +616,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var card=result.cards[0];
 						trigger.player.$throw(card);
 						game.delayx();
-						if(get.type(card)=='delay') trigger.player.addJudge(card);
-						else trigger.player.addJudge({name:get.color(card)=='red'?'lebu':'bingliang'},result.cards);
+						if(get.type(card,false)=='delay') trigger.player.addJudge(card);
+						else trigger.player.addJudge({name:get.color(card,false)=='red'?'lebu':'bingliang'},result.cards);
 					}
 				},
 				group:'shanzhuan_draw',
@@ -2701,11 +2702,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:["new_luoyan_tianxiang","new_luoyan_liuli"],
 			},
 			"new_luoyan_tianxiang":{
-				inherit:"retianxiang",
+				inherit:"oltianxiang",
 				filter:function (event,player){
 					if(!player.storage.new_xingwu||!player.storage.new_xingwu.length) return false;
-					if(player.hasSkill('retianxiang')||player.hasSkill('tianxiang')) return false;
-					return lib.skill.retianxiang.filter(event,player);
+					if(player.hasSkill('oltianxiang')) return false;
+					return lib.skill.oltianxiang.filter(event,player);
 				},
 				audio:"tianxiang",
 			},
@@ -5068,6 +5069,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						list.remove(players[i].name1);
 						list.remove(players[i].name2);
 					}
+					list.remove('zhaoyun');
+					list.remove('re_zhaoyun');
+					list.remove('ol_zhaoyun');
 					// var dialog=ui.create.dialog();
 					// dialog.add([list.randomGets(5),'character']);
 					player.chooseButton(true).set('ai',function(button){
@@ -8639,15 +8643,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{source:'damageBegin1'},
 						direct:true,
 						filter:function(event,player){
-							if(!player.hasSkill('fenxin_nei')){
-								if(!player.countCards('h',{color:'black'})) return false;
-							}
+							if(!player.countCards(player.hasSkill('fenxin_nei')?'he':'h',function(card){
+								if(_status.connectMode&&get.position(card)=='h') return true;
+								return get.color(card)=='black';
+							})) return false;
 							return (event.player.hp>=player.hp||player.hasSkill('fenxin_fan'))&&player!=event.player;
 						},
 						content:function(){
 							'step 0'
 							var goon=(get.attitude(player,trigger.player)<0);
-							var next=player.chooseToDiscard(get.prompt('jieyuan',trigger.player));
+							var next=player.chooseToDiscard(get.prompt('jieyuan',trigger.player),player.hasSkill('fenxin_nei')?'he':'h');
 							if(!player.hasSkill('fenxin_nei')){
 								next.set('filterCard',function(card){
 									return get.color(card)=='black';
@@ -8675,15 +8680,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:true,
 						trigger:{player:'damageBegin2'},
 						filter:function(event,player){
-							if(!player.hasSkill('fenxin_nei')){
-								if(!player.countCards('h',{color:'red'})) return false;
-							}
+							if(!player.countCards(player.hasSkill('fenxin_nei')?'he':'h',function(card){
+								if(_status.connectMode&&get.position(card)=='h') return true;
+								return get.color(card)=='black';
+							})) return false;
 							return event.source&&(event.source.hp>=player.hp||player.hasSkill('fenxin_zhong'))&&player!=event.source;
 						},
 						direct:true,
 						content:function(){
 							"step 0"
-							var next=player.chooseToDiscard(get.prompt('jieyuan'));
+							var next=player.chooseToDiscard(get.prompt('jieyuan'),player.hasSkill('fenxin_nei')?'he':'h');
 							if(!player.hasSkill('fenxin_nei')){
 								next.set('filterCard',function(card){
 									return get.color(card)=='red';
@@ -12951,17 +12957,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					event.target1=targets[0];
-					targets[0].gain(cards,player,'give');
+					targets[0].gain(cards,player,'giveAuto');
+					"step 1"
+					if(!targets[0].countCards('h')){
+						event.finish();
+						return;
+					}
 					var players=game.filterPlayer();
 					for(var i=0;i<players.length;i++){
-						if(players[i].countCards('h')&&players[i]!=event.target1&&players[i]!=player){
+						if(players[i]!=event.target1&&players[i]!=player&&event.target1.canCompare(players[i])){
 							break;
 						}
 					}
 					if(i==players.length){
 						event.finish();
 					}
-					"step 1"
+					"step 2"
 					player.chooseTarget(true,'选择拼点目标',function(card,player,target){
 						return _status.event.target1.canCompare(target)&&target!=player;
 					}).set('ai',function(target){
@@ -12972,8 +12983,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return eff-10;
 						}
 						return eff;
-					}).set('target1',event.target1);
-					"step 2"
+					}).set('target1',event.target1).set('forceDie',true);
+					"step 3"
 					if(result.targets.length){
 						event.target2=result.targets[0];
 						event.target1.line(event.target2);
@@ -12982,10 +12993,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						event.finish();
 					}
-					"step 3"
+					"step 4"
 					if(!result.tie){
-						if(result.bool&&event.target1.canUse({name:'sha',isCard:true},event.target2,false)){
-							event.target1.useCard({name:'sha',isCard:true},event.target2);
+						if(result.bool){
+							if(event.target1.canUse({name:'sha',isCard:true},event.target2,false)) event.target1.useCard({name:'sha',isCard:true},event.target2);
 						}
 						else if(event.target2.canUse({name:'sha',isCard:true},event.target1,false)){
 							event.target2.useCard({name:'sha',isCard:true},event.target1);
@@ -14483,6 +14494,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 		},
+		dynamicTranslate:{
+			kunfen:function(player){
+				if(player.storage.kunfen) return '结束阶段开始时，你可以失去1点体力，然后摸两张牌。';
+				return '锁定技，结束阶段开始时，你失去1点体力，然后摸两张牌。';
+			},
+			jieyuan:function(player){
+				var str='当你对一名其他角色造成伤害时，'
+				if(!player.hasSkill('fenxin_fan')) str+='若其体力值大于或等于你的体力值，';
+				str+='你可弃置一张';
+				if(!player.hasSkill('fenxin_nei')) str+='黑色手';
+				str+='牌，令此伤害+1；当你受到一名其他角色造成的伤害时，';
+				if(!player.hasSkill('fenxin_zhong')) str+='若其体力值大于或等于你的体力值，';
+				str+='你可弃置一张'
+				if(!player.hasSkill('fenxin_nei')) str+='红色手';
+				str+='牌，令此伤害-1。';
+				return str;
+			},
+		},
 		translate:{
 			"xinfu_lingren":"凌人",
 			"xinfu_lingren_info":"每回合限一次。当你于出牌阶段使用带有「伤害」这一标签的基本牌或普通锦囊牌指定目标后，你可以猜测其中的一个目标的手牌中是否有基本牌，锦囊牌或装备牌。若你猜中的项目数：≥1，此牌对该角色的伤害+1；≥2，你摸两张牌；≥3，你获得技能〖奸雄〗和〖行殇〗直到下回合开始。",
@@ -15004,7 +15033,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jieyuan_info:'当你对一名其他角色造成伤害时，若其体力值大于或等于你的体力值，你可弃置一张黑色手牌，令此伤害+1；当你受到一名其他角色造成的伤害时，若其体力值大于或等于你的体力值，你可弃置一张红色手牌，令此伤害-1。',
 			fenxin:'焚心',
 			fenxin_old:'焚心',
-			fenxin_info:'锁定技，一名其他角色死亡后，若其身份为：忠臣，你本局内发动〖竭缘〗减少伤害时无视体力值限制；反贼，你本局内发动〖竭缘〗增加伤害时无视体力值限制；内奸，你本局内选择发动〖竭缘〗的牌时无颜色限制。',
+			fenxin_info:'锁定技，一名其他角色死亡后，若其身份为：忠臣，你本局内发动〖竭缘〗减少伤害时无视体力值限制；反贼，你本局内发动〖竭缘〗增加伤害时无视体力值限制；内奸，你本局内选择发动〖竭缘〗的牌时无颜色和区域限制。',
 			fenxin_old_info:'限定技，当你杀死一名非主公角色时，你可以与其交换未翻开的身份牌。（你的身份为主公时不能发动此技能）',
 			qingyi:'轻逸',
 			qingyi1:'轻逸',

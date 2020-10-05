@@ -2735,14 +2735,14 @@ div:not(.handcards)>.card>.info>span,
 	opacity: 0 !important;
 }
 
-.player[data-position='0'].unseen>.avatar,
-.player[data-position='0'].unseen2>.avatar2,
-.player[data-position='0'].unseen>.name:not(.name2):not(.name_seat),
-.player[data-position='0'].unseen2>.name2,
-.unseen_v>.avatar,
-.unseen2_v>.avatar2,
-.unseen_v>.name:not(.name2):not(.name_seat),
-.unseen2_v>.name2 {
+#arena:not(.observe) .player[data-position='0'].unseen>.avatar,
+#arena:not(.observe) .player[data-position='0'].unseen2>.avatar2,
+#arena:not(.observe) .player[data-position='0'].unseen>.name:not(.name2):not(.name_seat),
+#arena:not(.observe) .player[data-position='0'].unseen2>.name2,
+#arena:not(.observe) .unseen_v>.avatar,
+#arena:not(.observe) .unseen2_v>.avatar2,
+#arena:not(.observe) .unseen_v>.name:not(.name2):not(.name_seat),
+#arena:not(.observe) .unseen2_v>.name2 {
 	opacity: 0.2 !important
 }
 
@@ -2752,6 +2752,7 @@ div:not(.handcards)>.card>.info>span,
 .player:not([data-position='0']).unseen.unseen2>.name_seat {
 	opacity: 1 !important;
 }
+
 .linked>.avatar,.linked>.avatar2 {
 	transform: rotate(-90deg);
 }
