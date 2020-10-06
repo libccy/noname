@@ -889,19 +889,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					'step 2'
-					var stat=trigger.player.getStat();
-					stat.card={};
-					for(var i in stat.skill){
-						var bool=false;
-						var info=lib.skill[i];
-						if(info.enable!=undefined){
-							if(typeof info.enable=='string'&&info.enable=='phaseUse') bool=true;
-							else if(typeof info.enable=='object'&&info.enable.contains('phaseUse')) bool=true;
-						}
-						if(bool) stat.skill[i]=0;
-					}
-					'step 3'
-					trigger.player.phaseUse();
+					var next=trigger.player.phaseUse();
+					event.next.remove(next);
+					trigger.getParent('phase').next.push(next);
 				},
 				ai:{
 					expose:0.5,

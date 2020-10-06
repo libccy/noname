@@ -878,20 +878,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'dangxian',
 				audioname:['guansuo','xin_liaohua','re_liaohua'],
 				content:function(){
-					'step 0'
-					player.phaseUse().xindangxian=true;
-					'step 1'
-					var stat=player.getStat();
-					stat.card={};
-					for(var i in stat.skill){
-						var bool=false;
-						var info=lib.skill[i];
-						if(info.enable!=undefined){
-							if(typeof info.enable=='string'&&info.enable=='phaseUse') bool=true;
-							else if(typeof info.enable=='object'&&info.enable.contains('phaseUse')) bool=true;
-						}
-						if(bool) stat.skill[i]=0;
-					}
+					var next=player.phaseUse();
+					next.xindangxian=true;
+					event.next.remove(next);
+					trigger.next.push(next);
 				},
 				group:'xindangxian_rewrite',
 				subSkill:{
@@ -1456,8 +1446,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else if(pe==te) return "摸一张牌";
 					else if(pe<te) return "失去体力";
 				},
-							line:"thunder",
-							content:function (){
+				line:"thunder",
+				content:function (){
 					var pe=player.countCards('e');
 					var te=target.countCards('e');
 					if(pe>te) target.recover();
@@ -6077,20 +6067,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				audioname:['guansuo'],
 				content:function(){
-					'step 0'
-					player.phaseUse();
-					'step 1'
-					var stat=player.getStat();
-					stat.card={};
-					for(var i in stat.skill){
-						var bool=false;
-						var info=lib.skill[i];
-						if(info.enable!=undefined){
-							if(typeof info.enable=='string'&&info.enable=='phaseUse') bool=true;
-							else if(typeof info.enable=='object'&&info.enable.contains('phaseUse')) bool=true;
-						}
-						if(bool) stat.skill[i]=0;
-					}
+					var next=player.phaseUse();
+					event.next.remove(next);
+					trigger.next.push(next);
 				}
 			},
 			longyin:{
@@ -12062,6 +12041,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			}
 		},
+		dynamicTranslate:{
+			rejueqing:function(player){
+				if(player.hasSkill('rejueqing_1st')) return '锁定技，你即将造成的伤害均视为失去体力。';
+				return '当你对其他角色造成伤害时，你可以防止此伤害。若如此做，你令其失去2X点体力，修改〖绝情〗并对自己造成2X点伤害。';
+			},
+			reyanzhu:function(player){
+				if(!player.storage.reyanzhu) return '出牌阶段限一次，你可以令一名其他角色选择一项：将装备区里的所有牌交给你并令你修改〖宴诛〗和〖兴学〗，或弃置一张牌并令下一次受到的伤害+1直到其下回合开始。';
+				return '出牌阶段限一次，你可以选择一名其他角色。该角色下一次受到的伤害+1直到其下回合开始。';
+			},
+			rexingxue:function(player){
+				if(player.storage.reyanzhu) return '结束阶段开始时，你可以令至多X名角色各摸一张牌。然后若有手牌数不等于体力值的目标角色，则这些角色各将一张牌置于牌堆顶。（X为你的体力上限）。';
+				return '结束阶段开始时，你可以令至多X名角色各摸一张牌。然后若有手牌数不等于体力值的目标角色，则这些角色各将一张牌置于牌堆顶。（X为你的体力值）。';
+			},
+			jiaozhao:function(player){
+				if(player.storage.jiaozhao2) return '出牌阶段限一次，你可以展示一张手牌，然后声明一张基本牌或普通锦囊牌的牌名。在此出牌阶段内，你可以将此手牌当声明的牌使用且你不能被选择为目标。';
+				if(player.storage.jiaozhao1) return '出牌阶段限一次，你可以展示一张手牌，然后选择距离最近的一名其他角色，该角色声明一张基本牌或普通锦囊牌的牌名。在此出牌阶段内，你可以将此手牌当声明的牌使用且你不能被选择为目标。';
+				return '出牌阶段限一次，你可以展示一张手牌，然后选择距离最近的一名其他角色，该角色声明一张基本牌的牌名。在此出牌阶段内，你可以将此手牌当声明的牌使用且你不能被选择为目标。';
+			},
+			funan:function(player){
+				if(player.hasSkill('funan_jiexun')) return '其他角色使用或打出牌响应你使用的牌时，你可获得其使用或打出的牌。';
+				return '其他角色使用或打出牌响应你使用的牌时，你可令其获得你使用的牌（其本回合不能使用或打出这些牌），然后你获得其使用或打出的牌。';
+			},
+		},
 		translate:{
 			old_huaxiong:'华雄',
 			yufan:'虞翻',
@@ -12242,9 +12244,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xintaoluan_info:'若场上没有濒死的角色，则你可以将一张牌当做任意一张基本牌或普通锦囊牌使用（此牌不得是本回合内你以此法使用过的牌），然后你令一名其他角色选择一项：1.交给你X张与你以此法使用的牌类别不同的牌；2.你失去X点体力且滔乱无效直到回合结束（X为你本回合内发动过〖滔乱〗的次数且至多为3）',
 			jiaozhao:'矫诏',
 			jiaozhao2:'矫诏',
-			jiaozhao_info:'出牌阶段限一次，你可以展示一张手牌，然后选择距离最近的一名其他角色，该角色声明一张基本牌的牌名。在此出牌阶段内，你可以将此手牌当声明的牌使用且你不能被选择为目标',
+			jiaozhao_info:'出牌阶段限一次，你可以展示一张手牌，然后选择距离最近的一名其他角色，该角色声明一张基本牌的牌名。在此出牌阶段内，你可以将此手牌当声明的牌使用且你不能被选择为目标。',
 			danxin:'殚心',
-			danxin_info:'当你受到伤害后，你可以摸一张牌，或对“矫诏”的描述依次执行下列一项修改：1.将“基本牌”改为“基本牌或普通锦囊牌”；2.将“选择距离最近的一名其他角色，该角色”改为“你”',
+			danxin_info:'当你受到伤害后，你可以摸一张牌，或对“矫诏”的描述依次执行下列一项修改：1.将“基本牌”改为“基本牌或普通锦囊牌”；2.将“选择距离最近的一名其他角色，该角色”改为“你”。',
 			duliang:'督粮',
 			duliang2:'督粮',
 			duliang_info:'出牌阶段限一次，你可以获得一名其他角色的一张手牌，然后选择一项：1.令其观看牌堆顶的两张牌，然后获得其中的基本牌；2.令其于下个摸牌阶段额外摸一张牌。',
@@ -12343,7 +12345,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reyanzhu2:'宴诛',
 			reyanzhu_info:'出牌阶段限一次，你可以令一名其他角色选择一项：将装备区里的所有牌交给你并令你修改〖宴诛〗和〖兴学〗，或弃置一张牌并令下一次受到的伤害+1直到其下回合开始。',
 			reyanzhu_rewrite:'宴诛·改',
-			reyanzhu_rewrite_info:'出牌阶段限一次，你可以选择一名其他角色。该角色下一次受到的伤害+1',
+			reyanzhu_rewrite_info:'出牌阶段限一次，你可以选择一名其他角色。该角色下一次受到的伤害+1直到其下回合开始。',
 			rexingxue:'兴学',
 			rexingxue_info:'结束阶段开始时，你可以令至多X名角色各摸一张牌。然后若有手牌数不等于体力值的目标角色，则这些角色各将一张牌置于牌堆顶。（X为你的体力值）。',
 			rexingxue_rewrite:'兴学·改',

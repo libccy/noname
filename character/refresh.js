@@ -43,7 +43,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_wuyi:['male','shu',4,['xinbenxi']],
 			re_zhuran:['male','wu',4,['xindanshou']],
 			re_caozhi:['male','wei',3,['reluoying','rejiushi','chengzhang']],
-			ol_pangtong:['male','shu',3,['xinlianhuan','olniepan'],[]],
+			ol_pangtong:['male','shu',3,['ollianhuan','olniepan'],[]],
 			re_zhangyi:['male','shu',4,['rewurong','shizhi']],
 			re_wuguotai:['female','wu',3,['reganlu','buyi']],
 			re_gaoshun:['male','qun',4,['rexianzhen','rejinjiu']],
@@ -7136,6 +7136,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 		},
+		dynamicTranslate:{
+			rejiushi:function(player){
+				if(player.storage.chengzhang) return '当你需要使用【酒】时，若你的武将牌正面向上，你可以翻面，视为使用一张【酒】。当你受到伤害后，若你的武将牌背面向上，你可以翻面。当你翻面时，你获得牌堆中的一张随机锦囊。';
+				return '当你需要使用【酒】时，若你的武将牌正面向上，你可以翻面，视为使用一张【酒】。当你受到伤害后，若你的武将牌背面向上，你可以翻面并获得牌堆中的一张随机锦囊。';
+			},
+		},
 		translate:{
 			re_zhangliao:'界张辽',
 			re_huangyueying:'新黄月英',
@@ -7509,7 +7515,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinyicong:'义从',
 			xinyicong_info:'锁定技，你计算与其他角色的距离时-X，其他角色计算与你的距离时+Y。（X为你的体力值-1，Y为你的已损失体力值-1）',
 			oltianxiang:'天香',
-			oltianxiang_info:'当你受到伤害时，你可以弃置一张红桃手牌，防止此次伤害并选择一名其他角色，然后你选择一项：1.令其受到伤害来源对其造成的1点伤害，然后摸X张牌（X为其已损失体力值且至多为5）；2.令其失去1点体力，然后获得你弃置的牌。',
+			oltianxiang_info:'当你受到伤害时，你可以弃置一张红桃牌，防止此伤害并选择一名其他角色，然后你选择一项：1.令其受到伤害来源对其造成的1点伤害，然后摸X张牌（X为其已损失体力值且至多为5）；2.令其失去1点体力，然后获得你弃置的牌。',
 			olhongyan:'红颜',
 			olhongyan_info:'锁定技，你的黑桃牌的花色视为红桃。若你的装备区内有红桃牌，则你的手牌上限基数视为体力上限。',
 			piaoling:'飘零',

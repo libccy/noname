@@ -1322,17 +1322,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player,name){
 					if(!player.countCards('he')||player.hasSkill('souying2')) return false;
 					if(!event.targets||event.targets.length!=1||event.player==event.target) return false;
+					if(event.card.name!='sha'&&get.type(event.card)!='trick') return false;
 					if(name=='useCardToPlayered'){
 						if(!event.cards.filterInD().length) return false;
 						var target=event.target;
 						return player.getHistory('useCard',function(evt){
-							return evt.targets&&evt.targets.length==1&&evt.targets[0]==target;
+							return evt.targets&&evt.targets.contains(target);
 						}).indexOf(event.getParent())>0;
 					}
 					else{
 						var source=event.player;
 						return source.getHistory('useCard',function(evt){
-							return evt.targets&&event.targets.length==1&&evt.targets[0]==player;
+							return evt.targets&&evt.targets.contains(player);
 						}).indexOf(event.getParent())>0;
 					}
 				},
@@ -1970,19 +1971,68 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			fenglve2:{
-				trigger:{player:'chooseToCompareAfter'},
+				trigger:{
+					player:'chooseToCompareAfter',
+					target:'chooseToCompareAfter',
+				},
 				check:function(event,player){
-					return get.attitude(player,event.target)*get.value(event.card1,event.target,'raw')>0;
+					var card,target;
+					if(player==event.player){
+						card=event.card1;
+						target=event.target;
+					}
+					else{
+						card=event.card2;
+						target=event.player;
+					}
+					return get.attitude(player,target)*get.value(card,target,'raw')>0;
 				},
 				filter:function(event,player){
-					return event.getParent().name=='fenglve'&&get.position(event.card1,true)=='o';
+					if(event.targets) return false;
+					var card,target;
+					if(player==event.player){
+						card=event.card1;
+						target=event.target;
+					}
+					else{
+						card=event.card2;
+						target=event.player;
+					}
+					return get.position(card,true)=='o';
 				},
-				prompt:function(event){
-					return '是否令'+get.translation(event.target)+'获得'+get.translation(event.card1)+'？'
+				prompt:function(event,player){
+					var card,target;
+					if(player==event.player){
+						card=event.card1;
+						target=event.target;
+					}
+					else{
+						card=event.card2;
+						target=event.player;
+					}
+					return '是否发动【锋略】，令'+get.translation(target)+'获得'+get.translation(card)+'？'
 				},
-				logTarget:'target',
+				logTarget:function(event,player){
+					var target;
+					if(player==event.player){
+						target=event.target;
+					}
+					else{
+						target=event.player;
+					}
+					return target;
+				},
 				content:function(){
-					trigger.target.gain(trigger.card1,'gain2','log');
+					var card,target;
+					if(player==trigger.player){
+						card=trigger.card1;
+						target=trigger.target;
+					}
+					else{
+						card=trigger.card2;
+						target=trigger.player;
+					}
+					target.gain(card,'gain2','log');
 				},
 			},
 			mouzhi:{
@@ -4603,13 +4653,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					event.cards=get.cards(num);
 					player.chooseButton(['【镇行】：请选择要获得的牌',event.cards]).set('filterButton',function(button){
-						for(var i=0;i<event.cards.length;i++){
-							if(button.link!=event.cards[i]&&get.suit(event.cards[i])==get.suit(button.link)) return false;
+						var cards=_status.event.cards;
+						for(var i=0;i<cards.length;i++){
+							if(button.link!=cards[i]&&get.suit(cards[i])==get.suit(button.link)) return false;
 						}
 						return true;
 					}).set('ai',function(button){
 						return get.value(button.link);
-					});
+					}).set('cards',event.cards);
 					'step 3'
 					var tothrow=[];
 					for(var i=event.cards.length-1;i>=0;i--){
@@ -5230,6 +5281,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				return mode=='versus'&&['guandu','4v4','four'].contains(_status.mode);
 			},
 		},
+		dynamicTranslate:{
+			xinlvli:function(player){
+				var str='每回合限一次';
+				if(player.storage.choujue) str+='（自己的回合内则改为限两次）';
+				str+='，当你造成';
+				if(player.storage.beishui) str+='或受到';
+				str+='伤害后，你可选择：1，若你的体力值大于你的手牌数，你摸Ｘ张牌；2，若你的手牌数大于你的体力值且你已受伤，你回复Ｘ点体力（Ｘ为你的手牌数与体力值之差）。';
+				return str;
+			},
+			mubing:function(player){
+				if(player.storage.mubing2) return '出牌阶段开始时，你可以弃置至多三张牌，然后展示牌堆顶的四张牌，并可令一名角色获得任意张点数之和不大于你弃置的牌点数之和的牌。';
+				return '出牌阶段开始时，你可以弃置至多两张牌，然后展示牌堆顶的三张牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。';
+			},
+		},
 		translate:{
 			lijue:"李傕",
 			zhangji:"张济",
@@ -5394,7 +5459,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xunchen:'荀谌',
 			fenglve:'锋略',
 			fenglve2:'锋略',
-			fenglve_info:'出牌阶段开始时，你可以与一名角色拼点，若你赢，该角色将其区域内的各一张牌交给你；若你没赢，你交给其一张牌。拼点结算后你可以令其获得你拼点的牌。',
+			fenglve_info:'出牌阶段开始时，你可以与一名角色拼点，若你赢，该角色将其区域内的各一张牌交给你；若你没赢，你交给其一张牌。当你的单人拼点结算后，你可以令对方获得你拼点的牌。',
 			mouzhi:'谋识',
 			mouzhi2:'谋识',
 			mouzhi_info:'出牌阶段限一次，你可以将一张手牌交给一名角色，若如此做，当其于其下回合的出牌阶段内对一名角色造成伤害后，若是此阶段其第一次对该角色造成伤害，你摸一张牌。',
@@ -5449,7 +5514,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mansi:'蛮嗣',
 			mansi_info:'出牌阶段限一次，你可以将所有手牌【南蛮入侵】使用；当有角色受到【南蛮入侵】的伤害后，你摸一张牌。',
 			souying:'薮影',
-			souying_info:'每回合限一次，当你对其他角色（或其他角色对你）使用牌指定唯一目标后，若此牌不是本回合你对其（或其对你）使用的第一张牌，你可以弃置一张牌将此牌收回手牌（或令此牌对你无效）。',
+			souying_info:'每回合限一次，当你对其他角色（或其他角色对你）使用【杀】或普通锦囊牌指定唯一目标后，若此牌不是本回合你对其（或其对你）使用的第一张【杀】或普通锦囊牌，你可以弃置一张牌，获得此牌对应的所有实体牌（或令此牌对你无效）。',
 			zhanyuan:'战缘',
 			zhanyuan_info:'觉醒技，准备阶段，若你已因蛮嗣累计获得超过7张牌，你加一点体力上限并回复1点体力，并可以选择一名男性角色，你与其获得技能〖系力〗，然后你失去技能〖蛮嗣〗',
 			hmxili:'系力',

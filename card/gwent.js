@@ -1341,6 +1341,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'spell_silver',
 				enable:true,
 				usable:1,
+				updateUsable:'phaseUse',
 				forceUsable:true,
 				filterTarget:function(card,player,target){
 					return target==player;
