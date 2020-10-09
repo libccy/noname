@@ -3154,14 +3154,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			pingjian_temp:{
 				onremove:true,
-				trigger:{player:'useSkillAfter'},
+				trigger:{player:['useSkillBegin','useCard1']},
 				silent:true,
 				firstDo:true,
 				filter:function(event,player){
-					return event.skill==player.storage.pingjian_temp;
+					if(!lib.skill[event.skill]) return false;
+					if(event.skill==player.storage.pingjian_temp) return true;
+					if(lib.skill[event.skill].sourceSkill==player.storage.pingjian_temp) return true;
+					return false;
 				},
 				content:function(){
-					player.removeSkill(trigger.skill);
+					player.removeSkill(player.storage.pingjian_temp);
 					player.removeSkill('pingjian_temp');
 				},
 			},
@@ -4014,14 +4017,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					var list=[];
-					for(var i=0;i<lib.group.length;i++){
-						if(lib.group[i]=='shen') continue;
-						if(lib.group[i]=='western'&&!game.hasPlayer(function(current){
-							return current.group=='western'
-						})) continue;
-						list.push(lib.group[i]);
-					}
+					var list=lib.group.filter(function(group){
+						return ['wei','shu','wu','qun'].contains(group)||game.hasPlayer(function(current){
+							return current.group==group;
+						})
+					});
 					player.chooseControl(list).set('prompt','秉诏：请选择一个势力').set('ai',function(){
 						var listx=list.slice(0);
 						list.sort(function(a,b){

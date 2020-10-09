@@ -837,23 +837,23 @@
 						}
 					},
 					// fewplayer:{
-					//     name:'启用人数',
+					//			  name:'启用人数',
 					// 	intro:'设置启用新版布局的最小人数（不足时切换至默认布局）',
-					//     init:'3',
-					//     // unfrequent:true,
-					//     item:{
-					//         '2':'两人',
-					//         '3':'三人',
-					//         '4':'四人',
-					//         '5':'五人',
-					//         '6':'六人',
-					//         '7':'七人',
-					//         '8':'八人',
-					//     },
-					//     onclick:function(item){
-					//         game.saveConfig('fewplayer',item);
-					//         if(ui.arena) ui.arena.setNumber(ui.arena.dataset.number);
-					//     }
+					//			  init:'3',
+					//			  // unfrequent:true,
+					//			  item:{
+					//									'2':'两人',
+					//									'3':'三人',
+					//									'4':'四人',
+					//									'5':'五人',
+					//									'6':'六人',
+					//									'7':'七人',
+					//									'8':'八人',
+					//			  },
+					//			  onclick:function(item){
+					//									game.saveConfig('fewplayer',item);
+					//									if(ui.arena) ui.arena.setNumber(ui.arena.dataset.number);
+					//			  }
 					// },
 					player_height:{
 						name:'角色高度',
@@ -3772,43 +3772,43 @@
 					// 	onclick:function(){
 					// 		if(this.innerHTML!='已隐藏'){
 					// 			this.innerHTML='已隐藏';
-					//             var pack=lib.config.all.cards.slice(0);
-					//             if(Array.isArray(lib.config.hiddenCardPack)){
-					//                 for(var i=0;i<lib.config.hiddenCardPack.length;i++){
-					//                     pack.add(lib.config.hiddenCardPack[i]);
-					//                 }
-					//             }
-					//             for(var i=0;i<pack.length;i++){
-					//                 if(lib.config.all.sgscards.contains(pack[i])){
-					//                     pack.splice(i--,1);
-					//                 }
-					//             }
+					//												 var pack=lib.config.all.cards.slice(0);
+					//												 if(Array.isArray(lib.config.hiddenCardPack)){
+					//															  for(var i=0;i<lib.config.hiddenCardPack.length;i++){
+					//																					pack.add(lib.config.hiddenCardPack[i]);
+					//															  }
+					//												 }
+					//												 for(var i=0;i<pack.length;i++){
+					//															  if(lib.config.all.sgscards.contains(pack[i])){
+					//																					pack.splice(i--,1);
+					//															  }
+					//												 }
 					// 			game.saveConfig('hiddenCardPack',pack);
 					//
-					//             var pack=lib.config.all.characters.slice(0);
-					//             if(Array.isArray(lib.config.hiddenCharacterPack)){
-					//                 for(var i=0;i<lib.config.hiddenCharacterPack.length;i++){
-					//                     pack.add(lib.config.hiddenCharacterPack[i]);
-					//                 }
-					//             }
-					//             for(var i=0;i<pack.length;i++){
-					//                 if(lib.config.all.sgscharacters.contains(pack[i])){
-					//                     pack.splice(i--,1);
-					//                 }
-					//             }
+					//												 var pack=lib.config.all.characters.slice(0);
+					//												 if(Array.isArray(lib.config.hiddenCharacterPack)){
+					//															  for(var i=0;i<lib.config.hiddenCharacterPack.length;i++){
+					//																					pack.add(lib.config.hiddenCharacterPack[i]);
+					//															  }
+					//												 }
+					//												 for(var i=0;i<pack.length;i++){
+					//															  if(lib.config.all.sgscharacters.contains(pack[i])){
+					//																					pack.splice(i--,1);
+					//															  }
+					//												 }
 					// 			game.saveConfig('hiddenCharacterPack',pack);
 					//
-					//             var pack=lib.config.all.mode.slice(0);
-					//             if(Array.isArray(lib.config.hiddenModePack)){
-					//                 for(var i=0;i<lib.config.hiddenModePack.length;i++){
-					//                     pack.add(lib.config.hiddenModePack[i]);
-					//                 }
-					//             }
-					//             for(var i=0;i<pack.length;i++){
-					//                 if(lib.config.all.sgsmodes.contains(pack[i])){
-					//                     pack.splice(i--,1);
-					//                 }
-					//             }
+					//												 var pack=lib.config.all.mode.slice(0);
+					//												 if(Array.isArray(lib.config.hiddenModePack)){
+					//															  for(var i=0;i<lib.config.hiddenModePack.length;i++){
+					//																					pack.add(lib.config.hiddenModePack[i]);
+					//															  }
+					//												 }
+					//												 for(var i=0;i<pack.length;i++){
+					//															  if(lib.config.all.sgsmodes.contains(pack[i])){
+					//																					pack.splice(i--,1);
+					//															  }
+					//												 }
 					// 			game.saveConfig('hiddenModePack',pack);
 					//
 					// 			var that=this;
@@ -9885,14 +9885,14 @@
 					var info=get.info(card);
 					var range;
 					if(!info.notarget){
-  				var select=get.copy(info.selectTarget);
-  				if(select==undefined){
-  					range=[1,1];
-  				}
-  				else if(typeof select=='number') range=[select,select];
-  				else if(get.itemtype(select)=='select') range=select;
-  				else if(typeof select=='function') range=select(card,player);
-  				game.checkMod(card,player,range,'selectTarget',player);
+						var select=get.copy(info.selectTarget);
+						if(select==undefined){
+							range=[1,1];
+						}
+						else if(typeof select=='number') range=[select,select];
+						else if(get.itemtype(select)=='select') range=select;
+						else if(typeof select=='function') range=select(card,player);
+						game.checkMod(card,player,range,'selectTarget',player);
  				}
 					if(info.notarget||range[1]==-1){
 						if(!info.notarget&&range[1]==-1){
@@ -10142,7 +10142,8 @@
 				cardsGotoOrdering:function(){
 					game.getGlobalHistory().cardMove.push(event);
 					for(var i=0;i<cards.length;i++){
-						cards[i].goto(ui.ordering);
+						cards[i].fix();
+						ui.ordering.appendChild(cards[i]);
 					}
 				 var evt=event.relatedEvent||event.getParent();
 					if(!evt.orderingCards) evt.orderingCards=[];
@@ -10337,9 +10338,9 @@
 					}
 					player.ai.tempIgnore=[];
 					_status.globalHistory.push({
-   			cardMove:[],
-   			custom:[],
-   		});
+ 					cardMove:[],
+ 					custom:[],
+ 				});
 					game.countPlayer2(function(current){
 						current.actionHistory.push({useCard:[],respond:[],skipped:[],lose:[],gain:[],sourceDamage:[],damage:[],custom:[]});
 						current.stat.push({card:{},skill:{}});
@@ -14262,7 +14263,7 @@
 					// 	game.playAudio('effect','draw');
 					// }
 					// game.broadcast(function(){
-					//     if(lib.config.background_audio){
+					//			  if(lib.config.background_audio){
 					// 		game.playAudio('effect','draw');
 					// 	}
 					// });
@@ -15080,12 +15081,12 @@
 					// player.removeEquipTrigger();
 					
 					// for(var i in lib.skill.globalmap){
-					//     if(lib.skill.globalmap[i].contains(player)){
-					//         lib.skill.globalmap[i].remove(player);
-					//         if(lib.skill.globalmap[i].length==0&&!lib.skill[i].globalFixed){
-					//             game.removeGlobalSkill(i);
-					//         }
-					//     }
+					//			  if(lib.skill.globalmap[i].contains(player)){
+					//									lib.skill.globalmap[i].remove(player);
+					//									if(lib.skill.globalmap[i].length==0&&!lib.skill[i].globalFixed){
+					//												 game.removeGlobalSkill(i);
+					//									}
+					//			  }
 					// }
 
 					game.broadcastAll(function(player){
@@ -15592,76 +15593,76 @@
 					var from=this;
 					if(from==to||from.hasSkill('undist')||to.hasSkill('undist')) return false;
 					if(!game.players.contains(from)&&!game.dead.contains(from)) return false;
-  			if(!game.players.contains(to)&&!game.dead.contains(to)) return false;
-  			var mod1=game.checkMod(from,to,'unchanged','inRange',from);
-  			if(mod1!='unchanged') return mod1;
-  			var mod2=game.checkMod(from,to,'unchanged','inRangeOf',to);
-  			if(mod2!='unchanged') return mod2;
-  			if(from.getAttackRange()<1) return false;
-  			var player=from,m,n=1,i;
-  			var fxy,txy;
-  			if(game.chess){
-  				fxy=from.getXY();
-  				txy=to.getXY();
-  				n=Math.abs(fxy[0]-txy[0])+Math.abs(fxy[1]-txy[1]);
-  			}
-  			else if(to.isMin(true)||from.isMin(true)){}
-  			else{
-  				var length=game.players.length;
-  				var totalPopulation=game.players.length+game.dead.length+1;
-  				for(var iwhile=0;iwhile<totalPopulation;iwhile++){
-  					if(player.nextSeat!=to){
-  						player=player.nextSeat;
-  						if(player.isAlive()&&!player.isOut()&&!player.hasSkill('undist')&&!player.isMin(true)) n++;
-  					}
-  					else{
-  						break;
-  					}
-  				}
-  				for(i=0;i<game.players.length;i++){
-  					if(game.players[i].isOut()||game.players[i].hasSkill('undist')||game.players[i].isMin(true)) length--;
-  				}
-  				if(from.isDead()) length++;
-  				if(to.isDead()) length++;
-  				var left=from.hasSkillTag('left_hand');
-  				var right=from.hasSkillTag('right_hand');
-  				if(left===right) n=Math.min(n,length-n);
-  				else if(left==true) n=length-n;
-  			}
+					if(!game.players.contains(to)&&!game.dead.contains(to)) return false;
+					var mod1=game.checkMod(from,to,'unchanged','inRange',from);
+					if(mod1!='unchanged') return mod1;
+					var mod2=game.checkMod(from,to,'unchanged','inRangeOf',to);
+					if(mod2!='unchanged') return mod2;
+					if(from.getAttackRange()<1) return false;
+					var player=from,m,n=1,i;
+					var fxy,txy;
+					if(game.chess){
+						fxy=from.getXY();
+						txy=to.getXY();
+						n=Math.abs(fxy[0]-txy[0])+Math.abs(fxy[1]-txy[1]);
+					}
+					else if(to.isMin(true)||from.isMin(true)){}
+					else{
+						var length=game.players.length;
+						var totalPopulation=game.players.length+game.dead.length+1;
+						for(var iwhile=0;iwhile<totalPopulation;iwhile++){
+							if(player.nextSeat!=to){
+								player=player.nextSeat;
+								if(player.isAlive()&&!player.isOut()&&!player.hasSkill('undist')&&!player.isMin(true)) n++;
+							}
+							else{
+								break;
+							}
+						}
+						for(i=0;i<game.players.length;i++){
+							if(game.players[i].isOut()||game.players[i].hasSkill('undist')||game.players[i].isMin(true)) length--;
+						}
+						if(from.isDead()) length++;
+						if(to.isDead()) length++;
+						var left=from.hasSkillTag('left_hand');
+						var right=from.hasSkillTag('right_hand');
+						if(left===right) n=Math.min(n,length-n);
+						else if(left==true) n=length-n;
+					}
   
-  			n=game.checkMod(from,to,n,'globalFrom',from);
-  			n=game.checkMod(from,to,n,'globalTo',to);
-  			m=n;
-  			m=game.checkMod(from,to,m,'attackFrom',from);
-  			m=game.checkMod(from,to,m,'attackTo',to);
-  			var equips1=from.getCards('e',function(card){
-  				return !ui.selected.cards||!ui.selected.cards.contains(card);
-  			}),equips2=to.getCards('e',function(card){
-  				return !ui.selected.cards||!ui.selected.cards.contains(card);
-  			});
-  			for(i=0;i<equips1.length;i++){
-  				var info=get.info(equips1[i]).distance;
-  				if(!info) continue;
-  				if(info.globalFrom){
-  					m+=info.globalFrom;
-  					n+=info.globalFrom;
-  				}
-  				if(info.attackFrom){
-  					m+=info.attackFrom;
-  				}
-  			}
-  			for(i=0;i<equips2.length;i++){
-  				var info=get.info(equips2[i]).distance;
-  				if(!info) continue;
-  				if(info.globalTo){
-  					m+=info.globalTo;
-  					n+=info.globalTo;
-  				}
-  				if(info.attaclTo){
-  					m+=info.attaclTo;
-  				}
-  			}
-  			return m<=1;
+					n=game.checkMod(from,to,n,'globalFrom',from);
+					n=game.checkMod(from,to,n,'globalTo',to);
+					m=n;
+					m=game.checkMod(from,to,m,'attackFrom',from);
+					m=game.checkMod(from,to,m,'attackTo',to);
+					var equips1=from.getCards('e',function(card){
+						return !ui.selected.cards||!ui.selected.cards.contains(card);
+					}),equips2=to.getCards('e',function(card){
+						return !ui.selected.cards||!ui.selected.cards.contains(card);
+					});
+					for(i=0;i<equips1.length;i++){
+						var info=get.info(equips1[i]).distance;
+						if(!info) continue;
+						if(info.globalFrom){
+							m+=info.globalFrom;
+							n+=info.globalFrom;
+						}
+						if(info.attackFrom){
+							m+=info.attackFrom;
+						}
+					}
+					for(i=0;i<equips2.length;i++){
+						var info=get.info(equips2[i]).distance;
+						if(!info) continue;
+						if(info.globalTo){
+							m+=info.globalTo;
+							n+=info.globalTo;
+						}
+						if(info.attaclTo){
+							m+=info.attaclTo;
+						}
+					}
+					return m<=1;
 				},
 				inRangeOf:function(source){
 					return source.inRange(this);
@@ -15696,22 +15697,22 @@
 					return next;
 				},
 				chooseToEnable:function(){
-        var next=game.createEvent('chooseToEnable');
-        next.player=this;
-        next.setContent('chooseToEnable');
-        return next;
-    },
-    chooseToDisable:function(horse){
-        var next=game.createEvent('chooseToDisable');
-        next.player=this;
-        if(horse) next.horse=true;
-        next.setContent('chooseToDisable');
-        return next;
-    },
-    countDisabled:function(){
-        if(!this.storage.disableEquip) return 0;
-        return this.storage.disableEquip.length;
-    },
+						  var next=game.createEvent('chooseToEnable');
+						  next.player=this;
+						  next.setContent('chooseToEnable');
+						  return next;
+			 },
+			 chooseToDisable:function(horse){
+						  var next=game.createEvent('chooseToDisable');
+						  next.player=this;
+						  if(horse) next.horse=true;
+						  next.setContent('chooseToDisable');
+						  return next;
+			 },
+			 countDisabled:function(){
+						  if(!this.storage.disableEquip) return 0;
+						  return this.storage.disableEquip.length;
+			 },
 				isPhaseUsing:function(notmeisok){
 					if(!notmeisok&&_status.currentPhase!=this) return false;
 					return _status.event.name=='phaseUse'||_status.event.getParent('phaseUse').name=='phaseUse';
@@ -19207,6 +19208,7 @@
 					}
 					if(next.judge==undefined) next.judge=function(){return 0};
 					if(next.position==undefined) next.position=ui.discardPile;
+					if(next.card) next.cardname=next.card.viewAs||next.card.name;
 
 					var str='';
 					if(next.card) str=get.translation(next.card.viewAs||next.card.name);
@@ -20534,14 +20536,14 @@
  						list.push(all[j]);
  					}
  					else{
-  					if(!filter) list.addArray(all[j][key]);
-  					else{
-  						var history=all[j][key].slice(0);
+							if(!filter) list.addArray(all[j][key]);
+							else{
+								var history=all[j][key].slice(0);
 								if(last) history=history.slice(0,history.indexOf(last)+1);
-  						for(var i=0;i<history.length;i++){
-  							if(filter(history[i])) list.push(history[i]);
-  						}
-  					}
+								for(var i=0;i<history.length;i++){
+									if(filter(history[i])) list.push(history[i]);
+								}
+							}
  					}
 					}
 					return list;
@@ -23603,12 +23605,12 @@
  							if(filter(info.trigger[i])){bool=true;break}
  						}
  						if(!bool) return;
-  					var priority=0;
+							var priority=0;
  						if(info.priority){
  							priority=info.priority*100;
  						}
  						if(info.silent){
-  						priority++;
+								priority++;
  						}
  						if(info.equipSkill) priority-=25;
  						if(info.cardSkill) priority-=50;
@@ -25648,9 +25650,9 @@
 				},
 				exec:function(func){
 					// if(typeof func=='function'){
-					//     var args=Array.from(arguments);
-					//     args.shift();
-					//     func.apply(this,args);
+					//			  var args=Array.from(arguments);
+					//			  args.shift();
+					//			  func.apply(this,args);
 					// }
 				},
 				log:function(){
@@ -27322,13 +27324,53 @@
 				game.importedPack=obj;
 			}
 		},
+		createDir:function(dir,success,error){
+			var nullFC=function(){};
+			success=success||nullFC;
+			error=error||nullFC;
+			dir=dir.split("/");
+				if(window.resolveLocalFileSystemURL){
+				window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
+ 				(function redo(entry){
+ 					var i=dir.shift();
+ 					entry.getDirectory(i,{create:true},function(dirEntry){
+ 			 	if(dir.length) redo(dirEntry);
+ 			 	else success();
+ 			 	});
+					})(entry);
+				},error);
+				}
+				else{
+ 				var fs=require("fs");
+ 				var str=__dirname;
+ 				(function redo(){
+						str+="/";
+						str+=dir.shift();
+						fs.exists(str,function(exists){
+						if(exists){
+							//已存在此目录
+							if(dir.length) redo();
+							else success();
+						}
+						else{
+							fs.mkdir(str, function(){
+							if(dir.length) redo();
+							else success();
+							});
+						}
+ 				});
+				})();
+			}
+		},
 		importExtension:function(data,finishLoad,exportext,pkg){
+			//by 来瓶可乐加冰
 			if(!window.JSZip){
 				lib.init.js(lib.assetURL+'game','jszip',function(){
 					game.importExtension(data,finishLoad,exportext,pkg);
 				});
 			}
 			else if(get.objtype(data)=='object'){
+			//导出
 				var zip=new JSZip();
 				var filelist=[];
 				var filelist2=[];
@@ -27421,17 +27463,23 @@
 				}
 			}
 			else{
+ 			//导入
+ 			function UHP(){
+ 				alert("导入失败");
+ 			};
 				var zip=new JSZip();
 				try{
 					zip.load(data);
+					// alert(zip.file('文件夹/加扩展.js').asText())
 					var str=zip.file('extension.js').asText();
+					if(str===""||undefined) throw('你导入的不是扩展！请选择正确的文件');
 					_status.importingExtension=true;
 					eval(str);
 					_status.importingExtension=false;
 					if(!game.importedPack) throw('err');
 					var extname=game.importedPack.name;
-					if(lib.config.all.plays.contains('extname')){
-						throw('err');
+					if(lib.config.all.plays.contains(extname)){
+						throw('禁止安装游戏原生扩展');
 					}
 					if(lib.config.extensions.contains(extname)){
 						game.removeExtension(extname,true);
@@ -27447,16 +27495,36 @@
 					if(game.download){
 						var filelist=[];
 						for(var i in zip.files){
-							if(i[0]!='.'&&i[0]!='_'){
+						//alert(zip.files[i].dir+i)
+							if(!zip.files[i].dir&&i[0]!='.'&&i[0]!='_'){
 								filelist.push(i);
 							}
 						}
+						//alert(filelist)
 						if(lib.node&&lib.node.fs){
+							//电脑端
+							//具备nodeJS环境
 							game.ensureDirectory('extension/'+extname,function(){
-								var writeFile=function(){
+								var writeFile=function(e){
+ 								if(e){
+										finishLoad();
+										UHP();
+										return;
+									}
 									if(filelist.length){
 										var filename=filelist.shift();
-										lib.node.fs.writeFile(__dirname+'/extension/'+extname+'/'+filename,zip.files[filename].asNodeBuffer(),null,writeFile);
+										//filename 数组 ...dir+/+file
+										var zipdir=filename;
+										filename=filename.split("/");
+										var name=filename.pop();
+										if(filename.length) game.createDir('extension/'+extname+"/"+filename.join("/"),function(){
+											//这里需要个创文件夹的函数
+											Letgo(filename.join("/")+"/"+name);
+										},UHP);
+ 									else Letgo(name);
+ 									function Letgo(name){
+ 										lib.node.fs.writeFile(__dirname+'/extension/'+extname+"/"+name,zip.file(zipdir).asNodeBuffer(),null,writeFile);
+ 									}
 									}
 									else{
 										finishLoad();
@@ -27465,24 +27533,36 @@
 								writeFile();
 							});
 						}
-						else{
+						else{						
 							window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
 								entry.getDirectory('extension/'+extname,{create:true},function(dirEntry){
-									var writeFile=function(){
-										if(filelist.length){
-											var filename=filelist.shift();
-											dirEntry.getFile(filename,{create:true},function(fileEntry){
+ 								//扩展文件夹
+ 								writeFile();
+ 								function writeFile(){
+ 									if(filelist.length){
+ 									var filename=filelist.shift();
+ 									//filename 数组 ...dir+/+file
+ 									var zipdir=filename;
+ 									filename=filename.split("/");
+ 									var name=filename.pop();
+ 									if(filename.length) game.createDir('extension/'+extname+"/"+filename.join("/"),function(){
+ 										Letgo(filename.join("/")+"/"+name);
+ 									},UHP);
+ 									else Letgo(name);
+ 									function Letgo(name){
+										dirEntry.getFile(name,{create:true},function(fileEntry){
 												fileEntry.createWriter(function(fileWriter){
-													fileWriter.onwriteend=writeFile;
-													fileWriter.write(zip.files[filename].asArrayBuffer());
+													fileWriter.onwriteend=writeFile;													
+													fileWriter.write(zip.file(zipdir).asArrayBuffer());
 												});
-											});
+											},UHP);
+											}										
 										}
 										else{
 											finishLoad();
 										}
-									};
-									writeFile();
+									};									
+									
 								});
 							});
 						}
@@ -27528,7 +27608,7 @@
 					alert('导入失败');
 					return false;
 				}
-			}
+			};
 		},
 		export:function(textToWrite,name){
 			var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
@@ -31607,8 +31687,8 @@
 
 				// var pilecfg=lib.config.customcardpile[get.config('cardpilename')];
 				// if(pilecfg){
-				//     lib.config.bannedpile=pilecfg[0]||{};
-				//     lib.config.addedpile=pilecfg[1]||{};
+				//			  lib.config.bannedpile=pilecfg[0]||{};
+				//			  lib.config.addedpile=pilecfg[1]||{};
 				// }
 
 				_status.event={
@@ -35178,15 +35258,15 @@
 							var expanded=false;
 							if(hiddenNodes.length){
 								// ui.create.div('.config.more','更多 <div>&gt;</div>',page,function(){
-								//     if(expanded){
-								//         this.classList.remove('on');
-								//         this.parentNode.classList.remove('expanded');
-								//     }
-								//     else{
-								//         this.classList.add('on');
-								//         this.parentNode.classList.add('expanded');
-								//     }
-								//     expanded=!expanded;
+								//			  if(expanded){
+								//									this.classList.remove('on');
+								//									this.parentNode.classList.remove('expanded');
+								//			  }
+								//			  else{
+								//									this.classList.add('on');
+								//									this.parentNode.classList.add('expanded');
+								//			  }
+								//			  expanded=!expanded;
 								// });
 								page.classList.add('morenodes');
 								for(var k=0;k<hiddenNodes.length;k++){
@@ -37980,7 +38060,7 @@
 								editnode.classList.add('disabled');
 								delnode.innerHTML='取消';
 								delete delnode.button;
-								container.code='card={\n    \n}\n\n\/*\n示例：\ncard={\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+								container.code='card={\n			 \n}\n\n\/*\n示例：\ncard={\n			 type:"basic",\n			 enable:true,\n			 filterTarget:true,\n			 content:function(){\n						  target.draw()\n			 },\n			 ai:{\n						  order:1,\n						  result:{\n												target:1\n						  }\n			 }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 							}
 
 							newCard=ui.create.div('.new_character',page);
@@ -38194,7 +38274,7 @@
 							};
 							var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
 							var editor=ui.create.div(editorpage);
-							container.code='card={\n    \n}\n\n\/*\n示例：\ncard={\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+							container.code='card={\n			 \n}\n\n\/*\n示例：\ncard={\n			 type:"basic",\n			 enable:true,\n			 filterTarget:true,\n			 content:function(){\n						  target.draw()\n			 },\n			 ai:{\n						  order:1,\n						  result:{\n												target:1\n						  }\n			 }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 
 							var editnode=ui.create.div('.menubutton.large.new_card.disabled','创建卡牌',newCard,function(){
 								var name=page.querySelector('input.new_name').value;
@@ -38545,7 +38625,7 @@
 								editnode.classList.add('disabled');
 								delnode.innerHTML='取消';
 								delete delnode.button;
-								container.code='skill={\n    \n}\n\n\/*\n示例：\nskill={\n    trigger:{player:"phaseJieshuBegin"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+								container.code='skill={\n			 \n}\n\n\/*\n示例：\nskill={\n			 trigger:{player:"phaseJieshuBegin"},\n			 frequent:true,\n			 content:function(){\n						  player.draw()\n			 }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 								if(page.fromchar=='add'){
 									page.fromchar=true;
 								}
@@ -38646,7 +38726,7 @@
 							};
 							var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
 							var editor=ui.create.div(editorpage);
-							container.code='skill={\n    \n}\n\n\/*\n示例：\nskill={\n    trigger:{player:"phaseJieshuBegin"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+							container.code='skill={\n			 \n}\n\n\/*\n示例：\nskill={\n			 trigger:{player:"phaseJieshuBegin"},\n			 frequent:true,\n			 content:function(){\n						  player.draw()\n			 }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 
 							var citebutton=document.createElement('button');
 							citebutton.innerHTML='引用代码';
@@ -38874,10 +38954,10 @@
 									}
 								}
 								else{
-									dashes.content.node.code='function(config,pack){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之后、界面加载之前\n参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可在此函数中修改）\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
-									dashes.precontent.node.code='function(){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之前，且不受禁用扩展的限制\n除添加模式外请慎用\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
-									dashes.config.node.code='config={\n    \n}\n\n\/*\n示例：\nconfig={\n    switcher_example:{\n        name:"示例列表选项",\n        init:"3",\n        item:{"1":"一","2":"二","3":"三"}\n    },\n    toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
-									dashes.help.node.code='help={\n    \n}\n\n\/*\n示例：\nhelp={\n    "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+									dashes.content.node.code='function(config,pack){\n			 \n}\n\n\/*\n函数执行时机为游戏数据加载之后、界面加载之前\n参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可在此函数中修改）\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+									dashes.precontent.node.code='function(){\n			 \n}\n\n\/*\n函数执行时机为游戏数据加载之前，且不受禁用扩展的限制\n除添加模式外请慎用\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+									dashes.config.node.code='config={\n			 \n}\n\n\/*\n示例：\nconfig={\n			 switcher_example:{\n						  name:"示例列表选项",\n						  init:"3",\n						  item:{"1":"一","2":"二","3":"三"}\n			 },\n			 toggle_example:{\n						  name:"示例开关选项",\n						  init:true\n			 }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+									dashes.help.node.code='help={\n			 \n}\n\n\/*\n示例：\nhelp={\n			 "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 								}
 							};
 							var dashes={};
@@ -38999,10 +39079,10 @@
 								}
 							};
 							page.content={}
-							createCode('主','主代码',page,clickCode,'content','function(config,pack){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之后、界面加载之前\n参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可在此函数中修改）\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
-							createCode('启','启动代码',page,clickCode,'precontent','function(){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之前，且不受禁用扩展的限制\n除添加模式外请慎用\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
-							createCode('选','选项代码',page,clickCode,'config','config={\n    \n}\n\n\/*\n示例：\nconfig={\n    switcher_example:{\n        name:"示例列表选项",\n        init:"3",\n        item:{"1":"一","2":"二","3":"三"}\n    },\n    toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
-							createCode('帮','帮助代码',page,clickCode,'help','help={\n    \n}\n\n\/*\n示例：\nhelp={\n    "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
+							createCode('主','主代码',page,clickCode,'content','function(config,pack){\n			 \n}\n\n\/*\n函数执行时机为游戏数据加载之后、界面加载之前\n参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可在此函数中修改）\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
+							createCode('启','启动代码',page,clickCode,'precontent','function(){\n			 \n}\n\n\/*\n函数执行时机为游戏数据加载之前，且不受禁用扩展的限制\n除添加模式外请慎用\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
+							createCode('选','选项代码',page,clickCode,'config','config={\n			 \n}\n\n\/*\n示例：\nconfig={\n			 switcher_example:{\n						  name:"示例列表选项",\n						  init:"3",\n						  item:{"1":"一","2":"二","3":"三"}\n			 },\n			 toggle_example:{\n						  name:"示例开关选项",\n						  init:true\n			 }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
+							createCode('帮','帮助代码',page,clickCode,'help','help={\n			 \n}\n\n\/*\n示例：\nhelp={\n			 "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
 
 							return page;
 						}());
@@ -39826,7 +39906,7 @@
 							game.checkForUpdate(null,true);
 						};
 						// if(lib.config.dev){
-						//     li1.lastChild.appendChild(button3);
+						//			  li1.lastChild.appendChild(button3);
 						// }
 
 						(function(){
@@ -41005,14 +41085,14 @@
 			},
 			characterDialog:function(){
 				// if(lib.config.character_dialog_style=='newstyle'){
-				//     for(var i=0;i<arguments.length;i++){
-				//         if(arguments[i]=='thisiscard'){
-				//             break;
-				//         }
-				//     }
-				//     if(i==arguments.length){
-				//         return ui.create.characterDialog2.apply(this,arguments);
-				//     }
+				//			  for(var i=0;i<arguments.length;i++){
+				//									if(arguments[i]=='thisiscard'){
+				//												 break;
+				//									}
+				//			  }
+				//			  if(i==arguments.length){
+				//									return ui.create.characterDialog2.apply(this,arguments);
+				//			  }
 				// }
 				var filter,str,noclick,thisiscard,seperate,expandall,onlypack,heightset,precharacter;
 				for(var i=0;i<arguments.length;i++){
@@ -42013,10 +42093,10 @@
 					// 	ui.arena.classList.remove('player_autolong');
 					// }
 					// if(game.layout=='long'&&parseInt(num)<parseInt(lib.config.fewplayer)){
-					//     this.classList.add('fewplayer');
+					//			  this.classList.add('fewplayer');
 					// }
 					// else{
-					//     this.classList.remove('fewplayer');
+					//			  this.classList.remove('fewplayer');
 					// }
 				}
 
@@ -46309,10 +46389,10 @@
 					}
 					if(lib.config.background_speak&&e!=='init'){
 						var audioname=this.link;
-  				if(info.audioname2&&info.audioname2[playername]){
-  					audioname=info.audioname2[playername];
-  					info=lib.skill[audioname];
-  				}
+						if(info.audioname2&&info.audioname2[playername]){
+							audioname=info.audioname2[playername];
+							info=lib.skill[audioname];
+						}
 						var audioinfo=info.audio;
 						var that=this;
 						var getIndex=function(i){
@@ -47868,16 +47948,16 @@
 			var indent='';
 			var str;
 			for(var i=0;i<level;i++){
-				indent+='    ';
+				indent+='			 ';
 			}
 			if(get.objtype(obj)=='object'){
 				str='{\n';
 				for(var i in obj){
 					if(/[^a-zA-Z]/.test(i)){
-						str+=indent+'    "'+i+'":'+get.stringify(obj[i],level+1)+',\n';
+						str+=indent+'			 "'+i+'":'+get.stringify(obj[i],level+1)+',\n';
 					}
 					else{
-						str+=indent+'    '+i+':'+get.stringify(obj[i],level+1)+',\n';
+						str+=indent+'			 '+i+':'+get.stringify(obj[i],level+1)+',\n';
 					}
 				}
 				str+=indent+'}';
@@ -47886,7 +47966,7 @@
 			else{
 				if(typeof obj=='function'){
 					str=obj.toString();
-					str=str.replace(/\t/g,'    ');
+					str=str.replace(/\t/g,'			 ');
 					var i=str.lastIndexOf('\n');
 					var num=0;
 					for(var j=i+1;j<str.length&&str[j]==' ';j++){
@@ -47894,7 +47974,7 @@
 					}
 					num=Math.floor(num/4);
 					for(i=0;i<num-level;i++){
-						str=str.replace(/\n    /g,'\n');
+						str=str.replace(/\n			 /g,'\n');
 					}
 				}
 				else{
@@ -48810,7 +48890,9 @@
 		},
 		number:function(card,player){
 			//啥时候狗卡出相关技能我再完善
-			return card.number;
+			if(typeof card.number=='number') return card.number;
+			else if(card.cards&&card.cards.length==1) return get.number(card.cards[0]);
+			return null;
 		},
 		nature:function(card,player){
 			if(get.itemtype(player)=='player'||player!==false){
@@ -49845,23 +49927,23 @@
 					}
 				}
 				// if(get.is.phoneLayout()){
-				//     var storage=node.storage;
-				//     for(i in storage){
-				//         if(get.info(i)&&get.info(i).intro){
-				//             intro=get.info(i).intro;
-				//             if(node.getSkills().concat(lib.skill.global).contains(i)==false&&!intro.show) continue;
-				//             var name=intro.name?intro.name:get.translation(i);
-				//             if(typeof name=='function'){
-				//                 name=name(storage[i],node);
-				//             }
-				//             translation='<div><div class="skill">『'+name.slice(0,2)+'』</div><div>';
-				//             var stint=get.storageintro(intro.content,storage[i],node,null,i);
-				//             if(stint){
-				//                 translation+=stint+'</div></div>';
-				//                 uiintro.add(translation);
-				//             }
-				//         }
-				//     }
+				//			  var storage=node.storage;
+				//			  for(i in storage){
+				//									if(get.info(i)&&get.info(i).intro){
+				//												 intro=get.info(i).intro;
+				//												 if(node.getSkills().concat(lib.skill.global).contains(i)==false&&!intro.show) continue;
+				//												 var name=intro.name?intro.name:get.translation(i);
+				//												 if(typeof name=='function'){
+				//															  name=name(storage[i],node);
+				//												 }
+				//												 translation='<div><div class="skill">『'+name.slice(0,2)+'』</div><div>';
+				//												 var stint=get.storageintro(intro.content,storage[i],node,null,i);
+				//												 if(stint){
+				//															  translation+=stint+'</div></div>';
+				//															  uiintro.add(translation);
+				//												 }
+				//									}
+				//			  }
 				// }
 
 				if(lib.config.right_range&&_status.gameStarted){
@@ -51024,21 +51106,21 @@
 					else temp3=undefined;
 					if(temp2&&typeof temp2.effect=='function'){
 						if(!player.hasSkillTag('ignoreSkill',true,{
-  					card:card,
-  					target:target,
-  					skill:skills2[i],
-  					isLink:isLink,
-  				})) temp2=temp2.effect(card,player,target,result2,isLink);
-  				else temp2=undefined;
+							card:card,
+							target:target,
+							skill:skills2[i],
+							isLink:isLink,
+						})) temp2=temp2.effect(card,player,target,result2,isLink);
+						else temp2=undefined;
 					}
 					else if(temp2&&typeof temp2.effect=='object'&&typeof temp2.effect.target=='function'){
 						if(!player.hasSkillTag('ignoreSkill',true,{
-  					card:card,
-  					target:target,
-  					skill:skills2[i],
-  					isLink:isLink,
-  				})) temp2=temp2.effect.target(card,player,target,result2,isLink);
-  				else temp2=undefined;
+							card:card,
+							target:target,
+							skill:skills2[i],
+							isLink:isLink,
+						})) temp2=temp2.effect.target(card,player,target,result2,isLink);
+						else temp2=undefined;
 					}
 					else temp2=undefined;
 					if(typeof temp2=='object'){
@@ -51186,21 +51268,21 @@
 					else temp3=undefined;
 					if(temp2&&typeof temp2.effect=='function'){
 						if(!player.hasSkillTag('ignoreSkill',true,{
-  					card:card,
-  					target:target,
-  					skill:skills2[i],
-  					isLink:isLink,
-  				})) temp2=temp2.effect(card,player,target,result2,isLink);
-  				else temp2=undefined;
+							card:card,
+							target:target,
+							skill:skills2[i],
+							isLink:isLink,
+						})) temp2=temp2.effect(card,player,target,result2,isLink);
+						else temp2=undefined;
 					}
 					else if(temp2&&typeof temp2.effect=='object'&&typeof temp2.effect.target=='function'){
 						if(!player.hasSkillTag('ignoreSkill',true,{
-  					card:card,
-  					target:target,
-  					skill:skills2[i],
-  					isLink:isLink,
-  				})) temp2=temp2.effect.target(card,player,target,result2,isLink);
-  				else temp2=undefined;
+							card:card,
+							target:target,
+							skill:skills2[i],
+							isLink:isLink,
+						})) temp2=temp2.effect.target(card,player,target,result2,isLink);
+						else temp2=undefined;
 					}
 					else temp2=undefined;
 					if(typeof temp2=='object'){

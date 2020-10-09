@@ -2797,7 +2797,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:'source',
 				content:function(){
-					trigger.source.damage().nature=lib.linked.randomGet();
+					trigger.source.damage().nature=['fire','thunder'].randomGet();
 				},
 			},
 			boss_pingdeng:{

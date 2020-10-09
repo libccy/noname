@@ -2411,7 +2411,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					judge:function(player,result){
-						if(_status.event.card&&_status.event.card.name=='lebu'&&player.countMark('sishu2')%2==1){
+						if(_status.event.cardname=='lebu'&&player.countMark('sishu2')%2==1){
 							if(result.bool==false){
 								result.bool=true;
 							}
@@ -4256,11 +4256,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"new_repaoxiao":{
 				audio:"paoxiao",
-				inherit:"paoxiao",
+				firstDo:true,
+				audioname2:{old_guanzhang:'old_fuhun'},
+				audioname:['re_zhangfei','guanzhang','xiahouba'],
+				trigger:{player:'useCard1'},
+				forced:true,
+				filter:function(event,player){
+					return (!event.audioed||!player.hasSkill('new_repaoxiao2'))&&event.card.name=='sha';
+				},
+				content:function(){
+					trigger.audioed=true;
+					player.addTempSkill('new_repaoxiao2');
+				},
 				mod:{
-					targetInRange:function (card,player){
-						if(card.name=='sha'&&get.cardCount({name:'sha'},player)>0) return true;
-					},
 					cardUsable:function (card,player,num){
 						if(card.name=='sha') return Infinity;
 					},
@@ -4271,6 +4279,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!get.zhu(player,'shouyue')) return false;
 						if(arg&&arg.name=='sha') return true;
 						return false;
+					},
+				},
+			},
+			new_repaoxiao2:{
+				charlotte:true,
+				mod:{
+					targetInRange:function (card,player){
+						if(card.name=='sha') return true;
 					},
 				},
 			},
@@ -6991,9 +7007,41 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				prompt:'将一张黑桃手牌当酒使用',
-				check:function(card){
+				check:function(cardx){
 					if(_status.event.type=='dying') return 1;
-					return 4-get.value(card);
+					var player=_status.event.player;
+					var shas=player.getCards('h','sha');
+					if(shas.length>1&&(player.getCardUsable('sha')>1||player.countCards('h','zhuge'))){
+						return 0;
+					}
+					shas.sort(function(a,b){
+						return get.order(b)-get.order(a);
+					});
+					var card;
+					if(shas.length){
+						for(var i=0;i<shas.length;i++){
+							if(shas[i]!=cardx&&lib.filter.filterCard(shas[i],player)){
+								card=shas[i];break;
+							}
+						}
+					}
+					if(card){
+						if(game.hasPlayer(function(current){
+							return (get.attitude(player,current)<0&&
+							!current.hasShan()
+							&&current.hp+current.countCards('h',{name:['tao','jiu']})>1+(player.storage.jiu||0)
+							&&player.canUse(card,current,true,true)&&
+							!current.hasSkillTag('filterDamage',null,{
+								player:player,
+								card:card,
+								jiu:true,
+							})&&
+							get.effect(current,card,player)>0);
+						})){
+							return 4-get.value(cardx);
+						}
+					}
+					return 0;
 				},
 				ai:{
 					skillTagFilter:function(player){
