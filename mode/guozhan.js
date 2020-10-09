@@ -211,6 +211,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				vanish:true,
 				derivation:'guozhan',
 			},
+			zhulian_card:{
+				cardimage:'wuzhong',
+			},
 		},
 		aozhanRank:{
 			'8':[],
@@ -1167,7 +1170,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						if(get.attitude(player,trigger.source)>=0) check=false;
 					}
-					player.chooseCard(get.prompt('gzfudi'),'交给其一张手牌，然后对其势力中体力值最大且不小于你的一名角色造成1点伤害').set('aicheck',check).set('ai',function(card){
+					player.chooseCard(get.prompt('gzfudi',trigger.source),'交给其一张手牌，然后对其势力中体力值最大且不小于你的一名角色造成1点伤害').set('aicheck',check).set('ai',function(card){
 						if(!_status.event.aicheck) return 0;
 						return 9-get.value(card);
 					});
@@ -2225,24 +2228,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				ai:{
 					threaten:0.8,
 					expose:0.1,
-				},
-			},
-			"new_fenji":{
-				audio:"fenji",
-				trigger:{
-					global:"phaseAfter",
-				},
-				filter:function (event,player){
-					if(event.player.countCards('h')==0&&event.player.isAlive()) return true;
-					return false;
-				},
-				check:function (event,player){
-					return get.attitude(player,event.player)>2;
-				},
-				content:function (){
-					player.line(trigger.player,'green');
-					trigger.player.draw(2);
-					player.loseHp();
 				},
 			},
 			"new_luanji":{
@@ -3532,12 +3517,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.countPlayer(function(current){current.addSkill('aozhan')});
 				},
 			},
-			"xianqu_skill":{
+			"_xianqu_skill":{
 				ruleSkill:true,
 				enable:"phaseUse",
-				//filter:function (event,player){
-					//return player.countCards('h')<4;
-				//},
+				filter:function (event,player){
+					return player.hasMark('_xianqu_skill');
+				},
 				usable:1,
 				mark:true,
 				intro:{
@@ -3545,9 +3530,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:function (){
 					"step 0"
+					player.removeMark('_xianqu_skill',1);
+					game.log(player,'移去了','#g先驱','标记');
 					var num=4-player.countCards('h');
 					if(num) player.draw(num);
-					player.chooseTarget('是否观看一名其他角色的一张暗置武将牌？',function(card,player,target){
+					"step 1"
+					if(game.hasPlayer(function(current){
+						return current!=player&&current.isUnseen(2);
+					})) player.chooseTarget('是否观看一名其他角色的一张暗置武将牌？',function(card,player,target){
 						return target!=player&&target.isUnseen(2);
 					}).set('ai',function(target){
 						if(target.isUnseen()){
@@ -3557,7 +3547,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						return -get.attitude(_status.event.player,target);
 					});
-					"step 1"
+					else event.finish();
+					"step 2"
 					if(result.bool){
 						event.target=result.targets[0];
 						player.line(event.target,'green');
@@ -3570,10 +3561,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(controls.length==0) event.finish();
 					}
 					else{
-						player.removeSkill('xianqu_skill');
+						player.removeSkill('_xianqu_skill');
 						event.finish();
 					}
-					"step 2"
+					"step 3"
 					if(result.control){
 						if(result.control=='主将'){
 							player.viewCharacter(event.target,0);
@@ -3588,7 +3579,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						player.viewCharacter(event.target,1);
 					}
-					player.removeSkill('xianqu_skill');
 				},
 				ai:{
 					order:1,
@@ -3602,78 +3592,93 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			"zhulianbihe_skill":{
 				ruleSkill:true,
-				group:["zhulianbihe_skill_draw","zhulianbihe_skill_tao"],
 				mark:true,
 				intro:{
 					content:"◇出牌阶段，你可以弃置此标记 然后摸两张牌。<br>◇你可以将此标记当做【桃】使用。",
 				},
 			},
 			"yinyang_skill":{
-				ruleSkill:true,
-				group:["yinyang_skill_draw","yinyang_skill_add"],
 				mark:true,
 				intro:{
 					content:"◇出牌阶段，你可以弃置此标记，然后摸一张牌。<br>◇弃牌阶段，你可以弃置此标记，然后本回合手牌上限+2。",
 				},
 			},
-			"zhulianbihe_skill_draw":{
+			"_zhulianbihe_skill_draw":{
 				ruleSkill:true,
 				enable:"phaseUse",
-				usable:1,
-				content:function (){
-					player.draw(2);
-					player.removeSkill('zhulianbihe_skill');
+				filter:function(event,player){
+					return player.hasMark('zhulianbihe_skill');
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						return ui.create.dialog('珠联璧合',[[
+							['摸牌','','zhulian_card'],
+							['基本','','tao']
+						],'vcard'],'hidden');
+					},
+					filter:function(button,player){
+						if(button.link[2]!='tao') return true;
+						return lib.filter.filterCard({name:'tao',isCard:true},player,_status.event.getParent());
+					},
+					check:function(button){
+						var player=_status.event.player;
+						if(button.link[2]=='tao') return get.effect_use(player,{name:'tao'},player)>0?2:0;
+						if(player.getHandcardLimit()-player.countCards('h')>1&&!game.hasPlayer(function(current){
+							return current!=player&&current.isFriendOf(player)&&current.hp+current.countCards('h','shan')<=2;
+						})) return 1;
+						return 0;
+					},
+					backup:function(links,player){
+						if(links[0][2]=='tao') return get.copy(lib.skill._zhulianbihe_skill_tao);
+						return {
+							content:function(){
+							 player.draw(2);
+							 player.removeMark('zhulianbihe_skill',1);
+							},
+						};
+					},
 				},
 				ai:{
-					order:function (item,player){
-						var cards=player.getCards('h');
-						if(player.hp>=3){
-							if(cards.length>=3){
-								for(var i=0;i<cards.length;i++){
-									if(get.tag(cards[i],'recover')>=1) return 7.2;
-								}
-								return 1;
-							}
-							else return 7.2;
-						}
-						if(player.hp=2){
-							if(cards.length<2){
-								for(var i=0;i<cards.length;i++){
-									if(get.tag(cards[i],'recover')>=1) return 7.2;
-								}
-								return 1;
-							}
-						}
-						return 1;
+					order:function(item,player){
+						if(get.effect_use(player,{name:'tao'},player)>0) return get.order({name:'tao'},player)-0.1;
+						return 7.2;
 					},
 					result:{
-						player:2,
+						player:1,
 					},
 				},
 			},
-			"zhulianbihe_skill_tao":{
+			"_zhulianbihe_skill_tao":{
 				ruleSkill:true,
 				enable:"chooseToUse",
+				filter:function(event,player){
+					return event.type!='phase'&&player.hasMark('zhulianbihe_skill');
+				},
 				viewAs:{
 					name:"tao",
+					isCard:true,
 				},
-				filterCard:function (){return false},
+				filterCard:function(){return false},
 				selectCard:-1,
-				precontent:function (){
-					player.removeSkill('zhulianbihe_skill');
+				precontent:function(){
+					player.removeMark('zhulianbihe_skill',1);
 				},
 				ai:{
 					save:true,
-					respondTao:true,
+					skillTagFilter:function(player){
+						if(!player.hasMark('zhulianbihe_skill')) return false;
+					},
 				},
 			},
-			"yinyang_skill_draw":{
+			"_yinyang_skill_draw":{
 				ruleSkill:true,
 				enable:"phaseUse",
-				usable:1,
-				content:function (){
+				filter:function(event,player){
+					return player.hasMark('yinyang_skill');
+				},
+				content:function(){
 					player.draw();
-					player.removeSkill('yinyang_skill');
+					player.removeMark('yinyang_skill',1);
 				},
 				ai:{
 					order:function (item,player){
@@ -3690,18 +3695,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			"yinyang_skill_add":{
+			"_yinyang_skill_add":{
 				ruleSkill:true,
 				trigger:{
-					player:"phaseDiscardBefore",
+					player:"phaseDiscardBegin",
 				},
 				filter:function (event,player){
-					return player.needsToDiscard();
+					return player.hasMark('yinyang_skill')&&player.needsToDiscard();
 				},
-				prompt:"是否弃置【阴阳鱼】标记，使本回合的手牌上限+2？",
+				prompt:"是否弃置一枚【阴阳鱼】标记，使本回合的手牌上限+2？",
 				content:function (){
 					player.addTempSkill('yinyang_add','phaseAfter');
-					player.removeSkill('yinyang_skill');
+					player.removeMark('yinyang_skill',1);
 				},
 			},
 			"yinyang_add":{
@@ -7436,20 +7441,24 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			jihun_info:"当你受到伤害后，或与你势力不同的角色脱离濒死状态后，你可以将剩余武将牌堆的一张牌当做“魂”扣置于游戏外。",
 			
 			
-			"xianqu_skill":"先驱",
-			"xianqu_skill_info":"",
+			"_xianqu_skill":"先驱",
+			"_xianqu_skill_info":"",
 			"zhulianbihe_skill":"珠联璧合",
 			"zhulianbihe_skill_info":"",
+			_zhulianbihe_skill_draw_backup:'珠联',
+			zhulian_card:'摸两张牌',
+			zhulian_card_info:'弃置【珠联璧合】标记并摸两张牌',
+			zhulian_card_bg:'摸',
 			"yinyang_skill":"阴阳鱼",
 			"yinyang_skill_info":"",
-			"zhulianbihe_skill_draw":"珠联•摸牌",
-			"zhulianbihe_skill_draw_info":"",
-			"zhulianbihe_skill_tao":"珠联•桃",
-			"zhulianbihe_skill_tao_info":"",
-			"yinyang_skill_draw":"阴阳鱼",
-			"yinyang_skill_draw_info":"",
-			"yinyang_skill_add":"阴阳鱼",
-			"yinyang_skill_add_info":"",
+			"_zhulianbihe_skill_draw":"珠联",
+			"_zhulianbihe_skill_draw_info":"",
+			"_zhulianbihe_skill_tao":"珠联",
+			"_zhulianbihe_skill_tao_info":"",
+			"_yinyang_skill_draw":"阴阳鱼",
+			"_yinyang_skill_draw_info":"",
+			"_yinyang_skill_add":"阴阳鱼",
+			"_yinyang_skill_add_info":"",
 			"yinyang_add":"阴阳鱼",
 			"yinyang_add_info":"",
 			
@@ -7459,8 +7468,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"new_duanliang_info":"出牌阶段，你可以将一张黑色基本牌或黑色装备牌当做【兵粮寸断】使用。你使用【兵粮寸断】没有距离限制。若你对距离超过2的角色发动了〖断粮〗，则本回合不能再发动〖断粮〗。",
 			"new_shushen":"淑慎",
 			"new_shushen_info":"当你回复1点体力后，你可令一名其他角色摸一张牌。",
-			"new_fenji":"奋激",
-			"new_fenji_info":"一名角色的结束阶段开始时，若其没有手牌，你可以令其摸两张牌，然后你失去1点体力。",
 			"new_luanji":"乱击",
 			"new_luanji_info":"你可以将两张与你本回合以此法转化的花色均不相同的手牌当【万箭齐发】使用。当一名与你势力相同的角色因响应此牌而打出【闪】时，该角色摸一张牌。",
 			"new_qingcheng":"倾城",
@@ -7950,8 +7957,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.$removeCharacter(event.num);
 				},
 				doubleDraw:function(){
-					game.log(player,'获得了','#g【阴阳鱼】','标记');
-					player.addSkill('yinyang_skill');
+					if(!player.hasMark('yinyang_skill')) player.addMark('yinyang_skill',1);
 				},
 				changeViceOnline:function(){
 					'step 0'
@@ -8028,8 +8034,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				zhulian:function(){
 					player.popup('珠联璧合');
-					game.log(player,'获得了','#g【珠联璧合】','标记');
-					player.addSkill('zhulianbihe_skill');
+					if(!player.hasMark('zhulianbihe_skill')) player.addMark('zhulianbihe_skill',1);
 				},
 			},
 			player:{
@@ -8430,8 +8435,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								this.draw(2).log=false;
 							}
 							else{
-								this.addSkill('xianqu_skill');
-								game.log(this,'获得了','#g【先驱】','标记');
+								this.addMark('_xianqu_skill',1);
 							}
 							_status.initshown=true;
 						}

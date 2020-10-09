@@ -126,10 +126,10 @@ window.config={
 	right_click:'pause',
 	sort:'type_sort',
 
-	cards:['standard','ex','extra','sp','classic','basic','zhulu'],
+	cards:['standard','ex','extra','sp','classic','basic'],
 	characters:['standard','shenhua','sp','sp2','yijiang','refresh','xinghuoliaoyuan','mobile','extra'],
-	connect_characters:[],
-	connect_cards:[],
+	connect_characters:['diy'],
+	connect_cards:['huanlekapai','guozhan','sp','zhulu'],
 	plays:[],
 	extensions:[],
 	banned:[],

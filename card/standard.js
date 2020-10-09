@@ -1735,11 +1735,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					});
 					next.logSkill='guanshi_skill';
 					next.set('ai',function(card){
-						var evt=_status.event.getParent();
-						if(get.attitude(evt.player,evt._trigger.target)<0){
-							if(evt.player.hasSkill('jiu')||
-							evt.player.hasSkill('tianxianjiu')||
-							evt._trigger.target.hp==1){
+						var evt=_status.event.getTrigger();
+						if(get.attitude(evt.player,evt.target)<0){
+							if(evt.baseDamage+evt.extraDamage>=Math.min(2,evt.target.hp)){
 								return 8-get.value(card)
 							}
 							return 5-get.value(card)

@@ -57,6 +57,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_kaori:['female','key','3/4',['kaori_siyuan']],
 			key_akiko:['female','key',3,['akiko_dongcha']],
 			key_abyusa:['female','key',3,['abyusa_jueqing','abyusa_dunying']],
+			key_godan:['male','key',6,['godan_yuanyi','godan_feiqu','godan_xiaoyuan']],
 			
 			key_kud:['female','key',3,['kud_qiaoshou','kud_buhui']],
 			key_misuzu:['female','key',3,['misuzu_hengzhou','misuzu_nongyin','misuzu_zhongxing']],
@@ -151,7 +152,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				"ns_huangchengyan","ns_sunchensunjun","ns_yuanxi","ns_caoshuang"],
 				diy_tieba:["diy_wenyang","ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_zhangwei"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan"],
 				diy_yongjian:["ns_chendao","yj_caoang"],
 			},
 		},
@@ -167,6 +168,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
+			key_godan:'#rAngel Beats!',
 			key_abyusa:'#rAngel Beats!',
 			key_akiko:'#bKanon',
 			key_kaori:'#bKanon',
@@ -319,6 +321,38 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			godan_yuanyi:{
+				trigger:{player:'phaseBegin'},
+				forced:true,
+				content:function(){
+					'step 0'
+					var num=game.roundNumber;
+					if(num&&typeof num=='number') player.draw(Math.min(3,num));
+					'step 1'
+					var next=player.phaseUse();
+					event.next.remove(next);
+					trigger.next.push(next);
+				},
+			},
+			godan_feiqu:{
+				inherit:'doruji_feiqu',
+			},
+			godan_xiaoyuan:{
+				trigger:{player:'changeHp'},
+				forced:true,
+				juexingji:true,
+				skillAnimation:true,
+				animationColor:'soil',
+				filter:function(event,player){
+					return event.num<0&&player.hp<4;
+				},
+				content:function(){
+					player.awakenSkill('godan_xiaoyuan');
+					player.loseMaxHp(3);
+					player.draw(3);
+					player.removeSkill('godan_feiqu');
+				},
+			},
 			abyusa_jueqing:{
 				audio:'jueqing',
 				trigger:{source:'damageBegin2'},
@@ -4291,7 +4325,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						player:function(card,player,target){
-							if(get.attitude(player,target)>0&&get.tag(card,'damage')) return 'zeroplayertarget';
+							if(target&&get.attitude(player,target)>0&&get.tag(card,'damage')) return 'zeroplayertarget';
 						},
 					},
 				},
@@ -10325,6 +10359,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_kaori:'美坂香里',
 			key_akiko:'水濑秋子',
 			key_abyusa:'游佐',
+			key_godan:'松下护騨',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -10567,6 +10602,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			abyusa_jueqing_rewrite_info:'锁定技，你即将造成的伤害均视为失去体力。',
 			abyusa_dunying:'遁影',
 			abyusa_dunying_info:'锁定技，其他角色计算与你的距离时+X。准备阶段和结束阶段，你摸X张牌（X为你已损失的体力值）。',
+			godan_yuanyi:'远忆',
+			godan_yuanyi_info:'锁定技，回合开始时，你摸X张牌并进行一个额外的出牌阶段。（X为游戏轮数且至多为3）',
+			godan_feiqu:'肥躯',
+			godan_feiqu_info:'锁定技，当你使用【杀】时，或你成为【杀】的目标后，你令此【杀】不可被响应。',
+			godan_xiaoyuan:'消元',
+			godan_xiaoyuan_info:'觉醒技，当你扣减体力时，若你的体力值小于4，则你减3点体力上限并摸三张牌，失去【肥躯】。',
 			
 			key_kud:'库特莉亚芙卡',
 			kud_qiaoshou:'巧手',

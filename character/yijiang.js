@@ -7851,7 +7851,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseUseEnd'},
 				direct:true,
 				filter:function(event,player){
-					return player.getStat().skill.yanyu>=2;
+					return player.getHistory('lose',function(evt){
+						var evt2=evt.getParent();
+						return evt2.name=='useSkill'&&evt2.skill=='yanyu'&&evt.getParent(3)==event;
+					}).length>=2;
 				},
 				content:function(){
 					'step 0'
@@ -12452,7 +12455,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhiyu:'智愚',
 			qice:'奇策',
 			qice_backup:'奇策',
-			jiangchi:'将弛',
+			jiangchi:'将驰',
 			jiangchi_less:'少摸一张',
 			jiangchi_more:'多摸一张',
 			zishou:'自守',

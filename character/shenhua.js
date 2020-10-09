@@ -15,7 +15,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			old_zhoutai:['male','wu',4,['gzbuqu']],
+			old_zhoutai:['male','wu',4,['buqu','new_fenji']],
 			old_caoren:['male','wei',4,['moon_jushou','jiewei']],
 			xuhuang:['male','wei',4,['gzduanliang']],
 			re_pangde:['male','qun',4,['mashu','jianchu']],
@@ -816,11 +816,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						filter:function(event,player){
-							var num=player.getStat('damage');
+							var num=0;
+							player.getHistory('sourceDamage',function(evt){
+								if(evt.getParent('phaseUse')==event) num+=evt.num;
+							});
 							return !num||num>1;
 						},
 						content:function(){
-							var numx=player.getStat('damage');
+							var numx=0;
+							player.getHistory('sourceDamage',function(evt){
+								if(evt.getParent('phaseUse')==trigger) numx+=evt.num;
+							});
 							if(!numx){
 								var num=player.hp-player.countCards('h');
 								if(num>0) player.draw(num);
@@ -2719,8 +2725,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				shaRelated:true,
 				mod:{
 					targetInRange:function(card,player,target){
-						if(card.name=='sha'&&card.number){
-							if(get.distance(player,target)<=card.number) return true;
+						if(card.name=='sha'&&typeof get.number(card)=='number'){
+							if(get.distance(player,target)<=get.number(card)) return true;
 						}
 					}
 				},
@@ -6502,6 +6508,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger[trigger.name=='gain'?'source':'player'].draw(2);
 				},
 			},
+			new_fenji:{
+				audio:"fenji",
+				trigger:{
+					global:"phaseJieshuBegin",
+				},
+				filter:function (event,player){
+					if(event.player.countCards('h')==0&&event.player.isAlive()) return true;
+					return false;
+				},
+				check:function (event,player){
+					return get.attitude(player,event.player)>2;
+				},
+				content:function (){
+					player.line(trigger.player,'green');
+					trigger.player.draw(2);
+					player.loseHp();
+				},
+			},
 			leiji:{
 				audio:2,
 				trigger:{player:['useCard','respond']},
@@ -7530,6 +7554,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guhuo_info:'每名角色的回合限一次，你可以扣置一张手牌当一张基本牌或普通锦囊牌使用或打出。其他角色依次选择是否质疑。一旦有其他角色质疑则翻开此牌：若为假则此牌作废，若为真，则质疑角色获得技能“缠怨”（锁定技，你不能质疑于吉，只要你的体力值为1，你失去你的武将技能）',
 			fenji_info:'当一名角色的手牌被其他角色弃置或获得后，你可以失去1点体力，然后令该角色摸两张牌。',
 			
+			new_fenji:"奋激",
+			new_fenji_info:"一名角色的结束阶段开始时，若其没有手牌，你可以令其摸两张牌，然后你失去1点体力。",
 			gzduanliang:'断粮',
 			gzduanliang_info:'你可以将一张黑色基本牌或黑色装备牌当【兵粮寸断】使用；你可以对距离为2的角色使用【兵粮寸断】',
 			"xinfu_guhuo":"蛊惑",

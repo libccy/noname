@@ -879,62 +879,57 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinjingong:{
 				audio:'jingong',
 				enable:'phaseUse',
+				usable:1,
 				filter:function(event,player){
-					return player.countCards('he',function(card){
+					return event.xinjingong_list&&player.countCards('he',function(card){
 						return card.name=='sha'||get.type(card)=='equip';
 					});
 				},
-				delay:false,
-				usable:1,
-				content:function(){
-					'step 0'
-					var list=get.inpile('trick').randomGets(2);
-					if(Math.random()<0.5){
-						list.push('wy_meirenji');
+				onChooseToUse:function(event){
+					if(!game.online){
+						var evt=event.getParent();
+						if(evt.name!='phaseUse') return;
+						if(!evt.xinjingong_list){
+							var list=get.inpile('trick').randomGets(2);
+							if(Math.random()<0.5){
+								list.push('wy_meirenji');
+							}
+							else{
+								list.push('wy_xiaolicangdao');
+							}
+							evt.xinjingong_list=list;
+						}
+						if(!event.xinjingong_list) event.set('xinjingong_list',evt.xinjingong_list);
 					}
-					else{
-						list.push('wy_xiaolicangdao');
-					}
-					for(var i=0;i<list.length;i++){
-						list[i]=['锦囊','',list[i]];
-					}
-					player.chooseButton(['矜功',[list,'vcard']]).set('filterButton',function(button,player){
-						return game.hasPlayer(function(current){
-							return player.canUse(button.link[2],current,true,false);
-						});
-					}).set('ai',function(button){
-						var player=_status.event.player;
-						return player.getUseValue(button.link[2]);
-					});
-					'step 1'
-					if(result.bool){
-						var name=result.links[0][2];
-						event.fakecard={name:name};
-						player.chooseCardTarget({
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						var list=[];
+						for(var i of event.xinjingong_list) list.push(['锦囊','',i]);
+						return ui.create.dialog('矜功',[list,'vcard']);
+					},
+					filter:function(button,player){
+						return lib.filter.filterCard({name:button.link[2]},player,_status.event.getParent());
+					},
+					check:function(button){
+						return _status.event.player.getUseValue({name:button.link[2]});
+					},
+					backup:function(links,player){
+						return {
+							audio:'xinjingong',
+							filterCard:true,
+							position:'he',
+							viewAs:{name:links[0][2]},
+							check:function(card){
+								return 6-get.value(card);
+							},
 							filterCard:function(card){
 								return card.name=='sha'||get.type(card)=='equip';
 							},
-							position:'he',
-							filterTarget:lib.filter.filterTarget,
-							selectTarget:lib.filter.selectTarget,
-							ai1:function(card){
-								return 7-get.value(card);
-							},
-							ai2:function(target){
-								var card=_status.event.fakecard;
-								var player=_status.event.player;
-								return get.effect(target,card,player,player);
-							},
-							_get_card:event.fakecard,
-							prompt:'将一张装备牌或【杀】当作'+get.translation(name)+'使用'
-						}).set('fakecard',event.fakecard);
-					}
-					else{
-						event.finish();
-					}
-					'step 2'
-					if(result.bool){
-						player.useCard(event.fakecard,result.cards,result.targets);
+						};
+					},
+					prompt:function(links,player){
+						return '将一张【杀】或装备牌当做'+get.translation(links[0][2])+'使用';
 					}
 				},
 				ai:{
@@ -5236,6 +5231,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
  						info.audioname2.old_yuanshu='weidi';
  					}
  				},map.skills);
+ 				'step 3'
+ 				if(player.isMinHp()) player.recover();
 				},
 			},
 			refanghun:{
@@ -9779,8 +9776,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(player.countCards('he')==0) return false;
 					if(event.card.name=='sha') return true;
-					var type=get.type(event.card,'trick');
-					return type=='trick';
+					return get.type(event.card)=='trick';
 				},
 				autodelay:true,
 				content:function(){
@@ -10328,8 +10324,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(card){return 6-get.value(card)},
 				content:function(){
 					'step 0'
-					var list=lib.group.slice(0);
-					list.remove('shen');
+					var list=lib.group.filter(function(group){
+						return ['wei','shu','wu','qun'].contains(group)||game.hasPlayer(function(current){
+							return current.group==group;
+						})
+					});
 					if(player.storage.xiemu2) list.removeArray(player.storage.xiemu2);
 					var list2=list.slice(0);
 					list2.sort(function(a,b){
@@ -11143,19 +11142,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qiangwu3:{
 				mod:{
 					aiOrder:function(player,card,num){
-						if(card.name=='sha'&&card.number>player.storage.qiangwu) return num+2;
+						if(card.name=='sha'&&get.number(card)>player.storage.qiangwu) return num+2;
 					},
 					targetInRange:function(card,player){
-						if(_status.currentPhase==player&&card.name=='sha'&&card.number<player.storage.qiangwu) return true;
+						if(_status.currentPhase==player&&card.name=='sha'&&get.number(card)<player.storage.qiangwu) return true;
 					},
 					cardUsable:function(card,player){
-						if(_status.currentPhase==player&&card.name=='sha'&&card.number>player.storage.qiangwu) return Infinity;
+						if(_status.currentPhase==player&&card.name=='sha'&&get.number(card)>player.storage.qiangwu) return Infinity;
 					}
 				},
 				trigger:{player:'useCard1'},
 				filter:function(event,player){
 					if(_status.currentPhase==player&&event.card.name=='sha'&&
-					event.card.number>player.storage.qiangwu&&event.addCount!==false) return true;
+					get.number(event.card)>player.storage.qiangwu&&event.addCount!==false) return true;
 					return false;
 				},
 				forced:true,
@@ -15194,7 +15193,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			canshi_info:'摸牌阶段开始时，你可以改为摸X张牌（X为已受伤的角色数），若如此做，当你于此回合内使用基本牌或锦囊牌时，你弃置一张牌。',
 			recanshi:'残蚀',
 			recanshi2:'残蚀',
-			recanshi_info:'摸牌阶段开始时，你可以多摸X张牌（X为已受伤的角色数），若如此做，当你于此回合内使用【杀】或锦囊牌时，你弃置一张牌。',
+			recanshi_info:'摸牌阶段开始时，你可以多摸X张牌（X为已受伤的角色数），若如此做，当你于此回合内使用【杀】或普通锦囊牌时，你弃置一张牌。',
 			zhuiji_info:'锁定技，你与体力值不大于你的角色的距离视为1。',
 			kunfen:'困奋',
 			kunfen_info:'锁定技，结束阶段开始时，你失去1点体力，然后摸两张牌。',
@@ -15317,6 +15316,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinmoucheng:'谋逞',
 			xinmoucheng_info:'觉醒技，准备阶段，若你已经发动了3次以上的〖连计〗，则你失去〖连计〗并获得〖矜功〗。',
 			xinjingong:'矜功',
+			xinjingong_backup:'矜功',
 			xinjingong_info:'出牌阶段限一次，你可以将一张【杀】或装备牌当做三张随机锦囊牌中的一张使用。',
 			caiyang:'蔡阳',
 			yinka:'印卡',
