@@ -309,7 +309,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(target.countCards('h')&&event.list.length){
 						event.current=event.list.shift();
-						event.current.gainPlayerCard(target,true);
+						event.current.gainPlayerCard(target,true,'h');
 						target.line2([event.current,player]);
 					}
 					else{
@@ -15312,7 +15312,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yidian:'佚典',
 			yidian_info:'当你使用牌选择目标时，若弃牌堆中没有与此牌名称相同的牌，则你可以为此牌增加一个目标（无距离限制）。',
 			xinlianji:'连计',
-			xinlianji_info:'出牌阶段限一次，你可以弃置一张手牌，令其使用牌堆中的一张随机武器牌，然后选择一项：对你指定的一名角色使用【杀】，或令你将其装备区里的武器牌交给任意角色。',
+			xinlianji_info:'出牌阶段限一次，你可以弃置一张手牌，令一名角色使用牌堆中的一张随机武器牌。然后其选择一项：对你指定的一名角色使用一张【杀】，或令你将其装备区里的武器牌交给任意角色。',
 			xinmoucheng:'谋逞',
 			xinmoucheng_info:'觉醒技，准备阶段，若你已经发动了3次以上的〖连计〗，则你失去〖连计〗并获得〖矜功〗。',
 			xinjingong:'矜功',

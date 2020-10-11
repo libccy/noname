@@ -387,7 +387,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			moying2:{},
 			juanhui:{
 				audio:2,
-				charlotte:true,
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
 				content:function(){
@@ -407,6 +406,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			juanhui2:{
+				charlotte:true,
 				mark:true,
 				intro:{
 					markcount:function(storage,player){
@@ -3143,9 +3143,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				firstDo:true,
 				filter:function(event,player){
-					if(!lib.skill[event.skill]) return false;
+					var info=lib.skill[event.skill];
+					if(!info) return false;
 					if(event.skill==player.storage.pingjian_temp) return true;
-					if(lib.skill[event.skill].sourceSkill==player.storage.pingjian_temp) return true;
+					if(info.sourceSkill==player.storage.pingjian_temp||info.group==player.storage.pingjian_temp) return true;
+					if(Array.isArray(info.group)&&info.group.contains(player.storage.pingjian_temp)) return true;
 					return false;
 				},
 				content:function(){
@@ -5365,7 +5367,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lisu:'李肃',
 			zhangwen:'张温',
 			puyuan:'蒲元',
-			xushao:'许邵',
+			xushao:'许劭',
 			mangyachang:"忙牙长",
 			xugong:"许贡",
 			zhangchangpu:"张昌蒲",
