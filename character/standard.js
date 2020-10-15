@@ -2063,11 +2063,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			lianying:{
 				audio:2,
-				trigger:{player:'loseAfter'},
+				trigger:{
+					player:'loseAfter',
+					source:'gainAfter',
+					global:['equipAfter','addJudgeAfter'],
+				},
 				frequent:true,
 				filter:function(event,player){
 					if(player.countCards('h')) return false;
-					return event.hs&&event.hs.length>0;
+					var evt=event.getl(player);
+					return evt&&evt.player==player&&evt.hs&&evt.hs.length>0;
 				},
 				content:function(){
 					player.draw();
@@ -2090,14 +2095,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiaoji:{
 				audio:2,
 				audioname:['sp_sunshangxiang','re_sunshangxiang'],
-				trigger:{player:'loseAfter'},
+				trigger:{
+					player:'loseAfter',
+					source:'gainAfter',
+					global:['equipAfter','addJudgeAfter'],
+				},
 				frequent:true,
 				filter:function(event,player){
-					return event.es&&event.es.length>0;
+					var evt=event.getl(player);
+					return evt&&evt.player==player&&evt.es&&evt.es.length>0;
 				},
 				content:function(){
 					"step 0"
-					event.count=trigger.es.length;
+					event.count=trigger.getl(player).es.length;
 					"step 1"
 					event.count--;
 					player.draw(2);

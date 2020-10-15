@@ -239,13 +239,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			reshangshi:{
 				audio:'shangshi',
-				trigger:{player:['loseAfter','changeHp']},
+				trigger:{
+					player:['loseAfter','changeHp','gainMaxHpAfter','loseMaxHpAfter'],
+					source:'gainAfter',
+					global:['equipAfter','addJudgeAfter'],
+				},
 				frequent:true,
 				prompt:function(event,player){
 					return '是否发动【伤逝】将手牌摸至'+get.cnNumber(player.getDamagedHp())+'张？'
 				},
 				prompt2:false,
 				filter:function(event,player){
+					if(event.getl&&!event.getl(player)) return false;
 					return player.countCards('h')<player.getDamagedHp();
 				},
 				content:function(){
@@ -8433,6 +8438,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'zhiman',
 				audioname:['guansuo','re_masu'],
 				trigger:{source:'damageBegin2'},
+				filter:function(event,player){
+					return player!=event.player;
+				},
 				check:function(event,player){
 					if(get.damageEffect(event.player,player,player)<0) return true;
 					var att=get.attitude(player,event.player);
@@ -10837,7 +10845,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xuanfeng:{
 				audio:2,
 				audioname:['boss_lvbu3','re_heqi'],
-				trigger:{player:['loseAfter','phaseDiscardEnd']},
+				trigger:{
+					player:['loseAfter','phaseDiscardEnd'],
+					source:'gainAfter',
+					global:['equipAfter','addJudgeAfter'],
+				},
 				direct:true,
 				filter:function(event,player){
 					if(event.name=='phaseDiscard'){
@@ -10847,7 +10859,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 						return cards.length>1;
 					}
-					else return event.es&&event.es.length>0;
+					else{
+						var evt=event.getl(player);
+						return evt&&evt.es&&evt.es.length>0;
+					}
 				},
 				content:function(){
 					"step 0"

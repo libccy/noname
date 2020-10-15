@@ -11974,12 +11974,12 @@
 					event.result.num2[event.iwhile]=event.num2;
 					var str;
 					if(event.num1>event.num2){
-						str=get.translation(player.name)+'拼点成功';
+						str=get.translation(player)+'拼点成功';
 						player.popup('胜');
 						target.popup('负');
 					}
 					else{
-						str=get.translation(player.name)+'拼点失败';
+						str=get.translation(player)+'拼点失败';
 						if(event.num1==event.num2){
 							player.popup('平');
 							target.popup('平');
@@ -12139,13 +12139,13 @@
 					if(event.num1>event.num2){
 						event.result.bool=true;
 						event.result.winner=player;
-						str=get.translation(player.name)+'拼点成功';
+						str=get.translation(player)+'拼点成功';
 						player.popup('胜');
 						target.popup('负');
 					}
 					else{
 						event.result.bool=false;
-						str=get.translation(player.name)+'拼点失败';
+						str=get.translation(player)+'拼点失败';
 						if(event.num1==event.num2){
 							event.result.tie=true;
 							player.popup('平');
@@ -14447,7 +14447,7 @@
 					if(cards){
 						var owner=event.source||get.owner(cards[0]);
 						if(owner){
-							var next=owner.lose(cards,ui.special).set('type','gain').set('forceDie',true);
+							var next=owner.lose(cards,ui.special).set('type','gain').set('forceDie',true).set('getlx',false);
 							if(event.animate=='give'||event.visible==true) next.visible=true;
 							event.relatedLose=next;
 						}
@@ -15226,7 +15226,7 @@
 				equip:function(){
 					"step 0"
 					var owner=get.owner(card)
-					if(owner) owner.lose(card,ui.special,'visible').set('type','equip');
+					if(owner) owner.lose(card,ui.special,'visible').set('type','equip').set('getlx',false);
 					"step 1"
 					if(event.cancelled){
 						event.finish();
@@ -15257,9 +15257,16 @@
 					}
 					player.equiping=true;
 					"step 3"
-					var current=player.getCards('e',{subtype:get.subtype(card)});
+					var info=get.info(card,false);
+					var current=player.getCards('e',function(card){
+						if(info.customSwap) return info.customSwap(card);
+						return get.subtype(card,false)==info.subtype;
+					});
 					if(current.length){
-						player.lose(current,false,'visible');
+						player.lose(current,false,'visible').set('type','equip').set('getlx',false);
+						if(info.loseThrow){
+							player.$throw(current);
+						}
 						event.swapped=true;
 						event.redo();
 					}
@@ -15310,7 +15317,7 @@
 					if(cards){
 						var owner=get.owner(cards[0]);
 						if(owner){
-							owner.lose(cards,'visible');
+							event.relatedLose=owner.lose(cards,'visible').set('getlx',false);
 						}
 					}
 					"step 1"
@@ -18728,6 +18735,27 @@
 						}
 					}
 					next.setContent('gain');
+					next.getl=function(player){
+						var that=this;
+						var map={
+							player:player,
+							hs:[],
+							es:[],
+							js:[],
+							cards:[],
+							cards2:[],
+						};
+						player.getHistory('lose',function(evt){
+							if(evt.parent==that){
+								map.hs.addArray(evt.hs);
+								map.es.addArray(evt.es);
+								map.js.addArray(evt.js);
+								map.cards.addArray(evt.cards);
+								map.cards2.addArray(evt.cards2);
+							}
+						});
+						if(map.cards.length>0) return map;
+					};
 					return next;
 				},
 				give:function(cards,target,visible){
@@ -18774,6 +18802,9 @@
 						next.cards=next.cards.slice(0);
 					}
 					next.setContent('lose');
+					next.getl=function(player){
+						if(this.getlx!==false&&this.player==player) return this;
+					};
 					return next;
 				},
 				damage:function(){
@@ -19130,6 +19161,28 @@
 					}
 					next.setContent(lib.element.content.equip);
 					if(get.is.object(next.card)&&next.card.cards) next.card=next.card.cards[0];
+					next.cards=[next.card];
+					next.getl=function(player){
+						var that=this;
+						var map={
+							player:player,
+							hs:[],
+							es:[],
+							js:[],
+							cards:[],
+							cards2:[],
+						};
+						player.getHistory('lose',function(evt){
+							if(evt.parent==that){
+								map.hs.addArray(evt.hs);
+								map.es.addArray(evt.es);
+								map.js.addArray(evt.js);
+								map.cards.addArray(evt.cards);
+								map.cards2.addArray(evt.cards2);
+							}
+						});
+						if(map.cards.length>0) return map;
+					};
 					return next;
 				},
 				addJudge:function(card,cards){
@@ -19140,6 +19193,27 @@
 					if(get.itemtype(next.cards)=='card') next.cards=[next.cards];
 					next.player=this;
 					next.setContent('addJudge');
+					next.getl=function(player){
+						var that=this;
+						var map={
+							player:player,
+							hs:[],
+							es:[],
+							js:[],
+							cards:[],
+							cards2:[],
+						};
+						player.getHistory('lose',function(evt){
+							if(evt.parent==that){
+								map.hs.addArray(evt.hs);
+								map.es.addArray(evt.es);
+								map.js.addArray(evt.js);
+								map.cards.addArray(evt.cards);
+								map.cards2.addArray(evt.cards2);
+							}
+						});
+						if(map.cards.length>0) return map;
+					};
 					return next;
 				},
 				canAddJudge:function(card){

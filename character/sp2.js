@@ -11,7 +11,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caobuxing:['male','wu',3,['moying','juanhui'],[]],
 			//sp_zhangliao:['male','qun',4,['mubing','diaoling']],
 			re_sunluyu:['female','wu',3,['remeibu','remumu']],
-			liuzan:['male','wu',4,['refenyin','liji']],
+			re_liuzan:['male','wu',4,['refenyin','liji']],
 			wenyang:['male','wei',5,['xinlvli','choujue']],
 			wangshuang:['male','wei',8,['spzhuilie']],
 			huaman:['female','shu',3,['hmmanyi','mansi','souying','zhanyuan']],
@@ -61,7 +61,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_shengun:["puyuan","guanlu","gexuan","xushao"],
 				sp_baigei:['re_panfeng','xingdaorong','caoxing'],
 				sp_guandu:["sp_zhanghe","xunchen","sp_shenpei","gaolan","lvkuanglvxiang","chunyuqiong","sp_xuyou"],
-				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','liuzan','re_sunluyu','caobuxing','ol_xinxianying','ol_yujin','re_maliang'],
+				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','re_sunluyu','caobuxing','ol_xinxianying','ol_yujin','re_maliang'],
 			}
 		},
 		skill:{
@@ -231,14 +231,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			moying:{
 				audio:2,
-				trigger:{player:'loseAfter'},
+				trigger:{
+					player:'loseAfter',
+					source:'gainAfter',
+					global:['equipAfter','addJudgeAfter'],
+				},
 				direct:true,
 				filter:function(event,player){
-					return player!=_status.currentPhase&&event.getParent().name!='useCard'&&event.cards2&&event.cards2.length==1&&!player.hasSkill('moying2')&&['equip','trick'].contains(get.type2(event.cards2[0],event.hs.contains(event.cards2[0])?player:false));
+					if(player==_status.currentPhase||event.getParent().name=='useCard') return false;
+					var evt=event.getl(player);
+					return evt&&evt.cards2&&evt.cards2.length==1&&
+					['equip','trick'].contains(get.type2(evt.cards2[0],(evt.type=='discard'&&evt.hs.contains(evt.cards2[0]))?player:false))&&
+					!player.hasSkill('moying2');
 				},
 				content:function(){
 					"step 0"
-					var number=trigger.cards2[0].number;
+					var number=trigger.getl(player).cards2[0].number;
 					var numbers=[number-2,number-1,number,number+1,number+2].filter(function(number){
 						return number>=1&&number<=13;
 					});
@@ -2594,8 +2602,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:"biaozhao",
 				filter:function (event,player){
 					if(!player.storage.biaozhao) return false;
-					var evt=event.getParent();
-					if(evt&&(evt.name=='useCard'||evt.name=='respond'||evt.name=='biaozhao2')) return false;
 					var suit=get.suit(player.storage.biaozhao[0]);
 					var num=get.number(player.storage.biaozhao[0]);
 					for(var i=0;i<event.cards.length;i++){
@@ -4011,11 +4017,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					player.chooseControl(list).set('prompt','秉诏：请选择一个势力').set('ai',function(){
 						var listx=list.slice(0);
-						list.sort(function(a,b){
+						listx.sort(function(a,b){
 							return game.countPlayer(function(current){
-								return current.group==b;
+								return current!=player&&current.group==b;
 							})-game.countPlayer(function(current){
-								return current.group==a;
+								return current!=player&&current.group==a;
 							});
 						})
 						return listx[0];
@@ -5523,7 +5529,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			beishui_info:'觉醒技，准备阶段，若你的手牌数或体力值小于2，你减1点体力上限并获得技能〖清剿〗，然后将〖膂力〗改为受到伤害后也可以发动。',
 			qingjiao:'清剿',
 			qingjiao_info:'出牌阶段开始时，你可以弃置所有手牌，然后从牌堆或弃牌堆中随机获得八张牌名各不相同且副类别不同的牌。若如此做，结束阶段，你弃置所有牌。',
-			liuzan:'留赞',
+			re_liuzan:'留赞',
 			refenyin:'奋音',
 			refenyin_info:'锁定技，你的回合内，当一张牌进入弃牌堆后，若本回合内没有过与此牌花色相同的卡牌进入过弃牌堆，则你摸一张牌。',
 			liji:'力激',

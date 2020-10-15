@@ -829,28 +829,26 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			xindiaodu:{
 				audio:"diaodu",
-				global:"xindiaodu_use",
-				subfrequent:['use'],
+				group:'xindiaodu_use',
 				subSkill:{
 					use:{
 						trigger:{
 							player:"useCard",
 						},
-						popup:false,
-						frequent:true,
-						prompt:'是否发动【调度】摸一张牌？',
 						filter:function (event,player){
-							return get.type(event.card)=='equip'&&game.hasPlayer(function(current){
-								return current.hasSkill('xindiaodu')&&current.isFriendOf(player);
-							});
+							return get.type(event.card)=='equip'&&event.player.isAlive()&&
+							event.player.isFriendOf(player)&&(player==event.player||player.hasSkill('xindiaodu'));
 						},
-						content:function (){
-							var logger=game.findPlayer(function(current){
-								return current.isFriendOf(player)&&current.hasSkill('xindiaodu');
-							});
-							logger.line(player,'green');
-							logger.logSkill('xindiaodu');
-							player.draw('nodelay');
+						direct:true,
+						content:function(){
+							'step 0'
+							var next=trigger.player.chooseBool('是否发动【调度】摸一张牌？');
+							if(player.hasSkill('xindiaodu')) next.set('frequentSkill','xindiaodu');
+							'step 1'
+							if(result.bool){
+								player.logSkill('xindiaodu',trigger.player);
+								trigger.player.draw('nodelay');
+							}
 						},
 						ai:{
 							reverseEquip:true,
@@ -900,7 +898,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 2'
-					if(result.bool){
+					if(result.bool&&player.getCards('h').contains(result.cards[0])){
 						event.card=result.cards[0];
 						player.chooseTarget('是否将'+get.translation(event.card)+'交给一名其他角色？',function(card,player,current){
 							return current!=player&&current!=_status.event.target1&&current.isFriendOf(player);
@@ -4090,10 +4088,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xuanlve:{
-				trigger:{player:'loseAfter'},
+				trigger:{
+					player:'loseAfter',
+					source:'gainAfter',
+					global:['equipAfter','addJudgeAfter'],
+				},
 				direct:true,
 				filter:function(event,player){
-					return event.es&&event.es.length>0;
+					var evt=event.getl(player);
+					return evt&&evt.es&&evt.es.length>0;
 				},
 				content:function(){
 					'step 0'
@@ -5495,13 +5498,35 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				inherit:'shoucheng',
 				audio:'shoucheng',
 				filter:function(event,player){
-					if(event.player.isDead()||event.player.countCards('h')) return false;
-					if(!event.player.isFriendOf(player)) return false;
-					if(_status.currentPhase==event.player) return false;
-					for(var i=0;i<event.cards.length;i++){
-						if(event.cards[i].original=='h') return true;
+					return game.hasPlayer(function(current){
+						if(current==_status.currentPhase||!current.isFriendOf(player)) return false;
+						var evt=event.getl(current);
+						return evt&&evt.hs&&evt.hs.length&&current.countCards('h')==0;
+					});
+				},
+				content:function(){
+					"step 0"
+					event.list=game.filterPlayer(function(current){
+						if(current==_status.currentPhase||!current.isFriendOf(player)) return false;
+						var evt=trigger.getl(current);
+						return evt&&evt.hs&&evt.hs.length;
+					}).sortBySeat(_status.currentPhase);
+					"step 1"
+					var target=event.list.shift();
+					event.target=target;
+					if(target.isAlive()&&target.countCards('h')==0){
+						player.chooseBool(get.prompt2('gzshoucheng',target)).set('ai',function(){
+							return get.attitude(_status.event.player,_status.event.getParent().target)>0;
+						});
 					}
-					return false;
+					else event.goto(3);
+					"step 2"
+					if(result.bool){
+						player.logSkill(event.name,target);
+						target.draw();
+					}
+					"step 3"
+					if(event.list.length) event.goto(1);
 				},
 			},
 			yicheng:{

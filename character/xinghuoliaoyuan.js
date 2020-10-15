@@ -215,28 +215,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function (player,target){
 							var raweffect=function(player,target){
- 							if(player.countCards('h','sha')){
- 								return get.effect(target,{name:'sha'},player,target);
- 							}
- 							else{
-  							var att=get.attitude(player,target);
-  							var nh=target.countCards('h');
-  							if(att>0){
-  								if(target.getEquip('baiyin')&&target.isDamaged()&&
-  									get.recoverEffect(target,player,player)>0){
-  									if(target.hp==1&&!target.hujia) return 1.6;
-  									if(target.hp==2) return 0.01;
-  									return 0;
-  								}
-  							}
-  							var es=target.getCards('e');
-  							var noe=(es.length==0||target.hasSkillTag('noe'));
-  							var noe2=(es.length==1&&es[0].name=='baiyin'&&target.isDamaged());
-  							var noh=(nh==0||target.hasSkillTag('noh'));
-  							if(noh&&(noe||noe2)) return 0;
-  							if(att<=0&&!target.countCards('he')) return 1.5;
-  							return -1.5;
- 							}
+								if(player.countCards('h','sha')){
+									return get.effect(target,{name:'sha'},player,target);
+								}
+								else{
+									var att=get.attitude(player,target);
+									var nh=target.countCards('h');
+									if(att>0){
+										if(target.getEquip('baiyin')&&target.isDamaged()&&
+											get.recoverEffect(target,player,player)>0){
+											if(target.hp==1&&!target.hujia) return 1.6;
+											if(target.hp==2) return 0.01;
+											return 0;
+										}
+									}
+									var es=target.getCards('e');
+									var noe=(es.length==0||target.hasSkillTag('noe'));
+									var noe2=(es.length==1&&es[0].name=='baiyin'&&target.isDamaged());
+									var noh=(nh==0||target.hasSkillTag('noh'));
+									if(noh&&(noe||noe2)) return 0;
+									if(att<=0&&!target.countCards('he')) return 1.5;
+									return -1.5;
+								}
 							}
 							var num=game.countPlayer(function(current){
 								return current!=player&&current.hp==target.hp&&(raweffect(player,current)*get.attitude(player,current))>0
@@ -421,33 +421,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-			"qinguo_use":{
-				audio:2,
-				trigger:{
-					player:"equipEnd",
-				},
-				filter:function (event,player){
-					if(!event.swapped&&player.countCards('e')==player.hp&&player.isDamaged()){
-						return true;
-					};
-					return false;
-				},
-				frequent:true,
-				content:function (){
-					player.recover();
-				},
-				ai:{
-					reverseEquip:true,
-					effect:{
-						target:function (card,player,target,current){
-							if(get.type(card)=='equip'&&player==target&&player==_status.currentPhase) return [1,3];
-						},
-					},
-				},
-			},
 			"xinfu_qinguo":{
-				group:["qinguo_use","qinguo_lose"],
+				group:"xinfu_qinguo_recover",
 				audio:2,
+				subfrequent:['recover'],
 				trigger:{
 					player:"useCardEnd",
 				},
@@ -455,23 +432,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.type(event.card)=='equip';
 				},
 				direct:true,
-				content:function (){
+				content:function(){
 					player.chooseUseTarget({name:'sha'},get.prompt('xinfu_qinguo'),'视为使用一张【杀】',false).logSkill='qinguo_use';
 				},
-			},
-			"qinguo_lose":{
-				audio:2,
-				trigger:{
-					player:"loseAfter",
-				},
-				filter:function (event,player){
-					if(event.getParent().name=='equip') return false;
-					if(player.hp!=player.countCards('e')||!player.isDamaged()) return false;
-					return event.es&&event.es.length>0;
-				},
-				frequent:true,
-				content:function (){
-					player.recover();
+				subSkill:{
+					recover:{
+						audio:'xinfu_qinguo',
+						trigger:{
+							player:'loseAfter',
+							source:'gainAfter',
+							global:['equipAfter','addJudgeAfter'],
+						},
+						prompt:'是否发动【勤国】回复1点体力？',
+						filter:function (event,player){
+							if(player.isHealthy()||player.countCards('e')!=player.hp) return false;
+							var evt=event.getl(player);
+							if(event.name=='equip') return !evt||evt.cards.length!=1;
+							return evt&&evt.es.length;
+						},
+						frequent:true,
+						content:function(){
+							player.recover();
+						},
+					},
 				},
 			},
 			"xinfu_jijun":{
@@ -930,13 +913,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						sub:true,
 						mod:{
 							ignoredHandcard:function (card,player){
-   					if(get.suit(card)=='heart'){
-   						return true;
-   					}
-   				},
+								if(get.suit(card)=='heart'){
+									return true;
+								}
+							},
 							cardDiscardable:function (card,player,name){
-   					if(name=='phaseDiscard'&&get.suit(card)=='heart') return false;
-   				},
+								if(name=='phaseDiscard'&&get.suit(card)=='heart') return false;
+							},
 						},
 					},
 				},
@@ -1174,17 +1157,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							aiOrder:function(player,card,num){
 								if(typeof card.number!='number') return;
 								var history=player.getHistory('useCard',function(evt){
- 								return evt.isPhaseUsing();
- 							});
- 							if(history.length==0) return num+10*(14-card.number);
- 							var num=get.number(history[0].card);
- 							if(!num) return;
- 							for(var i=1;i<history.length;i++){
- 								var num2=get.number(history[i].card);
- 								if(!num2||num2<=num) return;
- 								num=num2;
- 							}
- 							if(card.number>num) return num+10*(14-card.number);
+									return evt.isPhaseUsing();
+								});
+								if(history.length==0) return num+10*(14-card.number);
+								var num=get.number(history[0].card);
+								if(!num) return;
+								for(var i=1;i<history.length;i++){
+									var num2=get.number(history[i].card);
+									if(!num2||num2<=num) return;
+									num=num2;
+								}
+								if(card.number>num) return num+10*(14-card.number);
 							},
 						},
 						filter:function (event,player){
@@ -1227,17 +1210,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							aiOrder:function(player,card,num){
 								if(typeof card.number!='number') return;
 								var history=player.getHistory('useCard',function(evt){
- 								return evt.isPhaseUsing();
- 							});
- 							if(history.length==0) return num+10*card.number;
- 							var num=get.number(history[0].card);
- 							if(!num) return;
- 							for(var i=1;i<history.length;i++){
- 								var num2=get.number(history[i].card);
- 								if(!num2||num2>=num) return;
- 								num=num2;
- 							}
- 							if(card.number<num) return num+10*card.number;
+									return evt.isPhaseUsing();
+								});
+								if(history.length==0) return num+10*card.number;
+								var num=get.number(history[0].card);
+								if(!num) return;
+								for(var i=1;i<history.length;i++){
+									var num2=get.number(history[i].card);
+									if(!num2||num2>=num) return;
+									num=num2;
+								}
+								if(card.number<num) return num+10*card.number;
 							},
 						},
 						filter:function (event,player){
@@ -1493,14 +1476,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(card){
 					var player=_status.event.player;
 					if(!player.getEquip('zhangba')&&player.countCards('h','sha')<2){
- 					if(player.countCards('h',function(cardx){
- 						return cardx!=card&&cardx.name=='shan';
- 					})>0) return 0;
- 					var damaged=player.maxHp-player.hp-1;
- 					var ts=player.countCards('h',function(cardx){
- 						return cardx!=card&&cardx.name=='tao';
- 					});
- 					if(ts>0&&ts>damaged) return 0;
+						if(player.countCards('h',function(cardx){
+							return cardx!=card&&cardx.name=='shan';
+						})>0) return 0;
+						var damaged=player.maxHp-player.hp-1;
+						var ts=player.countCards('h',function(cardx){
+							return cardx!=card&&cardx.name=='tao';
+						});
+						if(ts>0&&ts>damaged) return 0;
 					}
 					if(card.name=='shan') return 15;
 					if(card.name=='tao') return 10;

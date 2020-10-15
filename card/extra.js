@@ -408,12 +408,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'equip2',
 				loseDelay:false,
 				onLose:function(){
-					if(player.isDamaged()) player.logSkill('baiyin_skill');
 					var next=game.createEvent('baiyin_recover');
 					event.next.remove(next);
-					event.getParent().after.push(next);
+					var evt=event.getParent();
+					if(evt.getlx===false) evt=evt.getParent();
+					evt.after.push(next);
 					next.player=player;
 					next.setContent(function(){
+						if(player.isDamaged()) player.logSkill('baiyin_skill');
 						player.recover();
 					});
 				},

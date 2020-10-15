@@ -129,11 +129,22 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				filterLose:function(card,player){
-				if(player.hasSkillTag('unequip2')) return false;
-				return true;
+					if(player.hasSkillTag('unequip2')) return false;
+					return true;
 				},
+				loseDelay:false,
 				onLose:function(){
+					var next=game.createEvent('taipingyaoshu');
+					event.next.remove(next);
+					var evt=event.getParent();
+					if(evt.getlx===false) evt=evt.getParent();
+					evt.after.push(next);
+					next.player=player;
+					next.setContent(lib.card.taipingyaoshu.onLosex);
+				},
+				onLosex:function(){
 					'step 0'
+					player.logSkill('taipingyaoshu');
 					player.draw(2);
 					'step 1'
 					if(player.hp>1) player.loseHp();

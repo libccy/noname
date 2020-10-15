@@ -444,6 +444,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return ['equip','delay'].contains(get.type(card,false));
 				},
 				filterTarget:function(card,player,target){
+					if(player==target) return false;
 					var card=ui.selected.cards[0];
 					if(get.type(card,false)=='delay') return target.canAddJudge({name:card.name});
 					return target.isEmpty(get.subtype(card,false));
@@ -948,10 +949,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			misuzu_zhongxing:{
-				trigger:{player:'loseAfter'},
+				trigger:{
+					player:'loseAfter',
+					source:'gainAfter',
+					global:['equipAfter','addJudgeAfter'],
+				},
 				direct:true,
 				filter:function(event,player){
-					return event.js&&event.js.length>0&&!player.hasSkill('misuzu_zhongxing_haruko');
+					var evt=event.getl(player);
+					return evt&&evt.js&&evt.js.length>0&&!player.hasSkill('misuzu_zhongxing_haruko');
 				},
 				content:function(){
 					'step 0'
@@ -979,16 +985,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			kamome_yangfan:{
 				trigger:{
-					global:'gameDrawAfter',
-					player:['enterGame','loseAfter'],
+					player:['loseAfter','enterGame'],
+					source:'gainAfter',
+					global:['equipAfter','addJudgeAfter','gameDrawAfter'],
 				},
 				forced:true,
 				filter:function(event,player){
-					if(event.name!='lose') return true;
-					return event.es&&event.es.length;
+					if(typeof event.getl!='function') return true;
+					var evt=event.getl(player);
+					return evt&&evt.player==player&&evt.es&&evt.es.length;
 				},
 				content:function(){
-					if(trigger.name=='lose') player.draw(2*trigger.es.length);
+					if(trigger.getl) player.draw(2*trigger.getl(player).es.length);
 					else player.equip(game.createCard2('kamome_suitcase','spade',1));
 				},
 				ai:{
@@ -1469,6 +1477,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 1'
 					if(result.control=='cancel2'){event.finish();return;}
+					player.logSkill('shiorimiyuki_tingxian');
 					var num=1+result.index;
 					player.draw(num);
 					'step 2'

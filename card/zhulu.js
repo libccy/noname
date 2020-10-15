@@ -319,11 +319,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filterTarget:lib.filter.notMe,
 				selectTarget:1,
 				toself:false,
-				onEquip:function(){
-					var cards=player.getCards('e',function(cardz){
-						return cardz!=card;
-					});
-					if(cards.length) player.discard(cards);
+				loseThrow:true,
+				customSwap:function(){
+					return true;
 				},
 				ai:{
 					order:9,
@@ -467,9 +465,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(player.sex!='male') return;
 					var next=game.createEvent('nvzhuang_lose');
 					event.next.remove(next);
-					event.getParent().after.push(next);
+					var evt=event.getParent();
+					if(evt.getlx===false) evt=evt.getParent();
+					evt.after.push(next);
 					next.player=player;
-					next.card=card;
 					next.setContent(function(){
 						if(player.countCards('he')){
 							player.popup('nvzhuang');

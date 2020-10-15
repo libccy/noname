@@ -52,11 +52,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.chooseToUse({
 						prompt:'请使用得到的一张牌，或者受到来自'+get.translation(player)+'的一点伤害',
 						filterCard:function(card,player,event){
-							var cards=_status.event.cards;
-							if(!cards||get.itemtype(card)!='card'||!cards.contains(card)) return false;
+							if(get.itemtype(card)!='card'||!cards.contains(card)) return false;
 							return lib.filter.filterCard(card,player,event);
 						},
-						cards:event.cards,
 					});
 					'step 2'
 					if(result.bool){
@@ -521,10 +519,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					var list=[];
-					game.countPlayer(function(current){
-						if(current.group!=player.group&&current.group!='shen') list.add(current.group);
-					});
+					var list=lib.group.filter(function(group){
+						return group!=player.group&&game.hasPlayer(function(current){
+							return current.group==group;
+						});
+					})
 					if(!event.renshe) list.push('cancel2');
 					player.chooseControl(list).set('prompt',event.renshe?'请选择一个势力':get.prompt('chijie')).set('prompt2',event.renshe?'':'将自己的势力变更为场上存在的一个势力').set('',function(){
 						return list.randomGet();

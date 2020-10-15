@@ -1107,7 +1107,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rexuanfeng:{
 				audio:'xuanfeng',
 				audioname:['boss_lvbu3','re_heqi','re_lingtong'],
-				trigger:{player:['loseAfter','phaseDiscardEnd']},
+				trigger:{
+					player:'loseAfter',
+					source:'gainAfter',
+					global:['equipAfter','addJudgeAfter'],
+				},
 				direct:true,
 				filter:function(event,player){
 					if(!game.hasPlayer(function(current){
@@ -1120,7 +1124,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 						return cards.length>1;
 					}
-					else return event.es&&event.es.length>0;
+					var evt=event.getl(player);
+					return evt&&evt.es&&evt.es.length>0;
 				},
 				content:function(){
 					'step 0'
@@ -5727,16 +5732,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			relianying:{
 				audio:2,
-				trigger:{player:'loseAfter'},
+				trigger:{
+					player:'loseAfter',
+					source:'gainAfter',
+					global:['equipAfter','addJudgeAfter'],
+				},
 				direct:true,
 				filter:function(event,player){
 					if(player.countCards('h')) return false;
-					return event.hs&&event.hs.length;
+					var evt=event.getl(player);
+					return evt&&evt.hs&&evt.hs.length;
 				},
 				content:function(){
 					"step 0"
-					var num=trigger.hs.length;
-					player.chooseTarget('选择发动连营的目标',[1,num]).ai=function(target){
+					var num=trigger.getl(player).hs.length;
+					player.chooseTarget(get.prompt('relianying'),'令至多'+get.cnNumber(num)+'名角色各摸一张牌',[1,num]).ai=function(target){
 						var player=_status.event.player;
 						if(player==target) return get.attitude(player,target)+10;
 						return get.attitude(player,target);

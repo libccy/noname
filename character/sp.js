@@ -5089,7 +5089,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			refuhan:{
 				audio:'fuhan',
-				trigger:{player:'phaseBegin'},
+				trigger:{player:'phaseZhunbeiBegin'},
 				unique:true,
 				limited:true,
 				skillAnimation:true,
@@ -5128,6 +5128,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						list.remove(players[i].name1);
 						list.remove(players[i].name2);
 					}
+					list.remove('zhaoyun');
+					list.remove('re_zhaoyun');
+					list.remove('ol_zhaoyun');
 					list=list.randomGets(Math.max(4,game.countPlayer()));
 					var skills=[];
 					for(var i of list){
@@ -6111,12 +6114,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			hongde:{
 				audio:2,
-				trigger:{player:['gainAfter','loseAfter']},
+				trigger:{
+					player:['loseAfter','gainAfter'],
+					source:'gainAfter',
+					global:['equipAfter','addJudgeAfter'],
+				},
 				direct:true,
 				filter:function(event,player){
-					if(event.name=='lose'&&event.type=='gain'&&event.getParent().player==player) return false;
-					if(event.name=='gain') return event.cards&&event.cards.length>1;
-					return event.cards2&&event.cards2.length>1;
+					if(event.name=='gain'&&event.player==player) return event.cards&&event.cards.length>1;
+					var evt=event.getl(player);
+					return evt&&evt.cards2&&evt.cards2.length>1;
 				},
 				content:function(){
 					'step 0'
@@ -11314,19 +11321,41 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['liushan']
 			},
 			shoucheng:{
-				trigger:{global:'loseAfter'},
+				trigger:{
+					global:['equipAfter','addJudgeAfter','loseAfter','gainAfter'],
+				},
 				audio:2,
-				check:function(event,player){
-					return get.attitude(player,event.player)>0;
-				},
+				direct:true,
 				filter:function(event,player){
-					if(event.player==player||event.player.isDead()||event.player.countCards('h')) return false;
-					if(_status.currentPhase==event.player) return false;
-					return event.hs&&event.hs.length>0;
+					return game.hasPlayer(function(current){
+						if(current==_status.currentPhase) return false;
+						var evt=event.getl(current);
+						return evt&&evt.hs&&evt.hs.length&&current.countCards('h')==0;
+					});
 				},
-				logTarget:'player',
 				content:function(){
-					trigger.player.draw();
+					"step 0"
+					event.list=game.filterPlayer(function(current){
+						if(current==_status.currentPhase) return false;
+						var evt=trigger.getl(current);
+						return evt&&evt.hs&&evt.hs.length;
+					}).sortBySeat(_status.currentPhase);
+					"step 1"
+					var target=event.list.shift();
+					event.target=target;
+					if(target.isAlive()&&target.countCards('h')==0){
+						player.chooseBool(get.prompt2('shoucheng',target)).set('ai',function(){
+							return get.attitude(_status.event.player,_status.event.getParent().target)>0;
+						});
+					}
+					else event.goto(3);
+					"step 2"
+					if(result.bool){
+						player.logSkill(event.name,target);
+						target.draw();
+					}
+					"step 3"
+					if(event.list.length) event.goto(1);
 				},
 				ai:{
 					threaten:1.3,

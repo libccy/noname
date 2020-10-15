@@ -20,6 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_shiki:['female','shen','3/5',['shiki_omusubi'],['key']],
 			//key_hina:['female','shen',3,[],['key']],
 			
+			//shen_diaochan:['female','shen',3,[],['qun']],
 			shen_guanyu:['male','shen',5,['new_wuhun','wushen'],['shu']],
 			shen_zhaoyun:['male','shen',2,['xinjuejing','relonghun'],['shu']],
 			shen_zhugeliang:['male','shen',3,['qixing','kuangfeng','dawu'],['shu']],
@@ -3422,6 +3423,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qixian_info:'锁定技，你的手牌上限视为7。',
 			caopi_xingdong:'行动',
 			caopi_xingdong_info:'出牌阶段限一次，你可以将一张【杀】或普通锦囊牌交给一名其他角色，然后该角色选择一项：对除你以外的角色使用此牌并在此牌结算完成后和你各摸一张牌；或跳过下回合的判定阶段和摸牌阶段。',
+			//shen_diaochan:'神貂蝉',
 			
 			key_kagari:'篝',
 			kagari_zongsi:'纵丝',
@@ -3429,7 +3431,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_shiki:'神山识',
 			shiki_omusubi:'御结',
 			shiki_omusubi_info:'一轮游戏开始时，你可以减1点体力上限，然后将一名其他角色武将牌上的技能加入到你的武将牌上。',
-			//key_hina:'雏',
+			shiki_omusubi_append:'<span style="font-family: yuanli">来吧，羽依里。用你的手，让我变成那只真正的鬼吧！</span>',
+			//key_hina:'佐藤雏',
 			
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',
