@@ -178,9 +178,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			checkResult:function(){
+				var me=game.me._trueMe||game.me;
 				if(game.zhu.isAlive()){
 					if(game.players.length>1) return;
-					if(game.me==game.zhu){
+					if(me==game.zhu){
 						game.over(true);
 					}
 					else{
@@ -188,7 +189,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 				else {
-					if(game.me==game.zhu){
+					if(me==game.zhu){
 						game.over(false);
 					}
 					else{

@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.105.3',
+	'v1.9.105.4',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -625,6 +625,7 @@ window.noname_asset_list=[
 	'audio/die/simazhao.mp3',
 	'audio/die/sunqian.mp3',
 	'audio/die/wuxian.mp3',
+	'audio/die/re_liuzan.mp3',
 	
 	'audio/skill/anguo1.mp3',
 	'audio/skill/anguo2.mp3',
@@ -2751,6 +2752,10 @@ window.noname_asset_list=[
 	'audio/skill/sbaiyin2.mp3',
 	'audio/skill/wansha_shen_simayi1.mp3',
 	'audio/skill/wansha_shen_simayi2.mp3',
+	'audio/skill/liji1.mp3',
+	'audio/skill/liji2.mp3',
+	'audio/skill/refenyin1.mp3',
+	'audio/skill/refenyin2.mp3',
 	
 	'font/huangcao.ttf',
 	'font/shousha.ttf',
@@ -3380,6 +3385,7 @@ window.noname_asset_list=[
 	'image/character/xin_gongsunzan.jpg',
 	'image/character/xin_liaohua.jpg',
 	'image/character/key_godan.jpg',
+	'image/character/shen_diaochan.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',

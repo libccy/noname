@@ -10895,7 +10895,7 @@
 							return false;
 						}
 						if(info.direct&&player.isUnderControl()){
-							game.modeSwapPlayer(player);
+							game.swapPlayerAuto(player);
 							event._result={bool:true};
 							event._direct=true;
 						}
@@ -21055,12 +21055,14 @@
 					}
 				},
 				isUnderControl:function(self,me){
-					me=me||game.me;
-					if(this.isMad()) return false;
+					me=(me||game.me);
+					var that=this._trueMe||this;
+					if(that.isMad()||game.notMe) return false;
 					if(this===me){
 						if(self) return true;
 						return false;
 					}
+					if(that===me||this==me._trueMe) return true;
 					if(_status.connectMode) return false;
 					if(lib.config.mode=='versus'){
 						if(_status.mode=='three') return this.side==me.side;
@@ -23639,7 +23641,7 @@
 					delete this.filterCard2;
 				},
 				isMine:function(){
-					return (this.player&&this.player==game.me&&!_status.auto&&!this.player.isMad());
+					return (this.player&&this.player==game.me&&!_status.auto&&!this.player.isMad()&&!game.notMe);
 				},
 				isOnline:function(){
 					return (this.player&&this.player.isOnline());
@@ -24892,7 +24894,7 @@
 					return true;
 				},
 				content:function(){
-					game.modeSwapPlayer(player);
+					game.swapPlayerAuto(player);
 				},
 			},
 			dualside:{
@@ -30174,6 +30176,7 @@
 		},
 		over:function(result){
 			if(_status.over) return;
+			if(game.me._trueMe) game.swapPlayer(game.me._trueMe);
 			var i,j,k,num,table,tr,td,dialog;
 			_status.over=true;
 			ui.control.show();
@@ -38705,7 +38708,7 @@
 								editnode.classList.add('disabled');
 								delnode.innerHTML='取消';
 								delete delnode.button;
-								container.code='skill={\n			 \n}\n\n\/*\n示例：\nskill={\n			 trigger:{player:"phaseJieshuBegin"},\n			 frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+								container.code='skill={\n    \n}\n\n\/*\n示例：\nskill={\n    trigger:{player:"phaseJieshuBegin"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 								if(page.fromchar=='add'){
 									page.fromchar=true;
 								}
@@ -38806,7 +38809,7 @@
 							};
 							var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
 							var editor=ui.create.div(editorpage);
-							container.code='skill={\n			 \n}\n\n\/*\n示例：\nskill={\n			 trigger:{player:"phaseJieshuBegin"},\n			 frequent:true,\n			 content:function(){\n						  player.draw()\n			 }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+							container.code='skill={\n    \n}\n\n\/*\n示例：\nskill={\n    trigger:{player:"phaseJieshuBegin"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 
 							var citebutton=document.createElement('button');
 							citebutton.innerHTML='引用代码';
@@ -40461,8 +40464,10 @@
 								row1.hide();
 								row2.hide();
 							}
-							if(lib.config.mode=='identity'||lib.config.mode=='guozhan'){
-								if(!game.phaseNumber||_status.qianlidanji){
+							if(lib.config.mode=='identity'||lib.config.mode=='guozhan'||lib.config.mode=='doudizhu'){
+								if(game.notMe||(game.me&&(game.me._trueMe||game.hasPlayer(function(current){
+									return current._trueMe==game.me;
+								})))||!game.phaseNumber||_status.qianlidanji){
 									nodereplace.classList.add('unselectable');
 								}
 								else if(_status.event.isMine()&&ui.auto.classList.contains('hidden')){
@@ -46702,6 +46707,7 @@
 					}
 				}
 				else{
+					if(game.notMe) return;
 					ui.control.show();
 					_status.auto=false;
 					ui.auto.classList.remove('glow');
@@ -50932,6 +50938,8 @@
 		},
 		attitude:function(from,to){
 			if(!from||!to) return 0;
+			from=from._trueMe||from;
+			arguments[0]=from;
 			var att=get.rawAttitude.apply(this,arguments);
 			if(from.isMad()) att=-att;
 			if(to.isMad()&&att>0){

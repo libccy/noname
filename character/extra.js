@@ -3,6 +3,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'extra',
 		connect:true,
+		connectBanned:['shen_diaochan'],
 		characterSort:{
 			extra:{
 				extra_feng:['shen_guanyu','shen_lvmeng'],
@@ -13,6 +14,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				extra_lei:['shen_ganning','shen_zhangliao'],
 				extra_key:['key_kagari','key_shiki'],
 				extra_ol:['ol_zhangliao','shen_caopi','shen_zhenji'],
+				extra_offline:['shen_diaochan'],
 			},
 		},
 		character:{
@@ -20,7 +22,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_shiki:['female','shen','3/5',['shiki_omusubi'],['key']],
 			//key_hina:['female','shen',3,[],['key']],
 			
-			//shen_diaochan:['female','shen',3,[],['qun']],
+			shen_diaochan:['female','shen',3,['meihun','huoxin'],['qun']],
 			shen_guanyu:['male','shen',5,['new_wuhun','wushen'],['shu']],
 			shen_zhaoyun:['male','shen',2,['xinjuejing','relonghun'],['shu']],
 			shen_zhugeliang:['male','shen',3,['qixing','kuangfeng','dawu'],['shu']],
@@ -47,7 +49,174 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterTitle:{
 			//shen_ganning:"体力上限：6",
 		},
+		characterFilter:{
+			shen_diaochan:function(mode){
+				return mode=='identity'||mode=='doudizhu';
+			},
+		},
 		skill:{
+			meihun:{
+				audio:2,
+				trigger:{
+					player:'phaseJieshuBegin',
+					target:'useCardToTargeted',
+				},
+				direct:true,
+				filter:function(event,player){
+					if(event.name!='phaseJieshu'&&event.card.name!='sha') return false;
+					return game.hasPlayer(function(current){
+						return current!=player&&current.countCards('h');
+					});
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('meihun'),function(card,player,target){
+						return target!=player&&target.countCards('h')>0;
+					}).set('ai',function(target){
+						var player=_status.event.player;
+						var att=get.attitude(player,target);
+						if(att>0) return 0;
+						return 0.1-att/target.countCards('h');
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('meihun',target);
+						event.target=target;
+						player.chooseControl(lib.suit).set('prompt','请选择一种花色').set('ai',function(){
+							return lib.suit.randomGet();
+						})
+					}
+					else event.finish();
+					'step 2'
+					var suit=result.control;
+					player.chat(get.translation(suit+2));
+					if(target.countCards('h',{suit:suit})){
+						target.chooseCard('h','交给'+get.translation(player)+'一张'+get.translation(suit)+'花色的手牌',true,function(card,player){
+							return get.suit(card,player)==_status.event.suit;
+						}).set('suit',suit);
+					}
+					else{
+						player.discardPlayerCard(target,true,'h','visible');
+						event.finish();
+					}
+					'step 3'
+					if(result.bool&&result.cards&&result.cards.length) player.gain(result.cards,target,'give');
+				},
+			},
+			//Connect Mode support after Angel Beats! -2nd beat-
+			huoxin:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					if(game.countPlayer()<3) return false;
+					for(var i of lib.suit){
+						if(player.countCards('h',{suit:i})>1) return true;
+					}
+					return false;
+				},
+				complexCard:true,
+				position:'h',
+				filterCard:function(card,player){
+					if(!ui.selected.cards.length){
+						var suit=get.suit(card);
+						return player.countCards('h',function(card2){
+							return card!=card2&&get.suit(card2,player)==suit;
+						})>0;
+					}
+					return get.suit(card,player)==get.suit(ui.selected.cards[0],player);
+				},
+				selectCard:2,
+				selectTarget:2,
+				filterTarget:lib.filter.notMe,
+				multitarget:true,
+				multiline:true,
+				delay:false,
+				check:function(card){
+					return 6-get.value(card);
+				},
+				targetprompt:['拼点发起人','拼点目标'],
+				content:function(){
+					'step 0'
+					player.showCards(cards);
+					'step 1'
+					var target=targets[0];
+					targets.sortBySeat();
+					if(target!=targets[0]) cards.reverse();
+					for(var i=0;i<targets.length;i++){
+						targets[i].gain(cards[i],player,'visible');
+						player.$give(cards[i],targets[i]);
+					}
+					'step 2'
+					if(targets[0].canCompare(targets[1])){
+						targets[0].chooseToCompare(targets[1]);
+					}
+					else event.finish();
+					'step 3'
+					if(result.bool!==true) targets[0].addMark('huoxin',1);
+					if(result.bool!==false) targets[1].addMark('huoxin',1);
+				},
+				marktext:'魅',
+				intro:{
+					name:'魅惑',
+					name2:'魅惑',
+					content:'mark',
+				},
+				group:'huoxin_control',
+				ai:{
+					order:1,
+					result:{
+						target:function(player,target){
+							if(target.hasMark('huoxin')) return -2;
+							return -1;
+						},
+					},
+				},
+			},
+			huoxin_control:{
+				audio:'huoxin',
+				forced:true,
+				trigger:{global:'phaseBeginStart'},
+				filter:function(event,player){
+					return player!=event.player&&!event.player._trueMe&&event.player.countMark('huoxin')>1;
+				},
+				logTarget:'player',
+				skillAnimation:true,
+				animationColor:'key',
+				content:function(){
+					trigger.player.removeMark('huoxin',trigger.player.countMark('huoxin'));
+					trigger.player._trueMe=player;
+					game.addGlobalSkill('autoswap');
+					if(trigger.player==game.me){
+						game.notMe=true;
+						if(!_status.auto) ui.click.auto();
+					}
+					trigger.player.addSkill('huoxin2');
+				},
+			},
+			huoxin2:{
+				trigger:{
+					player:['phaseAfter','dieAfter'],
+					global:'phaseBefore',
+				},
+				lastDo:true,
+				charlotte:true,
+				forceDie:true,
+				forced:true,
+				silent:true,
+				content:function(){
+					player.removeSkill('huoxin2');
+				},
+				onremove:function(player){
+					if(player==game.me){
+						if(!game.notMe) game.swapPlayerAuto(player._trueMe)
+						else delete game.notMe;
+						if(_status.auto) ui.click.auto();
+					}
+					delete player._trueMe;
+				},
+			},
 			shiki_omusubi:{
 				audio:2,
 				trigger:{global:'roundStart'},
@@ -3423,7 +3592,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qixian_info:'锁定技，你的手牌上限视为7。',
 			caopi_xingdong:'行动',
 			caopi_xingdong_info:'出牌阶段限一次，你可以将一张【杀】或普通锦囊牌交给一名其他角色，然后该角色选择一项：对除你以外的角色使用此牌并在此牌结算完成后和你各摸一张牌；或跳过下回合的判定阶段和摸牌阶段。',
-			//shen_diaochan:'神貂蝉',
+			shen_diaochan:'神貂蝉',
+			meihun:'魅魂',
+			meihun_info:'结束阶段或当你成为【杀】的目标后，你可以令一名其他角色交给你一张你声明的花色的牌，若其没有则你观看其手牌然后弃置其中一张。',
+			huoxin_control:'惑心',
+			huoxin:'惑心',
+			huoxin_info:'出牌阶段限一次，你可以展示两张花色相同的手牌并分别交给两名其他角色，然后令这两名角色拼点，没赢的角色获得1个“魅惑”标记。拥有2个或更多“魅惑”的角色回合即将开始时，该角色移去其所有“魅惑”，此回合改为由你操控。',
 			
 			key_kagari:'篝',
 			kagari_zongsi:'纵丝',
@@ -3442,6 +3616,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			extra_lei:'神话再临·雷',
 			extra_key:'神话再临·论外',
 			extra_ol:'神话再临OL',
+			extra_offline:'神话再临·线下',
 		},
 	};
 });

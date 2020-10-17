@@ -447,7 +447,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filter:function (event,player){
 							if(player.isHealthy()||player.countCards('e')!=player.hp) return false;
 							var evt=event.getl(player);
-							if(event.name=='equip') return !evt||evt.cards.length!=1;
+							if(event.name=='equip'&&event.player==player) return !evt||evt.cards.length!=1;
 							return evt&&evt.es.length;
 						},
 						frequent:true,

@@ -1108,7 +1108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'xuanfeng',
 				audioname:['boss_lvbu3','re_heqi','re_lingtong'],
 				trigger:{
-					player:'loseAfter',
+					player:['loseAfter','phaseDiscardEnd'],
 					source:'gainAfter',
 					global:['equipAfter','addJudgeAfter'],
 				},

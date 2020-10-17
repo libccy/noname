@@ -2261,8 +2261,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!trigger.player.countCards('h')) event.finish();
 					else player.chooseButton(['选择一张牌作为「蝶」',trigger.player.getCards('h')]).set('ai',function(button){
 						var val=get.buttonValue(button);
-						if(get.attitude(_status.event.player,get.owner(button.link))>0) return -val;
-						return val;
+						if(get.attitude(_status.event.player,get.owner(button.link))<=0) return 10+val;
+						if(val<=0) return 20;
+						if(button.link.name=='tao'||button.link.name=='jiu') return 0;
+						return 1/val;
 					});
 					'step 2'
 					if(result.bool){
