@@ -421,9 +421,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
+			qinguo_use:{audio:2},
 			"xinfu_qinguo":{
 				group:"xinfu_qinguo_recover",
-				audio:2,
+				audio:'qinguo_use',
 				subfrequent:['recover'],
 				trigger:{
 					player:"useCardEnd",
@@ -433,11 +434,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				direct:true,
 				content:function(){
-					player.chooseUseTarget({name:'sha'},get.prompt('xinfu_qinguo'),'视为使用一张【杀】',false).logSkill='qinguo_use';
+					player.chooseUseTarget({name:'sha'},get.prompt('xinfu_qinguo'),'视为使用一张【杀】',false).logSkill='xinfu_qinguo';
 				},
 				subSkill:{
 					recover:{
-						audio:'xinfu_qinguo',
+						audio:'qinguo_use',
 						trigger:{
 							player:'loseAfter',
 							source:'gainAfter',

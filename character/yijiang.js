@@ -21,7 +21,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_guanzhang:['male','shu',4,['old_fuhun']],
 			old_wangyi:['female','wei',3,['oldzhenlie','oldmiji']],
 			caozhang:['male','wei',4,['jiangchi']],
-			guohuai:['male','wei',4,['jingce']],
+			guohuai:['male','wei',4,['rejingce']],
 			zhangchunhua:['female','wei',3,['rejueqing','reshangshi']],
 			caozhi:['male','wei',3,['luoying','jiushi']],
 			caochong:['male','wei',3,['chengxiang','renxin']],
@@ -194,6 +194,55 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fazheng:['liubei'],
 		},
 		skill:{
+			rejingce:{
+				audio:'jingce',
+				trigger:{player:'phaseUseEnd'},
+				frequent:true,
+				filter:function(event,player){
+					return player.getHistory('useCard',function(evt){
+						return evt.getParent('phaseUse')==event;
+					}).length>0;
+				},
+				content:function(){
+					var list=[];
+					player.getHistory('useCard',function(evt){
+						if(evt.getParent('phaseUse')==trigger) list.add(get.type2(evt.card));
+					});
+					player.draw(list.length);
+				},
+				group:'rejingce_add',
+			},
+			rejingce_add:{
+				trigger:{player:'loseEnd'},
+				silent:true,
+				firstDo:true,
+				filter:function(event,player){
+					if(event.getParent().name!='useCard'||player!=_status.currentPhase) return false;
+					var list=player.getStorage('rejingce2');
+					for(var i of event.cards){
+						if(!list.contains(get.suit(i,player))) return true;
+					}
+					return false;
+				},
+				content:function(){
+					if(!player.storage.rejingce2) player.storage.rejingce2=[];
+					for(var i of trigger.cards) player.storage.rejingce2.add(get.suit(i,player));
+					player.storage.rejingce2.sort();
+					player.addTempSkill('rejingce2');
+					player.markSkill('rejingce2');
+				},
+			},
+			rejingce2:{
+				onremove:true,
+				intro:{
+					content:'当前已使用花色：$',
+				},
+				mod:{
+					maxHandcard:function(player,num){
+						return num+player.getStorage('rejingce2').length;
+					},
+				},
+			},
 			rejueqing:{
 				audio:'jueqing',
 				trigger:{source:'damageBegin2'},
@@ -12617,7 +12666,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reshangshi:'伤逝',
 			reshangshi_2nd:'伤逝',
 			reshangshi_info:'当你受到伤害时，你可以弃置一张牌。当你的手牌数小于X时，你可以将手牌摸至X张。（X为你已损失的体力值）',
-			re_gongsunzan:'界公孙瓒',
+			re_gongsunzan:'公孙瓒',
+			rejingce:'精策',
+			rejingce2:'精策',
+			rejingce_add:'精策',
+			rejingce_info:'当你于一回合内首次使用某种花色的手牌时，你的手牌上限+1。出牌阶段结束时，你可以摸X张牌（X为你本阶段内使用过的牌的类型数）。',
 			
 			yijiang_2011:'一将成名2011',
 			yijiang_2012:'一将成名2012',

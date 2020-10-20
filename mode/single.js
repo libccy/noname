@@ -304,7 +304,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			showIdentity:function(){},
 			checkResult:function(){
-				game.over(game.me.isAlive());
+				game.over((game.me._trueMe||game.me).isAlive());
 			},
 			checkOnlineResult:function(player){
 				return player.isAlive();

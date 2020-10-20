@@ -833,7 +833,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					use:{
 						trigger:{
-							player:"useCard",
+							global:"useCard",
 						},
 						filter:function (event,player){
 							return get.type(event.card)=='equip'&&event.player.isAlive()&&
@@ -6856,11 +6856,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			checkResult:function(){
 				_status.overing=true;
+				var me=game.me._trueMe||game.me;
 				for(var i=0;i<game.players.length;i++){
 					game.players[i].showCharacter(2);
 				}
-				if(game.me.identity=='ye'){
-					if(game.me.classList.contains('dead')){
+				if(me.identity=='ye'){
+					if(me.classList.contains('dead')){
 						game.over(false);
 					}
 					else{
@@ -6868,7 +6869,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 				else{
-					if(get.population(game.me.identity)==0){
+					if(get.population(me.identity)==0){
 						game.over(false);
 					}
 					else{

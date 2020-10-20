@@ -4570,7 +4570,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							for(var i=0;i<game.players.length;i++){
 								game.players[i].classList.remove('current_action');
 							}
-							game.over(_status.winside==game.me.side);
+							var me=game.me._trueMe||game.me;
+							game.over(_status.winside==me.side);
 						}
 					}
 				}
@@ -6443,9 +6444,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else{
+						var me=game.me._trueMe||game.me;
 						if(_status.mode=='four'||_status.mode=='guandu'){
 							if(this.identity=='zhu'){
-								game.over(this.side!=game.me.side);
+								game.over(this.side!=me.side);
 							}
 							else{
 								if(_status.mode=='guandu'&&source&&source.side!=this.side){
@@ -6461,14 +6463,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										side2.push(game.players[i]);
 									}
 								}
-								if(game.me.side){
+								if(me.side){
 									if(side1.length<=side2.length-2){
-										game.me.showGiveup();
+										me.showGiveup();
 									}
 								}
 								else{
 									if(side1.length>=side2.length+2){
-										game.me.showGiveup();
+										me.showGiveup();
 									}
 								}
 							}
@@ -6491,19 +6493,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									delete friend.replacetwo;
 								}
 								else{
-									game.over(this.side!=game.me.side);
+									game.over(this.side!=me.side);
 								}
 							}
 							else{
 								if(!friend){
-									game.over(this.side!=game.me.side);
+									game.over(this.side!=me.side);
 								}
 							}
 							return;
 						}
 						else if(_status.mode=='siguo'){
 							if(game.players.length==1||(game.players.length==2&&game.players[0].side==game.players[1].side)){
-								game.over(game.me.side==game.players[0].side);
+								game.over(me.side==game.players[0].side);
 							}
 							var assignzhibao=function(){
 								var list=game.players.slice(0);
@@ -6563,10 +6565,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						else if(_status.mode=='jiange'){
 							if(get.population('wei')==0){
-								game.over(game.me.identity=='shu');
+								game.over(me.identity=='shu');
 							}
 							else if(get.population('shu')==0){
-								game.over(game.me.identity=='wei');
+								game.over(me.identity=='wei');
 							}
 							return;
 						}
@@ -6580,7 +6582,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							else{
-								if(this==game.me){
+								if(this==me){
 									game.modeSwapPlayer(game.friendZhu);
 								}
 								game.friend.remove(this);
@@ -6588,7 +6590,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							return;
 						}
-						if(this.side==game.me.side){
+						if(this.side==me.side){
 							_status.friendDied.push(this.name);
 							_status.friendCount.innerHTML='阵亡: '+get.cnNumber(_status.friendDied.length,true);
 						}
@@ -6597,7 +6599,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							_status.enemyCount.innerHTML='杀敌: '+get.cnNumber(_status.enemyDied.length,true);
 						}
 
-						var list=(this.side==game.me.side)?_status.friend:_status.enemy;
+						var list=(this.side==me.side)?_status.friend:_status.enemy;
 						if((list.length==0&&lib.storage.noreplace_end)||
 						(lib.storage.zhu&&lib.storage.main_zhu&&this.identity=='zhu'&&game.players.length>2)){
 							if(game.friend.contains(this)){

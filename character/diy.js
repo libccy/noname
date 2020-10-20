@@ -3,7 +3,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'diy',
 		connect:true,
-		connectBanned:['diy_tianyu','diy_yangyi','diy_lukang','ns_huamulan','ns_yuji','ns_duangui','ns_liuzhang'],
+		connectBanned:['diy_tianyu','diy_yangyi','diy_lukang','ns_huamulan','ns_yuji','ns_duangui','ns_liuzhang','key_yuu'],
 		character:{
 			sp_key_yuri:['female','qun',4,['mubing','diaoling']],
 			ns_zhangwei:['female','wei',3,['nsqiyue','nsxuezhu']],
@@ -58,6 +58,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_akiko:['female','key',3,['akiko_dongcha']],
 			key_abyusa:['female','key',3,['abyusa_jueqing','abyusa_dunying']],
 			key_godan:['male','key',6,['godan_yuanyi','godan_feiqu','godan_xiaoyuan']],
+			key_yuu:['male','key',3,['yuu_lveduo']],
 			
 			key_kud:['female','key',3,['kud_qiaoshou','kud_buhui']],
 			key_misuzu:['female','key',3,['misuzu_hengzhou','misuzu_nongyin','misuzu_zhongxing']],
@@ -133,6 +134,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_xinnanhua:['male','qun',3,['ns_xiandao','ns_xiuzheng','ns_chuanshu'],[]],
 		},
 		characterFilter:{
+			key_yuu:function(mode){
+				return mode=='identity'||mode=='doudizhu'||mode=='single'||(mode=='versus'&&_status.mode!='standard');
+			},
 			key_tomoya:function(mode){
 				return mode!='chess'&&mode!='tafang'&&mode!='stone';
 			},
@@ -152,7 +156,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				"ns_huangchengyan","ns_sunchensunjun","ns_yuanxi","ns_caoshuang"],
 				diy_tieba:["diy_wenyang","ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_zhangwei"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu"],
 				diy_yongjian:["ns_chendao","yj_caoang"],
 			},
 		},
@@ -168,6 +172,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
+			key_yuu:'#bCharlotte',
 			key_godan:'#rAngel Beats!',
 			key_abyusa:'#rAngel Beats!',
 			key_akiko:'#bKanon',
@@ -321,6 +326,118 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			yuu_lveduo:{
+				mod:{
+					cardEnabled:function(card,player){
+						if(player.isTurnedOver()) return false;
+					},
+					cardRespondable:function(card,player){
+						if(player.isTurnedOver()) return false;
+					},
+					cardSavable:function(card,player){
+						if(player.isTurnedOver()) return false;
+					},
+				},
+				trigger:{global:'phaseBeginStart'},
+				filter:function(event,player){
+					return player!=event.player&&!event.player._trueMe&&!player.getStorage('yuu_lveduo').contains(event.player)&&!player.isTurnedOver()&&!player.hasSkill('yuu_lveduo4');
+				},
+				charlotte:true,
+				check:function(event,player){
+					if(get.attitude(player,event.player)>0) return false;
+					if(event.player.hasJudge('lebu')||!event.player.needsToDiscard()) return false;
+					return true;
+				},
+				logTarget:'player',
+				content:function(){
+					'step 0'
+					player.turnOver();
+					'step 1'
+					if(player.isTurnedOver()){
+						player.addTempSkill('yuu_lveduo4','roundStart')
+						if(!player.storage.yuu_lveduo) player.storage.yuu_lveduo=[];
+						player.storage.yuu_lveduo.push(trigger.player);
+						trigger.player._trueMe=player;
+						game.addGlobalSkill('autoswap');
+						if(trigger.player==game.me){
+							game.notMe=true;
+							if(!_status.auto) ui.click.auto();
+						}
+						player.addSkill('yuu_lveduo2');
+						trigger.player.addSkill('yuu_lveduo3');
+					}
+				},
+			},
+			yuu_lveduo2:{
+				trigger:{
+					player:'turnOverEnd',
+				},
+				lastDo:true,
+				charlotte:true,
+				forceDie:true,
+				forced:true,
+				silent:true,
+				filter:function(event,player){
+					return !player.isTurnedOver();
+				},
+				content:function(){
+					var target=game.findPlayer(function(current){
+						return current._trueMe==player;
+					});
+					if(target){
+						if(target==game.me){
+							if(!game.notMe) game.swapPlayerAuto(target._trueMe)
+							else delete game.notMe;
+							if(_status.auto) ui.click.auto();
+						}
+						delete target._trueMe;
+						target.removeSkill('yuu_lveduo3');
+						var skills=target.getStockSkills(true,true).filter(function(skill){
+							var info=get.info(skill);
+							return info&&info.charlotte==true;
+						});
+						if(skills.length){
+							target.removeSkill(skills);
+							player.addSkill(skills);
+							lib.translate.yuu_lveduo_info=lib.translate.yuu_lveduo_full_info;
+						}
+						if(target.name=='key_yusa'){
+							delete target.storage.dualside;
+							target.storage.dualside_over=true;
+							target.unmarkSkill('dualside');
+							target.removeSkill('dualside');
+						}
+						else if(target.name=='key_misa'){
+							delete target.storage.dualside;
+							target.storage.dualside_over=true;
+							target.unmarkSkill('dualside');
+							target.reinit('key_misa','key_yusa');
+							target.removeSkill('yusa_misa');
+							target.removeSkill('dualside');
+							target.turnOver(false);
+						}
+					}
+					player.removeSkill('yuu_lveduo2');
+				},
+			},
+			yuu_lveduo3:{
+				trigger:{
+					player:['phaseAfter','dieAfter'],
+					global:'phaseBefore',
+				},
+				lastDo:true,
+				charlotte:true,
+				forceDie:true,
+				forced:true,
+				silent:true,
+				content:function(){
+					player.removeSkill('yuu_lveduo3');
+				},
+				onremove:function(player){
+					if(player._trueMe&&player._trueMe.isTurnedOver()) player._trueMe.turnOver();
+				},
+			},
+			yuu_lveduo4:{},
 			godan_yuanyi:{
 				trigger:{player:'phaseBegin'},
 				forced:true,
@@ -881,6 +998,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			misuzu_hengzhou:{
 				trigger:{player:['phaseJieshuBegin','recoverEnd','damageEnd','phaseDrawBegin2','phaseZhunbeiBegin']},
 				forced:true,
+				character:true,
 				filter:function(event,player){
 					if(event.name=='phaseZhunbei') return true;
 					if(['damage','recover'].contains(event.name)) return event.num>0;
@@ -1519,6 +1637,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			shizuru_nianli:{
 				enable:'chooseToUse',
+				charlotte:true,
 				prompt:'展示一张♦/♣/♥/♠手牌，然后视为使用一张雷杀/闪/桃/无懈可击',
 				viewAs:function(cards,player){
 					var name=false;
@@ -1877,6 +1996,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				limited:true,
 				unique:true,
+				charlotte:true,
 				skillAnimation:true,
 				animationColor:'water',
 				filter:function(event,player){
@@ -1899,6 +2019,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			midori_nonghuan:{
 				enable:'phaseUse',
+				charlotte:true,
 				filter:function(event,player){
 					return (player.getStat('skill').midori_nonghuan||0)<player.hp;
 				},
@@ -1949,6 +2070,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			midori_tishen:{
 				trigger:{player:'phaseZhunbeiBegin'},
 				limited:true,
+				charlotte:true,
 				unique:true,
 				skillAnimation:true,
 				animationColor:'water',
@@ -2476,6 +2598,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			nagisa_tiandu:{
 				trigger:{player:'judgeEnd'},
+				charlotte:true,
 				frequent:function(event){
 					if(event.result.card.name=='du') return false;
 					return true;
@@ -2754,6 +2877,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hisako_zhuanyun:{
 				trigger:{player:'judgeBegin'},
 				forced:true,
+				charlotte:true,
 				silent:true,
 				filter:function(event,player){
 					return !event.directresult;
@@ -3866,6 +3990,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			tsumugi_huilang:{
 				trigger:{player:'phaseEnd'},
+				charlotte:true,
 				line:{color:[253, 198, 116]},
 				direct:true,
 				filter:function(event,player){
@@ -5516,7 +5641,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				check:function(event,player){
 					if(['equip','delay'].contains(get.type(event.card))) return get.attitude(player,event.player)<0;
-					return get.value(event.cards.filterInD()>0);
+					return get.value(event.cards.filterInD())>0;
 				},
 				logTarget:'player',
 				content:function(){
@@ -10371,6 +10496,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_akiko:'水濑秋子',
 			key_abyusa:'游佐',
 			key_godan:'松下护騨',
+			key_yuu:'乙坂有宇',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -10619,6 +10745,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			godan_feiqu_info:'锁定技，当你使用【杀】时，或你成为【杀】的目标后，你令此【杀】不可被响应。',
 			godan_xiaoyuan:'消元',
 			godan_xiaoyuan_info:'觉醒技，当你扣减体力时，若你的体力值小于4，则你减3点体力上限并摸三张牌，失去【肥躯】。',
+			yuu_lveduo:'掠夺',
+			yuu_lveduo_info:'每轮限一次，其他角色的回合开始时，若你本局游戏内未对其发动过〖掠夺〗且你的武将牌正面朝上，你可以将武将牌翻面并获得该角色本回合内的控制权。此回合结束时，你将武将牌翻回正面。锁定技，若你的武将牌背面朝上，则你不能使用或打出牌。',
+			yuu_lveduo_full_info:'每轮限一次，其他角色的回合开始时，若你本局游戏内未对其发动过〖掠夺〗且你的武将牌正面朝上，你可以将武将牌翻面并获得该角色本回合内的控制权。此回合结束时，你将武将牌翻回正面，获得该角色武将牌上所有的带有「Charlotte」标签的技能，且该角色失去这些技能。锁定技，若你的武将牌背面朝上，则你不能使用或打出牌。',
 			
 			key_kud:'库特莉亚芙卡',
 			kud_qiaoshou:'巧手',

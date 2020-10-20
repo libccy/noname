@@ -51,7 +51,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{
 			shen_diaochan:function(mode){
-				return mode=='identity'||mode=='doudizhu';
+				return mode=='identity'||mode=='doudizhu'||mode=='single'||(mode=='versus'&&_status.mode!='standard');
 			},
 		},
 		skill:{
@@ -154,8 +154,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 3'
-					if(result.bool!==true) targets[0].addMark('huoxin',1);
-					if(result.bool!==false) targets[1].addMark('huoxin',1);
+					if(result.winner!==targets[0]) targets[0].addMark('huoxin',1);
+					if(result.winner!==targets[1]) targets[1].addMark('huoxin',1);
 				},
 				marktext:'魅',
 				intro:{
@@ -3594,7 +3594,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caopi_xingdong_info:'出牌阶段限一次，你可以将一张【杀】或普通锦囊牌交给一名其他角色，然后该角色选择一项：对除你以外的角色使用此牌并在此牌结算完成后和你各摸一张牌；或跳过下回合的判定阶段和摸牌阶段。',
 			shen_diaochan:'神貂蝉',
 			meihun:'魅魂',
-			meihun_info:'结束阶段或当你成为【杀】的目标后，你可以令一名其他角色交给你一张你声明的花色的牌，若其没有则你观看其手牌然后弃置其中一张。',
+			meihun_info:'结束阶段或当你成为【杀】的目标后，你可以令一名其他角色交给你一张你声明的花色的手牌，若其没有则你观看其手牌然后弃置其中一张。',
 			huoxin_control:'惑心',
 			huoxin:'惑心',
 			huoxin_info:'出牌阶段限一次，你可以展示两张花色相同的手牌并分别交给两名其他角色，然后令这两名角色拼点，没赢的角色获得1个“魅惑”标记。拥有2个或更多“魅惑”的角色回合即将开始时，该角色移去其所有“魅惑”，此回合改为由你操控。',

@@ -11,7 +11,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_sticker:['sp_gongsunzan','sp_simazhao','sp_wangyuanji','sp_xinxianying','sp_liuxie'],
 				sp_guozhan:["zangba","shamoke","ganfuren","yuejin","hetaihou","dingfeng","panfeng","jianggan"],
 				sp_guozhan2:["mifuren","mateng","tianfeng","chendong","sp_dongzhuo","jiangfei","jiangqing","kongrong","bianfuren","liqueguosi","lvfan","cuimao","jiling","zhangren","zoushi"],
-				sp_single:["hejin","hansui","niujin"],
+				sp_single:["niujin"],
 				sp_others:["hanba","caiyang"],
 			},
 		},
@@ -33,8 +33,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuantanyuanshang:['male','qun',4,['neifa']],
 			xujing:['male','shu',3,['yuxu','xjshijian']],
 			
-			hejin:['male','qun',4,['spmouzhu']],
-			hansui:['male','qun',4,['spniluan','spweiwu']],
 			niujin:['male','wei',4,['cuorui','liewei']],
 			jianggan:["male","wei",3,["weicheng","daoshu"]],
 			
@@ -469,7 +467,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectTarget:-1,
 				content:function(){
 					'step 0'
-					target.chooseCard('he','交给'+get.translation(player)+'一张牌',true);
+					if(!target.countCards('he')) event.finish();
+					else target.chooseCard('he','交给'+get.translation(player)+'一张牌',true);
 					'step 1'
 					player.gain(result.cards,target,'giveAuto');
 					'step 2'
@@ -8972,7 +8971,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				audio:2,
 				filter:function(event,player){
-					return event.parent.name=='phaseDiscard'&&player.countCards('h',{type:'basic'})<player.countCards('h');
+					return player.countCards('h')>player.getHandcardLimit();
 				},
 				content:function(){},
 				mod:{
@@ -11680,12 +11679,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			sijian:{
-				trigger:{player:'loseAfter'},
+				trigger:{
+					player:'loseAfter',
+					source:'gainAfter',
+					global:['equipAfter','addJudgeAfter'],
+				},
 				direct:true,
 				audio:2,
 				filter:function(event,player){
 					if(player.countCards('h')) return false;
-					return event.hs&&event.hs.length>0;
+					var evt=event.getl(player);
+					return evt&&evt.hs&&evt.hs.length>0;
 				},
 				content:function(){
 					"step 0"

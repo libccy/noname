@@ -605,25 +605,31 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			jinhe_lose:{
-				trigger:{player:'loseEnd'},
+				trigger:{
+					player:['loseAfter','equipAfter'],
+				},
 				equipSkill:true,
 				forced:true,
 				filter:function(event,player){
-					if(event.type!='discard'||!_status.jinhe||event.getParent(2).name=='jinhe_skill'&&event.getParent(2).player==player) return false;
-					for(var i=0;i<event.es.length;i++){
-						if(event.es[i].name=='jinhe'&&_status.jinhe[event.es[i].cardid]) return true;
+					if(event.getl===false) return false;
+					if(event.name=='lose'&&event.position!=ui.discardPile||!_status.jinhe||event.getParent(2).name=='jinhe_skill'&&event.getParent(2).player==player) return false;
+					var evt=event.getl(player);
+					if(!evt) return false;
+					for(var i=0;i<evt.es.length;i++){
+						if(evt.es[i].name=='jinhe'&&_status.jinhe[evt.es[i].cardid]) return true;
 					}
 					return false;
 				},
 				content:function(){
 					"step 0"
-					for(var i=0;i<trigger.es.length;i++){
-						if(trigger.es[i].name=='jinhe'&&_status.jinhe[trigger.es[i].cardid]){
-							var card=_status.jinhe[trigger.es[i].cardid].card;
+					var es=trigger.getl(player).es;
+					for(var i=0;i<es.length;i++){
+						if(es[i].name=='jinhe'&&_status.jinhe[es[i].cardid]){
+							var card=_status.jinhe[es[i].cardid].card;
 							game.cardsDiscard(card);
 							player.$throw(card);
 							game.log(card,'进入了弃牌堆');
-							delete _status.jinhe[trigger.es[i].cardid];
+							delete _status.jinhe[es[i].cardid];
 						};
 					}
 					game.broadcastAll(function(jinhe){

@@ -17,7 +17,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			swd_chenjingchou:['male','wu',3,['youyin','yihua']],
 			swd_duguningke:['female','qun',3,['nlianji','touxi']],
 			swd_guyue:['male','wei',3,['gtiandao','gxianyin','wangchen']],
-			swd_tuobayuer:['female','shu',4,['liuhong','poyue','niepan']],
+			swd_tuobayuer:['female','shu',4,['swdliuhong','poyue','niepan']],
 			swd_yuwentuo:['male','shu',4,['wushuang','xielei','kunlunjing']],
 			swd_yuxiaoxue:['female','wei',3,['huanhun','daixing','yinyue']],
 
@@ -4005,7 +4005,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.recover();
 				}
 			},
-			liuhong:{
+			swdliuhong:{
 				trigger:{player:['useCard']},
 				frequent:true,
 				filter:function(event){
@@ -10082,8 +10082,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gongshen:'工神',
 			gongshen_info:'任意一名其他角色使用一张基本牌或锦囊牌指定目标后，你可以弃置一张装备牌令其失效',
 
-			liuhong:'流虹',
-			liuhong_info:'每当你使用一张杀，可以摸一张牌',
+			swdliuhong:'流虹',
+			swdliuhong_info:'每当你使用一张杀，可以摸一张牌',
 			poyue:'破月',
 			poyue_info:'锁定技，你的黑杀无视距离，红色杀不计入回合内的出杀限制且不可闪避',
 			poyue_info_alter:'锁定技，你的黑杀无视距离，红色杀不可闪避',

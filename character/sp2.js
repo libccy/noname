@@ -4,6 +4,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			hejin:['male','qun',4,['spmouzhu']],
+			hansui:['male','qun',4,['spniluan','spweiwu']],
+			liuhong:['male','qun',4,['yujue','tuxing'],['unseen']],
+			zhujun:['male','qun',4,['gongjian','kuimang'],['unseen']],
 			caoxing:['male','qun',4,['cxliushi','zhanwan'],['unseen']],
 			re_maliang:['male','shu',3,['rexiemu','heli'],[]],
 			ol_yujin:['male','wei',4,['rezhenjun']],
@@ -61,10 +65,171 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_shengun:["puyuan","guanlu","gexuan","xushao"],
 				sp_baigei:['re_panfeng','xingdaorong','caoxing'],
 				sp_guandu:["sp_zhanghe","xunchen","sp_shenpei","gaolan","lvkuanglvxiang","chunyuqiong","sp_xuyou"],
+				sp_huangjin:['liuhong','zhujun','hejin','hansui'],
 				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','re_sunluyu','caobuxing','ol_xinxianying','ol_yujin','re_maliang'],
 			}
 		},
 		skill:{
+			yujue:{
+				derivation:'zhihu',
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.countDisabled()<5;
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						return ui.create.dialog('###鬻爵###'+lib.translate.yujue_info);
+					},
+					chooseControl:function(event,player){
+						var list=[];
+						for(var i=1;i<6;i++){
+							if(!player.isDisabled(i)) list.push('equip'+i);
+						}
+						list.push('cancel2');
+						return list;
+					},
+					backup:function(result){
+						var next=get.copy(lib.skill.yujuex);
+						next.position=result.control;
+						return next;
+					},
+				},
+			},
+			yujuex:{
+				audio:'yujue',
+				content:function(){
+					'step 0'
+					player.disableEquip(lib.skill.yujue_backup.position);
+					'step 1'
+					if(player.isAlive()&&game.hasPlayer(function(current){
+						return current!=player&&current.countCards('h');
+					})){
+						player.chooseTarget(true,'选择一名角色交给你一张牌并获得技能〖执笏〗',function(card,player,target){
+							if(player==target) return false;
+							var hs=target.countCards('h');
+							return hs>0&&!game.hasPlayer(function(current){
+								return current!=player&&current!=target&&current.countCards('h')>hs;
+							});
+						});
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.line(target);
+						target.chooseCard('h',true,'交给'+get.translation(player)+'一张手牌');
+					}
+					else event.finish();
+					'step 3'
+					if(result.bool&&result.cards&&result.cards.length){
+						player.gain(result.cards,target,'giveAuto');
+						target.storage.zhihu_mark=player;
+						target.addSkill('zhihu');
+						target.addSkill('zhihu_mark');
+					}
+				},
+			},
+			zhihu:{
+				usable:3,
+				trigger:{source:'damageSource'},
+				forced:true,
+				filter:function(event,player){
+					return player!=event.player;
+				},
+				content:function(){
+					player.draw();
+				},
+			},
+			zhihu_mark:{
+				mark:'character',
+				intro:{
+					content:'以$之名，授予汝技能〖执笏〗，直至$的下回合开始为止！',
+				},
+				onremove:function(player){
+					delete player.storage.zhihu_mark;
+					player.removeSkill('zhihu');
+				},
+				trigger:{global:'phaseBeginStart'},
+				firstDo:true,
+				charlotte:true,
+				silent:true,
+				filter:function(event,player){
+					return event.player==player.storage.zhihu_mark;
+				},
+				content:function(){
+					player.removeSkill('zhihu_mark');
+				},
+			},
+			tuxing:{
+				trigger:{player:'disableEquipAfter'},
+				forced:true,
+				content:function(){
+					'step 0'
+					player.gainMaxHp();
+					player.recover();
+					'step 1'
+					if(player.countDisabled()>=5){
+						player.loseMaxHp(4);
+						player.addSkill('tuxing2');
+					}
+				}
+			},
+			tuxing2:{
+				audio:'tuxing',
+				trigger:{source:'damageBegin1'},
+				forced:true,
+				charlotte:true,
+				filter:function(event,player){
+					return event.getParent().name=='sha';
+				},
+				content:function(){
+					trigger.num++;
+				},
+				mark:true,
+				intro:{
+					content:'因执行【杀】的效果造成伤害时，此伤害+1',
+				},
+			},
+			gongjian:{
+				trigger:{player:'useCardToPlayered'},
+				usable:1,
+				logTarget:'target',
+				filter:function(event,player){
+					var evt=event.getParent();
+					var history=player.getAllHistory('useCard',function(evtx){
+						return evtx.card.name=='sha'
+					});
+					var index=history.indexOf(evt);
+					return index>0&&history[index-1].targets.filter(function(target){
+						return evt.targets.contains(target);
+					}).length>0&&event.target.countDiscardableCards(player,'he')>0;
+				},
+				content:function(){
+					'step 0'
+					player.discardPlayerCard(trigger.target,true,'he',2);
+					'step 1'
+					if(result.bool){
+						var cards=result.cards.filter(function(card){
+							return get.name(card,card.original=='h'?trigger.target:false)=='sha';
+						});
+						if(cards.length) player.gain(cards,'gain2','log');
+					}
+				},
+			},
+			kuimang:{
+				trigger:{global:'dieAfter'},
+				forced:true,
+				filter:function(event,player){
+					return player.getAllHistory('sourceDamage',function(target){
+						return target.player==event.player;
+					}).length>0;
+				},
+				content:function(){
+					player.draw(2);
+				},
+			},
 			cxliushi:{
 				enable:'phaseUse',
 				filter:function(event,player){
@@ -475,7 +640,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					backup:function(links,player){
 						return {
 							audio:'juanhui',
-							popname·true,
+							popname:true,
 							filterCard:true,
 							viewAs:{
  							name:links[0][2],
@@ -5265,6 +5430,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wenyang:"文俶（238年—291年），一作文淑，字次骞，小名阿鸯，世称文鸯，谯郡（今安徽亳州市）人。魏末晋初名将，曹魏扬州刺史文钦之子。骁勇善战，依附大将军曹爽，效忠于王室。司马师废黜皇帝曹芳后，随父联合毌丘俭于淮南起兵勤王。兵败之后，向南投奔吴国。诸葛诞发动淮南叛乱，奉命率军驰援。双方发生内讧，父亲为诸葛诞所害，遂降于司马昭，封关内侯。西晋建立后，任平虏护军。咸宁三年（277年），拜平西将军、都督凉秦雍州三州军事，大破鲜卑首领秃发树机能，名震天下，迁使持节、护东夷校尉、监辽东军事。八王之乱中，为诸葛诞外孙、东安王司马繇所诬杀，惨遭灭族，时年五十四岁。",
 			liuzan:'字正明，会稽长山人人，曾任左护军，有两子：留略、留平。少为会稽郡吏，曾参与镇压黄巾起义，后被东吴大将凌统所引用，任屯骑校尉。吴五凤二年（公元255年）留赞任左护军，随孙峻征淮南，因病撤军，被魏将蒋班围困于道，力战而死，时年73岁。',
 			caoxing:'曹性，东汉末年吕布部将，史载他曾与身为自己上司的反叛者郝萌交战，并砍去郝萌一臂，受到吕布的嘉奖。在罗贯中所著古典小说《三国演义》中，也有关于曹性箭射夏侯惇左目的描述，而曹性也随即被暴怒的夏侯惇所杀。',
+			zhujun:'朱儁（？－195年），字公伟。会稽郡上虞县（今浙江绍兴上虞区）人。东汉末年名将。朱儁出身寒门，赡养母亲，以好义轻财闻名，受乡里敬重。后被太守徐珪举为孝廉，任兰陵令，颇有治绩。再升任交州刺史，以家兵五千大破叛军，平定交州。战后以功封都亭侯，入朝为谏议大夫。光和七年（184年），黄巾起义爆发，朱儁以右中郎将、持节平定三郡之地，以功进封西乡侯，迁镇贼中郎将。又率军讨平黄巾，“威声满天下”。中平二年（185年），进拜右车骑将军，更封钱塘侯。后为河内太守，击退进逼的张燕。权臣董卓秉政时，想任朱儁为副手，遭其婉拒。其后出逃荆州，更屯军中牟，徐州刺史陶谦等欲推举他为太师，并传檄各州牧伯，相邀讨伐李傕、奉迎天子。但朱儁却奉诏入京任太仆。初平三年（192年），升任太尉、录尚书事。兴平元年（194年），行骠骑将军事，持节镇关东，因故未成行。兴平二年（195年），李傕与郭汜相互攻杀，郭汜扣留朱儁作为人质。朱儁性格刚烈，即日发病而死。',
+			liuhong:'汉灵帝刘宏（157年，一作156年－189年5月13日），生于冀州河间国（今河北深州）。东汉第十二位皇帝（168年－189年在位），汉章帝刘炟的玄孙。刘宏早年世袭解渎亭侯。永康元年（167年）十二月，汉桓帝刘志逝世，刘宏被外戚窦氏挑选为皇位继承人，于建宁元年（168年）正月即位。刘宏在位的大部分时期，施行党锢及宦官政治。他又设置西园，巧立名目搜刮钱财，甚至卖官鬻爵以用于自己享乐。在位晚期，爆发了黄巾起义，而凉州等地也陷入持续动乱之中。中平六年（189年），刘宏去世，谥号孝灵皇帝，葬于文陵。刘宏喜好辞赋，作有《皇羲篇》、《追德赋》、《令仪颂》、《招商歌》等。',
 		},
 		characterTitle:{
 			wulan:'#b对决限定武将',
@@ -5582,6 +5749,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			cxliushi_info:'出牌阶段，你可以将一张红桃牌置于牌堆顶，视为对一名角色使用一张不计入次数的【杀】。若此【杀】造成伤害，该角色手牌上限永久-1。',
 			zhanwan:'斩腕',
 			zhanwan_info:'锁定技，受到【流矢】效果影响的角色若弃牌阶段有弃牌，你摸等量的牌，然后移除【流矢】的效果。',
+			zhujun:'朱儁',
+			gongjian:'攻坚',
+			gongjian_info:'每回合限一次，当你使用【杀】指定目标后，若此【杀】和你使用的上一张【杀】有相同的目标，则你可以弃置其两张牌，然后获得以此法弃置的所有【杀】。',
+			kuimang:'溃蟒',
+			kuimang_info:'锁定技，一名角色死亡后，若你对其造成过伤害，你摸两张牌。',
+			liuhong:'刘宏',
+			yujue:'鬻爵',
+			yujue_backup:'鬻爵',
+			yujue_info:'出牌阶段限一次，你可以废除一个装备栏，然后令除你之外手牌数最多的一名其他角色交给你一张手牌。其获得〖执笏〗直到你的下回合开始。',
+			zhihu:'执笏',
+			zhihu_mark:'执笏',
+			zhihu_info:'锁定技，每回合限三次，当你对其他角色造成伤害后，你摸一张牌。',
+			tuxing:'图兴',
+			tuxing2:'图兴',
+			tuxing_info:'锁定技，当你废除一个装备栏时，你加1点体力上限并回复1点体力。然后若你所有的装备栏均已被废除，则你减4点体力上限，且本局游戏内使用【杀】造成的伤害+1。',
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",
@@ -5591,6 +5773,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_shengun:'三国奇人传',
 			sp_baigei:'无双上将',
 			sp_guandu:'官渡之战',
+			sp_huangjin:'黄巾之乱',
 			sp_decade:'其他新服武将',
 		},
 	};

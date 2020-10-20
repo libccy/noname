@@ -169,7 +169,13 @@
 						name:'无闪自动取消',
 						init:false,
 						unfrequent:true,
-						intro:'当自己需要使用或打出闪时，若自己没有闪，则跳过该步骤',
+						intro:'当自己需要使用或打出【闪】时，若自己没有【闪】，则跳过该步骤',
+					},
+					unauto_choose:{
+						name:'拆顺手牌选择',
+						init:false,
+						unfrequent:true,
+						intro:'拆牌或者顺牌时，就算只能选择对方的手牌依然手动选择',
 					},
 					wuxie_self:{
 						name:'不无懈自己',
@@ -11616,11 +11622,18 @@
 							if(info&&info.chooseButton){
 								if(event.dialog&&typeof event.dialog=='object') event.dialog.close();
 								var dialog=info.chooseButton.dialog(event,player);
-								var next=player.chooseButton(dialog);
-								next.set('ai',info.chooseButton.check||function(){return 1;});
-								next.set('filterButton',info.chooseButton.filter||function(){return true;});
-								next.set('selectButton',info.chooseButton.select||1);
-								event.buttoned=event.result.skill;
+								if(info.chooseButton.chooseControl){
+									var next=player.chooseControl(info.chooseButton.chooseControl(event,player));
+									next.dialog=dialog;
+ 								next.set('ai',info.chooseButton.check||function(){return 0;});
+								}
+								else{
+ 								var next=player.chooseButton(dialog);
+ 								next.set('ai',info.chooseButton.check||function(){return 1;});
+ 								next.set('filterButton',info.chooseButton.filter||function(){return true;});
+ 								next.set('selectButton',info.chooseButton.select||1);
+ 							}
+ 							event.buttoned=event.result.skill;
 							}
 							else if(info&&info.precontent&&!game.online){
 								var next=game.createEvent('pre_'+event.result.skill);
@@ -11632,9 +11645,9 @@
 					}
 					"step 3"
 					if(event.buttoned){
-						if(result.bool){
+						if(result.bool||result.control&&result.control!='cancel2'){
 							var info=get.info(event.buttoned).chooseButton;
-							lib.skill[event.buttoned+'_backup']=info.backup(result.links,player);
+							lib.skill[event.buttoned+'_backup']=info.backup(info.chooseControl?result:result.links,player);
 							lib.skill[event.buttoned+'_backup'].sourceSkill=event.buttoned;
 							if(game.online){
 								event._sendskill=[event.buttoned+'_backup',lib.skill[event.buttoned+'_backup']];
@@ -12978,7 +12991,7 @@
 					if(event.prompt2){
 						event.dialog.addText(event.prompt2);
 					}
-					var directh=true;
+					var directh=!lib.config.unauto_choose;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
 							var hs=target.getCards('h');
@@ -13024,7 +13037,7 @@
 							links:cs
 						}
 					}
-					else if(event.forced&&directh&&select[0]==select[1]){
+					else if(event.forced&&directh&&!event.isOnline()&&select[0]==select[1]){
 						event.result={
 							bool:true,
 							buttons:event.dialog.buttons.randomGets(select[0]),
@@ -13096,7 +13109,7 @@
 					if(event.prompt2){
 						event.dialog.addText(event.prompt2);
 					}
-					var directh=true;
+					var directh=!lib.config.unauto_choose;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
 							var hs=target.getDiscardableCards(player,'h');
@@ -13142,7 +13155,7 @@
 							links:cs
 						}
 					}
-					else if(event.forced&&directh&&select[0]==select[1]){
+					else if(event.forced&&directh&&!event.isOnline()&&select[0]==select[1]){
 						event.result={
 							bool:true,
 							buttons:event.dialog.buttons.randomGets(select[0]),
@@ -13241,7 +13254,7 @@
 					if(event.prompt2){
 						event.dialog.addText(event.prompt2);
 					}
-					var directh=true;
+					var directh=!lib.config.unauto_choose;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
 							var hs=target.getGainableCards(player,'h');
@@ -13288,7 +13301,7 @@
 							links:cs
 						}
 					}
-					else if(event.forced&&directh&&select[0]==select[1]){
+					else if(event.forced&&directh&&!event.isOnline()&&select[0]==select[1]){
 						event.result={
 							bool:true,
 							buttons:event.dialog.buttons.randomGets(select[0]),

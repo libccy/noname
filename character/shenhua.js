@@ -75,7 +75,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jiaxu:['liqueguosi'],
 			re_yuanshao:['yanwen'],
 			menghuo:['zhurong'],
-			sp_zhugeliang:['pangtong'],
+			sp_zhugeliang:['pangtong','huangyueying'],
 			sunce:['zhouyu','taishici','daqiao'],
 			zuoci:['yuji'],
 			xunyu:['xunyou'],

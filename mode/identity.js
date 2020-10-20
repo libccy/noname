@@ -530,7 +530,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			checkResult:function(){
-				var me=game.trueMe||game.me;
+				var me=game.me._trueMe||game.me;
 				if(_status.brawl&&_status.brawl.checkResult){
 					_status.brawl.checkResult();
 					return;
@@ -590,7 +590,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						else if(winner2.contains(me)){
 							game.showIdentity();
-							if(loser2.contains(game.trueMe||me)) game.over(false);
+							if(loser2.contains(me)) game.over(false);
 							else game.over(true);
 						}
 						else{
@@ -2741,7 +2741,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					if(player.isUnderControl()){
-						game.modeSwapPlayer(player);
+						game.swapPlayerAuto(player);
 					}
 					var num=3;
 					var cards=get.cards(num);
