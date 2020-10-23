@@ -416,7 +416,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return number>=1&&number<=13;
 					});
 					if(player.isUnderControl()){
-						game.modeSwapPlayer(player);
+						game.swapPlayerAuto(player);
 					}
 					var switchToAuto=function(){
 						_status.imchoosing=false;
@@ -726,52 +726,60 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					var num=player.storage.mubing2?3:2;
-					event.num=num+1;
-					player.chooseToDiscard([1,num],'he',get.prompt('mubing'),'弃置至多'+get.cnNumber(num)+'张牌，然后展示牌堆顶的'+get.cnNumber(num+1)+'张牌').set('ai',function(card){
+					var num=player.storage.mubing2?4:3;
+					event.num=num;
+					event.cards=game.cardsGotoOrdering(get.cards(num)).cards;
+					game.log(player,'展示了',event.cards);
+					event.videoId=lib.status.videoId++;
+					game.broadcastAll(function(player,id,cards){
+						var str=get.translation(player)+'发动了【募兵】';
+						var dialog=ui.create.dialog(str,cards);
+						dialog.videoId=id;
+					},player,event.videoId,event.cards);
+					game.addVideo('showCards',player,[get.translation(player)+'发动了【募兵】',get.cardsInfo(event.cards)]);
+					game.delay(2);
+					'step 1'
+					var numa=0;
+					cards.sort(function(a,b){
+						return a.number-b.number;
+					});
+					for(var i of cards){
+						if(get.value(i,player)>0) numa+=get.number(i);
+					}
+					player.chooseToDiscard([1,Infinity],'h').set('ai',function(card){
 						var player=_status.event.player;
-						if(card.name!='tengjia'&&get.position(card)=='e'&&get.equipValue(card,player)<=0) return 14;
-						if(!ui.selected.cards.length){
-							if(card.number<9) return 0;
-							if(card.number>11) return card.number;
-							if(!player.countCards('he',function(xcard){
-								return xcard!=card&&card.number+xcard.number>17;
-							})) return 0;
-							return card.number;
-						}
+						var numa=_status.event.numa;
+						//if(card.name!='tengjia'&&get.position(card)=='e'&&get.equipValue(card,player)<=0) return 14;
 						var num=0;
 						for(var i of ui.selected.cards){
 							num+=i.number;
 						}
-						if(num+card.number<18) return 0;
+						if(num>=numa) return 0;
+						if(card.number+num>=numa) return 15-get.value(card);
+						if(!ui.selected.cards.length){
+							var min=_status.event.min;
+							if(card.number<min&&!player.countCards('h',function(xcard){
+								return xcard!=card&&card.number+xcard.number>min;
+							})) return 0;
+							return card.number;
+						}
 						return Math.max(5-get.value(card),card.number);
-					}).logSkill='mubing';
-					'step 1'
+					}).set('prompt',false).set('numa',numa).set('min',cards[0].number);
+					var func=function(id){
+						var dialog=get.idDialog(id);
+						if(dialog) dialog.content.firstChild.innerHTML='请选择要弃置的牌';
+					};
+					if(player==game.me) func(event.videoId);
+					else if(player.isOnline()) player.send(func,event.videoId);
+					'step 2'
 					if(!result.bool){
-						event.finish();return;
+						return;
 					}
 					var numx=0;
 					for(var i of result.cards){
 						numx+=get.number(i);
 					}
 					event.numx=numx;
-					event.cards=game.cardsGotoOrdering(get.cards(num)).cards;
-					event.videoId=lib.status.videoId++;
-					game.broadcastAll(function(player,id,cards,numx){
-						var str;
-						if(player==game.me&&!_status.auto){
-							str='募兵：选择任意张点数不大于'+numx+'的牌';
-						}
-						else{
-							str='募兵';
-						}
-						var dialog=ui.create.dialog(str,cards);
-						dialog.videoId=id;
-					},player,event.videoId,event.cards,numx);
-					event.time=get.utc();
-					game.addVideo('showCards',player,['募兵',get.cardsInfo(event.cards)]);
-					game.addVideo('delay',null,2);
-					'step 2'
 					var next=player.chooseButton([0,num]);
 					next.set('dialog',event.videoId);
 					next.set('filterButton',function(button){
@@ -785,28 +793,89 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.set('ai',function(button){
 						return get.value(button.link,_status.event.player);
 					});
+					var func=function(id){
+						var dialog=get.idDialog(id);
+						if(dialog) dialog.content.firstChild.innerHTML='请选择要获得的牌';
+					};
+					if(player==game.me) func(event.videoId);
+					else if(player.isOnline()) player.send(func,event.videoId);
 					'step 3'
 					if(!result.bool) event.cards=[];
 					else event.cards=result.links;
-					var time=1000-(get.utc()-event.time);
-					if(time>0){
-						game.delay(0,time);
-					}
 					'step 4'
 					game.broadcastAll('closeDialog',event.videoId);
-					if(!cards.length){event.finish();return;}
-					if(player.storage.mubing2) player.chooseTarget('请选择一名角色获得'+get.translation(cards),true);
-					else event._result={bool:true,targets:[player]};
+					if(!cards.length){
+						event.finish();
+						return;
+					}
+					player.gain(cards,'log','gain2');
+					if(!player.storage.mubing2){
+						event.finish();
+						return;
+					}
+					event.given=[];
 					'step 5'
-					var target=result.targets[0];
-					player.line(target);
-					target.gain(cards,'log','gain2');
+					var hs=player.getCards('h');
+					cards=cards.filter(function(card){
+						return hs.contains(card);
+					});
+					if(cards.length&&game.hasPlayer(function(current){
+						return current!=player&&!event.given.contains(current);
+					})) player.chooseCardTarget({
+						prompt:'是否将获得的牌中的任意张交给其他角色？',
+						selectCard:[1,cards.length],
+						filterCard:function(card){
+							return _status.event.cards.contains(card);
+						},
+						filterTarget:function(card,player,target){
+							return target!=player&&!_status.event.given.contains(target);
+						},
+						cards:cards,
+						given:event.given,
+						ai1:function(card){
+							return -1;
+						},
+					});
+					else event.finish();
+					'step 6'
+					if(result.bool){
+						var target=result.targets[0];
+						var cards=result.cards;
+						event.given.push(target);
+						event.cards.removeArray(cards);
+						player.line(target,'green');
+						target.gain(cards,player,'giveAuto');
+						event.goto(5);
+					}
 				},
+			},
+			ziqu:{
+				trigger:{source:'damageBegin2'},
+				filter:function(event,player){
+					return event.player!=player&&!player.getStorage('ziqu').contains(event.player)&&
+					event.player.countCards('he')>0;
+				},
+				logTarget:'player',
+				content:function(){
+					'step 0'
+					trigger.cancel();
+					if(!player.storage.ziqu) player.storage.ziqu=[];
+					player.storage.ziqu.push(trigger.player);
+					player.markSkill('ziqu');
+					trigger.player.chooseCard(true,'he',function(card,player){
+						return !player.countCards('he',function(cardx){
+							return cardx.number>card.number;
+						});
+					});
+					'step 1'
+					if(result.bool&&result.cards&&result.cards.length) player.gain(result.cards,trigger.player,'giveAuto');
+				},
+				intro:{content:'已对#发动过'},
 			},
 			mubing_rewrite:{
 				mark:true,
 				intro:{
-					content:'出牌阶段开始时，你可以弃置至多三张牌，然后展示牌堆顶的四张牌，并可令一名角色获得任意张点数之和不大于你弃置的牌点数之和的牌。',
+					content:'出牌阶段开始时，你可以展示牌堆顶的四张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。然后你可将以此法获得的牌以任意方式交给其他角色。',
 				},
 			},
 			diaoling:{
@@ -5464,8 +5533,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				return str;
 			},
 			mubing:function(player){
-				if(player.storage.mubing2) return '出牌阶段开始时，你可以弃置至多三张牌，然后展示牌堆顶的四张牌，并可令一名角色获得任意张点数之和不大于你弃置的牌点数之和的牌。';
-				return '出牌阶段开始时，你可以弃置至多两张牌，然后展示牌堆顶的三张牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。';
+				if(player.storage.mubing2) return '出牌阶段开始时，你可以展示牌堆顶的四张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。然后你可将以此法获得的牌以任意方式交给其他角色。';
+				return '出牌阶段开始时，你可以展示牌堆顶的三张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。';
 			},
 		},
 		translate:{
@@ -5724,11 +5793,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_zhangliao:'SP张辽',
 			//这俩技能给SP仲村由理毫无违和感好吗！！！
 			mubing:'募兵',
-			mubing_info:'出牌阶段开始时，你可以弃置至多两张牌，然后展示牌堆顶的三张牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。',
+			mubing_info:'出牌阶段开始时，你可以展示牌堆顶的三张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。',
+			ziqu:'资取',
+			ziqu_info:'每名角色限一次，当你对有牌的其他角色造成伤害后，你可以防止此伤害。然后其将其点数最大的牌交给你。',
 			diaoling:'调令',
 			diaoling_info:'觉醒技，准备阶段，若你已因〖募兵〗获得了6张或更多的【杀】或武器牌或伤害锦囊牌，则你回复1点体力或摸两张牌，然后修改〖募兵〗。',
 			mubing_rewrite:'募兵·改',
-			mubing_rewrite_info:'出牌阶段开始时，你可以弃置至多三张牌，然后展示牌堆顶的四张牌，并可令一名角色获得任意张点数之和不大于你弃置的牌点数之和的牌。',
+			mubing_rewrite_info:'出牌阶段开始时，你可以展示牌堆顶的四张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。然后你可将以此法获得的牌以任意方式交给其他角色。',
 			caobuxing:'曹不兴',
 		 moying:'墨影',
 		 moying_info:'每回合限一次，当你于回合外不因使用而失去单一一张锦囊牌或装备牌后，你可以选择一个花色和与此牌点数差绝对值不超过2的点数，然后获得牌堆中所有与此牌花色点数相同的牌。',

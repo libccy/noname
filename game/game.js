@@ -10155,9 +10155,7 @@
 					if(!evt.orderingCards) evt.orderingCards=[];
 					if(!event.noOrdering&&!event.cardsOrdered){
 						event.cardsOrdered=true;
-						var next=game.createEvent('orderingDiscard',false);
-						event.next.remove(next)
-						evt.after.push(next)
+						var next=game.createEvent('orderingDiscard',false,evt.getParent());
 						next.relatedEvent=evt;
 						next.setContent('orderingDiscard');
 					}

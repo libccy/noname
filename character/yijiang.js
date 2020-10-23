@@ -1886,9 +1886,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 5'
 					if(!event.e&&player.isMinEquip()){
- 					var equip=get.cardPile(function(card){
- 						return get.type(card)=='equip'&&target.hasUseTarget(card);
- 					});
+						var equip=get.cardPile(function(card){
+							return get.type(card)=='equip'&&target.hasUseTarget(card);
+						});
 						if(equip) player.chooseUseTarget(equip,'noanimate','nopopup',true);
 					}
 					'step 6'
@@ -1968,12 +1968,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.syncStorage();
 					if(target.countCards('he')==0) event._result={index:0};
 					else{
- 					player.chooseControlList([
- 						'令'+get.translation(target)+'摸'+get.cnNumber(event.num)+'张牌',
- 						'令'+get.translation(target)+'弃置'+get.cnNumber(event.num)+'张牌'
- 					],function(){
- 						return _status.event.choice;
- 					}).set('choice',get.attitude(player,target)>0?0:1);
+						player.chooseControlList([
+							'令'+get.translation(target)+'摸'+get.cnNumber(event.num)+'张牌',
+							'令'+get.translation(target)+'弃置'+get.cnNumber(event.num)+'张牌'
+						],function(){
+							return _status.event.choice;
+						}).set('choice',get.attitude(player,target)>0?0:1);
 					}
 					'step 1'
 					if(result.index==0){
@@ -2008,10 +2008,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.player==player) return false;
 					if(player!=event.respondTo[0]) return false;
 					if(!player.hasSkill('funan_jiexun')){
- 					var cards=[]
- 					if(get.itemtype(event.respondTo[1])=='card') cards.push(event.respondTo[1]);
- 					else if(event.respondTo[1].cards) cards.addArray(event.respondTo[1].cards);
- 					return cards.filterInD('od').length>0;
+						var cards=[]
+						if(get.itemtype(event.respondTo[1])=='card') cards.push(event.respondTo[1]);
+						else if(event.respondTo[1].cards) cards.addArray(event.respondTo[1].cards);
+						return cards.filterInD('od').length>0;
 					}
 					else return event.cards.filterInD('od').length>0;
 				},
@@ -2020,9 +2020,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					if(!player.hasSkill('funan_jiexun')){
 						var cards=[]
- 					if(get.itemtype(trigger.respondTo[1])=='card') cards.push(trigger.respondTo[1]);
- 					else if(trigger.respondTo[1].cards) cards.addArray(trigger.respondTo[1].cards);
- 					cards=cards.filterInD('od');
+						if(get.itemtype(trigger.respondTo[1])=='card') cards.push(trigger.respondTo[1]);
+						else if(trigger.respondTo[1].cards) cards.addArray(trigger.respondTo[1].cards);
+						cards=cards.filterInD('od');
 						trigger.player.gain(cards,'gain2','log');
 						trigger.player.addTempSkill('funan_use');
 						if(!trigger.player.storage.funan_use){
@@ -7512,12 +7512,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player.countCards('h')==player.countCards('h','du')) return -1;
 							if(target.hasJudge('lebu')) return 0;
 							if(get.attitude(player,target)>3){
- 							var basis=get.threaten(target);
- 							if(player==get.zhu(player)&&player.hp<=2&&player.countCards('h','shan')&&!game.hasPlayer(function(current){
- 								return get.attitude(current,player)>3&&current.countCards('h','tao')>0;
- 							})) return 0;
- 							if(target.countCards('h')+player.countCards('h')>target.hp+2) return basis*0.8;
- 							return basis;
+								var basis=get.threaten(target);
+								if(player==get.zhu(player)&&player.hp<=2&&player.countCards('h','shan')&&!game.hasPlayer(function(current){
+									return get.attitude(current,player)>3&&current.countCards('h','tao')>0;
+								})) return 0;
+								if(target.countCards('h')+player.countCards('h')>target.hp+2) return basis*0.8;
+								return basis;
 							}
 							return 0;
 						}
@@ -8551,14 +8551,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function(player,target){
 							var disbool=false;
 							if(player.hasSkill('rezhiman')){
- 							if(target.countCards('j')&&get.attitude(player,target)>0){
- 								return 1;
- 							}
- 							if(target.countCards('he',function(card){
- 								return card.name=='tengjia'||get.value(card)>0;
- 							})){
- 								disbool=true;
- 							}
+								if(target.countCards('j')&&get.attitude(player,target)>0){
+									return 1;
+								}
+								if(target.countCards('he',function(card){
+									return card.name=='tengjia'||get.value(card)>0;
+								})){
+									disbool=true;
+								}
 							}
 							var damage=get.damageEffect(target,player);
 							if(disbool&&get.attitude(player,target)<0) return Math.min(-1,damage);
@@ -8588,24 +8588,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					order:10,
+					order:function(item,player){
+						if(player.countCards('h',function(card){
+							return player.hasValueTarget(card);
+						})) return 10;
+						return 1;
+					},
 					result:{
-						target:function (player,target){
-							if(player.hasSkill('qiaoshui3')) return 0;
-							var nd=!player.needsToDiscard();
-							if(player.hasCard(function(card){
-								if(get.position(card)!="h") return false;
-								var val=get.value(card)
-								if(nd&&val<0) return true;
-								if(val<=5){
-									return card.number>=12;
-								}
-								if(val<=6){
-									return card.number>=13;
-								}
-								return false;
-							})) return -1;
-							return 0;
+						target:function(player,target){
+							if(player.countCards('h',function(card){
+								return player.hasValueTarget(card);
+							})){
+								if(player.hasSkill('qiaoshui3')) return 0;
+								var nd=!player.needsToDiscard();
+								if(player.hasCard(function(card){
+									if(get.position(card)!="h") return false;
+									var val=get.value(card)
+									if(nd&&val<0) return true;
+									if(val<=5){
+										return card.number>=12;
+									}
+									if(val<=6){
+										return card.number>=13;
+									}
+									return false;
+								})) return -1;
+								return 0;
+							}
+							return -1;
 						},
 					},
 				},
@@ -9327,11 +9337,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								order:10,
 								result:{
 									target:function(player,target){
-   							if(player!=target) return 0;
-   							if(player.hasSkill('requanji')||(player.countCards('h')+2<=player.hp+player.storage.quanji.length)) return 1;
-   							return 0;
-   						}
-   					},
+	  							if(player!=target) return 0;
+	  							if(player.hasSkill('requanji')||(player.countCards('h')+2<=player.hp+player.storage.quanji.length)) return 1;
+	  							return 0;
+	  						}
+	  					},
 							},
 						}
 					},
@@ -9642,27 +9652,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function(card,player,target){
 							if(card.name!='sha') return;
 							var players=game.filterPlayer();
- 						if(get.attitude(player,target)<=0){
- 							for(var i=0;i<players.length;i++){
- 								var target2=players[i];
- 								if(player!=target2&&target!=target2&&player.canUse(card,target2,false)&&
- 									get.effect(target2,{name:'shacopy',nature:card.nature,suit:card.suit},player,target)>0&&
- 									get.effect(target2,{name:'shacopy',nature:card.nature,suit:card.suit},player,player)<0){
- 									if(target.hp==target.maxHp) return 0.3;
- 									return 0.6;
- 								}
- 							}
+							if(get.attitude(player,target)<=0){
+								for(var i=0;i<players.length;i++){
+									var target2=players[i];
+									if(player!=target2&&target!=target2&&player.canUse(card,target2,false)&&
+										get.effect(target2,{name:'shacopy',nature:card.nature,suit:card.suit},player,target)>0&&
+										get.effect(target2,{name:'shacopy',nature:card.nature,suit:card.suit},player,player)<0){
+										if(target.hp==target.maxHp) return 0.3;
+										return 0.6;
+									}
+								}
 							}
 							else{
 								for(var i=0;i<players.length;i++){
- 								var target2=players[i];
- 								if(player!=target2&&target!=target2&&player.canUse(card,target2,false)&&
- 									get.effect(target2,{name:'shacopy',nature:card.nature,suit:card.suit},player,player)>0){
- 									if(player.canUse(card,target2)) return;
- 									if(target.hp==target.maxHp) return [0,1];
- 									return [0,0];
- 								}
- 							}
+									var target2=players[i];
+									if(player!=target2&&target!=target2&&player.canUse(card,target2,false)&&
+										get.effect(target2,{name:'shacopy',nature:card.nature,suit:card.suit},player,player)>0){
+										if(player.canUse(card,target2)) return;
+										if(target.hp==target.maxHp) return [0,1];
+										return [0,0];
+									}
+								}
 							}
 						}
 					}

@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		connectBanned:['diy_tianyu','diy_yangyi','diy_lukang','ns_huamulan','ns_yuji','ns_duangui','ns_liuzhang','key_yuu'],
 		character:{
-			sp_key_yuri:['female','qun',4,['mubing','diaoling']],
+			sp_key_yuri:['female','qun',4,['mubing','ziqu','diaoling']],
 			ns_zhangwei:['female','wei',3,['nsqiyue','nsxuezhu']],
 			ns_chendao:['male','shu',4,['nsjianglie']],
 			yj_caoang:['male','wei',4,['yjxuepin']],

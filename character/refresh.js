@@ -36,7 +36,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_lingtong:['male','wu',4,['rexuanfeng']],
 			yujin_yujin:['male','wei',4,['rejieyue']],
 			re_caozhang:['male','wei',4,['new_jiangchi']],
-			re_chengpu:['male','wu',4,['lihuo','rechunlao']],
+			re_chengpu:['male','wu',4,['decadelihuo','decadechunlao']],
 			re_quancong:['male','wu',4,['xinyaoming']],
 			re_liaohua:['male','shu',4,['xindangxian','xinfuli']],
 			re_guohuai:['male','wei',4,['xinjingce']],
@@ -121,6 +121,107 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunben:['zhouyu','taishici','daqiao'],
 		},
 		skill:{
+			decadelihuo:{
+				trigger:{player:'useCard1'},
+				filter:function(event,player){
+					if(event.card.name=='sha'&&!event.card.nature) return true;
+					return false;
+				},
+				audio:'lihuo',
+				audioname:['re_chengpu'],
+				check:function(event,player){
+					return event.baseDamage>1&&game.hasPlayer(function(current){
+						return !event.targets.contains(current)&&player.canUse(event.card,current)
+						&&get.attitude(player,current)<0&&!current.hasShan()
+						&&get.effect(current,{name:'sha',nature:'fire'},player,player)>0;
+					});
+				},
+				content:function(){
+					trigger.card.nature='fire';
+				},
+				group:['decadelihuo2','decadelihuo3'],
+			},
+			decadelihuo2:{
+				trigger:{player:'useCard2'},
+				filter:function(event,player){
+					if(event.card.name!='sha'||event.card.nature!='fire') return false;
+					return game.hasPlayer(function(current){
+						return !event.targets.contains(current)&&player.canUse(event.card,current);
+					});
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('decadelihuo'),'为'+get.translation(trigger.card)+'增加一个目标',function(card,player,target){
+						return !_status.event.sourcex.contains(target)&&player.canUse(_status.event.card,target);
+					}).set('sourcex',trigger.targets).set('card',trigger.card).set('ai',function(target){
+						var player=_status.event.player;
+						return get.effect(target,_status.event.card,player,player);
+					});
+					'step 1'
+					if(result.bool){
+						if(!event.isMine()&&!_status.connectMode) game.delayx();
+						event.target=result.targets[0];
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					player.logSkill('decadelihuo',event.target);
+					trigger.targets.push(event.target);
+				},
+			},
+			decadelihuo3:{
+				trigger:{player:'useCardAfter'},
+				filter:function(event,player){
+					return event.card.name=='sha'&&event.card.nature=='fire'&&event.targets.length>1&&player.getHistory('sourceDamage',function(evt){
+						return evt.card==event.card;
+					}).length>0;
+				},
+				forced:true,
+				audio:'lihuo',
+				audioname:['re_chengpu'],
+				content:function(){
+					player.loseHp();
+				}
+			},
+			decadechunlao:{
+				audio:'chunlao',
+				audioname:['re_chengpu'],
+				enable:'chooseToUse',
+				viewAs:{name:'jiu',isCard:true},
+				viewAsFilter:function(player){
+					return !player.isLinked();
+				},
+				filterCard:function(){return false},
+				selectCard:-1,
+				precontent:function(){
+					player.logSkill('decadechunlao');
+					player.link();
+					delete event.result.skill;
+				},
+				group:'decadechunlao2',
+				ai:{
+					save:true,
+					jiuOther:true,
+					skillTagFilter:function(player,tag){
+						if(tag=='save') return !player.isLinked();
+					},
+				},
+			},
+			decadechunlao2:{
+				trigger:{
+					source:'damageSource',
+					player:'damageEnd',
+				},
+				prompt:'是否发动【醇醪】将武将牌横置？',
+				filter:function(event,player){
+					return player.isLinked()&event.num>1;
+				},
+				content:function(){
+					player.link();
+				},
+			},
 			oltianxiang:{
 				audio:'tianxiang',
 				audioname:['daxiaoqiao','re_xiaoqiao','ol_xiaoqiao'],
@@ -2967,7 +3068,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									fullimage:true,
 									image:'character:'+list[i]
 								}
-								lib.translate[cardname]=lib.translate[list[i]];
+								lib.translate[cardname]=get.rawName2(list[i]);
 								cards.push(game.createCard(cardname,'',''));
 							}
 							player.$draw(cards,'nobroadcast');
@@ -4533,7 +4634,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					if(player.isUnderControl()){
-						game.modeSwapPlayer(player);
+						game.swapPlayerAuto(player);
 					}
 					var num=game.countPlayer()<4?3:5;
 					var cards=get.cards(num);
@@ -7562,6 +7663,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olhongyan_info:'锁定技，你的黑桃牌的花色视为红桃。若你的装备区内有红桃牌，则你的手牌上限基数视为体力上限。',
 			piaoling:'飘零',
 			piaoling_info:'结束阶段，你可以进行判定。若判定结果为红桃，则你选择一项：1.将此牌交给一名角色。若你交给了自己，则你弃置一张牌。2.将此牌置于牌堆顶。',
+			decadelihuo:'疠火',
+			decadelihuo2:'疠火',
+			decadelihuo3:'疠火',
+			decadelihuo_info:'当你声明使用普【杀】时，你可以将此【杀】改为火【杀】。你使用的火【杀】结算完成后，若此【杀】的目标数大于1且你因此【杀】造成过伤害，则你失去1点体力。',
+			decadechunlao:'醇醪',
+			decadechunlao2:'醇醪',
+			decadechunlao_info:'你可以对其他角色使用【酒（使用方法②）】。当你需要使用【酒】时，若你的武将牌未横置，则你可以将武将牌横置，然后视为使用【酒】。当你受到或造成伤害后，若伤害值大于1且你的武将牌横置，则你可以重置武将牌。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

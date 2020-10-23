@@ -1235,7 +1235,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					if(player.isUnderControl()){
-						game.modeSwapPlayer(player);
+						game.swapPlayerAuto(player);
 					}
 					var num=Math.min(5,game.countPlayer());
 					if(player.hasSkill('yizhi')&&player.hasSkill('guanxing')){

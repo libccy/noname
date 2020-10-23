@@ -297,7 +297,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					var evt=evt2.getParent();
 					var next=game.createEvent('caochuan_gain');
 					_status.event.next.remove(next);
-					evt.after.push(next);
+					evt.after.unshift(next);
 					next.player=player;
 					next.setContent(function(){
 						var cards=event.getParent().cards.filterInD();

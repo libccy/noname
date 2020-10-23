@@ -4652,7 +4652,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									fullimage:true,
 									image:'character:'+list[i]
 								}
-								lib.translate[cardname]=lib.translate[list[i]];
+								lib.translate[cardname]=get.rawName2(list[i]);
 								cards.push(game.createCard(cardname,'',''));
 							}
 							player.$draw(cards,'nobroadcast');

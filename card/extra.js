@@ -50,7 +50,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				lianheng:true,
 				logv:false,
 				savable:function(card,player,dying){
-					return dying==player;
+					return dying==player||player.hasSkillTag('jiuOther',null,dying,true);
 				},
 				usable:1,
 				selectTarget:-1,
@@ -196,7 +196,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							return 7-get.value(card,evt.player);
 						}
 						return -1;
-					}).prompt=false;
+					}).set('prompt',false);
 					game.delay(2);
 					"step 2"
 					if(result.bool){
@@ -667,12 +667,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							filterCard:function(){return false},
 							selectCard:-1,
 							viewAs:links[0],
-							onuse:function(result,player){
+							precontent:function(){
 								var muniu=player.getEquip(5);
+								var card=event.result.card;
 								if(muniu&&muniu.cards){
-									muniu.cards.remove(result.card);
+									muniu.cards.remove(event.result.card);
 									lib.skill.muniu_skill.sync(muniu);
 								}
+								event.result.card=get.autoViewAs(card);
+								event.result.cards=[card];
+								delete event.result.skill;
 								player.updateMarks();
 							}
 						}
