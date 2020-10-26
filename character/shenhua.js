@@ -3150,12 +3150,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['gz_dengai'],
 				trigger:{
 					player:'loseAfter',
-					source:'gainAfter',
-					global:['equipAfter','addJudgeAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter'],
 				},
 				frequent:true,
 				filter:function(event,player){
 					if(player==_status.currentPhase) return false;
+					if(event.name=='gain'&&event.player==player) return false;
 					var evt=event.getl(player);
 					return evt&&evt.cards2&&evt.cards2.length>0;
 				},
@@ -3303,7 +3303,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jixi:{
 				audio:2,
-				audioname:['re_dengai','gz_dengai'],
+				audioname:['re_dengai','gz_dengai','ol_dengai'],
 				enable:'phaseUse',
 				filter:function(event,player){
 					return player.storage.tuntian.length>0&&event.filterCard({name:'shunshou'},player,event);

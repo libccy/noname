@@ -6,17 +6,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			mobile:{
-				mobile_default:["miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong"],
+				mobile_default:["miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan"],
 				mobile_yijiang:["yj_zhanghe","yj_zhangliao","yj_xuhuang","yj_ganning"],
 				mobile_sunben:["re_sunben"],
 				mobile_standard:["xin_xiahoudun"],
 				mobile_shenhua:["re_pangtong","re_guanqiujian","xin_yuanshao","re_liushan","re_dongzhuo","re_sp_zhugeliang","re_sunjian"],
-				mobile_yijiang1:["re_jikang","old_bulianshi","xin_liaohua","xin_caozhang","re_xusheng","xin_chengpu"],
+				mobile_yijiang1:["re_jikang","old_bulianshi","xin_liaohua","xin_caozhang","re_xusheng","xin_chengpu","xin_jianyong","xin_gongsunzan"],
 				mobile_sp:["old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","re_heqi","liuzan"],
 				mobile_trashbin:['old_jiakui'],
 			},
 		},
 		character:{
+			xin_gongsunzan:['male','qun',4,['xinyicong','qiaomeng']],
+			dingyuan:['male','qun',4,['beizhu']],
+			xin_jianyong:['male','shu',3,['xinqiaoshui','xinjyzongshi']],
 			old_jiakui:['male','wei',4,['tongqu','xinwanlan']],
 			xin_caozhang:['male','wei',4,['rejiangchi']],
 			xin_liaohua:['male','shu',4,['redangxian','refuli']],
@@ -75,6 +78,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_sunben:['male','wu',4,['jiang','rehunzi','zhiba'],['zhu']],
 		},
 		characterIntro:{
+			dingyuan:'丁原（？—189年），字建阳，兖州泰山郡南城县（山东省平邑县郑城镇）人。东汉末年军阀，官拜执金吾、并州刺史。任并州刺史期间，他亲近、善待主簿吕布，又调遣部下张杨、张辽等名将到洛阳任职。汉灵帝驾崩后，带兵进入洛阳，担任执金吾，并与大将军何进谋划诛杀十常侍，但不久事情败露，何进被宦官杀死。在宦官被诛灭之后，丁原与军阀董卓在废帝问题上意见不合产生矛盾，于是董卓诱使吕布将其杀害，其势力亦被吞并。',
 			furong:'傅肜（róng）（？－222年），义阳（今湖北枣阳）人，三国时蜀汉将领。刘备攻伐吴国时，傅肜为别督。后刘备被陆逊击败，傅肜率部断后，奋战至死。死前怒斥道：“吴狗！何有汉将军降者！”',
 			zhengxuan:'郑玄（127年－200年），字康成。北海郡高密县（今山东省高密市）人。东汉末年儒家学者、经学大师。郑玄曾入太学攻《京氏易》、《公羊春秋》及《三统历》、《九章算术》，又从张恭祖学《古文尚书》、《周礼》和《左传》等，最后从马融学古文经。游学归里之后，复客耕东莱，聚徒授课，弟子达数千人，家贫好学，终为大儒。党锢之祸起，遭禁锢，杜门注疏，潜心著述。晚年守节不仕，却遭逼迫从军，最终病逝于元城，年七十四。郑玄治学以古文经学为主，兼采今文经学。他遍注儒家经典，以毕生精力整理古代文化遗产，使经学进入了一个“小统一时代”。著有《天文七政论》、《中侯》等书，共百万余言，世称“郑学”，为汉代经学的集大成者。唐贞观年间，列郑玄于二十二“先师”之列，配享孔庙。宋代时被追封为高密伯。后人建有郑公祠以纪念。',
 			dengzhi:'邓芝（178年－251年），字伯苗。义阳郡新野县（今河南新野）人。东汉名将邓禹之后，三国时期蜀汉重臣。邓芝早年曾被预言能位至大将，后被刘备任为郫令，升迁为广汉太守。因任官公廉且有治绩，被征入朝为尚书。刘备逝世后，奉命出使吴国，成功修复两国关系，并深为吴大帝孙权所赏识。建兴六年（228年），丞相诸葛亮策划北伐，命邓芝与大将赵云佯攻郿城，以吸引魏国曹真军主力。建兴十二年（234年），迁前军师、前将军，领兖州刺史，封阳武亭侯，不久督领江州。延熙六年（243年），迁车骑将军，后授假节。又率军平定涪陵叛乱。延熙十四年（251年），邓芝病逝。邓芝性格正直、简单，不刻意修饰情绪。他为将二十多年，赏罚明断，体恤士卒。身上的衣食取自官府，从未经营过私产，妻儿甚至还有忍饥挨饿之时，死时家中也没有多余财物。',
@@ -297,6 +301,175 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		skill:{
+			//丁原
+			//程序员和设计师至少有一个脑子有坑
+			beizhu:{
+				audio:3,
+				enable:'phaseUse',
+				usable:1,
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countCards('h')>0;
+				},
+				content:function(){
+					'step 0'
+					player.addTempSkill('beizhu_draw');
+					player.viewHandcards(target);
+					'step 1'
+					var cards=target.getCards('h','sha');
+					if(cards.length){
+						event.cards=cards;
+						event.goto(4);
+					}
+					else player.discardPlayerCard('he',target,true);
+					'step 2'
+					player.chooseBool('是否令'+get.translation(target)+'获得一张【杀】？').set('ai',function(){
+						var evt=status.event.getParent();
+						return get.attitude(evt.player,evt.target)>0;
+					});
+					'step 3'
+					if(result.bool){
+						var card=get.cardPile2(function(card){
+							return card.name=='sha';
+						});
+						if(card) target.gain(card,'gain2');
+					}
+					else event.finish();
+					'step 4'
+					game.updateRoundNumber();
+					event.finish();
+					'step 5'
+					var hs=target.getCards('h');
+					cards=cards.filter(function(card){
+						return hs.contains(card)&&get.name(card,target)=='sha'&&target.canUse({
+							name:'sha',
+							isCard:true,
+							cards:[card],
+						},player,false);
+					});
+					if(cards.length){
+						var card=cards.randomRemove(1)[0];
+						target.useCard(player,false,{
+							name:'sha',
+							isCard:true,
+						},[card]).card.beizhu=true;
+						event.redo();
+					}
+				},
+			},
+			beizhu_draw:{
+				trigger:{player:'damageEnd'},
+				forced:true,
+				popup:false,
+				filter:function(event,player){
+					return event.card&&event.card.beizhu;
+				},
+				content:function(){
+					player.draw(trigger.num);
+				},
+			},
+			//新简雍
+			xinqiaoshui:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filterTarget:function(card,player,target){
+					return player.canCompare(target);
+				},
+				filter:function(event,player){
+					return player.countCards('h')>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseToCompare(target);
+					'step 1'
+					if(result.bool) player.addTempSkill('qiaoshui3','phaseUseEnd');
+					else{
+						player.addTempSkill('qiaoshui2','phaseUseEnd');
+					}
+				},
+				ai:{
+					order:function(item,player){
+						if(player.countCards('h',function(card){
+							return player.hasValueTarget(card);
+						})) return 10;
+						return 1;
+					},
+					result:{
+						target:function(player,target){
+							if(player.countCards('h',function(card){
+								return player.hasValueTarget(card);
+							})){
+								if(player.hasSkill('qiaoshui3')) return 0;
+								var nd=!player.needsToDiscard();
+								if(player.hasCard(function(card){
+									if(get.position(card)!="h") return false;
+									var val=get.value(card)
+									if(nd&&val<0) return true;
+									if(val<=5){
+										return card.number>=12;
+									}
+									if(val<=6){
+										return card.number>=13;
+									}
+									return false;
+								})) return -1;
+								return 0;
+							}
+							return -1;
+						},
+					},
+				},
+			},
+			xinjyzongshi:{
+				audio:2,
+				trigger:{
+					player:['chooseToCompareAfter','compareMultipleAfter'],
+					target:['chooseToCompareAfter','compareMultipleAfter']
+				},
+				filter:function(event,player){
+					return !event.preserve;
+				},
+				frequent:true,
+				content:function(){
+					'step 0'
+					var str='<div class="text center">牌堆顶';
+					var cards=get.cards();
+					if(player==trigger.player){
+						if(trigger.num1>trigger.num2&&get.position(trigger.card2,true)=='o'){
+							str+='/拼点牌';
+							cards.push(trigger.card2)
+						}
+						else if(trigger.num1<trigger.num2&&get.position(trigger.card1,true)=='o'){
+							str+='/拼点牌';
+							cards.push(trigger.card1);
+						}
+					}
+					else{
+						if(trigger.num1<trigger.num2&&get.position(trigger.card,true)=='o'){
+							str+='/拼点牌';
+							cards.push(trigger.card1);
+						}
+						else if(trigger.num1>trigger.num2&&get.position(trigger.card,true)=='o'){
+							str+='/拼点牌';
+							cards.push(trigger.card2);
+						}
+					}
+					str+='</div>';
+					event.cards=cards;
+					player.chooseButton(['纵适：选择要获得的牌',str,cards],true).set('ai',get.buttonValue);
+					'step 1'
+					if(result.bool){
+						var draw=result.links[0]==cards[0];
+						player.gain(result.links,draw?'draw':'gain2').log=false;
+						game.log(player,'获得了',draw?'牌堆顶的一张牌':result.links);
+						if(!draw){
+							cards[0].fix();
+							ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
+							game.updateRoundNumber();
+						}
+					}
+				}
+			},
 			//通渠张恭
 			rezhenxing:{
 				audio:'xinfu_zhenxing',
@@ -5926,12 +6099,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"rejiangchi_info":"出牌阶段开始时，你可以选择一项：1、摸一张牌，若如此做，你本阶段内不能使用【杀】。 2、弃置一张牌，若如此做，此阶段你使用【杀】无距离限制且你可以额外使用一张【杀】。",
 			rezhenxing:"镇行",
 			rezhenxing_info:"结束阶段开始时或当你受到伤害后，你可以观看牌堆顶的三张牌，然后你获得其中与其余牌花色均不相同的一张牌。",
+			xin_jianyong:'手杀简雍',
+			xinqiaoshui:'巧说',
+			xinqiaoshui_info:'出牌阶段限一次，你可以和一名其他角色拼点。若你赢，则你本阶段内使用的下一张基本牌或普通锦囊牌可以增加减少一个目标。若你没赢，你本阶段内不能使用锦囊牌。',
+			xinjyzongshi:'纵适',
+			xinjyzongshi_info:'当你拼点后，你可以观看牌堆顶的一张牌，然后选择一项：获得此牌，或获得两张拼点牌中点数较小的一张。',
+			dingyuan:'丁原',
+			beizhu:'备诛',
+			beizhu_draw:'备诛',
+			beizhu_info:'出牌阶段限一次，你可以观看一名其他角色的手牌。若其中：没有【杀】，你弃置其一张牌，然后你可令其获得牌堆中的一张【杀】；有【杀】，其依次对你使用这些【杀】，当你因此受到1点伤害后，你摸一张牌。',
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua:'手杀异构·神话再临',
 			mobile_yijiang1:'手杀异构·一将成名',
 			mobile_sp:'手杀异构·SP',
 			mobile_trashbin:'通厕所的',
 			old_jiakui:'贾逵重制',
+			xin_gongsunzan:'手杀公孙瓒',
 		}
 	};
 });

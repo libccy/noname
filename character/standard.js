@@ -2065,8 +2065,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{
 					player:'loseAfter',
-					source:'gainAfter',
-					global:['equipAfter','addJudgeAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter'],
 				},
 				frequent:true,
 				filter:function(event,player){
@@ -2097,8 +2096,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['sp_sunshangxiang','re_sunshangxiang'],
 				trigger:{
 					player:'loseAfter',
-					source:'gainAfter',
-					global:['equipAfter','addJudgeAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter'],
 				},
 				frequent:true,
 				filter:function(event,player){

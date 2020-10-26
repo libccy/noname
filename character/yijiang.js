@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			yijiang:{
 				yijiang_2011:['caozhi','re_yujin','zhangchunhua','fazheng','xin_masu','xin_xushu','xusheng','lingtong','wuguotai','chengong','gaoshun'],
-				yijiang_2012:['old_wangyi','xunyou','zhonghui','madai','liaohua','old_guanzhang','bulianshi','handang','chengpu','liubiao','old_huaxiong','caozhang','re_gongsunzan'],
+				yijiang_2012:['old_wangyi','xunyou','zhonghui','madai','liaohua','old_guanzhang','bulianshi','handang','chengpu','liubiao','old_huaxiong','caozhang'],
 				yijiang_2013:['manchong','guohuai','caochong','guanping','liufeng','jianyong','yufan','panzhangmazhong','zhuran','xin_liru','fuhuanghou'],
 				yijiang_2014:['hanhaoshihuan','chenqun','caozhen','zhangsong','wuyi','zhoucang','zhuhuan','guyong','sunluban','yj_jushou','caifuren'],
 				yijiang_2015:['caoxiu','caorui','zhongyao','xiahoushi','liuchen','zhangyi','zhuzhi','quancong','sunxiu','gongsunyuan','guotufengji'],
@@ -16,7 +16,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			re_gongsunzan:['male','qun',4,['qiaomeng','reyicong']],
 			fazheng:['male','shu',3,['enyuan','xuanhuo']],
 			old_guanzhang:['male','shu',4,['old_fuhun']],
 			old_wangyi:['female','wei',3,['oldzhenlie','oldmiji']],
@@ -42,7 +41,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jianyong:['male','shu',3,['qiaoshui','jyzongshi']],
 			madai:['male','shu',4,['mashu','oldqianxi']],
 			liufeng:['male','shu',4,['xiansi']],
-			manchong:['male','wei',3,['xinjunxing','yuce']],
+			manchong:['male','wei',3,['junxing','yuce']],
 			chenqun:['male','wei',3,['pindi','faen']],
 			sunluban:['female','wu',3,['chanhui','jiaojin']],
 			guyong:['male','wu',3,['shenxing','bingyi']],
@@ -290,8 +289,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'shangshi',
 				trigger:{
 					player:['loseAfter','changeHp','gainMaxHpAfter','loseMaxHpAfter'],
-					source:'gainAfter',
-					global:['equipAfter','addJudgeAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter'],
 				},
 				frequent:true,
 				prompt:function(event,player){
@@ -4809,6 +4807,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:'epic',
 				animationColor:'gray',
 				audio:2,
+				audioname:['re_liru'],
 				enable:'phaseUse',
 				filter:function(event,player){
 					return !player.storage.xinfencheng;
@@ -10076,8 +10075,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return false;
 				},
-				frequent:true,
-				popup:false,
+				direct:true,
 				content:function(){
 					"step 0"
 					var cards=[];
@@ -10095,13 +10093,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						while(cards.length){
 							ui.cardPile.insertBefore(cards.pop(),ui.cardPile.firstChild);
 						}
-						player.logSkill('zongxuan');
+						player.logSkill(event.name);
 					}
 				},
 			},
 			zhiyan:{
 				audio:2,
-				audioname:['gexuan'],
+				audioname:['gexuan','re_yufan'],
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
 				content:function(){
@@ -10906,8 +10904,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['boss_lvbu3','re_heqi'],
 				trigger:{
 					player:['loseAfter','phaseDiscardEnd'],
-					source:'gainAfter',
-					global:['equipAfter','addJudgeAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter'],
 				},
 				direct:true,
 				filter:function(event,player){
@@ -11526,6 +11523,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yuce:{
 				audio:2,
+				audioname:['re_manchong'],
 				trigger:{player:'damageAfter'},
 				direct:true,
 				filter:function(event,player){
@@ -12676,7 +12674,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reshangshi:'伤逝',
 			reshangshi_2nd:'伤逝',
 			reshangshi_info:'当你受到伤害时，你可以弃置一张牌。当你的手牌数小于X时，你可以将手牌摸至X张。（X为你已损失的体力值）',
-			re_gongsunzan:'公孙瓒',
 			rejingce:'精策',
 			rejingce2:'精策',
 			rejingce_add:'精策',

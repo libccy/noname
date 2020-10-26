@@ -2597,7 +2597,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					_status.firstAct=game.falseZhu;
 					game.delay(0,5000);
 					"step 1"
-					event.falseList=['xunyu','xunyou','re_guojia','re_zhangliao','re_xuhuang','yujin_yujin','caohong','jsp_guanyu','liuye','litong','zangba','manchong','hanhaoshihuan','chengyu','caoren'].filter(function(name){
+					event.falseList=['xunyu','xunyou','re_guojia','re_zhangliao','re_xuhuang','yujin_yujin','caohong','jsp_guanyu','liuye','litong','zangba','re_manchong','re_hanhaoshihuan','chengyu','caoren'].filter(function(name){
 						if(!Array.isArray(lib.character[name])) return false;
 						lib.character[name][1]='wei';
 						return true;
@@ -2673,7 +2673,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},evt);
 					game.me.chooseControl('ok').set('prompt','###本局特殊事件：'+get.translation(evt)+'###'+get.translation(evt+'_info'));
 					'step 1'
-					event.falseList=['xunyu','xunyou','re_guojia','re_zhangliao','re_xuhuang','yujin_yujin','caohong','jsp_guanyu','liuye','litong','zangba','manchong','hanhaoshihuan','chengyu','caoren'].filter(function(name){
+					event.falseList=['xunyu','xunyou','re_guojia','re_zhangliao','re_xuhuang','yujin_yujin','caohong','jsp_guanyu','liuye','litong','zangba','re_manchong','re_hanhaoshihuan','chengyu','caoren'].filter(function(name){
 						if(!Array.isArray(lib.character[name])) return false;
 						lib.character[name][1]='wei';
 						return true;

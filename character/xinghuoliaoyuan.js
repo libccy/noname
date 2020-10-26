@@ -441,8 +441,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:'qinguo_use',
 						trigger:{
 							player:'loseAfter',
-							source:'gainAfter',
-							global:['equipAfter','addJudgeAfter'],
+							global:['equipAfter','addJudgeAfter','gainAfter'],
 						},
 						prompt:'是否发动【勤国】回复1点体力？',
 						filter:function (event,player){
