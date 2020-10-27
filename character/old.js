@@ -4,11 +4,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'old',
 		characterSort:{
 			old:{
+				old_standard:['ol_yuanshu'],
 				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_guanqiujian","xiahouyuan","weiyan","xiaoqiao","pangde"],
 				old_refresh:["old_zhangfei","old_huatuo","old_zhaoyun","ol_huaxiong"],
 				old_yijiang1:["masu","xushu","yujin","xin_yujin","old_xusheng","old_lingtong"],
 				old_yijiang2:["old_zhonghui"],
-				old_yijiang3:["liru","old_zhuran","ol_manchong","old_fuhuanghou","old_caochong"],
+				old_yijiang3:["liru","old_zhuran","old_fuhuanghou","old_caochong"],
 				old_yijiang4:["old_caozhen","old_chenqun","old_zhuhuan"],
 				old_yijiang5:["old_caoxiu","old_quancong","old_zhuzhi"],
 				old_yijiang67:["ol_zhangrang","ol_liuyu"],
@@ -17,6 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			ol_yuanshu:['male','qun',4,['wangzun','tongji']],
 			pangde:['male','qun',4,['mashu','mengjin']],
 			ol_huaxiong:["male","qun",6,["new_reyaowu"]],
 			old_wangyun:['male','qun',4,['wylianji','moucheng']],
@@ -61,7 +63,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangliang:["male","qun",4,["old_jijun","old_fangtong"]],
 			ol_zhangrang:['male','qun',3,['xintaoluan']],
 			ol_guansuo:['male','shu',4,['zhengnan','xiefang']],
-			ol_manchong:['male','wei',3,['yuce','junxing']],
+			//ol_manchong:['male','wei',3,['yuce','junxing']],
 			ol_liuyu:['male','qun',2,['zongzuo','zhige']],
 			old_guanqiujian:["male","wei",4,["drlt_zhenrong","drlt_hongju"],[]],
 		},
@@ -784,7 +786,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhenshan_use_info:'每名角色的回合限一次，每当你需要使用或打出一张基本牌时，你可以与一名手牌数少于你的角色交换手牌。若如此做，视为你使用或打出了此牌',
 			oldxuanfeng:'旋风',
 			oldxuanfeng_info:'每当你失去一次装备区里的牌时，你可以执行下列两项中的一项：1.视为对任意一名其他角色使用一张【杀】（此【杀】不计入每回合的使用限制）；2.对与你距离1以内的一名其他角色造成一点伤害',
+			ol_yuanshu:'旧袁术',
 			
+			old_standard:'标准包',
 			old_shenhua:'神话再临',
 			old_refresh:'界限突破',
 			old_yijiang1:'一将成名2011',

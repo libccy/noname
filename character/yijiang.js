@@ -4861,24 +4861,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:1,
 					result:{
 						player:function(player){
-							var num=0,players=game.filterPlayer();
-							for(var i=0;i<players.length;i++){
-								if(player!=players[i]&&get.damageEffect(players[i],player,players[i],'fire')<0){
-									var att=get.attitude(player,players[i]);
-									if(att>0){
-										num--;
+							var num=0,eff=0,players=game.filterPlayer(function(current){
+								return current!=player;
+							}).sortBySeat(player);
+							for(var target of players){
+								if(get.damageEffect(target,player,target,'fire')>=0){num=0;continue};
+								var shao=false;
+								num++;
+								if(target.countCards('he',function(card){
+									if(get.type(card)!='basic'){
+										return get.value(card)<10;
 									}
-									else if(att<0){
-										num++;
-									}
+									return get.value(card)<8;
+								})<num) shao=true;
+								if(shao){
+									eff-=4*(get.realAttitude||get.attitude)(player,target);
+									num=0;
 								}
+								else eff-=num*(get.realAttitude||get.attitude)(player,target)/4;
 							}
-							if(game.players.length<5){
-								return num-1;
-							}
-							else{
-								return num-2;
-							}
+							if(eff<4) return 0;
+							return eff;
 						}
 					}
 				},
@@ -8902,9 +8905,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
-				filterTarget:function(card,player,target){
-					return target!=player&&target.countCards('h')>0;
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return current!=player&&current.countCards('h')>0;
+					});
 				},
+				subfrequent:['draw'],
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt2('qiangzhi'),function(card,player,target){
@@ -8916,47 +8922,36 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						player.logSkill('qiangzhi',target);
-						var card=target.getCards('h').randomGet();
-						player.showCards(card);
-						player.storage.qiangzhi=get.type(card,'trick');
-						game.addVideo('storage',player,['qiangzhi',player.storage.qiangzhi]);
-						player.markSkill('qiangzhi');
+						player.choosePlayerCard(target,'h',true);
 					}
+					else event.finish();
+					'step 2'
+					var card=result.cards[0];
+					player.showCards(card);
+					player.storage.qiangzhi_draw=get.type(card,'trick');
+					game.addVideo('storage',player,['qiangzhi_draw',player.storage.qiangzhi_draw]);
+					player.addTempSkill('qiangzhi_draw','phaseUseEnd');
 				},
+			},
+			qiangzhi_draw:{
+				trigger:{player:'useCard'},
+				frequent:true,
+				popup:false,
+				charlotte:true,
+				prompt:'是否执行【强识】的效果摸一张牌？',
+				filter:function(event,player){
+					return get.type(event.card,'trick')==player.storage.qiangzhi_draw;
+				},
+				content:function(){
+					player.draw();
+				},
+				onremove:true,
+				mark:true,
 				intro:{
 					content:function(type){
 						return get.translation(type)+'牌';
 					}
 				},
-				group:['qiangzhi2','qiangzhi3'],
-				ai:{
-					order:11,
-					result:{
-						player:1
-					}
-				}
-			},
-			qiangzhi2:{
-				trigger:{player:'useCard'},
-				frequent:true,
-				filter:function(event,player){
-					// return (get.type(event.card,'trick')==player.storage.qiangzhi&&event.cards[0]&&event.cards[0]==event.card);
-					return get.type(event.card,'trick')==player.storage.qiangzhi;
-				},
-				content:function(){
-					player.draw();
-				},
-				ai:{
-					threaten:1.4
-				}
-			},
-			qiangzhi3:{
-				trigger:{player:'phaseUseEnd'},
-				silent:true,
-				content:function(){
-					delete player.storage.qiangzhi;
-					player.unmarkSkill('qiangzhi');
-				}
 			},
 			dingpin:{
 				group:['dingpin3','dingpin4'],
@@ -12488,7 +12483,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			bingyi:'秉壹',
 			bingyi_info:'结束阶段开始时，你可以展示所有手牌，若这些牌颜色均相同，则你令至多X名角色各摸一张牌(X为你的手牌数)。',
 			qiangzhi:'强识',
-			qiangzhi2:'强识',
+			qiangzhi_draw:'强识',
 			qiangzhi_info:'出牌阶段开始时，你可以展示一名其他角色的一张手牌。若如此做，当你于此阶段内使用与此牌类别相同的牌时，你可以摸一张牌。',
 			xiantu:'献图',
 			xiantu2:'献图',

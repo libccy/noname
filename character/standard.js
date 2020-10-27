@@ -40,7 +40,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gongsunzan:['male','qun',4,['yicong']],
 			
 			xf_yiji:["male","shu",3,["xinfu_jijie","xinfu_jiyuan"],[]],
-			re_yuanshu:['male','qun',4,['wangzun','tongji']],
+			re_yuanshu:['male','qun',4,['rewangzun','retongji']],
 		},
 		characterIntro:{
 			liubei:'先主姓刘，讳备，字玄德，涿郡涿县人，汉景帝子中山靖王胜之后也。以仁德治天下。',
@@ -89,6 +89,92 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ganning:['lingtong'],
 		},
 		skill:{
+			rewangzun:{
+				trigger:{global:'phaseZhunbeiBegin'},
+				forced:true,
+				audio:'wangzun',
+				filter:function(event,player){
+					return event.player.hp>player.hp;
+				},
+				logTarget:'player',
+				content:function(){
+					player.draw();
+					var zhu=false;
+					var target=trigger.player;
+					switch(get.mode()){
+						case 'identity':{
+							zhu=target.isZhu;
+							break;
+						}
+						case 'guozhan':{
+							zhu=get.is.jun(target);
+							break;
+						}
+						case 'versus':{
+							zhu=target.identity=='zhu';
+							break;
+						}
+						case 'doudizhu':{
+							zhu=target==game.zhu;
+							break;
+						}
+					}
+					if(zhu){
+						player.draw();
+						target.addTempSkill('rewangzun2');
+						target.addMark('rewangzun2',1,false);
+					}
+				},
+			},
+			rewangzun2:{
+				onremove:true,
+				mod:{
+					maxHandcard:function(player,num){
+						return num-player.countMark('rewangzun2');
+					},
+				},
+				intro:{content:'手牌上限-#'},
+			},
+			retongji:{
+				trigger:{global:'useCardToTarget'},
+				logTarget:'target',
+				audio:'tongji',
+				direct:true,
+				filter:function(event,player){
+					return event.card.name=='sha'&&event.player!=player&&!event.targets.contains(player)&&
+					event.target.inRange(player)&&event.target.countCards('he')>0;
+				},
+				content:function(){
+					'step 0'
+					trigger.target.chooseCard('he','是否对'+get.translation(player)+'发动【同疾】？','弃置一张牌，将'+get.translation(trigger.card)+'转移给'+get.translation(player)).set('ai',function(card){
+						if(!_status.event.check) return -1;
+						return get.unuseful(card)+9;
+					}).set('check',function(){
+						if(trigger.target.countCards('h','shan')){
+							return -get.attitude(trigger.target,player);
+						}
+						if(get.attitude(trigger.target,player)<5){
+							return 6-get.attitude(trigger.target,player);
+						}
+						if(trigger.target.hp==1&&player.countCards('h','shan')==0){
+							return 10-get.attitude(trigger.target,player);
+						}
+						if(trigger.target.hp==2&&player.countCards('h','shan')==0){
+							return 8-get.attitude(trigger.target,player);
+						}
+						return -1;
+					}()>0);
+					'step 1'
+					if(result.bool){	
+						player.logSkill('retongji',trigger.target);
+						trigger.target.discard(result.cards);
+						var evt=trigger.getParent();
+						evt.triggeredTargets2.remove(trigger.target);
+						evt.targets.remove(trigger.target);
+						evt.targets.push(player);
+					}
+				},
+			},
 			hujia:{
 				audio:2,
 				audioname:['re_caocao'],
@@ -2835,6 +2921,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhanshen_info:'觉醒技，准备阶段，若场上有已死亡的其他己方角色且你已受伤，则你弃置装备区的武器牌，减1点体力上限，获得技能〖马术〗和〖神戟〗。',
 			shenji:'神戟',
 			shenji_info:'锁定技，你使用【杀】指定的目标数上限+2，次数上限+1。',
+			rewangzun:'妄尊',
+			rewangzun2:'妄尊',
+			rewangzun_info:'锁定技，一名其他角色的准备阶段开始时，若其体力值大于你，你摸一张牌。然后若其身份为主公/主帅/君主/地主且明智，则你摸一张牌，且其本回合的手牌上限-1。',
+			retongji:'同疾',
+			retongji_info:'攻击范围内包含你的角色成为【杀】的目标时，若你不是此【杀】的使用者或目标，其可弃置一张牌，然后将此【杀】转移给你。',
 			
 			standard_2008:"2008版标准包",
 			standard_2013:"2013版标准包",

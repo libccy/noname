@@ -598,7 +598,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			retuogu:{
-				audio:2,
+				audio:'tuogu',
 				trigger:{global:'die'},
 				filter:function(event,player){
 					return event.player.getStockSkills('仲村由理','天下第一').filter(function(skill){
@@ -2760,7 +2760,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					global:"phaseUseBegin",
 				},
 				filter:function (event,player){
-					return event.player!=player&&event.player.isAlive()&&event.player.inRange(player);
+					return event.player!=player&&event.player.isAlive()&&player.countCards('he')>0&&event.player.inRange(player);
 				},
 				direct:true,
 				derivation:["new_zhixi"],
@@ -5415,7 +5415,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				init:function(player){
 					player.storage.yjixi=0;
 				},
-				derivation:'wangzun',
+				derivation:'rewangzun',
 				trigger:{player:'phaseJieshuBegin'},
 				forced:true,
 				filter:function(event,player){
@@ -5455,8 +5455,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('choiceList',['获得技能〖妄尊〗',str]).set('choice',choice);
 					'step 2'
 					if(result.control=='选项一'){
-						player.addSkill('wangzun');
-						player.popup('wangzun');
+						player.addSkill('rewangzun');
+						player.popup('rewangzun');
 					}
 					else{
 						player.draw(2);

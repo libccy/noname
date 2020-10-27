@@ -207,7 +207,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return _status.event.targets.contains(target);
 					}).set('targets',game.filterPlayer(function(current){
 						return current!=player&&current.getHistory('lose').length>0;
-					}));
+					})).set('ai',function(target){
+						var player=_status.event.player;
+						return get.damageEffect(target,player,player);
+					});
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
@@ -7864,7 +7867,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_sunjian:'界孙坚',
 			wulie:'武烈',
 			wulie2:'武烈',
-			wulie_info:'限定技，结束阶段，你可以失去任意点体力并指定等量的角色。这些角色各获得一枚「烈」。有「烈」的角色受到伤害时，其移去一枚「烈」，然后防止此伤害。',
+			wulie_info:'限定技，结束阶段，你可以失去任意点体力并指定等量的角色。这些角色各获得一枚「烈」。有「烈」的其他角色受到伤害时，其移去一枚「烈」，然后防止此伤害。',
 			re_sunluban:'界孙鲁班',
 			re_masu:'界马谡',
 			ol_pangde:'界庞德',
