@@ -62,7 +62,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hanhaoshihuan:['male','wei',4,['shenduan','yonglve']],
 
 			caorui:['male','wei',3,['huituo','mingjian','xingshuai'],['zhu']],
-			caoxiu:['male','wei',4,['reqianju','reqingxi']],
+			caoxiu:['male','wei',4,['qianju','reqingxi']],
 			zhongyao:['male','wei',3,['huomo','zuoding']],
 			liuchen:['male','shu',4,['zhanjue','qinwang'],['zhu']],
 			zhangyi:['male','shu',4,['wurong','shizhi']],
@@ -1870,7 +1870,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return get.type(card)=='equip'&&target.hasUseTarget(card);
 					});
 					if(target.isMinEquip()&&equip){
-						target.chooseUseTarget(equip,'noanimate','nopopup',true);
+						target.chooseUseTarget(equip,'nothrow','nopopup',true);
 						event.e=true;
 					}
 					'step 3'
@@ -1885,9 +1885,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 5'
 					if(!event.e&&player.isMinEquip()){
 						var equip=get.cardPile(function(card){
-							return get.type(card)=='equip'&&target.hasUseTarget(card);
+							return get.type(card)=='equip'&&player.hasUseTarget(card);
 						});
-						if(equip) player.chooseUseTarget(equip,'noanimate','nopopup',true);
+						if(equip) player.chooseUseTarget(equip,'nothrow','nopopup',true);
 					}
 					'step 6'
 					game.updateRoundNumber();
@@ -2398,7 +2398,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.type(card)=='equip'&&!target.isDisabled(get.subtype(card));
 						});
 						if(event.card){
-							target.chooseUseTarget(event.card,'noanimate','nopopup',true);
+							target.chooseUseTarget(event.card,'nothrow','nopopup',true);
 							event.goto(3);
 						}
 						else{
@@ -2477,7 +2477,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return get.type(card)=='equip';
 							});
 							if(card){
-								trigger.source.chooseUseTarget(card,'noanimate','nopopup',true);
+								trigger.source.chooseUseTarget(card,'nothrow','nopopup',true);
 							}
 						},
 						ai:{
@@ -2527,7 +2527,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return get.type(card)=='equip';
 								});
 								if(card){
-									target.chooseUseTarget(card,true,'noanimate','nopopup',true);
+									target.chooseUseTarget(card,true,'nothrow','nopopup',true);
 								}
 							}
 							if(event.triggername=='dyingAfter'&&player.storage.juexiang_lie>0) event.goto(0);
@@ -4992,7 +4992,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.directfalse=true;
 					}
 					else{
-						trigger.target.chooseToDiscard(num,'弃置'+get.cnNumber(num)+'张手牌，或令杀的伤害+1').set('ai',function(card){
+						trigger.target.chooseToDiscard(num,'弃置'+get.cnNumber(num)+'张手牌，或令'+get.translation(trigger.card)+'的伤害+1').set('ai',function(card){
 							var player=_status.event.player;
 							if(player.hp==1){
 								if(get.type(card)=='basic'){
@@ -5016,18 +5016,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(e1){
 							player.discard(e1,'notBySelf');
 						}
+						event.finish();
 					}
 					else{
-						var storage=trigger.target.storage;
 						var id=trigger.target.playerid;
 						var map=trigger.customArgs;
 						if(!map[id]) map[id]={};
 						if(!map[id].extraDamage) map[id].extraDamage=0;
 						map[id].extraDamage++;
-						if(!storage.reqingxi2) storage.reqingxi2=[];
-						storage.reqingxi2.push(trigger.card);
-						trigger.target.addTempSkill('reqingxi2');
+						trigger.target.judge(function(card){
+							if(get.color(card)=='red') return -1;
+							return 0;
+						});
 					}
+					'step 2'
+					if(result.bool===false) trigger.directHit.add(trigger.target);
 				}
 			},
 			reqingxi2:{
@@ -5259,15 +5262,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					targetInRange:function(card,player,target){
 						if(target==player.storage.xinxianzhen) return true;
 					},
-					cardUsable:function(card,player,num){
-						if(typeof num=='number') return num+100;
+					cardUsableTarget:function(card,player,target){
+						if(target==player.storage.xinxianzhen) return true;
 					},
-					playerEnabled:function(card,player,target){
-						if(card.name=='sha'&&player.storage.xinxianzhen!=target&&!ui.selected.targets.contains(player.storage.xinxianzhen)){
-							var num=player.getCardUsable(card)-100;
-							if(num<=0) return false;
-						}
-					}
 				},
 				ai:{
 					unequip:true,
@@ -5381,15 +5378,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					targetInRange:function(card,player,target){
 						if(target==player.storage.xianzhen) return true;
 					},
-					cardUsable:function(card,player,num){
-						if(card.name=='sha'&&typeof num=='number') return num+100;
+					cardUsableTarget:function(card,player,target){
+						if(target==player.storage.xianzhen) return true;
 					},
-					playerEnabled:function(card,player,target){
-						if(card.name=='sha'&&player.storage.xianzhen!=target&&!ui.selected.targets.contains(player.storage.xianzhen)){
-							var num=player.getCardUsable(card)-100;
-							if(num<=0) return false;
-						}
-					}
 				},
 				ai:{
 					unequip:true,
@@ -10116,7 +10107,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var card=result[0];
 					if(get.type(card)=='equip'){
 						if(!event.target.isDisabled(get.subtype(card))){
-							event.target.chooseUseTarget(card,true,'noanimate','nopopup');
+							event.target.chooseUseTarget(card,true,'nopopup');
 							game.delay();
 						}
 						event.bool=true;
@@ -10880,12 +10871,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.draw();
 					"step 1"
-					player.showHandcards();
+					if(!player.countCards('h')) event.finish();
+					else player.showHandcards();
 					"step 2"
 					if(!trigger.source) return;
 					var cards=player.getCards('h');
+					var color=get.color(cards[0],player);
 					for(var i=1;i<cards.length;i++){
-						if(get.color(cards[i])!=get.color(cards[0])) return;
+						if(get.color(cards[i],player)!=color) return;
 					}
 					trigger.source.chooseToDiscard(true);
 				},
@@ -12316,7 +12309,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reqianju:'千驹',
 			reqianju_info:'锁定技，若你已受伤，你计算与其他角色的距离时-X（X为你已损失的体力值且至少为1）。',
 			reqingxi:'倾袭',
-			reqingxi_info:'当你使用【杀】或【决斗】指定目标后，你可以令其选择一项：1、弃置X张手牌（X为你攻击范围内的角色数，且当你装备区内有武器牌/没有武器牌时至多为4/2），若如此做，其弃置你的此武器牌；2、令此牌的伤害值+1且其不能使用或打出与此牌颜色不同的牌或转化的牌直到此牌结算完成。',
+			reqingxi_info:'当你使用【杀】或【决斗】指定目标后，你可以令其选择一项：1、弃置X张手牌（X为你攻击范围内的角色数，且当你装备区内有武器牌/没有武器牌时至多为4/2），若如此做，其弃置你的此武器牌；2、令此牌的伤害值+1且其进行判定，若结果为红色，则其不能响应此牌。',
 			jieyue:'节钺',
 			jieyue1:'节钺',
 			jieyue2:'节钺',

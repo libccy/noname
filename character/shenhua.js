@@ -965,18 +965,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return true;
 						}
 					},
-					cardUsable:function (card,player,num){
-						if(typeof num=='number'&&game.hasPlayer(function(current){
-							return current.hasSkill('drlt_xiongluan2');
-						})) return num+100;
-					},
-					playerEnabled:function (card,player,target){
-						if(game.hasPlayer(function(current){
-							return current.hasSkill('drlt_xiongluan2');
-						})&&!target.hasSkill('drlt_xiongluan2')){
-							var num=player.getCardUsable(card)-100;
-							if(num<=0) return false;
-						}
+					cardUsableTarget:function(card,player,target){
+						if(target.hasSkill('drlt_xiongluan2')) return true;
 					},
 				},
 			},

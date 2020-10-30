@@ -848,7 +848,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
  						card.remove();
  						card=game.createCard('qibaodao',card.suit,card.number);
  					}
-						targets[0].chooseUseTarget(card,true,'nopopup','noanimate');
+						targets[0].chooseUseTarget(card,true,'nopopup','nothrow');
 					}
 					else{
 						player.chat('没有装备牌了吗');
@@ -2440,14 +2440,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							targetInRange:function (card,player,target){
 								if(target==player.storage.zhengbi_eff1) return true;
 							},
-							cardUsable:function (card,player,num){
-								if(typeof num=='number'&&player.storage.zhengbi_eff1&&player.storage.zhengbi_eff1.isAlive()) return num+100;
-							},
-							playerEnabled:function (card,player,target){
-								if(player.storage.zhengbi_eff1.isAlive()&&player.storage.zhengbi_eff1&&target!=player.storage.zhengbi_eff1){
-									var num=player.getCardUsable(card)-100;
-									if(num<=0) return false;
-								}
+							cardUsableTarget:function (card,player,target){
+								if(player.storage.zhengbi_eff1==target) return true;
 							},
 						},
 						onremove:true,
@@ -3518,7 +3512,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						equip1=game.createCard2('qibaodao',equip1.suit,equip1.number);
 					}
 					target.$draw(equip1);
-					target.chooseUseTarget(true,equip1,'noanimate','nopopup');
+					target.chooseUseTarget(true,equip1,'nothrow','nopopup');
 					game.delay();
 					'step 2'
 					game.updateRoundNumber();
@@ -10265,11 +10259,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return false;
 						}
 					},
-					cardUsable:function(card,player){
-						if(player.storage.zuixiang2&&player.storage.zuixiang2.contains(get.type(card,'trick'))){
-							return false;
-						}
-					},
 					cardRespondable:function(card,player){
 						if(player.storage.zuixiang2&&player.storage.zuixiang2.contains(get.type(card,'trick'))){
 							return false;
@@ -12151,20 +12140,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					content:'players'
 				},
 				mod:{
-					cardUsable:function(card,player,num){
-						if(typeof num=='number') return num+100;
-					},
-					playerEnabled:function(card,player,target){
-						var bool=false;
-						if(player.storage.huxiao3&&ui.selected.targets.length){
-							for(var i=0;i<player.storage.huxiao3.length;i++){
-								if(ui.selected.targets.contains(player.storage.huxiao3[i])){bool=true;break}
-							}
-						}
-						if(!bool&&(!player.storage.huxiao3||!player.storage.huxiao3.contains(target))){
-							var num=player.getCardUsable(card)-100;
-							if(num<=0) return false;
-						}
+					cardUsableTarget:function(card,player,target){
+						if(player.storage.huxiao3&&player.storage.huxiao3.contains(target)) return true;
 					}
 				}
 			},
@@ -13118,30 +13095,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chixin:{
 				group:['chixin1','chixin2'],
 				mod:{
-					cardUsable:function(card,player,num){
-						if(card.name=='sha'){
-							return num+20;
-						}
+					cardUsableTarget:function(card,player,target){
+						if(card.name=='sha'&&!target.hasSkill('chixin3')&&player.inRange(target)) return true;
 					},
 				},
-				trigger:{player:'shaBefore'},
-				forced:true,
-				popup:false,
-				check:function(event,player){
-					return player.countCards('h','sha')>0;
-				},
-				filter:function(event,player){
-					return _status.currentPhase==player;
-				},
+				trigger:{player:'useCardToPlayered'},
+				silent:true,
+				firstDo:true,
 				content:function(){
-					var target=trigger.target;
-					if(target.hasSkill('chixin3')){
-						target.storage.chixin++;
-					}
-					else{
-						target.storage.chixin=1;
-						target.addTempSkill('chixin3','phaseUseEnd');
-					}
+					trigger.target.addTempSkill('chixin3');
 				}
 			},
 			chixin1:{
@@ -13171,23 +13133,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				}
 			},
-			chixin3:{
-				mod:{
-					targetEnabled:function(card,player,target){
-						if(card.name!='sha') return;
-						if(player==_status.currentPhase&&player.hasSkill('chixin')){
-							var num=player.getCardUsable(card,true)-20;
-							var players=game.filterPlayer();
-							for(var i=0;i<players.length;i++){
-								if(players[i].hasSkill('chixin3')){
-									num+=1-players[i].storage.chixin;
-								}
-							}
-							return num>1;
-						}
-					}
-				}
-			},
+			chixin3:{},
 			suiren:{
 				trigger:{player:'phaseZhunbeiBegin'},
 				skillAnimation:true,
@@ -13593,15 +13539,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{
 					player:"phaseZhunbeiBegin",
 				},
-				forced:true,
 				direct:true,
-				filter:function (event,player){
+				filter:function(event,player){
 					if(player.phaseNumber>1) return false;
 					return !game.hasPlayer(function(current){
 						return current.hasSkill('smh_huoji')||current.hasSkill('smh_lianhuan');
 					});
 				},
-				content:function (){
+				content:function(){
 					"step 0"
 					player.chooseTarget('请将「龙印」交给一名角色',true,function(card,player,target){
 						return target!=player;
@@ -13620,13 +13565,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(game.hasPlayer(function(current){
 						return !current.hasSkill('smh_huoji')&&current!=player
 					})){
-					player.chooseTarget('请将「凤印」交给一名角色',true,function(card,player,target){
-						return target!=player&&!target.hasSkill('smh_huoji');
-					}).set('ai',function(target){
-						var player=_status.event.player;
-						return 10+get.attitude(player,target);
-					});
-					}else event.finish();
+						player.chooseTarget('请将「凤印」交给一名角色',true,function(card,player,target){
+							return target!=player&&!target.hasSkill('smh_huoji');
+						}).set('ai',function(target){
+							var player=_status.event.player;
+							return 10+get.attitude(player,target);
+						});
+					}
+					else event.finish();
 					"step 2"
 					if(result.bool&&result.targets&&result.targets.length){
 						var target=result.targets[0];

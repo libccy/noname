@@ -1566,13 +1566,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							targetInRange:function (card,player,target){
 								if(target==player.storage.gzzhengbi_eff1) return true;
 							},
-							cardUsable:function (card,player,num){
-								if(typeof num=='number'&&player.storage.gzzhengbi_eff1.isAlive()&&player.storage.gzzhengbi_eff1.isUnseen()) return num+100;
-							},
-							playerEnabled:function (card,player,target){
-								if(player.storage.gzzhengbi_eff1.isAlive()&&player.storage.gzzhengbi_eff1.isUnseen()&&target!=player.storage.gzzhengbi_eff1){
-									var num=player.getCardUsable(card)-100;
-									if(num<=0) return false;
+							cardUsableTarget:function (card,player,target){
+								if(target==player.storage.gzzhengbi_eff1&&target.isUnseen()){
+									return true;
 								}
 							},
 						},

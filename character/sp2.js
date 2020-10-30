@@ -849,6 +849,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			ziqu:{
+				audio:2,
+				audioname:['sp_key_yuri'],
 				trigger:{source:'damageBegin2'},
 				filter:function(event,player){
 					return event.player!=player&&!player.getStorage('ziqu').contains(event.player)&&
@@ -4658,24 +4660,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_tanbei":{
 				locked:false,
 				mod:{
-					targetInRange:function (card,player,target){
+					targetInRange:function(card,player,target){
 						if(target.hasSkill('tanbei_effect1')){
 							return true;
 						}
 					},
-					cardUsable:function (card,player,num){
-						if(typeof num=='number'&&game.hasPlayer(function(current){
-							return current.hasSkill('tanbei_effect1');
-						})) return num+100;
+					cardUsableTarget:function(card,player,target){
+						if(target.hasSkill('tanbei_effect1')) return true;
 					},
-					playerEnabled:function (card,player,target){
+					playerEnabled:function(card,player,target){
 						if(target.hasSkill('tanbei_effect2')) return false;
-						if(game.hasPlayer(function(current){
-							return current.hasSkill('tanbei_effect1');
-						})&&!target.hasSkill('tanbei_effect1')){
-							var num=player.getCardUsable(card)-100;
-							if(num<=0) return false;
-						}
 					},
 				},
 				audio:2,

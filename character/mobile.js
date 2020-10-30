@@ -13,14 +13,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mobile_shenhua:["re_pangtong","re_guanqiujian","xin_yuanshao","re_liushan","re_dongzhuo","re_sp_zhugeliang","re_sunjian"],
 				mobile_yijiang1:["re_jikang","old_bulianshi","xin_liaohua","xin_caozhang","re_xusheng","xin_chengpu","xin_jianyong","xin_gongsunzan"],
 				mobile_sp:["old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","re_heqi","liuzan"],
-				mobile_trashbin:['old_jiakui'],
 			},
 		},
 		character:{
 			xin_gongsunzan:['male','qun',4,['xinyicong','qiaomeng']],
 			dingyuan:['male','qun',4,['beizhu']],
 			xin_jianyong:['male','shu',3,['xinqiaoshui','xinjyzongshi']],
-			old_jiakui:['male','wei',4,['tongqu','xinwanlan']],
 			xin_caozhang:['male','wei',4,['rejiangchi']],
 			xin_liaohua:['male','shu',4,['redangxian','refuli']],
 			furong:['male','shu',4,['xuewei','liechi']],
@@ -348,11 +346,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					if(cards.length){
 						var card=cards.randomRemove(1)[0];
-						target.useCard(player,false,{
-							name:'sha',
-							isCard:true,
-							cards:[card],
-						},[card]).card.beizhu=true;
+						target.useCard(player,false,card).card.beizhu=true;
 						event.redo();
 					}
 				},
@@ -6113,8 +6107,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mobile_shenhua:'手杀异构·神话再临',
 			mobile_yijiang1:'手杀异构·一将成名',
 			mobile_sp:'手杀异构·SP',
-			mobile_trashbin:'通厕所的',
-			old_jiakui:'贾逵重制',
 			xin_gongsunzan:'手杀公孙瓒',
 		}
 	};

@@ -752,7 +752,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_zhuran:'OL朱然',
 			ol_guansuo:'OL关索',
 			ol_manchong:'OL满宠',
-			ol_guohuai:'OL郭淮',
 			old_fuhuanghou:'旧伏皇后',
 			old_caochong:'旧曹冲',
 			old_guanqiujian:'旧毌丘俭',
