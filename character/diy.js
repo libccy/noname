@@ -1146,7 +1146,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				chooseButton:{
 					dialog:function(){
 						var list=[];
-						for(var i of lib.inpile){
+						var list2=['pyzhuren_heart','pyzhuren_diamond','pyzhuren_club','pyzhuren_spade','pyzhuren_shandian','rewrite_zhuge'];
+						list2.addArray(lib.inpile);
+						for(var i of list2){
 							var sub=get.subtype(i);
 							if(['equip1','equip4'].contains(sub)) list.push([sub,'',i]);
 						}
@@ -1158,7 +1160,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.subtype(name)=='equip4'||player.getEquip(name)) return 0;
 						var sha=player.countCards('h','sha');
 						switch(name){
-							case 'zhuge':
+							case 'rewrite_zhuge':
 							 return sha-player.getCardUsable('sha');
 							case 'guding':
 								if(sha>0&&game.hasPlayer(function(current){
@@ -1272,7 +1274,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var list=[];
-					for(var i of lib.inpile){
+					var list2=['rewrite_bagua','rewrite_renwang','rewrite_tengjia','rewrite_baiyin'];
+					list2.addArray(lib.inpile);
+					for(var i of list2){
 						var sub=get.subtype(i);
 						if(['equip2','equip3'].contains(sub)) list.push([sub,'',i]);
 					}
@@ -1284,13 +1288,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							case 'yexingyi':
 								if(player.hp>2||player.getEquip('bagua')||player.getEquip('tengjia')) return 1.5+Math.random();
 								return 0.5+Math.random();
-							case 'bagua':case 'renwang':
+							case 'rewrite_bagua':case 'rewrite_renwang':
 								if(player.getEquip('bagua')||player.getEquip('tengjia')||player.getEquip('renwang')) return Math.random();
 								return 1.2+Math.random();
-							case 'tengjia':
+							case 'rewrite_tengjia':
 								if(player.getEquip('baiyin')) return 1.3+Math.random();
 								return Math.random();
-							case 'baiyin':
+							case 'rewrite_baiyin':
 								return 0.4+Math.random();
 							default: return 0;
 						}

@@ -1583,7 +1583,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 2'
-					trigger.player.chooseToDiscard('弃置一张牌令'+get.translation(player)+'不能闪避此【杀】，或点「取消」摸两张牌并令此【杀】对其无效').set('ai',function(card){
+					trigger.player.chooseToDiscard('弃置一张牌令'+get.translation(player)+'不能闪避此【杀】，或点「取消」摸两张牌并令此【杀】对其无效','he').set('ai',function(card){
 						if(_status.event.goon) return 6-get.value(card);
 						return 0;
 					}).set('goon',get.attitude(trigger.player,player)<0);

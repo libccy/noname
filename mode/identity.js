@@ -1412,6 +1412,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							list3.push(i);
 						}
 					}
+					list2.sort(lib.sort.character);
 					event.list.randomSort();
 					_status.characterlist=event.list.slice(0);
 					list3.randomSort();

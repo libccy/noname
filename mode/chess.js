@@ -781,6 +781,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					return false;
 				},
+				dieAfter2:function(){
+					var player=this;
+					delete lib.posmap[player.dataset.position];
+					setTimeout(function(){
+						player.delete();
+					},500);
+					for(var i=0;i<ui.phasequeue.length;i++){
+						if(ui.phasequeue[i].link==player){
+							ui.phasequeue[i].remove();
+							ui.phasequeue.splice(i,1);
+							break;
+						}
+					}
+				},
 				dieAfter:function(source){
 					var player=this;
 					if(_status.friends){
@@ -794,17 +808,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					if(ui.enemyDied&&player.side!=game.me.side){
 						ui.enemyDied.innerHTML='杀敌: '+get.cnNumber(++_status.enemyDied,true);
-					}
-					delete lib.posmap[player.dataset.position];
-					setTimeout(function(){
-						player.delete();
-					},500);
-					for(var i=0;i<ui.phasequeue.length;i++){
-						if(ui.phasequeue[i].link==player){
-							ui.phasequeue[i].remove();
-							ui.phasequeue.splice(i,1);
-							break;
-						}
 					}
 					if(player==game.friendZhu){
 						if(game.friendViceZhu&&game.friendViceZhu.isAlive()){

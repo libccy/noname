@@ -313,7 +313,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						priority:-1,
 						filter:function(event,player){
-							return event.card==player.storage.wxuying;
+							return event.cards.contains(player.storage.wxuying);
 						},
 						content:function(){
 							if(_status.currentPhase==player){
@@ -1379,6 +1379,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.discard(cards);
 					if(event.position=='e'){
 						var name=cards[0].name;
+						if(name.indexOf('hstianqi_')!=0) return;
 						for(var i=0;i<player.storage.hstianqi.length;i++){
 							if(player.storage.hstianqi[i].name==name){
 								return;

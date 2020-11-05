@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.105.7',
+	'v1.9.105.8',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -632,6 +632,8 @@ window.noname_asset_list=[
 	'audio/die/re_yufan.mp3',
 	'audio/die/xin_jianyong.mp3',
 	'audio/die/sp_zhangliao.mp3',
+	'audio/die/re_caoxiu.mp3',
+	'audio/die/re_sunxiu.mp3',
 	
 	'audio/skill/anguo1.mp3',
 	'audio/skill/anguo2.mp3',
@@ -2789,6 +2791,12 @@ window.noname_asset_list=[
 	'audio/skill/mubing2.mp3',
 	'audio/skill/ziqu1.mp3',
 	'audio/skill/ziqu2.mp3',
+	'audio/skill/reqingxi1.mp3',
+	'audio/skill/reqingxi2.mp3',
+	'audio/skill/rexingxue1.mp3',
+	'audio/skill/rexingxue2.mp3',
+	'audio/skill/reyanzhu1.mp3',
+	'audio/skill/reyanzhu2.mp3',
 	
 	'font/huangcao.ttf',
 	'font/shousha.ttf',
@@ -3429,6 +3437,10 @@ window.noname_asset_list=[
 	'image/character/ol_yuanshu.jpg',
 	'image/character/key_kotori.jpg',
 	'image/character/key_ryoichi.jpg',
+	'image/character/re_caoxiu.jpg',
+	'image/character/re_hejin.jpg',
+	'image/character/re_sunxiu.jpg',
+	'image/character/xin_baosanniang.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',

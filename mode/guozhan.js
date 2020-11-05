@@ -6597,7 +6597,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		game:{
 			getCharacterChoice:function(list,num){
 				var choice=list.splice(0,num);
-				var map={wei:[],shu:[],wu:[],qun:[]};
+				var map={wei:[],shu:[],wu:[],qun:[],key:[]};
 				for(var i=0;i<choice.length;i++){
 					var group=lib.character[choice[i]][1];
 					if(map[group]){

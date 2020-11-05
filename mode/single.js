@@ -965,22 +965,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			suzi:{
-				audio:2,
-				trigger:{global:'loseAfter'},
-				filter:function(event,player){
-					if(event.getParent().name!='die') return false;
-					for(var i=0;i<event.cards.length;i++){
-						if(get.position(event.cards[i])=='d') return true;
-					}
-					return false;
-				},
-				content:function(){
-					var list=[];
-					for(var i=0;i<trigger.cards.length;i++){
-						if(get.position(trigger.cards[i])=='d') list.push(trigger.cards[i]);
-					}
-					player.gain(list,'gain2');
-				},
+				inherit:'xingshang',
 			},
 			cangji:{
 				trigger:{player:'die'},
@@ -1197,7 +1182,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			sgkuanggu:'狂骨',
 			sgkuanggu_info:'当你造成伤害后，若你已受伤，你可以进行判定：若结果为黑色，你回复1点体力。',
 			suzi:'肃资',
-			suzi_info:'当其他角色区域内的牌因死亡而进入弃牌堆后，你可以获得之。',
 			cangji:'藏机',
 			cangji_info:'当你死亡时，你可以将装备区内的所有牌移动到游戏外。若如此做，你的下一名角色登场时，你将这些牌置入你的装备区。',
 			sgrenwang:'仁望',

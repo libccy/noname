@@ -13,11 +13,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_yijiang2:['old_madai','wangyi','guanzhang','re_handang','re_zhonghui','re_liaohua','re_chengpu','re_caozhang','re_liubiao','re_bulianshi'],
 				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','re_yufan','re_liru','re_manchong'],
 				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan'],
-				refresh_yijiang5:['re_zhangyi','re_quancong'],
+				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu'],
 			},
 		},
 		connect:true,
 		character:{
+			re_caoxiu:['male','wei',4,['qianju','reqingxi']],
+			re_sunxiu:['male','wu',3,['reyanzhu','rexingxue','zhaofu'],['zhu']],
 			ol_dengai:['male','wei',4,['oltuntian','olzaoxian'],['unseen']],
 			re_gongsunzan:['male','qun',4,['reqiaomeng','reyicong']],
 			re_manchong:['male','wei',3,['rejunxing','yuce']],
@@ -167,7 +169,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					target.chooseToDiscard(cards.length,'弃置'+get.cnNumber(cards.length)+'张牌并失去1点体力，或点取消将武将牌翻面并摸'+get.cnNumber(cards.length)+'张牌').set('ai',function(card){
+					target.chooseToDiscard(cards.length,'弃置'+get.cnNumber(cards.length)+'张手牌并失去1点体力，或点取消将武将牌翻面并摸'+get.cnNumber(cards.length)+'张牌').set('ai',function(card){
 						var player=_status.event.player;
 						if(player.isTurnedOver()) return -1;
 						return (player.hp*player.hp)-get.value(card);
@@ -1436,7 +1438,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['boss_lvbu3','re_heqi','re_lingtong'],
 				trigger:{
 					player:['loseAfter','phaseDiscardEnd'],
-					global:['equipAfter','addJudgeAfter','addJudgeAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter'],
 				},
 				direct:true,
 				filter:function(event,player){
@@ -3082,6 +3084,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					_status.noclearcountdown=true;
 					event.videoId=lib.status.videoId++;
 					var cards=player.storage.rehuashen.character.slice(0);
+					var skills=[];
+					var sto=player.storage.rehuashen;
+					for(var i in player.storage.rehuashen.map){
+						skills.addArray(player.storage.rehuashen.map[i]);
+					}
+					var cond='out';
+					if(event.triggername=='phaseBegin'){
+						cond='in';
+					}
+					skills.randomSort();
+					skills.sort(function(a,b){
+						return get.skillRank(b,cond)-get.skillRank(a,cond);
+					});
+					event.aiChoice=skills[0];
+					var choice='更换技能';
+					if(event.aiChoice==player.storage.rehuashen.current2||get.skillRank(event.aiChoice,cond)<1) choice='弃置化身';
 					if(player.isOnline2()){
 						player.send(function(cards,id){
 							var dialog=ui.create.dialog('是否发动【化身】？',[cards,'character']);
@@ -3094,7 +3112,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.dialog.style.display='none';
 					}
 					if(event.triggername=='rehuashen') event._result={control:'更换技能'};
-					else player.chooseControl('弃置化身','更换技能','cancel2');
+					else player.chooseControl('弃置化身','更换技能','cancel2').set('ai',function(){
+						return _status.event.choice;
+					}).set('choice',choice);
 					"step 1"
 					event.control=result.control;
 					if(event.control=='cancel2'){
@@ -3116,6 +3136,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return button.link!=_status.event.current;
 						});
 						next.set('current',player.storage.rehuashen.current);
+					}
+					else{
+						next.set('ai',function(button){
+							return player.storage.rehuashen.map[button.link].contains(_status.event.choice)?2.5:1+Math.random();
+						});
+						next.set('choice',event.aiChoice);
 					}
 					var prompt=event.control=='弃置化身'?'选择弃置至多两张化身':'选择要切换的化身';
 					var func=function(id,prompt){
@@ -3154,7 +3180,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						var list=player.storage.rehuashen.map[event.card].slice(0);
 						list.push('返回');
-						player.chooseControl(list);
+						player.chooseControl(list).set('choice',event.aiChoice).set('ai',function(){
+							return _status.event.choice;
+						});
 					}
 					else{
 						lib.skill.rehuashen.removeHuashen(player,result.links.slice(0));
@@ -7858,7 +7886,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_sunjian:'界孙坚',
 			wulie:'武烈',
 			wulie2:'武烈',
-			wulie_info:'限定技，结束阶段，你可以失去任意点体力并指定等量的角色。这些角色各获得一枚「烈」。有「烈」的其他角色受到伤害时，其移去一枚「烈」，然后防止此伤害。',
+			wulie_info:'限定技，结束阶段，你可以失去任意点体力并指定等量的其他角色。这些角色各获得一枚「烈」。有「烈」的角色受到伤害时，其移去一枚「烈」，然后防止此伤害。',
 			re_sunluban:'界孙鲁班',
 			re_masu:'界马谡',
 			ol_pangde:'界庞德',
@@ -7927,6 +7955,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olzaoxian:'凿险',
 			oltuntian_info:'当你于回合外失去牌后，或于弃牌阶段因弃置而失去【杀】后，你可以进行判定。若判定结果不为♥，则你将此牌置于你的武将牌上，称之为【田】。锁定技，你计算与其他角色的距离时-X（X为你武将牌上【田】的数目）',
 			olzaoxian_info:'觉醒技，准备阶段，若你武将牌上【田】的数量达到3张或更多，则你减1点体力上限，并获得技能〖急袭〗。你于当前回合结束后进行一个额外的回合。',
+			re_sunxiu:'界孙休',
+			re_caoxiu:'界曹休',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

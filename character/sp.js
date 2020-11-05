@@ -10192,134 +10192,95 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				animationColor:'gray',
 				audio:true,
 				unique:true,
-				mark:true,
+				limited:true,
 				trigger:{player:'phaseZhunbeiBegin'},
-				//priority:10,
-				filter:function(event,player){
-					if(player.storage.zuixiang) return false;
-					return true;
-				},
-				check:function(event,player){
-					return player.countCards('h')<player.hp&&player.hp==player.maxHp;
-				},
 				content:function(){
-					"step 0"
-					var cards=get.cards(3);
-					player.storage.zuixiang=cards;
-					game.cardsGotoSpecial(cards);
-					player.showCards(player.storage.zuixiang);
-					player.markSkill('zuixiang');
-					player.syncStorage('zuixiang');
-					"step 1"
-					var cards=player.storage.zuixiang;
-					var bool=false;
-					for(var i=0;i<cards.length;i++){
-						for(var j=i+1;j<cards.length;j++){
-							if(cards[i].number==cards[j].number){
-								bool=true;
-								break;
-							}
-						}
-						if(bool) break;
-					}
-					if(bool){
-						player.gain(player.storage.zuixiang,'draw2').type='xinmanjuan';
-						player.storage.zuixiang=[];
-						player.awakenSkill('zuixiang');
+					'step 0'
+					player.awakenSkill('zuixiang');
+					event.cards=player.showCards(get.cards(3)).cards;
+					player.markAuto('zuixiang2',event.cards);
+					game.cardsGotoSpecial(event.cards);
+					'step 1'
+					if(lib.skill.zuixiang.filterSame(cards)){
+						player.gain(cards,'gain2').type='xinmanjuan';
 						delete player.storage.zuixiang2;
+						player.unmarkSkill('zuixiang2');
 					}
 					else{
-						player.storage.zuixiang2=[];
-						for(var i=0;i<cards.length;i++){
-							player.storage.zuixiang2.add(get.type(cards[i],'trick'));
+						trigger._zuixiang=true;
+						player.addSkill('zuixiang2');
+					}
+				},
+				filterSame:function(c){
+					for(var i=0;i<c.length;i++){
+						for(var j=i+1;j<c.length;j++){
+							if(get.number(c[i])==get.number(c[j])) return true;
 						}
 					}
-					player.storage.zuixiangtemp=true;
-				},
-				group:'zuixiang2',
-				intro:{
-					content:'cards',
-					onunmark:function(storage,player){
-						if(storage&&storage.length){
-							player.$throw(storage,1000);
-							game.cardsDiscard(storage);
-							game.log(storage,'被置入了弃牌堆');
-						 storage.length=0;
-						}
-					},
-				},
-				mod:{
-					targetEnabled:function(card,player,target){
-						if(target.storage.zuixiang2&&target.storage.zuixiang2.contains(get.type(card,'trick'))){
-							return false;
-						}
-					},
-					cardEnabled:function(card,player){
-						if(player.storage.zuixiang2&&player.storage.zuixiang2.contains(get.type(card,'trick'))){
-							return false;
-						}
-					},
-					cardRespondable:function(card,player){
-						if(player.storage.zuixiang2&&player.storage.zuixiang2.contains(get.type(card,'trick'))){
-							return false;
-						}
-					},
-					cardSavable:function(card,player){
-						if(player.storage.zuixiang2&&player.storage.zuixiang2.contains(get.type(card,'trick'))){
-							return false;
-						}
-					}
-				}
-			},
-			zuixiang2:{
-				unique:true,
-				trigger:{player:'phaseZhunbeiBegin'},
-				//priority:9.5,
-				filter:function(event,player){
-					if(player.storage.zuixiang&&player.storage.zuixiang.length) return true;
 					return false;
 				},
+			},
+			zuixiang2:{
+				intro:{
+					content:'cards',
+					onunmark:'throw',
+				},
+				mod:{
+					cardEnabled:function(card,player){
+						var type=get.type2(card);
+						var list=player.getStorage('zuixiang2');
+						for(var i of list){
+							if(get.type2(i)==type) return false;
+						}
+					},
+					cardRespondable:function(){
+						return lib.skill.zuixiang2.mod.cardEnabled.apply(this,arguments)
+					},
+					cardSavable:function(){
+						return lib.skill.zuixiang2.mod.cardEnabled.apply(this,arguments);
+					},
+				},
+				trigger:{
+					player:'phaseZhunbeiBegin',
+					target:'useCardToBefore',
+				},
 				forced:true,
-				popup:false,
+				filter:function(event,player){
+					if(event.name=='phaseZhunbei') return !event._zuixiang;
+					var type=get.type2(event.card);
+					var list=player.getStorage('zuixiang2');
+					for(var i of list){
+						if(get.type2(i)==type) return true;
+					}
+					return false;
+				},
 				content:function(){
-					"step 0"
-					if(player.storage.zuixiangtemp){
-						delete player.storage.zuixiangtemp;
+					'step 0'
+					if(event.triggername=='useCardToBefore'){
+						trigger.cancel();
 						event.finish();
+						return;
 					}
-					else{
-						var cards=get.cards(3);
-						player.storage.zuixiang.addArray(cards);
-						game.cardsGotoSpecial(cards);
-						//event.trigger('addCardToStorage');
-						player.showCards(player.storage.zuixiang);
-						player.markSkill('zuixiang');
-						player.syncStorage('zuixiang');
-					}
-					"step 1"
-					var cards=player.storage.zuixiang;
-					var bool=false;
-					for(var i=0;i<cards.length;i++){
-						for(var j=i+1;j<cards.length;j++){
-							if(cards[i].number==cards[j].number){
-								bool=true;
-								break;
-							}
-						}
-						if(bool) break;
-					}
-					if(bool){
-						player.gain(player.storage.zuixiang,'draw2').type='xinmanjuan';
-						player.storage.zuixiang=[];
-						player.awakenSkill('zuixiang');
+					var cards=get.cards(3);
+					player.markAuto('zuixiang2',cards);
+					player.showCards(player.storage.zuixiang2);
+					game.cardsGotoSpecial(cards);
+					'step 1'
+					var cards=player.getStorage('zuixiang2');
+					if(lib.skill.zuixiang.filterSame(cards)){
+						player.gain(cards,'gain2','log').type='xinmanjuan';
 						delete player.storage.zuixiang2;
+						player.removeSkill('zuixiang2');
 					}
-					else{
-						player.storage.zuixiang2=[];
-						for(var i=0;i<cards.length;i++){
-							player.storage.zuixiang2.add(get.type(cards[i]));
+				},
+				ai:{
+					effect:function(card,player,target){
+						var type=get.type2(card);
+						var list=target.getStorage('zuixiang2');
+						for(var i of list){
+							if(get.type2(i)==type) return 'zeroplayertarget';
 						}
-					}
+					},
 				},
 			},
 			naman:{
@@ -10555,11 +10516,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'phaseEnd'},
 						forced:true,
 						filter:function(event,player){
-							return event.player.hasSkill('rezhoufu3')&&event.player.isAlive();
+							return game.hasPlayer(function(current){
+								return current.hasSkill('rezhoufu3');
+							});
 						},
-						logTarget:'player',
+						logTarget:function(current){
+							return game.filterPlayer(function(current){
+								return current.hasSkill('rezhoufu3');
+							}).sortBySeat();
+						},
 						content:function(){
-							trigger.player.loseHp();
+							var targets=game.filterPlayer(function(current){
+								return current.hasSkill('rezhoufu3');
+							}).sortBySeat();
+							while(targets.length){
+								targets.shift().loseHp();
+							}
 						},
 					},
 				},
@@ -14339,7 +14311,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('xinfu_zhennan',result.targets);
 						var num=[1,2,3,1,1,2].randomGet();
 						if(get.isLuckyStar(player)) num=3;
-						player.line(result.targets[0],'fire');
+						//player.line(result.targets[0],'fire');
 						result.targets[0].damage(num);
 					}
 				},
@@ -14704,7 +14676,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			caoying:"曹婴",
 			simahui:"司马徽",
-			baosanniang:"鲍三娘",
+			baosanniang:"OL鲍三娘",
 			sp_xiahoushi:"SP夏侯氏",
 			pangdegong:"庞德公",
 			zhaotongzhaoguang:"赵统赵广",
@@ -15174,6 +15146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldxiemu:'协穆',
 			naman:'纳蛮',
 			zuixiang:'醉乡',
+			zuixiang2:'醉乡',
 			manjuan:'漫卷',
 			taichen:'抬榇',
 			jilei:'鸡肋',

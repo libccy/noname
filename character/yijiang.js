@@ -62,11 +62,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hanhaoshihuan:['male','wei',4,['shenduan','yonglve']],
 
 			caorui:['male','wei',3,['huituo','mingjian','xingshuai'],['zhu']],
-			caoxiu:['male','wei',4,['qianju','reqingxi']],
+			caoxiu:['male','wei',4,['qianju','qingxi']],
 			zhongyao:['male','wei',3,['huomo','zuoding']],
 			liuchen:['male','shu',4,['zhanjue','qinwang'],['zhu']],
 			zhangyi:['male','shu',4,['wurong','shizhi']],
-			sunxiu:['male','wu',3,['reyanzhu','rexingxue','rezhaofu'],['zhu']],
+			sunxiu:['male','wu',3,['yanzhu','xingxue','zhaofu'],['zhu']],
 			zhuzhi:['male','wu',4,['xinanguo']],
 			quancong:['male','wu',4,['yaoming']],
 			gongsunyuan:['male','qun',4,['huaiyi']],
@@ -320,7 +320,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('he')>0;
 				},
 				content:function(){
-					player.chooseToDiscard('是否发动【伤逝】弃置一张牌？').set('logSkill','reshangshi').set('ai',function(card){
+					player.chooseToDiscard('是否发动【伤逝】弃置一张牌？','he').set('logSkill','reshangshi').set('ai',function(card){
 						var player=_status.event.player;
 						if(player.countCards('h')>player.getDamagedHp()+_status.event.getTrigger().num) return 1;
 						if(player.isPhaseUsing()) return 0.1-player.getUseValue(card,null,true)/Math.max(0.1,get.value(card));
@@ -4974,7 +4974,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			reqingxi:{
-				audio:'qingxi',
+				audio:2,
 				trigger:{player:'useCardToPlayered'},
 				filter:function(event,player){
 					return event.card.name=='sha'||event.card.name=='juedou';
@@ -5024,25 +5024,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!map[id]) map[id]={};
 						if(!map[id].extraDamage) map[id].extraDamage=0;
 						map[id].extraDamage++;
-						trigger.target.judge(function(card){
-							if(get.color(card)=='red') return -1;
+						player.judge(function(card){
+							if(get.color(card)=='red') return 1;
 							return 0;
 						});
 					}
 					'step 2'
-					if(result.bool===false) trigger.directHit.add(trigger.target);
+					if(result.color=='red') trigger.directHit.add(trigger.target);
 				}
 			},
 			reqingxi2:{
 				mod:{
 					cardEnabled:function(card,player){
 						if(player.storage.reqingxi2&&player.storage.reqingxi2.filter(function(cd){
-							return get.color(cd)!=get.color(card);
+							return get.color(cd)==get.color(card);
 						}).length) return false;
 					},
 					cardRespondable:function(card,player){
 						if(player.storage.reqingxi2&&player.storage.reqingxi2.filter(function(cd){
-							return get.color(cd)!=get.color(card);
+							return get.color(cd)==get.color(card);
 						}).length) return false;
 					},
 				},
@@ -6423,7 +6423,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			reyanzhu:{
 				enable:'phaseUse',
-				audio:'yanzhu',
+				audio:2,
 				usable:1,
 				filterTarget:lib.filter.notMe,
 				derivation:['reyanzhu_rewrite','rexingxue_rewrite'],
@@ -6480,13 +6480,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rexingxue:{
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
-				audio:'xingxue',
+				audio:2,
 				filter:function(event,player){
-					return (player.storage.reyanzhu?player.hp:player.maxHp)>0;
+					return (player.storage.reyanzhu?player.maxHp:player.hp)>0;
 				},
 				content:function(){
 					'step 0'
-					player.chooseTarget([1,(player.storage.reyanzhu?player.maxHp:player.hp)],get.prompt('rexingxue'),'令所有目标角色依次摸一张牌，然后所有手牌数不等于体力值的目标角色依次将一张牌置于牌堆顶').set('ai',function(target){
+					player.chooseTarget([1,player.storage.reyanzhu?player.maxHp:player.hp],get.prompt('rexingxue'),'令所有目标角色依次摸一张牌，然后所有手牌数大于体力值的目标角色依次将一张牌置于牌堆顶').set('ai',function(target){
 						var att=get.attitude(player,target);
 						if(target.countCards('h')==target.hp-1) att*=2;
 						return att;
@@ -6507,7 +6507,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 4'
-					if(target.isAlive()&&target.countCards('h')&&target.countCards('h')!=target.hp) target.chooseCard('he',true,'将一张牌置于牌堆顶');
+					if(target.isAlive()&&target.countCards('h')&&target.countCards('h')>target.hp) target.chooseCard('he',true,'将一张牌置于牌堆顶');
 					else event.goto(3);
 					'step 5'
 					if(result&&result.cards){
@@ -12085,8 +12085,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				return '出牌阶段限一次，你可以选择一名其他角色。该角色下一次受到的伤害+1直到其下回合开始。';
 			},
 			rexingxue:function(player){
-				if(player.storage.reyanzhu) return '结束阶段开始时，你可以令至多X名角色各摸一张牌。然后若有手牌数不等于体力值的目标角色，则这些角色各将一张牌置于牌堆顶。（X为你的体力上限）。';
-				return '结束阶段开始时，你可以令至多X名角色各摸一张牌。然后若有手牌数不等于体力值的目标角色，则这些角色各将一张牌置于牌堆顶。（X为你的体力值）。';
+				if(player.storage.reyanzhu) return '结束阶段开始时，你可以令至多X名角色各摸一张牌。然后若有手牌数大于体力值的目标角色，则这些角色各将一张牌置于牌堆顶。（X为你的体力上限）。';
+				return '结束阶段开始时，你可以令至多X名角色各摸一张牌。然后若有手牌数大于体力值的目标角色，则这些角色各将一张牌置于牌堆顶。（X为你的体力值）。';
 			},
 			jiaozhao:function(player){
 				if(player.storage.jiaozhao2) return '出牌阶段限一次，你可以展示一张手牌，然后声明一张基本牌或普通锦囊牌的牌名。在此出牌阶段内，你可以将此手牌当声明的牌使用且你不能被选择为目标。';
@@ -12309,7 +12309,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reqianju:'千驹',
 			reqianju_info:'锁定技，若你已受伤，你计算与其他角色的距离时-X（X为你已损失的体力值且至少为1）。',
 			reqingxi:'倾袭',
-			reqingxi_info:'当你使用【杀】或【决斗】指定目标后，你可以令其选择一项：1、弃置X张手牌（X为你攻击范围内的角色数，且当你装备区内有武器牌/没有武器牌时至多为4/2），若如此做，其弃置你的此武器牌；2、令此牌的伤害值+1且其进行判定，若结果为红色，则其不能响应此牌。',
+			reqingxi_info:'当你使用【杀】或【决斗】指定目标后，你可以令其选择一项：1、弃置X张手牌（X为你攻击范围内的角色数，且当你装备区内有武器牌/没有武器牌时至多为4/2），若如此做，其弃置你的此武器牌；2、令此牌的伤害值+1且你进行判定，若结果为红色，则其不能响应此牌。',
 			jieyue:'节钺',
 			jieyue1:'节钺',
 			jieyue2:'节钺',
@@ -12381,9 +12381,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reyanzhu_rewrite:'宴诛·改',
 			reyanzhu_rewrite_info:'出牌阶段限一次，你可以选择一名其他角色。该角色下一次受到的伤害+1直到其下回合开始。',
 			rexingxue:'兴学',
-			rexingxue_info:'结束阶段开始时，你可以令至多X名角色各摸一张牌。然后若有手牌数不等于体力值的目标角色，则这些角色各将一张牌置于牌堆顶。（X为你的体力值）。',
+			rexingxue_info:'结束阶段开始时，你可以令至多X名角色各摸一张牌。然后若有手牌数大于体力值的目标角色，则这些角色各将一张牌置于牌堆顶。（X为你的体力值）。',
 			rexingxue_rewrite:'兴学·改',
-			rexingxue_rewrite_info:'结束阶段开始时，你可以令至多X名角色各摸一张牌。然后若有手牌数不等于体力值的目标角色，则这些角色各将一张牌置于牌堆顶。（X为你的体力上限）。',
+			rexingxue_rewrite_info:'结束阶段开始时，你可以令至多X名角色各摸一张牌。然后若有手牌数大于体力值的目标角色，则这些角色各将一张牌置于牌堆顶。（X为你的体力上限）。',
 			rezhaofu:'诏缚',
 			rezhaofu_info:'主公技，锁定技，你攻击范围内的角色视为在其他吴势力角色的攻击范围内。',
 			wurong:'怃戎',
