@@ -621,10 +621,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						trigger.untrigger();
 						trigger.responded=true;
 						trigger.result={bool:true,card:result.links[0],cards:result.links.slice(0)};
-						var muniu=player.getEquip(5);
-						muniu.cards.remove(result.links[0]);
-						lib.skill.muniu_skill.sync(muniu);
-						player.updateMarks();
 					}
 				},
 				ai:{
@@ -668,18 +664,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							selectCard:-1,
 							viewAs:links[0],
 							precontent:function(){
-								var muniu=player.getEquip(5);
-								var card=event.result.card;
-								if(muniu&&muniu.cards){
-									muniu.cards.remove(event.result.card);
-									lib.skill.muniu_skill.sync(muniu);
-								}
-								event.result.card=get.autoViewAs(card);
-								event.result.cards=[card];
-								delete event.result.skill;
-								player.updateMarks();
-							}
-						}
+-								delete event.result.skill;
+-							},
+						};
 					},
 					prompt:function(links){
 						return '选择'+get.translation(links)+'的目标';
@@ -742,7 +729,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			muniu_skill7:{
-				filter:function(){return false},
 				hiddenCard:function(player,name){
 					var muniu=player.getEquip(5);
 					if(!muniu.cards) return false;
@@ -751,6 +737,24 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(muniu.cards[i].name==name) return true;
 					}
 					return false;
+				},
+				trigger:{global:'cardsGotoOrderingEnd'},
+				silent:true,
+				firstDo:true,
+				filter:function(event,player){
+					var muniu=player.getEquip('muniu');
+					if(!muniu||!muniu.cards) return false;
+					return event.cards&&event.cards.filter(function(card){
+						return muniu.cards.contains(card);
+					}).length>0;
+				},
+				content:function(){
+					var muniu=player.getEquip(5);
+					if(muniu&&muniu.cards){
+						muniu.cards.remove(trigger.cards);
+						lib.skill.muniu_skill.sync(muniu);
+					}
+					player.updateMarks();
 				},
 			},
 			huogong2:{},

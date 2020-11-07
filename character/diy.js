@@ -10952,7 +10952,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			inari_huhun:'狐魂',
 			inari_huhun_info:'锁定技，你的♣牌的花色均视为♦。你的手牌上限+1。',
 			shiina_qingshen:'轻身',
-			shiina_qingshen_info:'当你受到或造成伤害后，你可以获得此次伤害的渠道对应的实体牌，然后将等量的武将牌置于你的武将牌上，称为「轻」。锁定技，你的手牌上限和攻击范围+X（X为「轻」数）。',
+			shiina_qingshen_info:'当你受到或造成伤害后，你可以获得此次伤害的渠道对应的实体牌，然后将等量的牌置于你的武将牌上，称为「轻」。锁定技，你的手牌上限和攻击范围+X（X为「轻」数）。',
 			shiina_feiyan:'飞燕',
 			shiina_feiyan_info:'一名其他角色的回合开始时，若其在你的攻击范围内，则你可以将一张「轻」置于弃牌堆，然后视为对其使用一张【杀】。若此【杀】未造成伤害，你摸一张牌。你于此【杀】的结算流程中视为拥有技能【铁骑】。',
 			shiina_retieji:'铁骑',

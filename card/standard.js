@@ -1958,6 +1958,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
+					delete event.wuxieresult;
+					delete event.wuxieresult2;
 					if(trigger.multitarget){
 						event.targets=trigger.targets;
 					}
@@ -1970,7 +1972,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						event.sourcex2=trigger.player;
 					}
 					event.source=trigger.player;
-					event.state=true;
+					if(event.state==undefined) event.state=true;
 					event.card=trigger.card;
 					event._global_waiting=true;
 					event.tempnowuxie=(trigger.targets&&trigger.targets.length>1&&!trigger.multitarget);

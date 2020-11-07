@@ -4,7 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
-			xin_baosanniang:['male','shu',3,['xinfu_wuniang','decadexushen']],
+			xin_baosanniang:['female','shu',3,['xinfu_wuniang','decadexushen']],
 			re_hejin:['male','qun',4,['spmouzhu']],
 			hansui:['male','qun',4,['spniluan','spweiwu']],
 			liuhong:['male','qun',4,['yujue','tuxing'],['unseen']],
@@ -1426,7 +1426,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.popup(trigger.card.name,trigger.name=='useCard'?'metal':'wood');
 					'step 1'
 					var random=0.5+player.countCards('e')*0.1;
-					if(get.isLuckyStar(player)||trigger.card.name=='wuxie') random=1;
+					if(get.isLuckyStar(player)) random=1;
 					if(random>=Math.random()){
 						player.popup('洗具');
 					}
@@ -1460,7 +1460,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lvli4:{
 				log:false,
 				enable:'chooseToUse',
-				filter:function(event,player){
+				viewAsFilter:function(player){
 					if(player.storage.lvli>1) return false;
 					if(player.storage.lvli>0&&(player!=_status.currentPhase||!player.storage.choujue)) return false;
 					return true;
@@ -1481,7 +1481,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lvli5:{
 				log:false,
 				enable:'chooseToUse',
-				filter:function(event,player){
+				viewAsFilter:function(player){
 					if(player.storage.lvli>1) return false;
 					if(player.storage.lvli>0&&(player!=_status.currentPhase||!player.storage.choujue)) return false;
 					return true;
@@ -5718,6 +5718,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				str+='伤害后，你可选择：1，若你的体力值大于你的手牌数，你摸Ｘ张牌；2，若你的手牌数大于你的体力值且你已受伤，你回复Ｘ点体力（Ｘ为你的手牌数与体力值之差）。';
 				return str;
 			},
+			lvli:function(player){
+				var str='每名角色的回合限一次';
+				if(player.storage.choujue) str+='（自己的回合内则改为限两次）';
+				str+='，你可以声明一个基本牌或普通锦囊牌的牌名，有随机概率视为使用之（装备区里的牌数越多，成功概率越大）';
+				if(player.storage.beishui) str+='。当你受到伤害后，你也可以以此法使用一张牌。';
+				return str;
+			},
 			mubing:function(player){
 				if(player.storage.mubing2) return '出牌阶段开始时，你可以展示牌堆顶的四张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。然后你可将以此法获得的牌以任意方式交给其他角色。';
 				return '出牌阶段开始时，你可以展示牌堆顶的三张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。';
@@ -5830,7 +5837,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pingjian_info:'结束阶段开始时/当你受到伤害后/出牌阶段限一次，你可以令系统随机从剩余武将牌堆中检索出三张拥有发动时机为结束阶段开始时/当你受到伤害后/出牌阶段的技能的武将牌。然后你可以选择尝试发动其中一个技能或摸一张牌。每个技能每局只能选择一次。',
 			pingjian_use:'评荐',
 			pytianjiang:'天匠',
-			pytianjiang_info:'游戏开始时，你随机获得两张不同副类别的装备牌，并置入你的装备区。出牌阶段，你装备区里的牌可以移动至其他角色的装备区并替换其原有装备。',
+			pytianjiang_info:'游戏开始时，你随机获得两张不同副类别的装备牌，并置入你的装备区。出牌阶段，你可以将装备区的牌移动至其他角色的装备区（可替换原装备）。若你以此法移动了〖铸刃〗的衍生装备，你摸两张牌。',
 			pytianjiang_move:'天匠',
 			pyzhuren:'铸刃',
 			pyzhuren_info:'出牌阶段限一次，你可以弃置一张手牌。根据此牌的花色点数，你有一定概率打造成功并获得一张武器牌（若打造失败或武器已有则改为摸一张【杀】，花色决定武器名称，点数决定成功率）。此武器牌进入弃牌堆时，将其移出游戏。',

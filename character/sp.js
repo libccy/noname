@@ -957,6 +957,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return {
 							audio:'xinjingong',
 							filterCard:true,
+							popname:true,
 							position:'he',
 							viewAs:{name:links[0][2]},
 							check:function(card){

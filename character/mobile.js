@@ -11,11 +11,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mobile_sunben:["re_sunben"],
 				mobile_standard:["xin_xiahoudun"],
 				mobile_shenhua:["re_pangtong","re_guanqiujian","xin_yuanshao","re_liushan","re_dongzhuo","re_sp_zhugeliang","re_sunjian"],
-				mobile_yijiang1:["re_jikang","old_bulianshi","xin_liaohua","xin_caozhang","re_xusheng","xin_chengpu","xin_jianyong","xin_gongsunzan"],
+				mobile_yijiang1:["re_jikang","old_bulianshi","xin_liaohua","xin_caozhang","re_xusheng","xin_chengpu","xin_jianyong","xin_gongsunzan","xin_zhuran"],
 				mobile_sp:["old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","re_heqi","liuzan"],
 			},
 		},
 		character:{
+			xin_zhuran:['male','wu',4,['mobiledanshou'],['unseen']],
 			xin_gongsunzan:['male','qun',4,['xinyicong','qiaomeng']],
 			dingyuan:['male','qun',4,['beizhu']],
 			xin_jianyong:['male','shu',3,['xinqiaoshui','xinjyzongshi']],
@@ -42,7 +43,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yangbiao:['male','qun',3,['zhaohan','rangjie','yizheng']],
 			re_sp_zhugeliang:["male","shu",3,["bazhen","rehuoji","rekanpo"],[]],
 			xin_xiahoudun:['male','wei',4,['reganglie','xinqingjian']],
-			zhangyì:['male','shu',4,['zhiyi']],
+			zhangyì:['male','shu',4,['rezhiyi']],
 			jiakui:['male','wei',3,['zhongzuo','wanlan']],
 			re_jikang:["male","wei",3,["new_qingxian","new_juexiang"]],
 			old_bulianshi:['female','wu',3,['anxu','zhuiyi']],
@@ -299,6 +300,51 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		skill:{
+			//手杀朱然
+			//设计师你改技能有瘾🐴
+			mobiledanshou:{
+				trigger:{global:'phaseJieshuBegin'},
+				audio:2,
+				direct:true,
+				filter:function(event,player){
+					if(player.countCards('he')>=event.player.countCards('h')) return true;
+					return game.hasPlayer2(function(current){
+						return current.getHistory('useCard',function(evt){
+							return get.type(evt.card)!='equip'&&evt.targets.contains(player);
+						}).length;
+					});
+				},
+				content:function(){
+					'step 0'
+					var list=[];
+					event.addIndex=0;
+					var num=game.countPlayer2(function(current){
+						return current.getHistory('useCard',function(evt){
+							return get.type(evt.card)!='equip'&&evt.targets.contains(player);
+						}).length;
+					});
+					event.num=num;
+					if(num) list.push('摸'+get.cnNumber(num)+'张牌');
+					else event.addIndex++;
+					var num2=trigger.player.countCards('h');
+					event.num2=num2;
+					if(num2&&player.countCards('he')>=num2) list.push('弃置'+get.cnNumber(num2)+'张牌并对'+get.translation(trigger.player)+'造成1点伤害');
+					else if(!num2) list.push('对'+get.translation(trigger.player)+'造成1点伤害');
+					player.chooseControl('cancel2').set('prompt',get.prompt('mobiledanshou')).set('choiceList',list);
+					'step 1'
+					if(result.control!='cancel2'){
+						player.logSkill('mobiledanshou',trigger.player);
+						if(result.index+event.addIndex==0){
+							player.draw(num);
+							event.finish();
+						}
+						else if(event.num2) player.chooseToDiscard('he',true,event.num2);
+					}
+					else event.finish();
+					'step 2'
+					trigger.player.damage();
+				},
+			},
 			//丁原
 			//程序员和设计师至少有一个脑子有坑
 			beizhu:{
@@ -2387,6 +2433,58 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.next.remove(next);
 						trigger.after.push(next);
 					}
+				},
+			},
+			rezhiyi:{
+				audio:'zhiyi',
+				trigger:{global:'phaseJieshuBegin'},
+				forced:true,
+				filter:function(event,player){
+					return player.getHistory('useCard',function(card){
+						return get.type(card.card)=='basic';
+					}).length>0||player.getHistory('respond',function(card){
+						return get.type(card.card)=='basic';
+					}).length>0;
+				},
+				content:function(){
+					'step 0'
+					var list=[];
+					player.getHistory('useCard',function(evt){
+						if(get.type(evt.card)!='basic') return;
+						var name=evt.card.name;
+						if(name=='sha'){
+							var nature=evt.card.nature;
+							switch(nature){
+								case 'fire':name='huosha';break;
+								case 'thunder':name='leisha';break;
+								case 'kami':name='kamisha';break;
+							}
+						}
+						list.add(name);
+					});
+					player.getHistory('respond',function(evt){
+						if(get.type(evt.card)!='basic') return;
+						var name=evt.card.name;
+						if(name=='sha'){
+							var nature=evt.card.nature;
+							switch(nature){
+								case 'fire':name='huosha';break;
+								case 'thunder':name='leisha';break;
+								case 'kami':name='kamisha';break;
+							}
+						}
+						list.add(name);
+					});
+					player.chooseButton(['执义：选择要使用的牌，或点取消摸一张牌',[list.map(function(name){
+						return ['基本','',name];
+					}),'vcard']],function(button){
+						return _status.event.player.getUseValue({name:button.link[2],nature:button.link[3]});
+					},function(button){
+						return _status.event.player.hasUseTarget({name:button.link[2],nature:button.link[3]});
+					});
+					'step 1'
+					if(!result.bool) player.draw();
+					else player.chooseUseTarget({name:result.links[0][2],isCard:true,nature:result.links[0][3]});
 				},
 			},
 			zhiyi:{
@@ -5889,6 +5987,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jiakui:'贾逵',
 			zhiyi:'执义',
 			zhiyi_info:'锁定技，当你于一回合内使用或打出第一张基本牌时，你选择一项：1.摸一张牌。2.于此牌A（若此牌是因响应牌B而使用或打出的，则改为牌B）的使用或打出流程结算完成后，视为使用一张与此牌名称和属性相同的卡牌。',
+			rezhiyi:'执义',
+			rezhiyi_info:'锁定技，一名角色的结束阶段开始时，若你本回合内使用或打出过基本牌，则你选择一项：1.摸一张牌。2.视为使用一张本回合内使用或打出过的基本牌。',
 			zhongzuo:'忠佐',
 			zhongzuo_info:'一名角色的结束阶段开始时，若你于此回合内造成或受到过伤害，则你可以令一名角色摸两张牌。若该角色已受伤，则你摸一张牌。',
 			wanlan:'挽澜',
@@ -6103,6 +6203,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			beizhu:'备诛',
 			beizhu_draw:'备诛',
 			beizhu_info:'出牌阶段限一次，你可以观看一名其他角色的手牌。若其中：没有【杀】，你弃置其一张牌，然后你可令其获得牌堆中的一张【杀】；有【杀】，其依次对你使用这些【杀】，当你因此受到1点伤害后，你摸一张牌。',
+			xin_zhuran:'手杀朱然',
+			mobiledanshou:'胆守',
+			mobiledanshou_info:'一名角色的结束阶段开始时，你可选择一项：①摸X张牌（X为本回合内目标包含你的非装备牌的数量）。②弃置Y张牌并对当前回合角色造成1点伤害（Y为其手牌数）。',
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua:'手杀异构·神话再临',
 			mobile_yijiang1:'手杀异构·一将成名',

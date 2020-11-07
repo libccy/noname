@@ -5284,7 +5284,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{player:'useCard2'},
 				filter:function(event,player){
-					return (event.card.name=='sha'||get.type(event.card)=='trick')&&
+					return player.storage.xinxianzhen&&player.storage.xinxianzhen.isAlive()&&
+					(event.card.name=='sha'||get.type(event.card)=='trick')&&
 					event.targets&&event.targets.length==1&&!event.targets.contains(player.storage.xinxianzhen);
 				},
 				check:function(event,player){
@@ -7248,7 +7249,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							filterCard:function(card){
 								return get.type(card)!='basic'&&get.color(card)=='black';
 							},
-							viewAs:{name:links[0][2],nature:links[0][3],suit:null,number:null,isCard:true},
+							viewAs:{
+								name:links[0][2],
+								nature:links[0][3],
+								suit:'none',
+								number:null,
+								isCard:true,
+							},
 							position:'he',
 							popname:true,
 							ignoreMod:true,
