@@ -6214,10 +6214,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:4,
 					result:{
 						player:function(player){
-							if(!player.storage.junktaoluan2) player.storage.junktaoluan2=0;
 							var players=game.filterPlayer();
 							for(var i=0;i<players.length;i++){
-								if(players[i]!=player&&players[i].countCards('he')>((player.storage.junktaoluan2+1)*2)&&get.attitude(player,players[i])>0){
+								if(players[i]!=player&&players[i].countCards('he')&&get.attitude(player,players[i])>0){
 									return 1;
 								}
 							}
@@ -6312,13 +6311,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				viewAs:{name:'shan'},
 				check:function(card){
 					var player=_status.event.player;
-					if(!player.storage.junktaoluan2) player.storage.junktaoluan2=0;
 					var allshown=true,players=game.filterPlayer();
 					for(var i=0;i<players.length;i++){
 						if(players[i].ai.shown==0){
 							allshown=false;
 						}
-						if(players[i]!=player&&players[i].countCards('he')>((player.storage.junktaoluan2+1)*2)&&get.attitude(player,players[i])>0){
+						if(players[i]!=player&&players[i].countCards('he')&&get.attitude(player,players[i])>0){
 							return 6-get.value(card);
 						}
 					}
@@ -6371,13 +6369,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(card){
 					var player=_status.event.player;
 					if(player.isPhaseUsing()) return 0;
-					if(!player.storage.junktaoluan2) player.storage.junktaoluan2=0;
 					var allshown=true,players=game.filterPlayer();
 					for(var i=0;i<players.length;i++){
 						if(players[i].ai.shown==0){
 							allshown=false;
 						}
-						if(players[i]!=player&&players[i].countCards('he')>((player.storage.junktaoluan2+1)*2)&&get.attitude(player,players[i])>0){
+						if(players[i]!=player&&players[i].countCards('he')&&get.attitude(player,players[i])>0){
 							return 6-get.value(card);
 						}
 					}
