@@ -2164,7 +2164,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				audio:2,
 				content:function(){
-					player.draw(player.getAttackRange());
+					player.draw(player.getHistory('useCard').length+player.getHistory('respond').length);
 				},
 				ai:{
 					threaten:1.8,
@@ -5302,7 +5302,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['fanghun_sha','fanghun_draw'],
 				subSkill:{
 					draw:{
-						trigger:{player:['useCard','respond']},
+						trigger:{player:['useCardAfter','respondAfter']},
 						forced:true,
 						popup:false,
 						filter:function(event){
@@ -5313,6 +5313,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					sha:{
+						audio:'fanghun',
 						enable:['chooseToUse','chooseToRespond'],
   				prompt:'弃置一枚【梅影】标记，将杀当做闪，或将闪当做杀，或将桃当做酒，或将酒当做桃使用或打出',
   				viewAs:function(cards,player){
@@ -14101,6 +14102,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!player.hasMark('xinfu_falu_'+suit)) player.addMark('xinfu_falu_'+suit);
 					}
 				},
+				ai:{threaten:1.4},
 			},
 			"xinfu_dianhua":{
 				trigger:{
@@ -14120,16 +14122,189 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<lib.suit.length;i++){
 						if(player.hasMark('xinfu_falu_'+lib.suit[i])) num++;
 					}
-					player.chooseCardButton(num,true,get.cards(num),'【点化】：按顺将卡牌置于牌堆顶（先选择的在上）').set('ai',function(button){
-						return get.value(button.link);
-					});
-					'step 1'
-					if(result.bool){
-						var list=result.links.slice(0);
-						while(list.length){
-							ui.cardPile.insertBefore(list.pop(),ui.cardPile.firstChild);
-						}
+					if(player.isUnderControl()){
+						game.swapPlayerAuto(player);
 					}
+					var cards=get.cards(num);
+					event.cards=cards;
+					var switchToAuto=function(){
+						_status.imchoosing=false;
+						if(event.dialog) event.dialog.close();
+						if(event.control) event.control.close();
+						var top=[];
+						var judges=player.getCards('j');
+						var stopped=false;
+						if(!player.hasWuxie()){
+							for(var i=0;i<judges.length;i++){
+								var judge=get.judge(judges[i]);
+								cards.sort(function(a,b){
+									return judge(b)-judge(a);
+								});
+								if(judge(cards[0])<0){
+									stopped=true;break;
+								}
+								else{
+									top.unshift(cards.shift());
+								}
+							}
+						}
+						var bottom;
+						if(!stopped){
+							cards.sort(function(a,b){
+								return get.value(b,player)-get.value(a,player);
+							});
+							while(cards.length){
+								if(get.value(cards[0],player)<=5) break;
+								top.unshift(cards.shift());
+							}
+						}
+						bottom=cards;
+						for(var i=0;i<top.length;i++){
+							ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
+						}
+						for(i=0;i<bottom.length;i++){
+							ui.cardPile.appendChild(bottom[i]);
+						}
+						player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(bottom.length)+'下');
+						game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
+						game.delay(2);
+					};
+					var chooseButton=function(online,player,cards){
+						var event=_status.event;
+						player=player||event.player;
+						cards=cards||event.cards;
+						event.top=[];
+						event.bottom=[];
+						event.status=true;
+						event.dialog=ui.create.dialog('按顺序选择置于牌堆顶的牌（先选择的在上）',cards);
+						for(var i=0;i<event.dialog.buttons.length;i++){
+							event.dialog.buttons[i].classList.add('pointerdiv');
+						}
+						event.switchToAuto=function(){
+							event._result='ai';
+							event.dialog.close();
+							event.control.close();
+							_status.imchoosing=false;
+						},
+						event.control=ui.create.control('ok','pileTop','pileBottom',function(link){
+							var event=_status.event;
+							if(link=='ok'){
+								if(online){
+									event._result={
+										top:[],
+										bottom:[]
+									}
+									for(var i=0;i<event.top.length;i++){
+										event._result.top.push(event.top[i].link);
+									}
+									for(var i=0;i<event.bottom.length;i++){
+										event._result.bottom.push(event.bottom[i].link);
+									}
+								}
+								else{
+									var i;
+									for(i=0;i<event.top.length;i++){
+										ui.cardPile.insertBefore(event.top[i].link,ui.cardPile.firstChild);
+									}
+									for(i=0;i<event.bottom.length;i++){
+										ui.cardPile.appendChild(event.bottom[i].link);
+									}
+									for(i=0;i<event.dialog.buttons.length;i++){
+										if(event.dialog.buttons[i].classList.contains('glow')==false&&
+											event.dialog.buttons[i].classList.contains('target')==false)
+										ui.cardPile.appendChild(event.dialog.buttons[i].link);
+									}
+									player.popup(get.cnNumber(event.top.length)+'上'+get.cnNumber(event.cards.length-event.top.length)+'下');
+									game.log(player,'将'+get.cnNumber(event.top.length)+'张牌置于牌堆顶');
+								}
+								event.dialog.close();
+								event.control.close();
+								game.resume();
+								_status.imchoosing=false;
+							}
+							else if(link=='pileTop'){
+								event.status=true;
+								event.dialog.content.childNodes[0].innerHTML='按顺序选择置于牌堆顶的牌';
+							}
+							else{
+								event.status=false;
+								event.dialog.content.childNodes[0].innerHTML='按顺序选择置于牌堆底的牌';
+							}
+						})
+						for(var i=0;i<event.dialog.buttons.length;i++){
+							event.dialog.buttons[i].classList.add('selectable');
+						}
+						event.custom.replace.button=function(link){
+							var event=_status.event;
+							if(link.classList.contains('target')){
+								link.classList.remove('target');
+								event.top.remove(link);
+							}
+							else if(link.classList.contains('glow')){
+								link.classList.remove('glow');
+								event.bottom.remove(link);
+							}
+							else if(event.status){
+								link.classList.add('target');
+								event.top.unshift(link);
+							}
+							else{
+								link.classList.add('glow');
+								event.bottom.push(link);
+							}
+						}
+						event.custom.replace.window=function(){
+							for(var i=0;i<_status.event.dialog.buttons.length;i++){
+								_status.event.dialog.buttons[i].classList.remove('target');
+								_status.event.dialog.buttons[i].classList.remove('glow');
+								_status.event.top.length=0;
+								_status.event.bottom.length=0;
+							}
+						}
+						game.pause();
+						game.countChoose();
+					};
+					event.switchToAuto=switchToAuto;
+
+					if(event.isMine()){
+						chooseButton();
+						event.finish();
+					}
+					else if(event.isOnline()){
+						event.player.send(chooseButton,true,event.player,event.cards);
+						event.player.wait();
+						game.pause();
+					}
+					else{
+						event.switchToAuto();
+						event.finish();
+					}
+					"step 1"
+					if(event.result=='ai'||!event.result){
+						event.switchToAuto();
+					}
+					else{
+						var top=event.result.top||[];
+						var bottom=event.result.bottom||[];
+						for(var i=0;i<top.length;i++){
+							ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
+						}
+						for(i=0;i<bottom.length;i++){
+							ui.cardPile.appendChild(bottom[i]);
+						}
+						for(i=0;i<event.cards.length;i++){
+							if(!top.contains(event.cards[i])&&!bottom.contains(event.cards[i])){
+								ui.cardPile.appendChild(event.cards[i]);
+							}
+						}
+						player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(event.cards.length-top.length)+'下');
+						game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
+						game.updateRoundNumber();
+						game.delay(2);
+					}
+				},
+				ai:{
+					threaten:2.2
 				},
 			},
 			"xinfu_zhenyi":{
@@ -14139,7 +14314,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				audio:2,
 				filter:function (event,player){
-					if(!event.nature) return false;
+					//if(!event.nature) return false;
 					return player.hasMark('xinfu_falu_diamond');
 				},
 				prompt2:'弃置「勾陈♦」标记，从牌堆中获得每种类型的牌各一张。',
@@ -14171,55 +14346,48 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					global:"judge",
 				},
 				direct:true,
-				filter:function (event,player){
+				filter:function(event,player){
 					return player.hasMark('xinfu_falu_spade');
 				},
-				content:function (){
+				content:function(){
 					"step 0"
 					var str=get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
 					get.translation(trigger.player.judging[0])+'，是否发动【真仪】，弃置「紫薇♠」标记并修改判定结果？';
-					player.chooseControl('黑桃5','红桃5','取消').set('prompt',str).set('ai',function(){
+					player.chooseControl('spade','heart','diamond','club','cancel2').set('prompt',str).set('ai',function(){
 						//return '取消';
 						var judging=_status.event.judging;
-						var cards={name:judging.name,suit:"spade",number:5};
-						var cardh={name:judging.name,suit:"heart",number:5};
-						var results=trigger.judge(cards)-trigger.judge(judging);
-						var resulth=trigger.judge(cardh)-trigger.judge(judging);
+						var trigger=_status.event.getTrigger();
+						var res1=trigger.judge(judging);
+						var list=lib.suit.slice(0);
 						var attitude=get.attitude(player,trigger.player);
-						if(attitude==0||(resulth==0&&results==0)) return '取消';
-						if(attitude>0){
-							if(results>0){
-								if(resulth>results) return '红桃5';
-								return '黑桃5';
-							}
-							else if(resulth>0) return '红桃5';
-							return '取消';
-						}
-						else{
-							if(results<0){
-								if(resulth<results) return '红桃5';
-								return '黑桃5';
-							}
-							else if(resulth<0) return '红桃5';
-							return '取消';
-						}
+						if(attitude==0) return 0;
+						var getj=function(suit){
+							return trigger.judge({
+								name:get.name(judging),
+								nature:get.nature(judging),
+								suit:suit,
+								number:2,
+							})
+						};
+						list.sort(function(a,b){
+							return (getj(b)-getj(a))*get.sgn(attitude);
+						});
+						if((getj(list[0])-res1)*attitude>0) return list[0];
+						return 'cancel2';
 					}).set('judging',trigger.player.judging[0]);
 					"step 1"
-					if(['黑桃5','红桃5'].contains(result.control)){
+					if(result.control!='cancel2'){
 						player.addExpose(0.25);
 						player.removeMark('xinfu_falu_spade');
 						player.logSkill('xinfu_zhenyi',trigger.player);
 						//player.line(trigger.player);
 						player.popup(result.control);
-						game.log(player,'将判定结果改为了','#y'+result.control);
+						game.log(player,'将判定结果改为了','#y'+get.translation(result.control+2)+5);
 						trigger.fixedResult={
-							suit:result.control=='黑桃5'?'spade':'heart',
-							color:result.control=='黑桃5'?'black':'red',
+							suit:result.control,
+							color:get.color({name:result.control}),
 							number:5,
 						};
-					}
-					else{
-						event.finish();
 					}
 				},
 				ai:{
@@ -14233,9 +14401,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"zhenyi_club":{
 				audio:'xinfu_zhenyi',
 				enable:"chooseToUse",
-				filter:function (event,player){
-					if(!player.isDying()) return false;
-					return player.hasMark('xinfu_falu_club');
+				viewAsFilter:function(player){
+					if(player==_status.currentPhase) return false;
+					return player.hasMark('xinfu_falu_club')&&player.countCards('h')>0;
 				},
 				filterCard:true,
 				position:"h",
@@ -14243,20 +14411,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					name:"tao",
 				},
 				prompt:"弃置「后土♣」标记，将一张手牌当桃使用",
-				check:function (card){return 15-get.value(card)},
-				precontent:function (){
+				check:function(card){return 15-get.value(card)},
+				precontent:function(){
 					player.removeMark('xinfu_falu_club');
 				},
 				ai:{
-					skillTagFilter:function (player){
-						if(!player.isDying()) return false;
-						return player.hasMark('xinfu_falu_club');
+					skillTagFilter:function(player){
+						if(player==_status.currentPhase) return false;
+						return player.hasMark('xinfu_falu_club')&&player.countCards('h')>0;
 					},
 					save:true,
-					respondTao:true,
 				},
 			},
-			"zhenyi_heart":{
+			zhenyi_heart:{
 				trigger:{
 					source:"damageBegin1",
 				},
@@ -14270,23 +14437,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player:player,
 						card:event.card,
 					})) return false;
-					return player.hasMark('xinfu_falu_spade')||get.color(ui.cardPile.firstChild)=='black';
+					return true;
+					//return player.hasMark('xinfu_falu_spade')||get.color(ui.cardPile.firstChild)=='black';
 				},
 				prompt2:function(event){
-					return '弃置「玉清♥」标记，然后进行判定。若结果为黑色，则对'+get.translation(event.player)+'即将造成的伤害+1。';
+					return '弃置「玉清♥」标记，令对'+get.translation(event.player)+'即将造成的伤害+1。';
 				},
 				logTarget:"player",
-				content:function (){
-					"step 0"
-					player.removeMark('xinfu_falu_heart')
-					player.judge(function(card){
-						if(get.color(card)=='black') return 4;
-						return -1;
-					});
-					"step 1"
-					if(result.bool==true){
-						trigger.num++;
-					}
+				content:function(){
+					player.removeMark('xinfu_falu_heart');
+					trigger.num++;
 				},
 			},
 			"xinfu_zhennan":{
@@ -14552,9 +14712,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_falu":"法箓",
 			"xinfu_falu_info":"锁定技，游戏开始时，你获得「紫薇」「后土」「玉清」「勾陈」标记各一个。当你的牌因弃置而进入弃牌堆后，根据这些牌的花色，你获得对应的标记：黑桃，你获得1枚「紫薇」；梅花，你获得1枚「后土」；红桃，你获得1枚「玉清」；方块，你获得1枚「勾陈」。（每种标记限拥有1个）",
 			"xinfu_dianhua":"点化",
-			"xinfu_dianhua_info":"准备阶段或结束阶段，你可以观看牌堆顶的X张牌（X为你的「紫薇」「后土」「玉清」「勾陈」标记数的总和）。若如此做，你将这些牌以任意顺序放回牌堆顶。",
+			"xinfu_dianhua_info":"准备阶段或结束阶段，你可以观看牌堆顶的X张牌（X为你的「紫薇」「后土」「玉清」「勾陈」标记数的总和）。若如此做，你将这些牌以任意顺序放回牌堆顶或牌堆底。",
 			"xinfu_zhenyi":"真仪",
-			"xinfu_zhenyi_info":"你可以在以下时机弃置相应的标记来发动以下效果：一名角色的判定牌生效前，你可以弃置一枚「紫薇」，然后将判定结果改为黑桃5或红桃5；当你处于濒死状态时，你可以弃置一枚「后土」，然后将你的一张手牌当【桃】使用；当你造成伤害时，你可以弃置一枚「玉清」，然后你进行一次判定。若结果为黑色，此伤害+1；当你受到属性伤害后，你可以弃置一张「勾陈」，然后你从牌堆中随机获得三种类型的牌各一张。",
+			"xinfu_zhenyi_info":"你可以在以下时机弃置相应的标记来发动以下效果：一名角色的判定牌生效前，你可以弃置一枚「紫薇」，然后将判定结果改为任意花色且点数为5；你的回合外，你可以弃置一枚「后土」，然后将你的一张手牌当【桃】使用；当你造成伤害时，你可以弃置一枚「玉清」，然后令此伤害+1；当你受到伤害后，你可以弃置一张「勾陈」，然后你从牌堆中随机获得三种类型的牌各一张。",
 			"zhenyi_spade":"真仪",
 			"zhenyi_spade_info":"",
 			"zhenyi_club":"真仪",

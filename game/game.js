@@ -3192,6 +3192,15 @@
 							}
 						}
 					},
+					show_rarity:{
+						name:'显示武将评级',
+						init:false,
+						intro:'仅供娱乐，重启后生效',
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_rarity',bool);
+						}
+					},
 					mark_identity_style:{
 						name:'标记身份操作',
 						intro:'设置单击身份按钮时的操作',
@@ -5791,11 +5800,13 @@
 						if(config.chess_mode=='leader'){
 							map.chess_leader_save.show();
 							map.chess_leader_clear.show();
+							map.chess_leader_allcharacter.show();
 							map.chess_character.hide();
 						}
 						else{
 							map.chess_leader_save.hide();
 							map.chess_leader_clear.hide();
+							map.chess_leader_allcharacter.hide();
 							map.chess_character.show();
 						}
 						if(config.chess_mode=='combat'){
@@ -5832,12 +5843,25 @@
 						restart:true,
 						frequent:true,
 					},
+					chess_leader_allcharacter:{
+						name:'启用全部角色',
+						init:true,
+						onclick:function(bool){
+							if(confirm('调整该设置将清除所有进度，是否继续？')){
+								for(var i=1;i<6;i++) game.save('save'+i,null);
+								game.saveConfig('chess_leader_allcharacter',bool,this._link.config.mode)
+								game.reload();
+								return;
+							}
+							else this.classList.toggle('on');
+						},
+					},
 					chess_leader_clear:{
 						name:'清除进度',
 						onclick:function(){
 							var node=this;
 							if(node._clearing){
-								game.save(get.config('chess_leader_save'),null);
+								for(var i=1;i<6;i++) game.save('save'+i,null);
 								game.reload();
 								return;
 							}
@@ -8198,7 +8222,7 @@
 								continue;
 							}
 							if(j=='character'&&!lib.config.characters.contains(i)&&lib.config.mode!='connect'){
-								if(lib.config.mode=='chess'&&get.config('chess_mode')=='leader'){
+								if(lib.config.mode=='chess'&&get.config('chess_mode')=='leader'&&get.config('chess_leader_allcharacter')){
 									for(k in character[i][j]){
 										lib.hiddenCharacters.push(k);
 									}
@@ -9750,6 +9774,11 @@
 			},
 		},
 		translate:{
+			junk:'平凡',
+			common:'普通',
+			rare:'精品',
+			epic:'史诗',
+			legend:'传说',
 			'default':"默认",
 			special:'特殊',
 			zhenfa:'阵法',
@@ -9943,6 +9972,7 @@
 						next.set('selectTarget',event.selectTarget||lib.filter.selectTarget);
 						if(event.nodistance) next.set('nodistance',true);
 						if(event.forced) next.set('forced',true);
+						if(event.addCount!==false) next.set('addCount_extra',true);
 						next.set('targets',targets);
 						next.set('prompt',event.prompt||('选择'+get.translation(card)+'的目标'));
 						if(event.prompt2) next.set('prompt2',event.prompt2);
@@ -24465,12 +24495,13 @@
 			cardUsable:function(card,player,event){
 				card=get.autoViewAs(card,null,player);
 				var info=get.info(card);
+				event=event||_status.event;
+				if(player!=_status.event.player) return true;
 				if(info.updateUsable=='phaseUse'){
-					event=event||_status.event;
-					if(player!=_status.event.player) return true;
 					if(event.getParent().name!='phaseUse') return true;
 					if(event.getParent().player!=player) return true;
 				}
+				event.addCount_extra=true;
 				var num=info.usable;
 				if(typeof num=='function') num=num(card,player);
 				num=game.checkMod(card,player,num,'cardUsable',player);
@@ -24479,7 +24510,6 @@
 				if(game.hasPlayer(function(current){
 					return game.checkMod(card,player,current,false,'cardUsableTarget',player);
 				})){
-					_status.event.addCount_extra=true;
 					return true;
 				}
 				return false;
@@ -26553,6 +26583,14 @@
 		phaseName:['phaseZhunbei','phaseJudge','phaseDraw','phaseUse','phaseDiscard','phaseJieshu'],
 	};
 	var game={
+		getRarity:function(name){
+			var rank=lib.rank.rarity;
+			if(rank.legend.contains(name)) return 'legend';
+			if(rank.epic.contains(name)) return 'epic';
+			if(rank.rare.contains(name)) return 'rare';
+			if(get.mode()!='chess'&&rank.junk.contains(name)) return 'junk';
+			return 'common';
+		},
 		getGlobalHistory:function(key,filter){
 			if(!key) return _status.globalHistory[_status.globalHistory.length-1];
 			if(!filter) return _status.globalHistory[_status.globalHistory.length-1][key];
@@ -33877,6 +33915,24 @@
 			void window.getComputedStyle(node, null).getPropertyValue("opacity");
 		},
 		create:{
+			rarity:function(button){
+				var rarity=game.getRarity(button.link);
+				if(rarity!='common'){
+					var intro=button.node.intro;
+					intro.classList.add('showintro');
+					intro.style.fontFamily='yuanli';
+					intro.style.fontSize='16px';
+					intro.style.bottom='6px';
+					intro.style.left='6px';
+					switch(rarity){
+						case 'rare':intro.dataset.nature='thunderm';break;
+						case 'epic':intro.dataset.nature='metalm';break;
+						case 'legend':intro.dataset.nature='orangem';break;
+						case 'junk':intro.dataset.nature='woodm';break;
+					}
+					intro.innerHTML=get.translation(rarity);
+				}
+			},
 			div:function(){
 				var str,innerHTML,position,position2,style,divposition,listen;
 				for(var i=0;i<arguments.length;i++){
@@ -36267,6 +36323,7 @@
 									for(var i=0;i<buttons.length;i++){
 										buttons[i].classList.add('noclick');
 										buttons[i].listen(banCharacter);
+										if(lib.config.show_rarity) ui.create.rarity(buttons[i]);
 										buttons[i].node.hp.style.transition='all 0s';
 										buttons[i].node.hp._innerHTML=buttons[i].node.hp.innerHTML;
 										if(mode!='mode_banned'){
@@ -36286,6 +36343,7 @@
 								for(var i=0;i<buttons.length;i++){
 									buttons[i].classList.add('noclick');
 									buttons[i].listen(banCharacter);
+									if(lib.config.show_rarity) ui.create.rarity(buttons[i]);
 									buttons[i].node.hp.style.transition='all 0s';
 									buttons[i].node.hp._innerHTML=buttons[i].node.hp.innerHTML;
 									if(mode!='mode_banned'){
@@ -36298,6 +36356,7 @@
 							var buttons=ui.create.buttons(list,'character',page);
 							for(var i=0;i<buttons.length;i++){
 								buttons[i].classList.add('noclick');
+								if(lib.config.show_rarity) ui.create.rarity(buttons[i]);
 								buttons[i].listen(banCharacter);
 								buttons[i].node.hp.style.transition='all 0s';
 								buttons[i].node.hp._innerHTML=buttons[i].node.hp.innerHTML;
@@ -49506,6 +49565,7 @@
 			var list=[];
 			for(var i in lib.character){
 				var info=lib.character[i];
+				if(!info) continue;
 				if(typeof func=='function'&&!func(info,i)) continue;
 				if(lib.filter.characterDisabled(i)) continue;
 				if(lib.filter.characterDisabled2(i)) continue;

@@ -382,6 +382,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				viewAsFilter:function(player){
 					return !player.isLinked();
 				},
+				filter:function(event,player){
+					return !player.isLinked();
+				},
 				filterCard:function(){return false},
 				selectCard:-1,
 				precontent:function(){
@@ -403,9 +406,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					source:'damageSource',
 					player:'damageEnd',
 				},
-				prompt:'是否发动【醇醪】将武将牌横置？',
+				prompt:'是否发动【醇醪】将武将牌重置？',
 				filter:function(event,player){
-					return player.isLinked()&event.num>1;
+					return player.isLinked()&&event.num>1;
 				},
 				content:function(){
 					player.link();
@@ -3058,7 +3061,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					'step 1'
-					player.chooseToCompare(target).set('small',target==source&&get.attitude(player,target)>0);
+					player.chooseToCompare(target).set('small',target==source&&get.attitude(player,target)>0).clear=false;
 					'step 2'
 					if(player==source&&result.bool||target==source&&!result.bool){
 						event.cards=[result.player,result.target].filterInD('d');
@@ -3071,6 +3074,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 3'
 					if(result.control!='cancel2') source.gain(event.cards,'gain2','log');
+					else ui.clear();
 				},
 			},
 			olzhiba3:{},
@@ -7471,10 +7475,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//priority:5,
 				content:function(){
 					"step 0"
-					player.chooseToCompare(trigger.target);
+					player.chooseToCompare(trigger.target).clear=false;
 					"step 1"
 					if(result.bool){
 						if(trigger.target.countGainableCards(player,'he')) player.gainPlayerCard(trigger.target,true,'he');
+						ui.clear();
 					}
 					else{
 						var card1=result.player;
@@ -7847,13 +7852,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_wuguotai:'界吴国太',
 			re_gaoshun:'界高顺',
 			reganlu:'甘露',
-			reganlu_info:'出牌阶段限一次，你可以选择装备区牌数之差的绝对值不小于X的两名角色或包含你在内的两名角色，然后交换这两名角色装备区内的牌。（X为你已损失的体力值）',
+			reganlu_info:'出牌阶段限一次，你可以选择装备区牌数之差的绝对值不大于X的两名角色或包含你在内的两名角色，然后交换这两名角色装备区内的牌。（X为你已损失的体力值）',
 			repojun:'破军',
 			repojun2:'破军',
 			repojun3:'破军',
 			repojun_info:'当你使用【杀】指定目标后，你可以将其的至多X张牌置于其武将牌上（X为其体力值），然后其于当前回合结束时获得这些牌。当你因执行【杀】的效果而对一名角色造成伤害时，若该角色的手牌数和装备区内的牌数均不大于你，则此伤害+1。',
 			rexianzhen:'陷阵',
-			rexianzhen_info:'出牌阶段限一次，你可以和一名其他角色拼点。若你赢，你本回合内对其使用牌没有次数和距离限制。若你没赢，你本回合内不能使用【杀】。若你以此法失去的拼点牌为【杀】，则你的【杀】不计入本回合的手牌上限。',
+			rexianzhen_info:'出牌阶段限一次，你可以和一名其他角色拼点。若你赢，你本回合内对其使用牌没有次数和距离限制且无视其防具。若你没赢，你本回合内不能使用【杀】。若你以此法失去的拼点牌为【杀】，则你的【杀】不计入本回合的手牌上限。',
 			rejinjiu:'禁酒',
 			rejinjiu_info:'锁定技，你的【酒】均视为【杀】。其他角色不能于你的回合内使用【酒】。当你受到酒【杀】的伤害时，你令此伤害-X（X为影响过此【杀】的伤害值的【酒】的数量）',
 			rejinjiu2:'禁酒',

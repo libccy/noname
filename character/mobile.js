@@ -242,7 +242,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:"equip",
 				subtype:"equip2",
-				cardnature:"fire",
+				//cardnature:"fire",
 				ai:{
 					equipValue:function(card,player){
 						if(player.hasSkillTag('maixie')&&player.hp>1) return 0;
@@ -713,7 +713,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//苏飞，新贾逵
 			tongqu:{
-				audio:'zhongzuo',
+				audio:2,
 				trigger:{
 					global:['gameDrawAfter','dying','phaseDrawBegin2'],
 					player:['enterGame','phaseZhunbeiBegin'],
@@ -1915,6 +1915,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('he')>0;
 				},
 				filterCard:true,
+				position:'he',
 				filterTarget:lib.filter.notMe,
 				check:function(card){
 					return 6-get.value(card);
@@ -2297,10 +2298,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					cardUsable:function(card,player,num){
-						if(card.name=='sha'){
+						var cardx=player.getEquip('rewrite_zhuge');
+						if(card.name=='sha'&&(!cardx||player.hasSkill('rw_zhuge_skill',null,false)||(!_status.rw_zhuge_temp&&!ui.selected.cards.contains(cardx)))){
 							return Infinity;
 						}
-					}
+					},
+					cardEnabled2:function(card,player){
+						if(!_status.event.addCount_extra||player.hasSkill('rw_zhuge_skill',null,false)) return;
+						if(card&&card==player.getEquip('rewrite_zhuge')){
+							_status.rw_zhuge_temp=true;
+							var bool=lib.filter.cardUsable(get.autoViewAs({name:'sha'},ui.selected.cards.concat([card])),player);
+							delete _status.rw_zhuge_temp;
+							if(!bool) return false;
+						}
+					},
 				},
 			},
 			xinqingjian:{
@@ -2585,12 +2596,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							qiaosi_c6:0,
 						}
 						event.map={
-							qiaosi_c1:[10,15],
-							qiaosi_c2:[20,35],
-							qiaosi_c3:[40,60],
-							qiaosi_c4:[40,60],
-							qiaosi_c5:[20,35],
-							qiaosi_c6:[10,15],
+							qiaosi_c1:[40,60],
+							qiaosi_c2:[80,120],
+							qiaosi_c3:[90,110],
+							qiaosi_c4:[90,110],
+							qiaosi_c5:[80,120],
+							qiaosi_c6:[40,60],
 						}
 						event.finishedx=[];
 						event.str='请开始你的表演<br><img src="'+lib.assetURL+'image/card/qiaosi_card1.png" width="60" height="60">qiaosi_c1% <img src="'+lib.assetURL+'image/card/qiaosi_card2.png" width="60" height="60">qiaosi_c2% <img src="'+lib.assetURL+'image/card/qiaosi_card3.png" width="60" height="60">qiaosi_c3%<br><img src="'+lib.assetURL+'image/card/qiaosi_card4.png" width="60" height="60">qiaosi_c4%<img src="'+lib.assetURL+'image/card/qiaosi_card5.png" width="60" height="60">qiaosi_c5% <img src="'+lib.assetURL+'image/card/qiaosi_card6.png" width="60" height="60">qiaosi_c6%';
@@ -4042,6 +4053,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool&&result.targets.length){
 						player.line(result.targets,'fire');
+						result.targets.sortBySeat();
 						for(var i=0;i<result.targets.length;i++){
 							result.targets[i].damage('fire');
 						}
@@ -4063,6 +4075,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool&&result.targets.length){
 						player.line(result.targets,'green');
+						result.targets.sortBySeat();
 						for(var i=0;i<result.targets.length;i++){
 							result.targets[i].link();
 						}
@@ -5943,7 +5956,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rw_zhuge_skill_info:'锁定技，你于出牌阶段内使用【杀】无次数限制。',
 			takaramono:"宝物",
 			"wolong_card":"卧龙",
-			"wolong_card_info":"对一名角色造成1点火焰伤害。若场上有存活的诸葛亮(火)，则改为对至多两名角色各造成两点火焰伤害。",
+			"wolong_card_info":"对一名角色造成1点火焰伤害。若场上有存活的诸葛亮(火)，则改为对至多两名角色各造成1点火焰伤害。",
 			"fengchu_card":"凤雏",
 			"fengchu_card_info":"横置至多三名角色。若场上有存活的庞统(火)，则改为横置至多四名角色。",
 			"xuanjian_card":"玄剑",

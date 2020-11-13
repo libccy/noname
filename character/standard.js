@@ -77,7 +77,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhenji:['caopi'],
 			caocao:['xuzhu','dianwei','bianfuren'],
 			huangzhong:['weiyan'],
-			zhugeliang:['jiangwei','jiangfei'],
+			zhugeliang:['jiangwei','jiangfei','huangyueying'],
 			liubei:['guanyu','zhangfei','ganfuren'],
 			zhaoyun:['liushan'],
 			daqiao:['xiaoqiao'],

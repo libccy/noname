@@ -6109,7 +6109,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.color(trigger.card)=='red'){
 							go=true;
 						}
-						else if(trigger.addCount===false) go=false;
+						else if(trigger.addCount===false||!trigger.player.isPhaseUsing()) go=false;
 						else if(!trigger.player.hasSkill('paoxiao')&&
 							!trigger.player.hasSkill('tanlin3')&&
 							!trigger.player.hasSkill('zhaxiang2')&&

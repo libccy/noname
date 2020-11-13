@@ -5804,7 +5804,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseUseBefore'},
 				direct:true,
 				filter:function(event,player){
-					return player.countCards('he',{type:'equip'})>0;
+					return player.countCards('he',function(card){
+						if(_status.connectMode) return true;
+						return get.type(card)=='equip';
+					})>0;
 				},
 				content:function(){
 					"step 0"
@@ -5834,7 +5837,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.logSkill('shensu2',result.targets);
 						player.discard(result.cards[0]);
-						player.useCard({name:'sha',isCard:true},result.targets[0]);
+						player.useCard({name:'sha',isCard:true},result.targets[0],false);
 						trigger.cancel();
 					}
 				}

@@ -3727,7 +3727,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				equipSkill:true,
 				mod:{
 					cardUsable:function(card,player,num){
-						if(card.name=='sha') return num+1;
+						var cardx=player.getEquip('pyzhuren_diamond');
+						if(card.name=='sha'&&(!cardx||player.hasSkill('pyzhuren_diamond',null,false)||(!_status.pyzhuren_diamond_temp&&!ui.selected.cards.contains(cardx)))){
+							return num+1;
+						}
+					},
+					cardEnabled2:function(card,player){
+						if(!_status.event.addCount_extra||player.hasSkill('pyzhuren_diamond',null,false)) return;
+						if(card&&card==player.getEquip('pyzhuren_diamond')){
+							_status.pyzhuren_diamond_temp=true;
+							var bool=lib.filter.cardUsable(get.autoViewAs({name:'sha'},ui.selected.cards.concat([card])),player);
+							delete _status.pyzhuren_diamond_temp;
+							if(!bool) return false;
+						}
 					},
 				},
 				filter:function(event,player){
@@ -3819,7 +3831,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addTempSkill('pyzhuren_spade2');
 					player.addMark('pyzhuren_spade2',1,false);
 					//trigger.target.gain(trigger.cards.filterInD(),'gain2','log');
-					trigger.target.loseHp(Math.min(player.countMark('pyzhuren_spade2'),5)).set('source',player);
+					trigger.target.loseHp(Math.min(player.countMark('pyzhuren_spade2'),5));//.set('source',player);
 				},
 				ai:{
 					jueqing:true,

@@ -1512,7 +1512,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				//priority:1,
 				check:function(event,player){
 					var target=event.player;
-					var eff=get.damageEffect(target,player,player);
+					var eff=get.damageEffect(target,player,player,event.nature);
 					if(get.attitude(player,target)>0){
 						if(eff>=0) return false;
 						return true;
@@ -1596,13 +1596,23 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					cardUsable:function(card,player,num){
-						if(card.name=='sha'){
+						var cardx=player.getEquip('zhuge');
+						if(card.name=='sha'&&(!cardx||player.hasSkill('zhuge_skill',null,false)||(!_status.zhuge_temp&&!ui.selected.cards.contains(cardx)))){
 							if(get.is.versus()||get.is.changban()){
 								return num+3;
 							}
 							return Infinity;
 						}
-					}
+					},
+					cardEnabled2:function(card,player){
+						if(!_status.event.addCount_extra||player.hasSkill('zhuge_skill',null,false)) return;
+						if(card&&card==player.getEquip('zhuge')){
+							_status.zhuge_temp=true;
+							var bool=lib.filter.cardUsable(get.autoViewAs({name:'sha'},ui.selected.cards.concat([card])),player);
+							delete _status.zhuge_temp;
+							if(!bool) return false;
+						}
+					},
 				},
 			},
 			cixiong_skill:{
