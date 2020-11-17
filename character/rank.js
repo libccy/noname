@@ -811,6 +811,7 @@ window.noname_character_rank={
 			'key_kamome',
 			'key_noda',
 			'key_shiina',
+			'key_shiroha',
 		],
 		epic:[
 			'pal_yueqi',

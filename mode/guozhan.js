@@ -1202,7 +1202,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					maixie_defend:true,
 					effect:{
 						target:function(card,player,target){
-							if(get.tag(card,'damage')){
+							if(get.tag(card,'damage')&&target.hp>1){
 								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
 								if(!target.countCards('h')) return [1,-1];
 								if(game.countPlayer(function(current){return current.isFriendOf(player)&&current.hp>=target.hp-1})) return [1,0,0,-2];

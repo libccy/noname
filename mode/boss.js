@@ -8876,7 +8876,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				filter:function(event,player){
 					if(player.countCards('h')==0) return false;
-					if(!player.hasSkill('qiangxi')) return true;
+					if(!player.hasSkill('qiangxix')) return true;
 					if(!player.hasSkill('retieji')) return true;
 					if(!player.hasSkill('rexuanfeng')) return true;
 					if(!player.hasSkill('wansha')) return true;
@@ -8891,7 +8891,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var list=[];
-					if(!player.hasSkill('qiangxi')) list.push('qiangxi');
+					if(!player.hasSkill('qiangxix')) list.push('qiangxix');
 					if(!player.hasSkill('retieji')) list.push('retieji');
 					if(!player.hasSkill('rexuanfeng')) list.push('rexuanfeng');
 					if(!player.hasSkill('wansha')) list.push('wansha');
@@ -8902,19 +8902,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						player.chooseControl(list,function(){
 							if(list.contains('rexuanfeng')&&player.countCards('he',{type:'equip'})) return 'rexuanfeng';
-							if(!player.getStat().skill.qiangxi){
-								if(player.hasSkill('qiangxi')&&player.getEquip(1)&&list.contains('rexuanfeng')) return 'rexuanfeng';
-								if(list.contains('wansha')||list.contains('qiangxi')){
+							if(!player.getStat().skill.qiangxix){
+								if(player.hasSkill('qiangxix')&&player.getEquip(1)&&list.contains('rexuanfeng')) return 'rexuanfeng';
+								if(list.contains('wansha')||list.contains('qiangxix')){
 									var players=game.filterPlayer();
 									for(var i=0;i<players.length;i++){
 										if(players[i].hp==1&&get.attitude(player,players[i])<0){
 											if(list.contains('wansha')) return 'wansha';
-											if(list.contains('qiangxi')) return 'qiangxi';
+											if(list.contains('qiangxix')) return 'qiangxix';
 										}
 									}
 								}
 							}
-							if(list.contains('qiangxi')) return 'qiangxi';
+							if(list.contains('qiangxix')) return 'qiangxix';
 							if(list.contains('wansha')) return 'wansha';
 							if(list.contains('rexuanfeng')) return 'rexuanfeng';
 							return 'retieji';
@@ -8928,8 +8928,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					order:function(){
 						var player=_status.event.player;
 						if(player.countCards('e',{type:'equip'})) return 10;
-						if(!player.getStat().skill.qiangxi){
-							if(player.hasSkill('qiangxi')&&player.getEquip(1)&&!player.hasSkill('rexuanfeng')) return 10;
+						if(!player.getStat().skill.qiangxix){
+							if(player.hasSkill('qiangxix')&&player.getEquip(1)&&!player.hasSkill('rexuanfeng')) return 10;
 							if(player.hasSkill('wansha')) return 1;
 							var players=game.filterPlayer();
 							for(var i=0;i<players.length;i++){
@@ -8941,9 +8941,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					result:{
 						player:function(player){
 							if(player.countCards('e',{type:'equip'})) return 1;
-							if(!player.getStat().skill.qiangxi){
-								if(player.hasSkill('qiangxi')&&player.getEquip(1)&&!player.hasSkill('rexuanfeng')) return 1;
-								if(!player.hasSkill('wansha')||!player.hasSkill('qiangxi')){
+							if(!player.getStat().skill.qiangxix){
+								if(player.hasSkill('qiangxix')&&player.getEquip(1)&&!player.hasSkill('rexuanfeng')) return 1;
+								if(!player.hasSkill('wansha')||!player.hasSkill('qiangxix')){
 									var players=game.filterPlayer();
 									for(var i=0;i<players.length;i++){
 										if(players[i].hp==1&&get.attitude(player,players[i])<0) return 1;

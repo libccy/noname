@@ -2271,9 +2271,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						event.localPlayer=true;
-						player.chooseCard(true).set('glow_result',true).ai=function(){
+						var hasShan=!target.countCards('h','shan');
+						player.chooseCard(true).set('glow_result',true).ai=function(card){
+							if(hasShan&&get.name(card)=='sha') return 1;
 							return Math.random();
-						};
+						}
 					}
 					if(target.isOnline()){
 						target.wait(sendback);

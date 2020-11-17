@@ -2775,6 +2775,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							next.set('openskilldialog','妙笔：将一张手牌当'+get.translation(card)+'使用');
 							next.set('norestore',true);
 							next.set('_backupevent','miaobix');
+							next.set('custom',{
+								add:{},
+								replace:{window:function(){}}
+							});
 							next.backup('miaobix');
 						}
 					}

@@ -852,7 +852,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				audioname:['sp_key_yuri'],
 				trigger:{player:'phaseUseBegin'},
-				direct:true,
+				//direct:true,
+				frequent:true,
 				filter:function(event,player){
 					return player.countCards('he')>0;
 				},
@@ -4918,6 +4919,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.set('openskilldialog',get.prompt2('xinfu_sidao'));
 					next.set('norestore',true);
 					next.set('_backupevent','xinfu_sidaox');
+					next.set('custom',{
+						add:{},
+						replace:{window:function(){}}
+					});
 					next.backup('xinfu_sidaox');
 				},
 			},

@@ -5024,8 +5024,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!map[id]) map[id]={};
 						if(!map[id].extraDamage) map[id].extraDamage=0;
 						map[id].extraDamage++;
-						player.judge(function(card){
-							if(get.color(card)=='red') return 1;
+						trigger.target.judge(function(card){
+							if(get.color(card)=='red') return -1;
 							return 0;
 						});
 					}
