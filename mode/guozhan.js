@@ -4021,68 +4021,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},*/
-			yongjin:{
-				unique:true,
-				limited:true,
-				skillAnimation:true,
-				animationColor:'wood',
-				enable:'phaseUse',
-				content:function(){
-					'step 0'
-					player.awakenSkill('yongjin');
-					event.count=3;
-					'step 1'
-					player.moveCard().nojudge=true;
-					event.count--;
-					'step 2'
-					if(event.count&&result.bool) event.goto(1);
-				},
-				ai:{
-					order:7,
-					result:{
-						player:function(player){
-							var num=0;
-							var friends=game.filterPlayer(function(current){
-								return get.attitude(player,current)>=4;
-							});
-							var vacancies={
-								equip1:0,
-								equip2:0,
-								equip3:0,
-								equip4:0,
-								equip5:0
-							};
-							for(var i=0;i<friends.length;i++){
-								for(var j=1;j<=5;j++){
-									if(friends[i].isEmpty(j)){
-										vacancies['equip'+j]++;
-									}
-								}
-							}
-							var sources=game.filterPlayer(function(current){
-								return get.attitude(player,current)<0&&current.countCards('e');
-							});
-							for(var i=0;i<sources.length;i++){
-								var es=sources[i].getCards('e');
-								for(var j=0;j<es.length;j++){
-									var type=get.subtype(es[j]);
-									if(vacancies[type]&&get.value(es[j])>0){
-										num++;
-										if(num>=3){
-											return 1;
-										}
-										vacancies[type]--;
-									}
-								}
-							}
-							if(num&&player.hp==1){
-								return 0.5;
-							}
-							return 0;
-						}
-					}
-				}
-			},
 			xuanlve:{
 				trigger:{
 					player:'loseAfter',
@@ -7564,8 +7502,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzdiancai_info:'其他角色的出牌阶段结束时，若你于此阶段失去了x张或更多的牌，则你可以将手牌摸至体力上限。若如此做，你可以变更副将（x为你的体力值）。',
 			xuanlve:'旋略',
 			xuanlve_info:'当你失去装备区里的牌后，你可以弃置一名其他角色的一张牌。',
-			yongjin:'勇进',
-			yongjin_info:'限定技，出牌阶段，你可以依次移动场上的至多三张装备牌。',
 			lianzi:'敛资',
 			lianzi_info:'出牌阶段限一次，你可以弃置一张手牌，然后亮出牌堆顶X张牌（X为吴势力角色装备区里的牌和“烽火”的总和），获得其中所有与你弃置牌类别相同的牌，将其余的牌置入弃牌堆，若你以此法一次获得了三张或更多的牌，则你失去技能〖敛资〗并获得技能〖制衡〗。',
 			gzqice:'奇策',

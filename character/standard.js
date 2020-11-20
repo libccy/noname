@@ -843,34 +843,52 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'jijiang1',
 				audioname:['liushan','re_liubei','re_liushan','ol_liushan'],
 				unique:true,
-				group:['jijiang1','jijiang2'],
+				group:['jijiang1'],
 				zhuSkill:true,
+				filter:function(event,player){
+					if(!player.hasZhuSkill('jijiang')||!game.hasPlayer(function(current){
+						return current!=player&&current.group=='shu';
+					})) return false;
+					return !event.jijiang&&(event.type!='phase'||!player.hasSkill('jijiang3'));
+				},
+				enable:['chooseToUse','chooseToRespond'],
+				viewAs:{name:'sha'},
+				filterCard:function(){return false},
+				selectCard:-1,
+				ai:{
+					order:function(){
+						return get.order({name:'sha'})+0.3;
+					},
+					respondSha:true,
+					skillTagFilter:function(player){
+						if(!player.hasZhuSkill('jijiang')||!game.hasPlayer(function(current){
+							return current!=player&&current.group=='shu';
+						})) return false;
+					},
+				},
 			},
 			jijiang1:{
 				audio:2,
 				audioname:['liushan','re_liubei','re_liushan','ol_liushan'],
-				trigger:{player:'chooseToRespondBegin'},
-				check:function(event){
-					if(event.jijiang) return false;
-					return true;
-				},
+				trigger:{player:['useCardBegin','respondBegin']},
+				logTarget:'targets',
 				filter:function(event,player){
-					if(event.responded) return false;
-					if(player.storage.jijianging) return false;
-					if(!player.hasZhuSkill('jijiang')) return false;
-					if(!event.filterCard({name:'sha'},player,event)) return false;
-					return game.hasPlayer(function(current){
-						return current!=player&&current.group=='shu';
-					});
+					return event.skill=='jijiang';
 				},
+				forced:true,
 				content:function(){
 					"step 0"
+					delete trigger.skill;
+					trigger.getParent().set('jijiang',true);
+					"step 1"
 					if(event.current==undefined) event.current=player.next;
 					if(event.current==player){
+						player.addTempSkill('jijiang3');
 						event.finish();
+						trigger.cancel();
+						trigger.getParent().goto(0);
 					}
 					else if(event.current.group=='shu'){
-						player.storage.jijianging=true;
 						var next=event.current.chooseToRespond('是否替'+get.translation(player)+'打出一张杀？',{name:'sha'});
 						next.set('ai',function(){
 							var event=_status.event;
@@ -886,13 +904,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.current=event.current.next;
 						event.redo();
 					}
-					"step 1"
-					player.storage.jijianging=false;
+					"step 2"
 					if(result.bool){
 						event.finish();
-						trigger.result=result;
-						trigger.responded=true;
-						trigger.animate=false;
+						trigger.card=result.card;
+						trigger.cards=result.cards;
+						trigger.throw=false;
 						if(typeof event.current.ai.shown=='number'&&event.current.ai.shown<0.95){
 							event.current.ai.shown+=0.3;
 							if(event.current.ai.shown>0.95) event.current.ai.shown=0.95;
@@ -900,104 +917,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						event.current=event.current.next;
-						event.goto(0);
+						event.goto(1);
 					}
-				}
-			},
-			jijiang2:{
-				audio:'jijiang1',
-				audioname:['liushan','re_liubei','re_liushan','ol_liushan'],
-				enable:'chooseToUse',
-				prompt:'选择一名目标角色。若有其他蜀势力角色打出【杀】响应，则视为你对其使用此【杀】。',
-				filter:function(event,player){
-					if(event.filterCard&&!event.filterCard({name:'sha'},player,event)) return false;
-					if(!player.hasZhuSkill('jijiang')) return false;
-					if(player.hasSkill('jijiang3')) return false;
-					if(!lib.filter.cardUsable({name:'sha'},player)) return false;
-					return game.hasPlayer(function(current){
-						return current!=player&&current.group=='shu';
-					});
-				},
-				filterTarget:function(card,player,target){
-					if(_status.event._backup&&
-						typeof _status.event._backup.filterTarget=='function'&&
-						!_status.event._backup.filterTarget({name:'sha'},player,target)){
-						return false;
-					}
-					return player.canUse({name:'sha'},target);
-				},
-				content:function(){
-					"step 0"
-					if(event.current==undefined) event.current=player.next;
-					if(event.current==player){
-						player.addSkill('jijiang3');
-						event.getParent(2).step=0;
-						event.finish();
-					}
-					else if(event.current.group=='shu'){
-						var next=event.current.chooseToRespond('是否替'+get.translation(player)+'对'+get.translation(target)+'使用一张杀',
-						function(card,player,event){
-							event=event||_status.event;
-							return card.name=='sha'&&event.source.canUse(card,event.target);
-						});
-						next.set('ai',function(card){
-							var event=_status.event;
-							return get.effect(event.target,card,event.source,event.player);
-						});
-						next.set('source',player);
-						next.set('target',target);
-						next.set('jijiang',true);
-						next.set('skillwarn','替'+get.translation(player)+'打出一张杀');
-						next.noOrdering=true;
-						next.autochoose=lib.filter.autoRespondSha;
-					}
-					else{
-						event.current=event.current.next;
-						event.redo();
-					}
-					"step 1"
-					if(result.bool){
-						event.finish();
-						if(result.cards&&result.cards.length){
-							player.useCard({name:'sha',isCard:true},result.cards,target).animate=false;
-						}
-						else{
-							player.useCard({name:'sha',isCard:true},target).animate=false;
-						}
-						if(typeof event.current.ai.shown=='number'&&event.current.ai.shown<0.95){
-							event.current.ai.shown+=0.3;
-							if(event.current.ai.shown>0.95) event.current.ai.shown=0.95;
-						}
-					}
-					else{
-						event.current=event.current.next;
-						event.goto(0);
-					}
-				},
-				ai:{
-					respondSha:true,
-					skillTagFilter:function(player){
-						if(!player.hasZhuSkill('jijiang')) return false;
-						return game.hasPlayer(function(current){
-							return current!=player&&current.group=='shu';
-						});
-					},
-					result:{
-						target:function(player,target){
-							if(player.hasSkill('jijiang3')) return 0;
-							return get.effect(target,{name:'sha'},player,target);
-						}
-					},
-					order:function(){
-						return get.order({name:'sha'})-0.1;
-					},
 				}
 			},
 			jijiang3:{
 				trigger:{global:['useCardAfter','useSkillAfter','phaseAfter']},
 				silent:true,
+				charlotte:true,
 				filter:function(event){
-					return event.skill!='jijiang2'&&event.skill!='qinwang2';
+					return event.skill!='jijiang'&&event.skill!='qinwang';
 				},
 				content:function(){
 					player.removeSkill('jijiang3');

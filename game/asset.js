@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.105.10',
+	'v1.9.106',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -634,6 +634,7 @@ window.noname_asset_list=[
 	'audio/die/sp_zhangliao.mp3',
 	'audio/die/re_caoxiu.mp3',
 	'audio/die/re_sunxiu.mp3',
+	'audio/die/caoxing.mp3',
 	
 	'audio/skill/anguo1.mp3',
 	'audio/skill/anguo2.mp3',
@@ -2799,6 +2800,10 @@ window.noname_asset_list=[
 	'audio/skill/reyanzhu2.mp3',
 	'audio/skill/tongqu1.mp3',
 	'audio/skill/tongqu2.mp3',
+	'audio/skill/cxliushi1.mp3',
+	'audio/skill/cxliushi2.mp3',
+	'audio/skill/zhanwan1.mp3',
+	'audio/skill/zhanwan2.mp3',
 	
 	'font/huangcao.ttf',
 	'font/shousha.ttf',
@@ -3447,6 +3452,7 @@ window.noname_asset_list=[
 	'image/character/junk_zhangrang.jpg',
 	'image/character/key_shiroha.jpg',
 	'image/character/ns_caimao.jpg',
+	'image/character/caoxing.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
@@ -5281,14 +5287,14 @@ window.noname_skin_list={
 	
 	key_hinata:1,
 	key_iwasawa:2,
-	key_nao:3,
-	key_shiki:4,
+	key_nao:4,
+	key_shiki:6,
 	key_yui:2,
 	key_yuri:4,
 	key_yuzuru:2,
-	sp_key_kanade:1,
+	sp_key_kanade:8,
 	key_kamome:1,
-	key_umi:1,
+	key_umi:2,
 	key_umi2:1,
 	key_mio:3,
 	key_midori:1,
@@ -5298,4 +5304,6 @@ window.noname_skin_list={
 	key_misuzu:1,
 	key_nagisa:1,
 	key_rin:3,
+	key_miki:1,
+	key_shiroha:6,
 };

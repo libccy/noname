@@ -6437,7 +6437,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									evt.after.push(next);
 									next.player=player;
 									next.setContent(function(){
-										player.storage.junktaoluan=[];
+										//player.storage.junktaoluan=[];
 										player.storage.junktaoluan2=[];
 									});
 								}
@@ -6536,7 +6536,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						evt.junktaoluan=true;
 						next.player=player;
 						next.setContent(function(){
-							player.storage.junktaoluan=[];
+							//player.storage.junktaoluan=[];
 							player.storage.junktaoluan2=[];
 						});
 					}
@@ -6593,7 +6593,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						evt.after.push(next);
 						next.player=player;
 						next.setContent(function(){
-							player.storage.junktaoluan=[];
+							//player.storage.junktaoluan=[];
 							player.storage.junktaoluan2=[];
 						});
 					}

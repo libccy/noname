@@ -10,7 +10,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_lin:['re_zhurong','re_menghuo','ol_sunjian','re_caopi','re_xuhuang','ol_dongzhuo'],
 				refresh_shan:['re_dengai','re_jiangwei','re_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce','ol_dengai'],
 				refresh_yijiang1:['re_wuguotai','re_gaoshun','re_caozhi','yujin_yujin','re_lingtong','re_masu','xin_xusheng','xin_fazheng'],
-				refresh_yijiang2:['old_madai','wangyi','guanzhang','re_handang','re_zhonghui','re_liaohua','re_chengpu','re_caozhang','re_liubiao','re_bulianshi'],
+				refresh_yijiang2:['old_madai','wangyi','guanzhang','re_handang','re_zhonghui','re_liaohua','re_chengpu','re_caozhang','re_liubiao','re_bulianshi','xin_lingtong'],
 				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','re_yufan','re_liru','re_manchong'],
 				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan'],
 				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu'],
@@ -18,6 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		connect:true,
 		character:{
+			xin_lingtong:['male','wu',4,['decadexuanfeng','yongjin'],['unseen']],
 			re_caoxiu:['male','wei',4,['qianju','reqingxi']],
 			re_sunxiu:['male','wu',3,['reyanzhu','rexingxue','zhaofu'],['zhu']],
 			ol_dengai:['male','wei',4,['oltuntian','olzaoxian'],['unseen']],
@@ -127,6 +128,267 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunben:['zhouyu','taishici','daqiao'],
 		},
 		skill:{
+			yongjin:{
+				unique:true,
+				limited:true,
+				skillAnimation:true,
+				animationColor:'wood',
+				enable:'phaseUse',
+				filter:function(event,player,cards){
+					return game.hasPlayer(function(current){
+						var es=current.getCards('e',function(card){
+							return !cards||!cards.contains(card);
+						});
+						for(var i=0;i<es.length;i++){
+							if(game.hasPlayer(function(current2){
+								return current!=current2&&!current2.isMin()&&current2.isEmpty(get.subtype(es[i]));
+							})){
+								return true;
+							}
+						}
+					});
+				},
+				content:function(){
+					'step 0'
+					player.awakenSkill('yongjin');
+					event.count=3;
+					event.cards=[];
+					'step 1'
+					event.count--;
+					if(!lib.skill.yongjin.filter(null,player,cards)){
+						event.finish();
+						return;
+					};
+					var next=player.chooseTarget(2,function(card,player,target){
+						if(ui.selected.targets.length){
+							var from=ui.selected.targets[0];
+							if(target.isMin()) return false;
+							var es=from.getCards('e',function(card){
+								return !_status.event.cards.contains(card);
+							});
+							for(var i=0;i<es.length;i++){
+								if(target.isEmpty(get.subtype(es[i]))) return true;
+							}
+							return false;
+						}
+						else{
+							return target.countCards('e',function(card){
+								return !_status.event.cards.contains(card);
+							})>0;
+						}
+					});
+					next.set('ai',function(target){
+						var player=_status.event.player;
+						var att=get.attitude(player,target);
+						var sgnatt=get.sgn(att);
+						if(ui.selected.targets.length==0){
+							if(att>0){
+								if(target.countCards('e',function(card){
+									return get.value(card,target)<0&&!_status.event.cards.contains(card)&&game.hasPlayer(function(current){
+										return current!=target&&get.attitude(player,current)<0&&current.isEmpty(get.subtype(card))
+									});
+								})>0) return 9;
+							}
+							else if(att<0){
+								if(game.hasPlayer(function(current){
+									if(current!=target&&get.attitude(player,current)>0){
+										var es=target.getCards('e',function(card){
+											return !_status.event.cards.contains(card);
+										});
+										for(var i=0;i<es.length;i++){
+											if(get.value(es[i],target)>0&&current.isEmpty(get.subtype(es[i]))&&get.effect(current,es[i],player,current)>0) return true;
+										}
+									}
+								})){
+									return -att;
+								}
+							}
+							return 0;
+						}
+						var es=ui.selected.targets[0].getCards('e',function(card){
+							return !_status.event.cards.contains(card);
+						});
+						var i;
+						var att2=get.sgn(get.attitude(player,ui.selected.targets[0]));
+						for(i=0;i<es.length;i++){
+							if(sgnatt!=0&&att2!=0&&
+								get.sgn(get.value(es[i],ui.selected.targets[0]))==-att2&&
+								get.sgn(get.effect(target,es[i],player,target))==sgnatt&&
+								target.isEmpty(get.subtype(es[i]))){
+								return Math.abs(att);
+							}
+						}
+						if(i==es.length){
+							return 0;
+						}
+						return -att*get.attitude(player,ui.selected.targets[0]);
+					});
+					next.set('multitarget',true);
+					next.set('cards',cards);
+					next.set('targetprompt',['被移走','移动目标']);
+					next.set('prompt','移动场上的一张装备牌');
+					'step 2'
+					if(result.bool){
+						player.line2(result.targets,'green');
+						event.targets=result.targets;
+					}
+					else{
+						event.finish();
+					}
+					'step 3'
+					game.delay();
+					'step 4'
+					if(targets.length==2){
+						player.choosePlayerCard('e',true,function(button){
+							var player=_status.event.player;
+							var targets0=_status.event.targets0;
+							var targets1=_status.event.targets1;
+							if(get.attitude(player,targets0)>0&&get.attitude(player,targets1)<0){
+								if(get.value(button.link,targets0)<0&&get.effect(targets1,button.link,player,targets1)>0) return 10;
+								return 0;
+							}
+							else{
+								return get.equipValue(button.link)*get.effect(targets1,button.link,player,targets1);
+							}
+						},targets[0]).set('nojudge',event.nojudge||false).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
+							if(_status.event.cards.contains(button.link)) return false;
+							var targets1=_status.event.targets1;
+							return targets1.isEmpty(get.subtype(button.link));
+						}).set('cards',cards);
+					}
+					else{
+						event.finish();
+					}
+					'step 5'
+					if(result.bool&&result.links.length){
+						var link=result.links[0];
+						cards.add(link);
+						event.targets[1].equip(link);
+						event.targets[0].$give(link,event.targets[1])
+						game.delay();
+					}
+					else event.finish();
+					'step 6'
+					if(event.count>0) event.goto(1);
+				},
+				ai:{
+					order:7,
+					result:{
+						player:function(player){
+							var num=0;
+							var friends=game.filterPlayer(function(current){
+								return get.attitude(player,current)>=4;
+							});
+							var vacancies={
+								equip1:0,
+								equip2:0,
+								equip3:0,
+								equip4:0,
+								equip5:0
+							};
+							for(var i=0;i<friends.length;i++){
+								for(var j=1;j<=5;j++){
+									if(friends[i].isEmpty(j)){
+										vacancies['equip'+j]++;
+									}
+								}
+							}
+							var sources=game.filterPlayer(function(current){
+								return get.attitude(player,current)<0&&current.countCards('e');
+							});
+							for(var i=0;i<sources.length;i++){
+								var es=sources[i].getCards('e');
+								for(var j=0;j<es.length;j++){
+									var type=get.subtype(es[j]);
+									if(vacancies[type]&&get.value(es[j])>0){
+										num++;
+										if(num>=3){
+											return 1;
+										}
+										vacancies[type]--;
+									}
+								}
+							}
+							if(num&&player.hp==1){
+								return 0.5;
+							}
+							return 0;
+						}
+					}
+				}
+			},
+			decadexuanfeng:{
+				audio:'xuanfeng',
+				audioname:['boss_lvbu3','re_heqi'],
+				trigger:{
+					player:['loseAfter','phaseDiscardEnd'],
+					global:['equipAfter','addJudgeAfter','gainAfter'],
+				},
+				direct:true,
+				filter:function(event,player){
+					if(event.name=='phaseDiscard'){
+						var cards=[];
+						player.getHistory('lose',function(evt){
+							if(evt&&evt.getParent('phaseDiscard')==event&&evt.hs) cards.addArray(evt.hs);
+						});
+						return cards.length>1;
+					}
+					else{
+						var evt=event.getl(player);
+						return evt&&evt.es&&evt.es.length>0;
+					}
+				},
+				content:function(){
+					"step 0"
+					event.count=2;
+					event.targets=[];
+					event.logged=false;
+					"step 1"
+					event.count--;
+					player.chooseTarget(get.prompt('decadexuanfeng'),'弃置一名其他角色的一张牌',function(card,player,target){
+						if(player==target) return false;
+						return target.countDiscardableCards(player,'he');
+					}).set('ai',function(target){
+						return -get.attitude(_status.event.player,target);
+					});
+					"step 2"
+					if(result.bool){
+						if(!event.logged){
+							player.logSkill('xuanfeng',result.targets);
+							event.logged=true;
+						}
+						else player.line(result.targets[0],'green');
+						targets.add(result.targets[0]);
+						player.discardPlayerCard(result.targets[0],'he',true);
+					}
+					else if(!targets.length) event.finish();
+					"step 3"
+					if(event.count) event.goto(1);
+					else if(player==_status.currentPhase){
+						player.chooseTarget('是否对一名目标角色造成1点伤害',function(card,player,target){
+							return _status.event.targets.contains(target);
+						}).set('targets',targets).set('ai',function(target){
+							var player=_status.event.player;
+							return get.damageEffect(target,player,player);
+						});
+					}
+					else event.finish();
+					"step 4"
+					if(result.bool){
+						player.line(result.targets[0],'thunder');
+						result.targets[0].damage();
+					}
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target,current){
+							if(get.type(card)=='equip'&&!get.cardtag(card,'gifts')) return [1,3];
+						}
+					},
+					reverseEquip:true,
+					noe:true
+				}
+			},
 			oltuntian:{
 				inherit:'tuntian',
 				filter:function(event,player){
@@ -8000,6 +8262,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olzaoxian_info:'觉醒技，准备阶段，若你武将牌上【田】的数量达到3张或更多，则你减1点体力上限，并获得技能〖急袭〗。你于当前回合结束后进行一个额外的回合。',
 			re_sunxiu:'界孙休',
 			re_caoxiu:'界曹休',
+			xin_lingtong:'界凌统',
+			decadexuanfeng:'旋风',
+			decadexuanfeng_info:'当你于弃牌阶段弃置过至少两张牌，或当你失去装备区里的牌后，你可以弃置至多两名其他角色的共计两张牌。若此时是你的回合内，你可以对其中一个目标造成1点伤害。',
+			yongjin:'勇进',
+			yongjin_info:'限定技，出牌阶段，你可以依次移动场上的至多三张不同的装备牌。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

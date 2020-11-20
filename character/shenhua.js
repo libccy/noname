@@ -566,7 +566,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(event.num==3) prompt="罪论：请按顺将卡牌置于牌堆顶（先选择的在上）";
 						else prompt="罪论：请按顺将"+get.cnNumber(event.num)+"张卡牌置于牌堆顶（先选择的在上），然后获得其余的牌。";
 						player.chooseCardButton(event.num,true,event.cards,prompt).set('ai',function(button){
-							return 100-get.value(button.link);
+							var player=_status.event.player;
+							var next=player.getNext();
+							var att=get.attitude(player,next);
+							var card=button.link;
+							var judge=next.getCards('j')[ui.selected.buttons.length];
+							if(judge){
+								return get.judge(judge)(card)*att;
+							}
+							return next.getUseValue(card)*att;
 						});
 					}
 					'step 2'

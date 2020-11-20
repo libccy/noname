@@ -4,12 +4,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			liubian:['male','qun',3,['shiyuan','dushi'],['unseen']],
 			xin_baosanniang:['female','shu',3,['xinfu_wuniang','decadexushen']],
 			re_hejin:['male','qun',4,['spmouzhu']],
 			hansui:['male','qun',4,['spniluan','spweiwu']],
 			liuhong:['male','qun',4,['yujue','tuxing'],['unseen']],
 			zhujun:['male','qun',4,['gongjian','kuimang'],['unseen']],
-			caoxing:['male','qun',4,['cxliushi','zhanwan'],['unseen']],
+			caoxing:['male','qun',4,['cxliushi','zhanwan']],
 			re_maliang:['male','shu',3,['rexiemu','heli'],[]],
 			ol_yujin:['male','wei',4,['rezhenjun']],
 			ol_xinxianying:['female','wei',3,['caishi','zhongjian']],
@@ -70,6 +71,48 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			shiyuan:{
+				trigger:{target:'useCardToTargeted'},
+				frequent:true,
+				filter:function(event,player){
+					return player!=event.player&&!player.getHistory('gain',function(evt){
+						return evt.getParent(2).name=='shiyuan'&&evt.cards.length==(2+get.sgn(event.player.hp-player.hp));
+					}).length;
+				},
+				content:function(){
+					player.draw(2+get.sgn(trigger.player.hp-player.hp));
+				},
+			},
+			dushi:{
+				global:'dushi2',
+				locked:true,
+				trigger:{player:'die'},
+				forceDie:true,
+				direct:true,
+				skillAnimation:true,
+				animationColor:'gray',
+				content:function(){
+					'step 0'
+					player.chooseTarget('请选择【毒逝】的目标','选择一名其他角色，令其获得技能【毒逝】',true,lib.filter.notMe).set('forceDie',true).set('ai',function(target){
+						return -get.attitude(_status.event.player,target);
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('dushi',target);
+						target.markSkill('dushi');
+						target.addSkillLog('dushi');
+					}
+				},
+				intro:{content:'您已经获得弘农王的诅咒'},
+			},
+			dushi2:{
+				mod:{
+					cardSavable:function(card,player,target){
+						if(card.name=='tao'&&target!=player&&target.hasSkill('dushi')) return false;
+					},
+				},
+			},
 			decadexushen:{
 				derivation:'decadezhennan',
 				audio:'xinfu_xushen',
@@ -363,6 +406,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			cxliushi:{
+				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
 					return player.countCards('he',{suit:'heart'})>0;
@@ -370,7 +414,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:{suit:'heart'},
 				position:'he',
 				filterTarget:function(card,player,target){
-					return player.canUse('sha',target);
+					return player.canUse('sha',target,false);
+				},
+				check:function(card){
+					var player=_status.event.player;
+					var next=player.getNext();
+					var att=get.attitude(player,next);
+					if(att>0){
+						var js=next.getCards('j');
+						if(js.length) return get.judge(js[0])+10-get.value(card);
+						return 9-get.value(card)
+					}
+					return 6-get.value(card);
 				},
 				discard:false,
 				prepare:'throw',
@@ -379,15 +434,36 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					cards[0].fix();
 					ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
 					game.updateRoundNumber();
-					player.useCard({name:'sha',isCard:true},false,targets);
-					"step 1"
-					if(target.getHistory('damage',function(evt){
-						var evt2=evt.getParent('useCard');
-						return evt.card==evt2.card&&evt2.getParent()==event;
-					}).length){
-						target.addSkill('cxliushi2');
-						target.addMark('cxliushi2',1,false);
-					}
+					player.useCard({name:'sha',isCard:true},false,targets).card.cxliushi=true;
+				},
+				group:'cxliushi_damage',
+				subSkill:{
+					damage:{
+						trigger:{source:'damageSource'},
+						forced:true,
+						popup:false,
+						filter:function(event,player){
+							return event.card&&event.card.cxliushi==true&&event.player.isAlive()&&event.getParent(3).name=='cxliushi';
+						},
+						content:function(){
+							trigger.player.addMark('cxliushi2',1);
+							trigger.player.addSkill('cxliushi2');
+						},
+					},
+				},
+				ai:{
+					order:function(){
+						return get.order({name:'sha'})-0.4;
+					},
+					result:{
+						target:function(player,target){
+							var eff=get.effect(target,{name:'sha'},player,target);
+							var damageEff=get.damageEffect(target,player,player);
+							if(eff>0) return damageEff>0?0:eff;
+							if(target.hasSkill('bagua_skill')||target.hasSkill('rw_bagua_skill')||target.hasSkill('bazhen')) return 0;
+							return eff;
+						},
+					},
 				},
 			},
 			cxliushi2:{
@@ -397,11 +473,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				onremove:true,
+				charlotte:true,
 				intro:{
+					name2:'流',
 					content:'手牌上限-#',
 				},
 			},
 			zhanwan:{
+				audio:2,
 				trigger:{global:'phaseDiscardEnd'},
 				forced:true,
 				filter:function(event,player){
@@ -5701,9 +5780,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wangshuang:'王双（？-228年），三国时期曹魏将领。蜀汉建兴六年（228年）冬，诸葛亮出散关，攻陈仓，后粮尽而退。王双率领骑兵追击蜀军，但在与蜀军的交战中被击败，王双也被蜀军所斩。在《三国演义》中，王双字子全，是陇西郡狄道县（今甘肃临洮县）人，有万夫不当之勇。在诸葛亮北伐期间，被魏延所斩。',
 			wenyang:"文俶（238年—291年），一作文淑，字次骞，小名阿鸯，世称文鸯，谯郡（今安徽亳州市）人。魏末晋初名将，曹魏扬州刺史文钦之子。骁勇善战，依附大将军曹爽，效忠于王室。司马师废黜皇帝曹芳后，随父联合毌丘俭于淮南起兵勤王。兵败之后，向南投奔吴国。诸葛诞发动淮南叛乱，奉命率军驰援。双方发生内讧，父亲为诸葛诞所害，遂降于司马昭，封关内侯。西晋建立后，任平虏护军。咸宁三年（277年），拜平西将军、都督凉秦雍州三州军事，大破鲜卑首领秃发树机能，名震天下，迁使持节、护东夷校尉、监辽东军事。八王之乱中，为诸葛诞外孙、东安王司马繇所诬杀，惨遭灭族，时年五十四岁。",
 			liuzan:'字正明，会稽长山人人，曾任左护军，有两子：留略、留平。少为会稽郡吏，曾参与镇压黄巾起义，后被东吴大将凌统所引用，任屯骑校尉。吴五凤二年（公元255年）留赞任左护军，随孙峻征淮南，因病撤军，被魏将蒋班围困于道，力战而死，时年73岁。',
-			caoxing:'曹性，东汉末年吕布部将，史载他曾与身为自己上司的反叛者郝萌交战，并砍去郝萌一臂，受到吕布的嘉奖。在罗贯中所著古典小说《三国演义》中，也有关于曹性箭射夏侯惇左目的描述，而曹性也随即被暴怒的夏侯惇所杀。',
+			caoxing:'曹性，东汉末年吕布部将，史载他曾与身为自己上司的反叛者郝萌交战，并砍去郝萌一臂，受到吕布的嘉奖。在罗贯中所著古典小说《三国演义》中，也有关于曹性箭射夏侯惇左目的描述，而曹性也随即被暴怒的夏侯惇所杀。在穿越小说《三国之银河射手》中，主角穿越成为曹性，经过一番闯荡之后，被封为“银河射手”。',
 			zhujun:'朱儁（？－195年），字公伟。会稽郡上虞县（今浙江绍兴上虞区）人。东汉末年名将。朱儁出身寒门，赡养母亲，以好义轻财闻名，受乡里敬重。后被太守徐珪举为孝廉，任兰陵令，颇有治绩。再升任交州刺史，以家兵五千大破叛军，平定交州。战后以功封都亭侯，入朝为谏议大夫。光和七年（184年），黄巾起义爆发，朱儁以右中郎将、持节平定三郡之地，以功进封西乡侯，迁镇贼中郎将。又率军讨平黄巾，“威声满天下”。中平二年（185年），进拜右车骑将军，更封钱塘侯。后为河内太守，击退进逼的张燕。权臣董卓秉政时，想任朱儁为副手，遭其婉拒。其后出逃荆州，更屯军中牟，徐州刺史陶谦等欲推举他为太师，并传檄各州牧伯，相邀讨伐李傕、奉迎天子。但朱儁却奉诏入京任太仆。初平三年（192年），升任太尉、录尚书事。兴平元年（194年），行骠骑将军事，持节镇关东，因故未成行。兴平二年（195年），李傕与郭汜相互攻杀，郭汜扣留朱儁作为人质。朱儁性格刚烈，即日发病而死。',
 			liuhong:'汉灵帝刘宏（157年，一作156年－189年5月13日），生于冀州河间国（今河北深州）。东汉第十二位皇帝（168年－189年在位），汉章帝刘炟的玄孙。刘宏早年世袭解渎亭侯。永康元年（167年）十二月，汉桓帝刘志逝世，刘宏被外戚窦氏挑选为皇位继承人，于建宁元年（168年）正月即位。刘宏在位的大部分时期，施行党锢及宦官政治。他又设置西园，巧立名目搜刮钱财，甚至卖官鬻爵以用于自己享乐。在位晚期，爆发了黄巾起义，而凉州等地也陷入持续动乱之中。中平六年（189年），刘宏去世，谥号孝灵皇帝，葬于文陵。刘宏喜好辞赋，作有《皇羲篇》、《追德赋》、《令仪颂》、《招商歌》等。',
+			liubian:'刘辩（176年－190年3月6日），是汉灵帝刘宏与何皇后的嫡长子。刘辩在灵帝驾崩后继位为帝，史称少帝，由于年幼，实权掌握在临朝称制的母亲何太后和母舅大将军何进手中。少帝在位时期，东汉政权已经名存实亡，他即位后不久即遭遇以何进为首的外戚集团和以十常侍为首的内廷宦官集团这两大敌对政治集团的火并，被迫出宫，回宫后又受制于以“勤王”为名进京的凉州军阀董卓，终于被废为弘农王，成为东汉唯一被废黜的皇帝，其同父异母弟陈留王刘协继位为帝，是为汉献帝。被废黜一年之后，刘辩在董卓胁迫下自尽，时年仅十五岁（一说十八岁），其弟献帝追谥他为怀王。中国古代的史书中称刘辩为皇子辩、少帝和弘农王等。因为在位不逾年，传统上称东汉共十二帝，刘辩与东汉另一位少帝刘懿都不在其中，亦皆无本纪；不过，现代史学界也有观点承认两位少帝均是汉朝皇帝，则刘辩为东汉第十三位皇帝。',
 		},
 		characterTitle:{
 			wulan:'#b对决限定武将',
@@ -6027,9 +6107,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caoxing:'曹性',
 			cxliushi:'流矢',
 			cxliushi2:'流矢',
-			cxliushi_info:'出牌阶段，你可以将一张红桃牌置于牌堆顶，视为对一名角色使用一张不计入次数的【杀】。若此【杀】造成伤害，该角色手牌上限永久-1。',
+			cxliushi_info:'出牌阶段，你可以将一张红桃牌置于牌堆顶，视为对一名角色使用一张【杀】（无距离限制且不计入使用次数）。当此【杀】造成伤害后，受到伤害的角色获得一个“流”。有“流”的角色手牌上限-X（X为其“流”数）。',
 			zhanwan:'斩腕',
-			zhanwan_info:'锁定技，受到【流矢】效果影响的角色若弃牌阶段有弃牌，你摸等量的牌，然后移除【流矢】的效果。',
+			zhanwan_info:'锁定技，有“流”的角色于弃牌阶段弃牌后，你摸等量的牌，然后其移去所有的“流”。',
 			zhujun:'朱儁',
 			gongjian:'攻坚',
 			gongjian_info:'每回合限一次，当你使用【杀】指定目标后，若此【杀】和你使用的上一张【杀】有相同的目标，则你可以弃置其两张牌，然后获得以此法弃置的所有【杀】。',
@@ -6051,6 +6131,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadexushen_info:"限定技，当你因其他角色而脱离濒死状态后，若场上没有“关索”，则你可发动此技能。你可令其选择是否将自己的一张武将牌变更为“关索”并摸三张牌。然后你回复一点体力，并获得技能〖镇南〗。",
 			decadezhennan:"镇南",
 			decadezhennan_info:"当你成为锦囊牌的目标后，若此牌的目标数大于1，则你可以对一名其他角色造成1点伤害。",
+			liubian:'刘辩',
+			shiyuan:'诗怨',
+			shiyuan_info:'每回合每项限一次， 当你成为其他角色使用牌的目标后: 1.若其体力值比你多,你摸三张牌; 2.若其体力值与你相同，你摸两张牌; 3.若其体力值比你少,你摸一张牌。',
+			dushi:'毒逝',
+			dushi_info:'锁定技，你处于濒死状态时，其他角色不能对你使用【桃】。你死亡时，你选择一名其他角色获得〖毒逝〗。',
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",

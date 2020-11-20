@@ -937,6 +937,7 @@ window.noname_character_rank={
 			'zhugedan',
 			'leitong',
 			'wulan',
+			'caoxing',
 			'diy_wenyang',
 			'ns_caoshuang',
 			'ns_huangchengyan',

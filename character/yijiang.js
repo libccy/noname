@@ -6950,103 +6950,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qinwang:{
 				audio:'qinwang1',
 				unique:true,
-				group:['qinwang1','qinwang2'],
+				group:['qinwang1'],
 				zhuSkill:true,
-				subSkill:{
-					ai:{}
-				}
-			},
-			qinwang1:{
-				audio:2,
-				trigger:{player:'chooseToRespondBegin'},
 				filter:function(event,player){
-					if(event.responded) return false;
-					if(!player.hasZhuSkill('qinwang')) return false;
-					if(!player.countCards('he')) return false;
-					if(!event.filterCard({name:'sha'},player,event)) return false;
-					return game.hasPlayer(function(current){
+					if(!player.hasZhuSkill('qinwang')||!game.hasPlayer(function(current){
 						return current!=player&&current.group=='shu';
-					});
+					})||!player.countCards('he')) return false;
+					return !event.jijiang&&(event.type!='phase'||!player.hasSkill('jijiang3'));
 				},
-				direct:true,
-				content:function(){
-					"step 0"
-					var yep=false;
-					if(!player.storage.jijianging&&!trigger.jijiang){
-						var players=game.filterPlayer();
-						for(var i=0;i<players.length;i++){
-							var nh=players[i].countCards('h');
-							if(player!=players[i]&&players[i].group=='shu'&&get.attitude(players[i],player)>2&&(nh>=3&&players[i].countCards('h','sha'))){
-								yep=true;break;
-							}
-						}
-					}
-					var next=player.chooseToDiscard(get.prompt('qinwang'),'弃置一张牌并发动【激将】','he');
-					next.set('ai',function(card){
-						if(_status.event.yep) return 5-get.value(card);
-						return 0;
-					});
-					next.set('yep',yep);
-					next.logSkill='qinwang'
-					"step 1"
-					if(!result.bool){
-						event.finish();
-					}
-					"step 2"
-					if(event.current==undefined) event.current=player.next;
-					if(event.current==player){
-						event.finish();
-					}
-					else if(event.current.group=='shu'){
-						player.storage.jijianging=true;
-						var next=event.current.chooseToRespond('是否替'+get.translation(player)+'打出一张杀？',{name:'sha'});
-						next.set('ai',function(){
-							var event=_status.event;
-							return (get.attitude(event.player,event.sourcex)-2);
-						});
-						next.set('sourcex',player);
-						next.set('jijiang',true);
-						next.noOrdering=true;
-						next.autochoose=lib.filter.autoRespondSha;
-					}
-					else{
-						event.current=event.current.next;
-						event.redo();
-					}
-					"step 3"
-					player.storage.jijianging=false;
-					if(result.bool){
-						event.finish();
-						trigger.result=result;
-						trigger.responded=true;
-						trigger.animate=false;
-						event.current.draw();
-						if(typeof event.current.ai.shown=='number'&&event.current.ai.shown<0.95){
-							event.current.ai.shown+=0.3;
-							if(event.current.ai.shown>0.95) event.current.ai.shown=0.95;
-						}
-					}
-					else{
-						event.current=event.current.next;
-						event.goto(2);
-					}
-				}
-			},
-			qinwang2:{
-				audio:'qinwang1',
-				enable:'chooseToUse',
-				filter:function(event,player){
-					if(event.filterCard&&!event.filterCard({name:'sha'},player,event)) return false;
-					if(!player.hasZhuSkill('qinwang')) return false;
-					if(!lib.filter.cardUsable({name:'sha'},player)) return false;
-					return game.hasPlayer(function(current){
-						return current!=player&&current.group=='shu';
-					});
+				enable:['chooseToUse','chooseToRespond'],
+				viewAs:{
+					name:'sha',
+					cards:[],
+					suit:'none',
+					number:null,
+					isCard:true,
 				},
-				filterCard:true,
+				filterCard:lib.filter.cardDiscardable,
 				position:'he',
 				check:function(card){
 					var player=_status.event.player,players=game.filterPlayer();
+					if(player.hasSkill('qinwang_ai')) return false;
 					for(var i=0;i<players.length;i++){
 						var nh=players[i].countCards('h');
 						if(players[i]!=player&&players[i].group=='shu'&&get.attitude(players[i],player)>2&&(nh>=3&&players[i].countCards('h','sha'))){
@@ -7055,36 +6979,51 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return 0;
 				},
-				filterTarget:function(card,player,target){
-					if(_status.event._backup&&
-						typeof _status.event._backup.filterTarget=='function'&&
-						!_status.event._backup.filterTarget({name:'sha'},player,target)){
-						return false;
-					}
-					return player.canUse({name:'sha'},target);
+				ai:{
+					order:function(){
+						return get.order({name:'sha'})-0.3;
+					},
+					respondSha:true,
+					skillTagFilter:function(player){
+						if(!player.hasZhuSkill('qinwang')||!game.hasPlayer(function(current){
+							return current!=player&&current.group=='shu';
+						})||!player.countCards('he')) return false;
+					},
 				},
+			},
+			qinwang1:{
+				audio:2,
+				trigger:{player:['useCardBegin','respondBegin']},
+				logTarget:'targets',
+				filter:function(event,player){
+					return event.skill=='qinwang';
+				},
+				forced:true,
 				content:function(){
 					"step 0"
+					delete trigger.skill;
+					delete trigger.card.cards;
+					player.discard(trigger.cards);
+					delete trigger.cards;
+					trigger.getParent().set('jijiang',true);
+					"step 1"
 					if(event.current==undefined) event.current=player.next;
 					if(event.current==player){
-						player.addSkill('jijiang3');
+						player.addTempSkill('jijiang3');
 						player.addTempSkill('qinwang_ai');
-						event.getParent(2).step=0;
 						event.finish();
+						trigger.cancel();
+						trigger.getParent().goto(0);
 					}
 					else if(event.current.group=='shu'){
-						var next=event.current.chooseToRespond('是否替'+get.translation(player)+'对'+get.translation(target)+'使用一张杀',
-						function(card,player,event){
-							var evt=event||_status.event;
-							return card.name=='sha'&&evt.source.canUse(card,evt.target);
-						});
-						next.set('ai',function(card){
+						var next=event.current.chooseToRespond('是否替'+get.translation(player)+'打出一张杀？',{name:'sha'});
+						next.set('ai',function(){
 							var event=_status.event;
-							return get.effect(event.target,card,event.source,event.player);
+							return (get.attitude(event.player,event.source)-2);
 						});
 						next.set('source',player);
-						next.set('target',target);
 						next.set('jijiang',true);
+						next.set('skillwarn','替'+get.translation(player)+'打出一张杀');
 						next.noOrdering=true;
 						next.autochoose=lib.filter.autoRespondSha;
 					}
@@ -7092,16 +7031,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.current=event.current.next;
 						event.redo();
 					}
-					"step 1"
+					"step 2"
 					if(result.bool){
-						event.finish();
 						event.current.draw();
-						if(result.cards&&result.cards.length){
-							player.useCard({name:'sha',isCard:true},result.cards,target).animate=false;
-						}
-						else{
-							player.useCard({name:'sha',isCard:true},target).animate=false;
-						}
+						event.finish();
+						trigger.card=result.card;
+						trigger.cards=result.cards;
+						trigger.throw=false;
 						if(typeof event.current.ai.shown=='number'&&event.current.ai.shown<0.95){
 							event.current.ai.shown+=0.3;
 							if(event.current.ai.shown>0.95) event.current.ai.shown=0.95;
@@ -7109,21 +7045,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						event.current=event.current.next;
-						event.goto(0);
+						event.goto(1);
 					}
-				},
-				ai:{
-					respondSha:true,
-					result:{
-						target:function(player,target){
-							if(player.hasSkill('jijiang3')) return 0;
-							if(player.hasSkill('qinwang_ai')) return 0;
-							return get.effect(target,{name:'sha'},player,target);
-						}
-					},
-					order:function(){
-						return get.order({name:'sha'})-0.1;
-					},
 				}
 			},
 			zuoding:{

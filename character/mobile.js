@@ -849,7 +849,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.countCards('h',function(card){
 						var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
 						if(mod2!='unchanged') return mod2;
-						var mod=game.checkMod(card,player,'unchanged','cardSavable',player);
+						var mod=game.checkMod(card,player,event.player,'unchanged','cardSavable',player);
 						if(mod!='unchanged') return mod;
 						var savable=get.info(card).savable;
 						if(typeof savable=='function') savable=savable(card,player,event.player);
@@ -2412,7 +2412,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.countCards('h',function(card){
 						var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
 						if(mod2!='unchanged') return mod2;
-						var mod=game.checkMod(card,player,'unchanged','cardSavable',player);
+						var mod=game.checkMod(card,player,event.player,'unchanged','cardSavable',player);
 						if(mod!='unchanged') return mod;
 						var savable=get.info(card).savable;
 						if(typeof savable=='function') savable=savable(card,player,event.player);
@@ -4325,70 +4325,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"pcaudio_xuanjian_card":{
 				audio:true,
 			},
-			"yizan_respond_sha":{
-				audio:2,
-				enable:["chooseToRespond"],
-				filterCard:function(card,player,target){
-					if(player.storage.yizan) return get.type(card)=='basic';
-					else if(ui.selected.cards.length){
-						if(get.type(ui.selected.cards[0])=='basic') return true;
-						return get.type(card)=='basic';
-					}
-					return true;
-				},
-				selectCard:function(){
-					var player=_status.event.player;
-					if(player.storage.yizan) return 1;
-					return 2;
-				},
-				position:"he",
-				viewAs:{
-					name:"sha",
-				},
-				complexCard:true,
-				viewAsFilter:function(player){
-					if(!player.storage.yizan){
-						if(player.countCards('h')<2) return false;
-					}
-					return player.hasCard(function(card){
-						return get.type(card)=='basic';
-					},'h');
-				},
-				prompt:function(){
-					var player=_status.event.player;
-					var str=!player.storage.yizan?'两张牌(其中至少应有一张基本牌)':'一张基本牌';
-					return '将'+str+'当做杀打出';
-				},
-				check:function(card){
-					if(!ui.selected.cards.length&&get.type(card)=='basic') return 6;
-					return 5-get.value(card);
-				},
-				ai:{
-					skillTagFilter:function(player){
-						if(!player.storage.yizan){
-							if(player.countCards('he')<2) return false;
-						}
-						return player.hasCard(function(card){
-							return get.type(card)=='basic';
-						},'h');
-					},
-					respondSha:true,
-				},
-			},
 			"yizan_use":{
-				init:function(player){
-					if(!player.storage.yizan_use) player.storage.yizan_use=0;
-					if(!player.storage.yizan) player.storage.yizan=false;
-				},
-				mark:true,
 				intro:{
 					content:"已发动过#次",
 				},
-				group:["yizan_respond_sha","yizan_respond_shan","yizan_count"],
-				enable:"chooseToUse",
+				enable:["chooseToUse","chooseToRespond"],
 				filter:function(event,player){
-				if(!player.storage.yizan&&player.countCards('he')<2) return false;
+					if(!player.storage.yizan&&player.countCards('he')<2) return false;
 					if(event.filterCard({name:'sha'},player,event)||
+						event.filterCard({name:'shan'},player,event)||
 						event.filterCard({name:'jiu'},player,event)||
 						event.filterCard({name:'tao'},player,event)){
 						return player.hasCard(function(card){
@@ -4405,6 +4350,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							list.push(['基本','','sha','fire']);
 							list.push(['基本','','sha','thunder']);
 						}
+						if(event.filterCard({name:'shan'},player,event)){
+							list.push(['基本','','shan']);
+						}
 						if(event.filterCard({name:'tao'},player,event)){
 							list.push(['基本','','tao']);
 						}
@@ -4416,11 +4364,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					check:function(button){
 						var player=_status.event.player;
 						var card={name:button.link[2],nature:button.link[3]};
-						if(game.hasPlayer(function(current){
+						if(_status.event.getParent().type!='phase'||game.hasPlayer(function(current){
 							return player.canUse(card,current)&&get.effect(current,card,player,player)>0;
 						})){
 							switch(button.link[2]){
-								case 'tao':return 5;
+								case 'tao':case 'shan':return 5;
 								case 'jiu':{
 									if(player.storage.yizan&&player.countCards('h',{type:'basic'})>2) return 3;
 								};
@@ -4434,6 +4382,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					backup:function(links,player){
 						return {
+							audio:'yizan_respond_shan',
 							filterCard:function(card,player,target){
 								if(player.storage.yizan) return get.type(card)=='basic';
 								else if(ui.selected.cards.length){
@@ -4456,13 +4405,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							position:'he',
 							popname:true,
 							precontent:function(){
-								player.logSkill('yizan_respond_shan');
+								player.addMark('yizan_use',1,false);
 							},
 						}
 					},
 					prompt:function(links,player){
 						var str=!player.storage.yizan?'两张牌(其中至少应有一张基本牌)':'一张基本牌';
-						return '将'+str+'当做'+get.translation(links[0][3]||'')+get.translation(links[0][2])+'使用';
+						return '将'+str+'当做'+get.translation(links[0][3]||'')+get.translation(links[0][2])+'使用或打出';
 					},
 				},
 				ai:{
@@ -4475,83 +4424,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 3.1;
 					},
 					save:true,
-					respondSha:true,
 					skillTagFilter:function(player,tag,arg){
 						if(!player.storage.yizan&&player.countCards('he')<2) return false;
-						if(player.hasCard(function(card){
+						if(!player.hasCard(function(card){
 							return get.type(card)=='basic';
 						},'he')){
-							if(tag=='respondSha'){
-								if(arg!='use') return false;
-							}
-						}
-						else{
 							return false;
 						}
 					},
 					result:{
 						player:1,
 					},
+					respondSha:true,
+					respondShan:true,
 				},
 			},
 			"yizan_respond_shan":{
-				complexCard:true,
 				audio:2,
-				enable:["chooseToUse","chooseToRespond"],
-				filterCard:function(card,player,target){
-					if(player.storage.yizan) return get.type(card)=='basic';
-						else if(ui.selected.cards.length){
-						if(get.type(ui.selected.cards[0])=='basic') return true;
-						return get.type(card)=='basic';
-					}
-					return true;
-				},
-				selectCard:function(){
-					var player=_status.event.player;
-					if(player.storage.yizan) return 1;
-					return 2;
-				},
-				position:"he",
-				viewAs:{
-					name:"shan",
-				},
-				viewAsFilter:function(player){
-					if(!player.storage.yizan){
-						if(player.countCards('he')<2) return false;
-					}
-					return player.hasCard(function(card){
-						return get.type(card)=='basic';
-					},'h');
-				},
-				prompt:function(){
-					var player=_status.event.player;
-					var str=!player.storage.yizan?'两张牌(其中至少应有一张基本牌)':'一张基本牌';
-					return '将'+str+'当做闪使用或打出';
-				},
-				check:function(card){
-					if(!ui.selected.cards.length&&get.type(card)=='basic') return 6;
-					return 5-get.value(card);
-				},
-				ai:{
-					respondShan:true,
-					skillTagFilter:function(player){
-					if(!player.storage.yizan){
-						if(player.countCards('he')<2) return false;
-					}
-					return player.hasCard(function(card){
-						return get.type(card)=='basic';
-					},'h');
-				},
-					effect:{
-						target:function(card,player,target,current){
-							if(get.tag(card,'respondShan')&&current<0) return 0.6
-						},
-					},
-					basic:{
-						useful:[7,2],
-						value:[7,2],
-					},
-				},
 			},
 			"xinfu_longyuan":{
 				audio:2,
@@ -4564,31 +4453,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'orange',
 				filter:function(event,player){
-					if(player.storage.xinfu_longyuan) return false;
-					return player.storage.yizan_use&&player.storage.yizan_use>2;
+					return player.countMark('yizan_use')>=3;
 				},
 				content:function(){
 					player.awakenSkill('xinfu_longyuan');
 					player.storage.yizan=true;
-					game.delay(1);
 				},
 				derivation:'yizan_rewrite',
-			},
-			"yizan_count":{
-				forced:true,
-				silent:true,
-				popup:false,
-				trigger:{
-					player:["respond","useCard1"],
-				},
-				filter:function(event,player){
-					if(event.skill!='yizan_respond_sha'&&event.skill!='yizan_respond_shan'&&event.skill!='yizan_use_backup') return false;
-					return player.storage.yizan_use!=undefined;
-				},
-				content:function(){
-					player.storage.yizan_use++;
-					player.markSkill('yizan_use');
-				},
 			},
 			xinfu_jingxie:{audio:2},
 			"xinfu_jingxie1":{
@@ -5977,6 +5848,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"yizan_respond_sha":"翊赞",
 			"yizan_respond_sha_info":"",
 			"yizan_use":"翊赞",
+			yizan_use_backup:'翊赞',
 			"yizan_use_info":"你可以将两张牌（其中至少一张为基本牌）当做任意基本牌使用或打出。",
 			"yizan_respond_shan":"翊赞",
 			"yizan_respond_shan_info":"",
