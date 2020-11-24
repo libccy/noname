@@ -400,9 +400,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						keepAI:true,
 						target:function(player,target){
 							var val=2;
-							var card=target.getEquip(2);
+							var val2=0;
+							var card=target.getEquip(1);
 							if(card){
-								var val2=get.value(card,target);
+								val2=get.value(card,target);
 								if(val2<0) return 0;
 							}
 							return -val-val2;
@@ -435,9 +436,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						keepAI:true,
 						target:function(player,target){
 							var val=2.5;
-							var card=target.getEquip(2);
+							var val2=0;
+							var card=target.getEquip(1);
 							if(card){
-								var val2=get.value(card,target);
+								val2=get.value(card,target);
 								if(val2<0) return 0;
 							}
 							return -val-val2;
@@ -470,9 +472,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						keepAI:true,
 						target:function(player,target){
 							var val=2;
+							var val2=0;
 							var card=target.getEquip(2);
 							if(card){
-								var val2=get.value(card,target);
+								val2=get.value(card,target);
 								if(val2<0) return 0;
 							}
 							return -val-val2;
@@ -535,8 +538,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var card=target.getEquip(2);
 							if(target.sex=='male'){
 								var val=0;
+								var val2=0;
 								if(card){
-									var val2=get.value(card,target);
+									val2=get.value(card,target);
 									if(val2<0) return 0;
 								}
 								var num=target.countCards('he',function(cardx){
@@ -549,6 +553,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								var val2=get.value(card,target);
 								if(val2>0) return val2/4;
 							}
+							return 0;
 						},
 					},
 				}
