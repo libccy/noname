@@ -16,7 +16,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tw_xiahouba:['male','shu',4,['twyanqin','twbaobian']],
 			tw_zumao:['male','wu',4,['twtijin']],
 			tw_caoang:['male','wei',4,['twxiaolian']],
-			tw_dingfeng:['male','wu',4,['twqijia','twzhulin']],
+			tw_dingfeng:['male','wu',4,['twqijia','twzhuchen']],
 			tw_caohong:['male','wei',4,['twhuzhu','twliancai']],
 			tw_maliang:['male','shu',3,['twrangyi','twbaimei']],
 			kaisa:["male","western",4,["zhengfu"]],
@@ -52,9 +52,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.chooseToUse({
 						prompt:'请使用得到的一张牌，或者受到来自'+get.translation(player)+'的一点伤害',
 						filterCard:function(card,player,event){
-							if(get.itemtype(card)!='card'||!cards.contains(card)) return false;
+							if(get.itemtype(card)!='card'||!event.cards.contains(card)) return false;
 							return lib.filter.filterCard(card,player,event);
 						},
+						cards:cards,
 					});
 					'step 2'
 					if(result.bool){
@@ -88,18 +89,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"damageBegin4",
 				},
 				forced:true,
-				priority:15,
-				filter:function (event,player){
+				filter:function(event,player){
 					if(player.countCards('h')) return false;
 					if(event.nature) return true;
 					return get.type(event.card,'trick')=='trick';
 				},
-				content:function (){
+				content:function(){
 					trigger.cancel();
 				},
 				ai:{
 					effect:{
-						target:function (card,player,target,current){
+						target:function(card,player,target,current){
 							if(target.countCards('h')) return;
 							if(get.tag(card,'natureDamage')) return 'zerotarget';
 							if(get.type(card)=='trick'&&get.tag(card,'damage')){
@@ -128,9 +128,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.countGainableCards(player,'e')) target.gainPlayerCard(player,'e',true);
 					'step 3'
 					if(target.isDamaged()&&target.hp<=player.hp){
-						player.chooseBool('是否令'+get.translation(target)+'回复1点体力？').ai=function(){
+						player.chooseBool('是否令'+get.translation(target)+'回复1点体力？').set('ai',function(){
 							return get.recoverEffect(target,player,player);
-						};
+						});
 					}
 					'step 4'
 					if(result.bool) target.recover();
@@ -139,7 +139,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:8,
 					result:{
 						target:function(player,target){
-							var eff=(target.isDamaged()&&target.hp<=player.hp)?get.recoverEffect(target,player,player):0;
+							var eff=(target.isDamaged()&&target.hp<=player.hp)?get.recoverEffect(target,player,target):0;
 							if(eff<=0&&!player.countGainableCards(target,'e')) return -1;
 							return eff;
 						},
@@ -148,15 +148,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			twliancai:{
 				audio:2,
-				trigger:{player:['turnOverEnd','phaseEnd']},
+				trigger:{player:['turnOverEnd','phaseJieshuBegin']},
 				filter:function(card,player,target){
-					return target=='phaseEnd'||player.countCards('h')<player.hp;
+					return target=='phaseJieshuBegin'||player.countCards('h')<player.hp;
 				},
 				filterTarget:function(card,player,target){
 					return target!=player&&target.countGainableCards(player,'e')>0;
 				},
 				check:function(card,player){
-					if(card.name=='turnOve') return true;
+					if(card.name=='turnOver') return true;
 					if(player.isTurnedOver()) return true;
 					if(player.hp-player.countCards('h')>1) return true;
 					return game.hasPlayer(function(current){
@@ -170,11 +170,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return -att;
 				},
 				prompt2:function(card,player,target){
-					return card.name=='phase'?'将武将牌翻面，然后获得一名其他角色装备区内的一张牌':'将手牌摸至与体力值相同';
+					return card.name=='phaseJieshu'?'将武将牌翻面，然后获得一名其他角色装备区内的一张牌':'将手牌摸至与体力值相同';
 				},
 				content:function(){
 					'step 0'
-					if(event.triggername=='phaseEnd') player.turnOver();
+					if(event.triggername=='phaseJieshuBegin') player.turnOver();
 					else{
 						player.draw(player.hp-player.countCards('h'));
 						event.finish();
@@ -189,12 +189,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			twqijia:{
-				group:'twqijia_alka',
+				//group:'twqijia_alka',
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
 					return player.countCards('e',function(card){
-						return !player.storage.twqijia.contains(get.subtype(card));
+						return !player.getStorage('twqijia_alka').contains(get.subtype(card));
 					});
 				},
 				filterTarget:function(card,player,target){
@@ -202,21 +202,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				position:'e',
 				filterCard:function(card,player){
-					return !player.storage.twqijia.contains(get.subtype(card));
+					return !player.getStorage('twqijia_alka').contains(get.subtype(card));
 				},
 				content:function(){
 					'step 0'
-					player.storage.twqijia.push(get.subtype(cards[0]));
+					player.addTempSkill('twqijia_alka');
+					player.storage.twqijia_alka.push(get.subtype(cards[0]));
 					player.useCard({name:'sha'},target,false);
 				},
 				subSkill:{
 					alka:{
-						sub:true,
-						trigger:{player:['phaseUseBegin','phaseUseEnd']},
-						silent:true,
-						content:function(){
-							player.storage.twqijia=[];
-							player.storage.twzhulin=[];
+						charlotte:true,
+						onremove:function(player){
+							delete player.storage.twqijia_alka;
+							delete player.storage.twzhuchen;
+							player.unmarkSkill('twzhuchen');
+						},
+						init:function(player,skill){
+							if(!player.storage[skill]) player.storage[skill]=[];
+							if(!player.storage.twzhuchen) player.storage.twzhuchen=[];
+						},
+						mod:{
+							globalFrom:function(from,to,distance){
+								if(from.storage.twzhuchen&&from.storage.twzhuchen.contains(to)) return -Infinity;
+							}
 						},
 					},
 				},
@@ -234,25 +243,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			twzhulin:{
-				group:'twqijia_alka',
-				locked:false,
-				mod:{
-					globalFrom:function(from,to,distance){
-						if(from.storage.twzhulin&&from.storage.twzhulin.contains(to)) return -Infinity;
-					}
-				},
+			twzhuchen:{
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.countCards('h',lib.skill.twzhulin.filterCard)>0;
+					return player.countCards('h',lib.skill.twzhuchen.filterCard)>0;
 				},
-				filterCard:function(card){
-					return card.name=='tao'||card.name=='jiu';
+				filterCard:function(card,player){
+					var name=get.name(card,player);
+					return name=='tao'||name=='jiu';
 				},
 				filterTarget:lib.filter.notMe,
 				content:function(){
-					player.storage.twzhulin.add(target);
-					player.markSkill('twzhulin');
+					player.addTempSkill('twqijia_alka');
+					player.storage.twzhuchen.add(target);
+					player.markSkill('twzhuchen');
 				},
 				intro:{
 					content:function(content,player){
@@ -274,7 +278,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					trigger.getParent().twxiaolian=trigger.targets[0];
 					trigger.targets.length=0;
-						trigger.getParent().triggeredTargets2.length=0;
+					trigger.getParent().triggeredTargets2.length=0;
 					trigger.targets.push(player);
 				},
 				group:'twxiaolian_damage',
@@ -344,6 +348,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.player=player;
 					next.target=trigger.player;
 					next.setContent(function(){
+						if(target.isDead()||!target.countCards('he')) return;
 						player.line(target,'green');
 						player.discardPlayerCard(target,true,'he');
 					});
@@ -556,8 +561,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twxiaolian_info:'当一名其他角色使用【杀】指定另一名其他角色为目标时，你可以将此【杀】的目标改为你。若如此做，当你受到此【杀】的伤害后，你可以将一张牌放在此【杀】原目标的武将牌旁，称之为“马”。锁定技，场上的一名角色每有一张“马”，其他角色计算与其的距离便+1。',
 			twqijia:'弃甲',
 			twqijia_info:'出牌阶段，你可以弃置一张装备区内的牌（每种类型的装备牌限一次），然后视为对攻击范围内的一名其他角色使用了一张【杀】。',
-			twzhulin:'诛綝',
-			twzhulin_info:'出牌阶段，你可以弃置一张【桃】或【酒】并选择一名其他角色。你与其的距离视为1直到此阶段结束。',
+			twzhuchen:'诛綝',
+			twzhuchen_info:'出牌阶段，你可以弃置一张【桃】或【酒】并选择一名其他角色。你与其的距离视为1直到此阶段结束。',
 			twhuzhu:'护主',
 			twhuzhu_info:'出牌阶段限一次，若你的装备区内有牌，则你可以令一名其他角色交给你一张手牌，然后获得你装备区内的一张牌。若其体力值不大于你，则你可以令其回复1点体力。',
 			twliancai:'敛财',

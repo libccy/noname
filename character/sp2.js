@@ -1416,56 +1416,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					check:function(button){
 						var player=_status.event.player;
-						var players=game.filterPlayer();
-						if(player.countCards('h',button.link)) return 0;
-						if(button.link[2]=='wuzhong'){
-							if(player.countCards('h')<player.hp){
-								return 3+Math.random();
-							}
-							return 0;
-						}
-						if(button.link[2]=='tao'){
-							return 3+Math.random();
-						}
-						if(button.link[2]=='sha'){
-							return 2+Math.random();
-						}
-						if(button.link[2]=='juedou'){
-							return 2+Math.random();
-						}
-						if(button.link[2]=='guohe'){
-							return 2+Math.random();
-						}
-						if(button.link[2]=='shunshou'){
-							for(var i=0;i<players.length;i++){
-								if(player.canUse('shunshou',players[i])&&get.attitude(player,players[i])<0){
-									return 2+Math.random();
-								}
-							}
-							return 0;
-						}
-						if(button.link[2]=='tiesuo'){
-							return 1+Math.random();
-						}
-						if(button.link[2]=='jiu'){
-							if(get.effect(player,{name:'jiu'})>0){
-								return 1+Math.random();
-							}
-							return 0;
-						}
-						if(button.link[2]=='nanman'||button.link[2]=='wanjian'||button.link[2]=='taoyuan'||button.link[2]=='wugu'){
-							var eff=0;
-							for(var i=0;i<players.length;i++){
-								if(players[i]!=player){
-									eff+=get.effect(players[i],{name:button.link[2]},player,player);
-								}
-							}
-							if(eff>0){
-								return eff+Math.random();
-							}
-							return 0;
-						}
-						return Math.random();
+						if(player.countCards('h',button.link[2])) return 0;
+						if(_status.event.getParent().type!='phase') return 1;
+						return player.getUseValue({name:button.link[2]});
 					},
 					backup:function(links,player){
 						return {
@@ -1475,7 +1428,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							check:function(card){
 								return 1;
 							},
-							viewAs:{name:links[0][2],nature:links[0][3]},
+							viewAs:{name:links[0][2],nature:links[0][3],isCard:true},
 						}
 					},
 					prompt:function(links,player){

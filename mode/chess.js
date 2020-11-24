@@ -2385,7 +2385,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							intro.innerHTML=get.translation(rarity);
 						}
 					}
-					game.leaderLord=['leader_caocao','leader_liubei','leader_sunquan'];
+					game.leaderLord=['leader_caocao','leader_liubei','leader_sunquan','leader_yuri'];
 					var dialog1=ui.create.dialog('选择君主','hidden');
 					event.dialog1=dialog1;
 					dialog1.classList.add('fullheight');
@@ -4566,6 +4566,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			leader_zhenlve:{
+				trigger:{global:'useCard1'},
+				unique:true,
+				charlotte:true,
+				firstDo:true,
+				filter:function(event,player){
+					return get.type(event.card)=='trick'&&event.player.isFriendOf(player);
+				},
+				content:function(){
+					trigger.nowuxie=true;
+				},
+			},
 			tongshuai:{
 				unique:true,
 				forbid:['guozhan'],
@@ -5057,7 +5069,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{player:'useCard'},
 				frequent:true,
-				filter:function(event){
+				filter:function(event,player){
 					return event.card&&event.card.name=='sha'&&player.getHistory('useCard',function(evt){
 						return evt.card.name=='sha';
 					})[0]==event;
@@ -5600,12 +5612,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			leader_caocao:'曹操',
 			leader_liubei:'刘备',
 			leader_sunquan:'孙权',
+			leader_yuri:'由理',
 			leader_xiaoxiong:'枭雄',
 			leader_xiaoxiong_info:'当你造成伤害后，获胜后会得到一定数量的额外金币奖励。',
 			leader_renyi:'仁义',
 			leader_renyi_info:'你招降敌将的成功率大幅增加。',
 			leader_mouduan:'谋断',
 			leader_mouduan_info:'其他友方角色回合内的行动范围+1。',
+			leader_zhenlve:'缜略',
+			leader_zhenlve_info:'友方角色使用的普通锦囊牌不可被【无懈可击】响应。',
 
 			tongshuai:'统率',
 			tongshuai_info:'准备阶段和结束阶段，你可以选择一名未上场的已方武将的一个技能作为你的技能',
@@ -5659,6 +5674,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_wushang_info:'锁定技，准备阶段，距离你5以内的所有其他角色需交给你一张手牌。',
 			boss_wuying:'无影',
 			boss_wuying_info:'锁定技，你回合内的移动距离-1；其他角色至你的距离+2。',
+
+			chess_default:'常规',
+			chess_boss:'魔王',
+			chess_leader:'君主',
 
 			mode_chess_character_config:'战棋模式',
 			mode_chess_card_config:'战棋模式',
@@ -6005,11 +6024,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				// image:'mode/chess/difficulty/leader_hard'
 			}
 		},
+		characterSort:{
+			mode_chess:{
+				chess_default:["chess_zhangliao","chess_huangzhong","chess_taishici","chess_sunshangxiang","chess_diaochan"],
+				chess_boss:["chess_jinchidiao","chess_beimingjukun","chess_wuzhaojinlong","chess_dongzhuo","chess_xingtian"],
+				chess_leader:["leader_caocao","leader_liubei","leader_sunquan","leader_yuri"],
+			},
+		},
 		characterPack:{
 			mode_chess:{
 				leader_caocao:['male','wei',4,['leader_xiaoxiong']],
 				leader_liubei:['male','shu',4,['leader_renyi']],
 				leader_sunquan:['male','wu',4,['leader_mouduan']],
+				leader_yuri:['female','key',4,['leader_zhenlve']],
 				// chess_caocao:['male','wei',3,['']],
 				// chess_xunyu:['male','wei',3,['']],
 				// chess_simayi:['male','wei',3,['']],

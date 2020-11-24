@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.106',
+	'v1.9.106.1',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -3453,6 +3453,7 @@ window.noname_asset_list=[
 	'image/character/key_shiroha.jpg',
 	'image/character/ns_caimao.jpg',
 	'image/character/caoxing.jpg',
+	'image/character/ns_jiaxu.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
@@ -4540,6 +4541,7 @@ window.noname_asset_list=[
 	'image/mode/chess/character/leader_caocao.jpg',
 	'image/mode/chess/character/leader_liubei.jpg',
 	'image/mode/chess/character/leader_sunquan.jpg',
+	'image/mode/chess/character/leader_yuri.jpg',
 	'image/mode/chess/difficulty/leader_easy.jpg',
 	'image/mode/chess/difficulty/leader_hard.jpg',
 	'image/mode/chess/difficulty/leader_medium.jpg',
@@ -5293,8 +5295,8 @@ window.noname_skin_list={
 	key_yuri:4,
 	key_yuzuru:2,
 	sp_key_kanade:8,
-	key_kamome:1,
-	key_umi:2,
+	key_kamome:5,
+	key_umi:5,
 	key_umi2:1,
 	key_mio:3,
 	key_midori:1,

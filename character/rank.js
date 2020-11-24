@@ -943,6 +943,7 @@ window.noname_character_rank={
 			'ns_huangchengyan',
 			'ns_sunchensunjun',
 			'ns_yuanxi',
+			'ns_jiaxu',
 			'key_haruko',
 			'key_akiko',
 			'key_sunohara',

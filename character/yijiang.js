@@ -6192,21 +6192,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			shifei:{
 				audio:2,
-				trigger:{player:['chooseToRespondBegin','chooseToUseBegin']},
+				enable:['chooseToRespond','chooseToUse'],
 				filter:function(event,player){
-					if(!_status.currentPhase) return false;
-					if(event.responded) return false;
-					if(!event.filterCard({name:'shan'},player,event)) return false;
-					if(event.name!='chooseToUse'&&!lib.filter.cardRespondable({name:'shan'},player,event)) return false;
+					if(!_status.currentPhase||event.shifei) return false;
+					if(!event.filterCard({name:'shan',isCard:true},player,event)) return false;
+					if(event.name!='chooseToUse'&&!lib.filter.cardRespondable({name:'shan',isCard:true},player,event)) return false;
 					return true;
 				},
-				check:function(event,player){
+				delay:false,
+				checkx:function(player){
 					if(get.attitude(player,_status.currentPhase)>0) return true;
 					var nh=_status.currentPhase.countCards('h')+1;
 					var players=game.filterPlayer();
 					for(var i=0;i<players.length;i++){
 						if(players[i].countCards('h')>nh){
-							if(!player.hasShan()||get.attitude(player,players[i])<=0) return true;
+							if(!player.countCards('h','shan')||get.attitude(player,players[i])<=0) return true;
 						}
 					}
 					return false;
@@ -6218,6 +6218,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(_status.currentPhase.isMaxHandcard(true)){
 						event.finish();
+						var evt=event.getParent(2);
+						evt.set('shifei',true);
+						evt.goto(0);
 						return;
 					}
 					var targets=game.filterPlayer(function(current){
@@ -6237,6 +6240,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					'step 2'
+					var evt=event.getParent(2);
 					var target;
 					if(event.onlytarget){
 						target=event.onlytarget;
@@ -6247,9 +6251,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(target){
 						player.line(target,'green');
 						player.discardPlayerCard(target,'he',true);
-						trigger.untrigger();
-						trigger.responded=true;
-						trigger.result={bool:true,card:{name:'shan',isCard:true}}
+						evt.result={bool:true,card:{name:'shan',isCard:true},cards:[]};
+						evt.redo();
+					}
+					else{
+						evt.set('shifei',true);
+						evt.goto(0);
 					}
 				},
 				ai:{
@@ -6264,7 +6271,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							}
 						}
-					}
+					},
+					order:8,
+					result:{
+						player:function(player){
+							return lib.skill.shifei.checkx(player)?1:0;
+						},
+					},
 				}
 			},
 			huaiyi:{
@@ -12290,7 +12303,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jigong:'急攻',
 			jigong_info:'出牌阶段开始时，你可以摸两张牌。若如此做，你本回合的手牌上限改为X（X为你此阶段造成的伤害点数之和）。',
 			shifei:'饰非',
-			shifei_info:'当你需要使用或打出【闪】时，你可以令当前回合角色摸一张牌，然后若其手牌数不为全场最多，则你弃置全场手牌数最多（或之一）角色的一张牌，视为你使用或打出了一张【闪】。',
+			shifei_info:'当你需要使用或打出【闪】时，你可以令当前回合角色摸一张牌。然后若其手牌数不为全场最多，则你弃置全场手牌数最多（或之一）角色的一张牌，视为你使用或打出了一张【闪】。',
 			huaiyi:'怀异',
 			huaiyi_info:'出牌阶段限一次，你可以展示所有手牌，若这些牌的颜色不全部相同，则你选择一种颜色并弃置该颜色的所有手牌，然后你可以获得至多X名角色的各一张牌（X为你以此法弃置的手牌数）。若你以此法获得的牌不少于两张，则你失去1点体力。',
 			yaoming:'邀名',

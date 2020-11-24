@@ -13645,7 +13645,7 @@
 								})) return 14;
 								if(target.countCards('e',function(card){
 									return get.value(card,target)<0&&game.hasPlayer(function(current){
-										return current!=target&&get.attitude(player,current)<0&&current.isEmpty(get.subtype(card))
+										return current!=target&&get.attitude(player,current)<0&&current.isEmpty(get.subtype(card))&&get.effect(target,card,player,player)<0;
 									});
 								})>0) return 9;
 							}
@@ -13654,7 +13654,7 @@
 									if(current!=target&&get.attitude(player,current)>0){
 										var es=target.getCards('e');
 										for(var i=0;i<es.length;i++){
-											if(get.value(es[i],target)>0&&current.isEmpty(get.subtype(es[i]))&&get.effect(current,es[i],player,current)>0) return true;
+											if(get.value(es[i],target)>0&&current.isEmpty(get.subtype(es[i]))&&get.effect(current,es[i],player,player)>0) return true;
 										}
 									}
 								})){
@@ -13667,7 +13667,7 @@
 						var i;
 						var att2=get.sgn(get.attitude(player,ui.selected.targets[0]));
 						for(i=0;i<es.length;i++){
-							if(sgnatt!=0&&att2!=0&&
+							if(sgnatt!=0&&att2!=0&&sgnatt!=att2&&
 								get.sgn(get.value(es[i],ui.selected.targets[0]))==-att2&&
 								get.sgn(get.effect(target,es[i],player,target))==sgnatt&&
 								target.isEmpty(get.subtype(es[i]))){
@@ -13710,7 +13710,7 @@
 							}
 							else{
 								if(get.position(button.link)=='j') return -10;
-								return get.equipValue(button.link)*get.effect(targets1,button.link,player,targets1);
+								return get.value(button.link)*get.effect(targets1,button.link,player,targets1);
 							}
 						},targets[0]).set('nojudge',event.nojudge||false).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
 							var targets1=_status.event.targets1;
@@ -18388,7 +18388,7 @@
 									if(withatt){
 										if(get.sgn(get.value(es[i],current))!=-att) return false;
 										var att2=get.sgn(get.attitude(player,current2));
-										if(att2!=get.sgn(get.effect(current2,es[i],player,current2))) return false;
+										if(att==att2||att2!=get.sgn(get.effect(current2,es[i],player,current2))) return false;
 									}
 									return current!=current2&&!current2.isMin()&&current2.isEmpty(get.subtype(es[i]));
 								})){
@@ -20042,6 +20042,7 @@
 					if(typeof card=='string') card={name:card,isCard:true};
 					var info=get.info(card);
 					if(info.multicheck&&!info.multicheck(card,this)) return false;
+					if(!lib.filter.cardEnabled(card,this)) return false;
 					if(distance!==false&&!lib.filter.targetInRange(card,this,target)) return false;
 					return lib.filter[includecard?'targetEnabledx':'targetEnabled'](card,this,target);
 				},
@@ -20623,6 +20624,16 @@
 							else if(Array.isArray(expire[roles[i]])){
 								for(var j=0;j<expire[roles[i]].length;j++){
 									lib.hookmap[expire[roles[i]][j]]=true;
+								}
+							}
+						}
+						if(expire.global){
+							if(typeof expire.global=='string'){
+								lib.hookmap[expire.global]=true;
+							}
+							else if(Array.isArray(expire.global)){
+								for(var i=0;i<expire.global.length;i++){
+									lib.hookmap[expire.global[i]]=true;
 								}
 							}
 						}
@@ -36397,7 +36408,7 @@
 									}
 								}
 								if(listx.length){
-									var cfgnodeX=createConfig({
+									var cfgnodeY={
 										name:lib.translate[pak],
 										_name:pak,
 										init:boolx,
@@ -36425,7 +36436,12 @@
 											game.saveConfig(connectMenu?('connect_'+modex.mode+'_banned'):(get.mode()+'_banned'),banned);
 											updateActive();
 										},
-									});
+									};
+									if(mode.indexOf('mode_')==0&&mode.indexOf('mode_extension_')!=0){
+										cfgnodeY.clear=true;
+										delete cfgnodeY.onclick;
+									}
+									var cfgnodeX=createConfig(cfgnodeY);
 									page.appendChild(cfgnodeX);
 									var buttons=ui.create.buttons(listx,'character',page);
 									for(var i=0;i<buttons.length;i++){
@@ -41233,7 +41249,7 @@
 					if(_status.paused&&_status.imchoosing&&!_status.auto){
 						ui.click.auto();
 					}
-				},true);
+				},true,true);
 			},
 			groupControl:function(dialog){
 				return ui.create.control('wei','shu','wu','qun','western','key',function(link,node){
