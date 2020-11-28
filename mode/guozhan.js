@@ -816,8 +816,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return event.name=='damage'||(event.player.isAlive()&&!event.player.isFriendOf(player))
 				},
 				content:function(){
-					var num=trigger.num||1;
-					var list=_status.characterlist.randomRemove(num);
+					var list=_status.characterlist.randomRemove(1);
 					if(list.length){
 						player.storage.yigui.character.addArray(list);
 						lib.skill.gzhuashen.drawCharacter(player,list);
@@ -830,6 +829,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			xindiaodu:{
 				audio:"diaodu",
 				group:'xindiaodu_use',
+				frequent:true,
 				subSkill:{
 					use:{
 						trigger:{
@@ -943,15 +943,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				audio:['buyi',2],
 			},
 			keshou:{
+				audio:2,
 				trigger:{player:'damageBegin3'},
-				direct:true,
+				//direct:true,
 				filter:function(event,player){
 					return event.num>0;
 				},
+				direct:true,
 				content:function(){
 					'step 0'
 					var check=(player.countCards('h',{color:'red'})>1||player.countCards('h',{color:'black'})>1);
-					player.chooseCard(get.prompt2('keshou'),'he',2,function(card){
+					player.chooseCard(get.prompt('keshou'),'弃置两张颜色相同的牌，令即将受到的伤害-1','he',2,function(card){
 						if(ui.selected.cards.length) return get.color(card)==get.color(ui.selected.cards[0]);
 						return true;
 					}).set('complexCard',true).set('ai',function(card){
@@ -964,14 +966,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return 6-get.value(card);
 					}).set('check',check);
 					'step 1'
+					var logged=false;
 					if(result.cards){
+						logged=true;
 						player.logSkill('keshou');
 						player.discard(result.cards);
 						trigger.num--;
-						if(trigger.num<=0) trigger.cancel();
-						if(!game.hasPlayer(function(current){
-							return current!=player&&current.isFriendOf(player);
-						})) player.judge(function(card){
+					}
+					if(!player.isUnseen()&&!game.hasPlayer(function(current){
+						return current!=player&&current.isFriendOf(player);
+					})){
+						if(!logged) player.logSkill('keshou');
+						player.judge(function(card){
 							if(get.color(card)=='red') return 1;
 							return 0;
 						});
@@ -982,16 +988,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zhuwei:{
+				audio:2,
 				trigger:{player:'judgeEnd'},
 				filter:function(event){
 					if(get.owner(event.result.card)) return false;
 					if(event.nogain&&event.nogain(event.result.card)) return false;
-					return event.result.card.name=='sha'||event.result.card.name=='juedou';
+					return true;
+					//return event.result.card.name=='sha'||event.result.card.name=='juedou';
 				},
+				frequent:true,
 				content:function(){
 					'step 0'
 					player.gain(trigger.result.card,'gain2');
-					player.chooseBool('是否令当前回合角色获得【筑围】的加成效果？').ai=function(){
+					player.chooseBool('是否令'+get.translation(_status.currentPhase)+'本回合的手牌上限和使用【杀】的次数上限+1？').ai=function(){
 						return get.attitude(player,_status.currentPhase)>0;
 					};
 					'step 1'
@@ -5124,7 +5133,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(player.hasSkill('huangjintianbingfu')){
 						num+=player.storage.huangjintianbingfu.length;
 					}
-					player.chooseCardButton(num,true,get.cards(num),'按顺将卡牌置于牌堆顶（先选择的在上）').set('ai',function(button){
+					player.chooseCardButton(num,true,get.cards(num),'按顺序将卡牌置于牌堆顶（先选择的在上）').set('ai',function(button){
 						return get.value(button.link);
 					});
 					'step 1'
@@ -7359,9 +7368,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzbuyi_info:'每回合限一次，当一名与你势力相同的角色脱离濒死状态后，你可以选择一个“军令”，令伤害来源选择一项：执行该军令，或令该脱离濒死状态的角色回复一点体力。',
 			gz_lukang:'陆抗',
 			keshou:'恪守',
-			keshou_info:'当你受到伤害时，你可以弃置两张颜色相同的牌。若如此做，此伤害-1。然后若场上没有与你势力相同的其他角色，则你进行判定，若结果为红色，你摸一张牌。',
+			keshou_info:'当你受到伤害时，你发动此技能。你可弃置两张颜色相同的牌，若如此做，此伤害-1。你的势力已确定且场上没有与你势力相同的其他角色，则你进行判定，若结果为红色，你摸一张牌。',
 			zhuwei:'筑围',
-			zhuwei_info:'当你的判定牌生效后，若此牌为【杀】或【决斗】，你可以获得之。然后，你可令当前回合角色本回合内使用【杀】的次数上限和手牌上限+1。',
+			zhuwei_info:'当你的判定牌生效后，你可以获得之。然后，你可令当前回合角色本回合内使用【杀】的次数上限和手牌上限+1。',
 			gz_yuanshu:'袁术',
 			gzweidi:'伪帝',
 			gzweidi_info:'出牌阶段限一次，你可以指定一名本回合从牌堆获得过牌的其他角色并选择一个“军令”，令其选择一项：执行该军令；或令你获得其所有手牌，然后交给其等量的牌。',

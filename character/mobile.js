@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			mobile:{
-				mobile_default:["miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan"],
+				mobile_default:["miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu"],
 				mobile_yijiang:["yj_zhanghe","yj_zhangliao","yj_xuhuang","yj_ganning"],
 				mobile_sunben:["re_sunben"],
 				mobile_standard:["xin_xiahoudun"],
@@ -16,7 +16,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			xin_zhuran:['male','wu',4,['mobiledanshou'],['unseen']],
+			simashi:['male','wei',4,['baiyi','jinglve','shanli']],
+			yanghuiyu:['female','wei',3,['hongyi','quanfeng']],
+			xin_zhuran:['male','wu',4,['mobiledanshou']],
 			xin_gongsunzan:['male','qun',4,['xinyicong','qiaomeng']],
 			dingyuan:['male','qun',4,['beizhu']],
 			xin_jianyong:['male','shu',3,['xinqiaoshui','xinjyzongshi']],
@@ -77,6 +79,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_sunben:['male','wu',4,['jiang','rehunzi','zhiba'],['zhu']],
 		},
 		characterIntro:{
+			simashi:'司马师（208年～255年3月23日），字子元，河内温县（今河南省温县）人。三国时期曹魏权臣，西晋王朝的奠基人之一，晋宣帝司马懿与宣穆皇后张春华的长子，晋文帝司马昭的同母兄，晋武帝司马炎的伯父。司马师沉着坚强，雄才大略，早年与夏侯玄、何晏齐名。高平陵政变后，以功封长平乡侯，旋加卫将军。司马懿死后，以抚军大将军辅政，独揽朝廷大权，次年升为大将军。掌权后，他制定选拔官吏的法规，命百官推荐贤才，整顿纲纪，使其各有职掌，朝野肃然。司马师也有卓越的军事才能，曾用计于新城之战击溃吴国诸葛恪的大军。嘉平六年（254年），魏帝曹芳与中书令李丰等人密谋除司马师，事情泄露，司马师杀死参与者，迫郭太后废曹芳，改立高贵乡公曹髦为帝。次年，亲自率兵平定毌丘俭、文钦之乱。回师途中病死，时年四十八岁，谥号“忠武”。后被追尊为晋景王。西晋建立后，被追尊为景皇帝，庙号世宗。',
+			yanghuiyu:'羊徽瑜（214年－278年），泰山南城（今山东新泰）人，晋景帝司马师第三任妻子。羊徽瑜出身官宦世家泰山羊氏，她是南阳太守羊续的孙女，上党太守羊衜之女；其母为东汉名士左中郎将蔡邕之女、蔡文姬的姐妹。羊徽瑜聪慧贤德，嫁给司马师后未有子女。以司马师之弟司马昭的次子司马攸为继子。司马师死后，司马攸侍奉羊徽瑜非常孝顺。泰始元年（265年），司马昭长子司马炎受禅登基，建立西晋，追谥伯父司马师为景皇帝。泰始二年（266年），尊奉羊徽瑜为景皇后，因居弘训宫，故称弘训太后。咸宁四年（278年），羊徽瑜去世，时年六十五岁，谥号景献皇后，与司马师合葬峻平陵。',
 			dingyuan:'丁原（？—189年），字建阳，兖州泰山郡南城县（山东省平邑县郑城镇）人。东汉末年军阀，官拜执金吾、并州刺史。任并州刺史期间，他亲近、善待主簿吕布，又调遣部下张杨、张辽等名将到洛阳任职。汉灵帝驾崩后，带兵进入洛阳，担任执金吾，并与大将军何进谋划诛杀十常侍，但不久事情败露，何进被宦官杀死。在宦官被诛灭之后，丁原与军阀董卓在废帝问题上意见不合产生矛盾，于是董卓诱使吕布将其杀害，其势力亦被吞并。',
 			furong:'傅肜（róng）（？－222年），义阳（今湖北枣阳）人，三国时蜀汉将领。刘备攻伐吴国时，傅肜为别督。后刘备被陆逊击败，傅肜率部断后，奋战至死。死前怒斥道：“吴狗！何有汉将军降者！”',
 			zhengxuan:'郑玄（127年－200年），字康成。北海郡高密县（今山东省高密市）人。东汉末年儒家学者、经学大师。郑玄曾入太学攻《京氏易》、《公羊春秋》及《三统历》、《九章算术》，又从张恭祖学《古文尚书》、《周礼》和《左传》等，最后从马融学古文经。游学归里之后，复客耕东莱，聚徒授课，弟子达数千人，家贫好学，终为大儒。党锢之祸起，遭禁锢，杜门注疏，潜心著述。晚年守节不仕，却遭逼迫从军，最终病逝于元城，年七十四。郑玄治学以古文经学为主，兼采今文经学。他遍注儒家经典，以毕生精力整理古代文化遗产，使经学进入了一个“小统一时代”。著有《天文七政论》、《中侯》等书，共百万余言，世称“郑学”，为汉代经学的集大成者。唐贞观年间，列郑玄于二十二“先师”之列，配享孔庙。宋代时被追封为高密伯。后人建有郑公祠以纪念。',
@@ -298,8 +302,298 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skills:["rw_zhuge_skill"],
 			},
 		},
-		characterFilter:{},
+		characterFilter:{
+			simashi:function(mode){
+				return !['boss','chess','tafang','stone','versus'].contains(mode);
+			},
+		},
 		skill:{
+			//司马师夫妇
+			//垃圾
+			baiyi:{
+				enable:'phaseUse',
+				usable:1,
+				filterTarget:lib.filter.notMe,
+				selectTarget:2,
+				limited:true,
+				skillAnimation:false,
+				//animationColor:'thunder',
+				filter:function(event,player){
+					return player.isDamaged()&&game.players.length>2;
+				},
+				multitarget:true,
+				multiline:true,
+				changeSeat:true,
+				contentBefore:function(){
+					player.$fullscreenpop('败移','thunder');
+				},
+				content:function(){
+					player.awakenSkill('baiyi');
+					game.broadcastAll(function(target1,target2){
+						game.swapSeat(target1,target2);
+					},targets[0],targets[1])
+				},
+			},
+			jinglve:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					if(player.hasSkill('jinglve2')) return false;
+					return game.hasPlayer(function(current){
+						return current!=player&&current.countCards('h')>0;
+					});
+				},
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countCards('h')>0;
+				},
+				content:function(){
+					'step 0'
+					if(!player.storage.jinglve4) player.storage.jinglve4=[];
+					player.storage.jinglve4.add(target);
+					player.chooseButton(['选择一张牌作为「死士」',target.getCards('h')],true).set('ai',function(button){
+						var target=_status.event.getParent().target;
+						var card=button.link;
+						var val=target.getUseValue(card);
+						if(val>0) return val;
+						return get.value(card);
+					});
+					'step 1'
+					if(result.bool){
+						player.storage.jinglve2=target;
+						player.storage.jinglve3=result.links[0];
+						player.addSkill('jinglve2');
+					}
+				},
+				ai:{
+					order:12,
+					result:{
+						target:-1,
+					},
+				},
+			},
+			jinglve2:{
+				mark:true,
+				intro:{
+					name:'死士',
+					mark:function(dialog,content,player){
+						dialog.addText('记录目标');
+						dialog.add([content]);
+						if(player==game.me||player.isUnderControl()){
+							dialog.addText('死士牌');
+							dialog.add([player.storage.jinglve3]);
+						}
+					},
+				},
+				onremove:function(player){
+					delete player.storage.jinglve2;
+					delete player.storage.jinglve3;
+				},
+				trigger:{global:['dieBegin','loseAfter']},
+				silent:true,
+				lastDo:true,
+				charlotte:true,
+				filter:function(event,player){
+					if(event.player!=player.storage.jinglve2) return false;
+					return event.name=='die'||(event.cards.contains(player.storage.jinglve3)&&event.getParent().name!='useCard');
+				},
+				content:function(){
+					player.removeSkill('jinglve2');
+				},
+				group:'jinglve3',
+			},
+			jinglve3:{
+				audio:'jinglve',
+				trigger:{global:['loseAfter','useCard','phaseAfter']},
+				filter:function(event,player){
+					if(event.player!=player.storage.jinglve2) return false;
+					if(event.name=='phase') return event.player.getCards('hej').contains(player.storage.jinglve3);
+					if(!event.cards.contains(player.storage.jinglve3)) return false;
+					return event.name=='useCard'||get.position(player.storage.jinglve3,true)=='d';
+				},
+				forced:true,
+				charlotte:true,
+				logTarget:'player',
+				content:function(){
+					if(trigger.name=='useCard'){
+						trigger.all_excluded=true;
+						trigger.targets.length=0;
+					}
+					else{
+						var next=player.gain(player.storage.jinglve3,trigger.name=='phase'?'giveAuto':'gain2');
+						if(trigger.name=='phase') next.source=trigger.player;
+					}
+					player.removeSkill('jinglve2');
+				},
+			},
+			shanli:{
+				audio:2,
+				trigger:{player:'phaseZhunbeiBegin'},
+				juexingji:true,
+				forced:true,
+				skillAnimation:true,
+				animationColor:'thunder',
+				filter:function(event,player){
+					return player.storage.baiyi&&player.getStorage('jinglve4').length>1;
+				},
+				content:function(){
+					'step 0'
+					player.awakenSkill('shanli');
+					player.loseMaxHp();
+					player.chooseTarget(true,'选择【擅立】的目标').set('ai',function(target){
+						return get.attitude(_status.event.player,target);
+					});
+					'step 1'
+					var target=result.targets[0];
+					event.target=target;
+					player.line(target,'green');
+					game.log(player,'拥立',target);
+					var list=[];
+					if(!_status.characterlist){
+						if(_status.connectMode) var list=get.charactersOL();
+						else{
+							var list=[];
+							for(var i in lib.character){
+								if(lib.filter.characterDisabled2(i)||lib.filter.characterDisabled(i)) continue;
+								list.push(i);
+							}
+						}
+						game.countPlayer2(function(current){
+							list.remove(current.name);
+							list.remove(current.name1);
+							list.remove(current.name2);
+							if(current.storage.rehuashen&&current.storage.rehuashen.character) list.removeArray(current.storage.rehuashen.character)
+						});
+						_status.characterlist=list;
+					}
+					_status.characterlist.randomSort();
+					var chara=[];
+					var skills=[];
+					for(var i of _status.characterlist){
+						if(i=='key_yuri') continue;
+						var character=lib.character[i];
+						if(character&&character[3]){
+							for(var j of character[3]){
+								if(skills.contains(j)||j=='yuri_wangxi'||target.hasSkill('j')) continue;
+								var info=get.info(j);
+								if(info&&info.zhuSkill){
+									skills.add(j);
+									chara.add(i);
+									continue;
+								}
+							}
+						}
+						if(skills.length>=3) break;
+					}
+					if(!skills.length){event.finish();return}
+					event.chara=chara;
+					event.skills=skills;
+					player.chooseControl(skills).set('dialog',['选择令'+get.translation(target)+'获得一个技能',[chara,'character']]);
+					'step 2'
+					target.addSkillLog(result.control);
+					target.storage.zhuSkill_shanli=[result.control];
+					target.setAvatarQueue(target.name1||target.name,[event.chara[event.skills.indexOf(result.control)]]);
+				},
+				//表情暂时来不及做
+			},
+			hongyi:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.countCards('he')>=Math.min(2,game.dead.length);
+				},
+				selectCard:function(){
+					return Math.min(2,game.dead.length);
+				},
+				filterCard:true,
+				filterTarget:lib.filter.notMe,
+				check:function(card){
+					var num=Math.min(2,game.dead.length);
+					if(!num) return 1;
+					if(num==1) return 7-get.value(card);
+					return 5-get.value(card);
+				},
+				position:'he',
+				content:function(){
+					player.addTempSkill('hongyi2',{player:'phaseBeginStart'});
+					player.storage.hongyi2.add(target);
+					player.markSkill('hongyi2');
+				},
+				ai:{
+					order:1,
+					result:{
+						target:function(player,target){
+							if(target.hasJudge('lebu')) return -0.5;
+							return -1-target.countCards('h');
+						},
+					},
+				},
+			},
+			hongyi2:{
+				audio:'hongyi',
+				trigger:{global:'damageBegin1'},
+				charlotte:true,
+				forced:true,
+				logTarget:'source',
+				filter:function(event,player){
+					return player.storage.hongyi2.contains(event.source);
+				},
+				content:function(){
+					'step 0'
+					trigger.source.judge();
+					'step 1'
+					if(result.color=='black') trigger.num--;
+					else trigger.player.draw();
+				},
+				onremove:true,
+				intro:{
+					content:'已选中$为技能目标',
+				},
+				init:function(player,skill){
+					if(!player.storage[skill]) player.storage[skill]=[];
+				},
+			},
+			quanfeng:{
+				audio:2,
+				trigger:{global:'die'},
+				filter:function(event,player){
+					return event.player.getStockSkills('仲村由理','天下第一').filter(function(skill){
+						var info=get.info(skill);
+						return info&&!info.juexingji&&!info.zhuSkill&&!info.charlotte&&!info.limited;
+					}).length>0;
+				},
+				logTarget:'player',
+				skillAnimation:true,
+				limited:true,
+				forced:true,
+				animationColor:'thunder',
+				content:function(){
+					'step 0'
+					player.awakenSkill('quanfeng');
+					var list=trigger.player.getStockSkills('仲村由理','天下第一').filter(function(skill){
+						var info=get.info(skill);
+						return info&&!info.juexingji&&!info.zhuSkill&&!info.charlotte&&!info.limited;
+					});
+					if(list.length==1) event._result={control:list[0]};
+					else player.chooseControl(list).set('prompt','选择获得'+get.translation(trigger.player)+'的一个技能').set('forceDie',true).set('ai',function(){
+						return list.randomGet();
+					});
+					'step 1'
+					player.addSkillLog(result.control);
+					game.broadcastAll(function(skill){
+						var list=[skill];game.expandSkills(list);
+						for(var i of list){
+							var info=lib.skill[i];
+							if(!info) continue;
+							if(!info.audioname2) info.audioname2={};
+							info.audioname2.yanghuiyu='quanfeng';
+						}
+					},result.control);
+					player.gainMaxHp();
+					player.recover();
+				},
+			},
 			//手杀朱然
 			//设计师你改技能有瘾🐴
 			mobiledanshou:{
@@ -307,42 +601,42 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				direct:true,
 				filter:function(event,player){
-					if(player.countCards('he')>=event.player.countCards('h')) return true;
-					return game.hasPlayer2(function(current){
-						return current.getHistory('useCard',function(evt){
-							return get.type(evt.card)!='equip'&&evt.targets.contains(player);
-						}).length;
-					});
+					if(player==event.player) return false;
+					var num=event.player.getHistory('useCard',function(evt){
+						return evt.targets.contains(player);
+					}).length;
+					return num==0||event.player.isAlive()&&num<=player.countCards('he');
 				},
 				content:function(){
 					'step 0'
-					var list=[];
-					event.addIndex=0;
-					var num=game.countPlayer2(function(current){
-						return current.getHistory('useCard',function(evt){
-							return get.type(evt.card)!='equip'&&evt.targets.contains(player);
-						}).length;
-					});
+					var num=trigger.player.getHistory('useCard',function(evt){
+						return evt.targets.contains(player);
+					}).length;
 					event.num=num;
-					if(num) list.push('摸'+get.cnNumber(num)+'张牌');
-					else event.addIndex++;
-					var num2=trigger.player.countCards('h');
-					event.num2=num2;
-					if(num2&&player.countCards('he')>=num2) list.push('弃置'+get.cnNumber(num2)+'张牌并对'+get.translation(trigger.player)+'造成1点伤害');
-					else if(!num2) list.push('对'+get.translation(trigger.player)+'造成1点伤害');
-					player.chooseControl('cancel2').set('prompt',get.prompt('mobiledanshou')).set('choiceList',list);
-					'step 1'
-					if(result.control!='cancel2'){
-						player.logSkill('mobiledanshou',trigger.player);
-						if(result.index+event.addIndex==0){
-							player.draw(num);
-							event.finish();
-						}
-						else if(event.num2) player.chooseToDiscard('he',true,event.num2);
+					if(num==0){
+						if(player.hasSkill('mobiledanshou')) event._result={bool:true};
+						else player.chooseBool('是否发动【胆守】摸一张牌？',lib.translate.mobiledanshou_info);
 					}
-					else event.finish();
+					else event.goto(2);
+					'step 1'
+					if(result.bool){
+						player.logSkill('mobiledanshou');
+						player.draw();
+					}
+					event.finish();
 					'step 2'
-					trigger.player.damage();
+					player.chooseToDiscard(num,get.prompt('mobiledanshou',trigger.player),'弃置'+get.translation(num)+'张牌并对其造成1点伤害','he').set('ai',function(card){
+						if(!_status.event.goon) return 0;
+						var num=_status.event.getParent().num;
+						if(num==1) return 8-get.value(card);
+						if(num==2) return 6.5-get.value(card);
+						return 5-get.value(card);
+					}).set('goon',get.damageEffect(trigger.player,player,player)>0).logSkill=['mobiledanshou',trigger.player];
+					'step 3'
+					if(result.bool){
+						player.addExpose(0.2);
+						trigger.player.damage();
+					}
 				},
 			},
 			//丁原
@@ -2723,7 +3017,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(card) cards.push(card);
 						else{
 							var card=get.cardPile(function(x){
-								return !cards.contains(card);
+								return !cards.contains(x);
 							});
 							if(card) cards.push(card);
 						}
@@ -3421,7 +3715,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseTarget(get.prompt('liezhi'),'弃置至多两名角色区域内的各一张牌',[1,2],function(card,player,target){
+					player.chooseTarget(get.prompt('liezhi'),'弃置至多两名其他角色区域内的各一张牌',[1,2],function(card,player,target){
 						return target!=player&&target.countDiscardableCards(player,'hej')>0;
 					}).ai=function(target){
 						var player=_status.event.player;
@@ -5911,7 +6205,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shouye:'守邺',
 			shouye_info:'每回合限一次。当其他角色使用牌指定你为唯一目标时，你可以与其进行【对策】。若你赢，则你取消此牌的目标，且你于此牌结算完成后获得其对应的所有实体牌。',
 			liezhi:'烈直',
-			liezhi_info:'准备阶段，你可以依次弃置至多两名角色区域内的各一张牌。若你受到过伤害，则〖烈直〗于你的下个回合无效。',
+			liezhi_info:'准备阶段，你可以依次弃置至多两名其他角色区域内的各一张牌。若你受到过伤害，则〖烈直〗于你的下个回合无效。',
 			
 			xinzhanyi:'战意',
 			xinzhanyi_info:'出牌阶段限一次，你可以弃置一张牌并失去1点体力，然后根据你弃置的牌获得以下效果直到回合结束：基本牌，你可以将一张基本牌当作杀、酒或桃使用，且你本回合第一次以此法使用的牌的回复值/伤害值+1；锦囊牌，摸三张牌且你使用的牌不能被【无懈可击】响应；装备牌，你使用【杀】指定目标角色后，其弃置两张牌，然后你获得其中的一张。',
@@ -6071,7 +6365,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liechi_info:'锁定技，当你进入濒死状态时，伤害来源弃置一张牌。',
 			xin_liaohua:'手杀廖化',
 			redangxian:'当先',
-			redangxian_info:'锁定技，回合开始时，你从弃牌堆中获得一张【杀】并进行一个额外的准备阶段。',
+			redangxian_info:'锁定技，回合开始时，你从弃牌堆中获得一张【杀】并进行一个额外的出牌阶段。',
 			refuli:'伏枥',
 			refuli_info:'限定技，当你处于濒死状态时，你可以将体力值回复至X点（X为势力数）。然后若你的体力值为全场唯一最多，你翻面。',
 			xin_caozhang:'手杀曹彰',
@@ -6090,7 +6384,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			beizhu_info:'出牌阶段限一次，你可以观看一名其他角色的手牌。若其中：没有【杀】，你弃置其一张牌，然后你可令其获得牌堆中的一张【杀】；有【杀】，其依次对你使用这些【杀】，当你因此受到1点伤害后，你摸一张牌。',
 			xin_zhuran:'手杀朱然',
 			mobiledanshou:'胆守',
-			mobiledanshou_info:'一名角色的结束阶段开始时，你可选择一项：①摸X张牌（X为本回合内目标包含你的非装备牌的数量）。②弃置Y张牌并对当前回合角色造成1点伤害（Y为其手牌数）。',
+			mobiledanshou_info:'一名其他角色的结束阶段开始时，若X：为0，你摸一张牌；不等于0，你可弃置X张牌并对其造成1点伤害（X为其本回合内使用的目标包含你的牌的数量）',
+			yanghuiyu:'羊徽瑜',
+			hongyi:'弘仪',
+			hongyi2:'弘仪',
+			hongyi_info:'出牌阶段限一次，你可以弃置X张牌并选择一名其他角色（X为场上已阵亡的角色数且至多为2）。你的下回合开始前，该角色造成伤害时进行判定，若结果为：黑色，此伤害-1。红色，受到伤害的角色摸一张牌。',
+			quanfeng:'劝封',
+			quanfeng_info:'锁定技，限定技，一名角色死亡时，你选择获得其的一个技能（主公技，限定技，觉醒技，带有Charlotte标签的技能除外），然后加1点体力上限并回复1点体力。',
+			simashi:'司马师',
+			baiyi:'败移',
+			baiyi_info:'限定技，出牌阶段，若你已受伤，你可以交换两名角色的座次。',
+			jinglve:'景略',
+			jinglve2:'景略',
+			jinglve3:'景略',
+			jinglve_info:'出牌阶段限一次，你可以观看一名其他角色的手牌，将其中一张牌标记为「死士」。当其使用对应的实体牌中包含「死士」的牌时，你取消此牌的所有目标。当「死士」牌不因使用而进入弃牌堆，或其回合结束后，若「死士」牌仍在其区域内，则你获得此牌。',
+			shanli:'擅立',
+			shanli_info:'觉醒技，准备阶段，若你已发动过〖败移〗且对至少两名角色发动过〖景略〗，则你减1点体力上限并选择一名其他角色。系统随机选择三个不为〖忘隙(仲村由理)〗的主公技，然后你选择其中一个，令其获得之。',
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua:'手杀异构·神话再临',
 			mobile_yijiang1:'手杀异构·一将成名',

@@ -55,6 +55,7 @@
 		ondb2:[],
 		chatHistory:[],
 		emotionList:{
+			xiaowu_emotion:14,
 			shibing_emotion:15,
 			guojia_emotion:20,
 			zhenji_emotion:20,
@@ -5848,9 +5849,9 @@
 						init:true,
 						onclick:function(bool){
 							if(confirm('调整该设置将清除所有进度，是否继续？')){
-								for(var i=1;i<6;i++) game.save('save'+i,null);
-								game.saveConfig('chess_leader_allcharacter',bool,this._link.config.mode)
-								game.reload();
+								for(var i=1;i<6;i++) game.save('save'+i,null,'chess');
+								game.saveConfig('chess_leader_allcharacter',bool,'chess')
+								if(get.mode()=='chess') game.reload();
 								return;
 							}
 							else this.classList.toggle('on');
@@ -5861,7 +5862,7 @@
 						onclick:function(){
 							var node=this;
 							if(node._clearing){
-								for(var i=1;i<6;i++) game.save('save'+i,null);
+								for(var i=1;i<6;i++) game.save('save'+i,null,'chess');
 								game.reload();
 								return;
 							}
@@ -9879,6 +9880,7 @@
 			baiban:'白板',
 			_disableJudge:"判定区",
 			
+			xiaowu_emotion:'小无表情',
 			guojia_emotion:'郭嘉表情',
 			zhenji_emotion:'甄姬表情',
 			shibing_emotion:'士兵表情',
@@ -15108,6 +15110,7 @@
 					"step 0"
 					game.log(player,'减少了'+get.cnNumber(num)+'点体力上限');
 					player.maxHp-=num;
+					event.loseHp=Math.max(0,player.hp-player.maxHp);
 					player.update();
 					"step 1"
 					if(player.maxHp<=0){
@@ -40962,7 +40965,7 @@
 										nodename2.setBackground(video.name2,'character');
 									}
 									var date=new Date(video.time);
-									var str=date.getFullYear()+'.'+(date.getMonth()+2)+'.'+(date.getDay()+1)+' '+
+									var str=date.getFullYear()+'.'+(date.getMonth()+1)+'.'+(date.getDate())+' '+
 										date.getHours()+':';
 									var minutes=date.getMinutes();
 									if(minutes<10){
@@ -48013,9 +48016,10 @@
 						cardid:card.cardid,
 						wunature:card.wunature,
 						storage:card.storage,
+						cards:card.cards,
 					};
 					if(get.itemtype(cards)=='cards'&&!card.cards) next.cards=cards.slice(0);
-					else next.cards=[card];
+					else if(get.itemtype(card)=='card') next.cards=[card];
 					return next;
 				}
 				else if(get.is.object(card)&&get.itemtype(cards)=='cards'&&!card.cards){

@@ -70,6 +70,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_yuanxi:['male','qun',4,['nsshengyan','nsdaizhan']],
 			ns_caoshuang:['male','wei',4,['nsjiquan','nsfuwei']],
 			
+			ns_lijue:['male','qun','4/6',['nsfeixiong','nscesuan']],
+			ns_zhangji:['male','qun',4,['nslulve']],
+			ns_fanchou:['male','qun',4,['nsyangwu']],
 			ns_jiaxu:['male','qun',3,['nsyice','luanwu']],
 			ns_zhangwei:['female','shu',3,['nsqiyue','nsxuezhu']],
 			ns_chendao:['male','shu',4,['nsjianglie']],
@@ -172,7 +175,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				diy_fakenews:["diy_wenyang","ns_zhangwei","ns_caimao"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
 				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha"],
-				diy_yongjian:["ns_chendao","yj_caoang","ns_jiaxu"],
+				diy_official:["ns_chendao","yj_caoang","ns_jiaxu","ns_lijue","ns_zhangji","ns_fanchou"],
 				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang'],
 			},
 		},
@@ -6364,6 +6367,144 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			
+			nsyangwu:{
+				enable:'phaseUse',
+				usable:1,
+				filterCard:{suit:'heart'},
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countCards('h')>0;
+				},
+				filter:function(event,player){
+					var info=lib.skill.nsyangwu;
+					return player.countCards('h',info.filterCard)&&game.hasPlayer(function(target){
+						return info.filterTarget(null,player,target);
+					});
+				},
+				check:function(card){
+					var num=0;
+					var player=_status.event.player;
+					game.countPlayer(function(current){
+						if(current!=player&&get.attitude(player,current)<0) num=Math.max(num,current.countCards('h')-player.countCards('h'));
+					});
+					return Math.ceil((num+1)/2)*2+4-get.value(card);
+				},
+				content:function(){
+					var num=Math.ceil((target.countCards('h')-player.countCards('h'))/2);
+					if(num) player.gainPlayerCard(target,true,'h',num,'visible');
+				},
+				ai:{
+					order:4,
+					result:{
+						target:function(player,target){
+							return player.countCards('h')-target.countCards('h');
+						},
+					},
+				},
+			},
+			nslulve:{
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return current.countCards('e')>0&&current.countCards('e')<=player.countCards('he');
+					});
+				},
+				filterCard:function(){
+					if(ui.selected.targets.length) return false;
+					return true;
+				},
+				position:'he',
+				selectCard:[1,Infinity],
+				complexSelect:true,
+				complexCard:true,
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countCards('e')>0&&ui.selected.cards.length==target.countCards('e');
+				},
+				check:function(card){
+					var player=_status.event.player;
+					if(game.hasPlayer(function(current){
+						return current!=player&&current.countCards('e')>0&&ui.selected.cards.length==current.countCards('e')&&get.damageEffect(current,player,player)>0;
+					})) return 0;
+					switch(ui.selected.cards.length){
+						case 0:return 8-get.value(card);
+						case 1:return 6-get.value(card);
+						case 2:return 3-get.value(card);
+						default:return 0;
+					}
+				},
+				content:function(){
+					target.damage('nocard');
+				},
+				ai:{
+					damage:true,
+					order:2,
+					result:{
+						target:function(player,target){
+							return get.damageEffect(target,player);
+						}
+					},
+					expose:0.3
+				}
+			},
+			nsfeixiong:{
+				trigger:{player:'phaseUseBegin'},
+				direct:true,
+				filter:function(event,player){
+					return player.countCards('h')>0&&game.hasPlayer(function(current){
+						return current!=player&&player.canCompare(current);
+					});
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('nsfeixiong'),function(card,player,target){
+						return player!=target&&player.canCompare(target);
+					}).set('ai',function(target){
+						var player=_status.event.player;
+						var hs=player.getCards('h').sort(function(a,b){
+							return b.number-a.number;
+						});
+						var ts=target.getCards('h').sort(function(a,b){
+							return b.number-a.number;
+						});
+						if(!hs.length||!ts.length) return 0;
+						if(hs[0].number>ts[0].number) return get.damageEffect(target,player,player);
+						return 0;
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('nsfeixiong',target);
+						player.chooseToCompare(target);
+					}
+					else event.finish();
+					'step 2'
+					if(!result.tie){
+						var targets=[player,target];
+						if(result.bool) targets.reverse();
+						targets[0].damage(targets[1]);
+					}
+				},
+			},
+			nscesuan:{
+				trigger:{player:'damageBegin3'},
+				forced:true,
+				content:function(){
+					'step 0'
+					trigger.cancel();
+					event.lose=player.loseMaxHp();
+					'step 1'
+					if(event.lose&&event.lose.loseHp) player.draw();
+				},
+				ai:{
+					filterDamage:true,
+					skillTagFilter:function(player,tag,arg){
+						if(arg&&arg.player){
+							if(arg.player.hasSkillTag('jueqing',false,player)) return false;
+						}
+					},
+				},
+			},
 			nsyice:{
 				trigger:{
 					player:'loseAfter',
@@ -6377,7 +6518,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var evt=event.getParent();
 						if(evt.name!='orderingDiscard'||!evt.relatedEvent||evt.relatedEvent.player!=player||!['useCard','respond'].contains(evt.relatedEvent.name)) return false;
 					}
-					return event.cards.filterInD('d').length>0;
+					return (event.cards2||event.cards).filterInD('d').length>0;
 				},
 				forced:true,
 				content:function(){
@@ -6385,7 +6526,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var evt=trigger.getParent().relatedEvent;
 					if((trigger.name=='discard'&&!trigger.delay)||evt&&evt.name=='respond') game.delayx();
 					'step 1'
-					var cards=trigger.cards.filterInD('d');
+					var cards=(trigger.cards2||trigger.cards).filterInD('d');
 					player.$gain2(cards);
 					if(cards.length==1) event._result={bool:true,links:cards};
 					else{
@@ -12161,10 +12302,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_jiaxu:'贾诩',
 			nsyice:'遗策',
 			nsyice_info:'锁定技，当你使用/打出/弃置的牌进入弃牌堆后，你将这些牌以任意顺序置于你的武将牌上，称为“策”。若这些“策”中有点数相同的牌，则你获得这两张牌中的所有牌，将这两张牌置于牌堆两端。若场上没有处于濒死状态的角色，则你对一名角色造成1点伤害。',
+			ns_lijue:'李傕',
+			ns_zhangji:'张济',
+			nsfeixiong:'飞熊',
+			nsfeixiong_info:'出牌阶段开始时，你可以和一名其他角色拼点。赢的角色对没赢的角色造成1点伤害。',
+			nscesuan:'策算',
+			nscesuan_info:'锁定技，当你受到伤害时，你防止此伤害并失去一点体力上限。若你因以此法失去体力上限导致体力值减少，则你摸一张牌。',
+			nslulve:'掳掠',
+			nslulve_info:'出牌阶段限一次，你可以弃置X张牌并选择一名装备区内有牌的其他角色，然后对其造成1点伤害（X为其装备区内的牌数）。',
+			ns_fanchou:'樊稠',
+			nsyangwu:'扬武',
+			nsyangwu_info:'出牌阶段限一次，你可以弃置一张♥手牌并选择一名手牌数大于你的其他角色。你观看其手牌并获得其中的X张牌（X为其与你手牌数之差的一半且向上取整）。',
 			diy_tieba:'吧友设计',
 			diy_default:'常规',
 			diy_key:'论外',
-			diy_yongjian:'其他官方武将',
+			diy_official:'其他官方武将',
 			diy_yijiang:'设计比赛2020',
 			diy_fakenews:'假新闻',
 			diy_trashbin:'垃圾桶',

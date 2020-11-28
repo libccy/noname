@@ -563,8 +563,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}else{
 						var prompt;
-						if(event.num==3) prompt="罪论：请按顺将卡牌置于牌堆顶（先选择的在上）";
-						else prompt="罪论：请按顺将"+get.cnNumber(event.num)+"张卡牌置于牌堆顶（先选择的在上），然后获得其余的牌。";
+						if(event.num==3) prompt="罪论：请按顺序将卡牌置于牌堆顶（先选择的在上）";
+						else prompt="罪论：请按顺序将"+get.cnNumber(event.num)+"张卡牌置于牌堆顶（先选择的在上），然后获得其余的牌。";
 						player.chooseCardButton(event.num,true,event.cards,prompt).set('ai',function(button){
 							var player=_status.event.player;
 							var next=player.getNext();

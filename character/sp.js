@@ -580,7 +580,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var info=get.info(skill);
 						return info&&!info.juexingji&&!info.zhuSkill&&!info.charlotte&&!info.limited;
 					});
-					if(!list.length) event._result={control:list[0]};
+					if(list.length==1) event._result={control:list[0]};
 					else trigger.player.chooseControl(list).set('prompt','选择令'+get.translation(player)+'获得一个技能').set('forceDie',true).set('ai',function(){
 						return list.randomGet();
 					});
@@ -613,7 +613,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var info=get.info(skill);
 						return info&&!info.juexingji&&!info.zhuSkill&&!info.charlotte&&!info.limited;
 					});
-					if(!list.length) event._result={control:list[0]};
+					if(list.length==1) event._result={control:list[0]};
 					else trigger.player.chooseControl(list).set('prompt','选择令'+get.translation(player)+'获得一个技能').set('forceDie',true).set('ai',function(){
 						return list.randomGet();
 					});
@@ -12404,7 +12404,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				filter:function(event,player){
 					return player.hasSkill('duwu2')==false&&game.hasPlayer(function(current){
-						return current.hp<=player.countCards('he')&&player.inRange(current);
+						return current.hp>0&&current.hp<=player.countCards('he')&&player.inRange(current);
 					});
 				},
 				filterCard:function(){
@@ -12416,12 +12416,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				complexSelect:true,
 				complexCard:true,
 				filterTarget:function(card,player,target){
-					return target!=player&&player.inRange(target)&&ui.selected.cards.length==target.hp;
+					return target!=player&&target.hp>0&&player.inRange(target)&&ui.selected.cards.length==target.hp;
 				},
 				check:function(card){
 					var player=_status.event.player;
 					if(game.hasPlayer(function(current){
-						return current!=player&&player.inRange(current)&&ui.selected.cards.length==current.hp&&get.damageEffect(current,player,player)>0;
+						return current!=player&&current.hp>0&&player.inRange(current)&&ui.selected.cards.length==current.hp&&get.damageEffect(current,player,player)>0;
 					})) return 0;
 					switch(ui.selected.cards.length){
 						case 0:return 8-get.value(card);

@@ -2172,12 +2172,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 							}
 						}
-						var length=Math.ceil(list.length/9);
 						for(var i in lib.rank){
 							if(Array.isArray(lib.rank[i])){
-								lib.rank[i]=list.splice(0,length);
+								for(var j=0;j<lib.rank[i].length;j++){
+									if(!list.contains(lib.rank[i][j])){
+										lib.rank[i].splice(j--,1);
+									}
+								}
 							}
 						}
+						//var length=Math.ceil(list.length/9);
+						//for(var i in lib.rank){
+						//	if(Array.isArray(lib.rank[i])){
+						//		lib.rank[i]=list.splice(0,length);
+						//	}
+						//}
 					}
 					'step 1'
 					lib.rank.all=lib.rank.s.
@@ -2799,7 +2808,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							switch(difficulty){
 								case 'leader_easy':list=lib.rank.d.concat(lib.rank.c).concat(lib.rank.bm);break;
 								case 'leader_medium':list=lib.rank.b.concat(lib.rank.bp).concat(lib.rank.am);break;
-								case 'leader_hard':list=lib.rank.a.concat(lib.rank.ap).concat(lib.rank.s);break;
+								case 'leader_hard':list=lib.rank.a.concat(lib.rank.ap).concat(lib.rank.s).concat(lib.rank.am.randomGets(Math.floor(lib.rank.am.length/2)));break;
 							}
 							for(var i=0;i<lib.hiddenCharacters.length;i++){
 								if(list.length<=number){
@@ -4571,6 +4580,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				charlotte:true,
 				firstDo:true,
+				forced:true,
+				popup:false,
 				filter:function(event,player){
 					return get.type(event.card)=='trick'&&event.player.isFriendOf(player);
 				},

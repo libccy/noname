@@ -4,7 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
-			liubian:['male','qun',3,['shiyuan','dushi'],['unseen']],
+			liubian:['male','qun',3,['shiyuan','dushi']],
 			xin_baosanniang:['female','shu',3,['xinfu_wuniang','decadexushen']],
 			re_hejin:['male','qun',4,['spmouzhu']],
 			hansui:['male','qun',4,['spniluan','spweiwu']],
@@ -67,7 +67,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_baigei:['re_panfeng','xingdaorong','caoxing'],
 				sp_guandu:["sp_zhanghe","xunchen","sp_shenpei","gaolan","lvkuanglvxiang","chunyuqiong","sp_xuyou"],
 				sp_huangjin:['liuhong','zhujun','re_hejin','hansui'],
-				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','re_sunluyu','caobuxing','ol_xinxianying','ol_yujin','re_maliang','xin_baosanniang'],
+				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','re_sunluyu','caobuxing','ol_xinxianying','ol_yujin','re_maliang','xin_baosanniang','liubian'],
 			}
 		},
 		skill:{
@@ -792,6 +792,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			juanhui2:{
 				charlotte:true,
 				mark:true,
+				mod:{
+					cardUsable:function(card){
+						if(card.name=='sha'&&_status.event.skill=='juanhui2_backup') return Infinity;
+					},
+				},
 				intro:{
 					markcount:function(storage,player){
 						return player.getStorage('juanhui3').length;
@@ -813,7 +818,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							for(var i of vcard){
 								if(i[2]=='sha'&&i[3]) str+=get.translation(i[3]);
 								str+=get.translation(i[2]);
-								str+='、'
+								str+='、';
 							}
 							str=str.slice(0,str.length-1);
 						}
@@ -827,7 +832,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'juanhui3',
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.getStorage('juanhui3').length>0;
+					return player.getStorage('juanhui3').length>0&&player.countCards('h')>0;
 				},
 				chooseButton:{
 					dialog:function(event,player){
@@ -1417,7 +1422,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					check:function(button){
 						var player=_status.event.player;
 						if(player.countCards('h',button.link[2])) return 0;
-						if(_status.event.getParent().type!='phase') return 1;
+						if(_status.event.getParent().type!='phase'&&!_status.event.getParent().lvli6) return 1;
 						return player.getUseValue({name:button.link[2]});
 					},
 					backup:function(links,player){
@@ -4696,7 +4701,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"phaseZhunbeiBegin",
 				},
 				direct:true,
-				content:function (){
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return current!=player&&current.hp<=player.hp;
+					});
+				},
+				content:function(){
 					"step 0"
 					player.chooseTarget(get.prompt('xinfu_langxi'),'对一名体力值不大于你的其他角色造成0-2点随机伤害',function(card,player,target){
 						return target.hp<=player.hp&&target!=player;
@@ -5805,7 +5815,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_tunjun":"屯军",
 			"xinfu_tunjun_info":"限定技，出牌阶段，你可以选择一名角色，令其随机使用牌堆中的X张装备牌。(X为你发动过“掠命”的次数)",
 			"xinfu_tanbei":"贪狈",
-			"xinfu_tanbei_info":"出牌阶段限一次，你可以令一名其他角色选择一项：<br>1.令你随机获得其区域内的一张牌，本回合内你不能对其使用牌。<br>2.令你此回合内对其使用牌没有次数与距离限制。",
+			"xinfu_tanbei_info":"出牌阶段限一次，你可以令一名其他角色选择一项：1.令你随机获得其区域内的一张牌，本回合内你不能对其使用牌。2.令你此回合内对其使用牌没有次数与距离限制。",
 			"xinfu_sidao":"伺盗",
 			xinfu_sidaox:'伺盗',
 			"xinfu_sidao_info":"出牌阶段限一次，当你对一名其他角色连续使用两张牌后，你可以将一张手牌当做【顺手牵羊】对其使用。",
@@ -5997,7 +6007,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hmmanyi_info:'锁定技，【南蛮入侵】对你无效。',
 			mansi_viewas:'蛮嗣',
 			mansi:'蛮嗣',
-			mansi_info:'出牌阶段限一次，你可以将所有手牌【南蛮入侵】使用；当有角色受到【南蛮入侵】的伤害后，你摸一张牌。',
+			mansi_info:'出牌阶段限一次，你可以将所有手牌当做【南蛮入侵】使用；当有角色受到【南蛮入侵】的伤害后，你摸一张牌。',
 			souying:'薮影',
 			souying_info:'每回合限一次，当你对其他角色（或其他角色对你）使用【杀】或普通锦囊牌指定唯一目标后，若此牌不是本回合你对其（或其对你）使用的第一张【杀】或普通锦囊牌，你可以弃置一张牌，获得此牌对应的所有实体牌（或令此牌对你无效）。',
 			zhanyuan:'战缘',
@@ -6086,7 +6096,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadezhennan_info:"当你成为锦囊牌的目标后，若此牌的目标数大于1，则你可以对一名其他角色造成1点伤害。",
 			liubian:'刘辩',
 			shiyuan:'诗怨',
-			shiyuan_info:'每回合每项限一次， 当你成为其他角色使用牌的目标后: 1.若其体力值比你多,你摸三张牌; 2.若其体力值与你相同，你摸两张牌; 3.若其体力值比你少,你摸一张牌。',
+			shiyuan_info:'每回合每项限一次，当你成为其他角色使用牌的目标后：①若其体力值大于你，你摸三张牌。②若其体力值等于你，你摸两张牌。③若其体力值小于你，你摸一张牌。',
 			dushi:'毒逝',
 			dushi_info:'锁定技，你处于濒死状态时，其他角色不能对你使用【桃】。你死亡时，你选择一名其他角色获得〖毒逝〗。',
 			

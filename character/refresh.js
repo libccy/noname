@@ -4126,8 +4126,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'xinleiji',
 				trigger:{player:'judgeAfter'},
 				direct:true,
+				disableReason:['暴虐','助祭','弘仪'],
 				filter:function(event,player){
-					return event.judgestr!='暴虐'&&event.judgestr!='助祭'&&['spade','club'].contains(event.result.suit);
+					return !lib.skill.xinleiji_misa.disableReason.contains(event.judgestr)&&['spade','club'].contains(event.result.suit);
 				},
 				content:function(){
 					'step 0'
@@ -7957,7 +7958,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olzhiba2:'制霸',
 			xinleiji:'雷击',
 			xinguidao:'鬼道',
-			xinleiji_info:'①当你使用或打出【闪】或【闪电】时，你可以进行判定。<br>②当你不因〖暴虐〗或〖助祭〗而进行的判定的判定牌生效后，若结果为：黑桃，你可对一名其他角色造成2点雷电伤害；梅花：你回复1点体力并可对一名其他其他角色造成1点雷电伤害。',
+			xinleiji_info:'①当你使用或打出【闪】或【闪电】时，你可以进行判定。<br>②当你不因〖暴虐〗或〖助祭〗或〖弘仪〗而进行的判定的判定牌生效后，若结果为：黑桃，你可对一名其他角色造成2点雷电伤害；梅花：你回复1点体力并可对一名其他其他角色造成1点雷电伤害。',
 			xinguidao_info:'一名角色的判定牌生效前，你可以打出一张黑色牌作为判定牌并获得原判定牌。若你以此法打出的牌为黑桃2-9，则你摸一张牌。',
 			reqiangxi:"强袭",
 			"reqiangxi_info":"出牌阶段对每名其他角色限一次，你可以选择一项：1. 失去一点体力并对你攻击范围内的一名其他角色造成一点伤害；2. 弃置一张武器牌并对你攻击范围内的一名其他角色造成一点伤害。",
