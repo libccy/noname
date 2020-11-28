@@ -3307,7 +3307,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(att>0) return att+1;
 						if(att==0) return Math.random();
 						return att;
-					});
+					}).set('hideTarget',true);
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];

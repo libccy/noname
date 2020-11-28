@@ -12777,7 +12777,7 @@
 							ui.click.cancel();
 						}
 					}
-					if(event.result.bool){
+					if(event.result.bool && event.hideTarget !== true){
 						for(var i=0;i<event.result.targets.length;i++){
 							event.result.targets[i].animate('target');
 						}
