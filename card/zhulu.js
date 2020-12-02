@@ -630,7 +630,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:9.5,
 					equipValue:function(card,player){
 						if(card!=player.getEquip(5)) return 5;
-						if(_status.jinhe&&_status.jinhe[card.cardid]&&(_status.event.name=='discardPlayerCard'||_status.event.name=='chooseToDiscard')) return 2*player.countCards('h');
+						if(_status.jinhe&&_status.jinhe[card.cardid]&&_status.event.name!='gainPlayerCard') return 3*player.countCards('h');
 						return 0;
 					},
 					value:function(){
@@ -741,6 +741,19 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(cards.length) player.discard(cards);
 					"step 2"
 					game.broadcastAll(ui.clear);
+				},
+				ai:{
+					order:1,
+					result:{
+						player:function(player){
+							var suit=get.suit(_status.jinhe[player.getEquip(5).cardid].card);
+							var hs=player.getCards('h',function(card){
+								return get.suit(card)==suit;
+							});
+							if(!hs.length||get.value(hs)<5) return 1;
+							return -1;
+						},
+					},
 				},
 			},
 			yexingyi_skill:{

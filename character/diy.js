@@ -4381,8 +4381,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					save:true,
 					respondSha:true,
+					fireAttack:true,
 					skillTagFilter:function(player){
-						return player.countCards('he',{suit:'diamond'})>0;
+						return target=='fireAttack'||player.countCards('he',{suit:'diamond'})>0;
 					},
 				},
 				group:['inari_baiwei_shan','inari_baiwei_draw'],
@@ -4637,6 +4638,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 0;
 						}
 					},
+					fireAttack:true,
 				},
 				group:'kanata_shuangche',
 			},
@@ -5266,6 +5268,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result.index==0) trigger.player.damage('fire');
 					else trigger.changeToZero();
+				},
+				ai:{
+					fireAttack:true,
 				},
 			},
 			nsqiyue:{
@@ -6372,7 +6377,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				filterCard:{suit:'heart'},
 				filterTarget:function(card,player,target){
-					return target!=player&&target.countCards('h')>0;
+					return target!=player&&target.countCards('h')>player.countCards('h');
 				},
 				filter:function(event,player){
 					var info=lib.skill.nsyangwu;

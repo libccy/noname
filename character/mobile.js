@@ -494,7 +494,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.storage.zhuSkill_shanli=[result.control];
 					target.setAvatarQueue(target.name1||target.name,[event.chara[event.skills.indexOf(result.control)]]);
 				},
-				//表情暂时来不及做
 			},
 			hongyi:{
 				audio:2,
@@ -780,11 +779,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else{
-						if(trigger.num1<trigger.num2&&get.position(trigger.card,true)=='o'){
+						if(trigger.num1<trigger.num2&&get.position(trigger.card1,true)=='o'){
 							str+='/拼点牌';
 							cards.push(trigger.card1);
 						}
-						else if(trigger.num1>trigger.num2&&get.position(trigger.card,true)=='o'){
+						else if(trigger.num1>trigger.num2&&get.position(trigger.card2,true)=='o'){
 							str+='/拼点牌';
 							cards.push(trigger.card2);
 						}
@@ -945,7 +944,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						if(player==get.zhu(player)&&player.hp<=2) return 0;
 						return get.attitude(player,target)-4;
-					});
+					}).animate=false;
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
@@ -4570,6 +4569,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:7,
+					fireAttack:true,
+					threaten:1.7,
 					result:{
 						player:1,
 					},
@@ -4719,6 +4720,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					save:true,
 					skillTagFilter:function(player,tag,arg){
+						if(tag=='fireAttack') return true;
 						if(!player.storage.yizan&&player.countCards('he')<2) return false;
 						if(!player.hasCard(function(card){
 							return get.type(card)=='basic';
@@ -4731,6 +4733,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					respondSha:true,
 					respondShan:true,
+					fireAttack:true,
 				},
 			},
 			"yizan_respond_shan":{
@@ -6399,7 +6402,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jinglve3:'景略',
 			jinglve_info:'出牌阶段限一次，你可以观看一名其他角色的手牌，将其中一张牌标记为「死士」。当其使用对应的实体牌中包含「死士」的牌时，你取消此牌的所有目标。当「死士」牌不因使用而进入弃牌堆，或其回合结束后，若「死士」牌仍在其区域内，则你获得此牌。',
 			shanli:'擅立',
-			shanli_info:'觉醒技，准备阶段，若你已发动过〖败移〗且对至少两名角色发动过〖景略〗，则你减1点体力上限并选择一名其他角色。系统随机选择三个不为〖忘隙(仲村由理)〗的主公技，然后你选择其中一个，令其获得之。',
+			shanli_info:'觉醒技，准备阶段，若你已发动过〖败移〗且对至少两名角色发动过〖景略〗，则你减1点体力上限并选择一名角色。系统随机选择三个不为〖忘隙(仲村由理)〗的主公技，然后你选择其中一个技能，令其获得之。其将交互表情中的【拖鞋】和【酒杯】替换为【手铐】和【玉玺】。',
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua:'手杀异构·神话再临',
 			mobile_yijiang1:'手杀异构·一将成名',

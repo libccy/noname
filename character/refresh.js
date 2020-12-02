@@ -657,6 +657,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.card.nature='fire';
 				},
 				group:['decadelihuo2','decadelihuo3'],
+				ai:{
+					fireAttack:true,
+				},
 			},
 			decadelihuo2:{
 				trigger:{player:'useCard2'},
@@ -3797,6 +3800,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				ai:{
+					fireAttack:true,
 					save:true,
 					respondShan:true,
 					respondSha:true,
@@ -3807,6 +3811,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						player:1,
 					},
+					threaten:1.3,
 				},
 				group:['reguhuo_shan','reguhuo_wuxie','reguhuo_guess'],
 			},
@@ -4312,6 +4317,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 6-get.value(card);
 					}
 					return 4-get.value(card)
+				},
+				ai:{
+					fireAttack:true,
 				},
 			},
 			rekanpo:{
@@ -5895,6 +5903,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					fireAttack:true,
 					order:function(skill,player){
 						if(player.hp<player.maxHp&&player.storage.rerende<2&&player.countCards('h')>1){
 							return 10;

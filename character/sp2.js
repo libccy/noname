@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			ol_dingyuan:['male','qun',4,['weihuan','shouchong'],['unseen']],
 			liubian:['male','qun',3,['shiyuan','dushi']],
 			xin_baosanniang:['female','shu',3,['xinfu_wuniang','decadexushen']],
 			re_hejin:['male','qun',4,['spmouzhu']],
@@ -71,6 +72,128 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			weihuan:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				direct:true,
+				filter:function(event,player){
+					if(!game.hasPlayer(function(current){
+						return current.hasSkill('panshi');
+					})) return true;
+					return player.countCards('he')>1&&game.hasPlayer(function(current){
+						return current!=player&&!current.hasSkill('panshi');
+					});
+				},
+				content:function(){
+					'step 0'
+					if(game.hasPlayer(function(current){
+						return current.hasSkill('panshi');
+					})) event.goto(2);
+					else player.chooseTarget(lib.filter.notMe,get.prompt('weihuan'),'令一名其他角色获得「虎」标记');
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('weihuan',target);
+						target.addSkill('panshi');
+					}
+					event.finish();
+					'step 2'
+					player.chooseCardTarget({
+						prompt:get.prompt('weihuan'),
+						prompt2:('弃置两张牌并将'+get.translation(game.filterPlayer(function(current){
+							return current.hasSkill('panshi');
+						}))+'的「虎」标记转移给其他角色'),
+						position:'he',
+						filterTarget:function(card,player,target){
+							return player!=target&&!target.hasSkill('panshi');
+						},
+						filterCard:lib.filter.cardDiscardable,
+						selectCard:2,
+					});
+					'step 3'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('weihuan');
+						player.discard(result.cards).delay=false;
+						player.line2(game.filterPlayer(function(current){
+							if(current.hasSkill('panshi')){
+								current.removeSkill('panshi');
+								return true;
+							}
+						}).concat(result.targets),'green');
+						target.addSkill('panshi');
+					}
+					else event.finish();
+					'step 4'
+					game.delayx();
+				},
+				derivation:'panshi',
+			},
+			panshi:{
+				mark:true,
+				marktext:'虎',
+				intro:{content:'吾乃吕奉先是也'},
+				trigger:{player:'phaseZhunbeiBegin'},
+				forced:true,
+				filter:function(event,player){
+					return player.countCards('h')>0&&game.hasPlayer(function(current){
+						return current!=player&&current.hasSkill('weihuan');
+					});
+				},
+				content:function(){
+					'step 0'
+					var targets=game.filterPlayer(function(current){
+						return current!=player&&current.hasSkill('weihuan');
+					});
+					if(targets.length==1){
+						event.target=targets[0];
+						player.chooseCard('h',true,'叛弑：将一张手牌交给'+get.translation(targets));
+					}
+					else player.chooseCardTarget({
+						prompt:'叛弑：将一张手牌交给'+get.translation(targets)+'中的一名角色',
+						filterCard:true,
+						position:'h',
+						targets:targets,
+						forced:true,
+						filterTarget:function(card,player,target){
+							return _status.event.targets.contains(target);
+						},
+					});
+					'step 1'
+					if(result.bool){
+						if(!target) target=result.targets[0];
+						player.line(target);
+						target.gain(result.cards,player,'giveAuto');
+					}
+				},
+				group:'panshi_damage',
+			},
+			panshi_damage:{
+				trigger:{source:'damageBegin1'},
+				forced:true,
+				logTarget:'player',
+				filter:function(event,player){
+					return event.card&&event.card.name=='sha'&&event.player.hasSkill('weihuan');
+				},
+				content:function(){
+					trigger.num++;
+				},
+			},
+			shouchong:{
+				trigger:{global:'damageEnd'},
+				forced:true,
+				filter:function(event,player){
+					return event.source&&event.source.isAlive()&&!player.hasSkill('shouchong2');
+				},
+				content:function(){
+					player.addTempSkill('shouchong2','roundStart');
+					if(trigger.source!=player) player.draw();
+					else if(trigger.player.isAlive()){
+						player.line(trigger.player,'green');
+						trigger.player.damage();
+					}
+				},
+			},
+			shouchong2:{},
 			shiyuan:{
 				trigger:{target:'useCardToTargeted'},
 				frequent:true,
@@ -1446,6 +1569,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player:1,
 					},
 					threaten:2.9,
+					fireAttack:true,
 				},
 				group:['lvli2','lvli3','lvli4','lvli5','lvli6']
 			},
@@ -6099,6 +6223,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shiyuan_info:'每回合每项限一次，当你成为其他角色使用牌的目标后：①若其体力值大于你，你摸三张牌。②若其体力值等于你，你摸两张牌。③若其体力值小于你，你摸一张牌。',
 			dushi:'毒逝',
 			dushi_info:'锁定技，你处于濒死状态时，其他角色不能对你使用【桃】。你死亡时，你选择一名其他角色获得〖毒逝〗。',
+			ol_dingyuan:'丁原',
+			weihuan:'为患',
+			weihuan_info:'准备阶段，若场上没有“虎”标记，你可令一名其他角色获得一个“虎”标记；若场上有“虎”标记，你可以弃置两张牌移动“虎”标记。拥有“虎”标记的角色获得技能“叛弑”',
+			panshi:'叛弑',
+			panshi_info:'锁定技，准备阶段，你交给有“为患”技能的角色一张手牌；你的【杀】对其造成的伤害+1',
+			shouchong:'首冲',
+			shouchong_info:'锁定技，有角色造成伤害后，若此伤害是本轮第一次造成伤害，且伤害来源是其他角色，则你摸一张牌；若伤害来源是你，则你对受伤角再造成1点伤害。',
+			
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",

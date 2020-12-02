@@ -1361,8 +1361,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		translate:{
-			
-			equip6:'坐骑',
 			liulongcanjia:'六龙骖驾',
 			liulongcanjia_info:'锁定技，你计算与其他角色的距离-1，其他角色计算与你的距离+1。</br>锁定技，当此牌进入你的装备区时，你弃置你装备区内其他坐骑牌；当此牌在你的装备区内，你不能使用其他坐骑牌（你的装备区便不能置入其他坐骑牌）。',
 			minguangkai:'明光铠',

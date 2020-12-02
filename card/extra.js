@@ -27,7 +27,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				clearLose:true,
 				equipDelay:false,
 				loseDelay:false,
-				skills:['muniu_skill','muniu_skill2','muniu_skill6','muniu_skill7'],
+				skills:['muniu_skill','muniu_skill4','muniu_skill6','muniu_skill7'],
 				ai:{
 					equipValue:function(card){
 						if(card.card) return 7+card.card.length;
@@ -166,7 +166,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				enable:true,
-				cardnature:'fire',
+				//cardnature:'fire',
 				filterTarget:function(card,player,target){
 					if(player!=game.me&&player.countCards('h')<2) return false;
 					return target.countCards('h')>0;
@@ -356,7 +356,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'equip',
 				subtype:'equip1',
-				cardnature:'fire',
+				//cardnature:'fire',
 				distance:{attackFrom:-3},
 				ai:{
 					basic:{
@@ -381,19 +381,50 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'equip',
 				subtype:'equip2',
-				cardnature:'fire',
+				//cardnature:'fire',
 				ai:{
+					value:function(card,player,index,method){
+						if(player.isDisabled(2)) return 0.01;
+						if(card==player.getEquip(2)){
+							if(player.hasSkillTag('noDirectDamage')) return 10;
+							if(game.hasPlayer(function(current){
+								return get.attitude(current,player)<0&&current.hasSkillTag('fireAttack',null,null,true);
+							})) return 0;
+							return 6;
+						}
+						var value=0;
+						var info=get.info(card);
+						var current=player.getEquip(info.subtype);
+						if(current&&card!=current){
+							value=get.value(current,player);
+						}
+						var equipValue=info.ai.equipValue;
+						if(equipValue==undefined){
+							equipValue=info.ai.basic.equipValue;
+						}
+						if(typeof equipValue=='function'){
+							if(method=='raw') return equipValue(card,player);
+							if(method=='raw2') return equipValue(card,player)-value;
+							return Math.max(0.1,equipValue(card,player)-value);
+						}
+						if(typeof equipValue!='number') equipValue=0;
+						if(method=='raw') return equipValue;
+						if(method=='raw2') return equipValue-value;
+						return Math.max(0.1,equipValue-value);
+					},
 					equipValue:function(card,player){
 						if(player.hasSkillTag('maixie')&&player.hp>1) return 0;
 						if(player.hasSkillTag('noDirectDamage')) return 10;
 						if(get.damageEffect(player,player,player,'fire')>=0) return 10;
-						var num=3-game.countPlayer(function(current){
-							return get.attitude(current,player)<0;
+						var num=4-game.countPlayer(function(current){
+							if(get.attitude(current,player)<0){
+								if(current.hasSkillTag('fireAttack',null,null,true)) return 3;
+								return 1;
+							}
+							return false;
 						});
-						if(player.hp==1) num+=4;
+						if(player.hp==1) num+=3;
 						if(player.hp==2) num+=1;
-						if(player.hp==3) num--;
-						if(player.hp>3) num-=4;
 						return num;
 					},
 					basic:{
@@ -630,7 +661,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			muniu_skill4:{
-				enable:'chooseToUse',
+				enable:['chooseToUse','chooseToRespond'],
 				filter:function(event,player){
 					var muniu=player.getEquip(5);
 					if(!muniu.cards) return false;
@@ -662,10 +693,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return {
 							filterCard:function(){return false},
 							selectCard:-1,
+							position:'h',
 							viewAs:links[0],
 							precontent:function(){
--								delete event.result.skill;
--							},
+								delete event.result.skill;
+							},
 						};
 					},
 					prompt:function(links){
@@ -901,6 +933,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					trigger.num++;
 				},
 				ai:{
+					fireAttack:true,
 					effect:{
 						target:function(card,player,target,current){
 							if(card.name=='sha'){

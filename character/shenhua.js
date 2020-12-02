@@ -4948,7 +4948,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 6-get.value(card);
 					}
 					return 3-get.value(card)
-				}
+				},
+				ai:{
+					fireAttack:true,
+				},
 			},
 			bazhen:{
 				audio:2,
@@ -6821,9 +6824,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					save:true,
 					respondShan:true,
+					fireAttack:true,
 					skillTagFilter:function(player){
 						if(player.hasSkill('guhuo_phase')) return false;
 					},
+					threaten:1.2,
 				},
 			},
 			"guhuo_guess":{

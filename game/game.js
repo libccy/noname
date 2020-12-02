@@ -9775,16 +9775,21 @@
 			},
 		},
 		translate:{
+			flower:'鲜花',
+			egg:'鸡蛋',
+			wine:'酒杯',
+			shoe:'拖鞋',
+			yuxis:'玉玺',
+			shoukao:'枷锁',
 			junk:'平凡',
 			common:'普通',
 			rare:'精品',
 			epic:'史诗',
 			legend:'传说',
-			'default':"默认",
+			default:"默认",
 			special:'特殊',
 			zhenfa:'阵法',
 			aozhan:"鏖战",
-			"aozhan_info":"",
 			mode_derivation_card_config:'衍生',
 			mode_banned_card_config:'禁卡',
 			mode_favourite_character_config:'收藏',
@@ -9859,6 +9864,7 @@
 			equip3:'防御马',
 			equip4:'攻击马',
 			equip5:'宝物',
+			equip6:'坐骑',
 			zero:'零',
 			one:'一',
 			two:'二',
@@ -11742,17 +11748,19 @@
 						if(game.modeSwapPlayer&&!_status.auto&&player.isUnderControl()){
 							game.modeSwapPlayer(player);
 						}
-						game.check();
 						if(event.isMine()){
-							game.pause();
-							if(event.openskilldialog){
-								event.skillDialog=ui.create.dialog(event.openskilldialog);
-								delete event.openskilldialog;
-								event.dialog=event.prompt;
-							}
-							else{
-								if(event.prompt) event.dialog=ui.create.dialog(event.prompt);
-								if(event.prompt2) event.dialog.addText(event.prompt2);
+							var ok=game.check();
+							if(!ok){
+								game.pause();
+								if(event.openskilldialog){
+									event.skillDialog=ui.create.dialog(event.openskilldialog);
+									delete event.openskilldialog;
+									event.dialog=event.prompt;
+								}
+								else{
+									if(event.prompt) event.dialog=ui.create.dialog(event.prompt);
+									if(event.prompt2) event.dialog.addText(event.prompt2);
+								}
 							}
 						}
 						else if(event.isOnline()){
@@ -11764,19 +11772,30 @@
 					}
 					"step 1"
 					if(event.result=='ai'){
-						game.check();
-						if(ai.basic.chooseCard(event.ai)||forced){
+						var ok=game.check();
+						if(ok){
 							ui.click.ok();
 						}
-						else if(event.skill){
+						else if(ai.basic.chooseCard(event.ai)){
+							ui.click.ok();
+							event._aiexcludeclear=true;
+						}
+						else if(event.skill&&!event.norestore){
 							var skill=event.skill;
 							ui.click.cancel();
 							event._aiexclude.add(skill);
+							var info=get.info(skill);
+							if(info.sourceSkill){
+								event._aiexclude.add(info.sourceSkill);
+							}
 							event.redo();
 							game.resume();
 						}
 						else{
 							ui.click.cancel();
+						}
+						if(event.aidelay&&event.result&&event.result.bool){
+							game.delayx();
 						}
 					}
 					"step 2"
@@ -12777,7 +12796,7 @@
 							ui.click.cancel();
 						}
 					}
-					if(event.result.bool){
+					if(event.result.bool&&event.animate!==false){
 						for(var i=0;i<event.result.targets.length;i++){
 							event.result.targets[i].animate('target');
 						}
@@ -12836,7 +12855,7 @@
 					}
 					"step 2"
 					event.resume();
-					if(event.result.bool){
+					if(event.result.bool&&event.animate!==false){
 						for(var i=0;i<event.result.targets.length;i++){
 							event.result.targets[i].animate('target');
 						}
@@ -15681,6 +15700,32 @@
 			},
 			player:{
 				//新函数
+				$throwEmotion:function(target,name){
+					game.addVideo('throwEmotion',this,[target.dataset.position,name]);
+					var getLeft=function(player){
+						if(player==game.me&&!ui.fakeme) return player.node.avatar.offsetWidth/2;
+						return player.offsetLeft+player.offsetWidth/2;
+					}
+					var player=this;
+					var emotion=ui.create.div('','<img src="'+lib.assetURL+'image/emotion/throw_emotion/'+name+'1.png">',ui.window);
+					var width=30;
+					var height=30;
+					var left=getLeft(player)-width;
+					var top=player.offsetTop+player.offsetHeight/3-height;
+					emotion.style.left=left+'px';
+					emotion.style.top=top+'px';
+					var left2=getLeft(target)-width;
+					var top2=target.offsetTop+target.offsetHeight/3-height;
+					emotion.style['z-index']=10;
+					emotion.style.transform='translateY('+(top2-top)+'px) translateX('+(left2-left)+'px)';
+					if(lib.config.background_audio) game.playAudio('effect','throw_'+name+get.rand(1,2));
+					setTimeout(function(){
+						emotion.innerHTML=('<img src="'+lib.assetURL+'image/emotion/throw_emotion/'+name+'2.png">');
+						setTimeout(function(){
+							emotion.delete();
+						},1200);
+					},600);
+				},
 				trySkillAnimate:function(name,popname,checkShow){
 					if(!game.online&&lib.config.skill_animation_type!='off'&&lib.skill[name]&&lib.skill[name].skillAnimation){
 						if(lib.config.skill_animation_type=='default'){
@@ -16461,6 +16506,11 @@
 					this.playerid=get.id();
 					game.playerMap[this.playerid]=this;
 					return this;
+				},
+				throwEmotion:function(target,emotion){
+					game.broadcastAll(function(player,target,emotion){
+						player.$throwEmotion(target,emotion);
+					},this,target,emotion);
 				},
 				emotion:function(pack,id){
 					var str='<img src="##assetURL##image/emotion/'+pack+'/'+id+'.gif" width="50" height="50">';
@@ -25070,6 +25120,7 @@
 				'chooseBoolBegin','choosePlayerCardBegin','discardPlayerCardBegin','gainPlayerCardBegin']},
 				forced:true,
 				priority:100,
+				forceDie:true,
 				popup:false,
 				filter:function(event,player){
 					if(event.autochoose&&event.autochoose()) return false;
@@ -25834,6 +25885,12 @@
 							}
 							game.updateWaiting();
 						}
+					}
+				},
+				throwEmotion:function(target,emotion){
+					var player=lib.playerOL[this.id];
+					if(player){
+						player.throwEmotion(target,emotion);
 					}
 				},
 				emotion:function(id,pack,emotion){
@@ -28768,6 +28825,14 @@
 			flame:function(player,type){
 				if(player&&type){
 					player['$'+type]();
+				}
+				else{
+					console.log(player);
+				}
+			},
+			throwEmotion:function(player,content){
+				if(player&&content){
+					player.$throwEmotion(game.playerMap[content[0]],content[1]);
 				}
 				else{
 					console.log(player);
@@ -46822,6 +46887,7 @@
 				var layer=ui.create.div('.poplayer',ui.window);
 				var clicklayer=function(e){
 					if(_status.touchpopping) return;
+					delete ui.throwEmotion;
 					delete _status.removePop;
 					uiintro.delete();
 					this.remove();
@@ -50386,6 +50452,62 @@
 						}
 					}
 				}
+				if(!game.observe&&_status.gameStarted&&game.me&&node!=game.me){
+					ui.throwEmotion=[];
+					uiintro.addText('发送交互表情');
+					var click=function(){
+						if(_status.dragged) return;
+						if(_status.justdragged) return;
+						if(_status.throwEmotionWait) return;
+						var emotion=this.link;
+						if(game.online){
+							game.send('throwEmotion',node,emotion);
+						}
+						else game.me.throwEmotion(node,emotion);
+						uiintro._close();
+						_status.throwEmotionWait=true;
+						setTimeout(function(){
+							_status.throwEmotionWait=false;
+							if(ui.throwEmotion){
+								for(var i of ui.throwEmotion) i.classList.remove('exclude');
+							}
+						},(emotion=='flower'||emotion=='egg')?5000:10000)
+					};
+					var td;
+					var table=document.createElement('div');
+					table.classList.add('add-setting');
+					table.style.margin='0';
+					table.style.width='100%';
+					table.style.position='relative';
+					var listi=['flower','egg'];
+					for(var i=0;i<listi.length;i++){
+						td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
+						ui.throwEmotion.add(td);
+						if(_status.throwEmotionWait) td.classList.add('exclude');
+						td.link=listi[i];
+						table.appendChild(td);
+						td.innerHTML='<span>'+get.translation(listi[i])+'</span>';
+						td.addEventListener(lib.config.touchscreen?'touchend':'click',click);
+					}
+					uiintro.content.appendChild(table);
+					table=document.createElement('div');
+					table.classList.add('add-setting');
+					table.style.margin='0';
+					table.style.width='100%';
+					table.style.position='relative';
+					var listi=['wine','shoe'];
+					if(game.me.storage.zhuSkill_shanli) listi=['yuxis','shoukao'];
+					for(var i=0;i<listi.length;i++){
+						td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
+						ui.throwEmotion.add(td);
+						if(_status.throwEmotionWait) td.classList.add('exclude');
+						td.link=listi[i];
+						table.appendChild(td);
+						td.innerHTML='<span>'+get.translation(listi[i])+'</span>';
+						td.addEventListener(lib.config.touchscreen?'touchend':'click',click);
+					}
+					uiintro.content.appendChild(table);
+				}
 				var modepack=lib.characterPack['mode_'+get.mode()];
 				if(lib.config.show_favourite&&lib.character[node.name]&&game.players.contains(node)&&
 					(!modepack||!modepack[node.name])&&(!simple||get.is.phoneLayout())){
@@ -51764,7 +51886,7 @@
 				return -1.5;
 			}
 			if(player.getCards('e').contains(card)){
-				var evalue=get.equipValue(card);
+				var evalue=get.value(card,player);
 				if(player.hasSkillTag('noe')){
 					if(evalue>=7){
 						return evalue/6;

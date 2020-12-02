@@ -226,6 +226,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.map[id].addArray(event.list2.randomRemove(1));
 						event.list.removeArray(event.map[id]);
 						event.map[id].addArray(event.list.randomRemove(4-event.map[id].length));
+						event.list2.removeArray(event.map[id]);
 					}
 					event.dialog=ui.create.dialog('你的选将框',[event.map[game.me.playerid],'character']);
 					event.start=game.players.randomGet();
@@ -893,6 +894,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.map[id].addArray(event.list2.randomRemove(1));
 						event.list.removeArray(event.map[id]);
 						event.map[id].addArray(event.list.randomRemove(4-event.map[id].length));
+						event.list2.removeArray(event.map[id]);
 					}
 					_status.characterlist=event.list.slice(0);
 					event.videoId=lib.status.videoId++;
@@ -1161,7 +1163,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		get:{
-			attitude:function(from,to){
+			rawAttitude:function(from,to){
 				if(from.identity==to.identity) return 10;
 				return -10;
 			},

@@ -1090,12 +1090,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							if(get.attitude(player,target)<=0) return (target.countCards('he',function(card){
-								return card.name=='tengjia'||get.value(card)>0;
+								return get.value(card,target)>0&&card!=target.getEquip('jinhe');
 							})>0)?-1.5:1.5;
 							var js=target.getCards('j');
 							if(js.length){
 								var jj=js[0].viewAs?{name:js[0].viewAs}:js[0];
-								if(jj.name=='shunshou') return 3;
+								//if(jj.name=='shunshou') return 3;
 								if(js.length==1&&get.effect(target,jj,target,player)>=0){
 									return -1.5;
 								}
@@ -1104,14 +1104,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							return -1.5;
 						},
 						player:function(player,target){
-							if(get.attitude(player,target)<0&&!target.countCards('he')){
+							if(get.attitude(player,target)<0&&!target.countCards('he',function(card){
+								return get.value(card,target)>0&&card!=target.getEquip('jinhe');
+							})){
 								return 0;
 							}
 							if(get.attitude(player,target)>1){
 								var js=target.getCards('j');
 								if(js.length){
 									var jj=js[0].viewAs?{name:js[0].viewAs}:js[0];
-									if(jj.name=='shunshou') return 1;
+									//if(jj.name=='shunshou') return 1;
 									if(js.length==1&&get.effect(target,jj,target,player)>=0){
 										return 0;
 									}
@@ -1189,7 +1191,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var es=target.getCards('e');
 							var noe=(es.length==0||target.hasSkillTag('noe'));
 							var noe2=(es.filter(function(esx){
-							return esx.name=='tengjia'||get.value(esx)>0
+								return get.value(esx,target)>0;
 							}).length==0);
 							var noh=(nh==0||target.hasSkillTag('noh'));
 							if(noh&&(noe||noe2)) return 0;

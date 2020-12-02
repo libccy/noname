@@ -7234,8 +7234,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					save:true,
 					respondSha:true,
+					fireAttack:true,
 					respondShan:true,
 					skillTagFilter:function(player,tag,arg){
+						if(tag=='fireAttack') return true;
 						if(player.hasCard(function(card){
 							return get.color(card)=='black'&&get.type(card)!='basic';
 						},'he')){
@@ -9416,7 +9418,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							else{
-								if(att<=0){
+								if(att<=0&&source.countCards('e',function(card){
+									return get.value(card,source)>0&&get.effect(player,card,player,player)>0;
+								})){
 									return '移动装备';
 								}
 							}
@@ -9432,8 +9436,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.control=='移动装备'){
 						player.logSkill('qieting',trigger.player);
-						player.choosePlayerCard(trigger.player,'e','将一张装备牌移至你的装备区').set('filterButton',function(button){
+						player.choosePlayerCard(trigger.player,'e','将一张装备牌移至你的装备区',true).set('filterButton',function(button){
 							return _status.event.player.isEmpty(get.subtype(button.link));
+						}).set('ai',function(button){
+							return get.effect(player,button.link,player,player);
 						});
 					}
 					else{
