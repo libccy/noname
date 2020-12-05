@@ -433,6 +433,8 @@ window.noname_character_rank={
 		'sp_key_yuri',
 		'tw_beimihu',
 		'ns_caoshuang',
+		'key_shizuku',
+		'luyusheng',
 	],
 	bp:[
 		'chess_diaochan',
@@ -913,6 +915,7 @@ window.noname_character_rank={
 		'niujin',
 		'ns_lijue',
 		'ns_zhangji',
+		'ol_dingyuan',
 	],
 	c:[
 		'xiahoudun',
@@ -1239,6 +1242,7 @@ window.noname_character_rank={
 			'key_rei',
 			'key_yusa',
 			'key_misa',
+			'key_shizuku',
 			'kaisa',
 		],
 		rare:[

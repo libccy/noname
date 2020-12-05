@@ -147,10 +147,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						useful:[5,1],
 						value:[5,1],
 					},
-					order:function(item){
-						if(_status.event.player.hasSkillTag('presha',true,null,true)) return 10;
-						if(lib.linked.contains(get.nature(item))) return 3.1;
-						return 3;
+					order:function(item,player){
+						if(player.hasSkillTag('presha',true,null,true)) return 10;
+						if(lib.linked.contains(get.nature(item))) return (player.getCardUsable('sha')>1?3:3.1);
+						return 3.05;
 					},
 					result:{
 						target:function(player,target,card,isLink){

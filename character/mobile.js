@@ -333,6 +333,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.swapSeat(target1,target2);
 					},targets[0],targets[1])
 				},
+				ai:{
+					order:1,
+					result:{
+						target:function(player,target){
+							if(player.hasUnknown()&&target!=player.next&&target!=player.previous) return 0;
+							var distance=Math.pow(get.distance(player,target,'absolute'),2);
+							if(!ui.selected.targets.length) return distance;
+							var distance2=Math.pow(get.distance(player,ui.selected.targets[0],'absolute'),2);
+							return Math.min(0,distance-distance2);
+						}
+					},
+				},
 			},
 			jinglve:{
 				audio:2,
@@ -441,7 +453,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('shanli');
 					player.loseMaxHp();
 					player.chooseTarget(true,'选择【擅立】的目标').set('ai',function(target){
-						return get.attitude(_status.event.player,target);
+						var att=get.attitude(_status.event.player,target);
+						if(target==game.me||target.isUnderControl()&&target.isOnline()) return 2*att;
+						return att;
 					});
 					'step 1'
 					var target=result.targets[0];

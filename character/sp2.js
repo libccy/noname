@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			luyusheng:['female','wu',3,['sicong','xianzhao'],['unseen']],
 			ol_dingyuan:['male','qun',4,['weihuan','shouchong'],['unseen']],
 			liubian:['male','qun',3,['shiyuan','dushi']],
 			xin_baosanniang:['female','shu',3,['xinfu_wuniang','decadexushen']],
@@ -72,6 +73,176 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			sicong:{
+				audio:2,
+				enable:'phaseUse',
+				getResult:function(cards){
+					var l=cards.length;
+					var all=Math.pow(l,2);
+					var list=[];
+					for(var i=1;i<all;i++){
+						var array=[];
+						for(var j=0;j<l;j++){
+							if(Math.floor((i%Math.pow(2,j+1))/Math.pow(2,j))>0) array.push(cards[j])
+						}
+						var num=0;
+						for(var k of array){
+							num+=get.number(k);
+						}
+						if(num==13) list.push(array);
+					}
+					if(list.length){
+						list.sort(function(a,b){
+							if(a.length!=b.length) return b.length-a.length;
+							return get.value(a)-get.value(b);
+						});
+						return list[0];
+					}
+					return list;
+				},
+				usable:1,
+				filterCard:function(card){
+					var num=0;
+					for(var i=0;i<ui.selected.cards.length;i++){
+						num+=get.number(ui.selected.cards[i]);
+					}
+					return get.number(card)+num<=13;
+				},
+				complexCard:true,
+				selectCard:function(){
+					var num=0;
+					for(var i=0;i<ui.selected.cards.length;i++){
+						num+=get.number(ui.selected.cards[i]);
+					}
+					if(num==13) return ui.selected.cards.length;
+					return ui.selected.cards.length+2;
+				},
+				check:function(card){
+					var evt=_status.event;
+					if(!evt.sicong_choice) evt.sicong_choice=lib.skill.sicong.getResult(evt.player.getCards('he'));
+					if(!evt.sicong_choice.contains(card)) return 0;
+					return 1;
+				},
+				position:'he',
+				content:function(){
+					'step 0'
+					player.draw(cards.length*2);
+					'step 1'
+					if(get.itemtype(result)=='cards'){
+						player.addTempSkill('sicong2');
+						player.markAuto('sicong2',result);
+					}
+				},
+				ai:{
+					order:5,
+					result:{player:1},
+				},
+			},
+			sicong2:{
+				intro:{
+					mark:function(dialog,content,player){
+						if(content&&content.length){
+							if(player==game.me||player.isUnderControl()){
+								dialog.addAuto(content);
+							}
+							else{
+								return '本回合以此法获得了'+get.cnNumber(content.length)+'张牌';
+							}
+						}
+					},
+					content:'cards',
+				},
+				onremove:true,
+				mod:{
+					targetInRange:function(card,player,target){
+						if(!card.cards) return;
+						var storage=player.getStorage('sicong2');
+						for(var i of card.cards){
+							if(!storage.contains(i)||get.color(i)!='black') return;
+						}
+						return true;
+					},
+					cardUsable:function(card,player,target){
+						if(!card.cards) return;
+						var storage=player.getStorage('sicong2');
+						for(var i of card.cards){
+							if(!storage.contains(i)||get.color(i)!='black') return;
+						}
+						return Infinity;
+					},
+					ignoredHandcard:function(card,player){
+						if(player.getStorage('sicong2').contains(card)&&get.color(card)=='red'){
+							return true;
+						}
+					},
+					cardDiscardable:function(card,player,name){
+						if(name=='phaseDiscard'&&player.getStorage('sicong2').contains(card)&&get.color(card)=='red'){
+							return false;
+						}
+					},
+					aiOrder:function(player,card,num){
+						if(player.getStorage('sicong2').contains(card)&&get.color(card)=='black') return num-0.1;
+					},
+				},
+			},
+			xianzhao:{
+				audio:2,
+				trigger:{player:'damageEnd'},
+				frequent:true,
+				content:function(){
+					'step 0'
+					player.judge();
+					'step 1'
+					var num=result.number;
+					var next=player.chooseToDiscard('是否弃置任意张点数之和为'+get.cnNumber(num)+'的牌并回复1点体力？',function(card){
+						var num=0;
+						for(var i=0;i<ui.selected.cards.length;i++){
+							num+=get.number(ui.selected.cards[i]);
+						}
+						return get.number(card)+num<=_status.event.num;
+					},'he');
+					next.set('num',num);
+					next.set('complexCard',true);
+					next.set('selectCard',function(){
+						var num=0;
+						for(var i=0;i<ui.selected.cards.length;i++){
+							num+=get.number(ui.selected.cards[i]);
+						}
+						if(num==_status.event.num) return ui.selected.cards.length;
+						return ui.selected.cards.length+2;
+					});
+					next.set('cardResult',function(){
+						var cards=player.getCards('he');
+						var l=cards.length;
+						var all=Math.pow(l,2);
+						var list=[];
+						for(var i=1;i<all;i++){
+							var array=[];
+							for(var j=0;j<l;j++){
+								if(Math.floor((i%Math.pow(2,j+1))/Math.pow(2,j))>0) array.push(cards[j])
+							}
+							var numx=0;
+							for(var k of array){
+								numx+=get.number(k);
+							}
+							if(numx==13) list.push(array);
+						}
+						if(list.length){
+							list.sort(function(a,b){
+								return get.value(a)-get.value(b);
+							});
+							return list[0];
+						}
+						return list;
+					}());
+					next.set('ai',function(card){
+						if(!_status.event.cardResult.contains(card)) return 0;
+						return 6-get.value(card);
+					});
+					'step 2'
+					if(result.bool) player.recover();
+				},
+			},
 			weihuan:{
 				trigger:{player:'phaseZhunbeiBegin'},
 				direct:true,
@@ -5871,6 +6042,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhujun:'朱儁（？－195年），字公伟。会稽郡上虞县（今浙江绍兴上虞区）人。东汉末年名将。朱儁出身寒门，赡养母亲，以好义轻财闻名，受乡里敬重。后被太守徐珪举为孝廉，任兰陵令，颇有治绩。再升任交州刺史，以家兵五千大破叛军，平定交州。战后以功封都亭侯，入朝为谏议大夫。光和七年（184年），黄巾起义爆发，朱儁以右中郎将、持节平定三郡之地，以功进封西乡侯，迁镇贼中郎将。又率军讨平黄巾，“威声满天下”。中平二年（185年），进拜右车骑将军，更封钱塘侯。后为河内太守，击退进逼的张燕。权臣董卓秉政时，想任朱儁为副手，遭其婉拒。其后出逃荆州，更屯军中牟，徐州刺史陶谦等欲推举他为太师，并传檄各州牧伯，相邀讨伐李傕、奉迎天子。但朱儁却奉诏入京任太仆。初平三年（192年），升任太尉、录尚书事。兴平元年（194年），行骠骑将军事，持节镇关东，因故未成行。兴平二年（195年），李傕与郭汜相互攻杀，郭汜扣留朱儁作为人质。朱儁性格刚烈，即日发病而死。',
 			liuhong:'汉灵帝刘宏（157年，一作156年－189年5月13日），生于冀州河间国（今河北深州）。东汉第十二位皇帝（168年－189年在位），汉章帝刘炟的玄孙。刘宏早年世袭解渎亭侯。永康元年（167年）十二月，汉桓帝刘志逝世，刘宏被外戚窦氏挑选为皇位继承人，于建宁元年（168年）正月即位。刘宏在位的大部分时期，施行党锢及宦官政治。他又设置西园，巧立名目搜刮钱财，甚至卖官鬻爵以用于自己享乐。在位晚期，爆发了黄巾起义，而凉州等地也陷入持续动乱之中。中平六年（189年），刘宏去世，谥号孝灵皇帝，葬于文陵。刘宏喜好辞赋，作有《皇羲篇》、《追德赋》、《令仪颂》、《招商歌》等。',
 			liubian:'刘辩（176年－190年3月6日），是汉灵帝刘宏与何皇后的嫡长子。刘辩在灵帝驾崩后继位为帝，史称少帝，由于年幼，实权掌握在临朝称制的母亲何太后和母舅大将军何进手中。少帝在位时期，东汉政权已经名存实亡，他即位后不久即遭遇以何进为首的外戚集团和以十常侍为首的内廷宦官集团这两大敌对政治集团的火并，被迫出宫，回宫后又受制于以“勤王”为名进京的凉州军阀董卓，终于被废为弘农王，成为东汉唯一被废黜的皇帝，其同父异母弟陈留王刘协继位为帝，是为汉献帝。被废黜一年之后，刘辩在董卓胁迫下自尽，时年仅十五岁（一说十八岁），其弟献帝追谥他为怀王。中国古代的史书中称刘辩为皇子辩、少帝和弘农王等。因为在位不逾年，传统上称东汉共十二帝，刘辩与东汉另一位少帝刘懿都不在其中，亦皆无本纪；不过，现代史学界也有观点承认两位少帝均是汉朝皇帝，则刘辩为东汉第十三位皇帝。',
+			luyusheng:'陆郁生（？年-？），三国时期吴国官员陆绩之女。陆郁生的父亲陆绩是吴郡公认的才子，又是当时吴郡陆氏的领袖。陆绩赴任担任郁林太守，遂取此名。陆郁生年少的时候就定下坚贞的志向。建安二十四年（219年)，陆绩早亡，她与两个兄弟陆宏、陆睿当时都只有几岁，一起返回吴县，被他们的从兄陆瑁接回抚养。13周岁的陆郁生嫁给同郡出身的张白为妻。出嫁3个月后，张白因为其兄张温一族的案件遭到连坐，被处以流刑，后死于流放地，陆郁生成为了寡妇，其后公开宣言不再改嫁，困难于生计但拒绝了所有提亲，在艰苦中从未停止服侍、照顾张白的姐妹。事情传到朝廷，皇帝褒奖陆郁生，号其为“义姑”。她的表侄姚信在文集中称赞她的义举。',
 		},
 		characterTitle:{
 			wulan:'#b对决限定武将',
@@ -6230,7 +6402,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			panshi_info:'锁定技，准备阶段，你交给有“为患”技能的角色一张手牌；你的【杀】对其造成的伤害+1',
 			shouchong:'首冲',
 			shouchong_info:'锁定技，有角色造成伤害后，若此伤害是本轮第一次造成伤害，且伤害来源是其他角色，则你摸一张牌；若伤害来源是你，则你对受伤角再造成1点伤害。',
-			
+			luyusheng:'陆郁生',
+			sicong:'思聪',
+			sicong2:'思聪',
+			sicong_info:'出牌阶段限一次，你可以弃置任意张点数之和为13的牌，然后摸两倍数量的牌。以此法获得的牌中，黑色牌本回合无距离和次数限制，红色牌本回合不计入手牌上限。',
+			xianzhao:'先兆',
+			xianzhao_info:'当你受到伤害后，你可以进行一次判定，然后若你弃置任意张点数之和与判定结果点数相同的牌，你回复1点体力。',
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",
