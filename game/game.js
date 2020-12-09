@@ -45,6 +45,7 @@
 		characterPack:{},
 		characterFilter:{},
 		characterSort:{},
+		characterReplace:{},
 		dynamicTranslate:{},
 		cardPack:{},
 		onresize:[],
@@ -9779,7 +9780,7 @@
 			egg:'鸡蛋',
 			wine:'酒杯',
 			shoe:'拖鞋',
-			yuxis:'玉玺',
+			yuxisx:'玉玺',
 			shoukao:'枷锁',
 			junk:'平凡',
 			common:'普通',
@@ -24525,7 +24526,7 @@
 				return true;
 			},
 			characterDisabled:function(i,libCharacter){
-				if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) return true;
+				if(!lib.character[i]||lib.character[i][4]&&lib.character[i][4].contains('forbidai')) return true;
 				if(lib.character[i][4]&&lib.character[i][4].contains('unseen')) return true;
 				if(lib.config.forbidai.contains(i)) return true;
 				if(lib.characterFilter[i]&&!lib.characterFilter[i](get.mode())) return true;
@@ -24584,6 +24585,7 @@
 			},
 			characterDisabled2:function(i){
 				var info=lib.character[i];
+				if(!info) return true;
 				if(info[4]){
 					if(info[4].contains('boss')) return true;
 					if(info[4].contains('hiddenboss')) return true;
@@ -43183,7 +43185,7 @@
 					node.link=item;
 					break;
 
-					case 'character':case 'player':
+					case 'character':case 'player':case 'characterx':
 					if(node){
 						node.classList.add('button');
 						node.classList.add('character');
@@ -43192,79 +43194,117 @@
 					else{
 						node=ui.create.div('.button.character',position);
 					}
+					node._link=item;
+					if(_status.noReplaceCharacter&&type=='characterx') type='character';
+					if(type=='characterx'){
+						if(lib.characterReplace[item]&&lib.characterReplace[item].length) item=lib.characterReplace[item][0];
+					}
 					node.link=item;
-					if(type=='character'){
-						node.setBackground(item,'character');
-						node.node={
-							name:ui.create.div('.name',node),
-							hp:ui.create.div('.hp',node),
-							intro:ui.create.div('.intro',node),
-							group:ui.create.div('.identity',node)
-						}
-						var infoitem=lib.character[item];
-						if(!infoitem){
-							for(var itemx in lib.characterPack){
-								if(lib.characterPack[itemx][item]){
-									infoitem=lib.characterPack[itemx][item];break;
+					if(type=='character'||type=='characterx'){
+						if(type=='characterx'&&lib.characterReplace[node._link]&&lib.characterReplace[node._link].length>1) node._replaceButton=true;
+						var func=function(node,item){
+							node.setBackground(item,'character');
+							if(node.node){
+								node.node.name.remove();
+								node.node.hp.remove();
+								node.node.group.remove();
+								node.node.intro.remove();
+								if(node.node.replaceButton) node.node.replaceButton.remove();
+							}
+							node.node={
+								name:ui.create.div('.name',node),
+								hp:ui.create.div('.hp',node),
+								group:ui.create.div('.identity',node),
+								intro:ui.create.div('.intro',node),
+							};
+							var infoitem=lib.character[item];
+							if(!infoitem){
+								for(var itemx in lib.characterPack){
+									if(lib.characterPack[itemx][item]){
+										infoitem=lib.characterPack[itemx][item];break;
+									}
 								}
 							}
-						}
-						node.node.name.innerHTML=get.slimName(item);
-						if(lib.config.buttoncharacter_style=='default'||lib.config.buttoncharacter_style=='simple'){
-							if(lib.config.buttoncharacter_style=='simple'){
+							node.node.name.innerHTML=get.slimName(item);
+							if(lib.config.buttoncharacter_style=='default'||lib.config.buttoncharacter_style=='simple'){
+								if(lib.config.buttoncharacter_style=='simple'){
+									node.node.group.style.display='none';
+								}
+								node.node.name.dataset.nature=get.groupnature(infoitem[1]);
+								node.node.group.dataset.nature=get.groupnature(infoitem[1],'raw');
+								node.classList.add('newstyle');
+								ui.create.div(node.node.hp);
+								var textnode=ui.create.div('.text',get.numStr(infoitem[2]),node.node.hp);
+								if(infoitem[2]==0){
+									node.node.hp.hide();
+								}
+								else if(get.infoHp(infoitem[2])<=3){
+									node.node.hp.dataset.condition='mid';
+								}
+								else{
+									node.node.hp.dataset.condition='high';
+								}
+							}
+							else{
+								var hp=get.infoHp(infoitem[2]);
+								var maxHp=get.infoMaxHp(infoitem[2]);
+								if(maxHp>14){
+									if(typeof infoitem[2]=='string') node.node.hp.innerHTML=infoitem[2];
+									else node.node.hp.innerHTML=get.numStr(infoitem[2]);
+									node.node.hp.classList.add('text');
+								}
+								else{
+									for(var i=0;i<maxHp;i++){
+										var next=ui.create.div('',node.node.hp);
+										if(i>=hp) next.classList.add('exclude');
+									}
+								}
+							}
+							if(node.node.hp.childNodes.length==0){
+								node.node.name.style.top='8px';
+							}
+							if(node.node.name.querySelectorAll('br').length>=4){
+								node.node.name.classList.add('long');
+								if(lib.config.buttoncharacter_style=='old'){
+									node.addEventListener('mouseenter',ui.click.buttonnameenter);
+									node.addEventListener('mouseleave',ui.click.buttonnameleave);
+								}
+							}
+							node.node.intro.innerHTML=lib.config.intro;
+							if(!noclick){
+								lib.setIntro(node);
+							}
+							if(infoitem[1]){
+								node.node.group.innerHTML='<div>'+get.translation(infoitem[1])+'</div>';
+								node.node.group.style.backgroundColor=get.translation(infoitem[1]+'Color');
+							}
+							else{
 								node.node.group.style.display='none';
 							}
-							node.node.name.dataset.nature=get.groupnature(infoitem[1]);
-							node.node.group.dataset.nature=get.groupnature(infoitem[1],'raw');
-							node.classList.add('newstyle');
-							ui.create.div(node.node.hp);
-							var textnode=ui.create.div('.text',get.numStr(infoitem[2]),node.node.hp);
-							if(infoitem[2]==0){
-								node.node.hp.hide();
+							if(node._replaceButton){
+								var intro=ui.create.div('.button.replaceButton',node);
+								node.node.replaceButton=intro;
+								intro.innerHTML='切换';
+								intro._node=node;
+								intro.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+									_status.tempNoButton=true;
+									var node=this._node;
+									var list=lib.characterReplace[node._link];
+									var link=node.link;
+									var index=list.indexOf(link);
+									if(index==list.length-1) index=0;
+									else index++;
+									link=list[index];
+									node.link=link;
+									node.refresh(node,link);
+									setTimeout(function(){
+										delete _status.tempNoButton;
+									},200);
+								});
 							}
-							else if(get.infoHp(infoitem[2])<=3){
-								node.node.hp.dataset.condition='mid';
-							}
-							else{
-								node.node.hp.dataset.condition='high';
-							}
-						}
-						else{
-							var hp=get.infoHp(infoitem[2]);
-							var maxHp=get.infoMaxHp(infoitem[2]);
-							if(maxHp>14){
-								if(typeof infoitem[2]=='string') node.node.hp.innerHTML=infoitem[2];
-								else node.node.hp.innerHTML=get.numStr(infoitem[2]);
-								node.node.hp.classList.add('text');
-							}
-							else{
-								for(var i=0;i<maxHp;i++){
-									var next=ui.create.div('',node.node.hp);
-									if(i>=hp) next.classList.add('exclude');
-								}
-							}
-						}
-						if(node.node.hp.childNodes.length==0){
-							node.node.name.style.top='8px';
-						}
-						if(node.node.name.querySelectorAll('br').length>=4){
-							node.node.name.classList.add('long');
-							if(lib.config.buttoncharacter_style=='old'){
-								node.addEventListener('mouseenter',ui.click.buttonnameenter);
-								node.addEventListener('mouseleave',ui.click.buttonnameleave);
-							}
-						}
-						node.node.intro.innerHTML=lib.config.intro;
-						if(!noclick){
-							lib.setIntro(node);
-						}
-						if(infoitem[1]){
-							node.node.group.innerHTML='<div>'+get.translation(infoitem[1])+'</div>';
-							node.node.group.style.backgroundColor=get.translation(infoitem[1]+'Color');
-						}
-						else{
-							node.node.group.style.display='none';
-						}
+						};
+						node.refresh=func;
+						node.refresh(node,item);
 					}
 					else{
 						node.node={
@@ -47773,6 +47813,14 @@
 		},
 	};
 	var get={
+		sourceCharacter:function(str){
+			if(str){
+				for(var i in lib.characterReplace){
+					if(lib.characterReplace[i].contains(str)) return i;
+				}
+			}
+			return str;
+		},
 		isLuckyStar:function(player){
 			if(player&&player.hasSkillTag('luckyStar')) return true;
 			if(_status.connectMode) return false;
@@ -50496,7 +50544,7 @@
 					table.style.width='100%';
 					table.style.position='relative';
 					var listi=['wine','shoe'];
-					if(game.me.storage.zhuSkill_shanli) listi=['yuxis','shoukao'];
+					if(game.me.storage.zhuSkill_shanli) listi=['yuxisx','shoukao'];
 					for(var i=0;i<listi.length;i++){
 						td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
 						ui.throwEmotion.add(td);

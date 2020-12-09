@@ -6056,6 +6056,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				return '你可以将两张牌（其中至少一张为基本牌）当做任意基本牌使用或打出。';
 			},
 		},
+		characterReplace:{
+			caochun:['caochun','old_caochun'],
+			majun:['majun','old_majun'],
+			zhanggong:['zhanggong','re_zhanggong'],
+			baosanniang:['xin_baosanniang','re_baosanniang','baosanniang'],
+			heqi:['re_heqi','heqi'],
+			weiwenzhugezhi:['weiwenzhugezhi','re_weiwenzhugezhi'],
+			xugong:['xugong','re_xugong'],
+			liuzan:['re_liuzan','liuzan'],
+			sufei:['sp_sufei','xf_sufei'],
+			jiakui:['jiakui','old_jiakui'],
+		},
 		translate:{
 			liuzan:'手杀留赞',
 			re_sp_zhugeliang:"手杀卧龙",

@@ -229,6 +229,8 @@ window.config={
 		// ['jiushi','kuiwei'],
 		['zishu','xinfu_songsang'],
 		['zishu','shenxing'],
+		['minishendao','luoshen'],
+		['minishendao','reluoshen'],
 		['akane_quanqing','lianying'],
 		['akane_quanqing','relianying'],
 		['akane_quanqing','shangshi'],

@@ -5452,14 +5452,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(event.judgeResult.color=='black') event.getParent().orderingCards.remove(card);
 					});
 					"step 1"
-					if(result.judge>0){
+					if(result.bool){
 						event.cards.push(result.card);
 						player.chooseBool('是否再次发动【洛神】？').set('frequentSkill','reluoshen');
 					}
 					else{
 						for(var i=0;i<event.cards.length;i++){
 							if(get.position(event.cards[i],true)!='o'){
-								event.cards.splice(i,1);i--;
+								event.cards.splice(i,1);
+								i--;
 							}
 						}
 						if(event.cards.length){

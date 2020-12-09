@@ -1602,6 +1602,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					chooseCharacterFixed:true,
 					chooseCharacter:function(list,player){
 						game.versusVideoName='同姓之争';
+						_status.noReplaceCharacter=true;
 						if(player.side==game.me.side){
 							if(_status.brawl.mylist){
 								return _status.brawl.mylist.randomGets(2);
@@ -1750,6 +1751,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					chooseCharacter:function(){
+						_status.noReplaceCharacter=true;
 						if(game.me==game.zhu){
 							return ['re_caocao'];
 						}
@@ -1926,6 +1928,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					submode:'two',
 					chooseCharacterFixed:true,
  				chooseCharacterBefore:function(){
+						_status.noReplaceCharacter=true;
  					game.versusVideoName='家族之争';
  					var map={
  						wei:[],

@@ -1693,7 +1693,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				onremove:true,
 				trigger:{
 					player:['damage','damageCancelled','damageZero'],
-					target:['shaMiss','useCardToExcluded','shaEnd'],
+					source:['damage','damageCancelled','damageZero'],
+					target:['shaMiss','useCardToExcluded','useCardToEnd'],
 					global:['useCardEnd'],
 				},
 				charlotte:true,

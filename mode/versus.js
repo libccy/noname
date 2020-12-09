@@ -1151,15 +1151,28 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						game.players[i].node.identity.dataset.color=game.players[i].side+'zhu';
 					}
+					//22选将框分配
 					var list=[];
-					for(i in lib.character){
-						if(!lib.filter.characterDisabled(i)){
+					var list4=[];
+					for(i in lib.characterReplace){
+						var ix=lib.characterReplace[i];
+						for(var j=0;j<ix.length;j++){
+							if(lib.filter.characterDisabled(ix[j])) ix.splice(j--,1);
+						}
+						if(ix.length){
 							list.push(i);
+							list4.addArray(ix);
+						}
+					}
+					for(i in lib.character){
+						if(!list4.contains(i)&&!lib.filter.characterDisabled(i)){
+							list.push(i);
+							list4.push(i);
 						}
 					}
 					var choose=[];
 					event.list=list;
-					_status.characterlist=list;
+					_status.characterlist=list4;
 
 					var addSetting=function(dialog){
 						dialog.add('选择座位').classList.add('add-setting');
@@ -1253,7 +1266,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.additionaldead=[];
 						basenum*=2;
 					}
-					var dialog=ui.create.dialog(basestr,[characterChoice,'character']);
+					var dialog=ui.create.dialog(basestr,[characterChoice,'characterx']);
 					game.me.chooseButton(true,dialog,basenum).set('onfree',true);
 					if(!_status.brawl||!_status.brawl.noAddSetting){
 						if(get.config('change_identity')){
@@ -1272,7 +1285,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							var buttons=ui.create.div('.buttons');
 							var node=_status.event.dialog.buttons[0].parentNode;
-							_status.event.dialog.buttons=ui.create.buttons(list.randomGets(7),'character',buttons);
+							_status.event.dialog.buttons=ui.create.buttons(list.randomGets(7),'characterx',buttons);
 							_status.event.dialog.content.insertBefore(buttons,node);
 							buttons.animate('start');
 							node.remove();
@@ -1375,9 +1388,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									}
 								}
 								else{
-									game.players[i].init(event.list.randomRemove());
+									var name=event.list.randomRemove();
+									if(lib.characterReplace[name]&&lib.characterReplace[name].length) name=lib.characterReplace[name].randomGet();
+									game.players[i].init(name);
 									if(_status.replacetwo){
-										game.players[i].replacetwo=event.list.randomRemove();
+										var name2=event.list.randomRemove();
+										if(lib.characterReplace[name2]&&lib.characterReplace[name2].length) name2=lib.characterReplace[name2].randomGet();
+										game.players[i].replacetwo=name2;
 									}
 								}
 							}
@@ -3045,12 +3062,47 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					}];
-					var list=get.charactersOL();
+					
+					//22联机分配武将
+					var list=[];
+					var libCharacter={};
+					var list4=[];
+					for(var i=0;i<lib.configOL.characterPack.length;i++){
+						var pack=lib.characterPack[lib.configOL.characterPack[i]];
+						for(var j in pack){
+							if(typeof func=='function'&&func(j)) continue;
+							if(lib.connectBanned.contains(j)) continue;
+							if(lib.character[j]) libCharacter[j]=pack[j];
+						}
+					}
+					for(i in lib.characterReplace){
+						var ix=lib.characterReplace[i];
+						for(var j=0;j<ix.length;j++){
+							if(!libCharacter[ix[j]]||lib.filter.characterDisabled(ix[j],libCharacter)) ix.splice(j--,1);
+						}
+						if(ix.length){
+							list.push(i);
+							list4.addArray(ix);
+						}
+					}
+					game.broadcast(function(list){
+						for(var i in lib.characterReplace){
+							var ix=lib.characterReplace[i];
+							for(var j=0;j<ix.length;j++){
+								if(!list.contains(ix[j])) ix.splice(j--,1);
+							}
+						}
+					},list4);
+					for(i in libCharacter){
+						if(list4.contains(i)||lib.filter.characterDisabled(i,libCharacter)) continue;
+						list.push(i);
+						list4.push(i);
+					}
 					var choose=[];
 					event.list=list;
-					_status.characterlist=list;
+					_status.characterlist=list4;
 					for(var i=0;i<game.players.length;i++){
-						choose.push([game.players[i],['选择角色',[list.randomRemove(7),'character']],true]);
+						choose.push([game.players[i],['选择角色',[list.randomRemove(7),'characterx']],true]);
 					}
 					game.me.chooseButtonOL(choose,function(player,result){
 						if(game.online||player==game.me) player.init(result.links[0]);
@@ -3058,7 +3110,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					for(var i in result){
 						if(result[i]=='ai'){
-							result[i]=event.list.randomRemove();
+							var name=event.list.randomRemove();
+							if(lib.characterReplace[name]&&lib.characterReplace[name].length) name=lib.characterReplace[name].randomGet();
+							result[i]=name;
 						}
 						else{
 							result[i]=result[i].links[0];

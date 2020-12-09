@@ -908,6 +908,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							_status.friendCount.innerHTML='友军: '+get.cnNumber(0);
 							game.over(false);
 						}
+					}
+					else if(game.enemy.isDead()){
+						if(!_status.enemylist.length){
+							_status.enemyCount.innerHTML='敌军: '+get.cnNumber(0);
+							game.over(true);
+						}
+					}
+				},
+				dieAfter2:function(source){
+					var dead=this;
+					if(game.me.isDead()){
+						if(!_status.mylist.length){
+							_status.friendCount.innerHTML='友军: '+get.cnNumber(0);
+							game.over(false);
+						}
 						else{
 							game.pause();
 							_status.deadfriend.push(this);
@@ -1036,7 +1051,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					setTimeout(function(){
 						dead.delete();
 					},500);
-				}
+				},
 			}
 		},
 		beastList:['stone_misha','stone_leiouke','stone_huofu','stone_caoyuanshi','stone_jiewangzhu',

@@ -1005,11 +1005,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					if(_status.event.zhongmode){
+						var listc=list.slice(0,2);
+						for(var i=0;i<listc.length;i++){
+							var listx=lib.characterReplace[listc[i]];
+							if(listx&&listx.length) listc[i]=listx.randomGet();
+						}
 						if(get.config('double_character')){
-							player.init(list[0],list[1]);
+							player.init(listc[0],listc[1]);
 						}
 						else{
-							player.init(list[0]);
+							player.init(listc[0]);
 						}
 						if(player.identity=='mingzhong'){
 							player.hp++;
@@ -1031,6 +1036,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							choice=list[0];
 							choice2=list[1];
 						}
+						if(lib.characterReplace[choice]&&lib.characterReplace[choice].length) choice=lib.characterReplace[choice].randomGet();
+						if(lib.characterReplace[choice2]&&lib.characterReplace[choice2].length) choice2=lib.characterReplace[choice2].randomGet();
 						if(get.config('double_character')){
 							player.init(choice,choice2);
 						}
@@ -1044,30 +1051,40 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else if(player.identity=='zhong'&&(Math.random()<0.5||['sunliang','key_akane'].contains(game.zhu.name))){
+						var listc=list.slice(0);
+						for(var i=0;i<listc.length;i++){
+							var listx=lib.characterReplace[listc[i]];
+							if(listx&&listx.length) listc[i]=listx.randomGet();
+						}
 						var choice=0;
-						for(var i=0;i<list.length;i++){
-							if(lib.character[list[i]][1]==game.zhu.group){
+						for(var i=0;i<listc.length;i++){
+							if(lib.character[listc[i]][1]==game.zhu.group){
 								choice=i;break;
 							}
 						}
 						if(get.config('double_character')){
-							player.init(list[choice],list[choice==0?choice+1:choice-1]);
+							player.init(listc[choice],listc[choice==0?choice+1:choice-1]);
 						}
 						else{
-							player.init(list[choice]);
+							player.init(listc[choice]);
 						}
 					}
 					else{
+						var listc=list.slice(0,2);
+						for(var i=0;i<listc.length;i++){
+							var listx=lib.characterReplace[listc[i]];
+							if(listx&&listx.length) listc[i]=listx.randomGet();
+						}
 						if(get.config('double_character')){
-							player.init(list[0],list[1]);
+							player.init(listc[0],listc[1]);
 						}
 						else{
-							player.init(list[0]);
+							player.init(listc[0]);
 						}
 					}
 					if(back){
-						list.remove(player.name);
-						list.remove(player.name2);
+						list.remove(get.sourceCharacter(player.name));
+						list.remove(get.sourceCharacter(player.name2));
 						for(var i=0;i<list.length;i++){
 							back.push(list[i]);
 						}
@@ -1103,6 +1120,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var list;
 					var list2=[];
 					var list3=[];
+					var list4=[];
 					var identityList;
 					var chosen=lib.config.continue_name||[];
 					game.saveConfig('continue_name');
@@ -1216,7 +1234,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								_status.event.parent.swapnodialog=function(dialog,list){
 									var buttons=ui.create.div('.buttons');
 									var node=dialog.buttons[0].parentNode;
-									dialog.buttons=ui.create.buttons(list,'character',buttons);
+									dialog.buttons=ui.create.buttons(list,'characterx',buttons);
 									dialog.content.insertBefore(buttons,node);
 									buttons.animate('start');
 									node.remove();
@@ -1401,10 +1419,30 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.me.setIdentity();
 						game.me.node.identity.classList.remove('guessing');
 					}
+					//选将框分配
+					for(i in lib.characterReplace){
+						var ix=lib.characterReplace[i];
+						for(var j=0;j<ix.length;j++){
+							if(chosen.contains(ix[j])||lib.filter.characterDisabled(ix[j])) ix.splice(j--,1);
+						}
+						if(ix.length){
+							event.list.push(i);
+							list4.addArray(ix);
+							var bool=false;
+							for(var j of ix){
+								if(lib.character[j][4]&&lib.character[j][4].contains('zhu')){
+									bool=true;break;
+								}
+							}
+							(bool?list2:list3).push(i);
+						}
+					}
 					for(i in lib.character){
+						if(list4.contains(i)) continue;
 						if(chosen.contains(i)) continue;
 						if(lib.filter.characterDisabled(i)) continue;
 						event.list.push(i);
+						list4.push(i);
 						if(lib.character[i][4]&&lib.character[i][4].contains('zhu')){
 							list2.push(i);
 						}
@@ -1414,7 +1452,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					list2.sort(lib.sort.character);
 					event.list.randomSort();
-					_status.characterlist=event.list.slice(0);
+					_status.characterlist=list4.slice(0).randomSort();
 					list3.randomSort();
 					if(_status.brawl&&_status.brawl.chooseCharacterFilter){
 						_status.brawl.chooseCharacterFilter(event.list,list2,list3);
@@ -1428,8 +1466,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					if(game.zhu!=game.me){
 						event.ai(game.zhu,event.list,list2)
-						event.list.remove(game.zhu.name);
-						event.list.remove(game.zhu.name2);
+						event.list.remove(get.sourceCharacter(game.zhu.name));
+						event.list.remove(get.sourceCharacter(game.zhu.name2));
 						if(_status.brawl&&_status.brawl.chooseCharacter){
 							list=_status.brawl.chooseCharacter(event.list,num);
 							if(list===false||list==='nozhu'){
@@ -1476,7 +1514,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(_status.brawl&&_status.brawl.chooseCharacterStr){
 							str=_status.brawl.chooseCharacterStr;
 						}
-						dialog=ui.create.dialog(str,'hidden',[list,'character']);
+						dialog=ui.create.dialog(str,'hidden',[list,'characterx']);
 						if(!_status.brawl||!_status.brawl.noAddSetting){
 							if(get.config('change_identity')){
 								addSetting(dialog);
@@ -1522,6 +1560,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							else{
+								list2.sort(lib.sort.character);
 								list3.randomSort();
 								if(_status.brawl&&_status.brawl.chooseCharacter){
 									list=_status.brawl.chooseCharacter(list2,list3,num);
@@ -1549,7 +1588,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							var buttons=ui.create.div('.buttons');
 							var node=_status.event.dialog.buttons[0].parentNode;
-							_status.event.dialog.buttons=ui.create.buttons(list,'character',buttons);
+							_status.event.dialog.buttons=ui.create.buttons(list,'characterx',buttons);
 							_status.event.dialog.content.insertBefore(buttons,node);
 							buttons.animate('start');
 							node.remove();
@@ -1831,6 +1870,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var list;
 					var list2=[];
 					var list3=[];
+					var list4=[];
 					event.list=[];
 					event.list2=[];
 
@@ -1842,10 +1882,38 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(lib.character[j]) libCharacter[j]=pack[j];
 						}
 					}
+					for(i in lib.characterReplace){
+						var ix=lib.characterReplace[i];
+						for(var j=0;j<ix.length;j++){
+							if(!libCharacter[ix[j]]||lib.filter.characterDisabled(ix[j])) ix.splice(j--,1);
+						}
+						if(ix.length){
+							event.list.push(i);
+							event.list2.push(i);
+							list4.addArray(ix);
+							var bool=false;
+							for(var j of ix){
+								if(libCharacter[j][4]&&libCharacter[j][4].contains('zhu')){
+									bool=true;break;
+								}
+							}
+							(bool?list2:list3).push(i);
+						}
+					}
+					game.broadcast(function(list){
+						for(var i in lib.characterReplace){
+							var ix=lib.characterReplace[i];
+							for(var j=0;j<ix.length;j++){
+								if(!list.contains(ix[j])) ix.splice(j--,1);
+							}
+						}
+					},list4);
 					for(i in libCharacter){
+						if(list4.contains(i)) continue;
 						if(lib.filter.characterDisabled(i,libCharacter)) continue;
 						event.list.push(i);
 						event.list2.push(i);
+						list4.push(i);
 						if(libCharacter[i][4]&&libCharacter[i][4].contains('zhu')){
 							list2.push(i);
 						}
@@ -1853,16 +1921,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							list3.push(i);
 						}
 					}
-					_status.characterlist=event.list.slice(0);
+					_status.characterlist=list4.slice(0);
 					if(event.zhongmode){
 						list=event.list.randomGets(8);
 					}
 					else{
+						list2.sort(lib.sort.character);
 						list=list2.concat(list3.randomGets(5));
 					}
 					var next=game.zhu.chooseButton(true);
 					next.set('selectButton',(lib.configOL.double_character?2:1));
-					next.set('createDialog',['选择角色',[list,'character']]);
+					next.set('createDialog',['选择角色',[list,'characterx']]);
 					next.set('callback',function(player,result){
 						player.init(result.links[0],result.links[1]);
 					});
@@ -1873,10 +1942,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(game.me!=game.zhu){
 						game.zhu.init(result.links[0],result.links[1])
 					}
-					event.list.remove(game.zhu.name);
-					event.list.remove(game.zhu.name2);
-					event.list2.remove(game.zhu.name);
-					event.list2.remove(game.zhu.name2);
+					event.list.remove(get.sourceCharacter(game.zhu.name));
+					event.list.remove(get.sourceCharacter(game.zhu.name2));
+					event.list2.remove(get.sourceCharacter(game.zhu.name));
+					event.list2.remove(get.sourceCharacter(game.zhu.name2));
 
 					if(game.players.length>4){
 						game.zhu.maxHp++;
@@ -1946,7 +2015,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(game.players[i].special_identity){
 								str+='（'+get.translation(game.players[i].special_identity)+'）';
 							}
-							list.push([game.players[i],[str,[event.list.randomRemove(num+num3),'character']],selectButton,true]);
+							list.push([game.players[i],[str,[event.list.randomRemove(num+num3),'characterx']],selectButton,true]);
 						}
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -1957,16 +2026,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i in result){
 						if(result[i]&&result[i].links){
 							for(var j=0;j<result[i].links.length;j++){
-								event.list2.remove(result[i].links[j]);
+								event.list2.remove(get.sourceCharacter(result[i].links[j]));
 							}
 						}
 					}
 					for(var i in result){
 						if(result[i]=='ai'){
 							result[i]=event.list2.randomRemove(lib.configOL.double_character?2:1);
+							for(var j=0;j<result[i].length;j++){
+								var listx=lib.characterReplace[result[i][j]];
+								if(listx&&listx.length) listc[j]=listx.randomGet();
+							}
 						}
 						else{
-							result[i]=result[i].links
+							result[i]=result[i].links;
 						}
 						if(lib.character[result[i][0]]&&lib.character[result[i][0]][1]=='shen') shen.push(lib.playerOL[i]);
 					}

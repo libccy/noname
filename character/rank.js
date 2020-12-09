@@ -253,6 +253,7 @@ window.noname_character_rank={
 		'key_shiroha',
 		'key_shiori',
 		'key_iwasawa',
+		'mini_zhugeliang',
 	],
 	am:[
 		'diy_caiwenji',
@@ -435,6 +436,7 @@ window.noname_character_rank={
 		'ns_caoshuang',
 		'key_shizuku',
 		'luyusheng',
+		'mini_lvbu',
 	],
 	bp:[
 		'chess_diaochan',
@@ -615,6 +617,8 @@ window.noname_character_rank={
 		'nashime',
 		'ns_huangchengyan',
 		'ns_yuanxi',
+		'mini_sunquan',
+		'mini_zuoci',
 	],
 	b:[
 		'diy_feishi',
@@ -1217,6 +1221,9 @@ window.noname_character_rank={
 			'liubian',
 			'simashi',
 			'yanghuiyu',
+			'mini_zuoci',
+			'mini_lvbu',
+			'mini_zhugeliang',
 			'key_haruko',
 			'key_akiko',
 			'key_sunohara',
@@ -1483,6 +1490,7 @@ window.noname_character_rank={
 			'ns_zhangji',
 			'ns_fanchou',
 			'xin_zhuran',
+			'mini_sunquan',
 		],
 		junk:[
 			'sunshao',

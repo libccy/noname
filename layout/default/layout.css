@@ -1974,6 +1974,22 @@ div:not(.handcards)>.card>.info>span,
     transform: none !important;
 	text-shadow: black 0 0 2px, black 0 0 3px;
 }
+
+.button.replaceButton,
+.button.replaceButton.text{
+	left: 2px;
+	top: auto;
+	text-align: center;
+	width: 42px;
+	right: auto;
+	bottom: 3px;
+	background-image: linear-gradient(rgba(150, 47, 47, 1), rgba(132, 43, 43, 1));
+	border-radius: 3px;
+}
+.button.replaceButton>div{
+	width: 10px;
+	height: 10px;
+}
 /*--------确认--------*/
 #control {
 	text-align: center;
@@ -3356,7 +3372,7 @@ div:not(.handcards)>.card>.info>span,
 #arena.selecting:not(.video) #me .card:not(.selectable)>.info,
 #arena.selecting:not(.video) #me .card:not(.selectable)>.range,
 #arena.selecting:not(.video) #me .card:not(.selectable)>.addinfo,
-#arena.selecting:not(.video) .dialog:not(.noselect) .button:not(.selectable):not(.noclick),
+#arena.selecting:not(.video) .dialog:not(.noselect) .button:not(.selectable):not(.noclick):not(.replaceButton),
 .dead,.likedead {
 	opacity: 0.6;
 }

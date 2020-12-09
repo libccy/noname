@@ -15,6 +15,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				extra_key:['key_kagari','key_shiki'],
 				extra_ol:['ol_zhangliao','shen_caopi','shen_zhenji'],
 				extra_offline:['shen_diaochan'],
+				extra_mini:['mini_zhugeliang','mini_lvbu'],
 			},
 		},
 		character:{
@@ -39,6 +40,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_zhangliao:['male','shen',4,['olduorui','olzhiti'],['wei']],
 			shen_caopi:['male','shen',5,['chuyuan','dengji'],['wei']],
 			shen_zhenji:['female','shen',4,['shenfu','qixian'],['wei']],
+			
+			mini_zhugeliang:['male','shen',3,['qixing','minikuangfeng','minidawu'],['shu']],
+			mini_lvbu:['male','shen',6,['miniwuqian','minishenfen']],
 		},
 		characterIntro:{
 			shen_guanyu:'关羽，字云长。曾水淹七军、擒于禁、斩庞德、威震华夏，吓得曹操差点迁都躲避，但是东吴偷袭荆州，关羽兵败被害。后传说吕蒙因关羽之魂索命而死。',
@@ -49,12 +53,190 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterTitle:{
 			//shen_ganning:"体力上限：6",
 		},
+		characterReplace:{
+			shen_zhangliao:['shen_zhangliao','ol_zhangliao'],
+			shen_zhugeliang:['shen_zhugeliang','mini_zhugeliang'],
+			shen_lvbu:['shen_lvbu','mini_lvbu'],
+		},
 		characterFilter:{
 			shen_diaochan:function(mode){
 				return mode=='identity'||mode=='doudizhu'||mode=='single'||(mode=='versus'&&_status.mode!='standard'&&_status.mode!='three');
 			},
 		},
 		skill:{
+			miniwuqian:{
+				audio:'wuqian',
+				trigger:{
+					player:'useCardToPlayered',
+				},
+				filter:function(event,player){
+					return (event.card.name=='sha'||event.card.name=='juedou')&&player==_status.currentPhase&&
+					player.getHistory('useCard',function(evt){
+						return (evt.card.name=='sha'||evt.card.name=='juedou');
+					}).indexOf(event.getParent())==0;
+				},
+				forced:true,
+				logTarget:'target',
+				content:function(){
+					trigger.target.addTempSkill('qinggang2');
+					trigger.target.storage.qinggang2.add(trigger.card);
+					if(trigger.card.name=='sha'){
+						var id=trigger.target.playerid;
+						var map=trigger.getParent().customArgs;
+						if(!map[id]) map[id]={};
+						if(typeof map[id].shanRequired=='number'){
+							map[id].shanRequired++;
+						}
+						else{
+							map[id].shanRequired=2;
+						}
+					}
+					else{
+						var id=trigger.target.playerid;
+						var idt=trigger.target.playerid;
+						var map=trigger.getParent().customArgs;
+						if(!map[idt]) map[idt]={};
+						if(!map[idt].shaReq) map[idt].shaReq={};
+						if(!map[idt].shaReq[id]) map[idt].shaReq[id]=1;
+						map[idt].shaReq[id]++;
+					}
+				},
+				ai:{
+					unequip_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						if(arg&&arg.name=='sha'&&!player.countUsed('sha')) return true;
+						return false;
+					}
+				}
+			},
+			minishenfen:{
+				audio:'ol_shenfen',
+				enable:'phaseUse',
+				skillAnimation:true,
+				animationColor:'metal',
+				limited:true,
+				content:function(){
+					"step 0"
+					player.awakenSkill('minishenfen');
+					player.loseHp(3);
+					event.delay=false;
+					event.targets=game.filterPlayer();
+					event.targets.remove(player);
+					event.targets.sort(lib.sort.seat);
+					player.line(event.targets,'green');
+					event.targets2=event.targets.slice(0);
+					event.targets3=event.targets.slice(0);
+					"step 1"
+					if(event.targets2.length){
+						event.targets2.shift().damage('nocard');
+						event.redo();
+					}
+					"step 2"
+					if(event.targets.length){
+						event.current=event.targets.shift()
+						if(event.current.countCards('e')) event.delay=true;
+						event.current.discard(event.current.getCards('e')).delay=false;
+					}
+					"step 3"
+					if(event.delay) game.delay(0.5);
+					event.delay=false;
+					if(event.targets.length) event.goto(2);
+					"step 4"
+					if(event.targets3.length){
+						var target=event.targets3.shift();
+						target.chooseToDiscard(4,'h',true).delay=false;
+						if(target.countCards('h')) event.delay=true;
+					}
+					"step 5"
+					if(event.delay) game.delay(0.5);
+					event.delay=false;
+					if(event.targets3.length) event.goto(4);
+				},
+				ai:{
+					order:10,
+					result:{
+						player:function(player){
+							if(player.hp<5||player.hasUnknown()) return 0;
+							return game.countPlayer(function(current){
+								if(current!=player){
+									return get.sgn(get.damageEffect(current,player,player));
+								}
+							});
+						}
+					}
+				}
+			},
+			minikuangfeng:{
+				audio:'kuangfeng',
+				trigger:{player:'phaseUseEnd'},
+				direct:true,
+				filter:function(event,player){
+					return player.getStorage('qixing').length>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget([1,Math.min(game.players.length,player.getStorage('qixing').length)],get.prompt2('minikuangfeng')).set('ai',function(target){
+						var player=_status.event.player;
+						var eff=get.damageEffect(target,player,player);
+						if(target.hp==1||!ui.selected.targets.length) return eff;
+						return 0;
+					});
+					'step 1'
+					if(result.bool){
+						event.targets=result.targets;
+						player.chooseButton(['请选择要移去的“星”',player.getStorage('qixing')],true,result.targets.length).set('ai',function(button){
+							return -get.value(button.link);
+						});
+					}
+					else event.finish();
+					'step 2'
+					var cards=result.links;
+					player.logSkill('minikuangfeng',targets);
+					player.$throw(cards,2000);
+					player.unmarkAuto('qixing',cards);
+					game.cardsDiscard(cards);
+					for(var i of targets) i.damage();
+				},
+			},
+			minidawu:{
+				audio:'dawu',
+				trigger:{player:'phaseJieshuBegin'},
+				direct:true,
+				filter:function(event,player){
+					return player.getStorage('qixing').length>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseButton([get.prompt('minidawu'),player.getStorage('qixing')]).set('ai',function(button){
+						return 1/Math.max(0.01,get.value(button.link));
+					});
+					'step 1'
+					if(result.bool){
+						var cards=result.links;
+						player.logSkill('minidawu');
+						player.$throw(cards,2000);
+						player.unmarkAuto('qixing',cards);
+						game.cardsDiscard(cards);
+						player.addTempSkill('minidawu2',{player:'phaseBegin'});
+					}
+				},
+			},
+			minidawu2:{
+				audio:'dawu',
+				trigger:{player:'damageBegin3'},
+				forced:true,
+				charlotte:true,
+				content:function(){
+					trigger.num--;
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(get.tag(card,'damage')&&(card.name!='sha'||!player.hasSkill('jiu'))) return 'zerotarget';
+						},
+					},
+				},
+			},
 			meihun:{
 				audio:2,
 				trigger:{
@@ -959,17 +1141,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					if(event.targets.length){
 						event.current=event.targets.shift()
+						if(event.current.countCards('e')) event.delay=true;
 						event.current.discard(event.current.getCards('e')).delay=false;
 					}
 					"step 3"
-					game.delay(0.5);
+					if(event.delay) game.delay(0.5);
+					event.delay=false;
 					if(event.targets.length) event.goto(2);
 					"step 4"
 					if(event.targets3.length){
-						event.targets3.shift().chooseToDiscard(4,'h',true).delay=false;
+						var target=event.targets3.shift();
+						target.chooseToDiscard(4,'h',true).delay=false;
+						if(target.countCards('h')) event.delay=true;
 					}
 					"step 5"
-					game.delay(0.5);
+					if(event.delay) game.delay(0.5);
+					event.delay=false;
 					if(event.targets3.length) event.goto(4);
 					"step 6"
 					player.turnOver();
@@ -3608,6 +3795,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huoxin_control:'惑心',
 			huoxin:'惑心',
 			huoxin_info:'出牌阶段限一次，你可以展示两张花色相同的手牌并分别交给两名其他角色，然后令这两名角色拼点，没赢的角色获得1个“魅惑”标记。拥有2个或更多“魅惑”的角色回合即将开始时，该角色移去其所有“魅惑”，此回合改为由你操控。',
+			mini_zhugeliang:'SP神诸葛亮',
+			minikuangfeng:'狂风',
+			minikuangfeng_info:'出牌阶段结束时，你可选择任意名角色并将等量的“星”置入弃牌堆，然后对这些角色各造成1点伤害。',
+			minidawu:'大雾',
+			minidawu2:'大雾',
+			minidawu_info:'结束阶段，你可以将一张“星”置入弃牌堆。当你于下回合开始前受到伤害时，此伤害-1。',
+			mini_lvbu:'SP神吕布',
+			miniwuqian:'无前',
+			miniwuqian_info:'锁定技，当你于回合内使用【杀】或【决斗】指定目标后，若此牌是你本回合内使用的第一张【杀】或【决斗】，则你令其每次响应此牌需要使用的【闪】或打出的【杀】的数量+1，且令其防具无效直到此牌对其结束。',
+			minishenfen:'神愤',
+			minishenfen_info:'限定技，出牌阶段，你可以失去3点体力，对所有其他角色各造成1点伤害。这些角色弃置装备区内的所有牌，然后弃置四张手牌。',
 			
 			key_kagari:'篝',
 			kagari_zongsi:'纵丝',
@@ -3628,6 +3826,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			extra_key:'神话再临·论外',
 			extra_ol:'神话再临OL',
 			extra_offline:'神话再临·线下',
+			extra_mini:'欢乐三国杀',
 		},
 	};
 });

@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.106.2.2',
+	'v1.9.106.3',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -3491,6 +3491,10 @@ window.noname_asset_list=[
 	'image/character/xin_zhuran.jpg',
 	'image/character/yanghuiyu.jpg',
 	'image/character/key_shizuku.jpg',
+	'image/character/mini_lvbu.jpg',
+	'image/character/mini_sunquan.jpg',
+	'image/character/mini_zhugeliang.jpg',
+	'image/character/mini_zuoci.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
@@ -4476,8 +4480,8 @@ window.noname_asset_list=[
 	'image/emotion/throw_emotion/shoukao2.png',
 	'image/emotion/throw_emotion/wine1.png',
 	'image/emotion/throw_emotion/wine2.png',
-	'image/emotion/throw_emotion/yuxis1.png',
-	'image/emotion/throw_emotion/yuxis2.png',
+	'image/emotion/throw_emotion/yuxisx1.png',
+	'image/emotion/throw_emotion/yuxisx2.png',
 	
 	'image/mode/boss/card/chixueqingfeng.png',
 	'image/mode/boss/card/chiyanzhenhunqin.png',
