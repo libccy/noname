@@ -551,7 +551,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 							if(card){
 								var val2=get.value(card,target);
-								if(val2>0) return val2/4;
+								if(val2>0) return -val2/4;
 							}
 							return 0;
 						},

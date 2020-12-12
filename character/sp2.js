@@ -65,6 +65,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yj_caoang:['male','wei',4,['yjxuepin']],
 			mini_sunquan:['male','wu',4,['minizhiheng','jiuyuan'],['zhu']],
 			mini_zuoci:['male','qun',3,['minishendao','minixinsheng']],
+			mini_jiangwei:['male','shu',4,['minitiaoxin','zhiji']],
+			mini_diaochan:['female','qun',3,['minilijian','rebiyue']],
+			mini_zhangchunhua:['female','wei',3,['jueqing','minishangshi']],
 		},
 		characterSort:{
 			sp2:{
@@ -78,13 +81,135 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_guandu:["sp_zhanghe","xunchen","sp_shenpei","gaolan","lvkuanglvxiang","chunyuqiong","sp_xuyou"],
 				sp_huangjin:['liuhong','zhujun','re_hejin','hansui'],
 				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','re_sunluyu','caobuxing','ol_xinxianying','ol_yujin','re_maliang','xin_baosanniang','liubian'],
-				sp_mini:["mini_sunquan","mini_zuoci"],
+				sp_mini:["mini_sunquan","mini_zuoci","mini_jiangwei","mini_diaochan","mini_zhangchunhua"],
 				sp_luanwu:["ns_lijue","ns_zhangji","ns_fanchou"],
 				sp_yongjian:["ns_chendao","yj_caoang"],
 				sp_s:["ns_jiaxu"],
 			}
 		},
 		skill:{
+			minishangshi:{
+				audio:2,
+				trigger:{player:['loseAfter','changeHp']},
+				frequent:true,
+				filter:function(event,player){
+					return player.countCards('h')<Math.max(1,player.getDamagedHp());
+				},
+				content:function(){
+					player.drawTo(Math.max(player.getDamagedHp(),1));
+				},
+				ai:{
+					noh:true,
+					skillTagFilter:function(player,tag){
+						if(tag=='noh'&&Math.max(1,player.getDamagedHp())<player.countCards('h')){
+							return false;
+						}
+					}
+				}
+			},
+			minilijian:{
+				trigger:{player:'useCard2'},
+				direct:true,
+				audio:'lijian',
+				usable:1,
+				filter:function(event,player){
+					if(!['sha','juedou'].contains(event.card.name)) return false;
+					var info=get.info(event.card);
+					if(info.allowMultiple==false) return false;
+					if(event.targets&&!info.multitarget){
+						if(game.hasPlayer(function(current){
+							return current.sex=='male'&&!event.targets.contains(current)&&lib.filter.targetEnabled2(event.card,player,current)&&lib.filter.targetInRange(event.card,player,current);
+						})){
+							return true;
+						}
+					}
+					return false;
+				},
+				content:function(){
+					'step 0'
+					var prompt2='为'+get.translation(trigger.card)+'增加一个目标'
+					player.chooseTarget(get.prompt('minilijian'),function(card,player,target){
+						var player=_status.event.player;
+						return target.sex=='male'&&!_status.event.targets.contains(target)&&lib.filter.targetEnabled2(_status.event.card,player,target)&&lib.filter.targetInRange(_status.event.card,player,target);
+					}).set('prompt2',prompt2).set('ai',function(target){
+						var trigger=_status.event.getTrigger();
+						var player=_status.event.player;
+						return get.effect(target,trigger.card,player,player);
+					}).set('card',trigger.card).set('targets',trigger.targets);
+					'step 1'
+					if(result.bool){
+						if(!event.isMine()) game.delayx();
+						event.targets=result.targets;
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if(event.targets){
+						player.logSkill('minilijian',event.targets);
+						trigger.targets.addArray(event.targets);
+					}
+				},
+				
+				ai:{
+					effect:{
+						player:function(card,player,target,current,isLink){
+							if(!isLink&&(card.name=='sha'||card.name=='juedou')&&(!player.storage.counttrigger||!player.storage.counttrigger.minilijian)){
+								if(player._minilijiantemp) return;
+								player._minilijiantemp=true;
+								if(get.effect(target,card,player,player)<=0){
+									delete player._minilijiantemp;
+									return;
+								}
+								if(game.hasPlayer(function(current){
+									return current!=target&&current.sex=='male'&&
+									player.canUse(card,current)&&get.effect(current,card,player,player)>0;
+								})){
+									delete player._minilijiantemp;
+									return [1,1];
+								}
+								delete player._minilijiantemp;
+							}
+						}
+					}
+				},
+			},
+			minitiaoxin:{
+				trigger:{player:'phaseUseBegin'},
+				direct:true,
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return current!=player&&current.countDiscardableCards(player,'h')>0;
+					});
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('minitiaoxin'),function(card,player,target){
+						return target!=player&&target.countDiscardableCards(player,'h')>0;
+					}).set('ai',function(target){
+						var att=get.attitude(_status.event.player,target);
+						if(target.countCards('h')==1) att=get.sgn(att);
+						return -att;
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('minitiaoxin',target);
+						player.discardPlayerCard(target,true,[1,2],'h');
+					}
+					else event.finish();
+					'step 2'
+					if(result.cards&&result.cards.length&&player.countCards('h')>0){
+						for(var i of result.cards){
+							if(get.name(i,target)=='sha'){
+								player.chooseToDiscard('h',true);
+								break;
+							}
+						}
+					}
+				},
+			},
 			minishendao:{
 				audio:'rehuashen',
 				trigger:{
@@ -6866,6 +6991,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			minishendao_info:'你的判定牌生效前，你可以将判定结果改为任意花色。',
 			minixinsheng:'新生',
 			minixinsheng_info:'当你受到伤害后，你可以展示牌堆顶的三张牌，然后获得其中每种花色的牌各一张。',
+			mini_jiangwei:'SP姜维',
+			minitiaoxin:'挑衅',
+			minitiaoxin_info:'出牌阶段开始时，你可以弃置一名其他角色的两张手牌。若你以此法弃置的牌中有【杀】，则你弃置一张手牌。',
+			mini_diaochan:'SP貂蝉',
+			minilijian:'离间',
+			minilijian_info:'每回合限触发一次，当你使用【杀】或【决斗】指定目标后，你可以为此牌增加一个目标。',
+			mini_zhangchunhua:'SP张春华',
+			minishangshi:'伤逝',
+			minishangshi_info:'当你的手牌数小于X时，你可以将手牌摸至X张（X为你已损失的体力值且至少为1）',
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",

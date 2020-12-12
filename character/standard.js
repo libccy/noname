@@ -1420,13 +1420,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<top.length;i++){
 							ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
 						}
-						for(i=0;i<bottom.length;i++){
-							ui.cardPile.appendChild(bottom[i]);
-						}
 						for(i=0;i<event.cards.length;i++){
 							if(!top.contains(event.cards[i])&&!bottom.contains(event.cards[i])){
 								ui.cardPile.appendChild(event.cards[i]);
 							}
+						}
+						for(i=0;i<bottom.length;i++){
+							ui.cardPile.appendChild(bottom[i]);
 						}
 						player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(event.cards.length-top.length)+'下');
 						game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
@@ -2680,7 +2680,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterReplace:{
 			caocao:['re_caocao','caocao'],
-			guojia:['re_guojia','rguojia'],
+			guojia:['re_guojia','guojia'],
 			simayi:['re_simayi','simayi'],
 			zhenji:['re_zhenji','zhenji'],
 			xuzhu:['re_xuzhu','xuzhu'],
@@ -2702,7 +2702,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunshangxiang:['re_sunshangxiang','sp_sunshangxiang','sunshangxiang'],
 			ganning:['re_ganning','yj_ganning','sp_ganning','ganning'],
 			lvbu:['re_lvbu','lvbu'],
-			diaochan:['re_diaochan','sp_diaochan','ganning'],
+			diaochan:['re_diaochan','sp_diaochan','mini_diaochan','diaochan'],
 			huatuo:['re_huatuo','old_huatuo','huatuo'],
 			huaxiong:['re_huaxiong','old_huaxiong','huaxiong','ol_huaxiong'],
 			yuanshu:['yl_yuanshu','yuanshu','re_yuanshu','old_yuanshu','ol_yuanshu'],

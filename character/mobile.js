@@ -6067,6 +6067,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuzan:['re_liuzan','liuzan'],
 			sufei:['sp_sufei','xf_sufei'],
 			jiakui:['jiakui','old_jiakui'],
+			shenpei:['shenpei','sp_shenpei'],
 		},
 		translate:{
 			liuzan:'手杀留赞',

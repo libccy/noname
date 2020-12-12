@@ -619,6 +619,7 @@ window.noname_character_rank={
 		'ns_yuanxi',
 		'mini_sunquan',
 		'mini_zuoci',
+		'mini_jiangwei',
 	],
 	b:[
 		'diy_feishi',
@@ -920,6 +921,7 @@ window.noname_character_rank={
 		'ns_lijue',
 		'ns_zhangji',
 		'ol_dingyuan',
+		'mini_zhangchunhua',
 	],
 	c:[
 		'xiahoudun',
@@ -1491,6 +1493,8 @@ window.noname_character_rank={
 			'ns_fanchou',
 			'xin_zhuran',
 			'mini_sunquan',
+			'mini_jiangwei',
+			'mini_zhangchunhua',
 		],
 		junk:[
 			'sunshao',

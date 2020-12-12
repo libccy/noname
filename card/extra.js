@@ -388,7 +388,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(card==player.getEquip(2)){
 							if(player.hasSkillTag('noDirectDamage')) return 10;
 							if(game.hasPlayer(function(current){
-								return get.attitude(current,player)<0&&current.hasSkillTag('fireAttack',null,null,true);
+								return current!=player&&get.attitude(current,player)<0&&current.hasSkillTag('fireAttack',null,null,true);
 							})) return 0;
 							return 6;
 						}

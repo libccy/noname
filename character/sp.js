@@ -9369,7 +9369,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var evt2=event.getParent('phaseUse');
 					if(evt2.player!=player) return false;
 					return player.getHistory('useCard',function(evt){
-						return ['sha','juedou'].contains(evt.card.name)&&evt.getParent('phaseUse')==evt2;
+						return evt.card.name==event.card.name&&evt.getParent('phaseUse')==evt2;
 					}).indexOf(event.getParent())==0;
 				},
 				direct:true,
@@ -14698,7 +14698,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wangyun:['re_wangyun','wangyun','old_wangyun'],
 			zhangliang:['re_zhangliang','zhangliang'],
 			lingju:['lingju','old_lingju'],
-			guansuo:['guansuo','old_guansuo'],
+			guansuo:['guansuo','ol_guansuo'],
 			zhangxingcai:['old_zhangxingcai'],
 		},
 		translate:{
@@ -15255,7 +15255,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			bushi_info:'当你受到1点伤害后，或其他角色受到你造成的1点伤害后，受到伤害的角色可以获得你的一张「米」',
 			midao_info:'一名角色的判定牌生效前，你可以打出一张「米」代替之。',
 			fengpo:'凤魄',
-			fengpo_info:'当你于出牌阶段内使用第一张【杀】或【决斗】指定目标后，若目标角色数为1，你可以选择一项：1.摸X张牌；2.令此牌的伤害值基数+X。（X为其手牌中方牌的数量）',
+			fengpo_info:'每种牌名限一次，当你于出牌阶段内第一次使用【杀】或【决斗】指定目标后，若目标角色数为1，你可以选择一项：1.摸X张牌；2.令此牌的伤害值基数+X。（X为其手牌中方牌的数量）',
 			chenqing:'陈情',
 			chenqing_info:'每轮限一次，当一名角色处于濒死状态时，你可以令另一名其他角色摸四张牌，然后其弃置四张牌。若其以此法弃置的四张牌花色各不相同，则视为该角色对濒死的角色使用一张【桃】。',
 			mozhi:'默识',

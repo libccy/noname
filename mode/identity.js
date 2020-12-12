@@ -1705,8 +1705,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						game.me.init(event.choosed[0]);
 					}
-					event.list.remove(game.me.name);
-					event.list.remove(game.me.name2);
+					event.list.remove(get.sourceCharacter(game.me.name));
+					event.list.remove(get.sourceCharacter(game.me.name2));
 					if(game.me==game.zhu&&game.players.length>4){
 						game.me.hp++;
 						game.me.maxHp++;
