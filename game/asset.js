@@ -3497,6 +3497,7 @@ window.noname_asset_list=[
 	'image/character/mini_zuoci.jpg',
 	'image/character/mini_zhangchunhua.jpg',
 	'image/character/mini_jiangwei.jpg',
+	'image/character/mini_diaochan.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
