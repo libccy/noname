@@ -5194,6 +5194,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					};
 					var chooseButton=function(list,skills){
 						var event=_status.event;
+						if(!event._result) event._result={};
 						event._result.skills=[];
 						var rSkill=event._result.skills;
 						var dialog=ui.create.dialog('请选择获得至多两个技能',[list,'character'],'hidden');

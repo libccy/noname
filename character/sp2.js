@@ -1630,6 +1630,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var chooseButton=function(player,numbers){
 						var event=_status.event;
 						player=player||event.player;
+						if(!event._result) event._result={};
 						var dialog=ui.create.dialog('是否发动【墨影】？','forcebutton','hidden');
 						event.dialog=dialog;
 						dialog.addText('花色');
