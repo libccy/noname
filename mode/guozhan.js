@@ -7814,114 +7814,105 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		element:{
 			content:{
 				chooseJunlingFor:function(){
-						'step 0'
-						var list=['junling1','junling2','junling3','junling4','junling5','junling6'];
-						list=list.randomGets(2).sort();
-						for(var i=0;i<list.length;i++) list[i]=['军令','',list[i]];
-						var prompt=event.prompt||'选择一张军令牌';
-						if(target!=undefined&&!event.prompt){
-							var str=target==player?'（你）':'';
-							prompt+='，令'+get.translation(target)+str+'选择是否执行';
-						}
-						player.chooseButton([prompt,[list,'vcard']],true).set('ai',function(button){
-							return get.junlingEffect(_status.event.player,button.link[2],_status.event.getParent().target,[],_status.event.player);
-						});
-						'step 1'
-						event.result={
-							junling:result.links[0][2],
-							targets:[],
-						};
-						if(result.links[0][2]=='junling1') player.chooseTarget('选择一名角色，做为若该军令被执行，受到伤害的角色',true).set('ai',function(_target){
-							return get.damageEffect(_target,target,player);
-						});
-						'step 2'
-						if(result.targets.length){
-							player.line(result.targets,'green');
-							event.result.targets=result.targets;
-						}
-					},
-					chooseJunlingControl:function(){
-						'step 0'
-						var dialog=[];
-						var str1=source==player?'（你）':'';
-						var str2=event.targets?'（被指定的角色为'+get.translation(event.targets)+'）':'';
-						if(!event.prompt) dialog.add(get.translation(event.source)+str1+'选择的军令'+str2+'为');
-						else{
-							dialog.add(event.prompt);
-							dialog.add(get.translation(event.source)+str1+'选择的军令'+str2+'为');
-						}
-						dialog.add([[event.junling],'vcard']);
-						var controls=[];
-						if(event.choiceList){
-							for(var i=0;i<event.choiceList.length;i++){
-								dialog.add('<div class="popup text" style="width:calc(100% - 10px);display:inline-block">选项'+get.cnNumber(i+1,true)+'：'+event.choiceList[i]+'</div>');
-								controls.push('选项'+get.cnNumber(i+1,true));
-							}
-						}
-						else if(event.controls) controls=event.controls;
-						else controls=['执行该军令','不执行该军令'];
-						if(!event.ai) event.ai=function(){return Math.floor(controls.length*Math.random())};
-						player.chooseControl(controls).set('dialog',dialog).set('ai',event.ai);
-						'step 1'
-						event.result={
-							index:result.index,
-							control:result.control,
-						};
-					},
-					carryOutJunling:function(){
-						'step 0'
-						switch(event.junling){
-							case 'junling1':{
-								if(targets[0].isAlive()){
-									player.line(targets,'green');
-									targets[0].damage(player);
-								}
-								break;
-							}
-							case 'junling2':player.draw();event.num=1;break;
-							case 'junling3':player.loseHp();break;
-							case 'junling4':player.addTempSkill('junling4_eff');player.addTempSkill('fengyin_vice');player.addTempSkill('fengyin_main');break;
-							case 'junling5':player.turnOver();player.addTempSkill('junling5_eff');break;
-						}
-						'step 1'
-						if(event.junling=='junling2'&&source!=player&&player.countCards('he')>0){
-							player.chooseCard('交给'+get.translation(source)+'第'+get.cnNumber(event.num)+'张牌（共两张）','he',true);
-							event.ing=true;
-						}
-						if(event.junling=='junling6'){
-							var position='',num0=0;
-							if(player.countCards('h')){position+='h';num0++;}
-							if(player.countCards('e')){position+='e';num0++;}
-							player.chooseCard('选择一张手牌和一张装备区内牌（若有），然后弃置其余的牌',position,num0,function(card){
-								if(ui.selected.cards.length) return get.position(card)!=get.position(ui.selected.cards[0]);
-								return true;
-							},true).set('complexCard',true).set('ai',function(card){return get.value(card)});
-						}
-						'step 2'
-						if(event.junling=='junling2'&&source!=player){
-							if(result.cards.length&&event.ing){
-								source.gain(result.cards,player,'giveAuto');
-							}
-							event.num++;
-							if(event.num<3){
-								event.ing=false;
-								event.goto(1);
-							}
-						}
-						if(event.junling=='junling6'){
-							var cards=player.getCards('he');
-							for(var i=0;i<result.cards.length;i++) cards.remove(result.cards[i]);
-							player.discard(cards);
-						}
-					},
-				showCharacter:function(){
 					'step 0'
-					event.trigger('showCharacterEnd');
+					var list=['junling1','junling2','junling3','junling4','junling5','junling6'];
+					list=list.randomGets(2).sort();
+					for(var i=0;i<list.length;i++) list[i]=['军令','',list[i]];
+					var prompt=event.prompt||'选择一张军令牌';
+					if(target!=undefined&&!event.prompt){
+						var str=target==player?'（你）':'';
+						prompt+='，令'+get.translation(target)+str+'选择是否执行';
+					}
+					player.chooseButton([prompt,[list,'vcard']],true).set('ai',function(button){
+						return get.junlingEffect(_status.event.player,button.link[2],_status.event.getParent().target,[],_status.event.player);
+					});
 					'step 1'
-					event.trigger('showCharacterAfter');
+					event.result={
+						junling:result.links[0][2],
+						targets:[],
+					};
+					if(result.links[0][2]=='junling1') player.chooseTarget('选择一名角色，做为若该军令被执行，受到伤害的角色',true).set('ai',function(_target){
+						return get.damageEffect(_target,target,player);
+					});
+					'step 2'
+					if(result.targets.length){
+						player.line(result.targets,'green');
+						event.result.targets=result.targets;
+					}
 				},
-				removeCharacter:function(){
-					player.$removeCharacter(event.num);
+				chooseJunlingControl:function(){
+					'step 0'
+					var dialog=[];
+					var str1=source==player?'（你）':'';
+					var str2=event.targets?'（被指定的角色为'+get.translation(event.targets)+'）':'';
+					if(!event.prompt) dialog.add(get.translation(event.source)+str1+'选择的军令'+str2+'为');
+					else{
+						dialog.add(event.prompt);
+						dialog.add(get.translation(event.source)+str1+'选择的军令'+str2+'为');
+					}
+					dialog.add([[event.junling],'vcard']);
+					var controls=[];
+					if(event.choiceList){
+						for(var i=0;i<event.choiceList.length;i++){
+							dialog.add('<div class="popup text" style="width:calc(100% - 10px);display:inline-block">选项'+get.cnNumber(i+1,true)+'：'+event.choiceList[i]+'</div>');
+							controls.push('选项'+get.cnNumber(i+1,true));
+						}
+					}
+					else if(event.controls) controls=event.controls;
+					else controls=['执行该军令','不执行该军令'];
+					if(!event.ai) event.ai=function(){return Math.floor(controls.length*Math.random())};
+					player.chooseControl(controls).set('dialog',dialog).set('ai',event.ai);
+					'step 1'
+					event.result={
+						index:result.index,
+						control:result.control,
+					};
+				},
+				carryOutJunling:function(){
+					'step 0'
+					switch(event.junling){
+						case 'junling1':{
+							if(targets[0].isAlive()){
+								player.line(targets,'green');
+								targets[0].damage(player);
+							}
+							break;
+						}
+						case 'junling2':player.draw();event.num=1;break;
+						case 'junling3':player.loseHp();break;
+						case 'junling4':player.addTempSkill('junling4_eff');player.addTempSkill('fengyin_vice');player.addTempSkill('fengyin_main');break;
+						case 'junling5':player.turnOver();player.addTempSkill('junling5_eff');break;
+					}
+					'step 1'
+					if(event.junling=='junling2'&&source!=player&&player.countCards('he')>0){
+						player.chooseCard('交给'+get.translation(source)+'第'+get.cnNumber(event.num)+'张牌（共两张）','he',true);
+						event.ing=true;
+					}
+					if(event.junling=='junling6'){
+						var position='',num0=0;
+						if(player.countCards('h')){position+='h';num0++;}
+						if(player.countCards('e')){position+='e';num0++;}
+						player.chooseCard('选择一张手牌和一张装备区内牌（若有），然后弃置其余的牌',position,num0,function(card){
+							if(ui.selected.cards.length) return get.position(card)!=get.position(ui.selected.cards[0]);
+							return true;
+						},true).set('complexCard',true).set('ai',function(card){return get.value(card)});
+					}
+					'step 2'
+					if(event.junling=='junling2'&&source!=player){
+						if(result.cards.length&&event.ing){
+							source.gain(result.cards,player,'giveAuto');
+						}
+						event.num++;
+						if(event.num<3){
+							event.ing=false;
+							event.goto(1);
+						}
+					}
+					if(event.junling=='junling6'){
+						var cards=player.getCards('he');
+						for(var i=0;i<result.cards.length;i++) cards.remove(result.cards[i]);
+						player.discard(cards);
+					}
 				},
 				doubleDraw:function(){
 					if(!player.hasMark('yinyang_skill')) player.addMark('yinyang_skill',1);
@@ -8288,20 +8279,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				hasViceCharacter:function(){
 					return this.name2.indexOf('gz_shibing')!=0;
-				},
-				showCharacter:function(num,log){
-					var toShow=[];
-					if((num==0||num==2)&&this.isUnseen(0)) toShow.add(this.name1);
-					if((num==1||num==2)&&this.isUnseen(1)) toShow.add(this.name2);
-					if(!toShow.length) return;
-					lib.element.player.$showCharacter.apply(this,arguments);
-					var next=game.createEvent('showCharacter',false);
-					next.player=this;
-					next.num=num;
-					next.toShow=toShow;
-					next._args=arguments;
-					next.setContent('showCharacter');
-					return next;
 				},
 				$showCharacter:function(num,log){
 					if(num==0&&!this.isUnseen(0)){

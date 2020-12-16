@@ -60,6 +60,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_jojiro:['male','key',4,['jojiro_shensu','jojiro_shunying']],
 			key_shiroha:['female','key',3,['shiroha_yuzhao','shiroha_guying','shiroha_jiezhao']],
 			key_shizuku:['female','key',3,['shizuku_sizhi','shizuku_biyi']],
+			key_hiroto:['male','key',3,['hiroto_huyu','hiroto_tuolao']],
 			
 			key_kud:['female','key',3,['kud_qiaoshou','kud_buhui']],
 			key_misuzu:['female','key',3,['misuzu_hengzhou','misuzu_nongyin','misuzu_zhongxing']],
@@ -169,7 +170,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				diy_tieba:["ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua"],
 				diy_fakenews:["diy_wenyang","ns_zhangwei","ns_caimao"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto"],
 				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang'],
 			},
 		},
@@ -185,6 +186,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
+			key_hiroto:'#b神様になった日',
 			key_shizuku:'#bSummer Pockets',
 			key_shiroha:'#bSummer Pockets',
 			key_jojiro:'#bCharlotte<br>战棋专属角色',
@@ -345,6 +347,122 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			hiroto_huyu:{
+				trigger:{global:'phaseUseEnd'},
+				direct:true,
+				noHidden:true,
+				filter:function(event,player){
+					return player!=event.player&&player.hasSkill('hiroto_huyu')&&!player.hasSkill('hiroto_zonglve')&&event.player.countCards('h')>0;
+				},
+				content:function(){
+					'step 0'
+					trigger.player.chooseCard(2,'h','是否对'+get.translation(player)+'发动【虎驭】？','将两张手牌交给该角色，然后令其获得〖纵略〗并于下回合获得该角色获得的所有牌').set('goon',function(){
+						var source=trigger.player;
+						if(get.attitude(source,player)>0) return 7;
+						if(source.hp>2) return 4;
+						return 0;
+					}()).set('ai',function(card){
+						return _status.event.goon-get.value(card);
+					});
+					'step 1'
+					if(result.bool){
+						player.logSkill('hiroto_huyu',trigger.player);
+						player.gain(result.cards,trigger.player,'giveAuto');
+						player.storage.hiroto_huyu2=trigger.player;
+						player.addSkill('hiroto_zonglve');
+						player.addSkill('hiroto_huyu2');
+					}
+				},
+				derivation:'hiroto_zonglve',
+			},
+			hiroto_huyu2:{
+				trigger:{player:'phaseEnd'},
+				forced:true,
+				popup:false,
+				charlotte:true,
+				content:function(){
+					player.removeSkill('hiroto_huyu2');
+					player.removeSkill('hiroto_zonglve');
+					var target=player.storage.hiroto_huyu2;
+					if(target&&target.isAlive()){
+						var cards=[];
+						player.getHistory('gain',function(evt){
+							cards.addArray(evt.cards);
+						});
+						var he=player.getCards('he');
+						cards=cards.filter(function(card){
+							return he.contains(card);
+						});
+						if(cards.length) target.gain(cards,player,'giveAuto');
+					}
+				},
+				mark:'character',
+				intro:{content:'已成为$的工具人'},
+			},
+			hiroto_zonglve:{
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.countCards('h')>0&&game.hasPlayer(function(current){
+						return current!=player&&current.countCards('h')>0;
+					});
+				},
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countCards('h')>0;
+				},
+				filterCard:true,
+				delay:false,
+				charlotte:true,
+				position:'h',
+				discard:false,
+				lose:false,
+				content:function(){
+					'step 0'
+					player.choosePlayerCard(true,target,'h');
+					'step 1'
+					event.card=result.cards[0];
+					player.$compare(cards[0],target,event.card);
+					game.log(player,'展示了',cards[0]);
+					game.log(target,'展示了',event.card)
+					game.delay(3.5);
+					'step 2'
+					game.broadcastAll(ui.clear);
+					if(get.color(cards[0],player)==get.color(card,target)){
+						target.damage('nocard');
+						target.discard(card).animate=false;
+					}
+					else player.gainPlayerCard(target,true,2,'hej');
+				},
+				mod:{
+					maxHandcard:function(player,num){
+						return num+3;
+					},
+				},
+				ai:{
+					order:7,
+					result:{
+						target:-1,
+					},
+				},
+			},
+			hiroto_tuolao:{
+				trigger:{player:'phaseAfter'},
+				forced:true,
+				juexingji:true,
+				skillAnimation:true,
+				animationColor:'water',
+				filter:function(event,player){
+					return player.phaseNumber>1&&!player.getHistory('lose',function(evt){
+						return evt.getParent(2).name=='hiroto_huyu2';
+					}).length;
+				},
+				content:function(){
+					player.awakenSkill('hiroto_tuolao');
+					player.draw(3);
+					player.removeSkill('hiroto_huyu');
+					player.addSkill('hiroto_zonglve');
+				},
+			},
 			shizuku_sizhi:{
 				audio:2,
 				enable:'phaseUse',
@@ -651,8 +769,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				direct:true,
 				filter:function(event,player,name){
-					if(name=='damageBegin3') return true;
 					if(!player.storage.shiroha_jiezhao&&player.hasSkill('shiroha_guying_temp')) return false;
+					if(name=='damageBegin3') return true;
 					return player!=event.player;
 				},
 				content:function(){
@@ -11587,6 +11705,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_jojiro:'高城丈士朗',
 			key_shiroha:'鸣濑白羽',
 			key_shizuku:'水织静久',
+			key_hiroto:'铃木央人',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -11879,6 +11998,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shiroha_guying_rewrite_info:'当你受到伤害/对其他角色造成伤害时，你可进行判定。若结果为红色/黑色，此伤害-1/+1。',
 			shiroha_jiezhao:'解兆',
 			shiroha_jiezhao_info:'一名角色的判定牌生效前，你可打出一张「兆」代替之。当你以此法移去最后一张「兆」后，你加1点体力上限并回复1点体力，然后修改〖孤影〗并随机获得以下技能中的一个：〖炒饭〗/〖习事〗/〖呣啾〗/〖结伴〗。',
+			hiroto_huyu:'虎驭',
+			hiroto_huyu2:'虎驭',
+			hiroto_huyu_info:'其他角色的出牌阶段结束时，若你没有技能〖纵略〗，则其可将两张手牌交给你。若如此做，你获得〖纵略〗。你的下回合结束时，你失去〖纵略〗并将本回合内获得的所有牌交给该角色。',
+			hiroto_zonglve:'纵略',
+			hiroto_zonglve_info:'锁定技，你的手牌上限+3。出牌阶段限一次，你可以将一张手牌背面朝下放置，并展示一名其他角色的一张手牌。若这两张牌：颜色相同，你对其造成1点伤害并弃置其展示的牌。颜色不同，你获得该角色区域内的两张牌。',
+			hiroto_tuolao:'脱牢',
+			hiroto_tuolao_info:'觉醒技，回合结束后，若此回合不是你的第一个回合且你本轮内未因〖虎驭〗失去过牌，则你摸三张牌，失去〖虎驭〗并获得〖纵略〗。',
 			
 			key_kud:'库特莉亚芙卡',
 			kud_qiaoshou:'巧手',

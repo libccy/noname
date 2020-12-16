@@ -9,8 +9,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_huo:["ol_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","ol_pangtong","ol_yuanshao","ol_pangde","re_taishici"],
 				refresh_lin:['re_zhurong','re_menghuo','ol_sunjian','re_caopi','re_xuhuang','ol_dongzhuo'],
 				refresh_shan:['re_dengai','re_jiangwei','re_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce','ol_dengai'],
-				refresh_yijiang1:['re_wuguotai','re_gaoshun','re_caozhi','yujin_yujin','re_lingtong','re_masu','xin_xusheng','xin_fazheng','xin_lingtong'],
-				refresh_yijiang2:['old_madai','wangyi','guanzhang','re_handang','re_zhonghui','re_liaohua','re_chengpu','re_caozhang','re_liubiao','re_bulianshi','xin_liubiao'],
+				refresh_yijiang1:['re_wuguotai','re_gaoshun','re_caozhi','yujin_yujin','re_masu','xin_xusheng','xin_fazheng','xin_lingtong'],
+				refresh_yijiang2:['old_madai','wangyi','guanzhang','re_handang','re_zhonghui','re_liaohua','re_chengpu','re_caozhang','re_bulianshi','xin_liubiao'],
 				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','re_yufan','re_liru','re_manchong'],
 				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan'],
 				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu'],
@@ -18,8 +18,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		connect:true,
 		character:{
-			xin_lingtong:['male','wu',4,['decadexuanfeng','yongjin'],['unseen']],
-			xin_liubiao:['male','qun',3,['decadezishou','decadezongshi'],['unseen']],
+			xin_lingtong:['male','wu',4,['decadexuanfeng','yongjin']],
+			xin_liubiao:['male','qun',3,['decadezishou','decadezongshi']],
 			re_caoxiu:['male','wei',4,['qianju','reqingxi']],
 			re_sunxiu:['male','wu',3,['reyanzhu','rexingxue','zhaofu'],['zhu']],
 			ol_dengai:['male','wei',4,['oltuntian','olzaoxian'],['unseen']],
@@ -30,7 +30,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_bulianshi:['female','wu',3,['reanxu','zhuiyi']],
 			re_hanhaoshihuan:['male','wei',4,['reshenduan','reyonglve']],
 			re_panzhangmazhong:['male','wu',4,['reduodao','reanjian']],
-			re_liubiao:['male','qun',3,['zishou','rezongshi']],
 			xin_fazheng:['male','shu',3,['xinenyuan','xinxuanhuo'],['die_audio']],
 			wangyi:['female','wei',3,['zhenlie','miji']],
 			old_madai:['male','shu',4,['mashu','qianxi']],
@@ -41,7 +40,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_sunluban:['female','wu',3,['rechanhui','rejiaojin']],
 			re_zhonghui:['male','wei',4,['requanji','zili']],
 			re_handang:['male','wu',4,['regongji','jiefan']],
-			re_lingtong:['male','wu',4,['rexuanfeng']],
 			yujin_yujin:['male','wei',4,['rejieyue']],
 			re_caozhang:['male','wei',4,['new_jiangchi']],
 			re_chengpu:['male','wu',4,['decadelihuo','decadechunlao']],
@@ -139,7 +137,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{target:'useCardToTargeted'},
 				forced:true,
 				filter:function(event,player){
-					return player!=_status.currentPhase&&player.countCards('h')>player.getHandcardLimit()&&
+					return player!=_status.currentPhase&&player.countCards('h')>=player.getHandcardLimit()&&
 					(get.type(event.card)=='delay'||get.color(event.card)=='nocolor');
 				},
 				content:function(){
@@ -148,7 +146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target){
-							if(target!=_status.currentPhase&&target.countCards('h')>target.getHandcardLimit()&&
+							if(target!=_status.currentPhase&&target.countCards('h')>=target.getHandcardLimit()&&
 								(get.type(card)=='delay'||get.color(card)=='nocolor')) return 'zerotarget';
 						},
 					},
@@ -195,6 +193,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			yongjin:{
+				audio:2,
+				audioname:['xin_lingtong'],
 				unique:true,
 				limited:true,
 				skillAnimation:true,
@@ -385,13 +385,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			decadexuanfeng:{
 				audio:'xuanfeng',
-				audioname:['boss_lvbu3','re_heqi'],
+				audioname:['boss_lvbu3','re_heqi','xin_lingtong'],
 				trigger:{
 					player:['loseAfter','phaseDiscardEnd'],
 					global:['equipAfter','addJudgeAfter','gainAfter'],
 				},
 				direct:true,
 				filter:function(event,player){
+					if(_status.dying.length) return false;
 					if(event.name=='phaseDiscard'){
 						var cards=[];
 						player.getHistory('lose',function(evt){
@@ -452,7 +453,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					reverseEquip:true,
-					noe:true
+					noe:true,
+					expose:0.2,
 				}
 			},
 			oltuntian:{
@@ -4077,6 +4079,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinleiji:{
 				group:'xinleiji_misa',
 				audio:2,
+				derivation:'xinleiji_faq',
 				audioname:['boss_qinglong'],
 				trigger:{player:['useCard','respond']},
 				filter:function(event,player){
@@ -4131,7 +4134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'xinleiji',
 				trigger:{player:'judgeAfter'},
 				direct:true,
-				disableReason:['暴虐','助祭','弘仪'],
+				disableReason:['暴虐','助祭','弘仪','孤影'],
 				filter:function(event,player){
 					return !lib.skill.xinleiji_misa.disableReason.contains(event.judgestr)&&['spade','club'].contains(event.result.suit);
 				},
@@ -4224,6 +4227,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			xinleiji_faq:{},
 			reqingguo:{
 				audio:2,
 				enable:['chooseToRespond','chooseToUse'],
@@ -7967,8 +7971,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olzhiba_info:'主公技，其他吴势力的角色的出牌阶段限一次，其可以与你拼点（你可拒绝此拼点）。若其没赢，你可以获得两张拼点牌。你的出牌阶段限一次，你可以和一名吴势力角色拼点，若你赢，你获得两张拼点牌。',
 			olzhiba2:'制霸',
 			xinleiji:'雷击',
+			xinleiji_misa:'雷击',
 			xinguidao:'鬼道',
-			xinleiji_info:'①当你使用或打出【闪】或【闪电】时，你可以进行判定。<br>②当你不因〖暴虐〗或〖助祭〗或〖弘仪〗而进行的判定的判定牌生效后，若结果为：黑桃，你可对一名其他角色造成2点雷电伤害；梅花：你回复1点体力并可对一名其他其他角色造成1点雷电伤害。',
+			xinleiji_info:'①当你使用或打出【闪】或【闪电】时，你可以进行判定。②当你的判定的判定牌生效后，若结果为：黑桃，你可对一名其他角色造成2点雷电伤害；梅花：你回复1点体力并可对一名其他其他角色造成1点雷电伤害。',
+			xinleiji_append:'<span style="font-family: yuanli">不能触发〖雷击〗的判定：〖暴虐〗、〖助祭〗、<br>〖弘仪〗、〖孤影〗。</span>',
+			xinleiji_faq:'不能触发〖雷击〗的判定',
+			xinleiji_faq_info:'<br>董卓/界董卓〖暴虐〗<br>黄巾雷使〖助祭〗<br>羊徽瑜〖弘仪〗<br>鸣濑白羽〖孤影〗',
 			xinguidao_info:'一名角色的判定牌生效前，你可以打出一张黑色牌作为判定牌并获得原判定牌。若你以此法打出的牌为黑桃2-9，则你摸一张牌。',
 			reqiangxi:"强袭",
 			"reqiangxi_info":"出牌阶段对每名其他角色限一次，你可以选择一项：1. 失去一点体力并对你攻击范围内的一名其他角色造成一点伤害；2. 弃置一张武器牌并对你攻击范围内的一名其他角色造成一点伤害。",
@@ -8224,7 +8232,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yujin_yujin:'界于禁',
 			rejieyue:'节钺',
 			rejieyue_info:'结束阶段开始时，你可以将一张牌交给一名其他角色。然后其选择一项：令你摸三张牌：或其保留一张手牌和装备区的牌，然后弃置其余的牌。',
-			re_lingtong:'界凌统',
 			rexuanfeng:'旋风',
 			rexuanfeng_info:'当你失去装备区内的牌时，或于弃牌阶段弃置了两张或更多的手牌后，你可以依次弃置一至两名其他角色的共计两张牌，或将一名其他角色装备区内的一张牌移动到另一名其他角色的装备区内。',
 			olpaoxiao:'咆哮',
@@ -8264,7 +8271,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wangyi:'界王异',
 			guanzhang:'界关兴张苞',
 			xin_fazheng:'界法正',
-			re_liubiao:'界刘表',
 			rezishou:'自守',
 			rezishou2:'自守',
 			//rezishou_info:'摸牌阶段，你可以多摸X张牌。若如此做，本回合你对其他角色造成伤害时，防止此伤害，且结束阶段，若你本回合没有使用牌指定其他角色为目标，则你可以将场上的一张装备牌移动到自己的装备区。（X为场上势力数）',
@@ -8318,7 +8324,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_caoxiu:'界曹休',
 			xin_lingtong:'界凌统',
 			decadexuanfeng:'旋风',
-			decadexuanfeng_info:'当你于弃牌阶段弃置过至少两张牌，或当你失去装备区里的牌后，你可以弃置至多两名其他角色的共计两张牌。若此时是你的回合内，你可以对其中一名目标造成1点伤害。',
+			decadexuanfeng_info:'当你于弃牌阶段弃置过至少两张牌，或当你失去装备区里的牌后，若场上没有处于濒死状态的角色，则你可以弃置至多两名其他角色的共计两张牌。若此时处于你的回合内，你可以对其中一名目标角色造成1点伤害。',
 			yongjin:'勇进',
 			yongjin_info:'限定技，出牌阶段，你可以依次移动场上的至多三张不同的装备牌。',
 			xin_liubiao:'界刘表',
@@ -8326,7 +8332,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadezishou_zhiheng:'自守',
 			decadezishou_info:'摸牌阶段，你可以多摸X张牌,然后本回合你对其他角色造成伤害时，防止此伤害。结束阶段，若你本回合没有使用牌指定其他角色为目标，你可以弃置任意张花色不同的手牌，然后摸等量的牌。',
 			decadezongshi:'宗室',
-			decadezongshi_info:'锁定技，你的手牌上限+X（X为现存势力数）。你的回合外，若你的手牌数大于等于手牌上限，延时类锦囊牌或无颜色的牌对你无效。',
+			decadezongshi_info:'锁定技，你的手牌上限+X（X为现存势力数）。你的回合外，若你的手牌数大于等于手牌上限，则当你成为延时类锦囊牌或无颜色的牌的目标后，你令此牌对你无效。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

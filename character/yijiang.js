@@ -12097,7 +12097,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuyu:['liuyu','ol_liuyu'],
 			zhangrang:['zhangrang','ol_zhangrang','junk_zhangrang'],
 			jikang:['re_jikang','jikang'],
-			xinxianying:['xinxianying','ol_xinxianying','sp_xinxianying'],
+			xinxianying:['re_xinxianying','xinxianying','sp_xinxianying','ol_xinxianying'],
 		},
 		translate:{
 			old_huaxiong:'华雄',

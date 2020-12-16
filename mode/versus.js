@@ -353,7 +353,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				else if(_status.mode=='2v2'||_status.mode=='3v3'){
 					_status.first_less=true;
-					var firstChoose=game.players.randomGet();
+					var firstChoose=(_status.firstAct||game.players.randomGet());
 					if(firstChoose.next.side==firstChoose.side){
 						firstChoose=firstChoose.next;
 					}
@@ -3035,11 +3035,41 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				var next=game.createEvent('chooseCharacterOL',false);
 				next.setContent(function(){
 					'step 0'
-					game.broadcastAll(function(ref,bool,bool2){
+					var ref=game.players[0];
+					var bool=Math.random()<0.5;
+					var bool2=Math.random()<0.5;
+					ref.side=bool;
+					ref.next.side=bool2;
+					ref.next.next.side=!bool;
+					ref.previous.side=!bool2;
+					var firstChoose=game.players.randomGet();
+					if(firstChoose.next.side==firstChoose.side){
+						firstChoose=firstChoose.next;
+					}
+					_status.firstAct=firstChoose;
+					for(var i=0;i<4;i++){
+						firstChoose.node.name.innerHTML=get.verticalStr(get.cnNumber(i+1,true)+'号位');
+						firstChoose=firstChoose.next;
+					}
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].side==game.me.side){
+							game.players[i].node.identity.firstChild.innerHTML='友';
+						}
+						else{
+							game.players[i].node.identity.firstChild.innerHTML='敌';
+						}
+						game.players[i].node.identity.dataset.color=game.players[i].side+'zhu';
+					}
+					ui.arena.classList.add('choose-character');
+					game.broadcast(function(ref,bool,bool2,firstChoose){
 						ref.side=bool;
 						ref.next.side=bool2;
 						ref.next.next.side=!bool;
 						ref.previous.side=!bool2;
+						for(var i=0;i<4;i++){
+							firstChoose.node.name.innerHTML=get.verticalStr(get.cnNumber(i+1,true)+'号位');
+							firstChoose=firstChoose.next;
+						}
 						for(var i=0;i<game.players.length;i++){
 							if(game.players[i].side==game.me.side){
 								game.players[i].node.identity.firstChild.innerHTML='友';
@@ -3050,7 +3080,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							game.players[i].node.identity.dataset.color=game.players[i].side+'zhu';
 						}
 						ui.arena.classList.add('choose-character');
-					},game.players[0],Math.random()<0.5,Math.random()<0.5);
+					},ref,bool,bool2,_status.firstAct);
 					_status.onreconnect=[function(){
 						var players=game.players.concat(game.dead);
 						for(var i=0;i<players.length;i++){

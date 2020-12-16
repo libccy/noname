@@ -1101,12 +1101,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							};
 							"step 1"
 							if(result.bool){
-								player.line(result.targets);
-								player.logSkill('liangyin');
+								player.logSkill('liangyin',result.targets);
 								result.targets[0].draw();
-							}else{
-								event.finish();
-							};
+							}
 						},
 						sub:true,
 					},
@@ -1127,12 +1124,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							};
 							"step 1"
 							if(result.bool){
-								player.line(result.targets);
-								player.logSkill('liangyin');
+								player.logSkill('liangyin',result.targets);
 								result.targets[0].chooseToDiscard('he',1,true);
-							}else{
-								event.finish();
-							};
+							}
 						},
 						sub:true,
 					},
@@ -1162,8 +1156,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.lose(result.cards,ui.special,'toStorage');
 						game.log(player,'将',result.cards,'置于其武将牌上');
 						player.addSkill('kongsheng2');
-					}else{
-						event.finish();
 					}
 				},
 			},
@@ -1466,7 +1458,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					};
 					'step 2'
-					//player.line(event.target,'green');
 					player.logSkill('nzry_yili',target);
 					if(result.index==1){
 						player.removeMark('nzry_huaiju',1);
@@ -1977,12 +1968,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							"step 1"
 							if(result.bool){
 								player.storage.nzry_zhenliang=false;
-								player.line(result.targets);
-								player.logSkill('nzry_zhenliang');
+								player.logSkill('nzry_zhenliang',result.targets);
 								result.targets[0].draw();
-							}else{
-								event.finish();
-							};
+							}
 						},
 					},
 				},
