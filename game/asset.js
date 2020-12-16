@@ -3513,6 +3513,7 @@ window.noname_asset_list=[
 	'image/character/key_hiroto.jpg',
 	'image/character/xin_lingtong.jpg',
 	'image/character/xin_liubiao.jpg',
+	'image/character/re_xinxianying.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',

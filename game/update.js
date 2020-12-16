@@ -4,6 +4,7 @@ window.noname_update={
 	changeLog:[
 		'铃木央人',
 		'界凌统、界刘表',
+		'辛宪英、鲍三娘',
 		'bug修复',
 	],
 	files:[
