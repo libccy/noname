@@ -6425,7 +6425,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			quanfeng_info:'锁定技，限定技，一名角色死亡时，你选择获得其的一个技能（主公技，限定技，觉醒技，带有Charlotte标签的技能除外），然后加1点体力上限并回复1点体力。',
 			simashi:'司马师',
 			baiyi:'败移',
-			baiyi_info:'限定技，出牌阶段，若你已受伤，你可以交换两名角色的座次。',
+			baiyi_info:'限定技，出牌阶段，若你已受伤，你可以交换两名其他角色的座次。',
 			jinglve:'景略',
 			jinglve2:'景略',
 			jinglve3:'景略',

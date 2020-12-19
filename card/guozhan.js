@@ -247,7 +247,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 8-get.value(card);
 					});
 					'step 3'
-					if(event.forceExecute||!result.bool) target.damage('thunder');
+					if(card.yingbian||!result.bool) target.damage('thunder');
 				},
 				ai:{
 					order:7,

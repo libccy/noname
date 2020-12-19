@@ -12054,7 +12054,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterReplace:{
 			caozhi:['re_caozhi','caozhi'],
-			zhangchunhua:['zhangchunhua','mini_zhangchunhua'],
+			zhangchunhua:['zhangchunhua','jin_zhangchunhua','mini_zhangchunhua'],
 			yujin:['yujin_yujin','re_yujin','ol_yujin','xin_yujin','yujin'],
 			xushu:['re_xushu','xin_xushu','xushu'],
 			fazheng:['xin_fazheng','fazheng'],

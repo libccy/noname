@@ -48,6 +48,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			icedamage:{
+				ai:{
+					result:{
+						target:-1.5
+					},
+					tag:{
+						damage:1,
+						iceDamage:1,
+						natureDamage:1,
+					}
+				}
+			},
 			respondShan:{
 				ai:{
 					result:{
@@ -63,13 +75,23 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			sha:{
 				audio:true,
 				fullskin:true,
-				nature:['thunder','fire','kami'],
+				nature:['thunder','fire','kami','ice'],
 				type:'basic',
 				enable:true,
 				usable:1,
 				updateUsable:'phaseUse',
+				global:'icesha_skill',
 				range:{attack:1},
 				selectTarget:1,
+				yingbian:function(event){
+					if(event.card.nature=='fire'){
+						if(typeof event.baseDamage!='number') event.baseDamage=1;
+						event.baseDamage++;
+					}
+					else{
+						event.yingbian_addTarget=true;
+					}
+				},
 				filterTarget:function(card,player,target){return player!=target},
 				content:function(){
 					"step 0"
@@ -233,6 +255,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				cardcolor:'red',
 				notarget:true,
 				nodelay:true,
+				yingbian:function(event){
+					event.player.draw();
+				},
 				content:function(){
 					event.result='shaned';
 					event.getParent().delayx=false;
@@ -735,6 +760,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'trick',
 				enable:true,
 				selectTarget:-1,
+				yingbian:function(event){
+					event.yingbian_removeTarget=true;
+				},
 				filterTarget:function(card,player,target){
 					return target!=player;
 				},
@@ -920,6 +948,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				enable:true,
+				yingbian:function(event){
+					event.directHit.addArray(game.players);
+				},
 				filterTarget:function(card,player,target){
 					return target!=player;
 				},
@@ -1330,6 +1361,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							delete ui.tempnowuxie;
 						}
 					}
+					if(event.card.yingbian){
+						var cardx=event.getParent().respondTo[1];
+						if(cardx&&cardx.cards&&cardx.cards.filterInD().length) player.gain(cardx.cards.filterInD(),'gain2','log');
+					}
 				},
 			},
 			lebu:{
@@ -1565,6 +1600,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						player.discardPlayerCard('he',trigger.player,true);
 					}
 				}
+			},
+			icesha_skill:{
+				inherit:'hanbing_skill',
+				trigger:{source:'damageBegin2'},
+				equipSkill:false,
+				ruleSkill:true,
+				filter:function(event){
+					return event.card&&event.card.name=='sha'&&event.nature=='ice'&&event.notLink()&&event.player.getCards('he').length>0;
+				},
 			},
 			renwang_skill:{
 				equipSkill:true,
@@ -2411,6 +2455,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			wuxie_info:'一张锦囊牌生效前，对此牌使用。抵消此牌对一名角色产生的效果，或抵消另一张【无懈可击】产生的效果。',
 			lebu_info:'出牌阶段，对一名其他角色使用。若判定结果不为红桃，跳过其出牌阶段。',
 			shandian_info:'出牌阶段，对自己使用。若判定结果为黑桃2~9，则目标角色受到3点雷电伤害。若判定不为黑桃2~9，将之移动到下家的判定区里。',
+			icesha_skill:'冰杀',
+			icesha_skill_info:'防止即将造成的伤害，改为依次弃置其两张牌。',
 		},
 		list:[
 			["spade",7,"sha"],

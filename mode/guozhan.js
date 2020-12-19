@@ -4390,7 +4390,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var card={name:button.link[2]};
 						var info=get.info(card);
 						var num=player.countCards('h');
-						if(get.tag(card,'multitarget')&&get.select(info.selectTarget)[1]==-1){
+						//if(get.tag(card,'multitarget')&&get.select(info.selectTarget)[1]==-1){
+						if(get.select(info.selectTarget)[1]==-1){
 							if(game.countPlayer(function(current){
 								return player.canUse(card,current)
 							})>num){

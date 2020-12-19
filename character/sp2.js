@@ -4,7 +4,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
-			//jin_zhangchunhua:['female','wei',3,['jiang','hunzi'],['hiddenSkill']],
+			jin_zhangchunhua:['female','jin',3,['huishi','qingleng','xuanmu'],['hiddenSkill']],
+			dongxie:['female','qun','3/4',['juntun','jiaojie']],
 			//jin_simayi:['female','wei',3,['reyingzi','gzyinghun'],['hiddenSkill']],
 			re_xinxianying:['female','wei',3,['rezhongjian','recaishi']],
 			luyusheng:['female','wu',3,['sicong','xianzhao'],['unseen']],
@@ -73,6 +74,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterSort:{
 			sp2:{
+				sp_yingbian:['jin_zhangchunhua'],
 				sp_whlw:["xurong","lijue","zhangji","fanchou","guosi"],
 				sp_zlzy:["zhangqiying","lvkai","zhanggong","weiwenzhugezhi","beimihu"],
 				sp_longzhou:["xf_tangzi","xf_huangquan","xf_sufei","sp_liuqi"],
@@ -82,7 +84,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_baigei:['re_panfeng','xingdaorong','caoxing'],
 				sp_guandu:["sp_zhanghe","xunchen","sp_shenpei","gaolan","lvkuanglvxiang","chunyuqiong","sp_xuyou"],
 				sp_huangjin:['liuhong','zhujun','re_hejin','hansui'],
-				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','re_sunluyu','caobuxing','ol_yujin','re_maliang','xin_baosanniang','liubian','re_xinxianying'],
+				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','re_sunluyu','caobuxing','ol_yujin','re_maliang','xin_baosanniang','liubian','re_xinxianying','dongxie'],
 				sp_mini:["mini_sunquan","mini_zuoci","mini_jiangwei","mini_diaochan","mini_zhangchunhua"],
 				sp_luanwu:["ns_lijue","ns_zhangji","ns_fanchou"],
 				sp_yongjian:["ns_chendao","yj_caoang"],
@@ -90,6 +92,118 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			juntun:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				forced:true,
+				filter:function(event,player){
+					return player.maxHp>1;
+				},
+				content:function(){
+					player.loseMaxHp();
+					player.draw(player.maxHp);
+				},
+			},
+			jiaojie:{
+				mod:{
+					ignoredHandcard:function(card,player){
+						if(get.color(card)=='red'){
+							return true;
+						}
+					},
+					cardDiscardable:function(card,player,name){
+						if(name=='phaseDiscard'&&get.color(card)=='red'){
+							return false;
+						}
+					},
+					targetInRange:function(card){
+						if(get.color(card)=='black') return true;
+					},
+					cardUsable:function(card){
+						if(get.color(card)=='black') return Infinity;
+					},
+				},
+			},
+			huishi:{
+				audio:2,
+				trigger:{player:'phaseDrawBegin1'},
+				filter:function(event,player){
+					return ui.cardPile.childElementCount%10>0&&!event.numFixed;
+				},
+				prompt:function(){
+					return get.prompt('huishi')+'（当前牌堆尾数：'+ui.cardPile.childElementCount%10+'）';
+				},
+				check:function(event,player){
+					return ui.cardPile.childElementCount%10>3;
+				},
+				content:function(){
+					'step 0'
+					trigger.changeToZero();
+					event.cards=game.cardsGotoOrdering(get.cards(ui.cardPile.childElementCount%10)).cards;
+					var num=Math.ceil(event.cards.length/2);
+					var str='按顺序将卡牌置于牌堆底';
+					if(event.cards.length>num) str='按顺序将'+get.cnNumber(num)+'张牌置于牌堆底，然后获得其余的牌';
+					player.chooseButton([str,'<div class="text center">（先选择的在上）</div>',event.cards],true,num).set('ai',function(card){
+						return -get.value(card);
+					});
+					'step 1'
+					for(var i of result.links){
+						cards.remove(i);
+						i.fix();
+						ui.cardPile.appendChild(i);
+					}
+					game.updateRoundNumber();
+					if(cards.length) player.gain(cards,'gain2','log');
+				},
+			},
+			qingleng:{
+				audio:2,
+				trigger:{global:'phaseEnd'},
+				direct:true,
+				filter:function(event,player){
+					var target=event.player;
+					return target!=player&&!target.storage.nohp&&(target.hp+target.countCards('h'))>=(ui.cardPile.childElementCount%10)&&player.countCards('he')>0&&player.canUse({name:'sha',nature:'ice'},target,false);
+				},
+				content:function(){
+					'step 0'
+					player.chooseCard('he',get.prompt('qingleng',trigger.player),'将一张牌当做冰【杀】对其使用',function(card,player){
+						return player.canUse(get.autoViewAs({name:'sha',nature:'ice'},[card]),_status.event.target,false);
+					}).set('target',trigger.player).set('ai',function(card){
+						if(get.effect(_status.event.target,get.autoViewAs({name:'sha',nature:'ice'},[card]),player)<=0) return false;
+						return 6-get.value(card);
+					});
+					'step 1'
+					if(result.bool){
+						player.useCard(get.autoViewAs({name:'sha',nature:'ice'},result.cards),result.cards,false,trigger.player,'qingleng');
+					}
+				},
+			},
+			xuanmu:{
+				audio:2,
+				trigger:{player:'showCharacterAfter'},
+				forced:true,
+				hiddenSkill:true,
+				filter:function(event,player){
+					return event.toShow.contains('jin_zhangchunhua')&&player!=_status.currentPhase;
+				},
+				content:function(){
+					player.addTempSkill('xuanmu2');
+				},
+			},
+			xuanmu2:{
+				trigger:{player:'damageBegin4'},
+				forced:true,
+				popup:false,
+				content:function(){
+					trigger.cancel();
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(get.tag(card,'damage')&&!player.hasSkillTag('jueqing',false,target)) return 'zerotarget';
+						},
+					},
+				},
+			},
 			decadewuniang:{
 				trigger:{
 					player:["useCard","respond"],
@@ -5182,10 +5296,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return '共有'+(storage.red+storage.black)+'个标记';
 					},
 				},
-				trigger:{global:'damage'},
+				trigger:{global:'damageEnd'},
 				forced:true,
 				filter:function(event,player){
-					return event.player!=player&&_status.currentPhase!=player;
+					return event.player!=player&&event.player.isAlive()&&_status.currentPhase!=player;
 				},
 				content:function(){
 					player.storage.gxlianhua[player.getFriends().contains(trigger.player)?'red':'black']++;
@@ -7161,7 +7275,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadewuniang:'武娘',
 			decadewuniang_info:'当你使用或打出【杀】时，你可以获得一名其他角色的一张牌。若如此做，其摸一张牌。（若你已发动许身，则关索也摸一张牌）',
 			jin_zhangchunhua:'晋张春华',
+			jin_zhangchunhua_ab:'张春华',
+			huishi:'慧识',
+			huishi_info:'摸牌阶段，你可以放弃摸牌，改为观看牌堆顶的X张牌，获得其中的一半（向下取整），然后将其余牌置入牌堆底。（X为牌堆数量的个位数）',
+			qingleng:'清冷',
+			qingleng_info:'一名角色的回合结束时，若其体力值与手牌数之和不小于X，你可将一张牌当无距离限制的冰属性【杀】对其使用。（X为牌堆数量的个位数）',
+			xuanmu:'宣穆',
+			xuanmu2:'宣穆',
+			xuanmu_info:'锁定技，隐匿技。你于其他角色的回合登场时，防止你受到的伤害直到回合结束。',
 			jin_simayi:'晋司马懿',
+			dongxie:'董翓',
+			juntun:'军屯',
+			juntun_info:'锁定技，准备阶段，若X大于1，则你减1点体力上限并摸X张牌（X为你的体力上限）。',
+			jiaojie:'狡黠',
+			jiaojie_info:'锁定技，你的红色牌不计入手牌上限。你使用黑色牌无距离和次数限制。',
+			sp_yingbian:'应变篇',
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",
 			sp_longzhou:"同舟共济",

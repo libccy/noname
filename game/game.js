@@ -9360,14 +9360,15 @@
 			},
 			c:function(){
 				(function(){
-					var a=0,b=0,c=0,d=0,e=0,f=0;
-					var sa=0,sb=0,sc=0,sd=0,se=0,sf=0;
+					var a=0,b=0,c=0,d=0,e=0,f=0,g=0;
+					var sa=0,sb=0,sc=0,sd=0,se=0,sf=0,sg=0;
 					for(var i in lib.character){
 						switch(lib.character[i][1]){
 							case 'wei':a++;if(lib.config.banned.contains(i)) sa++;break;
 							case 'shu':b++;if(lib.config.banned.contains(i)) sb++;break;
 							case 'wu':c++;if(lib.config.banned.contains(i)) sc++;break;
 							case 'qun':d++;if(lib.config.banned.contains(i)) sd++;break;
+							case 'jin':g++;if(lib.config.banned.contains(i)) sg++;break;
 							case 'western':e++;if(lib.config.banned.contains(i)) se++;break;
 							case 'key':f++;if(lib.config.banned.contains(i)) sf++;break;
 						}
@@ -9376,6 +9377,7 @@
 					console.log('蜀：'+(b-sb)+'/'+b);
 					console.log('吴：'+(c-sc)+'/'+c);
 					console.log('群：'+(d-sd)+'/'+d);
+					console.log('晋：'+(g-sg)+'/'+g);
 					console.log('西：'+(e-se)+'/'+e);
 					console.log('键：'+(f-sf)+'/'+f);
 					console.log('已启用：'+((a+b+c+d+e+f)-(sa+sb+sc+sd+se+sf))+'/'+(a+b+c+d+e+f));
@@ -9822,6 +9824,7 @@
 			thunder:"雷",
 			poison:"毒",
 			kami:'神',
+			ice:'冰',
 			wei:'魏',
 			shu:'蜀',
 			wu:'吴',
@@ -9829,6 +9832,7 @@
 			shen:'神',
 			western:'西',
 			key:'键',
+			jin:'晋',
 			wei2:'魏国',
 			shu2:'蜀国',
 			wu2:'吴国',
@@ -9836,6 +9840,7 @@
 			shen2:'神明',
 			western2:'西方',
 			key2:'KEY',
+			jin2:'晋朝',
 			male:'男',
 			female:'女',
 			mad:'混乱',
@@ -9853,6 +9858,7 @@
 			qunColor:"#f6f6f6",
 			shenColor:"#ffe14c",
 			westernColor:"#ffe14c",
+			jinColor:"#ffe14c",
 			keyColor:"#c9b1fd",
 			basic:'基本',
 			equip:'装备',
@@ -9881,6 +9887,7 @@
 			_lianhuan:'连环',
 			_lianhuan2:'连环',
 			_kamisha:'神杀',
+			_icesha:'冰杀',
 			qianxing:'潜行',
 			mianyi:'免疫',
 			fengyin:'封印',
@@ -15888,6 +15895,7 @@
 						this.name=this.name1;
 						skills=lib.character[this.name][3]||[];
 						this.sex=lib.character[this.name][0];
+						if(this.group=='unknown') this.group=lib.character[this.name][1];
 						this.classList.remove('unseen');
 						break;
 						case 1:
@@ -15906,6 +15914,7 @@
 						var skills=(lib.character[this.name][3]||[]);
 						if(this.name2) skills=skills.concat(lib.character[this.name2][3]||[]);
 						this.sex=lib.character[this.name][0];
+						if(this.group=='unknown') this.group=lib.character[this.name][1];
 						this.classList.remove('unseen');
 						this.classList.remove('unseen2');
 						break;
@@ -15918,8 +15927,7 @@
 					game.broadcast(function(player,name,sex,num,group){
 						player.group=group;
 						player.name=name;
-						player.sex=sex;
-						player.node.identity.classList.remove('guessing');
+						player.sex=sex;;
 						switch(num){
 							case 0:player.classList.remove('unseen');break;
 							case 1:player.classList.remove('unseen2');break;
@@ -16344,25 +16352,19 @@
 					this.node.intro.innerHTML=lib.config.intro;
 					this.node.name.dataset.nature=get.groupnature(this.group);
 					lib.setIntro(this);
-					// var name=get.translation(character);
 					this.node.name.innerHTML=get.slimName(character);
 					if(this.classList.contains('minskin')&&this.node.name.querySelectorAll('br').length>=4){
 						this.node.name.classList.add('long');
 					}
-					// if(!lib.config.show_name){
-					// 	this.node.name.style.display='none';
-					// }
-					// for(var i=0;i<name.length;i++){
-					// 	if(name[i]!='s'&&name[i]!='p')
-					// 	this.node.name.innerHTML+=name[i]+'<br/>';
-					// }
 					if(info[4].contains('hiddenSkill')){
 						if(!this.hiddenSkills) this.hiddenSkills=[];
 						this.hiddenSkills.addArray(skills);
 						skills=[];
 						this.classList.add('unseen');
 						this.name='unknown';
-						//this.node.name_seat=ui.create.div('.name.name_seat','未知',this);
+						this.node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(get.translation(this.name)),this);
+						this.sex='male';
+						this.group='unknown';
 						this.storage.nohp=true;
 					}
 					if(character2&&lib.character[character2]){
@@ -16423,15 +16425,7 @@
 						}
 						else skills=skills.concat(info2[3]);
 
-						// var name=get.translation(character2);
 						this.node.name2.innerHTML=get.slimName(character2);
-						// this.node.name2.dataset.nature=get.groupnature(info2[1]);
-						// if(!lib.config.show_name){
-						// 	this.node.name2.style.display='none';
-						// }
-						// for(var i=0;i<name.length;i++){
-						// 	this.node.name2.innerHTML+=name[i]+'<br/>';
-						// }
 					}
 					if(this.storage.nohp) this.node.hp.hide();
 					if(skill!=false){
@@ -16913,6 +16907,8 @@
 						linked:this.isLinked(),
 						turnedover:this.isTurnedOver(),
 						phaseNumber:this.phaseNumber,
+						unseen:this.isUnseen(0),
+						unseen2:this.isUnseen(1),
 					}
 					for(var i=0;i<state.judges.length;i++){
 						state.views[i]=state.judges[i].viewAs;
@@ -18226,34 +18222,41 @@
 					next._args.add('glow_result');
 					return next;
 				},
-				chooseCard:function(){
+				chooseCard:function(choose){
 					var next=game.createEvent('chooseCard');
 					next.player=this;
-					for(var i=0;i<arguments.length;i++){
-						if(typeof arguments[i]=='number'){
-							next.selectCard=[arguments[i],arguments[i]];
+					if(arguments.length==1&&get.is.object(choose)){
+						for(var i in choose){
+							next[i]=choose[i];
 						}
-						else if(get.itemtype(arguments[i])=='select'){
-							next.selectCard=arguments[i];
-						}
-						else if(typeof arguments[i]=='boolean'){
-							next.forced=arguments[i];
-						}
-						else if(get.itemtype(arguments[i])=='position'){
-							next.position=arguments[i];
-						}
-						else if(typeof arguments[i]=='function'){
-							if(next.filterCard) next.ai=arguments[i];
-							else next.filterCard=arguments[i];
-						}
-						else if(typeof arguments[i]=='object'&&arguments[i]){
-							next.filterCard=get.filter(arguments[i]);
-						}
-						else if(arguments[i]=='glow_result'){
-							next.glow_result=true;
-						}
-						else if(typeof arguments[i]=='string'){
-							get.evtprompt(next,arguments[i]);
+					}
+					else{
+						for(var i=0;i<arguments.length;i++){
+							if(typeof arguments[i]=='number'){
+								next.selectCard=[arguments[i],arguments[i]];
+							}
+							else if(get.itemtype(arguments[i])=='select'){
+								next.selectCard=arguments[i];
+							}
+							else if(typeof arguments[i]=='boolean'){
+								next.forced=arguments[i];
+							}
+							else if(get.itemtype(arguments[i])=='position'){
+								next.position=arguments[i];
+							}
+							else if(typeof arguments[i]=='function'){
+								if(next.filterCard) next.ai=arguments[i];
+								else next.filterCard=arguments[i];
+							}
+							else if(typeof arguments[i]=='object'&&arguments[i]){
+								next.filterCard=get.filter(arguments[i]);
+							}
+							else if(arguments[i]=='glow_result'){
+								next.glow_result=true;
+							}
+							else if(typeof arguments[i]=='string'){
+								get.evtprompt(next,arguments[i]);
+							}
 						}
 					}
 					if(next.filterCard==undefined) next.filterCard=lib.filter.all;
@@ -23342,6 +23345,10 @@
 							card[2]='sha';
 							card[3]='kami';
 						}
+						if(card[2]=='icesha'){
+							card[2]='sha';
+							card[3]='ice';
+						}
 					}
 					else if(typeof card=='object'){
 						card=[card.suit,card.number,card.name,card.nature];
@@ -23584,6 +23591,10 @@
 						else if(card[3]=='kami'){
 							name='神'+name;
 							this.node.image.classList.add('kami');
+						}
+						else if(card[3]=='ice'){
+							name='冰'+name;
+							this.node.image.classList.add('ice');
 						}
 					}
 					for(var i=0;i<name.length;i++){
@@ -24755,7 +24766,7 @@
 				}
 				var fullskills=game.expandSkills(player.getSkills().concat(lib.skill.global));
 				var info=get.info(skill);
-				if(info.noHidden&&!fullskills.contains(skill)){
+				if((info.noHidden||get.mode()!='guozhan')&&!fullskills.contains(skill)){
 					return false;
 				}
 				if(!info.trigger) return false;
@@ -25248,7 +25259,7 @@
 		},
 		skill:{
 			_showHiddenCharacter:{
-				trigger:{player:['changeHp','phaseBeginStart']},
+				trigger:{player:['changeHp','phaseBeginStart','loseMaxHpBegin']},
 				firstDo:true,
 				forced:true,
 				popup:false,
@@ -26764,7 +26775,13 @@
 								player.setModeState(info);
 							}
 							else{
-								player.init(info.name,info.name2);
+								player.init(info.name1,info.name2);
+							}
+							if(!info.unseen) player.classList.remove('unseen');
+							if(!info.unseen2) player.classList.remove('unseen2');
+							if(!player.isUnseen(2)&&player.storage.nohp){
+								delete player.storage.nohp;
+								player.node.hp.show();
 							}
 							player.playerid=i;
 							player.nickname=info.nickname;
@@ -27017,8 +27034,8 @@
 		},
 		suit:['club','spade','diamond','heart'],
 		group:['wei','shu','wu','qun','shen'],
-		nature:['fire','thunder','poison','kami'],
-		linked:['fire','thunder','kami'],
+		nature:['fire','thunder','poison','kami','ice'],
+		linked:['fire','thunder','kami','ice'],
 		groupnature:{
 			shen:'thunder',
 			wei:'water',
@@ -27027,6 +27044,7 @@
 			qun:'metal',
 			western:'thunder',
 			key:'key',
+			jin:'thunder',
 		},
 		phaseName:['phaseZhunbei','phaseJudge','phaseDraw','phaseUse','phaseDiscard','phaseJieshu'],
 	};
@@ -31636,6 +31654,7 @@
 									if(cardnature) tempname=get.translation(cardnature)+tempname;
 									if(cardnature=='thunder') cards[i]._tempName.dataset.nature='thunder';
 									if(cardnature=='kami') cards[i]._tempName.dataset.nature='kami';
+									if(cardnature=='ice') cards[i]._tempName.dataset.nature='ice';
 								}
 								cards[i]._tempName.innerHTML=lib.config.cardtempname=='default'?get.verticalStr(tempname):tempname;
 								cards[i]._tempName.tempname=tempname;
@@ -31818,7 +31837,7 @@
 						else if(info.enable=='phaseUse') enable=(event.type=='phase');
 						else if(typeof info.enable=='string') enable=(info.enable==event.name);
 						if(enable){
-							if(!game.expandSkills(player.getSkills().concat(lib.skill.global)).contains(skills2[i])&&(info.noHidden||player.hasSkillTag('nomingzhi',false,null,true))) enable=false;
+							if(!game.expandSkills(player.getSkills().concat(lib.skill.global)).contains(skills2[i])&&(info.noHidden||get.mode()!='guozhan'||player.hasSkillTag('nomingzhi',false,null,true))) enable=false;
 							if(info.filter&&!info.filter(event,player)) enable=false;
 							if(info.viewAs&&typeof info.viewAs!='function'&&event.filterCard&&!event.filterCard(info.viewAs,player,event)) enable=false;
 							if(info.viewAs&&typeof info.viewAs!='function'&&info.viewAsFilter&&info.viewAsFilter(player)==false) enable=false;
@@ -36608,9 +36627,10 @@
 							if(info[name][1]=='shu') return 1;
 							if(info[name][1]=='wu') return 2;
 							if(info[name][1]=='qun') return 3;
-							if(info[name][1]=='western') return 4;
-							if(info[name][1]=='key') return 5;
-							return 6;
+							if(info[name][1]=='jin') return 4;
+							if(info[name][1]=='western') return 5;
+							if(info[name][1]=='key') return 6;
+							return 7;
 						}
 						list.sort(function(a,b){
 							var del=groupSort(a)-groupSort(b);
@@ -38710,7 +38730,7 @@
 								editnode.classList.add('disabled');
 								delnode.innerHTML='取消';
 								delete delnode.button;
-								container.code='card={\n			 \n}\n\n\/*\n示例：\ncard={\n			 type:"basic",\n    enable:true,\n			 filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+								container.code='card={\n    \n}\n\n\/*\n示例：\ncard={\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 							}
 
 							newCard=ui.create.div('.new_character',page);
@@ -38924,7 +38944,7 @@
 							};
 							var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
 							var editor=ui.create.div(editorpage);
-							container.code='card={\n			 \n}\n\n\/*\n示例：\ncard={\n			 type:"basic",\n    enable:true,\n			 filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+							container.code='card={\n    \n}\n\n\/*\n示例：\ncard={\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 
 							var editnode=ui.create.div('.menubutton.large.new_card.disabled','创建卡牌',newCard,function(){
 								var name=page.querySelector('input.new_name').value;
@@ -39606,8 +39626,8 @@
 								else{
 									dashes.content.node.code='function(config,pack){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之后、界面加载之前\n参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可在此函数中修改）\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 									dashes.precontent.node.code='function(){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之前，且不受禁用扩展的限制\n除添加模式外请慎用\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
-									dashes.config.node.code='config={\n			 \n}\n\n\/*\n示例：\nconfig={\n			 switcher_example:{\n    name:"示例列表选项",\n        init:"3",\n        item:{"1":"一","2":"二","3":"三"}\n    },\n			 toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
-									dashes.help.node.code='help={\n			 \n}\n\n\/*\n示例：\nhelp={\n    "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+									dashes.config.node.code='config={\n    \n}\n\n\/*\n示例：\nconfig={\n    switcher_example:{\n    name:"示例列表选项",\n        init:"3",\n        item:{"1":"一","2":"二","3":"三"}\n    },\n    toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+									dashes.help.node.code='help={\n    \n}\n\n\/*\n示例：\nhelp={\n    "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 								}
 							};
 							var dashes={};
@@ -39730,8 +39750,8 @@
 							};
 							page.content={}
 							createCode('主','主代码',page,clickCode,'content','function(config,pack){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之后、界面加载之前\n参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可在此函数中修改）\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
-							createCode('启','启动代码',page,clickCode,'precontent','function(){\n			 \n}\n\n\/*\n函数执行时机为游戏数据加载之前，且不受禁用扩展的限制\n除添加模式外请慎用\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
-							createCode('选','选项代码',page,clickCode,'config','config={\n    \n}\n\n\/*\n示例：\nconfig={\n    switcher_example:{\n        name:"示例列表选项",\n        init:"3",\n						  item:{"1":"一","2":"二","3":"三"}\n    },\n			 toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
+							createCode('启','启动代码',page,clickCode,'precontent','function(){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之前，且不受禁用扩展的限制\n除添加模式外请慎用\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
+							createCode('选','选项代码',page,clickCode,'config','config={\n    \n}\n\n\/*\n示例：\nconfig={\n    switcher_example:{\n        name:"示例列表选项",\n        init:"3",\n     	  item:{"1":"一","2":"二","3":"三"}\n    },\n    toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
 							createCode('帮','帮助代码',page,clickCode,'help','help={\n    \n}\n\n\/*\n示例：\nhelp={\n    "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
 
 							return page;
@@ -41597,7 +41617,7 @@
 				},true,true);
 			},
 			groupControl:function(dialog){
-				return ui.create.control('wei','shu','wu','qun','western','key',function(link,node){
+				return ui.create.control('wei','shu','wu','qun','jin','western','key',function(link,node){
 					if(link=='全部'){
 						dialog.currentcapt='';
 						dialog.currentgroup='';
@@ -42024,7 +42044,7 @@
 					}
 				}
 				if(!thisiscard){
-					var groups=['wei','shu','wu','qun'];
+					var groups=['wei','shu','wu','qun','jin'];
 					var bool1=false;
 					var bool2=false;
 					var bool3=(get.mode()=='guozhan'&&_status.forceKey!=true&&get.config('onlyguozhan'));
@@ -43586,7 +43606,7 @@
 							name:ui.create.div('.name',node),
 							intro:ui.create.div('.intro',node)
 						}
-						if(item.name.indexOf('unknown')==0){
+						if(item.name&&item.name.indexOf('unknown')==0){
 							if(item.node&&item.node.name_seat){
 								node.classList.add('cardbg');
 								ui.create.div('.avatar_name',node,get.translation(item.name));
@@ -49952,6 +49972,9 @@
 					else if(str.nature=='kami'){
 						str2='神'+str2;
 					}
+					else if(str.nature=='ice'){
+						str2='冰'+str2;
+					}
 				}
 				if(get.itemtype(str)=='card'||str.isCard){
 					if(_status.cardtag&&str.cardid){
@@ -51591,7 +51614,7 @@
 			}
 		},
 		groups:function(){
-			return ['wei','shu','wu','qun','western','key'];
+			return ['wei','shu','wu','qun','jin','western','key'];
 		},
 		types:function(){
 			var types=[];
