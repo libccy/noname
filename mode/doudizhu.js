@@ -71,7 +71,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			var info=[];
 			for(var i=0;i<players.length;i++){
 				info.push({
-					name:players[i].name,
+					name:players[i].name1,
 					name2:players[i].name2,
 					identity:players[i].identity
 				});
@@ -404,7 +404,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.update();
 					}
 					if(back){
-						list.remove(get.sourceCharacter(player.name));
+						list.remove(get.sourceCharacter(player.name1));
 						list.remove(get.sourceCharacter(player.name2));
 						for(var i=0;i<list.length;i++){
 							back.push(list[i]);
@@ -773,7 +773,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						game.me.init(event.choosed[0]);
 					}
-					event.list.remove(get.sourceCharacter(game.me.name));
+					event.list.remove(get.sourceCharacter(game.me.name1));
 					event.list.remove(get.sourceCharacter(game.me.name2));
 					if(game.me==game.zhu){
 						game.me.hp++;
@@ -789,7 +789,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					"step 3"
 					for(var i=0;i<game.players.length;i++){
-						_status.characterlist.remove(get.sourceCharacter(game.players[i].name));
+						_status.characterlist.remove(get.sourceCharacter(game.players[i].name1));
 						_status.characterlist.remove(get.sourceCharacter(game.players[i].name2));
 					}
 					setTimeout(function(){
@@ -938,7 +938,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(i in lib.characterReplace){
 						var ix=lib.characterReplace[i];
 						for(var j=0;j<ix.length;j++){
-							if(!libCharacter[i]||lib.filter.characterDisabled(ix[j],libCharacter)) ix.splice(j--,1);
+							if(!libCharacter[ix[j]]||lib.filter.characterDisabled(ix[j],libCharacter)) ix.splice(j--,1);
 						}
 						if(ix.length){
 							var name=ix.randomGet();

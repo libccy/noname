@@ -496,7 +496,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			var info=[];
 			for(var i=0;i<players.length;i++){
 				info.push({
-					name:players[i].name,
+					name:players[i].name1,
 					name2:players[i].name2,
 					count:players[i].actcount
 				});
@@ -952,7 +952,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								ui.arena.appendChild(player);
 
 								game.addVideo('stoneSwap',null,{
-									name:player.name,
+									name:player.name1,
 									name2:player.name2,
 									position:player.dataset.position,
 									actcount:player.actcount,
@@ -1012,7 +1012,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								ui.arena.appendChild(player);
 
 								game.addVideo('stoneSwap',null,{
-									name:player.name,
+									name:player.name1,
 									name2:player.name2,
 									position:player.dataset.position,
 									actcount:player.actcount,

@@ -205,6 +205,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target!=player&&(get.mode()!='guozhan'||target.countCards('e')>0);
 				},
 				enable:true,
+				yingbian_prompt:'此牌的效果改为依次执行所有选项',
 				content:function(){
 					'step 0'
 					if(get.mode()!='guozhan'&&!get.is.single()) event.goto(2);
@@ -235,7 +236,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					event.finish();
 					'step 2'
-					target.chooseToDiscard(2,event.forceExecute,'e').set('ai',function(card){
+					target.chooseToDiscard(2,card.yingbian,'e').set('ai',function(card){
 						var player=_status.event.player;
 						var source=_status.event.getParent().player;
 						if(get.damageEffect(player,source,player,'thunder')>=0){
@@ -259,15 +260,26 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						natureDamage:1,
 						loseCard:1,
 					},
+					yingbian:function(card,player,targets,viewer){
+						if(get.attitude(viewer,player)<=0) return 0;
+						if(targets.filter(function(current){
+							return get.damageEffect(current,player,player,'thunder')>0&&current.countCards('e',function(card){
+								return get.value(card,current)<=0;
+							})<2&&current.countCards('e',function(card){
+								return get.value(card,current)>0;
+							})>0;
+						}).length) return 6;
+						return 0;
+					},
 					result:{
 						target:function(player,target){
 							if(get.mode()!='guozhan'&&!get.is.single()){
 								if(target.countCards('e',function(card){
 									return get.value(card,target)<=0;
-								})) return 1;
+								})>1) return 1;
 								var es=target.countCards('e');
 								if(es<2) return -1.5;
-								return 3/es;
+								return -3/es;
 							}
 							return -1-target.countCards('e');
 						}

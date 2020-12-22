@@ -15,7 +15,7 @@ window.config={
 	forbidthreecard:['qiankunbiao','shenhuofeiya','gw_ciguhanshuang','gw_birinongwu','gw_qinpendayu','gw_poxiao'],
 	all:{
 		sgscharacters:['standard','shenhua','xinghuoliaoyuan','refresh','yijiang','sp','sp2','extra','old','mobile','tw'],
-		sgscards:['standard','extra','sp','guozhan','zhulu'],
+		sgscards:['standard','extra','sp','guozhan','zhulu','yingbian'],
 		sgsmodes:['identity','guozhan','versus','doudizhu','single','brawl','connect'],
 		stockmode:['identity','guozhan','versus','boss','doudizhu','single','chess','stone','connect','brawl','tafang'],
 		stockextension:['boss','cardpile','coin','wuxing'],
@@ -129,7 +129,7 @@ window.config={
 	cards:['standard','ex','extra','sp','classic','basic'],
 	characters:['standard','shenhua','sp','sp2','yijiang','refresh','xinghuoliaoyuan','mobile','extra'],
 	connect_characters:['diy'],
-	connect_cards:['huanlekapai','guozhan','sp','zhulu'],
+	connect_cards:['huanlekapai','guozhan','sp','zhulu','yingbian'],
 	plays:[],
 	extensions:[],
 	banned:[],

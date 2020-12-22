@@ -326,7 +326,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			var info=[];
 			for(var i=0;i<players.length;i++){
 				info.push({
-					name:players[i].name,
+					name:players[i].name1,
 					name2:players[i].name2,
 					identity:players[i].node.identity.firstChild.innerHTML,
 					color:players[i].node.identity.dataset.color
@@ -594,10 +594,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var zhu=game.findPlayer2(function(current){
 						return current.side==game.me.side&&current.identity=='zhu';
 					});
-					var str=(game.me.side?'暖/':'冷/')+get.translation(zhu.previousSeat.name)+'/'+get.translation(zhu.name)+'/'+get.translation(zhu.nextSeat.name);
+					var str=(game.me.side?'暖/':'冷/')+get.translation(zhu.previousSeat.name1)+'/'+get.translation(zhu.name1)+'/'+get.translation(zhu.nextSeat.name1);
 					return ['统率三军',str]
 				}
-				var str=get.translation(game.me.name);
+				var str=get.translation(game.me.name1);
 				if(game.me.name2){
 					str+='/'+get.translation(game.me.name2);
 				}
@@ -813,7 +813,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var double=(result.links.length==2);
 					game.me.init(result.links[0],result.links[1]);
 					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].name) continue;
+						if(game.players[i].name1) continue;
 						if(game.players[i].type!='human'){
 							game.players[i].init(event.list[game.players[i].identity+game.players[i].type].randomRemove());
 						}
@@ -1069,7 +1069,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										enemyChoice._skipped=true;
 									}
 								}
-								if(!game.players[i].name) game.players[i].init(event.list[game.players[i].side].randomRemove());
+								if(!game.players[i].name1) game.players[i].init(event.list[game.players[i].side].randomRemove());
 							}
 						}
 						game.players[i].addSkill('longchuanzhibao');
@@ -1087,7 +1087,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					_status.firstAct.gainZhibao();
-					game.addRecentCharacter(game.me.name);
+					game.addRecentCharacter(game.me.name1);
 					setTimeout(function(){
 						ui.arena.classList.remove('choose-character');
 					},500);
@@ -1365,15 +1365,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(_status.replacetwo){
 						game.me.replacetwo=result.links[1];
 					}
-					event.list.remove(game.me.name);
+					event.list.remove(game.me.name1);
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]!=game.me){
 							if(_status.brawl&&_status.brawl.chooseCharacter){
 								var list=_status.brawl.chooseCharacter(event.list,game.players[i]);
 								game.players[i].init(list.randomGet());
-								event.list.remove(game.players[i].name);
+								event.list.remove(game.players[i].name1);
 								if(_status.replacetwo){
-									game.players[i].replacetwo=list.randomGet(game.players[i].name);
+									game.players[i].replacetwo=list.randomGet(game.players[i].name1);
 									event.list.remove(game.players[i].replacetwo);
 								}
 							}
@@ -1401,7 +1401,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					for(var i=0;i<game.players.length;i++){
-						_status.characterlist.remove(game.players[i].name);
+						_status.characterlist.remove(game.players[i].name1);
 						_status.characterlist.remove(game.players[i].replacetwo);
 					}
 					setTimeout(function(){
@@ -1549,7 +1549,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.addRecentCharacter(result.links[i]);
 					}
 					game.me.init(result.links[0]);
-					event.list.remove(game.me.name);
+					event.list.remove(game.me.name1);
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]!=game.me){
 							game.players[i].init(event.list.randomRemove());
@@ -1594,8 +1594,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						player.init(list[0]);
 					}
-					this.list.remove(player.name);
-					this.list2.remove(player.name);
+					this.list.remove(player.name1);
+					this.list2.remove(player.name1);
 				}
 				next.setContent(function(){
 					"step 0"
@@ -1791,8 +1791,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						var names=[];
 						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].name){
-								names.push(game.players[i].name);
+							if(game.players[i].name1){
+								names.push(game.players[i].name1);
 							}
 						}
 						for(var i=0;i<dialog.buttons.length;i++){
@@ -1840,8 +1840,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(event.current==game.me){
 							game.addRecentCharacter(result.buttons[0].link);
 						}
-						event.list.remove(event.current.name);
-						event.list2.remove(event.current.name);
+						event.list.remove(event.current.name1);
+						event.list2.remove(event.current.name1);
 						if(event.current.identity=='zhu'){
 							event.current.hp++;
 							event.current.maxHp++;
@@ -1851,7 +1851,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					if(event.four_assign){
 						for(var i=0;i<game.players.length;i++){
-							if(!game.players[i].name) break;
+							if(!game.players[i].name1) break;
 						}
 						if(i<game.players.length){
 							var side=event.current.side;
@@ -1859,7 +1859,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(event.flipassign){
 								for(var iwhile=0;iwhile<8;iwhile++){
 									event.current=event.current.next;
-									if(event.current.side!=side&&!event.current.name){
+									if(event.current.side!=side&&!event.current.name1){
 										break;
 									}
 								}
@@ -1867,7 +1867,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							else{
 								for(var iwhile=0;iwhile<8;iwhile++){
 									event.current=event.current.previous;
-									if(event.current.side==side&&!event.current.name){
+									if(event.current.side==side&&!event.current.name1){
 										break;
 									}
 								}
@@ -1878,7 +1878,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						for(var i=0;i<game.players.length;i++){
-							if(!game.players[i].name){
+							if(!game.players[i].name1){
 								event.ai(game.players[i],event.list.splice(0,3),event.list2);
 								game.players[i].node.name_seat.remove();
 							}
@@ -2869,7 +2869,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					event.current.classList.remove('selectedx');
 					for(var i=0;i<game.players.length;i++){
-						if(!game.players[i].name) break;
+						if(!game.players[i].name1) break;
 					}
 					if(i<game.players.length){
 						var side=event.current.side;
@@ -2877,7 +2877,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(event.flipassign){
 							for(var iwhile=0;iwhile<8;iwhile++){
 								event.current=event.current.next;
-								if(event.current.side!=side&&!event.current.name){
+								if(event.current.side!=side&&!event.current.name1){
 									break;
 								}
 							}
@@ -2885,7 +2885,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						else{
 							for(var iwhile=0;iwhile<8;iwhile++){
 								event.current=event.current.previous;
-								if(event.current.side==side&&!event.current.name){
+								if(event.current.side==side&&!event.current.name1){
 									break;
 								}
 							}
@@ -2985,7 +2985,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						lib.setPopped(_status.enemyCount,func2);
 
 						for(var i in result){
-							if(!lib.playerOL[i].name){
+							if(!lib.playerOL[i].name1){
 								lib.playerOL[i].init(result[i][0]);
 							}
 							if(lib.playerOL[i].side==game.me.side){
@@ -3148,13 +3148,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							result[i]=result[i].links[0];
 						}
 						_status.characterlist.remove(result[i]);
-						if(!lib.playerOL[i].name){
+						if(!lib.playerOL[i].name1){
 							lib.playerOL[i].init(result[i]);
 						}
 					}
 					game.broadcast(function(result){
 						for(var i in result){
-							if(!lib.playerOL[i].name){
+							if(!lib.playerOL[i].name1){
 								lib.playerOL[i].init(result[i]);
 							}
 						}
@@ -3349,20 +3349,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						result2=_status.enemy.randomGet();
 					}
-					if(!game.players[0].name) game.players[0].init(result1);
-					if(!game.players[1].name) game.players[1].init(result2);
+					if(!game.players[0].name1) game.players[0].init(result1);
+					if(!game.players[1].name1) game.players[1].init(result2);
 					_status.friend.remove(result1);
 					_status.enemy.remove(result2);
 					game.broadcast(function(result1,result2){
 						if(game.me.side){
-							if(!game.me.name) game.me.init(result1);
-							if(!game.me.next.name) game.me.next.init(result2);
+							if(!game.me.name1) game.me.init(result1);
+							if(!game.me.next.name1) game.me.next.init(result2);
 							_status.friend.remove(result1);
 							_status.enemy.remove(result2);
 						}
 						else{
-							if(!game.me.name) game.me.init(result2);
-							if(!game.me.next.name) game.me.next.init(result1);
+							if(!game.me.name1) game.me.init(result2);
+							if(!game.me.next.name1) game.me.next.init(result1);
 							_status.friend.remove(result2);
 							_status.enemy.remove(result1);
 						}
@@ -6463,11 +6463,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(_status.mode=='1v1'||_status.mode=='3v3'){
 							game.broadcastAll(function(dead){
 								if(dead.side==game.me.side){
-									_status.friendDied.push(dead.name);
+									_status.friendDied.push(dead.name1);
 									_status.friendCount.innerHTML='阵亡: '+get.cnNumber(_status.friendDied.length,true);
 								}
 								else{
-									_status.enemyDied.push(dead.name);
+									_status.enemyDied.push(dead.name1);
 									_status.enemyCount.innerHTML='杀敌: '+get.cnNumber(_status.enemyDied.length,true);
 								}
 							},this);
@@ -6675,11 +6675,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return;
 						}
 						if(this.side==me.side){
-							_status.friendDied.push(this.name);
+							_status.friendDied.push(this.name1);
 							_status.friendCount.innerHTML='阵亡: '+get.cnNumber(_status.friendDied.length,true);
 						}
 						else{
-							_status.enemyDied.push(this.name);
+							_status.enemyDied.push(this.name1);
 							_status.enemyCount.innerHTML='杀敌: '+get.cnNumber(_status.enemyDied.length,true);
 						}
 

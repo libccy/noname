@@ -1493,6 +1493,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				popup:false,
 				nopop:true,
+				forceLoad:true,
 				intro:{
 					content:function(storage,player){
 						return '结束阶段，你随机弃置一名随机敌人的一张随机牌（剩余'+player.storage.mapodoufu_markcount+'回合）'

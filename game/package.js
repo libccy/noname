@@ -27,6 +27,7 @@ window.noname_package={
 		sp:'SP',
 		guozhan:'国战',
 		zhulu:'逐鹿天下',
+		yingbian:'应变篇',
 		zhenfa:'阵法',
 		yunchou:'运筹帷幄',
 		swd:'轩辕剑',

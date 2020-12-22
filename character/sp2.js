@@ -5,10 +5,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		character:{
 			jin_zhangchunhua:['female','jin',3,['huishi','qingleng','xuanmu'],['hiddenSkill']],
+			jin_simayi:['male','jin',3,['buchen','smyyingshi','xiongzhi','quanbian'],['hiddenSkill']],
 			dongxie:['female','qun','3/4',['juntun','jiaojie']],
-			//jin_simayi:['female','wei',3,['reyingzi','gzyinghun'],['hiddenSkill']],
 			re_xinxianying:['female','wei',3,['rezhongjian','recaishi']],
-			luyusheng:['female','wu',3,['sicong','xianzhao'],['unseen']],
+			wangrong:['female','qun',3,['sicong','xianzhao'],['unseen']],
 			ol_dingyuan:['male','qun',4,['weihuan','shouchong'],['unseen']],
 			liubian:['male','qun',3,['shiyuan','dushi']],
 			xin_baosanniang:['female','shu',3,['decadewuniang','decadexushen']],
@@ -74,7 +74,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterSort:{
 			sp2:{
-				sp_yingbian:['jin_zhangchunhua'],
+				sp_yingbian:['jin_zhangchunhua','jin_simayi'],
 				sp_whlw:["xurong","lijue","zhangji","fanchou","guosi"],
 				sp_zlzy:["zhangqiying","lvkai","zhanggong","weiwenzhugezhi","beimihu"],
 				sp_longzhou:["xf_tangzi","xf_huangquan","xf_sufei","sp_liuqi"],
@@ -92,6 +92,160 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			buchen:{
+				audio:2,
+				trigger:{player:'showCharacterAfter'},
+				filter:function(event,player){
+					var target=_status.currentPhase;
+					return target&&target!=player&&target.countGainableCards(player,'he')>0;
+				},
+				direct:true,
+				content:function(){
+					var target=_status.currentPhase;
+					player.gainPlayerCard(target,'he',get.prompt('buchen',target)).set('logSkill',['buchen',target]);
+				},
+			},
+			smyyingshi:{
+				enable:'phaseUse',
+				locked:true,
+				onChooseToUse:function(event){
+					if(game.online) return;
+					var cards=[];
+					for(var i=0;i<event.player.maxHp;i++){
+						var card=ui.cardPile.childNodes[i];
+						if(card) cards.push(card);
+						else break;
+					}
+					event.set('smyyingshi',cards);
+				},
+				chooseButton:{
+					dialog:function(event){
+						var dialog=ui.create.dialog('鹰视','hidden');
+						if(event.smyyingshi&&event.smyyingshi.length) dialog.add(event.smyyingshi);
+						else dialog.addText('牌堆无牌');
+						for(var i of dialog.buttons){
+							i.classList.add('noclick');
+						}
+						dialog.buttons.length=0;
+						return dialog;
+					},
+					filter:function(){
+						return false;
+					},
+				},
+			},
+			xiongzhi:{
+				enable:'phaseUse',
+				limited:true,
+				skillAnimation:true,
+				animationColor:'thunder',
+				content:function(){
+					'step 0'
+					player.awakenSkill('xiongzhi');
+					'step 1'
+					var card=get.cards()[0];
+					event.card=card;
+					player.showCards(card);
+					'step 2'
+					player.chooseUseTarget(card,true);
+					'step 3'
+					if(result.bool) event.goto(1);
+					else{
+						card.fix();
+						ui.cardPile.insertBefore(card,ui.cardPile.firstChild);
+						game.updateRoundNumber();
+					}
+				},
+				ai:{
+					order:1,
+					result:{
+						player:function(player){
+							if(!player.hasSkill('smyyingshi')) return 1;
+							var cards=[];
+							for(var i=0;i<Math.min(2,player.maxHp);i++){
+								var card=ui.cardPile.childNodes[i];
+								if(card){
+									if(!player.hasValueTarget(card)) return 0;
+								}
+								else break;
+							}
+							return 1;
+						},
+					},
+				},
+			},
+			quanbian:{
+				trigger:{player:['useCard','respond']},
+				hasHand:function(event){
+					var evts=event.player.getHistory('lose',function(evt){
+						return evt.getParent()==event;
+					});
+					return evts&&evts.length==1&&evts[0].hs.length>0;
+				},
+				filter:function(event,player){
+					var phase=event.getParent('phaseUse');
+					if(!phase||phase.player!=player) return false;
+					var suit=get.suit(event.card);
+					if(!lib.suit.contains(suit)||!lib.skill.quanbian.hasHand(event)) return false;
+					return player.getHistory('useCard',function(evt){
+						return evt!=event&&get.suit(evt.card)==suit&&lib.skill.quanbian.hasHand(evt)&&evt.getParent('phaseUse')==phase;
+					}).length+player.getHistory('respond',function(evt){
+						return evt!=event&&get.suit(evt.card)==suit&&lib.skill.quanbian.hasHand(evt)&&evt.getParent('phaseUse')==phase;
+					}).length==0;
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseControl('cancel2').set('prompt',get.prompt('quanbian')).set('choiceList',[
+						'摸一张牌',
+						'观看牌堆顶的'+get.cnNumber(player.maxHp)+'张牌并将其中一张置于牌堆底',
+					]).set('ai',function(){
+						var player=_status.event.player;
+						var suit=get.suit(_status.event.getTrigger().card);
+						if(player.countCards('h',function(card){
+							return get.suit(card)==suit&&player.hasValueTarget(card,null,true);
+						})) return 'cancel2';
+						return 0;
+					});
+					'step 1'
+					if(result.control=='cancel2'){
+						event.finish();
+						return;
+					}
+					player.addTempSkill('quanbian2');
+					player.storage.quanbian2.add(get.suit(trigger.card));
+					player.markSkill('quanbian2');
+					if(result.index==0){
+						player.draw();
+						event.finish();
+						return;
+					}
+					event.cards=get.cards(player.maxHp);
+					player.chooseButton(['将一张牌置于牌堆底',event.cards],true);
+					'step 2'
+					while(cards.length){
+						var card=cards.pop();
+						card.fix();
+						if(card==result.links[0]) ui.cardPile.appendChild(card);
+						else ui.cardPile.insertBefore(card,ui.cardPile.firstChild);
+					}
+					game.updateRoundNumber();
+				},
+			},
+			quanbian2:{
+				init:function(player,skill){
+					if(!player.storage[skill]) player.storage[skill]=[];
+				},
+				onremove:true,
+				mod:{
+					cardEnabled2:function(card,player){
+						if(get.position(card)=='h'&&player.storage.quanbian2.contains(get.suit(card))) return false;
+					},
+				},
+				intro:{
+					content:'本回合内不能使用$花色的手牌',
+				},
+			},
 			juntun:{
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
@@ -5981,20 +6135,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"xinfu_tanbei":{
-				locked:false,
-				mod:{
-					targetInRange:function(card,player,target){
-						if(target.hasSkill('tanbei_effect1')){
-							return true;
-						}
-					},
-					cardUsableTarget:function(card,player,target){
-						if(target.hasSkill('tanbei_effect1')) return true;
-					},
-					playerEnabled:function(card,player,target){
-						if(target.hasSkill('tanbei_effect2')) return false;
-					},
-				},
 				audio:2,
 				enable:"phaseUse",
 				usable:1,
@@ -6016,13 +6156,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 					}
 					"step 1"
+					player.addTempSkill('tanbei_effect3');
 					if(result.index==0){
 						var card=target.getCards('hej').randomGet();
 						player.gain(card,target,'giveAuto','bySelf');
-						target.addTempSkill('tanbei_effect2','phaseAfter');
+						target.addTempSkill('tanbei_effect2');
 					}
 					else{
-						target.addTempSkill('tanbei_effect1','phaseAfter');
+						target.addTempSkill('tanbei_effect1');
 					}
 				},
 				ai:{
@@ -6035,6 +6176,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					threaten:1.1,
+				},
+			},
+			tanbei_effect3:{
+				charlotte:true,
+				mod:{
+					targetInRange:function(card,player,target){
+						if(target.hasSkill('tanbei_effect1')){
+							return true;
+						}
+					},
+					cardUsableTarget:function(card,player,target){
+						if(target.hasSkill('tanbei_effect1')) return true;
+					},
+					playerEnabled:function(card,player,target){
+						if(target.hasSkill('tanbei_effect2')) return false;
+					},
 				},
 			},
 			"xinfu_sidao":{
@@ -6090,8 +6247,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinfu_sidaoy:{},
 			"tanbei_effect1":{
+				charlotte:true,
 			},
 			"tanbei_effect2":{
+				charlotte:true,
 			},
 			"xinfu_tunan":{
 				audio:2,
@@ -6852,6 +7011,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuhong:'汉灵帝刘宏（157年，一作156年－189年5月13日），生于冀州河间国（今河北深州）。东汉第十二位皇帝（168年－189年在位），汉章帝刘炟的玄孙。刘宏早年世袭解渎亭侯。永康元年（167年）十二月，汉桓帝刘志逝世，刘宏被外戚窦氏挑选为皇位继承人，于建宁元年（168年）正月即位。刘宏在位的大部分时期，施行党锢及宦官政治。他又设置西园，巧立名目搜刮钱财，甚至卖官鬻爵以用于自己享乐。在位晚期，爆发了黄巾起义，而凉州等地也陷入持续动乱之中。中平六年（189年），刘宏去世，谥号孝灵皇帝，葬于文陵。刘宏喜好辞赋，作有《皇羲篇》、《追德赋》、《令仪颂》、《招商歌》等。',
 			liubian:'刘辩（176年－190年3月6日），是汉灵帝刘宏与何皇后的嫡长子。刘辩在灵帝驾崩后继位为帝，史称少帝，由于年幼，实权掌握在临朝称制的母亲何太后和母舅大将军何进手中。少帝在位时期，东汉政权已经名存实亡，他即位后不久即遭遇以何进为首的外戚集团和以十常侍为首的内廷宦官集团这两大敌对政治集团的火并，被迫出宫，回宫后又受制于以“勤王”为名进京的凉州军阀董卓，终于被废为弘农王，成为东汉唯一被废黜的皇帝，其同父异母弟陈留王刘协继位为帝，是为汉献帝。被废黜一年之后，刘辩在董卓胁迫下自尽，时年仅十五岁（一说十八岁），其弟献帝追谥他为怀王。中国古代的史书中称刘辩为皇子辩、少帝和弘农王等。因为在位不逾年，传统上称东汉共十二帝，刘辩与东汉另一位少帝刘懿都不在其中，亦皆无本纪；不过，现代史学界也有观点承认两位少帝均是汉朝皇帝，则刘辩为东汉第十三位皇帝。',
 			luyusheng:'陆郁生（？年-？），三国时期吴国官员陆绩之女。陆郁生的父亲陆绩是吴郡公认的才子，又是当时吴郡陆氏的领袖。陆绩赴任担任郁林太守，遂取此名。陆郁生年少的时候就定下坚贞的志向。建安二十四年（219年)，陆绩早亡，她与两个兄弟陆宏、陆睿当时都只有几岁，一起返回吴县，被他们的从兄陆瑁接回抚养。13周岁的陆郁生嫁给同郡出身的张白为妻。出嫁3个月后，张白因为其兄张温一族的案件遭到连坐，被处以流刑，后死于流放地，陆郁生成为了寡妇，其后公开宣言不再改嫁，困难于生计但拒绝了所有提亲，在艰苦中从未停止服侍、照顾张白的姐妹。事情传到朝廷，皇帝褒奖陆郁生，号其为“义姑”。她的表侄姚信在文集中称赞她的义举。',
+			wangrong:'汉灵怀皇后王荣（？~181年），赵国邯郸（今河北邯郸市）人。五官中郎将王苞孙女，汉灵帝刘宏妃子，汉献帝刘协生母。初以良家子选入掖庭，封为美人，服侍汉灵帝。光和四年（181年），生下陈留王刘协，惨遭灵思皇后毒杀。王荣死后，汉灵帝曾作《追德赋》、《令仪颂》。永汉元年（189年），其子刘协即位，是为汉献帝，追谥灵怀皇后，葬于文昭陵。',
 		},
 		characterTitle:{
 			wulan:'#b对决限定武将',
@@ -7223,6 +7383,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shouchong:'首冲',
 			shouchong_info:'锁定技，有角色造成伤害后，若此伤害是本轮第一次造成伤害，且伤害来源是其他角色，则你摸一张牌；若伤害来源是你，则你对受伤角再造成1点伤害。',
 			luyusheng:'陆郁生',
+			wangrong:'王荣',
 			sicong:'思聪',
 			sicong2:'思聪',
 			sicong_info:'出牌阶段限一次，你可以弃置任意张点数之和为13的牌，然后摸两倍数量的牌。以此法获得的牌中，黑色牌本回合无距离和次数限制，红色牌本回合不计入手牌上限。',
@@ -7289,6 +7450,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			juntun_info:'锁定技，准备阶段，若X大于1，则你减1点体力上限并摸X张牌（X为你的体力上限）。',
 			jiaojie:'狡黠',
 			jiaojie_info:'锁定技，你的红色牌不计入手牌上限。你使用黑色牌无距离和次数限制。',
+			buchen:'不臣',
+			buchen_info:'隐匿技，你于其他角色的回合登场时，可获得当前回合角色的一张牌。',
+			smyyingshi:'鹰视',
+			smyyingshi_info:'锁定技，出牌阶段，你可观看牌堆顶的X张牌（X为你的体力上限）。',
+			xiongzhi:'雄志',
+			xiongzhi_info:'限定技，出牌阶段，你可展示牌堆顶的一张牌并使用之。若如此做，你重复此流程，直到你以此法展示的牌无法使用。',
+			quanbian:'权变',
+			quanbian2:'权变',
+			quanbian_info:'当你于出牌阶段内使用/打出手牌时，若此牌有花色且你本回合内未使用/打出过该花色的其他手牌，则你可以选择一项：①摸一张牌。②将牌堆顶X张牌中的一张置于牌堆底（X为你的体力上限）。若你发动此技能，则你本回合内不能再使用与此牌花色相同的手牌。',
 			sp_yingbian:'应变篇',
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",

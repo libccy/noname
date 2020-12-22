@@ -121,9 +121,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				game.chooseCharacter();
 			}
 			"step 2"
-			game.broadcast(function(cardtag){
-				_status.cardtag=cardtag;
-			},_status.cardtag);
+			//game.broadcast(function(cardtag){
+			//	_status.cardtag=cardtag;
+			//},_status.cardtag);
 			if(ui.coin){
 				_status.coinCoeff=get.coinCoeff([game.me.name1,game.me.name2]);
 			}
@@ -6928,6 +6928,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(!lib.characterPack.mode_guozhan[i]) continue;
 							if(get.is.jun(i)) continue;
 						}
+						if(lib.character[i][4].contains('hiddenSkill')) continue;
 						if(lib.character[i][2]==3||lib.character[i][2]==4||lib.character[i][2]==5)
 						event.list.push(i);
 					}
@@ -6973,6 +6974,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									}
 								}
 							}
+							if(lib.character[button.link][4].contains('hiddenSkill')) return false;
 							if(ui.selected.buttons.length==0){
 								for(var i=0;i<ui.dialog.buttons.length;i++){
 									if(ui.dialog.buttons[i]!=button&&lib.character[button.link][1]==lib.character[ui.dialog.buttons[i].link][1]){
@@ -7145,11 +7147,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						for(var i in lib.characterPack.mode_guozhan){
 							if(i.indexOf('gz_shibing')==0) continue;
 							if(get.is.jun(i)) continue;
+							if(lib.character[i][4].contains('hiddenSkill')) continue;
 							list.push(i);
 						}
 					}
 					else{
-						list=get.charactersOL();
+						list=get.charactersOL(function(i){
+							return lib.character[i][4].contains('hiddenSkill');
+						});
 					}
 					_status.characterlist=list.slice(0);
 					_status.yeidentity=[];

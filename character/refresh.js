@@ -3731,7 +3731,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(i=='shan'||i=='wuxie') continue;
 						var type=get.type(i);
 						if((type=='basic'||type=='trick')&&event.filterCard({name:i},player,event)) return true;
-						if(i=='sha'&&(event.filterCard({name:i,nature:'fire'},player,event)||event.filterCard({name:i,nature:'thunder'},player,event))) return true;
+						if(i=='sha'&&(event.filterCard({name:i,nature:'ice'},player,event)||event.filterCard({name:i,nature:'fire'},player,event)||event.filterCard({name:i,nature:'thunder'},player,event))) return true;
 					}
 					return false;
 				},
@@ -3745,6 +3745,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(i=='sha'){
 								list.push([type,'',i,'fire']);
 								list.push([type,'',i,'thunder']);
+								list.push([type,'',i,'ice']);
 							}
 						}
 						return ui.create.dialog('蛊惑',[list,'vcard']);
@@ -4799,13 +4800,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_rewusheng":{
 				mod:{
 					targetInRange:function (card){
-						if(get.suit(card)=='diamond'&&(_status.event.skill=='new_rewusheng'||card.name=='sha')) return true;
+						if(get.suit(card)=='diamond'&&card.name=='sha') return true;
 					},
 				},
 				audio:"wusheng",
 				audioname:['re_guanyu','guanzhang','jsp_guanyu','guansuo'],
 				enable:["chooseToRespond","chooseToUse"],
-				filterCard:function (card,player){
+				filterCard:function(card,player){
 					if(get.zhu(player,'shouyue')) return true;
 					return get.color(card)=='red';
 				},
@@ -4822,57 +4823,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				prompt:"将一张红色牌当杀使用或打出",
-				check:function (card){return 4-get.value(card)},
+				check:function(card){return 4-get.value(card)},
 				ai:{
-					skillTagFilter:function (player){
+					skillTagFilter:function(player){
 						if(get.zhu(player,'shouyue')){
 							if(!player.countCards('he')) return false;
 						}
 						else{
 							if(!player.countCards('he',{color:'red'})) return false;
 						}
-					},
-					respondSha:true,
-					basic:{
-						useful:[5,1],
-						value:[5,1],
-					},
-					order:function (){
-						if(_status.event.player.hasSkillTag('presha',true,null,true)) return 10;
-						return 3;
-					},
-					result:{
-						target:function (player,target){
-							if(player.hasSkill('jiu')&&!target.getEquip('baiyin')){
-								if(get.attitude(player,target)>0){
-									return -6;
-								}
-								else{
-									return -3;
-								}
-							}
-							return -1.5;
-						},
-					},
-					tag:{
-						respond:1,
-						respondShan:1,
-						damage:function (card){
-							if(card.nature=='poison') return;
-							return 1;
-						},
-						natureDamage:function (card){
-							if(card.nature) return 1;
-						},
-						fireDamage:function (card,nature){
-							if(card.nature=='fire') return 1;
-						},
-						thunderDamage:function (card,nature){
-							if(card.nature=='thunder') return 1;
-						},
-						poisonDamage:function (card,nature){
-							if(card.nature=='poison') return 1;
-						},
 					},
 				},
 			},
@@ -5852,6 +5811,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								list.push(['基本','','sha']);
 								list.push(['基本','','sha','fire']);
 								list.push(['基本','','sha','thunder']);
+								list.push(['基本','','sha','ice']);
 							}
 							if(lib.filter.cardUsable({name:'tao'},player,event.getParent('chooseToUse'))&&game.hasPlayer(function(current){
 								return player.canUse('tao',current);
@@ -5878,7 +5838,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 											return player.canUse(card,current)&&get.effect(current,card,player,player)>0
 										})){
 											if(card.nature=='fire') return 2.95;
-											if(card.nature=='thunder') return 2.92;
+											if(card.nature=='thunder'||card.nature=='ice') return 2.92;
 											return 2.9;
 										}
 										return 0;

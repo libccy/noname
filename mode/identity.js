@@ -18,6 +18,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			group_key:{
 				fullskin:true,
 			},
+			group_jin:{
+				fullskin:true,
+			},
 		},
 		start:function(){
 			"step 0"
@@ -310,7 +313,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			var info=[];
 			for(var i=0;i<players.length;i++){
 				info.push({
-					name:players[i].name,
+					name:players[i].name1,
 					name2:players[i].name2,
 					identity:players[i].identity
 				});
@@ -1083,7 +1086,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					if(back){
-						list.remove(get.sourceCharacter(player.name));
+						list.remove(get.sourceCharacter(player.name1));
 						list.remove(get.sourceCharacter(player.name2));
 						for(var i=0;i<list.length;i++){
 							back.push(list[i]);
@@ -1466,7 +1469,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					if(game.zhu!=game.me){
 						event.ai(game.zhu,event.list,list2)
-						event.list.remove(get.sourceCharacter(game.zhu.name));
+						event.list.remove(get.sourceCharacter(game.zhu.name1));
 						event.list.remove(get.sourceCharacter(game.zhu.name2));
 						if(_status.brawl&&_status.brawl.chooseCharacter){
 							list=_status.brawl.chooseCharacter(event.list,num);
@@ -1705,7 +1708,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						game.me.init(event.choosed[0]);
 					}
-					event.list.remove(get.sourceCharacter(game.me.name));
+					event.list.remove(get.sourceCharacter(game.me.name1));
 					event.list.remove(get.sourceCharacter(game.me.name2));
 					if(game.me==game.zhu&&game.players.length>4){
 						game.me.hp++;
@@ -1942,9 +1945,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(game.me!=game.zhu){
 						game.zhu.init(result.links[0],result.links[1])
 					}
-					event.list.remove(get.sourceCharacter(game.zhu.name));
+					event.list.remove(get.sourceCharacter(game.zhu.name1));
 					event.list.remove(get.sourceCharacter(game.zhu.name2));
-					event.list2.remove(get.sourceCharacter(game.zhu.name));
+					event.list2.remove(get.sourceCharacter(game.zhu.name1));
 					event.list2.remove(get.sourceCharacter(game.zhu.name2));
 
 					if(game.players.length>4){
@@ -1964,7 +1967,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},game.zhu,game.zhu.name,game.zhu.name2,game.players.length>4);
 					
 					if(game.zhu.group=='shen'){
-						var list=['wei','shu','wu','qun','key'];
+						var list=['wei','shu','wu','qun','jin','key'];
 						for(var i=0;i<list.length;i++){
 							if(!lib.group.contains(list[i])) list[i].splice(i--,1);
 							else list[i]=['','','group_'+list[i]];
@@ -2045,7 +2048,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					event.result2=result;
 					if(shen.length){
-						var list=['wei','shu','wu','qun','key'];
+						var list=['wei','shu','wu','qun','jin','key'];
 						for(var i=0;i<list.length;i++){
 							if(!lib.group.contains(list[i])) list[i].splice(i--,1);
 							list[i]=['','','group_'+list[i]];
@@ -2109,11 +2112,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			group_wu:"吴势力",
 			group_qun:"群势力",
 			group_key:"键势力",
+			group_jin:"晋势力",
 			group_wei_bg:"魏",
 			group_shu_bg:"蜀",
 			group_wu_bg:"吴",
 			group_qun_bg:"群",
 			group_key_bg:"键",
+			group_jin_bg:"晋",
 			zhu:"主",
 			zhong:"忠",
 			mingzhong:"忠",

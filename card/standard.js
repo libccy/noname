@@ -83,6 +83,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				global:'icesha_skill',
 				range:{attack:1},
 				selectTarget:1,
+				yingbian_prompt:function(card){
+					if(card.nature=='fire'){
+						return '此牌的伤害值基数+1';
+					}
+					else{
+						return '当你使用此牌选择目标后，你可为此牌增加一个目标';
+					}
+				},
 				yingbian:function(event){
 					if(event.card.nature=='fire'){
 						if(typeof event.baseDamage!='number') event.baseDamage=1;
@@ -255,6 +263,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				cardcolor:'red',
 				notarget:true,
 				nodelay:true,
+				yingbian_prompt:'当你声明使用此牌后，你摸一张牌',
 				yingbian:function(event){
 					event.player.draw();
 				},
@@ -760,6 +769,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'trick',
 				enable:true,
 				selectTarget:-1,
+				yingbian_prompt:'当你使用此牌选择目标后，你可为此牌减少一个目标',
 				yingbian:function(event){
 					event.yingbian_removeTarget=true;
 				},
@@ -948,6 +958,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				enable:true,
+				yingbian_prompt:'你令此牌不可被响应',
 				yingbian:function(event){
 					event.directHit.addArray(game.players);
 				},
@@ -1058,7 +1069,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:-1.5,
-						player:function(player,target){
+						player:function(player,target,card){
+							if(get.cardtag(card,'yingbian_fujia')){
+								var num=player.countCards('h',function(cardx){
+									return cardx!=card&&(!card.cards||!card.cards.contains(cardx));
+								});
+								if(!game.hasPlayer(function(current){
+									return current.countCards('h')>num;
+								})) return 0;
+							}
 							if(get.damageEffect(target,player,target)>0&&get.attitude(player,target)>0&&get.attitude(target,player)>0){
 								return 0;
 							}
@@ -1322,6 +1341,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					expose:0.2
 				},
 				notarget:true,
+				yingbian_prompt:'当此牌生效后，你获得此牌响应的目标牌',
 				contentBefore:function(){
 					'step 0'
 					if(get.mode()=='guozhan'&&get.cardtag(card,'guo')){
@@ -2031,6 +2051,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					return true;
 				},
+				forceLoad:true,
 				content:function(){
 					'step 0'
 					delete event.wuxieresult;

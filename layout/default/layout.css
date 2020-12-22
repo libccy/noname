@@ -1303,6 +1303,8 @@ body>.background.land {
 	bottom: 5px;
 	right: 5px;
 	text-align: right;
+	text-shadow: rgba(213, 194, 179,1) 0 0 3px,rgba(213, 194, 179,1) 0 0 3px,rgba(213, 194, 179,1) 0 0 3px,
+		rgba(213, 194, 179,1) 0 0 3px,black 0 0 3px;
 }
 .card>.name {
 	top: 9px;
@@ -3477,7 +3479,7 @@ div:not(.handcards)>.card>.info>span,
 	color: rgba(90,118,99,0.3);
 }
 .ice {
-	color: rgba(80,160,255,0.3);
+	color: rgba(0,153,255,0.3);
 }
 .poison {
 	color: rgba(30, 133, 51,0.4);
@@ -4125,8 +4127,8 @@ div[data-decoration="bronze"]::after{
 	border: 1px solid #1F3C38;
 }
 .card.fullskin.ice>.name {
-	color: #152E63;
-	border: 1px solid #152E63;
+	color: #3B6273;
+	border: 1px solid #3B6273;
 }
 .card.fullskin.fire>.name {
 	color: #631515;
@@ -4300,8 +4302,10 @@ div[data-decoration="bronze"]::after{
 .greentext {
 	color: rgb(104,221,127);
 }
+.icetext {
+	color: rgb(59, 98, 115);
+}
 .thundertext,
-.icetext,
 .controlthundertext {
 	color: rgb(117,186,255);
 }

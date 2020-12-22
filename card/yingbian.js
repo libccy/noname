@@ -2,7 +2,7 @@
 game.import('card',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'yingbian',
-		//connect:true,
+		connect:true,
 		card:{
 			suijiyingbian:{
 				global:'suijiyingbian_skill',
@@ -16,6 +16,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					return target!=player&&target.countCards('hej')>0;
 				},
+				yingbian_prompt:'此牌的效果改为依次执行所有选项',
 				content:function(){
 					var dist=get.distance(player,target);
 					if(dist>1||card.yingbian) player.discardPlayerCard(target,'hej',true);
@@ -30,6 +31,19 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(get.attitude(viewer,player)>0&&get.attitude(viewer,target)>0){
 							return 0;
 						}
+					},
+					yingbian:function(card,player,targets,viewer){
+						if(get.attitude(viewer,player)<=0) return 0;
+						if(targets.filter(function(current){
+							var att=get.attitude(player,current);
+							if(att<=0) return current.countCards('he',function(card){
+								return get.value(card,current)>0;
+							})>1;
+							return current.countCards('ej',function(card){
+								return get.position(card)=='j'||get.value(card,current)<=0;
+							})>1;
+						}).length) return 6;
+						return 0;
 					},
 					basic:{
 						order:7.5,
@@ -116,6 +130,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					return target!=player&&target.countCards('h')>0;
 				},
+				yingbian_prompt:'当你使用此牌选择目标后，你可为此牌增加一个目标',
 				yingbian:function(event){
 					event.yingbian_addTarget=true;
 				},
@@ -137,6 +152,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						order:5,
 						useful:2,
 						value:6
+					},
+					yingbian:function(card,player,targets,viewer){
+						if(get.attitude(viewer,player)<=0) return 0;
+						if(game.hasPlayer(function(current){
+							return !targets.contains(current)&&lib.filter.targetEnabled2(card,player,current)&&get.effect(current,card,player,player)>0;
+						})) return 6;
+						return 0;
 					},
 					result:{
 						target:function(player,target,cardx){
@@ -240,7 +262,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						equipValue:2
 					}
 				},
-				skills:['taigongyinfu_skill']
+				skills:['taigongyinfu_skill','taigongyinfu_link'],
 			},
 		},
 		skill:{
@@ -249,20 +271,24 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					cardname:function(card,player){
 						if(card.name=='suijiyingbian'&&player.storage.suijiyingbian) return player.storage.suijiyingbian;
 					},
+					cardnature:function(card,player){
+						if(card.name=='suijiyingbian'&&player.storage.suijiyingbian_nature) return player.storage.suijiyingbian_nature;
+					},
 				},
 				trigger:{
-					player:['useCard1','respond','phaseBeginStart'],
+					player:['useCard1','respond'],
 				},
 				silent:true,
 				firstDo:true,
 				filter:function(event,player,name){
-					if(name=='phaseBeginStart') return true;
+					//if(name=='phaseBeginStart') return true;
 					var type=get.type(event.card);
 					return type=='basic'||type=='trick';
 				},
 				content:function(){
-					if(event.triggername=='phaseBeginStart') delete player.storage.suijiyingbian;
-					else player.storage.suijiyingbian=trigger.card.name;
+					//if(event.triggername=='phaseBeginStart') delete player.storage.suijiyingbian;
+					player.storage.suijiyingbian=trigger.card.name;
+					player.storage.suijiyingbian_nature=trigger.card.nature;
 				},
 			},
 			wuxinghelingshan_skill:{
@@ -330,7 +356,52 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				audio:true,
 			},
 			taigongyinfu_skill:{
+				equipSkill:true,
 				audio:true,
+				trigger:{player:'phaseUseEnd'},
+				direct:true,
+				filter:function(event,player){
+					return player.countCards('h')>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseCard('h','是否发动【太公阴符】重铸一张手牌？').set('ai',function(card){
+						return 5-get.value(card);
+					});
+					'step 1'
+					if(result.bool){
+						player.logSkill('taigongyinfu_skill');
+						player.lose(result.cards,ui.discardPile);
+						player.$throw(result.cards,1000);
+						game.log(player,'将',result.cards,'置入了弃牌堆');
+						player.draw();
+					}
+				},
+			},
+			taigongyinfu_link:{
+				audio:'taigongyinfu_skill',
+				trigger:{player:'phaseUseBegin'},
+				equipSkill:true,
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return !current.isLinked();
+					});
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(true,function(card,player,target){
+						return !target.isLinked();
+					},'是否发动【太公阴符】横置一名角色？').set('',function(target){
+						return get.effect(target,{name:'tiesuo'},_status.event.player);
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('taigongyinfu_skill',target);
+						target.link();
+					}
+				},
 			},
 			_yingbian:{
 				trigger:{player:'useCard1'},
@@ -343,7 +414,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(get.cardtag(card,'yingbian_kongchao')&&(!player.countCards('h')||bool)) return true;
 					if(get.cardtag(card,'yingbian_canqu')&&(player.hp==1||bool)) return true;
 					if(get.cardtag(card,'yingbian_fujia')&&(player.isMaxHandcard()||bool)) return true;
-					if(get.cardtag(card,'yingbian_zhuzhan')||bool) return true;
+					if(get.cardtag(card,'yingbian_zhuzhan')) return true;
 					return false;
 				},
 				content:function(){
@@ -370,23 +441,35 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					event._global_waiting=true;
-					event.send=function(player,card,source,id,id2,skillState){
+					event.send=function(player,card,source,targets,id,id2,skillState){
 						if(skillState){
 							player.applySkills(skillState);
 						}
 						var type=get.type(card);
+						var str=get.translation(source);
+						if(targets&&targets.length){
+							str+='对';
+							str+=get.translation(targets);
+						}
+						str+='使用了';
 						var next=player.chooseCard({
 							filterCard:function(card){
 								return get.type(card)==type&&lib.filter.cardDiscardable.apply(this,arguments);
 							},
-							prompt:(get.translation(source)+'使用了'+get.translation(card)+'，是否弃置一张'+get.translation(type)+'为其助战？'),
+							prompt:str+=(get.translation(card)+'，是否弃置一张'+get.translation(type)+'为其助战？'),
 							position:'h',
 							_global_waiting:true,
 							id:id,
 							id2:id2,
-							ai:function(card){
-								if(get.attitude(player,source)<=0) return false;
-								return 5-get.value(card);
+							ai:function(cardx){
+								var info=get.info(card);
+								if(info&&info.ai&&info.ai.yingbian){
+									var ai=info.ai.yingbian(card,source,targets,player);
+									if(!ai) return 0;
+									return ai-get.value(cardx);
+								}
+								else if(get.attitude(player,source)<=0) return 0;
+								return 5-get.value(cardx);
 							},
 						});
 						if(game.online){
@@ -418,7 +501,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						event.current=event.list.shift();
-						event.send(event.current,event.card,player,event.id,trigger.parent.id);
+						event.send(event.current,event.card,player,trigger.targets,event.id,trigger.parent.id);
 					}
 					'step 4'
 					if(result.bool){
@@ -461,12 +544,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(list[i].isOnline()){
 							withol=true;
 							list[i].wait(sendback);
-							list[i].send(event.send,list[i],event.card,player,event.id,trigger.parent.id,get.skillState(list[i]));
+							list[i].send(event.send,list[i],event.card,player,trigger.targets,event.id,trigger.parent.id,get.skillState(list[i]));
 							list.splice(i--,1);
 						}
 						else if(list[i]==game.me){
 							withme=true;
-							event.send(list[i],event.card,event.source,event.id,trigger.parent.id);
+							event.send(list[i],event.card,player,trigger.targets,event.id,trigger.parent.id);
 							list.splice(i--,1);
 						}
 					}
@@ -570,7 +653,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		},
 		translate:{
 			suijiyingbian:'随机应变',
-			suijiyingbian_info:'此牌的牌名视为你本回合内使用或打出的上一张基本牌或普通锦囊牌的牌名。',
+			suijiyingbian_info:'此牌的牌名视为你本局游戏内使用或打出的上一张基本牌或普通锦囊牌的牌名。',
 			zhujinqiyuan:'逐近弃远',
 			zhujinqiyuan_info:'出牌阶段，对一名有牌的其他角色使用。若你与其距离的大于1，你弃置其区域内的一张牌；若你与其的距离等于1，你获得其区域内的一张牌。',
 			dongzhuxianji:'洞烛先机',
@@ -582,7 +665,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			wuxinghelingshan_info:'当你声明使用不为神属性的属性【杀】时，你可将此【杀】的属性改为不为神属性的其他属性。',
 			wutiesuolian:'乌铁锁链',
 			wutiesuolian_skill:'乌铁锁链',
-			wutiesuolian_skill_info:'当你使用【杀】指定目标后，若其：已横置，你观看其手牌。未横置，其横置。',
+			wutiesuolian_info:'锁定技，当你使用【杀】指定目标后，若其：已横置，你观看其手牌。未横置，其横置。',
 			heiguangkai:'黑光铠',
 			heiguangkai_skill:'黑光铠',
 			heiguangkai_info:'锁定技，当你成为【杀】或普通锦囊牌的目标后，若此牌的目标数大于1，则你令此牌对你无效。',
@@ -592,7 +675,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			tianjitu_skill:'天机图',
 			tianjitu_info:'锁定技，当此牌进入你的装备区时，你弃置一张不为此【天机图】的牌。当此牌离开你的装备区后，你将手牌摸至五张。',
 			taigongyinfu:'太公阴符',
-			taigongyinfu_info:'出牌阶段开始时，你可以横置一名角色。出牌阶段结束时，你可以重置一张手牌。',
+			taigongyinfu_info:'出牌阶段开始时，你可以横置一名角色。出牌阶段结束时，你可以重铸一张手牌。',
+			taigongyinfu_skill:'太公阴符',
+			taigongyinfu_link:'太公阴符',
 			yingbian_zhuzhan_tag:'助战',
 			yingbian_kongchao_tag:'空巢',
 			yingbian_fujia_tag:'富甲',
@@ -765,5 +850,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['diamond',13,'zixin'],
 			['diamond',13,'hualiu'],
 		],
+		help:{
+			'应变篇':('<div style="margin:10px">应变机制</div><ul style="margin-top:0">'+
+			'<li>当一名角色声明使用右下角标注了应变条件的卡牌后，若其满足应变条件，则其触发此牌的“应变”效果。<br><li>长按或鼠标右键点击卡牌，即可查看此牌所拥有的应变效果。'+
+			'<br><li>应变条件<br><ul style="padding-left:20px;padding-top:5px"><li>空巢：该角色声明使用此牌后，其手牌数为0。<br><li>富甲：该角色声明使用此牌后，其手牌数为全场最多或之一。<br><li>残躯：该角色声明使用此牌后，其体力值为1。<br><li>助战：该角色声明使用此牌后，其发起“助战”。其他角色可弃置一张与此牌类型系统的卡牌，响应此“助战”。若有角色响应，则视为其应变成功。</ul></ul>'),
+		},
 	}
 });

@@ -1794,7 +1794,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filterCard:lib.filter.cardDiscardable,
 						filterTarget:lib.filter.notMe,
 						position:'he',
-						ai1:function(){return -1},
+						ai1:function(card){
+							var friend=0,enemy=0,player=_status.event.player;
+							var num=game.countPlayer(function(target){
+								var att=get.attitude(player,target);
+								if(att<0) enemy++;
+								if(target!=player&&att>0) friend++;
+								return true;
+							});
+							if(num>(friend+enemy+2)) return 0;
+							if(friend<enemy) return 0;
+							if(card.name=='sha') return 10-enemy;
+							return 10-enemy-get.value(card);
+						},
+						ai2:function(target){
+							return -get.attitude(_status.event.player,target)*(1+target.countCards('h'));
+						},
 					});
 					'step 1'
 					if(result.bool){
@@ -1809,7 +1824,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(get.type(name)=='trick') list.push(['锦囊','',name]);
 							else if(get.type(name)=='basic') list.push(['基本','',name]);
 						}
-						player.chooseButton(['请选择一个牌名',[list,'vcard'],true]);
+						player.chooseButton(['请选择一个牌名',[list,'vcard'],true]).set('ai',function(button){
+							return button.link[2]=='sha'?1:0;
+						});
 					}
 					else event.finish();
 					'step 2'
@@ -1923,6 +1940,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 0;
 					}).set('goon',function(){
 						if(get.attitude(trigger.player,player)>0) return true;
+						if(!trigger.player.countCards('he')) return true;
 						if(!player.hasShan()) return true;
 						return event.getRand()<0.5;
 					}());
@@ -1938,18 +1956,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 2'
-					trigger.player.chooseToDiscard('弃置一张牌令'+get.translation(player)+'不能闪避此【杀】，或点「取消」摸两张牌并令此【杀】对其无效','he').set('ai',function(card){
-						if(_status.event.goon) return 6-get.value(card);
+					var sha=get.translation(trigger.card);
+					if(!trigger.player.countCards('he',function(card){
+						return lib.filter.cardDiscardable(card,trigger.player,'duoduan');
+					})) event.finish();
+					else player.chooseControl().set('choiceList',[
+						'令其摸两张牌，然后令'+sha+'对你无效',
+						'令其弃置一张牌，然后你不可响应'+sha,
+					]).set('prompt','度断：令'+get.translation(trigger.player)+'执行一项').set('ai',function(){
+						var player=_status.event.player;
+						var source=_status.event.getTrigger().player;
+						if(get.attitude(player,source)>0) return 0;
+						if(!player.hasShan()&&player.hp>=2) return 1;
 						return 0;
-					}).set('goon',get.attitude(trigger.player,player)<0);
+					});
 					'step 3'
+					if(result.index==0) event.goto(5);
+					else trigger.player.chooseToDiscard('弃置一张牌令'+get.translation(player)+'不能闪避此【杀】','he',true);
+					'step 4'
 					if(result.bool){
 						trigger.directHit.add(player);
 					}
-					else{
-						trigger.player.draw(2);
-						trigger.excluded.add(player);
-					}
+					event.finish();
+					'step 5'
+					trigger.player.draw(2);
+					trigger.excluded.add(player);
 				},
 			},
 			duoduan_im:{
@@ -2778,6 +2809,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								case 'fire':name='huosha';break;
 								case 'thunder':name='leisha';break;
 								case 'kami':name='kamisha';break;
+								case 'ice':name='icesha';break;
 							}
 						}
 						list.add(name);
@@ -2791,6 +2823,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								case 'fire':name='huosha';break;
 								case 'thunder':name='leisha';break;
 								case 'kami':name='kamisha';break;
+								case 'ice':name='icesha';break;
 							}
 						}
 						list.add(name);
@@ -3845,6 +3878,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							list.push(['基本','','sha']);
 							list.push(['基本','','sha','fire']);
 							list.push(['基本','','sha','thunder']);
+							list.push(['基本','','sha','ice']);
 						}
 						if(event.filterCard({name:'tao'},player,event)){
 							list.push(['基本','','tao']);
@@ -3867,7 +3901,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								};
 								case 'sha':
 									if(button.link[3]=='fire') return 2.95;
-									else if(button.link[3]=='thunder') return 2.92;
+									else if(button.link[3]=='thunder'||button.link[3]=='ice') return 2.92;
 									else return 2.9;
 							}
 						}
@@ -4660,6 +4694,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							list.push(['基本','','sha']);
 							list.push(['基本','','sha','fire']);
 							list.push(['基本','','sha','thunder']);
+							list.push(['基本','','sha','ice']);
 						}
 						if(event.filterCard({name:'shan'},player,event)){
 							list.push(['基本','','shan']);
@@ -4685,7 +4720,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								};
 								case 'sha':
 									if(button.link[3]=='fire') return 2.95;
-									else if(button.link[3]=='thunder') return 2.92;
+									else if(button.link[3]=='thunder'||button.link[3]=='ice') return 2.92;
 									else return 2.9;
 							}
 						}

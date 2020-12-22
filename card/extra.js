@@ -887,6 +887,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					})) return false;
 					if(event.card.name=='nanman') return true;
 					if(event.card.name=='wanjian') return true;
+					if(event.card.name=='chuqibuyi') return true;
+					return false;
 				},
 				content:function(){
 					trigger.cancel();
@@ -904,7 +906,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								target:player,
 								card:card
 							})) return;
-							if(card.name=='nanman'||card.name=='wanjian') return 'zerotarget';
+							if(card.name=='nanman'||card.name=='wanjian'||card.name=='chuqibuyi') return 'zerotarget';
 							if(card.name=='sha'){
 								var equip1=player.getEquip(1);
 								if(equip1&&equip1.name=='zhuque') return 1.9;
@@ -1068,7 +1070,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			guding_info:'锁定技，当你使用【杀】对目标角色造成伤害时，若其没有手牌，此伤害+1。',
 			guding_skill:'古锭刀',
 			tengjia:'藤甲',
-			tengjia_info:'锁定技，【南蛮入侵】、【万箭齐发】和普通【杀】对你无效。你每次受到火焰伤害时，该伤害+1。',
+			tengjia_info:'锁定技，【南蛮入侵】、【万箭齐发】、【出其不意】和普通【杀】对你无效。当你受到火焰伤害时，该伤害+1。',
 			tengjia1:'藤甲',
 			tengjia2:'藤甲',
 			tengjia3:'藤甲',

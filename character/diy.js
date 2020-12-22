@@ -59,7 +59,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_kotori:['female','key',3,['kotori_yumo','kotori_huazhan']],
 			key_jojiro:['male','key',4,['jojiro_shensu','jojiro_shunying']],
 			key_shiroha:['female','key',3,['shiroha_yuzhao','shiroha_guying','shiroha_jiezhao']],
-			key_shizuku:['female','key',3,['shizuku_sizhi','shizuku_biyi']],
+			key_shizuku:['female','key',3,['shizuku_sizhi','shizuku_biyi','shizuku_sanhua']],
 			key_hiroto:['male','key',3,['hiroto_huyu','hiroto_tuolao']],
 			
 			key_kud:['female','key',3,['kud_qiaoshou','kud_buhui']],
@@ -630,6 +630,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 2'
 					if(result.bool) player.recover();
+				},
+			},
+			shizuku_sanhua:{
+				trigger:{player:'die'},
+				forceDie:true,
+				skillAnimation:true,
+				animationColor:'thunder',
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('shizuku_sanhua'),lib.filter.notMe).set('ai',function(target){
+						return get.attitude(_status.event.player,target);
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('shizuku_sanhua',target);
+						var names=[];
+						var cards=[];
+						while(cards.length<4){
+							var card=get.cardPile2(function(card){
+								return !cards.contains(card)&&!names.contains(card.name)&&get.type(card)=='basic';
+							});
+							if(card){
+								cards.push(card);
+								names.push(card.name);
+							}
+							else break;
+						}
+						if(cards.length) target.gain(cards,'gain2');
+					}
 				},
 			},
 			shiroha_yuzhao:{
@@ -1572,6 +1603,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(i=='sha'){
 							list.push([type,'',i,'fire']);
 							list.push([type,'',i,'thunder']);
+							list.push([type,'',i,'ice']);
 						}
 					}
 					player.chooseButton(['是否视为使用一张基本牌或普通锦囊牌？',[list,'vcard']]).set('filterButton',function(button){
@@ -4603,6 +4635,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									['基本','','sha'],
 									['基本','','sha','fire'],
 									['基本','','sha','thunder'],
+									['基本','','sha','ice'],
 								]);
 							}
 							else if(get.type(name)=='basic'){
@@ -4865,6 +4898,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								list.push(['基本','','sha']);
 								list.push(['基本','','sha','fire']);
 								list.push(['基本','','sha','thunder']);
+								list.push(['基本','','sha','ice']);
 							}
 							else if(get.type(name)=='trick') list.push(['锦囊','',name]);
 							else if(get.type(name)=='basic') list.push(['基本','',name]);
@@ -6674,6 +6708,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								list.push(['基本','','sha']);
 								list.push(['基本','','sha','fire']);
 								list.push(['基本','','sha','thunder']);
+								list.push(['基本','','sha','ice']);
 							}
 							else if(get.type(name)=='trick') list.push(['锦囊','',name]);
 							else if(get.type(name)=='basic') list.push(['基本','',name]);
@@ -11998,6 +12033,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shiroha_guying_rewrite_info:'当你受到伤害/对其他角色造成伤害时，你可进行判定。若结果为红色/黑色，此伤害-1/+1。',
 			shiroha_jiezhao:'解兆',
 			shiroha_jiezhao_info:'一名角色的判定牌生效前，你可打出一张「兆」代替之。当你以此法移去最后一张「兆」后，你加1点体力上限并回复1点体力，然后修改〖孤影〗并随机获得以下技能中的一个：〖炒饭〗/〖习事〗/〖呣啾〗/〖结伴〗。',
+			//猴年马月爆料再利用
+			shizuku_sizhi:'思智',
+			shizuku_sizhi2:'思智',
+			shizuku_sizhi_info:'出牌阶段限一次，你可以弃置任意张点数之和为13的牌，然后摸两倍数量的牌。以此法获得的牌中，黑色牌本回合无距离和次数限制，红色牌本回合不计入手牌上限。',
+			shizuku_biyi:'避忆',
+			shizuku_biyi_info:'当你受到伤害后，你可以进行一次判定，然后若你弃置任意张点数之和与判定结果点数相同的牌，你回复1点体力。',
+			shizuku_sanhua:'散花',
+			shizuku_sanhua_info:'当你死亡时，你可令一名其他角色从牌堆中获得四张名称各不相同的基本牌。',
 			hiroto_huyu:'虎驭',
 			hiroto_huyu2:'虎驭',
 			hiroto_huyu_info:'其他角色的出牌阶段结束时，若你没有技能〖纵略〗，则其可将两张手牌交给你。若如此做，你获得〖纵略〗。你的下回合结束时，你失去〖纵略〗并将本回合内获得的所有牌交给该角色。',
@@ -12040,12 +12083,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nao_shouqing2:'守情',
 			nao_shouqing3:'守情',
 			nao_shouqing_info:'其他角色的出牌阶段内可以对你使用【桃】。若如此做，其摸一张牌且本局游戏内的手牌上限+1。',
-			//猴年马月爆料再利用
-			shizuku_sizhi:'思智',
-			shizuku_sizhi2:'思智',
-			shizuku_sizhi_info:'出牌阶段限一次，你可以弃置任意张点数之和为13的牌，然后摸两倍数量的牌。以此法获得的牌中，黑色牌本回合无距离和次数限制，红色牌本回合不计入手牌上限。',
-			shizuku_biyi:'避忆',
-			shizuku_biyi_info:'当你受到伤害后，你可以进行一次判定，然后若你弃置任意张点数之和与判定结果点数相同的牌，你回复1点体力。',
 
 			ns_huangchengyan:'黄承彦',
 			nslongyue:'龙岳',
