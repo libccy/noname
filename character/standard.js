@@ -2681,7 +2681,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterReplace:{
 			caocao:['re_caocao','caocao'],
 			guojia:['re_guojia','guojia'],
-			simayi:['re_simayi','simayi'],
+			simayi:['jin_simayi','re_simayi','simayi'],
 			zhenji:['re_zhenji','zhenji'],
 			xuzhu:['re_xuzhu','xuzhu'],
 			zhangliao:['re_zhangliao','sp_zhangliao','yj_zhangliao','zhangliao'],

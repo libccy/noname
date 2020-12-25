@@ -143,7 +143,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wangyun:['male','qun',4,['xinlianji','xinmoucheng']],
 			sunqian:['male','shu',3,['qianya','shuimeng']],
 			xizhicai:['male','wei',3,['tiandu','xianfu','chouce']],
-			quyi:['male','qun',4,['fuqi','jiaozi']],
 
 			luzhi:['male','wei',3,['qingzhongx','weijing']],
 			
@@ -14864,7 +14863,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wangyun:'王允',
 			sunqian:'孙乾',
 			xizhicai:'戏志才',
-			quyi:'麴义',
 			liuye:'刘晔',
 			beimihu:'卑弥呼',
 			luzhi:'鲁芝',

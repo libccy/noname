@@ -1233,6 +1233,7 @@ window.noname_character_rank={
 			'mini_zhugeliang',
 			'jin_simayi',
 			'jin_zhangchunhua',
+			'liuhong',
 			'key_haruko',
 			'key_akiko',
 			'key_sunohara',
@@ -1507,6 +1508,8 @@ window.noname_character_rank={
 			'xin_lingtong',
 			'xin_liubiao',
 			're_xinxianying',
+			'ol_dingyuan',
+			'wangrong',
 		],
 		junk:[
 			'sunshao',

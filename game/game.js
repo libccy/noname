@@ -21393,10 +21393,10 @@
 					return _status.dying.contains(this)&&this.hp<=0&&this.isAlive();
 				},
 				isDamaged:function(){
-					return this.hp<this.maxHp;
+					return this.hp<this.maxHp&&!this.storage.nohp;
 				},
 				isHealthy:function(){
-					return this.hp==this.maxHp;
+					return this.hp==this.maxHp||this.storage.nohp;
 				},
 				isMaxHp:function(equal){
 					for(var i=0;i<game.players.length;i++){
@@ -49006,7 +49006,6 @@
 				roomId:game.roomId,
 				over:_status.over,
 				inpile:lib.inpile,
-				cardtag:_status.cardtag,
 			};
 			for(var i in lib.playerOL){
 				state.players[i]=lib.playerOL[i].getState();
