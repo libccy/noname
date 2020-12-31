@@ -6,7 +6,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		character:{
 			jin_zhangchunhua:['female','jin',3,['huishi','qingleng','xuanmu'],['hiddenSkill']],
 			jin_simayi:['male','jin',3,['buchen','smyyingshi','xiongzhi','quanbian'],['hiddenSkill']],
-			quyi:['male','qun',4,['fuqi','jiaozi']],
+			hanfu:['male','qun',4,['hfjieying','weipo']],
+			re_quyi:['male','qun',4,['refuqi','jiaozi']],
 			dongxie:['female','qun','3/4',['juntun','jiaojie']],
 			re_xinxianying:['female','wei',3,['rezhongjian','recaishi']],
 			wangrong:['female','qun',3,['minsi','jijing','zhuide']],
@@ -85,7 +86,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_baigei:['re_panfeng','xingdaorong','caoxing'],
 				sp_guandu:["sp_zhanghe","xunchen","sp_shenpei","gaolan","lvkuanglvxiang","chunyuqiong","sp_xuyou"],
 				sp_huangjin:['liuhong','zhujun','re_hejin','re_hansui','liubian'],
-				sp_fadong:['ol_dingyuan','wangrong','quyi'],
+				sp_fadong:['ol_dingyuan','wangrong','re_quyi','hanfu'],
 				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','re_sunluyu','caobuxing','ol_yujin','re_maliang','xin_baosanniang','re_xinxianying','dongxie'],
 				sp_mini:["mini_sunquan","mini_zuoci","mini_jiangwei","mini_diaochan","mini_zhangchunhua"],
 				sp_luanwu:["ns_lijue","ns_zhangji","ns_fanchou"],
@@ -94,6 +95,159 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			hfjieying:{
+				audio:2,
+				trigger:{player:'phaseJieshuBegin'},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('hfjieying'),lib.filter.notMe).set('ai',function(target){
+						var player=_status.event.player;
+						return get.attitude(player,target)*(1+target.countCards('h',function(card){
+							return !get.tag(card,'damage')&&target.hasValueTarget(card);
+						}))/(1+target.countCards('h'));
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('hfjieying',target);
+						target.addTempSkill('hfjieying2',{player:'phaseJieshuBegin'});
+					}
+				},
+				ai:{
+					expose:0.05,
+				},
+			},
+			hfjieying2:{
+				mod:{
+					playerEnabled:function(card,player,target){
+						if(player.storage.hfjieying2&&player!=target) return false;
+					},
+					targetInRange:function(card,player){
+						if(player==_status.currentPhase&&(card.name=='sha'||get.type(card)=='trick')) return true;
+					},
+					aiOrder:function(player,card,num){
+						var info=get.info(card);
+						if(!get.tag(card,'damage')&&(!info||!info.toself)) return num+8;
+					},
+				},
+				onremove:true,
+				trigger:{player:'useCard2'},
+				direct:true,
+				filter:function(event,player){
+					if(player!=_status.currentPhase) return false;
+					var card=event.card;
+					if(card.name!='sha'&&get.type(card)!='trick')return false;
+					var info=get.info(card);
+					if(info.allowMultiple==false) return false;
+					if(event.targets&&!info.multitarget){
+						if(game.hasPlayer(function(current){
+							return !event.targets.contains(current)&&lib.filter.targetEnabled2(card,player,current);
+						})){
+							return true;
+						}
+					}
+					return false;
+				},
+				content:function(){
+					'step 0'
+					var prompt2='为'+get.translation(trigger.card)+'增加一个目标'
+					player.chooseTarget(get.prompt('hfjieying2'),function(card,player,target){
+						var player=_status.event.player;
+						return !_status.event.targets.contains(target)&&lib.filter.targetEnabled2(_status.event.card,player,target);
+					}).set('prompt2',prompt2).set('ai',function(target){
+						var trigger=_status.event.getTrigger();
+						var player=_status.event.player;
+						return get.effect(target,trigger.card,player,player);
+					}).set('card',trigger.card).set('targets',trigger.targets);
+					'step 1'
+					if(result.bool){
+						if(!event.isMine()) game.delayx();
+						event.targets=result.targets;
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if(event.targets){
+						player.logSkill('hfjieying2',event.targets);
+						trigger.targets.addArray(event.targets);
+					}
+				},
+				group:'hfjieying3',
+				mark:true,
+				intro:{
+					content:function(player){
+						if(player) return '不能对其他角色使用牌直到回合结束';
+						return '使用【杀】或普通锦囊牌时无距离限制且可以多指定一个目标';
+					},
+				},
+			},
+			hfjieying3:{
+				trigger:{source:'damageSource'},
+				forced:true,
+				popup:false,
+				filter:function(event,player){
+					return !player.storage.hfjieying2&&player==_status.currentPhase;
+				},
+				content:function(){
+					player.storage.hfjieying2=true;
+				},
+			},
+			weipo:{
+				audio:2,
+				trigger:{target:'useCardToTargeted'},
+				forced:true,
+				filter:function(event,player){
+					return player!=event.player&&!player.hasSkill('weipo3')&&player.countCards('h')<Math.min(5,player.maxHp)&&(event.card.name=='sha'||get.type(event.card)=='trick');
+				},
+				content:function(){
+					var evt=trigger.getParent();
+					if(!evt.weipo) evt.weipo={};
+					evt.weipo[player.playerid]=player.countCards('h');
+					player.addTempSkill('weipo2');
+					player.drawTo(Math.min(5,player.maxHp));
+				},
+			},
+			weipo2:{
+				charlotte:true,
+				trigger:{global:'useCardAfter'},
+				forced:true,
+				popup:false,
+				filter:function(event,player){
+					return event.weipo&&event.weipo[player.playerid]!=undefined&&event.weipo[player.playerid]>player.countCards('h');
+				},
+				content:function(){
+					'step 0'
+					player.addTempSkill('weipo3',{player:'phaseBegin'});
+					if(player.countCards('h')&&trigger.player.isAlive()){
+						player.chooseCard('h',true,'将一张手牌交给'+get.translation(trigger.player));
+					}
+					else event.finish();
+					'step 1'
+					if(result.bool){
+						trigger.player.gain(result.cards,player,'giveAuto');
+					}
+				},
+			},
+			weipo3:{charlotte:true},
+			refuqi:{
+				audio:'fuqi',
+				forced:true,
+				trigger:{
+					player:"useCard",
+				},
+				filter:function(event,player){
+					return event.card&&(get.type(event.card)=='trick'||get.type(event.card)=='basic'&&!['shan','tao','jiu','du'].contains(event.card.name))&&game.hasPlayer(function(current){
+						return current!=player&&get.distance(player,current)<=1;
+					});
+				},
+				content:function(){
+					trigger.directHit.addArray(game.filterPlayer(function(current){
+						return current!=player&&get.distance(player,current)<=1;
+					}));
+				},
+			},
 			zhuide:{
 				audio:2,
 				trigger:{player:'die'},
@@ -140,6 +294,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			smyyingshi:{
+				audio:2,
 				enable:'phaseUse',
 				locked:true,
 				onChooseToUse:function(event){
@@ -169,6 +324,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			xiongzhi:{
+				audio:2,
 				enable:'phaseUse',
 				limited:true,
 				skillAnimation:true,
@@ -211,6 +367,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			quanbian:{
+				audio:2,
 				trigger:{player:['useCard','respond']},
 				hasHand:function(event){
 					var evts=event.player.getHistory('lose',function(evt){
@@ -283,6 +440,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			juntun:{
+				audio:2,
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				filter:function(event,player){
@@ -294,6 +452,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			jiaojie:{
+				audio:2,
 				mod:{
 					ignoredHandcard:function(card,player){
 						if(get.color(card)=='red'){
@@ -1280,6 +1439,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			cixiao:{
+				audio:2,
 				trigger:{player:'phaseZhunbeiBegin'},
 				direct:true,
 				filter:function(event,player){
@@ -1392,6 +1552,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			xianshuai:{
+				audio:2,
 				trigger:{global:'damageEnd'},
 				forced:true,
 				filter:function(event,player){
@@ -1399,8 +1560,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.addTempSkill('xianshuai2','roundStart');
-					if(trigger.source!=player) player.draw();
-					else if(trigger.player.isAlive()){
+					player.draw();
+					if(player==trigger.source&&trigger.player.isAlive()){
 						player.line(trigger.player,'green');
 						trigger.player.damage();
 					}
@@ -1408,6 +1569,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xianshuai2:{},
 			shiyuan:{
+				audio:2,
 				trigger:{target:'useCardToTargeted'},
 				frequent:true,
 				filter:function(event,player){
@@ -1422,6 +1584,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			dushi:{
+				audio:2,
 				global:'dushi2',
 				locked:true,
 				trigger:{player:'die'},
@@ -1542,6 +1705,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			yujue:{
+				audio:2,
 				derivation:'zhihu',
 				enable:'phaseUse',
 				usable:1,
@@ -1560,6 +1724,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						list.push('cancel2');
 						return list;
 					},
+					check:function(event,player){
+						for(var i=5;i>0;i--){
+							if(player.isEmpty(i)) return ('equip'+i);
+						}
+						return 'cancel2';
+					},
 					backup:function(result){
 						var next=get.copy(lib.skill.yujuex);
 						next.position=result.control;
@@ -1573,9 +1743,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(game.hasPlayer(function(target){
 								if(player==target) return false;
 								var hs=target.countCards('h');
-								return hs>0&&!game.hasPlayer(function(current){
-									return current!=player&&current!=target&&current.countCards('h')>hs;
-								})&&get.attitude(player,target)>0;
+								return hs>2&&get.attitude(player,target)>0;
 							})) return 1;
 							return 0;
 						},
@@ -1593,10 +1761,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					})){
 						player.chooseTarget(true,'选择一名角色交给你一张牌并获得技能〖执笏〗',function(card,player,target){
 							if(player==target) return false;
-							var hs=target.countCards('h');
-							return hs>0&&!game.hasPlayer(function(current){
-								return current!=player&&current!=target&&current.countCards('h')>hs;
-							});
+							return target.countCards('h')>0;
 						}).set('ai',function(target){
 							return get.attitude(_status.event.player,target)*target.countCards('h');
 						});
@@ -1651,6 +1816,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			tuxing:{
+				audio:2,
 				trigger:{player:'disableEquipAfter'},
 				forced:true,
 				content:function(){
@@ -1669,18 +1835,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageBegin1'},
 				forced:true,
 				charlotte:true,
-				filter:function(event,player){
-					return event.getParent().name=='sha';
-				},
 				content:function(){
 					trigger.num++;
 				},
 				mark:true,
 				intro:{
-					content:'因执行【杀】的效果造成伤害时，此伤害+1',
+					content:'造成伤害时，此伤害+1',
 				},
 			},
 			gongjian:{
+				audio:2,
 				trigger:{player:'useCardToPlayered'},
 				usable:1,
 				logTarget:'target',
@@ -1710,6 +1874,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			kuimang:{
+				audio:2,
 				trigger:{global:'dieAfter'},
 				forced:true,
 				filter:function(event,player){
@@ -7072,6 +7237,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liubian:'刘辩（176年－190年3月6日），是汉灵帝刘宏与何皇后的嫡长子。刘辩在灵帝驾崩后继位为帝，史称少帝，由于年幼，实权掌握在临朝称制的母亲何太后和母舅大将军何进手中。少帝在位时期，东汉政权已经名存实亡，他即位后不久即遭遇以何进为首的外戚集团和以十常侍为首的内廷宦官集团这两大敌对政治集团的火并，被迫出宫，回宫后又受制于以“勤王”为名进京的凉州军阀董卓，终于被废为弘农王，成为东汉唯一被废黜的皇帝，其同父异母弟陈留王刘协继位为帝，是为汉献帝。被废黜一年之后，刘辩在董卓胁迫下自尽，时年仅十五岁（一说十八岁），其弟献帝追谥他为怀王。中国古代的史书中称刘辩为皇子辩、少帝和弘农王等。因为在位不逾年，传统上称东汉共十二帝，刘辩与东汉另一位少帝刘懿都不在其中，亦皆无本纪；不过，现代史学界也有观点承认两位少帝均是汉朝皇帝，则刘辩为东汉第十三位皇帝。',
 			luyusheng:'陆郁生（？年-？），三国时期吴国官员陆绩之女。陆郁生的父亲陆绩是吴郡公认的才子，又是当时吴郡陆氏的领袖。陆绩赴任担任郁林太守，遂取此名。陆郁生年少的时候就定下坚贞的志向。建安二十四年（219年)，陆绩早亡，她与两个兄弟陆宏、陆睿当时都只有几岁，一起返回吴县，被他们的从兄陆瑁接回抚养。13周岁的陆郁生嫁给同郡出身的张白为妻。出嫁3个月后，张白因为其兄张温一族的案件遭到连坐，被处以流刑，后死于流放地，陆郁生成为了寡妇，其后公开宣言不再改嫁，困难于生计但拒绝了所有提亲，在艰苦中从未停止服侍、照顾张白的姐妹。事情传到朝廷，皇帝褒奖陆郁生，号其为“义姑”。她的表侄姚信在文集中称赞她的义举。',
 			wangrong:'汉灵怀皇后王荣（？~181年），赵国邯郸（今河北邯郸市）人。五官中郎将王苞孙女，汉灵帝刘宏妃子，汉献帝刘协生母。初以良家子选入掖庭，封为美人，服侍汉灵帝。光和四年（181年），生下陈留王刘协，惨遭灵思皇后毒杀。王荣死后，汉灵帝曾作《追德赋》、《令仪颂》。永汉元年（189年），其子刘协即位，是为汉献帝，追谥灵怀皇后，葬于文昭陵。',
+			hanfu:'韩馥（？—191年），字文节，颍川郡（今河南禹州）人。东汉末年的诸侯，冀州牧。韩馥担任过东汉的御史中丞，之后被董卓举荐为冀州牧；在各诸侯起兵讨伐董卓时，韩馥也是其中之一的参与者。韩馥与袁绍也曾经有意立刘虞为皇帝。当时冀州民殷人盛，兵粮优足，于是袁绍便用计夺取冀州，韩馥被迫投靠张邈；之后张邈与袁绍的使者见面，韩馥以为是要来杀害自己的，于是在厕所中以刻书用的小刀自杀。',
 		},
 		characterTitle:{
 			wulan:'#b对决限定武将',
@@ -7126,6 +7292,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huangfusong:['huangfusong','old_huangfusong'],
 			wenyang:['wenyang','diy_wenyang'],
 			dingyuan:['ol_dingyuan','dingyuan'],
+			quyi:['quyi','re_quyi'],
 		},
 		translate:{
 			lijue:"李傕",
@@ -7417,13 +7584,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuhong:'刘宏',
 			yujue:'鬻爵',
 			yujue_backup:'鬻爵',
-			yujue_info:'出牌阶段限一次，你可以废除一个装备栏，然后令除你之外手牌数最多的一名其他角色交给你一张手牌。其获得〖执笏〗直到你的下回合开始。',
+			yujue_info:'出牌阶段限一次，你可以废除一个装备栏，然后令一名有手牌的其他角色交给你一张手牌。其获得〖执笏〗直到你的下回合开始。',
 			zhihu:'执笏',
 			zhihu_mark:'执笏',
 			zhihu_info:'锁定技，每回合限两次，当你对其他角色造成伤害后，你摸两张牌。',
 			tuxing:'图兴',
 			tuxing2:'图兴',
-			tuxing_info:'锁定技，当你废除一个装备栏时，你加1点体力上限并回复1点体力。然后若你所有的装备栏均已被废除，则你减4点体力上限，且本局游戏内使用【杀】造成的伤害+1。',
+			tuxing_info:'锁定技，当你废除一个装备栏时，你加1点体力上限并回复1点体力。然后若你所有的装备栏均已被废除，则你减4点体力上限，且本局游戏内造成的伤害+1。',
 			re_hejin:'何进',
 			xin_baosanniang:'鲍三娘',
 			decadexushen:"许身",
@@ -7444,7 +7611,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			panshi:'叛弑',
 			panshi_info:'锁定技，准备阶段，你交给有“慈孝”技能的角色一张手牌；当你于出牌阶段因使用【杀】对其他角色造成伤害时，若其拥有技能“慈孝”，则此伤害+1，且你结束出牌阶段。',
 			xianshuai:'先率',
-			xianshuai_info:'锁定技，有角色造成伤害后，若此伤害是本轮第一次造成伤害，且伤害来源是其他角色，则你摸一张牌；若伤害来源是你，则你对受伤角再造成1点伤害。',
+			xianshuai_info:'锁定技，有角色造成伤害后，若此伤害是本轮第一次造成伤害：你摸一张牌；若伤害来源是你，则你对受伤角再造成1点伤害。',
 			luyusheng:'陆郁生',
 			wangrong:'王荣',
 			minsi:'敏思',
@@ -7526,7 +7693,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			quanbian2:'权变',
 			quanbian_info:'当你于出牌阶段内使用/打出手牌时，若此牌有花色且你本回合内未使用/打出过该花色的其他手牌，则你可以选择一项：①摸一张牌。②将牌堆顶X张牌中的一张置于牌堆底（X为你的体力上限）。若你发动此技能，则你本回合内不能再使用与此牌花色相同的手牌。',
 			re_hansui:'韩遂',
-			quyi:'麴义',
+			re_quyi:'麴义',
+			refuqi:'伏骑',
+			refuqi_info:'锁定技，当你使用牌时，你令所有距离为1的其他角色不能使用或打出牌响应此牌。',
+			hanfu:'韩馥',
+			hfjieying:'节应',
+			hfjieying2:'节应',
+			hfjieying3:'节应',
+			hfjieying_info:'结束阶段，你可以选择一名其他角色，该角色下回合使用【杀】或普通锦囊牌无距离限制且可多指定一个目标，且当其造成伤害后，其无法再使用牌直到回合结束。 ',
+			weipo:'危迫',
+			weipo_info:'锁定技，其他角色使用【杀】或普通锦囊牌指定你为目标后，若你的手牌数小于X，则你记录自己此时的手牌数为Y并将手牌摸至X张。此牌结算结束后，若你的手牌数小于Y，则你将一张手牌交给此牌的使用者，且此技能失效直到你的下回合开始。（X为你的体力上限且至多为5） ',
+			
 			sp_yingbian:'应变篇',
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",

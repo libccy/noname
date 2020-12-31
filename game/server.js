@@ -3,6 +3,7 @@
 	var wss=new WebSocketServer({port:8080});
 	var bannedKeys=[];
 	var bannedIps=[];
+	var version='1.9.108';
 
 	var rooms=[{},{},{},{},{},{},{},{}];
 	var systemEvent={
@@ -80,15 +81,22 @@
 			}
 		},
 		key:function(id){
-			this.onlineKey=id;
-			clearTimeout(this.keyCheck);
-			delete this.keyCheck;
-			if(typeof id!='string'||bannedKeys.indexOf(id)!=-1){
-				bannedIps.push(this._socket.remoteAddress);
-				console.log(id, this._socket.remoteAddress);
+			if(!id||typeof id!='object'||version!=id[1]){
+				console.log(id, this._socket.remoteAddress, '使用旧版本登录');
+				this.sendl('denied','version');
 				this.close();
+				clearTimeout(this.keyCheck);
+				delete this.keyCheck;
 				return;
 			}
+			else if(bannedKeys.indexOf(id[0])!=-1){
+				bannedIps.push(this._socket.remoteAddress);
+				console.log(id, this._socket.remoteAddress, '被封禁用户登录');
+				this.close();
+			}
+			this.onlineKey=id[0];
+			clearTimeout(this.keyCheck);
+			delete this.keyCheck;
 		},
 		events:function(cfg,id,type){
 			if(bannedKeys.indexOf(id)!=-1||typeof id!='string'){

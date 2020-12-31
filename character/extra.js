@@ -12,7 +12,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				extra_shan:['shen_zhaoyun','shen_simayi'],
 				extra_yin:['shen_liubei','shen_luxun'],
 				extra_lei:['shen_ganning','shen_zhangliao'],
-				extra_key:['key_kagari','key_shiki'],
+				extra_key:['key_kagari','key_shiki','key_hina'],
 				extra_ol:['ol_zhangliao','shen_caopi','shen_zhenji'],
 				extra_offline:['shen_diaochan'],
 				extra_mini:['mini_zhugeliang','mini_lvbu'],
@@ -21,7 +21,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		character:{
 			key_kagari:['female','shen',3,['kagari_zongsi'],['key']],
 			key_shiki:['female','shen','3/5',['shiki_omusubi'],['key']],
-			//key_hina:['female','shen',3,[],['key']],
+			key_hina:['female','shen',3,['hina_shenxian','hina_mashu','hina_tieji'],['key','hiddenSkill']],
 			
 			shen_diaochan:['female','shen',3,['meihun','huoxin'],['qun']],
 			shen_guanyu:['male','shen',5,['new_wuhun','wushen'],['shu']],
@@ -64,8 +64,168 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			hina_shenxian:{
+				hiddenSkill:true,
+				trigger:{player:'showCharacterAfter'},
+				forced:true,
+				filter:function(event,player){
+					return event.toShow.contains('key_hina');
+				},
+				content:function(){
+					player.equip(game.createCard('hina_shenji','diamond',13));
+				},
+			},
+			hina_mashu:{
+				mod:{
+					globalFrom:function(from,to,distance){
+						return distance-1;
+					}
+				},
+			},
+			hina_tieji:{
+				shaRelated:true,
+				trigger:{player:'useCardToPlayered'},
+				check:function(event,player){
+					return get.attitude(player,event.target)<0;
+				},
+				filter:function(event,player){
+					return event.card.name=='sha';
+				},
+				logTarget:'target',
+				content:function(){
+					"step 0"
+					player.judge(function(){return 0});
+					if(!trigger.target.hasSkill('fengyin')){
+						trigger.target.addTempSkill('fengyin');
+					}
+					"step 1"
+					var suit=result.suit;
+					if(result.suit=='spade'){
+						var id=trigger.target.playerid;
+						var map=trigger.customArgs;
+						if(!map[id]) map[id]={};
+						if(!map[id].extraDamage) map[id].extraDamage=0;
+						map[id].extraDamage++;
+					}
+					var target=trigger.target;
+					var num=target.countCards('h','shan');
+					target.chooseToDiscard('请弃置一张'+get.translation(suit)+'牌，否则不能使用闪抵消此杀','he',function(card){
+						return get.suit(card)==_status.event.suit;
+					}).set('ai',function(card){
+						var num=_status.event.num;
+						if(num==0) return 0;
+						if(card.name=='shan') return num>1?2:0;
+						return 8-get.value(card);
+					}).set('num',num).set('suit',suit);
+					"step 2"
+					if(!result.bool){
+						trigger.directHit.add(trigger.target);
+					}
+				},
+				ai:{
+					ignoreSkill:true,
+					skillTagFilter:function(player,tag,arg){
+						if(!arg||arg.isLink||!arg.card||arg.card.name!='sha') return false;
+						if(!arg.target||get.attitude(player,arg.target)>=0) return false;
+						if(!arg.skill||!lib.skill[arg.skill]||lib.skill[arg.skill].charlotte||get.is.locked(arg.skill)||!arg.target.getSkills(true,false).contains(arg.skill)) return false;
+					},
+				},
+			},
+			hina_guixin:{
+				trigger:{
+					player:"phaseZhunbeiBegin",
+				},
+				filter:function(event,player){
+					return player.hasSkill('hina_shenxian');
+				},
+				content:function(){
+					"step 0"
+					var targets=game.filterPlayer();
+					targets.remove(player);
+					targets.sort(lib.sort.seat);
+					event.targets=targets;
+					"step 1"
+					event.num=0;
+					player.line(targets,'green');
+					player.chooseControl('手牌区','装备区','判定区').set('ai',function(){
+						if(game.hasPlayer(function(current){
+							return current.countCards('j')&&current!=player&&get.attitude(player,current)>0;
+						})) return 2;
+						return Math.floor(Math.random()*3);
+					}).set('prompt','请选择优先获得的区域');
+					"step 2"
+					event.range={
+						手牌区:['h','e','j'],
+						装备区:['e','h','j'],
+						判定区:['j','h','e'],
+					}[result.control||'手牌区'];
+					"step 3"
+					if(num<event.targets.length){
+						var target=event.targets[num];
+						var range=event.range;
+						for(var i=0;i<range.length;i++){
+							var cards=target.getCards(range[i]);
+							if(cards.length){
+								var card=cards.randomGet();
+								player.gain(card,target,'giveAuto','bySelf');
+								break;
+							}
+						}
+						event.num++;
+					}
+					"step 4"
+					if(num<event.targets.length) event.goto(3);
+					"step 5"
+					player.turnOver();
+				},
+			},
+			hina_shenfen:{
+				trigger:{
+					player:"phaseJieshuBegin",
+				},
+				filter:function(event,player){
+					return player.hasSkill('hina_shenxian');
+				},
+				content:function(){
+					"step 0"
+					event.delay=false;
+					event.targets=game.filterPlayer();
+					event.targets.remove(player);
+					event.targets.sort(lib.sort.seat);
+					player.line(event.targets,'green');
+					event.targets2=event.targets.slice(0);
+					event.targets3=event.targets.slice(0);
+					"step 1"
+					if(event.targets2.length){
+						event.targets2.shift().damage('nocard');
+						event.redo();
+					}
+					"step 2"
+					if(event.targets.length){
+						event.current=event.targets.shift()
+						if(event.current.countCards('e')) event.delay=true;
+						event.current.discard(event.current.getCards('e')).delay=false;
+					}
+					"step 3"
+					if(event.delay) game.delay(0.5);
+					event.delay=false;
+					if(event.targets.length) event.goto(2);
+					"step 4"
+					if(event.targets3.length){
+						var target=event.targets3.shift();
+						target.chooseToDiscard(4,'h',true).delay=false;
+						if(target.countCards('h')) event.delay=true;
+					}
+					"step 5"
+					if(event.delay) game.delay(0.5);
+					event.delay=false;
+					if(event.targets3.length) event.goto(4);
+					"step 6"
+					player.turnOver();
+				},
+			},
 			miniwuqian:{
-				audio:'wuqian',
+				audio:'wuqian', 
 				trigger:{
 					player:'useCardToPlayered',
 				},
@@ -3633,6 +3793,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 		},
+		card:{
+			hina_shenji:{
+				type:'equip',
+				subtype:'equip5',
+				derivation:'key_hina',
+				skills:['hina_guixin','hina_shenfen'],
+				fullskin:true,
+				ai:{
+					equipValue:function(card,player){
+						if(player.hasSkill('hina_shenxian')) return 100;
+						return 0;
+					},
+					basic:{
+						equipValue:100
+					}
+				},
+			},
+		},
 		dynamicTranslate:{
 			nzry_longnu:function(player){
 				if(player.hasSkill('nzry_longnu_2')) return '转换技，锁定技，阴：出牌阶段开始时，你失去1点体力并摸一张牌，然后本回合内你的红色手牌均视为火【杀】且无距离限制。<span class="legendtext">阳：出牌阶段开始时，你减1点体力上限并摸一张牌，然后本回合你的锦囊牌均视为雷【杀】且无使用次数限制。</span>';
@@ -3815,7 +3993,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shiki_omusubi:'御结',
 			shiki_omusubi_info:'一轮游戏开始时，你可以减1点体力上限，然后将一名其他角色武将牌上的技能加入到你的武将牌上。',
 			shiki_omusubi_append:'<span style="font-family: yuanli">来吧，羽依里。用你的手，让我变成那只真正的鬼吧！</span>',
-			//key_hina:'佐藤雏',
+			key_hina:'佐藤雏',
+			hina_shenxian:'神现',
+			hina_shenxian_info:'隐匿技，锁定技，当你明置此武将牌时，你将一张【神机】置入装备区。',
+			hina_mashu:'马术',
+			hina_mashu_info:'锁定技，你计算于其他角色的距离时始终-1。',
+			hina_tieji:'铁骑',
+			hina_tieji_info:'当你使用【杀】指定目标后，你可进行判定。你令目标角色的所有非锁定技失效直到回合结束。除非其弃置一张与判定结果花色相同的牌，则其不能响应此【杀】。若判定结果为♠，则此【杀】对其的伤害+1。',
+			
+			hina_shenji:'神机',
+			hina_shenji_info:'若你拥有技能〖神现〗，则你可以于准备阶段发动〖归心〗，并可于结束阶段发动〖神愤〗。',
+			hina_guixin:'归心',
+			hina_shenfen:'神愤',
 			
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',

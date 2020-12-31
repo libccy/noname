@@ -7188,7 +7188,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhurong:['re_zhurong','zhurong'],
 			sunjian:['ol_sunjian','re_sunjian','sunjian'],
 			jiaxu:['jiaxu','sp_jiaxu','ns_jiaxu'],
-			dongzhuo:['ol_dongzhuo','re_dongzhuo','dongzhuo'],
+			dongzhuo:['ol_dongzhuo','sp_dongzhuo','re_dongzhuo','dongzhuo'],
 			dengai:['re_dengai','ol_dengai','dengai'],
 			zhanghe:['zhanghe','sp_zhanghe','yj_zhanghe'],
 			jiangwei:['re_jiangwei','sp_jiangwei','mini_jiangwei','jiangwei'],

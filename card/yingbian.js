@@ -251,6 +251,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					});
 				},
+				ai:{
+					basic:{
+						equipValue:0.5
+					}
+				},
 			},
 			taigongyinfu:{
 				audio:true,
@@ -398,15 +403,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseTarget(function(card,player,target){
 						return !target.isLinked();
-					},'是否发动【太公阴符】横置一名角色？').set('',function(target){
+					},'是否发动【太公阴符】横置一名角色？').set('ai',function(target){
 						return get.effect(target,{name:'tiesuo'},_status.event.player,_status.event.player);
 					});
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
-						player.logSkill('taigongyinfu_skill',target);
+						player.logSkill('taigongyinfu_link',target);
 						target.link();
 					}
+				},
+				ai:{
+					expose:0.2,
 				},
 			},
 			_yingbian:{
@@ -414,7 +422,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				popup:false,
 				firstDo:true,
+				ruleSkill:true,
 				filter:function(event,player){
+					if(event.card.yingbian) return false;
 					var bool=player.hasSkillTag('forceYingbian');
 					var card=event.card;
 					if(get.cardtag(card,'yingbian_kongchao')&&(!player.countCards('h')||bool)) return true;
@@ -440,7 +450,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						player.popup('富甲','orange');
 						bool=true;
 					}
-					else if(player.hasSkillTag('forceYingbian')) bool=true;
+					else if(player.hasSkillTag('forceYingbian')){
+						player.popup('应变','metal');
+						bool=true;
+					}
 					if(bool){
 						game.log(player,'触发了',card,'的应变条件');
 						event.goto(10);
@@ -591,6 +604,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target.discard(event.zhuzhanresult2.cards);
 						target.popup('助战','wood');
 						game.log(target,'响应了',player,'发起的助战');
+						target.addExpose(0.2);
 					}
 					else event.finish();
 					'step 10'

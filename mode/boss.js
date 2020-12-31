@@ -497,6 +497,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				fullskin:true,
  		},
+ 		shenzhixiunvfu:{
+ 			type:'equip',
+ 			subtype:'equip2',
+				modeimage:'boss',
+				fullskin:true,
+ 		},
  		gubuzifeng:{
 				type:'trick',
 				fullskin:true,
@@ -1604,7 +1610,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return name;
 					}
 					else{
-						var arr=['shen_caocao','shen_simayi','shen_guanyu','shen_zhugeliang','shen_zhaoyun','shen_zhouyu','shen_lvmeng','shen_lvbu','shen_liubei','shen_luxun','shen_ganning','ol_zhangliao','shen_zhenji','shen_caopi','key_kagari','key_shiki'];
+						var arr=['shen_caocao','shen_simayi','shen_guanyu','shen_zhugeliang','shen_zhaoyun','shen_zhouyu','shen_lvmeng','shen_lvbu','shen_liubei','shen_luxun','shen_ganning','ol_zhangliao','shen_zhenji','shen_caopi','key_kagari','key_shiki','key_hina'];
 						arr.removeArray(list);
 						return arr.randomGet();
 					}
@@ -1653,7 +1659,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							game.check();
 						});
 						control.backup1=ui.create.div('.buttons');
-						control.backup2=ui.create.buttons(['shen_caocao','shen_simayi','shen_guanyu','shen_zhugeliang','shen_zhaoyun','shen_zhouyu','shen_lvmeng','shen_lvbu','shen_liubei','shen_luxun','shen_ganning','ol_zhangliao','shen_zhenji','shen_caopi','key_kagari','key_shiki'],'character',control.backup1);
+						control.backup2=ui.create.buttons(['shen_caocao','shen_simayi','shen_guanyu','shen_zhugeliang','shen_zhaoyun','shen_zhouyu','shen_lvmeng','shen_lvbu','shen_liubei','shen_luxun','shen_ganning','ol_zhangliao','shen_zhenji','shen_caopi','key_kagari','key_shiki','key_hina'],'character',control.backup1);
 						return control;
 					}
 				},
@@ -1663,7 +1669,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.addGlobalSkill('thedayibecomeagod');
 					var list=['lebu','bingliang'];
 					for(var i=0;i<game.players.length;i++){
-						switch(game.players[i].name){
+						switch(game.players[i].name1){
 							case 'shen_guanyu':{
 								game.players[i].equip(game.createCard2('guilongzhanyuedao','spade',5));
 								lib.inpile.add('guilongzhanyuedao');
@@ -1751,6 +1757,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							case 'key_shiki':{
 								game.players[i].equip(game.createCard2('niaobaidaowenha','diamond',13));
 								lib.inpile.add('niaobaidaowenha');
+								break;
+							}
+							case 'key_hina':{
+								game.players[i].equip(game.createCard2('shenzhixiunvfu','spade',13));
+								lib.inpile.add('shenzhixiunvfu');
 								break;
 							}
 						}
@@ -9809,6 +9820,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			niaobaidaowenha_skill:'鸟白岛文蛤',
 			niaobaidaowenha_info:'当你减少1点体力上限后，你可令一名其他角色增加1点体力上限并回复1点体力。',
 			niaobaidaowenha_skill_info:'当你减少1点体力上限后，你可令一名其他角色增加1点体力上限并回复1点体力。',
+			shenzhixiunvfu:'神之修女服',
+			shenzhixiunvfu_info:'没什么实际作用的衣服，仅仅是显得像个神而已。',
 
 			mode_boss_card_config:'挑战卡牌',
 			mode_boss_character_config:'挑战武将',

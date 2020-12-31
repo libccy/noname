@@ -143,6 +143,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wangyun:['male','qun',4,['xinlianji','xinmoucheng']],
 			sunqian:['male','shu',3,['qianya','shuimeng']],
 			xizhicai:['male','wei',3,['tiandu','xianfu','chouce']],
+			quyi:['male','qun',4,['fuqi','jiaozi']],
 
 			luzhi:['male','wei',3,['qingzhongx','weijing']],
 			
@@ -540,12 +541,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			spweiwu:{
+				audio:2,
 				enable:'phaseUse',
 				usable:1,
 				viewAs:{name:'shunshou'},
 				filterCard:{color:'red'},
 				position:'he',
-				audio:'xiaoxi',
 				check:function(card){
 					return 7-get.value(card);
 				},
@@ -14689,7 +14690,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caoang:['caoang','yj_caoang','tw_caoang'],
 			caohong:['caohong','tw_caohong'],
 			xiahouba:['re_xiahouba','xiahouba'],
-			maliang:['maliang','re_maliang','ol_maliang','old_maliang'],
+			maliang:['maliang','re_maliang','tw_maliang','ol_maliang','old_maliang'],
 			dingfeng:['dingfeng','tw_dingfeng'],
 			zumao:['zumao','tw_zumao'],
 			beimihu:['tw_beimihu','beimihu'],
@@ -14701,7 +14702,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangliang:['re_zhangliang','zhangliang'],
 			lingju:['lingju','old_lingju'],
 			guansuo:['guansuo','ol_guansuo'],
-			zhangxingcai:['old_zhangxingcai'],
+			zhangxingcai:['zhangxingcai','old_zhangxingcai'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
@@ -15538,6 +15539,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spmouzhu_info:'出牌阶段限一次，你可以从“距离为1”或“体力值等于你”中选择一个条件，然后令此时所有满足条件的角色依次进行以下结算：交给你一张手牌，然后若其手牌数小于你，则其视为对你使用一张【杀】或【决斗】。',
 			xiaoxi:'骁袭',
 			xiaoxi_info:'当你登场时，你可以视为使用一张【杀】。',
+			quyi:'OL麴义',
 			
 			sp_default:"常规",
 			sp_zhongdan:"忠胆英杰",

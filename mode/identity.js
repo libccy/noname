@@ -1095,12 +1095,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(typeof lib.config.test_game=='string'&&player==game.me.next){
 						player.init(lib.config.test_game);
 					}
-					if(get.config('choose_group')&&player.group=='shen'){
+					if(get.config('choose_group')&&player.group=='shen'&&!player.isUnseen(0)){
 							var list=lib.group.slice(0);
 							list.remove('shen');
 							if(list.length) player.group=function(){
 							 if(_status.mode!='zhong'&&game.zhu&&game.zhu.group){
-							  if(['re_zhangjiao','liubei','re_liubei','caocao','re_caocao','sunquan','re_sunquan','zhangjiao','sp_zhangjiao','caopi','re_caopi','liuchen','caorui','sunliang','sunxiu','sunce','re_sunben','ol_liushan','re_liushan','key_akane','dongzhuo','re_dongzhuo','ol_dongzhuo'].contains(game.zhu.name)) return game.zhu.group;
+							  if(['re_zhangjiao','liubei','re_liubei','caocao','re_caocao','sunquan','re_sunquan','zhangjiao','sp_zhangjiao','caopi','re_caopi','liuchen','caorui','sunliang','sunxiu','sunce','re_sunben','ol_liushan','re_liushan','key_akane','dongzhuo','re_dongzhuo','ol_dongzhuo','liubian'].contains(game.zhu.name)) return game.zhu.group;
 							  if(game.zhu.name=='sunhao'&&player.identity=='zhong') return 'wu';
 							  if(game.zhu.name=='yl_yuanshu'){
 							   if(player.identity=='zhong') list.remove('qun');
@@ -1667,7 +1667,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					var chooseGroup=false;
 					if(event.chosen.length){
-						if(lib.character[event.chosen[0]][1]=='shen'){
+						if(lib.character[event.chosen[0]][1]=='shen'&&!lib.character[event.chosen[0]][4].contains('hiddenSkill')){
 							chooseGroup=true;
 						}
 					}
@@ -1678,13 +1678,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else if(result.buttons.length==2){
 						event.choosed=[result.buttons[0].link,result.buttons[1].link];
 						game.addRecentCharacter(result.buttons[0].link,result.buttons[1].link);
-						if(lib.character[event.choosed[0]][1]=='shen'){
+						if(lib.character[event.choosed[0]][1]=='shen'&&!lib.character[event.choosed[0]][4].contains('hiddenSkill')){
 							chooseGroup=true;
 						}
 					}
 					else{
 						event.choosed=[result.buttons[0].link];
-						if(lib.character[event.choosed[0]][1]=='shen'){
+						if(lib.character[event.choosed[0]][1]=='shen'&&!lib.character[event.choosed[0]][4].contains('hiddenSkill')){
 							chooseGroup=true;
 						}
 						game.addRecentCharacter(result.buttons[0].link);
@@ -1966,7 +1966,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					},game.zhu,game.zhu.name,game.zhu.name2,game.players.length>4);
 					
-					if(game.zhu.group=='shen'){
+					if(game.zhu.group=='shen'&&!game.zhu.isUnseen(0)){
 						var list=['wei','shu','wu','qun','jin','key'];
 						for(var i=0;i<list.length;i++){
 							if(!lib.group.contains(list[i])) list[i].splice(i--,1);
@@ -2044,7 +2044,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						else{
 							result[i]=result[i].links;
 						}
-						if(lib.character[result[i][0]]&&lib.character[result[i][0]][1]=='shen') shen.push(lib.playerOL[i]);
+						if(lib.character[result[i][0]]&&lib.character[result[i][0]][1]=='shen'&&!lib.character[result[i][0]][4].contains('hiddenSkill')) shen.push(lib.playerOL[i]);
 					}
 					event.result2=result;
 					if(shen.length){

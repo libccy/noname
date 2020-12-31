@@ -1102,7 +1102,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				chooseButton:{
 					dialog:function(event,player){
-					var list=[];
+						var list=[];
 						for(var i=0;i<lib.inpile.length;i++){
 							var name=lib.inpile[i];
 							if(player.storage.xintaoluan.contains(name)) continue;
@@ -2856,10 +2856,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					var list=['sha','shan','tao','jiu','taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman','lebu','bingliang','shandian'];
-					for(var i=0;i<player.storage.shouxi.length;i++){
-						list.remove(player.storage.shouxi[i]);
-					}
+					var list=lib.inpile.filter(function(i){
+						if(player.storage.shouxi.contains(i)) return false;
+						var type=get.type(i);
+						if(type=='basic'||type=='trick') return true;
+						return false;
+					});
 					for(var i=0;i<list.length;i++){
 						list[i]=[get.type(list[i]),'',list[i]];
 					}
@@ -4325,28 +4327,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 						return;
 					}
-					var list=['sha','sha','sha','sha','shan','tao','jiu'];
-					if(player.storage.jiaozhao1){
-						list=list.concat(['taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman']);
-					}
-					for(var i=0;i<list.length;i++){
-						if(i<=6){
-							if(i==1){
-								list[i]=['基本','',list[i],'fire'];
-							}
-							else if(i==2){
-								list[i]=['基本','',list[i],'thunder'];
-							}
-							else if(i==3){
-								list[i]=['基本','',list[i],'ice'];
-							}
-							else{
-								list[i]=['基本','',list[i]];
-							}
+					var list=[];
+					for(var i=0;i<lib.inpile.length;i++){
+						var name=lib.inpile[i];
+						if(name=='sha'){
+							list.push(['基本','','sha']);
+							list.push(['基本','','sha','fire']);
+							list.push(['基本','','sha','thunder']);
+							list.push(['基本','','sha','ice']);
 						}
-						else{
-							list[i]=['锦囊','',list[i]];
-						}
+						else if(get.type(name)=='basic') list.push(['基本','',name]);
+						else if(player.storage.jiaozhao1&&get.type(name)=='trick') list.push(['锦囊','',name]);
 					}
 					var choice;
 					if(get.attitude(event.target,player)<=0){

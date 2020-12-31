@@ -15927,7 +15927,7 @@
 					game.broadcast(function(player,name,sex,num,group){
 						player.group=group;
 						player.name=name;
-						player.sex=sex;;
+						player.sex=sex;
 						switch(num){
 							case 0:player.classList.remove('unseen');break;
 							case 1:player.classList.remove('unseen2');break;
@@ -17010,7 +17010,6 @@
 				update:function(){
 					if(_status.video&&arguments.length==0) return;
 					if(this.hp>=this.maxHp) this.hp=this.maxHp;
-					if(this.storage.nohp) return;
 					var hp=this.node.hp;
 					hp.style.transition='none';
 					game.broadcast(function(player,hp,maxHp,hujia){
@@ -17027,74 +17026,76 @@
 							this.unmarkSkill('ghujia');
 						}
 					}
-					if(this.maxHp==Infinity){
-						hp.innerHTML='∞';
-					}
-					else if(game.layout=='default'&&this.maxHp>14){
-						hp.innerHTML=this.hp+'/'+this.maxHp;
-						hp.classList.add('text');
-					}
-					else if(get.is.newLayout()&&
-					(
-						this.maxHp>9||
-						(this.maxHp>5&&this.classList.contains('minskin'))||
-						((game.layout=='mobile'||game.layout=='long')&&this.dataset.position==0&&this.maxHp>7)
-					)){
-						hp.innerHTML=this.hp+'<br>/<br>'+this.maxHp+'<div></div>';
-						if(this.hp==0){
-							hp.lastChild.classList.add('lost');
+					if(!this.storage.nohp){
+						if(this.maxHp==Infinity){
+							hp.innerHTML='∞';
 						}
-						hp.classList.add('textstyle');
-						// hp.classList.remove('long');
-					}
-					else{
-						hp.innerHTML='';
-						hp.classList.remove('text');
-						hp.classList.remove('textstyle');
-						while(this.maxHp>hp.childNodes.length){
-							ui.create.div(hp);
+						else if(game.layout=='default'&&this.maxHp>14){
+							hp.innerHTML=this.hp+'/'+this.maxHp;
+							hp.classList.add('text');
 						}
-						while(Math.max(0,this.maxHp)<hp.childNodes.length){
-							hp.removeChild(hp.lastChild);
-						}
-						for(var i=0;i<this.maxHp;i++){
-							var index=i;
-							if(get.is.newLayout()){
-								index=this.maxHp-i-1;
+						else if(get.is.newLayout()&&
+						(
+							this.maxHp>9||
+							(this.maxHp>5&&this.classList.contains('minskin'))||
+							((game.layout=='mobile'||game.layout=='long')&&this.dataset.position==0&&this.maxHp>7)
+						)){
+							hp.innerHTML=this.hp+'<br>/<br>'+this.maxHp+'<div></div>';
+							if(this.hp==0){
+								hp.lastChild.classList.add('lost');
 							}
-							if(i<this.hp){
-								hp.childNodes[index].classList.remove('lost');
-							}
-							else{
-								hp.childNodes[index].classList.add('lost');
-							}
+							hp.classList.add('textstyle');
+							// hp.classList.remove('long');
 						}
-						// if(this.maxHp==9){
-						// 	hp.classList.add('long');
-						// }
-						// else{
-						// 	hp.classList.remove('long');
-						// }
+						else{
+							hp.innerHTML='';
+							hp.classList.remove('text');
+							hp.classList.remove('textstyle');
+							while(this.maxHp>hp.childNodes.length){
+								ui.create.div(hp);
+							}
+							while(Math.max(0,this.maxHp)<hp.childNodes.length){
+								hp.removeChild(hp.lastChild);
+							}
+							for(var i=0;i<this.maxHp;i++){
+								var index=i;
+								if(get.is.newLayout()){
+									index=this.maxHp-i-1;
+								}
+								if(i<this.hp){
+									hp.childNodes[index].classList.remove('lost');
+								}
+								else{
+									hp.childNodes[index].classList.add('lost');
+								}
+							}
+							// if(this.maxHp==9){
+							// 	hp.classList.add('long');
+							// }
+							// else{
+							// 	hp.classList.remove('long');
+							// }
+						}
+						if(hp.classList.contains('room')){
+							hp.dataset.condition='high';
+						}
+						else if(this.hp==0){
+							hp.dataset.condition='';
+						}
+						else if(this.hp>Math.round(this.maxHp/2)||this.hp===this.maxHp){
+							hp.dataset.condition='high';
+						}
+						else if(this.hp>Math.floor(this.maxHp/3)){
+							hp.dataset.condition='mid';
+						}
+						else{
+							hp.dataset.condition='low';
+						}
+	
+						setTimeout(function(){
+							hp.style.transition='';
+						});
 					}
-					if(hp.classList.contains('room')){
-						hp.dataset.condition='high';
-					}
-					else if(this.hp==0){
-						hp.dataset.condition='';
-					}
-					else if(this.hp>Math.round(this.maxHp/2)||this.hp===this.maxHp){
-						hp.dataset.condition='high';
-					}
-					else if(this.hp>Math.floor(this.maxHp/3)){
-						hp.dataset.condition='mid';
-					}
-					else{
-						hp.dataset.condition='low';
-					}
-
-					setTimeout(function(){
-						hp.style.transition='';
-					});
 					var numh=this.countCards('h');
 					if(_status.video){
 						numh=arguments[0];
@@ -25270,8 +25271,8 @@
 				forced:true,
 				popup:false,
 				priority:25,
-				filter:function(event,player){
-					return player.isUnseen(2)&&get.mode()!='guozhan';
+				filter:function(event,player,name){
+					return player.isUnseen(2)&&get.mode()!='guozhan'&&(name=='phaseBeginStart'||event.num<0);
 				},
 				content:function(){
 					if(trigger.name=='loseMaxHp') trigger.cancel();
@@ -26361,7 +26362,7 @@
 					ui.create.connecting(true);
 				},
 				roomlist:function(list,events,clients,wsid){
-					game.send('server','key',game.onlineKey);
+					game.send('server','key',[game.onlineKey,lib.version]);
 					game.online=true;
 					game.onlinehall=true;
 					lib.config.recentIP.remove(_status.ip);
@@ -26932,7 +26933,12 @@
 				},
 				denied:function(reason){
 					switch(reason){
-						case 'version':alert('加入失败：版本不匹配');break;
+						case 'version':
+							alert('加入失败：版本不匹配，请将游戏更新至最新版');
+							game.saveConfig('tmp_owner_roomId');
+							game.saveConfig('tmp_user_roomId');
+							game.saveConfig('reconnect_info');
+							break;
 						case 'gaming':alert('加入失败：游戏已开始');break;
 						case 'number':alert('加入失败：房间已满');break;
 						case 'banned':alert('加入失败：房间拒绝你加入');break;

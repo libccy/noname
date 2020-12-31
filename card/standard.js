@@ -1382,8 +1382,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					if(event.card.yingbian){
-						var cardx=event.getParent().respondTo[1];
-						if(cardx&&cardx.cards&&cardx.cards.filterInD().length) player.gain(cardx.cards.filterInD(),'gain2','log');
+						var cardx=event.getParent().respondTo;
+						if(cardx&&cardx[1]&&cardx[1].cards&&cardx[1].cards.filterInD().length) player.gain(cardx[1].cards.filterInD(),'gain2','log');
 					}
 				},
 			},

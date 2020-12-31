@@ -6852,7 +6852,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.target.addTempSkill('fengyin');
 					}
 					"step 1"
-					var suit=get.suit(result.card);
+					var suit=result.suit;
 					var target=trigger.target;
 					var num=target.countCards('h','shan');
 					target.chooseToDiscard('请弃置一张'+get.translation(suit)+'牌，否则不能使用闪抵消此杀','he',function(card){
