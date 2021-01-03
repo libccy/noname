@@ -256,6 +256,7 @@ window.noname_character_rank={
 		'key_shiori',
 		'key_iwasawa',
 		'key_hiroto',
+		'key_nao',
 		'mini_zhugeliang',
 	],
 	am:[
@@ -776,8 +777,8 @@ window.noname_character_rank={
 		'yj_chendao',
 		'yj_caoang',
 		'jin_zhangchunhua',
+		'xin_hansui',
 		'ns_caimao',
-		'key_nao',
 		'key_haruko',
 		'key_rei',
 		'key_komari',
@@ -930,6 +931,7 @@ window.noname_character_rank={
 		'ns_zhangji',
 		'ol_dingyuan',
 		'mini_zhangchunhua',
+		'hucheer',
 	],
 	c:[
 		'xiahoudun',
@@ -1516,6 +1518,7 @@ window.noname_character_rank={
 			'wangrong',
 			're_quyi',
 			'hanfu',
+			'xin_hansui',
 		],
 		junk:[
 			'sunshao',

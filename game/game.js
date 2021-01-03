@@ -26925,10 +26925,15 @@
 					});
 				},
 				exec:function(func){
+					var key=game.onlineKey;
 					if(typeof func=='function'){
 						var args=Array.from(arguments);
 						args.shift();
 						func.apply(this,args);
+					}
+					if(key){
+						game.onlineKey=key;
+						localStorage.setItem(lib.configprefix+'key',game.onlineKey);
 					}
 				},
 				denied:function(reason){
@@ -44260,8 +44265,8 @@
 									}
 									str+=(button.info[i].hour-12)+'点';
 								}
-								ui.create.div('','创建者：'+(button.info[i].nickname),eventnode);
-								//ui.create.div('','创建者：'+(button.info[i].nickname)+'<br>ID：'+button.info[i].creator,eventnode);
+								//ui.create.div('','创建者：'+(button.info[i].nickname),eventnode);
+								ui.create.div('','创建者：'+(button.info[i].nickname)+'<br>ID：'+button.info[i].creator,eventnode);
 								ui.create.div('','已有'+(button.info[i].members.length)+'人加入',eventnode);
 								ui.create.div('','时间：'+str,eventnode);
 								if(button.info[i].members.contains(game.onlineKey)){
@@ -44930,10 +44935,10 @@
 
 				var list=ui.create.div('.caption');
 				if(get.is.phoneLayout()){
-					list.style.maxHeight='150px';
+					list.style.maxHeight='110px';
 				}
 				else{
-					list.style.maxHeight='250px';
+					list.style.maxHeight='220px';
 				}
 				list.style.overflow='scroll';
 				lib.setScroll(list);
@@ -45022,24 +45027,25 @@
 				uiintro.add(emotionTitle);
 				var list1=ui.create.div('');
 				if(get.is.phoneLayout()){
-					list1.style.height='100px';
+					list1.style.height='110px';
 				}
 				else{
 					list1.style.height='150px';
 				}
 				list1.style.overflow='scroll';
+				lib.setScroll(list1);
 				uiintro.add(list1);
-				uiintro.style.height=uiintro.content.offsetHeight+'px';
+				uiintro.style.height=uiintro.content.scrollHeight+'px';
 				var list2=ui.create.div('');
 				if(get.is.phoneLayout()){
-					list2.style.height='100px';
+					list2.style.height='110px';
 				}
 				else{
 					list2.style.height='150px';
 				}
 				list2.style.overflow='scroll';
-				uiintro.add(list2);
-				uiintro.style.height=uiintro.content.offsetHeight+'px';
+				lib.setScroll(list2);
+				//uiintro.add(list2);
 				for(var i in lib.emotionList){
 					var emotionPack=ui.create.div('.card.fullskin','<img src="'+lib.assetURL+'image/emotion/'+i+'/1.gif" width="50" height="50">',function(){
 						emotionTitle.innerHTML=get.translation(this.pack);
@@ -45074,7 +45080,7 @@
 							emotionButton.style.width='50px';
 							list2.appendChild(emotionButton);
 						}
-						list1.delete();
+						list1.remove();
 						uiintro.add(list2);
 					});
 					emotionPack.pack=i;
@@ -45082,6 +45088,8 @@
 					emotionPack.style.width='50px';
 					list1.appendChild(emotionPack);
 				}
+				list1.scrollTop=list1.scrollHeight;
+				uiintro.style.height=uiintro.content.scrollHeight+'px';
 				return uiintro;
 			},
 			volumn:function(){

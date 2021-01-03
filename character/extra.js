@@ -1171,6 +1171,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					threaten:0.01,
+					notemp:true,
 				},
 			},
 			"new_guixin":{

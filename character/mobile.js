@@ -2,20 +2,22 @@
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'mobile',
-		connectBanned:['miheng'],
+		//connectBanned:['miheng'],
 		connect:true,
 		characterSort:{
 			mobile:{
-				mobile_default:["miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu"],
+				mobile_default:["miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu","hucheer"],
 				mobile_yijiang:["yj_zhanghe","yj_zhangliao","yj_xuhuang","yj_ganning"],
 				mobile_sunben:["re_sunben"],
 				mobile_standard:["xin_xiahoudun"],
 				mobile_shenhua:["re_pangtong","re_guanqiujian","xin_yuanshao","re_liushan","re_dongzhuo","re_sp_zhugeliang","re_sunjian"],
 				mobile_yijiang1:["re_jikang","old_bulianshi","xin_liaohua","xin_caozhang","re_xusheng","xin_chengpu","xin_jianyong","xin_gongsunzan","xin_zhuran","re_lingtong","re_liubiao"],
-				mobile_sp:["old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","re_heqi","liuzan"],
+				mobile_sp:["old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","re_heqi","liuzan","xin_hansui"],
 			},
 		},
 		character:{
+			xin_hansui:['male','qun',4,['xinniluan','xiaoxi_hansui']],
+			hucheer:['male','qun',4,['daoji']],
 			re_lingtong:['male','wu',4,['rexuanfeng']],
 			re_liubiao:['male','qun',3,['zishou','rezongshi']],
 			simashi:['male','wei',4,['baiyi','jinglve','shanli']],
@@ -81,6 +83,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_sunben:['male','wu',4,['jiang','rehunzi','zhiba'],['zhu']],
 		},
 		characterIntro:{
+			hucheer:'胡车儿（生卒年不详），东汉末年武将，初从张绣，为其心腹猛将，勇冠三军，与贾诩交情甚佳。宛城大战后，张绣投降曹操，曹操爱胡车儿之骁勇，手以黄金与之。后因曹操私纳张绣亡叔张济的遗孀邹氏，张绣深感其辱，欲杀曹操，与贾诩商议后决心反曹。《三国演义》中，作者考虑到典韦的勇猛，便增加了令胡车儿盗走典韦的双戟的情节。最终典韦、曹昂（曹操长子）、曹安民（曹操侄子）皆死于此次战斗。野史说胡车儿跟随曹操征战，被赵云在长坂坡上红枪挑死。',
 			simashi:'司马师（208年～255年3月23日），字子元，河内温县（今河南省温县）人。三国时期曹魏权臣，西晋王朝的奠基人之一，晋宣帝司马懿与宣穆皇后张春华的长子，晋文帝司马昭的同母兄，晋武帝司马炎的伯父。司马师沉着坚强，雄才大略，早年与夏侯玄、何晏齐名。高平陵政变后，以功封长平乡侯，旋加卫将军。司马懿死后，以抚军大将军辅政，独揽朝廷大权，次年升为大将军。掌权后，他制定选拔官吏的法规，命百官推荐贤才，整顿纲纪，使其各有职掌，朝野肃然。司马师也有卓越的军事才能，曾用计于新城之战击溃吴国诸葛恪的大军。嘉平六年（254年），魏帝曹芳与中书令李丰等人密谋除司马师，事情泄露，司马师杀死参与者，迫郭太后废曹芳，改立高贵乡公曹髦为帝。次年，亲自率兵平定毌丘俭、文钦之乱。回师途中病死，时年四十八岁，谥号“忠武”。后被追尊为晋景王。西晋建立后，被追尊为景皇帝，庙号世宗。',
 			yanghuiyu:'羊徽瑜（214年－278年），泰山南城（今山东新泰）人，晋景帝司马师第三任妻子。羊徽瑜出身官宦世家泰山羊氏，她是南阳太守羊续的孙女，上党太守羊衜之女；其母为东汉名士左中郎将蔡邕之女、蔡文姬的姐妹。羊徽瑜聪慧贤德，嫁给司马师后未有子女。以司马师之弟司马昭的次子司马攸为继子。司马师死后，司马攸侍奉羊徽瑜非常孝顺。泰始元年（265年），司马昭长子司马炎受禅登基，建立西晋，追谥伯父司马师为景皇帝。泰始二年（266年），尊奉羊徽瑜为景皇后，因居弘训宫，故称弘训太后。咸宁四年（278年），羊徽瑜去世，时年六十五岁，谥号景献皇后，与司马师合葬峻平陵。',
 			dingyuan:'丁原（？—189年），字建阳，兖州泰山郡南城县（山东省平邑县郑城镇）人。东汉末年军阀，官拜执金吾、并州刺史。任并州刺史期间，他亲近、善待主簿吕布，又调遣部下张杨、张辽等名将到洛阳任职。汉灵帝驾崩后，带兵进入洛阳，担任执金吾，并与大将军何进谋划诛杀十常侍，但不久事情败露，何进被宦官杀死。在宦官被诛灭之后，丁原与军阀董卓在废帝问题上意见不合产生矛盾，于是董卓诱使吕布将其杀害，其势力亦被吞并。',
@@ -310,6 +313,115 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//韩遂
+			xinniluan:{
+				trigger:{global:'phaseJieshuBegin'},
+				direct:true,
+				filter:function(event,player){
+					return player!=event.player&&event.player.isAlive()&&event.player.getHistory('useCard',function(evt){
+						if(evt.targets&&evt.targets.length){
+							var targets=evt.targets.slice(0);
+							while(targets.contains(event.player)) targets.remove(event.player);
+							return targets.length>0;
+						}
+						return false;
+					}).length>0&&(_status.connectMode||player.hasSha());
+				},
+				content:function(){
+					'step 0'
+					player.chooseToUse({
+						logSkill:'xinniluan',
+						preTarget:trigger.player,
+						prompt:'是否发动【逆乱】，对'+get.translation(trigger.player)+'使用一张【杀】？',
+						filterCard:function(card,player){
+							return get.name(card)=='sha'&&lib.filter.filterCard.apply(this,arguments);
+						},
+						filterTarget:function(card,player,target){
+							return target==_status.event.preTarget&&lib.filter.targetEnabled.apply(this,arguments);
+						},
+						addCount:false,
+					});
+					'step 1'
+					if(result.bool&&player.getHistory('sourceDamage',function(evt){
+						return evt.getParent(4)==event;
+					}).length&&trigger.player.countDiscardableCards(player,'he')>0) player.discardPlayerCard(trigger.player,true,'he').boolline=true;
+				},
+			},
+			xiaoxi_hansui:{
+				audio:2,
+				enable:['chooseToRespond','chooseToUse'],
+				filterCard:function(card,player){
+					return get.color(card)=='black';
+				},
+				position:'he',
+				viewAs:{name:'sha'},
+				viewAsFilter:function(player){
+					if(!player.countCards('he',{color:'black'})) return false;
+				},
+				prompt:'将一张黑色牌当杀使用或打出',
+				check:function(card){return 4.5-get.value(card)},
+				ai:{
+					skillTagFilter:function(player){
+						if(!player.countCards('he',{color:'black'})) return false;
+					},
+					respondSha:true,
+				}
+			},
+			//胡车儿
+			daoji:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.countCards('he',function(card){
+						return get.type(card)!='basic';
+					})&&game.hasPlayer(function(target){
+						return target!=player&&target.countCards('e')>0;
+					});
+				},
+				filterCard:function(card){
+					return get.type(card)!='basic';
+				},
+				position:'he',
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countCards('e')>0;
+				},
+				check:function(card){
+					var player=_status.event.player;
+					if(game.hasPlayer(function(current){
+						return current!=player&&get.attitude(player,current)<0&&get.damageEffect(current,player,player)>0&&current.getEquip(1);
+					})) return 8-get.value(card);
+					return 5-get.value(card)
+				},
+				content:function(){
+					'step 0'
+					player.gainPlayerCard(target,'e',true).set('ai',function(button){
+						var card=button.link;
+						var player=_status.event.player;
+						if(get.subtype(card)=='equip1'&&get.damageEffect(_status.event.target,player,player)>0) return 6+get.value(card);
+						return get.value(card);
+					});
+					'step 1'
+					if(!result||!result.bool||!result.cards||!result.cards.length){
+						event.finish();
+						return;
+					}
+					var card=result.cards[0];
+					event.card=card;
+					if(player.getCards('h').contains(card)&&get.type(card)=='equip') player.chooseUseTarget(card,true).nopopup=true;
+					'step 2'
+					if(get.subtype(card,false)=='equip1') target.damage();
+				},
+				ai:{
+					order:6,
+					result:{
+						target:function(player,current){
+							if(get.damageEffect(current,player,player)>0&&current.getEquip(1)) return -1.5;
+							return -1;
+						},
+					},
+				},
+			},
 			//司马师夫妇
 			//垃圾
 			baiyi:{
@@ -5676,13 +5788,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'xhzhiyan',
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.countCards('h')!=player.maxHp&&!player.hasSkill('xinxhzhiyan_'+(player.countCards('h')>player.maxHp));
+					return (!player.hasSkill('xinxhzhiyan_true')&&player.countCards('h')>player.hp)||(!player.hasSkill('xinxhzhiyan_false')&&player.countCards('h')<player.maxHp)
 				},
 				filterCard:true,
 				selectCard:function(){
 					var player=_status.event.player;
-					var num=Math.max(0,player.countCards('h')-player.maxHp);
-					return [num,num];
+					if(player.hasSkill('xinxhzhiyan_true')) return 0;
+					var num=Math.max(0,player.countCards('h')-player.hp);
+					if(ui.selected.cards.length||player.hasSkill('xinxhzhiyan_false')) return [num,num];
+					return [0,num]
 				},
 				filterTarget:lib.filter.notMe,
 				selectTarget:function(){
@@ -5691,16 +5805,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				check:function(card){
 					var player=_status.event.player;
-					if(player.getUseValue(card)<=0&&game.hasPlayer(function(current){
-						return current!=player&&get.value(card,current)*get.attitude(player,current)>0;
-					})) return 1;
-					return 0;
+					var checkx=function(card){
+						if(player.getUseValue(card,null,true)<=0&&game.hasPlayer(function(current){
+							return current!=player&&get.value(card,current)>0&&get.attitude(player,current)>0;
+						})) return 2;
+						return 1;
+					}
+					if(player.countCards('h',function(card){
+						return checkx(card)>0;
+					})<(player.countCards('h')-player.hp)) return 0;
+					return checkx(card);
 				},
 				delay:false,
 				discard:false,
 				lose:false,
 				content:function(){
-					var bool=(player.countCards('h')>player.maxHp);
+					var bool=(cards&&cards.length>0);
 					player.addTempSkill('xinxhzhiyan_'+bool,'phaseUseEnd');
 					if(!bool){
 						player.draw(player.maxHp-player.countCards('h'));
@@ -5711,18 +5831,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:function(obj,player){
-						if(player.countCards('h')>player.maxHp) return 10;
+						if(player.countCards('h')>player.hp) return 10;
 						return 0.5;
 					},
 					result:{
 						player:function(player,target){
-							if(player.countCards('h')<player.maxHp) return 1;
+							if(!ui.selected.cards.length&&player.countCards('h')<player.maxHp) return 1;
 							return 0;
 						},
-						target:function(player,target){
-							if(player.countCards('h')>player.maxHp) return 1;
-							return 0;
-						},
+						target:1,
 					},
 				},
 			},
@@ -6395,7 +6512,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinzhilve_info:'出牌阶段限一次，你可以失去1点体力并选择一项：1.移动场上的一张牌；2.视为使用一张无距离限制且不计入次数限制的【杀】并摸一张牌。然后你本回合的手牌上限+1。',
 			xinxhzhiyan:'治严',
 			xinxhzhiyan_false:'治严',
-			xinxhzhiyan_info:'出牌阶段每项各限一次，若你的手牌数：大于体力上限，则你可以将X张手牌交给一名其他角色；小于体力上限，则你可以摸X张牌且本阶段内不能再对其他角色使用牌。（X为你的手牌数与体力上限之差的绝对值）',
+			xinxhzhiyan_info:'出牌阶段每项各限一次，若你的手牌数：大于体力上限，则你可以将X张手牌交给一名其他角色；小于体力值，则你可以摸X张牌且本阶段内不能再对其他角色使用牌。（X为你的手牌数与体力上限之差的绝对值）',
 			weifeng:'威风',
 			weifeng2:'威风',
 			weifeng3:'威风',
@@ -6469,6 +6586,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shanli_info:'觉醒技，准备阶段，若你已发动过〖败移〗且对至少两名角色发动过〖景略〗，则你减1点体力上限并选择一名角色。系统随机选择三个不为〖忘隙(仲村由理)〗的主公技，然后你选择其中一个技能，令其获得之。其将交互表情中的【拖鞋】和【酒杯】替换为【手铐】和【玉玺】。',
 			re_lingtong:'手杀凌统',
 			re_liubiao:'手杀刘表',
+			hucheer:'胡车儿',
+			daoji:'盗戟',
+			daoji_info:'出牌阶段限一次，你可以弃置一张非基本牌并选择一名装备区里有牌的其他角色，你获得其装备区中的一张牌并使用之。若你以此法获得的牌是武器牌，则你使用此牌后对其造成1点伤害。',
+			xin_hansui:'手杀韩遂',
+			xinniluan:'逆乱',
+			xinniluan_info:'其他角色的结束阶段，若其本回合对除其以外的角色使用过牌，则你可以对其使用一张【杀】。若以此法使用的【杀】造成伤害，则你弃置其一张牌。',
+			xiaoxi_hansui:'骁袭',
+			xiaoxi_hansui_info:'你可以将一张黑色牌当做【杀】使用或打出。',
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua:'手杀异构·神话再临',
 			mobile_yijiang1:'手杀异构·一将成名',

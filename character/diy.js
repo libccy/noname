@@ -2052,6 +2052,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return num+player.countMark('misuzu_hengzhou');
 					},
 				},
+				ai:{
+					notemp:true,
+				},
 			},
 			misuzu_nongyin:{
 				enable:'chooseToUse',
@@ -2482,16 +2485,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			nao_wanxin:{
-				trigger:{global:'roundStart'},
+				trigger:{global:'phaseEnd'},
 				hasHistory:function(player){
-					var list=player.actionHistory;
-					for(var i=list.length-1;i>=0;i--){
-						if(list[i].isRound) break;
-					}
-					list=list.slice(i);
-					return list.filter(function(yuu){
-						return yuu.damage&&yuu.damage.length>0;
-					}).length>0;
+					return player.getHistory('damage').length>0;
 				},
 				filter:function(event,player){
 					return game.hasPlayer(function(current){
@@ -4548,6 +4544,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					 return num+from.getStorage('shiina_qingshen').length;
 					},
 				},
+				ai:{
+					notemp:true,
+				},
 			},
 			shiina_feiyan:{
 				animalList:['key_inari','key_doruji'],
@@ -4579,6 +4578,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).length) player.draw();
 				},
 				group:'shiina_retieji',
+				ai:{
+					notemp:true,
+					combo:'shiina_feiyan'
+				},
 			},
 			shiina_retieji:{
 				shaRelated:true,
@@ -12078,7 +12081,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nao_duyin2:'独隐',
 			nao_duyin_info:'一名其他角色的回合开始时，若你本局游戏内未对其发动过〖独隐〗，则你可以弃置一张牌或将武将牌翻面。若如此做，你不能成为其使用牌的目标，且对其使用牌没有距离限制且不计入使用次数直到你的下回合结束。',
 			nao_wanxin:'挽心',
-			nao_wanxin_info:'一轮游戏结束时，你可以令一名本轮内受到过伤害的角色摸两张牌，然后你与其将武将牌重置。',
+			nao_wanxin_info:'一名角色的回合结束时，你可以令一名本回合内受到过伤害的角色摸两张牌，然后你与其将武将牌重置。',
 			nao_shouqing:'守情',
 			nao_shouqing2:'守情',
 			nao_shouqing3:'守情',

@@ -236,7 +236,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					event.finish();
 					'step 2'
-					target.chooseToDiscard(2,card.yingbian,'e').set('ai',function(card){
+					var next=target.chooseToDiscard(2,'e').set('ai',function(card){
 						var player=_status.event.player;
 						var source=_status.event.getParent().player;
 						if(get.damageEffect(player,source,player,'thunder')>=0){
@@ -247,6 +247,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 						return 8-get.value(card);
 					});
+					if(card.yingbian) next.set('forced',true);
 					'step 3'
 					if(card.yingbian||!result.bool) target.damage('thunder');
 				},

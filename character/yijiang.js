@@ -2917,6 +2917,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					})>=0;
 				},
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return current.countCards('h')<current.hp;
+					});
+				},
 				content:function(){
 					'step 0'
 					event.list=game.filterPlayer(function(current){
