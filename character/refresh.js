@@ -4612,9 +4612,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"phaseDrawBegin2",
 				},
 				direct:true,
-				//priority:-10,
-				filter:function (event){
-					return event.num>0&&!event.numFixed;
+				filter:function(event,player){
+					return event.num>0&&!event.numFixed&&game.hasPlayer(function(target){
+						return target.countCards('h')>0&&player!=target;
+					});
 				},
 				content:function (){
 					"step 0"

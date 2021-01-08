@@ -984,13 +984,13 @@ input.fileinput::-webkit-file-upload-button {
 .menu-buttons>.new_character>.add_skill{
 	position: absolute;
 	left: 12px;
-	top:180px;
+	top: 205px;
 	text-align: left;
 	line-height: 20px;
 	white-space: nowrap;
 }
 .menu-buttons>.new_character>.add_skill.options{
-	top:155px;
+	top:160px;
 }
 .menu-buttons>.new_character>.add_skill.options>span{
 	margin-right: 10px;
@@ -1006,9 +1006,9 @@ input.fileinput::-webkit-file-upload-button {
 }
 .menu-buttons>.new_character>.add_skill.create>div>textarea{
 	resize: none;
-    width: 200px;
-    height: 100px;
-    margin-top: 5px;
+ width: 200px;
+ height: 100px;
+ margin-top: 5px;
 }
 .menu-buttons>.new_character>.add_skill.create>div>div{
 	position: relative;
@@ -1020,7 +1020,7 @@ input.fileinput::-webkit-file-upload-button {
 .menu-buttons>.new_character>.skill_list{
 	position: absolute;
 	left: 12px;
-	top: 240px;
+	top: 265px;
 	text-align: left;
 	height: auto;
 	width: calc(100% - 20px);
@@ -1444,7 +1444,7 @@ input.fileinput::-webkit-file-upload-button {
 	transform: translateX(200px);
 }
 #create-extension>.menu-buttons>.new_character>.skill_list{
-    top: 220px;
+    top: 245px;
 }
 #create-extension>.menu-buttons>.new_character>.skill_list>div:first-child{
 	transition: all 0s;

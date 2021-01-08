@@ -13829,7 +13829,7 @@
 								var sex=player.sex=='female'?'female':'male';
 								var audioinfo=lib.card[card.name].audio;
 								// if(audioinfo||true){
-									if(card.name=='sha'&&(card.nature=='fire'||card.nature=='thunder')){
+									if(card.name=='sha'&&(card.nature=='fire'||card.nature=='thunder'||card.nature=='ice')){
 										game.playAudio('card',sex,card.name+'_'+card.nature);
 									}
 									else{
@@ -15921,6 +15921,8 @@
 					}
 					if(!this.isUnseen(2)){
 						delete this.storage.nohp;
+						this.hp=this.storage.rawHp+this.maxHp-1;
+						this.maxHp=this.storage.rawMaxHp+this.maxHp-1;
 						this.node.hp.show();
 						this.update();
 					}
@@ -15935,6 +15937,8 @@
 						}
 						if(!player.isUnseen(2)){
 							delete player.storage.nohp;
+							player.hp=player.storage.rawHp+player.maxHp-1;
+							player.maxHp=player.storage.rawMaxHp+player.maxHp-1;
 							player.node.hp.show();
 							player.update();
 						}
@@ -16430,7 +16434,13 @@
 
 						this.node.name2.innerHTML=get.slimName(character2);
 					}
-					if(this.storage.nohp) this.node.hp.hide();
+					if(this.storage.nohp){
+						this.storage.rawHp=this.hp;
+						this.storage.rawMaxHp=this.maxHp;
+						this.hp=1;
+						this.maxHp=1;
+						this.node.hp.hide();
+					}
 					if(skill!=false){
 						for(var i=0;i<skills.length;i++){
 							this.addSkill(skills[i]);
@@ -16659,7 +16669,15 @@
 					if(this.node.wuxing){
 						this.node.wuxing.hide();
 					}
+					if(this.node.name_seat){
+						this.node.name_seat.remove();
+						delete this.node.name_seat;
+					}
+					if(this.storage.nohp) this.node.hp.show();
+					this.classList.remove('unseen');
+					this.classList.remove('unseen2');
 					delete this.name;
+					delete this.name1;
 					delete this.sex;
 					delete this.group;
 					delete this.hp;
@@ -25161,15 +25179,16 @@
 		sort:{
 			character:function(a,b){
 				var groupSort=function(name){
-					if(!lib.character[name]) return 6;
+					if(!lib.character[name]) return 7;
 					if(lib.character[name][1]=='shen') return -1;
 					if(lib.character[name][1]=='wei') return 0;
 					if(lib.character[name][1]=='shu') return 1;
 					if(lib.character[name][1]=='wu') return 2;
 					if(lib.character[name][1]=='qun') return 3;
-					if(lib.character[name][1]=='key') return 4;
-					if(lib.character[name][1]=='western') return 5;
-					return 6;
+					if(lib.character[name][1]=='jin') return 4;
+					if(lib.character[name][1]=='key') return 5;
+					if(lib.character[name][1]=='western') return 6;
+					return 7;
 				}
 				var del=groupSort(a)-groupSort(b);
 				if(del!=0) return del;
@@ -25272,15 +25291,9 @@
 				popup:false,
 				priority:25,
 				filter:function(event,player,name){
-					return player.isUnseen(2)&&get.mode()!='guozhan'&&(name=='phaseBeginStart'||event.num<0);
+					return player.isUnseen(2)&&get.mode()!='guozhan';
 				},
 				content:function(){
-					if(trigger.name=='loseMaxHp') trigger.cancel();
-					else if(trigger.name=='changeHp'){
-						player.hp-=trigger.num;
-						trigger.cancel();
-						if(trigger.getParent().name=='damage'||trigger.getParent().name=='loseHp') trigger.getParent().cancel();
-					}
 					player.showCharacter(2);
 				},
 			},
@@ -38110,10 +38123,10 @@
 								groups.value=info[1];
 								if(info[4]){
 									for(var i=0;i<options.childNodes.length-1;i++){
-										if(info[4].contains(options.childNodes[i].lastChild.name)){
+										if(options.childNodes[i].lastChild&&info[4].contains(options.childNodes[i].lastChild.name)){
 											options.childNodes[i].lastChild.checked=true;
 										}
-										else{
+										else if(options.childNodes[i].lastChild){
 											options.childNodes[i].lastChild.checked=false;
 										}
 									}
@@ -38324,7 +38337,7 @@
 								grouplist.push([lib.group[i],get.translation(lib.group[i])]);
 							};
 							var groups=ui.create.selectlist(grouplist,null,ui.create.div('.indent','势力：',newCharacter));
-							var options=ui.create.div('.add_skill.options','<span>主公<input type="checkbox" name="zhu"></span><span>BOSS<input type="checkbox" name="boss"></span><span>AI禁选<input type="checkbox" name="forbidai"></span><br>',newCharacter);
+							var options=ui.create.div('.add_skill.options','<span>主公<input type="checkbox" name="zhu"></span><span>BOSS<input type="checkbox" name="boss"></span><span>AI禁选<input type="checkbox" name="forbidai"></span><br><span>隐匿技<input type="checkbox" name="hiddenSkill"></span><br>',newCharacter);
 							var addSkill=ui.create.div('.add_skill','添加技能<br>',newCharacter);
 							var list=[];
 							for(var i in lib.character){
@@ -38475,7 +38488,7 @@
 								}
 								var tags=[];
 								for(var i=0;i<options.childNodes.length-1;i++){
-									if(options.childNodes[i].lastChild.checked){
+									if(options.childNodes[i].lastChild&&options.childNodes[i].lastChild.checked){
 										tags.push(options.childNodes[i].lastChild.name);
 									}
 								}

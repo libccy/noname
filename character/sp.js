@@ -20,7 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_zhangliao:['male','qun',4,['mubing','ziqu','diaoling']],
 			caoshuang:['male','wei',4,['retuogu','shanzhuan']],
 			ol_zhangchangpu:['female','wei',3,['yanjiao','olxingshen']],
-			zhangling:['male','qun',4,['zlhuji','zlshoufu'],['unseen']],
+			zhangling:['male','qun',4,['zlhuji','zlshoufu']],
 			caiyang:['male','qun',1,['yinka'],['forbidai','unseen']],
 			panfeng:['male','qun',4,['kuangfu']],
 			sunshao:['male','wu',3,['bizheng','yidian']],
@@ -716,29 +716,59 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.judge(func);
 					'step 1'
 					if(result.bool&&get.itemtype(trigger.source)=='player'&&player.canUse('sha',trigger.source,false)){
-						player.useCard({name:'sha',isCard:true},trigger.source,false);
+						player.useCard({name:'sha',isCard:true},trigger.source,false,'noai');
 					}
 				},
 			},
 			zlshoufu:{
 				enable:'phaseUse',
 				usable:1,
-				filter:function(event,player){
-					return player.countCards('he')>0;
-				},
-				filterTarget:function(card,player,target){
-					return target!=player&&!target.getStorage('zlshoufu2').length;
-				},
-				filterCard:true,
-				position:'he',
-				discard:false,
-				toStorage:true,
-				prepare:'give',
+				delay:false,
 				content:function(){
+					'step 0'
+					player.draw();
+					'step 1'
+					var filterTarget=function(card,player,target){
+						return target!=player&&!target.hasSkill('zlshoufu2');
+					};
+					if(!player.countCards('h')||!game.hasPlayer(function(current){
+						return filterTarget(null,player,current);
+					})) event.finish();
+					else player.chooseCardTarget({
+						forced:true,
+						prompt:'将一张手牌作为“箓”置于其他角色的武将牌上',
+						filterTarget:filterTarget,
+						filterCard:true,
+						position:'h',
+						ai1:function(card){
+							if(get.type(card,false)=='equip') return 1-get.value(card);
+							return 7-get.value(card);
+						},
+						ai2:function(target){
+							var player=_status.event.player;
+							var att=get.attitude(player,target);
+							if(att>0) return -att;
+							return -att/get.distance(player,target,'absolute');
+						},
+					});
+					'step 2'
+					var target=result.targets[0];
+					var cards=result.cards;
+					player.lose(cards,ui.special,'toStorage');
+					player.line(target,'green');
+					player.$give(cards[0],target,false);
+					game.log(player,'将',cards[0],'作为“箓”置于',target,'的武将牌上');
 					target.addSkill('zlshoufu2');
 					target.storage.zlshoufu2_markcount=0;
 					target.markAuto('zlshoufu2',cards);
-					player.draw();
+					'step 3'
+					game.delayx();
+				},
+				ai:{
+					order:1,
+					result:{
+						player:1,
+					},
 				},
 			},
 			zlshoufu2:{
@@ -789,7 +819,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}).length) player.storage.zlshoufu2_markcount++;
 						}
 					}
-					if(trigger.name=='damage'||player.storage.zlshoufu2_markcount>=2) player.unmarkSkill('zlshoufu2');
+					if(trigger.name=='damage'||player.storage.zlshoufu2_markcount>=2){
+						player.unmarkSkill('zlshoufu2');
+						player.removeSkill('zlshoufu2');
+					}
 					else player.markSkill('zlshoufu2');
 				},
 			},
@@ -11593,7 +11626,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseJieshuBegin'},
 				filter:function(event,player){
-					return event.player.isAlive()&&event.player!=player&&player.countCards('h',{type:'basic'});
+					return event.player.isAlive()&&event.player!=player&&player.countCards('h',function(card){
+						if(_status.connectMode) return true;
+						return get.type(card)=='basic';
+					});
 				},
 				direct:true,
 				content:function(){
@@ -14698,8 +14734,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			beimihu:['tw_beimihu','beimihu'],
 			panfeng:['re_panfeng','panfeng'],
 			sunluyu:['sunluyu','re_sunluyu'],
-			simazhao:['simazhao','sp_simazhao'],
-			wangyuanji:['wangyuanji','sp_wangyuanji'],
+			jin_simazhao:['jin_simazhao','simazhao','sp_simazhao'],
+			wangyuanji:['jin_wangyuanji','wangyuanji','sp_wangyuanji'],
 			wangyun:['re_wangyun','wangyun','old_wangyun'],
 			zhangliang:['re_zhangliang','zhangliang'],
 			lingju:['lingju','old_lingju'],
@@ -15518,10 +15554,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yinka:'印卡',
 			zhangling:'张陵',
 			zlhuji:'虎骑',
-			zlhuji_info:'锁定技，你与其他角色的距离-1，你于回合外受到伤害后进行判定，若结果为红色，视为你对伤害来源使用一张【杀】(无视距离)。',
+			zlhuji_info:'锁定技，你与其他角色的距离-1，当你于回合外受到伤害后，你可进行判定，若结果为红色，视为你对伤害来源使用一张【杀】（无距离限制）。',
 			zlshoufu:'授符',
 			zlshoufu2:'授符',
-			zlshoufu_info:'出牌阶段限一次，你可摸一张牌，然后将一张手牌置于一名没有【箓】的角色的武将牌上，称为【箓】；其不能使用和打出与【箓】同类型的牌。该角色受伤后，或于弃牌阶段弃置至少2张与【箓】同类型的牌后，将【箓】置入弃牌堆。',
+			zlshoufu_info:'出牌阶段限一次，你可摸一张牌，然后将一张手牌置于一名没有【箓】的角色的武将牌上，称为【箓】；其不能使用和打出与【箓】同类型的牌。该角色受到伤害后，或于弃牌阶段弃置至少2张与【箓】同类型的牌后，将【箓】置入弃牌堆。',
 			ol_zhangchangpu:'OL张昌蒲',
 			olxingshen:'省身',
 			olxingshen_info:'当你受到伤害后，你可以随机摸至多两张牌。若如此做，你获得X个“省”，且下一次发动〖严教〗展示牌时移去所有“省”并多展示等量的牌。（X为你已损失的体力值，且你至多拥有6个“省”）',

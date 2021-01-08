@@ -1637,6 +1637,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					maixie:true,
 					maixie_hp:true,
+					combo:'sbaiyin',
 					/*effect:{
 						target:function(card,player,target){
 							if(player.hasSkillTag('jueqing',false,target)) return [1,-2];

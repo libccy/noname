@@ -1890,6 +1890,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 				},
+				ai:{
+					combo:'nzry_zhenliang',
+				},
 			},
 			"nzry_zhenliang":{
 				audio:"nzry_zhenliang_1",
@@ -1973,6 +1976,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						},
 					},
+				},
+				ai:{
+					combo:'nzry_mingren',
 				},
 			},
 			'nzry_jianxiang':{
