@@ -910,8 +910,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					save:true,
-					skillTagFilter:function(player){
-						return player.hp<=0&&player.storage.xinfuli!=true;
+					skillTagFilter:function(player,arg,target){
+						return player==target;
 					},
 					result:{
 						player:10
@@ -3765,6 +3765,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return event.type!='wuxie'&&event.type!='respondShan'&&!player.hasSkill('taoluan3')&&player.countCards('he')>0;//&&!_status.dying.length;
 				},
+				hiddenCard:function(player,name){
+					return (!player.storage.taoluan.contains(name)&&player.countCards('he')>0&&!player.hasSkill('taoluan3')&&lib.inpile.contains(name));
+				},
 				init:function(player){
 					if(!player.storage.taoluan) player.storage.taoluan=[];
 				},
@@ -3820,7 +3823,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					save:true,
 					skillTagFilter:function(player){
 						if(!player.countCards('he')||player.hasSkill('taoluan3')) return false;
 						if(!player.storage.taoluan.contains('tao')){}
@@ -6315,7 +6317,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.discard(cards);
 					event.num=cards.length;
 					'step 3'
-					player.chooseTarget('请选择至多'+get.cnNumber(event.num)+'名有牌的其他角色，获得这些角色的各一张手牌。',[1,event.num],function(card,player,target){
+					player.chooseTarget('请选择至多'+get.cnNumber(event.num)+'名有牌的其他角色，获得这些角色的各一张牌。',[1,event.num],function(card,player,target){
 						return target!=player&&target.countCards('he')>0;
 					}).set('ai',function(target){
 						return -get.attitude(_status.event.player,target)+0.5;
@@ -7134,6 +7136,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			huomo_use:{
 				enable:'chooseToUse',
+				hiddenCard:function(player,name){
+					return (['sha','shan','tao','jiu'].contains(name)&&(!player.storage.huomo||!player.storage.huomo[name])&&player.hasCard(function(card){
+						return get.color(card)=='black'&&get.type(card)!='basic';
+					},'he'));
+				},
 				filter:function(event,player){
 					if(!player.storage.huomo) player.storage.huomo={};
 					if((!player.storage.huomo.sha&&event.filterCard({name:'sha'},player,event))||
@@ -7234,7 +7241,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						return 2.9;
 					},
-					save:true,
 					respondSha:true,
 					fireAttack:true,
 					respondShan:true,
@@ -8214,8 +8220,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					save:true,
-					skillTagFilter:function(player){
-						return player.hp<=0&&player.storage.fuli!=true;
+					skillTagFilter:function(player,arg,target){
+						return player==target&&player.storage.fuli!=true;
 					},
 					result:{
 						player:10
@@ -10486,6 +10492,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jiushi1:{
 				audio:2,
 				enable:'chooseToUse',
+				hiddenCard:function(player,name){
+					if(name=='jiu') return !player.isTurnedOver();
+					return false;
+				},
 				filter:function(event,player){
 					if(player.classList.contains('turnedover')) return false;
 					return event.filterCard({name:'jiu',isCard:true},player,event);
@@ -10499,10 +10509,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.useCard({name:'jiu',isCard:true},player);
 				},
 				ai:{
-					save:true,
-					skillTagFilter:function(player){
-						return player.hp<=0&&!player.isTurnedOver();
-					},
 					order:5,
 					result:{
 						player:function(player){

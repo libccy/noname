@@ -583,7 +583,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					save:true,
 					respondSha:true,
 					respondShan:true,
 					skillTagFilter:function(player,tag){
@@ -593,13 +592,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							switch(tag){
 								case 'respondSha':if(muniu.cards[i].name=='sha') return true;break;
 								case 'respondShan':if(muniu.cards[i].name=='shan') return true;break;
-								case 'save':{
-									if(muniu.cards[i].name=='tao'||muniu.cards[i].name=='spell_zhiliaoshui') return true;
-									if(player==_status.event.dying){
-										if(muniu.cards[i].name=='jiu'||muniu.cards[i].name=='tianxianjiu') return true;
-									}
-									break;
-								}
 							}
 						}
 						return false;

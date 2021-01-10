@@ -2013,8 +2013,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player:1,
 					},
 					save:true,
-					skillTagFilter:function(player){
-						return player.isDying();
+					skillTagFilter:function(player,tag,target){
+						return player==target;
 					},
 				},
 			},
@@ -2087,12 +2087,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					result:0.5,
-					save:true,
-					skillTagFilter:function(player){
-						return !player.hasJudge('lebu')&&player.countCards('he',function(card){
-							return get.color(card)=='red'
-						});
-					},
 				},
 			},
 			misuzu_zhongxing:{
@@ -2730,7 +2724,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					respondSha:true,
 					respondShan:true,
-					save:true,
 					skillTagFilter:function(player,tag){
 						if(player.hasSkill('shizuru_nianli_round')) return false;
 						var name;
@@ -2762,7 +2755,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				hiddenCard:function(player,name){
-					return name=='wuxie'&&player.countCards('h',{suit:'spade'})>0&&!player.hasSkill('shizuru_nianli_round');
+					if(name=='wuxie') return player.countCards('h',function(card){
+						return _status.connectMode||get.suit(card)=='spade';
+					})>0&&!player.hasSkill('shizuru_nianli_round');
+					if(name=='tao') return player.countCards('h',{suit:'heart'})>0&&!player.hasSkill('shizuru_nianli_round');
+					return false;
 				},
 				group:'shizuru_nianli_clear',
 				subSkill:{
@@ -3415,6 +3412,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.markAuto('ao_diegui',result.links);
 						game.log(result.links,'飞向了',player);
 					}
+					else event.finish();
+					'step 3'
+					game.delayx();
 				},
 				locked:false,
 				mod:{
@@ -4619,6 +4619,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			inari_baiwei:{
 				enable:['chooseToUse','chooseToRespond'],
+				hiddenCard:function(player,name){
+					return name!='du'&&get.type(name)=='basic'&&player.countCards('he',{suit:'diamond'})>0;
+				},
 				filter:function(event,player){
 					if(event.type=='wuxie'||!player.countCards('he',{suit:'diamond'})) return false;
 					for(var i=0;i<lib.inpile.length;i++){
@@ -4695,7 +4698,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						player:1,
 					},
-					save:true,
 					respondSha:true,
 					fireAttack:true,
 					skillTagFilter:function(player,tag){
@@ -5915,8 +5917,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:10,
 					save:true,
-					skillTagFilter:function(player){
-						return player.isDying();
+					skillTagFilter:function(player,tag,target){
+						return player==target;
 					},
 					result:{
 						player:1,
@@ -6217,10 +6219,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					ai:{
 						usedu:true,
-						save:true,
-						skillTagFilter:function(player,tag){
-							if(tag=='save'&&(!player.isDying()||player.hasSkill('lucia_duqu_terra'))) return false;
-						},
 					},
 					subSkill:{terra:{sub:true}}
 				},

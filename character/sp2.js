@@ -443,9 +443,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.choosePlayerCard(target,'h',true);
 					'step 1'
 					player.showCards(result.cards);
-					var type=get.type2(result.cards[0]);
-					target.storage.choufa2=type;
-					target.addTempSkill('choufa2',{player:'phaseAfter'});
+					var type=get.type2(result.cards[0],target);
+					if(!target.storage.choufa2) target.storage.choufa2=[];
+					target.storage.choufa2.addArray(target.getCards('h',function(card){
+						return get.type2(card,target)!=type;
+					}));
+					if(target.storage.choufa2.length) target.addTempSkill('choufa2',{player:'phaseAfter'});
 				},
 				ai:{
 					order:9,
@@ -457,19 +460,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			choufa2:{
-				mark:true,
 				onremove:true,
 				charlotte:true,
-				intro:{
-					content:'不为$牌的手牌均视为杀',
-				},
 				mod:{
 					cardname:function(card,player){
-						if(get.type2(card,false)!=player.storage.choufa2) return 'sha';
+						if(player.storage.choufa2.contains(card)) return 'sha';
 					},
 					cardnature:function(card,player){
-						if(get.type2(card,false)!=player.storage.choufa2) return false;
+						if(player.storage.choufa2.contains(card)) return false;
 					},
+				},
+				trigger:{player:'loseEnd'},
+				silent:true,
+				content:function(){
+					player.storage.choufa2.removeArray(trigger.hs);
+					if(!player.storage.choufa2.length) player.removeSkill('choufa2');
 				},
 			},
 			zhaoran:{
@@ -677,7 +682,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var list=ui.selected.cards.map(function(i){
 							return get.type2(i);
 						});
-						if(!list.contains(get.type2(i))) return 6-get.value(card);
+						if(!list.contains(get.type2(card))) return 7-get.value(card);
 						return -get.value(card);
 					});
 					'step 2'
@@ -8504,7 +8509,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhanghuyuechen:'张虎乐綝',
 			xijue:'袭爵',
 			xijue_gain:'袭爵',
-			xijue_info:'锁定技，游戏开始时，你获得4枚“爵”。回合结束时，若你于本回合内造成过2点以上的伤害或杀死过角色，则你获得一枚“爵”。你可弃置一枚“爵”并在合适的时机发动〖突袭〗和〖骁果〗。',
+			xijue_info:'锁定技，游戏开始时，你获得4枚“爵”。回合结束时，若你于本回合内造成过的伤害点数总和大于1，或于本回合内杀死过角色，则你获得一枚“爵”。你可弃置一枚“爵”并在合适的时机发动〖突袭〗和〖骁果〗。',
 			xijue_tuxi:'突袭',
 			xijue_xiaoguo:'骁果',
 			duyu:'杜预',
@@ -8526,7 +8531,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tuishi_info:'隐匿技，你于其他角色A的回合内登场时，可于此回合结束时选择其攻击范围内的一名角色B。A选择一项：①对B使用一张【杀】。②你对A造成1点伤害。',
 			choufa:'筹伐',
 			choufa2:'筹伐',
-			choufa_info:'出牌阶段限一次，你可展示一名其他角色的一张手牌并记录此牌的类型A。其手牌中原类型不为A的手牌的牌名均视为【杀】且均视为无属性，直到其回合结束。',
+			choufa_info:'出牌阶段限一次，你可展示一名其他角色的一张手牌。你令其手牌中原类型与此牌不同的手牌的牌名均视为【杀】且均视为无属性，直到其回合结束。',
 			zhaoran:'昭然',
 			zhaoran2:'昭然',
 			zhaoran_info:'出牌阶段开始时，你可令你的手牌对其他角色可见直到出牌阶段结束。若如此做，当你于此阶段内失去一张手牌后，若你的手牌里没有与此牌花色相同的牌且你本回合内未因该花色的牌触发过此效果，则你选择一项：①摸一张牌。②弃置一名其他角色的一张牌。',
@@ -8547,13 +8552,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			taoyin_info:'隐匿技，当你登场后，若当前回合角色存在且不是你，则你可令该角色本回合的手牌上限-2。',
 			yimie:'夷灭',
 			yimie2:'夷灭',
-			yimie_info:'每回合限一次，当你对其他角色造成伤害时，若伤害值X小于Y，则你可失去1点体力，将伤害值改为Y。此伤害结算结束后，其回复(Y-X)点体力。',
+			yimie_info:'每回合限一次，当你对其他角色造成伤害时，若伤害值X小于Y，则你可失去1点体力，将伤害值改为Y。此伤害结算结束后，其回复(Y-X)点体力。（Y为其体力值）’',
 			ruilve:'睿略',
 			ruilve2:'睿略',
 			ruilve_info:'主公技，其他晋势力角色的出牌阶段限一次，该角色可以将一张带有伤害标签的基本牌或锦囊牌交给你。',
 			tairan:'泰然',
 			tairan2:'泰然',
-			tairan_info:'锁定技，回合结束时，你将体力回复至X，并将手牌摸至X张。出牌阶段开始时，你失去上次以此法回复的体力值，弃置上次以此法获得的牌。（X为你的体力上限，且至多为5）',
+			tairan_info:'锁定技，回合结束时，你回复Y点体力，并将手牌摸至X张。出牌阶段开始时，你失去Y点体力，弃置上次以此法获得的牌。（X为你的体力上限，且至多为5；Y=X-你的体力值）',
 			
 			sp_yingbian:'应变篇',
 			sp_whlw:"文和乱武",

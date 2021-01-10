@@ -4701,15 +4701,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				prompt:'将一张黑桃手牌当酒使用',
 				check:function(card){
-					if(_status.event.type=='dying') return 1;
+					if(_status.event.type=='dying') return 1/Math.max(0.1,get.value(card));
 					return 4-get.value(card);
 				},
 				ai:{
-					skillTagFilter:function(player){
-						return player.countCards('h',{suit:'spade'})>0&&player.hp<=0;
-					},
 					threaten:1.5,
-					save:true,
 				}
 			},
 			roulin:{
@@ -5089,9 +5085,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:0.5,
-					skillTagFilter:function(player){
-						if(player.storage.niepan) return false;
-						if(player.hp>0) return false;
+					skillTagFilter:function(player,tag,target){
+						if(player!=target||player.storage.niepan) return false;
 					},
 					save:true,
 					result:{
@@ -5147,9 +5142,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:1,
-					skillTagFilter:function(player){
-						if(player.storage.oldniepan) return false;
-						if(player.hp>0) return false;
+					skillTagFilter:function(player,arg,target){
+						if(player!=target||player.storage.oldniepan) return false;
 					},
 					save:true,
 					result:{
@@ -6467,8 +6461,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					save:true,
 					mingzhi:true,
-					skillTagFilter:function(player){
-						if(player.hp>0) return false;
+					skillTagFilter:function(player,tag,target){
+						if(player!=target) return false;
 					},
 				},
 				intro:{

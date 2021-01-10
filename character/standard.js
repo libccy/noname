@@ -2355,8 +2355,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				audioname:['re_huatuo'],
 				enable:'chooseToUse',
-				filter:function(event,player){
-					return _status.currentPhase!=player;
+				viewAsFilter:function(player){
+					return player!=_status.currentPhase&&player.countCards('h',{color:'red'})>0;
 				},
 				filterCard:function(card){
 					return get.color(card)=='red';
@@ -2366,12 +2366,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				prompt:'将一张红色牌当桃使用',
 				check:function(card){return 15-get.value(card)},
 				ai:{
-					skillTagFilter:function(player){
-						return player.countCards('he',{color:'red'})>0&&_status.currentPhase!=player;
-					},
 					threaten:1.5,
-					save:true,
-					respondTao:true,
 				}
 			},
 			wushuang:{

@@ -727,11 +727,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				group:'decadechunlao2',
 				ai:{
-					save:true,
 					jiuOther:true,
-					skillTagFilter:function(player,tag){
-						if(tag=='save') return !player.isLinked();
-					},
 				},
 			},
 			decadechunlao2:{
@@ -1500,6 +1496,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ollongdan:{
 				audio:'longdan_sha',
 				audioname:['re_zhaoyun'],
+				hiddenCard:function(player,name){
+					if(name=='tao') return player.countCards('h','jiu')>0;
+					if(name=='jiu') return player.countCards('h','tao')>0;
+					return false;
+				},
 				enable:['chooseToUse','chooseToRespond'],
 				prompt:'将杀当做闪，或将闪当做杀，或将桃当做酒，或将酒当做桃使用或打出',
 				viewAs:function(cards,player){
@@ -1556,13 +1557,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					respondSha:true,
 					respondShan:true,
-					save:true,
 					skillTagFilter:function(player,tag){
 						var name;
 						switch(tag){
 							case 'respondSha':name='shan';break;
 							case 'respondShan':name='sha';break;
-							case 'save':name='jiu';break;
 						}
 						if(!player.countCards('h',name)) return false;
 					},
@@ -2259,6 +2258,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			rejiushi1:{
+				hiddenCard:function(player,name){
+					if(name=='jiu') return !player.isTurnedOver();
+					return false;
+				},
 				audio:'rejiushi',
 				enable:'chooseToUse',
 				filter:function(event,player){
@@ -2274,10 +2277,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.useCard({name:'jiu',isCard:true},player);
 				},
 				ai:{
-					save:true,
-					skillTagFilter:function(player){
-						return player.hp<=0&&!player.isTurnedOver();
-					},
 					order:5,
 					result:{
 						player:function(player){
@@ -2549,9 +2548,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:1,
-					skillTagFilter:function(player){
-						if(player.storage.olniepan) return false;
-						if(player.hp>0) return false;
+					skillTagFilter:function(player,tag,target){
+						if(player!=target||player.storage.olniepan) return false;
 					},
 					save:true,
 					result:{
@@ -3725,6 +3723,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				derivation:'rechanyuan',
 				enable:['chooseToUse','chooseToRespond'],
+				hiddenCard:function(player,name){
+					return (lib.inpile.contains(name)&&player.countCards('h')>0&&!player.hasSkill('reguhuo_phase'));
+				},
 				filter:function(event,player){
 					if(!player.countCards('h')||player.hasSkill('reguhuo_phase')) return false;
 					for(var i of lib.inpile){
@@ -3804,7 +3805,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					fireAttack:true,
-					save:true,
 					respondShan:true,
 					respondSha:true,
 					skillTagFilter:function(player){
@@ -7121,8 +7121,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				position:'he',
 				filterCard:{suit:'diamond'},
 				filterTarget:function(card,player,target){
-					if(player==target) return false;
 					if(target.hasJudge('lebu')) return true;
+					if(player==target) return false;
 					return lib.filter.targetEnabled({name:'lebu'},player,target);
 				},
 				check:function(card){
@@ -7723,11 +7723,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return -1;
 				},
 				ai:{
-					skillTagFilter:function(player){
-						return player.countCards('h',{suit:'spade'})>0&&player.hp<=0;
-					},
 					threaten:1.5,
-					save:true,
 				},
 				trigger:{source:'damageEnd'},
 				locked:true,

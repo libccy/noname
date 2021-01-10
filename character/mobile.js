@@ -1033,8 +1033,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					save:true,
-					skillTagFilter:function(player){
-						return player.hp<=0;
+					skillTagFilter:function(player,arg,target){
+						return player==target;
 					},
 					result:{
 						player:10
@@ -3972,6 +3972,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove:function(p,s){
 					delete p.storage[s+1];
 				},
+				hiddenCard:function(player,name){
+					return ['sha','tao','jiu'].contains(name)&&player.countCards('h',{type:'basic'})>0;
+				},
 				enable:"chooseToUse",
 				filter:function(event,player){
 					if(event.filterCard({name:'sha'},player,event)||
@@ -4046,7 +4049,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						return 3.1;
 					},
-					save:true,
 					respondSha:true,
 					skillTagFilter:function(player,tag,arg){
 						if(player.hasCard(function(card){
@@ -4787,6 +4789,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					content:"已发动过#次",
 				},
 				enable:["chooseToUse","chooseToRespond"],
+				hiddenCard:function(player,name){
+					if(!['sha','shan','tao','jiu'].contains(name)) return false;
+					if(!player.storage.yizan&&player.countCards('he')<2) return false;
+					return player.hasCard(function(card){
+						return get.type(card)=='basic';
+					},'h');
+				},
 				filter:function(event,player){
 					if(!player.storage.yizan&&player.countCards('he')<2) return false;
 					if(event.filterCard({name:'sha'},player,event)||
@@ -4881,7 +4890,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						return 3.1;
 					},
-					save:true,
 					skillTagFilter:function(player,tag,arg){
 						if(tag=='fireAttack') return true;
 						if(!player.storage.yizan&&player.countCards('he')<2) return false;
@@ -4992,9 +5000,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:0.5,
-					skillTagFilter:function(player){
-						if(player.hp>0) return false;
+					skillTagFilter:function(player,arg,target){
+						if(player!=target) return false;
 						return player.countCards('he',function(card){
+							if(_status.connectMode&&get.position(card)=='h') return true;
 							return get.subtype(card)=='equip2';
 						})>0;
 					},
@@ -6137,7 +6146,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				ai:{
-					save:true,
 					respondSha:true,
 					respondShan:true,
 					skillTagFilter:function(player,tag){
@@ -6146,13 +6154,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							switch(tag){
 								case 'respondSha':if(gnjinfan[i].name=='sha') return true;break;
 								case 'respondShan':if(gnjinfan[i].name=='shan') return true;break;
-								case 'save':{
-									if(gnjinfan[i].name=='tao'||gnjinfan[i].name=='spell_zhiliaoshui') return true;
-									if(player==_status.event.dying){
-										if(gnjinfan[i].name=='jiu'||gnjinfan[i].name=='tianxianjiu') return true;
-									}
-									break;
-								}
 							}
 						}
 						return false;

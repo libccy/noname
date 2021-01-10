@@ -15863,6 +15863,16 @@
 			},
 			player:{
 				//新函数
+				canSave:function(target){
+					var player=this;
+					if(player.hasSkillTag('save',true,target,true)) return true;
+					for(var i in lib.card){
+						if(lib.inpile.contains(i)||player.countCards('h',i)){
+							if(lib.filter.cardSavable({name:i},player,target)&&(_status.connectMode||player.hasUsableCard(i))) return true;
+						}
+					}
+					return false;
+				},
 				showCharacter:function(num,log){
 					var toShow=[];
 					if((num==0||num==2)&&this.isUnseen(0)) toShow.add(this.name1);
@@ -24775,6 +24785,15 @@
 			filterButton:function(button){
 				return true;
 			},
+			cardSavable:function(card,player,target){
+				var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+				if(mod2!='unchanged') return mod2;
+				var mod=game.checkMod(card,player,target,'unchanged','cardSavable',player);
+				if(mod!='unchanged') return mod;
+				var savable=get.info(card).savable;
+				if(typeof savable=='function') savable=savable(card,player,target);
+				return savable;
+			},
 			filterTrigger:function(event,player,name,skill){
 				if(player._hookTrigger){
 					for(var i=0;i<player._hookTrigger.length;i++){
@@ -25795,7 +25814,7 @@
 				}
 			},
 			_save:{
-				trigger:{source:'dying2',player:'dying2'},
+				//trigger:{source:'dying2',player:'dying2'},
 				priority:5,
 				forced:true,
 				popup:false,
@@ -25820,21 +25839,11 @@
 					if(lib.config.tao_enemy&&event.dying.side!=player.side&&lib.config.mode!='identity'&&lib.config.mode!='guozhan'&&!event.dying.hasSkillTag('revertsave')){
 						event._result={bool:false}
 					}
-					else if(player.isOnline()||(_status.connectMode&&player==game.me)||player.hasSkillTag('save',true,null,true)||player.hasCard(function(card){
-						var savable=get.info(card).savable;
-						if(typeof savable=='function') savable=savable(card,player,event.dying);
-						return savable;
-					})){
+					else if(player.canSave(event.dying)){
 						player.chooseToUse({
 							filterCard:function(card,player,event){
 								event=event||_status.event;
-								var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
-								if(mod2!='unchanged') return mod2;
-								var mod=game.checkMod(card,player,event.dying,'unchanged','cardSavable',player);
-								if(mod!='unchanged') return mod;
-								var savable=get.info(card).savable;
-								if(typeof savable=='function') savable=savable(card,player,event.dying);
-								return savable;
+								return lib.filter.cardSavable(card,player,event.dying);
 							},
 							filterTarget:trigger.player,
 							prompt:str,

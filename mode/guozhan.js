@@ -428,14 +428,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			yigui:{
-				init:function (player,skill){
+				hiddenCard:function(player,name){
+					var storage=player.storage.yigui;
+					if(!storage||!storage.character.length||storage.used.contains(name)||!lib.inpile.contains(name)) return false;
+					return true;
+				},
+				init:function(player,skill){
 					if(!player.storage.skill) player.storage[skill]={
 						character:[],
 						used:[],
 					}
 				},
 				enable:"chooseToUse",
-				filter:function (event,player){
+				filter:function(event,player){
 					if(event.type=='wuxie'||event.type=='respondShan') return false;
 					var storage=player.storage.yigui;
 					if(!storage||!storage.character.length) return false;
@@ -457,22 +462,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					dialog:function (event,player){
 						var dialog=ui.create.dialog('役鬼','hidden');
 						dialog.add([player.storage.yigui.character,'character']);
-						var list=[
-							'sha','tao','jiu',
-							'taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman',
-							'xietianzi','shuiyanqijunx','lulitongxin','lianjunshengyan','chiling','diaohulishan','yuanjiao','huoshaolianying','zhibi','yiyi'
-						];
+						var list=lib.inpile;
 						var list2=[];
 						for(var i=0;i<list.length;i++){
-							if(i==0){
+							var name=list[i];
+							if(name=='shan'||name=='wuxie') continue;
+							var type=get.type(name);
+							if(name=='sha'){
 								list2.push(['基本','','sha']);
 								list2.push(['基本','','sha','fire']);
 								list2.push(['基本','','sha','thunder']);
 							}
-							else if(i<3){
+							else if(type=='basic'){
 								list2.push(['基本','',list[i]]);
 							}
-							else{
+							else if(type=='trick'){
 								list2.push(['锦囊','',list[i]]);
 							}
 						}
@@ -614,7 +618,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				group:["yigui_init","yigui_refrain","yigui_shan","yigui_wuxie"],
 				ai:{
-					save:true,
 					order:function(){
 						return 1+10*Math.random();
 					},
@@ -744,11 +747,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			yigui_wuxie:{
-				hiddenCard:function(player,name){
-					var storage=player.storage.yigui;
-					if(!storage||!storage.character.length||storage.used.contains('wuxie')) return false;
-					return name=='wuxie';
-				},
 				enable:"chooseToUse",
 				filter:function (event,player){
 					if(event.type!='wuxie') return false;
@@ -3657,6 +3655,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return event.type!='phase'&&player.hasMark('zhulianbihe_skill');
 				},
+				viewAsFilter:function(player){
+					return player.hasMark('zhulianbihe_skill');
+				},
 				viewAs:{
 					name:"tao",
 					isCard:true,
@@ -3665,12 +3666,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				selectCard:-1,
 				precontent:function(){
 					player.removeMark('zhulianbihe_skill',1);
-				},
-				ai:{
-					save:true,
-					skillTagFilter:function(player){
-						if(!player.hasMark('zhulianbihe_skill')) return false;
-					},
 				},
 			},
 			"_yinyang_skill_draw":{
@@ -4377,14 +4372,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				chooseButton:{
 					dialog:function(){
-						var list=[
-							'taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman',
-							'xietianzi','shuiyanqijunx','lulitongxin','lianjunshengyan','chiling','diaohulishan','yuanjiao','huoshaolianying','zhibi','yiyi',
-						];
+						var list=lib.inpile;
+						var list2=[];
 						for(var i=0;i<list.length;i++){
-							list[i]=['锦囊','',list[i]];
+							if(list[i]!='wuxie'&&get.type(list[i])=='trick') list2.push(['锦囊','',list[i]]);
 						}
-						return ui.create.dialog(get.translation('gzqice'),[list,'vcard']);
+						return ui.create.dialog(get.translation('gzqice'),[list2,'vcard']);
 					},
 					filter:function(button,player){
 						var card={name:button.link[2]};
@@ -5425,9 +5418,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:1,
-					skillTagFilter:function(player){
-						if(player.storage.jizhao) return false;
-						if(player.hp>0) return false;
+					skillTagFilter:function(player,arg,target){
+						if(player!=target||player.storage.jizhao) return false;
 					},
 					save:true,
 					result:{

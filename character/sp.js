@@ -20,7 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_zhangliao:['male','qun',4,['mubing','ziqu','diaoling']],
 			caoshuang:['male','wei',4,['retuogu','shanzhuan']],
 			ol_zhangchangpu:['female','wei',3,['yanjiao','olxingshen']],
-			zhangling:['male','qun',4,['zlhuji','zlshoufu']],
+			zhangling:['male','qun',3,['zlhuji','zlshoufu']],
 			caiyang:['male','qun',1,['yinka'],['forbidai','unseen']],
 			panfeng:['male','qun',4,['kuangfu']],
 			sunshao:['male','wu',3,['bizheng','yidian']],
@@ -715,7 +715,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					};
 					player.judge(func);
 					'step 1'
-					if(result.bool&&get.itemtype(trigger.source)=='player'&&player.canUse('sha',trigger.source,false)){
+					if(result.color=='red'&&get.itemtype(trigger.source)=='player'&&player.canUse('sha',trigger.source,false)){
 						player.useCard({name:'sha',isCard:true},trigger.source,false,'noai');
 					}
 				},
@@ -5324,6 +5324,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			fanghun:{
+				hiddenCard:function(player,name){
+					if(!player.storage.fanghun||player.storage.fanghun<=0) return false;
+					if(name=='tao') return player.countCards('h','jiu')>0;
+					if(name=='jiu') return player.countCards('h','tao')>0;
+					return false;
+				},
 				audio:2,
 				marktext:'影',
 				intro:{
@@ -5403,7 +5409,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return false;
 						},
 						filter:function(event,player){
-							if(!player.storage.fanghun||player.storage.fanghun<0) return false;
+							if(!player.storage.fanghun||player.storage.fanghun<=0) return false;
 							var filter=event.filterCard;
 							if(filter({name:'sha'},player,event)&&player.countCards('h','shan')) return true;
 							if(filter({name:'shan'},player,event)&&player.countCards('h','sha')) return true;
@@ -5418,14 +5424,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai:{
 							respondSha:true,
 							respondShan:true,
-							save:true,
 							skillTagFilter:function(player,tag){
 								if(!player.storage.fanghun||player.storage.fanghun<0) return false;
 								var name;
 								switch(tag){
 									case 'respondSha':name='shan';break;
 									case 'respondShan':name='sha';break;
-									case 'save':name='jiu';break;
 								}
 								if(!player.countCards('h',name)) return false;
 							},
@@ -8909,7 +8913,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:true,
 				position:'he',
 				ai:{
-					save:true,
 					skillTagFilter:function(){
 						return lib.skill.xisheng.viewAsFilter.apply(this,arguments)
 					},
@@ -9142,12 +9145,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					skillTagFilter:function(player){
-						return !player.hasSkill('chenqing2');
-					},
 					expose:0.2,
 					threaten:1.5,
-					save:true,
 				}
 			},
 			mozhi:{
@@ -12178,6 +12177,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			aocai:{
 				audio:2,
 				enable:['chooseToUse','chooseToRespond'],
+				hiddenCard:function(player,name){
+					if(player!=_status.currentPhase&&get.type(name)=='basic'&&lib.inpile.contains(name)) return true;
+				},
 				filter:function(event,player){
 					if(event.responded||player==_status.currentPhase||event.aocai) return false;
 					for(var i of lib.inpile){
@@ -12241,7 +12243,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:11,
 					respondShan:true,
 					respondSha:true,
-					save:true,
 					result:{
 						player:function(player){
 							if(_status.event.dying) return get.attitude(player,_status.event.dying);
@@ -14475,13 +14476,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(card){return 15-get.value(card)},
 				precontent:function(){
 					player.removeMark('xinfu_falu_club');
-				},
-				ai:{
-					skillTagFilter:function(player){
-						if(player==_status.currentPhase) return false;
-						return player.hasMark('xinfu_falu_club')&&player.countCards('h')>0;
-					},
-					save:true,
 				},
 			},
 			zhenyi_heart:{
