@@ -1544,9 +1544,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					};
 					'step 3'
 					if(result.bool){
-						var targets=result.targets;
+						var targets=result.targets.sortBySeat();
 						if(event.control==event.str1){
-							player.line(targets);
+							//player.line(targets);
 							player.logSkill('nzry_kuizhu',targets);
 							game.asyncDraw(targets);
 						}
@@ -1560,8 +1560,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								event.goto(2);
 							}
 							else{
-								player.line(targets);
-								player.logSkill('nzry_kuizhu');
+								//player.line(targets);
+								player.logSkill('nzry_kuizhu',targets);
 								for(var i=0;i<targets.length;i++){
 									targets[i].damage();
 								};

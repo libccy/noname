@@ -1264,9 +1264,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						player:function(player){
 							if(player.countCards('he',function(card){
-								if(get.type(card)=='equip') return 8-get.value(card);
-								return 6-get.value(card);
-							})<2) return -0.5;
+								if(get.type(card)=='equip') return get.value(card)<8;
+								return get.value(card)<6;
+							})<2) return 0;
 							return player.getUseValue({name:'kaihua'});
 						},
 					},
@@ -3891,7 +3891,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var target=result.targets[0];
 					player.addExpose(0.2);
 					player.line(target,'thunder');
-					target.damage();
+					target.damage('thunder');
 				},
 			},
 			hisako_zhuanyun:{
@@ -4916,7 +4916,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					check:function(button){
 						var player=_status.event.player;
 						if(player.countCards('h',button.link[2])>0) return 0;
-						if(button.link[2]=='wugu') return 0;
+						if(['wugu','zhulu_card'].contains(button.link[2])) return 0;
 						var effect=player.getUseValue(button.link[2]);
 						if(effect>0) return effect;
 						return 0;
@@ -4940,14 +4940,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					order:4,
+					order:1,
 					result:{
 						player:function(player){
 							var cards=player.getCards('he').sort(function(a,b){
 								return get.value(a)-get.value(b);
 							});
-							var num=(player.getStat('skill').haruka_shuangche||0);
-							if(cards.length>num){
+							var num=(player.getStat('skill').haruka_shuangche||0)+1;
+							if(player.needsToDiscard()>=num) return 1;
+							if(player.hp>2) return 1;
+							if(cards.length>=num){
 								var val=0;
 								for(var i=0;i<cards.length;i++){
 									val+=get.value(cards[i]);

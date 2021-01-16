@@ -700,6 +700,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{player:'damageEnd'},
 				forced:true,
+				filter:function(event,player){
+					return player!=_status.currentPhase;
+				},
 				content:function(){
 					'step 0'
 					var func=function(result){
@@ -759,7 +762,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.$give(cards[0],target,false);
 					game.log(player,'将',cards[0],'作为“箓”置于',target,'的武将牌上');
 					target.addSkill('zlshoufu2');
-					target.storage.zlshoufu2_markcount=0;
+					//target.storage.zlshoufu2_markcount=0;
 					target.markAuto('zlshoufu2',cards);
 					'step 3'
 					game.delayx();
@@ -767,7 +770,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:1,
 					result:{
-						player:1,
+						player:function(player){
+							if(game.hasPlayer(function(target){
+								return target!=player&&!target.hasSkill('zlshoufu2')&&get.attitude(player,target)<0;
+							})||!game.hasPlayer(function(target){
+								return target!=player&&!target.hasSkill('zlshoufu2')&&get.attitude(player,target)>0;
+							})) return 1;
+							return 0;
+						},
 					},
 				},
 			},
@@ -804,26 +814,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!storage.length) return false;
 					if(event.name=='damage') return true;
 					if(event.type!='discard'||event.getParent('phaseDiscard').player!=player) return false;
+					var num=0;
 					for(var i of event.cards2){
 						if(storage.filter(function(magic){
 							return get.type2(magic)==get.type2(i,event.hs.contains(i)?player:false);
-						}).length) return true;
+						}).length) num++;
 					}
-					return false;
+					return num>1;
 				},
 				content:function(){
-					if(trigger.name=='lose'){
-						for(var i of trigger.cards2){
-							if(player.getStorage('zlshoufu2').filter(function(magic){
-								return get.type2(magic)==get.type(i,trigger.hs.contains(i)?player:false);
-							}).length) player.storage.zlshoufu2_markcount++;
-						}
-					}
-					if(trigger.name=='damage'||player.storage.zlshoufu2_markcount>=2){
-						player.unmarkSkill('zlshoufu2');
-						player.removeSkill('zlshoufu2');
-					}
-					else player.markSkill('zlshoufu2');
+					player.removeSkill('zlshoufu2');
 				},
 			},
 			//蔡阳
@@ -15551,7 +15551,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zlhuji_info:'锁定技，你与其他角色的距离-1，当你于回合外受到伤害后，你可进行判定，若结果为红色，视为你对伤害来源使用一张【杀】（无距离限制）。',
 			zlshoufu:'授符',
 			zlshoufu2:'授符',
-			zlshoufu_info:'出牌阶段限一次，你可摸一张牌，然后将一张手牌置于一名没有【箓】的角色的武将牌上，称为【箓】；其不能使用和打出与【箓】同类型的牌。该角色受到伤害后，或于弃牌阶段弃置至少2张与【箓】同类型的牌后，将【箓】置入弃牌堆。',
+			zlshoufu_info:'出牌阶段限一次，你可摸一张牌，然后将一张手牌置于一名没有【箓】的角色的武将牌上，称为【箓】；其不能使用和打出与【箓】同类型的牌。该角色受到伤害后，或于弃牌阶段弃置至少两张与【箓】同类型的牌后，将【箓】置入弃牌堆。',
 			ol_zhangchangpu:'OL张昌蒲',
 			olxingshen:'省身',
 			olxingshen_info:'当你受到伤害后，你可以随机摸至多两张牌。若如此做，你获得X个“省”，且下一次发动〖严教〗展示牌时移去所有“省”并多展示等量的牌。（X为你已损失的体力值，且你至多拥有6个“省”）',

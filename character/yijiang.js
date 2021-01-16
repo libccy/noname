@@ -2285,7 +2285,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target){
 							if(get.tag(card,'damage')){
-								if(target.hp>1&&target.hasFriend()) return 0.8;
+								if(target.hp>1&&target.hasFriend()) return 0.4;
 							}
 						}
 					}

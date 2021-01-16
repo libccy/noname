@@ -4815,7 +4815,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				viewAs:{
 					name:"sha",
 				},
-				viewAsFilter:function (player){
+				viewAsFilter:function(player){
 					if(get.zhu(player,'shouyue')){
 						if(!player.countCards('he')) return false;
 					}
@@ -4826,6 +4826,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				prompt:"将一张红色牌当杀使用或打出",
 				check:function(card){return 4-get.value(card)},
 				ai:{
+					respondSha:true,
 					skillTagFilter:function(player){
 						if(get.zhu(player,'shouyue')){
 							if(!player.countCards('he')) return false;

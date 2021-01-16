@@ -1,11 +1,11 @@
 window.noname_update={
-	version:'1.9.108.2.1',
-	update:'1.9.108.2',
+	version:'1.9.108.2.2',
+	update:'1.9.108.2.1',
 	changeLog:[
-		'bug修复',
+		'庆祝《Angel Beats! -1st beat-》汉化版发布，特别版本更新！',
 	],
 	files:[
-		'card/extra.js',
+		//'card/extra.js',
 		//'card/gujian.js',
 		//'card/guozhan.js',
 		//'card/gwent.js',
@@ -33,7 +33,7 @@ window.noname_update={
 		'character/sp.js',
 		'character/sp2.js',
 		//'character/tw.js',
-		'character/standard.js',
+		//'character/standard.js',
 		//'character/swd.js',
 		//'character/xianjian.js',
 		//'character/xinghuoliaoyuan.js',
@@ -45,7 +45,7 @@ window.noname_update={
 		//'layout/nova/layout.css',
 		//'mode/identity.js',
 		//'mode/doudizhu.js',
-		'mode/guozhan.js',
+		//'mode/guozhan.js',
 		//'mode/chess.js',
 		//'mode/tafang.js',
 		//'mode/single.js',

@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.108.2.1',
+	'v1.9.108.2.2',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -4638,8 +4638,8 @@ window.noname_asset_list=[
 	'image/emotion/throw_emotion/flower2.png',
 	'image/emotion/throw_emotion/shoe1.png',
 	'image/emotion/throw_emotion/shoe2.png',
-	'image/emotion/throw_emotion/shoukao1.png',
-	'image/emotion/throw_emotion/shoukao2.png',
+	'image/emotion/throw_emotion/jiasuo1.png',
+	'image/emotion/throw_emotion/jiasuo2.png',
 	'image/emotion/throw_emotion/wine1.png',
 	'image/emotion/throw_emotion/wine2.png',
 	'image/emotion/throw_emotion/yuxisx1.png',

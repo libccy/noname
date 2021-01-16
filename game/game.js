@@ -9783,7 +9783,7 @@
 			wine:'酒杯',
 			shoe:'拖鞋',
 			yuxisx:'玉玺',
-			shoukao:'枷锁',
+			jiasuo:'枷锁',
 			junk:'平凡',
 			common:'普通',
 			rare:'精品',
@@ -15969,24 +15969,27 @@
 				$throwEmotion:function(target,name){
 					game.addVideo('throwEmotion',this,[target.dataset.position,name]);
 					var getLeft=function(player){
-						if(player==game.me&&!ui.fakeme) return player.node.avatar.offsetWidth/2;
-						return player.offsetLeft+player.offsetWidth/2;
+						if(player==game.me&&!ui.fakeme&&!ui.chess) return player.getLeft()+player.node.avatar.offsetWidth/2;
+						return player.getLeft()+player.offsetWidth/2;
 					}
 					var player=this;
-					var emotion=ui.create.div('','<img src="'+lib.assetURL+'image/emotion/throw_emotion/'+name+'1.png">',ui.window);
-					var width=30;
-					var height=30;
+					var emotion=ui.create.div('','<div style="text-align:center"> <img src="'+lib.assetURL+'image/emotion/throw_emotion/'+name+'1.png"> </div>',game.chess?ui.chess:ui.window);
+					emotion.style.width='60px';
+					emotion.style.height='60px';
+					var width=emotion.offsetWidth/2;
+					var height=emotion.offsetHeight/2;
+					if(game.chess) width+=60;
 					var left=getLeft(player)-width;
-					var top=player.offsetTop+player.offsetHeight/3-height;
+					var top=player.getTop()+player.offsetHeight/3-height;
 					emotion.style.left=left+'px';
 					emotion.style.top=top+'px';
 					var left2=getLeft(target)-width;
-					var top2=target.offsetTop+target.offsetHeight/3-height;
+					var top2=target.getTop()+target.offsetHeight/3-height;
 					emotion.style['z-index']=10;
 					emotion.style.transform='translateY('+(top2-top)+'px) translateX('+(left2-left)+'px)';
 					if(lib.config.background_audio) game.playAudio('effect','throw_'+name+get.rand(1,2));
 					setTimeout(function(){
-						emotion.innerHTML=('<img src="'+lib.assetURL+'image/emotion/throw_emotion/'+name+'2.png">');
+						emotion.innerHTML=('<div style="text-align:center"> <img src="'+lib.assetURL+'image/emotion/throw_emotion/'+name+'2.png"> </div>');
 						setTimeout(function(){
 							emotion.delete();
 						},1200);
@@ -50947,7 +50950,7 @@
 					table.style.width='100%';
 					table.style.position='relative';
 					var listi=['wine','shoe'];
-					if(game.me.storage.zhuSkill_shanli) listi=['yuxisx','shoukao'];
+					if(game.me.storage.zhuSkill_shanli) listi=['yuxisx','jiasuo'];
 					for(var i=0;i<listi.length;i++){
 						td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
 						ui.throwEmotion.add(td);

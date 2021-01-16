@@ -5933,6 +5933,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:11,
+					expose:0.2,
 					result:{
 						target:function(player,target){
 							if(ui.selected.cards.length){

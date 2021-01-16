@@ -2518,6 +2518,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.awakenSkill('yeyan');
 					event.num=0;
+					targets.sortBySeat();
 					"step 1"
 					if(cards.length==4) event.goto(2);
 					else {
