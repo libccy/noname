@@ -606,20 +606,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							case 0:{
 								if(game.hasPlayer(function(current){
 									return lib.filter.targetEnabled2(event.card,player,current)&&!event.targets.contains(current)&&get.effect(current,event.card,player,player)>0;
-								})) return 1.2+Math.random();
+								})) return 1.6+Math.random();
 								return 0;
 							}
 							case 1:{
+								if(event.targets.filter(function(current){
+									var eff1=get.effect(current,event.card,player,player);
+									player._xinbenxi_ai=true;
+									var eff2=get.effect(current,event.card,player,player);
+									delete player._xinbenxi_ai;
+									return eff1>eff2;
+								}).length) return 1.9+Math.random();
 								return Math.random();
 							}
 							case 2:{
-								if(event.card.name=='sha'||event.card.name=='juedou'||get.type(event.type)=='trick'&&game.hasPlayer(function(current){
-									return get.attitude(current,player)<0&&current.hasWuxie();
-								})) return 1+Math.random();
-								return Math.random();
+								var num=1.3;
+								if(event.card.name=='sha'&&event.targets.filter(function(current){
+									if(current.mayHaveShan()&&get.attitude(player,current)<=0){
+										if(current.hasSkillTag('useShan')) num=1.9;
+										return true;
+									}
+									return false;
+								}).length) return num+Math.random();
+								return 0.5+Math.random();
 							}
 							case 3:{
-								return get.tag(event.card,'damage')+Math.random();
+								return (get.tag(event.card,'damage')||0)+Math.random();
 							}
 						}
 					});
@@ -665,17 +677,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					unequip:true,
-					//norespond:true,
+					unequip_ai:true,
+					directHit_ai:true,
 					skillTagFilter:function(player,tag,arg){
 						if(tag=='unequip'){
 							if(arg&&player.storage.xinbenxi_unequip.contains(arg.card)) return true;
 							return false;
 						}
-						if(tag=='norespond'&&Array.isArray(arg)){
-							var evt=arg[2].getParent();
-							if(evt.type=='card'&&player.storage.xinbenxi_directHit.contains(evt.card)) return true;
-							return false;
-						}
+						if(_status.currentPhase!=player||game.hasPlayer(function(current){
+							return get.distance(player,current)>1;
+						})) return false;
+						if(tag=='directHit_ai') return arg.card.name=='sha';
+						if(arg.card.name!='sha'&&arg.card.name!='chuqibuyi') return false;
+						var card=arg.target.getEquip(2);
+						if(card&&card.name.indexOf('bagua')!=-1) return true;
+						if(player._xinbenxi_ai) return false;
 					},
 				},
 				subSkill:{
@@ -2022,12 +2038,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.itemtype(trigger.respondTo[1])=='card') cards.push(trigger.respondTo[1]);
 						else if(trigger.respondTo[1].cards) cards.addArray(trigger.respondTo[1].cards);
 						cards=cards.filterInD('od');
-						trigger.player.gain(cards,'gain2','log');
+						trigger.player.gain(cards,'gain2','log').gaintag.add('funan');
 						trigger.player.addTempSkill('funan_use');
-						if(!trigger.player.storage.funan_use){
-							trigger.player.storage.funan_use=[];
-						}
-						trigger.player.storage.funan_use.addArray(cards);
 					}
 					'step 1'
 					var cards=trigger.cards.filterInD('od');
@@ -2042,10 +2054,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					use:{
-						onremove:true,
+						onremove:function(player){
+							player.removeGaintag('funan');
+						},
+						charlotte:true,
 						mod:{
 							cardEnabled2:function(card,player){
-								if(player.storage.funan_use&&player.storage.funan_use.contains(card)){
+								if(get.itemtype(card)=='card'&&card.hasGaintag('funan')){
 									return false;
 								}
 							}
@@ -2147,6 +2162,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					directHit_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						if(player._zhuandui_temp) return false;
+						player._zhuandui_temp=true;
+						var bool=function(){
+							if(arg.card.name!='sha'||get.attitude(player,arg.target)>=0||!arg.target.countCards('h')) return false;
+							if(arg.target.countCards('h')==1&&(!arg.target.getEquip('bagua')||player.hasSkillTag('unequip',false,{
+								name:arg.card?arg.card.name:null,
+								target:arg.target,
+								card:arg.card
+							})||player.hasSkillTag('unequip_ai',false,{
+								name:arg.card?arg.card.name:null,
+								target:arg.target,
+								card:arg.card
+							}))) return true;
+							return player.countCards('h',function(card){
+								return card!=arg.card&&(!arg.card.cards||!arg.card.cards.contains(card))&&get.value(card)<=4&&(card.number>=(11+arg.target.countCards('h')/2)||get.suit(card,player)=='heart');
+							})>0;
+						}();
+						delete player._zhuandui_temp;
+						return bool;
+					},
 					effect:{
 						target:function(card,player,target,current){
 							if(card.name=='sha'&&current<0) return 0.7;
@@ -2161,7 +2198,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var player=_status.event.player;
 					return (!player.hasCard(function(card){
 						var val=get.value(card);
-						return val<0||(val<=4&&card.number>=11);
+						return val<0||(val<=4&&(card.number>=11||get.suit(card)=='heart'));
 					},'h'))?20:0;
 				},
 				filter:function(event){
@@ -4697,15 +4734,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['fulin_count','fulin_reset'],
 				subSkill:{
 					reset:{
-						trigger:{player:['phaseZhunbeiBegin','phaseJieshuBegin']},
+						trigger:{player:['phaseBefore','phaseAfter']},
 						silent:true,
 						priority:10,
 						content:function(){
-							player.storage.fulin=[];
+							player.removeGaintag('fulin');
 						}
 					},
 					count:{
-						trigger:{player:'gainEnd'},
+						trigger:{player:'gainBegin'},
 						audio:'fulin',
 						forced:true,
 						silent:true,
@@ -4713,25 +4750,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return _status.currentPhase==player;
 						},
 						content:function(){
-							if(!player.storage.fulin){
-								player.storage.fulin=[];
-							}
-							for(var i=0;i<trigger.cards.length;i++){
-								player.storage.fulin.add(trigger.cards[i]);
-							}
+							trigger.gaintag.add('fulin');
 						}
 					}
-				}
+				},
+				onremove:function(player){
+					player.removeGaintag('fulin');
+				},
 			},
 			fulin2:{
 				mod:{
 					ignoredHandcard:function(card,player){
-						if(player.storage.fulin&&player.storage.fulin.contains(card)){
+						if(card.hasGaintag('fulin')){
 							return true;
 						}
 					},
 					cardDiscardable:function(card,player,name){
-						if(name=='phaseDiscard'&&player.storage.fulin&&player.storage.fulin.contains(card)){
+						if(name=='phaseDiscard'&&card.hasGaintag('fulin')){
 							return false;
 						}
 					},
@@ -6905,6 +6940,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						player:function(card,player,target){
 							if(_status.event.skill=='zhanjue'){
+								if(player.hasSkillTag('directHit_ai',true,{
+									target:target,
+									card:card,
+								},true)) return;
 								if(player.countCards('h')>=3||target.countCards('h')>=3) return 'zeroplayertarget';
 								if(player.countCards('h','tao')) return 'zeroplayertarget';
 								if(target.countCards('h','sha')>1) return 'zeroplayertarget';
@@ -7761,7 +7800,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					unequip_ai:true,
+					directHit_ai:true,
 					skillTagFilter:function(player,tag,arg){
+						if(get.attitude(player,arg.target)>0||!player.isPhaseUsing()) return false;
+						if(tag=='directHit_ai') return arg.target.hp>=Math.max(1,arg.target.countCards('h')-1);
 						if(arg&&arg.name=='sha'&&arg.target.getEquip(2)) return true;
 						return false;
 					}
@@ -8258,6 +8300,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						result.targets[0].addTempSkill('qianxi2');
 						player.line(result.targets,'green');
 						game.addVideo('storage',result.targets[0],['qianxi2',event.color]);
+					}
+				},
+				ai:{
+					directHit_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						if(!arg.target.hasSkill('qianxi2')) return false;
+						if(arg.card.name=='sha') return arg.target.storage.qianxi2=='red'&&(!arg.target.getEquip('bagua')||player.hasSkillTag('unequip',false,{
+							name:arg.card?arg.card.name:null,
+							target:arg.target,
+							card:arg.card
+						})||player.hasSkillTag('unequip_ai',false,{
+							name:arg.card?arg.card.name:null,
+							target:arg.target,
+							card:arg.card
+						}));
+						return arg.target.storage.qianxi2=='black';
 					}
 				},
 			},

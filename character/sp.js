@@ -566,7 +566,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return event.player.getStockSkills('仲村由理','天下第一').filter(function(skill){
 						var info=get.info(skill);
-						return info&&!info.juexingji&&!info.zhuSkill&&!info.charlotte&&!info.limited;
+						return info&&!info.juexingji&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte&&!info.limited;
 					}).length>0;
 				},
 				logTarget:'player',
@@ -578,7 +578,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('tuogu');
 					var list=trigger.player.getStockSkills('仲村由理','天下第一').filter(function(skill){
 						var info=get.info(skill);
-						return info&&!info.juexingji&&!info.zhuSkill&&!info.charlotte&&!info.limited;
+						return info&&!info.juexingji&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte&&!info.limited;
 					});
 					if(list.length==1) event._result={control:list[0]};
 					else trigger.player.chooseControl(list).set('prompt','选择令'+get.translation(player)+'获得一个技能').set('forceDie',true).set('ai',function(){
@@ -603,7 +603,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return event.player.getStockSkills('仲村由理','天下第一').filter(function(skill){
 						var info=get.info(skill);
-						return info&&!info.juexingji&&!info.zhuSkill&&!info.charlotte&&!info.limited;
+						return info&&!info.juexingji&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte&&!info.limited;
 					}).length>0;
 				},
 				logTarget:'player',
@@ -611,7 +611,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var list=trigger.player.getStockSkills('仲村由理','天下第一').filter(function(skill){
 						var info=get.info(skill);
-						return info&&!info.juexingji&&!info.zhuSkill&&!info.charlotte&&!info.limited;
+						return info&&!info.juexingji&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte&&!info.limited;
 					});
 					if(list.length==1) event._result={control:list[0]};
 					else trigger.player.chooseControl(list).set('prompt','选择令'+get.translation(player)+'获得一个技能').set('forceDie',true).set('ai',function(){
@@ -3095,10 +3095,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									}
 								}
 							});
-							player.$throw(list);
+							player.$throw(list,1000);
 							player.lose(list,ui.discardPile,'visible');
 							game.log(player,'将',list,'置入弃牌堆');
 						}
+					},
+					mark:{
+						trigger:{
+							player:'gainBegin',
+							global:'phaseBeginStart',
+						},
+						silent:true,
+						filter:function(event,player){
+							return event.name!='gain'||player!=_status.currentPhase;
+						},
+						content:function(){
+							if(trigger.name=='gain') trigger.gaintag.add('zishu');
+							else player.removeGaintag('zishu');
+						},
 					},
 					draw:{
 						trigger:{player:'gainAfter'},
@@ -3117,7 +3131,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					threaten:1.2,
 					nogain:1
 				},
-				group:['zishu_draw','zishu_discard',]
+				group:['zishu_draw','zishu_discard','zishu_mark']
 			},
 			xinyingyuan:{
 				audio:'yingyuan',
@@ -3503,6 +3517,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.directHit.addArray(game.filterPlayer(function(current){
 						return current!=player&&get.distance(current,player)<=1;
 					}));
+				},
+				ai:{
+					directHit_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						return get.distance(arg.target,player)<=1;
+					},
 				},
 			},
 			wylianji:{
@@ -4858,8 +4878,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				delay:false,
 				filterCard:{name:'sha'},
 				content:function(){
-					target.gain(cards,player,'giveAuto');
-					target.storage.fuman3=cards[0];
+					target.gain(cards,player,'giveAuto').gaintag.add('fuman');
 					target.storage.fuman2=player;
 					target.addTempSkill('fuman2',{player:'phaseAfter'});
 				},
@@ -4879,13 +4898,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fuman2:{
 				mod:{
 					aiOrder:function(player,card,num){
-						if(card==player.storage.fuman3&&player.storage.fuman2.isIn()) return num+get.sgn(get.attitude(player,player.storage.fuman2));
+						if(get.itemtype(card)=='card'&&card.hasGaintag('fuman')&&player.storage.fuman2.isIn()) return num+get.sgn(get.attitude(player,player.storage.fuman2));
 					},
 				},
 				trigger:{player:'useCard'},
 				forced:true,
 				filter:function(event,player){
-					return event.cards.contains(player.storage.fuman3)&&player.storage.fuman2.isIn();
+					if(!player.storage.fuman2.isIn()) return false;
+					return player.getHistory('lose',function(evt){
+						if(evt.getParent()!=event) return false;
+						for(var i in evt.gaintag_map){
+							if(evt.gaintag_map[i].contains('fuman')) return true;
+						}
+						return false;
+					}).length>0;
 				},
 				mark:true,
 				intro:{
@@ -4900,7 +4926,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				onremove:function(player){
 					delete player.storage.fuman2;
-					delete player.storage.fuman3;
+					player.removeGaintag('fuman');
 				},
 			},
 			qizhou:{
@@ -5212,7 +5238,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i of list){
 						skills.addArray((lib.character[i][3]||[]).filter(function(skill){
 							var info=get.info(skill);
-							return info&&!info.zhuSkill&&!info.limited&&!info.juexingji&&!info.charlotte;
+							return info&&!info.zhuSkill&&!info.limited&&!info.juexingji&&!info.hiddenSkill&&!info.charlotte;
 						}));
 					}
 					if(!list.length||!skills.length){event.finish();return;}
@@ -5341,6 +5367,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'damageEnd',
 				},
 				forced:true,
+				locked:false,
 				filter:function(event){
 					return event.card&&event.card.name=='sha';
 				},
@@ -5637,70 +5664,54 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(name=='phaseDiscard'&&get.color(card)=='black') return false;
 					}
 				},
-				trigger:{global:'gainBegin'},
+				trigger:{global:'gainAfter'},
 				forced:true,
 				popup:false,
 				filter:function(event,player){
-					if(event.source==player&&event.player!=player){
-						for(var i=0;i<event.cards.length;i++){
-							if(get.color(event.cards[i])=='black') return true;
-						}
+					if(event.player!=player){
+						var hs=event.player.getCards('h');
+						var evt=event.getl(player);
+						return evt&&evt.cards2&&evt.cards2.filter(function(card){
+							return hs.contains(card)&&get.color(card,event.player)=='black';
+						}).length>0;
 					}
 					return false;
 				},
 				content:function(){
 					trigger.player.addSkill('xiehui2');
-					if(!trigger.player.storage.xiehui2){
-						trigger.player.storage.xiehui2=[];
-					}
-					for(var i=0;i<trigger.cards.length;i++){
-						if(get.color(trigger.cards[i])=='black'){
-							trigger.player.storage.xiehui2.add(trigger.cards[i]);
-						}
-					}
+					var hs=trigger.player.getCards('h');
+					var cards=trigger.getl(player).cards2.filter(function(card){
+						return hs.contains(card)&&get.color(card,trigger.player)=='black';
+					});
+					trigger.player.addGaintag(cards,'xiehui');
 				}
 			},
 			xiehui2:{
 				mark:true,
 				intro:{
 					content:'不能使用、打出或弃置获得的黑色牌',
-					nocount:true
 				},
 				mod:{
 					cardDiscardable:function(card,player){
-						if(player.storage.xiehui2&&player.storage.xiehui2.contains(card)) return false;
+						if(card.hasGaintag('xiehui')) return false;
 					},
 					cardEnabled2:function(card,player){
-						if(player.storage.xiehui2&&player.storage.xiehui2.contains(card)) return false;
+						if(get.itemtype(card)=='card'&&card.hasGaintag('xiehui')) return false;
 					},
 				},
-				group:['xiehui3','xiehui4']
-			},
-			xiehui3:{
 				trigger:{player:'changeHp'},
 				forced:true,
 				popup:false,
+				charlotte:true,
 				filter:function(event){
 					return event.num<0;
 				},
 				content:function(){
 					player.removeSkill('xiehui2');
-					delete player.storage.xiehui2;
-				}
-			},
-			xiehui4:{
-				trigger:{player:'loseEnd'},
-				silent:true,
-				content:function(){
-					if(player.storage.xiehui2){
-						for(var i=0;i<player.storage.xiehui2.length;i++){
-							if(trigger.cards.contains(player.storage.xiehui2[i])){
-								player.storage.xiehui2.splice(i--,1);
-							}
-						}
-					}
-					// player.updateMarks();
-				}
+				},
+				onremove:function(player){
+					player.removeGaintag('xiehui');
+				},
 			},
 			shanjia:{
 				sync:function(player){
@@ -10043,10 +10054,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseControl('basic','trick','equip','cancel2',function(){
 						var source=_status.event.source;
 						if(get.attitude(_status.event.player,source)>0) return 'cancel2';
-						if(!source.storage.jilei2||!source.storage.jilei2.contains('basic')) return 'basic';
-						if(_status.currentPhase!=source) return 'trick';
-						if(lib.filter.cardUsable({name:'sha'},source)&&source.countCards('h')>=2) return 'basic';
-						return 'trick';
+						var list=['basic','trick','equip'].filter(function(name){
+							return (!source.storage.jilei2||!source.storage.jilei2.contains(name));
+						});
+						if(!list.length) return 'cancel2';
+						if(list.contains('trick')&&source.countCards('h',function(card){
+							return get.type(card,source)=='trick'&&source.hasValueTarget(card);
+						})>1) return 'trick';
+						return list[0];
 					}).set('prompt',get.prompt2('jilei',trigger.source)).set('source',trigger.source);
 					'step 1'
 					if(result.control!='cancel2'){
@@ -15557,9 +15572,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olxingshen_info:'当你受到伤害后，你可以随机摸至多两张牌。若如此做，你获得X个“省”，且下一次发动〖严教〗展示牌时移去所有“省”并多展示等量的牌。（X为你已损失的体力值，且你至多拥有6个“省”）',
 			caoshuang:'曹爽',
 			tuogu:'托孤',
-			tuogu_info:'限定技，一名角色死亡时，你可以令其选择其武将牌上的一个技能（主公技，限定技，觉醒技等特殊技能除外），然后你获得其选择的技能。',
+			tuogu_info:'限定技，一名角色死亡时，你可以令其选择其武将牌上的一个技能（主公技，限定技，觉醒技，隐匿技等特殊技能除外），然后你获得其选择的技能。',
 			retuogu:'托孤',
-			retuogu_info:'一名角色死亡时，你可以令其选择其武将牌上的一个技能（主公技，限定技，觉醒技等特殊技能除外），然后你获得其选择的技能并失去上次因〖托孤〗获得的技能。',
+			retuogu_info:'一名角色死亡时，你可以令其选择其武将牌上的一个技能（主公技，限定技，觉醒技，隐匿技等特殊技能除外），然后你获得其选择的技能并失去上次因〖托孤〗获得的技能。',
 			shanzhuan:'擅专',
 			shanzhuan_info:'当你对其他角色造成伤害后，若其判定区没有牌，则你你可以将其的一张牌置于其的判定区。若此牌不为延时锦囊牌且此牌为：红色，此牌视为【乐不思蜀】；黑色，此牌视为【兵粮寸断】。回合结束时，若你本回合内未造成伤害，你可摸一张牌。',
 			spniluan:'逆乱',

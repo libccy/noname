@@ -938,6 +938,7 @@ window.noname_character_rank={
 		'mini_zhangchunhua',
 		'hucheer',
 		'jin_xiahouhui',
+		'xin_zhangfei',
 	],
 	c:[
 		'xiahoudun',
@@ -1526,6 +1527,7 @@ window.noname_character_rank={
 			'xin_lingtong',
 			'xin_liubiao',
 			're_xinxianying',
+			'xin_zhangfei',
 			'wangrong',
 			're_quyi',
 			'hanfu',

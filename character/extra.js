@@ -1946,10 +1946,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(get.tag(card,'respondSha')&&current<0) return 0.6
 						}
 					},
-					respondSha:true,
-					order:4,
-					useful:-1,
-					value:-1
+					directHit_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						return arg.card.name=='sha'&&get.suit(arg.card)=='heart';
+					},
 				}
 			},
 			wuhun:{

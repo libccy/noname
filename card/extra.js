@@ -855,8 +855,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					effect:{
-						player:function(card,player,target,current){
-							if(card.name=='sha'&&target.countCards('h')==0&&!target.hasSkillTag('filterDamage',null,{
+						player:function(card,player,target,current,isLink){
+							if(card.name=='sha'&&!isLink&&target.countCards('h')==0&&!target.hasSkillTag('filterDamage',null,{
 								player:player,
 								card:card,
 							})) return [1,0,1,-3];
@@ -891,11 +891,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(target.hasSkillTag('unequip2')) return;
 							if(player.hasSkillTag('unequip',false,{
 								name:card?card.name:null,
-								target:player,
+								target:target,
 								card:card
 							})||player.hasSkillTag('unequip_ai',false,{
 								name:card?card.name:null,
-								target:player,
+								target:target,
 								card:card
 							})) return;
 							if(card.name=='nanman'||card.name=='wanjian'||card.name=='chuqibuyi') return 'zerotarget';
@@ -984,12 +984,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(arg&&arg.player){
 							if(arg.player.hasSkillTag('unequip',false,{
 								name:arg.card?arg.card.name:null,
-								target:player,
+								target:target,
 								card:arg.card,
 							})) return false;
 							if(arg.player.hasSkillTag('unequip_ai',false,{
 								name:arg.card?arg.card.name:null,
-								target:player,
+								target:target,
 								card:arg.card,
 							})) return false;
 							if(arg.player.hasSkillTag('jueqing',false,player)) return false;

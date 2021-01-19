@@ -173,33 +173,56 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					canLink:function(player,target,card){
+						if(!target.isLinked()&&!player.hasSkill('wutiesuolian_skill')) return false;
+						if(target.mayHaveShan()&&!player.hasSkillTag('directHit_ai',true,{
+							target:target,
+							card:card,
+						},true)) return false;
+						if(player.hasSkill('jueqing')||target.hasSkill('gangzhi')||target.hasSkill('gangzhi')) return false;
+						return true;
+					},
 					basic:{
 						useful:[5,1],
 						value:[5,1],
 					},
 					order:function(item,player){
 						if(player.hasSkillTag('presha',true,null,true)) return 10;
-						if(lib.linked.contains(get.nature(item))) return (player.getCardUsable('sha')>1?3:3.1);
+						if(lib.linked.contains(get.nature(item))){
+							if(game.hasPlayer(function(current){
+								return current!=player&&current.isLinked()&&player.canUse(item,current,null,true)&&get.effect(current,item,player,player)>0&&lib.card.sha.ai.canLink(player,current,item);
+							})&&game.countPlayer(function(current){
+								return current.isLinked()&&get.damageEffect(current,player,player,get.nature(item))>0;
+							})>1) return 3.1;
+							return 3;
+						}
 						return 3.05;
 					},
 					result:{
 						target:function(player,target,card,isLink){
-							if(!isLink&&player.hasSkill('jiu')){
-								if(!target.hasSkillTag('filterDamage',null,{
-									player:player,
-									card:card,
-									jiu:true,
-								})){
- 								if(get.attitude(player,target)>0){
- 									return -7;
- 								}
- 								else{
- 									return -4;
- 								}
+							var eff=function(){
+								if(!isLink&&player.hasSkill('jiu')){
+									if(!target.hasSkillTag('filterDamage',null,{
+										player:player,
+										card:card,
+										jiu:true,
+									})){
+ 									if(get.attitude(player,target)>0){
+ 										return -7;
+ 									}
+ 									else{
+ 										return -4;
+ 									}
+									}
+									return -0.5;
 								}
-								return -0.5;
-							}
-							return -1.5;
+								return -1.5;
+							}();
+							if(!isLink&&target.mayHaveShan()&&!player.hasSkillTag('directHit_ai',true,{
+								target:target,
+								card:card,
+							},true)) return eff/1.2;
+							return eff;
 						},
 					},
 					tag:{
@@ -1070,13 +1093,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:-1.5,
 						player:function(player,target,card){
-							if(get.cardtag(card,'yingbian_fujia')){
-								var num=player.countCards('h',function(cardx){
-									return cardx!=card&&(!card.cards||!card.cards.contains(cardx));
-								});
-								if(!game.hasPlayer(function(current){
-									return current.countCards('h')>num;
-								})) return 0;
+							if(player.hasSkillTag('directHit_ai',true,{
+								target:target,
+								card:card,
+							},true)){
+								return 0;
 							}
 							if(get.damageEffect(target,player,target)>0&&get.attitude(player,target)>0&&get.attitude(target,player)>0){
 								return 0;
@@ -1654,11 +1675,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(target.hasSkillTag('unequip2')) return;
 							if(player.hasSkillTag('unequip',false,{
 								name:card?card.name:null,
-								target:player,
+								target:target,
 								card:card
 							})||player.hasSkillTag('unequip_ai',false,{
 								name:card?card.name:null,
-								target:player,
+								target:target,
 								card:card
 							})) return;
 							if(card.name=='sha'&&get.color(card)=='black') return 'zerotarget';
@@ -1847,7 +1868,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						trigger._result.bool=false;
 						trigger._result.result=null;
 					}
-				}
+				},
+				ai:{
+					directHit_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						if(get.attitude(player,arg.target)<0&&arg.card.name=='sha'&&player.countCards('he',function(card){
+							return card!=player.getEquip('guanshi')&&card!=arg.card&&(!arg.card.cards||!arg.card.cards.contains(card))&&get.value(card)<5;
+						})>1) return true;
+						return false;
+					},
+				},
 			},
 			fangtian_skill:{
 				equipSkill:true,
@@ -1979,7 +2009,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.responded) return false;
 					if(event.bagua_skill) return false;
-					if(!event.filterCard({name:'shan'},player,event)) return false;
+					if(!event.filterCard||!event.filterCard({name:'shan'},player,event)) return false;
 					if(event.name=='chooseToRespond'&&!lib.filter.cardRespondable({name:'shan'},player,event)) return false;
 					if(player.hasSkillTag('unequip2')) return false;
 					var evt=event.getParent();
@@ -2020,11 +2050,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(target.hasSkillTag('unequip2')) return;
 							if(player.hasSkillTag('unequip',false,{
 								name:card?card.name:null,
-								target:player,
+								target:target,
 								card:card
 							})||player.hasSkillTag('unequip_ai',false,{
 								name:card?card.name:null,
-								target:player,
+								target:target,
 								card:card
 							})) return;
 							if(get.tag(card,'respondShan')) return 0.5;

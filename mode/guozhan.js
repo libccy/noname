@@ -6036,6 +6036,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					if(trigger.name=='addJudge'){
 						trigger.cancel();
+						var owner=get.owner(trigger.card);
+						if(owner&&owner.getCards('hej').contains(trigger.card)) owner.lose(trigger.card,ui.discardPile);
+						else game.cardsDiscard(trigger.card);
+						game.log(trigger.card,'进入了弃牌堆');
 					}
 					else trigger.getParent().targets.remove(player);
 				},
@@ -6049,7 +6053,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			gzqianxun:{
 				audio:'qianxun',
-				trigger:{target:'useCardToTarget',player:'addJudgeBefore'},
+				trigger:{
+					target:'useCardToTarget',
+					player:'addJudgeBefore',
+				},
 				forced:true,
 				priority:15,
 				check:function(event,player){
@@ -6061,6 +6068,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					if(trigger.name=='addJudge'){
 						trigger.cancel();
+						var owner=get.owner(trigger.card);
+						if(owner&&owner.getCards('hej').contains(trigger.card)) owner.lose(trigger.card,ui.discardPile);
+						else game.cardsDiscard(trigger.card);
+						game.log(trigger.card,'进入了弃牌堆');
 					}
 					else trigger.getParent().targets.remove(player);
 				},

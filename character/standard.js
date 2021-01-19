@@ -1594,7 +1594,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						trigger.getParent().directHit.add(trigger.target);
 					}
-				}
+				},
+				ai:{
+					directHit_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						if(get.attitude(player,arg.target)>0||arg.card.name!='sha'||!ui.cardPile.firstChild||get.color(ui.cardPile.firstChild,player)!='red') return false;
+					},
+				},
 			},
 			jizhi:{
 				audio:2,
@@ -2397,7 +2403,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						map[id].shanRequired=2;
 					}
-				}
+				},
+				ai:{
+					directHit_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						if(arg.card.name!='sha'||arg.target.countCards('h','shan')>1) return false;
+					},
+				},
 			},
 			wushuang2:{
 				audio:'wushuang',
@@ -2421,10 +2433,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					map[idt].shaReq[id]++;
 				},
 				ai:{
-					result:{
-						target:function(card,player,target){
-							if(card.name=='juedou'&&target.countCards('h')>0) return [1,0,0,-1];
-						}
+					directHit_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						if(arg.card.name!='juedou'||Math.floor(arg.target.countCards('h','sha')/2)>player.countCards('h','sha')) return false;
 					}
 				}
 			},
@@ -2683,7 +2694,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiahoudun:['re_xiahoudun','sp_xiahoudun','xin_xiahoudun','xiahoudun'],
 			liubei:['re_liubei','sp_liubei','liubei'],
 			guanyu:['re_guanyu','jsp_guanyu','guanyu'],
-			zhangfei:['re_zhangfei','sp_zhangfei','old_zhangfei','zhangfei'],
+			zhangfei:['re_zhangfei','sp_zhangfei','xin_zhangfei','old_zhangfei','zhangfei'],
 			zhaoyun:['re_zhaoyun','sp_zhaoyun','jsp_zhaoyun','old_zhaoyun','zhaoyun'],
 			machao:['re_machao','sp_machao','machao','old_machao'],
 			zhugeliang:['re_zhugeliang','zhugeliang'],

@@ -34,7 +34,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_caochong:['male','wei',3,['oldrenxin','oldchengxiang']],
 			yuji:['male','qun',3,['old_guhuo'],['forbidai']],
 			zhangjiao:['male','qun',3,['leiji','guidao','huangtian'],['zhu']],
-			old_zhangfei:['male','shu',4,['paoxiao','new_tishen']],
+			old_zhangfei:['male','shu',4,['new_repaoxiao','new_tishen']],
 			old_zhaoyun:['male','shu',4,['longdan','new_yajiao']],
 			old_huatuo:['male','qun',3,['jijiu','chulao']],
 			jsp_caoren:['male','wei',4,['kuiwei','yanzheng']],

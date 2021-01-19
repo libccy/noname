@@ -383,6 +383,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.removeSkill('hiroto_huyu2');
 					player.removeSkill('hiroto_zonglve');
+					player.removeGaintag('hiroto_huyu2');
 					var target=player.storage.hiroto_huyu2;
 					if(target&&target.isAlive()){
 						var cards=[];
@@ -398,6 +399,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mark:'character',
 				intro:{content:'已成为$的工具人'},
+				group:'hiroto_huyu_gain',
+			},
+			hiroto_huyu_gain:{
+				trigger:{player:'gainBegin'},
+				silent:true,
+				filter:function(event,player){
+					if(player==_status.currentPhase) event.gaintag.add('hiroto_huyu2');
+					return false;
+				},
 			},
 			hiroto_zonglve:{
 				enable:'phaseUse',
@@ -515,13 +525,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				position:'he',
 				content:function(){
-					'step 0'
-					player.draw(cards.length*2);
-					'step 1'
-					if(get.itemtype(result)=='cards'){
-						player.addTempSkill('shizuku_sizhi2');
-						player.markAuto('shizuku_sizhi2',result);
-					}
+					player.draw(cards.length*2).gaintag=['shizuku_sizhi2'];
+					player.addTempSkill('shizuku_sizhi2');
 				},
 				ai:{
 					order:5,
@@ -529,49 +534,36 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			shizuku_sizhi2:{
-				intro:{
-					mark:function(dialog,content,player){
-						if(content&&content.length){
-							if(player==game.me||player.isUnderControl()){
-								dialog.addAuto(content);
-							}
-							else{
-								return '本回合以此法获得了'+get.cnNumber(content.length)+'张牌';
-							}
-						}
-					},
-					content:'cards',
+				onremove:function(player){
+					player.removeGaintag('shizuku_sizhi2');
 				},
-				onremove:true,
 				mod:{
 					targetInRange:function(card,player,target){
 						if(!card.cards) return;
-						var storage=player.getStorage('shizuku_sizhi2');
 						for(var i of card.cards){
-							if(!storage.contains(i)||get.color(i)!='black') return;
+							if(!i.hasGaintag('shizuku_sizhi2')||get.color(i)!='black') return;
 						}
 						return true;
 					},
 					cardUsable:function(card,player,target){
 						if(!card.cards) return;
-						var storage=player.getStorage('shizuku_sizhi2');
 						for(var i of card.cards){
-							if(!storage.contains(i)||get.color(i)!='black') return;
+							if(!i.hasGaintag('shizuku_sizhi2')||get.color(i)!='black') return;
 						}
 						return Infinity;
 					},
 					ignoredHandcard:function(card,player){
-						if(player.getStorage('shizuku_sizhi2').contains(card)&&get.color(card)=='red'){
+						if(card.hasGaintag('shizuku_sizhi2')&&get.color(card)=='red'){
 							return true;
 						}
 					},
 					cardDiscardable:function(card,player,name){
-						if(name=='phaseDiscard'&&player.getStorage('shizuku_sizhi2').contains(card)&&get.color(card)=='red'){
+						if(name=='phaseDiscard'&&card.hasGaintag('shizuku_sizhi2')&&get.color(card)=='red'){
 							return false;
 						}
 					},
 					aiOrder:function(player,card,num){
-						if(player.getStorage('shizuku_sizhi2').contains(card)&&get.color(card)=='black') return num-0.1;
+						if(get.itemtype(card)=='card'&&card.hasGaintag('shizuku_sizhi2')&&get.color(card)=='black') return num-0.1;
 					},
 				},
 			},
@@ -2608,18 +2600,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 3;
 					});
 					'step 1'
-					if(result.control=='cancel2'){event.finish();return;}
+					if(result.control=='cancel2') return;
 					player.logSkill('shiorimiyuki_tingxian');
 					var num=1+result.index;
-					player.draw(num);
-					'step 2'
-					event.cards=result;
+					player.draw(num).gaintag=['shiorimiyuki_tingxian'];
 					player.recover();
-					'step 3'
-					if(get.itemtype(cards)=='cards'){
-						trigger.shiorimiyuki_tingxian=cards;
-						player.addTempSkill('shiorimiyuki_tingxian2');
-					}
+					player.addTempSkill('shiorimiyuki_tingxian2');
 				},
 			},
 			shiorimiyuki_tingxian2:{
@@ -2628,25 +2614,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				charlotte:true,
 				mod:{
 					aiOrder:function(player,card,num){
-						var cards=_status.event.getParent('phaseUse').shiorimiyuki_tingxian;
-						if(cards&&cards.contains(card)) return num+2;
+						if(get.itemtype(card)=='card'&&card.hasGaintag('shiorimiyuki_tingxian')) return num+2;
 					},
-					aiValuetarget:function(player,card,num){
-						var cards=_status.event.getParent('phaseUse').shiorimiyuki_tingxian;
-						if(cards&&cards.contains(card)) return 0;
+					aiValue:function(player,card,num){
+						if(get.itemtype(card)=='card'&&card.hasGaintag('shiorimiyuki_tingxian')) return 0;
 					},
 				},
 				filter:function(event,player){
-					var hs=player.getCards('h');
-					return Array.isArray(event.shiorimiyuki_tingxian)&&event.shiorimiyuki_tingxian.filter(function(card){
-						return hs.contains(card);
-					}).length>0
+					return player.countCards('h',function(card){
+						return card.hasGaintag('shiorimiyuki_tingxian');
+					})>0;
 				},
 				content:function(){
-					var hs=player.getCards('h');
-					player.loseHp(trigger.shiorimiyuki_tingxian.filter(function(card){
-						return hs.contains(card);
-					}).length);
+					player.loseHp(player.countCards('h',function(card){
+						return card.hasGaintag('shiorimiyuki_tingxian');
+					}));
+					player.removeGaintag('shiorimiyuki_tingxian');
 				},
 			},
 			shizuru_nianli:{
@@ -3965,6 +3948,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							trigger.directHit.addArray(game.players);
 						},
+						ai:{
+							directHit_ai:true,
+							skillTagFilter:function(player,tag,arg){
+								return arg.card.name==player.storage.riki_spwenji_respond;
+							},
+						},
 					}
 				}
 			},
@@ -4112,6 +4101,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					if(trigger.name=='useCard') trigger.directHit.addArray(game.players);
 					else trigger.directHit.add(player);
+				},
+				ai:{
+					directHit_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						return arg.card.name=='sha';
+					},
+				},
+				global:'doruji_feiqu_ai',
+			},
+			doruji_feiqu_ai:{
+				ai:{
+					directHit_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						return arg.card.name=='sha'&&(arg.target.hasSkill('doruji_feiqu')||arg.target.hasSkill('godan_feiqu'));
+					},
 				},
 			},
 			akane_jugu:{
@@ -4306,30 +4310,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.itemtype(trigger.respondTo[1])=='card') cards.push(trigger.respondTo[1]);
 						else if(trigger.respondTo[1].cards) cards.addArray(trigger.respondTo[1].cards);
 						cards=cards.filterInD('od');
-						trigger.player.gain(cards,'gain2','log');
+						trigger.player.gain(cards,'gain2','log').gaintag.add('sasami_funan');
 						trigger.player.addTempSkill('sasami_funan_use');
-						if(!trigger.player.storage.sasami_funan_use){
-							trigger.player.storage.sasami_funan_use=[];
-						}
-						trigger.player.storage.sasami_funan_use.addArray(cards);
 					}
 					'step 1'
 					var cards=trigger.cards.filterInD('od');
 					player.gain(cards,'log','gain2');
 				},
 				subSkill:{
-					jiexun:{
-						charlotte:true,
-						mark:true,
-						intro:{
-							content:'你发动“复难”时，无须令其他角色获得你使用的牌'
-						},
-					},
 					use:{
-						onremove:true,
+						onremove:function(player){
+							player.removeGaintag('sasami_funan');
+						},
+						charlotte:true,
 						mod:{
 							cardEnabled2:function(card,player){
-								if(player.storage.sasami_funan_use&&player.storage.sasami_funan_use.contains(card)){
+								if(get.itemtype(card)=='card'&&card.hasGaintag('sasami_funan')){
 									return false;
 								}
 							}
@@ -5690,6 +5686,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				init:function(player,skill){
 					if(!player.storage[skill]) player.storage[skill]=[];
 				},
+				ai:{
+					directHit_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						return player.storage.yukine_magic&&player.storage.yukine_magic.contains(arg.card.name);
+					},
+				},
 			},
 			komari_tiankou:{
 				trigger:{
@@ -6504,6 +6506,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var next=player.chooseToUse();
 					next.set('norestore',true);
 					next.set('_backupevent','nsdaizhanx');
+					next.set('custom',{
+						add:{},
+						replace:{window:function(){}}
+					});
 					next.backup('nsdaizhanx');
 				},
 			},
@@ -11854,8 +11860,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rin_baoqiu_info:'锁定技，你的攻击范围+2。当你使用【杀】指定目标后，你进行判定。若结果：为红色，此【杀】对其的伤害值基数+1；为黑色，其无法闪避此【杀】；为♠/♥，此【杀】不计入使用次数限制且你摸一张牌；为♦/♣，目标角色的所有非锁定技失效直到回合结束，且你弃置其一张牌。',
 			sasami_miaobian:'喵变',
 			sasami_miaobian_info:'当你的体力值变为：3以下时，你获得技能〖公清〗，2以下时，你获得技能〖复难〗，1以下时，你获得技能〖暴球〗',
-			"sasami_gongqing":"公清",
-			"sasami_gongqing_info":"锁定技。当你受到伤害时，若伤害来源的攻击范围：<3，则你令此伤害的数值减为1。>3，你令此伤害+1。",
+			sasami_gongqing:"公清",
+			sasami_gongqing_info:"锁定技。当你受到伤害时，若伤害来源的攻击范围：<3，则你令此伤害的数值减为1。>3，你令此伤害+1。",
 			sasami_funan:'复难',
 			sasami_funan_info:'其他角色使用或打出牌响应你使用的牌时，你可令其获得你使用的牌（其本回合不能使用或打出这些牌），然后你获得其使用或打出的牌。',
 			sasami_baoqiu:'暴球',

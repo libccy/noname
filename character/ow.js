@@ -25,7 +25,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ow_laiyinhate:['male','qun',4,['zhongdun','mengji']],
 			ow_luba:['male','shu',4,['liangou','xiyang']],
 			ow_wensidun:['male','shu',4,['feitiao','dianji']],
-			ow_zhaliya:['female','wei',4,['pingzhang','liyong']],
+			ow_zhaliya:['female','wei',4,['pingzhang','owliyong']],
 
 			ow_heiying:['female','wei',3,['qinru','yinshen','maichong']],
 			ow_orisa:['female','wu',4,['qianggu','woliu']],
@@ -520,7 +520,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			pingzhang2:{},
 			pingzhang3:{},
-			liyong:{
+			owliyong:{
 				trigger:{player:'phaseDrawBegin'},
 				forced:true,
 				filter:function(event,player){
@@ -3473,8 +3473,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pingzhang:'屏障',
 			pingzhang_info:'每轮各限一次，当你受到伤害时，你可以弃置一张红桃牌令伤害-1；当一名其他角色受到伤害时，你可以弃置一张黑桃牌令伤害-1',
 			pingzhang_info_alter:'每轮各限一次，当你受到伤害时，你可以弃置一张红桃手牌令伤害-1；当一名其他角色受到伤害时，你可以弃置一张黑桃手牌令伤害-1',
-			liyong:'力涌',
-			liyong_info:'锁定技，你摸牌阶段摸牌数+X，X为你上一轮发动屏障的次数',
+			owliyong:'力涌',
+			owliyong_info:'锁定技，你摸牌阶段摸牌数+X，X为你上一轮发动屏障的次数',
 			dianji:'电击',
 			dianji_info:'出牌阶段限一次，你可以将一张手牌当作惊雷闪对距离2以内的角色使用',
 			feitiao:'飞跳',

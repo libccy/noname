@@ -9,13 +9,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mobile_default:["miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu","hucheer"],
 				mobile_yijiang:["yj_zhanghe","yj_zhangliao","yj_xuhuang","yj_ganning"],
 				mobile_sunben:["re_sunben"],
-				mobile_standard:["xin_xiahoudun"],
+				mobile_standard:["xin_xiahoudun","xin_zhangfei"],
 				mobile_shenhua:["re_pangtong","re_guanqiujian","xin_yuanshao","re_liushan","re_dongzhuo","re_sp_zhugeliang","re_sunjian"],
 				mobile_yijiang1:["re_jikang","old_bulianshi","xin_liaohua","xin_caozhang","re_xusheng","xin_chengpu","xin_jianyong","xin_gongsunzan","xin_zhuran","re_lingtong","re_liubiao"],
 				mobile_sp:["old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","re_heqi","liuzan","xin_hansui"],
 			},
 		},
 		character:{
+			xin_zhangfei:['male','shu',4,['new_repaoxiao','liyong']],
 			xin_hansui:['male','qun',4,['xinniluan','xiaoxi_hansui']],
 			hucheer:['male','qun',4,['daoji']],
 			re_lingtong:['male','wu',4,['rexuanfeng']],
@@ -313,6 +314,80 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//铁骑飞
+			liyong:{
+				audio:'retishen',
+				trigger:{player:'shaMiss'},
+				forced:true,
+				filter:function(event,player){
+					return player.isPhaseUsing();
+				},
+				content:function(){
+					trigger.getParent().liyong=true;
+					player.addTempSkill('liyong2','phaseUseEnd');
+				},
+			},
+			liyong2:{
+				audio:'retishen',
+				mark:true,
+				intro:{
+					content:'铁骑！强命！加伤！然后掉血嘞…',
+				},
+				trigger:{player:'useCardToPlayered'},
+				forced:true,
+				filter:function(event,player){
+					if(!event.card||event.card.name!='sha') return false;
+					var evt=event.getParent();
+					if(evt.liyong) return false;
+					var history=player.getHistory('useCard',function(evt){
+						return evt.card.name=='sha';
+					});
+					var evt2=history[history.indexOf(evt)-1];
+					return evt2&&evt2.liyong;
+				},
+				logTarget:'target',
+				content:function(){
+					var target=trigger.target;
+					target.addTempSkill('fengyin');
+					trigger.directHit.add(target);
+					var id=target.playerid;
+					var map=trigger.customArgs;
+					if(!map[id]) map[id]={};
+					if(!map[id].extraDamage) map[id].extraDamage=0;
+					map[id].extraDamage++;
+					trigger.getParent().liyong2=true;
+				},
+				group:['liyong3','liyong4'],
+			},
+			liyong3:{
+				trigger:{source:'damageSource'},
+				forced:true,
+				popup:false,
+				filter:function(event,player){
+					return event.card&&event.card.name=='sha'&&
+					event.player.isAlive()&&event.getParent(2).liyong2==true;
+				},
+				content:function(){
+					player.loseHp();
+				},
+			},
+			liyong4:{
+				trigger:{player:'useCardAfter'},
+				forced:true,
+				silent:true,
+				filter:function(evt,player){
+					if(!evt.card||evt.card.name!='sha') return false;
+					if(evt.liyong) return false;
+					var history=player.getHistory('useCard',function(evt){
+						return evt.card.name=='sha';
+					});
+					var evt2=history[history.indexOf(evt)-1];
+					return evt2&&evt2.liyong;
+				},
+				content:function(){
+					player.removeSkill('liyong2');
+				},
+			},
 			//韩遂
 			xinniluan:{
 				trigger:{global:'phaseJieshuBegin'},
@@ -687,7 +762,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return event.player.getStockSkills('仲村由理','天下第一').filter(function(skill){
 						var info=get.info(skill);
-						return info&&!info.juexingji&&!info.zhuSkill&&!info.charlotte&&!info.limited;
+						return info&&!info.juexingji&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte&&!info.limited;
 					}).length>0;
 				},
 				logTarget:'player',
@@ -700,7 +775,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('quanfeng');
 					var list=trigger.player.getStockSkills('仲村由理','天下第一').filter(function(skill){
 						var info=get.info(skill);
-						return info&&!info.juexingji&&!info.zhuSkill&&!info.charlotte&&!info.limited;
+						return info&&!info.juexingji&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte&&!info.limited;
 					});
 					if(list.length==1) event._result={control:list[0]};
 					else player.chooseControl(list).set('prompt','选择获得'+get.translation(trigger.player)+'的一个技能').set('forceDie',true).set('ai',function(){
@@ -6479,7 +6554,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chengzhao_info:'一名角色的结束阶段，若你于本回合内获得了两张以上的牌，则你可以与一名其他角色拼点。若你赢，你视为对其使用一张无视防具的【杀】。',
 			yangyi:'杨仪',
 			duoduan:'度断',
-			duoduan_info:'每回合限一次，当你成为【杀】的目标后，你可以重铸一张牌。若如此做，此【杀】的使用者选择一项：摸两张牌令此【杀】无效，或弃置一张牌并令你不能闪避此【杀】。',
+			duoduan_info:'每回合限一次，当你成为【杀】的目标后，你可以重铸一张牌。若如此做，你选择一项：①令使用者摸两张牌，且此【杀】无效。②令使用弃置一张牌，且你不能响应此【杀】。',
 			gongsun:'共损',
 			gongsun_info:'出牌阶段开始时，你可以弃置两张牌并指定一名其他角色。你选择一个基本牌或普通锦囊牌的牌名。直到你的下回合开始或你死亡，你与其不能使用或打出或弃置此名称的牌。',
 			gongsun_shadow:'共损',
@@ -6575,7 +6650,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hongyi2:'弘仪',
 			hongyi_info:'出牌阶段限一次，你可以弃置X张牌并选择一名其他角色（X为场上已阵亡的角色数且至多为2）。你的下回合开始前，该角色造成伤害时进行判定，若结果为：黑色，此伤害-1。红色，受到伤害的角色摸一张牌。',
 			quanfeng:'劝封',
-			quanfeng_info:'锁定技，限定技，一名角色死亡时，你选择获得其的一个技能（主公技，限定技，觉醒技，带有Charlotte标签的技能除外），然后加1点体力上限并回复1点体力。',
+			quanfeng_info:'锁定技，限定技，一名角色死亡时，你选择获得其的一个技能（主公技，限定技，觉醒技，隐匿技，带有Charlotte标签的技能除外），然后加1点体力上限并回复1点体力。',
 			simashi:'司马师',
 			baiyi:'败移',
 			baiyi_info:'限定技，出牌阶段，若你已受伤，你可以交换两名其他角色的座次。',
@@ -6595,6 +6670,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinniluan_info:'其他角色的结束阶段，若其本回合对除其以外的角色使用过牌，则你可以对其使用一张【杀】。若以此法使用的【杀】造成伤害，则你弃置其一张牌。',
 			xiaoxi_hansui:'骁袭',
 			xiaoxi_hansui_info:'你可以将一张黑色牌当做【杀】使用或打出。',
+			xin_zhangfei:'手杀张飞',
+			liyong:'厉勇',
+			liyong2:'厉勇',
+			liyong3:'厉勇',
+			liyong_info:'锁定技，若你于出牌阶段使用的【杀】被【闪】抵消，本阶段你下一张【杀】不可被响应且伤害+1，指定的目标本回合非锁定技失效，当此【杀】造成伤害后，若目标角色未死亡，你失去1点体力。',
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua:'手杀异构·神话再临',
 			mobile_yijiang1:'手杀异构·一将成名',
