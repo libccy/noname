@@ -101,6 +101,67 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			xinquanbian:{
+				audio:'quanbian',
+				trigger:{player:['useCard','respond']},
+				filter:function(event,player){
+					var phase=event.getParent('phaseUse');
+					if(!phase||phase.player!=player) return false;
+					var suit=get.suit(event.card);
+					if(!lib.suit.contains(suit)||!lib.skill.quanbian.hasHand(event)) return false;
+					return player.getHistory('useCard',function(evt){
+						return evt!=event&&get.suit(evt.card)==suit&&lib.skill.quanbian.hasHand(evt)&&evt.getParent('phaseUse')==phase;
+					}).length+player.getHistory('respond',function(evt){
+						return evt!=event&&get.suit(evt.card)==suit&&lib.skill.quanbian.hasHand(evt)&&evt.getParent('phaseUse')==phase;
+					}).length==0;
+				},
+				content:function(){
+					'step 0'
+					var cards=get.cards(Math.min(5,player.maxHp));
+					event.cards=cards;
+					var suit=get.suit(trigger.card);
+					player.chooseButton(['权变：获得一张不为'+get.translation(suit)+'花色的牌',cards]).set('suit',suit).set('filterButton',function(button){
+						return get.suit(button)!=_status.event.suit;
+					});
+					'step 1'
+					if(result.bool){
+						var card=result.links[0];
+						cards.remove(card);
+						player.gain(card,'gain2','log');
+						if(!cards.length) event.finish();
+					}
+					'step 2'
+					player.chooseCardButton(cards.length,true,cards,'按顺序将卡牌置于牌堆顶（先选择的在上）');
+					'step 3'
+					if(result.bool){
+						var list=result.links.slice(0);
+						while(list.length){
+							ui.cardPile.insertBefore(list.pop(),ui.cardPile.firstChild);
+						}
+						game.updateRoundNumber();
+					}
+				},
+				group:'xinquanbian_count',
+			},
+			xinquanbian_count:{
+				trigger:{player:'useCard1'},
+				silent:true,
+				firstDo:true,
+				filter:function(event,player){
+					return player.isPhaseUsing()&&lib.skill.quanbian.hasHand(event);
+				},
+				content:function(){
+					var stat=player.getStat('skill');
+					if(!stat.quanbian) stat.quanbian=0;
+					stat.quanbian++;
+				},
+				mod:{
+					cardEnabled2:function(card,player){
+						var stat=player.getStat('skill');
+						if(stat.quanbian&&stat.quanbian>=player.maxHp&&get.position(card)=='h') return false;
+					},
+				},
+			},
 			taoyin:{
 				audio:2,
 				trigger:{player:'showCharacterAfter'},
@@ -1128,7 +1189,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var card=get.cards()[0];
 					event.card=card;
 					player.showCards(card);
-					if(!player.hasUseTarget(card)) event.finish();
+					if(!player.hasUseTarget(card)){
+						card.fix();
+						ui.cardPile.insertBefore(card,ui.cardPile.firstChild);
+						game.updateRoundNumber();
+						event.finish();
+					}
 					'step 2'
 					var next=player.chooseUseTarget(card,true);
 					if(get.info(card).updateUsable=='phaseUse') next.addCount=false;
@@ -8122,6 +8188,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				return '出牌阶段限'+(player.hasSkill('recaishi2')?'两':'一')+'次，你可以选择一名本回合内未选择过的角色。你令其获得一项效果直至你的下回合开始：①其下次造成伤害后弃置两张牌，然后你摸一张牌。②其下次受到伤害后摸两张牌，然后你摸一张牌。'
 			},
 		},
+		perfectPair:{
+			jin_simayi:['jin_zhangchunhua'],
+			jin_simazhao:['jin_wangyuanji'],
+			jin_simashi:['jin_xiahouhui'],
+		},
 		characterReplace:{
 			lijue:['lijue','ns_lijue'],
 			fanchou:['fanchou','ns_fanchou'],
@@ -8189,7 +8260,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xz_xunxun":"恂恂",
 			"xz_xunxun_info":"摸牌阶段，你可以观看牌堆顶的四张牌，然后将其中的两张牌置于牌堆顶，并将其余的牌以任意顺序置于牌堆底。",
 			"xinfu_xingzhao":"兴棹",
-			"xinfu_xingzhao_info":"锁定技，若场上的已受伤角色合计为：1个以上，你视为拥有技能〖恂恂〗；2个以上，当你使用装备牌时，摸一张牌；3个以上，弃牌阶段开始时，你跳过此阶段。",
+			"xinfu_xingzhao_info":"锁定技，若X≥1，你视为拥有技能〖恂恂〗。若X≥2，当你使用装备牌时，你摸一张牌。若X≥3，弃牌阶段开始时，你跳过此阶段。（X为场上已受伤的角色数）",
 			"xinfu_xingzhao2":"兴棹",
 			"xinfu_xingzhao2_info":"",
 			"xinfu_dianhu":"点虎",
@@ -8597,8 +8668,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tairan:'泰然',
 			tairan2:'泰然',
 			tairan_info:'锁定技，回合结束时，你回复Y点体力，并将手牌摸至X张。出牌阶段开始时，你失去Y点体力，弃置上次以此法获得的牌。（X为你的体力上限，且至多为5；Y=X-你的体力值）',
+			gz_jin_simayi:'司马懿',
+			gz_jin_zhangchunhua:'张春华',
+			gz_jin_simazhao:'司马昭',
+			gz_jin_wangyuanji:'王元姬',
+			gz_jin_simashi:'司马师',
+			gz_jin_xiahouhui:'夏侯徽',
+			xinquanbian:'权变',
+			xinquanbian_info:'出牌阶段，每当你首次使用/打出一种花色的手牌时，你可以从牌堆顶的X张牌中获得一张与此牌花色不同的牌，并将其余牌以任意顺序置于牌堆顶。出牌阶段，你至多可使用X张手牌。（X为你的体力上限）',
 			
-			sp_yingbian:'应变篇',
+			sp_yingbian:'文德武备',
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",
 			sp_longzhou:"同舟共济",

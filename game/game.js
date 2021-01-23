@@ -4710,6 +4710,18 @@
 							map.connect_junzhu.hide();
 						}
 					},
+					connect_guozhan_mode:{
+						name:'游戏模式',
+						init:'normal',
+						item:{
+							normal:'势备',
+							yingbian:'应变',
+							old:'怀旧',
+						},
+						frequent:true,
+						restart:true,
+						intro:'<li>势备：默认模式，使用线下《君临天下·势备篇》的牌堆进行游戏。<br><li>应变：使用OL的应变国战牌堆进行游戏。<br><li>怀旧：使用传统国战的牌堆进行游戏。',
+					},
 					connect_player_number:{
 						name:'游戏人数',
 						init:'8',
@@ -4753,19 +4765,6 @@
 						// frequent:true,
 						intro:'主将和副将都明置后，若为特定组合，可获得【珠联璧合】标记'
 					},
-					connect_guozhanpile:{
-						name:'使用国战牌堆',
-						init:true,
-						frequent:true,
-						restart:true,
-					},
-					connect_onlyguozhan:{
-						name:'使用国战武将',
-						init:true,
-						frequent:true,
-						restart:true,
-						intro:'开启武将技能将替换为国战版本并禁用非国战武将'
-					},
 					connect_junzhu:{
 						name:'替换君主',
 						init:true,
@@ -4803,10 +4802,14 @@
 						name:'游戏模式',
 						init:'normal',
 						item:{
-							normal:'标准',
-							mingjiang:'明将'
+							normal:'势备',
+							yingbian:'应变',
+							old:'怀旧',
+							free:'自由',
 						},
 						frequent:true,
+						restart:true,
+						intro:'<li>势备：默认模式，使用线下《君临天下·势备篇》的牌堆进行游戏。<br><li>应变：使用OL的应变国战牌堆进行游戏。<br><li>怀旧：使用传统国战的牌堆进行游戏。<br><li>自由：使用玩家的自定义牌堆进行游戏。',
 					},
 					player_number:{
 						name:'游戏人数',
@@ -4864,12 +4867,6 @@
 						init:true,
 						// frequent:true,
 						intro:'主将和副将都明置后，若为特定组合，可获得【珠联璧合】标记'
-					},
-					guozhanpile:{
-						name:'使用国战牌堆',
-						init:true,
-						frequent:true,
-						restart:true,
 					},
 					changeViceType:{
 						name:'副将变更方式',
@@ -26728,6 +26725,11 @@
 								}
 							}
 							game.finishCards();
+							if(mode.characterPack){
+								for(var i in mode.characterPack){
+									lib.characterPack[i]=mode.characterPack[i];
+								}
+							}
 							_status.event={
 								finished:true,
 								next:[],
@@ -36950,7 +36952,7 @@
 											updateActive();
 										},
 									};
-									if(mode.indexOf('mode_')==0&&mode.indexOf('mode_extension_')!=0){
+									if(mode.indexOf('mode_')==0&&mode.indexOf('mode_extension_')!=0&&mode.indexOf('mode_guozhan')!=0){
 										cfgnodeY.clear=true;
 										delete cfgnodeY.onclick;
 									}
@@ -49080,6 +49082,12 @@
 				switch(config.identity_mode){
 					case 'purple':return '三对三对二';
 					case 'zhong':return '忠胆英杰';
+				}
+			}
+			else if(config.mode=='guozhan'&&config.guozhan_mode!='normal'){
+				switch(config.guozhan_mode){
+					case 'yingbian':return '应变国战';
+					case 'old':return '怀旧国战';
 				}
 			}
 			else{

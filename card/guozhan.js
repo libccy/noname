@@ -202,13 +202,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				filterTarget:function(card,player,target){
-					return target!=player&&(get.mode()!='guozhan'||target.countCards('e')>0);
+					return target!=player&&(get.mode()!='guozhan'||_status.mode=='yingbian'||_status.mode=='free'||target.countCards('e')>0);
 				},
 				enable:true,
 				yingbian_prompt:'此牌的效果改为依次执行所有选项',
 				content:function(){
 					'step 0'
-					if(get.mode()!='guozhan'&&!get.is.single()) event.goto(2);
+					if((get.mode()!='guozhan'||_status.mode=='yingbian'||_status.mode=='free')&&!get.is.single()) event.goto(2);
 					else if(!target.countCards('e',function(card){
 						return lib.filter.cardDiscardable(card,target);
 					})){
@@ -274,7 +274,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target){
-							if(get.mode()!='guozhan'&&!get.is.single()){
+							if(!get.is.single()&&(get.mode()!='guozhan'||_status.mode=='yingbian'||_status.mode=='free')){
 								if(target.countCards('e',function(card){
 									return get.value(card,target)<=0;
 								})>1) return 1;

@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.108.3',
+	'v1.9.108.3.2',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -3658,6 +3658,7 @@ window.noname_asset_list=[
 	'image/character/zhanghuyuechen.jpg',
 	'image/character/zhangling.jpg',
 	'image/character/xin_zhangfei.jpg',
+	'image/character/junk_simayi.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',

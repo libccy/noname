@@ -988,7 +988,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					backup:function(links,player){
 						return {
-							audio:'xinjingong',
+							audio:'jingong',
 							filterCard:true,
 							popname:true,
 							position:'he',
@@ -3764,63 +3764,61 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jingong:{
 				audio:2,
 				enable:'phaseUse',
+				usable:1,
 				filter:function(event,player){
-					return player.countCards('he',function(card){
+					return event.xinjingong_list&&player.countCards('he',function(card){
 						return card.name=='sha'||get.type(card)=='equip';
 					});
 				},
-				delay:false,
-				usable:1,
-				content:function(){
-					'step 0'
-					var list=get.inpile('trick').randomGets(2);
-					if(Math.random()<0.5){
-						list.push('wy_meirenji');
+				onChooseToUse:function(event){
+					if(!game.online){
+						var evt=event.getParent();
+						if(evt.name!='phaseUse') return;
+						if(!evt.xinjingong_list){
+							var list=get.inpile('trick').randomGets(2);
+							if(Math.random()<0.5){
+								list.push('wy_meirenji');
+							}
+							else{
+								list.push('wy_xiaolicangdao');
+							}
+							evt.xinjingong_list=list;
+						}
+						if(!event.xinjingong_list) event.set('xinjingong_list',evt.xinjingong_list);
 					}
-					else{
-						list.push('wy_xiaolicangdao');
-					}
-					for(var i=0;i<list.length;i++){
-						list[i]=['锦囊','',list[i]];
-					}
-					player.chooseButton(['矜功',[list,'vcard']]).set('filterButton',function(button,player){
-						return game.hasPlayer(function(current){
-							return player.canUse(button.link[2],current,true,false);
-						});
-					}).set('ai',function(button){
-						var player=_status.event.player;
-						return player.getUseValue(button.link[2]);
-					});
-					'step 1'
-					if(result.bool){
-						var name=result.links[0][2];
-						event.fakecard={name:name};
-						player.chooseCardTarget({
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						var list=[];
+						for(var i of event.xinjingong_list) list.push(['锦囊','',i]);
+						return ui.create.dialog('矜功',[list,'vcard']);
+					},
+					filter:function(button,player){
+						return lib.filter.filterCard({name:button.link[2]},player,_status.event.getParent());
+					},
+					check:function(button){
+						return _status.event.player.getUseValue({name:button.link[2]});
+					},
+					backup:function(links,player){
+						return {
+							audio:'jingong',
+							filterCard:true,
+							popname:true,
+							position:'he',
+							viewAs:{name:links[0][2]},
+							check:function(card){
+								return 6-get.value(card);
+							},
 							filterCard:function(card){
 								return card.name=='sha'||get.type(card)=='equip';
 							},
-							position:'he',
-							filterTarget:lib.filter.filterTarget,
-							selectTarget:lib.filter.selectTarget,
-							ai1:function(card){
-								return 7-get.value(card);
+							precontent:function(){
+								player.addTempSkill('jingong2');
 							},
-							ai2:function(target){
-								var card=_status.event.fakecard;
-								var player=_status.event.player;
-								return get.effect(target,card,player,player);
-							},
-							_get_card:event.fakecard,
-							prompt:'将一张装备牌或【杀】当作'+get.translation(name)+'使用'
-						}).set('fakecard',event.fakecard);
-					}
-					else{
-						event.finish();
-					}
-					'step 2'
-					if(result.bool){
-						player.useCard(event.fakecard,result.cards,result.targets);
-						player.addTempSkill('jingong2');
+						};
+					},
+					prompt:function(links,player){
+						return '将一张【杀】或装备牌当做'+get.translation(links[0][2])+'使用';
 					}
 				},
 				ai:{

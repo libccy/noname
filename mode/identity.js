@@ -1969,7 +1969,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(game.zhu.group=='shen'&&!game.zhu.isUnseen(0)){
 						var list=['wei','shu','wu','qun','jin','key'];
 						for(var i=0;i<list.length;i++){
-							if(!lib.group.contains(list[i])) list[i].splice(i--,1);
+							if(!lib.group.contains(list[i])) list.splice(i--,1);
 							else list[i]=['','','group_'+list[i]];
 						}
 						game.zhu.chooseButton(['请选择神武将的势力',[list,'vcard']],true).set('ai',function(){
@@ -2050,8 +2050,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(shen.length){
 						var list=['wei','shu','wu','qun','jin','key'];
 						for(var i=0;i<list.length;i++){
-							if(!lib.group.contains(list[i])) list[i].splice(i--,1);
-							list[i]=['','','group_'+list[i]];
+							if(!lib.group.contains(list[i])) list.splice(i--,1);
+							else list[i]=['','','group_'+list[i]];
 						}
 						for(var i=0;i<shen.length;i++){
 							shen[i]=[shen[i],['请选择神武将的势力',[list,'vcard']],1,true];

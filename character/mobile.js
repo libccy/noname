@@ -3823,7 +3823,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			remoucheng:{
-				derivation:'rejingong',
+				derivation:'jingong',
 				trigger:{
 					player:'remoucheng_awaken'
 				},
@@ -3835,59 +3835,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.awakenSkill('remoucheng');
 					player.removeSkill('relianji');
-					player.addSkill('rejingong');
+					player.addSkill('jingong');
 					player.gainMaxHp();
 					player.recover();
 				},
 			},
-			rejingong:{
-				audio:'jingong',
-				enable:'phaseUse',
-				delay:0,
-				usable:1,
-				content:function(){
-					'step 0'
-					var list=get.inpile('trick').randomGets(2);
-					if(Math.random()<0.5){
-						list.push('wy_meirenji');
-					}
-					else{
-						list.push('wy_xiaolicangdao');
-					}
-					for(var i=0;i<list.length;i++){
-						list[i]=['锦囊','',list[i]];
-					}
-					player.chooseButton(['矜功',[list,'vcard']]).set('filterButton',function(button,player){
-						return game.hasPlayer(function(current){
-							return player.canUse(button.link[2],current,true,false);
-						});
-					}).set('ai',function(button){
-						var player=_status.event.player;
-						var name=button.link[2];
-						if(game.hasPlayer(function(current){
-							return player.canUse(name,current)&&get.effect(current,{name:name},player,player)>0;
-						})){
-							if(name=='wy_meirenji'||name=='wy_xiaolicangdao') return Math.random()+0.5;
-							return Math.random();
-						}
-						return 0;
-					});
-					'step 1'
-					if(result.bool){
-						player.chooseUseTarget(result.links[0][2],true);
-						player.addTempSkill('jingong2');
-					}
-				},
-				ai:{
-					order:2,
-					result:{
-						player:function(player){
-							if((player.hp<=2||player.needsToDiscard())&&!player.getStat('damage')) return 0;
-							return 1;
-						}
-					}
-				}
-			},	
 			shouye:{
 				audio:2,
 				group:'shouye_after',
@@ -6441,8 +6393,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			relianji_info:'出牌阶段限一次，你可以选择两名其他角色。第一名角色随机使用牌堆中的一张武器牌，然后这名角色视为对另一名角色随机使用一张下列的牌名的牌：【决斗】、【火攻】、【南蛮入侵】、【万箭齐发】或普【杀】。然后若此牌造成伤害，你获得X枚“连计”标记（X为此次扣减的体力值点数）。',
 			remoucheng:'谋逞',
 			remoucheng_info:'觉醒技，当一名角色造成伤害后，若你拥有的“连计”标记数大于2，你加1点体力上限，回复1点体力，失去“连计”，获得“矜功”。',
-			rejingong:'矜功',
-			rejingong_info:'每回合可以用三个随机锦囊中的一个，三个锦囊中有一个是专属锦囊，本回合未造成伤害会失去1点体力。',
 			mobile_default:'常规',
 			mobile_others:'其他',
 			

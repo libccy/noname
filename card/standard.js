@@ -451,7 +451,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					equipValue:function(card,player){
 						if(!game.hasPlayer(function(current){
-							return player.canUse('sha',current)&&get.distance(player,current)<=1&&get.effect(current,{name:'sha'},player,player)>0;
+							return get.distance(player,current)<=1&&player.canUse('sha',current)&&get.effect(current,{name:'sha'},player,player)>0;
 						})){
 							return 1;
 						}
@@ -1362,7 +1362,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					expose:0.2
 				},
 				notarget:true,
-				yingbian_prompt:'当此牌生效后，你获得此牌响应的目标牌',
+				yingbian_prompt:function(card){
+					var suit=card.suit;
+					if(suit=='club'||suit=='spade') return '当你声明使用此牌时，你摸一张牌';
+					else return '当此牌生效后，你获得此牌响应的目标牌';
+				},
+				yingbian:function(event){
+					if(event.card.cards&&event.card.cards.length==1){
+						var suit=event.card.cards[0].suit;
+						if(suit=='heart'||suit=='diamond') return;
+					}
+					event.player.draw();
+				},
 				contentBefore:function(){
 					'step 0'
 					if(get.mode()=='guozhan'&&get.cardtag(card,'guo')){
@@ -1403,8 +1414,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					if(event.card.yingbian){
+						if(!event.card.cards||event.card.cards.length!=1) return;
+						var suit=event.card.cards[0].suit;
+						if(suit!='heart'&&suit!='diamond') return;
 						var cardx=event.getParent().respondTo;
-						if(cardx&&cardx[1]&&cardx[1].cards&&cardx[1].cards.filterInD().length) player.gain(cardx[1].cards.filterInD(),'gain2','log');
+						if(cardx&&cardx[1]&&cardx[1].cards&&cardx[1].cards.filterInD().length) player.gain(cardx[1].cards.filterInD('od'),'gain2','log');
 					}
 				},
 			},
@@ -1872,10 +1886,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					directHit_ai:true,
 					skillTagFilter:function(player,tag,arg){
-						if(get.attitude(player,arg.target)<0&&arg.card.name=='sha'&&player.countCards('he',function(card){
+						if(player._guanshi_temp) return;
+						player._guanshi_temp=true;
+						var bool=(get.attitude(player,arg.target)<0&&arg.card.name=='sha'&&player.countCards('he',function(card){
 							return card!=player.getEquip('guanshi')&&card!=arg.card&&(!arg.card.cards||!arg.card.cards.contains(card))&&get.value(card)<5;
-						})>1) return true;
-						return false;
+						})>1);
+						delete player._guanshi_temp;
+						return bool;
 					},
 				},
 			},

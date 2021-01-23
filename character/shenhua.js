@@ -7614,7 +7614,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiaoqiao:'旧小乔',
 			zhoutai:'界周泰',
 			zhangjiao:'张角',
-			yuji:'于吉',
+			//yuji:'于吉',
 			shensu:'神速',
 			shensu1:'神速',
 			shensu2:'神速',

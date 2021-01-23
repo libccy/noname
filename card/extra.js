@@ -984,12 +984,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(arg&&arg.player){
 							if(arg.player.hasSkillTag('unequip',false,{
 								name:arg.card?arg.card.name:null,
-								target:target,
+								target:player,
 								card:arg.card,
 							})) return false;
 							if(arg.player.hasSkillTag('unequip_ai',false,{
 								name:arg.card?arg.card.name:null,
-								target:target,
+								target:player,
 								card:arg.card,
 							})) return false;
 							if(arg.player.hasSkillTag('jueqing',false,player)) return false;

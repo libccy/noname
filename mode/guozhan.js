@@ -26,7 +26,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			}
-			lib.card.sha.complexTarget=true;
 		},
 		onreinit:function(){
 			var pack=lib.characterPack.mode_guozhan;
@@ -40,6 +39,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				if(!lib.translate[i]){
 					lib.translate[i]=lib.translate[i.slice(3)];
+				}
+			}
+			for(var i in lib.character){
+				if(lib.character[i][1]=='shen'){
+					if(lib.character[i][4]&&(lib.group.contains(lib.character[i][4][0])||lib.character[i][4][0]=='key')){
+						lib.character[i][1]=lib.character[i][4][0];
+					}
+					else{
+						lib.character[i][1]='qun';
+					}
 				}
 			}
 		},
@@ -68,9 +77,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				game.waitForPlayer();
 			}
 			else{
-				if(get.config('guozhanpile')){
-					lib.card.list=lib.guozhanPile.slice(0);
-					game.fixedPile=true;
+				_status.mode=get.config('guozhan_mode');
+				if(!['normal','yingbian','old','free'].contains(_status.mode)) _status.mode='normal';
+				//决定牌堆
+				switch(_status.mode){
+					case 'old':lib.card.list=lib.guozhanPile_old.slice(0);break;
+					case 'yingbian':
+						lib.card.list=lib.guozhanPile_yingbian.slice(0);
+						delete lib.translate.shuiyanqijunx_info_guozhan;
+						break;
+					case 'normal':lib.card.list=lib.guozhanPile.slice(0);break;
+				}
+				if(_status.mode!='free') game.fixedPile=true;
+				else{
+					delete lib.translate.shuiyanqijunx_info_guozhan;
 				}
 				game.prepareArena();
 				// game.delay();
@@ -84,20 +104,26 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 			"step 1"
 			if(_status.connectMode){
-				if(lib.configOL.guozhanpile){
-					lib.card.list=lib.guozhanPile.slice(0);
-					game.fixedPile=true;
+				_status.mode=lib.configOL.guozhan_mode;
+				if(!['normal','yingbian','old'].contains(_status.mode)) _status.mode='normal';
+				//决定牌堆
+				switch(_status.mode){
+					case 'old':lib.card.list=lib.guozhanPile_old.slice(0);break;
+					case 'yingbian':lib.card.list=lib.guozhanPile_yingbian.slice(0);break;
+					default:lib.card.list=lib.guozhanPile.slice(0);break;
 				}
-				game.broadcastAll(function(pack){
+				game.fixedPile=true;
+				game.broadcastAll(function(mode){
+					_status.mode=mode;
+					if(mode=='yingbian'){
+						delete lib.translate.shuiyanqijunx_info_guozhan;
+					}
 					for(var i=0;i<game.players.length;i++){
 						game.players[i].node.name.hide();
 						game.players[i].node.name2.hide();
 					}
-					lib.characterPack.mode_guozhan=pack;
+					var pack=lib.characterPack.mode_guozhan;
 					for(var i in pack){
-						if(!lib.configOL.onlyguozhan){
-							if(lib.character[i.slice(3)]) continue;
-						}
 						lib.character[i]=pack[i];
 						if(!lib.character[i][4]){
 							lib.character[i][4]=[];
@@ -106,7 +132,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							lib.translate[i]=lib.translate[i.slice(3)];
 						}
 					}
-				},lib.characterPack.mode_guozhan);
+					for(var i in lib.character){
+						if(lib.character[i][1]=='shen'){
+							if(lib.character[i][4]&&(lib.group.contains(lib.character[i][4][0])||lib.character[i][4][0]=='key')){
+								lib.character[i][1]=lib.character[i][4][0];
+							}
+							else{
+								lib.character[i][1]='qun';
+							}
+						}
+					}
+				},_status.mode);
 				game.randomMapOL();
 			}
 			else{
@@ -301,6 +337,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				guozhan_bian:["gz_liqueguosi","gz_zuoci","gz_bianfuren","gz_xunyou","gz_lingtong","gz_lvfan","gz_masu","gz_shamoke",],
 				guozhan_quan:["gz_cuimao","gz_yujin","gz_wangping","gz_fazheng","gz_wuguotai","gz_lukang","gz_yuanshu","gz_zhangxiu"],
 				guozhan_jun:["gz_jun_caocao","gz_jun_sunquan","gz_jun_liubei","gz_jun_zhangjiao"],
+				guozhan_jin:['gz_jin_simayi','gz_jin_simazhao','gz_jin_simashi','gz_jin_zhangchunhua','gz_jin_wangyuanji','gz_jin_xiahouhui'],
 				guozhan_others:["gz_lingcao","gz_lifeng","gz_beimihu","gz_jianggan"],
 			}
 		},
@@ -424,6 +461,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_yuanshu:['male','qun',4,['gzweidi','gzyongsi'],['gzskin']],
 				gz_zhangxiu:['male','qun',4,['gzfudi','congjian'],['gzskin']],
 				gz_jun_caocao:['male','wei',4,['jianan','huibian','gzzongyu','wuziliangjiangdao'],[]],
+				
+				gz_jin_zhangchunhua:['female','jin',3,['huishi','qingleng']],
+				gz_jin_simayi:['male','jin',3,['smyyingshi','xiongzhi','xinquanbian']],
+				gz_jin_wangyuanji:['female','jin',3,['yanxi']],
+				gz_jin_simazhao:['male','jin',3,['choufa','zhaoran']],
+				gz_jin_xiahouhui:['female','jin',3,['jyishi','shiduo']],
+				gz_jin_simashi:['male','jin',3,['yimie','tairan']],
 			}
 		},
 		skill:{
@@ -5136,6 +5180,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						while(list.length){
 							ui.cardPile.insertBefore(list.pop(),ui.cardPile.firstChild);
 						}
+						game.updateRoundNumber();
 					}
 				}
 			},
@@ -6548,7 +6593,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		game:{
 			getCharacterChoice:function(list,num){
 				var choice=list.splice(0,num);
-				var map={wei:[],shu:[],wu:[],qun:[],key:[]};
+				var map={wei:[],shu:[],wu:[],qun:[],key:[],jin:[]};
 				for(var i=0;i<choice.length;i++){
 					var group=lib.character[choice[i]][1];
 					if(map[group]){
@@ -7144,21 +7189,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.broadcastAll(function(){
 						ui.arena.classList.add('choose-character');
 					});
-					var list;
-					if(lib.configOL.onlyguozhan){
-						list=[];
+					var list=[];
+					//if(lib.configOL.onlyguozhan){
+						//list=[];
 						for(var i in lib.characterPack.mode_guozhan){
 							if(i.indexOf('gz_shibing')==0) continue;
 							if(get.is.jun(i)) continue;
-							if(lib.character[i][4].contains('hiddenSkill')) continue;
+							if(lib.config.guozhan_banned&&lib.config.guozhan_banned.contains(i)) continue;
 							list.push(i);
 						}
-					}
-					else{
-						list=get.charactersOL(function(i){
-							return lib.character[i][4].contains('hiddenSkill');
-						});
-					}
+					//}
+					//else{
+					//	list=get.charactersOL(function(i){
+					//		return lib.character[i][4].contains('hiddenSkill');
+					//	});
+					//}
 					_status.characterlist=list.slice(0);
 					_status.yeidentity=[];
 					event.list=list.slice(0);
@@ -7644,9 +7689,236 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			guozhan_bian:"君临天下·变",
 			guozhan_quan:"君临天下·权",
 			guozhan_jun:"君主武将",
+			guozhan_jin:'文德武备',
 			guozhan_others:"其他",
 		},
 		junList:['liubei','zhangjiao','sunquan','caocao'],
+		guozhanPile_yingbian:[
+			['spade',1,'juedou'],
+			['spade',1,'shandian'],
+			['spade',2,'cixiong'],
+			['spade',2,'bagua'],
+			['spade',2,'taigongyinfu'],
+			['spade',3,'shuiyanqijunx',null,['yingbian_zhuzhan']],
+			['spade',3,'zhujinqiyuan',null,['yingbian_zhuzhan']],
+			['spade',4,'guohe'],
+			['spade',4,'shuiyanqijunx',null,['yingbian_zhuzhan']],
+			['spade',5,'sha'],
+			['spade',5,'jueying'],
+			['spade',6,'qinggang'],
+			['spade',6,'sha','ice'],
+			['spade',7,'sha'],
+			['spade',7,'sha','ice'],
+			['spade',8,'sha','ice'],
+			['spade',8,'sha','ice'],
+			['spade',9,'sha'],
+			['spade',9,'jiu'],
+			['spade',10,'sha',null,['yingbian_canqu']],
+			['spade',10,'bingliang'],
+			['spade',11,'sha',null,['yingbian_canqu']],
+			['spade',11,'wuxie',null,['yingbian_kongchao']],
+			['spade',12,'zhangba'],
+			['spade',12,'tiesuo'],
+			['spade',13,'nanman',null,['yingbian_fujia']],
+			['spade',13,'wutiesuolian'],
+
+			['heart',1,'taoyuan'],
+			['heart',1,'wanjian'],
+			['heart',2,'shan'],
+			['heart',2,'chuqibuyi',null,['yingbian_zhuzhan']],
+			['heart',3,'wugu'],
+			['heart',3,'chuqibuyi',null,['yingbian_zhuzhan']],
+			['heart',4,'tao'],
+			['heart',4,'sha','fire',['yingbian_canqu']],
+			['heart',5,'qilin'],
+			['heart',5,'chitu'],
+			['heart',6,'tao'],
+			['heart',6,'lebu'],
+			['heart',7,'tao'],
+			['heart',7,'dongzhuxianji'],
+			['heart',8,'tao'],
+			['heart',8,'dongzhuxianji'],
+			['heart',9,'tao'],
+			['heart',9,'yuanjiao'],
+			['heart',10,'tao'],
+			['heart',10,'sha'],
+			['heart',11,'shan'],
+			['heart',11,'yiyi'],
+			['heart',12,'tao'],
+			['heart',12,'sha'],
+			['heart',12,'guohe'],
+			['heart',13,'shan'],
+			['heart',13,'zhuahuang'],
+
+			['diamond',1,'zhuge'],
+			['diamond',1,'wuxinghelingshan'],
+			['diamond',2,'shan'],
+			['diamond',2,'tao'],
+			['diamond',3,'shan'],
+			['diamond',3,'shunshou'],
+			['diamond',4,'yiyi'],
+			['diamond',4,'sha','fire',['yingbian_canqu']],
+			['diamond',5,'guanshi'],
+			['diamond',5,'sha','fire'],
+			['diamond',6,'shan'],
+			['diamond',6,'wuliu'],
+			['diamond',7,'shan',null,['yingbian_kongchao']],
+			['diamond',7,'shan',null,['yingbian_kongchao']],
+			['diamond',8,'shan',null,['yingbian_kongchao']],
+			['diamond',8,'shan',null,['yingbian_kongchao']],
+			['diamond',9,'shan'],
+			['diamond',9,'jiu'],
+			['diamond',10,'shan'],
+			['diamond',10,'sha'],
+			['diamond',11,'shan'],
+			['diamond',11,'sha'],
+			['diamond',12,'sha'],
+			['diamond',12,'sanjian'],
+			['diamond',12,'wuxie',null,['guo']],
+			['diamond',13,'shan'],
+			['diamond',13,'zixin'],
+
+			['club',1,'juedou'],
+			['club',1,'huxinjing'],
+			['club',2,'sha'],
+			['club',2,'tengjia'],
+			['club',2,'renwang'],
+			['club',3,'guohe'],
+			['club',3,'zhibi'],
+			['club',4,'sha',null,['yingbian_kongchao']],
+			['club',4,'zhibi'],
+			['club',5,'sha',null,['yingbian_kongchao']],
+			['club',5,'tongque'],
+			['club',6,'lebu'],
+			['club',6,'sha','thunder'],
+			['club',7,'nanman'],
+			['club',7,'sha','thunder'],
+			['club',8,'sha'],
+			['club',8,'sha','thunder'],
+			['club',9,'sha'],
+			['club',9,'jiu'],
+			['club',10,'sha'],
+			['club',10,'bingliang'],
+			['club',11,'sha'],
+			['club',11,'sha'],
+			['club',12,'zhujinqiyuan',null,['yingbian_zhuzhan']],
+			['club',12,'tiesuo'],
+			['club',13,'wuxie',null,['guo']],
+			['club',13,'tiesuo'],
+		],
+		guozhanPile_old:[
+			['spade',1,'juedou'],
+			['spade',1,'shandian'],
+			['spade',2,'cixiong'],
+			['spade',2,'bagua'],
+			['spade',2,'hanbing'],
+			['spade',3,'guohe'],
+			['spade',3,'shunshou'],
+			['spade',4,'guohe'],
+			['spade',4,'shunshou'],
+			['spade',5,'sha'],
+			['spade',5,'jueying'],
+			['spade',6,'qinggang'],
+			['spade',6,'sha','thunder'],
+			['spade',7,'sha'],
+			['spade',7,'sha','thunder'],
+			['spade',8,'sha'],
+			['spade',8,'sha'],
+			['spade',9,'sha'],
+			['spade',9,'jiu'],
+			['spade',10,'sha'],
+			['spade',10,'bingliang'],
+			['spade',11,'sha'],
+			['spade',11,'wuxie'],
+			['spade',12,'zhangba'],
+			['spade',12,'tiesuo'],
+			['spade',13,'nanman'],
+			['spade',13,'dawan'],
+
+			['club',1,'juedou'],
+			['club',1,'baiyin'],
+			['club',2,'sha'],
+			['club',2,'tengjia'],
+			['club',2,'renwang'],
+			['club',3,'sha'],
+			['club',3,'zhibi'],
+			['club',4,'sha'],
+			['club',4,'zhibi'],
+			['club',5,'sha'],
+			['club',5,'dilu'],
+			['club',6,'lebu'],
+			['club',6,'sha','thunder'],
+			['club',7,'nanman'],
+			['club',7,'sha','thunder'],
+			['club',8,'sha'],
+			['club',8,'sha','thunder'],
+			['club',9,'sha'],
+			['club',9,'jiu'],
+			['club',10,'sha'],
+			['club',10,'bingliang'],
+			['club',11,'sha'],
+			['club',11,'sha'],
+			['club',12,'jiedao'],
+			['club',12,'tiesuo'],
+			['club',13,'wuxie',null,['guo']],
+			['club',13,'tiesuo'],
+
+			['diamond',1,'zhuge'],
+			['diamond',1,'zhuque'],
+			['diamond',2,'shan'],
+			['diamond',2,'tao'],
+			['diamond',3,'shan'],
+			['diamond',3,'shunshou'],
+			['diamond',4,'yiyi'],
+			['diamond',4,'sha','fire'],
+			['diamond',5,'guanshi'],
+			['diamond',5,'sha','fire'],
+			['diamond',6,'shan'],
+			['diamond',6,'wuliu'],
+			['diamond',7,'shan'],
+			['diamond',7,'shan'],
+			['diamond',8,'shan'],
+			['diamond',8,'shan'],
+			['diamond',9,'shan'],
+			['diamond',9,'jiu'],
+			['diamond',10,'shan'],
+			['diamond',10,'sha'],
+			['diamond',11,'shan'],
+			['diamond',11,'sha'],
+			['diamond',12,'sha'],
+			['diamond',12,'sanjian'],
+			['diamond',12,'wuxie',null,['guo']],
+			['diamond',13,'shan'],
+			['diamond',13,'zixin'],
+
+			['heart',1,'taoyuan'],
+			['heart',1,'wanjian'],
+			['heart',2,'shan'],
+			['heart',2,'huogong'],
+			['heart',3,'wugu'],
+			['heart',3,'huogong'],
+			['heart',4,'tao'],
+			['heart',4,'sha','fire'],
+			['heart',5,'qilin'],
+			['heart',5,'chitu'],
+			['heart',6,'tao'],
+			['heart',6,'lebu'],
+			['heart',7,'tao'],
+			['heart',7,'wuzhong'],
+			['heart',8,'tao'],
+			['heart',8,'wuzhong'],
+			['heart',9,'tao'],
+			['heart',9,'yuanjiao'],
+			['heart',10,'tao'],
+			['heart',10,'sha'],
+			['heart',11,'shan'],
+			['heart',11,'yiyi'],
+			['heart',12,'tao'],
+			['heart',12,'sha'],
+			['heart',12,'guohe'],
+			['heart',13,'shan'],
+			['heart',13,'zhuahuang'],
+		],
 		guozhanPile:[
 			['spade',1,'juedou'],
 			['spade',1,'shandian'],
