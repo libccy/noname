@@ -1824,10 +1824,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.identityVideoName='同将模式';
 						var target=(_status.mode=='zhong')?game.zhong:game.zhu;
 						if(get.config('double_character')){
-							target.init(game.me.name,game.me.name2);
+							target.init(game.me.name1,game.me.name2);
 						}
 						else{
-							target.init(game.me.name);
+							target.init(game.me.name1);
 						}
 						target.hp++;
 						target.maxHp++;
@@ -1839,10 +1839,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						else{
 							if(get.config('double_character')){
-								player.init(game.me.name,game.me.name2);
+								player.init(game.me.name1,game.me.name2);
 							}
 							else{
-								player.init(game.me.name);
+								player.init(game.me.name1);
 							}
 						}
 					},
@@ -1858,7 +1858,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								return list.concat(list2.slice(0,num));
 							}
 						}
-					}
+					},
+					chooseCharacterBefore:function(){
+						if(_status.mode=='purple') _status.mode='normal';
+					},
 				}
 			},
 			jiazuzhizheng:{

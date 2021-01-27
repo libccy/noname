@@ -252,7 +252,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(card.yingbian||!result.bool) target.damage('thunder');
 				},
 				ai:{
-					order:7,
+					order:6,
 					value:4,
 					useful:2,
 					tag:{

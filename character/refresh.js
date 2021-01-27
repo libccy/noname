@@ -577,7 +577,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
 					game.updateRoundNumber();
 					'step 2'
-					target.chooseCard('he',true).set('prompt','选择交给'+get.translation(player)+'一张锦囊牌，或依次弃置两张非锦囊牌。');
+					if(!target.countCards('he',function(card){
+						if(get.type2(card)=='trick') return true;
+						return lib.filter.cardDiscardable(card,target,'remieji');
+					})) event.finish();
+					else target.chooseCard('he',true,function(card,player){
+						if(get.type2(card)=='trick') return true;
+						return lib.filter.cardDiscardable(card,player,'remieji');
+					}).set('prompt','选择交给'+get.translation(player)+'一张锦囊牌，或依次弃置两张非锦囊牌。');
 					'step 3'
 					if(result.cards&&result.cards.length){
 						if(get.type2(result.cards[0])=='trick'){

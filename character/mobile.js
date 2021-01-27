@@ -590,7 +590,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					delete player.storage.jinglve2;
 					delete player.storage.jinglve3;
 				},
-				trigger:{global:['dieBegin','loseAfter']},
+				trigger:{global:['dieEnd','loseAfter']},
 				silent:true,
 				lastDo:true,
 				charlotte:true,
@@ -3565,6 +3565,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 1;
 				},
 				discard:false,
+				delay:false,
 				content:function(){
 					'step 0'
 					target.gain(cards,player,'giveAuto');

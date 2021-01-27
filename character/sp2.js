@@ -766,6 +766,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:9,
+					threaten:1.7,
 					result:{
 						target:function(player,target){
 							if(target.hasSkillTag('nogain')) return -0.1;

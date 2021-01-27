@@ -2759,6 +2759,14 @@ div:not(.handcards)>.card>.info>span,
 	background-image: radial-gradient(circle at bottom left, rgb(255, 218, 71), rgb(224, 191, 62))
 }
 
+.identitycircle > div > div[data-color='jin'] {
+	background-image: radial-gradient(circle at bottom left, rgb(100, 74, 139), rgb(96, 72, 136))
+}
+
+.identitycircle > div > div[data-color='key'] {
+	background-image: radial-gradient(circle at bottom left, rgb(203, 177, 255), rgb(203, 177, 255))
+}
+
 .unseen>.avatar,.unseen>.name:not(.name2),
 .unseen2>.avatar2,.unseen2>.name2 {
 	opacity: 0 !important;

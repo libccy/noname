@@ -10213,9 +10213,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else if(get.tag(event.card,'damage')){
-						if(player.countCards('h')<2) return true;
+						if(event.card.name=='shuiyanqijunx') return player.countCards('e')<2;
+						return true;
+						//if(player.countCards('h')<2) return true;
 					}
-					else if(event.card.name=='shunshou'&&player.hp>2){
+					else if((event.card.name=='shunshou'||(event.card.name=='zhujinqiyuan'&&(event.card.yingbian||get.distance(event.player,player)<0)))&&player.hp>2){
 						return true;
 					}
 					return false;

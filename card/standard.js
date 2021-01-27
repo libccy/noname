@@ -207,12 +207,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 										card:card,
 										jiu:true,
 									})){
- 									if(get.attitude(player,target)>0){
- 										return -7;
- 									}
- 									else{
- 										return -4;
- 									}
+										if(get.attitude(player,target)>0){
+											return -7;
+										}
+										else{
+											return -4;
+										}
 									}
 									return -0.5;
 								}
@@ -450,19 +450,25 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return get.order({name:'sha'})-0.1;
 					},
 					equipValue:function(card,player){
-						if(!game.hasPlayer(function(current){
-							return get.distance(player,current)<=1&&player.canUse('sha',current)&&get.effect(current,{name:'sha'},player,player)>0;
-						})){
-							return 1;
-						}
-						if(player.hasSha()&&_status.currentPhase==player){
-							if(player.getEquip('zhuge')&&player.countUsed('sha')||player.getCardUsable('sha')==0){
-								return 10;
+						if(player._zhuge_temp) return 1;
+						player._zhuge_temp=true;
+						var result=function(){
+							if(!game.hasPlayer(function(current){
+								return get.distance(player,current)<=1&&player.canUse('sha',current)&&get.effect(current,{name:'sha'},player,player)>0;
+							})){
+								return 1;
 							}
-						}
-						var num=player.countCards('h','sha');
-						if(num>1) return 6+num;
-						return 3+num;
+							if(player.hasSha()&&_status.currentPhase==player){
+								if(player.getEquip('zhuge')&&player.countUsed('sha')||player.getCardUsable('sha')==0){
+									return 10;
+								}
+							}
+							var num=player.countCards('h','sha');
+							if(num>1) return 6+num;
+							return 3+num;
+						}();
+						delete player._zhuge_temp;
+						return result;
 					},
 					basic:{
 						equipValue:5
@@ -661,10 +667,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(dialog.buttons[i].link==card){
 							button=dialog.buttons[i];
 							button.querySelector('.info').innerHTML=function(target){
- 							if(target._tempTranslate) return target._tempTranslate;
- 							var name=target.name;
- 							if(lib.translate[name+'_ab']) return lib.translate[name+'_ab'];
- 							return get.translation(name);
+								if(target._tempTranslate) return target._tempTranslate;
+								var name=target.name;
+								if(lib.translate[name+'_ab']) return lib.translate[name+'_ab'];
+								return get.translation(name);
 							}(target);
 							dialog.buttons.remove(button);
 							break;

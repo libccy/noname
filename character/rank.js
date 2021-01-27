@@ -998,6 +998,7 @@ window.noname_character_rank={
 		'zangba',
 		'junk_zhangrang',
 		'ol_guohuai',
+		'junk_simayi',
 	],
 	rarity:{
 		legend:[
@@ -1550,6 +1551,7 @@ window.noname_character_rank={
 			'caiyong',
 			'xin_chengpu',
 			'junk_zhangrang',
+			'junk_simayi',
 		],
 	}
 };

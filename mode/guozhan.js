@@ -30,9 +30,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		onreinit:function(){
 			var pack=lib.characterPack.mode_guozhan;
 			for(var i in pack){
-				if(!lib.configOL.onlyguozhan){
-					if(lib.character[i.slice(3)]) continue;
-				}
 				lib.character[i]=pack[i];
 				if(!lib.character[i][4]){
 					lib.character[i][4]=[];
@@ -271,6 +268,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			],
 			'2':[
 				'gz_re_lusu','gz_zhangzhang',
+				'gz_jin_simashi','gz_jin_zhangchunhua',
 			],
 			'1':[
 				'gz_caocao','gz_guojia','gz_xiahoudun',
@@ -285,12 +283,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				'gz_shamoke','gz_lifeng','gz_wangping',
 				'gz_xiaoqiao','gz_zhoutai','gz_lvfan',
 				'gz_beimihu','gz_mateng','gz_jiaxu',
+				'gz_jin_wangyuanji',
 			],
 			'7':[
 				'gz_zhanghe','gz_jianggan','gz_simayi',
 				'gz_weiyan','gz_huangyueying','gz_zhugeliang',
 				'gz_lingtong','gz_sunshangxiang','gz_sunce',
 				'gz_re_yuanshao','gz_yuanshu','gz_hetaihou',
+				'gz_jin_simashi',
 			],
 			'6':[
 				'gz_zhenji','gz_guojia','gz_yujin',
@@ -309,18 +309,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				'gz_madai','gz_liubei','gz_mifuren',
 				'gz_wuguotai','gz_luxun','gz_taishici',
 				'gz_zhangjiao','gz_zuoci','gz_pangde',
+				'gz_jin_zhangchunhua',
 			],
 			'3':[
 				'gz_xiahoudun','gz_yuejin','gz_caoren',
 				'gz_machao','gz_masu','gz_fazheng',
 				'gz_zhangzhang','gz_lvmeng','gz_huanggai',
 				'gz_jiling','gz_lvbu','gz_dongzhuo',
+				'gz_jin_xiahouhui','gz_jin_simazhao',
 			],
 			'2':[
 				'gz_cuimao','gz_xiahouyuan','gz_caohong',
 				'gz_zhurong','gz_zhurong','gz_jiangfei',
 				'gz_xusheng','gz_dingfeng','gz_sunjian',
 				'gz_zhangren','gz_kongrong','gz_yanwen',
+				'gz_jin_simayi',
 			],
 			'1':[
 				'gz_zangba','gz_bianfuren','gz_xuzhu',
@@ -6676,18 +6679,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				uiintro.add('<div class="text chat">出牌时限：'+lib.configOL.choose_timeout+'秒');
 				uiintro.add('<div class="text chat">国战牌堆：'+(lib.configOL.guozhanpile?'开启':'关闭'));
 				uiintro.add('<div class="text chat">鏖战模式：'+(lib.configOL.aozhan?'开启':'关闭'));
-				uiintro.add('<div class="text chat">观看下家副将：'+(lib.configOL.viewnext?'开启':'关闭'));
-				last=uiintro.add('<div class="text chat">国战武将：'+(lib.configOL.onlyguozhan?'开启':'关闭'));
-				if(!lib.configOL.onlyguozhan){
-					// uiintro.add('<div class="text chat">屏蔽弱将：'+(lib.configOL.ban_weak?'开启':'关闭'));
-					// last=uiintro.add('<div class="text chat">屏蔽强将：'+(lib.configOL.ban_strong?'开启':'关闭'));
-					if(lib.configOL.banned.length){
-						last=uiintro.add('<div class="text chat">禁用武将：'+get.translation(lib.configOL.banned));
-					}
-					if(lib.configOL.bannedcards.length){
-						last=uiintro.add('<div class="text chat">禁用卡牌：'+get.translation(lib.configOL.bannedcards));
-					}
-				}
+				last=uiintro.add('<div class="text chat">观看下家副将：'+(lib.configOL.viewnext?'开启':'关闭'));
 				last.style.paddingBottom='8px';
 			},
 			addRecord:function(bool){
@@ -6755,6 +6747,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						case 'unknown':list[i]='未知';break;
 						case 'ye':list[i]='野心家';break;
 						case 'qun':list[i]+='雄';break;
+						case 'key':list[i]='Key';break;
+						case 'jin':list[i]+='朝';break;
 						default:list[i]+='国';
 					}
 				}

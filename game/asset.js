@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.108.3.2',
+	'v1.9.108.3.3',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -5112,6 +5112,10 @@ window.noname_asset_list=[
 	'image/mode/versus/character/boss_tuntianchiwen.jpg',
 	'image/mode/versus/character/boss_yuhuoshiyuan.jpg',
 	'image/mode/versus/character/boss_yunpingqinglong.jpg',
+	'image/mode/versus/character/boss_baijiwenyuan.jpg',
+	'image/mode/versus/character/boss_fuweizilong.jpg',
+	'image/mode/versus/character/boss_kumuyuanrang.jpg',
+	'image/mode/versus/character/boss_yihanyunchang.jpg',
 	'image/mode/versus/character/liuqi.jpg',
 	'image/mode/versus/character/tangzi.jpg',
 	'image/splash/boss.jpg',

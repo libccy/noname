@@ -218,7 +218,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'equip5',
 				ai:{
 					basic:{
-						equipValue:2
+						equipValue:6.5
 					}
 				},
 				skills:['tongque_skill']
@@ -274,7 +274,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'equip5',
 				ai:{
 					basic:{
-						equipValue:2
+						equipValue:3
 					}
 				},
 				skills:['taigongyinfu_skill','taigongyinfu_link'],
