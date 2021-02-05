@@ -2362,7 +2362,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['re_huatuo'],
 				enable:'chooseToUse',
 				viewAsFilter:function(player){
-					return player!=_status.currentPhase&&player.countCards('h',{color:'red'})>0;
+					return player!=_status.currentPhase&&player.countCards('he',{color:'red'})>0;
 				},
 				filterCard:function(card){
 					return get.color(card)=='red';

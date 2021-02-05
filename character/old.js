@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				old_standard:['ol_yuanshu'],
 				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_guanqiujian","xiahouyuan","weiyan","xiaoqiao","pangde"],
 				old_refresh:["old_zhangfei","old_huatuo","old_zhaoyun","ol_huaxiong"],
-				old_yijiang1:["masu","xushu","yujin","xin_yujin","old_xusheng","old_lingtong"],
+				old_yijiang1:["masu","xushu","yujin","xin_yujin","old_xusheng","old_lingtong","fazheng"],
 				old_yijiang2:["old_zhonghui"],
 				old_yijiang3:["liru","old_zhuran","old_fuhuanghou","old_caochong"],
 				old_yijiang4:["old_caozhen","old_chenqun","old_zhuhuan"],
@@ -18,6 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			fazheng:['male','shu',3,['enyuan','xuanhuo']],
 			ol_xinxianying:['female','wei',3,['caishi','zhongjian']],
 			ol_yuanshu:['male','qun',4,['wangzun','tongji']],
 			pangde:['male','qun',4,['mashu','mengjin']],
@@ -790,6 +791,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldxuanfeng_info:'每当你失去一次装备区里的牌时，你可以执行下列两项中的一项：1.视为对任意一名其他角色使用一张【杀】（此【杀】不计入每回合的使用限制）；2.对与你距离1以内的一名其他角色造成一点伤害',
 			ol_yuanshu:'旧袁术',
 			ol_xinxianying:'旧辛宪英',
+			fazheng:'旧法正',
 			
 			old_standard:'标准包',
 			old_shenhua:'神话再临',

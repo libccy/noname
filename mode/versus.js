@@ -29,7 +29,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		start:function(){
 			"step 0"
 			_status.mode=get.config('versus_mode');
-			if(_status.connectMode&&lib.configOL.versus_mode=='guandu') _status.mode='guandu';
+			if(_status.connectMode) _status.mode=lib.configOL.versus_mode;
 			if(_status.brawl&&_status.brawl.submode){
 				_status.mode=_status.brawl.submode;
 			}
@@ -154,6 +154,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				_status.brawl.chooseCharacterBefore();
 			}
 			if(_status.connectMode){
+				if(_status.mode=='guandu'){
+					for(var i=0;i<lib.card.list.length;i++){
+						switch(lib.card.list[i][2]){
+							case 'wugu':lib.card.list[i][2]='tunliang';break;
+							case 'nanman':lib.card.list[i][2]='lulitongxin';break;
+							case 'taoyuan':case 'shandian':lib.card.list[i][2]='yuanjun';break;
+							case 'muniu':lib.card.list.splice(i--,1);break;
+						}
+					}
+				}
 				if(lib.configOL.versus_mode=='1v1'){
 					game.randomMapOL('hidden');
 				}
@@ -560,6 +570,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				return '枭雄';
 			},
 			checkOnlineResult:function(player){
+				if(_status.mode=='4v4'||_status.mode=='guandu'){
+					var zhu=game.findPlayer(function(current){
+						return current.identity=='zhu';
+					});
+					return player.side==zhu.side;
+				}
 				return game.players[0].side==player.side;
 			},
 			getRoomInfo:function(uiintro){

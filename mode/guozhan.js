@@ -283,7 +283,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				'gz_shamoke','gz_lifeng','gz_wangping',
 				'gz_xiaoqiao','gz_zhoutai','gz_lvfan',
 				'gz_beimihu','gz_mateng','gz_jiaxu',
-				'gz_jin_wangyuanji',
+				'gz_jin_wangyuanji','gz_huaxin',
 			],
 			'7':[
 				'gz_zhanghe','gz_jianggan','gz_simayi',
@@ -341,7 +341,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				guozhan_quan:["gz_cuimao","gz_yujin","gz_wangping","gz_fazheng","gz_wuguotai","gz_lukang","gz_yuanshu","gz_zhangxiu"],
 				guozhan_jun:["gz_jun_caocao","gz_jun_sunquan","gz_jun_liubei","gz_jun_zhangjiao"],
 				guozhan_jin:['gz_jin_simayi','gz_jin_simazhao','gz_jin_simashi','gz_jin_zhangchunhua','gz_jin_wangyuanji','gz_jin_xiahouhui'],
-				guozhan_others:["gz_lingcao","gz_lifeng","gz_beimihu","gz_jianggan"],
+				guozhan_others:["gz_lingcao","gz_lifeng","gz_beimihu","gz_jianggan","gz_huaxin"],
 			}
 		},
 		characterPack:{
@@ -354,6 +354,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_shibing2wu:['female','wu',0,[],['unseen']],
 				gz_shibing1qun:['male','qun',0,[],['unseen']],
 				gz_shibing2qun:['female','qun',0,[],['unseen']],
+				gz_shibing1jin:['male','qun',0,[],['unseen']],
+				gz_shibing2jin:['female','qun',0,[],['unseen']],
 
 				gz_caocao:['male','wei',4,['jianxiong']],
 				gz_simayi:['male','wei',3,['fankui','guicai']],
@@ -454,6 +456,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_lifeng:['male','shu',3,['tunchu','shuliang']],
 				gz_beimihu:["female","qun",3,["hmkguishu","hmkyuanyu"]],
 				gz_jianggan:["male","wei",3,["weicheng","daoshu"]],
+				gz_huaxin:['male','wei',3,['wanggui','xibing']],
 				
 				gz_cuimao:['male','wei',3,['gzzhengbi','gzfengying'],[]],
 				gz_yujin:['male','wei',4,['gzjieyue'],['gzskin']],
@@ -1895,57 +1898,29 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						enable:'phaseUse',
 						usable:1,
 						filter:function(event,player){
-							return (!player.isUnseen())&&player.countCards('he')>2&&game.hasPlayer(function(current){
+							return (!player.isUnseen())&&player.countCards('h')>0&&game.hasPlayer(function(current){
 								return current!=player&&current.hasSkill('gzxuanhuo')&&player.isFriendOf(current);
 							});
 						},
-						prompt:function(){
-							var player=_status.event.player;
-							var list=game.filterPlayer(function(current){
-								return current!=player&&current.hasSkill('gzxuanhuo')&&player.isFriendOf(current);
-							});
-							var str='选择两张牌。将第一张牌交给'+get.translation(list);
-							if(list.length>1) str+='中的一人';
-							str+='，并弃置第二张牌';
-							return str;
-						},
-						position:'he',
+						prompt:'弃置一张手牌，然后获得以下技能中的一个：〖武圣〗〖咆哮〗〖龙胆〗〖铁骑〗〖烈弓〗〖狂骨〗',
+						position:'h',
 						filterCard:true,
-						selectCard:2,
 						check:function(card){
 							var player=_status.event.player;
-							if(player.hasSkill('new_paoxiao',true)||player.getEquip('zhuge')||game.hasPlayer(function(current){
-								return current.hasSkill('new_paoxiao');
-							})) return 0;
+							if(player.hasSkill('new_paoxiao',true)||player.getEquip('zhuge')) return 0;
 							if(player.countCards('h',function(cardx){
-								return !ui.selected.cards.contains(cardx)&&cardx!=card&&cardx.name=='sha'&&player.hasUseTarget(cardx);
+								return cardx!=card&&cardx.name=='sha'&&player.hasUseTarget(cardx);
 							})<2) return 0;
-							if(get.position(card)=='h') return 6-get.value(card);
-							return 5-get.value(card);
+							return 6.5-get.value(card);
 						},
-						filterTarget:function(card,player,target){return target!=player&&target.hasSkill('gzxuanhuo')&&target.isFriendOf(player)},
-						discard:false,
-						lose:false,
-						delay:false,
 						content:function(){
 							'step 0'
-							if(player!=game.me&&!player.isOnline()) cards.reverse();
-							target.gain(cards[0],player);
-							player.$giveAuto(cards[0],target);
-							player.discard(cards[1]);
-							'step 1'
 							var list=['wusheng','new_paoxiao','new_longdan','new_tieji','liegong','xinkuanggu'];
-							for(var i=0;i<list.length;i++){
-								if(game.hasPlayer(function(current){
-									return current.hasSkill(list[i])||current.hasSkill('fz_'+list[i]);
-								})) list.remove(list[i--]);
-							}
-							if(!list.length) event.finish();
-							else player.chooseControl(list).set('ai',function(){
+							player.chooseControl(list).set('ai',function(){
 								if(list.contains('new_paoxiao')) return 'new_paoxiao';
 								return list.randomGet();
 							}).set('prompt','选择并获得一项技能直到回合结束');
-							'step 2'
+							'step 1'
 							player.popup(result.control);
 							player.addTempSkill('fz_'+result.control);
 							game.log(player,'获得了技能','#g【'+get.translation(result.control)+'】');
@@ -1955,7 +1930,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						audio:['xuanhuo',2],
 						ai:{
 							order:8,
-							result:{target:1},
+							result:{player:1},
 						},
 					},
 					//used:{},
@@ -2143,20 +2118,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							'step 0'
-							event.num=trigger.num;
-							'step 1'
-							event.num--;
 							player.logSkill('enyuan_damage',trigger.source);
 							trigger.source.chooseCard('交给'+get.translation(player)+'一张手牌，或失去一点体力','h').set('ai',function(card){
 								if(get.attitude(_status.event.player,_status.event.getParent().player)>0) return 11-get.value(card);
 								return 7-get.value(card);
 							});
-							'step 2'
+							'step 1'
 							if(result.bool){
 								player.gain(result.cards[0],trigger.source,'giveAuto');
 							}
 							else trigger.source.loseHp();
-							if(event.num>0) event.goto(1);
 						},
 						audio:'enyuan2',
 					},
@@ -3433,7 +3404,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"_mingzhisuodingji":{
 				mode:["guozhan"],
 				enable:"phaseUse",
-				filter:function (event,player){
+				filter:function(event,player){
+					if(player.hasSkillTag('nomingzhi',false,null,true)) return false;
 					var bool=false;
 					var skillm=lib.character[player.name1][3];
 					var skillv=lib.character[player.name2][3];
@@ -3454,7 +3426,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return bool;
 				},
 				popup:false,
-				content:function (){
+				content:function(){
 					"step 0"
 					var choice=[];
 					var skillm=lib.character[player.name1][3];
@@ -7409,7 +7381,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			jianglue_info:'限定技，出牌阶段，你可以选择一个“军令”，然后与你势力相同的其他角色可以执行该军令（未确定势力角色可以在此时明置一张武将牌）。你与所有执行该军令的角色增加一点体力上限，然后回复一点体力，然后你摸X张牌（X为以此法回复了体力的角色数）。',
 			gz_fazheng:'法正',
 			gzxuanhuo:'眩惑',
-			gzxuanhuo_info:'与你势力相同的其他角色的出牌阶段限一次，该角色可以交给你一张牌并弃置一张牌，然后获得以下一项场上没有的技能直到回合结束：〖武圣〗、〖咆哮〗、〖龙胆〗、〖铁骑〗、〖烈弓〗、〖狂骨〗。',
+			gzxuanhuo_info:'与你势力相同的其他角色的出牌阶段限一次，其可弃置一张手牌，然后选择获得以下一项技能直到回合结束：〖武圣〗、〖咆哮〗、〖龙胆〗、〖铁骑〗、〖烈弓〗、〖狂骨〗。',
 			gzenyuan:'恩怨',
 			gzenyuan_info:'锁定技，当其他角色对你使用【桃】时，该角色摸一张牌；当你受到伤害后，伤害来源须交给你一张手牌或失去1点体力。',
 			gzbuyi:'补益',
@@ -7658,6 +7630,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gz_shibing2wu:'吴兵',
 			gz_shibing1qun:'群兵',
 			gz_shibing2qun:'群兵',
+			gz_shibing1jin:'晋兵',
+			gz_shibing2jin:'晋兵',
 			gzduanchang:'断肠',
 			gzduanchang_info:'锁定技，当你死亡时，你令杀死你的角色失去一张武将牌上的所有技能。',
 			gzweimu:'帷幕',

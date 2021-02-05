@@ -1087,6 +1087,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					pretao:true,
 					directHit_ai:true,
 					skillTagFilter:function(player,tag,arg){
+						if(tag=='pretao') return true;
 						if(player._wanglie_temp) return false;
 						player._wanglie_temp=true;
 						var bool=function(){

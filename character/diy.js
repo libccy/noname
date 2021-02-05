@@ -61,6 +61,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_shiroha:['female','key',3,['shiroha_yuzhao','shiroha_guying','shiroha_jiezhao']],
 			key_shizuku:['female','key',3,['shizuku_sizhi','shizuku_biyi','shizuku_sanhua']],
 			key_hiroto:['male','key',3,['hiroto_huyu','hiroto_tuolao']],
+			key_sakuya:['male','key',4,['youlong','luanfeng','sakuya_junbu']],
 			
 			key_kud:['female','key',3,['kud_qiaoshou','kud_buhui']],
 			key_misuzu:['female','key',3,['misuzu_hengzhou','misuzu_nongyin','misuzu_zhongxing']],
@@ -171,7 +172,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				diy_tieba:["ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua"],
 				diy_fakenews:["diy_wenyang","ns_zhangwei","ns_caimao"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto","key_sakuya"],
 				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang','junk_simayi'],
 			},
 		},
@@ -187,6 +188,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
+			key_sakuya:'#bRewrite',
 			key_hiroto:'#b神様になった日',
 			key_shizuku:'#bSummer Pockets',
 			key_shiroha:'#bSummer Pockets',
@@ -348,6 +350,84 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			sakuya_junbu:{
+				mod:{
+					targetInRange:function(card,player){
+						if(player.countDisabled()>=1) return true;
+					},
+					cardUsable:function(card,player){
+						if(player.countDisabled()>=2) return true;
+					},
+				},
+				trigger:{player:'useCard2'},
+				direct:true,
+				filter:function(event,player){
+					if(player.countDisabled()>=4) return true;
+					return lib.skill.sakuya_junbu.filter2.apply(this,arguments);
+				},
+				filter2:function(event,player){
+					if(player.countDisabled()<3) return false;
+					var card=event.card;
+					var info=get.info(card);
+					if(info.allowMultiple==false) return false;
+					if(event.targets&&!info.multitarget){
+						if(game.hasPlayer(function(current){
+							return !event.targets.contains(current)&&lib.filter.targetEnabled2(card,player,current);
+						})){
+							return true;
+						}
+					}
+					return false;
+				},
+				content:function(){
+					'step 0'
+					if(player.countDisabled()>=4){
+						trigger.directHit.addArray(game.players);
+						if(!lib.skill.sakuya_junbu.filter2(trigger,player)){
+							event.finish();
+							return;
+						}
+					}
+					var prompt2='为'+get.translation(trigger.card)+'增加一个目标';
+					player.chooseTarget(get.prompt('sakuya_junbu'),function(card,player,target){
+						var player=_status.event.player;
+						return !_status.event.targets.contains(target)&&lib.filter.targetEnabled2(_status.event.card,player,target);
+					}).set('prompt2',prompt2).set('ai',function(target){
+						var trigger=_status.event.getTrigger();
+						var player=_status.event.player;
+						return get.effect(target,trigger.card,player,player);
+					}).set('card',trigger.card).set('targets',trigger.targets);
+					'step 1'
+					if(result.bool){
+						if(!event.isMine()) game.delayx();
+						event.targets=result.targets;
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if(event.targets){
+						player.logSkill('sakuya_junbu',event.targets);
+						trigger.targets.addArray(event.targets);
+					}
+				},
+				group:'sakuya_junbu_damage',
+				subSkill:{
+					damage:{
+						trigger:{source:'damageBegin1'},
+						forced:true,
+						sub:true,
+						filter:function(event,player){
+							return player.countDisabled()>=5&&event.getParent().type=='card';
+						},
+						logTarget:'player',
+						content:function(){
+							player.loseHp();
+							trigger.num++;
+						},
+					},
+				},
+			},
 			hiroto_huyu:{
 				trigger:{global:'phaseUseEnd'},
 				direct:true,
@@ -6185,8 +6265,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				lucia_duqu:{
 					mod:{
-						cardSavable:function(card,player){
-							if(player.isDying()&&card.name=='du'&&!player.hasSkill('lucia_duqu_terra')) return true;
+						cardSavable:function(card,player,target){
+							if(player==target&&card.name=='du'&&!player.hasSkill('lucia_duqu_terra')) return true;
 						},
 					},
 					trigger:{
@@ -6224,6 +6304,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					ai:{
 						usedu:true,
+						save:true,
+						skillTagFilter:function(player,tag,target){
+							return player==target&&player.hasUsableCard('du')&&!player.hasSkill('lucia_duqu_terra');
+						},
 					},
 					subSkill:{terra:{sub:true}}
 				},
@@ -11751,6 +11835,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_shiroha:'鸣濑白羽',
 			key_shizuku:'水织静久',
 			key_hiroto:'铃木央人',
+			key_sakuya:'凤咲夜',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -12058,6 +12143,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hiroto_zonglve_info:'锁定技，你的手牌上限+3。出牌阶段限一次，你可以将一张手牌背面朝下放置，并展示一名其他角色的一张手牌。若这两张牌：颜色相同，你对其造成1点伤害并弃置其展示的牌。颜色不同，你获得该角色区域内的两张牌。',
 			hiroto_tuolao:'脱牢',
 			hiroto_tuolao_info:'觉醒技，回合结束后，若此回合不是你的第一个回合且你本轮内未因〖虎驭〗失去过牌，则你摸三张牌，失去〖虎驭〗并获得〖纵略〗。',
+			sakuya_junbu:'均步',
+			sakuya_junbu_info:'锁定技，若你已废除的装备栏数量：≥1，你使用牌无距离限制。≥2，你使用牌无次数限制。≥3，你使用牌时可以多指定一个目标。≥4，你使用的牌不可被响应。≥5，你使用牌造成伤害时失去1点体力，令此伤害+1。',
 			
 			key_kud:'库特莉亚芙卡',
 			kud_qiaoshou:'巧手',

@@ -301,7 +301,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.recover(num);
 					}
 					'step 1'
-					player.drawTo(Math.min(player.maxHp,5)).gaintag=['tairan'];
+					if(player.countCards('h')<Math.min(player.maxHp,5)) player.drawTo(Math.min(player.maxHp,5)).gaintag=['tairan'];
 				},
 			},
 			tairan2:{
@@ -966,8 +966,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			hfjieying2:{
 				mod:{
-					playerEnabled:function(card,player,target){
-						if(player.storage.hfjieying2&&player!=target) return false;
+					cardEnabled:function(card,player){
+						if(player.storage.hfjieying2) return false;
+					},
+					cardSavable:function(card,player){
+						if(player.storage.hfjieying2) return false;
 					},
 					targetInRange:function(card,player){
 						if(player==_status.currentPhase&&(card.name=='sha'||get.type(card)=='trick')) return true;
@@ -1024,7 +1027,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				intro:{
 					content:function(player){
-						if(player) return '不能对其他角色使用牌直到回合结束';
+						if(player) return '不能使用牌直到回合结束';
 						return '使用【杀】或普通锦囊牌时无距离限制且可以多指定一个目标';
 					},
 				},

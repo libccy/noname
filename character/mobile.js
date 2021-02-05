@@ -1367,7 +1367,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseTarget('请选择【诤荐】的目标',lib.translate.zhengjian_info).set('ai',function(target){
-						if(target.hasSkill('zhengjian')) return 0;
+						if(target.hasSkill('zhengjian_mark')) return 0;
 						if(player==target) return 0.5;
 						return get.attitude(_status.event.player,target)*(1+target.countCards('h'));
 					});
@@ -1379,6 +1379,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				group:'zhengjian_draw',
+				ai:{
+					notemp:true,
+				},
 			},
 			zhengjian_draw:{
 				audio:'zhengjian',
@@ -5832,7 +5835,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var player=_status.event.player;
 					if(player.hasSkill('xinxhzhiyan_true')) return 0;
 					var num=Math.max(0,player.countCards('h')-player.hp);
-					if(ui.selected.cards.length||player.hasSkill('xinxhzhiyan_false')) return [num,num];
+					if(ui.selected.cards.length||player.hasSkill('xinxhzhiyan_false')||player.countCards('h')>=player.maxHp) return [num,num];
 					return [0,num]
 				},
 				filterTarget:lib.filter.notMe,

@@ -13675,7 +13675,7 @@
 							if(att>0){
 								if(!_status.event.nojudge&&target.countCards('j',function(card){
 									return game.hasPlayer(function(current){
-										return current.canAddJudge(card)&&get.attitude(player,current)<0;
+										return current!=target&&current.canAddJudge(card)&&get.attitude(player,current)<0;
 									})
 								})) return 14;
 								if(target.countCards('e',function(card){
@@ -13711,10 +13711,10 @@
 						}
 						if(i==es.length&&(_status.event.nojudge||!ui.selected.targets[0].countCards('j',function(card){
 							return target.canAddJudge(card);
-						}))){
+						})||att2<=0)){
 							return 0;
 						}
-						return -att*get.attitude(player,ui.selected.targets[0]);
+						return -att*att2;
 					});
 					next.set('multitarget',true);
 					next.set('targetprompt',_status.event.targetprompt||['被移走','移动目标']);
@@ -15892,7 +15892,7 @@
 					if(player.hasSkillTag('save',true,target,true)) return true;
 					for(var i in lib.card){
 						if(lib.inpile.contains(i)||player.countCards('h',i)){
-							if(lib.filter.cardSavable({name:i},player,target)&&(_status.connectMode||player.hasUsableCard(i))) return true;
+							if(lib.card[i].savable&&lib.filter.cardSavable({name:i},player,target)&&(_status.connectMode||player.hasUsableCard(i))) return true;
 						}
 					}
 					return false;
@@ -15976,8 +15976,10 @@
 						}
 					},this,this.name,this.sex,num,this.group);
 					for(var i=0;i<skills.length;i++){
-						this.hiddenSkills.remove(skills[i]);
-						this.addSkill(skills[i]);
+						if(this.hiddenSkills.contains(skills[i])){
+							this.hiddenSkills.remove(skills[i]);
+							this.addSkill(skills[i]);
+						}
 					}
 					this.checkConflict();
 				},
@@ -16503,6 +16505,7 @@
 					this.nickname=name;
 					this.avatar=character;
 					this.node.nameol.innerHTML='';
+					if(lib.character[character]) this.sex=lib.character[character][0];
 				},
 				uninitOL:function(){
 					this.node.avatar.hide();
@@ -16510,6 +16513,7 @@
 					this.node.identity.firstChild.innerHTML='';
 					delete this.nickname;
 					delete this.avatar;
+					delete this.sex;
 				},
 				initRoom:function(info,info2){
 					if(!this.node.gaming){
@@ -16893,7 +16897,7 @@
 					}
 					setTimeout(function(){
 						dialog.delete();
-					},2000);
+					},lib.quickVoice.indexOf(str)!=-1?3800:2000);
 					var name=get.translation(this.name);
 					var info=[name?(name+'['+this.nickname+']'):this.nickname,str];
 					lib.chatHistory.push(info);
@@ -16904,6 +16908,9 @@
 						else{
 							delete _status.addChatEntry;
 						}
+					}
+					if(lib.config.background_speak&&lib.quickVoice.indexOf(str)!=-1){
+						game.playAudio('voice',(this.sex=='female'?'female':'male'),lib.quickVoice.indexOf(str));
 					}
 				},
 				showGiveup:function(){
@@ -27164,6 +27171,31 @@
 			jin:'thunder',
 		},
 		phaseName:['phaseZhunbei','phaseJudge','phaseDraw','phaseUse','phaseDiscard','phaseJieshu'],
+		quickVoice:[
+			'我从未见过如此厚颜无耻之人！',
+			'这波不亏',
+			'请收下我的膝盖',
+			'你咋不上天呢',
+			'放开我的队友，冲我来',
+			'你随便杀，闪不了算我输',
+			'见证奇迹的时刻到了',
+			'能不能快一点啊，兵贵神速啊',
+			'主公，别开枪，自己人',
+			'小内再不跳，后面还怎么玩儿啊',
+			'你们忍心，就这么让我酱油了？',
+			'我，我惹你们了吗',
+			'姑娘，你真是条汉子',
+			'三十六计，走为上，容我去去便回',
+			'人心散了，队伍不好带啊',
+			'昏君，昏君啊！',
+			'风吹鸡蛋壳，牌去人安乐',
+			'小内啊，您老悠着点儿',
+			'不好意思，刚才卡了',
+			'你可以打得再烂一点吗',
+			'哥们，给力点儿行嘛',
+			'哥哥，交个朋友吧',
+			'妹子，交个朋友吧',
+		],
 	};
 	var game={
 		getRarity:function(name){
@@ -45147,8 +45179,20 @@
 					list.scrollTop=list.scrollHeight;
 				};
 				uiintro._heightfixed=true;
-				var emotionTitle=ui.create.div('.text.center','聊天表情');
-				emotionTitle.style.width='calc(100%)';
+				var emotionTitle=ui.create.div('.text.center','聊天表情',function(){
+					if(emotionTitle.innerHTML=='快捷语音'){
+						emotionTitle.innerHTML='聊天表情';
+						list2.remove();
+						list3.remove();
+						uiintro.add(list1);
+					}
+					else{
+						emotionTitle.innerHTML='快捷语音';
+						list1.remove();
+						list2.remove();
+						uiintro.add(list3);
+					}
+				});
 				uiintro.add(emotionTitle);
 				var list1=ui.create.div('');
 				if(get.is.phoneLayout()){
@@ -45215,6 +45259,45 @@
 				}
 				list1.scrollTop=list1.scrollHeight;
 				uiintro.style.height=uiintro.content.scrollHeight+'px';
+				var list3=ui.create.div('.caption');
+				if(get.is.phoneLayout()){
+					list3.style.height='110px';
+				}
+				else{
+					list3.style.height='150px';
+				}
+				list3.style.overflow='scroll';
+				lib.setScroll(list3);
+				for(var i=0;i<lib.quickVoice.length;i++){
+					var node=ui.create.div('.text.chat',function(){
+						var player=game.me;
+						var str=this.innerHTML;
+						if(!player){
+							if(game.connectPlayers){
+								if(game.online){
+									for(var i=0;i<game.connectPlayers.length;i++){
+										if(game.connectPlayers[i].playerid==game.onlineID){
+											player=game.connectPlayers[i];break;
+										}
+									}
+								}
+								else{
+									player=game.connectPlayers[0];
+								}
+							}
+						}
+						if(!player) return;
+						if(game.online){
+							game.send('chat',game.onlineID,str);
+						}
+						else{
+							lib.element.player.chat.call(player,str);
+						}
+					});
+					node.innerHTML=lib.quickVoice[i];
+					list3.appendChild(node);
+				}
+				list3.scrollTop=list1.scrollHeight;
 				return uiintro;
 			},
 			volumn:function(){

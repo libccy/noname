@@ -35,6 +35,7 @@ window.noname_character_rank={
 		'key_hina',
 		'sp_key_kanade',
 		'key_shizuru',
+		'key_sakuya',
 	],
 	ap:[
 		'gjqt_aruan',
@@ -444,6 +445,8 @@ window.noname_character_rank={
 		'key_shizuku',
 		'wangrong',
 		'mini_lvbu',
+		're_fazheng',
+		'huaxin',
 	],
 	bp:[
 		'chess_diaochan',
@@ -631,6 +634,7 @@ window.noname_character_rank={
 		'mini_sunquan',
 		'mini_zuoci',
 		'mini_jiangwei',
+		're_fuhuanghou',
 	],
 	b:[
 		'diy_feishi',
@@ -939,6 +943,7 @@ window.noname_character_rank={
 		'hucheer',
 		'jin_xiahouhui',
 		'xin_zhangfei',
+		'wolongfengchu',
 	],
 	c:[
 		'xiahoudun',
@@ -1108,6 +1113,7 @@ window.noname_character_rank={
 			'key_shiina',
 			'key_shiroha',
 			'key_hina',
+			'key_sakuya',
 		],
 		epic:[
 			'pal_yueqi',
@@ -1535,6 +1541,8 @@ window.noname_character_rank={
 			'xin_hansui',
 			'duyu',
 			'zhanghuyuechen',
+			're_fazheng',
+			're_fuhuanghou',
 		],
 		junk:[
 			'sunshao',
@@ -1552,6 +1560,7 @@ window.noname_character_rank={
 			'xin_chengpu',
 			'junk_zhangrang',
 			'junk_simayi',
+			'wolongfengchu',
 		],
 	}
 };

@@ -9,15 +9,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_huo:["ol_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","ol_pangtong","ol_yuanshao","ol_pangde","re_taishici"],
 				refresh_lin:['re_zhurong','re_menghuo','ol_sunjian','re_caopi','re_xuhuang','ol_dongzhuo'],
 				refresh_shan:['re_dengai','re_jiangwei','re_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce','ol_dengai'],
-				refresh_yijiang1:['re_wuguotai','re_gaoshun','re_caozhi','yujin_yujin','re_masu','xin_xusheng','xin_fazheng','xin_lingtong'],
+				refresh_yijiang1:['re_wuguotai','re_gaoshun','re_caozhi','yujin_yujin','re_masu','xin_xusheng','re_fazheng','xin_lingtong'],
 				refresh_yijiang2:['old_madai','wangyi','guanzhang','re_handang','re_zhonghui','re_liaohua','re_chengpu','re_caozhang','re_bulianshi','xin_liubiao'],
-				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','re_yufan','re_liru','re_manchong'],
+				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','re_yufan','re_liru','re_manchong','re_fuhuanghou'],
 				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan'],
 				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu'],
 			},
 		},
 		connect:true,
 		character:{
+			re_fuhuanghou:['female','qun',3,['rezhuikong','reqiuyuan']],
+			re_fazheng:['male','shu',3,['reenyuan','rexuanhuo']],
 			xin_lingtong:['male','wu',4,['decadexuanfeng','yongjin']],
 			xin_liubiao:['male','qun',3,['decadezishou','decadezongshi']],
 			re_caoxiu:['male','wei',4,['qianju','reqingxi']],
@@ -30,7 +32,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_bulianshi:['female','wu',3,['reanxu','zhuiyi']],
 			re_hanhaoshihuan:['male','wei',4,['reshenduan','reyonglve']],
 			re_panzhangmazhong:['male','wu',4,['reduodao','reanjian']],
-			xin_fazheng:['male','shu',3,['xinenyuan','xinxuanhuo'],['die_audio']],
 			wangyi:['female','wei',3,['zhenlie','miji']],
 			old_madai:['male','shu',4,['mashu','qianxi']],
 			guanzhang:['male','shu',4,['fuhun']],
@@ -127,6 +128,310 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunben:['zhouyu','taishici','daqiao'],
 		},
 		skill:{
+			rezhuikong:{
+				audio:2,
+				trigger:{global:'phaseZhunbeiBegin'},
+				check:function(event,player){
+					if(get.attitude(player,event.player)<-2){
+						var cards=player.getCards('h');
+						if(cards.length>player.hp) return true;
+						for(var i=0;i<cards.length;i++){
+							var useful=get.useful(cards[i]);
+							if(useful<5) return true;
+							if(cards[i].number>7&&useful<7) return true;
+						}
+					}
+					return false;
+				},
+				logTarget:'player',
+				filter:function(event,player){
+					return player.hp<player.maxHp&&player.canCompare(event.player);
+				},
+				content:function(){
+					"step 0"
+					player.chooseToCompare(trigger.player).set('small',(player.hp>1&&get.effect(player,{name:'sha'},trigger.player,player)>0&&Math.random()<0.9));
+					"step 1"
+					if(result.bool){
+						trigger.player.addTempSkill('zishou2');
+						event.finish();
+					}
+					else if(result.target&&get.position(result.target)=='d') player.gain(result.target,'gain2','log');
+					"step 2"
+					var card={name:'sha',isCard:true};
+					if(trigger.player.canUse(card,player,false)) trigger.player.useCard(card,player,false);
+				},
+			},
+			reqiuyuan:{
+				audio:2,
+				trigger:{target:'useCardToTarget'},
+				direct:true,
+				filter:function(event,player){
+					return event.card.name=='sha';
+				},
+				content:function(){
+					"step 0"
+					player.chooseTarget(get.prompt2('reqiuyuan'),function(card,player,target){
+						return target!=player&&!_status.event.targets.contains(target)&&_status.event.playerx.canUse('sha',target,false);
+					}).set('ai',function(target){
+						var trigger=_status.event.getTrigger();
+						var player=_status.event.player;
+						return get.effect(target,trigger.card,trigger.player,player)+0.1;
+					}).set('targets',trigger.targets).set('playerx',trigger.player);
+					"step 1"
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('reqiuyuan',target);
+						event.target=target;
+						target.chooseCard(function(card,player){
+							var name=get.name(card,player);
+							return name!='sha'&&get.type(name)=='basic';
+						},'h','交给'+get.translation(player)+
+						'一张不为【杀】的基本牌，或成为此杀的额外目标且不可响应此【杀】').set('ai',function(card){
+							return get.attitude(target,_status.event.sourcex)>=0?1:-1;
+						}).set('sourcex',player);
+						game.delay();
+					}
+					else{
+						event.finish();
+					}
+					"step 2"
+					if(result.bool){
+						player.gain(result.cards,event.target,'give');
+						game.delay();
+					}
+					else{
+						trigger.getParent().targets.push(event.target);
+						trigger.getParent().triggeredTargets2.push(event.target);
+						trigger.directHit.push(event.target);
+						game.log(event.target,'成为了',trigger.card,'的额外目标');
+					}
+				},
+				ai:{
+					expose:0.2,
+					effect:{
+						target:function(card,player,target){
+							if(card.name!='sha') return;
+							var players=game.filterPlayer();
+							if(get.attitude(player,target)<=0){
+								for(var i=0;i<players.length;i++){
+									var target2=players[i];
+									if(player!=target2&&target!=target2&&player.canUse(card,target2,false)&&
+										get.effect(target2,{name:'shacopy',nature:card.nature,suit:card.suit},player,target)>0&&
+										get.effect(target2,{name:'shacopy',nature:card.nature,suit:card.suit},player,player)<0){
+										if(target.hp==target.maxHp) return 0.3;
+										return 0.6;
+									}
+								}
+							}
+							else{
+								for(var i=0;i<players.length;i++){
+									var target2=players[i];
+									if(player!=target2&&target!=target2&&player.canUse(card,target2,false)&&
+										get.effect(target2,{name:'shacopy',nature:card.nature,suit:card.suit},player,player)>0){
+										if(player.canUse(card,target2)) return;
+										if(target.hp==target.maxHp) return [0,1];
+										return [0,0];
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			reenyuan:{
+				audio:2,
+				group:['reenyuan1','reenyuan2'],
+			},
+			reenyuan1:{
+				audio:'reenyuan',
+				trigger:{player:'gainEnd'},
+				filter:function(event,player){
+					if(!event.source||event.source==player||!event.source.isIn()) return false;
+					var evt=event.getl(event.source);
+					return evt&&evt.cards2&&evt.cards2.length>1;
+				},
+				check:function(event,player){
+					return get.attitude(player,event.source)>0;
+				},
+				logTarget:'source',
+				prompt2:'令该角色摸一张牌',
+				content:function(){
+					trigger.source.draw();
+				},
+			},
+			reenyuan2:{
+				audio:'reenyuan',
+				trigger:{player:'damageEnd'},
+				logTarget:'source',
+				filter:function(event,player){
+					return event.source&&event.source!=player&&event.source.isAlive();
+				},
+				check:function(event,player){
+					var att=get.attitude(player,event.source);
+					var num=event.source.countCards('h');
+					if(att<=0) return true;
+					if(num>2) return true;
+					if(num) return att<4;
+					return false;
+				},
+				prompt2:'令该角色选择一项：①失去1点体力。②交给你一张手牌。若此牌不为♥，则你摸一张牌。',
+				content:function(){
+					'step 0'
+					event.count=trigger.num;
+					'step 1'
+					var target=trigger.source;
+					event.count--;
+					if(!target.countCards('h')) event._result={bool:false};
+					else target.chooseCard('h','恩怨：将一张手牌交给'+get.translation(player)+'，或失去1点体力').set('ai',function(card){
+						if(get.attitude(_status.event.player,_status.event.getParent().player)>0){
+							if(get.suit(card)!='heart') return 15-get.value(card);
+							return 11-get.value(card);
+						}
+						else{
+							var num=12-_status.event.player.hp*2;
+							if(get.suit(card)!='heart') num-=2;
+							return num-get.value(card);
+						}
+					});
+					'step 2'
+					var target=trigger.source;
+					if(result.bool){
+						var card=result.cards[0];
+						event.card=card;
+						player.gain(card,target,'giveAuto');
+					}
+					else{
+						target.loseHp();
+						event.goto(4);
+					}
+					'step 3'
+					if(get.suit(card)!='heart') player.draw();
+					'step 4'
+					var target=trigger.source;
+					if(target.isAlive()&&event.count>0) player.chooseBool(get.prompt('reenyuan',target),'令该角色选择一项：①失去1点体力。②交给你一张手牌。若此牌不为♥，则你摸一张牌。').set('ai',function(){
+						var evt=_status.event.getTrigger();
+						return lib.skill.reenyuan2.check(evt.player,evt.source);
+					});
+					else event.finish();
+					'step 5'
+					if(result.bool){
+						player.logSkill('reenyuan2',trigger.source);
+						event.goto(1);
+					}
+				},
+			},
+			rexuanhuo:{
+				audio:2,
+				trigger:{player:'phaseDrawEnd'},
+				direct:true,
+				filter:function(event,player){
+					return player.countCards('h')>1&&game.countPlayer()>2;
+				},
+				content:function(){
+					'step 0'
+					var ai2=function(target){
+						var player=_status.event.player;
+						if(get.attitude(player,target)<=0) return 0;
+						var list=[null,'fire','thunder','ice','juedou'];
+						if(target.hasSkill('ayato_zenshen')) list.push('kami');
+						var num=Math.max.apply(Math,list.map(function(i){
+							if(i=='juedou') return target.getUseValue({name:'juedou',isCard:true},false);
+							var card={name:'sha',nature:i,isCard:true};
+							return target.getUseValue(card,false);
+						}));
+						if(target.hasSkillTag('nogain')) num/=4;
+						return num;
+					};
+					player.chooseCardTarget({
+						prompt:get.prompt2('rexuanhuo'),
+						filterCard:true,
+						selectCard:2,
+						position:'h',
+						filterTarget:lib.filter.notMe,
+						goon:game.hasPlayer(function(current){
+							return current!=player&&ai2(player,current)>0;
+						}),
+						ai1:function(card){
+							if(!_status.event.goon) return 0;
+							return 7-get.value(card);
+						},
+						ai2:ai2,
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('rexuanhuo',target);
+						target.gain(result.cards,player,'giveAuto');
+					}
+					else event.finish();
+					'step 2'
+					if(game.hasPlayer(function(current){
+						return current!=player&&current!=target;
+					})) player.chooseTarget(function(card,player,target){
+						return target!=player&&target!=_status.event.target;
+					},'选择'+get.translation(target)+'使用【杀】或【决斗】的目标',true).set('target',target).set('ai',function(target){
+						var evt=_status.event;
+						var list=[null,'fire','thunder','ice','juedou'];
+						if(evt.target.hasSkill('ayato_zenshen')) list.push('kami')
+						return Math.max.apply(Math,list.map(function(i){
+							var card={name:'sha',isCard:true};
+							if(i=='juedou') card.name='juedou';
+							else if(i) card.nature=i;
+							if(!evt.target.canUse(card,target,false)) return 0;
+							return get.effect(target,card,evt.target,evt.player);
+						}));
+					});
+					else event.finish();
+					'step 3'
+					var target2=result.targets[0];
+					event.target2=target2;
+					player.line(target2);
+					game.log(player,'选择了',target2);
+					var list=[null,'fire','thunder','ice'];
+					var vcards=[];
+					if(target.hasSkill('ayato_zenshen')) list.push('kami');
+					for(var i of list){
+						if(target.canUse({name:'sha',isCard:true,nature:i},target2,false)) vcards.push(['基本','','sha',i]);
+					}
+					if(target.canUse({name:'juedou',isCard:true},target2,false)) vcards.push(['基本','','juedou']);
+					if(!vcards.length){
+						if(!target.countCards('h')) event.finish();
+						else event._result={index:1};
+					}
+					else if(!target.countCards('h')){
+						event._result={index:0};
+					}
+					else{
+						event.vcards=vcards;
+						target.chooseControl().set('choiceList',[
+							'视为对'+get.translation(target2)+'使用任意一种【杀】或【决斗】',
+							'将所有手牌交给'+get.translation(player),
+						]);
+					}
+					'step 4'
+					if(result.index==0){
+						if(event.vcards.length==1) event._result={links:event.vcards,bool:true};
+						else target.chooseButton(['请选择要对'+get.translation(event.target2)+'使用的牌',[event.vcards,'vcard']],true).set('ai',function(button){
+							var player=_status.event.player;
+							return get.effect(_status.event.getParent().target2,{name:button.link[2],isCard:true,nature:button.link[3]},player,player);
+						});
+					}
+					else{
+						player.gain(target.getCards('h'),target,'giveAuto');
+						event.finish();
+					}
+					'step 5'
+					if(result.bool) target.useCard({name:result.links[0][2],isCard:true,nature:result.links[0][3]},false,event.target2);
+				},
+				ai:{
+					expose:0.17,
+					fireAttack:true,
+					skillTagFilter:function(player){
+						return player.hasFriend();
+					},
+				},
+			},
 			decadezongshi:{
 				audio:2,
 				mod:{
@@ -421,7 +726,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					if(result.bool){
 						if(!event.logged){
-							player.logSkill('xuanfeng',result.targets);
+							player.logSkill('decadexuanfeng',result.targets);
 							event.logged=true;
 						}
 						else player.line(result.targets[0],'green');
@@ -8264,7 +8569,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_madai:'界马岱',
 			wangyi:'界王异',
 			guanzhang:'界关兴张苞',
-			xin_fazheng:'界法正',
 			rezishou:'自守',
 			rezishou2:'自守',
 			//rezishou_info:'摸牌阶段，你可以多摸X张牌。若如此做，本回合你对其他角色造成伤害时，防止此伤害，且结束阶段，若你本回合没有使用牌指定其他角色为目标，则你可以将场上的一张装备牌移动到自己的装备区。（X为场上势力数）',
@@ -8330,6 +8634,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_caozhen:'界曹真',
 			residi:'司敌',
 			residi_info:'结束阶段，你可以摸一张牌，并将一张牌置于你的武将牌上，称为“司”。其他角色的出牌阶段开始时，你可以移去任意张“司”。若如此做，其本阶段内不能使用或打出与这些“司”颜色相同的牌，且此阶段结束时，若X：不大于2，你视为对其使用【杀】；不大于1，你摸两张牌；不大于0，你将牌堆顶的一张牌置于你的武将牌上，称为“司”。（X为该角色本阶段内使用过牌的类型数）',
+			re_fazheng:'界法正',
+			reenyuan:'恩怨',
+			reenyuan1:'恩怨',
+			reenyuan2:'恩怨',
+			reenyuan_info:'当你获得一名其他角色的至少两张牌后，你可以令其摸一张牌。当你受到1点伤害后，你可令伤害来源选择一项：①失去1点体力。②交给你一张手牌。若此牌不为♥，则你摸一张牌。',
+			rexuanhuo:'眩惑',
+			rexuanhuo_info:'摸牌阶段结束时，你可以交给一名其他角色两张手牌，然后该角色选择一项：1. 视为对你选择的另一名角色使用任意一种【杀】，2. 交给你所有手牌。',
+			re_fuhuanghou:'界伏皇后',
+			reqiuyuan:'求援',
+			reqiuyuan_info:'当你成为【杀】的目标时，你可选择另一名其他角色。除非该角色交给你一张除【杀】以外的基本牌，否则其也成为此【杀】的目标且该角色不能响应此【杀】。',
+			rezhuikong:'惴恐',
+			rezhuikong_info:'其他角色的回合开始时，若你已受伤，你可与其拼点：若你赢，本回合该角色只能对自己使用牌；若你没赢，你获得其拼点的牌，然后其视为对你使用一张【杀】。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',
