@@ -12,6 +12,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jin_simashi:['male','jin','3/4',['taoyin','yimie','ruilve','tairan'],['hiddenSkill','zhu']],
 			zhanghuyuechen:['male','jin',4,['xijue']],
 			duyu:['male','jin',4,['sanchen','zhaotao']],
+			guozhao:['female','wei',3,['pianchong','zunwei']],
 			hanfu:['male','qun',4,['hfjieying','weipo']],
 			re_quyi:['male','qun',4,['refuqi','jiaozi']],
 			dongxie:['female','qun','3/4',['juntun','jiaojie']],
@@ -93,7 +94,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_guandu:["sp_zhanghe","xunchen","sp_shenpei","gaolan","lvkuanglvxiang","chunyuqiong","sp_xuyou"],
 				sp_huangjin:['liuhong','zhujun','re_hejin','re_hansui','liubian'],
 				sp_fadong:['ol_dingyuan','wangrong','re_quyi','hanfu'],
-				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','re_sunluyu','caobuxing','ol_yujin','re_maliang','xin_baosanniang','re_xinxianying','dongxie'],
+				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','re_sunluyu','caobuxing','ol_yujin','re_maliang','xin_baosanniang','re_xinxianying','dongxie','guozhao'],
 				sp_mini:["mini_sunquan","mini_zuoci","mini_jiangwei","mini_diaochan","mini_zhangchunhua"],
 				sp_luanwu:["ns_lijue","ns_zhangji","ns_fanchou"],
 				sp_yongjian:["ns_chendao","yj_caoang"],
@@ -101,6 +102,245 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			pianchong:{
+				audio:2,
+				trigger:{player:'phaseDrawBegin1'},
+				filter:function(event,player){
+					return !event.numFixed;
+				},
+				content:function(){
+					'step 0'
+					trigger.changeToZero();
+					var cards=[];
+					var card1=get.cardPile2(function(card){
+						return get.color(card,false)=='red';
+					});
+					if(card1) cards.push(card1);
+					var card2=get.cardPile2(function(card){
+						return get.color(card,false)=='black';
+					});
+					if(card2) cards.push(card2);
+					if(cards.length) player.gain(cards,'gain2');
+					'step 1'
+					game.updateRoundNumber();
+					player.chooseControl('red','black').set('prompt','偏宠：请选择一种颜色。直至你的下回合开始时，失去该颜色的一张牌后，从牌堆获得另一种颜色的一张牌。').set('ai',function(){
+						var red=0,black=0;
+						var player=_status.event.player;
+						var cards=player.getCards('he');
+						for(var i of cards){
+							var add=1;
+							var color=get.color(i,player);
+							if(get.position(i)=='e') add=0.5;
+							else if(get.name(i,player)!='sha'&&player.hasValueTarget(i)) add=1.5;
+							if(color=='red') red+=add;
+							else black+=add;
+						}
+						if(black>red) return 'black';
+						return 'red';
+					});
+					'step 2'
+					player.storage.pianchong2=result.control;
+					player.addTempSkill('pianchong2',{player:'phaseBeginStart'});
+					player.popup(result.control,result.control=='red'?'fire':'thunder');
+					game.log(player,'声明了','#y'+get.translation(result.control));
+				},
+				ai:{
+					threaten:4.8,
+				},
+			},
+			pianchong2:{
+				audio:'pianchong',
+				trigger:{
+					player:'loseAfter',
+					global:['equipAfter','addJudgeAfter','gainAfter'],
+				},
+				forced:true,
+				charlotte:true,
+				onremove:true,
+				filter:function(event,player){
+					var evt=event.getl(player);
+					if(!evt||!evt.cards2||!evt.cards2.length) return false;
+					for(var i of evt.cards2){
+						if(get.color(i,player)==player.storage.pianchong2) return true;
+					}
+					return false;
+				},
+				content:function(){
+					'step 0'
+					var num=trigger.getl(player).cards2.filter(function(card){
+						return get.color(card,player)==player.storage.pianchong2;
+					}).length;
+					var cards=[];
+					while(num--){
+						var card=get.cardPile2(function(card){
+							return !cards.contains(card)&&get.color(card,false)!=player.storage.pianchong2;
+						});
+						if(card) cards.push(card);
+						else break;
+					}
+					if(cards.length) player.gain(cards,'gain2');
+					else event.finish();
+					'step 1'
+					game.updateRoundNumber();
+				},
+				mark:true,
+				intro:{
+					content:'失去一张$牌后，从牌堆中获得一张与此牌颜色不同的牌',
+				},
+			},
+			zunwei:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return !player.storage.zunwei||player.storage.zunwei.length<3;
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						var list=[
+							'选择体力值大于你的一名角色',
+							'选择手牌数大于你的一名角色',
+							'选择装备数大于你的一名角色',
+						];
+						var choiceList=ui.create.dialog('尊位：清选择一项','forcebutton','hidden');
+						for(var i=0;i<list.length;i++){
+							if(player.storage.zunwei&&player.storage.zunwei.contains(i)) continue;
+							var bool=game.hasPlayer(function(current){
+								return current!=player&&lib.skill.zunwei.backups[i].filterTarget(null,player,current);
+							});
+							var str='<div class="popup text" style="width:calc(100% - 10px);display:inline-block">';
+							if(!bool) str+='<div style="opacity:0.5">';
+							str+=list[i];
+							if(!bool) str+='</div>';
+							str+='</div>';
+							var next=choiceList.add(str);
+							next.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
+							next.firstChild.link=i;
+							next.firstChild._filterButton=bool;
+							for(var j in lib.element.button){
+								next[j]=lib.element.button[i];
+							}
+							choiceList.buttons.add(next.firstChild);
+						}
+						return choiceList;
+					},
+					filter:function(button){
+						return button._filterButton;
+					},
+					backup:function(links){
+						var next=get.copy(lib.skill.zunwei.backups[links[0]]);
+						next.audio='zunwei';
+						next.filterCard=function(){return false};
+						next.selectCard=-1;
+						return next;
+					},
+					check:function(button){
+					 var player=_status.event.player;
+					 switch(button.link){
+					 	case 0:{
+					 		var target=game.findPlayer(function(current){
+					 			return current.isMaxHp();
+					 		});
+					 		return (Math.min(target.hp,player.maxHp)-player.hp)*2;
+					 	}
+					 	case 1:{
+					 		var target=game.findPlayer(function(current){
+					 			return current.isMaxHandcard();
+					 		});
+					 		return Math.min(5,target.countCards('h')-player.countCards('h'))*0.8;
+					 	}
+					 	case 2:{
+					 		var target=game.findPlayer(function(current){
+					 			return current.isMaxEquip();
+					 		});
+					 		return (target.countCards('e')-player.countCards('e'))*1.4;
+					 	}
+					 }
+					},
+					prompt:function(links){
+						return [
+							'选择一名体力值大于你的其他角色，将体力值回复至与其相同',
+							'选择一名手牌数大于你的其他角色，将手牌数摸至与其相同',
+							'选择一名装备区内牌数大于你的其他角色，依次使用牌堆中的装备牌，直到装备数与其相同',
+						][links[0]];
+					},
+				},
+				backups:[
+				{
+					filterTarget:function(card,player,target){
+						if(player.isHealthy()) return false;
+						return target.hp>player.hp;
+					},
+					content:function(){
+						player.recover(target.hp-player.hp);
+						if(!player.storage.zunwei) player.storage.zunwei=[];
+						player.storage.zunwei.add(0);
+					},
+					ai:{
+						order:10,
+						result:{
+							player:function(player,target){
+								return (Math.min(target.hp,player.maxHp)-player.hp);
+							},
+						},
+					},
+				},
+				{
+					filterTarget:function(card,player,target){
+						return target.countCards('h')>player.countCards('h');
+					},
+					content:function(){
+						player.draw(Math.min(5,target.countCards('h')-player.countCards('h')));
+						if(!player.storage.zunwei) player.storage.zunwei=[];
+						player.storage.zunwei.add(1);
+					},
+					ai:{
+						order:10,
+						result:{
+							player:function(player,target){
+								return Math.min(5,target.countCards('h')-player.countCards('h'));
+							},
+						},
+					},
+				},
+				{
+					filterTarget:function(card,player,target){
+						return target.countCards('e')>player.countCards('e');
+					},
+					content:function(){
+						'step 0'
+						if(!player.storage.zunwei) player.storage.zunwei=[];
+						player.storage.zunwei.add(2);
+						event.num=1;
+						'step 1'
+						var type='equip'+num;
+						if(!player.isEmpty(type)) return;
+						var card=get.cardPile2(function(card){
+							return get.subtype(card,false)==type&&player.canUse(card,player);
+						});
+						if(card) player.chooseUseTarget(card,true).nopopup=true;
+						'step 2'
+						game.updateRoundNumber();
+						event.num++;
+						if(event.num<=5&&target.isAlive()&&player.countCards('e')<target.countCards('e')) event.goto(1);
+					},
+					ai:{
+						order:10,
+						result:{
+							player:function(player,target){
+								return (target.countCards('e')-player.countCards('e'));
+							},
+						},
+					},
+				},
+				],
+				ai:{
+					order:10,
+					result:{
+						player:1,
+					},
+				},
+			},
 			xinquanbian:{
 				audio:'quanbian',
 				trigger:{player:['useCard','respond']},
@@ -8146,6 +8386,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhanghuyuechen:'张虎，生卒年不详，雁门马邑（今山西朔城区大夫庄）人。三国时期曹魏将领。名将张辽之子。官至偏将军，袭封晋阳侯，有一子张统。乐綝（195~257年），字号不详，阳平郡卫国县（今河南省清丰县）人。三国时期曹魏将领，右将军乐进的儿子。果毅坚毅，袭封广昌亭侯，累迁扬州刺史。甘露二年，为叛乱的征东大将军诸葛诞所杀，追赠卫尉。',
 			duyu:'杜预（222年－285年），字元凯，京兆郡杜陵县（今陕西西安）人，中国魏晋时期军事家、经学家、律学家，曹魏散骑常侍杜恕之子。杜预初仕曹魏，任尚书郎，后成为权臣司马昭的幕僚，封丰乐亭侯。西晋建立后，历任河南尹、安西军司、秦州刺史、度支尚书等职。咸宁四年（278年）接替羊祜出任镇南大将军，镇守荆州。他积极备战，支持晋武帝司马炎对孙吴作战，并在咸宁五年（279年）成为晋灭吴之战的统帅之一。战后因功进封当阳县侯，仍镇荆州。太康五年（285年），杜预被征入朝，拜司隶校尉，途中于邓县逝世，终年六十三岁。获赠征南大将军、开府仪同三司，谥号为成。杜预耽思经籍，博学多通，多有建树，时誉为“杜武库”。著有《春秋左氏传集解》及《春秋释例》等。为明朝之前唯一一个同时进入文庙和武庙之人。',
 			xiahouhui:'夏侯徽（211年－234年），字媛容，沛国谯县（今安徽亳州）人，司马师第一任妻子。征南大将军夏侯尚之女，母德阳乡主为大司马曹真之妹。夏侯徽与司马师之间，生有五个女儿。夏侯徽很有见识器度，每当司马师有什么想法时，都由她从旁策划协助。当时司马师之父司马懿位居上将重位，而他的儿子们都有雄才大略。夏侯徽深知司马师绝非曹魏忠臣，而司马师对出身曹魏家族的夏侯徽也非常顾忌。青龙二年（234年），正逢“大疫”、“大病”之年，夏侯徽被司马师毒杀，时年二十四岁，死后葬于峻平陵。西晋建国后，追谥夏侯徽为景怀皇后。',
+			guozhao:'郭照，电视剧《军师联盟》中的女主角之一，由唐艺昕饰演。原型为文德皇后郭氏（字女王），魏国皇后，张春华的义妹，深爱曹丕，替甄宓抚育曹叡，因甄宓之死被曹叡记恨，曹丕死后，成为皇太后，被曹叡逼上死路。自尽身亡。',
 		},
 		characterTitle:{
 			wulan:'#b对决限定武将',
@@ -8680,6 +8921,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gz_jin_xiahouhui:'夏侯徽',
 			xinquanbian:'权变',
 			xinquanbian_info:'出牌阶段，每当你首次使用/打出一种花色的手牌时，你可以从牌堆顶的X张牌中获得一张与此牌花色不同的牌，并将其余牌以任意顺序置于牌堆顶。出牌阶段，你至多可使用X张手牌。（X为你的体力上限）',
+			guozhao:'郭照',
+			pianchong:'偏宠',
+			pianchong2:'偏宠',
+			pianchong_info:'摸牌阶段开始时，你可放弃摸牌。若如此做，你从牌堆中获得一张红色牌和一张黑色牌。然后你选择一种颜色。你的下回合开始前，当你失去该颜色的一张牌后，你从牌堆中获得另一种颜色的一张牌。',
+			zunwei:'尊位',
+			zunwei_backup:'尊位',
+			zunwei_info:"出牌阶段限一次，你可选择本局游戏内未选择过的一项：①若你已受伤，则你可以选择一名体力值大于你的其他角色，你将体力值回复至X（X为你的体力上限与其体力值中的较小值）②选择一名手牌数大于你的其他角色，你将手牌数摸至与其相同（至多摸五张）③选择一名装备区内牌数大于你的其他角色。你令X=1。若你装备区内的('equip'+X)栏为空，则你使用牌堆中的一张副类别为('equip'+X)，且能对自己使用的装备牌。你令X+1。若X不大于5，且你装备区内的牌数仍小于目标角色，则你重复此流程。",
 			
 			sp_yingbian:'文德武备',
 			sp_whlw:"文和乱武",

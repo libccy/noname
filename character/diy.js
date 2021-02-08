@@ -356,7 +356,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(player.countDisabled()>=1) return true;
 					},
 					cardUsable:function(card,player){
-						if(player.countDisabled()>=2) return true;
+						if(player.countDisabled()>=2) return Infinity;
 					},
 				},
 				trigger:{player:'useCard2'},

@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.108.4',
+	'v1.9.108.4.1',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -678,6 +678,7 @@ window.noname_asset_list=[
 	'audio/die/re_fazheng.mp3',
 	'audio/die/re_fuhuanghou.mp3',
 	'audio/die/huaxin.mp3',
+	'audio/die/guozhao.mp3',
 
 	'audio/skill/decadezishou1.mp3',
 	'audio/skill/decadezishou2.mp3',
@@ -2970,6 +2971,10 @@ window.noname_asset_list=[
 	'audio/skill/wanggui2.mp3',
 	'audio/skill/xibing1.mp3',
 	'audio/skill/xibing2.mp3',
+	'audio/skill/pianchong1.mp3',
+	'audio/skill/pianchong2.mp3',
+	'audio/skill/zunwei1.mp3',
+	'audio/skill/zunwei2.mp3',
 	
 	'audio/voice/male/0.mp3',
 	'audio/voice/male/1.mp3',
@@ -3726,6 +3731,7 @@ window.noname_asset_list=[
 	'image/character/re_fazheng.jpg',
 	'image/character/re_fuhuanghou.jpg',
 	'image/character/wolongfengchu.jpg',
+	'image/character/guozhao.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
