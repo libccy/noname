@@ -2863,7 +2863,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"baka_hunshang":{
 				skillAnimation:true,
 				animationColor:'wood',
-				audio:"hunshang",
+				audio:"hunzi",
 				derivation:["baka_yingzi","baka_yinghun"],
 				viceSkill:true,
 				init:function (player){
@@ -2903,9 +2903,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				filter:function (event,player){
 					return player.isDamaged();
 				},
-				//priority:2,
-				audio:"yinghun",
-				audioname:["sunce"],
+				audio:'yinghun_sunce',
 				trigger:{
 					player:"phaseZhunbeiBegin",
 				},
@@ -2982,8 +2980,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return player.maxHp;
 					},
 				},
-				audio:"reyingzi",
-				audioname:["sunce"],
+				audio:'reyingzi_sunce',
 				trigger:{
 					player:"phaseDrawBegin2",
 				},
@@ -5893,19 +5890,24 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				group:['hunshang_yingzi','hunshang_yinghun'],
 			},
+			reyingzi_sunce:{audio:2},
+			yinghun_sunce:{audio:2},
 			hunshang_yingzi:{
 				inherit:'yingzi',
+				audio:'reyingzi_sunce',
 				filter:function(event,player){
 					return player.hp<=1&&!player.hasSkill('yingzi');
 				}
 			},
 			hunshang_yinghun:{
 				inherit:'gzyinghun',
+				audio:'yinghun_sunce',
 				filter:function(event,player){
 					return player.hp<=1&&player.isDamaged()&&!player.hasSkill('gzyinghun');
 				}
 			},
 			yingyang:{
+				audio:2,
 				trigger:{player:'compare',target:'compare'},
 				filter:function(event){
 					return !event.iwhile;

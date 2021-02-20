@@ -117,6 +117,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			hejin:['male','qun',4,['mouzhu','yanhuo']],
 			hansui:['male','qun',4,['xiaoxi','niluan']],
 			niujin:['male','wei',4,['cuorui','liewei']],
+			
+			jin_zhangchunhua:['female','jin',3,['huishi','qingleng']],
+			jin_simayi:['male','jin',3,['smyyingshi','xiongzhi','quanbian']],
+			jin_wangyuanji:['female','jin',3,['yanxi']],
+			jin_simazhao:['male','jin',3,['choufa','zhaoran']],
+			jin_xiahouhui:['female','jin',3,['jyishi','shiduo']],
+			jin_simashi:['male','jin','3/4',['yimie','tairan']],
+			zhanghuyuechen:['male','jin',4,['xijue']],
+			duyu:['male','jin',4,['sanchen','zhaotao']],
 		},
 		startBefore:function(){
 			
@@ -167,18 +176,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			if(_status.mode=='normal'){
 				lib.card.list=lib.singlePile.slice(0);
 				game.fixedPile=true;
-				game.broadcastAll(function(singleTranslate,characterSingle){
+				game.broadcastAll(function(singleTranslate,characterSingle,jin){
 					_status.mode='normal';
 					for(var j in singleTranslate) lib.translate[j]=singleTranslate[j];
 					_status.characterlist=[];
 					for(var i in characterSingle){
+						if(!jin&&characterSingle[i][1]=='jin') continue;
 						lib.character[i]=characterSingle[i];
 						if(!lib.character[i][4]){
 							lib.character[i][4]=[];
 						}
 						_status.characterlist.push(i);
 					}
-				},lib.singleTranslate,lib.characterSingle);
+				},lib.singleTranslate,lib.characterSingle,_status.connectMode?lib.configOL.enable_jin:get.config('enable_jin'));
 			}
 			else if(_status.mode=='changban'){
 				_status.characterlist=[];
@@ -286,6 +296,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			getRoomInfo:function(uiintro){
+				if(lib.configOL.single_mode=='normal') uiintro.add('<div class="text chat">晋势力武将：'+(lib.configOL.enable_jin?'开启':'关闭'));
 				if(lib.configOL.bannedcards.length){
 					uiintro.add('<div class="text chat">禁用卡牌：'+get.translation(lib.configOL.bannedcards));
 				}

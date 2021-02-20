@@ -47,25 +47,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					event.cards=player.getCards('h');
-					player.give(event.cards,target,true);
+					target.gain(event.cards,player,'giveAuto').gaintag.add('twrangyi');
+					target.addTempSkill('twrangyi2');
 					'step 1'
 					target.chooseToUse({
 						prompt:'请使用得到的一张牌，或者受到来自'+get.translation(player)+'的一点伤害',
-						filterCard:function(card,player,event){
-							if(get.itemtype(card)!='card'||!event.cards.contains(card)) return false;
+						filterCard:function(card,player){
+							if(get.itemtype(card)!='card'||!card.hasGaintag('twrangyi')) return false;
 							return lib.filter.filterCard(card,player,event);
 						},
 						cards:cards,
 					});
 					'step 2'
-					if(result.bool){
-						var hs=target.getCards('h');
-						for(var i=0;i<cards.length;i++){
-							if(!hs.contains(cards[i])) cards.splice(i--,1);
-						}
-						if(cards.length) target.give(cards,player,true);
-					}
-					else target.damage('nocard');
+					target.removeSkill('twrangyi');
+					if(!result.bool) target.damage('nocard');
 				},
 				ai:{
 					order:1,
@@ -81,6 +76,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.damageEffect(target,player,target);
 						},
 					},
+				},
+			},
+			twrangyi2:{
+				trigger:{player:'useCard'},
+				forced:true,
+				popup:false,
+				filter:function(event,player){
+					var evt=event.getParent(2);
+					return evt.name=='twrangyi'&&evt.player.isAlive()&&player.countCards('h',function(card){
+						return card.hasGaintag('twrangyi');
+					})>0;
+				},
+				content:function(){
+					var cards=player.getCards('h',function(card){
+						return card.hasGaintag('twrangyi');
+					});
+					trigger.getParent(2).player.gain(cards,player,'giveAuto');
+				},
+				onremove:function(player){
+					player.removeGaintag('twrangyi');
 				},
 			},
 			twbaimei:{
@@ -568,7 +583,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twliancai:'敛财',
 			twliancai_info:'结束阶段，你可以将武将牌翻面，然后获得一名其他角色装备区内的一张牌。当你的武将牌翻面时，你可以将手牌补至与体力值相同。',
 			twrangyi:'攘夷',
-			twrangyi_info:'出牌阶段限一次，你可以将所有手牌交给一名其他角色，然后令其选择一项：1.使用其中的一张牌，然后将其余的牌交还给你。2.受到来自你的1点伤害。',
+			twrangyi2:'攘夷',
+			twrangyi_info:'出牌阶段限一次，你可以将所有手牌交给一名其他角色，然后令其选择一项：1.使用其中的一张牌，并于此牌被使用时将其余的牌交还给你。2.受到来自你的1点伤害。',
 			twbaimei:'白眉',
 			twbaimei_info:'锁定技，若你没有手牌，则防止你受到的所有属性伤害和锦囊牌造成的伤害。',
 			chijie:'持节',

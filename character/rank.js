@@ -629,6 +629,8 @@ window.noname_character_rank={
 		'key_miki',
 		'key_ryoichi',
 		'key_kotori',
+		'key_chihaya',
+		'key_rumi',
 		'nashime',
 		'ns_huangchengyan',
 		'ns_yuanxi',
@@ -1005,6 +1007,7 @@ window.noname_character_rank={
 		'junk_zhangrang',
 		'ol_guohuai',
 		'junk_simayi',
+		'key_youta',
 	],
 	rarity:{
 		legend:[
@@ -1289,6 +1292,8 @@ window.noname_character_rank={
 			'key_misa',
 			'key_shizuku',
 			'key_hiroto',
+			'key_rumi',
+			'key_chihaya',
 			'kaisa',
 		],
 		rare:[
@@ -1563,6 +1568,7 @@ window.noname_character_rank={
 			'junk_zhangrang',
 			'junk_simayi',
 			'wolongfengchu',
+			'key_youta',
 		],
 	}
 };

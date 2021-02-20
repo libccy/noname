@@ -62,6 +62,7 @@
 			zhenji_emotion:20,
 			xiaosha_emotion:20,
 			xiaotao_emotion:20,
+			xiaojiu_emotion:20,
 		},
 		animate:{
 			skill:{},
@@ -5763,7 +5764,20 @@
 						restart:true,
 						frequent:true,
 					},
-					update:function(config,map){},
+					connect_enable_jin:{
+						name:'启用晋势力武将',
+						init:false,
+						restart:true,
+						frequent:true,
+					},
+					update:function(config,map){
+						if(config.connect_single_mode!='normal'){
+							map.connect_enable_jin.hide();
+						}
+						else{
+							map.connect_enable_jin.show();
+						}
+					},
 				},
 				config:{
 					single_mode:{
@@ -5777,7 +5791,19 @@
 						restart:true,
 						frequent:true,
 					},
+					enable_jin:{
+						name:'启用晋势力武将',
+						init:false,
+						restart:true,
+						frequent:true,
+					},
 					update:function(config,map){
+						if(config.single_mode!='normal'){
+							map.enable_jin.hide();
+						}
+						else{
+							map.enable_jin.show();
+						}
 					},
 				}
 			},
@@ -9897,6 +9923,7 @@
 			shibing_emotion:'士兵表情',
 			xiaosha_emotion:'小杀表情',
 			xiaotao_emotion:'小桃表情',
+			xiaojiu_emotion:'小桃表情',
 
 			pause:'暂停',
 			config:'选项',
@@ -45185,6 +45212,9 @@
 						list2.remove();
 						list3.remove();
 						uiintro.add(list1);
+						while(list2.childNodes.length){
+							list2.firstChild.remove();
+						}
 					}
 					else{
 						emotionTitle.innerHTML='快捷语音';

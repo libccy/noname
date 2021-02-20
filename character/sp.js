@@ -3746,7 +3746,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.player==player||player.storage.xianfu2&&player.storage.xianfu2.contains(player);
 				},
 				content:function(){
-					if(player==event.player) lib.skill.xianfu2.onremove(player);
+					if(player==trigger.player) lib.skill.xianfu2.onremove(player);
 					else player.storage.xianfu2.remove(event.player);
 				}
 			},
@@ -15897,7 +15897,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spmingjian:'明鉴',
 			spmingjian_info:'一名角色的回合开始时，你可以选择一项：①弃置一张牌，然后其跳过本回合的判定阶段。②将一张手牌置于其武将牌上，然后其本回合内进行判定时不触发「判定结果生效前」的时机，且其回合结束时将此牌置入弃牌堆。',
 			spyinzhi:'隐智',
-			spyinzhi_info:'当你受到1点伤害后，你可以展示牌堆顶的两张牌。若其中有黑桃牌，则你可以进行至多X次「令一名角色获得伤害来源的一张手牌」的步骤，然后获得其余的牌。（X为其中黑桃牌的数量）',
+			spyinzhi_info:'当你受到1点伤害后，你可以展示牌堆顶的两张牌。若其中有黑桃牌，则你可以进行至多X次「令一名角色获得伤害来源的一张手牌」的步骤。然后获得其余的牌。（X为其中黑桃牌的数量）',
 			sunshao:'孙邵',
 			bizheng:'弼政',
 			bizheng_info:'摸牌阶段结束时，你可以令一名其他角色摸两张牌。然后，若你的手牌数大于体力上限，你弃置两张牌。若其的手牌数大于体力上限，其弃置两张牌。',
