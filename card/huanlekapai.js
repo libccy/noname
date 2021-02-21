@@ -187,55 +187,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				equipSkill:true,
 				direct:true,
-				createDialog:function (player,target,onlylist){
-					var names=[];
-					var list=[];
-					if(target.name&&!target.isUnseen(0)) names.add(target.name);
-					if(target.name1&&!target.isUnseen(0)) names.add(target.name1);
-					if(target.name2&&!target.isUnseen(1)) names.add(target.name2);
-					var pss=player.getSkills();
-					for(var i=0;i<names.length;i++){
-						var info=lib.character[names[i]];
-						if(info){
-							var skills=info[3];
-							for(var j=0;j<skills.length;j++){
-								if(lib.translate[skills[j]+'_info']&&lib.skill[skills[j]]&&
-									!lib.skill[skills[j]].unique&&
-									!pss.contains(skills[j])){
-									list.push(skills[j]);
-								}
-							}
-						}
-					}
-					if(onlylist) return list;
-					var dialog=ui.create.dialog('forcebutton');
-					dialog.add('选择获得一项技能');
-					_status.event.list=list;
-					var clickItem=function(){
-						_status.event._result=this.link;
-						if(dialog) dialog.close();
-   		 _status.imchoosing=false;
-						game.resume();
-					};
-					for(i=0;i<list.length;i++){
-						if(lib.translate[list[i]+'_info']){
-							var translation=get.translation(list[i]);
-							if(translation[0]=='新'&&translation.length==3){
-								translation=translation.slice(1,3);
-							}
-							else{
-								translation=translation.slice(0,2);
-							}
-							var item=dialog.add('<div class="popup pointerdiv" style="width:80%;display:inline-block"><div class="skill">【'+
-							translation+'】</div><div>'+lib.translate[list[i]+'_info']+'</div></div>');
-							item.firstChild.addEventListener('click',clickItem);
-							item.firstChild.link=list[i];
-						}
-					}
-					dialog.add(ui.create.div('.placeholder'));
-					return dialog;
-				},
-   	content:function (){
+   	content:function(){
    		'step 0'
    		player.chooseTarget(get.prompt2('xuelunyang'),function(card,player,target){
    			var names=[];
@@ -268,46 +220,30 @@ game.import('card',function(lib,game,ui,get,ai,_status){
    			event.finish();
    		}
    		'step 2'
-   		event.skillai=function(list){
-   			return get.max(list,get.skillRank,'item');
-   		};
-   		if(event.isMine()){
-   			event.dialog=lib.skill.xuelunyang.createDialog(player,target);//tianshu
-   			event.switchToAuto=function(){
-   				event._result=event.skillai(event.list);
-   				event.dialog.close();
-   		 	_status.imchoosing=false;
-   				game.resume();
-   			};
-   			_status.imchoosing=true;
-   			game.pause();
-   		}
-   		else if(event.isOnline()){
-   			event.player.send(function(){
-   				var event=_status.event;
-   				event.skillai=function(list){
-   					return get.max(list,get.skillRank,'item');
-   				};
-   				event.dialog=lib.skill.xuelunyang.createDialog(player,target);//tianshu
-   	 		event.switchToAuto=function(){
-   	 			event._result=event.skillai(event.list);
-   		 		event.dialog.close();
-   		 		_status.imchoosing=false;
-   		 		game.resume();
-    			};
-    			_status.imchoosing=true;
-    			game.pause();
-   			})
-						event.player.wait();
-						game.pause();
-   		}
-   		else{
-   			event._result=event.skillai(lib.skill.xuelunyang.createDialog(player,target,true));
-   		}
+   		var names=[];
+					var list=[];
+					if(target.name&&!target.isUnseen(0)) names.add(target.name);
+					if(target.name1&&!target.isUnseen(0)) names.add(target.name1);
+					if(target.name2&&!target.isUnseen(1)) names.add(target.name2);
+					var pss=player.getSkills();
+					for(var i=0;i<names.length;i++){
+						var info=lib.character[names[i]];
+						if(info){
+							var skills=info[3];
+							for(var j=0;j<skills.length;j++){
+								if(lib.translate[skills[j]+'_info']&&lib.skill[skills[j]]&&
+									!lib.skill[skills[j]].unique&&
+									!pss.contains(skills[j])){
+									list.push(skills[j]);
+								}
+							}
+						}
+					}
+					player.chooseControl(list).set('prompt','选择获得一个技能').set('choice',get.max(list,get.skillRank,'item')).set('ai',function(){return _status.event.choice})
    		'step 3'
-   		player.addTempSkill(result);
-   		player.popup(result);
-   		game.log(player,'获得了','【'+get.translation(result)+'】');
+   		player.addTempSkill(result.control);
+   		player.popup(result.control);
+   		game.log(player,'获得了','#g【'+get.translation(result.control)+'】');
    	},
    },
 
