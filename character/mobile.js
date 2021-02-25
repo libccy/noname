@@ -6,16 +6,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			mobile:{
-				mobile_default:["miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu","hucheer"],
+				mobile_default:["miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu","hucheer","gongsunkang"],
 				mobile_yijiang:["yj_zhanghe","yj_zhangliao","yj_xuhuang","yj_ganning"],
 				mobile_sunben:["re_sunben"],
 				mobile_standard:["xin_xiahoudun","xin_zhangfei"],
 				mobile_shenhua:["re_pangtong","re_guanqiujian","xin_yuanshao","re_liushan","re_dongzhuo","re_sp_zhugeliang","re_sunjian"],
-				mobile_yijiang1:["re_jikang","old_bulianshi","xin_liaohua","xin_caozhang","re_xusheng","xin_chengpu","xin_jianyong","xin_gongsunzan","xin_zhuran","re_lingtong","re_liubiao"],
+				mobile_yijiang1:["re_jikang","old_bulianshi","xin_liaohua","xin_caozhang","re_xusheng","xin_chengpu","xin_jianyong","xin_gongsunzan","xin_zhuran","re_lingtong","re_liubiao","xin_guohuai","xin_panzhangmazhong","xin_fuhuanghou"],
 				mobile_sp:["old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","re_heqi","liuzan","xin_hansui"],
 			},
 		},
 		character:{
+			xin_fuhuanghou:['female','qun',3,['xinzhuikong','xinqiuyuan']],
+			xin_panzhangmazhong:['male','wu',4,['xinduodao','xinanjian']],
+			xin_guohuai:['male','wei',4,['mobilejingce']],
+			gongsunkang:['male','qun',4,['juliao','taomie']],
 			xin_zhangfei:['male','shu',4,['new_repaoxiao','liyong']],
 			xin_hansui:['male','qun',4,['xinniluan','xiaoxi_hansui']],
 			hucheer:['male','qun',4,['daoji']],
@@ -84,6 +88,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_sunben:['male','wu',4,['jiang','rehunzi','zhiba'],['zhu']],
 		},
 		characterIntro:{
+			gongsunkang:'公孙康（生卒年不详），辽东襄平（今辽宁辽阳）人。东汉末年辽东地区割据军阀，辽东太守公孙度长子（一作庶子）、车骑将军公孙恭之兄。公孙康在其父死后继任辽东太守。建安十二年（207年），擒斩图谋不轨的袁尚、袁熙兄弟，将其首级献予曹操，被拜为左将军，封襄平侯。建安十四年（209年），公孙康大破高句丽，陷其国都，并讨伐韩濊，设置带方郡。死后因二子年幼，由公孙恭继任。曹丕称帝后，被追赠为大司马。',
 			hucheer:'胡车儿（生卒年不详），东汉末年武将，初从张绣，为其心腹猛将，勇冠三军，与贾诩交情甚佳。宛城大战后，张绣投降曹操，曹操爱胡车儿之骁勇，手以黄金与之。后因曹操私纳张绣亡叔张济的遗孀邹氏，张绣深感其辱，欲杀曹操，与贾诩商议后决心反曹。《三国演义》中，作者考虑到典韦的勇猛，便增加了令胡车儿盗走典韦的双戟的情节。最终典韦、曹昂（曹操长子）、曹安民（曹操侄子）皆死于此次战斗。野史说胡车儿跟随曹操征战，被赵云在长坂坡上红枪挑死。',
 			simashi:'司马师（208年～255年3月23日），字子元，河内温县（今河南省温县）人。三国时期曹魏权臣，西晋王朝的奠基人之一，晋宣帝司马懿与宣穆皇后张春华的长子，晋文帝司马昭的同母兄，晋武帝司马炎的伯父。司马师沉着坚强，雄才大略，早年与夏侯玄、何晏齐名。高平陵政变后，以功封长平乡侯，旋加卫将军。司马懿死后，以抚军大将军辅政，独揽朝廷大权，次年升为大将军。掌权后，他制定选拔官吏的法规，命百官推荐贤才，整顿纲纪，使其各有职掌，朝野肃然。司马师也有卓越的军事才能，曾用计于新城之战击溃吴国诸葛恪的大军。嘉平六年（254年），魏帝曹芳与中书令李丰等人密谋除司马师，事情泄露，司马师杀死参与者，迫郭太后废曹芳，改立高贵乡公曹髦为帝。次年，亲自率兵平定毌丘俭、文钦之乱。回师途中病死，时年四十八岁，谥号“忠武”。后被追尊为晋景王。西晋建立后，被追尊为景皇帝，庙号世宗。',
 			yanghuiyu:'羊徽瑜（214年－278年），泰山南城（今山东新泰）人，晋景帝司马师第三任妻子。羊徽瑜出身官宦世家泰山羊氏，她是南阳太守羊续的孙女，上党太守羊衜之女；其母为东汉名士左中郎将蔡邕之女、蔡文姬的姐妹。羊徽瑜聪慧贤德，嫁给司马师后未有子女。以司马师之弟司马昭的次子司马攸为继子。司马师死后，司马攸侍奉羊徽瑜非常孝顺。泰始元年（265年），司马昭长子司马炎受禅登基，建立西晋，追谥伯父司马师为景皇帝。泰始二年（266年），尊奉羊徽瑜为景皇后，因居弘训宫，故称弘训太后。咸宁四年（278年），羊徽瑜去世，时年六十五岁，谥号景献皇后，与司马师合葬峻平陵。',
@@ -314,6 +319,403 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//界伏皇后
+			xinzhuikong:{
+				audio:2,
+				trigger:{global:'phaseZhunbeiBegin'},
+				check:function(event,player){
+					if(get.attitude(player,event.player)<-2){
+						var cards=player.getCards('h');
+						if(cards.length>player.hp) return true;
+						for(var i=0;i<cards.length;i++){
+							var useful=get.useful(cards[i]);
+							if(useful<5) return true;
+							if(cards[i].number>7&&useful<7) return true;
+						}
+					}
+					return false;
+				},
+				logTarget:'player',
+				filter:function(event,player){
+					return !player.hasSkill('xinzhuikong2')&&player.hp<=event.player.hp&&player.canCompare(event.player);
+				},
+				content:function(){
+					"step 0"
+					player.addTempSkill('xinzhuikong2','roundStart');
+					player.chooseToCompare(trigger.player).set('small',(player.hp>1&&get.effect(player,{name:'sha'},trigger.player,player)>0&&Math.random()<0.9));
+					"step 1"
+					if(result.bool){
+						trigger.player.addTempSkill('zishou2');
+						event.finish();
+					}
+					else if(result.target&&get.position(result.target)=='d') player.gain(result.target,'gain2','log');
+					"step 2"
+					var card={name:'sha',isCard:true};
+					if(trigger.player.canUse(card,player,false)) trigger.player.useCard(card,player,false);
+				},
+			},
+			xinzhuikong2:{charlotte:true},
+			xinqiuyuan:{
+				audio:2,
+				trigger:{target:'useCardToTarget'},
+				direct:true,
+				filter:function(event,player){
+					return event.card.name=='sha';
+				},
+				content:function(){
+					"step 0"
+					player.chooseTarget(get.prompt2('xinqiuyuan'),function(card,player,target){
+						return target!=player&&!_status.event.targets.contains(target)&&_status.event.playerx.canUse('sha',target,false);
+					}).set('ai',function(target){
+						var trigger=_status.event.getTrigger();
+						var player=_status.event.player;
+						return get.effect(target,trigger.card,trigger.player,player)+0.1;
+					}).set('targets',trigger.targets).set('playerx',trigger.player);
+					"step 1"
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('xinqiuyuan',target);
+						event.target=target;
+						target.chooseCard(function(card,player){
+							var name=get.name(card,player);
+							return name!='sha'&&get.type(name)=='basic';
+						},'h','交给'+get.translation(player)+
+						'一张不为【杀】的基本牌，或成为此杀的额外目标').set('ai',function(card){
+							return get.attitude(target,_status.event.sourcex)>=0?1:-1;
+						}).set('sourcex',player);
+						game.delay();
+					}
+					else{
+						event.finish();
+					}
+					"step 2"
+					if(result.bool){
+						player.gain(result.cards,event.target,'give');
+						game.delay();
+					}
+					else{
+						trigger.getParent().targets.push(event.target);
+						trigger.getParent().triggeredTargets2.push(event.target);
+						game.log(event.target,'成为了',trigger.card,'的额外目标');
+					}
+				},
+				ai:{
+					expose:0.2,
+					effect:{
+						target:function(card,player,target){
+							if(card.name!='sha') return;
+							var players=game.filterPlayer();
+							if(get.attitude(player,target)<=0){
+								for(var i=0;i<players.length;i++){
+									var target2=players[i];
+									if(player!=target2&&target!=target2&&player.canUse(card,target2,false)&&
+										get.effect(target2,{name:'shacopy',nature:card.nature,suit:card.suit},player,target)>0&&
+										get.effect(target2,{name:'shacopy',nature:card.nature,suit:card.suit},player,player)<0){
+										if(target.hp==target.maxHp) return 0.3;
+										return 0.6;
+									}
+								}
+							}
+							else{
+								for(var i=0;i<players.length;i++){
+									var target2=players[i];
+									if(player!=target2&&target!=target2&&player.canUse(card,target2,false)&&
+										get.effect(target2,{name:'shacopy',nature:card.nature,suit:card.suit},player,player)>0){
+										if(player.canUse(card,target2)) return;
+										if(target.hp==target.maxHp) return [0,1];
+										return [0,0];
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			//界潘璋马忠
+			xinduodao:{
+				audio:2,
+				trigger:{player:'damageEnd'},
+				logTarget:'source',
+				filter:function(event,player){
+					var source=event.source;
+					if(!source) return false;
+					var card=source.getEquip(1);
+					return card&&get.itemtype(card)=='card'&&lib.filter.canBeGained(card,player,source);
+				},
+				prompt2:function(event){
+					return '获得其装备区中的'+get.translation(event.source.getEquip(1));
+				},
+				check:function(event,player){
+					return (get.attitude(player,event.source)+0.1)*get.value(event.source.getEquip(1),event.source);
+				},
+				content:function(){
+					player.gain(trigger.source.getEquip(1),trigger.source,'give','bySelf');
+				},
+			},
+			xinanjian:{
+				audio:2,
+				trigger:{player:'useCardToPlayered'},
+				forced:true,
+				logTarget:'player',
+				filter:function(event,player){
+					return event.card.name=='sha'&&!player.inRangeOf(event.target);
+				},
+				content:function(){
+					'step 0'
+					var card=get.translation(trigger.card);
+					var target=get.translation(trigger.target);
+					player.chooseControl().set('prompt','暗箭：请选择一项').set('choiceList',[
+						'令'+target+'不能响应'+card,
+						'令'+card+'对'+target+'的伤害值基数+1',
+					]).set('ai',function(){
+						var target=_status.event.getTrigger().target;
+						var player=_status.event.player;
+						var num=target.mayHaveShan()?0:1;
+						if(get.attitude(player,target)>0) num=1-num;
+						return num;
+					});
+					'step 1'
+					if(result.index==0){
+						game.log(player,'令',trigger.card,'不能被',trigger.target,'响应');
+						trigger.directHit.push(trigger.target);
+					}
+					else{
+						game.log(player,'令',trigger.card,'对',trigger.target,'的伤害+1');
+						var id=trigger.target.playerid;
+						var map=trigger.customArgs;
+						if(!map[id]) map[id]={};
+						if(!map[id].extraDamage) map[id].extraDamage=0;
+						map[id].extraDamage++;
+					}
+				},
+				ai:{
+					directHit_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						if(!arg||!arg.card||!arg.target||arg.card.name!='sha'||arg.target.inRange(player)||get.attitude(player,arg.target)>0) return false;
+					},
+				},
+			},
+			//界郭笨
+			mobilejingce:{
+				audio:2,
+				trigger:{player:'phaseJieshuBegin'},
+				frequent:true,
+				filter:function(event,player){
+					var num=0;
+					game.getGlobalHistory('cardMove',function(evt){
+						if(evt.name!='cardsDiscard') return;
+						var evtx=evt.getParent();
+						if(evtx.name!='orderingDiscard') return false;
+						var evt2=(evtx.relatedEvent||evtx.getParent());
+						if(evt2&&(evt2.name=='useCard'||evt2.name=='respond')) num+=evt.cards.length;
+					});
+					return num>=player.hp;
+				},
+				content:function(){
+					player.draw(2);
+				},
+				group:'mobilejingce_count',
+				intro:{
+					content:function(num,player){
+						if(num==0) return '一张都没有？就这？';
+						if(num<player.hp) return '才'+get.cnNumber(num)+'张？就这？';
+						return '卧槽，牛逼啊，居然'+get.cnNumber(num)+'张了！';
+					},
+				},
+			},
+			mobilejingce_count:{
+			 trigger:{
+			 	global:['cardsDiscardEnd','phaseBefore'],
+			 	player:'phaseAfter',
+			 },
+			 silent:true,
+			 firstDo:true,
+			 filter:function(evt,player){
+			 	if(evt.name=='phase') return true;
+			 	if(player!=_status.currentPhase) return false;
+					var evtx=evt.getParent();
+					if(evtx.name!='orderingDiscard') return false;
+					var evt2=(evtx.relatedEvent||evtx.getParent());
+					return (evt2&&(evt2.name=='useCard'||evt2.name=='respond'))
+			 },
+			 content:function(){
+			 	if(trigger.name=='phase') player.unmarkSkill('mobilejingce');
+			 	else{
+			 	 var num=0;
+						game.getGlobalHistory('cardMove',function(evt){
+							if(evt.name!='cardsDiscard') return;
+							var evtx=evt.getParent();
+							if(evtx.name!='orderingDiscard') return false;
+							var evt2=(evtx.relatedEvent||evtx.getParent());
+							if(evt2&&(evt2.name=='useCard'||evt2.name=='respond')) num+=evt.cards.length;
+						});
+						player.storage.mobilejingce=num;
+			 	 player.markSkill('mobilejingce');
+			 	}
+			 },
+			},
+			//公孙康
+			juliao:{
+				mod:{
+					globalTo:function(from,to,distance){
+						return distance+game.countGroup()-1;
+					},
+				},
+			},
+			taomie:{
+				audio:3,
+				group:['taomie1','taomie2','taomie3'],
+				trigger:{source:'damageBegin1'},
+				forced:true,
+				locked:false,
+				direct:true,
+				filter:function(event,player){
+					return event.player.hasMark('taomie');
+				},
+				content:function(){
+					'step 0'
+					player.logSkill(Math.random()<0.5?'taomie2':'taomie3',trigger.player);
+					var target=get.translation(trigger.player);
+					player.chooseControl().set('prompt','讨灭：请选择一项').set('choiceList',[
+						'令即将对'+target+'造成的伤害+1',
+						'获得'+target+'的一张牌，并可将其交给另一名其他角色',
+						'依次执行以上所有选项，并移去'+target+'的“讨灭”标记',
+					]).set('ai',function(){
+						var evt=_status.event.getTrigger();
+						var player=_status.event.player;
+						var target=evt.player;
+						var bool1=!target.hasSkillTag('filterDamage',null,{
+							player:player,
+							card:evt.card,
+						});
+						var bool2=get.effect(target,{name:'shunshou'},player,player)>0;
+						if(bool1&&bool2&&target.hp<=evt.num+1) return 2;
+						if(bool1) return 0;
+						return 1;
+					});
+					'step 1'
+					if(result.index==2){
+						trigger.taomie_player=trigger.player;
+						trigger.player.addTempSkill('taomie4');
+					}
+					if(result.index!=1){
+						trigger.num++;
+					}
+					if(result.index!=0&&trigger.player.countGainableCards(player,'hej')>0){
+						player.gainPlayerCard(trigger.player,'hej',true);
+					}
+				 else event.finish();
+				 'step 2'
+				 var card=result.cards[0];
+				 if(card&&player.getCards('h').contains(card)&&game.hasPlayer(function(current){
+				 	return current!=player&&current!=trigger.player;
+				 })){
+				 	event.card=card;
+				 	player.chooseTarget('是否将'+get.translation(card)+'交给一名其他角色？',function(card,player,target){
+				 		return target!=player&&target!=_status.event.getTrigger().player;
+				 	}).set('ai',function(target){
+				  	var player=_status.event.player;
+				  	var card=_status.event.getParent().card;
+				  	if(target.hasSkillTag('nogain')||!player.needsToDiscard()||(get.tag(card,'damage')&&player.hasValueTarget(card,null,false)&&get.effect(_status.event.getTrigger().player,card,null,false)>0)) return 0;
+				  	return get.attitude(player,target)/(1+target.countCards('h'));
+				 	});
+				 }
+				 else event.finish();
+				 'step 3'
+				 if(result.bool){
+				 	var target=result.targets[0];
+				 	player.line(target);
+				 	target.gain(card,player,'giveAuto');
+				 }
+				},
+				intro:{
+					content:'mark',
+				},
+				ai:{
+					effect:{
+						player:function(card,player,target){
+							if(target&&get.tag(card,'damage')&&target.hasMark('taomie')){
+								if(player.hasSkillTag('jueqing',false,target)) return;
+								if(get.attitude(player,target)>0){
+									return 0.7;
+								}
+								return 1.2;
+							}
+						},
+					},
+				},
+			},
+			taomie1:{
+				audio:true,
+				trigger:{
+					player:'damageEnd',
+					source:'damageSource',
+				},
+				logTarget:function(trigger,player){
+					if(player==trigger.player) return trigger.source;
+					return trigger.player;
+				},
+				filter:function(event,player){
+					var target=lib.skill.taomie1.logTarget(event,player);
+					return target&&target.isAlive()&&!target.hasMark('taomie');
+				},
+				check:function(event,player){
+					var target=lib.skill.taomie1.logTarget(event,player);
+					if(get.attitude(player,target)>0) return false;
+					var target0=game.findPlayer(function(current){
+						return current.hasMark('taomie');
+					});
+					if(!target0) return true;
+					var eff1=0,eff2=0;
+					player.countCards('h',function(card){
+						if(!get.tag(card,'damage')) return false;
+						if(player.hasValueTarget(card,null,true)>0){
+							if(player.canUse(card,target,null,true)){
+								var eff=get.effect(target,card,player,player);
+								if(eff>0) eff1+=eff;
+							}
+							if(player.canUse(card,target0,null,true)){
+								var eff=get.effect(target0,card,player,player);
+								if(eff>0) eff2+=eff;
+							}
+						}
+					});
+					return eff1>eff2;
+				},
+				prompt2:function(event,player){
+					var target=lib.skill.taomie1.logTarget(event,player);
+					var str='令'+get.translation(target)+'获得“讨灭”标记';
+					if(game.hasPlayer(function(current){
+						return current.hasMark('taomie');
+					})) str+='，并移去场上已有的“讨灭”标记';
+					return str;
+				},
+				content:function(){
+					game.countPlayer(function(current){
+						var num=current.countMark('taomie');
+						if(num) current.removeMark('taomie');
+					});
+					lib.skill.taomie1.logTarget(trigger,player).addMark('taomie',1);
+				},
+			},
+			taomie2:{audio:true},
+			taomie3:{audio:true},
+			taomie4:{
+				trigger:{
+					global:['damageAfter','damageCancelled','damageZero'],
+					player:'dieBegin',
+				},
+				forced:true,
+				popup:false,
+				charlotte:true,
+				filter:function(event,player){
+					return player.hasMark('taomie')&&(event.name=='die'||event.taomie_player==player);
+				},
+				content:function(){
+					player.removeMark('taomie',player.countMark('taomie'));
+					player.removeSkill('taomie2');
+				},
+			},
 			//铁骑飞
 			liyong:{
 				audio:'retishen',
@@ -6629,6 +7031,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liyong2:'厉勇',
 			liyong3:'厉勇',
 			liyong_info:'锁定技，若你于出牌阶段使用的【杀】被【闪】抵消，本阶段你下一张【杀】不可被响应且伤害+1，指定的目标本回合非锁定技失效，当此【杀】造成伤害后，若目标角色未死亡，你失去1点体力。',
+			gongsunkang:'公孙康',
+			juliao:'据辽',
+			juliao_info:'锁定技，其他角色计算与你的距离始终+X（X为场上势力数-1）。',
+			taomie:'讨灭',
+			taomie1:'讨灭',
+			taomie2:'讨灭',
+			taomie3:'讨灭',
+			taomie4:'讨灭',
+			taomie_info:'当你受到伤害后或当你造成伤害后，你可以令伤害来源或受伤角色获得“讨灭”标记（如场上已有标记则转换给该角色）；当你对有“讨灭”标记的角色造成伤害时，选择一项：1. 此伤害+1；2. 你获得其区域内的一张牌并可将之交给另一名角色；3. 依次执行前两项并于伤害结算后弃置其“讨灭”标记。',
+			xin_guohuai:'手杀郭淮',
+			mobilejingce:'精策',
+			mobilejingce_info:'结束阶段，若此回合因使用或打出而置入弃牌堆的牌的数量不小于你的体力值，则你可以摸两张牌。',
+			xin_panzhangmazhong:'手杀潘璋马忠',
+			xinduodao:'夺刀',
+			xinduodao_info:'当你受到伤害后，你可以获得伤害来源装备区里的武器牌。',
+			xinanjian:'暗箭',
+			xinanjian_info:'锁定技，当你使用【杀】指定目标后，若你不在目标角色攻击范围内，你选择一项：1. 令其无法响应此【杀】；2. 其受到此【杀】造成的伤害+1。',
+			xin_fuhuanghou:'手杀伏皇后',
+			xinzhuikong:'惴恐',
+			xinzhuikong_info:'每轮限一次，其他角色的回合开始时，若其体力值不小于你，你可与其拼点。若你赢，其本回合无法使用牌指定除其以外的角色为目标；若你没赢，你获得其拼点的牌，然后其视为对你使用一张【杀】。',
+			xinqiuyuan:'求援',
+			xinqiuyuan_info:'当你成为【杀】的目标时，你可以令另一名其他角色交给你一张除【杀】以外的基本牌，否则其也成为此【杀】的目标。',
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua:'手杀异构·神话再临',
 			mobile_yijiang1:'手杀异构·一将成名',

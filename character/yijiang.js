@@ -9394,6 +9394,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player!=target;
 				},
 				mark:true,
+				delay:false,
 				content:function(){
 					"step 0"
 					player.awakenSkill('xianzhou');
@@ -12143,9 +12144,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liubiao:['re_liubiao','xin_liubiao','liubiao'],
 			manchong:['re_manchong','manchong'],
 			caochong:['caochong','old_caochong'],
-			guohuai:['guohuai','re_guohuai','ol_guohuai'],
+			guohuai:['guohuai','re_guohuai','xin_guohuai','ol_guohuai'],
 			jianyong:['re_jianyong','xin_jianyong','jianyong'],
-			panzhangmazhong:['re_panzhangmazhong','panzhangmazhong'],
+			panzhangmazhong:['xin_panzhangmazhong','re_panzhangmazhong','panzhangmazhong'],
 			yufan:['re_yufan','yufan'],
 			zhuran:['re_zhuran','xin_zhuran','zhuran','old_zhuran'],
 			liru:['re_liru','xin_liru','liru'],

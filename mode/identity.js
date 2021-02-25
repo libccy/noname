@@ -1101,7 +1101,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(list.length) player.group=function(){
 							 if(_status.mode!='zhong'&&game.zhu&&game.zhu.group){
 							  if(['re_zhangjiao','liubei','re_liubei','caocao','re_caocao','sunquan','re_sunquan','zhangjiao','sp_zhangjiao','caopi','re_caopi','liuchen','caorui','sunliang','sunxiu','sunce','re_sunben','ol_liushan','re_liushan','key_akane','dongzhuo','re_dongzhuo','ol_dongzhuo','jin_simashi'].contains(game.zhu.name)) return game.zhu.group;
-							  if(game.zhu.name=='sunhao'&&player.identity=='zhong') return 'wu';
 							  if(game.zhu.name=='yl_yuanshu'){
 							   if(player.identity=='zhong') list.remove('qun');
 							   else return 'qun';
@@ -2072,8 +2071,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						else if(result[i]=='ai') result[i]=function(){
 						 var player=lib.playerOL[i];
 						 var list=['wei','shu','wu','qun','jin','key'];
-							for(var i=0;i<list.length;i++){
-								if(!lib.group.contains(list[i])) list.splice(i--,1);
+							for(var ix=0;ix<list.length;ix++){
+								if(!lib.group.contains(list[ix])) list.splice(ix--,1);
 							}
 						 if(_status.mode!='zhong'&&game.zhu&&game.zhu.group){
 						  if(['re_zhangjiao','liubei','re_liubei','caocao','re_caocao','sunquan','re_sunquan','zhangjiao','sp_zhangjiao','caopi','re_caopi','liuchen','caorui','sunliang','sunxiu','sunce','re_sunben','ol_liushan','re_liushan','key_akane','dongzhuo','re_dongzhuo','ol_dongzhuo','jin_simashi'].contains(game.zhu.name)) return game.zhu.group;

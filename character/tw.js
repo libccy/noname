@@ -457,9 +457,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result.bool){
 						player.line(result.targets[0],'green');
-						game.asyncDraw([player,result.targets[0]]);
-						game.delay();
+						game.asyncDraw([player,result.targets[0]].sortBySeat());
 					}
+					else event.finish();
+					'step 3'
+					game.delay();
 				},
 			},
 			waishi:{

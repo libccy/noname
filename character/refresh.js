@@ -310,7 +310,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var target=trigger.source;
 					if(target.isAlive()&&event.count>0) player.chooseBool(get.prompt('reenyuan',target),'令该角色选择一项：①失去1点体力。②交给你一张手牌。若此牌不为♥，则你摸一张牌。').set('ai',function(){
 						var evt=_status.event.getTrigger();
-						return lib.skill.reenyuan2.check(evt.player,evt.source);
+						return lib.skill.reenyuan2.check(evt,evt.player);
 					});
 					else event.finish();
 					'step 5'

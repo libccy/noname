@@ -22,7 +22,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_xiahouyuan:['male','wei',4,['xinshensu']],
 			huangzhong:['male','shu',4,['liegong']],
 			re_weiyan:['male','shu',4,['xinkuanggu','qimou']],
-			re_xiaoqiao:['female','wu',3,['retianxiang','hongyan']],
+			re_xiaoqiao:['female','wu',3,['retianxiang','xinhongyan']],
 			sp_zhangjiao:['male','qun',3,['releiji','guidao','huangtian'],['zhu']],
 			re_yuji:["male","qun",3,["xinfu_guhuo"],["forbidai"]],
 			// yuji:['male','qun',3,['guhuo']],
@@ -6393,6 +6393,61 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			xinhongyan:{
+				audio:2,
+				mod:{
+					suit:function(card,suit){
+						if(suit=='spade') return 'heart';
+					}
+				},
+				trigger:{global:'judge'},
+				direct:true,
+				filter:function(event,player){
+					if(event.fixedResult&&event.fixedResult.suit) return event.fixedResult.suit=='heart';
+					return get.suit(event.player.judging[0],event.player)=='heart';
+				},
+				content:function(){
+					"step 0"
+					var str='红颜：'+get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
+					get.translation(trigger.player.judging[0])+'，请将其改为一种花色';
+					player.chooseControl('spade','heart','diamond','club').set('prompt',str).set('ai',function(){
+						var judging=_status.event.judging;
+						var trigger=_status.event.getTrigger();
+						var res1=trigger.judge(judging);
+						var list=lib.suit.slice(0);
+						var attitude=get.attitude(player,trigger.player);
+						if(attitude==0) return 0;
+						var getj=function(suit){
+							return trigger.judge({
+								name:get.name(judging),
+								nature:get.nature(judging),
+								suit:suit,
+								number:get.number(judging),
+							})
+						};
+						list.sort(function(a,b){
+							return (getj(b)-getj(a))*get.sgn(attitude);
+						});
+						return list[0];
+					}).set('judging',trigger.player.judging[0]);
+					"step 1"
+					if(result.control!='cancel2'){
+						player.addExpose(0.25);
+						player.popup(result.control);
+						game.log(player,'将判定结果改为了','#y'+get.translation(result.control+2));
+						if(!trigger.fixedResult) trigger.fixedResult={};
+						trigger.fixedResult.suit=result.control;
+						trigger.fixedResult.color=get.color({suit:result.control});
+					}
+				},
+				ai:{
+					rejudge:true,
+					tag:{
+						rejudge:0.4,
+					},
+					expose:0.5,
+				},
+			},
 			gzbuqu:{
 				audio:2,
 				trigger:{player:'changeHp'},
@@ -7678,6 +7733,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"guhuo_wuxie_info":"",
 			"guhuo_phase":"蛊惑",
 			"guhuo_phase_info":"",
+			xinhongyan:'红颜',
+			xinhongyan_info:'锁定技，你的♠牌和♠判定牌的花色视为♥。一名角色的判定结果生效前，若判定结果为♥，则你将其改为一种花色。',
 			
 			shenhua_feng:'神话再临·风',
 			shenhua_huo:'神话再临·火',
