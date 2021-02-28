@@ -84,7 +84,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangrang:['male','qun',3,['taoluan']],
 			sunziliufang:['male','wei',3,['guizao','jiyu']],
 
-			xinxianying:['female','wei',3,['xinzhongjian','xincaishi']],
+			xinxianying:['female','wei',3,['zhongjian','caishi']],
 			wuxian:['female','shu',3,['fumian','daiyan']],
 			xushi:['female','wu',3,['wengua','fuzhu']],
 			caojie:['female','qun',3,['shouxi','huimin']],
@@ -3451,7 +3451,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(!player.countCards('h')) return false;
 					if(player.getStat('skill').zhongjian&&!player.hasSkill('zhongjian2')) return false;
-					return true;
+					return game.hasPlayer(function(current){
+						return current!=player&&Math.min(current.hp,current.countCards('h'))>0;
+					});
 				},
 				filterCard:true,
 				check:function(){
@@ -3459,18 +3461,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				discard:false,
 				lose:false,
+				delay:false,
 				filterTarget:function(card,player,target){
-					return target!=player&&target.countCards('h')>0;
+					return target!=player&&target.hp>0&&target.countCards('h')>0;
 				},
 				content:function(){
 					'step 0'
 					player.showCards(cards);
 					'step 1'
-					var num=target.countCards('h')-target.hp;
-					if(num<=0){
-						num=1;
-					}
-					var hs=target.getCards('h').randomGets(num);
+					player.choosePlayerCard(target,'h',Math.min(target.countCards('h'),target.hp),true);
+					'step 2'
+					var hs=result.cards;
 					target.showCards(hs);
 					var colors=[];
 					var numbers=[];
@@ -3484,113 +3485,70 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!event.bool1&&colors.contains(get.color(hs[i]))) event.bool1=true;
 						if(!event.bool2&&numbers.contains(get.number(hs[i]))) event.bool2=true;
 					}
-					'step 2'
+					'step 3'
 					if(event.bool1){
-						player.chooseControl(function(event,player){
-							return _status.event.bool?0:1;
-						}).set('bool',(get.attitude(player,target)>=0||player.countCards('h')<target.countCards('h'))).set('choiceList',['摸一张牌','弃置'+get.translation(target)+'一张牌']);
+						var filterTarget=function(card,player,target){
+							return target!=player&&target.countDiscardableCards(player,'he')>0;
+						}
+						if(!game.hasPlayer(function(current){
+							return filterTarget(null,player,current);
+						})) event._result={bool:false};
+						else player.chooseTarget(filterTarget,'弃置一名其他角色的一张牌或摸一张牌').set('ai',function(target){
+							var att=get.attitude(player,target);
+							if(att>=0) return 0;
+							if(target.countCards('he',function(card){
+								return get.value(card)>5;
+							})) return -att;
+							return 0;
+						});
 					}
 					else{
-						event.goto(4);
-					}
-					'step 3'
-					if(result&&typeof result.index=='number'){
-						if(result.index==0) player.draw();
-						else player.discardPlayerCard(target,'he',true);
+						event.goto(5);
 					}
 					'step 4'
+					if(!result.bool) player.draw();
+					else{
+						var target=result.targets[0];
+						player.line(target,'green');
+						player.discardPlayerCard(target,true,'he');
+					}
+					'step 5'
 					if(event.bool2){
 						player.addTempSkill('zhongjian2');
 					}
 					if(!event.bool1&&!event.bool2){
-						if(player.hasSkill('caishi')&&typeof player.storage.caishi=='number'){
-							player.storage.caishi--;
-							if(player.storage.caishi<=0){
-								player.unmarkSkill('caishi');
-								if(player.storage.caishi<0){
-									player.markSkill('zhongjian');
-								}
-							}
-							else{
-								player.updateMarks();
-							}
-						}
-						else{
-							player.unmarkSkill('zhongjian');
-							if(player.hasSkill('zhongjian3')){
-								player.storage.zhongjian3--;
-							}
-							else{
-								player.addSkill('zhongjian3');
-							}
-						}
+						player.addSkill('caishix');
+						if(typeof player.storage.caishix!='number') player.storage.caishix=0;
+						player.storage.caishix--;
+						player.markSkill('caishix');
 						player.popup('杯具');
-					}
-				},
-				intro:{
-					content:function(storage,player){
-						return '手牌上限'+player.storage.caishi;
-					},
-					markcount:function(storage,player){
-						return player.storage.caishi;
 					}
 				},
 				ai:{
 					order:8,
 					result:{
 						player:function(player,target){
-							var num=Math.max(1,target.countCards('h')-target.hp);
-							if(get.attitude(player,target)<0) return 1.5*num;
-							return num;
+							return Math.min(target.hp,target.countCards('h'));
 						}
 					}
 				}
 			},
 			zhongjian2:{},
-			zhongjian3:{
-				init:function(player){
-					player.storage.zhongjian3=-1;
-				},
-				mark:true,
-				onremove:true,
-				intro:{
-					content:'手牌上限#'
-				},
-				mod:{
-					maxHandcard:function(player,num){
-						if(typeof player.storage.zhongjian3=='number') return num+player.storage.zhongjian3;
-					}
-				}
-			},
 			caishi:{
 				audio:2,
 				trigger:{player:'phaseDrawBegin'},
 				direct:true,
-				init:function(player){
-					player.storage.caishi=0;
-				},
-				onremove:function(player){
-					player.unmarkSkill('zhongjian');
-					delete player.storage.caishi;
-				},
-				intro:{
-					content:function(storage){
-						if(storage>0) return '手牌上限+'+storage;
-						if(storage<0) return '手牌上限'+storage;
-						return '手牌上限无变化';
-					},
-				},
 				content:function(){
 					'step 0'
 					if(player.isHealthy()){
 						event.type=0;
-						player.chooseBool(get.prompt('caishi'),'手牌上限+1，然后本回合你的牌不能对其他角色使用',function(event,player){
-							return player.skipList.contains('phaseUse')||!player.needsToDiscard(1);
+						player.chooseBool(get.prompt('caishi'),'令自己的手牌上限+1',function(){
+							return true;
 						});
 					}
 					else{
 						event.type=1;
-						player.chooseControlList(get.prompt('caishi'),'手牌上限+1，然后本回合你的牌不能对其他角色使用','回复1点体力，然后本回合你的牌不能对自己使用',function(){
+						player.chooseControlList(get.prompt('caishi'),'令自己的手牌上限+1','回复1点体力，然后本回合你的牌不能对自己使用',function(){
 							return 1;
 						});
 					}
@@ -3599,17 +3557,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(result.control!='cancel2'){
 							player.logSkill('caishi');
 							if(result.index==0){
-								player.addTempSkill('caishi2');
-								player.storage.caishi++;
-								if(player.storage.caishi>=0){
-									player.unmarkSkill('zhongjian');
-									if(player.storage.caishi>0){
-										player.markSkill('caishi');
-									}
-								}
-								else{
-									player.updateMarks();
-								}
+								player.addSkill('caishix');
+								if(typeof player.storage.caishix!='number') player.storage.caishix=0;
+								player.storage.caishix++;
+								player.markSkill('caishix');
 							}
 							else if(result.index==1){
 								player.recover();
@@ -3620,25 +3571,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						if(result.bool){
 							player.logSkill('caishi');
-							player.addTempSkill('caishi2');
-							player.storage.caishi++;
-							if(player.storage.caishi>=0){
-								player.unmarkSkill('zhongjian');
-								if(player.storage.caishi>0){
-									player.markSkill('caishi');
-								}
-							}
-							else{
-								player.updateMarks();
-							}
+							player.addSkill('caishix');
+							if(typeof player.storage.caishix!='number') player.storage.caishix=0;
+							player.storage.caishix++;
+							player.markSkill('caishix');
 						}
 					}
 				},
+			},
+			caishix:{
+				intro:{
+					content:function(storage){
+						if(storage>0) return '手牌上限+'+storage;
+						if(storage<0) return '手牌上限'+storage;
+						return '手牌上限无变化';
+					},
+				},
 				mod:{
 					maxHandcard:function(player,num){
-						if(typeof player.storage.caishi=='number') return num+player.storage.caishi;
+						if(typeof player.storage.caishix=='number') return num+player.storage.caishix;
 					},
-				}
+				},
+				charlotte:true,
+				onremove:true,
 			},
 			caishi2:{
 				mod:{
@@ -12150,7 +12105,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yufan:['re_yufan','yufan'],
 			zhuran:['re_zhuran','xin_zhuran','zhuran','old_zhuran'],
 			liru:['re_liru','xin_liru','liru'],
-			fuhuanghou:['re_fuhuanghou','fuhuanghou','old_fuhuanghou'],
+			fuhuanghou:['re_fuhuanghou','xin_fuhuanghou','fuhuanghou','old_fuhuanghou'],
 			chenqun:['chenqun','old_chenqun'],
 			hanhaoshihuan:['re_hanhaoshihuan','hanhaoshihuan'],
 			caozhen:['caozhen','old_caozhen'],
@@ -12166,7 +12121,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuyu:['liuyu','ol_liuyu'],
 			zhangrang:['zhangrang','ol_zhangrang','junk_zhangrang'],
 			jikang:['re_jikang','jikang'],
-			xinxianying:['re_xinxianying','xinxianying','sp_xinxianying','ol_xinxianying'],
+			xinxianying:['re_xinxianying','xinxianying','ol_xinxianying','sp_xinxianying'],
 		},
 		translate:{
 			old_huaxiong:'华雄',
@@ -12235,7 +12190,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huanghao:'黄皓',
 			zhangrang:'张让',
 			cenhun:'岑昏',
-			xinxianying:'辛宪英',
+			xinxianying:'OL辛宪英',
 			wuxian:'吴苋',
 			xushi:'徐氏',
 			caojie:'曹节',
@@ -12319,9 +12274,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhongjian_bg:'鉴',
 			zhongjian3:'忠鉴',
 			zhongjian3_bg:'鉴',
-			zhongjian_info:'出牌阶段限一次，你可以展示一张手牌，然后展示手牌数大于体力值的一名其他角色X张手牌（X为其手牌数和体力值之差且至少为1）。若以此法展示的牌与你展示的牌：有颜色相同的，你摸一张牌或弃置其一张牌；有点数相同的，本回合此技能改为“出牌阶段限两次”；均不同，你的手牌上限-1',
+			zhongjian_info:'出牌阶段限一次，你可以展示一张手牌，然后展示一名其他角色的X张手牌（X为其体力值）。若以此法展示的牌与你展示的牌：有颜色相同的，你选择：①摸一张牌。②弃置一名其他角色的一张牌；有点数相同的，本回合此技能改为“出牌阶段限两次”；均不同，你的手牌上限-1',
 			caishi:'才识',
-			caishi_info:'摸牌阶段开始时，你可以选择一项：1.手牌上限+1，然后本回合你的牌不能对其他角色使用；2.回复1点体力，然后本回合你的牌不能对自己使用',
+			caishix:'才识/忠鉴',
+			caishi_info:'摸牌阶段开始时，你可以选择一项：1.手牌上限+1；2.回复1点体力，然后本回合你的牌不能对自己使用',
 			xincaishi:'才识',
 			xincaishi_info:'摸牌阶段，你可以选择一项：1.少摸一张牌，然后本回合发动〖忠鉴〗时可以多展示自己的一张牌；2.本回合手牌上限-1，然后本回合发动〖忠鉴〗时可以多展示对方的一张牌；3.多摸两张牌，本回合不能发动〖忠鉴〗。',
 			guizao:'瑰藻',

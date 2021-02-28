@@ -992,13 +992,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					delete player.storage.jinglve2;
 					delete player.storage.jinglve3;
 				},
-				trigger:{global:['dieEnd','loseAfter']},
+				trigger:{global:['dieEnd','loseEnd','gainEnd']},
 				silent:true,
 				lastDo:true,
 				charlotte:true,
 				filter:function(event,player){
-					if(event.player!=player.storage.jinglve2) return false;
-					return event.name=='die'||(event.cards.contains(player.storage.jinglve3)&&event.getParent().name!='useCard');
+					if(event.name!='gain'&&event.player!=player.storage.jinglve2) return false;
+					return event.name=='die'||(event.cards.contains(player.storage.jinglve3)&&(event.name=='gain'||event.position!=ui.ordering));
 				},
 				content:function(){
 					player.removeSkill('jinglve2');
@@ -1007,9 +1007,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jinglve3:{
 				audio:'jinglve',
-				trigger:{global:['loseAfter','useCard','phaseAfter']},
+				trigger:{global:['loseAfter','useCard','phaseAfter','cardsDiscardAfter']},
 				filter:function(event,player){
-					if(event.player!=player.storage.jinglve2) return false;
+					if(event.player&&event.player!=player.storage.jinglve2) return false;
 					if(event.name=='phase') return event.player.getCards('hej').contains(player.storage.jinglve3);
 					if(!event.cards.contains(player.storage.jinglve3)) return false;
 					return event.name=='useCard'||get.position(player.storage.jinglve3,true)=='d';
@@ -2082,6 +2082,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ui.create.dialog(str).videoId=id;
 					};
 					var chooseButton=function(list){
+						var roundmenu=false;
+						if(ui.roundmenu&&ui.roundmenu.display!='none'){
+							roundmenu=true;
+							ui.roundmenu.style.display='none';
+						}
 						var event=_status.event;
 						event.settleed=false;
 						event.finishedx=[];
@@ -2090,7 +2095,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.zhengjing_nodes=[];
 						event.map=[];
 						event.dialog=ui.create.dialog('forcebutton','hidden');
-						event.dialog.textPrompt=event.dialog.addText('及时点击卡牌，但不要点到毒了！');
+						event.dialog.textPrompt=event.dialog.add('<div class="text center">及时点击卡牌，但不要点到毒了！</div>');
 						event.switchToAuto=function(){
 							event._result={
 								bool:true,
@@ -2099,6 +2104,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.dialog.close();
 							game.resume();
 							_status.imchoosing=false;
+							if(roundmenu) ui.roundmenu.style.display='';
 						};
 						event.dialog.classList.add('fixed');
 						event.dialog.classList.add('scroll1');
@@ -2112,11 +2118,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.settleed=true;
 							if(du){
 								if(lib.config.background_speak) game.playAudio('skill','zhengjing_boom');
-								event.dialog.textPrompt.innerHTML='  <br>叫你别点毒你非得点 这下翻车了吧';
+								event.dialog.textPrompt.innerHTML='<div class="text center">叫你别点毒你非得点 这下翻车了吧</div>';
 							}
 							else {
 								if(lib.config.background_speak) game.playAudio('skill','zhengjing_finish');
-								event.dialog.textPrompt.innerHTML='  <br>整理经典结束！共整理出'+get.cnNumber(event.finishedx.length)+'份经典';
+								event.dialog.textPrompt.innerHTML='<div class="text center">整理经典结束！共整理出'+get.cnNumber(event.finishedx.length)+'份经典</div>';
 							}
 							while(event.zhengjing_nodes.length){
 								event.zhengjing_nodes.shift().delete();
@@ -3693,6 +3699,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							ai2:function(target){
 								var att=get.attitude(_status.event.player,target);
+								if(target.hasSkillTag('nogain')) att/=10;
+								if(target.hasJudge('lebu')) att/=5;
 								return att;
 							},
 							prompt:'选择'+get.cnNumber(event.num)+'张牌，交给一名其他角色。',
@@ -5626,14 +5634,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							targetInRange:function(){
 								return true;
 							},
+							aiOrder:function(player,card,num){
+								var name=get.name(card);
+								if(name=='tao') return num+7+Math.pow(player.getDamagedHp(),2);
+								if(name=='sha') return num+6;
+								if(get.subtype(card)=='equip2') return num+get.value(card)/3;
+							},
 						},
 						trigger:{player:'useCard'},
 						forced:true,
 						charlotte:true,
-						//audio:'kuangcai',
 						silent:true,
 						popup:false,
-						//usable:5,
 						filter:function(event,player){
 							if(!player.forceCountChoose||!player.forceCountChoose.phaseUse){
 								return false;
@@ -5649,10 +5661,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							else game.broadcastAll(function(player){
 								player.forceCountChoose.phaseUse--;
 							},player);
-						},
-						ai:{
-							presha:true,
-							pretao:true,
 						},
 					},
 					cancel:{

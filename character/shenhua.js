@@ -1859,75 +1859,83 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.bottom=true;
 				},	
 			},
-			"nzry_mingren":{
+			nzry_mingren:{
 				audio:"nzry_mingren_1",
-				init:function (player){
-					if(!player.storage.nzry_mingren) player.storage.nzry_mingren=[];
-				},
 				marktext:"任",
 				intro:{
 					content:'cards',
-					onunmark:function(storage,player){
-						if(storage&&storage.length){
-							player.$throw(storage,1000);
-							game.cardsDiscard(storage);
-							game.log(storage,'被置入了弃牌堆');
-							player.storage.nzry_mingren.length=0;
-						}
-					},
+					onunmark:'throw',
 				},
-				mark:true,
 				group:["nzry_mingren_1","nzry_mingren_2"],
 				subSkill:{
-					'1':{
+					1:{
 						audio:2,
 						trigger:{
 							global:'gameDrawAfter',
 							player:'enterGame',
 						},
 						forced:true,
+						locked:false,
 						filter:function(event,player){
-							return !player.storage.nzry_mingren||!player.storage.nzry_mingren.length;
+							return !player.getStorage('nzry_mingren').length;
 						},
-						content:function (){
+						content:function(){
 							'step 0'
-							player.draw();
+							player.draw(2);
 							'step 1'
-							player.chooseCard('h','请选择一张手牌置于你的武将牌上，称为“任”',true).set('ai',function(card){
+							if(!player.countCards('h')) event.finish();
+							else player.chooseCard('h','将一张手牌置于武将牌上，称为“任”',true).set('ai',function(card){
 								return 6-get.value(card);
 							});
 							'step 2'
 							if(result.bool){
-								player.storage.nzry_mingren.push(result.cards[0]);
-								player.syncStorage('nzry_mingren');
+								player.markAuto('nzry_mingren',result.cards);
 								game.log(player,'将',result.cards[0],'置于其武将牌上');
 								player.lose(result.cards[0],ui.special,'toStorage');
 							};
 						},
 					},
-					'2':{
+					2:{
 						audio:2,
 						trigger:{
 							player:'phaseJieshuBegin',
 						},
+						filter:function(event,player){
+							return player.countCards('h')>0&&player.getStorage('nzry_mingren').length>0;
+						},
 						direct:true,
-						content:function (){
+						content:function(){
 							'step 0'
-							player.chooseCard('h','是否用一张手牌替换“任”？').set('ai',function(card){
-								return 5-get.value(card);
+							player.chooseCard('h','是否用一张手牌替换“任”（'+get.translation(player.getStorage('nzry_mingren')[0])+'）？').set('ai',function(card){
+								var player=_status.event.player;
+								var color=get.color(card);
+								if(color==get.color(player.getStorage('nzry_mingren')[0])) return false;
+								var num=0;
+								var list=[];
+								player.countCards('h',function(cardx){
+									if(cardx!=card||get.color(cardx)!=color) return false;
+									if(list.contains(cardx.name)) return false;
+									list.push(cardx.name);
+									switch(cardx.name){
+										case 'wuxie':num+=(game.countPlayer()/2.2);break;
+										case 'caochuan':num+=1.1;break;
+										case 'shan':num+=1;break;
+									}
+								});
+								return num*(30-get.value(card));
 							});
 							'step 1'
 							if(result.bool){
 								player.logSkill('nzry_mingren');
-								if(player.storage.nzry_mingren!=undefined&&player.storage.nzry_mingren[0]!=undefined){
-									player.gain(player.storage.nzry_mingren[0],'gain2','fromStorage');
-									player.storage.nzry_mingren.remove(player.storage.nzry_mingren[0]);
-								};
-								player.syncStorage('nzry_mingren');
-								player.storage.nzry_mingren.push(result.cards[0]);
-								player.syncStorage('nzry_mingren');
 								game.log(player,'将',result.cards[0],'置于其武将牌上');
 								player.lose(result.cards[0],ui.special,'toStorage');
+								var card=player.getStorage('nzry_mingren')[0];
+								if(card){
+									player.gain(card,'gain2','fromStorage');
+									player.storage.nzry_mingren.remove(card);
+									player.storage.nzry_mingren.push(result.cards[0]);
+									player.syncStorage('nzry_mingren');
+								}
 							};
 						},
 					},
@@ -1941,74 +1949,70 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				locked:false,
 				zhuanhuanji:true,
-				marktext:'贞',
 				intro:{
 					content:function(storage,player,skill){
-						if(player.storage.nzry_zhenliang==true) return '你的回合外，当你使用或打出牌进入弃牌堆时，若此牌与“任”类型相同，则你可以令一名角色摸一张牌';
-						return '出牌阶段限一次，你可以选择一名攻击范围内的其他角色，然后弃置X张与“任”颜色相同的牌并对其造成一点伤害（X为你与其的体力差且至少为1）';
+						if(player.storage.nzry_zhenliang==true) return '当你于回合外使用或打出的牌结算完成后，若此牌与“任”颜色相同，则你可以令一名角色摸一张牌。';
+						return '出牌阶段限一次，你可以弃置一张与“任”颜色相同的牌并对攻击范围内的一名角色造成1点伤害。';
 					},
 				},
 				group:["nzry_zhenliang_1","nzry_zhenliang_2"],
 				subSkill:{
-					'1':{
-						prompt:"出牌阶段限一次，你可以选择一名攻击范围内的其他角色，然后弃置X张与“任”颜色相同的牌并对其造成一点伤害（X为你与其的体力差且至少为1）",
+					1:{
+						prompt:'弃置一张与“任”颜色相同的牌，并对攻击范围内的一名角色造成1点伤害。',
 						audio:2,
 						enable:'phaseUse',
-						usable:1,
-						delay:false,
 						filter:function(event,player){
+							if(player.storage.nzry_zhenliang==true) return false;
 							var storage=player.getStorage('nzry_mingren');
-							if(get.itemtype(storage)!='cards') return false;
-							var num=player.countCards('he',{color:get.color(player.storage.nzry_mingren[0])});
+							if(!storage.length) return false;
+							var color=get.color(storage[0]);
+							if(player.countCards('he',function(card){
+								return get.color(card)==color;
+							})==0) return false;
 							return game.hasPlayer(function(current){
-								return current!=player&&
-								player.inRange(current)&&
-								player.storage.nzry_mingren!=undefined&&
-								num>=Math.max(Math.abs(current.hp-player.hp),1);
-							})&&player.storage.nzry_zhenliang!=true;
+								return player.inRange(current);
+							});
+						},
+						position:'he',
+						filterCard:function(card,player){
+							return get.color(card)==get.color(player.getStorage('nzry_mingren')[0]);
 						},
 						filterTarget:function(card,player,target){
-							return target!=player&&
-							player.inRange(target)&&
-							player.countCards('he',{color:get.color(player.storage.nzry_mingren[0])})>=Math.max(Math.abs(target.hp-player.hp),1);
+							return player.inRange(target);
+						},
+						check:function(card){
+							return 6.5-get.value(card);
 						},
 						content:function(){
-							'step 0'
-							player.chooseToDiscard('请选择发动【贞良】的牌',Math.max(Math.abs(target.hp-player.hp),1),'he',{color:get.color(player.storage.nzry_mingren[0])},true).set('ai',function(card){
-								return 6-get.value(card);
-							});
-							'step 1'
-							if(result.bool){
-								player.storage.nzry_zhenliang=true;
-								target.damage('nocard');
-							};
+							player.storage.nzry_zhenliang=true;
+							target.damage('nocard');
 						},
 						ai:{
 							order:5,
 							result:{
-								target:function(player,target){
-									if(Math.abs(target.hp-player.hp)<=1) return -1;
+								player:function(player,target){
+									return get.damageEffect(target,player,player);
 								},
 							},
 						},
 					},
-					'2':{
+					2:{
 						audio:2,
 						trigger:{
 							player:['useCardAfter','respondAfter'],
 						},
 						filter:function (event,player){
-							return _status.currentPhase!=player&&
-							player.storage.nzry_mingren!=undefined&&
-							player.storage.nzry_mingren[0]!=undefined&&
-							get.type(player.storage.nzry_mingren[0])==get.type(event.card)&&
-							player.storage.nzry_zhenliang==true;
+							if(_status.currentPhase==player||player.storage.nzry_zhenliang!=true) return false;
+							var card=player.getStorage('nzry_mingren')[0];
+							return card&&get.color(event.card)==get.color(card);
 						},
 						direct:true,
 						content:function(){
 							"step 0"
 							player.chooseTarget(get.prompt('nzry_zhenliang'),'令一名角色摸一张牌').ai=function(target){
-								return get.attitude(player,target)
+								if(target.hasSkillTag('nogain')) return 0.1;
+								var att=get.attitude(player,target);
+								return att*(Math.max(5-target.countCards('h'),2)+3);
 							};
 							"step 1"
 							if(result.bool){
@@ -7278,8 +7282,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				return '转换技，<span class="bluetext">阴：当你成为其他角色【杀】的目标后，你可以与其各摸一张牌，然后其本回合内不能再对你使用牌。</span>阳：当你使用【杀】指定一名角色为目标后，你可以获得其一张牌，然后你本回合内不能再对其使用牌。';
 			},
 			nzry_zhenliang:function(player){
-				if(player.storage.nzry_zhenliang==true) return '转换技，阴：出牌阶段限一次，你可以选择一名攻击范围内的其他角色，然后弃置X张与“任”颜色相同的牌并对其造成一点伤害（X为你与其的体力差且至少为1）。<span class="bluetext">阳：你的回合外，当你使用或打出牌进入弃牌堆时，若此牌与“任”类型相同，则你可以令一名角色摸一张牌。</span>';
-				return '转换技，<span class="bluetext">阴：出牌阶段限一次，你可以选择一名攻击范围内的其他角色，然后弃置X张与“任”颜色相同的牌并对其造成一点伤害（X为你与其的体力差且至少为1）。</span>阳：你的回合外，当你使用或打出牌进入弃牌堆时，若此牌与“任”类型相同，则你可以令一名角色摸一张牌。';
+				if(player.storage.nzry_zhenliang==true) return '转换技，阴：出牌阶段限一次，你可以弃置一张与“任”颜色相同的牌并对攻击范围内的一名角色造成1点伤害。<span class="bluetext">阳：当你于回合外使用或打出的牌结算完成后，若此牌与“任”颜色相同，则你可以令一名角色摸一张牌。</span>';
+				return '转换技，<span class="bluetext">阴：出牌阶段限一次，你可以弃置一张与“任”颜色相同的牌并对攻击范围内的一名角色造成1点伤害。</span>阳：当你于回合外使用或打出的牌结算完成后，若此牌与“任”颜色相同，则你可以令一名角色摸一张牌。';
 			},
 			nzry_chenglve:function(player){
 				if(player.storage.nzry_chenglve==true) return '转换技，出牌阶段限一次，阴：你可以摸一张牌，然后弃置两张手牌。<span class="bluetext">阳：你可以摸两张牌，然后弃置一张手牌。</span>若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制。';
@@ -7374,9 +7378,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_shenshi":"审时",
 			"nzry_shenshi_info":"转换技，阴：出牌阶段限一次，你可以将一张牌交给一名手牌数最多的角色，然后对其造成一点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张。阳：其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若此牌仍在该角色的区域内，你将手牌摸至四张。",
 			"nzry_mingren":"明任",
-			"nzry_mingren_info":"游戏开始时，你摸一张牌，然后将你的一张手牌置于你的武将牌上，称为“任”。结束阶段，你可以用手牌替换“任”。",
+			"nzry_mingren_info":"游戏开始时，你摸两张牌，然后将一张手牌置于你的武将牌上，称为“任”。结束阶段，你可以用一张手牌替换“任”。",
 			"nzry_zhenliang":"贞良",
-			"nzry_zhenliang_info":"转换技，阴：出牌阶段限一次，你可以选择一名攻击范围内的其他角色，然后弃置X张与“任”颜色相同的牌并对其造成一点伤害（X为你与其的体力差且至少为1）。阳：你的回合外，当你使用或打出牌进入弃牌堆时，若此牌与“任”类型相同，则你可以令一名角色摸一张牌。",
+			"nzry_zhenliang_info":"转换技，阴：出牌阶段限一次，你可以弃置一张与“任”颜色相同的牌并对攻击范围内的一名角色造成1点伤害。阳：当你于回合外使用或打出的牌结算完成后，若此牌与“任”颜色相同，则你可以令一名角色摸一张牌。",
 			"nzry_chenglve1":"成略",
 			"nzry_chenglve":"成略",
 			"nzry_chenglve_info":"转换技，出牌阶段限一次，阴：你可以摸一张牌，然后弃置两张手牌。阳：你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制。",

@@ -880,6 +880,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['diamond',13,'sha'],
 			['diamond',13,'zixin'],
 			['diamond',13,'hualiu'],
+			
+			['diamond',5,'muniu'],
 		],
 		help:{
 			'应变篇':('<div style="margin:10px">应变机制</div><ul style="margin-top:0">'+

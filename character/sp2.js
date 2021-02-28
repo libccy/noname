@@ -2344,7 +2344,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:4,
 					result:{
 						player:function(player,target){
-							if(player.hp==1) return -4;
+							if(player.hp==1) return -8;
 							if(target.countCards('e')>1) return 0;
 							if(player.hp>2||target.countCards('h')>1) return -0.5;
 							return -2;
@@ -2513,7 +2513,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							for(var k of array){
 								numx+=get.number(k);
 							}
-							if(numx==13) list.push(array);
+							if(numx==num) list.push(array);
 						}
 						if(list.length){
 							list.sort(function(a,b){
@@ -4615,7 +4615,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return target.isFriendOf(player)&&target.countDiscardableCards(player,'hej')>0;
 					},get.prompt2('wlcuorui')).set('ai',function(target){
 						if(target.countCards('e',function(card){
-							return card.name!='tengjia'&&get.value(card)<=0;
+							return card.name!='tengjia'&&get.value(card,target)<=0;
 						})) return 10;
 						if(target.countCards('j',function(card){
 							return get.effect(target,{name:card.viewAs||card.name},target,target)<0;
@@ -4762,7 +4762,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.draw();
 					'step 1'
-					player.chooseTarget(function(card,player,target){
+					player.chooseTarget('选择一名体力值最大的敌方角色，对其造成2点伤害',function(card,player,target){
 						return target.isEnemyOf(player)&&!game.hasPlayer(function(current){
 							return current.isEnemyOf(player)&&current.hp>target.hp;
 						});
@@ -6116,6 +6116,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addTempSkill(result.control,event.triggername=='damageEnd'?'damageAfter':'phaseJieshu');
 				},
 				group:'pingjian_use',
+				phaseUse_special:['xinfu_lingren'],
 			},
 			pingjian_use:{
 				audio:'pingjian',
@@ -6141,7 +6142,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var skills2=lib.character[name][3];
 							for(var j=0;j<skills2.length;j++){
 								if(player.storage.pingjian.contains(skills2[j])) continue;
-								if(skills.contains(skills2[j])){
+								if(skills.contains(skills2[j])||lib.skill.pingjian.phaseUse_special.contains(skills2[j])){
 									list.add(name);
 									if(!map[name]) map[name]=[];
 									map[name].push(skills2[j]);
@@ -7282,24 +7283,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				audio:2,
 				audioname:['tw_beimihu'],
-				filter:function(event,player){
+				filter:function(event,player,name){
 					return game.hasPlayer(function(current){
-						if(event.name=='roundStart'&&!current.isMinHp()) return false;
+						if(name=='roundStart'&&!current.isMinHp()) return false;
 						return current!=player&&!current.hasMark('zongkui_mark');
 					});
 				},
 				content:function(){
 					'step 0'
-					player.chooseTarget(get.prompt2('zongkui'),function(card,player,target){
-						if(_status.event.round&&!target.isMinHp()) return false;
-						return target!=player&&!target.hasMark('zongkui_mark');
-					}).set('ai',function(target){
-						var num=target.isMinHp()?0.5:(1+Math.random());
-						if(get.attitude(_status.event.player,target)<0){
-							num+=0.5;
-						}
-						return num;
-					}).set('round',event.triggername=='roundStart');
+					var targets=game.filterPlayer(function(current){
+						if(event.triggername=='roundStart'&&!current.isMinHp()) return false;
+						return current!=player&&!current.hasMark('zongkui_mark');
+					});
+					if(event.triggername=='roundStart'&&targets.length==1){
+						event._result={bool:true,targets:targets};
+					}
+					else{
+						var next=player.chooseTarget(get.prompt('zongkui'),'令一名'+(event.triggername=='roundStart'?'体力值最小的':'')+'其他角色获得“傀”标记',function(card,player,target){
+							if(_status.event.round&&!target.isMinHp()) return false;
+							return target!=player&&!target.hasMark('zongkui_mark');
+						}).set('ai',function(target){
+							var num=target.isMinHp()?0.5:1;
+							return num*get.threaten(target);
+						}).set('round',event.triggername=='roundStart');
+						if(event.triggername=='roundStart') next.set('forced',true);
+					}
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
@@ -8523,7 +8531,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zongkui:'纵傀',
 			zongkui_mark:'纵傀',
 			zongkui_mark_bg:'傀',
-			zongkui_info:'回合开始时，你可以指定一名未拥有“傀”标记的其他角色，令其获得一枚“傀”标记。每轮游戏开始时，你可以指定一名体力值最少且没有“傀”标记的其他角色，令其获得一枚“傀”标记。',
+			zongkui_info:'回合开始时，你可以指定一名未拥有“傀”标记的其他角色，令其获得一枚“傀”标记。每轮游戏开始时，你指定一名体力值最少且没有“傀”标记的其他角色，令其获得一枚“傀”标记。',
 			guju:'骨疽',
 			guju_info:'锁定技，拥有“傀”标记的角色受到伤害后，你摸一张牌。',
 			baijia:'拜假',

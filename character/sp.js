@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			sp:{
-				sp_default:["caoying","simahui","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","liuxie","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","fuwan","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","lingju","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","xujing","yuantanyuanshang","sunshao","zhangling",'guansuo','baosanniang','ol_zhangchangpu','caoshuang','sp_zhangliao','wolongfengchu'],
+				sp_default:["caoying","simahui","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","liuxie","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","fuwan","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","lingju","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","xujing","yuantanyuanshang","sunshao","zhangling",'guansuo','baosanniang','ol_zhangchangpu','caoshuang','sp_zhangliao','wolongfengchu','ol_xinxianying'],
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_star:["sp_xiahoushi","jsp_zhaoyun","huangjinleishi","sp_pangtong","sp_daqiao","sp_ganning","sp_xiahoudun","sp_lvmeng","sp_zhangfei","sp_liubei"],
 				sp_sticker:['sp_gongsunzan','sp_simazhao','sp_wangyuanji','sp_xinxianying','sp_liuxie'],
@@ -17,6 +17,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		character:{
+			ol_xinxianying:['female','wei',3,['xincaishi','xinzhongjian']],
 			huaxin:['male','wei',3,['wanggui','xibing']],
 			wolongfengchu:['male','shu',4,['youlong','luanfeng']],
 			sp_zhangliao:['male','qun',4,['mubing','ziqu','diaoling']],
@@ -1849,10 +1850,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var att=get.attitude(player,current);
 								if(att==0) return false;
 								if(att<0) return current.countCards('e',function(card){
-									return get.value(card)>0;
+									return get.value(card,current)>5;
 								})>0;
 								return current.countCards('ej',function(card){
-									return get.position(card)=='j'||get.value(card)<=0;
+									return get.position(card)=='j'||get.value(card,current)<=0;
 								})>0;
 							})) return 1;
 							return 0;
@@ -1880,7 +1881,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return get.position(card)=='j'||get.value(card,target)<=0;
 							})) return 2*att;
 							else if(att<0&&target.countCards('e',function(card){
-								return get.value(card)>0;
+								return get.value(card,target)>5;
 							})) return -att;
 							return -1;
 						});
@@ -1905,7 +1906,47 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.gainPlayerCard(target,'ej',true);
 					}
 					'step 3'
-					player.chooseToDiscard(true,'he');
+					player.chooseToDiscard(true,'he').set('ai',function(cardx){
+						var player=_status.event.player;
+						var num=0;
+						var hs=player.getCards('h');
+						var muniu=player.getEquip('muniu');
+						var subs=[];
+						if(muniu&&muniu.cards) hs=hs.concat(muniu.cards);
+						if(get.type(cardx)=='basic'){
+							var shas=hs.filter(function(card){
+								return card!=cardx&&get.name(card,player)=='sha'&&player.hasValueTarget(card);
+							});
+							var numx=player.countCards('h',function(card){
+								return get.type(card,player)!='basic';
+							});
+							num+=Math.min(numx,Math.max(0,shas.length-player.getCardUsable('sha')))*0.7;
+							num+=Math.min(player.getCardUsable('sha')+numx,shas.filter(function(card){
+								return game.countPlayer(function(current){
+									return player.canUse(card,current)&&get.effect(current,card,player,player)>0;
+								})>1;
+							}).length)*1.1;
+							var taos=Math.min(player.maxHp-player.hp,hs.filter(function(card){
+								return cardx!=card&&get.name(card,player)=='tao';
+							}).length);
+							num+=taos*player.getDamagedHp()*1.2;
+						}
+						else{
+							var numx=Math.sqrt(Math.min(5,player.countCards('h',function(card){
+								return get.type(card,player)=='basic';
+							})));
+							if(numx) num+=numx*Math.min(2,hs.filter(function(card){
+								if(card==cardx||get.type(card)!='equip'||!player.hasUseTarget(card)) return false;
+								subs.add(get.subtype(card));
+								return true;
+							}).length)*(2.5+player.countCards('e'))/2.5;
+							num+=hs.filter(function(card){
+								return card!=cardx&&get.type2(card)=='trick'&&player.hasValueTarget(card);
+							}).length*0.65;
+						}
+						if(get.position(cardx)=='e'&&cardx.name!='muniu'&&subs.contains(get.subtype(card))) num+=3;
+						return num*1.5-get.value(cardx);
+					});
 					'step 4'
 					if(result.bool&&result.cards&&result.cards.length){
 						var name=get.type(result.cards[0])=='basic'?'neifa_basic':'neifa_nobasic';
@@ -3462,7 +3503,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					threaten:1.2,
-					nogain:1
+					nogain:1,
+					skillTagFilter:function(player){
+						return player!=_status.currentPhase;
+					},
 				},
 				group:['zishu_draw','zishu_discard','zishu_mark']
 			},
@@ -3486,6 +3530,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var att=get.attitude(_status.event.player,target);
 						if(att<3) return 0;
 						if(target.hasJudge('lebu')) att/=2;
+						if(target.hasSkillTag('nogain')) att/=10;
 						return att/(1+get.distance(player,target,'absolute'));
 					});
 					'step 1'
@@ -3518,6 +3563,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(target.hasJudge('lebu')) return 0;
 						var att=get.attitude(_status.event.player,target);
 						if(att<3) return 0;
+						if(target.hasSkillTag('nogain')) att/=10;
 						if(target.hasSha()&&_status.event.sha){
 							att/=5;
 						}
@@ -3782,6 +3828,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						next.set('ai',function(target){
 							var player=_status.event.player;
 							var att=get.attitude(player,target)/Math.sqrt(1+target.countCards('h'));
+							if(target.hasSkillTag('nogain')) att/=10;
 							if(player.storage.xianfu2&&player.storage.xianfu2.contains(target)) return att*2;
 							return att;
 						})
@@ -10525,7 +10572,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					threaten:4.2,
-					nogain:1
+					nogain:1,
+					skillTagFilter:function(player){
+						return player!=_status.currentPhase;
+					},
 				},
 			},
 			manjuan:{
@@ -14896,42 +14946,71 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					expose:0.25,
 				},
 			},
-			"xinfu_yanyu":{
+			xinfu_yanyu:{
 				trigger:{
 					global:"phaseUseBegin",
 				},
 				direct:true,
-				filter:function (event,player){
+				filter:function(event,player){
 					return player.countCards('he')>0;
 				},
-				content:function (){
+				content:function(){
 					'step 0'
-					player.chooseToDiscard(get.prompt('xinfu_yanyu'),get.translation('xinfu_yanyu_info'),'he').set('ai',function(card){
-						var map=_status.event.goon;
-						var type=get.type(card,'trick');
-						if(!map[type]) return -1;
-						return map[type]-get.value(card);
-					}).set('logSkill','xinfu_yanyu').set('goon',function(){
-						var map={
-							basic:0,
-							trick:0.1,
-						};
-						var hs=trigger.player.getCards('h');
-						var sha=false;
-						var jiu=false;
-						for(var i=0;i<hs.length;i++){
-							if(trigger.player.hasValueTarget(hs[i])){
-								if(hs[i].name=='sha'&&!sha){
-									sha=true;
-									map.basic+=2;
+					var next=player.chooseToDiscard(get.prompt('xinfu_yanyu'),get.translation('xinfu_yanyu_info'),'he').set('logSkill','xinfu_yanyu');
+					if(player==trigger.player){
+						next.set('goon',function(){
+							var map={
+								basic:0,
+								trick:0.1,
+							};
+							var hs=trigger.player.getCards('h');
+							var sha=false;
+							var jiu=false;
+							for(var i=0;i<hs.length;i++){
+								if(trigger.player.hasValueTarget(hs[i])){
+									if(hs[i].name=='sha'&&!sha){
+										sha=true;
+										map.basic+=2;
+									}
+									if(hs[i].name=='tao') map.basic+=6;
+									if(hs[i].name=='jiu'){jiu=true;map.basic+=2.5;}
+									if(get.type(hs[i])=='trick') map.trick+=get.value(hs[i],player,'raw');
 								}
-								if(hs[i].name=='tao') map.basic+=6;
-								if(hs[i].name=='jiu'){jiu=true;map.basic+=2.5;}
-								if(get.type(hs[i])=='trick') map.trick+=get.value(hs[i],player,'raw');
 							}
-						}
-						return map;
-					}());
+							return map;
+						}());
+						next.set('ai',function(card){
+							var map=_status.event.goon;
+							var type=get.type(card,'trick');
+							if(!map[type]) return -1;
+							return map[type]-get.value(card);
+						});
+					}
+					else{
+						next.set('ai',function(cardx){
+							var map={
+								basic:0,
+								trick:0,
+							};
+							var hs=trigger.player.getCards('h');
+							var sha=false;
+							var jiu=false;
+							for(var i=0;i<hs.length;i++){
+								if(hs[i]!=cardx&&trigger.player.hasValueTarget(hs[i])){
+									if(hs[i].name=='sha'&&!sha){
+										sha=true;
+										map.basic+=2;
+									}
+									if(hs[i].name=='tao') map.basic+=6;
+									if(hs[i].name=='jiu'){jiu=true;map.basic+=3;}
+									if(get.type(hs[i])=='trick') map.trick+=player.getUseValue(hs[i]);
+								}
+							}
+							var type=get.type(cardx,'trick');
+							if(!map[type]) return -get.value(cardx);
+							return map[type]-get.value(cardx);
+						});
+					}
 					'step 1'
 					if(result.bool){
 						player.storage.xinfu_yanyu=get.type(result.cards[0],'trick');
@@ -14991,7 +15070,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var att=get.attitude(_status.event.player,target);
 							var card=_status.event.card;
 							var val=get.value(card);
-							if(target==_status.currentPhase&&target.hasValueTarget(card)) att=att*2;
+							if(player.storage.xinfu_yanyu2<3&&target==_status.currentPhase&&target.hasValueTarget(card,null,true)) att=att*5;
+							else if(target==player&&!player.hasJudge('lebu')&&get.type(card)=='trick') att=att*3;
+							if(target.hasSkillTag('nogain')) att/=10;
 							return att*val;
 						}).set('card',event.togain);
 					}
@@ -15013,7 +15094,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						popup:false,
-						content:function (){
+						content:function(){
 							player.removeAdditionalSkill('xinfu_xiaode');
 							player.removeSkill('xinfu_xiaode_remove');
 						},
@@ -15950,6 +16031,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xibing:'息兵',
 			xibing_info:'当一名其他角色在其出牌阶段内使用第一张黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至当前体力值(至多摸五张)且本回合不能再使用手牌。',
 			xibing_info_guozhan:'当一名其他角色在其出牌阶段内使用第一张黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至当前体力(至多摸五张)值且本回合不能再使用手牌。若你与其均明置了所有武将牌，则你可以暗置你与其各一张武将牌且本回合不能再明置此武将牌。',
+			ol_xinxianying:'辛宪英',
 			
 			sp_default:"常规",
 			sp_zhongdan:"忠胆英杰",

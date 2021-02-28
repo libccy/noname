@@ -1057,7 +1057,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							for(var k of array){
 								numx+=get.number(k);
 							}
-							if(numx==13) list.push(array);
+							if(numx==num) list.push(array);
 						}
 						if(list.length){
 							list.sort(function(a,b){

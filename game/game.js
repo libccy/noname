@@ -9923,7 +9923,7 @@
 			shibing_emotion:'士兵表情',
 			xiaosha_emotion:'小杀表情',
 			xiaotao_emotion:'小桃表情',
-			xiaojiu_emotion:'小桃表情',
+			xiaojiu_emotion:'小酒表情',
 
 			pause:'暂停',
 			config:'选项',
