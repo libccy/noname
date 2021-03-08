@@ -693,7 +693,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['boss_lvbu3','re_heqi','xin_lingtong'],
 				trigger:{
 					player:['loseAfter','phaseDiscardEnd'],
-					global:['equipAfter','addJudgeAfter','gainAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
 				},
 				direct:true,
 				filter:function(event,player){
@@ -871,6 +871,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				discard:false,
 				delay:false,
+				loseTo:'cardPile',
+				insert:true,
+				visible:true,
 				check:function(card){
 					return 8-get.value(card);
 				},
@@ -878,10 +881,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.showCards(cards);
 					'step 1'
-					cards[0].fix();
-					ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
-					game.updateRoundNumber();
-					'step 2'
 					if(!target.countCards('he',function(card){
 						if(get.type2(card)=='trick') return true;
 						return lib.filter.cardDiscardable(card,target,'remieji');
@@ -890,7 +889,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.type2(card)=='trick') return true;
 						return lib.filter.cardDiscardable(card,player,'remieji');
 					}).set('prompt','选择交给'+get.translation(player)+'一张锦囊牌，或依次弃置两张非锦囊牌。');
-					'step 3'
+					'step 2'
 					if(result.cards&&result.cards.length){
 						if(get.type2(result.cards[0])=='trick'){
 							player.gain(result.cards,target,'giveAuto');
@@ -899,7 +898,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else target.discard(result.cards);
 					}
 					else event.finish();
-					'step 4'
+					'step 3'
 					if(target.countCards('he',function(card){
 						return get.type2(card)!='trick';
 					})) target.chooseToDiscard('he',true,function(card){
@@ -929,7 +928,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result&&result.cards){
 						event.card=result.cards[0];
-						player.lose(result.cards,ui.special);
+						player.lose(result.cards,ui.cardPile,'insert');
 						game.log(player,'将',(get.position(event.card)=='h'?'一张牌':event.card),'置于牌堆顶');
 						game.broadcastAll(function(player){
 							var cardx=ui.create.card();
@@ -939,10 +938,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},player);
 					}
 					else event.finish();
-					'step 3'
-					card.fix();
-					ui.cardPile.insertBefore(card,ui.cardPile.firstChild);
-					game.updateRoundNumber();
 				},
 				ai:{
 					order:1,
@@ -2092,7 +2087,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['boss_lvbu3','re_heqi','re_lingtong'],
 				trigger:{
 					player:['loseAfter','phaseDiscardEnd'],
-					global:['equipAfter','addJudgeAfter','gainAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
 				},
 				direct:true,
 				filter:function(event,player){
@@ -4615,7 +4610,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:8.5,
 					result:{
 						target:function (player,target){
-							if(!player.countCards('he',{type:'equip'})){
+							if(!ui.selected.cards.length){
 								if(player.hp<2) return 0;
 								if(target.hp>=player.hp) return 0;
 							}
@@ -6732,7 +6727,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{
 					player:'loseAfter',
-					global:['equipAfter','addJudgeAfter','gainAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
 				},
 				direct:true,
 				filter:function(event,player){
@@ -7721,14 +7716,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			retuntian:{
 				audio:2,
-				trigger:{player:'loseEnd'},
+				trigger:{
+					player:'loseAfter',
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
+				},
 				frequent:true,
 				filter:function(event,player){
 					if(player==_status.currentPhase) return false;
-					for(var i=0;i<event.cards.length;i++){
-						if(event.cards[i].original&&event.cards[i].original!='j') return true;
-					}
-					return false;
+					if(event.name=='gain'&&event.player==player) return false;
+					var evt=event.getl(player);
+					return evt&&evt.cards2&&evt.cards2.length>0;
 				},
 				content:function(){
 					player.judge(function(card){

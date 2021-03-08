@@ -441,7 +441,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:'qinguo_use',
 						trigger:{
 							player:'loseAfter',
-							global:['equipAfter','addJudgeAfter','gainAfter'],
+							global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
 						},
 						prompt:'是否发动【勤国】回复1点体力？',
 						filter:function (event,player){
@@ -479,20 +479,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				callback:function(){
-						game.cardsGotoSpecial(card);
-						player.storage.xinfu_jijun.push(card);
-						var node=event.judgeResult.node;
-						node.moveDelete(player);
-						game.broadcast(function(cardid,player){
-							var node=lib.cardOL[cardid];
-							if(node){
-								node.moveDelete(player);
-							}
-						},node.cardid,player);
-						game.addVideo('gain2',player,get.cardsInfo([node]));
-						player.markSkill('xinfu_jijun');
-						game.addVideo('storage',player,['xinfu_jijun',get.cardsInfo(player.storage.xinfu_jijun),'cards']);
-						//event.trigger("addCardToStorage");
+					game.cardsGotoSpecial(card);
+					player.storage.xinfu_jijun.push(card);
+					var node=event.judgeResult.node;
+					node.moveDelete(player);
+					game.broadcast(function(cardid,player){
+						var node=lib.cardOL[cardid];
+						if(node){
+							node.moveDelete(player);
+						}
+					},node.cardid,player);
+					game.addVideo('gain2',player,get.cardsInfo([node]));
+					player.markSkill('xinfu_jijun');
+					game.addVideo('storage',player,['xinfu_jijun',get.cardsInfo(player.storage.xinfu_jijun),'cards']);
+					//event.trigger("addCardToStorage");
 				},
 				content:function (){
 					player.judge(function(card){
@@ -581,7 +581,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"phaseJieshuBegin",
 				},
 				filter:function (event,player){
-					return player.countCards('he')&&player.storage.xinfu_jijun.length;
+					return player.storage.xinfu_jijun&&player.storage.xinfu_jijun.length&&player.countCards('he');
 				},
 				direct:true,
 				skillAnimation:true,

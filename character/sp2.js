@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			shibao:['male','jin',4,['shibao_skill'],['unseen']],
 			jin_zhangchunhua:['female','jin',3,['huishi','qingleng','xuanmu'],['hiddenSkill']],
 			jin_simayi:['male','jin',3,['buchen','smyyingshi','xiongzhi','quanbian'],['hiddenSkill']],
 			jin_wangyuanji:['female','jin',3,['shiren','yanxi'],['hiddenSkill']],
@@ -83,7 +84,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterSort:{
 			sp2:{
-				sp_yingbian:['jin_zhangchunhua','jin_simayi','jin_wangyuanji','jin_simazhao','jin_xiahouhui','jin_simashi','duyu','zhanghuyuechen'],
+				sp_yingbian:['jin_zhangchunhua','jin_simayi','jin_wangyuanji','jin_simazhao','jin_xiahouhui','jin_simashi','duyu','zhanghuyuechen','shibao'],
 				sp_whlw:["xurong","lijue","zhangji","fanchou","guosi"],
 				sp_zlzy:["zhangqiying","lvkai","zhanggong","weiwenzhugezhi","beimihu"],
 				sp_longzhou:["xf_tangzi","xf_huangquan","xf_sufei","sp_liuqi"],
@@ -102,6 +103,136 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			shibao_skill:{
+				locked:false,
+				onremove:function(player){
+					player.removeSkill('shibao_skill_count');
+					player.removeGaintag('shibao_skill');
+				},
+				mod:{
+					targetInRange:function(card,player,target){
+						if(!card.cards||get.type(card)!='basic') return;
+						for(var i of card.cards){
+							if(i.hasGaintag('shibao_skill')) return (game.online?player==_status.currentPhase:player.isPhaseUsing());
+						}
+					},
+					cardUsable:function(card,player,target){
+						if(!card.cards||get.type(card)!='basic'||!(game.online?player==_status.currentPhase:player.isPhaseUsing())) return;
+						for(var i of card.cards){
+							if(i.hasGaintag('shibao_skill')) return Infinity;
+						}
+					},
+					aiOrder:function(player,card,num){
+						if(get.itemtype(card)=='card'&&card.hasGaintag('shibao_skill')&&get.type(card)=='basic') return num-0.1;
+					},
+				},
+				trigger:{player:'useCard2'},
+				direct:true,
+				filterx:function(event,player){
+					if(!player.isPhaseUsing()) return false;
+					return player.getHistory('lose',function(evt){
+						if(evt.getParent()!=event) return false;
+						for(var i in evt.gaintag_map){
+							if(evt.gaintag_map[i].contains('shibao_skill')) return true;
+						}
+						return false;
+					}).length>0;
+				},
+				filter:function(event,player){
+					if(!lib.skill.shibao_skill.filterx(event,player)) return false;
+					if(get.type(event.card)!='trick') return false;
+					if(event.targets&&event.targets.length>0) return true;
+					var info=get.info(event.card);
+					if(info.allowMultiple==false) return false;
+					if(event.targets&&!info.multitarget){
+						if(game.hasPlayer(function(current){
+							return !event.targets.contains(current)&&lib.filter.targetEnabled2(event.card,player,current)&&lib.filter.targetInRange(event.card,player,current);
+						})){
+							return true;
+						}
+					}
+					return false;
+				},
+				content:function(){
+					'step 0'
+					var prompt2='为'+get.translation(trigger.card)+'增加或减少一个目标'
+					player.chooseTarget(get.prompt('shibao_skill'),function(card,player,target){
+						var player=_status.event.player;
+						if(_status.event.targets.contains(target)) return true;
+						return lib.filter.targetEnabled2(_status.event.card,player,target)&&lib.filter.targetInRange(_status.event.card,player,target);
+					}).set('prompt2',prompt2).set('ai',function(target){
+						var trigger=_status.event.getTrigger();
+						var player=_status.event.player;
+						return get.effect(target,trigger.card,player,player)*(_status.event.targets.contains(target)?-1:1);
+					}).set('targets',trigger.targets).set('card',trigger.card);
+					'step 1'
+					if(result.bool){
+						if(!event.isMine()) game.delayx();
+						event.targets=result.targets;
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if(event.targets){
+						player.logSkill('shibao_skill',event.targets);
+						if(trigger.targets.contains(event.targets[0])) trigger.targets.removeArray(event.targets);
+						else trigger.targets.addArray(event.targets);
+					}
+				},
+				group:['shibao_skill_equip','shibao_skill_silent'],
+				subSkill:{
+					equip:{
+						trigger:{player:'useCard'},
+						filter:function(event,player){
+							return get.type(event.card)=='equip'&&lib.skill.shibao_skill.filterx(event,player);
+						},
+						forced:true,
+						locked:false,
+						content:function(){
+							player.draw();
+						},
+					},
+					silent:{
+						trigger:{
+							player:['enterGame','useCard1'],
+							global:'gameDrawAfter',
+						},
+						silent:true,
+						firstDo:true,
+						filter:function(event,player){
+							if(event.name=='useCard') return get.type(event.card)=='basic'&&lib.skill.shibao_skill.filterx(event,player)&&event.addCount!==false;
+							return true;
+						},
+						content:function(){
+							if(trigger.name=='useCard'){
+								trigger.addCount=false;
+								var stat=player.getStat();
+								if(stat&&stat.card&&stat.card[trigger.card.name]) stat.card[trigger.card.name]--;
+							}
+							else{
+								player.addSkill('shibao_skill_count');
+								player.addGaintag(player.getCards('h'),'shibao_skill');
+							}
+						},
+					},
+				},
+			},
+			shibao_skill_count:{
+				trigger:{
+					player:'gainBegin',
+					global:'roundStart',
+				},
+				silent:true,
+				filter:function(event,player){
+					if(event.name=='gain') return event.getParent(2).name!='shibao_skill_equip';
+					return game.roundNumber>1;
+				},
+				content:function(){
+					if(trigger.name=='gain') trigger.gaintag.add('shibao_skill');
+					else player.removeGaintag('shibao_skill');
+				},
+			},
 			pianchong:{
 				audio:2,
 				trigger:{player:'phaseDrawBegin1'},
@@ -152,7 +283,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'pianchong',
 				trigger:{
 					player:'loseAfter',
-					global:['equipAfter','addJudgeAfter','gainAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
 				},
 				forced:true,
 				charlotte:true,
@@ -782,7 +913,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				global:'zhaoran3',
 				trigger:{
 					player:'loseAfter',
-					global:['equipAfter','addJudgeAfter','gainAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
 				},
 				forced:true,
 				charlotte:true,
@@ -3017,11 +3148,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				discard:false,
 				prepare:'throw',
+				loseTo:'cardPile',
+				visible:true,
+				insert:true,
 				content:function(){
-					"step 0"
-					cards[0].fix();
-					ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
-					game.updateRoundNumber();
+					game.log(player,'将',cards,'置于牌堆顶'); 
 					player.useCard({name:'sha',isCard:true},false,targets).card.cxliushi=true;
 				},
 				group:'cxliushi_damage',
@@ -3197,7 +3328,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{
 					player:'loseAfter',
-					global:['equipAfter','addJudgeAfter','gainAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
 				},
 				direct:true,
 				filter:function(event,player){
@@ -7811,28 +7942,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.set('qianxinNum',num3);
 					}
 				},
-				filter:function (event,player){
+				filter:function(event,player){
 					return event.qianxinNum&&event.qianxinNum>0;
 				},
-				filterTarget:function (card,player,target){
+				filterTarget:function(card,player,target){
 					return target!=player;
 				},
 				filterCard:true,
-				selectCard:function (){
+				selectCard:function(){
 					var num1=game.players.length-1;
 					var num2=_status.event.qianxinNum;
 					return [1,Math.floor(num2/num1)];
 				},
 				discard:false,
-				check:function (){
+				check:function(){
 					return -1;
 				},
 				delay:false,
-				content:function (){
+				lose:false,
+				prompt:function(){
+					return '选择一名角色并将任意张手牌置于处理区，然后将这些牌放置于牌堆中'+get.cnNumber(game.players.length)+'倍数的位置（先选择的牌在上）';
+				},
+				content:function(){
 					'step 0'
+					player.lose(cards,ui.ordering).noOrdering=true;
 					player.$throw(cards.length);
 					player.storage.xinfu_qianxin=cards.slice(0);
 					player.storage.xinfu_qianxin2=target;
+					'step 1'
+					event.cards.reverse();
 					var num1=game.players.length;
 					var num2=ui.cardPile.childElementCount;
 					for(var i=0;i<event.cards.length;i++){
@@ -7847,6 +7985,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					game.updateRoundNumber();
 					game.log(player,'把',get.cnNumber(cards.length),'张牌放在了牌堆里');
+					game.delayx();
 				},
 				ai:{
 					order:1,
@@ -8395,6 +8534,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			duyu:'杜预（222年－285年），字元凯，京兆郡杜陵县（今陕西西安）人，中国魏晋时期军事家、经学家、律学家，曹魏散骑常侍杜恕之子。杜预初仕曹魏，任尚书郎，后成为权臣司马昭的幕僚，封丰乐亭侯。西晋建立后，历任河南尹、安西军司、秦州刺史、度支尚书等职。咸宁四年（278年）接替羊祜出任镇南大将军，镇守荆州。他积极备战，支持晋武帝司马炎对孙吴作战，并在咸宁五年（279年）成为晋灭吴之战的统帅之一。战后因功进封当阳县侯，仍镇荆州。太康五年（285年），杜预被征入朝，拜司隶校尉，途中于邓县逝世，终年六十三岁。获赠征南大将军、开府仪同三司，谥号为成。杜预耽思经籍，博学多通，多有建树，时誉为“杜武库”。著有《春秋左氏传集解》及《春秋释例》等。为明朝之前唯一一个同时进入文庙和武庙之人。',
 			xiahouhui:'夏侯徽（211年－234年），字媛容，沛国谯县（今安徽亳州）人，司马师第一任妻子。征南大将军夏侯尚之女，母德阳乡主为大司马曹真之妹。夏侯徽与司马师之间，生有五个女儿。夏侯徽很有见识器度，每当司马师有什么想法时，都由她从旁策划协助。当时司马师之父司马懿位居上将重位，而他的儿子们都有雄才大略。夏侯徽深知司马师绝非曹魏忠臣，而司马师对出身曹魏家族的夏侯徽也非常顾忌。青龙二年（234年），正逢“大疫”、“大病”之年，夏侯徽被司马师毒杀，时年二十四岁，死后葬于峻平陵。西晋建国后，追谥夏侯徽为景怀皇后。',
 			guozhao:'郭照，电视剧《军师联盟》中的女主角之一，由唐艺昕饰演。原型为文德皇后郭氏（字女王），魏国皇后，张春华的义妹，深爱曹丕，替甄宓抚育曹叡，因甄宓之死被曹叡记恨，曹丕死后，成为皇太后，被曹叡逼上死路。自尽身亡。',
+			shibao:'石苞（？～273年），字仲容，渤海南皮（今河北省南皮县）人。三国时曹魏至西晋重要将领，西晋开国功臣。西晋建立后，历任大司马、侍中、司徒等职，封乐陵郡公，卒后谥号为“武”。',
 		},
 		characterTitle:{
 			wulan:'#b对决限定武将',
@@ -8499,7 +8639,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_zhenxing":"镇行",
 			"xinfu_zhenxing_info":"结束阶段开始时或当你受到伤害后，你可以观看牌堆顶的至多三张牌，然后你获得其中与其余牌花色均不相同的一张牌。",
 			"xinfu_qianxin":"遣信",
-			"xinfu_qianxin_info":"出牌阶段限一次，若牌堆中没有“信”，你可以选择一名角色并将任意张手牌放置于牌堆中X倍数的位置（X为存活人数），称为“信”。该角色的弃牌阶段开始时，若其手牌区内有于本回合内获得过的“信”，其选择一项：令你将手牌摸至四张；本回合手牌上限-2。",
+			"xinfu_qianxin_info":"出牌阶段限一次，若牌堆中没有“信”，你可以选择一名角色并将任意张手牌置于处理区，然后将这些牌放置于牌堆中X倍数的位置（X为存活人数），称为“信”。该角色的弃牌阶段开始时，若其手牌区内有于本回合内获得过的“信”，其选择一项：令你将手牌摸至四张；本回合手牌上限-2。",
 			"qianxin_effect":"遣信",
 			"qianxin_effect_info":"",
 			"xinfu_qianxin2":"遣信",
@@ -8936,6 +9076,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zunwei:'尊位',
 			zunwei_backup:'尊位',
 			zunwei_info:"出牌阶段限一次，你可选择本局游戏内未选择过的一项：①若你已受伤，则你可以选择一名体力值大于你的其他角色，你将体力值回复至X（X为你的体力上限与其体力值中的较小值）②选择一名手牌数大于你的其他角色，你将手牌数摸至与其相同（至多摸五张）③选择一名装备区内牌数大于你的其他角色。你令X=1。若你装备区内的('equip'+X)栏为空，则你使用牌堆中的一张副类别为('equip'+X)，且能对自己使用的装备牌。你令X+1。若X不大于5，且你装备区内的牌数仍小于目标角色，则你重复此流程。",
+			shibao:'石苞',
+			shibao_skill:'石苞1',
+			shibao_skill_info:'出牌阶段，你使用本轮获得的牌时（以此技能获得的牌除外），根据类型执行以下效果：1.基本牌，不计入次数且无距离限制；2.锦囊牌，此牌目标+1或-1；3.装备牌，摸1张牌。',
 			
 			sp_yingbian:'文德武备',
 			sp_whlw:"文和乱武",

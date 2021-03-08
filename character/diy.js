@@ -1719,7 +1719,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ryoichi_baoyi:{
 				trigger:{
 					player:'loseAfter',
-					global:['gainAfter','equipAfter','addJudgeAfter'],
+					global:['gainAfter','equipAfter','addJudgeAfter','loseAsyncAfter'],
 				},
 				filterTarget:function(card,player,target){
 					return target!=player&&(target.sex=='female'||target.sex=='male'&&target.countCards('hej')>0);
@@ -2535,7 +2535,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			misuzu_zhongxing:{
 				trigger:{
 					player:'loseAfter',
-					global:['equipAfter','addJudgeAfter','gainAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
 				},
 				direct:true,
 				filter:function(event,player){
@@ -2569,7 +2569,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kamome_yangfan:{
 				trigger:{
 					player:['loseAfter','enterGame'],
-					global:['equipAfter','addJudgeAfter','gameDrawAfter','gainAfter'],
+					global:['equipAfter','addJudgeAfter','gameDrawAfter','gainAfter','loseAsyncAfter'],
 				},
 				forced:true,
 				filter:function(event,player){
@@ -3279,11 +3279,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
+					if(trigger.delay==false) game.delay();
+					'step 1'
 					var cards=trigger.cards.filter(function(card){
 						return get.position(card,true)=='d'&&get.type(card,false)=='equip';
 					});
 					player.chooseButton([get.prompt('kyoko_juwu'),cards],[1,cards.length]).set('ai',function(){return 1});
-					'step 1'
+					'step 2'
 					if(result.bool){
 						player.gain(result.links,'gain2','log');
 						player.logSkill('kyoko_juwu');

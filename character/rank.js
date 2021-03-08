@@ -261,6 +261,7 @@ window.noname_character_rank={
 		'key_hiroto',
 		'key_nao',
 		'mini_zhugeliang',
+		'mini_lvmeng',
 	],
 	am:[
 		'diy_caiwenji',
@@ -1089,6 +1090,7 @@ window.noname_character_rank={
 			'ns_zhangwei',
 			'ol_yuanshao',
 			'guozhao',
+			'mini_lvmeng',
 			'key_yuri',
 			'key_yuzuru',
 			'sp_key_kanade',

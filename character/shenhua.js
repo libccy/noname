@@ -3202,7 +3202,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['gz_dengai'],
 				trigger:{
 					player:'loseAfter',
-					global:['equipAfter','addJudgeAfter','gainAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
 				},
 				frequent:true,
 				filter:function(event,player){
@@ -5410,13 +5410,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:8,
 					result:{
 						player:function(player,target){
-							if(player.getEquip(1)) return 0;
+							if(ui.selected.cards.length) return 0;
 							if(player.hp>=target.hp) return -0.9;
 							if(player.hp<=2) return -10;
 							return -2;
 						},
 						target:function(player,target){
-							if(!player.getEquip(1)){
+							if(!ui.selected.cards.length){
 								if(player.hp<2) return 0;
 								if(player.hp==2&&target.hp>=2) return 0;
 								if(target.hp>player.hp) return 0;
@@ -5476,7 +5476,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:8.5,
 					result:{
 						target:function(player,target){
-							if(player.hasSkill('xinqiangxi2')||!player.countCards('he',{type:'equip'})){
+							if(!ui.selected.cards.length){
 								if(player.hp<2) return 0;
 								if(target.hp>=player.hp) return 0;
 							}

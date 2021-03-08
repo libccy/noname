@@ -12081,6 +12081,13 @@
 					}
 					if(event.dialog&&event.dialog.close) event.dialog.close();
 				},
+				chooseToCompareLose:function(){
+					for(var i=0;i<event.lose_list.length;i++){
+						var next=event.lose_list[i][0].lose(event.lose_list[i][1],ui.ordering);
+						next.relatedEvent=event.getParent();
+						next.getlx=false;
+					}
+				},
 				chooseToCompareMultiple:function(){
 					"step 0"
 					if(player.countCards('h')==0){
@@ -12119,17 +12126,19 @@
 					}
 					"step 2"
 					var cards=[];
+					var lose_list=[];
 					if(event.fixedResult&&event.fixedResult[player.playerid]){
 						event.list.unshift(player);
 						result.unshift({bool:true,cards:[event.fixedResult[player.playerid]]});
+						lose_list.push([player,[event.fixedResult[player.playerid]]]);
 					}
 					else{
 						if(result[0].skill&&lib.skill[result[0].skill]&&lib.skill[result[0].skill].onCompare){
 							player.logSkill(result[0].skill);
 							result[0].cards=lib.skill[result[0].skill].onCompare(player)
 						}
+						else lose_list.push([player,result[0].cards]);
 					};
-					player.lose(result[0].cards,ui.ordering);
 					for(var j=0;j<targets.length;j++){
 						if(event.list.contains(targets[j])){
 							var i=event.list.indexOf(targets[j]);
@@ -12137,13 +12146,18 @@
 								event.list[i].logSkill(result[i].skill);
 								result[i].cards=lib.skill[result[i].skill].onCompare(event.list[i]);
 							}
-							event.list[i].lose(result[i].cards,ui.ordering);
+							else lose_list.push([targets[j],result[i].cards]);
 							cards.push(result[i].cards[0]);
 						}
 						else if(event.fixedResult&&event.fixedResult[targets[j].playerid]){
-							targets[j].lose(event.fixedResult[targets[j].playerid],ui.ordering);
 							cards.push(event.fixedResult[targets[j].playerid]);
+							lose_list.push([targets[j],[event.fixedResult[targets[j].playerid]]]);
 						}
+					}
+					if(lose_list.length){
+						game.loseAsync({
+							lose_list:lose_list,
+						}).setContent('chooseToCompareLose');
 					}
 					event.cardlist=cards;
 					event.cards=cards;
@@ -12231,6 +12245,7 @@
 						return;
 					}
 					game.log(player,'对',target,'发起拼点');
+					event.lose_list=[];
 					"step 1"
 					var sendback=function(){
 						if(_status.event!=event){
@@ -12239,7 +12254,10 @@
 							};
 						}
 					};
-					if(event.fixedResult&&event.fixedResult[player.playerid]) event.card1=event.fixedResult[player.playerid];
+					if(event.fixedResult&&event.fixedResult[player.playerid]){
+						event.card1=event.fixedResult[player.playerid];
+						event.lose_list.push([player,event.card1]);
+					}
 					else if(player.isOnline()){
 						player.wait(sendback);
 						event.ol=true;
@@ -12252,7 +12270,10 @@
 						event.localPlayer=true;
 						player.chooseCard('请选择拼点牌',true).set('type','compare').set('glow_result',true).ai=event.ai;
 					}
-					if(event.fixedResult&&event.fixedResult[target.playerid]) event.card2=event.fixedResult[target.playerid];
+					if(event.fixedResult&&event.fixedResult[target.playerid]){
+						event.card2=event.fixedResult[target.playerid];
+						event.lose_list.push([target,event.card2]);
+					}
 					else if(target.isOnline()){
 						target.wait(sendback);
 						event.ol=true;
@@ -12270,6 +12291,7 @@
 							result.cards=lib.skill[result.skill].onCompare(player);
 							player.logSkill(result.skill);
 						}
+						else event.lose_list.push([player,result.cards[0]]);
 						event.card1=result.cards[0];
 					}
 					if(event.localTarget){
@@ -12281,6 +12303,7 @@
 							target.logSkill(result.skill);
 							result.cards=lib.skill[result.skill].onCompare(target);
 						}
+						else event.lose_list.push([target,result.cards[0]]);
 						event.card2=result.cards[0];
 					}
 					if(!event.resultOL&&event.ol){
@@ -12293,13 +12316,15 @@
 								player.logSkill(event.resultOL[player.playerid].skill);
 								event.resultOL[player.playerid].cards=lib.skill[event.resultOL[player.playerid].skill].onCompare(player);
 							}
-							event.card1=event.resultOL[player.playerid].cards[0]
+							else event.lose_list.push([player,event.resultOL[player.playerid].cards[0]]);
+							event.card1=event.resultOL[player.playerid].cards[0];
 						};
 						if(!event.card2){
 							if(event.resultOL[target.playerid].skill&&lib.skill[event.resultOL[target.playerid].skill]&&lib.skill[event.resultOL[target.playerid].skill].onCompare){
 								target.logSkill(event.resultOL[target.playerid].skill);
 								event.resultOL[target.playerid].cards=lib.skill[event.resultOL[target.playerid].skill].onCompare(player);
 							}
+							else event.lose_list.push([target,event.resultOL[target.playerid].cards[0]]);
 							event.card2=event.resultOL[target.playerid].cards[0];
 						}
 						if(!event.card1||!event.card2){
@@ -12317,8 +12342,11 @@
 							event.addToAI=true;
 						}
 					}
-					player.lose(event.card1,ui.ordering);
-					target.lose(event.card2,ui.ordering);
+					if(event.lose_list.length){
+						game.loseAsync({
+							lose_list:event.lose_list,
+						}).setContent('chooseToCompareLose');
+					}
 					"step 5"
 					game.broadcast(function(){
 						ui.arena.classList.add('thrownhighlight');
@@ -14272,6 +14300,7 @@
 								var losecard=player.lose(cards,ui.special);
 								if(info.visible) losecard.visible=true;
 								if(info.loseTo) losecard.position=ui[info.loseTo];
+								if(info.insert) losecard.insert=true;
 								if(losecard.position==ui.special&&info.toStorage) losecard.toStorage=true;
 							}
 						}
@@ -14602,31 +14631,42 @@
 					'step 0'
 					event.cards1=event.cards1||player.getCards('h');
 					event.cards2=event.cards2||target.getCards('h');
+					game.loseAsync({
+						player:player,
+						target:target,
+						cards1:event.cards1,
+						cards2:event.cards2,
+					}).setContent('swapHandcardsx');
+					'step 1'
+					player.gain(event.cards2);
+					target.gain(event.cards1);
+				},
+				swapHandcardsx:function(){
+					'step 0'
 					player.$giveAuto(event.cards1,target);
 					target.$giveAuto(event.cards2,player);
 					'step 1'
 					event.cards=event.cards1;
-					var next=player.lose(event.cards,ui.ordering);
+					var next=player.lose(event.cards,ui.ordering).getlx=false;
+					next.relatedEvent=event.getParent();
 					if(player==game.me){
 						event.delayed=true;
 					}
 					else{
 						next.delay=false;
 					}
-					'step 1'
+					'step 2'
 					event.cards=event.cards2;
-					var next=target.lose(event.cards,ui.ordering);
+					var next=target.lose(event.cards,ui.ordering).getlx=false;
+					next.relatedEvent=event.getParent();
 					if(target==game.me){
 						event.delayed=true;
 					}
 					else{
 						next.delay=false;
 					}
-					'step 2'
-					if(!event.delayed) game.delay();
 					'step 3'
-					player.gain(event.cards2);
-					target.gain(event.cards1);
+					if(!event.delayed) game.delay();
 				},
 				gainMultiple:function(){
 					'step 0'
@@ -14808,6 +14848,7 @@
 					"step 0"
 					var evt=event.getParent();
 					if(evt.name!='discard'&&event.type!='discard') return;
+					if(evt.delay===false) event.delay=false;
 					if(evt.animate!=false){
 						evt.discardid=lib.status.videoId++;
 						game.broadcastAll(function(player,cards,id){
@@ -14848,6 +14889,7 @@
 					"step 1"
 					event.gaintag_map={};
 					var hs=[],es=[],js=[];
+					if(event.insert_card&&event.position==ui.cardPile) event.cards.reverse();
 					var hej=player.getCards('hej');
 					event.stockcards=cards.slice(0);
 					for(var i=0;i<cards.length;i++){
@@ -14858,25 +14900,7 @@
 						cards[i].style.transform+=' scale(0.2)';
 						cards[i].classList.remove('glow');
 						cards[i].recheck();
-						var info=lib.card[cards[i].name];
-						if(info.destroy||cards[i]._destroy){
-							cards[i].delete();
-							cards[i].destroyed=info.destroy||cards[i]._destroy;
-						}
-						else if(event.position){
-							if(_status.discarded){
-								if(event.position==ui.discardPile){
-									_status.discarded.add(cards[i]);
-								}
-								else{
-									_status.discarded.remove(cards[i]);
-								}
-							}
-							cards[i].goto(event.position);
-						}
-						else{
-							cards[i].delete();
-						}
+						
 						if(!hej.contains(cards[i])){
 							cards.splice(i--,1);
 						}
@@ -14897,13 +14921,42 @@
 								cards[i].original=null;
 							}
 						}
+						
+						var info=lib.card[cards[i].name];
+						if(info.destroy||cards[i]._destroy){
+							cards[i].delete();
+							cards[i].destroyed=info.destroy||cards[i]._destroy;
+						}
+						else if(event.position){
+							if(_status.discarded){
+								if(event.position==ui.discardPile){
+									_status.discarded.add(cards[i]);
+								}
+								else{
+									_status.discarded.remove(cards[i]);
+								}
+							}
+							if(event.insert_card){
+								event.position.insertBefore(cards[i],event.position.firstChild);
+								cards[i].fix();
+							}
+							else if(event.position==ui.cardPile){
+								event.position.appendChild(cards[i]);
+								cards[i].fix();
+							}
+							else cards[i].goto(event.position);
+						}
+						else{
+							cards[i].remove();
+						}
 					}
 					if(player==game.me) ui.updatehl();
 					ui.updatej(player);
 					game.broadcast(function(player,cards,num){
 						for(var i=0;i<cards.length;i++){
 							cards[i].classList.remove('glow');
-							cards[i].delete();
+							cards[i].fix();
+							cards[i].remove();
 						}
 						if(player==game.me){
 							ui.updatehl();
@@ -14919,7 +14972,7 @@
 					game.addVideo('loseAfter',player);
 					event.num=0;
 					if(event.position==ui.ordering){
-						var evt=event.getParent();
+						var evt=event.relatedEvent||event.getParent();
 						if(!evt.orderingCards)	evt.orderingCards=[];
 						if(!event.noOrdering&&!event.cardsOrdered){
 							event.cardsOrdered=true;
@@ -14928,6 +14981,9 @@
 							next.setContent('orderingDiscard');
 						}
 						if(!event.noOrdering) evt.orderingCards.addArray(cards);
+					}
+					else if(event.position==ui.cardPile){
+						game.updateRoundNumber();
 					}
 					event.hs=hs;
 					event.es=es;
@@ -19351,6 +19407,9 @@
 						}
 						else if(arguments[i]=='visible'){
 							next.visible=true;
+						}
+						else if(arguments[i]=='insert'){
+							next.insert_card=true;
 						}
 					}
 					if(next.cards){
@@ -27225,6 +27284,34 @@
 		],
 	};
 	var game={
+		loseAsync:function(arg){
+			var next=game.createEvent('loseAsync');
+			next.getl=function(player){
+				var that=this;
+				var map={
+					player:player,
+					hs:[],
+					es:[],
+					js:[],
+					cards:[],
+					cards2:[],
+				};
+				player.getHistory('lose',function(evt){
+					if(evt.parent==that){
+						map.hs.addArray(evt.hs);
+						map.es.addArray(evt.es);
+						map.js.addArray(evt.js);
+						map.cards.addArray(evt.cards);
+						map.cards2.addArray(evt.cards2);
+					}
+				});
+				if(map.cards.length>0) return map;
+			};
+			if(arg&&get.is.object(arg)){
+				for(var i in arg) next[i]=arg[i];
+			}
+			return next;
+		},
 		getRarity:function(name){
 			var rank=lib.rank.rarity;
 			if(rank.legend.contains(name)) return 'legend';
@@ -29633,7 +29720,7 @@
 						for(var i=0;i<l1.length;i++){
 							for(var j=0;j<l2.length;j++){
 								if(l2[j].suit==l1[i][0]&&l2[j].number==l1[i][1]&&l2[j].name==l1[i][2]){
-									l2[j].delete();
+									l2[j].remove();
 									l2.splice(j--,1);
 									break;
 								}
@@ -44448,8 +44535,8 @@
 									}
 									str+=(button.info[i].hour-12)+'点';
 								}
-								//ui.create.div('','创建者：'+(button.info[i].nickname),eventnode);
-								ui.create.div('','创建者：'+(button.info[i].nickname)+'<br>ID：'+button.info[i].creator,eventnode);
+								ui.create.div('','创建者：'+(button.info[i].nickname),eventnode);
+								//ui.create.div('','创建者：'+(button.info[i].nickname)+'<br>ID：'+button.info[i].creator,eventnode);
 								ui.create.div('','已有'+(button.info[i].members.length)+'人加入',eventnode);
 								ui.create.div('','时间：'+str,eventnode);
 								if(button.info[i].members.contains(game.onlineKey)){
@@ -49909,7 +49996,7 @@
 			if(!lib.card[obj.name]) return;
 			return lib.card[obj.name].subtype;
 		},
-		equiptype:function(card){
+		equiptype:function(card,player){
 			var subtype=get.subtype(card,player);
 			if(subtype.indexOf('equip')==0) return parseInt(subtype[5]);
 			return 0;
@@ -51063,7 +51150,7 @@
 					td.innerHTML=node.countCards('h');
 					tr.appendChild(td);
 					td=document.createElement('td');
-					td.innerHTML=node.stat.length-1;
+					td.innerHTML=node.phaseNumber;
 					tr.appendChild(td);
 					td=document.createElement('td');
 

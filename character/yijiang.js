@@ -289,7 +289,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'shangshi',
 				trigger:{
 					player:['loseAfter','changeHp','gainMaxHpAfter','loseMaxHpAfter'],
-					global:['equipAfter','addJudgeAfter','gainAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
 				},
 				frequent:true,
 				prompt:function(event,player){
@@ -2289,17 +2289,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 3"
 					if(event.card){
 						player.logSkill('jianzheng',trigger.player);
-						player.lose(event.card,ui.special,'visible');
+						player.lose(event.card,ui.cardPile,'visible','insert');
 						player.$throw(event.card,1000);
-					}
-					"step 4"
-					if(event.card){
-						event.card.fix();
-						ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
-						game.updateRoundNumber();
 						game.log(player,'将',card,'置于牌堆顶');
 					}
-					"step 5"
+					"step 4"
 					if(get.color(trigger.card)!='black'){
 						trigger.getParent().targets.push(player);
 						trigger.player.line(player);
@@ -3130,6 +3124,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var list=game.filterPlayer(function(current){
 						return current.hasSkill('wengua');
 					});
+					if(list.length==1&&list[0]==player) return '将一张牌置于牌堆顶或是牌堆底';
 					var str='将一张牌交给'+get.translation(list);
 					if(list.length>1) str+='中的一人';
 					return str;
@@ -3192,22 +3187,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 4"
 					event.index=result.index;
 					if(event.index==0||event.index==1){
-					event.target.lose(event.card,ui.special);
-					game.broadcastAll(function(player){
+						var next=event.target.lose(event.card,ui.cardPile);
+						if(event.index==0) next.insert_card=true;
+						game.broadcastAll(function(player){
 						var cardx=ui.create.card();
-						cardx.classList.add('infohidden');
-						cardx.classList.add('infoflip');
-						player.$throw(cardx,1000,'nobroadcast');
-					},event.target);
+							cardx.classList.add('infohidden');
+							cardx.classList.add('infoflip');
+							player.$throw(cardx,1000,'nobroadcast');
+						},event.target);
 					}
 					else event.finish();
 					"step 5"
 					game.delay();
 					"step 6"
-					event.card.fix();
 					if(event.index==1){
 						game.log(event.target,'将获得的牌置于牌堆底');
-						ui.cardPile.appendChild(event.card);
 						if(ui.cardPile.childElementCount==1||player==event.target){
 							player.draw();
 						}
@@ -3217,7 +3211,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else if(event.index==0){
 						game.log(player,'将获得的牌置于牌堆顶');
-						ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
 						if(ui.cardPile.childElementCount==1||player==event.target){
 							player.draw('bottom');
 						}
@@ -4931,16 +4924,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(card){
 					return 8-get.value(card);
 				},
+				loseTo:'cardPile',
+				insert:true,
+				visible:true,
 				content:function(){
 					'step 0'
 					player.showCards(cards);
 					'step 1'
-					cards[0].fix();
-					ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
-					game.updateRoundNumber();
-					'step 2'
 					target.chooseToDiscard('he',true).set('prompt','请弃置一张锦囊牌，或依次弃置两张非锦囊牌。');
-					'step 3'
+					'step 2'
 					if((!result.cards||get.type(result.cards[0],'trick',result.cards[0].original=='h'?target:false)!='trick')&&target.countCards('he',function(card){
 						return get.type(card,'trick')!='trick';
 					})){
@@ -6523,7 +6515,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 5'
 					if(result&&result.cards){
 						event.card=result.cards[0];
-						target.lose(result.cards,ui.special);
+						target.lose(result.cards,ui.cardPile,'insert');
 						game.log(target,'将',(get.position(event.card)=='h'?'一张牌':event.card),'置于牌堆顶');
 						game.broadcastAll(function(player){
 							var cardx=ui.create.card();
@@ -6531,15 +6523,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							cardx.classList.add('infoflip');
 							player.$throw(cardx,1000,'nobroadcast');
 						},target);
-					}
-					else{
-						event.card=null;
-					}
-					'step 6'
-					if(event.card){
-						event.card.fix();
-						ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
-						game.delay();
 					}
 					event.goto(3);
 				},
@@ -6625,7 +6608,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 4'
 					if(result&&result.cards){
 						event.card=result.cards[0];
-						event.current.lose(result.cards,ui.special);
+						event.current.lose(result.cards,ui.cardPile,'visible','insert');
 						game.broadcastAll(function(player){
 							var cardx=ui.create.card();
 							cardx.classList.add('infohidden');
@@ -6638,11 +6621,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 5'
 					if(event.current==game.me) game.delay(0.5);
-					'step 6'
-					if(event.card){
-						event.card.fix();
-						ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
-					}
 					event.goto(2);
 				}
 			},
@@ -7212,13 +7190,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								game.log(player,'将',card,'置于牌堆顶');
 								event.result.card={name:event.result.card.name,nature:event.result.card.nature};
 								event.result.cards=[];
-								player.lose(card,ui.special,'visible');
+								player.lose(card,ui.cardPile,'visible','insert');
 								'step 1'
 								game.delay();
-								'step 2'
-								event.card.fix();
-								ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
-								game.updateRoundNumber();
 							},
 						}
 					},
@@ -10870,7 +10844,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['boss_lvbu3','re_heqi'],
 				trigger:{
 					player:['loseAfter','phaseDiscardEnd'],
-					global:['equipAfter','addJudgeAfter','gainAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
 				},
 				direct:true,
 				filter:function(event,player){

@@ -3746,6 +3746,7 @@ window.noname_asset_list=[
 	'image/character/xin_fuhuanghou.jpg',
 	'image/character/xin_guohuai.jpg',
 	'image/character/xin_panzhangmazhong.jpg',
+	'image/character/mini_lvmeng.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
