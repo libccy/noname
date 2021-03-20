@@ -3760,7 +3760,7 @@ window.noname_asset_list=[
 	'image/character/xin_panzhangmazhong.jpg',
 	'image/character/mini_lvmeng.jpg',
 	'image/character/boss_zhaoyun.jpg',
-	'image/character/chunyuqiong.jpg',
+	'image/character/re_chunyuqiong.jpg',
 	'image/character/ns_caoanmin.jpg',
 	'image/character/ol_dengai.jpg',
 	'image/character/re_caozhen.jpg',
