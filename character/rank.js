@@ -37,6 +37,7 @@ window.noname_character_rank={
 		'sp_key_kanade',
 		'key_shizuru',
 		'key_sakuya',
+		'boss_zhaoyun',
 	],
 	ap:[
 		'gjqt_aruan',
@@ -450,6 +451,7 @@ window.noname_character_rank={
 		'mini_lvbu',
 		're_fazheng',
 		'huaxin',
+		're_chunyuqiong',
 	],
 	bp:[
 		'chess_diaochan',
@@ -640,6 +642,8 @@ window.noname_character_rank={
 		'mini_zuoci',
 		'mini_jiangwei',
 		're_fuhuanghou',
+		're_gongsunyuan',
+		're_caozhen',
 	],
 	b:[
 		'diy_feishi',
@@ -811,6 +815,7 @@ window.noname_character_rank={
 		'yanghuiyu',
 		'xin_panzhangmazhong',
 		're_xiaoqiao',
+		'caoanmin',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1091,6 +1096,7 @@ window.noname_character_rank={
 			'ol_yuanshao',
 			'guozhao',
 			'mini_lvmeng',
+			'boss_zhaoyun',
 			'key_yuri',
 			'key_yuzuru',
 			'sp_key_kanade',
@@ -1558,6 +1564,11 @@ window.noname_character_rank={
 			're_fuhuanghou',
 			'gongsunkang',
 			'xin_panzhangmazhong',
+			'ol_dengai',
+			'caoanmin',
+			're_gongsunyuan',
+			're_caozhen',
+			're_chunyuqiong',
 		],
 		junk:[
 			'sunshao',

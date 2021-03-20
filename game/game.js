@@ -4299,6 +4299,7 @@
 							else{
 								map.double_hp.hide();
 							}
+							map.continue_game.show();
 						}
 						else if(config.identity_mode=='purple'){
 							map.player_number.hide();
@@ -4321,8 +4322,10 @@
 							map.change_choice.hide();
 							map.free_choose.hide();
 							map.change_identity.hide();
+							map.continue_game.hide();
 						}
 						else{
+							map.continue_game.show();
 							map.player_number.show();
 							map.enhance_zhu.show();
 							map.auto_identity.show();
@@ -4548,7 +4551,7 @@
 						onclick:function(bool){
 							game.saveConfig('continue_game',bool,this._link.config.mode);
 							if(get.config('continue_game')){
-								if(!ui.continue_game&&_status.over&&!_status.brawl){
+								if(!ui.continue_game&&_status.over&&!_status.brawl&&!game.no_continue_game){
 									ui.continue_game=ui.create.control('再战',game.reloadCurrent);
 								}
 							}
@@ -4987,7 +4990,7 @@
 						onclick:function(bool){
 							game.saveConfig('continue_game',bool,this._link.config.mode);
 							if(get.config('continue_game')){
-								if(!ui.continue_game&&_status.over&&!_status.brawl){
+								if(!ui.continue_game&&_status.over&&!_status.brawl&&!game.no_continue_game){
 									ui.continue_game=ui.create.control('再战',game.reloadCurrent);
 								}
 							}
@@ -5546,7 +5549,13 @@
 				name:'斗地主',
 				connect:{
 					update:function(config,map){
-						if(config.connect_doudizhu_mode=='kaihei'||config.connect_doudizhu_mode=='huanle'){
+						if(config.connect_doudizhu_mode=='online'){
+							map.connect_change_card.hide();
+						}
+						else{
+							map.connect_change_card.show();
+						}
+						if(config.connect_doudizhu_mode=='kaihei'||config.connect_doudizhu_mode=='huanle'||config.connect_doudizhu_mode=='online'){
 							map.connect_double_character.hide();
 						}
 						else{
@@ -5560,6 +5569,7 @@
 							normal:'休闲',
 							kaihei:'开黑',
 							huanle:'欢乐',
+							online:'智斗',
 						},
 						restart:true,
 						frequent:true,
@@ -5579,11 +5589,37 @@
 				},
 				config:{
 					update:function(config,map){
-						if(config.doudizhu_mode=='kaihei'||config.doudizhu_mode=='huanle'){
+						if(config.doudizhu_mode=='online'){
+							map.change_card.hide();
+							map.edit_character.show();
+							map.reset_character.show();
+						}
+						else{
+							map.change_card.show();
+							map.edit_character.hide();
+							map.reset_character.hide();
+						}
+						if(config.doudizhu_mode=='kaihei'||config.doudizhu_mode=='huanle'||config.doudizhu_mode=='online'){
 							map.double_character.hide();
+							map.free_choose.hide();
+							map.change_identity.hide();
+							map.change_choice.hide();
+							map.continue_game.hide();
+							map.dierestart.hide();
+							map.choice_zhu.hide();
+							map.choice_fan.hide();
+							map.revive.hide();
 						}
 						else{
 							map.double_character.show();
+							map.free_choose.show();
+							map.change_identity.show();
+							map.change_choice.show();
+							map.continue_game.show();
+							map.dierestart.show();
+							map.choice_zhu.show();
+							map.choice_fan.show();
+							map.revive.show();
 						}
 						if(config.double_character&&config.doudizhu_mode!='kaihei'&&config.doudizhu_mode!='huanle'){
 							map.double_hp.show();
@@ -5599,6 +5635,7 @@
 							normal:'休闲',
 							kaihei:'开黑',
 							huanle:'欢乐',
+							online:'智斗',
 						},
 						restart:true,
 						frequent:true,
@@ -5679,7 +5716,7 @@
 						onclick:function(bool){
 							game.saveConfig('continue_game',bool,this._link.config.mode);
 							if(get.config('continue_game')){
-								if(!ui.continue_game&&_status.over&&!_status.brawl){
+								if(!ui.continue_game&&_status.over&&!_status.brawl&&!game.no_continue_game){
 									ui.continue_game=ui.create.control('再战',game.reloadCurrent);
 								}
 							}
@@ -5746,6 +5783,124 @@
 							'6':'六',
 							'8':'八',
 							'10':'十',
+						},
+					},
+					edit_character:{
+						name:'编辑将池',
+						clear:true,
+						onclick:function(){
+							if(get.mode()!='doudizhu'){
+								alert('请进入斗地主模式，然后再编辑将池');
+								return;
+							}
+							var container=ui.create.div('.popup-container.editor');
+							var editorpage=ui.create.div(container);
+							var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
+								ui.window.classList.remove('shortcutpaused');
+								ui.window.classList.remove('systempaused');
+								container.delete(null);
+								delete window.saveNonameInput;
+							});
+							var node=container;
+							var map=get.config('character_online')||lib.characterOnline;
+							node.code='character='+get.stringify(map)+'\n/*\n    这里是智斗三国模式的武将将池。\n    您可以在这里编辑对武将将池进行编辑，然后点击“保存”按钮即可保存。\n    将池中的Key势力武将，仅同时在没有被禁用的情况下，才会出现在选将框中。\n    而非Key势力的武将，只要所在的武将包没有被隐藏，即可出现在选将框中。\n    该将池为单机模式/联机模式通用将池。在这里编辑后，即使进入联机模式，也依然会生效。\n    但联机模式本身禁用的武将（如神貂蝉）不会出现在联机模式的选将框中。\n*/';
+							ui.window.classList.add('shortcutpaused');
+							ui.window.classList.add('systempaused');
+							var saveInput=function(){
+								var code;
+								if(container.editor){
+									code=container.editor.getValue();
+								}
+								else if(container.textarea){
+									code=container.textarea.value;
+								}
+								try{
+									var character=null;
+									eval(code);
+									if(!get.is.object(character)){
+										throw('err');
+									}
+									var groups=[];
+									for(var i in character){
+										if(!Array.isArray(character[i])) throw('type');
+										if(character[i].length>=3) groups.push(i);
+									}
+									if(groups.length<3) throw('enough');
+								}
+								catch(e){
+									if(e=='type'){
+										alert('请严格按照格式填写，不要写入不为数组的数据');
+									}
+									else if(e=='enough'){
+										alert('请保证至少写入了3个势力，且每个势力至少有3个武将');
+									}
+									else if(e=='err'){
+										alert('代码格式有错误，请对比示例代码仔细检查');
+									}
+									else{
+										alert('代码语法有错误，请仔细检查（'+e+'）')
+									}
+									return;
+								}
+								game.saveConfig('character_online',character,'doudizhu');
+								ui.window.classList.remove('shortcutpaused');
+								ui.window.classList.remove('systempaused');
+								container.delete();
+								container.code=code;
+								delete window.saveNonameInput;
+							};
+							window.saveNonameInput=saveInput;
+							var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
+							var editor=ui.create.div(editorpage);
+							if(node.aced){
+								ui.window.appendChild(node);
+								node.editor.setValue(node.code,1);
+							}
+							else if(lib.device=='ios'){
+								ui.window.appendChild(node);
+								if(!node.textarea){
+									var textarea=document.createElement('textarea');
+									editor.appendChild(textarea);
+									node.textarea=textarea;
+									lib.setScroll(textarea);
+								}
+								node.textarea.value=node.code;
+							}
+							else{
+								var aceReady=function(){
+									ui.window.appendChild(node);
+									var mirror = window.CodeMirror(editor, {
+										value:node.code,
+										mode:"javascript",
+										lineWrapping:!lib.config.touchscreen&&lib.config.mousewheel,
+										lineNumbers:true,
+										indentUnit:4,
+										autoCloseBrackets:true,
+										theme:'mdn-like'
+									});
+									lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
+									node.aced=true;
+									node.editor=mirror;
+								}
+								if(!window.ace){
+									lib.init.js(lib.assetURL+'game','codemirror',aceReady);
+									lib.init.css(lib.assetURL+'layout/default','codemirror');
+								}
+								else{
+									aceReady();
+								}
+							};
+						},
+					},
+					reset_character:{
+						name:'重置将池',
+						intro:'将智斗三国模式下的将池重置为默认将池',
+						clear:true,
+						onclick:function(){
+							if(confirm('该操作不可撤销！是否清除智斗三国模式的自定义将池，并将其重置为默认将池？')){
+								game.saveConfig('character_online',null,'doudizhu');
+								alert('将池已重置');
+							}
 						},
 					},
 				}
@@ -10644,15 +10799,16 @@
 						if(typeof num=='function'){
 							numx=num(player);
 						}
-						player.directgain(get.cards(numx));
-						if(player.singleHp===true&&get.mode()!='guozhan'){
+						if(player.getTopCards) player.directgain(player.getTopCards(numx));
+						else player.directgain(get.cards(numx));
+						if(player.singleHp===true&&get.mode()!='guozhan'&&(lib.config.mode!='doudizhu'||_status.mode!='online')){
 							player.doubleDraw();
 						}
 						player=player.next;
 					}
 					while(player!=end);
 					event.changeCard=get.config('change_card');
-					if(_status.connectMode||lib.config.mode!='identity'&&lib.config.mode!='guozhan'&&lib.config.mode!='doudizhu'){
+					if(_status.connectMode||(lib.config.mode=='doudizhu'&&_status.mode=='online')||lib.config.mode!='identity'&&lib.config.mode!='guozhan'&&lib.config.mode!='doudizhu'){
 						event.changeCard='disabled';
 					}
 					"step 1"
@@ -14300,7 +14456,7 @@
 								var losecard=player.lose(cards,ui.special);
 								if(info.visible) losecard.visible=true;
 								if(info.loseTo) losecard.position=ui[info.loseTo];
-								if(info.insert) losecard.insert=true;
+								if(info.insert) losecard.insert_card=true;
 								if(losecard.position==ui.special&&info.toStorage) losecard.toStorage=true;
 							}
 						}
@@ -14521,6 +14677,7 @@
 					var cards;
 					if(num>0){
 						if(event.bottom) cards=get.bottomCards(num);
+						else if(player.getTopCards) cards=player.getTopCards(num);
 						else cards=get.cards(num);
 					}
 					else{
@@ -15448,7 +15605,7 @@
 						if(get.config('revive')&&lib.mode[lib.config.mode].config.revive&&!ui.revive){
 							ui.revive=ui.create.control('revive',ui.click.dierevive);
 						}
-						if(get.config('continue_game')&&!ui.continue_game&&lib.mode[lib.config.mode].config.continue_game&&!_status.brawl){
+						if(get.config('continue_game')&&!ui.continue_game&&lib.mode[lib.config.mode].config.continue_game&&!_status.brawl&&!game.no_continue_game){
 							ui.continue_game=ui.create.control('再战',game.reloadCurrent);
 						}
 						if(get.config('dierestart')&&lib.mode[lib.config.mode].config.dierestart&&!ui.restart){
@@ -15666,7 +15823,11 @@
 					"step 0"
 					var judgestr=get.translation(player)+'的'+event.judgestr+'判定';
 					event.videoId=lib.status.videoId++;
-					var cardj=event.directresult||get.cards()[0];
+					var cardj=event.directresult;
+					if(!cardj){
+						if(player.getTopCards) cardj=player.getTopCards()[0];
+						else cardj=get.cards()[0];
+					}
 					var nextj=game.cardsGotoOrdering(cardj);
 					if(event.position!=ui.discardPile) nextj.noOrdering=true;
 					player.judging.unshift(cardj);
@@ -26818,6 +26979,11 @@
 									lib.skill[i]=mode.skill[i];
 								}
 							}
+							if(mode.card){
+								for(var i in mode.card){
+									lib.card[i]=mode.card[i];
+								}
+							}
 							game.finishCards();
 							if(mode.characterPack){
 								for(var i in mode.characterPack){
@@ -31609,7 +31775,7 @@
 						});
 					}
 				}
-				else if(!_status.connectMode&&get.config('continue_game')&&!ui.continue_game&&!_status.brawl){
+				else if(!_status.connectMode&&get.config('continue_game')&&!ui.continue_game&&!_status.brawl&&!game.no_continue_game){
 					ui.continue_game=ui.create.control('再战',game.reloadCurrent);
 				}
 			}
@@ -32744,6 +32910,7 @@
 			if(num==undefined) next.num=4;
 			else next.num=num;
 			next.setContent('gameDraw');
+			return next;
 		},
 		chooseCharacterDouble:function(){
 			var next=game.createEvent('chooseCharacter',false);
@@ -49261,6 +49428,7 @@
 				switch(config.doudizhu_mode){
 					case 'kaihei':return '开黑斗地主';
 					case 'huanle':return '欢乐斗地主';
+					case 'online':return '智斗三国';
 					default:return '休闲斗地主';
 				}
 			}

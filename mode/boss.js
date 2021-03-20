@@ -1025,7 +1025,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				boss_zhugeliang:['male','shen',Infinity,['xiangxing','yueyin','fengqi','gaiming'],['shu','boss','bossallowed'],'qun'],
 				boss_huangyueying:['female','shen',4,['boss_gongshen','boss_jizhi','qicai','boss_guiyin'],['shu','boss','bossallowed'],'wei'],
 				boss_pangtong:['male','shen',4,['boss_tianyu','qiwu','niepan','boss_yuhuo'],['shu','boss','bossallowed'],'zhu'],
-				boss_zhaoyun:['male','shen',1,['boss_juejing','longhun','zhanjiang'],['shu','boss','bossallowed'],'qun'],
 
 				boss_zhouyu:['male','shen',6,['huoshen','boss_honglian','boss_xianyin'],['wu','boss','bossallowed'],'zhu'],
 
@@ -1948,9 +1947,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			boss_pangtong:{
 				loopType:2,
-				chongzheng:12
-			},
-			boss_zhaoyun:{
 				chongzheng:12
 			},
 			boss_zhenji:{
@@ -7860,50 +7856,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_xuanlin_intro2:{nobracket:true},
 			boss_xuanlin_intro3:{nobracket:true},
 			boss_xuanlin_intro4:{nobracket:true},
-			zhanjiang:{
-				trigger:{player:'phaseZhunbeiBegin'},
-				filter:function(event,player){
-					var players=game.filterPlayer();
-					for(var i=0;i<players.length;i++){
-						if(players[i]!=player&&players[i].getEquip('qinggang')){
-							return true;
-						}
-					}
-				},
-				content:function(){
-					var players=game.filterPlayer();
-					for(var i=0;i<players.length;i++){
-						if(players[i]!=player){
-							var e=players[i].getEquip('qinggang');
-							if(e){
-								player.line(players[i],'green');
-								players[i].give(e,player);
-							}
-						}
-					}
-				}
-			},
-			boss_juejing:{
-				trigger:{player:'phaseDrawBefore'},
-				forced:true,
-				content:function(){
-					trigger.cancel();
-				},
-				ai:{
-					noh:true,
-				},
-				group:'boss_juejing2'
-			},
-			boss_juejing2:{
-				trigger:{player:'loseEnd'},
-				forced:true,
-				filter:function(event,player){
-					return player.countCards('h')<4;
-				},
-				content:function(){
-					player.draw(4-player.countCards('h'));
-				}
-			},
 			boss_leiji:{
 				audio:2,
 				trigger:{player:['respond','useCard']},
@@ -9223,7 +9175,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_luxun:'蹁跹君子',
 			boss_zhenji:'洛水仙子',
 			boss_diaochan:'绝代妖姬',
-			boss_zhaoyun:'高达一号',
 			boss_guojia:'世之奇士',
 			boss_caocao:'魏武大帝',
 
@@ -9566,9 +9517,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			// boss_bianshen4:'后援',
 			// boss_bianshen4_info:'你死亡后，随机召唤罗刹、夜叉中的一个',
 
-			zhanjiang:'斩将',
-			zhanjiang_info:'准备阶段开始时，如果其他角色的装备区内有【青釭剑】，你可以获得之',
-
 			boss_qiangzheng:'强征',
 			boss_qiangzheng_info:'锁定技，结束阶段，你获得每个敌方角色的一张手牌',
 			boss_baolin:'暴凌',
@@ -9613,10 +9561,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_yuhuo_info:'觉醒技，在你涅槃后，你获得技能【神威】、【朱羽】',
 			boss_tianyu:'天狱',
 			boss_tianyu_info:'锁定技，结束阶段，你解除横置状态，除你之外的所有角色进入横置状态',
-
-			boss_juejing:'绝境',
-			boss_juejing2:'绝境',
-			boss_juejing_info:'锁定技，摸牌阶段开始时，你不摸牌；锁定技，若你的手牌数小于4，你将手牌补至四张',
 
 			boss_jizhi:'集智',
 			boss_jizhi_info:'每当你使用一张非转化的非基本牌，你可以摸一张牌并展示之',

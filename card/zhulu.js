@@ -273,7 +273,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:10,
 					tag:{
 						gain:1,
-						loseCard:1,
+						//loseCard:1,
 					},
 					basic:{
 						useful:0.5,

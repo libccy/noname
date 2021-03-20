@@ -896,8 +896,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwjingshi:{
 				enable:'phaseUse',
 				usable:1,
-				direct:true,
-				delay:0,
+				//direct:true,
+				//delay:0,
 				filter:function(event,player){
 					return game.hasPlayer(function(current){
 						return current.countCards('h');
@@ -942,7 +942,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(event.targets.contains(result.targets[0])){
 						player.popup('成功');
-						game.log(player,'发动','【镜师】','成功');
+						game.log(player,'发动','【血契】','成功');
 						var dialog=ui.create.dialog('hidden');
 						dialog.add('获得任意一名角色的一张手牌');
 						var list=game.filterPlayer(function(current){
@@ -959,7 +959,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						player.popup('失败');
-						game.log(player,'发动','【镜师】','失败');
+						game.log(player,'发动','【血契】','失败');
 						event.finish();
 					}
 					'step 2'

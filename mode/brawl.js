@@ -452,6 +452,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var skillsx=lib.character[name][3].slice(0);
 						lib.character[name][2]=4;
 						lib.character[name][3]=[];
+						if(lib.character[name][4]) lib.character[name][4].remove('hiddenSkill');
 						characters.push(name);
 						var list=skillsx.slice(0);
 						for(var j=0;j<skillsx.length;j++){

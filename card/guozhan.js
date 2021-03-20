@@ -208,9 +208,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				yingbian_prompt:'此牌的效果改为依次执行所有选项',
 				content:function(){
 					'step 0'
-					if((get.mode()!='guozhan'||_status.mode=='yingbian'||_status.mode=='free')&&!get.is.single()) event.goto(2);
+					if(event.card.yingbian){
+						target.discard(target.getCards('e',function(card){
+							return lib.filter.cardDiscardable(card,target,'shuiyanqijunx');
+						}));
+						target.damage('thunder');
+						event.finish();
+					}
 					else if(!target.countCards('e',function(card){
-						return lib.filter.cardDiscardable(card,target);
+						return lib.filter.cardDiscardable(card,target,'shuiyanqijunx');
 					})){
 						var next=target.damage();
 						if(!get.is.single()) next.nature='thunder';
@@ -228,28 +234,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					});
 					'step 1'
 					if(result.control=='discard_card'){
-						target.discard(target.getCards('e'));
+						target.discard(target.getCards('e',function(card){
+							return lib.filter.cardDiscardable(card,target,'shuiyanqijunx');
+						}));
 					}
 					else{
 						var next=target.damage();
 						if(!get.is.single()) next.nature='thunder'
 					}
 					event.finish();
-					'step 2'
-					var next=target.chooseToDiscard(2,'e').set('ai',function(card){
-						var player=_status.event.player;
-						var source=_status.event.getParent().player;
-						if(get.damageEffect(player,source,player,'thunder')>=0){
-							return 0;
-						}
-						if(player.hp>=3){
-							return 4-get.value(card);
-						}
-						return 8-get.value(card);
-					});
-					if(card.yingbian) next.set('forced',true);
-					'step 3'
-					if(card.yingbian||!result.bool) target.damage('thunder');
 				},
 				ai:{
 					order:6,
@@ -274,14 +267,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target){
-							if(!get.is.single()&&(get.mode()!='guozhan'||_status.mode=='yingbian'||_status.mode=='free')){
-								if(target.countCards('e',function(card){
-									return get.value(card,target)<=0;
-								})>1) return 1;
-								var es=target.countCards('e');
-								if(es<2) return -1.5;
-								return -3/es;
-							}
 							return -1-target.countCards('e');
 						}
 					}
@@ -1422,8 +1407,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			xietianzi_info:'出牌阶段，对自己使用。你结束出牌阶段，若如此做，弃牌阶段结束时，你可以弃置一张手牌，获得一个额外的回合',
 			xietianzi_info_guozhan:'出牌阶段，对为大势力角色的你使用。你结束出牌阶段，若如此做，弃牌阶段结束时，你可以弃置一张手牌，获得一个额外的回合',
 			shuiyanqijunx:'水淹七军',
+			shuiyanqijunx_info:'出牌阶段，对一名其他角色使用。目标角色选择一项：1、弃置装备区里的所有牌（至少一张）；2、受到你造成的1点雷电伤害',
 			shuiyanqijunx_info_guozhan:'出牌阶段，对一名装备区里有牌的其他角色使用。目标角色选择一项：1、弃置装备区里的所有牌；2、受到你造成的1点雷电伤害',
-			shuiyanqijunx_info:'出牌阶段，对一名其他角色使用。目标角色选择一项：1、弃置装备区内的两张牌；2、受到你造成的1点雷电伤害',
 			lulitongxin:'勠力同心',
 			lulitongxin_info:'出牌阶段，对所有大势力角色或所有小势力角色使用。若目标角色：不处于“连环状态”，其横置；处于“连环状态”，其摸一张牌',
 			lulitongxin_info_versus:'出牌阶段，对所有敌方角色或所有己方角色使用。若目标角色：为敌方角色且不处于“连环状态”，其横置；为己方角色且处于“连环状态”，其摸一张牌。',

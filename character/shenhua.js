@@ -1661,7 +1661,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					if(event.card.name!='sha') return false;
-					if(player.hasSkill('nzry_lijun2')) return false;
+					//if(player.hasSkill('nzry_lijun2')) return false;
 					if(player.group!='wu') return false;
 					if(_status.currentPhase!=player) return false;
 					if(!game.hasPlayer(function(target){
@@ -1688,7 +1688,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(!result.bool) event.finish();
 					else{
-						player.addTempSkill('nzry_lijun2','phaseUseEnd');
+						//player.addTempSkill('nzry_lijun2','phaseUseEnd');
 						var zhu=result.targets[0];
 						player.line(zhu,'green');
 						zhu.logSkill('nzry_lijun');
@@ -7394,7 +7394,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_zhizheng_info":"锁定技，你的出牌阶段内，攻击范围内不包含你的其他角色不能成为你使用牌的目标。出牌阶段结束时，若你本阶段内使用的牌数小于这些角色的数量，则你弃置其中一名角色的一张牌。",
 			"nzry_lijun1":"立军",
 			"nzry_lijun":"立军",
-			"nzry_lijun_info":"主公技，其他吴势力角色的回合限一次，其使用的【杀】结算后，可以将此【杀】交给你，然后你可以令其摸一张牌",
+			"nzry_lijun_info":"主公技，其他吴势力角色于回合内使用的【杀】结算后，可以将此【杀】对应的实体牌交给你，然后你可以令其摸一张牌。",
 			"nzry_huaiju":"怀橘",
 			"nzry_huaiju_info":"锁定技，游戏开始时，你获得3个“橘”标记。（有“橘”的角色受到伤害时，防止此伤害，然后移去一个“橘”；有“橘”的角色摸牌阶段额外摸一张牌）",
 			"tachibana_effect":"怀橘",

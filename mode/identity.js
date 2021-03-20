@@ -857,6 +857,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				next.setContent(function(){
 					"step 0"
 					ui.arena.classList.add('choose-character');
+					game.no_continue_game=true;
 					lib.init.onfree();
 					"step 1"
 					var list=['rZhu','rZhong','rNei','rYe'];

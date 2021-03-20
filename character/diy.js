@@ -1935,7 +1935,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			abyusa_jueqing:{
-				audio:'jueqing',
 				trigger:{source:'damageBegin2'},
 				skillAnimation:true,
 				animationColor:'water',
@@ -1964,7 +1963,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageBefore'},
 				forced:true,
 				charlotte:true,
-				audio:'jueqing',
 				filter:function(event,player){
 					return player.hasSkill('abyusa_jueqing');
 				},

@@ -9632,16 +9632,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.loseHp(player.countMark('ranshang'));
+					if(player.countMark('ranshang')>=2){
+						player.loseMaxHp(2);
+						player.draw(2);
+					}
 				}
 			},
 			hanyong:{
 				trigger:{player:'useCard'},
 				filter:function(event,player){
-					return game.roundNumber>player.hp&&event.card&&
-						(event.card.name=='nanman'||event.card.name=='wanjian');
+					return event.card&&(event.card.name=='nanman'||event.card.name=='wanjian'||(event.card.name=='sha'&&get.color(event.card)=='black'));
 				},
 				content:function(){
 					trigger.baseDamage++;
+					if(game.roundNumber<=player.hp) player.addMark('ranshang',1);
 				},
 			},
 			hanyong3:{
@@ -15745,9 +15749,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mozhi_info:'结束阶段开始时，你可以将一张手牌当作你本回合出牌阶段内使用的第一张基本或普通锦囊牌使用。然后，你可以将一张手牌当做你本回合出牌阶段内使用的第二张基本或普通锦囊牌使用。（你不能通过此技能使用【酒】）',
 			ranshang:'燃殇',
 			ranshang2:'燃殇',
-			ranshang_info:'锁定技，当你受到1点火焰伤害后，你获得1枚“燃”标记；结束阶段开始时，你失去X点体力（X为“燃”标记的数量）',
+			ranshang_info:'锁定技，当你受到1点火焰伤害后，你获得1枚“燃”标记；结束阶段开始时，你失去X点体力。若X不小于2，则你减2点体力上限并摸两张牌。（X为“燃”标记的数量）',
 			hanyong:'悍勇',
-			hanyong_info:'当你使用【南蛮入侵】或【万箭齐发】时，若你的体力值小于游戏轮数，你可以令此牌的伤害值基数+1。',
+			hanyong_info:'当你使用【南蛮入侵】或【万箭齐发】或黑色【杀】时，若你的体力值小于游戏轮数，你可以令此牌的伤害值基数+1。然后若你的体力值不小于游戏轮数，则你获得一枚“燃”标记。',
 
 			yicong:'义从',
 			yongsi:'庸肆',

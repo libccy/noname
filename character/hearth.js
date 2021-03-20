@@ -8025,6 +8025,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				position:'he',
 				filter:function(event,player){
+					if(player.storage.tuteng_awake) return true;
 					var rand=['tuteng1','tuteng2','tuteng3','tuteng4'];
 					for(var i=0;i<rand.length;i++){
 						if(!player.hasSkill(rand[i])) return true;
