@@ -1458,8 +1458,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					value:[5,1],
 					useful:[3,1],
 					result:{
-						player:function(player,target){
-							if(current.hasSkill('gw_ciguhanshuang')) return 0;
+						target:function(player,target){
+							if(target.hasSkill('gw_ciguhanshuang')) return 0;
 							return -1;
 						}
 					},

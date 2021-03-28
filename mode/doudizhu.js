@@ -2197,7 +2197,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			shu:[
 				're_guanyu','re_huangyueying','re_liubei','re_machao','re_zhangfei','zhaoyun','re_huangzhong','re_weiyan','re_pangtong','ol_sp_zhugeliang',
 				're_menghuo','re_zhurong','re_fazheng','re_masu','guanxingzhangbao','xin_liaohua','old_madai','re_jianyong','wuyi','zhangsong','zhoucang',
-				'liuchen','xiahoushi','re_zhangyi','quancong','liyan','guanyinping','guansuo','mayunlu','mazhong','mizhu','sunqian','xiahouba','zhangxingcai',
+				'liuchen','xiahoushi','re_zhangyi','liyan','guanyinping','guansuo','mayunlu','mazhong','mizhu','sunqian','xiahouba','zhangxingcai',
 				'wangping','yanyan','chendao','ganfuren','re_maliang','dengzhi','lifeng','zhangyì',
 			],
 			wu:[

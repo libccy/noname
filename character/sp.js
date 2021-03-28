@@ -10,13 +10,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_star:["sp_xiahoushi","jsp_zhaoyun","huangjinleishi","sp_pangtong","sp_daqiao","sp_ganning","sp_xiahoudun","sp_lvmeng","sp_zhangfei","sp_liubei"],
 				sp_sticker:['sp_gongsunzan','sp_simazhao','sp_wangyuanji','sp_xinxianying','sp_liuxie'],
 				sp_guozhan:["zangba","shamoke","ganfuren","yuejin","hetaihou","dingfeng","panfeng","jianggan"],
-				sp_guozhan2:["mifuren","mateng","tianfeng","chendong","sp_dongzhuo","jiangfei","jiangqing","kongrong","bianfuren","liqueguosi","lvfan","cuimao","jiling","zhangren","zoushi","huaxin"],
+				sp_guozhan2:["mifuren","mateng","tianfeng","chendong","sp_dongzhuo","jiangfei","jiangqing","kongrong","bianfuren","liqueguosi","lvfan","cuimao","jiling","zhangren","zoushi","huaxin","luyusheng"],
 				sp_single:["niujin"],
 				sp_others:["hanba","caiyang"],
 			},
 		},
 		characterFilter:{},
 		character:{
+			luyusheng:['female','wu',3,['zhente','zhiwei']],
 			ol_xinxianying:['female','wei',3,['xincaishi','xinzhongjian']],
 			huaxin:['male','wei',3,['wanggui','xibing']],
 			wolongfengchu:['male','shu',4,['youlong','luanfeng']],
@@ -97,7 +98,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_lvmeng:['male','wu',3,['tanhu','mouduan']],
 
 			guansuo:['male','shu',4,['xinzhengnan','xiefang']],
-			tadun:['male','qun',4,['luanzhan']],
+			tadun:['male','qun',4,['reluanzhan']],
 			yanbaihu:['male','qun',4,['zhidao','jili']],
 			chengyu:['male','wei',3,['shefu','benyu']],
 
@@ -153,6 +154,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			luyusheng:'陆郁生（？年-？），三国时期吴国官员陆绩之女。陆郁生的父亲陆绩是吴郡公认的才子，又是当时吴郡陆氏的领袖。陆绩赴任担任郁林太守，遂取此名。陆郁生年少的时候就定下坚贞的志向。建安二十四年（219年)，陆绩早亡，她与两个兄弟陆宏、陆睿当时都只有几岁，一起返回吴县，被他们的从兄陆瑁接回抚养。13周岁的陆郁生嫁给同郡出身的张白为妻。出嫁3个月后，张白因为其兄张温一族的案件遭到连坐，被处以流刑，后死于流放地，陆郁生成为了寡妇，其后公开宣言不再改嫁，困难于生计但拒绝了所有提亲，在艰苦中从未停止服侍、照顾张白的姐妹。事情传到朝廷，皇帝褒奖陆郁生，号其为“义姑”。她的表侄姚信在文集中称赞她的义举。',
 			wolongfengchu:'沙比武将，懒得复制粘贴，自己去看诸葛亮和庞统的介绍吧。',
 			huaxin:'华歆（157年－232年1月30日），字子鱼，汉族。平原郡高唐县人（今山东省高唐县）。汉末至三国曹魏初年名士、重臣。华歆早年拜太尉陈球为师，与卢植、郑玄、管宁等为同门，又与管宁、邴原共称一龙，华歆为龙头。汉灵帝时华歆被举为孝廉，任郎中，因病去官。又被大将军何进征召为尚书郎。后任豫章太守，甚得民心。孙策率军南下，华歆举郡投降，被奉为上宾。官渡之战时，被征为议郎、参司空军事。入为尚书、侍中，又代荀彧为尚书令。丞相曹操讨孙权时，授华歆为军师。后为魏王国的御史大夫。曹丕即王位，拜华歆为相国，封安乐乡侯。曹魏建立后，其相国职名改称司徒。魏明帝即位，升任太尉，晋封博平侯。太和五年十二月（232年1月），华歆去世，年七十五，谥号“敬”。有文集三十卷，今佚失，其余见《全三国文》。',
 			caoshuang:'曹爽（？－249年2月9日），字昭伯，沛国谯县（今安徽亳州市）人。三国时期魏国权臣，大司马曹真长子。曹爽体态肥胖，凭借宗室身份，出入宫廷，交好太子曹叡。魏明帝即位，起家员外散骑侍郎，累迁城门校尉、散骑常侍，转武卫将军。太和五年（231年），袭封邵陵侯。景初三年（239年），魏明帝曹叡病危，拜大将军、假黄钺，与司马懿并为托孤大臣。少帝曹芳即位，加侍中，改封武安侯。势倾四海，声震天下。任用私人，专权乱政，侵吞公产。伐蜀失败，虚耗国力。起居逾制，软禁郭太后。正始十年，太傅司马懿发动高平陵政变，掌握魏国大权。曹爽失去大将军职务，以谋反之罪处死，夷灭三族。',
@@ -162,7 +164,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huban:'为《三国演义》所杜撰的人物，正史无记载，荥阳太守王植麾下从事、桓帝时议郎胡华之子。关羽过五关斩六将时其中一关就是王植所镇守，胡班奉命放火夜袭关公，因敬服公之气概，并得其父托公所带家书，班看毕，叹曰：“险些误杀忠良！”故将之放走。胡班到荆州来投降关公，公念其旧日相救之情，甚爱之；令随费诗入川，见汉中王受爵。费诗辞别关公，带了胡班，自回蜀中去了。',
 			chunyuqiong:'淳于琼（？－200年），字仲简，颍川（治今河南禹州）人。东汉时期官吏，于汉灵帝中平五年（188）被任命为西园八校尉之一的右校尉，与蹇硕、袁绍、鲍鸿、曹操、赵融、冯芳、夏牟同列。为袁绍大将，与张郃、高览等人齐名。在官渡之战时镇守乌巢，遭到曹操的偷袭而惨败，自己也被曹操处斩。',
 			lvkuanglvxiang:'吕旷（生卒年不详），与吕翔同是袁绍属下，袁绍去世后，为袁尚守东平，后来投降曹操，并被封为列侯。在《三国演义》中，在曹操准备往南准备攻击前，两人跟著大将曹仁和将军李典准备要攻击刘备。但吕旷被赵云刺下马身亡，而吕翔也死于张飞矛下，可以算是出师未捷身先死',
-			caobuxing:'曹不兴，亦名弗兴，三国时著名画家。孙吴吴兴（今浙江湖州）人，生卒年不详。他在黄武年间（222—229年）享有很大的声誉。被称为“佛画之祖”。与东晋顾恺之、南朝宋陆探微、南朝梁张僧繇并称“六朝四大家”。又与赵达的算术、严武的弈棋、皇象的草书等号称“吴中八绝”。曹不兴善画龙、虎、马及人物，有“落墨为蝇”等传奇故事，其佛画成就对后世影响很大，相传其所画龙头令谢赫叹服不已。画迹今已不存，据《贞观公私画史》载，作品有《青溪龙》、《赤盘龙》、《南海监牧进十种马图》、《夷事夷兽样》、《桃源图》等，惜早已散佚。 但之后的著名画家卫协直接师承其法。',
+			caobuxing:'曹不兴，亦名弗兴，三国时著名画家。孙吴吴兴（今浙江湖州）人，生卒年不详。他在黄武年间（222—229年）享有很大的声誉。被称为“佛画之祖”。与东晋顾恺之、南朝宋陆探微、南朝梁张僧繇并称“六朝四大家”。又与赵达的算术、严武的弈棋、皇象的草书等号称“吴中八绝”。曹不兴善画龙、虎、马及人物，有“落墨为蝇”等传奇故事，其佛画成就对后世影响很大，相传其所画龙头令谢赫叹服不已。画迹今已不存，据《贞观公私画史》载，作品有《青溪龙》、《赤盘龙》、《南海监牧进十种马图》、《夷事夷兽样》、《桃源图》等，惜早已散佚。但之后的著名画家卫协直接师承其法。',
 			gaolan:'高览，生卒年不详，一名高奂，本属袁绍部将，后官渡之战淳于琼被曹操击破，与张郃一同投降曹操，被封为偏将军，东莱侯。《三国演义》里，曾与许褚、徐晃大战不分胜负。201年刘备败走荆州时，高览奉命追杀，三合斩刘辟，而后被冲阵而来的赵云刺死。',
 			xunchen:'荀谌，字友若，荀彧之兄（一说荀彧之弟），荀绲之子，颍川人。曾任军阀袁绍的幕僚。帮助袁绍游说韩馥，夺取了冀州。',
 			sunshao:'孙邵（163年－225年），字长绪，青州北海国人（今山东潍坊市昌乐县西）。原为北海相孔融的功曹，被孔融称赞为可任朝廷要职的人才，后随刘繇到达江东，继而辅佐孙权。孙权称吴王后，孙邵成为吴国首任丞相，数年后病逝。由于孙邵和当时吴国史官的关系并不是很好，因此在史书中并没有详细的记载。',
@@ -396,6 +398,229 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//陆郁生
+			zhente:{
+				audio:2,
+				trigger:{target:'useCardToTargeted'},
+				logTarget:'player',
+				usable:1,
+				filter:function(event,player){
+					if(player==event.player||get.color(event.card)!='black'||event.player.isDead()) return false;
+					var type=get.type(event.card);
+					return type=='basic'||type=='trick';
+				},
+				check:function(event,player){
+					return !event.excluded.contains(player)&&get.effect(player,event.card,event.player,player)<0;
+				},
+				content:function(){
+					'step 0'
+					trigger.player.chooseControl().set('choiceList',[
+						'本回合内不能再使用黑色牌',
+						'令'+get.translation(trigger.card)+'对'+get.translation(player)+'无效',
+					]).set('prompt',get.translation(player)+'发动了【贞特】，请选择一项').set('ai',function(){
+						var player=_status.event.player;
+						var target=_status.event.getParent().player;
+						var card=_status.event.getTrigger().card;
+						if(get.effect(target,card,player,player)<=0) return 1;
+						var hs=player.countCards('h',function(card){
+							return get.color(card,player)=='black'&&player.hasValueTarget(card,null,true);
+						});
+						if(!hs.length) return 0;
+						if(hs>1) return 1;
+						return Math.random()>0.5?0:1;
+					});
+					'step 1'
+					if(result.index==0) trigger.player.addTempSkill('zhente2');
+					else trigger.excluded.add(player);
+				},
+			},
+			zhente2:{
+				mod:{
+					cardEnabled:function(card){
+						if(get.color(card)=='black') return false;
+					},
+					cardSavable:function(card){
+						if(get.color(card)=='black') return false;
+					},
+				},
+				mark:true,
+				charlotte:true,
+				intro:{content:'本回合内不能使用黑色牌'},
+			},
+			zhiwei:{
+				audio:2,
+				trigger:{
+					player:['enterGame','showCharacterAfter'],
+					global:['gameDrawAfter'],
+				},
+				direct:true,
+				filter:function(event,player){
+					if(player.hasSkill('zhiwei2')) return false;
+					if(get.mode()=='guozhan') return event.name=='showCharacter'&&(event.toShow.contains('gz_luyusheng')||event.toShow.contains('luyusheng'));
+					return event.name!='showCharacter';
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget('请选择【至微】的目标','选择一名其他角色。该角色造成伤害后，你摸一张牌，该角色受到伤害后，你随机弃置一张手牌。你弃牌阶段弃置的牌均被该角色获得。',true,lib.filter.notMe).set('ai',function(target){
+						var att=get.attitude(_status.event.player,target);
+						if(att>0) return 1+att;
+						return Math.random();
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('zhiwei',target);
+						player.storage.zhiwei2=target;
+						player.addSkill('zhiwei2');
+					}
+				},
+			},
+			zhiwei2:{
+				group:['zhiwei2_draw','zhiwei2_discard','zhiwei2_gain','zhiwei2_clear'],
+				charlotte:true,
+				onremove:true,
+				mark:'character',
+				intro:{content:'$造成伤害后你摸一张牌；$受到伤害后你弃置一张牌；你于弃牌阶段弃置牌后交给$'},
+				subSkill:{
+					draw:{
+						audio:'zhiwei',
+						trigger:{global:'damageSource'},
+						forced:true,
+						filter:function(event,player){
+							return event.source==player.storage.zhiwei2;
+						},
+						logTarget:'source',
+						content:function(){
+							player.draw();
+						},
+					},
+					discard:{
+						audio:'zhiwei',
+						trigger:{global:'damageEnd'},
+						forced:true,
+						filter:function(event,player){
+							return event.player==player.storage.zhiwei2&&player.countCards('h',function(card){
+								return lib.filter.cardDiscardable(card,player,'zhiwei2_discard');
+							});
+						},
+						logTarget:'player',
+						content:function(){
+							player.discard(player.getCards('h',function(card){
+								return lib.filter.cardDiscardable(card,player,'zhiwei2_discard');
+							}).randomGet());
+						},
+					},
+					gain:{
+						audio:'zhiwei',
+						trigger:{player:'loseAfter'},
+						forced:true,
+						filter:function(event,player){
+							return event.type=='discard'&&event.getParent('phaseDiscard').player==player&&player.storage.zhiwei2&&player.storage.zhiwei2.isIn()&&event.cards2.filterInD('d').length>0;
+						},
+						logTarget:function(event,player){
+							return player.storage.zhiwei2;
+						},
+						content:function(){
+							if(trigger.delay===false) game.delay();
+							player.storage.zhiwei2.gain(trigger.cards2.filterInD('d'),'gain2');
+						},
+					},
+					clear:{
+						audio:'zhiwei',
+						trigger:{
+							global:'die',
+							player:['hideCharacterEnd','removeCharacterEnd'],
+						},
+						forced:true,
+						filter:function(event,player){
+							if(event.name=='die') return event.player==player.storage.zhiwei2;
+							if(event.name=='removeCharacter') return event.toRemove=='luyusheng'||event.toRemove=='gz_luyusheng';
+							return event.toHide=='luyusheng'||event.toHide=='gz_luyusheng';
+						},
+						content:function(){
+							'step 0'
+							player.removeSkill('zhiwei2');
+							if(trigger.name!='die'||get.mode()!='guozhan') event.finish();
+							'step 1'
+							if(player.name1=='gz_luyusheng'||player.name1=='luyusheng') player.hideCharacter(0);
+							if(player.name2=='gz_luyusheng'||player.name2=='luyusheng') player.hideCharacter(1);
+						},
+					},
+				},
+			},
+			//新塌顿
+			reluanzhan:{
+				audio:'luanzhan',
+				trigger:{
+					player:'damageEnd',
+					source:'damageSource',
+				},
+				forced:true,
+				content:function(){
+					player.addMark('reluanzhan',1,false);
+				},
+				intro:{content:'mark'},
+				ai:{notemp:true},
+				group:['reluanzhan_add','reluanzhan_remove'],
+			},
+			reluanzhan_add:{
+				trigger:{player:'useCard2'},
+				direct:true,
+				filter:function(event,player){
+					if(event.card.name!='sha'&&(get.color(event.card)!='black'||get.type(event.card)!='trick')||!player.countMark('reluanzhan')) return false;
+					var info=get.info(event.card);
+					if(info.allowMultiple==false) return false;
+					if(event.targets&&!info.multitarget){
+						if(game.hasPlayer(function(current){
+							return !event.targets.contains(current)&&lib.filter.targetEnabled2(event.card,player,current)&&lib.filter.targetInRange(event.card,player,current);
+						})){
+							return true;
+						}
+					}
+					return false;
+				},
+				content:function(){
+					'step 0'
+					var num=player.countMark('reluanzhan');
+					var prompt2='为'+get.translation(trigger.card)+'增加至多'+get.cnNumber(num)+'个目标'
+					player.chooseTarget(get.prompt('reluanzhan'),function(card,player,target){
+						if(_status.event.targets.contains(target)) return false;
+						var player=_status.event.player;
+						return lib.filter.targetEnabled2(_status.event.card,player,target)&&lib.filter.targetInRange(_status.event.card,player,target);
+					},[1,num]).set('prompt2',prompt2).set('ai',function(target){
+						var trigger=_status.event.getTrigger();
+						var player=_status.event.player;
+						return get.effect(target,trigger.card,player,player);
+					}).set('card',trigger.card).set('targets',trigger.targets);
+					'step 1'
+					if(result.bool){
+						if(!event.isMine()&&!event.isOnline()) game.delayx();
+						event.targets=result.targets;
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if(event.targets){
+						player.logSkill('reluanzhan',event.targets);
+						trigger.targets.addArray(event.targets);
+					}
+				},
+			},
+			reluanzhan_remove:{
+				audio:'luanzhan',
+				trigger:{player:'useCardToPlayered'},
+				forced:true,
+				filter:function(event,player){
+					if(!event.isFirstTarget||(event.card.name!='sha'&&(get.color(event.card)!='black'||get.type(event.card)!='trick'))||!player.countMark('reluanzhan')) return false;
+					var info=get.info(event.card);
+					if(info.allowMultiple==false||info.multitarget) return false;
+					return event.targets.length<player.countMark('reluanzhan');
+				},
+				content:function(){
+					player.removeMark('reluanzhan',Math.ceil(player.countMark('reluanzhan')/2));
+				},
+			},
 			//华歆
 			wanggui:{
 				audio:2,
@@ -474,16 +699,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(event,player){
 					var target=event.player;
 					var att=get.attitude(player,target);
+					var num2=Math.min(5,target.hp-target.countCards('h'));
+					if(num2<=0) return att<=0;
 					var num=target.countCards('h',function(card){
 						return target.hasValueTarget(card,null,true);
 					});
 					if(!num) return att>0;
-					var num2=Math.min(5,target.hp-target.countCards('h'));
 					return num>num2;
 				},
 				content:function(){
 					'step 0'
-					trigger.player.draw(Math.min(5,trigger.player.hp-trigger.player.countCards('h')));
+					var num=Math.min(5,trigger.player.hp-trigger.player.countCards('h'));
+					if(num>0) trigger.player.draw(num);
 					trigger.player.addTempSkill('xibing2');
 					player._xibing=true;
 					if(get.mode()!='guozhan'||player.isUnseen(2)||trigger.player.isUnseen(2)) event.finish();
@@ -1410,7 +1637,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('targets',trigger.targets).set('card',trigger.card);
 					'step 1'
 					if(result.bool){
-						if(!event.isMine()) game.delayx();
+						if(!event.isMine()&&!event.isOnline()) game.delayx();
 						event.targets=result.targets;
 					}
 					else{
@@ -2000,7 +2227,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('card',trigger.card);
 					'step 1'
 					if(result.bool){
-						if(!event.isMine()&&!_status.connectMode) game.delayx();
+						if(!event.isMine()&&!event.isOnline()) game.delayx();
 						event.targets=result.targets;
 					}
 					else{
@@ -2057,7 +2284,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('targets',trigger.targets).set('card',trigger.card);
 					'step 1'
 					if(result.bool){
-						if(!event.isMine()) game.delayx();
+						if(!event.isMine()&&!event.isOnline()) game.delayx();
 						event.targets=result.targets;
 					}
 					else{
@@ -5132,7 +5359,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 3'
 					if(result.bool){
-						if(!event.isMine()) game.delayx();
+						if(!event.isMine()&&!event.isOnline()) game.delayx();
 						event.target=result.targets[0];
 					}
 					else{
@@ -5458,7 +5685,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('card',trigger.card);
 					'step 1'
 					if(result.bool){
-						if(!event.isMine()&&!_status.connectMode) game.delayx();
+						if(!event.isMine()&&!event.isOnline()) game.delayx();
 						event.target=result.targets[0];
 					}
 					else{
@@ -7581,7 +7808,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						player.getHistory('custom').push({qizhi:true});
-						if(!event.isMine()&&!_status.connectMode) game.delay();
 						player.logSkill('qizhi',result.targets);
 						player.discardPlayerCard(result.targets[0],true,'he');
 						event.target=result.targets[0];
@@ -9632,7 +9858,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.loseHp(player.countMark('ranshang'));
-					if(player.countMark('ranshang')>=2){
+					if(player.countMark('ranshang')>2){
 						player.loseMaxHp(2);
 						player.draw(2);
 					}
@@ -9641,7 +9867,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hanyong:{
 				trigger:{player:'useCard'},
 				filter:function(event,player){
-					return event.card&&(event.card.name=='nanman'||event.card.name=='wanjian'||(event.card.name=='sha'&&get.color(event.card)=='black'));
+					return event.card&&(event.card.name=='nanman'||event.card.name=='wanjian'||(event.card.name=='sha'&&!event.card.nature&&get.suit(event.card)=='spade'));
 				},
 				content:function(){
 					trigger.baseDamage++;
@@ -12216,7 +12442,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseJieshuBegin'},
 				filter:function(event,player){
-					return event.player.countCards('h')<=1&&player.hasSkill('junbing');
+					return event.player.countCards('h')<=1&&(player==event.player||player.hasSkill('junbing'));
 				},
 				direct:true,
 				checkx:function(target,player){
@@ -15749,9 +15975,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mozhi_info:'结束阶段开始时，你可以将一张手牌当作你本回合出牌阶段内使用的第一张基本或普通锦囊牌使用。然后，你可以将一张手牌当做你本回合出牌阶段内使用的第二张基本或普通锦囊牌使用。（你不能通过此技能使用【酒】）',
 			ranshang:'燃殇',
 			ranshang2:'燃殇',
-			ranshang_info:'锁定技，当你受到1点火焰伤害后，你获得1枚“燃”标记；结束阶段开始时，你失去X点体力。若X不小于2，则你减2点体力上限并摸两张牌。（X为“燃”标记的数量）',
+			ranshang_info:'锁定技，当你受到1点火焰伤害后，你获得1枚“燃”标记；结束阶段开始时，你失去X点体力。若X大于2，则你减2点体力上限并摸两张牌。（X为“燃”标记的数量）',
 			hanyong:'悍勇',
-			hanyong_info:'当你使用【南蛮入侵】或【万箭齐发】或黑色【杀】时，若你的体力值小于游戏轮数，你可以令此牌的伤害值基数+1。然后若你的体力值不小于游戏轮数，则你获得一枚“燃”标记。',
+			hanyong_info:'当你使用【南蛮入侵】或【万箭齐发】或黑桃【杀】时，若你的体力值小于游戏轮数，你可以令此牌的伤害值基数+1。然后若你的体力值不小于游戏轮数，则你获得一枚“燃”标记。',
 
 			yicong:'义从',
 			yongsi:'庸肆',
@@ -16039,6 +16265,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xibing_info:'当一名其他角色在其出牌阶段内使用第一张黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至当前体力值(至多摸五张)且本回合不能再使用手牌。',
 			xibing_info_guozhan:'当一名其他角色在其出牌阶段内使用第一张黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至当前体力(至多摸五张)值且本回合不能再使用手牌。若你与其均明置了所有武将牌，则你可以暗置你与其各一张武将牌且本回合不能再明置此武将牌。',
 			ol_xinxianying:'辛宪英',
+			reluanzhan:'乱战',
+			reluanzhan_add:'乱战',
+			reluanzhan_remove:'乱战',
+			reluanzhan_info:'当你受到或造成伤害后，你获得一个“乱”。当你使用【杀】或黑色普通锦囊牌选择目标后，你可为此牌增加至多X个目标。当你使用这些牌指定第一个目标后，若此牌目标数小于X，则你移去X/2（向上取整）个“乱”。（X为“乱”数）',
+			luyusheng:'陆郁生',
+			zhente:'贞特',
+			zhente2:'贞特',
+			zhente_info:'每回合限一次，当你成为其他角色使用黑色基本牌或黑色普通锦囊牌的目标后，你可令使用者选择一项：1.本回合不能再使用黑色牌；2.此牌对你无效。 ',
+			zhiwei:'至微',
+			zhiwei2:'至微',
+			zhiwei_info:'游戏开始时，你选择一名其他角色。该角色造成伤害后，你摸一张牌，该角色受到伤害后，你随机弃置一张手牌。你弃牌阶段弃置的牌均被该角色获得。 ',
+			zhiwei_info_guozhan:'你明置此武将牌时，选择一名其他角色。该角色造成伤害后，你摸一张牌，该角色受到伤害后，你随机弃置一张手牌。你弃牌阶段弃置的牌均被该角色获得。该角色死亡时，若你的两个武将牌均明置，你暗置此武将牌。 ',
 			
 			sp_default:"常规",
 			sp_zhongdan:"忠胆英杰",

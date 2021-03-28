@@ -126,22 +126,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return num+player.countMark('recangchu');
 					},
 				},
-				group:'recangchu2',
+				group:['recangchu2','recangchu3'],
 			},
 			recangchu2:{
 				audio:'recangchu',
 				trigger:{
 					player:'gainAfter',
-					global:'die',
 				},
 				forced:true,
+				usable:1,
 				filter:function(event,player){
-					if(event.name=='die') return player.countMark('recangchu')>game.countPlayer();
 					return player!=_status.currentPhase&&player.countMark('recangchu')<game.countPlayer();
 				},
 				content:function(){
-					if(trigger.name=='die') player.removeMark('recangchu',player.countMark('recangchu')-game.countPlayer());
-					else player.addMark('recangchu',1);
+					player.addMark('recangchu',1);
+				},
+			},
+			recangchu3:{
+				audio:'recangchu',
+				trigger:{global:'die'},
+				forced:true,
+				filter:function(event,player){
+					return player.countMark('recangchu')>game.countPlayer();
+				},
+				content:function(){
+					player.removeMark('recangchu',player.countMark('recangchu')-game.countPlayer());
 				},
 			},
 			reliangying:{
@@ -159,10 +168,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					list.push('cancel2');
 					event.map=map;
-					player.chooseControl(list).set('prompt',get.prompt('reliangying')).set('prompt2','摸至多'+get.cnNumber(player.countMark('recangchu'))+'张牌，然后交给等量的其他角色各一张牌').set('ai',function(){
+					player.chooseControl(list).set('prompt',get.prompt('reliangying')).set('prompt2','摸至多'+get.cnNumber(player.countMark('recangchu'))+'张牌，然后交给等量的角色各一张牌').set('ai',function(){
 						var player=_status.event.player;
 						var num=Math.min(player.countMark('recangchu'),game.countPlayer(function(current){
-							return current!=player&&get.attitude(player,current)>0;
+							return get.attitude(player,current)>0;
 						}));
 						if(num) return get.cnNumber(num);
 						return 'cancel2';
@@ -180,9 +189,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(num){
 						player.chooseCardTarget({
 							prompt:'将'+get.cnNumber(num)+'张牌交给其他角色',
-							prompt2:'操作提示：先按顺序选中所有要给出的牌，然后再按顺序选择等量的目标角色',
-							selectCard:num,
-							selectTarget:num,
+							prompt2:'操作提示：先按顺序选中所有要给出的牌，然后再按顺序选择等量的目标角色。可少选一张牌，并将此牌留给自己',
+							selectCard:[num-1,num],
+							selectTarget:function(){
+								return ui.selected.cards.length;
+							},
 							filterTarget:function(card,player,target){
 								return target!=player;
 							},
@@ -225,7 +236,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return (event.name=='damage')?(event.nature=='fire'):(event.card&&event.card.name=='jiu');
 				},
 				content:function(){
-					player.removeMark('recangchu',1);
+					player.removeMark('recangchu',Math.min(player.countMark('recangchu'),trigger.num||1));
 				},
 				group:'reshishou2',
 			},
@@ -2760,7 +2771,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(event,player,target){
-					return player.inRange(target);
+					return player.inRange(target)&&target.countDiscardableCards(player,'he')>0;
 				},
 				content:function(){
 					'step 0'
@@ -2781,6 +2792,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return -2;
 						},
 						target:function(player,target){
+							if(target.countDiscardableCards(player,'he')<2) return 0;
 							return -2;
 						},
 					},
@@ -4760,6 +4772,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				viewAs:{name:'nanman'},
+				ai:{order:0.1},
 			},
 			souying:{
 				audio:2,
@@ -8827,7 +8840,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhujun:'朱儁（？－195年），字公伟。会稽郡上虞县（今浙江绍兴上虞区）人。东汉末年名将。朱儁出身寒门，赡养母亲，以好义轻财闻名，受乡里敬重。后被太守徐珪举为孝廉，任兰陵令，颇有治绩。再升任交州刺史，以家兵五千大破叛军，平定交州。战后以功封都亭侯，入朝为谏议大夫。光和七年（184年），黄巾起义爆发，朱儁以右中郎将、持节平定三郡之地，以功进封西乡侯，迁镇贼中郎将。又率军讨平黄巾，“威声满天下”。中平二年（185年），进拜右车骑将军，更封钱塘侯。后为河内太守，击退进逼的张燕。权臣董卓秉政时，想任朱儁为副手，遭其婉拒。其后出逃荆州，更屯军中牟，徐州刺史陶谦等欲推举他为太师，并传檄各州牧伯，相邀讨伐李傕、奉迎天子。但朱儁却奉诏入京任太仆。初平三年（192年），升任太尉、录尚书事。兴平元年（194年），行骠骑将军事，持节镇关东，因故未成行。兴平二年（195年），李傕与郭汜相互攻杀，郭汜扣留朱儁作为人质。朱儁性格刚烈，即日发病而死。',
 			liuhong:'汉灵帝刘宏（157年，一作156年－189年5月13日），生于冀州河间国（今河北深州）。东汉第十二位皇帝（168年－189年在位），汉章帝刘炟的玄孙。刘宏早年世袭解渎亭侯。永康元年（167年）十二月，汉桓帝刘志逝世，刘宏被外戚窦氏挑选为皇位继承人，于建宁元年（168年）正月即位。刘宏在位的大部分时期，施行党锢及宦官政治。他又设置西园，巧立名目搜刮钱财，甚至卖官鬻爵以用于自己享乐。在位晚期，爆发了黄巾起义，而凉州等地也陷入持续动乱之中。中平六年（189年），刘宏去世，谥号孝灵皇帝，葬于文陵。刘宏喜好辞赋，作有《皇羲篇》、《追德赋》、《令仪颂》、《招商歌》等。',
 			liubian:'刘辩（176年－190年3月6日），是汉灵帝刘宏与何皇后的嫡长子。刘辩在灵帝驾崩后继位为帝，史称少帝，由于年幼，实权掌握在临朝称制的母亲何太后和母舅大将军何进手中。少帝在位时期，东汉政权已经名存实亡，他即位后不久即遭遇以何进为首的外戚集团和以十常侍为首的内廷宦官集团这两大敌对政治集团的火并，被迫出宫，回宫后又受制于以“勤王”为名进京的凉州军阀董卓，终于被废为弘农王，成为东汉唯一被废黜的皇帝，其同父异母弟陈留王刘协继位为帝，是为汉献帝。被废黜一年之后，刘辩在董卓胁迫下自尽，时年仅十五岁（一说十八岁），其弟献帝追谥他为怀王。中国古代的史书中称刘辩为皇子辩、少帝和弘农王等。因为在位不逾年，传统上称东汉共十二帝，刘辩与东汉另一位少帝刘懿都不在其中，亦皆无本纪；不过，现代史学界也有观点承认两位少帝均是汉朝皇帝，则刘辩为东汉第十三位皇帝。',
-			luyusheng:'陆郁生（？年-？），三国时期吴国官员陆绩之女。陆郁生的父亲陆绩是吴郡公认的才子，又是当时吴郡陆氏的领袖。陆绩赴任担任郁林太守，遂取此名。陆郁生年少的时候就定下坚贞的志向。建安二十四年（219年)，陆绩早亡，她与两个兄弟陆宏、陆睿当时都只有几岁，一起返回吴县，被他们的从兄陆瑁接回抚养。13周岁的陆郁生嫁给同郡出身的张白为妻。出嫁3个月后，张白因为其兄张温一族的案件遭到连坐，被处以流刑，后死于流放地，陆郁生成为了寡妇，其后公开宣言不再改嫁，困难于生计但拒绝了所有提亲，在艰苦中从未停止服侍、照顾张白的姐妹。事情传到朝廷，皇帝褒奖陆郁生，号其为“义姑”。她的表侄姚信在文集中称赞她的义举。',
 			wangrong:'汉灵怀皇后王荣（？~181年），赵国邯郸（今河北邯郸市）人。五官中郎将王苞孙女，汉灵帝刘宏妃子，汉献帝刘协生母。初以良家子选入掖庭，封为美人，服侍汉灵帝。光和四年（181年），生下陈留王刘协，惨遭灵思皇后毒杀。王荣死后，汉灵帝曾作《追德赋》、《令仪颂》。永汉元年（189年），其子刘协即位，是为汉献帝，追谥灵怀皇后，葬于文昭陵。',
 			hanfu:'韩馥（？—191年），字文节，颍川郡（今河南禹州）人。东汉末年的诸侯，冀州牧。韩馥担任过东汉的御史中丞，之后被董卓举荐为冀州牧；在各诸侯起兵讨伐董卓时，韩馥也是其中之一的参与者。韩馥与袁绍也曾经有意立刘虞为皇帝。当时冀州民殷人盛，兵粮优足，于是袁绍便用计夺取冀州，韩馥被迫投靠张邈；之后张邈与袁绍的使者见面，韩馥以为是要来杀害自己的，于是在厕所中以刻书用的小刀自杀。',
 			zhanghuyuechen:'张虎，生卒年不详，雁门马邑（今山西朔城区大夫庄）人。三国时期曹魏将领。名将张辽之子。官至偏将军，袭封晋阳侯，有一子张统。乐綝（195~257年），字号不详，阳平郡卫国县（今河南省清丰县）人。三国时期曹魏将领，右将军乐进的儿子。果毅坚毅，袭封广昌亭侯，累迁扬州刺史。甘露二年，为叛乱的征东大将军诸葛诞所杀，追赠卫尉。',
@@ -9219,7 +9231,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			panshi_info:'锁定技，准备阶段，你交给有“慈孝”技能的角色一张手牌；当你于出牌阶段因使用【杀】对其他角色造成伤害时，若其拥有技能“慈孝”，则此伤害+1，且你结束出牌阶段。',
 			xianshuai:'先率',
 			xianshuai_info:'锁定技，有角色造成伤害后，若此伤害是本轮第一次造成伤害：你摸一张牌；若伤害来源是你，则你对受伤角色再造成1点伤害。',
-			luyusheng:'陆郁生',
 			wangrong:'王荣',
 			minsi:'敏思',
 			minsi2:'敏思',
@@ -9396,12 +9407,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_chunyuqiong:'淳于琼',
 			recangchu:'仓储',
 			recangchu2:'仓储',
+			recangchu3:'仓储',
 			recangchu_info:'锁定技，游戏开始时，你获得3个“粮”。你的手牌上限+X（X为“粮”数）。当你于回合外获得牌时，你获得一个“粮”。（你的“粮”数不能超过存活角色数）',
 			reliangying:'粮营',
 			reliangying_info:'弃牌阶段开始时，你可以摸至多X张牌，然后交给等量的角色各一张牌。（X为你的“粮”数）',
 			reshishou:'失守',
 			reshishou2:'失守',
-			reshishou_info:'锁定技，当你使用【酒】时或受到火焰伤害后，你移去一个“粮”。准备阶段，若你没有“粮”，你失去1点体力。',
+			reshishou_info:'锁定技，当你使用【酒】时或受到1点火焰伤害后，你移去一个“粮”。准备阶段，若你没有“粮”，你失去1点体力。',
 			
 			sp_yingbian:'文德武备',
 			sp_whlw:"文和乱武",

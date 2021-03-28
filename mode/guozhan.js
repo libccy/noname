@@ -295,7 +295,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			'6':[
 				'gz_zhenji','gz_guojia','gz_yujin',
 				'gz_jiangwei','gz_zhangfei','gz_sp_zhugeliang',
-				'gz_zhouyu','gz_lingcao','gz_daqiao',
+				'gz_zhouyu','gz_lingcao','gz_daqiao','gz_luyusheng',
 				'gz_yuji','gz_caiwenji','gz_diaochan',
 			],
 			'5':[
@@ -457,6 +457,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_beimihu:["female","qun",3,["hmkguishu","hmkyuanyu"]],
 				gz_jianggan:["male","wei",3,["weicheng","daoshu"]],
 				gz_huaxin:['male','wei',3,['wanggui','xibing']],
+				gz_luyusheng:['female','wu',3,['zhente','zhiwei']],
 				
 				gz_cuimao:['male','wei',3,['gzzhengbi','gzfengying'],[]],
 				gz_yujin:['male','wei',4,['gzjieyue'],['gzskin']],
@@ -879,13 +880,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				group:'xindiaodu_use',
 				frequent:true,
 				subSkill:{
+					temp:{},
 					use:{
 						trigger:{
 							global:"useCard",
 						},
 						filter:function (event,player){
 							return get.type(event.card)=='equip'&&event.player.isAlive()&&
-							event.player.isFriendOf(player)&&(player==event.player||player.hasSkill('xindiaodu'));
+							event.player.isFriendOf(player)&&(player==event.player||player.hasSkill('xindiaodu'))&&!event.player.hasSkill('xindiaodu_temp');
 						},
 						direct:true,
 						content:function(){
@@ -896,24 +898,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(result.bool){
 								player.logSkill('xindiaodu',trigger.player);
 								trigger.player.draw('nodelay');
+								trigger.player.addTempSkill('xindiaodu_temp');
 							}
-						},
-						ai:{
-							reverseEquip:true,
-							skillTagFilter:function (player){
-								if(!game.hasPlayer(function(current){
-									return current.isFriendOf(player)&&current.hasSkill('xindiaodu');
-								})){
-									return false;
-								}
-							},
-							effect:{
-								target:function (card,player,target,current){
-									if(get.type(card)=='equip'&&game.hasPlayer(function(current){
-										return current.isFriendOf(player)&&current.hasSkill('xindiaodu');
-									})) return [1,3];
-								},
-							},
 						},
 					},
 				},
@@ -7419,7 +7405,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzzongyu_info:'当【六龙骖驾】进入其他角色的装备区后，你可以将你装备区内所有坐骑牌（至少一张）与【六龙骖驾】交换位置。锁定技，当你使用坐骑牌后，若场上或弃牌堆中有【六龙骖驾】，则将【六龙骖驾】置入你的装备区。',
 					
 			xindiaodu:"调度",
-			"xindiaodu_info":"当与你势力相同的角色使用装备牌时，其可以摸一张牌；出牌阶段开始时，你可以获得与你势力相同的一名角色装备区内的一张牌，然后你可以将此牌交给另一名与你势力相同的其他角色。",
+			"xindiaodu_info":"每回合限一次，与你势力相同的角色使用装备牌时，其可以摸一张牌；出牌阶段开始时，你可以获得与你势力相同的一名角色装备区内的一张牌，然后你可以将此牌交给另一名与你势力相同的其他角色。",
 			yigui:"役鬼",
 			"yigui_info":"当你首次明置此武将牌时，你将剩余武将牌堆的两张牌扣置于游戏外，称为“魂”；你可以展示一张“魂”并将其置入剩余武将牌堆，视为使用了一张本回合内未以此法使用过的基本牌或普通锦囊牌。（若此牌需指定目标，则目标须为未确定势力的角色或野心家或与此“魂”势力相同的角色）",
 			"yigui_init":"役鬼",
@@ -8064,6 +8050,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		],
 		element:{
 			content:{
+				hideCharacter:function(){
+					'step 0'
+					event.trigger('hideCharacterEnd');
+					'step 1'
+					event.trigger('hideCharacterAfter');
+				},
 				chooseJunlingFor:function(){
 					'step 0'
 					var list=['junling1','junling2','junling3','junling4','junling5','junling6'];
@@ -8461,10 +8453,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return;
 					}
 					game.addVideo('hideCharacter',this,num);
+					var toHide;
 					var skills;
 					switch(num){
 						case 0:
 						if(log!==false) game.log(this,'暗置了主将'+get.translation(this.name1));
+						toHide=this.name1;
 						skills=lib.character[this.name][3];
 						this.name=this.name2;
 						this.sex=lib.character[this.name2][0];
@@ -8472,6 +8466,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						break;
 						case 1:
 						if(log!==false) game.log(this,'暗置了副将'+get.translation(this.name2));
+						toHide=this.name2;
 						skills=lib.character[this.name2][3];
 						this.classList.add('unseen2');
 						break;
@@ -8499,6 +8494,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						this.skills.remove(skills[i]);
 					}
 					this.checkConflict();
+					var next=game.createEvent('hideCharacter',false);
+					next.player=this;
+					next.toHide=toHide;
+					next.setContent('hideCharacter');
+					return next;
 				},
 				removeCharacter:function(num){
 					var name=this['name'+(num+1)];

@@ -452,6 +452,7 @@ window.noname_character_rank={
 		're_fazheng',
 		'huaxin',
 		're_chunyuqiong',
+		'ns_luyusheng',
 	],
 	bp:[
 		'chess_diaochan',
@@ -816,6 +817,7 @@ window.noname_character_rank={
 		'xin_panzhangmazhong',
 		're_xiaoqiao',
 		'caoanmin',
+		'luyusheng',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1276,6 +1278,7 @@ window.noname_character_rank={
 			'jin_xiahouhui',
 			'jin_simashi',
 			'zhangling',
+			'ns_luyusheng',
 			'key_haruko',
 			'key_akiko',
 			'key_sunohara',

@@ -1804,7 +1804,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				charlotte:true,
 				filter:function(event,player){
-					return player.storage.qinggang2&&event.card&&player.storage.qinggang2.contains(event.card);
+					return player.storage.qinggang2&&event.card&&player.storage.qinggang2.contains(event.card)&&(event.name!='damage'||event.notLink());
 				},
 				silent:true,
 				forced:true,

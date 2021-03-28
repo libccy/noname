@@ -61,7 +61,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_shiroha:['female','key',3,['shiroha_yuzhao','shiroha_guying','shiroha_jiezhao']],
 			key_shizuku:['female','key',3,['shizuku_sizhi','shizuku_biyi','shizuku_sanhua']],
 			key_hiroto:['male','key',3,['hiroto_huyu','hiroto_tuolao']],
-			key_sakuya:['male','key',4,['youlong','luanfeng','sakuya_junbu']],
+			key_sakuya:['male','key',3,['youlong','luanfeng','sakuya_junbu']],
 			key_youta:['male','key',4,[]],
 			key_rumi:['female','key','3/4',['rumi_shuwu']],
 			key_chihaya:['female','key',3,['chihaya_liewu','chihaya_youfeng']],
@@ -142,6 +142,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			// ns_sunhao:['male','qun',3,[]],
 			ns_xinnanhua:['male','qun',3,['ns_xiandao','ns_xiuzheng','ns_chuanshu'],[]],
 			ns_caimao:['male','qun',4,['nsdingzhou']],
+			ns_luyusheng:['female','wu',3,['nshuaishuang','nsfengli']],
 			
 			old_jiakui:['male','wei',4,['tongqu','xinwanlan']],
 			ol_guohuai:['male','wei',3,['rejingce']],
@@ -172,7 +173,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy:{
 				diy_yijiang:["key_kud","key_misuzu","key_kamome","key_nao",
 				"ns_huangchengyan","ns_sunchensunjun","ns_yuanxi","ns_caoshuang"],
-				diy_tieba:["ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua"],
+				diy_tieba:["ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_luyusheng"],
 				diy_fakenews:["diy_wenyang","ns_zhangwei","ns_caimao"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
 				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto","key_sakuya","key_youta","key_rumi","key_chihaya"],
@@ -258,6 +259,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_yuanxi:'#g食茸二十四',
 			ns_caoshuang:'#g荬庀芬兰',
 			
+			ns_luyusheng:'#g猫咪大院 - 魚と水',
 			ns_caimao:'#gP尔号玩家◆',
 			diy_wenyang:'#g最粗的梦想XD',
 			ns_zuoci:'#bskystarwuwei',
@@ -7400,40 +7402,251 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			junktaoluan_backup:{},
-				
-				
-				ns_chuanshu:{
-					audio:["xingshuai",2],
-					trigger:{
-						global:"dying",
-					},
-					priority:8,
-					unique:true,
-					skillAnimation:true,
-					animationColor:"water",
-					filter:function (event,player){
-						return event.player.hp<=0&&event.player!=player;
-					},
-					check:function (event,player){
-						return get.attitude(player,event.player)>0;
-					},
-					logTarget:"player",
-					content:function (){
-						'step 0'
-						trigger.player.chooseControl('releiji','guidao').set('prompt',''+get.translation(trigger.player)+'获得一项技能');
-						goon=true;
-						if(!goon){
-							event.finish();
+			
+			nshuaishuang:{
+				trigger:{player:'phaseJieshuBegin'},
+				forced:true,
+				content:function(){
+					'step 0'
+					var card=get.cardPile(function(card){
+						return card.name=='tao';
+					});
+					if(card){
+						player.gain(card,'gain2');
+					}
+					else event.finish();
+					'step 1'
+					game.updateRoundNumber();
+					player.loseHp();
+				},
+			},
+			nsfengli:{
+				trigger:{player:'phaseEnd'},
+				direct:true,
+				filter:function(event,player){
+					return player.countCards('h')>0&&game.hasPlayer(function(current){
+						return current!=player&&!current.hasSkill('nsfengli_use');
+					});
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('nsfengli'),function(card,player,target){
+						return target!=player&&!target.hasSkill('nsfengli_use');
+					}).set('ai',function(target){
+						return get.attitude(_status.event.player,target)/(5+target.countCards('h'));
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('nsfengli',target);
+						var cards=player.getCards('h');
+						player.addGaintag(cards,'nsfengli2');
+						player.addSkill('nsfengli2');
+						player.showHandcards();
+						target.addSkill('nsfengli_use');
+						target.storage.nsfengli_use=player;
+					}
+				},
+				group:['nsfengli_draw','nsfengli_clear'],
+				onremove:function(player){
+					player.removeSkill('nsfengli2');
+				},
+			},
+			nsfengli_draw:{
+				trigger:{
+					player:['loseAfter','nsfengliClear'],
+					global:['gainAfter','equipAfter','addJudgeAfter','loseAsyncAfter'],
+					target:'nsfengliUse',
+				},
+				direct:true,
+				charlotte:true,
+				filter:function(event,player,name){
+					if(name!='nsfengliUse'&&name!='nsfengliClear'){
+						var evt=event.getl(player);
+						if(!evt||!evt.gaintag_map) return false;
+						var bool=false;
+						for(var i in evt.gaintag_map){
+							if(evt.gaintag_map[i].contains('nsfengli2')) bool=true;break;
 						}
-						'step 1'
-						trigger.player.addSkillLog(result.control);
-						trigger.player.recover(1-trigger.player.hp);
-						trigger.player.draw(2);				
-						trigger.player.storage.ns_chuanshu2=player; 
-						trigger.player.addSkill('ns_chuanshu2');					
-						//game.broadcastAll()+trigger.player.node.avatar.setBackgroundImage('extension/群英会/ns_zhangjiao.jpg');		
-						//player.removeSkill('ns_chuanshu');			
-						player.awakenSkill('ns_chuanshu');				
+						if(!bool) return false;
+					}
+					var hs=player.countCards('h');
+					return game.hasPlayer(function(current){
+						return current!=player&&current.countCards('h')<hs;
+					});
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget('奉礼：是否令一名手牌数小于你的其他角色摸一张牌？',function(card,player,target){
+						return target!=player&&target.countCards('h')<player.countCards('h');
+					}).set('ai',function(target){
+						var player=_status.event.player;
+						var att=get.attitude(player,target)/Math.sqrt(1+target.countCards('h'));
+						if(target.hasSkillTag('nogain')) att/=10;
+						return att;
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('nsfengli',target);
+						target.draw();
+					}
+				},
+			},
+			nsfengli_clear:{
+				trigger:{player:'phaseBegin'},
+				forced:true,
+				filter:function(event,player){
+					return player.hasSkill('nsfengli2');
+				},
+				content:function(){
+					var hs=player.getCards('h',function(card){
+						return card.hasGaintag('nsfengli2');
+					});
+					if(hs.length) event.trigger('nsfengliClear');
+					player.removeSkill('nsfengli2');
+				},
+			},
+			nsfengli2:{
+				mark:true,
+				intro:{
+					mark:function(dialog,content,player){
+						var hs=player.getCards('h',function(card){
+							return card.hasGaintag('nsfengli2');
+						});
+						if(hs.length) dialog.addAuto(hs);
+						else dialog.addText('没有“礼”');
+					},
+				},
+				onremove:function(player){
+					player.removeGaintag('nsfengli2');
+					game.countPlayer(function(current){
+						if(current.storage.nsfengli_use==player) current.removeSkill('nsfengli_use');
+					})
+				},
+			},
+			nsfengli_use:{
+				hiddenCard:function(player,name){
+					if(player==_status.currentPhase) return false;
+					var target=player.storage.nsfengli_use;
+					var cards=target.getCards('h',function(card){
+						return card.hasGaintag('nsfengli2');
+					});
+					for(var i of cards){
+						if(get.name(i,target)==name) return true;
+					}
+					return false;
+				},
+				enable:['chooseToUse','chooseToRespond'],
+				charlotte:true,
+				onremove:true,
+				filter:function(event,player){
+					if(player==_status.currentPhase) return false;
+					var target=player.storage.nsfengli_use;
+					var cards=target.getCards('h',function(card){
+						return card.hasGaintag('nsfengli2');
+					});
+					for(var i of cards){
+						if(event.filterCard({
+							name:get.name(i,target),
+							nature:get.nature(i,target),
+							isCard:true,
+						},player,event)) return true;
+					}
+					return false;
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						var target=player.storage.nsfengli_use;
+						var cards=target.getCards('h',function(card){
+							return card.hasGaintag('nsfengli2');
+						});
+						return ui.create.dialog('奉礼',cards);
+					},
+					filter:function(button,player){
+						var evt=_status.event.getParent();
+						var target=player.storage.nsfengli_use;
+						return evt.filterCard({
+							name:get.name(button.link,target),
+							nature:get.nature(button.link,target),
+							isCard:true,
+						},player,evt);
+					},
+					check:function(button){
+						var player=_status.event.player;
+						var evt=_status.event.getParent();
+						if(evt.dying) return get.attitude(player,evt.dying);
+						return 1;
+					},
+					backup:function(links,player){
+						var target=player.storage.nsfengli_use;
+						return {
+							viewAs:{
+								name:get.name(links[0],target),
+								nature:get.nature(links[0],target),
+								isCard:true,
+							},
+							card:links[0],
+							filterCard:()=>false,
+							selectCard:-1,
+							precontent:function(){
+								var card=lib.skill.nsfengli_use_backup.card;
+								var target=player.storage.nsfengli_use;
+								event.target=target;
+								player.logSkill('nsfengli',target);
+								delete event.result.skill;
+								player.showCards(card,get.translation(player)+'发动了【奉礼】');
+								card.removeGaintag('nsfengli2');
+								event.trigger('nsfengliUse');
+							},
+						};
+					},
+					ai:{
+						hasSha:true,
+						hasShan:true,
+						skillTagFilter:function(player,tag){
+							var name='s'+tag.slice(4);
+							return lib.skill.nsfengli_use.hiddenCard(player,name);
+						},
+					},
+				},
+				ai:{
+					order:8,
+					result:{
+						player:1,
+					},
+				},
+			},
+			ns_chuanshu:{
+				audio:["xingshuai",2],
+				trigger:{
+					global:"dying",
+				},
+				priority:8,
+				unique:true,
+				skillAnimation:true,
+				animationColor:"water",
+				filter:function (event,player){
+					return event.player.hp<=0&&event.player!=player;
+				},
+				check:function (event,player){
+					return get.attitude(player,event.player)>0;
+				},
+				logTarget:"player",
+				content:function (){
+					'step 0'
+					trigger.player.chooseControl('releiji','guidao').set('prompt',''+get.translation(trigger.player)+'获得一项技能');
+					goon=true;
+					if(!goon){
+						event.finish();
+					}
+					'step 1'
+					trigger.player.addSkillLog(result.control);
+					trigger.player.recover(1-trigger.player.hp);
+					trigger.player.draw(2);
+					trigger.player.storage.ns_chuanshu2=player;
+					trigger.player.addSkill('ns_chuanshu2');
+					player.awakenSkill('ns_chuanshu');
 				},
 			},
 			ns_xiandao1:{
@@ -12144,6 +12357,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_yangyi:'杨仪',
 			ns_liuzhang:'刘璋',
 			ns_xinnanhua:'南华老仙',
+			ns_luyusheng:'陆郁生',
 			
 			sp_key_yuri:'SP仲村由理',
 			key_lucia:'此花露西娅',
@@ -12595,6 +12809,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			diy_wenyang:'文鸯',
 			ns_zhangwei:'张葳',
+			nshuaishuang:'怀霜',
+			nshuaishuang_info:'锁定技，结束阶段，你从牌堆/弃牌堆获得一张【桃】，然后失去1点体力。',
+			nsfengli:'奉礼',
+			nsfengli2:'奉礼',
+			nsfengli_draw:'奉礼',
+			nsfengli_clear:'奉礼',
+			nsfengli_use:'奉礼',
+			nsfengli_info:'回合结束时，你可以选择一名其他角色并展示所有手牌。你将所有手牌标记为“礼”。你的“礼”对所有角色可见。当该角色于回合外需要使用或打出牌时，其可移去一张“礼”的标记，然后视为使用或打出一张与此牌名称相同的牌。当你的“礼”减少时，你可令一名手牌数小于你的角色摸一张牌。你的回合开始时，你移去所有“礼”的标记，然后注销该角色对“礼”的操作权限。',
 			nsqiyue:'骑钺',
 			nsqiyue_info:'锁定技，当有角色的武将牌状态改变后，你摸一张牌。',
 			nsxuezhu:'血逐',

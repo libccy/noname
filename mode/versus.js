@@ -6305,15 +6305,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.log(source,'出场');
 					source.node.identity.dataset.color=get.translation(source.side+'Color');
 					source.draw(4);
-					_status.event.parent.parent.parent.untrigger(false,source);
-					var evt=_status.event.parent.parent.parent;
-					for(var i=0;i<100;i++){
+					var evt=event.getParent('dying');
+					if(evt&&evt.parent){
 						evt=evt.parent;
-						if(evt.player==source){
-							evt.finish();
-						}
-						if(evt.name=='phase'){
-							break;
+						evt.untrigger(false,source);
+						for(var i=0;i<100;i++){
+							evt=evt.parent;
+							if(evt.player==source){
+								evt.finish();
+							}
+							if(evt.name=='phase'){
+								break;
+							}
 						}
 					}
 					if(lib.storage.single_control){
@@ -6345,15 +6348,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.log(source,'出场');
 					// source.node.identity.dataset.color=source.side+'zhu';
 					source.draw(4);
-					_status.event.parent.parent.parent.untrigger(false,source);
-					var evt=_status.event.parent.parent.parent;
-					for(var i=0;i<100;i++){
+					var evt=event.getParent('dying');
+					if(evt&&evt.parent){
 						evt=evt.parent;
-						if(evt.player==source){
-							evt.finish();
-						}
-						if(evt.name=='phase'){
-							break;
+						evt.untrigger(false,source);
+						for(var i=0;i<100;i++){
+							evt=evt.parent;
+							if(evt.player==source){
+								evt.finish();
+							}
+							if(evt.name=='phase'){
+								break;
+							}
 						}
 					}
 					game.triggerEnter(source);
@@ -6488,7 +6494,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.log(source,'出场');
 
 					source.draw(4);
-					_status.event.parent.parent.parent.untrigger(false,source);
+					var evt=event.getParent('dying');
+					if(evt&&evt.parent){
+						evt=evt.parent;
+						evt.untrigger(false,source);
+						for(var i=0;i<100;i++){
+							evt=evt.parent;
+							if(evt.player==source){
+								evt.finish();
+							}
+							if(evt.name=='phase'){
+								break;
+							}
+						}
+					}
 					game.addVideo('reinit',source,[name,color]);
 					game.triggerEnter(source);
 				},

@@ -4851,7 +4851,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				viewAs:{
 					name:"wuxie",
 				},
-				prompt:"将一张黑色手牌当无懈可击使用",
+				prompt:"将一张黑色牌当无懈可击使用",
 				check:function (card){return 8-get.value(card)},
 			},
 			rejieming:{
@@ -8830,7 +8830,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rezhuikong_info:'其他角色的回合开始时，若你已受伤，你可与其拼点：若你赢，本回合该角色只能对自己使用牌；若你没赢，你获得其拼点的牌，然后其视为对你使用一张【杀】。',
 			re_gongsunyuan:'界公孙渊',
 			rehuaiyi:'怀异',
-			tehuaiyi_info:'出牌阶段限一次，你可以展示所有手牌，若这些牌的颜色：全部相同，你摸一张牌，并将此技能于本阶段内改为“限两次”，然后终止此技能的结算流程；不全部相同，则你选择一种颜色并弃置该颜色的所有手牌，然后你可以获得至多X名角色的各一张牌（X为你以此法弃置的手牌数）。若你以此法获得的牌不少于两张，则你失去1点体力。',
+			rehuaiyi_info:'出牌阶段限一次，你可以展示所有手牌，若这些牌的颜色：全部相同，你摸一张牌，并将此技能于本阶段内改为“限两次”，然后终止此技能的结算流程；不全部相同，则你选择一种颜色并弃置该颜色的所有手牌，然后你可以获得至多X名角色的各一张牌（X为你以此法弃置的手牌数）。若你以此法获得的牌不少于两张，则你失去1点体力。',
 			re_caozhen:'界曹真',
 			residi:'司敌',
 			residi_push:'司敌',

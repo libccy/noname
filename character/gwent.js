@@ -4416,7 +4416,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				autoViewAs:'sha',
 				ai:{
 					order:function(){
-						return lib.card.sha.ai.order()+0.5;
+						return get.order({name:'sha'})+0.5;
 					}
 				}
 			},
@@ -4429,7 +4429,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				autoViewAs:'jiu',
 				ai:{
 					order:function(){
-						return lib.card.jiu.ai.order()+0.5;
+						return get.order({name:'jiu'})+0.5;
 					}
 				}
 			},

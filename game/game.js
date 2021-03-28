@@ -12930,10 +12930,12 @@
 										event.dialog.add(event.promptx[i]);
 									}
 								}
-								event.promptbar=event.dialog.add('0/'+get.numStr(event.selectCard[1],'card'));
-								event.custom.add.card=function(){
-									_status.event.promptbar.innerHTML=
-									ui.selected.cards.length+'/'+get.numStr(_status.event.selectCard[1],'card');
+								if(Array.isArray(event.selectCard)){
+									event.promptbar=event.dialog.add('0/'+get.numStr(event.selectCard[1],'card'));
+									event.custom.add.card=function(){
+										_status.event.promptbar.innerHTML=
+										ui.selected.cards.length+'/'+get.numStr(_status.event.selectCard[1],'card');
+									}
 								}
 							}
 						}
@@ -24752,7 +24754,7 @@
 							this._notrigger.add(player);
 							if(!evt||!evt.map) return;
 							for(var i=0;i<evt.map.length;i++){
-								if(evt.map[i].player==player) evt.map[i].list=[];
+								if(evt.map[i].player==player) evt.map[i].list.length=0;
 							}
 						}
 					}
