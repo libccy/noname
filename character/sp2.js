@@ -483,7 +483,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('targets',trigger.targets).set('card',trigger.card);
 					'step 1'
 					if(result.bool){
-						if(!event.isMine()) game.delayx();
+						if(!event.isMine()&&!event.isOnline()) game.delayx();
 						event.targets=result.targets;
 					}
 					else{
@@ -1693,7 +1693,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('card',trigger.card).set('targets',trigger.targets);
 					'step 1'
 					if(result.bool){
-						if(!event.isMine()) game.delayx();
+						if(!event.isMine()&&!event.isOnline()) game.delayx();
 						event.targets=result.targets;
 					}
 					else{
@@ -2345,7 +2345,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('card',trigger.card).set('targets',trigger.targets);
 					'step 1'
 					if(result.bool){
-						if(!event.isMine()) game.delayx();
+						if(!event.isMine()&&!event.isOnline()) game.delayx();
 						event.targets=result.targets;
 					}
 					else{
@@ -6906,7 +6906,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('targets',trigger.targets).set('card',trigger.card);
 					'step 1'
 					if(result.bool){
-						if(!_status.connectMode&&!event.isMine()) game.delayx();
+						if(!event.isMine()&&!event.isOnline()) game.delayx();
 						event.targets=result.targets;
 					}
 					else{
@@ -7647,7 +7647,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							});
 							'step 1'
 							if(result.bool){
-								if(!event.isMine()&&!_status.connectMode) game.delayx();
+								if(!event.isMine()&&!event.isOnline()) game.delayx();
 								event.targets=result.targets.slice(0);
 								for(var i=0;i<event.targets.length;i++){
 									event.targets[i].removeMark('zongkui_mark',1);

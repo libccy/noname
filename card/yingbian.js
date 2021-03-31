@@ -209,7 +209,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						equipValue:2
 					}
 				},
-				skills:['heiguangkai_skill']
+				skills:['heiguangkai_skill'],
 			},
 			tongque:{
 				audio:true,
@@ -369,6 +369,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					trigger.excluded.add(player);
 				},
+				global:'heiguangkai_ai',
 			},
 			tongque_skill:{
 				ai:{forceYingbian:true},
@@ -680,7 +681,55 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						trigger.targets.remove(target);
 					}
 				},
-			}
+			},
+			heiguangkai_ai:{
+				ai:{
+					effect:{
+						player:function(card,player,target){
+							if(typeof card!='object'||!target||get.name(card)!='sha'&&get.type(card)!='trick') return;
+							var info=get.info(card);
+							var targets=[];
+							targets.addArray(ui.selected.targets);
+							var evt=_status.event.getParent('useCard');
+							if(evt&&evt.card==card) targets.addArray(evt.targets);
+							if(targets.length){
+								if(!targets.contains(target)){
+									if(target.hasSkill('heiguangkai_skill')&&!target.hasSkillTag('unequip2')&&!player.hasSkillTag('unequip',false,{
+										name:card?card.name:null,
+										target:target,
+										card:card,
+									})&&!player.hasSkillTag('unequip_ai',false,{
+										name:card?card.name:null,
+										target:target,
+										card:card,
+									})) return 'zerotarget';
+								}
+								else{
+									if(targets.length>1) return;
+									if(info.selectTarget!=-1&&targets[0].hasSkill('heiguangkai_skill')&&!targets[0].hasSkillTag('unequip2')&&!player.hasSkillTag('unequip',false,{
+										name:card?card.name:null,
+										target:targets[0],
+										card:card,
+									})&&!player.hasSkillTag('unequip_ai',false,{
+										name:card?card.name:null,
+										target:targets[0],
+										card:card,
+									})) return 'zerotarget';
+								}
+							}
+							if(target.hasSkill('heiguangkai_skill')&&!target.hasSkillTag('unequip2')&&!player.hasSkillTag('unequip',false,{
+								name:card?card.name:null,
+								target:target,
+								card:card,
+							})&&!player.hasSkillTag('unequip_ai',false,{
+								name:card?card.name:null,
+								target:target,
+								card:card,
+							})) return [1,0,0.7,0];
+						},
+					},
+				},
+			},
 		},
 		translate:{
 			suijiyingbian:'随机应变',

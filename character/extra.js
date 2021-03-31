@@ -736,8 +736,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 5'
 					if(event.index2!=2){
-						if(event.target1) event.target1.lose(card,ui.special);
-						else card.goto(ui.special);
+						//if(event.target1) event.target1.lose(card,ui.special);
+						//else card.goto(ui.special);
 						event.way=result.control;
 					}
 					else{
@@ -752,10 +752,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 6'
 					if(event.index2!=2){
-						card.fix();
 						var node=ui[event.index==0?'discardPile':'cardPile'];
-						if(event.way=='底部') node.appendChild(card);
-						else node.insertBefore(card,node.firstChild);
+						if(event.target1){
+							var next=event.target1.lose(card,event.position);
+							if(event.way=='顶部') next.insert_card=true;
+						}
+						else{
+							if(event.way=='底部') node.appendChild(card);
+							else node.insertBefore(card,node.firstChild);
+						}
 						game.updateRoundNumber();
 						event.finish();
 					}

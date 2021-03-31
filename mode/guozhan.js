@@ -341,7 +341,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				guozhan_quan:["gz_cuimao","gz_yujin","gz_wangping","gz_fazheng","gz_wuguotai","gz_lukang","gz_yuanshu","gz_zhangxiu"],
 				guozhan_jun:["gz_jun_caocao","gz_jun_sunquan","gz_jun_liubei","gz_jun_zhangjiao"],
 				guozhan_jin:['gz_jin_simayi','gz_jin_simazhao','gz_jin_simashi','gz_jin_zhangchunhua','gz_jin_wangyuanji','gz_jin_xiahouhui'],
-				guozhan_others:["gz_lingcao","gz_lifeng","gz_beimihu","gz_jianggan","gz_huaxin"],
+				guozhan_others:["gz_lingcao","gz_lifeng","gz_beimihu","gz_jianggan","gz_huaxin","gz_luyusheng"],
 			}
 		},
 		characterPack:{
