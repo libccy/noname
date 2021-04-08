@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			sp:{
-				sp_default:["caoying","simahui","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","liuxie","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","fuwan","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","lingju","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","xujing","yuantanyuanshang","sunshao","zhangling",'guansuo','baosanniang','ol_zhangchangpu','caoshuang','sp_zhangliao','wolongfengchu','ol_xinxianying'],
+				sp_default:["caoying","simahui","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","liuxie","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","fuwan","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","lingju","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","xujing","yuantanyuanshang","sunshao","zhangling",'guansuo','baosanniang','ol_zhangchangpu','caoshuang','sp_zhangliao','wolongfengchu','ol_xinxianying','ol_lisu'],
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_star:["sp_xiahoushi","jsp_zhaoyun","huangjinleishi","sp_pangtong","sp_daqiao","sp_ganning","sp_xiahoudun","sp_lvmeng","sp_zhangfei","sp_liubei"],
 				sp_sticker:['sp_gongsunzan','sp_simazhao','sp_wangyuanji','sp_xinxianying','sp_liuxie'],
@@ -17,6 +17,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		character:{
+			ol_lisu:['male','qun',3,['qiaoyan','xianzhu'],['unseen']],
 			luyusheng:['female','wu',3,['zhente','zhiwei']],
 			ol_xinxianying:['female','wei',3,['xincaishi','xinzhongjian']],
 			huaxin:['male','wei',3,['wanggui','xibing']],
@@ -154,6 +155,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			mifangfushiren:'麋芳（生卒年不详），字子方，东海郡朐县（今江苏省连云港市）人。汉末三国时期蜀国将领，刘备糜夫人的兄弟。麋芳本为徐州牧陶谦部下，曾被曹操表为彭城相。后来辞官，随刘备从徐州辗转至邺城、汝南、新野、长坂坡、江夏等地，奔波多年。傅士仁（生卒年不详），字君义，幽州广阳郡（今北京市）人，刘备手下将领。受到刘备的重用，但被关羽轻慢。<br>刘备称汉中王时，糜芳为南郡太守，但受到关羽的轻慢。后来，因未完成供给军资的任务而被关羽责骂，心中不安。吕蒙袭取荆州时，将已经投降的傅士仁展示给糜芳，麋芳于是选择投降，导致关羽兵败被杀。此后，在吴国担任将军，并且为吴征伐。',
+			mengda:'孟达（?－228），字子度，本字子敬，因刘备的叔父名叫刘子敬，为避讳而改字。扶风郡郿人，三国时期人物。本为刘璋属下，后降刘备。关羽围樊城、襄阳时因不发兵救关羽而触怒刘备，于是投奔曹魏。此后，劝降刘封，未果。在魏官至散骑常侍、建武将军，封平阳亭侯。此后又欲反曹魏而归蜀汉，事败而死。',
 			luyusheng:'陆郁生（？年-？），三国时期吴国官员陆绩之女。陆郁生的父亲陆绩是吴郡公认的才子，又是当时吴郡陆氏的领袖。陆绩赴任担任郁林太守，遂取此名。陆郁生年少的时候就定下坚贞的志向。建安二十四年（219年)，陆绩早亡，她与两个兄弟陆宏、陆睿当时都只有几岁，一起返回吴县，被他们的从兄陆瑁接回抚养。13周岁的陆郁生嫁给同郡出身的张白为妻。出嫁3个月后，张白因为其兄张温一族的案件遭到连坐，被处以流刑，后死于流放地，陆郁生成为了寡妇，其后公开宣言不再改嫁，困难于生计但拒绝了所有提亲，在艰苦中从未停止服侍、照顾张白的姐妹。事情传到朝廷，皇帝褒奖陆郁生，号其为“义姑”。她的表侄姚信在文集中称赞她的义举。',
 			wolongfengchu:'沙比武将，懒得复制粘贴，自己去看诸葛亮和庞统的介绍吧。',
 			huaxin:'华歆（157年－232年1月30日），字子鱼，汉族。平原郡高唐县人（今山东省高唐县）。汉末至三国曹魏初年名士、重臣。华歆早年拜太尉陈球为师，与卢植、郑玄、管宁等为同门，又与管宁、邴原共称一龙，华歆为龙头。汉灵帝时华歆被举为孝廉，任郎中，因病去官。又被大将军何进征召为尚书郎。后任豫章太守，甚得民心。孙策率军南下，华歆举郡投降，被奉为上宾。官渡之战时，被征为议郎、参司空军事。入为尚书、侍中，又代荀彧为尚书令。丞相曹操讨孙权时，授华歆为军师。后为魏王国的御史大夫。曹丕即王位，拜华歆为相国，封安乐乡侯。曹魏建立后，其相国职名改称司徒。魏明帝即位，升任太尉，晋封博平侯。太和五年十二月（232年1月），华歆去世，年七十五，谥号“敬”。有文集三十卷，今佚失，其余见《全三国文》。',
@@ -398,6 +401,107 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//李肃
+			qiaoyan:{
+				trigger:{player:'damageBegin2'},
+				forced:true,
+				filter:function(event,player){
+					return player!=_status.currentPhase&&event.source&&event.source!=player;
+				},
+				logTarget:'source',
+				content:function(){
+					'step 0'
+					var cards=player.getStorage('qiaoyan');
+					if(cards.length){
+						var source=trigger.source;
+						player.$give(cards,source,false);
+						source.gain(cards,'log');
+						player.unmarkAuto('qiaoyan',cards);
+						event.goto(3);
+					}
+					else{
+						trigger.cancel();
+						player.draw();
+					}
+					'step 1'
+					var hs=player.getCards('he');
+					if(!hs.length) event.finish();
+					else if(hs.length==1) event._result={bool:true,cards:hs};
+					else player.chooseCard('he',true,'将一张牌作为“珠”置于武将牌上');
+					'step 2'
+					if(result.bool&&result.cards&&result.cards.length){
+						var cards=result.cards;
+						player.lose(cards,ui.special,'visible','toStorage');
+						player.$give(cards,player,false);
+						player.markAuto('qiaoyan',cards);
+						game.log(player,'将',cards,'放在了武将牌上');
+					}
+					event.finish();
+					'step 3'
+					game.delayx();
+				},
+				marktext:'珠',
+				intro:{content:'cards',onunmark:'throw'},
+				ai:{
+					filterDamage:true,
+					skillTagFilter:function(player,tag,arg){
+						if(!player.getStorage('qiaoyan').length) return false;
+						if(arg&&arg.player){
+							if(arg.player.hasSkillTag('jueqing',false,player)) return false;
+						}
+					},
+					combo:'xianzhu',
+				},
+			},
+			xianzhu:{
+				trigger:{player:'phaseUseBegin'},
+				direct:true,
+				locked:true,
+				filter:function(event,player){
+					return player.storage.qiaoyan&&player.storage.qiaoyan.length>0;
+				},
+				content:function(){
+					'step 0'
+					event.cards=player.storage.qiaoyan;
+					player.chooseTarget(true,'请选择【献珠】的目标','令一名角色获得'+get.translation(event.cards)+'。若该角色不为你自己，则你令其视为对其攻击范围内的另一名角色使用【杀】').set('ai',function(target){
+						var player=_status.event.player;
+						var eff=get.sgn(get.attitude(player,target))*get.value(_status.event.getParent().cards);
+						if(player!=target) eff+=Math.max.apply(null,game.filterPlayer().map(function(current){
+							if(current!=target&&target.inRange(current)&&target.canUse('sha',current)) return get.effect(current,{name:'sha'},target,player);
+							return 0;
+						}));
+						return eff;
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('xianzhu',target);
+						player.$give(cards,target,false);
+						target.gain(cards,'log');
+						player.unmarkAuto('qiaoyan',cards);
+					}
+					else event.finish();
+					'step 2'
+					game.delayx();
+					if(player!=target&&target.isIn()&&player.isIn()&&game.hasPlayer(function(current){
+						return current!=target&&target.inRange(current)&&target.canUse('sha',current);
+					})){
+						var str=get.translation(target);
+						player.chooseTarget(true,'选择'+str+'攻击范围内的一名角色，视为'+str+'对其使用【杀】',function(card,player,target){
+							var source=_status.event.target;
+							return source.inRange(target)&&source.canUse('sha',target);
+						}).set('target',target).set('ai',function(target){
+							var evt=_status.event;
+							return get.effect(target,{name:'sha'},evt.target,evt.player)
+						});
+					}
+					else event.finish();
+					'step 3'
+					if(result.bool) target.useCard({name:'sha',isCard:true},result.targets[0],false);
+				},
+				ai:{combo:'qiaoyan'},
+			},
 			//陆郁生
 			zhente:{
 				audio:2,
@@ -9867,7 +9971,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hanyong:{
 				trigger:{player:'useCard'},
 				filter:function(event,player){
-					return event.card&&(event.card.name=='nanman'||event.card.name=='wanjian'||(event.card.name=='sha'&&!event.card.nature&&get.suit(event.card)=='spade'));
+					return event.card&&(event.card.name=='nanman'||event.card.name=='wanjian'||(event.card.name=='sha'&&!event.card.nature&&get.suit(event.card)=='spade'))&&player.isDamaged();
 				},
 				content:function(){
 					trigger.baseDamage++;
@@ -15414,6 +15518,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lingju:['lingju','old_lingju'],
 			guansuo:['guansuo','ol_guansuo'],
 			zhangxingcai:['zhangxingcai','old_zhangxingcai'],
+			lisu:['ol_lisu','lisu'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
@@ -15977,7 +16082,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ranshang2:'燃殇',
 			ranshang_info:'锁定技，当你受到1点火焰伤害后，你获得1枚“燃”标记；结束阶段开始时，你失去X点体力。若X大于2，则你减2点体力上限并摸两张牌。（X为“燃”标记的数量）',
 			hanyong:'悍勇',
-			hanyong_info:'当你使用【南蛮入侵】或【万箭齐发】或黑桃【杀】时，若你的体力值小于游戏轮数，你可以令此牌的伤害值基数+1。然后若你的体力值不小于游戏轮数，则你获得一枚“燃”标记。',
+			hanyong_info:'当你使用【南蛮入侵】或【万箭齐发】或黑桃【杀】时，若你已受伤，则你可以令此牌的伤害值基数+1。然后若你的体力值不小于游戏轮数，则你获得一枚“燃”标记。',
 
 			yicong:'义从',
 			yongsi:'庸肆',
@@ -16277,6 +16382,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhiwei2:'至微',
 			zhiwei_info:'游戏开始时，你选择一名其他角色。该角色造成伤害后，你摸一张牌，该角色受到伤害后，你随机弃置一张手牌。你弃牌阶段弃置的牌均被该角色获得。 ',
 			zhiwei_info_guozhan:'你明置此武将牌时，选择一名其他角色。该角色造成伤害后，你摸一张牌，该角色受到伤害后，你随机弃置一张手牌。你弃牌阶段弃置的牌均被该角色获得。该角色死亡时，若你的两个武将牌均明置，你暗置此武将牌。 ',
+			ol_lisu:'OL李肃',
+			qiaoyan:'巧言',
+			qiaoyan_info:'锁定技，当你于回合外受到其他角色造成的伤害时，若你：有“珠”，则你令伤害来源获得“珠”；没有“珠”，则你防止此伤害，然后摸一张牌，并将一张牌正面朝上置于武将牌上，称为“珠”。',
+			xianzhu:'献珠',
+			xianzhu_info:'锁定技，出牌阶段开始时，你令一名角色A获得“珠”。若A不为你自己，则你选择A攻击范围内的一名角色B，视为A对B使用一张【杀】。',
 			
 			sp_default:"常规",
 			sp_zhongdan:"忠胆英杰",

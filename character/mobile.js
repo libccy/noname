@@ -496,7 +496,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				animationColor:'wood',
 				content:function(){
 					'step 0'
-					player.chooseTarget(get.prompt2('fubi'),lib.filternotMe).set('ai',function(target){
+					player.chooseTarget(get.prompt2('fubi'),lib.filter.notMe).set('ai',function(target){
 						return get.attitude(_status.event.player,target);
 					});
 					'step 1'

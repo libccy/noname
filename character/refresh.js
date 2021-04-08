@@ -161,6 +161,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					onunmark:true,
 				},
 				group:'residi_push',
+				ai:{notemp:true},
 			},
 			residi_push:{
 				trigger:{global:'phaseUseBegin'},
@@ -892,7 +893,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.name=='phaseDiscard'){
 						var cards=[];
 						player.getHistory('lose',function(evt){
-							if(evt&&evt.getParent('phaseDiscard')==event&&evt.hs) cards.addArray(evt.hs);
+							if(evt&&evt.type=='discard'&&evt.getParent('phaseDiscard')==event&&evt.hs) cards.addArray(evt.hs);
 						});
 						return cards.length>1;
 					}
@@ -2287,7 +2288,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.name=='phaseDiscard'){
 						var cards=[];
 						player.getHistory('lose',function(evt){
-							if(evt&&evt.getParent('phaseDiscard')==event&&evt.hs) cards.addArray(evt.hs);
+							if(evt&&evt.type=='discard'&&evt.getParent('phaseDiscard')==event&&evt.hs) cards.addArray(evt.hs);
 						});
 						return cards.length>1;
 					}
@@ -4095,7 +4096,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					//if(name=='phaseBegin'&&game.phaseNumber==1) return false;
 					return player.storage.rehuashen&&player.storage.rehuashen.character.length>0;
 				},
-				banned:['lisu','sp_xiahoudun','xushao'],
+				banned:['lisu','sp_xiahoudun','xushao','zhoutai','old_zhoutai'],
 				addHuashen:function(player){
 					if(!player.storage.rehuashen) return;
 					if(!_status.characterlist){
@@ -7647,7 +7648,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					if(target.hasJudge('lebu')) return true;
 					if(player==target) return false;
-					return lib.filter.targetEnabled({name:'lebu'},player,target);
+					if(!game.checkMod(ui.selected.cards[0],player,'unchanged','cardEnabled2',player)) return false;
+					return player.canUse({name:'lebu',cards:ui.selected.cards},target);
 				},
 				check:function(card){
 					return 7-get.value(card);

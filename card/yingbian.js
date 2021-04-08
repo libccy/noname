@@ -144,7 +144,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						target.showCards(result.cards);
-						if(get.suit(card)!=get.suit(result.cards[0])) target.damage();
+						if(get.suit(card)!=get.suit(result.cards[0])) target.damage(event.baseDamage||1);
 					}
 				},
 				ai:{

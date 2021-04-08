@@ -5841,7 +5841,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return Math.random();
 							},
 							ai2:function(target){
-								return 5-Math.max(4,target.countCards('h'));
+								return Math.sqrt(5-Math.max(4,target.countCards('h')))*get.attitude(player,target);
 							},
 						});
 					}

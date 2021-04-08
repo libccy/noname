@@ -12474,8 +12474,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			iwasawa_refenyin_info:'锁定技，你的回合内，当一张牌进入弃牌堆后，若本回合内没有过与此牌花色相同的卡牌进入过弃牌堆，则你摸一张牌。',
 			//卡牌花色的计算不受【红颜】等技能的影响
 			kengo_weishang:'伪伤',
-			key_weishang_sha:'伪伤',
-			key_weishang_shan:'伪伤',
+			kengo_weishang_sha:'伪伤',
+			kengo_weishang_shan:'伪伤',
 			kengo_weishang_info:'出牌阶段限一次，你可以废除一个装备栏并摸两张牌。若你的武器栏已废除，则你使用【杀】的次数上限+1，且当你使用【杀】指定目标后，目标角色弃置一张牌；若你的防具栏已废除，则你可以将一张牌当做【闪】使用或打出；若你的攻击/防御坐骑栏已废除，则你至其他角色的距离-1/其他角色至你的距离-1。',
 			kengo_guidui:'归队',
 			kengo_guidui_info:'锁定技，准备阶段，若你有已废除的装备栏，则你恢复这些装备栏，且本局游戏内发动【伪伤】时不能废除这些装备栏。',

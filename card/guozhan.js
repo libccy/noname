@@ -212,13 +212,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target.discard(target.getCards('e',function(card){
 							return lib.filter.cardDiscardable(card,target,'shuiyanqijunx');
 						}));
-						target.damage('thunder');
+						target.damage('thunder',event.baseDamage||1);
 						event.finish();
 					}
 					else if(!target.countCards('e',function(card){
 						return lib.filter.cardDiscardable(card,target,'shuiyanqijunx');
 					})){
-						var next=target.damage();
+						var next=target.damage(event.baseDamage||1);
 						if(!get.is.single()) next.nature='thunder';
 						event.finish();
 						return;
@@ -239,7 +239,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}));
 					}
 					else{
-						var next=target.damage();
+						var next=target.damage(event.baseDamage||1);
 						if(!get.is.single()) next.nature='thunder'
 					}
 					event.finish();
@@ -579,7 +579,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				selectTarget:-1,
 				modTarget:true,
 				content:function(){
-					target.damage('fire');
+					target.damage('fire',event.baseDamage||1);
 				},
 				ai:{
 					order:5,

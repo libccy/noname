@@ -10011,6 +10011,7 @@
 			western:'西',
 			key:'键',
 			jin:'晋',
+			double:'双',
 			wei2:'魏国',
 			shu2:'蜀国',
 			wu2:'吴国',
@@ -10019,6 +10020,7 @@
 			western2:'西方',
 			key2:'KEY',
 			jin2:'晋朝',
+			double2:'双势力',
 			male:'男',
 			female:'女',
 			mad:'混乱',
@@ -25516,16 +25518,22 @@
 		},
 		sort:{
 			character:function(a,b){
+				var getGroup=function(name){
+					var group=get.is.double(name,true);
+					if(group) return group[0];
+					return lib.character[name][1];
+				}
 				var groupSort=function(name){
 					if(!lib.character[name]) return 7;
-					if(lib.character[name][1]=='shen') return -1;
-					if(lib.character[name][1]=='wei') return 0;
-					if(lib.character[name][1]=='shu') return 1;
-					if(lib.character[name][1]=='wu') return 2;
-					if(lib.character[name][1]=='qun') return 3;
-					if(lib.character[name][1]=='jin') return 4;
-					if(lib.character[name][1]=='key') return 5;
-					if(lib.character[name][1]=='western') return 6;
+					var group=getGroup(name);
+					if(group=='shen') return -1;
+					if(group=='wei') return 0;
+					if(group=='shu') return 1;
+					if(group=='wu') return 2;
+					if(group=='qun') return 3;
+					if(group=='jin') return 4;
+					if(group=='key') return 5;
+					if(group=='western') return 6;
 					return 7;
 				}
 				var del=groupSort(a)-groupSort(b);
@@ -34880,6 +34888,18 @@
 					}
 					else button.node.group.style.backgroundColor=get.translation('weiColor');
 				}
+				var group=get.is.double(button.link,true);
+				if(group&&group.length==2){
+					var str='';
+					for(var i of group){
+						str+=get.translation(i);
+					}
+					button.node.group.innerHTML=str;
+					if(button.classList.contains('newstyle')){
+						button.node.name.dataset.nature=get.groupnature(group[0]);
+						button.node.group.dataset.nature=get.groupnature(group[1]);
+					}
+				}
 			},
 			div:function(){
 				var str,innerHTML,position,position2,style,divposition,listen;
@@ -37087,15 +37107,22 @@
 							}
 						}
 						alterableCharacters.sort();
+						var getGroup=function(name){
+							var group=get.is.double(name,true);
+							if(group) return group[0];
+							return lib.character[name][1];
+						};
 						var groupSort=function(name){
-							if(info[name][1]=='shen') return -1;
-							if(info[name][1]=='wei') return 0;
-							if(info[name][1]=='shu') return 1;
-							if(info[name][1]=='wu') return 2;
-							if(info[name][1]=='qun') return 3;
-							if(info[name][1]=='jin') return 4;
-							if(info[name][1]=='western') return 5;
-							if(info[name][1]=='key') return 6;
+							if(!lib.character[name]) return 7;
+							var group=getGroup(name);
+							if(group=='shen') return -1;
+							if(group=='wei') return 0;
+							if(group=='shu') return 1;
+							if(group=='wu') return 2;
+							if(group=='qun') return 3;
+							if(group=='jin') return 4;
+							if(group=='key') return 5;
+							if(group=='western') return 6;
 							return 7;
 						}
 						list.sort(function(a,b){
@@ -42232,7 +42259,7 @@
 				//      			return ui.create.characterDialog2.apply(this,arguments);
 				//     }
 				// }
-				var filter,str,noclick,thisiscard,seperate,expandall,onlypack,heightset,precharacter;
+				var filter,str,noclick,thisiscard,seperate,expandall,onlypack,heightset,precharacter,characterx;
 				for(var i=0;i<arguments.length;i++){
 					if(arguments[i]==='thisiscard'){
 						thisiscard=true;
@@ -42245,6 +42272,9 @@
 					}
 					else if(arguments[i]=='precharacter'){
 						precharacter=true;
+					}
+					else if(arguments[i]=='characterx'){
+						characterx=true;
 					}
 					else if(typeof arguments[i]=='string'&&arguments[i].indexOf('onlypack:')==0){
 						onlypack=arguments[i].slice(9);
@@ -42514,6 +42544,7 @@
 					var bool1=false;
 					var bool2=false;
 					var bool3=(get.mode()=='guozhan'&&_status.forceKey!=true&&get.config('onlyguozhan'));
+					var bool4=(get.mode()!='guozhan');
 					for(var i in lib.character){
 						if(lib.character[i][1]=='shen'){
 							bool1=true;
@@ -42521,10 +42552,12 @@
 						if(bool3||lib.character[i][1]=='key'){
 							bool2=true;
 						}
-						if(bool1&&bool2) break;
+						if(!bool4&&get.is.double(i)) bool4=true;
+						if(bool1&&bool2&&bool4) break;
 					}
 					if(bool1) groups.add('shen');
 					if(bool2&&!bool3) groups.add('key');
+					if(bool4&&get.mode()=='guozhan') groups.add('double');
 					var natures=['water','soil','wood','metal'];
 					var span=document.createElement('span');
 					newlined.appendChild(span);
@@ -42568,11 +42601,17 @@
 								else if(dialog.currentcapt2&&dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt,true)){
 									dialog.buttons[i].classList.add('nodisplay');
 								}
-								else if(dialog.buttons[i].group!=dialog.currentgroup){
-									dialog.buttons[i].classList.add('nodisplay');
+								else if(dialog.currentgroup=='double'){
+									if(dialog.buttons[i]._changeGroup) dialog.buttons[i].classList.remove('nodisplay');
+									else dialog.buttons[i].classList.add('nodisplay');
 								}
 								else{
-									dialog.buttons[i].classList.remove('nodisplay');
+									if(dialog.buttons[i]._changeGroup||dialog.buttons[i].group!=dialog.currentgroup){
+										dialog.buttons[i].classList.add('nodisplay');
+									}
+									else{
+										dialog.buttons[i].classList.remove('nodisplay');
+									}
 								}
 							}
 						}
@@ -42727,13 +42766,23 @@
 					};
 				}
 				else{
+					var getGroup=function(name){
+						var group=get.is.double(name,true);
+						if(group) return group[0];
+						return lib.character[name][1];
+					}
 					groupSort=function(name){
-						if(lib.character[name][1]=='shen') return -1;
-						if(lib.character[name][1]=='wei') return 0;
-						if(lib.character[name][1]=='shu') return 1;
-						if(lib.character[name][1]=='wu') return 2;
-						if(lib.character[name][1]=='qun') return 3;
-						return 4
+						if(!lib.character[name]) return 7;
+						var group=getGroup(name);
+						if(group=='shen') return -1;
+						if(group=='wei') return 0;
+						if(group=='shu') return 1;
+						if(group=='wu') return 2;
+						if(group=='qun') return 3;
+						if(group=='jin') return 4;
+						if(group=='key') return 5;
+						if(group=='western') return 6;
+						return 7;
 					}
 				}
 				list.sort(function(a,b){
@@ -42833,6 +42882,9 @@
 				else{
 					if(precharacter){
 						dialog.add([list,'precharacter'],noclick);
+					}
+					else if(characterx){
+						dialog.add([list,'characterx'],noclick);
 					}
 					else{
 						dialog.add([list,'character'],noclick);
@@ -43962,7 +44014,16 @@
 					}
 					node.link=item;
 					if(type=='character'||type=='characterx'){
-						if(type=='characterx'&&lib.characterReplace[node._link]&&lib.characterReplace[node._link].length>1) node._replaceButton=true;
+						if(type=='characterx'&&item.indexOf('gz_')==0&&lib.character[item]&&lib.character[item][4]){
+							for(var ix of lib.character[item][4]){
+								if(ix.indexOf('doublegroup:')==0){
+									node._replaceButton=true;
+									node._changeGroup=ix.split(':').slice(1);
+									break;
+								}
+							}
+						}
+						else if(type=='characterx'&&lib.characterReplace[node._link]&&lib.characterReplace[node._link].length>1) node._replaceButton=true;
 						var func=function(node,item){
 							node.setBackground(item,'character');
 							if(node.node){
@@ -44047,7 +44108,23 @@
 								node.node.replaceButton=intro;
 								intro.innerHTML='切换';
 								intro._node=node;
-								intro.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+								if(node._changeGroup) intro.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+									_status.tempNoButton=true;
+									var node=this._node;
+									var list=node._changeGroup;
+									var link=lib.character[node.link][1];
+									var index=list.indexOf(link);
+									if(index==list.length-1) index=0;
+									else index++;
+									lib.character[node.link][1]=list[index];
+									node.refresh(node,node.link);
+									game.uncheck();
+									game.check();
+									setTimeout(function(){
+										delete _status.tempNoButton;
+									},200);
+								});
+								else intro.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
 									_status.tempNoButton=true;
 									var node=this._node;
 									var list=lib.characterReplace[node._link];
@@ -48663,6 +48740,16 @@
 			return 0;
 		},
 		is:{
+			double:function(name,array){
+				if(!lib.character[name]||!lib.character[name][4]||name.indexOf('gz_')!=0) return false;
+				for(var i of lib.character[name][4]){
+					if(i.indexOf('doublegroup:')==0){
+						if(!array) return true;
+						return i.split(':').slice(1);
+					}
+				}
+				return false;
+			},
 			yingbian:function(node){
 				return get.cardtag(node,'yingbian_zhuzhan')||get.cardtag(node,'yingbian_fujia')||get.cardtag(node,'yingbian_canqu')||get.cardtag(node,'yingbian_kongchao');
 			},
@@ -50580,6 +50667,15 @@
 			}
 			return '';
 		},
+		strNumber:function(num){
+			switch(num){
+				case 1:return 'A';
+				case 11:return 'J';
+				case 12:return 'Q';
+				case 13:return 'K';
+				default:return num.toString();
+			}
+		},
 		cnNumber:function(num,two){
 			if(num==Infinity) return '∞';
 			if(isNaN(num)) return '';
@@ -51810,7 +51906,16 @@
 			else if(node.classList.contains('character')){
 				var character=node.link;
 				if(lib.character[node.link]&&lib.character[node.link][1]){
-					uiintro.add(get.translation(character)+'&nbsp;&nbsp;'+lib.translate[lib.character[node.link][1]]);
+					var group=get.is.double(node.link,true);
+					if(group){
+						var str=get.translation(character)+'&nbsp;&nbsp;';
+						for(var i=0;i<group.length;i++){
+							str+=get.translation(group[i]);
+							if(i<group.length-1) str+='/';
+						}
+						uiintro.add(str);
+					}
+					else uiintro.add(get.translation(character)+'&nbsp;&nbsp;'+lib.translate[lib.character[node.link][1]]);
 				}
 				else{
 					uiintro.add(get.translation(character));

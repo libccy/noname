@@ -10851,7 +10851,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.name=='phaseDiscard'){
 						var cards=[];
 						player.getHistory('lose',function(evt){
-							if(evt&&evt.getParent('phaseDiscard')==event&&evt.hs) cards.addArray(evt.hs);
+							if(evt&&evt.type=='discard'&&evt.getParent('phaseDiscard')==event&&evt.hs) cards.addArray(evt.hs);
 						});
 						return cards.length>1;
 					}

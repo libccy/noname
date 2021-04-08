@@ -200,7 +200,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					game.delay(2);
 					"step 2"
 					if(result.bool){
-						target.damage('fire');
+						target.damage('fire',event.baseDamage||1);
 					}
 					else{
 						target.addTempSkill('huogong2');
