@@ -65,6 +65,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_youta:['male','key',4,[]],
 			key_rumi:['female','key','3/4',['rumi_shuwu']],
 			key_chihaya:['female','key',3,['chihaya_liewu','chihaya_youfeng']],
+			key_yukito:['male','key',4,['yukito_kongwu','yukito_yaxiang']],
+			key_crow:['male','key',4,[],['unseen']],
 			
 			key_kud:['female','key',3,['kud_qiaoshou','kud_buhui']],
 			key_misuzu:['female','key',3,['misuzu_hengzhou','misuzu_nongyin','misuzu_zhongxing']],
@@ -176,7 +178,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				diy_tieba:["ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_luyusheng"],
 				diy_fakenews:["diy_wenyang","ns_zhangwei","ns_caimao"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto","key_sakuya","key_youta","key_rumi","key_chihaya"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto","key_sakuya","key_youta","key_rumi","key_chihaya","key_yukito"],
 				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang','junk_simayi'],
 			},
 		},
@@ -192,6 +194,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
+			key_yukito:'#bAIR',
 			key_chihaya:'#bRewrite',
 			key_rumi:'#rONE ~輝く季節へ~',
 			key_youta:'#b神様になった日',
@@ -358,6 +361,566 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			yukito_kongwu:{
+				enable:'phaseUse',
+				usable:1,
+				content:function(){
+					"step 0"
+					if(_status.connectMode) event.time=lib.configOL.choose_timeout;
+					event.videoId=lib.status.videoId++;
+					if(player.isUnderControl()){
+						game.swapPlayerAuto(player);
+					}
+					var switchToAuto=function(){
+						game.pause();
+						game.countChoose();
+						setTimeout(function(){
+							_status.imchoosing=false;
+							event._result={
+								bool:true,
+								score:get.rand(1,5),
+							};
+							if(event.dialog) event.dialog.close();
+							if(event.control) event.control.close();
+							game.resume();
+						},5000);
+					};
+					var createDialog=function(player,id){
+						if(_status.connectMode) lib.configOL.choose_timeout='30';
+						if(player==game.me) return;
+						var str=get.translation(player)+'正在表演《小空飞天》...<br>';
+						ui.create.dialog(str).videoId=id;
+					};
+					var chooseButton=function(){
+						var roundmenu=false;
+						if(ui.roundmenu&&ui.roundmenu.display!='none'){
+							roundmenu=true;
+							ui.roundmenu.style.display='none';
+						}
+						var event=_status.event;
+						event.settleed=false;
+						event.score=0;
+						event.dialog=ui.create.dialog('forcebutton','hidden');
+						event.dialog.textPrompt=event.dialog.add('<div class="text center">准备好了吗？准备好了的话就点击屏幕开始吧！</div>');
+						event.dialog.textPrompt.style["z-index"]=10;
+						event.switchToAuto=function(){
+							event._result={
+								bool:true,
+								score:event.score,
+							};
+							event.dialog.close();
+							game.resume();
+							_status.imchoosing=false;
+							if(roundmenu) ui.roundmenu.style.display='';
+						};
+						event.dialog.classList.add('fixed');
+						event.dialog.classList.add('scroll1');
+						event.dialog.classList.add('scroll2');
+						event.dialog.classList.add('fullwidth');
+						event.dialog.classList.add('fullheight');
+						event.dialog.classList.add('noupdate');
+						event.dialog.style.overflow='hidden';
+						event.dialog.open();
+						
+						var height=event.dialog.offsetHeight;
+						var width=event.dialog.offsetWidth;
+						var top=50;
+						var speed=0;
+						var start=false;
+						
+						var bird=ui.create.div('');
+						bird.style["background-image"]='linear-gradient(rgba(6, 3, 55, 1), rgba(6, 3, 35, 1))';
+						bird.style["border-radius"]='3px';
+						var pipes=[];
+						bird.style.position='absolute';
+						bird.style.height='40px';
+						bird.style.width='40px';
+						bird.style.left=Math.ceil(width/3)+'px';
+						bird.style.top=(top/100*height)+'px';
+						bird.updatePosition=function(){
+							bird.style.transform='translateY('+(top/100*height-bird.offsetTop)+'px)';
+						};
+						event.dialog.appendChild(bird);
+						var isDead=function(){
+							if(top>100||top<0) return true;
+							var btop=top;
+							var bleft=100/3;
+							var bdown=btop+5;
+							var bright=bleft+5;
+							for(var i of pipes){
+								var left2=i.left;
+								var right2=left2+10;
+								var bottom2=i.height1;
+								var top2=i.height2;
+								
+								if(left2>bright||right2<bleft) continue;
+								if(btop<bottom2) return true;
+								if(bdown>top2) return true;
+								return false;
+							}
+							return false;
+						};
+						
+						var fly=function(){
+							if(!start){
+								start=true;
+								event.dialog.textPrompt.innerHTML='<div class="text center">当前分数：'+event.score+'</div>';
+								speed=-4;
+								event.fly=setInterval(function(){
+									top+=speed;
+									if(top<0) top=0;
+									bird.updatePosition();
+									for(var i of pipes){
+										i.left-=0.5;
+										i.updateLeft();
+									}
+									speed+=0.5;
+									if(speed>2.5) speed=2.5;
+									
+									if(isDead()==true){
+										event.settle();
+									}
+								},35);
+								var addPipe=function(){
+									var num=get.rand(5,55);
+									
+									var pipe1=ui.create.div('');
+									pipe1.style["background-image"]='linear-gradient(rgba(57, 133, 4, 1), rgba(60, 135, 6, 1))';
+									pipe1.style["border-radius"]='3px';
+									pipe1.style.position='absolute';
+									pipe1.height1=num;
+									pipe1.height2=num+50;
+									pipe1.left=110;
+									pipe1.num=1;
+									pipe1.style.height=Math.ceil(height*num/100)+'px';
+									pipe1.style.width=(width/10)+'px';
+									pipe1.style.left=(pipe1.left*width/100)+'px';
+									pipe1.style.top='0px';
+
+									var pipe2=ui.create.div('');
+									pipe2.style["background-image"]='linear-gradient(rgba(57, 133, 4, 1), rgba(60, 135, 6, 1))';
+									pipe2.style["border-radius"]='3px';
+									pipe1.pipe2=pipe2;
+									pipe2.style.position='absolute';
+									pipe2.style.height=Math.ceil((100-pipe1.height2)*height/100)+'px';
+									pipe2.style.width=(width/10)+'px';
+									pipe2.style.left=(pipe1.left*width/100)+'px';
+									pipe2.style.top=Math.ceil(pipe1.height2*height/100)+'px';
+									pipes.add(pipe1);
+									event.dialog.appendChild(pipe1);
+									event.dialog.appendChild(pipe2);
+									pipe1.updateLeft=function(){
+										this.style.transform='translateX('+((this.left/100*width)-this.offsetLeft)+'px)';
+										this.pipe2.style.transform='translateX('+((this.left/100*width)-this.pipe2.offsetLeft)+'px)';
+										if(this.left<25&&!this.score){
+											this.score=true;
+											event.score++;
+											event.dialog.textPrompt.innerHTML='<div class="text center">当前分数：'+event.score+'</div>';
+											if(event.score>=5) event.settle();
+										}
+										if(this.left<-15){
+											this.remove();
+											this.pipe2.remove();
+											pipes.remove(this);
+										}
+									}
+								};
+								event.addPipe=setInterval(addPipe,2500);
+							}
+							else if(speed>0){
+								speed=-4;
+							}
+						};
+						document.addEventListener(lib.config.touchscreen?'touchend':'click',fly);
+						
+						event.settle=function(){
+							clearInterval(event.fly);
+							clearInterval(event.addPipe);
+							document.removeEventListener(lib.config.touchscreen?'touchend':'click',fly);
+							setTimeout(function(){
+								event.switchToAuto()
+							},1000);
+						};
+						
+						game.pause();
+						game.countChoose();
+					};
+					//event.switchToAuto=switchToAuto;
+					game.broadcastAll(createDialog,player,event.videoId);
+					if(event.isMine()){
+						chooseButton();
+					}
+					else if(event.isOnline()){
+						event.player.send(chooseButton);
+						event.player.wait();
+						game.pause();
+					}
+					else{
+						switchToAuto();
+					}
+					"step 1"
+					game.broadcastAll(function(id,time){
+						if(_status.connectMode) lib.configOL.choose_timeout=time;
+						var dialog=get.idDialog(id);
+						if(dialog){
+							dialog.close();
+						}
+					},event.videoId,event.time);
+					var result=event.result||result;
+					game.log(player,'获得了','#g'+result.score+'分');
+					if(!result.score){
+						player.chooseToDiscard(2,true,'he');
+						event.finish();
+						return;
+					}
+					var list=[];
+					var list2=[];
+					for(var i=0;i<5;i++){
+						if(lib.skill.yukito_kongwu.moves[i].filter(player,true)) list.push(i);
+						else list2.push(i);
+					}
+					if(list.length>=result.score) list=list.randomGets(result.score);
+					else list.addArray(list2.randomGets(result.score-list.length));
+					list.sort();
+					event.videoId=lib.status.videoId++;
+					var func=function(id,list){
+						var choiceList=ui.create.dialog('控物：请选择一项','forcebutton');
+						choiceList.videoId=id;
+						for(var ii=0;ii<list.length;ii++){
+							var i=list[ii];
+							var str='<div class="popup text" style="width:calc(100% - 10px);display:inline-block">';
+							var bool=lib.skill.yukito_kongwu.moves[i].filter(player);
+							if(!bool) str+='<div style="opacity:0.5">';
+							str+=lib.skill.yukito_kongwu.moves[i].prompt;
+							if(!bool) str+='</div>';
+							str+='</div>';
+							var next=choiceList.add(str);
+							next.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
+							next.firstChild.link=i;
+							for(var j in lib.element.button){
+								next[j]=lib.element.button[j];
+							}
+							choiceList.buttons.add(next.firstChild);
+						}
+						return choiceList;
+					};
+					if(player.isOnline2()){
+						player.send(func,event.videoId,list);
+					}
+					event.dialog=func(event.videoId,list);
+					if(player!=game.me||_status.auto){
+						event.dialog.style.display='none';
+					}
+					var next=player.chooseButton();
+					next.set('dialog',event.videoId);
+					next.set('forced',true);
+					next.set('filterButton',function(button){
+						return lib.skill.yukito_kongwu.moves[button.link].filter(_status.event.player);
+					});
+					next.set('ai',function(button){
+						if(lib.skill.yukito_kongwu.moves[button.link].filter(_status.event.player,true)) return 1+Math.random();
+						return Math.random();
+					});
+					"step 2"
+					if(player.isOnline2()){
+						player.send('closeDialog',event.videoId);
+					}
+					event.dialog.close();
+					var num=result.links[0];
+					switch(num){
+						case 0:event.goto(3);break;
+						case 1:event.goto(5);break;
+						case 2:event.goto(7);break;
+						case 3:event.goto(9);break;
+						case 4:player.moveCard(true);event.finish();break;
+					}
+					"step 3"
+					player.chooseTarget(true,'令一名角色摸两张牌').set('ai',function(target){
+						var player=_status.event.player;
+						var att=get.attitude(player,target)/Math.sqrt(1+target.countCards('h'));
+						if(target.hasSkillTag('nogain')) att/=10;
+						return att;
+					});
+					"step 4"
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target,'green');
+						target.draw(2);
+					}
+					event.finish();
+					"step 5"
+					player.chooseTarget(true,'对一名角色造成1点伤害').set('ai',function(target){
+						var player=_status.event.player;
+						return get.damageEffect(target,player,player);
+					});
+					"step 6"
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target,'green');
+						target.damage();
+					}
+					event.finish();
+					"step 7"
+					player.chooseTarget(true,'令一名已受伤的角色回复1点体力',function(card,player,target){
+						return target.isDamaged();
+					}).set('ai',function(target){
+						var player=_status.event.player;
+						return get.recoverEffect(target,player,player);
+					});
+					"step 8"
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target,'green');
+						target.recover();
+					}
+					event.finish();
+					"step 9"
+					player.chooseTarget(true,'弃置一名角色区域内的两张牌',function(card,player,target){
+						return target.countDiscardableCards(player,'hej')>0;
+					}).set('ai',function(target){
+						return -get.attitude(_status.event.player,target);
+					});
+					"step 10"
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target,'green');
+						player.discardPlayerCard(target,'hej',true,2);
+					}
+					event.finish();
+				},
+				moves:[
+					{
+						prompt:'令一名角色摸两张牌',
+						filter:()=>true,
+					},
+					{
+						prompt:'对一名角色造成1点伤害',
+						filter:function(player,ai){
+							if(!ai) return true;
+							return game.hasPlayer(function(current){
+								return get.damageEffect(current,player,player)>0;
+							});
+						},
+					},
+					{
+						prompt:'令一名已受伤的角色回复1点体力',
+						filter:function(player,ai){
+							return game.hasPlayer(function(current){
+								if(current.isDamaged()) return !ai||get.recoverEffect(current,player,player)>0;
+							});
+						}
+					},
+					{
+						prompt:'弃置一名角色区域内的两张牌',
+						filter:function(player,ai){
+							return game.hasPlayer(function(current){
+								return current.countDiscardableCards(player,'hej',function(card){
+									if(!ai) return true;
+									return get.buttonValue({link:card})*get.attitude(player,current)>0;
+								})>=(ai?1:Math.min(2,current.countDiscardableCards(player,'hej')));
+							});
+						},
+					},
+					{
+						prompt:'移动场上的一张牌',
+						filter:function(player,ai){
+							return player.canMoveCard(ai);
+						},
+					},
+				],
+				ai:{
+					order:10,
+					result:{player:1},
+					threaten:3.2,
+				}
+			},
+			yukito_yaxiang:{
+				enable:'chooseToUse',
+				limited:true,
+				filter:function(event,player){
+					return event.type=='dying'&&(player.name1=='key_yukito'||player.name2=='key_yukito');
+				},
+				filterTarget:function(card,player,target){
+					return target==_status.event.dying;
+				},
+				selectTarget:-1,
+				skillAnimation:true,
+				animationColor:'key',
+				content:function(){
+					'step 0'
+					player.awakenSkill('yukito_yaxiang');
+					player.reinit('key_yukito','key_crow');
+					'step 1'
+					if(target.hp<3) target.recover(3-target.hp);
+					'step 2'
+					var cards=target.getCards('j');
+					if(cards.length) target.discard(cards);
+					'step 3'
+					target.addSkill('misuzu_zhongyuan');
+				},
+				derivation:'misuzu_zhongyuan',
+				ai:{
+					save:true,
+					order:4,
+					result:{
+						target:function(player,target){
+							if(get.attitude(player,target)<4) return false;
+							if(player.countCards('h',function(card){
+								var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+								if(mod2!='unchanged') return mod2;
+								var mod=game.checkMod(card,player,target,'unchanged','cardSavable',player);
+								if(mod!='unchanged') return mod;
+								var savable=get.info(card).savable;
+								if(typeof savable=='function') savable=savable(card,player,target);
+								return savable;
+							})>=1-target.hp) return false;
+							if(target==player||target==get.zhu(player)) return true;
+							return !player.hasUnknown();
+						},
+					},
+				},
+			},
+			misuzu_zhongyuan:{
+				trigger:{player:'judge'},
+				skillAnimation:true,
+				animationColor:'key',
+				direct:true,
+				content:function(){
+					'step 0'
+					var str='你的'+(trigger.judgestr||'')+'判定为'+
+					get.translation(trigger.player.judging[0])+'，是否发动【终愿】修改判定结果？';
+					if(player.isUnderControl()){
+						game.swapPlayerAuto(player);
+					}
+					var switchToAuto=function(){
+						_status.imchoosing=false;
+						event._result={
+							bool:false,
+						};
+						if(event.dialog) event.dialog.close();
+						if(event.control) event.control.close();
+					};
+					var chooseButton=function(player,str){
+						var event=_status.event;
+						player=player||event.player;
+						if(!event._result) event._result={};
+						var dialog=ui.create.dialog(str,'forcebutton','hidden');
+						event.dialog=dialog;
+						dialog.addText('花色');
+						var table=document.createElement('div');
+						table.classList.add('add-setting');
+						table.style.margin='0';
+						table.style.width='100%';
+						table.style.position='relative';
+						var listi=['spade','heart','club','diamond'];
+						for(var i=0;i<listi.length;i++){
+							var td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
+							td.link=listi[i];
+							table.appendChild(td);
+							td.innerHTML='<span>'+get.translation(listi[i])+'</span>';
+							td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+								if(_status.dragged) return;
+								if(_status.justdragged) return;
+								_status.tempNoButton=true;
+								setTimeout(function(){
+									_status.tempNoButton=false;
+								},500);
+								var link=this.link;
+								var current=this.parentNode.querySelector('.bluebg');
+								if(current){
+									current.classList.remove('bluebg');
+								}
+								this.classList.add('bluebg');
+								event._result.suit=link;
+							});
+						}
+						dialog.content.appendChild(table);
+						dialog.addText('点数');
+						var table2=document.createElement('div');
+						table2.classList.add('add-setting');
+						table2.style.margin='0';
+						table2.style.width='100%';
+						table2.style.position='relative';
+						for(var i=1;i<14;i++){
+							var td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
+							td.link=i;
+							table2.appendChild(td);
+							var num=i;
+							td.innerHTML='<span>'+get.strNumber(num)+'</span>';
+							td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+								if(_status.dragged) return;
+								if(_status.justdragged) return;
+								_status.tempNoButton=true;
+								setTimeout(function(){
+									_status.tempNoButton=false;
+								},500);
+								var link=this.link;
+								var current=this.parentNode.querySelector('.bluebg');
+								if(current){
+									current.classList.remove('bluebg');
+								}
+								this.classList.add('bluebg');
+								event._result.number=link;
+							});
+						}
+						dialog.content.appendChild(table2);
+						dialog.add('　　');
+						event.dialog.open();
+						
+						event.switchToAuto=function(){
+							event._result={
+								bool:false,
+							};
+							event.dialog.close();
+							event.control.close();
+							game.resume();
+							_status.imchoosing=false;
+						};
+						event.control=ui.create.control('ok','cancel2',function(link){
+							var result=event._result;
+							if(link=='cancel2') result.bool=false;
+							else{
+								if(!result.number||!result.suit) return;
+								result.bool=true;
+							}
+							event.dialog.close();
+							event.control.close();
+							game.resume();
+							_status.imchoosing=false;
+						});
+						for(var i=0;i<event.dialog.buttons.length;i++){
+							event.dialog.buttons[i].classList.add('selectable');
+						}
+						game.pause();
+						game.countChoose();
+					};
+					if(event.isMine()){
+						chooseButton(player,str);
+					}
+					else if(event.isOnline()){
+						event.player.send(chooseButton,event.player,str);
+						event.player.wait();
+						game.pause();
+					}
+					else{
+						switchToAuto();
+					}
+					'step 1'
+					var map=event.result||result;
+					if(map.bool){
+						player.awakenSkill('misuzu_zhongyuan');
+						player.logSkill('misuzu_zhongyuan',player);
+						game.log(player,'将判定结果修改为了','#g'+get.translation(result.suit+2)+get.strNumber(result.number));
+						trigger.fixedResult={
+							suit:result.suit,
+							color:get.color({suit:result.suit}),
+							number:result.number,
+						};
+						player.popup(get.translation(result.suit+2)+get.strNumber(result.number),'thunder');
+						event.getParent('arrangeTrigger').finish();
+					}
+				},
+			},
 			chihaya_liewu:{
 				derivation:'chihaya_huairou',
 				mod:{
@@ -1125,7 +1688,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.$throw(storage,1000);
 							game.cardsDiscard(storage);
 							game.log(storage,'被置入了弃牌堆');
-						 storage.length=0;
+							storage.length=0;
 						}
 					},
 					mark:function(dialog,content,player){
@@ -2270,7 +2833,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var sha=player.countCards('h','sha');
 						switch(name){
 							case 'rewrite_zhuge':
-							 return sha-player.getCardUsable('sha');
+								return sha-player.getCardUsable('sha');
 							case 'guding':
 								if(sha>0&&game.hasPlayer(function(current){
 									return get.attitude(player,current)<0&&!current.countCards('h')&&player.canUse('sha',current)&&get.effect(current,{name:'sha'},player)>0;
@@ -2366,7 +2929,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.$throw(storage,1000);
 							game.cardsDiscard(storage);
 							game.log(storage,'被置入了弃牌堆');
-						 storage.length=0;
+							storage.length=0;
 						}
 						player.removeAdditionalSkill('kud_qiaoshou_equip');
 						delete player.storage.kud_qiaoshou_equip2;
@@ -2845,16 +3408,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(hs.length){
 						if(hs.length<=num) event._result={bool:true,cards:hs};
 						else{
-						 target.chooseCard('he',true,'交给'+get.translation(player)+get.cnNumber(num)+'张牌',num).set('ai',function(card){
-						 	var player=_status.event.player;
-						 	var target=_status.event.getParent().player;
-						 	if(get.attitude(player,target)>0){
-						 		if(!target.hasShan()&&card.name=='shan') return 10;
-						 		if(get.type(card)=='equip'&&!get.cardtag(card,'gifts')&&target.hasUseTarget(card)) return 10-get.value(card);
-						 		return 6-get.value(card);
-						 	}
-						 	return -get.value(card);
-						 });
+							target.chooseCard('he',true,'交给'+get.translation(player)+get.cnNumber(num)+'张牌',num).set('ai',function(card){
+								var player=_status.event.player;
+								var target=_status.event.getParent().player;
+								if(get.attitude(player,target)>0){
+									if(!target.hasShan()&&card.name=='shan') return 10;
+									if(get.type(card)=='equip'&&!get.cardtag(card,'gifts')&&target.hasUseTarget(card)) return 10-get.value(card);
+									return 6-get.value(card);
+								}
+								return -get.value(card);
+							});
 						}
 					}
 					else event.finish();
@@ -3108,18 +3671,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var map={sha:'diamond',tao:'heart'}
 						for(var i=0;i<list.length;i++){
 							var name=list[i];
-		 				if(player.countCards('h',function(card){
-		 					return get.suit(card,player)==map[name];
-		 				})>0&&player.getUseValue({name:name,nature:name=='sha'?'fire':null})>0){
-		 					var temp=get.order({name:name,nature:name=='sha'?'fire':null});
-		 					if(temp>max){
-		 						max=temp;
-		 						name2=map[name];
-		 					}
-		 				}
-		 			}
-		 			if(name2==get.suit(card,player)) return 1;
-		 			return 0;
+							if(player.countCards('h',function(card){
+								return get.suit(card,player)==map[name];
+							})>0&&player.getUseValue({name:name,nature:name=='sha'?'fire':null})>0){
+								var temp=get.order({name:name,nature:name=='sha'?'fire':null});
+								if(temp>max){
+									max=temp;
+									name2=map[name];
+								}
+							}
+						}
+						if(name2==get.suit(card,player)) return 1;
+						return 0;
 					}
 					return 1;
 				},
@@ -3175,15 +3738,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var map={sha:'diamond',tao:'heart'}
 							for(var i=0;i<list.length;i++){
 								var name=list[i];
-			 				if(player.countCards('h',function(card){
-		 						return get.suit(card,player)==map[name];
-		 					})>0&&player.getUseValue({name:name,nature:name=='sha'?'thunder':null})>0){
-			 					var temp=get.order({name:name,nature:name=='sha'?'thunder':null});
-			 					if(temp>max) max=temp;
-			 				}
-			 			}
-			 			max/=1.1;
-			 			return max;
+								if(player.countCards('h',function(card){
+									return get.suit(card,player)==map[name];
+								})>0&&player.getUseValue({name:name,nature:name=='sha'?'thunder':null})>0){
+									var temp=get.order({name:name,nature:name=='sha'?'thunder':null});
+									if(temp>max) max=temp;
+								}
+							}
+							max/=1.1;
+							return max;
 						}
 						return 2;
 					},
@@ -3969,33 +4532,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else{
 							var targets=game.players.slice(0);
 							var info=get.info(card);
-	 					var range;
-	 					if(!info.notarget){
-	   				var select=get.copy(info.selectTarget);
-	   				if(select==undefined){
-	   					range=[1,1];
-	   				}
-	   				else if(typeof select=='number') range=[select,select];
-	   				else if(get.itemtype(select)=='select') range=select;
-	   				else if(typeof select=='function') range=select(card,player);
-	   				game.checkMod(card,target,range,'selectTarget',target);
-	  				}
-	 					if(info.notarget||range[1]==-1){
-	 						if(range[1]==-1){
-	 							for(var i=0;i<targets.length;i++){
-	 								if(!target.canUse(card,targets[i])){
-	 									targets.splice(i--,1);
-	 								}
-	 							}
-	 							if(targets.length){
-	 								event.targets2=targets;
-	 							}
-	 							else{
-	 								event.finish();
-	 								return;
-	 							}
-	 						}
-	 						else event.targets2=[];
+							var range;
+							if(!info.notarget){
+								var select=get.copy(info.selectTarget);
+								if(select==undefined){
+									range=[1,1];
+								}
+								else if(typeof select=='number') range=[select,select];
+								else if(get.itemtype(select)=='select') range=select;
+								else if(typeof select=='function') range=select(card,player);
+								game.checkMod(card,target,range,'selectTarget',target);
+							}
+							if(info.notarget||range[1]==-1){
+								if(range[1]==-1){
+									for(var i=0;i<targets.length;i++){
+										if(!target.canUse(card,targets[i])){
+											targets.splice(i--,1);
+										}
+									}
+									if(targets.length){
+										event.targets2=targets;
+									}
+									else{
+										event.finish();
+										return;
+									}
+								}
+								else event.targets2=[];
 								var next=player.chooseBool();
 								next.set('prompt',event.prompt||('是否令'+get.translation(target)+(event.targets2.length?'对':'')+get.translation(event.targets2)+'使用'+get.translation(card)+'?'));
 								next.set('prompt2','或点「取消」，令其将此牌置入弃牌堆');
@@ -4006,36 +4569,36 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									}
 									return eff>0;
 								};
-	 					}
-	 					else{
-	 						var next=player.chooseTarget();
-	 						next.set('_get_card',card);
-	 						next.set('source',target);
-	 						next.set('filterTarget',function(card,player,target){
-	 							return lib.filter.filterTarget(_status.event._get_card,_status.event.source,target);
-	 						});
-	 						next.set('ai',function(target){
-	 							var evt=_status.event;
-	 							return get.effect(target,evt._get_card,evt.source,evt.player)
-	 						});
-	 						next.set('selectTarget',function(){
-	  						var card=get.card(),player=_status.event.source;
-	    				if(card==undefined) return;
-	    				var range;
-	    				var select=get.copy(get.info(card).selectTarget);
-	    				if(select==undefined){
-	    					if(get.info(card).filterTarget==undefined) return[0,0];
-	    					range=[1,1];
-	    				}
-	    				else if(typeof select=='number') range=[select,select];
-	    				else if(get.itemtype(select)=='select') range=select;
-	    				else if(typeof select=='function') range=select(card,player);
-	    				game.checkMod(card,player,range,'selectTarget',player);
-	    				return range;
-	 						});
-	 						next.set('prompt',event.prompt||('选择'+get.translation(target)+'使用'+get.translation(card)+'的目标'));
-	 						next.set('prompt2','或点「取消」令其将此牌置入弃牌堆');
-	 					}
+							}
+							else{
+								var next=player.chooseTarget();
+								next.set('_get_card',card);
+								next.set('source',target);
+								next.set('filterTarget',function(card,player,target){
+									return lib.filter.filterTarget(_status.event._get_card,_status.event.source,target);
+								});
+								next.set('ai',function(target){
+									var evt=_status.event;
+									return get.effect(target,evt._get_card,evt.source,evt.player)
+								});
+								next.set('selectTarget',function(){
+									var card=get.card(),player=_status.event.source;
+									if(card==undefined) return;
+									var range;
+									var select=get.copy(get.info(card).selectTarget);
+									if(select==undefined){
+										if(get.info(card).filterTarget==undefined) return[0,0];
+										range=[1,1];
+									}
+									else if(typeof select=='number') range=[select,select];
+									else if(get.itemtype(select)=='select') range=select;
+									else if(typeof select=='function') range=select(card,player);
+									game.checkMod(card,player,range,'selectTarget',player);
+									return range;
+								});
+								next.set('prompt',event.prompt||('选择'+get.translation(target)+'使用'+get.translation(card)+'的目标'));
+								next.set('prompt2','或点「取消」令其将此牌置入弃牌堆');
+							}
 						}
 					}
 					else event.finish();
@@ -4524,21 +5087,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				group:'yuiko_dilve_gain',
 				subSkill:{
-	 			gain:{
-	 				trigger:{
-	 					player:['chooseToCompareAfter','compareMultipleAfter'],
-	 					target:['chooseToCompareAfter','compareMultipleAfter']
-	 				},
-	 				filter:function(event,player){
-	 					if(event.preserve) return false;
-	 					return [event.card1,event.card2].filterInD('od').length>0;
-	 				},
-	 				prompt2:function(event,player){
-	 					return '获得'+get.translation([event.card1,event.card2].filterInD('od'));
-	 				},
-	 				content:function(){
-	 					player.gain([trigger.card1,trigger.card2].filterInD('od'),'gain2','log');
-	 				}
+					gain:{
+						trigger:{
+							player:['chooseToCompareAfter','compareMultipleAfter'],
+							target:['chooseToCompareAfter','compareMultipleAfter']
+						},
+						filter:function(event,player){
+							if(event.preserve) return false;
+							return [event.card1,event.card2].filterInD('od').length>0;
+						},
+						prompt2:function(event,player){
+							return '获得'+get.translation([event.card1,event.card2].filterInD('od'));
+						},
+						content:function(){
+							player.gain([trigger.card1,trigger.card2].filterInD('od'),'gain2','log');
+						}
 					},
 				},
 			},
@@ -4808,8 +5371,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var id=target.playerid;
 					if(!map[id]) map[id]={};
 					if(result.color=='red'){
-				 	if(!map[id].extraDamage) map[id].extraDamage=0;
-				 	map[id].extraDamage++;
+						if(!map[id].extraDamage) map[id].extraDamage=0;
+						map[id].extraDamage++;
 					}
 					if(result.color=='black'){
 						trigger.directHit.add(target);
@@ -4987,10 +5550,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					attackFrom:function(from,to,num){
-					 return num-from.getStorage('shiina_qingshen').length;
+						return num-from.getStorage('shiina_qingshen').length;
 					},
 					maxHandcard:function(from,num){
-					 return num+from.getStorage('shiina_qingshen').length;
+						return num+from.getStorage('shiina_qingshen').length;
 					},
 				},
 				ai:{
@@ -5134,13 +5697,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var max=0
 							for(var i=0;i<lib.inpile.length;i++){
 								var name=lib.inpile[i];
-			 				if(get.type(name)=='basic'&&player.getUseValue({name:name})>0){
-			 					var temp=get.order({name:name});
-			 					if(temp>max) max=temp;
-			 				}
-			 			}
-			 			if(max>0) max+=0.5;
-			 			return max;
+								if(get.type(name)=='basic'&&player.getUseValue({name:name})>0){
+									var temp=get.order({name:name});
+									if(temp>max) max=temp;
+								}
+							}
+							if(max>0) max+=0.5;
+							return max;
 						}
 						return 4;
 					},
@@ -12423,6 +12986,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_youta:'成神阳太',
 			key_rumi:'七濑留美',
 			key_chihaya:'凤千早',
+			key_yukito:'国崎往人',
+			key_crow:'小空',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -12742,7 +13307,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chihaya_youfeng_info:'转换技，阴，每轮限一次，你可以加1点体力上限，视为使用一张普通锦囊牌；阳，每轮限一次，你可以废除你的一个装备栏，视为使用一张基本牌。',
 			chihaya_huairou:'怀柔',
 			chihaya_huairou_info:'出牌阶段，你可以重铸装备牌。',
-			
+			yukito_kongwu:'控物',
+			yukito_kongwu_info:'出牌阶段限一次，你可以表演《小空飞天》。若如此做，你从以下项目中随机选择X项，并执行其中的一项：①令一名角色摸两张牌。②对一名角色造成1点伤害。③令一名已受伤的角色回复1点体力。④弃置一名角色区域内的两张牌。⑤移动场上的一张牌。若X=0，则你弃置两张牌。（X为你的得分）',
+			yukito_yaxiang:'鸦翔',
+			yukito_yaxiang_info:'限定技，当有角色进入濒死状态时，你可移去此武将牌，然后令该角色将体力值回复至3点，弃置判定区的所有牌并获得技能〖终愿〗。',
+			misuzu_zhongyuan:'终愿',
+			misuzu_zhongyuan_info:'限定技。当你的判定结果生效时，你可将判定结果改为任意花色和点数并结束此时机。',
+
 			key_kud:'库特莉亚芙卡',
 			kud_qiaoshou:'巧手',
 			kud_qiaoshou_equip:'巧手',

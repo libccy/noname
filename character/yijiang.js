@@ -575,7 +575,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							next.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
 							next.firstChild.link=i;
 							for(var j in lib.element.button){
-								next[j]=lib.element.button[i];
+								next[j]=lib.element.button[j];
 							}
 							choiceList.buttons.add(next.firstChild);
 						}
@@ -8352,7 +8352,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							next.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
 							next.firstChild.link=i;
 							for(var j in lib.element.button){
-								next[j]=lib.element.button[i];
+								next[j]=lib.element.button[j];
 							}
 							choiceList.buttons.add(next.firstChild);
 						}

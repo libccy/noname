@@ -173,7 +173,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var num=Math.min(player.countMark('recangchu'),game.countPlayer(function(current){
 							return get.attitude(player,current)>0;
 						}));
-						if(num) return get.cnNumber(num);
+						if(num>0) return get.cnNumber(num,true);
 						return 'cancel2';
 					});
 					'step 1'
@@ -200,11 +200,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							complexSelect:true,
 							position:'he',
 							ai1:function(card){
+								if(game.countPlayer(function(current){
+									return target!=_status.event.player&&get.attitude(_status.event.player,target)>0;
+								})<=ui.selected.cards.length) return 0;
 								if(card.name=='shan') return 1;
 								return Math.random();
 							},
 							ai2:function(target){
-								return get.attitude(_status.event.player,target)+(5-Math.max(4,target.countCards('h')));
+								if(!target) return 1;
+								return Math.sqrt(5-Math.max(4,target.countCards('h')))*get.attitude(_status.event.player,target);
 							},
 							forced:true,
 						});
@@ -665,7 +669,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							next.firstChild.link=i;
 							next.firstChild._filterButton=bool;
 							for(var j in lib.element.button){
-								next[j]=lib.element.button[i];
+								next[j]=lib.element.button[j];
 							}
 							choiceList.buttons.add(next.firstChild);
 						}
@@ -1379,7 +1383,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						cards.remove(card2);
 						player.$gain2(cards);
 						player.gain(cards,'log').gaintag.add('yanxi');
-						player.gain(card,target,'bySelf','giveAuto').gaintag.add('yanxi');
+						player.gain(card,target,'bySelf','give').gaintag.add('yanxi');
 					}
 					else{
 						player.popup('杯具');
@@ -1445,6 +1449,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.getStat('skill').sanchen--;
 						}
 					}
+					else{
+						target.draw();
+						player.getStat('skill').sanchen--;
+					}
 				},
 				ai:{
 					order:9,
@@ -1459,6 +1467,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:'已发动过#次技能',
 				},
+				marktext:'陈',
 			},
 			zhaotao:{
 				trigger:{player:'phaseZhunbeiBegin'},
@@ -5841,7 +5850,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return Math.random();
 							},
 							ai2:function(target){
-								return Math.sqrt(5-Math.max(4,target.countCards('h')))*get.attitude(player,target);
+								return Math.sqrt(5-Math.max(4,target.countCards('h')))*get.attitude(_status.event.player,target);
 							},
 						});
 					}
@@ -6245,7 +6254,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							next.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
 							next.firstChild.link=i;
 							for(var j in lib.element.button){
-								next[j]=lib.element.button[i];
+								next[j]=lib.element.button[j];
 							}
 							choiceList.buttons.add(next.firstChild);
 						}
@@ -9329,7 +9338,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xijue_xiaoguo:'骁果',
 			duyu:'杜预',
 			sanchen:'三陈',
-			sanchen_info:'出牌阶段，你可选择一名本回合内未选择过的角色。其摸三张牌，然后弃置三张牌。若其以此法弃置的牌的类别均不相同，则其摸一张牌。否则你本阶段内不能再发动〖三陈〗。',
+			sanchen_info:'出牌阶段，你可选择一名本回合内未选择过的角色。其摸三张牌，然后弃置三张牌。若其未以此法弃置牌或以此法弃置的牌的类别均不相同，则其摸一张牌。否则你本阶段内不能再发动〖三陈〗。',
 			zhaotao:'诏讨',
 			zhaotao_info:'觉醒技，准备阶段，若你本局游戏内发动〖三陈〗的次数大于2，则你减1点体力上限并获得〖破竹〗。',
 			pozhu:'破竹',

@@ -25945,22 +25945,22 @@
 				}
 			},
 			baiban:{
-				init:function (player,skill){
+				init:function(player,skill){
 					var skills=player.getSkills(true,false);
 					for(var i=0;i<skills.length;i++){
-						if(get.skills[i]||lib.skill[skills[i]].charlotte){
+						if(lib.skill[skills[i]].charlotte){
 							skills.splice(i--,1);
 						}
 					}
 					player.disableSkill(skill,skills);
 				},
-				onremove:function (player,skill){
+				onremove:function(player,skill){
 					player.enableSkill(skill);
 				},
 				mark:true,
 				locked:true,
 				intro:{
-					content:function (storage,player,skill){
+					content:function(storage,player,skill){
 						var list=[];
 						for(var i in player.disabledSkills){
 							if(player.disabledSkills[i].contains(skill)){
@@ -31829,6 +31829,9 @@
 				lib.configOL.gameStarted=false;
 				game.saveConfig('pagecfg'+window.isNonameServer,[lib.configOL,game.roomId,_status.onlinenickname,_status.onlineavatar]);
 				game.reload();
+			}
+			else if(_status.connectMode&&!game.online){
+				setTimeout(game.reload,15000)
 			}
 		},
 		loop:function(){

@@ -103,7 +103,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yanbaihu:['male','qun',4,['zhidao','jili']],
 			chengyu:['male','wei',3,['shefu','benyu']],
 
-			wanglang:['male','wei',3,['gushe','jici']],
+			wanglang:['male','wei',3,['regushe','rejici']],
 			sp_pangde:['male','wei',4,['mashu','juesi']],
 			sp_jiaxu:['male','wei',3,['zhenlue','jianshu','yongdi']],
 
@@ -894,7 +894,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							td.link=i;
 							td.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
 							for(var j in lib.element.button){
-								td[j]=lib.element.button[i];
+								td[j]=lib.element.button[j];
 							}
 							table.appendChild(td);
 							dialog.buttons.add(td);
@@ -1091,7 +1091,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							next.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
 							next.firstChild.link=i;
 							for(var j in lib.element.button){
-								next[j]=lib.element.button[i];
+								next[j]=lib.element.button[j];
 							}
 							choiceList.buttons.add(next.firstChild);
 						}
@@ -7287,6 +7287,133 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					expose:0.2
 				}
 			},
+			regushe:{
+				audio:'gushe',
+				enable:'phaseUse',
+				filterTarget:function(card,player,target){
+					return player.canCompare(target);
+				},
+				selectTarget:[1,3],
+				filter:function(event,player){
+					return (player.countMark('regushe')+player.countMark('regushe2')<7)&&player.countCards('h')>0;
+				},
+				multitarget:true,
+				multiline:true,
+				content:function(){
+					player.addTempSkill('regushe2');
+					player.chooseToCompare(targets).callback=lib.skill.regushe.callback;
+				},
+				intro:{
+					name:'饶舌',
+					content:'mark'
+				},
+				callback:function(){
+					'step 0'
+					if(event.num1<=event.num2){
+						target.chat(lib.skill.gushe.chat[player.countMark('regushe')]);
+						game.delay();
+						player.addMark('regushe',1);
+						if(player.countMark('regushe')>=7){
+							player.die();
+						}
+					}
+					else player.addMark('regushe2',1,false);
+					'step 1'
+					if(event.num1>=event.num2){
+						target.chooseToDiscard('he','弃置一张牌，或令'+get.translation(player)+'摸一张牌').set('ai',function(card){
+							if(_status.event.goon) return 6-get.value(card);
+							return 0;
+						}).set('goon',get.attitude(target,player)<0);
+					}
+					else event.goto(3);
+					'step 2'
+					if(!result.bool){
+						player.draw();
+					}
+					'step 3'
+					if(event.num1<=event.num2){
+						player.chooseToDiscard('he','弃置一张牌，或摸一张牌').set('ai',function(){return -1;});
+					}
+					else event.finish();
+					'step 4'
+					if(!result.bool) player.draw();
+				},
+				ai:{
+					order:7,
+					result:{
+						target:function(player,target){
+							var num=ui.selected.targets.length+1;
+							if(num+player.countMark('regushe')<=6) return -1;
+							var hs=player.getCards('h');
+							for(var i=0;i<hs.length;i++){
+								if(get.value(hs[i])<=6){
+									switch(hs[i].number){
+										case 13:return -1;
+										case 12:if(player.countMark('regushe')+num<=8) return -1;break;
+										case 11:if(player.countMark('regushe')+num<=7) return -1;break;
+										default:if(hs[i].number>5&&player.countMark('regushe')+num<=6) return -1;
+									}
+								}
+							}
+							return 0;
+						},
+					}
+				},
+				marktext:'饶',
+			},
+			regushe2:{
+				charlotte:true,
+				onremove:true,
+			},
+			rejici:{
+				audio:'jici',
+				trigger:{
+					player:'compare',
+					target:'compare',
+				},
+				forced:true,
+				filter:function(event,player){
+					if(player!=event.target&&event.iwhile) return false;
+					return (player==event.player?event.num1:event.num2)<=player.countMark('regushe');
+				},
+				content:function(){
+					trigger[player==trigger.player?'num1':'num2']+=player.countMark('regushe');
+					game.log(player,'的拼点牌点数+'+player.countMark('regushe'));
+					game.delayx();
+					var cards=[trigger.card1];
+					if(trigger.cardlist) cards.addArray(trigger.cardlist);
+					else cards.push(trigger.card2);
+					cards.sort(function(a,b){
+						return get.number(b)-get.number(a);
+					});
+					var num=get.number(cards[0]);
+					for(var i=1;i<cards.length;i++){
+						if(get.number(cards[i])<num){
+							cards.splice(i);
+							break;
+						}
+					}
+					cards=cards.filterInD();
+					if(cards.length) player.gain(cards,'gain2');
+				},
+				group:'rejici2',
+			},
+			rejici2:{
+				trigger:{player:'die'},
+				forced:true,
+				forceDie:true,
+				skillAnimation:true,
+				animationColor:'water',
+				filter:function(event,player){
+					return event.source&&event.source.isIn();
+				},
+				logTarget:'source',
+				content:function(){
+					var num=7-player.countMark('regushe');
+					if(num>0) trigger.source.chooseToDiscard(num,true,'he');
+					trigger.source.loseHp();
+				},
+			},
 			gushe:{
 				audio:2,
 				enable:'phaseUse',
@@ -7433,7 +7560,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!player.storage.shefu2) player.storage.shefu2=[];
 				},
 				filter:function(event,player){
-					return player.countCards('h')>0;
+					return player.countCards('he')>0;
 				},
 				intro:{
 					content:'cards',
@@ -7500,7 +7627,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.storage.shefu2.push(result.links[0][2]);
 						player.logSkill('shefu');
-						player.chooseCard('h','选择一张手牌作为“伏兵”',true);
+						player.chooseCard('he','选择一张牌作为“伏兵”',true);
 						if(player.isOnline2()){
 							player.send(function(storage){
 								game.me.storage.shefu2=storage;
@@ -7528,7 +7655,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'shefu',
 				filter:function(event,player){
 					if(_status.currentPhase==player) return false;
-					return player.storage.shefu2&&player.storage.shefu2.contains(event.card.name);
+					return player.storage.shefu2&&player.storage.shefu2.contains(event.card.name)&&event.player.getHistory('lose',function(evt){
+						return evt.getParent()==event&&evt.hs&&evt.hs.length==event.cards.length;
+					}).length;
 				},
 				direct:true,
 				content:function(){
@@ -7571,7 +7700,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.set('effect',effect);
 					"step 1"
 					if(result.bool){
-						player.logSkill('shefu');
+						player.logSkill('shefu',trigger.player);
 						var index=player.storage.shefu2.indexOf(trigger.card.name);
 						if(index!=-1){
 							var card=player.storage.shefu[index];
@@ -7594,6 +7723,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						trigger.targets.length=0;
 						trigger.all_excluded=true;
+						if(trigger.player==_status.currentPhase) trigger.player.addTempSkill('baiban');
 					}
 				},
 				ai:{
@@ -10361,7 +10491,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							next.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
 							next.firstChild.link=i;
 							for(var j in lib.element.button){
-								next[j]=lib.element.button[i];
+								next[j]=lib.element.button[j];
 							}
 							choiceList.buttons.add(next.firstChild);
 						}
@@ -15941,6 +16071,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jianshu_info:'限定技，出牌阶段，你可以将一张黑色手牌交给一名其他角色，并选择另一名其他角色，然后令这两名角色拼点。赢的角色弃置两张牌，没赢的角色失去一点体力。',
 			yongdi:'拥嫡',
 			yongdi_info:'限定技，准备阶段开始时，你可令一名其他男性角色增加一点体力上限并回复1点体力，然后若该角色的武将牌上有主公技且其不为主公，其获得此主公技。',
+			regushe:'鼓舌',
+			regushe_info:'出牌阶段，若X小于7，则你可以用一张手牌与至多三名角色同时拼点，然后依次结算拼点结果，没赢的角色选择一项：1.弃置一张牌；2.令你摸一张牌。若你没赢，你获得一个“饶舌”标记。当你获得第7个“饶舌”标记时，你死亡。（X为你的“饶舌”标记数与本回合因“鼓舌”拼点而胜利的次数之和）',
+			rejici:'激词',
+			rejici2:'激词',
+			rejici_info:'锁定技，当你展示拼点牌后，若此牌的点数不大于X，则你令此牌点数+X，并获得此次拼点中原点数最大的拼点牌。',
 			gushe:'鼓舌',
 			gushe_bg:'舌',
 			gushe_info:'出牌阶段限一次，你可以用一张手牌与至多三名角色同时拼点，然后依次结算拼点结果，没赢的角色选择一项：1.弃置一张牌；2.令你摸一张牌。若你没赢，你获得一个“饶舌”标记。当你获得第7个“饶舌”标记时，你死亡。',
@@ -15948,7 +16083,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jici_info:'当你因发动〖鼓舌〗而扣置的拼点牌亮出后，若点数小于X，你可令点数+X；若点数等于X，你可令你本回合发动〖鼓舌〗的次数上限+1。（X为你“饶舌”标记的数量）',
 			shefu:'设伏',
 			shefu_bg:'伏',
-			shefu_info:'结束阶段开始时，你可以将一张手牌移出游戏，称为「伏兵」。然后为「伏兵」记录一个基本牌或锦囊牌的名称（须与其他「伏兵」记录的名称均不同）。你的回合外，当有其他角色使用与你记录的「伏兵」牌名相同的牌时，你可以取消此牌的所有目标，然后移去该「伏兵」',
+			shefu_info:'结束阶段开始时，你可以将一张牌移出游戏，称为「伏兵」。并为「伏兵」记录一个基本牌或锦囊牌的名称（须与其他「伏兵」记录的名称均不同）。你的回合外，当有其他角色使用与你记录的「伏兵」牌名相同的手牌时，你可以取消此牌的所有目标，然后移去该「伏兵」。若此时处于使用者的回合内，则你令使用者当前的所有非Charlotte技失效直至回合结束。',
 			benyu:'贲育',
 			benyu2:'贲育',
 			benyu_info:'当你受到伤害后，若你的手牌数不大于伤害来源的手牌数，你可以将手牌摸至与伤害来源手牌数相同（至多摸至5张）；否则你可以弃置大于伤害来源手牌数的手牌，然后对其造成1点伤害。',
