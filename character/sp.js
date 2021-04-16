@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			sp:{
-				sp_default:["caoying","simahui","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","liuxie","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","fuwan","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","lingju","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","xujing","yuantanyuanshang","sunshao","zhangling",'guansuo','baosanniang','ol_zhangchangpu','caoshuang','sp_zhangliao','wolongfengchu','ol_xinxianying','ol_lisu'],
+				sp_default:["caoying","simahui","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","liuxie","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","fuwan","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","lingju","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","xujing","yuantanyuanshang","sunshao","zhangling",'guansuo','baosanniang','ol_zhangchangpu','caoshuang','sp_zhangliao','wolongfengchu','ol_xinxianying'],
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_star:["sp_xiahoushi","jsp_zhaoyun","huangjinleishi","sp_pangtong","sp_daqiao","sp_ganning","sp_xiahoudun","sp_lvmeng","sp_zhangfei","sp_liubei"],
 				sp_sticker:['sp_gongsunzan','sp_simazhao','sp_wangyuanji','sp_xinxianying','sp_liuxie'],
@@ -17,7 +17,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		character:{
-			ol_lisu:['male','qun',3,['qiaoyan','xianzhu'],['unseen']],
 			luyusheng:['female','wu',3,['zhente','zhiwei']],
 			ol_xinxianying:['female','wei',3,['xincaishi','xinzhongjian']],
 			huaxin:['male','wei',3,['wanggui','xibing']],
@@ -401,107 +400,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
-			//李肃
-			qiaoyan:{
-				trigger:{player:'damageBegin2'},
-				forced:true,
-				filter:function(event,player){
-					return player!=_status.currentPhase&&event.source&&event.source!=player;
-				},
-				logTarget:'source',
-				content:function(){
-					'step 0'
-					var cards=player.getStorage('qiaoyan');
-					if(cards.length){
-						var source=trigger.source;
-						player.$give(cards,source,false);
-						source.gain(cards,'log');
-						player.unmarkAuto('qiaoyan',cards);
-						event.goto(3);
-					}
-					else{
-						trigger.cancel();
-						player.draw();
-					}
-					'step 1'
-					var hs=player.getCards('he');
-					if(!hs.length) event.finish();
-					else if(hs.length==1) event._result={bool:true,cards:hs};
-					else player.chooseCard('he',true,'将一张牌作为“珠”置于武将牌上');
-					'step 2'
-					if(result.bool&&result.cards&&result.cards.length){
-						var cards=result.cards;
-						player.lose(cards,ui.special,'visible','toStorage');
-						player.$give(cards,player,false);
-						player.markAuto('qiaoyan',cards);
-						game.log(player,'将',cards,'放在了武将牌上');
-					}
-					event.finish();
-					'step 3'
-					game.delayx();
-				},
-				marktext:'珠',
-				intro:{content:'cards',onunmark:'throw'},
-				ai:{
-					filterDamage:true,
-					skillTagFilter:function(player,tag,arg){
-						if(!player.getStorage('qiaoyan').length) return false;
-						if(arg&&arg.player){
-							if(arg.player.hasSkillTag('jueqing',false,player)) return false;
-						}
-					},
-					combo:'xianzhu',
-				},
-			},
-			xianzhu:{
-				trigger:{player:'phaseUseBegin'},
-				direct:true,
-				locked:true,
-				filter:function(event,player){
-					return player.storage.qiaoyan&&player.storage.qiaoyan.length>0;
-				},
-				content:function(){
-					'step 0'
-					event.cards=player.storage.qiaoyan;
-					player.chooseTarget(true,'请选择【献珠】的目标','令一名角色获得'+get.translation(event.cards)+'。若该角色不为你自己，则你令其视为对其攻击范围内的另一名角色使用【杀】').set('ai',function(target){
-						var player=_status.event.player;
-						var eff=get.sgn(get.attitude(player,target))*get.value(_status.event.getParent().cards);
-						if(player!=target) eff+=Math.max.apply(null,game.filterPlayer().map(function(current){
-							if(current!=target&&target.inRange(current)&&target.canUse('sha',current)) return get.effect(current,{name:'sha'},target,player);
-							return 0;
-						}));
-						return eff;
-					});
-					'step 1'
-					if(result.bool){
-						var target=result.targets[0];
-						event.target=target;
-						player.logSkill('xianzhu',target);
-						player.$give(cards,target,false);
-						target.gain(cards,'log');
-						player.unmarkAuto('qiaoyan',cards);
-					}
-					else event.finish();
-					'step 2'
-					game.delayx();
-					if(player!=target&&target.isIn()&&player.isIn()&&game.hasPlayer(function(current){
-						return current!=target&&target.inRange(current)&&target.canUse('sha',current);
-					})){
-						var str=get.translation(target);
-						player.chooseTarget(true,'选择'+str+'攻击范围内的一名角色，视为'+str+'对其使用【杀】',function(card,player,target){
-							var source=_status.event.target;
-							return source.inRange(target)&&source.canUse('sha',target);
-						}).set('target',target).set('ai',function(target){
-							var evt=_status.event;
-							return get.effect(target,{name:'sha'},evt.target,evt.player)
-						});
-					}
-					else event.finish();
-					'step 3'
-					if(result.bool) target.useCard({name:'sha',isCard:true},result.targets[0],false);
-				},
-				ai:{combo:'qiaoyan'},
-			},
 			//陆郁生
 			zhente:{
 				audio:2,
@@ -7399,6 +7297,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'rejici2',
 			},
 			rejici2:{
+				audio:'jici',
 				trigger:{player:'die'},
 				forced:true,
 				forceDie:true,
@@ -7738,47 +7637,69 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!event.source) return false;
 					var nh1=player.countCards('h');
 					var nh2=event.source.countCards('h');
-					if(nh1==nh2) return false;
-					if(nh2<nh2&&nh1>=5) return false;
-					if(nh2>nh2&&event.source.isDead()) return false;
-					return true;
+					var eh=player.countCards('e');
+					if((nh1+eh)>nh2&&event.source.isAlive()) return true;
+					if(nh1<Math.min(5,nh2)) return true;
 				},
 				direct:true,
 				content:function(){
 					"step 0"
 					var num1=player.countCards('h');
 					var num2=trigger.source.countCards('h');
-					if(num1>num2){
-						var next=player.chooseToDiscard([num2+1,num1],'贲育：是否弃置至少'+(num2+1)+'张手牌,并对'+get.translation(trigger.source)+'造成一点伤害？');
-						next.logSkill=['benyu',trigger.source];
-						next.set('ai',function(card){
-							var trigger=_status.event.getTrigger();
-							var player=_status.event.player;
-							if(ui.selected.cards.length>=_status.event.num){
-								return -1;
-							}
-							if(get.damageEffect(trigger.source,player,player)>0&&_status.event.num<=2){
-								return 8-get.value(card);
-							}
-							return -1;
-						});
-						next.set('num',num2+1);
+					var eh=player.countCards('he',function(card){
+						return lib.filter.cardDiscardable(card,player,'benyu');
+					});
+					var bool1=false,bool2=false;
+					if(num1<Math.min(num2,5)) bool1=true;
+					if(eh>num2&&trigger.source.isAlive()) bool2=true;
+					if(bool1&&bool2){
+						event.chosen=true;
+						player.chooseControl('cancel2').set('prompt',get.prompt('benyu',trigger.source)).set('choiceList',[
+							'将手牌摸至'+get.cnNumber(Math.min(num2,5))+'张',
+							'弃置至少'+get.cnNumber(num2+1)+'张牌并对其造成1点伤害',
+						])
+					}
+					else if(bool2) event.goto(3);
+					"step 1"
+					if(event.chosen){
+						if(result.control=='cancel2') event.finish();
+						else if(result.index==1) event.goto(3);
+						else event._result={bool:true};
+					}
+					else player.chooseBool(get.prompt('benyu',trigger.source),'将手牌摸至'+get.cnNumber(Math.min(trigger.source.countCards('h'),5))+'张');
+					"step 2"
+					if(result.bool){
+						player.logSkill('benyu',trigger.source);
+						player.drawTo(Math.min(trigger.source.countCards('h'),5));
+					}
+					event.finish();
+					"step 3"
+					var num=trigger.source.countCards('h')+1;
+					var args=[[num,player.countCards('he')],'he'];
+					if(event.chosen){
+						player.logSkill('benyu',trigger.source);
+						args.push(true);
 					}
 					else{
-						event.draw=true;
-						event.num=Math.min(num2,5)-num1;
-						player.chooseBool(get.prompt2('benyu'));
+						args.push(get.prompt('benyu',trigger.source));
+						args.push('弃置'+get.cnNumber(num)+'张牌并对其造成1点伤害');
 					}
-					"step 1"
-					if(result.bool){
-						if(event.draw){
-							player.logSkill('benyu',trigger.source);
-							player.draw(event.num);
+					var next=player.chooseToDiscard.apply(player,args);
+					if(!event.chosen) next.logSkill=['benyu',trigger.source];
+					next.set('ai',function(card){
+						var trigger=_status.event.getTrigger();
+						var player=_status.event.player;
+						if(ui.selected.cards.length>=_status.event.num){
+							return -1;
 						}
-						else{
-							trigger.source.damage(player);
+						if(get.damageEffect(trigger.source,player,player)>0&&(get.value(card,player)<0||_status.event.num<=2)){
+							return 8-get.value(card);
 						}
-					}
+						return -1;
+					});
+					next.set('num',num);
+					"step 4"
+					if(result.bool) trigger.source.damage();
 				},
 			},
 			jili:{
@@ -16075,7 +15996,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			regushe_info:'出牌阶段，若X小于7，则你可以用一张手牌与至多三名角色同时拼点，然后依次结算拼点结果，没赢的角色选择一项：1.弃置一张牌；2.令你摸一张牌。若你没赢，你获得一个“饶舌”标记。当你获得第7个“饶舌”标记时，你死亡。（X为你的“饶舌”标记数与本回合因“鼓舌”拼点而胜利的次数之和）',
 			rejici:'激词',
 			rejici2:'激词',
-			rejici_info:'锁定技，当你展示拼点牌后，若此牌的点数不大于X，则你令此牌点数+X，并获得此次拼点中原点数最大的拼点牌。',
+			rejici_info:'锁定技，当你展示拼点牌后，若此牌的点数不大于X，则你令此牌点数+X，并获得此次拼点中原点数最大的拼点牌。当你死亡时，你令杀死你的角色弃置7-X张牌并失去1点体力。（X为你的“饶舌”标记数）',
 			gushe:'鼓舌',
 			gushe_bg:'舌',
 			gushe_info:'出牌阶段限一次，你可以用一张手牌与至多三名角色同时拼点，然后依次结算拼点结果，没赢的角色选择一项：1.弃置一张牌；2.令你摸一张牌。若你没赢，你获得一个“饶舌”标记。当你获得第7个“饶舌”标记时，你死亡。',
@@ -16517,11 +16438,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhiwei2:'至微',
 			zhiwei_info:'游戏开始时，你选择一名其他角色。该角色造成伤害后，你摸一张牌，该角色受到伤害后，你随机弃置一张手牌。你弃牌阶段弃置的牌均被该角色获得。 ',
 			zhiwei_info_guozhan:'你明置此武将牌时，选择一名其他角色。该角色造成伤害后，你摸一张牌，该角色受到伤害后，你随机弃置一张手牌。你弃牌阶段弃置的牌均被该角色获得。该角色死亡时，若你的两个武将牌均明置，你暗置此武将牌。 ',
-			ol_lisu:'OL李肃',
-			qiaoyan:'巧言',
-			qiaoyan_info:'锁定技，当你于回合外受到其他角色造成的伤害时，若你：有“珠”，则你令伤害来源获得“珠”；没有“珠”，则你防止此伤害，然后摸一张牌，并将一张牌正面朝上置于武将牌上，称为“珠”。',
-			xianzhu:'献珠',
-			xianzhu_info:'锁定技，出牌阶段开始时，你令一名角色A获得“珠”。若A不为你自己，则你选择A攻击范围内的一名角色B，视为A对B使用一张【杀】。',
 			
 			sp_default:"常规",
 			sp_zhongdan:"忠胆英杰",

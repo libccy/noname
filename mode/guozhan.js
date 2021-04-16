@@ -26,6 +26,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			}
+			if(lib.skill.sanchen) lib.skill.sanchen.derivation='pozhu';
 		},
 		onreinit:function(){
 			var pack=lib.characterPack.mode_guozhan;
@@ -140,6 +141,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					lib.characterReplace={};
+					if(lib.skill.sanchen) lib.skill.sanchen.derivation='pozhu';
 				},_status.mode);
 				game.randomMapOL();
 			}
@@ -285,7 +287,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				'gz_shamoke','gz_lifeng','gz_wangping',
 				'gz_xiaoqiao','gz_zhoutai','gz_lvfan',
 				'gz_beimihu','gz_mateng','gz_jiaxu',
-				'gz_jin_wangyuanji','gz_huaxin',
+				'gz_jin_wangyuanji','gz_huaxin','gz_duyu',
 			],
 			'7':[
 				'gz_zhanghe','gz_jianggan','gz_simayi',
@@ -305,6 +307,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				'gz_liushan','gz_pangtong','gz_zhaoyun',
 				'gz_re_lusu','gz_sunquan','gz_ganning',
 				'gz_zhangxiu','gz_liqueguosi','gz_huatuo',
+				'gz_zhanghuyuechen',
 			],
 			'4':[
 				'gz_dianwei','gz_dengai','gz_xunyu',
@@ -343,7 +346,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				guozhan_bian:["gz_liqueguosi","gz_zuoci","gz_bianfuren","gz_xunyou","gz_lingtong","gz_lvfan","gz_masu","gz_shamoke",],
 				guozhan_quan:["gz_cuimao","gz_yujin","gz_wangping","gz_fazheng","gz_wuguotai","gz_lukang","gz_yuanshu","gz_zhangxiu"],
 				guozhan_jun:["gz_jun_caocao","gz_jun_sunquan","gz_jun_liubei","gz_jun_zhangjiao"],
-				guozhan_jin:['gz_jin_simayi','gz_jin_simazhao','gz_jin_simashi','gz_jin_zhangchunhua','gz_jin_wangyuanji','gz_jin_xiahouhui'],
+				guozhan_jin:['gz_jin_simayi','gz_jin_simazhao','gz_jin_simashi','gz_jin_zhangchunhua','gz_jin_wangyuanji','gz_jin_xiahouhui','gz_duyu','gz_zhanghuyuechen'],
 				guozhan_double:['gz_tangzi','gz_liuqi','gz_mengda','gz_mifangfushiren','gz_zhanglu','gz_shixie'],
 				guozhan_zongheng:['gz_huaxin','gz_luyusheng'],
 				guozhan_others:["gz_lingcao","gz_lifeng","gz_beimihu","gz_jianggan"],
@@ -487,6 +490,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_jin_simazhao:['male','jin',3,['choufa','zhaoran']],
 				gz_jin_xiahouhui:['female','jin',3,['jyishi','shiduo']],
 				gz_jin_simashi:['male','jin',3,['yimie','tairan']],
+				gz_duyu:['male','jin',4,['sanchen']],
+				gz_zhanghuyuechen:['male','jin',4,['xijue']],
 			}
 		},
 		skill:{
@@ -1053,7 +1058,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.logSkill('mffengshi');
 							source.line(player,'green');
 						}
-						trigger.getParent().baseDamage++;
+						if(get.tag(trigger.card,'damage')) trigger.getParent().baseDamage++;
 						source.chooseToDiscard('he',true);
 					}
 					else event.finish();
@@ -2486,8 +2491,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(player.hasSkill('new_paoxiao',true)||player.getEquip('zhuge')) return 0;
 							if(player.countCards('h',function(cardx){
 								return cardx!=card&&cardx.name=='sha'&&player.hasUseTarget(cardx);
-							})<2) return 0;
-							return 6.5-get.value(card);
+							})<(player.getCardUsable('sha')+1)) return 0;
+							return 7-get.value(card);
 						},
 						content:function(){
 							'step 0'

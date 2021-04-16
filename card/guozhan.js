@@ -17,9 +17,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					globalFrom:-1,
 					globalTo:+1,
 				},
-				onEquip:function(){
-					var cards=player.getCards('e',{subtype:['equip3','equip4']});
-					if(cards.length) player.discard(cards);
+				customSwap:function(card){
+					var type=get.subtype(card,false);
+					return type=='equip3'||type=='equip4'||type=='equip6';
 				},
 				skills:['liulongcanjia'],
 				ai:{

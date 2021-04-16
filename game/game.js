@@ -10473,7 +10473,7 @@
 					var e2=target.getCards('e');
 					var todis2=[];
 					for(var i=0;i<e2.length;i++){
-						if(player.isDisabled(get.subtype(e2[i]))) todis1.push(e2[i]);
+						if(player.isDisabled(get.subtype(e2[i]))) todis2.push(e2[i]);
 					}
 					target.discard(todis2);
 					"step 1"
@@ -19646,6 +19646,7 @@
 						if(this.num<=0){
 							delete this.filterStop;
 							this.trigger('damageZero');
+							this.finish();
 							this._triggered=null;
 							return true;
 						}

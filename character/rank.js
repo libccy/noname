@@ -630,6 +630,7 @@ window.noname_character_rank={
 		'hanfu',
 		're_quyi',
 		'zhanghuyuechen',
+		'fanyufeng',
 		'key_kengo',
 		'key_riki',
 		'key_hinata',
@@ -649,6 +650,7 @@ window.noname_character_rank={
 		're_fuhuanghou',
 		're_gongsunyuan',
 		're_caozhen',
+		'ol_lisu',
 	],
 	b:[
 		'diy_feishi',
@@ -1284,6 +1286,7 @@ window.noname_character_rank={
 			'jin_simashi',
 			'zhangling',
 			'ns_luyusheng',
+			'fanyufeng',
 			'key_haruko',
 			'key_akiko',
 			'key_sunohara',
@@ -1580,6 +1583,8 @@ window.noname_character_rank={
 			're_chunyuqiong',
 			'sp_chenzhen',
 			'sp_wangcan',
+			'lisu',
+			'ol_lisu',
 		],
 		junk:[
 			'sunshao',

@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.109.3.1',
+	'v1.9.109.3.2',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -689,6 +689,8 @@ window.noname_asset_list=[
 	'audio/die/sp_sunshao.mp3',
 	'audio/die/sp_wangcan.mp3',
 	'audio/die/sp_xunchen.mp3',
+	'audio/die/fanyufeng.mp3',
+	'audio/die/ol_lisu.mp3',
 
 	'audio/skill/decadezishou1.mp3',
 	'audio/skill/decadezishou2.mp3',
@@ -3025,6 +3027,14 @@ window.noname_asset_list=[
 	'audio/skill/spshanxi2.mp3',
 	'audio/skill/zuici1.mp3',
 	'audio/skill/zuici2.mp3',
+	'audio/skill/bazhan1.mp3',
+	'audio/skill/bazhan2.mp3',
+	'audio/skill/jiaoying1.mp3',
+	'audio/skill/jiaoying2.mp3',
+	'audio/skill/qiaoyan1.mp3',
+	'audio/skill/qiaoyan2.mp3',
+	'audio/skill/xianzhu1.mp3',
+	'audio/skill/xianzhu2.mp3',
 	
 	'audio/voice/male/0.mp3',
 	'audio/voice/male/1.mp3',
@@ -3137,6 +3147,7 @@ window.noname_asset_list=[
 	'image/card/kamome_suitcase.png',
 	'image/card/miki_hydrogladiator.png',
 	'image/card/hina_shenji.png',
+	'image/card/miki_binoculars.png',
 
 	'image/card/bagua.png',
 	'image/card/baihupifeng.png',
@@ -3812,6 +3823,8 @@ window.noname_asset_list=[
 	'image/character/mifangfushiren.jpg',
 	'image/character/tangzi.jpg',
 	'image/character/key_yukito.jpg',
+	'image/character/fanyufeng.jpg',
+	'image/character/ol_lisu.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
