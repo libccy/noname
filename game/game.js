@@ -6772,6 +6772,7 @@
 						if(type=='character'){
 							if(lib.characterPack['mode_'+mode]&&lib.characterPack['mode_'+mode][name]){
 								if(mode=='guozhan'){
+									nameinfo=lib.character[name];
 									if(name.indexOf('gz_shibing')==0){
 										name=name.slice(3,11);
 									}
@@ -10106,6 +10107,7 @@
 					event.trigger('showCharacterEnd');
 					'step 1'
 					event.trigger('showCharacterAfter');
+					if(get.mode()=='identity'&&player.isZhu) event.trigger('zhuUpdate');
 				},
 				removeCharacter:function(){
 					player.$removeCharacter(event.num);
@@ -20243,7 +20245,15 @@
 					if(lib.translate[name]){
 						this.trySkillAnimate(name,popname,checkShow);
 						if(typeof targets=='object'&&targets.length){
-							var str=(targets[0]==this?'#b自己':targets);
+							var str;
+							if(targets[0]==this){
+								str='#b自己';
+								if(targets.length>1){
+									str+='、';
+									str+=get.translation(targets.slice(1));
+								}
+							}
+							else str=targets;
 							game.log(this,'对',str,'发动了','【'+get.skillTranslation(name,this)+'】');
 						}
 						else{

@@ -12052,7 +12052,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterReplace:{
 			caozhi:['re_caozhi','caozhi'],
-			zhangchunhua:['jin_zhangchunhua','zhangchunhua','mini_zhangchunhua'],
+			zhangchunhua:['zhangchunhua','mini_zhangchunhua'],
 			yujin:['yujin_yujin','re_yujin','ol_yujin','xin_yujin','yujin'],
 			xushu:['re_xushu','xin_xushu','xushu'],
 			fazheng:['re_fazheng','xin_fazheng','fazheng'],
@@ -12087,7 +12087,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunluban:['re_sunluban','sunluban'],
 			zhuhuan:['zhuhuan','old_zhuhuan'],
 			caoxiu:['re_caoxiu','caoxiu','old_caoxiu'],
-			xiahoushi:['xiahoushi','sp_xiahoushi'],
+			//xiahoushi:['xiahoushi','sp_xiahoushi'],
 			zhangyi:['re_zhangyi','zhangyi'],
 			quancong:['re_quancong','quancong','old_quancong'],
 			sunxiu:['re_sunxiu','sunxiu'],

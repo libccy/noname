@@ -2654,6 +2654,29 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							['在下一关中召唤胡班一同战斗',function(){
 								_status.qianlidanji.addFellow('huban');
 							}],
+							['将一张宝物牌置入装备区并摸一张牌',function(){
+								var card=get.cardPile(function(card){
+									return get.subtype(card)=='equip5'&&!get.cardtag(card,'gifts');
+								});
+								if(card) game.zhu.equip(card);
+								game.zhu.draw();
+							}],
+							['摸五张牌，然后将自己翻面',function(){
+								game.zhu.draw(5);
+								game.zhu.turnOver(true);
+							}],
+							['获得一张【酒】和一张【杀】',function(){
+								var list=[];
+								var card=get.cardPile(function(card){
+										return card.name=='sha';
+									});
+								if(card) list.push(card);
+								var card=get.cardPile(function(card){
+										return card.name=='jiu';
+									});
+								if(card) list.push(card);
+								if(list.length) game.zhu.gain(list,'gain2','log');
+							}],
 						],
 						replace_character:function(){
 							'step 0'
@@ -2941,7 +2964,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
    						character:{
    							pujing:['male','qun',1,[],[]],
    							huban:['male','qun',2,[],[]],
-   							caiyang:['male','qun',1,[],[]],
+   							caiyang:['male','qun',1,['zhuixi'],[]],
    						},
    						translate:{
    							pujing:'普净',

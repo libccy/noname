@@ -299,7 +299,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			'6':[
 				'gz_zhenji','gz_guojia','gz_yujin',
 				'gz_jiangwei','gz_zhangfei','gz_sp_zhugeliang',
-				'gz_zhouyu','gz_lingcao','gz_daqiao','gz_luyusheng',
+				'gz_zhouyu','gz_lingcao','gz_daqiao','gz_dingfeng',
 				'gz_yuji','gz_caiwenji','gz_diaochan','gz_zuoci',
 			],
 			'5':[
@@ -326,7 +326,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			'2':[
 				'gz_cuimao','gz_xiahouyuan','gz_caohong',
 				'gz_zhurong','gz_zhurong','gz_jiangfei',
-				'gz_xusheng','gz_dingfeng','gz_sunjian',
+				'gz_xusheng','gz_luyusheng','gz_sunjian',
 				'gz_zhangren','gz_kongrong','gz_yanwen',
 				'gz_jin_simayi',
 			],
@@ -419,7 +419,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_zhoutai:['male','wu',4,['buqu','new_fenji']],
 				gz_re_lusu:['male','wu',3,['haoshi','dimeng']],
 				gz_zhangzhang:['male','wu',3,['zhijian','guzheng']],
-				gz_dingfeng:['male','wu',4,['fenxun','duanbing'],['gzskin']],
+				gz_dingfeng:['male','wu',4,['reduanbing','refenxun'],['gzskin']],
 
 				gz_huatuo:['male','qun',3,['new_chuli','jijiu']],
 				gz_lvbu:['male','qun',5,['wushuang'],['gzskin']],
@@ -5386,7 +5386,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return player.countCards('h');
 				},
 				filterTarget:function(card,player,target){
-					return target.sameIdentityAs(player);
+					return target.isFriendOf(player);
 				},
 				check:function(card){
 					return 7-get.value(card);
@@ -7106,10 +7106,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(config.inline){
 						var next=target.getNext();
 						var previous=target.getPrevious();
-						return (next==player||previous==player||next&&next.inline(player)||previous&&previous.inline(player))
+						if(next==player||previous==player||next&&next.inline(player)||previous&&previous.inline(player)) return true;
 					}
-					else if(config.siege){
-						return (target==player.getNext().getNext()||target==player.getPrevious().getPrevious());
+					if(config.siege){
+						if(target==player.getNext().getNext()||target==player.getPrevious().getPrevious()) return true;
 					}
 					return false;
 				},
@@ -7133,7 +7133,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(lib.skill._zhenfazhaohuan.getConfig(player,event.current)){
 						player.line(event.current,'green');
 						if(event.current._group==player.group&&event.current.wontYe()){
-							event.current.chooseControl('明置主将','明置副将','取消').set('prompt','是否响应'+get.translation(player)+'的阵法召唤？').ai=function(){return Math.floor(Math.random()*3)};
+							event.current.chooseControl('明置主将','明置副将','取消').set('prompt','是否响应'+get.translation(player)+'的阵法召唤？').ai=function(){return Math.floor(Math.random()*2)};
 						}
 						else event.goto(3);
 					}

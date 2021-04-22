@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			zhaozhong:['male','qun',6,['yangzhong','huangkong']],
 			fanyufeng:['female','qun',3,['bazhan','jiaoying']],
 			ol_lisu:['male','qun',3,['qiaoyan','xianzhu']],
 			jin_yanghuiyu:['female','jin',3,['huirong','ciwei','caiyuan'],['hiddenSkill','unseen']],
@@ -100,7 +101,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_guandu:["sp_zhanghe","xunchen","sp_shenpei","gaolan","lvkuanglvxiang","chunyuqiong","sp_xuyou"],
 				sp_huangjin:['liuhong','zhujun','re_hejin','re_hansui','liubian'],
 				sp_fadong:['ol_dingyuan','wangrong','re_quyi','hanfu'],
-				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','re_sunluyu','caobuxing','ol_yujin','re_maliang','xin_baosanniang','re_xinxianying','dongxie','guozhao','fanyufeng'],
+				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','re_sunluyu','caobuxing','ol_yujin','re_maliang','xin_baosanniang','re_xinxianying','dongxie','guozhao','fanyufeng','zhaozhong'],
 				sp_mini:["mini_sunquan","mini_zuoci","mini_jiangwei","mini_diaochan","mini_zhangchunhua"],
 				sp_luanwu:["ns_lijue","ns_zhangji","ns_fanchou"],
 				sp_yongjian:["ns_chendao","yj_caoang"],
@@ -108,6 +109,42 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//赵忠
+			yangzhong:{
+				trigger:{
+					source:'damageSource',
+					player:'damageEnd',
+				},
+				direct:true,
+				filter:function(event,player){
+					var target=event.player,source=event.source;
+					if(player!=source&&!player.hasSkill('yangzhong')) return false;
+					if(!target||!source||!target.isAlive()||!source.isAlive()) return false;
+					return source.countCards('he')>1;
+				},
+				content:function(){
+					'step 0'
+					trigger.source.chooseToDiscard('是否对'+get.translation(trigger.player)+'发动【殃众】？','弃置两张牌，并令其失去1点体力','he',2).set('ai',function(card){
+						var evt=_status.event;
+						if(get.attitude(evt.player,evt.getTrigger().player)>=0) return 0;
+						return 7-get.value(card);
+					}).logSkill=['yangzhong',trigger.player];
+					'step 1'
+					if(result.bool) trigger.player.loseHp();
+				},
+			},
+			huangkong:{
+				trigger:{target:'useCardToTargeted'},
+				forced:true,
+				filter:function(event,player){
+					if(player==_status.currentPhase||event.targets.length!=1||player.countCards('h')) return false;
+					var type=get.type(event.card);
+					return ((type=='basic'||type=='trick')&&get.tag(event.card,'damage')>0);
+				},
+				content:function(){
+					player.draw(2);
+				},
+			},
 			//樊玉凤
 			bazhan:{
 				audio:2,
@@ -374,10 +411,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.cards=player.storage.qiaoyan;
 					player.chooseTarget(true,'请选择【献珠】的目标','令一名角色获得'+get.translation(event.cards)+'。若该角色不为你自己，则你令其视为对其攻击范围内的另一名角色使用【杀】').set('ai',function(target){
 						var player=_status.event.player;
-						var eff=get.sgn(get.attitude(player,target))*get.value(_status.event.getParent().cards);
-						if(player!=target) eff+=Math.max.apply(null,game.filterPlayer().map(function(current){
-							if(current!=target&&target.inRange(current)&&target.canUse('sha',current)) return get.effect(current,{name:'sha'},target,player);
-							return 0;
+						var eff=get.sgn(get.attitude(player,target))*get.value(_status.event.getParent().cards[0],target);
+						if(player!=target) eff+=Math.max.apply(null,game.filterPlayer(function(current){
+							if(current!=target&&target.inRange(current)&&target.canUse('sha',current)) return true;
+						}).map(function(current){
+							return get.effect(current,{name:'sha'},target,player);
 						}));
 						return eff;
 					});
@@ -9186,6 +9224,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shibao:'石苞（？～273年），字仲容，渤海南皮（今河北省南皮县）人。三国时曹魏至西晋重要将领，西晋开国功臣。西晋建立后，历任大司马、侍中、司徒等职，封乐陵郡公，卒后谥号为“武”。',
 			caoanmin:'曹安民（？-197年），沛国谯县（今安徽亳州）人，字安民。东汉时期人物，曹德之子，曹操之侄，曹昂的堂兄弟，曹丕的堂兄，死于宛城之战。按曹丕《典论》记载的“亡兄孝廉子脩、从兄安民遇害。”等情况来看，安民应该是曹操侄子错不了，曹丕是他们属于兄弟关系肯定不会弄错。另外从典论的记载来看安民是和子脩并提的，子脩是曹昂的字，安民则肯定也是字不是名，至于三国志中记载则应取自曹丕之《典论》但陈寿又不知曹安民其名，故写为“长子昂、弟子安民”。',
 			fanyufeng:'樊夫人，东汉末年人物，昔桂阳太守赵范寡嫂。赵云随刘备平定江南四郡后，刘备以赵云为桂阳太守。赵范居心叵测，要将自己的嫂嫂樊氏嫁给赵云，但遭到赵云的拒绝。后来，赵范逃走，樊氏也下落不明。2001年，应日本日中青少年文化中心成立50周年之邀，北京京剧院赴日进行40场巡回演出，这次访日的剧目都不同程度地进行了加工改编，以符合日本观众的需求。《取桂阳》是根据老本重新排演的，叶金援饰赵云，王怡饰樊玉凤。剧中的樊玉凤成为文武双全的巾帼英雄，被赵云收降，后来在《龙凤呈祥》中也参与堵截东吴的追兵。',
+			zhaozhong:'赵忠（？—189年），安平人，东汉末年宦官，赵延之兄。桓帝、灵帝时，历为小黄门、中常侍、大长秋、车骑将军等职，封都乡侯。在职时以搜刮暴敛、骄纵贪婪见称，灵帝极为宠信，常谓“赵常侍是我母”。中平六年（189年），何进谋诛宦官，事泄，他和其余几个常侍设计伏杀何进，袁绍、袁术等人闻何进被杀，入宫杀尽宦官，后捕杀赵忠。',
 		},
 		characterTitle:{
 			wulan:'#b对决限定武将',
@@ -9251,8 +9290,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dingyuan:['ol_dingyuan','dingyuan'],
 			quyi:['quyi','re_quyi'],
 			hansui:['xin_hansui','re_hansui'],
-			jin_simashi:['jin_simashi','simashi'],
-			jin_yanghuiyu:['jin_yanghuiyu','yanghuiyu'],
+			//jin_simashi:['jin_simashi','simashi'],
+			//jin_yanghuiyu:['jin_yanghuiyu','yanghuiyu'],
 			chunyuqiong:['chunyuqiong','re_chunyuqiong'],
 		},
 		translate:{
@@ -9777,6 +9816,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jiaoying3:'醮影',
 			jiaoying3_draw:'醮影',
 			jiaoying_info:'锁定技，其他角色获得你的手牌后，该角色本回合不能使用或打出与此牌颜色相同的牌。然后此回合结束时，若其本回合没有再使用牌，你令一名角色将手牌摸至体力上限（至多摸至五张）。',
+			zhaozhong:'赵忠',
+			yangzhong:'殃众',
+			yangzhong_info:'当你造成或受到伤害后，若受伤角色和伤害来源均存活，则伤害来源可弃置两张牌，然后令受伤角色失去1点体力。',
+			huangkong:'惶恐',
+			huangkong_info:'锁定技，当你于回合外成为【杀】或伤害类锦囊牌的唯一目标后，若你没有手牌，则你摸两张牌。',
 
 			sp_yingbian:'文德武备',
 			sp_whlw:"文和乱武",

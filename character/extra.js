@@ -44,7 +44,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			mini_zhugeliang:['male','shen',3,['qixing','minikuangfeng','minidawu'],['shu']],
 			mini_lvbu:['male','shen',6,['miniwuqian','minishenfen']],
-			mini_lvmeng:['male','shen',3,['shelie','minigongxin']],
+			mini_lvmeng:['male','shen',3,['shelie','minigongxin'],['wu']],
 		},
 		characterIntro:{
 			shen_guanyu:'关羽，字云长。曾水淹七军、擒于禁、斩庞德、威震华夏，吓得曹操差点迁都躲避，但是东吴偷袭荆州，关羽兵败被害。后传说吕蒙因关羽之魂索命而死。',
