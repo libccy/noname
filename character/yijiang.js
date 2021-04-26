@@ -21,7 +21,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_wangyi:['female','wei',3,['oldzhenlie','oldmiji']],
 			caozhang:['male','wei',4,['jiangchi']],
 			guohuai:['male','wei',4,['rejingce']],
-			zhangchunhua:['female','wei',3,['rejueqing','reshangshi']],
+			zhangchunhua:['female','wei',3,['jueqing','shangshi']],
 			caozhi:['male','wei',3,['luoying','jiushi']],
 			caochong:['male','wei',3,['chengxiang','renxin']],
 			xunyou:['male','wei',3,['qice','zhiyu']],
@@ -243,7 +243,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			rejueqing:{
-				audio:'jueqing',
+				audio:2,
 				trigger:{source:'damageBegin2'},
 				skillAnimation:true,
 				animationColor:'water',
@@ -252,19 +252,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				prompt2:function(event,player){
 					var num=get.cnNumber(2*event.num);
-					return '防止即将令其造成的伤害，改为令其失去'+num+'点体力并对自己造成'+num+'点伤害';
+					return '令即将对其造成的伤害翻倍至'+num+'，并令自己失去'+get.cnNumber(event.num)+'点体力';
 				},
 				check:function(event,player){
-					return player.hp>event.num*2&&event.player.hp>event.num&&event.player.hp<=2*event.num&&get.attitude(player,event.player)<0;
+					return player.hp>event.num&&event.player.hp>event.num&&!event.player.hasSkillTag('filterDamage',null,{
+						player:player,
+						card:event.card,
+					})&&get.attitude(player,event.player)<0;
 				},
 				logTarget:'player',
 				content:function(){
-					'step 0'
-					trigger.cancel();
-					trigger.player.loseHp(2*trigger.num);
-					player.damage(2*trigger.num);
-					'step 1'
-					player.addSkill('rejueqing_1st');
+					player.loseHp(trigger.num);
+					trigger.num*=2;
+					var next=game.createEvent('rejueqing_add',false);
+					event.next.remove(next);
+					trigger.after.push(next);
+					next.player=player;
+					next.setContent(function(){
+						player.addSkill('rejueqing_1st');
+					});
 				},
 				derivation:'rejueqing_rewrite',
 			},
@@ -286,7 +292,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			reshangshi:{
-				audio:'shangshi',
+				audio:2,
 				trigger:{
 					player:['loseAfter','changeHp','gainMaxHpAfter','loseMaxHpAfter'],
 					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
@@ -12030,7 +12036,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		dynamicTranslate:{
 			rejueqing:function(player){
 				if(player.hasSkill('rejueqing_1st')) return '锁定技，你即将造成的伤害均视为失去体力。';
-				return '当你对其他角色造成伤害时，你可以防止此伤害。若如此做，你令其失去2X点体力，修改〖绝情〗并对自己造成2X点伤害。';
+				return '当你对其他角色造成伤害时，你可以令此伤害值+X。若如此做，你失去X点体力，并于此伤害结算完成后修改〖绝情〗（X为伤害值）。';
 			},
 			reyanzhu:function(player){
 				if(!player.storage.reyanzhu) return '出牌阶段限一次，你可以令一名其他角色选择一项：将装备区里的所有牌交给你并令你修改〖宴诛〗和〖兴学〗，或弃置一张牌并令下一次受到的伤害+1直到其下回合开始。';
@@ -12052,7 +12058,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterReplace:{
 			caozhi:['re_caozhi','caozhi'],
-			zhangchunhua:['zhangchunhua','mini_zhangchunhua'],
+			zhangchunhua:['re_zhangchunhua','zhangchunhua','mini_zhangchunhua'],
 			yujin:['yujin_yujin','re_yujin','ol_yujin','xin_yujin','yujin'],
 			xushu:['re_xushu','xin_xushu','xushu'],
 			fazheng:['re_fazheng','xin_fazheng','fazheng'],
@@ -12068,7 +12074,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			madai:['old_madai','madai'],
 			liaohua:['xin_liaohua','re_liaohua','liaohua'],
 			bulianshi:['re_bulianshi','bulianshi','old_bulianshi'],
-			handang:['re_handang','handang'],
+			handang:['xin_handang','re_handang','handang'],
 			chengpu:['re_chengpu','chengpu','xin_chengpu'],
 			liubiao:['re_liubiao','xin_liubiao','liubiao'],
 			manchong:['re_manchong','manchong'],
@@ -12656,7 +12662,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_fuhun:'父魂',
 			old_fuhun_info:'摸牌阶段开始时，你可以放弃摸牌，改为从牌堆顶亮出两张牌并获得之，若亮出的牌颜色不同，你获得技能“武圣”、“咆哮”，直到回合结束。',
 			rejueqing:'绝情',
-			rejueqing_info:'当你对其他角色造成伤害时，你可以防止此伤害。若如此做，你令其失去2X点体力，修改〖绝情〗并对自己造成2X点伤害。',
+			rejueqing_info:'当你对其他角色造成伤害时，你可以令此伤害值+X。若如此做，你失去X点体力，并于此伤害结算完成后修改〖绝情〗（X为伤害值）。',
 			rejueqing_1st:'绝情',
 			rejueqing_rewrite:'绝情·改',
 			rejueqing_rewrite_info:'锁定技，你即将造成的伤害均视为失去体力。',

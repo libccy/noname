@@ -9,8 +9,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_huo:["ol_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","ol_pangtong","ol_yuanshao","ol_pangde","re_taishici"],
 				refresh_lin:['re_zhurong','re_menghuo','ol_sunjian','re_caopi','re_xuhuang','ol_dongzhuo'],
 				refresh_shan:['re_jiangwei','re_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce','ol_dengai'],
-				refresh_yijiang1:['re_wuguotai','re_gaoshun','re_caozhi','yujin_yujin','re_masu','xin_xusheng','re_fazheng','xin_lingtong'],
-				refresh_yijiang2:['old_madai','wangyi','guanzhang','re_handang','re_zhonghui','re_liaohua','re_chengpu','re_caozhang','re_bulianshi','xin_liubiao'],
+				refresh_yijiang1:['re_wuguotai','re_gaoshun','re_caozhi','yujin_yujin','re_masu','xin_xusheng','re_fazheng','xin_lingtong','re_zhangchunhua'],
+				refresh_yijiang2:['old_madai','wangyi','guanzhang','xin_handang','re_zhonghui','re_liaohua','re_chengpu','re_caozhang','re_bulianshi','xin_liubiao'],
 				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','re_yufan','re_liru','re_manchong','re_fuhuanghou'],
 				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen'],
 				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu','re_gongsunyuan'],
@@ -18,6 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		connect:true,
 		character:{
+			re_zhangchunhua:['female','wei',3,['rejueqing','reshangshi']],
 			re_gongsunyuan:['male','qun',4,['rehuaiyi']],
 			re_caozhen:['male','wei',4,['residi']],
 			re_fuhuanghou:['female','qun',3,['rezhuikong','reqiuyuan']],
@@ -42,7 +43,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_masu:['male','shu',3,['resanyao','rezhiman']],
 			re_sunluban:['female','wu',3,['rechanhui','rejiaojin']],
 			re_zhonghui:['male','wei',4,['requanji','zili']],
-			re_handang:['male','wu',4,['regongji','jiefan']],
+			xin_handang:['male','wu',4,['xingongji','xinjiefan']],
 			yujin_yujin:['male','wei',4,['rejieyue']],
 			re_caozhang:['male','wei',4,['new_jiangchi']],
 			re_chengpu:['male','wu',4,['decadelihuo','decadechunlao']],
@@ -127,8 +128,171 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		perfectPair:{
 			sunben:['zhouyu','taishici','daqiao'],
+			re_xushu:['zhaoyun','sp_zhugeliang'],
 		},
 		skill:{
+			xingongji:{
+				enable:'phaseUse',
+				usable:1,
+				audio:2,
+				position:'he',
+				filterCard:true,
+				filter:function(event,player){
+					return player.countCards('h')>0;
+				},
+				check:function(card){
+					var base=0,player=_status.event.player,suit=get.suit(card,player),added=false,added2=false,added3;
+					if(get.type(card)=='equip'&&game.hasPlayer(function(target){
+						var att=get.attitude(player,target);
+						if(att>=0) return 0;
+						if(target.countCards('he',function(card){
+							return get.value(card)>5;
+						})) return -att;
+					})) base+=6;
+					var hs=player.getCards('h');
+					var muniu=player.getEquip('muniu');
+					if(muniu&&card!=muniu&&muniu.cards) hs=hs.concat(muniu.cards);
+					for(var i of hs){
+						if(i!=card&&get.name(i)=='sha'){
+							if(get.suit(i,player)==suit){
+								if(player.hasValueTarget(i,false)){
+									added3=true;
+									base+=5.5;
+								}
+							}
+							else{
+								if(player.hasValueTarget(i,false)) added2=true;
+								if(!added&&!player.hasValueTarget(i,null,true)&&player.hasValueTarget(i,false,true)){
+									base+=4;
+									added=true;
+								}
+							}
+						}
+					}
+					if(added3&&!added2) base-=4.5;
+					return base-get.value(card);
+				},
+				content:function(){
+					"step 0"
+					if(!player.storage.xingongji2) player.storage.xingongji2=[];
+					player.storage.xingongji2.add(get.suit(cards[0],player));
+					player.addTempSkill('xingongji2');
+					"step 1"
+					if(get.type(cards[0],null,cards[0].original=='h'?player:false)=='equip'){
+						player.chooseTarget('是否弃置一名角色的一张牌？',function(card,player,target){
+							return player!=target&&target.countCards('he')>0;
+						}).set('ai',function(target){
+							var att=get.attitude(player,target);
+							if(att>=0) return 0;
+							if(target.countCards('he',function(card){
+								return get.value(card)>5;
+							})) return -att;
+							return -att*0.8;
+						});
+					}
+					else{
+						event.finish();
+					}
+					"step 2"
+					if(result.bool){
+						player.line(result.targets,'green');
+						player.discardPlayerCard(result.targets[0],'he',true);
+					}
+				},
+				ai:{
+					order:4.5,
+					result:{
+						player:1
+					}
+				}
+			},
+			xingongji2:{
+				charlotte:true,
+				onremove:true,
+				mod:{
+					attackFrom:function(){
+						return -Infinity;
+					},
+					cardUsable:function(card,player){
+						if(card.name=='sha'&&player.storage.xingongji2.contains(get.suit(card))) return Infinity;
+					},
+					aiOrder:function(player,card,num){
+						if(get.name(card)=='sha'&&!player.storage.xingongji2.contains(get.suit(card))) return num+1;
+					},
+				},
+				mark:true,
+				intro:{
+					content:'使用$花色的杀无次数限制',
+				},
+			},
+			xinjiefan:{
+				skillAnimation:true,
+				animationColor:'wood',
+				audio:2,
+				unique:true,
+				limited:true,
+				enable:'phaseUse',
+				filterTarget:true,
+				content:function(){
+					"step 0"
+					player.awakenSkill('xinjiefan');
+					event.players=game.filterPlayer(function(current){
+						return current!=target&&current.inRange(target);
+					});
+					event.players.sortBySeat();
+					"step 1"
+					if(event.players.length){
+						event.current=event.players.shift();
+						event.current.animate('target');
+						player.line(event.current,'green');
+						if(event.current.countCards('he')&&target.isAlive()){
+							event.current.chooseToDiscard({subtype:'equip1'},'he','弃置一张武器牌或让'+
+							get.translation(target)+'摸一张牌').set('ai',function(card){
+								if(get.attitude(_status.event.player,_status.event.target)<0) return 7-get.value(card);
+								return -1;
+							}).set('target',target);
+							event.tempbool=false;
+						}
+						else{
+							event.tempbool=true;
+						}
+					}
+					else{
+						if(game.roundNumber<=1) player.addTempSkill('xinjiefan2');
+						event.finish();
+					}
+					"step 2"
+					if(event.tempbool||result.bool==false){
+						target.draw();
+					}
+					event.goto(1);
+				},
+				ai:{
+					order:5,
+					result:{
+						target:function(player,target){
+							if(player.hp>2&&game.roundNumber>1){
+								if(game.phaseNumber<game.players.length*2) return 0;
+							}
+							var num=0,players=game.filterPlayer();
+							for(var i=0;i<players.length;i++){
+								if(players[i]!=target&&players[i].inRange(target)){
+									num++;
+								}
+							}
+							return num;
+						}
+					}
+				}
+			},
+			xinjiefan2:{
+				trigger:{player:'phaseEnd'},
+				forced:true,
+				popup:false,
+				content:function(){
+					player.restoreSkill('xinjiefan');
+				},
+			},
 			residi:{
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
@@ -1223,9 +1387,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.link();
 					delete event.result.skill;
 				},
-				group:'decadechunlao2',
+				group:['decadechunlao2','decadechunlaox'],
 				ai:{
 					jiuOther:true,
+				},
+			},
+			decadechunlaox:{
+				trigger:{player:'damageBegin2'},
+				silent:true,
+				lastDo:true,
+				filter:function(event,player){
+					return !player.isLinked();
+				},
+				content:function(){
+					trigger.decadechunlaox=true;
 				},
 			},
 			decadechunlao2:{
@@ -1235,7 +1410,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				prompt:'是否发动【醇醪】将武将牌重置？',
 				filter:function(event,player){
-					return player.isLinked()&&event.num>1;
+					return player.isLinked()&&event.num>1&&!event.decadechunlaox;
 				},
 				content:function(){
 					player.link();
@@ -8731,7 +8906,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olyajiao:'涯角',
 			olyajiao_info:'当你于回合外因使用或打出而失去手牌后，你可以展示牌堆顶的一张牌。若这两张牌的类别相同，你可以将展示的牌交给一名角色；若类别不同，你可弃置攻击范围内包含你的角色区域里的一张牌。',
 			re_zhonghui:'界钟会',
-			re_handang:'界韩当',
 			requanji:'权计',
 			requanji_info:'出牌阶段结束时，若你的手牌数大于体力值，或当你受到1点伤害后，你可以摸一张牌，然后将一张手牌置于武将牌上，称为“权”；你的手牌上限+X（X为“权”的数量）。',
 			regongji:'弓骑',
@@ -8839,6 +9013,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			residi2:'司敌',
 			residi3:'司敌',
 			residi_info:'结束阶段，你可以将一张非基本牌置于武将牌上，称为“司”。其他角色的出牌阶段开始时，你可以移去一张“司”。若如此做，其本阶段内不能使用或打出与“司”颜色相同的牌。此阶段结束时，若其于此阶段内未使用过：【杀】，你视为对其使用一张【杀】。锦囊牌，你摸两张牌。',
+			gz_re_xushu:'徐庶',
+			re_zhangchunhua:'界张春华',
+			xin_handang:'界韩当',
+			xingongji:'弓骑',
+			xingongji2:'弓骑',
+			xingongji_info:'出牌阶段限一次，你可以弃置一张牌，然后你的攻击范围视为无限且使用与此牌花色相同的【杀】无次数限制直到回合结束。若你以此法弃置的牌为装备牌，则你可以弃置一名其他角色的一张牌。',
+			xinjiefan:'解烦',
+			xinjiefan_info:'限定技，出牌阶段，你可以选择一名角色，令攻击范围内含有该角色的所有角色依次选择一项：1.弃置一张武器牌；2.令其摸一张牌。然后若游戏轮数为1，则你于此回合结束时恢复此技能。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

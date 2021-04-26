@@ -2502,25 +2502,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			abyusa_jueqing:{
 				trigger:{source:'damageBegin2'},
 				skillAnimation:true,
-				animationColor:'water',
+				animationColor:'metal',
 				filter:function(event,player){
 					return player!=event.player&&!player.hasSkill('abyusa_jueqing_1st');
 				},
 				prompt2:function(event,player){
-					var num=get.cnNumber(2*event.num);
-					return '防止即将令其造成的伤害，改为令其失去'+num+'点体力并对自己造成'+num+'点伤害';
+					return '令即将对其造成的伤害+'+event.num+'，并令自己失去'+get.cnNumber(event.num)+'点体力';
 				},
 				check:function(event,player){
-					return player.hp>event.num*2&&event.player.hp>event.num&&event.player.hp<=2*event.num&&get.attitude(player,event.player)<0;
+					return player.hp>event.num&&event.player.hp>event.num&&!event.player.hasSkillTag('filterDamage',null,{
+						player:player,
+						card:event.card,
+					})&&get.attitude(player,event.player)<0;
 				},
 				logTarget:'player',
 				content:function(){
-					'step 0'
-					trigger.cancel();
-					trigger.player.loseHp(2*trigger.num);
-					player.damage(2*trigger.num);
-					'step 1'
-					player.addSkill('abyusa_jueqing_1st');
+					player.loseHp(trigger.num);
+					trigger.num*=2;
+					var next=game.createEvent('abyusa_jueqing_add',false);
+					event.next.remove(next);
+					trigger.after.push(next);
+					next.player=player;
+					next.setContent(function(){
+						player.addSkill('abyusa_jueqing_1st');
+					});
 				},
 				derivation:'abyusa_jueqing_rewrite',
 			},
@@ -12825,7 +12830,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			abyusa_jueqing:function(player){
 				if(player.hasSkill('abyusa_jueqing_1st')) return '锁定技，你即将造成的伤害均视为失去体力。';
-				return '当你对其他角色造成伤害时，你可以防止此伤害。若如此做，你令其失去2X点体力，修改〖绝情〗并对自己造成2X点伤害。';
+				return '当你对其他角色造成伤害时，你可以令此伤害值+X。若如此做，你失去X点体力，并于此伤害结算完成后修改〖绝情〗（X为伤害值）。';
 			},
 			tomoya_shangxian:function(player){
 				if(player.storage.tomoya_shangxian) return '锁定技，你计算与其他角色的距离时始终从顺时针方向计算。出牌阶段开始时，你可摸一张牌，并改变此方向。';
@@ -13224,7 +13229,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			akiko_dongcha_info_identity:'锁定技，其他角色的手牌对你可见。游戏开始时，你令其他角色的身份牌对你可见。',
 			akiko_dongcha_info:'锁定技，其他角色的手牌对你可见。',
 			abyusa_jueqing:'绝情',
-			abyusa_jueqing_info:'当你对其他角色造成伤害时，你可以防止此伤害。若如此做，你令其失去2X点体力，修改〖绝情〗并对自己造成2X点伤害。',
+			abyusa_jueqing_info:'当你对其他角色造成伤害时，你可以令此伤害值+X。若如此做，你失去X点体力，并于此伤害结算完成后修改〖绝情〗（X为伤害值）。',
 			abyusa_jueqing_1st:'绝情',
 			abyusa_jueqing_rewrite:'绝情·改',
 			abyusa_jueqing_rewrite_info:'锁定技，你即将造成的伤害均视为失去体力。',

@@ -12,11 +12,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mobile_sunben:["re_sunben"],
 				mobile_standard:["xin_xiahoudun","xin_zhangfei"],
 				mobile_shenhua:["re_pangtong","re_guanqiujian","xin_yuanshao","re_liushan","re_dongzhuo","re_sp_zhugeliang","re_sunjian","re_dengai"],
-				mobile_yijiang1:["re_jikang","old_bulianshi","xin_liaohua","xin_caozhang","re_xusheng","xin_chengpu","xin_jianyong","xin_gongsunzan","xin_zhuran","re_lingtong","re_liubiao","xin_guohuai","xin_panzhangmazhong","xin_fuhuanghou"],
+				mobile_yijiang1:["re_jikang","old_bulianshi","xin_liaohua","xin_caozhang","re_xusheng","xin_chengpu","xin_jianyong","xin_gongsunzan","xin_zhuran","re_lingtong","re_liubiao","xin_guohuai","xin_panzhangmazhong","xin_fuhuanghou","re_handang"],
 				mobile_sp:["old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","re_heqi","liuzan","xin_hansui"],
 			},
 		},
 		character:{
+			re_handang:['male','wu',4,['regongji','jiefan']],
 			sp_wangcan:['male','wei',3,['spqiai','spshanxi']],
 			sp_chenzhen:['male','shu',3,['shameng']],
 			sp_sunshao:['male','wu',3,['fubi','zuici']],
@@ -4401,6 +4402,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.markSkill('rebiaozhao');
 					}
 				},
+				ai:{notemp:true},
 			},
 			"rebiaozhao2":{
 				trigger:{
@@ -6127,6 +6129,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zhaohuo:{
 				audio:2,
+				audioname:['re_taoqian'],
 				trigger:{global:'dying'},
 				forced:true,
 				//priority:12,
@@ -6143,6 +6146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yixiang:{
 				audio:2,
+				audioname:['re_taoqian'],
 				trigger:{target:'useCardToTargeted'},
 				frequent:true,
 				filter:function(event,player){
@@ -6181,6 +6185,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yirang:{
 				audio:2,
+				audioname:['re_taoqian'],
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
 				filter:function(event,player){
@@ -7699,6 +7704,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jianzhan_info:'出牌阶段限一次，你可选择一名其他角色A和其攻击范围内的另一名手牌数小于其的角色B。A选择一项：①视为对B使用一张【杀】。②令你摸一张牌。',
 			duoji:'夺冀',
 			duoji_info:'限定技，出牌阶段，你可弃置两张手牌并选择一名装备区有牌的其他角色。你获得其装备区里的所有牌。',
+			re_handang:'手杀韩当',
 			
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua:'手杀异构·神话再临',

@@ -4,6 +4,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			caosong:['male','wei',3,['cslilu','csyizheng']],
+			re_taoqian:['male','qun',3,['zhaohuo','reyixiang','yirang']],
 			zhaozhong:['male','qun',6,['yangzhong','huangkong']],
 			fanyufeng:['female','qun',3,['bazhan','jiaoying']],
 			ol_lisu:['male','qun',3,['qiaoyan','xianzhu']],
@@ -101,6 +103,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_guandu:["sp_zhanghe","xunchen","sp_shenpei","gaolan","lvkuanglvxiang","chunyuqiong","sp_xuyou"],
 				sp_huangjin:['liuhong','zhujun','re_hejin','re_hansui','liubian'],
 				sp_fadong:['ol_dingyuan','wangrong','re_quyi','hanfu'],
+				sp_xuzhou:['re_taoqian','caosong'],
 				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','re_sunluyu','caobuxing','ol_yujin','re_maliang','xin_baosanniang','re_xinxianying','dongxie','guozhao','fanyufeng','zhaozhong'],
 				sp_mini:["mini_sunquan","mini_zuoci","mini_jiangwei","mini_diaochan","mini_zhangchunhua"],
 				sp_luanwu:["ns_lijue","ns_zhangji","ns_fanchou"],
@@ -109,8 +112,178 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//陶谦和曹嵩
+			cslilu:{
+				audio:2,
+				trigger:{player:'phaseDrawBegin1'},
+				filter:function(event,player){
+					return !event.numFixed;
+				},
+				check:function(event,player){
+					return Math.min(player.maxHp,5)-player.countCards('h')>3||game.hasPlayer(function(current){
+						return current!=player&&get.attitude(player,current)>0;
+					});
+				},
+				content:function(){
+					'step 0'
+					trigger.changeToZero();
+					'step 1'
+					player.drawTo(Math.min(player.maxHp,5));
+					'step 2'
+					if(player.countCards('h')>0){
+						var str='将至少一张手牌交给一名其他角色';
+						var num=player.countMark('cslilu');
+						if(num<player.countCards('h')){
+							if(num>0) str+=('。若给出的牌数大于'+get.cnNumber(num)+'张，则你');
+							else str+='，并';
+							str+='加1点体力上限并回复1点体力'
+						}
+						player.chooseCardTarget({
+							prompt:str,
+							filterCard:true,
+							filterTarget:lib.filter.notMe,
+							selectCard:[1,Infinity],
+							forced:true,
+							ai1:function(card){
+								if(ui.selected.cards.length<_status.event.goon){
+									if(get.tag(card,'damage')&&game.hasPlayer(function(current){
+										current!=player&&get.attitude(player,current)>0&&!current.hasSkillTag('nogain')&&!current.hasJudge('lebu')&&current.hasValueTarget(card);
+									})) return 1;
+									return 1/Math.max(0.1,get.value(card));
+								}
+								return 0;
+							},
+							ai2:function(target){
+								return Math.sqrt(5-Math.max(4,target.countCards('h')))*get.attitude(_status.event.player,target);
+							},
+							goon:function(){
+								if(!game.hasPlayer(function(current){
+									return current!=player&&get.attitude(player,current)>0&&!current.hasSkillTag('nogain')&&!current.hasJudge('lebu');
+								})) return 1;
+								if(num<player.countCards('h')) return num+1;
+								return 1;
+							}(),
+						});
+					}
+					else event.finish();
+					'step 3'
+					if(result.bool){
+						var num=player.countMark('cslilu');
+						result.targets[0].gain(result.cards,player,'giveAuto');
+						if(result.cards.length>num){
+							player.gainMaxHp();
+							player.recover();
+						}
+						player.storage.cslilu=result.cards.length;
+						player.markSkill('cslilu');
+					}
+				},
+			},
+			csyizheng:{
+				audio:2,
+				trigger:{player:'phaseJieshuBegin'},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('csyizheng'),lib.filter.notMe).set('ai',function(target){
+						if(target.isTurnedOver()||target.hasJudge('lebu')) return 0;
+						return get.attitude(_status.event.player,target)*Math.max(0,target.countCards('h')-2);
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('csyizheng',target);
+						player.storage.csyizheng2=target;
+						player.addTempSkill('csyizheng2',{player:'phaseBegin'});
+					}
+				},
+			},
+			csyizheng2:{
+				audio:'csyizheng',
+				trigger:{
+					global:['recoverBegin','damageBegin1'],
+				},
+				forced:true,
+				charlotte:true,
+				logTarget:function(event){
+					return event.name=='damage'?event.source:event.player;
+				},
+				filter:function(event,player){
+					var target=lib.skill.csyizheng2.logTarget(event);
+					if(target!=player.storage.csyizheng2) return false;
+					return player.maxHp>target.maxHp;
+				},
+				content:function(){
+					player.loseMaxHp();
+					trigger.num++;
+				},
+				mark:'character',
+				intro:{
+					content:'$造成伤害或回复体力时，若你的体力上限大于其，则你减1点体力上限，然后此伤害/回复量+1',
+				},
+			},
+			reyixiang:{
+				audio:'yixiang',
+				audioname:['re_taoqian'],
+				trigger:{player:'damageBegin1'},
+				forced:true,
+				filter:function(event,player){
+					var evt=event.getParent(2);
+					if(evt.name!='useCard'||evt.card!=event.card) return false;
+					var source=evt.player;
+					var phsu=evt.getParent('phaseUse');
+					if(!source||source==player||source!=phsu.player) return false;
+					return source.getHistory('useCard',function(evt2){
+						return evt2.getParent('phaseUse')==phsu;
+					})[0]==evt;
+				},
+				content:function(){
+					trigger.num--;
+				},
+				group:'reyixiang_card',
+				subSkill:{
+					card:{
+						trigger:{target:'useCardToTargeted'},
+						forced:true,
+						filter:function(event,player){
+							if(get.color(event.card)!='black') return false;
+							var evt=event.getParent();
+							var source=evt.player;
+							var phsu=evt.getParent('phaseUse');
+							if(!source||source==player||source!=phsu.player) return false;
+							return source.getHistory('useCard',function(evt2){
+								return evt2.getParent('phaseUse')==phsu;
+							}).indexOf(evt)==1;
+						},
+						content:function(){
+							trigger.excluded.add(player);
+						},
+					},
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target,current,isLink){
+							if(isLink||!player.isPhaseUsing()) return;
+							var num;
+							var evt=_status.event.getParent('useCard'),evt2=_status.event.getParent('phaseUse');
+							if(evt.card==card){
+								num=player.getHistory('useCard',function(evt){
+									return evt.getParent('phaseUse')==evt2;
+								}).indexOf(evt);
+							}
+							else num=player.getHistory('useCard',function(evt){
+								return evt.getParent('phaseUse')==evt2;
+							}).length;
+							if(num<0||num>1) return;
+							if(num==0&&get.tag(card,'damage')) return 'zerotarget';
+							if(num==1&&get.color(card)=='black') return 'zeroplayertarget';
+						},
+					},
+				},
+			},
 			//赵忠
 			yangzhong:{
+				audio:2,
 				trigger:{
 					source:'damageSource',
 					player:'damageEnd',
@@ -134,6 +307,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			huangkong:{
+				audio:2,
 				trigger:{target:'useCardToTargeted'},
 				forced:true,
 				filter:function(event,player){
@@ -1182,7 +1356,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				firstDo:true,
 				filter:function(event,player){
-					return player.isPhaseUsing()&&lib.skill.quanbian.hasHand(event);
+					return player.isPhaseUsing()&&lib.skill.quanbian.hasHand(event)&&get.type(event.card)!='equip';
 				},
 				content:function(){
 					var stat=player.getStat('skill');
@@ -1192,7 +1366,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mod:{
 					cardEnabled2:function(card,player){
 						var stat=player.getStat('skill');
-						if(stat.quanbian&&stat.quanbian>=player.maxHp&&get.position(card)=='h') return false;
+						if(stat.quanbian&&stat.quanbian>=player.maxHp&&get.position(card)=='h'&&get.type(card,player)!='equip') return false;
 					},
 				},
 			},
@@ -1814,8 +1988,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					threaten:1.7,
 					result:{
 						target:function(player,target){
-							if(target.hasSkillTag('nogain')) return -0.1;
-							return 1;
+							if(target.hasSkillTag('nogain')) return 0.1;
+							return Math.sqrt(target.countCards('he'));
 						},
 					},
 				},
@@ -9225,6 +9399,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caoanmin:'曹安民（？-197年），沛国谯县（今安徽亳州）人，字安民。东汉时期人物，曹德之子，曹操之侄，曹昂的堂兄弟，曹丕的堂兄，死于宛城之战。按曹丕《典论》记载的“亡兄孝廉子脩、从兄安民遇害。”等情况来看，安民应该是曹操侄子错不了，曹丕是他们属于兄弟关系肯定不会弄错。另外从典论的记载来看安民是和子脩并提的，子脩是曹昂的字，安民则肯定也是字不是名，至于三国志中记载则应取自曹丕之《典论》但陈寿又不知曹安民其名，故写为“长子昂、弟子安民”。',
 			fanyufeng:'樊夫人，东汉末年人物，昔桂阳太守赵范寡嫂。赵云随刘备平定江南四郡后，刘备以赵云为桂阳太守。赵范居心叵测，要将自己的嫂嫂樊氏嫁给赵云，但遭到赵云的拒绝。后来，赵范逃走，樊氏也下落不明。2001年，应日本日中青少年文化中心成立50周年之邀，北京京剧院赴日进行40场巡回演出，这次访日的剧目都不同程度地进行了加工改编，以符合日本观众的需求。《取桂阳》是根据老本重新排演的，叶金援饰赵云，王怡饰樊玉凤。剧中的樊玉凤成为文武双全的巾帼英雄，被赵云收降，后来在《龙凤呈祥》中也参与堵截东吴的追兵。',
 			zhaozhong:'赵忠（？—189年），安平人，东汉末年宦官，赵延之兄。桓帝、灵帝时，历为小黄门、中常侍、大长秋、车骑将军等职，封都乡侯。在职时以搜刮暴敛、骄纵贪婪见称，灵帝极为宠信，常谓“赵常侍是我母”。中平六年（189年），何进谋诛宦官，事泄，他和其余几个常侍设计伏杀何进，袁绍、袁术等人闻何进被杀，入宫杀尽宦官，后捕杀赵忠。',
+			caosong:'曹嵩（？—194年），字巨高，沛郡谯县（今安徽省亳州市）人。东汉大臣，大长秋曹腾的养子，曹操之父亲。门荫入仕，历任司隶校尉、鸿胪卿、大司农，位列九卿，位高权重。中平四年（187年），靠着贿赂中官，出任太尉，位列三公。中平五年（188年），受累于黄巾之乱，坐罪免官。兴平元年（194年），投奔兖州牧曹操，遇害于徐州。延康元年（220年），追尊魏国太王。曹魏建立后，追尊皇帝，谥号为太。',
 		},
 		characterTitle:{
 			wulan:'#b对决限定武将',
@@ -9293,6 +9468,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//jin_simashi:['jin_simashi','simashi'],
 			//jin_yanghuiyu:['jin_yanghuiyu','yanghuiyu'],
 			chunyuqiong:['chunyuqiong','re_chunyuqiong'],
+			taoqian:['taoqian','re_taoqian'],
 		},
 		translate:{
 			lijue:"李傕",
@@ -9771,7 +9947,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gz_jin_simashi:'司马师',
 			gz_jin_xiahouhui:'夏侯徽',
 			xinquanbian:'权变',
-			xinquanbian_info:'出牌阶段，每当你首次使用/打出一种花色的手牌时，你可以从牌堆顶的X张牌中获得一张与此牌花色不同的牌，并将其余牌以任意顺序置于牌堆顶。出牌阶段，你至多可使用X张手牌。（X为你的体力上限）',
+			xinquanbian_info:'出牌阶段，每当你首次使用/打出一种花色的手牌时，你可以从牌堆顶的X张牌中获得一张与此牌花色不同的牌，并将其余牌以任意顺序置于牌堆顶。出牌阶段，你至多可使用X张非装备手牌。（X为你的体力上限）',
 			guozhao:'郭照',
 			pianchong:'偏宠',
 			pianchong2:'偏宠',
@@ -9821,6 +9997,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yangzhong_info:'当你造成或受到伤害后，若受伤角色和伤害来源均存活，则伤害来源可弃置两张牌，然后令受伤角色失去1点体力。',
 			huangkong:'惶恐',
 			huangkong_info:'锁定技，当你于回合外成为【杀】或伤害类锦囊牌的唯一目标后，若你没有手牌，则你摸两张牌。',
+			re_taoqian:'陶谦',
+			reyixiang:'义襄',
+			reyixiang_info:'锁定技，其他角色于其出牌阶段内使用的第一张牌对你的伤害-1；其使用的第二张牌若为黑色，则对你无效。',
+			caosong:'曹嵩',
+			cslilu:'礼赂',
+			cslilu_info:'摸牌阶段，你可以放弃摸牌，改为将手牌摸至X张，然后将至少一张手牌交给一名其他角色。若你以此法给出的牌数大于你上次以此法给出的牌数，则你加1点体力上限并回复1点体力。',
+			csyizheng:'翊正',
+			csyizheng2:'翊正',
+			csyizheng_info:'结束阶段开始时，你可以选择一名其他角色。你的下回合开始前，当该角色造成伤害或回复体力时，若其体力上限小于你，则你减1点体力上限，且令此伤害值/回复值+1。',
 
 			sp_yingbian:'文德武备',
 			sp_whlw:"文和乱武",
@@ -9833,6 +10018,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_guandu:'官渡之战',
 			sp_huangjin:'黄巾之乱',
 			sp_fadong:'诸侯伐董',
+			sp_xuzhou:'徐州风云',
 			sp_decade:'其他新服武将',
 			sp_mini:'欢乐三国杀',
 			sp_luanwu:'文和乱武·线下',

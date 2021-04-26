@@ -26246,17 +26246,15 @@
 				prompt:'将要重铸的牌置入弃牌堆并摸一张牌',
 				filter:function(event,player){
 					return player.hasCard(function(card){
-						var info=get.info(card);
-						if(typeof info.chongzhu=='function'){
-							return info.chongzhu(event,player);
-						}
-						return info.chongzhu;
+						return lib.skill._chongzhu.filterCard(card,player);
 					});
 				},
-				filterCard:function(card){
+				filterCard:function(card,player){
+					var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
+					if(mod!='unchanged') return mod;
 					var info=get.info(card);
 					if(typeof info.chongzhu=='function'){
-						return info.chongzhu(event,_status.event.player);
+						return info.chongzhu(event,player);
 					}
 					return info.chongzhu;
 				},

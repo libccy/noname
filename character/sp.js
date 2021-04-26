@@ -7725,7 +7725,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//priority:15,
 				audio:'shefu',
 				filter:function(event,player){
-					if(_status.currentPhase==player) return false;
+					if(_status.currentPhase==player||event.player==player) return false;
 					return player.storage.shefu2&&player.storage.shefu2.contains(event.card.name)&&event.player.getHistory('lose',function(evt){
 						return evt.getParent()==event&&evt.hs&&evt.hs.length==event.cards.length;
 					}).length;
@@ -16175,11 +16175,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jici:'激词',
 			jici_info:'当你因发动〖鼓舌〗而扣置的拼点牌亮出后，若点数小于X，你可令点数+X；若点数等于X，你可令你本回合发动〖鼓舌〗的次数上限+1。（X为你“饶舌”标记的数量）',
 			shefu:'设伏',
+			shefu2:'设伏',
 			shefu_bg:'伏',
 			shefu_info:'结束阶段开始时，你可以将一张牌移出游戏，称为「伏兵」。并为「伏兵」记录一个基本牌或锦囊牌的名称（须与其他「伏兵」记录的名称均不同）。你的回合外，当有其他角色使用与你记录的「伏兵」牌名相同的手牌时，你可以取消此牌的所有目标，然后移去该「伏兵」。若此时处于使用者的回合内，则你令使用者当前的所有非Charlotte技失效直至回合结束。',
 			benyu:'贲育',
 			benyu2:'贲育',
-			benyu_info:'当你受到伤害后，若你的手牌数不大于伤害来源的手牌数，你可以将手牌摸至与伤害来源手牌数相同（至多摸至5张）；否则你可以弃置大于伤害来源手牌数的手牌，然后对其造成1点伤害。',
+			benyu_info:'当你受到伤害后，你可选择：①将手牌摸至与伤害来源手牌数相同（至多摸至5张）；②弃置大于伤害来源手牌数的牌，然后对其造成1点伤害。',
 			zhidao:'雉盗',
 			zhidao_info:'锁定技，当你于你的回合内第一次对区域里有牌的其他角色造成伤害后，你获得其手牌、装备区和判定区里的各一张牌，然后直到回合结束，其他角色不能被选择为你使用牌的目标。',
 			jili:'寄篱',
