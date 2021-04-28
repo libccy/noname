@@ -73,7 +73,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		perfectPair:{
 			jiaxu:['liqueguosi'],
-			re_yuanshao:['yanwen'],
+			re_yuanshao:['yanwen','tianfeng'],
 			menghuo:['zhurong'],
 			sp_zhugeliang:['pangtong','huangyueying'],
 			sunce:['zhouyu','taishici','daqiao'],

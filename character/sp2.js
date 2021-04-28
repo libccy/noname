@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		character:{
 			caosong:['male','wei',3,['cslilu','csyizheng']],
-			re_taoqian:['male','qun',3,['zhaohuo','reyixiang','yirang']],
+			re_taoqian:['male','qun',3,['zhaohuo','reyixiang','reyirang']],
 			zhaozhong:['male','qun',6,['yangzhong','huangkong']],
 			fanyufeng:['female','qun',3,['bazhan','jiaoying']],
 			ol_lisu:['male','qun',3,['qiaoyan','xianzhu']],
@@ -113,6 +113,41 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			//陶谦和曹嵩
+			reyirang:{
+				audio:'yirang',
+				audioname:['re_taoqian'],
+				trigger:{player:'phaseUseBegin'},
+				direct:true,
+				filter:function(event,player){
+					if(!player.countCards('he',function(card){
+						return get.type(card)!='basic';
+					})){
+						return false;
+					}
+					return game.hasPlayer(function(current){
+						return current.maxHp>player.maxHp;
+					});
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('reyirang'),function(card,player,target){
+						return target.maxHp>player.maxHp;
+					}).set('ai',function(target){
+						return (get.attitude(_status.event.player,target)-2)*target.maxHp;
+					});
+					'step 1'
+					if(result.bool){
+						var cards=player.getCards('he',function(card){
+							return get.type(card)!='basic';
+						});
+						var target=result.targets[0];
+						player.logSkill('reyirang',target);
+						target.gain(cards,player,'give');
+						player.gainMaxHp(target.maxHp-player.maxHp,true);
+						player.recover(cards.length);
+					}
+				}
+			},
 			cslilu:{
 				audio:2,
 				trigger:{player:'phaseDrawBegin1'},
@@ -2674,7 +2709,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
-						player.logSkill('xinfu_wuniang',target);
+						player.logSkill('decadewuniang',target);
 						player.line(target,'fire');
 						player.gainPlayerCard(target,'he',true);
 						target.draw();
@@ -9892,7 +9927,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			duyu:'杜预',
 			sanchen:'三陈',
 			sanchen_info:'出牌阶段，你可选择一名本回合内未选择过的角色。其摸三张牌，然后弃置三张牌。若其未以此法弃置牌或以此法弃置的牌的类别均不相同，则其摸一张牌。否则你本阶段内不能再发动〖三陈〗。',
-			sanchen_info_guozhan:'出牌阶段，你可选择一名本回合内未选择过的角色。其摸三张牌，然后弃置三张牌。若其未以此法弃置牌或以此法弃置的牌的类别均不相同，则其摸一张牌且你获得技能〖破竹〗只到回合结束。否则你本阶段内不能再发动〖三陈〗。',
+			sanchen_info_guozhan:'出牌阶段，你可选择一名本回合内未选择过的角色。其摸三张牌，然后弃置三张牌。若其未以此法弃置牌或以此法弃置的牌的类别均不相同，则其摸一张牌且你获得技能〖破竹〗直到回合结束。否则你本阶段内不能再发动〖三陈〗。',
 			zhaotao:'诏讨',
 			zhaotao_info:'觉醒技，准备阶段，若你本局游戏内发动〖三陈〗的次数大于2，则你减1点体力上限并获得〖破竹〗。',
 			pozhu:'破竹',
@@ -10002,10 +10037,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reyixiang_info:'锁定技，其他角色于其出牌阶段内使用的第一张牌对你的伤害-1；其使用的第二张牌若为黑色，则对你无效。',
 			caosong:'曹嵩',
 			cslilu:'礼赂',
-			cslilu_info:'摸牌阶段，你可以放弃摸牌，改为将手牌摸至X张，然后将至少一张手牌交给一名其他角色。若你以此法给出的牌数大于你上次以此法给出的牌数，则你加1点体力上限并回复1点体力。',
+			cslilu_info:'摸牌阶段，你可以放弃摸牌，改为将手牌摸至X张（X为你的体力上限和5中的最小值），然后将至少一张手牌交给一名其他角色。若你以此法给出的牌数大于你上次以此法给出的牌数，则你加1点体力上限并回复1点体力。',
 			csyizheng:'翊正',
 			csyizheng2:'翊正',
 			csyizheng_info:'结束阶段开始时，你可以选择一名其他角色。你的下回合开始前，当该角色造成伤害或回复体力时，若其体力上限小于你，则你减1点体力上限，且令此伤害值/回复值+1。',
+			reyirang:'揖让',
+			reyirang_info:'出牌阶段开始时，你可以将所有非基本牌交给一名体力上限大于你的其他角色，然后调整体力上限至与该角色相同并回复X点体力（X为你以此法交给其的牌数）。',
 
 			sp_yingbian:'文德武备',
 			sp_whlw:"文和乱武",

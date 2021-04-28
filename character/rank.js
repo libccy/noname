@@ -967,6 +967,7 @@ window.noname_character_rank={
 		'xin_fuhuanghou',
 		'sp_xunchen',
 		'zhaozhong',
+		'zongyu',
 	],
 	c:[
 		'xiahoudun',

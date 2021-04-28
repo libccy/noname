@@ -6224,6 +6224,11 @@
 						init:true,
 						frequent:true
 					},
+					qunxionggeju:{
+						name:'群雄割据',
+						init:true,
+						frequent:true
+					},
 					duzhansanguo:{
 						name:'毒战三国',
 						init:true,
@@ -32877,6 +32882,7 @@
 					ui.playerids.style.display='';
 				}
 
+				if(mode[lib.config.mode].startBefore) mode[lib.config.mode].startBefore();
 				game.createEvent('game',false).setContent(mode[lib.config.mode].start);
 				if(lib.mode[lib.config.mode]&&lib.mode[lib.config.mode].fromextension){
 					var startstr=mode[lib.config.mode].start.toString();
@@ -34899,18 +34905,6 @@
 						button.node.group.dataset.nature='water';
 					}
 					else button.node.group.style.backgroundColor=get.translation('weiColor');
-				}
-				var group=get.is.double(button.link,true);
-				if(group&&group.length==2){
-					var str='';
-					for(var i of group){
-						str+=get.translation(i);
-					}
-					button.node.group.innerHTML=str;
-					if(button.classList.contains('newstyle')){
-						button.node.name.dataset.nature=get.groupnature(group[0]);
-						button.node.group.dataset.nature=get.groupnature(group[1]);
-					}
 				}
 			},
 			div:function(){
@@ -44026,16 +44020,9 @@
 					}
 					node.link=item;
 					if(type=='character'||type=='characterx'){
-						if(type=='characterx'&&item.indexOf('gz_')==0&&lib.character[item]&&lib.character[item][4]){
-							for(var ix of lib.character[item][4]){
-								if(ix.indexOf('doublegroup:')==0){
-									node._replaceButton=true;
-									node._changeGroup=ix.split(':').slice(1);
-									break;
-								}
-							}
-						}
-						else if(type=='characterx'&&lib.characterReplace[node._link]&&lib.characterReplace[node._link].length>1) node._replaceButton=true;
+						var double=get.is.double(node._link,true);
+						if(double) node._changeGroup=true;
+						if(type=='characterx'&&lib.characterReplace[node._link]&&lib.characterReplace[node._link].length>1) node._replaceButton=true;
 						var func=function(node,item){
 							node.setBackground(item,'character');
 							if(node.node){
@@ -44067,6 +44054,10 @@
 								node.node.name.dataset.nature=get.groupnature(infoitem[1]);
 								node.node.group.dataset.nature=get.groupnature(infoitem[1],'raw');
 								node.classList.add('newstyle');
+								if(double&&double.length){
+									node.node.name.dataset.nature=get.groupnature(double[0]);
+									node.node.group.dataset.nature=get.groupnature(double[double.length==2?1:0]);
+								}
 								ui.create.div(node.node.hp);
 								var textnode=ui.create.div('.text',get.numStr(infoitem[2]),node.node.hp);
 								if(infoitem[2]==0){
@@ -44109,7 +44100,18 @@
 								lib.setIntro(node);
 							}
 							if(infoitem[1]){
-								node.node.group.innerHTML='<div>'+get.translation(infoitem[1])+'</div>';
+								if(double){
+									var str='<div>';
+									if(double.length==2){
+										for(var i of double){
+											str+=get.translation(i);
+										}
+									}
+									else str+=get.translation(double[0]);
+									str+='</div>';
+									node.node.group.innerHTML=str;
+								}
+								else node.node.group.innerHTML='<div>'+get.translation(infoitem[1])+'</div>';
 								node.node.group.style.backgroundColor=get.translation(infoitem[1]+'Color');
 							}
 							else{
@@ -44120,23 +44122,7 @@
 								node.node.replaceButton=intro;
 								intro.innerHTML='切换';
 								intro._node=node;
-								if(node._changeGroup) intro.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
-									_status.tempNoButton=true;
-									var node=this._node;
-									var list=node._changeGroup;
-									var link=lib.character[node.link][1];
-									var index=list.indexOf(link);
-									if(index==list.length-1) index=0;
-									else index++;
-									lib.character[node.link][1]=list[index];
-									node.refresh(node,node.link);
-									game.uncheck();
-									game.check();
-									setTimeout(function(){
-										delete _status.tempNoButton;
-									},200);
-								});
-								else intro.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+								intro.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
 									_status.tempNoButton=true;
 									var node=this._node;
 									var list=lib.characterReplace[node._link];

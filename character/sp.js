@@ -10,13 +10,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_star:["sp_xiahoushi","jsp_zhaoyun","huangjinleishi","sp_pangtong","sp_daqiao","sp_ganning","sp_xiahoudun","sp_lvmeng","sp_zhangfei","sp_liubei"],
 				sp_sticker:['sp_gongsunzan','sp_simazhao','sp_wangyuanji','sp_xinxianying','sp_liuxie'],
 				sp_guozhan:["zangba","shamoke","ganfuren","yuejin","hetaihou","dingfeng","panfeng","jianggan"],
-				sp_guozhan2:["mifuren","mateng","tianfeng","chendong","sp_dongzhuo","jiangfei","jiangqing","kongrong","bianfuren","liqueguosi","lvfan","cuimao","jiling","zhangren","zoushi","huaxin","luyusheng"],
+				sp_guozhan2:["mifuren","mateng","tianfeng","chendong","sp_dongzhuo","jiangfei","jiangqing","kongrong","bianfuren","liqueguosi","lvfan","cuimao","jiling","zhangren","zoushi","huaxin","luyusheng","zongyu"],
 				sp_single:["niujin"],
 				sp_others:["hanba","caiyang"],
 			},
 		},
 		characterFilter:{},
 		character:{
+			zongyu:['male','shu',3,['zyqiao','chengshang']],
 			luyusheng:['female','wu',3,['zhente','zhiwei']],
 			ol_xinxianying:['female','wei',3,['xincaishi','xinzhongjian']],
 			huaxin:['male','wei',3,['wanggui','xibing']],
@@ -154,6 +155,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			zongyu:'宗预（？－264年），字德艳 ，荆州南阳郡安众县（今河南省南阳市）人。三国时期蜀汉官员、将领。曾随张飞入蜀助平益州，又受辟为丞相诸葛亮手下主簿，升任参军、右中郎将。诸葛亮逝世后，宗预受命出使孙吴，得到孙权的赞赏。迁后将军，出督永安，又升任征西大将军，并受封关内侯。公元258年（景耀元年），因病回成都，受任镇军大将军。蜀汉灭亡后，宗预随后主刘禅徙往洛阳，在中途病逝。宗预为人坦率耿直，多次出使孙吴并深得孙权的敬重，为吴、汉两国同盟的巩固作出了一定的贡献。',
 			mifangfushiren:'麋芳（生卒年不详），字子方，东海郡朐县（今江苏省连云港市）人。汉末三国时期蜀国将领，刘备糜夫人的兄弟。麋芳本为徐州牧陶谦部下，曾被曹操表为彭城相。后来辞官，随刘备从徐州辗转至邺城、汝南、新野、长坂坡、江夏等地，奔波多年。傅士仁（生卒年不详），字君义，幽州广阳郡（今北京市）人，刘备手下将领。受到刘备的重用，但被关羽轻慢。<br>刘备称汉中王时，糜芳为南郡太守，但受到关羽的轻慢。后来，因未完成供给军资的任务而被关羽责骂，心中不安。吕蒙袭取荆州时，将已经投降的傅士仁展示给糜芳，麋芳于是选择投降，导致关羽兵败被杀。此后，在吴国担任将军，并且为吴征伐。',
 			mengda:'孟达（?－228），字子度，本字子敬，因刘备的叔父名叫刘子敬，为避讳而改字。扶风郡郿人，三国时期人物。本为刘璋属下，后降刘备。关羽围樊城、襄阳时因不发兵救关羽而触怒刘备，于是投奔曹魏。此后，劝降刘封，未果。在魏官至散骑常侍、建武将军，封平阳亭侯。此后又欲反曹魏而归蜀汉，事败而死。',
 			luyusheng:'陆郁生（？年-？），三国时期吴国官员陆绩之女。陆郁生的父亲陆绩是吴郡公认的才子，又是当时吴郡陆氏的领袖。陆绩赴任担任郁林太守，遂取此名。陆郁生年少的时候就定下坚贞的志向。建安二十四年（219年)，陆绩早亡，她与两个兄弟陆宏、陆睿当时都只有几岁，一起返回吴县，被他们的从兄陆瑁接回抚养。13周岁的陆郁生嫁给同郡出身的张白为妻。出嫁3个月后，张白因为其兄张温一族的案件遭到连坐，被处以流刑，后死于流放地，陆郁生成为了寡妇，其后公开宣言不再改嫁，困难于生计但拒绝了所有提亲，在艰苦中从未停止服侍、照顾张白的姐妹。事情传到朝廷，皇帝褒奖陆郁生，号其为“义姑”。她的表侄姚信在文集中称赞她的义举。',
@@ -400,6 +402,64 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//宗预
+			zyqiao:{
+				audio:2,
+				trigger:{target:'useCardToTargeted'},
+				logTarget:'player',
+				usable:2,
+				filter:function(event,player){
+					var source=event.player;
+					if(source==player) return false;
+					if(get.mode()=='guozhan'&&source.isFriendOf(player)) return false;
+					return source.countDiscardableCards(player,'he')>0;
+				},
+				check:function(event,player){
+					var target=event.player;
+					if(get.attitude(player,target)>=0) return false;
+					if(!player.countCards('he',function(card){
+						return lib.filter.cardDiscardable(card,player,'zyqiao');
+					})) return true;
+					if(player.countCards('he',(card)=>get.value(card,player)<5)) return true;
+					if(target.countCards('he',(card)=>get.value(card,target)>6)&&player.countCards('he',(card)=>get.value(card,player)<7)) return true;
+					return false;
+				},
+				content:function(){
+					'step 0'
+					player.discardPlayerCard(trigger.player,true,'he');
+					'step 1'
+					if(player.countCards('he',function(card){
+						return lib.filter.cardDiscardable(card,player,'zyqiao');
+					})) player.chooseToDiscard('he',true);
+				},
+			},
+			chengshang:{
+				audio:2,
+				trigger:{player:'useCardAfter'},
+				filter:function(event,player){
+					if(!lib.suit.contains(get.suit(event.card,false))||typeof get.number(event.card)!='number') return false;
+					if(player.getHistory('sourceDamage',function(evt){
+						return evt.card==event.card;
+					}).length) return false;
+					var phsu=event.getParent('phaseUse');
+					if(!phsu||phsu.player!=player) return false;
+					if(player.getHistory('gain',function(evt){
+						return evt.getParent().name=='chengshang';
+					}).length) return false;
+					for(var i of event.targets){
+						if(i!=player&&(get.mode()!='guozhan'||i.isEnemyOf(player))) return true;
+					}
+					return false;
+				},
+				content:function(){
+					var suit=get.suit(trigger.card);
+					var number=get.number(trigger.card);
+					var card=get.cardPile2(function(card){
+						return card.suit==suit&&card.number==number;
+					});
+					if(card) player.gain(card,'gain2');
+				},
+			},
 			//新丁奉
 			reduanbing:{
 				audio:2,
@@ -16618,6 +16678,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			refenxun:'奋迅',
 			refenxun2:'奋迅',
 			refenxun_info:'出牌阶段限一次，你可以选择一名其他角色，然后本回合你计算与其的距离视为1；结束阶段开始时，若你未对其造成过伤害，你弃一张牌。',
+			zongyu:'宗预',
+			zyqiao:'气傲',
+			zyqiao_info:'每回合限两次。当你成为其他角色使用牌的目标后，你可以弃置其一张牌，然后你弃置一张牌。',
+			zyqiao_info_guozhan:'每回合限两次。当你成为其他势力的角色使用牌的目标后，你可以弃置其一张牌，然后你弃置一张牌。',
+			chengshang:'承赏',
+			chengshang_info:'当你于出牌阶段内使用的牌结算完成后，若此牌未造成过伤害且此牌的目标包含其他角色且你本阶段内未因〖承赏〗获得过牌，则你可以从牌堆中获得一张与此牌花色点数相同的牌。',
+			chengshang_info_guozhan:'当你于出牌阶段内使用的牌结算完成后，若此牌未造成过伤害且此牌的目标包含其他角色且你本阶段内未因〖承赏〗获得过牌，则你可以从牌堆中获得一张与此牌花色点数相同的牌。',
 			
 			sp_default:"常规",
 			sp_zhongdan:"忠胆英杰",
