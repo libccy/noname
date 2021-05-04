@@ -1127,7 +1127,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					trigger.num++;
 				},
 				ai:{
-					threaten:1.3
+					threaten:1.3,
+					forceMajor:true,
 				},
 				group:'yuxi_skill2'
 			},

@@ -131,6 +131,123 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_xushu:['zhaoyun','sp_zhugeliang'],
 		},
 		skill:{
+			//国钟会
+			gzquanji:{
+				audio:'quanji',
+				trigger:{
+					player:'damageEnd',
+					source:'damageSource',
+				},
+				frequent:true,
+				filter:function(event,player,name){
+					if(name=='damageEnd') return true;
+					if(!event.card) return false;
+					var evt=event.getParent();
+					return evt&&evt.card==event.card&&evt.type=='card'&&evt.targets&&evt.targets.length==1;
+				},
+				content:function(){
+					'step 0'
+					player.draw();
+					'step 1'
+					var hs=player.getCards('he');
+					if(hs.length>0){
+						if(hs.length==1) event._result={bool:true,cards:hs};
+						else player.chooseCard('he',true,'选择一张牌作为“权”');
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						var cs=result.cards;
+						player.lose(cs,ui.special,'toStorage');
+						player.markAuto('gzquanji',cs);
+						game.log(player,'将',cs,'放在了武将牌上');
+					}
+				},
+				intro:{
+					content:'cards',
+					onunmark:'throw',
+				},
+				locked:false,
+				mod:{
+					maxHandcard:function(player,num){
+						return num+player.getStorage('gzquanji').length;
+					},
+				},
+			},
+			gzpaiyi:{
+				audio:'paiyi',
+				enable:'phaseUse',
+				filter:function(event,player){
+					return player.getStorage('gzquanji').length>0&&!player.hasSkill('gzquanji2');
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						return ui.create.dialog('排异',player.storage.gzquanji,'hidden')
+					},
+					backup:function(links,player){
+						return {
+							audio:'paiyi',
+							filterTarget:true,
+							filterCard:function(){return false},
+							selectCard:-1,
+							card:links[0],
+							delay:false,
+							content:lib.skill.gzpaiyi.contentx,
+							ai:{
+								order:10,
+								result:{
+									target:function(player,target){
+	  							var num=player.getStorage('gzquanji').length-1;
+	  							if(num==0){
+	  								if(target.countCards('h')>player.countCards('h')) return get.damageEffect(target,player,target);
+	  								return 0;
+	  							}
+	  							if(target!=player) return 0;
+	  							if(player.needsToDiscard()&&!player.getEquip('zhuge')&&!player.hasSkill('new_paoxiao')) return 0;
+	  							return 1;
+	  						}
+	  					},
+							},
+						}
+					},
+					prompt:function(){return '请选择【排异】的目标'},
+				},
+				contentx:function(){
+					"step 0"
+					var card=lib.skill.gzpaiyi_backup.card;
+					game.cardsDiscard(card);
+					player.$throw(card);
+					player.storage.gzquanji.remove(card);
+					game.log(card,'进入了弃牌堆');
+					if(!player.storage.gzquanji.length){
+						player.unmarkSkill('gzquanji');
+					}
+					else{
+						player.markSkill('gzquanji');
+					}
+					player.syncStorage('gzquanji');
+					game.delayx();
+					"step 1"
+					var num=player.getStorage('gzquanji').length;
+					if(num) target.draw(num);
+					"step 2"
+					if(target.countCards('h')>player.countCards('h')){
+						target.damage();
+						player.addTempSkill('gzquanji2');
+					}
+				},
+				ai:{
+					order:function(item,player){
+						var num=player.getStorage('gzquanji').length;
+						if(num==1) return 8;
+						return 1;
+					},
+					result:{
+						player:1,
+					},
+				},
+			},
+			gzquanji2:{charlotte:true},
 			xingongji:{
 				enable:'phaseUse',
 				usable:1,
@@ -9021,6 +9138,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xingongji_info:'出牌阶段限一次，你可以弃置一张牌，然后你的攻击范围视为无限且使用与此牌花色相同的【杀】无次数限制直到回合结束。若你以此法弃置的牌为装备牌，则你可以弃置一名其他角色的一张牌。',
 			xinjiefan:'解烦',
 			xinjiefan_info:'限定技，出牌阶段，你可以选择一名角色，令攻击范围内含有该角色的所有角色依次选择一项：1.弃置一张武器牌；2.令其摸一张牌。然后若游戏轮数为1，则你于此回合结束时恢复此技能。',
+			gzquanji:'权计',
+			gzquanji_info:'当你受到伤害后或当你使用牌指定唯一目标并对其造成伤害后，你可以摸一张牌，然后你将一张牌置于武将牌上，称为“权”；你的手牌上限+X（X为“权”的数量）。',
+			gzpaiyi:'排异',
+			gzpaiyi_backup:'排异',
+			gzpaiyi_info:'出牌阶段，你可以将移去一张“权”放入弃牌堆，然后选择一名角色并令其摸X张牌（X为“权”的数量），若其手牌数不小于你，则你对其造成1点伤害且本技能于此回合内失效。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',
