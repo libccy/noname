@@ -295,7 +295,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				'gz_weiyan','gz_huangyueying','gz_zhugeliang',
 				'gz_lingtong','gz_sunshangxiang','gz_sunce',
 				'gz_re_yuanshao','gz_yuanshu','gz_hetaihou',
-				'gz_jin_simashi','gz_tangzi',
+				'gz_jin_simashi','gz_tangzi','gz_sp_duyu',
 			],
 			'6':[
 				'gz_zhenji','gz_guojia','gz_yujin',
@@ -353,7 +353,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				guozhan_double:['gz_tangzi','gz_liuqi','gz_mengda','gz_mifangfushiren','gz_zhanglu','gz_shixie'],
 				guozhan_yexinjia:['gz_zhonghui'],
 				guozhan_zongheng:['gz_huaxin','gz_luyusheng','gz_zongyu'],
-				guozhan_others:["gz_lingcao","gz_lifeng","gz_beimihu","gz_jianggan","gz_key_ushio"],
+				guozhan_others:["gz_lingcao","gz_lifeng","gz_beimihu","gz_jianggan","gz_key_ushio","gz_sp_duyu"],
 			}
 		},
 		characterPack:{
@@ -368,6 +368,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_shibing2qun:['female','qun',0,[],['unseen']],
 				gz_shibing1jin:['male','qun',0,[],['unseen']],
 				gz_shibing2jin:['female','qun',0,[],['unseen']],
+				gz_shibing1ye:['male','qun',0,[],['unseen']],
+				gz_shibing2ye:['female','qun',0,[],['unseen']],
 
 				gz_zhonghui:['male','ye',4,['gzquanji','gzpaiyi']],
 				gz_tangzi:['male','wei',4,['gzxingzhao'],['doublegroup:wei:wu']],
@@ -445,7 +447,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 				gz_dengai:['male','wei',4,['tuntian','ziliang','gzjixi'],['gzskin','die_audio']],
 				gz_caohong:['male','wei',4,['huyuan','heyi'],['gzskin']],
-				gz_jiangfei:['male','shu',3,['shengxi','gzshoucheng']],
+				gz_jiangfei:['male','shu',3,['reshengxi','gzshoucheng']],
 				gz_jiangwei:['male','shu',4,['tiaoxin','yizhi','tianfu'],['gzskin']],
 				gz_xusheng:['male','wu',4,['yicheng'],['gzskin']],
 				gz_jiangqing:['male','wu',4,['gzshangyi','niaoxiang']],
@@ -477,6 +479,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_lifeng:['male','shu',3,['tunchu','shuliang']],
 				gz_beimihu:["female","qun",3,["hmkguishu","hmkyuanyu"]],
 				gz_jianggan:["male","wei",3,["weicheng","daoshu"]],
+				gz_sp_duyu:['male','qun',4,['spwuku','spmiewu']],
 				gz_huaxin:['male','wei',3,['wanggui','xibing']],
 				gz_luyusheng:['female','wu',3,['zhente','zhiwei']],
 				gz_zongyu:['male','shu',3,['zyqiao','chengshang']],
@@ -8274,6 +8277,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			junling6_bg:'令',
 			junling6_info:'若被执行，执行者选择一张手牌和一张装备区内牌（若有），然后弃置其余的牌。',
 
+			gz_sp_duyu:'杜预',
 			gzpozhen:'破阵',
 			gzpozhen_info:'限定技，其他角色的回合开始时，你可以令其本回合不可使用、打出或重铸手牌；若其处于队列或围攻关系中，你可依次弃置此队列或参与围攻关系的其他角色的一张牌。',
 			gzjiancai:'荐才',
@@ -8572,6 +8576,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gz_shibing2qun:'群兵',
 			gz_shibing1jin:'晋兵',
 			gz_shibing2jin:'晋兵',
+			gz_shibing1ye:'士兵',
+			gz_shibing2ye:'士兵',
 			gzduanchang:'断肠',
 			gzduanchang_info:'锁定技，当你死亡时，你令杀死你的角色失去一张武将牌上的所有技能。',
 			gzweimu:'帷幕',

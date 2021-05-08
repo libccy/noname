@@ -3983,6 +3983,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				logTarget:'target',
 				filter:function(event,player){
+					if(event.card.name!='sha') return false;
+					if(event.parent.gongjian_targets&&event.parent.gongjian_targets.filter(function(target){
+						return event.targets.contains(target);
+					}).length>0) return event.target.countDiscardableCards(player,'he')>0;
 					var evt=event.getParent();
 					var history=player.getAllHistory('useCard',function(evtx){
 						return evtx.card.name=='sha'
@@ -4005,6 +4009,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 						if(cards.length) player.gain(cards,'gain2','log');
 					}
+				},
+				group:'gongjian_count',
+				subSkill:{
+					count:{
+						trigger:{global:'useCard1'},
+						silent:true,
+						firstDo:true,
+						filter:function(event,player){
+							return event.card&&event.card.name=='sha';
+						},
+						content:function(){
+							if(player.storage.gongjian) trigger.gongjian_targets=player.storage.gongjian;
+							player.storage.gongjian=trigger.targets;
+						},
+					},
 				},
 			},
 			kuimang:{
@@ -9789,7 +9808,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhanwan_info:'锁定技，有“流”的角色于弃牌阶段弃牌后，你摸等量的牌，然后其移去所有的“流”。',
 			zhujun:'朱儁',
 			gongjian:'攻坚',
-			gongjian_info:'每回合限一次，当你使用【杀】指定目标后，若此【杀】和你使用的上一张【杀】有相同的目标，则你可以弃置其两张牌，然后获得以此法弃置的所有【杀】。',
+			gongjian_info:'每回合限一次，当你使用【杀】指定目标后，若此【杀】和你使用的上一张【杀】或场上使用的上一张【杀】有相同的目标，则你可以弃置其两张牌，然后获得以此法弃置的所有【杀】。',
 			kuimang:'溃蟒',
 			kuimang_info:'锁定技，一名角色死亡后，若你对其造成过伤害，你摸两张牌。',
 			liuhong:'刘宏',

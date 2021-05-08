@@ -129,7 +129,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuejin:['male','wei',4,['xiaoguo']],
 			chendong:['male','wu',4,['duanxie','fenming']],
 			sp_dongzhuo:['male','qun',5,['hengzheng']],
-			jiangfei:['male','shu',3,['shengxi','shoucheng']],
+			jiangfei:['male','shu',3,['reshengxi','shoucheng']],
 			jiangqing:['male','wu',4,['shangyi','zniaoxiang']],
 			hetaihou:['female','qun',3,['zhendu','qiluan']],
 			kongrong:['male','qun',3,['lirang','mingshi']],
@@ -13152,12 +13152,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			huxiao:{
 				trigger:{source:'damageSource'},
-				//silent:true,
 				forced:true,
 				filter:function(event,player){
 					if(event._notrigger.contains(event.player)) return false;
 					return event.nature=='fire';
 				},
+				logTarget:'player',
 				content:function(){
 					if(!player.storage.huxiao3){
 						player.storage.huxiao3=[];
@@ -13166,17 +13166,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.player.draw();
 					player.addTempSkill('huxiao3');
 				},
-				//group:['huxiao_clear'],
-				subSkill:{
-					clear:{
-						trigger:{source:'damageSource'},
-						priority:-7,
-						silent:true,
-						content:function(){
-							delete player.storage.huxiao;
-						}
-					}
-				}
 			},
 			huxiao3:{
 				onremove:true,

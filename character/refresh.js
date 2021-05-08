@@ -9142,7 +9142,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gzquanji_info:'当你受到伤害后或当你使用牌指定唯一目标并对其造成伤害后，你可以摸一张牌，然后你将一张牌置于武将牌上，称为“权”；你的手牌上限+X（X为“权”的数量）。',
 			gzpaiyi:'排异',
 			gzpaiyi_backup:'排异',
-			gzpaiyi_info:'出牌阶段，你可以将移去一张“权”放入弃牌堆，然后选择一名角色并令其摸X张牌（X为“权”的数量），若其手牌数不小于你，则你对其造成1点伤害且本技能于此回合内失效。',
+			gzpaiyi_info:'出牌阶段，你可以将移去一张“权”，然后选择一名角色并令其摸X张牌（X为“权”的数量），若其手牌数不小于你，则你对其造成1点伤害且本技能于此回合内失效。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',
