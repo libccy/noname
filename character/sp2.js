@@ -4,12 +4,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			simazhou:['male','jin',4,['caiwang','naxiang']],
+			huangzu:['male','qun',4,['wangong'],['unseen']],
 			caosong:['male','wei',3,['cslilu','csyizheng']],
 			re_taoqian:['male','qun',3,['zhaohuo','reyixiang','reyirang']],
 			zhaozhong:['male','qun',6,['yangzhong','huangkong']],
 			fanyufeng:['female','qun',3,['bazhan','jiaoying']],
 			ol_lisu:['male','qun',3,['qiaoyan','xianzhu']],
-			jin_yanghuiyu:['female','jin',3,['huirong','ciwei','caiyuan'],['hiddenSkill','unseen']],
+			jin_yanghuiyu:['female','jin',3,['huirong','ciwei','caiyuan'],['hiddenSkill']],
 			shibao:['male','jin',4,['shibao_skill'],['unseen']],
 			jin_zhangchunhua:['female','jin',3,['huishi','qingleng','xuanmu'],['hiddenSkill']],
 			jin_simayi:['male','jin',3,['buchen','smyyingshi','xiongzhi','quanbian'],['hiddenSkill']],
@@ -92,7 +94,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterSort:{
 			sp2:{
-				sp_yingbian:['jin_zhangchunhua','jin_simayi','jin_wangyuanji','jin_simazhao','jin_xiahouhui','jin_yanghuiyu','jin_simashi','duyu','zhanghuyuechen','shibao','ol_lisu'],
+				sp_yingbian:['jin_zhangchunhua','jin_simayi','jin_wangyuanji','jin_simazhao','jin_xiahouhui','jin_yanghuiyu','jin_simashi','duyu','zhanghuyuechen','shibao','ol_lisu','huangzu','simazhou'],
 				sp_whlw:["xurong","lijue","zhangji","fanchou","guosi"],
 				sp_zlzy:["zhangqiying","lvkai","zhanggong","weiwenzhugezhi","beimihu"],
 				sp_longzhou:["xf_tangzi","xf_huangquan","xf_sufei","sp_liuqi"],
@@ -112,6 +114,96 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//司马伷和黄祖
+			caiwang:{
+				audio:2,
+				trigger:{global:['useCard','respond']},
+				filter:function(event,player){
+					if(!Array.isArray(event.respondTo)||event.respondTo[0]==event.player||![event.respondTo[0],event.player].contains(player)) return false;
+					var color=get.color(event.card);
+					if(color=='none'||get.color(event.respondTo[1])!=color) return false;
+					var target=lib.skill.caiwang.logTarget(event,player);
+					return target[player.getStorage('naxiang2').contains(target)?'countGainableCards':'countDiscardableCards'](player,'he')>0
+				},
+				logTarget:function(event,player){
+					return (player==event.respondTo[0]?event.player:event.respondTo[0]);
+				},
+				prompt2:function(event,player){
+					var target=lib.skill.caiwang.logTarget(event,player);
+					return (player.getStorage('naxiang2').contains(target)?'获得':'弃置')+'该角色的一张牌';
+				},
+				check:function(event,player){
+					return get.attitude(player,lib.skill.caiwang.logTarget(event,player))<=0;
+				},
+				content:function(){
+					var target=lib.skill.caiwang.logTarget(trigger,player);
+					player[player.getStorage('naxiang2').contains(target)?'gainPlayerCard':'discardPlayerCard'](target,'he',true);
+				},
+			},
+			naxiang:{
+				audio:2,
+				trigger:{
+					player:'damageEnd',
+					source:'damageSource',
+				},
+				forced:true,
+				filter:function(event,player){
+					var target=lib.skill.naxiang.logTarget(event,player);
+					return target&&target!=player&&target.isAlive();
+				},
+				logTarget:function(event,player){
+					return player==event.player?event.source:event.player;
+				},
+				content:function(){
+					player.addTempSkill('naxiang2',{player:'phaseBegin'});
+					if(!player.storage.naxiang2) player.storage.naxiang2=[];
+					player.storage.naxiang2.add(lib.skill.naxiang.logTarget(trigger,player));
+					player.markSkill('naxiang2');
+				},
+				ai:{
+					combo:'caiwang',
+				},
+			},
+			naxiang2:{
+				onremove:true,
+				intro:{
+					content:'已接受$的投降；对这些角色发动【才望】时将“弃置”改为“获得”',
+				},
+			},
+			wangong:{
+				audio:2,
+				trigger:{player:'useCard'},
+				forced:true,
+				filter:function(event,player){
+					return get.type(event.card,false)=='basic';
+				},
+				content:function(){
+					player.addSkill('wangong2');
+				},
+			},
+			wangong2:{
+				trigger:{player:'useCard1'},
+				forced:true,
+				popup:false,
+				firstDo:true,
+				charlotte:true,
+				content:function(){
+					player.removeSkill('wangong2');
+					if(trigger.card.name=='sha') trigger.baseDamage++;
+				},
+				mod:{
+					cardUsable:function(card){
+						if(card.name=='sha') return Infinity;
+					},
+					targetInRange:function(card){
+						if(card.name=='sha') return true;
+					},
+				},
+				mark:true,
+				intro:{
+					content:'使用【杀】无距离和次数限制且伤害+1',
+				},
+			},
 			//陶谦和曹嵩
 			reyirang:{
 				audio:'yirang',
@@ -9454,6 +9546,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fanyufeng:'樊夫人，东汉末年人物，昔桂阳太守赵范寡嫂。赵云随刘备平定江南四郡后，刘备以赵云为桂阳太守。赵范居心叵测，要将自己的嫂嫂樊氏嫁给赵云，但遭到赵云的拒绝。后来，赵范逃走，樊氏也下落不明。2001年，应日本日中青少年文化中心成立50周年之邀，北京京剧院赴日进行40场巡回演出，这次访日的剧目都不同程度地进行了加工改编，以符合日本观众的需求。《取桂阳》是根据老本重新排演的，叶金援饰赵云，王怡饰樊玉凤。剧中的樊玉凤成为文武双全的巾帼英雄，被赵云收降，后来在《龙凤呈祥》中也参与堵截东吴的追兵。',
 			zhaozhong:'赵忠（？—189年），安平人，东汉末年宦官，赵延之兄。桓帝、灵帝时，历为小黄门、中常侍、大长秋、车骑将军等职，封都乡侯。在职时以搜刮暴敛、骄纵贪婪见称，灵帝极为宠信，常谓“赵常侍是我母”。中平六年（189年），何进谋诛宦官，事泄，他和其余几个常侍设计伏杀何进，袁绍、袁术等人闻何进被杀，入宫杀尽宦官，后捕杀赵忠。',
 			caosong:'曹嵩（？—194年），字巨高，沛郡谯县（今安徽省亳州市）人。东汉大臣，大长秋曹腾的养子，曹操之父亲。门荫入仕，历任司隶校尉、鸿胪卿、大司农，位列九卿，位高权重。中平四年（187年），靠着贿赂中官，出任太尉，位列三公。中平五年（188年），受累于黄巾之乱，坐罪免官。兴平元年（194年），投奔兖州牧曹操，遇害于徐州。延康元年（220年），追尊魏国太王。曹魏建立后，追尊皇帝，谥号为太。',
+			simazhou:'司马伷（zhòu）（227年～283年6月12日），字子将，河内郡温县（今河南省温县）人。西晋宗室、将领，晋宣帝司马懿第三子，伏太妃所生。晋景帝司马师、文帝司马昭的同父异母弟，晋武帝司马炎的叔父。司马伷少有才气，在曹魏历任宁朔将军、散骑常侍、征虏将军等职，先后受封南安亭侯、东武乡侯，五等爵制建立后，改封南皮伯。西晋建立后，获封东莞郡王，入朝任尚书右仆射、抚军将军，出外拜镇东大将军。后改封琅邪王，加开府仪同三司。西晋伐吴时，率军出涂中，孙皓向他投降并奉上玉玺。战后因功拜大将军，增邑三千户。太康四年（283年），司马伷去世，享年五十七岁。谥号为武，世称“琅邪武王”。著有《周官宁朔新书》八卷，今已亡佚。',
+			huangzu:'黄祖（？－208年），东汉末年将领。刘表任荆州牧时，黄祖出任江夏太守。初平二年（191年），黄祖在与长沙太守孙坚交战时，其部下将孙坚射死，因此与孙家结下仇怨。之后，黄祖多次率部与东吴军队交战，射杀凌操、徐琨等人。建安十三年（208年），在与孙权的交战中，兵败被杀。',
 		},
 		characterTitle:{
 			wulan:'#b对决限定武将',
@@ -9507,7 +9601,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		perfectPair:{
 			jin_simayi:['jin_zhangchunhua'],
 			jin_simazhao:['jin_wangyuanji'],
-			jin_simashi:['jin_xiahouhui'],
+			jin_simashi:['jin_xiahouhui','jin_yanghuiyu'],
 		},
 		characterReplace:{
 			lijue:['lijue','ns_lijue'],
@@ -10014,6 +10108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shibao_skill_info:'出牌阶段，你使用本轮获得的牌时（以此技能获得的牌除外），根据类型执行以下效果：1.基本牌，不计入次数且无距离限制；2.锦囊牌，此牌目标+1或-1；3.装备牌，摸1张牌。',
 			jin_yanghuiyu:'晋羊徽瑜',
 			jin_yanghuiyu_ab:'羊徽瑜',
+			gz_jin_yanghuiyu:'羊徽瑜',
 			huirong:'慧容',
 			huirong_info:'隐匿技，锁定技。当你登场后，你令一名角色将手牌数摸至/弃至与体力值相同（至多摸至五张）。',
 			ciwei:'慈威',
@@ -10062,6 +10157,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			csyizheng_info:'结束阶段开始时，你可以选择一名其他角色。你的下回合开始前，当该角色造成伤害或回复体力时，若其体力上限小于你，则你减1点体力上限，且令此伤害值/回复值+1。',
 			reyirang:'揖让',
 			reyirang_info:'出牌阶段开始时，你可以将所有非基本牌交给一名体力上限大于你的其他角色，然后调整体力上限至与该角色相同并回复X点体力（X为你以此法交给其的牌数）。',
+			huangzu:'黄祖',
+			wangong:'挽弓',
+			wangong2:'挽弓',
+			wangong_info:'锁定技，当你使用基本牌时，你获得如下效果：当你使用下一张牌时，若此牌为【杀】，则此牌无次数和距离限制且伤害+1。',
+			simazhou:'司马伷',
+			caiwang:'才望',
+			caiwang_info:'当你使用或打出牌响应其他角色使用的牌，或其他角色使用或打出牌响应你使用的牌后，若这两张牌颜色相同，则你可以弃置对方的一张牌。',
+			naxiang:'纳降',
+			naxiang2:'纳降',
+			naxiang_info:'锁定技，当你受到其他角色造成的伤害后，或你对其他角色造成伤害后，你对其发动〖才望〗时的“弃置”改为“获得”直到你的下回合开始。',
 
 			sp_yingbian:'文德武备',
 			sp_whlw:"文和乱武",

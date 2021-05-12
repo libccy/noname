@@ -38,6 +38,7 @@ window.noname_character_rank={
 		'key_shizuru',
 		'key_sakuya',
 		'boss_zhaoyun',
+		'noname',
 	],
 	ap:[
 		'gjqt_aruan',
@@ -830,6 +831,8 @@ window.noname_character_rank={
 		'caoanmin',
 		'luyusheng',
 		'dingfeng',
+		'huangzu',
+		'jin_yanghuiyu',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -973,6 +976,7 @@ window.noname_character_rank={
 		'zhaozhong',
 		'zongyu',
 		'sp_sunshao',
+		'simazhou',
 	],
 	c:[
 		'xiahoudun',
@@ -1149,6 +1153,7 @@ window.noname_character_rank={
 			'key_shiroha',
 			'key_hina',
 			'key_sakuya',
+			'noname',
 		],
 		epic:[
 			'pal_yueqi',
@@ -1299,6 +1304,7 @@ window.noname_character_rank={
 			're_taoqian',
 			'caosong',
 			'sp_duyu',
+			'jin_yanghuiyu',
 			'key_haruko',
 			'key_akiko',
 			'key_sunohara',
@@ -1603,6 +1609,8 @@ window.noname_character_rank={
 			'sp_bianfuren',
 			'luotong',
 			'feiyi',
+			'huangzu',
+			'simazhou',
 		],
 		junk:[
 			'sunshao',

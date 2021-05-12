@@ -764,7 +764,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					respondSha:true,
 					respondShan:true,
 					skillTagFilter:function(player){
-						if(player.countMark('spwuku')||!player.countCards('he')||player.hasSkill('spmiewu2')) return false;
+						if(!player.countMark('spwuku')||!player.countCards('he')||player.hasSkill('spmiewu2')) return false;
 					},
 					order:1,
 					result:{

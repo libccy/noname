@@ -302,7 +302,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				'gz_jiangwei','gz_zhangfei','gz_sp_zhugeliang',
 				'gz_zhouyu','gz_lingcao','gz_daqiao','gz_dingfeng',
 				'gz_yuji','gz_caiwenji','gz_diaochan','gz_zuoci',
-				'gz_key_ushio',
+				'gz_key_ushio','gz_jin_simazhao',
 			],
 			'5':[
 				'gz_zhangliao','gz_caocao','gz_xuhuang',
@@ -316,14 +316,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				'gz_madai','gz_liubei','gz_mifuren',
 				'gz_wuguotai','gz_luxun','gz_taishici',
 				'gz_zhangjiao','gz_pangde','gz_liuqi',
-				'gz_jin_zhangchunhua','gz_mifangfushiren','gz_shixie',
+				'gz_jin_zhangchunhua','gz_mifangfushiren','gz_shixie','gz_jin_yanghuiyu',
 			],
 			'3':[
 				'gz_xiahoudun','gz_yuejin','gz_caoren',
 				'gz_machao','gz_masu','gz_fazheng',
 				'gz_zhangzhang','gz_lvmeng','gz_huanggai',
 				'gz_jiling','gz_lvbu','gz_dongzhuo',
-				'gz_jin_xiahouhui','gz_jin_simazhao','gz_zhanglu',
+				'gz_jin_xiahouhui','gz_simazhou','gz_zhanglu',
 			],
 			'2':[
 				'gz_cuimao','gz_xiahouyuan','gz_caohong',
@@ -348,7 +348,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				guozhan_bian:["gz_liqueguosi","gz_zuoci","gz_bianfuren","gz_xunyou","gz_lingtong","gz_lvfan","gz_masu","gz_shamoke",],
 				guozhan_quan:["gz_cuimao","gz_yujin","gz_wangping","gz_fazheng","gz_wuguotai","gz_lukang","gz_yuanshu","gz_zhangxiu"],
 				guozhan_jun:["gz_jun_caocao","gz_jun_sunquan","gz_jun_liubei","gz_jun_zhangjiao"],
-				guozhan_jin:['gz_jin_simayi','gz_jin_simazhao','gz_jin_simashi','gz_jin_zhangchunhua','gz_jin_wangyuanji','gz_jin_xiahouhui','gz_duyu','gz_zhanghuyuechen'],
+				guozhan_jin:['gz_jin_simayi','gz_jin_simazhao','gz_jin_simashi','gz_jin_zhangchunhua','gz_jin_wangyuanji','gz_jin_xiahouhui','gz_duyu','gz_zhanghuyuechen','gz_jin_yanghuiyu'],
 				guozhan_single:['gz_re_xushu'],
 				guozhan_double:['gz_tangzi','gz_liuqi','gz_mengda','gz_mifangfushiren','gz_zhanglu','gz_shixie'],
 				guozhan_yexinjia:['gz_zhonghui'],
@@ -366,10 +366,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_shibing2wu:['female','wu',0,[],['unseen']],
 				gz_shibing1qun:['male','qun',0,[],['unseen']],
 				gz_shibing2qun:['female','qun',0,[],['unseen']],
-				gz_shibing1jin:['male','qun',0,[],['unseen']],
-				gz_shibing2jin:['female','qun',0,[],['unseen']],
-				gz_shibing1ye:['male','qun',0,[],['unseen']],
-				gz_shibing2ye:['female','qun',0,[],['unseen']],
+				gz_shibing1jin:['male','jin',0,[],['unseen']],
+				gz_shibing2jin:['female','jin',0,[],['unseen']],
+				gz_shibing1ye:['male','ye',0,[],['unseen']],
+				gz_shibing2ye:['female','ye',0,[],['unseen']],
+				gz_shibing1key:['male','key',0,[],['unseen']],
+				gz_shibing2key:['female','key',0,[],['unseen']],
 
 				gz_zhonghui:['male','ye',4,['gzquanji','gzpaiyi']],
 				gz_tangzi:['male','wei',4,['gzxingzhao'],['doublegroup:wei:wu']],
@@ -502,7 +504,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_jin_simashi:['male','jin',3,['yimie','tairan']],
 				gz_duyu:['male','jin',4,['sanchen']],
 				gz_zhanghuyuechen:['male','jin',4,['xijue']],
-				
+				gz_jin_yanghuiyu:['female','jin',3,['ciwei','caiyuan']],
+				gz_simazhou:['male','jin',4,['caiwang','naxiang']],
+
 				gz_key_ushio:['female','key',3,['ushio_huanxin','ushio_xilv'],['doublegroup:key:wei:shu:wu:qun:jin']],
 			}
 		},
@@ -7223,7 +7227,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.showCharacter(0);
 						var yelist=[];
 						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].identity=='ye'&&game.players[i]._group==player.group){
+							if(game.players[i].identity=='ye'&&game.players[i]._group==player.group&&lib.character[game.players[i].name1][1]!='ye'){
 								yelist.push(game.players[i]);
 							}
 						}
@@ -7887,7 +7891,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								if(get.is.double(button.link)) return false;
 								if(lib.character[button.link][1]=='ye') return true;
 								for(var i=0;i<ui.dialog.buttons.length;i++){
-									if(ui.dialog.buttons[i]!=button&&lib.character[button.link][1]==lib.character[ui.dialog.buttons[i].link][1]){
+									var double=get.is.double(ui.dialog.buttons[i].link,true);
+									if(ui.dialog.buttons[i]!=button&&(lib.character[button.link][1]==lib.character[ui.dialog.buttons[i].link][1]||double&&double.contains(lib.character[button.link][1]))){
 										return true;
 									}
 								}
@@ -8102,7 +8107,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(get.is.double(button.link)) return false;
 							if(lib.character[button.link][1]=='ye') return true;
 							for(var i=0;i<ui.dialog.buttons.length;i++){
-								if(ui.dialog.buttons[i]!=button&&lib.character[button.link][1]==lib.character[ui.dialog.buttons[i].link][1]){
+								var double=get.is.double(ui.dialog.buttons[i].link,true);
+								if(ui.dialog.buttons[i]!=button&&(lib.character[button.link][1]==lib.character[ui.dialog.buttons[i].link][1]||double&&double.contains(lib.character[button.link][1]))){
 									return true;
 								}
 							}
@@ -8578,6 +8584,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gz_shibing2jin:'晋兵',
 			gz_shibing1ye:'士兵',
 			gz_shibing2ye:'士兵',
+			gz_shibing1key:'键兵',
+			gz_shibing2key:'键兵',
 			gzduanchang:'断肠',
 			gzduanchang_info:'锁定技，当你死亡时，你令杀死你的角色失去一张武将牌上的所有技能。',
 			gzweimu:'帷幕',
