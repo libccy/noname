@@ -1078,7 +1078,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzbiluan:{
 				mod:{
 					globalTo:function(from,to,distance){
-						return distance+to.countCards('e');
+						return distance+Math.max(1,to.countCards('e'));
 					},
 				},
 			},
@@ -2754,9 +2754,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							name:"sha",
 						},
 						viewAsFilter:function(player){
-							if(!player.countCards('h','shan')) return false;
+							if(!player.countCards('hs','shan')) return false;
 						},
 						prompt:"将一张闪当杀使用或打出",
+						position:'hs',
 						check:function(){return 1},
 						ai:{
 							effect:{
@@ -2766,7 +2767,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							},
 							respondSha:true,
 							skillTagFilter:function(player){
-								if(!player.countCards('h','shan')) return false;
+								if(!player.countCards('hs','shan')) return false;
 							},
 							order:function(){
 								return get.order({name:'sha'})+0.1;
@@ -2783,15 +2784,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						viewAs:{
 							name:"shan",
 						},
+						position:'hs',
 						prompt:"将一张杀当闪使用或打出",
 						check:function(){return 1},
 						viewAsFilter:function(player){
-							if(!player.countCards('h','sha')) return false;
+							if(!player.countCards('hs','sha')) return false;
 						},
 						ai:{
 							respondShan:true,
 							skillTagFilter:function(player){
-								if(!player.countCards('h','sha')) return false;
+								if(!player.countCards('hs','sha')) return false;
 							},
 							effect:{
 								target:function(card,player,target,current){
@@ -2908,9 +2910,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					if(player.hasSkill('new_duanliang_off')) return false;
-					return player.countCards('he',{type:['basic','equip'],color:'black'})
+					return player.countCards('hes',{type:['basic','equip'],color:'black'})
 				},
-				position:"he",
+				position:"hes",
 				viewAs:{
 					name:"bingliang",
 				},
@@ -2978,6 +2980,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return !player.storage.new_luanji.contains(get.suit(card));
 				},
 				selectCard:2,
+				position:'hs',
+				filter:function(event,player){
+					return player.countCards('hs',function(card){
+						return !player.storage.new_luanji||!player.storage.new_luanji.contains(get.suit(card));
+					})>1;
+				},
 				check:function(card){
 					var player=_status.event.player;
 					var targets=game.filterPlayer(function(current){
@@ -3416,8 +3424,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						viewAs:{
 							name:"sha",
 						},
+						position:'hs',
 						viewAsFilter:function(player){
-							if(!player.countCards('h','shan')) return false;
+							if(!player.countCards('hs','shan')) return false;
 						},
 						prompt:"将一张闪当杀使用或打出",
 						check:function(){return 1},
@@ -3429,7 +3438,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							},
 							respondSha:true,
 							skillTagFilter:function(player){
-								if(!player.countCards('h','shan')) return false;
+								if(!player.countCards('hs','shan')) return false;
 							},
 							order:function(){
 								return get.order({name:'sha'})+0.1;
@@ -3446,15 +3455,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						viewAs:{
 							name:"shan",
 						},
+						position:'hs',
 						prompt:"将一张杀当闪使用或打出",
 						check:function(){return 1},
 						viewAsFilter:function(player){
-							if(!player.countCards('h','sha')) return false;
+							if(!player.countCards('hs','sha')) return false;
 						},
 						ai:{
 							respondShan:true,
 							skillTagFilter:function(player){
-								if(!player.countCards('h','sha')) return false;
+								if(!player.countCards('hs','sha')) return false;
 							},
 							effect:{
 								target:function(card,player,target,current){
@@ -4054,7 +4064,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				audio:'bmcanshi',
 				enable:"phaseUse",
 				filter:function(event,player){
-					return player.countCards('h',{suit:'spade'})>0;
+					return player.countCards('hs',{suit:'spade'})>0;
 				},
 				init:function(player){
 					if(!player.storage.hmkguishu) player.storage.hmkguishu=0;
@@ -4079,7 +4089,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return 3;
 						}
 						if(button.link=='zhibi'){
-							if(player.countCards('h',{suit:'spade'})>2) return 1;
+							if(player.countCards('hs',{suit:'spade'})>2) return 1;
 							return 0;
 						}
 					},
@@ -4089,7 +4099,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							filterCard:function(card,player){
 								return get.suit(card)=='spade';
 							},
-							position:"h",
+							position:"hs",
 							selectCard:1,
 							popname:true,
 							ai:function(card){
@@ -7004,8 +7014,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				viewAs:{name:'yiyi'},
 				usable:4,
 				filterCard:{color:'red'},
+				position:'hs',
 				viewAsFilter:function(player){
-					return player.countCards('h',{color:'red'})>0;
+					return player.countCards('hs',{color:'red'})>0;
 				},
 				check:function(card){
 					return 5-get.value(card);
@@ -8311,7 +8322,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzmidao:'米道',
 			gzmidao_info:'与你势力相同的其他角色的出牌阶段限一次。该角色使用基本牌或普通锦囊牌指定目标时，其可交给你一张手牌，然后你可改变此牌的花色和点数。',
 			gzbiluan:'避乱',
-			gzbiluan_info:'锁定技，其他角色计算至你的距离时+X（X为你装备区内的牌数）。',
+			gzbiluan_info:'锁定技，其他角色计算至你的距离时+X（X为你装备区内的牌数且至少为1）。',
 			gzlixia:'礼下',
 			gzlixia_info:'与你势力不同的角色的准备阶段开始时，其可弃置你装备区内的一张牌，然后其选择一项：①弃置两张牌。②失去1点体力。③令你摸两张牌。',
 			mffengshi:'锋势',

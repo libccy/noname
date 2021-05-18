@@ -1117,7 +1117,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'taoluan',
 				enable:'chooseToUse',
 				filter:function(event,player){
-					return event.type!='wuxie'&&event.type!='respondShan'&&!player.hasSkill('xintaoluan3')&&player.countCards('he')>0&&!_status.dying.length;
+					return event.type!='wuxie'&&event.type!='respondShan'&&!player.hasSkill('xintaoluan3')&&player.countCards('hes')>0&&!_status.dying.length;
 				},
 				init:function(player){
 					if(!player.storage.xintaoluan) player.storage.xintaoluan=[];
@@ -1147,7 +1147,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					check:function(button){
 						var player=_status.event.player;
-						if(player.countCards('h',button.link[2])>0) return 0;
+						if(player.countCards('hs',button.link[2])>0) return 0;
 						if(button.link[2]=='wugu') return;
 						var effect=player.getUseValue(button.link[2]);
 						if(effect>0) return effect;
@@ -1162,7 +1162,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							check:function(card){
 								return 6-get.value(card);
 							},
-							position:'he',
+							position:'hes',
 							viewAs:{name:links[0][2],nature:links[0][3]},
 							onuse:function(result,player){
 								var evt=_status.event.getParent('phase');
@@ -1257,7 +1257,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				prompt:'将一张牌当做闪使用',
 				enable:'chooseToUse',
 				filter:function(event,player){
-					return player.countCards('he')&&!player.storage.xintaoluan.contains('shan')&&!player.hasSkill('xintaoluan3')&&!_status.dying.length;
+					return player.countCards('hes')&&!player.storage.xintaoluan.contains('shan')&&!player.hasSkill('xintaoluan3')&&!_status.dying.length;
 				},
 				onuse:function(result,player){
 					var evt=_status.event.getParent('phase');
@@ -1275,7 +1275,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.xintaoluan.add('shan');
 				},
 				filterCard:true,
-				position:'he',
+				position:'hes',
 				selectCard:1,
 				viewAs:{name:'shan'},
 				check:function(card){
@@ -1294,7 +1294,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					skillTagFilter:function(player){
-						return player.countCards('he')&&!player.storage.xintaoluan.contains('shan')&&!player.hasSkill('xintaoluan3');
+						return player.countCards('hes')&&!player.storage.xintaoluan.contains('shan')&&!player.hasSkill('xintaoluan3');
 					},
 					threaten:1.5,
 					respondShan:true,
@@ -1305,10 +1305,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'chooseToUse',
 				prompt:'将一张牌当做无懈可击使用',
 				filter:function(event,player){
-					return player.countCards('he')&&(!player.storage.xintaoluan.contains('wuxie'))&&!player.hasSkill('xintaoluan3')&&!_status.dying.length;
+					return player.countCards('hes')&&(!player.storage.xintaoluan.contains('wuxie'))&&!player.hasSkill('xintaoluan3')&&!_status.dying.length;
 				},
 				viewAsFilter:function(player){
-					return player.countCards('he')&&(!player.storage.xintaoluan.contains('wuxie'))&&!player.hasSkill('xintaoluan3')&&!_status.dying.length;
+					return player.countCards('hes')&&(!player.storage.xintaoluan.contains('wuxie'))&&!player.hasSkill('xintaoluan3')&&!_status.dying.length;
 				},
 				onuse:function(result,player){
 					var evt=_status.event.getParent('phase');
@@ -1326,7 +1326,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.xintaoluan.add('wuxie');
 				},
 				filterCard:true,
-				position:'he',
+				position:'hes',
 				selectCard:1,
 				viewAs:{name:'wuxie'},
 				check:function(card){
@@ -3754,10 +3754,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'chooseToUse',
 				filter:function(event,player){
-					return event.type!='wuxie'&&event.type!='respondShan'&&!player.hasSkill('taoluan3')&&player.countCards('he')>0;//&&!_status.dying.length;
+					return event.type!='wuxie'&&event.type!='respondShan'&&!player.hasSkill('taoluan3')&&player.countCards('hes')>0;//&&!_status.dying.length;
 				},
 				hiddenCard:function(player,name){
-					return (!player.storage.taoluan.contains(name)&&player.countCards('he')>0&&!player.hasSkill('taoluan3')&&lib.inpile.contains(name));
+					return (!player.storage.taoluan.contains(name)&&player.countCards('hes')>0&&!player.hasSkill('taoluan3')&&lib.inpile.contains(name));
 				},
 				init:function(player){
 					if(!player.storage.taoluan) player.storage.taoluan=[];
@@ -3787,7 +3787,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					check:function(button){
 						var player=_status.event.player;
-						if(player.countCards('h',button.link[2])>0) return 0;
+						if(player.countCards('hs',button.link[2])>0) return 0;
 						if(button.link[2]=='wugu') return 0;
 						var effect=player.getUseValue(button.link[2]);
 						if(effect>0) return effect;
@@ -3802,7 +3802,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							check:function(card){
 								return 6-get.value(card);
 							},
-							position:'he',
+							position:'hes',
 							viewAs:{name:links[0][2],nature:links[0][3]},
 							onuse:function(result,player){
 								player.storage.taoluan.add(result.card.name);
@@ -3815,7 +3815,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					skillTagFilter:function(player){
-						if(!player.countCards('he')||player.hasSkill('taoluan3')) return false;
+						if(!player.countCards('hes')||player.hasSkill('taoluan3')) return false;
 						if(!player.storage.taoluan.contains('tao')){}
 						else if(player.isDying()&&!player.storage.taoluan.contains('jiu')){}
 						else return false;
@@ -3855,9 +3855,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						if(get.attitude(player,target)>0){
 							if(get.attitude(target,player)>0){
-								return target.countCards('h');
+								return target.countCards('he');
 							}
-							return target.countCards('h')/2;
+							return target.countCards('he')/2;
 						}
 						return 0;
 					});
@@ -3892,18 +3892,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				prompt:'将一张牌当做闪使用',
 				enable:'chooseToUse',
 				filter:function(event,player){
-					return !player.storage.taoluan.contains('shan')&&!player.hasSkill('taoluan3')&&player.countCards('he');//&&!_status.dying.length;
+					return !player.storage.taoluan.contains('shan')&&!player.hasSkill('taoluan3')&&player.countCards('hes');//&&!_status.dying.length;
 				},
 				onuse:function(result,player){
 					player.storage.taoluan.add('shan');
 				},
 				filterCard:true,
-				position:'he',
+				position:'hes',
 				selectCard:1,
 				viewAs:{name:'shan'},
 				ai:{
 					skillTagFilter:function(player){
-						return player.countCards('he')&&!player.storage.taoluan.contains('shan')&&!player.hasSkill('taoluan3');
+						return player.countCards('hes')&&!player.storage.taoluan.contains('shan')&&!player.hasSkill('taoluan3');
 					},
 					threaten:1.5,
 					respondShan:true,
@@ -3914,13 +3914,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'chooseToUse',
 				prompt:'将一张牌当做无懈可击使用',
 				viewAsFilter:function(player){
-					return !player.storage.taoluan.contains('wuxie')&&!player.hasSkill('taoluan3')&&player.countCards('he');
+					return !player.storage.taoluan.contains('wuxie')&&!player.hasSkill('taoluan3')&&player.countCards('hes');
 				},
 				onuse:function(result,player){
 					player.storage.taoluan.add('wuxie');
 				},
 				filterCard:true,
-				position:'he',
+				position:'hes',
 				selectCard:1,
 				viewAs:{name:'wuxie'},
 			},
@@ -5184,8 +5184,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.color(card)=='black';
 				},
 				viewAsFilter:function(player){
-					return player.countCards('h',{color:'black'})>0;
+					return player.countCards('hs',{color:'black'})>0;
 				},
+				position:'hs',
 				viewAs:{name:'wuxie'},
 				prompt:'将一张黑色手牌当无懈可击使用',
 				check:function(card){return 8-get.value(card)},
@@ -5198,8 +5199,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.color(card)=='red';
 				},
 				viewAs:{name:'shan'},
+				position:'hs',
 				viewAsFilter:function(player){
-					if(!player.countCards('h',{color:'red'})) return false;
+					if(!player.countCards('hs',{color:'red'})) return false;
 				},
 				audio:true,
 				prompt:'将一张红色手牌当闪使用或打出',
@@ -7892,27 +7894,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:['chooseToUse','chooseToRespond'],
 				filterCard:true,
 				selectCard:2,
-				position:'h',
+				position:'hs',
 				audio:2,
 				derivation:['new_rewusheng','olpaoxiao'],
 				viewAs:{name:'sha'},
 				prompt:'将两张手牌当杀使用或打出',
+				viewAsFilter:function(player){
+					return player.countCards('hs')>1;
+				},
 				check:function(card){
 					if(_status.event.player.hasSkill('new_rewusheng')&&get.color(card)=='red') return 0;
 					if(_status.event.name=='chooseToRespond'){
 						if(card.name=='sha') return 0;
 						return 6-get.useful(card);
 					}
-					if(_status.event.player.countCards('h')<4) return 6-get.useful(card);
+					if(_status.event.player.countCards('hs')<4) return 6-get.useful(card);
 					return 7-get.useful(card);
 				},
 				ai:{
 					respondSha:true,
+					skillTagFilter:function(player){
+						if(player.countCards('hs')<2) return false;
+					},
 					order:function(item,player){
 						if(player.hasSkill('new_rewusheng')&&player.hasSkill('olpaoxiao')){
 							return 1;
 						}
-						if(player.countCards('h')<4){
+						if(player.countCards('hs')<4){
 							return 1;
 						}
 						return 4;

@@ -1838,11 +1838,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:['chooseToUse','chooseToRespond'],
 				filterCard:true,
 				selectCard:2,
-				position:'h',
+				position:'hs',
 				viewAs:{name:'sha'},
 				complexCard:true,
 				filter:function(event,player){
-					return player.countCards('h')>=2;
+					return player.countCards('hs')>=2;
 				},
 				audio:true,
 				prompt:'将两张手牌当杀使用或打出',
@@ -1853,7 +1853,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					respondSha:true,
 					skillTagFilter:function(player){
-						return player.countCards('h')>=2;
+						return player.countCards('hs')>=2;
 					},
 				}
 			},

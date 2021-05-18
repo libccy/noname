@@ -3,7 +3,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'xianjian',
 		character:{
-			pal_lixiaoyao:['male','qun',4,['tianjian','yufeng']],
+			pal_lixiaoyao:['male','qun',4,['tianjian','xjyufeng']],
 			pal_zhaoliner:['female','wei',3,['huimeng','tianshe']],
 			pal_linyueru:['female','wei',3,['guiyuan','qijian']],
 			pal_anu:['female','wu',3,['lingdi','anwugu']],
@@ -229,13 +229,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					switch(player.countUsed()){
 						case 2:skill='yanzhan';break;
 						case 3:skill='tianjian';break;
-						case 4:skill='yufeng';break;
+						case 4:skill='xjyufeng';break;
 					}
 					if(skill&&!player.hasSkill(skill)){
 						player.addTempSkill(skill);
 						player.popup(skill);
 						game.log(player,'获得了','【'+get.translation(skill)+'】');
-						if(skill=='yufeng'){
+						if(skill=='xjyufeng'){
 							var nh=player.countCards('h');
 							if(nh<2){
 								player.draw(2-nh);
@@ -243,7 +243,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!player.storage.counttrigger){
 									player.storage.counttrigger={};
 								}
-								player.storage.counttrigger.yufeng=1;
+								player.storage.counttrigger.xjyufeng=1;
 							}
 						}
 					}
@@ -1838,7 +1838,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-			yufeng:{
+			xjyufeng:{
 				trigger:{player:'loseEnd'},
 				forced:true,
 				usable:2,
@@ -4368,8 +4368,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tianjian:'天剑',
 			tianjian_info:'出牌阶段限一次，你可以将一张杀当作万箭齐发使用，受到伤害的角色随机弃置一张牌',
 			tianjian_info_alter:'出牌阶段限一次，你可以将一张杀当作万箭齐发使用',
-			yufeng:'御风',
-			yufeng_info:'锁定技，当你失去手牌后，若手牌数少于2，你将手牌数补至2（每回合最多发动两次）',
+			xjyufeng:'御风',
+			xjyufeng_info:'锁定技，当你失去手牌后，若手牌数少于2，你将手牌数补至2（每回合最多发动两次）',
 			huimeng:'回梦',
 			huimeng_info:'每当你回复一点体力，可以摸两张牌',
 			tianshe:'天蛇',

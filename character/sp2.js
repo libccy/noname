@@ -2145,11 +2145,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pozhu:{
 				enable:'phaseUse',
 				viewAsFilter:function(player){
-					return !player.hasSkill('pozhu3');
+					return !player.hasSkill('pozhu3')&&player.countCards('hs')>0;
 				},
 				viewAs:{name:'chuqibuyi'},
 				filterCard:true,
-				position:'h',
+				position:'hs',
 				check:function(card){
 					return 7-get.value(card);
 				},
@@ -4559,7 +4559,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'juanhui3',
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.getStorage('juanhui3').length>0&&player.countCards('h')>0;
+					return player.getStorage('juanhui3').length>0&&player.countCards('hs')>0;
 				},
 				chooseButton:{
 					dialog:function(event,player){
@@ -4585,6 +4585,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							audio:'juanhui',
 							popname:true,
 							filterCard:true,
+							position:'hs',
 							viewAs:{
 								name:links[0][2],
 								nature:links[0][3],
@@ -5876,12 +5877,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:"phaseUse",
 				filter:function(event,player){
 					if(player.hasJudge('bingliang')) return false;
-					return player.countCards('he',function(card){
+					return player.countCards('hes',function(card){
 						return get.color(card)=='black'&&get.type(card)=='basic';
 					})>0;
 				},
 				viewAs:{name:'bingliang'},
-				position:"he",
+				position:"hes",
 				filterCard:function(card,player,event){
 					return get.color(card)=='black'&&get.type(card)=='basic'&&player.canAddJudge({name:'bingliang',cards:[card]});
 				},
@@ -8715,7 +8716,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'useCardAfter',
 				},
 				filter:function(event,player){
-					if(player.hasSkill('xinfu_sidaoy')||!player.countCards('h')) return false;
+					if(player.hasSkill('xinfu_sidaoy')||!player.countCards('hs')) return false;
 					if(!event.targets||!event.targets.length||!event.isPhaseUsing(player)) return false;
 					var history=player.getHistory('useCard');
 					var index=history.indexOf(event)-1;
@@ -8749,7 +8750,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:function(card){
 					return get.itemtype(card)=='card';
 				},
-				position:"h",
+				position:"hs",
 				viewAs:{
 					name:"shunshou",
 				},

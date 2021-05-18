@@ -1944,13 +1944,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						lib.init.onfree();
 					}
 					else{
+						var chara=(get.config('character_three')||lib.choiceThree);
 						game.chooseCharacterDouble(function(i){
 							if(get.config('enable_all_three')){
 								if(lib.filter.characterDisabled(i)) return false;
 								return !lib.filter.characterDisabled(i);
 							}
 							else{
-								return lib.choiceThree.contains(i);
+								return chara.contains(i);
 							}
 						},function(i){
 							return i==1?'主帅':'前锋';

@@ -105,7 +105,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			taipingyaoshu:{
 				audio:true,
-				mode:['guozhan'],
 				fullskin:true,
 				type:'equip',
 				subtype:'equip2',
@@ -1070,12 +1069,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				equipSkill:true,
 				mod:{
 					maxHandcard:function(player,num){
-						if(player.hasSkill('huangjintianbingfu')){
-							num+=player.storage.huangjintianbingfu.length;
+						if(get.mode()=='guozhan'){
+							if(player.hasSkill('huangjintianbingfu')){
+								num+=player.storage.huangjintianbingfu.length;
+							}
+							return num+game.countPlayer(function(current){
+								return current.isFriendOf(player);
+							});
 						}
-						return num+game.countPlayer(function(current){
-							return current.isFriendOf(player);
-						});
+						return num+game.countGroup();
 					}
 				},
 				trigger:{player:'damageBegin4'},
@@ -1399,7 +1401,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			feilongduofeng3:'飞龙夺凤',
 			feilongduofeng_info:'当你使用【杀】指定一名角色为目标后，你可令该角色弃置一张牌。当你使用【杀】令其他角色进入濒死状态时，你可以获得其一张手牌。',
 			taipingyaoshu:'太平要术',
-			taipingyaoshu_info:'锁定技，防止你受到的所有属性伤害；全场每有一名与你势力相同的角色存活，你的手牌上限便+1；当你失去装备区里的【太平要术】时，你摸两张牌，然后若你的体力值大于1，你失去1点体力。',
+			taipingyaoshu_info:'锁定技，防止你受到的所有属性伤害；你的手牌上限+X（X为势力数）；当你失去装备区里的【太平要术】时，你摸两张牌，然后若你的体力值大于1，你失去1点体力。',
+			taipingyaoshu_info_guozhan:'锁定技，防止你受到的所有属性伤害；全场每有一名与你势力相同的角色存活，你的手牌上限便+1；当你失去装备区里的【太平要术】时，你摸两张牌，然后若你的体力值大于1，你失去1点体力。',
 			yuxi_skill:'玉玺',
 			yuxi_skill2:'玉玺',
 			yuxi:'玉玺',

@@ -1589,7 +1589,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			_gongshoujintui:{
 				enable:'chooseToUse',
 				filter:function(event,player){
-					var cards=player.getCards('h');
+					var cards=player.getCards('hs');
 					for(var i of cards){
 						var name=get.name(i,player);
 						if(name=='gongshoujianbei'){
@@ -1620,11 +1620,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				chooseButton:{
 					dialog:function(event,player){
 						var list=[];
-						if(player.countCards('h','gongshoujianbei')){
+						if(player.countCards('hs','gongshoujianbei')){
 							list.push(['锦囊','','wanjian']);
 							list.push(['锦囊','','taoyuan']);
 						}
-						if(player.countCards('h','jintuiziru')){
+						if(player.countCards('hs','jintuiziru')){
 							list.push(['锦囊','','nanman']);
 							list.push(['锦囊','','wugu']);
 						}
@@ -1633,7 +1633,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					filter:function(button,player){
 						var name=button.link[2];
 						var rawname=((name=='wanjian'||name=='taoyuan')?'gongshoujianbei':'jintuiziru');
-						var cards=player.getCards('h');
+						var cards=player.getCards('hs');
 						var evt=_status.event.getParent();
 						for(var i of cards){
 							if(get.name(i,player)==rawname&&evt.filterCard({

@@ -3077,7 +3077,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					isCard:true,
 				},
 				viewAsFilter:function(player){
-					return !player.hasJudge('lebu')&&player.countCards('he',function(card){
+					return !player.hasJudge('lebu')&&player.countCards('hes',function(card){
 						return get.color(card)=='red'&&get.type(card,'trick')!='trick';
 					});
 				},
@@ -3088,7 +3088,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 7+(_status.event.dying||_status.event.player).getDamagedHp()-get.value(card);
 				},
 				ignoreMod:true,
-				position:'he',
+				position:'hes',
 				precontent:function(){
 					player.logSkill('misuzu_nongyin');
 					player.$throw(event.result.cards);
@@ -3550,10 +3550,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					})>1?1:-1;
 				},
 				filter:function(event,player){
-					return player.countCards('h','tao')&&game.hasPlayer(function(current){
+					return player.countCards('hs','tao')&&game.hasPlayer(function(current){
 						return lib.skill.nao_shouqing2.filterTarget(null,player,current)
 					});
 				},
+				position:'hs',
 				onuse:function(links,player){
 					player.addSkill('nao_shouqing3');
 					player.addMark('nao_shouqing3',1,false);
@@ -4122,9 +4123,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				viewAs:{name:'mapodoufu'},
 				filterCard:{suit:'heart'},
 				viewAsFilter:function(player){
-					return player.countCards('he',{suit:'heart'})>0;
+					return player.countCards('hes',{suit:'heart'})>0;
 				},
-				position:'he',
+				position:'hes',
 				mod:{
 					selectTarget:function(card,player,range){
 						if(card.name=='mapodoufu'&&range[1]!=-1) range[1]++;
@@ -4806,7 +4807,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hinata_qiulve:{
 				enable:['chooseToUse','chooseToRespond'],
 				viewAsFilter:function(player){
-					return player.countCards('he',function(card){
+					return player.countCards('hes',function(card){
 						return get.type(card)!='basic';
 					})>0;
 				},
@@ -4815,7 +4816,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.type(card)!='basic';
 				},
 				locked:false,
-				position:'he',
+				position:'hes',
 				check:function(card){
 					var val=get.value(card);
 					if(val>=6) return 0;
@@ -4831,7 +4832,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					respondSha:true,
 					skillTagFilter:function(player){
-						return player.countCards('he',function(card){
+						return player.countCards('hes',function(card){
 							return get.type(card)!='basic';
 						})>0;
 					},
@@ -5640,10 +5641,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			inari_baiwei:{
 				enable:['chooseToUse','chooseToRespond'],
 				hiddenCard:function(player,name){
-					return name!='du'&&get.type(name)=='basic'&&player.countCards('he',{suit:'diamond'})>0;
+					return name!='du'&&get.type(name)=='basic'&&player.countCards('hes',{suit:'diamond'})>0;
 				},
 				filter:function(event,player){
-					if(event.type=='wuxie'||!player.countCards('he',{suit:'diamond'})) return false;
+					if(event.type=='wuxie'||!player.countCards('hse',{suit:'diamond'})) return false;
 					for(var i=0;i<lib.inpile.length;i++){
 						var name=lib.inpile[i];
 						if(name!='du'&&name!='shan'&&get.type(name)=='basic'&&event.filterCard({name:name},player,event)) return true;
@@ -5691,7 +5692,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(get.type(card)=='basic') return 6;
 								return 1/Math.max(0.1,get.value(card));
 							},
-							position:'he',
+							position:'hse',
 							viewAs:{name:links[0][2],nature:links[0][3]},
 						}
 					},
@@ -5736,13 +5737,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(card){
 					return 1/Math.max(0.1,get.value(card));
 				},
-				position:'he',
+				position:'hse',
 				ai:{
 					order:10,
 					result:{player:1},
 					respondShan:true,
 					skillTagFilter:function(player){
-						return player.countCards('he',{suit:'diamond'})>0;
+						return player.countCards('hse',{suit:'diamond'})>0;
 					},
 				},
 			},
@@ -6309,10 +6310,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:['chooseToUse','chooseToRespond'],
 				viewAs:{name:'shan'},
 				filterCard:true,
-				position:'he',
+				position:'hes',
 				prompt:'将一张牌当做闪使用或打出',
 				viewAsFilter:function(player){
-					return player.isDisabled(2)&&player.countCards('he')>0;
+					return player.isDisabled(2)&&player.countCards('hes')>0;
 				},
 				check:function(card){
 					return 1/Math.max(0.1,get.value(card));
@@ -7383,7 +7384,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			noname_retieji:{
 				inherit:"retieji",
 				mark:true,
-				marktext:"<img style=width:21px src="+lib.assetURL+"/image/character/noname_machao.png>",
+				marktext:"<img style=width:21px src="+lib.assetURL+"image/character/noname_machao.png>",
 				intro:{
 					name:"小无·铁骑",
 					content:"你使用【杀】指定一名角色为目标后，可以进行一次判定并令该角色的非锁定技失效直到回合结束，除非该角色弃置一张与判定结果花色相同的牌，否则不能使用【闪】抵消此【杀】。",
@@ -7392,7 +7393,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			noname_jiang:{
 				inherit:"jiang",
 				mark:true,
-				marktext:"<img style=width:21px src="+lib.assetURL+"/image/character/noname_sunce.png>",
+				marktext:"<img style=width:21px src="+lib.assetURL+"image/character/noname_sunce.png>",
 				intro:{
 					name:"小无·激昂",
 					content:"每当你使用（指定目标后）或被使用（成为目标后）一张【决斗】或红色的【杀】时，你可以摸一张牌。",
@@ -7885,7 +7886,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'taoluan',
 				enable:'chooseToUse',
 				filter:function(event,player){
-					return event.type!='wuxie'&&event.type!='respondShan'&&!player.hasSkill('junktaoluan3')&&player.countCards('he',function(card){
+					return event.type!='wuxie'&&event.type!='respondShan'&&!player.hasSkill('junktaoluan3')&&player.countCards('hes',function(card){
 						return !player.storage.junktaoluan2.contains(get.suit(card));
 					})>0;
 				},
@@ -7918,7 +7919,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					check:function(button){
 						var player=_status.event.player;
-						if(player.countCards('h',button.link[2])>0) return 0;
+						if(player.countCards('sh',button.link[2])>0) return 0;
 						if(button.link[2]=='wugu') return;
 						var effect=player.getUseValue(button.link[2]);
 						if(effect>0) return effect;
@@ -7935,7 +7936,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							check:function(card){
 								return 6-get.value(card);
 							},
-							position:'he',
+							position:'hse',
 							viewAs:{name:links[0][2],nature:links[0][3]},
 							onuse:function(result,player){
 								player.storage.junktaoluan2.add(get.suit(result.cards[0],player));
@@ -8032,7 +8033,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				prompt:'将一张牌当做闪使用',
 				enable:'chooseToUse',
 				filter:function(event,player){
-					return player.countCards('he',function(card){
+					return player.countCards('hes',function(card){
 						return !player.storage.junktaoluan2.contains(get.suit(card));
 					})&&!player.storage.junktaoluan.contains('shan')&&!player.hasSkill('junktaoluan3');
 				},
@@ -8055,7 +8056,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:function(card,player){
 					return !player.storage.junktaoluan2.contains(get.suit(card));
 				},
-				position:'he',
+				position:'hes',
 				selectCard:1,
 				viewAs:{name:'shan'},
 				check:function(card){
@@ -8073,7 +8074,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					skillTagFilter:function(player){
-						return player.countCards('he')&&!player.storage.junktaoluan.contains('shan')&&!player.hasSkill('junktaoluan3');
+						return player.countCards('hse')&&!player.storage.junktaoluan.contains('shan')&&!player.hasSkill('junktaoluan3');
 					},
 					threaten:1.5,
 					respondShan:true,
@@ -8084,12 +8085,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'chooseToUse',
 				prompt:'将一张牌当做无懈可击使用',
 				filter:function(event,player){
-					return player.countCards('he',function(card){
+					return player.countCards('hes',function(card){
 						return !player.storage.junktaoluan2.contains(get.suit(card));
 					})&&(!player.storage.junktaoluan.contains('wuxie'))&&!player.hasSkill('junktaoluan3');
 				},
 				viewAsFilter:function(player){
-					return player.countCards('he',function(card){
+					return player.countCards('hes',function(card){
 						return !player.storage.junktaoluan2.contains(get.suit(card));
 					})&&(!player.storage.junktaoluan.contains('wuxie'))&&!player.hasSkill('junktaoluan3');
 				},
@@ -8112,7 +8113,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:function(card,player){
 					return !player.storage.junktaoluan2.contains(get.suit(card));
 				},
-				position:'he',
+				position:'hse',
 				selectCard:1,
 				viewAs:{name:'wuxie'},
 				check:function(card){
@@ -10715,13 +10716,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.hp<=0;
 				},
 				filterCard:{suit:'club'},
-				position:'he',
+				position:'hse',
 				viewAs:{name:'tao'},
 				prompt:'将一张梅花牌当桃使用',
 				check:function(card){return 15-get.value(card)},
 				ai:{
 					skillTagFilter:function(player){
-						return player.countCards('he',{suit:'club'})>0;
+						return player.countCards('hes',{suit:'club'})>0;
 					},
 					threaten:1.5,
 					save:true,
@@ -10870,8 +10871,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filter:function(event,player){
 							return player.hasCard(function(card){
 								return get.color(card)!=player.storage.nsduijue_use;
-							});
+							},'hs');
 						},
+						position:'hs',
 						filterCard:function(card,player){
 							return get.color(card)!=player.storage.nsduijue_use;
 						},
@@ -10900,15 +10902,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:true,
 				viewAs:{name:'sha'},
 				viewAsFilter:function(player){
-					if(!player.countCards('h')) return false;
+					if(!player.countCards('hs')) return false;
 				},
+				position:'hs',
 				prompt:'将一张手牌当杀打出',
 				check:function(card){return 7-get.value(card)},
 				ai:{
 					respondSha:true,
 					skillTagFilter:function(player,tag,arg){
 						if(arg!='respond') return false;
-						if(!player.countCards('h')) return false;
+						if(!player.countCards('hs')) return false;
 					},
 				}
 			},
@@ -11736,8 +11739,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				viewAs:{name:'wugu'},
 				usable:1,
 				filterCard:{type:'basic'},
+				position:'hs',
 				filter:function(event,player){
-					return player.countCards('h',{type:'basic'})>0;
+					return player.countCards('hs',{type:'basic'})>0;
 				},
 				check:function(card){
 					return 6-get.value(card);
@@ -12516,11 +12520,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:function(card){
 					return get.type(card)!='basic';
 				},
-				position:'he',
+				position:'hse',
 				filter:function(event,player){
 					return player.hasCard(function(card){
 						return get.type(card)!='basic';
-					},'he');
+					},'hes');
 				},
 				viewAs:{name:'shuiyanqijun'},
 				prompt:'将一张非基本牌当水淹七军使用',

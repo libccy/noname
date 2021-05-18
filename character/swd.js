@@ -26,7 +26,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			swd_quxian:['female','qun',3,['mojian','huanxia']],
 			swd_xiyan:['male','qun',3,['jiefen','datong']],
 			swd_cheyun:['female','wu',3,['cyxianjiang','cyqiaoxie','shengong']],
-			swd_huanyuanzhi:['male','qun',3,['tianshu','lanzhi','mufeng']],
+			swd_huanyuanzhi:['male','qun',3,['swdtianshu','lanzhi','mufeng']],
 			swd_murongshi:['female','shu',4,['duanyi','guxing']],
 			swd_jipeng:['male','wu',3,['reyingzi','guozao']],
 			swd_qi:['male','qun',3,['yaotong','heihuo','pojian']],
@@ -7123,13 +7123,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			tianshu_old:{
+			swdtianshu_old:{
 				unique:true,
 				trigger:{player:'phaseEnd'},
 				direct:true,
 				init:function(player){
-					player.storage.tianshu=[];
-					player.storage.tianshu2={};
+					player.storage.swdtianshu=[];
+					player.storage.swdtianshu2={};
 				},
 				intro:{
 					content:function(storage){
@@ -7154,10 +7154,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseToDiscard('he',get.prompt('tianshu')).ai=function(card){
+					player.chooseToDiscard('he',get.prompt('swdtianshu')).ai=function(card){
 						if(get.position(card)=='h') return 5-get.useful(card);
 						return 4-get.value(card);
-					}.logSkill='tianshu';
+					}.logSkill='swdtianshu';
 					'step 1'
 					if(result.bool){
 						var list=[];
@@ -7176,7 +7176,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					'step 2'
-					player.storage.tianshu_learn=result.links[0];
+					player.storage.swdtianshu_learn=result.links[0];
 					//
 					// var target=trigger.targets[0];
 					// var names=[];
@@ -7190,7 +7190,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					//     if(info){
 					//         var skills=info[3];
 					//         for(var j=0;j<skills.length;j++){
-					//             if(player.storage.tianshu.contains(skills[j])) continue;
+					//             if(player.storage.swdtianshu.contains(skills[j])) continue;
 					//             if(lib.translate[skills[j]+'_info']&&lib.skill[skills[j]]&&
 					//                 !lib.skill[skills[j]].unique&&!pss.contains(skills[j])){
 					//                 list.add(skills[j]);
@@ -7199,22 +7199,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					//     }
 					// }
 					// var skill=list.randomGet();
-					// player.storage.tianshu.push(skill);
-					// player.storage.tianshu2.push(target);
+					// player.storage.swdtianshu.push(skill);
+					// player.storage.swdtianshu2.push(target);
 					// player.popup(skill);
-					// player.syncStorage('tianshu');
+					// player.syncStorage('swdtianshu');
 					// player.updateMarks();
 					// game.log(player,'学习了','【'+get.translation(skill)+'】');
 				},
-				group:'tianshu2',
+				group:'swdtianshu2',
 				ai:{
 					threaten:2
 				}
 			},
-			tianshu2:{
+			swdtianshu2:{
 				enable:'phaseUse',
 				filter:function(event,player){
-					return !player.hasSkill('tianshu3')&&player.storage.tianshu&&player.storage.tianshu.length>0;
+					return !player.hasSkill('swdtianshu3')&&player.storage.swdtianshu&&player.storage.swdtianshu.length>0;
 				},
 				intro:{
 					nocount:true
@@ -7222,9 +7222,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				delay:0,
 				content:function(){
 					'step 0'
-					var list=player.storage.tianshu;
-					if(player.additionalSkills.tianshu){
-						player.removeSkill(player.additionalSkills.tianshu);
+					var list=player.storage.swdtianshu;
+					if(player.additionalSkills.swdtianshu){
+						player.removeSkill(player.additionalSkills.swdtianshu);
 					}
 					event.skillai=function(list){
 						return get.max(list,get.skillRank,'item');
@@ -7272,12 +7272,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var link=result;
 					player.addSkill(link);
 					player.skills.remove(link);
-					player.additionalSkills.tianshu=link;
+					player.additionalSkills.swdtianshu=link;
 					player.popup(link);
-					var target=player.storage.tianshu2[player.storage.tianshu.indexOf(link)];
-					player.markSkillCharacter('tianshu2',target,get.translation(link),lib.translate[link+'_info']);
+					var target=player.storage.swdtianshu2[player.storage.swdtianshu.indexOf(link)];
+					player.markSkillCharacter('swdtianshu2',target,get.translation(link),lib.translate[link+'_info']);
 					player.checkMarks();
-					player.addSkill('tianshu3');
+					player.addSkill('swdtianshu3');
 				},
 				ai:{
 					order:10,
@@ -7288,17 +7288,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			tianshu3:{
+			swdtianshu3:{
 				trigger:{global:['useCardAfter','useSkillAfter','phaseAfter']},
 				silent:true,
 				filter:function(event){
-					return event.skill!='tianshu2';
+					return event.skill!='swdtianshu2';
 				},
 				content:function(){
-					player.removeSkill('tianshu3');
+					player.removeSkill('swdtianshu3');
 				}
 			},
-			tianshu:{
+			swdtianshu:{
 				unique:true,
 				enable:'phaseUse',
 				filterCard:function(card){
@@ -7327,7 +7327,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return false;
 					}
 				},
-				group:'tianshu_remove',
+				group:'swdtianshu_remove',
 				createDialog:function(player,target,onlylist){
 					var names=[];
 					var list=[];
@@ -7384,7 +7384,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return get.max(list,get.skillRank,'item');
 					};
 					if(event.isMine()){
-						event.dialog=lib.skill.tianshu.createDialog(player,target);
+						event.dialog=lib.skill.swdtianshu.createDialog(player,target);
 						event.switchToAuto=function(){
 							event._result=event.skillai(event.list);
 							game.resume();
@@ -7393,7 +7393,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.pause();
 					}
 					else{
-						event._result=event.skillai(lib.skill.tianshu.createDialog(player,target,true));
+						event._result=event.skillai(lib.skill.swdtianshu.createDialog(player,target,true));
 					}
 					"step 1"
 					_status.imchoosing=false;
@@ -7401,10 +7401,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.dialog.close();
 					}
 					var link=result;
-					player.addAdditionalSkill('tianshu',link);
+					player.addAdditionalSkill('swdtianshu',link);
 					player.popup(link);
-					player.markSkillCharacter('tianshu',target,get.translation(link),lib.translate[link+'_info']);
-					player.storage.tianshu=target;
+					player.markSkillCharacter('swdtianshu',target,get.translation(link),lib.translate[link+'_info']);
+					player.storage.swdtianshu=target;
 					player.checkMarks();
 					game.log(player,'获得了技能','【'+get.translation(link)+'】');
 				},
@@ -7418,35 +7418,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			tianshu_remove:{
+			swdtianshu_remove:{
 				trigger:{global:'dieAfter'},
 				silent:true,
 				filter:function(event,player){
-					return event.player==player.storage.tianshu;
+					return event.player==player.storage.swdtianshu;
 				},
 				content:function(){
-					player.unmarkSkill('tianshu');
-					player.removeAdditionalSkill('tianshu');
-					delete player.storage.tianshu;
+					player.unmarkSkill('swdtianshu');
+					player.removeAdditionalSkill('swdtianshu');
+					delete player.storage.swdtianshu;
 				}
 			},
-			tianshu2_old:{
+			swdtianshu2_old:{
 				trigger:{player:'phaseBegin'},
 				direct:true,
 				priority:-9,
 				content:function(){
 					"step 0"
-					player.chooseTarget(get.prompt('tianshu'),lib.skill.tianshu.filterTarget).ai=function(target){
+					player.chooseTarget(get.prompt('swdtianshu'),lib.skill.swdtianshu.filterTarget).ai=function(target){
 						if(target.maxHp<5) return Math.random()*(5-target.maxHp);
 						return -1;
 					};
 					"step 1"
 					if(result.bool){
-						player.logSkill('tianshu',result.targets);
+						player.logSkill('swdtianshu',result.targets);
 						event.target=result.targets[0];
 						if(event.isMine()){
 							ui.auto.hide();
-							event.dialog=lib.skill.tianshu.createDialog(player,result.targets[0]);
+							event.dialog=lib.skill.swdtianshu.createDialog(player,result.targets[0]);
 							game.pause();
 						}
 						else{
@@ -7482,8 +7482,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					"step 2"
-					if(player.storage.tianshu){
-						player.unmark(player.storage.tianshu+'_charactermark');
+					if(player.storage.swdtianshu){
+						player.unmark(player.storage.swdtianshu+'_charactermark');
 					}
 					ui.auto.show();
 					if(event.dialog){
@@ -7493,7 +7493,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var target=event.target;
 					player.addSkill(link);
 					player.skills.remove(link);
-					player.additionalSkills.tianshu=link;
+					player.additionalSkills.swdtianshu=link;
 					player.markCharacter(target.name,{
 						name:get.translation(link),
 						content:lib.translate[link+'_info']
@@ -7501,10 +7501,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.addVideo('markCharacter',player,{
 						name:'get.translation(link)',
 						content:lib.translate[link+'_info'],
-						id:'tianshu',
+						id:'swdtianshu',
 						target:target.name
 					});
-					player.storage.tianshu=target.name;
+					player.storage.swdtianshu=target.name;
 					player.checkMarks();
 					player.popup(link);
 				},
@@ -10144,9 +10144,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tanlin2:'探麟',
 			pozhen:'破阵',
 			yunchou:'运筹',
-			tianshu:'天书',
-			tianshu_bg:'书',
-			tianshu2:'天书',
+			swdtianshu:'天书',
+			swdtianshu_bg:'书',
+			swdtianshu2:'天书',
 			xingdian:'星点',
 			luomei:'落梅',
 			yulin:'玉鳞',
@@ -10259,8 +10259,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pozhen_info_alter:'每当你受到一次伤害，若你的手牌数小于伤害来源，你可以弃置其X张手牌。X为你与伤害来源的手牌数之差。',
 			yunchou_info:'出牌阶段限一次，你可以弃置一张手牌，并弃置一名其他角色的一张手牌，若两张牌颜色相同，你摸一张牌，否则对方摸一张牌',
 			yunchou_info_alter:'出牌阶段限一次，你可以弃置一张非基本手牌，并弃置一名其他角色的一张手牌，若两张牌颜色相同，你摸一张牌，否则对方摸一张牌',
-			tianshu_old_info:'结束阶段，你可以弃置一张牌并从三名随机武将中选择一个，在2X回合后你将其所有技能加入你的天书列表，X为其技能数；在技能加入天书列表时，或于出牌阶段，你可以装备一项天书列表中的技能',
-			tianshu_info:'出牌阶段，你可以弃置一张锦囊牌，然后获得一名其他角色的一项技能直到该角色死亡（替换以此法获得的前一个技能）',
+			swdtianshu_old_info:'结束阶段，你可以弃置一张牌并从三名随机武将中选择一个，在2X回合后你将其所有技能加入你的天书列表，X为其技能数；在技能加入天书列表时，或于出牌阶段，你可以装备一项天书列表中的技能',
+			swdtianshu_info:'出牌阶段，你可以弃置一张锦囊牌，然后获得一名其他角色的一项技能直到该角色死亡（替换以此法获得的前一个技能）',
 			zaowu_info:'出牌阶段限一次，你可以将一张黑桃或红桃手牌当作封印之蛋使用',
 			luomei_info:'每当你使用或打出一张梅花花色的牌，你可以摸一张牌',
 			xingdian_info:'出牌阶段限一次，你可以弃置一张手牌，然后随机弃置两名敌人各一张牌',

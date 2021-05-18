@@ -3424,7 +3424,7 @@ div:not(.handcards)>.card>.info>span,
 #window:not(.nopointer) .pointertable td>span,
 #window:not(.nopointer) .config>.toggle.onoff,
 #window:not(.nopointer) .pointerdialog .button:not(.unselectable),
-#window:not(.nopointer) .dialog.fullheight .buttons .button:not(.selectedx):not(.glow):not(.forbidden),
+#window:not(.nopointer) .dialog.fullheight .buttons .button:not(.selectedx):not(.glow):not(.glows):not(.forbidden),
 #window:not(.nopointer) #arena.selecting:not(.video) .player .equips>.card.selectable,
 #window:not(.nopointer) #arena.selecting #me .card.selectable,
 #window:not(.nopointer) #arena.selecting .button.selectable,
@@ -4483,6 +4483,7 @@ div[data-decoration="bronze"]::after{
 }*/
 .player.selectable:not(.selected)::before,
 .card.glow::before,
+.card.glows::before,
 .button.glow::before {
 	opacity: 1;
 }
@@ -4503,6 +4504,9 @@ div[data-decoration="bronze"]::after{
 #me .card.glow::before {
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px,rgb(0, 133, 255) 0 0 5px, rgba(0, 133, 255,1) 0 0 10px;
 }
+#me .card.glows::before {
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px,rgb(255, 153, 51) 0 0 5px, rgba(255, 153, 51,1) 0 0 10px;
+}
 
 #me>#handcards1:not(.scrollh),
 #me>#handcards2:not(.scrollh) {
@@ -4514,6 +4518,9 @@ div[data-decoration="bronze"]::after{
 #me>div:not(.scrollh)>.handcards>.card.selected{
 	top:-20px;
 }*/
+.glows:not(.button):not(.card){
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(255, 153, 51, 0.4) 0 0 5px, rgba(255, 153, 51, 0.5) 0 0 12px, rgba(255, 153, 51, 0.8) 0 0 15px !important;
+}
 .glow:not(.button):not(.card){
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 133, 255, 0.4) 0 0 5px, rgba(0, 133, 255, 0.5) 0 0 12px, rgba(0, 133, 255, 0.8) 0 0 15px !important;
 }

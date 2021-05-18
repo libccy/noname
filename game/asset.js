@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.109.3.8',
+	'v1.9.110',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -701,6 +701,8 @@ window.noname_asset_list=[
 	'audio/die/sp_bianfuren.mp3',
 	'audio/die/sp_duyu.mp3',
 	'audio/die/zongyu.mp3',
+	'audio/die/nanhualaoxian.mp3',
+	'audio/die/simazhou.mp3',
 
 	'audio/skill/decadezishou1.mp3',
 	'audio/skill/decadezishou2.mp3',
@@ -3087,6 +3089,14 @@ window.noname_asset_list=[
 	'audio/skill/spyuejian2.mp3',
 	'audio/skill/zyqiao1.mp3',
 	'audio/skill/zyqiao2.mp3',
+	'audio/skill/caiwang1.mp3',
+	'audio/skill/caiwang2.mp3',
+	'audio/skill/naxiang1.mp3',
+	'audio/skill/naxiang2.mp3',
+	'audio/skill/tianshu1.mp3',
+	'audio/skill/tianshu2.mp3',
+	'audio/skill/yufeng1.mp3',
+	'audio/skill/yufeng2.mp3',
 	
 	'audio/voice/male/0.mp3',
 	'audio/voice/male/1.mp3',
@@ -3183,7 +3193,8 @@ window.noname_asset_list=[
 	'image/card/kuwu.png',
 	'image/card/jiuwei.png',
 	'image/card/mianju.png',
-	'image/card/shoulijian.png','image/card/rewrite_bagua.png',
+	'image/card/shoulijian.png',
+	'image/card/rewrite_bagua.png',
 	'image/card/rewrite_baiyin.png',
 	'image/card/rewrite_lanyinjia.png',
 	'image/card/rewrite_renwang.png',
@@ -3893,6 +3904,7 @@ window.noname_asset_list=[
 	'image/character/noname_machao.png',
 	'image/character/noname_sunce.png',
 	'image/character/simazhou.jpg',
+	'image/character/nanhualaoxian.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
