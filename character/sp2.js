@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			cheliji:['male','qun',4,['cheliji_skill1','cheliji_skill2'],['unseen']],
 			simazhou:['male','jin',4,['caiwang','naxiang']],
 			huangzu:['male','qun',4,['wangong'],['unseen']],
 			caosong:['male','wei',3,['cslilu','csyizheng']],
@@ -114,6 +115,136 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//彻里吉
+			cheliji_skill1:{
+				audio:2,
+				enable:'phaseUse',
+				derivation:['cheliji_sichengliangyu','cheliji_tiejixuanyu','cheliji_feilunzhanyu'],
+				filter:function(event,player){
+					return !player.getEquip(5)&&player.countCards('he',{color:'black'})>0;
+				},
+				filterCard:{color:'black'},
+				position:'he',
+				check:function(card){
+					return 5-get.value(card);
+				},
+				content:function(){
+					'step 0'
+					player.chooseButton(['请选择要装备的宝物',[lib.skill.cheliji_skill1.derivation.map(function(i){
+						return ['宝物','',i];
+					}),'vcard']],true).set('ai',function(button){
+						if(button.link[2]=='cheliji_sichengliangyu'&&player.countCards('h')<player.hp) return 1;
+						return Math.random();
+					});
+					'step 1'
+					var card=game.createCard(result.links[0][2]);
+					player.$gain2(card);
+					player.equip(card);
+					game.delay();
+				},
+				group:'cheliji_skill1_lose',
+				subfrequent:['lose'],
+				ai:{
+					order:0.4,
+					result:{
+						player:1,
+					},
+				},
+				subSkill:{
+					lose:{
+						audio:'cheliji_skill1',
+						trigger:{
+							player:'loseAfter',
+							global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
+						},
+						frequent:true,
+						filter:function(event,player){
+							var evt=event.getl(player);
+							if(!evt||!evt.es||!evt.es.length) return false;
+							for(var i of evt.es){
+								if(get.subtype(i,false)=='equip5') return true;
+							}
+							return false;
+						},
+						content:function(){
+							'step 0'
+							player.judge(function(card){
+								if(get.color(card)=='black') return 3;
+								return 0;
+							});
+							'step 1'
+							if(result.bool){
+								var card=game.createCard(lib.skill.cheliji_skill1.derivation.randomGet());
+								player.$gain2(card);
+								player.equip(card);
+								game.delay();
+							}
+						},
+					},
+				}
+			},
+			cheliji_skill2:{
+				mod:{
+					globalFrom:function(player,target,distance){
+						if(player.getEquip(5)) return distance-1;
+					}
+				},
+			},
+			cheliji_sichengliangyu:{
+				trigger:{global:'phaseJieshuBegin'},
+				equipSkill:true,
+				filter:function(event,player){
+					return player.countCards('h')<player.hp&&player.getEquip('cheliji_sichengliangyu');
+				},
+				content:function(){
+					'step 0'
+					player.draw(2);
+					'step 1'
+					var card=player.getEquip('cheliji_sichengliangyu');
+					if(card) player.discard(card);
+				},
+			},
+			cheliji_tiejixuanyu:{
+				trigger:{global:'phaseJieshuBegin'},
+				equipSkill:true,
+				filter:function(event,player){
+					return player!=event.player&&!event.player.getHistory('sourceDamage').length
+					&&event.player.countCards('he')>0&&player.getEquip('cheliji_tiejixuanyu');
+				},
+				logTarget:'player',
+				check:function(event,player){
+					return get.attitude(player,event.player)<0;
+				},
+				content:function(){
+					'step 0'
+					trigger.player.chooseToDiscard('he',2,true);
+					'step 1'
+					var card=player.getEquip('cheliji_tiejixuanyu');
+					if(card) player.discard(card);
+				},
+			},
+			cheliji_feilunzhanyu:{
+				trigger:{global:'phaseJieshuBegin'},
+				equipSkill:true,
+				filter:function(event,player){
+					return player!=event.player&&event.player.getHistory('useCard',function(card){
+						return get.type(card)!='basic';
+					}).length>0&&event.player.countCards('he')>0&&player.getEquip('cheliji_feilunzhanyu');
+				},
+				logTarget:'player',
+				check:function(event,player){
+					return get.attitude(player,event.player)<=0;
+				},
+				content:function(){
+					'step 0'
+					trigger.player.chooseCard('he',true,'将一张牌交给'+get.translation(player));
+					'step 1'
+					if(result.bool) player.gain(result.cards,trigger.player,'giveAuto');
+					'step 2'
+					var card=player.getEquip('cheliji_feilunzhanyu');
+					if(card) player.discard(card);
+				},
+			},
 			//司马伷和黄祖
 			caiwang:{
 				audio:2,
@@ -966,14 +1097,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return event.toShow&&event.toShow.contains('jin_yanghuiyu')&&game.hasPlayer(function(target){
 						var num=target.countCards('h');
-						return num>target.hp||Math.min(5,target.hp);
+						return num>target.hp||num<Math.min(5,target.hp);
 					});
 				},
 				content:function(){
 					'step 0'
 					player.chooseTarget('请选择【慧容】的目标','令一名角色将手牌数摸至/弃置至与其体力值相同（至多摸至五张）',true,function(card,player,target){
 						var num=target.countCards('h');
-						return num>target.hp||Math.min(5,target.hp);
+						return num>target.hp||num<Math.min(5,target.hp);
 					}).set('ai',function(target){
 						var att=get.attitude(_status.event.player,target);
 						var num=target.countCards('h');
@@ -9417,6 +9548,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		card:{
+			cheliji_sichengliangyu:{
+				fullskin:true,
+				vanish:true,
+				//derivation:'cheliji',
+				destroy:'cheliji_skill1',
+				type:'equip',
+				subtype:'equip5',
+				skills:['cheliji_sichengliangyu'],
+			},
+			cheliji_tiejixuanyu:{
+				fullskin:true,
+				vanish:true,
+				//derivation:'cheliji',
+				destroy:'cheliji_skill1',
+				type:'equip',
+				subtype:'equip5',
+				skills:['cheliji_tiejixuanyu'],
+			},
+			cheliji_feilunzhanyu:{
+				fullskin:true,
+				vanish:true,
+				//derivation:'cheliji',
+				destroy:'cheliji_skill1',
+				type:'equip',
+				subtype:'equip5',
+				skills:['cheliji_feilunzhanyu'],
+			},
 			pyzhuren_heart:{
 				fullskin:true,
 				derivation:'puyuan',
@@ -9549,6 +9707,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caosong:'曹嵩（？—194年），字巨高，沛郡谯县（今安徽省亳州市）人。东汉大臣，大长秋曹腾的养子，曹操之父亲。门荫入仕，历任司隶校尉、鸿胪卿、大司农，位列九卿，位高权重。中平四年（187年），靠着贿赂中官，出任太尉，位列三公。中平五年（188年），受累于黄巾之乱，坐罪免官。兴平元年（194年），投奔兖州牧曹操，遇害于徐州。延康元年（220年），追尊魏国太王。曹魏建立后，追尊皇帝，谥号为太。',
 			simazhou:'司马伷（zhòu）（227年～283年6月12日），字子将，河内郡温县（今河南省温县）人。西晋宗室、将领，晋宣帝司马懿第三子，伏太妃所生。晋景帝司马师、文帝司马昭的同父异母弟，晋武帝司马炎的叔父。司马伷少有才气，在曹魏历任宁朔将军、散骑常侍、征虏将军等职，先后受封南安亭侯、东武乡侯，五等爵制建立后，改封南皮伯。西晋建立后，获封东莞郡王，入朝任尚书右仆射、抚军将军，出外拜镇东大将军。后改封琅邪王，加开府仪同三司。西晋伐吴时，率军出涂中，孙皓向他投降并奉上玉玺。战后因功拜大将军，增邑三千户。太康四年（283年），司马伷去世，享年五十七岁。谥号为武，世称“琅邪武王”。著有《周官宁朔新书》八卷，今已亡佚。',
 			huangzu:'黄祖（？－208年），东汉末年将领。刘表任荆州牧时，黄祖出任江夏太守。初平二年（191年），黄祖在与长沙太守孙坚交战时，其部下将孙坚射死，因此与孙家结下仇怨。之后，黄祖多次率部与东吴军队交战，射杀凌操、徐琨等人。建安十三年（208年），在与孙权的交战中，兵败被杀。',
+			cheliji:'彻里吉是历史小说《三国演义》中的虚构人物，西羌国王。蜀相诸葛亮伐魏，魏都督曹真驰书赴羌，国王彻里吉即命雅丹丞相与越吉元帅起羌兵一十五万、并战车直扣西平关。后军大败，越吉亡，雅丹被俘，亮将所获羌兵及车马器械，尽给还雅丹，俱放回国。彻里吉感蜀恩义，与之结盟。正史中没有关于彻里吉的记载。',
 		},
 		characterTitle:{
 			wulan:'#b对决限定武将',
@@ -10168,6 +10327,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			naxiang:'纳降',
 			naxiang2:'纳降',
 			naxiang_info:'锁定技，当你受到其他角色造成的伤害后，或你对其他角色造成伤害后，你对其发动〖才望〗时的“弃置”改为“获得”直到你的下回合开始。',
+			cheliji:'彻里吉',
+			cheliji_skill1:'彻里吉技能1',
+			cheliji_skill1_info:'出牌阶段，若你的装备区里没有宝物牌，你可弃置一张黑色牌，选择一张【舆】置入你的装备区；当你失去装备区里的宝物牌后，你可进行判定，若结果为黑色，将一张随机的【舆】置入你的装备区。',
+			cheliji_skill2:'彻里吉技能2',
+			cheliji_skill2_info:'锁定技，若你的装备区内有宝物牌，你与其他角色的距离-1',
+			cheliji_sichengliangyu:'四乘粮舆',
+			cheliji_sichengliangyu_info:'一名角色的回合结束时，若你的手牌数小于体力值，你可以摸两张牌，然后弃置此牌。',
+			cheliji_tiejixuanyu:'铁蒺玄舆',
+			cheliji_tiejixuanyu_info:'其他角色的回合结束时，若其本回合未造成过伤害，你可以令其弃置两张牌，然后弃置此牌。',
+			cheliji_feilunzhanyu:'飞轮战舆',
+			cheliji_feilunzhanyu_info:'其他角色的回合结束时，若其本回合使用过非基本牌，你可以令其交给你一张牌，然后弃置此牌。',
 
 			sp_yingbian:'文德武备',
 			sp_whlw:"文和乱武",

@@ -84,7 +84,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				range:{attack:1},
 				selectTarget:1,
 				yingbian_prompt:function(card){
-					if(card.nature=='fire'){
+					if(lib.linked.contains(card.nature)){
 						return '此牌的伤害值基数+1';
 					}
 					else{
@@ -92,9 +92,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				yingbian:function(event){
-					if(event.card.nature=='fire'){
+					if(lib.linked.contains(event.card.nature)){
 						if(typeof event.baseDamage!='number') event.baseDamage=1;
 						event.baseDamage++;
+						game.log(event.card,'的伤害值基数+1');
 					}
 					else{
 						event.yingbian_addTarget=true;
@@ -1220,6 +1221,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(player==target) return false;
 					return target.countDiscardableCards(player,get.is.single()?'he':'hej');
 				},
+				yingbian_prompt:'当你使用此牌选择目标后，你可为此牌增加一个目标',
+				yingbian:function(event){
+					event.yingbian_addTarget=true;
+				},
 				content:function(){
 					'step 0'
 					if(!get.is.single()&&target.countDiscardableCards(player,'hej')){
@@ -1245,6 +1250,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						order:9,
 						useful:1,
 						value:5,
+					},
+					yingbian:function(card,player,targets,viewer){
+						if(get.attitude(viewer,player)<=0) return 0;
+						if(game.hasPlayer(function(current){
+							return !targets.contains(current)&&lib.filter.targetEnabled2(card,player,current)&&get.effect(current,card,player,player)>0;
+						})) return 6;
+						return 0;
 					},
 					result:{
 						target:function(player,target){

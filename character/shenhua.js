@@ -699,7 +699,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player:function(player){
 							if(!player.isDisabled('equip2')) return 1;
 							if(!player.isDisabled('equip1')&&(player.countCards('h',function(card){
-								return get.name(card,player)=='sha'&&player.hasUseTarget(card);
+								return get.name(card,player)=='sha'&&player.hasValueTarget(card);
 							})-player.getCardUsable('sha'))>1) return 1;
 							if(!player.isDisabled('equip5')&&player.countCards('h',function(card){
 								return get.type2(card,player)=='trick'&&player.hasUseTarget(card);
@@ -2754,7 +2754,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					event.num=trigger.num;
 					'step 1'
-					player.chooseDrawRecover(get.prompt(event.name)).set('logSkill',event.name).set('prompt2','摸一张牌或回复1点体力');
+					var choice;
+					if(player.isDamaged()&&get.recoverEffect(player)>0&&(player.countCards('hs',function(card){
+							return card.name=='sha'&&player.hasValueTarget(card);
+						})>=player.getCardUsable('sha'))){
+						choice='recover_hp';
+					}
+					else{
+						choice='draw_card';
+					}
+					var next=player.chooseDrawRecover(get.prompt(event.name)).set('logSkill',event.name).set('prompt2','摸一张牌或回复1点体力');
+					next.set('choice',choice);
+					next.set('ai',function(){
+						return _status.event.getParent().choice;
+					});
 					'step 2'
 					if(result.control!='cancel2'){
 						event.num--;

@@ -1157,7 +1157,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			qinzheng_count:{
-				trigger:{player:'useCard1'},
+				trigger:{player:['useCard1','respond']},
 				silent:true,
 				firstDo:true,
 				noHidden:true,
@@ -4744,7 +4744,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								links:['qiaosi_c1','qiaosi_c6'].concat(['qiaosi_c2','qiaosi_c3','qiaosi_c4','qiaosi_c5'].randomGets(1)),
 							};
 							if(event.dialog) event.dialog.close();
-							if(event.control) event.control.close();
+							if(event.controls){
+								for(var i of event.controls) i.close();
+							}
 							game.resume();
 						},5000);
 					};
@@ -4794,11 +4796,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								links:event.finishedx.slice(0),
 							};
 							event.dialog.close();
-							event.control.close();
+							for(var i of event.controls) i.close();
 							game.resume();
 							_status.imchoosing=false;
 						},
-						event.control=ui.create.control('qiaosi_c1','qiaosi_c2','qiaosi_c3','qiaosi_c4','qiaosi_c5','qiaosi_c6',function(link){
+						event.controls=[];
+						for(var i=1;i<=6;i++) event.controls.push(ui.create.control('qiaosi_c'+i,function(link){
 							var event=_status.event;
 							if(event.finishedx.contains(link)) return;
 							event.status[link]+=get.rand.apply(get,event.map[link]);
@@ -4816,7 +4819,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										links:event.finishedx.slice(0),
 									};
 									event.dialog.close();
-									event.control.close();
+									for(var i of event.controls) i.close();
 									game.resume();
 									_status.imchoosing=false;
 								}
@@ -4828,7 +4831,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 								event.dialog.content.childNodes[0].innerHTML=str;
 							}
-						});
+						}));
 						for(var i=0;i<event.dialog.buttons.length;i++){
 							event.dialog.buttons[i].classList.add('selectable');
 						}
@@ -6622,6 +6625,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return ["bagua","baiyin","lanyinjia","renwang","tengjia","zhuge"].contains(card.name);
 				},
 				discard:false,
+				lose:false,
+				delay:false,
 				check:function(){
 					return 1;
 				},
@@ -6630,7 +6635,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.showCards(cards);
 					"step 1"
 					var card=cards[0];
-					player.gain(game.createCard('rewrite_'+card.name,get.suit(card),card.number),'gain2');
+					player.removeEquipTrigger(card);
+					game.broadcastAll(function(card){
+						card.init([card.suit,card.number,'rewrite_'+card.name]);
+					},card);
+					var info=get.info(card);
+					if(info.skills){
+						for(var i=0;i<info.skills.length;i++){
+							player.addSkillTrigger(info.skills[i]);
+						}
+					}
 				},
 				ai:{
 					basic:{

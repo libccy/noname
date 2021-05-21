@@ -10315,14 +10315,6 @@
 							bool:true,
 							targets:event.targets2||result.targets,
 						};
-						if(event.logSkill){
-							if(typeof event.logSkill=='string'){
-								player.logSkill(event.logSkill);
-							}
-							else if(Array.isArray(event.logSkill)){
-								player.logSkill.apply(player,event.logSkill);
-							}
-						}
 						var next=player.useCard(card,event.targets2||result.targets);
 						if(cards) next.cards=cards.slice(0);
 						if(event.nopopup) next.nopopup=true;
@@ -10331,6 +10323,14 @@
 						if(event.addCount===false) next.addCount=false;
 						if(event.noTargetDelay) next.targetDelay=false;
 						if(event.nodelayx) next.delayx=false;
+						if(event.logSkill){
+							if(typeof event.logSkill=='string'){
+								next.skill=event.logSkill;
+							}
+							else if(Array.isArray(event.logSkill)){
+								player.logSkill.apply(player,event.logSkill);
+							}
+						}
 					}
 					else event.result={bool:false};
 				},
@@ -16257,18 +16257,19 @@
 			},
 			player:{
 				//新函数
-				loseToSpecial:function(cards,tag){
+				loseToSpecial:function(cards,tag,target){
 					var next=game.loseAsync({
 						player:this,
 						cards:cards,
 						tag:tag,
 						toStorage:true,
+						target:target||this,
 					});
 					next.setContent(function(){
 						"step 0"
 						player.lose(cards,ui.special).set('getlx',false);
 						"step 1"
-						player.directgains(cards,null,event.tag)
+						target.directgains(cards,null,event.tag)
 					});
 					return next;
 				},
@@ -17841,7 +17842,7 @@
 								}
 							}
 							for(j=0;j<this.node.handcards2.childElementCount;j++){
-								if(!this.node.handcards2.childNodes[j].classList.contains('removing')&&!this.node.handcards1.childNodes[j].classList.contains('glows')){
+								if(!this.node.handcards2.childNodes[j].classList.contains('removing')&&!this.node.handcards2.childNodes[j].classList.contains('glows')){
 									cards.push(this.node.handcards2.childNodes[j]);
 								}
 							}
@@ -17853,7 +17854,7 @@
 								}
 							}
 							for(j=0;j<this.node.handcards2.childElementCount;j++){
-								if(!this.node.handcards2.childNodes[j].classList.contains('removing')&&this.node.handcards1.childNodes[j].classList.contains('glows')){
+								if(!this.node.handcards2.childNodes[j].classList.contains('removing')&&this.node.handcards2.childNodes[j].classList.contains('glows')){
 									cards.push(this.node.handcards2.childNodes[j]);
 								}
 							}
@@ -18057,12 +18058,12 @@
 						for(i=0;i<arg1.length;i++){
 							if(arg1[i]=='h'){
 								for(j=0;j<this.node.handcards1.childElementCount;j++){
-									if(!this.node.handcards1.childNodes[j].classList.contains('removing')&&!this.node.handcards1.childNodes[j].classList.contains('feichu')){
+									if(!this.node.handcards1.childNodes[j].classList.contains('removing')&&!this.node.handcards1.childNodes[j].classList.contains('feichu')&&!this.node.handcards1.childNodes[j].classList.contains('glows')){
 										cards.push(this.node.handcards1.childNodes[j]);
 									}
 								}
 								for(j=0;j<this.node.handcards2.childElementCount;j++){
-									if(!this.node.handcards2.childNodes[j].classList.contains('removing')&&!this.node.handcards2.childNodes[j].classList.contains('feichu')){
+									if(!this.node.handcards2.childNodes[j].classList.contains('removing')&&!this.node.handcards2.childNodes[j].classList.contains('feichu')&&!this.node.handcards2.childNodes[j].classList.contains('glows')){
 										cards.push(this.node.handcards2.childNodes[j]);
 									}
 								}

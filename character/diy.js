@@ -68,6 +68,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_chihaya:['female','key',3,['chihaya_liewu','chihaya_youfeng']],
 			key_yukito:['male','key',4,['yukito_kongwu','yukito_yaxiang']],
 			key_crow:['male','key',4,[],['unseen']],
+			key_asara:['female','key',3,['asara_shelu','asara_yingwei']],
+			key_kotomi:['female','key',3,['kotomi_qinji','kotomi_chuanxiang']],
 			
 			key_kud:['female','key',3,['kud_qiaoshou','kud_buhui']],
 			key_misuzu:['female','key',3,['misuzu_hengzhou','misuzu_nongyin','misuzu_zhongxing']],
@@ -180,7 +182,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				diy_fakenews:["diy_wenyang","ns_zhangwei","ns_caimao"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
 				diy_noname:['noname'],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto","key_sakuya","key_youta","key_rumi","key_chihaya","key_yukito"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto","key_sakuya","key_youta","key_rumi","key_chihaya","key_yukito","key_asara","key_kotomi"],
 				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang','junk_simayi'],
 			},
 		},
@@ -197,6 +199,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_tianyu:'字国让，渔阳雍奴（今天津市武清区东北）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。',
 		},
 		characterTitle:{
+			key_kotomi:'#gClannad',
+			key_asara:'#bRewrite',
 			key_yukito:'#bAIR',
 			key_chihaya:'#bRewrite',
 			key_rumi:'#rONE ~輝く季節へ~',
@@ -350,20 +354,169 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		perfectPair:{
 			yuji:['zuoci'],
-			key_riki:['key_rin','key_saya','key_kyousuke'],
+			key_riki:['key_rin','key_saya','key_kyousuke','key_kud'],
+			key_kud:['key_harukakanata'],
 			key_komari:['key_rin','key_sasami'],
 			key_masato:['key_kengo'],
 			key_yuiko:['key_harukakanata'],
 			key_doruji:['key_rin'],
-			key_tomoya:['key_nagisa','key_sunohara'],
+			key_tomoya:['key_nagisa','key_sunohara','key_kotomi'],
 			key_ao:['key_inari'],
+			key_shiroha:['key_umi'],
+			key_shizuku:['key_tsumugi'],
 			key_yuzuru:['key_hinata','key_kanade','key_ayato'],
-			key_yuri:['key_kanade'],
+			key_yuri:['key_kanade','key_abyusa'],
 			key_hinata:['key_yui'],
 			key_iwasawa:['key_hisako'],
+			key_yuu:['key_nao'],
+			key_jojiro:['key_yusa'],
+			key_kaori:['key_shiori'],
+			key_chihaya:['key_sakuya'],
 			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			kotomi_qinji:{
+				trigger:{player:'phaseUseBegin'},
+				filter:function(event,player){
+					return player.hasUseTarget('wanjian');
+				},
+				direct:true,
+				content:function(){
+					player.addTempSkill('kotomi_qinji2');
+					player.chooseUseTarget({name:'wanjian',isCard:true},get.prompt('kotomi_qinji'),'视为使用一张【万箭齐发】').logSkill='kotomi_qinji';
+				},
+			},
+			kotomi_qinji2:{
+				trigger:{source:'damageBefore'},
+				forced:true,
+				popup:false,
+				filter:function(event,player){
+					return event.getParent().skill=='kotomi_qinji';
+				},
+				content:function(){
+					trigger.cancel();
+					trigger.player.loseHp(trigger.num);
+				},
+			},
+			kotomi_chuanxiang:{
+				global:'kotomi_chuanxiang2',
+			},
+			kotomi_chuanxiang2:{
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return !player.hasSkill('kotomi_chuanxiang')&&player.countCards('e',lib.skill.kotomi_chuanxiang2.filterCard)>0;
+				},
+				filterCard:function(card,player){
+					if(!player) player=_status.event.player;
+					return game.hasPlayer(function(current){
+						return current!=player&&current.isEmpty(get.subtype(card,false));
+					});
+				},
+				position:'e',
+				filterTarget:function(card,player,target){
+					return target!=player&&target.isEmpty(get.subtype(ui.selected.cards[0],false));
+				},
+				check:function(card){
+					if(get.value(card)<=0) return 10;
+					var player=_status.event.player;
+					if(game.hasPlayer(function(current){
+						return current.hasSkill('kotomi_chuanxiang')&&get.attitude(player,current)>0;
+					})){
+						var subtype=get.subtype(card,false);
+						if(player.countCards('hs',function(cardx){
+							return get.type(cardx)=='equip'&&get.subtype(cardx,false)==subtype&&player.canUse(cardx,player)&&get.effect(player,cardx,player,player)>0;
+						})) return 8;
+						return 7/Math.max(1,get.value(card));
+					}
+					return 0;
+				},
+				prepare:'give',
+				discard:false,
+				lose:false,
+				content:function(){
+					'step 0'
+					target.equip(cards[0]);
+					var list=game.filterPlayer(function(current){
+						return current.hasSkill('kotomi_chuanxiang');
+					});
+					game.asyncDraw(list,function(targetx){
+						return targetx==target?2:1;
+					});
+					'step 1'
+					game.delayx();
+				},
+				ai:{
+					order:8,
+					result:{
+						target:function(player,target){
+							var card=ui.selected.cards[0];
+							if(!card) return 0;
+							var eff=get.effect(target,card,player,target);
+							if(target.hasSkill('kotomi_chuanxiang')) eff++;
+							return eff;
+						},
+					},
+				},
+			},
+			asara_shelu:{
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.countCards('he')>0&&game.hasPlayer(function(current){
+						return current!=player&&current.countCards('h')>0;
+					});
+				},
+				filterCard:true,
+				position:'he',
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countCards('h')>0;
+				},
+				check:function(card){
+					return 6-get.value(card);
+				},
+				content:function(){
+					'step 0'
+					if(!target.countCards('h')) event.finish();
+					else player.choosePlayerCard(target,'h',true);
+					'step 1'
+					player.showCards(result.cards);
+					event.cards2=result.cards;
+					'step 2'
+					target.$give(event.cards2,player,false);
+					target.loseToSpecial(event.cards2,'asara_yingwei',player);
+					var card1=cards[0],card2=event.cards2[0];
+					if(card1.suit==card2.suit) player.draw(2);
+					if(card1.number==card2.number) player.recover();
+				},
+				ai:{
+					order:6,
+					result:{
+						target:-1,
+					},
+				},
+			},
+			asara_yingwei:{
+				trigger:{player:'useCard1'},
+				forced:true,
+				filter:function(event,player){
+					return player.getHistory('lose',function(evt){
+						if(evt.getParent()!=event) return false;
+						for(var i in evt.gaintag_map){
+							if(evt.gaintag_map[i].contains('asara_yingwei')) return true;
+						}
+						return false;
+					}).length>0;
+				},
+				content:function(){
+					if(!trigger.card.yingbian){
+						trigger.card.yingbian=true;
+						var info=get.info(trigger.card);
+						if(info&&info.yingbian) info.yingbian(trigger);
+						player.addTempSkill('yingbian_changeTarget');
+					}
+				},
+			},
 			yukito_kongwu:{
 				enable:'phaseUse',
 				usable:1,
@@ -13158,6 +13311,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_chihaya:'凤千早',
 			key_yukito:'国崎往人',
 			key_crow:'小空',
+			key_asara:'井上晶',
+			key_kotomi:'一之濑琴美',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -13483,6 +13638,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yukito_yaxiang_info:'限定技，当有角色进入濒死状态时，你可移去此武将牌，然后令该角色将体力值回复至3点，弃置判定区的所有牌并获得技能〖终愿〗。',
 			misuzu_zhongyuan:'终愿',
 			misuzu_zhongyuan_info:'限定技。当你的判定结果生效时，你可将判定结果改为任意花色和点数并结束此时机。',
+			asara_shelu:'摄录',
+			asara_shelu_info:'出牌阶段限一次，你可以弃置一张牌，然后展示一名其他角色的一张手牌并将其置于你的武将牌上，称为“影”。若你以此法弃置的牌和展示的牌：花色相同，则你摸两张牌。点数相同，则你回复1点体力。',
+			asara_yingwei:'影威',
+			asara_yingwei_info:'你可以如手牌般使用或打出“影”。锁定技，当你使用“影”时，强制触发对应的应变效果。',
+			kotomi_qinji:'琴击',
+			kotomi_qinji_info:'出牌阶段开始时，你可视为使用使用【万箭齐发】。你以此法使用【万箭齐发】造成的伤害视为失去体力。',
+			kotomi_chuanxiang:'传箱',
+			kotomi_chuanxiang2:'传箱',
+			kotomi_chuanxiang_info:'其他角色的出牌阶段限一次，其可以将装备区内的一张牌移动到另一名角色的装备区内，然后你摸一张牌。若你是目标角色，则你改为摸两张牌。',
 
 			key_kud:'库特莉亚芙卡',
 			kud_qiaoshou:'巧手',

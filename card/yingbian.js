@@ -812,7 +812,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['heart',1,'wuxie'],
 			['heart',2,'shan',null,['yingbian_kongchao']],
 			['heart',2,'shan',null,['yingbian_kongchao']],
-			['heart',2,'guohe'],
+			['heart',2,'guohe',null,['yingbian_zhuzhan']],
 			['heart',3,'wugu'],
 			['heart',3,'tao'],
 			['heart',3,'chuqibuyi',null,['yingbian_zhuzhan']],

@@ -3296,16 +3296,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				animationColor:'orange',
 				content:function(){
 					'step 0'
-					var shas=player.getCards('h','sha');
-					var num;
-					if(player.hp>=4&&shas.length>=3){
-						num=3;
-					}
-					else if(player.hp>=3&&shas.length>=2){
-						num=2;
-					}
-					else{
-						num=1
+					var num=player.hp-1;
+					if(player.countCards('hs',{name:['tao','jiu']})){
+						num=player.hp;
 					}
 					var map={};
 					var list=[];
@@ -3328,30 +3321,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addTempSkill('reqimou2');
 				},
 				ai:{
-					order:2,
+					order:14,
 					result:{
 						player:function(player){
-							if(player.hp==1) return 0;
-							var shas=player.getCards('h','sha');
-							if(!shas.length) return 0;
-							var card=shas[0];
-							if(!lib.filter.cardEnabled(card,player)) return 0;
-							if(lib.filter.cardUsable(card,player)) return 0;
-							var mindist;
-							if(player.hp>=4&&shas.length>=3){
-								mindist=4;
-							}
-							else if(player.hp>=3&&shas.length>=2){
-								mindist=3;
-							}
-							else{
-								mindist=2;
-							}
+							if(player.hp<3) return false;
+							var mindist=player.hp;
+							if(player.countCards('hs',{name:['tao','jiu']})) mindist++;
 							if(game.hasPlayer(function(current){
-								return (current.hp<=mindist-1&&
-									get.distance(player,current,'attack')<=mindist&&
-									player.canUse(card,current,false)&&
-									get.effect(current,card,player,player)>0);
+								return (get.distance(player,current)<=mindist&&
+									player.canUse('sha',current,false)&&
+									get.effect(current,{name:'sha'},player,player)>0);
 							})){
 								return 1;
 							}
