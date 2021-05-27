@@ -1744,7 +1744,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					cardEnabled2:function(card,player){
 						if(!_status.event.addCount_extra||player.hasSkill('zhuge_skill',null,false)) return;
 						if(card&&card==player.getEquip('zhuge')){
-							var cardz=get.card();
+							try{
+								var cardz=get.card();
+							}
+							catch(e){
+								return;
+							}
 							if(!cardz||cardz.name!='sha') return;
 							_status.zhuge_temp=true;
 							var bool=lib.filter.cardUsable(get.autoViewAs({name:'sha'},ui.selected.cards.concat([card])),player);

@@ -4,10 +4,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			xiahoujie:['male','wei',5,['liedan','zhuangdan']],
 			cheliji:['male','qun',4,['cheliji_skill1','cheliji_skill2'],['unseen']],
 			simazhou:['male','jin',4,['caiwang','naxiang']],
 			huangzu:['male','qun',4,['wangong'],['unseen']],
-			caosong:['male','wei',3,['cslilu','csyizheng']],
+			caosong:['male','wei',4,['cslilu','csyizheng']],
 			re_taoqian:['male','qun',3,['zhaohuo','reyixiang','reyirang']],
 			zhaozhong:['male','qun',6,['yangzhong','huangkong']],
 			fanyufeng:['female','qun',3,['bazhan','jiaoying']],
@@ -102,7 +103,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_zizouqi:["mangyachang","xugong","zhangchangpu"],
 				sp_sbfm:["lisu","xinpi","zhangwen"],
 				sp_shengun:["puyuan","guanlu","gexuan","xushao"],
-				sp_baigei:['re_panfeng','xingdaorong','caoxing','re_chunyuqiong'],
+				sp_baigei:['re_panfeng','xingdaorong','caoxing','re_chunyuqiong','xiahoujie'],
 				sp_guandu:["sp_zhanghe","xunchen","sp_shenpei","gaolan","lvkuanglvxiang","chunyuqiong","sp_xuyou"],
 				sp_huangjin:['liuhong','zhujun','re_hejin','re_hansui','liubian'],
 				sp_fadong:['ol_dingyuan','wangrong','re_quyi','hanfu'],
@@ -115,6 +116,51 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//夏侯杰
+			liedan:{
+				audio:2,
+				trigger:{global:'phaseZhunbeiBegin'},
+				forced:true,
+				filter:function(event,player){
+					return (player!=event.player||player.countMark('liedan')>4)&&!player.hasSkill('zhuangdan_mark');
+				},
+				logTarget:'player',
+				content:function(){
+					if(player==trigger.player){
+						player.die();
+						return;
+					}
+					var num=0;
+					if(player.hp>trigger.player.hp) num++;
+					if(player.countCards('h')>trigger.player.countCards('h')) num++;
+					if(player.countCards('e')>trigger.player.countCards('e')) num++;
+					if(num){
+						player.draw(num);
+						if(num==3) player.gainMaxHp();
+					}
+					else{
+						player.addMark('liedan',1);
+						player.loseHp();
+					}
+				},
+				intro:{content:'mark'},
+			},
+			zhuangdan:{
+				audio:2,
+				trigger:{global:'phaseEnd'},
+				forced:true,
+				filter:function(event,player){
+					return player!=event.player&&player.isMaxHandcard(true);
+				},
+				content:function(){
+					player.addTempSkill('zhuangdan_mark',{player:'phaseEnd'})
+				},
+			},
+			zhuangdan_mark:{
+				mark:true,
+				marktext:'胆',
+				intro:{content:'我超勇的'},
+			},
 			//彻里吉
 			cheliji_skill1:{
 				audio:2,
@@ -5585,6 +5631,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			mansi_viewas:{
 				audio:'mansi',
+				position:'h',
 				enable:'phaseUse',
 				usable:1,
 				filterCard:true,
@@ -9654,6 +9701,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		characterIntro:{
+			tangji:'唐姬，会稽太守唐瑁女，弘农怀王刘辩的妃子。刘辩死后，唐姬回归故里，因节烈不愿改嫁他人，后被汉献帝下诏封为弘农王妃。',
 			lijue:"李傕（jué，一说“傕”读音“què”）（？—198年），字稚然。北地郡泥阳县（今陕西省耀县）人，汉末群雄之一。东汉末年汉献帝时的军阀、权臣，官至大司马、车骑将军、开府、领司隶校尉、假节。<br>李傕本为董卓部将，后被董卓的女婿牛辅派遣至中牟与朱儁交战，大破朱儁，进而至陈留、颍川等地劫掠。初平三年（192年）董卓和牛辅被杀后，李傕归无所依，于是采用贾诩之谋，伙同郭汜、张济、樊稠等原董卓部曲将攻向长安。击败吕布，杀死王允等人，占领长安，把持朝廷大权。后诸将不和，李傕在会议上杀死了樊稠，又与郭汜分别劫持了汉献帝和众臣，相互交战，张济率兵赶来和解，于是二人罢兵，李傕出屯池阳黄白城，郭汜、张济等人随汉献帝东归前往弘农。<br>后来，李傕、郭汜、张济反悔，联合起来追击汉献帝，与杨奉、董承等人几番交战。汉献帝一路逃亡，狼狈不堪，到达安邑，与李傕等人讲和。不久，汉献帝被曹操迎往许都。建安三年（198年），曹操派谒者仆射裴茂召集关西诸将段煨等人征讨李傕，灭其三族。",
 			zhangji:"张济（？－196年），武威郡祖厉县（今甘肃靖远东南）人。东汉末年割据军阀之一。 张济原为董卓部将，董卓被诛杀后，张济与李傕一同率军攻破长安，任中郎将。不久，升任镇东将军，封平阳侯，出屯弘农。献帝东迁时，张济升任骠骑将军，率军护卫献帝，后来因与董承等人有矛盾，便与李傕、郭汜一同追赶献帝。 建安元年（196年），张济因军队缺粮而进攻穰城，中流矢而死。死后，部队由侄儿张绣接管。",
 			guosi:"郭汜（？－197年），又名郭多，凉州张掖（今甘肃张掖西北）人，东汉末年将领、军阀，献帝时权臣。原为董卓部下。董卓被杀后，凉州众将归无所依，于是采用贾诩之谋，联兵将攻向长安，击败吕布，杀死王允等人，占领长安，把持朝廷大权。几年后，郭汜被部将伍习杀死。",
@@ -9708,6 +9756,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			simazhou:'司马伷（zhòu）（227年～283年6月12日），字子将，河内郡温县（今河南省温县）人。西晋宗室、将领，晋宣帝司马懿第三子，伏太妃所生。晋景帝司马师、文帝司马昭的同父异母弟，晋武帝司马炎的叔父。司马伷少有才气，在曹魏历任宁朔将军、散骑常侍、征虏将军等职，先后受封南安亭侯、东武乡侯，五等爵制建立后，改封南皮伯。西晋建立后，获封东莞郡王，入朝任尚书右仆射、抚军将军，出外拜镇东大将军。后改封琅邪王，加开府仪同三司。西晋伐吴时，率军出涂中，孙皓向他投降并奉上玉玺。战后因功拜大将军，增邑三千户。太康四年（283年），司马伷去世，享年五十七岁。谥号为武，世称“琅邪武王”。著有《周官宁朔新书》八卷，今已亡佚。',
 			huangzu:'黄祖（？－208年），东汉末年将领。刘表任荆州牧时，黄祖出任江夏太守。初平二年（191年），黄祖在与长沙太守孙坚交战时，其部下将孙坚射死，因此与孙家结下仇怨。之后，黄祖多次率部与东吴军队交战，射杀凌操、徐琨等人。建安十三年（208年），在与孙权的交战中，兵败被杀。',
 			cheliji:'彻里吉是历史小说《三国演义》中的虚构人物，西羌国王。蜀相诸葛亮伐魏，魏都督曹真驰书赴羌，国王彻里吉即命雅丹丞相与越吉元帅起羌兵一十五万、并战车直扣西平关。后军大败，越吉亡，雅丹被俘，亮将所获羌兵及车马器械，尽给还雅丹，俱放回国。彻里吉感蜀恩义，与之结盟。正史中没有关于彻里吉的记载。',
+			xiahoujie:'夏侯杰（？—208年），是罗贯中的小说《三国演义》中曹操的部将，征战时常常带在身边。在第42回长坂坡之战中，张飞大吼，从马儿受惊跌下马来而死。',
 		},
 		characterTitle:{
 			wulan:'#b对决限定武将',
@@ -10338,6 +10387,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			cheliji_tiejixuanyu_info:'其他角色的回合结束时，若其本回合未造成过伤害，你可以令其弃置两张牌，然后弃置此牌。',
 			cheliji_feilunzhanyu:'飞轮战舆',
 			cheliji_feilunzhanyu_info:'其他角色的回合结束时，若其本回合使用过非基本牌，你可以令其交给你一张牌，然后弃置此牌。',
+			xiahoujie:'夏侯杰',
+			liedan:'烈胆',
+			liedan_info:'锁定技，其他角色的准备阶段开始时，若X大于0，则你摸X张牌。若X等于3，则你加1点体力上限。若X为0，则你失去1点体力并获得一枚“裂”（X为你的手牌数，体力值，装备区牌数中大于其的数量）。准备阶段，若“裂”数大于4，则你死亡。',
+			zhuangdan:'壮胆',
+			zhuangdan_mark:'壮胆',
+			zhuangdan_info:'锁定技，其他角色的回合结束时，若你的手牌数为全场唯一最多，则你令〖烈胆〗失效直到你下回合结束。',
 
 			sp_yingbian:'文德武备',
 			sp_whlw:"文和乱武",

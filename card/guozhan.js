@@ -711,8 +711,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:true,
 				filterTarget:function(card,player,target){
 					if(get.mode()=='guozhan'){
-						if(player.identity=='unknown'||player.identity=='ye') return player==target;
-						return player.identity==target.identity;
+						return target.isFriendOf(player);
 					}
 					else if(get.is.versus()){
 						return player.side==target.side;

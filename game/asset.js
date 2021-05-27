@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.110.1',
+	'v1.9.110.2',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -703,6 +703,8 @@ window.noname_asset_list=[
 	'audio/die/zongyu.mp3',
 	'audio/die/nanhualaoxian.mp3',
 	'audio/die/simazhou.mp3',
+	'audio/die/re_zhoucang.mp3',
+	'audio/die/xiahoujie.mp3',
 
 	'audio/skill/decadezishou1.mp3',
 	'audio/skill/decadezishou2.mp3',
@@ -3097,7 +3099,12 @@ window.noname_asset_list=[
 	'audio/skill/tianshu2.mp3',
 	'audio/skill/yufeng1.mp3',
 	'audio/skill/yufeng2.mp3',
-	
+	'audio/skill/liedan1.mp3',
+	'audio/skill/liedan2.mp3',
+	'audio/skill/rezhongyong1.mp3',
+	'audio/skill/rezhongyong2.mp3',
+	'audio/skill/zhuangdan1.mp3',
+	'audio/skill/zhuangdan2.mp3',	
 	'audio/voice/male/0.mp3',
 	'audio/voice/male/1.mp3',
 	'audio/voice/male/2.mp3',
@@ -3907,6 +3914,12 @@ window.noname_asset_list=[
 	'image/character/nanhualaoxian.jpg',
 	'image/character/key_asara.jpg',
 	'image/character/key_kotomi.jpg',
+	'image/character/ns_chengpu.jpg',
+	'image/character/re_zhoucang.jpg',
+	'image/character/sp_fuhuanghou.jpg',
+	'image/character/sp_fuwan.jpg',
+	'image/character/sp_jiben.jpg',
+	'image/character/xiahoujie.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',

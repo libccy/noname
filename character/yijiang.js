@@ -6863,6 +6863,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				filterCard:true,
 				selectCard:-1,
+				position:'h',
 				filter:function(event,player){
 					if(player.getStat().skill.zhanjue_draw&&player.getStat().skill.zhanjue_draw>=2) return false;
 					var hs=player.getCards('h');
@@ -10157,9 +10158,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else if(get.tag(event.card,'damage')){
-						if(event.card.name=='shuiyanqijunx') return player.countCards('e')<2;
+						if(event.card.name=='shuiyanqijunx') return player.countCards('e')==0;
 						return true;
-						//if(player.countCards('h')<2) return true;
 					}
 					else if((event.card.name=='shunshou'||(event.card.name=='zhujinqiyuan'&&(event.card.yingbian||get.distance(event.player,player)<0)))&&player.hp>2){
 						return true;
@@ -10802,6 +10802,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return {
 							filterCard:true,
 							selectCard:-1,
+							position:'h',
 							audio:2,
 							popname:true,
 							viewAs:{name:links[0][2]},
@@ -12083,7 +12084,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liaohua:['xin_liaohua','re_liaohua','liaohua'],
 			bulianshi:['re_bulianshi','bulianshi','old_bulianshi'],
 			handang:['xin_handang','re_handang','handang'],
-			chengpu:['re_chengpu','chengpu','xin_chengpu'],
+			chengpu:['re_chengpu','ns_chengpu','chengpu','xin_chengpu'],
 			liubiao:['re_liubiao','xin_liubiao','liubiao'],
 			manchong:['re_manchong','manchong'],
 			caochong:['caochong','old_caochong'],

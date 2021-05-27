@@ -576,7 +576,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(var i of result.targets) i.addSkill('yufeng2');
 						if(event.score>result.targets.length) player.draw(event.score-result.targets.length);
 					}
-					else player.draw(result.score);
+					else player.draw(event.score);
 				},
 				ai:{
 					order:10,
@@ -2169,7 +2169,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				charlotte:true,
 				filter:function(event,player){
 					if(event.name!='gain'&&event.player!=player.storage.jinglve2) return false;
-					return event.name=='die'||(event.cards.contains(player.storage.jinglve3)&&(event.name=='gain'||event.position!=ui.ordering));
+					return event.name=='die'||(event.cards.contains(player.storage.jinglve3)&&(event.name=='gain'||event.position!=ui.ordering&&event.position!=ui.discardPile));
 				},
 				content:function(){
 					player.removeSkill('jinglve2');
@@ -2183,7 +2183,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.player&&event.player!=player.storage.jinglve2) return false;
 					if(event.name=='phase') return event.player.getCards('hej').contains(player.storage.jinglve3);
 					if(!event.cards.contains(player.storage.jinglve3)) return false;
-					return event.name=='useCard'||get.position(player.storage.jinglve3,true)=='d';
+					return event.name=='useCard'||get.position(player.storage.jinglve3,true)=='d'||event.position==ui.discardPile;
 				},
 				forced:true,
 				charlotte:true,
@@ -2194,8 +2194,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.targets.length=0;
 					}
 					else{
-						var next=player.gain(player.storage.jinglve3,trigger.name=='phase'?'giveAuto':'gain2');
-						if(trigger.name=='phase') next.source=trigger.player;
+						if(trigger.name=='phase'){
+							player.gain(player.storage.jinglve3,trigger.player,'giveAuto');
+						}
+						else if(get.position(player.storage.jinglve3,true)=='d') player.gain(player.storage.jinglve3,'gain2');
 					}
 					player.removeSkill('jinglve2');
 				},
@@ -4476,7 +4478,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					cardEnabled2:function(card,player){
 						if(!_status.event.addCount_extra||player.hasSkill('rw_zhuge_skill',null,false)) return;
 						if(card&&card==player.getEquip('rewrite_zhuge')){
-							var cardz=get.card();
+							try{
+								var cardz=get.card();
+							}
+							catch(e){
+								return;
+							}
 							if(!cardz||cardz.name!='sha') return;
 							_status.rw_zhuge_temp=true;
 							var bool=lib.filter.cardUsable(get.autoViewAs({name:'sha'},ui.selected.cards.concat([card])),player);
@@ -6608,7 +6615,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				derivation:'yizan_rewrite',
 			},
-			xinfu_jingxie:{audio:2},
+			xinfu_jingxie:{
+				audio:2,
+				video:function(player,info){
+					var l2=player.getCards(info[0]?'e':'h'),l1=info[1];
+					for(var j=0;j<l2.length;j++){
+						if(l2[j].suit==l1[0]&&l2[j].number==l1[1]&&l2[j].name==l1[2]){
+							l2[j].init([l2[j].suit,l2[j].number,'rewrite_'+l2[j].name]);
+							break;
+						}
+					}
+				},
+			},
 			"xinfu_jingxie1":{
 				group:["xinfu_jingxie2"],
 				position:"he",
@@ -6635,14 +6653,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.showCards(cards);
 					"step 1"
 					var card=cards[0];
-					player.removeEquipTrigger(card);
+					var bool=(get.position(card)=='e');
+					if(bool) player.removeEquipTrigger(card);
+					game.addVideo('skill',player,['xinfu_jingxie',[bool,get.cardInfo(card)]])
 					game.broadcastAll(function(card){
 						card.init([card.suit,card.number,'rewrite_'+card.name]);
 					},card);
-					var info=get.info(card);
-					if(info.skills){
-						for(var i=0;i<info.skills.length;i++){
-							player.addSkillTrigger(info.skills[i]);
+					if(bool){
+						var info=get.info(card);
+						if(info.skills){
+							for(var i=0;i<info.skills.length;i++){
+								player.addSkillTrigger(info.skills[i]);
+							}
 						}
 					}
 				},
