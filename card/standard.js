@@ -1680,7 +1680,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				equipSkill:false,
 				ruleSkill:true,
 				filter:function(event){
-					return event.card&&event.card.name=='sha'&&event.nature=='ice'&&event.notLink()&&event.player.getCards('he').length>0;
+					return event.nature=='ice'&&event.notLink()&&event.player.getCards('he').length>0;
 				},
 			},
 			renwang_skill:{

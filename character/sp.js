@@ -5,19 +5,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			sp:{
-				sp_default:["caoying","simahui","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","xujing","yuantanyuanshang","sunshao","zhangling",'guansuo','baosanniang','ol_zhangchangpu','caoshuang','sp_zhangliao','wolongfengchu','ol_xinxianying'],
+				sp_default:["caoying","simahui","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","xujing","yuantanyuanshang","sunshao","zhangling",'guansuo','baosanniang','ol_zhangchangpu','caoshuang','sp_zhangliao','wolongfengchu','ol_xinxianying','panshu'],
 				sp_tongque:["liuxie","lingju","fuwan","sp_fuwan","sp_fuhuanghou","sp_jiben"],
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_star:["sp_xiahoushi","jsp_zhaoyun","huangjinleishi","sp_pangtong","sp_daqiao","sp_ganning","sp_xiahoudun","sp_lvmeng","sp_zhangfei","sp_liubei"],
 				sp_sticker:['sp_gongsunzan','sp_simazhao','sp_wangyuanji','sp_xinxianying','sp_liuxie'],
 				sp_guozhan:["zangba","shamoke","ganfuren","yuejin","hetaihou","dingfeng","panfeng","jianggan"],
-				sp_guozhan2:["mifuren","mateng","tianfeng","chendong","sp_dongzhuo","jiangfei","jiangqing","kongrong","bianfuren","liqueguosi","lvfan","cuimao","jiling","zhangren","zoushi","huaxin","luyusheng","zongyu"],
+				sp_guozhan2:["mateng","tianfeng","chendong","sp_dongzhuo","jiangfei","jiangqing","kongrong","liqueguosi","lvfan","cuimao","jiling","zhangren","zoushi","huaxin","luyusheng","zongyu"],
 				sp_single:["niujin"],
 				sp_others:["hanba","caiyang"],
 			},
 		},
 		characterFilter:{},
 		character:{
+			panshu:['female','wu',3,['weiyi','jinzhi'],['unseen']],
 			sp_jiben:['male','qun',3,['spduanzhi','spduyi']],
 			sp_fuhuanghou:['female','qun',3,['spcangni','spmixin']],
 			sp_fuwan:['male','qun',3,['spfengyin','spchizhong']],
@@ -127,7 +128,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			heqi:['male','wu',4,['qizhou','shanxi']],
 
 			ganfuren:['female','shu',3,['shushen','shenzhi']],
-			mifuren:['female','shu',3,['guixiu','cunsi']],
+			//mifuren:['female','shu',3,['guixiu','cunsi']],
 			mateng:['male','qun',4,['xiongyi','mashu']],
 			tianfeng:['male','qun',3,['sijian','suishi']],
 			yuejin:['male','wei',4,['xiaoguo']],
@@ -138,7 +139,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hetaihou:['female','qun',3,['zhendu','qiluan']],
 			kongrong:['male','qun',3,['lirang','mingshi']],
 			dingfeng:['male','wu',4,['reduanbing','refenxun']],
-			bianfuren:['female','wei',3,['wanwei','yuejian']],
+			//bianfuren:['female','wei',3,['wanwei','yuejian']],
 			shamoke:['male','shu',4,['gzjili']],
 			liqueguosi:['male','qun',4,['xiongsuan']],
 			lvfan:['male','wu',3,['diaodu','diancai']],
@@ -159,6 +160,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			panshu:'潘淑（？－252年），会稽句章（今浙江省宁波市）人，是吴大帝孙权的皇后，吴少帝孙亮的母亲。和孙权是中国历代帝后中年龄差距较大的一对。潘淑少时与姐姐俱没入织室，容媚有宠，拜为夫人，生有一子孙亮。赤乌十三年（250年），孙权立孙亮为皇太子，翌年（251年）立潘淑为皇后。神凤元年（252年）暴崩，合葬蒋陵。世称潘淑为江东绝色，有神女之称。',
 			jiben:'吉本（？—218年），东汉末年太医令。建安二十三年春正月，时金祎自以世为汉臣，睹汉祚将移，谓可季兴，乃喟然发愤，遂与太医令本、少府耿纪、司直韦晃、本子邈、邈弟穆等结谋攻许，杀曹公长史王必，南援刘备。后必营，必与典农中郎将严匡讨斩之。在《三国演义》中，吉本在此为吉平或吉太，因字称平，故又唤作吉平。曾参与董承等人刺杀曹操的计划，并企图在为曹操治病时毒死曹操，但被曹操识破而遭处刑。之后其子吉邈和吉穆都参与了由耿纪和韦晃等人所发动的反叛曹操的行动，但都失败被杀。',
 			zongyu:'宗预（？－264年），字德艳 ，荆州南阳郡安众县（今河南省南阳市）人。三国时期蜀汉官员、将领。曾随张飞入蜀助平益州，又受辟为丞相诸葛亮手下主簿，升任参军、右中郎将。诸葛亮逝世后，宗预受命出使孙吴，得到孙权的赞赏。迁后将军，出督永安，又升任征西大将军，并受封关内侯。公元258年（景耀元年），因病回成都，受任镇军大将军。蜀汉灭亡后，宗预随后主刘禅徙往洛阳，在中途病逝。宗预为人坦率耿直，多次出使孙吴并深得孙权的敬重，为吴、汉两国同盟的巩固作出了一定的贡献。',
 			mifangfushiren:'麋芳（生卒年不详），字子方，东海郡朐县（今江苏省连云港市）人。汉末三国时期蜀国将领，刘备糜夫人的兄弟。麋芳本为徐州牧陶谦部下，曾被曹操表为彭城相。后来辞官，随刘备从徐州辗转至邺城、汝南、新野、长坂坡、江夏等地，奔波多年。傅士仁（生卒年不详），字君义，幽州广阳郡（今北京市）人，刘备手下将领。受到刘备的重用，但被关羽轻慢。<br>刘备称汉中王时，糜芳为南郡太守，但受到关羽的轻慢。后来，因未完成供给军资的任务而被关羽责骂，心中不安。吕蒙袭取荆州时，将已经投降的傅士仁展示给糜芳，麋芳于是选择投降，导致关羽兵败被杀。此后，在吴国担任将军，并且为吴征伐。',
@@ -407,6 +409,163 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//潘淑
+			weiyi:{
+				trigger:{global:'damageEnd'},
+				filter:function(event,player){
+					if(player.getStorage('weiyi').contains(event.player)||!event.player.isIn()) return false;
+					return event.player.hp>=player.hp||event.player.isDamaged();
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					var list=[];
+					if(trigger.player.hp>=player.hp) list.push('失去体力');
+					if(trigger.player.hp<=player.hp&&trigger.player.isDamaged()) list.push('回复体力');
+					list.push('cancel2')
+					player.chooseControl(list).set('prompt',get.prompt2('weiyi',trigger.player)).set('ai',function(){
+						var player=_status.event.player,target=_status.event.getTrigger().player;
+						var att=get.attitude(player,target),eff=get.recoverEffect(target,player,player);
+						if(target.hp<=player.hp&&target.isDamaged()&&att>2&&eff>0){
+							if(player==target){
+								var storage=player.getStorage('weiyi');
+								if(player.hp>=2&&game.hasPlayer(function(current){
+									return current.hp==player.hp+1&&!storage.contains(current)&&get.attitude(player,current)<0;
+								})) return 'cancel2';
+							}
+							return '回复体力';
+						}
+						if(target.hp>=player.hp&&att<-2&&eff<0) return '失去体力';
+						return 'cancel2';
+					});
+					'step 1'
+					if(result.control!='cancel2'){
+						var target=trigger.player;
+						player.logSkill('weiyi',target);
+						player.markAuto('weiyi',[target]);
+						target[result.control=='失去体力'?'loseHp':'recover']();
+					}
+				},
+				onremove:true,
+				intro:{
+					content:'已令$对汝威服',
+				},
+			},
+			jinzhi:{
+				audio:2,
+				enable:['chooseToUse','chooseToRespond'],
+				hiddenCard:function(player,name){
+					if(get.type(name)=='basic'&&lib.inpile.contains(name)&&player.countMark('jinzhi2')<player.countCards('he')) return true;
+				},
+				filter:function(event,player){
+					if(event.responded||event.jinzhi||player.countMark('jinzhi2')>=player.countCards('he')) return false;
+					for(var i of lib.inpile){
+						if(get.type(i)=='basic'&&event.filterCard({name:i},player,event)) return true;
+					}
+					return false;
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						var list=[];
+						for(var i of lib.inpile){
+							if(get.type(i)=='basic'&&event.filterCard({name:i},player,event)){
+								list.push(['基本','',i]);
+								if(i=='sha'){
+									list.push(['基本','',i,'fire']);
+									list.push(['基本','',i,'thunder']);
+									list.push(['基本','',i,'ice']);
+								}
+							}
+						}
+						return ui.create.dialog('锦织',[list,'vcard'],'hidden')
+					},
+					check:function(button){
+						if(button.link[2]=='shan') return 3;
+						var player=_status.event.player;
+						if(button.link[2]=='jiu'){
+							if(player.getUseValue({name:'jiu'})<=0) return 0;
+							if(player.countCards('h','sha')) return 4
+						}
+						return player.getUseValue({name:button.link[2],nature:button.link[3]})/4;
+					},
+					backup:function(links,player){
+						return {
+							selectCard:player.countMark('jinzhi2')+1,
+							filterCard:lib.filter.cardDiscardable,
+							viewAs:{
+								name:links[0][2],
+								nature:links[0][3],
+								suit:'none',
+								number:null,
+								isCard:true,
+							},
+							position:'he',
+							check:function(card){
+								var player=_status.event.player,color=get.color(card,player);
+								if(player.countCards('he',{color:color})<=player.countMark('jinzhi2')||(ui.selected.cards.length&&get.color(ui.selected.cards[0],player)!=color)) return 0;
+								if(lib.skill.jinzhi_backup.viewAs.name=='jiu'&&!player.countCards('h',function(cardx){
+									return card!=cardx&&!ui.selected.cards.contains(cardx)&&get.name(cardx,player)=='sha';
+								})) return 0;
+								return 6-get.value(card);
+							},
+							precontent:function(){
+								player.logSkill('jinzhi');
+								player.addTempSkill('jinzhi2','roundStart');
+								player.addMark('jinzhi2',1,false);
+								var cards=event.result.cards;
+								player.discard(cards);
+								player.draw();
+								event.result.card={
+									name:event.result.card.name,
+									nature:event.result.card.nature,
+									isCard:true,
+								};
+								event.result.cards=[];
+								delete event.result.skill;
+								if(cards.length>1){
+									var color=get.color(cards[0],player);
+									for(var i=1;i<cards.length;i++){
+										if(get.color(cards[i],player)!=color){
+											var evt=event.getParent();
+											evt.set('jinzhi',true);
+											evt.goto(0);
+											return;
+										}
+									}
+								}
+							},
+						}
+					},
+					prompt:function(links,player){
+						var name=links[0][2];
+						var nature=links[0][3];
+						return '弃置'+get.cnNumber(player.countMark('jinzhi2')+1)+'张牌并摸一张牌。若弃置的牌颜色均相同，则视为使用'+(get.translation(nature)||'')+get.translation(name);
+					},
+				},
+				ai:{
+					order:function(item,player){
+						if(_status.event.type=='phase'&&player.getUseValue({name:'jiu'},null,true)>0&&player.countCards('h','sha')) return 4;
+						return 1;
+					},
+					respondShan:true,
+					respondSha:true,
+					skillTagFilter:function(player){
+						if(player.countMark('jinzhi2')>=player.countCards('he')) return false;
+					},
+					result:{
+						player:function(player){
+							if(_status.event.dying) return get.attitude(player,_status.event.dying);
+							return 1;
+						}
+					}
+				}
+			},
+			jinzhi2:{
+				onremove:true,
+				intro:{
+					content:'本轮已发动过#次',
+				},
+			},
 			//铜雀台
 			spduanzhi:{
 				trigger:{target:'useCardToTargeted'},
@@ -3489,6 +3648,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			zhengbi:{
+				audio:2,
 				trigger:{player:'phaseUseBegin'},
 				filter:function(event,player){
 					//if(event.player!=player) return false;
@@ -3575,6 +3735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			fengying:{
+				audio:2,
 				limited:true,
 				enable:'phaseUse',
 				position:'h',
@@ -16956,6 +17117,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spduyi:'毒医',
 			spduyi2:'毒医',
 			spduyi_info:'出牌阶段限一次，你可以亮出牌堆顶的一张牌并交给一名角色，若此牌为黑色，该角色不能使用或打出手牌，直到回到结束。',
+			panshu:'潘淑',
+			weiyi:'威仪',
+			weiyi_info:'每名角色限一次。当有角色受到伤害后，你可选择：①若其体力值不小于你，则其失去1点体力。②若其体力值不大于你且其已受伤，则其回复1点体力。',
+			jinzhi:'锦织',
+			jinzhi2:'锦织',
+			jinzhi_info:'当你需要使用或打出一张基本牌时，你可弃置X张牌并摸一张牌。若你以此法弃置的牌均为同一颜色，则视为你使用或打出了此牌。',
 			
 			sp_default:"常规",
 			sp_tongque:"铜雀台",

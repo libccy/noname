@@ -6037,7 +6037,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					event.shan.filterInD('d');
 					if(!event.sha.length&&!event.shan.length) event.finish();
-					player.chooseTarget(get.prompt2('zhongyong'),function(card,player,target){
+					player.chooseTarget(get.prompt2('xinzhongyong'),function(card,player,target){
 						return !_status.event.source.contains(target)&&target!=player;
 					}).set('ai',function(target){
 						return get.attitude(_status.event.player,target);
@@ -12264,10 +12264,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhongjian_bg:'鉴',
 			zhongjian3:'忠鉴',
 			zhongjian3_bg:'鉴',
-			zhongjian_info:'出牌阶段限一次，你可以展示一张手牌，然后展示一名其他角色的X张手牌（X为其体力值）。若以此法展示的牌与你展示的牌：有颜色相同的，你选择：①摸一张牌。②弃置一名其他角色的一张牌；有点数相同的，本回合此技能改为“出牌阶段限两次”；均不同，你的手牌上限-1',
+			zhongjian_info:'出牌阶段限一次，你可以展示一张手牌，然后展示一名其他角色的X张手牌（X为其体力值）。若以此法展示的牌与你展示的牌：有颜色相同的，你选择：①摸一张牌。②弃置一名其他角色的一张牌；有点数相同的，本回合此技能改为“出牌阶段限两次”；均不同，你的手牌上限-1。',
 			caishi:'才识',
 			caishix:'才识/忠鉴',
-			caishi_info:'摸牌阶段开始时，你可以选择一项：1.手牌上限+1；2.回复1点体力，然后本回合你的牌不能对自己使用',
+			caishi_info:'摸牌阶段开始时，你可以选择一项：1.令手牌上限+1；2.回复1点体力，本回合内不能对自己使用牌。',
 			xincaishi:'才识',
 			xincaishi_info:'摸牌阶段，你可以选择一项：1.少摸一张牌，然后本回合发动〖忠鉴〗时可以多展示自己的一张牌；2.本回合手牌上限-1，然后本回合发动〖忠鉴〗时可以多展示对方的一张牌；3.多摸两张牌，本回合不能发动〖忠鉴〗。',
 			guizao:'瑰藻',

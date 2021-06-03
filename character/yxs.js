@@ -4,7 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'yxs',
 		character:{
 			yxs_qinqiong:["male","wei",4,["yxs_fanji","yxs_menshen"],[]],
-			yxs_wuzetian:['female','wu',4,['nvquan','qiandu','weiyi']],
+			yxs_wuzetian:['female','wu',4,['nvquan','qiandu','yxsweiyi']],
 			yxs_caocao:['male','wei',4,['zhulu','xieling']],
 			yxs_mozi:['male','qun',3,['jieyong','feigong','jianai']],
 			yxs_bole:['male','wu',3,['bolehuiyan','xiangma']],
@@ -2302,7 +2302,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiangma:{
 				inherit:'yicong'
 			},
-			weiyi:{
+			yxsweiyi:{
 				trigger:{player:'damageEnd'},
 				filter:function(event,player){
 					return (event.source&&event.source.countCards('he'));
@@ -3074,8 +3074,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fanpu_info:'出牌阶段限一次，你可以移去3枚统领标记并视为对攻击范围内的至多3名角色使用一张杀',
 			fenghuo:'烽火',
 			fenghuo_info:'你可以将一张装备区内的牌当作南蛮入侵使用',
-			weiyi:'威仪',
-			weiyi_info:'每当你受到一次伤害，可以令伤害来源弃置两张牌',
+			yxsweiyi:'威仪',
+			yxsweiyi_info:'每当你受到一次伤害，可以令伤害来源弃置两张牌',
 			xieling:'挟令',
 			xieling_info:'出牌阶段，弃掉两张手牌，将任意一名角色装备区或判定区的牌移动到另一名角色对应的区域',
 			baye:'霸业',
