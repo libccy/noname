@@ -2175,7 +2175,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				charlotte:true,
 				content:function(){
-					var list=['wei','shu','wu','qun'];
+					var list=['wei','shu','wu','qun','jin'];
 					for(var i of list){
 						if(!player.hasMark('kotori_yumo_'+i)){
 							player.addMark('kotori_yumo_'+i,1,false);
@@ -2205,7 +2205,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseBegin'},
 				direct:true,
 				filter:function(event,player){
-					var list=['wei','shu','wu','qun','key'];
+					var list=['wei','shu','wu','qun','key','jin'];
 					for(var i in list){
 						if(player.hasMark('kotori_yumo_'+list[i]))	return true;
 					}
@@ -2213,7 +2213,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					var list=['wei','shu','wu','qun','key'];
+					var list=['wei','shu','wu','qun','key','jin'];
 					var list2=[];
 					for(var i of list){
 						if(player.hasMark('kotori_yumo_'+i))	list2.push('kotori_skill_'+i);
@@ -2334,6 +2334,46 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
+			kotori_skill_jin:{
+				trigger:{player:'phaseDrawEnd'},
+				filter:function(event,player){
+					var hs=player.getCards('h');
+					return hs.length>0&&player.getHistory('gain',function(evt){
+						if(evt.getParent().name!='draw'||evt.getParent('phaseDraw')!=event) return false;
+						for(var i of evt.cards){
+							if(hs.contains(i)) return true;
+						}
+						return false;
+					}).length>0;
+				},
+				check:function(event,player){
+					var hs=player.getCards('h'),cards=[],suits=[];
+					player.getHistory('gain',function(evt){
+						if(evt.getParent().name!='draw'||evt.getParent('phaseDraw')!=event) return false;
+						for(var i of evt.cards){
+							if(hs.contains(i)){
+								cards.add(i);
+								suits.add(get.suit(i,player));
+							}
+						}
+					});
+					return cards.length==suits.length;
+				},
+				content:function(){
+					var hs=player.getCards('h'),cards=[],suits=[];
+					player.getHistory('gain',function(evt){
+						if(evt.getParent().name!='draw'||evt.getParent('phaseDraw')!=trigger) return false;
+						for(var i of evt.cards){
+							if(hs.contains(i)){
+								cards.add(i);
+								suits.add(get.suit(i,player));
+							}
+						}
+					});
+					player.showCards(cards,get.translation(player)+'发动了【晋势】');
+					if(cards.length==suits.length) player.draw();
+				},
+			},
 			kotori_qunxin_temp:{
 				onremove:true,
 				mod:{
@@ -2362,12 +2402,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				marktext:'<span class="legendtext">魔</span>',
 				intro:{name:'<span class="legendtext">魔物</span>',content:'mark'},
 			},
+			kotori_yumo_jin:{
+				marktext:'<span class="icetext">魔</span>',
+				intro:{name:'<span class="icetext">魔物</span>',content:'mark'},
+			},
 			kotori_huazhan:{
 				charlotte:true,
 				enable:'chooseToUse',
 				filter:function(event,player){
 					var bool=false;
-					var list=['wei','shu','wu','qun','key'];
+					var list=['wei','shu','wu','qun','key','jin'];
 					for(var i of list){
 						if(player.hasMark('kotori_yumo_'+i)&&!player.getStorage('kotori_huazhan2').contains('kotori_yumo_'+i)){
 							bool=true;break;
@@ -2380,7 +2424,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return ui.create.dialog('###花绽###'+lib.translate.kotori_huazhan_info);
 					},
 					chooseControl:function(event,player){
-						var list=['wei','shu','wu','qun','key'];
+						var list=['wei','shu','wu','qun','key','jin'];
 						var list2=[];
 						for(var i of list){
 							if(player.hasMark('kotori_yumo_'+i)&&!player.getStorage('kotori_huazhan2').contains('kotori_yumo_'+i))	list2.push('kotori_yumo_'+i);
@@ -2390,7 +2434,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					check:function(){
 						var player=_status.event.player;
-						var list=['wei','shu','wu','qun','key'];
+						var list=['wei','shu','wu','qun','key','jin'];
 						var list2=[];
 						for(var i of list){
 							if(player.hasMark('kotori_yumo_'+i)&&!player.getStorage('kotori_huazhan2').contains('kotori_yumo_'+i))	list2.push('kotori_yumo_'+i);
@@ -13572,7 +13616,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kotori_yumo:'驭魔',
 			kotori_yumo_damage:'驭魔',
 			kotori_yumo_gain:'驭魔',
-			kotori_yumo_info:'锁定技，游戏开始时，你获得蓝色、红色、绿色、黄色魔物各一个。当有角色受到伤害后，若你没有对应的标记，你根据其势力获得一个对应魔物：魏：蓝、蜀：红、吴：绿、群：黄、键：紫。回合开始时，你可以弃置一个对应的魔物并获得以下技能之一直到回合结束：蓝：魏业、红：蜀义、绿：吴耀、黄：群心、紫：键魂。',
+			kotori_yumo_info:'锁定技，游戏开始时，你获得蓝色、红色、绿色、黄色、灰色魔物各一个。当有角色受到伤害后，若你没有对应的标记，你根据其势力获得一个对应魔物：魏：蓝、蜀：红、吴：绿、群：黄、灰：晋、键：紫。回合开始时，你可以弃置一个对应的魔物并获得以下技能之一直到回合结束：蓝：魏业、红：蜀义、绿：吴耀、黄：群心、灰：晋势、紫：键魂。',
 			kotori_skill_wei:'魏业',
 			kotori_skill_wei_info:'回合开始时，你可以弃置一张牌并指定一名其他角色，该角色须弃置一张牌，否则你摸一张牌。',
 			kotori_skill_shu:'蜀义',
@@ -13583,13 +13627,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kotori_skill_qun_info:'锁定技，弃牌阶段开始时，若你的手牌数比体力值多2或更多，你本回合手牌上限+1；若你已损失体力值大于1，你手牌上限+1',
 			kotori_skill_key:'键魂',
 			kotori_skill_key_info:'出牌阶段限一次，你可以摸一张牌并获得1点护甲。若如此做，你于当前回合结束时失去1点体力。',
+			kotori_skill_jin:'晋势',
+			kotori_skill_jin_info:'摸牌阶段结束时，你可以展示你于此阶段内因摸牌而获得的牌。若这些牌的花色均不同，则你摸一张牌。',
 			kotori_yumo_wei:'<span class="thundertext">魔物</span>',
 			kotori_yumo_shu:'<span class="firetext">魔物</span>',
 			kotori_yumo_wu:'<span class="greentext">魔物</span>',
 			kotori_yumo_qun:'<span class="yellowtext">魔物</span>',
 			kotori_yumo_key:'<span class="legendtext">魔物</span>',
+			kotori_yumo_jin:'<span class="icetext">魔物</span>',
 			kotori_huazhan:'花绽',
-			kotori_huazhan_info:'每回合每种魔物限一次，你可将一个蓝色/红色/绿色/黄色/紫色魔物当做【树上开花】使用。',
+			kotori_huazhan_info:'每回合每种魔物限一次，你可将一个蓝色/红色/绿色/黄色/紫色/灰色魔物当做【树上开花】使用。',
 			jojiro_shensu:'神速',
 			jojiro_shensu_info:'你可以选择一至三项：1. 跳过判定阶段和摸牌阶段；2. 跳过出牌阶段并弃置一张装备牌；3. 跳过弃牌阶段并将你的武将牌翻面。你每选择一项，视为你对一名其他角色使用一张没有距离限制的【杀】',
 			jojiro_shensu1:'神速',

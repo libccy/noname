@@ -18,7 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		character:{
-			panshu:['female','wu',3,['weiyi','jinzhi'],['unseen']],
+			panshu:['female','wu',3,['weiyi','jinzhi']],
 			sp_jiben:['male','qun',3,['spduanzhi','spduyi']],
 			sp_fuhuanghou:['female','qun',3,['spcangni','spmixin']],
 			sp_fuwan:['male','qun',3,['spfengyin','spchizhong']],

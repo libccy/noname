@@ -33,6 +33,7 @@ window.noname_source_list=[
 	'character/xianjian.js',
 	'character/xinghuoliaoyuan.js',
 	'character/yijiang.js',
+	'character/yingbian.js',
 	'character/yxs.js',
 	'game/asset.js',
 	'game/codemirror.js',

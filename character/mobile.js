@@ -343,7 +343,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		skill:{
 			//狗剩
 			reduoji:{
-				audio:2,
+				audio:'duoji',
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
@@ -995,7 +995,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'refubi_buff',
 				subSkill:{
 					buff:{
-						trigger:{global:'phaseUseBegin'},
+						trigger:{global:'phaseZhunbeiBegin'},
 						direct:true,
 						filter:function(event,player){
 							return event.player!=player&&event.player.hasMark('refubi');
@@ -1009,7 +1009,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							]).set('ai',function(){
 								var player=_status.event.player,target=_status.event.getTrigger().player;
 								if(get.attitude(player,target)<=0) return 'cancel2';
-								if(target.countCards('h',function(card){
+								if(!target.hasJudge('lebu')&&target.countCards('h',function(card){
 									return get.name(card,target)=='sha'&&target.hasValueTarget(card);
 								})>target.getCardUsable('sha')) return 0;
 								return 1;

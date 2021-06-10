@@ -2245,10 +2245,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var node=this;
 					var getList=function(){
 						var list=[
-						['liubei','guanyu','zhangfei'],
-						['caocao','guojia','xunyu'],
-						['sunquan','zhangzhang','zhouyu'],
-						['re_yuanshao','guotufengji','yj_jushou']
+							['liubei','guanyu','zhangfei'],
+							['caocao','guojia','xunyu'],
+							['sunquan','zhangzhang','zhouyu'],
+							['re_yuanshao','guotufengji','yj_jushou'],
+							['jin_simayi','jin_simazhao','jin_wangyuanji'],
 						];
 						if(_status.keyVerified) list.push(['key_yuri','key_yuzuru','sp_key_kanade'])
 						list.randomSort();
@@ -2310,6 +2311,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
  						shu:[],
  						wu:[],
  						qun:[],
+ 						jin:[],
  						key:[],
  					};
  					var map3=[];
@@ -2406,6 +2408,48 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
  								if(player.countCards('h')-player.hp>1) num++;
  								player.addMark('qunxin_temp',num,false);
  								player.addTempSkill('qunxin_temp','phaseDiscardEnd');
+ 							},
+ 						},
+ 						_jiazu_jin:{
+ 							trigger:{player:'phaseDrawEnd'},
+ 							popup:'晋势',
+ 							prompt2:'摸牌阶段结束时，你可以展示你于此阶段内因摸牌而获得的牌。若这些牌的花色均不同，则你摸一张牌。',
+ 							filter:function(event,player){
+ 								var hs=player.getCards('h');
+ 								return player.group=='jin'&&hs.length>0&&player.getHistory('gain',function(evt){
+ 									if(evt.getParent().name!='draw'||evt.getParent('phaseDraw')!=event) return false;
+ 									for(var i of evt.cards){
+ 										if(hs.contains(i)) return true;
+ 									}
+ 									return false;
+ 								}).length>0;
+ 							},
+ 							check:function(event,player){
+ 								var hs=player.getCards('h'),cards=[],suits=[];
+ 								player.getHistory('gain',function(evt){
+ 									if(evt.getParent().name!='draw'||evt.getParent('phaseDraw')!=event) return false;
+ 									for(var i of evt.cards){
+ 										if(hs.contains(i)){
+ 											cards.add(i);
+ 											suits.add(get.suit(i,player));
+ 										}
+ 									}
+ 								});
+ 								return cards.length==suits.length;
+ 							},
+ 							content:function(){
+ 								var hs=player.getCards('h'),cards=[],suits=[];
+ 								player.getHistory('gain',function(evt){
+ 									if(evt.getParent().name!='draw'||evt.getParent('phaseDraw')!=trigger) return false;
+ 									for(var i of evt.cards){
+ 										if(hs.contains(i)){
+ 											cards.add(i);
+ 											suits.add(get.suit(i,player));
+ 										}
+ 									}
+ 								});
+ 								player.showCards(cards,get.translation(player)+'发动了【晋势】');
+ 								if(cards.length==suits.length) player.draw();
  							},
  						},
  						_jiazu_key:{
@@ -2513,6 +2557,27 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
  								player.draw();
  							},
  						},
+ 						_jiazu_awaken_jin:{
+ 							popup:'洛阳',
+ 							intro:{
+ 								content:'锁定技，结束阶段，若你手牌中的花色数小于3，则你摸一张牌。',
+ 							},
+ 							trigger:{player:'phaseJieshuBegin'},
+ 							forced:true,
+ 							filter:function(event,player){
+ 								if(!player._jiazuAwaken||player.group!='jin') return false;
+ 								var hs=player.getCards('h'),suits=[];
+ 								if(hs.length<3) return true;
+ 								for(var i of hs){
+ 									suits.add(get.suit(i,player));
+ 									if(suits.length>2) return false;
+ 								}
+ 								return true;
+ 							},
+ 							content:function(){
+ 								player.draw();
+ 							},
+ 						},
  						_jiazu_awaken:{
  							trigger:{global:'die'},
  							forced:true,
@@ -2557,6 +2622,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
   							popup:'群心',
   							prompt2:'锁定技，弃牌阶段开始时，若你的手牌数比体力值多2或更多，你本回合手牌上限+1；若你已损失体力值大于1，你手牌上限+1',
   						},
+  						_jiazu_jin:{
+ 								popup:'晋势',
+ 								prompt2:'摸牌阶段结束时，你可以展示你于此阶段内因摸牌而获得的牌。若这些牌的花色均不同，则你摸一张牌。',
+ 							},
   						_jiazu_key:{
   							popup:'键魂',
   							prompt2:'出牌阶段限一次，你可以摸一张牌并获得1点护甲。若如此做，你于当前回合结束时失去1点体力。',
@@ -2585,6 +2654,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
   								content:'锁定技，当你使用锦囊牌指定其他角色为目标后，你摸一张牌。',
   							},
   						},
+  						_jiazu_awaken_jin:{
+ 								popup:'洛阳',
+ 								intro:{
+ 									content:'锁定技，结束阶段，若你手牌中的花色数小于3，则你摸一张牌。',
+ 								},
+ 							},
   						_jiazu_awaken_key:{
   							popup:'光坂',
   							intro:{

@@ -393,7 +393,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						player.logSkill('taigongyinfu_skill');
-						player.lose(result.cards,ui.discardPile);
+						player.lose(result.cards,ui.discardPile,'visible');
 						player.$throw(result.cards,1000);
 						game.log(player,'将',result.cards,'置入了弃牌堆');
 						player.draw();

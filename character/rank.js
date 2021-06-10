@@ -249,7 +249,7 @@ window.noname_character_rank={
 		'wolongfengchu',
 		'yanghuiyu',
 		'liubian',
-		'nanhualaoxian',
+		'panshu',
 		'key_misuzu',
 		'key_sunohara',
 		'key_umi',
@@ -666,6 +666,7 @@ window.noname_character_rank={
 		're_zhoucang',
 		'ruanyu',
 		'wujing',
+		'nanhualaoxian',
 	],
 	b:[
 		'diy_feishi',
@@ -843,6 +844,9 @@ window.noname_character_rank={
 		'jin_yanghuiyu',
 		'sp_mifuren',
 		'sp_xinpi',
+		'cheliji',
+		'shibao',
+		'zhangmiao',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1135,6 +1139,7 @@ window.noname_character_rank={
 			'boss_zhaoyun',
 			'yanghuiyu',
 			'nanhualaoxian',
+			'panshu',
 			'key_yuri',
 			'key_yuzuru',
 			'sp_key_kanade',
@@ -1635,6 +1640,7 @@ window.noname_character_rank={
 			'ns_chengpu',
 			're_zhoucang',
 			'sp_mifuren',
+			'cheliji',
 		],
 		junk:[
 			'sunshao',
