@@ -179,7 +179,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return !player.getHistory('skipped').contains('phaseUse')&&player.getHistory('useCard',function(evt){
 						return evt.getParent().name=='mouni';
-					});
+					}).length>0;
 				},
 				content:function(){
 					'step 0'
@@ -7319,6 +7319,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						player.logSkill('zongkui',target);
 						target.addMark('zongkui_mark',1);
+						game.delayx();
 					}
 				},
 				subSkill:{
@@ -7410,7 +7411,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"xinfu_lveming":{
-				init:function (player){
+				init:function(player){
 					player.storage.xinfu_lveming=0;
 				},
 				mark:true,
@@ -7425,24 +7426,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function (){
 					"step 0"
-					var list=[1,2,3,4,5,6,7,8,9,10,11,12,13]
+					var list=[1,2,3,4,5,6,7,8,9,10,11,12,13].map((i)=>get.strNumber(i));
 					target.chooseControl(list).set('ai',function(){
-						return list.randomGet();
-					});
+						return get.rand(0,12);
+					}).set('prompt','请选择一个点数');
 					"step 1"
 					if(result.control){
-						target.popup(result.control);
-						player.storage.xinfu_lveming++;
-						event.num=result.control;
+						target.$damagepop(result.control,'thunder');
+						var num=result.index+1;
+						event.num=num;
 					}
 					else{
-						target.popup('13');
-						player.storage.xinfu_lveming++;
+						target.$damagepop('K','thunder');
 						event.num=13;
 					};
+					game.log(target,'选择的点数是','#y'+get.strNumber(event.num));
+					player.storage.xinfu_lveming++;
 					player.judge(function(card){
-						if(card.number==event.num) return 4;
-						return -1;
+						if(card.number==_status.event.getParent('xinfu_lveming').num) return 4;
+						return 0;
 					});
 					"step 2"
 					if(result.bool==true){

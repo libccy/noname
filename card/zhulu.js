@@ -187,7 +187,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(player.hasUnknown(2)){
 								return 0;
 							}
-							return 2-2*get.distance(player,target,'absolute')/game.countPlayer();
+							return (1-get.distance(player,target,'absolute')/game.countPlayer())*get.attitude(player,target)>0?0.4:0.7;
 						}
 					},
 					tag:{

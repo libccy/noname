@@ -12528,7 +12528,7 @@
 				},
 				chooseToCompare:function(){
 					"step 0"
-					if(player.countCards('h')==0||target.countCards('h')==0){
+					if(((!event.fixedResult&&!event.fixedResult[player.playerid])&&player.countCards('h')==0)||((!event.fixedResult&&!event.fixedResult[target.playerid])&&target.countCards('h')==0)){
 						event.result={cancelled:true,bool:false}
 						event.finish();
 						return;
@@ -26573,53 +26573,6 @@
 					}
 				},
 			},
-			_lianhuan2:{
-				trigger:{global:'damageAfter'},
-				filter:function(event,player){
-					return false;
-					return (event.nature&&lib.linked.contains(event.nature)&&event.player.isLinked()&&
-						event.player.classList.contains('dead')&&player.isLinked());
-				},
-				silent:true,
-				popup:false,
-				forced:true,
-				priority:-5,
-				content:function(){
-					"step 0"
-					event.forceDie=true;
-					trigger.player.removeLink();
-					if(!trigger.notLink()) event.finish();
-					"step 1"
-					event.targets=game.filterPlayer(function(current){
-						return current.isLinked();
-					});
-					lib.tempSortSeat=_status.currentPhase||trigger.player;
-					event.targets.sort(lib.sort.seat);
-					delete lib.tempSortSeat;
-					event._args=[trigger.num,trigger.nature,trigger.cards,trigger.card];
-					if(trigger.source) event._args.push(trigger.source);
-					else event._args.push("nosource");
-					"step 2"
-					if(event.targets.length){
-						var target=event.targets.shift();
-						target.damage.apply(target,event._args.slice(0));
-						event.redo();
-					}
-				}
-			},
-			_lianhuan3:{
-				trigger:{global:'damageAfter'},
-				priority:-10,
-				forced:true,
-				popup:false,
-				filter:function(event,player){
-					return false;
-					return event.player.classList.contains('dead');
-				},
-				content:function(){
-					trigger.player.removeLink();
-				}
-			},
 			_lianhuan4:{
 				trigger:{player:'changeHp'},
 				priority:-10,
@@ -27765,7 +27718,7 @@
 		cardsGotoSpecial:function(cards,bool){
 			var type=get.itemtype(cards);
 			if(type!='cards'&&type!='card') return;
-			var next=game.createEvent('cardsDiscard');
+			var next=game.createEvent('cardsGotoSpecial');
 			next.cards=type=='cards'?cards.slice(0):[cards];
 			if(bool===false) next.notrigger=true;
 			next.setContent('cardsGotoSpecial');
@@ -44211,7 +44164,7 @@
 						node=item.cloneNode(true);
 					}
 					node.classList.add('button');
-					position.appendChild(node);
+					if(position) position.appendChild(node);
 					node.link=item;
 					if(item.style.backgroundImage){
 						node.style.backgroundImage=item.style.backgroundImage;
@@ -44225,6 +44178,13 @@
 					}
 					if(!noclick){
 						lib.setIntro(node);
+					}
+					if(get.position(item)=='j'&&item.viewAs&&item.viewAs!=item.name&&lib.config.cardtempname!='off'){
+						node._tempName=ui.create.div('.tempname',node);
+						var tempname=get.translation(item.viewAs);
+						node._tempName.dataset.nature='wood';
+						node._tempName.innerHTML=lib.config.cardtempname=='default'?get.verticalStr(tempname):tempname;
+						node._tempName.tempname=tempname;
 					}
 					break;
 
@@ -49751,7 +49711,7 @@
 					case 'kaihei':return '开黑斗地主';
 					case 'huanle':return '欢乐斗地主';
 					case 'online':return '智斗三国';
-					default:return '休闲斗地主';
+					default:return '休闲'+(config.double_character?'双将':'')+'斗地主';
 				}
 			}
 			if(config.mode=='versus'){
@@ -49773,7 +49733,8 @@
 			else if(config.mode=='identity'&&config.identity_mode!='normal'){
 				switch(config.identity_mode){
 					case 'purple':return '三对三对二';
-					case 'zhong':return '忠胆英杰';
+					case 'zhong':return (config.double_character?'双将':'')+'忠胆英杰';
+					default:return (config.double_character?'双将':'')+get.cnNumber(parseInt(config.number))+'人身份';
 				}
 			}
 			else if(config.mode=='guozhan'&&config.guozhan_mode!='normal'){
@@ -50952,7 +50913,7 @@
 		},
 		selectableCards:function(sort){
 			if(!_status.event.player) return[];
-			var cards=_status.event.player.getCards('hejs');
+			var cards=_status.event.player.getCards('hes');
 			var selectable=[];
 			for(var i=0;i<cards.length;i++){
 				if(cards[i].classList.contains('selectable')&&
@@ -53172,7 +53133,10 @@
 			var player=get.owner(card);
 			if(!player) player=_status.event.player;
 			if(player.getCards('j').contains(card)){
-				var efff=get.effect(player,card,player,player);
+				var efff=get.effect(player,{
+					name:card.viewAs||card.name,
+					cards:[card],
+				},player,player);
 				if(efff>0) return 0.5;
 				if(efff==0) return 0;
 				return -1.5;

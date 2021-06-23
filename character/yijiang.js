@@ -19,7 +19,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_fazheng:['male','shu',3,['xinenyuan','xinxuanhuo'],['die_audio']],
 			old_guanzhang:['male','shu',4,['old_fuhun']],
 			old_wangyi:['female','wei',3,['oldzhenlie','oldmiji']],
-			caozhang:['male','wei',4,['jiangchi']],
+			caozhang:['male','wei',4,['new_jiangchi']],
 			guohuai:['male','wei',4,['rejingce']],
 			zhangchunhua:['female','wei',3,['jueqing','shangshi']],
 			caozhi:['male','wei',3,['luoying','jiushi']],
@@ -2437,7 +2437,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.index==0){
 						target.loseHp();
 						event.card=get.cardPile(function(card){
-							return get.type(card)=='equip'&&!target.isDisabled(get.subtype(card));
+							return get.type(card)=='equip'&&target.canUse(card,target);
 						});
 						if(event.card){
 							target.chooseUseTarget(event.card,'nothrow','nopopup',true);
@@ -2516,7 +2516,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							trigger.source.loseHp();
 							var card=get.cardPile(function(card){
-								return get.type(card)=='equip';
+								return get.type(card)=='equip'&&trigger.source.canUse(card,trigger.source);
 							});
 							if(card){
 								trigger.source.chooseUseTarget(card,'nothrow','nopopup',true);
@@ -2566,7 +2566,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.logSkill('juexiang_lie',target);
 								target.loseHp();
 								var card=get.cardPile(function(card){
-									return get.type(card)=='equip';
+									return get.type(card)=='equip'&&target.canUse(card,target);
 								});
 								if(card){
 									target.chooseUseTarget(card,true,'nothrow','nopopup',true);

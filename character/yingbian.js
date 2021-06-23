@@ -7,7 +7,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			weiguan:['male','jin',3,['zhongyun','shenpin']],
 			cheliji:['male','qun',4,['chexuan','qiangshou']],
 			simazhou:['male','jin',4,['caiwang','naxiang']],
-			huangzu:['male','qun',4,['wangong'],['unseen']],
 			ol_lisu:['male','qun',3,['qiaoyan','xianzhu']],
 			jin_yanghuiyu:['female','jin',3,['huirong','ciwei','caiyuan'],['hiddenSkill']],
 			shibao:['male','jin',4,['zhuosheng']],
@@ -517,40 +516,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove:true,
 				intro:{
 					content:'已接受$的投降；对这些角色发动【才望】时将“弃置”改为“获得”',
-				},
-			},
-			wangong:{
-				audio:2,
-				trigger:{player:'useCard'},
-				forced:true,
-				filter:function(event,player){
-					return get.type(event.card,false)=='basic';
-				},
-				content:function(){
-					player.addSkill('wangong2');
-				},
-			},
-			wangong2:{
-				trigger:{player:'useCard1'},
-				forced:true,
-				popup:false,
-				firstDo:true,
-				charlotte:true,
-				content:function(){
-					player.removeSkill('wangong2');
-					if(trigger.card.name=='sha') trigger.baseDamage++;
-				},
-				mod:{
-					cardUsable:function(card){
-						if(card.name=='sha') return Infinity;
-					},
-					targetInRange:function(card){
-						if(card.name=='sha') return true;
-					},
-				},
-				mark:true,
-				intro:{
-					content:'使用【杀】无距离和次数限制且伤害+1',
 				},
 			},
 			//李肃
@@ -1793,7 +1758,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				filter:function(event,player){
 					var target=event.player;
-					return target!=player&&!target.storage.nohp&&(target.hp+target.countCards('h'))>=(ui.cardPile.childElementCount%10)&&player.countCards('he')>0&&player.canUse({name:'sha',nature:'ice'},target,false);
+					return target!=player&&target.isIn()&&!target.storage.nohp&&(target.hp+target.countCards('h'))>=(ui.cardPile.childElementCount%10)&&player.countCards('he')>0&&player.canUse({name:'sha',nature:'ice'},target,false);
 				},
 				content:function(){
 					'step 0'
@@ -1988,10 +1953,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ciwei_info:'一名角色于其回合内使用第二张牌时，若此牌为基本牌或普通锦囊牌，则你可以弃置一张牌，取消此牌的所有目标。',
 			caiyuan:'才媛',
 			caiyuan_info:'锁定技，当你扣减体力时，你获得一枚“才媛”标记直到你的下回合结束。结束阶段开始时，若你没有“才媛”标记且此回合不是你的第一个回合 ，则你摸两张牌。',
-			huangzu:'黄祖',
-			wangong:'挽弓',
-			wangong2:'挽弓',
-			wangong_info:'锁定技，当你使用基本牌时，你获得如下效果：当你使用下一张牌时，若此牌为【杀】，则此牌无次数和距离限制且伤害+1。',
 			simazhou:'司马伷',
 			caiwang:'才望',
 			caiwang_info:'当你使用或打出牌响应其他角色使用的牌，或其他角色使用或打出牌响应你使用的牌后，若这两张牌颜色相同，则你可以弃置对方的一张牌。',

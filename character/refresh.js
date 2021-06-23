@@ -47,7 +47,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhonghui:['male','wei',4,['requanji','zili']],
 			xin_handang:['male','wu',4,['xingongji','xinjiefan']],
 			yujin_yujin:['male','wei',4,['rejieyue']],
-			re_caozhang:['male','wei',4,['new_jiangchi']],
+			re_caozhang:['male','wei',4,['xinjiangchi']],
 			re_chengpu:['male','wu',4,['ollihuo','rechunlao']],
 			re_quancong:['male','wu',4,['xinyaoming']],
 			re_liaohua:['male','shu',4,['xindangxian','xinfuli']],
@@ -133,6 +133,65 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_xushu:['zhaoyun','sp_zhugeliang'],
 		},
 		skill:{
+			//界曹彰
+			xinjiangchi:{
+				trigger:{player:'phaseDrawEnd'},
+				direct:true,
+				content:function(){
+					'step 0'
+					var list=[
+						'摸一张牌',
+						'摸两张牌，本回合内不能使用或打出【杀】',
+					];
+					if(player.countCards('he',function(card){
+						return lib.filter.cardDiscardable(card,player,'xinjiangchi')>0;
+					})>0) list.push('弃置一张牌，本回合可以多使用一张【杀】且无距离限制');
+					player.chooseControl('cancel2').set('prompt',get.prompt('xinjiangchi')).set('choiceList',list);
+					'step 1'
+					if(result.control!='cancel2'){
+						switch(result.index){
+							case 0:{
+								player.draw();
+								break;
+							}
+							case 1:{
+								player.draw(2);
+								player.addTempSkill('xinjiangchi_less');
+								break;
+							}
+							case 2:{
+								player.chooseToDiscard('he',true);
+								player.addTempSkill('xinjiangchi_more');
+								break;
+							}
+						}
+					}
+				},
+				subSkill:{
+					less:{
+						mod:{
+							cardEnabled:function(card){
+								if(card.name=='sha') return false;
+							},
+							cardRespondable:function(card){
+								if(card.name=='sha') return false;
+							},
+						},
+						charlotte:true,
+					},
+					more:{
+						mod:{
+							cardUsable:function(card,player,num){
+								if(card.name=='sha') return num+1;
+							},
+							targetInRange:function(card){
+								if(card.name=='sha') return true;
+							},
+						},
+						charlotte:true,
+					},
+				},
+			},
 			//界周仓和程普
 			ollihuo:{
 				mod:{
@@ -9331,6 +9390,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ollihuo3:'疠火',
 			ollihuo4:'疠火',
 			ollihuo_info:'你使用普通的【杀】可以改为火【杀】，若此【杀】造成过伤害，你失去1点体力；你使用火【杀】可以多选择一个目标。你每回合使用的第一张牌如果是【杀】，则此【杀】结算完毕后可置于你的武将牌上。',
+			xinjiangchi:'将驰',
+			xinjiangchi_info:'摸牌阶段结束时，你可选择：①摸一张牌。②摸两张牌，然后本回合内不能使用或打出【杀】。③弃置一张牌，然后本回合内可以多使用一张【杀】，且使用【杀】无距离限制。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',
