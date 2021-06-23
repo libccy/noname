@@ -12528,7 +12528,7 @@
 				},
 				chooseToCompare:function(){
 					"step 0"
-					if(((!event.fixedResult&&!event.fixedResult[player.playerid])&&player.countCards('h')==0)||((!event.fixedResult&&!event.fixedResult[target.playerid])&&target.countCards('h')==0)){
+					if(((!event.fixedResult||!event.fixedResult[player.playerid])&&player.countCards('h')==0)||((!event.fixedResult||!event.fixedResult[target.playerid])&&target.countCards('h')==0)){
 						event.result={cancelled:true,bool:false}
 						event.finish();
 						return;

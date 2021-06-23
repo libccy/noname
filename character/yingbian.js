@@ -205,6 +205,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return player.inRange(current);
 					}));
 				},
+				usable:1,
 				content:function(){
 					'step 0'
 					var filterTarget=function(card,player,target){
