@@ -158,9 +158,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				game.chooseCharacter();
 			}
 			"step 2"
-			//game.broadcast(function(cardtag){
-			//	_status.cardtag=cardtag;
-			//},_status.cardtag);
+			game.broadcastAll(function(){
+				lib.inpile.removeArray(['gz_haolingtianxia','gz_kefuzhongyuan','gz_guguoanbang','gz_wenheluanwu']);
+			});
 			if(ui.coin){
 				_status.coinCoeff=get.coinCoeff([game.me.name1,game.me.name2]);
 			}
@@ -383,8 +383,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_shixie:['male','qun',3,['gzbiluan','gzlixia'],['doublegroup:qun:wu','gzskin']],
 				gz_zhanglu:['male','qun',3,['gzbushi','gzmidao'],['doublegroup:qun:wei','gzskin']],
 				gz_dongzhao:['male','wei',3,['quanjin','zaoyun']],
-				gz_re_xushu:['male','shu',4,['zhuhai','gzpozhen','gzjiancai'],['gzskin']],
-				gz_wujing:['male','wu',4,['heji'],['gzskin']],
+				gz_re_xushu:['male','shu',4,['gzzhuhai','gzpozhen','gzjiancai'],['gzskin']],
+				gz_wujing:['male','wu',4,['donggui','fengyang'],['gzskin']],
 				gz_yanbaihu:['male','qun',4,['gzzhidao','gzyjili'],['gzskin']],
 
 				gz_caocao:['male','wei',4,['jianxiong']],
@@ -519,6 +519,63 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			gzzhuhai:{
+				audio:'zhuhai',
+				audioname:['gz_re_xushu'],
+				trigger:{global:'phaseJieshuBegin'},
+				direct:true,
+				filter:function(event,player){
+					return event.player.isAlive()&&event.player.getStat('damage')&&
+					lib.filter.targetEnabled({name:'sha'},player,event.player)&&(player.hasSha()||_status.connectMode&&player.countCards('h')>0);
+				},
+				content:function(){
+					var next=player.chooseToUse(function(card,player,event){
+						if(get.name(card)!='sha') return false;
+						return lib.filter.filterCard.apply(this,arguments);
+					},'诛害：是否对'+get.translation(trigger.player)+'使用一张杀？').set('logSkill','gzzhuhai').set('complexSelect',true).set('filterTarget',function(card,player,target){
+						if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
+						return lib.filter.targetEnabled.apply(this,arguments);
+					}).set('sourcex',trigger.player);
+					player.addTempSkill('gzzhuhai2');
+					next.oncard=function(card,player){
+						if(trigger.player.getHistory('sourceDamage',function(evt){
+							return evt.player.isFriendOf(player);
+						}).length){
+							player.addTempSkill('gzzhuhai2');
+							card.gzzhuhai_tag=true;
+						}
+					}
+				},
+				ai:{
+					unequip_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						var evt=_status.event.getParent();
+						if(evt.name!='gzzhuhai') return false;
+						if(!target.getHistory('sourceDamage',function(evt){
+							return evt.player.sameIdentityAs(player);
+						}).length) return false;
+						return true;
+					},
+				},
+			},
+			gzzhuhai2:{
+				trigger:{player:'shaMiss'},
+				forced:true,
+				popup:false,
+				filter:function(event,player){
+					return event.card.gzzhuhai_tag==true&&event.target.countCards('he')>0;
+				},
+				content:function(){
+					player.line(trigger.target);
+					trigger.target.chooseToDiscard('he',true);
+				},
+ 			ai:{
+ 				unequip:true,
+ 				skillTagFilter:function(player,tag,arg){
+ 					if(!arg||!arg.card||!arg.card.gzzhuhai_tag) return false;
+ 				},
+ 			},
+			},
 			quanjin:{
 				audio:2,
 				enable:'phaseUse',
@@ -8931,6 +8988,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzpozhen_info:'限定技，其他角色的回合开始时，你可以令其本回合不可使用、打出或重铸手牌；若其处于队列或围攻关系中，你可依次弃置此队列或参与围攻关系的其他角色的一张牌。',
 			gzjiancai:'荐才',
 			gzjiancai_info:'副将技，此武将牌上单独的阴阳鱼个数-1。与你势力相同的角色即将受到伤害而进入濒死状态时，你可以防止此伤害，若如此做，你须变更副将；与你势力相同的角色变更副将时，其额外获得两张备选武将牌。',
+			gzzhuhai:'诛害',
+			gzzhuhai_info:'其他角色的结束阶段开始时，若其本回合内造成过伤害，则你可以对其使用一张【杀】（无距离限制）。若其本回合内对与你势力相同的角色造成过伤害，则此【杀】无视防具，且当其抵消此【杀】后，其须弃置一张牌。',
 
 			gz_tangzi:'唐咨',
 			gz_mengda:'孟达',
@@ -8973,7 +9032,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzyjili2:'寄篱',
 			gzyjili_info:'副将技，锁定技，你计算体力上限时减少1个单独的阴阳鱼，当你成为红色基本牌或红色普通锦囊牌的唯一目标后，你令此牌的使用者于此牌结算完成后视为对你使用一张牌名和属性相同的牌。当你于一回合内第二次受到伤害时，你防止此伤害并移除此武将牌。',
 			wujing:'吴景',
-			donggui:'东归',
+			donggui:'调归',
 			donggui_info:'出牌阶段限一次，你可以暗置武将牌均明置的一名其他角色一张武将牌，视为对其使用【调虎离山】，且其本回合不能明置此武将牌。若因此形成队列，你摸X张牌（X为该队列中的角色数）。',
 			fengyang:'风扬',
 			fengyang_info:'阵法技，结束阶段，你所在队列的角色可以依次弃置一张装备区里的牌，然后摸两张牌。',
@@ -9690,6 +9749,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 			['diamond',6,'dinglanyemingzhu'],
 			['heart',13,'liulongcanjia'],
+			
+			['spade',12,'gz_haolingtianxia'],
+			['diamond',1,'gz_kefuzhongyuan'],
+			['heart',1,'gz_guguoanbang'],
+			['club',12,'gz_wenheluanwu'],
 		],
 		element:{
 			content:{

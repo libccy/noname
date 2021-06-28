@@ -4,6 +4,227 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		name:'guozhan',
 		connect:true,
 		card:{
+			gz_haolingtianxia:{
+				audio:true,
+				mode:['guozhan'],
+				fullskin:true,
+				type:'trick',
+				enable:true,
+				filterTarget:function(card,player,target){
+					return target!=player&&!target.isMinHp();
+				},
+				content:function(){
+					'step 0'
+					event.list=game.filterPlayer(function(current){
+						return current!=target;
+					}).sortBySeat();
+					'step 1'
+					if(!target.isIn()){
+						event.finish();
+						return;
+					}
+					var current=event.list.shift();
+					if(!current||!current.isIn()||current.hasSkill('diaohulishan')){
+						if(event.list.length) event.redo();
+						else event.finish();
+						return;
+					}
+					event.current=current;
+					if(current.identity!='wei'){
+						current.chooseToDiscard('he','弃置一张牌，并视为对'+get.translation(target)+'使用一张【杀】，或点击「取消」弃置其一张牌').set('ai',function(card){
+							if(!_status.event.goon) return 0;
+							return 5-get.value(card);
+						}).set('goon',(get.effect(target,{name:'guohe'},current)<get.effect(target,{name:'sha'},current)));
+					}
+					else{
+						current.chooseBool('是否视为对'+get.translation(target)+'使用一张【杀】？','若点击「取消」则改为获得其一张牌').set('ai',function(){
+							var player=_status.event.player,target=_status.event.getParent().target;
+							return (get.effect(target,{name:'shunshou'},player)<=get.effect(target,{name:'sha'},player))
+						});
+					}
+					'step 2'
+					if(!target.isIn()){
+						event.finish();
+						return;
+					}
+					var current=event.current;
+					if(result.bool){
+						if(current.isIn()&&current.canUse({name:'sha',isCard:true},target,false)) current.useCard({name:'sha',isCard:true},target,false);
+					}
+					else{
+						current[current.identity=='wei'?'gainPlayerCard':'discardPlayerCard'](target,true,'he').set('boolline',true);
+					}
+					if(event.list.length) event.goto(1);
+				},
+				ai:{
+					order:6,
+					value:9,
+					useful:6,
+					tag:{
+						damage:1,
+						discard:1,
+						loseCard:1,
+					},
+					result:{
+						target:function(player,target){
+							return -1.5*(game.countPlayer()-1);
+						},
+					},
+				},
+			},
+			gz_kefuzhongyuan:{
+				audio:true,
+				mode:['guozhan'],
+				fullskin:true,
+				type:'trick',
+				enable:true,
+				filterTarget:true,
+				selectTarget:[1,Infinity],
+				content:function(){
+					'step 0'
+					var p1='请选择【杀】的目标',p2='或点击「取消」摸一张牌';
+					if(target.identity=='shu'){
+						p1+='（伤害+1）';
+						p2='或点击「取消」摸两张牌';
+					}
+					var next=target.chooseUseTarget('sha',p1,p2,false);
+					if(target.identity=='shu') next.set('oncard',function(){
+						_status.event.baseDamage++;
+					});
+					'step 1'
+					if(!result.bool){
+						target.draw(target.identity=='shu'?2:1);
+					}
+				},
+				ai:{
+					order:3,
+					value:9,
+					useful:6,
+					tag:{
+						gain:1,
+					},
+					result:{target:1.5},
+				},
+			},
+			gz_guguoanbang:{
+				audio:true,
+				mode:['guozhan'],
+				fullskin:true,
+				type:'trick',
+				enable:true,
+				selectTarget:-1,
+				toself:true,
+				filterTarget:function(card,player,target){
+					return target==player;
+				},
+				modTarget:true,
+				content:function(){
+					'step 0'
+					target.draw(8);
+					'step 1'
+					target.chooseToDiscard('请弃置至少六张手牌',[6,target.countCards('h')],true,'h');
+					if(target.identity!='wu') event.finish();
+					'step 2'
+					if(!result.cards||!result.cards.length) event.finish();
+					event.give_cards=result.cards;
+					event.given_list=[];
+					'step 3'
+					event.give_cards=event.give_cards.filterInD('d');
+					if(!event.give_cards.length||!game.hasPlayer(function(current){
+						return current!=target&&current.identity=='wu'&&!event.given_list.contains(current);
+					})) event.finish();
+					else{
+						target.chooseButton(['是否将弃置的牌交给其他吴势力角色？',event.give_cards],[1,2]);
+					}
+					'step 4'
+					if(result.bool){
+						event.cards2=result.links;
+						target.chooseTarget(true,'选择获得'+get.translation(event.cards2)+'的角色',function(card,player,target){
+							return target!=player&&target.identity=='wu'&&!_status.event.targets.contains(target);
+						}).set('targets',event.given_list);
+					}
+					else event.finish();
+					'step 5'
+					if(result.bool&&result.targets&&result.targets.length){
+						var current=result.targets[0];
+						target.line(current,'green');
+						current.gain(event.cards2,'gain2');
+						event.given_list.push(current);
+						event.goto(3);
+					}
+				},
+				ai:{
+					order:6,
+					value:9,
+					useful:6,
+					tag:{
+						draw:8,
+						loseCard:6,
+						discard:6,
+					},
+					result:{
+						target:function(player,target){
+							if(target.identity!='wu') return 3;
+							return Math.max(3,Math.min(8,2*game.countPlayer(function(current){
+								return current.identity=='wu';
+							})));
+						},
+					},
+				},
+			},
+			gz_wenheluanwu:{
+				audio:true,
+				mode:['guozhan'],
+				fullskin:true,
+				type:'trick',
+				enable:true,
+				filterTarget:true,
+				selectTarget:-1,
+				ignoreTarget:function(card,player,target){
+					return target.countCards('h')==0;
+				},
+				content:function(){
+					'step 0'
+					if(!target.countCards('h')||!player.isIn()) event.finish();
+					else target.showHandcards();
+					'step 1'
+					var str=get.translation(target);
+					player.chooseControl().set('prompt','文和乱武：请选择一项').set('choiceList',[
+						'令'+str+'弃置两张类型不同的手牌',
+						'弃置'+str+'的一张手牌',
+					]);
+					'step 2'
+					if(result.index==0){
+						var list=[],hs=target.getCards('h');
+						for(var i of hs){
+							if(lib.filter.cardDiscardable(i,target,'gz_wenheluanwu')) list.add(get.type2(i,target));
+							if(list.length>1) break;
+						}
+						if(list.length>1) target.chooseToDiscard('h',true,'请弃置两张类型不同的手牌',2,function(card,player){
+							if(!ui.selected.cards.length) return true;
+							return get.type2(card,target)!=get.type2(ui.selected.cards[0],target);
+						}).set('complexCard',true);
+						else if(list.length==1) target.chooseToDiscard('h',true);
+						else event.finish();
+					}
+					else{
+						player.discardPlayerCard(target,'h',true,'visible');
+					}
+					'step 3'
+					if(target.identity!='qun'||!result.bool||!result.cards||!result.cards.length||target.countCards('h')>0||target.hp<1) event.finish();
+					else target.draw(Math.min(5,target.hp));
+				},
+				ai:{
+					order:6,
+					value:10,
+					useful:6,
+					tag:{
+						discard:1.5,
+						loseCard:1.5,
+					},
+					result:{target:-1.5},
+				},
+			},
 			liulongcanjia:{
 				audio:true,
 				mode:['guozhan'],
@@ -1449,6 +1670,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			huxinjing_bg:'镜',
 			huxinjing:'护心镜',
 			huxinjing_info:'当你受到伤害时，若伤害值大于或等于你的体力值，则你可以将【护心镜】置入弃牌堆，然后防止此伤害。',
+			gz_haolingtianxia:'号令天下',
+			gz_haolingtianxia_info:'出牌阶段，对一名体力值不为全场最少的角色使用。所有其他角色依次选择一项：①弃置一张牌（魏势力角色无需弃牌），视为对目标角色使用一张【杀】；②弃置目标角色的一张牌（魏势力角色改为获得其一张牌）。',
+			gz_kefuzhongyuan:'克复中原',
+			gz_kefuzhongyuan_info:'出牌阶段，对任意名角色使用。目标角色选择一项：①视为使用一张【杀】（蜀势力角色以此法使用【杀】的伤害值基数+1）；②摸一张牌（蜀势力角色改为摸两张牌）。',
+			gz_guguoanbang:'固国安邦',
+			gz_guguoanbang_info:'出牌阶段，对你自己使用。你摸八张牌，然后弃置至少六张手牌。然后若你的势力为吴，则你可以将你以此法弃置的牌交给其他吴势力角色（每名角色至多获得两张牌）。',
+			gz_wenheluanwu:'文和乱武',
+			gz_wenheluanwu_info:'出牌阶段，对所有角色使用。目标角色展示所有手牌，然后你选择一项：①令其弃置两张类型不同的手牌；②你弃置其一张手牌。然后若其为群势力角色且其没有手牌，则其将手牌摸至当前体力值（至多为5）。',
 		},
 		list:[
 			['heart',9,'yuanjiao'],

@@ -1043,6 +1043,7 @@ window.noname_character_rank={
 		'ns_fanchou',
 		'zhangchunhua',
 		'weiguan',
+		're_chenqun',
 	],
 	d:[
 		'lvmeng',
@@ -1062,6 +1063,7 @@ window.noname_character_rank={
 		'ol_guohuai',
 		'junk_simayi',
 		'key_youta',
+		'old_chenqun',
 	],
 	rarity:{
 		legend:[
@@ -1667,6 +1669,7 @@ window.noname_character_rank={
 			'junk_zhangrang',
 			'junk_simayi',
 			'wolongfengchu',
+			're_chenqun',
 			'key_youta',
 		],
 	}

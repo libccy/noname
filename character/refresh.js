@@ -12,12 +12,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_yijiang1:['re_wuguotai','re_gaoshun','re_caozhi','yujin_yujin','re_masu','xin_xusheng','re_fazheng','xin_lingtong','re_zhangchunhua'],
 				refresh_yijiang2:['old_madai','wangyi','guanzhang','xin_handang','re_zhonghui','re_liaohua','re_chengpu','re_caozhang','re_bulianshi','xin_liubiao'],
 				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','re_yufan','re_liru','re_manchong','re_fuhuanghou'],
-				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen','re_zhoucang'],
+				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen','re_zhoucang','re_chenqun'],
 				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu','re_gongsunyuan'],
 			},
 		},
 		connect:true,
 		character:{
+			re_chenqun:['math','wei',3,['redingpin','refaen']],
 			re_zhoucang:['male','shu',4,['rezhongyong']],
 			ol_zhurong:['female','shu',4,['juxiang','lieren','changbiao'],['unseen']],
 			re_zhangchunhua:['female','wei',3,['rejueqing','reshangshi']],
@@ -133,6 +134,84 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_xushu:['zhaoyun','sp_zhugeliang'],
 		},
 		skill:{
+			//界陈群
+			redingpin:{
+				audio:2,
+				enable:'phaseUse',
+				onChooseToUse:function(event){
+					if(event.type!='phase'||game.online) return;
+					var list=[],player=event.player;
+					player.getHistory('useCard',function(evt){
+						list.add(get.type2(evt.card));
+					});
+					player.getHistory('lose',function(evt){
+						if(evt.type!='discard'||evt.getParent(2).redingpin_ignore) return;
+						for(var i of evt.cards2){
+							list.add(get.type2(i,evt.hs.contains(i)?player:false));
+						}
+					})
+					event.set('redingpin_types',list);
+				},
+				filter:function(event,player){
+					var list=event.redingpin_types||[];
+					return player.countCards('he',function(card){
+						return !list.contains(get.type2(card));
+					})>0;
+				},
+				filterCard:function(card){
+					var list=_status.event.redingpin_types||[];
+					return !list.contains(get.type2(card));
+				},
+				position:'he',
+				filterTarget:function(card,player,target){
+					return !target.hasSkill('redingpin2');
+				},
+				content:function(){
+					'step 0'
+					target.judge(function(card){
+						var evt=_status.event.getParent('redingpin'),suit=get.suit(card);
+						switch(suit){
+							case 'club': case 'spade':return evt.target.hp;
+							case 'diamond':return get.sgn(get.attitude(evt.target,evt.player))*-3;
+						}
+						return 0;
+					});
+					'step 1'
+					switch(result.suit){
+						case 'spade': case 'club':
+							if(target.hp>0) target.draw(Math.min(3,target.hp));
+							target.addTempSkill('redingpin2');
+							break;
+						case 'heart':
+							event.getParent().redingpin_ignore=true;
+							break;
+						case 'diamond':
+							player.turnOver();
+							break;
+					}
+				},
+				ai:{
+					order:9,
+					result:{
+						target:function(player,target){
+							if(player.isTurnedOver()) return target.hp;
+							var card=ui.cardPile.firstChild;
+							if(!card) return;
+							if(get.color(card)=='black') return target.hp;
+							return 0;
+						},
+					},
+				},
+			},
+			redingpin2:{charlotte:true},
+			refaen:{
+				audio:2,
+				trigger:{global:['turnOverAfter','linkAfter']},
+				logTarget:'player',
+				content:function(){
+					trigger.player.draw();
+				},
+			},
 			//界曹彰
 			xinjiangchi:{
 				trigger:{player:'phaseDrawEnd'},
@@ -9392,6 +9471,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ollihuo_info:'你使用普通的【杀】可以改为火【杀】，若此【杀】造成过伤害，你失去1点体力；你使用火【杀】可以多选择一个目标。你每回合使用的第一张牌如果是【杀】，则此【杀】结算完毕后可置于你的武将牌上。',
 			xinjiangchi:'将驰',
 			xinjiangchi_info:'摸牌阶段结束时，你可选择：①摸一张牌。②摸两张牌，然后本回合内不能使用或打出【杀】。③弃置一张牌，然后本回合内可以多使用一张【杀】，且使用【杀】无距离限制。',
+			re_chenqun:'界陈群',
+			redingpin:'定品',
+			redingpin_info:'出牌阶段，你可以弃置一张本回合未使用过/弃置过的类型的牌并选择一名角色。其进行判定，若结果为：黑色，其摸X张牌（X为其体力值且至多为3）且本回合内不能再成为〖定品〗的目标；红桃，你令此次弃置的牌不计入〖定品〗弃置牌合法性的检测；方片，你将武将牌翻面。',
+			refaen:'法恩',
+			refaen_info:'一名角色翻面或横置后，你可令其摸一张牌。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

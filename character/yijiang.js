@@ -12095,7 +12095,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhuran:['re_zhuran','xin_zhuran','zhuran','old_zhuran'],
 			liru:['re_liru','xin_liru','liru'],
 			fuhuanghou:['re_fuhuanghou','xin_fuhuanghou','fuhuanghou','old_fuhuanghou'],
-			chenqun:['chenqun','old_chenqun'],
+			chenqun:['chenqun','re_chenqun','old_chenqun'],
 			hanhaoshihuan:['re_hanhaoshihuan','hanhaoshihuan'],
 			caozhen:['re_caozhen','caozhen','old_caozhen'],
 			wuyi:['re_wuyi','wuyi'],
@@ -12112,6 +12112,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jikang:['re_jikang','jikang'],
 			xinxianying:['re_xinxianying','xinxianying','ol_xinxianying','sp_xinxianying'],
 			gongsunyuan:['re_gongsunyuan','gongsunyuan'],
+			zhoucang:['re_zhoucang','zhoucang'],
 		},
 		translate:{
 			old_huaxiong:'华雄',

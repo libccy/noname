@@ -8585,7 +8585,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spcunsi2:'存嗣',
 			spcunsi_info:'出牌阶段限一次，你可将武将牌翻至背面并选择一名其他角色。其从牌堆或弃牌堆中获得一张【杀】，且下一张杀的伤害值基数+1。',
 			spguixiu:'闺秀',
-			spguixiu_info:'锁定技，当你受到伤害后，若你的武将牌背面朝上，则你将武将牌翻至正面。当你的武将牌从背面翻至背面时，你摸一张牌。',
+			spguixiu_info:'锁定技，当你受到伤害后，若你的武将牌背面朝上，则你将武将牌翻至正面。当你的武将牌从背面翻至正面时，你摸一张牌。',
 			sp_xinpi:'SP辛毗',
 			spyinju:'引裾',
 			spyinju2:'引裾',

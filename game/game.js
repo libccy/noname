@@ -10322,6 +10322,7 @@
 							targets:event.targets2||result.targets,
 						};
 						var next=player.useCard(card,event.targets2||result.targets);
+						next.oncard=event.oncard;
 						if(cards) next.cards=cards.slice(0);
 						if(event.nopopup) next.nopopup=true;
 						if(event.animate===false) next.animate=false;
@@ -14238,13 +14239,13 @@
 						}
 					}
 					event.id=get.id();
-					if(event.oncard){
-						event.oncard(event.card,event.player);
-					}
 					event.excluded=[];
 					event.directHit=[];
 					event.customArgs={default:{}};
-					event.baseDamage=get.info(card,false).baseDamage||1;
+					if(typeof event.baseDamage!='number') event.baseDamage=get.info(card,false).baseDamage||1;
+					if(event.oncard){
+						event.oncard(event.card,event.player);
+					}
 					player.actionHistory[player.actionHistory.length-1].useCard.push(event);
 					if(event.addCount!==false){
 						if(player.stat[player.stat.length-1].card[card.name]==undefined){
@@ -20085,7 +20086,10 @@
 					if(reason&&reason.source) next.source=reason.source;
 					next.setContent('dying');
 					next.filterStop=function(){
-						return this.player.hp>0;
+						if(this.player.hp>0){
+							delete this.filterStop;
+							return true;
+						}
 					};
 					return next;
 				},

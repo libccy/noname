@@ -2728,15 +2728,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.awakenSkill('decadexushen');
 					player.addSkill('decadezhennan');
-					player.recover();
 					player.addTempSkill('decadexushen2');
 					trigger.decadexushen=true;
+					player.recover();
 				},
 			},
 			decadexushen2:{
 				trigger:{player:'dyingAfter'},
 				forced:true,
 				popup:false,
+				charlotte:true,
 				filter:function(event,player){
 					return event.decadexushen==true&&!game.hasPlayer(function(current){
 						return current.name=='guansuo'||current.name2=='guansuo';

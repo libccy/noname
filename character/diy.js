@@ -2544,8 +2544,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						player:function(player){
 							if(player.countCards('he',function(card){
-								if(get.type(card)=='equip') return get.value(card)<8;
-								return get.value(card)<6;
+								if(get.type(card,player)=='equip') return get.value(card)<6;
+								return get.value(card)<5;
 							})<2) return 0;
 							return player.getUseValue({name:'kaihua'});
 						},
