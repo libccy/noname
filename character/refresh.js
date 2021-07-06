@@ -208,6 +208,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:['turnOverAfter','linkAfter']},
 				logTarget:'player',
+				check:function(event,player){
+					return get.attitude(player,event.player)>0;
+				},
 				content:function(){
 					trigger.player.draw();
 				},

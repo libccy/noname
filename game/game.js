@@ -538,6 +538,100 @@
 							lib.updateURL=lib.updateURLS[item]||lib.updateURLS.coding;
 						},
 					},
+					extension_source:{
+						name:'获取扩展地址',
+						init:'Coding',
+						unfrequent:true,
+						item:{},
+						intro:function(){
+							return '获取在线扩展时的地址。当前地址：<br>'+lib.config.extension_sources[lib.config.extension_source];
+						},
+						onclick:function(item){
+							game.saveConfig('extension_source',item);
+						},
+					},
+					extension_create:{
+						name:'添加获取扩展地址',
+						clear:true,
+						unfrequent:true,
+						onclick:function(){
+							game.prompt('请输入地址名称',function(str){
+								if(str){
+									var map=lib.config.extension_sources;
+									game.prompt('请输入'+str+'的地址',function(str2){
+										if(str2){
+											delete map[str];
+											map[str]=str2;
+											game.saveConfig('extension_sources',map);
+											game.saveConfig('extension_source',str);
+											var nodexx=ui.extension_source;
+											nodexx.updateInner();
+											var nodeyy=nodexx._link.menu;
+											var nodezz=nodexx._link.config;
+											for(var i=0;i<nodeyy.childElementCount;i++){
+												if(nodeyy.childNodes[i]._link==str){
+													nodeyy.childNodes[i].remove();
+													break;
+												}
+											}
+											var textMenu=ui.create.div('',str,nodeyy,function(){
+												var node=this.parentNode._link;
+												var config=node._link.config;
+												node._link.current=this.link;
+												var tmpName=node.lastChild.innerHTML;
+												node.lastChild.innerHTML=config.item[this._link];
+												if(config.onclick){
+													if(config.onclick.call(node,this._link,this)===false){
+														node.lastChild.innerHTML=tmpName;
+													}
+												}
+												if(config.update){
+													config.update();
+												}
+											});
+											textMenu._link=str;
+											nodezz.item[name]=str;
+											alert('已添加扩展地址：'+str);
+										}
+									})
+								}
+							});
+						},
+					},
+					extension_delete:{
+						name:'删除当前扩展地址',
+						clear:true,
+						unfrequent:true,
+						onclick:function(){
+							var bool=false,map=lib.config.extension_sources;
+							for(var i in map){
+								if(i!=lib.config.extension_source){
+									bool=true;
+									break;
+								}
+							}
+							if(!bool){
+								alert('不能删除最后一个扩展地址！');
+								return;
+							}
+							var name=lib.config.extension_source;
+							game.saveConfig('extension_source',i);
+							delete map[name];
+							game.saveConfig('extension_sources',map);
+							var nodexx=ui.extension_source;
+							nodexx.updateInner();
+							var nodeyy=nodexx._link.menu;
+							var nodezz=nodexx._link.config;
+							for(var i=0;i<nodeyy.childElementCount;i++){
+								if(nodeyy.childNodes[i]._link==name){
+									nodeyy.childNodes[i].remove();
+									break;
+								}
+							}
+							delete nodezz.item[name];
+							alert('已删除扩展地址：'+name);
+						},
+					},
 					update:function(config,map){
 						if('ontouchstart' in document){
 							map.touchscreen.show();
@@ -7471,6 +7565,11 @@
 					if(pack.theme){
 						for(i in pack.theme){
 							lib.configMenu.appearence.config.theme.item[i]=pack.theme[i];
+						}
+					}
+					if(lib.config.extension_sources){
+						for(i in lib.config.extension_sources){
+							lib.configMenu.general.config.extension_source.item[i]=i;
 						}
 					}
 
@@ -16829,6 +16928,7 @@
 						this.sex='male';
 						//this.group='unknown';
 						this.storage.nohp=true;
+						skills.add('g_hidden_ai');
 					}
 					if(character2&&lib.character[character2]){
 						var info2=lib.character[character2];
@@ -16885,8 +16985,9 @@
 							this.hiddenSkills.addArray(info2[3]);
 							this.classList.add(_status.video?'unseen2_v':'unseen2');
 							this.storage.nohp=true;
+							skills.add('g_hidden_ai');
 						}
-						else skills=skills.concat(info2[3]);
+						else skills.addArray(info2[3]);
 
 						this.node.name2.innerHTML=get.slimName(character2);
 					}
@@ -25886,6 +25987,7 @@
 				},
 				content:function(){
 					player.showCharacter(2);
+					player.removeSkill('g_hidden_ai');
 				},
 			},
 			_kamisha:{
@@ -35608,7 +35710,7 @@
 						else{
 							node.classList.add('switcher');
 							node.listen(clickSwitcher);
-							ui.create.div('',config.item[config.init],node);
+							node._link.choosing=ui.create.div('',config.item[config.init],node);
 							node._link.menu=ui.create.div('.menu');
 							if(config.visualMenu){
 								node._link.menu.classList.add('visual');
@@ -36583,6 +36685,12 @@
 												game.putDB('audio',link,fileToLoad,callback);
 											}
 										}
+									}
+								}
+								else if(j=='extension_source'){
+									ui.extension_source=cfgnode;
+									cfgnode.updateInner=function(){
+										this._link.choosing.innerHTML=lib.config.extension_source;
 									}
 								}
 								map[j]=cfgnode;
@@ -40487,7 +40595,10 @@
 						importExtension.style.textAlign='left';
 						ui.create.div('','<input type="file" accept="application/zip" style="width:153px"><button>确定</button>',importExtension);
 
-						var extensionURL=lib.updateURL.replace(/noname/g,'noname-extension')+'/master/';
+						var extensionURL;
+						var source=lib.config.extension_sources,index=lib.config.extension_source;
+						if(source&&source[index]) extensionURL=source[index];
+						else extensionURL=lib.updateURL.replace(/noname/g,'noname-extension')+'/master/';
 
 						var reloadnode=ui.create.div('.config.toggle.pointerdiv','重新启动',page,game.reload);
 						reloadnode.style.display='none';

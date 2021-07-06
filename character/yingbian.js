@@ -1810,6 +1810,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
+			g_hidden_ai:{
+				charlotte:true,
+				ai:{
+					threaten:function(player,target){
+						if(get.mode()!='guozhan'&&target.isUnseen(2)) return 0.0001;
+						return 1;
+					},
+				},
+			},
 		},
 		card:{
 			cheliji_sichengliangyu:{

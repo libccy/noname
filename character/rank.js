@@ -101,6 +101,7 @@ window.noname_character_rank={
 		'key_shiina',
 		'key_kud',
 		'key_yukito',
+		'key_yuuki',
 	],
 	a:[
 		'diy_zaozhirenjun',
@@ -672,6 +673,7 @@ window.noname_character_rank={
 		'wujing',
 		'nanhualaoxian',
 		'ns_sunyi',
+		'key_kyouko',
 	],
 	b:[
 		'diy_feishi',
@@ -999,6 +1001,7 @@ window.noname_character_rank={
 		'sp_jiben',
 		'sp_fuwan',
 		're_chengpu',
+		're_niujin',
 	],
 	c:[
 		'xiahoudun',
@@ -1371,6 +1374,8 @@ window.noname_character_rank={
 			'key_chihaya',
 			'key_yukito',
 			'key_kotomi',
+			'key_yuuki',
+			'key_kyouko',
 			'kaisa',
 		],
 		rare:[

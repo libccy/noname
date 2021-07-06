@@ -490,7 +490,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_huaxin:['male','wei',3,['wanggui','xibing']],
 				gz_luyusheng:['female','wu',3,['zhente','zhiwei']],
 				gz_zongyu:['male','shu',3,['zyqiao','chengshang']],
-				gz_miheng:['male','qun',3,['gzkuangcai','gzshejian']],
+				gz_miheng:['male','qun',3,['gzkuangcai','gzshejian'],['gzskin']],
 				
 				gz_cuimao:['male','wei',3,['gzzhengbi','gzfengying'],[]],
 				gz_yujin:['male','wei',4,['gzjieyue'],['gzskin']],
@@ -883,10 +883,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				zhenfa:'inline',
 				trigger:{player:'phaseJieshuBegin'},
 				filter:function(event,player){
+					var bool=player.hasSkill('fengyang');
 					return game.hasPlayer(function(current){
 						return current!=player&&current.inline(player);
 					})&&game.hasPlayer(function(current){
-						return current.inline(player)&&current.countCards('e')>0;
+						return (current==player||bool)&&current.inline(player)&&current.countCards('e')>0;
 					});
 				},
 				direct:true,
@@ -897,7 +898,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}).sortBySeat();
 					'step 1'
 					var target=event.list.shift();
-					if(target.countCards('e')){
+					if((target==player||player.hasSkill('fengyang'))&&target.countCards('e')){
 						event.target=target;
 						target.chooseToDiscard('e',get.prompt('fengyang'),'弃置装备区内的一张牌并摸两张牌').set('ai',function(card){
 							return 5.5-get.value(card);

@@ -2070,7 +2070,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						enable:'phaseUse',
 						usable:1,
 						filter:function(event,player){
-							return player.countCards('h')>0&&player.storage.nzry_shenshi!=true;
+							return player.countCards('he')>0&&player.storage.nzry_shenshi!=true;
 						},
 						discard:false,
 						line:true,

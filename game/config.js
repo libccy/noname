@@ -1,4 +1,9 @@
 window.config={
+	extension_sources:{
+		Coding:'https://nakamurayuri.coding.net/p/noname-extension/d/noname-extension/git/raw/master/',
+		GitHub:'https://raw.githubusercontent.com/libccy/noname-extension/master/',
+	},
+	extension_source:'Coding',
 	forbidai:['ns_liuzhang','yuji','re_yuji'],
 	forbidai_user:[],
 	forbidall:[],

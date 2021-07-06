@@ -465,6 +465,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					event.finish();
 				},
 				ai:{
+					canLink:function(player,target,card){
+						if(player.hasSkill('jueqing')||target.hasSkill('gangzhi')||target.hasSkill('gangzhi')) return false;
+						var es=target.countCards('e');
+						if(!es) return true;
+						if(target.hp>=3&&es>=2){
+							return true;
+						}
+						return false;
+					},
 					order:6,
 					value:4,
 					useful:2,
@@ -486,8 +495,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 0;
 					},
 					result:{
-						target:function(player,target){
-							return -1-target.countCards('e');
+						target:function(player,target,card,isLink){
+							if(isLink) return -1.5;
+							var es=target.getCards('e');
+							if(!es.length) return -1.5;
+							var val=0;
+							for(var i of es) val+=get.value(i,target);
+							return -Math.min(1.5,val/5);
 						}
 					}
 				}

@@ -1431,13 +1431,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					if(num%5==0){
 						var card=get.cardPile2(function(card){
-							return card.name=='tao'||card.name=='jiu';
+							return ['tao','jiu','zong','xionghuangjiu'].contains(card.name);
 						});
 						if(card) cards.push(card);
 					}
 					if(num%8==0){
 						var card=get.cardPile2(function(card){
-							return card.name=='juedou'||card.name=='wuzhong';
+							return ['juedou','wuzhong','zengbin','sadouchengbing','dongzhuxianji','tongzhougongji'].contains(card.name);
 						});
 						if(card) cards.push(card);
 					}
@@ -8544,7 +8544,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_handang:'手杀韩当',
 			luotong:'骆统',
 			qinzheng:'勤政',
-			qinzheng_info:'锁定技，当你使用或打出牌时，若你本局游戏内使用或打出过的牌数和：为3的倍数，你从牌堆中获得一张【杀】或【闪】；为5的倍数，你从牌堆中获得一张【桃】或【酒】；为8的倍数，你从牌堆中获得一张【决斗】或【无中生有】。',
+			qinzheng_info:'锁定技，当你使用或打出牌时，若你本局游戏内使用或打出过的牌数和：为3的倍数，你从牌堆中获得一张【杀】或【闪】；为5的倍数，你从牌堆中获得一张【桃】或【酒】；为8的倍数，你从牌堆中获得一张【决斗】或【无中生有】（可获得对应的衍生替换牌）。',
 			sp_duyu:'SP杜预',
 			spwuku:'武库',
 			spwuku_info:'锁定技，当有角色使用装备牌时，若你的“武库”数小于3，则你获得一个“武库”。',

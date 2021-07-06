@@ -75,6 +75,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_misuzu:['female','key',3,['misuzu_hengzhou','misuzu_nongyin','misuzu_zhongxing']],
 			key_kamome:['female','key',3,['kamome_yangfan','kamome_huanmeng','kamome_jieban']],
 			key_nao:['female','key',3,['nao_duyin','nao_wanxin','nao_shouqing']],
+			key_yuuki:['female','key',3,['yuuki_yicha']],
+			key_kyouko:['female','key',3,['kyouko_rongzhu','kyouko_gongmian']],
 			
 			ns_huangchengyan:['male','shu',3,['nslongyue','nszhenyin']],
 			ns_sunchensunjun:['male','wu',5,['nsxianhai','nsxingchu']],
@@ -184,7 +186,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy:{
 				diy_yijiang:["key_kud","key_misuzu","key_kamome","key_nao",
 				"ns_huangchengyan","ns_sunchensunjun","ns_yuanxi","ns_caoshuang"],
-				diy_yijiang2:[
+				diy_yijiang2:["key_yuuki","key_kyouko",
 				"ns_chentai","ns_huangwudie","ns_sunyi","ns_zhangning","ns_yanghu"],
 				diy_tieba:["ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_luyusheng"],
 				diy_fakenews:["diy_wenyang","ns_zhangwei","ns_caimao","ns_chengpu"],
@@ -276,6 +278,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_misuzu:'#b长发及腰黑长直',
 			key_kamome:'#b仿生纱',
 			key_nao:'#b潮鸣',
+			key_yuuki:'#b4399司命',
+			key_kyouko:'#g阿阿啊687',
 			
 			ns_huangchengyan:'#g竹邀月',
 			ns_sunchensunjun:'#gVenusjeu',
@@ -447,6 +451,378 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			kyouko_rongzhu:{
+				trigger:{global:'gainEnd'},
+				filter:function(event,player){
+					if(player==event.player||event.getParent().name=='kyouko_rongzhu') return false;
+					var evt=event.getl(player);
+					return evt&&evt.cards2&&evt.cards2.length>0;
+				},
+				logTarget:'player',
+				check:function(event,player){
+					return get.attitude(player,event.player)>0;
+				},
+				content:function(){
+					'step 0'
+					player.draw();
+					'step 1'
+					var target=trigger.player;
+					if(player.countCards('he')>0&&target.isIn()){
+						player.chooseCard('he',true,'将一张牌交给'+get.translation(target));
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						trigger.player.gain(result.cards,player,'giveAuto');
+						var target=_status.currentPhase;
+						var name;
+						if(target==player){
+							name='kyouko_rongzhu_me';
+							player.addTempSkill(name);
+							player.addMark(name,1,false);
+						}
+						else if(target==trigger.player){
+							name='kyouko_rongzhu_notme';
+							player.addTempSkill(name);
+							player.addMark(name,1,false);
+						}
+					}
+				},
+				subSkill:{
+					me:{
+						mod:{
+							maxHandcard:function(player,num){
+								return num+player.countMark('kyouko_rongzhu_me');
+							},
+						},
+						intro:{content:'手牌上限+#'},
+						onremove:true,
+					},
+					notme:{
+						mod:{
+							cardUsable:function(card,player,num){
+								if(card.name=='sha') return num+player.countMark('kyouko_rongzhu_notme');
+							},
+						},
+						intro:{content:'使用杀的次数上限+#'},
+						onremove:true,
+					},
+				},
+			},
+			kyouko_gongmian:{
+				enable:'phaseUse',
+				prompt:'出牌阶段，你可以选择一名未以此法选择过的角色，若其手牌：大于你，你获得其一张牌，然后交给其一张牌；小于你，其交给你一张牌，然后你交给其一张牌；等于你，你与其各摸一张牌。',
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return current!=player&&lib.skill.kyouko_gongmian.filterTarget(null,player,current);
+					});
+				},
+				filterTarget:function(card,kyouko,hina){
+					if(kyouko==hina||kyouko.getStorage('kyouko_gongmian').contains(hina)) return false;
+				 var hs=hina.countCards('he');
+				 if(hs==0) return kyouko.countCards('h')==0;
+				 return true;
+				},
+				content:function(){
+					'step 0'
+					player.markAuto('kyouko_gongmian',targets);
+					var hs=player.countCards('h'),ts=target.countCards('h');
+					player.getHistory('custom').push({kyouko_gongmian:true});
+					if(hs>ts){
+						event.utype=1;
+						target.chooseCard('he',true,'交给'+get.translation(player)+'一张牌');
+					}
+					else if(hs==ts){
+						game.asyncDraw([player,target]);
+						event.utype=2;
+					}
+					else{
+						event.utype=3;
+						player.gainPlayerCard(target,true,'he');
+					}
+					'step 1'
+					if(event.utype==2){
+						game.delayx();
+						event.finish();
+					}
+					else if(!result.bool) event.finish();
+					else if(event.utype==1) player.gain(result.cards,target,'giveAuto');
+					'step 2'
+					if(player.countCards('he')>0){
+						player.chooseCard('he',true,'交给'+get.translation(target)+'一张牌');
+					}
+					else event.finish();
+					'step 3'
+					if(result.bool) target.gain(result.cards,player,'giveAuto');
+				},
+				intro:{
+					content:'已与$共勉',
+				},
+				group:['kyouko_gongmian_use','kyouko_gongmian_discard'],
+				ai:{
+					order:6,
+					result:{
+						target:function(player,target){
+							if(player.getHistory('custom',function(evt){
+								return evt.kyouko_gongmian==true;
+							}).length) return 0;
+							return 1;
+						},
+					},
+				},
+			},
+			kyouko_gongmian_use:{
+				trigger:{player:'phaseUseEnd'},
+				direct:true,
+				filter:function(event,player){
+					return player.getHistory('custom',function(evt){
+						return evt.kyouko_gongmian==true;
+					}).length>0&&game.hasPlayer(function(current){
+						return current!=player&&current.countGainableCards(player,'hej')>0;
+					});
+				},
+				content:function(){
+					'step 0'
+					event.num=player.getHistory('custom',function(evt){
+						return evt.kyouko_gongmian==true;
+					}).length;
+					player.chooseTarget(get.prompt('kyouko_gongmian'),'获得一名其他角色的至多'+get.cnNumber(event.num)+'张牌，然后交给其等量的牌',function(card,player,target){
+						return target!=player&&target.countGainableCards(player,'hej')>0;
+					}).set('ai',function(target){
+						var player=_status.event.player,att=get.attitude(player,target);
+						if(att>0) return att;
+						var he=player.getCards('he');
+						if(target.countCards('he',function(card){
+							return get.value(card,target)>7;
+						})&&he.length>0) return -att+5-Math.min.apply(Math,he.map(function(card){
+							return get.value(card,player);
+						}));
+						return 0;
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('kyouko_gongmian',target);
+						player.gainPlayerCard(target,'hej',true,[1,num]);
+					}
+					else event.finish();
+					'step 2'
+					if(target.isIn()&&result.bool&&result.cards&&result.cards.length&&player.countCards('he')>0){
+						var num=result.cards.length,hs=player.getCards('he');
+						if(hs.length<=num) event._result={bool:true,cards:hs};
+						else player.chooseCard('he',true,num,'交给'+get.translation(target)+get.cnNumber(num)+'张牌');
+					}
+					else event.finish();
+					'step 3'
+					if(result.bool&&result.cards&&result.cards.length){
+						target.gain(result.cards,player,'giveAuto')
+					}
+				},
+			},
+			kyouko_gongmian_discard:{
+				trigger:{player:'phaseDiscardBegin'},
+				direct:true,
+				filter:function(event,player){
+					var hs=player.countCards('h');
+					return hs>0&&player.getHistory('custom',function(evt){
+						return evt.kyouko_gongmian==true;
+					}).length>=player.hp&&game.hasPlayer(function(current){
+						return current!=player&&current.countCards('h')<hs;
+					});
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('kyouko_gongmian'),'获得一名其他角色的所有手牌，然后将一半的牌交给该角色（向上取整）',function(card,player,target){
+						return target!=player&&target.countCards('h')<player.countCards('h');
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('kyouko_gongmian',target);
+						var hs=target.getCards('h');
+						if(hs.length>0) player.gain(hs,target,'giveAuto','bySelf');
+					}
+					else event.finish();
+					'step 2'
+					if(target.isIn()&&player.countCards('h')>0){
+						var hs=player.getCards('h'),num=Math.ceil(hs.length/2);
+						if(hs.length<=num) event._result={bool:true,cards:hs};
+						else player.chooseCard('he',true,num,'交给'+get.translation(target)+get.cnNumber(num)+'张牌');
+					}
+					else event.finish();
+					'step 3'
+					if(result.bool&&result.cards&&result.cards.length){
+						target.gain(result.cards,player,'giveAuto')
+					}
+				},
+			},
+			yuuki_yicha:{
+				trigger:{player:'phaseUseBegin'},
+				frequent:true,
+				createDialog:function(id){
+					var dialog=ui.create.dialog('hidden');
+					(dialog.textPrompt=dialog.add('异插')).style.textAlign='center';
+					dialog.cards=[];
+					dialog.rawButtons=[];
+					dialog.videoId=id;
+					var cards=[];
+					for(var i=0;i<3;i++){
+						var card=ui.create.card(null,null,true);
+						card.pos=i;
+						card.pos_x=i;
+						card.pos_y=0;
+						cards.push(card);
+						dialog.rawButtons.push(card);
+					}
+					dialog.add(cards);
+					cards=[];
+					for(var i=0;i<3;i++){
+						var card=ui.create.card(null,null,true);
+						card.pos=i+3;
+						card.pos_x=i;
+						card.pos_y=1;
+						cards.push(card);
+						dialog.rawButtons.push(card);
+					}
+					dialog.add(cards);
+					for(var i of dialog.buttons){
+						i.pos_x=i.link.pos_x;
+						i.pos_y=i.link.pos_y;
+						i.link=i.link.pos;
+					}
+					dialog.open();
+				},
+				addCard:function(card,id,pos){
+					var dialog=get.idDialog(id);
+					if(!dialog) return;
+					for(var i=0;i<dialog.buttons.length;i++){
+						var button=dialog.buttons[i];
+						if(button.link==pos){
+							var card2=ui.create.button(card,'card');
+							card2.pos=button.link;
+							card2.pos_x=button.pos_x;
+							card2.pos_y=button.pos_y;
+							card2.classList.add('noclick');
+							button.parentNode.insertBefore(card2,button);
+							dialog.cards.push(card2);
+							button.remove();
+							dialog.buttons.splice(i,1);
+							break;
+						}
+					}
+				},
+				changePrompt:function(str,id){
+					var dialog=get.idDialog(id);
+					if(!dialog) return;
+					dialog.textPrompt.innerHTML=str;
+				},
+				content:function(){
+					'step 0'
+					var next=game.createEvent('cardsGotoOrdering');
+					next.cards=[];
+					next.setContent('cardsGotoOrdering');
+					event.videoId=lib.status.videoId++;
+					event.forceDie=true;
+					event.cards=[];
+					event.positions=[0,1,2,3,4,5];
+					game.broadcastAll(function(id){
+						lib.skill.yuuki_yicha.createDialog(id);
+					},event.videoId);
+					player.judge().set('callback',function(){
+						event.getParent().orderingCards.remove(event.judgeResult.card);
+						event.getParent(2).orderingCards.add(event.judgeResult.card);
+					});
+					'step 1'
+					if(get.position(result.card,true)=='o'){
+						var pos=event.positions.randomRemove();
+						game.broadcastAll(function(card,id,player,pos){
+							lib.skill.yuuki_yicha.addCard(card,id,pos);
+							lib.skill.yuuki_yicha.changePrompt(get.translation(player)+'放置了'+get.translation(card),id);
+						},result.card,event.videoId,player,pos);
+						cards.push(result.card);
+						game.delay(2);
+					}
+					player.judge().set('callback',function(){
+						event.getParent().orderingCards.remove(event.judgeResult.card);
+						event.getParent(2).orderingCards.add(event.judgeResult.card);
+					});
+					'step 2'
+					if(get.position(result.card,true)=='o'){
+						var pos=event.positions.randomRemove();
+						game.broadcastAll(function(card,id,player,pos){
+							lib.skill.yuuki_yicha.addCard(card,id,pos);
+							lib.skill.yuuki_yicha.changePrompt(get.translation(player)+'放置了'+get.translation(card),id);
+						},result.card,event.videoId,player,pos);
+						cards.push(result.card);
+						game.delay(2);
+					}
+					if(cards.length) event.count=4;
+					else{
+						game.broadcastAll('closeDialog',event.videoId);
+						event.finish();
+					}
+					'step 3'
+					event.count--;
+					player.judge().set('callback',function(){
+						event.getParent().orderingCards.remove(event.judgeResult.card);
+						event.getParent(2).orderingCards.add(event.judgeResult.card);
+					});
+					'step 4'
+					var card=result.card;
+					event.card=card;
+					var str='请选择一个位置放置'+get.translation(card);
+					if(player==game.me||player.isUnderControl()){
+						lib.skill.yuuki_yicha.changePrompt(str,event.videoId);
+					}
+					else if(player.isOnline()){
+						player.send(function(str,id){
+							lib.skill.yuuki_yicha.changePrompt(str,event.videoId);
+						},str,id);
+					}
+					player.chooseButton().set('dialog',event.videoId).set('filterButton',function(button){
+						var posx=button.pos_x,posy=button.pos_y;
+						var list=[],cards=ui.dialog.cards;
+						for(var i of cards){
+							if(i.pos_x==posx&&Math.abs(i.pos_y-posy)==1) list.push(i.link);
+							if(i.pos_y==posy&&Math.abs(i.pos_x-posx)==1) list.push(i.link);
+						}
+						if(list.length>0){
+							var color=get.color(list[0],false);
+							if(list.length>1){
+								for(var i=1;i<list.length;i++){
+									if(get.color(list[i])!=color) return false;
+								}
+							}
+							return get.color(_status.event.card,false)!=color;
+						}
+						return false;
+					}).set('card',card);
+					'step 5'
+					if(result.bool){
+						cards.push(card);
+						event.positions.remove(result.links[0]);
+						game.broadcastAll(function(card,id,pos,player){
+							lib.skill.yuuki_yicha.addCard(card,id,pos);
+							lib.skill.yuuki_yicha.changePrompt(get.translation(player)+'放置了'+get.translation(card),id);
+						},card,event.videoId,result.links[0],player);
+						game.delay(2);
+					}
+					if(event.count>0) event.goto(3);
+					'step 6'
+					game.broadcastAll('closeDialog',event.videoId);
+					player.chooseTarget('令一名角色获得'+get.translation(cards),true).set('ai',function(target){
+						return get.attitude(_status.event.player,target);
+					});
+					'step 7'
+					if(result.bool&&result.targets&&result.targets.length){
+						var target=result.targets[0];
+						player.line(target,'green');
+						target.gain(cards,'gain2');
+					}
+				},
+			},
 			kotomi_qinji:{
 				trigger:{player:'phaseUseBegin'},
 				filter:function(event,player){
@@ -14425,6 +14801,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nao_shouqing2:'守情',
 			nao_shouqing3:'守情',
 			nao_shouqing_info:'其他角色的出牌阶段内可以对你使用【桃】。若如此做，其摸一张牌且本局游戏内的手牌上限+1。',
+			key_yuuki:'冰室忧希',
+			yuuki_yicha:'异插',
+			yuuki_yicha_info:'出牌阶段开始时，你可依次进行两次判定并将判定牌依次置入两行三列方阵的两个随机位置中。然后你依次进行四次判定，每次可将当前判定牌置入空方格，且须与相邻方格的牌颜色均不同。若如此做，你令一名角色获得方阵内的所有牌。',
+			key_kyouko:'伊座并杏子',
+			kyouko_rongzhu:'容助',
+			kyouko_rongzhu_info:'其他角色不因此技能而获得你的牌后，你可摸一张牌，然后交给其一张牌。若其是当前回合角色，则其本回合使用【杀】的次数上限+1；若你是当前回合角色，则你本回合的手牌上限+1。',
+			kyouko_gongmian:'共勉',
+			kyouko_gongmian_use:'共勉',
+			kyouko_gongmian_exchange:'共勉',
+			kyouko_gongmian_info:'①出牌阶段，你可以选择一名未以此法选择过的角色，若其手牌：大于你，你获得其一张牌，然后交给其一张牌；小于你，其交给你一张牌，然后你交给其一张牌；等于你，你与其各摸一张牌。②出牌阶段结束时，你可以获得一名其他角色区域内的至多X张牌，然后交给其等量的牌。③弃牌阶段开始时，若X不小于你的体力值，你可以获得一名手牌数少于你的角色的所有手牌，然后将手牌数的一半（向上取整）交给该角色。（X为你本回合内发动过〖共勉①〗的次数）',
 
 			noname:"小无",
 			noname_zhuyuan:"祝愿",

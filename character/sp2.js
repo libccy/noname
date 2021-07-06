@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			re_niujin:['male','wei',4,['recuorui','reliewei']],
 			zhangmiao:['male','qun',4,['mouni','zongfan']],
 			liangxing:['male','qun',4,['lulve','lxzhuixi'],['unseen']],
 			ruanyu:['male','wei',3,['xingzuo','miaoxian']],
@@ -96,7 +97,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_huangjin:['liuhong','zhujun','re_hejin','re_hansui','liubian'],
 				sp_fadong:['ol_dingyuan','wangrong','re_quyi','hanfu'],
 				sp_xuzhou:['re_taoqian','caosong'],
-				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','re_sunluyu','caobuxing','ol_yujin','re_maliang','xin_baosanniang','re_xinxianying','dongxie','guozhao','fanyufeng','zhaozhong','ruanyu','liangxing','zhangmiao'],
+				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','re_sunluyu','caobuxing','ol_yujin','re_maliang','xin_baosanniang','re_xinxianying','dongxie','guozhao','fanyufeng','zhaozhong','ruanyu','liangxing','zhangmiao','re_niujin'],
 				sp_mini:["mini_sunquan","mini_zuoci","mini_jiangwei","mini_diaochan","mini_zhangchunhua"],
 				sp_luanwu:["ns_lijue","ns_zhangji","ns_fanchou"],
 				sp_yongjian:["ns_chendao","yj_caoang"],
@@ -104,6 +105,51 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//牛金
+			recuorui:{
+				audio:'cuorui',
+				trigger:{player:'phaseBegin'},
+				skillAnimation:true,
+				animationColor:'thunder',
+				filter:function(event,player){
+					return player.phaseNumber==1&&player.hp>0&&game.hasPlayer(function(current){
+						return current!=player&&current.countGainableCards(player,'h')>0;
+					})
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget([1,player.hp],get.prompt('recuorui'),'获得至多'+get.cnNumber(player.hp)+'名角色的各一张手牌',function(card,player,current){
+						return current!=player&&current.countGainableCards(player,'h')>0;
+					}).set('ai',function(target){
+						var att=get.attitude(_status.event.player,target);
+						if(target.hasSkill('tuntian')) return att/10;
+						return 1-att;
+					});
+					'step 1'
+					if(result.bool){
+						var targets=result.targets;
+						player.logSkill('recuorui',targets);
+						targets.sortBySeat();
+						player.gainMultiple(targets);
+					}
+				},
+			},
+			reliewei:{
+				audio:'liewei',
+				trigger:{global:'dying'},
+				frequent:true,
+				filter:function(event,player){
+					var evt=event.getParent();
+					return evt&&evt.name=='damage'&&evt.source==player&&player.getHistory('custom',function(evt){
+						return evt&&evt.reliewei==true;
+					}).length<player.hp;
+				},
+				content:function(){
+					player.getHistory('custom').push({reliewei:true});
+					player.draw();
+				},
+			},
 			//张邈
 			mouni:{
 				trigger:{player:'phaseZhunbeiBegin'},
@@ -368,7 +414,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseTarget(function(card,player,target){
 						return target.countCards('h')>0;
-					},'兴作：是否令一他角色将其手牌与牌堆底的三张牌替换？').set('ai',function(target){
+					},'兴作：是否令一名角色将其手牌与牌堆底的三张牌替换？').set('ai',function(target){
 						var player=_status.event.player,att=get.attitude(player,target),hs=target.getCards('h'),num=hs.length;
 						var getv=function(list,target){
 							var num=0;
@@ -8954,6 +9000,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zongfan_info:'觉醒技，结束阶段，若你本回合内因〖谋逆〗使用过【杀】且未跳过本回合的出牌阶段，则你将任意张牌交给一名其他角色，然后加X点体力上限并回复X点体力（X为你以此法给出的牌数）。最后失去〖谋逆〗并获得〖战孤〗。',
 			zhangu:'战孤',
 			zhangu_info:'锁定技，准备阶段，若你的体力上限大于1且没有手牌/装备区内没有牌，则你减1点体力上限，然后从牌堆中获得三张类型不同的牌。',
+			re_niujin:'牛金',
+			recuorui:'摧锐',
+			recuorui_info:'你的第一个回合开始时，你可以依次获得至多X名角色的各一张手牌（X为你的体力值）。',
+			reliewei:'裂围',
+			reliewei_info:'每回合限X次（X为你的体力值），当有其他角色因你造成伤害而进入濒死状态时，你可以摸一张牌。',
 
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",

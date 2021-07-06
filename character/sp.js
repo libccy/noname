@@ -12,7 +12,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_sticker:['sp_gongsunzan','sp_simazhao','sp_wangyuanji','sp_xinxianying','sp_liuxie'],
 				sp_guozhan:["zangba","shamoke","ganfuren","yuejin","hetaihou","dingfeng","panfeng","jianggan"],
 				sp_guozhan2:["mateng","tianfeng","chendong","sp_dongzhuo","jiangfei","jiangqing","kongrong","liqueguosi","lvfan","cuimao","jiling","zhangren","zoushi","huaxin","luyusheng","zongyu"],
-				sp_single:["niujin"],
+				//sp_single:["niujin"],
 				sp_others:["hanba","caiyang"],
 			},
 		},
@@ -45,7 +45,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuantanyuanshang:['male','qun',4,['neifa']],
 			xujing:['male','shu',3,['yuxu','xjshijian']],
 			
-			niujin:['male','wei',4,['cuorui','liewei']],
+			//niujin:['male','wei',4,['cuorui','liewei']],
 			jianggan:["male","wei",3,["weicheng","daoshu"]],
 			
 			caoying:["female","wei",4,["xinfu_lingren","xinfu_fujian"],[]],
@@ -3169,7 +3169,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseJieshuBegin'},
 				filter:function(event,player){
 					return event.player!=player&&(event.player.hp>player.hp||event.player.getHistory('useCard',function(card){
-						return card.name=='sha';
+						return card.card.name=='sha';
 					}).length>0);
 				},
 				direct:true,
@@ -9497,7 +9497,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							if(target.countCards('j',function(card){
-								return get.value(target,{
+								return get.effect(target,{
 									name:card.viewAs||card.name,
 									cards:[card],
 								},target,target)<0;
@@ -9511,14 +9511,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseJudgeBegin'},
 				forced:true,
 				filter:function(event,player){
-					return player.countCards('j')>0;
+					return player.countCards('j')>0&&player.hasJudge('yanxiao_card');
 				},
 				content:function(){
 					player.gain(player.getCards('j'),'gain2');
 				},
 				ai:{
 					effect:{
-						target:function(card){
+						target:function(card,player,target){
 							if(get.type(card)=='delay'&&target.hasJudge('yanxiao_card')) return [0,0,0,0.1];
 						}
 					}
