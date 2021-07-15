@@ -14,6 +14,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				extra_lei:['shen_ganning','shen_zhangliao'],
 				extra_key:['key_kagari','key_shiki','key_hina'],
 				extra_ol:['ol_zhangliao','shen_caopi','shen_zhenji'],
+				extra_mobile:['shen_guojia'],
 				extra_offline:['shen_diaochan','boss_zhaoyun'],
 				extra_mini:['mini_zhugeliang','mini_lvbu','mini_lvmeng'],
 			},
@@ -23,6 +24,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_shiki:['female','shen','3/5',['shiki_omusubi'],['key']],
 			key_hina:['female','shen',3,['hina_shenxian','hina_mashu','hina_tieji'],['key','hiddenSkill']],
 			
+			shen_guojia:['male','shen',3,['shuishi','stianyi','sghuishi']],
 			shen_diaochan:['female','shen',3,['meihun','huoxin'],['qun']],
 			shen_guanyu:['male','shen',5,['new_wuhun','wushen'],['shu']],
 			shen_zhaoyun:['male','shen',2,['xinjuejing','relonghun'],['shu']],
@@ -33,10 +35,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_caocao:['male','shen',3,['new_guixin','feiying'],['wei']],
 			shen_lvbu:['male','shen',5,['baonu','wumou','ol_wuqian','ol_shenfen'],['qun']],
 			
-			"shen_liubei":["male","shen",6,["nzry_longnu","nzry_jieying"],["shu"]],
-			"shen_luxun":["male","shen",4,["nzry_junlve","nzry_cuike","nzry_dinghuo"],["wu"]],
-			"shen_zhangliao":["male","shen",4,["drlt_duorui","drlt_zhiti"],["wei"]],
-			"shen_ganning":["male","shen","3/6",["drlt_poxi","drlt_jieying"],["wu"]],
+			shen_liubei:["male","shen",6,["nzry_longnu","nzry_jieying"],["shu"]],
+			shen_luxun:["male","shen",4,["nzry_junlve","nzry_cuike","nzry_dinghuo"],["wu"]],
+			shen_zhangliao:["male","shen",4,["drlt_duorui","drlt_zhiti"],["wei"]],
+			shen_ganning:["male","shen","3/6",["drlt_poxi","drlt_jieying"],["wu"]],
 			ol_zhangliao:['male','shen',4,['olduorui','olzhiti'],['wei']],
 			shen_caopi:['male','shen',5,['chuyuan','dengji'],['wei']],
 			shen_zhenji:['female','shen',4,['shenfu','qixian'],['wei']],
@@ -226,6 +228,190 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.targets3.length) event.goto(4);
 					"step 6"
 					player.turnOver();
+				},
+			},
+			shuishi:{
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.maxHp<10;
+				},
+				filterTarget:true,
+				content:function(){
+					'step 0'
+					target.draw();
+					'step 1'
+					if(!result||!Array.isArray(result)||result.length!=1||get.itemtype(result[0])!='card'){
+						event.finish();
+						return;
+					}
+					var suit=get.suit(result[0]),hs=target.getCards('h');
+					for(var i of hs){
+						if(i!=result[0]&&get.suit(i,target)==suit){
+							player.loseMaxHp();
+							target.showHandcards();
+							event.finish();
+							return;
+						}
+					}
+					player.gainMaxHp();
+					'step 2'
+					if(player.maxHp<10){
+						player.chooseBool('是否继续发动【慧识】？');
+					}
+					else event.finish();
+					'step 3'
+					if(result.bool) event.goto(0);
+				},
+				ai:{
+					order:0.5,
+					result:{
+						target:0.2,
+						player:function(player,target){
+							var list=[],hs=target.getCards('h');
+							for(var i of hs) list.add(get.suit(i,target));
+							if(list.length==0) return 0;
+							if(list.length==1) return player.maxHp>2?0:-2;
+							if(list.length==2) return player.maxHp>3?0:-2;
+							return -2;
+						},
+					},
+				},
+			},
+			stianyi:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				forced:true,
+				juexingji:true,
+				skillAnimation:true,
+				animationColor:'gray',
+				filter:function(event,player){
+					return !game.hasPlayer(function(current){
+						return current.getAllHistory('damage').length==0;
+					});
+				},
+				content:function(){
+					'step 0'
+					player.awakenSkill('stianyi');
+					player.gainMaxHp(2);
+					player.recover();
+					'step 1'
+					player.chooseTarget(true,'令一名角色获得技能〖佐幸〗').set('ai',function(target){
+						return get.attitude(_status.event.player,target);
+					});
+					'step 2'
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target,'green');
+						target.storage.zuoxing=player;
+						target.addSkill('zuoxing');
+					}
+				},
+				derivation:'zuoxing',
+			},
+			zuoxing:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				filter:function(event,player){
+					var target=player.storage.zuoxing;
+					return target&&target.isAlive()&&target.maxHp>1;
+				},
+				logTarget:function(event,player){
+					return player.storage.zuoxing;
+				},
+				check:function(event,player){
+					var target=player.storage.zuoxing;
+					if(get.attitude(player,target)<=0) return true;
+					return target.maxHp>3&&!player.hasJudge('lebu');
+				},
+				content:function(){
+					player.storage.zuoxing.loseMaxHp();
+					player.addTempSkill('zuoxing2');
+				},
+			},
+			zuoxing2:{
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					for(var i of lib.inpile){
+						if(get.type(i)=='trick'&&event.filterCard({name:i,isCard:true},player,event)) return true;
+					}
+					return false;
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						var list=[];
+						for(var i of lib.inpile){
+							if(get.type(i)=='trick'&&event.filterCard({name:i,isCard:true},player,event)) list.push(['锦囊','',i]);
+						}
+						return ui.create.dialog('佐幸',[list,'vcard']);
+					},
+					check:function(button){
+						return _status.event.player.getUseValue({name:button.link[2],isCard:true});
+					},
+					backup:function(links,player){
+						return {
+							viewAs:{
+								name:links[0][2],
+								isCard:true,
+							},
+							filterCard:()=>false,
+							selectCard:-1,
+							popname:true,
+							precontent:function(){
+								player.logSkill('zuoxing');
+								//delete event.result.skill;
+							},
+						}
+					},
+					prompt:function(links,player){
+						return '请选择'+get.translation(links[0][2])+'的目标';
+					},
+				},
+				ai:{order:1,result:{player:1}},
+			},
+			sghuishi:{
+				enable:'phaseUse',
+				limited:true,
+				skillAnimation:true,
+				animationColor:'water',
+				filterTarget:lib.filter.notMe,
+				content:function(){
+					'step 0'
+					player.awakenSkill('sghuishi');
+					var list=target.getSkills(null,false,false).filter(function(skill){
+						var info=lib.skill[skill];
+						return info&&info.juexingji;
+					});
+					if(list.length){
+						target.addMark('sghuishi',1,false);
+						for(var i of list){
+							var info=lib.skill[i];
+							if(info.filter&&!info.charlotte&&!info.sghuishi_filter){
+								info.sghuishi_filter=info.filter;
+								info.filter=function(event,player){
+									if(player.hasMark('sghuishi')) return true;
+									return this.sghuishi_filter.apply(this,arguments);
+								}
+							}
+						}
+					}
+					else target.draw(4);
+					player.loseMaxHp(2);
+				},
+				intro:{content:'发动非Charlotte觉醒技时无视条件'},
+				ai:{
+					order:0.1,
+					expose:0.2,
+					result:{
+						target:function(player,target){
+							if(player.hasUnknown()||player.maxHp<5) return 0;
+							var list=target.getSkills(null,false,false).filter(function(skill){
+								var info=lib.skill[skill];
+								return info&&info.juexingji;
+							});
+							if(list.length||target.hasJudge('lebu')||target.hasSkillTag('nogain')) return 0;
+							return 4;
+						},
+					},
 				},
 			},
 			zhanjiang:{
@@ -4147,6 +4333,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			boss_juejing_info:'锁定技，摸牌阶段开始前，你跳过此阶段。当你获得牌/失去手牌后，若你的手牌数大于4/小于4，则你将手牌摸至4张/弃置至4张。',
 			zhanjiang:'斩将',
 			zhanjiang_info:'准备阶段开始时，如果其他角色的装备区内有【青釭剑】，你可以获得之',
+			shen_guojia:'神郭嘉',
+			shuishi:'慧识',
+			shuishi_info:'出牌阶段限一次，若你的体力上限小于10，则你可选择一名角色。你令其摸一张牌，若其以此法获得的牌：与该角色的其他手牌花色均不相同，则你加1点体力上限，若你的体力上限小于10，则你可以重复此流程；否则你减1点体力上限，且其展示所有手牌。',
+			stianyi:'天翊',
+			stianyi_info:'觉醒技，准备阶段，若场上的所有存活角色均于本局游戏内受到过伤害，则你加2点体力上限并回复1点体力，然后令一名角色获得技能〖佐幸〗。',
+			zuoxing:'佐幸',
+			zuoxing2:'佐幸',
+			zuoxing_info:'准备阶段，若令你获得〖佐幸〗的角色存活且体力上限大于1，则你可以令其减1点体力上限，然后你获得如下效果：出牌阶段限一次，你可以获得一张普通锦囊牌。',
+			sghuishi:'辉逝',
+			sghuishi_info:'限定技，出牌阶段，你可以选择一名其他角色：若其有未发动过的觉醒技，则你令其发动这些觉醒技时无视原有条件；否则其摸四张牌。然后你减2点体力上限。',
 			
 			key_kagari:'篝',
 			kagari_zongsi:'纵丝',
@@ -4178,6 +4374,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			extra_lei:'神话再临·雷',
 			extra_key:'神话再临·论外',
 			extra_ol:'神话再临OL',
+			extra_mobile:'神话再临·始计篇',
 			extra_offline:'神话再临·线下',
 			extra_mini:'欢乐三国杀',
 		},

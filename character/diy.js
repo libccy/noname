@@ -76,6 +76,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_kamome:['female','key',3,['kamome_yangfan','kamome_huanmeng','kamome_jieban']],
 			key_nao:['female','key',3,['nao_duyin','nao_wanxin','nao_shouqing']],
 			key_yuuki:['female','key',3,['yuuki_yicha']],
+			key_tenzen:['male','key',4,['tenzen_yixing','tenzen_lingyu']],
 			key_kyouko:['female','key',3,['kyouko_rongzhu','kyouko_gongmian']],
 			
 			ns_huangchengyan:['male','shu',3,['nslongyue','nszhenyin']],
@@ -186,7 +187,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy:{
 				diy_yijiang:["key_kud","key_misuzu","key_kamome","key_nao",
 				"ns_huangchengyan","ns_sunchensunjun","ns_yuanxi","ns_caoshuang"],
-				diy_yijiang2:["key_yuuki","key_kyouko",
+				diy_yijiang2:["key_yuuki","key_tenzen","key_kyouko",
 				"ns_chentai","ns_huangwudie","ns_sunyi","ns_zhangning","ns_yanghu"],
 				diy_tieba:["ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_luyusheng"],
 				diy_fakenews:["diy_wenyang","ns_zhangwei","ns_caimao","ns_chengpu"],
@@ -279,7 +280,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_kamome:'#b仿生纱',
 			key_nao:'#b潮鸣',
 			key_yuuki:'#b4399司命',
-			key_kyouko:'#g阿阿啊687',
+			key_kyouko:'#b阿阿阿687',
 			
 			ns_huangchengyan:'#g竹邀月',
 			ns_sunchensunjun:'#gVenusjeu',
@@ -451,6 +452,166 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			tenzen_yixing:{
+				trigger:{
+					player:'damageEnd',
+					source:'damageSource',
+				},
+				logTarget:function(event,player){
+					if(player==event.player) return event.source;
+					return event.player;
+				},
+				filter:function(event,player){
+					if(!event.card||(event.card.name!='sha'&&event.card.name!='juedou')) return false;
+					var hairi=lib.skill.tenzen_yixing.logTarget(event,player);
+					return hairi&&hairi!=player&&hairi.isAlive()&&(hairi.name1!='key_shizuku'&&hairi.name2!='key_shizuku');
+				},
+				frequent:true,
+				content:function(){
+					'step 0'
+					player.draw();
+					'step 1'
+					if(player.countCards('he')>0){
+						player.chooseCard('he',true,'将一张牌作为“兴”置于武将牌上');
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						var cards=result.cards;
+						player.lose(cards,ui.special,'toStorage');
+						player.markAuto('tenzen_yixing',cards);
+						game.log(player,'将',cards,'放在了武将牌上');
+					}
+				},
+				intro:{
+					content:'cards',
+				},
+				group:'tenzen_yixing_counter',
+				subSkill:{
+					counter:{
+						trigger:{target:'useCardToTargeted'},
+						filter:function(event,player){
+							if(player==event.player||!player.getStorage('tenzen_yixing').length) return false;
+							return event.targets.length==1&&(event.card.name=='sha'||get.type(event.card)=='trick');
+						},
+						prompt:function(event){
+							return '获得武将牌上的一张“兴”，并于'+get.translation(event.card)+'结算完成后视为对'+get.translation(event.player)+'使用一张同名牌';
+						},
+						check:function(event,player){
+							if(!player.storage.tenzen_lingyu&&player.getStorage('tenzen_yixing').length<3) return false;
+							var card={
+								name:event.card.name,
+								nature:event.card.nature,
+								isCard:true,
+							}
+							return player.canUse(card,event.player,false)&&get.effect(event.player,card,player,player)>0;
+						},
+						content:function(){
+							'step 0'
+							player.chooseButton(['选择获得一张“兴”',player.storage.tenzen_yixing],true);
+							'step 1'
+							if(result.bool){
+								player.gain(result.links,'gain2','fromStorage');
+								player.unmarkAuto('tenzen_yixing',result.links);
+							}
+							var next=game.createEvent('tenzen_yixing_insert');
+							event.next.remove(next);
+							trigger.getParent().after.push(next);
+							next.player=player;
+							next.target=trigger.player;
+							next.setContent(function(){
+								var card=event.getParent().card;
+								card={
+									name:card.name,
+									nature:card.nature,
+									isCard:true,
+								};
+								if(player.canUse(card,target,false)) player.useCard(card,target,false,'tenzen_yixing');
+							});
+						},
+					},
+				},
+			},
+			tenzen_lingyu:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				forced:true,
+				juexingji:true,
+				skillAnimation:true,
+				animationColor:'water',
+				filter:function(event,player){
+					return player.getStorage('tenzen_yixing').length>1;
+				},
+				content:function(){
+					player.awakenSkill('tenzen_lingyu');
+					player.storage.tenzen_lingyu=true;
+					player.loseMaxHp();
+					if(player.isHealthy()) player.draw(2);
+					player.addSkill('tenzen_tianquan');
+				},
+			},
+			tenzen_tianquan:{
+				trigger:{player:'useCardToPlayered'},
+				filter:function(event,player){
+					return (event.card.name=='sha'||event.card.name=='juedou')&&event.targets.length==1&&player.getStorage('tenzen_yixing').length>0;
+				},
+				logTarget:'target',
+				usable:1,
+				check:function(event,player){
+					return get.attitude(player,event.target)<0;
+				},
+				content:function(){
+					'step 0'
+					player.viewHandcards(trigger.target);
+					'step 1'
+					player.chooseButton(['选择一张“兴”置于牌堆顶',player.storage.tenzen_yixing],true);
+					'step 2'
+					if(result.bool){
+						player.unmarkAuto('tenzen_yixing',result.links);
+						var cards=get.cards(5);
+						player.showCards(cards,get.translation(player)+'发动了【天全】');
+						game.cardsGotoOrdering(cards).relatedEvent=trigger.getParent();
+						ui.cardPile.insertBefore(result.links[0],ui.cardPile.firstChild);
+						var num=cards.filter(function(card){
+							return get.type(card,false)=='basic';
+						}).length;
+						if(num){
+							if(trigger.card.name=='sha'){
+								var id=trigger.target.playerid;
+								var map=trigger.getParent().customArgs;
+								if(!map[id]) map[id]={};
+								if(typeof map[id].shanRequired=='number'){
+									map[id].shanRequired+=num;
+								}
+								else{
+									map[id].shanRequired=1+num;
+								}
+							}
+							else{
+								var idt=trigger.target.playerid;
+								var map=trigger.getParent().customArgs;
+								if(!map[idt]) map[idt]={};
+								if(!map[idt].shaReq) map[idt].shaReq={};
+								if(!map[idt].shaReq[idt]) map[idt].shaReq[idt]=1;
+								map[idt].shaReq[idt]++;
+							}
+						}
+						if(num<5){
+							var next=game.createEvent('tenzen_lingyu_gain');
+							next.cards=cards;
+							next.player=player;
+							event.next.remove(next);
+							trigger.getParent().after.push(next);
+							next.setContent(function(){
+								if(player.getHistory('sourceDamage',function(evt){
+									return evt.card==event.parent.card;
+								}).length>0) player.gain(cards.filter(function(card){
+									return get.type(card,false)!='basic';
+								}),'gain2');
+							});
+						}
+					}
+				},
+			},
 			kyouko_rongzhu:{
 				trigger:{global:'gainEnd'},
 				filter:function(event,player){
@@ -2963,7 +3124,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 3'
 					if(event.count&&game.hasPlayer(function(target){
-						return lib.skill.ryoichi_baoyi.filterTarget;
+						return lib.skill.ryoichi_baoyi.filterTarget(null,player,target);
 					})) event.goto(1);
 				},
 			},
@@ -14811,6 +14972,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kyouko_gongmian_use:'共勉',
 			kyouko_gongmian_exchange:'共勉',
 			kyouko_gongmian_info:'①出牌阶段，你可以选择一名未以此法选择过的角色，若其手牌：大于你，你获得其一张牌，然后交给其一张牌；小于你，其交给你一张牌，然后你交给其一张牌；等于你，你与其各摸一张牌。②出牌阶段结束时，你可以获得一名其他角色区域内的至多X张牌，然后交给其等量的牌。③弃牌阶段开始时，若X不小于你的体力值，你可以获得一名手牌数少于你的角色的所有手牌，然后将手牌数的一半（向上取整）交给该角色。（X为你本回合内发动过〖共勉①〗的次数）',
+			key_tenzen:'加纳天善',
+			tenzen_yixing:'弈兴',
+			tenzen_yixing_info:'当你因【杀】或【决斗】而造成伤害后或受到伤害后，你可以摸一张牌，然后将一张牌置于武将牌上，称为“兴”。当你成为其他角色使用【杀】或普通锦囊牌的唯一目标后，你可以获得一张“兴”，并于此牌结算完成后视为对其使用一张名称相同的牌。',
+			//若对方为水织静久则无法触发〖弈兴〗
+			tenzen_lingyu:'领域',
+			tenzen_lingyu_info:'觉醒技，准备阶段，若你的“兴”超过一张，则你减1点体力上限并获得技能〖天全〗。若你以此法失去了体力，则你摸两张牌。',
+			tenzen_tianquan:'天全',
+			tenzen_tianquan_info:'每回合限一次，当你使用【杀】或【决斗】指定唯一目标后，你可以观看目标角色的手牌，将一张“兴”置于牌堆顶并展示牌堆顶的五张牌。这些牌中每有一张基本牌，响应此牌需要的【闪】/【杀】的数量便+1。此牌结算完成后，若此牌造成过伤害，则你获得这些牌中的非基本牌。',
 
 			noname:"小无",
 			noname_zhuyuan:"祝愿",

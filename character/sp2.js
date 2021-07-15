@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			duanwei:['male','qun',4,['langmie']],
 			re_niujin:['male','wei',4,['recuorui','reliewei']],
 			zhangmiao:['male','qun',4,['mouni','zongfan']],
 			liangxing:['male','qun',4,['lulve','lxzhuixi'],['unseen']],
@@ -97,7 +98,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_huangjin:['liuhong','zhujun','re_hejin','re_hansui','liubian'],
 				sp_fadong:['ol_dingyuan','wangrong','re_quyi','hanfu'],
 				sp_xuzhou:['re_taoqian','caosong'],
-				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','re_sunluyu','caobuxing','ol_yujin','re_maliang','xin_baosanniang','re_xinxianying','dongxie','guozhao','fanyufeng','zhaozhong','ruanyu','liangxing','zhangmiao','re_niujin'],
+				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','re_sunluyu','caobuxing','ol_yujin','re_maliang','xin_baosanniang','re_xinxianying','dongxie','guozhao','fanyufeng','zhaozhong','ruanyu','liangxing','zhangmiao','re_niujin','duanwei'],
 				sp_mini:["mini_sunquan","mini_zuoci","mini_jiangwei","mini_diaochan","mini_zhangchunhua"],
 				sp_luanwu:["ns_lijue","ns_zhangji","ns_fanchou"],
 				sp_yongjian:["ns_chendao","yj_caoang"],
@@ -105,6 +106,50 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//狼灭
+			langmie:{
+				trigger:{global:'phaseUseEnd'},
+				forced:true,
+				filter:function(event,player){
+					if(player==event.player) return false;
+					var map={};
+					var list=event.player.getHistory('useCard',function(evt){
+						var evt2=evt.getParent('phaseUse');
+						return evt2==event;
+					});
+					for(var i of list){
+						var name=i.card.name;
+						if(!map[name]) map[name]=true;
+						else return true;
+					}
+				},
+				frequent:true,
+				logTarget:'player',
+				content:function(){
+					player.draw();
+				},
+				group:'langmie_damage',
+			},
+			langmie_damage:{
+				audio:'langmie',
+				trigger:{global:'phaseEnd'},
+				direct:true,
+				filter:function(event,player){
+					return event.player!=player&&event.player.getHistory('sourceDamage',function(evt){
+						return evt.num>1;
+					}).length>0&&player.countCards('he')>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseToDiscard('he',get.prompt('langmie',trigger.player),'弃置一张牌并对其造成1点伤害').set('goon',get.damageEffect(trigger.player,player,player)>0).set('ai',function(card){
+						if(!_status.event.goon) return 0;
+						return 7-get.value(card);
+					}).logSkill=['langmie_damage',trigger.player];
+					'step 1'
+					if(result.bool) trigger.player.damage();
+				},
+				ai:{expose:0.2},
+			},
 			//牛金
 			recuorui:{
 				audio:'cuorui',
@@ -7885,28 +7930,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				delay:false,
 				lose:false,
 				prompt:function(){
-					return '选择一名角色并将任意张手牌置于处理区，然后将这些牌放置于牌堆中'+get.cnNumber(game.players.length)+'倍数的位置（先选择的牌在上）';
+					return '选择一名角色并将任意张手牌放置于牌堆中'+get.cnNumber(game.players.length)+'倍数的位置（先选择的牌在上）';
 				},
 				content:function(){
 					'step 0'
-					player.lose(cards,ui.ordering).noOrdering=true;
 					player.$throw(cards.length);
 					player.storage.xinfu_qianxin=cards.slice(0);
 					player.storage.xinfu_qianxin2=target;
-					'step 1'
-					event.cards.reverse();
-					var num1=game.players.length;
-					var num2=ui.cardPile.childElementCount;
-					for(var i=0;i<event.cards.length;i++){
-						event.cards[i].fix();
+					//cards.reverse();
+					player.lose(cards,ui.cardPile).insert_index=function(event,card){
+						var num1=game.players.length,i=event.cards.indexOf(card);
 						var num3=num1*(i+1)-1;
-						if(num3<num2){
-							ui.cardPile.insertBefore(cards[i],ui.cardPile.childNodes[num3]);
-						}
-						else{
-							ui.cardPile.appendChild(cards[i]);
-						}
-					}
+						return ui.cardPile.childNodes[num3];
+					};
+					'step 1'
 					game.updateRoundNumber();
 					game.log(player,'把',get.cnNumber(cards.length),'张牌放在了牌堆里');
 					game.delayx();
@@ -8463,6 +8500,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ruanyu:'阮瑀（约165—212年），字元瑜，陈留尉氏（今河南开封市尉氏县）人，是东汉末年文学家，建安七子之一。阮瑀所作章表书记很出色，当时军国书檄文字，多为阮瑀与陈琳所拟。名作有《为曹公作书与孙权》。诗有《驾出北郭门行》，描写孤儿受后母虐待的苦难遭遇，比较生动形象。年轻时曾受学于蔡邕，蔡邕称他为“奇才”。后徙为丞相仓曹掾属。诗歌语言朴素，往往能反映出一般的社会问题。阮瑀的音乐修养颇高，他的儿子阮籍，孙子阮咸皆当时名人，位列“竹林七贤”，妙于音律。明人辑有《阮元瑜集》。',
 			liangxing:'梁兴（？-212年），武威郡姑臧人也，东汉末年凉州军阀之一。与张横、贾诩、段煨是同乡，曾斩杀李傕。建安十六年，同韩遂、马超联合，起兵反抗曹操。梁兴率步骑五千夜袭曹军先头部队徐晃，被击退。联军战败后，梁兴逃到蓝田，劫掠周围郡县。夏侯渊进攻蓝田联合郑浑征讨梁兴，梁兴战败，不知所终。',
 			zhangmiao:'张邈（？－195年），字孟卓，东平寿张（今山东东平县）人。东汉大臣、名士，“八厨”之一。举孝廉出身，授骑都尉，出任陈留太守。参与讨伐董卓，参加汴水之战，归附于曹操。兴平元年（194年），趁着曹操讨伐徐州牧陶谦，联合陈宫发动叛乱，迎立吕布为兖州牧。受到曹操讨伐，兵败投奔徐州牧刘备。兴平二年，张邈向袁术借兵途中，被部下所杀。',
+			duanwei:'段煨（？～209年），字忠明，武威郡姑臧（今甘肃省武威市）人也。东汉末年将领，东汉太尉段颎同族兄弟，与太尉贾诩、张济、宣威侯张绣乃是同乡。原为董卓帐下将领，奉命屯兵华阴，勤劳农业。兴平二年（195年），迎接汉献帝刘协东归洛阳，供给衣食补给，与护驾将领杨定不和，引发激战十余天，听从汉献帝刘协劝解。东汉建安三年（198年），攻打黄白城，击杀李傕，夷其三族，封为镇远将军、闅乡亭侯、北地太守，累迁大鸿胪、金光禄大夫。建安十四年（209年），寿终正寝。',
 		},
 		characterTitle:{
 			wulan:'#b对决限定武将',
@@ -8571,7 +8609,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_zhenxing":"镇行",
 			"xinfu_zhenxing_info":"结束阶段开始时或当你受到伤害后，你可以观看牌堆顶的至多三张牌，然后你获得其中与其余牌花色均不相同的一张牌。",
 			"xinfu_qianxin":"遣信",
-			"xinfu_qianxin_info":"出牌阶段限一次，若牌堆中没有“信”，你可以选择一名角色并将任意张手牌置于处理区，然后将这些牌放置于牌堆中X倍数的位置（X为存活人数），称为“信”。该角色的弃牌阶段开始时，若其手牌区内有于本回合内获得过的“信”，其选择一项：令你将手牌摸至四张；本回合手牌上限-2。",
+			"xinfu_qianxin_info":"出牌阶段限一次，若牌堆中没有“信”，你可以选择一名角色并将任意张手牌放置于牌堆中X倍数的位置（X为存活人数），称为“信”。该角色的弃牌阶段开始时，若其手牌区内有于本回合内获得过的“信”，其选择一项：令你将手牌摸至四张；本回合手牌上限-2。",
 			"qianxin_effect":"遣信",
 			"qianxin_effect_info":"",
 			"xinfu_qianxin2":"遣信",
@@ -9005,6 +9043,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			recuorui_info:'你的第一个回合开始时，你可以依次获得至多X名角色的各一张手牌（X为你的体力值）。',
 			reliewei:'裂围',
 			reliewei_info:'每回合限X次（X为你的体力值），当有其他角色因你造成伤害而进入濒死状态时，你可以摸一张牌。',
+			duanwei:'段煨',
+			langmie:'狼灭',
+			langmie_damage:'狼灭',
+			langmie_info:'其他角色的出牌阶段结束时，若其本阶段内使用过的牌中有名称相同的牌，则你可以摸一张牌；其他角色的结束阶段开始时，若其本回合内一次性造成过大于1点的伤害，则你可以弃置一张牌并对其造成1点伤害。',
 
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",

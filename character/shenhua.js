@@ -5571,11 +5571,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(card.name=='sha') return num+1;
 					}
 				},
+				charlotte:true,
 			},
 			tianyi3:{
 				mod:{
 					cardEnabled:function(card){if(card.name=='sha') return false}
-				}
+				},
+				charlotte:true,
 			},
 			shuangxiong:{
 				audio:true,
@@ -7337,13 +7339,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caopi:['caopi','re_caopi'],
 			xuhuang:['re_xuhuang','xuhuang'],
 			menghuo:['re_menghuo','menghuo'],
-			zhurong:['re_zhurong','zhurong'],
+			zhurong:['re_zhurong','ol_zhurong','zhurong'],
 			sunjian:['ol_sunjian','re_sunjian','sunjian'],
 			jiaxu:['jiaxu','ns_jiaxu'],
 			dongzhuo:['ol_dongzhuo','sp_dongzhuo','re_dongzhuo','dongzhuo'],
 			dengai:['re_dengai','ol_dengai','dengai'],
 			sp_zhanghe:['sp_zhanghe','yj_zhanghe'],
-			jiangwei:['re_jiangwei','mini_jiangwei','jiangwei'],
+			jiangwei:['ol_jiangwei','re_jiangwei','mini_jiangwei','jiangwei'],
 			liushan:['ol_liushan','re_liushan','liushan'],
 			sunce:['re_sunben','re_sunce','sunce'],
 			zhangzhang:['re_zhangzhang','zhangzhang'],

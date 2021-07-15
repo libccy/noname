@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.110.7.1',
+	'v1.9.110.8',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -728,6 +728,7 @@ window.noname_asset_list=[
 	'audio/die/re_chenqun.mp3',
 	'audio/die/ruanyu.mp3',
 	'audio/die/zhangmiao.mp3',
+	'audio/die/re_guotufengji.mp3',
 
 	'audio/skill/decadezishou1.mp3',
 	'audio/skill/decadezishou2.mp3',
@@ -3214,6 +3215,10 @@ window.noname_asset_list=[
 	'audio/skill/zhangu2.mp3',
 	'audio/skill/zongfan1.mp3',
 	'audio/skill/zongfan2.mp3',
+	'audio/skill/rejigong1.mp3',
+	'audio/skill/rejigong2.mp3',
+	'audio/skill/shifei_re_guotufengji1.mp3',
+	'audio/skill/shifei_re_guotufengji2.mp3',
 
 	'audio/voice/male/0.mp3',
 	'audio/voice/male/1.mp3',
@@ -4065,6 +4070,14 @@ window.noname_asset_list=[
 	'image/character/key_kyouko.jpg',
 	'image/character/key_yuuki.jpg',
 	'image/character/re_niujin.jpg',
+	'image/character/duanwei.jpg',
+	'image/character/huangchengyan.jpg',
+	'image/character/key_tenzen.jpg',
+	'image/character/ol_jiangwei.jpg',
+	'image/character/ol_zhurong.jpg',
+	'image/character/re_guotufengji.jpg',
+	'image/character/shen_guojia.jpg',
+	'image/character/zhongyan.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',

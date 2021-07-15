@@ -295,8 +295,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				'gz_weiyan','gz_huangyueying','gz_zhugeliang',
 				'gz_lingtong','gz_sunshangxiang','gz_sunce',
 				'gz_re_yuanshao','gz_yuanshu','gz_hetaihou',
-				'gz_jin_simashi','gz_sp_duyu','gz_miheng',
-				'gz_shibao',
+				'gz_jin_simashi','gz_sp_duyu',
 			],
 			'6':[
 				'gz_zhenji','gz_guojia','gz_yujin',
@@ -311,7 +310,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				'gz_re_lusu','gz_sunquan','gz_ganning',
 				'gz_zhangxiu','gz_liqueguosi','gz_huatuo',
 				'gz_zhanghuyuechen','gz_re_xushu','gz_mifangfushiren',
-				'gz_wujing','gz_weiguan',
+				'gz_wujing','gz_weiguan','gz_miheng',
+				'gz_shibao',
 			],
 			'4':[
 				'gz_dianwei','gz_dengai','gz_xunyu',
@@ -490,7 +490,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_huaxin:['male','wei',3,['wanggui','xibing']],
 				gz_luyusheng:['female','wu',3,['zhente','zhiwei']],
 				gz_zongyu:['male','shu',3,['zyqiao','chengshang']],
-				gz_miheng:['male','qun',3,['gzkuangcai','gzshejian'],['gzskin']],
+				gz_miheng:['male','qun',3,['gzrekuangcai','gzshejian'],['gzskin']],
 				
 				gz_cuimao:['male','wei',3,['gzzhengbi','gzfengying'],[]],
 				gz_yujin:['male','wei',4,['gzjieyue'],['gzskin']],
@@ -514,6 +514,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_simazhou:['male','jin',4,['caiwang','naxiang']],
 				gz_shibao:['male','jin',4,['zhuosheng']],
 				gz_weiguan:['male','jin',3,['zhongyun','shenpin']],
+				gz_zhongyan:['female','jin',3,['bolan','yifa']],
 
 				gz_key_ushio:['female','key',3,['ushio_huanxin','ushio_xilv'],['doublegroup:key:wei:shu:wu:qun:jin']],
 			}
@@ -911,6 +912,35 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					'step 3'
 					if(event.list.length) event.goto(1);
+				},
+			},
+			gzrekuangcai:{
+				audio:'kuangcai',
+				forced:true,
+				trigger:{player:'phaseDiscardBegin'},
+				filter:function(event,player){
+					return player.getHistory('useCard').length&&!player.getHistory('sourceDamage').length;
+				},
+				content:function(){
+					player.addTempSkill('gzrekuangcai_less');
+				},
+				mod:{
+					targetInRange:function(card,player){
+						if(player==_status.currentPhase) return true;
+					},
+					cardUsable:function(card,player){
+						if(player==_status.currentPhase) return Infinity;
+					},
+				},
+				subSkill:{
+					less:{
+						mod:{
+							maxHandcard:function(player,num){
+								return num-1;
+							},
+						},
+						charlotte:true,
+					},
 				},
 			},
 			gzkuangcai:{
@@ -1373,14 +1403,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else if(target.isIn()&&player.countCards('he',function(card){
 						return !card.hasGaintag('gzwenji');
 					})){
-						player.chooseCard('he','交给'+get.translation(target)+'一张其他牌，或弃置“问计”牌',function(card){
+						player.chooseCard('he','交给'+get.translation(target)+'一张其他牌，或令其摸一张牌',function(card){
 							return !card.hasGaintag('gzwenji');
 						}).set('ai',function(card){
-							var player=_status.event.player,target=_status.event.getParent().target,val=get.value(card,target),hs=player.getCards('h',function(card){
-								return card.hasGaintag('gzwenji');
-							})[0];
-							if(get.attitude(player,target)>0||(hs&&get.value(hs)>val)) return 1/Math.min(0.1,val);
-							return 0;
+							return 5-get.value(card);
 						});
 					}
 					else event.finish();
@@ -1390,10 +1416,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.removeGaintag('gzwenji');
 					}
 					else{
-						var cards=player.getCards('h',function(card){
-							return card.hasGaintag('gzwenji');
-						});
-						if(cards.length) player.discard(cards);
+						target.draw();
 					}
 				},
 				subSkill:{
@@ -9007,7 +9030,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			liangfan2:'量反',
 			liangfan_info:'锁定技，准备阶段开始时，若你的武将牌上有“函”，则你获得这些牌，然后失去1点体力。当你于此回合内因使用实体牌中包含“函”的牌且执行这些牌的效果而对目标角色造成伤害时，你可以获得目标角色的一张牌。',
 			gzwenji:'问计',
-			gzwenji_info:'出牌阶段开始时，你可令一名其他角色交给你一张牌。然后若该角色：未确定势力或势力与你相同，则你于本回合内使用实体牌包含“问计”牌的牌无距离和次数限制，且不可被其他角色响应。与你势力不同，则你交给其一张不为“问计”牌的牌或弃置“问计”牌。',
+			gzwenji_info:'出牌阶段开始时，你可令一名其他角色交给你一张牌。然后若该角色：未确定势力或势力与你相同，则你于本回合内使用实体牌包含“问计”牌的牌无距离和次数限制，且不可被其他角色响应。与你势力不同，则你交给其一张不为“问计”牌的牌或令其摸一张牌。',
 			gztunjiang:'屯江',
 			gztunjiang_info:'结束阶段，若你于本回合的出牌阶段内使用过牌且这些牌均未指定其他角色为目标，则你可摸X张牌（X为势力数）。',
 			gzbushi:'布施',
@@ -9022,6 +9045,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzlixia_info:'与你势力不同的角色的准备阶段开始时，其可弃置你装备区内的一张牌，然后其选择一项：①弃置两张手牌。②失去1点体力。③令你摸两张牌。',
 			mffengshi:'锋势',
 			mffengshi_info:'当你使用牌指定唯一目标后，或成为其他角色使用牌的唯一目标后，若此牌使用者的手牌数大于此牌目标的手牌数，则此牌的使用者可令你弃置自己和对方的各一张牌，并令此牌的伤害值+1。',
+			gzrekuangcai:'狂才',
+			gzrekuangcai_info:'锁定技，你于回合内使用牌无距离和次数限制；弃牌阶段开始时，若你本回合内使用过牌但未造成过伤害，则你的手牌上限-1。',
 			gzkuangcai:'狂才',
 			gzkuangcai_info:'锁定技，你的回合内，你使用牌无距离和次数限制，无视防具且不能被【无懈可击】响应；弃牌阶段开始时，若你本回合使用过牌但没造成伤害，本回合你的手牌上限-2；若你本回合造成的伤害点数不小于你使用的牌数，你将手牌摸至体力上限且本回合手牌上限+2。',
 			gzshejian:'舌箭',

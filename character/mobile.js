@@ -12,12 +12,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mobile_shijixin:['wujing','sp_mifuren','sp_xinpi'],
 				mobile_sunben:["re_sunben"],
 				mobile_standard:["xin_xiahoudun","xin_zhangfei"],
-				mobile_shenhua:["re_pangtong","re_guanqiujian","xin_yuanshao","re_liushan","re_dongzhuo","re_sp_zhugeliang","re_sunjian","re_dengai"],
+				mobile_shenhua:["re_pangtong","re_guanqiujian","xin_yuanshao","re_liushan","re_dongzhuo","re_sp_zhugeliang","re_sunjian","re_dengai","re_jiangwei","re_zhurong"],
 				mobile_yijiang1:["re_jikang","old_bulianshi","xin_liaohua","xin_caozhang","re_xusheng","xin_chengpu","xin_jianyong","xin_gongsunzan","xin_zhuran","re_lingtong","re_liubiao","xin_guohuai","xin_panzhangmazhong","xin_fuhuanghou","re_handang"],
 				mobile_sp:["old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","re_heqi","liuzan","xin_hansui"],
 			},
 		},
 		character:{
+			re_zhurong:['female','shu',4,['juxiang','relieren']],
+			re_jiangwei:['male','shu',4,['retiaoxin','zhiji']],
 			wujing:['male','wu',4,['heji']],
 			sp_mifuren:['female','shu',3,['spcunsi','spguixiu']],
 			sp_xinpi:['male','wei',3,['spyinju','spchijie']],
@@ -341,6 +343,76 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			relieren:{
+				shaRelated:true,
+				audio:2,
+				audioname:['boss_lvbu3'],
+				trigger:{player:'useCardToPlayered'},
+				filter:function(event,player){
+					return event.card.name=='sha'&&player.canCompare(event.target);
+				},
+				check:function(event,player){
+					return get.attitude(player,event.target)<0;
+				},
+				//priority:5,
+				content:function(){
+					"step 0"
+					player.chooseToCompare(trigger.target).clear=false;
+					"step 1"
+					if(result.bool){
+						if(trigger.target.countGainableCards(player,'he')) player.gainPlayerCard(trigger.target,true,'he');
+						ui.clear();
+					}
+					else{
+						var card1=result.player;
+						var card2=result.target;
+						if(get.position(card1)=='d') trigger.target.gain(card1,'gain2');
+						if(get.position(card2)=='d') player.gain(card2,'gain2');
+					}
+				}
+			},
+			retiaoxin:{
+				audio:'tiaoxin',
+				audioname:['sp_jiangwei','xiahouba','re_jiangwei'],
+				enable:'phaseUse',
+				usable:1,
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countCards('he');
+				},
+				content:function(){
+					"step 0"
+					target.chooseToUse(function(card,player,event){
+						if(get.name(card)!='sha') return false;
+						return lib.filter.filterCard.apply(this,arguments);
+					},'挑衅：对'+get.translation(player)+'使用一张杀，或令其弃置你的一张牌').set('targetRequired',true).set('complexSelect',true).set('filterTarget',function(card,player,target){
+						if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
+						return lib.filter.filterTarget.apply(this,arguments);
+					}).set('sourcex',player);
+					"step 1"
+					if(result.bool==false&&target.countCards('he')>0){
+						player.discardPlayerCard(target,'he',true);
+					}
+					else{
+						event.finish();
+					}
+				},
+				ai:{
+					order:4,
+					expose:0.2,
+					result:{
+						target:-1,
+						player:function(player,target){
+							if(!target.canUse('sha',player)) return 0;
+							if(target.countCards('h')==0) return 0;
+							if(target.countCards('h')==1) return -0.1;
+							if(player.hp<=2) return -2;
+							if(player.countCards('h','shan')==0) return -1;
+							return -0.5;
+						}
+					},
+					threaten:1.1
+				}
+			},
 			//狗剩
 			reduoji:{
 				audio:'duoji',
@@ -8594,6 +8666,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spchijie_info:'每回合限一次。当你成为其他角色使用牌的唯一目标时，你可判定。若结果大于6，则你取消此牌的所有目标。',
 			reduoji:'夺冀',
 			reduoji_info:'出牌阶段限一次，你可将一张牌置于其他角色的武将牌上，称为“冀”。当有装备牌因使用而进入一名角色的装备区后，若该角色有“冀”且其为使用者，则你获得此装备牌，其移去一个“冀”并摸一张牌。一名其他角色的回合结束后，若其有“冀”，则你获得其的所有“冀”。',
+			re_jiangwei:'界姜维',
+			retiaoxin:'挑衅',
+			retiaoxin_info:'出牌阶段限一次，你可以指定一名有牌的其他角色，该角色需对你使用一张【杀】，否则你弃置其一张牌。',
+			re_zhurong:'界祝融',
+			relieren:'烈刃',
+			relieren_info:'当你使用【杀】指定目标后，你可以和目标角色进行拼点。若你赢，你获得其一张牌。若你没赢，你获得对方的拼点牌，其获得你的拼点牌。',
 			
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua:'手杀异构·神话再临',

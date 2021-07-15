@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'yingbian',
 		connect:true,
 		character:{
+			zhongyan:['female','jin',3,['bolan','yifa']],
 			weiguan:['male','jin',3,['zhongyun','shenpin']],
 			cheliji:['male','qun',4,['chexuan','qiangshou']],
 			simazhou:['male','jin',4,['caiwang','naxiang']],
@@ -24,9 +25,116 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				yingbian_pack1:['jin_simayi','jin_zhangchunhua','ol_lisu','simazhou','cheliji'],
 				yingbian_pack2:['jin_simashi','jin_xiahouhui','zhanghuyuechen','shibao','jin_yanghuiyu'],
 				yingbian_pack3:['jin_simazhao','jin_wangyuanji','duyu','weiguan'],
+				yingbian_pack4:['zhongyan'],
 			},
 		},
 		skill:{
+			bolan:{
+				audio:2,
+				initList:function(player){
+					var list,skills=[];
+					if(get.mode()=='guozhan'){
+						list=[];
+						for(var i in lib.characterPack.mode_guozhan) list.push(i);
+					}
+					else if(_status.connectMode) list=get.charactersOL();
+					else{
+						list=[];
+						for(var i in lib.character){
+							if(lib.filter.characterDisabled2(i)||lib.filter.characterDisabled(i)) continue;
+							list.push(i);
+						}
+					}
+					for(var i of list){
+						if(i.indexOf('gz_jun')==0) continue;
+						for(var j of lib.character[i][3]){
+							if(j=='bolan') continue;
+							var skill=lib.skill[j];
+							if(!skill||skill.zhuSkill) continue;
+							if(skill.init||skill.ai&&(skill.ai.combo||skill.ai.notemp||skill.ai.neg)) continue;
+							var info=lib.translate[j+'_info'];
+							if(info&&info.indexOf('出牌阶段限一次')!=-1) skills.add(j);
+						}
+					}
+					player.storage.bolan=skills;
+				},
+				trigger:{global:'phaseUseBegin'},
+				direct:true,
+				frequent:true,
+				filter:function(event,player){
+					return player==event.player||player.hasSkill('bolan');
+				},
+				content:function(){
+					'step 0'
+					if(player==trigger.player){
+						var next=player.chooseBool(get.prompt('bolan'),'选择获得一个出牌阶段限一次的技能');
+						if(player.hasSkill('bolan')) next.set('frequentSkill','bolan');
+					}
+					else{
+						trigger.player.chooseBool(get.prompt('bolan'),'失去1点体力，然后获得'+get.translation(player)+'选择的一个出牌阶段限一次的技能').set('ai',function(){
+							var player=_status.event.player,target=_status.event.getParent().player;
+							return player.hp>2&&get.attitude(player,target)>0;
+						});
+					}
+					'step 1'
+					if(result.bool){
+						player.logSkill('bolan',trigger.player);
+						if(player!=trigger.player) trigger.player.loseHp();
+					}
+					else event.finish();
+					'step 2'
+					if(player.isIn()&&trigger.player.isIn()){
+						if(!player.storage.bolan) lib.skill.bolan.initList(player);
+						var list=player.storage.bolan.randomGets(3);
+						if(!list.length){
+							event.finish();
+							return;
+						}
+						event.videoId=lib.status.videoId++;
+						var func=function(skills,id){
+							var dialog=ui.create.dialog('forcebutton');
+							dialog.videoId=id;
+							dialog.add('博览：选择一个技能');
+							for(var i=0;i<skills.length;i++){
+								dialog.add('<div class="popup pointerdiv" style="width:80%;display:inline-block"><div class="skill">【'+get.translation(skills[i])+'】</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
+							}
+							dialog.addText(' <br> ');
+						}
+						if(player.isOnline()) player.send(func,list,event.videoId);
+						else if(player==game.me) func(list,event.videoId);
+						player.chooseControl(list);
+					}
+					else event.finish();
+					'step 3'
+					game.broadcastAll('closeDialog',event.videoId);
+					trigger.player.addTempSkill(result.control,'phaseUseEnd');
+				},
+			},
+			yifa:{
+				audio:2,
+				trigger:{target:'useCardToTargeted'},
+				forced:true,
+				logTarget:'player',
+				filter:function(event,player){
+					return player!=event.player&&(event.card.name=='sha'||
+					get.color(event.card)=='black'&&get.type(event.card)=='trick');
+				},
+				content:function(){
+					var target=trigger.player;
+					target.addTempSkill('yifa2');
+					target.addMark('yifa2',1,false);
+				},
+			},
+			yifa2:{
+				charlotte:true,
+				onremove:true,
+				intro:{content:'手牌上限-#'},
+				mod:{
+					maxHandcard:function(player,num){
+						return num-player.countMark('yifa2');
+					},
+				},
+			},
 			buchen:{
 				audio:2,
 				trigger:{player:'showCharacterAfter'},
@@ -446,7 +554,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				equipSkill:true,
 				filter:function(event,player){
 					return player!=event.player&&event.player.getHistory('useCard',function(card){
-						return get.type(card)!='basic';
+						return get.type(card.card)!='basic';
 					}).length>0&&event.player.countCards('he')>0&&player.getEquip('cheliji_feilunzhanyu');
 				},
 				logTarget:'player',
@@ -485,6 +593,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.attitude(player,lib.skill.caiwang.logTarget(event,player))<=0;
 				},
 				content:function(){
+					if(player!=game.me&&!player.isOnline()) game.delayx();
 					var target=lib.skill.caiwang.logTarget(trigger,player);
 					player[player.getStorage('naxiang2').contains(target)?'gainPlayerCard':'discardPlayerCard'](target,'he',true);
 				},
@@ -743,7 +852,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					cardUsable:function(card,player,target){
-						if(!card.cards||get.type(card)!='basic'||!(game.online?player==_status.currentPhase:player.isPhaseUsing())) return;
+						if(!card.cards||get.mode()=='guozhan'||get.type(card)!='basic'||!(game.online?player==_status.currentPhase:player.isPhaseUsing())) return;
 						for(var i of card.cards){
 							if(i.hasGaintag('zhuosheng')) return Infinity;
 						}
@@ -829,7 +938,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						silent:true,
 						firstDo:true,
 						filter:function(event,player){
-							if(event.name=='useCard') return get.type(event.card)=='basic'&&lib.skill.zhuosheng.filterx(event,player)&&event.addCount!==false;
+							if(event.name=='useCard') return get.mode()!='guozhan'&&get.type(event.card)=='basic'&&lib.skill.zhuosheng.filterx(event,player)&&event.addCount!==false;
 							return true;
 						},
 						content:function(){
@@ -1858,6 +1967,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huangzu:'黄祖（？－208年），东汉末年将领。刘表任荆州牧时，黄祖出任江夏太守。初平二年（191年），黄祖在与长沙太守孙坚交战时，其部下将孙坚射死，因此与孙家结下仇怨。之后，黄祖多次率部与东吴军队交战，射杀凌操、徐琨等人。建安十三年（208年），在与孙权的交战中，兵败被杀。',
 			cheliji:'彻里吉是历史小说《三国演义》中的虚构人物，西羌国王。蜀相诸葛亮伐魏，魏都督曹真驰书赴羌，国王彻里吉即命雅丹丞相与越吉元帅起羌兵一十五万、并战车直扣西平关。后军大败，越吉亡，雅丹被俘，亮将所获羌兵及车马器械，尽给还雅丹，俱放回国。彻里吉感蜀恩义，与之结盟。正史中没有关于彻里吉的记载。',
 			weiguan:'卫瓘（220年－291年），字伯玉。河东郡安邑县（今山西省夏县）人。三国曹魏后期至西晋初年重臣、书法家，曹魏尚书卫觊之子。卫瓘出身官宦世家，年轻时仕官于曹魏，历任尚书郎、散骑常侍、侍中、廷尉等职。后以镇西军司、监军身份参与伐蜀战争。蜀汉亡后，与钟会一道逮捕邓艾；钟会谋反时，又成功平息叛乱，命田续杀邓艾父子。回师后转任督徐州诸军事、镇东将军，封菑阳侯。西晋建立后，历任青州、幽州刺史、征东大将军等职，成功化解北方边境威胁，因功进爵菑阳公。后入朝为尚书令、侍中，又升任司空，领太子少傅。后逊位，拜太保。晋惠帝即位后，与贾皇后对立，终在政变中满门遇害，享年七十二岁。卫瓘善隶书及章草。不仅兼工各体，还能学古人之长，是颇有创意的书法家。唐朝张怀瓘《书断》中评其章草为“神品”。',
+			zhongyan:' 钟琰 (？—？年）颍川人，王浑之妻。生卒年不详，约魏末晋初间前后在世。王浑的妻子钟琰，是颍川人，为魏太傅钟繇的曾孙女，父亲钟徽，为黄门郎。她平时广泛阅读各种书籍，因此几岁的时候就能撰写文章。她聪慧弘雅，善于啸咏，她的礼仪法度，为中表所推崇，她写有文集五卷。',
 		},
 		characterTitle:{},
 		perfectPair:{},
@@ -1954,6 +2064,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shibao:'石苞',
 			zhuosheng:'擢升',
 			zhuosheng_info:'出牌阶段，①你使用本轮内获得的基本牌时无次数和距离限制。②你使用本轮内获得的普通锦囊牌选择目标后，可令此牌的目标数+1或-1。③你使用本轮内获得的装备牌时可以摸一张牌（以此法获得的牌不能触发〖擢升〗）。',
+			zhuosheng_info_guozhan:'出牌阶段，①你使用本轮内获得的基本牌时无距离限制。②你使用本轮内获得的普通锦囊牌选择目标后，可令此牌的目标数+1或-1。③你使用本轮内获得的装备牌时可以摸一张牌（以此法获得的牌不能触发〖擢升〗）。',
 			jin_yanghuiyu:'晋羊徽瑜',
 			jin_yanghuiyu_ab:'羊徽瑜',
 			gz_jin_yanghuiyu:'羊徽瑜',
@@ -1989,10 +2100,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhongyun_info:'锁定技。每名角色的回合限一次，你受伤/回复体力后，若你的体力值与手牌数相等，你回复一点体力或对你攻击范围内的一名角色造成1点伤害；每名角色的回合限一次，你获得手牌或失去手牌后，若你的体力值与手牌数相等，你摸一张牌或弃置一名其他角色一张牌。',
 			shenpin:'神品',
 			shenpin_info:'当一名角色的判定牌生效前，你可以打出一张与判定牌颜色不同的牌代替之。',
+			zhongyan:'钟琰',
+			bolan:'博览',
+			bolan_info:'出牌阶段开始时，你可从三个描述中包含“出牌阶段限一次”的技能中选择一个获得直到此阶段结束；其他角色的出牌阶段限一次，其可以失去1点体力，令你从三个描述中包含“出牌阶段限一次”的技能中选择一个，其获得此技能直到此阶段结束。',
+			yifa:'仪法',
+			yifa2:'仪法',
+			yifa_info:'锁定技，其他角色使用【杀】或黑色普通锦囊牌指定你为目标后，其手牌上限-1直到回合结束。',
 
 			yingbian_pack1:'文德武备·理',
 			yingbian_pack2:'文德武备·备',
 			yingbian_pack3:'文德武备·果',
+			yingbian_pack4:'文德武备·戒',
 		},
 	};
 });

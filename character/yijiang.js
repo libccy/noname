@@ -6189,6 +6189,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			shifei:{
 				audio:2,
+				audioname:['re_guotufengji'],
 				enable:['chooseToRespond','chooseToUse'],
 				filter:function(event,player){
 					if(!_status.currentPhase||event.shifei) return false;
@@ -12113,6 +12114,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinxianying:['re_xinxianying','xinxianying','ol_xinxianying','sp_xinxianying'],
 			gongsunyuan:['re_gongsunyuan','gongsunyuan'],
 			zhoucang:['re_zhoucang','zhoucang'],
+			guotufengji:['re_guotufengji','guotufengji'],
 		},
 		translate:{
 			old_huaxiong:'华雄',

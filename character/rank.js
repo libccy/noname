@@ -470,6 +470,8 @@ window.noname_character_rank={
 		'ns_chentai',
 		'ns_yanghu',
 		'ns_zhangning',
+		'huangchengyan',
+		'zhongyan',
 	],
 	bp:[
 		'chess_diaochan',
@@ -674,6 +676,10 @@ window.noname_character_rank={
 		'nanhualaoxian',
 		'ns_sunyi',
 		'key_kyouko',
+		're_guotufengji',
+		'shen_guojia',
+		'ol_jiangwei',
+		'key_tenzen',
 	],
 	b:[
 		'diy_feishi',
@@ -854,6 +860,7 @@ window.noname_character_rank={
 		'cheliji',
 		'shibao',
 		'zhangmiao',
+		'ol_zhurong',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1067,6 +1074,7 @@ window.noname_character_rank={
 		'junk_simayi',
 		'key_youta',
 		'old_chenqun',
+		'duanwei',
 	],
 	rarity:{
 		legend:[
@@ -1171,6 +1179,7 @@ window.noname_character_rank={
 			're_sunben',
 			'ol_dingyuan',
 			'wujing',
+			'shen_guojia',
 			'key_tomoya',
 			'key_masato',
 			'key_shiorimiyuki',
@@ -1184,6 +1193,9 @@ window.noname_character_rank={
 			'key_shiroha',
 			'key_hina',
 			'key_sakuya',
+			'key_yuuki',
+			'key_kyouko',
+			'key_tenzen',
 			'noname',
 		],
 		epic:[
@@ -1374,8 +1386,7 @@ window.noname_character_rank={
 			'key_chihaya',
 			'key_yukito',
 			'key_kotomi',
-			'key_yuuki',
-			'key_kyouko',
+			'zhongyan',
 			'kaisa',
 		],
 		rare:[
@@ -1657,6 +1668,10 @@ window.noname_character_rank={
 			're_zhoucang',
 			'sp_mifuren',
 			'cheliji',
+			're_guotufengji',
+			'ol_jiangwei',
+			'ol_zhurong',
+			'huangchengyan',
 		],
 		junk:[
 			'sunshao',

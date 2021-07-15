@@ -640,7 +640,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			muniu_skill7:{
 				trigger:{player:'loseEnd'},
 				firstDo:true,
-				silent:true,
+				forced:true,
+				//silent:true,
 				filter:function(event,player){
 					if(!event.ss||!event.ss.length||event.parent.name=='lose_muniu') return false;
 					var muniu=player.getEquip('muniu');
@@ -950,6 +951,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			muniu:'木牛流马',
 			muniu_bg:'牛',
 			muniu_skill:'木牛',
+			muniu_skill7:'木牛流马',
 			muniu_skill_bg:'辎',
 			muniu_info:'出牌阶段限一次，你可以将一张手牌扣置于你装备区里的【木牛流马】下，若如此做，你可以将此装备移动到一名其他角色的装备区里；你可以将此装备牌下的牌如手牌般使用或打出。',
 			muniu_skill_info:'出牌阶段限一次，你可以将一张手牌扣置于你装备区里的【木牛流马】下，若如此做，你可以将此装备移动到一名其他角色的装备区里；你可以将此装备牌下的牌如手牌般使用或打出。',

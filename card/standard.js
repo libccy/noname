@@ -2399,6 +2399,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						game.players[i].hideTimer();
 					}
 					'step 8'
+					if(event.wuxieresult&&event.wuxieresult2&&event.wuxieresult2.skill){
+						var info=get.info(event.wuxieresult2.skill);
+						if(info&&info.precontent&&!game.online){
+							var next=game.createEvent('pre_'+event.wuxieresult2);
+							next.setContent(info.precontent);
+							next.set('result',event.wuxieresult2);
+							next.set('player',event.wuxieresult);
+						}
+					}
+					'step 9'
 					if(event.wuxieresult){
 						var next=event.wuxieresult.useResult(event.wuxieresult2);
 						if(event.stateplayer&&event.statecard) next.respondTo=[event.stateplayer,event.statecard];
@@ -2406,7 +2416,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							next.respondTo=[trigger.player,trigger.card];
 						}
 					}
-					'step 9'
+					'step 10'
 					if(event.wuxieresult){
 						if(result.wuxied){
 							event.nowuxie=result.nowuxie;
