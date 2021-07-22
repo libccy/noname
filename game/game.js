@@ -5768,7 +5768,7 @@
 						else{
 							map.connect_change_card.show();
 						}
-						if(config.connect_doudizhu_mode=='kaihei'||config.connect_doudizhu_mode=='huanle'||config.connect_doudizhu_mode=='online'){
+						if(config.connect_doudizhu_mode!='normal'){
 							map.connect_double_character.hide();
 						}
 						else{
@@ -5782,6 +5782,7 @@
 							normal:'休闲',
 							kaihei:'开黑',
 							huanle:'欢乐',
+							binglin:'兵临',
 							online:'智斗',
 						},
 						restart:true,
@@ -5812,7 +5813,7 @@
 							map.edit_character.hide();
 							map.reset_character.hide();
 						}
-						if(config.doudizhu_mode=='kaihei'||config.doudizhu_mode=='huanle'||config.doudizhu_mode=='online'){
+						if(config.doudizhu_mode!='normal'){
 							map.double_character.hide();
 							map.free_choose.hide();
 							map.change_identity.hide();
@@ -5834,7 +5835,7 @@
 							map.choice_fan.show();
 							map.revive.show();
 						}
-						if(config.double_character&&config.doudizhu_mode!='kaihei'&&config.doudizhu_mode!='huanle'){
+						if(config.double_character&&config.doudizhu_mode=='normal'){
 							map.double_hp.show();
 						}
 						else{
@@ -5848,6 +5849,7 @@
 							normal:'休闲',
 							kaihei:'开黑',
 							huanle:'欢乐',
+							binglin:'兵临',
 							online:'智斗',
 						},
 						restart:true,
@@ -49829,6 +49831,7 @@
 				switch(config.doudizhu_mode){
 					case 'kaihei':return '开黑斗地主';
 					case 'huanle':return '欢乐斗地主';
+					case 'binglin':return '兵临城下';
 					case 'online':return '智斗三国';
 					default:return '休闲'+(config.double_character?'双将':'')+'斗地主';
 				}

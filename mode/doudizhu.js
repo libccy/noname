@@ -27,12 +27,39 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				game.prepareArena(3);
 			}
 			"step 1"
+			event.replacePile=function(){
+				var map={
+					shuiyanqijunx:'shuiyanqijuny',
+					bingliang:'binglinchengxia',
+					fangtian:'toushiche',
+					wutiesuolian:'toushiche',
+				};
+				for(var i=0;i<lib.card.list.length;i++){
+					var name=lib.card.list[i][2];
+					if(map[name]){
+						lib.card.list[i][2]=map[name];
+						lib.card.list[i][4]=null;
+						lib.card.list[i]._replaced=true;
+					}
+					else if(name=='lebu'){
+						switch(lib.card.list[i][0]){
+							case 'spade': lib.card.list[i][2]='shuiyanqijuny';break;
+							case 'club': lib.card.list[i][2]='luojingxiashi';break;
+							default: lib.card.list[i][2]='baiyidujiang';break;
+						}
+						lib.card.list[i]._replaced=true;
+					}
+				}
+			}
 			_status.mode=get.config('doudizhu_mode');
 			if(_status.connectMode){
 				_status.mode=lib.configOL.doudizhu_mode;
 				game.waitForPlayer(function(){
 						lib.configOL.number=3;
 				});
+			}
+			else if(_status.mode=='binglin'){
+				event.replacePile();
 			}
 			else if(_status.mode=='online'){
 				lib.card.list=lib.online_cardPile.slice(0);
@@ -46,6 +73,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					lib.inpile.addArray(['nanman','wanjian','taoyuan','wugu']);
 					game.fixedPile=true;
 				}
+				else if(_status.mode=='binglin') event.replacePile();
 				if(lib.configOL.number<3){
 					lib.configOL.number=3;
 				}
@@ -100,6 +128,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(lib.character[player.name2]&&get.infoHp(lib.character[player.name2][2])>3) num++;
 					}
 					return num;
+				};
+			}
+			else if(_status.mode=='binglin'){
+				next.num=function(player){
+					return (player==game.zhu?5:4);
 				};
 			}
 			if(_status.mode!='online'&&_status.connectMode&&lib.configOL.change_card) game.replaceHandcards(game.players.slice(0));
@@ -196,6 +229,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					case 'normal':namex='休闲斗地主';break;
 					case 'kaihei':namex='开黑斗地主';break;
 					case 'huanle':namex='欢乐斗地主';break;
+					case 'binglin':namex='兵临城下';break;
 					case 'online':namex='智斗三国';break;
 				}
 				var name=[
@@ -226,7 +260,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			checkResult:function(){
 				var me=game.me._trueMe||game.me;
 				if(game.zhu.isAlive()){
-					if(_status.mode!='online'&&game.players.length>1) return;
+					if(_status.mode!='online'&&(_status.mode!='binglin'||game.roundNumber<3)&&game.players.length>1) return;
 					if(me==game.zhu){
 						game.over(true);
 					}
@@ -288,7 +322,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.dialog=ui.create.dialog('你的选将框与底牌',[event.map[game.me.playerid],'character'],game.me.storage.doudizhu_cardPile);
 					event.start=game.players.randomGet();
 					event.current=event.start;
-					game.delay(4);
+					game.delay(7);
 					"step 2"
 					if(event.current==game.me) event.dialog.content.firstChild.innerHTML='是否叫地主？';
 					else{
@@ -354,7 +388,102 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},500);
 				});
 			},
-			
+			chooseCharacterBinglin:function(){
+				var next=game.createEvent('chooseCharacter',false);
+				next.setContent(function(){
+					"step 0"
+					game.no_continue_game=true;
+					lib.init.onfree();
+					"step 1"
+					ui.arena.classList.add('choose-character');
+					game.zhuSkill='zhuSkill_'+['xiangyang','jiangling','fancheng'].randomGet();
+					var i;
+					event.list=[];
+					event.map={};
+					for(i in lib.character){
+						if(lib.filter.characterDisabled(i)) continue;
+						event.list.push(i);
+					}
+					event.list.randomSort();
+					_status.characterlist=event.list.slice(0);
+					for(var player of game.players){
+						event.map[player.playerid]=event.list.randomRemove(4);
+					}
+					event.controls=['不叫地主','一倍','两倍','三倍'];
+					event.dialog=ui.create.dialog('本局城池：'+get.translation(game.zhuSkill),[event.map[game.me.playerid],'character']);
+					event.start=game.players.randomGet();
+					event.current=event.start;
+					game.delay(8);
+					"step 2"
+					event.current.classList.add('glow_phase');
+					if(event.current==game.me) event.dialog.content.firstChild.innerHTML='是否叫地主？';
+					else{
+						event.dialog.content.firstChild.innerHTML='请等待其他玩家叫地主';
+						game.delay(2);
+					}
+					event.current.chooseControl(event.controls).set('ai',function(){
+						return _status.event.getParent().controls.randomGet();
+					});
+					"step 3"
+					event.current.classList.remove('glow_phase');
+					event.current._control=result.control;
+					event.current.chat(result.control);
+					if(result.control=='三倍'){
+						game.bonusNum=3;
+						game.zhu=event.current;
+						return;
+					}
+					else if(result.control!='不叫地主'){
+						event.controls.splice(1,event.controls.indexOf(result.control));
+						event.tempDizhu=event.current;
+						if(result.control=='二倍') game.bonusNum=2;
+					}
+					event.current=event.current.next;
+					if(event.current==event.start){
+						game.zhu=event.tempDizhu||event.start.previous;
+					}
+					else event.goto(2);
+					if(event.current==event.start.previous&&!event.tempDizhu) event.controls.remove('不叫地主');
+					"step 4"
+					for(var player of game.players){
+						player.identity=player==game.zhu?'zhu':'fan';
+						player.showIdentity();
+					}
+					event.dialog.close();
+					event.map[game.zhu.playerid].addArray(event.list.randomRemove(3));
+					"step 5"
+					var list=['请选择你的武将',[event.map[game.me.playerid],'character']];
+					if(game.me.identity=='fan'){
+						var friend=game.findPlayer(function(current){
+							return current!=game.me&&current.identity=='fan';
+						});
+						list.push('<div class="text center">队友的选将框</div>');
+						list.push([event.map[friend.playerid],'character']);
+					}
+					game.me.chooseButton(list,true).set('list',event.map[game.me.playerid]).set('filterButton',function(button){
+						return _status.event.list.contains(button.link);
+					});
+					"step 6"
+					game.me.init(result.links[0]);
+					for(var player of game.players){
+						if(player!=game.me) player.init(event.map[player.playerid].randomGet());
+						if(player==game.zhu){
+							player.addSkill(game.zhuSkill);
+						}
+						else player.addSkill(['binglin_shaxue','binglin_neihong']);
+					}
+					game.zhu.hp++;
+					game.zhu.maxHp++;
+					game.zhu.update();
+					for(var i=0;i<game.players.length;i++){
+						_status.characterlist.remove(game.players[i].name1);
+						_status.characterlist.remove(game.players[i].name2);
+					}
+					setTimeout(function(){
+						ui.arena.classList.remove('choose-character');
+					},500);
+				});
+			},
 			chooseCharacterHuanle:function(){
 				var next=game.createEvent('chooseCharacter',false);
 				next.setContent(function(){
@@ -530,6 +659,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				if(_status.mode=='online'){
 					game.chooseCharacterZhidou();
+					return;
+				}
+				if(_status.mode=='binglin'){
+					game.chooseCharacterBinglin();
 					return;
 				}
 				var next=game.createEvent('chooseCharacter',false);
@@ -1013,7 +1146,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(player.identity=='fan') player._friend=(player.next.identity=='fan'?player.next:player.previous);
 						map[player.playerid]=player._characterChoice;
 					}
-					game.broadcast(function(map){
+					game.broadcastAll(function(map){
 						for(var i in map){
 							lib.playerOL[i]._characterChoice=map[i];
 						}
@@ -1203,6 +1336,150 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},500);
 				});
 			},
+			chooseCharacterBinglinOL:function(){
+				var next=game.createEvent('chooseCharacter',false);
+				next.setContent(function(){
+					"step 0"
+					ui.arena.classList.add('choose-character');
+					var i;
+					var libCharacter={};
+					for(var i=0;i<lib.configOL.characterPack.length;i++){
+						var pack=lib.characterPack[lib.configOL.characterPack[i]];
+						for(var j in pack){
+							if(j=='zuoci') continue;
+							if(lib.character[j]) libCharacter[j]=pack[j];
+						}
+					}
+					event.list=[];
+					event.map={};
+					for(i in libCharacter){
+						if(lib.filter.characterDisabled(i,libCharacter)) continue;
+						event.list.push(i);
+					}
+					event.list.randomSort();
+					_status.characterlist=event.list.slice(0);
+					event.controls=['不叫地主','一倍','两倍','三倍'];
+					for(var player of game.players){
+						var id=player.playerid;
+						event.map[id]=event.list.randomRemove(4);
+					}
+					event.start=game.players.randomGet();
+					event.current=event.start;
+					
+					event.videoId=lib.status.videoId++;
+					game.zhuSkill='zhuSkill_'+['xiangyang','jiangling','fancheng'].randomGet();
+					game.broadcastAll(function(map,id,skill){
+						ui.create.dialog('本局城池：'+get.translation(skill),[map[game.me.playerid],'character']).videoId=id;
+					},event.map,event.videoId,game.zhuSkill);
+					game.delay(6);
+					"step 1"
+					game.broadcastAll(function(id,current){
+						var dialog=get.idDialog(id);
+						if(dialog){
+							if(game.me==current) dialog.content.firstChild.innerHTML='是否叫地主？';
+							else dialog.content.firstChild.innerHTML='请等待其他玩家叫地主';
+						}
+					},event.videoId,event.current);
+					if(event.current!=game.me&&!event.current.isOnline()) game.delay(2);
+					event.current.chooseControl(event.controls).set('ai',function(){
+						return _status.event.getParent().controls.randomGet();
+					});
+					"step 2"
+					event.current._control=result.control;
+					event.current.chat(result.control);
+					if(result.control=='三倍'){
+						game.bonusNum=3;
+						game.zhu=event.current;
+						return;
+					}
+					else if(result.control!='不叫地主'){
+						event.controls.splice(1,event.controls.indexOf(result.control));
+						event.tempDizhu=event.current;
+						if(result.control=='二倍') game.bonusNum=2;
+					}
+					event.current=event.current.next;
+					if(event.current==event.start){
+						game.zhu=event.tempDizhu||event.start;
+					}
+					else event.goto(1);
+					if(event.current==event.start.previous&&!event.tempDizhu) event.controls.remove('不叫地主');
+					"step 3"
+					for(var player of game.players){
+						player.identity=player==game.zhu?'zhu':'fan';
+						player.showIdentity();
+						player.identityShown=true;
+						player._characterChoice=event.map[player.playerid];
+					}
+					event.map[game.zhu.playerid].addArray(event.list.randomRemove(3));
+					game.broadcastAll(function(id,map){
+						var dialog=get.idDialog(id);
+						if(dialog) dialog.close();
+						game.me._characterChoice=map[game.me.playerid];
+					},event.videoId,event.map);
+					var list=[];
+					for(var i=0;i<game.players.length;i++){
+						var dialog=['请选择武将',[event.map[game.players[i].playerid],'character']];
+						if(game.players[i].identity=='fan'){
+							var friend=game.findPlayer(function(current){
+								return current!=game.players[i]&&current.identity=='fan';
+							});
+							dialog.push('<div class="text center">队友的选将框</div>');
+							dialog.push([event.map[friend.playerid],'character']);
+						}
+						list.push([game.players[i],dialog,true,function(){return Math.random()},function(button){
+							return _status.event.player._characterChoice.contains(button.link);
+						}]);
+					}
+					game.me.chooseButtonOL(list,function(player,result){
+						if(game.online||player==game.me) player.init(result.links[0]);
+					});
+					"step 4"
+					for(var i in lib.playerOL){
+						if(!result[i]||result[i]=='ai'||!result[i].links||!result[i].links.length){
+							result[i]=event.map[i].randomGet();
+						}
+						else{
+							result[i]=result[i].links[0];
+						}
+						if(!lib.playerOL[i].name){
+							lib.playerOL[i].init(result[i]);
+						}
+					}
+					
+					game.zhu.maxHp++;
+					game.zhu.hp++;
+					game.zhu.update();
+					
+					game.broadcast(function(result,zhu){
+						for(var i in result){
+							if(!lib.playerOL[i].name){
+								lib.playerOL[i].init(result[i]);
+							}
+						}
+						game.zhu=zhu;
+						zhu.maxHp++;
+						zhu.hp++;
+						zhu.update();
+						
+						setTimeout(function(){
+							ui.arena.classList.remove('choose-character');
+						},500);
+					},result,game.zhu);
+					for(var player of game.players){
+						if(player==game.zhu){
+							player.addSkill(game.zhuSkill);
+						}
+						else player.addSkill(['binglin_shaxue','binglin_neihong']);
+					}
+					for(var i=0;i<game.players.length;i++){
+						_status.characterlist.remove(game.players[i].name1);
+						_status.characterlist.remove(game.players[i].name2);
+					}
+					setTimeout(function(){
+						ui.arena.classList.remove('choose-character');
+					},500);
+				});
+			},
 			chooseCharacterZhidouOL:function(){
 				var next=game.createEvent('chooseCharacter',false);
 				next.setContent(function(){
@@ -1353,6 +1630,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				else if(_status.mode=='online'){
 					game.chooseCharacterZhidouOL();
+					return;
+				}
+				else if(_status.mode=='binglin'){
+					game.chooseCharacterBinglinOL();
 					return;
 				}
 				var next=game.createEvent('chooseCharacter',false);
@@ -1509,6 +1790,29 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			zhadan_info:'当一张牌被使用时，对此牌使用。取消此牌的所有目标，且本局游戏的底价翻倍。',
 			jiwangkailai:'继往开来',
 			jiwangkailai_info:'出牌阶段，对包含你自己在内的一名角色使用。目标角色选择一项：①弃置所有手牌，然后摸等量的牌。②将所有手牌当做一张不为【继往开来】的普通锦囊牌使用。',
+			zhuSkill_xiangyang:'襄阳',
+			zhuSkill_xiangyang_info:'回合结束时，你可获得一个额外的出牌阶段或摸牌阶段。',
+			zhuSkill_jiangling:'江陵',
+			zhuSkill_jiangling_info:'当你使用【杀】或普通锦囊牌选择唯一目标时，你可为此牌增加一个目标。',
+			zhuSkill_fancheng:'樊城',
+			zhuSkill_fancheng2:'樊城',
+			zhuSkill_fancheng_info:'限定技，出牌阶段，你可获得如下效果：每回合限两次，当你造成伤害时，此伤害+1。',
+			binglin_shaxue:'歃血',
+			binglin_shaxue_info:'锁定技，每局游戏限三次，当你受到队友造成的伤害时，你防止此伤害。',
+			binglin_neihong:'内讧',
+			binglin_neihong_info:'锁定技，当你杀死队友后，你所在的阵营视为游戏失败。',
+			baiyidujiang:'白衣渡江',
+			baiyidujiang_info:'出牌阶段，对地主使用。你选择一项：①令其将手牌数摸至全场最多。②令其将手牌数弃置至全场最少。',
+			shuiyanqijuny:'水淹七军',
+			shuiyanqijuny_info:'出牌阶段，对至多两名角色使用。目标角色受到1点雷属性伤害，然后若其：是第一个目标，其弃置一张牌；不是第一个目标，其摸一张牌。',
+			luojingxiashi:'落井下石',
+			luojingxiashi_info:'出牌阶段，对所有其他的已受伤角色使用。目标角色受到1点伤害。',
+			binglinchengxia:'兵临城下',
+			binglinchengxia_info:'出牌阶段，对一名其他角色使用。将此牌横置于目标角色的判定区内。目标角色于判定阶段进行判定，若判定结果不为♦，则其弃置装备区内的所有牌或受到1点伤害。',
+			toushiche:'投石车',
+			toushiche_skill:'投石车',
+			toushiche_info:'锁定技，结束阶段开始时，你令所有手牌数大于你的角色依次弃置一张手牌。',
+			_binglin_bingjin:'兵尽',
 		},
 		element:{
 			player:{
@@ -1555,7 +1859,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				dieAfter:function(source){
-					game.checkResult();
+					if(_status.mode=='binglin'&&source&&this!=source&&this.identity==source.identity&&source.hasSkill('binglin_neihong')){
+						if(game.me==game.zhu){
+							game.over(true);
+						}
+						else{
+							game.over(false);
+						}
+					}
+					else game.checkResult();
 				},
 				logAi:function(targets,card){},
 				showIdentity:function(){
@@ -1586,6 +1898,138 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			_binglin_bingjin:{
+				trigger:{player:'phaseEnd'},
+				forced:true,
+				ruleSkill:true,
+				filter:function(event,player){
+					return game.roundNumber>14;
+				},
+				content:function(){
+					player.loseHp();
+				},
+			},
+			zhuSkill_xiangyang:{
+				trigger:{player:'phaseEnd'},
+				charlotte:true,
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseControl('摸牌阶段','出牌阶段','cancel2').set('prompt','襄阳：是否执行一个额外的阶段？');
+					'step 1'
+					if(result.control!='cancel2'){
+						player.logSkill(event.name);
+						var next=player[result.index?'phaseUse':'phaseDraw']();
+						event.next.remove(next);
+						trigger.next.push(next);
+					}	
+				},
+			},
+			zhuSkill_jiangling:{
+				trigger:{player:'useCard2'},
+				direct:true,
+				charlotte:true,
+				filter:function(event,player){
+					if(event.card.name!='sha'&&get.type(event.card)!='trick') return false;
+					if(!event.targets||event.targets.length!=1) return false;
+					var info=get.info(event.card);
+					if(info.allowMultiple==false) return false;
+					if(event.targets&&!info.multitarget){
+						if(game.hasPlayer(function(current){
+							return !event.targets.contains(current)&&lib.filter.targetEnabled2(event.card,player,current)&&lib.filter.targetInRange(event.card,player,current);
+						})){
+							return true;
+						}
+					}
+					return false;
+				},
+				content:function(){
+					'step 0'
+					var prompt2='为'+get.translation(trigger.card)+'增加一个目标'
+					player.chooseTarget(get.prompt('zhuSkill_jiangling'),function(card,player,target){
+						var player=_status.event.player;
+						if(_status.event.targets.contains(target)) return false;
+						return lib.filter.targetEnabled2(_status.event.card,player,target)&&lib.filter.targetInRange(_status.event.card,player,target);
+					}).set('prompt2',prompt2).set('ai',function(target){
+						var trigger=_status.event.getTrigger();
+						var player=_status.event.player;
+						return get.effect(target,trigger.card,player,player)*(_status.event.targets.contains(target)?-1:1);
+					}).set('targets',trigger.targets).set('card',trigger.card);
+					'step 1'
+					if(result.bool){
+						if(!event.isMine()&&!event.isOnline()) game.delayx();
+						event.targets=result.targets;
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if(event.targets){
+						player.logSkill('zhuSkill_jiangling',event.targets);
+						if(trigger.targets.contains(event.targets[0])) trigger.targets.removeArray(event.targets);
+						else trigger.targets.addArray(event.targets);
+					}
+				},
+			},
+			zhuSkill_fancheng:{
+				enable:'phaseUse',
+				limited:true,
+				charlotte:true,
+				skillAnimation:true,
+				animationColor:'gray',
+				content:function(){
+					player.awakenSkill('zhuSkill_fancheng');
+					player.addTempSkill('zhuSkill_fancheng2');
+				},
+			},
+			zhuSkill_fancheng2:{
+				trigger:{source:'damageBegin2'},
+				forced:true,
+				charlotte:true,
+				usable:2,
+				logTarget:'player',
+				content:function(){
+					trigger.num++;
+				},
+			},
+			binglin_shaxue:{
+				init:function(player,skill){
+					player.addMark(skill,3,false);
+				},
+				trigger:{player:'damageBegin3'},
+				forced:true,
+				charlotte:true,
+				filter:function(event,player){
+					return event.source&&player!=event.source&&player.identity==event.source.identity&&player.countMark('binglin_shaxue')>0;
+				},
+				content:function(){
+					trigger.cancel();
+					player.removeMark('binglin_shaxue',1,false);
+				},
+				intro:{content:'剩余次数：#'},
+			},
+			binglin_neihong:{charlotte:true},
+			toushiche_skill:{
+				trigger:{player:'phaseJieshuBegin'},
+				forced:true,
+				filter:function(event,player){
+				 return lib.skill.toushiche_skill.logTarget(null,player).length>0;
+				},
+				logTarget:function(event,player){
+					var hs=player.countCards('h');
+					return game.filterPlayer(function(current){
+						return current!=player&&current.countCards('h')>hs;
+					});
+				},
+				content:function(){
+					'step 0'
+					event.targets=lib.skill.toushiche_skill.logTarget(null,player).sortBySeat();
+					'step 1'
+					var target=targets.shift();
+					if(target.countCards('h')>0) target.chooseToDiscard('h',true);
+					if(targets.length) event.redo();
+				},
+			},
 			_gongshoujintui:{
 				enable:'chooseToUse',
 				filter:function(event,player){
@@ -1713,7 +2157,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseJudgeBegin'},
 				direct:true,
 				filter:function(event,player){
-					return _status.mode!='online'&&player==game.zhu&&player.countCards('j')&&player.countCards('h')>1;
+					return _status.mode!='online'&&_status.mode!='binglin'&&player==game.zhu&&player.countCards('j')&&player.countCards('h')>1;
 				},
 				content:function(){
 					"step 0"
@@ -1730,14 +2174,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				filter:function(event,player){
-					return _status.mode!='online'&&player==game.zhu;
+					return _status.mode!='online'&&_status.mode!='binglin'&&player==game.zhu;
 				},
 				content:function(){
 					player.draw();
 				},
 				mod:{
 					cardUsable:function(card,player,num){
-						if(_status.mode!='online'&&player==game.zhu&&card.name=='sha') return num+1;
+						if(_status.mode!='online'&&_status.mode!='binglin'&&player==game.zhu&&card.name=='sha') return num+1;
 					},
 				},
 			},
@@ -1747,7 +2191,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				popup:false,
 				filter:function(event,player){
-					return _status.mode!='online'&&event.player.identity==player.identity;
+					return _status.mode!='online'&&_status.mode!='binglin'&&event.player.identity==player.identity;
 				},
 				content:function(){
 					player.chooseDrawRecover(2);
@@ -2060,6 +2504,208 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		card:{
+			baiyidujiang:{
+				fullskin:true,
+				enable:true,
+				filterTarget:function(card,player,target){
+					return target==game.zhu;
+				},
+				selectTarget:-1,
+				type:'trick',
+				content:function(){
+					'step 0'
+					if(!player.isIn()||!target.isIn()){
+						event.finish();
+						return;
+					}
+					var num1=0,num2=Infinity,str=get.translation(target);
+					game.countPlayer(function(current){
+						var num=current.countCards('h');
+						if(num>num1) num1=num;
+						if(num<num2) num2=num;
+					});
+					var num=target.countCards('h'),choices=[];
+					event.addIndex=0;
+					if(num<num1){
+						choices.push('令'+str+'将手牌摸至'+get.cnNumber(num1)+'张');
+						event.num1=num1;
+					}
+					else event.addIndex++;
+					if(num>num2){
+						choices.push('令'+str+'将手牌弃置至'+get.cnNumber(num2)+'张');
+						event.num2=num2;
+					}
+					if(!choices.length) event.finish();
+					else if(choices.length==1) event._result={index:0};
+					else player.chooseControl().set('choiceList',choices).set('ai',function(){
+						var evt=_status.event.getParent();
+						return get.attitude(evt.player,evt.target)>0?1:0;
+					});
+					'step 1'
+					if(result.index+event.addIndex==0){
+						target.drawTo(event.num1);
+					}
+					else target.chooseToDiscard(true,'h',target.countCards('h')-event.num2);
+				},
+				ai:{
+					order:6,
+					value:4,
+					useful:2,
+					tag:{
+						draw:1,
+						loseCard:1,
+					},
+					result:{
+						target:function(player,target,card,isLink){
+							var num1=0,num2=Infinity,str=get.translation(target);
+							game.countPlayer(function(current){
+								var num=current.countCards('h',function(cardx){
+										if(ui.selected.cards.contains(cardx)) return false;
+										if(card.cards&&card.cards.contains(cardx)) return false;
+										return true;
+								});
+								if(num>num1) num1=num;
+								if(num<num2) num2=num;
+							});
+							var num=target.countCards('h',function(cardx){
+								if(ui.selected.cards.contains(cardx)) return false;
+								if(card.cards&&card.cards.contains(cardx)) return false;
+								return true;
+							});
+							if(num1>num){
+								if(get.attitude(player,target)>0) return (num1-num)/1.2;
+							}
+							if(num2<num){
+								if(get.attitude(player,target)>0) return (num2-num)/1.2;
+							}
+							return 0;
+						}
+					}
+				}
+			},
+			shuiyanqijuny:{
+				fullskin:true,
+				cardimage:'shuiyanqijunx',
+				enable:true,
+				filterTarget:true,
+				type:'trick',
+				selectTarget:[1,2],
+				content:function(){
+					target.damage('thunder');
+					if(num>0) target.draw();
+					else target.chooseToDiscard('he',true);
+				},
+				ai:{
+					order:6,
+					value:4,
+					useful:2,
+					tag:{
+						damage:1,
+						thunderDamage:1,
+						natureDamage:1,
+						loseCard:1,
+					},
+					result:{
+						target:function(player,target){
+							if(!ui.selected.targets.length) return -1.5;
+							return -0.5
+						}
+					}
+				}
+			},
+			luojingxiashi:{
+				fullskin:true,
+				enable:true,
+				type:'trick',
+				selectTarget:-1,
+				filterTarget:function(card,player,target){
+					return target!=player&&target.isDamaged();
+				},
+				content:function(){
+					target.damage();
+				},
+				ai:{
+					order:3,
+					value:4,
+					useful:2,
+					tag:{
+						loseCard:1,
+					},
+					result:{
+						target:-1.5,
+					}
+				}
+			},
+			binglinchengxia:{
+				fullskin:true,
+				type:'delay',
+				filterTarget:function(card,player,target){
+					return (lib.filter.judge(card,player,target)&&player!=target);
+				},
+				judge:function(card){
+					if(get.suit(card)=='diamond') return 0;
+					return -3;
+				},
+				effect:function(){
+					'step 0'
+					if(result.bool==false){
+						if(!player.countCards('e',function(card){
+							return lib.filter.cardDiscardable(card,player,'shuiyanqijuny');
+						})){
+							player.damage('nosource');
+							event.finish();
+							return;
+						}
+						else player.chooseControl('discard_card','take_damage',function(event,player){
+							if(get.damageEffect(player,event.player,player)>=0){
+								return 'take_damage';
+							}
+							if(player.hp>=3&&player.countCards('e')>=2){
+								return 'take_damage';
+							}
+							return 'discard_card';
+						});
+					}
+					else event.finish();
+					'step 1'
+					if(result.control=='discard_card'){
+						player.discard(player.getCards('e',function(card){
+							return lib.filter.cardDiscardable(card,player,'shuiyanqijuny');
+						}));
+					}
+					else player.damage('nosource');
+				},
+				ai:{
+					order:1,
+					value:3,
+					useful:2,
+					tag:{
+						damage:1,
+						loseCard:1,
+					},
+					result:{
+						target:function(player,target,card,isLink){
+							var es=target.getCards('e');
+							if(!es.length) return -1.5;
+							var val=0;
+							for(var i of es) val+=get.value(i,target);
+							return -Math.min(1.5,val/5);
+						}
+					}
+				}
+			},
+			toushiche:{
+				fullskin:true,
+				type:'equip',
+				subtype:'equip1',
+				distance:{attackFrom:-3},
+				ai:{
+					basic:{
+						equipValue:2.5
+					}
+				},
+				skills:['toushiche_skill']
+			},
 			gongshoujianbei:{
 				fullskin:true,
 				type:'trick',
