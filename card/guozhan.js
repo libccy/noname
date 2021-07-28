@@ -425,10 +425,31 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target!=player&&(get.mode()!='guozhan'||_status.mode=='yingbian'||_status.mode=='free'||target.countCards('e')>0);
 				},
 				enable:true,
-				yingbian_prompt:'此牌的效果改为依次执行所有选项',
+				yingbian_prompt:function(card){
+					var str='';
+					if(get.cardtag(card,'yingbian_all')){
+						str+='此牌的效果改为依次执行所有选项';
+					}
+					if(!str.length||get.cardtag(card,'yingbian_add')){
+						if(str.length) str+='；';
+						str+='当你使用此牌选择目标后，你可为此牌增加一个目标';
+					}
+					return str;
+				},
+				yingbian:function(event){
+					var card=event.card,bool=false;
+					if(get.cardtag(card,'yingbian_all')){
+						bool=true;
+						card.yingbian_all=true;
+						game.log(card,'执行所有选项');
+					}
+					if(!bool||get.cardtag(card,'yingbian_add')){
+						event.yingbian_addTarget=true;
+					}
+				},
 				content:function(){
 					'step 0'
-					if(event.card.yingbian){
+					if(event.card.yingbian_all){
 						target.discard(target.getCards('e',function(card){
 							return lib.filter.cardDiscardable(card,target,'shuiyanqijunx');
 						}));
@@ -485,13 +506,21 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					yingbian:function(card,player,targets,viewer){
 						if(get.attitude(viewer,player)<=0) return 0;
-						if(targets.filter(function(current){
-							return get.damageEffect(current,player,player,'thunder')>0&&current.countCards('e',function(card){
-								return get.value(card,current)<=0;
-							})<2&&current.countCards('e',function(card){
-								return get.value(card,current)>0;
-							})>0;
-						}).length) return 6;
+						var base=0;
+						if(get.cardtag(card,'yingbian_all')){
+							if(targets.filter(function(current){
+								return get.damageEffect(current,player,player,'thunder')>0&&current.countCards('e',function(card){
+									return get.value(card,current)<=0;
+								})<2&&current.countCards('e',function(card){
+									return get.value(card,current)>0;
+								})>0;
+							}).length) base+=6;
+						}
+						if(get.cardtag(card,'yingbian_add')){
+							if(game.hasPlayer(function(current){
+								return !targets.contains(current)&&lib.filter.targetEnabled2(card,player,current)&&get.effect(current,card,player,player)>0;
+							})) base+=6;
+						}
 						return 0;
 					},
 					result:{

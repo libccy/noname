@@ -351,7 +351,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//界曹彰
 			xinjiangchi:{
-				trigger:{player:'phaseDrawEnd'},
+				trigger:{player:'phaseUseBegin'},
 				direct:true,
 				content:function(){
 					'step 0'
@@ -362,9 +362,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.countCards('he',function(card){
 						return lib.filter.cardDiscardable(card,player,'xinjiangchi')>0;
 					})>0) list.push('弃置一张牌，本回合可以多使用一张【杀】且无距离限制');
-					player.chooseControl('cancel2').set('prompt',get.prompt('xinjiangchi')).set('choiceList',list);
+					player.chooseControl('cancel2').set('prompt',get.prompt('xinjiangchi')).set('choiceList',list).set('ai',function(){
+						var player=_status.event.player;
+						if(!player.countCards('hs',function(card){
+							return get.name(card)=='sha'&&player.hasValueTarget(card,false);
+						})) return 1;
+						return 0;
+					});
 					'step 1'
 					if(result.control!='cancel2'){
+						player.logSkill('xinjiangchi');
 						switch(result.index){
 							case 0:{
 								player.draw();
@@ -9536,7 +9543,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ollihuo4:'疠火',
 			ollihuo_info:'你使用普通的【杀】可以改为火【杀】，若此【杀】造成过伤害，你失去1点体力；你使用火【杀】可以多选择一个目标。你每回合使用的第一张牌如果是【杀】，则此【杀】结算完毕后可置于你的武将牌上。',
 			xinjiangchi:'将驰',
-			xinjiangchi_info:'摸牌阶段结束时，你可选择：①摸一张牌。②摸两张牌，然后本回合内不能使用或打出【杀】。③弃置一张牌，然后本回合内可以多使用一张【杀】，且使用【杀】无距离限制。',
+			xinjiangchi_info:'出牌阶段开始时，你可选择：①摸一张牌。②摸两张牌，然后本回合内不能使用或打出【杀】。③弃置一张牌，然后本回合内可以多使用一张【杀】，且使用【杀】无距离限制。',
 			re_chenqun:'界陈群',
 			redingpin:'定品',
 			redingpin_info:'出牌阶段，你可以弃置一张本回合未使用过/弃置过的类型的牌并选择一名角色。其进行判定，若结果为：黑色，其摸X张牌（X为其体力值且至多为3）且本回合内不能再成为〖定品〗的目标；红桃，你令此次弃置的牌不计入〖定品〗弃置牌合法性的检测；方片，你将武将牌翻面。',

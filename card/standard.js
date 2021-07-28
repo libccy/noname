@@ -84,20 +84,34 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				range:{attack:1},
 				selectTarget:1,
 				yingbian_prompt:function(card){
-					if(lib.linked.contains(card.nature)){
-						return '此牌的伤害值基数+1';
+					var str='';
+					if(get.cardtag(card,'yingbian_hit')){
+						str+='此牌不可被响应';
 					}
-					else{
-						return '当你使用此牌选择目标后，你可为此牌增加一个目标';
+					if(get.cardtag(card,'yingbian_damage')){
+						if(str.length) str+='；';
+						str+='此牌的伤害值基数+1';
 					}
+					if(!str.length||get.cardtag(card,'yingbian_add')){
+						if(str.length) str+='；';
+						str+='当你使用此牌选择目标后，你可为此牌增加一个目标';
+					}
+					return str;
 				},
 				yingbian:function(event){
-					if(lib.linked.contains(event.card.nature)){
+					var card=event.card,bool=false;
+					if(get.cardtag(card,'yingbian_hit')){
+						bool=true;
+						event.directHit.addArray(game.players);
+						game.log(card,'不可被响应');
+					}
+					if(get.cardtag(card,'yingbian_damage')){
+						bool=true;
 						if(typeof event.baseDamage!='number') event.baseDamage=1;
 						event.baseDamage++;
 						game.log(event.card,'的伤害值基数+1');
 					}
-					else{
+					if(!bool||get.cardtag(card,'yingbian_add')){
 						event.yingbian_addTarget=true;
 					}
 				},
@@ -174,6 +188,34 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					yingbian:function(card,player,targets,viewer){
+						if(get.attitude(viewer,player)<=0) return 0;
+						var base=0,hit=false;
+						if(get.cardtag(card,'yingbian_hit')){
+							hit=true;
+							if(targets.filter(function(target){
+								return target.hasShan()&&get.attitude(viewer,target)<0&&get.damageEffect(target,player,viewer,get.nature(card))>0;
+							})) base+=5;
+						}
+						if(get.cardtag(card,'yingbian_all')){
+							if(game.hasPlayer(function(current){
+								return !targets.contains(current)&&lib.filter.targetEnabled2(card,player,current)&&get.effect(current,card,player,player)>0;
+							})) base+=5;
+						}
+						if(get.cardtag(card,'yingbian_damage')){
+							if(targets.filter(function(target){
+								return get.attitude(player,target)<0&&(hit||!target.mayHaveShan()||player.hasSkillTag('directHit_ai',true,{
+								target:target,
+								card:card,
+								},true))&&!target.hasSkillTag('filterDamage',null,{
+									player:player,
+									card:card,
+									jiu:true,
+								})
+							})) base+=5;
+						}
+						return base;
+					},
 					canLink:function(player,target,card){
 						if(!target.isLinked()&&!player.hasSkill('wutiesuolian_skill')) return false;
 						if(target.mayHaveShan()&&!player.hasSkillTag('directHit_ai',true,{
@@ -287,9 +329,25 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				cardcolor:'red',
 				notarget:true,
 				nodelay:true,
-				yingbian_prompt:'当你声明使用此牌后，你摸一张牌',
+				yingbian_prompt:function(card){
+					var str='';
+					if(get.cardtag(card,'yingbian_gain')){
+						str+='当你声明使用此牌时，你获得此牌响应的目标牌';
+					}
+					if(!str.length||get.cardtag(card,'yingbian_draw')){
+						if(str.length) str+='；';
+						str+='当你声明使用此牌时，你摸一张牌';
+					}
+					return str;
+				},
 				yingbian:function(event){
-					event.player.draw();
+					var bool=false;
+					if(get.cardtag(event.card,'yingbian_damage')){
+						bool=true;
+						var cardx=event.respondTo;
+						if(cardx&&cardx[1]&&cardx[1].cards&&cardx[1].cards.filterInD('od').length) player.gain(cardx[1].cards.filterInD('od'),'gain2','log');
+					}
+					if(!bool||get.cardtag(event.card,'yingbian_draw')) event.player.draw();
 				},
 				content:function(){
 					event.result='shaned';
@@ -764,6 +822,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				selectTarget:-1,
 				cardcolor:'red',
 				reverseOrder:true,
+				yingbian_prompt:'当你使用此牌选择目标后，你可为此牌减少一个目标',
+				yingbian:function(event){
+					event.yingbian_removeTarget=true;
+				},
 				filterTarget:function(card,player,target){
 					//return target.hp<target.maxHp;
 					return true;
@@ -875,6 +937,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:true,
 				selectTarget:-1,
 				reverseOrder:true,
+				yingbian_prompt:'当你使用此牌选择目标后，你可为此牌减少一个目标',
+				yingbian:function(event){
+					event.yingbian_removeTarget=true;
+				},
 				filterTarget:function(card,player,target){
 					return target!=player;
 				},
@@ -1381,16 +1447,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				notarget:true,
 				yingbian_prompt:function(card){
-					var suit=card.suit;
-					if(suit=='club'||suit=='spade') return '当你声明使用此牌时，你摸一张牌';
-					else return '当此牌生效后，你获得此牌响应的目标牌';
+					if(!get.cardtag(card,'yingbian_gain')) return '当你声明使用此牌时，你摸一张牌';
+					return '当此牌生效后，你获得此牌响应的目标牌';
 				},
 				yingbian:function(event){
-					if(event.card.cards&&event.card.cards.length==1){
-						var suit=event.card.cards[0].suit;
-						if(suit=='heart'||suit=='diamond') return;
-					}
-					event.player.draw();
+					if(!get.cardtag(event.card,'yingbian_gain')) event.player.draw();
 				},
 				contentBefore:function(){
 					'step 0'
@@ -1431,12 +1492,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							delete ui.tempnowuxie;
 						}
 					}
-					if(event.card.yingbian){
-						if(!event.card.cards||event.card.cards.length!=1) return;
-						var suit=event.card.cards[0].suit;
-						if(suit!='heart'&&suit!='diamond') return;
+					if(event.card.yingbian&&get.cardtag(event.card,'yingbian_gain')){
 						var cardx=event.getParent().respondTo;
-						if(cardx&&cardx[1]&&cardx[1].cards&&cardx[1].cards.filterInD().length) player.gain(cardx[1].cards.filterInD('od'),'gain2','log');
+						if(cardx&&cardx[1]&&cardx[1].cards&&cardx[1].cards.filterInD('od').length) player.gain(cardx[1].cards.filterInD('od'),'gain2','log');
 					}
 				},
 			},

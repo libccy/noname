@@ -1903,7 +1903,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				ruleSkill:true,
 				filter:function(event,player){
-					return game.roundNumber>14;
+					return _status.mode=='binglin'&&game.roundNumber>14;
 				},
 				content:function(){
 					player.loseHp();
@@ -2007,6 +2007,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.removeMark('binglin_shaxue',1,false);
 				},
 				intro:{content:'剩余次数：#'},
+				ai:{
+					viewHandcard:true,
+					skillTagFilter:function(player,tag,arg){
+						return player!=arg&&arg.hasSkill('binglin_shaxue');
+					},
+				},
 			},
 			binglin_neihong:{charlotte:true},
 			toushiche_skill:{
@@ -2539,7 +2545,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else if(choices.length==1) event._result={index:0};
 					else player.chooseControl().set('choiceList',choices).set('ai',function(){
 						var evt=_status.event.getParent();
-						return get.attitude(evt.player,evt.target)>0?1:0;
+						return get.attitude(evt.player,evt.target)>0?0:1;
 					});
 					'step 1'
 					if(result.index+event.addIndex==0){

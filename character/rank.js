@@ -472,6 +472,8 @@ window.noname_character_rank={
 		'ns_zhangning',
 		'huangchengyan',
 		'zhongyan',
+		'wangling',
+		'zhouchu',
 	],
 	bp:[
 		'chess_diaochan',
@@ -680,6 +682,8 @@ window.noname_character_rank={
 		'shen_guojia',
 		'ol_jiangwei',
 		'key_tenzen',
+		'jsp_liubei',
+		'liangxing',
 	],
 	b:[
 		'diy_feishi',
@@ -861,6 +865,7 @@ window.noname_character_rank={
 		'shibao',
 		'zhangmiao',
 		'ol_zhurong',
+		'sp_kongrong',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1009,6 +1014,7 @@ window.noname_character_rank={
 		'sp_fuwan',
 		're_chengpu',
 		're_niujin',
+		'wangfuzhaolei',
 	],
 	c:[
 		'xiahoudun',
@@ -1350,6 +1356,7 @@ window.noname_character_rank={
 			'jin_yanghuiyu',
 			'xiahoujie',
 			'ruanyu',
+			'zhouqun',
 			'ns_chentai',
 			'ns_huangwudie',
 			'ns_sunyi',
@@ -1672,6 +1679,9 @@ window.noname_character_rank={
 			'ol_jiangwei',
 			'ol_zhurong',
 			'huangchengyan',
+			'liangxing',
+			'wangling',
+			'zhouchu',
 		],
 		junk:[
 			'sunshao',

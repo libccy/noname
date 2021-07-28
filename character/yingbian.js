@@ -840,6 +840,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhuosheng:{
 				audio:2,
 				locked:false,
+				init:function(player){
+					player.addSkill('zhuosheng_count');
+					if(game.phaseNumber>0){
+						var hs=player.getCards('h'),all=player.getAllHistory(),cards=[];
+						for(var i=all.length-1;i>=0;i--){
+							for(var j of all[i].gain){
+								cards.addArray(j.cards);
+							}
+							if(all[i].isRound) break;
+						}
+						cards=cards.filter(function(i){
+							return hs.contains(i);
+						});
+						if(cards.length) player.addGaintag(cards,'zhuosheng');
+					}
+				},
 				onremove:function(player){
 					player.removeSkill('zhuosheng_count');
 					player.removeGaintag('zhuosheng');
@@ -932,25 +948,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					silent:{
 						trigger:{
-							player:['enterGame','useCard1'],
-							global:'gameDrawAfter',
+							player:'useCard1',
 						},
 						silent:true,
 						firstDo:true,
 						filter:function(event,player){
-							if(event.name=='useCard') return get.mode()!='guozhan'&&get.type(event.card)=='basic'&&lib.skill.zhuosheng.filterx(event,player)&&event.addCount!==false;
-							return true;
+							return get.mode()!='guozhan'&&get.type(event.card)=='basic'&&lib.skill.zhuosheng.filterx(event,player)&&event.addCount!==false;
 						},
 						content:function(){
-							if(trigger.name=='useCard'){
-								trigger.addCount=false;
-								var stat=player.getStat();
-								if(stat&&stat.card&&stat.card[trigger.card.name]) stat.card[trigger.card.name]--;
-							}
-							else{
-								player.addSkill('zhuosheng_count');
-								player.addGaintag(player.getCards('h'),'zhuosheng');
-							}
+							trigger.addCount=false;
+							var stat=player.getStat();
+							if(stat&&stat.card&&stat.card[trigger.card.name]) stat.card[trigger.card.name]--;
 						},
 					},
 				},

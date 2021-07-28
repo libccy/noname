@@ -22,6 +22,12 @@
 			cardMove:[],
 			custom:[],
 		}],
+		cardtag:{
+			yingbian_zhuzhan:[],
+			yingbian_kongchao:[],
+			yingbian_fujia:[],
+			yingbian_canqu:[],
+		},
 	};
 	var lib={
 		configprefix:'noname_0.9_',
@@ -4118,7 +4124,7 @@
 					nopointer:true,
 				},
 				enableai:{
-					name:'AI可选',
+					name:'随机选将可用',
 					init:false
 				},
 				hide:{
@@ -24385,6 +24391,7 @@
 								}
 								_status.cardtag[tag].add(this.cardid);
 								tagstr+=lib.translate[tag+'_tag'];
+								//if(i<tags.length-1) tagstr+=' ';
 							}
 							tagstr+='</span>';
 							this.node.range.innerHTML+=tagstr;
@@ -37459,10 +37466,10 @@
 							onclick:togglePack
 						});
 						var cfgnodeAI=createConfig({
-							name:'AI禁选',
+							name:'仅点将可用',
 							_name:mode,
 							init:boolAI,
-							intro:'将该武将包内的武将全部设置为AI禁选',
+							intro:'将该武将包内的武将全部设置为仅点将可用',
 							onclick:function(bool){
 								if(bool){
 									for(var i=0;i<list.length;i++){
@@ -39099,7 +39106,7 @@
 								grouplist.push([lib.group[i],get.translation(lib.group[i])]);
 							};
 							var groups=ui.create.selectlist(grouplist,null,ui.create.div('.indent','势力：',newCharacter));
-							var options=ui.create.div('.add_skill.options','<span>主公<input type="checkbox" name="zhu"></span><span>BOSS<input type="checkbox" name="boss"></span><span>AI禁选<input type="checkbox" name="forbidai"></span><br><span>隐匿技<input type="checkbox" name="hiddenSkill"></span><br>',newCharacter);
+							var options=ui.create.div('.add_skill.options','<span>主公<input type="checkbox" name="zhu"></span><span>BOSS<input type="checkbox" name="boss"></span><span>仅点将可用<input type="checkbox" name="forbidai"></span><br><span>隐匿技<input type="checkbox" name="hiddenSkill"></span><br>',newCharacter);
 							var addSkill=ui.create.div('.add_skill','添加技能<br>',newCharacter);
 							var list=[];
 							for(var i in lib.character){
@@ -44810,6 +44817,9 @@
 					}
 				}
 				lib.inpile.sort(lib.sort.card);
+				for(var i in _status.cardtag){
+					if(!_status.cardtag[i].length) delete _status.cardtag[i];
+				}
 				game.broadcastAll(function(num,pile,top,cardtag){
 					if(ui.cardPileNumber) ui.cardPileNumber.innerHTML='0轮 剩余牌: '+num;
 					lib.inpile=pile;
@@ -52299,7 +52309,7 @@
 						}
 					}
 					if(node._banning=='offline'){
-						var cfg=ui.create.div('.config','AI可选',page);
+						var cfg=ui.create.div('.config','随机选将可用',page);
 						cfg.classList.add('toggle');
 						cfg.listen(function(){
 							this.classList.toggle('on');

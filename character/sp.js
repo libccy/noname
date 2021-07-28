@@ -10,8 +10,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_star:["sp_xiahoushi","jsp_zhaoyun","huangjinleishi","sp_pangtong","sp_daqiao","sp_ganning","sp_xiahoudun","sp_lvmeng","sp_zhangfei","sp_liubei"],
 				sp_sticker:['sp_gongsunzan','sp_simazhao','sp_wangyuanji','sp_xinxianying','sp_liuxie'],
-				sp_guozhan:["zangba","shamoke","ganfuren","yuejin","hetaihou","dingfeng","panfeng","jianggan"],
-				sp_guozhan2:["mateng","tianfeng","chendong","sp_dongzhuo","jiangfei","jiangqing","kongrong","liqueguosi","lvfan","cuimao","jiling","zhangren","zoushi","huaxin","luyusheng","zongyu"],
+				sp_guozhan:["zangba","shamoke","ganfuren","yuejin","hetaihou","dingfeng","panfeng","jianggan","luyusheng"],
+				sp_guozhan2:["mateng","tianfeng","chendong","sp_dongzhuo","jiangfei","jiangqing","liqueguosi","lvfan","cuimao","jiling","zhangren","zoushi","huaxin","zongyu"],
 				//sp_single:["niujin"],
 				sp_others:["hanba","caiyang"],
 			},
@@ -139,7 +139,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jiangfei:['male','shu',3,['reshengxi','shoucheng']],
 			jiangqing:['male','wu',4,['shangyi','zniaoxiang']],
 			hetaihou:['female','qun',3,['zhendu','qiluan']],
-			kongrong:['male','qun',3,['lirang','mingshi']],
+			//kongrong:['male','qun',3,['lirang','mingshi']],
 			dingfeng:['male','wu',4,['reduanbing','refenxun']],
 			//bianfuren:['female','wei',3,['wanwei','yuejian']],
 			shamoke:['male','shu',4,['gzjili']],
@@ -1242,7 +1242,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'player',
 				usable:1,
 				filter:function(event,player){
-					if(player==event.player||get.color(event.card)!='black'||event.player.isDead()) return false;
+					var color=get.color(event.card);
+					if(player==event.player||event.player.isDead()||(get.mode()=='guozhan'&&color!='black')) return false;
 					var type=get.type(event.card);
 					return type=='basic'||type=='trick';
 				},
@@ -1252,42 +1253,49 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					trigger.player.chooseControl().set('choiceList',[
-						'本回合内不能再使用黑色牌',
+						'本回合内不能再使用'+get.translation(get.color(trigger.card))+'牌',
 						'令'+get.translation(trigger.card)+'对'+get.translation(player)+'无效',
 					]).set('prompt',get.translation(player)+'发动了【贞特】，请选择一项').set('ai',function(){
 						var player=_status.event.player;
 						var target=_status.event.getParent().player;
-						var card=_status.event.getTrigger().card;
+						var card=_status.event.getTrigger().card,color=get.color(card);
 						if(get.effect(target,card,player,player)<=0) return 1;
 						var hs=player.countCards('h',function(card){
-							return get.color(card,player)=='black'&&player.hasValueTarget(card,null,true);
+							return get.color(card,player)==color&&player.hasValueTarget(card,null,true);
 						});
 						if(!hs.length) return 0;
 						if(hs>1) return 1;
 						return Math.random()>0.5?0:1;
 					});
 					'step 1'
-					if(result.index==0) trigger.player.addTempSkill('zhente2');
+					if(result.index==0){
+						trigger.player.addTempSkill('zhente2');
+						trigger.player.storage.zhente2.add(get.color(trigger.card));
+						trigger.player.markSkill('zhente2');
+					}
 					else trigger.excluded.add(player);
 				},
 			},
 			zhente2:{
 				mod:{
-					cardEnabled:function(card){
-						if(get.color(card)=='black') return false;
+					cardEnabled:function(card,player){
+						if(player.getStorage('zhente2').contains(get.color(card))) return false;
 					},
-					cardSavable:function(card){
-						if(get.color(card)=='black') return false;
+					cardSavable:function(card,player){
+						if(player.getStorage('zhente2').contains(get.color(card))) return false;
 					},
 				},
-				mark:true,
 				charlotte:true,
-				intro:{content:'本回合内不能使用黑色牌'},
+				onremove:true,
+				init:function(player,skill){
+					if(!player.storage[skill]) player.storage[skill]=[];
+				},
+				intro:{content:'本回合内不能使用$牌'},
 			},
 			zhiwei:{
 				audio:2,
 				trigger:{
-					player:['enterGame','showCharacterAfter'],
+					player:['enterGame','showCharacterAfter','phaseBegin'],
 					global:['gameDrawAfter'],
 				},
 				direct:true,
@@ -4022,7 +4030,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"phaseUseBegin",
 				},
 				intro:{
-					content:"本局游戏内已失去过#张装备区内的牌",
+					content:"本局游戏内已失去过#张装备牌",
 				},
 				frequent:true,
 				sync:function(player){
@@ -17247,10 +17255,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			luyusheng:'陆郁生',
 			zhente:'贞特',
 			zhente2:'贞特',
-			zhente_info:'每回合限一次，当你成为其他角色使用黑色基本牌或黑色普通锦囊牌的目标后，你可令使用者选择一项：1.本回合不能再使用黑色牌；2.此牌对你无效。 ',
+			zhente_info:'每回合限一次，当你成为其他角色使用基本牌或普通锦囊牌的目标后，你可令使用者选择一项：1.本回合不能再使用与此牌颜色相同的牌；2.此牌对你无效。 ',
+			zhente_info_guozhan:'每回合限一次，当你成为其他角色使用黑色基本牌或黑色普通锦囊牌的目标后，你可令使用者选择一项：1.本回合不能再使用黑色牌；2.此牌对你无效。 ',
 			zhiwei:'至微',
 			zhiwei2:'至微',
-			zhiwei_info:'游戏开始时，你选择一名其他角色。该角色造成伤害后，你摸一张牌，该角色受到伤害后，你随机弃置一张手牌。你弃牌阶段弃置的牌均被该角色获得。',
+			zhiwei_info:'游戏开始时/你的回合开始时，若场上没有因此法被选择过的角色存活，则你选择一名其他角色。该角色造成伤害后，你摸一张牌，该角色受到伤害后，你随机弃置一张手牌。你弃牌阶段弃置的牌均被该角色获得。',
 			zhiwei_info_guozhan:'你明置此武将牌时，选择一名其他角色。该角色造成伤害后，你摸一张牌，该角色受到伤害后，你随机弃置一张手牌。你弃牌阶段弃置的牌均被该角色获得。该角色死亡时，若你的两个武将牌均明置，你暗置此武将牌。 ',
 			zhuixi:'追袭',
 			zhuixi_info:'锁定技，你使用【杀】的次数上限+1。',
