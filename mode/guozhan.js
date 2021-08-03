@@ -350,7 +350,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				guozhan_bian:["gz_liqueguosi","gz_zuoci","gz_bianfuren","gz_xunyou","gz_lingtong","gz_lvfan","gz_masu","gz_shamoke",],
 				guozhan_quan:["gz_cuimao","gz_yujin","gz_wangping","gz_fazheng","gz_wuguotai","gz_lukang","gz_yuanshu","gz_zhangxiu"],
 				guozhan_jun:["gz_jun_caocao","gz_jun_sunquan","gz_jun_liubei","gz_jun_zhangjiao"],
-				guozhan_jin:['gz_jin_simayi','gz_jin_simazhao','gz_jin_simashi','gz_jin_zhangchunhua','gz_jin_wangyuanji','gz_jin_xiahouhui','gz_duyu','gz_zhanghuyuechen','gz_jin_yanghuiyu','gz_simazhou','gz_shibao','gz_weiguan'],
+				guozhan_jin:['gz_jin_simayi','gz_jin_simazhao','gz_jin_simashi','gz_jin_zhangchunhua','gz_jin_wangyuanji','gz_jin_xiahouhui','gz_duyu','gz_zhanghuyuechen','gz_jin_yanghuiyu','gz_simazhou','gz_shibao','gz_weiguan','gz_zhongyan'],
 				guozhan_single:['gz_re_xushu','gz_yanbaihu','gz_wujing','gz_dongzhao'],
 				guozhan_double:['gz_tangzi','gz_liuqi','gz_mengda','gz_mifangfushiren','gz_zhanglu','gz_shixie'],
 				guozhan_yexinjia:['gz_zhonghui'],
@@ -915,7 +915,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			gzrekuangcai:{
-				audio:'kuangcai',
+				audio:'gzkuangcai',
 				forced:true,
 				trigger:{player:'phaseDiscardBegin'},
 				filter:function(event,player){
@@ -944,7 +944,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			gzkuangcai:{
-				audio:'kuangcai',
+				audio:2,
 				trigger:{player:'useCard1'},
 				forced:true,
 				firstDo:true,
@@ -972,7 +972,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				group:'gzkuangcai_discard',
 				subSkill:{
 					discard:{
-						audio:'kuangcai',
+						audio:'gzkuangcai',
 						trigger:{player:'phaseDiscardBegin'},
 						forced:true,
 						filter:function(event,player){
@@ -1017,7 +1017,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			gzshejian:{
-				audio:'shejian',
+				audio:2,
 				trigger:{target:'useCardToTargeted'},
 				filter:function(event,player){
 					if(player==event.player||event.targets.length!=1) return false;
@@ -1825,59 +1825,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.draw(2);
 							break;
 					}
-				},
-			},
-			mffengshi:{
-				audio:2,
-				trigger:{
-					player:'useCardToPlayered',
-					target:'useCardToTargeted',
-				},
-				direct:true,
-				filter:function(event,player){
-					if(event.player==event.target||event.targets.length!=1) return false;
-					if(player!=event.player&&!player.hasSkill('mffengshi')) return false;
-					return event.player.countCards('h')>event.target.countCards('h')&&event.target.countCards('he')>0;
-				},
-				content:function(){
-					'step 0'
-					event.source=trigger.player;
-					event.target=(player==trigger.target?trigger.player:trigger.target);
-					var str;
-					if(player==trigger.player) str='弃置自己的和该角色';
-					else str='令其弃置其与你的';
-					trigger.player.chooseBool('是否对'+get.translation(trigger.target)+'发动【锋势】？',str+'的各一张牌，然后令'+get.translation(trigger.card)+'的伤害+1').set('ai',function(){
-						var player=_status.event.getParent().player;
-						var target=_status.event.getParent().target;
-						var viewer=_status.event.player;
-						if(viewer==player){
-							if(get.attitude(viewer,target)>=0) return false;
-							if(player.countCards('he',(card)=>get.value(card,player)<5)) return true;
-							var card=_status.event.getTrigger().card;
-							if((get.tag(card,'damage')||target.countCards('he',(card)=>get.value(card,target)>6))&&player.countCards('he',(card)=>get.value(card,player)<7)) return true;
-							return false;
-						}
-						else{
-							if(get.attitude(viewer,player)>=0) return false;
-							if(!get.tag(card,'damage')) return false;
-							if(viewer.countCards('he')>player.countCards('he')) return true;
-							if(viewer.countCards('he',(card)=>get.value(card,target)>6)) return false;
-							return true;
-						}
-					});
-					'step 1'
-					if(result.bool){
-						if(player==source) player.logSkill('mffengshi',target);
-						else{
-							player.logSkill('mffengshi');
-							source.line(player,'green');
-						}
-						if(get.tag(trigger.card,'damage')) trigger.getParent().baseDamage++;
-						player.chooseToDiscard('he',true);
-					}
-					else event.finish();
-					'step 2'
-					if(target.countDiscardableCards(player,'he')>0) player.discardPlayerCard(target,'he',true);
 				},
 			},
 
@@ -3216,6 +3163,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			
 			jianglue:{
 				limited:true,
+				audio:2,
 				enable:'phaseUse',
 				prepare:function(cards,player){
 					var targets=game.filterPlayer(function(current){
@@ -9043,8 +8991,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzbiluan_info:'锁定技，其他角色计算至你的距离时+X（X为你装备区内的牌数且至少为1）。',
 			gzlixia:'礼下',
 			gzlixia_info:'与你势力不同的角色的准备阶段开始时，其可弃置你装备区内的一张牌，然后其选择一项：①弃置两张手牌。②失去1点体力。③令你摸两张牌。',
-			mffengshi:'锋势',
-			mffengshi_info:'当你使用牌指定唯一目标后，或成为其他角色使用牌的唯一目标后，若此牌使用者的手牌数大于此牌目标的手牌数，则此牌的使用者可令你弃置自己和对方的各一张牌，并令此牌的伤害值+1。',
 			gzrekuangcai:'狂才',
 			gzrekuangcai_info:'锁定技，你于回合内使用牌无距离和次数限制；弃牌阶段开始时，若你本回合内使用过牌但未造成过伤害，则你的手牌上限-1。',
 			gzkuangcai:'狂才',

@@ -76,6 +76,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_kamome:['female','key',3,['kamome_yangfan','kamome_huanmeng','kamome_jieban']],
 			key_nao:['female','key',3,['nao_duyin','nao_wanxin','nao_shouqing']],
 			key_yuuki:['female','key',3,['yuuki_yicha']],
+			key_kotarou:['male','key',3,['kotarou_rewrite','kotarou_aurora']],
 			key_tenzen:['male','key',4,['tenzen_yixing','tenzen_lingyu']],
 			key_kyouko:['female','key',3,['kyouko_rongzhu','kyouko_gongmian']],
 			
@@ -83,7 +84,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_sunchensunjun:['male','wu',5,['nsxianhai','nsxingchu']],
 			ns_yuanxi:['male','qun',4,['nsshengyan','nsdaizhan']],
 			ns_caoshuang:['male','wei',4,['nsjiquan','nsfuwei']],
-			ns_sunyi:['male','wu',4,['nsguolie'],[]],
+			ns_sunyi:['male','wu',4,['nsguolie']],
 			ns_huangwudie:['female','shu',4,['nsdiewu','nslingying','nspojian']],
 			ns_chentai:['male','wei',4,['nsweiyuan','nsjuxian']],
 			ns_zhangning:['female','qun',3,['nsfuzhou','nsguidao','nstaiping']],
@@ -153,7 +154,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			// ns_zhaoyunshen:['male','qun',3,[]],
 			// ns_lisu:['male','qun',3,[]],
 			// ns_sunhao:['male','qun',3,[]],
-			ns_xinnanhua:['male','qun',3,['ns_xiandao','ns_xiuzheng','ns_chuanshu'],[]],
+			ns_xinnanhua:['male','qun',3,['ns_xiandao','ns_xiuzheng','ns_chuanshu']],
 			ns_caimao:['male','qun',4,['nsdingzhou']],
 			ns_luyusheng:['female','wu',3,['nshuaishuang','nsfengli']],
 			ns_chengpu:['male','wu',4,['decadelihuo','decadechunlao']],
@@ -282,6 +283,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_yuuki:'#b4399司命',
 			key_kyouko:'#b阿阿阿687',
 			key_tenzen:'#b皋耳击',
+			key_kotarou:'#bb1154486224',
 			
 			ns_huangchengyan:'#g竹邀月',
 			ns_sunchensunjun:'#gVenusjeu',
@@ -453,6 +455,163 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			kotarou_aurora:{
+				trigger:{
+					player:['damageEnd','loseHpEnd','gainMaxHpEnd']
+				},
+				forced:true,
+				charlotte:true,
+				filter:function(event,player){
+					return !player.isDisabled(1);
+				},
+				content:function(){
+					if(player.isEmpty(1)){
+						var card=get.cardPile2(function(card){
+							return get.subtype(card)=='equip1'&&!get.cardtag(card,'gifts')&&player.canUse(card,player);
+						});
+						if(card) player.chooseUseTarget(card,true);
+					}
+					else player.chooseUseTarget('sha',true,false);
+				},
+			},
+			kotarou_rewrite:{
+				enable:'phaseUse',
+				charlotte:true,
+				filter:function(event,player){
+					return !player.hasSkill('kotarou_rewrite_block');
+				},
+				content:function(){
+					'step 0'
+					player.getHistory('custom').push({kotarou_rewrite:true});
+					player.chooseControl().set('choiceList',[
+						'视为使用一张本局游戏没有以此法使用过的基本牌或普通锦囊牌',
+						'移动场上的一张牌',
+						'增加一点体力上限并失去1点体力',
+						'本回合内下一次造成的伤害+1',
+						'本回合内下一次回复体力时，额外回复一点体力',
+						'本回合内手牌上限和【杀】的使用次数+1 　　　　　　　　　　　　　　　　　　　　　　　　',
+					]).set('ai',function(){
+						var player=_status.event.player;
+						if(player.hp>2&&player.getUseValue({name:'sha'})>0) return 2;
+						return 0;
+					});
+					'step 1'
+					lib.skill.kotarou_rewrite.rewrites[result.index](player,event);
+					if(result.index!=0) event.goto(3);
+					'step 2'
+					if(result.bool){
+						player.storage.kotarou_rewrite.push(result.links[0][2]);
+						player.chooseUseTarget(true,{name:result.links[0][2],nature:result.links[0][3],isCard:true});
+					}
+					'step 3'
+					if(player.getHistory('custom',function(evt){
+						return evt&&evt.kotarou_rewrite==true;
+					}).length>=3) player.addTempSkill('kotarou_rewrite_block');
+				},
+				onremove:true,
+				rewrites:[
+					function(player,event){
+						var list=[];
+						if(!player.storage.kotarou_rewrite) player.storage.kotarou_rewrite=[];
+						for(var i of lib.inpile){
+							if(player.storage.kotarou_rewrite.contains(i)) continue;
+							var type=get.type(i);
+							if((type=='basic'||type=='trick')) list.push([type,'',i]);
+							if(i=='sha'){
+								list.push([type,'',i,'fire']);
+								list.push([type,'',i,'thunder']);
+								list.push([type,'',i,'ice']);
+							}
+						}
+						if(list.length){
+							player.chooseButton(['改写：视为使用一张基本牌或普通锦囊牌',[list,'vcard']],true).set('filterButton',function(button){
+								return player.hasUseTarget({name:button.link[2],nature:button.link[3],isCard:true},null,true);
+							}).set('ai',function(button){
+								return player.getUseValue({name:button.link[2],nature:button.link[3],isCard:true});
+							});
+						}
+						else event._result={bool:false};
+					},
+					function(player,event){
+						player.moveCard(true);
+					},
+					function(player,event){
+						if(player.maxHp<5) player.gainMaxHp();
+						player.loseHp();
+					},
+					function(player,event){
+						player.addSkill('kotarou_rewrite_damage');
+						player.addMark('kotarou_rewrite_damage',1,false);
+						game.log(player,'本回合下次造成的伤害','#y+1');
+					},
+					function(player,event){
+						player.addSkill('kotarou_rewrite_recover');
+						player.addMark('kotarou_rewrite_recover',1,false);
+						game.log(player,'本回合下次回复的体力','#y+1');
+					},
+					function(player,event){
+						player.addSkill('kotarou_rewrite_sha');
+						player.addMark('kotarou_rewrite_sha',1,false);
+						game.log(player,'本回合的手牌上限和使用【杀】的次数上限','#y+1');
+					},
+				],
+				ai:{
+					order:4,
+					result:{
+						player:function(player){
+							if(player.getHistory('custom',function(evt){
+								return evt&&evt.kotarou_rewrite==true;
+							}).length>=2) return 0;
+							return 1;
+						},
+					}
+				},
+			},
+			kotarou_rewrite_damage:{
+				onremove:true,
+				trigger:{source:'damageBegin1'},
+				forced:true,
+				content:function(){
+					trigger.num+=player.countMark('kotarou_rewrite_damage');
+					player.removeSkill('kotarou_rewrite_damage');
+				},
+				charlotte:true,
+				intro:{content:'下一次造成的伤害+#'},
+			},
+			kotarou_rewrite_recover:{
+				onremove:true,
+				trigger:{player:'recoverBegin'},
+				forced:true,
+				content:function(){
+					trigger.num+=player.countMark('kotarou_rewrite_recover');
+					player.removeSkill('kotarou_rewrite_recover');
+				},
+				charlotte:true,
+				intro:{content:'下一次回复的体力+#'},
+			},
+			kotarou_rewrite_sha:{
+				onremove:true,
+				mod:{
+					maxHandcard:function(player,num){
+						return num+player.countMark('kotarou_rewrite_sha');
+					},
+					cardUsable:function(card,player,num){
+						if(card.name=='sha') return num+player.countMark('kotarou_rewrite_sha');
+					}
+				},
+				charlotte:true,
+				intro:{content:'手牌上限和出杀次数+#'},
+			},
+			kotarou_rewrite_block:{
+				trigger:{player:'phaseEnd'},
+				forced:true,
+				charlotte:true,
+				content:function(){
+					player.removeSkill('kotarou_rewrite');
+					player.removeSkill('kotarou_aurora');
+					if(player.maxHp>3) player.loseMaxHp(player.maxHp-3)
+				},
+			},
 			tenzen_yixing:{
 				trigger:{
 					global:'damageEnd',
@@ -14989,6 +15148,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tenzen_lingyu_info:'觉醒技，准备阶段，若你的“兴”不小于你的体力值，则你减1点体力上限并获得技能〖天全〗。若你以此法失去了体力，则你摸两张牌。',
 			tenzen_tianquan:'天全',
 			tenzen_tianquan_info:'每回合限一次，当你使用【杀】或【决斗】指定唯一目标后，你可以移去两张“兴”并展示牌堆顶的五张牌。这些牌中每有一张基本牌，响应此牌需要的【闪】/【杀】的数量便+1。此牌结算完成后，若此牌造成过伤害，则你获得这些牌中的非基本牌。',
+			key_kotarou:'天王寺瑚太朗',
+			kotarou_aurora:'丝刃',
+			kotarou_aurora_info:'锁定技，当扣减体力或增加体力上限后，若你的装备区内：有武器牌，你视为使用一张【杀】；没有武器牌，你使用牌堆中的一张不为赠物的武器牌。',
+			kotarou_rewrite:'改写',
+			kotarou_rewrite_damage:'改写',
+			kotarou_rewrite_recover:'改写',
+			kotarou_rewrite_sha:'改写',
+			kotarou_rewrite_block:'改写',
+			kotarou_rewrite_info:'出牌阶段，你可选择：①视为使用一张本局游戏没有以此法使用过的基本牌或普通锦囊牌；②移动场上的一张牌；③增加一点体力上限并失去1点体力（体力上限至多为5）；④下一次造成的伤害+1；⑤下一次回复的体力值+1；⑥本回合内的手牌上限和使用【杀】的使用次数+1。若你于本回合内发动过〖改写〗的次数超过两次，则你令此技能失效，且于回合结束后将体力上限降至3点，失去〖丝刃〗和〖改写〗。',
 
 			noname:"小无",
 			noname_zhuyuan:"祝愿",

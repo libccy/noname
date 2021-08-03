@@ -13,11 +13,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mobile_sunben:["re_sunben"],
 				mobile_standard:["xin_xiahoudun","xin_zhangfei"],
 				mobile_shenhua:["re_pangtong","re_guanqiujian","xin_yuanshao","re_liushan","re_dongzhuo","re_sp_zhugeliang","re_sunjian","re_dengai","re_jiangwei","re_zhurong"],
-				mobile_yijiang1:["re_jikang","old_bulianshi","xin_liaohua","xin_caozhang","re_xusheng","xin_chengpu","xin_jianyong","xin_gongsunzan","xin_zhuran","re_lingtong","re_liubiao","xin_guohuai","xin_panzhangmazhong","xin_fuhuanghou","re_handang"],
+				mobile_yijiang1:["re_jikang","old_bulianshi","xin_liaohua","xin_caozhang","re_xusheng","xin_chengpu","xin_jianyong","xin_gongsunzan","xin_zhuran","re_lingtong","re_liubiao","xin_guohuai","xin_panzhangmazhong","xin_fuhuanghou","re_handang","ol_yujin"],
 				mobile_sp:["old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","re_heqi","liuzan","xin_hansui"],
 			},
 		},
 		character:{
+			ol_yujin:['male','wei',4,['rejieyue']],
 			sp_kongrong:['male','qun',3,['spmingshi','splirang']],
 			zhouchu:['male','wu',4,['xianghai','chuhai']],
 			wangfuzhaolei:['male','shu',4,['xunyi']],
@@ -70,12 +71,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_chengpu:['male','wu',4,['relihuo','chunlao']],
 			yangyi:['male','shu',3,['duoduan','gongsun']],
 			dongcheng:['male','qun',4,['chengzhao']],
-			re_pangtong:['male','shu',3,['xinlianhuan','niepan'],[]],
+			re_pangtong:['male','shu',3,['xinlianhuan','niepan']],
 			re_guanqiujian:['male','wei',4,['rezhengrong','rehongju']],
 			chendeng:['male','qun',3,['zhouxuan','fengji']],
 			re_heqi:['male','wu',4,['reqizhou','reshanxi']],
 			yangbiao:['male','qun',3,['zhaohan','rangjie','yizheng']],
-			re_sp_zhugeliang:["male","shu",3,["bazhen","rehuoji","rekanpo"],[]],
+			re_sp_zhugeliang:["male","shu",3,["bazhen","rehuoji","rekanpo"]],
 			xin_xiahoudun:['male','wei',4,['reganglie','xinqingjian']],
 			zhangyì:['male','shu',4,['rezhiyi']],
 			jiakui:['male','wei',3,['zhongzuo','wanlan']],
@@ -88,14 +89,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lifeng:['male','shu',3,['tunchu','shuliang']],
 			zhuling:['male','wei',4,['xinzhanyi']],
 			liuye:['male','wei',3,['polu','choulve']],
-			zhaotongzhaoguang:["male","shu",4,["yizan_use","xinfu_longyuan"],[]],
-			majun:["male","wei",3,["xinfu_jingxie1","qiaosi"],[]],
-			simazhao:["male","wei",3,["xinfu_daigong","xinfu_zhaoxin"],[]],
-			wangyuanji:["female","wei",3,["xinfu_qianchong","xinfu_shangjian"],[]],
-			pangdegong:["male","qun",3,["xinfu_pingcai","xinfu_pdgyingshi"],[]],
+			zhaotongzhaoguang:["male","shu",4,["yizan_use","xinfu_longyuan"]],
+			majun:["male","wei",3,["xinfu_jingxie1","qiaosi"]],
+			simazhao:["male","wei",3,["xinfu_daigong","xinfu_zhaoxin"]],
+			wangyuanji:["female","wei",3,["xinfu_qianchong","xinfu_shangjian"]],
+			pangdegong:["male","qun",3,["xinfu_pingcai","xinfu_pdgyingshi"]],
 			old_yuanshu:['male','qun',4,['xinyongsi','yjixi']],
 			
-			shenpei:["male","qun","2/3",["shouye","liezhi"],[]],
+			shenpei:["male","qun","2/3",["shouye","liezhi"]],
 			re_wangyun:['male','qun',3,['relianji','remoucheng']],
 			
 			re_baosanniang:['female','shu',3,['meiyong','rexushen','rezhennan']],
@@ -352,6 +353,96 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			rejieyue:{
+				audio:2,
+				trigger:{player:'phaseJieshuBegin'},
+				direct:true,
+				filter:function(event,player){
+					return player.countCards('he')>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseCardTarget({
+						prompt:get.prompt2('rejieyue'),
+						filterCard:true,
+						position:'he',
+						filterTarget:lib.filter.notMe,
+						ai1:function(card){
+							var player=_status.event.player;
+							if(get.name(card)=='du') return 20;
+							if(get.position(card)=='e'&&get.value(card)<=0) return 14;
+							if(get.position(card)=='h'&&game.hasPlayer(function(current){
+								return current!=player&&get.attitude(player,current)>0&&current.getUseValue(card)>player.getUseValue(card)&&current.getUseValue(card)>player.getUseValue(card);
+							})) return 12;
+							if(game.hasPlayer(function(current){
+								return current!=player&&get.attitude(player,current)>0;
+							})){
+								if(card.name=='wuxie') return 11;
+								if(card.name=='shan'&&player.countCards('h','shan')>1) return 9
+							}
+							return 6/Math.max(1,get.value(card));
+						},
+						ai2:function(target){
+							var player=_status.event.player;
+							var card=ui.selected.cards[0];
+							var att=get.attitude(player,target);
+							if(card.name=='du') return -6*att;
+							if(att>0){
+								if(get.position(card)=='h'&&target.getUseValue(card)>player.getUseValue(card)) return 4*att;
+								if(get.value(card,target)>get.value(card,player)) return 2*att;
+								return 1.2*att;
+							}
+							return -att*Math.min(4,target.countCards('he'))/4;
+						},
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('rejieyue',target);
+						target.gain(result.cards,player,'giveAuto');
+					}
+					else event.finish();
+					'step 2'
+					var num=0;
+					if(target.countCards('h')) num++;
+					if(target.countCards('e')) num++;
+					if(num>0){
+						var next=target.chooseCard('he',num,'选择保留每个区域的各一张牌，然后弃置其余的牌。或点取消，令'+get.translation(player)+'摸三张牌',function(card){
+							for(var i=0;i<ui.selected.cards.length;i++){
+								if(get.position(ui.selected.cards[i])==get.position(card)) return false;
+							}
+							return true;
+						});
+						next.set('complexCard',true);
+						next.set('goon',get.attitude(target,player)>=0);
+						next.set('maxNum',num);
+						next.set('ai',function(card){
+							if(_status.event.goon) return -1;
+							var num=_status.event.maxNum;
+							if(ui.selected.cards.length>=num-1){
+								var val=get.value(player.getCards('he',function(cardx){
+									return cardx!=card&&!ui.selected.cards.contains(cardx);
+								}));
+								if(val>=14) return 0;
+							}
+							return get.value(card);
+						});
+					}
+					else event._result={bool:false};
+					'step 3'
+					if(!result.bool) player.draw(3);
+					else {
+						var cards=target.getCards('he');
+						cards.removeArray(result.cards);
+						if(cards.length) target.discard(cards);
+					}
+				},
+				ai:{
+					threaten:1.3,
+					expose:0.2,
+				},
+			},
 			spmingshi:{
 				audio:2,
 				trigger:{player:'damageEnd'},
@@ -4048,12 +4139,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var list=game.filterPlayer(function(current){
 						return current.countMark('zhengjian_mark')>0;
 					});
-					if(list.length){
+					if(list.length>1){
 						event.delay=true;
 						game.asyncDraw(list,function(target){
 							return Math.min(5,target.maxHp,target.countMark('zhengjian_mark'));
 						});
 					}
+					else if(list.length==1) list[0].draw(Math.min(5,target.maxHp,target.countMark('zhengjian_mark')));
 					'step 1'
 					game.countPlayer(function(current){
 						current.removeSkill('zhengjian_mark');
@@ -8849,14 +8941,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunshao:['sp_sunshao','sunshao'],
 			xunchen:['xunchen','sp_xunchen'],
 			xinpi:['xinpi','sp_xinpi'],
-			//duyu:['duyu','sp_duyu'],
+			duyu:['duyu','sp_duyu'],
 			//bianfuren:['sp_bianfuren','bianfuren'],
 		},
 		translate:{
 			liuzan:'手杀留赞',
 			re_sp_zhugeliang:"手杀卧龙",
 			ly_piliche:'霹雳车',
-			ly_piliche_info:'当你对其他角色造成伤害后，若造成伤害的牌不为延时锦囊牌，你可以弃置其装备区里的防具牌与+1坐骑牌；当你失去此装备时，销毁之。',
+			ly_piliche_info:'当你对其他角色造成伤害后，你可以弃置其装备区内的所有牌。',
 			polu:'破橹',
 			polu_info:'锁定技，回合开始时，若【霹雳车】未加入游戏或在牌堆/弃牌堆内，则你使用之；当你受到1点伤害后，若你的装备区里没有【霹雳车】，则你摸一张牌并使用牌堆中的一张随机武器牌。',
 			choulve:'筹略',
@@ -9100,7 +9192,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rehongju_info:'觉醒技，准备阶段，若你武将牌上「荣」的数量不小于3且有角色死亡，则你摸等同于「荣」数量的牌。然后可以用任意数量的手牌交换等量的「荣」。你减1点体力上限并获得技能〖清侧〗。',
 			reqingce_info:'出牌阶段，你可以将一张「荣」置入弃牌堆，然后弃置场上的一张牌。',
 			re_pangtong:"手杀庞统",
-			dongcheng:'董承',
+			dongcheng:'手杀董承',
 			chengzhao:'承诏',
 			chengzhao_info:'一名角色的结束阶段，若你于本回合内获得了两张以上的牌，则你可以与一名其他角色拼点。若你赢，你视为对其使用一张无视防具的【杀】。',
 			yangyi:'杨仪',
@@ -9361,6 +9453,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spmingshi_info:'锁定技，当你受到1点伤害后，伤害来源弃置一张牌。',
 			splirang:'礼让',
 			splirang_info:'出牌阶段限一次，你可以弃置所有手牌，然后将其中的至多X张牌交给一名其他角色（X为你的体力值），之后摸一张牌。',
+			ol_yujin:'手杀于禁',
+			rejieyue:'节钺',
+			rejieyue_info:'结束阶段开始时，你可以将一张牌交给一名其他角色。然后其选择一项：令你摸三张牌：或其保留一张手牌和装备区的牌，然后弃置其余的牌。',
 			
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua:'手杀异构·神话再临',

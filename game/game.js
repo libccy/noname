@@ -7382,32 +7382,35 @@
 					}
 				};
 				window.onerror=function(msg, src, line, column, err){
-					var str=msg + '\n' + _status.event.name + ': ' + _status.event.step;
-					str+='\n'+_status.event.parent.name+': '+_status.event.parent.step;
-					str+='\n'+_status.event.parent.parent.name+': '+_status.event.parent.parent.step;
-					var evt=_status.event;
-					if(evt.player||evt.target||evt.source||evt.skill||evt.card){
-						str+='\n-------------'
-					}
-					if(evt.player){
-						str+='\nplayer: ' + evt.player.name;
-					}
-					if(evt.target){
-						str+='\ntarget: ' + evt.target.name;
-					}
-					if(evt.source){
-						str+='\nsource: ' + evt.source.name;
-					}
-					if(evt.skill){
-						str+='\nskill: ' + evt.skill.name;
-					}
-					if(evt.card){
-						str+='\ncard: ' + evt.card.name;
+					var str=msg;
+					if(window._status&&_status.event){
+ 					var evt=_status.event;
+ 					str+=('\n'+evt.name+': '+evt.step);
+ 					if(evt.parent) str+='\n'+evt.parent.name+': '+evt.parent.step;
+ 					if(evt.parent&&evt.parent.parent) str+='\n'+evt.parent.parent.name+': '+evt.parent.parent.step;
+ 					if(evt.player||evt.target||evt.source||evt.skill||evt.card){
+ 						str+='\n-------------'
+ 					}
+ 					if(evt.player){
+ 						str+='\nplayer: ' + evt.player.name;
+ 					}
+ 					if(evt.target){
+ 						str+='\ntarget: ' + evt.target.name;
+ 					}
+ 					if(evt.source){
+ 						str+='\nsource: ' + evt.source.name;
+ 					}
+ 					if(evt.skill){
+ 						str+='\nskill: ' + evt.skill.name;
+ 					}
+ 					if(evt.card){
+ 						str+='\ncard: ' + evt.card.name;
+ 					}
 					}
 					str+='\n-------------';
 					str+='\n'+line;
 					str+='\n'+column;
-					str+='\n'+err.stack;
+					if(err&&err.stack) str+='\n'+err.stack;
 					alert(str);
 					window.ea=Array.from(arguments);
 					window.em=msg;
@@ -52897,7 +52900,10 @@
 			var zerotarget=false,zeroplayer=false;
 			for(var i=0;i<skills1.length;i++){
 				temp1=get.info(skills1[i]).ai;
-				if(temp1&&typeof temp1.effect=='object'&&typeof temp1.effect.player=='function'){
+				if(temp1&&typeof temp1.effect=='object'&&typeof temp1.effect.player_use=='function'){
+					temp1=temp1.effect.player_use(card,player,target,result1,isLink);
+				}
+				else if(temp1&&typeof temp1.effect=='object'&&typeof temp1.effect.player=='function'){
 					temp1=temp1.effect.player(card,player,target,result1,isLink);
 				}
 				else temp1=undefined;
@@ -52939,6 +52945,15 @@
 							skill:skills2[i],
 							isLink:isLink,
 						})) temp2=temp2.effect(card,player,target,result2,isLink);
+						else temp2=undefined;
+					}
+					else if(temp2&&typeof temp2.effect=='object'&&typeof temp2.effect.target_use=='function'){
+						if(!player.hasSkillTag('ignoreSkill',true,{
+							card:card,
+							target:target,
+							skill:skills2[i],
+							isLink:isLink,
+						})) temp2=temp2.effect.target_use(card,player,target,result2,isLink);
 						else temp2=undefined;
 					}
 					else if(temp2&&typeof temp2.effect=='object'&&typeof temp2.effect.target=='function'){

@@ -10,14 +10,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_star:["sp_xiahoushi","jsp_zhaoyun","huangjinleishi","sp_pangtong","sp_daqiao","sp_ganning","sp_xiahoudun","sp_lvmeng","sp_zhangfei","sp_liubei"],
 				sp_sticker:['sp_gongsunzan','sp_simazhao','sp_wangyuanji','sp_xinxianying','sp_liuxie'],
-				sp_guozhan:["zangba","shamoke","ganfuren","yuejin","hetaihou","dingfeng","panfeng","jianggan","luyusheng"],
-				sp_guozhan2:["mateng","tianfeng","chendong","sp_dongzhuo","jiangfei","jiangqing","liqueguosi","lvfan","cuimao","jiling","zhangren","zoushi","huaxin","zongyu"],
+				sp_guozhan:["zangba","shamoke","ganfuren","yuejin","hetaihou","dingfeng","panfeng","jianggan","luyusheng","sp_mifangfushiren","huaxin"],
+				sp_guozhan2:["mateng","tianfeng","chendong","sp_dongzhuo","jiangfei","jiangqing","liqueguosi","lvfan","cuimao","jiling","zhangren","zoushi","zongyu"],
 				//sp_single:["niujin"],
 				sp_others:["hanba","caiyang"],
 			},
 		},
 		characterFilter:{},
 		character:{
+			sp_mifangfushiren:['male','shu',4,['mffengshi']],
 			huangchengyan:['male','qun',3,['guanxu','yashi']],
 			huangzu:['male','qun',4,['wangong']],
 			panshu:['female','wu',3,['weiyi','jinzhi']],
@@ -27,7 +28,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zongyu:['male','shu',3,['zyqiao','chengshang']],
 			luyusheng:['female','wu',3,['zhente','zhiwei']],
 			ol_xinxianying:['female','wei',3,['xincaishi','xinzhongjian']],
-			huaxin:['male','wei',3,['wanggui','xibing']],
+			huaxin:['male','wei',3,['spwanggui','xibing']],
 			wolongfengchu:['male','shu',4,['youlong','luanfeng']],
 			sp_zhangliao:['male','qun',4,['mubing','ziqu','diaoling']],
 			caoshuang:['male','wei',4,['retuogu','shanzhuan']],
@@ -51,7 +52,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			caoying:["female","wei",4,["xinfu_lingren","xinfu_fujian"],[]],
 			simahui:["male","qun",3,["xinfu_jianjie","xinfu_chenghao","xinfu_yinshi"],[]],
-			baosanniang:["female","shu",3,["xinfu_wuniang","xinfu_xushen"],[]],
+			baosanniang:["female","shu",4,["olwuniang","olxushen"],[]],
 			
 			sp_xiahoushi:["female","shu",3,["xinfu_yanyu","xinfu_xiaode"],[]],
 			
@@ -429,6 +430,168 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//OL鲍三娘
+			olwuniang:{
+				audio:'xinfu_wuniang',
+				trigger:{player:'useCardAfter'},
+				usable:1,
+				filter:function(event,player){
+					return event.card.name=='sha'&&event.targets.length==1&&event.targets[0].isAlive();
+				},
+				logTarget:'targets',
+				content:function(){
+					'step 0'
+					var target=trigger.targets[0];
+					target.chooseToUse(function(card,player,event){
+						if(get.name(card)!='sha') return false;
+						return lib.filter.filterCard.apply(this,arguments);
+					},'武娘：是否对'+get.translation(player)+'使用一张杀？').set('targetRequired',true).set('complexSelect',true).set('filterTarget',function(card,player,target){
+						if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
+						return lib.filter.filterTarget.apply(this,arguments);
+					}).set('sourcex',player);
+					'step 1'
+					player.addTempSkill('olwuniang2');
+					player.addMark('olwuniang2',1,false);
+					player.draw();
+				},
+			},
+			olwuniang2:{
+				onremove:true,
+				charlotte:true,
+				mod:{
+					cardUsable:function(card,player,num){
+						if(card.name=='sha') return num+player.countMark('olwuniang2');
+					},
+				},
+			},
+			olxushen:{
+				derivation:'olzhennan',
+				audio:'xinfu_xushen',
+				trigger:{player:'dying'},
+				limited:true,
+				skillAnimation:true,
+				animationColor:'fire',
+				filter:function(event,player){
+					return player.hp<1;
+				},
+				content:function(){
+					'step 0'
+					player.awakenSkill('olxushen');
+					player.addSkill('olzhennan');
+					player.recover(1-player.hp);
+					'step 1'
+					if(player.isDying()||game.hasPlayer(function(current){
+						return current.name1=='guansuo'||current.name2=='guansuo';
+					}));
+					player.chooseTarget(function(card,player,current){
+						return current!=player&&current.sex=='male';
+					},'许身：是否令一名其他男性角色选择是否将其武将牌替换为“关索”？').set('ai',function(target){
+						return get.attitude(_status.event.player,target)-4;
+					});
+					'step 2'
+					if(!result.bool){
+						event.finish();
+						return;
+					}
+					var target=result.targets[0];
+					event.target=target;
+					player.line(target,'fire');
+					target.chooseBool('许身：是否将自己的一张武将牌替换为“关索”并令'+get.translation(player)+'？');
+					'step 3'
+					if(result.bool){
+						if(target.name2!=undefined){
+							target.chooseControl(target.name1,target.name2).set('prompt','请选择要更换的武将牌');
+						}
+						else event._result={control:target.name1};
+					}
+					else event.goto(4);
+					'step 4'
+					target.reinit(result.control,'guansuo');
+					if(_status.characterlist){
+						_status.characterlist.add(result.control);
+						_status.characterlist.remove('guansuo');
+					}
+				},
+			},
+			olzhennan:{
+				audio:'xinfu_zhennan',
+				enable:'phaseUse',
+				usable:1,
+				viewAs:{name:'nanman'},
+				filterCard:true,
+				selectCard:function(){
+					if(ui.selected.targets.length) return [ui.selected.targets.length,Math.min(ui.selected.targets.length+1,game.players.length-1)];
+					return [1,Infinity];
+				},
+				check:function(card){
+					var player=_status.event.player;
+					if(game.countPlayer(function(current){
+						return current!=player&&player.canUse('nanman',current)&&get.effect(target,{name:'nanman'},player,player)>0;
+					})<=ui.selected.cards.length) return 0;
+					return 6-get.value(card);
+				},
+				selectTarget:function(){
+					return ui.selected.cards.length;
+				},
+				ai:{
+					order:2,
+				},
+			},
+			//糜芳傅士仁
+			mffengshi:{
+				audio:2,
+				audioname:['sp_mifangfushiren'],
+				trigger:{
+					player:'useCardToPlayered',
+					target:'useCardToTargeted',
+				},
+				direct:true,
+				filter:function(event,player){
+					if(event.player==event.target||event.targets.length!=1) return false;
+					if(player!=event.player&&!player.hasSkill('mffengshi')) return false;
+					return event.player.countCards('h')>event.target.countCards('h')&&event.target.countCards('he')>0;
+				},
+				content:function(){
+					'step 0'
+					event.source=trigger.player;
+					event.target=(player==trigger.target?trigger.player:trigger.target);
+					var str;
+					if(player==trigger.player) str='弃置自己的和该角色';
+					else str='令其弃置其与你的';
+					trigger.player.chooseBool('是否对'+get.translation(trigger.target)+'发动【锋势】？',str+'的各一张牌，然后令'+get.translation(trigger.card)+'的伤害+1').set('ai',function(){
+						var player=_status.event.getParent().player;
+						var target=_status.event.getParent().target;
+						var viewer=_status.event.player;
+						if(viewer==player){
+							if(get.attitude(viewer,target)>=0) return false;
+							if(player.countCards('he',(card)=>get.value(card,player)<5)) return true;
+							var card=_status.event.getTrigger().card;
+							if((get.tag(card,'damage')||target.countCards('he',(card)=>get.value(card,target)>6))&&player.countCards('he',(card)=>get.value(card,player)<7)) return true;
+							return false;
+						}
+						else{
+							if(get.attitude(viewer,player)>=0) return false;
+							if(!get.tag(card,'damage')) return false;
+							if(viewer.countCards('he')>player.countCards('he')) return true;
+							if(viewer.countCards('he',(card)=>get.value(card,target)>6)) return false;
+							return true;
+						}
+					});
+					'step 1'
+					if(result.bool){
+						if(player==source) player.logSkill('mffengshi',target);
+						else{
+							player.logSkill('mffengshi');
+							source.line(player,'green');
+						}
+						if(get.tag(trigger.card,'damage')) trigger.getParent().baseDamage++;
+						player.chooseToDiscard('he',true);
+					}
+					else event.finish();
+					'step 2'
+					if(target.countDiscardableCards(player,'he')>0) player.discardPlayerCard(target,'he',true);
+				},
+			},
 			//黄承彦
 			guanxu:{
 				enable:'phaseUse',
@@ -1467,6 +1630,67 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			//华歆
+			spwanggui:{
+				audio:'wanggui',
+				trigger:{source:'damageSource'},
+				direct:true,
+				usable:1,
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return current.group!=player.group;
+					});
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('spwanggui'),'对一名势力不同的其他角色造成1点伤害',function(card,player,target){
+						return target.group!=player.group;
+					}).set('ai',function(target){
+						var player=_status.event.player;
+						return get.damageEffect(target,player,player);
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('spwanggui',target);
+						target.damage();
+					}
+					else player.storage.counttrigger.spwanggui--;
+				},
+				group:'spwanggui_draw',
+				subSkill:{
+					draw:{
+						trigger:{player:'damageEnd'},
+						direct:true,
+						content:function(){
+							'step 0'
+							player.chooseTarget(get.prompt('spwanggui'),'令自己摸一张牌，或和一名势力相同的其他角色各摸一张牌',function(card,player,target){
+								return target.group==player.group;
+							}).set('ai',function(target){
+								var player=_status.event.player,att=get.attitude(player,target);
+								if(target!=player) att*=2;
+								if(target.hasSkillTag('nogain')) att/=1.7;
+								return att;
+							});
+							'step 1'
+							if(result.bool){
+								var target=result.targets[0];
+								player.logSkill('spwanggui',target);
+								if(player==target){
+									player.draw();
+									event.finish();
+								}
+								else{
+									var list=[player,target].sortBySeat();
+									game.asyncDraw(list);
+								}
+							}
+							else event.finish();
+							'step 2'
+							game.delayx();
+						},
+					},
+				},
+			},
 			wanggui:{
 				audio:2,
 				trigger:{
@@ -1480,14 +1704,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.addTempSkill('wanggui2');
-					var bool;
-					var guozhan=get.mode()=='guozhan';
-					if(guozhan) bool=player.isUnseen(2);
-					else bool=!player._xibing;
+					var bool=player.isUnseen(2);
 					if(bool){
-						player.chooseTarget('望归：是否对一名'+(guozhan?'势力不同的':'其他')+'角色造成1点伤害？',guozhan?function(card,player,target){
+						player.chooseTarget('望归：是否对一名势力不同的角色造成1点伤害？',function(card,player,target){
 							return target.isEnemyOf(player);
-						}:lib.filter.notMe).set('ai',function(target){
+						}).set('ai',function(target){
 							var player=_status.event.player;
 							return get.damageEffect(target,player,player);
 						});
@@ -1501,18 +1722,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					event.finish();
 					'step 2'
-					if(get.mode()=='guozhan'){
-						player.chooseBool('望归：是否令所有与自己势力相同的角色各摸一张牌？');
-					}
-					else player.chooseTarget('望归：是否令至多三名角色各摸一张牌？',[1,3]).set('ai',function(target){
-						var att=get.attitude(_status.event.player,target);
-						if(target.hasSkill('nogain')&&target!=_status.currentPhase) att/=10;
-						return att;
-					});
+					player.chooseBool('望归：是否令所有与自己势力相同的角色各摸一张牌？');
 					'step 3'
 					if(result.bool){
-						var targets=result.targets;
-						if(get.mode()=='guozhan') targets=game.filterPlayer(function(current){
+						var targets=game.filterPlayer(function(current){
 							return current.isFriendOf(player);
 						});
 						targets.sortBySeat();
@@ -1536,7 +1749,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!bool(event.card)) return false;
 					var evt=event.getParent('phaseUse');
 					if(evt.player!=event.player) return false;
-					return event.player.getHistory('useCard',function(evtx){
+					return get.mode()!='guozhan'||event.player.getHistory('useCard',function(evtx){
 						return bool(evtx.card)&&evtx.getParent('phaseUse')==evt;
 					})[0]==event.getParent();
 				},
@@ -1794,6 +2007,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					trigger.player.drawTo(6-num);
+					if(trigger.player.storage.kotarou_rewrite) trigger.player.storage.kotarou_rewrite=[];
 					if(player==trigger.player) player.storage.youlong2=[];
 				},
 			},
@@ -16383,8 +16597,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			beimihu:['tw_beimihu','beimihu'],
 			panfeng:['re_panfeng','panfeng'],
 			sunluyu:['sunluyu','re_sunluyu'],
-			simazhao:['simazhao','sp_simazhao'],
-			wangyuanji:['wangyuanji','sp_wangyuanji'],
+			jin_simazhao:['jin_simazhao','simazhao','sp_simazhao'],
+			jin_wangyuanji:['jin_wangyuanji','wangyuanji','sp_wangyuanji'],
 			wangyun:['re_wangyun','wangyun','old_wangyun'],
 			zhangliang:['re_zhangliang','zhangliang'],
 			lingju:['lingju','old_lingju'],
@@ -17239,13 +17453,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			youlong:'游龙',
 			youlong_info:'转换技，阴，每轮限一次，你可以废除你的一个装备栏，视为使用一张未以此法使用过的普通锦囊牌；阳，每轮限一次，你可以废除你的一个装备栏，视为使用一张未以此法使用过的基本牌。',
 			luanfeng:'鸾凤',
+			//luanfeng_info_fullinfo:'限定技，一名角色进入濒死状态时，若其体力上限不小于你，你可令其回复至3点体力，恢复其被废除的装备栏，令其手牌补至6-X张（X为以此法恢复的装备栏数量），重置其因“改写”使用过的牌名。若该角色是你，重置你因“游龙”使用过的牌名。',
 			luanfeng_info:'限定技，一名角色进入濒死状态时，若其体力上限不小于你，你可令其回复至3点体力，恢复其被废除的装备栏，令其手牌补至6-X张（X为以此法恢复的装备栏数量）。若该角色是你，重置你因“游龙”使用过的牌名。',
 			huaxin:'华歆',
 			wanggui:'望归',
-			wanggui_info:'每回合限触发一次，当你受到或造成伤害后，若你本局游戏内：未发动过〖息兵〗，则你可对一名其他角色造成1点伤害。已发动过〖息兵〗，则你可令至多三名角色各摸一张牌。',
-			wanggui_info_guozhan:'每回合限触发一次，当你造成或受到伤害后，若你：仅明置了此武将牌，则你可对与你势力不同的一名角色造成1点伤害；武将牌均明置，则你可令与你势力相同的角色各摸一张牌。',
+			wanggui_info:'每回合限触发一次，当你造成或受到伤害后，若你：仅明置了此武将牌，则你可对与你势力不同的一名角色造成1点伤害；武将牌均明置，则你可令与你势力相同的角色各摸一张牌。',
+			spwanggui:'望归',
+			spwanggui_info:'①当你受到伤害后，你可以摸一张牌，或和一名势力相同的其他角色各摸一张牌；②每回合限一次，当你造成伤害后，你可以对一名与你势力不同的角色造成1点伤害。',
 			xibing:'息兵',
-			xibing_info:'当一名其他角色在其出牌阶段内使用第一张黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至当前体力值(至多摸五张)且本回合不能再使用手牌。',
+			xibing_info:'当一名其他角色在其出牌阶段内使用黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至当前体力值(至多摸五张)且本回合不能再使用手牌。',
 			xibing_info_guozhan:'当一名其他角色在其出牌阶段内使用第一张黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至当前体力(至多摸五张)值且本回合不能再使用手牌。若你与其均明置了所有武将牌，则你可以暗置你与其各一张武将牌且本回合不能再明置此武将牌。',
 			ol_xinxianying:'辛宪英',
 			reluanzhan:'乱战',
@@ -17309,6 +17525,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guanxu_info:'出牌阶段限一次，你可以观看一名其他角色的手牌，然后你可将其中一张手牌与牌堆顶5张牌中的一张交换。若如此做，你弃置其手牌中3张花色相同的牌。',
 			yashi:'雅士',
 			yashi_info:'当你受到一次伤害后，你可选择一项：1. 令伤害来源的非锁定技无效直到其下个回合开始；2. 对一名其他角色发动〖观虚〗。',
+			sp_mifangfushiren:'糜芳傅士仁',
+			mffengshi:'锋势',
+			mffengshi_info:'当你使用牌指定唯一目标后，或成为其他角色使用牌的唯一目标后，若此牌使用者的手牌数大于此牌目标的手牌数，则此牌的使用者可令你弃置自己和对方的各一张牌，并令此牌的伤害值+1。',
+			olwuniang:'武娘',
+			olwuniang_info:'每回合限一次，当你于回合内使用的【杀】结算完成后，若此【杀】对应的目标数为1，则你可以令目标角色选择是否对你使用使用【杀】。你于其选择结算完成后摸一张牌，且本回合内使用【杀】的次数上限+1。',
+			olxushen:'许身',
+			olxushen_info:'限定技，当你进入濒死状态时，你可将体力回复至1点并获得技能〖镇南〗。然后若场上没有存活的“关索”，则你可以令一名其他男性角色选择是否将一张武将牌替换为“关索”。',
+			olzhennan:'镇南',
+			olzhennan_info:'【南蛮入侵】对你无效。出牌阶段限一次，你可以将任意张手牌当做【南蛮入侵】对等量的角色使用。',
 			
 			sp_default:"常规",
 			sp_tongque:"铜雀台",

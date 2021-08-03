@@ -1659,7 +1659,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					effect:{
-						player:function(card,player){
+						player_use:function(card,player){
 							if (get.type(card)=='trick'&&get.value(card)<6){
 								return [0,-2];
 							}

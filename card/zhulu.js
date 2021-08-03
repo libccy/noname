@@ -827,7 +827,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var next=player.chooseToUse();
 					next.set('prompt','是否使用【草船借箭】响应'+get.translation(trigger.player)+'使用的'+get.translation(trigger.card)+'？');
-					next.set('filterCard',function(card){
+					next.set('filterCard',function(card,player){
 						if(get.name(card)!='caochuan') return false;
 						return lib.filter.cardEnabled(card,player,'forceEnable');
 					});

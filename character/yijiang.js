@@ -3757,17 +3757,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.type!='wuxie'&&event.type!='respondShan'&&!player.hasSkill('taoluan3')&&player.countCards('hes')>0;//&&!_status.dying.length;
 				},
 				hiddenCard:function(player,name){
-					return (!player.storage.taoluan.contains(name)&&player.countCards('hes')>0&&!player.hasSkill('taoluan3')&&lib.inpile.contains(name));
+					return (!player.getStorage('taoluan').contains(name)&&player.countCards('hes')>0&&!player.hasSkill('taoluan3')&&lib.inpile.contains(name));
 				},
 				init:function(player){
 					if(!player.storage.taoluan) player.storage.taoluan=[];
 				},
+				onremove:true,
 				chooseButton:{
 					dialog:function(event,player){
 					var list=[];
 						for(var i=0;i<lib.inpile.length;i++){
 							var name=lib.inpile[i];
-							if(player.storage.taoluan.contains(name)) continue;
+							if(player.storage.taoluan&&player.storage.taoluan.contains(name)) continue;
 							if(name=='sha'){
 								list.push(['基本','','sha']);
 								list.push(['基本','','sha','fire']);
@@ -3892,7 +3893,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				prompt:'将一张牌当做闪使用',
 				enable:'chooseToUse',
 				filter:function(event,player){
-					return !player.storage.taoluan.contains('shan')&&!player.hasSkill('taoluan3')&&player.countCards('hes');//&&!_status.dying.length;
+					return !player.getStorage('taoluan').contains('shan')&&!player.hasSkill('taoluan3')&&player.countCards('hes');//&&!_status.dying.length;
 				},
 				onuse:function(result,player){
 					player.storage.taoluan.add('shan');
@@ -3903,7 +3904,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				viewAs:{name:'shan'},
 				ai:{
 					skillTagFilter:function(player){
-						return player.countCards('hes')&&!player.storage.taoluan.contains('shan')&&!player.hasSkill('taoluan3');
+						return player.countCards('hes')&&!player.getStorage('taoluan').contains('shan')&&!player.hasSkill('taoluan3');
 					},
 					threaten:1.5,
 					respondShan:true,
@@ -3914,7 +3915,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'chooseToUse',
 				prompt:'将一张牌当做无懈可击使用',
 				viewAsFilter:function(player){
-					return !player.storage.taoluan.contains('wuxie')&&!player.hasSkill('taoluan3')&&player.countCards('hes');
+					return !player.getStorage('taoluan').contains('wuxie')&&!player.hasSkill('taoluan3')&&player.countCards('hes');
 				},
 				onuse:function(result,player){
 					player.storage.taoluan.add('wuxie');
