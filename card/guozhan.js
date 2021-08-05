@@ -4,6 +4,40 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		name:'guozhan',
 		connect:true,
 		card:{
+			zhaoshu:{
+				audio:true,
+				mode:['guozhan'],
+				fullskin:true,
+				type:'equip',
+				subtype:'equip5',
+				skills:['zhaoshu_skill'],
+				content:function(){
+					cards=cards.filterInD();
+					if(cards.length&&target.isAlive()){
+						player.$gain2(cards,false);
+						target.markAuto('zhaoshu_skill',cards);
+						target.addSkill('zhaoshu_skill');
+						game.addGlobalSkill('zhaoshu_global');
+					}
+				},
+				onEquip:function(){
+					if(player.isAlive()){
+						player.lose(card)._triggered=null;
+						player.markAuto('zhaoshu_skill',[card]);
+						player.addSkill('zhaoshu_skill');
+						game.addGlobalSkill('zhaoshu_global');
+					}
+				},
+				ai:{
+					order:12,
+					value:3,
+					useful:1,
+					result:{
+						keepAI:true,
+						target:1,
+					},
+				}
+			},
 			gz_haolingtianxia:{
 				audio:true,
 				mode:['guozhan'],
@@ -1060,6 +1094,135 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			zhaoshu_skill:{
+				equipSkill:true,
+				charlotte:true,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					var cards=player.getStorage('zhaoshu_cards');
+					if(cards.length<4) return false;
+					var list=[];
+					for(var i of cards){
+						list.add(get.suit(i,false));
+						if(list.length>=4) return true;
+					}
+					return false;
+				},
+				delay:false,
+				content:function(){
+					'step 0'
+					var cards=player.getStorage('zhaoshu_cards');
+					game.cardsDiscard(cards);
+					player.$throw(cards);
+					game.log(player,'移去了',cards);
+					cards.length=0;
+					player.markSkill('zhaoshu_cards');
+					game.delayx();
+					'step 1'
+					var list=[
+						['spade',12,'gz_haolingtianxia'],
+						['diamond',1,'gz_kefuzhongyuan'],
+						['heart',1,'gz_guguoanbang'],
+						['club',12,'gz_wenheluanwu'],
+					];
+					for(var i=0;i<list.length;i++){
+						if(lib.inpile.contains(list[i][2])) list.splice(i--,1);
+					}
+					if(list.length){
+						var card=list.randomGet();
+						lib.inpile.add(card[2]);
+						player.gain(game.createCard2(card[2],card[0],card[1]),'gain2');
+					}
+				},
+				ai:{
+					order:10,
+					result:{player:1},
+				},
+				mark:true,
+				marktext:'诏',
+				intro:{
+					name:'诏书',
+					mark:function(dialog,content,player){
+						dialog.add(content);
+						dialog.addText('<br><li>与你势力相同的角色的出牌阶段限一次，其可以将一张手牌（小势力角色改为至多两张）置于【诏书】上，称为“应”。<br><li>出牌阶段限一次，若你的“应”中包含至少四种花色，则你可以发动“锦囊召唤”，将所有“应”置入弃牌堆，然后随机获得一张未加入游戏的势力锦囊牌。',false);
+						if(player.storage.zhaoshu_cards&&player.storage.zhaoshu_cards.length){
+							dialog.addAuto(player.storage.zhaoshu_cards)
+						}
+					},
+					content:'cards',
+					markcount:function(content,player){
+						return player.getStorage('zhaoshu_cards').length;
+					},
+					onunmark:function(storage,player){
+						var cards=player.getStorage('zhaoshu_skill').concat(player.getStorage('zhaoshu_cards'));
+						if(cards.length){
+							game.log(cards,'进入了弃牌堆');
+							game.cardsDiscard(cards);
+							player.$throw(cards,1000);
+						}
+						delete player.storage.zhaoshu_skill;
+						delete player.storage.zhaoshu_cards;
+						player.removeSkill('zhaoshu_skill');
+					},
+				},
+			},
+			zhaoshu_global:{
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					if(!player.countCards('h')) return false;
+					return game.hasPlayer(function(current){
+						return current.hasSkill('zhaoshu_skill')&&current.isFriendOf(player);
+					});
+				},
+				filterCard:true,
+				selectCard:function(){
+					if(_status.event.player.isNotMajor()) return [1,2];
+					return [1,1];
+				},
+				position:'h',
+				discard:false,
+				toStorage:true,
+				check:function(card){
+					var player=_status.event.player,cards=ui.selected.cards.concat(game.findPlayer(function(current){
+						return current.hasSkill('zhaoshu_skill')&&current.isFriendOf(player);
+					}).getStorage('zhaoshu_cards')),suit=get.suit(card,false);
+					for(var i of cards){
+						if(get.suit(i)==suit) return 0;
+					}
+					return 5+player.needsToDiscard()*1.5-get.value(card);
+				},
+				filterTarget:function(card,player,target){
+					return target.hasSkill('zhaoshu_skill')&&target.isFriendOf(player);
+				},
+				selectTarget:function(){
+					if(game.countPlayer(function(current){
+						return current.hasSkill('zhaoshu_skill')&&current.isFriendOf(_status.event.player);
+					})==1) return -1;
+					return 1;
+				},
+				prompt:function(){
+					var player=_status.event.player;
+					return '将'+(player.isNotMajor()?'至多两':'一')+'张手牌置于'+get.translation(game.filterPlayer(function(current){
+						return current.hasSkill('zhaoshu_skill')&&current.isFriendOf(player);
+					}))+'的【诏书】上';
+				},
+				prepare:function(cards,player,targets){
+					var target=targets[0]
+					player.$give(cards,target,false);
+					game.log(player,'将',cards,'放在了',target,'的',target.getStorage('zhaoshu_skill'),'上');
+					target.markAuto('zhaoshu_cards',cards);
+					target.markSkill('zhaoshu_skill');
+				},
+				content:function(){},
+				ai:{
+					order:1,
+					result:{
+						player:1,
+					},
+				},
+			},
 			liulongcanjia:{
 				equipSkill:true,
 				mod:{
@@ -1463,6 +1626,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						_status.chiling=true;
 						if(player&&player.popup) player.popup('敕令');
 					}
+					if(!lib.inpile.contains('zhaoshu')){
+						lib.inpile.push('zhaoshu');
+						var card=game.createCard2('zhaoshu','club',3);
+						game.log(card,'被置于了牌堆底');
+						ui.cardPile.appendChild(card);
+						game.updateRoundNumber();
+					}
 				},
 			},
 			g_chiling2:{},
@@ -1683,7 +1853,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			lianjunshengyan_info:'出牌阶段，对你和你选择的除你的势力外的一个势力的所有角色。若目标角色：为你，你选择摸Y张牌并回复X-Y点体力（X为该势力的角色数，Y∈[0,X]）；不为你，其摸一张牌，然后重置。',
 			lianjunshengyan_info_boss:'出牌阶段，对场上所有角色使用。你摸X张牌（X为目存活角色数），其他角色依次选择回复1点体力或摸一张牌。',
 			chiling:'敕令',
-			chiling_info:'出牌阶段，对所有没有势力的角色使用。目标角色选择一项：1、明置一张武将牌，然后摸一张牌；2、弃置一张装备牌；3、失去1点体力。当【敕令】因判定或弃置而置入弃牌堆时，系统将之移出游戏，然后系统于当前回合结束后视为对所有没有势力的角色使用【敕令】',
+			chiling_info:'出牌阶段，对所有没有势力的角色使用。目标角色选择一项：1、明置一张武将牌，然后摸一张牌；2、弃置一张装备牌；3、失去1点体力。当【敕令】因判定或弃置而置入弃牌堆时，系统将之移出游戏并将【诏书】置于牌堆底，然后系统于当前回合结束后视为对所有没有势力的角色使用【敕令】。',
 			diaohulishan:'调虎离山',
 			diaohulishan_info:'出牌阶段，对至多两名其他角色使用。目标角色于此回合结束之前不计入距离的计算且不能使用牌且不是牌的合法目标且不能失去或回复体力或受到伤害。',
 			huoshaolianying:'火烧连营',
@@ -1721,6 +1891,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gz_guguoanbang_info:'出牌阶段，对你自己使用。你摸八张牌，然后弃置至少六张手牌。然后若你的势力为吴，则你可以将你以此法弃置的牌交给其他吴势力角色（每名角色至多获得两张牌）。',
 			gz_wenheluanwu:'文和乱武',
 			gz_wenheluanwu_info:'出牌阶段，对所有角色使用。目标角色展示所有手牌，然后你选择一项：①令其弃置两张类型不同的手牌；②你弃置其一张手牌。然后若其为群势力角色且其没有手牌，则其将手牌摸至当前体力值（至多为5）。',
+			zhaoshu:'诏书',
+			zhaoshu_skill:'锦囊召唤',
+			zhaoshu_global:'诏书',
+			zhaoshu_info:'<li>出牌阶段，对你自己使用。你将此牌置于目标的武将牌上。<br><li>与你势力相同的角色的出牌阶段限一次，其可以将一张手牌（小势力角色改为至多两张）置于【诏书】上，称为“应”。<br><li>出牌阶段限一次，若你的“应”中包含至少四种花色，则你可以发动“锦囊召唤”，将所有“应”置入弃牌堆，然后随机获得一张未加入游戏的势力锦囊牌。',
 		},
 		list:[
 			['heart',9,'yuanjiao'],

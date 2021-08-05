@@ -183,7 +183,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					var next=player.chooseToDiscard(get.prompt('longyin'),'弃置一张牌'+(get.color(trigger.card)=='red'?'并摸一张牌':'')+'，令'+get.translation(trigger.player)+'本次使用的【杀】不计入使用次数','he');
-					next.logSkill=['longyin',trigger.player];
+					next.logSkill=['relongyin',trigger.player];
 					next.set('ai',function(card){
 						if(_status.event.go){
 							return 6-get.value(card);
@@ -208,6 +208,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			jiezhong:{
+				audio:2,
 				trigger:{player:'phaseUseBegin'},
 				limited:true,
 				skillAnimation:true,
@@ -6534,7 +6535,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			reguanxing:{
 				audio:'guanxing',
-				audioname:['jiangwei','re_jiangwei','re_zhugeliang','gexuan'],
+				audioname:['jiangwei','re_jiangwei','re_zhugeliang','gexuan','ol_jiangwei'],
 				trigger:{player:['phaseZhunbeiBegin','phaseJieshuBegin']},
 				frequent:true,
 				filter:function(event,player,name){

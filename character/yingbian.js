@@ -1982,7 +1982,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterFilter:{},
 		dynamicTranslate:{},
 		perfectPair:{
-			jin_simayi:['jin_zhangchunhua'],
+			jin_simayi:['jin_zhangchunhua','shibao'],
 			jin_simazhao:['jin_wangyuanji'],
 			jin_simashi:['jin_xiahouhui','jin_yanghuiyu'],
 		},

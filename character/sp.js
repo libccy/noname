@@ -536,6 +536,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:2,
 				},
+				group:'olzhennan2',
+			},
+			olzhennan2:{
+				trigger:{target:'useCardToBefore'},
+				forced:true,
+				locked:false,
+				audio:'olzhennan',
+				filter:function(event,player){
+					return event.card.name=='nanman';
+				},
+				content:function(){
+					trigger.cancel();
+				},
 			},
 			//糜芳傅士仁
 			mffengshi:{
@@ -17533,6 +17546,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olxushen:'许身',
 			olxushen_info:'限定技，当你进入濒死状态时，你可将体力回复至1点并获得技能〖镇南〗。然后若场上没有存活的“关索”，则你可以令一名其他男性角色选择是否将一张武将牌替换为“关索”。',
 			olzhennan:'镇南',
+			olzhennan2:'镇南',
 			olzhennan_info:'【南蛮入侵】对你无效。出牌阶段限一次，你可以将任意张手牌当做【南蛮入侵】对等量的角色使用。',
 			
 			sp_default:"常规",

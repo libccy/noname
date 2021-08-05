@@ -4145,7 +4145,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return Math.min(5,target.maxHp,target.countMark('zhengjian_mark'));
 						});
 					}
-					else if(list.length==1) list[0].draw(Math.min(5,target.maxHp,target.countMark('zhengjian_mark')));
+					else if(list.length==1) list[0].draw(Math.min(5,list[0].maxHp,list[0].countMark('zhengjian_mark')));
 					'step 1'
 					game.countPlayer(function(current){
 						current.removeSkill('zhengjian_mark');

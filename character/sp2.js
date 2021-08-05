@@ -447,8 +447,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						check:function(event,player){
 							return get.attitude(player,event.player)>0;
 						},
+						prompt2:'令其将体力值回复至1点',
 						content:function(){
-							trigger.player.recover(1-player.hp);
+							trigger.player.recover(1-trigger.player.hp);
 							player.addTempSkill('jielie_temp','roundStart');
 						},
 					},
@@ -459,6 +460,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filter:function(event,player){
 							return event.player==player.storage.jielie;
 						},
+						forced:true,
 						content:function(){
 							var cards=player.getCards('he');
 							if(cards.length) player.discard(cards);
@@ -472,7 +474,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			kangge:{
 				audio:2,
-				trigger:{player:'damageBegin2'},
+				trigger:{player:'damageBegin4'},
 				direct:true,
 				filter:function(event,player){
 					return event.source!=player&&event.source!=player.storage.jielie;
@@ -487,7 +489,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.suit=result.control;
 						player.logSkill('kangge');
 						trigger.cancel();
-						player.loseHp();
+						player.loseHp(trigger.num);
 					}
 					else event.finish();
 					'step 2'

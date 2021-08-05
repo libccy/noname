@@ -2824,7 +2824,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			tiaoxin:{
 				audio:2,
-				audioname:['sp_jiangwei','xiahouba','re_jiangwei','gz_jiangwei'],
+				audioname:['sp_jiangwei','xiahouba','re_jiangwei','gz_jiangwei','ol_jiangwei'],
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
@@ -4239,7 +4239,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//unique:true,
 				locked:true,
 				audio:"juxiang1",
-				audioname:['re_zhurong'],
+				audioname:['re_zhurong','ol_zhurong'],
 				group:['juxiang1','juxiang2'],
 				ai:{
 					effect:{
@@ -4251,7 +4251,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			juxiang1:{
 				audio:2,
-				audioname:['re_zhurong'],
+				audioname:['re_zhurong','ol_zhurong'],
 				trigger:{target:'useCardToBefore'},
 				forced:true,
 				priority:15,
@@ -4264,7 +4264,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			juxiang2:{
 				audio:"juxiang1",
-				audioname:['re_zhurong'],
+				audioname:['re_zhurong','ol_zhurong'],
 				trigger:{global:'useCardAfter'},
 				forced:true,
 				filter:function(event,player){
@@ -4277,7 +4277,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lieren:{
 				shaRelated:true,
 				audio:2,
-				audioname:['boss_lvbu3'],
+				audioname:['boss_lvbu3','ol_zhurong'],
 				trigger:{source:'damageSource'},
 				filter:function(event,player){
 					if(event._notrigger.contains(event.player)) return false;
