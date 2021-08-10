@@ -7418,7 +7418,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.count=trigger.num;
 					"step 1"
 					event.count--;
-					player.gainPlayerCard(get.prompt('refankui',trigger.source),trigger.source,get.buttonValue,'he').set('logSkill',['refankui',trigger.source]);
+					player.gainPlayerCard(get.prompt('refankui',trigger.source),trigger.source,get.buttonValue,'he').set('logSkill',[event.name,trigger.source]);
 					"step 2"
 					if(result.bool&&event.count>0&&trigger.source.countGainableCards(player,'he')>0) event.goto(1);
 				},

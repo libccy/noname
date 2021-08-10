@@ -79,6 +79,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_kotarou:['male','key',3,['kotarou_rewrite','kotarou_aurora']],
 			key_tenzen:['male','key',4,['tenzen_yixing','tenzen_lingyu']],
 			key_kyouko:['female','key',3,['kyouko_rongzhu','kyouko_gongmian']],
+			key_kyou:['female','key',3,['kyou_zhidian','kyou_duanfa']],
 			
 			ns_huangchengyan:['male','shu',3,['nslongyue','nszhenyin']],
 			ns_sunchensunjun:['male','wu',5,['nsxianhai','nsxingchu']],
@@ -280,6 +281,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_misuzu:'#b长发及腰黑长直',
 			key_kamome:'#b仿生纱',
 			key_nao:'#b潮鸣',
+			key_kyou:'#b长发及腰黑长直',
 			key_yuuki:'#b4399司命',
 			key_kyouko:'#b阿阿阿687',
 			key_tenzen:'#b皋耳击',
@@ -455,6 +457,123 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			kyou_zhidian:{
+				locked:false,
+				mod:{
+					targetInRange:function(card){
+						if(card.kyou_zhidian) return true;
+					},
+					aiOrder:function(player,card,numx){
+						var num=_status.event._kyou_zhidian_baseValue;
+						if(num>0&&get.type2(card)=='trick'&&player.getUseValue(card)<num) return numx/10;
+					},
+				},
+				enable:'chooseToUse',
+				filter:function(event,player){
+					return player.countCards('hs',(card)=>get.type2(card)=='trick')>0;
+				},
+				filterCard:function(card){
+					return get.type2(card)=='trick';
+				},
+				onChooseToUse:function(event){
+					event._kyou_zhidian_baseValue=event.player.getUseValue({name:'sha'});
+				},
+				check:function(card){
+					var num=_status.event._kyou_zhidian_baseValue,player=_status.event.player;
+					return num-player.getUseValue(card);
+				},
+				prompt:'将一张锦囊牌当做【杀】使用',
+				viewAs:{
+					name:'sha',
+					kyou_zhidian:true,
+				},
+				group:'kyou_zhidian_aim',
+				ai:{
+					respondSha:true,
+					skillTagFilter:(player)=>player.countCards('hs',(card)=>get.type2(card)=='trick')>0,
+				},
+				subSkill:{
+					aim:{
+						trigger:{
+							player:'useCardToPlayered',
+						},
+						forced:true,
+						locked:false,
+						filter:function(event,player){
+							return event.isFirstTarget&&event.card.name=='sha';
+						},
+						logTarget:'target',
+						content:function(){
+							'step 0'
+							var list=['不可被响应','无视防具','伤害+1','不计入次数'];
+							list.remove(player.storage.kyou_zhidian);
+							player.chooseControl(list).set('prompt','掷典：请为'+get.translation(trigger.card)+'选择一种效果').set('choice',function(){
+								if(list.contains('不计入次数')&&player.hasSha()) return '不计入次数';
+								if(list.contains('不可被响应')&&trigger.target.mayHaveShan()) return '不可被响应';
+								if(list.contains('伤害+1')) return '伤害+1';
+								return list.randomGet();
+							}()).set('ai',()=>_status.event.choice);
+							'step 1'
+							var target=trigger.target;
+							player.storage.kyou_zhidian=result.control;
+							game.log(player,'对',target,'的',trigger.card,'#g'+result.control);
+							switch(result.control){
+								case '不可被响应':
+									trigger.directHit.add(target);
+									break;
+								case '无视防具':
+									target.addTempSkill('qinggang2');
+									target.storage.qinggang2.add(trigger.card);
+									break;
+								case '伤害+1':
+									var map=trigger.customArgs;
+									var id=target.playerid;
+									if(!map[id]) map[id]={};
+									if(!map[id].extraDamage) map[id].extraDamage=0;
+									map[id].extraDamage++;
+									break;
+								case '不计入次数':
+									var evt=trigger.getParent();
+									if(evt.addCount!==false){
+										evt.addCount=false;
+										player.getStat().card.sha--;
+									}
+									break;
+							}
+						},
+					}
+				},
+			},
+			kyou_duanfa:{
+				trigger:{player:'damageBegin2'},
+				limited:true,
+				skillAnimation:true,
+				animationColor:'thunder',
+				filter:function(event,player){
+					return player.hp<=event.num;
+				},
+				content:function(){
+					player.awakenSkill('kyou_duanfa');
+					if(player.countCards('h')>0) player.chooseToDiscard('h',true,player.countCards('h'));
+					player.recover();
+					trigger.cancel();
+					player.addTempSkill('kyou_duanfa_draw',{player:'phaseBegin'});
+				},
+				subSkill:{
+					draw:{
+						trigger:{target:'useCardToTargeted'},
+						forced:true,
+						charlotte:true,
+						filter:function(event,player){
+							if(event.card.name=='sha') return true;
+							return get.type(event.card,false)=='trick'&&get.tag(event.card,'damage')>0;
+						},
+						content:function(){
+							player.draw();
+						},
+					},
+				},
+			},
 			kotarou_aurora:{
 				trigger:{
 					player:['damageEnd','loseHpEnd','gainMaxHpEnd']
@@ -15157,6 +15276,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kotarou_rewrite_sha:'改写',
 			kotarou_rewrite_block:'改写',
 			kotarou_rewrite_info:'出牌阶段，你可选择：①视为使用一张本局游戏没有以此法使用过的基本牌或普通锦囊牌；②移动场上的一张牌；③增加一点体力上限并失去1点体力（体力上限至多为5）；④下一次造成的伤害+1；⑤下一次回复的体力值+1；⑥本回合内的手牌上限和使用【杀】的使用次数+1。若你于本回合内发动过〖改写〗的次数超过两次，则你令此技能失效，且于回合结束后将体力上限降至3点，失去〖丝刃〗和〖改写〗。',
+			key_kyou:'藤林杏',
+			kyou_zhidian:'掷典',
+			kyou_zhidian_info:'你可以将一张锦囊牌当做【杀】使用（无距离限制）。当你使用【杀】指定第一个目标后，你选择一个与上次不同的选项：①此【杀】不可被响应。②此【杀】无视防具。③此【杀】伤害+1。④此【杀】不计入次数限制。',
+			kyou_duanfa:'断发',
+			kyou_duanfa_info:'限定技，当你受到伤害时，若伤害值不小于你的体力值，则你可弃置所有手牌，防止此伤害并回复1点体力；且当你于你的下回合开始前成为【杀】或伤害性锦囊牌的目标后，你摸一张牌。',
 
 			noname:"小无",
 			noname_zhuyuan:"祝愿",

@@ -8923,7 +8923,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		perfectPair:{
-			wujing:['sunce','sunben','wuguotai'], 
+			wujing:['sunce','sunben','wuguotai'],
+			simazhao:['simayi','jin_simayi','jin_wangyuanji'],
 		},
 		characterReplace:{
 			caochun:['caochun','old_caochun'],

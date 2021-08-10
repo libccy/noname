@@ -191,6 +191,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuchen:['liushan'],
 			yujin:['xiahoudun'],
 			fazheng:['liubei'],
+			zhonghui:['jiangwei','dengai'],
 		},
 		skill:{
 			rejingce:{

@@ -14,6 +14,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					cards=cards.filterInD();
 					if(cards.length&&target.isAlive()){
+						game.cardsGotoSpecial(cards);
+						game.log(cards,'被移出了游戏');
 						player.$gain2(cards,false);
 						target.markAuto('zhaoshu_skill',cards);
 						target.addSkill('zhaoshu_skill');

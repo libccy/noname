@@ -268,6 +268,7 @@ window.noname_character_rank={
 		'key_hiroto',
 		'key_nao',
 		'key_kotarou',
+		'key_kyou',
 		'mini_zhugeliang',
 		'mini_lvmeng',
 	],
@@ -1212,6 +1213,7 @@ window.noname_character_rank={
 			'key_kyouko',
 			'key_tenzen',
 			'key_kotarou',
+			'key_kyou',
 			'noname',
 		],
 		epic:[

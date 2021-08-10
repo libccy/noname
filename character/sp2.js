@@ -517,7 +517,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseTarget(function(card,player,current){
+					player.chooseTarget(function(card,player,target){
 						return target!=player&&target.countCards('j',function(card){
 							return player.canAddJudge(card);
 						})>0;
