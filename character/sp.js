@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			sp:{
-				sp_default:["caoying","simahui","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","xujing","yuantanyuanshang","sunshao","zhangling",'guansuo','baosanniang','ol_zhangchangpu','caoshuang','sp_zhangliao','wolongfengchu','ol_xinxianying','panshu','huangzu','huangchengyan'],
+				sp_default:["caoying","simahui","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","xujing","yuantanyuanshang","sunshao","zhangling",'guansuo','baosanniang','ol_zhangchangpu','caoshuang','sp_zhangliao','wolongfengchu','ol_xinxianying','panshu','huangzu','huangchengyan','gaogan'],
 				sp_tongque:["liuxie","lingju","fuwan","sp_fuwan","sp_fuhuanghou","sp_jiben"],
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_star:["sp_xiahoushi","jsp_zhaoyun","huangjinleishi","sp_pangtong","sp_daqiao","sp_ganning","sp_xiahoudun","sp_lvmeng","sp_zhangfei","sp_liubei"],
@@ -18,6 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		character:{
+			gaogan:['male','qun',4,['juguan']],
 			sp_mifangfushiren:['male','shu',4,['mffengshi']],
 			huangchengyan:['male','qun',3,['guanxu','yashi']],
 			huangzu:['male','qun',4,['wangong']],
@@ -163,6 +164,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			gaogan:'高干（？~206年），字元才，陈留郡圉县（今河南杞县圉镇）人。东汉末年并州割据将领，蜀郡太守高躬之子、大将军袁绍外甥。出身陈留高氏，才志弘邈，文武秀出。早年联合荀谌游说韩馥让出冀州牧。袁绍平定河北后，以为并州牧。官渡之战时，在西线配合作战。因曹操早有准备，没有实质进展。袁绍死后，袁谭、袁尚与曹操大战于黎阳郡时，联合郭援攻打平阳郡，为马腾为首关中将领所败，郭援为庞德所斩。袁尚败走中山郡后，出降于曹操，仍为并州刺史。建安十年，兴兵反曹，固守壶关，成功抵挡乐进进攻。得知曹操亲征后，留下别将守城，亲往匈奴呼厨泉求救，没有成功。引兵攻略河东郡，屡为钟繇、张既所败。建安十一年，投奔荆州刘表。途经上洛时，为上洛都尉捕斩之。',
 			huangchengyan:'黄承彦，生卒年不详，汉末三国时期沔阳名士，诸葛亮岳父，黄月英之父。南郡大士蔡讽的女婿，与襄阳名士上层社会圈子：庞统（凤雏）、庞德公、司马徽、徐庶等人交好。《襄阳记》：黄承彦者，高爽开列，为沔阳名士，谓诸葛孔明曰：“闻君择妇，身有丑女，黄头黑色，而才堪配。”孔明许，即载送之。时人以为笑乐，乡里为之谚曰：“莫作孔明择妇，正得阿承丑女。”',
 			panshu:'潘淑（？－252年），会稽句章（今浙江省宁波市）人，是吴大帝孙权的皇后，吴少帝孙亮的母亲。和孙权是中国历代帝后中年龄差距较大的一对。潘淑少时与姐姐俱没入织室，容媚有宠，拜为夫人，生有一子孙亮。赤乌十三年（250年），孙权立孙亮为皇太子，翌年（251年）立潘淑为皇后。神凤元年（252年）暴崩，合葬蒋陵。世称潘淑为江东绝色，有神女之称。',
 			jiben:'吉本（？—218年），东汉末年太医令。建安二十三年春正月，时金祎自以世为汉臣，睹汉祚将移，谓可季兴，乃喟然发愤，遂与太医令本、少府耿纪、司直韦晃、本子邈、邈弟穆等结谋攻许，杀曹公长史王必，南援刘备。后必营，必与典农中郎将严匡讨斩之。在《三国演义》中，吉本在此为吉平或吉太，因字称平，故又唤作吉平。曾参与董承等人刺杀曹操的计划，并企图在为曹操治病时毒死曹操，但被曹操识破而遭处刑。之后其子吉邈和吉穆都参与了由耿纪和韦晃等人所发动的反叛曹操的行动，但都失败被杀。',
@@ -430,6 +432,106 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//高干
+			juguan:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return event.filterCard({
+						name:'sha',
+					},player,event)||event.filterCard({
+						name:'juedou',
+					},player,event);
+				},
+				chooseButton:{
+					dialog:function(){
+						return ui.create.dialog('拒关',[['sha','juedou'],'vcard']);
+					},
+					filter:function(button,player){
+						var evt=_status.event.getParent();
+						return evt.filterCard({
+							name:button.link[2],
+						},player,evt);
+					},
+					check:function(button){
+						return _status.event.player.getUseValue({
+							name:button.link[2],
+						})*(button.link[2]=='juedou'?3:1);
+					},
+					backup:function(links){
+						return {
+							audio:'juguan',
+							viewAs:{name:links[0][2]},
+							filterCard:true,
+							check:function(card){
+								return 6-get.value(card);
+							},
+							position:'h',
+							onuse:function(result,player){
+								player.addTempSkill('juguan_effect');
+							},
+						}
+					},
+					prompt:function(links){
+						return '将一张手牌当做'+get.translation(links[0][2])+'使用';
+					},
+				},
+				ai:{
+					order:function(item,player){
+						return Math.max(get.order({name:'sha'}),get.order({name:'juedou'}))+0.2;
+					},
+					result:{player:1},
+				},
+				subSkill:{
+					effect:{
+						trigger:{source:'damage'},
+						forced:true,
+						charlotte:true,
+						firstDo:true,
+						silent:true,
+						popup:false,
+						filter:function(event,player){
+							var evt=event.getParent('useCard');
+							return event.card&&evt&&event.card==evt.card&&evt.skill=='juguan_backup';
+						},
+						content:function(){
+							player.addSkill('juguan_draw');
+							player.markAuto('juguan_draw',[trigger.player]);
+						},
+					},
+					draw:{
+						audio:'juguan',
+						trigger:{player:'phaseDrawBegin'},
+						forced:true,
+						charlotte:true,
+						onremove:true,
+						content:function(){
+							player.removeSkill('juguan_draw');
+							if(!trigger.numFixed) trigger.num+=2;
+						},
+						group:'juguan_clear',
+						intro:{
+							content:'若没有受到$的伤害，则下个摸牌阶段多摸两张牌',
+						},
+					},
+					clear:{
+						trigger:{player:'damage'},
+						forced:true,
+						charlotte:true,
+						firstDo:true,
+						silent:true,
+						popup:false,
+						filter:function(event,player){
+						 return player.storage.juguan_draw&&player.storage.juguan_draw.contains(event.source);
+						},
+						content:function(){
+							player.unmarkAuto('juguan_draw',[trigger.source]);
+							if(!player.storage.juguan_draw||!player.storage.juguan_draw.length) player.removeSkill('juguan_draw');
+						},
+					},
+				},
+			},
 			//OL鲍三娘
 			olwuniang:{
 				audio:'xinfu_wuniang',
@@ -14023,14 +14125,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var evt=event.getParent(2);
 					evt.set('aocai',true);
-					var cards=get.cards(player.countCards('h')==0?4:2);
+					var cards=get.cards((get.mode()!='guozhan'&&player.countCards('h')==0)?4:2);
 					for(var i=cards.length-1;i>=0;i--){
 						ui.cardPile.insertBefore(cards[i].fix(),ui.cardPile.firstChild);
 					}
+					var aozhan=player.hasSkill('aozhan');
 					player.chooseButton(['傲才：选择要'+(evt.name=='chooseToUse'?'使用':'打出')+'的牌',cards]).set('filterButton',function(button){
 						return _status.event.cards.contains(button.link);
 					}).set('cards',cards.filter(function(card){
-						return evt.filterCard(card,evt.player,evt)
+						if(aozhan&&card.name=='tao'){
+							return evt.filterCard({
+								name:'sha',isCard:true,cards:[card],
+							},evt.player,evt)||evt.filterCard({
+								name:'shan',isCard:true,cards:[card],
+							},evt.player,evt);
+						}
+						return evt.filterCard(card,evt.player,evt);
 					})).set('ai',function(button){
 						var evt=_status.event.getParent(3);
 						if(evt&&evt.ai){
@@ -14045,11 +14155,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					var evt=event.getParent(2);
 					if(result.bool&&result.links&&result.links.length){
+						var name=result.links[0].name,aozhan=(player.hasSkill('aozhan')&&name=='tao');
+						if(aozhan){
+							name=evt.filterCard({
+								name:'sha',isCard:true,cards:[card],
+							},evt.player,evt)?'sha':'shan';
+						}
 						if(evt.name=='chooseToUse'){
-						game.broadcastAll(function(result){
-								lib.skill.aocai_backup.viewAs={name:result.name,cards:[result],isCard:true};
+							game.broadcastAll(function(result,name){
+								lib.skill.aocai_backup.viewAs={name:name,cards:[result],isCard:true};
 								lib.skill.aocai_backup.prompt='选择'+get.translation(result)+'的目标';
-							},result.links[0]);
+							},result.links[0],name);
 							evt.set('_backupevent','aocai_backup');
 							evt.backup('aocai_backup');
 						}
@@ -14057,6 +14173,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							delete evt.result.skill;
 							delete evt.result.used;
 							evt.result.card=get.autoViewAs(result.links[0]);
+							if(aozhan) evt.result.card.name=name;
 							evt.result.cards=[result.links[0]];
 							evt.redo();
 							return;
@@ -14086,8 +14203,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sourceSkill:'aocai',
 				precontent:function(){
 					delete event.result.skill;
+					var name=event.result.card.name;
 					event.result.cards=event.result.card.cards;
-					event.result.card=get.autoViewAs(event.result.cards[0])
+					event.result.card=get.autoViewAs(event.result.cards[0]);
+					event.result.card.name=name;
 				},
 				filterCard:function(){return false},
 				selectCard:-1,
@@ -16619,6 +16738,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangxingcai:['zhangxingcai','old_zhangxingcai'],
 			lisu:['ol_lisu','lisu'],
 			fuwan:['fuwan','sp_fuwan'],
+			huaxin:['ol_huaxin','huaxin'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
@@ -17378,6 +17498,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xueji_info:'出牌阶段限一次，你可以弃置一张红色牌，然后选择至多X名角色，横置这些角色并对其中一名角色造成1点火焰伤害。（X为你已损失的体力值且至少为1）',
 			huxiao_info:'锁定技，当你造成火属性伤害时，该角色摸一张牌。然后，你于此回合内对其使用牌没有次数限制。',
 			aocai_info:'当你于回合外需要使用或打出一张基本牌时，你可以观看牌堆顶的两张牌（若你没有手牌则改为四张）。若你观看的牌中有此牌，你可以使用打出之。',
+			aocai_info_guozhan:'当你于回合外需要使用或打出一张基本牌时，你可以观看牌堆顶的两张牌。若你观看的牌中有此牌，你可以使用打出之。',
 			hongyuan_info:'摸牌阶段，你可以少摸一张牌并指定至多两名其他角色。若如此做，这些角色各摸一张牌。',
 			hongyuan_info_combat:'摸牌阶段，你可以少摸一张牌。若如此做，其他友方角色各摸一张牌。',
 			huanshi_info:'一名角色的判定牌生效前，你可令其观看你的手牌。若如此做，该角色选择你的一张牌，你打出此牌代替之。',
@@ -17548,6 +17669,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olzhennan:'镇南',
 			olzhennan2:'镇南',
 			olzhennan_info:'【南蛮入侵】对你无效。出牌阶段限一次，你可以将任意张手牌当做【南蛮入侵】对等量的角色使用。',
+			gaogan:'高干',
+			juguan:'拒关',
+			juguan_backup:'拒关',
+			juguan_info:'出牌阶段限一次，你可将一张手牌当【杀】或【决斗】使用。若受到此牌伤害的角色未在你的下回合开始前对你造成过伤害，你的下个摸牌阶段摸牌数+2。',
 			
 			sp_default:"常规",
 			sp_tongque:"铜雀台",

@@ -1793,10 +1793,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			zhuSkill_xiangyang:'襄阳',
 			zhuSkill_xiangyang_info:'回合结束时，你可获得一个额外的出牌阶段或摸牌阶段。',
 			zhuSkill_jiangling:'江陵',
-			zhuSkill_jiangling_info:'当你使用【杀】或普通锦囊牌选择唯一目标时，你可为此牌增加一个目标。',
+			zhuSkill_jiangling_info:'当你使用【杀】或普通锦囊牌选择唯一目标时，你可为此牌增加一个目标（该目标不可响应此牌）。',
 			zhuSkill_fancheng:'樊城',
 			zhuSkill_fancheng2:'樊城',
-			zhuSkill_fancheng_info:'限定技，出牌阶段，你可获得如下效果：每回合限两次，当你造成伤害时，此伤害+1。',
+			zhuSkill_fancheng_info:'限定技，出牌阶段，你可获得如下效果直到回合结束：每回合限X次，当你造成伤害时，此伤害+1（X为游戏轮数且至少为2）。',
 			binglin_shaxue:'歃血',
 			binglin_shaxue_info:'锁定技，每局游戏限三次，当你受到队友造成的伤害时，你防止此伤害。',
 			binglin_neihong:'内讧',
@@ -1967,7 +1967,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(event.targets){
 						player.logSkill('zhuSkill_jiangling',event.targets);
 						if(trigger.targets.contains(event.targets[0])) trigger.targets.removeArray(event.targets);
-						else trigger.targets.addArray(event.targets);
+						else{
+							trigger.directHit.addArray(event.targets);
+							trigger.targets.addArray(event.targets);
+						}
 					}
 				},
 			},
@@ -1986,10 +1989,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageBegin2'},
 				forced:true,
 				charlotte:true,
-				usable:2,
+				onremove:true,
+				filter:function(event,player){
+					return player.countMark('zhuSkill_fancheng2')<Math.max(2,game.roundNumber);
+				},
 				logTarget:'player',
 				content:function(){
 					trigger.num++;
+					player.addMark('zhuSkill_fancheng2',1,false);
 				},
 			},
 			binglin_shaxue:{

@@ -318,7 +318,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			youyan:{
 				audio:2,
 				trigger:{player:'loseAfter'},
-				usable:1,
+				//usable:1,
 				filter:function(event,player){
 					if(event.type!='discard'||!event.cards2||!event.cards2.length||player!=_status.currentPhase) return false;
 					var list=[];
@@ -326,9 +326,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						list.add(get.suit(i,player));
 						if(list.length>=lib.suit.length) return false;
 					}
-					return true;
+					var evt=event.getParent('phaseUse');
+					if(evt&&evt.player==player&&!evt.youyaned) return true;
+					var evt=event.getParent('phaseDiscard');
+					if(evt&&evt.player==player&&!evt.youyaned) return true;
+					return false;
 				},
 				content:function(){
+					var evt=event.getParent('phaseUse');
+					if(evt&&evt.player==player) evt.youyaned=true;
+					else{
+						var evt=event.getParent('phaseDiscard');
+						if(evt) evt.youyaned=true;
+					}
 					var list=[],cards=[];
 					for(var i of trigger.cards2){
 						list.add(get.suit(i,player));
@@ -346,10 +356,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						player_use:function(card,player,target){
 							if(typeof card=='object'&&player==_status.currentPhase&&
-							(!player.storage.counttrigger||!player.storage.counttrigger.youyan)&&
+							//(!player.storage.counttrigger||!player.storage.counttrigger.youyan)&&
 							player.needsToDiscard()==1&&card.cards&&card.cards.filter(function(i){
 								return get.position(i)=='h';
-							}).length>0&&!get.tag(card,'draw')&&!get.tag(card,'gain')) return 'zeroplayertarget';
+							}).length>0&&!get.tag(card,'draw')&&!get.tag(card,'gain')&&!get.tag(card,'discard')) return 'zeroplayertarget';
 						},
 					},
 				},
@@ -372,14 +382,65 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(target.hasSkill('maixie')||target.hasSkill('maixie_defend')) att/=3;
 						if(target!=player) att/=Math.pow(game.players.length-get.distance(player,target,'absolute'),0.7);
 						return att;
-					});
+					}).set('animate',false);
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
-						player.logSkill('zhuihuan',target);
-						target.addTempSkill('zhuihuan2',{player:'phaseZhunbeiBegin'});
+						player.logSkill('zhuihuan');
+						target.addSkill('zhuihuan2_new');
 						game.delayx();
 					}
+				},
+			},
+			zhuihuan2_new:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				charlotte:true,
+				forced:true,
+				onremove:true,
+				filter:function(event,player){
+					if(player.storage.zhuihuan2_new){
+						for(var source of player.storage.zhuihuan2_new){
+							if(!source.isIn()) continue;
+							if(source.hp>player.hp) return true;
+							return source.countCards('h')>0;
+						}
+					}
+				},
+				logTarget:function(event,player){
+					return player.storage.zhuihuan2_new.filter(function(target){
+						return target.isIn();
+					});
+				},
+				content:function(){
+					'step 0'
+					event.targets=player.storage.zhuihuan2_new;
+					player.removeSkill('zhuihuan2_new');
+					'step 1'
+					var target=targets.shift();
+					if(target.isIn()){
+						if(target.hp>player.hp) target.damage(2);
+						else{
+							var hs=target.getCards('h');
+							if(hs.length) target.discard(hs.randomGets(2));
+						}
+					}
+					if(targets.length) event.redo();
+				},
+				group:'zhuihuan2_new_count',
+				subSkill:{
+					count:{
+						trigger:{player:'damage'},
+						forced:true,
+						silent:true,
+						popup:false,
+						charlotte:true,
+						filter:function(event,player){
+							return get.itemtype(event.source)=='player';
+						},
+						content:function(){
+							player.markAuto('zhuihuan2_new',[trigger.source]);
+						},
+					},
 				},
 			},
 			zhuihuan2:{
@@ -9697,10 +9758,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kangge_info:'当你受到除自己和“节烈”角色以外的角色造成的伤害时，你可以防止此伤害并选择一种花色，然后你失去X点体力，从弃牌堆中随机获得X张此花色的牌（X为伤害值）。',
 			yangwan:'杨婉',
 			youyan:'诱言',
-			youyan_info:'你的回合内限一次，当你的牌因弃置进入弃牌堆后，你可以从牌堆中获得本次弃牌中没有的花色的牌各一张。',
+			youyan_info:'出牌阶段/弃牌阶段各限一次，当你的牌因弃置进入弃牌堆后，你可以从牌堆中获得本次弃牌中没有的花色的牌各一张。',
 			zhuihuan:'追还',
 			zhuihuan2:'追还',
-			zhuihuan_info:'结束阶段，你可以选择一名角色，直到该角色的下个准备阶段，此期间内对其造成过伤害的角色：若体力值大于该角色，则受到其造成的1点伤害；若体力值小于等于该角色，则随机弃置一张手牌。',
+			zhuihuan2_new:'追还',
+			zhuihuan_info:'结束阶段开始时，你可以选择一名角色（对其他角色不可见）。记录所有对该角色造成过伤害的角色。该角色的下个准备阶段开始时停止记录，且所有记录过的角色：若体力值大于该角色，则受到其造成的2点伤害；若体力值小于等于该角色，则随机弃置两张手牌。',
 			re_dongcheng:'董承',
 			xuezhao:'血诏',
 			xuezhao_info:'出牌阶段限一次，你可弃置一张手牌并选择至多X名其他角色(X为你的体力值）。这些角色依次选择是否交给你一张牌，若选择是，该角色摸一张牌且你本回合可多使用一张【杀】；若选择否，该角色本回合无法响应你使用的牌。',

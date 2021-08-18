@@ -479,6 +479,7 @@ window.noname_character_rank={
 		'yangwan',
 		're_dongcheng',
 		'ol_yujin',
+		'ol_huaxin',
 	],
 	bp:[
 		'chess_diaochan',
@@ -690,6 +691,7 @@ window.noname_character_rank={
 		'jsp_liubei',
 		'liangxing',
 		'tangji',
+		'gaogan',
 	],
 	b:[
 		'diy_feishi',
@@ -1374,6 +1376,7 @@ window.noname_character_rank={
 			'ns_sunyi',
 			'ns_zhangning',
 			'ns_yanghu',
+			'ol_huaxin',
 			'key_haruko',
 			'key_akiko',
 			'key_sunohara',
@@ -1696,6 +1699,7 @@ window.noname_character_rank={
 			'zhouchu',
 			'dongcheng',
 			'tangji',
+			'gaogan',
 		],
 		junk:[
 			'sunshao',

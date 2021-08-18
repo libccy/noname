@@ -158,7 +158,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						value:9.2
 					},
 					result:{
-						target:2.1,
+						target:2.5,
 					},
 					tag:{
 						draw:2

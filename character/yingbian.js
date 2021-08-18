@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'yingbian',
 		connect:true,
 		character:{
+			ol_huaxin:['male','wei',3,['caozhao','olxibing']],
 			zhongyan:['female','jin',3,['bolan','yifa']],
 			weiguan:['male','jin',3,['zhongyun','shenpin']],
 			cheliji:['male','qun',4,['chexuan','qiangshou']],
@@ -22,13 +23,204 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterSort:{
 			yingbian:{
-				yingbian_pack1:['jin_simayi','jin_zhangchunhua','ol_lisu','simazhou','cheliji'],
+				yingbian_pack1:['jin_simayi','jin_zhangchunhua','ol_lisu','simazhou','cheliji','ol_huaxin'],
 				yingbian_pack2:['jin_simashi','jin_xiahouhui','zhanghuyuechen','shibao','jin_yanghuiyu'],
 				yingbian_pack3:['jin_simazhao','jin_wangyuanji','duyu','weiguan'],
 				yingbian_pack4:['zhongyan'],
 			},
 		},
 		skill:{
+			caozhao:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					if(player.countCards('h')==0||!game.hasPlayer(function(current){
+						return current!=player&&current.hp<=player.hp;
+					})) return false;
+					var list=player.getStorage('caozhao');
+					for(var i of lib.inpile){
+						if(!list.contains(i)&&['basic','trick'].contains(get.type(i))) return true;
+					}
+					return false;
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						var list=player.getStorage('caozhao'),vcards=[];
+						for(var i of lib.inpile){
+							if(!list.contains(i)){
+								var type=get.type(i);
+								if(type=='basic'||type=='trick') vcards.push([type,'',i]);
+							}
+						}
+						return ui.create.dialog('草诏',[vcards,'vcard']);
+					},
+					check:function(button){
+						return _status.event.player.getUseValue({name:button.link[2],isCard:true},null,true);
+					},
+					backup:function(links,player){
+						return {
+							audio:'caozhao',
+							cardname:links[0][2],
+							filterCard:true,
+							position:'h',
+							check:function(card){
+								return player.getUseValue({name:lib.skill.caozhao_backup.cardname})-((player.getUseValue(card,null,true)+0.1)/(get.value(card)/6));
+							},
+							filterTarget:function(card,player,target){
+								return target!=player&&target.hp<=player.hp;
+							},
+							discard:false,
+							lose:false,
+							content:function(){
+								'step 0'
+								player.showCards(cards,get.translation(player)+'发动【草诏】，声明'+get.translation(lib.skill.caozhao_backup.cardname));
+								if(!player.storage.caozhao) player.storage.caozhao=[];
+								player.storage.caozhao.push(lib.skill.caozhao_backup.cardname);
+								'step 1'
+								target.chooseControl().set('choiceList',[
+									'令'+get.translation(player)+'将'+get.translation(cards[0])+'的牌名改为'+get.translation(lib.skill.caozhao_backup.cardname),
+									'失去1点体力',
+								]).set('ai',function(event,player){
+									var target=_status.event.getParent().player;
+									if(get.attitude(player,target)>0) return 0;
+									if(player.hp>3||(player.hp>1&&player.hasSkill('zhaxiang'))) return 1;
+									if(player.hp>2) return Math.random()>0.5?0:1;
+									return 0;
+								});
+								'step 2'
+								if(result.index==1){
+									target.addExpose(0.2);
+									target.loseHp();
+									event.finish();
+								}
+								else{
+									player.chooseTarget('是否将'+get.translation(lib.skill.caozhao_backup.cardname)+'（'+get.translation(card)+'）交给一名其他角色？',lib.filter.notMe).set('ai',()=>-1);
+								}
+								'step 3'
+								if(result.bool){
+									var target=result.targets[0];
+									player.line(target,'green');
+									if(!target.storage.caozhao_info) target.storage.caozhao_info={};
+									target.storage.caozhao_info[cards[0].cardid]=lib.skill.caozhao_backup.cardname;
+									target.addSkill('caozhao_info');
+									target.gain(cards,player,'give').gaintag.add('caozhao');
+								}
+								else{
+									if(!player.storage.caozhao_info) player.storage.caozhao_info={};
+									player.storage.caozhao_info[cards[0].cardid]=lib.skill.caozhao_backup.cardname;
+									player.addGaintag(cards,'caozhao');
+									player.addSkill('caozhao_info');
+								}
+							},
+							ai:{
+								result:{
+									player:2,
+									target:0.1,
+								},
+							},
+						}
+					},
+					prompt:function(links,player){
+						return '将一张手牌声明为'+get.translation(links[0][2]);
+					},
+				},
+				ai:{
+					order:1,
+					result:{
+						player:1,
+					},
+				},
+			},
+			caozhao_info:{
+				charlotte:true,
+				mod:{
+					cardname:function(card,player){
+						var map=player.storage.caozhao_info;
+						if(map&&map[card.cardid]&&get.itemtype(card)=='card'&&card.hasGaintag('caozhao')) return map[card.cardid];
+					},
+					cardnature:function(card,player){
+						var map=player.storage.caozhao_info;
+						if(map&&map[card.cardid]&&get.itemtype(card)=='card'&&card.hasGaintag('caozhao')) return false;
+					},
+				},
+			},
+			olxibing:{
+				audio:2,
+				trigger:{
+					player:'damageEnd',
+					source:'damageSource',
+				},
+				filter:function(event,player){
+					return event.player&&event.source&&event.player!=event.source&&
+					event.player.isAlive()&&event.source.isAlive()&&
+					(event.player.countCards('he')>0||event.source.countCards('he')>0);
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					var target=(player==trigger.player?trigger.source:trigger.player);
+					event.target=target;
+					player.chooseTarget(get.prompt('olxibing'),'弃置自己或'+get.translation(target)+'的两张牌，然后手牌数较少的角色摸两张牌且不能对你使用牌直到回合结束',function(card,player,target){
+						if(target!=player&&target!=_status.event.target) return false;
+						return target.countCards('he')>0;
+					}).set('target',target).set('ai',function(targetx){
+						var player=_status.event.player,target=_status.event.target;
+						if(target==targetx){
+							if(get.attitude(player,target)>0) return 0;
+							var cards=target.getCards('he',function(card){
+								return lib.filter.canBeDiscarded(card,player,target);
+							}).sort(function(a,b){
+								return get.buttonValue(b)-get.buttonValue(a);
+							});
+							if((target.countCards('h')-player.countCards('h'))>=Math.max(0,Math.min(2,cards.length)-target.countCards('e',function(card){
+								var index=cards.indexOf(card);
+								return index!=-1&&index<2;
+							}))) return 1;
+							return 0;
+						}
+						var cards=player.getCards('he',function(card){
+							return lib.filter.cardDiscardable(card,player,'olxibing')
+						}).sort(function(a,b){
+							return get.useful(a)-get.useful(b);
+						});
+						if(player.countCards('h')-target.countCards('h')<Math.max(0,Math.min(cards.length,2)-player.countCards('e',function(card){
+							var index=cards.indexOf(card);
+							return index!=-1&&index<2;
+						}))&&(cards.length<2||get.value(cards[1])<5.5)) return 0.8;
+						return 0;
+					});
+					'step 1'
+					if(result.bool){
+						player.logSkill('olxibing',target);
+						var target=result.targets[0];
+						if(target==player) player.chooseToDiscard('he',2,true);
+						else player.discardPlayerCard(target,'he',true,2);
+					}
+					else event.finish();
+					'step 2'
+					if(player.isIn()&&target.isIn()){
+						var hs=player.countCards('h'),ts=target.countCards('h');
+						if(hs!=ts){
+							var drawer=hs>ts?target:player;
+							drawer.draw(2);
+							player.addTempSkill('olxibing2');
+							player.markAuto('olxibing2',[drawer]);
+						}
+					}
+				},
+			},
+			olxibing2:{
+				mod:{
+					targetEnabled:function(card,player,target){
+						if(target.getStorage('olxibing2').contains(player)) return false;
+					},
+					cardSavable:function(card,player,target){
+						if(target.getStorage('olxibing2').contains(player)) return false;
+					},
+				},
+				onremove:true,
+			},
 			bolan:{
 				audio:2,
 				initList:function(player){
@@ -768,6 +960,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
+					if(player!=game.me&&!player.isOnline()) game.delayx();
 					player.chooseToDiscard(get.prompt('ciwei',trigger.player),'弃置一张牌，取消'+get.translation(trigger.card)+'的所有目标','he').set('ai',function(card){
 						return (_status.event.goon/1.4)-get.value(card);
 					}).set('goon',function(){
@@ -1434,6 +1627,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
+					if(trigger.delay===false) game.delayx();
 					var list=[];
 					var suits=get.copy(player.storage.zhaoran2);
 					suits.addArray(player.getCards('h').map(function(card){
@@ -2114,6 +2308,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yifa:'仪法',
 			yifa2:'仪法',
 			yifa_info:'锁定技，其他角色使用【杀】或黑色普通锦囊牌指定你为目标后，其手牌上限-1直到回合结束。',
+			ol_huaxin:'OL华歆',
+			caozhao:'草诏',
+			caozhao_backup:'草诏',
+			caozhao_info:'出牌阶段限一次，你可展示一张手牌并声明一种未以此法声明过的基本牌或普通锦囊牌，令一名体力不大于你的其他角色选择一项：令此牌视为你声明的牌，或其失去1点体力。然后若此牌声明成功，然后你可将其交给一名其他角色。',
+			olxibing:'息兵',
+			olxibing_info:'每当你受到其他角色造成的伤害后/对其他角色造成伤害后，你可弃置你或该角色两张牌，然后你们中手牌少的角色摸两张牌，以此法摸牌的角色不能使用牌指定你为目标直到回合结束。',
 
 			yingbian_pack1:'文德武备·理',
 			yingbian_pack2:'文德武备·备',

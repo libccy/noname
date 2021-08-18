@@ -7860,7 +7860,7 @@
 					lib.init.cordovaReady=function(){
 						if(lib.device=='android'){
 							document.addEventListener("pause", function(){
-								if(!_status.paused2&&!_status.event.isMine()){
+								if(!_status.paused2&&(typeof _status.event.isMine=='function'&&!_status.event.isMine())){
 									ui.click.pause();
 								}
 								if(ui.backgroundMusic){
@@ -15250,7 +15250,10 @@
 				lose:function(){
 					"step 0"
 					var evt=event.getParent();
-					if(evt.name!='discard'&&event.type!='discard') return;
+					if(evt.name!='discard'&&event.type!='discard'){
+						event.delay=false;
+						return;
+					}
 					if(evt.delay===false) event.delay=false;
 					if(evt.animate!=false){
 						evt.discardid=lib.status.videoId++;

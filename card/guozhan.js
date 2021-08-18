@@ -729,7 +729,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				selectTarget:-1,
 				chooseai:function(event,player){
+					if(player.hasSkillTag('mingzhi_yes')) return '选项一';
 					if(_status.event.controls.contains('选项三')){
+						if(player.hasSkillTag('mingzhi_no')) return '选项三';
 						return Math.random()<0.5?'选项一':'选项三';
 					}
 					else{

@@ -1231,7 +1231,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return lib.filter.filterCard.apply(this,arguments);
 					},'引裾：对'+get.translation(player)+'使用一张杀，或跳过下回合的出牌阶段和弃牌阶段').set('targetRequired',true).set('complexSelect',true).set('filterTarget',function(card,player,target){
 						if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
-						return lib.filter.filterTarget.apply(this,arguments);
+						return lib.filter.targetEnabled.apply(this,arguments);
 					}).set('sourcex',player);
 					"step 1"
 					if(!result.bool) target.addSkill('spyinju2');
@@ -9411,7 +9411,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_xinpi:'SP辛毗',
 			spyinju:'引裾',
 			spyinju2:'引裾',
-			spyinju_info:'出牌阶段限一次，你可令一名其他角色选择一项：①对你使用一张【杀】。②其下个回合的准备阶段开始时，跳过出牌阶段和弃牌阶段。',
+			spyinju_info:'出牌阶段限一次，你可令一名其他角色选择一项：①对你使用一张【杀】（无距离限制）。②其下个回合的准备阶段开始时，跳过出牌阶段和弃牌阶段。',
 			spchijie:'持节',
 			spchijie_info:'每回合限一次。当你成为其他角色使用牌的唯一目标时，你可判定。若结果大于6，则你取消此牌的所有目标。',
 			reduoji:'夺冀',
