@@ -18,6 +18,8 @@ window.config={
 	forbidboss:['caiwenji','gjqt_aruan','pal_xuanxiao','swd_hupo'],
 	forbiddouble:['zhugedan','swd_kangnalishi','dongzhuo','wutugu','hs_siwangzhiyi','hs_ronghejuren','hs_shanlingjuren'],
 	forbidthreecard:['qiankunbiao','shenhuofeiya','gw_ciguhanshuang','gw_birinongwu','gw_qinpendayu','gw_poxiao'],
+	zhinang_tricks:['guohe','wuxie','wuzhong','dongzhuxianji'],
+	connect_zhinang_tricks:['guohe','wuxie','wuzhong','dongzhuxianji'],
 	all:{
 		sgscharacters:['standard','shenhua','xinghuoliaoyuan','refresh','yijiang','sp','sp2','extra','old','mobile','tw','yingbian'],
 		sgscards:['standard','extra','sp','guozhan','zhulu','yingbian'],

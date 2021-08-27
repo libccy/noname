@@ -146,6 +146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
+					game.delayx();
 					var go=false;
 					if(get.attitude(player,trigger.player)>0){
 						if(get.color(trigger.card)=='red'){
@@ -4952,7 +4953,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var skills=lib.character[name][3];
 						for(var j=0;j<skills.length;j++){
 							var info=lib.skill[skills[j]];
-							if(info.charlotte||(info.unique&&!info.gainable)||info.juexingji||info.limited||info.zhuSkill||info.hiddenSkill) skills.splice(j--,1);
+							if(info.charlotte||(info.unique&&!info.gainable)||info.juexingji||info.limited||info.zhuSkill||info.hiddenSkill||info.dutySkill) skills.splice(j--,1);
 						}
 						if(skills.length){
 							player.storage.rehuashen.character.push(name);
@@ -9387,7 +9388,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reguhuo_ally_bg:'真',
 			reguhuo_betray_bg:'假',
 			rehuashen:'化身',
-			rehuashen_info:'游戏开始后，你随机获得三张未加入游戏的武将牌，选一张置于你面前并声明该武将牌的一项技能，你拥有该技能且同时将性别和势力属性变成与该武将相同直到该化身被替换。你的每个准备阶段和结束后，你可以选择一项：①弃置至多两张未展示的化身牌并重新获得等量化身牌；②更换所展示的化身牌或技能。（你不可声明限定技、觉醒技、隐匿技、主公技等特殊技能）。',
+			rehuashen_info:'游戏开始后，你随机获得三张未加入游戏的武将牌，选一张置于你面前并声明该武将牌的一项技能，你拥有该技能且同时将性别和势力属性变成与该武将相同直到该化身被替换。你的每个准备阶段和结束后，你可以选择一项：①弃置至多两张未展示的化身牌并重新获得等量化身牌；②更换所展示的化身牌或技能。（你不可声明限定技、觉醒技、隐匿技、使命技、主公技等特殊技能）。',
 			rexinsheng:'新生',
 			rexinsheng_info:'当你受到1点伤害后，你可以获得一张新的化身牌。',
 			re_menghuo:'界孟获',

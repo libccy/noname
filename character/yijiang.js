@@ -6103,6 +6103,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
+					game.delayx();
 					var go=false;
 					if(get.attitude(player,trigger.player)>0){
 						if(get.color(trigger.card)=='red'){
@@ -12115,7 +12116,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jikang:['re_jikang','jikang'],
 			xinxianying:['re_xinxianying','xinxianying','ol_xinxianying','sp_xinxianying'],
 			gongsunyuan:['re_gongsunyuan','gongsunyuan'],
-			zhoucang:['re_zhoucang','zhoucang'],
+			zhoucang:['re_zhoucang','xin_zhoucang','zhoucang'],
 			guotufengji:['re_guotufengji','guotufengji'],
 		},
 		translate:{

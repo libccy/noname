@@ -14,7 +14,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				extra_lei:['shen_ganning','shen_zhangliao'],
 				extra_key:['key_kagari','key_shiki','key_hina'],
 				extra_ol:['ol_zhangliao','shen_caopi','shen_zhenji'],
-				extra_mobile:['shen_guojia'],
+				extra_mobilezhi:['shen_guojia'],
+				extra_mobilexin:['shen_taishici'],
 				extra_offline:['shen_diaochan','boss_zhaoyun'],
 				extra_mini:['mini_zhugeliang','mini_lvbu','mini_lvmeng'],
 			},
@@ -24,7 +25,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_shiki:['female','shen','3/5',['shiki_omusubi'],['key']],
 			key_hina:['female','shen',3,['hina_shenxian','hina_mashu','hina_tieji'],['key','hiddenSkill']],
 			
-			shen_guojia:['male','shen',3,['shuishi','stianyi','sghuishi']],
+			shen_taishici:['male','shen',4,['dulie','tspowei','dangmo'],['wu']],
+			shen_guojia:['male','shen',3,['reshuishi','stianyi','resghuishi'],['wei']],
 			shen_diaochan:['female','shen',3,['meihun','huoxin'],['qun']],
 			shen_guanyu:['male','shen',5,['new_wuhun','wushen'],['shu']],
 			shen_zhaoyun:['male','shen',2,['xinjuejing','relonghun'],['shu']],
@@ -230,7 +232,245 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.turnOver();
 				},
 			},
+			dulie:{
+				audio:2,
+				trigger:{
+					global:'gameDrawAfter',
+					player:'enterGame',
+				},
+				locked:true,
+				direct:true,
+				filter:function(event,player){
+					return game.players.length>1&&!game.hasPlayer(function(current){
+						return current.hasMark('dulie');
+					});
+				},
+				content:function(){
+					'step 0'
+					var num=Math.floor(game.players.length/2);
+					player.chooseTarget(num,true,'请选择【笃烈】的目标','令'+get.cnNumber(num)+'名角色获得“围”标记',lib.filter.notMe).set('ai',function(target){
+						var player=_status.event.player;
+						return Math.max(1,get.attitude(player,target))/Math.max(1,get.distance(player,target));
+					});
+					'step 1'
+					if(result.bool){
+						var targets=result.targets.sortBySeat();
+						player.logSkill('dulie',targets);
+						for(var i of targets) i.addMark('dulie',1);
+						game.delayx();
+					}
+				},
+				mod:{
+					targetInRange:function(card,player,target){
+						if(card.name=='sha'&&!target.hasMark('dulie')) return true;
+					},
+				},
+				marktext:'围',
+				intro:{
+					name:'笃烈/破阵 (围)',
+					name2:'围',
+					content:'mark',
+				},
+				group:'dulie_sha',
+				subSkill:{
+					sha:{
+						audio:'dulie',
+						trigger:{target:'useCardToTarget'},
+						forced:true,
+						logTarget:'player',
+						filter:function(event,player){
+							return event.card.name=='sha'&&event.player.isIn()&&!event.player.hasMark('dulie');
+						},
+						content:function(){
+							'step 0'
+							player.judge(function(result){
+								if(get.color(result)=='red') return 2;
+								return -1;
+							});
+							'step 1'
+							if(result.bool){
+								trigger.targets.remove(player);
+								trigger.getParent().triggeredTargets2.remove(player);
+								trigger.untrigger();
+							}
+						},
+						ai:{
+							effect:{
+								target:function(card,player,target,current,isLink){
+									if(card.name=='sha'&&!isLink&&!player.hasMark('dulie')) return 0.5;
+								},
+							},
+						},
+					},
+				},
+			},
+			tspowei:{
+				audio:2,
+				dutySkill:true,
+				forced:true,
+				trigger:{source:'damageBegin2'},
+				logTarget:'player',
+				filter:function(event,player){
+					return event.card&&event.card.name=='sha'&&event.player&&
+					event.player.isIn()&&event.player.hasMark('dulie');
+				},
+				content:function(){
+					trigger.cancel();
+					trigger.player.removeMark('dulie',trigger.player.countMark('dulie'));
+				},
+				derivation:'shenzhu',
+				group:['tspowei_achieve','tspowei_fail'],
+				ai:{
+					combo:'dulie',
+					effect:{
+						player:function(card,player,target){
+							if(card.name=='sha'&&target.hasMark('dulie')&&get.attitude(player,target)>=0) return [1,1,0,0];
+							if(get.tag(card,'damage')&&_status.event.type=='respondShan'&&_status.event.getParent().name=='sha'&&target.hasMark('dulie')&&get.attitude(target,player)>=0) return [1,1,0,0];
+						},
+					},
+				},
+				subSkill:{
+					achieve:{
+						audio:'tspowei',
+						trigger:{player:'useCardAfter'},
+						forced:true,
+						skillAnimation:true,
+						animationColor:'metal',
+						filter:function(event,player){
+							return event.card.name=='sha'&&!game.hasPlayer(function(current){
+								return current.hasMark('dulie');
+							});
+						},
+						content:function(){
+							game.log(player,'成功完成使命');
+							player.awakenSkill('tspowei');
+							player.addSkillLog('shenzhu');
+						},
+					},
+					fail:{
+						audio:'tspowei',
+						trigger:{player:'dying'},
+						forced:true,
+						content:function(){
+							'step 0'
+							game.log(player,'使命失败');
+							player.awakenSkill('tspowei');
+							var num=player.countCards('e');
+							if(num>0) player.chooseToDiscard('e',true,num);
+							'step 1'
+							if(player.hp<1) player.recover(1-player.hp);
+						},
+					},
+				},
+			},
+			shenzhu:{
+				audio:2,
+				mod:{
+					cardUsable:function(card){
+						if(card.name=='sha') return Infinity;
+					},
+				},
+				trigger:{player:'useCardAfter'},
+				forced:true,
+				filter:function(event,player){
+					return event.card.name=='sha'&&event.card.isCard&&event.cards.length==1;
+				},
+				content:function(){
+					player.draw();
+				},
+			},
+			dangmo:{
+				audio:2,
+				trigger:{player:'useCard2'},
+				direct:true,
+				filter:function(event,player){
+					if(event.card.name!='sha'||player.hp<=1) return false;
+					var evt=event.getParent('phaseUse');
+					return evt&&evt.player==player&&player.getHistory('useCard',function(evtx){
+						return evtx.card.name=='sha'&&evtx.getParent('phaseUse')==evt;
+					})[0]==event&&game.hasPlayer(function(current){
+						return !event.targets.contains(current)&&lib.filter.filterTarget(event.card,player,current);
+					});
+				},
+				content:function(){
+					'step 0'
+					var num=Math.min(player.hp-1,game.countPlayer(function(current){
+						return !trigger.targets.contains(current)&&lib.filter.filterTarget(trigger.card,player,current);
+					}));
+					player.chooseTarget(get.prompt('dangmo'),'为'+get.translation(trigger.card)+'增加至多'+get.translation(num)+'个目标',[1,num],function(card,player,target){
+						var evt=_status.event.getTrigger();
+						return !evt.targets.contains(target)&&lib.filter.filterTarget(evt.card,player,target);
+					}).set('ai',function(target){
+						var evt=_status.event.getTrigger(),eff=get.effect(target,evt.card,evt.player,evt.player);
+						if(player.hasSkill('tspowei')&&target.hasMark('dulie')) return 4*eff;
+						return eff;
+					});
+					'step 1'
+					if(result.bool){
+						if(player!=game.me&&!player.isOnline()) game.delayx();
+						event.targets=result.targets;
+					}
+					else event.finish();
+					'step 2'
+					player.logSkill('dangmo',targets);
+					trigger.targets.addArray(targets);
+				},
+			},
+			reshuishi:{
+				audio:'shuishi',
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.maxHp<10;
+				},
+				content:function(){
+					'step 0'
+					event.cards=[];
+					event.suits=[];
+					'step 1'
+					player.judge(function(result){
+						var evt=_status.event.getParent('reshuishi');
+						if(evt&&evt.suits&&evt.suits.contains(get.suit(result))) return 0;
+						return 1;
+					}).set('callback',function(){
+						event.getParent().orderingCards.remove(event.judgeResult.card);
+					});
+					'step 2'
+					event.cards.push(result.card);
+					if(result.bool&&player.maxHp<10){
+						event.suits.push(result.suit);
+						player.gainMaxHp();
+						event.goto(1);
+					}
+					else{
+						cards=cards.filterInD();
+						if(cards.length) player.chooseTarget('将'+get.translation(cards)+'交给一名角色',true).set('ai',function(target){
+							var player=_status.event.player;
+							var att=get.attitude(player,target)/Math.sqrt(1+target.countCards('h'));
+							if(target.hasSkillTag('nogain')) att/=10;
+							return att;
+						});
+						else event.finish();
+					}
+					'step 3'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.line(target,'green');
+						target.gain(cards,'gain2');
+					}
+					'step 4'
+					if(target.isMaxHandcard()) player.loseMaxHp();
+				},
+				ai:{
+					order:1,
+					result:{
+						player:1,
+					},
+				},
+			},
 			shuishi:{
+				audio:2,
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
@@ -279,6 +519,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			stianyi:{
+				audio:2,
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				juexingji:true,
@@ -309,6 +550,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				derivation:'zuoxing',
 			},
 			zuoxing:{
+				audio:2,
 				trigger:{player:'phaseZhunbeiBegin'},
 				filter:function(event,player){
 					var target=player.storage.zuoxing;
@@ -368,7 +610,61 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{order:1,result:{player:1}},
 			},
+			resghuishi:{
+				audio:'sghuishi',
+				inherit:'sghuishi',
+				filterTarget:true,
+				content:function(){
+					'step 0'
+					player.awakenSkill('resghuishi');
+					var list=target.getSkills(null,false,false).filter(function(skill){
+						var info=lib.skill[skill];
+						return info&&info.juexingji&&!target.awakenedSkills.contains(skill);
+					});
+					if(player.maxHp>=game.players.length&&list.length>0){
+						if(list.length==1) event._result={control:list[0]};
+						else player.chooseControl(list).set('prompt','选择一个觉醒技，令'+get.translation(target)+'可无视条件发动该技能');
+					}
+					else{
+						target.draw(4);
+						event.goto(2);
+					}
+					'step 1'
+					target.storage.resghuishi=result.control;
+					target.markSkill('resghuishi');
+					var info=lib.skill[result.control];
+					if(info.filter&&!info.charlotte&&!info.sghuishi_filter){
+						info.sghuishi_filter=info.filter;
+						info.filter=function(event,player){
+							if(player.storage.resghuishi) return true;
+							return this.sghuishi_filter.apply(this,arguments);
+						}
+					}
+					'step 2'
+					player.loseMaxHp(2);
+				},
+				intro:{content:'发动【$】时无视条件'},
+				ai:{
+					order:0.1,
+					expose:0.2,
+					result:{
+						target:function(player,target){
+							if(target!=player&&player.hasUnknown()||player.maxHp<(player.getDamagedHp()>1?5:6)) return 0;
+							if(target==player&&player.hasSkill('resghuishi')&&game.hasPlayer(function(current){
+								return current.getAllHistory('damage').length==0;
+							})) return 4;
+							var list=target.getSkills(null,false,false).filter(function(skill){
+								var info=lib.skill[skill];
+								return info&&info.juexingji&&!target.awakenedSkills.contains(skill);
+							});
+							if(list.length||target.hasJudge('lebu')||target.hasSkillTag('nogain')) return 0;
+							return 4;
+						},
+					},
+				},
+			},
 			sghuishi:{
+				audio:2,
 				enable:'phaseUse',
 				limited:true,
 				skillAnimation:true,
@@ -3769,7 +4065,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					listm=listm.concat(listv);
 					var func=function(skill){
 						var info=get.info(skill);
-						if(!info||info.charlotte||info.hiddenSkill||info.zhuSkill||info.juexingji||info.limited||(info.unique&&!info.gainable)||lib.skill.drlt_duorui.bannedList.contains(skill)) return false;
+						if(!info||info.charlotte||info.hiddenSkill||info.zhuSkill||info.juexingji||info.limited||info.dutySkill||(info.unique&&!info.gainable)||lib.skill.drlt_duorui.bannedList.contains(skill)) return false;
 						return true;
 					};
 					for(var i=0;i<listm.length;i++){
@@ -4187,7 +4483,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"drlt_duorui1":"失效技能",
 			"drlt_duorui1_bg":"锐",
 			"drlt_duorui":"夺锐",
-			"drlt_duorui_info":"当你于出牌阶段内对一名其他角色造成伤害后，你可以废除你装备区内的一个装备栏（若已全部废除则可以跳过此步骤），然后获得该角色的一个技能直到其的下回合结束或其死亡(觉醒技，限定技，主公技，隐匿技等特殊技能除外)。若如此做，该角色该技能失效且你不能再发动〖夺锐〗直到你失去以此法获得的技能。",
+			"drlt_duorui_info":"当你于出牌阶段内对一名其他角色造成伤害后，你可以废除你装备区内的一个装备栏（若已全部废除则可以跳过此步骤），然后获得该角色的一个技能直到其的下回合结束或其死亡(觉醒技，限定技，主公技，隐匿技，使命技等特殊技能除外)。若如此做，该角色该技能失效且你不能再发动〖夺锐〗直到你失去以此法获得的技能。",
 			"drlt_zhiti":"止啼",
 			"drlt_zhiti_info":"锁定技，你攻击范围内已受伤的其他角色手牌上限-1；当你拼点或【决斗】胜利，或受到伤害后，你恢复一个装备栏",
 			
@@ -4343,6 +4639,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zuoxing_info:'准备阶段，若令你获得〖佐幸〗的角色存活且体力上限大于1，则你可以令其减1点体力上限，然后你获得如下效果：出牌阶段限一次，你可以获得一张普通锦囊牌。',
 			sghuishi:'辉逝',
 			sghuishi_info:'限定技，出牌阶段，你可以选择一名其他角色：若其有未发动过的觉醒技，则你令其发动这些觉醒技时无视原有条件；否则其摸四张牌。然后你减2点体力上限。',
+			shen_taishici:'神太史慈',
+			dulie:'笃烈',
+			dulie_info:'锁定技。①游戏开始时，你令X名其他角色获得“围”（X为游戏人数的一半且向下取整）。②你对没有“围”的角色使用【杀】无距离限制。③当你成为【杀】的目标时，若使用者没有“围”，则你进行判定。若结果为红色，则取消此目标。',
+			tspowei:'破围',
+			tspowei_info:'使命技。①当你因使用【杀】而对有“围”的角色造成伤害时，你防止此伤害并移去该角色的“围”。②使命：当你使用【杀】结算完成后，若场上没有“围”，则你获得技能〖神著〗。③失败：当你进入濒死状态时，你弃置装备区的所有牌，然后将体力值回复至1点。',
+			shenzhu:'神著',
+			shenzhu_info:'你使用【杀】无次数限制。当你使用有对应实体牌的非转化【杀】结算结束后，你摸一张牌。',
+			dangmo:'荡魔',
+			dangmo_info:'当你于出牌阶段内使用第一张【杀】选择目标后，你可以为此牌增加至多Y-1个目标（Y为你的体力值）。',
+			reshuishi:'慧识',
+			reshuishi_info:'出牌阶段限一次，你可进行判定牌不置入弃牌堆的判定。若判定结果与本次发动技能时的其他判定结果的花色均不相同，则你加1点体力上限并重复此流程。然后你将所有位于处理区的判定牌交给一名角色。若其手牌数为全场最多，则你减1点体力上限。',
+			resghuishi:'辉逝',
+			resghuishi_info:'限定技，出牌阶段，你可选择一名角色。若你的体力上限不小于存活人数且其有未发动的觉醒技，则你令其中一个技能无视发动条件；否则其摸四张牌。然后你减2点体力上限。',
 			
 			key_kagari:'篝',
 			kagari_zongsi:'纵丝',
@@ -4372,9 +4681,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			extra_shan:'神话再临·山',
 			extra_yin:'神话再临·阴',
 			extra_lei:'神话再临·雷',
-			extra_key:'神话再临·论外',
+			extra_key:'论外',
 			extra_ol:'神话再临OL',
-			extra_mobile:'神话再临·始计篇',
+			extra_mobilezhi:'始计篇·智',
+			extra_mobilexin:'始计篇·信',
 			extra_offline:'神话再临·线下',
 			extra_mini:'欢乐三国杀',
 		},

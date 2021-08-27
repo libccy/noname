@@ -3781,7 +3781,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var skills=lib.character[name][3].slice(0);
 						for(var i=0;i<skills.length;i++){
 							var info=lib.skill[skills[i]];
-							if(info.limited||info.juexingji||info.charlotte||info.zhuSkill||info.hiddenSkill){
+							if(info.limited||info.juexingji||info.charlotte||info.zhuSkill||info.hiddenSkill||info.dutySkill){
 								skills.splice(i--,1);
 							}
 						}
@@ -3866,7 +3866,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!info){
 								continue;
 							}
-							if(!info.limited&&!info.juexingji&&!info.charlotte&&!info.zhuSkill&&!info.hiddenSkill){
+							if(!info.limited&&!info.juexingji&&!info.charlotte&&!info.zhuSkill&&!info.hiddenSkill&&!info.dutySkill){
 								add=true;break;
 							}
 						}
@@ -7275,30 +7275,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"guhuo_phase":{},
 		},
-		//废除装备栏时显示的卡牌
-		card:{
-			"feichu_equip1":{
-				type:"equip",
-				subtype:"equip1",
-			},
-			"feichu_equip2":{
-				type:"equip",
-				subtype:"equip2",
-			},
-			"feichu_equip3":{
-				type:"equip",
-				subtype:"equip3",
-			},
-			"feichu_equip4":{
-				type:"equip",
-				subtype:"equip4",
-			},
-			"feichu_equip5":{
-				type:"equip",
-				subtype:"equip5",
-			},
-			disable_judge:{},
-		},
+		card:{},
 		dynamicTranslate:{
 			nzry_juzhan:function(player){
 				if(player.storage.nzry_juzhan1==true) return '转换技，阴：当你成为其他角色【杀】的目标后，你可以与其各摸一张牌，然后其本回合内不能再对你使用牌。<span class="bluetext">阳：当你使用【杀】指定一名角色为目标后，你可以获得其一张牌，然后你本回合内不能再对其使用牌。</span>';
@@ -7357,25 +7334,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhugezhan:['zhugezhan','old_zhugezhan'],
 		},
 		translate:{
-			"feichu_equip1":"已废除",
-			"feichu_equip1_info":"武器栏已废除",
-			"feichu_equip2":"已废除",
-			"feichu_equip2_info":"防具栏已废除",
-			"feichu_equip3":"已废除",
-			"feichu_equip3_info":"防御坐骑栏已废除",
-			"feichu_equip4":"已废除",
-			"feichu_equip4_info":"攻击坐骑栏已废除",
-			"feichu_equip5":"已废除",
-			"feichu_equip5_info":"宝物栏已废除",
-			"feichu_equip1_bg":"废",
-			"feichu_equip2_bg":"废",
-			"feichu_equip3_bg":"废",
-			"feichu_equip4_bg":"废",
-			"feichu_equip5_bg":"废",
-			disable_judge:'已废除',
-			disable_judge_info:'判定区已废除',
-			disable_judge_bg:'废',
-			
 			re_yuanshao:'袁绍',
 			re_lusu:'鲁肃',
 			re_yuji:"于吉",
@@ -7556,7 +7514,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			beige_info:'当有角色受到【杀】造成的伤害后，你可以弃一张牌，并令其进行一次判定，若判定结果为：♥该角色回复1点体力；♦︎该角色摸两张牌；♣伤害来源弃两张牌；♠伤害来源将其武将牌翻面',
 			duanchang_info:'锁定技，杀死你的角色失去当前的所有技能。',
 			// fushen_info:'回合开始前，你可以选择与任意一名角色交换控制权，该角色可选择在下一个回合开始前与你换回',
-			huashen_info:'所有人都展示武将牌后，你随机获得两张未加入游戏的武将牌，选一张置于你面前并声明该武将的一项技能，你拥有该技能且同时将性别和势力属性变成与该武将相同直到该化身被替换。在你的每个准备阶段和结束后，你可以替换化身牌，你须为新的化身重新声明一项技能（你不可声明限定技、觉醒技、隐匿技、主公技等特殊技能）。',
+			huashen_info:'所有人都展示武将牌后，你随机获得两张未加入游戏的武将牌，选一张置于你面前并声明该武将的一项技能，你拥有该技能且同时将性别和势力属性变成与该武将相同直到该化身被替换。在你的每个准备阶段和结束后，你可以替换化身牌，你须为新的化身重新声明一项技能（你不可声明限定技、觉醒技、隐匿技、使命技、主公技等特殊技能）。',
 			xinsheng_info:'每当你受到1点伤害后，你可获得一张新的化身牌。',
 			jiangwei:'姜维',
 			liushan:'刘禅',

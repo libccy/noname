@@ -6676,7 +6676,8 @@
 			'<li>使用卡牌<br>player.useCard(card,<br>targets)<li>死亡<br>player.die()<li>复活<br>player.revive(hp)</ul>'+
 			'<div style="margin:10px">游戏操作</div><ul style="margin-top:0"><li>在命令框中输出结果<br>game.print(str)<li>清除命令框中的内容<br>cls<li>上一条/下一条输入的内容<br>up/down<li>游戏结束<br>game.over(bool)'+
 			'<li>角色资料<br>lib.character<li>卡牌资料<br>lib.card</ul>',
-			'游戏名词':'<ul><li>护甲：和体力类似，每点护甲可抵挡一点伤害，但不影响手牌上限'+
+			'游戏名词':'<ul><li>智囊：无名杀默认为过河拆桥/无懈可击/无中生有/洞烛先机。牌堆中没有的智囊牌会被过滤。可在卡牌设置中自行增减。若没有可用的智囊，则改为随机选取的三种锦囊牌的牌名。'+
+			'<li>护甲：和体力类似，每点护甲可抵挡一点伤害，但不影响手牌上限'+
 			'<li>随从：通过技能获得，拥有独立的技能、手牌区和装备区（共享判定区），出场时替代主武将的位置；随从死亡时自动切换回主武将'+
 			'<li>发现：从三张随机亮出的牌中选择一张，若无特殊说明，则获得此牌'+
 			'<li>蓄力技：发动时可以增大黄色的数字。若如此做，红色数字于技能的结算过程中改为原来的两倍'
@@ -10335,6 +10336,32 @@
 			unknown5:'六号位',
 			unknown6:'七号位',
 			unknown7:'八号位',
+			
+			feichu_equip1:"已废除",
+			feichu_equip1_info:"武器栏已废除",
+			feichu_equip2:"已废除",
+			feichu_equip2_info:"防具栏已废除",
+			feichu_equip3:"已废除",
+			feichu_equip3_info:"防御坐骑栏已废除",
+			feichu_equip4:"已废除",
+			feichu_equip4_info:"攻击坐骑栏已废除",
+			feichu_equip5:"已废除",
+			feichu_equip5_info:"宝物栏已废除",
+			feichu_equip1_bg:"废",
+			feichu_equip2_bg:"废",
+			feichu_equip3_bg:"废",
+			feichu_equip4_bg:"废",
+			feichu_equip5_bg:"废",
+			disable_judge:'已废除',
+			disable_judge_info:'判定区已废除',
+			disable_judge_bg:'废',
+			pss:'手势',
+			pss_paper:'布',
+			pss_scissor:'剪刀',
+			pss_stone:'石头',
+			pss_paper_info:'石头剪刀布时的一种手势。克制石头，但被剪刀克制。',
+			pss_scissor_info:'石头剪刀布时的一种手势。克制布，但被石头克制。',
+			pss_stone_info:'石头剪刀布时的一种手势。克制剪刀，但被布克制。',
 		},
 		element:{
 			content:{
@@ -19495,7 +19522,7 @@
 							this.ai.tempIgnore.add(next.targets[i]);
 						}
 					}
-					if(typeof this.logAi=='function'&&!next.noai){
+					if(typeof this.logAi=='function'&&!next.noai&&!get.info(next.card).noai){
 						var postAi=get.info(next.card).postAi;
 						if(postAi&&postAi(next.targets)){
 							next.postAi=true;
@@ -25460,6 +25487,39 @@
 		},
 		card:{
 			list:[],
+			pss_paper:{
+				type:'pss',
+				fullskin:true,
+			},
+			pss_scissor:{
+				type:'pss',
+				fullskin:true,
+			},
+			pss_stone:{
+				type:'pss',
+				fullskin:true,
+			},
+			feichu_equip1:{
+				type:"equip",
+				subtype:"equip1",
+			},
+			feichu_equip2:{
+				type:"equip",
+				subtype:"equip2",
+			},
+			feichu_equip3:{
+				type:"equip",
+				subtype:"equip3",
+			},
+			feichu_equip4:{
+				type:"equip",
+				subtype:"equip4",
+			},
+			feichu_equip5:{
+				type:"equip",
+				subtype:"equip5",
+			},
+			disable_judge:{},
 		},
 		filter:{
 			all:function(){
@@ -27047,7 +27107,7 @@
 						game.ip=get.trimip(_status.ip);
 						for(var i=0;i<list.length;i++){
 							var player=ui.create.player(ui.window).animate('start');
-							if(list.length==8) player.dataset.position=i.toString();
+							if(list.length>6) player.dataset.position='cx'+i;
 							else player.dataset.position='c'+i;
 							player.classList.add('connect');
 							player.roomindex=i;
@@ -27174,7 +27234,7 @@
 				updaterooms:function(list,clients){
 					if(ui.rooms){
 						ui.window.classList.add('more_room');
-						var list2=['re_caocao','re_liubei','re_sunquan','re_zhangjiao','re_caopi','ol_liushan','re_sunce','ol_yuanshao'];
+						var list2=['re_caocao','re_liubei','re_sunquan','re_zhangjiao','jin_simashi','re_caopi','ol_liushan','re_sunce','ol_yuanshao','jin_simazhao'];
 						for(var i=0;i<ui.rooms.length;i++){
 							ui.rooms[i].initRoom(list[i],list2[i]);
 						}
@@ -33149,6 +33209,7 @@
 							if(i=='update') continue;
 							lib.configOL[i.slice(8)]=get.config(i);
 						}
+						lib.configOL.zhinang_tricks=lib.config.connect_zhinang_tricks;
 						lib.configOL.characterPack=lib.connectCharacterPack.slice(0);
 						lib.configOL.cardPack=lib.connectCardPack.slice(0);
 						for(var i=0;i<lib.config.connect_characters.length;i++){
@@ -35944,6 +36005,7 @@
 										if(i=='update') continue;
 										config[i.slice(8)]=get.config(i,lib.configOL.mode);
 									}
+									config.zhinang_tricks=lib.config.connect_zhinang_tricks;
 									if(game.online){
 										if(game.onlinezhu){
 											game.send('changeRoomConfig',config);
@@ -35978,6 +36040,7 @@
 											if(i=='update') continue;
 											config[i.slice(8)]=get.config(i,lib.configOL.mode);
 										}
+										config.zhinang_tricks=lib.config.connect_zhinang_tricks;
 
 										config.characterPack=lib.connectCharacterPack.slice(0);
 										config.cardPack=lib.connectCardPack.slice(0);
@@ -49042,6 +49105,16 @@
 		},
 	};
 	var get={
+		zhinangs:function(filter){
+			var list=(_status.connectMode?lib.configOL:lib.config).zhinang_tricks;
+			if(!list||!list.filter||!list.length) return get.inpile('trick','trick').randomGets(3);
+			if(filter===false) return list.slice(0);
+			list=list.filter(function(i){
+				return lib.inpile.contains(i);
+			});
+			if(list.length) return list;
+			return get.inpile('trick','trick').randomGets(3);
+		},
 		sourceCharacter:function(str){
 			if(str){
 				for(var i in lib.characterReplace){
@@ -52132,12 +52205,16 @@
 							list.push(modeorder[i]);
 						}
 					}
+					if(lib.card[name]&&lib.card[name].type=='trick') list.push('zhinang_tricks');
 					var page=ui.create.div('.menu-buttons.configpopped',uiintro.content);
 					var banall=false;
 					for(var i=0;i<list.length;i++){
-						var cfg=ui.create.div('.config',lib.translate[list[i]]+'模式',page);
+						var cfg=ui.create.div('.config',list[i]=='zhinang_tricks'?'设为智囊':(lib.translate[list[i]]+'模式'),page);
 						cfg.classList.add('toggle');
-						if(node._banning=='offline'){
+						if(list[i]=='zhinang_tricks'){
+							cfg.bannedname=((node._banning=='offline')?'':'connect_')+'zhinang_tricks';
+						}
+						else if(node._banning=='offline'){
 							cfg.bannedname=list[i]+'_bannedcards';
 						}
 						else{
@@ -52146,7 +52223,7 @@
 						cfg.listen(clickBanned);
 						ui.create.div(ui.create.div(cfg));
 						var banned=lib.config[cfg.bannedname]||[];
-						if(!banned.contains(name)){
+						if(banned.contains(name)==(list[i]=='zhinang_tricks')){
 							cfg.classList.add('on');
 							banall=true;
 						}
@@ -52154,7 +52231,7 @@
 					ui.create.div('.menubutton.pointerdiv',banall?'全部禁用':'全部启用',uiintro.content,function(){
 						if(this.innerHTML=='全部禁用'){
 							for(var i=0;i<page.childElementCount;i++){
-								if(page.childNodes[i].bannedname&&page.childNodes[i].classList.contains('on')){
+								if(page.childNodes[i].bannedname.indexOf('zhinang_tricks')==-1&&page.childNodes[i].bannedname&&page.childNodes[i].classList.contains('on')){
 									clickBanned.call(page.childNodes[i]);
 								}
 							}
@@ -52162,7 +52239,7 @@
 						}
 						else{
 							for(var i=0;i<page.childElementCount;i++){
-								if(page.childNodes[i].bannedname&&!page.childNodes[i].classList.contains('on')){
+								if(page.childNodes[i].bannedname.indexOf('zhinang_tricks')==-1&&page.childNodes[i].bannedname&&!page.childNodes[i].classList.contains('on')){
 									clickBanned.call(page.childNodes[i]);
 								}
 							}

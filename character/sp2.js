@@ -800,7 +800,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return evt2==event;
 					});
 					for(var i of list){
-						var name=i.card.name;
+						var name=get.type2(i.card,false);
 						if(!map[name]) map[name]=true;
 						else return true;
 					}
@@ -817,9 +817,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseEnd'},
 				direct:true,
 				filter:function(event,player){
-					return event.player!=player&&event.player.getHistory('sourceDamage',function(evt){
-						return evt.num>1;
-					}).length>0&&player.countCards('he')>0;
+					return event.player!=player&&(event.player.getStat('damage')||0)>1&&player.countCards('he')>0;
 				},
 				content:function(){
 					'step 0'
@@ -6869,7 +6867,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								game.expandSkills(list2);
 								for(var k=0;k<list2.length;k++){
 									var info=lib.skill[list2[k]];
-									if(!info||!info.trigger||!info.trigger.player||info.silent||info.limited||info.juexingji||info.zhuanhuanji||info.hiddenSkill) continue;
+									if(!info||!info.trigger||!info.trigger.player||info.silent||info.limited||info.juexingji||info.zhuanhuanji||info.hiddenSkill||info.dutySkill) continue;
 									if(info.trigger.player==name2||Array.isArray(info.trigger.player)&&info.trigger.player.contains(name2)){
 										if(info.init||info.ai&&(info.ai.combo||info.ai.notemp||info.ai.neg)) continue;
 										if(info.filter){
@@ -6947,7 +6945,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								game.expandSkills(list2);
 								for(var k=0;k<list2.length;k++){
 									var info=lib.skill[list2[k]];
-									if(!info||!info.enable||info.viewAs||info.limited||info.juexingji||info.zhuanhuanji||info.hiddenSkill) continue;
+									if(!info||!info.enable||info.viewAs||info.limited||info.juexingji||info.zhuanhuanji||info.hiddenSkill||info.dutySkill) continue;
 									if(info.enable=='phaseUse'||Array.isArray(info.enable)&&info.enable.contains('phaseUse')){
 										if(info.init||info.onChooseToUse||info.ai&&(info.ai.combo||info.ai.notemp||info.ai.neg)) continue;
 										if(info.filter){
@@ -9741,7 +9739,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			duanwei:'段煨',
 			langmie:'狼灭',
 			langmie_damage:'狼灭',
-			langmie_info:'其他角色的出牌阶段结束时，若其本阶段内使用过的牌中有名称相同的牌，则你可以摸一张牌；其他角色的结束阶段开始时，若其本回合内一次性造成过大于1点的伤害，则你可以弃置一张牌并对其造成1点伤害。',
+			langmie_info:'其他角色的出牌阶段结束时，若其本阶段内使用过的牌中有类型相同的牌，则你可以摸一张牌；其他角色的结束阶段开始时，若其本回合内造成的伤害大于1，则你可以弃置一张牌并对其造成1点伤害。',
 			jsp_liubei:'群刘备',
 			jsp_liubei_ab:'刘备',
 			jsprende:'仁德',
@@ -9753,7 +9751,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liangjue_info:'锁定技，当有黑色牌进入或者离开你的判定区或装备区后，若你的体力值大于1，你失去1点体力，然后摸一张牌。',
 			tangji:'唐姬',
 			jielie:'节烈',
-			jielie_info:'你的第一个回合开始时，选择一名其他角色，该角色每次于其回合外摸牌时，你摸等量的牌；其进入濒死状态时，你可令其回复体力至1点（每回合限一次）。该角色死亡时，你弃置所有牌并失去1点体力。',
+			jielie_info:'你的第一个回合开始时，选择一名其他角色，该角色每次于其回合外摸牌时，你摸等量的牌（每回合限一次且至多摸三张）；其进入濒死状态时，你可令其回复体力至1点（每轮限一次）。该角色死亡时，你弃置所有牌并失去1点体力。',
 			kangge:'抗歌',
 			kangge_info:'当你受到除自己和“节烈”角色以外的角色造成的伤害时，你可以防止此伤害并选择一种花色，然后你失去X点体力，从弃牌堆中随机获得X张此花色的牌（X为伤害值）。',
 			yangwan:'杨婉',

@@ -95,7 +95,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									event.finish();
 								}
 								else{
-									player.chooseTarget('是否将'+get.translation(lib.skill.caozhao_backup.cardname)+'（'+get.translation(card)+'）交给一名其他角色？',lib.filter.notMe).set('ai',()=>-1);
+									player.chooseTarget('是否将'+get.translation(lib.skill.caozhao_backup.cardname)+'（'+get.translation(cards[0])+'）交给一名其他角色？',lib.filter.notMe).set('ai',()=>-1);
 								}
 								'step 3'
 								if(result.bool){
@@ -513,7 +513,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					};
 					if(game.hasPlayer((current)=>filterTarget('L∞pers',player,current))){
 						var bool=player.isHealthy();
-						player.chooseTarget('忠允：对攻击范围内的一名角色造成1点伤害'+(bool?'':'，或点取消回复1点体力'),filterTarget,bool);
+						player.chooseTarget('忠允：对攻击范围内的一名角色造成1点伤害'+(bool?'':'，或点取消回复1点体力'),filterTarget,bool).set('ai',function(target){
+							var player=_status.event.player;
+							return get.damageEffect(target,player,player);
+						});
 					}
 					else event._result={bool:false};
 					'step 1'
@@ -543,6 +546,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				content:function(){
 					'step 0'
+					if(trigger.delay===false) game.delayx();
 					var filterTarget=function(card,player,target){
 						return target!=player&&target.countDiscardableCards(player,'he')>0;
 					}

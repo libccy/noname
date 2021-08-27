@@ -3232,6 +3232,47 @@ div:not(.handcards)>.card>.info>span,
 	left: calc(50% + 20px);
 	top: calc(50% + 80px)
 }
+#window>.player.connect[data-position='cx0']{
+	left:calc(150% / 7 - 1275px / 7);
+	top:calc(300% / 7 - 160px + 5px);
+}
+#window>.player.connect[data-position='cx1']{
+	left:calc(247% / 7 - 850px / 7);
+	top:calc(300% / 7 - 160px + 5px);
+}
+#window>.player.connect[data-position='cx2']{
+	left:calc(350% / 7 - 525px / 7);
+	top:calc(300% / 7 - 160px + 5px);
+}
+#window>.player.connect[data-position='cx3']{
+	left:calc(453% / 7 - 200px / 7);
+	top:calc(300% / 7 - 160px + 5px);
+}
+#window>.player.connect[data-position='cx4']{
+	left:calc(550% / 7 + 125px / 7);
+	top:calc(300% / 7 - 160px + 5px);
+}
+#window>.player.connect[data-position='cx5']{
+	left:calc(150% / 7 - 1275px / 7);
+	top:calc(400% / 7 - 40px + 5px);
+}
+#window>.player.connect[data-position='cx6']{
+	left:calc(247% / 7 - 850px / 7);
+	top:calc(400% / 7 - 40px + 5px);
+}
+#window>.player.connect[data-position='cx7']{
+	left:calc(350% / 7 - 525px / 7);
+	top:calc(400% / 7 - 40px + 5px);
+}
+#window>.player.connect[data-position='cx8']{
+	left:calc(453% / 7 - 200px / 7);
+	top:calc(400% / 7 - 40px + 5px);
+}
+#window>.player.connect[data-position='cx9']{
+	left:calc(550% / 7 + 125px / 7);
+	top:calc(400% / 7 - 40px + 5px);
+}
+
 #window>.player.connect {
 	width: 120px;
 }

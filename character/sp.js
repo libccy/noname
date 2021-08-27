@@ -584,12 +584,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(player.isDying()||game.hasPlayer(function(current){
 						return current.name1=='guansuo'||current.name2=='guansuo';
-					}));
-					player.chooseTarget(function(card,player,current){
-						return current!=player&&current.sex=='male';
-					},'许身：是否令一名其他男性角色选择是否将其武将牌替换为“关索”？').set('ai',function(target){
-						return get.attitude(_status.event.player,target)-4;
-					});
+					})){
+						player.chooseTarget(function(card,player,current){
+							return current!=player&&current.sex=='male';
+						},'许身：是否令一名其他男性角色选择是否将其武将牌替换为“关索”？').set('ai',function(target){
+							return get.attitude(_status.event.player,target)-4;
+						});
+					}
+					else event.finish();
 					'step 2'
 					if(!result.bool){
 						event.finish();
@@ -2301,7 +2303,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return event.player.getStockSkills('仲村由理','天下第一').filter(function(skill){
 						var info=get.info(skill);
-						return info&&!info.juexingji&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte&&!info.limited;
+						return info&&!info.juexingji&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte&&!info.limited&&!info.dutySkill;
 					}).length>0;
 				},
 				logTarget:'player',
@@ -2313,7 +2315,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('tuogu');
 					var list=trigger.player.getStockSkills('仲村由理','天下第一').filter(function(skill){
 						var info=get.info(skill);
-						return info&&!info.juexingji&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte&&!info.limited;
+						return info&&!info.juexingji&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte&&!info.limited&&!info.dutySkill;
 					});
 					if(list.length==1) event._result={control:list[0]};
 					else trigger.player.chooseControl(list).set('prompt','选择令'+get.translation(player)+'获得一个技能').set('forceDie',true).set('ai',function(){
@@ -2338,7 +2340,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return event.player.getStockSkills('仲村由理','天下第一').filter(function(skill){
 						var info=get.info(skill);
-						return info&&!info.juexingji&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte&&!info.limited;
+						return info&&!info.juexingji&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte&&!info.limited&&!info.dutySkill;
 					}).length>0;
 				},
 				logTarget:'player',
@@ -2346,7 +2348,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var list=trigger.player.getStockSkills('仲村由理','天下第一').filter(function(skill){
 						var info=get.info(skill);
-						return info&&!info.juexingji&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte&&!info.limited;
+						return info&&!info.juexingji&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte&&!info.limited&&!info.dutySkill;
 					});
 					if(list.length==1) event._result={control:list[0]};
 					else trigger.player.chooseControl(list).set('prompt','选择令'+get.translation(player)+'获得一个技能').set('forceDie',true).set('ai',function(){
@@ -7024,7 +7026,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i of list){
 						skills.addArray((lib.character[i][3]||[]).filter(function(skill){
 							var info=get.info(skill);
-							return info&&!info.zhuSkill&&!info.limited&&!info.juexingji&&!info.hiddenSkill&&!info.charlotte;
+							return info&&!info.zhuSkill&&!info.limited&&!info.juexingji&&!info.hiddenSkill&&!info.charlotte&&!info.dutySkill;
 						}));
 					}
 					if(!list.length||!skills.length){event.finish();return;}
@@ -16673,7 +16675,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					listm=listm.concat(listv);
 					var func=function(skill){
 						var info=get.info(skill);
-						if(info.charlotte||info.zhuSkill||(info.unique&&!info.limited)||info.juexingji) return false;
+						if(info.charlotte||info.zhuSkill||(info.unique&&!info.limited)||info.juexingji||info.dutySkill||info.hiddenSkill) return false;
 						return true;
 					};
 					for(var i=0;i<listm.length;i++){
@@ -16738,7 +16740,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangxingcai:['zhangxingcai','old_zhangxingcai'],
 			lisu:['ol_lisu','lisu'],
 			fuwan:['fuwan','sp_fuwan'],
-			huaxin:['ol_huaxin','huaxin'],
+			huaxin:['ol_huaxin','huaxin','sp_huaxin'],
+			xujing:['xujing','sp_xujing'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
@@ -16804,7 +16807,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_yanyu2":"燕语",
 			"xinfu_yanyu2_info":"",
 			"xinfu_xiaode":"孝德",
-			"xinfu_xiaode_info":"其他角色死亡后，你可以声明该角色武将牌上的一个不为主公技或觉醒技的技能。若如此做，你获得此技能且不能再发动〖孝德〗直到你的回合结束。",
+			"xinfu_xiaode_info":"其他角色死亡后，你可以声明该角色武将牌上的一个技能（主公技、觉醒技、隐匿技、使命技除外）。若如此做，你获得此技能且不能再发动〖孝德〗直到你的回合结束。",
 			zhangren:'张任',
 			zoushi:'邹氏',
 			zangba:'臧霸',
@@ -17119,7 +17122,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fuhan:'扶汉',
 			fuhan_info:'限定技，回合开始时，你可以移去所有“梅影”标记并摸等量的牌，随机观看五名未登场的蜀势力角色，将武将牌替换为其中一名角色，并将体力上限数调整为本局游戏中移去“梅影”标记的数量（至少为2，至多为8），然后回复1点体力。',
 			refuhan:'扶汉',
-			refuhan_info:'限定技，回合开始时，你可以移去所有"梅影"标记并摸等量的牌，然后从X张蜀势力武将牌中选择并获得至多两个技能（限定技、觉醒技、主公技除外）。若此时你是体力值最低的角色，你回复1点体力（X为场上角色数，且X∈[4,+∞)）。',
+			refuhan_info:'限定技，回合开始时，你可以移去所有"梅影"标记并摸等量的牌，然后从X张蜀势力武将牌中选择并获得至多两个技能（限定技、觉醒技、隐匿技、使命技、主公技除外）。若此时你是体力值最低的角色，你回复1点体力（X为场上角色数，且X∈[4,+∞)）。',
 			yjixi:'觊玺',
 			yjixi_info:'觉醒技，结束阶段，若你连续三回合没有因〖庸肆〗而失去过体力，则你增加1点体力上限并回复1点体力，然后选择一项：获得技能〖妄尊〗；摸两张牌并获得当前主公的主公技。',
 			xinyongsi:'庸肆',
@@ -17568,9 +17571,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olxingshen_info:'当你受到伤害后，你可以随机摸至多两张牌。若如此做，你获得X个“省”，且下一次发动〖严教〗展示牌时移去所有“省”并多展示等量的牌。（X为你已损失的体力值，且你至多拥有6个“省”）',
 			caoshuang:'曹爽',
 			tuogu:'托孤',
-			tuogu_info:'限定技，一名角色死亡时，你可以令其选择其武将牌上的一个技能（主公技，限定技，觉醒技，隐匿技等特殊技能除外），然后你获得其选择的技能。',
+			tuogu_info:'限定技，一名角色死亡时，你可以令其选择其武将牌上的一个技能（主公技，限定技，觉醒技，隐匿技、使命技等特殊技能除外），然后你获得其选择的技能。',
 			retuogu:'托孤',
-			retuogu_info:'一名角色死亡时，你可以令其选择其武将牌上的一个技能（主公技，限定技，觉醒技，隐匿技等特殊技能除外），然后你获得其选择的技能并失去上次因〖托孤〗获得的技能。',
+			retuogu_info:'一名角色死亡时，你可以令其选择其武将牌上的一个技能（主公技，限定技，觉醒技，隐匿技、使命技等特殊技能除外），然后你获得其选择的技能并失去上次因〖托孤〗获得的技能。',
 			shanzhuan:'擅专',
 			shanzhuan_info:'当你对其他角色造成伤害后，若其判定区没有牌，则你你可以将其的一张牌置于其的判定区。若此牌不为延时锦囊牌且此牌为：红色，此牌视为【乐不思蜀】；黑色，此牌视为【兵粮寸断】。回合结束时，若你本回合内未造成伤害，你可摸一张牌。',
 			spniluan:'逆乱',
