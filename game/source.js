@@ -20,6 +20,7 @@ window.noname_source_list=[
 	'character/hearth.js',
 	'character/mobile.js',
 	'character/mtg.js',
+	'character/offline.js',
 	'character/old.js',
 	'character/ow.js',
 	'character/rank.js',

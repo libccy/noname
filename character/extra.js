@@ -331,7 +331,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					achieve:{
-						audio:'tspowei',
+						audio:'tspowei1',
 						trigger:{player:'useCardAfter'},
 						forced:true,
 						skillAnimation:true,
@@ -348,7 +348,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					fail:{
-						audio:'tspowei',
+						audio:'tspowei2',
 						trigger:{player:'dying'},
 						forced:true,
 						content:function(){
@@ -363,6 +363,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
+			tspowei1:{audio:true},
+			tspowei2:{audio:true},
 			shenzhu:{
 				audio:2,
 				mod:{

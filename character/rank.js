@@ -693,6 +693,7 @@ window.noname_character_rank={
 		'tangji',
 		'gaogan',
 		'sp_xunchen',
+		'duxi',
 	],
 	b:[
 		'diy_feishi',
@@ -1706,6 +1707,7 @@ window.noname_character_rank={
 			'tangji',
 			'gaogan',
 			'caizhenji',
+			'duxi',
 		],
 		junk:[
 			'sunshao',

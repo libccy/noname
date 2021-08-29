@@ -49,7 +49,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_chenzhen:['male','shu',3,['shameng']],
 			sp_sunshao:['male','wu',3,['mjdingyi','mjzuici','mjfubi']],
 			sp_xunchen:['male','qun',3,['mjweipo','mjchenshi','mjmouzhi']],
-			re_dengai:['male','wei',4,['mjweipo','mjchenshi','mjmouzhi']],
+			re_dengai:['male','wei',4,['retuntian','zaoxian']],
 			xin_fuhuanghou:['female','qun',3,['xinzhuikong','xinqiuyuan']],
 			xin_panzhangmazhong:['male','wu',4,['xinduodao','xinanjian']],
 			xin_guohuai:['male','wei',4,['mobilejingce']],
@@ -552,6 +552,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			mjweipo:{
+				audio:2,
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
@@ -590,6 +591,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			mjweipo_effect:{
+				audio:'mjweipo',
 				enable:'chooseToUse',
 				hiddenCard:function(player,name){
 					return name==player.storage.mjweipo_effect&&player.countCards('h','sha')>0;
@@ -825,7 +827,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			mjkuanji:{
-				audio:2,
+				audio:'fyjianyu',
 				usable:1,
 				trigger:{player:'loseAfter'},
 				direct:true,
@@ -863,6 +865,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			mjdingyi:{
+				audio:2,
 				trigger:{
 					global:'gameDrawAfter',
 					player:'enterGame',
@@ -965,6 +968,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			mjzuici:{
+				audio:'zuici',
 				trigger:{player:'damageEnd'},
 				filter:function(event,player){
 					if(!event.source||!event.source.isIn()) return false;
@@ -998,6 +1002,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			mjfubi:{
+				audio:'fubi',
 				enable:'phaseUse',
 				filter:function(event,player){
 					if(player.hasSkill('mjfubi_round')) return false;
@@ -1349,6 +1354,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{content:'已对$发动过此技能'},
 			},
 			hxrenshi:{
+				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
 					return player.countCards('h')>0&&(!player.storage.hxrenshi2||game.hasPlayer(function(current){
@@ -1391,6 +1397,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove:true,
 			},
 			debao:{
+				audio:2,
 				trigger:{global:'gainAfter'},
 				forced:true,
 				filter:function(event,player){
@@ -1426,6 +1433,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			buqi:{
+				audio:2,
 				trigger:{global:'dying'},
 				forced:true,
 				filter:function(event,player){
@@ -4229,6 +4237,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				 	player.line(target);
 				 	target.gain(card,player,'giveAuto');
 				 }
+				},
+				mod:{
+					inRangeOf:function(from,to){
+						if(from.hasMark('taomie')) return true;
+					},
 				},
 				intro:{
 					content:'mark',
@@ -10646,7 +10659,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			taomie2:'讨灭',
 			taomie3:'讨灭',
 			taomie4:'讨灭',
-			taomie_info:'当你受到伤害后或当你造成伤害后，你可以令伤害来源或受伤角色获得“讨灭”标记（如场上已有标记则转换给该角色）；当你对有“讨灭”标记的角色造成伤害时，选择一项：1. 此伤害+1；2. 你获得其区域内的一张牌并可将之交给另一名角色；3. 依次执行前两项并于伤害结算后弃置其“讨灭”标记。',
+			taomie_info:'当你受到伤害后或当你造成伤害后，你可以令伤害来源或受伤角色获得“讨灭”标记（如场上已有标记则转移给该角色）；你视为在有“讨灭”标记的角色的攻击范围内，且当你对该角色造成伤害时，选择一项：1. 此伤害+1；2. 你获得其区域内的一张牌并可将之交给另一名角色；3. 依次执行前两项并于伤害结算后弃置其“讨灭”标记。',
 			xin_guohuai:'手杀郭淮',
 			mobilejingce:'精策',
 			mobilejingce_info:'结束阶段，若此回合因使用或打出而置入弃牌堆的牌的数量不小于你的体力值，则你可以摸两张牌。',
