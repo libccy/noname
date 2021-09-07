@@ -9,10 +9,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				offline_sticker:['sp_gongsunzan','sp_simazhao','sp_wangyuanji','sp_xinxianying','sp_liuxie'],
 				offline_luanwu:["ns_lijue","ns_zhangji","ns_fanchou"],
 				offline_yongjian:["ns_chendao","yj_caoang"],
-				offline_s:["ns_jiaxu","ns_caoanmin","jsp_liubei"],
+				offline_others:["ns_jiaxu","ns_caoanmin","jsp_liubei","longyufei"],
 			},
 		},
 		character:{
+			longyufei:['female','shu',3,['longyi','zhenjue']],
 			sp_liubei:['male','shu',4,['zhaolie','shichou'],['zhu']],
 			sp_zhangfei:['male','shu',4,['jie','dahe']],
 			sp_lvmeng:['male','wu',3,['tanhu','mouduan']],
@@ -39,6 +40,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterIntro:{
 			huangjinleishi:"黄巾军中负责施法的女祭司二人组。",
+			longyufei:'《三国杀·阵面对决》中的虚构角色，设定是由刘备之女夏侯岚、关羽之女关银屏、张飞之女张星彩三人在与吕布之魔魂战斗时，释放雅典娜的惊叹而召唤出来的精元化神。',
 		},
 		perfectPair:{},
 		card:{
@@ -61,6 +63,125 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//龙羽飞
+			longyi:{
+				enable:['chooseToUse','chooseToRespond'],
+				filter:function(event,player){
+					if(event.type=='wuxie') return false;
+					var hs=player.getCards('h');
+					if(!hs.length) return false;
+					for(var i of hs){
+						if(game.checkMod(i,player,'unchanged','cardEnabled2',player)===false) return false;
+					}
+					for(var i of lib.inpile){
+						if(i!='du'&&get.type(i)=='basic'&&event.filterCard({name:i,cards:hs},player,event)) return true;
+						if(i=='sha'){
+							var list=['fire','thunder','ice'];
+							for(var j of list){
+								if(event.filterCard({name:i,nature:j,cards:hs},player,event)) return true;
+							}
+						}
+					}
+					return false;
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						var vcards=[],hs=player.getCards('h');
+						for(var i of lib.inpile){
+							if(i!='du'&&get.type(i)=='basic'&&event.filterCard({name:i,cards:hs},player,event)) vcards.push(['基本','',i]);
+							if(i=='sha'){
+								var list=['fire','thunder','ice'];
+								for(var j of list){
+									if(event.filterCard({name:i,nature:j,cards:hs},player,event)) vcards.push(['基本','',i,j]);
+								}
+							}
+						}
+						return ui.create.dialog('龙裔',[vcards,'vcard']);
+					},
+					check:function(button,player){
+						if(_status.event.getParent().type!='phase') return 1;
+						return _status.event.player.getUseValue({name:button.link[2],nature:button.link[3]});
+					},
+					backup:function(links,player){
+						return {
+							audio:'longyi',
+							popname:true,
+							viewAs:{name:links[0][2],nature:links[0][3]},
+							filterCard:true,
+							selectCard:-1,
+							position:'h',
+						}
+					},
+				},
+				hiddenCard:function(player,name){
+					return name!='du'&&get.type(name)=='basic'&&player.countCards('h')>0;
+				},
+				ai:{
+					respondSha:true,
+					respondShan:true,
+					skillTagFilter:function(player){
+						return player.countCards('h')>0;
+					},
+					order:0.5,
+					result:{
+						player:function(player){
+							if(_status.event.dying){
+								return get.attitude(player,_status.event.dying);
+							}
+							if(_status.event.type=='respondShan') return 1;
+							var val=0,hs=player.getCards('h'),max=0;
+							for(var i of hs){
+								val+=get.value(i,player);
+								if(get.type(i,player)=='trick') max+=5;
+							}
+							if(player.hasSkill('zhenjue')) max+=7;
+							return val<=max?1:0;
+						},
+					},
+				},
+				group:'longyi_effect',
+				subSkill:{
+					effect:{
+						trigger:{player:'useCard'},
+						forced:true,
+						charlotte:true,
+						popup:false,
+						filter:function(event,player){
+							if(event.skill!='longyi_backup') return false;
+							for(var i of event.cards){
+								var type=get.type2(i,player);
+								if(type=='basic'||type=='trick') return true;
+							}
+							return false;
+						},
+						content:function(){
+							var map={};
+							for(var i of trigger.cards){
+								map[get.type2(i,player)]=true;
+							}
+							if(map.trick) player.draw();
+							if(map.equip) trigger.directHit.addArray(game.players);
+						},
+					},
+					backup:{},
+				},
+			},
+			zhenjue:{
+				trigger:{global:'phaseJieshuBegin'},
+				filter:function(event,player){
+					return player.countCards('h')==0;
+				},
+				logTarget:'player',
+				content:function(){
+					'step 0'
+					trigger.player.chooseToDiscard('he','弃置一张牌，或令'+get.translation(player)+'摸一张牌').set('ai',function(card){
+						if(_status.event.goon) return 7-get.value(card);
+						return -get.value(card);
+					}).set('goon',get.attitude(trigger.player,player)<0);
+					'step 1'
+					if(!result.bool) player.draw();
+				},
+			},
 			//群刘备
 			jsprende:{
 				audio:'rerende',
@@ -2444,12 +2565,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shichou:'誓仇',
 			shichou2:'誓仇',
 			shichou_info:'主公技，限定技，准备阶段，你可指定一名蜀势力角色并交给其两张牌。本局游戏中，当你受到伤害时，改为该角色受到等量的伤害并摸等量的牌，直至该角色第一次进入濒死状态。',
+			longyufei:'龙羽飞',
+			longyi:'龙裔',
+			longyi_info:'你可将所有手牌当做任意基本牌使用或打出。若此牌对应的实体牌中：有锦囊牌，你摸一张牌；有装备牌，此牌不可被响应。',
+			zhenjue:'阵绝',
+			zhenjue_info:'一名角色的结束阶段开始时，若你没有手牌，则你可以令其选择一项：①弃置一张牌。②令你摸一张牌。',
 			
 			offline_star:'桌游志·SP',
 			offline_sticker:'桌游志·贴纸',
 			offline_luanwu:'文和乱武',
 			offline_yongjian:'用间篇',
-			offline_s:'线下S系列',
+			offline_others:'线下其他系列',
 		},
 	};
 });

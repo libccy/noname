@@ -1796,7 +1796,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			zhuSkill_jiangling_info:'当你使用【杀】或普通锦囊牌选择唯一目标时，你可为此牌增加一个目标（该目标不可响应此牌）。',
 			zhuSkill_fancheng:'樊城',
 			zhuSkill_fancheng2:'樊城',
-			zhuSkill_fancheng_info:'限定技，出牌阶段，你可获得如下效果直到回合结束：每回合限X次，当你造成伤害时，此伤害+1（X为游戏轮数且至少为2）。',
+			zhuSkill_fancheng_info:'限定技，出牌阶段，你可摸X张牌获得如下效果直到回合结束：每回合限X次，当你造成伤害时，此伤害+1（X为游戏轮数）。',
 			binglin_shaxue:'歃血',
 			binglin_shaxue_info:'锁定技，每局游戏限三次，当你受到队友造成的伤害时，你防止此伤害。',
 			binglin_neihong:'内讧',
@@ -1981,6 +1981,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'gray',
 				content:function(){
+					player.draw(game.roundNumber);
 					player.awakenSkill('zhuSkill_fancheng');
 					player.addTempSkill('zhuSkill_fancheng2');
 				},
@@ -1991,7 +1992,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				charlotte:true,
 				onremove:true,
 				filter:function(event,player){
-					return player.countMark('zhuSkill_fancheng2')<Math.max(2,game.roundNumber);
+					return player.countMark('zhuSkill_fancheng2')<game.roundNumber;
 				},
 				logTarget:'player',
 				content:function(){

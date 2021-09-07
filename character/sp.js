@@ -3442,8 +3442,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//forced:true,
 				frequent:true,
 				filter:function(event,player){
-					if(event.source==player&&event.player!=player&&player.hp>player.countCards('h')){
-						return event.relatedLose&&event.relatedLose.hs&&event.relatedLose.hs.length>0;
+					if(event.player!=player&&player.hp>player.countCards('h')){
+						var evt=event.getl(player);
+						return evt&&evt.hs&&evt.hs.length>0;
 					}
 					return false;
 				},
@@ -6420,7 +6421,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mark:true,
 				intro:{
-					content:'下个回合结束之前使用“抚蛮”牌时，令$一张牌'
+					content:'下个回合结束之前使用“抚蛮”牌时，令$摸一张牌'
 				},
 				content:function(){
 					'step 0'
@@ -15247,7 +15248,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yanbaihu:'严白虎',
 			wanglang:'王朗',
 			caochun:'曹纯',
-			dongbai:'董白',
+			dongbai:'OL董白',
 			zhaoxiang:'赵襄',
 			heqi:'贺齐',
 			kanze:'阚泽',
@@ -15955,7 +15956,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			juguan_info:'出牌阶段限一次，你可将一张手牌当【杀】或【决斗】使用。若受到此牌伤害的角色未在你的下回合开始前对你造成过伤害，你的下个摸牌阶段摸牌数+2。',
 			duxi:'杜袭',
 			quxi:'驱徙',
-			quxi_info:'限定技。出牌阶段结束时，你可跳过下个弃牌阶段并选择两名手牌数不同的其他角色。你将翻至背面，令这两名角色中手牌数较少的角色获得另一名角色的一张牌并获得一枚“丰”，另一名角色获得一枚“歉”。拥有“丰”/“歉”的角色的摸牌阶段额定摸牌数+1/-1。拥有“丰”/“”的角色死亡时，或一轮游戏开始时，你可转移“丰”/“歉”。',
+			quxi_info:'限定技。出牌阶段结束时，你可跳过下个弃牌阶段并选择两名手牌数不同的其他角色。你将翻至背面，令这两名角色中手牌数较少的角色获得另一名角色的一张牌并获得一枚“丰”，另一名角色获得一枚“歉”。拥有“丰”/“歉”的角色的摸牌阶段额定摸牌数+1/-1。拥有“丰”/“歉”的角色死亡时，或一轮游戏开始时，你可转移“丰”/“歉”。',
 			bixiong:'避凶',
 			bixiong2:'避凶',
 			bixiong_info:'锁定技，当你于弃牌阶段弃置手牌后，你不能成为与这些牌花色相同的牌的目标直到你下回合开始。',

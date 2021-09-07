@@ -15120,9 +15120,17 @@
 				gain:function(){
 					"step 0"
 					if(cards){
-						var owner=event.source||get.owner(cards[0]);
-						if(owner){
-							var next=owner.lose(cards,ui.special).set('type','gain').set('forceDie',true).set('getlx',false);
+						var map={};
+						for(var i of cards){
+							var owner=get.owner(i,'judge');
+							if(owner&&(owner!=player||get.position(i)!='h')){
+								var id=owner.playerid;
+								if(!map[id]) map[id]=[];
+								map[id].push(i);
+							}
+						}
+						for(var i in map){
+							var owner=(_status.connectMode?lib.playerOL:game.playerMap)[i],next=owner.lose(map[i],ui.special).set('type','gain').set('forceDie',true).set('getlx',false);
 							if(event.animate=='give'||event.visible==true) next.visible=true;
 							event.relatedLose=next;
 						}
@@ -26753,7 +26761,7 @@
 					"step 2"
 					if(event.targets.length){
 						var target=event.targets.shift();
-						target.damage.apply(target,event._args.slice(0));
+						if(target.isLinked()) target.damage.apply(target,event._args.slice(0));
 						event.redo();
 					}
 				},

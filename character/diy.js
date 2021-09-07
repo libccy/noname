@@ -70,6 +70,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_crow:['male','key',4,[],['unseen']],
 			key_asara:['female','key',3,['asara_shelu','asara_yingwei']],
 			key_kotomi:['female','key',3,['kotomi_qinji','kotomi_chuanxiang']],
+			key_mia:['female','key',3,['mia_shihui','mia_qianmeng']],
 			
 			key_kud:['female','key',3,['kud_qiaoshou','kud_buhui']],
 			key_misuzu:['female','key',3,['misuzu_hengzhou','misuzu_nongyin','misuzu_zhongxing']],
@@ -195,7 +196,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				diy_fakenews:["diy_wenyang","ns_zhangwei","ns_caimao","ns_chengpu"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
 				diy_noname:['noname'],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto","key_sakuya","key_youta","key_rumi","key_chihaya","key_yukito","key_asara","key_kotomi"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto","key_sakuya","key_youta","key_rumi","key_chihaya","key_yukito","key_asara","key_kotomi","key_mia"],
 				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang','junk_simayi'],
 			},
 		},
@@ -217,6 +218,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yanghu:'羊祜（221年－278年12月27日），字叔子，泰山郡南城县人。西晋时期杰出的战略家、政治家、文学家，曹魏上党太守羊衜的儿子，名儒蔡邕的女儿蔡文姬的外甥。出身“泰山羊氏”，博学能文，清廉正直。曹魏时期，接受公车征辟，出任中书郎，迁给事黄门侍郎。姐姐嫁给大将军司马师，投靠司马氏家族，仕途平步青云。魏元帝曹奂即位，出任秘书监、相国从事中郎、中领军，统领御林军，兼管内外政事，册封钜平县子，迁。西晋建立后，迁中军将军、散骑常侍、郎中令，册封钜平侯。泰始五年（269年），出任车骑将军、荆州都督，加任开府仪同三司坐镇襄阳，屯田兴学，以德怀柔，深得军民之心；扩充军备，训练士兵，全力准备灭亡孙吴，累迁征南大将军，册封南城侯。咸宁四年，去世，临终前举荐杜预接任职务，获赠侍中、太傅，谥号为“成”。唐宋时期，配享武庙。',
 		},
 		characterTitle:{
+			key_kotomi:'#bLoopers',
 			key_kotomi:'#gClannad',
 			key_asara:'#bRewrite',
 			key_yukito:'#bAIR',
@@ -457,6 +459,136 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			mia_shihui:{
+				trigger:{player:'phaseDrawBegin1'},
+				forced:true,
+				filter:function(event,player){
+					return !event.numFixed;
+				},
+				content:function(){
+					trigger.changeToZero();
+					var num=0;all=player.getAllHistory();
+					if(all.length>1){
+						for(var i=all.length-2;i>=0;i--){
+							if(all[i].isMe){
+								for(var evt of all[i].lose){
+									if(evt.type=='discard') num+=evt.cards2.length;
+								}
+								break;
+							}
+						}
+					}
+					player.draw(1+num);
+				},
+				group:'mia_shihui_recover',
+				subSkill:{
+					recover:{
+						trigger:{player:'phaseJieshuBegin'},
+						forced:true,
+						filter:function(event,player){
+							return player.isDamaged()||player.countCards('he')>0;
+						},
+						content:function(){
+							player.chooseToDiscard('he',true);
+							player.recover();
+						},
+					},
+				},
+			},
+			mia_qianmeng:{
+				trigger:{
+					global:'gameDrawAfter',
+					player:'enterGame',
+				},
+				forced:true,
+				dutySkill:true,
+				content:function(){
+					'step 0'
+					player.draw();
+					'step 1'
+					if(player.countCards('he')>0){
+						player.chooseCard('he',true,'潜梦：选择一张牌置于牌堆中');
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						var card=result.cards[0];
+						player.storage.mia_qianmeng=card;
+						player.$throw(card,1000);
+						player.lose(card,ui.cardPile).insert_index=function(){
+							return ui.cardPile.childNodes[Math.ceil(ui.cardPile.childNodes.length/2)];
+						};
+					}
+					else event.finish();
+					'step 3'
+					game.delayx();
+				},
+				onremove:true,
+				group:['mia_qianmeng_achieve','mia_qianmeng_fail'],
+				subSkill:{
+					achieve:{
+						trigger:{global:'gainAfter'},
+						forced:true,
+						filter:function(event,player){
+							var card=player.storage.mia_qianmeng;
+							return card&&event.cards.contains(card)&&event.player.getCards('he').contains(card);
+						},
+						skillAnimation:true,
+						animationColor:'key',
+						content:function(){
+							'step 0'
+							player.awakenSkill('mia_qianmeng');
+							if(player!=trigger.player) player.gain(player.storage.mia_qianmeng,trigger.player,'give');
+							'step 1'
+							if(player.hp<player.maxHp) player.recover(player.maxHp-player.hp);
+							player.removeSkill('mia_shihui');
+							player.addSkill('mia_fengfa');
+						},
+					},
+					fail:{
+						trigger:{player:'die'},
+						direct:true,
+						forceDie:true,
+						filter:function(event,player){
+							return get.itemtype(player.storage.mia_qianmeng)=='card';
+						},
+						content:function(){
+							'step 0'
+							player.chooseTarget(get.prompt('mia_qianmeng'),'令一名角色获得牌堆中所有点数为'+player.storage.mia_qianmeng.number+'的牌',lib.filter.notMe);
+							'step 1'
+							if(result.bool){
+								var target=result.targets[0];
+								player.logSkill('mia_qianmeng_fail',target);
+								var num=player.storage.mia_qianmeng.number,cards=[];
+								for(var i=0;i<ui.cardPile.childNodes.length;i++){
+									var card=ui.cardPile.childNodes[i];
+									if(card.number==num) cards.push(card);
+								}
+								if(cards.length) target.gain(cards,'gain2');
+							}
+						},
+					},
+				},
+			},
+			mia_fengfa:{
+				trigger:{player:'phaseDrawBegin2'},
+				forced:true,
+				filter:function(event,player){
+					return !event.numFixed;
+				},
+				content:function(){
+					var num=0;all=player.getAllHistory();
+					if(all.length>1){
+						for(var i=all.length-2;i>=0;i--){
+							if(all[i].isMe){
+								num+=all[i].useCard.length;
+								break;
+							}
+						}
+					}
+					trigger.num+=num;
+				},
+			},
 			kyou_zhidian:{
 				locked:false,
 				mod:{
@@ -4978,7 +5110,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				frequent:true,
 				content:function(){
-					player.draw(2);
+					'step 0'
+					if(trigger.name=='phaseUse'){
+						player.draw(2);
+						event.finish();
+						return;
+					}
+					var list=[],history=player.getHistory('useCard');
+					for(var i of history){
+						list.add(get.suit(i.card));
+						if(list.length>=player.hp) break;
+					}
+					if(list.length>=player.hp) event.goon=true;
+					else player.chooseControl('摸牌阶段','出牌阶段').set('prompt','精策：选择要执行的额外阶段');
+					'step 1'
+					if(event.goon||result.index==0){
+						var next=player.phaseDraw();
+						event.next.remove(next);
+						trigger.getParent().next.push(next);
+					}
+					if(event.goon||result.index==1){
+						var next=player.phaseUse();
+						event.next.remove(next);
+						trigger.getParent().next.push(next);
+					}
 				},
 			},
 			kyoko_shelie:{
@@ -14877,6 +15032,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_crow:'小空',
 			key_asara:'井上晶',
 			key_kotomi:'一之濑琴美',
+			key_mia:'藤川米娅',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -15214,6 +15370,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kotomi_chuanxiang:'传箱',
 			kotomi_chuanxiang2:'传箱',
 			kotomi_chuanxiang_info:'其他角色的出牌阶段限一次，其可以将装备区内的一张牌移动到另一名角色的装备区内，然后你摸一张牌。若你是目标角色，则你改为摸两张牌。',
+			mia_shihui:'时迴',
+			mia_shihui_info:'锁定技，摸牌阶段，你改为摸X+1张牌（X为你上回合弃置的牌数）；结束阶段，你弃置一张牌并回复1点体力。',
+			mia_qianmeng:'潜梦',
+			mia_qianmeng_info:'使命技。①游戏开始时，你摸一张牌，然后将一张牌置于牌堆的正中央。②使命：当有角色获得“潜梦”牌时，其将此牌交给你。你将体力值回复至上限，失去〖时迴〗并获得〖风发〗。③失败：当你死亡时，你可令一名角色获得牌堆中所有与“潜梦”牌点数相同的牌。',
+			mia_fengfa:'风发',
+			mia_fengfa_info:'锁定技。摸牌阶段，你多摸X张牌（X为你上回合使用过的牌数）。',
 
 			key_kud:'库特莉亚芙卡',
 			kud_qiaoshou:'巧手',

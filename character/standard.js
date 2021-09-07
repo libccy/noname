@@ -86,7 +86,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lvbu:['diaochan'],
 			machao:['madai','mayunlu'],
 			zhangliao:['zangba'],
-			ganning:['lingtong'],
+			ganning:['lingtong','xf_sufei'],
 		},
 		skill:{
 			rewangzun:{

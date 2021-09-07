@@ -12,12 +12,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_yijiang1:['re_wuguotai','re_gaoshun','re_caozhi','yujin_yujin','re_masu','xin_xusheng','re_fazheng','xin_lingtong','re_zhangchunhua'],
 				refresh_yijiang2:['old_madai','wangyi','guanzhang','xin_handang','re_zhonghui','re_liaohua','re_chengpu','re_caozhang','re_bulianshi','xin_liubiao'],
 				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','re_yufan','re_liru','re_manchong','re_fuhuanghou','re_guanping'],
-				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen','re_zhoucang','re_chenqun'],
+				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen','re_zhoucang','re_chenqun','re_caifuren'],
 				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu','re_gongsunyuan','re_guotufengji'],
 			},
 		},
 		connect:true,
 		character:{
+			re_caifuren:['female','qun',3,['reqieting','rexianzhou']],
 			re_guanping:['male','shu',4,['relongyin','jiezhong']],
 			re_guotufengji:['male','qun',3,['rejigong','shifei']],
 			re_chenqun:['male','wei',3,['redingpin','refaen']],
@@ -135,6 +136,132 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_xushu:['zhaoyun','sp_zhugeliang'],
 		},
 		skill:{
+			//界蔡夫人
+			reqieting:{
+				audio:2,
+				trigger:{global:'phaseEnd'},
+				direct:true,
+				filter:function(event,player){
+					var target=event.player;
+					if(player==target) return false;
+					if(!target.getHistory('sourceDamage').length){
+						var cards=target.getCards('e');
+						for(var i of cards){
+							if(player.isEmpty(get.subtype(i))) return true;
+						}
+					}
+					return target.getHistory('useCard',function(evt){
+						return evt.targets&&evt.targets.filter(function(i){
+							return i!=target;
+						}).length>0;
+					}).length==0;
+				},
+				frequent:true,
+				content:function(){
+					'step 0'
+					var target=trigger.player;
+					event.target=target;
+					event.logged=false;
+					var list=[];
+					if(!target.getHistory('sourceDamage').length){
+						var cards=target.getCards('e');
+						for(var i of cards){
+							if(player.isEmpty(get.subtype(i))) list.push(i);
+						}
+					}
+					if(list.length){
+						player.choosePlayerCard(target,'e',get.prompt('reqieting',target)).set('list',list).set('filterButton',function(button){
+							return _status.event.list.contains(button.link);
+						}).set('ai',function(button){
+							var evt=_status.event,val=get.value(button.link);
+							if(evt.target.hasSkillTag('noe')) val-=4;
+							if((evt.att>0)==(val>0)) return 0;
+							return get.effect(evt.player,button.link,evt.player,evt.player);
+						}).set('att',get.attitude(player,target));
+					}
+					else event.goto(2);
+					'step 1'
+					if(result.bool){
+						player.logSkill('reqieting',target);
+						event.logged=true;
+						var card=result.links[0];
+						target.$give(card,player,false);
+						game.delay(0.5);
+						player.equip(card);
+					}
+					if(target.getHistory('useCard',function(evt){
+						return evt.targets&&evt.targets.filter(function(i){
+							return i!=target;
+						}).length>0;
+					}).length!=0) event.finish();
+					'step 2'
+					player.chooseBool('是否发动【窃听】摸一张牌？').set('frequentSkill','reqieting');
+					'step 3'
+					if(result.bool){
+						if(!event.logged) player.logSkill('reqieting',target);
+						player.draw();
+					}
+				},
+			},
+			rexianzhou:{
+				audio:2,
+				enable:'phaseUse',
+				limited:true,
+				skillAnimation:true,
+				animationColor:'gray',
+				filter:function(event,player){
+					return player.countCards('e')>0;
+				},
+				filterCard:true,
+				position:'e',
+				selectCard:-1,
+				filterTarget:lib.filter.notMe,
+				discard:false,
+				lose:false,
+				delay:false,
+				content:function(){
+					'step 0'
+					player.awakenSkill('rexianzhou');
+					target.gain(cards,player,'give');
+					player.recover(cards.length)
+					'step 1'
+					var list=game.filterPlayer(function(current){
+						return target.inRange(current);
+					});
+					if(list.length){
+						var max=Math.min(list.length,cards.length);
+						player.chooseTarget(true,[1,max],'对至多'+get.cnNumber(max)+'名范围内的角色各造成1点伤害',function(card,player,target){
+							return _status.event.list.contains(target);
+						}).set('list',list);
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						var targets=result.targets.sortBySeat();
+						player.line(targets,'green');
+						for(var i of targets) i.damage('nocard');
+					}
+				},
+				ai:{
+					order:1,
+					result:{
+						target:1,
+						player:function(player){
+							var bool=true,players=game.filterPlayer();
+							for(var i=0;i<players.length;i++){
+								if(players[i]!=player&&get.attitude(player,players[i])>2&&get.attitude(players[i],player)>2){
+									bool=false;break;
+								}
+							}
+							if(bool) return -10;
+							if(player.hp==1) return 1;
+							if(game.phaseNumber<game.players.length) return -10;
+							if(player.countCards('e')+player.hp<=player.maxHp) return 1;
+							return -10;
+						}
+					},
+				}
+			},
 			//界关平
 			relongyin:{
 				audio:2,
@@ -9644,6 +9771,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			relongyin_info:'当一名角色于其出牌阶段使用【杀】时，你可弃置一张牌令此【杀】不计入出牌阶段使用次数。若此【杀】为红色，则你摸一张牌；若你以此法弃置的牌与此【杀】点数相同，则你重置“竭忠”。',
 			jiezhong:'竭忠',
 			jiezhong_info:'限定技，出牌阶段开始时，你可以将手牌补至手牌上限（至多摸五张）。',
+			re_caifuren:'界蔡夫人',
+			reqieting:'窃听',
+			reqieting_info:'其他角色的回合结束时，若其本回合内未造成过伤害，则你可将其装备区内的一张牌置于你的装备区内；若其本回合内未对其他角色使用过牌，则你可摸一张牌。',
+			rexianzhou:'献州',
+			rexianzhou_info:'限定技。出牌阶段，你可将装备区内的所有牌交给一名其他角色。你回复X点体力，然后对其攻击范围内的至多X名角色各造成1点伤害（X为你以此法给出的牌数）。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

@@ -12118,6 +12118,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gongsunyuan:['re_gongsunyuan','gongsunyuan'],
 			zhoucang:['re_zhoucang','xin_zhoucang','zhoucang'],
 			guotufengji:['re_guotufengji','guotufengji'],
+			guanping:['re_guanping','guanping'],
+			caifuren:['re_caifuren','caifuren'],
 		},
 		translate:{
 			old_huaxiong:'华雄',

@@ -1607,20 +1607,39 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								for(var i=0;i<targets.length;i++){
 									targets[i].damage();
 								};
-								if(targets.length>=2) player.loseHp();
+								//if(targets.length>=2) player.loseHp();
 							};
 						};
 					};
 				},
 			},
-			"nzry_zhizheng":{
-				audio:2,
-				mod:{
-					playerEnabled:function(card,player,target){
-						var info=get.info(card);
-						if(target!=player&&(!info||!info.singleCard||!ui.selected.targets.length)&&player.isPhaseUsing()&&!target.inRange(player)) return false;
+			rechezheng:{
+				audio:'nzry_zhizheng',
+				trigger:{source:'damageBegin2'},
+				filter:function(event,player){
+					return player.isPhaseUsing()&&!player.inRangeOf(event.player);
+				},
+				forced:true,
+				logTarget:'player',
+				content:function(){
+					trigger.cancel();
+				},
+				ai:{
+					effect:{
+						player:function(card,player,target){
+							if(get.tag(card,'damage')&&!player.inRangeOf(target)) return 'zerotarget';
+						},
 					},
 				},
+			},
+			nzry_zhizheng:{
+				audio:2,
+				//mod:{
+				//	playerEnabled:function(card,player,target){
+				//		var info=get.info(card);
+				//		if(target!=player&&(!info||!info.singleCard||!ui.selected.targets.length)&&player.isPhaseUsing()&&!target.inRange(player)) return false;
+				//	},
+				//},
 				trigger:{
 					player:'phaseUseEnd'
 				},
@@ -1645,14 +1664,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.discardPlayerCard(result.targets[0],'he',1,true);
 					};
 				},
+				group:'rechezheng',
 			},
-			"nzry_lijun":{
+			nzry_lijun:{
 				unique:true,
 				global:'nzry_lijun1',
 				audio:'nzry_lijun1',
 				zhuSkill:true,
 			},
-			nzry_lijun2:{},
+			nzry_lijun2:{
+				mod:{
+					cardUsable:function(card,player,num){
+						if(card.name=='sha') return num+player.countMark('nzry_lijun2');
+					},
+				},
+				onremove:true,
+			},
 			"nzry_lijun1":{
 				audio:2,
 				//forceaudio:true,
@@ -1661,7 +1688,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					if(event.card.name!='sha') return false;
-					//if(player.hasSkill('nzry_lijun2')) return false;
+					if(player.hasSkill('nzry_lijun2')) return false;
 					if(player.group!='wu') return false;
 					if(_status.currentPhase!=player) return false;
 					if(!game.hasPlayer(function(target){
@@ -1688,7 +1715,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(!result.bool) event.finish();
 					else{
-						//player.addTempSkill('nzry_lijun2','phaseUseEnd');
+						player.addTempSkill('nzry_lijun2','phaseUseEnd');
 						var zhu=result.targets[0];
 						player.line(zhu,'green');
 						zhu.logSkill('nzry_lijun');
@@ -1705,7 +1732,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}).set('prompt','是否令'+get.translation(player)+'摸一张牌？');
 					}
 					'step 2'
-					if(result.bool) player.draw();
+					if(result.bool){
+						player.draw();
+						player.addMark('nzry_lijun2',1,false);
+					}
 				},
 			},
 			"nzry_chenglve":{
@@ -5345,6 +5375,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return target.countCards('h')<Math.min(target.maxHp,5);
 					}).set('ai',function(target){
 						var att=get.attitude(_status.event.player,target);
+						if(target.hasSkillTag('nogain')) att/=6;
 						if(att>2){
 							return Math.min(5,target.maxHp)-target.countCards('h');
 						}
@@ -7372,12 +7403,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_cunmu":"寸目",
 			"nzry_cunmu_info":"锁定技，当你摸牌时，改为从牌堆底摸牌。",
 			"nzry_kuizhu":"溃诛",
-			"nzry_kuizhu_info":"弃牌阶段结束后，你可以选择一项：令至多X名角色各摸一张牌，或对任意名体力值之和为X的角色造成一点伤害，若不少于2名角色，你须受到一点伤害。（X为你此阶段弃置的牌数）",
+			"nzry_kuizhu_info":"弃牌阶段结束后，你可以选择一项：①令至多X名角色各摸一张牌。②对任意名体力值之和为X的角色造成一点伤害。（X为你此阶段弃置的牌数）",
 			"nzry_zhizheng":"掣政",
+			rechezheng:'掣政',
 			"nzry_zhizheng_info":"锁定技，你的出牌阶段内，攻击范围内不包含你的其他角色不能成为你使用牌的目标。出牌阶段结束时，若你本阶段内使用的牌数小于这些角色的数量，则你弃置其中一名角色的一张牌。",
 			"nzry_lijun1":"立军",
 			"nzry_lijun":"立军",
-			"nzry_lijun_info":"主公技，其他吴势力角色于回合内使用的【杀】结算后，可以将此【杀】对应的实体牌交给你，然后你可以令其摸一张牌。",
+			"nzry_lijun_info":"主公技，其他吴势力角色的出牌阶段限一次，其使用【杀】结算后，可以将此【杀】对应的实体牌交给你，然后你可以令其摸一张牌且本阶段内使用【杀】的次数上限+1。",
 			"nzry_huaiju":"怀橘",
 			"nzry_huaiju_info":"锁定技，游戏开始时，你获得3个“橘”标记。（有“橘”的角色受到伤害时，防止此伤害，然后移去一个“橘”；有“橘”的角色摸牌阶段额外摸一张牌）",
 			"tachibana_effect":"怀橘",
