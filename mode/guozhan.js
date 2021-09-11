@@ -356,8 +356,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				guozhan_quan:["gz_cuimao","gz_yujin","gz_wangping","gz_fazheng","gz_wuguotai","gz_lukang","gz_yuanshu","gz_zhangxiu"],
 				guozhan_jun:["gz_jun_caocao","gz_jun_sunquan","gz_jun_liubei","gz_jun_zhangjiao"],
 				guozhan_jin:['gz_jin_simayi','gz_jin_simazhao','gz_jin_simashi','gz_jin_zhangchunhua','gz_jin_wangyuanji','gz_jin_xiahouhui','gz_duyu','gz_zhanghuyuechen','gz_jin_yanghuiyu','gz_simazhou','gz_shibao','gz_weiguan','gz_zhongyan'],
-				guozhan_single:['gz_re_xushu','gz_yanbaihu','gz_wujing','gz_dongzhao','gz_huangzu','gz_zhugeke','gz_liuba'],
-				guozhan_double:['gz_tangzi','gz_liuqi','gz_mengda','gz_mifangfushiren','gz_zhanglu','gz_shixie','gz_xuyou','gz_xiahouba','gz_panjun','gz_xf_sufei','gz_wenqin'],
+				guozhan_single:['gz_re_xushu','gz_yanbaihu','gz_wujing','gz_dongzhao','gz_huangzu','gz_zhugeke','gz_liuba','gz_wenpin'],
+				guozhan_double:['gz_tangzi','gz_liuqi','gz_mengda','gz_mifangfushiren','gz_zhanglu','gz_shixie','gz_xuyou','gz_xiahouba','gz_panjun','gz_xf_sufei','gz_wenqin','gz_pengyang'],
 				guozhan_yexinjia:['gz_zhonghui','gz_simazhao','gz_gongsunyuan'],
 				guozhan_zongheng:['gz_huaxin','gz_luyusheng','gz_zongyu','gz_miheng','gz_fengxi'],
 				guozhan_others:["gz_lingcao","gz_lifeng","gz_beimihu","gz_jianggan","gz_key_ushio","gz_sp_duyu"],
@@ -401,6 +401,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_wenqin:['male','wei',4,['gzyaoqi'],['doublegroup:wei:wu']],
 				gz_xf_sufei:['male','wu',4,['gzlianpian'],['doublegroup:wu:qun']],
 				gz_liuba:['male','shu',3,['chouduo','guiyin']],
+				gz_pengyang:['male','shu',3,['jianni','xiaoba'],['doublegroup:shu:qun']],
+				gz_wenpin:['male','wei',4,['gzzhenwei','gzyulin']],
 
 				gz_caocao:['male','wei',4,['jianxiong']],
 				gz_simayi:['male','wei',3,['fankui','guicai']],
@@ -536,6 +538,337 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//文聘
+			gzzhenwei:{
+				trigger:{player:'phaseDiscardBegin'},
+				check:function(event,player){
+					return player.hp>2&&player.needsToDiscard()>0&&game.countPlayer(function(current){
+						return get.attitude(current,player)<=0;
+					})>game.countPlayer()/2;
+				},
+				content:function(){
+					player.addTempSkill('gzzhenwei_effect');
+					player.loseHp();
+				},
+				subSkill:{
+					effect:{
+						trigger:{player:'phaseDiscardAfter'},
+						forced:true,
+						charlotte:true,
+						popup:false,
+						filter:function(event,player){
+							return player.getHistory('lose',function(evt){
+								return evt.type=='discard'&&evt.cards2&&evt.cards2.length>0&&evt.getParent('phaseDiscard')==event;
+							}).length>0;
+						},
+						content:function(){
+							'step 0'
+							var num=0;
+							player.getHistory('lose',function(evt){
+								if(evt.type=='discard'&&evt.getParent('phaseDiscard')==trigger) num+=evt.cards2.length;
+							});
+							event.num=num;
+							event.targets=game.filterPlayer(function(current){
+								return current!=player;
+							}).sortBySeat();
+							'step 1'
+							var target=targets.shift();
+							event.target=target;
+							if(target.isIn()){
+								player.line(target,'green');
+								target.chooseCard('h',num,'将'+get.cnNumber(num)+'张牌置入弃牌堆，或受到1点伤害').set('ai',function(card){
+									var evt=_status.event.getParent();
+									if(get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
+									return (8/Math.sqrt(evt.num)+evt.target.getDamagedHp())-get.value(card);
+								});
+							}
+							else if(targets.length) event.redo();
+							else event.finish();
+							'step 2'
+							if(result.bool){
+								target.lose(result.cards,ui.discardPile,'visible');
+								target.$throw(result.cards,1000);
+								game.log(target,'将',result.cards,'置入了弃牌堆');
+							}
+							else target.damage();
+							'step 3'
+							game.delayx();
+							if(targets.length) event.goto(1);
+						},
+					},
+				},
+				ai:{
+					noDieAfter2:true,
+					skillTagFilter:function(player,tag,target){
+						return target.isFriendOf(player);
+					},
+				},
+			},
+			gzyulin:{
+				trigger:{player:'phaseJieshuBegin'},
+				zhenfa:'siege',
+				direct:true,
+				locked:true,
+				filter:function(event,player){
+					return game.countPlayer()>4&&game.hasPlayer(function(current){
+						return player.sieged(current)&&player.canUse('sha',current,false);
+					});
+				},
+				content:function(){
+					'step 0'
+					var list=game.filterPlayer(function(current){
+						return player.sieged(current)&&player.canUse('sha',current,false);
+					});
+					if(player.hasSkill('gzyulin')){
+						if(list.length==1) event._result={bool:true,targets:list};
+						else player.chooseTarget('鱼鳞：视为对一名围攻你的角色使用【杀】',function(card,player,target){
+							return _status.event.list.contains(target);
+						},true).set('list',list).set('ai',function(target){
+							var player=_status.event.player;
+							return get.effect(target,{name:'sha',isCard:true},player,player);
+						});
+					}
+					else{
+						player.chooseTarget(get.prompt('gzyulin'),'视为对一名围攻你的角色使用【杀】',function(card,player,target){
+							return _status.event.list.contains(target);
+						}).set('list',list).set('ai',function(target){
+							var player=_status.event.player;
+							return get.effect(target,{name:'sha',isCard:true},player,player);
+						});
+					}
+					'step 1'
+					if(result.bool){
+						player.useCard({name:'sha',isCard:true},result.targets[0],'gzyulin',false);
+					}
+				},
+				global:'gzyulin_siege',
+				subSkill:{
+					siege:{
+						mod:{
+							maxHandcard:function(player,num){
+								if(game.countPlayer()<4) return;
+								var next=player.getNext(),prev=player.getPrevious(),siege=[];
+								if(player.siege(next)) siege.push(next.getNext());
+								if(player.siege(prev)) siege.push(prev.getPrevious());
+								if(siege.length){
+									siege.push(player);
+									num+=siege.filter(function(source){
+										return source.hasSkill('gzyulin');
+									}).length;
+								}
+								if(player.sieged()){
+									if(next.hasSkill('gzyulin')) num--;
+									if(prev.hasSkill('gzyulin')) num--;
+								}
+								return num;
+							},
+						},
+					},
+				},
+			},
+			//彭羕
+			jianni:{
+				trigger:{global:'phaseUseBegin'},
+				direct:true,
+				filter:function(event,player){
+					if(!player.isFriendOf(event.player)||!game.hasPlayer(function(current){
+						return !current.isLinked();
+					})) return false;
+					if(_status.connectMode&&player.hasSkill('jianni')) return player.countCards('h')>0;
+					return player.countCards('h',function(card){
+						return get.type2(card,player)=='trick';
+					});
+				},
+				content:function(){
+					'step 0'
+					player.chooseCardTarget({
+						prompt:get.prompt('jianni'),
+						prompt2:'弃置一张锦囊牌并选择要横置的角色',
+						filterCard:function(card,player){
+							return get.type2(card,player)=='trick'&&lib.filter.cardDiscardable(card,player,'jianni');
+						},
+						filterTarget:function(card,player,target){
+							return !target.isLinked();
+						},
+						goon:function(){
+							var target=trigger.player;
+							if(player.canUse('tao',target)&&get.effect(target,{name:'tao',isCard:true},player,player)>0) return true;
+							var card={name:'sha',nature:'thunder',isCard:true};
+							if(game.hasPlayer(function(current){
+								return current!=player&&current!=target&&target.canUse(card,current,false)&&get.effect(current,card,target,player)>0;
+							})) return true;
+							return false;
+						}(),
+						ai1:function(card){
+							if(_status.event.goon) return 7-get.value(card);
+							return 0;
+						},
+						ai2:function(target){
+							var player=_status.event.player;
+							return ((target.identity!='unknown'&&!game.hasPlayer(function(current){
+								return current!=target&&current.isFriendOf(target)&&current.isLinked();
+							}))?3:1)*(-get.attitude(target,player,player)+1);
+						},
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('jianni',target);
+						player.discard(result.cards);
+					}
+					else event.finish();
+					'step 2'
+					if(!target.isLinked()) target.link();
+					'step 3'
+					var map={},sides=[],pmap=_status.connectMode?lib.playerOL:game.playerMap,player;
+					for(var i of game.players){
+						if(i.identity=='unknown') continue;
+						var added=false;
+						for(var j of sides){
+							if(i.isFriendOf(pmap[j])){
+								added=true;
+								map[j].push(i);
+								if(i==this) player=j;
+								break;
+							}
+						}
+						if(!added){
+							map[i.playerid]=[i];
+							sides.push(i.playerid);
+							if(i==this) player=i.playerid;
+						}
+					}
+					var num=0;
+					for(var i in map){
+						if(map[i].filter(function(i){
+							return i.isLinked();
+						}).length) num++;
+					}
+					if(num>0) player.draw(num);
+					'step 4'
+					if(trigger.player.isIn()){
+						var target=trigger.player,tao=player.canUse('tao',target),sha=game.filterPlayer(function(current){
+							return current!=target&&current!=player&&target.canUse({name:'sha',nature:'thunder',isCard:true},current,false);
+						});
+						if(sha.length){
+							var next=player.chooseTarget('请选择'+get.translation(target)+'使用雷【杀】的目标',function(card,player,target){
+								return _status.event.list.contains(target);
+							});
+							if(tao){
+								next.set('prompt2','或点「取消」并视为对其使用【桃】');
+								next.set('goon',get.effect(target,{name:'tao',isCard:true},player,player));
+							}
+							else{
+								next.set('forced',true);
+								next.set('goon',0);
+							}
+							next.set('list',sha);
+							next.set('ai',function(target){
+								var player=_status.event.player;
+								return get.effect(target,{name:'sha',nature:'thunder',isCard:true},_status.event.getTrigger().player,player)-_status.event.goon;
+							});
+						}
+						else if(tao) event._result={bool:false};
+						else event.finish();
+					}
+					else event.finish();
+					'step 5'
+					if(result.bool){
+						var target=result.targets[0];
+						if(player==trigger.player) player.line(target);
+						else{
+							player.line2([trigger.player,target]);
+							game.delay(0.5);
+						}
+						trigger.player.useCard({name:'sha',nature:'thunder',isCard:true},target,false).animate=false;
+					}
+					else player.useCard({name:'tao',isCard:true},trigger.player);
+				},
+			},
+			xiaoba:{
+				trigger:{global:'useCard'},
+				forced:true,
+				filter:function(event,player){
+					if(player!=event.player&&!event.targets.contains(player)) return false;
+					var type=get.type2(event.card);
+					if(type!='basic'&&type!='trick') return false;
+					var list=game.filterPlayer(function(current){
+						return current!=player&&current.isFriendOf(player);
+					});
+					if(!list.length) return false;
+					var hs=player.countCards('h');
+					for(var i of list){
+						if(i.countCards('h')>hs) return false;
+					}
+					return true;
+				},
+				check:()=>false,
+				content:function(){
+					trigger.directHit.addArray(game.players);
+				},
+				global:'xiaoba_ai',
+				ai:{
+					halfneg:true,
+					directHit_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						if(!arg.card) return false;
+						var type=get.type2(arg.card);
+						if(type!='basic'&&type!='trick') return false;
+						var list=game.filterPlayer(function(current){
+							return current!=player&&current.isFriendOf(player);
+						});
+						if(!list.length) return false;
+						var cards=[arg.card];
+						if(arg.card.cards) cards.addArray(arg.card.cards);
+						cards.addArray(ui.selected.cards);
+						var hhs=function(card){
+							return !cards.contains(card);
+						};
+						var hs=player.countCards('h',hhs);
+						for(var i of list){
+							if(i.countCards('h',hhs)>hs) return false;
+						}
+						return true;
+					},
+				},
+				subSkill:{
+					ai:{
+						ai:{
+							directHit_ai:true,
+							skillTagFilter:function(playerx,tag,arg){
+								if(!arg.card) return false;
+								var type=get.type2(arg.card);
+								if(type!='basic'&&type!='trick') return false;
+								var player;
+								if(arg.target&&arg.target.hasSkill('xiaoba')) player=arg.target;
+								else{
+									var list=ui.selected.targets.filter(function(target){
+										return target.hasSkill('xiaoba');
+									});
+									if(list.length) player=list[0];
+									else return false;
+								}
+								var list=game.filterPlayer(function(current){
+									return current!=player&&current.isFriendOf(player);
+								});
+								if(!list.length) return false;
+								var cards=[arg.card];
+								if(arg.card.cards) cards.addArray(arg.card.cards);
+								cards.addArray(ui.selected.cards);
+								var hhs=function(card){
+									return !cards.contains(card);
+								};
+								var hs=player.countCards('h',hhs);
+								for(var i of list){
+									if(i.countCards('h',hhs)>hs) return false;
+								}
+								return true;
+							},
+						},
+					},
+				},
+			},
 			//刘巴
 			chouduo:{
 				trigger:{global:'phaseJieshuBegin'},
@@ -9946,6 +10279,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			wenqin:'文钦',
 			fengxi:'冯熙',
 			liuba:'刘巴',
+			pengyang:'彭羕',
+			gzzhenwei:'镇卫',
+			gzzhenwei_info:'①弃牌阶段开始时，你可失去1点体力。然后若你于此阶段内弃置过你的牌，则你令其他角色各选择一项：1.将X张手牌置入弃牌堆（X为你于此阶段内弃置过的牌数）；2.受到你造成的1点伤害。②你杀死与你势力相同的角色不执行奖惩。 ',
+			gzyulin:'鱼鳞',
+			gzyulin_info:'阵法技，若你在一个围攻关系中：①是围攻角色，则所有围攻角色的手牌上限+1且被围攻角色手牌上限-1；②是被围攻角色，则结束阶段开始时，你视为对一名围攻角色使用【杀】。',
+			jianni:'谏逆',
+			jianni_info:'一名己方角色A的出牌阶段开始时，你可弃置一张锦囊牌，横置一名结算并摸X张牌（X为拥有横置角色的势力数）。然后你选择一项：①视为对A使用一张【桃】；②令A视为对由你选择的另一名角色使用一张雷【杀】。',
+			xiaoba:'嚣跋',
+			xiaoba_info:'锁定技，当你使用或被使用基本牌或普通锦囊牌时，若有其他与你势力相同的角色且这些角色的手牌数均不大于你，则此牌不可被响应。',
 			chouduo:'筹度',
 			chouduo_info:'己方角色的结束阶段开始时，其可以摸X张牌（X为其本回合弃牌阶段弃置的牌数且至多为3）。 ',
 			guiyin:'归隐',
@@ -11026,6 +11368,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				dieAfter2:function(source){
 					var that=this;
+					if(source&&source.hasSkillTag('noDieAfter2',null,this)) return;
 					if(source&&source.shijun){
 						source.discard(source.getCards('he'));
 						delete source.shijun;

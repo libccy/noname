@@ -1484,7 +1484,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.type!='discard'){
 						var evt=event.getParent();
-						if(evt.name!='useCard'&&event.type!='respond') return false;
+						if(evt.name!='useCard'&&evt.name!='respond') return false;
 					}
 					var target=_status.currentPhase;
 					if(!event.cards2||event.cards2.length!=1||!target||target==player||!target.isIn()) return false;

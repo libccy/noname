@@ -2640,7 +2640,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						lib.character[name][1]='wei';
 						return true;
 					});
-					event.trueList=['xunchen','gaolan','sp_zhanghe','sp_xuyou','chenlin','jsp_liubei','yj_jushou','sp_shenpei','tianfeng','yuantanyuanshang','lvkuanglvxiang','xinpi','guotufengji','chunyuqiong'].filter(function(name){
+					event.trueList=['xunchen','gaolan','sp_zhanghe','sp_xuyou','chenlin','jsp_liubei','yj_jushou','sp_shenpei','tianfeng','yuantanyuanshang','lvkuanglvxiang','xinpi','re_guotufengji','chunyuqiong'].filter(function(name){
 						if(!Array.isArray(lib.character[name])) return false;
 						lib.character[name][1]='qun';
 						return true;
@@ -2716,7 +2716,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						lib.character[name][1]='wei';
 						return true;
 					});
-					event.trueList=['xunchen','gaolan','sp_zhanghe','sp_xuyou','chenlin','jsp_liubei','yj_jushou','sp_shenpei','tianfeng','yuantanyuanshang','lvkuanglvxiang','xinpi','guotufengji','chunyuqiong'].filter(function(name){
+					event.trueList=['xunchen','gaolan','sp_zhanghe','sp_xuyou','chenlin','jsp_liubei','yj_jushou','sp_shenpei','tianfeng','yuantanyuanshang','lvkuanglvxiang','xinpi','re_guotufengji','chunyuqiong'].filter(function(name){
 						if(!Array.isArray(lib.character[name])) return false;
 						lib.character[name][1]='qun';
 						return true;

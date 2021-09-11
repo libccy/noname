@@ -230,9 +230,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					if(list.length){
 						var max=Math.min(list.length,cards.length);
-						player.chooseTarget(true,[1,max],'对至多'+get.cnNumber(max)+'名范围内的角色各造成1点伤害',function(card,player,target){
+						target.chooseTarget(true,[1,max],'对至多'+get.cnNumber(max)+'名范围内的角色各造成1点伤害',function(card,player,target){
 							return _status.event.list.contains(target);
-						}).set('list',list);
+						}).set('list',list).set('ai',function(target){
+							var player=_status.event.player;
+							return get.damageEffect(target,player,player);
+						});
 					}
 					else event.finish();
 					'step 2'
