@@ -23,7 +23,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			xin_caifuren:['male','qun',3,['xinqieting','xianzhou']],
+			xin_caifuren:['female','qun',3,['xinqieting','xianzhou']],
 			sp_yanghu:['male','qun',3,['mingfa','rongbei']],
 			qiaogong:['male','wu',3,['yizhu','luanchou']],
 			liuzhang:['male','qun',3,['xiusheng','yinlang','huaibi'],['zhu']],
