@@ -12,12 +12,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_yijiang1:['re_wuguotai','re_gaoshun','re_caozhi','yujin_yujin','re_masu','xin_xusheng','re_fazheng','xin_lingtong','re_zhangchunhua'],
 				refresh_yijiang2:['old_madai','wangyi','guanzhang','xin_handang','re_zhonghui','re_liaohua','re_chengpu','re_caozhang','re_bulianshi','xin_liubiao'],
 				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','re_yufan','re_liru','re_manchong','re_fuhuanghou','re_guanping'],
-				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen','re_zhoucang','re_chenqun','re_caifuren'],
+				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen','re_zhoucang','re_chenqun','re_caifuren','xin_guyong'],
 				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu','re_gongsunyuan','re_guotufengji'],
 			},
 		},
 		connect:true,
 		character:{
+			xin_guyong:['male','wu',3,['xinshenxing','bingyi']],
 			re_caifuren:['female','qun',3,['reqieting','rexianzhou']],
 			re_guanping:['male','shu',4,['relongyin','jiezhong']],
 			re_guotufengji:['male','qun',3,['rejigong','shifei']],
@@ -136,6 +137,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_xushu:['zhaoyun','sp_zhugeliang'],
 		},
 		skill:{
+			xinshenxing:{
+				audio:2,
+				enable:'phaseUse',
+				filter:function(event,player){
+					return (player.getStat('skill').xinshenxing||0)<player.hp&&player.countCards('he')>1;
+				},
+				selectCard:2,
+				position:'he',
+				check:function(card){
+					if(!ui.selected.cards.length||get.color(card)!=get.color(ui.selected.cards[0])) return 6.5-get.value(card);
+					return 6.5-get.value(card)-get.value(ui.selected.cards[0]);
+				},
+				filterCard:true,
+				content:function(){
+					player.draw(get.color(cards)=='none'?2:1);
+				},
+				ai:{
+					order:1,
+					result:{player:1},
+				},
+			},
 			//界蔡夫人
 			reqieting:{
 				audio:2,
@@ -9779,6 +9801,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reqieting_info:'其他角色的回合结束时，若其本回合内未造成过伤害，则你可将其装备区内的一张牌置于你的装备区内；若其本回合内未对其他角色使用过牌，则你可摸一张牌。',
 			rexianzhou:'献州',
 			rexianzhou_info:'限定技。出牌阶段，你可将装备区内的所有牌交给一名其他角色。你回复X点体力，然后对其攻击范围内的至多X名角色各造成1点伤害（X为你以此法给出的牌数）。',
+			xin_guyong:'界顾雍',
+			xinshenxing:'慎行',
+			xinshenxing_info:'出牌阶段限X次（X为你的体力值），你可以弃置两张牌，然后摸一张牌。若这两张牌颜色不同，则改为摸两张牌。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

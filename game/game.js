@@ -28,6 +28,7 @@
 			yingbian_fujia:[],
 			yingbian_canqu:[],
 		},
+		renku:[],
 	};
 	var lib={
 		configprefix:'noname_0.9_',
@@ -6677,6 +6678,7 @@
 			'<div style="margin:10px">游戏操作</div><ul style="margin-top:0"><li>在命令框中输出结果<br>game.print(str)<li>清除命令框中的内容<br>cls<li>上一条/下一条输入的内容<br>up/down<li>游戏结束<br>game.over(bool)'+
 			'<li>角色资料<br>lib.character<li>卡牌资料<br>lib.card</ul>',
 			'游戏名词':'<ul><li>智囊：无名杀默认为过河拆桥/无懈可击/无中生有/洞烛先机。牌堆中没有的智囊牌会被过滤。可在卡牌设置中自行增减。若没有可用的智囊，则改为随机选取的三种锦囊牌的牌名。'+
+			'<li>仁库：部分武将使用的游戏外共通区域。至多包含六张牌。当有新牌注入后，若牌数超过上限，则将最早进入仁库的溢出牌置入弃牌堆。'+
 			'<li>护甲：和体力类似，每点护甲可抵挡一点伤害，但不影响手牌上限'+
 			'<li>随从：通过技能获得，拥有独立的技能、手牌区和装备区（共享判定区），出场时替代主武将的位置；随从死亡时自动切换回主武将'+
 			'<li>发现：从三张随机亮出的牌中选择一张，若无特殊说明，则获得此牌'+
@@ -10362,6 +10364,7 @@
 			pss_paper_info:'石头剪刀布时的一种手势。克制石头，但被剪刀克制。',
 			pss_scissor_info:'石头剪刀布时的一种手势。克制布，但被石头克制。',
 			pss_stone_info:'石头剪刀布时的一种手势。克制剪刀，但被布克制。',
+			renku:'仁库',
 		},
 		element:{
 			content:{
@@ -10673,6 +10676,15 @@
 					for(var i=0;i<cards.length;i++){
 						cards[i].fix();
 						ui.special.appendChild(cards[i]);
+					}
+					if(event.toRenku){
+						_status.renku.addArray(cards);
+						if(_status.renku.length>6){
+							var cards=_status.renku.splice(0,_status.renku.length-6);
+							game.log(cards,'从仁库进入了弃牌堆');
+							game.cardsDiscard(cards).fromRenku=true;
+						}
+						game.updateRenku();
 					}
 					if(event.notrigger!==true) event.trigger('addCardToStorage');
 				},
@@ -15442,6 +15454,7 @@
 					else if(event.position==ui.cardPile){
 						game.updateRoundNumber();
 					}
+					if(event.toRenku) _status.renku.addArray(cards);
 					event.hs=hs;
 					event.es=es;
 					event.js=js;
@@ -15491,6 +15504,15 @@
 					event.num++;
 					event.goto(2);
 					"step 4"
+					if(event.toRenku){
+						if(_status.renku.length>6){
+							var cards=_status.renku.splice(0,_status.renku.length-6);
+							game.log(cards,'从仁库进入了弃牌堆');
+							game.cardsDiscard(cards).fromRenku=true;
+						}
+						game.updateRenku();
+					}
+					"step 5"
 					var evt=event.getParent();
 					if(evt.name!='discard'&&event.type!='discard') return;
 					if(evt.delay!=false){
@@ -16443,6 +16465,7 @@
 					return next;
 				},
 				addGaintag:function(cards,tag){
+					if(get.itemtype(cards)=='card') cards=[cards];
 					game.addVideo('addGaintag',this,[get.cardsInfo(cards),tag]);
 					game.broadcastAll(function(player,cards,tag){
 						var hs=player.getCards('h');
@@ -19891,6 +19914,10 @@
 						else if(arguments[i]=='fromStorage'){
 							next.fromStorage=true;
 						}
+						else if(arguments[i]=='fromRenku'){
+							next.fromStorage=true;
+							next.fromRenku=true;
+						}
 						else if(arguments[i]=='bySelf'){
 							next.bySelf=true;
 						}
@@ -19956,6 +19983,10 @@
 						}
 						else if(arguments[i]=='toStorage'){
 							next.toStorage=true;
+						}
+						else if(arguments[i]=='toRenku'){
+							next.toStorage=true;
+							next.toRenku=true;
 						}
 						else if(arguments[i]=='visible'){
 							next.visible=true;
@@ -21788,6 +21819,14 @@
 						return history;
 					}
 				},
+				hasHistory:function(key,filter,last){
+					var history=this.getHistory(key).slice(0);
+					if(last) history=history.slice(0,history.indexOf(last)+1);
+					for(var i=0;i<history.length;i++){
+						if(filter(history[i])) return true;
+					}
+					return false;
+				},
 				getLastHistory:function(key,filter,last){
 					var history=false;
 					for(var i=this.actionHistory.length-1;i>=0;i--){
@@ -21826,6 +21865,18 @@
 						}
 					}
 					return list;
+				},
+				hasAllHistory:function(key,filter,last){
+					var list=[];
+					var all=this.actionHistory;
+					for(var j=0;j<all.length;j++){
+						var history=all[j][key].slice(0);
+						if(last) history=history.slice(0,history.indexOf(last)+1);
+						for(var i=0;i<history.length;i++){
+							if(filter(history[i])) return true;
+						}
+					}
+					return false;
 				},
 				getLastUsed:function(num){
 					if(typeof num!='number') num=0;
@@ -26063,6 +26114,21 @@
 			}
 		},
 		skill:{
+			renku:{
+				intro:{
+					markcount:function(){
+						return _status.renku.length;
+					},
+					mark:function(dialog,content,player){
+						if(!_status.renku.length) return '仁库中没有牌';
+						else dialog.addAuto(_status.renku);
+					},
+					content:function(){
+						if(!_status.renku.length) return '仁库中没有牌';
+						return get.translation(_status.renku);
+					},
+				},
+			},
 			_showHiddenCharacter:{
 				trigger:{player:['changeHp','phaseBeginStart','loseMaxHpBegin']},
 				firstDo:true,
@@ -27514,6 +27580,7 @@
 						}
 						ui.arena.setNumber(state.number);
 						_status.mode=state.mode;
+						_status.renku=state.renku;
 						lib.inpile=state.inpile;
 						var pos=state.players[observe||game.onlineID].position;
 						for(var i in state.players){
@@ -27843,6 +27910,14 @@
 		],
 	};
 	var game={
+		updateRenku:function(){
+			game.broadcast(function(renku){
+				_status.renku=renku;
+			},_status.renku);
+			for(var i of game.players){
+				if(i.storage.renku) i.markSkill('renku');
+			}
+		},
 		loseAsync:function(arg){
 			var next=game.createEvent('loseAsync');
 			next.getl=function(player){
@@ -27913,7 +27988,8 @@
 			if(type!='cards'&&type!='card') return;
 			var next=game.createEvent('cardsGotoSpecial');
 			next.cards=type=='cards'?cards.slice(0):[cards];
-			if(bool===false) next.notrigger=true;
+			if(bool=='toRenku') next.toRenku=true;
+			else if(bool===false) next.notrigger=true;
 			next.setContent('cardsGotoSpecial');
 			return next;
 		},
@@ -50021,6 +50097,7 @@
 				roomId:game.roomId,
 				over:_status.over,
 				inpile:lib.inpile,
+				renku:_status.renku,
 			};
 			for(var i in lib.playerOL){
 				state.players[i]=lib.playerOL[i].getState();

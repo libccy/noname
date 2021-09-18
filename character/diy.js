@@ -537,6 +537,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						animationColor:'key',
 						content:function(){
 							'step 0'
+							game.log(player,'成功完成使命');
 							player.awakenSkill('mia_qianmeng');
 							if(player!=trigger.player) player.gain(player.storage.mia_qianmeng,trigger.player,'give');
 							'step 1'
@@ -554,6 +555,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							'step 0'
+							game.log(player,'使命失败');
 							player.chooseTarget(get.prompt('mia_qianmeng'),'令一名角色获得牌堆中所有点数为'+player.storage.mia_qianmeng.number+'的牌',lib.filter.notMe);
 							'step 1'
 							if(result.bool){

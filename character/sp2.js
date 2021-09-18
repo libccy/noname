@@ -767,17 +767,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 3'
 					if(result.bool){
-						player.$gain2(event.cards2);
-						player.gain(event.cards2);
-						game.delay(0.3);
+						for(var i=0;i<cards.length;i++){
+							if(event.cards2.contains(cards[i])){
+								targets[i].$give(cards[i],player,false);
+							}
+						}
+						player.gain(event.cards2,'log');
 					}
 					else event.finish();
 					'step 4'
+					var draws=[];
 					for(var i=0;i<cards.length;i++){
 						if(!event.cards2.contains(cards[i])){
 							targets[i].discard(cards[i]).delay=false;
 						}
+						else draws.push(targets[i]);
 					}
+					if(draws.length) game.asyncDraw(draws);
 					'step 5'
 					game.delayx();
 				},
