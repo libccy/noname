@@ -17,7 +17,7 @@
 			this.room=room;
 			delete this.status;
 			room.owner=this;
-			room.key=game.onlineKey;
+			room.key=key;
 			this.sendl('createroom',key);
 		},
 		enter:function(key,nickname,avatar){
