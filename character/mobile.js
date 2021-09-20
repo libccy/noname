@@ -1886,7 +1886,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageBegin2'},
 				forced:true,
 				filter:function(event,player){
-					if(!event.card||get.color(event.card)=='nocolor') return false;
+					if(!event.card||get.color(event.card)=='none') return false;
 					var all=player.getAllHistory('damage');
 					if(!all.length) return false;
 					return all[all.length-1].card&&get.color(all[all.length-1].card)==get.color(event.card);
@@ -1899,7 +1899,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function(card,player,target){
 							if(get.tag(card,'damage')){
 								var color=get.color(card);
-								if(color=='nocolor') return;
+								if(color=='none') return;
 								var all=target.getAllHistory('damage');
 								if(!all.length||!all[all.length-1].card) return;
 								if(get.color(all[all.length-1].card)==color) return 'zerotarget';
@@ -5180,7 +5180,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCardToPlayered'},
 				forced:true,
-				logTarget:'player',
+				logTarget:'target',
 				filter:function(event,player){
 					return event.card.name=='sha'&&!player.inRangeOf(event.target);
 				},

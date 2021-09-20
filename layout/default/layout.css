@@ -3297,6 +3297,9 @@ div:not(.handcards)>.card>.info>span,
 .connectevents.left{
 	transform: translateX(-85px);
 }
+.connectevents.left2{
+	transform: translateX(-170px);
+}
 .connectevents.icon{
 	width: 20px;
 	height: 20px;

@@ -121,7 +121,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				var info=lib.config.reconnect_info;
 				game.onlineID=info[1];
 				game.roomId=info[2];
-				if(typeof game.roomId=='number'){
+				if(typeof game.roomId=='string'){
 					game.roomIdServer=true;
 				}
 				var n=5;

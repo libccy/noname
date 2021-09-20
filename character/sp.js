@@ -748,7 +748,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(card){
 					var player=_status.event.player;
 					if(game.countPlayer(function(current){
-						return current!=player&&player.canUse('nanman',current)&&get.effect(target,{name:'nanman'},player,player)>0;
+						return current!=player&&player.canUse('nanman',current)&&get.effect(current,{name:'nanman'},player,player)>0;
 					})<=ui.selected.cards.length) return 0;
 					return 6-get.value(card);
 				},
