@@ -1509,6 +1509,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(get.suit(card)=='heart') return 0;
 					return -3;
 				},
+				judge2:function(result){
+					if(result.bool==false) return true;
+					return false;
+				},
 				effect:function(){
 					if(result.bool==false){
 						player.skip('phaseUse');
@@ -1554,6 +1558,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				judge:function(card){
 					if(get.suit(card)=='spade'&&get.number(card)>1&&get.number(card)<10) return -6;
 					return 0;
+				},
+				judge2:function(result){
+					if(result.bool==false) return true;
+					return false;
 				},
 				effect:function(){
 					if(result.bool==false){
@@ -2135,7 +2143,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					trigger.bagua_skill=true;
-					player.judge('bagua',function(card){return (get.color(card)=='red')?1.5:-0.5});
+					player.judge('bagua',function(card){return (get.color(card)=='red')?1.5:-0.5}).judge2=function(result){
+						return result.bool;
+					};
 					"step 1"
 					if(result.judge>0){
 						trigger.untrigger();
@@ -2615,7 +2625,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			juedou_info:'出牌阶段，对一名其他角色使用。由其开始，其与你轮流打出一张【杀】，直到其中一方未打出【杀】为止。未打出【杀】的一方受到另一方对其造成的1点伤害。',
 			shunshou_info:'出牌阶段，对距离为1且区域里有牌的一名其他角色使用。你获得其区域里的一张牌。',
 			guohe_info:'出牌阶段，对区域里有牌的一名其他角色使用。你弃置其区域里的一张牌。',
-			jiedao_info:'出牌阶段，对装备区里有武器牌且有使用【杀】的目标的一名其他角色使用。令其对你指定的一名角色使用一张【杀】，否则将其装备区里的武器牌交给你。',
+			jiedao_info:'出牌阶段，对装备区里有武器牌且有使用【杀】的目标的一名其他角色使用。令其对你指定的一名角色使用一张【杀】，否则将其装备区里的武器牌交给你。<br><span class="text" style="font-family: yuanli">这是一种十分含蓄的计谋。</span>',
 			wuxie_info:'一张锦囊牌生效前，对此牌使用。抵消此牌对一名角色产生的效果，或抵消另一张【无懈可击】产生的效果。',
 			lebu_info:'出牌阶段，对一名其他角色使用。若判定结果不为红桃，跳过其出牌阶段。',
 			shandian_info:'出牌阶段，对自己使用。若判定结果为黑桃2~9，则目标角色受到3点雷电伤害。若判定不为黑桃2~9，将之移动到下家的判定区里。',

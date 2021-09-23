@@ -15,14 +15,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mobile_standard:["xin_xiahoudun","xin_zhangfei"],
 				mobile_shenhua:["re_pangtong","re_guanqiujian","xin_yuanshao","re_liushan","re_dongzhuo","re_sp_zhugeliang","re_sunjian","re_dengai","re_jiangwei","re_zhurong"],
 				mobile_yijiang1:["re_xusheng","re_lingtong","ol_yujin"],
-				mobile_yijiang2:["old_bulianshi","xin_liaohua","xin_caozhang","re_liubiao","re_handang","xin_chengpu","xin_gongsunzan"],
+				mobile_yijiang2:["old_bulianshi","xin_liaohua","xin_caozhang","re_liubiao","re_handang","xin_chengpu","xin_gongsunzan","re_zhonghui"],
 				mobile_yijiang3:["xin_jianyong","xin_zhuran","xin_guohuai","xin_panzhangmazhong","xin_fuhuanghou"],
-				mobile_yijiang4:[,"xin_zhoucang","xin_caifuren"],
+				mobile_yijiang4:["xin_zhoucang","xin_caifuren","xin_guyong"],
 				mobile_yijiang67:["re_jikang"],
 				mobile_sp:["old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","re_heqi","liuzan","xin_hansui"],
 			},
 		},
 		character:{
+			xin_guyong:['male','wu',3,['xinshenxing','xinbingyi']],
+			re_zhonghui:['male','wei',4,['requanji','zili']],
 			xin_caifuren:['female','qun',3,['xinqieting','xianzhou']],
 			sp_yanghu:['male','qun',3,['mingfa','rongbei']],
 			qiaogong:['male','wu',3,['yizhu','luanchou']],
@@ -129,6 +131,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_sunben:['male','wu',4,['jiang','rehunzi','zhiba'],['zhu']],
 		},
 		characterIntro:{
+			gongsunkang:'公孙康（生卒年不详），辽东襄平（今辽宁辽阳）人。东汉末年辽东地区割据军阀，辽东太守公孙度长子（一作庶子）、车骑将军公孙恭之兄。公孙康在其父死后继任辽东太守。建安十二年（207年），擒斩图谋不轨的袁尚、袁熙兄弟，将其首级献予曹操，被拜为左将军，封襄平侯。建安十四年（209年），公孙康大破高句丽，陷其国都，并讨伐韩濊，设置带方郡。死后因二子年幼，由公孙恭继任。曹丕称帝后，被追赠为大司马。',
 			qiaogong:'桥公，亦作“乔公”，名字不详，是中国汉末三国时期的长者，江东二乔的父亲，三国时期庐江郡皖县（今安徽潜山）人，中国长篇古典名著《三国演义》中称之为“乔国老”。',
 			liuzhang:'刘璋（生卒年不详），字季玉，江夏竟陵（今湖北省天门市）人。东汉末年宗室、军阀，益州牧刘焉幼子，在父亲刘焉死后继任益州牧。刘璋为人懦弱多疑。汉中张鲁骄纵，不听刘璋号令，于是刘璋杀张鲁母弟，双方成为仇敌，刘璋派庞羲攻击张鲁，战败。后益州内乱，平定后，又有曹操将前来袭击的消息。在内外交逼之下，刘璋听信手下张松、法正之言，迎接刘备入益州，想借刘备之力，抵抗曹操。不料此举乃引狼入室，刘备反手攻击刘璋，又有法正为内应，进至成都。成都吏民都想抵抗刘备，但刘璋为百姓计而开城出降，群下莫不流涕。刘备占据成都后，刘璋以振威将军的身份被迁往荆州居住，关羽失荆州后，刘璋归属东吴，被孙权任命为益州牧，不久后去世，卒年不详。',
 			zhangzhongjing:'张仲景（约公元150～154年—约公元215～219年），名机，字仲景，南阳涅阳县（今河南省邓州市穰东镇张寨村）人。东汉末年著名医学家，被后人尊称为“医圣”。张仲景广泛收集医方，写出了传世巨著《伤寒杂病论》。它确立的“辨证论治”原则，是中医临床的基本原则，是中医的灵魂所在。在方剂学方面，《伤寒杂病论》也做出了巨大贡献，创造了很多剂型，记载了大量有效的方剂。其所确立的六经辨证的治疗原则，受到历代医学家的推崇。这是中国第一部从理论到实践、确立辨证论治法则的医学专著，是中国医学史上影响最大的著作之一，是后学者研习中医必备的经典著作，广泛受到医学生和临床大夫的重视。',
@@ -561,6 +564,146 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//顾雍
+			xinshenxing:{
+				audio:2,
+				enable:'phaseUse',
+				filter:function(event,player){
+					return (player.getStat('skill').xinshenxing||0)<player.hp&&player.countCards('he')>1;
+				},
+				selectCard:2,
+				position:'he',
+				check:function(card){
+					if(!ui.selected.cards.length||get.color(card)!=get.color(ui.selected.cards[0])) return 6.5-get.value(card);
+					return 6.5-get.value(card)-get.value(ui.selected.cards[0]);
+				},
+				filterCard:true,
+				content:function(){
+					player.draw(get.color(cards)=='none'?2:1);
+				},
+				ai:{
+					order:1,
+					result:{player:1},
+				},
+			},
+			xinbingyi:{
+				audio:'bingyi',
+				audioname:['xin_guyong'],
+				trigger:{player:'phaseJieshuBegin'},
+				filter:function(event,player){
+					return player.countCards('h')>0;
+				},
+				filterx:function(event,player){
+					var cards=player.getCards('h');
+					if(cards.length==1) return true;
+					var color=get.color(cards[0],player),type=get.type(cards[0],player);
+					for(var i=1;i<cards.length;i++){
+						if(color&&get.color(cards[i],player)!=color) color=false;
+						if(type&&get.type(cards[i],player)!=type) color=false;
+						if(!color&&!type) return false;
+					}
+					return true;
+				},
+				direct:true,
+				content:function(){
+					"step 0"
+					if(lib.skill.xinbingyi.filterx(trigger,player)){
+						player.chooseTarget(get.prompt('xinbingyi'),'展示所有手牌，并选择至多'+get.cnNumber(player.countCards('h'))+'名角色各摸一张牌',[0,player.countCards('h')],function(card,player,target){
+							return true;
+						}).set('ai',function(target){
+							return get.attitude(_status.event.player,target);
+						});
+					}
+					else player.chooseBool(get.prompt('bingyi'),'展示所有手牌').ai=function(){return false};
+					"step 1"
+					if(result.bool){
+						player.logSkill('xinbingyi');
+						player.showHandcards(get.translation(player)+'发动了【秉壹】');
+						event.targets=result.targets;
+					}
+					else{
+						event.finish();
+					}
+					"step 2"
+					if(targets&&targets.length){
+						player.line(targets,'green');
+						targets.sortBySeat();
+						game.asyncDraw(targets);
+					}
+				},
+				ai:{
+					expose:0.1,
+				}
+			},
+			//钟会
+			requanji:{
+				audio:2,
+				trigger:{player:['damageEnd','phaseUseEnd']},
+				frequent:true,
+				locked:false,
+				notemp:true,
+				init:function(player){
+					if(!player.storage.quanji) player.storage.quanji=[];
+				},
+				filter:function(event,player){
+					if(event.name=='phaseUse') return player.countCards('h')>player.hp;
+					return event.num>0;
+				},
+				content:function(){
+					"step 0"
+					event.count=trigger.num||1;
+					"step 1"
+					event.count--;
+					player.draw();
+					"step 2"
+					if(player.countCards('h')){
+						player.chooseCard('将一张手牌置于武将牌上作为“权”',true);
+					}
+					else{
+						event.goto(4);
+					}
+					"step 3"
+					if(result.cards&&result.cards.length){
+						player.lose(result.cards,ui.special,'toStorage');
+						player.storage.quanji=player.storage.quanji.concat(result.cards);
+						player.syncStorage('quanji');
+						player.markSkill('quanji');
+						game.log(player,'将',result.cards,'置于武将牌上作为“权”');
+					}
+					"step 4"
+					if(event.count>0){
+						player.chooseBool(get.prompt2('requanji')).set('frequentSkill','requanji');
+					}
+					else event.finish();
+					"step 5"
+					if(result.bool){
+						player.logSkill('requanji');
+						event.goto(1);
+					}
+				},
+				mod:{
+					maxHandcard:function(player,num){
+						return num+player.storage.quanji.length;
+					}
+				},
+				ai:{
+					maixie:true,
+					maixie_hp:true,
+					threaten:0.8,
+					effect:{
+						target:function(card,player,target){
+							if(get.tag(card,'damage')){
+								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
+								if(!target.hasFriend()) return;
+								if(target.hp>=4) return [0.5,get.tag(card,'damage')*2];
+								if(!target.hasSkill('paiyi')&&target.hp>1) return [0.5,get.tag(card,'damage')*1.5];
+								if(target.hp==3) return [0.5,get.tag(card,'damage')*1.5];
+								if(target.hp==2) return [1,get.tag(card,'damage')*0.5];
+							}
+						}
+					}
+				}
+			},
 			//王凌
 			xingqi:{
 				audio:2,
@@ -3734,7 +3877,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.judge(function(card){
 						if(get.number(card)>6) return 2;
 						return 0;
-					});
+					}).judge2=function(result){
+						return result.bool?true:false;
+					};
 					'step 1'
 					if(result.bool){
 						trigger.targets.length=0;
@@ -9033,9 +9178,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							if(!player.storage.relianji) player.storage.relianji=0;
 							player.storage.relianji++;
-							if(player.storage.relianji>2){
-								event.trigger('remoucheng_awaken');
-							}
+							event.trigger('remoucheng_awaken');
 						},
 					},
 				},
@@ -9046,6 +9189,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'remoucheng_awaken'
 				},
 				forced:true,
+				filter:function(event,player){
+					return player.storage.relianji&&player.storage.relianji>2;
+				},
 				audio:'moucheng',
 				juexingji:true,
 				skillAnimation:true,
@@ -9640,7 +9786,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:"bagua_skill",
 				content:function(){
 					"step 0"
-					player.judge('rewrite_bagua',function(card){return (get.suit(card)!='spade')?1.5:-0.5});
+					player.judge('rewrite_bagua',function(card){return (get.suit(card)!='spade')?1.5:-0.5}).judge2=function(result){
+						return result.bool;
+					};
 					"step 1"
 					if(result.judge>0){
 						trigger.untrigger();
@@ -10120,7 +10268,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					prompt:function(links,player){
-						var str=!player.storage.yizan?'两张牌(其中至少应有一张基本牌)':'一张基本牌';
+						var str=player.storage.yizan?'一张基本牌':'两张牌(其中至少应有一张基本牌)';
 						return '将'+str+'当做'+get.translation(links[0][3]||'')+get.translation(links[0][2])+'使用或打出';
 					},
 				},
@@ -11544,7 +11692,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			relianji:'连计',
 			relianji_info:'出牌阶段限一次，你可以选择两名其他角色。第一名角色随机使用牌堆中的一张武器牌，然后这名角色视为对另一名角色随机使用一张下列的牌名的牌：【决斗】、【火攻】、【南蛮入侵】、【万箭齐发】或普【杀】。然后若此牌造成伤害，你获得X枚“连计”标记（X为此次扣减的体力值点数）。',
 			remoucheng:'谋逞',
-			remoucheng_info:'觉醒技，当一名角色造成伤害后，若你拥有的“连计”标记数大于2，你加1点体力上限，回复1点体力，失去“连计”，获得“矜功”。',
+			remoucheng_info:'觉醒技，当一名角色因〖连计〗造成伤害后，若你拥有的“连计”标记数大于2，你加1点体力上限，回复1点体力，失去“连计”，获得“矜功”。',
 			mobile_default:'常规',
 			mobile_others:'其他',
 			
@@ -11916,7 +12064,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guying_info:'锁定技。每回合限一次，当你于回合外因使用/打出/弃置而失去牌后，若牌数为1，则你获得一枚“固”并令当前回合角色选择一项：①随机交给你一张牌。②令你获得本次失去的牌，若为装备牌，则你使用之。准备阶段开始时，你移去所有“固”并弃置等量的牌。',
 			muzhen:'睦阵',
 			muzhen_backup:'睦阵',
-			muzhen_info:'出牌阶段各限一次。①你可以将两张牌交给一名装备区内有牌的其他角色，然后获得其装备区内的一张牌。②你可以将装备区内的一张牌置于其他角色的装备区内，然后获得其一张牌。',
+			muzhen_info:'出牌阶段各限一次。①你可以将两张牌交给一名装备区内有牌的其他角色，然后获得其装备区内的一张牌。②你可以将装备区内的一张牌置于其他角色的装备区内，然后获得其一张手牌。',
 			sp_huaxin:'手杀华歆',
 			hxrenshi:'仁仕',
 			hxrenshi_info:'出牌阶段每名角色限一次。你可以将一张手牌交给一名其他角色。',
@@ -11998,7 +12146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xuancun:'悬存',
 			xuancun_info:'其他角色的回合结束时，若你的手牌数小于体力值，则你可以令其摸X张牌（X为你的体力值与手牌数之差且至多为2）',
 			xinlirang:'礼让',
-			xinlirang_info:'①其他角色的摸牌阶段开始时，若你没有“谦”标记，则你可以获得一枚“谦”标记。若如此做，其额定摸牌数+2，且本回合的弃牌阶段开始时，你可以获得其弃置的至多两张牌。②摸牌阶段开始时，若你有“谦”标记，则你跳过出牌阶段并移除“谦”标记。',
+			xinlirang_info:'①其他角色的摸牌阶段开始时，若你没有“谦”标记，则你可以获得一枚“谦”标记。若如此做，其额定摸牌数+2，且本回合的弃牌阶段开始时，你可以获得其弃置的至多两张牌。②摸牌阶段开始时，若你有“谦”标记，则你跳过此摸牌阶段并移除“谦”标记。',
 			xinmingshi:'名仕',
 			xinmingshi_info:'锁定技，当你受到伤害后，若你有“谦”标记，则伤害来源弃置一张牌。若此牌为：黑色：你获得之。红色，你回复1点体力。',
 			xingqi:'星启',
@@ -12009,6 +12157,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mibei_info:'使命技。①使命：当你使用的牌结算完成后，若你的“备”中包含的基本牌，锦囊牌，装备牌数量均大于1，则你从牌堆中获得这三种类型的牌各一张并获得技能“谋立”。②失败：结束阶段开始时，若你没有“备”，且你于本回合的准备阶段开始时也没有“备”，则你减1点体力上限。',
 			xinmouli:'谋立',
 			xinmouli_info:'出牌阶段限一次，你可以指定一名其他角色。其移去你的一个“备”，然后从牌堆中获得一张与此“备”名称相同的牌。',
+			re_zhonghui:'手杀钟会',
+			requanji:'权计',
+			requanji_info:'出牌阶段结束时，若你的手牌数大于体力值，或当你受到1点伤害后，你可以摸一张牌，然后将一张手牌置于武将牌上，称为“权”；你的手牌上限+X（X为“权”的数量）。',
+			xin_guyong:'手杀顾雍',
+			xinshenxing:'慎行',
+			xinshenxing_info:'出牌阶段限X次（X为你的体力值），你可以弃置两张牌，然后摸一张牌。若这两张牌颜色不同，则改为摸两张牌。',
+			xinbingyi:'秉壹',
+			xinbingyi_info:'结束阶段，你可展示所有手牌。若这些牌的颜色或类型均相同，则你可以令至多X名角色各摸一张牌（X为你的手牌数）。',
 			
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua:'手杀异构·神话再临',

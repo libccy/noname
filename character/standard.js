@@ -363,7 +363,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.judge(function(card){
 						if(get.suit(card)=='heart') return -2;
 						return 2;
-					})
+					}).judge2=function(result){
+						return result.bool;
+					};
 					"step 1"
 					if(result.judge<2){
 						event.finish();return;
@@ -410,7 +412,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.judge(function(card){
 						if(get.suit(card)=='heart') return -2;
 						return 2;
-					})
+					}).judge2=function(result){
+						return result.bool;
+					};
 					"step 3"
 					if(result.judge<2){
 						event.finish();return;
@@ -623,6 +627,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.color(card)=='black') return 1.5;
 						return -1.5;
 					});
+					next.judge2=function(result){
+						return result.bool;
+					};
 					if(get.mode()!='guozhan'&&!player.hasSkillTag('rejudge')) next.set('callback',function(){
 						if(event.judgeResult.color=='black'&&get.position(card,true)=='o') player.gain(card,'gain2');
 					});
@@ -667,7 +674,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.judge(function(card){
 						if(get.color(card)=='black') return 1.5;
 						return -1.5;
-					},ui.special);
+					},ui.special).judge2=function(result){
+						return result.bool;
+					};
 					"step 1"
 					if(result.judge>0){
 						event.cards.push(result.card);
@@ -1592,7 +1601,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(get.color(card)=='red') return 2;
 						}
 						return -0.5;
-					});
+					}).judge2=function(result){
+						return result.bool;
+					};
 					"step 1"
 					if(result.bool){
 						trigger.getParent().directHit.add(trigger.target);

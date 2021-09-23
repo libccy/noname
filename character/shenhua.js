@@ -3261,6 +3261,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.suit(card)=='heart') return -1;
 						return 1;
 					});
+					next.judge2=function(result){
+						return result.bool;
+					};
 					if(get.mode()!='guozhan'){
 						next.callback=lib.skill.tuntian.callback;
 						event.finish();
@@ -4903,7 +4906,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.source.judge(function(card){
 							if(get.suit(card)=='spade') return 4;
 							return 0;
-						});
+						}).judge2=function(result){
+							return result.bool?true:false;
+						};
 					}
 					else{
 						event.finish();
@@ -5834,7 +5839,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(suit=='spade') return -4;
 							if(suit=='club') return -2;
 							return 0;
-						});
+						}).judge2=function(result){
+							return result.bool==false?true:false;
+						};
 					}
 					else{
 						event.finish();
@@ -6519,7 +6526,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				group:'gzbuqu_recover',
 				//locked:true,
-				frequent:true,
+				forced:true,
+				locked:false,
 				ondisable:true,
 				onremove:function(player){
 					if(player.storage.gzbuqu.length){
@@ -6725,7 +6733,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.target.judge(function(card){
 							if(get.suit(card)=='spade') return -4;
 							return 0;
-						});
+						}).judge2=function(result){
+							return result.bool==false?true:false;
+						};
 					}
 					else{
 						event.finish();
@@ -7715,7 +7725,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinliegong:'烈弓',
 			xinkuanggu:'狂骨',
 			gzbuqu:'不屈',
-			gzbuqu_info:'当你扣减1点体力时，若你的体力值为0，你可以将牌堆顶的一张牌置于你的武将牌上：若此牌的点数与你武将牌上的其他牌均不同，你不会死亡；若你的武将牌上有点数相同的牌，你进入濒死状态',
+			gzbuqu_info:'①当你扣减1点体力时，若你的体力值小于1，则你将牌堆顶的一张牌置于你的武将牌上，称为“创”。②当你回复1点体力时，你移去一张“创”。③若你有“创”且点数均不相同，则你不结算濒死状态。',
 			xinkuanggu_info:'当你对距离1以内的一名角色造成1点伤害后，你可以回复1点体力或摸一张牌。',
 			xinliegong_info:'你使用【杀】可以选择你距离不大于此【杀】点数的角色为目标；当你使用【杀】指定一个目标后，你可以根据下列条件执行相应的效果：1.其手牌数小于等于你的手牌数，此【杀】不可被【闪】响应，2.其体力值大于等于你的体力值，此【杀】伤害+1。',
 			jiewei_info:'当你的武将牌翻面后，你可以摸一张牌。然后你可以使用一张锦囊牌或装备牌，并可以在此牌结算后弃置场上一张同类型的牌',

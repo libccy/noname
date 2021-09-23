@@ -355,11 +355,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}).set('dialog',event.videoId);
 					"step 4"
 					game.me.init(result.links[0]);
+					game.addRecentCharacter(result.links[0]);
 					game.me.chooseButton(true).set('ai',function(button){
 						return Math.random();
 					}).set('dialog',event.videoId);
 					"step 5"
 					game.me.next.init(result.links[0]);
+					game.addRecentCharacter(result.links[0]);
 					setTimeout(function(){
 						ui.arena.classList.remove('choose-character');
 					},500);

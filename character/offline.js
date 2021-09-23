@@ -142,7 +142,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'longyi_effect',
 				subSkill:{
 					effect:{
-						trigger:{player:'useCard'},
+						trigger:{player:['useCard','respond']},
 						forced:true,
 						charlotte:true,
 						popup:false,
@@ -160,7 +160,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								map[get.type2(i,player)]=true;
 							}
 							if(map.trick) player.draw();
-							if(map.equip) trigger.directHit.addArray(game.players);
+							if(map.equip&&trigger.directHit) trigger.directHit.addArray(game.players);
 						},
 					},
 					backup:{},

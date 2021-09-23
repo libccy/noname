@@ -694,6 +694,8 @@ window.noname_character_rank={
 		'sp_kongrong',
 		'qiaogong',
 		'liuzhang',
+		're_guyong',
+		'xin_zhonghui',
 	],
 	b:[
 		'diy_feishi',
@@ -1032,6 +1034,7 @@ window.noname_character_rank={
 		'caizhenji',
 		'longyufei',
 		'sp_zhangwen',
+		're_zoushi',
 	],
 	c:[
 		'xiahoudun',
@@ -1384,6 +1387,7 @@ window.noname_character_rank={
 			'ns_yanghu',
 			'ol_huaxin',
 			'longyufei',
+			're_guyong',
 			'key_haruko',
 			'key_akiko',
 			'key_sunohara',
@@ -1714,6 +1718,7 @@ window.noname_character_rank={
 			'qiaogong',
 			'liuzhang',
 			'zhangzhongjing',
+			'xin_zhonghui',
 		],
 		junk:[
 			'sunshao',

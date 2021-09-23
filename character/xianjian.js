@@ -92,7 +92,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				animationColor:'water',
 				unique:true,
 				filter:function(event,player){
-					return game.roundNumber>=3&&player.countUsed()>player.hp;
+					return game.roundNumber>=3&&player.getHistory('useCard').length>player.hp;
 				},
 				content:function(){
 					'step 0'

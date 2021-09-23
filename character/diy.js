@@ -3012,7 +3012,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addTempSkill('shiroha_guying_temp');
 						player.judge(function(card){
 							return (get.color(card)==(_status.event.getParent('shiroha_guying').num>0?'black':'red'))?2:0;
-						});
+						}).judge2=function(result){
+							return result.bool?true:false;
+						};
 					}
 					else event.finish();
 					'step 2'
@@ -6136,7 +6138,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.judge(function(card){
 						return get.suit(card)=='spade'?2:-2;
-					});
+					}).judge2=function(result){
+						return result.bool;
+					};
 					'step 1'
 					if(result.bool){
 						player.chooseTarget(lib.filter.notMe,true,'选择一名其他角色，对其造成1点雷属性伤害').set('ai',function(target){
@@ -7097,7 +7101,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.judge(function(card){
 						return get.color(card)=='red'?5:0;
-					});
+					}).judge2=function(result){
+						return result.bool?true:false;
+					};
 					'step 1'
 					if(result.bool){
 						player.line(trigger.getParent().playerfalse);
@@ -8137,6 +8143,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				animationColor:'key',
 				content:function(){
 					'step 0'
+					player.awakenSkill('umi_qihuan');
 					player.reinit('key_umi','key_umi2');
 					player.recover(game.countGroup()||1);
 					if(!game.dead.length) event.finish();
@@ -14998,7 +15005,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_doruji:'多鲁基',
 			key_yuiko:'来谷唯湖',
 			key_riki:'直枝理树'/*+'子'*/,
-			key_hisako:'久子',
+			key_hisako:'高桥久子',
 			key_hinata:'日向秀树',
 			key_noda:'野田',
 			key_tomoya:'冈崎朋也',

@@ -983,8 +983,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['useCard','respond']},
 				forced:true,
 				filter:function(event,player){
-					if(get.is.converted(event)) return false;
-					if(event.card.zhenying_link) return false;
+					if(!event.card.isCard) return false;
+					if(event.cards[0]&&event.cards[0].zhenying_link) return false;
 					if(get.color(event.card)!='black') return false;
 					if(['delay','equip'].contains(get.type(event.card))) return false;
 					return true;

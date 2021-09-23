@@ -538,6 +538,45 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//邹氏
+			huoshui:{
+				audio:2,
+				enable:'phaseUse',
+				unique:true,
+				forceunique:true,
+				filter:function(event,player){
+					if(player.name1=='gz_zoushi') return player.isUnseen(0);
+					return player.isUnseen(1);
+				},
+				content:function(){
+					if(player.name1=='gz_zoushi') player.showCharacter(0);
+					else player.showCharacter(1);
+				},
+				global:'huoshui_mingzhi'
+			},
+			huoshui_mingzhi:{
+				ai:{
+					nomingzhi:true,
+					skillTagFilter:function(player){
+						if(_status.currentPhase&&_status.currentPhase!=player&&_status.currentPhase.hasSkill('huoshui')){
+							return true;
+						}
+						return false;
+					}
+				}
+			},
+			qingcheng:{
+				audio:2,
+			},
+			qingcheng_ai:{
+				ai:{
+					effect:{
+						target:function(card){
+							if(get.tag(card,'damage')) return 2;
+						}
+					}
+				}
+			},
 			//文聘
 			gzzhenwei:{
 				trigger:{player:'phaseDiscardBegin'},
@@ -5117,7 +5156,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							if(target.hp<=0) return -5;
-							if(player.getStat().skill.qingcheng) return 0;
+							if(player.getStat().skill.new_qingcheng) return 0;
 							if(!target.hasSkillTag('maixie')) return 0;
 							if(get.attitude(player,target)>=0) return 0;
 							if(player.hasCard(function(card){
@@ -10438,6 +10477,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"new_luanji_info":"你可以将两张与你本回合以此法转化的花色均不相同的手牌当【万箭齐发】使用。当一名与你势力相同的角色因响应此牌而打出【闪】时，该角色摸一张牌。",
 			"new_qingcheng":"倾城",
 			"new_qingcheng_info":"出牌阶段，你可以弃置一张黑色牌并选择一名武将牌均明置的其他角色，然后你暗置其一张武将牌。若你以此法弃置的牌为装备牌，则你可以暗置另一名武将牌均明置的角色的一张武将牌。",
+			huoshui:'祸水',
+			huoshui_info:'出牌阶段，你可以明置此武将牌：你的回合内，若此武将牌处于明置状态，其他角色不能明置其武将牌。',
 			"new_kongcheng":"空城",
 			"new_kongcheng_info":"锁定技，若你没有手牌，1.当你成为【杀】或【决斗】的目标时，取消之；2.你的回合外，其他角色交给你牌后，你将这些牌置于你的武将牌上。摸牌阶段开始时，你获得武将牌上的这些牌。",
 			"new_keji":"克己",

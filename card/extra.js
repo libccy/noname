@@ -330,6 +330,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(get.suit(card)=='club') return 0;
 					return -3;
 				},
+				judge2:function(result){
+					if(result.bool==false) return true;
+					return false;
+				},
 				effect:function(){
 					if(result.bool==false){
 						if(get.is.changban()) player.addTempSkill('bingliang_changban');

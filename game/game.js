@@ -6646,8 +6646,8 @@
 			globalId:0,
 		},
 		help:{
-			'游戏操作':'<ul><li>长按/鼠标悬停/右键单击显示信息<li>触屏模式中，双指点击切换暂停；下划显示菜单，上划切换托管<li>键盘快捷键<br>'+
-			'<table><tr><td>A<td>切换托管<tr><td>W<td>切换不询问无懈<tr><td>空格<td>暂停</table><li>编辑牌堆<br>在卡牌包中修改牌堆后，将自动创建一个临时牌堆，在所有模式中共用，当保存当前牌堆后，临时牌堆被清除。每个模式可设置不同的已保存牌堆，设置的牌堆优先级大于临时牌堆</ul>',
+			'游戏操作':'<ul><li>长按/鼠标悬停/右键单击显示信息。<li>触屏模式中，双指点击切换暂停；下划显示菜单，上划切换托管。<li>键盘快捷键<br>'+
+			'<table><tr><td>A<td>切换托管<tr><td>W<td>切换不询问无懈<tr><td>空格<td>暂停</table><li>编辑牌堆<br>在卡牌包中修改牌堆后，将自动创建一个临时牌堆，在所有模式中共用，当保存当前牌堆后，临时牌堆被清除。每个模式可设置不同的已保存牌堆，设置的牌堆优先级大于临时牌堆。</ul>',
 			'游戏命令':'<div style="margin:10px">变量名</div><ul style="margin-top:0"><li>场上角色<br>game.players<li>阵亡角色<br>game.dead'+
 			'<li>玩家<br>game.me<li>玩家的上/下家<br>game.me.previous/next'+
 			'<li>玩家的上/下家（含阵亡）<br>game.me.previousSeat/<br>nextSeat'+
@@ -6662,10 +6662,10 @@
 			'<li>角色资料<br>lib.character<li>卡牌资料<br>lib.card</ul>',
 			'游戏名词':'<ul><li>智囊：无名杀默认为过河拆桥/无懈可击/无中生有/洞烛先机。牌堆中没有的智囊牌会被过滤。可在卡牌设置中自行增减。若没有可用的智囊，则改为随机选取的三种锦囊牌的牌名。'+
 			'<li>仁库：部分武将使用的游戏外共通区域。至多包含六张牌。当有新牌注入后，若牌数超过上限，则将最早进入仁库的溢出牌置入弃牌堆。'+
-			'<li>护甲：和体力类似，每点护甲可抵挡一点伤害，但不影响手牌上限'+
-			'<li>随从：通过技能获得，拥有独立的技能、手牌区和装备区（共享判定区），出场时替代主武将的位置；随从死亡时自动切换回主武将'+
-			'<li>发现：从三张随机亮出的牌中选择一张，若无特殊说明，则获得此牌'+
-			'<li>蓄力技：发动时可以增大黄色的数字。若如此做，红色数字于技能的结算过程中改为原来的两倍'
+			'<li>护甲：和体力类似，每点护甲可抵挡一点伤害，但不影响手牌上限。'+
+			'<li>随从：通过技能获得，拥有独立的技能、手牌区和装备区（共享判定区），出场时替代主武将的位置；随从死亡时自动切换回主武将。'+
+			'<li>发现：从三张随机亮出的牌中选择一张，若无特殊说明，则获得此牌。'+
+			'<li>蓄力技：发动时可以增大黄色的数字。若如此做，红色数字于技能的结算过程中改为原来的两倍。'
 		},
 		setIntro:function(node,func,left){
 			if(lib.config.touchscreen){
@@ -16194,12 +16194,10 @@
 					else event.result.bool=null;
 					player.judging.shift();
 					game.checkMod(player,event.result,'judge',player);
-					if(event.result.bool==true){
-						player.popup('洗具');
-					}
-					else if(event.result.bool==false){
-						player.popup('杯具');
-					}
+					if(event.judge2){
+						var judge2=event.judge2(event.result);
+						if(typeof judge2=='boolean') player.tryJudgeAnimate(judge2);
+					};
 					if(event.clearArena!=false){
 						game.broadcastAll(ui.clear);
 					}
@@ -16595,6 +16593,14 @@
 							emotion.delete();
 						},1200);
 					},600);
+				},
+				tryJudgeAnimate:function(bool){
+					var player=this;
+					game.broadcast(function(player,bool){
+						player.trySkillAnimate(bool);
+					},player,bool);
+					if(bool) this.popup('判定生效','wood',false);
+					else this.popup('判定失效','fire',false);
 				},
 				trySkillAnimate:function(name,popname,checkShow){
 					if(!game.online&&lib.config.skill_animation_type!='off'&&lib.skill[name]&&lib.skill[name].skillAnimation){
@@ -17134,7 +17140,7 @@
 							}
 						}
 						this.maxHp=parseInt(config.number);
-						this.hp=info[3];
+						this.hp=Math.min(this.maxHp,info[3]);
 						if(this.hp<this.maxHp||config.gameStarted) str+=('人数：'+this.hp+'/'+this.maxHp);
 						else str+=('人数：<span class="firetext">'+this.hp+'/'+this.maxHp+'</span>');
 						
@@ -20465,6 +20471,7 @@
 					}
 					if(next.card&&next.judge==undefined){
 						next.judge=get.judge(next.card);
+						next.judge2=get.judge2(next.card);
 					}
 					if(next.judge==undefined) next.judge=function(){return 0};
 					if(next.position==undefined) next.position=ui.discardPile;
@@ -44103,6 +44110,7 @@
 				// }
 				
 				ui.sortCard=ui.create.system('整理手牌',function(){
+					if(!game.me) return;
 					var hs=game.me.getCards('h');
 					if(!hs.length) return;
 					game.addVideo('lose',game.me,[get.cardsInfo(hs),[],[],[]]);
@@ -50023,16 +50031,16 @@
 			}
 			else if(config.mode=='single'){
 				switch(config.single_mode){
-					case 'normal':return '新1v1';
+					case 'normal':return '新１ｖ１';
 					case 'changban':return '血战长坂坡';
 					case 'dianjiang':return '点将单挑';
 				}
 			}
-			else if(config.mode=='identity'&&config.identity_mode!='normal'){
+			else if(config.mode=='identity'){
 				switch(config.identity_mode){
 					case 'purple':return '三对三对二';
 					case 'zhong':return (config.double_character?'双将':'')+'忠胆英杰';
-					default:return (config.double_character?'双将':'')+get.cnNumber(parseInt(config.number))+'人身份';
+					default:return get.cnNumber(parseInt(config.number))+'人'+(config.double_character?'双将':'')+'身份';
 				}
 			}
 			else if(config.mode=='guozhan'&&config.guozhan_mode!='normal'){
@@ -50876,6 +50884,10 @@
 		judge:function(card){
 			if(card.viewAs) return lib.card[card.viewAs].judge;
 			return get.info(card).judge;
+		},
+		judge2:function(card){
+			if(card.viewAs) return lib.card[card.viewAs].judge2;
+			return get.info(card).judge2;
 		},
 		distance:function(from,to,method){
 			if(from==to) return 0;

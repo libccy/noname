@@ -373,7 +373,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.judge(function(card){
 						return get.color(card)=='black'?1:-1;
-					});
+					}).judge2=function(result){
+						return result.bool;
+					};
 					'step 1'
 					if(result.bool&&player.maxHp>player.hp){
 						var cards=get.cards(player.maxHp-player.hp);
@@ -423,7 +425,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.judge(function(card){
 						return get.suit(card)!='heart'?1:-1;
-					});
+					}).judge2=function(result){
+						return result.bool;
+					};
 					'step 1'
 					if(result.bool){
 						trigger.cancel();
@@ -5024,7 +5028,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.target.judge(function(card){
 							if(get.color(card)=='red') return -1;
 							return 0;
-						});
+						}).judge2=function(result){
+							return result.bool==false?true:false;
+						};
 					}
 					'step 2'
 					if(result.color=='red') trigger.directHit.add(trigger.target);
@@ -6620,7 +6626,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 4'
 					if(result&&result.cards){
 						event.card=result.cards[0];
-						event.current.lose(result.cards,ui.cardPile,'visible','insert');
+						event.current.lose(result.cards,ui.cardPile,'insert');
 						game.broadcastAll(function(player){
 							var cardx=ui.create.card();
 							cardx.classList.add('infohidden');
@@ -8932,7 +8938,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.dingpin.push(get.type(cards[0],'trick'));
 					target.judge(function(card){
 						return get.color(card)=='black'?1:-1;
-					});
+					}).judge2=function(result){
+						return result.bool;
+					};
 					"step 1"
 					if(result.bool){
 						target.draw(target.maxHp-target.hp);
@@ -12082,7 +12090,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wuguotai:['re_wuguotai','wuguotai'],
 			lingtong:['xin_lingtong','re_lingtong','lingtong','old_lingtong'],
 			gaoshun:['gaoshun','re_gaoshun'],
-			zhonghui:['re_zhonghui','zhonghui','old_zhonghui'],
+			zhonghui:['re_zhonghui','xin_zhonghui','zhonghui','old_zhonghui'],
 			wangyi:['wangyi','old_wangyi'],
 			caozhang:['re_caozhang','xin_caozhang','caozhang'],
 			guanzhang:['guanzhang','old_guanzhang'],
@@ -12122,7 +12130,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guotufengji:['re_guotufengji','guotufengji'],
 			guanping:['re_guanping','guanping'],
 			caifuren:['xin_caifuren','re_caifuren','caifuren'],
-			guyong:['xin_guyong','guyong'],
+			guyong:['re_guyong','xin_guyong','guyong'],
 		},
 		translate:{
 			old_huaxiong:'华雄',
