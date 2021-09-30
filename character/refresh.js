@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_standard:["re_caocao","re_simayi","re_guojia","re_lidian","re_zhangliao","re_xuzhu","re_xiahoudun","re_zhangfei","re_zhaoyun","re_guanyu","re_machao","re_xushu","re_zhouyu","re_lvmeng","re_ganning","re_luxun","re_daqiao","re_huanggai","re_lvbu","re_huatuo","re_liubei","re_diaochan","re_huangyueying","re_sunquan","re_sunshangxiang","re_zhenji","re_zhugeliang","re_huaxiong",'re_gongsunzan'],
 				refresh_feng:['caoren','ol_xiahouyuan','re_huangzhong','ol_weiyan','ol_xiaoqiao','zhoutai','re_zhangjiao','xin_yuji'],
 				refresh_huo:["ol_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","ol_pangtong","ol_yuanshao","ol_pangde","re_taishici"],
-				refresh_lin:['re_menghuo','ol_sunjian','re_caopi','re_xuhuang','ol_dongzhuo','ol_zhurong'],
+				refresh_lin:['re_menghuo','ol_sunjian','re_caopi','re_xuhuang','ol_dongzhuo','ol_zhurong','re_jiaxu'],
 				refresh_shan:['ol_jiangwei','re_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce','ol_dengai'],
 				refresh_yijiang1:['re_wuguotai','re_gaoshun','re_caozhi','yujin_yujin','re_masu','xin_xusheng','re_fazheng','xin_lingtong','re_zhangchunhua'],
 				refresh_yijiang2:['old_madai','wangyi','guanzhang','xin_handang','xin_zhonghui','re_liaohua','re_chengpu','re_caozhang','re_bulianshi','xin_liubiao'],
@@ -18,6 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		connect:true,
 		character:{
+			re_jiaxu:['male','qun',3,['rewansha','reluanwu','reweimu'],['unseen']],
 			re_guyong:['male','wu',3,['reshenxing','rebingyi']],
 			xin_zhonghui:['male','wei',4,['xinquanji','xinzili']],
 			re_caifuren:['female','qun',3,['reqieting','rexianzhou']],
@@ -137,6 +138,152 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_xushu:['zhaoyun','sp_zhugeliang'],
 		},
 		skill:{
+			//贾诩
+			rewansha:{
+				audio:'wansha',
+				audioname:['re_jiaxu','shen_simayi','boss_lvbu2'],
+				global:'rewansha_global',
+				trigger:{global:'dyingBegin'},
+				forced:true,
+				logTarget:'player',
+				filter:function(event,player){
+					return player==_status.currentPhase;
+				},
+				content:function(){
+					game.countPlayer(function(current){
+						if(current!=player&&current!=trigger.player) current.addSkillBlocker('rewansha_fengyin');
+					});
+					player.addTempSkill('rewansha_clear');
+				},
+				subSkill:{
+					global:{
+						mod:{
+							cardEnabled:function(card,player){
+								var source=_status.currentPhase;
+								if(card.name=='tao'&&source&&source!=player&&source.hasSkill('rewansha')) return false;
+							},
+							cardSavable:function(card,player){
+								var source=_status.currentPhase;
+								if(card.name=='tao'&&source&&source!=player&&source.hasSkill('rewansha')) return false;
+							},
+						},
+					},
+					fengyin:{
+						inherit:'fengyin',
+					},
+					clear:{
+						trigger:{global:'dyingAfter'},
+						forced:true,
+						charlotte:true,
+						popup:false,
+						filter:function(event,player){
+							return !_status.dying.length;
+						},
+						content:function(){
+							player.removeSkill('rewansha_clear');
+						},
+						onremove:function(){
+							game.countPlayer2(function(current){
+								current.removeSkillBlocker('rewansha_fengyin');
+							});
+						},
+					},
+				},
+			},
+			reluanwu:{
+				audio:2,
+				unique:true,
+				enable:'phaseUse',
+				limited:true,
+				skillAnimation:'epic',
+				animationColor:'thunder',
+				filterTarget:function(card,player,target){
+					return target!=player;
+				},
+				selectTarget:-1,
+				multitarget:true,
+				multiline:true,
+				content:function(){
+					"step 0"
+					player.awakenSkill('reluanwu');
+					event.current=player.next;
+					event.currented=[];
+					event.num1=0;
+					event.num2=0;
+					"step 1"
+					event.currented.push(event.current);
+					event.current.animate('target');
+					event.current.chooseToUse('乱武：使用一张杀或流失一点体力',{name:'sha'},function(card,player,target){
+						if(player==target) return false;
+						if(!player.canUse('sha',target)) return false;
+						if(get.distance(player,target)<=1) return true;
+						if(game.hasPlayer(function(current){
+							return current!=player&&get.distance(player,current)<get.distance(player,target);
+						})){
+							return false;
+						}
+						return true;
+					});
+					"step 2"
+					if(result.bool==false){
+						event.num1++;
+						event.current.loseHp();
+					}
+					else event.num2++;
+					event.current=event.current.next;
+					if(event.current!=player&&!event.currented.contains(event.current)){
+						game.delay(0.5);
+						event.goto(1);
+					}
+					else player.draw(Math.max(event.num1,event.num2));
+				},
+				ai:{
+					order:1,
+					result:{
+						player:function(player){
+							if(lib.config.mode=='identity'&&game.zhu.isZhu&&player.identity=='fan'){
+								if(game.zhu.hp==1&&game.zhu.countCards('h')<=2) return 1;
+							}
+							var num=0;
+							var players=game.filterPlayer();
+							for(var i=0;i<players.length;i++){
+								var att=get.attitude(player,players[i]);
+								if(att>0) att=1;
+								if(att<0) att=-1;
+								if(players[i]!=player&&players[i].hp<=3){
+									if(players[i].countCards('h')==0) num+=att/players[i].hp;
+									else if(players[i].countCards('h')==1) num+=att/2/players[i].hp;
+									else if(players[i].countCards('h')==2) num+=att/4/players[i].hp;
+								}
+								if(players[i].hp==1) num+=att*1.5;
+							}
+							if(player.hp==1){
+								return -num;
+							}
+							if(player.hp==2){
+								return -game.players.length/4-num;
+							}
+							return -game.players.length/3-num;
+						}
+					}
+				}
+			},
+			reweimu:{
+				audio:2,
+				mod:{
+					targetEnabled:function(card){
+						if(get.type2(card)=='trick'&&get.color(card)=='black') return false;
+					},
+				},
+				trigger:{player:'damageBegin2'},
+				forced:true,
+				filter:function(event,player){
+					return player==_status.currentPhase;
+				},
+				content:function(){
+					trigger.cancel();
+				},
+			},
 			//顾雍
 			reshenxing:{
 				audio:2,
@@ -5719,66 +5866,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reguhuo_backup:{},
 			reguhuo_phase:{},
 			rechanyuan:{
-				//charlotte:true,
-				firstDo:true,
-				trigger:{
-					player:["phaseBefore","changeHp"],
+				init:function(player,skill){
+					player.addSkillBlocker(skill);
 				},
-				priority:99,
-				firstDo:true,
-				forced:true,
-				popup:false,
-				unique:true,
-				content:function (){
-					if(player.hp<=1){
-						var skills=player.getSkills(true,false);
-						for(var i=0;i<skills.length;i++){
-							var info=get.info(skills[i]);
-							if(skills[i]=='chanyuan'||skills[i]=='rechanyuan'||info.charlotte){
-								skills.splice(i--,1);
-							}
-						}
-						player.disableSkill('rechanyuan',skills);
-					}
-					else player.enableSkill('rechanyuan');
+				onremove:function(player,skill){
+					player.removeSkillBlocker(skill);
+				},
+				charlotte:true,
+				locked:true,
+				skillBlocker:function(skill,player){
+					return skill!='chanyuan'&&skill!='rechanyuan'&&!lib.skill[skill].charlotte&&player.hp<=1;
 				},
 				mark:true,
 				intro:{
-					content:function (storage,player,skill){
-						var str='<li>锁定技，你不能质疑于吉，只要你的体力值不大于1，你的其他技能便全部失效。';
-						var list=[];
-						for(var i in player.disabledSkills){
-							if(player.disabledSkills[i].contains(skill)){
-								list.push(i)
-							}
-						}
-						if(list.length){
-							str+='<br><li>失效技能：';
-							for(var i=0;i<list.length;i++){
-								if(lib.translate[list[i]+'_info']){
-									str+=get.translation(list[i])+'、';
-								}
-							}
-							return str.slice(0,str.length-1);
-						}else return str;
-					},
-				},
-				init:function (player,skill){
-					if(player.hp<=1){
-						var skills=player.getSkills(true,false);
-						for(var i=0;i<skills.length;i++){
-							var info=get.info(skills[i]);
-							if(skills[i]=='chanyuan'||skills[i]=='rechanyuan'||info.charlotte){
-								skills.splice(i--,1);
-							}
-						}
-						player.disableSkill(skill,skills);
+					content:function(storage,player,skill){
+						var str='<li>锁定技，你不能于〖蛊惑〗的结算流程中进行质疑。当你的体力值不大于1时，你的其他技能失效。';
+						var list=player.getSkills(null,null,false).filter(function(i){
+							return lib.skill.rechanyuan.skillBlocker(i,player);
+						});
+						if(list.length) str+=('<br><li>失效技能：'+get.translation(list))
+						return str;
 					}
-				},
-				onremove:function (player,skill){
-					player.enableSkill(skill);
-				},
-				locked:true,
+				}
 			},
 			botu:{
 				audio:2,
@@ -6531,6 +6640,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.suit(card)=='diamond'&&card.name=='sha') return true;
 					},
 				},
+				locked:false,
 				audio:"wusheng",
 				audioname:['re_guanyu','guanzhang','jsp_guanyu','guansuo'],
 				enable:["chooseToRespond","chooseToUse"],
@@ -7142,7 +7252,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var next=player.judge(function(card){
 						if(get.color(card)=='black') return 1.5;
 						return -1.5;
-					}).judge2=function(result){
+					});
+					next.judge2=function(result){
 						return result.bool;
 					};
 					if(get.mode()!='guozhan'&&!player.hasSkillTag('rejudge')) next.set('callback',function(){
@@ -9768,7 +9879,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reguhuo_guess:"蛊惑",
 			reguhuo_guess_info:"",
 			rechanyuan:"缠怨",
-			rechanyuan_info:"锁定技，你不能质疑于吉，只要你的体力值不大于1，你失去你的武将技能。",
+			rechanyuan_info:"锁定技，你不能于〖蛊惑〗的结算流程中进行质疑。当你的体力值不大于1时，你的其他技能失效。",
 			reguhuo_sha:"蛊惑",
 			reguhuo_shan:"蛊惑",
 			reguhuo_wuxie:"蛊惑",
@@ -10045,9 +10156,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinpaiyi_info:'出牌阶段每项各限一次，你可移去一张“权”并选择一项：①令一名角色摸X张牌。②对至多X名角色各造成1点伤害。（X为“权”数）',
 			re_guyong:'界顾雍',
 			reshenxing:'慎行',
-			reshenxing_info:'出牌阶段，你可以（X为你本阶段内发动过〖慎行〗的次数），然后摸一张牌。若这两张牌颜色不同，则改为摸两张牌。',
+			reshenxing_info:'出牌阶段，你可以弃置X张牌（X为你本阶段内发动过〖慎行〗的次数），然后摸一张牌。若这两张牌颜色不同，则改为摸两张牌。',
 			rebingyi:'秉壹',
 			rebingyi_info:'结束阶段，你可展示所有手牌。若这些牌：颜色均相同，则你可以令至多X名角色各摸一张牌（X为你的手牌数）；点数均相同，则你摸一张牌。',
+			re_jiaxu:'界贾诩',
+			rewansha:'完杀',
+			rewansha_info:'锁定技。①你的回合内，不处于濒死状态的角色不能使用【桃】。②当有角色于你的回合内进入濒死状态时，你令所有其他角色的非锁定技失效直到此濒死状态结算结束。',
+			reluanwu:'乱武',
+			reluanwu_info:'限定技，出牌阶段，你可令所有其他角色依次选择一项：①对距离最近（或之一）的角色使用一张【杀】；②失去1点体力。然后你摸X张牌（X为选择①和②的角色数中的最大值）。',
+			reweimu:'帷幕',
+			reweimu_info:'锁定技。①你不能成为黑色锦囊牌的目标。②当你于回合内受到伤害时，防止此伤害。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

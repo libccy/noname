@@ -3289,6 +3289,7 @@ div:not(.handcards)>.card>.info>span,
 	top: auto;
 	right: 20px;
 	bottom: 20px;
+	z-index: 5;
 }
 .connectevents.server{
 	left: 20px;

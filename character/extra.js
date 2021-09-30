@@ -2175,7 +2175,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.removeMark('renjie',1);
-					player.addTempSkill('wansha');
+					player.addTempSkill('rewansha');
 				}
 			},
 			jilue_zhiheng:{

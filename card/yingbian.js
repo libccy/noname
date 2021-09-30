@@ -795,7 +795,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			zhujinqiyuan:'逐近弃远',
 			zhujinqiyuan_info:'出牌阶段，对一名有牌的其他角色使用。若你与其距离的大于1，你弃置其区域内的一张牌；若你与其的距离等于1，你获得其区域内的一张牌。',
 			dongzhuxianji:'洞烛先机',
-			dongzhuxianji_info:'出牌阶段，对包含你在内的一名角色使用。你观看牌堆顶的两张牌并将其以任意顺序置于牌堆顶或牌堆底，然后摸两张牌。',
+			dongzhuxianji_info:'出牌阶段，对包含你在内的一名角色使用。目标角色卜算2，然后摸两张牌。',
 			chuqibuyi:'出其不意',
 			chuqibuyi_info:'出牌阶段，对一名有手牌的其他角色使用。你展示其一张手牌，若此牌与【出其不意】的花色不同，则你对其造成1点伤害。',
 			wuxinghelingshan:'五行鹤翎扇',

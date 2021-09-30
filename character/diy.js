@@ -71,6 +71,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_asara:['female','key',3,['asara_shelu','asara_yingwei']],
 			key_kotomi:['female','key',3,['kotomi_qinji','kotomi_chuanxiang']],
 			key_mia:['female','key',3,['mia_shihui','mia_qianmeng']],
+			key_kano:['female','key',3,['kano_liezhen','kano_poyu']],
 			
 			key_kud:['female','key',3,['kud_qiaoshou','kud_buhui']],
 			key_misuzu:['female','key',3,['misuzu_hengzhou','misuzu_nongyin','misuzu_zhongxing']],
@@ -196,7 +197,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				diy_fakenews:["diy_wenyang","ns_zhangwei","ns_caimao","ns_chengpu"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
 				diy_noname:['noname'],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto","key_sakuya","key_youta","key_rumi","key_chihaya","key_yukito","key_asara","key_kotomi","key_mia"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto","key_sakuya","key_youta","key_rumi","key_chihaya","key_yukito","key_asara","key_kotomi","key_mia","key_kano"],
 				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang','junk_simayi'],
 			},
 		},
@@ -204,7 +205,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			noname:'无名杀的吉祥物。<br>画师：空城<br>技能设计：李木子',
 			ns_zhangwei:'血骑教习·张葳，三国杀集换式卡牌游戏《阵面对决》中的帝畿系列卡牌。游卡桌游官方原创的三国时期女性角色。',
 			diy_feishi:'字公举，生卒年不详，益州犍为郡南安县（今四川省乐山市）人。刘璋占据益州时，以费诗为绵竹县县令。刘备进攻刘璋夺取益州，费诗举城而降，后受拜督军从事，转任牂牁郡太守，再为州前部司马。',
-			//diy_liuyan:'字元海，新兴（今山西忻州北）人，匈奴族，匈奴首领冒顿单于之后，南匈奴单于于夫罗之孙，左贤王刘豹之子，母呼延氏，十六国时期前赵政权开国皇帝，304年－310年在位。',
 			diy_lukang:'字幼节，吴郡吴县（今江苏苏州）人。三国时期吴国名将，丞相陆逊次子。',
 			diy_liufu:'字元颖，沛国相县（今安徽濉溪县西北）人。东汉末年名守。在汉末避难于淮南，说服袁术将戚寄和秦翊率部投奔曹操，曹操大悦，使司徒辟其为掾属。',
 			diy_xizhenxihong:'习珍，襄阳人。三国时蜀汉将领。先主刘备时曾任零陵北部都尉，加裨将军。建安二十四年，关羽率荆州大军攻打樊城，唯有习珍据城不降。被困月余，直到箭尽粮绝，拔剑自刎而死。习宏，生卒年不详，习珍之弟。曾在东吴入侵蜀汉时建议哥哥习珍伪降，约樊胄举兵。习珍死后，弟弟习宏落在东吴，有问必不答，终身不为孙权发一言。',
@@ -218,7 +218,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yanghu:'羊祜（221年－278年12月27日），字叔子，泰山郡南城县人。西晋时期杰出的战略家、政治家、文学家，曹魏上党太守羊衜的儿子，名儒蔡邕的女儿蔡文姬的外甥。出身“泰山羊氏”，博学能文，清廉正直。曹魏时期，接受公车征辟，出任中书郎，迁给事黄门侍郎。姐姐嫁给大将军司马师，投靠司马氏家族，仕途平步青云。魏元帝曹奂即位，出任秘书监、相国从事中郎、中领军，统领御林军，兼管内外政事，册封钜平县子，迁。西晋建立后，迁中军将军、散骑常侍、郎中令，册封钜平侯。泰始五年（269年），出任车骑将军、荆州都督，加任开府仪同三司坐镇襄阳，屯田兴学，以德怀柔，深得军民之心；扩充军备，训练士兵，全力准备灭亡孙吴，累迁征南大将军，册封南城侯。咸宁四年，去世，临终前举荐杜预接任职务，获赠侍中、太傅，谥号为“成”。唐宋时期，配享武庙。',
 		},
 		characterTitle:{
-			key_kotomi:'#bLoopers',
+			key_kano:'#bAIR',
+			key_mia:'#bLoopers',
 			key_kotomi:'#gClannad',
 			key_asara:'#bRewrite',
 			key_yukito:'#bAIR',
@@ -333,6 +334,51 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_liuzhang:'#r矮子剑薄荷糖',
 		},
 		card:{
+			kano_paibingbuzhen:{
+				fullskin:true,
+				type:'trick',
+				enable:true,
+				filterTarget:true,
+				selectTarget:[1,3],
+				content:function(){
+					'step 0'
+					target.draw();
+					'step 1'
+					var hs=target.getCards('he');
+					if(!hs.length) event.finish();
+					else if(hs.length==1) event._result={bool:true,cards:hs};
+					else target.chooseCard('he',true,'选择一张牌置入仁库');
+					'step 2'
+					if(result.bool){
+						var card=result.cards[0];
+						target.$throw(card,1000);
+						target.lose(card,'toRenku');
+					}
+				},
+				contentAfter:function(){
+					if(player.isIn()&&_status.renku.length&&function(){
+						var cards=_status.renku;
+						if(cards.length==1) return true;
+						var color=get.color(cards[0],false),type=get.type(cards[0],false);
+						for(var i=1;i<cards.length;i++){
+							if(color&&get.color(cards[i],false)!=color) color=false;
+							if(type&&get.type(cards[i],false)!=type) type=false;
+							if(!color&&!type) return false;
+						}
+						return true;
+					}()) player.draw();
+				},
+				ai:{
+					order:1,
+					result:{
+						player:function(player,target){
+							if(player.hasSkill('kano_poyu')) return 2;
+							return 0;
+						},
+						target:0.1,
+					},
+				},
+			},
 			kamome_suitcase:{
 				fullskin:true,
 				type:'equip',
@@ -459,6 +505,91 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			kano_liezhen:{
+				trigger:{player:'phaseJieshuBegin'},
+				filter:function(event,player){
+					return player.getHistory('useCard').length>0;
+				},
+				direct:true,
+				frequent:true,
+				content:function(){
+					'step 0'
+					var history=player.getHistory('useCard');
+					if(history.length>1){
+						var type=get.type2(history[0].card,false);
+						for(var i=1;i<history.length;i++){
+							if(get.type2(history[i].card,false)!=type){
+								player.chooseButton(['列阵：是否视为使用其中一种牌？',[['kano_paibingbuzhen'].concat(get.zhinangs()),'vcard']]).set('filterButton',function(button){
+									return _status.event.player.hasUseTarget({name:button.link[2],isCard:true});
+								}).set('ai',function(button){
+									return _status.event.player.getUseValue({name:button.link[2],isCard:true});
+								});
+								event.goto(2);
+								return;
+							}
+						}
+					}
+					var str=_status.renku.length?'获得仁库中的所有牌':'摸两张牌';
+					player.chooseBool(get.prompt('kano_liezhen'),str).set('frequentSkill','kano_liezhen');
+					'step 1'
+					if(result.bool){
+						player.logSkill('kano_liezhen');
+						if(_status.renku.length){
+							player.gain(_status.renku,'gain2','fromRenku');
+							_status.renku.length=0;
+							game.updateRenku();
+						}
+						else player.draw(2);
+					}
+					event.finish();
+					'step 2'
+					if(result.bool) player.chooseUseTarget(result.links[0][2],true).logSkill='kano_liezhen';
+				},
+				init:function(player){
+					player.storage.renku=true;
+				},
+			},
+			kano_poyu:{
+				trigger:{target:'useCardToTargeted'},
+				charlotte:true,
+				filter:function(event,player){
+					return _status.renku.length>0&&(event.card.name=='sha'||get.type(event.card)=='trick'&&get.tag(event.card,'damage')>0);
+				},
+				check:function(trigger,player){
+					return get.effect(player,trigger.card,trigger.player,player)<0;
+				},
+				content:function(){
+					'step 0'
+					player.judge();
+					'step 1'
+					var bool=false,type=get.type2(result.card.name);
+					for(var i of _status.renku){
+						if(get.suit(i)==result.suit||get.type2(i)==type){
+							bool=true;break;
+						}
+					}
+					if(bool){
+						player.chooseButton(['是否移去一张牌，令'+get.translation(trigger.card)+'对你无效？',_status.renku]).set('types',[result.suit,type]).set('filterButton',function(button){
+							var types=_status.event.types;
+							return get.suit(button.link,false)==types[0]||get.type2(button.link,false)==types[1];
+						}).set('ai',()=>1);
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						var card=result.links[0];
+						player.$throw(card,1000);
+						_status.renku.remove(card);
+						game.cardsDiscard(card).fromRenku=true;
+						game.log(player,'将',card,'置入了弃牌堆');
+						trigger.excluded.add(player);
+						game.updateRenku();
+					}
+				},
+				init:function(player){
+					player.storage.renku=true;
+				},
+			},
 			mia_shihui:{
 				trigger:{player:'phaseDrawBegin1'},
 				forced:true,
@@ -2998,6 +3129,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(name=='damageBegin3') return true;
 					return player!=event.player;
 				},
+				locked:function(skill,player){
+					if(!player||!player.storage.shiroha_jiezhao) return true;
+					return false;
+				},
 				content:function(){
 					'step 0'
 					var num=event.triggername=='damageBegin3'?-1:1;
@@ -3732,14 +3867,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			abyusa_jueqing:{
+				audio:2,
 				trigger:{source:'damageBegin2'},
 				skillAnimation:true,
-				animationColor:'metal',
+				animationColor:'water',
 				filter:function(event,player){
-					return player!=event.player&&!player.hasSkill('abyusa_jueqing_1st');
+					return player!=event.player&&!player.storage.abyusa_jueqing_rewrite;
 				},
 				prompt2:function(event,player){
-					return '令即将对其造成的伤害+'+event.num+'，并令自己失去'+get.cnNumber(event.num)+'点体力';
+					var num=get.cnNumber(2*event.num,true);
+					return '令即将对其造成的伤害翻倍至'+num+'点，并令自己失去'+get.cnNumber(event.num)+'点体力';
 				},
 				check:function(event,player){
 					return player.hp>event.num&&event.player.hp>event.num&&!event.player.hasSkillTag('filterDamage',null,{
@@ -3747,35 +3884,39 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						card:event.card,
 					})&&get.attitude(player,event.player)<0;
 				},
+				locked:function(skill,player){
+					return player&&player.storage.abyusa_jueqing_rewrite;
+				},
 				logTarget:'player',
 				content:function(){
 					player.loseHp(trigger.num);
 					trigger.num*=2;
-					var next=game.createEvent('abyusa_jueqing_add',false);
-					event.next.remove(next);
-					trigger.after.push(next);
-					next.player=player;
-					next.setContent(function(){
-						player.addSkill('abyusa_jueqing_1st');
-					});
+					player.storage.abyusa_jueqing_rewrite=true;
 				},
 				derivation:'abyusa_jueqing_rewrite',
-			},
-			abyusa_jueqing_1st:{
-				trigger:{source:'damageBefore'},
-				forced:true,
-				charlotte:true,
-				filter:function(event,player){
-					return player.hasSkill('abyusa_jueqing');
+				group:'abyusa_jueqing_rewrite',
+				subSkill:{
+					rewrite:{
+						trigger:{source:'damageBefore'},
+						forced:true,
+						charlotte:true,
+						audio:'abyusa_jueqing',
+						filter:function(event,player){
+							return player.storage.abyusa_jueqing_rewrite==true;
+						},
+						check:function(){return false;},
+						content:function(){
+							trigger.cancel();
+							trigger.player.loseHp(trigger.num);
+						},
+						ai:{
+							jueqing:true,
+							skillTagFilter:function(player){
+								return player.storage.abyusa_jueqing_rewrite==true;
+							},
+						}
+					}
 				},
-				check:function(){return false;},
-				content:function(){
-					trigger.cancel();
-					trigger.player.loseHp(trigger.num);
-				},
-				ai:{
-					jueqing:true
-				}
 			},
 			akiko_dongcha:{
 				trigger:{global:'gameDrawAfter'},
@@ -9640,6 +9781,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var target=(name=='damageSource'?event.source:event.player);
 					return target&&target!=player&&get.distance(player,target)<=1&&target.countCards('hej')>0;
 				},
+				locked:function(skill,player){
+					return player&&player.storage.nsfuwei;
+				},
 				content:function(){
 					'step 0'
 					var target=(event.triggername=='damageSource'?trigger.source:trigger.player);
@@ -14858,7 +15002,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				return '与你距离1以内的其他角色造成或受到伤害后，你可以将其区域内的一张牌置于你的武将牌上（称为“威”）。你使用【杀】的次数上限+X（X为“威”数）。';
 			},
 			abyusa_jueqing:function(player){
-				if(player.hasSkill('abyusa_jueqing_1st')) return '锁定技，你即将造成的伤害均视为失去体力。';
+				if(player.storage.abyusa_jueqing_rewrite) return '锁定技，你即将造成的伤害均视为失去体力。';
 				return '当你对其他角色造成伤害时，你可以令此伤害值+X。若如此做，你失去X点体力，并于此伤害结算完成后修改〖绝情〗（X为伤害值）。';
 			},
 			tomoya_shangxian:function(player){
@@ -15042,6 +15186,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_asara:'井上晶',
 			key_kotomi:'一之濑琴美',
 			key_mia:'藤川米娅',
+			key_kano:'雾岛佳乃',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -15385,6 +15530,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mia_qianmeng_info:'使命技。①游戏开始时，你摸一张牌，然后将一张牌置于牌堆的正中央。②使命：当有角色获得“潜梦”牌时，其将此牌交给你。你将体力值回复至上限，失去〖时迴〗并获得〖风发〗。③失败：当你死亡时，你可令一名角色获得牌堆中所有与“潜梦”牌点数相同的牌。',
 			mia_fengfa:'风发',
 			mia_fengfa_info:'锁定技。摸牌阶段，你多摸X张牌（X为你上回合使用过的牌数）。',
+			kano_liezhen:'列阵',
+			kano_liezhen_info:'结束阶段，若你本回合内使用过牌且这些牌的类型：不均相同，你可视为使用【排兵布阵】或智囊；均相同，你获得仁库中的所有牌（没有则改为摸两张牌）。',
+			kano_paibingbuzhen:'排兵布阵',
+			kano_paibingbuzhen_info:'出牌阶段，对至多三名角色使用。目标角色摸一张牌，然后将一张牌置入仁库。若仁库中的牌类型或颜色均相同，则你摸一张牌。',
+			kano_poyu:'破羽',
+			kano_poyu_info:'当你成为【杀】或伤害性锦囊牌的目标后，若仁库中有牌，你可判定。然后你可从仁库中移去一张与此牌类型或花色相同的牌，令此牌对你无效。',
 
 			key_kud:'库特莉亚芙卡',
 			kud_qiaoshou:'巧手',

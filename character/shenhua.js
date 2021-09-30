@@ -7117,65 +7117,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			chanyuan:{
-				//charlotte:true,
-				firstDo:true,
-				trigger:{
-					player:["phaseBefore","changeHp"],
+				init:function(player,skill){
+					player.addSkillBlocker(skill);
 				},
-				priority:99,
-				forced:true,
-				popup:false,
-				unique:true,
-				content:function(){
-					if(player.hp==1){
-						var skills=player.getSkills(true,false);
-						for(var i=0;i<skills.length;i++){
-							var info=get.info(skills[i]);
-							if(skills[i]=='chanyuan'||skills[i]=='rechanyuan'||info.charlotte){
-								skills.splice(i--,1);
-							}
-						}
-						player.disableSkill('chanyuan',skills);
-					}
-					else player.enableSkill('chanyuan');
+				onremove:function(player,skill){
+					player.removeSkillBlocker(skill);
+				},
+				charlotte:true,
+				locked:true,
+				skillBlocker:function(skill,player){
+					return skill!='chanyuan'&&skill!='rechanyuan'&&!lib.skill[skill].charlotte&&player.hp<=1;
 				},
 				mark:true,
 				intro:{
 					content:function(storage,player,skill){
 						var str='<li>锁定技，你不能质疑于吉，只要你的体力值为1，你的其他技能便全部失效。';
-						var list=[];
-						for(var i in player.disabledSkills){
-							if(player.disabledSkills[i].contains(skill)){
-								list.push(i)
-							}
-						}
-						if(list.length){
-							str+='<br><li>失效技能：';
-							for(var i=0;i<list.length;i++){
-								if(lib.translate[list[i]+'_info']){
-									str+=get.translation(list[i])+'、';
-								}
-							}
-							return str.slice(0,str.length-1);
-						}else return str;
-					},
-				},
-				init:function(player,skill){
-					if(player.hp==1){
-						var skills=player.getSkills(true,false);
-						for(var i=0;i<skills.length;i++){
-							var info=get.info(skills[i]);
-							if(skills[i]=='chanyuan'||skills[i]=='rechanyuan'||info.charlotte){
-								skills.splice(i--,1);
-							}
-						}
-						player.disableSkill(skill,skills);
+						var list=player.getSkills(null,null,false).filter(function(i){
+							return lib.skill.rechanyuan.skillBlocker(i,player);
+						});
+						if(list.length) str+=('<br><li>失效技能：'+get.translation(list))
+						return str;
 					}
-				},
-				onremove:function(player,skill){
-					player.enableSkill(skill);
-				},
-				locked:true,
+				}
 			},
 			"guhuo_respond":{
 				trigger:{
@@ -7359,7 +7322,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			menghuo:['re_menghuo','menghuo'],
 			zhurong:['re_zhurong','ol_zhurong','zhurong'],
 			sunjian:['ol_sunjian','re_sunjian','sunjian'],
-			jiaxu:['jiaxu','ns_jiaxu'],
+			jiaxu:['re_jiaxu','jiaxu','ns_jiaxu'],
 			dongzhuo:['ol_dongzhuo','sp_dongzhuo','re_dongzhuo','dongzhuo'],
 			dengai:['re_dengai','ol_dengai','dengai'],
 			sp_zhanghe:['sp_zhanghe','yj_zhanghe'],

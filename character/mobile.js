@@ -599,7 +599,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var color=get.color(cards[0],player),type=get.type(cards[0],player);
 					for(var i=1;i<cards.length;i++){
 						if(color&&get.color(cards[i],player)!=color) color=false;
-						if(type&&get.type(cards[i],player)!=type) color=false;
+						if(type&&get.type(cards[i],player)!=type) type=false;
 						if(!color&&!type) return false;
 					}
 					return true;

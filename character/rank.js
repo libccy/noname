@@ -1388,6 +1388,8 @@ window.noname_character_rank={
 			'ol_huaxin',
 			'longyufei',
 			're_guyong',
+			're_panshu',
+			'key_kano',
 			'key_haruko',
 			'key_akiko',
 			'key_sunohara',

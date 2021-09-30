@@ -91,7 +91,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hs_kazhakusi:['male','shu',3,['lianjin']],
 			// hs_lazi:['male','wei',3,[]],
 			hs_shaku:['male','wei',3,['shouji']],
-			hs_laxiao:['male','shu',3,['guimou','yingxi','longyi']],
+			hs_laxiao:['male','shu',3,['guimou','yingxi','hlongyi']],
 			// hs_xiangyaqishi:['male','wei',3,[]],
 			// hs_fenjie:['male','shu',3,['guimou','yingxi']],
 			hs_mojinbaozi:['male','wei',3,['jingcu','shengzhang']],
@@ -2945,7 +2945,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			longyi:{
+			hlongyi:{
 				mod:{
 					ignoredHandcard:function(card,player){
 						if(get.color(card)=='black'){
@@ -9792,8 +9792,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			moxie_info:'锁定技，你失去毒时不流失体力；你使用毒时摸两张牌；结束阶段，你将一张随机手牌转化为毒',
 			gfuhun:'附魂',
 			gfuhun_info:'结束阶段，若你未翻面，你可以和一名其他角色拼点，若你赢，你将武将牌翻至背面，该角色进入混乱状态直到下一回合结束',
-			longyi:'龙裔',
-			longyi_info:'锁定技，你的黑色牌不占用手牌上限',
+			hlongyi:'龙裔',
+			hlongyi_info:'锁定技，你的黑色牌不占用手牌上限',
 			zhongji:'重击',
 			zhongji_info:'每当你即将造成伤害，可弃置一张黑色手牌令伤害+1',
 			fuwen:'符文',

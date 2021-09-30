@@ -5887,7 +5887,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				filterTarget:function(card,player,target){
 					if(target==player) return false;
-					var stat=player.getStat().fuman_targets;
+					var stat=player.getStat('skill').fuman_targets;
 					return !stat||!stat.contains(target);
 				},
 				filter:function(event,player){
@@ -10236,6 +10236,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kunfen:{
 				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
+				locked:function(skill,player){
+					if(!player||!player.storage.kunfen) return true;
+					return false;
+				},
 				direct:true,
 				content:function(){
 					"step 0"

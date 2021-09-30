@@ -15125,7 +15125,8 @@
 							}
 						}
 						for(var i in map){
-							var owner=(_status.connectMode?lib.playerOL:game.playerMap)[i],next=owner.lose(map[i],ui.special).set('type','gain').set('forceDie',true).set('getlx',false);
+							var owner=(_status.connectMode?lib.playerOL:game.playerMap)[i];
+							var next=owner.lose(map[i],ui.special).set('type','gain').set('forceDie',true).set('getlx',false);
 							if(event.animate=='give'||event.visible==true) next.visible=true;
 							event.relatedLose=next;
 						}
@@ -16429,6 +16430,16 @@
 			},
 			player:{
 				//新函数
+				addSkillBlocker:function(skill){
+					if(!this.storage.skill_blocker) this.storage.skill_blocker=[];
+					this.storage.skill_blocker.push(skill);
+				},
+				removeSkillBlocker:function(skill){
+					if(this.storage.skill_blocker){
+						this.storage.skill_blocker.remove(skill);
+						if(!this.storage.skill_blocker.length) delete this.storage.skill_blocker;
+					}
+				},
 				loseToSpecial:function(cards,tag,target){
 					var next=game.loseAsync({
 						player:this,
@@ -26378,74 +26389,47 @@
 			},
 			fengyin:{
 				init:function(player,skill){
-					var skills=player.getSkills(true,false);
-					for(var i=0;i<skills.length;i++){
-						if(get.is.locked(skills[i])||lib.skill[skills[i]].charlotte){
-							skills.splice(i--,1);
-						}
-					}
-					player.disableSkill(skill,skills);
+					player.addSkillBlocker(skill);
 				},
 				onremove:function(player,skill){
-					player.enableSkill(skill);
+					player.removeSkillBlocker(skill);
 				},
-				locked:true,
 				charlotte:true,
+				skillBlocker:function(skill,player){
+					return !lib.skill[skill].charlotte&&!get.is.locked(skill,player);
+				},
 				mark:true,
 				intro:{
 					content:function(storage,player,skill){
-						var list=[];
-						for(var i in player.disabledSkills){
-							if(player.disabledSkills[i].contains(skill)){
-								list.push(i)
-							}
-						}
-						if(list.length){
-							var str='失效技能：';
-							for(var i=0;i<list.length;i++){
-								if(lib.translate[list[i]+'_info']){
-									str+=get.translation(list[i])+'、';
-								}
-							}
-							return str.slice(0,str.length-1);
-						}
+						var list=player.getSkills(null,null,false).filter(function(i){
+							return lib.skill.fengyin.skillBlocker(i,player);
+						});
+						if(list.length) return '失效技能：'+get.translation(list);
+						return '无失效技能';
 					}
 				}
 			},
 			baiban:{
 				init:function(player,skill){
-					var skills=player.getSkills(true,false);
-					for(var i=0;i<skills.length;i++){
-						if(lib.skill[skills[i]].charlotte){
-							skills.splice(i--,1);
-						}
-					}
-					player.disableSkill(skill,skills);
+					player.addSkillBlocker(skill);
 				},
 				onremove:function(player,skill){
-					player.enableSkill(skill);
+					player.removeSkillBlocker(skill);
+				},
+				charlotte:true,
+				skillBlocker:function(skill,player){
+					return !lib.skill[skill].charlotte;
 				},
 				mark:true,
-				locked:true,
 				intro:{
 					content:function(storage,player,skill){
-						var list=[];
-						for(var i in player.disabledSkills){
-							if(player.disabledSkills[i].contains(skill)){
-								list.push(i)
-							}
-						}
-						if(list.length){
-							var str='失效技能：';
-							for(var i=0;i<list.length;i++){
-								if(lib.translate[list[i]+'_info']){
-									str+=get.translation(list[i])+'、';
-								}
-							}
-							return str.slice(0,str.length-1);
-						}
-					},
-				},
+						var list=player.getSkills(null,null,false).filter(function(i){
+							return lib.skill.baiban.skillBlocker(i,player);
+						});
+						if(list.length) return '失效技能：'+get.translation(list);
+						return '无失效技能';
+					}
+				}
 			},
 			qianxing:{
 				mark:true,
@@ -35164,6 +35148,11 @@
 			var out=skills.slice(0);
 			for(var i in player.disabledSkills){
 				out.remove(i);
+			}
+			if(player.storage.skill_blocker&&player.storage.skill_blocker.length){
+				for(var i=0;i<out.length;i++){
+					if(get.is.blocked(out[i],player)) out.splice(i--,1);
+				}
 			}
 			return out;
 		},
@@ -49238,6 +49227,13 @@
 			return 0;
 		},
 		is:{
+			blocked:function(skill,player){
+				if(!player.storage.skill_blocker||!player.storage.skill_blocker.length) return false;
+				for(var i of player.storage.skill_blocker){
+					if(lib.skill[i]&&lib.skill[i].skillBlocker&&lib.skill[i].skillBlocker(skill,player)) return true;
+				}
+				return false;
+			},
 			double:function(name,array){
 				if(!lib.character[name]||!lib.character[name][4]||name.indexOf('gz_')!=0) return false;
 				for(var i of lib.character[name][4]){
@@ -49434,8 +49430,9 @@
 			pos:function(str){
 				return (str=='h'||str=='e'||str=='j'||str=='he'||str=='hj'||str=='ej'||str=='hej');
 			},
-			locked:function(skill){
+			locked:function(skill,player){
 				var info=lib.skill[skill];
+				if(typeof info.locked=='function') return info.locked(skill,player);
 				if(info.locked==false) return false;
 				if(info.trigger&&info.forced) return true;
 				if(info.mod) return true;
@@ -51423,9 +51420,10 @@
 			return num;
 		},
 		owner:function(card,method){
-			for(var i=0;i<game.players.length;i++){
-				if(game.players[i].getCards('hej').contains(card)) return game.players[i];
-				if(game.players[i].judging[0]==card&&method!='judge') return game.players[i];
+			var list=game.players.concat(game.dead);
+			for(var i=0;i<list.length;i++){
+				if(list[i].getCards('hej').contains(card)) return list[i];
+				if(list[i].judging[0]==card&&method!='judge') return list[i];
 			}
 			//for(var i=0;i<game.players.length;i++){
 			//	if(game.players[i].using&&game.players[i].using.contains(card)) return game.players[i];
@@ -51756,11 +51754,7 @@
 					}
 				}
 
-				var skills=node.getSkills(false,false);
-				for(var i in node.forbiddenSkills){
-					skills.add(i);
-				}
-				skills=skills.slice(0);
+				var skills=node.getSkills(null,null,false).slice(0);
 				var skills2=game.filterSkills(skills,node);
 				if(node==game.me&&node.hiddenSkills.length){
 					skills.addArray(node.hiddenSkills);
@@ -51769,7 +51763,7 @@
 					if(node.disabledSkills[i].length==1&&
 						node.disabledSkills[i][0]==i+'_awake'&&
 						!node.hiddenSkills.contains(i)){
-						skills.push(i);
+						skills.add(i);
 					}
 				}
 				for(i=0;i<skills.length;i++){
