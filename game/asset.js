@@ -4413,6 +4413,7 @@ window.noname_asset_list=[
 	'image/character/gz_dengzhi.jpg',
 	'image/character/re_panshu.jpg',
 	'image/character/zhanghu.jpg',
+	'image/character/key_kano.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
