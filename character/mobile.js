@@ -596,10 +596,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterx:function(event,player){
 					var cards=player.getCards('h');
 					if(cards.length==1) return true;
-					var color=get.color(cards[0],player),type=get.type(cards[0],player);
+					var color=get.color(cards[0],player),type=get.type2(cards[0],player);
 					for(var i=1;i<cards.length;i++){
 						if(color&&get.color(cards[i],player)!=color) color=false;
-						if(type&&get.type(cards[i],player)!=type) type=false;
+						if(type&&get.type2(cards[i],player)!=type) type=false;
 						if(!color&&!type) return false;
 					}
 					return true;
@@ -1390,7 +1390,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				marktext:'姻',
 				intro:{
 					name:'共患',
-					content:'锁定技。每回合限一次，一名其他角色受到伤害时，若其拥有“姻”标记且其体力值大于你，则你将伤害转移给自己。',
+					content:'锁定技。每回合限一次，一名其他角色受到伤害时，若其拥有“姻”标记且其体力值小于你，则你将伤害转移给自己。',
 				},
 				ai:{
 					order:10,
@@ -6061,6 +6061,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'requanfeng_gain',
 			},
 			requanfeng_gain:{
+				audio:'quanfeng',
 				trigger:{global:'die'},
 				filter:function(event,player){
 					return player.hasSkill('hongyi')&&event.player.getStockSkills('仲村由理','天下第一').filter(function(skill){
@@ -12130,7 +12131,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			luanchou:'鸾俦',
 			luanchou_info:'出牌阶段限一次，你可令两名角色获得“姻”标记并清除原有标记。拥有“姻”标记的角色视为拥有技能〖共患〗。',
 			gonghuan:'共患',
-			gonghuan_info:'锁定技。每回合限一次，一名其他角色受到伤害时，若其拥有“姻”标记且其体力值大于你，则你将伤害转移给自己。',
+			gonghuan_info:'锁定技。每回合限一次，一名其他角色受到伤害时，若其拥有“姻”标记且其体力值小于你，则你将伤害转移给自己。',
 			sp_yanghu:'羊祜',
 			mingfa:'明伐',
 			mingfa_info:'①结束阶段，你可展示一张牌并记录为“明伐”。②出牌阶段开始时，若“明伐”牌在你的手牌区或装备区，则你可以使用“明伐”牌与一名其他角色拼点。若你赢：你获得对方一张牌并从牌堆中获得一张点数等于“明伐”牌牌面点数-1的牌。若你没赢：你本回合不能使用牌指定其他角色为目标。③你的拼点牌亮出后，你令此牌的点数+2。',

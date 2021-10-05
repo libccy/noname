@@ -2125,6 +2125,7 @@ div:not(.handcards)>.card>.info>span,
 	width: 100%;
 	font-size: 12px;
 	text-align: center;
+	white-space: nowrap;
 	/*opacity: 0;*/
 }
 .player:hover>.nameol {

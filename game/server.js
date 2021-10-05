@@ -10,7 +10,8 @@
 	var bannedKeyWords=[];
 	var messages={
 		create:function(key,nickname,avatar,config,mode){
-			this.nickname=nickname;
+			if(this.onlineKey!=key) return;
+			this.nickname=util.getNickname(nickname);
 			this.avatar=avatar;
 			var room={};
 			rooms.push(room);
@@ -21,7 +22,7 @@
 			this.sendl('createroom',key);
 		},
 		enter:function(key,nickname,avatar){
-			this.nickname=nickname;
+			this.nickname=util.getNickname(nickname);
 			this.avatar=avatar;
 			var room=false;
 			for(var i of rooms){
@@ -40,10 +41,10 @@
 				if(room.servermode&&!room.owner._onconfig&&config&&mode){
 					room.owner.sendl('createroom',index,config,mode);
 					room.owner._onconfig=this;
-					room.owner.nickname=nickname;
+					room.owner.nickname=util.getNickname(nickname);
 					room.owner.avatar=avatar;
 				}
-				else if(!room.config){
+				else if(!room.config||(room.config.gameStarted&&(!room.config.observe||!room.config.observeReady))){
 					this.sendl('enterroomfailed');
 				}
 				else{
@@ -54,7 +55,7 @@
 			}
 		},
 		changeAvatar:function(nickname,avatar){
-			this.nickname=nickname;
+			this.nickname=util.getNickname(nickname);
 			this.avatar=avatar;
 			util.updateclients();
 		},
@@ -68,7 +69,7 @@
 				else{
 					room.owner=this;
 					this.room=room;
-					this.nickname=cfg[1];
+					this.nickname=util.getNickname(cfg[1]);
 					this.avatar=cfg[2];
 					this.sendl('createroom',cfg[0],{},'auto')
 				}
@@ -103,7 +104,7 @@
 			delete this.keyCheck;
 		},
 		events:function(cfg,id,type){
-			if(bannedKeys.indexOf(id)!=-1||typeof id!='string'){
+			if(bannedKeys.indexOf(id)!=-1||typeof id!='string'||this.onlineKey!=id){
 				bannedIps.push(this._socket.remoteAddress);
 				console.log(id, this._socket.remoteAddress);
 				this.close();
@@ -148,7 +149,7 @@
 						this.sendl('eventsdenied','ban');
 					}
 					else{
-						cfg.nickname=cfg.nickname||'无名玩家';
+						cfg.nickname=util.getNickname(nickname);
 						cfg.avatar=cfg.nickname||'caocao';
 						cfg.creator=id;
 						cfg.id=util.getid();
@@ -205,6 +206,9 @@
 		},
 	};
 	var util={
+		getNickname:function(str){
+			return typeof str=='string'?(str.slice(0,12)):'无名玩家';
+		},
 		isBanned:function(str){
 			for(var i of bannedKeyWords){
 				if(str.indexOf(i)!=-1) return true;

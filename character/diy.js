@@ -12339,11 +12339,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nsyaowang:{
 				trigger:{player:'phaseBegin'},
 				direct:true,
-				group:'tianshu_remove',
 				createDialog:function(player,target,onlylist){
 					var names=[];
 					var list=[];
-					if(target.name&&!target.isUnseen(0)) names.add(target.name);
 					if(target.name1&&!target.isUnseen(0)) names.add(target.name1);
 					if(target.name2&&!target.isUnseen(1)) names.add(target.name2);
 					var pss=player.getSkills();
@@ -12355,7 +12353,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(lib.translate[skills[j]+'_info']&&lib.skill[skills[j]]&&
 									!lib.skill[skills[j]].unique&&
 									!pss.contains(skills[j])){
-									list.push(skills[j]);
+									list.add(skills[j]);
 								}
 							}
 						}
@@ -12390,7 +12388,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseTarget(get.prompt2('nsyaowang'),function(card,player,target){
 						var names=[];
-						if(target.name&&!target.isUnseen(0)) names.add(target.name);
 						if(target.name1&&!target.isUnseen(0)) names.add(target.name1);
 						if(target.name2&&!target.isUnseen(1)) names.add(target.name2);
 						var pss=player.getSkills();
@@ -12424,7 +12421,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return get.max(list,get.skillRank,'item');
 					};
 					if(event.isMine()){
-						event.dialog=lib.skill.tianshu.createDialog(player,target);
+						event.dialog=lib.skill.nsyaowang.createDialog(player,target);
 						event.switchToAuto=function(){
 							event._result=event.skillai(event.list);
 							game.resume();

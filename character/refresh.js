@@ -1104,6 +1104,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:['turnOverAfter','linkAfter']},
 				logTarget:'player',
+				filter:function(event,player){
+					if(event.name=='link') return event.player.isLinked();
+					return !event.player.isTurnedOver();
+				},
 				check:function(event,player){
 					return get.attitude(player,event.player)>0;
 				},

@@ -424,7 +424,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						 })) return get.attitude(player,target)/(Math.sqrt(1+target.countCards('h')));
 						 return 0;
 						}
-						return -get.attitude(_status.event.player,target);
+						if(target.countCards('h')>ui.selected.targets[0].countCards('h')) return -get.attitude(_status.event.player,target);
+						return 0;
 					});
 					'step 1'
 					if(result.bool){

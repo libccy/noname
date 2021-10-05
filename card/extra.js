@@ -18,6 +18,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				forceDie:true,
 				onLose:function(){
 					delete player.getStat('skill').muniu_skill;
+					player.unmarkSkill('muniu_skill');
 					if(!card||!card.cards||!card.cards.length) return;
 					if((!event.getParent(2)||event.getParent(2).name!='swapEquip')&&(event.getParent().type!='equip'||event.getParent().swapEquip)){
 						player.lose(card.cards,ui.discardPile);

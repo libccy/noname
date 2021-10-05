@@ -5,12 +5,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			tw:{
-				tw_mobile:['tw_beimihu','nashime','tw_gexuan','tw_dongzhao'],
+				tw_mobile:['tw_beimihu','nashime','tw_gexuan','tw_dongzhao','jiachong','duosidawang','wuban'],
 				tw_yijiang:['tw_caoang','tw_caohong','tw_zumao','tw_dingfeng','tw_maliang','tw_xiahouba'],
 				tw_english:['kaisa'],
 			},
 		},
 		character:{
+			wuban:['male','shu',4,['jintao']],
+			duosidawang:['male','qun','4/5',['equan','manji']],
+			jiachong:['male','qun',3,['beini','dingfa']],
 			tw_dongzhao:['male','wei',3,['twmiaolve','twyingjia']],
 			tw_gexuan:['male','qun',3,['twdanfa','twlingbao','twsidao']],
 			tw_beimihu:['female','qun',3,['zongkui','guju','baijia','bingzhao'],['zhu']],
@@ -25,6 +28,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterIntro:{
 			nashime:'难升米（なしめ，或なんしょうまい）是倭国大夫。景初二年六月，受女王卑弥呼之命，与都市牛利出使魏国，被魏国拜为率善中郎将。',
+			jiachong:'贾充（217年—282年），字公闾，平阳襄陵（今山西襄汾）人，三国曹魏至西晋时期大臣，曹魏豫州刺史贾逵之子。西晋王朝的开国元勋。出身平阳贾氏。曾参与镇压淮南二叛和弑杀魏帝曹髦，因此深得司马氏信任，其女儿贾褒（一名荃）及贾南风分别嫁予司马炎弟司马攸及次子司马衷，与司马氏结为姻亲，地位显赫。晋朝建立后，转任车骑将军、散骑常侍、尚书仆射，后升任司空、太尉等要职。更封鲁郡公。咸宁末，为使持节、假黄钺、大都督征讨吴国。吴国平定后，增邑八千户。太康三年（282年），贾充去世。西晋朝廷追赠他为太宰，礼官议谥曰荒，司马炎不采纳，改谥为武。有集五卷。',
+			duosidawang:'朵思大王是《三国演义》中人物，南蛮秃龙洞的元帅，孟获弟弟孟优的朋友，据说是南蛮第一智者。',
+			wuban:'吴班，字元雄，生卒年不详，兖州陈留郡（治今河南省开封市）人。三国时期蜀汉将领。为领军，随刘备参加伐吴之战，后又随蜀汉丞相诸葛亮参加北伐曹魏的战争，并于公元231年（建兴九年）的北伐中大破司马懿。官至骠骑将军，封绵竹侯。吴班以豪爽侠义著称于当时，又因族妹吴氏是蜀汉穆皇后，在蜀汉将领中有较高的地位。',
 		},
 		card:{
 			dz_mantianguohai:{
@@ -123,6 +129,185 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			jintao:{
+				mod:{
+					cardUsable:function(card,player,num){
+						if(card.name=='sha') return num+1;
+					},
+					targetInRange:function(card){
+						if(card.name=='sha') return true;
+					},
+				},
+				audio:2,
+				trigger:{player:'useCard'},
+				forced:true,
+				filter:function(event,player){
+					if(event.card.name!='sha') return false;
+					var evt=event.getParent('phaseUse');
+					if(!evt||evt.player!=player) return false;
+					var index=player.getHistory('useCard',function(evtx){
+						return evtx.card.name=='sha'&&evtx.getParent('phaseUse')==evt;
+					}).indexOf(event);
+					return index==0||index==1;
+				},
+				content:function(){
+					var evt=trigger.getParent('phaseUse');
+					var index=player.getHistory('useCard',function(evtx){
+						return evtx.card.name=='sha'&&evtx.getParent('phaseUse')==evt;
+					}).indexOf(trigger);
+					if(index==0){
+						game.log(trigger.card,'伤害+1');
+						if(typeof trigger.baseDamage!='number') trigger.baseDamage=1;
+						trigger.baseDamage++;
+					}
+					else{
+						game.log(trigger.card,'不可被响应');
+						trigger.directHit.addArray(game.players);
+					}
+				},
+			},
+			equan:{
+				audio:2,
+				trigger:{global:'damageEnd'},
+				forced:true,
+				filter:function(event,player){
+					return player==_status.currentPhase&&event.player.isIn();
+				},
+				logTarget:'player',
+				content:function(){
+					trigger.player.addMark('equan',trigger.num,false);
+				},
+				group:['equan_block','equan_lose'],
+				marktext:'毒',
+				intro:{
+					name:'恶泉(毒)',
+					name2:'毒',
+				},
+				subSkill:{
+					lose:{
+						audio:'equan',
+						trigger:{player:'phaseZhunbeiBegin'},
+						forced:true,
+						filter:function(){
+							return game.hasPlayer(function(current){
+								return current.hasMark('equan');
+							});
+						},
+						logTarget:function(){
+							return game.filterPlayer(function(current){
+								return current.hasMark('equan');
+							});
+						},
+						content:function(){
+							game.countPlayer(function(current){
+								var num=current.countMark('equan');
+								if(num){
+									current.removeMark('equan',num);
+									current.loseHp(num);
+								}
+							});
+						},
+					},
+					block:{
+						trigger:{global:'dyingBegin'},
+						forced:true,
+						logTarget:'player',
+						filter:function(event,player){
+							var evt=event.getParent(2);
+							return evt.name=='equan_lose'&&evt.player==player;
+						},
+						content:function(){
+							trigger.player.addTempSkill('fengyin');
+						},
+					},
+				},
+			},
+			manji:{
+				audio:2,
+				trigger:{global:'loseHpAfter'},
+				forced:true,
+				filter:function(event,player){
+					return player.hp>=event.player.hp||player.isDamaged();
+				},
+				logTarget:'player',
+				content:function(){
+					if(player.hp<=trigger.player.hp) player.recover();
+					if(player.hp>=trigger.player.hp) player.draw();
+				},
+			},
+			beini:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filterTarget:lib.filter.notMe,
+				content:function(){
+					'step 0'
+					var str=get.translation(target);
+					player.chooseControl().set('choiceList',[
+						'摸两张牌，然后令'+str+'视为对自己使用【杀】',
+						'令'+str+'摸两张牌，然后视为对其使用【杀】',
+					]).set('ai',function(){
+						var evt=_status.event.getParent(),player=evt.player,target=evt.target;
+						var card={name:'sha',isCard:true},att=get.attitude(player,target)>0;
+						if(!target.canUse(card,player,false)||get.effect(player,card,target,player)>=0) return 0;
+						if(att&&(!player.canUse(card,target,false)||get.effect(target,card,player,player)>=0)) return 1;
+						if(target.hasSkill('nogain')&&player.canUse(card,target,false)&&get.effect(target,card,player,player)>0) return 1;
+						if(player.hasShan()) return 0;
+						if(att&&target.hasShan()) return 1;
+						return 0;
+					});
+					'step 1'
+					var list=[player,target];
+					if(result.index==1) list.reverse();
+					event.list=list;
+					list[0].draw(2);
+					'step 2'
+					var list=event.list;
+					if(list[1].isIn()&&list[0].isIn()&&list[1].canUse('sha',list[0],false)) list[1].useCard({name:'sha',isCard:true},list[0],false);
+				},
+				ai:{
+					order:5,
+					expose:0,
+					result:{
+						player:function(player,target){
+							var card={name:'sha',isCard:true},att=get.attitude(player,target)>0;
+							if(!target.canUse(card,player,false)||get.effect(player,card,target,player)>=0) return 2;
+							if(att&&(!player.canUse(card,target,false)||get.effect(target,card,player,player)>=0)) return 2;
+							if(target.hasSkill('nogain')&&player.canUse(card,target,false)) return get.effect(target,card,player,player)
+							if(player.hasShan()) return 1;
+							if(att&&target.hasShan()) return 1;
+							return 0;
+						},
+					},
+				},
+			},
+			dingfa:{
+				audio:2,
+				trigger:{player:'phaseDiscardAfter'},
+				direct:true,
+				filter:function(event,player){
+					var num=0;
+					player.getHistory('lose',function(evt){
+						num+=evt.cards2.length;
+					});
+					return num>=player.hp;
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('dingfa'),'操作提示：选择自己以回复体力，或选择其他角色以造成伤害',function(card,player,target){
+						return target==player?player.isDamaged():true;
+					}).set('ai',function(target){
+						return target!=player?get.damageEffect(target,player,player):get.recoverEffect(player,player,player)
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('dingfa',target);
+						if(target==player) player.recover();
+						else target.damage();
+					}
+				},
+			},
 			dz_mantianguohai:{
 				mod:{
 					ignoredHandcard:function(card,player){
@@ -1167,6 +1352,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twyingjia_info:'一名角色的回合结束时，若你本回合内使用过两张或更多的同名锦囊牌，则你可弃置一张手牌并令一名角色进行一个额外回合。',
 			dz_mantianguohai:'瞒天过海',
 			dz_mantianguohai_info:'此牌不计入拥有者的手牌上限。出牌阶段，对一至两名区域内有牌的其他角色使用。你获得目标角色一张牌，然后依次交给每名目标角色各一张牌。',
+			jiachong:'贾充',
+			beini:'悖逆',
+			beini_info:'出牌阶段限一次，你可以选择一名体力值不小于你的角色，令你或其摸两张牌，然后未摸牌的角色视为对摸牌的角色使用一张【杀】。',
+			dingfa:'定法',
+			dingfa_info:'弃牌阶段结束时，若本回合你失去的牌数不小于你的体力值，你可以选择一项：1、回复1点体力；2、对一名其他角色造成1点伤害。 ',
+			duosidawang:'朵思大王',
+			equan:'恶泉',
+			equan_info:'锁定技。①当有角色于你的回合内受到伤害后，其获得X枚“毒”（X为伤害值）。②准备阶段，你令所有拥有“毒”标记的角色移去所有“毒”标记并失去等量的体力。③当有角色因〖恶泉②〗进入濒死状态时，你令其所有非锁定技失效直到回合结束。',
+			manji:'蛮汲',
+			manji_info:'锁定技。其他角色失去体力后，若你的体力值：不大于该角色，你回复1点体力；不小于该角色，你摸一张牌。',
+			wuban:'吴班',
+			jintao:'进讨',
+			jintao_info:'锁定技，你使用【杀】无距离限制且次数上限+1。你于出牌阶段内使用的第一张【杀】伤害+1，第二张【杀】不可被响应。',
 			tw_mobile:'移动版',
 			tw_yijiang:'一将成名TW',
 			tw_english:'英文版',

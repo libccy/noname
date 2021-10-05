@@ -718,7 +718,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						card=event.directButton.link;
 					}
 					else{
-						card=result.links[0];
+						for(var i of dialog.buttons){
+							if(i.link==result.links[0]){
+								card=i.link;
+								break;
+							}
+						}
+						if(!card) card=event.dialog.buttons[0].link;
 					}
 
 					var button;

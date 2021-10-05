@@ -977,6 +977,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(target.hasSkill('drlt_xiongluan2')) return true;
 					},
 				},
+				charlotte:true,
 			},
 			'drlt_xiongluan2':{
 				mod:{
@@ -991,6 +992,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 				},
+				charlotte:true,
 			},
 			
 			

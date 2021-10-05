@@ -134,7 +134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var hs=player.getCards('he');
 					if(!hs.length||!target.isIn()) event.finish();
 					else if(hs.length<=num) event._result={bool:true,cards:hs};
-					else player.chooseCard('he',true,'选择交给'+get.translation(target)+get.cnNumber(num)+'张牌');
+					else player.chooseCard('he',true,'选择交给'+get.translation(target)+get.cnNumber(num)+'张牌',num);
 					'step 2'
 					if(result.bool&&result.cards&&result.cards.length) target.gain(result.cards,player,'giveAuto');
 				},
@@ -162,17 +162,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard'},
 				forced:true,
 				filter:function(event,player){
-					return (event.card.name=='tao'||event.card.name=='wuxie')&&((player!=status.currentPhase&&!player.hasMark('tongyuan_'+event.card.name))||(player.hasMark('tongyuan_tao')&&player.hasMark('tongyuan_wuxie')));
+					return (event.card.name=='tao'||event.card.name=='wuxie')&&((player!=_status.currentPhase&&!player.hasMark('tongyuan_'+event.card.name))||(player.hasMark('tongyuan_tao')&&player.hasMark('tongyuan_wuxie')));
 				},
 				content:function(){
 					if(!player.hasMark('tongyuan_'+trigger.card.name)){
 						player.addMark('tongyuan_'+trigger.card.name,1,false);
 						game.log(player,'修改了技能','#g【摧坚】');
 					}
-					else if(trigger.card.name=='wuxie') trigger.directHit.addArray(game.players);
+					else{
+					if(trigger.card.name=='wuxie') trigger.directHit.addArray(game.players);
 					else{
 						if(typeof trigger.baseDamage!='number') trigger.baseDamage=1;
 						trigger.baseDamage++;
+					}
 					}
 				},
 			},
@@ -241,6 +243,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return player.countDisabled()>=5;
 						},
 						content:function(){
+							player.gainMaxHp(2);
 							player.addSkill('xianwei_effect');
 						},
 					},
@@ -382,14 +385,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return evt&&evt.hs&&evt.hs.length&&current.countCards('h')==0;
 				},
 				usable:1,
-				logTarget:'player',
+				logTarget:function(){
+					return _status.currentPhase;
+				},
 				prompt2:'与该角色各摸两张牌',
 				check:function(event,player){
-					return get.attitude(player,event.player)>0;
+					return get.attitude(player,_status.currentPhase)>0;
 				},
 				content:function(){
 					'step 0'
-					game.asyncDraw([trigger.player,player],2);
+					game.asyncDraw([_status.currentPhase,player],2);
 					'step 1'
 					var e1=player.getHistory('gain',function(evt){
 						return evt.getParent(2)==event;
@@ -398,11 +403,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addTempSkill('yaner_zhiren',{player:'phaseBegin'});
 						game.log(player,'修改了技能','#g【织纴】');
 					}
-					if(trigger.player.isIn()&&trigger.player.isDamaged()){
-						var e2=trigger.player.getHistory('gain',function(evt){
+					var target=_status.currentPhase;
+					if(target.isIn()&&target.isDamaged()){
+						var e2=target.getHistory('gain',function(evt){
 							return evt.getParent(2)==event;
 						})[0];
-						if(e2&&e2.cards&&e2.cards.length==2&&get.type(e2.cards[0])==get.type(e2.cards[1])) trigger.player.recover();
+						if(e2&&e2.cards&&e2.cards.length==2&&get.type(e2.cards[0])==get.type(e2.cards[1])) target.recover();
 					}
 					'step 2'
 					game.delayx();
@@ -9560,6 +9566,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huaxin:'华歆（157年－232年1月30日），字子鱼，汉族。平原郡高唐县人（今山东省高唐县）。汉末至三国曹魏初年名士、重臣。华歆早年拜太尉陈球为师，与卢植、郑玄、管宁等为同门，又与管宁、邴原共称一龙，华歆为龙头。汉灵帝时华歆被举为孝廉，任郎中，因病去官。又被大将军何进征召为尚书郎。后任豫章太守，甚得民心。孙策率军南下，华歆举郡投降，被奉为上宾。官渡之战时，被征为议郎、参司空军事。入为尚书、侍中，又代荀彧为尚书令。丞相曹操讨孙权时，授华歆为军师。后为魏王国的御史大夫。曹丕即王位，拜华歆为相国，封安乐乡侯。曹魏建立后，其相国职名改称司徒。魏明帝即位，升任太尉，晋封博平侯。太和五年十二月（232年1月），华歆去世，年七十五，谥号“敬”。有文集三十卷，今佚失，其余见《全三国文》。',
 			luyusheng:'陆郁生（？年-？），三国时期吴国官员陆绩之女。陆郁生的父亲陆绩是吴郡公认的才子，又是当时吴郡陆氏的领袖。陆绩赴任担任郁林太守，遂取此名。陆郁生年少的时候就定下坚贞的志向。建安二十四年（219年)，陆绩早亡，她与两个兄弟陆宏、陆睿当时都只有几岁，一起返回吴县，被他们的从兄陆瑁接回抚养。13周岁的陆郁生嫁给同郡出身的张白为妻。出嫁3个月后，张白因为其兄张温一族的案件遭到连坐，被处以流刑，后死于流放地，陆郁生成为了寡妇，其后公开宣言不再改嫁，困难于生计但拒绝了所有提亲，在艰苦中从未停止服侍、照顾张白的姐妹。事情传到朝廷，皇帝褒奖陆郁生，号其为“义姑”。她的表侄姚信在文集中称赞她的义举。',
 			dongxie:'董卓之女，牛辅之妻。在《三国群英传》中名为董宜，在电视剧《三国群英会之吕布与貂蝉》中名为董媛。',
+			caoanmin:'曹安民（？-197年），沛国谯县（今安徽亳州）人，字安民。东汉时期人物，曹德之子，曹操之侄，曹昂的堂兄弟，曹丕的堂兄，死于宛城之战。按曹丕《典论》记载的“亡兄孝廉子脩、从兄安民遇害。”等情况来看，安民应该是曹操侄子错不了，曹丕是他们属于兄弟关系肯定不会弄错。另外从典论的记载来看安民是和子脩并提的，子脩是曹昂的字，安民则肯定也是字不是名，至于三国志中记载则应取自曹丕之《典论》但陈寿又不知曹安民其名，故写为“长子昂、弟子安民”。',
 		},
 		characterTitle:{
 			wulan:'#b对决限定武将',
