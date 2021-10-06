@@ -1038,6 +1038,7 @@ window.noname_character_rank={
 		'longyufei',
 		'sp_zhangwen',
 		're_zoushi',
+		'yuejiu',
 	],
 	c:[
 		'xiahoudun',

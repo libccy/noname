@@ -5,12 +5,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			tw:{
-				tw_mobile:['tw_beimihu','nashime','tw_gexuan','tw_dongzhao','jiachong','duosidawang','wuban'],
+				tw_mobile:['tw_beimihu','nashime','tw_gexuan','tw_dongzhao','jiachong','duosidawang','wuban','yuejiu'],
 				tw_yijiang:['tw_caoang','tw_caohong','tw_zumao','tw_dingfeng','tw_maliang','tw_xiahouba'],
 				tw_english:['kaisa'],
 			},
 		},
 		character:{
+			yuejiu:['male','qun',4,['cuijin']],
 			wuban:['male','shu',4,['jintao']],
 			duosidawang:['male','qun','4/5',['equan','manji']],
 			jiachong:['male','qun',3,['beini','dingfa']],
@@ -31,6 +32,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jiachong:'贾充（217年—282年），字公闾，平阳襄陵（今山西襄汾）人，三国曹魏至西晋时期大臣，曹魏豫州刺史贾逵之子。西晋王朝的开国元勋。出身平阳贾氏。曾参与镇压淮南二叛和弑杀魏帝曹髦，因此深得司马氏信任，其女儿贾褒（一名荃）及贾南风分别嫁予司马炎弟司马攸及次子司马衷，与司马氏结为姻亲，地位显赫。晋朝建立后，转任车骑将军、散骑常侍、尚书仆射，后升任司空、太尉等要职。更封鲁郡公。咸宁末，为使持节、假黄钺、大都督征讨吴国。吴国平定后，增邑八千户。太康三年（282年），贾充去世。西晋朝廷追赠他为太宰，礼官议谥曰荒，司马炎不采纳，改谥为武。有集五卷。',
 			duosidawang:'朵思大王是《三国演义》中人物，南蛮秃龙洞的元帅，孟获弟弟孟优的朋友，据说是南蛮第一智者。',
 			wuban:'吴班，字元雄，生卒年不详，兖州陈留郡（治今河南省开封市）人。三国时期蜀汉将领。为领军，随刘备参加伐吴之战，后又随蜀汉丞相诸葛亮参加北伐曹魏的战争，并于公元231年（建兴九年）的北伐中大破司马懿。官至骠骑将军，封绵竹侯。吴班以豪爽侠义著称于当时，又因族妹吴氏是蜀汉穆皇后，在蜀汉将领中有较高的地位。',
+			yuejiu:'乐就（？－197），在袁术为攻徐州而大兴七军之际，以督战官之身份担任联络之役。但是，袁术军不幸战败，其也在寿春被曹操军逮捕并遭到斩首。',
 		},
 		card:{
 			dz_mantianguohai:{
@@ -129,6 +131,50 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			cuijin:{
+				trigger:{global:'useCard'},
+				direct:true,
+				filter:function(event,player){
+					return event.card.name=='sha'&&(event.player==player||player.inRange(event.player))&&player.countCards('h')>0;
+				},
+				content:function(){
+					'step 0'
+					var target=trigger.player;
+					event.target=target;
+					player.chooseToDiscard('he',get.prompt('cuijin',target),'弃置一张牌并令'+get.translation(trigger.player)+'使用的【杀】伤害+1，但若其未造成伤害，则你对其造成1点伤害。').logSkill=['cuijin',target];
+					'step 1'
+					if(result.bool){
+						if(typeof trigger.baseDamage!='number') trigger.baseDamage=1;
+						trigger.baseDamage++;
+						player.addTempSkill('cuijin_damage');
+						player.markAuto('cuijin_damage',[trigger.card]);
+					}
+				},
+				subSkill:{
+					damage:{
+						trigger:{global:'useCardAfter'},
+						forced:true,
+						popup:false,
+						charlotte:true,
+						onremove:true,
+						filter:function(event,player){
+							return player.storage.cuijin_damage.contains(event.card);
+						},
+						content:function(){
+							player.storage.cuijin_damage.remove(trigger.card);
+							if(!player.storage.cuijin_damage.length) player.removeSkill('cuijin_damage');
+							if(trigger.player.isIn()&&!game.hasPlayer2(function(current){
+								return current.hasHistory('damage',function(evt){
+									return evt.card==trigger.card;
+								});
+							})){
+								player.line(trigger.player,'green');
+								trigger.player.damage();
+							}
+						},
+					},
+				},
+			},
 			jintao:{
 				mod:{
 					cardUsable:function(card,player,num){
@@ -1365,6 +1411,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wuban:'吴班',
 			jintao:'进讨',
 			jintao_info:'锁定技，你使用【杀】无距离限制且次数上限+1。你于出牌阶段内使用的第一张【杀】伤害+1，第二张【杀】不可被响应。',
+			yuejiu:'乐就',
+			cuijin:'催进',
+			cuijin_info:'当你或你攻击范围内的角色使用【杀】时，你可以弃置一张牌并获得如下效果：此【杀】的伤害值基数+1，且当此【杀】结算结束后，若未造成过伤害，则你对使用者造成1点伤害。',
 			tw_mobile:'移动版',
 			tw_yijiang:'一将成名TW',
 			tw_english:'英文版',

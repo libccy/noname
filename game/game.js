@@ -24711,7 +24711,7 @@
 						next._modparent=event;
 						game.resume();
 					},this.name,this._args||[],this._set,
-					get.stringifiedResult(this.parent,3),get.skillState(this.player));
+					get.stringifiedResult(this.parent),get.skillState(this.player));
 					this.player.wait();
 					game.pause();
 				},
@@ -50472,6 +50472,36 @@
 			}
 			return func;
 		},
+		eventInfoOL:function(item,level){
+			if(Object.prototype.toString.call(item)=='[object Object]'){
+				var item2={};
+				for(var i in item){
+					if(i=='_trigger'){
+						if(level!==false) item2[i]=get.eventInfoOL(item[i],false);
+					}
+					else if(lib.element.event[i]||i=='content'||get.itemtype(item[i])=='event') continue;
+					else item2[i]=get.stringifiedResult(item[i],level-1);
+				}
+				return '_noname_event:'+JSON.stringify(item2);
+			}
+			else{
+				return '';
+			}
+		},
+		infoEventOL:function(item){
+			var evt;
+			try{
+				evt=JSON.parse(item.slice(14));
+				for(var i in evt){
+					evt[i]=get.parsedResult(evt[i]);
+				}
+				for(var i in lib.element.event) evt[i]=lib.element.event[i];
+			}
+			catch(e){
+				console.log(e);
+			}
+			return evt||item;
+		},
 		stringifiedResult:function(item,level){
 			if(!item) return item;
 			if(typeof item=='function'){
@@ -50483,6 +50513,7 @@
 					case 'cards': return get.cardsInfoOL(item);
 					case 'player': return get.playerInfoOL(item);
 					case 'players': return get.playersInfoOL(item);
+					case 'event': return get.eventInfoOL(item);
 					default:
 					if(typeof level!='number'){
 						level=5;
@@ -50530,6 +50561,9 @@
 				}
 				else if(item.indexOf('_noname_player:')==0){
 					return get.infoPlayerOL(item);
+				}
+				else if(item.indexOf('_noname_event:')==0){
+					return get.infoEventOL(item);
 				}
 				else if(item=='_noname_infinity'){
 					return Infinity;
@@ -50729,6 +50763,9 @@
 				if(obj.classList.contains('card')) return 'card';
 				if(obj.classList.contains('player')) return 'player';
 				if(obj.classList.contains('dialog')) return 'dialog';
+			}
+			if(get.is.object(obj)){
+				if(obj.isMine==lib.element.event.isMine) return 'event';
 			}
 		},
 		equipNum:function(card){
