@@ -490,7 +490,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.triggername=='phaseJieshuBegin'){
 						var num=trigger.player.countCards('h');
 						if(num>0) player.chooseToDiscard(get.prompt('xindanshou',trigger.player),num,'弃置'+get.cnNumber(num)+'张牌并对'+get.translation(trigger.player)+'造成1点伤害','he').set('logSkill',['xindanshou',trigger.player]).set('ai',function(card){
-							if(get.damageEffect(_status.event.getTrigger().player,_status.event.player,_status.event.player)>0) return 6-get.value(card);
+							if(get.damageEffect(_status.event.getTrigger().player,_status.event.player,_status.event.player)>0) return Math.max(5.5,8-_status.event.selectTarget)-get.value(card);
 							return -1;
 						});
 						else player.chooseBool(get.prompt('xindanshou',trigger.player),'对'+get.translation(trigger.player)+'造成1点伤害').ai=function(){
@@ -506,7 +506,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						});
 						event.num=num;
-						player.chooseBool(get.prompt('xindanshou')+'（可摸'+get.cnNumber(num)+'张牌）',get.translation('xindanshou_info'));
+						player.chooseBool(get.prompt('xindanshou')+'（可摸'+get.cnNumber(num)+'张牌）',get.translation('xindanshou_info')).set('ai',function(){
+							return _status.event.choice;
+						}).set('choice',function(){
+							if(player.isPhaseUsing()){
+								if(player.countCards('h',function(card){
+									return ['basic','trick'].contains(get.type(card,'trick'))&&player.canUse(card,player,null,true)&&get.effect(player,card,player)>0&&player.getUseValue(card,null,true)>0;
+								})) return false;
+								return true;
+							}
+							if(num>2) return true;
+							var card=trigger.card;
+							if(get.tag(card,'damage')&&player.hp<=trigger.getParent().baseDamage&&(!get.tag(card,'respondShan')||!player.hasShan())&&(!get.tag(card,'respondSha')||!player.hasSha())) return true;
+							var source=_status.currentPhase,todis=(source.countCards('h')-Math.max(0,source.needsToDiscard()));
+							if(todis<=Math.max(Math.min(2+(source.hp<=1?1:0),player.countCards('he',function(card){
+								return get.value(card,player)<Math.max(5.5,8-todis)
+							})),player.countCards('he',function(card){
+								return get.value(card,player)<=0;
+							}))&&get.damageEffect(source,player,player)>0) return false;
+							if(!source.isPhaseUsing()||get.attitude(player,source)>0) return true;
+							if(card.name=='sha'&&!source.getCardUsable('sha')) return true;
+							return Math.random()<num/3;
+						}());
 					}
 					'step 1'
 					if(result.bool){
@@ -523,6 +544,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				subSkill:{as:{sub:true}},
+				ai:{
+					threaten:0.6,
+					effect:{
+						target:function(card,player,target,current){
+							if(typeof card!='object'||target.hasSkill('xindanshou_as')||!['basic','trick'].contains(get.type(card,'trick'))) return;
+							var num=0;
+							game.countPlayer2(function(current){
+								var history=current.getHistory('useCard');
+								for(var j=0;j<history.length;j++){
+									if(['basic','trick'].contains(get.type(history[j].card,'trick'))&&history[j].targets&&history[j].targets.contains(player)) num++;
+								}
+							});
+							if(player==target&&current>0) return [1.1,num];
+							return [0.9,num];
+						},
+					},
+				},
 			},
 			xinbenxi:{
 				group:['xinbenxi_summer','xinbenxi_damage'],

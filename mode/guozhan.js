@@ -394,7 +394,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_wujing:['male','wu',4,['donggui','fengyang'],['gzskin']],
 				gz_yanbaihu:['male','qun',4,['gzzhidao','gzyjili'],['gzskin']],
 				gz_xuyou:['male','wei',3,['gzchenglve','gzshicai'],['doublegroup:wei:qun']],
-				gz_xiahouba:['male','shu',4,['gzbaolie'],['doublegroup:shu:wei']],
+				gz_xiahouba:['male','shu',4,['gzbaolie'],['doublegroup:shu:wei','gzskin']],
 				gz_panjun:['male','wu',3,['gzguanwei','xinfu_gongqing'],['doublegroup:wu:shu']],
 				gz_huangzu:['male','qun',4,['gzwangong']],
 				gz_zhugeke:['male','wu',3,['aocai','gzduwu']],

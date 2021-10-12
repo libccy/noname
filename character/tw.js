@@ -11,6 +11,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			tw_zhaoxiang:['female','shu',4,['refanghun','twfuhan','twqueshi']],
 			yuejiu:['male','qun',4,['cuijin']],
 			wuban:['male','shu',4,['jintao']],
 			duosidawang:['male','qun','4/5',['equan','manji']],
@@ -119,7 +120,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						equipValue:7,
 					}
 				},
-				skills:['gx_chongyingshenfu']
+				skills:['gx_chongyingshenfu'],
+				loseDelay:false,
+			},
+			meiyingqiang:{
+				fullskin:true,
+				type:'equip',
+				subtype:'equip1',
+				cardimage:'yinyueqiang',
+				derivation:'tw_zhaoxiang',
+				distance:{attackFrom:-2},
+				ai:{
+					basic:{
+						equipValue:4.5,
+					}
+				},
+				skills:['meiyingqiang'],
 			},
 		},
 		characterFilter:{
@@ -131,6 +147,131 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			twfuhan:{
+				audio:'fuhan',
+				trigger:{player:'phaseZhunbeiBegin'},
+				unique:true,
+				limited:true,
+				skillAnimation:true,
+				animationColor:'orange',
+				forceunique:true,
+				filter:function(event,player){
+					return player.countMark('fanghun')>0;
+				},
+				prompt:function(event,player){
+					var num=Math.max(2,player.storage.fanghun);
+					num=Math.min(num,8);
+					return get.prompt('twfuhan')+'（体力上限：'+num+'）';
+				},
+				check:function(event,player){
+					if(player.storage.fanghun>=Math.min(4,player.maxHp)) return true;
+					if(player.hp<=2&&player.storage.fanghun>=3) return true;
+					return false;
+				},
+				content:function(){
+					'step 0'
+					event.num=player.storage.fanghun;
+					player.removeMark('fanghun',player.storage.fanghun);
+					player.awakenSkill('twfuhan');
+					if(_status.characterlist){
+						list=[];
+						for(var i=0;i<_status.characterlist.length;i++){
+							var name=_status.characterlist[i];
+							if(lib.character[name][1]=='shu') list.push(name);
+						}
+					}
+					else if(_status.connectMode){
+						list=get.charactersOL(function(i){
+							return lib.character[i][1]!='shu';
+						});
+					}
+					else{
+						list=get.gainableCharacters(function(info){
+							return info[1]=='shu';
+						});
+					}
+					var players=game.players.concat(game.dead);
+					for(var i=0;i<players.length;i++){
+						list.remove(players[i].name);
+						list.remove(players[i].name1);
+						list.remove(players[i].name2);
+					}
+					list.remove('zhaoxiang');
+					player.chooseButton(['扶汉：选择获得一张武将牌上的所有技能',[list.randomGets(5),'character']],true);
+					'step 1'
+					if(result.bool){
+						var name=result.links[0];
+						player.flashAvatar('twhuashen',name);
+						game.log(player,'获得了','#y'+get.translation(name),'的所有技能');
+						player.addSkill(lib.character[name][3])
+					}
+					'step 2'
+					var num=event.num-player.maxHp;
+					if(num>0) player.gainMaxHp(num);
+					else player.loseMaxHp(-num);
+					player.recover();
+					'step 3'
+					var card=get.cardPile('meiyingqiang','field');
+					if(card){
+						player.gain(card,'gain2','log');
+					}
+				},
+			},
+			twqueshi:{
+				trigger:{
+					global:'gameDrawAfter',
+					player:'enterGame',
+				},
+				forced:true,
+				locked:false,
+				filter:function(event,player){
+					return !player.isDisabled(1);
+				},
+				content:function(){
+					if(!lib.inpile.contains('meiyingqiang')){
+						lib.inpile.push('meiyingqiang');
+						player.equip(game.createCard('meiyingqiang','diamond',12));
+					}
+					else{
+						var card=get.cardPile(function(card){
+							return card.name=='meiyingqiang'&&card!=player.getEquip(1);
+						},'field');
+						if(card) player.equip(card);
+					}
+				},
+			},
+			meiyingqiang:{
+				equipSkill:true,
+				trigger:{
+					player:['loseAfter','gainAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
+				},
+				filter:function(event,player){
+					if(player==_status.currentPhase) return false;
+					var evt=event.getl(player);
+					if(!evt||!evt.cards2||!evt.cards2.length) return false;
+					var list=player.getHistory('lose',function(evt){
+						return evt.cards2&&evt.cards2.length;
+					});
+					if(event.name=='lose'){
+						if(list.indexOf(event)!=0) return false;
+					}
+					else{
+						if(!player.hasHistory('lose',function(evt){
+							return evt.getParent()==event&&list.indexOf(evt)==0;
+						})) return false;
+					}
+					return _status.connectMode||!lib.config.skip_shan||player.hasSha();
+				},
+				direct:true,
+				content:function(){
+					if(trigger.delay===false) game.delayx();
+					player.chooseToUse('梅影枪：是否使用一张【杀】？',function(card){
+						if(get.name(card)!='sha') return false;
+						return lib.filter.cardEnabled.apply(this,arguments);
+					}).set('addCount',false).logSkill='meiyingqiang';
+				},
+			},
 			cuijin:{
 				trigger:{global:'useCard'},
 				direct:true,
@@ -139,9 +280,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
+					if(player!=game.me&&!player.isOnline()) game.delayx();
 					var target=trigger.player;
 					event.target=target;
-					player.chooseToDiscard('he',get.prompt('cuijin',target),'弃置一张牌并令'+get.translation(trigger.player)+'使用的【杀】伤害+1，但若其未造成伤害，则你对其造成1点伤害。').logSkill=['cuijin',target];
+					player.chooseToDiscard('he',get.prompt('cuijin',target),'弃置一张牌并令'+get.translation(trigger.player)+'使用的【杀】伤害+1，但若其未造成伤害，则你对其造成1点伤害。').set('ai',function(card){
+						if(_status.event.goon) return 7-get.value(card);
+						return 0;
+					}).set('goon',function(){
+						var d1=true;
+						if(trigger.player.hasSkill('jueqing')||trigger.player.hasSkill('gangzhi')) d1=false
+						for(var target of trigger.targets){
+							if(!target.mayHaveShan()||trigger.player.hasSkillTag('directHit_ai',true,{
+								target:target,
+								card:trigger.card,
+							},true)){
+								if(!target.hasSkill('gangzhi')) d1=false;
+								if(!target.hasSkillTag('filterDamage',null,{
+									player:trigger.player,
+									card:trigger.card,
+								})&&get.attitude(player,target)<0) return true;
+							}
+						}
+						if(d1) return get.damageEffect(trigger.player,player,player)>0;
+						return false;
+					}()).logSkill=['cuijin',target];
 					'step 1'
 					if(result.bool){
 						if(typeof trigger.baseDamage!='number') trigger.baseDamage=1;
@@ -528,17 +690,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				content:function(){
-					player.addSkill('gx_chongyingshenfu_effect');
 					player.markAuto('gx_chongyingshenfu_effect',[trigger.card.name]);
 				},
+				group:'gx_chongyingshenfu_effect',
 				subSkill:{
 					effect:{
 						trigger:{player:'damageBegin4'},
 						forced:true,
 						equipSkill:true,
-						charlotte:true,
 						filter:function(event,player){
-							if(!event.card||!event.card.name||!player.getStorage('gx_chongyingshenfu_effect').contains(event.card.name)) return false;
+							if(!event.card||!event.card.name||!player.storage.gx_chongyingshenfu_effect||!player.getStorage('gx_chongyingshenfu_effect').contains(event.card.name)) return false;
 							if(player.hasSkillTag('unequip2')) return false;
 							if(event.source.hasSkillTag('unequip',false,{
 								name:event.card.name,
@@ -1390,7 +1551,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gx_taijifuchen:'太极拂尘',
 			gx_taijifuchen_info:'锁定技，当你使用【杀】指定目标后，你令目标角色选择一项：①弃置一张牌，若此牌和【杀】花色相同，则你获得之。②其不可响应此【杀】。',
 			gx_chongyingshenfu:'冲应神符',
-			gx_chongyingshenfu_info:'锁定技，当你受到牌造成的伤害后，你令所有同名牌对你造成的伤害-1直到游戏结束。',
+			gx_chongyingshenfu_info:'锁定技。①当你受到牌造成的伤害后，你记录此牌的名称。②当你受到〖冲应神符①〗记录过的牌造成的伤害时，你令此牌伤害-1。',
 			tw_dongzhao:'TW董昭',
 			twmiaolve:'妙略',
 			twmiaolve_info:'游戏开始时，你获得两张【瞒天过海】。当你受到1点伤害后，你可选择：①获得一张【瞒天过海】并摸一张牌。②获得一张智囊。',
@@ -1414,6 +1575,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuejiu:'乐就',
 			cuijin:'催进',
 			cuijin_info:'当你或你攻击范围内的角色使用【杀】时，你可以弃置一张牌并获得如下效果：此【杀】的伤害值基数+1，且当此【杀】结算结束后，若未造成过伤害，则你对使用者造成1点伤害。',
+			tw_zhaoxiang:'TW赵襄',
+			twfuhan:'扶汉',
+			twfuhan_info:'限定技。准备阶段开始时时，你可以移去所有"梅影"标记，然后从五张未登场的蜀势力武将牌中选择一名获得其所有技能，将体力上限数调整为以此技能移去所有“梅影”标记的数量（最少为2，最多为8）并回复1点体力，然后从牌堆/弃牌堆/场上获得【梅影枪】。',
+			twqueshi:'鹊拾',
+			twqueshi_info:'游戏开始时，你将【梅影枪】置于你的装备区。',
+			meiyingqiang:'梅影枪',
+			meiyingqiang_info:'当你于其他角色的回合内第一次失去牌时，你可以使用一张【杀】。',
 			tw_mobile:'移动版',
 			tw_yijiang:'一将成名TW',
 			tw_english:'英文版',

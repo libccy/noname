@@ -11550,7 +11550,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinpi:['xinpi','sp_xinpi'],
 			duyu:['duyu','sp_duyu'],
 			zhangwen:['sp_zhangwen','zhangwen'],
-			//bianfuren:['sp_bianfuren','bianfuren'],
+			bianfuren:['bianfuren','sp_bianfuren'],
 		},
 		translate:{
 			liuzan:'手杀留赞',

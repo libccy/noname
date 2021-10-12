@@ -32752,7 +32752,7 @@
 					else{
 						skills2=player.getSkills(true,true,false);
 					}
-					skills2=game.filterSkills(skills2.concat(lib.skill.global),player,player.getSkills('e'));
+					skills2=game.filterSkills(skills2.concat(lib.skill.global),player,player.getSkills('e').concat(lib.skill.global));
 					event._skillChoice=[];
 					game.expandSkills(skills2);
 					for(i=0;i<skills2.length;i++){
@@ -52922,30 +52922,34 @@
 		sgnAttitude:function(){
 			return get.sgn(get.attitude.apply(this,arguments));
 		},
-		useful:function(card){
+		useful:function(card,player){
 			if(get.position(card)=='j') return -1;
 			if(get.position(card)=='e') return get.equipValue(card);
 			if(card._modUseful){
 				return card._modUseful();
 			}
 			var i=0;
-			if(_status.event.player){
-				i=_status.event.player.getCards('h',card.name).indexOf(card);
+			if(!player) player=_status.event.player;
+			if(player){
+				i=player.getCards('h',card.name).indexOf(card);
 				if(i<0) i=0;
 			}
 			var aii=get.info(card).ai;
 			var useful;
 			if(aii&&aii.useful) useful=aii.useful;
 			else if(aii&&aii.basic) useful=aii.basic.useful;
-			if(useful==undefined) return -1;
-			if(typeof useful=='function'){
-				return useful(card,i);
+			var result;
+			if(useful==undefined) result=-1;
+			else if(typeof useful=='function'){
+				result=useful(card,i);
 			}
-			if(typeof useful=='number') return useful;
-			if(i<useful.length){
-				return useful[i];
+			else if(typeof useful=='number') result=useful;
+			else if(i<useful.length){
+				result=useful[i];
 			}
-			return useful[useful.length-1];
+			else result=useful[useful.length-1];
+			result=game.checkMod(player,card,result,'aiUseful',player);
+			return result;
 		},
 		unuseful:function(card){
 			return -get.useful(card);
@@ -52976,7 +52980,7 @@
 			if(player==undefined||get.itemtype(player)!='player') player=_status.event.player;
 			var geti=function(){
 				var num=0,i;
-				var cards=player.getCards('h',card.name);
+				var cards=player.getCards('hs',card.name);
 				if(cards.contains(card)){
 					return cards.indexOf(card);
 				}

@@ -727,6 +727,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			qingguo:{
+				mod:{
+					aiValue:function(player,card,num){
+						if(get.name(card)!='shan'&&get.color(card)!='black') return;
+						var cards=player.getCards('hs',function(card){
+							return get.name(card)=='shan'||get.color(card)=='black';
+						});
+						cards.sort(function(a,b){
+							return (get.name(b)=='shan'?1:2)-(get.name(a)=='shan'?1:2);
+						});
+						var geti=function(){
+							if(cards.contains(card)){
+								return cards.indexOf(card);
+							}
+							return cards.length;
+						};
+						if(get.name(card)=='shan') return Math.min(num,[6,4,3][Math.min(geti(),2)])*0.6;
+						return Math.max(num,[6.5,4,3][Math.min(geti(),2)]);
+					},
+					aiUseful:function(){
+						return lib.skill.qingguo.mod.aiValue.apply(this,arguments);
+					},
+				},
+				locked:false,
 				audio:2,
 				enable:['chooseToRespond','chooseToUse'],
 				filterCard:function(card){
@@ -740,6 +763,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				prompt:'将一张黑色手牌当闪使用或打出',
 				check:function(){return 1},
 				ai:{
+					order:3,
 					respondShan:true,
 					skillTagFilter:function(player){
 						if(!player.countCards('hs',{color:'black'})) return false;
@@ -2372,6 +2396,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			jijiu:{
+				mod:{
+					aiValue:function(player,card,num){
+						if(get.name(card)!='tao'&&get.color(card)!='red') return;
+						var cards=player.getCards('hs',function(card){
+							return get.name(card)=='tao'||get.color(card)=='red';
+						});
+						cards.sort(function(a,b){
+							return (get.name(a)=='tao'?1:2)-(get.name(b)=='tao'?1:2);
+						});
+						var geti=function(){
+							if(cards.contains(card)){
+								return cards.indexOf(card);
+							}
+							return cards.length;
+						};
+						return Math.max(num,[6.5,4,3,2][Math.min(geti(),2)]);
+					},
+					aiUseful:function(){
+						return lib.skill.kanpo.mod.aiValue.apply(this,arguments);
+					},
+				},
+				locked:false,
 				audio:2,
 				audioname:['re_huatuo'],
 				enable:'chooseToUse',

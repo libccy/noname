@@ -1072,6 +1072,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				position:'e',
 				check:function(){return 1},
 				ai:{
+					order:0.5,
 					respondShan:true,
 					skillTagFilter:function(player){
 						if(!player.countCards('e')) return false;

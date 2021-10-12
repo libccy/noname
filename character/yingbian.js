@@ -667,7 +667,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'chexuan_lose',
 				subfrequent:['lose'],
 				ai:{
-					order:0.4,
+					order:6,
 					result:{
 						player:1,
 					},

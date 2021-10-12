@@ -4942,16 +4942,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					event.currented.push(event.current);
 					event.current.animate('target');
-					event.current.chooseToUse('乱武：使用一张杀或流失一点体力',{name:'sha'},function(card,player,target){
+					event.current.chooseToUse('乱武：使用一张杀或失去一点体力',function(card){
+						if(get.name(card)!='sha') return false;
+						return lib.filter.filterCard.apply(this,arguments)
+					},function(card,player,target){
 						if(player==target) return false;
-						if(!player.canUse('sha',target)) return false;
-						if(get.distance(player,target)<=1) return true;
-						if(game.hasPlayer(function(current){
-							return current!=player&&get.distance(player,current)<get.distance(player,target);
-						})){
-							return false;
+						var dist=get.distance(player,target);
+						if(dist>1){
+							if(game.hasPlayer(function(current){
+								return current!=player&&get.distance(player,current)<dist;
+							})){
+								return false;
+							}
 						}
-						return true;
+						return lib.filter.filterTarget.apply(this,arguments)
+					}).set('ai2',function(){
+						return get.effect_use.apply(this,arguments)+0.01;
 					});
 					"step 2"
 					if(result.bool==false) event.current.loseHp();
@@ -5092,6 +5098,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			kanpo:{
+				mod:{
+					aiValue:function(player,card,num){
+						if(get.name(card)!='wuxie'&&get.color(card)!='black') return;
+						var cards=player.getCards('hs',function(card){
+							return get.name(card)=='wuxie'||get.color(card)=='black';
+						});
+						cards.sort(function(a,b){
+							return (get.name(b)=='wuxie'?1:2)-(get.name(a)=='wuxie'?1:2);
+						});
+						var geti=function(){
+							if(cards.contains(card)){
+								return cards.indexOf(card);
+							}
+							return cards.length;
+						};
+						if(get.name(card)=='wuxie') return Math.min(num,[6,4,3][Math.min(geti(),2)])*0.6;
+						return Math.max(num,[6,4,3][Math.min(geti(),2)]);
+					},
+					aiUseful:function(){
+						return lib.skill.kanpo.mod.aiValue.apply(this,arguments);
+					},
+				},
+				locked:false,
 				audio:2,
 				enable:'chooseToUse',
 				filterCard:function(card){
@@ -7338,6 +7367,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guanqiujian:['guanqiujian','re_guanqiujian','old_guanqiujian'],
 			chendao:['chendao','ns_chendao'],
 			zhugezhan:['zhugezhan','old_zhugezhan'],
+			ol_lusu:['ol_lusu','re_lusu'],
 		},
 		translate:{
 			re_yuanshao:'袁绍',

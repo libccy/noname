@@ -698,6 +698,8 @@ window.noname_character_rank={
 		'xin_zhonghui',
 		'jiachong',
 		'wuban',
+		'tw_zhaoxiang',
+		'ol_lusu',
 	],
 	b:[
 		'diy_feishi',
@@ -888,6 +890,7 @@ window.noname_character_rank={
 		're_dongbai',
 		'xin_guyong',
 		'duosidawang',
+		're_jiaxu',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1427,6 +1430,7 @@ window.noname_character_rank={
 			'key_kotomi',
 			'zhongyan',
 			'kaisa',
+			'tw_zhaoxiang',
 		],
 		rare:[
 			'pal_shenqishuang',
@@ -1726,6 +1730,7 @@ window.noname_character_rank={
 			'zhangzhongjing',
 			'xin_zhonghui',
 			'jiachong',
+			'ol_lusu',
 		],
 		junk:[
 			'sunshao',

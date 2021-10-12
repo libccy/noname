@@ -222,12 +222,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							target:target,
 							card:card,
 						},true)) return false;
-						if(player.hasSkill('jueqing')||target.hasSkill('gangzhi')||target.hasSkill('gangzhi')) return false;
+						if(player.hasSkill('jueqing')||player.hasSkill('gangzhi')||target.hasSkill('gangzhi')) return false;
 						return true;
 					},
 					basic:{
-						useful:[5,1],
-						value:[5,1],
+						useful:[5,3,1],
+						value:[5,3,1],
 					},
 					order:function(item,player){
 						if(player.hasSkillTag('presha',true,null,true)) return 10;
@@ -293,8 +293,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			shacopy:{
 				ai:{
 					basic:{
-						useful:[5,1],
-						value:[5,1],
+						useful:[5,3,1],
+						value:[5,3,1],
 					},
 					order:3,
 					result:{
@@ -357,8 +357,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:3,
 					basic:{
-						useful:[7,2],
-						value:[7,2],
+						useful:[7,5.1,2],
+						value:[7,5.1,2],
 					},
 					result:{player:1},
 					//expose:0.2
@@ -389,8 +389,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(player.hasSkillTag('pretao')) return 5;
 							return 2;
 						},
-						useful:[8,6.5,5,4],
-						value:[8,6.5,5,4],
+						useful:[6.5,4,3,2],
+						value:[6.5,4,3,2],
 					},
 					result:{
 						target:2,
@@ -800,7 +800,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					basic:{
 						order:3,
-						useful:1,
+						useful:0.5,
 					},
 					result:{
 						target:function(player,target){
@@ -848,7 +848,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							return 11;
 						},
 						useful:[3,1],
-						value:0
+						value:0,
 					},
 					result:{
 						target:function(player,target){
@@ -886,7 +886,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
 							if(evt.player.hasSkillTag('notricksource')) return 0;
 							if(evt.target.hasSkillTag('notrick')) return 0;
-							return 11-get.value(card);
+							return get.order(card);
 						});
 						next.autochoose=lib.filter.autoRespondSha;
 					}
@@ -964,7 +964,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(evt.target.hasSkillTag('noShan')){
 								return -1;
 							}
-						return 11-get.value(card);
+						return get.order(card);
 						});
 						next.autochoose=lib.filter.autoRespondShan;
 					}
@@ -1101,14 +1101,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(event.player==target){
 								if(player.hasSkill('naman')) return -1;
 								if(get.attitude(target,player)<0||event.player.hp<=1){
-									return get.unuseful2(card)
+									return get.order(card);
 								}
 								return -1;
 							}
 							else{
 								if(target.hasSkill('naman')) return -1;
 								if(get.attitude(player,target)<0||event.player.hp<=1){
-									return get.unuseful2(card)
+									return get.order(card);
 								}
 								return -1;
 							}
@@ -1320,7 +1320,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					basic:{
 						order:9,
-						useful:1,
+						useful:5,
 						value:5,
 					},
 					yingbian:function(card,player,targets,viewer){
@@ -1445,8 +1445,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'trick',
 				ai:{
 					basic:{
-						useful:[6,4],
-						value:[6,4],
+						useful:[6,4,3],
+						value:[6,4,3],
 					},
 					result:{player:1},
 					expose:0.2
