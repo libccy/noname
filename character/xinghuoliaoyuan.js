@@ -880,8 +880,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					expose:0.5,
 				},
 			},
+			xinfu_gongqing_gz_panjun:{audio:2},
 			"xinfu_gongqing":{
 				audio:true,
+				audioname2:{gz_panjun:'xinfu_gongqing_gz_panjun'},
 				trigger:{
 					player:["damageBegin3","damageBegin4"],
 				},

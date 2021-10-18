@@ -548,24 +548,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(trigger.name=='die'){
 								var gain=trigger.player.countMark('quxi_gain'),lose=trigger.player.countMark('quxi_lose');
 								player.chooseTarget('是否令一名角色获得'+get.translation(trigger.player)+'的“'+(gain&&lose?'丰”和“歉':(gain?'丰':'歉'))+'”标记？',function(card,player,target){
-									return target!=player&&!target.hasMark('quxi_gain')&&!target.hasMark('quxi_lose');
+									return !target.hasMark('quxi_gain')&&!target.hasMark('quxi_lose');
 								}).set('goon',gain-lose).set('ai',function(target){
 									var evt=_status.event;
 									return evt.goon*get.attitude(evt.player,target);
 								});
 							}
-							else player.chooseTarget(2,'是否转移“丰”或“歉”标记？',function(card,player,target){
-								if(player==target) return false;
-								if(ui.selected.targets.length) return (!target.hasMark('quxi_gain')&&!target.hasMark('quxi_lose'));
-								return target.countMark('quxi_gain')>0||target.countMark('quxi_lose')>0;
-							}).set('complexTarget',true).set('complexSelect',true).set('targetprompt',['移走标记','获得标记']).set('ai',function(target){
-								var player=_status.event.player;
-								if(!ui.selected.targets.length){
-									return -get.attitude(player,target)*(target.countMark('quxi_gain')-target.countMark('quxi_lose'));
-								}
-								var targetx=ui.selected.targets[0];
-								return get.attitude(player,target)*(targetx.countMark('quxi_gain')-targetx.countMark('quxi_lose'));
-							});
+							else event.goto(2);
 							'step 1'
 							if(result.bool){
 								var targets=result.targets;
@@ -580,6 +569,59 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(lose){
 									targets[0].removeMark('quxi_lose',lose);
 									targets[1].addMark('quxi_lose',lose);
+								}
+								game.delayx();
+								event.finish();
+							}
+							'step 2'
+							if(game.hasPlayer(function(target){
+								return target.countMark('quxi_gain')>0;
+							})) player.chooseTarget(2,'是否转移“丰”标记？',function(card,player,target){
+								if(ui.selected.targets.length) return (!target.hasMark('quxi_gain')&&!target.hasMark('quxi_lose'));
+								return target.countMark('quxi_gain')>0;
+							}).set('complexTarget',true).set('complexSelect',true).set('targetprompt',['移走标记','获得标记']).set('ai',function(target){
+								var player=_status.event.player;
+								if(!ui.selected.targets.length){
+									return -get.attitude(player,target);
+								}
+								return get.attitude(player,target);
+							});
+							else event.goto(4);
+							'step 3'
+							if(result.bool){
+								var targets=result.targets;
+								player.logSkill('quxi_effect',targets,false);
+								player.line2(targets);
+								var gain=targets[0].countMark('quxi_gain');
+								if(gain){
+									targets[0].removeMark('quxi_gain',gain);
+									targets[1].addMark('quxi_gain',gain);
+								}
+								game.delayx();
+							}
+							'step 4'
+							if(game.hasPlayer(function(target){
+								return target.countMark('quxi_lose')>0;
+							})) player.chooseTarget(2,'是否转移“歉”标记？',function(card,player,target){
+								if(ui.selected.targets.length) return (!target.hasMark('quxi_gain')&&!target.hasMark('quxi_lose'));
+								return target.countMark('quxi_lose')>0;
+							}).set('complexTarget',true).set('complexSelect',true).set('targetprompt',['移走标记','获得标记']).set('ai',function(target){
+								var player=_status.event.player;
+								if(!ui.selected.targets.length){
+									return get.attitude(player,target);
+								}
+								return -get.attitude(player,target);
+							});
+							else event.finish();
+							'step 5'
+							if(result.bool){
+								var targets=result.targets;
+								player.logSkill('quxi_effect',targets,false);
+								player.line2(targets);
+								var gain=targets[0].countMark('quxi_lose');
+								if(gain){
+									targets[0].removeMark('quxi_lose',gain);
+									targets[1].addMark('quxi_lose',gain);
 								}
 								game.delayx();
 							}
@@ -2400,17 +2442,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mod:{
 					cardEnabled:function(card,player){
 						if(player.getStorage('zlshoufu2').filter(function(magic){
-							return get.type2(magic)==get.type(card);
+							return get.type2(magic)==get.type2(card);
 						}).length) return false;
 					},
 					cardRespondable:function(card,player){
 						if(player.getStorage('zlshoufu2').filter(function(magic){
-							return get.type2(magic)==get.type(card);
+							return get.type2(magic)==get.type2(card);
 						}).length) return false;
 					},
 					cardSavable:function(card,player){
 						if(player.getStorage('zlshoufu2').filter(function(magic){
-							return get.type2(magic)==get.type(card);
+							return get.type2(magic)==get.type2(card);
 						}).length) return false;
 					},
 				},

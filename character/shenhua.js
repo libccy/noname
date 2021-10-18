@@ -83,6 +83,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuanshu:['jiling'],
 			zhangxiu:['jiaxu'],
 			wangping:['jiangfei'],
+			jiangwei:['xiahouba'],
 		},
 		characterFilter:{
 			zuoci:function(mode){
@@ -759,6 +760,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					player.storage.drlt_poshi=true;
+					player.awakenSkill('drlt_poshi');
 					player.loseMaxHp();
 					"step 1"
 					var num=player.maxHp-player.countCards('h');

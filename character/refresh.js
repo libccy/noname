@@ -182,6 +182,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								selectTarget:targets.length==1?-1:1,
 								selectCard:num,
 								prompt:'将'+get.cnNumber(num)+'张手牌交给一名手牌数最少的其他角色',
+								forced:true,
 								ai1:function(card){
 									var goon=false,player=_status.event.player;
 									for(var i of _status.event.targets){
@@ -1568,7 +1569,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//国钟会
 			gzquanji:{
-				audio:'quanji',
+				audio:2,
 				trigger:{
 					player:'damageEnd',
 					source:'damageSource',
@@ -1610,7 +1611,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			gzpaiyi:{
-				audio:'paiyi',
+				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
 					return player.getStorage('gzquanji').length>0&&!player.hasSkill('gzquanji2');
@@ -1621,7 +1622,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					backup:function(links,player){
 						return {
-							audio:'paiyi',
+							audio:'gzpaiyi',
 							filterTarget:true,
 							filterCard:function(){return false},
 							selectCard:-1,
@@ -1664,7 +1665,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.delayx();
 					"step 1"
 					var num=player.getStorage('gzquanji').length;
-					if(num) target.draw(num);
+					if(num) target.draw(Math.min(7,num));
 					"step 2"
 					if(target.countCards('h')>player.countCards('h')){
 						target.damage();
@@ -8426,7 +8427,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.storage.refanjian=cards[0];
 					target.gain(cards[0],player,'give');
 					"step 1"
-					target.chooseControl('refanjian_card','refanjian_hp').ai=function(event,player){
+					var suit=get.suit(target.storage.refanjian);
+					if(!target.countCards('h')) event._result={control:'refanjian_hp'};
+					else target.chooseControl('refanjian_card','refanjian_hp').ai=function(event,player){
 						var cards=player.getCards('he',{suit:get.suit(player.storage.refanjian)});
 						if(cards.length==1) return 0;
 						if(cards.length>=2){
@@ -8451,7 +8454,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					"step 3"
-					target.discard(target.getCards('he',{suit:get.suit(target.storage.refanjian)}))
+					var suit=get.suit(target.storage.refanjian);
+					target.discard(target.getCards('he',function(i){
+						return get.suit(i)==suit&&lib.filter.cardDiscardable(i,target,'refanjian');
+					}));
 					delete target.storage.refanjian;
 				},
 				ai:{
@@ -10390,7 +10396,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gzquanji_info:'当你受到伤害后或当你使用牌指定唯一目标并对其造成伤害后，你可以摸一张牌，然后你将一张牌置于武将牌上，称为“权”；你的手牌上限+X（X为“权”的数量）。',
 			gzpaiyi:'排异',
 			gzpaiyi_backup:'排异',
-			gzpaiyi_info:'出牌阶段，你可以将移去一张“权”，然后选择一名角色并令其摸X张牌（X为“权”的数量），若其手牌数不小于你，则你对其造成1点伤害且本技能于此回合内失效。',
+			gzpaiyi_info:'出牌阶段，你可以将移去一张“权”，然后选择一名角色并令其摸X张牌（X为“权”的数量且至多为7），若其手牌数不小于你，则你对其造成1点伤害且本技能于此回合内失效。',
 			ol_zhurong:'界祝融',
 			changbiao:'长标',
 			changbiao_info:'出牌阶段限一次，你可以将任意张手牌当做【杀】使用（无距离限制）。若你因此【杀】对目标角色造成过伤害，则你于出牌阶段结束时摸X张牌（X为此【杀】对应的实体牌数量）。',

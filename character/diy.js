@@ -340,6 +340,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:true,
 				filterTarget:true,
 				selectTarget:[1,3],
+				derivation:'key_kano',
 				content:function(){
 					'step 0'
 					target.draw();

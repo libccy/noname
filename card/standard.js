@@ -1242,16 +1242,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(get.attitude(player,target)<=0) return (target.countCards('he',function(card){
 								return get.value(card,target)>0&&card!=target.getEquip('jinhe');
 							})>0)?-1.5:1.5;
-							var js=target.getCards('j');
-							if(js.length){
-								var jj=js[0].viewAs?{name:js[0].viewAs}:js[0];
-								//if(jj.name=='shunshou') return 3;
-								if(js.length==1&&get.effect(target,jj,target,player)>=0){
-									return -1.5;
-								}
-								return 3;
-							}
-							return -1.5;
+							return (target.countCards('ej',function(card){
+								if(get.position(card)=='e') return get.value(card,target)<=0;
+								var cardj=card.viewAs?{name:card.viewAs}:card;
+								return get.effect(target,cardj,target,player)<0;
+							})>0)?1.5:-1.5;
 						},
 						player:function(player,target){
 							if(get.attitude(player,target)<0&&!target.countCards('he',function(card){
@@ -1260,16 +1255,89 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								return 0;
 							}
 							if(get.attitude(player,target)>1){
-								var js=target.getCards('j');
-								if(js.length){
-									var jj=js[0].viewAs?{name:js[0].viewAs}:js[0];
-									//if(jj.name=='shunshou') return 1;
-									if(js.length==1&&get.effect(target,jj,target,player)>=0){
-										return 0;
-									}
-									return 1;
-								}
+								return (target.countCards('ej',function(card){
+									if(get.position(card)=='e') return get.value(card,target)<=0;
+									var cardj=card.viewAs?{name:card.viewAs}:card;
+									return get.effect(target,cardj,target,player)<0;
+								})>0)?1.5:-1.5;
+							}
+							return 1;
+						}
+					},
+					tag:{
+						loseCard:1,
+						gain:1,
+					}
+				}
+			},
+			shunshou_copy:{
+				ai:{
+					basic:{
+						order:7.5,
+						useful:4,
+						value:9
+					},
+					result:{
+						target:function(player,target){
+							if(get.attitude(player,target)<=0) return (target.countCards('he',function(card){
+								return get.value(card,target)>0&&card!=target.getEquip('jinhe');
+							})>0)?-1.5:1.5;
+							return (target.countCards('ej',function(card){
+								if(get.position(card)=='e') return get.value(card,target)<=0;
+								var cardj=card.viewAs?{name:card.viewAs}:card;
+								return get.effect(target,cardj,target,player)<0;
+							})>0)?1.5:-1.5;
+						},
+						player:function(player,target){
+							if(get.attitude(player,target)<0&&!target.countCards('he',function(card){
+								return get.value(card,target)>0&&card!=target.getEquip('jinhe');
+							})){
 								return 0;
+							}
+							if(get.attitude(player,target)>1){
+								return (target.countCards('ej',function(card){
+									if(get.position(card)=='e') return get.value(card,target)<=0;
+									var cardj=card.viewAs?{name:card.viewAs}:card;
+									return get.effect(target,cardj,target,player)<0;
+								})>0)?1.5:-1.5;
+							}
+							return 1;
+						}
+					},
+					tag:{
+						loseCard:1,
+						gain:1,
+					}
+				}
+			},
+			shunshou_copy2:{
+				ai:{
+					basic:{
+						order:7.5,
+						useful:4,
+						value:9
+					},
+					result:{
+						target:function(player,target){
+							if(get.attitude(player,target)<=0) return (target.countCards('he',function(card){
+								return get.value(card,target)>0&&card!=target.getEquip('jinhe');
+							})>0)?-1.5:1.5;
+							return (target.countCards('e',function(card){
+								return get.value(card,target)<=0;
+							})>0)?1.5:-1.5;
+						},
+						player:function(player,target){
+							if(get.attitude(player,target)<0&&!target.countCards('he',function(card){
+								return get.value(card,target)>0&&card!=target.getEquip('jinhe');
+							})){
+								return 0;
+							}
+							if(get.attitude(player,target)>1){
+								return (target.countCards('ej',function(card){
+									if(get.position(card)=='e') return get.value(card,target)<=0;
+									var cardj=card.viewAs?{name:card.viewAs}:card;
+									return get.effect(target,cardj,target,player)<0;
+								})>0)?1.5:-1.5;
 							}
 							return 1;
 						}
@@ -1335,19 +1403,95 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var att=get.attitude(player,target);
 							var nh=target.countCards('h');
 							if(att>0){
-								var js=target.getCards('j');
-								if(js.length){
-									var jj=js[0].viewAs?{name:js[0].viewAs}:js[0];
-									if(jj.name=='guohe'||js.length>1||get.effect(target,jj,target,player)<0){
-										return 3;
-									}
-								}
+								if(target.countCards('j',function(card){
+									var cardj=card.viewAs?{name:card.viewAs}:card;
+									return get.effect(target,cardj,target,player)<0;
+								})>0) return 3;
 								if(target.getEquip('baiyin')&&target.isDamaged()&&
 									get.recoverEffect(target,player,player)>0){
 									if(target.hp==1&&!target.hujia) return 1.6;
-									if(target.hp==2) return 0.01;
-									return 0;
 								}
+								if(target.countCards('e',function(card){
+									if(get.position(card)=='e') return get.value(card,target)<0;
+								})>0) return 1;
+							}
+							var es=target.getCards('e');
+							var noe=(es.length==0||target.hasSkillTag('noe'));
+							var noe2=(es.filter(function(esx){
+								return get.value(esx,target)>0;
+							}).length==0);
+							var noh=(nh==0||target.hasSkillTag('noh'));
+							if(noh&&(noe||noe2)) return 0;
+							if(att<=0&&!target.countCards('he')) return 1.5;
+							return -1.5;
+						},
+					},
+					tag:{
+						loseCard:1,
+						discard:1
+					}
+				}
+			},
+			guohe_copy:{
+				ai:{
+					basic:{
+						order:9,
+						useful:5,
+						value:5,
+					},
+					result:{
+						target:function(player,target){
+							var att=get.attitude(player,target);
+							var nh=target.countCards('h');
+							if(att>0){
+								if(target.countCards('j',function(card){
+									var cardj=card.viewAs?{name:card.viewAs}:card;
+									return get.effect(target,cardj,target,player)<0;
+								})>0) return 3;
+								if(target.getEquip('baiyin')&&target.isDamaged()&&
+									get.recoverEffect(target,player,player)>0){
+									if(target.hp==1&&!target.hujia) return 1.6;
+								}
+								if(target.countCards('e',function(card){
+									if(get.position(card)=='e') return get.value(card,target)<0;
+								})>0) return 1;
+							}
+							var es=target.getCards('e');
+							var noe=(es.length==0||target.hasSkillTag('noe'));
+							var noe2=(es.filter(function(esx){
+								return get.value(esx,target)>0;
+							}).length==0);
+							var noh=(nh==0||target.hasSkillTag('noh'));
+							if(noh&&(noe||noe2)) return 0;
+							if(att<=0&&!target.countCards('he')) return 1.5;
+							return -1.5;
+						},
+					},
+					tag:{
+						loseCard:1,
+						discard:1
+					}
+				}
+			},
+			guohe_copy2:{
+				ai:{
+					basic:{
+						order:9,
+						useful:5,
+						value:5,
+					},
+					result:{
+						target:function(player,target){
+							var att=get.attitude(player,target);
+							var nh=target.countCards('h');
+							if(att>0){
+								if(target.getEquip('baiyin')&&target.isDamaged()&&
+									get.recoverEffect(target,player,player)>0){
+									if(target.hp==1&&!target.hujia) return 1.6;
+								}
+								if(target.countCards('e',function(card){
+									if(get.position(card)=='e') return get.value(card,target)<0;
+								})>0) return 1;
 							}
 							var es=target.getCards('e');
 							var noe=(es.length==0||target.hasSkillTag('noe'));
@@ -2631,7 +2775,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			juedou_info:'出牌阶段，对一名其他角色使用。由其开始，其与你轮流打出一张【杀】，直到其中一方未打出【杀】为止。未打出【杀】的一方受到另一方对其造成的1点伤害。',
 			shunshou_info:'出牌阶段，对距离为1且区域里有牌的一名其他角色使用。你获得其区域里的一张牌。',
 			guohe_info:'出牌阶段，对区域里有牌的一名其他角色使用。你弃置其区域里的一张牌。',
-			jiedao_info:'出牌阶段，对装备区里有武器牌且有使用【杀】的目标的一名其他角色使用。令其对你指定的一名角色使用一张【杀】，否则将其装备区里的武器牌交给你。<br><span class="text" style="font-family: yuanli">这是一种十分含蓄的计谋。</span>',
+			jiedao_info:'出牌阶段，对装备区里有武器牌且有使用【杀】的目标的一名其他角色使用。令其对你指定的一名角色使用一张【杀】，否则将其装备区里的武器牌交给你。',
+			jiedao_append:'<span class="text" style="font-family: yuanli">这是一种十分含蓄的计谋。</span>',
 			wuxie_info:'一张锦囊牌生效前，对此牌使用。抵消此牌对一名角色产生的效果，或抵消另一张【无懈可击】产生的效果。',
 			lebu_info:'出牌阶段，对一名其他角色使用。若判定结果不为红桃，跳过其出牌阶段。',
 			shandian_info:'出牌阶段，对自己使用。若判定结果为黑桃2~9，则目标角色受到3点雷电伤害。若判定不为黑桃2~9，将之移动到下家的判定区里。',

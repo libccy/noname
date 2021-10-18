@@ -10348,6 +10348,18 @@
 			pss_scissor_info:'石头剪刀布时的一种手势。克制布，但被石头克制。',
 			pss_stone_info:'石头剪刀布时的一种手势。克制剪刀，但被布克制。',
 			renku:'仁库',
+			group_wei:"魏势力",
+			group_shu:"蜀势力",
+			group_wu:"吴势力",
+			group_qun:"群势力",
+			group_key:"键势力",
+			group_jin:"晋势力",
+			group_wei_bg:"魏",
+			group_shu_bg:"蜀",
+			group_wu_bg:"吴",
+			group_qun_bg:"群",
+			group_key_bg:"键",
+			group_jin_bg:"晋",
 		},
 		element:{
 			content:{
@@ -10665,7 +10677,7 @@
 						if(_status.renku.length>6){
 							var cards=_status.renku.splice(0,_status.renku.length-6);
 							game.log(cards,'从仁库进入了弃牌堆');
-							game.cardsDiscard(cards).fromRenku=true;
+							game.cardsDiscard(cards).set('outRange',true).fromRenku=true;
 						}
 						game.updateRenku();
 					}
@@ -15492,7 +15504,7 @@
 						if(_status.renku.length>6){
 							var cards=_status.renku.splice(0,_status.renku.length-6);
 							game.log(cards,'从仁库进入了弃牌堆');
-							game.cardsDiscard(cards).fromRenku=true;
+							game.cardsDiscard(cards).set('outRange',true).fromRenku=true;
 						}
 						game.updateRenku();
 					}
@@ -16476,9 +16488,11 @@
 				canSave:function(target){
 					var player=this;
 					if(player.hasSkillTag('save',true,target,true)) return true;
+					var name={},hs=player.getCards('hs');
+					for(var i of hs) name[get.name(i)]=true;
 					for(var i in lib.card){
-						if(lib.inpile.contains(i)||player.countCards('hs',i)){
-							if(lib.card[i].savable&&lib.filter.cardSavable({name:i},player,target)&&(_status.connectMode||player.hasUsableCard(i))) return true;
+						if(lib.card[i].savable&&(lib.inpile.contains(i)||name[i])){
+							if(lib.filter.cardSavable({name:i},player,target)&&(_status.connectMode||player.hasUsableCard(i))) return true;
 						}
 					}
 					return false;
@@ -24755,7 +24769,12 @@
 				getTrigger:function(){
 					return this.getParent()._trigger;
 				},
-				getRand:function(){
+				getRand:function(name){
+					if(name){
+						if(!this._rand_map) this._rand_map={};
+						if(!this._rand_map[name]) this._rand_map[name]=Math.random();
+						return this._rand_map[name];
+					}
 					if(!this._rand) this._rand=Math.random();
 					return this._rand;
 				},
@@ -25565,6 +25584,12 @@
 				subtype:"equip5",
 			},
 			disable_judge:{},
+			group_wei:{fullskin:true},
+			group_shu:{fullskin:true},
+			group_wu:{fullskin:true},
+			group_qun:{fullskin:true},
+			group_key:{fullskin:true},
+			group_jin:{fullskin:true},
 		},
 		filter:{
 			all:function(){
@@ -43029,7 +43054,7 @@
 					var bool1=false;
 					var bool2=false;
 					var bool3=(get.mode()=='guozhan'&&_status.forceKey!=true&&get.config('onlyguozhan'));
-					var bool4=(get.mode()!='guozhan');
+					var bool4=false;
 					for(var i in lib.character){
 						if(lib.character[i][1]=='shen'){
 							bool1=true;
@@ -43042,7 +43067,7 @@
 					}
 					if(bool1) groups.add('shen');
 					if(bool2&&!bool3) groups.add('key');
-					if(bool4&&get.mode()=='guozhan') groups.add('double');
+					if(bool4) groups.add('double');
 					var natures=['water','soil','wood','metal'];
 					var span=document.createElement('span');
 					newlined.appendChild(span);
@@ -49247,7 +49272,7 @@
 				return false;
 			},
 			double:function(name,array){
-				if(!lib.character[name]||!lib.character[name][4]||name.indexOf('gz_')!=0) return false;
+				if(!lib.character[name]||!lib.character[name][4]||name.indexOf('gz_')!=0&&name.indexOf('db_')!=0) return false;
 				for(var i of lib.character[name][4]){
 					if(i.indexOf('doublegroup:')==0){
 						if(!array) return true;

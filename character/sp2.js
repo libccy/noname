@@ -261,32 +261,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhiren:{
 				audio:2,
 				trigger:{player:'useCard'},
-				direct:true,
 				filter:function(event,player){
-					return (player==_status.currentPhase||player.hasSkill('yaner_zhiren'))&&get.color(event.card)=='red'&&player.getHistory('useCard',function(evt){
-						return get.color(evt.card)=='red'
+					return (player==_status.currentPhase||player.hasSkill('yaner_zhiren'))&&event.card.isCard&&player.getHistory('useCard',function(evt){
+						return evt.card.isCard;
 					}).indexOf(event)==0;
 				},
+				frequent:true,
+				locked:false,
 				content:function(){
 					'step 0'
 					event.num=get.translation(trigger.card.name).length;
-					event.logged=false;
-					player.chooseBool('织纴：是否卜算'+event.num+'？');
-					'step 1'
-					if(result.bool){
-						player.logSkill('zhiren');
-						event.logged=true;
-						player.chooseToGuanxing(num);
-					}
+					player.chooseToGuanxing(event.num);
 					if(event.num<2) event.finish();
-					'step 2'
+					'step 1'
 					if(!game.hasPlayer(function(current){
 						return current.countDiscardableCards(player,'e')>0;
 					})){
-						event.forcejudge=true;
-						event.goto(4);
+						event.goto(3);
 					}
-					else player.chooseTarget('织纴：是否弃置一名其他角色装备区内的一张牌？',function(card,player,target){
+					else player.chooseTarget('织纴：是否弃置一名角色装备区内的一张牌？',function(card,player,target){
 						return target.countDiscardableCards(player,'e')>0;
 					}).set('ai',function(target){
 						var player=_status.event.player,att=get.attitude(player,target),es=target.getCards('e'),val=0;
@@ -296,27 +289,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						return eff;
 					});
-					'step 3'
+					'step 2'
 					if(result.bool){
 						var target=result.targets[0];
-						if(!event.logged){
-							event.logged=true;
-							player.logSkill('zhiren',target);
-							player.addExpose(0.15);
-						}
-						else player.line(target,'green');
+						player.addExpose(0.15);
+						player.line(target,'green');
 						player.discardPlayerCard(target,'e',true);
 					}
 					else event.goto(6);
 					if(event.num<3) event.finish();
-					'step 4'
+					'step 3'
 					if(!game.hasPlayer(function(current){
 						return current.countDiscardableCards(player,'j')>0;
 					})){
 						if(event.num<3) event.finish();
-						else event.goto(6);
+						else event.goto(5);
 					}
-					else if(!event.forcejudge) player.chooseTarget('织纴：弃置一名其他角色判定区内的一张牌',true,function(card,player,target){
+					else player.chooseTarget('织纴：是否弃置一名角色判定区内的一张牌？',function(card,player,target){
 						return target.countDiscardableCards(player,'j')>0;
 					}).set('ai',function(target){
 						var player=_status.event.player,att=get.attitude(player,target),es=target.getCards('j'),val=0;
@@ -326,51 +315,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						return eff;
 					});
-					else player.chooseTarget('织纴：是否弃置一名其他角色判定区内的一张牌？',function(card,player,target){
-						return target.countDiscardableCards(player,'j')>0;
-					}).set('ai',function(target){
-						var player=_status.event.player,att=get.attitude(player,target),es=target.getCards('j'),val=0;
-						for(var i of es){
-							var eff=-(get.effect(target,i,target,player))
-							if(eff>val) val=eff;
-						}
-						return eff;
-					});
-					'step 5'
+					'step 4'
 					if(result.bool){
 						var target=result.targets[0];
-						if(!event.logged){
-							event.logged=true;
-							player.logSkill('zhiren',target);
-							player.addExpose(0.15);
-						}
-						else player.line(target,'green');
+						player.addExpose(0.15);
+						player.line(target,'green');
 						player.discardPlayerCard(target,'j',true);
 					}
 					if(event.num<3) event.finish();
-					'step 6'
-					if(player.isDamaged()) player.chooseBool('织纴：是否回复1点体力？');
-					else if(event.num<4) event.finish();
-					else event.goto(8);
-					'step 7'
-					if(result.bool){
-						if(!event.logged){
-							event.logged=true;
-							player.logSkill('zhiren');
-						}
-						player.recover();
-					}
+					'step 5'
+					player.recover();
 					if(event.num<4) event.finish();
-					'step 8'
-					player.chooseBool('织纴：是否摸三张牌？');
-					'step 9'
-					if(result.bool){
-						if(!event.logged){
-							event.logged=true;
-							player.logSkill('zhiren');
-						}
-						player.draw(3);
-					}
+					'step 6'
+					player.draw(3);
+				},
+				mod:{
+					aiOrder:function(player,card,num){
+						if(player==_status.currentPhase&&!player.getHistory('useCard',function(evt){
+							return evt.card.isCard;
+						}).length) return num+Math.pow(get.translation(card.name).length,2);
+					},
 				},
 			},
 			yaner:{
@@ -380,7 +344,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					var current=_status.currentPhase;
-					if(!current||current==player||!current.isPhaseUsing()) return false;
+					if(!current||current==player||!current.isIn()||!current.isPhaseUsing()) return false;
 					var evt=event.getl(current);
 					return evt&&evt.hs&&evt.hs.length&&current.countCards('h')==0;
 				},
@@ -2633,7 +2597,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('ai',function(target){
 						var att=get.attitude(_status.event.player,target);
 						if(att>2){
-							return Math.min(5,target.maxHp)-target.countCards('h');
+							return 5-target.countCards('h');
 						}
 						return att/3;
 					});
@@ -9617,7 +9581,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				return '转换技，出牌阶段限一次，<span class="bluetext">阴：你可以将至多两张手牌交给一名其他角色。</span>阳：你可以获得一名其他角色的至多两张手牌。若以此法移动的牌包含【酒】或♥牌，则你可令得到此牌的角色执行一项：①回复1点体力。②复原武将牌。';
 			},
 			zhiren:function(player){
-				return '当你于'+(player.hasSkill('yaner_zhiren')?'一':'你的')+'回合内使用第一张红色牌时，你可依次执行以下选项中的前X项：①卜算X。②弃置场上的一张装备牌和延时锦囊牌。③回复1点体力。④摸三张牌。（X为此牌的名称的字数）';
+				return '当你于'+(player.hasSkill('yaner_zhiren')?'一':'你的')+'回合内使用第一张非转化牌时，你可依次执行以下选项中的前X项：①卜算X。②可弃置场上的一张装备牌和延时锦囊牌。③回复1点体力。④摸三张牌。（X为此牌的名称的字数）';
 			},
 			cuijian:function(player){
 				return '出牌阶段限一次，你可以选择一名有手牌的其他角色。若其手牌中：有【闪】，其将装备区内的防具牌和所有【闪】交给你，然后你交给其'+(player.hasMark('tongyuan_tao')?'一张':'等量的')+'牌；没有【闪】，你'+(player.hasMark('tongyuan_wuxie')?'摸一张':'弃置一张手')+'牌。';
@@ -9631,7 +9595,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangji:['zhangji','ns_zhangji'],
 			zhangchangpu:['ol_zhangchangpu','zhangchangpu'],
 			huangfusong:['huangfusong','old_huangfusong'],
-			wenyang:['wenyang','diy_wenyang'],
+			wenyang:['wenyang','db_wenyang','diy_wenyang'],
 			dingyuan:['ol_dingyuan','dingyuan'],
 			quyi:['quyi','re_quyi'],
 			hansui:['xin_hansui','re_hansui'],
@@ -10149,7 +10113,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reqingcheng_info:'出牌阶段限一次，你可以与一名手牌数小于你的男性角色交换手牌。',
 			re_panshu:'潘淑',
 			zhiren:'织纴',
-			zhiren_info:'当你于你的回合内使用第一张红色牌时，你可依次执行以下选项中的前X项：①卜算X。②弃置场上的一张装备牌和延时锦囊牌。③回复1点体力。④摸三张牌。（X为此牌的名称的字数）',
+			zhiren_info:'当你于你的回合内使用第一张非转化牌时，你可依次执行以下选项中的前X项：①卜算X。②可弃置场上的一张装备牌和延时锦囊牌。③回复1点体力。④摸三张牌。（X为此牌的名称的字数）',
 			yaner:'燕尔',
 			yaner_info:'每回合限一次。当有其他角色于其出牌阶段内失去手牌后，若其没有手牌，则你可以与其各摸两张牌。若其以此法摸得的两张牌类型相同，则其回复1点体力。若你以此法摸得的两张牌类型相同，则你将〖织纴〗中的“你的回合内”改为“一回合内”。',
 			caoanmin:'曹安民',

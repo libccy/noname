@@ -79,11 +79,11 @@
 	display:none;
 }
 
-#arena:not(.chess).textequip .player[data-position='0'].unseen .equips>.card,
+/*#arena:not(.chess).textequip .player[data-position='0'].unseen .equips>.card,
 .player:not([data-position='0']).unseen .equips>.card,
 #arena.chess .player.unseen .equips>.card{
 	background:none;
-	/*border-image:linear-gradient(to right, transparent,rgba(0,0,0,0.4) 10%,rgba(0, 0, 0,0.4) 70%,transparent) 100% 0 0;*/
+	border-image:linear-gradient(to right, transparent,rgba(0,0,0,0.4) 10%,rgba(0, 0, 0,0.4) 70%,transparent) 100% 0 0;
 }
 #arena:not(.chess).textequip .player[data-position='0'].unseen .equips>.card,
 .player:not([data-position='0']).unseen .equips>.card,
@@ -94,7 +94,7 @@
 .player:not([data-position='0']).unseen .equips>.card:first-child,
 #arena.chess .player.unseen .equips>.card:first-child{
 	border-image:linear-gradient(transparent,transparent);
-}
+}*/
 .player:not([data-position='0']) .equips>.card.selected,
 #arena.chess .player .equips>.card.selected{
 	background:linear-gradient(to right,rgba(0, 133, 255,0.3),transparent),

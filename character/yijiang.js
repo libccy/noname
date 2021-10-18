@@ -191,7 +191,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuchen:['liushan'],
 			yujin:['xiahoudun'],
 			fazheng:['liubei'],
-			zhonghui:['jiangwei','dengai'],
+			zhonghui:['jiangwei'],
 		},
 		skill:{
 			rejingce:{
@@ -9081,24 +9081,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.chooseTarget(get.prompt2('chanhui'),function(card,player,target){
 						if(player==target) return false;
-						var trigger=_status.event;
-						return player.canUse(trigger.card,target)&&trigger.targets.contains(target)==false;
+						var evt=_status.event.getTrigger();
+						return !evt.targets.contains(target)&&lib.filter.targetEnabled2(evt.card,player,target)&&lib.filter.targetInRange(evt.card,player,target);
 					}).set('ai',function(target){
 						var trigger=_status.event.getTrigger();
 						var player=_status.event.player;
 						return get.effect(target,trigger.card,player,player)+0.01;
-					}).set('targets',trigger.targets).set('card',trigger.card);
+					});
 					"step 1"
 					if(result.bool){
-						game.delay(0,200);
 						event.target=result.targets[0];
 					}
 					else{
 						event.finish();
 					}
 					"step 2"
-					game.delay();
-					player.addSkill('chanhui2');
+					player.addTempSkill('chanhui2');
 					player.logSkill('chanhui',event.target);
 					event.target.chooseCard('交给'+get.translation(player)+'一张手牌，或成为'+
 					get.translation(trigger.card)+'的额外目标').set('ai',function(card){
@@ -9199,15 +9197,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			chanhui2:{
-				trigger:{player:'phaseJieshuBegin'},
-				forced:true,
-				popup:false,
-				audio:false,
-				content:function(){
-					player.removeSkill('chanhui2');
-				}
-			},
+			chanhui2:{},
 			quanji:{
 				audio:2,
 				trigger:{player:'damageEnd'},
@@ -12154,7 +12144,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hanhaoshihuan:['re_hanhaoshihuan','hanhaoshihuan'],
 			caozhen:['re_caozhen','caozhen','old_caozhen'],
 			wuyi:['re_wuyi','wuyi'],
-			sunluban:['re_sunluban','sunluban'],
+			sunluban:['re_sunluban','xin_sunluban','sunluban'],
 			zhuhuan:['zhuhuan','old_zhuhuan'],
 			caoxiu:['re_caoxiu','caoxiu','old_caoxiu'],
 			//xiahoushi:['xiahoushi','sp_xiahoushi'],
