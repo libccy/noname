@@ -575,7 +575,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCardAfter'},
 				direct:true,
 				filter:function(event,player){
-					return get.type(event.card,false)!='delay'&&event.targets.length==1&&game.hasPlayer(function(current){
+					return get.type(event.card,false)!='delay'&&game.hasPlayer(function(current){
 						return player!=current&&(!player.storage.disordersidi||!player.storage.disordersidi.contains(current));
 					});
 				},
@@ -609,7 +609,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				intro:{
 					content:function(storage,player){
-						if((player==game.me||player.iscardUnderControl())&&!game.observe){
+						if((player==game.me||player.isUnderControl())&&!game.observe){
 							var str='R={ ';
 							for(var i=0;i<storage.length;i++){
 								str+=('<'+get.translation(storage[i])+', '+get.translation(player.storage.disordersidi2[i])+'>');
@@ -618,7 +618,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							str+=' }'
 							return str;
 						}
-						return get.translation(storage);
+						return '已指定'+get.translation(storage)+'为目标';
 					},
 				},
 				onremove:function(player){
@@ -641,6 +641,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					exec:{
+						audio:'disordersidi',
 						trigger:{global:'useCardToPlayered'},
 						forced:true,
 						locked:false,
@@ -808,7 +809,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					fail:{
-						trigger:{player:'compareAfter'},
+						trigger:{player:'chooseToCompareAfter'},
 						forced:true,
 						filter:function(event,player){
 							return event.getParent().name=='rechuhai'&&event.num1<13&&!event.result.bool;
@@ -12534,7 +12535,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			relihuo_damage:'疠火',
 			relihuo_baigei:'疠火',
 			relihuo_info:'当你使用普【杀】时，你可以将此杀改为火属性。若如此做，当你因执行此【杀】的效果而对横置角色造成伤害时，此伤害+1；当你使用的火【杀】结算完成后，你失去X点体力（X为你因此【杀】造成的伤害总点数的一半且向下取整）',
-			dengzhi:'邓芝',
+			dengzhi:'手杀邓芝',
 			jimeng:'急盟',
 			jimeng_info:'出牌阶段开始时，你可以获得一名其他角色的一张牌，然后交给该角色X张牌（X为你当前体力值）。',
 			shuaiyan:'率言',
@@ -12926,7 +12927,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinjiaojin_info:'当你受到男性角色造成的伤害时，你可以弃置一张装备牌，令此伤害-1。',
 			xin_caozhen:'手杀曹真',
 			disordersidi:'司敌',
-			disordersidi_info:'①当你使用的不为延时锦囊牌的牌结算结束后，你可选择一名R内不存在以a为第一序偶的二元序偶的角色a，并选择一名角色b，在关系R内建立二元序偶<a,b>（b对其他角色不可见）。②一名角色a使用的不为延时锦囊牌的牌结算结束后，你清除R内以其为第一元素的二元序偶。③一名角色a使用不为延时锦囊牌的牌指定b为唯一目标时，若aRb成立，则你从R内移除<a,b>，且：若b为你，你摸一张牌；若b不为你，你可选择：⒈取消此牌的目标，并对a造成1点伤害。⒉摸两张牌。',
+			disordersidi_info:'①当你使用的不为延时锦囊牌的牌结算结束后，你可选择一名R内不存在以a为第一序偶的二元序偶的其他角色a，并选择一名角色b，在关系R内建立二元序偶<a,b>（b对其他角色不可见）。②一名角色a使用的不为延时锦囊牌的牌结算结束后，你清除R内以其为第一元素的二元序偶。③一名角色a使用不为延时锦囊牌的牌指定b为唯一目标时，若aRb成立，则你从R内移除<a,b>，且：若b为你，你摸一张牌；若b不为你，你可选择：⒈取消此牌的目标，并对a造成1点伤害。⒉摸两张牌。',
 			
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua:'手杀异构·神话再临',

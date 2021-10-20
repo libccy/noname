@@ -16,6 +16,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					return target!=player&&target.countCards('hej')>0;
 				},
+				yingbian_tags:['all','hit','add'],
 				yingbian_prompt:function(card){
 					var str='';
 					if(get.cardtag(card,'yingbian_all')){
@@ -174,6 +175,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target!=player&&target.countCards('h')>0;
 				},
 				yingbian_prompt:'当你使用此牌选择目标后，你可为此牌增加一个目标',
+				yingbian_tags:['add'],
 				yingbian:function(event){
 					event.yingbian_addTarget=true;
 				},
@@ -385,13 +387,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				equipSkill:true,
 				audio:true,
 				filter:function(event,player){
-					return event.card.name=='sha'&&(!event.target.isLinked()||event.target.countCards('h'));
+					return event.card.name=='sha'&&!event.target.isLinked();//||event.target.countCards('h'));
 				},
 				logTarget:'target',
 				content:function(){
 					var target=trigger.target;
 					if(!target.isLinked()) target.link();
-					else player.viewHandcards(target);
+					//else player.viewHandcards(target);
 				},
 			},
 			heiguangkai_skill:{
@@ -803,7 +805,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			wuxinghelingshan_info:'当你声明使用不为神属性的属性【杀】时，你可将此【杀】的属性改为不为神属性的其他属性。',
 			wutiesuolian:'乌铁锁链',
 			wutiesuolian_skill:'乌铁锁链',
-			wutiesuolian_info:'锁定技，当你使用【杀】指定目标后，若其：已横置，你观看其手牌。未横置，其横置。',
+			wutiesuolian_info:'锁定技，当你使用【杀】指定目标后，若其未横置，则其横置。',
 			heiguangkai:'黑光铠',
 			heiguangkai_skill:'黑光铠',
 			heiguangkai_info:'锁定技，当你成为【杀】或黑色普通锦囊牌的目标后，若此牌的目标数大于1，则你令此牌对你无效。',
@@ -866,7 +868,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['spade',11,'wuxie'],
 			['spade',11,'shunshou'],
 			['spade',11,'tiesuo'],
-			['spade',12,'zhujinqiyuan',null,['yingbian_zhuzhan','yingbian_hit']],
+			['spade',12,'zhujinqiyuan',null,['yingbian_fujia','yingbian_hit']],
 			['spade',12,'tiesuo'],
 			['spade',12,'zhangba'],
 			['spade',13,'wuxie',null,['yingbian_kongchao','yingbian_draw']],

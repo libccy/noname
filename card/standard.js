@@ -115,6 +115,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						event.yingbian_addTarget=true;
 					}
 				},
+				yingbian_tags:['hit','damage','add'],
 				filterTarget:function(card,player,target){return player!=target},
 				content:function(){
 					"step 0"
@@ -340,6 +341,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					return str;
 				},
+				yingbian_tags:['gain','draw'],
 				yingbian:function(event){
 					var bool=false;
 					if(get.cardtag(event.card,'yingbian_damage')){
@@ -829,6 +831,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				cardcolor:'red',
 				reverseOrder:true,
 				yingbian_prompt:'当你使用此牌选择目标后，你可为此牌减少一个目标',
+				yingbian_tags:['remove'],
 				yingbian:function(event){
 					event.yingbian_removeTarget=true;
 				},
@@ -868,6 +871,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:true,
 				selectTarget:-1,
 				yingbian_prompt:'当你使用此牌选择目标后，你可为此牌减少一个目标',
+				yingbian_tags:['remove'],
 				yingbian:function(event){
 					event.yingbian_removeTarget=true;
 				},
@@ -944,6 +948,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				selectTarget:-1,
 				reverseOrder:true,
 				yingbian_prompt:'当你使用此牌选择目标后，你可为此牌减少一个目标',
+				yingbian_tags:['remove'],
 				yingbian:function(event){
 					event.yingbian_removeTarget=true;
 				},
@@ -1061,6 +1066,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'trick',
 				enable:true,
 				yingbian_prompt:'你令此牌不可被响应',
+				yingbian_tags:['hit'],
 				yingbian:function(event){
 					event.directHit.addArray(game.players);
 				},
@@ -1362,6 +1368,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target.countDiscardableCards(player,get.is.single()?'he':'hej');
 				},
 				yingbian_prompt:'当你使用此牌选择目标后，你可为此牌增加一个目标',
+				yingbian_tags:['add'],
 				yingbian:function(event){
 					event.yingbian_addTarget=true;
 				},
@@ -1596,12 +1603,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					expose:0.2
 				},
 				notarget:true,
+				yingbian_tags:['gain','draw'],
 				yingbian_prompt:function(card){
 					if(!get.cardtag(card,'yingbian_gain')) return '当你声明使用此牌时，你摸一张牌';
 					return '当此牌生效后，你获得此牌响应的目标牌';
 				},
 				yingbian:function(event){
-					if(!get.cardtag(event.card,'yingbian_gain')) event.player.draw();
+					if(!get.cardtag(event.card,'yingbian_gain')||get.cardtag(event.card,'yingbian_draw')) event.player.draw();
 				},
 				contentBefore:function(){
 					'step 0'

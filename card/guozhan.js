@@ -835,6 +835,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:"equip",
 				subtype:"equip2",
 				skills:['huxinjing'],
+				filterTarget:function(card,player,target){
+					if(get.mode()!='guozhan') return true;
+					return player==target;
+				},
+				selectTarget:function(){
+					return get.mode()=='guozhan'?-1:1;
+				},
+				toself:false,
 				ai:{
 					basic:{
 						equipValue:6
@@ -1739,6 +1747,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target:player,
 						card:event.card
 					})) return false;
+					if(get.mode()!='guozhan'&&event.num>1) return true;
 					return event.num>=player.hp;
 				},
 				content:function(){
@@ -1747,20 +1756,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(e2){
 						player.discard(e2);
 					}
-				}
-			},
-			huxinjing2:{
-				equipSkill:true,
-				trigger:{player:['damageEnd','damageZero']},
-				//priority:10,
-				forced:true,
-				popup:false,
-				content:function(){
-					var card=player.getEquip('huxinjing');
-					if(card){
-						player.discard(card);
-					}
-					player.removeSkill('huxinjing2');
+					player.removeSkill('huxinjing');
 				}
 			},
 			wuliu_skill:{
@@ -1886,7 +1882,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			jingfanma_info:'你的进攻距离+1',
 			huxinjing_bg:'镜',
 			huxinjing:'护心镜',
-			huxinjing_info:'当你受到伤害时，若伤害值大于或等于你的体力值，则你可以将【护心镜】置入弃牌堆，然后防止此伤害。',
+			huxinjing_info:'此牌可对其他角色使用。当你受到伤害时，若伤害值大于1或大于等于你的体力值，则你可以将【护心镜】置入弃牌堆，然后防止此伤害。',
+			huxinjing_info_guozhan:'当你受到伤害时，若伤害值大于或等于你的体力值，则你可以将【护心镜】置入弃牌堆，然后防止此伤害。',
 			gz_haolingtianxia:'号令天下',
 			gz_haolingtianxia_info:'出牌阶段，对一名体力值不为全场最少的角色使用。所有其他角色依次选择一项：①弃置一张牌（魏势力角色无需弃牌），视为对目标角色使用一张【杀】；②弃置目标角色的一张牌（魏势力角色改为获得其一张牌）。',
 			gz_kefuzhongyuan:'克复中原',

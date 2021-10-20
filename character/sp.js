@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			sp:{
-				sp_default:["caoying","simahui","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","xujing","yuantanyuanshang","sunshao","zhangling",'guansuo','baosanniang','ol_zhangchangpu','caoshuang','sp_zhangliao','wolongfengchu','ol_xinxianying','panshu','huangzu','huangchengyan','gaogan','duxi'],
+				sp_default:["caoying","simahui","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","xujing","yuantanyuanshang","sunshao","zhangling",'guansuo','baosanniang','ol_zhangchangpu','caoshuang','sp_zhangliao','wolongfengchu','ol_xinxianying','panshu','huangzu','huangchengyan','gaogan','duxi','ol_dengzhi'],
 				sp_tongque:["liuxie","lingju","fuwan","sp_fuwan","sp_fuhuanghou","sp_jiben"],
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_guozhan:["zangba","shamoke","ganfuren","yuejin","hetaihou","dingfeng","panfeng","jianggan","sp_mifangfushiren","bianfuren"],
@@ -16,6 +16,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		character:{
+			ol_dengzhi:['male','shu',3,['olxiuhao','olsujian']],
 			bianfuren:['female','wei',3,['fuwei','yuejian']],
 			duxi:['male','wei',3,['quxi','bixiong']],
 			gaogan:['male','qun',4,['juguan']],
@@ -392,6 +393,191 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//邓芝
+			olxiuhao:{
+				audio:2,
+				trigger:{
+					player:'damageBegin4',
+					source:'damageBegin2',
+				},
+				usable:1,
+				filter:function(event,player){
+					return event.source&&event.source.isIn()&&event.source!=event.player;
+				},
+				logTarget:function(event,player){
+					return player==event.player?event.source:event.player;
+				},
+				check:function(event,player){
+					_status.olxiuhao_judging=true;
+					var bool=false;
+					if(player==event.source){
+						if(get.attitude(player,event.player)>0) bool=true;
+						if(get.damageEffect(event.player,player,player,event.nature)<=0) bool=true;
+					}
+					else{
+						if(get.attitude(player,event.source)>0) bool=true;
+						if(get.damageEffect(player,event.source,player,event.nature)<0){
+							if(event.source.hasSkillTag('nogain')) bool=true;
+							if(event.num>=player.hp+player.countCards('hs',{name:['tao','jiu']})&&(!player.hasFriend()||player==get.zhu(player))) return true;
+							return false;
+						}
+					}
+					delete _status.olxiuhao_judging;
+					return bool;
+				},
+				content:function(){
+					trigger.cancel();
+					trigger.source.draw(2);
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(!_status.olxiuhao_judging&&get.tag(card,'damage')&&get.attitude(target,player)>0&&(!player.storage.counttrigger||!player.storage.counttrigger.olxiuhao)) return [0,0.5,0,0.5];
+						},
+						player:function(card,player,target){
+							if(!_status.olxiuhao_judging&&get.tag(card,'damage')&&get.attitude(player,target)>0&&(!player.storage.counttrigger||!player.storage.counttrigger.olxiuhao)) return [0,0.5,0,0.5];
+						},
+					},
+				},
+			},
+			olsujian:{
+				trigger:{player:'phaseDiscardBefore'},
+				forced:true,
+				content:function(){
+					'step 0'
+					trigger.cancel();
+					var cards=lib.skill.olsujian.update(player);
+					if(!cards.length) event.finish();
+					else{
+						event.cards=cards;
+						var str=get.translation(cards);
+						player.chooseControl().set('choiceList',[
+							'将'+str+'分配给任意名其他角色',
+							'弃置'+str+'并弃置一名其他角色至多等量的牌',
+						]).set('ai',function(){
+							var cards=_status.event.getParent().cards,player=_status.event.player;
+							if(!game.hasPlayer(function(current){
+								return get.attitude
+							})) return 1;
+							if(game.hasPlayer(function(current){
+								var att=get.attitude(player,current);
+								return att!=0&&current.countDiscardableCards(player,'he',function(i){
+									if(att>0) return get.value(i,current)>=4;
+									return get.value(i,current)<=0;
+								})>=cards.length&&get.effect(current,{name:'guohe_copy2'},player,player)>0;
+							})) return 1;
+							return 0;
+						});
+					}
+					'step 1'
+					if(result.index==1){
+						cards=event.cards.filter(function(i){
+							return lib.filter.cardDiscardable(i,player,'olsujian');
+						});
+						if(cards.length){
+							event.num=cards.length;
+							player.discard(cards);
+						}
+						else event.finish();
+					}
+					else event.goto(4);
+					'step 2'
+					if(game.hasPlayer(function(current){
+						return current!=player&&current.countDiscardableCards(player,'he')>0;
+					})){
+						player.chooseTarget(true,'弃置一名其他角色的至多'+get.cnNumber(num)+'张牌',function(card,player,current){
+							return current!=player&&current.countDiscardableCards(player,'he')>0;
+						}).set('ai',function(current){
+							var att=get.attitude(player,current);
+							if(current.countDiscardableCards(player,'he',function(i){
+								if(att>0) return get.value(i,current)>=4;
+								return get.value(i,current)<=0;
+							})>=num) return 4*get.effect(current,{name:'guohe_copy2'},player,player);
+							return get.effect(current,{name:'guohe_copy2'},player,player);
+						});
+					}
+					else event.finish();
+					'step 3'
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target,'green');
+						player.discardPlayerCard(target,true,[1,num]);
+					}
+					event.finish();
+					'step 4'
+					if(_status.connectMode) game.broadcastAll(function(){_status.noclearcountdown=true});
+					event.given_map={};
+					'step 5'
+					player.chooseCardTarget({
+						filterCard:function(card){
+							return card.hasGaintag('olsujian');
+						},
+						filterTarget:lib.filter.notMe,
+						selectCard:[1,cards.length],
+						forced:true,
+						prompt:'请选择要分配的卡牌和目标',
+						ai1:function(card){
+							if(!ui.selected.cards.length) return 1;
+							return 0;
+						},
+						ai2:function(target){
+							var player=_status.event.player,card=ui.selected.cards[0];
+							var val=target.getUseValue(card);
+							if(val>0) return val*get.attitude(player,target)*2;
+							return get.value(card,target)*get.attitude(player,target);
+						},
+					});
+					'step 6'
+					if(result.bool){
+						var res=result.cards,target=result.targets[0].playerid;
+						player.removeGaintag('olsujian',res);
+						player.addGaintag(res,'olsujian_given');
+						cards.removeArray(res);
+						if(!event.given_map[target]) event.given_map[target]=[];
+						event.given_map[target].addArray(res);
+						if(cards.length) event.goto(5);
+					}
+					else event.finish();
+					'step 7'
+					if(_status.connectMode){
+						game.broadcastAll(function(){delete _status.noclearcountdown});
+						game.stopCountChoose();
+					}
+					for(var i in event.given_map){
+						var source=(_status.connectMode?lib.playerOL:game.playerMap)[i];
+						player.line(source,'green');
+						source.gain(event.given_map[i],player,'giveAuto');
+					}
+					event.next.sort(function(a,b){
+						return lib.sort.seat(a.player,b.player);
+					});
+				},
+				update:function(player){
+					player.removeGaintag('olsujian');
+					var hs=player.getCards('h');
+					player.getHistory('gain',function(evt){
+						hs.removeArray(evt.cards);
+					});
+					if(hs.length) player.addGaintag(hs,'olsujian');
+					return hs;
+				},
+				group:'olsujian_sync',
+				subSkill:{
+					sync:{
+						trigger:{player:['phaseBeginStart','gainBegin']},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						filter:function(event,player){
+							if(event.name=='gain') return (player==_status.currentPhase)&&(event.getParent('olsujian').player!=player);
+							return true;
+						},
+						content:function(){
+							lib.skill.olsujian.update(player);
+						},
+					},
+				},
+			},
 			//卞夫人
 			fuwei:{
 				audio:'wanwei',
@@ -14805,6 +14991,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huaxin:['ol_huaxin','huaxin','sp_huaxin'],
 			xujing:['xujing','sp_xujing'],
 			zhaoxiang:['zhaoxiang','tw_zhaoxiang'],
+			dengzhi:['ol_dengzhi','dengzhi'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
@@ -15629,6 +15816,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fuwei_info:'每回合限一次。当你的牌被其他角色弃置或获得后，你可从牌堆中获得一张与此牌名称相同的牌（若没有则改为摸一张牌）。',
 			yuejian:'约俭',
 			yuejian_info:'每回合限两次。当其他角色对你使用的牌A结算结束后，你可展示所有手牌。若牌A有花色且你的手牌中没有同花色的牌，则你获得牌A对应的所有实体牌。',
+			ol_dengzhi:'邓芝',
+			olxiuhao:'修好',
+			olxiuhao_info:'每回合限一次。当你受到其他角色造成的伤害时，或对其他角色造成伤害时，你可防止此伤害，然后令伤害来源摸两张牌。',
+			olsujian:'素俭',
+			olsujian_given:'已分配',
+			olsujian_info:'锁定技。弃牌阶段开始前，你跳过此阶段。然后你选择一项：①将所有不为本回合获得的手牌分配给其他角色。②弃置这些手牌，然后弃置一名其他角色等量的牌。',
 			
 			sp_default:"常规",
 			sp_tongque:"铜雀台",

@@ -326,11 +326,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						mod:{
 							cardEnabled:function(card,player){
 								var source=_status.currentPhase;
-								if(card.name=='tao'&&source&&source!=player&&source.hasSkill('rewansha')) return false;
+								if(card.name=='tao'&&source&&source!=player&&source.hasSkill('rewansha')&&!player.isDying()) return false;
 							},
 							cardSavable:function(card,player){
 								var source=_status.currentPhase;
-								if(card.name=='tao'&&source&&source!=player&&source.hasSkill('rewansha')) return false;
+								if(card.name=='tao'&&source&&source!=player&&source.hasSkill('rewansha')&&!player.isDying()) return false;
 							},
 						},
 					},
