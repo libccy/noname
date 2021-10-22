@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.110.9.3.1',
+	'v1.9.110.9.3.2',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -792,6 +792,7 @@ window.noname_asset_list=[
 	'audio/die/xin_sunluban.mp3',
 	'audio/die/ol_dengai.mp3',
 	'audio/die/xin_caozhen.mp3',
+	'audio/die/caoanmin.mp3',
 
 	'audio/skill/decadezishou1.mp3',
 	'audio/skill/decadezishou2.mp3',
@@ -3564,6 +3565,8 @@ window.noname_asset_list=[
 	'audio/skill/olsujian2.mp3',
 	'audio/skill/olxiuhao1.mp3',
 	'audio/skill/olxiuhao2.mp3',
+	'audio/skill/xianwei1.mp3',
+	'audio/skill/xianwei2.mp3',
 
 	'audio/voice/male/0.mp3',
 	'audio/voice/male/1.mp3',
