@@ -29,6 +29,7 @@
 			yingbian_canqu:[],
 		},
 		renku:[],
+		prehidden_skills:[],
 	};
 	var lib={
 		configprefix:'noname_0.9_',
@@ -10423,6 +10424,7 @@
 						else{
 							var next=player.chooseBool();
 							next.set('prompt',event.prompt||('是否'+(event.targets2.length?'对':'')+get.translation(event.targets2)+'使用'+get.translation(card)+'?'));
+							if(event.hsskill) next.setHiddenSkill(event.hsskill);
 							if(event.prompt2) next.set('prompt2',event.prompt2);
 							next.ai=function(){
 								var eff=0;
@@ -10449,6 +10451,7 @@
 						next.set('targets',targets);
 						next.set('prompt',event.prompt||('选择'+get.translation(card)+'的目标'));
 						if(event.prompt2) next.set('prompt2',event.prompt2);
+						if(event.hsskill) next.setHiddenSkill(event.hsskill);
 					}
 					'step 1'
 					if(result.bool){
@@ -11342,7 +11345,7 @@
 					for(var i=0;i<event.choice.length;i++){
 						controls.push(event.choice[i][0]);
 					}
-					event.current.chooseControl(controls).set('prompt','选择下一个触发的技能').set('forceDie',true);
+					event.current.chooseControl(controls).set('prompt','选择下一个触发的技能').set('forceDie',true).set('arrangeSkill',true);
 					'step 5'
 					if(result.control){
 						for(var i=0;i<event.doing.list.length;i++){
@@ -11997,6 +12000,10 @@
 						return;
 					}
 					else if(event.isMine()){
+						if(event.hsskill&&!event.forced&&_status.prehidden_skills.contains(event.hsskill)){
+							ui.click.cancel();
+							return;
+						}
 						if(event.type=='wuxie'){
 							if(ui.tempnowuxie){
 								var triggerevent=event.getTrigger();
@@ -12224,6 +12231,10 @@
 							game.modeSwapPlayer(player);
 						}
 						if(event.isMine()){
+							if(event.hsskill&&!event.forced&&_status.prehidden_skills.contains(event.hsskill)){
+								ui.click.cancel();
+								return;
+							}
 							var ok=game.check();
 							if(!ok){
 								game.pause();
@@ -12405,6 +12416,10 @@
 						var range=get.select(event.selectCard);
 						game.check();
 						if(event.isMine()){
+							if(event.hsskill&&!event.forced&&_status.prehidden_skills.contains(event.hsskill)){
+								ui.click.cancel();
+								return;
+							}
 							game.pause();
 							if(range[1]>1&&typeof event.selectCard!='function'){
 								event.promptdiscard=ui.create.control('提示',function(){
@@ -13001,6 +13016,10 @@
 					}
 					game.check();
 					if(event.isMine()){
+						if(event.hsskill&&!event.forced&&_status.prehidden_skills.contains(event.hsskill)){
+							ui.click.cancel();
+							return;
+						}
 						game.pause();
 					}
 					else if(event.isOnline()){
@@ -13185,6 +13204,10 @@
 						game.check();
 						if(event.isMine()){
 							game.pause();
+							if(event.hsskill&&!event.forced&&_status.prehidden_skills.contains(event.hsskill)){
+								ui.click.cancel();
+								return;
+							}
 							if(event.prompt!=false){
 								var str;
 								if(typeof event.prompt=='string') str=event.prompt;
@@ -13253,6 +13276,10 @@
 				chooseTarget:function(){
 					"step 0"
 					if(event.isMine()){
+						if(event.hsskill&&!event.forced&&_status.prehidden_skills.contains(event.hsskill)){
+							ui.click.cancel();
+							return;
+						}
 						game.check();
 						game.pause();
 						if(event.createDialog&&!event.dialog&&Array.isArray(event.createDialog)){
@@ -13324,6 +13351,10 @@
 				chooseCardTarget:function(){
 					"step 0"
 					if(event.isMine()){
+						if(event.hsskill&&!event.forced&&_status.prehidden_skills.contains(event.hsskill)){
+							ui.click.cancel();
+							return;
+						}
 						game.check();
 						game.pause();
 						if(event.prompt!=false){
@@ -13397,6 +13428,28 @@
 						event.controls.push('cancel2');
 					}
 					if(event.isMine()){
+						if(event.arrangeSkill){
+							var hidden=player.hiddenSkills.slice(0);
+							game.expandSkills(hidden);
+							if(hidden.length){
+								for(var i of event.controls){
+									if(_status.prehidden_skills.contains(i)&&hidden.contains(i)){
+										event.result={
+											bool:true,
+											control:i,
+										}
+										return;
+									}
+								}
+							}
+						}
+						else if(event.hsskill&&_status.prehidden_skills.contains(event.hsskill)&&event.controls.contains('cancel2')){
+							event.result={
+								bool:true,
+								control:'cancel2',
+							}
+							return;
+						}
 						if(event.sortcard){
 							var prompt=event.prompt||'选择一个位置';
 							if(event.tosort){
@@ -13524,6 +13577,10 @@
 							ui.click.ok();
 							return;
 						}
+						else if(event.hsskill&&_status.prehidden_skills.contains(event.hsskill)){
+							ui.click.cancel();
+							return;
+						}
 						ui.create.confirm('oc');
 						if(event.createDialog&&!event.dialog){
 							if(Array.isArray(event.createDialog)){
@@ -13592,6 +13649,7 @@
 					}
 					var next=player.chooseControl(controls);
 					next.set('prompt',prompt);
+					if(event.hsskill) next.setHiddenSkill(event.hsskill);
 					if(event.ai){
 						next.set('ai',event.ai);
 					}
@@ -13704,6 +13762,10 @@
 					}
 					else{
 						if(event.isMine()){
+							if(event.hsskill&&!event.forced&&_status.prehidden_skills.contains(event.hsskill)){
+								ui.click.cancel();
+								return;
+							}
 							event.dialog.open();
 							game.check();
 							game.pause();
@@ -16480,7 +16542,7 @@
 				},
 				removeGaintag:function(tag,cards){
 					game.addVideo('removeGaintag',this,tag);
-					game.broadcastAll(function(player,tag){
+					game.broadcastAll(function(player,tag,cards){
 						cards=cards||player.getCards('h');
 						for(var i of cards) i.removeGaintag(tag);
 					},this,tag,cards);
@@ -24672,6 +24734,13 @@
 				},
 				redo:function(){
 					this.step--;
+				},
+				setHiddenSkill:function(skill){
+					if(!this.player) return this;
+					var hidden=this.player.hiddenSkills.slice(0);
+					game.expandSkills(hidden);
+					if(hidden.contains(skill)) this.set('hsskill',skill);
+					return this;
 				},
 				set:function(key,value){
 					if(arguments.length==1&&Array.isArray(arguments[0])){
@@ -48646,6 +48715,26 @@
 				ui.click.touchpop();
 				e.stopPropagation();
 			},
+			hiddenskill:function(e){
+				this.classList.toggle('on');
+				var hidden=lib.skill[this.link].preHidden;
+				if(Array.isArray(hidden)){
+					if(this.classList.contains('on')){
+						_status.prehidden_skills.removeArray(hidden);
+					}
+					else{
+						_status.prehidden_skills.addArray(hidden);
+					}
+				}
+				if(this.classList.contains('on')){
+					_status.prehidden_skills.remove(this.link);
+				}
+				else{
+					_status.prehidden_skills.add(this.link);
+				}
+				ui.click.touchpop();
+				e.stopPropagation();
+			},
 			// forcetouch:function(){
 			// 	if(_status.force||_status.dragged){
 			// 		clearInterval(_status.forcetouchinterval);
@@ -51859,7 +51948,16 @@
 							uiintro.add(forbidstr);
 						}
 						else if(!skills2.contains(skills[i])){
-							uiintro.add('<div style="opacity:0.5"><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i],node)+'</div></div>');
+							if(lib.skill[skills[i]].preHidden&&get.mode()=='guozhan'){
+								uiintro.add('<div><div class="skill" style="opacity:0.5">【'+translation+'】</div><div><span style="opacity:0.5">'+get.skillInfoTranslation(skills[i],node)+'</span><br><div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">预亮技能</div></div></div>');
+								var underlinenode=uiintro.content.lastChild.querySelector('.underlinenode');
+								if(_status.prehidden_skills.contains(skills[i])){
+									underlinenode.classList.remove('on');
+								}
+								underlinenode.link=skills[i];
+								underlinenode.listen(ui.click.hiddenskill);
+							}
+							else uiintro.add('<div style="opacity:0.5"><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i],node)+'</div></div>');
 						}
 						else if(lib.skill[skills[i]].temp||!node.skills.contains(skills[i])||lib.skill[skills[i]].thundertext){
 							if(lib.skill[skills[i]].frequent||lib.skill[skills[i]].subfrequent){

@@ -245,6 +245,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jianxiong:{
 				audio:2,
+				preHidden:true,
 				trigger:{player:'damageEnd'},
 				filter:function(event,player){
 					return get.itemtype(event.cards)=='cards'&&get.position(event.cards[0],true)=='o';
@@ -266,12 +267,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fankui:{
 				audio:2,
 				trigger:{player:'damageEnd'},
-				direct:true,
+				logTarget:'source',
+				preHidden:true,
 				filter:function(event,player){
 					return (event.source&&event.source.countGainableCards(player,'he')&&event.num>0&&event.source!=player);
 				},
 				content:function(){
-					player.gainPlayerCard(get.prompt('fankui',trigger.source),trigger.source,get.buttonValue,'he').set('logSkill',[event.name,trigger.source]);
+					player.gainPlayerCard(true,trigger.source,'he');
 				},
 				ai:{
 					maixie_defend:true,
@@ -289,6 +291,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'judge'},
 				direct:true,
+				preHidden:true,
 				filter:function(event,player){
 					return player.countCards(get.mode()=='guozhan'?'hes':'hs')>0;
 				},
@@ -315,7 +318,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else{
 							return -result-get.value(card)/2;
 						}
-					}).set('judging',trigger.player.judging[0]);
+					}).set('judging',trigger.player.judging[0]).setHiddenSkill('guicai');
 					"step 1"
 					if(result.bool){
 						player.respond(result.cards,'guicai','highlight','noOrdering');
@@ -489,6 +492,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return get.attitude(player,current)<0&&player.canUse('sha',current);
 					});
 				},
+				preHidden:true,
 				filter:function(event,player){
 					return !event.numFixed&&event.num>0;
 				},
@@ -514,6 +518,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				audioname:['re_guojia','xizhicai','gz_nagisa'],
 				trigger:{player:'judgeEnd'},
+				preHidden:true,
 				frequent:function(event){
 					if(event.result.card.name=='du') return false;
 					//if(get.mode()=='guozhan') return false;
@@ -620,6 +625,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseZhunbeiBegin'},
 				frequent:true,
+				preHidden:true,
 				content:function(){
 					"step 0"
 					if(event.cards==undefined) event.cards=[];
@@ -1281,6 +1287,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['jiangwei','re_jiangwei','re_zhugeliang'],
 				trigger:{player:'phaseZhunbeiBegin'},
 				frequent:true,
+				preHidden:true,
 				content:function(){
 					"step 0"
 					if(player.isUnderControl()){
@@ -1615,6 +1622,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.card.name=='sha';
 				},
 				logTarget:'target',
+				preHidden:true,
 				content:function(){
 					"step 0"
 					player.judge(function(card){
@@ -1645,6 +1653,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['jianyong'],
 				trigger:{player:'useCard'},
 				frequent:true,
+				preHidden:true,
 				filter:function(event){
 					return (get.type(event.card)=='trick'&&event.card.isCard);
 				},
@@ -2031,6 +2040,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['re_daqiao','daxiaoqiao'],
 				trigger:{target:'useCardToTarget'},
 				direct:true,
+				preHidden:true,
 				filter:function(event,player){
 					if(event.card.name!='sha') return false;
 					if(player.countCards('he')==0) return false;
@@ -2073,7 +2083,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						prompt2:'弃置一张牌，将此【杀】转移给攻击范围内的一名其他角色',
 						source:trigger.player,
 						card:trigger.card,
-					});
+					}).setHiddenSkill(event.name);
 					"step 1"
 					if(result.bool){
 						var target=result.targets[0];
@@ -2441,7 +2451,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['re_lvbu','shen_lvbu'],
 				forced:true,
 				locked:true,
-				group:['wushuang1','wushuang2']
+				group:['wushuang1','wushuang2'],
+				preHidden:['wushuang1','wushuang2'],
 			},
 			wushuang1:{
 				audio:'wushuang',
@@ -2579,6 +2590,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
 				frequent:true,
+				preHidden:true,
 				content:function(){
 					player.draw();
 				},

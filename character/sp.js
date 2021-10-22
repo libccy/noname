@@ -1095,6 +1095,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target:'useCardToTargeted',
 				},
 				direct:true,
+				preHidden:true,
 				filter:function(event,player){
 					if(event.player==event.target||event.targets.length!=1) return false;
 					if(player!=event.player&&!player.hasSkill('mffengshi')) return false;
@@ -1107,7 +1108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var str;
 					if(player==trigger.player) str='弃置自己的和该角色';
 					else str='令其弃置其与你的';
-					trigger.player.chooseBool('是否对'+get.translation(trigger.target)+'发动【锋势】？',str+'的各一张牌，然后令'+get.translation(trigger.card)+'的伤害+1').set('ai',function(){
+					var next=trigger.player.chooseBool('是否对'+get.translation(trigger.target)+'发动【锋势】？',str+'的各一张牌，然后令'+get.translation(trigger.card)+'的伤害+1').set('ai',function(){
 						var player=_status.event.getParent().player;
 						var target=_status.event.getParent().target;
 						var viewer=_status.event.player;
@@ -1126,6 +1127,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return true;
 						}
 					});
+					if(player==next.player) next.setHiddenSkill('mffengshi');
 					'step 1'
 					if(result.bool){
 						if(player==source) player.logSkill('mffengshi',target);
@@ -1729,6 +1731,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{target:'useCardToTargeted'},
 				logTarget:'player',
 				usable:2,
+				preHidden:true,
 				filter:function(event,player){
 					var source=event.player;
 					if(source==player) return false;
@@ -1772,6 +1775,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return false;
 				},
+				preHidden:true,
 				content:function(){
 					var suit=get.suit(trigger.card);
 					var number=get.number(trigger.card);
@@ -1793,6 +1797,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				direct:true,
+				preHidden:['reduanbing_sha'],
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt('reduanbing'),'为'+get.translation(trigger.card)+'增加一个目标',function(card,player,target){
@@ -1800,7 +1805,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('sourcex',trigger.targets).set('ai',function(target){
 						var player=_status.event.player;
 						return get.effect(target,_status.event.card,player,player);
-					}).set('card',trigger.card);
+					}).set('card',trigger.card).setHiddenSkill(event.name);
 					'step 1'
 					if(result.bool){
 						if(!event.isMine()&&!event.isOnline()) game.delayx();
@@ -3426,6 +3431,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return false;
 				},
+				preHidden:true,
 				content:function(){
 					player.draw();
 				},
@@ -3605,6 +3611,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wanwei:{
 				trigger:{target:['rewriteGainResult','rewriteDiscardResult']},
 				direct:true,
+				preHidden:true,
 				filter:function(event,player){
 					return event.player!=player;
 				},
@@ -3618,6 +3625,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					next.filterButton=trigger.filterButton;
 					next.selectButton=trigger.result.cards.length;
+					next.setHiddenSkill('wanwei');
 					'step 1'
 					if(result.bool){
 						player.logSkill('wanwei');
@@ -3656,6 +3664,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['useCard','respond']},
 				frequent:true,
 				locked:false,
+				preHidden:true,
 				filter:function(event,player){
 					return player.getHistory('useCard').length+player.getHistory('respond').length==player.getAttackRange();
 				},
@@ -5528,6 +5537,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chuanxin:{
 				audio:2,
 				trigger:{source:'damageBegin2'},
+				preHidden:true,
 				filter:function(event,player){
 					if(_status.currentPhase!=player) return false;
 					if(!_status.event.getParent('phaseUse')) return false;
@@ -5605,6 +5615,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hengjiang:{
 				audio:2,
 				trigger:{player:'damageEnd'},
+				preHidden:true,
 				check:function(event,player){
 					return get.attitude(player,_status.currentPhase)<0||!_status.currentPhase.needsToDiscard(2);
 				},
@@ -5758,7 +5769,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shuangren:{
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
-				//priority:15,
+				preHidden:true,
 				content:function(){
 					'step 0'
 					var goon;
@@ -5780,7 +5791,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.effect(target,{name:'sha'},player,player);
 						}
 						return 0;
-					}).set('goon',goon);
+					}).set('goon',goon).setHiddenSkill(event.name);
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
@@ -5794,11 +5805,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result.bool){
 						var target=event.target;
-						if(target.identity!='ye'&&target.identity!='unknown'&&game.hasPlayer(function(current){
-							if(!player.canUse('sha',current,false)) return false;
+						if(game.hasPlayer(function(current){
 							if(target==current) return false;
+							if(!player.canUse('sha',current,false)) return false;
 							if(get.mode()=='guozhan'){
-								return target.identity==current.identity;
+								return target.isFriendOf(current);
 							}
 							return true;
 						})){
@@ -5809,13 +5820,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.chooseTarget(str+'角色使用一张杀',true,function(card,player,target){
 								if(!player.canUse('sha',target,false)) return false;
 								if(get.mode()=='guozhan'){
-									return target.identity==_status.event.identity;
+									return targe.isFriendOf(status.event.identity);
 								}
 								return true;
 							}).set('ai',function(target){
 								var player=_status.event.player;
 								return get.effect(target,{name:'sha'},player,player);
-							}).set('identity',target.identity);
+							}).set('identity',target);
 						}
 						else{
 							player.useCard({name:'sha',isCard:true},target,false);
@@ -11480,6 +11491,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				direct:true,
 				popup:false,
+				preHidden:true,
 				content:function(){
 					"step 0"
 					if(trigger.delay==false) game.delay();
@@ -11508,7 +11520,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!_status.event.goon||ui.selected.buttons.length) return 0;
 							if(button.link.name=='du') return 2;
 							return 1;
-						}).set('goon',goon);
+						}).set('goon',goon).setHiddenSkill(event.name);
 					}
 					else{
 						event.finish();
@@ -11693,6 +11705,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return /*(get.mode()!='guozhan'||event.player!=player)&&*/event.player.isAlive()&&player.countCards('h')>0;
 				},
 				direct:true,
+				preHidden:true,
 				content:function(){
 					"step 0"
 					var nono=(Math.abs(get.attitude(player,trigger.player))<3);
@@ -11715,6 +11728,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					next.set('logSkill',['zhendu',trigger.player]);
 					next.set('nono',nono);
+					next.setHiddenSkill('zhendu');
 					"step 1"
 					if(result.bool){
 						trigger.player.chooseUseTarget({name:'jiu'},true,'noTargetDelay','nodelayx');
@@ -11732,8 +11746,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			qiluan:{
 				audio:'qiluan2',
-				//group:'qiluan_draw',
-				//subfrequent:['draw'],
+				preHidden:true,
 				trigger:{global:'phaseEnd'},
 				frequent:true,
 				filter:function(event,player){
@@ -11878,6 +11891,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hengzheng:{
 				audio:2,
 				trigger:{player:'phaseDrawBegin1'},
+				preHidden:true,
 				filter:function(event,player){
 					return !event.numFixed&&(player.hp==1||player.countCards('h')==0);
 				},
@@ -12027,6 +12041,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return player.isLinked();
 				},
+				preHidden:true,
 				content:function(){
 					"step 0"
 					event.targets=game.filterPlayer(function(current){
@@ -12201,6 +12216,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				direct:true,
 				audio:2,
+				preHidden:true,
 				filter:function(event,player){
 					if(player.countCards('h')) return false;
 					if(event.name=='gain'&&event.player==player) return false;
@@ -12213,7 +12229,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return player!=target&&target.countCards('he')>0;
 					}).set('ai',function(target){
 						return -get.attitude(_status.event.player,target);
-					});
+					}).setHiddenSkill(event.name);
 					"step 1"
 					if(result.bool){
 						player.logSkill('sijian',result.targets);
@@ -12457,6 +12473,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return player.countCards('h')>0;
 				},
+				preHidden:true,
 				content:function(){
 					"step 0"
 					var cards=player.getCards('h');
@@ -13589,11 +13606,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			kuangfu:{
 				trigger:{source:'damageSource'},
-				direct:true,
 				audio:2,
 				filter:function(event){
 					if(event._notrigger.contains(event.player)) return false;
 					return event.card&&event.card.name=='sha'&&event.player.countCards('e');
+				},
+				logTarget:'player',
+				preHidden:true,
+				check:function(event,player){
+					return get.attitude(player,event.player)<=0;
 				},
 				content:function(){
 					"step 0"
@@ -13606,7 +13627,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('neg',neg);
 					"step 1"
 					if(result.bool){
-						player.logSkill('kuangfu');
 						event.card=result.links[0];
 						if(player.isEmpty(get.subtype(event.card))){
 							player.chooseBool('是否将'+get.translation(event.card)+'置入自己的装备区？').ai=function(){

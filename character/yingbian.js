@@ -253,13 +253,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseUseBegin'},
 				direct:true,
 				frequent:true,
+				preHidden:true,
 				filter:function(event,player){
 					return player==event.player||player.hasSkill('bolan');
 				},
 				content:function(){
 					'step 0'
 					if(player==trigger.player){
-						var next=player.chooseBool(get.prompt('bolan'),'选择获得一个出牌阶段限一次的技能');
+						var next=player.chooseBool(get.prompt('bolan'),'选择获得一个出牌阶段限一次的技能').setHiddenSkill(event.name);
 						if(player.hasSkill('bolan')) next.set('frequentSkill','bolan');
 					}
 					else{
@@ -506,6 +507,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}));
 				},
 				usable:1,
+				preHidden:['zhongyun2'],
 				content:function(){
 					'step 0'
 					var filterTarget=function(card,player,target){
@@ -579,6 +581,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					})>0;
 				},
 				direct:true,
+				preHidden:true,
 				content:function(){
 					"step 0"
 					var color=get.color(trigger.player.judging[0],trigger.player);
@@ -604,7 +607,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else{
 							return -result;
 						}
-					}).set('judging',trigger.player.judging[0]).set('color',color);
+					}).set('judging',trigger.player.judging[0]).set('color',color).setHiddenSkill(event.name);
 					"step 1"
 					if(result.bool){
 						player.respond(result.cards,'highlight','shenpin','noOrdering');
@@ -771,6 +774,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caiwang:{
 				audio:2,
 				trigger:{global:['useCard','respond']},
+				preHidden:true,
 				filter:function(event,player){
 					if(!Array.isArray(event.respondTo)||event.respondTo[0]==event.player||![event.respondTo[0],event.player].contains(player)) return false;
 					var color=get.color(event.card);
@@ -801,6 +805,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					source:'damageSource',
 				},
 				forced:true,
+				preHidden:true,
 				filter:function(event,player){
 					var target=lib.skill.naxiang.logTarget(event,player);
 					return target&&target!=player&&target.isAlive();
@@ -958,6 +963,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ciwei:{
 				trigger:{global:'useCard'},
 				direct:true,
+				preHidden:true,
 				filter:function(event,player){
 					if(event.all_excluded||event.player==player||event.player!=_status.currentPhase||!player.countCards('he')) return false;
 					return event.player.getHistory('useCard').indexOf(event)==1&&['basic','trick'].contains(get.type(event.card));
@@ -974,7 +980,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							num-=get.effect(i,trigger.card,trigger.player,player)
 						}
 						return num;
-					}()).logSkill=['ciwei',trigger.player];
+					}()).setHiddenSkill(event.name).logSkill=['ciwei',trigger.player];
 					'step 1'
 					if(result.bool){
 						trigger.targets.length=0;
@@ -1006,6 +1012,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caiyuan:{
 				trigger:{player:'phaseJieshuBegin'},
 				forced:true,
+				preHidden:true,
 				filter:function(event,player){
 					return !player.hasSkill('caiyuan_mark')&&player.phaseNumber>1;
 				},
@@ -1177,6 +1184,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinquanbian:{
 				audio:'quanbian',
+				preHidden:true,
 				trigger:{player:['useCard','respond']},
 				filter:function(event,player){
 					var phase=event.getParent('phaseUse');
@@ -1272,6 +1280,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yimie:{
 				audio:2,
 				usable:1,
+				preHidden:true,
 				trigger:{source:'damageBegin1'},
 				filter:function(event,player){
 					return player!=event.player&&event.num<event.player.hp;
@@ -1362,6 +1371,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseEnd'},
 				forced:true,
+				preHidden:true,
 				filter:function(event,player){
 					return player.hp<player.maxHp||player.countCards('h')<player.maxHp;
 				},
@@ -1425,6 +1435,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'loseAfter'},
 				direct:true,
+				preHidden:true,
 				filter:function(event,player){
 					return (event.type=='discard'&&event.hs&&event.hs.filterInD('d').length&&event.player.isAlive()&&
 					event.player!=player&&event.player.isPhaseUsing()&&!player.hasSkill('jyishi2'));
@@ -1443,7 +1454,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(cards.length==1) return -get.value(card);
 						cards.remove(card);
 						return (get.value(cards)-get.value(card)-2);
-					}).set('source',trigger.player);
+					}).set('source',trigger.player).setHiddenSkill(event.name);
 					'step 1'
 					if(result.bool){
 						player.addTempSkill('jyishi2');
@@ -1602,6 +1613,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhaoran:{
 				audio:2,
 				trigger:{player:'phaseUseBegin'},
+				preHidden:true,
 				content:function(){
 					player.addTempSkill('zhaoran2','phaseUseEnd');
 				},
@@ -2042,6 +2054,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return ui.cardPile.childElementCount%10>0&&!event.numFixed;
 				},
+				preHidden:true,
 				prompt:function(){
 					return get.prompt('huishi')+'（当前牌堆尾数：'+ui.cardPile.childElementCount%10+'）';
 				},
@@ -2072,6 +2085,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseEnd'},
 				direct:true,
+				preHidden:true,
 				filter:function(event,player){
 					var target=event.player;
 					return target!=player&&target.isIn()&&!target.storage.nohp&&(target.hp+target.countCards('h'))>=(ui.cardPile.childElementCount%10)&&player.countCards('he')>0&&player.canUse({name:'sha',nature:'ice'},target,false);
@@ -2083,7 +2097,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('target',trigger.player).set('ai',function(card){
 						if(get.effect(_status.event.target,get.autoViewAs({name:'sha',nature:'ice'},[card]),player)<=0) return false;
 						return 6-get.value(card);
-					});
+					}).setHiddenSkill(event.name);
 					'step 1'
 					if(result.bool){
 						player.useCard(get.autoViewAs({name:'sha',nature:'ice'},result.cards),result.cards,false,trigger.player,'qingleng');

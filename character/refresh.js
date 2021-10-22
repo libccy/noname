@@ -1575,6 +1575,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					source:'damageSource',
 				},
 				frequent:true,
+				preHidden:true,
 				filter:function(event,player,name){
 					if(name=='damageEnd') return true;
 					if(!event.card) return false;
@@ -6731,12 +6732,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					halfneg:true,
 				},
 			},
-			"new_retuxi":{
+			new_retuxi:{
 				audio:"retuxi",
 				trigger:{
 					player:"phaseDrawBegin2",
 				},
 				direct:true,
+				preHidden:true,
 				filter:function(event,player){
 					return event.num>0&&!event.numFixed&&game.hasPlayer(function(target){
 						return target.countCards('h')>0&&player!=target;
@@ -6752,7 +6754,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var att=get.attitude(_status.event.player,target);
 						if(target.hasSkill('tuntian')) return att/10;
 						return 1-att;
-					});
+					}).setHiddenSkill('new_retuxi');
 					"step 1"
 					if(result.bool){
 						result.targets.sortBySeat();
@@ -8272,6 +8274,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return (get.attitude(player,event.source)<=0);
 				},
 				logTarget:'source',
+				preHidden:true,
 				content:function(){
 					"step 0"
 					event.num=trigger.num;
@@ -8390,6 +8393,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['heqi','sunce','gexuan','re_sunben','re_sunce','re_heqi'],
 				trigger:{player:'phaseDrawBegin2'},
 				forced:true,
+				preHidden:true,
 				filter:function(event,player){
 					return !event.numFixed;
 				},
@@ -9390,9 +9394,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xunxun:{
 				audio:2,
 				trigger:{player:'phaseDrawBegin1'},
-				//check:function(event,player){
-				//	return !player.hasSkill('reyiji2');
-				//},
+				preHidden:true,
 				content:function(){
 					"step 0"
 					event.cards=get.cards(4);
@@ -9430,6 +9432,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.player==player) return event.source;
 					return event.player;
 				},
+				preHidden:true,
 				content:function(){
 					"step 0"
 					event.count=trigger.num;

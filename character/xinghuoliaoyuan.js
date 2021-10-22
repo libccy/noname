@@ -894,7 +894,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(name=='damageBegin3') return range>3;
 					return event.num>1&&range<3;
 				},
-				//priority:-9.5,
+				preHidden:true,
 				content:function (){
 					trigger.num=event.triggername=='damageBegin4'?1:trigger.num+1;
 				},

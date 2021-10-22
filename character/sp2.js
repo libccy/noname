@@ -216,7 +216,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					var cardType=result.control;
 					event.cardType=cardType;
-					player.draw(player.countDisabled());
+					var num=player.countDisabled();
+					if(num<5) player.draw(5-num);
 					player.chooseTarget(true,lib.filter.notMe,'令一名其他角色从牌堆中使用一张'+get.translation(cardType)+'牌').set('ai',function(target){
 						var player=_status.event.player,type=_status.event.cardType;
 						var card=get.cardPile2(function(card){
@@ -296,7 +297,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.line(target,'green');
 						player.discardPlayerCard(target,'e',true);
 					}
-					else event.goto(6);
+					else event.goto(5);
 					if(event.num<3) event.finish();
 					'step 3'
 					if(!game.hasPlayer(function(current){
@@ -435,6 +436,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{target:'useCardToTargeted'},
 				logTarget:'player',
 				usable:1,
+				preHidden:true,
 				filter:function(event,player){
 					var color=get.color(event.card);
 					if(player==event.player||event.player.isDead()||(get.mode()=='guozhan'&&color!='black')) return false;
@@ -659,6 +661,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return player.hasSkill('wanggui')&&!player.hasSkill('wanggui2');
 				},
+				preHidden:true,
 				content:function(){
 					'step 0'
 					player.addTempSkill('wanggui2');
@@ -669,7 +672,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}).set('ai',function(target){
 							var player=_status.event.player;
 							return get.damageEffect(target,player,player);
-						});
+						}).setHiddenSkill('wanggui');
 					}
 					else event.goto(2);
 					'step 1'
@@ -680,7 +683,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					event.finish();
 					'step 2'
-					player.chooseBool('望归：是否令所有与自己势力相同的角色各摸一张牌？');
+					player.chooseBool('望归：是否令所有与自己势力相同的角色各摸一张牌？').setHiddenSkill('wanggui');
 					'step 3'
 					if(result.bool){
 						var targets=game.filterPlayer(function(current){
@@ -723,6 +726,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!num) return att>0;
 					return num>num2;
 				},
+				preHidden:true,
 				content:function(){
 					'step 0'
 					var num=Math.min(5,trigger.player.hp-trigger.player.countCards('h'));
@@ -10115,10 +10119,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhiren:'织纴',
 			zhiren_info:'当你于你的回合内使用第一张非转化牌时，你可依次执行以下选项中的前X项：①卜算X。②可弃置场上的一张装备牌和延时锦囊牌。③回复1点体力。④摸三张牌。（X为此牌的名称的字数）',
 			yaner:'燕尔',
-			yaner_info:'每回合限一次。当有其他角色于其出牌阶段内失去手牌后，若其没有手牌，则你可以与其各摸两张牌。若其以此法摸得的两张牌类型相同，则其回复1点体力。若你以此法摸得的两张牌类型相同，则你将〖织纴〗中的“你的回合内”改为“一回合内”。',
+			yaner_info:'每回合限一次。当有其他角色于其出牌阶段内失去手牌后，若其没有手牌，则你可以与其各摸两张牌。若其以此法摸得的两张牌类型相同，则其回复1点体力。若你以此法摸得的两张牌类型相同，则你将〖织纴〗中的“你的回合内”改为“一回合内”直至你下回合开始。',
 			caoanmin:'曹安民',
 			xianwei:'险卫',
-			xianwei_info:'锁定技，准备阶段，你废除一个装备栏并摸X张牌（X为你已废除的装备栏数），然后令一名其他角色对其自己使用一张牌堆中的一张与此装备栏副类别相同的装备牌（没有可使用的牌则改为摸一张牌）。当你废除所有装备栏后，你加2点体力上限，然后你与所有其他角色视为在彼此的攻击范围内。',
+			xianwei_info:'锁定技，准备阶段，你废除一个装备栏并摸X张牌（X为你未废除的装备栏数），然后令一名其他角色对其自己使用一张牌堆中的一张与此装备栏副类别相同的装备牌（没有可使用的牌则改为摸一张牌）。当你废除所有装备栏后，你加2点体力上限，然后你与所有其他角色视为在彼此的攻击范围内。',
 			zhanghu:'张虎',
 			cuijian:'摧坚',
 			cuijian_info:'出牌阶段限一次，你可以选择一名有手牌的其他角色。若其手牌中：有【闪】，其将装备区内的防具牌和所有【闪】交给你，然后你交给其等量的牌；没有【闪】，你弃置一张手牌。',
