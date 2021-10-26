@@ -1625,8 +1625,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
 				},
 				forced:true,
-				charlotte:true,
-				onremove:true,
 				filter:function(event,player){
 					if(player.hp<=1) return false;
 					if(event.player==player){

@@ -896,6 +896,8 @@ window.noname_character_rank={
 		're_jiaxu',
 		'xin_caozhen',
 		'ol_dengzhi',
+		'sundeng',
+		'duji',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -935,7 +937,6 @@ window.noname_character_rank={
 		'sunxiu',
 		'quancong',
 		'guohuanghou',
-		'sundeng',
 		'fazheng',
 		'guanping',
 		'old_guanzhang',
@@ -1101,7 +1102,6 @@ window.noname_character_rank={
 		'huaxiong',
 		'gongsunzan',
 		'xuzhu',
-		'duji',
 		'old_huaxiong',
 		'chengpu',
 		'zhangwen',
@@ -1744,7 +1744,6 @@ window.noname_character_rank={
 		],
 		junk:[
 			'sunshao',
-			'duji',
 			'ol_guohuai',
 			'gongsunzan',
 			're_sunce',

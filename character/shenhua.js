@@ -1045,6 +1045,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"drlt_wanglie":{
+				locked:false,
 				mod:{
 					targetInRange:function(card,player,target,now){
 						if(game.online){

@@ -254,13 +254,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
-					return game.hasPlayer((current)=>current.countCards('h')>0);
+					return game.hasPlayer((current)=>lib.skill.oldimeng.filterTarget(null,player,current));
 				},
 				selectTarget:2,
 				complexTarget:true,
 				filterTarget:function(card,player,target){
-					if(!ui.selected.targets.length||ui.selected.targets[0].countCards('h')>0) return true;
-					return target.countCards('h')>0;
+					if(target==player) return false;
+					var ps=player.countCards('he');
+					if(!ui.selected.targets.length){
+						var hs=target.countCards('h');
+						return game.hasPlayer(function(current){
+							if(current==player||current==target) return false;
+							var cs=current.countCards('h');
+							return (hs>0||cs>0)&&Math.abs(hs-cs)<=ps;
+						});
+					}
+					var current=ui.selected.targets[0],hs=target.countCards('h'),cs=current.countCards('h');
+					return (hs>0||cs>0)&&Math.abs(hs-cs)<=ps;
 				},
 				multitarget:true,
 				multiline:true,
@@ -10467,7 +10477,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olhaoshi:'好施',
 			olhaoshi_info:'摸牌阶段开始时，你可以多摸两张牌。然后摸牌阶段结束时，若你的手牌数大于5，则你将手牌数的一半（向下取整）交给一名手牌最少其他角色并获得如下效果直到你下回合开始：当你成为【杀】或普通锦囊牌的目标后，其可以交给你一张手 牌。',
 			oldimeng:'缔盟',
-			oldimeng_info:'出牌阶段限一次，你可令两名角色交换手牌并获得如下效果：出牌阶段结束时，你弃置X张牌（X为这两名角色的手牌数之差）。',
+			oldimeng_info:'出牌阶段限一次，你可令两名满足X≤Y的其他角色交换手牌并获得如下效果：出牌阶段结束时，你弃置X张牌（X为这两名角色手牌数之差的绝对值；Y为你的手牌数）。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

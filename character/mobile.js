@@ -646,7 +646,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						locked:false,
 						filter:function(event,player){
-							if(get.type(event.card,false)=='delay'||!player.storage.disordersidi) return false;
+							if(get.type(event.card,false)=='delay'||!player.storage.disordersidi||event.targets.length!=1) return false;
 							var index=player.storage.disordersidi.indexOf(event.player);
 							return index!=-1&&player.storage.disordersidi2[index]==event.target;
 						},

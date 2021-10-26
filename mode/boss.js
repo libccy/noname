@@ -1609,7 +1609,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return name;
 					}
 					else{
-						var arr=['shen_caocao','shen_simayi','shen_guanyu','shen_zhugeliang','shen_zhaoyun','shen_zhouyu','shen_lvmeng','shen_lvbu','shen_liubei','shen_luxun','shen_ganning','ol_zhangliao','shen_zhenji','shen_caopi','key_kagari','key_shiki','key_hina'];
+						var arr=['shen_caocao','shen_simayi','shen_guanyu','shen_zhugeliang','shen_zhaoyun','shen_zhouyu','shen_lvmeng','shen_lvbu','shen_liubei','shen_luxun','shen_ganning','ol_zhangliao','shen_zhenji','shen_caopi','key_kagari','key_shiki','db_key_hina'];
 						arr.removeArray(list);
 						return arr.randomGet();
 					}
@@ -1658,7 +1658,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							game.check();
 						});
 						control.backup1=ui.create.div('.buttons');
-						control.backup2=ui.create.buttons(['shen_caocao','shen_simayi','shen_guanyu','shen_zhugeliang','shen_zhaoyun','shen_zhouyu','shen_lvmeng','shen_lvbu','shen_liubei','shen_luxun','shen_ganning','ol_zhangliao','shen_zhenji','shen_caopi','key_kagari','key_shiki','key_hina'],'character',control.backup1);
+						control.backup2=ui.create.buttons(['shen_caocao','shen_simayi','shen_guanyu','shen_zhugeliang','shen_zhaoyun','shen_zhouyu','shen_lvmeng','shen_lvbu','shen_liubei','shen_luxun','shen_ganning','ol_zhangliao','shen_zhenji','shen_caopi','key_kagari','key_shiki','db_key_hina'],'character',control.backup1);
 						return control;
 					}
 				},
@@ -1758,7 +1758,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								lib.inpile.add('niaobaidaowenha');
 								break;
 							}
-							case 'key_hina':{
+							case 'db_key_hina':{
 								game.players[i].equip(game.createCard2('shenzhixiunvfu','spade',13));
 								lib.inpile.add('shenzhixiunvfu');
 								break;

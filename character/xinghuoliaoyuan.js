@@ -11,7 +11,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhangliang:["male","qun",4,["xinfu_jijun","xinfu_fangtong"],[]],
 			lvqian:["male","wei",4,["xinfu_weilu","xinfu_zengdao"],[]],
 			panjun:["male","wu",3,["xinfu_guanwei","xinfu_gongqing"],[]],
-			duji:["male","wei",3,["xinfu_andong","xinfu_yingshi"],[]],
+			duji:["male","wei",3,["xinfu_andong","xinyingshi"],[]],
 			zhoufang:["male","wu",3,["xinfu_duanfa","xinfu_youdi"],[]],
 			yanjun:["male","wu",3,["xinfu_guanchao","xinfu_xunxian"],[]],
 			liuyao:["male","qun",4,["xinfu_kannan"],[]],
@@ -42,7 +42,112 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//zhaotongzhaoguang:['zhaoyun','mayunlu'],
 		},
 		skill:{
-			"xinfu_guolun":{
+			xinyingshi:{
+				audio:'xinfu_yingshi',
+				trigger:{player:'phaseUseBegin'},
+				direct:true,
+				filter:function(event,player){
+					return player.countCards('he')>0&&!game.hasPlayer(function(current){
+						return current.storage.xinyingshi_cards&&current.storage.xinyingshi_cards.length>0;
+					});
+				},
+				content:function(){
+					'step 0'
+					player.chooseCardTarget({
+						filterCard:true,
+						filterTarget:lib.filter.notMe,
+						selectCard:[1,player.countCards('he')],
+						position:'he',
+						prompt:get.prompt('xinyingshi'),
+						prompt2:'将任意张牌置于一名其他角色的武将牌上作为“酬”',
+						ai1:function(card){
+							return 1-player.getUseValue(card);
+						},
+						ai2:function(target){
+							var player=_status.event.player;
+							return (1+game.countPlayer(function(current){
+								return get.attitude(player,current)>0&&current.inRange(target)&&get.damageEffect(target,current,player)>0;
+							}))*-get.attitude(player,target);
+						},
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0],cards=result.cards;
+						player.logSkill('xinyingshi',target);
+						player.lose(cards,ui.special,'toStorage');
+						player.$give(cards,target,false);
+						target.addSkill('xinyingshi_cards');
+						target.markAuto('xinyingshi_cards',cards);
+						target.storage.xinyingshi_source=player;
+						game.log(player,'将',cards,'置于了',target,'的武将牌上');
+					}
+					else event.finish();
+					'step 2'
+					game.delay(0,get.delayx(650,650));
+				},
+				subSkill:{
+					cards:{
+						trigger:{player:'damageSource'},
+						forced:true,
+						charlotte:true,
+						filter:function(event,player){
+							return event.source&&event.source.isIn()&&event.card&&event.getParent().type=='card'&&
+							player.storage.xinyingshi_cards&&player.storage.xinyingshi_cards.length;
+						},
+						logTarget:'source',
+						content:function(){
+							'step 0'
+							event.target=trigger.source;
+							event.target.chooseButton(['应势：请选择你的赏金',player.storage.xinyingshi_cards]);
+							'step 1'
+							if(result.bool){
+								var cards=[result.links[0]];
+								player.unmarkAuto('xinyingshi_cards',cards);
+								for(var i=0;i<ui.cardPile.childNodes.length;i++){
+									var card=ui.cardPile.childNodes[i];
+									if(card.number==cards[0].number&&card.suit==cards[0].suit) cards.push(card);
+								}
+								player.$give(cards[0],target);
+								if(cards.length>1){
+									setTimeout(function(){
+										target.$gain2(cards.slice(1));
+									},get.delayx(200,200));
+									game.log(target,'从牌堆获得了',cards.slice(1))
+								}
+								game.delay(0,get.delayx(500,500));
+								target.gain(cards);
+								if(!player.storage.xinyingshi_cards||!player.storage.xinyingshi_cards.length) player.removeSkill('xinyingshi_cards');
+							}
+							else event.finish();
+							'step 2'
+							game.delay(0,get.delayx(150,150));
+						},
+						marktext:'酬',
+						intro:{
+							content:'cards',
+							onunmark:function(storage,player){
+								if(storage&&storage.length){
+									var source=player.storage.xinyingshi_source;
+									if(source&&source.isIn()){
+										source.logSkill('xinyingshi',player);
+										player.$give(storage,source);
+										game.delayx(0,get.delayx(500,500));
+										source.gain(storage);
+									}
+									else{
+										game.cardsDiscard(storage);
+										player.$throw(storage,1000);
+									}
+								}
+								delete player.storage.xinyingshi_source;
+								delete player.storage.xinyingshi_cards;
+							},
+						},
+						ai:{threaten:3},
+					},
+				},
+			},
+			xinfu_guolun:{
 				audio:2,
 				enable:"phaseUse",
 				usable:1,
@@ -959,7 +1064,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<cards.length;i++){
 						if(get.suit(cards[i])=='heart') togain.push(cards[i]);
 					}
-					if(togain.length) trigger.source.give(togain,player);
+					if(togain.length) player.gain(togain,trigger.source,'giveAuto');
 				},
 			},
 			"xinfu_yingshi":{
@@ -1581,6 +1686,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_tushe_info":"当你使用非装备牌指定目标后，若你没有基本牌，则你可以摸X张牌。（X为此牌指定的目标数）",
 			"xinfu_limu":"立牧",
 			"xinfu_limu_info":"出牌阶段限一次，你可以将一张♦牌当做【乐不思蜀】对自己使用，然后回复1点体力。只要你的判定区内有牌，你对攻击范围内的其他角色使用牌便没有次数和距离限制。",
+			xinyingshi:'应势',
+			xinyingshi_info:'出牌阶段开始时，若场上所有角色的武将牌上均没有“酬”，则你可以将任意张牌置于一名角色的武将牌上，称为“酬”。若如此做：当有角色使用牌对有“酬”的角色造成伤害后，其可以获得一张“酬”，并获得牌堆中所有与“酬”花色点数均相同的牌；有“酬”的角色死亡时，你获得其所有“酬”。',
 		},
 	};
 });
