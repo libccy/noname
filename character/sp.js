@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			sp:{
-				sp_default:["caoying","simahui","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","xujing","yuantanyuanshang","sunshao","zhangling",'guansuo','baosanniang','ol_zhangchangpu','caoshuang','sp_zhangliao','wolongfengchu','ol_xinxianying','panshu','huangzu','huangchengyan','gaogan','duxi','ol_dengzhi'],
+				sp_default:["caoying","simahui","yangxiu","chenlin","caohong","xiahouba","yuanshu","sp_diaochan","sp_zhaoyun","zhugejin","zhugeke","guanyinping","simalang","zhangxingcai","sp_sunshangxiang","caoang","sp_caoren","zhangbao","maliang","zhugedan","sp_jiangwei","sp_machao","sunhao","shixie","mayunlu","zhanglu","wutugu","sp_caiwenji","zhugeguo","jsp_guanyu","jsp_huangyueying","sunluyu","zumao","wenpin","daxiaoqiao","tadun","yanbaihu","chengyu","wanglang","sp_pangde","sp_jiaxu","litong","mizhu","buzhi","caochun","dongbai","zhaoxiang","mazhong","dongyun","kanze","heqi","wangyun","sunqian","xizhicai","quyi","luzhi","xujing","yuantanyuanshang","sunshao","zhangling",'guansuo','baosanniang','ol_zhangchangpu','caoshuang','sp_zhangliao','wolongfengchu','ol_xinxianying','panshu','huangzu','huangchengyan','gaogan','duxi','ol_dengzhi','ol_wangrong'],
 				sp_tongque:["liuxie","lingju","fuwan","sp_fuwan","sp_fuhuanghou","sp_jiben"],
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_guozhan:["zangba","shamoke","ganfuren","yuejin","hetaihou","dingfeng","panfeng","jianggan","sp_mifangfushiren","bianfuren"],
@@ -16,6 +16,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		character:{
+			ol_wangrong:['female','qun',3,['olfengzi','oljizhan','olfusong'],['unseen']],
 			ol_dengzhi:['male','shu',3,['olxiuhao','olsujian']],
 			bianfuren:['female','wei',3,['fuwei','yuejian']],
 			duxi:['male','wei',3,['quxi','bixiong']],
@@ -393,6 +394,110 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//王荣
+			olfengzi:{
+				audio:2,
+				trigger:{player:'useCard'},
+				direct:true,
+				filter:function(event,player){
+					if(event.olfengzi_buff||!event.targets.length||!player.isPhaseUsing()||player.hasSkill('olfengzi_buff')) return false;
+					var type=get.type(event.card,false);
+					if(type!='basic'&&type!='trick') return false;
+					return player.hasCard(function(i){
+						if(_status.connectMode) return true;
+						return get.type2(i,player)==type;
+					},'h');
+				},
+				content:function(){
+					'step 0'
+					if(player!=game.me&&!player.isUnderControl()&&!player.isOnline()) game.delayx();
+					var type=get.type(trigger.card,false);
+					player.chooseToDiscard('h',get.prompt('olfengzi'),'弃置一张'+get.translation(type)+'牌，令'+get.translation(trigger.card)+'结算两次',function(card,player){
+						return get.type(card,player)==_status.event.type;
+					}).set('type',type).logSkill='olfengzi';
+					'step 1'
+					if(result.bool){
+						player.addTempSkill('olfengzi_buff','phaseUseAfter');
+						trigger.olfengzi_buff=player;
+					}
+				},
+				subSkill:{
+					buff:{
+						trigger:{global:'useCardToTargeted'},
+						forced:true,
+						charlotte:true,
+						popup:false,
+						lastDo:true,
+						filter:function(event,player){
+							return (event.parent.olfengzi_buff==player&&event.targets.length==event.parent.triggeredTargets4.length);
+						},
+						content:function(){
+							trigger.getParent().targets=trigger.getParent().targets.concat(trigger.targets);
+							trigger.getParent().triggeredTargets4=trigger.getParent().triggeredTargets4.concat(trigger.targets);
+						},
+					},
+				},
+			},
+			oljizhan:{
+				audio:2,
+				trigger:{player:'phaseDrawBegin1'},
+				filter:function(event,player){
+					return !event.numFixed;
+				},
+				content:function(){
+					'step 0'
+					trigger.changeToZero();
+					var card=get.cards()[0];
+					game.cardsGotoOrdering(card);
+					event.cards=[card];
+					event.num=get.number(card,false);
+					player.showCards(card,get.translation(player)+'发动了【吉占】');
+					'step 1'
+					var str=get.strNumber(num);
+					player.chooseControl('大于'+str,'小于'+str,'cancel2').set('prompt','吉占：猜测下一张牌的点数');
+					'step 2'
+					var card=get.cards()[0];
+					game.cardsGotoOrdering(card);
+					event.cards.push(card);
+					var num=get.number(card,false);
+					if(num>event.num&&result.index==0||num<event.num&&result.index==1){
+						event.num=num;
+						event.goto(1);
+					}
+					player.showCards(card);
+					'step 3'
+					player.gain(cards,'gain2');
+				},
+			},
+			olfusong:{
+				audio:2,
+				forceDie:true,
+				trigger:{player:'die'},
+				skillAnimation:true,
+				animationColor:'gray',
+				direct:true,
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return current.maxHp>player.maxHp;
+					});
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('olfusong'),'令一名体力上限大于你的其他角色获得〖丰姿〗或〖吉占〗',function(card,player,target){
+						return target.maxHp>player.maxHp;
+					}).set('forceDie',true);
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('olfusong',target);
+						player.chooseControl('olfengzi','oljizhan').set('prompt','令'+get.translation(target)+'获得其中一个技能');
+					}
+					else event.finish();
+					'step 2'
+					target.addSkillLog(result.control);
+				},
+			},
 			//邓芝
 			olxiuhao:{
 				audio:2,
@@ -418,8 +523,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.attitude(player,event.source)>0) bool=true;
 						if(get.damageEffect(player,event.source,player,event.nature)<0){
 							if(event.source.hasSkillTag('nogain')) bool=true;
-							if(event.num>=player.hp+player.countCards('hs',{name:['tao','jiu']})&&(!player.hasFriend()||player==get.zhu(player))) return true;
-							return false;
+							if(event.num>=player.hp+player.countCards('hs',{name:['tao','jiu']})&&(!player.hasFriend()||player==get.zhu(player))) bool=true;
 						}
 					}
 					delete _status.olxiuhao_judging;
@@ -5820,7 +5924,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.chooseTarget(str+'角色使用一张杀',true,function(card,player,target){
 								if(!player.canUse('sha',target,false)) return false;
 								if(get.mode()=='guozhan'){
-									return targe.isFriendOf(status.event.identity);
+									return target.isFriendOf(status.event.identity);
 								}
 								return true;
 							}).set('ai',function(target){
@@ -13651,7 +13755,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"useCardToPlayered",
 				},
 				direct:true,
-				filter:function (event,player){
+				filter:function(event,player){
 					if(event.getParent().triggeredTargets3.length>1) return false;
 					if(!player.isPhaseUsing()) return false;
 					if(!['basic','trick'].contains(get.type(event.card))) return false;
@@ -13660,7 +13764,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function (){
 					'step 0'
-					player.chooseTarget(get.prompt2('xinfu_lingren'),function(card,player,target){
+					player.chooseTarget(get.prompt('xinfu_lingren'),'选择一名目标角色并猜测其手牌构成',function(card,player,target){
 						return _status.event.targets.contains(target);
 					}).set('ai',function(target){
 						return 2-get.attitude(_status.event.player,target);
@@ -15012,6 +15116,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xujing:['xujing','sp_xujing'],
 			zhaoxiang:['zhaoxiang','tw_zhaoxiang'],
 			dengzhi:['ol_dengzhi','dengzhi'],
+			wangrong:['wangrong','ol_wangrong'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
@@ -15842,6 +15947,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olsujian:'素俭',
 			olsujian_given:'已分配',
 			olsujian_info:'锁定技。弃牌阶段开始前，你跳过此阶段。然后你选择一项：①将所有不为本回合获得的手牌分配给其他角色。②弃置这些手牌，然后弃置一名其他角色等量的牌。',
+			ol_wangrong:'OL王荣',
+			olfengzi:'丰姿',
+			olfengzi_info:'出牌阶段限一次。当你使用有目标的基本牌或普通锦囊牌时，你可弃置一张与此牌类型相同的牌，然后令此牌结算两次。',
+			oljizhan:'吉占',
+			oljizhan_info:'摸牌阶段开始时，你可以放弃摸牌。你展示牌堆顶的一张牌，并猜测牌堆顶的下一张牌点数大于或小于此牌。若你猜对，你可继续重复此流程。然后你获得以此法展示的所有牌。',
+			olfusong:'赋颂',
+			olfusong_info:'当你死亡时，你可以令一名体力上限大于你的其他角色获得〖吉占〗或〖丰姿〗。',
 			
 			sp_default:"常规",
 			sp_tongque:"铜雀台",

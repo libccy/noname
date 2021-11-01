@@ -17232,6 +17232,14 @@
 						else str+=('人数：<span class="firetext">'+this.hp+'/'+this.maxHp+'</span>');
 						
 						str+=('　('+info[0].slice(0,12)+' 的房间)');
+						if(config.mode!='guozhan'&&(config.mode!='doudizhu'||config.doudizhu_mode!='online')){
+							str+='【';
+							for(var i=0;i<config.cardPack.length;i++){
+								str+=(get.translation(config.cardPack[i]+'_card_config').slice(0,2));
+								if(i<config.cardPack.length-1) str+='+';
+							}
+							str+='】';
+						}
 						this.config=config;
 						if(this.hp==this.maxHp&&!config.gameStarted){
 							this.roomfull=true;
@@ -27614,6 +27622,11 @@
 								lib.skill[i]=mode.skill[i];
 							}
 						}
+						if(mode.card){
+							for(var i in mode.card){
+								lib.card[i]=mode.card[i];
+							}
+						}
 						game.finishCards();
 						if(mode.characterPack){
 							for(var i in mode.characterPack){
@@ -29792,10 +29805,10 @@
 			},
 			skill:function(player,content){
 				if(typeof content=='string'){
-					lib.skill[content].video(player);
+					if(lib.skill[content]) lib.skill[content].video(player);
 				}
 				else if(Array.isArray(content)){
-					lib.skill[content[0]].video(player,content[1]);
+					if(lib.skill[content[0]]) lib.skill[content[0]].video(player,content[1]);
 				}
 				else{
 					console.log(player,content)
@@ -48872,16 +48885,17 @@
 		},
 		updatec:function(){
 			if(_status.noupdatec) return;
-			var length=0;
+			var length=0,minoffset=-Infinity;
 			var controls=[];
 			var widths=[];
+			var leftwidths=[];
 			var add=function(node,first){
 				var thiswidth=parseInt(node.style.width);
 				if(thiswidth){
 					thiswidth+=8;
 					length+=thiswidth;
 					if(first){
-						widths.unshift(thiswidth);
+						leftwidths.push(thiswidth);
 					}
 					else{
 						widths.push(thiswidth);
@@ -48890,7 +48904,7 @@
 				else{
 					length+=node.offsetWidth;
 					if(first){
-						widths.unshift(node.offsetWidth);
+						leftwidths.push(node.offsetWidth);
 					}
 					else{
 						widths.push(node.offsetWidth);
@@ -48903,17 +48917,18 @@
 					controls.push(node);
 				}
 			}
-			var stayleft=null;
+			widths=leftwidths.concat(widths);
+			var staylefts=[];
 			for(var i=0;i<ui.control.childNodes.length;i++){
 				if(ui.control.childNodes[i].classList.contains('removing')) continue;
-				if(!stayleft&&lib.config.wuxie_right&&ui.control.childNodes[i].stayleft){
-					stayleft=ui.control.childNodes[i];
+				if(lib.config.wuxie_right&&ui.control.childNodes[i].stayleft){
+					staylefts.push(ui.control.childNodes[i]);
 				}
 				else{
 					add(ui.control.childNodes[i]);
 				}
 			}
-			if(stayleft){
+			if(staylefts.length){
 				var fullwidth=0;
 				var fullright=(game.layout=='long'||game.layout=='long2'||game.chess||(game.layout!='nova'&&parseInt(ui.arena.dataset.number)<=5));
 				for(var i=0;i<widths.length;i++){
@@ -48921,12 +48936,19 @@
 					if(get.is.phoneLayout()) fullwidth+=6;
 				}
 				fullwidth/=2;
-				fullwidth+=stayleft.offsetWidth;
-				if(get.is.phoneLayout()){
-					fullwidth+=18;
-				}
-				else{
-					fullwidth+=12;
+				var currentLeft=0;
+				for(var stayleft of staylefts){
+					stayleft.currentLeft=currentLeft;
+					fullwidth+=stayleft.offsetWidth;
+					currentLeft+=stayleft.offsetWidth;
+					if(get.is.phoneLayout()){
+						fullwidth+=18;
+						currentLeft+=18;
+					}
+					else{
+						fullwidth+=12;
+						currentLeft+=12;
+					}
 				}
 				if(fullright){
 					fullwidth+=124;
@@ -48937,28 +48959,37 @@
 				else{
 					fullwidth+=154;
 				}
-				if(game.layout!='default'&&game.layout!='newlayout'&&ui.arena.offsetWidth/2>=fullwidth){
-					var current_offset=stayleft._offset;
-					if(fullright){
-						stayleft._offset=Math.ceil(-ui.arena.offsetWidth/2)+135;
-						if((game.layout=='long2'||game.layout=='nova')&&ui.arena.dataset.number=='8'&&get.mode()!='boss'){
-							stayleft._offset+=game.me.getLeft();
+				for(var stayleft of staylefts){
+					if(game.layout!='default'&&game.layout!='newlayout'){
+						var current_offset=stayleft._offset;
+						if(fullright){
+							stayleft._offset=Math.ceil(-ui.arena.offsetWidth/2)+135;
+							if((game.layout=='long2'||game.layout=='nova')&&ui.arena.dataset.number=='8'&&get.mode()!='boss'){
+								stayleft._offset+=game.me.getLeft();
+							}
+						}
+						else{
+							stayleft._offset=Math.ceil(-ui.arena.offsetWidth/2)+165;
+						}
+						stayleft._offset+=stayleft.currentLeft;
+						
+						if(current_offset!=stayleft._offset){
+							stayleft.animate('controlpressdownx',500);
+							stayleft.style.transform='translateX('+stayleft._offset+'px)';
 						}
 					}
 					else{
-						stayleft._offset=Math.ceil(-ui.arena.offsetWidth/2)+165;
-					}
-					if(current_offset!=stayleft._offset){
-						stayleft.animate('controlpressdownx',500);
-						stayleft.style.transform='translateX('+stayleft._offset+'px)';
+						add(stayleft,true);
 					}
 				}
-				else{
-					add(stayleft,true);
+				if(staylefts.length&&controls.length){
+					var last=staylefts[staylefts.length-1];
+					minoffset=last._offset+last.offsetWidth+(get.is.phoneLayout()?18:12);
 				}
 			}
 			if(!controls.length) return;
 			var offset=-length/2;
+			if(minoffset>offset) offset=minoffset;
 			var control=controls.shift();
 			if(control._offset!=offset){
 				control.animate('controlpressdownx',500);

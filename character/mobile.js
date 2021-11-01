@@ -612,7 +612,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if((player==game.me||player.isUnderControl())&&!game.observe){
 							var str='R={ ';
 							for(var i=0;i<storage.length;i++){
-								str+=('<'+get.translation(storage[i])+', '+get.translation(player.storage.disordersidi2[i])+'>');
+								str+=('&lt;'+get.translation(storage[i])+', '+get.translation(player.storage.disordersidi2[i])+'&gt;');
 								if(i<storage.length-1) str+=', ';
 							}
 							str+=' }'
@@ -2130,12 +2130,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target){
+							if(_status.luanchou_judging) return;
+							_status.luanchou_judging=true;
 							if(get.tag(card,'damage')&&target.hasMark('luanchou')){
 								var other=game.findPlayer(function(current){
 									return current!=target&&current.hasMark('luanchou')&&current.hp>target.hp&&(!current.storage.counttrigger||!current.storage.counttrigger.gonghuan);
 								});
-								if(!other) return;
-								return [0,0,0,get.effect(other,card,player,target)];
+								if(!other){
+									delete _status.luanchou_judging;
+									return;
+								};
+								var eff=[0,0,0,get.damageEffect(other,player,target,get.nature(card))];
+								delete _status.luanchou_judging;
+								return eff;
 							}
 						},
 					},
@@ -12927,7 +12934,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinzenhui:'谮毁',
 			xinzenhui_info:'出牌阶段限一次。当你使用【杀】或黑色普通锦囊牌指定目标时，你可选择另一名能成为此牌目标的其他角色并选择一项：①令其也成为此牌的目标。②获得其一张牌，然后将此牌的使用者改为该角色。',
 			xinjiaojin:'骄矜',
-			xinjiaojin_info:'当你受到男性角色造成的伤害时，你可以弃置一张装备牌，令此伤害-1。',
+			xinjiaojin_info:'当你受到男性角色造成的伤害时，你可以弃置一张装备牌并防止此伤害。',
 			xin_caozhen:'手杀曹真',
 			disordersidi:'司敌',
 			disordersidi_info:'①当你使用的不为延时锦囊牌的牌结算结束后，你可选择一名R内不存在以a为第一序偶的二元序偶的其他角色a，并选择一名角色b，在关系R内建立二元序偶<a,b>（b对其他角色不可见）。②一名角色a使用的不为延时锦囊牌的牌结算结束后，你清除R内以其为第一元素的二元序偶。③一名角色a使用不为延时锦囊牌的牌指定b为唯一目标时，若aRb成立，则你从R内移除<a,b>，且：若b为你，你摸一张牌；若b不为你，你可选择：⒈取消此牌的目标，并对a造成1点伤害。⒉摸两张牌。',

@@ -1,6 +1,6 @@
 window.noname_update={
-	version:'1.9.110.9.3.3',
-	update:'1.9.110.9.3.2',
+	version:'1.9.110.9.3.4',
+	update:'1.9.110.9.3.3',
 	changeLog:[
 		'界鲁肃、孙登、郭皇后、薛综、杜畿技能修改',
 		'bug修复',

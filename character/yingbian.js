@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'yingbian',
 		connect:true,
 		character:{
+			zuofen:['female','jin',3,['zhaosong','lisi'],['unseen']],
 			ol_huaxin:['male','wei',3,['caozhao','olxibing']],
 			zhongyan:['female','jin',3,['bolan','yifa']],
 			weiguan:['male','jin',3,['zhongyun','shenpin']],
@@ -15,7 +16,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jin_zhangchunhua:['female','jin',3,['huishi','qingleng','xuanmu'],['hiddenSkill']],
 			jin_simayi:['male','jin',3,['buchen','smyyingshi','xiongzhi','quanbian'],['hiddenSkill']],
 			jin_wangyuanji:['female','jin',3,['shiren','yanxi'],['hiddenSkill']],
-			jin_simazhao:['male','jin',3,['tuishi','choufa','zhaoran','chengwu'],['zhu','hiddenSkill']],
+			jin_simazhao:['male','jin',3,['tuishi','xinchoufa','zhaoran','chengwu'],['zhu','hiddenSkill']],
 			jin_xiahouhui:['female','jin',3,['baoqie','jyishi','shiduo'],['hiddenSkill']],
 			jin_simashi:['male','jin','3/4',['taoyin','yimie','ruilve','tairan'],['hiddenSkill','zhu']],
 			zhanghuyuechen:['male','jin',4,['xijue']],
@@ -30,6 +31,204 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			zhaosong:{
+				trigger:{global:'phaseUseBegin'},
+				logTarget:'player',
+				filter:function(event,player){
+					if(player==event.player||!event.player.countCards('h')) return false;
+					var types=['basic','trick','equip'];
+					for(var i of types){
+						if(event.player.hasMark('zhaosong_'+i)) return false;
+					}
+					return true;
+				},
+				prompt2:'令其交给你一张手牌，并根据类型获得对应的标记',
+				content:function(){
+					'step 0'
+					event.target=trigger.player;
+					event.target.chooseCard('h',true,get.translation(player)+'发动了【诏颂】；请交给其一张手牌');
+					'step 1'
+					if(result.bool){
+						var card=result.cards[0];
+						player.gain(card,target,'give');
+						var type=get.type2(card,target);
+						if(lib.skill['zhaosong_'+type]){
+							target.addSkill('zhaosong_'+type);
+							target.addMark('zhaosong_'+type);
+						}
+					}
+				},
+				subSkill:{
+					basic:{
+						marktext:'颂',
+						intro:{
+							name:'诏颂(颂)',
+							name2:'颂',
+							content:'当你使用【杀】选择唯一目标时，你可移去“颂”，并为此【杀】增加至多两个目标。然后若此【杀】造成的伤害小于2，你失去1点体力。',
+						},
+						trigger:{player:'useCard2'},
+						direct:true,
+						charlotte:true,
+						onremove:true,
+						filter:function(event,player){
+							return player.hasMark('zhaosong_basic')&&event.card.name=='sha'&&
+							event.targets.length==1&&game.hasPlayer(function(current){
+								return current!=player&&current!=event.targets[0]&&lib.filter.targetEnabled2(event.card,player,current);
+							});
+						},
+						content:function(){
+							'step 0'
+							player.chooseTarget([1,2],'是否弃置“颂”标记？','为'+get.translation(trigger.card)+'增加至多两个目标',function(card,player,target){
+								var evt=_status.event.getTrigger();
+								return target!=player&&target!=evt.targets[0]&&lib.filter.targetEnabled2(evt.card,player,target);
+							}).set('ai',function(target){
+								var evt=_status.event.getTrigger();
+								return get.effect(target,evt.card,evt.player,evt.player);
+							});
+							'step 1'
+							if(result.bool){
+								if(player!=event.player&&!player.isOnline()) game.delayx();
+								player.addTempSkill('zhaosong_shaloss');
+							}
+							else event.finish();
+							'step 2'
+							var targets=result.targets;
+							player.logSkill('zhaosong_basic',targets);
+							player.removeMark('zhaosong_basic',1);
+							player.removeSkill('zhaosong_basic');
+							trigger.targets.addArray(targets);
+							trigger.zhaosong_basic=true;
+						},
+					},
+					shaloss:{
+						trigger:{player:'useCardAfter'},
+						forced:true,
+						charlotte:true,
+						filter:function(event,player){
+							if(!event.zhaosong_basic) return false;
+							var num=0;
+							player.getHistory('sourceDamage',function(evt){
+								if(evt.card==event.card) num+=evt.num;
+							});
+							return num<2;
+						},
+						content:function(){
+							player.loseHp();
+						},
+					},
+					trick:{
+						marktext:'诔',
+						intro:{
+							name:'诏颂(诔)',
+							name2:'诔',
+							content:'当你进入濒死状态时，你可移去“诔”并减1点体力上限，然后将体力回复至1点并摸一张牌。',
+						},
+						trigger:{player:'dying'},
+						prompt:'是否弃置“诔”标记？',
+						prompt2:'减1点体力上限，然后回复体力至1点并摸一张牌。',
+						charlotte:true,
+						onremove:true,
+						filter:function(event,player){
+							return player.hasMark('zhaosong_trick')&&player.hp<1;
+						},
+						check:function(event,player){
+							if(player.maxHp<2||player.countCards('h',function(card){
+								var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+								if(mod2!='unchanged') return mod2;
+								var mod=game.checkMod(card,player,event.player,'unchanged','cardSavable',player);
+								if(mod!='unchanged') return mod;
+								var savable=get.info(card).savable;
+								if(typeof savable=='function') savable=savable(card,player,event.player);
+								return savable;
+							})>=1+event.num-event.player.hp) return false;
+							return true;
+						},
+						content:function(){
+							'step 0'
+							player.removeMark('zhaosong_trick',1);
+							player.removeSkill('zhaosong_trick');
+							player.loseMaxHp();
+							'step 1'
+							if(player.hp<1) player.recover(1-player.hp);
+							player.draw();
+						},
+					},
+					equip:{
+						marktext:'赋',
+						intro:{
+							name:'诏颂(赋)',
+							name2:'赋',
+							content:'出牌阶段开始时，你可移去“赋”并弃置一名角色区域内的一张牌，然后可以令其摸一张牌。',
+						},
+						trigger:{player:'phaseUseBegin'},
+						direct:true,
+						charlotte:true,
+						onremove:true,
+						filter:function(event,player){
+							return player.hasMark('zhaosong_equip')&&game.hasPlayer(function(current){
+								return current.hasCard(function(card){
+									return lib.filter.canBeDiscarded(card,player,current);
+								},'hej');
+							});
+						},
+						content:function(){
+							'step 0'
+							player.chooseTarget('是否弃置“赋”标记？','弃置一名角色区域内的一张牌，然后可以令其摸一张牌',function(card,player,current){
+								return current.hasCard(function(card){
+									return lib.filter.canBeDiscarded(card,player,current);
+								},'hej');
+							}).set('ai',function(target){
+								var player=_status.event.player,att=get.attitude(player,target)>0?2:1;
+								return get.effect(target,{name:'guohe_copy'},player,player)*att;
+							});
+							'step 1'
+							if(result.bool){
+								var target=result.targets[0];
+								event.target=target;
+								player.logSkill('zhaosong_equip',target);
+								player.removeMark('zhaosong_equip',1);
+								player.removeSkill('zhaosong_equip');
+								player.discardPlayerCard(target,true,'hej');
+							}
+							else event.finish();
+							'step 2'
+							if(target.isIn()){
+								player.chooseBool('是否令'+get.translation(target)+'摸一张牌？').set('ai',function(){
+									var evt=_status.event.getParent();
+									return get.attitude(evt.player,evt.target)>0;
+								});
+							}
+							else event.finish();
+							'step 3'
+							if(result.bool) target.draw();
+						},
+					},
+				},
+			},
+			lisi:{
+				audio:2,
+				trigger:{player:'useCardAfter'},
+				direct:true,
+				filter:function(event,player){
+					if(player==_status.currentPhase||!event.cards.filterInD().length) return false;
+					var hs=player.countCards('h');
+					return game.hasPlayer(function(current){
+						return current!=player&&current.countCards('h')<=hs;
+					});
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('lisi'),'将'+get.translation(trigger.cards.filterInD())+'交给一名手牌数不大于你的其他角色',function(card,player,target){
+						return target!=player&&target.countCards('h')<=player.countCards('h');
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('lisi',target);
+						target.gain(trigger.cards.filterInD(),'gain2');
+					}
+				},
+			},
 			caozhao:{
 				audio:2,
 				enable:'phaseUse',
@@ -1566,6 +1765,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!result.bool) target.damage();
 				},
 			},
+			xinchoufa:{
+				audio:'choufa',
+				inherit:'choufa',
+				content:function(){
+					'step 0'
+					player.choosePlayerCard(target,'h',true);
+					'step 1'
+					player.showCards(result.cards,get.translation(player)+'对'+get.translation(target)+'发动了【筹伐】');
+					var type=get.type2(result.cards[0],target),hs=target.getCards('h',function(card){
+						return card!=result.cards[0]&&get.type2(card,target)!=type;
+					});
+					if(hs.length){
+						target.addGaintag(hs,'xinchoufa');
+						target.addTempSkill('xinchoufa2',{player:'phaseAfter'});
+					}
+				},
+			},
+			xinchoufa2:{
+				charlotte:true,
+				onremove:function(player){
+					player.removeGaintag('xinchoufa');
+				},
+				mod:{
+					cardname:function(card){
+						if(get.itemtype(card)=='card'&&card.hasGaintag('xinchoufa')) return 'sha';
+					},
+					cardnature:function(card){
+						if(get.itemtype(card)=='card'&&card.hasGaintag('xinchoufa')) return false;
+					},
+				},
+			},
 			choufa:{
 				enable:'phaseUse',
 				audio:2,
@@ -2188,6 +2418,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			cheliji:'彻里吉是历史小说《三国演义》中的虚构人物，西羌国王。蜀相诸葛亮伐魏，魏都督曹真驰书赴羌，国王彻里吉即命雅丹丞相与越吉元帅起羌兵一十五万、并战车直扣西平关。后军大败，越吉亡，雅丹被俘，亮将所获羌兵及车马器械，尽给还雅丹，俱放回国。彻里吉感蜀恩义，与之结盟。正史中没有关于彻里吉的记载。',
 			weiguan:'卫瓘（220年－291年），字伯玉。河东郡安邑县（今山西省夏县）人。三国曹魏后期至西晋初年重臣、书法家，曹魏尚书卫觊之子。卫瓘出身官宦世家，年轻时仕官于曹魏，历任尚书郎、散骑常侍、侍中、廷尉等职。后以镇西军司、监军身份参与伐蜀战争。蜀汉亡后，与钟会一道逮捕邓艾；钟会谋反时，又成功平息叛乱，命田续杀邓艾父子。回师后转任督徐州诸军事、镇东将军，封菑阳侯。西晋建立后，历任青州、幽州刺史、征东大将军等职，成功化解北方边境威胁，因功进爵菑阳公。后入朝为尚书令、侍中，又升任司空，领太子少傅。后逊位，拜太保。晋惠帝即位后，与贾皇后对立，终在政变中满门遇害，享年七十二岁。卫瓘善隶书及章草。不仅兼工各体，还能学古人之长，是颇有创意的书法家。唐朝张怀瓘《书断》中评其章草为“神品”。',
 			zhongyan:' 钟琰 (？—？年）颍川人，王浑之妻。生卒年不详，约魏末晋初间前后在世。王浑的妻子钟琰，是颍川人，为魏太傅钟繇的曾孙女，父亲钟徽，为黄门郎。她平时广泛阅读各种书籍，因此几岁的时候就能撰写文章。她聪慧弘雅，善于啸咏，她的礼仪法度，为中表所推崇，她写有文集五卷。',
+			zuofen:'左芬（约253年－300年4月23日），出土墓志作左棻，字兰芝，齐国临淄（今山东临淄）人，西晋诗人。少好学，善属文。为晋武帝贵人。今存诗、赋、颂、赞、诔等20余篇，大都为应诏而作，《离思赋》最著名。原有集，已失传。',
 		},
 		characterTitle:{},
 		perfectPair:{},
@@ -2246,6 +2477,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			choufa:'筹伐',
 			choufa2:'筹伐',
 			choufa_info:'出牌阶段限一次，你可展示一名其他角色的一张手牌并记录其类型A。你令其原类型不为A的手牌的牌名均视为【杀】且均视为无属性，直到其回合结束。',
+			xinchoufa:'筹伐',
+			xinchoufa_info:'出牌阶段限一次，你可展示一名其他角色的一张手牌A。你令其所有类型与A不同的手牌的牌名均视为【杀】且均视为无属性，直到其回合结束。',
 			zhaoran:'昭然',
 			zhaoran2:'昭然',
 			zhaoran_info:'出牌阶段开始时，你可令你的手牌对其他角色可见直到出牌阶段结束。若如此做，当你于此阶段内失去一张手牌后，若你的手牌里没有与此牌花色相同的牌且你本回合内未因该花色的牌触发过此效果，则你选择一项：①摸一张牌。②弃置一名其他角色的一张牌。',
@@ -2332,6 +2565,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caozhao_info:'出牌阶段限一次，你可展示一张手牌并声明一种未以此法声明过的基本牌或普通锦囊牌，令一名体力不大于你的其他角色选择一项：令此牌视为你声明的牌，或其失去1点体力。然后若此牌声明成功，然后你可将其交给一名其他角色。',
 			olxibing:'息兵',
 			olxibing_info:'每当你受到其他角色造成的伤害后/对其他角色造成伤害后，你可弃置你或该角色两张牌，然后你们中手牌少的角色摸两张牌，以此法摸牌的角色不能使用牌指定你为目标直到回合结束。',
+			zuofen:'左棻',
+			zhaosong:'诏颂',
+			zhaosong_info:'一名其他角色于其出牌阶段开始时，若其没有标记，你可令其正面向上交给你一张手牌，然后根据此牌的类型，令该角色获得对应的标记：锦囊牌，“诔”标记；装备牌，“赋”标记；基本牌，“颂”标记。进入濒死时，你可弃置"诔"，减少一点体力上限，回复至1体力并摸1张牌；出牌阶段开始时，你可弃置“赋”，弃置一名角色区域内的一张牌，然后可令其摸一张牌；你使用仅指定一个目标的【杀】时，可弃置“颂”为此【杀】额外选择至多两个目标，然后若此【杀】造成的伤害小于2，你失去1点体力。',
+			lisi:'离思',
+			lisi_info:'每当你于回合外使用牌的置入弃牌堆时，你可将其交给一名手牌数不大于你的其他角色。',
 
 			yingbian_pack1:'文德武备·理',
 			yingbian_pack2:'文德武备·备',

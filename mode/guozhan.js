@@ -1158,7 +1158,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var evt=_status.event.getParent();
 							if(get.attitude(evt.target,evt.player)>0) return 1-evt.addIndex;
 							return evt.addIndex;
-						});
+						}).set('prompt','是否对'+str+'发动【连翩】？');
 					}
 					'step 1'
 					if(result.bool){
@@ -2413,8 +2413,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.target=target;
 						var next=target.chooseToDiscard('e',get.prompt('fengyang'),'弃置装备区内的一张牌并摸两张牌').set('ai',function(card){
 							return 5.5-get.value(card);
-						}).logSkill='fengyang';
-						if(player==target) next.setHiddenSkill('qiaobian');
+						});
+						next.logSkill='fengyang';
+						if(player==target) next.setHiddenSkill('fengyang');
 					}
 					else event.goto(3);
 					'step 2'
@@ -5784,6 +5785,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:-1,
 					},
+					tag:{
+						discard:1,
+						lose:1,
+						loseCard:1,
+					},
 					threaten:1.2,
 					order:3,
 				},
@@ -6879,7 +6885,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(get.prompt('xuanlve'),'弃置一名其他角色的一张牌',function(card,player,target){
 						return target!=player&&target.countDiscardableCards(player,'he');
 					}).set('ai',function(target){
-						return -get.attitude(_status.event.player,target);
+						var player=_status.event.player;
+						return get.effect(target,{name:'guohe_copy2'},player,player);
 					}).setHiddenSkill(event.name);
 					'step 1'
 					if(result.bool){
@@ -8425,7 +8432,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var source=_status.event.source;
 							return get.distance(source,target)<=1&&source!=target&&target.countCards('he');
 						}).set('ai',function(target){
-							return -get.attitude(_status.event.player,target);
+							var player=_status.event.player;
+						return get.effect(target,{name:'guohe_copy2'},player,player);
 						}).set('source',target);
 					}
 					else{

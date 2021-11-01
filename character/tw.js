@@ -657,7 +657,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var suit=get.suit(trigger.card);
 					var num=trigger.target.countCards('h','shan');
-					var next=trigger.target.chooseToDiscard('弃置一张牌，或不能响应'+get.translation(trigger.card)).set('ai',function(card){
+					var next=trigger.target.chooseToDiscard('弃置一张牌，或不能响应'+get.translation(trigger.card)).set('ai','he',function(card){
 						var num=_status.event.num;
 						if(num==0) return 0;
 						if(card.name=='shan') return num>1?2:0;
@@ -900,6 +900,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					none:{
 						selectTarget:2,
 						filterTarget:function(card,player,target){
+							if(!ui.selected.targets.length) return true;
 							return target.countCards('he')>0;
 						},
 						complexSelect:true,
