@@ -7193,7 +7193,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:function(storage,player,skill){
 						var str='<li>锁定技，你不能质疑于吉，只要你的体力值为1，你的其他技能便全部失效。';
-						var list=player.getSkills(null,null,false).filter(function(i){
+						var list=player.getSkills(null,false,false).filter(function(i){
 							return lib.skill.rechanyuan.skillBlocker(i,player);
 						});
 						if(list.length) str+=('<br><li>失效技能：'+get.translation(list))

@@ -9508,6 +9508,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:1,
+					combo:'quanji',
 					result:{
 						player:1,
 					}

@@ -468,7 +468,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						for(var j=0;j<list.length;j++){
 							if(skills.contains(list[j])||banned.contains(list[j])) continue;
 							var info=get.info(list[j]);
-							if(!info||info.zhuSkill||info.juexingji||info.charlotte||info.limited) continue;
+							if(!info||info.zhuSkill||info.juexingji||info.charlotte||info.limited||info.hiddenSkill||info.dutySkill||info.groupSkill||(info.ai&&info.ai.combo)) continue;
 							skills.push(list[j]);
 						}
 					}

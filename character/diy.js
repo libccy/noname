@@ -8649,6 +8649,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					usedu:true,
 					save:true,
 					skillTagFilter:function(player,tag,target){
+						if(tag=='usedu') return player.isDamaged();
 						return player==target&&player.hasUsableCard('du')&&!player.hasSkill('lucia_duqu_terra');
 					},
 				},

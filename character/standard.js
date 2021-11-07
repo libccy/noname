@@ -2448,7 +2448,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wushuang:{
 				shaRelated:true,
 				audio:2,
-				audioname:['re_lvbu','shen_lvbu'],
+				audioname:['re_lvbu','shen_lvbu','lvlingqi'],
 				forced:true,
 				locked:true,
 				group:['wushuang1','wushuang2'],
@@ -2456,7 +2456,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			wushuang1:{
 				audio:'wushuang',
-				audioname:['re_lvbu','shen_lvbu'],
+				audioname:['re_lvbu','shen_lvbu','lvlingqi'],
 				trigger:{player:'useCardToPlayered'},
 				forced:true,
 				filter:function(event,player){
@@ -2484,7 +2484,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			wushuang2:{
 				audio:'wushuang',
-				audioname:['re_lvbu','shen_lvbu'],
+				audioname:['re_lvbu','shen_lvbu','lvlingqi'],
 				trigger:{player:'useCardToPlayered',target:'useCardToTargeted'},
 				forced:true,
 				logTarget:function(trigger,player){

@@ -16,7 +16,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{},
 		character:{
-			ol_wangrong:['female','qun',3,['olfengzi','oljizhan','olfusong'],['unseen']],
+			ol_wangrong:['female','qun',3,['olfengzi','oljizhan','olfusong']],
 			ol_dengzhi:['male','shu',3,['olxiuhao','olsujian']],
 			bianfuren:['female','wei',3,['fuwei','yuejian']],
 			duxi:['male','wei',3,['quxi','bixiong']],
@@ -413,8 +413,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player!=game.me&&!player.isUnderControl()&&!player.isOnline()) game.delayx();
 					var type=get.type(trigger.card,false);
 					player.chooseToDiscard('h',get.prompt('olfengzi'),'弃置一张'+get.translation(type)+'牌，令'+get.translation(trigger.card)+'结算两次',function(card,player){
-						return get.type(card,player)==_status.event.type;
-					}).set('type',type).logSkill='olfengzi';
+						return get.type2(card,player)==_status.event.type;
+					}).set('type',type).set('ai',()=>-1).logSkill='olfengzi';
 					'step 1'
 					if(result.bool){
 						player.addTempSkill('olfengzi_buff','phaseUseAfter');
@@ -454,7 +454,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.showCards(card,get.translation(player)+'发动了【吉占】');
 					'step 1'
 					var str=get.strNumber(num);
-					player.chooseControl('大于'+str,'小于'+str,'cancel2').set('prompt','吉占：猜测下一张牌的点数');
+					player.chooseControl('大于'+str,'小于'+str,'cancel2').set('prompt','吉占：猜测下一张牌的点数').set('choice',num<7?0:1).set('ai',()=>_status.event.choice);
 					'step 2'
 					var card=get.cards()[0];
 					game.cardsGotoOrdering(card);
@@ -485,13 +485,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseTarget(get.prompt('olfusong'),'令一名体力上限大于你的其他角色获得〖丰姿〗或〖吉占〗',function(card,player,target){
 						return target.maxHp>player.maxHp;
-					}).set('forceDie',true);
+					}).set('forceDie',true).set('ai',(target)=>get.attitude(_status.event.player,target));
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
 						event.target=target;
 						player.logSkill('olfusong',target);
-						player.chooseControl('olfengzi','oljizhan').set('prompt','令'+get.translation(target)+'获得其中一个技能');
+						player.chooseControl('olfengzi','oljizhan').set('prompt','令'+get.translation(target)+'获得其中一个技能').set('ai',()=>(Math.random()>0.5?0:1));
 					}
 					else event.finish();
 					'step 2'

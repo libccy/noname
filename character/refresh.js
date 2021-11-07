@@ -6134,7 +6134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:function(storage,player,skill){
 						var str='<li>锁定技，你不能于〖蛊惑〗的结算流程中进行质疑。当你的体力值不大于1时，你的其他技能失效。';
-						var list=player.getSkills(null,null,false).filter(function(i){
+						var list=player.getSkills(null,false,false).filter(function(i){
 							return lib.skill.rechanyuan.skillBlocker(i,player);
 						});
 						if(list.length) str+=('<br><li>失效技能：'+get.translation(list))

@@ -51721,16 +51721,21 @@
 				return false;
 			};
 			if(create!='discardPile'){
+				var num=get.rand(0,ui.cardPile.childNodes.length-1);
 				for(var i=0;i<ui.cardPile.childNodes.length;i++){
-					if(filter(ui.cardPile.childNodes[i])){
-						return ui.cardPile.childNodes[i];
+					var j=i;
+					if(j>=ui.cardPile.childNodes.length) j-=ui.cardPile.childNodes.length;
+					if(filter(ui.cardPile.childNodes[j])){
+						return ui.cardPile.childNodes[j];
 					}
 				}
 			}
 			if(create!='cardPile'){
 				for(var i=0;i<ui.discardPile.childNodes.length;i++){
-					if(filter(ui.discardPile.childNodes[i])){
-						return ui.discardPile.childNodes[i];
+					var j=i;
+					if(j>=ui.discardPile.childNodes.length) j-=ui.discardPile.childNodes.length;
+					if(filter(ui.discardPile.childNodes[j])){
+						return ui.discardPile.childNodes[j];
 					}
 				}
 			}

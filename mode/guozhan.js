@@ -530,7 +530,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_duyu:['male','jin',4,['sanchen']],
 				gz_zhanghuyuechen:['male','jin',4,['xijue']],
 				gz_jin_yanghuiyu:['female','jin',3,['ciwei','caiyuan']],
-				gz_simazhou:['male','jin',4,['caiwang','naxiang']],
+				gz_simazhou:['male','jin',4,['recaiwang','naxiang']],
 				gz_shibao:['male','jin',4,['gzzhuosheng']],
 				gz_weiguan:['male','jin',3,['zhongyun','shenpin']],
 				gz_zhongyan:['female','jin',3,['bolan','yifa']],

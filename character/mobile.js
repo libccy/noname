@@ -128,7 +128,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hujinding:['female','shu','2/6',['renshi','wuyuan','huaizi']],
 			
 			re_zhanggong:['male','wei',3,['reqianxin','rezhenxing']],
-			re_xugong:['male','wu',3,['rebiaozhao','yechou']],
+			re_xugong:['male','qun',3,['rebiaozhao','yechou']],
 			re_weiwenzhugezhi:['male','wu',4,['refuhai']],
 			
 			xin_yuanshao:['male','qun',4,['reluanji','xueyi'],['zhu']],

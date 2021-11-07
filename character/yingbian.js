@@ -9,7 +9,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhongyan:['female','jin',3,['bolan','yifa']],
 			weiguan:['male','jin',3,['zhongyun','shenpin']],
 			cheliji:['male','qun',4,['chexuan','qiangshou']],
-			simazhou:['male','jin',4,['caiwang','naxiang']],
+			simazhou:['male','jin',4,['recaiwang','naxiang']],
 			ol_lisu:['male','qun',3,['qiaoyan','xianzhu']],
 			jin_yanghuiyu:['female','jin',3,['huirong','ciwei','caiyuan'],['hiddenSkill']],
 			shibao:['male','jin',4,['zhuosheng']],
@@ -31,6 +31,81 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			recaiwang:{
+				audio:'caiwang',
+				inherit:'caiwang',
+				group:['recaiwang_hand','recaiwang_equip','recaiwang_judge'],
+			},
+			recaiwang_hand:{
+				audio:'caiwang',
+				enable:['chooseToUse','chooseToRespond'],
+				viewAsFilter:function(player){
+					var js=player.getCards('h');
+					return js.length==1&&game.checkMod(js[0],player,'unchanged','cardEnabled2',player);
+				},
+				selectCard:-1,
+				filterCard:true,
+				position:'h',
+				prompt:'将全部手牌当做【闪】使用',
+				viewAs:{name:'shan'},
+				check:(card)=>10-get.value(card),
+				ai:{
+					order:1,
+					respondShan:true,
+					skillTagFilter:function(player){
+						return player.countCards('h')==1;
+					},
+				},
+			},
+			recaiwang_equip:{
+				audio:'caiwang',
+				enable:['chooseToUse','chooseToRespond'],
+				viewAsFilter:function(player){
+					var js=player.getCards('e');
+					return js.length==1&&game.checkMod(js[0],player,'unchanged','cardEnabled2',player);
+				},
+				selectCard:-1,
+				filterCard:true,
+				check:(card)=>9-get.value(card),
+				position:'e',
+				prompt:'将装备区的牌当做【无懈可击】使用',
+				viewAs:{name:'wuxie'},
+				ai:{
+					order:1,
+				},
+			},
+			recaiwang_judge:{
+				audio:'caiwang',
+				enable:['chooseToUse','chooseToRespond'],
+				viewAsFilter:function(player){
+					var js=player.getCards('j');
+					return js.length==1&&game.checkMod(js[0],player,'unchanged','cardEnabled2',player);
+				},
+				selectCard:-1,
+				filterCard:true,
+				position:'j',
+				prompt:'将判定区的牌当做【杀】使用',
+				viewAs:{name:'sha'},
+				check:(card)=>1,
+				locked:false,
+				ai:{
+					order:10,
+					respondSha:true,
+					skillTagFilter:function(player){
+						return player.countCards('j')==1;
+					},
+					effect:{
+						target:function(card,player,target,current){
+							if(card&&(card.name=='shandian'||card.name=='fulei')&&player==target&&!target.countCards('j')&&target.isPhaseUsing()&&target.hasValueTarget({name:'sha'},null,true)) return [1,2];
+						},
+					},
+				},
+				mod:{
+					aiOrder:function(player,card,num){
+						if(card.name=='shandian'||card.name=='fulei') return num+3;
+					},
+				},
+			},
 			zhaosong:{
 				trigger:{global:'phaseUseBegin'},
 				logTarget:'player',
@@ -991,9 +1066,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(event,player){
 					return get.attitude(player,lib.skill.caiwang.logTarget(event,player))<=0;
 				},
+				popup:false,
 				content:function(){
+					'step 0'
 					if(player!=game.me&&!player.isOnline()) game.delayx();
+					'step 1'
 					var target=lib.skill.caiwang.logTarget(trigger,player);
+					player.logSkill(event.name,target);
 					player[player.getStorage('naxiang2').contains(target)?'gainPlayerCard':'discardPlayerCard'](target,'he',true);
 				},
 			},
@@ -2532,7 +2611,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caiwang_info:'当你使用或打出牌响应其他角色使用的牌，或其他角色使用或打出牌响应你使用的牌后，若这两张牌颜色相同，则你可以弃置对方的一张牌。',
 			naxiang:'纳降',
 			naxiang2:'纳降',
-			naxiang_info:'锁定技，当你受到其他角色造成的伤害后，或你对其他角色造成伤害后，你对其发动〖才望〗时的“弃置”改为“获得”直到你的下回合开始。',
+			naxiang_info:'锁定技，当你受到其他角色造成的伤害后，或你对其他角色造成伤害后，你对其发动〖才望①〗时的“弃置”改为“获得”直到你的下回合开始。',
 			cheliji:'彻里吉',
 			chexuan:'车悬',
 			chexuan_info:'出牌阶段，若你的装备区里没有宝物牌，你可弃置一张黑色牌，选择一张【舆】置入你的装备区；当你失去装备区里的宝物牌后，你可进行判定，若结果为黑色，将一张随机的【舆】置入你的装备区。',
@@ -2570,6 +2649,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhaosong_info:'一名其他角色于其出牌阶段开始时，若其没有标记，你可令其正面向上交给你一张手牌，然后根据此牌的类型，令该角色获得对应的标记：锦囊牌，“诔”标记；装备牌，“赋”标记；基本牌，“颂”标记。进入濒死时，你可弃置"诔"，减少一点体力上限，回复至1体力并摸1张牌；出牌阶段开始时，你可弃置“赋”，弃置一名角色区域内的一张牌，然后可令其摸一张牌；你使用仅指定一个目标的【杀】时，可弃置“颂”为此【杀】额外选择至多两个目标，然后若此【杀】造成的伤害小于2，你失去1点体力。',
 			lisi:'离思',
 			lisi_info:'每当你于回合外使用牌的置入弃牌堆时，你可将其交给一名手牌数不大于你的其他角色。',
+			recaiwang:'才望',
+			recaiwang_info:'①当你使用或打出牌响应其他角色使用的牌，或其他角色使用或打出牌响应你使用的牌后，若这两张牌颜色相同，则你可以弃置对方的一张牌。②若你的手牌数为1，则你可以将该手牌当做【闪】使用或打出。③若你的装备区牌数为1，则你可以将该装备当做【无懈可击】使用或打出。④若你的判定区牌数为1，则你可以将该延时锦囊牌当做【杀】使用或打出。',
+			recaiwang_hand:'才望',
+			recaiwang_equip:'才望',
+			recaiwang_judge:'才望',
 
 			yingbian_pack1:'文德武备·理',
 			yingbian_pack2:'文德武备·备',
