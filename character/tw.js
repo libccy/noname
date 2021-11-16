@@ -5,12 +5,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			tw:{
-				tw_mobile:['tw_beimihu','nashime','tw_gexuan','tw_dongzhao','jiachong','duosidawang','wuban','yuejiu'],
+				tw_mobile:['tw_beimihu','nashime','tw_gexuan','tw_dongzhao','jiachong','duosidawang','wuban','yuejiu','tw_fuwan'],
 				tw_yijiang:['tw_caoang','tw_caohong','tw_zumao','tw_dingfeng','tw_maliang','tw_xiahouba'],
 				tw_english:['kaisa'],
 			},
 		},
 		character:{
+			tw_fuwan:['male','qun',4,['twmoukui']],
 			tw_zhaoxiang:['female','shu',4,['refanghun','twfuhan','twqueshi']],
 			yuejiu:['male','qun',4,['cuijin']],
 			wuban:['male','shu',4,['jintao']],
@@ -147,6 +148,62 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			twmoukui:{
+				trigger:{player:'useCardToPlayered'},
+				direct:true,
+				filter:function(event,player){
+					return event.card&&event.card.name=='sha';
+				},
+				content:function(){
+					'step 0'
+					var list=['选项一'];
+					if(trigger.target.countDiscardableCards(player,'he')>0) list.push('选项二');
+					list.push('背水！');
+					list.push('cancel2');
+					player.chooseControl(list).set('choiceList',[
+						'摸一张牌',
+						'弃置'+get.translation(trigger.target)+'的一张牌',
+						'背水！依次执行以上两项。然后若此【杀】未令其进入濒死状态，则其弃置你的一张牌。',
+					]).set('prompt',get.prompt('twmoukui',trigger.target));
+					'step 1'
+					if(result.control!='cancel2'){
+						var target=trigger.target;
+						player.logSkill('twmoukui',target);
+						if(result.control=='选项一'||result.control=='背水！') player.draw();
+						if(result.control=='选项二'||result.control=='背水！') player.discardPlayerCard(target,true,'he');
+						if(result.control=='背水！'){
+							player.addTempSkill('twmoukui_effect');
+							var evt=trigger.getParent();
+							if(!evt.twmoukui_effect) evt.twmoukui_effect=[];
+							evt.twmoukui_effect.add(target);
+						}
+					}
+				},
+				subSkill:{
+					effect:{
+						trigger:{player:'useCardAfter'},
+						charlotte:true,
+						forced:true,
+						filter:function(event,player){
+							return event.twmoukui_effect&&event.twmoukui_effect.filter(function(current){
+								return current.isIn()&&!current.hasHistory('damage',function(evt){
+									return evt._dyinged&&evt.card==event.card;
+								});
+							}).length>0;
+						},
+						content:function(){
+							var list=trigger.twmoukui_effect.filter(function(current){
+								return current.isIn()&&!current.hasHistory('damage',function(evt){
+									return evt._dyinged&&evt.card==event.card;
+								});
+							}).sortBySeat();
+							for(var i of list){
+							 i.discardPlayerCard(player,true,'he').boolline=true;
+							}
+						},
+					},
+				},
+			},
 			twfuhan:{
 				audio:'fuhan',
 				trigger:{player:'phaseZhunbeiBegin'},
@@ -1583,6 +1640,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twqueshi_info:'游戏开始时，你将【梅影枪】置于你的装备区。',
 			meiyingqiang:'梅影枪',
 			meiyingqiang_info:'当你于其他角色的回合内第一次失去牌时，你可以使用一张【杀】。',
+			tw_fuwan:'TW伏完',
+			twmoukui:'谋溃',
+			twmoukui_info:'当你使用【杀】指定目标后，你可以选择一项：①摸一张牌；②弃置该角色的一张牌；③背水：若此【杀】未因造成伤害而令该角色进入过濒死状态，则该角色弃置你的一张牌。',
 			tw_mobile:'移动版',
 			tw_yijiang:'一将成名TW',
 			tw_english:'英文版',

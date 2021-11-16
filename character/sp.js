@@ -9,7 +9,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_tongque:["liuxie","lingju","fuwan","sp_fuwan","sp_fuhuanghou","sp_jiben"],
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_guozhan:["zangba","shamoke","ganfuren","yuejin","hetaihou","dingfeng","panfeng","jianggan","sp_mifangfushiren","bianfuren"],
-				sp_guozhan2:["mateng","tianfeng","chendong","sp_dongzhuo","jiangfei","jiangqing","liqueguosi","lvfan","cuimao","jiling","zhangren","zoushi","zongyu"],
+				sp_guozhan2:["mateng","tianfeng","sp_dongzhuo","jiangfei","jiangqing","liqueguosi","lvfan","cuimao","jiling","zhangren","zongyu"],
 				//sp_single:["niujin"],
 				sp_others:["hanba","caiyang"],
 			},
@@ -119,7 +119,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mateng:['male','qun',4,['xiongyi','mashu']],
 			tianfeng:['male','qun',3,['sijian','suishi']],
 			yuejin:['male','wei',4,['xiaoguo']],
-			chendong:['male','wu',4,['duanxie','fenming']],
 			sp_dongzhuo:['male','qun',5,['hengzheng']],
 			jiangfei:['male','shu',3,['reshengxi','shoucheng']],
 			jiangqing:['male','wu',4,['shangyi','zniaoxiang']],
@@ -281,7 +280,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lingcao:['lingtong'],
 			lingju:['diaochan','lvbu'],
 			jiangqing:['zhoutai'],
-			dingfeng:['xusheng'],
+			dingfeng:['xusheng','zhugeke'],
 			caohong:['caoren'],
 			daxiaoqiao:['zhouyu','sunce'],
 			cuiyan:['caocao'],
@@ -4157,6 +4156,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=0;
 					for(var i=0;i<history.length;i++){
 						for(var j=0;j<history[i].lose.length;j++){
+							if(history[i].lose[j].parent.name=='useCard') continue;
 							num+=history[i].lose[j].cards2.filter(function(card){
 								return get.type(card,false)=='equip';
 							}).length;
@@ -5919,12 +5919,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						})){
 							var str='对一名';
 							if(get.mode()=='guozhan'){
-								str+=get.translation(target.identity)+'势力的';
+								str+=('与'+get.translation(target)+'势力相同的');
 							}
 							player.chooseTarget(str+'角色使用一张杀',true,function(card,player,target){
 								if(!player.canUse('sha',target,false)) return false;
 								if(get.mode()=='guozhan'){
-									return target.isFriendOf(status.event.identity);
+									return target.isFriendOf(_status.event.identity);
 								}
 								return true;
 							}).set('ai',function(target){
@@ -6920,6 +6920,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					 			if(max>0) max+=((player.storage.refuhan||player.storage.twfuhan)?0.3:-0.3);
 					 			return max;
 								}
+								if(!player) player=_status.event.player;
 								return (player.storage.refuhan||player.storage.twfuhan)?4:1;
 							},
 						},
@@ -11813,16 +11814,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					var nono=(Math.abs(get.attitude(player,trigger.player))<3);
-					if(player==trigger.player||get.damageEffect(trigger.player,player,player)<=0){
+					if(player==trigger.player||get.damageEffect(trigger.player,player,player)<=0||!trigger.player.hasUseTarget({name:'jiu'},null,true)){
 						nono=true
 					}
 					else if(trigger.player.hp>2){
 						nono=true;
 					}
-					else if(trigger.player.hp>1&&player.countCards('h')<3){
-						nono=true;
-					}
-					else if(trigger.player.canUse('sha',player)&&!player.countCards('h','shan')&&trigger.player.countCards('h')>=3){
+					else if(trigger.player.hp>1&&player.countCards('h')<3&&(trigger.player.canUse('sha',player)&&!player.countCards('h','shan')&&trigger.player.countCards('h')>=3)){
 						nono=true;
 					}
 					var next=player.chooseToDiscard(get.prompt2('zhendu',trigger.player));
@@ -12749,6 +12747,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			aocai:{
 				audio:2,
+				audioname:['gz_zhugeke'],
 				enable:['chooseToUse','chooseToRespond'],
 				hiddenCard:function(player,name){
 					if(player!=_status.currentPhase&&get.type(name)=='basic'&&lib.inpile.contains(name)) return true;
@@ -15117,6 +15116,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhaoxiang:['zhaoxiang','tw_zhaoxiang'],
 			dengzhi:['ol_dengzhi','dengzhi'],
 			wangrong:['wangrong','ol_wangrong'],
+			zongyu:['sp_zongyu','zongyu'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
@@ -15319,7 +15319,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			daoshu_info:'出牌阶段，你可以选择一个花色并获得一名其他角色的一张手牌。若此牌花色与你选择的相同，则你对其造成1点伤害。否则你须交给其一张与此牌花色不同的手牌（没有则展示手牌），且本阶段内不能再发动〖盗书〗',
 
 			xinshanjia:"缮甲",
-			"xinshanjia_info":"出牌阶段开始时，你可以摸三张牌，然后弃置3-X张牌(X为你本局游戏内失去过的装备牌的数目且至多为3)。若你没有以此法弃置基本牌或锦囊牌，则你可以视为使用了一张不计入出牌阶段使用次数的【杀】。",
+			xinshanjia_info:"出牌阶段开始时，你可以摸三张牌，然后弃置3-X张牌(X为你本局游戏内不因使用而失去过的装备牌的数目且至多为3)。若你没有以此法弃置基本牌或锦囊牌，则你可以视为使用了一张无距离限制且不计入出牌阶段使用次数的【杀】。",
 			"new_meibu":"魅步",
 			"new_meibu_info":"其他角色的出牌阶段开始时，若你在其攻击范围内，你可以弃置一张牌，令该角色于本回合内获得技能〖止息〗。若你以此法弃置的牌不是【杀】或黑色锦囊牌，则本回合其与你的距离视为1。",
 			"new_mumu":"穆穆",

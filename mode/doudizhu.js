@@ -2039,6 +2039,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					trigger.cancel();
 					player.removeMark('binglin_shaxue',1,false);
+					trigger.source.removeMark('binglin_shaxue',1,false);
 				},
 				intro:{content:'剩余次数：#'},
 				ai:{
@@ -2052,6 +2053,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			toushiche_skill:{
 				trigger:{player:'phaseJieshuBegin'},
 				forced:true,
+				equipSkill:true,
 				filter:function(event,player){
 				 return lib.skill.toushiche_skill.logTarget(null,player).length>0;
 				},

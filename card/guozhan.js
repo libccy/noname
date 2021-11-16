@@ -631,7 +631,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				mode:['guozhan','boss'],
 				filterTarget:function(card,player,target){
-					if(get.mode()=='guozhan') return target!=player&&target.identity!='unknown'&&(target.identity!=player.identity||target.identity=='ye');
+					if(get.mode()=='guozhan') return target!=player&&target.identity!='unknown'&&!target.isFriendOf(player);
 					return true;
 				},
 				selectTarget:function(){

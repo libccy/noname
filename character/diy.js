@@ -3670,11 +3670,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.draw(event.count);
 					'step 1'
 					event.count--;
-					player.chooseTarget(true,lib.skill.ryoichi_baoyi.filterTarget,'请选择【爆衣】的目标').set('ai',function(target){
-						return -get.attitude(_status.event.player,target);
-					});
+					if(game.hasPlayer(function(target){
+						return lib.skill.ryoichi_baoyi.filterTarget(null,player,target);
+					})){
+						player.chooseTarget(true,lib.skill.ryoichi_baoyi.filterTarget,'请选择【爆衣】的目标').set('ai',function(target){
+							return -get.attitude(_status.event.player,target);
+						});
+					}
+					else event.finish();
 					'step 2'
-					if(result.bool){
+					if(result.bool&&result.targets&&result.targets.length){
 						var target=result.targets[0];
 						player.line(target,'green');
 						if(target.sex=='female') target.loseHp();

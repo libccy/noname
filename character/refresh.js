@@ -1624,6 +1624,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gzpaiyi:{
 				audio:2,
 				enable:'phaseUse',
+				usable:1,
 				filter:function(event,player){
 					return player.getStorage('gzquanji').length>0&&!player.hasSkill('gzquanji2');
 				},
@@ -10409,7 +10410,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gzquanji_info:'当你受到伤害后或当你使用牌指定唯一目标并对其造成伤害后，你可以摸一张牌，然后你将一张牌置于武将牌上，称为“权”；你的手牌上限+X（X为“权”的数量）。',
 			gzpaiyi:'排异',
 			gzpaiyi_backup:'排异',
-			gzpaiyi_info:'出牌阶段，你可以将移去一张“权”，然后选择一名角色并令其摸X张牌（X为“权”的数量且至多为7），若其手牌数不小于你，则你对其造成1点伤害且本技能于此回合内失效。',
+			gzpaiyi_info:'出牌阶段限一次，你可以将移去一张“权”，然后选择一名角色并令其摸X张牌（X为“权”的数量且至多为7），若其手牌数不小于你，则你对其造成1点伤害且本技能于此回合内失效。',
 			ol_zhurong:'界祝融',
 			changbiao:'长标',
 			changbiao_info:'出牌阶段限一次，你可以将任意张手牌当做【杀】使用（无距离限制）。若你因此【杀】对目标角色造成过伤害，则你于出牌阶段结束时摸X张牌（X为此【杀】对应的实体牌数量）。',
@@ -10427,7 +10428,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			redingpin:'定品',
 			redingpin_info:'出牌阶段，你可以弃置一张本回合未使用过/弃置过的类型的牌并选择一名角色。其进行判定，若结果为：黑色，其摸X张牌（X为其体力值且至多为3）且本回合内不能再成为〖定品〗的目标；红桃，你令此次弃置的牌不计入〖定品〗弃置牌合法性的检测；方片，你将武将牌翻面。',
 			refaen:'法恩',
-			refaen_info:'一名角色翻面或横置后，你可令其摸一张牌。',
+			refaen_info:'一名角色翻至正面或横置后，你可令其摸一张牌。',
 			reshizhi:'矢志',
 			reshizhi_info:'锁定技，若你的体力值为1，则你的【闪】视为【杀】，且当你使用对应的实体牌为一张【闪】的非转化普通杀造成伤害后，你回复1点体力。',
 			re_guotufengji:'界郭图逢纪',
