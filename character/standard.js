@@ -2213,7 +2213,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 4-get.value(card)
 				},
 				filterTarget:function(card,player,target){
-					if(target.sex!='male') return false;
+					if(!target.hasSex('female')) return false;
 					if(target.hp>=target.maxHp) return false;
 					if(target==player) return false;
 					return true;
@@ -2268,7 +2268,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						},
 						filterTarget:function(card,player,target){
-							if(target.sex!='male') return false;
+							if(!target.hasSex('male')) return false;
 							var card=ui.selected.cards[0];
 							if(!card) return false;
 							if(get.position(card)=='e'&&target.countCards('e',{subtype:get.subtype(card)})) return false;
@@ -2352,7 +2352,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 4-get.value(card)
 						},
 						filterTarget:function(card,player,target){
-							if(target.sex!='male') return false;
+							if(!target.hasSex('male')) return false;
 							if(target.hp>=target.maxHp) return false;
 							if(target==player) return false;
 							return true;
@@ -2549,7 +2549,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				filter:function(event,player){
 					return game.countPlayer(function(current){
-						return current!=player&&current.sex=='male';
+						return current!=player&&current.hasSex('male');
 					})>1;
 				},
 				check:function(card){return 10-get.value(card)},
@@ -2557,7 +2557,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				position:'he',
 				filterTarget:function(card,player,target){
 					if(player==target) return false;
-					if(target.sex!='male') return false;
+					if(!target.hasSex('male')) return false;
 					if(ui.selected.targets.length==1){
 						return target.canUse({name:'juedou'},ui.selected.targets[0]);
 					}

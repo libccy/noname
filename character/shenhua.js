@@ -1445,12 +1445,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					name2:'橘',
 					content:'当前有#个“橘”',
 				},
-				//mark:true,
 				audio:2,
 				trigger:{
-					global:'gameDrawAfter'
+					global:'phaseBefore',
+					player:'enterGame',
 				},
 				forced:true,
+				filter:function(event,player){
+					return (event.name!='phase'||game.phaseNumber==0);
+				},
 				content:function(){
 					player.addMark('nzry_huaiju',3);
 					player.addSkill('nzry_huaiju_ai');
@@ -1458,7 +1461,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['tachibana_effect'],
 			},
 			//没错 这是个橘
-			"tachibana_effect":{
+			tachibana_effect:{
 				audio:'nzry_huaiju',
 				trigger:{
 					global:['damageBegin4','phaseDrawBegin2'],
@@ -1906,13 +1909,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					1:{
 						audio:2,
 						trigger:{
-							global:'gameDrawAfter',
+							global:'phaseBefore',
 							player:'enterGame',
 						},
 						forced:true,
 						locked:false,
 						filter:function(event,player){
-							return !player.getStorage('nzry_mingren').length;
+							return !player.getStorage('nzry_mingren').length&&(event.name!='phase'||game.phaseNumber==0);
 						},
 						content:function(){
 							'step 0'
@@ -4846,9 +4849,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.card.name!='sha') return false;
 					if(player==event.player){
-						return event.target.sex=='female';
+						return event.target.hasSex('female');
 					}
-					return event.player.sex=='female';
+					return event.player.hasSex('female');
 				},
 				check:function(event,player){
 					return player==event.player;
@@ -4867,7 +4870,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					directHit_ai:true,
 					skillTagFilter:function(player,tag,arg){
-						if(arg.card.name!='sha'||arg.target.sex!='female'||arg.target.countCards('h','shan')>1) return false;
+						if(arg.card.name!='sha'||!arg.target.hasSex('female')||arg.target.countCards('h','shan')>1) return false;
 					},
 				},
 			},

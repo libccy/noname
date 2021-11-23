@@ -1458,7 +1458,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else event.addIndex++;
 					if(target.hp>player.hp) list.push('令其失去'+get.cnNumber(target.hp-player.hp)+'点体力');
 					if(!list.length) event.finish();
-					else if(list.length==1) event.result={index:0};
+					else if(list.length==1) event._result={index:0};
 					else player.chooseControl().set('choiceList',list).set('prompt','令'+get.translation(target)+'执行一项').set('ai',function(){
 						var player=_status.event.player,target=_status.event.getParent().target;
 						return (target.hp-player.hp)>(Math.min(target.maxHp,target.countCards('h'))/2)?1:0;

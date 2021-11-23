@@ -300,12 +300,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				type:'trick',
 				enable:true,
 				filterTarget:function(card,player,target){
-					return target.countCards('h')&&target!=player&&target.sex=='male';
+					return target.countCards('h')&&target!=player&&target.hasSex('male');
 				},
 				content:function(){
 					'step 0'
 					event.list=game.filterPlayer(function(current){
-						return current!=player&&current!=target&&current.sex=='female';
+						return current!=player&&current!=target&&current.hasSex('female');
 					}).sortBySeat();
 					'step 1'
 					if(target.countCards('h')&&event.list.length){
@@ -340,7 +340,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							var num=game.countPlayer(function(current){
-								return current!=player&&current!=target&&current.sex=='female';
+								return current!=player&&current!=target&&current.hasSex('female');
 							});
 							var nh=target.countCards('h');
 							num=Math.min(num,nh);
@@ -490,7 +490,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						event.target=target;
 						player.logSkill('olfusong',target);
-						player.chooseControl('olfengzi','oljizhan').set('prompt','令'+get.translation(target)+'获得其中一个技能').set('ai',()=>(Math.random()>0.5?0:1));
+						target.chooseControl('olfengzi','oljizhan').set('prompt','令'+get.translation(target)+'获得其中一个技能').set('ai',()=>(Math.random()>0.5?0:1));
 					}
 					else event.finish();
 					'step 2'
@@ -1121,7 +1121,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return current.name1=='guansuo'||current.name2=='guansuo';
 					})){
 						player.chooseTarget(function(card,player,current){
-							return current!=player&&current.sex=='male';
+							return current!=player&&current.hasSex('male');
 						},'许身：是否令一名其他男性角色选择是否将其武将牌替换为“关索”？').set('ai',function(target){
 							return get.attitude(_status.event.player,target)-4;
 						});
@@ -2340,7 +2340,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['machao','hansui','pangde'],
 				trigger:{
 					player:'enterGame',
-					global:'gameDrawAfter',
+					global:'phaseBefore',
+				},
+				filter:function(event,player){
+					return (event.name!='phase'||game.phaseNumber==0);
 				},
 				direct:true,
 				content:function(){
@@ -3484,12 +3487,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			cuorui:{
 				audio:2,
 				trigger:{
-					global:'gameDrawAfter',
+					global:'phaseBefore',
 					player:'enterGame',
 				},
 				forced:true,
 				filter:function(event,player){
-					return player.maxHp>0&&!get.is.single();
+					return player.maxHp>0&&!get.is.single()&&(event.name!='phase'||game.phaseNumber==0);
 				},
 				content:function(){
 					player.draw(Math.min(5,player.maxHp),false);
@@ -4335,7 +4338,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget('请选择【星舞】的目标','弃置其装备区内的所有牌。然后对其造成两点伤害（目标为女性角色则改为1点）',true,lib.filter.notMe).set('ai',function(target){
 						return -get.attitude(_status.event.player,target)*Math.sqrt(4+target.countCards('e',function(card){
 							return get.value(card,target)>0;
-						}))*(target.sex=='female'?1:2);
+						}))*(target.hasSex('female')?1:2);
 					});
 					'step 7'
 					if(result.bool&&result.targets&&result.targets.length){
@@ -4343,7 +4346,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.line(target,'green');
 						var num=target.countCards('e');
 						if(num) player.discardPlayerCard(target,'e',num,true);
-						target.damage(target.sex=='female'?1:2);
+						target.damage(target.hasSex('female')?1:2);
 					}
 				},
 				ai:{
@@ -4914,12 +4917,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xianfu:{
 				trigger:{
-					global:'gameDrawAfter',
+					global:'phaseBefore',
 					player:'enterGame',
 				},
 				forced:true,
-				filter:function(){
-					return game.players.length>1;
+				filter:function(event){
+					return game.players.length>1&&(event.name!='phase'||game.phaseNumber==0);
 				},
 				audio:6,
 				content:function(){
@@ -7506,8 +7509,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return num+player.maxHp;
 					}
 				},
-				trigger:{global:'gameDrawAfter',player:'enterGame'},
+				trigger:{global:'phaseBefore',player:'enterGame'},
 				forced:true,
+				filter:function(event,player){
+					return (event.name!='phase'||game.phaseNumber==0);
+				},
 				content:function(){
 					player.draw(player.maxHp);
 				}
@@ -7719,7 +7725,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt2('yongdi'),function(card,player,target){
-						return (target.sex=='male'||target.name=='key_yuri')&&target!=player;
+						return (target.hasSex('male')||target.name=='key_yuri')&&target!=player;
 					}).set('ai',function(target){
 						if(!_status.event.goon) return 0;
 						var player=_status.event.player;
@@ -8511,7 +8517,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mod:{
 					globalFrom:function(from,to,distance){
 						return distance-game.countPlayer(function(current){
-							return current.sex=='female';
+							return current.hasSex('female');
 						});
 					}
 				}
@@ -8949,7 +8955,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						if(player.storage.xingwu.length==2){
 							if(!game.hasPlayer(function(current){
-								return (current!=player&&current.sex=='male'&&
+								return (current!=player&&current.hasSex('male')&&
 									get.damageEffect(current,player,player)>0&&
 									get.attitude(player,current)<0)
 							})) return 0;
@@ -8978,7 +8984,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						player.unmarkSkill('xingwu');
 						player.chooseTarget(function(card,player,target){
-							return target!=player&&target.sex=='male';
+							return target!=player&&target.hasSex('male');
 						},'对一名男性角色造成两点伤害并弃置其装备区内的牌').set('ai',function(target){
 							var player=_status.event.player;
 							if(get.attitude(player,target)>0) return -1;
@@ -12092,7 +12098,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.cunsi=false;
 				},
 				filterTarget:function(card,player,target){
-					return player!=target&&target.sex=='male';
+					return player!=target&&target.hasSex('male');
 				},
 				content:function(){
 					"step 0"
@@ -13405,7 +13411,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
-					return player!=target&&target.sex=='male';
+					return player!=target&&target.hasSex('male');
 				},
 				filterCard:true,
 				position:'he',
@@ -13987,11 +13993,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					init:{
 						audio:'xinfu_xionghuo',
 						trigger:{
-							global:"gameDrawAfter",
+							global:"phaseBefore",
 							player:"enterGame",
 						},
 						forced:true,
 						locked:false,
+						filter:function(event,player){
+							return (event.name!='phase'||game.phaseNumber==0);
+						},
 						content:function(){
 							player.addMark("xionghuo",3);
 						},
@@ -14582,7 +14591,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						popup:false,
 						filter:function (event,player){
 							if(!event.card||event.card.name!='tao') return false;
-							if(!event.source||event.source.sex!='male') return false;
+							if(!event.source||!event.source.hasSex('male')) return false;
 							if(!player.isDying()) return false;
 							if(game.hasPlayer(function(current){
 								return current.name=='guansuo'||current.name2=='guansuo';
@@ -14675,10 +14684,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{
 					player:["loseAfter","enterGame"],
-					global:"gameDrawAfter",
+					global:"phaseBefore",
 				},
 				filter:function (event,player){
-					if(event.name!='lose') return true;
+					if(event.name!='lose') return (event.name!='phase'||game.phaseNumber==0);
 					if(event.type!='discard') return false;
 					for(var i=0;i<event.cards2.length;i++){
 						if(!player.hasMark('xinfu_falu_'+get.suit(event.cards2[i]))) return true;
@@ -15953,7 +15962,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oljizhan:'吉占',
 			oljizhan_info:'摸牌阶段开始时，你可以放弃摸牌。你展示牌堆顶的一张牌，并猜测牌堆顶的下一张牌点数大于或小于此牌。若你猜对，你可继续重复此流程。然后你获得以此法展示的所有牌。',
 			olfusong:'赋颂',
-			olfusong_info:'当你死亡时，你可以令一名体力上限大于你的其他角色获得〖吉占〗或〖丰姿〗。',
+			olfusong_info:'当你死亡时，你可以选择一名体力上限大于你的其他角色。其选择获得〖吉占〗或〖丰姿〗。',
 			
 			sp_default:"常规",
 			sp_tongque:"铜雀台",

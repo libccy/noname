@@ -1188,11 +1188,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				priority:10,
 				audio:'zongzuo',
 				filter:function(event,player){
-					return !player.storage.xinzongzuo;
+					return game.phaseNumber==0;
 				},
 				content:function(){
 					'step 0'
-					player.storage.xinzongzuo=true;
 					var num=game.countGroup();
 					player.gainMaxHp(num);
 					event.num=num;
@@ -3227,7 +3226,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseJieshuBegin'},
 				filter:function(event,player){
-					return event.player!=player&&event.player.sex=='male'&&ui.cardPile.childElementCount<=player.hp*10;
+					return event.player!=player&&event.player.hasSex('male')&&ui.cardPile.childElementCount<=player.hp*10;
 				},
 				check:function(event,player){
 					return get.attitude(player,event.player)<0&&get.effect(event.player,{name:'sha'},player,player)>0;
@@ -4709,11 +4708,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				priority:10,
 				audio:2,
 				filter:function(event,player){
-					return !player.storage.zongzuo;
+					return game.phaseNumber==0;
 				},
 				content:function(){
 					'step 0'
-					player.storage.zongzuo=true;
 					var num=game.countGroup();
 					player.gainMaxHp(num);
 					event.num=num;
@@ -8042,7 +8040,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt('yanyu'),'令一名男性角色摸两张牌',function(card,player,target){
-						return target.sex=='male'&&target!=player;
+						return target.hasSex('male')&&target!=player;
 					}).set('ai',function(target){
 						return get.attitude(_status.event.player,target);
 					});
@@ -9186,7 +9184,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'damageBegin3'},
 				filter:function(event,player){
-					return player.countCards('he',{type:'equip'})&&event.source&&event.source.sex=='male';
+					return player.countCards('he',{type:'equip'})&&event.source&&event.source.hasSex('male');
 				},
 				direct:true,
 				content:function(){
@@ -9318,7 +9316,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{target:'useCardToTargeted'},
 				filter:function(event,player){
-					return (event.card.name=='sha'||get.type(event.card)=='trick')&&event.player&&event.player.sex=='male'&&player.countCards('he',function(card){
+					return (event.card.name=='sha'||get.type(event.card)=='trick')&&event.player&&event.player.hasSex('male')&&player.countCards('he',function(card){
 						return _status.connectMode||get.type(card)=='equip';
 					});
 				},

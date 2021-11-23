@@ -5813,11 +5813,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			rehuashen_init:{
 				trigger:{
-					global:'gameDrawAfter',
+					global:'phaseBefore',
 					player:'enterGame',
 				},
 				forced:true,
 				popup:false,
+				filter:function(event,player){
+					return (event.name!='phase'||game.phaseNumber==0);
+				},
 				content:function(){
 					lib.skill.rehuashen.addHuashens(player,3);
 					player.syncStorage('rehuashen');
@@ -7646,7 +7649,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				filterTarget:function(card,player,target){
-					if(target.sex!='male') return false;
+					if(!target.hasSex('male')) return false;
 					var card=ui.selected.cards[0];
 					if(!card) return false;
 					if(get.position(card)=='e'&&!target.isEmpty(get.subtype(card))) return false;
@@ -9225,7 +9228,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				delay:false,
 				filter:function(event,player){
 					return game.hasPlayer(function(current){
-						return current.sex=='male';
+						return current.hasSex('male');
 					});
 				},
 				content:function(){
@@ -9250,7 +9253,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.showCards([event.card]);
 					"step 2"
 					player.chooseTarget(true,'选择一名男性角色送出'+get.translation(event.card),function(card,player,target){
-						return target.sex=='male';
+						return target.hasSex('male');
 					}).set('ai',function(target){
 						var att=get.attitude(_status.event.player,target);
 						if(_status.event.neg) return -att;
@@ -9266,7 +9269,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						player:function(player){
 							if(game.hasPlayer(function(current){
-								return current.sex=='male'&&get.attitude(player,current)>0;
+								return current.hasSex('male')&&get.attitude(player,current)>0;
 							})) return 2;
 							return 0;
 						},
@@ -10410,7 +10413,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gzquanji_info:'当你受到伤害后或当你使用牌指定唯一目标并对其造成伤害后，你可以摸一张牌，然后你将一张牌置于武将牌上，称为“权”；你的手牌上限+X（X为“权”的数量）。',
 			gzpaiyi:'排异',
 			gzpaiyi_backup:'排异',
-			gzpaiyi_info:'出牌阶段限一次，你可以将移去一张“权”，然后选择一名角色并令其摸X张牌（X为“权”的数量且至多为7），若其手牌数不小于你，则你对其造成1点伤害且本技能于此回合内失效。',
+			gzpaiyi_info:'出牌阶段限一次。你可以移去一张“权”，然后选择一名角色并令其摸X张牌（X为“权”的数量且至多为7），若其手牌数不小于你，则你对其造成1点伤害。',
 			ol_zhurong:'界祝融',
 			changbiao:'长标',
 			changbiao_info:'出牌阶段限一次，你可以将任意张手牌当做【杀】使用（无距离限制）。若你因此【杀】对目标角色造成过伤害，则你于出牌阶段结束时摸X张牌（X为此【杀】对应的实体牌数量）。',

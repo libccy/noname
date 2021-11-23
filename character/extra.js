@@ -607,12 +607,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dulie:{
 				audio:2,
 				trigger:{
-					global:'gameDrawAfter',
+					global:'phaseBefore',
 					player:'enterGame',
 				},
 				forced:true,
 				filter:function(event,player){
-					return game.players.length>1&&game.hasPlayer(function(current){
+					return (event.name!='phase'||game.phaseNumber==0)&&game.players.length>1&&game.hasPlayer(function(current){
 						return current!=player&&!current.hasMark('dulie');
 					});
 				},
@@ -2286,11 +2286,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{
 					source:'damageSource',
 					player:['damageEnd','enterGame'],
-					global:'gameDrawAfter',
+					global:'phaseBefore',
 				},
 				forced:true,
 				filter:function(event){
-					return event.name!='damage'||event.num>0; 
+					return (event.name!='damage'&&(event.name!='phase'||game.phaseNumber==0))||event.num>0; 
 				},
 				content:function(){
 					player.addMark('baonu',trigger.name=='damage'?trigger.num:2);
@@ -2967,13 +2967,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qixing:{
 				audio:2,
 				unique:true,
-				trigger:{global:'gameDrawAfter',player:'phaseZhunbeiBegin'},
-				forced:true,
-				check:function(event,player){
-					return player.hp<=1;
+				trigger:{
+					global:'phaseBefore',
+					player:'enterGame',
 				},
+				forced:true,
 				filter:function(event,player){
-					return !player.storage.qixing;
+					return (event.name!='phase'||game.phaseNumber==0);
 				},
 				content:function(){
 					"step 0"
@@ -4001,11 +4001,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:2,
 						trigger:{
 							player:['linkBefore','enterGame'],
-							global:'gameDrawAfter',
+							global:'phaseBefore',
 						},
 						forced:true,
 						filter:function(event,player){
-							return player.isLinked()==(event.name=='link');
+							if(player.isLinked()) return false;
+							if(event.name=='link') return true;
+							return (event.name!='phase'||game.phaseNumber==0);
 						},
 						content:function(){
 							if(trigger.name!='link') player.link(true);

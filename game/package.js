@@ -26,10 +26,11 @@ window.noname_package={
 	card:{
 		standard:'标准',
 		extra:'军争',
-		sp:'SP',
+		sp:'忠胆英杰',
 		guozhan:'国战',
 		zhulu:'逐鹿天下',
 		yingbian:'应变篇',
+		yongjian:'用间篇',
 		zhenfa:'阵法',
 		yunchou:'运筹帷幄',
 		swd:'轩辕剑',

@@ -141,6 +141,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(event.shanRequired>1){
 							next.set('prompt2','（共需使用'+event.shanRequired+'张闪）');
 						}
+						else if(event.card.nature=='stab'){
+							next.set('prompt2','（在此之后仍需弃置一张手牌）');
+						}
 						next.set('ai1',function(card){
 							var target=_status.event.player;
 							var evt=_status.event.getParent();
@@ -172,6 +175,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(event.shanRequired>0){
 							event.goto(1);
 						}
+						else if(event.card.nature=='stab'&&target.countCards('h')>0){
+							event.responded=result;
+							event.goto(4);
+						}
 						else{
 							event.trigger('shaMiss');
 							event.responded=result;
@@ -179,6 +186,28 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 3"
 					if((!result||!result.bool||!result.result||result.result!='shaned')&&!event.unhurt){
+						target.damage(get.nature(event.card),event.baseDamage+event.extraDamage);
+						event.result={bool:true}
+						event.trigger('shaDamage');
+					}
+					else{
+						event.result={bool:false}
+						event.trigger('shaUnhirt');
+					}
+					event.finish();
+					"step 4"
+					target.chooseToDiscard('刺杀：请弃置一张牌，否则此【杀】依然造成伤害').set('ai',function(card){
+						var target=_status.event.player;
+						var evt=_status.event.getParent();
+						var bool=true;
+						if(get.damageEffect(target,evt.player,target,evt.card.nature)>=0) bool=false;
+						if(bool){
+							return 8-get.useful(card);
+						}
+						return 0;
+					});
+					"step 5"
+					if((!result||!result.bool)&&!event.unhurt){
 						target.damage(get.nature(event.card),event.baseDamage+event.extraDamage);
 						event.result={bool:true}
 						event.trigger('shaDamage');
@@ -1995,9 +2024,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					if(event.card.name!='sha') return false;
-					if(player.sex=='male'&&event.target.sex=='female') return true;
-					if(player.sex=='female'&&event.target.sex=='male') return true;
-					return false;
+					return player.differentSexFrom(event.target);
 				},
 				content:function(){
 					"step 0"
@@ -2675,6 +2702,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			sha:'杀',
 			huosha:'火杀',
 			leisha:'雷杀',
+			icesha:'冰杀',
+			kamisha:'神杀',
+			cisha:'刺杀',
 			shan:'闪',
 			tao:'桃',
 			bagua:'八卦阵',

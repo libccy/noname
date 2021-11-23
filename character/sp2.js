@@ -150,21 +150,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.showCards(cards,get.translation(player)+'发动了【经合】');
-					event.skills=lib.skill.jinghe.derivation.randomGets(targets.length);
+					event.skills=lib.skill.jinghe.derivation.randomGets(4);
 					player.addTempSkill('jinghe_clear',{player:'phaseBegin'});
 					event.targets.sortBySeat();
+					event.num=0;
 					'step 1'
-					event.target=targets[targets.length-event.skills.length];
-					event.target.chooseControl(event.skills).set('choiceList',event.skills.map(function(i){
+					event.target=targets[num];
+					event.num++;
+					event.target.chooseControl(event.skills,'cancel2').set('choiceList',event.skills.map(function(i){
 						return '<div class="skill">【'+get.translation(lib.translate[i+'_ab']||get.translation(i).slice(0,2))+'】</div><div>'+get.skillInfoTranslation(i,player)+'</div>';
 					})).set('displayIndex',false).set('prompt','选择获得一个技能');
 					'step 2'
 					var skill=result.control;
-					event.skills.remove(skill);
-					target.addAdditionalSkill('jinghe_'+player.playerid,skill);
-					target.popup(skill);
-					game.log(target,'获得了技能','#g【'+get.translation(skill)+'】');
-					if(event.skills.length) event.goto(1);
+					if(skill!='cancel2'){
+						event.skills.remove(skill);
+						target.addAdditionalSkill('jinghe_'+player.playerid,skill);
+						target.popup(skill);
+						game.log(target,'获得了技能','#g【'+get.translation(skill)+'】');
+					}
+					if(event.num<event.targets.length) event.goto(1);
 					if(target!=game.me&&!target.isOnline2()) game.delayx();
 				},
 				ai:{
@@ -291,11 +295,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'dying'},
 				usable:1,
 				logTarget:'player',
-				check:function(event,player){
-					return get.attitude(player,event.player)>0;
-				},
+				frequent:true,
 				content:function(){
-					trigger.player.draw(2);
+					player.draw(2);
 				},
 			},
 			nhxianshou:{
@@ -453,6 +455,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.removeSkill('zhukou');
 					player.addSkill('yuyun');
 				},
+				derivation:'yuyun',
 			},
 			yuyun:{
 				trigger:{player:'phaseUseBegin'},
@@ -1372,7 +1375,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return game.hasPlayer((current)=>lib.skill.reqingcheng.filterTarget(null,player,current));
 				},
 				filterTarget:function(card,player,target){
-					return target!=player&&target.sex=='male'&&target.countCards('h')<player.countCards('h');
+					return target!=player&&target.hasSex('male')&&target.countCards('h')<player.countCards('h');
 				},
 				content:function(){
 					player.swapHandcards(target);
@@ -1449,13 +1452,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{
 					player:['enterGame','showCharacterAfter','phaseBegin'],
-					global:['gameDrawAfter'],
+					global:['phaseBefore'],
 				},
 				direct:true,
 				filter:function(event,player){
 					if(player.hasSkill('zhiwei2')) return false;
 					if(get.mode()=='guozhan') return event.name=='showCharacter'&&(event.toShow.contains('gz_luyusheng')||event.toShow.contains('luyusheng'));
-					return event.name!='showCharacter';
+					return event.name!='showCharacter'&&(event.name!='phase'||game.phaseNumber==0);
 				},
 				content:function(){
 					'step 0'
@@ -6453,7 +6456,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.recover();
 					'step 1'
 					player.chooseTarget('是否失去〖蛮嗣〗，令一名其他男性角色和自己一同获得技能〖系力〗？',function(card,player,target){
-						return target!=player&&target.sex=='male';
+						return target!=player&&target.hasSex('male');
 					}).ai=function(target){
 						return get.attitude(_status.event.player,target);
 					};
@@ -7401,13 +7404,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			cangchu:{
 				trigger:{
-					global:'gameDrawAfter',
+					global:'phaseBefore',
 					player:['damageEnd','enterGame'],
 				},
 				audio:2,
 				forced:true,
 				filter:function(event,player){
-					if(event.name!='damage') return true;
+					if(event.name!='damage') return (event.name!='phase'||game.phaseNumber==0);
 					return event.nature=='fire'&&player.countMark('cangchu')>0;
 				},
 				content:function(){
@@ -8308,11 +8311,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pytianjiang:{
 				audio:2,
 				trigger:{
-					global:'gameDrawAfter',
+					global:'phaseBefore',
 					player:'enterGame',
 				},
 				forced:true,
 				locked:false,
+				filter:function(event,player){
+					return (event.name!='phase'||game.phaseNumber==0);
+				},
 				content:function(){
 					'step 0'
 					var i=0;
@@ -9260,9 +9266,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return '已选择了'+get.translation(group)+'势力'
 					},
 				},
-				trigger:{global:['gameDrawAfter','zhuUpdate']},
+				trigger:{global:['phaseBefore','zhuUpdate']},
 				filter:function(event,player){
-					return !player.storage.bingzhao&&player.hasZhuSkill('bingzhao');
+					return !player.storage.bingzhao&&player.hasZhuSkill('bingzhao')&&(event.name!='phase'||game.phaseNumber==0);
 				},
 				content:function(){
 					'step 0'
@@ -10277,12 +10283,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_dianhu":{
 				audio:2,
 				trigger:{
-					global:"gameDrawAfter",
+					global:"phaseBefore",
 					player:"enterGame",
 				},
 				forced:true,
 				filter:function(){
-					return game.players.length>1;
+					return game.players.length>1&&(event.name!='phase'||game.phaseNumber==0);
 				},
 				content:function(){
 					'step 0'

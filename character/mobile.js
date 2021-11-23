@@ -578,7 +578,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		skill:{
 			//新刘璋
 			jutu:{
-				audio:2,
+				audio:'xiusheng',
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				filter:function(event,player){
@@ -621,7 +621,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{combo:'jutu'},
 			},
 			yaohu:{
-				audio:2,
+				audio:'yinlang',
 				trigger:{player:'phaseBegin'},
 				direct:true,
 				filter:function(event,player){
@@ -671,7 +671,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					round:{},
 					gain:{
-						audio:'yaohu',
+						audio:'yinlang',
 						trigger:{global:'phaseUseBegin'},
 						direct:true,
 						filter:function(event,player){
@@ -1144,13 +1144,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					]).set('ai',function(){
 						if(player.countCards('hs',function(card){
 							return get.name(card)=='sha'&&player.hasValueTarget(card);
-						})>player.getCardUsable({name:'sha '})) return 0;
+						})>player.getCardUsable({name:'sha'})) return 0;
 						return 1;
 					});
 					'step 1'
 					if(result.control!='cancel2'){
 						player.logSkill('spyilie');
-						game.log(player,'选择了【毅烈】的','#g'+result.control);
+						game.log(player,'选择了','#g【毅烈】','的','#y'+result.control);
 						if(result.index%2==0) player.addTempSkill('spyilie_add','phaseUseEnd');
 						if(result.index>0) player.addTempSkill('spyilie_miss');
 						if(result.index==2) player.loseHp();
@@ -1373,7 +1373,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'damageBegin4'},
 				filter:function(event,player){
-					return player.countCards('he',{type:'equip'})&&event.source&&event.source.sex=='male';
+					return player.countCards('he',{type:'equip'})&&event.source&&event.source.hasSex('male');
 				},
 				direct:true,
 				content:function(){
@@ -1711,7 +1711,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				usable:1,
 				filter:function(event,player){
-					return (event.card.name=='sha'||event.card.name=='juedou')&&(event.target.countGainableCards(player,'h')>0||player.hasCard(function(i){
+					return (event.card.name=='sha'||event.card.name=='juedou')&&event.targets.length==1&&
+					(event.target.countGainableCards(player,'h')>0||player.hasCard(function(i){
 						return _status.connectMode||get.type(i,player)=='basic'&&lib.filter.cardDiscardable(i,player,'dbquedi');
 					},'h'));
 				},
@@ -3561,11 +3562,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mjdingyi:{
 				audio:2,
 				trigger:{
-					global:'gameDrawAfter',
+					global:'phaseBefore',
 					player:'enterGame',
 				},
 				forced:true,
 				locked:false,
+				filter:function(event,player){
+					return (event.name!='phase'||game.phaseNumber==0);
+				},
 				logTarget:function(){
 					return game.players;
 				},
@@ -4654,13 +4658,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xunyi:{
 				audio:2,
 				trigger:{
-					global:['gameDrawAfter','dieAfter'],
+					global:['phaseBefore','dieAfter'],
 					player:'enterGame',
 				},
 				direct:true,
 				filter:function(event,player){
 					if(event.name=='die') return event.player==player.storage.xunyi2;
-					return !player.storage.xunyi2;
+					return !player.storage.xunyi2&&(event.name!='phase'||game.phaseNumber==0);
 				},
 				content:function(){
 					'step 0'
@@ -5793,10 +5797,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			refubi:{
 				audio:'fubi',
 				trigger:{
-					global:'gameDrawAfter',
+					global:'phaseBefore',
 					player:'enterGame',
 				},
 				direct:true,
+				filter:function(event,player){
+					return (event.name!='phase'||game.phaseNumber==0);
+				},
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt2('refubi'),lib.filter.notMe).set('ai',function(target){
@@ -6464,12 +6471,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			fubi:{
 				trigger:{
-					global:'gameDrawAfter',
+					global:'phaseBefore',
 					player:'enterGame',
 				},
 				direct:true,
 				skillAnimation:true,
 				animationColor:'wood',
+				filter:function(event,player){
+					return (event.name!='phase'||game.phaseNumber==0);
+				},
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt2('fubi'),lib.filter.notMe).set('ai',function(target){
@@ -7990,7 +8000,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tongqu:{
 				audio:2,
 				trigger:{
-					global:['gameDrawAfter','dying','phaseDrawBegin2'],
+					global:['phaseBefore','dying','phaseDrawBegin2'],
 					player:['enterGame','phaseZhunbeiBegin'],
 				},
 				direct:true,
@@ -8000,7 +8010,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.name=='phaseZhunbei') return game.hasPlayer(function(current){
 						return !current.hasMark('tongqu');
 					});
-					return !player.hasMark('tongqu');
+					return !player.hasMark('tongqu')&&(event.name!='phase'||game.phaseNumber==0);
 				},
 				content:function(){
 					'step 0'
@@ -9793,6 +9803,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								case 'thunder':name='leisha';break;
 								case 'kami':name='kamisha';break;
 								case 'ice':name='icesha';break;
+								case 'stab':name='cisha';break;
 							}
 						}
 						list.add(name);
@@ -9807,6 +9818,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								case 'thunder':name='leisha';break;
 								case 'kami':name='kamisha';break;
 								case 'ice':name='icesha';break;
+								case 'stab':name='cisha';break;
 							}
 						}
 						list.add(name);
@@ -10420,7 +10432,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				filter:function(event,player){
 					return game.hasPlayer(function(current){
-						return current.sex=='male';
+						return current.hasSex('male');
 					})
 				},
 				skillAnimation:true,
@@ -10429,7 +10441,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkill('rexushen2');
 					player.awakenSkill('rexushen');
 					player.loseHp(game.countPlayer(function(current){
-						return current.sex=='male';
+						return current.hasSex('male');
 					}));
 				},
 				ai:{
@@ -10437,7 +10449,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						player:function(player){
 							if(player.hp!=game.countPlayer(function(current){
-								return current.sex=='male';
+								return current.hasSex('male');
 							})) return 0;
 							return game.hasPlayer(function(current){
 								return get.attitude(player,current)>4&&current.countCards('h','tao')
@@ -12865,7 +12877,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.logSkill('gnjinfan');
 						game.log(player,'将',result.cards,'放到了武将牌上');
-						player.loseToSpecial(result.cards,'gnjinfan');
+						player.loseToSpecial(result.cards,'gnjinfan').visible=true;
 					}
 					else event.finish();
 					'step 2'

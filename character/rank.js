@@ -710,6 +710,7 @@ window.noname_character_rank={
 		'dufuren',
 		'yuanhuan',
 		'zhouyi',
+		'yangzhi',
 	],
 	b:[
 		'diy_feishi',
@@ -907,6 +908,7 @@ window.noname_character_rank={
 		'duji',
 		'sp_chendong',
 		'sp_zongyu',
+		'yangyan',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1758,6 +1760,8 @@ window.noname_character_rank={
 			'yuanhuan',
 			'zhouyi',
 			'fuqian',
+			'yangyan',
+			'yangzhi',
 		],
 		junk:[
 			'sunshao',

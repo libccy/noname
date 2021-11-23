@@ -240,32 +240,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				skills:['yinyueqiang']
 			},
-			
-			du:{
-				type:'basic',
-				fullskin:true,
-				toself:true,
-				ai:{
-					value:-5,
-					useful:6,
-					result:{
-						player:function(player,target){
-							if(player.hasSkillTag('usedu')) return 5;
-							return -1;
-						}
-					},
-					order:7.5
-				},
-				enable:true,
-				modTarget:true,
-				global:'g_du',
-				filterTarget:function(card,player,target){
-					return target==player;
-				},
-				delay:false,
-				content:function(){},
-				selectTarget:-1
-			},
 			shengdong:{
 				audio:true,
 				fullskin:true,
@@ -601,30 +575,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			g_du:{
-				cardSkill:true,
-				trigger:{player:'loseEnd'},
-				popup:false,
-				forced:true,
-				filter:function(event,player){
-					if(!event.visible) return false;
-					if(player.hasSkillTag('nodu')) return false;
-					if(event.hs){
-						for(var i=0;i<event.hs.length;i++){
-							if(get.name(event.hs[i],player)=='du') return true;
-						}
-					}
-					return false;
-				},
-				content:function(){
-					var num=0;
-					for(var i=0;i<trigger.hs.length;i++){
-						if(get.name(trigger.hs[i],player)=='du') num++;
-					}
-					if(trigger.getParent().name!='useCard'||trigger.getParent().card.name!='du') player.popup('毒','wood');
-					player.loseHp(num).type='du';
-				},
-			},
 			caomu_skill:{
 				cardSkill:true,
 				unique:true,
@@ -666,8 +616,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			lanyinjia_info:'你可以将一张手牌当做【闪】使用或打出。锁定技，【烂银甲】不会无效化；当你受到【杀】造成的伤害时，弃置【烂银甲】。',
 			yinyueqiang:'银月枪',
 			yinyueqiang_info:'你的回合外，每当你使用或打出了一张黑色手牌（若为使用则在它结算之前），你可以立即对你攻击范围内的任意一名角色使用一张【杀】',
-			du:'毒',
-			du_info:'当此牌正面朝上离开你的手牌区时，你失去一点体力',
 			shengdong:'声东击西',
 			shengdong_info:'出牌阶段，对一名其他角色使用。你交给目标角色一张手牌，若如此做，其将两张牌交给另一名由你选择的其他角色（不足则全给，存活角色不超过2时可重铸）',
 			zengbin:'增兵减灶',
@@ -684,12 +632,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['diamond',4,'zengbin'],
 			['heart',6,'zengbin'],
 			['spade',7,'zengbin'],
-			['spade',3,'du'],
-			['spade',9,'du'],
-			['club',3,'du'],
-			['club',9,'du'],
-			['diamond',5,'du'],
-			['diamond',9,'du'],
 			['diamond',12,'yinyueqiang'],
 			["spade",11,'jinchan'],
 			["club",12,'jinchan'],
