@@ -906,9 +906,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var type=get.type(i);
 							if((type=='basic'||type=='trick')) list.push([type,'',i]);
 							if(i=='sha'){
-								list.push([type,'',i,'fire']);
-								list.push([type,'',i,'thunder']);
-								list.push([type,'',i,'ice']);
+								for(var j of lib.inpile_nature) list.push([type,'',i,j]);
 							}
 						}
 						if(list.length){
@@ -2394,9 +2392,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(event.filterCard({name:name,isCard:true},player,event)){
 								list.push([type,'',name]);
 								if(name=='sha'){
-									list.push([type,'',name,'fire']);
-									list.push([type,'',name,'thunder']);
-									list.push([type,'',name,'ice']);
+									for(var j of lib.inpile_nature) list.push([type,'',i,j]);
 								}
 							}
 						}
@@ -4000,9 +3996,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var type=get.type(i);
 						if(type=='basic'||type=='trick') list.push([type,'',i]);
 						if(i=='sha'){
-							list.push([type,'',i,'fire']);
-							list.push([type,'',i,'thunder']);
-							list.push([type,'',i,'ice']);
+							for(var j of lib.inpile_nature) list.push([type,'',i,j]);
 						}
 					}
 					player.chooseButton(['是否视为使用一张基本牌或普通锦囊牌？',[list,'vcard']]).set('filterButton',function(button){
@@ -7077,12 +7071,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var name=lib.inpile[i];
 							if(name=='du'||name=='shan') continue;
 							if(name=='sha'){
-								list.addArray([
-									['基本','','sha'],
-									['基本','','sha','fire'],
-									['基本','','sha','thunder'],
-									['基本','','sha','ice'],
-								]);
+								list.push(['基本','','sha']);
+								for(var j of lib.inpile_nature) list.push(['基本','',name,j]);
 							}
 							else if(get.type(name)=='basic'){
 								list.push(['基本','',name]);
@@ -7343,9 +7333,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(name=='boss_mengpohuihun') continue;
 							if(name=='sha'){
 								list.push(['基本','','sha']);
-								list.push(['基本','','sha','fire']);
-								list.push(['基本','','sha','thunder']);
-								list.push(['基本','','sha','ice']);
+								for(var j of lib.inpile_nature) list.push(['基本','',name,j]);
 							}
 							else if(get.type(name)=='trick') list.push(['锦囊','',name]);
 							else if(get.type(name)=='basic') list.push(['基本','',name]);
@@ -9936,9 +9924,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player.storage.junktaoluan.contains(name)) continue;
 							if(name=='sha'){
 								list.push(['基本','','sha']);
-								list.push(['基本','','sha','fire']);
-								list.push(['基本','','sha','thunder']);
-								list.push(['基本','','sha','ice']);
+								for(var j of lib.inpile_nature) list.push(['基本','',name,j]);
 							}
 							else if(get.type(name)=='trick') list.push(['锦囊','',name]);
 							else if(get.type(name)=='basic') list.push(['基本','',name]);

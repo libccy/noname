@@ -1240,9 +1240,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player.storage.xintaoluan.contains(name)) continue;
 							if(name=='sha'){
 								list.push(['基本','','sha']);
-								list.push(['基本','','sha','fire']);
-								list.push(['基本','','sha','thunder']);
-								list.push(['基本','','sha','ice']);
+								for(var j of lib.inpile_nature) list.push(['基本','','sha',j]);
 							}
 							else if(get.type(name)=='trick') list.push(['锦囊','',name]);
 							else if(get.type(name)=='basic') list.push(['基本','',name]);
@@ -3932,9 +3930,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player.storage.taoluan&&player.storage.taoluan.contains(name)) continue;
 							if(name=='sha'){
 								list.push(['基本','','sha']);
-								list.push(['基本','','sha','fire']);
-								list.push(['基本','','sha','thunder']);
-								list.push(['基本','','sha','ice']);
+								for(var j of lib.inpile_nature) list.push(['基本','','sha',j]);
 							}
 							else if(get.type(name)=='trick') list.push(['锦囊','',name]);
 							else if(get.type(name)=='basic') list.push(['基本','',name]);
@@ -4501,9 +4497,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var name=lib.inpile[i];
 						if(name=='sha'){
 							list.push(['基本','','sha']);
-							list.push(['基本','','sha','fire']);
-							list.push(['基本','','sha','thunder']);
-							list.push(['基本','','sha','ice']);
+							for(var j of lib.inpile_nature) list.push(['基本','','sha',j]);
 						}
 						else if(get.type(name)=='basic') list.push(['基本','',name]);
 						else if(player.countMark('xindanxin')>0&&get.type(name)=='trick') list.push(['锦囊','',name]);
@@ -4595,8 +4589,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}};
 								if(event.filterCard(card,player,event)) list.push([type,'',i]);
 								if(i=='sha'){
-									var natures=['fire','thunder','ice'];
-									for(var j of natures){
+									for(var j of lib.inpile_nature){
 										card.nature=j;
 										if(event.filterCard(card,player,event)) list.push([type,'',i,j]);
 									}
@@ -7335,9 +7328,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var list=[];
 						if(!player.storage.huomo.sha&&event.filterCard({name:'sha'},player,event)){
 							list.push(['基本','','sha']);
-							list.push(['基本','','sha','fire']);
-							list.push(['基本','','sha','thunder']);
-							list.push(['基本','','sha','ice']);
+							for(var j of lib.inpile_nature) list.push(['基本','','sha',j]);
 						}
 						if(!player.storage.huomo.tao&&event.filterCard({name:'tao'},player,event)){
 							list.push(['基本','','tao']);

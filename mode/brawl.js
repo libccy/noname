@@ -1604,12 +1604,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player1=this.player1;
 						player2=this.player2;
 					}
-					var rect1=player1.getBoundingClientRect();
-					var rect2=player2.getBoundingClientRect();
-					var left1=rect1.left+rect1.width/2-ui.arena.offsetLeft;
-					var left2=rect2.left+rect2.width/2-ui.arena.offsetLeft;
-					var top1=rect1.top+rect1.height/2-ui.arena.offsetTop;
-					var top2=rect2.top+rect2.height/2-ui.arena.offsetTop;
 
 					var createCard=function(wuxie){
 						var card;
@@ -1628,7 +1622,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 
 					var func=function(){
-						game.linexy([left1,top1,left2,top2]);
+						game.linexy([
+							player1.getLeft()+player1.offsetWidth/2,
+							player1.getTop()+player1.offsetHeight/2,
+							player2.getLeft()+player2.offsetWidth/2,
+							player2.getTop()+player2.offsetHeight/2,
+						],node);
 						var card=createCard(true);
 						card.style.left='43px';
 						card.style.top='58px';
@@ -1660,7 +1659,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						setTimeout(function(){
 							if(!node.showcaseinterval) return;
 							player2.node.count.innerHTML='1';
-							game.linexy([left2,top2,left1,top1]);
+							game.linexy([
+								player2.getLeft()+player2.offsetWidth/2,
+								player2.getTop()+player2.offsetHeight/2,
+								player1.getLeft()+player1.offsetWidth/2,
+								player1.getTop()+player1.offsetHeight/2,
+							],node);
 							var card=createCard(true);
 							card.style.left='auto';
 							card.style.right='43px';
@@ -2917,7 +2921,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						player1=this.player1;
 					}
-					var rect1=player1.getBoundingClientRect();
 					var func=function(){
 						var player2=ui.create.player(null,true).init('caiyang');
 						player2.node.marks.remove();
@@ -2932,32 +2935,34 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						ui.refresh(player2);
 						player2.style.opacity=1;
 						player2.style.transform='scale(0.9)';
-						var rect2=player2.getBoundingClientRect();
-						var left1=rect1.left+rect1.width/2-ui.arena.offsetLeft;
-						var left2=rect2.left+rect2.width/2-ui.arena.offsetLeft;
-						var top1=rect1.top+rect1.height/2-ui.arena.offsetTop;
-						var top2=rect2.top+rect2.height/2-ui.arena.offsetTop;
 						setTimeout(function(){
  						if(!player2) return;
- 						game.linexy([left1,top1,left2,top2]);
- 						var popup=ui.create.div('.damage');
- 						popup.innerHTML='-1';
- 						popup.dataset.nature='soil';
- 						player2.appendChild(popup);
- 						ui.refresh(popup);
- 						popup.classList.add('damageadded');
- 						popup.listenTransition(function(){
- 							setTimeout(function(){
- 								popup.delete();
- 							},200);
- 						});
+ 						game.linexy([
+								player1.getLeft()+player1.offsetWidth/2,
+								player1.getTop()+player1.offsetHeight/2,
+								player2.getLeft()+player2.offsetWidth/2,
+								player2.getTop()+player2.offsetHeight/2,
+							],node);
+							setTimeout(function(){
+ 							var popup=ui.create.div('.damage');
+ 							popup.innerHTML='-1';
+ 							popup.dataset.nature='soil';
+ 							player2.appendChild(popup);
+ 							ui.refresh(popup);
+ 							popup.classList.add('damageadded');
+ 							popup.listenTransition(function(){
+ 								setTimeout(function(){
+ 									popup.delete();
+ 								},300);
+ 							});
+ 						},250)
 						},600);
 						setTimeout(function(){
 							if(!player2) return;
 							player2.style.transition='all 0.5s';
 							player2.style.transform='scale(1.2)';
 							player2.delete();
-						},1100);
+						},1200);
 					};
 					node.showcaseinterval=setInterval(func,2600);
 					func();
@@ -3487,8 +3492,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						].randomGet();
 					}
 					if(init){
-						player1=ui.create.player(null,true).init(list[0]);
-						player2=ui.create.player(null,true).init(list[1]);
+						player1=ui.create.player(null,true);
+						player2=ui.create.player(null,true);
 						player1.node.marks.remove();
 						player1.node.hp.remove();
 						player2.node.marks.remove();
@@ -3513,8 +3518,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					var player3,player4;
 					if(init){
-						player3=ui.create.player(null,true).init(list[3]);
-						player4=ui.create.player(null,true).init(list[2]);
+						player3=ui.create.player(null,true);
+						player4=ui.create.player(null,true);
 						player3.node.marks.remove();
 						player3.node.hp.remove();
 						player4.node.marks.remove();
@@ -3537,6 +3542,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player3=this.player3;
 						player4=this.player4;
 					}
+					player1.init(list[0]);
+					player2.init(list[1]);
+					player3.init(list[3]);
+					player4.init(list[2]);
 				},
 				intro:['双方使用特定的武将，搭配特定的技能，还原特定的经典场景'],
 				content:{

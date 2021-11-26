@@ -2253,7 +2253,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var ai2=function(target){
 						var player=_status.event.player;
 						if(get.attitude(player,target)<=0) return 0;
-						var list=[null,'fire','thunder','ice','juedou'];
+						var list=[null,'juedou'].concat(lib.inpile_nature);
 						if(target.hasSkill('ayato_zenshen')) list.push('kami');
 						var num=Math.max.apply(Math,list.map(function(i){
 							if(i=='juedou') return target.getUseValue({name:'juedou',isCard:true},false);
@@ -2293,7 +2293,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return target!=player&&target!=_status.event.target;
 					},'选择'+get.translation(target)+'使用【杀】或【决斗】的目标',true).set('target',target).set('ai',function(target){
 						var evt=_status.event;
-						var list=[null,'fire','thunder','ice','juedou'];
+						var list=[null,'juedou'].concat(lib.inpile_nature);
 						if(evt.target.hasSkill('ayato_zenshen')) list.push('kami')
 						return Math.max.apply(Math,list.map(function(i){
 							var card={name:'sha',isCard:true};
@@ -2309,9 +2309,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.target2=target2;
 					player.line(target2);
 					game.log(player,'选择了',target2);
-					var list=[null,'fire','thunder','ice'];
+					var list=lib.inpile_nature.slice(0);
+					list.unshift(null);
 					var vcards=[];
-					if(target.hasSkill('ayato_zenshen')) list.push('kami');
+					if(target.hasSkill('ayato_zenshen')) list.add('kami');
 					for(var i of list){
 						if(target.canUse({name:'sha',isCard:true,nature:i},target2,false)) vcards.push(['基本','','sha',i]);
 					}
@@ -2321,6 +2322,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else event._result={index:1};
 					}
 					else if(!target.countCards('h')){
+						event.vcards=vcards;
 						event._result={index:0};
 					}
 					else{
@@ -5858,7 +5860,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(i=='shan'||i=='wuxie') continue;
 						var type=get.type(i);
 						if((type=='basic'||type=='trick')&&event.filterCard({name:i},player,event)) return true;
-						if(i=='sha'&&(event.filterCard({name:i,nature:'ice'},player,event)||event.filterCard({name:i,nature:'fire'},player,event)||event.filterCard({name:i,nature:'thunder'},player,event))) return true;
+						if(i=='sha'){
+							for(var j of lib.inpile_nature){
+								if(event.filterCard({name:i,nature:j},player,event)) return true;
+							}
+						}
 					}
 					return false;
 				},
@@ -5870,9 +5876,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var type=get.type(i);
 							if(type=='basic'||type=='trick') list.push([type,'',i]);
 							if(i=='sha'){
-								list.push([type,'',i,'fire']);
-								list.push([type,'',i,'thunder']);
-								list.push([type,'',i,'ice']);
+								for(var j of lib.inpile_nature) list.push(['基本','','sha',j]);
 							}
 						}
 						return ui.create.dialog('蛊惑',[list,'vcard']);
@@ -7959,9 +7963,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return player.canUse('sha',current);
 							})){
 								list.push(['基本','','sha']);
-								list.push(['基本','','sha','fire']);
-								list.push(['基本','','sha','thunder']);
-								list.push(['基本','','sha','ice']);
+							}
+							for(var i of lib.inpile_nature){
+							 if(lib.filter.cardUsable({name:'sha',nature:i},player,event.getParent('chooseToUse'))&&game.hasPlayer(function(current){
+										return player.canUse({name:'sha',nature:i},current);
+									})){
+									list.push(['基本','','sha',i]);
+								}
 							}
 							if(lib.filter.cardUsable({name:'tao'},player,event.getParent('chooseToUse'))&&game.hasPlayer(function(current){
 								return player.canUse('tao',current);

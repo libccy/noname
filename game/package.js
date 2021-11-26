@@ -5,7 +5,7 @@ window.noname_package={
 		shenhua:'神话再临',
 		xinghuoliaoyuan:'星火燎原',
 		yijiang:'一将成名',
-		sp:'SP',
+		sp:'璀璨星河',
 		yingbian:'文德武备',
 		sp2:'系列专属',
 		extra:'神将',		

@@ -79,6 +79,7 @@
 		arenaReady:[],
 		onfree:[],
 		inpile:[],
+		inpile_nature:[],
 		extensions:[],
 		extensionPack:{},
 		cardType:{},
@@ -27708,6 +27709,7 @@
 						_status.mode=state.mode;
 						_status.renku=state.renku;
 						lib.inpile=state.inpile;
+						lib.inpile_nature=state.inpile_nature;
 						var pos=state.players[observe||game.onlineID].position;
 						for(var i in state.players){
 							var info=state.players[i];
@@ -27995,7 +27997,7 @@
 		},
 		suit:['club','spade','diamond','heart'],
 		group:['wei','shu','wu','qun','jin','shen'],
-		nature:['fire','thunder','poison','kami','ice','stab'],
+		nature:['fire','thunder','kami','ice','stab','poison'],
 		linked:['fire','thunder','kami','ice'],
 		groupnature:{
 			shen:'thunder',
@@ -31291,7 +31293,10 @@
 			else{
 				node.style.transform='rotate('+(-deg)+'deg) scaleY(0)';
 				node.style.height=get.xyDistance(from,to)+'px';
-				if(game.chess){
+				if(get.objtype(arguments[1])=='div'){
+					arguments[1].appendChild(node);
+				}
+				else if(game.chess){
 					ui.chess.appendChild(node);
 				}
 				else{
@@ -45126,19 +45131,24 @@
 							if(game.bannedcards&&game.bannedcards.contains(lib.card.list[i][2])) continue;
 						}
 						lib.inpile.add(lib.card.list[i][2]);
+						if(lib.card.list[i][2]=='sha'&&lib.card.list[i][3]) lib.inpile_nature.add(lib.card.list[i][3]);
 						ui.create.card(ui.cardPile).init(lib.card.list[i]);
 					}
 				}
 				lib.inpile.sort(lib.sort.card);
+				lib.inpile_nature.sort(function(a,b){
+					return lib.nature.indexOf(a)-lib.nature.indexOf(b);
+				})
 				for(var i in _status.cardtag){
 					if(!_status.cardtag[i].length) delete _status.cardtag[i];
 				}
-				game.broadcastAll(function(num,pile,top,cardtag){
+				game.broadcastAll(function(num,pile,top,cardtag,inpile2){
 					if(ui.cardPileNumber) ui.cardPileNumber.innerHTML='0轮 剩余牌: '+num;
 					lib.inpile=pile;
 					_status.pileTop=top;
 					_status.cardtag=cardtag;
-				},ui.cardPile.childNodes.length,lib.inpile,ui.cardPile.firstChild,_status.cardtag);
+					lib.inpile_nature=inpile2;
+				},ui.cardPile.childNodes.length,lib.inpile,ui.cardPile.firstChild,_status.cardtag,lib.inpile_nature);
 			},
 		},
 		click:{
@@ -50303,6 +50313,7 @@
 				roomId:game.roomId,
 				over:_status.over,
 				inpile:lib.inpile,
+				inpile_nature:lib.inpile_nature,
 				renku:_status.renku,
 			};
 			for(var i in lib.playerOL){
@@ -51992,7 +52003,7 @@
 					uiintro.addText(get.colorspan(lib.characterTitle[node.name]));
 				}
 
-				if(node.isUnderControl()||(!game.observe&&game.me&&game.me.hasSkillTag('viewHandcard',null,node,true))){
+				if(!node.noclick&&(node.isUnderControl()||(!game.observe&&game.me&&game.me.hasSkillTag('viewHandcard',null,node,true)))){
 					var hs=node.getCards('h');
 					if(hs.length){
 						uiintro.add('<div class="text center">手牌</div>');
@@ -52644,7 +52655,13 @@
 								}
 							}
 						}
-						if(lib.translate[name+'_info']){
+						if(lib.card[name].cardPrompt){
+							var str=lib.card[name].cardPrompt(node.link||node),placetext=uiintro.add('<div class="text" style="display:inline">'+str+'</div>');
+							if(str.indexOf('<div class="skill"')!=0){
+								uiintro._place_text=placetext;
+							}
+						}
+						else if(lib.translate[name+'_info']){
 							var placetext=uiintro.add('<div class="text" style="display:inline">'+lib.translate[name+'_info']+'</div>');
 							if(lib.translate[name+'_info'].indexOf('<div class="skill"')!=0){
 								uiintro._place_text=placetext;

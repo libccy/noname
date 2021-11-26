@@ -90,8 +90,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(var i of lib.inpile){
 							if(i!='du'&&get.type(i)=='basic'&&event.filterCard({name:i,cards:hs},player,event)) vcards.push(['基本','',i]);
 							if(i=='sha'){
-								var list=['fire','thunder','ice'];
-								for(var j of list){
+								for(var j of lib.inpile_nature){
 									if(event.filterCard({name:i,nature:j,cards:hs},player,event)) vcards.push(['基本','',i,j]);
 								}
 							}
@@ -242,9 +241,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return player.canUse('sha',current);
 							})){
 								list.push(['基本','','sha']);
-								list.push(['基本','','sha','fire']);
-								list.push(['基本','','sha','thunder']);
-								list.push(['基本','','sha','ice']);
+							}
+							for(var i of lib.inpile_nature){
+							 if(lib.filter.cardUsable({name:'sha',nature:i},player,event.getParent('chooseToUse'))&&game.hasPlayer(function(current){
+										return player.canUse({name:'sha',nature:i},current);
+									})){
+									list.push(['基本','','sha',i]);
+								}
 							}
 							if(lib.filter.cardUsable({name:'tao'},player,event.getParent('chooseToUse'))&&game.hasPlayer(function(current){
 								return player.canUse('tao',current);

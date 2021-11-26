@@ -909,6 +909,8 @@ window.noname_character_rank={
 		'sp_chendong',
 		'sp_zongyu',
 		'yangyan',
+		'zuofen',
+		're_kanze',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1762,6 +1764,7 @@ window.noname_character_rank={
 			'fuqian',
 			'yangyan',
 			'yangzhi',
+			'zuofen',
 		],
 		junk:[
 			'sunshao',

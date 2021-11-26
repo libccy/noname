@@ -7060,7 +7060,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseZhunbeiBegin'},
 				forced:true,
 				filter:function(event,player){
-					return event.player!=player&&event.player.countCards('he')>1;
+					return event.player!=player&&(event.player.countCards('h')>1||event.player.countCards('e')>1);
 				},
 				content:function(){
 					'step 0'
@@ -7516,8 +7516,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_zuijiu:{
 				trigger:{source:'damageBegin1'},
 				filter:function(event){
-					return event.card&&(event.card.name=='sha'||event.card.name=='juedou')&&
-					event.parent.name!='_lianhuan'&&event.parent.name!='_lianhuan2';
+					return event.card&&event.card.name=='sha'&&event.getParent().name=='sha';
 				},
 				forced:true,
 				content:function(){
@@ -9402,7 +9401,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_mengtai:'萌态',
 			boss_mengtai_info:'锁定技，若你的出牌阶段被跳过，你跳过本回合的弃牌阶段；若你的摸牌阶段被跳过，结束阶段开始时，你摸三张牌',
 			boss_ruizhi:'睿智',
-			boss_ruizhi_info:'锁定技，其他角色的准备阶段开始时，其选择一张手牌和一张装备区里的牌，然后弃置其余的牌',
+			boss_ruizhi_info:'锁定技，其他角色的准备阶段开始时，其选择一张手牌和一张装备区里的牌，然后弃置其余的牌。',
 			boss_jingjue:'警觉',
 			boss_jingjue_info:'每当你于回合外失去牌时，你可以进行一次判定，若结果为红色，你回复1点体力',
 			boss_renxing:'任性',
@@ -9436,7 +9435,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_danshu_info:'每当你于回合外失去牌时，你可以进行一次判定，若结果为红色，你回复1点体力',
 
 			boss_zuijiu:'醉酒',
-			boss_zuijiu_info:'锁定技，你的【杀】额外造成1点伤害',
+			boss_zuijiu_info:'锁定技，你因【杀】造成伤害时，此伤害+1。',
 			boss_taiping:'太平',
 			boss_taiping_info:'锁定技，摸牌阶段摸牌时，你的摸牌数量+2',
 			boss_suoming:'索命',

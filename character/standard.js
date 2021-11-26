@@ -2213,7 +2213,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 4-get.value(card)
 				},
 				filterTarget:function(card,player,target){
-					if(!target.hasSex('female')) return false;
+					if(!target.hasSex('male')) return false;
 					if(target.hp>=target.maxHp) return false;
 					if(target==player) return false;
 					return true;

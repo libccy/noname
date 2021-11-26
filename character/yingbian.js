@@ -6,7 +6,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		character:{
 			yangzhi:['female','jin',3,['wanyi','maihuo']],
 			yangyan:['female','jin',3,['xuanbei','xianwan']],
-			zuofen:['female','jin',3,['zhaosong','lisi'],['unseen']],
 			ol_huaxin:['male','wei',3,['caozhao','olxibing']],
 			zhongyan:['female','jin',3,['bolan','yifa']],
 			weiguan:['male','jin',3,['zhongyun','shenpin']],
@@ -38,13 +37,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.hasCard(function(i){
+					return player.getStorage('wanyi2').length<4&&player.hasCard(function(i){
 						return get.is.yingbian(i);
 					},'hs');
 				},
 				chooseButton:{
-					dialog:function(){
-						return ui.create.dialog('婉嫕',[['zhujinqiyuan','chuqibuyi','shuiyanqijunx','dongzhuxianji'],'vcard'],'unseen');
+					dialog:function(event,player){
+						var list=['zhujinqiyuan','chuqibuyi','shuiyanqijunx','dongzhuxianji'];
+						list.removeArray(player.getStorage('wanyi2'))
+						return ui.create.dialog('婉嫕',[list,'vcard'],'hidden');
 					},
 					filter:function(button,player){
 						return lib.filter.filterCard({name:button.link[2]},player,_status.event.getParent());
@@ -66,6 +67,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return 1/Math.max(1,get.value(card));
 							},
 							position:'hs',
+							onuse:function(links,player){
+								if(!player.storage.wanyi2) player.storage.wanyi2=[];
+								player.storage.wanyi2.add(links.card.name);
+								player.addTempSkill('wanyi2');
+							},
 						}
 					},
 					prompt:function(links){
@@ -75,6 +81,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{backup:{}},
 				ai:{order:8,result:{player:1}},
 			},
+			wanyi2:{onremove:true},
 			maihuo:{
 				audio:2,
 				trigger:{target:'useCardToTargeted'},
@@ -83,6 +90,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.card.name=='sha'&&event.card.isCard&&event.getParent(2).name!='maihuo_effect'&&
 					event.cards.filterInD().length>0&&event.targets.length==1&&
 					event.player.isIn()&&(!event.player.storage.maihuo_effect||!event.player.storage.maihuo_effect.length);
+				},
+				prompt2:function(event){
+					return '令'+get.translation(event.card)+'暂时对你无效';
 				},
 				check:function(event,player){
 					return get.effect(player,event.card,event.player,player)<0;
@@ -102,15 +112,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						charlotte:true,
 						filter:function(event,player){
-							if(!player.storage.maihuo_effect||!player.storage.maihuo_effect.length) return false;
-							var card=player.storage.maihuo_effect[0];
-							if(card.name!='sha') card=get.autoViewAs({
-								name:'sha',
-								isCard:true,
-							},player.storage.maihuo_effect);
-							var target=player.storage.maihuo_target;
-							if(!card||!target||!target.isIn()||!player.canUse(card,target,false)) return false;
-							return true;
+							return player.storage.maihuo_effect&&player.storage.maihuo_effect.length>0;
 						},
 						content:function(){
 							var card=player.storage.maihuo_effect[0];
@@ -119,8 +121,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								isCard:true,
 							},player.storage.maihuo_effect);
 							var target=player.storage.maihuo_target;
-							player.useCard(card,target,player.storage.maihuo_effect,false);
-							delete player.storage.maihuo_effect;
+							if(target.isIn()&&player.canUse(card,target,null,true)){
+								player.useCard(card,target,player.storage.maihuo_effect);
+								delete player.storage.maihuo_effect;
+							}
 							player.removeSkill('maihuo_effect');
 						},
 						intro:{
@@ -171,7 +175,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{player:'useCardAfter'},
 						usable:1,
 						filter:function(event,player){
-							return event.card.yingbian&&event.cards.filterInD().length>0;
+							return (event.card.yingbian||get.is.yingbian(event.card))&&event.cards.filterInD().length>0;
 						},
 						direct:true,
 						content:function(){
@@ -302,204 +306,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					aiOrder:function(player,card,num){
 						if(card.name=='shandian'||card.name=='fulei') return num+3;
 					},
-				},
-			},
-			zhaosong:{
-				trigger:{global:'phaseUseBegin'},
-				logTarget:'player',
-				filter:function(event,player){
-					if(player==event.player||!event.player.countCards('h')) return false;
-					var types=['basic','trick','equip'];
-					for(var i of types){
-						if(event.player.hasMark('zhaosong_'+i)) return false;
-					}
-					return true;
-				},
-				prompt2:'令其交给你一张手牌，并根据类型获得对应的标记',
-				content:function(){
-					'step 0'
-					event.target=trigger.player;
-					event.target.chooseCard('h',true,get.translation(player)+'发动了【诏颂】；请交给其一张手牌');
-					'step 1'
-					if(result.bool){
-						var card=result.cards[0];
-						player.gain(card,target,'give');
-						var type=get.type2(card,target);
-						if(lib.skill['zhaosong_'+type]){
-							target.addSkill('zhaosong_'+type);
-							target.addMark('zhaosong_'+type);
-						}
-					}
-				},
-				subSkill:{
-					basic:{
-						marktext:'颂',
-						intro:{
-							name:'诏颂(颂)',
-							name2:'颂',
-							content:'当你使用【杀】选择唯一目标时，你可移去“颂”，并为此【杀】增加至多两个目标。然后若此【杀】造成的伤害小于2，你失去1点体力。',
-						},
-						trigger:{player:'useCard2'},
-						direct:true,
-						charlotte:true,
-						onremove:true,
-						filter:function(event,player){
-							return player.hasMark('zhaosong_basic')&&event.card.name=='sha'&&
-							event.targets.length==1&&game.hasPlayer(function(current){
-								return current!=player&&current!=event.targets[0]&&lib.filter.targetEnabled2(event.card,player,current);
-							});
-						},
-						content:function(){
-							'step 0'
-							player.chooseTarget([1,2],'是否弃置“颂”标记？','为'+get.translation(trigger.card)+'增加至多两个目标',function(card,player,target){
-								var evt=_status.event.getTrigger();
-								return target!=player&&target!=evt.targets[0]&&lib.filter.targetEnabled2(evt.card,player,target);
-							}).set('ai',function(target){
-								var evt=_status.event.getTrigger();
-								return get.effect(target,evt.card,evt.player,evt.player);
-							});
-							'step 1'
-							if(result.bool){
-								if(player!=event.player&&!player.isOnline()) game.delayx();
-								player.addTempSkill('zhaosong_shaloss');
-							}
-							else event.finish();
-							'step 2'
-							var targets=result.targets;
-							player.logSkill('zhaosong_basic',targets);
-							player.removeMark('zhaosong_basic',1);
-							player.removeSkill('zhaosong_basic');
-							trigger.targets.addArray(targets);
-							trigger.zhaosong_basic=true;
-						},
-					},
-					shaloss:{
-						trigger:{player:'useCardAfter'},
-						forced:true,
-						charlotte:true,
-						filter:function(event,player){
-							if(!event.zhaosong_basic) return false;
-							var num=0;
-							player.getHistory('sourceDamage',function(evt){
-								if(evt.card==event.card) num+=evt.num;
-							});
-							return num<2;
-						},
-						content:function(){
-							player.loseHp();
-						},
-					},
-					trick:{
-						marktext:'诔',
-						intro:{
-							name:'诏颂(诔)',
-							name2:'诔',
-							content:'当你进入濒死状态时，你可移去“诔”并减1点体力上限，然后将体力回复至1点并摸一张牌。',
-						},
-						trigger:{player:'dying'},
-						prompt:'是否弃置“诔”标记？',
-						prompt2:'减1点体力上限，然后回复体力至1点并摸一张牌。',
-						charlotte:true,
-						onremove:true,
-						filter:function(event,player){
-							return player.hasMark('zhaosong_trick')&&player.hp<1;
-						},
-						check:function(event,player){
-							if(player.maxHp<2||player.countCards('h',function(card){
-								var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
-								if(mod2!='unchanged') return mod2;
-								var mod=game.checkMod(card,player,event.player,'unchanged','cardSavable',player);
-								if(mod!='unchanged') return mod;
-								var savable=get.info(card).savable;
-								if(typeof savable=='function') savable=savable(card,player,event.player);
-								return savable;
-							})>=1+event.num-event.player.hp) return false;
-							return true;
-						},
-						content:function(){
-							'step 0'
-							player.removeMark('zhaosong_trick',1);
-							player.removeSkill('zhaosong_trick');
-							player.loseMaxHp();
-							'step 1'
-							if(player.hp<1) player.recover(1-player.hp);
-							player.draw();
-						},
-					},
-					equip:{
-						marktext:'赋',
-						intro:{
-							name:'诏颂(赋)',
-							name2:'赋',
-							content:'出牌阶段开始时，你可移去“赋”并弃置一名角色区域内的一张牌，然后可以令其摸一张牌。',
-						},
-						trigger:{player:'phaseUseBegin'},
-						direct:true,
-						charlotte:true,
-						onremove:true,
-						filter:function(event,player){
-							return player.hasMark('zhaosong_equip')&&game.hasPlayer(function(current){
-								return current.hasCard(function(card){
-									return lib.filter.canBeDiscarded(card,player,current);
-								},'hej');
-							});
-						},
-						content:function(){
-							'step 0'
-							player.chooseTarget('是否弃置“赋”标记？','弃置一名角色区域内的一张牌，然后可以令其摸一张牌',function(card,player,current){
-								return current.hasCard(function(card){
-									return lib.filter.canBeDiscarded(card,player,current);
-								},'hej');
-							}).set('ai',function(target){
-								var player=_status.event.player,att=get.attitude(player,target)>0?2:1;
-								return get.effect(target,{name:'guohe_copy'},player,player)*att;
-							});
-							'step 1'
-							if(result.bool){
-								var target=result.targets[0];
-								event.target=target;
-								player.logSkill('zhaosong_equip',target);
-								player.removeMark('zhaosong_equip',1);
-								player.removeSkill('zhaosong_equip');
-								player.discardPlayerCard(target,true,'hej');
-							}
-							else event.finish();
-							'step 2'
-							if(target.isIn()){
-								player.chooseBool('是否令'+get.translation(target)+'摸一张牌？').set('ai',function(){
-									var evt=_status.event.getParent();
-									return get.attitude(evt.player,evt.target)>0;
-								});
-							}
-							else event.finish();
-							'step 3'
-							if(result.bool) target.draw();
-						},
-					},
-				},
-			},
-			lisi:{
-				audio:2,
-				trigger:{player:'useCardAfter'},
-				direct:true,
-				filter:function(event,player){
-					if(player==_status.currentPhase||!event.cards.filterInD().length) return false;
-					var hs=player.countCards('h');
-					return game.hasPlayer(function(current){
-						return current!=player&&current.countCards('h')<=hs;
-					});
-				},
-				content:function(){
-					'step 0'
-					player.chooseTarget(get.prompt('lisi'),'将'+get.translation(trigger.cards.filterInD())+'交给一名手牌数不大于你的其他角色',function(card,player,target){
-						return target!=player&&target.countCards('h')<=player.countCards('h');
-					});
-					'step 1'
-					if(result.bool){
-						var target=result.targets[0];
-						player.logSkill('lisi',target);
-						target.gain(trigger.cards.filterInD(),'gain2');
-					}
 				},
 			},
 			caozhao:{
@@ -1417,6 +1223,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return num>target.hp||num<Math.min(5,target.hp);
 					});
 				},
+				hiddenSkill:true,
 				content:function(){
 					'step 0'
 					player.chooseTarget('请选择【慧容】的目标','令一名角色将手牌数摸至/弃置至与其体力值相同（至多摸至五张）',true,function(card,player,target){
@@ -2696,7 +2503,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			cheliji:'彻里吉是历史小说《三国演义》中的虚构人物，西羌国王。蜀相诸葛亮伐魏，魏都督曹真驰书赴羌，国王彻里吉即命雅丹丞相与越吉元帅起羌兵一十五万、并战车直扣西平关。后军大败，越吉亡，雅丹被俘，亮将所获羌兵及车马器械，尽给还雅丹，俱放回国。彻里吉感蜀恩义，与之结盟。正史中没有关于彻里吉的记载。',
 			weiguan:'卫瓘（220年－291年），字伯玉。河东郡安邑县（今山西省夏县）人。三国曹魏后期至西晋初年重臣、书法家，曹魏尚书卫觊之子。卫瓘出身官宦世家，年轻时仕官于曹魏，历任尚书郎、散骑常侍、侍中、廷尉等职。后以镇西军司、监军身份参与伐蜀战争。蜀汉亡后，与钟会一道逮捕邓艾；钟会谋反时，又成功平息叛乱，命田续杀邓艾父子。回师后转任督徐州诸军事、镇东将军，封菑阳侯。西晋建立后，历任青州、幽州刺史、征东大将军等职，成功化解北方边境威胁，因功进爵菑阳公。后入朝为尚书令、侍中，又升任司空，领太子少傅。后逊位，拜太保。晋惠帝即位后，与贾皇后对立，终在政变中满门遇害，享年七十二岁。卫瓘善隶书及章草。不仅兼工各体，还能学古人之长，是颇有创意的书法家。唐朝张怀瓘《书断》中评其章草为“神品”。',
 			zhongyan:' 钟琰 (？—？年）颍川人，王浑之妻。生卒年不详，约魏末晋初间前后在世。王浑的妻子钟琰，是颍川人，为魏太傅钟繇的曾孙女，父亲钟徽，为黄门郎。她平时广泛阅读各种书籍，因此几岁的时候就能撰写文章。她聪慧弘雅，善于啸咏，她的礼仪法度，为中表所推崇，她写有文集五卷。',
-			zuofen:'左芬（约253年－300年4月23日），出土墓志作左棻，字兰芝，齐国临淄（今山东临淄）人，西晋诗人。少好学，善属文。为晋武帝贵人。今存诗、赋、颂、赞、诔等20余篇，大都为应诏而作，《离思赋》最著名。原有集，已失传。',
 			yangyan:'杨艳（238年－274年8月25日），字琼芝，弘农郡华阴县（今陕西省华阴市）人，晋武帝司马炎第一任皇后，曹魏通事郎杨炳之女。自幼父母双亡，为舅舅赵俊所养，跟随继母段氏生活。聪明贤慧，善于书法，天生丽质，娴熟女红，嫁给了世子司马炎。泰始元年（265年），晋武帝即位，建立西晋。泰始二年（266年），杨艳受册为皇后，深得晋武帝宠幸，生下三子三女，包括晋惠帝司马衷。泰始十年（274年），去世，时年三十七，陪葬于峻阳陵，谥号武元皇后。',
 			yangzhi:'杨芷（259年－292年3月6日），字季兰，小字男胤，弘农郡华阴县（今陕西省华阴市）人，晋武帝司马炎第二任皇后，东汉太尉杨震幼子杨奉后裔，东汉末年东莱太守、蓩亭侯杨众曾孙女，西晋太傅杨骏与嫡妻庞氏之女，武元皇后杨艳堂妹。咸宁二年（276年），立为皇后，史称“婉嫕有妇德， 美映椒房”，得宠于晋武帝。生渤海殇王，早薨，之后再无生育。其父杨骏擅权引起皇后贾南风忌恨，贾南风联络汝南王司马亮、楚王司马玮发动政变，杀死杨骏，并唆使大臣上书状告杨芷谋反，让晋惠帝司马衷将其贬为庶人，押到金墉城居住。元康二年（292年），杨芷冻饿而死，谥号武悼皇后。',
 		},
@@ -2845,11 +2651,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caozhao_info:'出牌阶段限一次，你可展示一张手牌并声明一种未以此法声明过的基本牌或普通锦囊牌，令一名体力不大于你的其他角色选择一项：令此牌视为你声明的牌，或其失去1点体力。然后若此牌声明成功，然后你可将其交给一名其他角色。',
 			olxibing:'息兵',
 			olxibing_info:'每当你受到其他角色造成的伤害后/对其他角色造成伤害后，你可弃置你或该角色两张牌，然后你们中手牌少的角色摸两张牌，以此法摸牌的角色不能使用牌指定你为目标直到回合结束。',
-			zuofen:'左棻',
-			zhaosong:'诏颂',
-			zhaosong_info:'一名其他角色于其出牌阶段开始时，若其没有标记，你可令其正面向上交给你一张手牌，然后根据此牌的类型，令该角色获得对应的标记：锦囊牌，“诔”标记；装备牌，“赋”标记；基本牌，“颂”标记。进入濒死时，你可弃置"诔"，减少一点体力上限，回复至1体力并摸1张牌；出牌阶段开始时，你可弃置“赋”，弃置一名角色区域内的一张牌，然后可令其摸一张牌；你使用仅指定一个目标的【杀】时，可弃置“颂”为此【杀】额外选择至多两个目标，然后若此【杀】造成的伤害小于2，你失去1点体力。',
-			lisi:'离思',
-			lisi_info:'每当你于回合外使用牌的置入弃牌堆时，你可将其交给一名手牌数不大于你的其他角色。',
 			recaiwang:'才望',
 			recaiwang_info:'①当你使用或打出牌响应其他角色使用的牌，或其他角色使用或打出牌响应你使用的牌后，若这两张牌颜色相同，则你可以弃置对方的一张牌。②若你的手牌数为1，则你可以将该手牌当做【闪】使用或打出。③若你的装备区牌数为1，则你可以将该装备当做【无懈可击】使用或打出。④若你的判定区牌数为1，则你可以将该延时锦囊牌当做【杀】使用或打出。',
 			recaiwang_hand:'才望',
@@ -2857,14 +2658,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			recaiwang_judge:'才望',
 			yangyan:'杨艳',
 			xuanbei:'选备',
-			xuanbei_info:'①游戏开始时，你从牌堆中获得两张具有应变标签的牌。②每回合限一次。当你使用的满足应变效果的牌结算结束后，你可将此牌对应的所有实体牌交给一名其他角色。',
+			xuanbei_info:'①游戏开始时，你从牌堆中获得两张具有应变标签的牌。②每回合限一次。当你使用的具有应变标签的牌结算结束后，你可将此牌对应的所有实体牌交给一名其他角色。',
 			xianwan:'娴婉',
 			xianwan_info:'①当你需要使用【闪】时，若你的武将牌未横置，则你可以横置武将牌并视为使用【闪】。②当你需要使用【杀】时，若你的武将牌横置，则你可以横置武将牌并视为使用【杀】。',
 			yangzhi:'杨芷',
 			wanyi:'婉嫕',
-			wanyi_info:'出牌阶段，你可以将一张具有应变效果的牌当做【逐近弃远】/【出其不意】/【水淹七军】/【洞烛先机】使用。',
+			wanyi_info:'每回合每项限一次。出牌阶段，你可以将一张具有应变效果的牌当做【逐近弃远】/【出其不意】/【水淹七军】/【洞烛先机】使用。',
 			maihuo:'埋祸',
-			maihuo_info:'①当你成为其他角色使用【杀】的目标后，若此【杀】不为转化牌且有对应的实体牌且其武将牌上没有“祸”且你是此牌的唯一目标，则你可以令此牌对你无效，并将此【杀】置于其武将牌上，称为“祸”。②一名其他角色的出牌阶段开始时，若其武将牌上有“祸”，则其对你使用此“祸”。③当你对有“祸”的其他角色造成伤害后，你移去其“祸”。',
+			maihuo_info:'①当你成为其他角色使用【杀】的目标后，若此【杀】不为转化牌且有对应的实体牌且其武将牌上没有“祸”且你是此牌的唯一目标，则你可以令此牌对你无效，并将此【杀】置于其武将牌上，称为“祸”。②一名其他角色的出牌阶段开始时，若其武将牌上有“祸”，则其对你使用此“祸”（有距离限制且计入次数限制）。③当你对有“祸”的其他角色造成伤害后，你移去其“祸”。',
 
 			yingbian_pack1:'文德武备·理',
 			yingbian_pack2:'文德武备·备',

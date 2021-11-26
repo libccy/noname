@@ -83,6 +83,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				global:'icesha_skill',
 				range:{attack:1},
 				selectTarget:1,
+				cardPrompt:function(card){
+					if(card.nature=='stab') return '出牌阶段，对你攻击范围内的一名角色使用。其须使用一张【闪】，且在此之后需弃置一张手牌（没有则不弃）。否则你对其造成1点伤害。';
+					if(lib.linked.contains(card.nature)) return '出牌阶段，对你攻击范围内的一名角色使用。其须使用一张【闪】，否则你对其造成1点'+get.translation(card.nature)+'属性伤害。';
+					return '出牌阶段，对你攻击范围内的一名角色使用。其须使用一张【闪】，否则你对其造成1点伤害。';
+				},
 				yingbian_prompt:function(card){
 					var str='';
 					if(get.cardtag(card,'yingbian_hit')){
@@ -211,6 +216,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target.damage(get.nature(event.card),event.baseDamage+event.extraDamage);
 						event.result={bool:true}
 						event.trigger('shaDamage');
+						event.finish();
+					}
+					else{
+						event.trigger('shaMiss');
+					}
+					"step 6"
+					if((!result||!result.bool)&&!event.unhurt){
+						target.damage(get.nature(event.card),event.baseDamage+event.extraDamage);
+						event.result={bool:true}
+						event.trigger('shaDamage');
+						event.finish();
 					}
 					else{
 						event.result={bool:false}
@@ -1856,16 +1872,25 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					if(!_status.qinglong_guozhan) _status.qinglong_guozhan=[];
-					_status.qinglong_guozhan=[];
 					_status.qinglong_guozhan.add(trigger);
 					game.countPlayer2(function(current){
 						current.addTempSkill('qinglong_guozhan_mingzhi');
 					});
+					game.broadcast(function(list){
+						_status.qinglong_guozhan=list;
+					},_status.qinglong_guozhan.map(function(i){
+						return {targets:i.targets};
+					}))
 					var next=game.createEvent('qinglong_guozhan');
 					event.next.remove(next);
 					trigger.after.add(next);
 					next.setContent(function(){
 						_status.qinglong_guozhan.remove(event.parent);
+						game.broadcast(function(list){
+							_status.qinglong_guozhan=list;
+						},_status.qinglong_guozhan.map(function(i){
+							return {targets:i.targets};
+						}));
 					});
 				}
 			},
@@ -2775,7 +2800,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			hanbing_skill_info:'当你使用杀造成伤害时，你可以防止此伤害，改为依次弃置目标角色的两张牌。',
 			renwang_info:'锁定技，黑色的杀对你无效',
 			renwang_skill_info:'锁定技，黑色的杀对你无效',
-			sha_info:'出牌阶段，对攻击范围内的一名角色使用，令其使用一张【闪】，否则受到一点伤害。',
+			sha_info:'出牌阶段，对你攻击范围内的一名角色使用。其须使用一张【闪】，否则你对其造成1点伤害。',
 			shan_info:'抵消一张【杀】',
 			tao_info:'出牌阶段，对自己使用，回复一点体力。',
 			bagua_info:'当你需要使用或打出一张【闪】时，你可以进行一次判定，若判定结果为红色，视为你使用或打出了一张【闪】。',

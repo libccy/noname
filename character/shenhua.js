@@ -7038,9 +7038,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(name=='wuxie') continue;
 							if(name=='sha'){
 								list.push(['基本','','sha']);
-								list.push(['基本','','sha','fire']);
-								list.push(['基本','','sha','thunder']);
-								list.push(['基本','','sha','ice']);
+								for(var j of lib.inpile_nature) list.push(['基本','','sha',j]);
 							}
 							else if(get.type(name)=='trick') list.push(['锦囊','',name]);
 							else if(get.type(name)=='basic') list.push(['基本','',name]);

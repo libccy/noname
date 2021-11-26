@@ -3379,8 +3379,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					var switchToAuto=function(){
 						_status.imchoosing=false;
-						var listn=['普通','fire','thunder'];
-						if(_status.mode=='yingbian') listn.add('ice');
+						var listn=['普通'].concat(lib.inpile_nature);
 						event._result={
 							bool:true,
 							suit:lib.suit.randomGet(),
@@ -3430,8 +3429,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						table2.style.margin='0';
 						table2.style.width='100%';
 						table2.style.position='relative';
-						var listn=['普通','fire','thunder'];
-						if(_status.mode=='yingbian') listn.add('ice');
+						var listn=['普通'].concat(lib.inpile_nature);
 						for(var i=0;i<listn.length;i++){
 							var td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
 							var nature=listn[i];
@@ -9776,13 +9774,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						event.targets=targets;
-						target.chooseBool('是否发起【拉拢人心】？','令所有其他不为君主/暴露野心家的角色依次选择是否与你结盟。第一个选择加入的人将势力和胜利条件改为与你相同');
+						source.chooseBool('是否发起【拉拢人心】？','令所有其他不为君主/暴露野心家的角色依次选择是否与你结盟。第一个选择加入的人将势力和胜利条件改为与你相同');
 					}
 					'step 4'
 					if(!result.bool){
 						if(event.targets2.length) event.goto(3);
 						return;
 					}
+					'step 5'
 					var target=targets.shift();
 					event.target=target;
 					source.line(target,'green');
@@ -9791,7 +9790,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(game.players.length<5) return Math.random()<0.5;
 						return Math.random()<0.3;
 					});
-					'step 5'
+					'step 6'
 					if(result.bool){
 						game.broadcastAll(function(player,target){
 							player.say('加入');
@@ -9807,9 +9806,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						target.chat('拒绝');
 						game.delay(1.5);
-						if(targets.length) event.goto(4);
+						if(targets.length) event.goto(5);
 					}
-					'step 6'
+					'step 7'
 					if(event.targets2.length) event.goto(3);
 					else delete _status.showYexings;
 				});

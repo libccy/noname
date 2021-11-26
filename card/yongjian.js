@@ -333,7 +333,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				equipSkill:true,
 				filter:function(event,player){
-					return event.card&&event.card.name=='sha'&&event.getParent().name=='sha'&&player.countCards('h')>0;
+					return event.card&&event.card.name=='sha'&&event.getParent().name=='sha'&&player.isDamaged()&&player.countCards('h')>0;
 				},
 				content:function(){
 					'step 0'
@@ -649,7 +649,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			tuixinzhifu:'推心置腹',
 			tuixinzhifu_info:'出牌阶段，对一名距离为1的其他角色使用。你获得其区域内的至多两张牌，然后交给其等量的牌。',
 			yitianjian:'倚天剑',
-			yitianjian_info:'当你因执行【杀】的效果而造成伤害后，你可弃置一张手牌，然后回复1点体力。',
+			yitianjian_info:'当你因执行【杀】的效果而造成伤害后，若你已受伤，则你可弃置一张手牌，然后回复1点体力。',
 			qixingbaodao:'七星宝刀',
 			qixingbaodao_info:'锁定技。当此牌进入你的装备区后，你弃置装备区和判定区内的所有其他牌。',
 			duanjian:'断剑',
@@ -727,7 +727,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['diamond',10,'tuixinzhifu'],
 			['diamond',11,'tao',null,['gifts']],
 			['diamond',12,'shan'],
-			['diamond',13,'','stab'],
+			['diamond',13,'sha','stab'],
 		],
 	}
 });

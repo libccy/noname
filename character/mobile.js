@@ -3467,23 +3467,42 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageBegin2'},
 				forced:true,
 				filter:function(event,player){
-					if(!event.card||get.color(event.card)=='none') return false;
+					if(!event.card||get.suit(event.card)=='none') return false;
 					var all=player.getAllHistory('damage');
 					if(!all.length) return false;
-					return all[all.length-1].card&&get.color(all[all.length-1].card)==get.color(event.card);
+					return all[all.length-1].card&&get.suit(all[all.length-1].card)==get.suit(event.card);
 				},
 				content:function(){
 					trigger.cancel();
 				},
+				group:'mjmouzhi_mark',
+				intro:{content:'上次受到伤害的花色：$'},
 				ai:{
 					effect:{
 						target:function(card,player,target){
 							if(get.tag(card,'damage')){
-								var color=get.color(card);
+								var color=get.suit(card);
 								if(color=='none') return;
 								var all=target.getAllHistory('damage');
 								if(!all.length||!all[all.length-1].card) return;
-								if(get.color(all[all.length-1].card)==color) return 'zerotarget';
+								if(get.suit(all[all.length-1].card)==color) return 'zerotarget';
+							}
+						},
+					},
+				},
+				subSkill:{
+					mark:{
+						trigger:{player:'damage'},
+						silent:true,
+						firstDo:true,
+						content:function(){
+							if(!trigger.card||get.suit(trigger.card)=='none') player.unmarkSkill('mjmouzhi');
+							else{
+								player.markSkill('mjmouzhi');
+								game.broadcastAll(function(player,suit){
+									if(player.marks.mjmouzhi) player.marks.mjmouzhi.firstChild.innerHTML=get.translation(suit);
+									player.storage.mjmouzhi=suit;
+								},player,get.suit(trigger.card))
 							}
 						},
 					},
@@ -6170,9 +6189,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var name=lib.inpile[i];
 							if(name=='sha'){
 								if(event.filterCard({name:name},player,event)) list.push(['基本','','sha']);
-								if(event.filterCard({name:name,nature:'fire'},player,event)) list.push(['基本','','sha','fire']);
-								if(event.filterCard({name:name,nature:'thunder'},player,event)) list.push(['基本','','sha','thunder']);
-								if((get.mode()!='guozhan'||_status.mode=='yingbian')&&event.filterCard({name:name,nature:'ice'},player,event)) list.push(['基本','','sha','ice']);
+								for(var j of lib.inpile_nature){
+									if(event.filterCard({name:name,nature:j},player,event)) list.push(['基本','','sha',j]);
+								}
 							}
 							else if(get.type2(name)=='trick'&&event.filterCard({name:name},player,event)) list.push(['锦囊','',name]);
 							else if(get.type(name)=='basic'&&event.filterCard({name:name},player,event)) list.push(['基本','',name]);
@@ -10834,9 +10853,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var list=[];
 						if(event.filterCard({name:'sha'},player,event)){
 							list.push(['基本','','sha']);
-							list.push(['基本','','sha','fire']);
-							list.push(['基本','','sha','thunder']);
-							list.push(['基本','','sha','ice']);
+							for(var j of lib.inpile_nature) list.push(['基本','','sha',j]);
 						}
 						if(event.filterCard({name:'tao'},player,event)){
 							list.push(['基本','','tao']);
@@ -11656,9 +11673,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var list=[];
 						if(event.filterCard({name:'sha'},player,event)){
 							list.push(['基本','','sha']);
-							list.push(['基本','','sha','fire']);
-							list.push(['基本','','sha','thunder']);
-							list.push(['基本','','sha','ice']);
+							for(var j of lib.inpile_nature) list.push(['基本','','sha',j]);
 						}
 						if(event.filterCard({name:'shan'},player,event)){
 							list.push(['基本','','shan']);
@@ -13577,7 +13592,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mjchenshi_target:'陈势',
 			mjchenshi_info:'当有角色使用【兵临城下】指定第一个目标后，其可交给你一张牌，并将牌堆的顶三张牌中所有不为【杀】的牌置入弃牌堆；当有角色成为【兵临城下】的目标后，其可交给你一张牌，然后将牌堆顶三张牌中所有的【杀】置入弃牌堆。',
 			mjmouzhi:'谋识',
-			mjmouzhi_info:'锁定技，当你受到伤害时，若伤害渠道对应的牌和你上次受到的伤害颜色相同，则你防止此伤害。',
+			mjmouzhi_info:'锁定技，当你受到伤害时，若伤害渠道对应的牌和你上次受到的伤害花色相同，则你防止此伤害。',
 			zhangzhongjing:'张机',
 			jishi:'济世',
 			jishi_info:'锁定技。①当你使用的牌结算完成后，若你未因此牌造成过伤害，则你将此牌对应的所有实体牌置于仁库中。②当有牌不因溢出而离开仁库时，你摸一张牌。',

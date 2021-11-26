@@ -4,6 +4,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			sp_mifangfushiren:['male','shu',4,['mffengshi']],
+			re_kanze:['male','wu',3,['xiashu','rekuanshi']],
 			re_nanhualaoxian:['male','qun',4,['gongxiu','jinghe']],
 			zhouyi:['female','wu',3,['zhukou','mengqing']],
 			lvlingqi:['female','qun',4,['guowu','zhuangrong']],
@@ -106,10 +108,51 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_fadong:['ol_dingyuan','wangrong','re_quyi','hanfu'],
 				sp_xuzhou:['re_taoqian','caosong','zhangmiao','qiuliju'],
 				sp_zhongyuan:['re_hucheer','re_zoushi','caoanmin'],
-				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','caobuxing','re_maliang','xin_baosanniang','re_xinxianying','dongxie','guozhao','fanyufeng','ruanyu','liangxing','re_niujin','re_dongzhao','re_dongcheng','yangwan','heyan','re_panshu','zhanghu','dufuren','zhouyi','re_nanhualaoxian','lvlingqi'],
+				sp_binglin:['re_niujin',"sp_mifangfushiren"],
+				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','caobuxing','re_maliang','xin_baosanniang','re_xinxianying','dongxie','guozhao','fanyufeng','ruanyu','liangxing','re_dongzhao','re_dongcheng','yangwan','heyan','re_panshu','zhanghu','dufuren','zhouyi','re_nanhualaoxian','lvlingqi','re_kanze'],
 			}
 		},
 		skill:{
+			//阚泽
+			rekuanshi:{
+				audio:'kuanshi',
+				trigger:{player:'phaseJieshuBegin'},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('rekuanshi')).set('animate',false).set('ai',function(target){
+						var att=get.attitude(player,target);
+						if(target.hp<3) att/=1.5;
+						return att;
+					});
+					'step 1'
+					if(result.bool){
+						player.logSkill('rekuanshi');
+						player.addTempSkill('rekuanshi_effect',{player:'phaseBegin'});
+						player.storage.rekuanshi_effect=result.targets[0];
+						game.delayx();
+					}
+				},
+				subSkill:{
+					effect:{
+						audio:'kuanshi',
+						trigger:{global:'damageEnd'},
+						forced:true,
+						charlotte:true,
+						logTarget:'player',
+						filter:function(event,player){
+							if(event.player!=player.storage.rekuanshi_effect||event.player.isHealthy()) return false;
+							var history=event.player.getHistory('damage',null,event),num=0;
+							for(var i of history) num+=i.num;
+							return num>1&&(num-event.num)<2;
+						},
+						content:function(){
+							trigger.player.recover();
+							player.removeSkill('rekuanshi_effect');
+						}
+					},
+				},
+			},
 			//南华老仙
 			jinghe:{
 				enable:'phaseUse',
@@ -10287,7 +10330,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"enterGame",
 				},
 				forced:true,
-				filter:function(){
+				filter:function(event){
 					return game.players.length>1&&(event.name!='phase'||game.phaseNumber==0);
 				},
 				content:function(){
@@ -10424,6 +10467,63 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(evt&&evt.targets.contains(target)&&(!player.storage.counttrigger||!player.storage.counttrigger.xinfu_lianpian||!player.storage.counttrigger.xinfu_lianpian<3)&&player.isPhaseUsing(player)) return [1.5,0];
 						}
 					},
+				},
+			},
+			//糜芳傅士仁
+			mffengshi:{
+				audio:2,
+				audioname:['sp_mifangfushiren'],
+				trigger:{
+					player:'useCardToPlayered',
+					target:'useCardToTargeted',
+				},
+				direct:true,
+				preHidden:true,
+				filter:function(event,player){
+					if(event.player==event.target||event.targets.length!=1) return false;
+					if(player!=event.player&&!player.hasSkill('mffengshi')) return false;
+					return event.player.countCards('h')>event.target.countCards('h')&&event.target.countCards('he')>0;
+				},
+				content:function(){
+					'step 0'
+					event.source=trigger.player;
+					event.target=(player==trigger.target?trigger.player:trigger.target);
+					var str;
+					if(player==trigger.player) str='弃置自己的和该角色';
+					else str='令其弃置其与你的';
+					var next=trigger.player.chooseBool('是否对'+get.translation(trigger.target)+'发动【锋势】？',str+'的各一张牌，然后令'+get.translation(trigger.card)+'的伤害+1').set('ai',function(){
+						var player=_status.event.getParent().player;
+						var target=_status.event.getParent().target;
+						var viewer=_status.event.player;
+						if(viewer==player){
+							if(get.attitude(viewer,target)>=0) return false;
+							if(player.countCards('he',(card)=>get.value(card,player)<5)) return true;
+							var card=_status.event.getTrigger().card;
+							if((get.tag(card,'damage')||target.countCards('he',(card)=>get.value(card,target)>6))&&player.countCards('he',(card)=>get.value(card,player)<7)) return true;
+							return false;
+						}
+						else{
+							if(get.attitude(viewer,player)>=0) return false;
+							if(!get.tag(card,'damage')) return false;
+							if(viewer.countCards('he')>player.countCards('he')) return true;
+							if(viewer.countCards('he',(card)=>get.value(card,target)>6)) return false;
+							return true;
+						}
+					});
+					if(player==next.player) next.setHiddenSkill('mffengshi');
+					'step 1'
+					if(result.bool){
+						if(player==source) player.logSkill('mffengshi',target);
+						else{
+							player.logSkill('mffengshi');
+							source.line(player,'green');
+						}
+						if(get.tag(trigger.card,'damage')) trigger.getParent().baseDamage++;
+						player.chooseToDiscard('he',true);
+					}
+					else event.finish();
+					'step 2'
+					if(target.countDiscardableCards(player,'he')>0) player.discardPlayerCard(target,'he',true);
 				},
 			},
 		},
@@ -10575,6 +10675,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dufuren:'杜夫人（生卒年不详），东汉末年至三国时人。有异色，原为吕布将秦宜禄之妻，生子秦朗。后为曹操纳为妾，又生曹林、曹衮、金乡公主。',
 			lvlingqi:'吕玲绮，虚拟人物，源于日本光荣株式会社（现光荣特库摩公司）旗下游戏《真·三国无双》系列，初次登场于《真三国无双7：猛将传》。吕布的女儿，寂寥而威风凛凛的战姬，发挥着不亚于父亲的武艺，非常勇敢地身先士卒立于前线。虽然有着能够直面困难的坚强意志，却由于过去的经历而有着非常害怕孤独的一面。',
 			zhouyi:'周夷，游卡桌游旗下产品《三国杀》自行杜撰的人物。设定为周瑜的妹妹，和周瑜一同征战。',
+			mifangfushiren:'麋芳（生卒年不详），字子方，东海郡朐县（今江苏省连云港市）人。汉末三国时期蜀国将领，刘备糜夫人的兄弟。麋芳本为徐州牧陶谦部下，曾被曹操表为彭城相。后来辞官，随刘备从徐州辗转至邺城、汝南、新野、长坂坡、江夏等地，奔波多年。傅士仁（生卒年不详），字君义，幽州广阳郡（今北京市）人，刘备手下将领。受到刘备的重用，但被关羽轻慢。<br>刘备称汉中王时，糜芳为南郡太守，但受到关羽的轻慢。后来，因未完成供给军资的任务而被关羽责骂，心中不安。吕蒙袭取荆州时，将已经投降的傅士仁展示给糜芳，麋芳于是选择投降，导致关羽兵败被杀。此后，在吴国担任将军，并且为吴征伐。',
 		},
 		characterTitle:{
 			wulan:'#b对决限定武将',
@@ -10654,6 +10755,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gexuan:['gexuan','tw_gexuan'],
 			panshu:['panshu','re_panshu'],
 			nanhualaoxian:['re_nanhualaoxian','nanhualaoxian'],
+			kanze:['re_kanze','kanze'],
 		},
 		translate:{
 			lijue:"李傕",
@@ -11175,7 +11277,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yise:'异色',
 			yise_info:'其他角色获得你的牌后，若这些牌中：有红色牌，你可令其回复1点体力；有黑色牌，其下次受到【杀】造成的伤害时，此伤害+1。',
 			shunshi:'顺世',
-			shunshi_info:'准备阶段开始时，或当你受到伤害后，你可将一张牌交给一名其他角色并获得如下效果直到你的回合结束：摸牌阶段的额定摸牌数+1，使用【杀】的次数上限+1，手牌上限+1。',
+			shunshi_info:'准备阶段开始时，或当你受到伤害后，你可将一张牌交给一名不为伤害来源的其他角色并获得如下效果直到你的回合结束：摸牌阶段的额定摸牌数+1，使用【杀】的次数上限+1，手牌上限+1。',
 			lvlingqi:'吕玲绮',
 			guowu:'帼舞',
 			guowu_info:'出牌阶段开始时，你可以展示全部手牌，根据你展示的类型数，你获得对应效果：至少一类，从弃牌堆获得一张【杀】；至少两类，此阶段使用牌无距离限制；至少三类，此阶段使用【杀】或普通锦囊牌可以多指定两个目标。',
@@ -11213,6 +11315,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nhguanyue_info:'结束阶段，你可以观看牌堆顶两张牌，然后获得其中—张，另一张放回牌堆顶。',
 			nhyanzheng:'言政',
 			nhyanzheng_info:'准备阶段，若你的手牌数大于1，你可以保留一张手牌并弃置其余的牌，然后选择至多等于弃牌数量的角色，对这些角色各造成1点伤害。',
+			re_kanze:'阚泽',
+			rekuanshi:'宽释',
+			rekuanshi_info:'结束阶段，你可以选择一名角色。你获得如下一次性效果直到你下回合开始：当其于一回合内受到第2点伤害后，其回复1点体力。',
+			sp_mifangfushiren:'糜芳傅士仁',
+			mffengshi:'锋势',
+			mffengshi_info:'当你使用牌指定唯一目标后，或成为其他角色使用牌的唯一目标后，若此牌使用者的手牌数大于此牌目标的手牌数，则此牌的使用者可令你弃置自己和对方的各一张牌，并令此牌的伤害值+1。',
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",
@@ -11228,6 +11336,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_caizijiaren:'才子佳人',
 			sp_qihuan:'戚宦之争',
 			sp_zhongyuan:'中原狼烟',
+			sp_binglin:'兵临城下',
 			sp_decade:'其他新服武将',
 		},
 	};

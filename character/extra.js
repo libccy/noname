@@ -4005,9 +4005,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						filter:function(event,player){
-							if(player.isLinked()) return false;
-							if(event.name=='link') return true;
-							return (event.name!='phase'||game.phaseNumber==0);
+							if(event.name=='link') return player.isLinked();
+							return (event.name!='phase'||game.phaseNumber==0)&&!player.isLinked();
 						},
 						content:function(){
 							if(trigger.name!='link') player.link(true);
