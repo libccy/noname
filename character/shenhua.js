@@ -203,52 +203,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.awakenSkill('hongju');
-					if(player.countCards('h')==0) event.goto(2);
-					else{
-						var dialog=['请选择要交换的手牌和「荣」，或点「取消」','<div class="text center">「征荣」牌</div>',player.storage.zhengrong,'<div class="text center">手牌区</div>',player.getCards('h')];
-						var next=player.chooseButton(dialog);
-						next.set('filterButton',function(button){
-							var ss=_status.event.player.storage.zhengrong;
-							var hs=_status.event.player.getCards('h');
-							var sn=0;
-							var hn=0;
-							var ub=ui.selected.buttons;
-							for(var i=0;i<ub.length;i++){
-								if(ss.contains(ub[i].link)) sn++;
-								else hn++;
-							}
-							return !(sn>=hs.length&&ss.contains(button.link)||hn>=ss.length&&hs.contains(button.link));
-						});
-						next.set('selectButton',function(){
-							if(ui.selected.buttons.length==0) return 2;
-							var ss=_status.event.player.storage.zhengrong;
-							var hs=_status.event.player.getCards('h');
-							var sn=0;
-							var hn=0;
-							var ub=ui.selected.buttons;
-							for(var i=0;i<ub.length;i++){
-								if(ss.contains(ub[i].link)) sn++;
-								else hn++;
-							}
-							if(sn!=hn) return 2*Math.max(sn,hn);
-							else{
-								if(sn==ss.length||hn==hs.length||sn==hs.length||hn==ss.length) return ub.length;
-								return [ub.length,ub.length+1];
-							}
-						});
-						next.set('ai',function(){return -1});
+					var cards=player.getStorage('zhengrong');
+					if(!cards.length||!player.countCards('h')){
+						event.finish();
+						return;
 					}
+					var next=player.chooseToMove('征荣：是否交换“荣”和手牌？');
+					next.set('list',[
+						[get.translation(player)+'（你）的“荣”',cards],
+						['手牌区',player.getCards('h')],
+					]);
+					next.set('filterMove',function(from,to){
+						return typeof to!='number';
+					});
+					next.set('processAI',function(list){
+						var player=_status.event.player,cards=list[0][1].concat(list[1][1]).sort(function(a,b){
+							return get.value(a)-get.value(b);
+						}),cards2=cards.splice(0,player.storage.zhengrong.length);
+						return [cards2,cards];
+					});
 					'step 1'
 					if(result.bool){
-						var gains=[];
-						var pushs=[];
-						for(var i=0;i<result.links.length;i++){
-							var card=result.links[i];
-							if(player.storage.zhengrong.contains(card)) gains.push(card);
-							else pushs.push(card);
-						}
+						var pushs=result.moved[0],gains=result.moved[1];
+						pushs.removeArray(player.storage.zhengrong);
+						gains.removeArray(player.getCards('h'));
+						if(!pushs.length||pushs.length!=gains.length) return;
 						player.lose(pushs,ui.special,'toStorage');
-						game.log(player,'将',pushs,'放在了武将牌上');
+						game.log(player,'将',pushs,'作为“荣”置于武将牌上');
 						player.gain(gains,'gain2','log','fromStorage');
 						player.storage.zhengrong.addArray(pushs);
 						player.storage.zhengrong.removeArray(gains);
@@ -532,9 +513,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				check:function(event,player){
 					var num=0;
-					if(player.getHistory('lose',function(evt){
+					if(player.hasHistory('lose',function(evt){
 						return evt.type=='discard';
-					}).length) num++;
+					})) num++;
 					if(!player.isMinHandcard()) num++;
 					if(!player.getStat('damage')) num++;
 					if(num==3) return player.hp>=2;
@@ -542,9 +523,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				prompt:function(event,player){
 					var num=3;
-					if(player.getHistory('lose',function(evt){
+					if(player.hasHistory('lose',function(evt){
 						return evt.type=='discard';
-					}).length) num--;
+					})) num--;
 					if(!player.isMinHandcard()) num--;
 					if(!player.getStat('damage')) num--;
 					return get.prompt('xinfu_zuilun')+'（可获得'+get.cnNumber(num)+'张牌）'
@@ -553,34 +534,64 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					event.num=0;
 					event.cards=get.cards(3);
-					if(player.getHistory('lose',function(evt){
+					game.cardsGotoOrdering(cards);
+					if(player.hasHistory('lose',function(evt){
 						return evt.type=='discard';
-					}).length) event.num++;
+					})) event.num++;
 					if(!player.isMinHandcard()) event.num++;
 					if(!player.getStat('damage')) event.num++;
 					'step 1'
 					if(event.num==0){
 						player.gain(event.cards,'draw');
 						event.finish();
-					}else{
-						var prompt;
-						if(event.num==3) prompt="罪论：请按顺序将卡牌置于牌堆顶（先选择的在上）";
-						else prompt="罪论：请按顺序将"+get.cnNumber(event.num)+"张卡牌置于牌堆顶（先选择的在上），然后获得其余的牌。";
-						player.chooseCardButton(event.num,true,event.cards,prompt).set('ai',function(button){
-							var player=_status.event.player;
-							var next=player.getNext();
-							var att=get.attitude(player,next);
-							var card=button.link;
-							var judge=next.getCards('j')[ui.selected.buttons.length];
-							if(judge){
-								return get.judge(judge)(card)*att;
+					}
+					else{
+						var prompt='罪论：将'+get.cnNumber(num)+'牌置于牌堆顶';
+						if(num<3) prompt+='并获得其余的牌';
+						var next=player.chooseToMove(prompt,true);
+						if(num<3){
+							next.set('list',[
+								['牌堆顶',cards],
+								['获得'],
+							]);
+							next.set('filterMove',function(from,to,moved){
+								if(to==1&&moved[0].length<=_status.event.num) return false;
+								return true;
+							});
+							next.set('filterOk',function(moved){
+								return moved[0].length==_status.event.num;
+							});
+						}
+						else{
+							next.set('list',[
+								['牌堆顶',cards],
+							]);
+						}
+						next.set('num',num);
+						next.set('processAI',function(list){
+							var check=function(card){
+								var player=_status.event.player;
+								var next=player.next;
+								var att=get.attitude(player,next);
+								var judge=next.getCards('j')[tops.length];
+								if(judge){
+									return get.judge(judge)(card)*att;
+								}
+								return next.getUseValue(card)*att;
 							}
-							return next.getUseValue(card)*att;
+							var cards=list[0][1].slice(0),tops=[];
+							while(tops.length<_status.event.num){
+								list.sort(function(a,b){
+									return check(b)-check(a);
+								});
+								tops.push(cards.shift());
+							}
+							return [tops,cards];
 						});
 					}
 					'step 2'
 					if(result.bool){
-						var list=result.links.slice(0);
+						var list=result.moved[0];
 						var num=list.length-1;
 						for(var i=0;i<list.length;i++){
 							event.cards.remove(list[num-i]);
@@ -1082,6 +1093,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return get.tag(card,'damage')&&player.hasValueTarget(card,null,true);
 					})) return true;
 					return false;
+				},
+				prompt2:function(event){
+					return '令'+get.translation(event.card)+'不能被响应，然后本回合不能再使用牌'
 				},
 				content:function(){
 					trigger.nowuxie=true;
@@ -1846,7 +1860,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var history=player.getHistory('useCard');
 					var evt=name=='useCardAfter'?event:event.getParent();
 					for(var i=0;i<history.length;i++){
-						if(history[i]!=evt&&get.type(history[i].card)==get.type(event.card)) return false;
+						if(history[i]!=evt&&get.type2(history[i].card)==get.type2(event.card)) return false;
 						else if(history[i]==evt) return true;
 					}
 					return false;
@@ -1867,14 +1881,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					event.cards=trigger.cards.filterInD();
 					if(event.cards.length>1){
-						player.chooseButton(true,event.cards.length,['按顺序将卡牌置于牌堆顶（先选择的在上）',event.cards]).set('ai',function(button){
-							var value=get.value(button.link);
-							if(_status.event.reverse) return value;
-							return -value;
-						}).set('reverse',((_status.currentPhase&&_status.currentPhase.next)?get.attitude(player,_status.currentPhase.next)>0:false))
+						var next=player.chooseToMove('恃才：将牌按顺序置于牌堆顶');
+						next.set('list',[['牌堆顶',event.cards]]);
+						next.set('reverse',((_status.currentPhase&&_status.currentPhase.next)?get.attitude(player,_status.currentPhase.next)>0:false));
+						next.set('processAI',function(list){
+							var cards=list[0][1].slice(0);
+							cards.sort(function(a,b){
+								return (_status.event.reverse?1:-1)*(get.value(b)-get.value(a));
+							});
+							return [cards];
+						});
 					}
 					"step 1"
-					if(result.bool&&result.links&&result.links.length) cards=result.links.slice(0);
+					if(result.bool&&result.moved&&result.moved[0].length) cards=result.moved[0].slice(0);
 					while(cards.length){
 						var card=cards.pop();
 						if(get.position(card,true)=='o'){

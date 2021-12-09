@@ -1062,225 +1062,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			xinguanxing:{
-				audio:'guanxing',
-				// alter:true,
-				trigger:{player:['phaseZhunbeiBegin','phaseJieshuBegin']},
-				frequent:true,
-				filter:function(event,player,name){
-					if(name=='phaseJieshuBegin'){
-						return player.hasSkill('xinguanxing_on');
-					}
-					return true;
-				},
-				content:function(){
-					'step 0'
-					if(get.is.altered('xinguanxing')){
-						event.num=game.countPlayer()<4?3:5;
-					}
-					else{
-						event.num=Math.min(5,game.countPlayer());
-					}
-					event.cards=get.cards(event.num);
-					event.chosen=[];
-					event.num1=0;
-					event.num2=0;
-					event.bottom=-1;
-					'step 1'
-					var js=player.getCards('j');
-					var pos;
-					var choice=-1;
-					var getval=function(card,pos){
-						if(js[pos]){
-							return (get.judge(js[pos]))(card);
-						}
-						else if(event.triggername=='phaseJieshuBegin'&&get.attitude(player,player.getNext())<=0){
-							return 11.5-get.value(card,player);
-						}
-						else{
-							return get.value(card,player);
-						}
-					};
-					event.discard=false;
-					var minval=6;
-					for(pos=0;pos<event.cards.length;pos++){
-						var max=getval(event.cards[pos],pos);
-						for(var j=pos+1;j<event.cards.length;j++){
-							var current=getval(event.cards[j],pos);
-							if(current>max){
-								choice=j;
-								max=current;
-							}
-						}
-						if(event.bottom<0){
-							if(!js[pos]){
-								if(max<minval){
-									event.bottom=pos;
-								}
-							}
-							else if(max<0){
-								event.bottom=pos;
-							}
-						}
-						if(event.bottom>=0&&event.bottom<=pos){
-							choice=pos;
-							event.discard=true;break;
-						}
-						if(choice!=-1){
-							break;
-						}
-					}
-					player.chooseCardButton('观星：选择要移动的牌',event.cards).set('filterButton',function(button){
-						return !_status.event.chosen.contains(button.link);
-					}).set('chosen',event.chosen).set('ai',function(button){
-						return button.link==_status.event.choice?1:0;
-					}).set('choice',event.cards[choice]);
-					event.pos=pos;
-					'step 2'
-					if(result.bool){
-						var card=result.links[0];
-						var index=event.cards.indexOf(card);
-						event.card=card;
-						event.chosen.push(card);
-						event.cards.remove(event.card);
-						var controlai=event.pos||0;
-						if(event.discard){
-							controlai=event.cards.length+1;
-						}
-						var buttons=event.cards.slice(0);
-						player.chooseControl(function(){
-							return _status.event.controlai;
-						}).set('controlai',controlai).set('sortcard',buttons).set('tosort',card);
-					}
-					else{
-						event.goto(4);
-					}
-					'step 3'
-					if(typeof result.index=='number'){
-						if(result.index>event.cards.length){
-							ui.cardPile.appendChild(event.card);
-							event.num2++;
-						}
-						else{
-							event.cards.splice(result.index,0,event.card);
-						}
-						event.num--;
-						if(event.num>0){
-							event.goto(1);
-						}
-					}
-					'step 4'
-					while(event.cards.length){
-						ui.cardPile.insertBefore(event.cards.pop(),ui.cardPile.firstChild);
-						event.num1++;
-					}
-					var js=player.getCards('j');
-					if(js.length==1){
-						if((get.judge(js[0]))(ui.cardPile.firstChild)<0){
-							player.addTempSkill('guanxing_fail');
-						}
-					}
-					player.popup(get.cnNumber(event.num1)+'上'+get.cnNumber(event.num2)+'下');
-					game.log(player,'将','#y'+get.cnNumber(event.num1)+'张牌','置于牌堆顶，','#y'+get.cnNumber(event.num2)+'张牌','置于牌堆底');
-					if(event.triggername=='phaseZhunbeiBegin'&&get.is.altered('xinguanxing')&&event.num1==0){
-						player.addTempSkill('xinguanxing_on');
-					}
-				},
-				subSkill:{
-					on:{}
-				}
-			},
-			guanxing_oldnew:{
-				audio:2,
-				audioname:['jiangwei'],
-				trigger:{player:'phaseZhunbeiBegin'},
-				frequent:true,
-				content:function(){
-					'step 0'
-					event.num=Math.min(5,game.countPlayer());
-					if(event.name!='yizhi'&&player.hasSkill('yizhi')) event.num=5;
-					event.cards=get.cards(event.num);
-					event.chosen=[];
-					event.num1=0;
-					event.num2=0;
-					'step 1'
-					var js=player.getCards('j');
-					var pos;
-					var choice=-1;
-					var getval=function(card,pos){
-						if(js[pos]){
-							return (get.judge(js[pos]))(card);
-						}
-						else{
-							return get.value(card);
-						}
-					};
-					for(pos=0;pos<Math.min(event.cards.length,js.length+2);pos++){
-						var max=getval(event.cards[pos],pos);
-						for(var j=pos+1;j<event.cards.length;j++){
-							var current=getval(event.cards[j],pos);
-							if(current>max){
-								choice=j;
-								max=current;
-							}
-						}
-						if(choice!=-1){
-							break;
-						}
-					}
-					player.chooseCardButton('观星：选择要移动的牌',event.cards).set('filterButton',function(button){
-						return !_status.event.chosen.contains(button.link);
-					}).set('chosen',event.chosen).set('ai',function(button){
-						return button.link==_status.event.choice?1:0;
-					}).set('choice',event.cards[choice]);
-					event.pos=pos;
-					'step 2'
-					if(result.bool){
-						var card=result.links[0];
-						var index=event.cards.indexOf(card);
-						event.card=card;
-						event.chosen.push(card);
-						event.cards.remove(event.card);
-						var buttons=event.cards.slice(0);
-						player.chooseControl(function(){
-							return _status.event.controlai;
-						}).set('controlai',event.pos||0).set('sortcard',buttons).set('tosort',card);
-					}
-					else{
-						event.goto(4);
-					}
-					'step 3'
-					if(typeof result.index=='number'){
-						if(result.index>event.cards.length){
-							ui.cardPile.appendChild(event.card);
-							event.num2++;
-						}
-						else{
-							event.cards.splice(result.index,0,event.card);
-						}
-						event.num--;
-						if(event.num>0){
-							event.goto(1);
-						}
-					}
-					'step 4'
-					while(event.cards.length){
-						ui.cardPile.insertBefore(event.cards.pop(),ui.cardPile.firstChild);
-						event.num1++;
-					}
-					var js=player.getCards('j');
-					if(js.length==1){
-						if((get.judge(js[0]))(ui.cardPile.firstChild)<0){
-							player.addTempSkill('guanxing_fail');
-						}
-					}
-					player.popup(get.cnNumber(event.num1)+'上'+get.cnNumber(event.num2)+'下');
-					game.log(player,'将','#y'+get.cnNumber(event.num1)+'张牌','置于牌堆顶，','#y'+get.cnNumber(event.num2)+'张牌','置于牌堆底');
-				},
-				ai:{
-					guanxing:true
-				}
-			},
 			guanxing_fail:{},
 			guanxing:{
 				audio:2,
@@ -1290,19 +1071,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				preHidden:true,
 				content:function(){
 					"step 0"
-					if(player.isUnderControl()){
-						game.swapPlayerAuto(player);
-					}
 					var num=Math.min(5,game.countPlayer());
 					if(player.hasSkill('yizhi')&&player.hasSkill('guanxing')){
 						num=5;
 					}
 					var cards=get.cards(num);
-					event.cards=cards;
-					var switchToAuto=function(){
-						_status.imchoosing=false;
-						if(event.dialog) event.dialog.close();
-						if(event.control) event.control.close();
+					game.cardsGotoOrdering(cards);
+					var next=player.chooseToMove();
+					next.set('list',[
+						['牌堆顶',cards],
+						['牌堆底'],
+					]);
+					next.set('prompt','观星：点击将牌移动到牌堆顶或牌堆底');
+					next.processAI=function(list){
+						var cards=list[0][1],player=_status.event.player;
 						var top=[];
 						var judges=player.getCards('j');
 						var stopped=false;
@@ -1331,149 +1113,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						bottom=cards;
-						for(var i=0;i<top.length;i++){
-							ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
-						}
-						for(i=0;i<bottom.length;i++){
-							ui.cardPile.appendChild(bottom[i]);
-						}
-						player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(bottom.length)+'下');
-						game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
-						game.delay(2);
-					};
-					var chooseButton=function(online,player,cards){
-						var event=_status.event;
-						player=player||event.player;
-						cards=cards||event.cards;
-						event.top=[];
-						event.bottom=[];
-						event.status=true;
-						event.dialog=ui.create.dialog('按顺序选择置于牌堆顶的牌（先选择的在上）',cards);
-						for(var i=0;i<event.dialog.buttons.length;i++){
-							event.dialog.buttons[i].classList.add('pointerdiv');
-						}
-						event.switchToAuto=function(){
-							event._result='ai';
-							event.dialog.close();
-							event.control.close();
-							_status.imchoosing=false;
-						},
-						event.control=ui.create.control('ok','pileTop','pileBottom',function(link){
-							var event=_status.event;
-							if(link=='ok'){
-								if(online){
-									event._result={
-										top:[],
-										bottom:[]
-									}
-									for(var i=0;i<event.top.length;i++){
-										event._result.top.push(event.top[i].link);
-									}
-									for(var i=0;i<event.bottom.length;i++){
-										event._result.bottom.push(event.bottom[i].link);
-									}
-								}
-								else{
-									var i;
-									for(i=0;i<event.top.length;i++){
-										ui.cardPile.insertBefore(event.top[i].link,ui.cardPile.firstChild);
-									}
-									for(i=0;i<event.bottom.length;i++){
-										ui.cardPile.appendChild(event.bottom[i].link);
-									}
-									for(i=0;i<event.dialog.buttons.length;i++){
-										if(event.dialog.buttons[i].classList.contains('glow')==false&&
-											event.dialog.buttons[i].classList.contains('target')==false)
-										ui.cardPile.appendChild(event.dialog.buttons[i].link);
-									}
-									player.popup(get.cnNumber(event.top.length)+'上'+get.cnNumber(event.cards.length-event.top.length)+'下');
-									game.log(player,'将'+get.cnNumber(event.top.length)+'张牌置于牌堆顶');
-								}
-								event.dialog.close();
-								event.control.close();
-								game.resume();
-								_status.imchoosing=false;
-							}
-							else if(link=='pileTop'){
-								event.status=true;
-								event.dialog.content.childNodes[0].innerHTML='按顺序选择置于牌堆顶的牌';
-							}
-							else{
-								event.status=false;
-								event.dialog.content.childNodes[0].innerHTML='按顺序选择置于牌堆底的牌';
-							}
-						})
-						for(var i=0;i<event.dialog.buttons.length;i++){
-							event.dialog.buttons[i].classList.add('selectable');
-						}
-						event.custom.replace.button=function(link){
-							var event=_status.event;
-							if(link.classList.contains('target')){
-								link.classList.remove('target');
-								event.top.remove(link);
-							}
-							else if(link.classList.contains('glow')){
-								link.classList.remove('glow');
-								event.bottom.remove(link);
-							}
-							else if(event.status){
-								link.classList.add('target');
-								event.top.unshift(link);
-							}
-							else{
-								link.classList.add('glow');
-								event.bottom.push(link);
-							}
-						}
-						event.custom.replace.window=function(){
-							for(var i=0;i<_status.event.dialog.buttons.length;i++){
-								_status.event.dialog.buttons[i].classList.remove('target');
-								_status.event.dialog.buttons[i].classList.remove('glow');
-								_status.event.top.length=0;
-								_status.event.bottom.length=0;
-							}
-						}
-						game.pause();
-						game.countChoose();
-					};
-					event.switchToAuto=switchToAuto;
-
-					if(event.isMine()){
-						chooseButton();
-						event.finish();
-					}
-					else if(event.isOnline()){
-						event.player.send(chooseButton,true,event.player,event.cards);
-						event.player.wait();
-						game.pause();
-					}
-					else{
-						event.switchToAuto();
-						event.finish();
+						return [top,bottom];
 					}
 					"step 1"
-					if(event.result=='ai'||!event.result){
-						event.switchToAuto();
+					var top=result.moved[0];
+					var bottom=result.moved[1];
+					top.reverse();
+					for(var i=0;i<top.length;i++){
+						ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
 					}
-					else{
-						var top=event.result.top||[];
-						var bottom=event.result.bottom||[];
-						for(var i=0;i<top.length;i++){
-							ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
-						}
-						for(i=0;i<event.cards.length;i++){
-							if(!top.contains(event.cards[i])&&!bottom.contains(event.cards[i])){
-								ui.cardPile.appendChild(event.cards[i]);
-							}
-						}
-						for(i=0;i<bottom.length;i++){
-							ui.cardPile.appendChild(bottom[i]);
-						}
-						player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(event.cards.length-top.length)+'下');
-						game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
-						game.updateRoundNumber();
-						game.delay(2);
+					for(i=0;i<bottom.length;i++){
+						ui.cardPile.appendChild(bottom[i]);
 					}
+					player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(bottom.length)+'下');
+					game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
+					game.updateRoundNumber();
+					game.delayx();
 				},
 				ai:{
 					threaten:1.2
@@ -2899,9 +2554,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wusheng_info:'你可以将一张红色牌当做【杀】使用或打出。',
 			paoxiao_info:'锁定技，出牌阶段，你使用【杀】没有数量限制。',
 			guanxing_info:'准备阶段，你可以观看牌堆顶的X张牌，并将其以任意顺序置于牌堆项或牌堆底。（X为存活角色数且至多为5）',
-			xinguanxing:'观星',
-			xinguanxing_info:'准备阶段，你可以观看牌堆顶的x张牌，并将其以任意顺序置于牌堆项或牌堆底，x为存活角色个数且不超过5',
-			xinguanxing_info_alter:'准备阶段，你可以观看牌堆顶的5张牌（存活角色小于4时改为3张），并将其以任意顺序置于牌堆项或牌堆底，如果你把观星的牌都放在牌堆底，你可以在结束阶段再进行1次观星',
 			kongcheng_info:'锁定技，当你没有手牌时，你不能成为【杀】或【决斗】的目标。',
 			longdan_info:'你可以将【杀】当做【闪】，或将【闪】当做【杀】使用或打出。',
 			mashu_info:'锁定技，你计算与其他角色的距离时-1。',

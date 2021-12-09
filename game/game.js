@@ -7398,7 +7398,7 @@
 					str+='\n-------------';
 					str+='\n'+line;
 					str+='\n'+column;
-					if(err&&err.stack) str+='\n'+err.stack;
+					if(err&&err.stack) str+='\n'+decodeURI(err.stack);
 					alert(str);
 					window.ea=Array.from(arguments);
 					window.em=msg;
@@ -7408,7 +7408,7 @@
 					game.print(msg);
 					game.print(line);
 					game.print(column);
-					game.print(err.stack);
+					game.print(decodeURI(err.stack));
 					if(!lib.config.errstop){
 						_status.withError=true;
 						game.loop();
@@ -10369,6 +10369,137 @@
 				emptyEvent:function(){
 					event.trigger(event.name);
 				},
+				chooseToMove:function(){
+					'step 0'
+					if(event.chooseTime&&_status.connectMode&&!game.online){
+						event.time=lib.configOL.choose_timeout;
+						game.broadcastAll(function(time){
+							lib.configOL.choose_timeout=time;
+						},event.chooseTime);
+					}
+					if(event.isMine()){
+						var list=event.list,filterMove=event.filterMove,filterOk=event.filterOk;
+						_status.imchoosing=true;
+						var event=_status.event;
+						event.settleed=false;
+						event.dialog=ui.create.dialog(event.prompt||'请选择要操作的牌','hidden','forcebutton');
+						event.switchToAuto=function(){
+							if(!filterOk(event.moved)){
+								if(!event.forced) event._result={bool:false};
+								else event._result='ai';
+							}
+							else{
+								event._result={
+									bool:true,
+									moved:event.moved,
+								};
+							}
+							event.dialog.close();
+							if(ui.confirm) ui.confirm.close();
+							game.resume();
+							_status.imchoosing=false;
+						};
+						event.dialog.classList.add('scroll1');
+						event.dialog.classList.add('scroll2');
+						event.dialog.classList.add('fullwidth');
+						
+						event.moved=[];
+						var buttonss=[];
+						event.buttonss=buttonss;
+						var updateButtons=function(){
+							for(var i of buttonss){
+								event.moved[i._link]=get.links(Array.from(i.childNodes));
+								if(i.textPrompt) i.previousSibling.innerHTML=('<div class="text center">'+i.textPrompt(event.moved[i._link])+'</div>');
+							}
+							if(filterOk(event.moved)){
+								ui.create.confirm('o');
+							}
+							else{
+								if(!event.forced) ui.create.confirm('c');
+								else if(ui.confirm) ui.confirm.close();
+							}
+						};
+						var clickButtons=function(){
+							if(!ui.selected.guanxing_button) return;
+							if(ui.selected.guanxing_button.parentNode==this) return;
+							if(!filterMove(ui.selected.guanxing_button,this._link,event.moved)) return;
+							ui.selected.guanxing_button.classList.remove('glow2');
+							this.appendChild(ui.selected.guanxing_button);
+							delete ui.selected.guanxing_button;
+							updateButtons();
+						};
+						
+						for(var i=0;i<list.length;i++){
+							event.dialog.add('<div class="text center">'+list[i][0]+'</div>');
+							var buttons=ui.create.div('.buttons',event.dialog.content,clickButtons);
+							buttonss.push(buttons);
+							buttons.classList.add('popup');
+							buttons.classList.add('guanxing');
+							buttons._link=i;
+							if(list[i][1]){
+								ui.create.buttons(list[i][1],'card',buttons);
+							}
+							if(list[i][2]) buttons.textPrompt=list[i][2];
+						}
+						event.dialog.open();
+						updateButtons();
+						
+						event.custom.replace.button=function(button){
+							if(!ui.selected.guanxing_button){
+								ui.selected.guanxing_button=button;
+								button.classList.add('glow2');
+								return;
+							}
+							if(ui.selected.guanxing_button==button){
+								button.classList.remove('glow2');
+								delete ui.selected.guanxing_button;
+								return;
+							}
+							if(!filterMove(button,ui.selected.guanxing_button,event.moved)) return;
+							var par1=ui.selected.guanxing_button.parentNode,ind1=ui.selected.guanxing_button.nextSibling,par2=button.parentNode,ind2=button.nextSibling;
+							ui.selected.guanxing_button.classList.remove('glow2');
+							par1.insertBefore(button,ind1);
+							par2.insertBefore(ui.selected.guanxing_button,ind2);
+							delete ui.selected.guanxing_button;
+							updateButtons();
+						}
+						event.custom.replace.confirm=function(bool){
+							if(bool) event._result={
+								bool:true,
+								moved:event.moved,
+							};
+							else event._result={bool:false};
+							event.dialog.close();
+							if(ui.confirm) ui.confirm.close();
+							game.resume();
+							_status.imchoosing=false;
+						};
+						
+						game.pause();
+						game.countChoose();
+						event.choosing=true;
+					}
+					else if(event.isOnline()){
+						event.send();
+					}
+					else{
+						event.result='ai';
+					}
+					"step 1"
+					if(event.time) game.broadcastAll(function(time){
+						lib.configOL.choose_timeout=time;
+					},event.time);
+					var result=event.result||result;
+					if((!result||result=='ai'||(event.forced&&!result.bool))&&event.processAI){
+						var moved=event.processAI(event.list);
+						if(moved) result={
+							bool:true,
+							moved:moved,
+						}
+						else result={bool:false};
+					}
+					event.result=result;
+				},
 				showCharacter:function(){
 					'step 0'
 					event.trigger('showCharacterEnd');
@@ -11287,7 +11418,7 @@
 					}
 					event.filter2=function(info2){
 						var info=lib.skill[info2[0]];
-						if(!lib.translate[info2[0]]||info.popup===false||info.silent) return false;
+						if(!lib.translate[info2[0]]||info.silent) return false;
 						return true;
 					}
 					event.filter3=function(info,info2){
@@ -12433,9 +12564,9 @@
 							}
 							game.pause();
 							if(range[1]>1&&typeof event.selectCard!='function'){
-								event.promptdiscard=ui.create.control('提示',function(){
+								event.promptdiscard=ui.create.control('AI代选',function(){
 									ai.basic.chooseCard(event.ai);
-									if(_status.event.custom.add.card){
+									if(_status.event.custom&&_status.event.custom.add.card){
 										_status.event.custom.add.card();
 									}
 									for(var i=0;i<ui.selected.cards.length;i++){
@@ -16371,15 +16502,16 @@
 				},
 				chooseToGuanxing:function(){
 					"step 0"
-					if(player.isUnderControl()){
-						game.swapPlayerAuto(player);
-					}
 					var cards=get.cards(num);
-					event.cards=cards;
-					var switchToAuto=(event.ai||function(){
-						_status.imchoosing=false;
-						if(event.dialog) event.dialog.close();
-						if(event.control) event.control.close();
+					game.cardsGotoOrdering(cards);
+					var next=player.chooseToMove();
+					next.set('list',[
+						['牌堆顶',cards],
+						['牌堆底'],
+					]);
+					next.set('prompt','点击将牌移动到牌堆顶或牌堆底');
+					next.processAI=event.processAI||function(list){
+						var cards=list[0][1],player=_status.event.player;
 						var top=[];
 						var bottom;
 						cards.sort(function(a,b){
@@ -16390,130 +16522,22 @@
 							top.unshift(cards.shift());
 						}
 						bottom=cards;
-						for(var i=0;i<top.length;i++){
-							ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
-						}
-						for(i=0;i<bottom.length;i++){
-							ui.cardPile.appendChild(bottom[i]);
-						}
-						player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(bottom.length)+'下');
-						game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
-						game.delay(2);
-					});
-					var chooseButton=function(player,cards){
-						var event=_status.event;
-						player=player||event.player;
-						cards=cards||event.cards;
-						event.top=[];
-						event.bottom=[];
-						event.status=true;
-						event.dialog=ui.create.dialog('按顺序选择置于牌堆顶的牌（先选择的在上）',cards);
-						for(var i=0;i<event.dialog.buttons.length;i++){
-							event.dialog.buttons[i].classList.add('pointerdiv');
-						}
-						event.switchToAuto=function(){
-							event._result='ai';
-							event.dialog.close();
-							event.control.close();
-							_status.imchoosing=false;
-						},
-						event.control=ui.create.control('ok','pileTop','pileBottom',function(link){
-							var event=_status.event;
-							if(link=='ok'){
-								event._result={
-									top:[],
-									bottom:[]
-								}
-								for(var i=0;i<event.top.length;i++){
-									event._result.top.push(event.top[i].link);
-								}
-								for(var i=0;i<event.bottom.length;i++){
-									event._result.bottom.push(event.bottom[i].link);
-								}
-								event.dialog.close();
-								event.control.close();
-								game.resume();
-								_status.imchoosing=false;
-							}
-							else if(link=='pileTop'){
-								event.status=true;
-								event.dialog.content.childNodes[0].innerHTML='按顺序选择置于牌堆顶的牌';
-							}
-							else{
-								event.status=false;
-								event.dialog.content.childNodes[0].innerHTML='按顺序选择置于牌堆底的牌';
-							}
-						})
-						for(var i=0;i<event.dialog.buttons.length;i++){
-							event.dialog.buttons[i].classList.add('selectable');
-						}
-						event.custom.replace.button=function(link){
-							var event=_status.event;
-							if(link.classList.contains('target')){
-								link.classList.remove('target');
-								event.top.remove(link);
-							}
-							else if(link.classList.contains('glow')){
-								link.classList.remove('glow');
-								event.bottom.remove(link);
-							}
-							else if(event.status){
-								link.classList.add('target');
-								event.top.unshift(link);
-							}
-							else{
-								link.classList.add('glow');
-								event.bottom.push(link);
-							}
-						}
-						event.custom.replace.window=function(){
-							for(var i=0;i<_status.event.dialog.buttons.length;i++){
-								_status.event.dialog.buttons[i].classList.remove('target');
-								_status.event.dialog.buttons[i].classList.remove('glow');
-								_status.event.top.length=0;
-								_status.event.bottom.length=0;
-							}
-						}
-						game.pause();
-						game.countChoose();
+						return [top,bottom];
 					};
-					event.switchToAuto=switchToAuto;
-					if(event.isMine()){
-						chooseButton();
-					}
-					else if(event.isOnline()){
-						event.player.send(chooseButton,event.player,event.cards);
-						event.player.wait();
-						game.pause();
-					}
-					else{
-						event.switchToAuto();
-						event.finish();
-					}
 					"step 1"
-					var result=event.result||result;
-					if(!result||result=='ai'){
-						event.switchToAuto();
+					var top=result.moved[0];
+					var bottom=result.moved[1];
+					top.reverse();
+					for(var i=0;i<top.length;i++){
+						ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
 					}
-					else{
-						var top=result.top||[];
-						var bottom=result.bottom||[];
-						for(var i=0;i<top.length;i++){
-							ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
-						}
-						for(i=0;i<event.cards.length;i++){
-							if(!top.contains(event.cards[i])&&!bottom.contains(event.cards[i])){
-								ui.cardPile.appendChild(event.cards[i]);
-							}
-						}
-						for(i=0;i<bottom.length;i++){
-							ui.cardPile.appendChild(bottom[i]);
-						}
-						player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(event.cards.length-top.length)+'下');
-						game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
-						game.updateRoundNumber();
-						game.delay(2);
-					}	
+					for(i=0;i<bottom.length;i++){
+						ui.cardPile.appendChild(bottom[i]);
+					}
+					player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(bottom.length)+'下');
+					game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
+					game.updateRoundNumber();
+					game.delayx();
 				},
 			},
 			player:{
@@ -16675,6 +16699,22 @@
 						}
 					}
 					this.checkConflict();
+				},
+				chooseToMove:function(){
+					var next=game.createEvent('chooseToMove');
+					next.player=this;
+					for(var i=0;i<arguments.length;i++){
+						if(typeof arguments[i]=='boolean'){
+							next.forced=arguments[i];
+						}
+						else if(typeof arguments[i]=='string'){
+							next.prompt=arguments[i];
+						}
+					}
+					next.setContent('chooseToMove');
+					next.filterOk=function(){return true};
+					next.filterMove=function(){return true};
+					return next;
 				},
 				chooseToGuanxing:function(num){
 					var next=game.createEvent('chooseToGuanxing');
@@ -18861,7 +18901,7 @@
 							var event=_status.event.getParent();
 							var to=(player==event.player?event.target:event.player);
 							var addi=(get.value(card)>=8&&get.type(card)!='equip')?-10:0;
-							if(card.name=='du') addi+=5;
+							if(card.name=='du') addi-=5;
 							if(player==event.player){
 								if(get.attitude(player,to)>0&&event.small){
 									return -getn(card)-get.value(card)/2+addi;
@@ -18877,6 +18917,7 @@
 						}
 						next.setContent('chooseToCompare');
 					}
+					next.forceDie=true;
 					next._args=Array.from(arguments);
 					return next;
 				},
@@ -26398,7 +26439,7 @@
 				firstDo:true,
 				trigger:{player:['playercontrol','chooseToUseBegin','chooseToRespondBegin','chooseToDiscardBegin','chooseToCompareBegin',
 				'chooseButtonBegin','chooseCardBegin','chooseTargetBegin','chooseCardTargetBegin','chooseControlBegin',
-				'chooseBoolBegin','choosePlayerCardBegin','discardPlayerCardBegin','gainPlayerCardBegin']},
+				'chooseBoolBegin','choosePlayerCardBegin','discardPlayerCardBegin','gainPlayerCardBegin','chooseToMoveBegin']},
 				forced:true,
 				priority:100,
 				forceDie:true,
@@ -47500,7 +47541,7 @@
 						game.resume2();
 					}
 					else if((_status.event.isMine()||_status.event.forceMine)&&!dialogtouched){
-						if(_status.event.custom.replace.window){
+						if(_status.event.custom&&_status.event.custom.replace.window){
 							_status.event.custom.replace.window();
 						}
 						else{
@@ -47609,7 +47650,7 @@
 				if(_status.justdragged) return;
 				_status.clicked=true;
 				var custom=_status.event.custom;
-				if(custom.replace.button){
+				if(custom&&custom.replace.button){
 					custom.replace.button(this);
 					return;
 				}
@@ -47658,7 +47699,7 @@
 					return;
 				}
 				var custom=_status.event.custom;
-				if(custom.replace.card){
+				if(custom&&custom.replace.card){
 					custom.replace.card(this);
 					return;
 				}
@@ -47837,7 +47878,7 @@
 				}
 				_status.clicked=true;
 				var custom=_status.event.custom;
-				if(custom.replace.target){
+				if(custom&&custom.replace.target){
 					custom.replace.target(this,e);
 					return;
 				}
@@ -48000,7 +48041,7 @@
 			},
 			ok:function(node){
 				var event=_status.event;
-				if(event.custom.replace.confirm){
+				if(event.custom&&event.custom.replace.confirm){
 					event.custom.replace.confirm(true);return;
 				}
 				event.result={
@@ -48623,15 +48664,16 @@
 				}
 			},
 			pause:function(){
-				if(_status.paused2) return;
-				if(_status.nopause) return;
+				if(_status.paused2||_status.pausing||_status.nopause) return;
 				if(!_status.video){
 					if(ui.pause.classList.contains('hidden')) return;
 					if(!_status.gameStarted) return;
 				}
 				ui.system.hide();
 				game.pause2();
-				var node=ui.create.pause().animate('start');
+				var node=ui.create.pause();
+				if(!node) return;
+				node.animate('start');
 				ui.sidebar3.innerHTML='';
 				if(lib.config.show_discardpile){
 					for(var i=0;i<ui.discardPile.childNodes.length;i++){

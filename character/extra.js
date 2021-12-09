@@ -2977,49 +2977,39 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					player.storage.qixing=game.cardsGotoSpecial(get.cards(7)).cards;
-					player.markSkill('qixing');
-					game.addVideo('storage',player,['qixing',get.cardsInfo(player.storage.qixing),'cards']);
+					player.markAuto('qixing',game.cardsGotoSpecial(get.cards(7)).cards);
 					"step 1"
-					player.chooseCard('选择任意张手牌与“星”交换',[1,Math.min(player.countCards('h'),player.storage.qixing.length)]).set('promptx',[player.storage.qixing]).ai=function(card){
-						var val=get.value(card);
-						if(val<0) return 10;
-						if(player.skipList.contains('phaseUse')){
-							return val;
-						}
-						return -val;
-					};
+					var cards=player.getStorage('qixing');
+					if(!cards.length||!player.countCards('h')){
+						event.finish();
+						return;
+					}
+					var next=player.chooseToMove('七星：是否交换“星”和手牌？');
+					next.set('list',[
+						[get.translation(player)+'（你）的星',cards],
+						['手牌区',player.getCards('h')],
+					]);
+					next.set('filterMove',function(from,to){
+						return typeof to!='number';
+					});
+					next.set('processAI',function(list){
+						var player=_status.event.player,cards=list[0][1].concat(list[1][1]).sort(function(a,b){
+							return get.useful(a)-get.useful(b);
+						}),cards2=cards.splice(0,player.storage.qixing.length);
+						return [cards2,cards];
+					});
 					"step 2"
 					if(result.bool){
-						player.logSkill('qixing');
-						player.lose(result.cards,ui.special,'toStorage');
-						player.storage.qixing=player.storage.qixing.concat(result.cards);
-						player.syncStorage('qixing');
-						event.num=result.cards.length;
-					}
-					else{
-						event.finish();
-					}
-					"step 3"
-					player.chooseCardButton(player.storage.qixing,'选择'+event.num+'张牌作为手牌',event.num,true).ai=function(button){
-						var val=get.value(button.link);
-						if(val<0) return -10;
-						if(player.skipList.contains('phaseUse')){
-							return -val;
-						}
-						return val;
-					}
-					if(player==game.me&&!event.isMine()){
-						game.delay(0.5);
-					}
-					"step 4"
-					player.gain(result.links,'fromStorage');
-					for(var i=0;i<result.links.length;i++){
-						player.storage.qixing.remove(result.links[i]);
-					}
-					player.syncStorage('qixing');
-					if(player==game.me&&_status.auto){
-						game.delay(0.5);
+						var pushs=result.moved[0],gains=result.moved[1];
+						pushs.removeArray(player.storage.qixing);
+						gains.removeArray(player.getCards('h'));
+						if(!pushs.length||pushs.length!=gains.length) return;
+						player.lose(pushs,ui.special,'toStorage');
+						game.log(player,'将',pushs,'作为“星”置于武将牌上');
+						player.gain(gains,'gain2','log','fromStorage');
+						player.storage.qixing.addArray(pushs);
+						player.storage.qixing.removeArray(gains);
+						player.markSkill('qixing');
 					}
 				},
 				mark:true,
@@ -3061,45 +3051,38 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					player.chooseCard('选择任意张手牌与“星”交换',[1,Math.min(player.countCards('h'),player.storage.qixing.length)]).set('promptx',[player.storage.qixing]).ai=function(card){
-						var val=get.value(card);
-						if(val<0) return 10;
-						if(player.skipList.contains('phaseUse')){
-							return val;
-						}
-						return -val;
-					};
+					var cards=player.getStorage('qixing');
+					if(!cards.length||!player.countCards('h')){
+						event.finish();
+						return;
+					}
+					var next=player.chooseToMove('七星：是否交换“星”和手牌？');
+					next.set('list',[
+						[get.translation(player)+'（你）的星',cards],
+						['手牌区',player.getCards('h')],
+					]);
+					next.set('filterMove',function(from,to){
+						return typeof to!='number';
+					});
+					next.set('processAI',function(list){
+						var player=_status.event.player,cards=list[0][1].concat(list[1][1]).sort(function(a,b){
+							return get.value(a)-get.value(b);
+						}),cards2=cards.splice(0,player.storage.qixing.length);
+						return [cards2,cards];
+					});
 					"step 1"
 					if(result.bool){
-						player.logSkill('qixing');
-						player.lose(result.cards,ui.special,'toStorage');
-						player.storage.qixing=player.storage.qixing.concat(result.cards);
-						player.syncStorage('qixing');
-						event.num=result.cards.length;
-					}
-					else{
-						event.finish();
-					}
-					"step 2"
-					player.chooseCardButton(player.storage.qixing,'选择'+event.num+'张牌作为手牌',event.num,true).ai=function(button){
-						var val=get.value(button.link);
-						if(val<0) return -10;
-						if(player.skipList.contains('phaseUse')){
-							return -val;
-						}
-						return val;
-					}
-					if(player==game.me&&!event.isMine()){
-						game.delay(0.5);
-					}
-					"step 3"
-					player.gain(result.links,'fromStorage');
-					for(var i=0;i<result.links.length;i++){
-						player.storage.qixing.remove(result.links[i]);
-					}
-					player.syncStorage('qixing');
-					if(player==game.me&&_status.auto){
-						game.delay(0.5);
+						var pushs=result.moved[0],gains=result.moved[1];
+						pushs.removeArray(player.storage.qixing);
+						gains.removeArray(player.getCards('h'));
+						if(!pushs.length||pushs.length!=gains.length) return;
+						player.logSkill('qixing2');
+						player.lose(pushs,ui.special,'toStorage');
+						game.log(player,'将',pushs,'作为“星”置于武将牌上');
+						player.gain(gains,'gain2','log','fromStorage');
+						player.storage.qixing.addArray(pushs);
+						player.storage.qixing.removeArray(gains);
+						player.markSkill('qixing');
 					}
 				}
 			},

@@ -523,7 +523,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					canLink:function(player,target,card){
-						if(player.hasSkill('jueqing')||target.hasSkill('gangzhi')||target.hasSkill('gangzhi')) return false;
+						if(!target.isLinked()||player.hasSkill('jueqing')||target.hasSkill('gangzhi')||target.hasSkill('gangzhi')) return false;
 						var es=target.countCards('e');
 						if(!es) return true;
 						if(target.hp>=3&&es>=2){

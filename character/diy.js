@@ -165,7 +165,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_jiakui:['male','wei',4,['tongqu','xinwanlan']],
 			ol_guohuai:['male','wei',3,['rejingce']],
 			junk_zhangrang:['male','qun',3,['junktaoluan']],
-			junk_simayi:['male','jin',3,['buchen','smyyingshi','xiongzhi','xinquanbian'],['hiddenSkill']],
 		},
 		characterFilter:{
 			key_jojiro:function(mode){
@@ -198,7 +197,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
 				diy_noname:['noname'],
 				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto","key_sakuya","key_youta","key_rumi","key_chihaya","key_yukito","key_asara","key_kotomi","key_mia","key_kano"],
-				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang','junk_simayi'],
+				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang'],
 			},
 		},
 		characterIntro:{
@@ -3042,77 +3041,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					event.num=game.countGroup();
 					player.markAuto('shiroha_yuzhao',game.cardsGotoSpecial(get.cards(event.num)).cards);
-					if(window.decadeUI&&!_status.connectMode) event.goto(3);
 					'step 1'
-					player.chooseButton(['将'+get.cnNumber(num)+'张牌置于牌堆顶（先选择的在上）',player.getStorage('shiroha_yuzhao')],true,num).set('ai',function(button){
-						var player=_status.event.player;
-						var next=_status.event.getTrigger().player;
-						var att=get.attitude(player,next);
-						var card=button.link;
-						var judge=next.getCards('j')[ui.selected.buttons.length];
-						if(judge){
-							return get.judge(judge)(card)*att;
-						}
-						return get.value(card)*att;
+					var next=player.chooseToMove(),num=game.countGroup();
+					next.set('prompt','预兆：将'+get.cnNumber(num)+'张牌置于牌堆顶');
+					next.set('num',num);
+					next.set('forced',true);
+					next.set('filterOk',function(moved){
+						return moved[1].length==_status.event.num;
+					});
+					next.set('filterMove',function(from,to,moved){
+						if(to!=1) return true;
+						return moved[1].length<_status.event.num;
+					});
+					next.set('list',[
+						[get.translation(player)+'（你）的“兆”',player.storage.shiroha_yuzhao],
+						['牌堆顶'],
+					]);
+					next.set('processAI',function(list){
+						var cards=list[0][1],cards2=cards.randomRemove(_status.event.num);
+						return [cards,cards2];
 					});
 					'step 2'
-					player.unmarkAuto('shiroha_yuzhao',result.links);
-					while(result.links.length){
-						ui.cardPile.insertBefore(result.links.pop().fix(),ui.cardPile.firstChild);
-					}
-					game.updateRoundNumber();
-					event.finish();
-					'step 3'
-					'短鸽自己八成不会写，我先写好算了';
-					var cards=player.getStorage('shiroha_yuzhao');
-					var yuzhao=decadeUI.content.chooseGuanXing(player,cards,cards.length,null,num);
-					yuzhao.caption='【预兆】';
-					yuzhao.header1='预兆';
-					yuzhao.header2='牌堆顶';
-					yuzhao.tip='将'+num+'张牌置于牌堆顶<br>'+yuzhao.tip;
-					yuzhao.callback=function(){
-						return this.cards[1].length==num; 
-					};
-					event.switchToAuto=function(){
-						var cheats=[];
-						var cards=yuzhao.cards[0].slice(0);
-						var stopped=false;
-					
-						var next=trigger.player;
-						var hasFriend=get.attitude(player,next)>0;
-					
-						var judges=next.node.judges.childNodes;
-						if(judges.length>0) cheats=decadeUI.get.cheatJudgeCards(cards,judges,hasFriend);
-						if(hasFriend){
-							cards=cards.sort(function(b,a){
-								return get.value(b,next)-get.value(a,next);
-							});
-						}
-						else{
-							cards.sort(function(a,b){
-								return get.value(b,next)-get.value(a,next);
-							});
-						}
-						cards=cheats.concat(cards);
-						var time=500;
-						var gainNum=num;
-						for(var i=cards.length-1;i>=0;i--){
-							setTimeout(function(card,index,finished,moveDown){
-								yuzhao.move(card,index,moveDown?1:0);
-								if(finished) yuzhao.finishTime(1000);
-							},time,cards[i],i,i==0,gainNum>0);
-							time += 500;
-							gainNum--;
-						}
-					};
-					if(!event.isMine()){
-						event.switchToAuto();
-					}
-					'step 4'
-					var cards=event.cards2;
-					if(event.result&&event.result.bool){
+					if(result&&result.bool){
+						var cards=result.moved[1];
 						player.unmarkAuto('shiroha_yuzhao',cards);
-						var first=ui.cardPile.firstChild;
 						while(cards.length){
 							ui.cardPile.insertBefore(cards.pop().fix(),ui.cardPile.firstChild);
 						}
@@ -15932,11 +15884,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_caimao:'蔡瑁',
 			nsdingzhou:'定州',
 			nsdingzhou_info:'出牌阶段限一次，你可以选择一名区域内有牌的其他角色。你随机获得其区域内的一张牌，然后摸一张牌。若你以此法获得了两张颜色不同的牌，则你失去1点体力。',
-			junk_simayi:'止息司马懿',
 			ol_guohuai_ab:'郭淮',
 			junk_zhangrang_ab:'张让',
 			old_jiakui_ab:'贾逵',
-			junk_simayi_ab:'司马懿',
 			diy_tieba:'吧友设计',
 			diy_default:'常规',
 			diy_noname:'无名专属',

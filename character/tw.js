@@ -5,12 +5,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			tw:{
-				tw_mobile:['tw_beimihu','nashime','tw_gexuan','tw_dongzhao','jiachong','duosidawang','wuban','yuejiu','tw_fuwan'],
+				tw_mobile:['tw_beimihu','nashime','tw_gexuan','tw_dongzhao','jiachong','duosidawang','wuban','yuejiu','tw_fuwan','tw_yujin','tw_zhaoxiang'],
 				tw_yijiang:['tw_caoang','tw_caohong','tw_zumao','tw_dingfeng','tw_maliang','tw_xiahouba'],
 				tw_english:['kaisa'],
 			},
 		},
 		character:{
+			tw_yujin:['male','qun',4,['xinzhenjun']],
 			tw_fuwan:['male','qun',4,['twmoukui']],
 			tw_zhaoxiang:['female','shu',4,['refanghun','twfuhan','twqueshi']],
 			yuejiu:['male','qun',4,['cuijin']],
@@ -148,6 +149,90 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			xinzhenjun:{
+				audio:2,
+				trigger:{
+					player:'phaseUseBegin'
+				},
+				direct:true,
+				filter:function(event,player){
+					return player.countCards('he')>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseCardTarget({
+						filterCard:true,
+						filterTarget:lib.filter.notMe,
+						position:'he',
+						prompt:get.prompt2('xinzhenjun'),
+						ai1:function(card){
+							var player=_status.event.player;
+							if(card.name=='sha'&&get.color(card)=='red'){
+								for(var i=0;i<game.players.length;i++){
+									var current=game.players[i];
+									if(current!=player&&get.attitude(player,current)>0&&current.hasValueTarget(card)) return 7;
+								}
+								return 0;
+							}
+							return 7-get.value(card);
+						},
+						ai2:function(target){
+							var player=_status.event.player;
+							var card=ui.selected.cards[0];
+							var att=get.attitude(player,target);
+							if(get.value(card)<0) return -att*2;
+							if(target.countCards('h',{name:'sha',color:'red'})||target.hasSkill('wusheng')||target.hasSkill('new_rewusheng')||target.hasSkill('wushen')||(card.name=='sha'&&get.color(card)=='red'&&target.hasValueTarget(card))) return att*2;
+							var eff=0;
+							game.countPlayer(function(current){
+								if(target!=current&&get.distance(target,current,'attack')>1) return;
+								var eff2=get.damageEffect(current,player,player);
+								if(eff2>eff) eff=eff2;
+							});
+							if(att>0&&eff>0) eff+=2*att;
+							return eff;
+						},
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('xinzhenjun',target);
+						target.gain(result.cards,player,'giveAuto')
+					}
+					else event.finish();
+					'step 2'
+					target.chooseToUse({
+						filterCard:function(card){
+							return get.name(card)=='sha'&&get.color(card)!='black'&&lib.filter.cardEnabled.apply(this,arguments);
+						},
+						prompt:'请使用一张不为黑色的【杀】，否则'+get.translation(player)+'可以对你或你攻击范围内的一名其他角色造成1点伤害',
+					});
+					'step 3'
+					if(result.bool){
+						var num=1;
+						game.countPlayer2(function(current){
+							current.getHistory('damage',function(evt){
+								if(evt.getParent(evt.notLink()?4:8)==event) num+=evt.num;
+							});
+						});
+						player.draw(num);
+						event.finish();
+					}
+					else{
+						player.chooseTarget('是否对'+get.translation(target)+'或其攻击范围内的一名角色造成1点伤害？',function(card,player,target){
+							return target==_status.event.targetx||_status.event.targetx.inRange(target);
+						}).set('targetx',event.target).ai=function(target){
+							var player=_status.event.player;
+							return get.damageEffect(target,player,player)
+						};
+					}
+					'step 4'
+					if(result.bool){
+						player.line(result.targets);
+						result.targets[0].damage('nocard');
+					}
+				},
+			},
 			twmoukui:{
 				trigger:{player:'useCardToPlayered'},
 				direct:true,
@@ -1643,6 +1728,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tw_fuwan:'TW伏完',
 			twmoukui:'谋溃',
 			twmoukui_info:'当你使用【杀】指定目标后，你可以选择一项：①摸一张牌；②弃置该角色的一张牌；③背水：若此【杀】未因造成伤害而令该角色进入过濒死状态，则该角色弃置你的一张牌。',
+			tw_yujin:'SP于禁',
+			xinzhenjun:'镇军',
+			xinzhenjun_info:'出牌阶段开始时，你可以将一张牌交给一名其他角色，令其选择是否使用一张不为黑色的【杀】。若其选择是，则你于此【杀】结算完成后摸1+X张牌(X为此【杀】造成的伤害总点数)。若其选择否，则你对其或其攻击范围内的一名其他角色造成1点伤害。',
 			tw_mobile:'移动版',
 			tw_yijiang:'一将成名TW',
 			tw_english:'英文版',

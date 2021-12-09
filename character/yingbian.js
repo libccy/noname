@@ -15,7 +15,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jin_yanghuiyu:['female','jin',3,['huirong','ciwei','caiyuan'],['hiddenSkill']],
 			shibao:['male','jin',4,['zhuosheng']],
 			jin_zhangchunhua:['female','jin',3,['huishi','qingleng','xuanmu'],['hiddenSkill']],
-			jin_simayi:['male','jin',3,['buchen','smyyingshi','xiongzhi','quanbian'],['hiddenSkill']],
+			jin_simayi:['male','jin',3,['buchen','smyyingshi','xiongzhi','xinquanbian'],['hiddenSkill']],
 			jin_wangyuanji:['female','jin',3,['shiren','yanxi'],['hiddenSkill']],
 			jin_simazhao:['male','jin',3,['tuishi','xinchoufa','zhaoran','chengwu'],['zhu','hiddenSkill']],
 			jin_xiahouhui:['female','jin',3,['baoqie','jyishi','shiduo'],['hiddenSkill']],
@@ -1484,25 +1484,51 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var cards=get.cards(Math.min(5,player.maxHp));
-					event.cards=cards;
+					game.cardsGotoOrdering(cards);
 					var suit=get.suit(trigger.card);
-					player.chooseButton(['权变：获得一张不为'+get.translation(suit)+'花色的牌',cards]).set('suit',suit).set('filterButton',function(button){
-						return get.suit(button)!=_status.event.suit;
+					var next=player.chooseToMove('权变：获得一张不为'+get.translation(suit)+'花色的牌并排列其他牌');
+					next.set('suit',suit);
+					next.set('list',[
+						['牌堆顶',cards],
+						['获得'],
+					])
+					next.set('filterMove',function(from,to,moved){
+						var suit=_status.event.suit;
+						if(moved[0].contains(from.link)){
+							if(typeof to=='number'){
+								if(to==1){
+									if(moved[1].length) return false;
+									return get.suit(from.link,false)!=suit;
+								}
+								return true;
+							}
+							if(moved[1].contains(to.link)) return get.suit(from.link,false)!=suit;
+							return true;
+						}
+						else{
+							if(typeof to=='number') return true;
+							return get.suit(to.link,false)!=suit;
+						}
+					});
+					next.set('processAI',function(list){
+						var cards=list[0][1].slice(0).sort(function(a,b){
+							return get.value(b)-get.value(a);
+						}),gains=[];
+						for(var i of cards){
+							if(get.suit(i,false)!=_status.event.suit){
+								cards.remove(i);
+								gains.push(i);
+								break;
+							}
+						}
+						return [cards,gains];
 					});
 					'step 1'
 					if(result.bool){
-						var card=result.links[0];
-						cards.remove(card);
-						player.gain(card,'gain2','log');
-						if(!cards.length) event.finish();
-					}
-					'step 2'
-					player.chooseCardButton(cards.length,true,cards,'按顺序将卡牌置于牌堆顶（先选择的在上）');
-					'step 3'
-					if(result.bool){
-						var list=result.links.slice(0);
-						while(list.length){
-							ui.cardPile.insertBefore(list.pop(),ui.cardPile.firstChild);
+						var list=result.moved;
+						if(list[1].length) player.gain(list[1],'gain2');
+						while(list[0].length){
+							ui.cardPile.insertBefore(list[0].pop(),ui.cardPile.firstChild);
 						}
 						game.updateRoundNumber();
 					}
@@ -2379,21 +2405,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					trigger.changeToZero();
-					event.cards=game.cardsGotoOrdering(get.cards(ui.cardPile.childElementCount%10)).cards;
-					var num=Math.ceil(event.cards.length/2);
-					var str='按顺序将卡牌置于牌堆底';
-					if(event.cards.length>num) str='按顺序将'+get.cnNumber(num)+'张牌置于牌堆底，然后获得其余的牌';
-					player.chooseButton([str,'<div class="text center">（先选择的在上）</div>',event.cards],true,num).set('ai',function(card){
-						return -get.value(card);
+					var cards=game.cardsGotoOrdering(get.cards(ui.cardPile.childElementCount%10)).cards;
+					var num=Math.ceil(cards.length/2);
+					var next=player.chooseToMove('慧识：将'+get.cnNumber(num)+'张牌置于牌堆底并获得其余的牌',true);
+					next.set('list',[
+						['牌堆顶的展示牌',cards],
+						['牌堆底'],
+					]);
+					next.set('filterMove',function(from,to,moved){
+						if(moved[0].contains(from)&&to==1) return moved[1].length<_status.event.num;
+						return true;
+					});
+					next.set('filterOk',function(moved){
+						return moved[1].length==_status.event.num;
+					});
+					next.set('num',num);
+					next.set('processAI',function(list){
+						var cards=list[0][1].slice(0).sort(function(a,b){
+							return get.value(b)-get.useful(a);
+						});
+						return [cards,cards.splice(cards.length-_status.event.num)];
 					});
 					'step 1'
-					for(var i of result.links){
-						cards.remove(i);
-						i.fix();
-						ui.cardPile.appendChild(i);
+					if(result.bool){
+						var list=result.moved;
+						if(list[0].length) player.gain(list[0],'gain2');
+						while(list[1].length) ui.cardPile.appendChild(list[1].shift().fix());
 					}
-					game.updateRoundNumber();
-					if(cards.length) player.gain(cards,'gain2','log');
 				},
 			},
 			qingleng:{

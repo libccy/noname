@@ -1709,8 +1709,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return (lib.filter.judge(card,player,target)&&player!=target);
 				},
 				judge:function(card){
-					if(get.suit(card)=='heart') return 0;
-					return -3;
+					if(get.suit(card)=='heart') return 1;
+					return -2;
 				},
 				judge2:function(result){
 					if(result.bool==false) return true;
@@ -1759,8 +1759,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				selectTarget:[-1,-1],
 				judge:function(card){
-					if(get.suit(card)=='spade'&&get.number(card)>1&&get.number(card)<10) return -6;
-					return 0;
+					if(get.suit(card)=='spade'&&get.number(card)>1&&get.number(card)<10) return -5;
+					return 1;
 				},
 				judge2:function(result){
 					if(result.bool==false) return true;

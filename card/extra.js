@@ -327,8 +327,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return (lib.filter.judge(card,player,target)&&player!=target);
 				},
 				judge:function(card){
-					if(get.suit(card)=='club') return 0;
-					return -3;
+					if(get.suit(card)=='club') return 1;
+					return -2;
 				},
 				judge2:function(result){
 					if(result.bool==false) return true;

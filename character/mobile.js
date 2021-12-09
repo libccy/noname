@@ -1127,7 +1127,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var num1=player.countCards('h'),num2=player.storage.fengjie2.hp;
 					if(num1>num2) player.chooseToDiscard('h',true,num1-num2);
-					else player.drawTo(Math.min(4,num2));
+					else player.drawTo(Math.min(num1+4,num2));
 				},
 			},
 			//陈武董袭
@@ -3287,35 +3287,47 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			mjweipo_effect:{
 				audio:'mjweipo',
-				enable:'chooseToUse',
-				hiddenCard:function(player,name){
-					return name==player.storage.mjweipo_effect&&player.countCards('h','sha')>0;
-				},
-				viewAs:function(cards,player){
-					return {name:player.storage.mjweipo_effect};
-				},
+				enable:'phaseUse',
 				filter:function(event,player){
-					return player.countCards('hs','sha')>0&&event.filterCard({name:player.storage.mjweipo_effect},player,event);
+					return player.countCards('h','sha')>0;
 				},
 				prompt:function(){
-					return '将一张杀当做'+get.translation(_status.event.player.storage.mjweipo_effect)+'使用';
+					return '弃置一张【杀】并获得一张'+get.translation(_status.event.player.storage.mjweipo_effect);
 				},
 				filterCard:{name:'sha'},
 				check:function(card){
 					return 6-get.value(card);
 				},
-				position:'hs',
+				position:'h',
 				popname:true,
-				onuse:function(links,player){
+				content:function(){
+					var name=player.storage.mjweipo_effect,card=false;
+					if(name=='binglinchengxiax'){
+						if(!_status.binglinchengxiax){
+							_status.binglinchengxiax=[
+								['spade',7],
+								['club',7],
+								['club',13],
+							];
+							game.broadcastAll(function(){lib.inpile.add('binglinchengxiax')});
+						}
+						if(_status.binglinchengxiax.length){
+							var info=_status.binglinchengxiax.randomRemove();
+							card=game.createCard2('binglinchengxiax',info[0],info[1]);
+						}
+					}
+					if(!card) card=get.cardPile(name);
+					if(card) player.gain(card,'gain2');
 					player.removeSkill('mjweipo_effect');
 				},
 				ai:{
 					order:7,
+					result:{player:1},
 				},
-				group:'mjweipo_remove',
 				mark:true,
 				marktext:'迫',
-				intro:{content:'可将【杀】当做【$】使用'},
+				intro:{content:'可弃置一张【杀】并获得【$】'},
+				group:'mjweipo_remove',
 			},
 			mjweipo_remove:{
 				trigger:{global:['phaseBegin','die']},
@@ -11226,7 +11238,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					threaten:0.7,
 				},
 			},
-			"xinfu_shangjian":{
+			xinfu_shangjian:{
 				trigger:{
 					global:"phaseJieshuBegin",
 				},
@@ -11238,6 +11250,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					return num>0&&num<=player.hp
 				},
+				locked:true,
 				frequent:true,
 				content:function(){
 					'step 0'
@@ -13034,7 +13047,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shenpei:['shenpei','sp_shenpei'],
 			wangcan:['wangcan','sp_wangcan'],
 			sunshao:['sp_sunshao','sunshao'],
-			xunchen:['xunchen','sp_xunchen'],
+			xunchen:['re_xunchen','xunchen','sp_xunchen'],
 			xinpi:['xinpi','sp_xinpi'],
 			duyu:['duyu','sp_duyu'],
 			zhangwen:['sp_zhangwen','zhangwen'],
@@ -13084,7 +13097,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"qc_mingzhe":"明哲",
 			"qc_mingzhe_info":"",
 			"xinfu_shangjian":"尚俭",
-			"xinfu_shangjian_info":"一名角色的结束阶段开始时，若你于此回合内失去了X张或更少的牌，则你可以摸等量的牌。（X为你的体力值）",
+			"xinfu_shangjian_info":"锁定技。一名角色的结束阶段开始时，若你于此回合内失去了X张或更少的牌，则你可以摸等量的牌（X为你的体力值）。",
 			"rw_bagua_skill":"先天八卦阵",
 			"rw_bagua_skill_info":"当你需要使用或打出一张【闪】时，你可以进行判定，若判定结果不为黑桃，视为你使用或打出了一张【闪】。",
 			"rw_baiyin_skill":"照月狮子盔",
@@ -13586,7 +13599,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mjweipo:'危迫',
 			mjweipo_effect:'危迫',
 			mjweipo_remove:'危迫',
-			mjweipo_info:'出牌阶段限一次。你可以选择一个智囊或【兵临城下】，令一名没有〖危迫〗效果的角色获得如下一次性效果直到你下回合开始：其可以将一张【杀】当做你选择的牌使用。',
+			mjweipo_info:'出牌阶段限一次。你可以选择一个智囊或【兵临城下】，令一名没有〖危迫〗效果的角色获得如下一次性效果直到你下回合开始：其可于出牌阶段弃置一张【杀】，并获得一张你选择的牌。',
 			mjchenshi:'陈势',
 			mjchenshi_player:'陈势',
 			mjchenshi_target:'陈势',
@@ -13697,7 +13710,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qingjue_info:'每轮限一次。当有其他角色A使用牌指定另一名体力值小于A且不处于濒死状态的其他角色B为目标时，你可以摸一张牌，然后与A拼点。若你赢，你取消此目标。若你没赢，你将此牌的目标改为自己。',
 			fengjie:'奉节',
 			fengjie2:'奉节',
-			fengjie_info:'锁定技，准备阶段开始时，你选择一名其他角色并获得如下效果直到你下回合开始：一名角色的结束阶段开始时，你将手牌摸至（至多摸至四张）或弃置至与其体力值相等。',
+			fengjie_info:'锁定技，准备阶段开始时，你选择一名其他角色并获得如下效果直到你下回合开始：一名角色的结束阶段开始时，你将手牌摸至（至多摸四张）或弃置至与其体力值相等。',
 			sp_zongyu:'手杀宗预',
 			zhibian:'直辩',
 			zhibian_info:'准备阶段，你可以和一名其他角色拼点。若你赢，你可选择：①将其装备区/判定区内的一张牌移动到你的对应区域。②回复1点体力。③背水：跳过下个摸牌阶段，然后依次执行上述所有选项；若你没赢，你失去1点体力。',

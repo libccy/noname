@@ -1447,6 +1447,10 @@ div:not(.handcards)>.card>.info>span,
 .button.card.button>.intro {
 	top: 69px;
 }
+.buttons.guanxing {
+	min-height: 110px;
+	width: 90%;
+}
 .buttons.smallzoom {
 	display: block;
 	zoom: 0.65
@@ -1463,10 +1467,10 @@ div:not(.handcards)>.card>.info>span,
 	margin-left: 0px;
 	margin-right: 0px;
 }
-.buttons.scrollbuttons .button:first-child{
+.buttons.scrollbuttons:not(.popup) .button:first-child{
 	margin-left: 12px;
 }
-.buttons.scrollbuttons .button:last-child{
+.buttons.scrollbuttons:not(.popup) .button:last-child{
 	margin-right: 12px;
 }
 /*.buttons.smallzoom .card.button>.name,
