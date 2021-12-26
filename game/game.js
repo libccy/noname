@@ -53668,47 +53668,31 @@
 				}
 				result2+=temp02;
 				result1+=temp01;
-				if(get.attitude(player,target)<0){
-					result2*=Math.sqrt(threaten);
-				}
-				else{
-					result2*=Math.sqrt(Math.sqrt(threaten));
-				}
-				// *** continue here ***
-				if(target.hp==1) result2*=2.5;
-				if(target.hp==2) result2*=1.8;
-				if(target.countCards('h')==0){
-					if(get.tag(card,'respondSha')||get.tag(card,'respondShan')){
-						result2*=1.7;
+				if(typeof card=='object'){
+						if(get.attitude(player,target)<0){
+						result2*=Math.sqrt(threaten);
 					}
 					else{
-						result2*=1.5;
+						result2*=Math.sqrt(Math.sqrt(threaten));
 					}
+					// *** continue here ***
+					if(target.hp==1) result2*=2.5;
+					if(target.hp==2) result2*=1.8;
+					if(target.countCards('h')==0){
+						if(get.tag(card,'respondSha')||get.tag(card,'respondShan')){
+							result2*=1.7;
+						}
+						else{
+							result2*=1.5;
+						}
+					}
+					if(target.countCards('h')==1) result2*=1.3;
+					if(target.countCards('h')==2) result2*=1.1;
+					if(target.countCards('h')>3) result2*=0.5;
+					if(target.hp==4) result2*=0.9;
+					if(target.hp==5) result2*=0.8;
+					if(target.hp>5) result2*=0.6;
 				}
-				if(target.countCards('h')==1) result2*=1.3;
-				if(target.countCards('h')==2) result2*=1.1;
-				if(target.countCards('h')>3) result2*=0.5;
-				if(target.hp==4) result2*=0.9;
-				if(target.hp==5) result2*=0.8;
-				if(target.hp>5) result2*=0.6;
-				// if(get.attitude(player,target)<0){
-				// 	result2*=threaten;
-				// }
-				// else{
-				// 	result2*=Math.sqrt(threaten);
-				// }
-				// if(target.hp<=1) result2*=2;
-				// if(target.hp==2) result2*=1.1;
-				// if(target.countCards('h')==0){
-				// 	result2*=1.1;
-				// 	if(get.tag(card,'respondSha')||get.tag(card,'respondShan')) result2*=1.4;
-				// }
-				// if(target.countCards('h')==1) result2*=1.05;
-				// if(target.countCards('h')==2) result2*=1.02;
-				// if(target.countCards('h')>3) result2*=0.9;
-				// if(target.hp==4) result2*=0.9;
-				// if(target.hp==5) result2*=0.8;
-				// if(target.hp>5) result2*=0.6;
 			}
 			else{
 				result2+=temp02;

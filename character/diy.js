@@ -3282,7 +3282,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var num=player.getHistory('skipped').length;
 					event.num=num;
-					player.chooseToMove(num,'瞬影：移动至多'+get.cnNumber(num)+'格或失去1点体力');
+					player.chooseToMoveChess(num,'瞬影：移动至多'+get.cnNumber(num)+'格或失去1点体力');
 					'step 1'
 					if(!result.bool) player.loseHp();
 					else player.draw(num);

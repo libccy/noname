@@ -1303,6 +1303,16 @@ body>.background.land {
 	bottom: 5px;
 	right: 5px;
 	text-align: right;
+	text-shadow: rgba(213, 194, 179,1) 0 0 3px,rgba(213, 194, 179,1) 0 0 3px,rgba(213, 194, 179,1) 0 0 3px,
+		rgba(213, 194, 179,1) 0 0 3px,black 0 0 3px;
+}
+.card>.gaintag {
+	bottom: 5px;
+	left: 5px;
+	text-align: left;
+	color: white;
+	text-shadow: rgba(255, 120, 0,1) 0 0 2px,rgba(255, 120, 0,1) 0 0 2px,rgba(255, 120, 0,1) 0 0 2px,
+		rgba(255, 120, 0,1) 0 0 2px,black 0 0 1px;
 }
 .card>.name {
 	top: 9px;
@@ -1437,6 +1447,10 @@ div:not(.handcards)>.card>.info>span,
 .button.card.button>.intro {
 	top: 69px;
 }
+.buttons.guanxing {
+	min-height: 110px;
+	width: 90%;
+}
 .buttons.smallzoom {
 	display: block;
 	zoom: 0.65
@@ -1453,10 +1467,10 @@ div:not(.handcards)>.card>.info>span,
 	margin-left: 0px;
 	margin-right: 0px;
 }
-.buttons.scrollbuttons .button:first-child{
+.buttons.scrollbuttons:not(.popup) .button:first-child{
 	margin-left: 12px;
 }
-.buttons.scrollbuttons .button:last-child{
+.buttons.scrollbuttons:not(.popup) .button:last-child{
 	margin-right: 12px;
 }
 /*.buttons.smallzoom .card.button>.name,
@@ -1869,10 +1883,13 @@ div:not(.handcards)>.card>.info>span,
 }
 
 .skill {
-	font-size: 5px;
 	left: 0 !important;
 	width: 70px !important;
 	white-space: nowrap;
+}
+.skilln {
+	left: 0 !important;
+	width: 70px !important;
 }
 .skill>.card {
 	transform: scale(0.56);
@@ -1970,6 +1987,22 @@ div:not(.handcards)>.card>.info>span,
 	height: auto;
     transform: none !important;
 	text-shadow: black 0 0 2px, black 0 0 3px;
+}
+
+.button.replaceButton,
+.button.replaceButton.text{
+	left: 2px;
+	top: auto;
+	text-align: center;
+	width: 42px;
+	right: auto;
+	bottom: 3px;
+	background-image: linear-gradient(rgba(150, 47, 47, 1), rgba(132, 43, 43, 1));
+	border-radius: 3px;
+}
+.button.replaceButton>div{
+	width: 10px;
+	height: 10px;
 }
 /*--------确认--------*/
 #control {
@@ -2096,6 +2129,7 @@ div:not(.handcards)>.card>.info>span,
 	width: 100%;
 	font-size: 12px;
 	text-align: center;
+	white-space: nowrap;
 	/*opacity: 0;*/
 }
 .player:hover>.nameol {
@@ -2248,6 +2282,9 @@ div:not(.handcards)>.card>.info>span,
 #window>.damage.fullscreenavatar[data-nature='thunder']:not(.noshadow)>div:first-child>div{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 10px, rgba(0, 0, 0,0.3) 0 0 30px, rgba(100, 74, 139,1) 0 0 60px;
 }
+#window>.damage.fullscreenavatar[data-nature='kami']:not(.noshadow)>div:first-child>div{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 10px, rgba(0, 0, 0,0.3) 0 0 30px, rgba(90, 118, 99,1) 0 0 60px;
+}
 #window>.damage.fullscreenavatar[data-nature='metal']>div:first-child>div{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 10px, rgba(255, 0, 0,0.1) 0 0 30px, rgba(255, 203, 0,0.6) 0 0 80px;
 }
@@ -2256,6 +2293,9 @@ div:not(.handcards)>.card>.info>span,
 }
 #window>.damage.fullscreenavatar[data-nature='water']>div:first-child>div{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 10px, rgba(0, 0, 0,0.3) 0 0 30px, rgba(78, 117, 140,1) 0 0 60px, rgba(78, 117, 140,1) 0 0 60px;
+}
+#window>.damage.fullscreenavatar[data-nature='ice']>div:first-child>div{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 20px, rgba(0, 0, 0,0.3) 0 0 40px, rgba(213, 194, 179, 1) 0 0 80px;
 }
 #window>.damage.fullscreenavatar[data-nature='soil']>div:first-child>div{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0,0.5) 0 0 10px, rgba(0, 0, 0,0.3) 0 0 30px, rgba(128, 59, 2,1) 0 0 60px;
@@ -2724,28 +2764,38 @@ div:not(.handcards)>.card>.info>span,
 	background-image: radial-gradient(circle at bottom left, rgb(255, 218, 71), rgb(224, 191, 62))
 }
 
+.identitycircle > div > div[data-color='jin'] {
+	background-image: radial-gradient(circle at bottom left, rgb(100, 74, 139), rgb(96, 72, 136))
+}
+
+.identitycircle > div > div[data-color='key'] {
+	background-image: radial-gradient(circle at bottom left, rgb(203, 177, 255), rgb(203, 177, 255))
+}
+
 .unseen>.avatar,.unseen>.name:not(.name2),
 .unseen2>.avatar2,.unseen2>.name2 {
 	opacity: 0 !important;
 }
 
-.player[data-position='0'].unseen>.avatar,
-.player[data-position='0'].unseen2>.avatar2,
-.player[data-position='0'].unseen>.name:not(.name2):not(.name_seat),
-.player[data-position='0'].unseen2>.name2,
-.unseen_v>.avatar,
-.unseen2_v>.avatar2,
-.unseen_v>.name:not(.name2):not(.name_seat),
-.unseen2_v>.name2 {
+#arena:not(.observe) .player[data-position='0'].unseen>.avatar,
+#arena:not(.observe) .player[data-position='0'].unseen2>.avatar2,
+#arena:not(.observe) .player[data-position='0'].unseen>.name:not(.name2):not(.name_seat),
+#arena:not(.observe) .player[data-position='0'].unseen2>.name2,
+#arena:not(.observe) .unseen_v>.avatar,
+#arena:not(.observe) .unseen2_v>.avatar2,
+#arena:not(.observe) .unseen_v>.name:not(.name2):not(.name_seat),
+#arena:not(.observe) .unseen2_v>.name2 {
 	opacity: 0.2 !important
 }
 
 .player>.name_seat {
 	opacity: 0;
 }
-.player:not([data-position='0']).unseen.unseen2>.name_seat {
+.player:not([data-position='0']).unseen.unseen2>.name_seat,
+.player:not([data-position='0']):not(.fullskin2).unseen>.name_seat {
 	opacity: 1 !important;
 }
+
 .linked>.avatar,.linked>.avatar2 {
 	transform: rotate(-90deg);
 }
@@ -3187,6 +3237,47 @@ div:not(.handcards)>.card>.info>span,
 	left: calc(50% + 20px);
 	top: calc(50% + 80px)
 }
+#window>.player.connect[data-position='cx0']{
+	left:calc(150% / 7 - 1275px / 7);
+	top:calc(300% / 7 - 160px + 5px);
+}
+#window>.player.connect[data-position='cx1']{
+	left:calc(247% / 7 - 850px / 7);
+	top:calc(300% / 7 - 160px + 5px);
+}
+#window>.player.connect[data-position='cx2']{
+	left:calc(350% / 7 - 525px / 7);
+	top:calc(300% / 7 - 160px + 5px);
+}
+#window>.player.connect[data-position='cx3']{
+	left:calc(453% / 7 - 200px / 7);
+	top:calc(300% / 7 - 160px + 5px);
+}
+#window>.player.connect[data-position='cx4']{
+	left:calc(550% / 7 + 125px / 7);
+	top:calc(300% / 7 - 160px + 5px);
+}
+#window>.player.connect[data-position='cx5']{
+	left:calc(150% / 7 - 1275px / 7);
+	top:calc(400% / 7 - 40px + 5px);
+}
+#window>.player.connect[data-position='cx6']{
+	left:calc(247% / 7 - 850px / 7);
+	top:calc(400% / 7 - 40px + 5px);
+}
+#window>.player.connect[data-position='cx7']{
+	left:calc(350% / 7 - 525px / 7);
+	top:calc(400% / 7 - 40px + 5px);
+}
+#window>.player.connect[data-position='cx8']{
+	left:calc(453% / 7 - 200px / 7);
+	top:calc(400% / 7 - 40px + 5px);
+}
+#window>.player.connect[data-position='cx9']{
+	left:calc(550% / 7 + 125px / 7);
+	top:calc(400% / 7 - 40px + 5px);
+}
+
 #window>.player.connect {
 	width: 120px;
 }
@@ -3203,6 +3294,7 @@ div:not(.handcards)>.card>.info>span,
 	top: auto;
 	right: 20px;
 	bottom: 20px;
+	z-index: 5;
 }
 .connectevents.server{
 	left: 20px;
@@ -3210,6 +3302,9 @@ div:not(.handcards)>.card>.info>span,
 }
 .connectevents.left{
 	transform: translateX(-85px);
+}
+.connectevents.left2{
+	transform: translateX(-170px);
 }
 .connectevents.icon{
 	width: 20px;
@@ -3334,6 +3429,7 @@ div:not(.handcards)>.card>.info>span,
 #arena.selecting:not(.video) .player[data-position='0'] .card:not(.selectable)>.name2,
 #arena.selecting:not(.video) .player[data-position='0'] .card:not(.selectable)>.info,
 #arena.selecting:not(.video) .player[data-position='0'] .card:not(.selectable)>.range,
+#arena.selecting:not(.video) .player[data-position='0'] .card:not(.selectable)>.gaintag,
 #arena.selecting:not(.video) .player[data-position='0'] .card:not(.selectable)>.addinfo,
 #arena.selecting:not(.video) .player.current_action .card:not(.selectable)>.background,
 #arena.selecting:not(.video) .player.current_action .card:not(.selectable)>.image,
@@ -3341,6 +3437,7 @@ div:not(.handcards)>.card>.info>span,
 #arena.selecting:not(.video) .player.current_action .card:not(.selectable)>.name2,
 #arena.selecting:not(.video) .player.current_action .card:not(.selectable)>.info,
 #arena.selecting:not(.video) .player.current_action .card:not(.selectable)>.range,
+#arena.selecting:not(.video) .player.current_action .card:not(.selectable)>.gaintag,
 #arena.selecting:not(.video) .player.current_action .card:not(.selectable)>.addinfo,
 #arena.selecting:not(.video) #me .card:not(.selectable)>.background,
 #arena.selecting:not(.video) #me .card:not(.selectable)>.image,
@@ -3348,8 +3445,9 @@ div:not(.handcards)>.card>.info>span,
 #arena.selecting:not(.video) #me .card:not(.selectable)>.name2,
 #arena.selecting:not(.video) #me .card:not(.selectable)>.info,
 #arena.selecting:not(.video) #me .card:not(.selectable)>.range,
+#arena.selecting:not(.video) #me .card:not(.selectable)>.gaintag,
 #arena.selecting:not(.video) #me .card:not(.selectable)>.addinfo,
-#arena.selecting:not(.video) .dialog:not(.noselect) .button:not(.selectable):not(.noclick),
+#arena.selecting:not(.video) .dialog:not(.noselect) .button:not(.selectable):not(.noclick):not(.replaceButton),
 .dead,.likedead {
 	opacity: 0.6;
 }
@@ -3376,7 +3474,7 @@ div:not(.handcards)>.card>.info>span,
 #window:not(.nopointer) .pointertable td>span,
 #window:not(.nopointer) .config>.toggle.onoff,
 #window:not(.nopointer) .pointerdialog .button:not(.unselectable),
-#window:not(.nopointer) .dialog.fullheight .buttons .button:not(.selectedx):not(.glow):not(.forbidden),
+#window:not(.nopointer) .dialog.fullheight .buttons .button:not(.selectedx):not(.glow):not(.glows):not(.forbidden),
 #window:not(.nopointer) #arena.selecting:not(.video) .player .equips>.card.selectable,
 #window:not(.nopointer) #arena.selecting #me .card.selectable,
 #window:not(.nopointer) #arena.selecting .button.selectable,
@@ -3432,6 +3530,7 @@ div:not(.handcards)>.card>.info>span,
 .card.selectable>.name2,
 .card.selectable>.info,
 .card.selectable>.range,
+.card.selectable>.gaintag,
 .button.selectable {
 	opacity: 1;
 }
@@ -3445,6 +3544,12 @@ div:not(.handcards)>.card>.info>span,
 }
 .thunder {
 	color: rgba(0,80,255,0.3);
+}
+.kami {
+	color: rgba(90,118,99,0.3);
+}
+.ice {
+	color: rgba(0,153,255,0.3);
 }
 .poison {
 	color: rgba(30, 133, 51,0.4);
@@ -3777,6 +3882,7 @@ span[data-nature='keymm'] {
 .player .identity[data-color="ye"],
 .player .identity[data-color="rYe"],
 .player .identity[data-color="bYe"],
+.player .identity[data-color="jin"],
 div[data-nature='thunder'],
 span[data-nature='thunder'] {
 	text-shadow: rgba(100, 74, 139,1) 0 0 2px,rgba(100, 74, 139,1) 0 0 5px,rgba(100, 74, 139,1) 0 0 10px,
@@ -3791,6 +3897,23 @@ div[data-nature='thundermm'],
 span[data-nature='thundermm'] {
 	text-shadow: rgba(100, 74, 139,1) 0 0 2px,rgba(100, 74, 139,1) 0 0 2px,rgba(100, 74, 139,1) 0 0 2px,
 		rgba(100, 74, 139,1) 0 0 2px,black 0 0 1px;
+}
+
+.player .identity[data-color="kami"],
+div[data-nature='kami'],
+span[data-nature='kami'] {
+	text-shadow: rgba(90, 118, 99,1) 0 0 2px,rgba(90, 118, 99,1) 0 0 5px,rgba(90, 118, 99,1) 0 0 10px,
+		rgba(90, 118, 99,1) 0 0 10px,rgba(90, 118, 99,1) 0 0 20px,rgba(90, 118, 99,1) 0 0 20px,black 0 0 1px;
+}
+div[data-nature='kamim'],
+span[data-nature='kamim'] {
+	text-shadow: rgba(90, 118, 99,1) 0 0 2px,rgba(90, 118, 99,1) 0 0 5px,rgba(90, 118, 99,1) 0 0 5px,
+		rgba(90, 118, 99,1) 0 0 5px,black 0 0 1px;
+}
+div[data-nature='kamimm'],
+span[data-nature='kamimm'] {
+	text-shadow: rgba(90, 118, 99,1) 0 0 2px,rgba(90, 118, 99,1) 0 0 2px,rgba(90, 118, 99,1) 0 0 2px,
+		rgba(90, 118, 99,1) 0 0 2px,black 0 0 1px;
 }
 
 .player .identity[data-color="fan"],
@@ -3879,6 +4002,27 @@ span[data-nature='graymm'] {
 }
 div[data-nature='graymx'],
 span[data-nature='graymx'] {
+	text-shadow: black 0 0 1px,rgba(213, 194, 179,0.2) 0 0 2px,rgba(213, 194, 179,1) 0 0 2px,rgba(213, 194, 179,1) 0 0 5px,
+		rgba(213, 194, 179,1) 0 0 5px,black 0 0 1px;
+}
+
+div[data-nature='ice'],
+span[data-nature='ice'] {
+	text-shadow: rgba(213, 194, 179,1) 0 0 2px,rgba(213, 194, 179,1) 0 0 5px,rgba(213, 194, 179,1) 0 0 10px,
+		rgba(213, 194, 179,1) 0 0 10px,rgba(213, 194, 179,1) 0 0 20px,rgba(213, 194, 179,1) 0 0 20px,black 0 0 1px;
+}
+div[data-nature='icem'],
+span[data-nature='icem'] {
+	text-shadow: rgba(213, 194, 179,1) 0 0 2px,rgba(213, 194, 179,1) 0 0 5px,rgba(213, 194, 179,1) 0 0 5px,
+		rgba(213, 194, 179,1) 0 0 5px,black 0 0 1px;
+}
+div[data-nature='icemm'],
+span[data-nature='icemm'] {
+	text-shadow: rgba(213, 194, 179,1) 0 0 2px,rgba(213, 194, 179,1) 0 0 2px,rgba(213, 194, 179,1) 0 0 2px,
+		rgba(213, 194, 179,1) 0 0 2px,black 0 0 1px;
+}
+div[data-nature='icemx'],
+span[data-nature='icemx'] {
 	text-shadow: black 0 0 1px,rgba(213, 194, 179,0.2) 0 0 2px,rgba(213, 194, 179,1) 0 0 2px,rgba(213, 194, 179,1) 0 0 5px,
 		rgba(213, 194, 179,1) 0 0 5px,black 0 0 1px;
 }
@@ -4047,6 +4191,14 @@ div[data-decoration="bronze"]::after{
 .card.fullskin.thunder>.name {
 	color: #152E63;
 	border: 1px solid #152E63;
+}
+.card.fullskin.kami>.name {
+	color: #1F3C38;
+	border: 1px solid #1F3C38;
+}
+.card.fullskin.ice>.name {
+	color: #3B6273;
+	border: 1px solid #3B6273;
 }
 .card.fullskin.fire>.name {
 	color: #631515;
@@ -4220,9 +4372,15 @@ div[data-decoration="bronze"]::after{
 .greentext {
 	color: rgb(104,221,127);
 }
+.icetext {
+	color: rgb(59, 98, 115);
+}
 .thundertext,
 .controlthundertext {
 	color: rgb(117,186,255);
+}
+.kamitext {
+	color: rgb(90,118,99);
 }
 .whitetext .thundertext {
 	color: white;
@@ -4313,15 +4471,12 @@ div[data-decoration="bronze"]::after{
 	top: 74px;
 	right: 6px;
 }
-.tempname {
-	font-family: 'huangcao','xinwei';
-	font-size: 20px;
-	color: white !important;
-	pointer-events: none;
-}
 .card .tempname {
 	top: 6px;
 	left: 6px;
+	font-size: 22px;
+	color: white !important;
+	pointer-events: none;
 }
 /*.card.equip1 .wunature,
 .card.equip3 .wunature,
@@ -4409,6 +4564,11 @@ div[data-decoration="bronze"]::after{
 #me>div:not(.scrollh)>.handcards>.card.selected{
 	top:-20px;
 }*/
+
+#me .card.glows {
+	opacity: 1;
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px,rgb(255, 153, 51) 0 0 5px, rgba(255, 153, 51,1) 0 0 10px;
+}
 .glow:not(.button):not(.card){
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 133, 255, 0.4) 0 0 5px, rgba(0, 133, 255, 0.5) 0 0 12px, rgba(0, 133, 255, 0.8) 0 0 15px !important;
 }

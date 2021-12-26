@@ -714,6 +714,10 @@ window.noname_character_rank={
 		'zhouyi',
 		'yangzhi',
 		'wanniangongzhu',
+		'sunyi',
+		'sp_gaolan',
+		'simafu',
+		'mayuanyi',
 	],
 	b:[
 		'diy_feishi',
@@ -916,6 +920,9 @@ window.noname_character_rank={
 		're_kanze',
 		'tongyuan',
 		'zhangning',
+		'sp_huaman',
+		'sp_wangshuang',
+		'yanpu',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1775,6 +1782,9 @@ window.noname_character_rank={
 			'wanniangongzhu',
 			're_xunchen',
 			'tongyuan',
+			'simafu',
+			'mayuanyi',
+			'sp_huaman',
 		],
 		junk:[
 			'sunshao',

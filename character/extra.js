@@ -307,6 +307,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.loseMaxHp();
 				},
 				locked:false,
+				global:'yingba_mark',
 				mod:{
 					cardUsableTarget:function(card,player,target){
 						if(target.hasMark('yingba_mark')) return true;
@@ -330,6 +331,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							name:'平定',
 							content:'mark',
 							onunmark:true,
+						},
+						mod:{
+							maxHandcard:function(player,numx){
+								var num=player.countMark('yingba_mark');
+								if(num) return numx+num*game.countPlayer(function(current){
+									return current.hasSkill('yingba');
+								});
+							},
 						},
 					},
 				},
@@ -400,14 +409,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageBegin2'},
 				direct:true,
 				filter:function(event,player){
-					return event.source&&event.source!=player&&event.num<player.countCards('h');
+					return event.source&&event.source!=player&&player.maxHp>1&&player.countCards('h')>0;
 				},
 				content:function(){
 					'step 0'
 					player.chooseCardTarget({
 						prompt:get.prompt('pinghe'),
-						prompt2:'将'+get.cnNumber(trigger.num)+'张手牌交给一名其他角色并防止伤害'+(player.hasSkill('yingba')?'，然后令伤害来源获得等量“平定”标记':''),
-						selectCard:trigger.num,
+						prompt2:'将一张手牌交给一名其他角色并防止伤害'+(player.hasSkill('yingba')?'，然后令伤害来源获得一个“平定”标记':''),
 						filterCard:true,
 						filterTarget:lib.filter.notMe,
 						ai1:function(card){
@@ -428,9 +436,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('pinghe',target);
 						target.gain(result.cards,player,'giveAuto');
 						trigger.cancel();
-						player.loseMaxHp(trigger.num);
+						player.loseMaxHp();
 						if(player.hasSkill('yingba')){
-							trigger.source.addMark('yingba_mark',trigger.num);
+							trigger.source.addMark('yingba_mark',1);
 						}
 					}
 				},
@@ -750,8 +758,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.draw();
-					player.addTempSkill('shenzhu_less');
-					player.addMark('shenzhu_less',1,false);
+					//player.addTempSkill('shenzhu_less');
+					//player.addMark('shenzhu_less',1,false);
 				},
 				subSkill:{
 					less:{
@@ -4835,7 +4843,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tspowei:'破围',
 			tspowei_info:'使命技。①当你因使用【杀】而对有“围”的角色造成伤害时，你防止此伤害并移去该角色的“围”。②使命：当你使用【杀】结算完成后，若场上没有“围”，则你获得技能〖神著〗。③失败：当你进入濒死状态时，你将体力值回复至1点，然后弃置装备区的所有牌。',
 			shenzhu:'神著',
-			shenzhu_info:'你使用【杀】无次数限制。当你使用有对应实体牌的非转化【杀】结算结束后，你摸一张牌，且本回合的手牌上限-1。',
+			shenzhu_info:'你使用【杀】无次数限制。当你使用有对应实体牌的非转化【杀】结算结束后，你摸一张牌。',
 			dangmo:'荡魔',
 			dangmo_info:'当你于出牌阶段内使用第一张【杀】选择目标后，你可以为此牌增加至多Y-1个目标（Y为你的体力值）。',
 			reshuishi:'慧识',
@@ -4853,11 +4861,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dinghan_info:'①当你成为未记录过的锦囊牌的目标时，你记录此牌名并取消之。②准备阶段，你可在〖定汉①〗的记录中添加或减少一种锦囊牌的牌名。',
 			shen_sunce:'神孙策',
 			yingba:'英霸',
-			yingba_info:'①出牌阶段限一次，你可令一名体力上限大于1的其他角色减少1点体力上限并获得“平定”标记，然后你减少1点体力上限。②你对拥有“平定”标记的角色使用牌没有次数限制。',
+			yingba_info:'①出牌阶段限一次，你可令一名体力上限大于1的其他角色减少1点体力上限并获得“平定”标记，然后你减少1点体力上限。②你对拥有“平定”标记的角色使用牌没有次数限制。③拥有“平定”标记的角色的手牌上限+X（X为其“平定”数）。',
 			scfuhai:'覆海',
 			scfuhai_info:'锁定技。①当你使用牌指定目标后，若目标角色有“平定”标记，则其不可响应此牌。②当你使用牌结算结束后，你移除所有目标角色的“平定”标记并增加等量的体力上限。③拥有“平定”标记的角色死亡时，你增加X点体力上限并摸X张牌。（X为其拥有的“平定”标记数）。',
 			pinghe:'冯河',
-			pinghe_info:'①你的手牌上限基数等于你已损失的体力值。②当你受到其他角色造成的伤害时，若你的手牌数大于X，则你可以防止此伤害，减少X点体力值上限并将X张手牌交给一名其他角色（X为伤害值）。然后若你拥有〖英霸〗，则伤害来源获得X个“平定”标记。',
+			pinghe_info:'①你的手牌上限基数等于你已损失的体力值。②当你受到其他角色造成的伤害时，若你有牌且你的体力上限大于1，则你可以防止此伤害，减少一点体力上限并将一张手牌交给一名其他角色。然后若你拥有〖英霸〗，则伤害来源获得一个“平定”标记。',
 			
 			key_kagari:'篝',
 			kagari_zongsi:'纵丝',
@@ -4872,7 +4880,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hina_shenshi_yingbian:'神视',
 			hina_shenshi_info:'神势力技。出牌阶段开始时/结束时，你可摸两张牌，然后将其中一张牌置于牌堆顶。你以此法获得的牌视为拥有全部应变效果，且可以无条件发动。',
 			hina_xingzhi:'幸凪',
-			hina_xingzhi_info:'键势力技。每回合限一次，你可以通过“助战”触发一张牌的全部助战效果，且响应助战的角色摸两张牌。',
+			hina_xingzhi_info:'键势力技。每回合限一次，你可以通过“助战”触发一张牌的全部应变效果，且响应助战的角色摸两张牌。',
 			
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',

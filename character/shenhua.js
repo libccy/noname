@@ -2309,7 +2309,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				preHidden:true,
 				check:function(event,player){
-					return get.attitude(player,event.player)<=0;
+					return get.attitude(player,target.player)<=0;
 				},
 				logTarget:'target',
 				content:function(){

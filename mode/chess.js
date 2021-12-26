@@ -517,11 +517,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					return grids;
 				},
-				chooseToMove:function(num,prompt){
-					var next=game.createEvent('chooseToMove');
+				chooseToMoveChess:function(num,prompt){
+					var next=game.createEvent('chooseToMoveChess');
 					next.num=num||1;
 					next.player=this;
-					next.setContent('chooseToMove');
+					next.setContent('chooseToMoveChess');
 					next.prompt=prompt;
 					return next;
 				},
@@ -1243,7 +1243,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.modeSwapPlayer(player);
 					}
 				},
-				chooseToMove:function(){
+				chooseToMoveChess:function(){
 					"step 0"
 					if(!player.movable(0,1)&&!player.movable(0,-1)&&
 						!player.movable(1,0)&&!player.movable(-1,0)){
@@ -5102,7 +5102,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					player.chooseToMove(2,get.prompt('pianyi'));
+					player.chooseToMoveChess(2,get.prompt('pianyi'));
 					"step 1"
 					if(result.bool){
 						player.logSkill('pianyi');
@@ -5119,7 +5119,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					player.chooseToMove(player.getHistory('useCard',function(evt){
+					player.chooseToMoveChess(player.getHistory('useCard',function(evt){
 						return evt.card.name=='sha';
 					}).length,get.prompt('lingdong'));
 					"step 1"
@@ -5308,7 +5308,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					var move=2;
 					move=game.checkMod(player,move,'chessMove',player);
-					player.chooseToMove(move).phasing=true;
+					player.chooseToMoveChess(move).phasing=true;
 					"step 1"
 					if(ui.confirm){
 						ui.confirm.classList.add('removing');

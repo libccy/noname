@@ -722,25 +722,30 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return !lib.filter.cardDiscardable(card,player,'gzduannian');
 					},'h');
 				},
-				check:function(card){
+				check:function(event,player){
 					return player.countCards('h',function(card){
 						return get.value(card)>=6;
 					})<=Math.max(1,player.countCards('h')/2);
 				},
 				content:function(){
+					'step 0'
 					var cards=player.getCards('h',function(card){
 						return lib.filter.cardDiscardable(card,player,'gzduannian');
 					});
 					if(cards.length){
 						player.discard(cards);
-						player.draw(cards.length);
 					}
+					else event.finish();
+					'step 1'
+					player.drawTo(Math.min(5,player.maxHp));
 				},
 			},
 			gzlianyou:{
 				trigger:{player:'die'},
 				direct:true,
 				forceDie:true,
+				skillAnimation:true,
+				animationColor:'fire',
 				content:function(){
 					'step 0'
 					player.chooseTarget(lib.filter.notMe,get.prompt('gzlianyou'),'令一名其他角色获得〖兴火〗').set('forceDie',true).set('ai',function(target){
@@ -757,7 +762,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				derivation:'gzxinghuo',
 			},
 			gzxinghuo:{
-				trigger:{player:'damageBegin1'},
+				trigger:{source:'damageBegin1'},
 				forced:true,
 				filter:function(event){
 					return event.nature=='fire';
