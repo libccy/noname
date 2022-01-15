@@ -81,7 +81,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liubei:['guanyu','zhangfei','ganfuren'],
 			zhaoyun:['liushan'],
 			daqiao:['xiaoqiao'],
-			zhouyu:['huanggai','xiaoqiao'],
+			zhouyu:['huanggai','xiaoqiao','zhouyi'],
 			sunquan:['zhoutai'],
 			lvbu:['diaochan'],
 			machao:['madai','mayunlu'],

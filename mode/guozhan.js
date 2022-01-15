@@ -773,6 +773,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			//南华老仙
 			gzgongxiu:{
+				audio:'gongxiu',
 				trigger:{player:'phaseDrawBegin2'},
 				preHidden:true,
 				filter:function(event,player){
@@ -780,7 +781,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					trigger.num--;
-					player.addTempSkill('gzgongxiu2','phaseUseAfter');
+					player.addTempSkill('gzgongxiu2','phaseDrawAfter');
 				},
 			},
 			gzgongxiu2:{
@@ -821,6 +822,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			gzjinghe:{
+				audio:'jinghe',
 				enable:'phaseUse',
 				filter:function(event,player){
 					return player.maxHp>0&&player.countCards('h')>0&&!player.hasSkill('gzjinghe_clear');
@@ -1189,7 +1191,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
-					return target.countGainableCards(player,'h')>0;
+					return target!=player&&target.countGainableCards(player,'h')>0;
 				},
 				content:function(){
 					'step 0'
@@ -2113,13 +2115,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				delay:false,
 				filter:function(event,player){
-					return player.countCards('h',{color:'red'})&&player.countCards('h',{color:'black'});
+					return player.countCards('h')>0;
 				},
 				content:function(){
 					'step 0'
 					player.showHandcards();
 					'step 1'
-					player.chooseControl('红色','黑色').set('ai',function(){
+					if(!player.countCards('h',{color:'red'})) event._result={control:'黑色'};
+					else if(!player.countCards('h',{color:'black'})) event._result={control:'红色'};
+					else player.chooseControl('红色','黑色').set('ai',function(){
 						var player=_status.event.player,num=player.maxHp-player.getStorage('gzhuaiyi').length;
 						if(player.countCards('h',{color:'red'})<=num&&
 						player.countCards('h',{color:'black'})>num) return '红色';
@@ -2656,11 +2660,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}).set('sourcex',trigger.player).setHiddenSkill(event.name);
 					player.addTempSkill('gzzhuhai2');
 					next.oncard=function(card,player){
-						if(trigger.player.getHistory('sourceDamage',function(evt){
-							return evt.player.isFriendOf(player);
-						}).length){
-							player.addTempSkill('gzzhuhai2');
-							card.gzzhuhai_tag=true;
+						try{
+							if(trigger.player.getHistory('sourceDamage',function(evt){
+								return evt.player.isFriendOf(player);
+							}).length){
+								player.addTempSkill('gzzhuhai2');
+								card.gzzhuhai_tag=true;
+							}
+						}catch(e){
+							alert('发生了一个导致【诛害】无法正常触发无视防具效果的错误。请关闭十周年UI/手杀UI等扩展以解决');
 						}
 					}
 				},
@@ -3958,6 +3966,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 
 			yigui:{
+				audio:2,
 				hiddenCard:function(player,name){
 					var storage=player.storage.yigui;
 					if(name=='shan'||name=='wuxie'||!storage||!storage.character.length||storage.used.contains(name)||!lib.inpile.contains(name)) return false;
@@ -4107,7 +4116,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							complexCard:true,
 							check:function(){return 1},
 							popname:true,
-							audio:"huashen1",
+							audio:"yigui",
 							viewAs:{
 								name:name,
 								nature:nature,
@@ -4191,7 +4200,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"yigui_init":{
-				audio:"huashen",
+				audio:"yigui",
 				trigger:{
 					player:'showCharacterAfter',
 				},
@@ -4251,7 +4260,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							complexCard:true,
 							check:function(){return 1},
 							popname:true,
-							audio:"huashen1",
+							audio:"yigui",
 							viewAs:{
 								name:'shan',
 								isCard:true,
@@ -4313,7 +4322,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							complexCard:true,
 							check:function(){return 1},
 							popname:true,
-							audio:"huashen1",
+							audio:"yigui",
 							viewAs:{
 								name:'wuxie',
 								isCard:true,
@@ -4345,7 +4354,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player:'damageEnd',
 					global:'dyingAfter',
 				},
-				audio:"xinsheng",
+				audio:2,
 				frequent:true,
 				preHidden:true,
 				filter:function(event,player){

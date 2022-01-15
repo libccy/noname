@@ -2635,12 +2635,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					_status.firstAct=game.falseZhu;
 					game.delay(0,5000);
 					"step 1"
-					event.falseList=['xunyu','xunyou','re_guojia','re_zhangliao','re_xuhuang','yujin_yujin','caohong','jsp_guanyu','liuye','litong','zangba','re_manchong','re_hanhaoshihuan','chengyu','caoren'].filter(function(name){
+					event.falseList=['xunyu','xunyou','re_guojia','re_zhangliao','re_xuhuang','yujin_yujin','caohong','jsp_guanyu','liuye','litong','zangba','re_manchong','re_hanhaoshihuan','chengyu','caoren','zhangxiu','sp_jiaxu'].filter(function(name){
 						if(!Array.isArray(lib.character[name])) return false;
 						lib.character[name][1]='wei';
 						return true;
 					});
-					event.trueList=['xunchen','gaolan','sp_zhanghe','sp_xuyou','chenlin','jsp_liubei','yj_jushou','sp_shenpei','tianfeng','yuantanyuanshang','lvkuanglvxiang','xinpi','re_guotufengji','chunyuqiong'].filter(function(name){
+					event.trueList=['xunchen','gaolan','sp_zhanghe','sp_xuyou','chenlin','jsp_liubei','yj_jushou','sp_shenpei','tianfeng','yuantanyuanshang','lvkuanglvxiang','xinpi','re_guotufengji','chunyuqiong','hanmeng','xinping'].filter(function(name){
 						if(!Array.isArray(lib.character[name])) return false;
 						lib.character[name][1]='qun';
 						return true;
@@ -2657,7 +2657,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var list=[];
 					game.countPlayer(function(current){
 						if(current.identity=='zhong'){
-							var choice=event[current.side+'List'].randomRemove(3);
+							var choice=event[current.side+'List'].randomRemove(4);
 							event.map[current.playerid]=choice;
 							list.push([current,['请选择武将',[choice,'character']],true]);
 						}
@@ -2711,12 +2711,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},evt);
 					game.me.chooseControl('ok').set('prompt','###本局特殊事件：'+get.translation(evt)+'###'+get.translation(evt+'_info'));
 					'step 1'
-					event.falseList=['xunyu','xunyou','re_guojia','re_zhangliao','re_xuhuang','yujin_yujin','caohong','jsp_guanyu','liuye','litong','zangba','re_manchong','re_hanhaoshihuan','chengyu','caoren'].filter(function(name){
+					event.falseList=['xunyu','xunyou','re_guojia','re_zhangliao','re_xuhuang','yujin_yujin','caohong','jsp_guanyu','liuye','litong','zangba','re_manchong','re_hanhaoshihuan','chengyu','caoren','zhangxiu','sp_jiaxu'].filter(function(name){
 						if(!Array.isArray(lib.character[name])) return false;
 						lib.character[name][1]='wei';
 						return true;
 					});
-					event.trueList=['xunchen','gaolan','sp_zhanghe','sp_xuyou','chenlin','jsp_liubei','yj_jushou','sp_shenpei','tianfeng','yuantanyuanshang','lvkuanglvxiang','xinpi','re_guotufengji','chunyuqiong'].filter(function(name){
+					event.trueList=['xunchen','gaolan','sp_zhanghe','sp_xuyou','chenlin','jsp_liubei','yj_jushou','sp_shenpei','tianfeng','yuantanyuanshang','lvkuanglvxiang','xinpi','re_guotufengji','chunyuqiong','hanmeng','xinping'].filter(function(name){
 						if(!Array.isArray(lib.character[name])) return false;
 						lib.character[name][1]='qun';
 						return true;
@@ -2724,7 +2724,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(game.me.identity!='zhu'){
 						event.choose_me=true;
-						game.me.chooseButton(['请选择你的武将牌',[event[game.me.side+'List'].randomRemove(3),'character']],true);
+						game.me.chooseButton(['请选择你的武将牌',[event[game.me.side+'List'].randomRemove(4),'character']],true);
 					}
 					'step 3'
 					if(event.choose_me) game.me.init(result.links[0]);

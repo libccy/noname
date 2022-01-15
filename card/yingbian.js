@@ -690,6 +690,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard2'},
 				forced:true,
 				popup:false,
+				charlotte:true,
 				filter:function(event,player){
 					if(event.yingbian_removeTarget&&event.targets&&event.targets.length>1) return true;
 					if(!event.yingbian_addTarget) return false;

@@ -567,7 +567,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return evt.name=='equan_lose'&&evt.player==player;
 						},
 						content:function(){
-							trigger.player.addTempSkill('fengyin');
+							trigger.player.addTempSkill('baiban');
 						},
 					},
 				},
@@ -577,7 +577,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'loseHpAfter'},
 				forced:true,
 				filter:function(event,player){
-					return player.hp>=event.player.hp||player.isDamaged();
+					return player!=event.player&&player.hp>=event.player.hp||player.isDamaged();
 				},
 				logTarget:'player',
 				content:function(){
@@ -613,7 +613,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					list[0].draw(2);
 					'step 2'
 					var list=event.list;
-					if(list[1].isIn()&&list[0].isIn()&&list[1].canUse('sha',list[0],false)) list[1].useCard({name:'sha',isCard:true},list[0],false);
+					if(list[1].isIn()&&list[0].isIn()&&list[1].canUse('sha',list[0],false)) list[1].useCard({name:'sha',isCard:true},list[0],false,'noai');
 				},
 				ai:{
 					order:5,
@@ -1709,7 +1709,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dingfa_info:'弃牌阶段结束时，若本回合你失去的牌数不小于你的体力值，你可以选择一项：1、回复1点体力；2、对一名其他角色造成1点伤害。 ',
 			duosidawang:'朵思大王',
 			equan:'恶泉',
-			equan_info:'锁定技。①当有角色于你的回合内受到伤害后，其获得X枚“毒”（X为伤害值）。②准备阶段，你令所有拥有“毒”标记的角色移去所有“毒”标记并失去等量的体力。③当有角色因〖恶泉②〗进入濒死状态时，你令其所有非锁定技失效直到回合结束。',
+			equan_info:'锁定技。①当有角色于你的回合内受到伤害后，其获得X枚“毒”（X为伤害值）。②准备阶段，你令所有拥有“毒”标记的角色移去所有“毒”标记并失去等量的体力。③当有角色因〖恶泉②〗进入濒死状态时，你令其所有技能失效直到回合结束。',
 			manji:'蛮汲',
 			manji_info:'锁定技。其他角色失去体力后，若你的体力值：不大于该角色，你回复1点体力；不小于该角色，你摸一张牌。',
 			wuban:'吴班',

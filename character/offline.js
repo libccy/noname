@@ -8,11 +8,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				offline_star:["sp_xiahoushi","jsp_zhaoyun","huangjinleishi","sp_pangtong","sp_daqiao","sp_ganning","sp_xiahoudun","sp_lvmeng","sp_zhangfei","sp_liubei"],
 				offline_sticker:['sp_gongsunzan','sp_simazhao','sp_wangyuanji','sp_xinxianying','sp_liuxie'],
 				offline_luanwu:["ns_lijue","ns_zhangji","ns_fanchou"],
-				offline_yongjian:["ns_chendao","yj_caoang"],
+				offline_yongjian:["ns_chendao","yj_caoang","yj_caocao"],
 				offline_others:["ns_jiaxu","ns_caoanmin","jsp_liubei","longyufei"],
 			},
 		},
 		character:{
+			yj_caocao:['male','qun',4,['yjxiandao','yjsancai','yjyibing']],
 			longyufei:['female','shu',3,['longyi','zhenjue']],
 			sp_liubei:['male','shu',4,['zhaolie','shichou'],['zhu']],
 			sp_zhangfei:['male','shu',4,['jie','dahe']],
@@ -63,6 +64,107 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//群曹操
+			yjxiandao:{
+				trigger:{player:'_yongjian_zengyuEnd'},
+				usable:1,
+				forced:true,
+				locked:false,
+				filter:function(event,player){
+					return !event._zengyu_denied&&event.target.isIn();
+				},
+				logTarget:'target',
+				content:function(){
+					'step 0'
+					event.target=trigger.target;
+					event.card=trigger.cards[0];
+					event.target.markAuto('yjxiandao',[get.suit(event.card,false)])
+					event.target.addTempSkill('yjxiandao_block');
+					'step 1'
+					var type=get.type(card,false);
+					if(type=='trick') player.draw(2);
+					if(type=='equip'){
+						if(target.countGainableCards(player,'he',function(cardx){
+							return cardx!=card;
+						})>0) player.gainPlayerCard(target,'he',true).set('card',card).set('filterButton',function(button){
+							return button.link!=_status.event.card;
+						});
+						if(get.subtype(card,false)=='equip1') target.damage();
+					}
+				},
+				subSkill:{
+					block:{
+						charlotte:true,
+						onremove:true,
+						mod:{
+							cardEnabled:function(card,player){
+								if(player.getStorage('yjxiandao_block').contains(get.suit(card))) return false;
+							},
+							cardRespondable:function(card,player){
+								if(player.getStorage('yjxiandao_block').contains(get.suit(card))) return false;
+							},
+							cardSavable:function(card,player){
+								if(player.getStorage('yjxiandao_block').contains(get.suit(card))) return false;
+							},
+						},
+						mark:true,
+						intro:{content:'不能使用或打出$牌'},
+					},
+				},
+			},
+			yjsancai:{
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.countCards('h')>0;
+				},
+				content:function(){
+					'step 0'
+					player.showHandcards();
+					var hs=player.getCards('h');
+					if(hs.length>1){
+						var type=get.type2(hs[0],player);
+						for(var i=1;i<hs.length;i++){
+							if(get.type(hs[i])!=type){
+								event.finish();
+								return;
+							}
+						}
+					}
+					'step 1'
+					player.chooseCardTarget({
+						prompt:'是否赠予一张手牌？',
+						filterCard:true,
+						filterTarget:lib.filter.notMe,
+					});
+					'step 2'
+					if(result.bool){
+						player.line(result.targets[0],'green');
+						var next=game.createEvent('_yongjian_zengyu');
+						next.player=player;
+						next.target=result.targets[0];
+						next.cards=result.cards;
+						next.setContent(lib.skill._yongjian_zengyu.content);
+					}
+				},
+			},
+			yjyibing:{
+				trigger:{player:'gainAfter'},
+				direct:true,
+				filter:function(event,player){
+					if(event.getParent().name=='_yongjian_zengyu') return false;
+					var evt=event.getParent('phaseDraw'),hs=player.getCards('h');
+					return (!evt||evt.player!=player)&&event.cards.filter(function(card){
+						return hs.contains(card)&&game.checkMod(card,player,'unchanged','cardEnabled2',player)!==false;
+					}).length==event.cards.length&&player.hasUseTarget({
+						name:'sha',
+						cards:event.cards,
+					},false);
+				},
+				content:function(){
+					player.chooseUseTarget(get.prompt('yjyibing'),'将'+get.translation(trigger.cards)+'当做【杀】使用','sha',trigger.cards,false,'nodistance').logSkill='yjyibing';
+				},
+			},
 			//龙羽飞
 			longyi:{
 				enable:['chooseToUse','chooseToRespond'],
@@ -111,6 +213,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							position:'h',
 						}
 					},
+					prompt:function(links,player){
+						return '将所有手牌当做'+(get.translation(links[0][3])||'')+get.translation(links[0][2])+'使用或打出';
+					}
 				},
 				hiddenCard:function(player,name){
 					return name!='du'&&get.type(name)=='basic'&&player.countCards('h')>0;
@@ -149,7 +254,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(event.skill!='longyi_backup') return false;
 							for(var i of event.cards){
 								var type=get.type2(i,player);
-								if(type=='basic'||type=='trick') return true;
+								if(type=='equip'||type=='trick') return true;
 							}
 							return false;
 						},
@@ -2573,6 +2678,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			longyi_info:'你可将所有手牌当做任意基本牌使用或打出。若此牌对应的实体牌中：有锦囊牌，你摸一张牌；有装备牌，此牌不可被响应。',
 			zhenjue:'阵绝',
 			zhenjue_info:'一名角色的结束阶段开始时，若你没有手牌，则你可以令其选择一项：①弃置一张牌。②令你摸一张牌。',
+			yj_caocao:'SP曹操',
+			yjxiandao:'献刀',
+			yjxiandao_info:'每回合限一次。当你对其他角色发动〖赠予〗后，你令其不能使用或打出与本次赠予移动的牌A花色相同的牌直到回合结束。然后若牌A：为锦囊牌，你摸两张牌。为装备牌，你获得其一张不为A的牌。为武器牌，你对其造成1点伤害。',
+			yjsancai:'散财',
+			yjsancai_info:'出牌阶段限一次，你可以展示所有手牌。若这些牌的类别均相同，则你可以发动一次〖赠予〗（可以选择任意手牌）。',
+			yjyibing:'义兵',
+			yjyibing_info:'当你不因〖赠予〗而于摸牌阶段外获得牌时，你可以将此次获得的所有牌当做【杀】使用（无距离限制且不计入使用次数）。',
 			
 			offline_star:'桌游志·SP',
 			offline_sticker:'桌游志·贴纸',

@@ -36,7 +36,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_lingtong:['male','wu',4,['decadexuanfeng','yongjin']],
 			xin_liubiao:['male','qun',3,['decadezishou','decadezongshi']],
 			re_caoxiu:['male','wei',4,['qianju','reqingxi']],
-			re_sunxiu:['male','wu',3,['reyanzhu','rexingxue','zhaofu'],['zhu']],
+			re_sunxiu:['male','wu',3,['reyanzhu','rexingxue','xinzhaofu'],['zhu']],
 			ol_dengai:['male','wei',4,['oltuntian','olzaoxian']],
 			re_gongsunzan:['male','qun',4,['reqiaomeng','reyicong']],
 			re_manchong:['male','wei',3,['rejunxing','yuce']],
@@ -86,7 +86,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_huanggai:['male','wu',4,['rekurou','zhaxiang']],
 			re_lvbu:['male','qun',5,['wushuang','new_liyu']],
 			re_huatuo:['male','qun',3,['jijiu','new_reqingnang']],
-			re_liubei:['male','shu',4,['rerende','jijiang'],['zhu']],
+			re_liubei:['male','shu',4,['rerende','rejijiang'],['zhu']],
 			re_diaochan:['female','qun',3,['lijian','rebiyue']],
 			re_huangyueying:['female','shu',3,['rejizhi','reqicai']],
 			re_sunquan:['male','wu',4,['rezhiheng','rejiuyuan'],['zhu']],
@@ -95,7 +95,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhugeliang:['male','shu',3,['reguanxing','kongcheng']],
 			re_huaxiong:["male","qun",6,["reyaowu"]],
 			
-			re_zhangjiao:['male','qun',3,['xinleiji','xinguidao','huangtian'],['zhu']],
+			re_zhangjiao:['male','qun',3,['xinleiji','xinguidao','xinhuangtian'],['zhu']],
 			xin_yuji:['male','qun',3,['reguhuo']],
 			re_zuoci:['male','qun',3,['rehuashen','rexinsheng']],
 			
@@ -139,6 +139,172 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_xushu:['zhaoyun','sp_zhugeliang'],
 		},
 		skill:{
+			//新主公技
+			xinhuangtian:{
+				unique:true,
+				audio:'xinhuangtian2',
+				audioname:['zhangjiao','re_zhangjiao'],
+				global:'xinhuangtian2',
+				zhuSkill:true,
+			},
+			xinhuangtian2:{
+				audio:2,
+				enable:'phaseUse',
+				discard:false,
+				lose:false,
+				delay:false,
+				line:true,
+				direct:true,
+				clearTime:true,
+				prepare:function(cards,player,targets){
+					targets[0].logSkill('xinhuangtian');
+				},
+				prompt:function(){
+					var player=_status.event.player;
+					var list=game.filterPlayer(function(target){
+						return target!=player&&target.hasZhuSkill('xinhuangtian',player);
+					});
+					var str='将一张【闪】或【闪电】交给'+get.translation(list);
+					if(list.length>1) str+='中的一人';
+					return str;
+				},
+				filter:function(event,player){
+					if(player.group!='qun') return false;
+					if(!game.hasPlayer(function(target){
+						return target!=player&&target.hasZhuSkill('xinhuangtian',player)&&!target.hasSkill('xinhuangtian3');
+					})) return false;
+					return player.hasCard(function(card){
+						return lib.skill.xinhuangtian2.filterCard(card,player);
+					},'h');
+				},
+				filterCard:function(card,player){
+					return get.name(card,player)=='shan'||get.suit(card,player)=='spade';
+				},
+				log:false,
+				visible:true,
+				filterTarget:function(card,player,target){
+					return target!=player&&target.hasZhuSkill('xinhuangtian',player)&&!target.hasSkill('xinhuangtian3');
+				},
+				//usable:1,
+				//forceaudio:true,
+				content:function(){
+					target.gain(cards,player,'giveAuto');
+					target.addTempSkill('xinhuangtian3','phaseUseEnd');
+				},
+				ai:{
+					expose:0.3,
+					order:10,
+					result:{
+						target:5
+					}
+				}
+			},
+			xinhuangtian3:{},
+			rejijiang:{
+				audio:'jijiang1',
+				audioname:['liushan','re_liubei','re_liushan','ol_liushan'],
+				unique:true,
+				group:['rejijiang1','rejijiang3'],
+				zhuSkill:true,
+				filter:function(event,player){
+					if(!player.hasZhuSkill('rejijiang')||!game.hasPlayer(function(current){
+						return current!=player&&current.group=='shu';
+					})) return false;
+					return !event.jijiang&&(event.type!='phase'||!player.hasSkill('jijiang3'));
+				},
+				enable:['chooseToUse','chooseToRespond'],
+				viewAs:{name:'sha'},
+				filterCard:function(){return false},
+				selectCard:-1,
+				ai:{
+					order:function(){
+						return get.order({name:'sha'})+0.3;
+					},
+					respondSha:true,
+					skillTagFilter:function(player){
+						if(!player.hasZhuSkill('rejijiang')||!game.hasPlayer(function(current){
+							return current!=player&&current.group=='shu';
+						})) return false;
+					},
+				},
+			},
+			rejijiang1:{
+				audio:'jijiang1',
+				audioname:['liushan','re_liubei','re_liushan','ol_liushan'],
+				trigger:{player:['useCardBegin','respondBegin']},
+				logTarget:'targets',
+				filter:function(event,player){
+					return event.skill=='rejijiang';
+				},
+				forced:true,
+				content:function(){
+					"step 0"
+					delete trigger.skill;
+					trigger.getParent().set('jijiang',true);
+					"step 1"
+					if(event.current==undefined) event.current=player.next;
+					if(event.current==player){
+						player.addTempSkill('jijiang3');
+						event.finish();
+						trigger.cancel();
+						trigger.getParent().goto(0);
+					}
+					else if(event.current.group=='shu'){
+						var next=event.current.chooseToRespond('是否替'+get.translation(player)+'打出一张杀？',{name:'sha'});
+						next.set('ai',function(){
+							var event=_status.event;
+							return (get.attitude(event.player,event.source)-2);
+						});
+						next.set('source',player);
+						next.set('jijiang',true);
+						next.set('skillwarn','替'+get.translation(player)+'打出一张杀');
+						next.noOrdering=true;
+						next.autochoose=lib.filter.autoRespondSha;
+					}
+					else{
+						event.current=event.current.next;
+						event.redo();
+					}
+					"step 2"
+					if(result.bool){
+						event.finish();
+						trigger.card=result.card;
+						trigger.cards=result.cards;
+						trigger.throw=false;
+						if(typeof event.current.ai.shown=='number'&&event.current.ai.shown<0.95){
+							event.current.ai.shown+=0.3;
+							if(event.current.ai.shown>0.95) event.current.ai.shown=0.95;
+						}
+					}
+					else{
+						event.current=event.current.next;
+						event.goto(1);
+					}
+				}
+			},
+			rejijiang3:{
+				trigger:{global:['useCard','respond']},
+				usable:1,
+				direct:true,
+				filter:function(event,player){
+					return event.card.name=='sha'&&event.player!=player&&event.player.group=='shu'&&event.player.isIn()&&
+						event.player!=_status.currentPhase&&player.hasZhuSkill('rejijiang');
+				},
+				content:function(){
+					'step 0'
+					trigger.player.chooseBool('激将：是否令'+get.translation(player)+'摸一张牌？').set('ai',function(){
+						var evt=_status.event;
+						return get.attitude(evt.player,evt.getParent().player)>0;
+					});
+					'step 1'
+					if(result.bool){
+						player.logSkill('rejijiang');
+						trigger.player.line(player,'fire');
+						player.draw();
+					}
+					else player.storage.counttrigger.rejijiang3--;
+				},
+			},
 			//鲁肃
 			olhaoshi:{
 				trigger:{player:'phaseDrawBegin2'},
@@ -3742,6 +3908,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				locked:false,
 				audio:'longdan_sha',
 				audioname:['re_zhaoyun'],
+				audioname2:{tongyuan:'longdan_tongyuan'},
 				hiddenCard:function(player,name){
 					if(name=='tao') return player.countCards('hs','jiu')>0;
 					if(name=='jiu') return player.countCards('hs','tao')>0;
@@ -5214,7 +5381,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				juexingji:true,
 				zhuSkill:true,
 				keepSkill:true,
-				derivation:['jijiang','sishu'],
+				derivation:['rejijiang','sishu'],
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				filter:function(event,player){
@@ -5231,13 +5398,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.log(player,'获得了技能','#g【思蜀】','和','#g【激将】');
 					player.addSkill('sishu');
 					if(player.hasSkill('olruoyu')){
-						player.addSkill('jijiang');
+						player.addSkill('rejijiang');
 					}
 					else{
-						player.addAdditionalSkill('olruoyu','jijiang');
+						player.addAdditionalSkill('olruoyu','rejijiang');
 					}
 					if(!player.isZhu){
-						player.storage.zhuSkill_olruoyu=['jijiang'];
+						player.storage.zhuSkill_olruoyu=['rejijiang'];
 					}
 					else{
 						event.trigger('zhuUpdate');
@@ -5366,7 +5533,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=game.countPlayer(function(current){
 						return	current.group=='qun';
 					})
-					if(num) player.addMark('olxueyi',num)
+					if(num) player.addMark('olxueyi',num*2);
 				},
 				marktext:'裔',
 				intro:{
@@ -5375,17 +5542,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					maxHandcard:function(player,num){
-						if(player.hasZhuSkill('olxueyi')) return num+2*player.countMark('olxueyi');
+						if(player.hasZhuSkill('olxueyi')) return num+player.countMark('olxueyi');
 					},
 				},
 				group:'olxueyi_draw',
 			},
 			olxueyi_draw:{
 				audio:'olxueyi',
-				trigger:{player:'phaseBegin'},
+				trigger:{player:'phaseUseBegin'},
 				prompt2:'弃置一枚「裔」标记，然后摸一张牌',
 				check:function(event,player){
-					return !player.hasJudge('lebu')&&player.getUseValue('wanjian')>0;
+					return player.getUseValue('wanjian')>0||!player.needsToDiscard();
 				},
 				filter:function(event,player){
 					return player.hasZhuSkill('olxueyi')&&player.hasMark('olxueyi');
@@ -7596,40 +7763,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			rejiuyuan:{
-				global:'rejiuyuan2',
 				audio:2,
 				zhuSkill:true,
-			},
-			rejiuyuan2:{
-				audio:'jiuyuan',
-				forceaudio:true,
-				trigger:{player:'useCardToPlayer'},
-				filter:function(event,player){
-					if(event.card.name!='tao') return false;
-					if(player.group!='wu') return false;
-					if(event.target!=player) return false;
-					return game.hasPlayer(function(target){
-						return player!=target&&!event.targets.contains(target)&&target.isDamaged()&&target.hp<player.hp&&target.hasZhuSkill('rejiuyuan',player);
-					});
-				},
+				trigger:{global:'recoverBefore'},
 				direct:true,
+				filter:function(event,player){
+					return player!=event.player&&event.player.group=='wu'&&player.hp<=event.player.hp&&
+						event.getParent().name!='rejiuyuan'&&player.hasZhuSkill('rejiuyuan',event.player)
+				},
 				content:function(){
 					'step 0'
-					player.chooseTarget(get.prompt2('rejiuyuan'),function(card,player,target){
-						return player!=target&&!_status.event.targets.contains(target)&&target.isDamaged()&&target.hp<player.hp&&target.hasZhuSkill('rejiuyuan',player);
-					}).set('ai',function(target){
-						return get.attitude(_status.event.player,target);
-					}).set('targets',trigger.targets);
+					trigger.player.chooseBool('是否对'+get.translation(player)+'发动【救援】？','改为令其回复1点体力，然后你摸一张牌').set('ai',function(){
+						var evt=_status.event;
+						return get.attitude(evt.player,evt.getParent().player)>0;
+					});
 					'step 1'
 					if(result.bool){
-						var target=result.targets[0];
-						target.logSkill('rejiuyuan');
-						player.line('rejiuyuan2',target,'green');
-						trigger.getParent().targets.remove(player);
-						trigger.getParent().targets.push(target);
-						player.draw();
+						player.logSkill('rejiuyuan');
+						trigger.player.line(player,'green');
+						trigger.cancel();
+						player.recover();
+						trigger.player.draw();
 					}
-				}
+				},
 			},
 			rezhiheng:{
 				audio:2,
@@ -9918,7 +10074,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olluanji_info:'你可以将两张花色相同的手牌当做【万箭齐发】使用。当你使用【万箭齐发】选择目标后，你可以为此牌减少一个目标。',
 			olluanji_remove:'乱击',
 			olxueyi:'血裔',
-			olxueyi_info:'主公技，锁定技，游戏开始时，你获得X个“裔”标记。回合开始时，你可以移去一个“裔”标记，然后摸一张牌。你每有一个“裔”标记，手牌上限便+2。（X为场上群势力角色的数目）',
+			olxueyi_info:'主公技，锁定技。①游戏开始时，你获得2X个“裔”标记（X为场上群势力角色的数目）。②出牌阶段开始时，你可以移去一个“裔”标记，然后摸一张牌。③你的手牌上限+Y（Y为“裔”标记数）。',
 			olxueyi_draw:'血裔',
 			olhunzi:'魂姿',
 			olhunzi_info:'觉醒技，准备阶段，若你的体力值为1，你减1点体力上限并回复1点体力，然后获得技能〖英姿〗和〖英魂〗。',
@@ -9933,6 +10089,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinleiji_faq:'不能触发〖雷击〗的判定',
 			xinleiji_faq_info:'<br>董卓/界董卓〖暴虐〗<br>黄巾雷使〖助祭〗<br>羊徽瑜〖弘仪〗<br>鸣濑白羽〖孤影〗',
 			xinguidao_info:'一名角色的判定牌生效前，你可以打出一张黑色牌作为判定牌并获得原判定牌。若你以此法打出的牌为黑桃2-9，则你摸一张牌。',
+			xinhuangtian:'黄天',
+			xinhuangtian2:'黄天',
+			xinhuangtian_info:'主公技。其他群势力角色的出牌阶段限一次，该角色可以交给一张【闪】或黑桃手牌。',
 			reqiangxi:"强袭",
 			"reqiangxi_info":"出牌阶段对每名其他角色限一次，你可以选择一项：1. 失去一点体力并对你攻击范围内的一名其他角色造成一点伤害；2. 弃置一张武器牌并对你攻击范围内的一名其他角色造成一点伤害。",
 			rehuoji:"火计",
@@ -9967,7 +10126,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_yajiao":"涯角",
 			"new_yajiao_info":"每当你于回合外使用或打出牌时，你可以亮出牌堆顶的一张牌，并将其交给一名角色。若此牌与你此次使用或打出的牌类别不同，则你弃置一张牌。",
 			"new_liyu":"利驭",
-			"new_liyu_info":"当你使用【杀】对一名其他角色造成伤害后，你可以获得其一张牌。若此牌不为装备牌，则其摸一张牌。若此牌为装备牌，则视为你对其选择的另一名角色使用一张【决斗】。",
+			"new_liyu_info":"当你使用【杀】对一名其他角色造成伤害后，你可以获得其区域内的一张牌。若此牌不为装备牌，则其摸一张牌。若此牌为装备牌，则视为你对其选择的另一名角色使用一张【决斗】。",
 			"new_retuxi":"突袭",
 			"new_retuxi_info":"摸牌阶段摸牌时，你可以少摸任意张牌，然后获得等量的角色的各一张手牌。",
 			"new_retuxi_info_guozhan":"摸牌阶段摸牌时，你可以少摸至多两张牌，然后获得等量的角色的各一张手牌。",
@@ -10377,6 +10536,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olhaoshi_info:'摸牌阶段开始时，你可以多摸两张牌。然后摸牌阶段结束时，若你的手牌数大于5，则你将手牌数的一半（向下取整）交给一名手牌最少其他角色并获得如下效果直到你下回合开始：当你成为【杀】或普通锦囊牌的目标后，其可以交给你一张手 牌。',
 			oldimeng:'缔盟',
 			oldimeng_info:'出牌阶段限一次，你可令两名满足X≤Y的其他角色交换手牌并获得如下效果：出牌阶段结束时，你弃置X张牌（X为这两名角色手牌数之差的绝对值；Y为你的手牌数）。',
+			
+			rejijiang:'激将',
+			rejijiang1:'激将',
+			rejijiang2:'激将',
+			rejijiang_info:'主公技。①当你需要使用或打出【杀】时，你可以令其他蜀势力角色依次选择是否打出一张【杀】。若有角色响应，则你视为使用或打出了此【杀】。②每回合限一次。当有蜀势力角色于回合外使用或打出【杀】时，其可以令你摸一张牌。',
+			
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

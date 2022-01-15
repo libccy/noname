@@ -309,7 +309,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				locked:false,
 				global:'yingba_mark',
 				mod:{
-					cardUsableTarget:function(card,player,target){
+					targetInRange:function(card,player,target){
 						if(target.hasMark('yingba_mark')) return true;
 					},
 				},
@@ -354,7 +354,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					trigger.directHit.add(trigger.target);
 				},
-				group:['scfuhai_die','scfuhai_usea'],
+				group:['scfuhai_die'],
 				ai:{
 					directHit_ai:true,
 					skillTagFilter:function(player,tag,arg){
@@ -405,18 +405,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return player.getDamagedHp();
 					},
 				},
-				locked:false,
 				trigger:{player:'damageBegin2'},
-				direct:true,
+				forced:true,
 				filter:function(event,player){
 					return event.source&&event.source!=player&&player.maxHp>1&&player.countCards('h')>0;
 				},
 				content:function(){
 					'step 0'
 					player.chooseCardTarget({
-						prompt:get.prompt('pinghe'),
+						prompt:'请选择【冯河】的牌和目标',
 						prompt2:'将一张手牌交给一名其他角色并防止伤害'+(player.hasSkill('yingba')?'，然后令伤害来源获得一个“平定”标记':''),
 						filterCard:true,
+						forced:true,
 						filterTarget:lib.filter.notMe,
 						ai1:function(card){
 							if(get.tag(card,'recover')&&!game.hasPlayer(function(current){
@@ -433,7 +433,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
-						player.logSkill('pinghe',target);
+						//player.logSkill('pinghe',target);
+						player.line(target,'green');
 						target.gain(result.cards,player,'giveAuto');
 						trigger.cancel();
 						player.loseMaxHp();
@@ -4861,11 +4862,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dinghan_info:'①当你成为未记录过的锦囊牌的目标时，你记录此牌名并取消之。②准备阶段，你可在〖定汉①〗的记录中添加或减少一种锦囊牌的牌名。',
 			shen_sunce:'神孙策',
 			yingba:'英霸',
-			yingba_info:'①出牌阶段限一次，你可令一名体力上限大于1的其他角色减少1点体力上限并获得“平定”标记，然后你减少1点体力上限。②你对拥有“平定”标记的角色使用牌没有次数限制。③拥有“平定”标记的角色的手牌上限+X（X为其“平定”数）。',
+			yingba_info:'①出牌阶段限一次，你可令一名体力上限大于1的其他角色减少1点体力上限并获得“平定”标记，然后你减少1点体力上限。②你对拥有“平定”标记的角色使用牌没有距离限制。③拥有“平定”标记的角色的手牌上限+X（X为其“平定”数）。',
 			scfuhai:'覆海',
-			scfuhai_info:'锁定技。①当你使用牌指定目标后，若目标角色有“平定”标记，则其不可响应此牌。②当你使用牌结算结束后，你移除所有目标角色的“平定”标记并增加等量的体力上限。③拥有“平定”标记的角色死亡时，你增加X点体力上限并摸X张牌。（X为其拥有的“平定”标记数）。',
+			scfuhai_info:'锁定技。①当你使用牌指定目标后，若目标角色有“平定”标记，则其不可响应此牌。②拥有“平定”标记的角色死亡时，你增加X点体力上限并摸X张牌。（X为其拥有的“平定”标记数）。',
 			pinghe:'冯河',
-			pinghe_info:'①你的手牌上限基数等于你已损失的体力值。②当你受到其他角色造成的伤害时，若你有牌且你的体力上限大于1，则你可以防止此伤害，减少一点体力上限并将一张手牌交给一名其他角色。然后若你拥有〖英霸〗，则伤害来源获得一个“平定”标记。',
+			pinghe_info:'锁定技。①你的手牌上限基数等于你已损失的体力值。②当你受到其他角色造成的伤害时，若你有牌且你的体力上限大于1，则你防止此伤害，减一点体力上限并将一张手牌交给一名其他角色。然后若你拥有〖英霸〗，则伤害来源获得一个“平定”标记。',
 			
 			key_kagari:'篝',
 			kagari_zongsi:'纵丝',

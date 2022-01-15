@@ -66,7 +66,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhongyao:['male','wei',3,['huomo','zuoding']],
 			liuchen:['male','shu',4,['zhanjue','qinwang'],['zhu']],
 			zhangyi:['male','shu',4,['wurong','shizhi']],
-			sunxiu:['male','wu',3,['yanzhu','xingxue','zhaofu'],['zhu']],
+			sunxiu:['male','wu',3,['yanzhu','xingxue','xinzhaofu'],['zhu']],
 			zhuzhi:['male','wu',4,['xinanguo']],
 			quancong:['male','wu',4,['yaoming']],
 			gongsunyuan:['male','qun',4,['huaiyi']],
@@ -194,6 +194,43 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhonghui:['jiangwei'],
 		},
 		skill:{
+			//孙体
+			xinzhaofu:{
+				audio:'zhaofu',
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.hasZhuSkill('xinzhaofu');
+				},
+				limited:true,
+				skillAnimation:true,
+				animationColor:'wood',
+				selectTarget:[1,2],
+				filterTarget:lib.filter.notMe,
+				contentBefore:function(){
+					player.awakenSkill('xinzhaofu');
+				},
+				content:function(){
+					target.addSkill('xinzhaofu_effect');
+					target.markAuto('xinzhaofu_effect',[player]);
+				},
+				subSkill:{
+					effect:{
+						charlotte:true,
+						mark:true,
+						intro:{content:'已视为在其他吴势力角色的攻击范围内'},
+						mod:{
+							inRangeOf:function(from,to){
+								if(from.group!='wu') return;
+								var list=to.getStorage('xinzhaofu_effect');
+								for(var i of list){
+									if(i!=from) return true;
+								}
+							},
+						},
+					},
+				},
+			},
 			xinkuangbi:{
 				audio:'kuangbi',
 				enable:'phaseUse',
@@ -1445,7 +1482,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					player.showCards(cards);
 					'step 1'
-					player.choosePlayerCard(target,'h',[1,player.hasSkill('xincaishi_1')?4:3],'请选择要展示的牌').ai=function(){return Math.random()};
+					player.choosePlayerCard(target,'h',[1,player.hasSkill('xincaishi_1')?4:3],'请选择要展示的牌',true).ai=function(){return Math.random()};
 					'step 2'
 					event.cards2=result.cards.slice(0);
 					target.showCards(event.cards2);
@@ -12449,7 +12486,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jigong:'急攻',
 			jigong_info:'出牌阶段开始时，你可以摸两张牌。若如此做，你本回合的手牌上限改为X（X为你此阶段造成的伤害点数之和）。',
 			shifei:'饰非',
-			shifei_info:'当你需要使用或打出【闪】时，你可以令当前回合角色摸一张牌。然后若其手牌数不为全场最多，则你弃置全场手牌数最多（或之一）角色的一张牌，视为你使用或打出了一张【闪】。',
+			shifei_info:'当你需要使用或打出【闪】时，你可以令当前回合角色摸一张牌。然后若其手牌数不为全场唯一最多，则你弃置全场手牌数最多（或之一）角色的一张牌，视为你使用或打出了一张【闪】。',
 			huaiyi:'怀异',
 			huaiyi_info:'出牌阶段限一次，你可以展示所有手牌，若这些牌的颜色不全部相同，则你选择一种颜色并弃置该颜色的所有手牌，然后你可以获得至多X名角色的各一张牌（X为你以此法弃置的手牌数）。若你以此法获得的牌不少于两张，则你失去1点体力。',
 			yaoming:'邀名',
@@ -12484,7 +12521,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qinwang:'勤王',
 			qinwang1:'勤王',
 			qinwang2:'勤王',
-			qinwang_info:'主公技，当你需要使用或打出一张【杀】时，你可以弃置一张牌，然后视为你发动了〖激将〗。若有角色响应，则该角色打出【杀】时摸一张牌。',
+			qinwang_info:'主公技，当你需要使用或打出一张【杀】时，你可以弃置一张牌，然后视为你发动了〖激将①〗。若有角色响应，则该角色打出【杀】时摸一张牌。',
 			huomo:'活墨',
 			huomo_use:'活墨',
 			//huomo_use_backup:'活墨',
@@ -12757,6 +12794,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rejingce_info:'当你于一回合内首次使用某种花色的手牌时，你的手牌上限+1。出牌阶段结束时，你可以摸X张牌（X为你本阶段内使用过的牌的类型数）。',
 			xinkuangbi:'匡弼',
 			xinkuangbi_info:'出牌阶段限一次。你可以令一名其他角色交给你至多三张牌（不计入你本回合的手牌上限）。然后其于其的下回合开始时摸等量的牌。',
+			xinzhaofu:'诏缚',
+			xinzhaofu_info:'主公技，限定技。出牌阶段，你可选择至多两名其他角色。这两名角色视为在所有其他吴势力角色的攻击范围内。',
 			
 			yijiang_2011:'一将成名2011',
 			yijiang_2012:'一将成名2012',
