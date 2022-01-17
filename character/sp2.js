@@ -1037,7 +1037,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseCard('h',get.prompt('nhyanzheng2')).set('goon',function(){
+					player.chooseCard('h',get.prompt('nhyanzheng')).set('goon',function(){
 						var num=player.countCards('h')-1;
 						return game.countPlayer(function(current){
 							return get.damageEffect(current,player,player)>0;
@@ -1920,6 +1920,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return get.effect(target,card,target,player);
 					}).set('cardType',event.cardType);
 					'step 2'
+					if(!result.bool) return;
 					var target=result.targets[0];
 					player.line(target,'green');
 					var card=get.cardPile2(function(card){

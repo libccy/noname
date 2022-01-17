@@ -51282,11 +51282,12 @@
 		type2:function(card,player){
 			return get.type(card,'trick',player);
 		},
-		subtype:function(obj){
+		subtype:function(obj,player){
 			if(typeof obj=='string') obj={name:obj};
 			if(typeof obj!='object') return;
-			if(!lib.card[obj.name]) return;
-			return lib.card[obj.name].subtype;
+			var name=get.name(obj,player);
+			if(!lib.card[name]) return;
+			return lib.card[name].subtype;
 		},
 		equiptype:function(card,player){
 			var subtype=get.subtype(card,player);

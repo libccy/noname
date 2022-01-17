@@ -623,7 +623,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.score=score;
 					game.log(player,'的演奏评级为','#y'+result.rank[0],'，获得积分点数','#y'+score,'分');
 					if(score<3){
-						if(score>2) player.draw();
+						if(score>=2) player.draw();
 						event.finish();
 						return;
 					}
@@ -1845,7 +1845,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.judge(function(card){
 							if(get.color(card)=='black') return -2;
 							return 0.1;
-						}).al2=function(result){
+						}).judge2=function(result){
 							return result.bool===false?true:false;
 						};
 					}
@@ -2095,14 +2095,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return get.effect(target,{name:'sha'},evt.source,evt.player);
 								});
 							}
-							else event.finish();
+							else{
+								event._result={bool:false};
+								event.goto(4);
+							}
 							'step 3'
 							var target2=result.targets[0];
 							player.line(target2,'green');
 							target.chooseToUse(function(card,player,event){
 								if(get.name(card)!='sha') return false;
 								return lib.filter.filterCard.apply(this,arguments);
-							},'对'+get.translation(target2)+'使用一张杀，否则本回合对'+get.translation(player)+'使用伤害牌时，需交给其两张牌才能生效').set('targetRequired',true).set('complexSelect',true).set('filterTarget',function(card,player,target){
+							},'对'+get.translation(target2)+'使用一张杀，否则交给其两张牌').set('targetRequired',true).set('complexSelect',true).set('filterTarget',function(card,player,target){
 								if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
 								return lib.filter.targetEnabled.apply(this,arguments);
 							}).set('sourcex',target2).set('addCount',false);
@@ -2113,6 +2116,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								else if(hs.length<=2) event._result={bool:true,cards:hs};
 								else target.chooseCard(2,true,'交给'+get.translation(player)+'两张牌','he');
 							}
+							else event.finish();
 							'step 5'
 							if(result.bool) player.gain(result.cards,target,'giveAuto');
 						},

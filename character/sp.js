@@ -671,7 +671,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!target.storage.oljuanxia_counter) target.storage.oljuanxia_counter={};
 						if(!target.storage.oljuanxia_counter[player.playerid]) target.storage.oljuanxia_counter[player.playerid]=0;
 						target.storage.oljuanxia_counter[player.playerid]+=result.links.length;
-						for(var i of result.links) player.useCard({name:i[2]},target,false);
+						event.links=result.links;
+					}
+					'step 4'
+					if(target.isIn()){
+						var name=event.links.shift()[2];
+						player.useCard({name:name,isCard:true},target,false);
+						if(event.links.length) event.redo();
 					}
 				},
 				subSkill:{

@@ -568,6 +568,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			_yongjian_zengyu:{
 				enable:'phaseUse',
+				forceLoad:true,
 				filter:function(event,player){
 					return player.hasCard((card)=>lib.skill._yongjian_zengyu.filterCard(card),'h');
 				},
