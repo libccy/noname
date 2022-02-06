@@ -4,6 +4,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'yingbian',
 		connect:true,
 		character:{
+			xuangongzhu:['female','jin',3,['gaoling','qimei','ybzhuiji'],['hiddenSkill']],
+			xinchang:['male','jin',3,['canmou','congjian']],
 			yangzhi:['female','jin',3,['wanyi','maihuo']],
 			yangyan:['female','jin',3,['xuanbei','xianwan']],
 			ol_huaxin:['male','wei',3,['caozhao','olxibing']],
@@ -27,12 +29,218 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yingbian:{
 				yingbian_pack1:['jin_simayi','jin_zhangchunhua','ol_lisu','simazhou','cheliji','ol_huaxin'],
 				yingbian_pack2:['jin_simashi','jin_xiahouhui','zhanghuyuechen','shibao','jin_yanghuiyu'],
-				yingbian_pack3:['jin_simazhao','jin_wangyuanji','duyu','weiguan'],
-				yingbian_pack4:['zhongyan'],
+				yingbian_pack3:['jin_simazhao','jin_wangyuanji','duyu','weiguan','xuangongzhu'],
+				yingbian_pack4:['zhongyan','xinchang'],
 				yingbian_pack5:['yangyan','yangzhi'],
 			},
 		},
 		skill:{
+			gaoling:{
+				audio:2,
+				trigger:{player:'showCharacterAfter'},
+				hiddenSkill:true,
+				filter:function(event,player){
+					return event.toShow.contains('xuangongzhu')&&player!=_status.currentPhase&&game.hasPlayer(function(current){
+						return current.isDamaged();
+					});
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('gaoling'),'令一名角色回复1点体力',function(card,player,target){
+						return target.isDamaged();
+					}).set('ai',function(target){
+						var player=_status.event.player;
+						return get.recoverEffect(target,player,player);
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('gaoling',target);
+						target.recover();
+					}
+				},
+			},
+			qimei:{
+				audio:2,
+				trigger:{player:'phaseZhunbeiBegin'},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('qimei'),'选择一名其他角色并获得“齐眉”效果',lib.filter.notMe).set('',function(target){
+						var player=_status.event.player;
+						return get.attitude(player,target)/(Math.abs(player.countCards('h')+2-target.countCards('h'))+1)
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('qimei',target);
+						player.storage.qimei_draw=target;
+						player.addTempSkill('qimei_draw',{player:'phaseBegin'});
+						game.delayx();
+					}
+				},
+				subSkill:{
+					draw:{
+						audio:'qimei',
+						charlotte:true,
+						forced:true,
+						trigger:{global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','loseAfter','gainAfter']},
+						logTarget:function(event,player){
+							return player.storage.qimei_draw;
+						},
+						usable:1,
+						filter:function(event,player){
+							var target=player.storage.qimei_draw;
+							if(!target||!target.isIn()) return false;
+							if(event.name!='gain'||(event.player!=player&&event.player!=target)){
+							var evt1=event.getl(player);
+								if(!evt1||!evt1.hs||!evt1.hs.length){
+									var evt2=event.getl(target);
+									if(!evt2||!evt2.hs||!evt2.hs.length) return false;
+								}
+							}
+							return player.countCards('h')==target.countCards('h');
+						},
+						content:function(){
+							if(trigger.delay===false) game.delayx();
+							player.storage.qimei_draw.draw();
+						},
+						group:'qimei_hp',
+						onremove:true,
+						mark:'character',
+						intro:{content:'已和$组成齐眉组合'},
+					},
+					hp:{
+						audio:'qimei',
+						trigger:{global:'changeHp'},
+						charlotte:true,
+						forced:true,
+						logTarget:function(event,player){
+							return player.storage.qimei_draw;
+						},
+						usable:1,
+						filter:function(event,player){
+							var target=player.storage.qimei_draw;
+							if(!target||!target.isIn()) return false;
+							if(player!=event.player&&target!=event.player) return false;
+							return player.hp==target.hp;
+						},
+						content:function(){
+							game.delayx();
+							player.storage.qimei_draw.draw();
+						},
+					},
+				},
+			},
+			ybzhuiji:{
+				audio:2,
+				trigger:{player:'phaseUseBegin'},
+				direct:true,
+				content:function(){
+					'step 0'
+					var list=['摸两张牌，并于出牌阶段结束时失去1点体力'];
+					if(player.isDamaged()) list.push('回复1点体力，并于出牌阶段结束时弃置两张牌');
+					player.chooseControl('cancel2').set('choiceList',list).set('prompt',get.prompt('ybzhuiji')).set('ai',function(){
+						var player=_status.event.player;
+						if(player.isDamaged()&&player.countCards('h','tao')<player.getDamagedHp()) return 1;
+						return 'cancel2';
+					});
+					'step 1'
+					if(result.control!='cancel2'){
+						if(result.index==0) player.draw(2);
+						else player.recover();
+						player.addTempSkill('ybzhuiji_'+result.index,'phaseUseAfter');
+					}
+				},
+				subSkill:{
+					0:{
+						trigger:{player:'phaseUseEnd'},
+						forced:true,
+						charlotte:true,
+						content:function(){
+							player.loseHp();
+						},
+					},
+					1:{
+						trigger:{player:'phaseUseEnd'},
+						forced:true,
+						charlotte:true,
+						content:function(){
+							player.chooseToDiscard('he',2,true);
+						},
+					},
+				},
+			},
+			canmou:{
+				audio:2,
+				trigger:{global:'useCardToPlayer'},
+				direct:true,
+				filter:function(event,player){
+					if(!event.player.isMaxHandcard(true)||!event.isFirstTarget||get.type(event.card,null,false)!='trick') return false;
+					var info=get.info(event.card);
+					if(info.allowMultiple==false) return false;
+					if(event.targets&&!info.multitarget){
+						if(game.hasPlayer(function(current){
+							return !event.targets.contains(current)&&lib.filter.targetEnabled2(event.card,event.player,current);//&&lib.filter.targetInRange(event.card,event.player,current);
+						})){
+							return true;
+						}
+					}
+					return false;
+				},
+				content:function(){
+					'step 0'
+					var prompt2='为'+get.translation(trigger.card)+'增加一个目标'
+					player.chooseTarget(get.prompt('canmou'),function(card,player,target){
+						var player=_status.event.source;
+						return !_status.event.targets.contains(target)&&lib.filter.targetEnabled2(_status.event.card,player,target);//&&lib.filter.targetInRange(_status.event.card,player,target);
+					}).set('prompt2',prompt2).set('ai',function(target){
+						var trigger=_status.event.getTrigger();
+						var player=_status.event.source;
+						return get.effect(target,trigger.card,player,_status.event.player);
+					}).set('targets',trigger.targets).set('card',trigger.card).set('source',trigger.player);
+					'step 1'
+					if(result.bool){
+						if(!event.isMine()&&!event.isOnline()) game.delayx();
+						event.targets=result.targets;
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					if(event.targets){
+						player.logSkill('canmou',event.targets);
+						trigger.targets.addArray(event.targets);
+						game.log(event.targets,'也成为了',trigger.card,'的目标');
+					}
+				},
+			},
+			congjian:{
+				audio:2,
+				trigger:{global:'useCardToTarget'},
+				logTarget:'target',
+				filter:function(event,player){
+					return event.target!=player&&event.targets.length==1&&get.type(event.card,null,false)=='trick'
+					&&event.target.isMaxHp(true)&&lib.filter.targetEnabled2(event.card,event.player,player);
+				},
+				check:function(event,player){
+					return get.effect(player,event.card,event.player,player)>0;
+				},
+				content:function(){
+					trigger.targets.push(player);
+					game.log(player,'也成为了',trigger.card,'的目标');
+					var next=game.createEvent('congjian_draw',false);
+					next.player=player;
+					event.next.remove(next);
+					trigger.getParent().after.push(next);
+					next.setContent(function(){
+						if(player.hasHistory('damage',function(evt){
+							return evt.card==event.parent.card;
+						})) player.draw(2);
+					});
+				},
+			},
 			wanyi:{
 				audio:2,
 				enable:'phaseUse',
@@ -612,7 +820,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				hiddenSkill:true,
 				filter:function(event,player){
 					var target=_status.currentPhase;
-					return target&&target!=player&&target.countGainableCards(player,'he')>0;
+					return event.toShow.contains('jin_simayi')&&target&&target!=player&&target.countGainableCards(player,'he')>0;
 				},
 				direct:true,
 				content:function(){
@@ -2543,6 +2751,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhongyan:' 钟琰 (？—？年）颍川人，王浑之妻。生卒年不详，约魏末晋初间前后在世。王浑的妻子钟琰，是颍川人，为魏太傅钟繇的曾孙女，父亲钟徽，为黄门郎。她平时广泛阅读各种书籍，因此几岁的时候就能撰写文章。她聪慧弘雅，善于啸咏，她的礼仪法度，为中表所推崇，她写有文集五卷。',
 			yangyan:'杨艳（238年－274年8月25日），字琼芝，弘农郡华阴县（今陕西省华阴市）人，晋武帝司马炎第一任皇后，曹魏通事郎杨炳之女。自幼父母双亡，为舅舅赵俊所养，跟随继母段氏生活。聪明贤慧，善于书法，天生丽质，娴熟女红，嫁给了世子司马炎。泰始元年（265年），晋武帝即位，建立西晋。泰始二年（266年），杨艳受册为皇后，深得晋武帝宠幸，生下三子三女，包括晋惠帝司马衷。泰始十年（274年），去世，时年三十七，陪葬于峻阳陵，谥号武元皇后。',
 			yangzhi:'杨芷（259年－292年3月6日），字季兰，小字男胤，弘农郡华阴县（今陕西省华阴市）人，晋武帝司马炎第二任皇后，东汉太尉杨震幼子杨奉后裔，东汉末年东莱太守、蓩亭侯杨众曾孙女，西晋太傅杨骏与嫡妻庞氏之女，武元皇后杨艳堂妹。咸宁二年（276年），立为皇后，史称“婉嫕有妇德， 美映椒房”，得宠于晋武帝。生渤海殇王，早薨，之后再无生育。其父杨骏擅权引起皇后贾南风忌恨，贾南风联络汝南王司马亮、楚王司马玮发动政变，杀死杨骏，并唆使大臣上书状告杨芷谋反，让晋惠帝司马衷将其贬为庶人，押到金墉城居住。元康二年（292年），杨芷冻饿而死，谥号武悼皇后。',
+			xinchang:'辛敞（生卒年不详），字泰雍，陇西人氏，是曹魏时代官员。卫尉辛毗之子，辛宪英之弟。',
+			xuangongzhu:'高陵宣公主（？—？）司马氏，晋宣帝司马懿第二女。司马氏下嫁杜预。其兄弟司马炎登基时，司马氏已经去世。泰始年间（265年—274年）追赠高陵公主。',
 		},
 		characterTitle:{},
 		perfectPair:{},
@@ -2704,6 +2914,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wanyi_info:'每回合每项限一次。出牌阶段，你可以将一张具有应变效果的牌当做【逐近弃远】/【出其不意】/【水淹七军】/【洞烛先机】使用。',
 			maihuo:'埋祸',
 			maihuo_info:'①当你成为其他角色使用【杀】的目标后，若此【杀】不为转化牌且有对应的实体牌且其武将牌上没有“祸”且你是此牌的唯一目标，则你可以令此牌对你无效，并将此【杀】置于其武将牌上，称为“祸”。②一名其他角色的出牌阶段开始时，若其武将牌上有“祸”，则其对你使用此“祸”（有距离限制且计入次数限制）。③当你对有“祸”的其他角色造成伤害后，你移去其“祸”。',
+			xinchang:'辛敞',
+			canmou:'参谋',
+			canmou_info:'一名角色使用普通锦囊牌指定第一个目标时，若其手牌数为全场唯一最多，则你可以为此牌增加一个额外目标。',
+			congjian:'从鉴',
+			congjian_info:'一名其他角色成为普通锦囊牌的唯一目标时，若其体力值为全场唯一最多，则你也可以成为此牌的目标。此牌结算结束后，若你受到过渠道为此牌的伤害，则你摸两张牌。',
+			xuangongzhu:'宣公主',
+			gaoling:'高陵',
+			gaoling_info:'隐匿技。当你于回合外明置此武将牌时，你可以令一名角色回复1点体力。',
+			qimei:'齐眉',
+			qimei_info:'准备阶段，你可以选择一名其他角色。你获得如下效果直到下回合开始：①每回合限一次，当你或其获得牌/失去手牌后，若你与其手牌数相等，则其摸一张牌。②每回合限一次，当你或其的体力值变化后，若你与其体力值相等，则其摸一张牌。',
+			ybzhuiji:'追姬',
+			ybzhuiji_info:'出牌阶段开始时，你可选择一项：①摸两张牌，并于出牌阶段结束时失去1点体力；②回复1点体力，并于出牌阶段结束时弃置两张牌。',
 
 			yingbian_pack1:'文德武备·理',
 			yingbian_pack2:'文德武备·备',

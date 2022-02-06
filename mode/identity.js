@@ -2474,7 +2474,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					this.ai.shown=1;
 					this.setIdentity();
 					if(this.special_identity){
-						this.node.identity.firstChild.innerHTML=get.translation(game.players[i].special_identity+'_bg');
+						this.node.identity.firstChild.innerHTML=get.translation(this.special_identity+'_bg');
 					}
 					if(this.identity=='zhu'){
 						this.isZhu=true;

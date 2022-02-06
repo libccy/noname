@@ -83,7 +83,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			daqiao:['xiaoqiao'],
 			zhouyu:['huanggai','xiaoqiao','zhouyi'],
 			sunquan:['zhoutai'],
-			lvbu:['diaochan'],
+			lvbu:['diaochan','lvlingqi'],
 			machao:['madai','mayunlu'],
 			zhangliao:['zangba'],
 			ganning:['lingtong','xf_sufei'],

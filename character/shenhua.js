@@ -7407,7 +7407,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jiaxu:['re_jiaxu','jiaxu','ns_jiaxu'],
 			dongzhuo:['ol_dongzhuo','sp_dongzhuo','re_dongzhuo','dongzhuo'],
 			dengai:['re_dengai','ol_dengai','dengai'],
-			sp_zhanghe:['sp_zhanghe','yj_zhanghe'],
+			sp_ol_zhanghe:['sp_ol_zhanghe','yj_zhanghe','sp_zhanghe'],
 			jiangwei:['ol_jiangwei','re_jiangwei','jiangwei'],
 			liushan:['ol_liushan','re_liushan','liushan'],
 			sunce:['re_sunben','re_sunce','sunce'],
@@ -7610,7 +7610,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dengai:'邓艾',
 			sunce:'孙策',
 			zhangzhang:'张昭张紘',
-			caiwenji:'蔡文姬',
+			caiwenji:'蔡琰',
 			zuoci:'左慈',
 
 			zhurong:'祝融',

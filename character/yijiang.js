@@ -10169,7 +10169,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					var card=result[0];
 					if(get.type(card)=='equip'){
-						if(!event.target.isDisabled(get.subtype(card))){
+						if(target.getCards('h').contains(card)&&target.hasUseTarget(card)){
 							event.target.chooseUseTarget(card,true,'nopopup');
 							game.delay();
 						}
@@ -12192,7 +12192,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guohuai:['guohuai','re_guohuai','xin_guohuai','ol_guohuai'],
 			jianyong:['re_jianyong','xin_jianyong','jianyong'],
 			panzhangmazhong:['xin_panzhangmazhong','re_panzhangmazhong','panzhangmazhong'],
-			yufan:['re_yufan','yufan'],
+			yufan:['xin_yufan','re_yufan','yufan'],
 			zhuran:['re_zhuran','xin_zhuran','zhuran','old_zhuran'],
 			liru:['re_liru','xin_liru','liru'],
 			fuhuanghou:['re_fuhuanghou','xin_fuhuanghou','fuhuanghou','old_fuhuanghou'],
